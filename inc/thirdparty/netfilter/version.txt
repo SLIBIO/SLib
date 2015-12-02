@@ -1,0 +1,2 @@
+libnetfilter_queue 1.0.2
+libnfnetlink 1.0.1

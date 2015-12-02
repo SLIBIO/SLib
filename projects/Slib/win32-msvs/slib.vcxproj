@@ -1,0 +1,680 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\inc\slib\audio.h" />
+    <ClInclude Include="..\..\..\inc\slib\audio\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\audio\dsound.h" />
+    <ClInclude Include="..\..\..\inc\slib\audio\format.h" />
+    <ClInclude Include="..\..\..\inc\slib\audio\object.h" />
+    <ClInclude Include="..\..\..\inc\slib\audio\opensl_es.h" />
+    <ClInclude Include="..\..\..\inc\slib\codec.h" />
+    <ClInclude Include="..\..\..\inc\slib\codec\audio_codec_opus.h" />
+    <ClInclude Include="..\..\..\inc\slib\codec\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\codec\object.h" />
+    <ClInclude Include="..\..\..\inc\slib\codec\video_codec_vpx.h" />
+    <ClInclude Include="..\..\..\inc\slib\core.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\algorithm.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\app.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\array.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\array2d.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\async.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\base.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\base64.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\callback.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\content_type.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\endian.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\event.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\expire.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\file.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\hashtable.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\io.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\iterator.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\java.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\json.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\list.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\log.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\map.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\math.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\memory.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\mio.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\mutex.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\object.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\option.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\pipe.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\platform_android.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\platform_apple.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\platform_windows.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\pointer.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\queue.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\queue_channel.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\reference.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\resource.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\scoped_pointer.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\service.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\setting.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\spinlock.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\string.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\system.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\thread.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\thread_pool.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\time.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\tree.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\variant.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\win32_com.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\aes.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\block_cipher.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\gcm.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\hash.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\md5.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\rsa.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\secure_stream.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\sha1.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\sha2.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\zlib.h" />
+    <ClInclude Include="..\..\..\inc\slib\db.h" />
+    <ClInclude Include="..\..\..\inc\slib\db\db.h" />
+    <ClInclude Include="..\..\..\inc\slib\db\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\db\sqlite.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics\bitmap.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics\brush.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics\canvas.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics\color.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics\config.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics\constants.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics\context.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics\drawable.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics\font.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics\freetype.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics\image.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics\path.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics\pen.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics\util.h" />
+    <ClInclude Include="..\..\..\inc\slib\math.h" />
+    <ClInclude Include="..\..\..\inc\slib\math\bezier.h" />
+    <ClInclude Include="..\..\..\inc\slib\math\bigint.h" />
+    <ClInclude Include="..\..\..\inc\slib\math\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\math\geograph.h" />
+    <ClInclude Include="..\..\..\inc\slib\math\geometry.h" />
+    <ClInclude Include="..\..\..\inc\slib\math\geometry2d.h" />
+    <ClInclude Include="..\..\..\inc\slib\math\geometry3d.h" />
+    <ClInclude Include="..\..\..\inc\slib\math\int128.h" />
+    <ClInclude Include="..\..\..\inc\slib\math\matrix.h" />
+    <ClInclude Include="..\..\..\inc\slib\math\vector.h" />
+    <ClInclude Include="..\..\..\inc\slib\mobile.h" />
+    <ClInclude Include="..\..\..\inc\slib\mobile\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\mobile\sensor.h" />
+    <ClInclude Include="..\..\..\inc\slib\mobile\vibrator.h" />
+    <ClInclude Include="..\..\..\inc\slib\network.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\address.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\arp.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\async.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\capture.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\constants.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\dbip.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\dns.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\ethernet.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\event.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\http.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\http_client.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\http_common.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\http_proxy.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\http_service.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\icmp.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\io.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\nat.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\netfilter.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\secure_stream.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\socket.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\tcpip.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\url.h" />
+    <ClInclude Include="..\..\..\inc\slib\p2p.h" />
+    <ClInclude Include="..\..\..\inc\slib\p2p\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\p2p\hns_client.h" />
+    <ClInclude Include="..\..\..\inc\slib\p2p\hns_service.h" />
+    <ClInclude Include="..\..\..\inc\slib\p2p\switch.h" />
+    <ClInclude Include="..\..\..\inc\slib\render.h" />
+    <ClInclude Include="..\..\..\inc\slib\render\base.h" />
+    <ClInclude Include="..\..\..\inc\slib\render\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\render\engine.h" />
+    <ClInclude Include="..\..\..\inc\slib\render\index_buffer.h" />
+    <ClInclude Include="..\..\..\inc\slib\render\object.h" />
+    <ClInclude Include="..\..\..\inc\slib\render\object2d.h" />
+    <ClInclude Include="..\..\..\inc\slib\render\opengl.h" />
+    <ClInclude Include="..\..\..\inc\slib\render\opengl_entries.h" />
+    <ClInclude Include="..\..\..\inc\slib\render\program.h" />
+    <ClInclude Include="..\..\..\inc\slib\render\texture.h" />
+    <ClInclude Include="..\..\..\inc\slib\render\vertex_buffer.h" />
+    <ClInclude Include="..\..\..\inc\slib\slib.h" />
+    <ClInclude Include="..\..\..\inc\slib\streamer.h" />
+    <ClInclude Include="..\..\..\inc\slib\streamer\audio.h" />
+    <ClInclude Include="..\..\..\inc\slib\streamer\codec.h" />
+    <ClInclude Include="..\..\..\inc\slib\streamer\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\streamer\filters.h" />
+    <ClInclude Include="..\..\..\inc\slib\streamer\graph.h" />
+    <ClInclude Include="..\..\..\inc\slib\streamer\network.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\button.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\check_box.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\constants.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\core.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\cursor.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\drop_down_list.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\edit_view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\event.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\generic_view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\image_view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\label_view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\list_details_view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\platform.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\radio_button.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\render_view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\screen.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\scroll_view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\s_button.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\s_check_box.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\s_image_view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\s_label_view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\s_radio_button.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\s_tab_view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\s_view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\tab_view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\view_group.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\web_view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\window.h" />
+    <ClInclude Include="..\..\..\src\slib\core\async_config.h" />
+    <ClInclude Include="..\..\..\src\slib\graphics\graphics_image_soil2.h" />
+    <ClInclude Include="..\..\..\src\slib\network\network_async_config.h" />
+    <ClInclude Include="..\..\..\src\slib\render\render_opengl_egl.h" />
+    <ClInclude Include="..\..\..\src\slib\render\render_opengl_gl.h" />
+    <ClInclude Include="..\..\..\src\slib\render\render_opengl_gles.h" />
+    <ClInclude Include="..\..\..\src\slib\render\render_opengl_impl.h" />
+    <ClInclude Include="..\..\..\src\slib\ui\ui_view_win32.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\slib\audio\audio_format.cpp" />
+    <ClCompile Include="..\..\..\src\slib\audio\audio_object.cpp" />
+    <ClCompile Include="..\..\..\src\slib\audio\audio_dsound.cpp" />
+    <ClCompile Include="..\..\..\src\slib\audio\audio_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\codec\codec_opus.cpp" />
+    <ClCompile Include="..\..\..\src\slib\codec\codec_vpx.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\algorithm.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\app.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\async.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\async_iocp.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\async_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\base.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\base64.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\callback.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\content_type.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\event.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\event_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\file.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\file_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\io.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\json.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\log.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\math.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\memory.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\mutex.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\pipe.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\pipe_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\java.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\platform_windows.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\pointer.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\reference.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\resource.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\service.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\setting.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\spinlock.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\string.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\string_conv.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\system.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\system_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\thread.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\thread_pool.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\thread_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\time.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\variant.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\win32_com.cpp" />
+    <ClCompile Include="..\..\..\src\slib\crypto\crypto_aes.cpp" />
+    <ClCompile Include="..\..\..\src\slib\crypto\crypto_gcm.cpp" />
+    <ClCompile Include="..\..\..\src\slib\crypto\crypto_hash.cpp" />
+    <ClCompile Include="..\..\..\src\slib\crypto\crypto_md5.cpp" />
+    <ClCompile Include="..\..\..\src\slib\crypto\crypto_rsa.cpp" />
+    <ClCompile Include="..\..\..\src\slib\crypto\crypto_sha1.cpp" />
+    <ClCompile Include="..\..\..\src\slib\crypto\crypto_sha2.cpp" />
+    <ClCompile Include="..\..\..\src\slib\crypto\crypto_secure_stream.cpp" />
+    <ClCompile Include="..\..\..\src\slib\crypto\crypto_zlib.cpp" />
+    <ClCompile Include="..\..\..\src\slib\db\db_sqlite3.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_bitmap.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_brush.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_canvas.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_color.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_context.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_drawable.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_font.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_freetype.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_image.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_image_jpeg.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_image_png.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_image_soil2.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_path.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_pen.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_util.cpp" />
+    <ClCompile Include="..\..\..\src\slib\math\math_bigint.cpp" />
+    <ClCompile Include="..\..\..\src\slib\math\math_geograph.cpp" />
+    <ClCompile Include="..\..\..\src\slib\math\math_int128.cpp" />
+    <ClCompile Include="..\..\..\src\slib\mobile\mobile_sensor.cpp" />
+    <ClCompile Include="..\..\..\src\slib\mobile\mobile_vibrator.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_address.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_async.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_async_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_capture.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_capture_pcap.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_dns.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_ethernet.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_event.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_event_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_http_client.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_http_common.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_http_proxy.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_http_service.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_icmp.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_io.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_nat.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_netfilter.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_secure_stream.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_socket.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_tcpip.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\network_url.cpp" />
+    <ClCompile Include="..\..\..\src\slib\p2p\p2p_hns_client.cpp" />
+    <ClCompile Include="..\..\..\src\slib\p2p\p2p_hns_service.cpp" />
+    <ClCompile Include="..\..\..\src\slib\p2p\p2p_switch.cpp" />
+    <ClCompile Include="..\..\..\src\slib\render\render_base.cpp" />
+    <ClCompile Include="..\..\..\src\slib\render\render_engine.cpp" />
+    <ClCompile Include="..\..\..\src\slib\render\render_index_buffer.cpp" />
+    <ClCompile Include="..\..\..\src\slib\render\render_object.cpp" />
+    <ClCompile Include="..\..\..\src\slib\render\render_object2d.cpp" />
+    <ClCompile Include="..\..\..\src\slib\render\render_opengl_egl.cpp" />
+    <ClCompile Include="..\..\..\src\slib\render\render_opengl_gl.cpp" />
+    <ClCompile Include="..\..\..\src\slib\render\render_opengl_gles.cpp" />
+    <ClCompile Include="..\..\..\src\slib\render\render_opengl_wgl.cpp" />
+    <ClCompile Include="..\..\..\src\slib\render\render_program.cpp" />
+    <ClCompile Include="..\..\..\src\slib\render\render_texture.cpp" />
+    <ClCompile Include="..\..\..\src\slib\render\render_vertex_buffer.cpp" />
+    <ClCompile Include="..\..\..\src\slib\streamer\streamer_audio.cpp" />
+    <ClCompile Include="..\..\..\src\slib\streamer\streamer_codec.cpp" />
+    <ClCompile Include="..\..\..\src\slib\streamer\streamer_filters.cpp" />
+    <ClCompile Include="..\..\..\src\slib\streamer\streamer_graph.cpp" />
+    <ClCompile Include="..\..\..\src\slib\streamer\streamer_network.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_button.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_button_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_check_box.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_check_box_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_drop_down_list.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_drop_down_list_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_edit_view.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_edit_view_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_label_view.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_label_view_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_list_details_view.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_list_details_view_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_radio_button.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_radio_button_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_render_view.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_render_view_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_scroll_view.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_scroll_view_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_tab_view.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_tab_view_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_web_view.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uic_web_view_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uis_button.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uis_check_box.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uis_image_view.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uis_label_view.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uis_radio_button.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uis_tab_view.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\uis_view.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_core.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_core_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_cursor.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_cursor_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_event.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_event_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_generic_view.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_graphics_canvas_gdiplus.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_graphics_context.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_graphics_drawable_gdiplus.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_graphics_font_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_graphics_path_gdiplus.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_view.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_view_group.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_view_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_window.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_window_win32.cpp" />
+    <ClCompile Include="..\..\..\src\thirdparty\thirdparty_freetype.c">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MaxSpeed</Optimization>
+      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</IntrinsicFunctions>
+      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IntrinsicFunctions>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ProgramDatabase</DebugInformationFormat>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\thirdparty\thirdparty_libjpeg.c">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MaxSpeed</Optimization>
+      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</IntrinsicFunctions>
+      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IntrinsicFunctions>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ProgramDatabase</DebugInformationFormat>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\thirdparty\thirdparty_libopus.c">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MaxSpeed</Optimization>
+      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</IntrinsicFunctions>
+      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IntrinsicFunctions>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ProgramDatabase</DebugInformationFormat>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\thirdparty\thirdparty_libpng.c">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MaxSpeed</Optimization>
+      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</IntrinsicFunctions>
+      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IntrinsicFunctions>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ProgramDatabase</DebugInformationFormat>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\thirdparty\thirdparty_libvpx.c">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\thirdparty\thirdparty_libvpx_dec.c">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\thirdparty\thirdparty_libvpx_enc.c">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\thirdparty\thirdparty_soil2.c" />
+    <ClCompile Include="..\..\..\src\thirdparty\thirdparty_sqlite3.c">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MaxSpeed</Optimization>
+      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</IntrinsicFunctions>
+      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IntrinsicFunctions>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ProgramDatabase</DebugInformationFormat>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\thirdparty\thirdparty_zlib.c">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MaxSpeed</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MaxSpeed</Optimization>
+      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</IntrinsicFunctions>
+      <IntrinsicFunctions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</IntrinsicFunctions>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ProgramDatabase</DebugInformationFormat>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
+      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
+      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+    </ClCompile>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{9F3CDC01-7C8E-4C06-82F8-6EF4C068F4B3}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>slib</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140_xp</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>..\..\..\bin\slib\win32\x86_debug\</OutDir>
+    <IntDir>Build\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\..\..\bin\slib\win32\x86_release\</OutDir>
+    <IntDir>Build\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>..\..\..\bin\slib\win32\x64_debug\</OutDir>
+    <IntDir>Build\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IntDir>Build\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>..\..\..\bin\slib\win32\x64_release\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PreBuildEvent>
+      <Command>xcopy /Y ..\..\..\thirdparty\libvpx\vpx1.4\platforms\x86_win\vc12\*.lib $(OutDir)
+
+xcopy /Y ..\..\..\inc\thirdparty\winpcap\Lib\wpcap.lib $(OutDir)</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PreBuildEvent>
+      <Command>xcopy /Y ..\..\..\thirdparty\libvpx\vpx1.4\platforms\x64_win\vc12\*.lib $(OutDir)
+
+xcopy /Y ..\..\..\inc\thirdparty\winpcap\Lib\x64\wpcap.lib $(OutDir)</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <PreBuildEvent>
+      <Command>xcopy /Y ..\..\..\thirdparty\libvpx\vpx1.4\platforms\x86_win\vc12\*.lib $(OutDir)
+
+xcopy /Y ..\..\..\inc\thirdparty\winpcap\Lib\wpcap.lib $(OutDir)</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <PreBuildEvent>
+      <Command>xcopy /Y ..\..\..\thirdparty\libvpx\vpx1.4\platforms\x64_win\vc12\*.lib $(OutDir)
+
+xcopy /Y ..\..\..\inc\thirdparty\winpcap\Lib\x64\wpcap.lib $(OutDir)</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
