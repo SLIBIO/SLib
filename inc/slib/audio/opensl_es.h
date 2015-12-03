@@ -1,20 +1,20 @@
-#ifndef CHECKHEADER_SLIB_AUDIO_OPENSLES
-#define CHECKHEADER_SLIB_AUDIO_OPENSLES
+#ifndef CHECKHEADER_SLIB_AUDIO_OPENSL_ES
+#define CHECKHEADER_SLIB_AUDIO_OPENSL_ES
 
 #include "definition.h"
-#include "object.h"
+#include "player.h"
+#include "recorder.h"
+
+#if defined(SLIB_PLATFORM_IS_ANDROID)
+#define SLIB_AUDIO_SUPPORT_OPENSL_ES
+#endif
 
 SLIB_AUDIO_NAMESPACE_BEGIN
-class SLIB_EXPORT OpenSLES_AudioPlayer
+class SLIB_EXPORT OpenSL_ES
 {
 public:
-	static Ref<AudioPlayer> create(const AudioPlayerParam& param);
-};
-
-class SLIB_EXPORT OpenSLES_AudioRecorder
-{
-public:
-	static Ref<AudioRecorder> create(const AudioRecorderParam& param);
+	static Ref<AudioPlayer> createPlayer(const AudioPlayerParam& param);
+	static Ref<AudioRecorder> createRecorder(const AudioRecorderParam& param);
 };
 SLIB_AUDIO_NAMESPACE_END
 

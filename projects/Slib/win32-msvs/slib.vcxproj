@@ -23,13 +23,19 @@
     <ClInclude Include="..\..\..\inc\slib\audio\definition.h" />
     <ClInclude Include="..\..\..\inc\slib\audio\dsound.h" />
     <ClInclude Include="..\..\..\inc\slib\audio\format.h" />
-    <ClInclude Include="..\..\..\inc\slib\audio\object.h" />
     <ClInclude Include="..\..\..\inc\slib\audio\opensl_es.h" />
+    <ClInclude Include="..\..\..\inc\slib\audio\player.h" />
+    <ClInclude Include="..\..\..\inc\slib\audio\recorder.h" />
+    <ClInclude Include="..\..\..\inc\slib\capture.h" />
+    <ClInclude Include="..\..\..\inc\slib\capture\camera.h" />
+    <ClInclude Include="..\..\..\inc\slib\capture\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\capture\video.h" />
     <ClInclude Include="..\..\..\inc\slib\codec.h" />
-    <ClInclude Include="..\..\..\inc\slib\codec\audio_codec_opus.h" />
+    <ClInclude Include="..\..\..\inc\slib\codec\audio.h" />
+    <ClInclude Include="..\..\..\inc\slib\codec\audio_opus.h" />
     <ClInclude Include="..\..\..\inc\slib\codec\definition.h" />
-    <ClInclude Include="..\..\..\inc\slib\codec\object.h" />
-    <ClInclude Include="..\..\..\inc\slib\codec\video_codec_vpx.h" />
+    <ClInclude Include="..\..\..\inc\slib\codec\video.h" />
+    <ClInclude Include="..\..\..\inc\slib\codec\video_vpx.h" />
     <ClInclude Include="..\..\..\inc\slib\core.h" />
     <ClInclude Include="..\..\..\inc\slib\core\algorithm.h" />
     <ClInclude Include="..\..\..\inc\slib\core\app.h" />
@@ -178,6 +184,7 @@
     <ClInclude Include="..\..\..\inc\slib\streamer\network.h" />
     <ClInclude Include="..\..\..\inc\slib\ui.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\button.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\camera_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\check_box.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\constants.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\core.h" />
@@ -196,6 +203,7 @@
     <ClInclude Include="..\..\..\inc\slib\ui\screen.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\scroll_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\s_button.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\s_camera_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\s_check_box.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\s_image_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\s_label_view.h" />
@@ -218,11 +226,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\audio\audio_format.cpp" />
-    <ClCompile Include="..\..\..\src\slib\audio\audio_object.cpp" />
-    <ClCompile Include="..\..\..\src\slib\audio\audio_dsound.cpp" />
-    <ClCompile Include="..\..\..\src\slib\audio\audio_win32.cpp" />
-    <ClCompile Include="..\..\..\src\slib\codec\codec_opus.cpp" />
-    <ClCompile Include="..\..\..\src\slib\codec\codec_vpx.cpp" />
+    <ClCompile Include="..\..\..\src\slib\audio\audio_player.cpp" />
+    <ClCompile Include="..\..\..\src\slib\audio\audio_player_dsound.cpp" />
+    <ClCompile Include="..\..\..\src\slib\audio\audio_player_opensl_es.cpp" />
+    <ClCompile Include="..\..\..\src\slib\audio\audio_player_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\audio\audio_recorder.cpp" />
+    <ClCompile Include="..\..\..\src\slib\audio\audio_recorder_dsound.cpp" />
+    <ClCompile Include="..\..\..\src\slib\audio\audio_recorder_opensl_es.cpp" />
+    <ClCompile Include="..\..\..\src\slib\audio\audio_recorder_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\capture\capture_camera.cpp" />
+    <ClCompile Include="..\..\..\src\slib\capture\capture_video.cpp" />
+    <ClCompile Include="..\..\..\src\slib\codec\codec_audio.cpp" />
+    <ClCompile Include="..\..\..\src\slib\codec\codec_audio_opus.cpp" />
+    <ClCompile Include="..\..\..\src\slib\codec\codec_video.cpp" />
+    <ClCompile Include="..\..\..\src\slib\codec\codec_video_vpx.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\algorithm.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\app.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\async.cpp" />

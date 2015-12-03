@@ -3,7 +3,7 @@
 #define CHECKHEADER_SLIB_CODEC_OPUS
 
 #include "definition.h"
-#include "object.h"
+#include "audio.h"
 
 SLIB_CODEC_NAMESPACE_BEGIN
 

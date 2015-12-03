@@ -1,9 +1,8 @@
-
-#ifndef CHECKHEADER_SLIB_CODEC_LIBVPX
-#define CHECKHEADER_SLIB_CODEC_LIBVPX
+#ifndef CHECKHEADER_SLIB_CODEC_VIDEO_VPX
+#define CHECKHEADER_SLIB_CODEC_VIDEO_VPX
 
 #include "definition.h"
-#include "object.h"
+#include "video.h"
 
 SLIB_CODEC_NAMESPACE_BEGIN
 

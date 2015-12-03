@@ -4,7 +4,7 @@
 #include "definition.h"
 
 #include "graph.h"
-#include "../codec/audio_codec_opus.h"
+#include "../codec/audio_opus.h"
 
 SLIB_STREAMER_NAMESPACE_BEGIN
 

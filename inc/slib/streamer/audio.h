@@ -4,7 +4,8 @@
 #include "definition.h"
 
 #include "graph.h"
-#include "../audio/object.h"
+#include "../audio/player.h"
+#include "../audio/recorder.h"
 
 SLIB_STREAMER_NAMESPACE_BEGIN
 

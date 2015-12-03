@@ -2,21 +2,18 @@
 #define CHECKHEADER_SLIB_AUDIO_DSOUND
 
 #include "definition.h"
-#include "object.h"
+#include "player.h"
+#include "recorder.h"
 
 SLIB_AUDIO_NAMESPACE_BEGIN
-class SLIB_EXPORT DirectSound_AudioPlayer
+class SLIB_EXPORT DirectSound
 {
 public:
-	static Ref<AudioPlayer> create(const AudioPlayerParam& param);
-	static List<AudioDeviceInfo> getDevicesList();
-};
-
-class SLIB_EXPORT DirectSound_AudioRecorder
-{
-public:
-	static Ref<AudioRecorder> create(const AudioRecorderParam& param);
-	static List<AudioDeviceInfo> getDevicesList();
+	static Ref<AudioPlayer> createPlayer(const AudioPlayerParam& param);
+	static List<AudioPlayerInfo> getPlayersList();
+	
+	static Ref<AudioRecorder> createRecorder(const AudioRecorderParam& param);
+	static List<AudioRecorderInfo> getRecordersList();
 };
 SLIB_AUDIO_NAMESPACE_END
 

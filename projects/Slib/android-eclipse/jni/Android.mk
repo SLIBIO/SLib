@@ -7,18 +7,18 @@ SLIB_MATH = $(SRC_BASE)/slib/math
 SLIB_NETWORK = $(SRC_BASE)/slib/network
 SLIB_GRAPHICS = $(SRC_BASE)/slib/graphics
 
-SLIB_UI = $(SRC_BASE)/slib/ui
 SLIB_RENDER = $(SRC_BASE)/slib/render
+SLIB_UI = $(SRC_BASE)/slib/ui
 
-SLIB_CODEC = $(SRC_BASE)/slib/codec
 SLIB_AUDIO = $(SRC_BASE)/slib/audio
-
+SLIB_CAPTURE = $(SRC_BASE)/slib/capture
 SLIB_MOBILE = $(SRC_BASE)/slib/mobile
 
+SLIB_DB = $(SRC_BASE)/slib/db
+
+SLIB_CODEC = $(SRC_BASE)/slib/codec
 SLIB_STREAMER = $(SRC_BASE)/slib/streamer
 SLIB_P2P = $(SRC_BASE)/slib/p2p
-
-SLIB_DB = $(SRC_BASE)/slib/db
 
 SLIB_THIRDPARTY = $(SRC_BASE)/thirdparty
 
@@ -35,18 +35,18 @@ SLIB_MATH_FILES := $(wildcard $(LOCAL_PATH)/$(SLIB_MATH)/*.cpp)
 SLIB_NETWORK_FILES := $(wildcard $(LOCAL_PATH)/$(SLIB_NETWORK)/*.cpp)
 SLIB_GRAPHICS_FILES := $(wildcard $(LOCAL_PATH)/$(SLIB_GRAPHICS)/*.cpp)
 
-SLIB_UI_FILES := $(wildcard $(LOCAL_PATH)/$(SLIB_UI)/*.cpp)
 SLIB_RENDER_FILES := $(wildcard $(LOCAL_PATH)/$(SLIB_RENDER)/*.cpp)
+SLIB_UI_FILES := $(wildcard $(LOCAL_PATH)/$(SLIB_UI)/*.cpp)
 
-SLIB_CODEC_FILES := $(wildcard $(LOCAL_PATH)/$(SLIB_CODEC)/*.cpp)
 SLIB_AUDIO_FILES := $(wildcard $(LOCAL_PATH)/$(SLIB_AUDIO)/*.cpp)
-
+SLIB_CAPTURE_FILES := $(wildcard $(LOCAL_PATH)/$(SLIB_CAPTURE)/*.cpp)
 SLIB_MOBILE_FILES := $(wildcard $(LOCAL_PATH)/$(SLIB_MOBILE)/*.cpp)
 
+SLIB_DB_FILES := $(wildcard $(LOCAL_PATH)/$(SLIB_DB)/*.cpp)
+
+SLIB_CODEC_FILES := $(wildcard $(LOCAL_PATH)/$(SLIB_CODEC)/*.cpp)
 SLIB_STREAMER_FILES := $(wildcard $(LOCAL_PATH)/$(SLIB_STREAMER)/*.cpp)
 SLIB_P2P_FILES := $(wildcard $(LOCAL_PATH)/$(SLIB_P2P)/*.cpp)
-
-SLIB_DB_FILES := $(wildcard $(LOCAL_PATH)/$(SLIB_DB)/*.cpp)
 
 LOCAL_SRC_FILES := $(SLIB_CORE_FILES:$(LOCAL_PATH)/%=%) 
 LOCAL_SRC_FILES += $(SLIB_CRYPTO_FILES:$(LOCAL_PATH)/%=%) 

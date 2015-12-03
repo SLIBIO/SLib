@@ -33,6 +33,20 @@
 		2630CF7E1C0BE7B900D3237F /* uic_list_details_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2630CF7D1C0BE7B900D3237F /* uic_list_details_view.cpp */; };
 		266B91CA1BF21CD100FAC9D9 /* render_vertex_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266B91C91BF21CD100FAC9D9 /* render_vertex_buffer.cpp */; };
 		266B91CC1BF21CD800FAC9D9 /* render_index_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266B91CB1BF21CD800FAC9D9 /* render_index_buffer.cpp */; };
+		2689DDDC1C1021B3004CF9E5 /* audio_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2689DDDB1C1021B3004CF9E5 /* audio_player.cpp */; };
+		2689DDDE1C1021BB004CF9E5 /* audio_recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2689DDDD1C1021BB004CF9E5 /* audio_recorder.cpp */; };
+		2689DDE01C1022BE004CF9E5 /* audio_player_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2689DDDF1C1022BE004CF9E5 /* audio_player_ios.mm */; };
+		2689DDE21C1022C6004CF9E5 /* audio_recorder_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2689DDE11C1022C6004CF9E5 /* audio_recorder_ios.mm */; };
+		2689DDE41C1028FD004CF9E5 /* codec_audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2689DDE31C1028FD004CF9E5 /* codec_audio.cpp */; };
+		2689DDE61C102906004CF9E5 /* codec_audio_opus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2689DDE51C102906004CF9E5 /* codec_audio_opus.cpp */; };
+		2689DDE81C10290C004CF9E5 /* codec_video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2689DDE71C10290C004CF9E5 /* codec_video.cpp */; };
+		2689DDEA1C102911004CF9E5 /* codec_video_vpx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2689DDE91C102911004CF9E5 /* codec_video_vpx.cpp */; };
+		2689DDED1C1033DE004CF9E5 /* capture_video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2689DDEC1C1033DE004CF9E5 /* capture_video.cpp */; };
+		2689DDEF1C104102004CF9E5 /* capture_camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2689DDEE1C104102004CF9E5 /* capture_camera.cpp */; };
+		2689DE0B1C1076DF004CF9E5 /* audio_player_dsound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2689DE0A1C1076DF004CF9E5 /* audio_player_dsound.cpp */; };
+		2689DE0D1C1076E5004CF9E5 /* audio_player_opensl_es.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2689DE0C1C1076E5004CF9E5 /* audio_player_opensl_es.cpp */; };
+		2689DE0F1C1076EF004CF9E5 /* audio_recorder_dsound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2689DE0E1C1076EF004CF9E5 /* audio_recorder_dsound.cpp */; };
+		2689DE111C1076F6004CF9E5 /* audio_recorder_opensl_es.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2689DE101C1076F6004CF9E5 /* audio_recorder_opensl_es.cpp */; };
 		26B34F501BDA740400F5EEE0 /* uic_web_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26B34F4F1BDA740400F5EEE0 /* uic_web_view_ios.mm */; };
 		26B34F521BDA740C00F5EEE0 /* uic_web_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B34F511BDA740C00F5EEE0 /* uic_web_view.cpp */; };
 		26B34F541BDA744700F5EEE0 /* uic_scroll_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26B34F531BDA744700F5EEE0 /* uic_scroll_view_ios.mm */; };
@@ -80,10 +94,6 @@
 		A25B26AE1BAB00D8001757E3 /* uic_edit_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = A25B26AD1BAB00D8001757E3 /* uic_edit_view_ios.mm */; };
 		A25B26B01BAB00E0001757E3 /* uic_render_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25B26AF1BAB00E0001757E3 /* uic_render_view.cpp */; };
 		A25B26B21BAB00E6001757E3 /* uic_render_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = A25B26B11BAB00E6001757E3 /* uic_render_view_ios.mm */; };
-		A25F2F301B039EF600854DAF /* audio_android.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F2EBE1B039EF600854DAF /* audio_android.cpp */; };
-		A25F2F311B039EF600854DAF /* audio_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = A25F2EBF1B039EF600854DAF /* audio_ios.mm */; };
-		A25F2F331B039EF600854DAF /* audio_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F2EC11B039EF600854DAF /* audio_object.cpp */; };
-		A25F2F361B039EF600854DAF /* codec_opus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F2EC51B039EF600854DAF /* codec_opus.cpp */; };
 		A25F2F371B039EF600854DAF /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F2EC71B039EF600854DAF /* app.cpp */; };
 		A25F2F381B039EF600854DAF /* async.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F2EC81B039EF600854DAF /* async.cpp */; };
 		A25F2F3B1B039EF600854DAF /* async_kqueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F2ECC1B039EF600854DAF /* async_kqueue.cpp */; };
@@ -173,7 +183,6 @@
 		A2E42BFB1B73D87700E7971C /* crypto_secure_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E42BFA1B73D87700E7971C /* crypto_secure_stream.cpp */; };
 		A2E42BFD1B73D87E00E7971C /* crypto_gcm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E42BFC1B73D87E00E7971C /* crypto_gcm.cpp */; };
 		A2F2AAC81B25D26400A92448 /* ui_cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2F2AAC71B25D26400A92448 /* ui_cursor.cpp */; };
-		AE75B9AE1B0F25F4004A70EE /* codec_vpx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE75B9AD1B0F25F4004A70EE /* codec_vpx.cpp */; };
 		AE75B9B21B0F2600004A70EE /* thirdparty_libvpx_dec.c in Sources */ = {isa = PBXBuildFile; fileRef = AE75B9AF1B0F2600004A70EE /* thirdparty_libvpx_dec.c */; settings = {COMPILER_FLAGS = "-O3 -w"; }; };
 		AE75B9B31B0F2600004A70EE /* thirdparty_libvpx_enc.c in Sources */ = {isa = PBXBuildFile; fileRef = AE75B9B01B0F2600004A70EE /* thirdparty_libvpx_enc.c */; settings = {COMPILER_FLAGS = "-O3 -w"; }; };
 		AE75B9B41B0F2600004A70EE /* thirdparty_libvpx.c in Sources */ = {isa = PBXBuildFile; fileRef = AE75B9B11B0F2600004A70EE /* thirdparty_libvpx.c */; settings = {COMPILER_FLAGS = "-w"; }; };
@@ -219,6 +228,20 @@
 		2630CF7D1C0BE7B900D3237F /* uic_list_details_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = uic_list_details_view.cpp; sourceTree = "<group>"; };
 		266B91C91BF21CD100FAC9D9 /* render_vertex_buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_vertex_buffer.cpp; sourceTree = "<group>"; };
 		266B91CB1BF21CD800FAC9D9 /* render_index_buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_index_buffer.cpp; sourceTree = "<group>"; };
+		2689DDDB1C1021B3004CF9E5 /* audio_player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_player.cpp; sourceTree = "<group>"; };
+		2689DDDD1C1021BB004CF9E5 /* audio_recorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_recorder.cpp; sourceTree = "<group>"; };
+		2689DDDF1C1022BE004CF9E5 /* audio_player_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = audio_player_ios.mm; sourceTree = "<group>"; };
+		2689DDE11C1022C6004CF9E5 /* audio_recorder_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = audio_recorder_ios.mm; sourceTree = "<group>"; };
+		2689DDE31C1028FD004CF9E5 /* codec_audio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = codec_audio.cpp; sourceTree = "<group>"; };
+		2689DDE51C102906004CF9E5 /* codec_audio_opus.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = codec_audio_opus.cpp; sourceTree = "<group>"; };
+		2689DDE71C10290C004CF9E5 /* codec_video.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = codec_video.cpp; sourceTree = "<group>"; };
+		2689DDE91C102911004CF9E5 /* codec_video_vpx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = codec_video_vpx.cpp; sourceTree = "<group>"; };
+		2689DDEC1C1033DE004CF9E5 /* capture_video.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = capture_video.cpp; sourceTree = "<group>"; };
+		2689DDEE1C104102004CF9E5 /* capture_camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = capture_camera.cpp; sourceTree = "<group>"; };
+		2689DE0A1C1076DF004CF9E5 /* audio_player_dsound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_player_dsound.cpp; sourceTree = "<group>"; };
+		2689DE0C1C1076E5004CF9E5 /* audio_player_opensl_es.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_player_opensl_es.cpp; sourceTree = "<group>"; };
+		2689DE0E1C1076EF004CF9E5 /* audio_recorder_dsound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_recorder_dsound.cpp; sourceTree = "<group>"; };
+		2689DE101C1076F6004CF9E5 /* audio_recorder_opensl_es.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_recorder_opensl_es.cpp; sourceTree = "<group>"; };
 		26B34F4F1BDA740400F5EEE0 /* uic_web_view_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = uic_web_view_ios.mm; sourceTree = "<group>"; };
 		26B34F511BDA740C00F5EEE0 /* uic_web_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = uic_web_view.cpp; sourceTree = "<group>"; };
 		26B34F531BDA744700F5EEE0 /* uic_scroll_view_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = uic_scroll_view_ios.mm; sourceTree = "<group>"; };
@@ -268,10 +291,6 @@
 		A25B26B11BAB00E6001757E3 /* uic_render_view_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = uic_render_view_ios.mm; sourceTree = "<group>"; };
 		A25B26B31BAB0142001757E3 /* ui_view_ios.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ui_view_ios.h; sourceTree = "<group>"; };
 		A25F2EBA1B039EC300854DAF /* slib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = slib; sourceTree = "<group>"; };
-		A25F2EBE1B039EF600854DAF /* audio_android.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_android.cpp; sourceTree = "<group>"; };
-		A25F2EBF1B039EF600854DAF /* audio_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = audio_ios.mm; sourceTree = "<group>"; };
-		A25F2EC11B039EF600854DAF /* audio_object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_object.cpp; sourceTree = "<group>"; };
-		A25F2EC51B039EF600854DAF /* codec_opus.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = codec_opus.cpp; sourceTree = "<group>"; };
 		A25F2EC71B039EF600854DAF /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = app.cpp; sourceTree = "<group>"; };
 		A25F2EC81B039EF600854DAF /* async.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = async.cpp; sourceTree = "<group>"; };
 		A25F2EC91B039EF600854DAF /* async_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = async_config.h; sourceTree = "<group>"; };
@@ -368,7 +387,6 @@
 		A2E42BFA1B73D87700E7971C /* crypto_secure_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crypto_secure_stream.cpp; sourceTree = "<group>"; };
 		A2E42BFC1B73D87E00E7971C /* crypto_gcm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crypto_gcm.cpp; sourceTree = "<group>"; };
 		A2F2AAC71B25D26400A92448 /* ui_cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_cursor.cpp; sourceTree = "<group>"; };
-		AE75B9AD1B0F25F4004A70EE /* codec_vpx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = codec_vpx.cpp; sourceTree = "<group>"; };
 		AE75B9AF1B0F2600004A70EE /* thirdparty_libvpx_dec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_libvpx_dec.c; sourceTree = "<group>"; };
 		AE75B9B01B0F2600004A70EE /* thirdparty_libvpx_enc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_libvpx_enc.c; sourceTree = "<group>"; };
 		AE75B9B11B0F2600004A70EE /* thirdparty_libvpx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_libvpx.c; sourceTree = "<group>"; };
@@ -444,10 +462,20 @@
 			path = graphics;
 			sourceTree = "<group>";
 		};
+		2689DDEB1C1033DE004CF9E5 /* capture */ = {
+			isa = PBXGroup;
+			children = (
+				2689DDEE1C104102004CF9E5 /* capture_camera.cpp */,
+				2689DDEC1C1033DE004CF9E5 /* capture_video.cpp */,
+			);
+			path = capture;
+			sourceTree = "<group>";
+		};
 		A25F2EBC1B039EF600854DAF /* slib */ = {
 			isa = PBXGroup;
 			children = (
 				A25F2EBD1B039EF600854DAF /* audio */,
+				2689DDEB1C1033DE004CF9E5 /* capture */,
 				A25F2EC41B039EF600854DAF /* codec */,
 				A25F2EC61B039EF600854DAF /* core */,
 				A25F2EED1B039EF600854DAF /* crypto */,
@@ -467,10 +495,15 @@
 		A25F2EBD1B039EF600854DAF /* audio */ = {
 			isa = PBXGroup;
 			children = (
-				A25F2EBE1B039EF600854DAF /* audio_android.cpp */,
 				A2DE1DB71B3882B100A74698 /* audio_format.cpp */,
-				A25F2EBF1B039EF600854DAF /* audio_ios.mm */,
-				A25F2EC11B039EF600854DAF /* audio_object.cpp */,
+				2689DDDB1C1021B3004CF9E5 /* audio_player.cpp */,
+				2689DE0A1C1076DF004CF9E5 /* audio_player_dsound.cpp */,
+				2689DDDF1C1022BE004CF9E5 /* audio_player_ios.mm */,
+				2689DE0C1C1076E5004CF9E5 /* audio_player_opensl_es.cpp */,
+				2689DDDD1C1021BB004CF9E5 /* audio_recorder.cpp */,
+				2689DE0E1C1076EF004CF9E5 /* audio_recorder_dsound.cpp */,
+				2689DDE11C1022C6004CF9E5 /* audio_recorder_ios.mm */,
+				2689DE101C1076F6004CF9E5 /* audio_recorder_opensl_es.cpp */,
 			);
 			path = audio;
 			sourceTree = "<group>";
@@ -478,8 +511,10 @@
 		A25F2EC41B039EF600854DAF /* codec */ = {
 			isa = PBXGroup;
 			children = (
-				A25F2EC51B039EF600854DAF /* codec_opus.cpp */,
-				AE75B9AD1B0F25F4004A70EE /* codec_vpx.cpp */,
+				2689DDE31C1028FD004CF9E5 /* codec_audio.cpp */,
+				2689DDE51C102906004CF9E5 /* codec_audio_opus.cpp */,
+				2689DDE71C10290C004CF9E5 /* codec_video.cpp */,
+				2689DDE91C102911004CF9E5 /* codec_video_vpx.cpp */,
 			);
 			path = codec;
 			sourceTree = "<group>";
@@ -786,7 +821,6 @@
 				A234D6EE1B3F12F600ADDF4E /* content_type.cpp in Sources */,
 				A2DE1DA71B383EA000A74698 /* system_unix.cpp in Sources */,
 				260252241BF18D2F00DEFAB1 /* ui_graphics_canvas_quartz.mm in Sources */,
-				AE75B9AE1B0F25F4004A70EE /* codec_vpx.cpp in Sources */,
 				26B391BE1C04458A00E3C13F /* uic_drop_down_list.cpp in Sources */,
 				26B34F521BDA740C00F5EEE0 /* uic_web_view.cpp in Sources */,
 				26B34F541BDA744700F5EEE0 /* uic_scroll_view_ios.mm in Sources */,
@@ -804,8 +838,8 @@
 				A2DE1DB01B383ED100A74698 /* network_event.cpp in Sources */,
 				260252201BF18CB800DEFAB1 /* graphics_path.cpp in Sources */,
 				A25B26AE1BAB00D8001757E3 /* uic_edit_view_ios.mm in Sources */,
-				A25F2F361B039EF600854DAF /* codec_opus.cpp in Sources */,
 				A2E42BF21B73D84300E7971C /* network_netfilter.cpp in Sources */,
+				2689DDEF1C104102004CF9E5 /* capture_camera.cpp in Sources */,
 				A2DE1D9D1B383E7800A74698 /* event_unix.cpp in Sources */,
 				A25F2F7E1B039EF600854DAF /* render_texture.cpp in Sources */,
 				A2DE1DA01B383E8500A74698 /* pipe.cpp in Sources */,
@@ -818,8 +852,11 @@
 				A25F2F5C1B039EF600854DAF /* crypto_rsa.cpp in Sources */,
 				A2498C781AFA9C3200C76201 /* thirdparty_libopus.c in Sources */,
 				260252171BF18CB800DEFAB1 /* graphics_color.cpp in Sources */,
+				2689DDE41C1028FD004CF9E5 /* codec_audio.cpp in Sources */,
 				A25F2F7A1B039EF600854DAF /* render_object.cpp in Sources */,
+				2689DDE81C10290C004CF9E5 /* codec_video.cpp in Sources */,
 				A25F2F4D1B039EF600854DAF /* reference.cpp in Sources */,
+				2689DDDE1C1021BB004CF9E5 /* audio_recorder.cpp in Sources */,
 				260252001BF18BCF00DEFAB1 /* thread_pool.cpp in Sources */,
 				A25F2F7B1B039EF600854DAF /* render_object2d.cpp in Sources */,
 				A25F2F4F1B039EF600854DAF /* service.cpp in Sources */,
@@ -860,16 +897,16 @@
 				A25F2F6A1B039EF600854DAF /* mobile_vibrator.cpp in Sources */,
 				A24142E31BA7CA4C00D7AB80 /* algorithm.cpp in Sources */,
 				A25F2F551B039EF600854DAF /* thread.cpp in Sources */,
-				A25F2F301B039EF600854DAF /* audio_android.cpp in Sources */,
 				A25F2F381B039EF600854DAF /* async.cpp in Sources */,
 				A21A74531BBF08ED006A8BC8 /* uic_radio_button.cpp in Sources */,
+				2689DDE61C102906004CF9E5 /* codec_audio_opus.cpp in Sources */,
 				260252261BF18D4300DEFAB1 /* ui_graphics_context.cpp in Sources */,
 				A25F2F3E1B039EF600854DAF /* base.cpp in Sources */,
-				A25F2F331B039EF600854DAF /* audio_object.cpp in Sources */,
 				A2774E3E1B1CBC2B00538A7B /* ui_window_ios.mm in Sources */,
 				A25F2F4E1B039EF600854DAF /* resource.cpp in Sources */,
 				AE75B9B21B0F2600004A70EE /* thirdparty_libvpx_dec.c in Sources */,
 				A25F2F791B039EF600854DAF /* render_engine.cpp in Sources */,
+				2689DE0B1C1076DF004CF9E5 /* audio_player_dsound.cpp in Sources */,
 				2602521A1BF18CB800DEFAB1 /* graphics_font.cpp in Sources */,
 				A25F2F4C1B039EF600854DAF /* platform_windows.cpp in Sources */,
 				A25F2F8E1B039EF600854DAF /* ui_view.cpp in Sources */,
@@ -892,17 +929,20 @@
 				26B34F5B1BDA87BA00F5EEE0 /* uis_radio_button.cpp in Sources */,
 				A25F2F451B039EF600854DAF /* json.cpp in Sources */,
 				A25B26A61BAB0069001757E3 /* uic_button.cpp in Sources */,
+				2689DE0F1C1076EF004CF9E5 /* audio_recorder_dsound.cpp in Sources */,
 				A2F2AAC81B25D26400A92448 /* ui_cursor.cpp in Sources */,
 				A25F2F811B039EF600854DAF /* streamer_filters.cpp in Sources */,
+				2689DDED1C1033DE004CF9E5 /* capture_video.cpp in Sources */,
 				A25F2F671B039EF600854DAF /* math_geograph.cpp in Sources */,
 				A25F2F441B039EF600854DAF /* io.cpp in Sources */,
 				260252141BF18CB800DEFAB1 /* graphics_bitmap.cpp in Sources */,
 				A25F2F491B039EF600854DAF /* platform_android.cpp in Sources */,
 				260252021BF18BE200DEFAB1 /* callback.cpp in Sources */,
 				26B34F5F1BDA9C2A00F5EEE0 /* uis_button.cpp in Sources */,
+				2689DDE01C1022BE004CF9E5 /* audio_player_ios.mm in Sources */,
 				A25F2F751B039EF600854DAF /* p2p_hns_client.cpp in Sources */,
-				A25F2F311B039EF600854DAF /* audio_ios.mm in Sources */,
 				A2774E261B1CBBC700538A7B /* render_opengl_egl.cpp in Sources */,
+				2689DE111C1076F6004CF9E5 /* audio_recorder_opensl_es.cpp in Sources */,
 				A24929A51B8C3FFB00928EAD /* crypto_sha1.cpp in Sources */,
 				266B91CA1BF21CD100FAC9D9 /* render_vertex_buffer.cpp in Sources */,
 				A2498C771AFA9C3200C76201 /* thirdparty_libjpeg.c in Sources */,
@@ -921,11 +961,13 @@
 				A25F2F7F1B039EF600854DAF /* streamer_audio.cpp in Sources */,
 				A2774E361B1CBC2100538A7B /* ui_view_ios.mm in Sources */,
 				A25B26B21BAB00E6001757E3 /* uic_render_view_ios.mm in Sources */,
+				2689DDDC1C1021B3004CF9E5 /* audio_player.cpp in Sources */,
 				2602521B1BF18CB800DEFAB1 /* graphics_freetype.cpp in Sources */,
 				A25F2F821B039EF600854DAF /* streamer_graph.cpp in Sources */,
 				A25F2F3B1B039EF600854DAF /* async_kqueue.cpp in Sources */,
 				2602521D1BF18CB800DEFAB1 /* graphics_image_jpeg.cpp in Sources */,
 				A25F2F471B039EF600854DAF /* memory.cpp in Sources */,
+				2689DDE21C1022C6004CF9E5 /* audio_recorder_ios.mm in Sources */,
 				260252161BF18CB800DEFAB1 /* graphics_canvas.cpp in Sources */,
 				260252181BF18CB800DEFAB1 /* graphics_context.cpp in Sources */,
 				A25F2F6D1B039EF600854DAF /* network_async.cpp in Sources */,
@@ -943,6 +985,8 @@
 				A25B26AC1BAB00CE001757E3 /* uic_edit_view.cpp in Sources */,
 				266B91CC1BF21CD800FAC9D9 /* render_index_buffer.cpp in Sources */,
 				A2E42BFB1B73D87700E7971C /* crypto_secure_stream.cpp in Sources */,
+				2689DDEA1C102911004CF9E5 /* codec_video_vpx.cpp in Sources */,
+				2689DE0D1C1076E5004CF9E5 /* audio_player_opensl_es.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -95,6 +95,12 @@
     <Filter Include="src\slib\graphics">
       <UniqueIdentifier>{7e7339e2-ced3-4f3c-914b-189751a86ef6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="inc\capture">
+      <UniqueIdentifier>{e08afebe-eef5-4910-8ab4-b1808b575759}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\slib\capture">
+      <UniqueIdentifier>{6f0fca8c-5c38-4f83-8742-3aef527e496c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\slib\network\network_async_config.h">
@@ -169,22 +175,10 @@
     <ClInclude Include="..\..\..\inc\slib\audio\format.h">
       <Filter>inc\audio</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\audio\object.h">
-      <Filter>inc\audio</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\audio\opensl_es.h">
       <Filter>inc\audio</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\codec\audio_codec_opus.h">
-      <Filter>inc\codec</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\codec\definition.h">
-      <Filter>inc\codec</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\codec\object.h">
-      <Filter>inc\codec</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\codec\video_codec_vpx.h">
       <Filter>inc\codec</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\core\base64.h">
@@ -685,6 +679,42 @@
     <ClInclude Include="..\..\..\inc\slib\ui\s_tab_view.h">
       <Filter>inc\ui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\capture\camera.h">
+      <Filter>inc\capture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\capture\definition.h">
+      <Filter>inc\capture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\capture\video.h">
+      <Filter>inc\capture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\capture.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\audio\player.h">
+      <Filter>inc\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\audio\recorder.h">
+      <Filter>inc\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\codec\audio_opus.h">
+      <Filter>inc\codec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\codec\video.h">
+      <Filter>inc\codec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\codec\video_vpx.h">
+      <Filter>inc\codec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\codec\audio.h">
+      <Filter>inc\codec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\ui\camera_view.h">
+      <Filter>inc\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\ui\s_camera_view.h">
+      <Filter>inc\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">
@@ -786,12 +816,6 @@
     <ClCompile Include="..\..\..\src\slib\p2p\p2p_hns_client.cpp">
       <Filter>src\slib\p2p</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\codec\codec_opus.cpp">
-      <Filter>src\slib\codec</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\audio\audio_object.cpp">
-      <Filter>src\slib\audio</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\slib\streamer\streamer_graph.cpp">
       <Filter>src\slib\streamer</Filter>
     </ClCompile>
@@ -867,9 +891,6 @@
     <ClCompile Include="..\..\..\src\slib\mobile\mobile_vibrator.cpp">
       <Filter>src\slib\mobile</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\codec\codec_vpx.cpp">
-      <Filter>src\slib\codec</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\thirdparty\thirdparty_libvpx.c">
       <Filter>src\thirdparty</Filter>
     </ClCompile>
@@ -884,12 +905,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\ui_view_win32.cpp">
       <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\audio\audio_dsound.cpp">
-      <Filter>src\slib\audio</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\audio\audio_win32.cpp">
-      <Filter>src\slib\audio</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\ui_window_win32.cpp">
       <Filter>src\slib\ui</Filter>
@@ -1202,6 +1217,48 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\uis_tab_view.cpp">
       <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\codec\codec_audio.cpp">
+      <Filter>src\slib\codec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\codec\codec_audio_opus.cpp">
+      <Filter>src\slib\codec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\codec\codec_video.cpp">
+      <Filter>src\slib\codec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\codec\codec_video_vpx.cpp">
+      <Filter>src\slib\codec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\capture\capture_camera.cpp">
+      <Filter>src\slib\capture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\capture\capture_video.cpp">
+      <Filter>src\slib\capture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\audio\audio_player.cpp">
+      <Filter>src\slib\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\audio\audio_recorder.cpp">
+      <Filter>src\slib\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\audio\audio_player_dsound.cpp">
+      <Filter>src\slib\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\audio\audio_player_win32.cpp">
+      <Filter>src\slib\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\audio\audio_recorder_dsound.cpp">
+      <Filter>src\slib\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\audio\audio_recorder_win32.cpp">
+      <Filter>src\slib\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\audio\audio_player_opensl_es.cpp">
+      <Filter>src\slib\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\audio\audio_recorder_opensl_es.cpp">
+      <Filter>src\slib\audio</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

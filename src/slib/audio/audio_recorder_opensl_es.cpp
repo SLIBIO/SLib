@@ -1,10 +1,6 @@
 #include "../../../inc/slib/audio/opensl_es.h"
 
-#if defined(SLIB_PLATFORM_IS_ANDROID)
-#define SUPPORT_OPENSL_ES
-#endif
-
-#ifdef SUPPORT_OPENSL_ES
+#ifdef SLIB_AUDIO_SUPPORT_OPENSL_ES
 
 #include "../../../inc/slib/core/log.h"
 #include "../../../inc/slib/core/pointer.h"
@@ -492,34 +488,18 @@ public:
 	}
 };
 
-Ref<AudioPlayerBuffer> _OpenSLES_AudioPlayerImpl::createBuffer(const AudioPlayerBufferParam& param)
-{
-	return Ref<AudioPlayerBuffer>::from(_OpenSLES_AudioPlayerBufferImpl::create(this, param));
-}
-
-Ref<AudioRecorder> OpenSLES_AudioRecorder::create(const AudioRecorderParam& param)
+Ref<AudioRecorder> OpenSL_ES::createRecorder(const AudioRecorderParam& param)
 {
 	return Ref<AudioRecorder>::from(_OpenSLES_AudioRecorderImpl::create(param));
 }
-
-Ref<AudioPlayer> OpenSLES_AudioPlayer::create(const AudioPlayerParam& param)
-{
-	return Ref<AudioPlayer>::from(_OpenSLES_AudioPlayerImpl::create(param));
-}
-
 SLIB_AUDIO_NAMESPACE_END
 
 #else
 
 SLIB_AUDIO_NAMESPACE_BEGIN
-Ref<AudioRecorder> OpenSLES_AudioRecorder::create(const AudioRecorderParam& param)
+Ref<AudioRecorder> OpenSL_ES::createRecorder(const AudioRecorderParam& param)
 {
 	return Ref<AudioRecorder>::null();
-}
-
-Ref<AudioPlayer> OpenSLES_AudioPlayer::create(const AudioPlayerParam& param)
-{
-	return Ref<AudioPlayer>::null();
 }
 SLIB_AUDIO_NAMESPACE_END
 

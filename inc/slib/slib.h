@@ -8,17 +8,18 @@
 #include "network.h"
 #include "graphics.h"
 
-#include "ui.h"
 #include "render.h"
+#include "ui.h"
 
-#include "codec.h"
 #include "audio.h"
-
+#include "capture.h"
 #include "mobile.h"
 
+#include "db.h"
+
+#include "codec.h"
 #include "streamer.h"
 #include "p2p.h"
 
-#include "db.h"
 
 #endif //CHECKHEADER_SLIB_MAIN_HEADER

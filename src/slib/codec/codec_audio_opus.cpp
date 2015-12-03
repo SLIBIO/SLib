@@ -1,5 +1,5 @@
 #include "../../../inc/slib/codec/definition.h"
-#include "../../../inc/slib/codec/audio_codec_opus.h"
+#include "../../../inc/slib/codec/audio_opus.h"
 #include "../../../inc/slib/core/log.h"
 #include "../../../inc/slib/core/time.h"
 

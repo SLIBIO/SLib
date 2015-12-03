@@ -1,4 +1,4 @@
-#include "../../../inc/slib/codec/video_codec_vpx.h"
+#include "../../../inc/slib/codec/video_vpx.h"
 #include "../../../inc/slib/core/log.h"
 #include "../../../inc/slib/core/io.h"
 #include "../../../inc/slib/core/scoped_pointer.h"
