@@ -5,7 +5,6 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
-import android.graphics.Region;
 
 public class Graphics {
 
@@ -34,7 +33,7 @@ public class Graphics {
 	}
 	
 	public void clipToRectangle(float left, float top, float right, float bottom) {
-		canvas.clipRect(left, top, right, bottom, Region.Op.REPLACE);
+		canvas.clipRect(left, top, right, bottom);
 	}
 	
 	public void clipToPath(UiPath path) {
