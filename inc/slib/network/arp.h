@@ -4,7 +4,8 @@
 #include "definition.h"
 
 #include "ethernet.h"
-#include "address.h"
+#include "mac_address.h"
+#include "ip_address.h"
 
 /*
 	ARP - Address Resolution Protocol

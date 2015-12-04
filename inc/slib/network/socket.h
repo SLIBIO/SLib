@@ -2,13 +2,16 @@
 #define CHECKHEADER_SLIB_NETWORK_SOCKET
 
 #include "definition.h"
-#include "address.h"
+
 #include "constants.h"
+#include "socket_address.h"
+#include "mac_address.h"
 
 typedef int sl_socket;
 #define SLIB_SOCKET_INVALID_HANDLE (-1)
 
 SLIB_NETWORK_NAMESPACE_BEGIN
+
 class SLIB_EXPORT L2PacketInfo
 {
 public:

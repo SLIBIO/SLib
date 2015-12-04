@@ -26,18 +26,6 @@
     <Filter Include="src\slib\network">
       <UniqueIdentifier>{3aeedfd1-c574-463d-a99c-0f139c0b102b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\slib\p2p">
-      <UniqueIdentifier>{5330dec1-61fc-42ca-ac77-04e207c0a4aa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\slib\codec">
-      <UniqueIdentifier>{d901cea5-19fe-4725-ac11-9c1605cc2183}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\slib\audio">
-      <UniqueIdentifier>{32c7132b-764a-49f6-87e1-57b4ae34808c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\slib\streamer">
-      <UniqueIdentifier>{2cdfa9ad-d01b-4deb-8f58-12540487dec7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\slib\ui">
       <UniqueIdentifier>{4879ad43-dc2e-4d53-996c-5411899f8010}</UniqueIdentifier>
     </Filter>
@@ -47,23 +35,11 @@
     <Filter Include="src\slib\db">
       <UniqueIdentifier>{06c138ef-e680-48b9-9d13-1552a8c1debc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\slib\mobile">
-      <UniqueIdentifier>{02c07562-3c23-4616-b82b-bac1b7f875c1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="inc">
       <UniqueIdentifier>{5ccc7a8b-0d8a-4d13-b191-b39b5fa2a1a0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="inc\audio">
-      <UniqueIdentifier>{f9904672-576a-4f10-bf81-51a45cb793a9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="inc\codec">
-      <UniqueIdentifier>{815aa44f-55e0-491d-bf10-452aa8c4649a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="inc\core">
       <UniqueIdentifier>{f8d6a0e3-2eb7-452c-bd96-7223091accd3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="inc\crypto">
-      <UniqueIdentifier>{30220f0a-ee98-4ea0-905a-625d66c5d705}</UniqueIdentifier>
     </Filter>
     <Filter Include="inc\db">
       <UniqueIdentifier>{e942c1a3-302e-4792-b68e-b45657427376}</UniqueIdentifier>
@@ -74,20 +50,11 @@
     <Filter Include="inc\math">
       <UniqueIdentifier>{6b272324-dda0-46a0-b631-c91a144587f2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="inc\mobile">
-      <UniqueIdentifier>{86efe254-d678-404e-90ac-886093584d15}</UniqueIdentifier>
-    </Filter>
     <Filter Include="inc\network">
       <UniqueIdentifier>{cb215fc3-0e69-45e2-a38a-a4b9d8d0c6e2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="inc\p2p">
-      <UniqueIdentifier>{c4d0d8e4-1ca4-4da5-add7-0c8aa7291e80}</UniqueIdentifier>
-    </Filter>
     <Filter Include="inc\render">
       <UniqueIdentifier>{6739f889-e258-4a28-aa80-7c51dbae89e5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="inc\streamer">
-      <UniqueIdentifier>{54aaf6a6-41e3-45f6-bf52-d7fbd587fcc1}</UniqueIdentifier>
     </Filter>
     <Filter Include="inc\ui">
       <UniqueIdentifier>{3c560f96-5122-41d6-acae-d77945fb745b}</UniqueIdentifier>
@@ -95,40 +62,22 @@
     <Filter Include="src\slib\graphics">
       <UniqueIdentifier>{7e7339e2-ced3-4f3c-914b-189751a86ef6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="inc\capture">
-      <UniqueIdentifier>{e08afebe-eef5-4910-8ab4-b1808b575759}</UniqueIdentifier>
+    <Filter Include="src\slib\media">
+      <UniqueIdentifier>{32c7132b-764a-49f6-87e1-57b4ae34808c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\slib\capture">
-      <UniqueIdentifier>{6f0fca8c-5c38-4f83-8742-3aef527e496c}</UniqueIdentifier>
+    <Filter Include="src\slib\device">
+      <UniqueIdentifier>{02c07562-3c23-4616-b82b-bac1b7f875c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="inc\media">
+      <UniqueIdentifier>{815aa44f-55e0-491d-bf10-452aa8c4649a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="inc\device">
+      <UniqueIdentifier>{86efe254-d678-404e-90ac-886093584d15}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\slib\network\network_async_config.h">
-      <Filter>src\slib\network</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\slib\core\async_config.h">
       <Filter>src\slib\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\slib\render\render_opengl_egl.h">
-      <Filter>src\slib\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\slib\render\render_opengl_gl.h">
-      <Filter>src\slib\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\slib\render\render_opengl_gles.h">
-      <Filter>src\slib\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\slib\render\render_opengl_impl.h">
-      <Filter>src\slib\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\slib\ui\ui_view_win32.h">
-      <Filter>src\slib\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\audio.h">
-      <Filter>inc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\codec.h">
-      <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\core.h">
       <Filter>inc</Filter>
@@ -145,13 +94,7 @@
     <ClInclude Include="..\..\..\inc\slib\math.h">
       <Filter>inc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\mobile.h">
-      <Filter>inc</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\network.h">
-      <Filter>inc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\p2p.h">
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\render.h">
@@ -160,26 +103,8 @@
     <ClInclude Include="..\..\..\inc\slib\slib.h">
       <Filter>inc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\streamer.h">
-      <Filter>inc</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui.h">
       <Filter>inc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\audio\definition.h">
-      <Filter>inc\audio</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\audio\dsound.h">
-      <Filter>inc\audio</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\audio\format.h">
-      <Filter>inc\audio</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\audio\opensl_es.h">
-      <Filter>inc\audio</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\codec\definition.h">
-      <Filter>inc\codec</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\core\base64.h">
       <Filter>inc\core</Filter>
@@ -316,39 +241,6 @@
     <ClInclude Include="..\..\..\inc\slib\core\base.h">
       <Filter>inc\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\crypto\aes.h">
-      <Filter>inc\crypto</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\crypto\block_cipher.h">
-      <Filter>inc\crypto</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\crypto\definition.h">
-      <Filter>inc\crypto</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\crypto\gcm.h">
-      <Filter>inc\crypto</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\crypto\hash.h">
-      <Filter>inc\crypto</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\crypto\md5.h">
-      <Filter>inc\crypto</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\crypto\rsa.h">
-      <Filter>inc\crypto</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\crypto\secure_stream.h">
-      <Filter>inc\crypto</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\crypto\sha1.h">
-      <Filter>inc\crypto</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\crypto\sha2.h">
-      <Filter>inc\crypto</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\crypto\zlib.h">
-      <Filter>inc\crypto</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\db\db.h">
       <Filter>inc\db</Filter>
     </ClInclude>
@@ -433,96 +325,6 @@
     <ClInclude Include="..\..\..\inc\slib\math\vector.h">
       <Filter>inc\math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\mobile\definition.h">
-      <Filter>inc\mobile</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\mobile\sensor.h">
-      <Filter>inc\mobile</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\mobile\vibrator.h">
-      <Filter>inc\mobile</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\netfilter.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\secure_stream.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\socket.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\tcpip.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\url.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\address.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\arp.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\async.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\capture.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\constants.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\dbip.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\definition.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\dns.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\ethernet.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\event.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\http.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\http_client.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\http_common.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\http_proxy.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\http_service.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\icmp.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\io.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\nat.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\p2p\definition.h">
-      <Filter>inc\p2p</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\p2p\hns_client.h">
-      <Filter>inc\p2p</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\p2p\hns_service.h">
-      <Filter>inc\p2p</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\p2p\switch.h">
-      <Filter>inc\p2p</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\render\base.h">
       <Filter>inc\render</Filter>
     </ClInclude>
@@ -555,24 +357,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\render\vertex_buffer.h">
       <Filter>inc\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\streamer\audio.h">
-      <Filter>inc\streamer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\streamer\codec.h">
-      <Filter>inc\streamer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\streamer\definition.h">
-      <Filter>inc\streamer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\streamer\filters.h">
-      <Filter>inc\streamer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\streamer\graph.h">
-      <Filter>inc\streamer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\streamer\network.h">
-      <Filter>inc\streamer</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\web_view.h">
       <Filter>inc\ui</Filter>
@@ -655,9 +439,6 @@
     <ClInclude Include="..\..\..\inc\slib\ui\view_group.h">
       <Filter>inc\ui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\slib\graphics\graphics_image_soil2.h">
-      <Filter>src\slib\graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\drop_down_list.h">
       <Filter>inc\ui</Filter>
     </ClInclude>
@@ -679,40 +460,163 @@
     <ClInclude Include="..\..\..\inc\slib\ui\s_tab_view.h">
       <Filter>inc\ui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\capture\camera.h">
-      <Filter>inc\capture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\capture\definition.h">
-      <Filter>inc\capture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\capture\video.h">
-      <Filter>inc\capture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\capture.h">
-      <Filter>inc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\audio\player.h">
-      <Filter>inc\audio</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\audio\recorder.h">
-      <Filter>inc\audio</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\codec\audio_opus.h">
-      <Filter>inc\codec</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\codec\video.h">
-      <Filter>inc\codec</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\codec\video_vpx.h">
-      <Filter>inc\codec</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\codec\audio.h">
-      <Filter>inc\codec</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\camera_view.h">
       <Filter>inc\ui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\s_camera_view.h">
+      <Filter>inc\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\slib\graphics\image_soil2.h">
+      <Filter>src\slib\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\slib\network\network_async_config.h">
+      <Filter>src\slib\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\slib\render\opengl_egl.h">
+      <Filter>src\slib\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\slib\render\opengl_gl.h">
+      <Filter>src\slib\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\slib\render\opengl_gles.h">
+      <Filter>src\slib\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\slib\render\opengl_impl.h">
+      <Filter>src\slib\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\slib\ui\view_win32.h">
+      <Filter>src\slib\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\url.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\media\audio_codec.h">
+      <Filter>inc\media</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\media\audio_format.h">
+      <Filter>inc\media</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\media\audio_player.h">
+      <Filter>inc\media</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\media\audio_recorder.h">
+      <Filter>inc\media</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\media\camera.h">
+      <Filter>inc\media</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\media\codec_opus.h">
+      <Filter>inc\media</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\media\codec_vpx.h">
+      <Filter>inc\media</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\media\definition.h">
+      <Filter>inc\media</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\media\dsound.h">
+      <Filter>inc\media</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\media\opensl_es.h">
+      <Filter>inc\media</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\media\video_capture.h">
+      <Filter>inc\media</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\media\video_codec.h">
+      <Filter>inc\media</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\media\video_format.h">
+      <Filter>inc\media</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\device\definition.h">
+      <Filter>inc\device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\device\sensor.h">
+      <Filter>inc\device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\device\vibrator.h">
+      <Filter>inc\device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\capture.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\constants.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\definition.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\dns.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\ethernet.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\event.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\http.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\http_client.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\http_common.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\http_proxy.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\http_service.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\icmp.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\io.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\ip_address.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\mac_address.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\nat.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\netfilter.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\os.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\secure_stream.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\socket.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\socket_address.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\tcpip.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\arp.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\async.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\media.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\device.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\ui\video_view.h">
       <Filter>inc\ui</Filter>
     </ClInclude>
   </ItemGroup>
@@ -780,81 +684,6 @@
     <ClCompile Include="..\..\..\src\slib\core\file_win32.cpp">
       <Filter>src\slib\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\math\math_geograph.cpp">
-      <Filter>src\slib\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\math\math_bigint.cpp">
-      <Filter>src\slib\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\crypto\crypto_md5.cpp">
-      <Filter>src\slib\crypto</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\crypto\crypto_rsa.cpp">
-      <Filter>src\slib\crypto</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\crypto\crypto_sha2.cpp">
-      <Filter>src\slib\crypto</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\crypto\crypto_aes.cpp">
-      <Filter>src\slib\crypto</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_url.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_address.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_socket.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\p2p\p2p_hns_service.cpp">
-      <Filter>src\slib\p2p</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\p2p\p2p_switch.cpp">
-      <Filter>src\slib\p2p</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\p2p\p2p_hns_client.cpp">
-      <Filter>src\slib\p2p</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\streamer\streamer_graph.cpp">
-      <Filter>src\slib\streamer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\streamer\streamer_network.cpp">
-      <Filter>src\slib\streamer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\streamer\streamer_audio.cpp">
-      <Filter>src\slib\streamer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\streamer\streamer_codec.cpp">
-      <Filter>src\slib\streamer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\streamer\streamer_filters.cpp">
-      <Filter>src\slib\streamer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\ui_event.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\ui_event_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\ui_view.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\ui_window.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\ui_core_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\db\db_sqlite3.cpp">
-      <Filter>src\slib\db</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_async.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_io.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\string_conv.cpp">
       <Filter>src\slib\core</Filter>
     </ClCompile>
@@ -885,12 +714,6 @@
     <ClCompile Include="..\..\..\src\slib\core\async_win32.cpp">
       <Filter>src\slib\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\mobile\mobile_sensor.cpp">
-      <Filter>src\slib\mobile</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\mobile\mobile_vibrator.cpp">
-      <Filter>src\slib\mobile</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\thirdparty\thirdparty_libvpx.c">
       <Filter>src\thirdparty</Filter>
     </ClCompile>
@@ -900,50 +723,8 @@
     <ClCompile Include="..\..\..\src\thirdparty\thirdparty_libvpx_enc.c">
       <Filter>src\thirdparty</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\ui_core.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\ui_view_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\ui_window_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\pointer.cpp">
       <Filter>src\slib\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\ui_cursor.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\render\render_base.cpp">
-      <Filter>src\slib\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\render\render_engine.cpp">
-      <Filter>src\slib\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\render\render_object.cpp">
-      <Filter>src\slib\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\render\render_object2d.cpp">
-      <Filter>src\slib\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\render\render_opengl_egl.cpp">
-      <Filter>src\slib\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\render\render_opengl_gl.cpp">
-      <Filter>src\slib\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\render\render_opengl_gles.cpp">
-      <Filter>src\slib\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\render\render_opengl_wgl.cpp">
-      <Filter>src\slib\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\render\render_program.cpp">
-      <Filter>src\slib\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\render\render_texture.cpp">
-      <Filter>src\slib\render</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\pipe.cpp">
       <Filter>src\slib\core</Filter>
@@ -957,98 +738,14 @@
     <ClCompile Include="..\..\..\src\slib\core\java.cpp">
       <Filter>src\slib\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_event.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\audio\audio_format.cpp">
-      <Filter>src\slib\audio</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\content_type.cpp">
       <Filter>src\slib\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_netfilter.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_dns.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_tcpip.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\crypto\crypto_secure_stream.cpp">
-      <Filter>src\slib\crypto</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\crypto\crypto_gcm.cpp">
-      <Filter>src\slib\crypto</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\math\math_int128.cpp">
-      <Filter>src\slib\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_capture.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\crypto\crypto_sha1.cpp">
-      <Filter>src\slib\crypto</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\crypto\crypto_hash.cpp">
-      <Filter>src\slib\crypto</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_secure_stream.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\crypto\crypto_zlib.cpp">
-      <Filter>src\slib\crypto</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_http_service.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_http_proxy.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_http_client.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_http_common.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_nat.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_icmp.cpp">
-      <Filter>src\slib\network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\algorithm.cpp">
       <Filter>src\slib\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_capture_pcap.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_ethernet.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\thirdparty\thirdparty_soil2.c">
       <Filter>src\thirdparty</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_button_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_edit_view_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_render_view_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_edit_view.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_label_view.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_render_view.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_button.cpp">
-      <Filter>src\slib\ui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\callback.cpp">
       <Filter>src\slib\core</Filter>
@@ -1058,150 +755,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\thread_pool.cpp">
       <Filter>src\slib\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\graphics\graphics_pen.cpp">
-      <Filter>src\slib\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\graphics\graphics_util.cpp">
-      <Filter>src\slib\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\graphics\graphics_bitmap.cpp">
-      <Filter>src\slib\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\graphics\graphics_brush.cpp">
-      <Filter>src\slib\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\graphics\graphics_canvas.cpp">
-      <Filter>src\slib\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\graphics\graphics_color.cpp">
-      <Filter>src\slib\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\graphics\graphics_context.cpp">
-      <Filter>src\slib\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\graphics\graphics_drawable.cpp">
-      <Filter>src\slib\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\graphics\graphics_font.cpp">
-      <Filter>src\slib\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\graphics\graphics_freetype.cpp">
-      <Filter>src\slib\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\graphics\graphics_image.cpp">
-      <Filter>src\slib\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\graphics\graphics_image_jpeg.cpp">
-      <Filter>src\slib\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\graphics\graphics_image_png.cpp">
-      <Filter>src\slib\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\graphics\graphics_image_soil2.cpp">
-      <Filter>src\slib\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\graphics\graphics_path.cpp">
-      <Filter>src\slib\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\render\render_index_buffer.cpp">
-      <Filter>src\slib\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\render\render_vertex_buffer.cpp">
-      <Filter>src\slib\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\ui_cursor_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\ui_generic_view.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\ui_graphics_font_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\ui_graphics_canvas_gdiplus.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\ui_graphics_drawable_gdiplus.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\ui_graphics_context.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\ui_graphics_path_gdiplus.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uis_check_box.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uis_image_view.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uis_label_view.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uis_radio_button.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uis_view.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uis_button.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\ui_view_group.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_check_box_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_check_box.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_radio_button_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_radio_button.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_drop_down_list.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_drop_down_list_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_label_view_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_list_details_view_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_list_details_view.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_scroll_view_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_scroll_view.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_tab_view.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_tab_view_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_web_view.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uic_web_view_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_async_win32.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_event_win32.cpp">
-      <Filter>src\slib\network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\platform_windows.cpp">
       <Filter>src\slib\core</Filter>
@@ -1215,50 +768,386 @@
     <ClCompile Include="..\..\..\src\slib\core\system_win32.cpp">
       <Filter>src\slib\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\uis_tab_view.cpp">
+    <ClCompile Include="..\..\..\src\slib\media\audio_recorder_win32.cpp">
+      <Filter>src\slib\media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\camera.cpp">
+      <Filter>src\slib\media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\codec_opus.cpp">
+      <Filter>src\slib\media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\codec_vpx.cpp">
+      <Filter>src\slib\media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\video_capture.cpp">
+      <Filter>src\slib\media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\video_codec.cpp">
+      <Filter>src\slib\media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\audio_codec.cpp">
+      <Filter>src\slib\media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\audio_format.cpp">
+      <Filter>src\slib\media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\audio_player.cpp">
+      <Filter>src\slib\media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\audio_player_dsound.cpp">
+      <Filter>src\slib\media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\audio_player_opensl_es.cpp">
+      <Filter>src\slib\media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\audio_player_win32.cpp">
+      <Filter>src\slib\media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\audio_recorder.cpp">
+      <Filter>src\slib\media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\audio_recorder_dsound.cpp">
+      <Filter>src\slib\media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\audio_recorder_opensl_es.cpp">
+      <Filter>src\slib\media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\crypto\aes.cpp">
+      <Filter>src\slib\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\crypto\compress_zlib.cpp">
+      <Filter>src\slib\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\crypto\crypto_hash.cpp">
+      <Filter>src\slib\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\crypto\crypto_secure_stream.cpp">
+      <Filter>src\slib\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\crypto\gcm.cpp">
+      <Filter>src\slib\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\crypto\md5.cpp">
+      <Filter>src\slib\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\crypto\rsa.cpp">
+      <Filter>src\slib\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\crypto\sha1.cpp">
+      <Filter>src\slib\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\crypto\sha2.cpp">
+      <Filter>src\slib\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\url.cpp">
+      <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\db\sqlite3.cpp">
+      <Filter>src\slib\db</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\drawable.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\font.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\font_freetype.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_context.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_path.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_util.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\image.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\image_jpeg.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\image_png.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\image_soil2.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\pen.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\bitmap.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\brush.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\canvas.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\color.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\bigint.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\geograph.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\int128.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\device\sensor.cpp">
+      <Filter>src\slib\device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\device\vibrator.cpp">
+      <Filter>src\slib\device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\http_client.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\http_common.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\http_proxy.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\http_service.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\icmp.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\ip_address.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\mac_address.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\nat.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\net_capture.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\net_capture_pcap.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\netfilter.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\network_async.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\network_async_win32.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\network_io.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\network_os.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\network_secure_stream.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\socket.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\socket_address.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\socket_event.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\socket_event_win32.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\tcpip.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\dns.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\ethernet.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\render\opengl_egl.cpp">
+      <Filter>src\slib\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\render\opengl_gl.cpp">
+      <Filter>src\slib\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\render\opengl_gles.cpp">
+      <Filter>src\slib\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\render\opengl_wgl.cpp">
+      <Filter>src\slib\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\render\render_base.cpp">
+      <Filter>src\slib\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\render\render_engine.cpp">
+      <Filter>src\slib\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\render\render_object.cpp">
+      <Filter>src\slib\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\render\render_object2d.cpp">
+      <Filter>src\slib\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\render\render_program.cpp">
+      <Filter>src\slib\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\render\texture.cpp">
+      <Filter>src\slib\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\render\vertex_buffer.cpp">
+      <Filter>src\slib\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\render\index_buffer.cpp">
+      <Filter>src\slib\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\view_win32.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\codec\codec_audio.cpp">
-      <Filter>src\slib\codec</Filter>
+    <ClCompile Include="..\..\..\src\slib\ui\web_view.cpp">
+      <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\codec\codec_audio_opus.cpp">
-      <Filter>src\slib\codec</Filter>
+    <ClCompile Include="..\..\..\src\slib\ui\web_view_win32.cpp">
+      <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\codec\codec_video.cpp">
-      <Filter>src\slib\codec</Filter>
+    <ClCompile Include="..\..\..\src\slib\ui\window.cpp">
+      <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\codec\codec_video_vpx.cpp">
-      <Filter>src\slib\codec</Filter>
+    <ClCompile Include="..\..\..\src\slib\ui\window_win32.cpp">
+      <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\capture\capture_camera.cpp">
-      <Filter>src\slib\capture</Filter>
+    <ClCompile Include="..\..\..\src\slib\ui\button.cpp">
+      <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\capture\capture_video.cpp">
-      <Filter>src\slib\capture</Filter>
+    <ClCompile Include="..\..\..\src\slib\ui\button_win32.cpp">
+      <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\audio\audio_player.cpp">
-      <Filter>src\slib\audio</Filter>
+    <ClCompile Include="..\..\..\src\slib\ui\canvas_gdiplus.cpp">
+      <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\audio\audio_recorder.cpp">
-      <Filter>src\slib\audio</Filter>
+    <ClCompile Include="..\..\..\src\slib\ui\check_box.cpp">
+      <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\audio\audio_player_dsound.cpp">
-      <Filter>src\slib\audio</Filter>
+    <ClCompile Include="..\..\..\src\slib\ui\check_box_win32.cpp">
+      <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\audio\audio_player_win32.cpp">
-      <Filter>src\slib\audio</Filter>
+    <ClCompile Include="..\..\..\src\slib\ui\cursor.cpp">
+      <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\audio\audio_recorder_dsound.cpp">
-      <Filter>src\slib\audio</Filter>
+    <ClCompile Include="..\..\..\src\slib\ui\cursor_win32.cpp">
+      <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\audio\audio_recorder_win32.cpp">
-      <Filter>src\slib\audio</Filter>
+    <ClCompile Include="..\..\..\src\slib\ui\drawable_gdiplus.cpp">
+      <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\audio\audio_player_opensl_es.cpp">
-      <Filter>src\slib\audio</Filter>
+    <ClCompile Include="..\..\..\src\slib\ui\drop_down_list.cpp">
+      <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\audio\audio_recorder_opensl_es.cpp">
-      <Filter>src\slib\audio</Filter>
+    <ClCompile Include="..\..\..\src\slib\ui\drop_down_list_win32.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\edit_view.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\edit_view_win32.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\font_win32.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\generic_view.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\graphics_path_gdiplus.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\label_view.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\label_view_win32.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\list_details_view.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\list_details_view_win32.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\radio_button.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\radio_button_win32.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\render_view.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\render_view_win32.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\s_button.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\s_check_box.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\s_image_view.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\s_label_view.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\s_radio_button.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\s_tab_view.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\s_view.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\scroll_view.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\scroll_view_win32.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\tab_view.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\tab_view_win32.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\ui_core.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\ui_core_win32.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\ui_event.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\ui_event_win32.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\ui_graphics_context.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\view.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\view_group.cpp">
+      <Filter>src\slib\ui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

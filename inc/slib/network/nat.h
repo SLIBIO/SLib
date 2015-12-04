@@ -2,8 +2,10 @@
 #define CHECKHEADER_SLIB_NETWORK_NAT
 
 #include "definition.h"
+
 #include "tcpip.h"
 #include "icmp.h"
+#include "socket_address.h"
 
 #include "../core/object.h"
 #include "../core/map.h"

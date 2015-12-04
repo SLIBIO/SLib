@@ -2,7 +2,8 @@
 #define CHECKHEADER_SLIB_NETWORK_DNS
 
 #include "definition.h"
-#include "address.h"
+
+#include "socket_address.h"
 #include "async.h"
 
 #include "../core/mio.h"

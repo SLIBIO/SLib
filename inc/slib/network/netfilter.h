@@ -3,7 +3,8 @@
 
 #include "definition.h"
 
-#include "address.h"
+#include "mac_address.h"
+
 #include "../core/object.h"
 #include "../core/pointer.h"
 

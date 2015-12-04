@@ -2,8 +2,9 @@
 #define CHECKHEADER_SLIB_NETWORK_ETHERNET
 
 #include "definition.h"
-#include "address.h"
+
 #include "constants.h"
+#include "mac_address.h"
 
 #include "../core/mio.h"
 #include "../core/map.h"

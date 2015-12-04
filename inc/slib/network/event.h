@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_NETWORK_EVENT
 
 #include "definition.h"
+
 #include "socket.h"
 #include "../core/event.h"
 

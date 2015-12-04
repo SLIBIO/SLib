@@ -2,8 +2,9 @@
 #define CHECKHEADER_SLIB_NETWORK_TCPIP
 
 #include "definition.h"
-#include "address.h"
+
 #include "constants.h"
+#include "ip_address.h"
 
 #include "../core/mio.h"
 #include "../core/expire.h"

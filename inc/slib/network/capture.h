@@ -10,8 +10,10 @@
 		
 *****************************************************************/
 
-#include "address.h"
+#include "definition.h"
+
 #include "constants.h"
+#include "ip_address.h"
 
 #include "../core/object.h"
 #include "../core/pointer.h"

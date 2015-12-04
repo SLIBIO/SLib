@@ -48,6 +48,7 @@
 #include "core/setting.h"
 #include "core/json.h"
 #include "core/base64.h"
+#include "core/url.h"
 
 #endif
 

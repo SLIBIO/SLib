@@ -3,7 +3,7 @@
 
 #include "http_common.h"
 
-#include "address.h"
+#include "socket_address.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 

@@ -10,8 +10,9 @@ SLIB_GRAPHICS_NAMESPACE_BEGIN
 
 class GraphicsContext;
 
-struct SLIB_EXPORT BitmapDesc
+class SLIB_EXPORT BitmapDesc
 {
+public:
 	sl_uint32 width;
 	sl_uint32 height;
 	ColorModel colorModel;

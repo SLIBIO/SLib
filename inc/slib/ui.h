@@ -24,6 +24,7 @@
 #include "ui/tab_view.h"
 #include "ui/render_view.h"
 #include "ui/web_view.h"
+#include "ui/video_view.h"
 #include "ui/camera_view.h"
 
 #include "ui/s_view.h"
@@ -33,6 +34,5 @@
 #include "ui/s_check_box.h"
 #include "ui/s_radio_button.h"
 #include "ui/s_tab_view.h"
-#include "ui/s_camera_view.h"
 
 #endif
