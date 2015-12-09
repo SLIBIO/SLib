@@ -110,13 +110,13 @@ Size ScrollView::getScrollRange()
 	Ref<View> content = m_viewContent;
 	if (content.isNotNull()) {
 		Size ret;
-		ret.width = content->getWidth() - getWidth();
-		if (ret.width < 0) {
-			ret.width = 0;
+		ret.x = content->getWidth() - getWidth();
+		if (ret.x < 0) {
+			ret.x = 0;
 		}
-		ret.height = content->getHeight() - getHeight();
-		if (ret.height < 0) {
-			ret.height = 0;
+		ret.y = content->getHeight() - getHeight();
+		if (ret.y < 0) {
+			ret.y = 0;
 		}
 		return ret;
 	}

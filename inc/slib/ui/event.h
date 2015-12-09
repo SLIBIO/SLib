@@ -5,7 +5,9 @@
 #include "constants.h"
 
 #include "../core/string.h"
-#include "../math/geometry2d.h"
+#include "../math/point.h"
+#include "../math/size.h"
+#include "../math/matrix3.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 

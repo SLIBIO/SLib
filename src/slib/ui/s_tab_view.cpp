@@ -271,11 +271,11 @@ Rectangle STabView::getTabBarRegion()
 		ret.left = 0;
 		ret.top = 0;
 		ret.right = m_tabWidth;
-		ret.bottom = size.height;
+		ret.bottom = size.y;
 	} else {
 		ret.left = 0;
 		ret.top = 0;
-		ret.right = size.width;
+		ret.right = size.x;
 		ret.bottom = m_tabHeight;
 	}
 	return ret;

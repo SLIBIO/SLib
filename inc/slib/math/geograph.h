@@ -2,7 +2,10 @@
 #define CHECKHEADER_SLIB_MATH_GEOGRAPH
 
 #include "definition.h"
-#include "geometry.h"
+
+#include "vector3.h"
+
+#include "../core/list.h"
 
 SLIB_MATH_NAMESPACE_BEGIN
 

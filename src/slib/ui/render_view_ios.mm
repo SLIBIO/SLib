@@ -103,7 +103,7 @@ void _iOS_GLCallback(_Slib_iOS_GLView* handle)
 			return;
 		}
 		
-		if (handle.superview != nil && handle.hidden == FALSE && !(UIApp::isMobilePaused())) {
+		if (handle.superview != nil && handle.hidden == NO && !(UIApp::isMobilePaused())) {
 			
 			if (desc.m_context == nil) {
 				if (!(desc.create())) {
@@ -113,34 +113,37 @@ void _iOS_GLCallback(_Slib_iOS_GLView* handle)
 			
 			handle.context = desc.m_context;
 			
-			sl_bool flagUpdate = sl_false;
-			if (handle->m_flagRenderingContinuously) {
-				flagUpdate = sl_true;
-			} else {
-				if (handle->m_flagRequestRender) {
+			sl_uint32 width = (sl_uint32)(handle.drawableWidth);
+			sl_uint32 height = (sl_uint32)(handle.drawableHeight);
+			
+			if (width > 0 && height > 0) {
+				
+				sl_bool flagUpdate = sl_false;
+				if (handle->m_flagRenderingContinuously) {
 					flagUpdate = sl_true;
+				} else {
+					if (handle->m_flagRequestRender) {
+						flagUpdate = sl_true;
+					}
+				}
+				handle->m_flagRequestRender = sl_false;
+				
+				if (flagUpdate) {
+					
+					[EAGLContext setCurrentContext:desc.m_context];
+					
+					desc.m_engine->setViewport(0, 0, width, height);
+					
+					Ref<View> _view = instance->getView();
+					if (RenderView::checkInstance(_view)) {
+						RenderView* view = (RenderView*)(_view.get());
+						view->dispatchOnFrame(desc.m_engine.get());
+					}
+					
+					[handle display];
+
 				}
 			}
-			handle->m_flagRequestRender = sl_false;
-			
-			if (flagUpdate) {
-				
-				[EAGLContext setCurrentContext:desc.m_context];
-				
-				sl_uint32 width = (sl_uint32)(handle.drawableWidth);
-				sl_uint32 height = (sl_uint32)(handle.drawableHeight);
-				
-				desc.m_engine->setViewport(0, 0, width, height);
-				
-				Ref<View> _view = instance->getView();
-				if (RenderView::checkInstance(_view)) {
-					RenderView* view = (RenderView*)(_view.get());
-					view->dispatchOnFrame(desc.m_engine.get());
-				}
-				
-				[handle display];
-			}
-			
 		} else {
 			desc.clear();
 		}

@@ -4,6 +4,10 @@
 #include "graphics/constants.h"
 
 #include "graphics/color.h"
+#include "graphics/yuv.h"
+#include "graphics/bitmap_format.h"
+#include "graphics/bitmap_data.h"
+
 #include "graphics/pen.h"
 #include "graphics/brush.h"
 #include "graphics/font.h"

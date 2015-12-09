@@ -658,31 +658,50 @@ void GL_BASE::flush()
 	GL_ENTRY(glFlush)();
 }
 
-sl_uint32 GL_BASE::createTexture2D(sl_uint32 width, sl_uint32 height, ColorModel colorModel, const void* pixels, sl_uint32 pitch)
+sl_uint32 GL_BASE::createTexture2D(const BitmapData& bitmapData)
 {
 	GLuint texture = 0;
 	GL_ENTRY(glGenTextures)(1, &texture);
 	if (texture) {
+		sl_uint32 width = bitmapData.width;
+		sl_uint32 height = bitmapData.height;
 		GL_ENTRY(glBindTexture)(GL_TEXTURE_2D, texture);
-		if (pixels) {
-			if (colorModel == Color::RGBA && (pitch == 0 || pitch == (width << 2))) {
-				GL_ENTRY(glTexImage2D)(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-			} else {
-				sl_uint32 size = width * height;
-				SLIB_SCOPED_BUFFER(sl_uint8, STACK_IMAGE_SIZE, glImage, size << 2);
-				Color::convert(width, height, colorModel, pixels, pitch, Color::RGBA, glImage, width << 2);
-				GL_ENTRY(glTexImage2D)(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, glImage);
-			}
+		if (bitmapData.format == bitmapFormatRGBA && (bitmapData.pitch == 0 || bitmapData.pitch == width << 2)) {
+			GL_ENTRY(glTexImage2D)(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, bitmapData.data);
 		} else {
-			GL_ENTRY(glTexImage2D)(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, sl_null);
+			sl_uint32 size = width * height;
+			SLIB_SCOPED_BUFFER(sl_uint8, STACK_IMAGE_SIZE, glImage, size << 2);
+			BitmapData temp;
+			temp.width = width;
+			temp.height = height;
+			temp.format = bitmapFormatRGBA;
+			temp.data = glImage;
+			temp.pitch = width << 2;
+			temp.copyPixelsFrom(bitmapData);
+			GL_ENTRY(glTexImage2D)(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, glImage);
 		}
 	}
 	return texture;
 }
 
-sl_uint32 GL_BASE::createTexture2D(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_uint32 stride)
+sl_uint32 GL_BASE::createTexture2D(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride)
 {
-	return createTexture2D(width, height, Color::defaultModel, pixels, stride << 2);
+	if (width > 0 && height > 0) {
+		if (pixels) {
+			BitmapData bitmapData(width, height, pixels, stride);
+			return createTexture2D(bitmapData);
+		} else {
+			GLuint texture = 0;
+			GL_ENTRY(glGenTextures)(1, &texture);
+			if (texture) {
+				GL_ENTRY(glBindTexture)(GL_TEXTURE_2D, texture);
+				GL_ENTRY(glTexImage2D)(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, sl_null);
+			}
+			return texture;
+		}
+	} else {
+		return 0;
+	}
 }
 
 sl_uint32 GL_BASE::createTexture2D(const Ref<Bitmap>& _bitmap, sl_uint32 x, sl_uint32 y, sl_uint32 w, sl_uint32 h)
@@ -716,16 +735,21 @@ sl_uint32 GL_BASE::createTexture2D(const Ref<Bitmap>& _bitmap, sl_uint32 x, sl_u
 		return createTexture2D(w, h, image->getColors(), image->getStride());
 	} else {
 		SLIB_SCOPED_BUFFER(sl_uint8, STACK_IMAGE_SIZE, glImage, (w * h) << 2);
-		if (bitmap->readPixels(x, y, w, h, Color::RGBA, glImage)) {
-			return createTexture2D(w, h, Color::RGBA, glImage);
+		BitmapData temp;
+		temp.width = w;
+		temp.height = h;
+		temp.format = bitmapFormatRGBA;
+		temp.data = glImage;
+		temp.pitch = w << 2;
+		if (bitmap->readPixels(x, y, temp)) {
+			return createTexture2D(temp);
 		}
 		return 0;
 	}
 }
 
-sl_uint32 GL_BASE::createTexture2D(const Ref<Bitmap>& _bitmap)
+sl_uint32 GL_BASE::createTexture2D(const Ref<Bitmap>& bitmap)
 {
-	Ref<Bitmap> bitmap = _bitmap;
 	if (bitmap.isNull()) {
 		return 0;
 	}
@@ -742,8 +766,14 @@ sl_uint32 GL_BASE::createTexture2D(const Ref<Bitmap>& _bitmap)
 		return createTexture2D(w, h, image->getColors(), image->getStride());
 	} else {
 		SLIB_SCOPED_BUFFER(sl_uint8, STACK_IMAGE_SIZE, glImage, (w * h) << 2);
-		if (bitmap->readPixels(0, 0, w, h, Color::RGBA, glImage)) {
-			return createTexture2D(w, h, Color::RGBA, glImage);
+		BitmapData temp;
+		temp.width = w;
+		temp.height = h;
+		temp.format = bitmapFormatRGBA;
+		temp.data = glImage;
+		temp.pitch = w << 2;
+		if (bitmap->readPixels(0, 0, temp)) {
+			return createTexture2D(temp);
 		}
 		return 0;
 	}
@@ -767,21 +797,30 @@ sl_uint32 GL_BASE::createTexture2DFromResource(const String& path)
 	return createTexture2D(image);
 }
 
-void GL_BASE::updateTexture2D(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, ColorModel colorModel, const void* pixels, sl_uint32 pitch)
+void GL_BASE::updateTexture2D(sl_uint32 x, sl_uint32 y, const BitmapData& bitmapData)
 {
-	if (colorModel == Color::RGBA && (pitch == 0 || pitch == (width << 2))) {
-		GL_ENTRY(glTexSubImage2D)(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+	sl_uint32 width = bitmapData.width;
+	sl_uint32 height = bitmapData.height;
+	if (bitmapData.format == bitmapFormatRGBA && (bitmapData.pitch == 0 || bitmapData.pitch == width << 2)) {
+		GL_ENTRY(glTexSubImage2D)(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, bitmapData.data);
 	} else {
 		sl_uint32 size = width * height;
 		SLIB_SCOPED_BUFFER(sl_uint8, STACK_IMAGE_SIZE, glImage, size << 2);
-		Color::convert(width, height, colorModel, pixels, pitch, Color::RGBA, glImage, width << 2);
+		BitmapData temp;
+		temp.width = width;
+		temp.height = height;
+		temp.format = bitmapFormatRGBA;
+		temp.data = glImage;
+		temp.pitch = width << 2;
+		temp.copyPixelsFrom(bitmapData);
 		GL_ENTRY(glTexSubImage2D)(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, glImage);
 	}
 }
 
-void GL_BASE::updateTexture2D(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color* pixels, sl_uint32 stride)
+void GL_BASE::updateTexture2D(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride)
 {
-	updateTexture2D(x, y, width, height, Color::defaultModel, pixels, stride << 2);
+	BitmapData bitmapData(width, height, pixels, stride);
+	updateTexture2D(x, y, bitmapData);
 }
 
 void GL_BASE::updateTexture2D(sl_uint32 x, sl_uint32 y, sl_uint32 w, sl_uint32 h, const Ref<Bitmap>& _bitmap, sl_uint32 bx, sl_uint32 by)
@@ -815,8 +854,14 @@ void GL_BASE::updateTexture2D(sl_uint32 x, sl_uint32 y, sl_uint32 w, sl_uint32 h
 		updateTexture2D(x, y, w, h, image->getColorsAt(bx, by), image->getStride());
 	} else {
 		SLIB_SCOPED_BUFFER(sl_uint8, STACK_IMAGE_SIZE, glImage, (w * h) << 2);
-		if (bitmap->readPixels(bx, by, w, h, Color::RGBA, glImage)) {
-			updateTexture2D(x, y, w, h, Color::RGBA, glImage, w << 2);
+		BitmapData temp;
+		temp.width = w;
+		temp.height = h;
+		temp.format = bitmapFormatRGBA;
+		temp.data = glImage;
+		temp.pitch = w << 2;
+		if (bitmap->readPixels(bx, by, temp)) {
+			updateTexture2D(x, y, temp);
 		}
 	}
 }

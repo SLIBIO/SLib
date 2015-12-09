@@ -1,5 +1,6 @@
 #include "../../../inc/slib/render/engine.h"
 #include "../../../inc/slib/render/object2d.h"
+#include "../../../inc/slib/math/transform2d.h"
 
 SLIB_RENDER_NAMESPACE_BEGIN
 sl_bool RenderObject2D::hitTest(const Point& ptWorld)

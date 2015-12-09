@@ -52,8 +52,6 @@
 		266DD3AE1C117B1200D47AB0 /* bigint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3AB1C117B1200D47AB0 /* bigint.cpp */; };
 		266DD3AF1C117B1200D47AB0 /* geograph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3AC1C117B1200D47AB0 /* geograph.cpp */; };
 		266DD3B01C117B1200D47AB0 /* int128.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3AD1C117B1200D47AB0 /* int128.cpp */; };
-		266DD3B61C117D0A00D47AB0 /* sensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3B21C117D0A00D47AB0 /* sensor.cpp */; };
-		266DD3B81C117D0A00D47AB0 /* vibrator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3B41C117D0A00D47AB0 /* vibrator.cpp */; };
 		266DD3BA1C11804E00D47AB0 /* url.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3B91C11804E00D47AB0 /* url.cpp */; };
 		266DD3D51C1181B500D47AB0 /* dns.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3BB1C1181B500D47AB0 /* dns.cpp */; };
 		266DD3D61C1181B500D47AB0 /* ethernet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3BC1C1181B500D47AB0 /* ethernet.cpp */; };
@@ -127,6 +125,15 @@
 		266DD4521C1191F300D47AB0 /* web_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4511C1191F300D47AB0 /* web_view.cpp */; };
 		266DD4541C1191FE00D47AB0 /* web_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4531C1191FE00D47AB0 /* web_view_ios.mm */; };
 		266DD46C1C11934A00D47AB0 /* compress_zlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD46B1C11934A00D47AB0 /* compress_zlib.cpp */; };
+		266DD5EE1C11CEBB00D47AB0 /* camera_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5ED1C11CEBB00D47AB0 /* camera_ios.mm */; };
+		266DD5F61C11E09B00D47AB0 /* camera_avfoundation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5F51C11E09B00D47AB0 /* camera_avfoundation.mm */; };
+		268916341C182AC8009FD75E /* camera_dshow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268916331C182AC8009FD75E /* camera_dshow.cpp */; };
+		26A9B7621C172BCC004C9B0E /* camera_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A9B7611C172BCC004C9B0E /* camera_view.cpp */; };
+		26A9B7641C172BDE004C9B0E /* video_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A9B7631C172BDE004C9B0E /* video_view.cpp */; };
+		26C0A3511C128D80005690FE /* sensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A34D1C128D80005690FE /* sensor.cpp */; };
+		26C0A3531C128D80005690FE /* vibrator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A34F1C128D80005690FE /* vibrator.cpp */; };
+		26C0A3561C131F8E005690FE /* bitmap_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A3551C131F8E005690FE /* bitmap_data.cpp */; };
+		26C0A3581C133969005690FE /* bitmap_format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A3571C133969005690FE /* bitmap_format.cpp */; };
 		A234D6EE1B3F12F600ADDF4E /* content_type.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A234D6ED1B3F12F600ADDF4E /* content_type.cpp */; };
 		A24142E31BA7CA4C00D7AB80 /* algorithm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A24142E21BA7CA4C00D7AB80 /* algorithm.cpp */; };
 		A24142F71BA85F4500D7AB80 /* thirdparty_soil2.c in Sources */ = {isa = PBXBuildFile; fileRef = A24142F61BA85F4500D7AB80 /* thirdparty_soil2.c */; settings = {COMPILER_FLAGS = "-O3 -Wno-conversion"; }; };
@@ -239,8 +246,6 @@
 		266DD3AB1C117B1200D47AB0 /* bigint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bigint.cpp; sourceTree = "<group>"; };
 		266DD3AC1C117B1200D47AB0 /* geograph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = geograph.cpp; sourceTree = "<group>"; };
 		266DD3AD1C117B1200D47AB0 /* int128.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = int128.cpp; sourceTree = "<group>"; };
-		266DD3B21C117D0A00D47AB0 /* sensor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sensor.cpp; path = ../device/sensor.cpp; sourceTree = "<group>"; };
-		266DD3B41C117D0A00D47AB0 /* vibrator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vibrator.cpp; path = ../device/vibrator.cpp; sourceTree = "<group>"; };
 		266DD3B91C11804E00D47AB0 /* url.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = url.cpp; sourceTree = "<group>"; };
 		266DD3BB1C1181B500D47AB0 /* dns.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dns.cpp; sourceTree = "<group>"; };
 		266DD3BC1C1181B500D47AB0 /* ethernet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ethernet.cpp; sourceTree = "<group>"; };
@@ -320,6 +325,15 @@
 		266DD4511C1191F300D47AB0 /* web_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = web_view.cpp; sourceTree = "<group>"; };
 		266DD4531C1191FE00D47AB0 /* web_view_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = web_view_ios.mm; sourceTree = "<group>"; };
 		266DD46B1C11934A00D47AB0 /* compress_zlib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = compress_zlib.cpp; sourceTree = "<group>"; };
+		266DD5ED1C11CEBB00D47AB0 /* camera_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = camera_ios.mm; path = media/camera_ios.mm; sourceTree = "<group>"; };
+		266DD5F51C11E09B00D47AB0 /* camera_avfoundation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = camera_avfoundation.mm; path = media/camera_avfoundation.mm; sourceTree = "<group>"; };
+		268916331C182AC8009FD75E /* camera_dshow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = camera_dshow.cpp; path = media/camera_dshow.cpp; sourceTree = "<group>"; };
+		26A9B7611C172BCC004C9B0E /* camera_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera_view.cpp; sourceTree = "<group>"; };
+		26A9B7631C172BDE004C9B0E /* video_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_view.cpp; sourceTree = "<group>"; };
+		26C0A34D1C128D80005690FE /* sensor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sensor.cpp; sourceTree = "<group>"; };
+		26C0A34F1C128D80005690FE /* vibrator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vibrator.cpp; sourceTree = "<group>"; };
+		26C0A3551C131F8E005690FE /* bitmap_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_data.cpp; sourceTree = "<group>"; };
+		26C0A3571C133969005690FE /* bitmap_format.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_format.cpp; sourceTree = "<group>"; };
 		A234D6ED1B3F12F600ADDF4E /* content_type.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = content_type.cpp; sourceTree = "<group>"; };
 		A24142E21BA7CA4C00D7AB80 /* algorithm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = algorithm.cpp; sourceTree = "<group>"; };
 		A24142F61BA85F4500D7AB80 /* thirdparty_soil2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_soil2.c; sourceTree = "<group>"; };
@@ -427,6 +441,8 @@
 			isa = PBXGroup;
 			children = (
 				266DD38C1C117AE300D47AB0 /* bitmap.cpp */,
+				26C0A3551C131F8E005690FE /* bitmap_data.cpp */,
+				26C0A3571C133969005690FE /* bitmap_format.cpp */,
 				266DD38D1C117AE300D47AB0 /* brush.cpp */,
 				266DD38E1C117AE300D47AB0 /* canvas.cpp */,
 				266DD38F1C117AE300D47AB0 /* color.cpp */,
@@ -460,6 +476,9 @@
 				266DD3721C1171E400D47AB0 /* audio_recorder_ios.mm */,
 				266DD3731C1171E400D47AB0 /* audio_recorder_opensl_es.cpp */,
 				266DD35D1C1170BD00D47AB0 /* camera.cpp */,
+				266DD5F51C11E09B00D47AB0 /* camera_avfoundation.mm */,
+				268916331C182AC8009FD75E /* camera_dshow.cpp */,
+				266DD5ED1C11CEBB00D47AB0 /* camera_ios.mm */,
 				266DD35E1C1170BD00D47AB0 /* codec_opus.cpp */,
 				266DD35F1C1170BD00D47AB0 /* codec_vpx.cpp */,
 				266DD3601C1170BD00D47AB0 /* video_capture.cpp */,
@@ -468,13 +487,22 @@
 			name = media;
 			sourceTree = "<group>";
 		};
+		26C0A34C1C128D80005690FE /* device */ = {
+			isa = PBXGroup;
+			children = (
+				26C0A34D1C128D80005690FE /* sensor.cpp */,
+				26C0A34F1C128D80005690FE /* vibrator.cpp */,
+			);
+			path = device;
+			sourceTree = "<group>";
+		};
 		A25F2EBC1B039EF600854DAF /* slib */ = {
 			isa = PBXGroup;
 			children = (
 				A25F2EC61B039EF600854DAF /* core */,
 				A25F2EED1B039EF600854DAF /* crypto */,
 				A25F2EF21B039EF600854DAF /* db */,
-				A25F2EFF1B039EF600854DAF /* device */,
+				26C0A34C1C128D80005690FE /* device */,
 				260252031BF18CB800DEFAB1 /* graphics */,
 				A25F2EFB1B039EF600854DAF /* math */,
 				266DD3581C11705C00D47AB0 /* media */,
@@ -568,16 +596,6 @@
 			path = math;
 			sourceTree = "<group>";
 		};
-		A25F2EFF1B039EF600854DAF /* device */ = {
-			isa = PBXGroup;
-			children = (
-				266DD3B21C117D0A00D47AB0 /* sensor.cpp */,
-				266DD3B41C117D0A00D47AB0 /* vibrator.cpp */,
-			);
-			name = device;
-			path = mobile;
-			sourceTree = "<group>";
-		};
 		A25F2F041B039EF600854DAF /* network */ = {
 			isa = PBXGroup;
 			children = (
@@ -636,6 +654,7 @@
 			children = (
 				266DD4311C118FF200D47AB0 /* button.cpp */,
 				266DD4331C118FF700D47AB0 /* button_ios.mm */,
+				26A9B7611C172BCC004C9B0E /* camera_view.cpp */,
 				266DD41E1C118E9600D47AB0 /* canvas_quartz.mm */,
 				266DD4351C11901A00D47AB0 /* check_box.cpp */,
 				266DD41A1C118E4A00D47AB0 /* cursor.cpp */,
@@ -668,6 +687,7 @@
 				A25F2F291B039EF600854DAF /* ui_event.cpp */,
 				A2774E271B1CBBF600538A7B /* ui_event_ios.mm */,
 				260252251BF18D4300DEFAB1 /* ui_graphics_context.cpp */,
+				26A9B7631C172BDE004C9B0E /* video_view.cpp */,
 				266DD4281C118F6D00D47AB0 /* view.cpp */,
 				266DD4261C118F2500D47AB0 /* view_group.cpp */,
 				266DD42A1C118F7800D47AB0 /* view_ios.h */,
@@ -764,7 +784,6 @@
 				A234D6EE1B3F12F600ADDF4E /* content_type.cpp in Sources */,
 				A2DE1DA71B383EA000A74698 /* system_unix.cpp in Sources */,
 				A25F2F421B039EF600854DAF /* file_unix.cpp in Sources */,
-				266DD3B61C117D0A00D47AB0 /* sensor.cpp in Sources */,
 				A25F2F861B039EF600854DAF /* ui_core_ios.mm in Sources */,
 				266DD3E01C1181B500D47AB0 /* net_capture.cpp in Sources */,
 				A25F2F891B039EF600854DAF /* ui_event.cpp in Sources */,
@@ -780,11 +799,12 @@
 				266DD3701C1171B800D47AB0 /* audio_player_opensl_es.cpp in Sources */,
 				A2DE1D9D1B383E7800A74698 /* event_unix.cpp in Sources */,
 				A2DE1DA01B383E8500A74698 /* pipe.cpp in Sources */,
+				268916341C182AC8009FD75E /* camera_dshow.cpp in Sources */,
 				A25F2F401B039EF600854DAF /* event.cpp in Sources */,
 				266DD39C1C117AE300D47AB0 /* bitmap.cpp in Sources */,
 				266DD4401C1190E800D47AB0 /* label_view.cpp in Sources */,
 				266DD43C1C1190A600D47AB0 /* edit_view.cpp in Sources */,
-				266DD3B81C117D0A00D47AB0 /* vibrator.cpp in Sources */,
+				26C0A3581C133969005690FE /* bitmap_format.cpp in Sources */,
 				A25F2F581B039EF600854DAF /* time.cpp in Sources */,
 				266DD3AF1C117B1200D47AB0 /* geograph.cpp in Sources */,
 				A2498C761AFA9C3200C76201 /* thirdparty_freetype.c in Sources */,
@@ -807,6 +827,7 @@
 				266DD4301C118FB700D47AB0 /* window_ios.mm in Sources */,
 				A25F2F3F1B039EF600854DAF /* base64.cpp in Sources */,
 				266DD3A71C117AE300D47AB0 /* image_png.cpp in Sources */,
+				266DD5EE1C11CEBB00D47AB0 /* camera_ios.mm in Sources */,
 				266DD38B1C117A4300D47AB0 /* sqlite3.cpp in Sources */,
 				266DD44E1C1191B900D47AB0 /* scroll_view_ios.mm in Sources */,
 				266DD4071C118B9900D47AB0 /* render_program.cpp in Sources */,
@@ -820,12 +841,15 @@
 				266DD3751C1171E400D47AB0 /* audio_recorder_ios.mm in Sources */,
 				A25F2F481B039EF600854DAF /* mutex.cpp in Sources */,
 				A2774E2A1B1CBBFD00538A7B /* ui_core.cpp in Sources */,
+				26A9B7621C172BCC004C9B0E /* camera_view.cpp in Sources */,
 				266DD3831C117A3100D47AB0 /* gcm.cpp in Sources */,
 				266DD3A31C117AE300D47AB0 /* graphics_context.cpp in Sources */,
 				266DD3DB1C1181B500D47AB0 /* icmp.cpp in Sources */,
+				266DD5F61C11E09B00D47AB0 /* camera_avfoundation.mm in Sources */,
 				266DD3E41C1181B500D47AB0 /* network_async.cpp in Sources */,
 				A2774E281B1CBBF600538A7B /* ui_event_ios.mm in Sources */,
 				266DD3621C1170BD00D47AB0 /* audio_codec.cpp in Sources */,
+				26C0A3531C128D80005690FE /* vibrator.cpp in Sources */,
 				266DD3881C117A3100D47AB0 /* sha2.cpp in Sources */,
 				266DD3A51C117AE300D47AB0 /* graphics_util.cpp in Sources */,
 				266DD3E71C1181B500D47AB0 /* network_secure_stream.cpp in Sources */,
@@ -886,6 +910,7 @@
 				A25F2F451B039EF600854DAF /* json.cpp in Sources */,
 				266DD3DF1C1181B500D47AB0 /* net_capture_pcap.cpp in Sources */,
 				266DD4161C118E2100D47AB0 /* s_label_view.cpp in Sources */,
+				26C0A3561C131F8E005690FE /* bitmap_data.cpp in Sources */,
 				266DD3A81C117AE300D47AB0 /* image_soil2.cpp in Sources */,
 				266DD3E51C1181B500D47AB0 /* network_os.cpp in Sources */,
 				266DD3DA1C1181B500D47AB0 /* http_service.cpp in Sources */,
@@ -894,9 +919,11 @@
 				260252021BF18BE200DEFAB1 /* callback.cpp in Sources */,
 				266DD3761C1171E400D47AB0 /* audio_recorder_opensl_es.cpp in Sources */,
 				266DD4291C118F6D00D47AB0 /* view.cpp in Sources */,
+				26C0A3511C128D80005690FE /* sensor.cpp in Sources */,
 				266DD4521C1191F300D47AB0 /* web_view.cpp in Sources */,
 				266DD3AA1C117AE300D47AB0 /* pen.cpp in Sources */,
 				266DD41D1C118E5B00D47AB0 /* generic_view.cpp in Sources */,
+				26A9B7641C172BDE004C9B0E /* video_view.cpp in Sources */,
 				A2498C771AFA9C3200C76201 /* thirdparty_libjpeg.c in Sources */,
 				266DD4321C118FF200D47AB0 /* button.cpp in Sources */,
 				A25F2F541B039EF600854DAF /* system.cpp in Sources */,

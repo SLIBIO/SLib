@@ -15,9 +15,9 @@ Ref<Image> Image_SOIL2::loadImage(const void* content, sl_size size)
 	if (map) {
 		ret = Image::create(width, height);
 		if (ret.isNotNull()) {
-			Color::convert(width, height, Color::RGBA, map, width * 4, ret->getColors(), width);
-			return ret;
+			Base::copyMemory(ret->getColors(), map, width * height * 4);
 		}
+		SOIL_free_image_data(map);
 	}
 	return ret;
 }

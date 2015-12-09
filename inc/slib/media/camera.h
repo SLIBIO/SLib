@@ -25,6 +25,7 @@ public:
 
 	sl_uint32 preferedFrameWidth;
 	sl_uint32 preferedFrameHeight;
+	BitmapFormat preferedFrameFormat;
 
 public:
 	CameraParam();

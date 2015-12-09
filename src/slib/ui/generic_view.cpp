@@ -437,7 +437,7 @@ void GenericView::setPadding(sl_real padding)
 Rectangle GenericView::getContentBounds()
 {
 	Size size = getSize();
-	Rectangle ret(m_paddingLeft, m_paddingTop, size.width - m_paddingRight, size.height - m_paddingBottom);
+	Rectangle ret(m_paddingLeft, m_paddingTop, size.x - m_paddingRight, size.y - m_paddingBottom);
 	return ret;
 }
 SLIB_UI_NAMESPACE_END

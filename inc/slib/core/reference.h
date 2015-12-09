@@ -21,22 +21,28 @@ public:
 	{
 		m_nRef = 0;
 	}
+	
 	SLIB_INLINE ~RefCount()
 	{
 	}
+	
 	SLIB_INLINE sl_reg add()
 	{
 		return Base::interlockedIncrement(&m_nRef);
 	}
+	
 	SLIB_INLINE sl_reg release()
 	{
 		return Base::interlockedDecrement(&m_nRef);
 	}
+	
 	SLIB_INLINE sl_reg getCount()
 	{
 		return m_nRef;
 	}
+	
 	sl_bool waitNoRef(sl_int32 timeout = -1);
+	
 };
 SLIB_NAMESPACE_END
 
@@ -63,10 +69,10 @@ SLIB_NAMESPACE_END
 
 
 #define SLIB_DECLARE_OBJECT_TYPE_BASE(CLASS) \
-	template <class _ObjectClass, sl_bool _flagThreadSafe> \
-	static sl_bool checkInstance(const slib::Ref<_ObjectClass, _flagThreadSafe>& _object) \
+	template <class _ObjectClass> \
+	static sl_bool checkInstance(const slib::Ref<_ObjectClass>& _object) \
 	{ \
-		slib::Ref<_ObjectClass, _flagThreadSafe> object = _object; \
+		slib::Ref<_ObjectClass> object = _object; \
 		if (object.isNotNull()) { \
 			return object->checkClassType(CLASS::ClassType()); \
 		} else { \
@@ -191,20 +197,19 @@ public: \
 	{ \
 		return m_object; \
 	} \
-	SLIB_INLINE Ref<Referable, sl_false> getReference() const \
+	SLIB_INLINE Ref<Referable> getReference() const \
 	{ \
 		return m_object.getReference(); \
 	} \
-	template <class _ObjectClass, sl_bool _flagThreadSafe> \
-	SLIB_INLINE static const CLASS_TYPE& fromReference(const slib::Ref<_ObjectClass, _flagThreadSafe>& object) \
+	template <class _ObjectClass> \
+	SLIB_INLINE static const CLASS_TYPE& fromReference(const slib::Ref<_ObjectClass>& object) \
 	{ \
 		return *((CLASS_TYPE*)((void*)&object)); \
 	}
 
 #define SLIB_DECLARE_OBJECT_WRAPPER(CLASS_NAME, CLASS_TYPE, OBJ_TYPE, REF_TYPE) \
 	SLIB_DECLARE_OBJECT_WRAPPER_NO_OP(CLASS_NAME, CLASS_TYPE, OBJ_TYPE, REF_TYPE) \
-	template <sl_bool _flagThreadSafe> \
-	SLIB_INLINE CLASS_NAME(const slib::Ref<OBJ_TYPE, _flagThreadSafe>& object) : m_object(object) \
+	SLIB_INLINE CLASS_NAME(const slib::Ref<OBJ_TYPE>& object) : m_object(object) \
 	{ \
 	} \
 	SLIB_INLINE sl_bool operator==(const CLASS_TYPE& other) const \
@@ -225,8 +230,8 @@ public: \
 		m_object = object; \
 		return *this; \
 	} \
-	template <class _ObjectClass, sl_bool _flagThreadSafe> \
-	SLIB_INLINE CLASS_TYPE& operator=(const slib::Ref<_ObjectClass, _flagThreadSafe>& object) \
+	template <class _ObjectClass> \
+	SLIB_INLINE CLASS_TYPE& operator=(const slib::Ref<_ObjectClass>& object) \
 	{ \
 		m_object = object; \
 		return *this; \
@@ -312,10 +317,10 @@ public:
 
 extern void* const _Ref_null;
 
-template <class ObjectClass, sl_bool flagThreadSafe = sl_true>
+template <class ObjectClass>
 class SLIB_EXPORT Ref
 {
-	typedef Ref<ObjectClass, flagThreadSafe> _Type;
+	typedef Ref<ObjectClass> _Type;
 public:
 	ObjectClass* m_object;
 
@@ -333,20 +338,14 @@ public:
 		}
 	}
 
-	SLIB_INLINE Ref(const Ref<ObjectClass, sl_true>& other)
+	SLIB_INLINE Ref(const Ref<ObjectClass>& other)
 	{
 		ObjectClass* object = other._cloneObject();
 		m_object = object;
 	}
 
-	SLIB_INLINE Ref(const Ref<ObjectClass, sl_false>& other)
-	{
-		ObjectClass* object = other._cloneObject();
-		m_object = object;
-	}
-
-	template <class _ObjectClass, sl_bool _flagThreadSafe>
-	SLIB_INLINE Ref(const Ref<_ObjectClass, _flagThreadSafe>& other)
+	template <class _ObjectClass>
+	SLIB_INLINE Ref(const Ref<_ObjectClass>& other)
 	{
 		ObjectClass* object = other._cloneObject();
 		m_object = object;
@@ -391,7 +390,7 @@ public:
 		return m_object;
 	}
 
-	SLIB_INLINE _Type& operator=(const Ref<ObjectClass , sl_true>& other)
+	SLIB_INLINE _Type& operator=(const Ref<ObjectClass>& other)
 	{
 		if ((void*)this != (void*)(&other) && m_object != other.m_object) {
 			ObjectClass* object = other._cloneObject();
@@ -399,18 +398,9 @@ public:
 		}
 		return *this;
 	}
-
-	SLIB_INLINE _Type& operator=(const Ref<ObjectClass, sl_false>& other)
-	{
-		if ((void*)this != (void*)(&other) && m_object != other.m_object) {
-			ObjectClass* object = other._cloneObject();
-			_replaceObject(object);
-		}
-		return *this;
-	}
-
-	template <class _ObjectClass, sl_bool _flagThreadSafe>
-	SLIB_INLINE _Type& operator=(const Ref<_ObjectClass, _flagThreadSafe>& other)
+	
+	template <class _ObjectClass>
+	SLIB_INLINE _Type& operator=(const Ref<_ObjectClass>& other)
 	{
 		if ((void*)this != (void*)(&other) && m_object != other.m_object) {
 			ObjectClass* object = other._cloneObject();
@@ -430,6 +420,7 @@ public:
 		}
 		return *this;
 	}
+	
 	SLIB_INLINE _Type& operator=(ObjectClass* _other)
 	{
 		Referable* other = (Referable*)_other;
@@ -446,21 +437,19 @@ public:
 	{
 		return (m_object == other);
 	}
+	
 	SLIB_INLINE sl_bool operator==(ObjectClass* other) const
 	{
 		return (m_object == other);
 	}
 	
-	SLIB_INLINE sl_bool operator==(const Ref<ObjectClass, sl_true>& other) const
+	SLIB_INLINE sl_bool operator==(const Ref<ObjectClass>& other) const
 	{
 		return ((void*)m_object == (void*)(other.m_object));
 	}
-	SLIB_INLINE sl_bool operator==(const Ref<ObjectClass, sl_false>& other) const
-	{
-		return ((void*)m_object == (void*)(other.m_object));
-	}
-	template <class _ObjectClass, sl_bool _flagThreadSafe>
-	SLIB_INLINE sl_bool operator==(const Ref<_ObjectClass, _flagThreadSafe>& other) const
+	
+	template <class _ObjectClass>
+	SLIB_INLINE sl_bool operator==(const Ref<_ObjectClass>& other) const
 	{
 		return ((void*)m_object == (void*)(other.m_object));
 	}
@@ -469,34 +458,27 @@ public:
 	{
 		return (m_object != other);
 	}
+	
 	SLIB_INLINE sl_bool operator!=(ObjectClass* other) const
 	{
 		return (m_object != other);
 	}
 
-	SLIB_INLINE sl_bool operator!=(const Ref<ObjectClass, sl_true>& other) const
+	SLIB_INLINE sl_bool operator!=(const Ref<ObjectClass>& other) const
 	{
 		return ((void*)m_object != (void*)(other.m_object));
 	}
-	SLIB_INLINE sl_bool operator!=(const Ref<ObjectClass, sl_false>& other) const
-	{
-		return ((void*)m_object != (void*)(other.m_object));
-	}
-	template <class _ObjectClass, sl_bool _flagThreadSafe>
-	SLIB_INLINE sl_bool operator!=(const Ref<_ObjectClass, _flagThreadSafe>& other) const
+	
+	template <class _ObjectClass>
+	SLIB_INLINE sl_bool operator!=(const Ref<_ObjectClass>& other) const
 	{
 		return ((void*)m_object != (void*)(other.m_object));
 	}
 
-	SLIB_INLINE friend sl_bool operator==(const ObjectClass* a, const Ref<ObjectClass, flagThreadSafe>& b)
+	SLIB_INLINE friend sl_bool operator==(const ObjectClass* a, const Ref<ObjectClass>& b)
 	{
 		return (a == b.m_object);
 	}
-	SLIB_INLINE friend sl_bool operator!=(const ObjectClass* a, const Ref<ObjectClass, flagThreadSafe>& b)
-	{
-		return (a != b.m_object);
-	}
-	
 	
 	SLIB_INLINE ObjectClass& operator*() const
 	{
@@ -508,15 +490,15 @@ public:
 		return (ObjectClass*)m_object;
 	}
 
-	template <class _ObjectClass, sl_bool _flagThreadSafe>
-	SLIB_INLINE static const _Type& from(const Ref<_ObjectClass, _flagThreadSafe>& other)
+	template <class _ObjectClass>
+	SLIB_INLINE static const _Type& from(const Ref<_ObjectClass>& other)
 	{
 		return *((_Type*)((void*)&other));
 	}
 
-	SLIB_INLINE const Ref<Referable, flagThreadSafe>& getReference() const
+	SLIB_INLINE const Ref<Referable>& getReference() const
 	{
-		return *((Ref<Referable, flagThreadSafe>*)((void*)this));
+		return *((Ref<Referable>*)((void*)this));
 	}
 
 public:
@@ -526,45 +508,28 @@ public:
 		if ((void*)source == (void*)(&_Ref_null)) {
 			return sl_null;
 		}
-		if (flagThreadSafe) {
-			SpinLocker lock(SpinLockPoolForReference::get(source));
-			ObjectClass* object = *source;
-			if (object) {
-				((Referable*)object)->increaseReference();
-			}
-			return object;
-		} else {
-			ObjectClass* object = *source;
-			if (object) {
-				((Referable*)object)->increaseReference();
-			}
-			return object;
+		SpinLocker lock(SpinLockPoolForReference::get(source));
+		ObjectClass* object = *source;
+		if (object) {
+			((Referable*)object)->increaseReference();
 		}
+		return object;
 	}
 
 	void _replaceObject(ObjectClass* object)
 	{
 		ObjectClass** target = &m_object;
-		if (flagThreadSafe) {
-			SpinLocker lock(SpinLockPoolForReference::get(target));
-			ObjectClass* before = *target;
-			*target = object;
-			if (before) {
-				sl_reg nRef = ((Referable*)before)->_decreaseReference();
-				if (nRef == 0) {
-					lock.unlock();
-					((Referable*)before)->_free();
-				}
-			}
-		} else {
-			ObjectClass* before = *target;
-			*target = object;
-			if (before) {
-				((Referable*)before)->decreaseReference();
+		SpinLocker lock(SpinLockPoolForReference::get(target));
+		ObjectClass* before = *target;
+		*target = object;
+		if (before) {
+			sl_reg nRef = ((Referable*)before)->_decreaseReference();
+			if (nRef == 0) {
+				lock.unlock();
+				((Referable*)before)->_free();
 			}
 		}
 	}
-
 };
 
 class SLIB_EXPORT WeakRefObject : public Referable
@@ -577,24 +542,18 @@ public:
 	SpinLock lock;
 };
 
-template <class ObjectClass, sl_bool flagThreadSafe = sl_true>
+template <class ObjectClass>
 class SLIB_EXPORT WeakRef
 {
-	typedef WeakRef<ObjectClass, flagThreadSafe> _Type;
-	typedef Ref<WeakRefObject, flagThreadSafe> _Ref;
+	typedef WeakRef<ObjectClass> _Type;
+	typedef Ref<WeakRefObject> _Ref;
 	SLIB_DECLARE_OBJECT_TYPE_FROM(_Type, WeakRefObject)
 	SLIB_DECLARE_OBJECT_WRAPPER_NO_OP(WeakRef, _Type, WeakRefObject, _Ref)
 
 public:
-	SLIB_INLINE WeakRef(const Ref<ObjectClass, sl_true>& _ref)
+	SLIB_INLINE WeakRef(const Ref<ObjectClass>& _ref)
 	{
-		Ref<ObjectClass, sl_false> ref(_ref);
-		_setFromReference((Referable*)(ref.getObject()));
-	}
-
-	SLIB_INLINE WeakRef(const Ref<ObjectClass, sl_false>& _ref)
-	{
-		Ref<ObjectClass, sl_false> ref(_ref);
+		Ref<ObjectClass> ref(_ref);
 		_setFromReference((Referable*)(ref.getObject()));
 	}
 
@@ -615,18 +574,13 @@ public:
 		return *this;
 	}
 
-	SLIB_INLINE _Type& operator=(const Ref<ObjectClass, sl_true>& _ref)
+	SLIB_INLINE _Type& operator=(const Ref<ObjectClass>& _ref)
 	{
-		Ref<ObjectClass, sl_false> ref(_ref);
+		Ref<ObjectClass> ref(_ref);
 		_setFromReference((Referable*)(ref.getObject()));
 		return *this;
 	}
-	SLIB_INLINE _Type& operator=(const Ref<ObjectClass, sl_false>& _ref)
-	{
-		Ref<ObjectClass, sl_false> ref(_ref);
-		_setFromReference((Referable*)(ref.getObject()));
-		return *this;
-	}
+	
 	SLIB_INLINE _Type& operator=(const ObjectClass* ref)
 	{
 		_setFromReference((Referable*)ref);
@@ -643,9 +597,9 @@ public:
 		return m_object != other.m_object;
 	}
 
-	Ref<ObjectClass, sl_false> lock() const
+	Ref<ObjectClass> lock() const
 	{
-		Ref<ObjectClass, sl_false> ret;
+		Ref<ObjectClass> ret;
 		_Ref refWeak(m_object);
 		if (refWeak.isNotNull()) {
 			WeakRefObject* weak = refWeak.getObject();

@@ -104,7 +104,7 @@ void View::setFrame(const Rectangle &frame)
 	Size sizeNew = frame.getSize();
 	m_frame = frame;
 	_setFrame(frame);
-	if (!(Math::isNearZero(sizeOld.width - sizeNew.width) && Math::isNearZero(sizeOld.height - sizeNew.height))) {
+	if (!(Math::isNearZero(sizeOld.x - sizeNew.x) && Math::isNearZero(sizeOld.y - sizeNew.y))) {
 		onResize();
 	}
 }
@@ -170,7 +170,7 @@ Size View::getSize()
 
 void View::setSize(const Size& size)
 {
-	setFrame(m_frame.left, m_frame.top, size.width, size.height);
+	setFrame(m_frame.left, m_frame.top, size.x, size.y);
 }
 
 void View::setSize(sl_real width, sl_real height)

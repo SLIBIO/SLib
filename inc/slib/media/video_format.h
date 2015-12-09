@@ -8,8 +8,10 @@
 
 SLIB_MEDIA_NAMESPACE_BEGIN
 
-class VideoFrame : public BitmapDesc
+class SLIB_EXPORT VideoFrame
 {
+public:
+	BitmapData image;
 };
 
 SLIB_MEDIA_NAMESPACE_END

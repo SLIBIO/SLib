@@ -5,7 +5,7 @@
 #include "base.h"
 #include "texture.h"
 
-#include "../math/geometry.h"
+#include "../math/matrix4.h"
 #include "../graphics/color.h"
 
 #define SLIB_RENDER_MAX_TEXTURE_SAMPLERS 16
@@ -91,17 +91,20 @@ public:
 			return Ref<Texture>::null();
 		}
 	}
+	
 	SLIB_INLINE Ref<Texture> getTexture()
 	{
 		return m_textures[0];
 	}
-	SLIB_INLINE void setTexture(sl_uint32 no, Ref<Texture> texture)
+	
+	SLIB_INLINE void setTexture(sl_uint32 no, const Ref<Texture>& texture)
 	{
 		if (no < SLIB_RENDER_MAX_TEXTURE_SAMPLERS) {
 			m_textures[no] = texture;
 		}
 	}
-	SLIB_INLINE void setTexture(Ref<Texture> texture)
+	
+	SLIB_INLINE void setTexture(const Ref<Texture>& texture)
 	{
 		m_textures[0] = texture;
 	}
@@ -119,8 +122,7 @@ protected:
 class SLIB_EXPORT RenderProgram2D_PositionTexture : public RenderProgram2D
 {
 public:
-	RenderProgram2D_PositionTexture() {}
-	~RenderProgram2D_PositionTexture() {}
+	SLIB_INLINE RenderProgram2D_PositionTexture() {}
 
 	struct VertexData
 	{
@@ -134,12 +136,21 @@ public:
 	virtual void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
 };
 
+// Position(2), TexCoord(2)
+class SLIB_EXPORT RenderProgram2D_PositionTextureYUV : public RenderProgram2D_PositionTexture
+{
+public:
+	SLIB_INLINE RenderProgram2D_PositionTextureYUV() {}
+
+public:
+	virtual String getGLSLFragmentShader(RenderEngine* engine);
+};
+
 // Position(2), Color(4)
 class SLIB_EXPORT RenderProgram2D_PositionColor : public RenderProgram2D
 {
 public:
-	RenderProgram2D_PositionColor() {}
-	~RenderProgram2D_PositionColor() {}
+	SLIB_INLINE RenderProgram2D_PositionColor() {}
 
 	struct VertexData
 	{
@@ -157,8 +168,7 @@ public:
 class SLIB_EXPORT RenderProgram2D_Position : public RenderProgram2D
 {
 public:
-	RenderProgram2D_Position() {}
-	~RenderProgram2D_Position() {}
+	SLIB_INLINE RenderProgram2D_Position() {}
 
 	struct VertexData
 	{
@@ -255,13 +265,15 @@ public:
 	{
 		return m_textures[0];
 	}
-	SLIB_INLINE void setTexture(sl_uint32 no, Ref<Texture> texture)
+	
+	SLIB_INLINE void setTexture(sl_uint32 no, const Ref<Texture>& texture)
 	{
 		if (no < SLIB_RENDER_MAX_TEXTURE_SAMPLERS) {
 			m_textures[no] = texture;
 		}
 	}
-	SLIB_INLINE void setTexture(Ref<Texture> texture)
+	
+	SLIB_INLINE void setTexture(const Ref<Texture>& texture)
 	{
 		m_textures[0] = texture;
 	}
@@ -274,6 +286,7 @@ public:
 			return 0;
 		}
 	}
+	
 	SLIB_INLINE void setTextureAlpha(sl_uint32 no, float alpha)
 	{
 		if (no < SLIB_RENDER_MAX_TEXTURE_SAMPLERS) {
@@ -309,8 +322,7 @@ protected:
 class SLIB_EXPORT RenderProgram3D_PositionNormalColor_Diffuse : public RenderProgram3D
 {
 public:
-	RenderProgram3D_PositionNormalColor_Diffuse() {}
-	~RenderProgram3D_PositionNormalColor_Diffuse() {}
+	SLIB_INLINE RenderProgram3D_PositionNormalColor_Diffuse() {}
 	
 	struct VertexData
 	{
@@ -329,8 +341,7 @@ public:
 class SLIB_EXPORT RenderProgram3D_PositionColor : public RenderProgram3D
 {
 public:
-	RenderProgram3D_PositionColor() {}
-	~RenderProgram3D_PositionColor() {}
+	SLIB_INLINE RenderProgram3D_PositionColor() {}
 
 	struct VertexData
 	{
@@ -348,8 +359,7 @@ public:
 class SLIB_EXPORT RenderProgram3D_PositionNormalTexture_Diffuse : public RenderProgram3D
 {
 public:
-	RenderProgram3D_PositionNormalTexture_Diffuse() {}
-	~RenderProgram3D_PositionNormalTexture_Diffuse() {}
+	SLIB_INLINE RenderProgram3D_PositionNormalTexture_Diffuse() {}
 
 	struct VertexData
 	{
@@ -368,8 +378,7 @@ public:
 class SLIB_EXPORT RenderProgram3D_PositionTexture : public RenderProgram3D
 {
 public:
-	RenderProgram3D_PositionTexture() {}
-	~RenderProgram3D_PositionTexture() {}
+	SLIB_INLINE RenderProgram3D_PositionTexture() {}
 
 	struct VertexData
 	{
@@ -387,8 +396,7 @@ public:
 class SLIB_EXPORT RenderProgram3D_PositionNormal_Diffuse : public RenderProgram3D
 {
 public:
-	RenderProgram3D_PositionNormal_Diffuse() {}
-	~RenderProgram3D_PositionNormal_Diffuse() {}
+	SLIB_INLINE RenderProgram3D_PositionNormal_Diffuse() {}
 
 	struct VertexData
 	{
@@ -406,8 +414,7 @@ public:
 class SLIB_EXPORT RenderProgram3D_Position : public RenderProgram3D
 {
 public:
-	RenderProgram3D_Position() {}
-	~RenderProgram3D_Position() {}
+	SLIB_INLINE RenderProgram3D_Position() {}
 
 	struct VertexData
 	{

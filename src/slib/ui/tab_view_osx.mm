@@ -183,8 +183,8 @@ Size TabView::getContentViewSize()
 		NSTabView* tv = (NSTabView*)handle;
 		NSRect rc = [tv contentRect];
 		Size ret;
-		ret.width = rc.size.width;
-		ret.height = rc.size.height;
+		ret.x = rc.size.width;
+		ret.y = rc.size.height;
 		return ret;
 	}
 	return Size::zero();

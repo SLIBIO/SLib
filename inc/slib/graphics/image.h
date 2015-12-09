@@ -17,7 +17,7 @@ struct SLIB_EXPORT ImageDesc
 {
 	sl_uint32 width;
 	sl_uint32 height;
-	sl_uint32 stride;
+	sl_int32 stride;
 	Color* colors;
 	
 	Ref<Referable> ref;
@@ -31,12 +31,12 @@ protected:
 	
 public:
 	static Ref<Image> createStatic(const ImageDesc& desc);
-	static Ref<Image> createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_uint32 stride = 0);
-	static Ref<Image> createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_uint32 stride, const Ref<Referable>& ref);
+	static Ref<Image> createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride = 0);
+	static Ref<Image> createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride, const Ref<Referable>& ref);
 	
 	static Ref<Image> create(const ImageDesc& desc);
-	static Ref<Image> create(sl_uint32 width, sl_uint32 height, const Color* pixels = sl_null, sl_uint32 strideSource = 0);
-	static Ref<Image> create(sl_uint32 width, sl_uint32 height, ColorModel colorModel, const void* data, sl_uint32 pitchSource = 0);
+	static Ref<Image> create(sl_uint32 width, sl_uint32 height, const Color* pixels = sl_null, sl_int32 strideSource = 0);
+	static Ref<Image> create(const BitmapData& bitmapData);
 
 	static Ref<Image> createFromBitmap(const Ref<Bitmap>& bitmap);
 	static Ref<Image> createFromBitmap(const Ref<Bitmap>& bitmap, sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height);
@@ -49,19 +49,17 @@ public:
 	sl_uint32 getBitmapHeight();
 
 	// override
-	sl_bool readPixels(sl_uint32 x, sl_uint32 y, BitmapDesc& desc);
+	sl_bool readPixels(sl_uint32 x, sl_uint32 y, BitmapData& desc);
 	
 	// override
-	sl_bool writePixels(sl_uint32 x, sl_uint32 y, const BitmapDesc& desc);
+	sl_bool writePixels(sl_uint32 x, sl_uint32 y, const BitmapData& desc);
 	
 	// override
 	sl_bool resetPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color& color);
 	
-	sl_bool readPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, ColorModel model, void* data, sl_uint32 pitch = 0);
-	sl_bool readPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, Color* colors, sl_uint32 stride = 0);
+	sl_bool readPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, Color* colors, sl_int32 stride = 0);
 	
-	sl_bool writePixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color* colors, sl_uint32 stride = 0);
-	sl_bool writePixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, ColorModel model, const void* data, sl_uint32 pitch = 0);
+	sl_bool writePixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color* colors, sl_int32 stride = 0);
 	
 	sl_bool resetPixels(const Color& color);
 		
@@ -78,7 +76,7 @@ public:
 		return m_desc.height;
 	}
 	
-	SLIB_INLINE sl_uint32 getStride() const
+	SLIB_INLINE sl_int32 getStride() const
 	{
 		return m_desc.stride;
 	}
@@ -88,12 +86,12 @@ public:
 		return (Color*)(m_desc.colors);
 	}
 
-	SLIB_INLINE Color* getColorsAt(sl_uint32 x, sl_uint32 y) const
+	SLIB_INLINE Color* getColorsAt(sl_int32 x, sl_int32 y) const
 	{
 		return getColors() + x + y * m_desc.stride;
 	}
 	
-	SLIB_INLINE Color& getPixel(sl_uint32 x, sl_uint32 y) const
+	SLIB_INLINE Color& getPixel(sl_int32 x, sl_int32 y) const
 	{
 		return getColors()[x + y * m_desc.stride];
 	}

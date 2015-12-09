@@ -15,12 +15,12 @@ Ref<Image> Image::createStatic(const ImageDesc& desc)
 	return createStatic(desc.width, desc.height, desc.colors, desc.stride, desc.ref);
 }
 
-Ref<Image> Image::createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_uint32 stride)
+Ref<Image> Image::createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride)
 {
 	return createStatic(width, height, pixels, stride, Ref<Referable>::null());
 }
 
-Ref<Image> Image::createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_uint32 stride, const Ref<Referable>& _ref)
+Ref<Image> Image::createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride, const Ref<Referable>& _ref)
 {
 	Ref<Image> ret;
 	if (width == 0 || height == 0 || pixels == sl_null) {
@@ -45,14 +45,36 @@ Ref<Image> Image::create(const ImageDesc& desc)
 	return create(desc.width, desc.height, desc.colors, desc.stride);
 }
 
-Ref<Image> Image::create(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_uint32 stride)
+Ref<Image> Image::create(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride)
 {
-	return create(width, height, Color::defaultModel, pixels, stride << 2);
+	if (pixels) {
+		BitmapData bitmapData(width, height, pixels, stride);
+		return create(bitmapData);
+	} else {
+		Ref<Image> ret;
+		sl_uint32 size = (width*height) << 2;
+		Memory mem = Memory::create(size);
+		if (mem.isNotEmpty()) {
+			ret = new Image;
+			if (ret.isNotNull()) {
+				ret->m_desc.width = width;
+				ret->m_desc.height = height;
+				ret->m_desc.stride = width;
+				ret->m_desc.ref = mem.getReference();
+				ret->m_desc.colors = (Color*)(mem.getBuf());
+				Base::zeroMemory(ret->m_desc.colors, size);
+			}
+		}
+		return ret;
+
+	}
 }
 
-Ref<Image> Image::create(sl_uint32 width, sl_uint32 height, ColorModel colorModel, const void* data, sl_uint32 pitch)
+Ref<Image> Image::create(const BitmapData& bitmapData)
 {
 	Ref<Image> ret;
+	sl_uint32 width = bitmapData.width;
+	sl_uint32 height = bitmapData.height;
 	if (width == 0 || height == 0) {
 		return ret;
 	}
@@ -66,14 +88,11 @@ Ref<Image> Image::create(sl_uint32 width, sl_uint32 height, ColorModel colorMode
 			ret->m_desc.stride = width;
 			ret->m_desc.ref = mem.getReference();
 			ret->m_desc.colors = (Color*)(mem.getBuf());
-			if (data) {
-				if (pitch == 0) {
-					pitch = width;
-				}
-				Color::convert(width, height, colorModel, data, pitch, ret->m_desc.colors, width);
-			} else {
-				Base::zeroMemory(ret->m_desc.colors, size);
+			BitmapData dst(width, height, (Color*)(mem.getBuf()));
+			if (bitmapData.format.isPrecomputedAlpha()) {
+				dst.format = dst.format.getPrecomputedAlphaFormat();
 			}
+			dst.copyPixelsFrom(bitmapData);
 		}
 	}
 	return ret;
@@ -152,7 +171,7 @@ sl_uint32 Image::getBitmapHeight()
 	return m_desc.height;
 }
 
-sl_bool Image::readPixels(sl_uint32 x, sl_uint32 y, BitmapDesc& bmd)
+sl_bool Image::readPixels(sl_uint32 x, sl_uint32 y, BitmapData& bmd)
 {
 	ImageDesc& imd = m_desc;
 	if (x >= imd.width || y >= imd.height) {
@@ -162,11 +181,12 @@ sl_bool Image::readPixels(sl_uint32 x, sl_uint32 y, BitmapDesc& bmd)
 		return sl_false;
 	}
 	Color* colors = getColorsAt(x, y);
-	Color::convert(bmd.width, bmd.height, colors, imd.stride, bmd.colorModel, bmd.data, bmd.pitch);
+	BitmapData src(bmd.width, bmd.height, colors, imd.stride);
+	bmd.copyPixelsFrom(src);
 	return sl_true;
 }
 
-sl_bool Image::writePixels(sl_uint32 x, sl_uint32 y, const BitmapDesc& bmd)
+sl_bool Image::writePixels(sl_uint32 x, sl_uint32 y, const BitmapData& bmd)
 {
 	ImageDesc& imd = m_desc;
 	if (x >= imd.width || y >= imd.height) {
@@ -176,7 +196,8 @@ sl_bool Image::writePixels(sl_uint32 x, sl_uint32 y, const BitmapDesc& bmd)
 		return sl_false;
 	}
 	Color* colors = getColorsAt(x, y);
-	Color::convert(bmd.width, bmd.height, bmd.colorModel, bmd.data, bmd.pitch, colors, imd.stride);
+	BitmapData src(bmd.width, bmd.height, colors, imd.stride);
+	src.copyPixelsFrom(bmd);
 	return sl_true;
 }
 
@@ -203,36 +224,16 @@ sl_bool Image::resetPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 
 	return sl_true;
 }
 
-sl_bool Image::readPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, ColorModel model, void* data, sl_uint32 pitch)
+sl_bool Image::readPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, Color* colors, sl_int32 stride)
 {
-	BitmapDesc bd;
-	bd.width = width;
-	bd.height = height;
-	bd.colorModel = model;
-	bd.data = data;
-	bd.pitch = pitch;
-	return readPixels(x, y, bd);
+	BitmapData bitmapData(width, height, colors, stride);
+	return readPixels(x, y, bitmapData);
 }
 
-sl_bool Image::readPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, Color* colors, sl_uint32 stride)
+sl_bool Image::writePixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color* colors, sl_int32 stride)
 {
-	return readPixels(x, y, width, height, Color::defaultModel, colors, stride << 2);
-}
-
-sl_bool Image::writePixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, ColorModel model, const void* data, sl_uint32 pitch)
-{
-	BitmapDesc bd;
-	bd.width = width;
-	bd.height = height;
-	bd.colorModel = model;
-	bd.data = (void*)data;
-	bd.pitch = pitch;
-	return writePixels(x, y, bd);
-}
-
-sl_bool Image::writePixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color* colors, sl_uint32 stride)
-{
-	return writePixels(x, y, width, height, Color::defaultModel, colors, stride << 2);
+	BitmapData bitmapData(width, height, colors, stride);
+	return writePixels(x, y, bitmapData);
 }
 
 sl_bool Image::resetPixels(const Color& color)

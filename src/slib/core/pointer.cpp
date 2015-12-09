@@ -3,36 +3,6 @@
 
 SLIB_NAMESPACE_BEGIN
 
-void* _SafePtr_lock(const Ref<_SafePtrContainer>& _object)
-{
-	Ref<_SafePtrContainer> o = _object;
-	_SafePtrContainer* container = o.getObject();
-	if (container) {
-		SpinLocker lock(&(container->locker));
-		Base::interlockedIncrement32(&(container->nRefCount));
-		return container->obj;
-	} else {
-		return sl_null;
-	}
-}
-
-void _SafePtr_free(const Ref<_SafePtrContainer>& _object)
-{
-	Ref<_SafePtrContainer> o = _object;
-	_SafePtrContainer* container = o.getObject();
-	if (container) {
-		while (container->obj) {
-			SpinLocker lock(&(container->locker));
-			if (Base::interlockedCompareExchange32(&(container->nRefCount), 0, 0)) {
-				container->obj = sl_null;
-				break;
-			}
-			lock.unlock();
-			Base::yield();
-		}
-	}
-}
-
 sl_ptr _RefPtr_null[2] = {0, 0};
 
 void _RefPtr_copy(_RefPtr_Container* target, _RefPtr_Container* source)
@@ -86,28 +56,14 @@ void _RefPtr_set(_RefPtr_Container* target, const void* pointer)
 	target->m_reference.setNull();
 }
 
-void _RefPtr_set(_RefPtr_Container* target, const Ref<Referable, sl_true>& ref)
+void _RefPtr_set(_RefPtr_Container* target, const Ref<Referable>& ref)
 {
 	SpinLocker lock(SpinLockPoolForRefPtr::get(target));
 	target->m_reference = ref;
 	target->m_pointer = target->m_reference.getObject();
 }
 
-void _RefPtr_set(_RefPtr_Container* target, const Ref<Referable, sl_false>& ref)
-{
-	SpinLocker lock(SpinLockPoolForRefPtr::get(target));
-	target->m_reference = ref;
-	target->m_pointer = target->m_reference.getObject();
-}
-
-void _RefPtr_set(_RefPtr_Container* target, const void* pointer, const Ref<Referable, sl_true>& ref)
-{
-	SpinLocker lock(SpinLockPoolForRefPtr::get(target));
-	target->m_reference = ref;
-	target->m_pointer = (void*)pointer;
-}
-
-void _RefPtr_set(_RefPtr_Container* target, const void* pointer, const Ref<Referable, sl_false>& ref)
+void _RefPtr_set(_RefPtr_Container* target, const void* pointer, const Ref<Referable>& ref)
 {
 	SpinLocker lock(SpinLockPoolForRefPtr::get(target));
 	target->m_reference = ref;
@@ -167,28 +123,14 @@ void _Ptr_set(_Ptr_Container* target, const void* pointer)
 	target->m_reference.setNull();
 }
 
-void _Ptr_set(_Ptr_Container* target, const Ref<Referable, sl_true>& ref)
+void _Ptr_set(_Ptr_Container* target, const Ref<Referable>& ref)
 {
 	SpinLocker lock(SpinLockPoolForPtr::get(target));
 	target->m_reference = ref;
 	target->m_pointer = target->m_reference.getObject();
 }
 
-void _Ptr_set(_Ptr_Container* target, const Ref<Referable, sl_false>& ref)
-{
-	SpinLocker lock(SpinLockPoolForPtr::get(target));
-	target->m_reference = ref;
-	target->m_pointer = target->m_reference.getObject();
-}
-
-void _Ptr_set(_Ptr_Container* target, const void* pointer, const Ref<Referable, sl_true>& ref)
-{
-	SpinLocker lock(SpinLockPoolForPtr::get(target));
-	target->m_reference = ref;
-	target->m_pointer = (void*)pointer;
-}
-
-void _Ptr_set(_Ptr_Container* target, const void* pointer, const Ref<Referable, sl_false>& ref)
+void _Ptr_set(_Ptr_Container* target, const void* pointer, const Ref<Referable>& ref)
 {
 	SpinLocker lock(SpinLockPoolForPtr::get(target));
 	target->m_reference = ref;

@@ -300,7 +300,7 @@ public:
 		if (hPen || hBrush) {
 			_JAndroidGraphics::drawRoundRectangle.call(m_canvas
 					, (float)(rect.left), (float)(rect.top), (float)(rect.right), (float)(rect.bottom)
-					, (float)(radius.width), (float)(radius.height), hPen, hBrush);
+					, (float)(radius.x), (float)(radius.y), hPen, hBrush);
 		}
 	}
 

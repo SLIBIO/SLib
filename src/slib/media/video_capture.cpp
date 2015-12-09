@@ -27,17 +27,5 @@ void VideoCapture::onCaptureVideoFrame(VideoCaptureFrame* frame)
 	}
 }
 
-Memory VideoCapture::_getMemProcess(sl_size size)
-{
-	Memory mem = m_memProcess;
-	if (mem.getSize() >= size) {
-		return mem;
-	} else {
-		mem = Memory::create(size);
-		m_memProcess = mem;
-		return mem;
-	}
-}
-
 SLIB_MEDIA_NAMESPACE_END
 

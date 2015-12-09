@@ -252,8 +252,8 @@ public:
 		if (window != nil) {
 			CGRect rect = [window frame];
 			Size ret;
-			ret.width = (sl_real)(rect.size.width);
-			ret.height = (sl_real)(rect.size.height);
+			ret.x = (sl_real)(rect.size.width);
+			ret.y = (sl_real)(rect.size.height);
 			return ret;
 		} else {
 			return Size::zero();
@@ -267,8 +267,8 @@ public:
 		if (window != nil) {
 			dispatch_async(dispatch_get_main_queue(), ^{
 				CGRect frame = [window frame];
-				frame.size.width = size.width;
-				frame.size.height = size.height;
+				frame.size.width = size.x;
+				frame.size.height = size.y;
 				[window setFrame:frame];
 			});
 			return sl_true;

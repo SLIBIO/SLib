@@ -4,7 +4,7 @@
 #include "definition.h"
 
 #include "../core/object.h"
-#include "../math/geometry2d.h"
+#include "../math/rectangle.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 

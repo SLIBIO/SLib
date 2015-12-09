@@ -185,6 +185,30 @@ SLIB_RENDER_NAMESPACE_END
 
 
 /*******************************
+	RenderProgram2D_PositionTextureYUV
+ *******************************/
+SLIB_RENDER_NAMESPACE_BEGIN
+String RenderProgram2D_PositionTextureYUV::getGLSLFragmentShader(RenderEngine* engine)
+{
+	String source = SLIB_STRINGIFY(
+	   uniform vec3 u_Color;
+	   uniform float u_Alpha;
+	   uniform sampler2D u_Texture;
+	   varying vec2 v_TexCoord;
+	   void main() {
+		   vec4 YUV = texture2D(u_Texture, v_TexCoord);
+		   float R = YUV.r + 1.370705*(YUV.b-0.5);
+		   float G = YUV.r - 0.698001*(YUV.g-0.5) - 0.337633*(YUV.b-0.5);
+		   float B = YUV.r + 1.732446*(YUV.g-0.5);
+		   vec4 C = vec4(u_Color, u_Alpha);
+		   gl_FragColor = vec4(R, G, B, YUV.a) * C;
+	   }
+	);
+	return source;
+}
+SLIB_RENDER_NAMESPACE_END
+
+/*******************************
 	RenderProgram2D_PositionColor
 *******************************/
 SLIB_RENDER_NAMESPACE_BEGIN

@@ -6,7 +6,7 @@
 #include "../core/object.h"
 #include "../core/memory.h"
 #include "../core/string.h"
-#include "../math/geometry.h"
+#include "../math/size.h"
 
 #include "color.h"
 

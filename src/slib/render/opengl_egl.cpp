@@ -269,8 +269,8 @@ public:
 			m_flagRequestRender = sl_false;
 			if (flagUpdate) {
 				Sizei size = getWindowSize(m_hWindow);
-				if (size.width != 0 && size.height != 0) {
-					m_renderEngine->setViewport(0, 0, size.width, size.height);
+				if (size.x != 0 && size.y != 0) {
+					m_renderEngine->setViewport(0, 0, size.x, size.y);
 					callback->onFrame(m_renderEngine.get());
 					_EGL_ENTRY(eglSwapInterval)(m_display, 0);
 					_EGL_ENTRY(eglSwapBuffers)(m_display, m_surface);

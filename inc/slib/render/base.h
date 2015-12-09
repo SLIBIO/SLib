@@ -52,7 +52,7 @@ public:
 		return m_engine.lock();
 	}
 
-	SLIB_INLINE Ref<RenderBaseObjectInstance> getInstance()
+	SLIB_INLINE const Ref<RenderBaseObjectInstance>& getInstance()
 	{
 		return m_instance;
 	}

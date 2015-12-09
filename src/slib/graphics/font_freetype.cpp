@@ -204,10 +204,10 @@ public:
 					Color* colorsOutput = imageOutput->getColorsAt(dx, dy);
 					sl_uint32 strideImage = imageOutput->getStride();
 
-					sl_uint32 rs = color.r();
-					sl_uint32 gs = color.g();
-					sl_uint32 bs = color.b();
-					sl_uint32 as = color.a();
+					sl_uint32 rs = color.r;
+					sl_uint32 gs = color.g;
+					sl_uint32 bs = color.b;
+					sl_uint32 as = color.a;
 
 					if (slot->bitmap.pixel_mode == FT_PIXEL_MODE_GRAY) {
 						for (int y = 0; y < heightChar; y++) {
@@ -348,10 +348,10 @@ public:
 								Color* colorsOutput = imageOutput->getColorsAt(dx, dy);
 								sl_uint32 strideImage = imageOutput->getStride();
 
-								sl_uint32 rs = color.r();
-								sl_uint32 gs = color.g();
-								sl_uint32 bs = color.b();
-								sl_uint32 as = color.a();
+								sl_uint32 rs = color.r;
+								sl_uint32 gs = color.g;
+								sl_uint32 bs = color.b;
+								sl_uint32 as = color.a;
 
 								if (bitmapGlyph->bitmap.pixel_mode == FT_PIXEL_MODE_GRAY) {
 									for (int y = 0; y < heightChar; y++) {

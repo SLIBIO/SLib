@@ -6,7 +6,7 @@
 #include "brush.h"
 
 #include "../core/object.h"
-#include "../math/geometry2d.h"
+#include "../math/rectangle.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 

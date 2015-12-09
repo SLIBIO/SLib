@@ -6,8 +6,7 @@
 #include "../core/object.h"
 #include "../core/memory.h"
 #include "../core/string.h"
-
-#include "../math/geometry2d.h"
+#include "../math/rectangle.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 

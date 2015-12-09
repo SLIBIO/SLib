@@ -29,8 +29,8 @@ public:
 
 public:
 	static Ref<Texture> create(const Ref<Bitmap>& source);
-	static Ref<Texture> create(sl_uint32 width, sl_uint32 height, ColorModel colorModel, const void* dataInit, sl_uint32 pitch = 0);
-	static Ref<Texture> create(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_uint32 stride = 0);
+	static Ref<Texture> create(const BitmapData& bitmapData);
+	static Ref<Texture> create(sl_uint32 width, sl_uint32 height, const Color* colors = sl_null, sl_int32 stride = 0);
 	static Ref<Texture> loadFromMemory(const void* mem, sl_size size);
 	static Ref<Texture> loadFromMemory(const Memory& mem);
 	static Ref<Texture> loadFromFile(const String& filePath);

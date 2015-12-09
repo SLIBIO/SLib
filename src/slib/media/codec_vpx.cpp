@@ -134,27 +134,24 @@ public:
 		delete codec_image;
 		return Ref<_VpxVideoEncoderImpl>::null();
 	}
-
-	void initializeCodecImage(const sl_uint8* i420, sl_int32 width, sl_int32 height)
-	{
-		sl_int32 yPlaneSize = width * height;
-		Base::copyMemory(m_codec_image->planes[0], i420, (yPlaneSize));
-		Base::copyMemory(m_codec_image->planes[1], i420 + yPlaneSize, (yPlaneSize >> 2));
-		Base::copyMemory(m_codec_image->planes[2], i420 + yPlaneSize + (yPlaneSize >> 2), (yPlaneSize >> 2));
-	}
-
+	
 	sl_bool encode(const VideoFrame& input, void* output, sl_uint32& sizeOutput, sl_uint32& outTime)
 	{
-		if (m_nWidth == input.width && m_nHeight == input.height) {
-			if (input.colorModel != Color::YUV_I420) {
-				SLIB_SCOPED_ARRAY(sl_uint8, i420, input.width * input.height * 2);
-				Color::convert(input.width, input.height, input.colorModel, input.data, input.pitch, Color::YUV_I420, i420, 0);
-				initializeCodecImage(i420, input.width, input.height);
-
-			} else {
-				initializeCodecImage((sl_uint8*)(input.data), input.width, input.height);
-			}
-
+		if (m_nWidth == input.image.width && m_nHeight == input.image.height) {
+			
+			BitmapData dst;
+			dst.width = m_codec_image->w;
+			dst.height = m_codec_image->h;
+			dst.format = bitmapFormatYUV_I420;
+			dst.data = m_codec_image->planes[0];
+			dst.pitch = m_codec_image->stride[0];
+			dst.data1 = m_codec_image->planes[1];
+			dst.pitch1 = m_codec_image->stride[1];
+			dst.data2 = m_codec_image->planes[2];
+			dst.pitch2 = m_codec_image->stride[2];
+			
+			dst.copyPixelsFrom(input.image);
+			
 			sl_int32 flags = 0;
 			if (m_nProcessFrameCount > 0 && m_nProcessFrameCount % m_nKeyFrameInterval == 0) {
 				flags |= VPX_EFLAG_FORCE_KF;
@@ -310,26 +307,23 @@ public:
 		sl_int64 size = reader.readInt64();
 
 		if (!vpx_codec_decode(m_codec, (sl_uint8*)input + 16, (unsigned int)size, NULL, 0)) {
+			
 			vpx_codec_iter_t iter = NULL;
+			
 			while ((m_codec_image = vpx_codec_get_frame(m_codec, &iter)) != NULL) {
-				sl_int32 yPlaneSize = m_nWidth * m_nHeight;
-				SLIB_SCOPED_ARRAY(sl_uint8, i420, yPlaneSize * 2);
-
-				sl_uint32 _indexI420 = 0;
-				for (sl_uint32 plane = 0; plane < 3; ++plane) {
-					const unsigned char *buf = m_codec_image->planes[plane];
-					const int stride = m_codec_image->stride[plane];
-					const int w = vpx_img_plane_width(m_codec_image, plane) * ((m_codec_image->fmt & VPX_IMG_FMT_HIGHBITDEPTH) ? 2 : 1);
-					const int h = vpx_img_plane_height(m_codec_image, plane);
-					int y;
-
-					for (y = 0; y < h; ++y) {
-						Base::copyMemory(i420 + _indexI420, buf, w);
-						_indexI420 += w;
-						buf += stride;
-					}
-				}
-				Color::convert(m_nWidth, m_nHeight, Color::YUV_I420, i420, m_nWidth, output.colorModel, output.data, output.pitch);
+				
+				BitmapData src;
+				src.width = m_codec_image->w;
+				src.height = m_codec_image->h;
+				src.format = bitmapFormatYUV_I420;
+				src.data = m_codec_image->planes[0];
+				src.pitch = m_codec_image->stride[0];
+				src.data1 = m_codec_image->planes[1];
+				src.pitch1 = m_codec_image->stride[1];
+				src.data2 = m_codec_image->planes[2];
+				src.pitch2 = m_codec_image->stride[2];
+				
+				output.image.copyPixelsFrom(src);				
 			}
 		}
 		return sl_false;

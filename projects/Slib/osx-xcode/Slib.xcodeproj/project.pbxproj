@@ -144,6 +144,13 @@
 		266DD5E51C11940A00D47AB0 /* web_view_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5431C11940A00D47AB0 /* web_view_osx.mm */; };
 		266DD5E71C11940A00D47AB0 /* window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5451C11940A00D47AB0 /* window.cpp */; };
 		266DD5EA1C11940A00D47AB0 /* window_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5481C11940A00D47AB0 /* window_osx.mm */; };
+		266DD5F01C11D25900D47AB0 /* camera_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5EF1C11D25900D47AB0 /* camera_osx.mm */; };
+		266DD5F41C11DF1500D47AB0 /* camera_avfoundation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5F31C11DF1500D47AB0 /* camera_avfoundation.mm */; };
+		2688DD851C16F6E200973672 /* video_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2688DD841C16F6E200973672 /* video_view.cpp */; };
+		2688DD871C16FBDF00973672 /* camera_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2688DD861C16FBDF00973672 /* camera_view.cpp */; };
+		268916361C182ADA009FD75E /* camera_dshow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268916351C182ADA009FD75E /* camera_dshow.cpp */; };
+		26B0AF851C13E08600CD8673 /* bitmap_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B0AF831C13E08600CD8673 /* bitmap_data.cpp */; };
+		26B0AF861C13E08600CD8673 /* bitmap_format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B0AF841C13E08600CD8673 /* bitmap_format.cpp */; };
 		26D53C451BDF25090010BDA4 /* math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D53C441BDF25090010BDA4 /* math.cpp */; };
 		A21C166B1BA74E8F006B1FA1 /* algorithm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A21C166A1BA74E8F006B1FA1 /* algorithm.cpp */; };
 		A234D6EB1B3F12A600ADDF4E /* content_type.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A234D6EA1B3F12A600ADDF4E /* content_type.cpp */; };
@@ -330,6 +337,13 @@
 		266DD5431C11940A00D47AB0 /* web_view_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = web_view_osx.mm; sourceTree = "<group>"; };
 		266DD5451C11940A00D47AB0 /* window.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = window.cpp; sourceTree = "<group>"; };
 		266DD5481C11940A00D47AB0 /* window_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = window_osx.mm; sourceTree = "<group>"; };
+		266DD5EF1C11D25900D47AB0 /* camera_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = camera_osx.mm; sourceTree = "<group>"; };
+		266DD5F31C11DF1500D47AB0 /* camera_avfoundation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = camera_avfoundation.mm; sourceTree = "<group>"; };
+		2688DD841C16F6E200973672 /* video_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_view.cpp; sourceTree = "<group>"; };
+		2688DD861C16FBDF00973672 /* camera_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera_view.cpp; sourceTree = "<group>"; };
+		268916351C182ADA009FD75E /* camera_dshow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera_dshow.cpp; sourceTree = "<group>"; };
+		26B0AF831C13E08600CD8673 /* bitmap_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_data.cpp; sourceTree = "<group>"; };
+		26B0AF841C13E08600CD8673 /* bitmap_format.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_format.cpp; sourceTree = "<group>"; };
 		26D53C441BDF25090010BDA4 /* math.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = math.cpp; sourceTree = "<group>"; };
 		28CE36521A0FEDC600AB513C /* libslib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libslib.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A21C166A1BA74E8F006B1FA1 /* algorithm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = algorithm.cpp; sourceTree = "<group>"; };
@@ -414,6 +428,9 @@
 				266DD4B21C11940A00D47AB0 /* audio_recorder_opensl_es.cpp */,
 				266DD4B31C11940A00D47AB0 /* audio_recorder_osx.mm */,
 				266DD4B51C11940A00D47AB0 /* camera.cpp */,
+				266DD5F31C11DF1500D47AB0 /* camera_avfoundation.mm */,
+				268916351C182ADA009FD75E /* camera_dshow.cpp */,
+				266DD5EF1C11D25900D47AB0 /* camera_osx.mm */,
 				266DD4B71C11940A00D47AB0 /* codec_opus.cpp */,
 				266DD4B81C11940A00D47AB0 /* codec_vpx.cpp */,
 				266DD4B91C11940A00D47AB0 /* media_platform_osx.h */,
@@ -482,6 +499,7 @@
 			children = (
 				266DD4EA1C11940A00D47AB0 /* button.cpp */,
 				266DD4ED1C11940A00D47AB0 /* button_osx.mm */,
+				2688DD861C16FBDF00973672 /* camera_view.cpp */,
 				266DD4F11C11940A00D47AB0 /* canvas_quartz.mm */,
 				266DD4F21C11940A00D47AB0 /* check_box.cpp */,
 				266DD4F31C11940A00D47AB0 /* check_box_osx.mm */,
@@ -519,6 +537,7 @@
 				266DD5301C11940A00D47AB0 /* ui_event.cpp */,
 				266DD5331C11940A00D47AB0 /* ui_event_osx.mm */,
 				266DD5351C11940A00D47AB0 /* ui_graphics_context.cpp */,
+				2688DD841C16F6E200973672 /* video_view.cpp */,
 				266DD5361C11940A00D47AB0 /* view.cpp */,
 				266DD5391C11940A00D47AB0 /* view_group.cpp */,
 				266DD53C1C11940A00D47AB0 /* view_osx.h */,
@@ -535,12 +554,14 @@
 			isa = PBXGroup;
 			children = (
 				266DD47E1C1193C400D47AB0 /* bitmap.cpp */,
+				26B0AF831C13E08600CD8673 /* bitmap_data.cpp */,
+				26B0AF841C13E08600CD8673 /* bitmap_format.cpp */,
 				266DD47F1C1193C400D47AB0 /* brush.cpp */,
 				266DD4801C1193C400D47AB0 /* canvas.cpp */,
 				266DD4811C1193C400D47AB0 /* color.cpp */,
 				266DD4821C1193C400D47AB0 /* drawable.cpp */,
-				266DD4831C1193C400D47AB0 /* font_freetype.cpp */,
 				266DD4841C1193C400D47AB0 /* font.cpp */,
+				266DD4831C1193C400D47AB0 /* font_freetype.cpp */,
 				266DD4851C1193C400D47AB0 /* graphics_context.cpp */,
 				266DD4861C1193C400D47AB0 /* graphics_path.cpp */,
 				266DD4871C1193C400D47AB0 /* graphics_util.cpp */,
@@ -823,6 +844,7 @@
 				266DD5D21C11940A00D47AB0 /* ui_event.cpp in Sources */,
 				266DD4641C11930800D47AB0 /* crypto_secure_stream.cpp in Sources */,
 				266DD57D1C11940A00D47AB0 /* opengl_egl.cpp in Sources */,
+				26B0AF851C13E08600CD8673 /* bitmap_data.cpp in Sources */,
 				26599DBC1BEA5DDF008659BB /* callback.cpp in Sources */,
 				266DD55D1C11940A00D47AB0 /* codec_vpx.cpp in Sources */,
 				266DD5B61C11940A00D47AB0 /* radio_button.cpp in Sources */,
@@ -846,7 +868,9 @@
 				266DD5C21C11940A00D47AB0 /* s_radio_button.cpp in Sources */,
 				266DD58F1C11940A00D47AB0 /* button_osx.mm in Sources */,
 				266DD5D71C11940A00D47AB0 /* ui_graphics_context.cpp in Sources */,
+				2688DD851C16F6E200973672 /* video_view.cpp in Sources */,
 				266DD56F1C11940A00D47AB0 /* network_async.cpp in Sources */,
+				266DD5F41C11DF1500D47AB0 /* camera_avfoundation.mm in Sources */,
 				A2C8BE351AFA832800D584D1 /* thirdparty_libjpeg.c in Sources */,
 				A2C8BE391AFA832800D584D1 /* thirdparty_zlib.c in Sources */,
 				A25F30231B03A33700854DAF /* reference.cpp in Sources */,
@@ -856,7 +880,9 @@
 				266DD5CA1C11940A00D47AB0 /* tab_view.cpp in Sources */,
 				266DD46E1C11936100D47AB0 /* sqlite3.cpp in Sources */,
 				266DD47C1C1193AB00D47AB0 /* vibrator.cpp in Sources */,
+				268916361C182ADA009FD75E /* camera_dshow.cpp in Sources */,
 				A25F30251B03A33700854DAF /* service.cpp in Sources */,
+				266DD5F01C11D25900D47AB0 /* camera_osx.mm in Sources */,
 				A25F30281B03A33700854DAF /* string.cpp in Sources */,
 				A25F30151B03A33700854DAF /* base64.cpp in Sources */,
 				A2C8BE341AFA832800D584D1 /* thirdparty_freetype.c in Sources */,
@@ -902,7 +928,9 @@
 				A2C8BE371AFA832800D584D1 /* thirdparty_libpng.c in Sources */,
 				266DD54E1C11940A00D47AB0 /* audio_player_dsound.cpp in Sources */,
 				266DD57B1C11940A00D47AB0 /* tcpip.cpp in Sources */,
+				2688DD871C16FBDF00973672 /* camera_view.cpp in Sources */,
 				A25F301B1B03A33700854DAF /* json.cpp in Sources */,
+				26B0AF861C13E08600CD8673 /* bitmap_format.cpp in Sources */,
 				266DD5751C11940A00D47AB0 /* network_secure_stream.cpp in Sources */,
 				266DD46A1C11930800D47AB0 /* compress_zlib.cpp in Sources */,
 				266DD5711C11940A00D47AB0 /* network_async_unix.cpp in Sources */,

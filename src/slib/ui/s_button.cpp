@@ -44,8 +44,8 @@ SButton::SButton(sl_uint32 nCategories, SButtonCategory* categories)
 	m_state = buttonStateNormal;
 	m_category = 0;
 	
-	m_iconSize.width = 0;
-	m_iconSize.height = 0;
+	m_iconSize.x = 0;
+	m_iconSize.y = 0;
 	m_contentAlignment = alignMiddleCenter;
 	m_iconAlignment = alignMiddleCenter;
 	m_textAlignment = alignMiddleCenter;
@@ -528,13 +528,13 @@ void SButton::_invalidateButtonState()
 
 void SButton::layoutIconAndText(GraphicsContext* gc, sl_real widthFrame, sl_real heightFrame, Size& sizeContent, Rectangle& frameIcon, Rectangle& frameText)
 {
-	sl_real widthIcon = m_iconSize.width + m_iconMarginLeft + m_iconMarginRight;
-	sl_real heightIcon = m_iconSize.height + m_iconMarginTop + m_iconMarginBottom;
+	sl_real widthIcon = m_iconSize.x + m_iconMarginLeft + m_iconMarginRight;
+	sl_real heightIcon = m_iconSize.y + m_iconMarginTop + m_iconMarginBottom;
 	
 	Ref<Font> font = _getFont();
 	Size sizeText = gc->getFontTextSize(font, m_text);
-	sl_real widthText = sizeText.width + m_textMarginLeft + m_textMarginRight;
-	sl_real heightText = sizeText.height + m_textMarginTop + m_textMarginBottom;
+	sl_real widthText = sizeText.x + m_textMarginLeft + m_textMarginRight;
+	sl_real heightText = sizeText.y + m_textMarginTop + m_textMarginBottom;
 	
 	Alignment alignIcon = m_iconAlignment;
 	sl_uint32 horzIcon = alignIcon & alignHorizontalMask;
@@ -638,8 +638,8 @@ void SButton::layoutIconAndText(GraphicsContext* gc, sl_real widthFrame, sl_real
 		
 	}
 	
-	sizeContent.width = widthContent;
-	sizeContent.height = heightContent;
+	sizeContent.x = widthContent;
+	sizeContent.y = heightContent;
 	
 	if (widthContent >= 0 && heightContent >= 0) {
 		frameIcon.left = xIcon + m_iconMarginLeft;
@@ -675,7 +675,7 @@ void SButton::drawContent(Canvas* canvas, const Ref<Drawable>& _icon, const Stri
 	Size sizeContent;
 	Rectangle rcIcon, rcText;
 	layoutIconAndText(gc.get(), bound.getWidth(), bound.getHeight(), sizeContent, rcIcon, rcText);
-	Point pt = GraphicsUtil::calculateAlignPosition(bound, sizeContent.width, sizeContent.height, m_contentAlignment);
+	Point pt = GraphicsUtil::calculateAlignPosition(bound, sizeContent.x, sizeContent.y, m_contentAlignment);
 	rcIcon.left += pt.x;
 	rcIcon.top += pt.y;
 	rcIcon.right += pt.x;

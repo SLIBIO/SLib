@@ -9,6 +9,7 @@ CameraParam::CameraParam()
 {
 	preferedFrameWidth = 0;
 	preferedFrameHeight = 0;
+	preferedFrameFormat = bitmapFormatYUV_NV21;
 }
 
 void CameraParam::setFrontCamera()

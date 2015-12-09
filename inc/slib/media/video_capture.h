@@ -53,12 +53,6 @@ public:
 	
 protected:
 	void onCaptureVideoFrame(VideoCaptureFrame* frame);
-	
-protected:
-	Memory _getMemProcess(sl_size size);
-	
-protected:
-	Memory m_memProcess;
 
 };
 

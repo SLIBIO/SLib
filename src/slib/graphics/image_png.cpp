@@ -3,7 +3,6 @@
 #ifdef SLIB_GRAPHICS_IMAGE_SUPPORT_PNG
 
 #include "../../../inc/slib/core/file.h"
-#include "../../../inc/slib/core/scoped_pointer.h"
 
 #include "../../../inc/thirdparty/libpng/png.h"
 #include "../../../inc/thirdparty/libpng/pngstruct.h"
@@ -18,7 +17,7 @@ Ref<Image> Image::loadFromPNG(const void* content, sl_size size)
 	Ref<Image> ret;
 	if (png_image_begin_read_from_memory(&image, content, size)) {
 
-		image.format = PNG_FORMAT_BGRA;
+		image.format = PNG_FORMAT_RGBA;
 		sl_uint32 pitch = image.width * 4;
 		sl_uint32 size = pitch * image.height;
 
@@ -86,10 +85,8 @@ Memory Image::saveToPNG(const Ref<Image>& _image)
 
 				png_write_info(png_ptr, info_ptr);
 
-				SLIB_SCOPED_BUFFER(sl_uint8, 4096, row, width*4);
 				for (sl_uint32 i = 0; i < height; i++) {
-					Color::convert(width, pixels, Color::RGBA, row);
-					png_write_row(png_ptr, row);
+					png_write_row(png_ptr, (png_const_bytep)pixels);
 					pixels += stride;
 				}
 

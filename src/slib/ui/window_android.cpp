@@ -230,7 +230,7 @@ public:
 	{
 		jobject jwindow = m_window;
 		if (jwindow) {
-			_JAndroidWindow::setSize.call(jwindow, size.width, size.height);
+			_JAndroidWindow::setSize.call(jwindow, size.x, size.y);
 			return sl_true;
 		}
 		return sl_false;

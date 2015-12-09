@@ -208,8 +208,8 @@ Size UI::getFontTextSize(const Ref<Font>& _font, const String& _text)
 		Gdiplus::PointF origin(0, 0);
 		Gdiplus::Status result = fs.graphics->MeasureString((WCHAR*)(text.getBuf()), text.getLength(), handle, origin, &format, &bound);
 		if (result == Gdiplus::Ok) {
-			ret.width = bound.Width;
-			ret.height = bound.Height;
+			ret.x = bound.Width;
+			ret.y = bound.Height;
 		}
 	}
 	return ret;

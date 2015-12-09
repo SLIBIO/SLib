@@ -77,8 +77,8 @@ public:
 				sizeContent = Sizei::zero();
 			}
 			Sizei sizeParent = view->getSize();
-			Windows::setWindowHorizontalScrollParam(handle, 0, sizeContent.width, sizeParent.width);
-			Windows::setWindowVerticalScrollParam(handle, 0, sizeContent.height, sizeParent.height);
+			Windows::setWindowHorizontalScrollParam(handle, 0, sizeContent.x, sizeParent.x);
+			Windows::setWindowVerticalScrollParam(handle, 0, sizeContent.y, sizeParent.y);
 			__refreshContentPosition(view);
 		}
 	}

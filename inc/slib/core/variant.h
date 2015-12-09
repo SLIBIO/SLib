@@ -31,10 +31,6 @@ public:
 		typeString16 = 11,
 		typeObject = 20,
 		typeWeak = 30,
-		typeSharedPtr = 31,
-		typeWeakPtr = 32,
-		typeSafePtr = 33,
-		typeUnitedPtr = 34
 	};
 
 private:
@@ -206,51 +202,23 @@ public:
 		return ret;
 	}
 
-	template <class T, sl_bool flagThreadSafe>
-	SLIB_INLINE Variant(const Ref<T, flagThreadSafe>& object)
+	template <class T>
+	SLIB_INLINE Variant(const Ref<T>& object)
 	{
 		m_type = typeObject;
-		new ((Ref<T, flagThreadSafe>*)(void*)(&m_value)) Ref<T, flagThreadSafe>(object);
+		new ((Ref<T>*)(void*)(&m_value)) Ref<T>(object);
 	}
 
-	template <class T, sl_bool flagThreadSafe>
-	SLIB_INLINE Variant(const WeakRef<T, flagThreadSafe>& object)
+	template <class T>
+	SLIB_INLINE Variant(const WeakRef<T>& object)
 	{
 		m_type = typeWeak;
-		new ((Ref<T, flagThreadSafe>*)(void*)(&m_value)) Ref<T, flagThreadSafe>(object);
-	}
-
-	template <class T, sl_bool flagThreadSafe>
-	SLIB_INLINE Variant(const SharedPtr<T, flagThreadSafe>& object)
-	{
-		m_type = typeSharedPtr;
-		new ((SharedPtr<T, flagThreadSafe>*)(void*)(&m_value)) SharedPtr<T, flagThreadSafe>(object);
-	}
-
-	template <class T, sl_bool flagThreadSafe>
-	SLIB_INLINE Variant(const WeakPtr<T, flagThreadSafe>& object)
-	{
-		m_type = typeWeakPtr;
-		new ((WeakPtr<T, flagThreadSafe>*)(void*)(&m_value)) WeakPtr<T, flagThreadSafe>(object);
-	}
-
-	template <class T>
-	SLIB_INLINE Variant(const SafePtr<T>& object)
-	{
-		m_type = typeSafePtr;
-		new ((SafePtr<T>*)(void*)(&m_value)) SafePtr<T>(object);
-	}
-
-	template <class T>
-	SLIB_INLINE Variant(const UnitedPtr<T>& object)
-	{
-		m_type = typeUnitedPtr;
-		new ((UnitedPtr<T>*)(void*)(&m_value)) UnitedPtr<T>(object);
+		new ((WeakRef<T>*)(void*)(&m_value)) WeakRef<T>(object);
 	}
 
 	// the object class must be derived from Object
-	template <class T, sl_bool flagThreadSafe>
-	SLIB_INLINE static Variant fromObject(const Ref<T, flagThreadSafe>& value)
+	template <class T>
+	SLIB_INLINE static Variant fromObject(const Ref<T>& value)
 	{
 		Variant ret(value);
 		return ret;
@@ -434,12 +402,12 @@ public:
 			return Ref<Referable>::null();
 		}
 	}
-	template <class T, sl_bool flagThreadSafe>
-	SLIB_INLINE const Ref<T, flagThreadSafe> getObject(const Ref<T, flagThreadSafe>& def) const
+	template <class T>
+	SLIB_INLINE const Ref<T> getObject(const Ref<T>& def) const
 	{
 		Variant v = *this;
 		if (v.m_type == typeObject) {
-			return *(Ref<T, flagThreadSafe>*)(void*)(&(v.m_value));
+			return *(Ref<T>*)(void*)(&(v.m_value));
 		} else {
 			return def;
 		}
@@ -450,13 +418,16 @@ public:
 		const Ref<Referable>& obj = getObject();
 		return obj.isNull();
 	}
+	
 	SLIB_INLINE sl_class_type getObjectClassType() const;
+	
 	SLIB_INLINE const char* getObjectClassTypeName() const;
 
 	SLIB_INLINE sl_bool isMemory() const
 	{
 		return MemoryObject::checkInstance(getObject());
 	}
+	
 	SLIB_INLINE Memory getMemory() const
 	{
 		Ref<Referable> obj = getObject();
@@ -562,62 +533,17 @@ public:
 		}
 	}
 
-
-	template <class T, sl_bool flagThreadSafe>
-	SLIB_INLINE const WeakRef<T, flagThreadSafe> getWeak(const WeakRef<T, flagThreadSafe>& def) const
+	template <class T>
+	SLIB_INLINE const WeakRef<T> getWeak(const WeakRef<T>& def) const
 	{
 		Variant v = *this;
 		if (v.m_type == typeWeak) {
-			return *(WeakRef<T, flagThreadSafe>*)(void*)(&(v.m_value));
+			return *(WeakRef<T>*)(void*)(&(v.m_value));
 		} else {
 			return def;
 		}
 	}
-
-	template <class T, sl_bool flagThreadSafe>
-	SLIB_INLINE const SharedPtr<T, flagThreadSafe> getSharedPtr(const SharedPtr<T, flagThreadSafe>& def) const
-	{
-		Variant v = *this;
-		if (v.m_type == typeSharedPtr) {
-			return *(SharedPtr<T, flagThreadSafe>*)(void*)(&(v.m_value));
-		} else {
-			return def;
-		}
-	}
-
-	template <class T, sl_bool flagThreadSafe>
-	SLIB_INLINE const WeakPtr<T, flagThreadSafe> getWeakPtr(const WeakPtr<T, flagThreadSafe>& def) const
-	{
-		Variant v = *this;
-		if (v.m_type == typeWeakPtr) {
-			return *(WeakPtr<T, flagThreadSafe>*)(void*)(&(v.m_value));
-		} else {
-			return def;
-		}
-	}
-
-	template <class T>
-	SLIB_INLINE const SafePtr<T> getSafePtr(const SafePtr<T>& def) const
-	{
-		Variant v = *this;
-		if (v.m_type == typeSafePtr) {
-			return *(SafePtr<T>*)(void*)(&(v.m_value));
-		} else {
-			return def;
-		}
-	}
-
-	template <class T>
-	SLIB_INLINE const UnitedPtr<T> getUnitedPtr(const UnitedPtr<T>& def) const
-	{
-		Variant v = *this;
-		if (v.m_type == typeUnitedPtr) {
-			return *(UnitedPtr<T>*)(void*)(&(v.m_value));
-		} else {
-			return def;
-		}
-	}
-
+	
 	String toString() const;
 
 	String toJSON() const;

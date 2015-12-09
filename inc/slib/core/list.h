@@ -637,7 +637,7 @@ public:
 	template <class _TYPE, sl_bool _flagThreadSafe, class _COMPARE>
 	sl_bool insert(sl_size index, const List<_TYPE, _flagThreadSafe, _COMPARE>& other)
 	{
-		Ref< ListObject<_TYPE, _flagThreadSafe, _COMPARE>, sl_false > object2 = other.getObjectReference();
+		Ref< ListObject<_TYPE, _flagThreadSafe, _COMPARE>  > object2 = other.getObjectReference();
 		if (object2.isNull())
 			return sl_true;
 		_ListRef object1(m_object);

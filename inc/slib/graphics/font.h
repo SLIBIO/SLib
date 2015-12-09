@@ -5,7 +5,7 @@
 
 #include "../core/object.h"
 #include "../core/string.h"
-#include "../math/geometry2d.h"
+#include "../math/size.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 

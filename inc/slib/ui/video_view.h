@@ -16,7 +16,17 @@ public:
 	VideoView();
 	
 public:
+	void updateCurrentFrame(const VideoFrame* frame);
 	
+protected:
+	// override
+	void onFrame(RenderEngine* engine);
+	
+protected:
+	Ref<Texture> m_textureFrame;
+	sl_bool m_flagYUV;
+	Ref<RenderProgram2D> m_programRGB;
+	Ref<RenderProgram2D> m_programYUV;
 };
 SLIB_UI_NAMESPACE_END
 

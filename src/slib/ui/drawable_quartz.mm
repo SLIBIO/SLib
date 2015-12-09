@@ -102,25 +102,23 @@ CGImageRef UIPlatform::getImageDrawableHandle(Drawable* _drawable)
 
 void _Drawable_DataProviderRelease(void *info, const void *data, size_t size)
 {
-	delete[] ((char*)data);
+	Referable* ref = (Referable*)info;
+	ref->decreaseReference();
 }
 
 Ref<Drawable> UI::createDrawableFromImage(const ImageDesc& desc)
 {
 	sl_uint32 width = desc.width;
 	sl_uint32 height = desc.height;
-	sl_uint32 size = (width * height) << 2;
-	char* buf = new char[size];
-	if (!buf) {
-		return Ref<Drawable>::null();
-	}
-	Color::convert(width, height, desc.colors, desc.stride, Color::RGBA, buf, width<<2);
+	sl_uint32 stride = desc.stride;
 	Ref<Drawable> ret;
-	CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, buf, size, _Drawable_DataProviderRelease);
+	Ref<Referable> refData = desc.ref;
+	refData->increaseReference();
+	CGDataProviderRef provider = CGDataProviderCreateWithData(refData.get(), desc.colors, (stride * height) << 2, _Drawable_DataProviderRelease);
 	if (provider) {
 		CGColorSpaceRef colorSpaceRef = CGColorSpaceCreateDeviceRGB();
 		if (colorSpaceRef) {
-			CGImageRef imageRef = CGImageCreate(width, height, 8, 32, width<<2, colorSpaceRef
+			CGImageRef imageRef = CGImageCreate(width, height, 8, 32, stride << 2, colorSpaceRef
 												, kCGBitmapByteOrder32Big | kCGImageAlphaLast
 												, provider, NULL, NO, kCGRenderingIntentDefault);
 			if (imageRef) {
@@ -130,6 +128,8 @@ Ref<Drawable> UI::createDrawableFromImage(const ImageDesc& desc)
 			CGColorSpaceRelease(colorSpaceRef);
 		}
 		CGDataProviderRelease(provider);
+	} else {
+		refData->decreaseReference();
 	}
 	return ret;
 }
@@ -155,8 +155,6 @@ public:
 	sl_uint32 m_width;
 	sl_uint32 m_height;
 	
-#define bitmapColorModel Color::RGBA
-
 	_Quartz_Bitmap()
 	{
 	}
@@ -251,7 +249,7 @@ public:
 		return m_height;
 	}
 	
-	sl_bool readPixels(sl_uint32 x, sl_uint32 y, BitmapDesc& desc)
+	sl_bool readPixels(sl_uint32 x, sl_uint32 y, BitmapData& bitmapData)
 	{
 		if (x > m_width) {
 			return sl_false;
@@ -259,24 +257,19 @@ public:
 		if (y > m_height) {
 			return sl_false;
 		}
-		sl_uint32 width = desc.width;
-		sl_uint32 height = desc.height;
-		sl_uint32 pitch = desc.pitch;
-		if (width > m_width - x) {
-			return sl_false;
-		}
-		if (height > m_height - y) {
-			return sl_false;
-		}
-		if (pitch == 0) {
-			pitch = (sl_uint32)(Color::calculatePitchAlign1(width, Color::getModelBits(desc.colorModel)));
-		}
-		sl_uint32* src = ((sl_uint32*)m_buf) + m_width * y + x;
-		Color::convertPAtoNPA(width, height, bitmapColorModel, src, m_width << 2, desc.colorModel, desc.data, pitch);
+		BitmapData source;
+		source.width = m_width - x;
+		source.height = m_height - y;
+		source.format = bitmapFormatRGBA_PA;
+		source.data = ((sl_uint32*)m_buf) + m_width * y + x;
+		source.pitch = m_width << 2;
+		
+		bitmapData.copyPixelsFrom(source);
+		
 		return sl_true;
 	}
 	
-	sl_bool writePixels(sl_uint32 x, sl_uint32 y, const BitmapDesc& desc)
+	sl_bool writePixels(sl_uint32 x, sl_uint32 y, const BitmapData& bitmapData)
 	{
 		if (x > m_width) {
 			return sl_false;
@@ -284,24 +277,20 @@ public:
 		if (y > m_height) {
 			return sl_false;
 		}
-		sl_uint32 width = desc.width;
-		sl_uint32 height = desc.height;
-		sl_uint32 pitch = desc.pitch;
-		if (width > m_width - x) {
-			return sl_false;
-		}
-		if (height > m_height - y) {
-			return sl_false;
-		}
-		if (pitch == 0) {
-			pitch = (sl_uint32)(Color::calculatePitchAlign1(width, Color::getModelBits(desc.colorModel)));
-		}
-		sl_uint32* dst = ((sl_uint32*)m_buf) + m_width * y + x;
-		Color::convertNPAtoPA(width, height, desc.colorModel, desc.data, pitch, bitmapColorModel, dst, m_width << 2);
+		
+		BitmapData target;
+		target.width = m_width - x;
+		target.height = m_height - y;
+		target.format = bitmapFormatRGBA_PA;
+		target.data = ((sl_uint32*)m_buf) + m_width * y + x;
+		target.pitch = m_width << 2;
+		
+		target.copyPixelsFrom(bitmapData);
+
 		return sl_true;
 	}
 	
-	sl_bool resetPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color& color)
+	sl_bool resetPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color& _color)
 	{
 		if (x > m_width) {
 			return sl_false;
@@ -310,14 +299,18 @@ public:
 			return sl_false;
 		}
 		if (width > m_width - x) {
-			return sl_false;
+			width = m_width - x;
 		}
 		if (height > m_height - y) {
-			return sl_false;
+			height = m_height - y;
 		}
-		sl_uint32* buf = ((sl_uint32*)m_buf) + width * y + x;
-		sl_uint32 pattern;
-		color.write(bitmapColorModel, &pattern);
+		if (width == 0 || height == 0) {
+			return sl_true;
+		}
+		sl_uint32* buf = ((sl_uint32*)m_buf) + m_width * y + x;
+		Color color = _color;
+		color.convertNPAtoPA();
+		sl_uint32 pattern = *(sl_uint32*)((void*)&color);
 		for (sl_uint32 j = 0; j < height; j++) {
 			sl_uint32* t = buf;
 			for (sl_uint32 i = 0; i < width; i++) {

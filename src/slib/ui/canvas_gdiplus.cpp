@@ -290,7 +290,7 @@ public:
 				if (pf) {
 					Color color = _color;
 					Gdiplus::StringFormat format(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsNoClip);
-					Gdiplus::SolidBrush brush(Gdiplus::Color(color.a(), color.r(), color.g(), color.b()));
+					Gdiplus::SolidBrush brush(Gdiplus::Color(color.a, color.r, color.g, color.b));
 					graphics->DrawString((const WCHAR*)(text.getBuf()), text.getLength()
 						, pf
 						, Gdiplus::PointF(x, y + 1)
@@ -373,7 +373,7 @@ public:
 		sl_real height = rect.getHeight();
 		Ref<GraphicsPath> path = GraphicsPath::create();
 		if (path.isNotNull()) {
-			path->addRoundRect(rect.left, rect.top, width, height, radius.width, radius.height);
+			path->addRoundRect(rect.left, rect.top, width, height, radius.x, radius.y);
 			drawPath(path, _pen, _brush);
 		}
 	}

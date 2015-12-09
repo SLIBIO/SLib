@@ -95,6 +95,16 @@ enum GraphicsPathPointType
 	graphicsPathPointFlagClose = 0x80
 };
 
+enum ColorSpace
+{
+	ColorSpace_None = 0,
+	ColorSpace_RGB = 1,
+	ColorSpace_YUV = 2,
+	ColorSpace_CMYK = 3,
+	ColorSpace_HLS = 4,
+	ColorSpace_HSV = 5
+};
+
 SLIB_GRAPHICS_NAMESPACE_END
 
 #endif

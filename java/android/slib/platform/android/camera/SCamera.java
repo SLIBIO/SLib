@@ -3,6 +3,7 @@ package slib.platform.android.camera;
 import java.util.List;
 import java.util.Vector;
 
+import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import slib.platform.android.Logger;
@@ -62,10 +63,10 @@ public class SCamera implements Camera.PreviewCallback {
 			} else {
 				camera = Camera.open();			
 			}
-			if (camera != null) {
+			if (camera == null) {
 				return null;
 			}			
-			SCamera ret = new SCamera(camera, nativeObject);
+			SCamera ret = new SCamera(camera, id, nativeObject);
 			return ret;
 		} catch (Exception e) {
 			Logger.exception(e);
@@ -76,7 +77,7 @@ public class SCamera implements Camera.PreviewCallback {
 	public static Camera openCamera(String id) {
 		SCameraInfo[] infos = getCamerasList();
 		for (int i = 0; i < infos.length; i++) {
-			if (infos[i].equals(id)) {
+			if (infos[i].id.equals(id)) {
 				return Camera.open(infos[i].index);
 			}
 		}
@@ -84,17 +85,29 @@ public class SCamera implements Camera.PreviewCallback {
 	}
 	
 	Camera camera;
+	String id;
 	long nativeObject;
 	
 	boolean flagRunning = false;
 	byte[] bufCapture;
 	
-	public SCamera(Camera camera, long nativeObject) {
+	public SCamera(Camera camera, String id, long nativeObject) {
 		this.camera = camera;
+		this.id = id;
 		this.nativeObject = nativeObject;
+		
+		try {
+			camera.setPreviewCallbackWithBuffer(this);
+			SurfaceTexture texture = new SurfaceTexture(0);
+			camera.setPreviewTexture(texture);
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+
+		log("Created");
 	}
 	
-	public void setPreferedFrameSize(int width, int height) {
+	public void setPreferedFrameSettings(int width, int height) {
 		try {
 			if (width > 0 && height > 0) {
 				Camera.Parameters params = camera.getParameters();
@@ -116,7 +129,7 @@ public class SCamera implements Camera.PreviewCallback {
 				}
 				if (widthSel > 0 && heightSel > 0) {
 					params.setPreviewSize(widthSel, heightSel);
-					camera.setParameters(params);									
+					camera.setParameters(params);				
 				}
 			}
 		} catch (Exception e) {
@@ -142,15 +155,17 @@ public class SCamera implements Camera.PreviewCallback {
 			if (flagRunning) {
 				return;
 			}
-			Size size = camera.getParameters().getPreviewSize();
+			Camera.Parameters params = camera.getParameters();
+			Size size = params.getPreviewSize();
 			int len = getSizeForNV21(size.width, size.height);
 			if (bufCapture == null || bufCapture.length != len) {
-				bufCapture = new byte[size.width * size.height];				
+				bufCapture = new byte[len];				
 			}
 			camera.addCallbackBuffer(bufCapture);
-			camera.setPreviewCallbackWithBuffer(this);
 			camera.startPreview();
-			flagRunning = true;			
+			flagRunning = true;
+			
+			log("Started: " + size.width + "x" + size.height + " Format:" + params.getPreviewFormat());
 		} catch (Exception e) {
 			Logger.exception(e);
 		}
@@ -166,6 +181,8 @@ public class SCamera implements Camera.PreviewCallback {
 			}
 			camera.stopPreview();
 			flagRunning = false;
+			
+			log("Stopped");
 		} catch (Exception e) {
 			Logger.exception(e);
 		}
@@ -193,5 +210,9 @@ public class SCamera implements Camera.PreviewCallback {
 	
 	private int getSizeForNV21(int width, int height) {
 		return width * height + (width * height) / 2;
+	}
+	
+	private void log(String s) {
+		Logger.info("Camera [" + id + "] " + s);
 	}
 }

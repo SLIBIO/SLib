@@ -1,6 +1,7 @@
 #include "../../../inc/slib/graphics/canvas.h"
 #include "../../../inc/slib/graphics/context.h"
 #include "../../../inc/slib/graphics/util.h"
+#include "../../../inc/slib/math/transform2d.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 Canvas::Canvas()
@@ -134,7 +135,7 @@ void Canvas::drawText(const String& _text, const Rectangle& rcDst, const Ref<Fon
 	}
 	String text = _text;
 	Size size = getTextSize(font, text);
-	Point pt = GraphicsUtil::calculateAlignPosition(rcDst, size.width, size.height, align);
+	Point pt = GraphicsUtil::calculateAlignPosition(rcDst, size.x, size.y, align);
 	drawText(text, pt.x, pt.y, font, color);
 }
 

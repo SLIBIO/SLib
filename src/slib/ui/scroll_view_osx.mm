@@ -139,13 +139,13 @@ Size ScrollView::getScrollRange()
 			Size ret;
 			NSRect rcDoc = [doc frame];
 			NSRect rcClip = [clip bounds];
-			ret.width = (sl_real)(NSMaxX(rcDoc) - NSWidth(rcClip));
-			ret.height = (sl_real)(NSMaxY(rcDoc) - NSHeight(rcClip));
-			if (ret.width < 0) {
-				ret.width = 0;
+			ret.x = (sl_real)(NSMaxX(rcDoc) - NSWidth(rcClip));
+			ret.y = (sl_real)(NSMaxY(rcDoc) - NSHeight(rcClip));
+			if (ret.x < 0) {
+				ret.x = 0;
 			}
-			if (ret.height < 0) {
-				ret.height = 0;
+			if (ret.y < 0) {
+				ret.y = 0;
 			}
 			return ret;
 		}

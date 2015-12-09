@@ -14,6 +14,8 @@
 
 #include "media/opensl_es.h"
 #include "media/dsound.h"
+#include "media/dshow.h"
+#include "media/avfoundation.h"
 
 #include "media/codec_opus.h"
 #include "media/codec_vpx.h"

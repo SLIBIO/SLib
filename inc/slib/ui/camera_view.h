@@ -16,15 +16,17 @@ public:
 	CameraView();
 	
 public:
-	virtual void start(sl_uint32 cameraIndex);
+	virtual void start(const CameraParam& param);
 	virtual void stop();
 	
 public:
 	SLIB_PROPERTY_INLINE(Ptr<IVideoCaptureListener>, FrameListener)
 	
-public:
+protected:
 	virtual void onCaptureVideoFrame(VideoCapture* capture, VideoCaptureFrame* frame);
 	
+protected:
+	Ref<Camera> m_camera;
 };
 SLIB_UI_NAMESPACE_END
 

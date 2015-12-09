@@ -219,8 +219,8 @@ Size UI::getFontTextSize(const Ref<Font>& _font, const String& _text)
 			CTLineRef line = CTLineCreateWithAttributedString(attrString);
 			if (line) {
 				CGRect rect = CTLineGetBoundsWithOptions(line, kCTLineBoundsUseGlyphPathBounds);
-				ret.width = (sl_real)(rect.size.width);
-				ret.height = (sl_real)(rect.size.height);
+				ret.x = (sl_real)(rect.size.width);
+				ret.y = (sl_real)(rect.size.height);
 				CFRelease(line);
 			}
 			CFRelease(attrString);

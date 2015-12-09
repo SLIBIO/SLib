@@ -18,7 +18,7 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidCamera, "slib/platform/android/camera/SCamera")
 	SLIB_JNI_STATIC_METHOD(getCamerasList, "getCamerasList", "()[Lslib/platform/android/camera/SCameraInfo;");
 	SLIB_JNI_STATIC_METHOD(create, "create", "(Ljava/lang/String;J)Lslib/platform/android/camera/SCamera;");
 
-	SLIB_JNI_METHOD(setPreferedFrameSize, "setPreferedFrameSize", "(II)V");
+	SLIB_JNI_METHOD(setPreferedFrameSettings, "setPreferedFrameSettings", "(II)V");
 	SLIB_JNI_METHOD(release, "release", "()V");
 	SLIB_JNI_METHOD(start, "start", "()V");
 	SLIB_JNI_METHOD(stop, "stop", "()V");
@@ -42,7 +42,6 @@ public:
 	~_Android_Camera()
 	{
 		release();
-		_AndroidCameras_get().remove((jlong)this);
 	}
 
 	static Ref<_Android_Camera> _create(const CameraParam& param)
@@ -56,7 +55,9 @@ public:
 			if (jcamera.isNotNull()) {
 				ret->m_camera = jcamera;
 				ret->setListener(param.listener);
-				_JAndroidCamera::setPreferedFrameSize.call(jcamera, param.preferedFrameWidth, param.preferedFrameHeight);
+				_JAndroidCamera::setPreferedFrameSettings.call(jcamera,
+						param.preferedFrameWidth,
+						param.preferedFrameHeight);
 				if (param.flagAutoStart) {
 					ret->start();
 				}
@@ -82,6 +83,7 @@ public:
 		}
 		_JAndroidCamera::release.call(jcamera);
 		m_camera.setNull();
+		_AndroidCameras_get().remove((jlong)this);
 	}
 
 	sl_bool isOpened()
@@ -114,6 +116,7 @@ public:
 		return sl_false;
 	}
 
+	Memory m_memFrame;
 	void _onFrame(jbyteArray jdata, jint width, jint height) {
 		if (width & 1) {
 			return;
@@ -122,23 +125,28 @@ public:
 			return;
 		}
 		sl_uint32 size = Jni::getArrayLength(jdata);
-		Memory mem = _getMemProcess(size);
+		Memory mem = m_memFrame;
 		if (mem.isNull()) {
-			return;
+			mem = Memory::create(size);
+			if (mem.isNull()) {
+				return;
+			}
+			m_memFrame = mem;
 		}
 		Jni::getByteArrayRegion(jdata, 0, size, (jbyte*)(mem.getBuf()));
 		VideoCaptureFrame frame;
-		frame.width = (sl_uint32)(width);
-		frame.height = (sl_uint32)(height);
-		frame.colorModel = Color::YUV_NV21;
-		frame.data = mem.getBuf();
-		frame.pitch = 0;
-		frame.ref = mem.getReference();
+		frame.image.width = (sl_uint32)(width);
+		frame.image.height = (sl_uint32)(height);
+		frame.image.format = bitmapFormatYUV_NV21;
+		frame.image.data = mem.getBuf();
+		frame.image.pitch = 0;
+		frame.image.ref = mem.getReference();
 		onCaptureVideoFrame(&frame);
 	}
+
 };
 
-SLIB_JNI_BEGIN_CLASS_SECTION(_JAndroidCameraInfo)
+SLIB_JNI_BEGIN_CLASS_SECTION(_JAndroidCamera)
 	SLIB_JNI_NATIVE_IMPL(nativeOnFrame, "nativeOnFrame", "(J[BII)V", void, jlong instance, jbyteArray jdata, jint jwidth, jint jheight)
 	{
 		Ref<_Android_Camera> camera = _Android_Camera::get(instance);

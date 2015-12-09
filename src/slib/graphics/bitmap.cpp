@@ -57,36 +57,16 @@ void Bitmap::update()
 	m_drawableCached.setNull();
 }
 
-sl_bool Bitmap::readPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, ColorModel model, void* data, sl_uint32 pitch)
+sl_bool Bitmap::readPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, Color* colors, sl_int32 stride)
 {
-	BitmapDesc bd;
-	bd.width = width;
-	bd.height = height;
-	bd.colorModel = model;
-	bd.data = data;
-	bd.pitch = pitch;
-	return readPixels(x, y, bd);
+	BitmapData bitmapData(width, height, colors, stride);
+	return readPixels(x, y, bitmapData);
 }
 
-sl_bool Bitmap::readPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, Color* colors, sl_uint32 stride)
+sl_bool Bitmap::writePixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color* colors, sl_int32 stride)
 {
-	return readPixels(x, y, width, height, Color::defaultModel, colors, stride << 2);
-}
-
-sl_bool Bitmap::writePixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, ColorModel model, const void* data, sl_uint32 pitch)
-{
-	BitmapDesc bd;
-	bd.width = width;
-	bd.height = height;
-	bd.colorModel = model;
-	bd.data = (void*)data;
-	bd.pitch = pitch;
-	return writePixels(x, y, bd);
-}
-
-sl_bool Bitmap::writePixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color* colors, sl_uint32 stride)
-{
-	return writePixels(x, y, width, height, Color::defaultModel, colors, stride << 2);
+	BitmapData bitmapData(width, height, colors, stride);
+	return writePixels(x, y, bitmapData);
 }
 
 sl_bool Bitmap::resetPixels(const Color& color)

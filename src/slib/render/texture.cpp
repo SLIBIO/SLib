@@ -15,8 +15,8 @@ Texture::Texture()
 
 Ref<Texture> Texture::create(const Ref<Bitmap>& _source)
 {
-	Ref<Bitmap> source = _source;
 	Ref<Texture> ret;
+	Ref<Bitmap> source = _source;
 	if (source.isNotNull()) {
 		sl_uint32 width = source->getWidth();
 		sl_uint32 height = source->getHeight();
@@ -32,12 +32,12 @@ Ref<Texture> Texture::create(const Ref<Bitmap>& _source)
 	return ret;
 }
 
-Ref<Texture> Texture::create(sl_uint32 width, sl_uint32 height, ColorModel colorModel, const void* data, sl_uint32 pitch)
+Ref<Texture> Texture::create(const BitmapData& bitmapData)
 {
-	return create(Image::create(width, height, colorModel, data, pitch));
+	return create(Image::create(bitmapData));
 }
 
-Ref<Texture> Texture::create(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_uint32 stride)
+Ref<Texture> Texture::create(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride)
 {
 	return create(Image::create(width, height, pixels, stride));
 }
@@ -74,9 +74,8 @@ void Texture::freeSource()
 	m_source.setNull();
 }
 
-sl_bool Texture::setSource(const Ref<Bitmap>& _source)
+sl_bool Texture::setSource(const Ref<Bitmap>& source)
 {
-	Ref<Bitmap> source = _source;
 	if (source.isNull()) {
 		return sl_false;
 	}

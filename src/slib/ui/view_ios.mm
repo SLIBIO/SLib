@@ -99,6 +99,8 @@ void iOS_ViewInstance::onDraw(CGRect _rectDirty)
 		
 		if (context != nil) {
 			
+			CGContextTranslateCTM(context, 0.5, -0.5);
+			
 			Ref<Canvas> canvas = UIPlatform::createCanvas(context, (sl_uint32)(rectBound.size.width), (sl_uint32)(rectBound.size.height));
 			
 			if (canvas.isNotNull()) {

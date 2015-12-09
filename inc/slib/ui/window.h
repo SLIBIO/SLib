@@ -9,6 +9,7 @@
 #include "../core/object.h"
 #include "../core/callback.h"
 #include "../graphics/color.h"
+#include "../math/rectangle.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 

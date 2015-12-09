@@ -11,6 +11,7 @@
 #include "drawable.h"
 
 #include "../core/object.h"
+#include "../math/matrix3.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 

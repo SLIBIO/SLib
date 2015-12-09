@@ -4,7 +4,7 @@
 #include "definition.h"
 #include "constants.h"
 
-#include "../math/geometry2d.h"
+#include "../math/rectangle.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 class SLIB_EXPORT GraphicsUtil

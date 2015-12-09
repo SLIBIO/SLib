@@ -28,7 +28,7 @@ public:
 			}
 			viewContent->setParent(this);
 			Size sizeContent = viewContent->getSize();
-			[sv setContentSize:CGSizeMake(sizeContent.width, sizeContent.height)];
+			[sv setContentSize:CGSizeMake(sizeContent.x, sizeContent.y)];
 			if (handle != nil) {
 				[sv addSubview:handle];
 			}
@@ -66,7 +66,7 @@ void ScrollView::onResizeChild(View* child)
 		Ref<View> viewContent = m_viewContent;
 		if (viewContent.isNotNull()) {
 			Size sizeContent = viewContent->getSize();
-			[sv setContentSize:CGSizeMake(sizeContent.width, sizeContent.height)];
+			[sv setContentSize:CGSizeMake(sizeContent.x, sizeContent.y)];
 		}
 	}
 }
@@ -124,13 +124,13 @@ Size ScrollView::getScrollRange()
 		CGSize sizeContent = sv.contentSize;
 		CGSize sizeFrame = sv.bounds.size;
 		Size ret;
-		ret.width = sizeContent.width - sizeFrame.width;
-		if (ret.width < 0) {
-			ret.width = 0;
+		ret.x = sizeContent.width - sizeFrame.width;
+		if (ret.x < 0) {
+			ret.x = 0;
 		}
-		ret.height = sizeContent.height - sizeFrame.height;
-		if (ret.height < 0) {
-			ret.height = 0;
+		ret.y = sizeContent.height - sizeFrame.height;
+		if (ret.y < 0) {
+			ret.y = 0;
 		}
 		return ret;
 	}

@@ -172,144 +172,149 @@ public:
 		return m_bitmap->GetHeight();
 	}
 	
-	sl_bool readPixels(sl_uint32 x, sl_uint32 y, BitmapDesc& desc)
+	sl_bool readPixels(sl_uint32 x, sl_uint32 y, BitmapData& _dst)
 	{
 		sl_uint32 w = getBitmapWidth();
 		sl_uint32 h = getBitmapHeight();
 		if (x >= w || y >= h) {
 			return sl_false;
 		}
-		sl_uint32 width = desc.width;
-		sl_uint32 height = desc.height;
-		sl_uint32 pitch = desc.pitch;
-		if (width > w - x || height > h - y) {
-			return sl_false;
+
+		BitmapData dst(_dst);
+		sl_uint32 width = dst.width;
+		sl_uint32 height = dst.height;
+
+		dst.fillDefaultValues();
+
+		if (width > w - x) {
+			width = w - x;
 		}
-		sl_uint32 bpp = Color::getModelBits(desc.colorModel);
-		if (pitch == 0) {
-			pitch = (sl_uint32)(Color::calculatePitchAlign1(width, bpp));
+		if (height > h - y) {
+			height = h - y;
 		}
-		sl_uint8* pixels = (sl_uint8*)desc.data;
-		Gdiplus::BitmapData data;
-		data.Width = width;
-		data.Height = height;
-		data.Stride = pitch;
-		data.Scan0 = pixels;
+		if (width == 0 || height == 0) {
+			return sl_true;
+		}
+
 		Gdiplus::Rect rc(x, y, width, height);
 		Gdiplus::Status result;
-		
-		sl_bool flagUseLineCopy = sl_false;
-		if (bpp == 32) {
+
+		if (dst.format.getBitsPerSample() == 32 && dst.format.getPlanesCount() == 1) {
+
+			Gdiplus::BitmapData data;
+			data.Width = width;
+			data.Height = height;
+			data.Scan0 = dst.data;
+			data.Stride = dst.pitch;
 			data.PixelFormat = PixelFormat32bppARGB;
+
+			BitmapData src(dst);
+			src.format = bitmapFormatBGRA;
+
 			result = m_bitmap->LockBits(&rc, Gdiplus::ImageLockModeRead | Gdiplus::ImageLockModeUserInputBuf, PixelFormat32bppARGB, &data);
 			if (result == Gdiplus::Ok) {
 				m_bitmap->UnlockBits(&data);
-				Color::convert(width, height, Color::BGRA, pixels, pitch, desc.colorModel, pixels, pitch);
+				dst.copyPixelsFrom(src);
 				return sl_true;
 			}
-		} else if (bpp == 24) {
-			data.PixelFormat = PixelFormat24bppRGB;
-			result = m_bitmap->LockBits(&rc, Gdiplus::ImageLockModeRead | Gdiplus::ImageLockModeUserInputBuf, PixelFormat24bppRGB, &data);
-			if (result == Gdiplus::Ok) {
-				m_bitmap->UnlockBits(&data);
-				Color::convert(width, height, Color::BGR, pixels, pitch, desc.colorModel, pixels, pitch);
-				return sl_true;
-			}
+
+			return sl_false;
+
 		} else {
-			flagUseLineCopy = sl_true;
-		}
-		
-		if (flagUseLineCopy) {
-			sl_uint32 pitchIn = width * 4;
-			sl_uint32 nRowsUnit = 0x100000 / pitchIn;
-			if (nRowsUnit == 0) {
+			
+			SLIB_SCOPED_BUFFER(Color, 65536, buf, width*height);
+			if (!buf) {
 				return sl_false;
 			}
-			SLIB_SCOPED_ARRAY(sl_uint8, buf, nRowsUnit * pitchIn);
-			data.Stride = pitchIn;
+
+			Gdiplus::BitmapData data;
+			data.Width = width;
+			data.Height = height;
 			data.Scan0 = buf;
-			for (sl_uint32 i = 0; i < height; i += nRowsUnit) {
-				sl_uint32 h = height - i;
-				if (h > nRowsUnit) {
-					h = nRowsUnit;
-				}
-				rc.Y = y;
-				rc.Height = h;
-				data.Height = h;
-				result = m_bitmap->LockBits(&rc, Gdiplus::ImageLockModeRead | Gdiplus::ImageLockModeUserInputBuf, PixelFormat32bppARGB, &data);
-				if (result == Gdiplus::Ok) {
-					m_bitmap->UnlockBits(&data);
-					Color::convert(width, h, Color::BGRA, buf, pitchIn, desc.colorModel, pixels, pitch);
-				} else {
-					return sl_false;
-				}
-				y += h;
-				pixels += pitch * h;
+			data.Stride = width << 2;
+			data.PixelFormat = PixelFormat32bppARGB;
+
+			result = m_bitmap->LockBits(&rc, Gdiplus::ImageLockModeRead | Gdiplus::ImageLockModeUserInputBuf, PixelFormat32bppARGB, &data);
+			if (result == Gdiplus::Ok) {
+
+				BitmapData src(width, height, buf);
+				src.format = bitmapFormatBGRA;
+				dst.copyPixelsFrom(src);
+
+				m_bitmap->UnlockBits(&data);
+
+				return sl_true;
 			}
-			return sl_true;
+
+			return sl_false;
 		}
-		return sl_false;
 	}
 	
-	sl_bool writePixels(sl_uint32 x, sl_uint32 y, const BitmapDesc& desc)
+	sl_bool writePixels(sl_uint32 x, sl_uint32 y, const BitmapData& _src)
 	{
 		sl_uint32 w = getBitmapWidth();
 		sl_uint32 h = getBitmapHeight();
 		if (x >= w || y >= h) {
 			return sl_false;
 		}
-		sl_uint32 width = desc.width;
-		sl_uint32 height = desc.height;
-		sl_uint32 pitch = desc.pitch;
-		if (width > w - x || height > h - y) {
-			return sl_false;
+
+		BitmapData src(_src);
+		sl_uint32 width = src.width;
+		sl_uint32 height = src.height;
+
+		src.fillDefaultValues();
+
+		if (width > w - x) {
+			width = w - x;
 		}
-		sl_uint32 bpp = Color::getModelBits(desc.colorModel);
-		if (pitch == 0) {
-			pitch = (sl_uint32)(Color::calculatePitchAlign1(width, bpp));
+		if (height > h - y) {
+			height = h - y;
 		}
-		
-		const sl_uint8* pixels = (const sl_uint8*)desc.data;
+		if (width == 0 || height == 0) {
+			return sl_true;
+		}
+
 		Gdiplus::Rect rc(x, y, width, height);
-		if (desc.colorModel == Color::BGRA) {
+		Gdiplus::Status result;
+
+		if (src.format == bitmapFormatBGRA) {
+
 			Gdiplus::BitmapData data;
 			data.Width = width;
 			data.Height = height;
 			data.PixelFormat = PixelFormat32bppARGB;
-			data.Stride = pitch;
-			data.Scan0 = (void*)pixels;
-			Gdiplus::Status result = m_bitmap->LockBits(&rc, Gdiplus::ImageLockModeWrite | Gdiplus::ImageLockModeUserInputBuf, PixelFormat32bppARGB, &data);
+			data.Stride = src.pitch;
+			data.Scan0 = src.data;
+
+			result = m_bitmap->LockBits(&rc, Gdiplus::ImageLockModeWrite | Gdiplus::ImageLockModeUserInputBuf, PixelFormat32bppARGB, &data);
 			if (result == Gdiplus::Ok) {
 				result = m_bitmap->UnlockBits(&data);
 				return result == Gdiplus::Ok;
 			}
+			
 		} else {
-			sl_uint32 pitchOut = width * 4;
-			sl_uint32 nRowsUnit = 0x100000 / pitchOut;
-			if (nRowsUnit == 0) {
+			
+			SLIB_SCOPED_BUFFER(Color, 65536, buf, width*height);
+			if (!buf) {
 				return sl_false;
 			}
-			SLIB_SCOPED_ARRAY(sl_uint8, buf, nRowsUnit * pitchOut);
+
 			Gdiplus::BitmapData data;
-			data.Stride = pitchOut;
+			data.Width = width;
+			data.Height = height;
 			data.Scan0 = buf;
-			for (sl_uint32 i = 0; i < height; i += nRowsUnit) {
-				sl_uint32 h = height - i;
-				if (h > nRowsUnit) {
-					h = nRowsUnit;
-				}
-				rc.Y = y;
-				rc.Height = h;
-				data.Height = h;
-				Gdiplus::Status result = m_bitmap->LockBits(&rc, Gdiplus::ImageLockModeWrite | Gdiplus::ImageLockModeUserInputBuf, PixelFormat32bppARGB, &data);
-				Color::convert(width, h, desc.colorModel, pixels, pitch, Color::BGRA, buf, pitchOut);
-				if (result == Gdiplus::Ok) {
-					m_bitmap->UnlockBits(&data);
-				} else {
-					return sl_false;
-				}
-				y += h;
-				pixels += pitch * h;
+			data.Stride = width << 2;
+			data.PixelFormat = PixelFormat32bppARGB;
+
+			result = m_bitmap->LockBits(&rc, Gdiplus::ImageLockModeWrite | Gdiplus::ImageLockModeUserInputBuf, PixelFormat32bppARGB, &data);
+
+			if (result == Gdiplus::Ok) {
+
+				BitmapData dst(width, height, buf);
+				dst.format = bitmapFormatBGRA;
+				dst.copyPixelsFrom(src);
+
+				m_bitmap->UnlockBits(&data);
 			}
 			return sl_true;
 		}
@@ -323,8 +328,14 @@ public:
 		if (x >= w || y >= h) {
 			return sl_false;
 		}
-		if (width > w - x || height > h - y) {
-			return sl_false;
+		if (width > w - x) {
+			width = w - x;
+		}
+		if (height > h - y) {
+			height = h - y;
+		}
+		if (width == 0 || height == 0) {
+			return sl_true;
 		}
 		
 		Gdiplus::Rect rc(x, y, width, height);

@@ -22,10 +22,6 @@ Variant::Variant(const Variant& other)
 				break;
 			case typeObject:
 			case typeWeak:
-			case typeSharedPtr:
-			case typeWeakPtr:
-			case typeSafePtr:
-			case typeUnitedPtr:
 				new ((Ref<Referable>*)(void*)(&m_value)) Ref<Referable>(*(Ref<Referable>*)(void*)(&(other.m_value)));
 				break;
 			default:
@@ -48,10 +44,6 @@ Variant::~Variant()
 		break;
 	case typeObject:
 	case typeWeak:
-	case typeSharedPtr:
-	case typeWeakPtr:
-	case typeSafePtr:
-	case typeUnitedPtr:
 		(*(Ref<Referable>*)(void*)(&m_value)).Ref<Referable>::~Ref();
 		break;
 	default:
@@ -100,10 +92,6 @@ Variant& Variant::operator=(const Variant& other)
 				break;
 			case typeObject:
 			case typeWeak:
-			case typeSharedPtr:
-			case typeWeakPtr:
-			case typeSafePtr:
-			case typeUnitedPtr:
 				new ((Ref<Referable>*)(void*)(&m_value)) Ref<Referable>(*(Ref<Referable>*)(void*)(&(other.m_value)));
 				break;
 			default:
@@ -121,10 +109,6 @@ Variant& Variant::operator=(const Variant& other)
 			break;
 		case typeObject:
 		case typeWeak:
-		case typeSharedPtr:
-		case typeWeakPtr:
-		case typeSafePtr:
-		case typeUnitedPtr:
             (*(Ref<Referable>*)(void*)(&valueFree)).Ref<Referable>::~Ref();
             break;
         default:
@@ -172,10 +156,6 @@ sl_bool Variant::operator==(const Variant& other)
 		return *(String16*)(void*)(&(v1.m_value)) == *(String16*)(void*)(&(v2.m_value));
 	case typeObject:
 	case typeWeak:
-	case typeSharedPtr:
-	case typeWeakPtr:
-	case typeSafePtr:
-	case typeUnitedPtr:
 		return *(Ref<Referable>*)(void*)(&(v1.m_value)) == *(Ref<Referable>*)(void*)(&(v2.m_value));
 	}
 	return sl_false;
@@ -633,14 +613,6 @@ String Variant::toString() const
 		}
 	case typeWeak:
 		return "<weak-ref>";
-	case typeSharedPtr:
-		return "<shared-ptr>";
-	case typeWeakPtr:
-		return "<weak-ptr>";
-	case typeSafePtr:
-		return "<safe-ptr>";
-	case typeUnitedPtr:
-		return "<united-ptr>";
 	default:
 		return "<error-type>";
 	}

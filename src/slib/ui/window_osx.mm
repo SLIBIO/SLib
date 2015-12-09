@@ -313,8 +313,8 @@ public:
 		if (window != nil) {
 			dispatch_async(dispatch_get_main_queue(), ^{
 				NSSize s;
-				s.width = size.width;
-				s.height = size.height;
+				s.width = size.x;
+				s.height = size.y;
 				[window setContentSize:s];
 			});
 			return sl_true;
@@ -773,8 +773,8 @@ public:
 			NSRect frame = [window frame];
 			NSRect client = [window contentRectForFrameRect:frame];
 			Size ret;
-			ret.width = sizeClient.width + (sl_real)(frame.size.width - client.size.width);
-			ret.height = sizeClient.height + (sl_real)(frame.size.height - client.size.height);
+			ret.x = sizeClient.x + (sl_real)(frame.size.width - client.size.width);
+			ret.y = sizeClient.y + (sl_real)(frame.size.height - client.size.height);
 			return ret;
 		} else {
 			return sizeClient;
@@ -788,8 +788,8 @@ public:
 			NSRect frame = [window frame];
 			NSRect client = [window contentRectForFrameRect:frame];
 			Size ret;
-			ret.width = sizeWindow.width - (sl_real)(frame.size.width - client.size.width);
-			ret.height = sizeWindow.height - (sl_real)(frame.size.height - client.size.height);
+			ret.x = sizeWindow.x - (sl_real)(frame.size.width - client.size.width);
+			ret.y = sizeWindow.y - (sl_real)(frame.size.height - client.size.height);
 			return ret;
 		} else {
 			return sizeWindow;
@@ -902,8 +902,8 @@ SLIB_UI_NAMESPACE_END
 	if (window.isNotNull()) {
 		slib::Size size(frameSize.width, frameSize.height);
 		window->onResize(size);
-		frameSize.width = size.width;
-		frameSize.height = size.height;
+		frameSize.width = size.x;
+		frameSize.height = size.y;
 	}
 	return frameSize;
 }

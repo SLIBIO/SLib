@@ -1,10 +1,3 @@
-#ifndef CHECKHEADER_SLIB_MATH_BEZIER
-#define CHECKHEADER_SLIB_MATH_BEZIER
-
-#include "definition.h"
-#include "geometry2d.h"
-
-SLIB_MATH_NAMESPACE_BEGIN
 /*******************************
 		CubicBezierCurve
 
@@ -17,6 +10,17 @@ B(n,m)	= m th coefficient of nth degree Bernstein polynomial
 C(n,m)	= Combinations of n things, taken m at a time
 		= n! / (m! * (n-m)!)
 *******************************/
+
+#ifndef CHECKHEADER_SLIB_MATH_BEZIER
+#define CHECKHEADER_SLIB_MATH_BEZIER
+
+#include "definition.h"
+
+#include "point.h"
+#include "rectangle.h"
+
+SLIB_MATH_NAMESPACE_BEGIN
+
 template <class T>
 class SLIB_EXPORT CubicBezierCurveT
 {
@@ -53,7 +57,7 @@ public:
 		y3 = _y3;
 	}
 
-	SLIB_INLINE CubicBezierCurveT(const Vector2T<T>& P0, const Vector2T<T>& P1, const Vector2T<T>& P2, const Vector2T<T>& P3)
+	SLIB_INLINE CubicBezierCurveT(const PointT<T>& P0, const PointT<T>& P1, const PointT<T>& P2, const PointT<T>& P3)
 	{
 		x0 = P0.x;
 		y0 = P0.y;
@@ -92,20 +96,20 @@ public:
 		y = it3 * y0 + _3it2t * y1 + _3itt2 * y2 + t3 * y3;
 	}
 
-	SLIB_INLINE void getPoint(T t, Vector2T<T>& pt)
+	SLIB_INLINE void getPoint(T t, PointT<T>& pt)
 	{
 		getPoint(t, pt.x, pt.y);
 	}
 
-	SLIB_INLINE Vector2T<T> getPoint(T t)
+	SLIB_INLINE PointT<T> getPoint(T t)
 	{
-		Vector2T<T> ret;
+		PointT<T> ret;
 		getPoint(t, ret);
 		return ret;
 	}
 	
 	// returns 1 + 3 * NumberOfArcSections points
-	static sl_uint32 convertArcToBezier(Vector2T<T> pts[13], T left, T top, T right, T bottom, T startDegrees, T sweepDegrees)
+	static sl_uint32 convertArcToBezier(PointT<T> pts[13], T left, T top, T right, T bottom, T startDegrees, T sweepDegrees)
 	{
 		T PI2, _2PI;
 		Math::getPI2(&PI2);
@@ -182,7 +186,7 @@ public:
 		}
 	}
 
-	SLIB_INLINE static sl_uint32 convertArcToBezier(Vector2T<T> pts[13], const RectangleT<T>& rc, T startDegrees, T sweepDegrees)
+	SLIB_INLINE static sl_uint32 convertArcToBezier(PointT<T> pts[13], const RectangleT<T>& rc, T startDegrees, T sweepDegrees)
 	{
 		return convertArcToBezier(pts, rc.left, rc.top, rc.right, rc.bottom, startDegrees, sweepDegrees);
 	}

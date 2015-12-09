@@ -3,6 +3,7 @@
 #ifdef SLIB_GRAPHICS_IMAGE_SUPPORT_JPEG
 
 #include "../../../inc/slib/core/file.h"
+#include "../../../inc/slib/core/scoped_pointer.h"
 
 #include <stdio.h>
 #include <setjmp.h>
@@ -37,7 +38,6 @@ Ref<Image> Image::loadFromJPEG(const void* content, sl_size size)
 	jerr.pub.error_exit = _slib_image_jpeg_error_exit;
 
 	Ref<Image> ret;
-	Memory rowMem;
 
 	if (setjmp(jerr.setjmp_buffer)) {
 		jpeg_destroy_decompress(&cinfo);
@@ -59,14 +59,20 @@ Ref<Image> Image::loadFromJPEG(const void* content, sl_size size)
 	ret = Image::create(width, height);
 	if (ret.isNotNull()) {
 		JSAMPROW row_pointer[1];
-		rowMem = Memory::create(width * 3);
-		if (rowMem.isNotEmpty()) {
-			row_pointer[0] = (JSAMPROW)(rowMem.getBuf());
+		SLIB_SCOPED_BUFFER(sl_uint8, 4096, row, width*3);
+		if (row) {
+			row_pointer[0] = (JSAMPROW)(row);
 			Color* pixels = ret->getColors();
 			sl_uint32 stride = ret->getStride();
 			while (cinfo.output_scanline < height) {
 				jpeg_read_scanlines(&cinfo, row_pointer, 1);
-				Color::convert(width, Color::RGB, row_pointer[0], pixels);
+				sl_uint8* p = row;
+				for (sl_uint32 i = 0; i < width; i++) {
+					pixels[i].r = *(p++);
+					pixels[i].g = *(p++);
+					pixels[i].b = *(p++);
+					pixels[i].a = 255;
+				}
 				pixels += stride;
 			}
 		}
@@ -86,8 +92,7 @@ Memory Image::saveToJPEG(const Ref<Image>& _image, float quality)
 	}
 
 	Memory ret;
-	Memory memRow;
-
+	
 	jpeg_compress_struct cinfo;
 	_slib_image_ext_jpeg_error_mgr jerr;
 
@@ -132,19 +137,26 @@ Memory Image::saveToJPEG(const Ref<Image>& _image, float quality)
 
 	jpeg_start_compress(&cinfo, 1);
 
-	JSAMPROW row_pointer[1];
-	memRow = Memory::create(width * 3);
-	if (memRow.isNotEmpty()) {
-		row_pointer[0] = (JSAMPROW)(memRow.getBuf());
-		while (cinfo.next_scanline < height) {			
-			Color::convert(width, pixels, Color::RGB, row_pointer[0]);
+	
+	SLIB_SCOPED_BUFFER(sl_uint8, 4096, row, width*3);
+	if (row) {
+		JSAMPROW row_pointer[1];
+		row_pointer[0] = (JSAMPROW)(row);
+		while (cinfo.next_scanline < height) {
+			sl_uint8* p = row;
+			for (sl_uint32 i = 0; i < width; i++) {
+				*(p++) = pixels[i].r;
+				*(p++) = pixels[i].g;
+				*(p++) = pixels[i].b;
+			}
 			jpeg_write_scanlines(&cinfo, row_pointer, 1);
 			pixels += stride;
 		}
 	}
+
 	jpeg_finish_compress(&cinfo);
 
-	if (memRow.isNotEmpty() && buf) {
+	if (row && buf) {
 		ret = Memory::create(buf, size);
 	}
 

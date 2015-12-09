@@ -3,6 +3,7 @@
 
 #include "../../../inc/slib/graphics/canvas.h"
 #include "../../../inc/slib/ui/core.h"
+#include "../../../inc/slib/math/transform3d.h"
 
 SLIB_RENDER_NAMESPACE_BEGIN
 
@@ -41,7 +42,7 @@ void RenderEngine::drawPrimitive(Primitive* primitive)
 	m_nCountDrawnPrimitivesOnLastScene++;
 }
 
-void RenderEngine::draw(RenderProgram* program, Primitive* primitives, sl_uint32 count)
+void RenderEngine::draw(const Ref<RenderProgram>& program, Primitive* primitives, sl_uint32 count)
 {
 	if (beginProgram(program)) {
 		for (sl_uint32 i = 0; i < count; i++) {
@@ -51,7 +52,7 @@ void RenderEngine::draw(RenderProgram* program, Primitive* primitives, sl_uint32
 	}
 }
 
-void RenderEngine::drawRectangle2D(RenderProgram* program)
+void RenderEngine::drawRectangle2D(const Ref<RenderProgram>& program)
 {
 	Ref<VertexBuffer> vb = _getDefaultVertexBufferForDrawRectangle2D();
 	draw(program, 4, vb, Primitive::typeTriangleStrip);
@@ -79,17 +80,19 @@ static void _RenderEngine_makeTextureTransform2D(Matrix3& mat, const Rectangle& 
 	mat.m20 = x; mat.m21 = y; mat.m22 = 1;
 }
 
-void RenderEngine::drawRectangle2D(const Matrix3& transform, RenderProgram2D* program)
+void RenderEngine::drawRectangle2D(const Matrix3& transform, const Ref<RenderProgram2D>& _program)
 {
-	if (program) {
+	Ref<RenderProgram2D> program = _program;
+	if (program.isNotNull()) {
 		program->setTransform(transform);
 		drawRectangle2D(program);
 	}
 }
 
-void RenderEngine::drawRectangle2D(const Rectangle& rectDst, RenderProgram2D* program)
+void RenderEngine::drawRectangle2D(const Rectangle& rectDst, const Ref<RenderProgram2D>& _program)
 {
-	if (program) {
+	Ref<RenderProgram2D> program = _program;
+	if (program.isNotNull()) {
 		Matrix3 matTransform;
 		_RenderEngine_makeTransform2D(matTransform, rectDst);
 		program->setTransform(matTransform);
@@ -125,25 +128,34 @@ Ref<VertexBuffer> RenderEngine::_getDefaultVertexBufferForDrawRectangle2D()
 		, { { 0, 1 } }
 		, { { 1, 1 } }
 	};
-	SLIB_SAFE_STATIC(Ref<VertexBuffer>, ret, VertexBuffer::create(v, sizeof(v)));
+	Ref<VertexBuffer> ret = m_defaultVertexBufferForDrawRectangle2D;
+	if (ret.isNull()) {
+		ret = VertexBuffer::create(v, sizeof(v));
+		m_defaultVertexBufferForDrawRectangle2D = ret;
+	}
 	return ret;
 }
 
 Ref<RenderProgram2D> RenderEngine::_getDefaultRenderProgramForDrawRectangle2D()
 {
-	SLIB_SAFE_STATIC(Ref<RenderProgram2D>, ret, new RenderProgram2D_Position);
+	Ref<RenderProgram2D> ret = m_defaultRenderProgramForDrawRectangle2D;
+	if (ret.isNull()) {
+		ret = new RenderProgram2D_Position;
+		m_defaultRenderProgramForDrawRectangle2D = ret;
+	}
 	return ret;
 }
 
-void RenderEngine::drawTexture2D(RenderProgram* program)
+void RenderEngine::drawTexture2D(const Ref<RenderProgram>& program)
 {
 	Ref<VertexBuffer> vb = _getDefaultVertexBufferForDrawTexture2D();
 	draw(program, 4, vb, Primitive::typeTriangleStrip);
 }
 
-void RenderEngine::drawTexture2D(const Matrix3& transform, const Ref<Texture>& _texture, const Rectangle& rectSrc, RenderProgram2D* program)
+void RenderEngine::drawTexture2D(const Matrix3& transform, const Ref<Texture>& _texture, const Rectangle& rectSrc, const Ref<RenderProgram2D>& _program)
 {
-	if (program) {
+	Ref<RenderProgram2D> program = _program;
+	if (program.isNotNull()) {
 		Ref<Texture> texture = _texture;
 		if (texture.isNotNull()) {
 			Matrix3 mt;
@@ -156,9 +168,10 @@ void RenderEngine::drawTexture2D(const Matrix3& transform, const Ref<Texture>& _
 	}
 }
 
-void RenderEngine::drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& _texture, const Rectangle& rectSrc, RenderProgram2D* program)
+void RenderEngine::drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& _texture, const Rectangle& rectSrc, const Ref<RenderProgram2D>& _program)
 {
-	if (program) {
+	Ref<RenderProgram2D> program = _program;
+	if (program.isNotNull()) {
 		Ref<Texture> texture = _texture;
 		if (texture.isNotNull()) {
 			Matrix3 matTransform;
@@ -213,9 +226,10 @@ void RenderEngine::drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& t
 	}
 }
 
-void RenderEngine::drawLines(RenderProgram* program, Line3* lines, sl_uint32 n)
+void RenderEngine::drawLines(const Ref<RenderProgram>& _program, Line3* lines, sl_uint32 n)
 {
-	if (program) {
+	Ref<RenderProgram> program = _program;
+	if (program.isNotNull()) {
 		Ref<VertexBuffer> vb = VertexBuffer::create(lines, sizeof(Line3)*n);
 		draw(program, n * 2, vb, Primitive::typeLines);
 	}
@@ -229,13 +243,21 @@ Ref<VertexBuffer> RenderEngine::_getDefaultVertexBufferForDrawTexture2D()
 		, { { 0, 1 }, { 0, 1 } }
 		, { { 1, 1 }, { 1, 1 } }
 	};
-	SLIB_SAFE_STATIC(Ref<VertexBuffer>, ret, VertexBuffer::create(v, sizeof(v)));
+	Ref<VertexBuffer> ret = m_defaultVertexBufferForDrawTexture2D;
+	if (ret.isNull()) {
+		ret = VertexBuffer::create(v, sizeof(v));
+		m_defaultVertexBufferForDrawTexture2D = ret;
+	}
 	return ret;
 }
 
 Ref<RenderProgram2D> RenderEngine::_getDefaultRenderProgramForDrawTexture2D()
 {
-	SLIB_SAFE_STATIC(Ref<RenderProgram2D>, ret, new RenderProgram2D_PositionTexture);
+	Ref<RenderProgram2D> ret = m_defaultRenderProgramForDrawTexture2D;
+	if (ret.isNull()) {
+		ret = new RenderProgram2D_PositionTexture;
+		m_defaultRenderProgramForDrawTexture2D = ret;
+	}
 	return ret;
 }
 
@@ -291,6 +313,46 @@ void RenderEngine::drawDebugText()
 		screenToViewport(0, 0, size.x, DEBUG_HEIGHT)
 		, texture
 		, Rectangle(0, 0, size.x / DEBUG_WIDTH, 1));
+}
+
+Point RenderEngine::screenToViewport(const Point& ptViewport)
+{
+	return Transform3::convertScreenToViewport(ptViewport, (sl_real)m_viewportWidth, (sl_real)m_viewportHeight);
+}
+
+Point RenderEngine::screenToViewport(sl_real x, sl_real y)
+{
+	return Transform3::convertScreenToViewport(Point(x, y), (sl_real)m_viewportWidth, (sl_real)m_viewportHeight);
+}
+
+Point RenderEngine::viewportToScreen(const Point& ptScreen)
+{
+	return Transform3::convertViewportToScreen(ptScreen, (sl_real)m_viewportWidth, (sl_real)m_viewportHeight);
+}
+
+Point RenderEngine::viewportToScreen(sl_real x, sl_real y)
+{
+	return Transform3::convertViewportToScreen(Point(x, y), (sl_real)m_viewportWidth, (sl_real)m_viewportHeight);
+}
+
+Rectangle RenderEngine::screenToViewport(const Rectangle& rc)
+{
+	return Transform3::convertScreenToViewport(rc, (sl_real)m_viewportWidth, (sl_real)m_viewportHeight);
+}
+
+Rectangle RenderEngine::screenToViewport(sl_real x, sl_real y, sl_real width, sl_real height)
+{
+	return Transform3::convertScreenToViewport(Rectangle(x, y, x + width, y + height), (sl_real)m_viewportWidth, (sl_real)m_viewportHeight);
+}
+
+Rectangle RenderEngine::viewportToScreen(const Rectangle& rc)
+{
+	return Transform3::convertViewportToScreen(rc, (sl_real)m_viewportWidth, (sl_real)m_viewportHeight);
+}
+
+Rectangle RenderEngine::viewportToScreen(sl_real x, sl_real y, sl_real width, sl_real height)
+{
+	return Transform3::convertViewportToScreen(Rectangle(x, y, x + width, y + height), (sl_real)m_viewportWidth, (sl_real)m_viewportHeight);
 }
 
 SLIB_RENDER_NAMESPACE_END
