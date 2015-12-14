@@ -99,7 +99,13 @@ public class Util {
 							nativeShowAlertResult(alert.nativeObject, Alert.RESULT_OK);
 						}
 					});
-					alertDialogBuilder.setCancelable(false);
+					alertDialogBuilder.setOnCancelListener(new AlertDialog.OnCancelListener() {						
+						@Override
+						public void onCancel(DialogInterface dialog) {
+							nativeShowAlertResult(alert.nativeObject, Alert.RESULT_OK);
+						}
+					});
+					alertDialogBuilder.setCancelable(true);
 					break;
 				case Alert.TYPE_OKCANCEL:
 					alertDialogBuilder.setPositiveButton(alert.titleOk, new AlertDialog.OnClickListener() {						
@@ -111,6 +117,12 @@ public class Util {
 					alertDialogBuilder.setNegativeButton(alert.titleCancel, new AlertDialog.OnClickListener() {						
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
+							nativeShowAlertResult(alert.nativeObject, Alert.RESULT_CANCEL);
+						}
+					});
+					alertDialogBuilder.setOnCancelListener(new AlertDialog.OnCancelListener() {						
+						@Override
+						public void onCancel(DialogInterface dialog) {
 							nativeShowAlertResult(alert.nativeObject, Alert.RESULT_CANCEL);
 						}
 					});
@@ -129,6 +141,7 @@ public class Util {
 							nativeShowAlertResult(alert.nativeObject, Alert.RESULT_NO);
 						}
 					});
+					alertDialogBuilder.setCancelable(false);
 					break;
 				case Alert.TYPE_YESNOCANCEL:
 					alertDialogBuilder.setPositiveButton(alert.titleYes, new AlertDialog.OnClickListener() {						
@@ -146,6 +159,12 @@ public class Util {
 					alertDialogBuilder.setNegativeButton(alert.titleCancel, new AlertDialog.OnClickListener() {						
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
+							nativeShowAlertResult(alert.nativeObject, Alert.RESULT_CANCEL);
+						}
+					});
+					alertDialogBuilder.setOnCancelListener(new AlertDialog.OnCancelListener() {						
+						@Override
+						public void onCancel(DialogInterface dialog) {
 							nativeShowAlertResult(alert.nativeObject, Alert.RESULT_CANCEL);
 						}
 					});

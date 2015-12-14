@@ -28,6 +28,7 @@ class _OSX_Window : public WindowInstance
 {
 public:
 	NSWindow* m_window;
+	__weak NSWindow* m_parent;
 	sl_real m_heightScreen;
 	Ref<ViewInstance> m_viewContent;
 	
@@ -159,7 +160,7 @@ public:
 	{
 		NSWindow* window = m_window;
 		if (window != nil) {
-			NSWindow* parent = [window parentWindow];
+			NSWindow* parent = m_parent;
 			if (parent != nil) {
 				return UIPlatform::createWindowInstance(parent);
 			}
@@ -175,6 +176,7 @@ public:
 			if (windowInst.isNotNull()) {
 				_OSX_Window* w = (_OSX_Window*)(windowInst.getObject());
 				NSWindow* p = w->m_window;
+				m_parent = p;
 				if (p != nil) {
 					[p addChildWindow:window ordered:NSWindowAbove];
 					return sl_true;
@@ -184,6 +186,7 @@ public:
 				if (p != nil) {
 					[p removeChildWindow:window];
 				}
+				m_parent = nil;
 				return sl_true;
 			}
 		}
@@ -408,7 +411,12 @@ public:
 		NSWindow* window = m_window;
 		if (window != nil) {
 			if (flag) {
-				[window orderFrontRegardless];
+				NSWindow* parent = m_parent;
+				if (parent != nil) {
+					[parent addChildWindow:window ordered:NSWindowAbove];
+				} else {
+					[window orderFrontRegardless];
+				}
 			} else {
 				[window orderOut:nil];
 			}
