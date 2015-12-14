@@ -128,6 +128,7 @@
 		266DD5EE1C11CEBB00D47AB0 /* camera_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5ED1C11CEBB00D47AB0 /* camera_ios.mm */; };
 		266DD5F61C11E09B00D47AB0 /* camera_avfoundation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5F51C11E09B00D47AB0 /* camera_avfoundation.mm */; };
 		268916341C182AC8009FD75E /* camera_dshow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268916331C182AC8009FD75E /* camera_dshow.cpp */; };
+		26948C491C1EBA2700FD141A /* radio_group.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26948C481C1EBA2700FD141A /* radio_group.cpp */; };
 		26A9B7621C172BCC004C9B0E /* camera_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A9B7611C172BCC004C9B0E /* camera_view.cpp */; };
 		26A9B7641C172BDE004C9B0E /* video_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A9B7631C172BDE004C9B0E /* video_view.cpp */; };
 		26C0A3511C128D80005690FE /* sensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A34D1C128D80005690FE /* sensor.cpp */; };
@@ -328,6 +329,7 @@
 		266DD5ED1C11CEBB00D47AB0 /* camera_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = camera_ios.mm; path = media/camera_ios.mm; sourceTree = "<group>"; };
 		266DD5F51C11E09B00D47AB0 /* camera_avfoundation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = camera_avfoundation.mm; path = media/camera_avfoundation.mm; sourceTree = "<group>"; };
 		268916331C182AC8009FD75E /* camera_dshow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = camera_dshow.cpp; path = media/camera_dshow.cpp; sourceTree = "<group>"; };
+		26948C481C1EBA2700FD141A /* radio_group.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = radio_group.cpp; sourceTree = "<group>"; };
 		26A9B7611C172BCC004C9B0E /* camera_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera_view.cpp; sourceTree = "<group>"; };
 		26A9B7631C172BDE004C9B0E /* video_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_view.cpp; sourceTree = "<group>"; };
 		26C0A34D1C128D80005690FE /* sensor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sensor.cpp; sourceTree = "<group>"; };
@@ -670,6 +672,7 @@
 				266DD4411C11910F00D47AB0 /* label_view_ios.mm */,
 				266DD4431C11912B00D47AB0 /* list_details_view.cpp */,
 				266DD4451C11914200D47AB0 /* radio_button.cpp */,
+				26948C481C1EBA2700FD141A /* radio_group.cpp */,
 				266DD4471C11917700D47AB0 /* render_view.cpp */,
 				266DD4491C11918300D47AB0 /* render_view_ios.mm */,
 				266DD40C1C118E2100D47AB0 /* s_button.cpp */,
@@ -783,6 +786,7 @@
 				266DD3EC1C1181B500D47AB0 /* socket.cpp in Sources */,
 				A234D6EE1B3F12F600ADDF4E /* content_type.cpp in Sources */,
 				A2DE1DA71B383EA000A74698 /* system_unix.cpp in Sources */,
+				26948C491C1EBA2700FD141A /* radio_group.cpp in Sources */,
 				A25F2F421B039EF600854DAF /* file_unix.cpp in Sources */,
 				A25F2F861B039EF600854DAF /* ui_core_ios.mm in Sources */,
 				266DD3E01C1181B500D47AB0 /* net_capture.cpp in Sources */,

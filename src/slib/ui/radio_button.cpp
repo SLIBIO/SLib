@@ -9,6 +9,10 @@ RadioButton::RadioButton()
 
 void RadioButton::onClick()
 {
+	Ref<RadioGroup> group = getRadioGroup();
+	if (group.isNotNull()) {
+		group->select(this);
+	}
 	Ref<Runnable> callback = getOnClick();
 	if (callback.isNotNull()) {
 		callback->run();

@@ -8,6 +8,8 @@
 
 #include "../../../inc/slib/core/queue.h"
 
+#include "view_win32.h"
+
 #include <commctrl.h>
 
 #if defined _M_IX86
@@ -30,7 +32,7 @@ class _Win32_UI
 public:
 	Ref<Screen> m_screenPrimary;
 	Queue< Ref<Runnable> > m_queueDispatch;
-	
+
 	_Win32_UI();
 
 	static _Win32_UI* get()
@@ -129,6 +131,12 @@ void UI::runLoop()
 			sl_bool flagDefaultProcess = sl_true;
 			if (hWnd) {
 				if (::IsDialogMessageW(hWnd, &msg)) {
+					flagDefaultProcess = sl_false;
+				}
+			}
+			Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(msg.hwnd));
+			if (instance.isNotNull()) {
+				if (instance->preprocessWindowMessage(msg)) {
 					flagDefaultProcess = sl_false;
 				}
 			}

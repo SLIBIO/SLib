@@ -50,6 +50,18 @@ public:
 		::InvalidateRect(handle, NULL, TRUE);
 	}
 
+	sl_bool preprocessWindowMessage(MSG& msg)
+	{
+		if (msg.message == WM_KEYDOWN) {
+			LRESULT lr;
+			sl_bool flag = Win32_ViewInstance::processWindowMessage(msg.message, msg.wParam, msg.lParam, lr);
+			if (flag) {
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+
 	sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 	{
 		return sl_false;

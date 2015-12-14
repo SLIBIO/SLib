@@ -682,6 +682,9 @@
     <ClInclude Include="..\..\..\inc\slib\media\dshow.h">
       <Filter>inc\media</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\ui\radio_group.h">
+      <Filter>inc\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">
@@ -1232,6 +1235,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\graphics\bitmap_format.cpp">
       <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\radio_group.cpp">
+      <Filter>src\slib\ui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

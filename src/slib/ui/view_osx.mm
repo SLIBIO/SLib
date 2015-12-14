@@ -4,12 +4,18 @@
 
 #include "view_osx.h"
 
+#include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/view_group.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+void UI::setDefaultFontName(const String& fontName)
+{
+}
+
 /******************************************
 			OSX_ViewInstance
 ******************************************/
+
 OSX_ViewInstance::OSX_ViewInstance()
 {
 	m_handle = nil;

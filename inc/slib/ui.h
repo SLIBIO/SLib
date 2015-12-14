@@ -18,6 +18,7 @@
 #include "ui/button.h"
 #include "ui/check_box.h"
 #include "ui/radio_button.h"
+#include "ui/radio_group.h"
 #include "ui/drop_down_list.h"
 
 #include "ui/list_details_view.h"

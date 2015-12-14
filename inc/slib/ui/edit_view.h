@@ -2,7 +2,9 @@
 #define CHECKHEADER_SLIB_UI_EDIT_VIEW
 
 #include "definition.h"
+
 #include "view.h"
+#include "../core/callback.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 class EditView;
@@ -10,7 +12,7 @@ class EditView;
 class SLIB_EXPORT IEditViewListener
 {
 public:
-	virtual String onChange(EditView* edit, const String& newValue) = 0;
+	virtual String onChange(EditView* edit, const String& newValue);
 };
 
 class SLIB_EXPORT EditView : public View
@@ -49,13 +51,20 @@ public:
 	
 public:
 	SLIB_PROPERTY_INLINE(Ptr<IEditViewListener>, Listener)
+	SLIB_PROPERTY_INLINE(Ref<Runnable>, EnterAction)
 	
 protected:
 	// override
 	Ref<ViewInstance> createInstance(ViewInstance* parent);
+
+	// override
+	void onKeyEvent(UIEvent* ev);
 	
 public:
 	virtual String onChange(const String& newValue);
+
+public:
+	void dispatchEnterAction();
 
 protected:
 	String m_text;

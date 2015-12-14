@@ -233,6 +233,16 @@ void sl_log_error(const char* tag, const char* msg);
 		_m_property_##NAME = v; \
 	}
 
+#define SLIB_WEAK_PROPERTY_INLINE(TYPE, NAME) protected: \
+	slib::WeakRef<TYPE> _m_property_##NAME; \
+	public: \
+	SLIB_INLINE slib::Ref<TYPE> get##NAME() const { \
+		return _m_property_##NAME.lock(); \
+	} \
+	SLIB_INLINE void set##NAME(const slib::Ref<TYPE>& v) { \
+		_m_property_##NAME = v; \
+	}
+
 #define SLIB_PROPERTY(TYPE, NAME) protected: \
 	TYPE _m_property_##NAME; \
 	public: \

@@ -125,6 +125,10 @@ void SCheckBox::setChecked(sl_bool flag)
 void SCheckBox::dispatchClick()
 {
 	setChecked(!m_flagChecked);
+	Ref<RadioGroup> group = getRadioGroup();
+	if (group.isNotNull()) {
+		group->select(this);
+	}
 	SButton::dispatchClick();
 }
 SLIB_UI_NAMESPACE_END

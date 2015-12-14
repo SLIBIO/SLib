@@ -58,14 +58,15 @@ public:
 	HWND getHandle();
 
 public:
+	virtual sl_bool preprocessWindowMessage(MSG& msg);
 	virtual sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result);
 	virtual sl_bool processCommand(SHORT code, LRESULT& result);
 	virtual sl_bool processNotify(NMHDR* nmhdr, LRESULT& result);
 	virtual sl_bool processControlColor(UINT msg, HDC hDC, HBRUSH& result);
 	virtual void processPostControlColor(UINT msg, HDC hDC, HBRUSH& result);
 
-	void onEventKey(sl_bool flagDown, WPARAM wParam, LPARAM lParam);
-	void onEventMouse(UIEventAction action, WPARAM wParam, LPARAM lParam);
+	sl_bool onEventKey(sl_bool flagDown, WPARAM wParam, LPARAM lParam);
+	sl_bool onEventMouse(UIEventAction action, WPARAM wParam, LPARAM lParam);
 	sl_bool onEventMouseWheel(sl_bool flagVertical, WPARAM wParam, LPARAM lParam);
 	sl_bool onEventSetCursor();
 	void applyModifiers(UIEvent* ev);
@@ -82,6 +83,8 @@ class Win32_View_Shared
 {
 public:
 	ATOM wndClass;
+	HFONT hFontDefault;
+
 
 public:
 	Win32_View_Shared();

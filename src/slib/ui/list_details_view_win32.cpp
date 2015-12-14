@@ -194,6 +194,7 @@ void ListDetailsView::_refreshRowsCount()
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		((_ListDetailsView*)this)->__applyRowsCount(handle);
+		::InvalidateRect(handle, NULL, TRUE);
 	}
 }
 

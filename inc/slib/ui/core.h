@@ -22,6 +22,8 @@ class SLIB_EXPORT UI
 {
 public:
 	// Graphics (Platform Specific)
+	static void setDefaultFontName(const String& fontName);
+
 	static Size getFontTextSize(const Ref<Font>& font, const String& text);
 	
 	static Rectangle getPathBounds(const Ref<GraphicsPath>& path);

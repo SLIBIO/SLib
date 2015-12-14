@@ -10,6 +10,7 @@
 #if defined(SLIB_UI_SUPPORT_NATIVE_CHECK_BOX)
 
 #include "view.h"
+#include "radio_group.h"
 
 #include "../core/callback.h"
 
@@ -33,7 +34,8 @@ public:
 
 public:
 	SLIB_PROPERTY_INLINE(Ref<Runnable>, OnClick)
-	
+	SLIB_WEAK_PROPERTY_INLINE(RadioGroup, RadioGroup)
+
 public:
 	// override
 	void onClick();

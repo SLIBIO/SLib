@@ -18,6 +18,7 @@ public:
 	sl_bool processCommand(SHORT code, LRESULT& result)
 	{
 		if (code == BN_CLICKED) {
+			::SendMessageW(getHandle(), BM_SETCHECK, BST_CHECKED, 0);
 			onClick();
 			return sl_true;
 		}

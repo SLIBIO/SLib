@@ -4,6 +4,7 @@
 
 #include "view_win32.h"
 
+#include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/view_group.h"
 #include "../../../inc/slib/ui/scroll_view.h"
 
@@ -47,6 +48,17 @@ Win32_View_Shared* Win32_View_Shared::get()
 {
 	SLIB_SAFE_STATIC(Win32_View_Shared, ret);
 	return &ret;
+}
+
+void UI::setDefaultFontName(const String& _fontName)
+{
+	String16 fontName = _fontName;
+	HFONT hFont = ::CreateFontW(14, 0, 0, 0, 200, FALSE, FALSE
+		, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS
+		, ANTIALIASED_QUALITY
+		, DEFAULT_PITCH
+		, (LPCWSTR)(fontName.getBuf()));
+	Win32_View_Shared::get()->hFontDefault = hFont;
 }
 
 /******************************************
@@ -95,6 +107,10 @@ HWND Win32_ViewInstance::createHandle(
 			, hInst
 			, NULL);
 		if (hWnd) {
+			HFONT hFont = Win32_View_Shared::get()->hFontDefault;
+			if (hFont) {
+				::SendMessageW(hWnd, WM_SETFONT, (WPARAM)hFont, TRUE);
+			}
 			if (!(view->isEnabled())) {
 				::EnableWindow(hWnd, FALSE);
 			}
@@ -109,7 +125,7 @@ HWND Win32_ViewInstance::getHandle()
 	return m_handle;
 }
 
-void Win32_ViewInstance::onEventKey(sl_bool flagDown, WPARAM wParam, LPARAM lParam)
+sl_bool Win32_ViewInstance::onEventKey(sl_bool flagDown, WPARAM wParam, LPARAM lParam)
 {
 	HWND hWnd = m_handle;
 	if (hWnd) {
@@ -133,11 +149,15 @@ void Win32_ViewInstance::onEventKey(sl_bool flagDown, WPARAM wParam, LPARAM lPar
 		if (ke.isNotNull()) {
 			applyModifiers(ke.get());
 			onKeyEvent(ke.get());
+			if (ke->isPreventedDefault()) {
+				return sl_true;
+			}
 		}
 	}
+	return sl_false;
 }
 
-void Win32_ViewInstance::onEventMouse(UIEventAction action, WPARAM wParam, LPARAM lParam)
+sl_bool Win32_ViewInstance::onEventMouse(UIEventAction action, WPARAM wParam, LPARAM lParam)
 {
 	HWND hWnd = m_handle;
 	if (hWnd) {
@@ -151,8 +171,12 @@ void Win32_ViewInstance::onEventMouse(UIEventAction action, WPARAM wParam, LPARA
 		if (me.isNotNull()) {
 			applyModifiers(me.get());
 			onMouseEvent(me.get());
+			if (me->isPreventedDefault()) {
+				return sl_true;
+			}
 		}
 	}
+	return sl_false;
 }
 
 sl_bool Win32_ViewInstance::onEventMouseWheel(sl_bool flagVertical, WPARAM wParam, LPARAM lParam)
@@ -209,6 +233,11 @@ void Win32_ViewInstance::applyModifiers(UIEvent* ev)
 	if ((GetKeyState(VK_LWIN) | GetKeyState(VK_RWIN)) & 0x8000) {
 		ev->setWindowsKey();
 	}
+}
+
+sl_bool Win32_ViewInstance::preprocessWindowMessage(MSG& msg)
+{
+	return sl_false;
 }
 
 sl_bool Win32_ViewInstance::processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
@@ -288,67 +317,62 @@ sl_bool Win32_ViewInstance::processWindowMessage(UINT msg, WPARAM wParam, LPARAM
 
 		case WM_KEYDOWN:
 			{
-				onEventKey(sl_true, wParam, lParam);
-				return sl_true;
+				return onEventKey(sl_true, wParam, lParam);
 			}
 		case WM_KEYUP:
 			{
-				onEventKey(sl_false, wParam, lParam);
-				return sl_true;
+				return onEventKey(sl_false, wParam, lParam);
 			}
 		case WM_LBUTTONDOWN:
 			{
-				onEventMouse(actionLeftButtonDown, wParam, lParam);
+				sl_bool flag = onEventMouse(actionLeftButtonDown, wParam, lParam);
 				m_actionMouseCapture = actionLeftButtonDown;
 				::SetCapture(hWnd);
-				return sl_true;
+				return flag;
 			}
 		case WM_LBUTTONDBLCLK:
 			{
-				onEventMouse(actionLeftButtonDoubleClick, wParam, lParam);
-				return sl_true;
+				return onEventMouse(actionLeftButtonDoubleClick, wParam, lParam);
 			}
 		case WM_LBUTTONUP:
 			{
-				onEventMouse(actionLeftButtonUp, wParam, lParam);
+				sl_bool flag = onEventMouse(actionLeftButtonUp, wParam, lParam);
 				::ReleaseCapture();
-				return sl_true;
+				return flag;
 			}
 		case WM_RBUTTONDOWN:
 			{
-				onEventMouse(actionRightButtonDown, wParam, lParam);
+				sl_bool flag = onEventMouse(actionRightButtonDown, wParam, lParam);
 				m_actionMouseCapture = actionRightButtonDown;
 				::SetCapture(hWnd);
-				return sl_true;
+				return flag;
 			}
 		case WM_RBUTTONDBLCLK:
 			{
-				onEventMouse(actionRightButtonDoubleClick, wParam, lParam);
-				return sl_true;
+				return onEventMouse(actionRightButtonDoubleClick, wParam, lParam);
 			}
 		case WM_RBUTTONUP:
 			{
-				onEventMouse(actionRightButtonUp, wParam, lParam);
+				sl_bool flag = onEventMouse(actionRightButtonUp, wParam, lParam);
 				::ReleaseCapture();
-				return sl_true;
+				return flag;
 			}
 		case WM_MBUTTONDOWN:
 			{
-				onEventMouse(actionMiddleButtonDown, wParam, lParam);
+				sl_bool flag = onEventMouse(actionMiddleButtonDown, wParam, lParam);
 				m_actionMouseCapture = actionMiddleButtonDown;
 				::SetCapture(hWnd);
-				return sl_true;
+				return flag;
 			}
 		case WM_MBUTTONDBLCLK:
 			{
-				onEventMouse(actionMiddleButtonDoubleClick, wParam, lParam);
-				return sl_true;
+				return onEventMouse(actionMiddleButtonDoubleClick, wParam, lParam);
 			}
 		case WM_MBUTTONUP:
 			{
-				onEventMouse(actionMiddleButtonUp, wParam, lParam);
+				sl_bool flag = onEventMouse(actionMiddleButtonUp, wParam, lParam);
 				::ReleaseCapture();
-				return sl_true;
+				return flag;
 			}
 		case WM_MOUSEMOVE:
 			{
@@ -369,18 +393,18 @@ sl_bool Win32_ViewInstance::processWindowMessage(UINT msg, WPARAM wParam, LPARAM
 
 				if (::GetCapture() == hWnd) {
 					if (m_actionMouseCapture == actionLeftButtonDown) {
-						onEventMouse(actionLeftButtonDrag, wParam, lParam);
+						return onEventMouse(actionLeftButtonDrag, wParam, lParam);
 					} else if (m_actionMouseCapture == actionRightButtonDown) {
-						onEventMouse(actionRightButtonDrag, wParam, lParam);
+						return onEventMouse(actionRightButtonDrag, wParam, lParam);
 					} else if (m_actionMouseCapture == actionMiddleButtonDown) {
-						onEventMouse(actionMiddleButtonDrag, wParam, lParam);
+						return onEventMouse(actionMiddleButtonDrag, wParam, lParam);
 					} else {
-						onEventMouse(actionMouseMove, wParam, lParam);
+						return onEventMouse(actionMouseMove, wParam, lParam);
 					}
 				} else {
-					onEventMouse(actionMouseMove, wParam, lParam);
+					return onEventMouse(actionMouseMove, wParam, lParam);
 				}
-				return sl_true;
+				break;
 			}
 		case WM_MOUSELEAVE:
 			{

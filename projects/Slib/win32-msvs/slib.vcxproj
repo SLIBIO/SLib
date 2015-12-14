@@ -196,6 +196,7 @@
     <ClInclude Include="..\..\..\inc\slib\ui\list_details_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\platform.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\radio_button.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\radio_group.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\render_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\screen.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\scroll_view.h" />
@@ -370,6 +371,7 @@
     <ClCompile Include="..\..\..\src\slib\ui\list_details_view_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\radio_button.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\radio_button_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\radio_group.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\render_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\render_view_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\scroll_view.cpp" />

@@ -4,6 +4,11 @@ SLIB_UI_NAMESPACE_BEGIN
 /**********************
 	EditView
  ***********************/
+String IEditViewListener::onChange(EditView* edit, const String& newValue)
+{
+	return newValue;
+}
+
 EditView::EditView()
 {
 	m_textAlignment = alignMiddleCenter;
@@ -12,6 +17,25 @@ EditView::EditView()
 	m_flagMultiLine = sl_false;
 	m_textColor = Color::black();
 	m_backgroundColor = Color::white();
+}
+
+void EditView::onKeyEvent(UIEvent* ev)
+{
+	if (!(isMultiLine())) {
+		if (ev->getAction() == actionKeyDown) {
+			if (ev->getKeycode() == keyEnter) {
+				dispatchEnterAction();
+			}
+		}
+	}
+}
+
+void EditView::dispatchEnterAction()
+{
+	Ref<Runnable> action = getEnterAction();
+	if (action.isNotNull()) {
+		action->run();
+	}
 }
 
 String EditView::onChange(const String& newValue)

@@ -3,6 +3,7 @@
 
 #include "definition.h"
 #include "s_button.h"
+#include "radio_group.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 class SLIB_EXPORT SCheckBox : public SButton
@@ -20,6 +21,9 @@ public:
 	// override
 	void dispatchClick();
 	
+public:
+	SLIB_WEAK_PROPERTY_INLINE(RadioGroup, RadioGroup)
+
 protected:
 	sl_bool m_flagChecked;
 };
