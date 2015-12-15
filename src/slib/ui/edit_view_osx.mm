@@ -438,6 +438,18 @@ SLIB_UI_NAMESPACE_END
 	}
 	return result;
 }
+
+- (void)keyUp:(NSEvent*)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	if (instance.isNotNull()) {
+		sl_bool flagNoDefault = instance->onEventKey(sl_false, theEvent);
+		if (flagNoDefault) {
+			return;
+		}
+	}
+	[super keyUp:theEvent];
+}
 @end
 
 @implementation _Slib_OSX_SecureTextField
@@ -447,6 +459,18 @@ SLIB_UI_NAMESPACE_END
 	if (instance.isNotNull()) {
 		slib::_EditView::onChangeTextField(instance.get(), self);
 	}
+}
+
+- (void)keyUp:(NSEvent*)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	if (instance.isNotNull()) {
+		sl_bool flagNoDefault = instance->onEventKey(sl_false, theEvent);
+		if (flagNoDefault) {
+			return;
+		}
+	}
+	[super keyUp:theEvent];
 }
 @end
 
@@ -486,6 +510,7 @@ SLIB_UI_NAMESPACE_END
 @end
 
 @implementation _Slib_OSX_TextArea_TextView
+
 @end
 
 #endif

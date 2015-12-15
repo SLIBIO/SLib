@@ -52,7 +52,7 @@ public:
 
 	sl_bool preprocessWindowMessage(MSG& msg)
 	{
-		if (msg.message == WM_KEYDOWN) {
+		if (msg.message == WM_KEYUP) {
 			LRESULT lr;
 			sl_bool flag = Win32_ViewInstance::processWindowMessage(msg.message, msg.wParam, msg.lParam, lr);
 			if (flag) {

@@ -112,6 +112,11 @@ SLIB_UI_NAMESPACE_END
 		instance->onClick();
 	}
 }
+
+- (BOOL)performKeyEquivalent:(NSEvent *)anEvent
+{
+	return NO;
+}
 @end
 
 #endif

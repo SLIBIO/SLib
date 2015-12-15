@@ -22,7 +22,7 @@ EditView::EditView()
 void EditView::onKeyEvent(UIEvent* ev)
 {
 	if (!(isMultiLine())) {
-		if (ev->getAction() == actionKeyDown) {
+		if (ev->getAction() == actionKeyUp) {
 			if (ev->getKeycode() == keyEnter) {
 				dispatchEnterAction();
 			}
