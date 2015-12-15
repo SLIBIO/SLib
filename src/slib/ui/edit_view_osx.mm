@@ -23,6 +23,9 @@
 @end
 
 @interface _Slib_OSX_TextArea_TextView : NSTextView {
+	
+	@public slib::WeakRef<slib::OSX_ViewInstance> m_viewInstance;
+
 }
 @end
 
@@ -162,6 +165,9 @@ Ref<ViewInstance> TextArea::createInstance(ViewInstance* _parent)
 		((_EditView*)this)->__applyProperties(handle);
 	}
 	OSX_VIEW_CREATE_INSTANCE_END
+	if (handle != nil) {
+		handle->textView->m_viewInstance = ret;
+	}
 	return Ref<ViewInstance>::from(ret);
 }
 
@@ -510,6 +516,18 @@ SLIB_UI_NAMESPACE_END
 @end
 
 @implementation _Slib_OSX_TextArea_TextView
+
+- (void)keyUp:(NSEvent*)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	if (instance.isNotNull()) {
+		sl_bool flagNoDefault = instance->onEventKey(sl_false, theEvent);
+		if (flagNoDefault) {
+			return;
+		}
+	}
+	[super keyUp:theEvent];
+}
 
 @end
 
