@@ -1,21 +1,12 @@
 
-*.log
-*.tlog
-*.obj
-*.ipch
-*.pdb
-*.exe
-*.idb
-*.sap
-*.o
-*.so
 *.sdf
 *.opensdf
 *.suo
-*.ilk
-*.o.d
+
 obj/
 bin/
 .kdev4/
 project.xcworkspace/
 xcuserdata/
+Debug/
+Release/

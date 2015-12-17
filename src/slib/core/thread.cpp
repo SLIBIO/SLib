@@ -160,6 +160,21 @@ void Thread::clearProperty(const String& name)
 	m_properties.remove(name);
 }
 
+Ref<Referable> Thread::getAttachedObject(const String& name)
+{
+	return m_attachedObjects.getValue(name, Ref<Referable>::null());
+}
+
+void Thread::attachObject(const String& name, const Ref<Referable>& object)
+{
+	m_attachedObjects.put(name, object);
+}
+
+void Thread::removeAttachedObject(const String& name)
+{
+	m_attachedObjects.remove(name);
+}
+
 void Thread::_run()
 {
 #if defined(SLIB_PLATFORM_USE_JNI)
@@ -171,6 +186,8 @@ void Thread::_run()
 		m_runnable->run();
 	}
 	m_runnable.setNull();
+
+	m_attachedObjects.clear();
 
 #if defined(SLIB_PLATFORM_USE_JNI)
 	Jni::detachThread();

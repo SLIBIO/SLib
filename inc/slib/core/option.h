@@ -220,10 +220,10 @@
 #		endif
 #	elif defined(__ia64__) // itanium (IA64)
 #		define SLIB_ARCH_IS_IA64
-#	elif defined(__i386__) || defined(_X86_) // x86
-#		define SLIB_ARCH_IS_X86
 #	elif defined(__amd64__) || defined(__x86_64__) // AMD64(x86_64)
 #		define SLIB_ARCH_IS_X64
+#	elif defined(__i386__) || defined(_X86_) // x86
+#		define SLIB_ARCH_IS_X86
 #	elif defined(__mips__)
 #		define SLIB_ARCH_IS_MIPS
 #	endif

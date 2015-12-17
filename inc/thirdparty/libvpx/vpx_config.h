@@ -31,7 +31,7 @@
 #					include "./platforms/armv7_ios/vpx_config.h"
 #				endif
 #			endif
-#		else
+#		elif TARGET_OS_MAC
 #           if defined(__amd64__) || defined(__x86_64__) || defined(__amd64__) || defined(__x86_64__) || defined(__aarch64__)
 #               include "./platforms/x64_mac/vpx_config.h"
 #           else

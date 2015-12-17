@@ -9,6 +9,11 @@
 /* Begin PBXBuildFile section */
 		26599DBA1BEA5DD2008659BB /* thread_pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26599DB91BEA5DD2008659BB /* thread_pool.cpp */; };
 		26599DBC1BEA5DDF008659BB /* callback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26599DBB1BEA5DDF008659BB /* callback.cpp */; };
+		265EBF241C23041600AD81D9 /* database_cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF1F1C23041600AD81D9 /* database_cursor.cpp */; };
+		265EBF251C23041600AD81D9 /* database_statement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF201C23041600AD81D9 /* database_statement.cpp */; };
+		265EBF261C23041600AD81D9 /* database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF211C23041600AD81D9 /* database.cpp */; };
+		265EBF271C23041600AD81D9 /* mysql.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF221C23041600AD81D9 /* mysql.cpp */; };
+		265EBF281C23041600AD81D9 /* sqlite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF231C23041600AD81D9 /* sqlite.cpp */; };
 		266DD4581C1192E800D47AB0 /* url.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4571C1192E800D47AB0 /* url.cpp */; };
 		266DD4621C11930800D47AB0 /* aes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4591C11930800D47AB0 /* aes.cpp */; };
 		266DD4631C11930800D47AB0 /* crypto_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD45A1C11930800D47AB0 /* crypto_hash.cpp */; };
@@ -19,7 +24,6 @@
 		266DD4681C11930800D47AB0 /* sha1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD45F1C11930800D47AB0 /* sha1.cpp */; };
 		266DD4691C11930800D47AB0 /* sha2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4601C11930800D47AB0 /* sha2.cpp */; };
 		266DD46A1C11930800D47AB0 /* compress_zlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4611C11930800D47AB0 /* compress_zlib.cpp */; };
-		266DD46E1C11936100D47AB0 /* sqlite3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD46D1C11936100D47AB0 /* sqlite3.cpp */; };
 		266DD47A1C1193AB00D47AB0 /* sensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4761C1193AB00D47AB0 /* sensor.cpp */; };
 		266DD47C1C1193AB00D47AB0 /* vibrator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4781C1193AB00D47AB0 /* vibrator.cpp */; };
 		266DD48E1C1193C400D47AB0 /* bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD47E1C1193C400D47AB0 /* bitmap.cpp */; };
@@ -203,6 +207,11 @@
 /* Begin PBXFileReference section */
 		26599DB91BEA5DD2008659BB /* thread_pool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_pool.cpp; sourceTree = "<group>"; };
 		26599DBB1BEA5DDF008659BB /* callback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = callback.cpp; sourceTree = "<group>"; };
+		265EBF1F1C23041600AD81D9 /* database_cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database_cursor.cpp; sourceTree = "<group>"; };
+		265EBF201C23041600AD81D9 /* database_statement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database_statement.cpp; sourceTree = "<group>"; };
+		265EBF211C23041600AD81D9 /* database.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database.cpp; sourceTree = "<group>"; };
+		265EBF221C23041600AD81D9 /* mysql.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mysql.cpp; sourceTree = "<group>"; };
+		265EBF231C23041600AD81D9 /* sqlite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sqlite.cpp; sourceTree = "<group>"; };
 		266DD4571C1192E800D47AB0 /* url.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = url.cpp; sourceTree = "<group>"; };
 		266DD4591C11930800D47AB0 /* aes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = aes.cpp; sourceTree = "<group>"; };
 		266DD45A1C11930800D47AB0 /* crypto_hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crypto_hash.cpp; sourceTree = "<group>"; };
@@ -213,7 +222,6 @@
 		266DD45F1C11930800D47AB0 /* sha1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sha1.cpp; sourceTree = "<group>"; };
 		266DD4601C11930800D47AB0 /* sha2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sha2.cpp; sourceTree = "<group>"; };
 		266DD4611C11930800D47AB0 /* compress_zlib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = compress_zlib.cpp; sourceTree = "<group>"; };
-		266DD46D1C11936100D47AB0 /* sqlite3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sqlite3.cpp; sourceTree = "<group>"; };
 		266DD4761C1193AB00D47AB0 /* sensor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sensor.cpp; sourceTree = "<group>"; };
 		266DD4781C1193AB00D47AB0 /* vibrator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vibrator.cpp; sourceTree = "<group>"; };
 		266DD47E1C1193C400D47AB0 /* bitmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap.cpp; sourceTree = "<group>"; };
@@ -713,7 +721,11 @@
 		A25F2FC71B03A33700854DAF /* db */ = {
 			isa = PBXGroup;
 			children = (
-				266DD46D1C11936100D47AB0 /* sqlite3.cpp */,
+				265EBF1F1C23041600AD81D9 /* database_cursor.cpp */,
+				265EBF201C23041600AD81D9 /* database_statement.cpp */,
+				265EBF211C23041600AD81D9 /* database.cpp */,
+				265EBF221C23041600AD81D9 /* mysql.cpp */,
+				265EBF231C23041600AD81D9 /* sqlite.cpp */,
 			);
 			path = db;
 			sourceTree = "<group>";
@@ -804,6 +816,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				266DD4941C1193C400D47AB0 /* font.cpp in Sources */,
+				265EBF281C23041600AD81D9 /* sqlite.cpp in Sources */,
 				266DD5AE1C11940A00D47AB0 /* label_view.cpp in Sources */,
 				AECCC4B01B0F064D002B0284 /* thirdparty_libvpx_dec.c in Sources */,
 				266DD5851C11940A00D47AB0 /* render_base.cpp in Sources */,
@@ -881,7 +894,6 @@
 				266DD54A1C11940A00D47AB0 /* audio_codec.cpp in Sources */,
 				266DD5501C11940A00D47AB0 /* audio_player_opensl_es.cpp in Sources */,
 				266DD5CA1C11940A00D47AB0 /* tab_view.cpp in Sources */,
-				266DD46E1C11936100D47AB0 /* sqlite3.cpp in Sources */,
 				266DD47C1C1193AB00D47AB0 /* vibrator.cpp in Sources */,
 				268916361C182ADA009FD75E /* camera_dshow.cpp in Sources */,
 				26948C461C1EBA0F00FD141A /* radio_group.cpp in Sources */,
@@ -912,6 +924,7 @@
 				A2774E0C1B1A005B00538A7B /* pointer.cpp in Sources */,
 				A25F300D1B03A33700854DAF /* async.cpp in Sources */,
 				A25F30141B03A33700854DAF /* base.cpp in Sources */,
+				265EBF241C23041600AD81D9 /* database_cursor.cpp in Sources */,
 				266DD5E71C11940A00D47AB0 /* window.cpp in Sources */,
 				266DD4911C1193C400D47AB0 /* color.cpp in Sources */,
 				A25F30241B03A33700854DAF /* resource.cpp in Sources */,
@@ -981,9 +994,12 @@
 				A25F30171B03A33700854DAF /* file.cpp in Sources */,
 				266DD5611C11940A00D47AB0 /* video_codec.cpp in Sources */,
 				266DD54C1C11940A00D47AB0 /* audio_player.cpp in Sources */,
+				265EBF261C23041600AD81D9 /* database.cpp in Sources */,
 				A21C166B1BA74E8F006B1FA1 /* algorithm.cpp in Sources */,
+				265EBF271C23041600AD81D9 /* mysql.cpp in Sources */,
 				266DD5621C11940A00D47AB0 /* dns.cpp in Sources */,
 				266DD47A1C1193AB00D47AB0 /* sensor.cpp in Sources */,
+				265EBF251C23041600AD81D9 /* database_statement.cpp in Sources */,
 				266DD5581C11940A00D47AB0 /* audio_recorder_osx.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -117,7 +117,7 @@ Variant& Variant::operator=(const Variant& other)
 	return *this;
 }
 
-sl_bool Variant::operator==(const Variant& other)
+sl_bool Variant::operator==(const Variant& other) const
 {
 	if (this == &other) {
 		return sl_true;

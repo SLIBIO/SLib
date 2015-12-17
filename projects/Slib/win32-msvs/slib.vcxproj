@@ -72,8 +72,9 @@
     <ClInclude Include="..\..\..\inc\slib\core\win32_com.h" />
     <ClInclude Include="..\..\..\inc\slib\crypto.h" />
     <ClInclude Include="..\..\..\inc\slib\db.h" />
-    <ClInclude Include="..\..\..\inc\slib\db\db.h" />
+    <ClInclude Include="..\..\..\inc\slib\db\database.h" />
     <ClInclude Include="..\..\..\inc\slib\db\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\db\mysql.h" />
     <ClInclude Include="..\..\..\inc\slib\db\sqlite.h" />
     <ClInclude Include="..\..\..\inc\slib\device.h" />
     <ClInclude Include="..\..\..\inc\slib\device\definition.h" />
@@ -273,7 +274,11 @@
     <ClCompile Include="..\..\..\src\slib\crypto\rsa.cpp" />
     <ClCompile Include="..\..\..\src\slib\crypto\sha1.cpp" />
     <ClCompile Include="..\..\..\src\slib\crypto\sha2.cpp" />
-    <ClCompile Include="..\..\..\src\slib\db\sqlite3.cpp" />
+    <ClCompile Include="..\..\..\src\slib\db\database.cpp" />
+    <ClCompile Include="..\..\..\src\slib\db\database_cursor.cpp" />
+    <ClCompile Include="..\..\..\src\slib\db\database_statement.cpp" />
+    <ClCompile Include="..\..\..\src\slib\db\mysql.cpp" />
+    <ClCompile Include="..\..\..\src\slib\db\sqlite.cpp" />
     <ClCompile Include="..\..\..\src\slib\device\sensor.cpp" />
     <ClCompile Include="..\..\..\src\slib\device\vibrator.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\bitmap.cpp" />
@@ -615,9 +620,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy /Y ..\..\..\thirdparty\libvpx\vpx1.4\platforms\x86_win\vc12\*.lib $(OutDir)
-
-xcopy /Y ..\..\..\inc\thirdparty\winpcap\Lib\wpcap.lib $(OutDir)</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -638,9 +642,8 @@ xcopy /Y ..\..\..\inc\thirdparty\winpcap\Lib\wpcap.lib $(OutDir)</Command>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy /Y ..\..\..\thirdparty\libvpx\vpx1.4\platforms\x64_win\vc12\*.lib $(OutDir)
-
-xcopy /Y ..\..\..\inc\thirdparty\winpcap\Lib\x64\wpcap.lib $(OutDir)</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -663,9 +666,8 @@ xcopy /Y ..\..\..\inc\thirdparty\winpcap\Lib\x64\wpcap.lib $(OutDir)</Command>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy /Y ..\..\..\thirdparty\libvpx\vpx1.4\platforms\x86_win\vc12\*.lib $(OutDir)
-
-xcopy /Y ..\..\..\inc\thirdparty\winpcap\Lib\wpcap.lib $(OutDir)</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -688,9 +690,8 @@ xcopy /Y ..\..\..\inc\thirdparty\winpcap\Lib\wpcap.lib $(OutDir)</Command>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy /Y ..\..\..\thirdparty\libvpx\vpx1.4\platforms\x64_win\vc12\*.lib $(OutDir)
-
-xcopy /Y ..\..\..\inc\thirdparty\winpcap\Lib\x64\wpcap.lib $(OutDir)</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

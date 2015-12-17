@@ -42,6 +42,7 @@ public:
 	{
 		m_type = typeEmpty;
 	}
+
 	Variant(const Variant& other);
 
 	~Variant();
@@ -52,8 +53,10 @@ public:
 	}
 
 	Variant& operator=(const Variant& other);
-	sl_bool operator==(const Variant& other);
-	SLIB_INLINE sl_bool operator!=(const Variant& other)
+
+	sl_bool operator==(const Variant& other) const;
+
+	SLIB_INLINE sl_bool operator!=(const Variant& other) const
 	{
 		return !(*this == other);
 	}
@@ -75,6 +78,7 @@ public:
 		m_type = typeUint32;
 		*(sl_uint32*)(void*)(&m_value) = value;
 	}
+
 	SLIB_INLINE static Variant fromUint32(sl_uint32 value)
 	{
 		Variant ret(value);
@@ -86,6 +90,7 @@ public:
 		m_type = typeInt64;
 		*(sl_int64*)(void*)(&m_value) = value;
 	}
+
 	SLIB_INLINE static Variant fromInt64(sl_int64 value)
 	{
 		Variant ret(value);
@@ -97,6 +102,7 @@ public:
 		m_type = typeUint64;
 		*(sl_uint64*)(void*)(&m_value) = value;
 	}
+
 	SLIB_INLINE static Variant fromUint64(sl_uint64 value)
 	{
 		Variant ret(value);
@@ -108,6 +114,7 @@ public:
 		m_type = typeFloat;
 		*(float*)(void*)(&m_value) = value;
 	}
+
 	SLIB_INLINE static Variant fromFloat(float value)
 	{
 		Variant ret(value);
@@ -119,6 +126,7 @@ public:
 		m_type = typeDouble;
 		*(double*)(void*)(&m_value) = value;
 	}
+
 	SLIB_INLINE static Variant fromDouble(double value)
 	{
 		Variant ret(value);
@@ -130,6 +138,7 @@ public:
 		m_type = typeTime;
 		*(Time*)(void*)(&m_value) = value;
 	}
+
 	SLIB_INLINE static Variant fromTime(const Time& value)
 	{
 		Variant ret(value);
@@ -141,6 +150,7 @@ public:
 		m_type = typePointer;
 		*(const void**)(void*)(&m_value) = ptr;
 	}
+
 	SLIB_INLINE static Variant fromPointer(const void* value)
 	{
 		Variant ret(value);
@@ -152,6 +162,7 @@ public:
 		m_type = typeBoolean;
 		*(sl_bool*)(void*)(&m_value) = value;
 	}
+
 	SLIB_INLINE static Variant fromBoolean(sl_bool value)
 	{
 		Variant ret(value);
@@ -163,6 +174,7 @@ public:
 		m_type = typeString8;
 		new ((String8*)(void*)(&m_value)) String8(value);
 	}
+
 	SLIB_INLINE static Variant fromString(const String8& value)
 	{
 		Variant ret(value);
@@ -174,6 +186,7 @@ public:
 		m_type = typeString16;
 		new ((String16*)(void*)(&m_value)) String16(value);
 	}
+
 	SLIB_INLINE static Variant fromString(const String16& value)
 	{
 		Variant ret(value);
@@ -185,6 +198,7 @@ public:
 		m_type = typeObject;
 		new ((List<Variant>*)(void*)(&m_value)) List<Variant>(object);
 	}
+
 	SLIB_INLINE static Variant fromVariantList(const List<Variant>& value)
 	{
 		Variant ret(value);
@@ -196,6 +210,7 @@ public:
 		m_type = typeObject;
 		new ((Map<String, Variant>*)(void*)(&m_value)) Map<String, Variant>(object);
 	}
+
 	SLIB_INLINE static Variant fromVariantMap(const Map<String, Variant>& value)
 	{
 		Variant ret(value);
@@ -203,24 +218,42 @@ public:
 	}
 
 	template <class T>
-	SLIB_INLINE Variant(const Ref<T>& object)
+	SLIB_INLINE Variant(const Ref<T>& ref)
 	{
 		m_type = typeObject;
-		new ((Ref<T>*)(void*)(&m_value)) Ref<T>(object);
+		new ((Ref<T>*)(void*)(&m_value)) Ref<T>(ref);
 	}
 
 	template <class T>
-	SLIB_INLINE Variant(const WeakRef<T>& object)
+	SLIB_INLINE static Variant fromRef(const Ref<T>& ref)
+	{
+		Variant ret(ref);
+		return ret;
+	}
+
+	template <class T>
+	SLIB_INLINE Variant(const WeakRef<T>& weak)
 	{
 		m_type = typeWeak;
-		new ((WeakRef<T>*)(void*)(&m_value)) WeakRef<T>(object);
+		new ((WeakRef<T>*)(void*)(&m_value)) WeakRef<T>(weak);
 	}
 
-	// the object class must be derived from Object
 	template <class T>
-	SLIB_INLINE static Variant fromObject(const Ref<T>& value)
+	SLIB_INLINE static Variant fromWeakRef(const WeakRef<T>& weak)
 	{
-		Variant ret(value);
+		Variant ret(weak);
+		return ret;
+	}
+
+	SLIB_INLINE Variant(const Memory& mem)
+	{
+		m_type = typeObject;
+		new ((Memory*)(void*)(&m_value)) Memory(mem);
+	}
+
+	SLIB_INLINE static Variant fromMemory(const Memory& mem)
+	{
+		Variant ret(mem);
 		return ret;
 	}
 
@@ -266,14 +299,17 @@ public:
 	{
 		return m_type == typeEmpty;
 	}
+
 	SLIB_INLINE sl_bool isNull() const
 	{
 		return m_type == typeEmpty;
 	}
+
 	SLIB_INLINE sl_bool isNotEmpty() const
 	{
 		return m_type != typeEmpty;
 	}
+
 	SLIB_INLINE sl_bool isNotNull() const
 	{
 		return m_type != typeEmpty;
@@ -283,24 +319,28 @@ public:
 	{
 		return m_type == typeInt32;
 	}
+
 	sl_int32 getInt32(sl_int32 def = 0) const;
 
 	SLIB_INLINE sl_bool isUint32() const
 	{
 		return m_type == typeUint32;
 	}
+
 	sl_uint32 getUint32(sl_uint32 def = 0) const;
 
 	SLIB_INLINE sl_bool isInt64() const
 	{
 		return m_type == typeInt64;
 	}
+
 	sl_int64 getInt64(sl_int64 def = 0) const;
 
 	SLIB_INLINE sl_bool isUint64() const
 	{
 		return m_type == typeUint64;
 	}
+
 	sl_uint64 getUint64(sl_uint64 def = 0) const;
 
 	SLIB_INLINE sl_bool isInteger() const
@@ -312,12 +352,14 @@ public:
 	{
 		return m_type == typeFloat;
 	}
+
 	float getFloat(float def = 0) const;
 
 	SLIB_INLINE sl_bool isDouble() const
 	{
 		return m_type == typeDouble;
 	}
+
 	double getDouble(double def = 0) const;
 
 	SLIB_INLINE sl_bool isFloatOrDouble() const
@@ -334,7 +376,9 @@ public:
 	{
 		return m_type == typeTime;
 	}
+
 	Time getTime(Time def) const;
+
 	Time getTime() const
 	{
 		return getTime(Time::zero());
@@ -344,46 +388,54 @@ public:
 	{
 		return m_type == typePointer;
 	}
+
 	const void* getPointer(const void* def = sl_null) const;
 
 	SLIB_INLINE sl_bool isBoolean() const
 	{
 		return m_type == typeBoolean;
 	}
+
 	sl_bool getBoolean(sl_bool def) const;
 
 	SLIB_INLINE sl_bool isString() const
 	{
 		return m_type == typeString8 || m_type == typeString16;
 	}
+
 	SLIB_INLINE sl_bool isString8() const
 	{
 		return m_type == typeString8;
 	}
+
 	SLIB_INLINE sl_bool isString16() const
 	{
 		return m_type == typeString16;
 	}
 
 	String getString(const String& def) const;
+
 	String16 getString16(const String16& def) const;
 
 	SLIB_INLINE String getString() const
 	{
 		return getString(String::null());
 	}
+
 	SLIB_INLINE String16 getString16() const
 	{
 		return getString16(String16::null());
 	}
 
 	String getStringOnly(const String& def) const;
+
 	String16 getString16Only(const String16& def) const;
 
 	SLIB_INLINE const String getStringOnly() const
 	{
 		return getStringOnly(String::null());
 	}
+
 	SLIB_INLINE const String16 getString16Only() const
 	{
 		return getString16Only(String16::null());
@@ -393,6 +445,7 @@ public:
 	{
 		return m_type == typeObject;
 	}
+
 	SLIB_INLINE const Ref<Referable> getObject() const
 	{
 		Variant v = *this;
@@ -402,6 +455,7 @@ public:
 			return Ref<Referable>::null();
 		}
 	}
+
 	template <class T>
 	SLIB_INLINE const Ref<T> getObject(const Ref<T>& def) const
 	{

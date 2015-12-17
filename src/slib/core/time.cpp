@@ -3,10 +3,15 @@
 SLIB_NAMESPACE_BEGIN
 
 #define TIME_MILLIS SLIB_INT64(1000)
+#define TIME_MILLISF 1000.0
 #define TIME_SECOND SLIB_INT64(1000000)
+#define TIME_SECONDF 1000000.0
 #define TIME_MINUTE SLIB_INT64(60000000)
+#define TIME_MINUTEF 60000000.0
 #define TIME_HOUR SLIB_INT64(3600000000)
+#define TIME_HOURF 3600000000.0
 #define TIME_DAY SLIB_INT64(86400000000)
+#define TIME_DAYF 86400000000.0
 
 void Time::set(int year, int month, int day) {
 	Time old(m_time);
@@ -29,11 +34,11 @@ void Time::setYear(int year)
 	set(year, date.month, date.day);
 }
 
-void Time::addYear(int year)
+void Time::addYears(int years)
 {
 	DATE date;
 	get(&date);
-	set(date.year + year, date.month, date.day);
+	set(date.year + years, date.month, date.day);
 }
 
 int Time::getMonth() const
@@ -56,13 +61,13 @@ void Time::setMonth(int month)
 	set(date.year + yearAdd, monthNew + 1, date.day);
 }
 
-void Time::addMonth(int month)
+void Time::addMonths(int months)
 {
 	DATE date;
 	get(&date);
-	month += date.month;
-	int monthNew = (month - 1) % 12;
-	int yearAdd = (month - 1) / 12;
+	months += date.month;
+	int monthNew = (months - 1) % 12;
+	int yearAdd = (months - 1) / 12;
 	if (monthNew < 0) {
 		monthNew += 12;
 		yearAdd--;
@@ -77,6 +82,13 @@ int Time::getDay() const
 	return date.day;
 }
 
+double Time::getDayf() const
+{
+	DATE date;
+	get(&date);
+	return date.day + (m_time % TIME_DAY) / TIME_DAYF;
+}
+
 void Time::setDay(int day)
 {
 	Time old(m_time);
@@ -85,14 +97,30 @@ void Time::setDay(int day)
 	m_time = old.m_time + (sl_int64)(day - date.day)*TIME_DAY;
 }
 
-void Time::addDay(int day)
+void Time::setDayf(double day)
 {
-	m_time += (sl_int64)(day)*TIME_DAY;
+	Time t(getYear(), getMonth(), 1);
+	m_time = t.m_time + (sl_int64)((day - 1)*TIME_DAYF);
+}
+
+void Time::addDays(sl_int64 days)
+{
+	m_time += days*TIME_DAY;
+}
+
+void Time::addDaysf(double days)
+{
+	m_time += (sl_int64)(days*TIME_DAYF);
 }
 
 int Time::getHour() const
 {
 	return (int)((m_time / TIME_HOUR) % 24);
+}
+
+double Time::getHourf() const
+{
+	return (m_time % TIME_DAY) / TIME_HOURF;
 }
 
 void Time::setHour(int hour)
@@ -102,14 +130,30 @@ void Time::setHour(int hour)
 	m_time = old + (sl_int64)(hour - oldHour)*TIME_HOUR;
 }
 
-void Time::addHour(int hour)
+void Time::setHourf(double hour)
 {
-	m_time += (sl_int64)(hour)*TIME_HOUR;
+	sl_int64 old = m_time;
+	m_time = old - (old % TIME_DAY) + (sl_int64)(hour * TIME_HOURF);
+}
+
+void Time::addHours(sl_int64 hours)
+{
+	m_time += hours*TIME_HOUR;
+}
+
+void Time::addHoursf(double hours)
+{
+	m_time += (sl_int64)(hours*TIME_HOURF);
 }
 
 int Time::getMinute() const
 {
 	return (int)((m_time / TIME_MINUTE) % 60);
+}
+
+double Time::getMinutef() const
+{
+	return (m_time % TIME_HOUR) / TIME_MINUTEF;
 }
 
 void Time::setMinute(int minute)
@@ -119,14 +163,30 @@ void Time::setMinute(int minute)
 	m_time = old + (sl_int64)(minute - oldMinute)*TIME_MINUTE;
 }
 
-void Time::addMinute(int minute)
+void Time::setMinutef(double minute)
 {
-	m_time += (sl_int64)(minute)*TIME_MINUTE;
+	sl_int64 old = m_time;
+	m_time = old - (old % TIME_HOUR) + (sl_int64)(minute*TIME_MINUTEF);
+}
+
+void Time::addMinutes(sl_int64 minutes)
+{
+	m_time += minutes*TIME_MINUTE;
+}
+
+void Time::addMinutesf(double minutes)
+{
+	m_time += (sl_int64)(minutes*TIME_MINUTEF);
 }
 
 int Time::getSecond() const
 {
 	return (int)((m_time / TIME_SECOND) % 60);
+}
+
+double Time::getSecondf() const
+{
+	return (m_time % TIME_MINUTE) / TIME_SECONDF;
 }
 
 void Time::setSecond(int second)
@@ -136,14 +196,30 @@ void Time::setSecond(int second)
 	m_time = old + (sl_int64)(second - oldSecond)*TIME_SECOND;
 }
 
-void Time::addSecond(int second)
+void Time::setSecondf(double second)
 {
-	m_time += (sl_int64)(second)*TIME_SECOND;
+	sl_int64 old = m_time;
+	m_time = old - (old % TIME_MINUTE) + (sl_int64)(second*TIME_SECOND);
+}
+
+void Time::addSeconds(sl_int64 seconds)
+{
+	m_time += seconds*TIME_SECOND;
+}
+
+void Time::addSecondsf(double seconds)
+{
+	m_time += (sl_int64)(seconds*TIME_SECONDF);
 }
 
 int Time::getMillisecond() const
 {
 	return (int)((m_time / TIME_MILLIS) % 1000);
+}
+
+double Time::getMillisecondf() const
+{
+	return (m_time % TIME_SECOND) / TIME_MILLISF;
 }
 
 void Time::setMillisecond(int millis)
@@ -153,9 +229,53 @@ void Time::setMillisecond(int millis)
 	m_time = old + (sl_int64)(millis - oldMillis)*TIME_MILLIS;
 }
 
-void Time::addMillisecond(int hour)
+void Time::setMillisecondf(double millis)
 {
-	m_time += (sl_int64)(hour)*TIME_MILLIS;
+	sl_int64 old = m_time;
+	m_time = old - (old % TIME_SECOND) + (sl_int64)(millis*TIME_MILLIS);
+}
+
+void Time::addMilliseconds(sl_int64 milis)
+{
+	m_time += milis*TIME_MILLIS;
+}
+
+void Time::addMillisecondsf(double milis)
+{
+	m_time += (sl_int64)(milis*TIME_MILLISF);
+}
+
+int Time::getMicrosecond() const
+{
+	return (int)(m_time % 1000);
+}
+
+double Time::getMicrosecondf() const
+{
+	return (double)(m_time % 1000);
+}
+
+void Time::setMicrosecond(int micros)
+{
+	sl_int64 old = m_time;
+	int oldMicros = (int)(old % 1000);
+	m_time = old + (micros - oldMicros);
+}
+
+void Time::setMicrosecondf(double micros)
+{
+	sl_int64 old = m_time;
+	m_time = old - (old % TIME_MILLIS) + (sl_int64)(micros);
+}
+
+void Time::addMicroseconds(sl_int64 micros)
+{
+	m_time += micros;
+}
+
+void Time::addMicrosecondsf(double micros)
+{
+	m_time += (sl_int64)micros;
 }
 
 int Time::getDayOfWeek() const
@@ -196,9 +316,19 @@ sl_int64 Time::getDaysCount() const
 	return (m_time / TIME_DAY);
 }
 
-void Time::setDaysCount(sl_int64 count)
+double Time::getDaysCountf() const
 {
-	m_time = (sl_int64)(count)*TIME_DAY + (m_time % TIME_DAY);
+	return (m_time / TIME_DAYF);
+}
+
+void Time::setDaysCount(sl_int64 days)
+{
+	m_time = days*TIME_DAY + (m_time % TIME_DAY);
+}
+
+void Time::setDaysCountf(double days)
+{
+	m_time = (sl_int64)(days*TIME_DAYF);
 }
 
 sl_int64 Time::getHoursCount() const
@@ -206,9 +336,19 @@ sl_int64 Time::getHoursCount() const
 	return (m_time / TIME_HOUR);
 }
 
-void Time::setHoursCount(sl_int64 count)
+double Time::getHoursCountf() const
 {
-	m_time = (sl_int64)(count)*TIME_HOUR + (m_time % TIME_HOUR);
+	return (m_time / TIME_HOURF);
+}
+
+void Time::setHoursCount(sl_int64 hours)
+{
+	m_time = hours*TIME_HOUR + (m_time % TIME_HOUR);
+}
+
+void Time::setHoursCountf(double hours)
+{
+	m_time = (sl_int64)(hours*TIME_HOURF);
 }
 
 sl_int64 Time::getMinutesCount() const
@@ -216,18 +356,37 @@ sl_int64 Time::getMinutesCount() const
 	return (m_time / TIME_MINUTE);
 }
 
-void Time::setMinutesCount(sl_int64 count)
+double Time::getMinutesCountf() const
 {
-	m_time = (sl_int64)(count)*TIME_MINUTE + (m_time % TIME_MINUTE);
+	return (m_time / TIME_MINUTEF);
+}
+
+void Time::setMinutesCount(sl_int64 minutes)
+{
+	m_time = minutes*TIME_MINUTE + (m_time % TIME_MINUTE);
+}
+
+void Time::setMinutesCountf(double minutes)
+{
+	m_time = (sl_int64)(minutes*TIME_MINUTEF);
 }
 
 sl_int64 Time::getSecondsCount() const
 {
-	return (int)(m_time / TIME_SECOND);
+	return (m_time / TIME_SECOND);
 }
 
-void Time::setSecondsCount(sl_int64 count) {
-	m_time = (sl_int64)(count)*TIME_SECOND + (m_time % TIME_SECOND);
+double Time::getSecondsCountf() const
+{
+	return (m_time / TIME_SECONDF);
+}
+
+void Time::setSecondsCount(sl_int64 seconds) {
+	m_time = seconds*TIME_SECOND + (m_time % TIME_SECOND);
+}
+
+void Time::setSecondsCountf(double seconds) {
+	m_time = (sl_int64)(seconds*TIME_SECONDF);
 }
 
 sl_int64 Time::getMillisecondsCount() const
@@ -235,9 +394,39 @@ sl_int64 Time::getMillisecondsCount() const
 	return (m_time / TIME_MILLIS);
 }
 
-void Time::setMillisecondsCount(sl_int64 count)
+double Time::getMillisecondsCountf() const
 {
-	m_time = (sl_int64)(count)*TIME_MILLIS + (m_time % TIME_MILLIS);
+	return (m_time / TIME_MILLISF);
+}
+
+void Time::setMillisecondsCount(sl_int64 millis)
+{
+	m_time = millis*TIME_MILLIS + (m_time % TIME_MILLIS);
+}
+
+void Time::setMillisecondsCountf(double millis)
+{
+	m_time = (sl_int64)(millis*TIME_MILLISF);
+}
+
+sl_int64 Time::getMicrosecondsCount() const
+{
+	return m_time;
+}
+
+double Time::getMicrosecondsCountf() const
+{
+	return (double)m_time;
+}
+
+void Time::setMicrosecondsCount(sl_int64 micros)
+{
+	m_time = micros;
+}
+
+void Time::setMicrosecondsCountf(double micros)
+{
+	m_time = (sl_int64)(micros);
 }
 
 int Time::getDaysCountInMonth() const
@@ -246,7 +435,7 @@ int Time::getDaysCountInMonth() const
 	get(&date);
 	Time timeStart(date.year, date.month, 1);
 	Time timeEnd = timeStart;
-	timeEnd.addMonth(1);
+	timeEnd.addMonths(1);
 	return (int)((timeEnd.m_time - timeStart.m_time) / TIME_DAY);
 }
 
@@ -325,6 +514,11 @@ String Time::getWeekday(sl_bool flagShort) const
 		}
 	}
 	return String::null();
+}
+
+Time Time::getTimeOnly() const
+{
+	return m_time % TIME_DAY;
 }
 
 String Time::format(const String& fmt) const

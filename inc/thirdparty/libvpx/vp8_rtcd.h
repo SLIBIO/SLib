@@ -24,7 +24,7 @@
 #					include "./platforms/armv7_ios/vp8_rtcd.h"
 #				endif
 #			endif
-#		else
+#		elif TARGET_OS_MAC
 #           if defined(__amd64__) || defined(__x86_64__) || defined(__amd64__) || defined(__x86_64__) || defined(__aarch64__)
 #               include "./platforms/x64_mac/vp8_rtcd.h"
 #           else

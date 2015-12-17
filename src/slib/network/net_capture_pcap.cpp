@@ -9,8 +9,7 @@
 #define TAG "NetCapture"
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
-#include "../../../inc/thirdparty/winpcap/Include/pcap/pcap.h"
-#pragma comment(lib, "wpcap.lib")
+#include "../../../inc/thirdparty/winpcap/pcap/pcap.h"
 #elif defined(SLIB_PLATFORM_IS_UNIX)
 #include "../../../inc/thirdparty/pcap/pcap.h"
 #include <sys/socket.h>

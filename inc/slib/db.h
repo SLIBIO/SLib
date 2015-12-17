@@ -1,7 +1,9 @@
-#ifndef CHECKHEADER_SLIB_DATABASE_HEADER
-#define CHECKHEADER_SLIB_DATABASE_HEADER
+#ifndef CHECKHEADER_SLIB_DB_HEADER
+#define CHECKHEADER_SLIB_DB_HEADER
 
-#include "db/db.h"
+#include "db/database.h"
+
 #include "db/sqlite.h"
+#include "db/mysql.h"
 
 #endif

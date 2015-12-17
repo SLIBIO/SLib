@@ -1,20 +1,20 @@
-#ifndef CHECKHEADER_SLIB_DATABASE_SQLITE
-#define CHECKHEADER_SLIB_DATABASE_SQLITE
+#ifndef CHECKHEADER_SLIB_DB_SQLITE
+#define CHECKHEADER_SLIB_DB_SQLITE
 
-#include "db.h"
+#include "database.h"
 
-SLIB_DATABASE_NAMESPACE_BEGIN
+SLIB_DB_NAMESPACE_BEGIN
 
-class SLIB_EXPORT SqliteDatabase : public Database
+class SLIB_EXPORT SQLiteDatabase : public Database
 {
-	SLIB_DECLARE_OBJECT(SqliteDatabase, Database)
+	SLIB_DECLARE_OBJECT(SQLiteDatabase, Database)
 protected:
-	SqliteDatabase();
+	SQLiteDatabase();
 
 public:
-	static Ref<SqliteDatabase> connect(const String& filePath);
+	static Ref<SQLiteDatabase> connect(const String& filePath);
 };
 
-SLIB_DATABASE_NAMESPACE_END
+SLIB_DB_NAMESPACE_END
 
 #endif

@@ -81,6 +81,11 @@ public:
 	void setProperty(const String& name, const Variant& value);
 	void clearProperty(const String& name);
 
+	// attached objects are removed when the thread is exited
+	Ref<Referable> getAttachedObject(const String& name);
+	void attachObject(const String& name, const Ref<Referable>& object);
+	void removeAttachedObject(const String& name);
+
 private:
 	void* m_handle;
 	Thread::Priority m_priority;
@@ -94,6 +99,7 @@ private:
 	Ref<Event> m_eventWaiting;
 
 	Map<String, Variant> m_properties;
+	Map< String, Ref<Referable> > m_attachedObjects;
 
 private:
 	static Thread* _nativeGetCurrentThread();
