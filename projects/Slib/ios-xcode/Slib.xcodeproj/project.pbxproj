@@ -138,6 +138,8 @@
 		26C0A3531C128D80005690FE /* vibrator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A34F1C128D80005690FE /* vibrator.cpp */; };
 		26C0A3561C131F8E005690FE /* bitmap_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A3551C131F8E005690FE /* bitmap_data.cpp */; };
 		26C0A3581C133969005690FE /* bitmap_format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A3571C133969005690FE /* bitmap_format.cpp */; };
+		26CA8D711C23A61D0049A658 /* system_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26CA8D701C23A61D0049A658 /* system_apple.mm */; };
+		26CA8D871C243D300049A658 /* video_format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CA8D861C243D300049A658 /* video_format.cpp */; };
 		A234D6EE1B3F12F600ADDF4E /* content_type.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A234D6ED1B3F12F600ADDF4E /* content_type.cpp */; };
 		A24142E31BA7CA4C00D7AB80 /* algorithm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A24142E21BA7CA4C00D7AB80 /* algorithm.cpp */; };
 		A24142F71BA85F4500D7AB80 /* thirdparty_soil2.c in Sources */ = {isa = PBXBuildFile; fileRef = A24142F61BA85F4500D7AB80 /* thirdparty_soil2.c */; settings = {COMPILER_FLAGS = "-O3 -Wno-conversion"; }; };
@@ -342,6 +344,8 @@
 		26C0A34F1C128D80005690FE /* vibrator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vibrator.cpp; sourceTree = "<group>"; };
 		26C0A3551C131F8E005690FE /* bitmap_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_data.cpp; sourceTree = "<group>"; };
 		26C0A3571C133969005690FE /* bitmap_format.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_format.cpp; sourceTree = "<group>"; };
+		26CA8D701C23A61D0049A658 /* system_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = system_apple.mm; sourceTree = "<group>"; };
+		26CA8D861C243D300049A658 /* video_format.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = video_format.cpp; path = media/video_format.cpp; sourceTree = "<group>"; };
 		A234D6ED1B3F12F600ADDF4E /* content_type.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = content_type.cpp; sourceTree = "<group>"; };
 		A24142E21BA7CA4C00D7AB80 /* algorithm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = algorithm.cpp; sourceTree = "<group>"; };
 		A24142F61BA85F4500D7AB80 /* thirdparty_soil2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_soil2.c; sourceTree = "<group>"; };
@@ -491,6 +495,7 @@
 				266DD35F1C1170BD00D47AB0 /* codec_vpx.cpp */,
 				266DD3601C1170BD00D47AB0 /* video_capture.cpp */,
 				266DD3611C1170BD00D47AB0 /* video_codec.cpp */,
+				26CA8D861C243D300049A658 /* video_format.cpp */,
 			);
 			name = media;
 			sourceTree = "<group>";
@@ -559,6 +564,7 @@
 				A25F2EE31B039EF600854DAF /* string.cpp */,
 				A25F2EE41B039EF600854DAF /* string_conv.cpp */,
 				A25F2EE51B039EF600854DAF /* system.cpp */,
+				26CA8D701C23A61D0049A658 /* system_apple.mm */,
 				A2DE1DA51B383EA000A74698 /* system_unix.cpp */,
 				A25F2EE61B039EF600854DAF /* thread.cpp */,
 				A25F2EE81B039EF600854DAF /* thread_apple.mm */,
@@ -857,6 +863,7 @@
 				26A9B7621C172BCC004C9B0E /* camera_view.cpp in Sources */,
 				266DD3831C117A3100D47AB0 /* gcm.cpp in Sources */,
 				266DD3A31C117AE300D47AB0 /* graphics_context.cpp in Sources */,
+				26CA8D871C243D300049A658 /* video_format.cpp in Sources */,
 				266DD3DB1C1181B500D47AB0 /* icmp.cpp in Sources */,
 				266DD5F61C11E09B00D47AB0 /* camera_avfoundation.mm in Sources */,
 				266DD3E41C1181B500D47AB0 /* network_async.cpp in Sources */,
@@ -927,6 +934,7 @@
 				266DD4161C118E2100D47AB0 /* s_label_view.cpp in Sources */,
 				26C0A3561C131F8E005690FE /* bitmap_data.cpp in Sources */,
 				266DD3A81C117AE300D47AB0 /* image_soil2.cpp in Sources */,
+				26CA8D711C23A61D0049A658 /* system_apple.mm in Sources */,
 				266DD3E51C1181B500D47AB0 /* network_os.cpp in Sources */,
 				266DD3DA1C1181B500D47AB0 /* http_service.cpp in Sources */,
 				A25F2F441B039EF600854DAF /* io.cpp in Sources */,

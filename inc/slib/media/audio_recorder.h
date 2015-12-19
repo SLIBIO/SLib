@@ -26,9 +26,9 @@ class SLIB_EXPORT AudioRecorderParam
 {
 public:
 	String deviceId;
-	sl_uint32 nSamplesPerSecond;
-	sl_uint32 nFrameLengthInMilliseconds;
-	sl_uint32 nBufferLengthInMilliseconds;
+	sl_uint32 samplesPerSecond;
+	sl_uint32 frameLengthInMilliseconds;
+	sl_uint32 bufferLengthInMilliseconds;
 	Ptr<IAudioRecorderListener> listener;
 	sl_bool flagAutoStart;
 	

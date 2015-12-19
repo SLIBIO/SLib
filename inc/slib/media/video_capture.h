@@ -30,7 +30,7 @@ class VideoCapture;
 class SLIB_EXPORT IVideoCaptureListener
 {
 public:
-	virtual void onCaptureVideoFrame(VideoCapture* capture, VideoCaptureFrame* frame);
+	virtual void onCaptureVideoFrame(VideoCapture* capture, VideoCaptureFrame* frame) = 0;
 };
 
 class SLIB_EXPORT VideoCapture : public Object

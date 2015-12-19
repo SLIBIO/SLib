@@ -23,6 +23,20 @@ String System::getApplicationDirectory()
 	return path;
 }
 
+#if !defined(SLIB_PLATFORM_IS_APPLE)
+String System::getApplicationHomeDirectory()
+{
+	return getApplicationDirectory();
+}
+
+String System::getCachesDirectory()
+{
+	String dir = getApplicationDirectory() + "/caches";
+	File::createDirectory(dir);
+	return dir;
+}
+#endif
+
 #if defined(SLIB_PLATFORM_IS_MOBILE)
 static List<String>& _System_getGlobalUniqueInstances()
 {

@@ -1,14 +1,9 @@
 #include "../../../inc/slib/media/video_capture.h"
 
 SLIB_MEDIA_NAMESPACE_BEGIN
-
 VideoCaptureParam::VideoCaptureParam()
 {
 	flagAutoStart = sl_true;
-}
-
-void IVideoCaptureListener::onCaptureVideoFrame(VideoCapture *capture, VideoCaptureFrame *frame)
-{
 }
 
 VideoCapture::VideoCapture()

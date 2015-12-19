@@ -14,6 +14,8 @@ public:
 	// System & Application Information
 	static String getApplicationPath();
 	static String getApplicationDirectory();
+	static String getApplicationHomeDirectory();
+	static String getCachesDirectory();
 	static String getTempDirectory();
 
 	// Tick count

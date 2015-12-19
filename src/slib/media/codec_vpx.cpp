@@ -17,18 +17,18 @@ VideoVpxEncoderParam::VideoVpxEncoderParam()
 {
 	type = VP8;
 	mode = VPX_CBR;
-	nWidth = nHeight = 192;
-	nFramePerSecond = 25;
-	nBitrate = 150;
-	nKeyFrameInterval = 5;
-	nCpuUsage = 3;
-	nThreadCount = 1;
+	width = height = 192;
+	framesPerSecond = 25;
+	bitrate = 150;
+	keyFrameInterval = 5;
+	cpuUsage = 3;
+	threadsCount = 1;
 }
 
 VideoVpxDecoderParam::VideoVpxDecoderParam()
 {
 	type = VP8;
-	nWidth = nHeight = 192;
+	width = height = 192;
 }
 
 VideoVpxEncoder::VideoVpxEncoder()
@@ -90,16 +90,16 @@ public:
 		}
 		
 		if (codec_interface != sl_null) {
-			if (vpx_img_alloc(codec_image, VPX_IMG_FMT_I420, param.nWidth, param.nHeight, 1)) {
+			if (vpx_img_alloc(codec_image, VPX_IMG_FMT_I420, param.width, param.height, 1)) {
 				vpx_codec_err_t res = vpx_codec_enc_config_default(codec_interface(), &codec_config, 0);
 				if (!res) {
-					codec_config.g_w = param.nWidth;
-					codec_config.g_h = param.nHeight;
+					codec_config.g_w = param.width;
+					codec_config.g_h = param.height;
 					codec_config.rc_end_usage = (vpx_rc_mode)param.mode;
-					codec_config.rc_target_bitrate = param.nBitrate;
-					codec_config.g_threads = param.nThreadCount;
-					codec_config.g_usage = param.nCpuUsage;
-					codec_config.g_timebase.den = param.nFramePerSecond;
+					codec_config.rc_target_bitrate = param.bitrate;
+					codec_config.g_threads = param.threadsCount;
+					codec_config.g_usage = param.cpuUsage;
+					codec_config.g_timebase.den = param.framesPerSecond;
 					codec_config.g_timebase.num = 1;
 
 					if (!vpx_codec_enc_init(codec, codec_interface(), &codec_config, 0)) {
@@ -109,10 +109,10 @@ public:
 							ret->m_codec_config = codec_config;
 							ret->m_codec_image = codec_image;
 							ret->m_codec_interface = codec_interface;
-							ret->m_nWidth = param.nWidth;
-							ret->m_nHeight = param.nHeight;
-							ret->m_nKeyFrameInterval = param.nKeyFrameInterval;
-							ret->setBitrate(param.nBitrate);
+							ret->m_nWidth = param.width;
+							ret->m_nHeight = param.height;
+							ret->m_nKeyFrameInterval = param.keyFrameInterval;
+							ret->setBitrate(param.bitrate);
 							return ret;
 						} else {
 							vpx_codec_destroy(codec);
@@ -135,7 +135,7 @@ public:
 		return Ref<_VpxVideoEncoderImpl>::null();
 	}
 	
-	sl_bool encode(const VideoFrame& input, void* output, sl_uint32& sizeOutput, sl_uint32& outTime)
+	Memory encode(const VideoFrame& input)
 	{
 		if (m_nWidth == input.image.width && m_nHeight == input.image.height) {
 			
@@ -157,7 +157,6 @@ public:
 				flags |= VPX_EFLAG_FORCE_KF;
 			}
 			vpx_codec_err_t res = vpx_codec_encode(m_codec, m_codec_image, m_nProcessFrameCount++, 1, flags, VPX_DL_REALTIME);
-			outTime = 0;
 			if (res == VPX_CODEC_OK) {
 				vpx_codec_iter_t iter = sl_null;
 				const vpx_codec_cx_pkt_t *pkt = sl_null;
@@ -172,22 +171,15 @@ public:
 					}
 				}
 
-				Memory encodedData = encodeWriter.getData();
-				if (encodedData.getSize() < sizeOutput) {
-					sizeOutput = (sl_uint32)encodedData.getSize();
-					Base::copyMemory(output, encodedData.getBuf(), sizeOutput);
-					return sl_true;
-				} else {
-					logError("Size of output buffer is small.");
-					sizeOutput = 0;
-				}
+				return encodeWriter.getData();
+				
 			} else {
 				logError("Failed to encode bitmap data.");
 			}
 		} else {
-			logError("BitmapDesc size is wrong.");
+			logError("VideoFrame size is wrong.");
 		}
-		return sl_false;
+		return Memory::null();
 	}
 
 	void setBitrate(const sl_uint32& _bitrate)
@@ -263,8 +255,8 @@ public:
 			if (!vpx_codec_dec_init(codec, codec_interface(), NULL, 0)) {
 				Ref<_VpxVideoDecoderImpl> ret = new _VpxVideoDecoderImpl;
 				if (ret.isNotNull()) {
-					ret->m_nWidth = param.nWidth;
-					ret->m_nHeight = param.nHeight;
+					ret->m_nWidth = param.width;
+					ret->m_nHeight = param.height;
 					ret->m_codec = codec;
 					ret->m_codec_image = codec_image;
 					ret->m_codec_interface = codec_interface;

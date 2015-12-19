@@ -18,6 +18,14 @@ Ref<Window> WindowInstance::getWindow()
 	return m_window.lock();
 }
 
+void WindowInstance::onCreate()
+{
+	Ref<Window> window = getWindow();
+	if (window.isNotNull()) {
+		window->onCreate();
+	}
+}
+
 sl_bool WindowInstance::onClose()
 {
 	Ref<Window> window = getWindow();
@@ -588,6 +596,17 @@ sl_bool Window::createWindow(const WindowParam& param)
 		
 		onCreate();
 		
+#if !defined(SLIB_PLATFORM_IS_OSX)
+		Size sizeOld = getSize();
+		if (sizeOld.x > 0 && sizeOld.y > 0) {
+			Size size = sizeOld;
+			onResize(size);
+			if (size != sizeOld) {
+				setSize(size);
+			}
+		}
+#endif
+
 		if (param.flagModal) {
 			_runModal();
 		}

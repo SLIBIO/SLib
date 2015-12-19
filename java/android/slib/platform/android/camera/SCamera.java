@@ -3,13 +3,82 @@ package slib.platform.android.camera;
 import java.util.List;
 import java.util.Vector;
 
+import android.app.Activity;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import slib.platform.android.Logger;
 
-public class SCamera implements Camera.PreviewCallback {
+public class SCamera implements Camera.PreviewCallback, Camera.ErrorCallback {
 	
+	static Monitor monitor = new Monitor();
+	static Object sync = new Object();
+	static Vector<SCamera> cameraObjectList = new Vector<SCamera>();
+	static boolean flagRunningActivity = false;
+
+	public static void onResumeActivity(Activity activity)
+	{
+		synchronized (sync) {
+			try {
+				flagRunningActivity = true;
+				for (SCamera camera : cameraObjectList) {
+					if (camera.flagRunningRequest) {
+						camera.startCamera();					
+					}
+				}
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
+		}
+	}
+
+	public static void onPauseActivity(Activity activity)
+	{
+		synchronized (sync) {
+			try {
+				flagRunningActivity = false;
+				for (SCamera camera : cameraObjectList) {
+					camera.stopCamera();
+				}
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
+		}
+	}
+	
+	static class Monitor implements Runnable {
+		
+		public Monitor() {
+			new Thread(this).start();
+		}
+		
+		public void run() {
+			while (true) {
+				synchronized (sync) {
+					if (flagRunningActivity) {
+						try {
+							long t = System.currentTimeMillis();
+							for (SCamera camera : cameraObjectList) {
+								if (camera.flagRunning && camera.flagRunningRequest) {
+									if (t - camera.timeLastFrame > 2000 && t - camera.timeLastStart > 5000) {
+										camera.processHalt();
+									}
+								}
+							}
+						} catch (Exception e) {
+							Logger.exception(e);
+						}
+					}
+				}
+				try {
+					Thread.sleep(2000);
+				} catch (Exception e) {
+					Logger.exception(e);
+				}
+			}
+		}
+	}
+
 	public static SCameraInfo[] getCamerasList() {
 		
 		Vector<SCameraInfo> ret = new Vector<SCameraInfo>();
@@ -66,8 +135,11 @@ public class SCamera implements Camera.PreviewCallback {
 			if (camera == null) {
 				return null;
 			}			
-			SCamera ret = new SCamera(camera, id, nativeObject);
-			return ret;
+			synchronized (sync) {
+				SCamera ret = new SCamera(camera, id, nativeObject);
+				cameraObjectList.add(ret);
+				return ret;
+			}
 		} catch (Exception e) {
 			Logger.exception(e);
 		}
@@ -88,21 +160,23 @@ public class SCamera implements Camera.PreviewCallback {
 	String id;
 	long nativeObject;
 	
+	boolean flagRunningRequest = false;
 	boolean flagRunning = false;
+	
 	byte[] bufCapture;
 	
+	SurfaceTexture texture = new SurfaceTexture(0);
+
+	long timeLastFrame;
+	long timeLastStart;
+	
 	public SCamera(Camera camera, String id, long nativeObject) {
+		
 		this.camera = camera;
 		this.id = id;
 		this.nativeObject = nativeObject;
 		
-		try {
-			camera.setPreviewCallbackWithBuffer(this);
-			SurfaceTexture texture = new SurfaceTexture(0);
-			camera.setPreviewTexture(texture);
-		} catch (Exception e) {
-			Logger.exception(e);
-		}
+		camera.setErrorCallback(this);
 
 		log("Created");
 	}
@@ -139,6 +213,7 @@ public class SCamera implements Camera.PreviewCallback {
 	
 	public void release() {
 		try {
+			cameraObjectList.remove(this);
 			stop();
 			camera.release();
 			camera = null;
@@ -148,6 +223,15 @@ public class SCamera implements Camera.PreviewCallback {
 	}
 
 	public void start() {
+		synchronized (sync) {
+			flagRunningRequest = true;
+			if (flagRunningActivity) {
+				startCamera();			
+			}
+		}
+	}
+	
+	private void startCamera() {
 		try {
 			if (camera == null) {
 				return;
@@ -155,14 +239,23 @@ public class SCamera implements Camera.PreviewCallback {
 			if (flagRunning) {
 				return;
 			}
+			
+			timeLastStart = System.currentTimeMillis();
+			
+			camera.setPreviewCallbackWithBuffer(null);
 			Camera.Parameters params = camera.getParameters();
 			Size size = params.getPreviewSize();
 			int len = getSizeForNV21(size.width, size.height);
 			if (bufCapture == null || bufCapture.length != len) {
-				bufCapture = new byte[len];				
+				bufCapture  = new byte[len];				
 			}
 			camera.addCallbackBuffer(bufCapture);
+			camera.setPreviewCallbackWithBuffer(this);
+			
+			camera.setPreviewTexture(texture);
+			
 			camera.startPreview();
+			
 			flagRunning = true;
 			
 			log("Started: " + size.width + "x" + size.height + " Format:" + params.getPreviewFormat());
@@ -172,6 +265,15 @@ public class SCamera implements Camera.PreviewCallback {
 	}
 
 	public void stop() {
+		synchronized (sync) {
+			flagRunningRequest = false;
+			if (flagRunningActivity) {
+				stopCamera();
+			}
+		}
+	}
+	
+	public void stopCamera() {
 		try {
 			if (camera == null) {
 				return;
@@ -197,15 +299,29 @@ public class SCamera implements Camera.PreviewCallback {
 	
 	private native void nativeOnFrame(long nativeObject, byte[] data, int width, int height);
 	public void onPreviewFrame(byte[] data, Camera camera) {
+		timeLastFrame = System.currentTimeMillis();
 		if (camera == null) {
 			return;
 		}
-		if (!flagRunning) {
-			return;
+		if (flagRunning) {
+			Size size = camera.getParameters().getPreviewSize();
+			nativeOnFrame(nativeObject, data, size.width, size.height);
 		}
-		Size size = camera.getParameters().getPreviewSize();
-		nativeOnFrame(nativeObject, data, size.width, size.height);
 		camera.addCallbackBuffer(data);
+	}
+	
+	void processHalt() {
+		try {
+			stopCamera();
+			startCamera();
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+	
+	@Override
+	public void onError(int error, Camera camera) {
+		log("Error occured: Error No = " + error);
 	}
 	
 	private int getSizeForNV21(int width, int height) {

@@ -207,6 +207,12 @@ public class UiWindow extends FrameLayout {
 		return ret;
 	}
 	
+	private static native void nativeOnResize(long instance, float w, float h);
+	public void onSizeChanged(int w, int h, int oldw, int oldh) {
+		super.onSizeChanged(w, h, oldw, oldh);
+		nativeOnResize(instance, w, h);
+    }
+	
 	private static native boolean nativeOnClose(long instance);
 	public void onClose() {
 		if (nativeOnClose(instance)) {

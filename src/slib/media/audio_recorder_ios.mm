@@ -92,7 +92,7 @@ public:
 					AudioStreamBasicDescription formatDst;
 					formatDst.mFormatID = kAudioFormatLinearPCM;
 					formatDst.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
-					formatDst.mSampleRate = param.nSamplesPerSecond;
+					formatDst.mSampleRate = param.samplesPerSecond;
 					formatDst.mBitsPerChannel = 16;
 					formatDst.mChannelsPerFrame = 1;
 					formatDst.mBytesPerFrame = formatDst.mChannelsPerFrame * formatDst.mBitsPerChannel / 8;
@@ -108,8 +108,8 @@ public:
 							
 							ret->m_audioUnitInput = audioUnitInput;
 							ret->m_converter = converter;
-							ret->m_nSamplesPerFrame = param.nSamplesPerSecond * param.nFrameLengthInMilliseconds / 1000;
-							ret->m_queue.setQueueSize(param.nSamplesPerSecond * param.nBufferLengthInMilliseconds / 1000);
+							ret->m_nSamplesPerFrame = param.samplesPerSecond * param.frameLengthInMilliseconds / 1000;
+							ret->m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000);
 							ret->m_formatSrc = formatSrc;
 							ret->m_formatDst = formatDst;
 							ret->setListener(param.listener);

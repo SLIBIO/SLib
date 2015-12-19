@@ -8,10 +8,10 @@ AudioPlayerInfo::AudioPlayerInfo()
 
 AudioPlayerBufferParam::AudioPlayerBufferParam()
 {
-	nSamplesPerSecond = 16000;
-	nChannels = 1;
-	nFrameLengthInMilliseconds = 50;
-	nBufferLengthInMilliseconds = 1000;
+	samplesPerSecond = 16000;
+	channelsCount = 1;
+	frameLengthInMilliseconds = 50;
+	bufferLengthInMilliseconds = 1000;
 	flagAutoStart = sl_true;
 }
 

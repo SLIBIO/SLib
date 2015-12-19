@@ -68,12 +68,12 @@ public:
 				wf.wFormatTag = WAVE_FORMAT_PCM;
 				wf.nChannels = 1;
 				wf.wBitsPerSample = 16;
-				wf.nSamplesPerSec = param.nSamplesPerSecond;
+				wf.nSamplesPerSec = param.samplesPerSecond;
 				wf.nBlockAlign = wf.wBitsPerSample * wf.nChannels / 8;
 				wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;
 				wf.cbSize = 0;
 
-				sl_uint32 samplesPerFrame = wf.nSamplesPerSec * param.nFrameLengthInMilliseconds / 1000;
+				sl_uint32 samplesPerFrame = wf.nSamplesPerSec * param.frameLengthInMilliseconds / 1000;
 				sl_uint32 sizeBuffer = samplesPerFrame * wf.nBlockAlign * 3;
 				sl_int32 notifySize = sizeBuffer / NUM_PLAY_NOTIFICATIONS;
 
@@ -118,7 +118,7 @@ public:
 									ret->m_hNotificationEvents[1] = hNotificationEvents[1];
 									ret->m_nSamplesFrame = samplesPerFrame;
 									ret->m_nBufferSize = sizeBuffer;
-									ret->m_nSamplesBuffer = param.nSamplesPerSecond * param.nBufferLengthInMilliseconds / 1000;
+									ret->m_nSamplesBuffer = param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000;
 									ret->m_queue.setQueueSize(ret->m_nSamplesBuffer);
 									ret->setListener(param.listener);
 									if (param.flagAutoStart) {

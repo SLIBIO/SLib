@@ -11,9 +11,9 @@ SLIB_MEDIA_NAMESPACE_BEGIN
 
 AudioOpusEncoderParam::AudioOpusEncoderParam()
 {
-	nSamplesPerSecond = 16000;
-	nChannels = 1;
-	nBitsPerSecond = 8000;
+	samplesPerSecond = 16000;
+	channelsCount = 1;
+	bitsPerSecond = 8000;
 	type = typeVoice;
 }
 
@@ -65,16 +65,16 @@ public:
 
 	static Ref<_OpusAudioEncoderImpl> create(const AudioOpusEncoderParam& param)
 	{
-		if (!isValidSamplingRate(param.nSamplesPerSecond)) {
+		if (!isValidSamplingRate(param.samplesPerSecond)) {
 			logError("Encoding sampling rate must be one of 8000, 12000, 16000, 24000, 48000");
 			return Ref<_OpusAudioEncoderImpl>::null();
 		}
-		if (param.nChannels != 1 && param.nChannels != 2) {
+		if (param.channelsCount != 1 && param.channelsCount != 2) {
 			logError("Encoding channel must be 1 or 2");
 			return Ref<_OpusAudioEncoderImpl>::null();
 		}
 		
-		int sizeEncoder = opus_encoder_get_size((opus_int32)(param.nChannels));
+		int sizeEncoder = opus_encoder_get_size((opus_int32)(param.channelsCount));
 		if (sizeEncoder <= 0) {
 			return Ref<_OpusAudioEncoderImpl>::null();
 		}
@@ -87,7 +87,7 @@ public:
 				if (param.type == param.typeMusic) {
 					app = OPUS_APPLICATION_AUDIO;
 				}
-				int error = opus_encoder_init(encoder, (opus_int32)(param.nSamplesPerSecond), (opus_int32)(param.nChannels), app);
+				int error = opus_encoder_init(encoder, (opus_int32)(param.samplesPerSecond), (opus_int32)(param.channelsCount), app);
 				if (error == OPUS_OK) {
 					
 					if (app == OPUS_SIGNAL_VOICE) {
@@ -107,10 +107,10 @@ public:
 						ret->m_timeStartReset.reset();
 #endif
 						
-						ret->m_nSamplesPerSecond = param.nSamplesPerSecond;
-						ret->m_nChannels = param.nChannels;
+						ret->m_nSamplesPerSecond = param.samplesPerSecond;
+						ret->m_nChannels = param.channelsCount;
 						
-						ret->setBitrate(param.nBitsPerSecond);
+						ret->setBitrate(param.bitsPerSecond);
 						
 						return ret;
 					}
@@ -167,8 +167,8 @@ Ref<AudioOpusEncoder> AudioOpusEncoder::create(const AudioOpusEncoderParam& para
 
 AudioOpusDecoderParam::AudioOpusDecoderParam()
 {
-	nSamplesPerSecond = 16000;
-	nChannels = 1;
+	samplesPerSecond = 16000;
+	channelsCount = 1;
 }
 
 AudioOpusDecoder::AudioOpusDecoder()
@@ -202,24 +202,24 @@ public:
 
 	static Ref<_OpusAudioDecoderImpl> create(const AudioOpusDecoderParam& param)
 	{
-		if (!isValidSamplingRate(param.nSamplesPerSecond)) {
+		if (!isValidSamplingRate(param.samplesPerSecond)) {
 			logError("Decoding sampling rate must be one of 8000, 12000, 16000, 24000, 48000");
 			return Ref<_OpusAudioDecoderImpl>::null();
 		}
-		if (param.nChannels != 1 && param.nChannels != 2) {
+		if (param.channelsCount != 1 && param.channelsCount != 2) {
 			logError("Decoding channel must be 1 or 2");
 			return Ref<_OpusAudioDecoderImpl>::null();
 		}
 		int error;
-		OpusDecoder* decoder = opus_decoder_create((opus_int32)(param.nSamplesPerSecond), (opus_int32)(param.nChannels), &error);
+		OpusDecoder* decoder = opus_decoder_create((opus_int32)(param.samplesPerSecond), (opus_int32)(param.channelsCount), &error);
 		if (! decoder) {
 			return Ref<_OpusAudioDecoderImpl>::null();
 		}
 		Ref<_OpusAudioDecoderImpl> ret = new _OpusAudioDecoderImpl();
 		if (ret.isNotNull()) {
 			ret->m_decoder = decoder;
-			ret->m_nSamplesPerSecond = param.nSamplesPerSecond;
-			ret->m_nChannels = param.nChannels;
+			ret->m_nSamplesPerSecond = param.samplesPerSecond;
+			ret->m_nChannels = param.channelsCount;
 		} else {
 			opus_decoder_destroy(decoder);
 		}

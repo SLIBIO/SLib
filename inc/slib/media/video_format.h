@@ -12,6 +12,11 @@ class SLIB_EXPORT VideoFrame
 {
 public:
 	BitmapData image;
+	RotationMode rotation;
+	FlipMode flip;
+	
+public:
+	VideoFrame();
 };
 
 SLIB_MEDIA_NAMESPACE_END

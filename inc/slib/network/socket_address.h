@@ -43,6 +43,11 @@ public:
 		this->ip = _ip;
 		this->port = _port;
 	}
+	
+	SLIB_INLINE SocketAddress(const String& str)
+	{
+		parse(str);
+	}
 
 	SLIB_INLINE SocketAddress(const SocketAddress& other)
 	{

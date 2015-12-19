@@ -120,7 +120,12 @@ public:
 		
 		[session addInput:input];
 		[session addOutput:output];
-
+		
+		AVCaptureConnection *videoConnection = [output connectionWithMediaType:AVMediaTypeVideo];
+		if ([videoConnection isVideoOrientationSupported]) {
+			[videoConnection setVideoOrientation:AVCaptureVideoOrientationPortrait];
+		}
+		
 		ret = new _AVFoundation_Camera();
 		if (ret.isNotNull()) {
 			callback->m_camera = ret;
@@ -282,7 +287,7 @@ public:
 				CVPlanarPixelBufferInfo_YCbCrBiPlanar* p = (CVPlanarPixelBufferInfo_YCbCrBiPlanar*)baseAddress;
 				if (p->componentInfoY.offset == 0) {
 					frame.image.format = bitmapFormatYUV_NV12;
-					frame.image.data = base;
+					frame.image.data = base + sizeof(CVPlanarPixelBufferInfo_YCbCrBiPlanar);
 				} else {
 					frame.image.format = bitmapFormatYUV_NV12;
 					frame.image.data = base + (sl_int32)(Endian::swap32LE(p->componentInfoY.offset));

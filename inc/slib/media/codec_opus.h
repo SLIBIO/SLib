@@ -12,9 +12,9 @@ struct SLIB_EXPORT AudioOpusEncoderParam
 		typeVoice = 0,
 		typeMusic = 1
 	};
-	sl_uint32 nSamplesPerSecond;
-	sl_uint32 nChannels;
-	sl_uint32 nBitsPerSecond;
+	sl_uint32 samplesPerSecond;
+	sl_uint32 channelsCount;
+	sl_uint32 bitsPerSecond;
 	Type type;
 
 	AudioOpusEncoderParam();
@@ -32,8 +32,8 @@ public:
 
 struct SLIB_EXPORT AudioOpusDecoderParam
 {
-	sl_uint32 nSamplesPerSecond;
-	sl_uint32 nChannels;
+	sl_uint32 samplesPerSecond;
+	sl_uint32 channelsCount;
 
 	AudioOpusDecoderParam();
 };

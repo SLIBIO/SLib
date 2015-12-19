@@ -64,7 +64,7 @@ public:
             return ret;
         }
         
-        UInt32 sizeFrame = param.nFrameLengthInMilliseconds * formatDst.mSampleRate * formatDst.mBytesPerFrame / 1000;
+        UInt32 sizeFrame = param.frameLengthInMilliseconds * formatDst.mSampleRate * formatDst.mBytesPerFrame / 1000;
         if (sizeFrame < rangeBufferSize.mMinimum) {
             logError("Required frame size(" + String::fromUint32(sizeFrame) + ") is smaller than minimum " + String::fromUint32(rangeBufferSize.mMinimum));
             return ret;
@@ -78,7 +78,7 @@ public:
         AudioStreamBasicDescription formatSrc;
         formatSrc.mFormatID = kAudioFormatLinearPCM;
         formatSrc.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
-        formatSrc.mSampleRate = param.nSamplesPerSecond;
+        formatSrc.mSampleRate = param.samplesPerSecond;
         formatSrc.mBitsPerChannel = 16;
         formatSrc.mChannelsPerFrame = 1;
         formatSrc.mBytesPerFrame = formatSrc.mChannelsPerFrame * formatSrc.mBitsPerChannel / 8;
@@ -99,7 +99,7 @@ public:
 					
 					ret->m_deviceID = deviceID;
 					ret->m_converter = converter;
-					ret->m_queue.setQueueSize(param.nSamplesPerSecond * param.nBufferLengthInMilliseconds / 1000);
+					ret->m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000);
 					ret->m_formatSrc = formatSrc;
 					ret->m_formatDst = formatDst;
 					ret->setListener(param.listener);

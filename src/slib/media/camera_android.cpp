@@ -141,6 +141,7 @@ public:
 		frame.image.data = mem.getBuf();
 		frame.image.pitch = 0;
 		frame.image.ref = mem.getReference();
+		frame.rotation = rotation_90;
 		onCaptureVideoFrame(&frame);
 	}
 

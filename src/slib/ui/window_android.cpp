@@ -20,7 +20,7 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidRectF, "android/graphics/RectF")
 	SLIB_JNI_FLOAT_FIELD(bottom);
 SLIB_JNI_END_CLASS
 
-
+void JNICALL _AndroidWindow_nativeOnResize(JNIEnv* env, jobject _this, jlong instance, float w, float h);
 jboolean JNICALL _AndroidWindow_nativeOnClose(JNIEnv* env, jobject _this, jlong instance);
 
 SLIB_JNI_BEGIN_CLASS(_JAndroidWindow, "slib/platform/android/ui/window/UiWindow")
@@ -47,6 +47,7 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidWindow, "slib/platform/android/ui/window/UiWindow"
 	SLIB_JNI_METHOD(convertCoordinateFromScreenToWindow, "convertCoordinateFromScreenToWindow", "(FF)Landroid/graphics/PointF;");
 	SLIB_JNI_METHOD(convertCoordinateFromWindowToScreen, "convertCoordinateFromWindowToScreen", "(FF)Landroid/graphics/PointF;");
 
+	SLIB_JNI_NATIVE(onResize, "nativeOnResize", "(JFF)V", _AndroidWindow_nativeOnResize);
 	SLIB_JNI_NATIVE(onClose, "nativeOnClose", "(J)Z", _AndroidWindow_nativeOnClose);
 
 SLIB_JNI_END_CLASS
@@ -431,6 +432,15 @@ public:
 Ref<_Android_Window> _AndroidUi_getWindow(jlong instance)
 {
 	return Ref<_Android_Window>::from(UIPlatform::getWindowInstance((jobject)instance));
+}
+
+void JNICALL _AndroidWindow_nativeOnResize(JNIEnv* env, jobject _this, jlong instance, float w, float h)
+{
+	Ref<_Android_Window> window = _AndroidUi_getWindow(instance);
+	if (window.isNotNull()) {
+		Size size(w, h);
+		window->onResize(size);
+	}
 }
 
 jboolean JNICALL _AndroidWindow_nativeOnClose(JNIEnv* env, jobject _this, jlong instance)

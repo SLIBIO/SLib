@@ -113,9 +113,8 @@ void _iOS_GLCallback(_Slib_iOS_GLView* handle)
 			
 			handle.context = desc.m_context;
 			
-			sl_uint32 width = (sl_uint32)(handle.drawableWidth);
-			sl_uint32 height = (sl_uint32)(handle.drawableHeight);
-			
+			sl_uint32 width = (sl_uint32)(handle.frame.size.width) * (handle.contentScaleFactor);
+			sl_uint32 height = (sl_uint32)(handle.frame.size.height) * (handle.contentScaleFactor);
 			if (width > 0 && height > 0) {
 				
 				sl_bool flagUpdate = sl_false;
@@ -187,6 +186,11 @@ SLIB_UI_NAMESPACE_END
 
 - (void)drawRect:(CGRect)dirtyRect
 {
+}
+
+- (void)setFrame:(CGRect)frame
+{
+	[super setFrame:frame];
 }
 
 IOS_VIEW_EVENTS

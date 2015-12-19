@@ -8,9 +8,9 @@ AudioRecorderInfo::AudioRecorderInfo()
 
 AudioRecorderParam::AudioRecorderParam()
 {
-	nSamplesPerSecond = 16000;
-	nFrameLengthInMilliseconds = 50;
-	nBufferLengthInMilliseconds = 1000;
+	samplesPerSecond = 16000;
+	frameLengthInMilliseconds = 50;
+	bufferLengthInMilliseconds = 1000;
 	flagAutoStart = sl_true;
 }
 

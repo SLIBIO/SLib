@@ -24,7 +24,6 @@
 #include <sys/syscall.h>
 
 #if defined(SLIB_PLATFORM_IS_APPLE)
-#include <mach-o/dyld.h>
 #include <mach/mach.h>
 #endif
 
@@ -34,28 +33,10 @@
 #endif
 
 SLIB_NAMESPACE_BEGIN
+#if !defined(SLIB_PLATFORM_IS_APPLE)
 String System::getApplicationPath()
 {
-#if defined(SLIB_PLATFORM_IS_APPLE)
-	uint32_t size = 2048;
-	char* path = (char*)(Base::createMemory(size + 1));
-	if (!path) {
-		return String::null();
-	}
-	char* pathResolved = (char*)(Base::createMemory(size + 1));
-	if (!pathResolved) {
-		Base::freeMemory(path);
-		return String::null();
-	}
-	pathResolved[0] = 0;
-	if (_NSGetExecutablePath(path, &size) == 0) {
-		realpath(path, pathResolved);
-	}
-	String ret = String::fromUtf8(pathResolved);
-	Base::freeMemory(path);
-	Base::freeMemory(pathResolved);
-	return ret;
-#elif defined(SLIB_PLATFORM_IS_ANDROID)
+#if defined(SLIB_PLATFORM_IS_ANDROID)
 	sl_uint32 size = 2048;
 	char* path = (char*)(Base::createMemory(size+1));
 	if (!path) {
@@ -100,15 +81,14 @@ String System::getApplicationPath()
 String System::getTempDirectory()
 {
 #if defined(SLIB_PLATFORM_IS_MOBILE)
-	SLIB_STATIC_STRING(temp, "/temp");
-	String dir = System::getApplicationDirectory() + temp;
+	String dir = System::getApplicationDirectory() + "/temp";
 	File::createDirectory(dir);
 	return dir;
 #else
-	SLIB_STATIC_STRING(tmp, "/tmp");
-	return tmp;
+	return "/tmp";
 #endif
 }
+#endif
 
 sl_uint32 System::getTickCount()
 {

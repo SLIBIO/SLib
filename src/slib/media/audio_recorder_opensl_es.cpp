@@ -82,7 +82,7 @@ public:
 			{
 				configuration.formatType = SL_DATAFORMAT_PCM;
 				configuration.numChannels = 1;
-				configuration.samplesPerSec = param.nSamplesPerSecond * 1000;
+				configuration.samplesPerSec = param.samplesPerSecond * 1000;
 				configuration.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
 				configuration.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
 				configuration.channelMask = SL_SPEAKER_FRONT_CENTER;
@@ -107,8 +107,8 @@ public:
 								ret->m_recorderObject = recorderObject;
 								ret->m_recordInterface = recordInterface;
 								ret->m_bufferQueue = bufferQueue;
-								ret->m_nSamplesFrame = param.nSamplesPerSecond * param.nFrameLengthInMilliseconds / 1000;
-								ret->m_queue.setQueueSize(param.nSamplesPerSecond * param.nBufferLengthInMilliseconds / 1000);
+								ret->m_nSamplesFrame = param.samplesPerSecond * param.frameLengthInMilliseconds / 1000;
+								ret->m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000);
 								ret->m_bufFrame = new sl_int16[ret->m_nSamplesFrame * 2];
 								ret->setListener(param.listener);
 								if (ret->m_bufFrame) {
@@ -337,8 +337,8 @@ public:
 		SLDataFormat_PCM configuration;
 		{
 			configuration.formatType = SL_DATAFORMAT_PCM;
-			configuration.numChannels = param.nChannels;
-			configuration.samplesPerSec = param.nSamplesPerSecond * 1000;
+			configuration.numChannels = param.channelsCount;
+			configuration.samplesPerSec = param.samplesPerSecond * 1000;
 			configuration.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
 			configuration.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
 			if (configuration.numChannels == 2) {
@@ -371,8 +371,8 @@ public:
 							ret->m_playerObject = playerObject;
 							ret->m_playerInterface = playerInterface;
 							ret->m_bufferQueue = bufferQueue;
-							ret->m_nSamplesFrame = param.nSamplesPerSecond * param.nFrameLengthInMilliseconds / 1000 * param.nChannels;
-							ret->m_queue.setQueueSize(param.nSamplesPerSecond * param.nBufferLengthInMilliseconds / 1000 * param.nChannels);
+							ret->m_nSamplesFrame = param.samplesPerSecond * param.frameLengthInMilliseconds / 1000 * param.channelsCount;
+							ret->m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000 * param.channelsCount);
 							ret->m_bufFrame = new sl_int16[ret->m_nSamplesFrame * 2];
 							ret->setListener(param.listener);
 							if (ret->m_bufFrame) {

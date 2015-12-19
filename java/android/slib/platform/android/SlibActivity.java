@@ -2,6 +2,7 @@ package slib.platform.android;
 
 import java.util.Vector;
 
+import slib.platform.android.camera.SCamera;
 import slib.platform.android.ui.window.UiWindow;
 import android.app.Activity;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ public class SlibActivity extends Activity {
 	protected void onPause() {
 		super.onPause();
 		Android.onPauseActivity(this);
+		SCamera.onPauseActivity(this);
 		flagVisible = false;
 	}
 	
@@ -27,6 +29,7 @@ public class SlibActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		Android.onResumeActivity(this);
+		SCamera.onResumeActivity(this);
 		flagVisible = true;
 	}
 

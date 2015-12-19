@@ -26,10 +26,10 @@ class IAudioPlayerBufferListener;
 class SLIB_EXPORT AudioPlayerBufferParam
 {
 public:
-	sl_uint32 nSamplesPerSecond;
-	sl_uint32 nChannels;
-	sl_uint32 nBufferLengthInMilliseconds;
-	sl_uint32 nFrameLengthInMilliseconds;
+	sl_uint32 samplesPerSecond;
+	sl_uint32 channelsCount;
+	sl_uint32 bufferLengthInMilliseconds;
+	sl_uint32 frameLengthInMilliseconds;
 	Ptr<IAudioPlayerBufferListener> listener;
 	sl_bool flagAutoStart;
 	

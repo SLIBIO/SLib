@@ -15,7 +15,7 @@ class SLIB_EXPORT VideoEncoder : public Object
 public:
 	VideoEncoder();
 	
-	virtual sl_bool encode(const VideoFrame& input, void* output, sl_uint32& sizeOutput, sl_uint32& encodingTime) = 0;
+	virtual Memory encode(const VideoFrame& input) = 0;
 public:
 	SLIB_PROPERTY(sl_uint32, Bitrate)
 	

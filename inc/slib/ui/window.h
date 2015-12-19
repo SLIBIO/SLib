@@ -407,6 +407,7 @@ public:
 	Ref<Window> getWindow();
 
 public:
+	void onCreate();
 	sl_bool onClose();
 	void onActivate();
 	void onDeactivate();

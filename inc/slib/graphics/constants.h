@@ -79,6 +79,22 @@ enum BlendMode
 	blendSrcAlpha = 1
 };
 
+enum RotationMode
+{
+	rotation_0 = 0,
+	rotation_90 = 90,
+	rotation_180 = 180,
+	rotation_270 = 270
+};
+
+enum FlipMode
+{
+	flipNone = 0,
+	flipHorizontal = 1,
+	flipVertical = 2,
+	flipHorizontalAndVertical = 3
+};
+
 enum ScaleType
 {
 	scaleTypeNone = 0,

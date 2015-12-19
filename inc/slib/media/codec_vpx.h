@@ -7,8 +7,9 @@
 
 SLIB_MEDIA_NAMESPACE_BEGIN
 
-struct SLIB_EXPORT VideoVpxEncoderParam
+class SLIB_EXPORT VideoVpxEncoderParam
 {
+public:
 	enum Type {
 		VP8 = 0,
 		VP9 = 1
@@ -20,30 +21,33 @@ struct SLIB_EXPORT VideoVpxEncoderParam
 		VPX_CQ,
 		VPX_Q,
 	};
-	sl_uint32 nWidth;
-	sl_uint32 nHeight;
-	sl_uint32 nFramePerSecond;
-	sl_uint32 nKeyFrameInterval;
-	sl_uint32 nBitrate;
-	sl_uint32 nThreadCount;
-	sl_uint32 nCpuUsage;
+	sl_uint32 width;
+	sl_uint32 height;
+	sl_uint32 framesPerSecond;
+	sl_uint32 keyFrameInterval;
+	sl_uint32 bitrate;
+	sl_uint32 threadsCount;
+	sl_uint32 cpuUsage;
 	BitRateControlMode mode;
 	Type type;
 
+public:
 	VideoVpxEncoderParam();
 };
 
-struct SLIB_EXPORT VideoVpxDecoderParam
+class SLIB_EXPORT VideoVpxDecoderParam
 {
+public:
 	enum Type {
 		VP8 = 0,
 		VP9 = 1
 	};
 
 	Type type;
-	sl_uint32 nWidth;
-	sl_uint32 nHeight;
+	sl_uint32 width;
+	sl_uint32 height;
 	
+public:
 	VideoVpxDecoderParam();
 };
 
