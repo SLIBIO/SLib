@@ -70,7 +70,7 @@ void HttpClientContext::setUrl(const String& strUrl)
 
 Ref<HttpClientConnection> HttpClientContext::getConnection()
 {
-	return m_connection.lock();
+	return m_connection;
 }
 
 Ref<HttpClientContext> HttpClientContext::create()
@@ -104,12 +104,12 @@ Ref<AsyncStream> HttpClientConnection::getIO()
 
 Ref<HttpClient> HttpClientConnection::getClient()
 {
-	return m_client.lock();
+	return m_client;
 }
 
 Ref<HttpClientSession> HttpClientConnection::getSession()
 {
-	return m_session.lock();
+	return m_session;
 }
 
 Ref<HttpClientConnection> HttpClientConnection::create(HttpClient* _client, HttpClientSession* _session, AsyncStream* _io)

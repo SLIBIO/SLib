@@ -33,7 +33,7 @@ void Bitmap::onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& r
 	if (context.isNull()) {
 		return;
 	}
-	Ref<GraphicsContext> contextCached = m_contextCached.lock();
+	Ref<GraphicsContext> contextCached = m_contextCached;
 	Ref<Drawable> drawableCached = m_drawableCached;
 	if (contextCached == context && drawableCached.isNotNull()) {
 		drawableCached->onDraw(canvas, rectDst, rectSrc);

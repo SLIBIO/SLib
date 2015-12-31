@@ -1,5 +1,6 @@
 #include "../../../inc/slib/crypto/md5.h"
 #include "../../../inc/slib/core/io.h"
+#include "../../../inc/slib/core/math.h"
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
 

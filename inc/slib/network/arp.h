@@ -24,7 +24,7 @@
 */
 
 SLIB_NETWORK_NAMESPACE_BEGIN
-class SLIB_EXPORT ArpPacketFormat
+class SLIB_EXPORT ARP_PacketFormat
 {
 public:
 	SLIB_INLINE sl_uint16 getHardwareType() const

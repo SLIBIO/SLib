@@ -1177,7 +1177,7 @@ public:
 		_MapRef dst(m_object);
 		if (dst.isNotNull()) {
 			Ref< IMap<_KT, _VT> > src(other.m_object);
-			if ((void*)(dst.getObject()) == (void*)(src.getObject())) {
+			if ((void*)(dst.get()) == (void*)(src.get())) {
 				return sl_false;
 			}
 			if (src.isNotNull()) {

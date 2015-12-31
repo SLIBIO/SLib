@@ -195,7 +195,7 @@ public:
 		if (hWnd) {
 			Ref<WindowInstance> window = _window;
 			if (window.isNotNull()) {
-				_Win32_Window* w = (_Win32_Window*)(window.getObject());
+				_Win32_Window* w = (_Win32_Window*)(window.get());
 				HWND hWndParent = w->m_handle;
 				if (hWndParent) {
 					::SetWindowLongPtr(hWnd, GWLP_HWNDPARENT, (LONG_PTR)hWndParent);
@@ -804,7 +804,7 @@ public:
 LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	Ref<WindowInstance> _window = UIPlatform::getWindowInstance(hWnd);
-	_Win32_Window* window = (_Win32_Window*)(_window.getObject());
+	_Win32_Window* window = (_Win32_Window*)(_window.get());
 	if (window && window->m_handle) {
 		switch (uMsg) {
 		case WM_CLOSE:

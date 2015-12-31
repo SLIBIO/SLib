@@ -74,7 +74,7 @@ public:
 							ret->m_hDC = hDC;
 							ret->m_context = context;
 
-							ret->m_threadRender = Thread::start(SLIB_CALLBACK_CLASS(_WGLRendererImpl, run, ret.getObject()));
+							ret->m_threadRender = Thread::start(SLIB_CALLBACK_CLASS(_WGLRendererImpl, run, ret.get()));
 
 							return ret;
 						}

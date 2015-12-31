@@ -36,6 +36,7 @@ public:
 	SLIB_INLINE Memory(sl_size size) : m_object(MemoryObject::create(sl_null, size))
 	{
 	}
+
 	SLIB_INLINE Memory(const void* buf, sl_size size) : m_object(MemoryObject::create(buf, size))
 	{
 	}
@@ -45,16 +46,19 @@ public:
 		Memory ret(size);
 		return ret;
 	}
+
 	SLIB_INLINE static Memory create(const void* buf, sl_size size)
 	{
 		Memory ret(buf, size);
 		return ret;
 	}
+
 	SLIB_INLINE static Memory createStatic(const void* buf, sl_size size)
 	{
-		return createStatic(buf, size, sl_null);
+		return createStatic(buf, size, Ref<Referable>::null());
 	}
-	SLIB_INLINE static Memory createStatic(const void* buf, sl_size size, Ref<Referable> reference)
+
+	SLIB_INLINE static Memory createStatic(const void* buf, sl_size size, const Ref<Referable>& reference)
 	{
 		Memory ret;
 		ret.m_object = MemoryObject::createStatic(buf, size, reference);
@@ -62,6 +66,7 @@ public:
 	}
 
 	Memory sub(sl_size offset) const;
+
 	Memory sub(sl_size offset, sl_size size) const;
 
 	SLIB_INLINE void* getBuf() const
@@ -73,6 +78,7 @@ public:
 			return sl_null;
 		}
 	}
+
 	SLIB_INLINE sl_size getSize() const
 	{
 		Ref<MemoryObject> object = m_object;
@@ -82,10 +88,12 @@ public:
 			return 0;
 		}
 	}
+
 	SLIB_INLINE sl_size size() const
 	{
 		return getSize();
 	}
+
 	SLIB_INLINE sl_uint8& operator[](sl_size index)
 	{
 		return ((sl_uint8*)(m_object->m_buf))[index];
@@ -95,13 +103,16 @@ public:
 	{
 		return isNull();
 	}
+
 	SLIB_INLINE sl_bool isNotEmpty() const
 	{
 		return isNotNull();
 	}
 	
 	sl_size read(sl_size offset, sl_size len, void* output);
+
 	sl_size write(sl_size offset, sl_size len, const void* source);
+
 	sl_size copy(sl_size offsetTarget, Memory source, sl_size offsetSource = 0, sl_size len = SLIB_SIZE_MAX);
 
 	SLIB_INLINE sl_size read(void* output, sl_size len)

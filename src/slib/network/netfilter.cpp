@@ -219,7 +219,7 @@ public:
 		}
 		Ref<_Linux_NetFilterQueue> queueObj = new _Linux_NetFilterQueue;
 		if (queueObj.isNotNull()) {
-			nfq_q_handle* queue = nfq_create_queue(m_handle, queueNumber, &_Linux_NetFilter::_callbackFilter, queueObj.getObject());
+			nfq_q_handle* queue = nfq_create_queue(m_handle, queueNumber, &_Linux_NetFilter::_callbackFilter, queueObj.get());
 			if (queue) {
 				nfq_set_queue_maxlen(queue, 1024*10);
 				queueObj->m_filter = this;

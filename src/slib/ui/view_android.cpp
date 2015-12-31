@@ -14,7 +14,7 @@ void JNICALL _AndroidView_nativeOnDraw(JNIEnv* env, jobject _this, jlong jinstan
 	if (instance.isNotNull()) {
 		Ref<Canvas> canvas = UIPlatform::createCanvas(jcanvas);
 		if (canvas.isNotNull()) {
-			instance->onDraw(canvas.getObject());
+			instance->onDraw(canvas.get());
 		}
 	}
 }

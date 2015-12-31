@@ -21,12 +21,12 @@ public:
 
 	SLIB_INLINE Ref<RenderBaseObject> getObject()
 	{
-		return m_object.lock();
+		return m_object;
 	}
 
 	SLIB_INLINE Ref<RenderEngine> getEngine()
 	{
-		return m_engine.lock();
+		return m_engine;
 	}
 
 protected:
@@ -49,7 +49,7 @@ public:
 
 	SLIB_INLINE Ref<RenderEngine> getEngine()
 	{
-		return m_engine.lock();
+		return m_engine;
 	}
 
 	SLIB_INLINE const Ref<RenderBaseObjectInstance>& getInstance()

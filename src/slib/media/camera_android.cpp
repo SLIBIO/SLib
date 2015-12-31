@@ -48,7 +48,7 @@ public:
 	{
 		Ref<_Android_Camera> ret = new _Android_Camera();
 		if (ret.isNotNull()) {
-			jlong instance = (jlong)(ret.getObject());
+			jlong instance = (jlong)(ret.get());
 			_AndroidCameras_get().put(instance, ret);
 			JniLocal<jstring> jid = Jni::getJniString(param.deviceId);
 			JniLocal<jobject> jcamera = _JAndroidCamera::create.callObject(sl_null, jid.get(), instance);

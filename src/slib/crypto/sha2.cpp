@@ -1,5 +1,6 @@
 #include "../../../inc/slib/crypto/sha2.h"
 #include "../../../inc/slib/core/mio.h"
+#include "../../../inc/slib/core/math.h"
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
 _SHA256Base::_SHA256Base()

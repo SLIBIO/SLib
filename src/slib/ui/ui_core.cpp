@@ -211,7 +211,7 @@ void UIPlatform::_registerViewInstance(const void* handle, ViewInstance* instanc
 Ref<ViewInstance> UIPlatform::_getViewInstance(const void* handle)
 {
 	_UiViewInstanceMap& map = _UI_getViewInstances();
-	return map.getValue(handle, WeakRef<ViewInstance>::null()).lock();
+	return map.getValue(handle, WeakRef<ViewInstance>::null());
 }
 
 void UIPlatform::_removeViewInstance(const void* handle)
@@ -232,7 +232,7 @@ void UIPlatform::_registerWindowInstance(const void* handle, WindowInstance* ins
 Ref<WindowInstance> UIPlatform::_getWindowInstance(const void* handle)
 {
 	_UiWindowInstanceMap& map = _UI_getWindowInstances();
-	return map.getValue(handle, WeakRef<WindowInstance>::null()).lock();
+	return map.getValue(handle, WeakRef<WindowInstance>::null());
 }
 
 void UIPlatform::_removeWindowInstance(const void* handle)

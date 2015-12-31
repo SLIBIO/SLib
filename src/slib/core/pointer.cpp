@@ -60,7 +60,7 @@ void _RefPtr_set(_RefPtr_Container* target, const Ref<Referable>& ref)
 {
 	SpinLocker lock(SpinLockPoolForRefPtr::get(target));
 	target->m_reference = ref;
-	target->m_pointer = target->m_reference.getObject();
+	target->m_pointer = target->m_reference.get();
 }
 
 void _RefPtr_set(_RefPtr_Container* target, const void* pointer, const Ref<Referable>& ref)
@@ -127,7 +127,7 @@ void _Ptr_set(_Ptr_Container* target, const Ref<Referable>& ref)
 {
 	SpinLocker lock(SpinLockPoolForPtr::get(target));
 	target->m_reference = ref;
-	target->m_pointer = target->m_reference.getObject();
+	target->m_pointer = target->m_reference.get();
 }
 
 void _Ptr_set(_Ptr_Container* target, const void* pointer, const Ref<Referable>& ref)
@@ -148,8 +148,8 @@ void _Ptr_lock(_Ptr_Container* target, _Ptr_Container* source)
 	}
 	if (ref.isNotNull()) {
 		if (WeakRefObject::checkInstance(ref)) {
-			WeakRef<Referable> w = (WeakRefObject*)(ref.getObject());
-			target->m_reference = w.lock();
+			WeakRef<Referable> w = (WeakRefObject*)(ref.get());
+			target->m_reference = w;
 			if (target->m_reference.isNull()) {
 				target->m_pointer = sl_null;
 			} else {

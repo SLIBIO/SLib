@@ -25,8 +25,9 @@ RenderBaseObject::~RenderBaseObject()
 
 void RenderBaseObject::linkEngine(const Ref<RenderEngine>& _engine, const Ref<RenderBaseObjectInstance>& _instance)
 {
-	Ref<RenderEngine> engine = _engine;
-	if (engine != m_engine.lock()) {
+	Ref<RenderEngine> engine(_engine);
+	Ref<RenderEngine> engineOld(m_engine);
+	if (engine != engineOld) {
 		unlinkEngine();
 		Ref<RenderBaseObjectInstance> instance = _instance;
 		if (engine.isNotNull() && instance.isNotNull()) {
@@ -38,7 +39,7 @@ void RenderBaseObject::linkEngine(const Ref<RenderEngine>& _engine, const Ref<Re
 
 void RenderBaseObject::unlinkEngine()
 {
-	Ref<RenderEngine> engine = m_engine.lock();
+	Ref<RenderEngine> engine(m_engine);
 	if (engine.isNotNull()) {
 		engine->_onFreeInstance(m_instance.get());
 	}

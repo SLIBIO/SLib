@@ -174,7 +174,7 @@ public:
 		if (window != nil) {
 			Ref<WindowInstance> windowInst = _window;
 			if (windowInst.isNotNull()) {
-				_OSX_Window* w = (_OSX_Window*)(windowInst.getObject());
+				_OSX_Window* w = (_OSX_Window*)(windowInst.get());
 				NSWindow* p = w->m_window;
 				m_parent = p;
 				if (p != nil) {

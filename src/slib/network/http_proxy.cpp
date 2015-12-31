@@ -44,7 +44,7 @@ sl_bool HttpProxy::preprocessRequest(HttpServiceContext* context)
 		String method = context->getMethod();
 		if (method.toUpper() == SLIB_HTTP_METHOD_CONNECT) {
 			if (m_param.flagLogDebug) {
-				SLIB_LOG(SERVICE_TAG, "[" + String::fromPointerValue(connection.getObject()) + "] PROXY CONNECT - Host: " + context->getPath());
+				SLIB_LOG(SERVICE_TAG, "[" + String::fromPointerValue(connection.get()) + "] PROXY CONNECT - Host: " + context->getPath());
 			}
 			Ref<AsyncLoop> loop = getAsyncLoop();
 			if (loop.isNotNull()) {
@@ -68,7 +68,7 @@ sl_bool HttpProxy::preprocessRequest(HttpServiceContext* context)
 			String host = context->getHost();
 			if (m_param.flagLogDebug) {
 				String method = context->getMethod();
-				SLIB_LOG(SERVICE_TAG, "[" + String::fromPointerValue(connection.getObject()) + "] PROXY " + method + " - Host: " + host);
+				SLIB_LOG(SERVICE_TAG, "[" + String::fromPointerValue(connection.get()) + "] PROXY " + method + " - Host: " + host);
 			}
 			Ref<AsyncLoop> loop = getAsyncLoop();
 			if (loop.isNotNull()) {
@@ -131,7 +131,7 @@ public:
 		m_nCountCopy--;
 		if (m_nCountCopy == 0) {
 			lock.unlock();
-			Ref<HttpServiceConnection> connection = m_connection.lock();
+			Ref<HttpServiceConnection> connection = m_connection;
 			if (connection.isNotNull()) {
 				connection->close();
 				connection->setProxyObject(Ref<Referable>::null());
@@ -150,7 +150,7 @@ void HttpProxy::_processConnect(Ref<HttpServiceContext> context)
 	Ref<_HttpProxy_ConnectContext> connectContext = new _HttpProxy_ConnectContext(connection.get(), context->getRequestBody());
 	if (connectContext.isNotNull()) {
 		if (connectTo(connection.get(), host, WeakRef<_HttpProxy_ConnectContext>(connectContext))) {
-			connection->setProxyObject(connectContext.getObject());
+			connection->setProxyObject(connectContext.get());
 			return;
 		}
 	}
@@ -225,7 +225,7 @@ public:
 			} else if (task->getWrittenSize() >= m_sizeResponse) {
 				m_copyLocalToRemote.setNull();
 				m_copyRemoteToLocal.setNull();
-				Ref<HttpServiceConnection> connection = m_connection.lock();
+				Ref<HttpServiceConnection> connection = m_connection;
 				if (connection.isNotNull()) {
 					connection->setProxyObject(Ref<Referable>::null());
 					connection->start();
@@ -255,7 +255,7 @@ void HttpProxy::_processProxy(Ref<HttpServiceContext> context, String host, sl_u
 	Ref<_HttpProxy_ProxyContext> proxyContext = new _HttpProxy_ProxyContext(connection.get(), context.get());
 	if (proxyContext.isNotNull()) {
 		if (connectTo(connection.get(), host, WeakRef<_HttpProxy_ProxyContext>(proxyContext))) {
-			connection->setProxyObject(proxyContext.getObject());
+			connection->setProxyObject(proxyContext.get());
 			return;
 		}
 	}
@@ -276,7 +276,7 @@ public:
 
 	void onConnect(AsyncTcpSocket* socket, const SocketAddress& address, sl_bool flagError)
 	{
-		Ref<HttpServiceConnection> connection = m_connection.lock();
+		Ref<HttpServiceConnection> connection = m_connection;
 		if (connection.isNull()) {
 			return;
 		}
@@ -297,7 +297,7 @@ sl_bool HttpProxy::connectTo(HttpServiceConnection* connection, const String& ho
 		if (socket.isNotNull()) {
 			Ref<_HttpProxy_ConnectListener> listenerConnect = new _HttpProxy_ConnectListener(connection, listener);
 			if (socket->connect(address, listenerConnect)) {
-				connection->setUserObject(socket.getObject());
+				connection->setUserObject(socket.get());
 				return sl_true;
 			}
 		}

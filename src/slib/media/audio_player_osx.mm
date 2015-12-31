@@ -105,7 +105,7 @@ public:
 					ret->setListener(param.listener);
 					
 					AudioDeviceIOProcID callback;
-					if (AudioDeviceCreateIOProcID(deviceID, DeviceIOProc, ret.getObject(), &callback) == kAudioHardwareNoError) {
+					if (AudioDeviceCreateIOProcID(deviceID, DeviceIOProc, ret.get(), &callback) == kAudioHardwareNoError) {
 						ret->m_callback = callback;
 						if (param.flagAutoStart) {
 							ret->start();

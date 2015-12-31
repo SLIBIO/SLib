@@ -290,7 +290,7 @@ public:
 		MutexLocker locker(flagThreadSafe ? this->getLocker() : sl_null);
 		Ref< ListObject<TYPE, flagThreadSafe, COMPARE> > ret = new ListObject<TYPE, flagThreadSafe, COMPARE>(m_count);
 		if (ret.isNotNull()) {
-			if (ret.m_object->getCapacity() == 0) {
+			if (ret->getCapacity() == 0) {
 				ret.setNull();
 				return ret;
 			}
@@ -492,14 +492,14 @@ class SLIB_EXPORT List
 public:
 	template <sl_bool _flagThreadSafe, class _COMPARE>
 	SLIB_INLINE List(const List<TYPE, _flagThreadSafe, _COMPARE>& other)
-	: m_object(*((_ListRef*)&(other.getObjectReference())))
+	: m_object(*((_ListRef*)&(other.getReference())))
 	{
 	}
 
 	template <sl_bool _flagThreadSafe, class _COMPARE>
 	SLIB_INLINE _ListType& operator=(const List<TYPE, _flagThreadSafe, _COMPARE>& other)
 	{
-		m_object = *((_ListRef*)&(other.getObjectReference()));
+		m_object = *((_ListRef*)&(other.getReference()));
 		return *this;
 	}
 
@@ -637,13 +637,13 @@ public:
 	template <class _TYPE, sl_bool _flagThreadSafe, class _COMPARE>
 	sl_bool insert(sl_size index, const List<_TYPE, _flagThreadSafe, _COMPARE>& other)
 	{
-		Ref< ListObject<_TYPE, _flagThreadSafe, _COMPARE>  > object2 = other.getObjectReference();
+		Ref< ListObject<_TYPE, _flagThreadSafe, _COMPARE>  > object2 = other.getReference();
 		if (object2.isNull())
 			return sl_true;
 		_ListRef object1(m_object);
 		if (object1.isNotNull()) {
-			if ((void*)(object1.getObject()) != (void*)(object2.getObject())) {
-				return object1->insert(index, *(object2.getObject()));
+			if ((void*)(object1.get()) != (void*)(object2.get())) {
+				return object1->insert(index, *(object2.get()));
 			} else {
 				_ListType list(duplicate());
 				if (list.isNotNull()) {

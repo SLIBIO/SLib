@@ -15,7 +15,7 @@ void WindowInstance::setWindow(Ref<Window> window)
 
 Ref<Window> WindowInstance::getWindow()
 {
-	return m_window.lock();
+	return m_window;
 }
 
 void WindowInstance::onCreate()

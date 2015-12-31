@@ -61,7 +61,7 @@ public:
 					Ref<_Android_Sensor> ret = new _Android_Sensor;
 					if (ret.isNotNull()) {
 						ret->m_sensors = sensors;
-						jlong instance = (jlong)(ret.getObject());
+						jlong instance = (jlong)(ret.get());
 						_JAndroidSensors::setInstance.call(obj, instance);
 						_AndroidSensors_get().put(instance, ret);
 						return ret;

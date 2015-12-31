@@ -65,7 +65,7 @@ public:
 		MutexLocker lock(getLocker());
 		Ref<AsyncTimer> timer = m_timer;
 		if (timer.isNotNull()) {
-			Ref<AsyncLoop> loop = m_loop.lock();
+			Ref<AsyncLoop> loop = m_loop;
 			if (loop.isNotNull()) {
 				loop->removeTimer(timer);
 			}

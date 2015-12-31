@@ -119,15 +119,14 @@ public:
 		MIO::writeUint16BE(_id, id);
 	}
 
-	// true = Response, false = Question
-	SLIB_INLINE sl_bool isQR() const
+	SLIB_INLINE sl_bool isQuestion() const
 	{
-		return (_flags[0] & 0x80) != 0;
+		return (_flags[0] & 0x80) == 0;
 	}
-	// true = Response, false = Question
-	SLIB_INLINE void setQR(sl_bool flag)
+
+	SLIB_INLINE void setQuestion(sl_bool flag)
 	{
-		_flags[0] = (sl_uint8)((_flags[0] & 0x7F) | (flag ? 0x80 : 0));
+		_flags[0] = (sl_uint8)((_flags[0] & 0x7F) | (flag ? 0 : 0x80));
 	}
 
 	enum Opcode
@@ -483,7 +482,7 @@ public:
 	void sendQuestion(const IPv4Address& serverIp, const String& host);
 
 public:
-	SLIB_PROPERTY_INLINE(Ptr<IDnsClientListener>, Listener);
+	SLIB_PROPERTY_INLINE(Ptr<IDnsClientListener>, Listener)
 
 protected:
 	Ref<AsyncUdpSocket> m_udp;
@@ -501,7 +500,19 @@ class DnsServer;
 class SLIB_EXPORT IDnsServerListener
 {
 public:
-	virtual IPv4Address onResolveDnsHost(DnsServer* server, const SocketAddress& clientAddress, const DnsQuestion& question) = 0;
+	virtual IPv4Address onResolveDnsHost(DnsServer* server, const SocketAddress& clientAddress, const DnsQuestion& question);
+	virtual void onCacheDnsHost(DnsServer* server, const String& name, const IPv4Address& addr);
+};
+
+class SLIB_EXPORT DnsServerParam
+{
+public:
+	IPv4Address forwardTarget;
+	Ptr<IDnsServerListener> listener;
+	sl_bool flagUseCache;
+
+public:
+	DnsServerParam();
 };
 
 class SLIB_EXPORT DnsServer : public Object
@@ -512,33 +523,35 @@ public:
 	~DnsServer();
 
 public:
-	static Ref<DnsServer> create(const Ref<AsyncLoop>& loop);
-	static Ref<DnsServer> create();
+	static Ref<DnsServer> create(const DnsServerParam& param);
 
 public:
 	void release();
 
-	void sendAnswer(const SocketAddress& clientAddress, const DnsQuestion& question, const IPv4Address& answer);
-
-	Ref<AsyncLoop> getAsyncLoop();
+	void sendHostAddressAnswer(const SocketAddress& clientAddress, const DnsQuestion& question, const IPv4Address& answer);
 
 public:
-	SLIB_PROPERTY_INLINE(Ptr<IDnsServerListener>, Listener);
+	SLIB_PROPERTY_INLINE(Ptr<IDnsServerListener>, Listener)
 
 private:
 	Ref<Socket> m_udp;
 	Memory m_memReceive;
-	WeakRef<AsyncLoop> m_loop;
 	Ref<Thread> m_thread;
 	
-	Map<String, IPv4Address> m_mapDNS;
+	Map<String, IPv4Address> m_mapDNSCache;
+	sl_bool m_flagUseCache;
+
+	Map<sl_uint16, sl_uint16> m_mapForwardId;
+	Map<sl_uint16, SocketAddress> m_mapForwardAddress;
+	IPv4Address m_forwardTarget;
+	sl_uint16 m_lastForwardId;
+
 
 protected:
-	void _processDnsQuestion(SocketAddress address, DnsQuestion question);
 	void _run();
 
-	virtual IPv4Address resolveDnsHost(DnsServer* server, const SocketAddress& clientAddress, const DnsQuestion& question);
-	
+	virtual IPv4Address resolveDnsHost(const SocketAddress& clientAddress, const DnsQuestion& question);
+	virtual void cacheDnsHost(const String& name, const IPv4Address& addr);
 };
 
 SLIB_NETWORK_NAMESPACE_END

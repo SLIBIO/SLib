@@ -237,7 +237,17 @@ void sl_log_error(const char* tag, const char* msg);
 	slib::WeakRef<TYPE> _m_property_##NAME; \
 	public: \
 	SLIB_INLINE slib::Ref<TYPE> get##NAME() const { \
-		return _m_property_##NAME.lock(); \
+		return _m_property_##NAME; \
+	} \
+	SLIB_INLINE void set##NAME(const slib::Ref<TYPE>& v) { \
+		_m_property_##NAME = v; \
+	}
+
+#define SLIB_REF_PROPERTY_INLINE(TYPE, NAME) protected: \
+	slib::SafeRef<TYPE> _m_property_##NAME; \
+	public: \
+	SLIB_INLINE slib::Ref<TYPE> get##NAME() const { \
+		return _m_property_##NAME; \
 	} \
 	SLIB_INLINE void set##NAME(const slib::Ref<TYPE>& v) { \
 		_m_property_##NAME = v; \
@@ -263,34 +273,24 @@ void sl_log_error(const char* tag, const char* msg);
 		_m_property_##NAME = v; \
 	}
 
-#define SLIB_PROPERTY_USERAPPLY(TYPE, NAME) protected: \
-	TYPE _m_property_##NAME; \
+#define SLIB_WEAK_PROPERTY(TYPE, NAME) protected: \
+	slib::WeakRef<TYPE> _m_property_##NAME; \
 	public: \
-	virtual TYPE const& get##NAME() const { \
+	virtual slib::Ref<TYPE> get##NAME() const { \
 		return _m_property_##NAME; \
 	} \
-	SLIB_INLINE void initialize##NAME(TYPE const& v) { \
+	virtual void set##NAME(const slib::Ref<TYPE>& v) { \
 		_m_property_##NAME = v; \
-	} \
-	virtual void set##NAME(TYPE const& v) { \
-		if (apply##NAME(v)) { \
-			_m_property_##NAME = v; \
-		} \
 	}
 
-#define SLIB_BOOLEAN_PROPERTY_USERAPPLY(NAME) protected: \
-	sl_bool _m_property_##NAME; \
+#define SLIB_REF_PROPERTY(TYPE, NAME) protected: \
+	slib::SafeRef<TYPE> _m_property_##NAME; \
 	public: \
-	virtual sl_bool is##NAME() const { \
+	virtual slib::Ref<TYPE> get##NAME() const { \
 		return _m_property_##NAME; \
 	} \
-	SLIB_INLINE void initialize##NAME(sl_bool v) { \
+	virtual void set##NAME(const slib::Ref<TYPE>& v) { \
 		_m_property_##NAME = v; \
-	} \
-	virtual void set##NAME(sl_bool v) { \
-		if (apply##NAME(v)) { \
-			_m_property_##NAME = v; \
-		} \
 	}
 
 SLIB_NAMESPACE_BEGIN

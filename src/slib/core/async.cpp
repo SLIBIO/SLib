@@ -85,7 +85,7 @@ Ref<AsyncLoop> AsyncLoop::create()
 		if (ret.isNotNull()) {
 			ret->m_flagNonIO = sl_false;
 			ret->m_handle = handle;
-			ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(AsyncLoop, __runLoop, ret.getObject()));
+			ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(AsyncLoop, __runLoop, ret.get()));
 			if (ret->m_thread.isNull()) {
 				ret.setNull();
 			}
@@ -106,7 +106,7 @@ Ref<AsyncLoop> AsyncLoop::createNonIO()
 	ret = new AsyncLoop;
 	if (ret.isNotNull()) {
 		ret->m_flagNonIO = sl_true;
-		ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(AsyncLoop, _runLoopNonIO, ret.getObject()));
+		ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(AsyncLoop, _runLoopNonIO, ret.get()));
 		if (ret->m_thread.isNull()) {
 			ret.setNull();
 		}
@@ -433,7 +433,7 @@ sl_int32 AsyncLoop::_getTimeout_Timer()
 	Ref<ThreadPool> pool = m_threadPool;
 	Link<Timer>* link = m_queueTimers.getBegin();
 	while (link) {
-		Ref<AsyncTimer> timer = link->value.timer.lock();
+		Ref<AsyncTimer> timer(link->value.timer);
 		if (timer.isNotNull()) {
 			if (timer->isStarted()) {
 				sl_uint64 t = rel - timer->getLastRunTime();
@@ -611,7 +611,7 @@ AsyncInstance::~AsyncInstance()
 
 Ref<AsyncObject> AsyncInstance::getObject()
 {
-	return m_object.lock();
+	return m_object;
 }
 
 void AsyncInstance::setObject(AsyncObject* object)
@@ -651,7 +651,7 @@ AsyncObject::~AsyncObject()
 
 Ref<AsyncLoop> AsyncObject::getLoop()
 {
-	Ref<AsyncLoop> loop = m_loop.lock();
+	Ref<AsyncLoop> loop = m_loop;
 	if (loop.isNull()) {
 		loop = AsyncLoop::getDefault();
 	}

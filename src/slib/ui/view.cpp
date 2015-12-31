@@ -39,7 +39,7 @@ const Ref<ViewInstance>& View::getViewInstance()
 
 Ref<Window> View::getWindow()
 {
-	Ref<Window> window =  m_window.lock();
+	Ref<Window> window = m_window;
 	if (window.isNotNull()) {
 		return window;
 	}
@@ -57,7 +57,7 @@ void View::setWindow(const Ref<Window>& window)
 
 Ref<View> View::getParent()
 {
-	return m_parent.lock();
+	return m_parent;
 }
 
 void View::setParent(const Ref<View>& parent)
@@ -474,7 +474,7 @@ void ViewInstance::setView(View* view)
 
 Ref<View> ViewInstance::getView()
 {
-	return m_view.lock();
+	return m_view;
 }
 
 void ViewInstance::onDraw(Canvas* canvas)

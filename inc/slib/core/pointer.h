@@ -191,7 +191,7 @@ public:
 	SLIB_INLINE Ptr(const Ref<O>& reference)
 	{
 		m_reference = reference;
-		m_pointer = (O*)(m_reference.getObject());
+		m_pointer = (O*)(m_reference.get());
 	}
 
 	template <class O>
@@ -202,12 +202,26 @@ public:
 	}
 
 	template <class O>
+	SLIB_INLINE Ptr(const SafeRef<O>& reference)
+	{
+		m_reference = reference;
+		m_pointer = (O*)(m_reference.getObject());
+	}
+
+	template <class O>
+	SLIB_INLINE Ptr(const TYPE* pointer, const SafeRef<O>& reference)
+	{
+		m_pointer = (TYPE*)pointer;
+		m_reference = reference;
+	}
+
+	template <class O>
 	SLIB_INLINE Ptr(const WeakRef<O>& weak)
 	{
-		Ref<O> o = weak.lock();
+		Ref<O> o(weak);
 		if (o.isNotNull()) {
-			m_pointer = (O*)(o.getObject());
-			m_reference = weak.getReference();
+			m_pointer = (O*)(o.get());
+			m_reference = weak.getWeakRefObject();
 		} else {
 			m_pointer = sl_null;
 		}
@@ -217,7 +231,7 @@ public:
 	SLIB_INLINE Ptr(const TYPE* pointer, const WeakRef<O>& weak)
 	{
 		m_pointer = (TYPE*)pointer;
-		m_reference = weak.getReference();
+		m_reference = weak.getWeakRefObject();
 	}
 
 public:
@@ -247,10 +261,37 @@ public:
 	template <class O>
 	SLIB_INLINE Ptr<TYPE>& operator=(const Ref<O>& _reference)
 	{
-		Ref<O> reference = _reference;
+		Ref<O> reference(_reference);
 		TYPE* pointer = reference.get();
 		_Ptr_set((_Ptr_Container*)((void*)this), pointer, Ref<Referable>::from(reference));
 		return *this;
+	}
+
+	SLIB_INLINE Ptr<TYPE>& operator=(const SafeRef<TYPE>& _reference)
+	{
+		Ref<TYPE> reference(_reference);
+		_Ptr_set((_Ptr_Container*)((void*)this), Ref<Referable>::from(reference));
+		return *this;
+	}
+
+	template <class O>
+	SLIB_INLINE Ptr<TYPE>& operator=(const SafeRef<O>& _reference)
+	{
+		Ref<O> reference(_reference);
+		TYPE* pointer = reference.get();
+		_Ptr_set((_Ptr_Container*)((void*)this), pointer, Ref<Referable>::from(reference));
+		return *this;
+	}
+
+	SLIB_INLINE Ptr<TYPE>& operator=(const WeakRef<TYPE>& weak)
+	{
+		return (*this = Ptr<TYPE>(weak));
+	}
+
+	template <class O>
+	SLIB_INLINE Ptr<TYPE>& operator=(const WeakRef<O>& weak)
+	{
+		return (*this = Ptr<TYPE>(weak));
 	}
 
 	SLIB_INLINE sl_bool operator==(const Ptr<TYPE>& other) const

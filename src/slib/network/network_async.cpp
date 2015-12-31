@@ -325,7 +325,7 @@ void AsyncTcpServerInstance::_onAccept(const Ref<Socket>& socketAccept, const So
 	}
 	PtrLocker<IAsyncTcpServerListener> listener(getListener());
 	if (listener.isNotNull()) {
-		listener->onAccept(server.getObject(), socketAccept, address);
+		listener->onAccept(server.get(), socketAccept, address);
 	}
 }
 
@@ -337,7 +337,7 @@ void AsyncTcpServerInstance::_onError()
 	}
 	PtrLocker<IAsyncTcpServerListener> listener(getListener());
 	if (listener.isNotNull()) {
-		listener->onError(server.getObject());
+		listener->onError(server.get());
 	}
 }
 
@@ -397,7 +397,7 @@ void AsyncTcpServer::start()
 	if (loop.isNotNull()) {
 		Ref<AsyncTcpServerInstance> instance = getInstance();
 		if (instance.isNotNull()) {
-			loop->requestOrder(instance.getObject());
+			loop->requestOrder(instance.get());
 		}
 	}
 }

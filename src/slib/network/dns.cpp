@@ -287,7 +287,7 @@ void DnsClient::sendQuestion(const SocketAddress& serverAddress, const DnsQuesti
 	char buf[1024];
 	DNS_HeaderFormat* header = (DNS_HeaderFormat*)buf;
 	Base::zeroMemory(buf, sizeof(DNS_HeaderFormat));
-	header->setQR(sl_false); // Question
+	header->setQuestion(sl_true); // Question
 	header->setId(question.id);
 	header->setRD(sl_true); // Recursive Desired
 	header->setOpcode(DNS_HeaderFormat::opcodeQuery);
@@ -324,7 +324,7 @@ void DnsClient::onReceiveFrom(AsyncUdpSocket* socket, void* data, sl_uint32 size
 			break;
 		}
 		DNS_HeaderFormat* header = (DNS_HeaderFormat*)buf;
-		if (!(header->isQR())) { // is question?
+		if (header->isQuestion()) { // is question?
 			break;
 		}
 		DnsAnswer response;
@@ -420,18 +420,32 @@ Ref<DnsClient> DnsClient::create()
 /*************************************************************
 						DnsServer
 *************************************************************/
+IPv4Address IDnsServerListener::onResolveDnsHost(DnsServer* server, const SocketAddress& clientAddress, const DnsQuestion& question)
+{
+	return IPv4Address::zero();
+}
+
+void IDnsServerListener::onCacheDnsHost(DnsServer* server, const String& name, const IPv4Address& addr)
+{
+}
+
+DnsServerParam::DnsServerParam()
+{
+	forwardTarget.setZero();
+	flagUseCache = sl_false;
+}
+
 DnsServer::DnsServer()
 {
+	m_lastForwardId = 0;
+	m_forwardTarget.setZero();
+
+	m_flagUseCache = sl_false;
 }
 
 DnsServer::~DnsServer()
 {
 	release();
-}
-
-Ref<AsyncLoop> DnsServer::getAsyncLoop()
-{
-	return m_loop.lock();
 }
 
 void DnsServer::release()
@@ -449,7 +463,7 @@ void DnsServer::release()
 	m_udp.setNull();
 }
 
-void DnsServer::sendAnswer(const SocketAddress& clientAddress, const DnsQuestion& question, const IPv4Address& answer)
+void DnsServer::sendHostAddressAnswer(const SocketAddress& clientAddress, const DnsQuestion& question, const IPv4Address& answer)
 {
 	Ref<Socket> udp = m_udp;
 	if (udp.isNull()) {
@@ -457,35 +471,63 @@ void DnsServer::sendAnswer(const SocketAddress& clientAddress, const DnsQuestion
 	}
 
 	char buf[1024];
+	Base::zeroMemory(buf, sizeof(buf));
 
-	DNS_HeaderFormat* header = (DNS_HeaderFormat*)(buf);
-	header->setId(question.id);
-	header->setQR(sl_true); // Response
-	header->setRD(sl_true); // Recursive Desired
-	header->setOpcode(DNS_HeaderFormat::opcodeQuery);
-	header->setResponseCode(DNS_HeaderFormat::responseNoError);
-	header->setQuestionsCount(1);
-	header->setAnswersCount(1);
-	header->setAuthoritiesCount(0);
-	header->setAdditionalsCount(0);
+	if (answer.isNotZero()) {
 
-	sl_uint32 offset = sizeof(DNS_HeaderFormat);
-	DNS_QuestionRecord recordQuestion;
-	recordQuestion.setName(question.name);
-	recordQuestion.setType(DNS_QuestionRecord::type_A);
-	offset = recordQuestion.buildRecord(buf, offset, 1024);
-	if (offset == 0) {
-		return;
+		DNS_HeaderFormat* header = (DNS_HeaderFormat*)(buf);
+		header->setId(question.id);
+		header->setQuestion(sl_false); // Response
+		header->setRD(sl_false);
+		header->setOpcode(DNS_HeaderFormat::opcodeQuery);
+		header->setResponseCode(DNS_HeaderFormat::responseNoError);
+		header->setQuestionsCount(1);
+		header->setAnswersCount(1);
+		header->setAuthoritiesCount(0);
+		header->setAdditionalsCount(0);
+
+		sl_uint32 offset = sizeof(DNS_HeaderFormat);
+		DNS_QuestionRecord recordQuestion;
+		recordQuestion.setName(question.name);
+		recordQuestion.setType(DNS_QuestionRecord::type_A);
+		offset = recordQuestion.buildRecord(buf, offset, 1024);
+		if (offset == 0) {
+			return;
+		}
+
+		DNS_ResponseRecord recordResponse;
+		recordResponse.setName(question.name);
+		offset = recordResponse.buildRecord_A(buf, offset, 1024, answer);
+		if (offset == 0) {
+			return;
+		}
+
+		udp->sendTo(buf, offset, clientAddress);
+
+	} else {
+
+		DNS_HeaderFormat* header = (DNS_HeaderFormat*)(buf);
+		header->setId(question.id);
+		header->setQuestion(sl_false); // Response
+		header->setRD(sl_false);
+		header->setOpcode(DNS_HeaderFormat::opcodeQuery);
+		header->setResponseCode(DNS_HeaderFormat::responseNameError);
+		header->setQuestionsCount(1);
+		header->setAnswersCount(0);
+		header->setAuthoritiesCount(0);
+		header->setAdditionalsCount(0);
+
+		sl_uint32 offset = sizeof(DNS_HeaderFormat);
+		DNS_QuestionRecord recordQuestion;
+		recordQuestion.setName(question.name);
+		recordQuestion.setType(DNS_QuestionRecord::type_A);
+		offset = recordQuestion.buildRecord(buf, offset, 1024);
+		if (offset == 0) {
+			return;
+		}
+
+		udp->sendTo(buf, offset, clientAddress);
 	}
-
-	DNS_ResponseRecord recordResponse;
-	recordResponse.setName(question.name);
-	offset = recordResponse.buildRecord_A(buf, offset, 1024, answer);
-	if (offset == 0) {
-		return;
-	}
-
-	udp->sendTo(buf, offset, clientAddress);
 
 }
 
@@ -493,10 +535,6 @@ void DnsServer::_run()
 {
 	Ref<Socket> udp = m_udp;
 	if (udp.isNull()) {
-		return;
-	}
-	Ref<AsyncLoop> loop = getAsyncLoop();
-	if (loop.isNull()) {
 		return;
 	}
 	Ref<SocketEvent> ev = SocketEvent::createRead(udp);
@@ -508,49 +546,101 @@ void DnsServer::_run()
 	while (Thread::isNotStoppingCurrent()) {
 		SocketAddress address;
 		sl_int32 size = udp->receiveFrom(buf, sizeBuf, address);
-		do {
-			if (size < sizeof(DNS_HeaderFormat)) {
-				break;
-			}
+		if (size >= sizeof(DNS_HeaderFormat)) {
 			DNS_HeaderFormat* header = (DNS_HeaderFormat*)buf;
-			if (header->isQR()) { // is response?
-				break;
-			}
-			if (header->getQuestionsCount() == 0) {
-				break;
-			}
-			sl_uint32 offset = sizeof(DNS_HeaderFormat);
-			DNS_QuestionRecord record;
-			offset = record.parseRecord(buf, offset, size);
-			if (offset == 0) {
-				break;
-			}
-			String host = record.getName();
-			if (host.isNotEmpty()) {
-				DnsQuestion question;
-				question.id = header->getId();
-				question.name = host;
-				loop->addTask(SLIB_CALLBACK_WEAKREF(DnsServer, _processDnsQuestion, this, address, question));
-				IPv4Address ip;
-				if (m_mapDNS.get(question.name, &ip)) {
-					sendAnswer(address, question, ip);
+			if (header->isQuestion()) { // is response?
+				if (header->getQuestionsCount() > 0) {
+					sl_uint32 offset = sizeof(DNS_HeaderFormat);
+					while (1) {
+						DNS_QuestionRecord record;
+						offset = record.parseRecord(buf, offset, size);
+						if (offset == 0) {
+							break;
+						}
+						if (record.getType() == DNS_Record::type_A) {
+							String host = record.getName();
+							if (host.isNotEmpty()) {
+								DnsQuestion question;
+								question.id = header->getId();
+								question.name = host;
+								IPv4Address ip = resolveDnsHost(address, question);
+								sl_bool flagSent = sl_false;
+								if (ip.isNotZero()) {
+									sendHostAddressAnswer(address, question, ip);
+									flagSent = sl_true;
+								} else {
+									if (m_flagUseCache) {
+										if (m_mapDNSCache.get(question.name, &ip)) {
+											sendHostAddressAnswer(address, question, ip);
+											flagSent = sl_true;
+										}
+									}
+								}
+								if (!flagSent) {
+									if (m_forwardTarget.isNotZero()) {
+										sl_uint16 idTarget = m_lastForwardId++;
+										sl_uint16 idSource = header->getId();
+										m_mapForwardId.put(idTarget, idSource);
+										m_mapForwardAddress.put(idTarget, address);
+										header->setId(idTarget);
+										udp->sendTo(buf, size, SocketAddress(m_forwardTarget, SLIB_NETWORK_DNS_PORT));
+									} else {
+										sendHostAddressAnswer(address, question, IPv4Address::zero());
+									}
+								}
+							}
+							break;
+						}
+					}
+				}
+			} else {
+				sl_uint16 idSource = header->getId();
+				sl_uint16 idTarget = 0;
+				if (m_mapForwardId.get(idSource, &idTarget)) {
+					SocketAddress addrTarget;
+					if (m_mapForwardAddress.get(idSource, &addrTarget)) {
+						header->setId(idTarget);
+						udp->sendTo(buf, size, addrTarget);
+					}
+				}
+
+				sl_uint32 i, n;
+				sl_uint32 offset = sizeof(DNS_HeaderFormat);
+
+				n = header->getQuestionsCount();
+				for (i = 0; i < n; i++) {
+					DNS_QuestionRecord record;
+					offset = record.parseRecord(buf, offset, size);
+					if (offset == 0) {
+						break;
+					}
+				}
+				if (i != n) {
+					break;
+				}
+				n = header->getAnswersCount() + header->getAuthoritiesCount() + header->getAdditionalsCount();
+				for (i = 0; i < n; i++) {
+					DNS_ResponseRecord record;
+					offset = record.parseRecord(buf, offset, size);
+					if (offset == 0) {
+						break;
+					}
+					sl_uint16 type = record.getType();
+					if (type == DNS_ResponseRecord::type_A) {
+						String name = record.getName();
+						IPv4Address address = record.parseData_A();
+						if (address.isNotZero()) {
+							cacheDnsHost(name, address);
+						}
+					}
 				}
 			}
-		} while (0);
+		}
 		ev->wait();
 	}
 }
 
-void DnsServer::_processDnsQuestion(SocketAddress address, DnsQuestion question)
-{
-	IPv4Address ip = resolveDnsHost(this, address, question);
-	if (ip.isNotZero()) {
-		m_mapDNS.put(question.name, ip);
-		sendAnswer(address, question, ip);
-	}
-}
-
-IPv4Address DnsServer::resolveDnsHost(DnsServer* server, const SocketAddress& clientAddress, const DnsQuestion& question)
+IPv4Address DnsServer::resolveDnsHost(const SocketAddress& clientAddress, const DnsQuestion& question)
 {
 	PtrLocker<IDnsServerListener> listener(getListener());
 	if (listener.isNotNull()) {
@@ -559,15 +649,19 @@ IPv4Address DnsServer::resolveDnsHost(DnsServer* server, const SocketAddress& cl
 	return IPv4Address::zero();
 }
 
-Ref<DnsServer> DnsServer::create(const Ref<AsyncLoop>& _loop)
+void DnsServer::cacheDnsHost(const String& name, const IPv4Address& address)
 {
-	Ref<AsyncLoop> loop = _loop;
-	if (loop.isNull()) {
-		loop = AsyncLoop::getDefault();
-		if (loop.isNull()) {
-			return Ref<DnsServer>::null();
-		}
+	if (m_flagUseCache) {
+		m_mapDNSCache.put(name, address);
 	}
+	PtrLocker<IDnsServerListener> listener(getListener());
+	if (listener.isNotNull()) {
+		listener->onCacheDnsHost(this, name, address);
+	}
+}
+
+Ref<DnsServer> DnsServer::create(const DnsServerParam& param)
+{
 	Ref<DnsServer> ret;
 	Memory memReceive = Memory::create(4096);
 	if (memReceive.isEmpty()) {
@@ -579,9 +673,10 @@ Ref<DnsServer> DnsServer::create(const Ref<AsyncLoop>& _loop)
 			socket->setNonBlockingMode(sl_true);
 			ret = new DnsServer;
 			if (ret.isNotNull()) {
-				ret->m_loop = loop;
 				ret->m_udp = socket;
 				ret->m_memReceive = memReceive;
+				ret->m_forwardTarget = param.forwardTarget;
+				ret->setListener(param.listener);
 				ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(DnsServer, _run, ret.get()));
 			}
 		} else {
@@ -589,10 +684,5 @@ Ref<DnsServer> DnsServer::create(const Ref<AsyncLoop>& _loop)
 		}
 	}
 	return ret;
-}
-
-Ref<DnsServer> DnsServer::create()
-{
-	return DnsServer::create(AsyncLoop::getDefault());
 }
 SLIB_NETWORK_NAMESPACE_END

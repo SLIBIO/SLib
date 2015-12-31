@@ -10,7 +10,7 @@ Canvas::Canvas()
 
 Ref<GraphicsContext> Canvas::getGraphicsContext()
 {
-	return m_context.lock();
+	return m_context;
 }
 
 void Canvas::setGraphicsContext(const Ref<GraphicsContext>& context)

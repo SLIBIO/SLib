@@ -162,7 +162,7 @@ public:
 							ret->m_bufFrame = new sl_int16[ret->m_nSamplesFrame * 2];
 							ret->setListener(param.listener);
 							if (ret->m_bufFrame) {
-								if ((*bufferQueue)->RegisterCallback(bufferQueue, _OpenSLES_AudioPlayerBufferImpl::callback, ret.getObject()) == SL_RESULT_SUCCESS) {
+								if ((*bufferQueue)->RegisterCallback(bufferQueue, _OpenSLES_AudioPlayerBufferImpl::callback, ret.get()) == SL_RESULT_SUCCESS) {
 									if (param.flagAutoStart) {
 										ret->start();
 									}

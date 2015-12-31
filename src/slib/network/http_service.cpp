@@ -37,12 +37,12 @@ Ref<HttpService> HttpServiceContext::getService()
 
 Ref<HttpServiceConnection> HttpServiceContext::getConnection()
 {
-	return m_connection.lock();
+	return m_connection;
 }
 
 Ref<AsyncStream> HttpServiceContext::getIO()
 {
-	Ref<HttpServiceConnection> connection = m_connection.lock();
+	Ref<HttpServiceConnection> connection = m_connection;
 	if (connection.isNotNull()) {
 		return connection->getIO();
 	}
@@ -112,7 +112,7 @@ Ref<AsyncStream> HttpServiceConnection::getIO()
 
 Ref<HttpService> HttpServiceConnection::getService()
 {
-	return m_service.lock();
+	return m_service;
 }
 
 Ref<HttpServiceConnection> HttpServiceConnection::create(HttpService* _service, AsyncStream* _io)
@@ -374,7 +374,7 @@ public:
 
 	void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError)
 	{
-		Ref<HttpServiceConnection> connection = m_connection.lock();
+		Ref<HttpServiceConnection> connection = m_connection;
 		if (connection.isNotNull()) {
 			connection->close();
 		}
@@ -428,7 +428,7 @@ void HttpServiceConnection::sendProxyResponse_Failed()
 ******************************************************/
 Ref<HttpService> HttpServiceConnectionProvider::getService()
 {
-	return m_service.lock();
+	return m_service;
 }
 
 void HttpServiceConnectionProvider::setService(const Ref<HttpService>& service)
@@ -472,7 +472,7 @@ public:
 			if (stream.isNotNull()) {
 				SocketAddress addrLocal;
 				socketAccept->getLocalAddress(addrLocal);
-				service->addConnection(stream.getObject(), address, addrLocal);
+				service->addConnection(stream.get(), address, addrLocal);
 			}
 		}
 	}
@@ -568,7 +568,7 @@ void HttpService::processRequest(HttpServiceContext* context)
 		return;
 	}
 	if (m_param.flagLogDebug) {
-		SLIB_LOG(SERVICE_TAG, "[" + String::fromPointerValue(connection.getObject()) + "] Method="
+		SLIB_LOG(SERVICE_TAG, "[" + String::fromPointerValue(connection.get()) + "] Method="
 			+ context->getMethod()
 			+ " Path=" + context->getPath()
 			+ " Query=" + context->getQuery()
@@ -634,11 +634,11 @@ Ref<HttpServiceConnection> HttpService::addConnection(const Ref<AsyncStream>& _s
 	Ref<HttpServiceConnection> connection = HttpServiceConnection::create(this, stream.get());
 	if (connection.isNotNull()) {
 		if (m_param.flagLogDebug) {
-			SLIB_LOG(SERVICE_TAG, "[" + String::fromPointerValue(connection.getObject()) + "] Connection Created - Address: " + remoteAddress.toString());
+			SLIB_LOG(SERVICE_TAG, "[" + String::fromPointerValue(connection.get()) + "] Connection Created - Address: " + remoteAddress.toString());
 		}
 		connection->setRemoteAddress(remoteAddress);
 		connection->setLocalAddress(localAddress);
-		m_connections.put(connection.getObject(), connection);
+		m_connections.put(connection.get(), connection);
 		connection->start();
 	}
 	return connection;

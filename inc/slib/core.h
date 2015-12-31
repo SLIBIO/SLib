@@ -1,4 +1,3 @@
-
 #ifndef CHECKHEADER_SLIB_CORE_HEADER
 #define CHECKHEADER_SLIB_CORE_HEADER
 
@@ -7,6 +6,7 @@
 #include "core/endian.h"
 #include "core/mio.h"
 
+#include "core/atomic.h"
 #include "core/spinlock.h"
 #include "core/mutex.h"
 #include "core/reference.h"
@@ -20,6 +20,7 @@
 #include "core/algorithm.h"
 #include "core/array.h"
 #include "core/array2d.h"
+#include "core/iterator.h"
 #include "core/list.h"
 #include "core/map.h"
 #include "core/queue.h"

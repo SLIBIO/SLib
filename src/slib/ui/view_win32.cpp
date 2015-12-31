@@ -306,7 +306,7 @@ sl_bool Win32_ViewInstance::processWindowMessage(UINT msg, WPARAM wParam, LPARAM
 						Ref<Canvas> graphics = UIPlatform::createCanvas(_graphics, rect.right, rect.bottom, &rcDirty);
 						if (graphics.isNotNull()) {
 							_graphics->SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
-							onDraw(graphics.getObject());
+							onDraw(graphics.get());
 						}
 					}
 					::EndPaint(hWnd, &ps);

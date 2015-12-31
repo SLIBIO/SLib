@@ -144,7 +144,7 @@ void RenderObjectGroup2D::dispatchUIEvent(UIEvent* event)
 		return;
 	}
 
-	Ref<RenderObject2D> c = m_childMouseCapture.lock();
+	Ref<RenderObject2D> c = m_childMouseCapture;
 	if (c.isNotNull()) {
 		ButtonState s = c->getButtonState();
 		if (s == buttonStateDown || s == buttonStateHover) {

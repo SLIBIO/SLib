@@ -1047,7 +1047,7 @@ public:
 	Ref<_BaseInstance> getValidInstance(RenderBaseObject* object)
 	{
 		Ref<GL_ENGINE> engine = Ref<GL_ENGINE>::from(object->getEngine());
-		if (engine.getObject() == this) {
+		if (engine.get() == this) {
 			Ref<_BaseInstance> instance = Ref<_BaseInstance>::from(object->getInstance());
 			if (instance.isNotNull() && !(instance->m_flagCleared)) {
 				instance->update(object);
@@ -1267,7 +1267,7 @@ public:
 	void _onUpdateVertexBuffer(VertexBuffer* buffer, sl_size offset, sl_size size)
 	{
 		Ref<_VertexBufferInstance> _instance = Ref<_VertexBufferInstance>::from(buffer->getInstance());
-		_VertexBufferInstance* instance = _instance.getObject();
+		_VertexBufferInstance* instance = _instance.get();
 		if (instance) {
 			sl_size offsetEnd = offset + size;
 			if (instance->m_flagUpdated) {
@@ -1352,7 +1352,7 @@ public:
 	void _onUpdateIndexBuffer(IndexBuffer* buffer, sl_size offset, sl_size size)
 	{
 		Ref<_IndexBufferInstance> _instance = Ref<_IndexBufferInstance>::from(buffer->getInstance());
-		_IndexBufferInstance* instance = _instance.getObject();
+		_IndexBufferInstance* instance = _instance.get();
 		if (instance) {
 			sl_size offsetEnd = offset + size;
 			if (instance->m_flagUpdated) {
@@ -1444,7 +1444,7 @@ public:
 			return;
 		}
 		Ref<_TextureInstance> _instance = Ref<_TextureInstance>::from(texture->getInstance());
-		_TextureInstance* instance = _instance.getObject();
+		_TextureInstance* instance = _instance.get();
 		if (instance) {
 			if (instance->m_flagUpdated) {
 				instance->rectUpdate.mergeRectangle(Rectanglei(x, y, x + width, y + height));

@@ -82,7 +82,7 @@ void UIEvent::transformPoints(const Matrix3& mat)
 	if (isTouchEvent()) {
 		Array<TouchPoint> points = m_points;
 		sl_size n = points.count();
-		TouchPoint* pts = points.getBuf();
+		TouchPoint* pts = points.data();
 		for (sl_size i = 0; i < n; i++) {
 			pts[i].point = mat.transformPosition(pts[i].point);
 		}

@@ -181,7 +181,7 @@ public:
 												ret->m_context = context;
 												ret->m_config = config;
 
-												ret->m_threadRender = Thread::start(SLIB_CALLBACK_CLASS(_EGLRendererImpl, run, ret.getObject()));
+												ret->m_threadRender = Thread::start(SLIB_CALLBACK_CLASS(_EGLRendererImpl, run, ret.get()));
 
 												return ret;
 											}

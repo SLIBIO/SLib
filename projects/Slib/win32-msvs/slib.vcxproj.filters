@@ -688,6 +688,9 @@
     <ClInclude Include="..\..\..\inc\slib\db\database.h">
       <Filter>inc\db</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\atomic.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">
@@ -1253,6 +1256,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\db\database_statement.cpp">
       <Filter>src\slib\db</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\atomic.cpp">
+      <Filter>src\slib\core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

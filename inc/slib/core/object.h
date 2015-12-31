@@ -3,8 +3,10 @@
 
 #include "definition.h"
 #include "reference.h"
+#include "mutex.h"
 
 SLIB_NAMESPACE_BEGIN
+
 class SLIB_EXPORT Object : public Referable
 {
 	SLIB_DECLARE_ROOT_OBJECT(Object)
@@ -12,16 +14,12 @@ private:
 	Mutex m_locker;
 
 public:
-	Object();
+	SLIB_INLINE Object() {}
 
-	SLIB_INLINE const Mutex* getLocker() const
+public:
+	SLIB_INLINE Mutex* getLocker() const
 	{
-		return &m_locker;
-	}
-
-	SLIB_INLINE Mutex* getLocker()
-	{
-		return &m_locker;
+		return (Mutex*)(&m_locker);
 	}
 
 	SLIB_INLINE void lock() const
@@ -38,7 +36,24 @@ public:
 	{
 		return m_locker.tryLock();
 	}
+
 };
+
+class SLIB_EXPORT ObjectLocker
+{
+public:
+	MutexLocker m_locker;
+
+public:
+	SLIB_INLINE ObjectLocker(const Object* object) : m_locker(object ? object->getLocker(): sl_null)
+	{
+	}
+
+	SLIB_INLINE ObjectLocker(const Object* object1, const Object* object2) : m_locker(object1 ? object1->getLocker() : sl_null, object2 ? object2->getLocker() : sl_null)
+	{
+	}
+};
+
 SLIB_NAMESPACE_END
 
-#endif// CHECK_HEADER_SLIB_CORE_OBJECT
+#endif

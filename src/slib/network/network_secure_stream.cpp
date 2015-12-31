@@ -33,9 +33,9 @@ void AsyncTcpSecureStreamServer::onAccept(AsyncTcpServer* socketListen, const Re
 	if (socket.isNotNull()) {
 		AsyncSecureStreamServerParam param = m_param;
 		param.listener = (WeakRef<AsyncTcpSecureStreamServer>)(this);
-		Ref<AsyncSecureStream> stream = SecureStreamServer::createAsyncStream(socket.getObject(), param);
+		Ref<AsyncSecureStream> stream = SecureStreamServer::createAsyncStream(socket.get(), param);
 		if (stream.isNotNull()) {
-			m_streams.put(stream.getObject(), stream);
+			m_streams.put(stream.get(), stream);
 		}
 	}
 }
@@ -98,7 +98,7 @@ Ref<AsyncSecureStream> AsyncTcpSecureStreamClient::create(const Ref<AsyncTcpSock
 	if (socket.isNull()) {
 		return ret;
 	}
-	ret = SecureStreamClient::createAsyncStream(socket.getObject(), param, flagConnect);
+	ret = SecureStreamClient::createAsyncStream(socket.get(), param, flagConnect);
 	return ret;
 }
 
@@ -109,7 +109,7 @@ public:
 
 	void onConnect(AsyncTcpSocket* socket, const SocketAddress& address, sl_bool flagError)
 	{
-		Ref<AsyncSecureStream> stream = m_stream.lock();
+		Ref<AsyncSecureStream> stream = m_stream;
 		if (stream.isNull()) {
 			return;
 		}

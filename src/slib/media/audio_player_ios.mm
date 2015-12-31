@@ -119,7 +119,7 @@ public:
 							
 							AURenderCallbackStruct cs;
 							cs.inputProc = CallbackOutput;
-							cs.inputProcRefCon = ret.getObject();
+							cs.inputProcRefCon = ret.get();
 							
 							result = AudioUnitSetProperty(audioUnitOutput,
 														  kAudioUnitProperty_SetRenderCallback,

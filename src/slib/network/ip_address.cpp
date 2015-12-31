@@ -1,5 +1,6 @@
 #include "../../../inc/slib/network/ip_address.h"
 #include "../../../inc/slib/network/os.h"
+#include "../../../inc/slib/core/math.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 

@@ -26,6 +26,7 @@ class SLIB_EXPORT MutexLocker
 private:
 	sl_size m_count;
 	const Mutex* m_mutex[SLIB_MAX_LOCK_MUTEX];
+
 public:
 	SLIB_INLINE MutexLocker()
 	{
@@ -42,21 +43,25 @@ public:
 		init();
 		lock(mutex);
 	}
+
 	SLIB_INLINE MutexLocker(const Mutex* mutex1, const Mutex* mutex2)
 	{
 		init();
 		lock(mutex1, mutex2);
 	}
+
 	SLIB_INLINE MutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3)
 	{
 		init();
 		lock(mutex1, mutex2, mutex3);
 	}
+
 	SLIB_INLINE MutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3, const Mutex* mutex4)
 	{
 		init();
 		lock(mutex1, mutex2, mutex3, mutex4);
 	}
+
 	SLIB_INLINE MutexLocker(Mutex const* const* mutex_array, sl_size count)
 	{
 		init();

@@ -435,7 +435,7 @@ public:
 			lock.unlock();
 			PtrLocker<IAsyncStreamListener> listener(req->listener);
 			if (listener.isNotNull()) {
-				listener->onRead(this, data, sizeRead, req->refData.getObject(), flagError);
+				listener->onRead(this, data, sizeRead, req->refData.get(), flagError);
 			}
 		} else {
 			if (flagError) {
@@ -490,7 +490,7 @@ public:
 		AsyncStreamRequest* req = (AsyncStreamRequest*)ref;
 		PtrLocker<IAsyncStreamListener> listener(req->listener);
 		if (listener.isNotNull()) {
-			listener->onWrite(this, data, sizeWritten, req->refData.getObject(), flagError);
+			listener->onWrite(this, data, sizeWritten, req->refData.get(), flagError);
 		}
 	}
 
@@ -499,7 +499,7 @@ public:
 		if (req.isNotNull()) {
 			PtrLocker<IAsyncStreamListener> listener(req->listener);
 			if (listener.isNotNull()) {
-				listener->onRead(this, req->data, req->size, req->refData.getObject(), sl_false);
+				listener->onRead(this, req->data, req->size, req->refData.get(), sl_false);
 			}
 		}
 	}
@@ -1047,7 +1047,7 @@ public:
 			lock.unlock();
 			PtrLocker<IAsyncStreamListener> listener(req->listener);
 			if (listener.isNotNull()) {
-				listener->onRead(this, data, sizeRead, req->refData.getObject(), flagError);
+				listener->onRead(this, data, sizeRead, req->refData.get(), flagError);
 			}
 		} else {
 			if (flagError) {
@@ -1094,7 +1094,7 @@ public:
 		AsyncStreamRequest* req = (AsyncStreamRequest*)ref;
 		PtrLocker<IAsyncStreamListener> listener(req->listener);
 		if (listener.isNotNull()) {
-			listener->onWrite(this, data, sizeWritten, req->refData.getObject(), flagError);
+			listener->onWrite(this, data, sizeWritten, req->refData.get(), flagError);
 		}
 	}
 
@@ -1103,7 +1103,7 @@ public:
 		if (req.isNotNull()) {
 			PtrLocker<IAsyncStreamListener> listener(req->listener);
 			if (listener.isNotNull()) {
-				listener->onRead(this, req->data, req->size, req->refData.getObject(), sl_false);
+				listener->onRead(this, req->data, req->size, req->refData.get(), sl_false);
 			}
 		}
 	}

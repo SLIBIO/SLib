@@ -133,7 +133,7 @@ public:
 		}
 		PtrLocker<IAsyncStreamListener> listener(req->listener);
 		if (listener.isNotNull()) {
-			listener->onRead((AsyncStream*)(object.getObject()), req->data, size, req->refData.get(), flagError);
+			listener->onRead((AsyncStream*)(object.get()), req->data, size, req->refData.get(), flagError);
 		}
 	}
 
@@ -145,7 +145,7 @@ public:
 		}
 		PtrLocker<IAsyncStreamListener> listener(req->listener);
 		if (listener.isNotNull()) {
-			listener->onWrite((AsyncStream*)(object.getObject()), req->data, size, req->refData.get(), flagError);
+			listener->onWrite((AsyncStream*)(object.get()), req->data, size, req->refData.get(), flagError);
 		}
 	}
 

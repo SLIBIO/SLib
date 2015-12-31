@@ -4,31 +4,45 @@
 #include "definition.h"
 #include "algorithm.h"
 #include "reference.h"
-#include "math.h"
+#include "iterator.h"
 
 SLIB_NAMESPACE_BEGIN
-template <class TYPE>
-class SLIB_EXPORT ArrayObject : public Referable
+
+template <class T>
+class SLIB_EXPORT ArrayInfo
 {
-	SLIB_DECLARE_ROOT_OBJECT(ArrayObject)
 public:
-	TYPE* m_data;
+	T* data;
+	sl_size count;
+	Ref<Referable> refer;
+};
+
+template < class T, class COMPARE = Compare<T> >
+class SLIB_EXPORT CArray : public Referable
+{
+	SLIB_DECLARE_ROOT_OBJECT(CArray)
+public:
+	typedef CArray<T, COMPARE> _Type;
+
+protected:
+	T* m_data;
 	sl_size m_count;
-	sl_size m_size;
 	sl_bool m_flagStatic;
 	Ref<Referable> m_refer;
 	
-private:
-	ArrayObject() {}
+protected:
+	SLIB_INLINE CArray()
+	{
+	}
 	
 public:
-	~ArrayObject()
+	~CArray()
 	{
 		if (! m_flagStatic) {
 			if (m_data) {
-				TYPE* p = m_data;
+				T* p = m_data;
 				for (sl_size i = 0; i < m_count; i++) {
-					p->~TYPE();
+					p->~T();
 					p ++;
 				}
 				Base::freeMemory(m_data);
@@ -37,152 +51,360 @@ public:
 	}
 	
 public:
-	static ArrayObject<TYPE>* create(sl_size count, const TYPE* data = sl_null)
+	SLIB_INLINE static _Type* create(sl_size count)
+	{
+		return create(sl_null, count);
+	}
+
+	static _Type* create(const T* data, sl_size count)
 	{
 		if (count == 0) {
 			return sl_null;
 		}
-		sl_size size = count * sizeof(TYPE);
-		TYPE* dataNew = (TYPE*)(Base::createMemory(size));
+		sl_size size = count * sizeof(T);
+		T* dataNew = (T*)(Base::createMemory(size));
 		if (dataNew == sl_null) {
 			return sl_null;
 		}
-		ArrayObject<TYPE>* ret = new ArrayObject<TYPE>();
+		_Type* ret = new _Type;
 		if (ret) {
 			if (data) {
-				TYPE* p = dataNew;
-				const TYPE* q = data;
+				T* p = dataNew;
+				const T* q = data;
 				for (sl_size i = 0; i < count; i++) {
-					new (p) TYPE(*q);
+					new (p) T(*q);
 					p ++;
 					q ++;
 				}
 			} else {
-				TYPE* p = dataNew;
+				T* p = dataNew;
 				for (sl_size i = 0; i < count; i++) {
-					new (p) TYPE();
+					new (p) T();
 					p ++;
 				}
 			}
 			ret->m_flagStatic = sl_false;
 			ret->m_data = dataNew;
 			ret->m_count = count;
-			ret->m_size = size;
 		} else {
 			Base::freeMemory(dataNew);
 		}
 		return ret;
 	}
 	
-	static ArrayObject<TYPE>* createStatic(const void* data, sl_size count, const Ref<Referable>& refer) {
+	static _Type* createStatic(const T* data, sl_size count, const Ref<Referable>& refer)
+	{
 		if (data == sl_null || count == 0) {
 			return sl_null;
 		}
-		ArrayObject<TYPE>* ret = new ArrayObject<TYPE>();
+		_Type* ret = new ArrayObject<T>();
 		if (ret) {
 			ret->m_flagStatic = sl_true;
-			ret->m_data = (TYPE*)data;
+			ret->m_data = (T*)data;
 			ret->m_count = count;
-			ret->m_size = sizeof(TYPE) * count;
 			ret->m_refer = refer;
 		}
 		return ret;
 	}
-};
 
-template <class TYPE>
-class SLIB_EXPORT ArrayInfo
-{
 public:
-	TYPE* data;
-	sl_size count;
-	Ref<Referable> object;
-	
-	SLIB_INLINE TYPE& operator[](sl_reg index)
+	SLIB_INLINE T* getData() const
 	{
-		return data[index];
-	}
-};
-
-/** auto-referencing object **/
-template <class TYPE, class COMPARE = Compare<TYPE> >
-class SLIB_EXPORT Array
-{
-	typedef Array<TYPE, COMPARE> _Array;
-	SLIB_DECLARE_OBJECT_TYPE_FROM(_Array, ArrayObject<TYPE>)
-	SLIB_DECLARE_OBJECT_WRAPPER(Array, _Array, ArrayObject<TYPE>, Ref< ArrayObject<TYPE> >)
-	
-public:
-	SLIB_INLINE Array(sl_size count) : m_object(ArrayObject<TYPE>::create(count))
-	{
-	}
-	
-	SLIB_INLINE Array(const TYPE* data, sl_size count) : m_object(ArrayObject<TYPE>::create(count, data))
-	{
-	}
-	
-	SLIB_INLINE static Array<TYPE> create(sl_size count)
-	{
-		Array<TYPE> ret(count);
-		return ret;
+		return m_data;
 	}
 
-	SLIB_INLINE static Array<TYPE> create(const TYPE* data, sl_size count)
+	SLIB_INLINE T* data() const
 	{
-		Array<TYPE> ret(data, count);
-		return ret;
-	}
-
-	SLIB_INLINE static Array<TYPE> createStatic(const TYPE* data, sl_size count)
-	{
-		Array<TYPE> ret;
-		ret.m_object = ArrayObject<TYPE>::createStatic(data, count, sl_null);
-		return ret;
-	}
-
-	SLIB_INLINE static Array<TYPE> createStatic(const TYPE* data, sl_size count, const Ref<Referable>& refer)
-	{
-		Array<TYPE> ret;
-		ret.m_object = ArrayObject<TYPE>::createStatic(data, count, refer);
-		return ret;
-	}
-
-	Array<TYPE> sub(sl_size start, sl_size count)
-	{
-		Array<TYPE> ret;
-		Array<TYPE> arr = *this;
-		sl_size countParent = arr.getCount();
-		if (start >= countParent) {
-			return ret;
-		}
-		if (count > countParent - start) {
-			count = countParent - start;
-		}
-		if (count == 0) {
-			return ret;
-		}
-		ret.m_object = ArrayObject<TYPE>::createStatic(arr.getBuf() + start, count, arr.getReference());
-		return ret;
-	}
-	
-	SLIB_INLINE TYPE* getBuf() const
-	{
-		Ref< ArrayObject<TYPE> > object = m_object;
-		if (object.isNotNull()) {
-			return object->m_data;
-		} else {
-			return sl_null;
-		}
+		return m_data;
 	}
 
 	SLIB_INLINE sl_size getCount() const
 	{
-		Ref< ArrayObject<TYPE> > object = m_object;
-		if (object.isNotNull()) {
-			return object->m_count;
-		} else {
+		return m_count;
+	}
+
+	SLIB_INLINE sl_size count() const
+	{
+		return m_count;
+	}
+
+	SLIB_INLINE sl_bool isStatic() const
+	{
+		return m_flagStatic;
+	}
+
+	SLIB_INLINE const Ref<Referable>& getRefer() const
+	{
+		return m_refer;
+	}
+
+public:
+	SLIB_INLINE T& operator[](sl_reg index) const
+	{
+		return m_data[index];
+	}
+
+	SLIB_INLINE T* getItemPtr(sl_size index) const
+	{
+		if (index < m_count) {
+			return m_data + index;
+		}
+		return sl_null;
+	}
+
+	SLIB_INLINE sl_bool getItem(sl_size index, T* _out = sl_null) const
+	{
+		if (index < m_count) {
+			*_out = m_data[index];
+			return sl_true;
+		}
+		return sl_false;
+	}
+
+	SLIB_INLINE T getItemValue(sl_size index, const T& def) const
+	{
+		if (index < m_count) {
+			return m_data[index];
+		}
+		return def;
+	}
+
+	SLIB_INLINE sl_bool setItem(sl_size index, const T& value) const
+	{
+		if (index < m_count) {
+			m_data[index] = value;
+			return sl_true;
+		}
+		return sl_false;
+	}
+
+public:
+	_Type* sub(sl_size start, sl_size count = SLIB_SIZE_MAX) const
+	{
+		sl_size countParent = m_count;
+		if (start < countParent) {
+			if (count > countParent - start) {
+				count = countParent - start;
+			}
+			if (count > 0) {
+				if (m_flagStatic) {
+					return createStatic(m_data + start, count, m_refer);
+				} else {
+					return createStatic(m_data + start, count, this);
+				}
+			}
+		}
+		return sl_null;
+	}
+
+	sl_reg indexOf(const T& value, sl_reg start = 0) const
+	{
+		sl_reg ret = -1;
+		sl_reg n = m_count;
+		T* p = m_data;
+		if (start < 0) {
+			start = 0;
+		}
+		for (sl_reg i = start; i < n; i++) {
+			if (COMPARE::equals(p[i], value)) {
+				ret = i;
+				break;
+			}
+		}
+		return ret;
+	}
+
+	sl_reg lastIndexOf(const T& value, sl_reg start = -1) const
+	{
+		sl_reg ret = -1;
+		sl_reg n = m_count;
+		T* p = m_data;
+		if (start < 0 || start >= n) {
+			start = n - 1;
+		}
+		for (sl_reg i = start; i >= 0; i--) {
+			if (COMPARE::equals(p[i], value)) {
+				ret = i;
+				break;
+			}
+		}
+		return ret;
+	}
+
+	SLIB_INLINE sl_bool contains(const T& value) const
+	{
+		return indexOf(value) >= 0;
+	}
+
+	template <class _T>
+	sl_size read(sl_size startSource, sl_size len, _T* dataDst) const
+	{
+		T* pSrc = m_data;
+		_T* pDst = dataDst;
+		if (pDst && pSrc) {
+			sl_size countSrc = m_count;
+			if (startSource < countSrc) {
+				sl_size lenSrc = countSrc - startSource;
+				if (len > lenSrc) {
+					len = lenSrc;
+				}
+				pSrc += startSource;
+				for (sl_size i = 0; i < len; i++) {
+					*(pDst) = *(pSrc);
+					pDst++;
+					pSrc++;
+				}
+				return len;
+			}
+		}
+		return 0;
+	}
+
+	template <class _T>
+	sl_size write(sl_size startTarget, sl_size len, const _T* dataSrc) const
+	{
+		T* pDst = m_data;
+		const _T* pSrc = dataSrc;
+		if (pSrc && pDst) {
+			sl_size countDst = m_count;
+			if (startTarget < countDst) {
+				sl_size lenDst = countDst - startTarget;
+				if (len > lenDst) {
+					len = lenDst;
+				}
+				pDst += startTarget;
+				for (sl_size i = 0; i < len; i++) {
+					*(pDst) = *(pSrc);
+					pDst++;
+					pSrc++;
+				}
+				return len;
+			}
+		}
+		return 0;
+	}
+
+	template <class _T, class _COMPARE>
+	sl_size copy(sl_size startTarget, const CArray<_T, _COMPARE>* source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const
+	{
+		T* pSrc = source->data();
+		if (pSrc == sl_null) {
 			return 0;
 		}
+		sl_size countSrc = source->count();
+		if (startSource >= countSrc) {
+			return 0;
+		}
+		sl_size lenSrc = countSrc - startSource;
+		if (len > lenSrc) {
+			len = lenSrc;
+		}
+		return write<_T>(startTarget, len, pSrc + startSource);
+	}
+
+	template <class _T, class _COMPARE>
+	SLIB_INLINE sl_size copy(const CArray<_T, _COMPARE>* source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX) const
+	{
+		return copy(0, source, start, len);
+	}
+
+	SLIB_INLINE _Type* duplicate() const
+	{
+		return create(m_data, m_count);
+	}
+};
+
+template <class T, class COMPARE>
+class SafeArray;
+
+/** auto-referencing object **/
+template < class T, class COMPARE = Compare<T> >
+class SLIB_EXPORT Array
+{
+	typedef Array<T, COMPARE> _Type;
+	typedef CArray<T, COMPARE> _Obj;
+	typedef Ref<_Obj> _Ref;
+	SLIB_DECLARE_OBJECT_TYPE_FROM(_Type, _Obj)
+	SLIB_DECLARE_OBJECT_WRAPPER(Array, _Type, _Obj, _Ref)
+	
+public:
+	SLIB_INLINE Array(sl_size count) : m_object(_Obj::create(count))
+	{
+	}
+	
+	SLIB_INLINE Array(const T* data, sl_size count) : m_object(_Obj::create(data, count))
+	{
+	}
+
+	SLIB_INLINE Array(const T* data, sl_size count, const Ref<Referable>& refer) : m_object(_Obj::create(data, count, refer))
+	{
+	}
+
+public:
+	template <class _COMPARE>
+	SLIB_INLINE Array(const Array<T, _COMPARE>& other) : m_object(other.getReference())
+	{
+	}
+
+	template <class _COMPARE>
+	SLIB_INLINE _Type& operator=(const Array<T, _COMPARE>& other)
+	{
+		m_object = other.getReference();
+		return *this;
+	}
+
+	Array(const SafeArray<T, COMPARE>& other);
+
+	_Type& operator=(const SafeArray<T, COMPARE>& other);
+
+	SLIB_INLINE _Obj* getObject() const
+	{
+		return m_object.get();
+	}
+
+public:
+	SLIB_INLINE static _Type create(sl_size count)
+	{
+		return _Type(count);
+	}
+
+	SLIB_INLINE static _Type create(const T* data, sl_size count)
+	{
+		return _Type(data, count);
+	}
+
+	SLIB_INLINE static _Type createStatic(const T* data, sl_size count)
+	{
+		return _Type(data, count, Ref<Referable>::null());
+	}
+
+	SLIB_INLINE static _Type createStatic(const T* data, sl_size count, const Ref<Referable>& refer)
+	{
+		return _Type(data, count, refer);
+	}
+
+public:
+	SLIB_INLINE T* getData() const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->data();
+		}
+		return sl_null;
+	}
+
+	SLIB_INLINE T* data() const
+	{
+		return getData();
+	}
+
+	SLIB_INLINE sl_size getCount() const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->count();
+		}
+		return 0;
 	}
 
 	SLIB_INLINE sl_size count() const
@@ -190,234 +412,191 @@ public:
 		return getCount();
 	}
 
-	SLIB_INLINE TYPE& operator[](sl_reg index)
+	SLIB_INLINE sl_bool isEmpty() const
 	{
-		return *(m_object->m_data + index);
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->count() == 0;
+		}
+		return sl_true;
 	}
-	
-	SLIB_INLINE TYPE* getItemPtr(sl_size index) const
+
+	SLIB_INLINE sl_bool isNotEmpty() const
 	{
-		Ref< ArrayObject<TYPE> > object = m_object;
-		if (object.isNotNull()) {
-			if (index < object->m_count) {
-				return object->m_data + index;
-			}
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->count() != 0;
+		}
+		return sl_false;
+	}
+
+public:
+	SLIB_INLINE T& operator[](sl_reg index) const
+	{
+		return *(m_object->data() + index);
+	}
+
+	SLIB_INLINE T* getItemPtr(sl_size index) const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->getItemPtr(index);
 		}
 		return sl_null;
 	}
-	
-	SLIB_INLINE sl_bool getItem(sl_size index, TYPE* _out = sl_null) const
+
+	SLIB_INLINE sl_bool getItem(sl_size index, T* _out = sl_null) const
 	{
-		Ref< ArrayObject<TYPE> > object = m_object;
-		if (object.isNotNull()) {
-			if (index < object->m_count) {
-				*_out = object->m_data[index];
-				return sl_true;
-			}
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->getItem(index, _out);
 		}
 		return sl_false;
 	}
-	
-	SLIB_INLINE TYPE getItemValue(sl_size index, const TYPE& def) const
+
+	SLIB_INLINE T getItemValue(sl_size index, const T& def) const
 	{
-		Ref< ArrayObject<TYPE> > object = m_object;
-		if (object.isNotNull()) {
-			if (index < object->m_count) {
-				return object->m_data[index];
-			}
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->getItemValue(index, def);
 		}
 		return def;
 	}
-	
-	SLIB_INLINE sl_bool setItem(sl_size index, const TYPE& value)
+
+	SLIB_INLINE sl_bool setItem(sl_size index, const T& value) const
 	{
-		Ref< ArrayObject<TYPE> > object = m_object;
-		if (object.isNotNull()) {
-			if (index < object->m_count) {
-				object->m_data[index] = value;
-				return sl_true;
-			}
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->setItem(index, value);
 		}
 		return sl_false;
 	}
 
-	sl_reg indexOf(const TYPE& value, sl_reg start = 0)
+public:
+	SLIB_INLINE _Type sub(sl_size start, sl_size count = SLIB_SIZE_MAX) const
 	{
-		Ref< ArrayObject<TYPE> > object = m_object;
-		sl_reg ret = -1;
-		if (object.isNotNull()) {
-			sl_reg n = object->m_count;
-			TYPE* p = object->m_data;
-			if (start < 0) {
-				start = 0;
-			}
-			for (sl_reg i = start; i < n; i++) {
-				if (COMPARE::equals(p[i], value)) {
-					ret = i;
-					break;
-				}
-			}
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->sub(start, count);
 		}
-		return ret;
+		return _Type::null();
 	}
 
-	sl_reg lastIndexOf(const TYPE& value, sl_reg start = -1)
+	SLIB_INLINE sl_reg indexOf(const T& value, sl_reg start = 0) const
 	{
-		Ref< ArrayObject<TYPE> > object = m_object;
-		sl_reg ret = -1;
-		if (object.isNotNull()) {
-			sl_reg n = object->m_count;
-			TYPE* p = object->m_data;
-			if (start < 0 || start >= n) {
-				start = n - 1;
-			}
-			for (sl_reg i = start; i >= 0; i--) {
-				if (COMPARE::equals(p[i], value)) {
-					ret = i;
-					break;
-				}
-			}
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->indexOf(value, start);
 		}
-		return ret;
+		return -1;
 	}
 
-	SLIB_INLINE sl_bool contains(const TYPE& value)
+	SLIB_INLINE sl_reg lastIndexOf(const T& value, sl_reg start = -1) const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->lastIndexOf(value, start);
+		}
+		return -1;
+	}
+
+	SLIB_INLINE sl_bool contains(const T& value) const
 	{
 		return indexOf(value) >= 0;
 	}
 	
-	template <class T>
-	sl_size read(sl_size startSource, sl_size len, T* dataDst)
+	template <class _T>
+	SLIB_INLINE sl_size read(sl_size startSource, sl_size len, _T* dataDst) const
 	{
-		Array<TYPE> source = *this;
-		TYPE* pSrc = source.getBuf();
-		T* pDst = dataDst;
-		if (pDst == sl_null || pSrc == sl_null) {
-			return 0;
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->read(startSource, len, dataDst);
 		}
-		sl_size countSrc = source.getCount();
-		if (startSource >= countSrc) {
-			return 0;
-		}
-		sl_size lenSrc = countSrc - startSource;
-		if (len > lenSrc) {
-			len = lenSrc;
-		}
-		pSrc += startSource;
-		for (sl_size i = 0; i < len; i++) {
-			*(pDst) = *(pSrc);
-			pDst ++;
-			pSrc ++;
-		}
-		return len;
+		return 0;
 	}
 	
-	template <class T>
-	sl_size write(sl_size startTarget, sl_size len, const T* dataSrc)
+	template <class _T>
+	SLIB_INLINE sl_size write(sl_size startTarget, sl_size len, const _T* dataSrc) const
 	{
-		Array<TYPE> target = *this;
-		TYPE* pDst = target.getBuf();
-		const T* pSrc = dataSrc;
-		if (pDst == sl_null || pSrc == sl_null) {
-			return 0;
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->write(startTarget, len, dataSrc);
 		}
-		sl_size countDst = target.getCount();
-		if (startTarget >= countDst) {
-			return 0;
-		}
-		sl_size lenDst = countDst - startTarget;
-		if (len > lenDst) {
-			len = lenDst;
-		}
-		pDst += startTarget;
-		for (sl_size i = 0; i < len; i++) {
-			*(pDst) = *(pSrc);
-			pDst ++;
-			pSrc ++;
-		}
-		return len;
+		return 0;
 	}
 
-	template <class T, class _COMPARE>
-	sl_size copy(sl_size startTarget, Array<T, _COMPARE> source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX)
+	template <class _T, class _COMPARE>
+	sl_size copy(sl_size startTarget, const Array<_T, _COMPARE>& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const
 	{
-		TYPE* pSrc = source.getBuf();
-		if (pSrc == sl_null) {
-			return 0;
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->copy(startTarget, source.getObject(), startSource, len);
 		}
-		sl_size countSrc = source.getCount();
-		if (startSource >= countSrc) {
-			return 0;
-		}
-		sl_size lenSrc = countSrc - startSource;
-		if (len > lenSrc) {
-			len = lenSrc;
-		}
-		return write<T>(startTarget, len, pSrc + startSource);
+		return 0;
 	}
 	
-	template <class T, class _COMPARE>
-	SLIB_INLINE sl_size copy(const Array<T, _COMPARE>& source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX)
+	template <class _T, class _COMPARE>
+	SLIB_INLINE sl_size copy(const Array<_T, _COMPARE>& source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX) const
 	{
 		return copy(0, source, start, len);
 	}
 	
-	sl_bool getInfo(ArrayInfo<TYPE>& info)
+	SLIB_INLINE _Type duplicate() const
 	{
-		Ref< ArrayObject<TYPE> > obj = m_object;
-		if (obj.isNotNull()) {
-			info.data = obj->m_data;
-			info.count = obj->m_count;
-			if (obj->m_flagStatic) {
-				info.object = obj->m_refer;
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->duplicate();
+		}
+		return _Type::null();
+	}
+
+	Iterator<T> iterator() const;
+
+	sl_bool getInfo(ArrayInfo<T>& info)
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			info.data = obj->data();
+			info.count = obj->count();
+			if (obj->isStatic()) {
+				info.refer = obj->getRefer();
 			} else {
-				info.object = obj.get();
+				info.refer = obj;
 			}
 			return sl_true;
 		} else {
 			info.data = sl_null;
 			info.count = 0;
-			info.object.setNull();
+			info.refer.setNull();
 			return sl_false;
 		}
 	}
-	
-	SLIB_INLINE Array<TYPE> duplicate() const
-	{
-		Ref< ArrayObject<TYPE> > obj = m_object;
-		if (obj.isNotNull()) {
-			return Array<TYPE>::create(obj->m_data, obj->m_count);
-		}
-		return Array<TYPE>::null();
-	}
 
-	Iterator<TYPE> iterator() const;
 };
 
-template <class TYPE, class COMPARE>
-class SLIB_EXPORT ArrayIterator : public IIterator<TYPE>
+template <class T, class COMPARE>
+class SLIB_EXPORT ArrayIterator : public IIterator<T>
 {
 protected:
-	ArrayInfo<TYPE> m_arr;
+	ArrayInfo<T> m_arr;
 	sl_size m_index;
 
 public:
-	ArrayIterator(const Array<TYPE, COMPARE>& arr)
+	SLIB_INLINE ArrayIterator(const Array<T, COMPARE>& arr)
 	{
 		m_index = 0;
 		arr.getInfo(m_arr);
 	}
 
-	~ArrayIterator()
-	{
-	}
-
+public:
+	// override
 	sl_bool hasNext()
 	{
 		return (m_index < m_arr.count);
 	}
 
-	sl_bool next(TYPE* out)
+	// override
+	sl_bool next(T* out)
 	{
 		sl_uint32 index = m_index;
 		if (index < m_arr.count) {
@@ -430,23 +609,225 @@ public:
 		return sl_false;
 	}
 
+	// override
 	sl_reg getIndex()
 	{
 		return (sl_reg)m_index - 1;
 	}
 };
 
-template <class TYPE, class COMPARE>
-Iterator<TYPE> Array<TYPE, COMPARE>::iterator() const
+template <class T, class COMPARE>
+Iterator<T> Array<T, COMPARE>::iterator() const
 {
-	Array<TYPE, COMPARE> o = *this;
-	if (o.isNotNull()) {
-		return new ArrayIterator<TYPE, COMPARE>(o);
-	} else {
-		return Iterator<TYPE>::null();
+	_Obj* obj = m_object.get();
+	if (obj) {
+		return new ArrayIterator<T, COMPARE>(obj);
 	}
+	return Iterator<T>::null();
 }
 
+
+/** auto-referencing object **/
+template < class T, class COMPARE = Compare<T> >
+class SLIB_EXPORT SafeArray
+{
+	typedef SafeArray<T, COMPARE> _Type;
+	typedef CArray<T, COMPARE> _Obj;
+	typedef SafeRef<_Obj> _Ref;
+	typedef Array<T, COMPARE> _LocalType;
+	typedef Ref<_Obj> _LocalRef;
+	SLIB_DECLARE_OBJECT_TYPE_FROM(_Type, _Obj)
+	SLIB_DECLARE_OBJECT_WRAPPER(SafeArray, _Type, _Obj, _Ref)
+
+public:
+	SLIB_INLINE SafeArray(sl_size count) : m_object(_Obj::create(count))
+	{
+	}
+
+	SLIB_INLINE SafeArray(const T* data, sl_size count) : m_object(_Obj::create(data, count))
+	{
+	}
+
+	SLIB_INLINE SafeArray(const T* data, sl_size count, const Ref<Referable>& refer) : m_object(_Obj::create(data, count, refer))
+	{
+	}
+
+public:
+	template <class _COMPARE>
+	SLIB_INLINE SafeArray(const SafeArray<T, _COMPARE>& other) : m_object(other.getReference())
+	{
+	}
+
+	template <class _COMPARE>
+	SLIB_INLINE _Type& operator=(const SafeArray<T, _COMPARE>& other)
+	{
+		m_object = other.getReference();
+		return *this;
+	}
+
+	SLIB_INLINE SafeArray(const Array<T, COMPARE>& other) : m_object(other.getReference())
+	{
+	}
+
+	SLIB_INLINE _Type& operator=(const Array<T, COMPARE>& other)
+	{
+		m_object = other.getReference();
+		return *this;
+	}
+
+public:
+	SLIB_INLINE sl_size getCount() const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->count();
+		}
+		return 0;
+	}
+
+	SLIB_INLINE sl_size count() const
+	{
+		return getCount();
+	}
+
+	SLIB_INLINE sl_bool isEmpty() const
+	{
+		return getCount() == 0;
+	}
+
+	SLIB_INLINE sl_bool isNotEmpty() const
+	{
+		return getCount() != 0;
+	}
+
+public:
+	SLIB_INLINE sl_bool getItem(sl_size index, T* _out = sl_null) const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->getItem(index, _out);
+		}
+		return sl_false;
+	}
+
+	SLIB_INLINE T getItemValue(sl_size index, const T& def) const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->getItemValue(index, def);
+		}
+		return def;
+	}
+
+	SLIB_INLINE sl_bool setItem(sl_size index, const T& value) const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->setItem(index, value);
+		}
+		return sl_false;
+	}
+
+public:
+	SLIB_INLINE _LocalType sub(sl_size start, sl_size count = SLIB_SIZE_MAX) const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->sub(start, count);
+		}
+		return _LocalType::null();
+	}
+
+	SLIB_INLINE sl_reg indexOf(const T& value, sl_reg start = 0) const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->indexOf(value, start);
+		}
+		return -1;
+	}
+
+	SLIB_INLINE sl_reg lastIndexOf(const T& value, sl_reg start = -1) const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->lastIndexOf(value, start);
+		}
+		return -1;
+	}
+
+	SLIB_INLINE sl_bool contains(const T& value) const
+	{
+		return indexOf(value) >= 0;
+	}
+
+	template <class _T>
+	SLIB_INLINE sl_size read(sl_size startSource, sl_size len, _T* dataDst) const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->read(startSource, len, dataDst);
+		}
+		return 0;
+	}
+
+	template <class _T>
+	SLIB_INLINE sl_size write(sl_size startTarget, sl_size len, const _T* dataSrc) const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->write(startTarget, len, dataSrc);
+		}
+		return 0;
+	}
+
+	template <class _T, class _COMPARE>
+	SLIB_INLINE sl_size copy(sl_size startTarget, const Array<_T, _COMPARE>& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->copy(startTarget, source.getObject(), startSource, len);
+		}
+		return 0;
+	}
+
+	template <class _T, class _COMPARE>
+	SLIB_INLINE sl_size copy(const Array<_T, _COMPARE>& source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX) const
+	{
+		return copy(0, source, start, len);
+	}
+
+	SLIB_INLINE _LocalType duplicate() const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->duplicate();
+		}
+		return _LocalType::null();
+	}
+
+	sl_bool getInfo(ArrayInfo<T>& info);
+
+};
+
+template <class T, class COMPARE>
+SLIB_INLINE Array<T, COMPARE>::Array(const SafeArray<T, COMPARE>& other) : m_object(other.getReference())
+{
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE Array<T, COMPARE>& Array<T, COMPARE>::operator=(const SafeArray<T, COMPARE>& other)
+{
+	m_object = other.getReference();
+	return *this;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE sl_bool SafeArray<T, COMPARE>::getInfo(ArrayInfo<T>& info)
+{
+	_LocalType obj(*this);
+	return obj.getInfo(info);
+}
 SLIB_NAMESPACE_END
 
 #endif

@@ -2,65 +2,59 @@
 #define CHECKHEADER_SLIB_CORE_ITERATOR
 
 #include "definition.h"
-#include "object.h"
-
-/************************************************************************/
-/* IIterator Interface Declaration                                      */
-/************************************************************************/
+#include "reference.h"
 
 SLIB_NAMESPACE_BEGIN
+
 template <class TYPE>
-class SLIB_EXPORT IIterator : public Object
+class SLIB_EXPORT IIterator : public Referable
 {
-	SLIB_DECLARE_OBJECT(IIterator, Object)
+	SLIB_DECLARE_ROOT_OBJECT(IIterator)
 public:
 	IIterator() {}
+
+public:
 	virtual sl_bool hasNext() = 0;
 	virtual sl_bool next(TYPE* out = sl_null) = 0;
 	virtual sl_reg getIndex() = 0;
 };
-SLIB_NAMESPACE_END
-
-/************************************************************************
-* Iterator class Definition
-************************************************************************/
-SLIB_NAMESPACE_BEGIN
 
 /** auto-referencing object **/
 template <class TYPE >
 class SLIB_EXPORT Iterator
 {
-	SLIB_DECLARE_OBJECT_TYPE_FROM(Iterator<TYPE>, IIterator<TYPE>)
-	SLIB_DECLARE_OBJECT_WRAPPER(Iterator, Iterator<TYPE>, IIterator<TYPE>, Ref< IIterator<TYPE> >)
+	typedef Iterator<TYPE> _Type;
+	typedef IIterator<TYPE> _Obj;
+	typedef Ref<_Obj> _Ref;
+	SLIB_DECLARE_OBJECT_TYPE_FROM(_Type, _Obj)
+	SLIB_DECLARE_OBJECT_WRAPPER(Iterator, _Type, _Obj, _Ref)
 
 public:
-
 	SLIB_INLINE sl_bool hasNext() const
     {
-		Ref< IIterator<TYPE> > object = m_object;
-		if (object.isNotNull()) {
-			return object->hasNext();
-		} else {
-			return sl_false;
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->hasNext();
 		}
+		return sl_false;
 	}
+
 	SLIB_INLINE sl_reg getIndex() const
     {
-		Ref< IIterator<TYPE> > object = m_object;
-		if (object.isNotNull()) {
-			return object->getIndex();
-		} else {
-			return -1;
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->getIndex();
 		}
+		return -1;
 	}
+
 	SLIB_INLINE sl_bool next(TYPE* out) const
     {
-		Ref< IIterator<TYPE> > object = m_object;
-		if (object.isNotNull()) {
-			return object->next(out);
-		} else {
-			return sl_false;
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->next(out);
 		}
+		return sl_false;
 	};
 };
 SLIB_NAMESPACE_END
