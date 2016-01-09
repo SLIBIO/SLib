@@ -251,7 +251,7 @@ SLIB_UI_NAMESPACE_END
 
 - (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(null_unspecified WKNavigation *)navigation
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::WebView::checkInstance(view)) {
@@ -262,7 +262,7 @@ SLIB_UI_NAMESPACE_END
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(null_unspecified WKNavigation *)navigation
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::WebView::checkInstance(view)) {
@@ -273,7 +273,7 @@ SLIB_UI_NAMESPACE_END
 
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(null_unspecified WKNavigation *)navigation withError:(NSError *)error
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::WebView::checkInstance(view)) {
@@ -284,7 +284,7 @@ SLIB_UI_NAMESPACE_END
 
 - (void)webView:(WKWebView *)webView didFailNavigation:(null_unspecified WKNavigation *)navigation withError:(NSError *)error
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::WebView::checkInstance(view)) {
@@ -296,7 +296,7 @@ SLIB_UI_NAMESPACE_END
 - (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message
 {
 	id body = message.body;
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::WebView::checkInstance(view)) {

@@ -551,9 +551,8 @@ void Time::set(const String& str)
 	set(arr[0], arr[1], arr[2], arr[3], arr[4], arr[5]);
 }
 
-void Time::parseTime(const String& _date, int* out)
+void Time::parseTime(const String& date, int* out)
 {
-	String8 date = _date;
 	Base::resetMemory(out, 0, 6 * sizeof(int));
 
 	const sl_char8* ch = date.getBuf();

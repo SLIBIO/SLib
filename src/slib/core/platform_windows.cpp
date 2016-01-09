@@ -82,11 +82,11 @@ String Windows::getWindowText(HWND hWnd)
 	return String::null();
 }
 
-void Windows::setWindowText(HWND hWnd, const String& _text)
+void Windows::setWindowText(HWND hWnd, const String& _str)
 {
 	if (hWnd) {
-		String16 text = _text;
-		::SetWindowTextW(hWnd, (LPCWSTR)(text.getBuf()));
+		String16 str = _str;
+		::SetWindowTextW(hWnd, (LPCWSTR)(str.getBuf()));
 	}
 }
 

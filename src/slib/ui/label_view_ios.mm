@@ -176,19 +176,18 @@ void LabelView::setBackgroundColor(const Color& color)
 	m_backgroundColor = color;
 }
 
-void LabelView::setFont(const Ref<Font>& _font)
+void LabelView::setFont(const Ref<Font>& font)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[UILabel class]]) {
 		UILabel* tv = (UILabel*)handle;
 		Ref<FontInstance> fontInstance;
-		Ref<Font> font = _font;
 		UIFont* hFont = UIPlatform::getUIFont(font.get(), fontInstance);
 		if (hFont != nil) {
 			[tv setFont:hFont];
 		}
 	}
-	m_font = _font;
+	m_font = font;
 }
 SLIB_UI_NAMESPACE_END
 
@@ -207,7 +206,7 @@ SLIB_UI_NAMESPACE_END
 
 - (void)labelTapped
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		instance->onClick();
 	}

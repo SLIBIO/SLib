@@ -116,7 +116,7 @@ Window::Window()
 
 void Window::close()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	Ref<WindowInstance> instance = m_instance;
 	if (instance.isNotNull()) {
 		instance->close();
@@ -139,9 +139,9 @@ const Ref<ViewGroup>& Window::getContentView()
 	return m_viewContent;
 }
 
-void Window::setContentView(const Ref<ViewGroup>& _view)
+void Window::setContentView(const Ref<ViewGroup>& view)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	
 	Ref<ViewGroup> orig = m_viewContent;
 	Ref<ViewInstance> instance;
@@ -149,7 +149,6 @@ void Window::setContentView(const Ref<ViewGroup>& _view)
 		instance = orig->getViewInstance();
 		orig->detach();
 	}
-	Ref<ViewGroup> view = _view;
 	if (view.isNotNull() && instance.isNotNull()) {
 		view->attach(instance);
 		view->setWindow(this);
@@ -525,13 +524,11 @@ Size Window::getClientSizeFromWindowSize(const Size& sizeWindow)
 	}
 }
 
-void Window::attach(const Ref<WindowInstance>& _instance)
+void Window::attach(const Ref<WindowInstance>& instance)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 
 	detach();
-	
-	Ref<WindowInstance> instance = _instance;
 	
 	if (instance.isNotNull()) {
 		
@@ -554,7 +551,7 @@ void Window::attach(const Ref<WindowInstance>& _instance)
 
 void Window::detach()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	
 	m_viewContent->detach();
 	Ref<WindowInstance> instance = m_instance;
@@ -616,10 +613,8 @@ sl_bool Window::createWindow(const WindowParam& param)
 	return sl_false;
 }
 
-void Window::create(const WindowParam& param, const Ref<Runnable>& _callbackSuccess, const Ref<Runnable>& _callbackFail)
+void Window::create(const WindowParam& param, const Ref<Runnable>& callbackSuccess, const Ref<Runnable>& callbackFail)
 {
-	Ref<Runnable> callbackSuccess = _callbackSuccess;
-	Ref<Runnable> callbackFail = _callbackFail;
 	if (UI::isUIThread()) {
 		if (createWindow(param)) {
 			if (callbackSuccess.isNotNull()) {
@@ -661,9 +656,8 @@ void Window::_runModal()
 	}
 }
 
-void Window::addView(const Ref<View>& _child)
+void Window::addView(const Ref<View>& child)
 {
-	Ref<View> child = _child;
 	if (child.isNotNull()) {
 		Ref<ViewGroup> view = m_viewContent;
 		if (view.isNotNull()) {
@@ -672,9 +666,8 @@ void Window::addView(const Ref<View>& _child)
 	}
 }
 
-void Window::removeView(const Ref<View>& _child)
+void Window::removeView(const Ref<View>& child)
 {
-	Ref<View> child = _child;
 	if (child.isNotNull()) {
 		Ref<ViewGroup> view = m_viewContent;
 		if (view.isNotNull()) {
@@ -922,9 +915,8 @@ void WindowParam::init()
 	flagModal = sl_false;
 }
 
-void WindowParam::setParent(const Ref<Window>& _parent)
+void WindowParam::setParent(const Ref<Window>& parent)
 {
-	Ref<Window> parent = _parent;
 	if (parent.isNotNull()) {
 		this->parent = parent->getWindowInstance();
 	}

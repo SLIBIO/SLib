@@ -76,7 +76,7 @@ public:
 
 	Channel activateChannel(sl_size no)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		ArrayInfo<Channel> info;
 		m_arr.getInfo(info);
 		if (no < info.count) {

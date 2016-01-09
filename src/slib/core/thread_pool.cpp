@@ -29,7 +29,7 @@ void ThreadPool::release()
 	}
 	m_flagRunning = sl_false;
 
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	ListLocker< Ref<Thread> > threads(m_threadWorkers.duplicate());
 	for (sl_size i = 0; i < threads.count(); i++) {
 		threads[i]->finish();
@@ -49,16 +49,15 @@ sl_uint32 ThreadPool::getThreadsCount()
 	return (sl_uint32)(m_threadWorkers.count());
 }
 
-sl_bool ThreadPool::addTask(const Ref<Runnable>& _task)
+sl_bool ThreadPool::addTask(const Ref<Runnable>& task)
 {
-	Ref<Runnable> task = _task;
 	if (task.isNull()) {
 		return sl_false;
 	}
 	if (!m_flagRunning) {
 		return sl_false;
 	}
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	// add task
 	if (!(m_tasks.push(task))) {
 		return sl_false;

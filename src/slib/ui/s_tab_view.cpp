@@ -38,7 +38,7 @@ sl_uint32 STabView::getTabsCount()
 
 void STabView::setTabsCount(sl_uint32 nNew)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	ListLocker<TabViewItem> items(m_items);
 	if (nNew < 1) {
 		nNew = 1;
@@ -62,7 +62,7 @@ void STabView::setTabsCount(sl_uint32 nNew)
 
 String STabView::getTabLabel(sl_uint32 index)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (index < m_items.count()) {
 		TabViewItem* item = m_items.getItemPtr(index);
 		return item->label;
@@ -70,12 +70,11 @@ String STabView::getTabLabel(sl_uint32 index)
 	return String::null();
 }
 
-void STabView::setTabLabel(sl_uint32 index, const String& _text)
+void STabView::setTabLabel(sl_uint32 index, const String& text)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (index < m_items.count()) {
 		TabViewItem* item = m_items.getItemPtr(index);
-		String text = _text;
 		item->label = text;
 		invalidateTabBar();
 	}
@@ -83,7 +82,7 @@ void STabView::setTabLabel(sl_uint32 index, const String& _text)
 
 Ref<View> STabView::getTabContentView(sl_uint32 index)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (index < m_items.count()) {
 		TabViewItem* item = m_items.getItemPtr(index);
 		return item->contentView;
@@ -91,12 +90,11 @@ Ref<View> STabView::getTabContentView(sl_uint32 index)
 	return Ref<View>::null();
 }
 
-void STabView::setTabContentView(sl_uint32 index, const Ref<View>& _view)
+void STabView::setTabContentView(sl_uint32 index, const Ref<View>& view)
 {
 	MutexLocker lock(m_items.getLocker());
 	if (index < m_items.count()) {
 		TabViewItem* item = m_items.getItemPtr(index);
-		Ref<View> view = _view;
 		if (item->contentView != view) {
 			removeChild(item->contentView);
 			addChild(view);
@@ -114,7 +112,7 @@ sl_uint32 STabView::getSelectedTabIndex()
 
 void STabView::selectTab(sl_uint32 index)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	ListLocker<TabViewItem> items(m_items);
 	if (index >= items.count()) {
 		index = 0;
@@ -324,7 +322,7 @@ void STabView::invalidateTabBar()
 
 void STabView::relayout()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	Rectangle bound = getContentBounds();
 	ListLocker<TabViewItem> items(m_items);
 	for (sl_size i = 0; i < items.count(); i++) {
@@ -347,7 +345,7 @@ void STabView::onSelectTab(sl_uint32 index)
 void STabView::onClickView(UIEvent* ev)
 {
 	Point pt = ev->getPoint();
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	ListLocker<TabViewItem> items(m_items);
 	sl_uint32 n = (sl_uint32)(items.count());
 	for (sl_uint32 i = 0; i < n; i++) {
@@ -367,7 +365,7 @@ void STabView::onMouseEvent(UIEvent* ev)
 		invalidateTabBar();
 	} else if (ev->getAction() == actionMouseMove) {
 		Point pt = ev->getPoint();
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		ListLocker<TabViewItem> items(m_items);
 		sl_uint32 n = (sl_uint32)(items.count());
 		for (sl_uint32 i = 0; i < n; i++) {
@@ -389,7 +387,7 @@ void STabView::onMouseEvent(UIEvent* ev)
 void STabView::onDraw(Canvas* canvas)
 {
 	onDrawTabBarBackground(canvas);
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	ListLocker<TabViewItem> items(m_items);
 	sl_uint32 n = (sl_uint32)(items.count());
 	for (sl_uint32 i = 0; i < n; i++) {
@@ -402,7 +400,7 @@ void STabView::onDrawTabBarBackground(Canvas* canvas)
 	canvas->draw(getTabBarRegion(), m_tabBarBackground);
 }
 
-void STabView::onDrawTab(Canvas* canvas, const Rectangle& rect, sl_uint32 index, const String& _label)
+void STabView::onDrawTab(Canvas* canvas, const Rectangle& rect, sl_uint32 index, const String& label)
 {
 	Rectangle rc = getTabRegion(index);
 	Color labelColor;
@@ -415,7 +413,6 @@ void STabView::onDrawTab(Canvas* canvas, const Rectangle& rect, sl_uint32 index,
 	} else {
 		labelColor = m_tabLabelColor;
 	}
-	String label = _label;
 	if (label.isNotEmpty()) {
 		Ref<Font> font = _getFont();
 		if (m_flagVertical) {

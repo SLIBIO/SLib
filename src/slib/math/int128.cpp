@@ -131,9 +131,8 @@ sl_int32 Uint128::parseString(Uint128* out, const sl_char16* sz, sl_uint32 posBe
 	return _Uint128_parseString(out, sz, posBegin, len, radix);
 }
 
-sl_bool Uint128::parseString(const String& _str, sl_uint32 radix)
+sl_bool Uint128::parseString(const String& str, sl_uint32 radix)
 {
-	String str = _str;
 	sl_uint32 n = str.getLength();
 	if (n == 0) {
 		return sl_false;

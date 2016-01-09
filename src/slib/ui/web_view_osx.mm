@@ -104,7 +104,7 @@ public:
 	}
 	
 #ifndef USE_WK_WEB_VIEW
-	String __callJavaScript(OSWebView* wv, const String& _func, const String* params, sl_uint32 nParams)
+	String __callJavaScript(OSWebView* wv, const String& func, const String* params, sl_uint32 nParams)
 	{
 		WebScriptObject* so = [wv windowScriptObject];
 		NSMutableArray* arr = [NSMutableArray new];
@@ -114,9 +114,9 @@ public:
 				[arr addObject:param];
 			}
 		}
-		NSString* func = Apple::getNSStringFromString(_func);
-		id ret = [so callWebScriptMethod:func withArguments:arr];
-		NSString* s = [NSString stringWithFormat:@"%@", ret];
+		NSString* s = Apple::getNSStringFromString(func);
+		id ret = [so callWebScriptMethod:s withArguments:arr];
+		s = [NSString stringWithFormat:@"%@", ret];
 		return Apple::getStringFromNSString(s);
 	}
 
@@ -327,7 +327,7 @@ SLIB_UI_NAMESPACE_END
 		return;
 	}
 #endif
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::WebView::checkInstance(view)) {
@@ -346,7 +346,7 @@ SLIB_UI_NAMESPACE_END
 		return;
 	}
 #endif
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::WebView::checkInstance(view)) {
@@ -365,7 +365,7 @@ SLIB_UI_NAMESPACE_END
 		return;
 	}
 #endif
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::WebView::checkInstance(view)) {
@@ -385,7 +385,7 @@ SLIB_UI_NAMESPACE_END
 		return;
 	}
 #endif
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::WebView::checkInstance(view)) {
@@ -398,7 +398,7 @@ SLIB_UI_NAMESPACE_END
 - (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message
 {
 	id body = message.body;
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::WebView::checkInstance(view)) {

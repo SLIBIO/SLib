@@ -157,7 +157,7 @@ public:
 
 	void release()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (!m_flagOpened) {
 			return;
 		}
@@ -179,7 +179,7 @@ public:
 
 	void start()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (!m_flagOpened) {
 			return;
 		}
@@ -194,7 +194,7 @@ public:
 
 	void stop()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (!m_flagOpened) {
 			return;
 		}

@@ -662,7 +662,7 @@ Size SButton::measureContentSize(GraphicsContext* gc)
 	return size;
 }
 
-void SButton::drawContent(Canvas* canvas, const Ref<Drawable>& _icon, const String& _text, const Color& textColor)
+void SButton::drawContent(Canvas* canvas, const Ref<Drawable>& icon, const String& text, const Color& textColor)
 {
 	Ref<GraphicsContext> gc = canvas->getGraphicsContext();
 	if (gc.isNull()) {
@@ -684,11 +684,9 @@ void SButton::drawContent(Canvas* canvas, const Ref<Drawable>& _icon, const Stri
 	rcText.top += pt.y;
 	rcText.right += pt.x;
 	rcText.bottom += pt.y;
-	Ref<Drawable> icon = _icon;
 	if (icon.isNotNull()) {
 		canvas->draw(rcIcon, icon);
 	}
-	String text = _text;
 	if (text.isNotEmpty()) {
 		canvas->drawText(text, rcText.left, rcText.top, _getFont(), textColor);
 	}

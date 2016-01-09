@@ -12,7 +12,7 @@ class _DropDownList : public DropDownList
 public:
 	void __applyItemsCount(HWND hWnd)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		sl_uint32 nOrig = (sl_uint32)(::SendMessageW(hWnd, CB_GETCOUNT, 0, 0));
 		sl_uint32 nNew = (sl_uint32)(m_titles.count());
 		if (nOrig == nNew) {
@@ -151,9 +151,8 @@ void DropDownList::_setItemTitle(sl_uint32 index, const String& title)
 	}
 }
 
-void DropDownList::setFont(const Ref<Font>& _font)
+void DropDownList::setFont(const Ref<Font>& font)
 {
-	Ref<Font> font = _font;
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {

@@ -829,10 +829,9 @@ sl_bool Socket::getOption_IncludeIpHeader() const
 	return getOption(IPPROTO_IP, IP_HDRINCL) != 0;
 }
 
-sl_bool Socket::setOption_bindToDevice(const String& _ifname)
+sl_bool Socket::setOption_bindToDevice(const String& ifname)
 {
 #if defined(SLIB_PLATFORM_IS_LINUX)
-	String8 ifname = _ifname;
 	return setOption(SOL_SOCKET, SO_BINDTODEVICE, ifname.getBuf(), ifname.getLength());
 #else
 	return sl_false;

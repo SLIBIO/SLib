@@ -12,7 +12,7 @@ AsyncTcpSecureStreamServer::~AsyncTcpSecureStreamServer()
 
 void AsyncTcpSecureStreamServer::start()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (m_server.isNotNull()) {
 		m_server->start();
 	}
@@ -20,7 +20,7 @@ void AsyncTcpSecureStreamServer::start()
 
 void AsyncTcpSecureStreamServer::close()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (m_server.isNotNull()) {
 		m_server->close();
 		m_server.setNull();
@@ -51,10 +51,9 @@ void AsyncTcpSecureStreamServer::onConnectedSecureStream(AsyncSecureStream* secu
 	m_streams.remove(securedStream);
 }
 
-Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::create(const Ref<AsyncTcpServer>& _server, const AsyncSecureStreamServerParam& param, sl_bool flagStart)
+Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::create(const Ref<AsyncTcpServer>& server, const AsyncSecureStreamServerParam& param, sl_bool flagStart)
 {
 	Ref<AsyncTcpSecureStreamServer> ret;
-	Ref<AsyncTcpServer> server = _server;
 	if (server.isNull()) {
 		return ret;
 	}
@@ -91,10 +90,9 @@ Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::create(const AsyncSe
 	return create(AsyncTcpServer::create(portListen, flagIPv6), param, flagStart);
 }
 
-Ref<AsyncSecureStream> AsyncTcpSecureStreamClient::create(const Ref<AsyncTcpSocket>& _socket, const AsyncSecureStreamClientParam& param, sl_bool flagConnect)
+Ref<AsyncSecureStream> AsyncTcpSecureStreamClient::create(const Ref<AsyncTcpSocket>& socket, const AsyncSecureStreamClientParam& param, sl_bool flagConnect)
 {
 	Ref<AsyncSecureStream> ret;
-	Ref<AsyncTcpSocket> socket = _socket;
 	if (socket.isNull()) {
 		return ret;
 	}

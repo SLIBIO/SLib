@@ -57,9 +57,8 @@ Ref<Font> Font::create(String familyName, sl_real size, sl_bool flagBold, sl_boo
 	return create(desc);
 }
 
-Size Font::getTextSize(const Ref<GraphicsContext>& _context, const String& text)
+Size Font::getTextSize(const Ref<GraphicsContext>& context, const String& text)
 {
-	Ref<GraphicsContext> context = _context;
 	if (context.isNotNull()) {
 		return context->getFontTextSize(this, text);
 	}

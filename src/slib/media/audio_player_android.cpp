@@ -16,7 +16,7 @@ List<AudioPlayerInfo> AudioPlayer::getPlayersList()
 	AudioPlayerInfo ret;
 	SLIB_STATIC_STRING(s, "Internal Speaker");
 	ret.name = s;
-	return List<AudioPlayerInfo>::fromElement(ret);
+	return List<AudioPlayerInfo>::createFromElement(ret);
 }
 SLIB_MEDIA_NAMESPACE_END
 

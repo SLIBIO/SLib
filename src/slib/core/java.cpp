@@ -186,9 +186,8 @@ JniClass Jni::findClass(const char* className)
 	return ret;
 }
 
-JniClass Jni::getClass(const String& _className)
+JniClass Jni::getClass(const String& className)
 {
-	String className = _className;
 	JniClass ret;
 	if (_g_jni_classes.get(className, &ret)) {
 		return ret;
@@ -308,10 +307,9 @@ void Jni::deleteWeakRef(jobject obj)
 	}
 }
 
-jstring Jni::getJniString(const String& _str)
+jstring Jni::getJniString(const String& str)
 {
 	jstring ret = sl_null;
-	String8 str = _str;
 	if (str.isNotNull()) {
 		JNIEnv* env = Jni::getCurrent();
 		if (env) {
@@ -321,10 +319,9 @@ jstring Jni::getJniString(const String& _str)
 	return ret;
 }
 
-jstring Jni::getJniString16(const String16& _str)
+jstring Jni::getJniString16(const String16& str)
 {
 	jstring ret = sl_null;
-	String16 str = _str;
 	if (str.isNotNull()) {
 		JNIEnv* env = Jni::getCurrent();
 		if (env) {
@@ -617,7 +614,7 @@ _JniGlobal::~_JniGlobal()
 /************************************************
 	JniClass
 **************************************************/
-sl_bool JniClass::isInstanceOf(jobject obj)
+sl_bool JniClass::isInstanceOf(jobject obj) const
 {
 	jclass cls = get();
 	JNIEnv* env = Jni::getCurrent();
@@ -627,7 +624,7 @@ sl_bool JniClass::isInstanceOf(jobject obj)
 	return sl_false;
 }
 
-jmethodID JniClass::getMethodID(const char* name, const char* sig)
+jmethodID JniClass::getMethodID(const char* name, const char* sig) const
 {
 	jmethodID ret = sl_null;
 	jclass cls = get();
@@ -643,7 +640,7 @@ jmethodID JniClass::getMethodID(const char* name, const char* sig)
 	return 0;
 }
 
-jmethodID JniClass::getStaticMethodID(const char* name, const char* sig)
+jmethodID JniClass::getStaticMethodID(const char* name, const char* sig) const
 {
 	jmethodID ret = sl_null;
 	jclass cls = get();
@@ -658,7 +655,7 @@ jmethodID JniClass::getStaticMethodID(const char* name, const char* sig)
 	return ret;
 }
 
-jfieldID JniClass::getFieldID(const char* name, const char* sig)
+jfieldID JniClass::getFieldID(const char* name, const char* sig) const
 {
 	jfieldID ret = sl_null;
 	jclass cls = get();
@@ -673,7 +670,7 @@ jfieldID JniClass::getFieldID(const char* name, const char* sig)
 	return ret;
 }
 
-jfieldID JniClass::getStaticFieldID(const char* name, const char* sig)
+jfieldID JniClass::getStaticFieldID(const char* name, const char* sig) const
 {
 	jfieldID ret = sl_null;
 	jclass cls = get();
@@ -689,7 +686,7 @@ jfieldID JniClass::getStaticFieldID(const char* name, const char* sig)
 }
 
 #define DEFINE_JNI_CALL_METHOD(TYPE, NAME) \
-TYPE JniClass::call##NAME##Method(jmethodID method, jobject _this, ...) \
+TYPE JniClass::call##NAME##Method(jmethodID method, jobject _this, ...) const \
 { \
 	va_list args; \
 	va_start(args, _this); \
@@ -703,7 +700,7 @@ TYPE JniClass::call##NAME##Method(jmethodID method, jobject _this, ...) \
 	va_end(args); \
 	return ret; \
 } \
-TYPE JniClass::call##NAME##Method(const char* name, const char* sig, jobject _this, ...) \
+TYPE JniClass::call##NAME##Method(const char* name, const char* sig, jobject _this, ...) const \
 { \
 	va_list args; \
 	va_start(args, _this); \
@@ -722,7 +719,7 @@ TYPE JniClass::call##NAME##Method(const char* name, const char* sig, jobject _th
 	va_end(args); \
 	return ret; \
 } \
-TYPE JniClass::callStatic##NAME##Method(jmethodID method, ...) \
+TYPE JniClass::callStatic##NAME##Method(jmethodID method, ...) const \
 { \
 	va_list args; \
 	va_start(args, method); \
@@ -737,7 +734,7 @@ TYPE JniClass::callStatic##NAME##Method(jmethodID method, ...) \
 	va_end(args); \
 	return ret; \
 } \
-TYPE JniClass::callStatic##NAME##Method(const char* name, const char* sig, ...) \
+TYPE JniClass::callStatic##NAME##Method(const char* name, const char* sig, ...) const \
 { \
 	va_list args; \
 	va_start(args, sig); \
@@ -800,7 +797,7 @@ DEFINE_JNI_CALL_METHOD(jlong, Long)
 DEFINE_JNI_CALL_METHOD(jfloat, Float)
 DEFINE_JNI_CALL_METHOD(jdouble, Double)
 
-jobject JniClass::newObject(jmethodID method, ...)
+jobject JniClass::newObject(jmethodID method, ...) const
 {
 	va_list args;
 	va_start(args, method);
@@ -816,7 +813,7 @@ jobject JniClass::newObject(jmethodID method, ...)
 	return ret;
 }
 
-jobject JniClass::newObject(const char* sig, ...)
+jobject JniClass::newObject(const char* sig, ...) const
 {
 	va_list args;
 	va_start(args, sig);
@@ -835,7 +832,7 @@ jobject JniClass::newObject(const char* sig, ...)
 	return ret;
 }
 
-jobject JniClass::newObject()
+jobject JniClass::newObject() const
 {
 	return newObject("()V");
 }
@@ -859,7 +856,7 @@ jobject _JniSingletonMethod::newObject(jobject _null, ...)
 	return ret;
 }
 
-void JniClass::callVoidMethod(jmethodID method, jobject _this, ...)
+void JniClass::callVoidMethod(jmethodID method, jobject _this, ...) const
 {
 	va_list args;
 	va_start(args, _this);
@@ -872,7 +869,7 @@ void JniClass::callVoidMethod(jmethodID method, jobject _this, ...)
 	va_end(args);
 }
 
-void JniClass::callVoidMethod(const char* name, const char* sig, jobject _this, ...)
+void JniClass::callVoidMethod(const char* name, const char* sig, jobject _this, ...) const
 {
 	va_list args;
 	va_start(args, _this);
@@ -907,7 +904,7 @@ void _JniSingletonMethod::call(jobject _this, ...)
 	va_end(args);
 }
 
-void JniClass::callStaticVoidMethod(jmethodID method, ...)
+void JniClass::callStaticVoidMethod(jmethodID method, ...) const
 {
 	va_list args;
 	va_start(args, method);
@@ -921,7 +918,7 @@ void JniClass::callStaticVoidMethod(jmethodID method, ...)
 	va_end(args);
 }
 
-void JniClass::callStaticVoidMethod(const char* name, const char* sig, ...)
+void JniClass::callStaticVoidMethod(const char* name, const char* sig, ...) const
 {
 	va_list args;
 	va_start(args, sig);
@@ -955,7 +952,7 @@ void _JniSingletonStaticMethod::call(jobject _null, ...)
 	va_end(args);
 }
 
-String JniClass::callStringMethod(jmethodID method, jobject _this, ...)
+String JniClass::callStringMethod(jmethodID method, jobject _this, ...) const
 {
 	va_list args;
 	va_start(args, _this);
@@ -973,7 +970,7 @@ String JniClass::callStringMethod(jmethodID method, jobject _this, ...)
 	return ret;
 }
 
-String16 JniClass::callString16Method(jmethodID method, jobject _this, ...)
+String16 JniClass::callString16Method(jmethodID method, jobject _this, ...) const
 {
 	va_list args;
 	va_start(args, _this);
@@ -991,7 +988,7 @@ String16 JniClass::callString16Method(jmethodID method, jobject _this, ...)
 	return ret;
 }
 
-String JniClass::callStringMethod(const char* name, const char* sig, jobject _this, ...)
+String JniClass::callStringMethod(const char* name, const char* sig, jobject _this, ...) const
 {
 	va_list args;
 	va_start(args, _this);
@@ -1014,7 +1011,7 @@ String JniClass::callStringMethod(const char* name, const char* sig, jobject _th
 	return ret;
 }
 
-String16 JniClass::callString16Method(const char* name, const char* sig, jobject _this, ...)
+String16 JniClass::callString16Method(const char* name, const char* sig, jobject _this, ...) const
 {
 	va_list args;
 	va_start(args, _this);
@@ -1083,7 +1080,7 @@ String16 _JniSingletonMethod::callString16(jobject _this, ...)
 	return ret;
 }
 
-String JniClass::callStaticStringMethod(jmethodID method, ...)
+String JniClass::callStaticStringMethod(jmethodID method, ...) const
 {
 	va_list args;
 	va_start(args, method);
@@ -1102,7 +1099,7 @@ String JniClass::callStaticStringMethod(jmethodID method, ...)
 	return ret;
 }
 
-String16 JniClass::callStaticString16Method(jmethodID method, ...)
+String16 JniClass::callStaticString16Method(jmethodID method, ...) const
 {
 	va_list args;
 	va_start(args, method);
@@ -1121,7 +1118,7 @@ String16 JniClass::callStaticString16Method(jmethodID method, ...)
 	return ret;
 }
 
-String JniClass::callStaticStringMethod(const char* name, const char* sig, ...)
+String JniClass::callStaticStringMethod(const char* name, const char* sig, ...) const
 {
 	va_list args;
 	va_start(args, sig);
@@ -1143,7 +1140,7 @@ String JniClass::callStaticStringMethod(const char* name, const char* sig, ...)
 	return ret;
 }
 
-String16 JniClass::callStaticString16Method(const char* name, const char* sig, ...)
+String16 JniClass::callStaticString16Method(const char* name, const char* sig, ...) const
 {
 	va_list args;
 	va_start(args, sig);
@@ -1212,7 +1209,7 @@ String16 _JniSingletonStaticMethod::callString16(jobject _null, ...)
 }
 
 #define DEFINE_JNI_FIELD(TYPE, NAME) \
-TYPE JniClass::get##NAME##Field(jfieldID field, jobject _this) \
+TYPE JniClass::get##NAME##Field(jfieldID field, jobject _this) const \
 { \
 	TYPE ret = 0; \
 	if (field && _this) { \
@@ -1223,7 +1220,7 @@ TYPE JniClass::get##NAME##Field(jfieldID field, jobject _this) \
 	} \
 	return ret; \
 } \
-TYPE JniClass::get##NAME##Field(const char* name, const char* sig, jobject _this) \
+TYPE JniClass::get##NAME##Field(const char* name, const char* sig, jobject _this) const \
 { \
 	TYPE ret = 0; \
 	if (_this) { \
@@ -1239,7 +1236,7 @@ TYPE JniClass::get##NAME##Field(const char* name, const char* sig, jobject _this
 	} \
 	return ret; \
 } \
-TYPE JniClass::getStatic##NAME##Field(jfieldID field) \
+TYPE JniClass::getStatic##NAME##Field(jfieldID field) const \
 { \
 	TYPE ret = 0; \
 	if (field) { \
@@ -1251,7 +1248,7 @@ TYPE JniClass::getStatic##NAME##Field(jfieldID field) \
 	} \
 	return ret; \
 } \
-TYPE JniClass::getStatic##NAME##Field(const char* name, const char* sig) \
+TYPE JniClass::getStatic##NAME##Field(const char* name, const char* sig) const \
 { \
 	TYPE ret = 0; \
 	jclass cls = get(); \
@@ -1266,7 +1263,7 @@ TYPE JniClass::getStatic##NAME##Field(const char* name, const char* sig) \
 	} \
 	return ret; \
 } \
-void JniClass::set##NAME##Field(jfieldID field, jobject _this, TYPE value) \
+void JniClass::set##NAME##Field(jfieldID field, jobject _this, TYPE value) const \
 { \
 	if (field && _this) { \
 		JNIEnv* env = Jni::getCurrent(); \
@@ -1275,7 +1272,7 @@ void JniClass::set##NAME##Field(jfieldID field, jobject _this, TYPE value) \
 		} \
 	} \
 } \
-void JniClass::set##NAME##Field(const char* name, const char* sig, jobject _this, TYPE value) \
+void JniClass::set##NAME##Field(const char* name, const char* sig, jobject _this, TYPE value) const \
 { \
 	if (_this) { \
 		jfieldID field = getFieldID(name, sig); \
@@ -1289,7 +1286,7 @@ void JniClass::set##NAME##Field(const char* name, const char* sig, jobject _this
 		} \
 	} \
 } \
-void JniClass::setStatic##NAME##Field(jfieldID field, TYPE value) \
+void JniClass::setStatic##NAME##Field(jfieldID field, TYPE value) const \
 { \
 	TYPE ret = sl_null; \
 	if (field) { \
@@ -1300,7 +1297,7 @@ void JniClass::setStatic##NAME##Field(jfieldID field, TYPE value) \
 		} \
 	} \
 } \
-void JniClass::setStatic##NAME##Field(const char* name, const char* sig, TYPE value) \
+void JniClass::setStatic##NAME##Field(const char* name, const char* sig, TYPE value) const \
 { \
 	TYPE ret = sl_null; \
 	jclass cls = get(); \
@@ -1381,7 +1378,7 @@ DEFINE_JNI_FIELD(jlong, Long)
 DEFINE_JNI_FIELD(jfloat, Float)
 DEFINE_JNI_FIELD(jdouble, Double)
 
-String JniClass::getStringField(jfieldID field, jobject _this)
+String JniClass::getStringField(jfieldID field, jobject _this) const
 {
 	String ret;
 	JniLocal<jstring> str = (jstring)(getObjectField(field, _this));
@@ -1391,7 +1388,7 @@ String JniClass::getStringField(jfieldID field, jobject _this)
 	return ret;
 }
 
-String16 JniClass::getString16Field(jfieldID field, jobject _this)
+String16 JniClass::getString16Field(jfieldID field, jobject _this) const
 {
 	String16 ret;
 	JniLocal<jstring> str = (jstring)(getObjectField(field, _this));
@@ -1401,7 +1398,7 @@ String16 JniClass::getString16Field(jfieldID field, jobject _this)
 	return ret;
 }
 
-String JniClass::getStringField(const char* name, const char* sig, jobject _this)
+String JniClass::getStringField(const char* name, const char* sig, jobject _this) const
 {
 	String ret;
 	JniLocal<jstring> str = (jstring)(getObjectField(name, sig, _this));
@@ -1411,7 +1408,7 @@ String JniClass::getStringField(const char* name, const char* sig, jobject _this
 	return ret;
 }
 
-String16 JniClass::getString16Field(const char* name, const char* sig, jobject _this)
+String16 JniClass::getString16Field(const char* name, const char* sig, jobject _this) const
 {
 	String16 ret;
 	JniLocal<jstring> str = (jstring)(getObjectField(name, sig, _this));
@@ -1421,7 +1418,7 @@ String16 JniClass::getString16Field(const char* name, const char* sig, jobject _
 	return ret;
 }
 
-String JniClass::getStaticStringField(jfieldID field)
+String JniClass::getStaticStringField(jfieldID field) const
 {
 	String ret;
 	JniLocal<jstring> str = (jstring)(getStaticObjectField(field));
@@ -1431,7 +1428,7 @@ String JniClass::getStaticStringField(jfieldID field)
 	return ret;
 }
 
-String16 JniClass::getStaticString16Field(jfieldID field)
+String16 JniClass::getStaticString16Field(jfieldID field) const
 {
 	String16 ret;
 	JniLocal<jstring> str = (jstring)(getStaticObjectField(field));
@@ -1441,7 +1438,7 @@ String16 JniClass::getStaticString16Field(jfieldID field)
 	return ret;
 }
 
-String JniClass::getStaticStringField(const char* name, const char* sig)
+String JniClass::getStaticStringField(const char* name, const char* sig) const
 {
 	String ret;
 	JniLocal<jstring> str = (jstring)(getStaticObjectField(name, sig));
@@ -1451,7 +1448,7 @@ String JniClass::getStaticStringField(const char* name, const char* sig)
 	return ret;
 }
 
-String16 JniClass::getStaticString16Field(const char* name, const char* sig)
+String16 JniClass::getStaticString16Field(const char* name, const char* sig) const
 {
 	String16 ret;
 	JniLocal<jstring> str = (jstring)(getStaticObjectField(name, sig));
@@ -1461,49 +1458,49 @@ String16 JniClass::getStaticString16Field(const char* name, const char* sig)
 	return ret;
 }
 
-void JniClass::setStringField(jfieldID field, jobject _this, const String& value)
+void JniClass::setStringField(jfieldID field, jobject _this, const String& value) const
 {
 	JniLocal<jstring> str = Jni::getJniString(value);
 	setObjectField(field, _this, str);
 }
 
-void JniClass::setString16Field(jfieldID field, jobject _this, const String16& value)
+void JniClass::setString16Field(jfieldID field, jobject _this, const String16& value) const
 {
 	JniLocal<jstring> str = Jni::getJniString16(value);
 	setObjectField(field, _this, str);
 }
 
-void JniClass::setStringField(const char* name, const char* sig, jobject _this, const String& value)
+void JniClass::setStringField(const char* name, const char* sig, jobject _this, const String& value) const
 {
 	JniLocal<jstring> str = Jni::getJniString(value);
 	setObjectField(name, sig, _this, str);
 }
 
-void JniClass::setString16Field(const char* name, const char* sig, jobject _this, const String16& value)
+void JniClass::setString16Field(const char* name, const char* sig, jobject _this, const String16& value) const
 {
 	JniLocal<jstring> str = Jni::getJniString16(value);
 	setObjectField(name, sig, _this, str);
 }
 
-void JniClass::setStaticStringField(jfieldID field, const String& value)
+void JniClass::setStaticStringField(jfieldID field, const String& value) const
 {
 	JniLocal<jstring> str = Jni::getJniString(value);
 	setStaticObjectField(field, str);
 }
 
-void JniClass::setStaticString16Field(jfieldID field, const String16& value)
+void JniClass::setStaticString16Field(jfieldID field, const String16& value) const
 {
 	JniLocal<jstring> str = Jni::getJniString16(value);
 	setStaticObjectField(field, str);
 }
 
-void JniClass::setStaticStringField(const char* name, const char* sig, const String& value)
+void JniClass::setStaticStringField(const char* name, const char* sig, const String& value) const
 {
 	JniLocal<jstring> str = Jni::getJniString(value);
 	setStaticObjectField(name, sig, str);
 }
 
-void JniClass::setStaticString16Field(const char* name, const char* sig, const String16& value)
+void JniClass::setStaticString16Field(const char* name, const char* sig, const String16& value) const
 {
 	JniLocal<jstring> str = Jni::getJniString16(value);
 	setStaticObjectField(name, sig, str);
@@ -1662,7 +1659,7 @@ JniClass JniClass::getClassOfObject(jobject obj)
 	return ret;
 }
 
-sl_bool JniClass::registerNative(const char* name, const char* sig, const void* fn)
+sl_bool JniClass::registerNative(const char* name, const char* sig, const void* fn) const
 {
 	jclass cls = get();
 	if (cls) {

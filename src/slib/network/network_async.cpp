@@ -388,7 +388,7 @@ sl_bool AsyncTcpServer::isOpened()
 
 void AsyncTcpServer::start()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (m_flagStarted) {
 		return;
 	}

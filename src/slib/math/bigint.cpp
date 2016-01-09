@@ -5,9 +5,10 @@
 
 #define STACK_BUFFER_SIZE 4096
 
-/*************************************
+/*
 	CBigInt
-**************************************/
+*/
+
 #define CBIGINT_INT32(o, v) \
 	CBigInt o; \
 	sl_uint32 __m__##o; \
@@ -416,6 +417,577 @@ sl_uint32 CBigInt::getLeastSignificantBits() const
 	return 0;
 }
 
+void CBigInt::setZero()
+{
+	if (data) {
+		Base::zeroMemory(data, length * 4);
+	}
+}
+
+
+CBigInt* CBigInt::allocate(sl_uint32 length)
+{
+	CBigInt* newObject = new CBigInt;
+	if (newObject) {
+		if (length > 0) {
+			sl_uint32* data = new sl_uint32[length];
+			if (data) {
+				newObject->m_flagUserData = sl_false;
+				newObject->length = length;
+				newObject->data = data;
+				Base::zeroMemory(data, length * 4);
+				return newObject;
+			}
+			delete newObject;
+		} else {
+			return newObject;
+		}
+	}
+	return sl_null;
+}
+
+CBigInt* CBigInt::duplicate(sl_uint32 newLength) const
+{
+	CBigInt* ret = allocate(length);
+	if (ret) {
+		sl_uint32 n = Math::min(length, newLength);
+		if (n > 0) {
+			Base::copyMemory(ret->data, data, n * 4);
+		}
+		ret->sign = sign;
+		ret->length = newLength;
+		return ret;
+	}
+	return sl_null;
+}
+
+sl_bool CBigInt::copyAbsFrom(const CBigInt& other)
+{
+	if (this == &other) {
+		return sl_true;
+	}
+	sl_uint32 n = other.getSizeInElements();
+	if (growLength(n)) {
+		if (other.data) {
+			Base::copyMemory(data, other.data, n * 4);
+			Base::zeroMemory(data + n, (length - n) * 4);
+		} else {
+			setZero();
+		}
+		return sl_true;
+	} else {
+		return sl_false;
+	}
+}
+
+sl_bool CBigInt::growLength(sl_uint32 newLength)
+{
+	if (length >= newLength) {
+		return sl_true;
+	}
+	sl_uint32* newData = new sl_uint32[newLength];
+	if (newData) {
+		if (data) {
+			Base::copyMemory(newData, data, length * 4);
+			Base::zeroMemory(newData + length, (newLength - length) * 4);
+			if (!m_flagUserData) {
+				delete[] data;
+			}
+		} else {
+			Base::zeroMemory(newData, newLength * 4);
+		}
+		m_flagUserData = sl_false;
+		length = newLength;
+		data = newData;
+		return sl_true;
+	} else {
+		return sl_false;
+	}
+}
+
+sl_bool CBigInt::setLength(sl_uint32 newLength)
+{
+	if (length < newLength) {
+		return growLength(newLength);
+	} else if (length == newLength) {
+		return sl_true;
+	} else {
+		if (newLength) {
+			sl_uint32* newData = new sl_uint32[newLength];
+			if (newData) {
+				if (data) {
+					Base::copyMemory(newData, data, newLength * 4);
+					if (!m_flagUserData) {
+						delete[] data;
+					}
+				}
+				m_flagUserData = sl_false;
+				length = newLength;
+				data = newData;
+				return sl_true;
+			} else {
+				return sl_false;
+			}
+		} else {
+			if (data) {
+				if (!m_flagUserData) {
+					delete[] data;
+				}
+			}
+			length = 0;
+			data = sl_null;
+			return sl_true;
+		}
+	}
+}
+
+sl_bool CBigInt::setValueFromElements(const sl_uint32* _data, sl_uint32 n)
+{
+	sl_uint32 nd = getSizeInElements();
+	if (growLength(n)) {
+		sl_uint32 i;
+		for (i = 0; i < n; i++) {
+			data[i] = _data[i];
+		}
+		for (; i < nd; i++) {
+			data[i] = 0;
+		}
+		return sl_true;
+	}
+	return sl_false;
+}
+
+sl_bool CBigInt::setBytesLE(const void* _bytes, sl_uint32 nBytes)
+{
+	sl_uint8* bytes = (sl_uint8*)_bytes;
+	// remove zeros
+	{
+		sl_uint32 n;
+		for (n = nBytes; n > 0; n--) {
+			if (bytes[n - 1]) {
+				break;
+			}
+		}
+		nBytes = n;
+	}
+	setZero();
+	if (nBytes) {
+		if (growLength((nBytes + 3) >> 2)) {
+			for (sl_uint32 i = 0; i < nBytes; i++) {
+				data[i >> 2] |= ((sl_uint32)(bytes[i])) << ((i & 3) << 3);
+			}
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
+CBigInt* CBigInt::fromBytesLE(const void* bytes, sl_uint32 nBytes)
+{
+	CBigInt* ret = CBigInt::allocate((nBytes + 3) >> 2);
+	if (ret) {
+		if (ret->setBytesLE(bytes, nBytes)) {
+			return ret;
+		}
+		delete ret;
+	}
+	return ret;
+}
+
+sl_bool CBigInt::getBytesLE(void* _bytes, sl_uint32 n) const
+{
+	sl_uint32 size = getSizeInBytes();
+	if (n < size) {
+		return sl_false;
+	}
+	sl_uint8* bytes = (sl_uint8*)_bytes;
+	sl_uint32 i;
+	for (i = 0; i < size; i++) {
+		bytes[i] = (sl_uint8)(data[i >> 2] >> ((i & 3) << 3));
+	}
+	for (; i < n; i++) {
+		bytes[i] = 0;
+	}
+	return sl_true;
+}
+
+Memory CBigInt::getBytesLE() const
+{
+	sl_uint32 size = getSizeInBytes();
+	Memory mem = Memory::create(size);
+	if (mem.isNotEmpty()) {
+		sl_uint8* bytes = (sl_uint8*)(mem.getBuf());
+		for (sl_uint32 i = 0; i < size; i++) {
+			bytes[i] = (sl_uint8)(data[i >> 2] >> ((i & 3) << 3));
+		}
+	}
+	return mem;
+}
+
+sl_bool CBigInt::setBytesBE(const void* _bytes, sl_uint32 nBytes)
+{
+	sl_uint8* bytes = (sl_uint8*)_bytes;
+	// remove zeros
+	{
+		sl_uint32 n;
+		for (n = 0; n < nBytes; n++) {
+			if (bytes[n]) {
+				break;
+			}
+		}
+		nBytes -= n;
+		bytes += n;
+	}
+	setZero();
+	if (nBytes) {
+		if (growLength((nBytes + 3) >> 2)) {
+			sl_uint32 m = nBytes - 1;
+			for (sl_uint32 i = 0; i < nBytes; i++) {
+				data[i >> 2] |= ((sl_uint32)(bytes[m])) << ((i & 3) << 3);
+				m--;
+			}
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
+CBigInt* CBigInt::fromBytesBE(const void* bytes, sl_uint32 nBytes)
+{
+	CBigInt* ret = CBigInt::allocate((nBytes + 3) >> 2);
+	if (ret) {
+		if (ret->setBytesBE(bytes, nBytes)) {
+			return ret;
+		}
+		delete ret;
+	}
+	return ret;
+}
+
+sl_bool CBigInt::getBytesBE(void* _bytes, sl_uint32 n) const
+{
+	sl_uint32 size = getSizeInBytes();
+	if (n < size) {
+		return sl_false;
+	}
+	sl_uint8* bytes = (sl_uint8*)_bytes;
+	sl_uint32 i;
+	sl_uint32 m = n - 1;
+	for (i = 0; i < size; i++) {
+		bytes[m] = (sl_uint8)(data[i >> 2] >> ((i & 3) << 3));
+		m--;
+	}
+	for (; i < n; i++) {
+		bytes[m] = 0;
+		m--;
+	}
+	return sl_true;
+}
+
+Memory CBigInt::getBytesBE() const
+{
+	sl_uint32 size = getSizeInBytes();
+	Memory mem = Memory::create(size);
+	if (mem.isNotEmpty()) {
+		sl_uint8* bytes = (sl_uint8*)(mem.getBuf());
+		sl_uint32 m = size - 1;
+		for (sl_uint32 i = 0; i < size; i++) {
+			bytes[m] = (sl_uint8)(data[i >> 2] >> ((i & 3) << 3));
+			m--;
+		}
+	}
+	return mem;
+}
+
+sl_bool CBigInt::setValue(sl_int32 v)
+{
+	if (growLength(1)) {
+		if (v < 0) {
+			data[0] = -v;
+			sign = -1;
+		} else {
+			data[0] = v;
+			sign = 1;
+		}
+		Base::zeroMemory(data + 1, (length - 1) * 4);
+		return sl_true;
+	} else {
+		return sl_false;
+	}
+}
+
+CBigInt* CBigInt::fromInt32(sl_int32 v)
+{
+	CBigInt* ret = allocate(1);
+	if (ret) {
+		ret->setValue(v);
+		return ret;
+	}
+	return sl_null;
+}
+
+sl_bool CBigInt::setValue(sl_uint32 v)
+{
+	if (growLength(1)) {
+		sign = 1;
+		data[0] = v;
+		Base::zeroMemory(data + 1, (length - 1) * 4);
+		return sl_true;
+	} else {
+		return sl_false;
+	}
+}
+
+CBigInt* CBigInt::fromUint32(sl_uint32 v)
+{
+	CBigInt* ret = allocate(1);
+	if (ret) {
+		ret->setValue(v);
+		return ret;
+	}
+	return sl_null;
+}
+
+sl_bool CBigInt::setValue(sl_int64 v)
+{
+	if (growLength(2)) {
+		sl_uint64 _v;
+		if (v < 0) {
+			_v = v;
+			sign = -1;
+		} else {
+			_v = v;
+			sign = 1;
+		}
+		data[0] = (sl_uint32)(_v);
+		data[1] = (sl_uint32)(_v >> 32);
+		Base::zeroMemory(data + 2, (length - 2) * 4);
+		return sl_true;
+	} else {
+		return sl_false;
+	}
+}
+
+CBigInt* CBigInt::fromInt64(sl_int64 v)
+{
+	CBigInt* ret = allocate(2);
+	if (ret) {
+		ret->setValue(v);
+		return ret;
+	}
+	return sl_null;
+}
+
+sl_bool CBigInt::setValue(sl_uint64 v)
+{
+	if (growLength(2)) {
+		sign = 1;
+		data[0] = (sl_uint32)(v);
+		data[1] = (sl_uint32)(v >> 32);
+		Base::zeroMemory(data + 2, (length - 2) * 4);
+		return sl_true;
+	} else {
+		return sl_false;
+	}
+}
+
+CBigInt* CBigInt::fromUint64(sl_uint64 v)
+{
+	CBigInt* ret = allocate(2);
+	if (ret) {
+		ret->setValue(v);
+		return ret;
+	}
+	return sl_null;
+}
+
+template <class CT>
+sl_int32 _CBigInt_parseString(CBigInt* out, const CT* sz, sl_uint32 posBegin, sl_uint32 len, sl_uint32 radix)
+{
+	if (radix < 2 || radix > 64) {
+		return SLIB_PARSE_ERROR;;
+	}
+	sl_int32 sign;
+	sl_uint32 pos = posBegin;
+	if (pos < len && sz[pos] == '-') {
+		pos++;
+		sign = -1;
+	} else {
+		sign = 1;
+	}
+	for (; pos < len; pos++) {
+		sl_int32 c = (sl_uint32)(sz[pos]);
+		if (c != '\t' && c != ' ') {
+			break;
+		}
+	}
+	sl_uint32 end = pos;
+	const sl_uint8* pattern = radix <= 36 ? _StringConv_radixInversePatternSmall : _StringConv_radixInversePatternBig;
+	for (; end < len; end++) {
+		sl_uint32 c = (sl_uint8)(sz[end]);
+		sl_uint32 v = c < 128 ? pattern[c] : 255;
+		if (v >= radix) {
+			break;
+		}
+	}
+	if (end <= pos) {
+		return SLIB_PARSE_ERROR;
+	}
+	if (!out) {
+		return end;
+	}
+	out->sign = sign;
+	if (radix == 16) {
+		out->setZero();
+		sl_uint32 nh = end - pos;
+		sl_uint32 ne = ((nh << 2) + 31) >> 5;
+		if (!(out->growLength(ne))) {
+			return SLIB_PARSE_ERROR;
+		}
+		sl_uint32* data = out->data;
+		sl_uint32 ih = nh - 1;
+		for (; pos < end; pos++) {
+			sl_uint32 c = (sl_uint8)(sz[pos]);
+			sl_uint32 v = c < 128 ? pattern[c] : 255;
+			if (v >= radix) {
+				break;
+			}
+			sl_uint32 ie = ih >> 3;
+			sl_uint32 ib = (ih << 2) & 31;
+			data[ie] |= (v << ib);
+			ih--;
+		}
+		return pos;
+	} else {
+		sl_uint32 nb = (sl_uint32)(Math::ceil(Math::log2((double)radix) * len));
+		sl_uint32 ne = (nb + 31) >> 5;
+		SLIB_SCOPED_BUFFER(sl_uint32, STACK_BUFFER_SIZE, a, ne);
+		if (!a) {
+			return SLIB_PARSE_ERROR;
+		}
+		sl_uint32 n = 0;
+		for (; pos < end; pos++) {
+			sl_uint32 c = (sl_uint8)(sz[pos]);
+			sl_uint32 v = c < 128 ? pattern[c] : 255;
+			if (v >= radix) {
+				break;
+			}
+			sl_uint32 o = _cbigint_mul_uint32(a, a, n, radix, v);
+			if (o) {
+				a[n] = o;
+				n++;
+			}
+		}
+		if (!(out->setValueFromElements(a, n))) {
+			return SLIB_PARSE_ERROR;
+		}
+		return pos;
+	}
+}
+
+sl_int32 CBigInt::parseString(CBigInt* out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_uint32 radix)
+{
+	return _CBigInt_parseString(out, sz, posBegin, len, radix);
+}
+
+sl_int32 CBigInt::parseString(CBigInt* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_uint32 radix)
+{
+	return _CBigInt_parseString(out, sz, posBegin, len, radix);
+}
+
+sl_bool CBigInt::parseString(const String& s, sl_uint32 radix)
+{
+	sl_uint32 n = s.getLength();
+	if (n == 0) {
+		return sl_false;
+	}
+	return _CBigInt_parseString(this, s.getBuf(), 0, n, radix) == n;
+}
+
+CBigInt* CBigInt::fromString(const String& s, sl_uint32 radix)
+{
+	CBigInt* ret = new CBigInt;
+	if (ret) {
+		ret->parseString(s, radix);
+	}
+	return ret;
+}
+
+String CBigInt::toString(sl_uint32 radix) const
+{
+	if (radix < 2 || radix > 64) {
+		return String::null();
+	}
+	sl_uint32 nb = getSizeInBits();
+	if (nb == 0) {
+		SLIB_STATIC_STRING(s, "0");
+		return s;
+	}
+	if (radix == 16) {
+		sl_uint32 nh = (nb + 3) >> 2;
+		sl_uint32 ns;
+		if (sign < 0) {
+			ns = nh + 1;
+		} else {
+			ns = nh;
+		}
+		String ret = String8::allocate(ns);
+		if (ret.isNotNull()) {
+			sl_char8* buf = ret.getBuf();
+			if (sign < 0) {
+				buf[0] = '-';
+				buf++;
+			}
+			sl_uint32 ih = nh - 1;
+			for (sl_uint32 i = 0; i < nh; i++) {
+				sl_uint32 ie = ih >> 3;
+				sl_uint32 ib = (ih << 2) & 31;
+				sl_uint32 vh = (data[ie] >> ib) & 15;
+				if (vh < 10) {
+					buf[i] = (sl_char8)(vh + 0x30);
+				} else {
+					buf[i] = (sl_char8)(vh + 0x37);
+				}
+				ih--;
+			}
+		}
+		return ret;
+	} else {
+		sl_uint32 ne = (nb + 31) >> 5;
+		sl_uint32 n = (sl_uint32)(Math::ceil((nb + 1) / Math::log2((double)radix))) + 1;
+		SLIB_SCOPED_BUFFER(sl_uint32, STACK_BUFFER_SIZE, a, ne);
+		if (!a) {
+			return String::null();
+		}
+		SLIB_SCOPED_BUFFER(sl_char8, STACK_BUFFER_SIZE, s, n + 2);
+		if (!s) {
+			return String::null();
+		}
+		s = s + n;
+		s[1] = 0;
+		Base::copyMemory(a, data, ne * 4);
+		sl_uint32 l = 0;
+		for (; ne > 0;) {
+			sl_uint32 v = _cbigint_div_uint32(a, a, ne, radix, 0);
+			ne = _cbigint_mse(a, ne);
+			if (v < radix) {
+				*s = _StringConv_radixPatternUpper[v];
+			} else {
+				*s = '?';
+			}
+			s--;
+			l++;
+		}
+		if (sign < 0) {
+			*s = '-';
+			s--;
+			l++;
+		}
+		return String(s + 1, l);
+	}
+}
+
+
 sl_int32 CBigInt::compareAbs(const CBigInt& other) const
 {
 	const CBigInt& a = *this;
@@ -706,7 +1278,7 @@ sl_bool CBigInt::mulAbs(const CBigInt& a, const CBigInt& b)
 	sl_uint32 na = a.getSizeInElements();
 	sl_uint32 nb = b.getSizeInElements();
 	if (na == 0 || nb == 0) {
-		makeZero();
+		setZero();
 		return sl_true;
 	}
 	sl_uint32 nd;
@@ -765,7 +1337,7 @@ sl_bool CBigInt::mulAbs(const CBigInt& a, sl_uint32 b)
 {
 	sl_uint32 na = a.getSizeInElements();
 	if (na == 0 || b == 0) {
-		makeZero();
+		setZero();
 		return sl_true;
 	}
 	sl_uint32 nd;
@@ -825,10 +1397,10 @@ sl_bool CBigInt::divAbs(const CBigInt& a, const CBigInt& b, CBigInt* quotient, C
 	}
 	if (nba == 0) {
 		if (remainder) {
-			remainder->makeZero();
+			remainder->setZero();
 		}
 		if (quotient) {
-			quotient->makeZero();
+			quotient->setZero();
 		}
 		return sl_true;
 	}
@@ -839,7 +1411,7 @@ sl_bool CBigInt::divAbs(const CBigInt& a, const CBigInt& b, CBigInt* quotient, C
 			}
 		}
 		if (quotient) {
-			quotient->makeZero();
+			quotient->setZero();
 		}
 		return sl_true;
 	}
@@ -916,13 +1488,13 @@ sl_bool CBigInt::divAbs(const CBigInt& a, sl_uint32 b, CBigInt* quotient, sl_uin
 			*remainder = 0;
 		}
 		if (quotient) {
-			quotient->makeZero();
+			quotient->setZero();
 		}
 		return sl_true;
 	}
 	sl_uint32* q;
 	if (quotient) {
-		quotient->makeZero();
+		quotient->setZero();
 		if (quotient->growLength(na)) {
 			q = quotient->data;
 		} else {
@@ -1122,7 +1694,7 @@ sl_bool CBigInt::shiftRight(const CBigInt& a, sl_uint32 shift)
 	}	
 	sl_uint32 nba = a.getSizeInBits();
 	if (nba <= shift) {
-		makeZero();
+		setZero();
 		return sl_true;
 	}
 	sl_uint32 nd;
@@ -1161,7 +1733,7 @@ sl_bool CBigInt::shiftRight(const CBigInt& a, sl_uint32 shift)
 	}
 }
 
-sl_bool CBigInt::_pow(const CBigInt& A, const CBigInt& E, const CBigInt* pM)
+sl_bool CBigInt::pow(const CBigInt& A, const CBigInt& E, const CBigInt* pM)
 {
 	if (pM) {
 		sl_uint32 nM = pM->getSizeInElements();
@@ -1182,7 +1754,7 @@ sl_bool CBigInt::_pow(const CBigInt& A, const CBigInt& E, const CBigInt* pM)
 	}
 	sl_uint32 nA = A.getSizeInElements();
 	if (nA == 0) {
-		makeZero();
+		setZero();
 		return sl_true;
 	}
 	CBigInt T;
@@ -1227,10 +1799,10 @@ sl_bool CBigInt::_pow(const CBigInt& A, const CBigInt& E, const CBigInt* pM)
 	return sl_true;
 }
 
-sl_bool CBigInt::_pow(const CBigInt& A, sl_uint32 E, const CBigInt* pM)
+sl_bool CBigInt::pow(const CBigInt& A, sl_uint32 E, const CBigInt* pM)
 {
 	CBIGINT_UINT32(o, E);
-	return _pow(A, o, pM);
+	return pow(A, o, pM);
 }
 
 /*
@@ -1315,7 +1887,7 @@ sl_bool CBigInt::pow_montgomery(const CBigInt& A, const CBigInt& _E, const CBigI
 	}
 	sl_uint32 nA = A.getSizeInElements();
 	if (nA == 0) {
-		makeZero();
+		setZero();
 		return sl_true;
 	}
 
@@ -1525,7 +2097,7 @@ sl_bool CBigInt::gcd(const CBigInt& _A, const CBigInt& _B)
 	sl_uint32 lbA = _A.getLeastSignificantBits();
 	sl_uint32 lbB = _B.getLeastSignificantBits();
 	if (lbA == 0 || lbB == 0) {
-		makeZero();
+		setZero();
 		return sl_true;
 	}
 	sl_uint32 min_p2 = Math::min(lbA - 1, lbB - 1);
@@ -1574,725 +2146,35 @@ sl_bool CBigInt::gcd(const CBigInt& _A, const CBigInt& _B)
 	return sl_true;
 }
 
-sl_bool CBigInt::setValueFromElements(const sl_uint32* _data, sl_uint32 n)
-{
-	sl_uint32 nd = getSizeInElements();
-	if (growLength(n)) {
-		sl_uint32 i;
-		for (i = 0; i < n; i++) {
-			data[i] = _data[i];
-		}
-		for (; i < nd; i++) {
-			data[i] = 0;
-		}
-		return sl_true;
-	}
-	return sl_false;
-}
 
-sl_bool CBigInt::setBytesLE(const void* _bytes, sl_uint32 nBytes)
-{
-	sl_uint8* bytes = (sl_uint8*)_bytes;
-	// remove zeros
-	{
-		sl_uint32 n;
-		for (n = nBytes; n > 0; n--) {
-			if (bytes[n - 1]) {
-				break;
-			}
-		}
-		nBytes = n;
-	}
-	makeZero();
-	if (nBytes) {
-		if (growLength((nBytes + 3) >> 2)) {
-			for (sl_uint32 i = 0; i < nBytes; i++) {
-				data[i >> 2] |= ((sl_uint32)(bytes[i])) << ((i & 3) << 3);
-			}
-			return sl_true;
-		}
-	}
-	return sl_false;
-}
+/*
+	BigInt
+*/
 
-sl_bool CBigInt::getBytesLE(void* _bytes, sl_uint32 n) const
+String BigInt::toString(sl_uint32 radix) const
 {
-	sl_uint32 size = getSizeInBytes();
-	if (n < size) {
-		return sl_false;
-	}
-	sl_uint8* bytes = (sl_uint8*)_bytes;
-	sl_uint32 i;
-	for (i = 0; i < size; i++) {
-		bytes[i] = (sl_uint8)(data[i >> 2] >> ((i & 3) << 3));
-	}
-	for (; i < n; i++) {
-		bytes[i] = 0;
-	}
-	return sl_true;
-}
-
-Memory CBigInt::getBytesLE() const
-{
-	sl_uint32 size = getSizeInBytes();
-	Memory mem = Memory::create(size);
-	if (mem.isNotEmpty()) {
-		sl_uint8* bytes = (sl_uint8*)(mem.getBuf());
-		for (sl_uint32 i = 0; i < size; i++) {
-			bytes[i] = (sl_uint8)(data[i >> 2] >> ((i & 3) << 3));
-		}
-	}
-	return mem;
-}
-
-sl_bool CBigInt::setBytesBE(const void* _bytes, sl_uint32 nBytes)
-{
-	sl_uint8* bytes = (sl_uint8*)_bytes;
-	// remove zeros
-	{
-		sl_uint32 n;
-		for (n = 0; n < nBytes; n++) {
-			if (bytes[n]) {
-				break;
-			}
-		}
-		nBytes -= n;
-		bytes += n;
-	}
-	makeZero();
-	if (nBytes) {
-		if (growLength((nBytes + 3) >> 2)) {
-			sl_uint32 m = nBytes - 1;
-			for (sl_uint32 i = 0; i < nBytes; i++) {
-				data[i >> 2] |= ((sl_uint32)(bytes[m])) << ((i & 3) << 3);
-				m--;
-			}
-			return sl_true;
-		}
-	}
-	return sl_false;
-}
-
-sl_bool CBigInt::getBytesBE(void* _bytes, sl_uint32 n) const
-{
-	sl_uint32 size = getSizeInBytes();
-	if (n < size) {
-		return sl_false;
-	}
-	sl_uint8* bytes = (sl_uint8*)_bytes;
-	sl_uint32 i;
-	sl_uint32 m = n - 1;
-	for (i = 0; i < size; i++) {
-		bytes[m] = (sl_uint8)(data[i >> 2] >> ((i & 3) << 3));
-		m--;
-	}
-	for (; i < n; i++) {
-		bytes[m] = 0;
-		m--;
-	}
-	return sl_true;
-}
-
-Memory CBigInt::getBytesBE() const
-{
-	sl_uint32 size = getSizeInBytes();
-	Memory mem = Memory::create(size);
-	if (mem.isNotEmpty()) {
-		sl_uint8* bytes = (sl_uint8*)(mem.getBuf());
-		sl_uint32 m = size - 1;
-		for (sl_uint32 i = 0; i < size; i++) {
-			bytes[m] = (sl_uint8)(data[i >> 2] >> ((i & 3) << 3));
-			m--;
-		}
-	}
-	return mem;
-}
-
-CBigInt* CBigInt::allocate(sl_uint32 length)
-{
-	CBigInt* newObject = new CBigInt;
-	if (newObject) {
-		if (length > 0) {
-			sl_uint32* data = new sl_uint32[length];
-			if (data) {
-				newObject->m_flagUserData = sl_false;
-				newObject->length = length;
-				newObject->data = data;
-				Base::zeroMemory(data, length * 4);
-				return newObject;
-			}
-			delete newObject;
-		} else {
-			return newObject;
-		}
-	}
-	return sl_null;
-}
-
-CBigInt* CBigInt::duplicate(sl_uint32 newLength) const
-{
-	CBigInt* ret = allocate(length);
-	if (ret) {
-		sl_uint32 n = Math::min(length, newLength);
-		if (n > 0) {
-			Base::copyMemory(ret->data, data, n * 4);
-		}
-		ret->sign = sign;
-		ret->length = newLength;
-		return ret;
-	}
-	return sl_null;
-}
-
-sl_bool CBigInt::copyAbsFrom(const CBigInt& other)
-{
-	if (this == &other) {
-		return sl_true;
-	}
-	sl_uint32 n = other.getSizeInElements();
-	if (growLength(n)) {
-		if (other.data) {
-			Base::copyMemory(data, other.data, n * 4);
-			Base::zeroMemory(data + n, (length - n) * 4);
-		} else {
-			makeZero();
-		}
-		return sl_true;
+	CBigInt* o = m_object.get();
+	if (o) {
+		return o->toString(radix);
 	} else {
-		return sl_false;
-	}
-}
-
-void CBigInt::makeZero()
-{
-	if (data) {
-		Base::zeroMemory(data, length * 4);
-	}
-}
-
-sl_bool CBigInt::setValue(sl_int32 v)
-{
-	if (growLength(1)) {
-		if (v < 0) {
-			data[0] = -v;
-			sign = -1;
-		} else {
-			data[0] = v;
-			sign = 1;
-		}
-		Base::zeroMemory(data + 1, (length - 1) * 4);
-		return sl_true;
-	} else {
-		return sl_false;
-	}
-}
-
-sl_bool CBigInt::setValue(sl_uint32 v)
-{
-	if (growLength(1)) {
-		sign = 1;
-		data[0] = v;
-		Base::zeroMemory(data + 1, (length - 1) * 4);
-		return sl_true;
-	} else {
-		return sl_false;
-	}
-}
-
-sl_bool CBigInt::setValue(sl_int64 v)
-{
-	if (growLength(2)) {
-		sl_uint64 _v;
-		if (v < 0) {
-			_v = v;
-			sign = -1;
-		} else {
-			_v = v;
-			sign = 1;
-		}
-		data[0] = (sl_uint32)(_v);
-		data[1] = (sl_uint32)(_v >> 32);
-		Base::zeroMemory(data + 2, (length - 2) * 4);
-		return sl_true;
-	} else {
-		return sl_false;
-	}
-}
-
-sl_bool CBigInt::setValue(sl_uint64 v)
-{
-	if (growLength(2)) {
-		sign = 1;
-		data[0] = (sl_uint32)(v);
-		data[1] = (sl_uint32)(v >> 32);
-		Base::zeroMemory(data + 2, (length - 2) * 4);
-		return sl_true;
-	} else {
-		return sl_false;
-	}
-}
-
-CBigInt* CBigInt::fromInt32(sl_int32 v)
-{
-	CBigInt* ret = allocate(1);
-	if (ret) {
-		ret->setValue(v);
-		return ret;
-	}
-	return sl_null;
-}
-
-CBigInt* CBigInt::fromUint32(sl_uint32 v)
-{
-	CBigInt* ret = allocate(1);
-	if (ret) {
-		ret->setValue(v);
-		return ret;
-	}
-	return sl_null;
-}
-
-CBigInt* CBigInt::fromInt64(sl_int64 v)
-{
-	CBigInt* ret = allocate(2);
-	if (ret) {
-		ret->setValue(v);
-		return ret;
-	}
-	return sl_null;
-}
-
-CBigInt* CBigInt::fromUint64(sl_uint64 v)
-{
-	CBigInt* ret = allocate(2);
-	if (ret) {
-		ret->setValue(v);
-		return ret;
-	}
-	return sl_null;
-}
-
-sl_bool CBigInt::growLength(sl_uint32 newLength)
-{
-	if (length >= newLength) {
-		return sl_true;
-	}
-	sl_uint32* newData = new sl_uint32[newLength];
-	if (newData) {
-		if (data) {
-			Base::copyMemory(newData, data, length * 4);
-			Base::zeroMemory(newData + length, (newLength - length) * 4);
-			if (!m_flagUserData) {
-				delete[] data;
-			}
-		} else {
-			Base::zeroMemory(newData, newLength * 4);
-		}
-		m_flagUserData = sl_false;
-		length = newLength;
-		data = newData;
-		return sl_true;
-	} else {
-		return sl_false;
-	}
-}
-
-sl_bool CBigInt::setLength(sl_uint32 newLength)
-{
-	if (length < newLength) {
-		return growLength(newLength);
-	} else if (length == newLength) {
-		return sl_true;
-	} else {
-		if (newLength) {
-			sl_uint32* newData = new sl_uint32[newLength];
-			if (newData) {
-				if (data) {
-					Base::copyMemory(newData, data, newLength * 4);
-					if (!m_flagUserData) {
-						delete[] data;
-					}
-				}
-				m_flagUserData = sl_false;
-				length = newLength;
-				data = newData;
-				return sl_true;
-			} else {
-				return sl_false;
-			}
-		} else {
-			if (data) {
-				if (!m_flagUserData) {
-					delete[] data;
-				}
-			}
-			length = 0;
-			data = sl_null;
-			return sl_true;
-		}
-	}
-}
-
-template <class CT>
-sl_int32 _CBigInt_parseString(CBigInt* out, const CT* sz, sl_uint32 posBegin, sl_uint32 len, sl_uint32 radix)
-{
-	if (radix < 2 || radix > 64) {
-		return SLIB_PARSE_ERROR;;
-	}
-	sl_int32 sign;
-	sl_uint32 pos = posBegin;
-	if (pos < len && sz[pos] == '-') {
-		pos++;
-		sign = -1;
-	} else {
-		sign = 1;
-	}
-	for (; pos < len; pos++) {
-		sl_int32 c = (sl_uint32)(sz[pos]);
-		if (c != '\t' && c != ' ') {
-			break;
-		}
-	}
-	sl_uint32 end = pos;
-	const sl_uint8* pattern = radix <= 36 ? _StringConv_radixInversePatternSmall : _StringConv_radixInversePatternBig;
-	for (; end < len; end++) {
-		sl_uint32 c = (sl_uint8)(sz[end]);
-		sl_uint32 v = c < 128 ? pattern[c] : 255;
-		if (v >= radix) {
-			break;
-		}
-	}
-	if (end <= pos) {
-		return SLIB_PARSE_ERROR;
-	}
-	if (!out) {
-		return end;
-	}
-	out->sign = sign;
-	if (radix == 16) {
-		out->makeZero();
-		sl_uint32 nh = end - pos;
-		sl_uint32 ne = ((nh << 2) + 31) >> 5;
-		if (!(out->growLength(ne))) {
-			return SLIB_PARSE_ERROR;
-		}
-		sl_uint32* data = out->data;
-		sl_uint32 ih = nh - 1;
-		for (; pos < end; pos++) {
-			sl_uint32 c = (sl_uint8)(sz[pos]);
-			sl_uint32 v = c < 128 ? pattern[c] : 255;
-			if (v >= radix) {
-				break;
-			}
-			sl_uint32 ie = ih >> 3;
-			sl_uint32 ib = (ih << 2) & 31;
-			data[ie] |= (v << ib);
-			ih--;
-		}
-		return pos;
-	} else {
-		sl_uint32 nb = (sl_uint32)(Math::ceil(Math::log2((double)radix) * len));
-		sl_uint32 ne = (nb + 31) >> 5;
-		SLIB_SCOPED_BUFFER(sl_uint32, STACK_BUFFER_SIZE, a, ne);
-		if (!a) {
-			return SLIB_PARSE_ERROR;
-		}
-		sl_uint32 n = 0;
-		for (; pos < end; pos++) {
-			sl_uint32 c = (sl_uint8)(sz[pos]);
-			sl_uint32 v = c < 128 ? pattern[c] : 255;
-			if (v >= radix) {
-				break;
-			}
-			sl_uint32 o = _cbigint_mul_uint32(a, a, n, radix, v);
-			if (o) {
-				a[n] = o;
-				n++;
-			}
-		}
-		if (!(out->setValueFromElements(a, n))) {
-			return SLIB_PARSE_ERROR;
-		}
-		return pos;
-	}
-}
-
-sl_int32 CBigInt::parseString(CBigInt* out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_uint32 radix)
-{
-	return _CBigInt_parseString(out, sz, posBegin, len, radix);
-}
-
-sl_int32 CBigInt::parseString(CBigInt* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_uint32 radix)
-{
-	return _CBigInt_parseString(out, sz, posBegin, len, radix);
-}
-
-sl_bool CBigInt::parseString(const String& str, sl_uint32 radix)
-{
-	String s = str;
-	sl_uint32 n = s.getLength();
-	if (n == 0) {
-		return sl_false;
-	}
-	return _CBigInt_parseString(this, s.getBuf(), 0, n, radix) == n;
-}
-
-CBigInt* CBigInt::fromString(const String& str, sl_uint32 radix)
-{
-	CBigInt* ret = new CBigInt;
-	if (ret) {
-		ret->parseString(str, radix);
-	}
-	return ret;
-}
-
-String CBigInt::toString(sl_uint32 radix) const
-{
-	if (radix < 2 || radix > 64) {
-		return String::null();
-	}
-	sl_uint32 nb = getSizeInBits();
-	if (nb == 0) {
 		SLIB_STATIC_STRING(s, "0");
 		return s;
 	}
-	if (radix == 16) {
-		sl_uint32 nh = (nb + 3) >> 2;
-		sl_uint32 ns;
-		if (sign < 0) {
-			ns = nh + 1;
+}
+
+sl_int32 BigInt::compare(const BigInt& other) const
+{
+	CBigInt* a = m_object.get();
+	CBigInt* b = other.m_object.get();
+	if (a) {
+		if (b) {
+			return a->compare(*b);
 		} else {
-			ns = nh;
-		}
-		String ret = String8::memory(ns);
-		if (ret.isNotNull()) {
-			sl_char8* buf = ret.getBuf();
-			if (sign < 0) {
-				buf[0] = '-';
-				buf++;
-			}
-			sl_uint32 ih = nh - 1;
-			for (sl_uint32 i = 0; i < nh; i++) {
-				sl_uint32 ie = ih >> 3;
-				sl_uint32 ib = (ih << 2) & 31;
-				sl_uint32 vh = (data[ie] >> ib) & 15;
-				if (vh < 10) {
-					buf[i] = (sl_char8)(vh + 0x30);
-				} else {
-					buf[i] = (sl_char8)(vh + 0x37);
-				}
-				ih--;
-			}
-		}
-		return ret;
-	} else {
-		sl_uint32 ne = (nb + 31) >> 5;
-		sl_uint32 n = (sl_uint32)(Math::ceil((nb + 1) / Math::log2((double)radix))) + 1;
-		SLIB_SCOPED_BUFFER(sl_uint32, STACK_BUFFER_SIZE, a, ne);
-		if (!a) {
-			return String::null();
-		}
-		SLIB_SCOPED_BUFFER(sl_char8, STACK_BUFFER_SIZE, s, n + 2);
-		if (!s) {
-			return String::null();
-		}
-		s = s + n;
-		s[1] = 0;
-		Base::copyMemory(a, data, ne * 4);
-		sl_uint32 l = 0;
-		for (; ne > 0;) {
-			sl_uint32 v = _cbigint_div_uint32(a, a, ne, radix, 0);
-			ne = _cbigint_mse(a, ne);
-			if (v < radix) {
-				*s = _StringConv_radixPatternUpper[v];
-			} else {
-				*s = '?';
-			}
-			s--;
-			l++;
-		}
-		if (sign < 0) {
-			*s = '-';
-			s--;
-			l++;
-		}
-		return String(s + 1, l);
-	}
-}
-/*************************************
-	BigInt
-**************************************/
-BigInt::BigInt(sl_int32 n) : m_object(CBigInt::fromInt32(n))
-{
-}
-
-BigInt::BigInt(sl_uint32 n) : m_object(CBigInt::fromUint32(n))
-{
-}
-
-BigInt::BigInt(sl_int64 n) : m_object(CBigInt::fromInt64(n))
-{
-}
-
-BigInt::BigInt(sl_uint64 n) : m_object(CBigInt::fromUint64(n))
-{
-}
-
-BigInt& BigInt::operator=(sl_int32 n)
-{
-	m_object = CBigInt::fromInt32(n);
-	return *this;
-}
-
-BigInt& BigInt::operator=(sl_uint32 n)
-{
-	m_object = CBigInt::fromUint32(n);
-	return *this;
-}
-
-BigInt& BigInt::operator=(sl_int64 n)
-{
-	m_object = CBigInt::fromInt64(n);
-	return *this;
-}
-
-BigInt& BigInt::operator=(sl_uint64 n)
-{
-	m_object = CBigInt::fromUint64(n);
-	return *this;
-}
-
-sl_uint32 BigInt::getElementsCount() const
-{
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().getElementsCount();
-	} else {
-		return 0;
-	}
-}
-
-sl_uint32* BigInt::getElements() const
-{
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().getElements();
-	} else {
-		return sl_null;
-	}
-}
-
-sl_int32 BigInt::getSign() const
-{
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().getSign();
-	} else {
-		return 1;
-	}
-}
-
-BigInt BigInt::negative() const
-{
-	BigInt bi = duplicate();
-	if (bi.isNotNull()) {
-		bi.instance().makeNagative();
-	}
-	return bi;
-}
-
-sl_bool BigInt::getBit(sl_uint32 pos) const
-{
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().getBit(pos);
-	}
-	return sl_false;
-}
-
-sl_uint32 BigInt::getMostSignificantElements() const
-{
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().getMostSignificantElements();
-	} else {
-		return 0;
-	}
-}
-
-sl_uint32 BigInt::getLeastSignificantElements() const
-{
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().getLeastSignificantElements();
-	} else {
-		return 0;
-	}
-}
-
-sl_uint32 BigInt::getMostSignificantBytes() const
-{
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().getMostSignificantBytes();
-	} else {
-		return 0;
-	}
-}
-
-sl_uint32 BigInt::getLeastSignificantBytes() const
-{
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().getLeastSignificantBytes();
-	} else {
-		return 0;
-	}
-}
-
-sl_uint32 BigInt::getMostSignificantBits() const
-{
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().getMostSignificantBits();
-	} else {
-		return 0;
-	}
-}
-
-sl_uint32 BigInt::getLeastSignificantBits() const
-{
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().getLeastSignificantBits();
-	} else {
-		return 0;
-	}
-}
-
-sl_bool BigInt::isZero() const
-{
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().isZero();
-	} else {
-		return sl_true;
-	}
-}
-
-sl_int32 BigInt::compare(const BigInt& _other) const
-{
-	BigInt a = *this;
-	BigInt b = _other;
-	if (a.isNotNull()) {
-		if (b.isNotNull()) {
-			return a.instance().compare(b.instance());
-		} else {
-			return a.instance().getSign();
+			return a->getSign();
 		}
 	} else {
-		if (b.isNotNull()) {
-			return -(b.instance().getSign());
+		if (b) {
+			return -(b->getSign());
 		} else {
 			return 0;
 		}
@@ -2301,9 +2183,9 @@ sl_int32 BigInt::compare(const BigInt& _other) const
 
 sl_int32 BigInt::compare(sl_int32 v) const
 {
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().compare(v);
+	CBigInt* a = m_object.get();
+	if (a) {
+		return a->compare(v);
 	} else {
 		if (v > 0) {
 			return -1;
@@ -2317,9 +2199,9 @@ sl_int32 BigInt::compare(sl_int32 v) const
 
 sl_int32 BigInt::compare(sl_uint32 v) const
 {
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().compare(v);
+	CBigInt* a = m_object.get();
+	if (a) {
+		return a->compare(v);
 	} else {
 		return -1;
 	}
@@ -2327,9 +2209,9 @@ sl_int32 BigInt::compare(sl_uint32 v) const
 
 sl_int32 BigInt::compare(sl_int64 v) const
 {
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().compare(v);
+	CBigInt* a = m_object.get();
+	if (a) {
+		return a->compare(v);
 	} else {
 		if (v > 0) {
 			return -1;
@@ -2343,281 +2225,588 @@ sl_int32 BigInt::compare(sl_int64 v) const
 
 sl_int32 BigInt::compare(sl_uint64 v) const
 {
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().compare(v);
+	CBigInt* a = m_object.get();
+	if (a) {
+		return a->compare(v);
 	} else {
 		return -1;
 	}
 }
 
-BigInt BigInt::add(const BigInt& other) const
+BigInt BigInt::add(const BigInt& A, const BigInt& B)
 {
-	BigInt a = *this;
-	BigInt b = other;
-	if (a.isNull()) {
-		if (b.isNull()) {
-			return BigInt::null();
+	CBigInt* a = A.m_object.get();
+	CBigInt* b = B.m_object.get();
+	if (b) {
+		if (a) {
+			CBigInt* r = new CBigInt;
+			if (r) {
+				if (r->add(*a, *b)) {
+					return r;
+				}
+				delete r;
+			}
 		} else {
 			return b;
 		}
 	} else {
-		if (b.isNull()) {
-			return a;
-		}
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().add(a.instance(), b.instance())) {
-			return ret;
-		}
+		return a;
 	}
 	return BigInt::null();
 }
 
-BigInt BigInt::add(sl_int32 v) const
+sl_bool BigInt::add(const BigInt& other)
 {
-	BigInt a = *this;
-	if (a.isNull()) {
-		return BigInt::fromInt32(v);
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().add(a.instance(), v)) {
-			return ret;
-		}
-	}
-	return BigInt::null();
-}
-
-BigInt BigInt::add(sl_uint32 v) const
-{
-	BigInt a = *this;
-	if (a.isNull()) {
-		return BigInt::fromUint32(v);
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().add(a.instance(), v)) {
-			return ret;
-		}
-	}
-	return BigInt::null();
-}
-
-BigInt BigInt::add(sl_int64 v) const
-{
-	BigInt a = *this;
-	if (a.isNull()) {
-		return BigInt::fromInt64(v);
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().add(a.instance(), v)) {
-			return ret;
-		}
-	}
-	return BigInt::null();
-}
-
-BigInt BigInt::add(sl_uint64 v) const
-{
-	BigInt a = *this;
-	if (a.isNull()) {
-		return BigInt::fromUint64(v);
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().add(a.instance(), v)) {
-			return ret;
-		}
-	}
-	return BigInt::null();
-}
-
-BigInt BigInt::sub(const BigInt& other) const
-{
-	BigInt a = *this;
-	BigInt b = other;
-	if (a.isNull()) {
-		if (b.isNull()) {
-			return BigInt::null();
+	CBigInt* a = m_object.get();
+	CBigInt* b = other.m_object.get();
+	if (b) {
+		if (a) {
+			return a->add(*a, *b);
 		} else {
-			return b.negative();
+			a = b->duplicate();
+			if (a) {
+				m_object = a;
+				return sl_true;
+			}
 		}
 	} else {
-		if (b.isNull()) {
-			return a;
-		}
+		return sl_true;
 	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().sub(a.instance(), b.instance())) {
-			return ret;
-		}
-	}
-	return BigInt::null();
+	return sl_false;
 }
 
-BigInt BigInt::sub(sl_int32 v) const
+BigInt BigInt::add(const BigInt& A, sl_int32 v)
 {
-	BigInt a = *this;
-	if (a.isNull()) {
-		return BigInt::fromInt32(-v);
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().sub(a.instance(), v)) {
-			return ret;
-		}
-	}
-	return BigInt::null();
-}
-
-BigInt BigInt::sub(sl_uint32 v) const
-{
-	BigInt a = *this;
-	if (a.isNull()) {
-		return BigInt::fromUint32(v).negative();
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().sub(a.instance(), v)) {
-			return ret;
-		}
-	}
-	return BigInt::null();
-}
-
-BigInt BigInt::sub(sl_int64 v) const
-{
-	BigInt a = *this;
-	if (a.isNull()) {
-		return BigInt::fromInt64(-v);
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().sub(a.instance(), v)) {
-			return ret;
-		}
-	}
-	return BigInt::null();
-}
-
-BigInt BigInt::sub(sl_uint64 v) const
-{
-	BigInt a = *this;
-	if (a.isNull()) {
-		return BigInt::fromUint64(v).negative();
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().sub(a.instance(), v)) {
-			return ret;
-		}
-	}
-	return BigInt::null();
-}
-
-BigInt BigInt::mul(const BigInt& other) const
-{
-	BigInt a = *this;
-	BigInt b = other;
-	if (a.isNull() || b.isNull()) {
-		return BigInt::null();
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().mul(a.instance(), b.instance())) {
-			return ret;
-		}
-	}
-	return BigInt::null();
-}
-
-BigInt BigInt::mul(sl_int32 v) const
-{
-	BigInt a = *this;
-	if (a.isNull()) {
-		return BigInt::null();
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().mul(a.instance(), v)) {
-			return ret;
-		}
-	}
-	return BigInt::null();
-}
-
-BigInt BigInt::mul(sl_uint32 v) const
-{
-	BigInt a = *this;
-	if (a.isNull()) {
-		return BigInt::null();
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().mul(a.instance(), v)) {
-			return ret;
-		}
-	}
-	return BigInt::null();
-}
-
-BigInt BigInt::mul(sl_int64 v) const
-{
-	BigInt a = *this;
-	if (a.isNull()) {
-		return BigInt::null();
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().mul(a.instance(), v)) {
-			return ret;
-		}
-	}
-	return BigInt::null();
-}
-
-BigInt BigInt::mul(sl_uint64 v) const
-{
-	BigInt a = *this;
-	if (a.isNull()) {
-		return BigInt::null();
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().mul(a.instance(), v)) {
-			return ret;
-		}
-	}
-	return BigInt::null();
-}
-
-BigInt BigInt::div(const BigInt& other, BigInt* remainder) const
-{
-	BigInt a = *this;
-	BigInt b = other;
-	if (a.isNull() || b.isNull()) {
-		if (remainder) {
-			*remainder = BigInt::null();
-		}
-		return BigInt::null();
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		BigInt _r;
-		CBigInt* r = sl_null;
-		if (remainder) {
-			_r = new CBigInt;
-			r = &(_r.instance());
-		}
-		if (CBigInt::div(a.instance(), b.instance(), &(ret.instance()), r)) {
+	CBigInt* a = A.m_object.get();
+	if (v) {
+		if (a) {
+			CBigInt* r = new CBigInt;
 			if (r) {
-				*remainder = _r;
+				if (r->add(*a, v)) {
+					return r;
+				}
+				delete r;
 			}
-			return ret;
+		} else {
+			return CBigInt::fromInt32(v);
+		}
+	} else {
+		return a;
+	}
+	return BigInt::null();
+}
+
+sl_bool BigInt::add(sl_int32 v)
+{
+	CBigInt* a = m_object.get();
+	if (v) {
+		if (a) {
+			return a->add(*a, v);
+		} else {
+			a = CBigInt::fromInt32(v);
+			if (a) {
+				m_object = a;
+				return sl_true;
+			}
+		}
+	} else {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+BigInt BigInt::add(const BigInt& A, sl_uint32 v)
+{
+	CBigInt* a = A.m_object.get();
+	if (v) {
+		if (a) {
+			CBigInt* r = new CBigInt;
+			if (r) {
+				if (r->add(*a, v)) {
+					return r;
+				}
+				delete r;
+			}
+		} else {
+			return CBigInt::fromUint32(v);
+		}
+	} else {
+		return a;
+	}
+	return BigInt::null();
+}
+
+sl_bool BigInt::add(sl_uint32 v)
+{
+	CBigInt* a = m_object.get();
+	if (v) {
+		if (a) {
+			return a->add(*a, v);
+		} else {
+			a = CBigInt::fromUint32(v);
+			if (a) {
+				m_object = a;
+				return sl_true;
+			}
+		}
+	} else {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+BigInt BigInt::add(const BigInt& A, sl_int64 v)
+{
+	CBigInt* a = A.m_object.get();
+	if (v) {
+		if (a) {
+			CBigInt* r = new CBigInt;
+			if (r) {
+				if (r->add(*a, v)) {
+					return r;
+				}
+				delete r;
+			}
+		} else {
+			return CBigInt::fromInt64(v);
+		}
+	} else {
+		return a;
+	}
+	return BigInt::null();
+}
+
+sl_bool BigInt::add(sl_int64 v)
+{
+	CBigInt* a = m_object.get();
+	if (v) {
+		if (a) {
+			return a->add(*a, v);
+		} else {
+			a = CBigInt::fromInt64(v);
+			if (a) {
+				m_object = a;
+				return sl_true;
+			}
+		}
+	} else {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+BigInt BigInt::add(const BigInt& A, sl_uint64 v)
+{
+	CBigInt* a = A.m_object.get();
+	if (v) {
+		if (a) {
+			CBigInt* r = new CBigInt;
+			if (r) {
+				if (r->add(*a, v)) {
+					return r;
+				}
+				delete r;
+			}
+		} else {
+			return CBigInt::fromUint64(v);
+		}
+	} else {
+		return a;
+	}
+	return BigInt::null();
+}
+
+sl_bool BigInt::add(sl_uint64 v)
+{
+	CBigInt* a = m_object.get();
+	if (v) {
+		if (a) {
+			return a->add(*a, v);
+		} else {
+			a = CBigInt::fromUint64(v);
+			if (a) {
+				m_object = a;
+				return sl_true;
+			}
+		}
+	} else {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+
+BigInt BigInt::sub(const BigInt& A, const BigInt& B)
+{
+	CBigInt* a = A.m_object.get();
+	CBigInt* b = B.m_object.get();
+	if (b) {
+		if (a) {
+			CBigInt* r = new CBigInt;
+			if (r) {
+				if (r->sub(*a, *b)) {
+					return r;
+				}
+				delete r;
+			}
+		} else {
+			CBigInt* r = b->duplicate();
+			if (r) {
+				r->makeNagative();
+				return r;
+			}
+		}
+	} else {
+		return a;
+	}
+	return BigInt::null();
+}
+
+sl_bool BigInt::sub(const BigInt& other)
+{
+	CBigInt* a = m_object.get();
+	CBigInt* b = other.m_object.get();
+	if (b) {
+		if (a) {
+			return a->sub(*a, *b);
+		} else {
+			a = b->duplicate();
+			if (a) {
+				a->makeNagative();
+				m_object = a;
+				return sl_true;
+			}
+		}
+	} else {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+BigInt BigInt::sub(const BigInt& A, sl_int32 v)
+{
+	CBigInt* a = A.m_object.get();
+	if (v) {
+		if (a) {
+			CBigInt* r = new CBigInt;
+			if (r) {
+				if (r->sub(*a, v)) {
+					return r;
+				}
+				delete r;
+			}
+		} else {
+			return CBigInt::fromInt32(-v);
+		}
+	} else {
+		return a;
+	}
+	return BigInt::null();
+}
+
+sl_bool BigInt::sub(sl_int32 v)
+{
+	CBigInt* a = m_object.get();
+	if (v) {
+		if (a) {
+			return a->sub(*a, v);
+		} else {
+			a = CBigInt::fromInt32(-v);
+			if (a) {
+				m_object = a;
+				return sl_true;
+			}
+		}
+	} else {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+BigInt BigInt::sub(const BigInt& A, sl_uint32 v)
+{
+	CBigInt* a = A.m_object.get();
+	if (v) {
+		if (a) {
+			CBigInt* r = new CBigInt;
+			if (r) {
+				if (r->sub(*a, v)) {
+					return r;
+				}
+				delete r;
+			}
+		} else {
+			return CBigInt::fromInt64(-((sl_int64)v));
+		}
+	} else {
+		return a;
+	}
+	return BigInt::null();
+}
+
+sl_bool BigInt::sub(sl_uint32 v)
+{
+	CBigInt* a = m_object.get();
+	if (v) {
+		if (a) {
+			return a->sub(*a, v);
+		} else {
+			a = CBigInt::fromUint32(v);
+			if (a) {
+				a->makeNagative();
+				m_object = a;
+				return sl_true;
+			}
+		}
+	} else {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+BigInt BigInt::sub(const BigInt& A, sl_int64 v)
+{
+	CBigInt* a = A.m_object.get();
+	if (v) {
+		if (a) {
+			CBigInt* r = new CBigInt;
+			if (r) {
+				if (r->sub(*a, v)) {
+					return r;
+				}
+				delete r;
+			}
+		} else {
+			return CBigInt::fromInt64(-v);
+		}
+	} else {
+		return a;
+	}
+	return BigInt::null();
+}
+
+sl_bool BigInt::sub(sl_int64 v)
+{
+	CBigInt* a = m_object.get();
+	if (v) {
+		if (a) {
+			return a->sub(*a, v);
+		} else {
+			a = CBigInt::fromInt64(-v);
+			if (a) {
+				m_object = a;
+				return sl_true;
+			}
+		}
+	} else {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+BigInt BigInt::sub(const BigInt& A, sl_uint64 v)
+{
+	CBigInt* a = A.m_object.get();
+	if (v) {
+		if (a) {
+			CBigInt* r = new CBigInt;
+			if (r) {
+				if (r->sub(*a, v)) {
+					return r;
+				}
+				delete r;
+			}
+		} else {
+			CBigInt* r = CBigInt::fromUint64(v);
+			if (r) {
+				r->makeNagative();
+				return r;
+			}
+		}
+	} else {
+		return a;
+	}
+	return BigInt::null();
+}
+
+sl_bool BigInt::sub(sl_uint64 v)
+{
+	CBigInt* a = m_object.get();
+	if (v) {
+		if (a) {
+			return a->sub(*a, v);
+		} else {
+			a = CBigInt::fromUint64(v);
+			if (a) {
+				a->makeNagative();
+				m_object = a;
+				return sl_true;
+			}
+		}
+	} else {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+BigInt BigInt::mul(const BigInt& A, const BigInt& B)
+{
+	CBigInt* a = A.m_object.get();
+	if (a) {
+		CBigInt* b = B.m_object.get();
+		if (b) {
+			CBigInt* r = new CBigInt;
+			if (r) {
+				if (r->mul(*a, *b)) {
+					return r;
+				}
+				delete r;
+			}
+		}
+	}
+	return BigInt::null();
+}
+
+sl_bool BigInt::mul(const BigInt& other)
+{
+	CBigInt* a = m_object.get();
+	CBigInt* b = other.m_object.get();
+	if (a) {
+		if (b) {
+			return a->mul(*a, *b);
+		} else {
+			a->setZero();
+			return sl_true;
+		}
+	} else {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+BigInt BigInt::mul(const BigInt& A, sl_int32 v)
+{
+	CBigInt* a = A.m_object.get();
+	if (a) {
+		if (v) {
+			CBigInt* r = new CBigInt;
+			if (r) {
+				if (r->mul(*a, v)) {
+					return r;
+				}
+				delete r;
+			}
+		}
+	}
+	return BigInt::null();
+}
+
+sl_bool BigInt::mul(sl_int32 v)
+{
+	CBigInt* a = m_object.get();
+	if (a) {
+		if (v) {
+			return a->mul(*a, v);
+		} else {
+			a->setZero();
+			return sl_true;
+		}
+	} else {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+BigInt BigInt::mul(const BigInt& A, sl_uint32 v)
+{
+	CBigInt* a = A.m_object.get();
+	if (a) {
+		if (v) {
+			CBigInt* r = new CBigInt;
+			if (r) {
+				if (r->mul(*a, v)) {
+					return r;
+				}
+				delete r;
+			}
+		}
+	}
+	return BigInt::null();
+}
+
+sl_bool BigInt::mul(sl_uint32 v)
+{
+	CBigInt* a = m_object.get();
+	if (a) {
+		if (v) {
+			return a->mul(*a, v);
+		} else {
+			a->setZero();
+			return sl_true;
+		}
+	} else {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+BigInt BigInt::mul(const BigInt& A, sl_uint64 v)
+{
+	CBigInt* a = A.m_object.get();
+	if (a) {
+		if (v) {
+			CBigInt* r = new CBigInt;
+			if (r) {
+				if (r->mul(*a, v)) {
+					return r;
+				}
+				delete r;
+			}
+		}
+	}
+	return BigInt::null();
+}
+
+sl_bool BigInt::mul(sl_uint64 v)
+{
+	CBigInt* a = m_object.get();
+	if (a) {
+		if (v) {
+			return a->mul(*a, v);
+		} else {
+			a->setZero();
+			return sl_true;
+		}
+	} else {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+BigInt BigInt::div(const BigInt& A, const BigInt& B, BigInt* remainder)
+{
+	CBigInt* a = A.m_object.get();
+	CBigInt* b = B.m_object.get();
+	if (b) {
+		if (a) {
+			CBigInt* q = new CBigInt;
+			if (q) {
+				if (remainder) {
+					CBigInt* r = new CBigInt;
+					if (r) {
+						if (CBigInt::div(*a, *b, q, r)) {
+							*remainder = r;
+							return q;
+						}
+						delete r;
+					}
+				} else {
+					if (CBigInt::div(*a, *b, q, sl_null)) {
+						return q;
+					}
+				}
+				delete q;
+			}
 		}
 	}
 	if (remainder) {
@@ -2626,61 +2815,48 @@ BigInt BigInt::div(const BigInt& other, BigInt* remainder) const
 	return BigInt::null();
 }
 
-BigInt BigInt::div(sl_int32 v, sl_uint32* remainder) const
+sl_bool BigInt::div(const BigInt& other, BigInt* remainder)
 {
-	BigInt a = *this;
-	if (a.isNull()) {
-		if (remainder) {
-			*remainder = 0;
+	CBigInt* a = m_object.get();
+	CBigInt* b = other.m_object.get();
+	if (b) {
+		if (a) {
+			if (remainder) {
+				CBigInt* r = new CBigInt;
+				if (r) {
+					if (CBigInt::div(*a, *b, a, r)) {
+						*remainder = r;
+						return sl_true;
+					}
+					delete r;
+				}
+			} else {
+				if (CBigInt::div(*a, *b, a, sl_null)) {
+					return sl_true;
+				}
+			}
+		} else {
+			if (remainder) {
+				*remainder = BigInt::null();
+			}
+			return sl_true;
 		}
-		return BigInt::null();
 	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (CBigInt::div(a.instance(), v, &(ret.instance()), remainder)) {
-			return ret;
-		}
-	}
-	if (remainder) {
-		*remainder = 0;
-	}
-	return BigInt::null();
+	return sl_false;
 }
 
-BigInt BigInt::div(sl_uint32 v, sl_uint32* remainder) const
+BigInt BigInt::div(const BigInt& A, sl_int32 v, sl_uint32* remainder)
 {
-	BigInt a = *this;
-	if (a.isNull()) {
-		if (remainder) {
-			*remainder = 0;
-		}
-		return BigInt::null();
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (CBigInt::div(a.instance(), v, &(ret.instance()), remainder)) {
-			return ret;
-		}
-	}
-	if (remainder) {
-		*remainder = 0;
-	}
-	return BigInt::null();
-}
-
-BigInt BigInt::div(sl_int64 v, sl_uint64* remainder) const
-{
-	BigInt a = *this;
-	if (a.isNull()) {
-		if (remainder) {
-			*remainder = 0;
-		}
-		return BigInt::null();
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (CBigInt::div(a.instance(), v, &(ret.instance()), remainder)) {
-			return ret;
+	CBigInt* a = A.m_object.get();
+	if (v) {
+		if (a) {
+			CBigInt* q = new CBigInt;
+			if (q) {
+				if (CBigInt::div(*a, v, q, remainder)) {
+					return q;
+				}
+				delete q;
+			}
 		}
 	}
 	if (remainder) {
@@ -2689,19 +2865,36 @@ BigInt BigInt::div(sl_int64 v, sl_uint64* remainder) const
 	return BigInt::null();
 }
 
-BigInt BigInt::div(sl_uint64 v, sl_uint64* remainder) const
+sl_bool BigInt::div(sl_int32 v, sl_uint32* remainder)
 {
-	BigInt a = *this;
-	if (a.isNull()) {
-		if (remainder) {
-			*remainder = 0;
+	CBigInt* a = m_object.get();
+	if (v) {
+		if (a) {
+			if (CBigInt::div(*a, v, a, remainder)) {
+				return sl_true;
+			}
+		} else {
+			if (remainder) {
+				*remainder = 0;
+			}
+			return sl_true;
 		}
-		return BigInt::null();
 	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (CBigInt::div(a.instance(), v, &(ret.instance()), remainder)) {
-			return ret;
+	return sl_false;
+}
+
+BigInt BigInt::div(const BigInt& A, sl_uint32 v, sl_uint32* remainder)
+{
+	CBigInt* a = A.m_object.get();
+	if (v) {
+		if (a) {
+			CBigInt* q = new CBigInt;
+			if (q) {
+				if (CBigInt::div(*a, v, q, remainder)) {
+					return q;
+				}
+				delete q;
+			}
 		}
 	}
 	if (remainder) {
@@ -2710,355 +2903,447 @@ BigInt BigInt::div(sl_uint64 v, sl_uint64* remainder) const
 	return BigInt::null();
 }
 
-BigInt BigInt::mod(const BigInt& other) const
+sl_bool BigInt::div(sl_uint32 v, sl_uint32* remainder)
 {
-	BigInt a = *this;
-	BigInt b = other;
-	if (a.isNull() || b.isNull()) {
-		return BigInt::null();
+	CBigInt* a = m_object.get();
+	if (v) {
+		if (a) {
+			if (CBigInt::div(*a, v, a, remainder)) {
+				return sl_true;
+			}
+		} else {
+			if (remainder) {
+				*remainder = 0;
+			}
+			return sl_true;
+		}
 	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (CBigInt::div(a.instance(), b.instance(), sl_null, &(ret.instance()))) {
-			return ret;
+	return sl_false;
+}
+
+BigInt BigInt::div(const BigInt& A, sl_int64 v, sl_uint64* remainder)
+{
+	CBigInt* a = A.m_object.get();
+	if (v) {
+		if (a) {
+			CBigInt* q = new CBigInt;
+			if (q) {
+				if (CBigInt::div(*a, v, q, remainder)) {
+					return q;
+				}
+				delete q;
+			}
+		}
+	}
+	if (remainder) {
+		*remainder = 0;
+	}
+	return BigInt::null();
+}
+
+sl_bool BigInt::div(sl_int64 v, sl_uint64* remainder)
+{
+	CBigInt* a = m_object.get();
+	if (v) {
+		if (a) {
+			if (CBigInt::div(*a, v, a, remainder)) {
+				return sl_true;
+			}
+		} else {
+			if (remainder) {
+				*remainder = 0;
+			}
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
+BigInt BigInt::div(const BigInt& A, sl_uint64 v, sl_uint64* remainder)
+{
+	CBigInt* a = A.m_object.get();
+	if (v) {
+		if (a) {
+			CBigInt* q = new CBigInt;
+			if (q) {
+				if (CBigInt::div(*a, v, q, remainder)) {
+					return q;
+				}
+				delete q;
+			}
+		}
+	}
+	if (remainder) {
+		*remainder = 0;
+	}
+	return BigInt::null();
+}
+
+sl_bool BigInt::div(sl_uint64 v, sl_uint64* remainder)
+{
+	CBigInt* a = m_object.get();
+	if (v) {
+		if (a) {
+			if (CBigInt::div(*a, v, a, remainder)) {
+				return sl_true;
+			}
+		} else {
+			if (remainder) {
+				*remainder = 0;
+			}
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
+BigInt BigInt::mod(const BigInt& A, const BigInt& B)
+{
+	CBigInt* a = A.m_object.get();
+	CBigInt* b = B.m_object.get();
+	if (b) {
+		if (a) {
+			CBigInt* r = new CBigInt;
+			if (r) {
+				if (CBigInt::div(*a, *b, sl_null, r)) {
+					return r;
+				}
+				delete r;
+			}
 		}
 	}
 	return BigInt::null();
 }
 
-sl_uint32 BigInt::mod(sl_int32 v) const
+sl_bool BigInt::mod(const BigInt& other)
 {
-	BigInt a = *this;
-	if (a.isNull()) {
-		return 0;
+	CBigInt* a = m_object.get();
+	CBigInt* b = other.m_object.get();
+	if (b) {
+		if (a) {
+			return CBigInt::div(*a, *b, sl_null, a);
+		} else {
+			return sl_true;
+		}
 	}
-	sl_uint32 ret = 0;
-	if (CBigInt::div(a.instance(), v, sl_null, &ret)) {
-		return ret;
+	return sl_false;
+}
+
+sl_uint32 BigInt::mod(const BigInt& A, sl_int32 v)
+{
+	CBigInt* a = A.m_object.get();
+	if (a) {
+		sl_uint32 r;
+		if (CBigInt::div(*a, v, sl_null, &r)) {
+			return r;
+		}
 	}
 	return 0;
 }
 
-sl_uint32 BigInt::mod(sl_uint32 v) const
+sl_uint32 BigInt::mod(const BigInt& A, sl_uint32 v)
 {
-	BigInt a = *this;
-	if (a.isNull()) {
-		return 0;
-	}
-	sl_uint32 ret = 0;
-	if (CBigInt::div(a.instance(), v, sl_null, &ret)) {
-		return ret;
+	CBigInt* a = A.m_object.get();
+	if (a) {
+		sl_uint32 r;
+		if (CBigInt::div(*a, v, sl_null, &r)) {
+			return r;
+		}
 	}
 	return 0;
 }
 
-sl_uint64 BigInt::mod(sl_int64 v) const
+sl_uint64 BigInt::mod(const BigInt& A, sl_int64 v)
 {
-	BigInt a = *this;
-	if (a.isNull()) {
-		return 0;
-	}
-	sl_uint64 ret = 0;
-	if (CBigInt::div(a.instance(), v, sl_null, &ret)) {
-		return ret;
+	CBigInt* a = A.m_object.get();
+	if (a) {
+		sl_uint64 r;
+		if (CBigInt::div(*a, v, sl_null, &r)) {
+			return r;
+		}
 	}
 	return 0;
 }
 
-sl_uint64 BigInt::mod(sl_uint64 v) const
+sl_uint64 BigInt::mod(const BigInt& A, sl_uint64 v)
 {
-	BigInt a = *this;
-	if (a.isNull()) {
-		return 0;
-	}
-	sl_uint64 ret = 0;
-	if (CBigInt::div(a.instance(), v, sl_null, &ret)) {
-		return ret;
+	CBigInt* a = A.m_object.get();
+	if (a) {
+		sl_uint64 r;
+		if (CBigInt::div(*a, v, sl_null, &r)) {
+			return r;
+		}
 	}
 	return 0;
 }
 
-BigInt BigInt::_pow(const BigInt& _E, const BigInt* _pM)
+BigInt BigInt::shiftLeft(const BigInt& A, sl_uint32 n)
 {
-	BigInt E = _E;
-	if (E.isNull()) {
+	CBigInt* a = A.m_object.get();
+	if (n) {
+		if (a) {
+			CBigInt* r = new CBigInt;
+			if (r) {
+				if (r->shiftLeft(*a, n)) {
+					return r;
+				}
+				delete r;
+			}
+		}
+	} else {
+		return a;
+	}
+	return BigInt::null();
+}
+
+sl_bool BigInt::shiftLeft(sl_uint32 n)
+{
+	CBigInt* a = m_object.get();
+	if (n) {
+		if (a) {
+			return a->shiftLeft(*a, n);
+		} else {
+			return sl_true;
+		}
+	} else {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+BigInt BigInt::shiftRight(const BigInt& A, sl_uint32 n)
+{
+	CBigInt* a = A.m_object.get();
+	if (n) {
+		if (a) {
+			CBigInt* r = new CBigInt;
+			if (r) {
+				if (r->shiftRight(*a, n)) {
+					return r;
+				}
+				delete r;
+			}
+		}
+	} else {
+		return a;
+	}
+	return BigInt::null();
+}
+
+sl_bool BigInt::shiftRight(sl_uint32 n)
+{
+	CBigInt* a = m_object.get();
+	if (n) {
+		if (a) {
+			return a->shiftRight(*a, n);
+		} else {
+			return sl_true;
+		}
+	} else {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+BigInt BigInt::pow(const BigInt& A, const BigInt& E, const BigInt* pM)
+{
+	CBigInt* a = A.m_object.get();
+	CBigInt* e = E.m_object.get();
+	if (!e || e->isZero()) {
 		return fromInt32(1);
 	}
-	BigInt A = *this;
-	if (A.isNull()) {
-		return BigInt::null();
-	}
-	const CBigInt* pM;
-	if (_pM) {
-		pM = &(_pM->instance());
-	} else {
-		pM = sl_null;
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance()._pow(A.instance(), E.instance(), pM)) {
-			return ret;
+	if (a) {
+		CBigInt* r = new CBigInt;
+		if (r) {
+			if (pM) {
+				if (r->pow(*a, *e, pM->m_object.get())) {
+					return r;
+				}
+			} else {
+				if (r->pow(*a, *e, sl_null)) {
+					return r;
+				}
+			}
+			delete r;
 		}
 	}
 	return BigInt::null();
 }
 
-BigInt BigInt::_pow(sl_uint32 E, const BigInt* _pM)
+sl_bool BigInt::pow(const BigInt& E, const BigInt* pM)
 {
-	if (E == 0) {
+	CBigInt* a = m_object.get();
+	CBigInt* e = E.m_object.get();
+	if (!e || e->isZero()) {
+		if (a) {
+			if (a->setValue(1)) {
+				return sl_true;
+			}
+		} else {
+			a = CBigInt::fromInt32(1);
+			if (a) {
+				m_object = a;
+				return sl_true;
+			}
+		}
+	} else {
+		if (a) {
+			if (pM) {
+				return a->pow(*a, *e, pM->m_object.get());
+			} else {
+				return a->pow(*a, *e, sl_null);
+			}
+		} else {
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
+BigInt BigInt::pow(const BigInt& A, sl_uint32 E, const BigInt* pM)
+{
+	CBigInt* a = A.m_object.get();
+	if (E) {
+		if (E == 1) {
+			return a;
+		}
+		if (a) {
+			CBigInt* r = new CBigInt;
+			if (r) {
+				if (pM) {
+					if (r->pow(*a, E, pM->m_object.get())) {
+						return r;
+					}
+				} else {
+					if (r->pow(*a, E, sl_null)) {
+						return r;
+					}
+				}
+				delete r;
+			}
+		}
+	} else {
 		return fromInt32(1);
 	}
-	BigInt A = *this;
-	if (A.isNull()) {
-		return BigInt::null();
-	}
-	const CBigInt* pM;
-	if (_pM) {
-		pM = &(_pM->instance());
-	} else {
-		pM = sl_null;
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance()._pow(A.instance(), E, pM)) {
-			return ret;
-		}
-	}
 	return BigInt::null();
 }
 
-BigInt BigInt::pow_montgomery(const BigInt& _E, const BigInt& _M)
+sl_bool BigInt::pow(sl_uint32 E, const BigInt* pM)
 {
-	BigInt M = _M;
-	if (M.isNull()) {
-		return BigInt::null();
+	CBigInt* a = m_object.get();
+	if (E) {
+		if (E == 1) {
+			sl_true;
+		}
+		if (a) {
+			if (pM) {
+				return a->pow(*a, E, pM->m_object.get());
+			} else {
+				return a->pow(*a, E, sl_null);
+			}
+		}
+	} else {
+		if (a) {
+			if (a->setValue(1)) {
+				return sl_true;
+			}
+		} else {
+			a = CBigInt::fromInt32(1);
+			if (a) {
+				m_object = a;
+				return sl_true;
+			}
+		}
 	}
-	BigInt E = _E;
-	if (E.isNull()) {
+	return sl_false;
+}
+
+BigInt BigInt::pow_montgomery(const BigInt& A, const BigInt& E, const BigInt& M)
+{
+	CBigInt* a = A.m_object.get();
+	CBigInt* e = E.m_object.get();
+	CBigInt* m = M.m_object.get();
+	if (!e || e->isZero()) {
 		return fromInt32(1);
-	}
-	BigInt A = *this;
-	if (A.isNull()) {
-		return BigInt::null();
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().pow_montgomery(A.instance(), E.instance(), M.instance())) {
-			return ret;
+	} else {
+		if (m) {
+			if (a) {
+				CBigInt* r = new CBigInt;
+				if (r) {
+					if (r->pow_montgomery(*a, *e, *m)) {
+						return r;
+					}
+					delete r;
+				}
+			}
 		}
 	}
 	return BigInt::null();
 }
 
-BigInt BigInt::gcd(const BigInt& other)
+sl_bool BigInt::pow_montgomery(const BigInt& E, const BigInt& M)
 {
-	BigInt A = *this;
-	if (A.isNull()) {
-		return BigInt::null();
+	CBigInt* a = m_object.get();
+	CBigInt* e = E.m_object.get();
+	CBigInt* m = M.m_object.get();
+	if (!e || e->isZero()) {
+		if (a) {
+			if (a->setValue(1)) {
+				return sl_true;
+			}
+		} else {
+			a = CBigInt::fromInt32(1);
+			if (a) {
+				m_object = a;
+				return sl_true;
+			}
+		}
+	} else {
+		if (m) {
+			if (a) {
+				return a->pow_montgomery(*a, *e, *m);
+			} else {
+				return sl_true;
+			}
+		}
 	}
-	BigInt B = other;
-	if (B.isNull()) {
-		return BigInt::null();
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().gcd(A.instance(), B.instance())) {
-			return ret;
+	return sl_false;
+}
+
+BigInt BigInt::gcd(const BigInt& A, const BigInt& B)
+{
+	CBigInt* a = A.m_object.get();
+	CBigInt* b = B.m_object.get();
+	if (a) {
+		if (b) {
+			CBigInt* r = new CBigInt;
+			if (r) {
+				if (r->gcd(*a, *b)) {
+					return r;
+				}
+				delete r;
+			}
 		}
 	}
 	return BigInt::null();
 }
 
-BigInt BigInt::inverseMod(const BigInt& _M)
+BigInt BigInt::inverseMod(const BigInt& A, const BigInt& M)
 {
-	BigInt A = *this;
-	if (A.isNull()) {
-		return BigInt::null();
-	}
-	BigInt M = _M;
-	if (M.isNull()) {
-		return BigInt::null();
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().inverseMod(A.instance(), M.instance())) {
-			return ret;
+	CBigInt* a = A.m_object.get();
+	CBigInt* m = M.m_object.get();
+	if (a) {
+		if (m) {
+			CBigInt* r = new CBigInt;
+			if (r) {
+				if (r->inverseMod(*a, *m)) {
+					return r;
+				}
+				delete r;
+			}
 		}
 	}
 	return BigInt::null();
 }
 
-BigInt BigInt::shiftLeft(sl_uint32 n) const
-{
-	BigInt bi = *this;
-	if (bi.isNull()) {
-		return bi;
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().shiftLeft(bi.instance(), n)) {
-			return ret;
-		}
-	}
-	return BigInt::null();
-}
-
-BigInt BigInt::shiftRight(sl_uint32 n) const
-{
-	BigInt bi = *this;
-	if (bi.isNull()) {
-		return bi;
-	}
-	BigInt ret = new CBigInt;
-	if (ret.isNotNull()) {
-		if (ret.instance().shiftRight(bi.instance(), n)) {
-			return ret;
-		}
-	}
-	return BigInt::null();
-}
-
-BigInt BigInt::fromBytesLE(const void* bytes, sl_uint32 nBytes)
-{
-	if (nBytes == 0) {
-		return BigInt::null();
-	}
-	BigInt bi = CBigInt::allocate((nBytes + 3) >> 2);
-	if (bi.isNotNull()) {
-		if (bi.instance().setBytesLE(bytes, nBytes)) {
-			return bi;
-		}
-	}
-	return BigInt::null();
-}
-
-sl_bool BigInt::getBytesLE(void* buf, sl_uint32 n) const
-{
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().getBytesLE(buf, n);
-	} else {
-		return sl_false;
-	}
-}
-
-Memory BigInt::getBytesLE() const
-{
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().getBytesLE();
-	} else {
-		return Memory::null();
-	}
-}
-
-BigInt BigInt::fromBytesBE(const void* bytes, sl_uint32 nBytes)
-{
-	if (nBytes == 0) {
-		return BigInt::null();
-	}
-	BigInt bi = CBigInt::allocate((nBytes + 3) >> 2);
-	if (bi.isNotNull()) {
-		if (bi.instance().setBytesBE(bytes, nBytes)) {
-			return bi;
-		}
-	}
-	return BigInt::null();
-}
-
-sl_bool BigInt::getBytesBE(void* buf, sl_uint32 n) const
-{
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().getBytesBE(buf, n);
-	} else {
-		return sl_false;
-	}
-}
-
-Memory BigInt::getBytesBE() const
-{
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().getBytesBE();
-	} else {
-		return Memory::null();
-	}
-}
-
-BigInt BigInt::duplicate() const
-{
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().duplicate();
-	} else {
-		return BigInt::null();
-	}
-}
-
-BigInt BigInt::compact() const
-{
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().duplicateCompact();
-	} else {
-		return BigInt::null();
-	}
-}
-
-BigInt BigInt::fromInt32(sl_int32 v)
-{
-	return CBigInt::fromInt32(v);
-}
-
-BigInt BigInt::fromUint32(sl_uint32 v)
-{
-	return CBigInt::fromUint32(v);
-}
-
-BigInt BigInt::fromInt64(sl_int64 v)
-{
-	return CBigInt::fromInt64(v);
-}
-
-BigInt BigInt::fromUint64(sl_uint64 v)
-{
-	return CBigInt::fromUint64(v);
-}
-
-BigInt BigInt::fromString(const String& str, sl_uint32 radix)
-{
-	return CBigInt::fromString(str, radix);
-}
-
-String BigInt::toString(sl_uint32 radix) const
-{
-	BigInt bi = *this;
-	if (bi.isNotNull()) {
-		return bi.instance().toString(radix);
-	} else {
-		SLIB_STATIC_STRING(s, "0");
-		return s;
-	}
-}
-
-sl_int32 BigInt::parseString(BigInt* out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_uint32 radix)
-{
-	Ref<CBigInt> o;
-	if (out) {
-		o = new CBigInt;
-		out->m_object = o;
-	}
-	return CBigInt::parseString(o.get(), sz, posBegin, len, radix);
-}
-
-sl_int32 BigInt::parseString(BigInt* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_uint32 radix)
-{
-	Ref<CBigInt> o;
-	if (out) {
-		o = new CBigInt;
-		out->m_object = o;
-	}
-	return CBigInt::parseString(o.get(), sz, posBegin, len, radix);
-}
 SLIB_MATH_NAMESPACE_END

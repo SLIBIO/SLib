@@ -102,9 +102,8 @@ sl_int32 SocketAddress::parse(SocketAddress* out, const sl_char16* sz, sl_uint32
 	return _SocketAddress_parse(out, sz, posBegin, len);
 }
 
-sl_bool SocketAddress::parse(const String& _str)
+sl_bool SocketAddress::parse(const String& s)
 {
-	String s = _str;
 	sl_uint32 n = s.getLength();
 	if (n == 0) {
 		return sl_false;
@@ -112,9 +111,8 @@ sl_bool SocketAddress::parse(const String& _str)
 	return _SocketAddress_parse(this, s.getBuf(), 0, n) == n;
 }
 
-sl_bool SocketAddress::setHostAddress(const String& _address)
+sl_bool SocketAddress::setHostAddress(const String& address)
 {
-	String address = _address;
 	sl_int32 index = address.lastIndexOf(':');
 	if (index < 0) {
 		port = 0;

@@ -23,13 +23,12 @@ public:
 		::sqlite3_close(m_db);
 	}
 
-	static Ref<_Sqlite3Database> connect(const String& _filePath)
+	static Ref<_Sqlite3Database> connect(const String& filePath)
 	{
 		Ref<_Sqlite3Database> ret;
 		sqlite3* db = sl_null;
-		String8 filePath = _filePath;
 		if (File::exists(filePath)) {
-			sl_int32 iResult = ::sqlite3_open(filePath.getBuf(), &db);
+			sl_int32 iResult = ::sqlite3_open(filePath.data(), &db);
 			if (SQLITE_OK == iResult) {
 				ret = new _Sqlite3Database();
 				if (ret.isNotNull()) {
@@ -42,12 +41,11 @@ public:
 		return ret;
 	}
 
-	sl_bool execute(const String& _sql, sl_size* pOutAffectedRowsCount)
+	sl_bool execute(const String& sql, sl_uint64* pOutAffectedRowsCount)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		char* zErrMsg = 0;
-		String8 sql = _sql;
-		if (SQLITE_OK == ::sqlite3_exec(m_db, sql.getBuf(), 0, 0, &zErrMsg)) {
+		if (SQLITE_OK == ::sqlite3_exec(m_db, sql.data(), 0, 0, &zErrMsg)) {
 			if (pOutAffectedRowsCount) {
 				*pOutAffectedRowsCount = ::sqlite3_changes(m_db);
 			}
@@ -89,11 +87,11 @@ public:
 			for (sl_int32 i = 0; i < cols; i++) {
 				const char* buf = ::sqlite3_column_name(statement, (int)i);
 				String name(buf);
-				m_listColumnNames.push(name);
+				m_listColumnNames.add(name);
 				m_mapColumnIndexes.put(name, i);
 			}
 			m_nColumnNames = (sl_uint32)(m_listColumnNames.getCount());
-			m_columnNames = m_listColumnNames.getBuffer();
+			m_columnNames = m_listColumnNames.data();
 
 			db->lock();
 		}
@@ -388,7 +386,7 @@ public:
 							} else {
 								String8 str = var.getString();
 								var = str;
-								iRet = ::sqlite3_bind_text(m_statement, i, str.getBuf(), str.getLength(), SQLITE_STATIC);
+								iRet = ::sqlite3_bind_text(m_statement, i, str.data(), str.getLength(), SQLITE_STATIC);
 							}
 						}
 						if (iRet != SQLITE_OK) {
@@ -402,9 +400,9 @@ public:
 			return sl_false;
 		}
 
-		sl_bool execute(const Variant* params, sl_uint32 nParams, sl_size* pOutAffectedRowsCount)
+		sl_bool execute(const Variant* params, sl_uint32 nParams, sl_uint64* pOutAffectedRowsCount)
 		{
-			MutexLocker lock(m_db->getLocker());
+			ObjectLocker lock(m_db.get());
 			if (_execute(params, nParams)) {
 				if (::sqlite3_step(m_statement) == SQLITE_DONE) {
 					::sqlite3_reset(m_statement);
@@ -420,7 +418,7 @@ public:
 
 		Ref<DatabaseCursor> query(const Variant* params, sl_uint32 nParams)
 		{
-			MutexLocker lock(m_db->getLocker());
+			ObjectLocker lock(m_db.get());
 			Ref<DatabaseCursor> ret;
 			if (_execute(params, nParams)) {
 				ret = new _DatabaseCursor(m_db.get(), this, m_statement);
@@ -434,13 +432,12 @@ public:
 		}
 	};
 
-	Ref<DatabaseStatement> prepareStatement(const String& _sql)
+	Ref<DatabaseStatement> prepareStatement(const String& sql)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		Ref<DatabaseStatement> ret;
-		String8 sql = _sql;
 		sqlite3_stmt* statement = sl_null;
-		if (SQLITE_OK == ::sqlite3_prepare_v2(m_db, sql.getBuf(), -1, &statement, sl_null)) {
+		if (SQLITE_OK == ::sqlite3_prepare_v2(m_db, sql.data(), -1, &statement, sl_null)) {
 			ret = new _DatabaseStatement(this, statement);
 			if (ret.isNotNull()) {
 				return ret;

@@ -308,7 +308,7 @@ public:
 	void mergePoints(const List< PointT<T> >& points)
 	{
 		ListLocker< PointT<T> > list(points);
-		mergePoints(list.getBuffer(), list.getCount());
+		mergePoints(list.data(), list.getCount());
 	}
 	
 	void setFromPoints(const PointT<T>* points, sl_size count)
@@ -324,7 +324,7 @@ public:
 	void setFromPoints(const List< PointT<T> >& points)
 	{
 		ListLocker< PointT<T> > list(points);
-		setFromPoints(list.getBuffer(), list.getCount());
+		setFromPoints(list.data(), list.getCount());
 	}
 	
 	SLIB_INLINE void setFromPoints(const PointT<T>& pt1, const PointT<T>& pt2)

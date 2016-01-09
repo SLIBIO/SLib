@@ -29,6 +29,7 @@ class SLIB_EXPORT JniLocal
 public:
 	T value;
 
+public:
 	SLIB_INLINE JniLocal()
 	{
 		this->value = sl_null;
@@ -44,12 +45,18 @@ public:
 		free();
 	}
 
-	SLIB_INLINE T get()
+public:
+	SLIB_INLINE T get() const
 	{
 		return value;
 	}
 
 	SLIB_INLINE operator T&()
+	{
+		return value;
+	}
+
+	SLIB_INLINE operator T() const
 	{
 		return value;
 	}
@@ -60,12 +67,12 @@ public:
 		return value;
 	}
 
-	SLIB_INLINE sl_bool isNotNull()
+	SLIB_INLINE sl_bool isNotNull() const
 	{
 		return value != sl_null;
 	}
 
-	SLIB_INLINE sl_bool isNull()
+	SLIB_INLINE sl_bool isNull() const
 	{
 		return value == sl_null;
 	}
@@ -91,44 +98,53 @@ public:
 	static Ref<_JniGlobal> from(jobject obj);
 };
 
+
+template <class T>
+class JniSafeGlobal;
+
 template <class T>
 class SLIB_EXPORT JniGlobal
 {
 	SLIB_DECLARE_OBJECT_TYPE_FROM(JniGlobal<T>, _JniGlobal)
 	SLIB_DECLARE_OBJECT_WRAPPER(JniGlobal, JniGlobal<T>, _JniGlobal, Ref<_JniGlobal>)
+
 public:
-	SLIB_INLINE JniGlobal(T obj)
+	JniGlobal(const JniSafeGlobal<T>& g);
+	
+	SLIB_INLINE JniGlobal(T obj) : m_object(_JniGlobal::from(obj))
 	{
-		m_object = _JniGlobal::from(obj);
 	}
 
+	SLIB_INLINE JniGlobal(const JniLocal<T>& obj) : m_object(_JniGlobal::from(obj.get()))
+	{
+	}
+
+public:
+	JniGlobal<T>& operator=(const JniSafeGlobal<T>& g);
+	
 	SLIB_INLINE JniGlobal<T>& operator=(T obj)
 	{
 		m_object = _JniGlobal::from(obj);
 		return *this;
 	}
 
-	SLIB_INLINE JniGlobal(JniLocal<T>& obj)
-	{
-		m_object = _JniGlobal::from(obj.get());
-	}
-
-	SLIB_INLINE JniGlobal<T>& operator=(JniLocal<T>& obj)
+	SLIB_INLINE JniGlobal<T>& operator=(const JniLocal<T>& obj)
 	{
 		m_object = _JniGlobal::from(obj.get());
 		return *this;
 	}
-
+	
+public:
 	SLIB_INLINE static JniGlobal<T> from(T obj)
 	{
-		JniGlobal<T> ret(obj);
-		return ret;
+		return JniGlobal<T>(obj);
 	}
 
+public:
 	SLIB_INLINE T get() const
 	{
-		Ref<_JniGlobal> o = m_object;
-		if (o.isNotNull()) {
+		_JniGlobal* o = m_object.get();
+		if (o) {
 			return (T)(o->object);
 		} else {
 			return 0;
@@ -141,26 +157,97 @@ public:
 	}
 };
 
+
+template <class T>
+class SLIB_EXPORT JniSafeGlobal
+{
+	SLIB_DECLARE_OBJECT_TYPE_FROM(JniSafeGlobal<T>, _JniGlobal)
+	SLIB_DECLARE_OBJECT_WRAPPER(JniSafeGlobal, JniSafeGlobal<T>, _JniGlobal, SafeRef<_JniGlobal>)
+
+public:
+	SLIB_INLINE JniSafeGlobal(const JniGlobal<T>& g) : m_object(g.getReference())
+	{
+	}
+
+	SLIB_INLINE JniSafeGlobal(T obj) : m_object(_JniGlobal::from(obj))
+	{
+	}
+		
+	SLIB_INLINE JniSafeGlobal(JniLocal<T>& obj) : m_object(_JniGlobal::from(obj.get()))
+	{
+	}
+
+public:
+	SLIB_INLINE JniSafeGlobal<T>& operator=(const JniGlobal<T>& g)
+	{
+		m_object = g.getReference();
+		return *this;
+	}
+	
+	SLIB_INLINE JniSafeGlobal<T>& operator=(T obj)
+	{
+		m_object = _JniGlobal::from(obj);
+		return *this;
+	}
+	
+	SLIB_INLINE JniSafeGlobal<T>& operator=(JniLocal<T>& obj)
+	{
+		m_object = _JniGlobal::from(obj.get());
+		return *this;
+	}
+
+public:
+	SLIB_INLINE T get() const
+	{
+		Ref<_JniGlobal> o = m_object;
+		if (o.isNotNull()) {
+			return (T)(o->object);
+		} else {
+			return 0;
+		}
+	}
+};
+
+template <class T>
+SLIB_INLINE JniGlobal<T>::JniGlobal(const JniSafeGlobal<T>& g) : m_object(g.getReference())
+{
+}
+
+template <class T>
+SLIB_INLINE JniGlobal<T>& JniGlobal<T>::operator=(const JniSafeGlobal<T>& g)
+{
+	m_object = g.getReference();
+	return *this;
+}
+
+
+class JniSafeClass;
+
 class SLIB_EXPORT JniClass
 {
 	SLIB_DECLARE_OBJECT_TYPE_FROM(JniClass, _JniGlobal)
 	SLIB_DECLARE_OBJECT_WRAPPER(JniClass, JniClass, _JniGlobal, Ref<_JniGlobal>)
+    
 public:
-	SLIB_INLINE JniClass(jclass cls)
+    JniClass(const JniSafeClass& g);
+    
+	SLIB_INLINE JniClass(jclass cls) : m_object(_JniGlobal::from(cls))
 	{
-		m_object = _JniGlobal::from(cls);
 	}
 
+public:
+    JniClass& operator=(const JniSafeClass& g);
+    
 	SLIB_INLINE JniClass& operator=(jclass cls)
 	{
 		m_object = _JniGlobal::from(cls);
 		return *this;
 	}
 
+public:
 	SLIB_INLINE static JniClass from(jclass cls)
 	{
-		JniClass ret(cls);
-		return ret;
+		return JniClass(cls);
 	}
 
 	static JniClass getClassOfObject(jobject object);
@@ -181,7 +268,7 @@ public:
 	}
 
 public:
-	sl_bool isInstanceOf(jobject obj);
+	sl_bool isInstanceOf(jobject obj) const;
 
 	/*
 	 * Signature
@@ -198,158 +285,196 @@ public:
 	 * [<type> - type[]
 	 * (arg-types)ret-type : method type
 	 */
-	jmethodID getMethodID(const char* name, const char* sig);
-	jmethodID getStaticMethodID(const char* name, const char* sig);
-	jfieldID getFieldID(const char* name, const char* sig);
-	jfieldID getStaticFieldID(const char* name, const char* sig);
+	jmethodID getMethodID(const char* name, const char* sig) const;
+	jmethodID getStaticMethodID(const char* name, const char* sig) const;
+	jfieldID getFieldID(const char* name, const char* sig) const;
+	jfieldID getStaticFieldID(const char* name, const char* sig) const;
 
-	jobject newObject(jmethodID method, ...);
-	jobject newObject(const char* sigConstructor, ...);
-	jobject newObject();
+	jobject newObject(jmethodID method, ...) const;
+	jobject newObject(const char* sigConstructor, ...) const;
+	jobject newObject() const;
 
-	jobject callObjectMethod(jmethodID method, jobject _this, ...);
-	jobject callObjectMethod(const char* name, const char* sig, jobject _this, ...);
-	jobject callStaticObjectMethod(jmethodID method, ...);
-	jobject callStaticObjectMethod(const char* name, const char* sig, ...);
-	jboolean callBooleanMethod(jmethodID method, jobject _this, ...);
-	jboolean callBooleanMethod(const char* name, const char* sig, jobject _this, ...);
-	jboolean callStaticBooleanMethod(jmethodID method, ...);
-	jboolean callStaticBooleanMethod(const char* name, const char* sig, ...);
-	jbyte callByteMethod(jmethodID method, jobject _this, ...);
-	jbyte callByteMethod(const char* name, const char* sig, jobject _this, ...);
-	jbyte callStaticByteMethod(jmethodID method, ...);
-	jbyte callStaticByteMethod(const char* name, const char* sig, ...);
-	jchar callCharMethod(jmethodID method, jobject _this, ...);
-	jchar callCharMethod(const char* name, const char* sig, jobject _this, ...);
-	jchar callStaticCharMethod(jmethodID method, ...);
-	jchar callStaticCharMethod(const char* name, const char* sig, ...);
-	jshort callShortMethod(jmethodID method, jobject _this, ...);
-	jshort callShortMethod(const char* name, const char* sig, jobject _this, ...);
-	jshort callStaticShortMethod(jmethodID method, ...);
-	jshort callStaticShortMethod(const char* name, const char* sig, ...);
-	jint callIntMethod(jmethodID method, jobject _this, ...);
-	jint callIntMethod(const char* name, const char* sig, jobject _this, ...);
-	jint callStaticIntMethod(jmethodID method, ...);
-	jint callStaticIntMethod(const char* name, const char* sig, ...);
-	jlong callLongMethod(jmethodID method, jobject _this, ...);
-	jlong callLongMethod(const char* name, const char* sig, jobject _this, ...);
-	jlong callStaticLongMethod(jmethodID method, ...);
-	jlong callStaticLongMethod(const char* name, const char* sig, ...);
-	jfloat callFloatMethod(jmethodID method, jobject _this, ...);
-	jfloat callFloatMethod(const char* name, const char* sig, jobject _this, ...);
-	jfloat callStaticFloatMethod(jmethodID method, ...);
-	jfloat callStaticFloatMethod(const char* name, const char* sig, ...);
-	jdouble callDoubleMethod(jmethodID method, jobject _this, ...);
-	jdouble callDoubleMethod(const char* name, const char* sig, jobject _this, ...);
-	jdouble callStaticDoubleMethod(jmethodID method, ...);
-	jdouble callStaticDoubleMethod(const char* name, const char* sig, ...);
-	void callVoidMethod(jmethodID method, jobject _this, ...);
-	void callVoidMethod(const char* name, const char* sig, jobject _this, ...);
-	void callStaticVoidMethod(jmethodID method, ...);
-	void callStaticVoidMethod(const char* name, const char* sig, ...);
-	String callStringMethod(jmethodID method, jobject _this, ...);
-	String callStringMethod(const char* name, const char* sig, jobject _this, ...);
-	String16 callString16Method(jmethodID method, jobject _this, ...);
-	String16 callString16Method(const char* name, const char* sig, jobject _this, ...);
-	String callStaticStringMethod(jmethodID method, ...);
-	String callStaticStringMethod(const char* name, const char* sig, ...);
-	String16 callStaticString16Method(jmethodID method, ...);
-	String16 callStaticString16Method(const char* name, const char* sig, ...);
+	jobject callObjectMethod(jmethodID method, jobject _this, ...) const;
+	jobject callObjectMethod(const char* name, const char* sig, jobject _this, ...) const;
+	jobject callStaticObjectMethod(jmethodID method, ...) const;
+	jobject callStaticObjectMethod(const char* name, const char* sig, ...) const;
+	jboolean callBooleanMethod(jmethodID method, jobject _this, ...) const;
+	jboolean callBooleanMethod(const char* name, const char* sig, jobject _this, ...) const;
+	jboolean callStaticBooleanMethod(jmethodID method, ...) const;
+	jboolean callStaticBooleanMethod(const char* name, const char* sig, ...) const;
+	jbyte callByteMethod(jmethodID method, jobject _this, ...) const;
+	jbyte callByteMethod(const char* name, const char* sig, jobject _this, ...) const;
+	jbyte callStaticByteMethod(jmethodID method, ...) const;
+	jbyte callStaticByteMethod(const char* name, const char* sig, ...) const;
+	jchar callCharMethod(jmethodID method, jobject _this, ...) const;
+	jchar callCharMethod(const char* name, const char* sig, jobject _this, ...) const;
+	jchar callStaticCharMethod(jmethodID method, ...) const;
+	jchar callStaticCharMethod(const char* name, const char* sig, ...) const;
+	jshort callShortMethod(jmethodID method, jobject _this, ...) const;
+	jshort callShortMethod(const char* name, const char* sig, jobject _this, ...) const;
+	jshort callStaticShortMethod(jmethodID method, ...) const;
+	jshort callStaticShortMethod(const char* name, const char* sig, ...) const;
+	jint callIntMethod(jmethodID method, jobject _this, ...) const;
+	jint callIntMethod(const char* name, const char* sig, jobject _this, ...) const;
+	jint callStaticIntMethod(jmethodID method, ...) const;
+	jint callStaticIntMethod(const char* name, const char* sig, ...) const;
+	jlong callLongMethod(jmethodID method, jobject _this, ...) const;
+	jlong callLongMethod(const char* name, const char* sig, jobject _this, ...) const;
+	jlong callStaticLongMethod(jmethodID method, ...) const;
+	jlong callStaticLongMethod(const char* name, const char* sig, ...) const;
+	jfloat callFloatMethod(jmethodID method, jobject _this, ...) const;
+	jfloat callFloatMethod(const char* name, const char* sig, jobject _this, ...) const;
+	jfloat callStaticFloatMethod(jmethodID method, ...) const;
+	jfloat callStaticFloatMethod(const char* name, const char* sig, ...) const;
+	jdouble callDoubleMethod(jmethodID method, jobject _this, ...) const;
+	jdouble callDoubleMethod(const char* name, const char* sig, jobject _this, ...) const;
+	jdouble callStaticDoubleMethod(jmethodID method, ...) const;
+	jdouble callStaticDoubleMethod(const char* name, const char* sig, ...) const;
+	void callVoidMethod(jmethodID method, jobject _this, ...) const;
+	void callVoidMethod(const char* name, const char* sig, jobject _this, ...) const;
+	void callStaticVoidMethod(jmethodID method, ...) const;
+	void callStaticVoidMethod(const char* name, const char* sig, ...) const;
+	String callStringMethod(jmethodID method, jobject _this, ...) const;
+	String callStringMethod(const char* name, const char* sig, jobject _this, ...) const;
+	String16 callString16Method(jmethodID method, jobject _this, ...) const;
+	String16 callString16Method(const char* name, const char* sig, jobject _this, ...) const;
+	String callStaticStringMethod(jmethodID method, ...) const;
+	String callStaticStringMethod(const char* name, const char* sig, ...) const;
+	String16 callStaticString16Method(jmethodID method, ...) const;
+	String16 callStaticString16Method(const char* name, const char* sig, ...) const;
 
-	jobject getObjectField(jfieldID field, jobject _this);
-	jobject getObjectField(const char* name, const char* sig, jobject _this);
-	void setObjectField(jfieldID field, jobject _this, jobject value);
-	void setObjectField(const char* name, const char* sig, jobject _this, jobject value);
-	jobject getStaticObjectField(jfieldID field);
-	jobject getStaticObjectField(const char* name, const char* sig);
-	void setStaticObjectField(jfieldID field, jobject value);
-	void setStaticObjectField(const char* name, const char* sig, jobject value);
-	jboolean getBooleanField(jfieldID field, jobject _this);
-	jboolean getBooleanField(const char* name, const char* sig, jobject _this);
-	void setBooleanField(jfieldID field, jobject _this, jboolean value);
-	void setBooleanField(const char* name, const char* sig, jobject _this, jboolean value);
-	jboolean getStaticBooleanField(jfieldID field);
-	jboolean getStaticBooleanField(const char* name, const char* sig);
-	void setStaticBooleanField(jfieldID field, jboolean value);
-	void setStaticBooleanField(const char* name, const char* sig, jboolean value);
-	jbyte getByteField(jfieldID field, jobject _this);
-	jbyte getByteField(const char* name, const char* sig, jobject _this);
-	void setByteField(jfieldID field, jobject _this, jbyte value);
-	void setByteField(const char* name, const char* sig, jobject _this, jbyte value);
-	jbyte getStaticByteField(jfieldID field);
-	jbyte getStaticByteField(const char* name, const char* sig);
-	void setStaticByteField(jfieldID field, jbyte value);
-	void setStaticByteField(const char* name, const char* sig, jbyte value);
-	jchar getCharField(jfieldID field, jobject _this);
-	jchar getCharField(const char* name, const char* sig, jobject _this);
-	void setCharField(jfieldID field, jobject _this, jchar value);
-	void setCharField(const char* name, const char* sig, jobject _this, jchar value);
-	jchar getStaticCharField(jfieldID field);
-	jchar getStaticCharField(const char* name, const char* sig);
-	void setStaticCharField(jfieldID field, jchar value);
-	void setStaticCharField(const char* name, const char* sig, jchar value);
-	jshort getShortField(jfieldID field, jobject _this);
-	jshort getShortField(const char* name, const char* sig, jobject _this);
-	void setShortField(jfieldID field, jobject _this, jshort value);
-	void setShortField(const char* name, const char* sig, jobject _this, jshort value);
-	jshort getStaticShortField(jfieldID field);
-	jshort getStaticShortField(const char* name, const char* sig);
-	void setStaticShortField(jfieldID field, jshort value);
-	void setStaticShortField(const char* name, const char* sig, jshort value);
-	jint getIntField(jfieldID field, jobject _this);
-	jint getIntField(const char* name, const char* sig, jobject _this);
-	void setIntField(jfieldID field, jobject _this, jint value);
-	void setIntField(const char* name, const char* sig, jobject _this, jint value);
-	jint getStaticIntField(jfieldID field);
-	jint getStaticIntField(const char* name, const char* sig);
-	void setStaticIntField(jfieldID field, jint value);
-	void setStaticIntField(const char* name, const char* sig, jint value);
-	jlong getLongField(jfieldID field, jobject _this);
-	jlong getLongField(const char* name, const char* sig, jobject _this);
-	void setLongField(jfieldID field, jobject _this, jlong value);
-	void setLongField(const char* name, const char* sig, jobject _this, jlong value);
-	jlong getStaticLongField(jfieldID field);
-	jlong getStaticLongField(const char* name, const char* sig);
-	void setStaticLongField(jfieldID field, jlong value);
-	void setStaticLongField(const char* name, const char* sig, jlong value);
-	jfloat getFloatField(jfieldID field, jobject _this);
-	jfloat getFloatField(const char* name, const char* sig, jobject _this);
-	void setFloatField(jfieldID field, jobject _this, jfloat value);
-	void setFloatField(const char* name, const char* sig, jobject _this, jfloat value);
-	jfloat getStaticFloatField(jfieldID field);
-	jfloat getStaticFloatField(const char* name, const char* sig);
-	void setStaticFloatField(jfieldID field, jfloat value);
-	void setStaticFloatField(const char* name, const char* sig, jfloat value);
-	jdouble getDoubleField(jfieldID field, jobject _this);
-	jdouble getDoubleField(const char* name, const char* sig, jobject _this);
-	void setDoubleField(jfieldID field, jobject _this, jdouble value);
-	void setDoubleField(const char* name, const char* sig, jobject _this, jdouble value);
-	jdouble getStaticDoubleField(jfieldID field);
-	jdouble getStaticDoubleField(const char* name, const char* sig);
-	void setStaticDoubleField(jfieldID field, jdouble value);
-	void setStaticDoubleField(const char* name, const char* sig, jdouble value);
+	jobject getObjectField(jfieldID field, jobject _this) const;
+	jobject getObjectField(const char* name, const char* sig, jobject _this) const;
+	void setObjectField(jfieldID field, jobject _this, jobject value) const;
+	void setObjectField(const char* name, const char* sig, jobject _this, jobject value) const;
+	jobject getStaticObjectField(jfieldID field) const;
+	jobject getStaticObjectField(const char* name, const char* sig) const;
+	void setStaticObjectField(jfieldID field, jobject value) const;
+	void setStaticObjectField(const char* name, const char* sig, jobject value) const;
+	jboolean getBooleanField(jfieldID field, jobject _this) const;
+	jboolean getBooleanField(const char* name, const char* sig, jobject _this) const;
+	void setBooleanField(jfieldID field, jobject _this, jboolean value) const;
+	void setBooleanField(const char* name, const char* sig, jobject _this, jboolean value) const;
+	jboolean getStaticBooleanField(jfieldID field) const;
+	jboolean getStaticBooleanField(const char* name, const char* sig) const;
+	void setStaticBooleanField(jfieldID field, jboolean value) const;
+	void setStaticBooleanField(const char* name, const char* sig, jboolean value) const;
+	jbyte getByteField(jfieldID field, jobject _this) const;
+	jbyte getByteField(const char* name, const char* sig, jobject _this) const;
+	void setByteField(jfieldID field, jobject _this, jbyte value) const;
+	void setByteField(const char* name, const char* sig, jobject _this, jbyte value) const;
+	jbyte getStaticByteField(jfieldID field) const;
+	jbyte getStaticByteField(const char* name, const char* sig) const;
+	void setStaticByteField(jfieldID field, jbyte value) const;
+	void setStaticByteField(const char* name, const char* sig, jbyte value) const;
+	jchar getCharField(jfieldID field, jobject _this) const;
+	jchar getCharField(const char* name, const char* sig, jobject _this) const;
+	void setCharField(jfieldID field, jobject _this, jchar value) const;
+	void setCharField(const char* name, const char* sig, jobject _this, jchar value) const;
+	jchar getStaticCharField(jfieldID field) const;
+	jchar getStaticCharField(const char* name, const char* sig) const;
+	void setStaticCharField(jfieldID field, jchar value) const;
+	void setStaticCharField(const char* name, const char* sig, jchar value) const;
+	jshort getShortField(jfieldID field, jobject _this) const;
+	jshort getShortField(const char* name, const char* sig, jobject _this) const;
+	void setShortField(jfieldID field, jobject _this, jshort value) const;
+	void setShortField(const char* name, const char* sig, jobject _this, jshort value) const;
+	jshort getStaticShortField(jfieldID field) const;
+	jshort getStaticShortField(const char* name, const char* sig) const;
+	void setStaticShortField(jfieldID field, jshort value) const;
+	void setStaticShortField(const char* name, const char* sig, jshort value) const;
+	jint getIntField(jfieldID field, jobject _this) const;
+	jint getIntField(const char* name, const char* sig, jobject _this) const;
+	void setIntField(jfieldID field, jobject _this, jint value) const;
+	void setIntField(const char* name, const char* sig, jobject _this, jint value) const;
+	jint getStaticIntField(jfieldID field) const;
+	jint getStaticIntField(const char* name, const char* sig) const;
+	void setStaticIntField(jfieldID field, jint value) const;
+	void setStaticIntField(const char* name, const char* sig, jint value) const;
+	jlong getLongField(jfieldID field, jobject _this) const;
+	jlong getLongField(const char* name, const char* sig, jobject _this) const;
+	void setLongField(jfieldID field, jobject _this, jlong value) const;
+	void setLongField(const char* name, const char* sig, jobject _this, jlong value) const;
+	jlong getStaticLongField(jfieldID field) const;
+	jlong getStaticLongField(const char* name, const char* sig) const;
+	void setStaticLongField(jfieldID field, jlong value) const;
+	void setStaticLongField(const char* name, const char* sig, jlong value) const;
+	jfloat getFloatField(jfieldID field, jobject _this) const;
+	jfloat getFloatField(const char* name, const char* sig, jobject _this) const;
+	void setFloatField(jfieldID field, jobject _this, jfloat value) const;
+	void setFloatField(const char* name, const char* sig, jobject _this, jfloat value) const;
+	jfloat getStaticFloatField(jfieldID field) const;
+	jfloat getStaticFloatField(const char* name, const char* sig) const;
+	void setStaticFloatField(jfieldID field, jfloat value) const;
+	void setStaticFloatField(const char* name, const char* sig, jfloat value) const;
+	jdouble getDoubleField(jfieldID field, jobject _this) const;
+	jdouble getDoubleField(const char* name, const char* sig, jobject _this) const;
+	void setDoubleField(jfieldID field, jobject _this, jdouble value) const;
+	void setDoubleField(const char* name, const char* sig, jobject _this, jdouble value) const;
+	jdouble getStaticDoubleField(jfieldID field) const;
+	jdouble getStaticDoubleField(const char* name, const char* sig) const;
+	void setStaticDoubleField(jfieldID field, jdouble value) const;
+	void setStaticDoubleField(const char* name, const char* sig, jdouble value) const;
 
-	String getStringField(jfieldID field, jobject _this);
-	String getStringField(const char* name, const char* sig, jobject _this);
-	String16 getString16Field(jfieldID field, jobject _this);
-	String16 getString16Field(const char* name, const char* sig, jobject _this);
-	String getStaticStringField(jfieldID field);
-	String getStaticStringField(const char* name, const char* sig);
-	String16 getStaticString16Field(jfieldID field);
-	String16 getStaticString16Field(const char* name, const char* sig);
+	String getStringField(jfieldID field, jobject _this) const;
+	String getStringField(const char* name, const char* sig, jobject _this) const;
+	String16 getString16Field(jfieldID field, jobject _this) const;
+	String16 getString16Field(const char* name, const char* sig, jobject _this) const;
+	String getStaticStringField(jfieldID field) const;
+	String getStaticStringField(const char* name, const char* sig) const;
+	String16 getStaticString16Field(jfieldID field) const;
+	String16 getStaticString16Field(const char* name, const char* sig) const;
 
-	void setStringField(jfieldID field, jobject _this, const String& value);
-	void setStringField(const char* name, const char* sig, jobject _this, const String& value);
-	void setString16Field(jfieldID field, jobject _this, const String16& value);
-	void setString16Field(const char* name, const char* sig, jobject _this, const String16& value);
-	void setStaticStringField(jfieldID field, const String& value);
-	void setStaticStringField(const char* name, const char* sig, const String& value);
-	void setStaticString16Field(jfieldID field, const String16& value);
-	void setStaticString16Field(const char* name, const char* sig, const String16& value);
+	void setStringField(jfieldID field, jobject _this, const String& value) const;
+	void setStringField(const char* name, const char* sig, jobject _this, const String& value) const;
+	void setString16Field(jfieldID field, jobject _this, const String16& value) const;
+	void setString16Field(const char* name, const char* sig, jobject _this, const String16& value) const;
+	void setStaticStringField(jfieldID field, const String& value) const;
+	void setStaticStringField(const char* name, const char* sig, const String& value) const;
+	void setStaticString16Field(jfieldID field, const String16& value) const;
+	void setStaticString16Field(const char* name, const char* sig, const String16& value) const;
 
-	sl_bool registerNative(const char* name, const char* sig, const void* fn);
+	sl_bool registerNative(const char* name, const char* sig, const void* fn) const;
 
 };
+
+class SLIB_EXPORT JniSafeClass
+{
+	SLIB_DECLARE_OBJECT_TYPE_FROM(JniSafeClass, _JniGlobal)
+	SLIB_DECLARE_OBJECT_WRAPPER(JniSafeClass, JniSafeClass, _JniGlobal, SafeRef<_JniGlobal>)
+    
+public:
+    SLIB_INLINE JniSafeClass(const JniClass& g) : m_object(g.getReference())
+    {        
+    }
+    
+	SLIB_INLINE JniSafeClass(jclass cls) : m_object(_JniGlobal::from(cls))
+	{
+	}
+
+public:
+    JniSafeClass& operator=(const JniClass& g)
+    {
+        m_object = g.getReference();
+    }
+    
+	SLIB_INLINE JniSafeClass& operator=(jclass cls)
+	{
+		m_object = _JniGlobal::from(cls);
+		return *this;
+	}
+};
+
+JniClass::JniClass(const JniSafeClass& g) : m_object(g.getReference())
+{
+}
+
+JniClass& JniClass::operator=(const JniSafeClass& g)
+{
+    m_object = g.getReference();
+    return *this;
+}
+
 
 class SLIB_EXPORT Jni
 {

@@ -166,7 +166,7 @@ public:
 	
 	void release()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (!m_flagOpened) {
 			return;
 		}
@@ -186,7 +186,7 @@ public:
 	
 	void start()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (!m_flagOpened) {
 			return;
 		}
@@ -201,7 +201,7 @@ public:
 	
 	void stop()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (!m_flagOpened) {
 			return;
 		}
@@ -355,7 +355,7 @@ List<AudioRecorderInfo> AudioRecorder::getRecordersList()
 	AudioRecorderInfo ret;
 	SLIB_STATIC_STRING(s, "Internal Microphone");
 	ret.name = s;
-	return List<AudioRecorderInfo>::fromElement(ret);
+	return List<AudioRecorderInfo>::createFromElement(ret);
 }
 SLIB_MEDIA_NAMESPACE_END
 

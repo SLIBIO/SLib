@@ -12,15 +12,15 @@ Image::Image()
 
 Ref<Image> Image::createStatic(const ImageDesc& desc)
 {
-	return createStatic(desc.width, desc.height, desc.colors, desc.stride, desc.ref);
+	return createStatic(desc.width, desc.height, desc.colors, desc.stride, desc.ref.get());
 }
 
 Ref<Image> Image::createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride)
 {
-	return createStatic(width, height, pixels, stride, Ref<Referable>::null());
+	return createStatic(width, height, pixels, stride, sl_null);
 }
 
-Ref<Image> Image::createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride, const Ref<Referable>& _ref)
+Ref<Image> Image::createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride, const Referable* ref)
 {
 	Ref<Image> ret;
 	if (width == 0 || height == 0 || pixels == sl_null) {
@@ -35,7 +35,7 @@ Ref<Image> Image::createStatic(sl_uint32 width, sl_uint32 height, const Color* p
 		ret->m_desc.width = width;
 		ret->m_desc.height = height;
 		ret->m_desc.stride = stride;
-		ret->m_desc.ref = _ref;
+		ret->m_desc.ref = ref;
 	}
 	return ret;
 }
@@ -98,10 +98,9 @@ Ref<Image> Image::create(const BitmapData& bitmapData)
 	return ret;
 }
 
-Ref<Image> Image::createFromBitmap(const Ref<Bitmap>& _bitmap, sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
+Ref<Image> Image::createFromBitmap(const Ref<Bitmap>& bitmap, sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
 {
 	Ref<Image> ret;
-	Ref<Bitmap> bitmap = _bitmap;
 	if (bitmap.isNull()) {
 		return ret;
 	}
@@ -135,10 +134,9 @@ Ref<Image> Image::createFromBitmap(const Ref<Bitmap>& _bitmap, sl_uint32 x, sl_u
 	return ret;
 }
 
-Ref<Image> Image::createFromBitmap(const Ref<Bitmap>& _bitmap)
+Ref<Image> Image::createFromBitmap(const Ref<Bitmap>& bitmap)
 {
 	Ref<Image> ret;
-	Ref<Bitmap> bitmap = _bitmap;
 	if (bitmap.isNull()) {
 		return ret;
 	}
@@ -354,10 +352,9 @@ void Image::draw(ImageDesc& dst, const ImageDesc& src, BlendMode blend, StretchM
 }
 
 void Image::drawImage(sl_int32 dx, sl_int32 dy, sl_int32 dw, sl_int32 dh
-	, const Ref<Image>& _src, sl_int32 sx, sl_int32 sy, sl_int32 sw, sl_int32 sh
+	, const Ref<Image>& src, sl_int32 sx, sl_int32 sy, sl_int32 sw, sl_int32 sh
 	, BlendMode blend, StretchMode stretch )
 {
-	Ref<Image> src = _src;
 	if (src.isNull()) {
 		return;
 	}

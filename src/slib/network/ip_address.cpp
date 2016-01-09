@@ -68,9 +68,8 @@ sl_int32 IPv4Address::parse(IPv4Address* out, const sl_char16* sz, sl_uint32 pos
 	return _IPv4Address_parse(out, sz, posBegin, n);
 }
 
-sl_bool IPv4Address::parse(const String& _str)
+sl_bool IPv4Address::parse(const String& s)
 {
-	String s = _str;
 	sl_uint32 n = s.getLength();
 	if (n == 0) {
 		return sl_false;
@@ -239,9 +238,8 @@ sl_int32 IPv6Address::parse(IPv6Address* out, const sl_char16* sz, sl_uint32 pos
 	return _IPv6Address_parse(out, sz, posStart, n);
 }
 
-sl_bool IPv6Address::parse(const String& _str)
+sl_bool IPv6Address::parse(const String& s)
 {
-	String s = _str;
 	sl_uint32 n = s.getLength();
 	if (n == 0) {
 		return sl_false;
@@ -338,9 +336,8 @@ sl_int32 IPAddress::parse(IPAddress* out, const sl_char16* sz, sl_uint32 posStar
 	return _IPAddress_parse(out, sz, posStart, len);
 }
 
-sl_bool IPAddress::parse(const String& _str)
+sl_bool IPAddress::parse(const String& s)
 {
-	String s = _str;
 	sl_uint32 n = s.getLength();
 	if (n == 0) {
 		return sl_false;

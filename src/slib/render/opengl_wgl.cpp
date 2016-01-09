@@ -94,7 +94,7 @@ public:
 			m_threadRender->finishAndWait();
 		}
 
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 
 		if (m_renderEngine.isNotNull()) {
 			m_renderEngine->release();

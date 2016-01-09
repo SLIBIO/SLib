@@ -37,11 +37,13 @@ class SLIB_EXPORT SpinLocker
 	SLIB_DECLARE_CLASS_NOCOPY(SpinLocker)
 private:
 	const SpinLock* m_lock;
+	
 public:
 	SLIB_INLINE SpinLocker()
 	{
 		m_lock = sl_null;
 	}
+	
 	SLIB_INLINE SpinLocker(const SpinLock* lock)
 	{
 		m_lock = lock;
@@ -49,6 +51,7 @@ public:
 			lock->lock();
 		}
 	}
+	
 	SLIB_INLINE void lock(const SpinLock* lock)
 	{
 		if (! m_lock) {			
@@ -58,6 +61,7 @@ public:
 			}
 		}
 	}
+	
 	SLIB_INLINE void unlock()
 	{
 		if (m_lock) {
@@ -65,6 +69,7 @@ public:
 			m_lock = sl_null;
 		}
 	}
+	
 	SLIB_INLINE ~SpinLocker()
 	{
 		unlock();
@@ -92,9 +97,11 @@ sl_int32 SpinLockPool<CATEGORY>::m_locks[SLIB_SPINLOCK_POOL_SIZE] = { 0 };
 typedef SpinLockPool<-1> SpinLockPoolForString;
 typedef SpinLockPool<-2> SpinLockPoolForReference;
 typedef SpinLockPool<-3> SpinLockPoolForWeakReference;
-typedef SpinLockPool<-4> SpinLockPoolForVariant;
-typedef SpinLockPool<-5> SpinLockPoolForPtr;
-typedef SpinLockPool<-6> SpinLockPoolForRefPtr;
+typedef SpinLockPool<-4> SpinLockPoolForPtr;
+typedef SpinLockPool<-5> SpinLockPoolForRefPtr;
+typedef SpinLockPool<-10> SpinLockPoolForVariant;
+typedef SpinLockPool<-20> SpinLockPoolForList;
+typedef SpinLockPool<-21> SpinLockPoolForMap;
 
 SLIB_NAMESPACE_END
 

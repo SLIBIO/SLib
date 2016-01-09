@@ -252,18 +252,17 @@ void EditView::setBackgroundColor(const Color& color)
 	m_backgroundColor = color;
 }
 
-void EditView::setFont(const Ref<Font>& _font)
+void EditView::setFont(const Ref<Font>& font)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		Ref<Font> font = _font;
 		Ref<FontInstance> fontInstance;
 		jobject jfont = UIPlatform::getNativeFont(font.get(), fontInstance);
 		if (jfont) {
 			_JAndroidEditView::setFont.callBoolean(sl_null, handle, jfont);
 		}
 	}
-	m_font = _font;
+	m_font = font;
 }
 
 SLIB_UI_NAMESPACE_END

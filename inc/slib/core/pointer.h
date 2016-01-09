@@ -48,7 +48,7 @@ public:
 	SLIB_INLINE RefPtr(const Ref<O>& reference)
 	{
 		m_reference = reference;
-		m_pointer = (O*)(m_reference.getObject());
+		m_pointer = (O*)(m_reference.get());
 	}
 	
 	template <class O>
@@ -205,7 +205,7 @@ public:
 	SLIB_INLINE Ptr(const SafeRef<O>& reference)
 	{
 		m_reference = reference;
-		m_pointer = (O*)(m_reference.getObject());
+		m_pointer = (O*)(m_reference.get());
 	}
 
 	template <class O>

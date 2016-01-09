@@ -162,7 +162,7 @@ sl_uint32 NAT_Table::getMappedTcpTargetPort(const SocketAddress& address)
 	}
 	m_portTcpCurrent = port;
 	if (m_mapTcpIncoming.get(port, &element)) {
-		m_mapTcpOutgoing.removeAllKeys(element.addressSource);
+		m_mapTcpOutgoing.removeAllMatchingKeys(element.addressSource);
 	}
 	element.addressSource = address;
 	element.portTarget = port;
@@ -183,7 +183,7 @@ sl_uint32 NAT_Table::getMappedUdpTargetPort(const SocketAddress& address)
 	}
 	m_portUdpCurrent = port;
 	if (m_mapUdpIncoming.get(port, &element)) {
-		m_mapUdpOutgoing.removeAllKeys(element.addressSource);
+		m_mapUdpOutgoing.removeAllMatchingKeys(element.addressSource);
 	}
 	element.addressSource = address;
 	element.portTarget = port;
@@ -200,7 +200,7 @@ sl_uint16 NAT_Table::getMappedIcmpEchoSequenceNumber(const ICMP_EchoAddress& add
 	}
 	sl_uint16 sn = ++ m_icmpEchoSequenceCurrent;
 	if (m_mapIcmpEchoIncoming.get(sn, &element)) {
-		m_mapIcmpEchoOutgoing.removeAllKeys(element.addressSource);
+		m_mapIcmpEchoOutgoing.removeAllMatchingKeys(element.addressSource);
 	}
 	element.addressSource = address;
 	element.sequenceNumberTarget = sn;

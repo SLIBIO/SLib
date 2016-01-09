@@ -141,9 +141,8 @@ void HttpRequestHeader::applyPostParameters(const void* data, sl_size size)
 	m_parameters.put(m_postParameters);
 }
 
-void HttpRequestHeader::applyPostParameters(const String& _str)
+void HttpRequestHeader::applyPostParameters(const String& str)
 {
-	String8 str = _str;
 	applyPostParameters(str.getBuf(), str.getLength());
 }
 
@@ -153,9 +152,8 @@ void HttpRequestHeader::applyQueryToParameters()
 	m_parameters.put(m_queryParameters);
 }
 
-Map<String, String> HttpRequestHeader::parseParameters(const String& _str)
+Map<String, String> HttpRequestHeader::parseParameters(const String& str)
 {
-	String8 str = _str;
 	return parseParameters(str.getBuf(), str.getLength());
 }
 
@@ -651,9 +649,8 @@ HttpOutputBuffer::HttpOutputBuffer()
 {
 }
 
-void HttpOutputBuffer::write(const String& _str)
+void HttpOutputBuffer::write(const String& str)
 {
-	String8 str = _str;
 	write(str.getBuf(), str.getLength());
 }
 
@@ -836,14 +833,13 @@ public:
 };
 
 Ref<HttpContentReader> HttpContentReader::createPersistent(
-	const Ref<AsyncStream>& _io
+	const Ref<AsyncStream>& io
 	, const Ptr<IHttpContentReaderListener>& listener
 	, sl_uint64 contentLength
 	, sl_uint32 bufferSize
 	, sl_bool flagDecompress)
 {
 	Ref<_HttpContentReader_Persistent> ret = new _HttpContentReader_Persistent;
-	Ref<AsyncStream> io = _io;
 	if (io.isNull()) {
 		return ret;
 	}
@@ -1007,13 +1003,12 @@ public:
 };
 
 Ref<HttpContentReader> HttpContentReader::createChunked(
-	const Ref<AsyncStream>& _io
+	const Ref<AsyncStream>& io
 	, const Ptr<IHttpContentReaderListener>& listener
 	, sl_uint32 bufferSize
 	, sl_bool flagDecompress)
 {
 	Ref<_HttpContentReader_Chunked> ret = new _HttpContentReader_Chunked;
-	Ref<AsyncStream> io = _io;
 	if (io.isNull()) {
 		return ret;
 	}
@@ -1047,13 +1042,12 @@ public:
 };
 
 Ref<HttpContentReader> HttpContentReader::createTearDown(
-	const Ref<AsyncStream>& _io
+	const Ref<AsyncStream>& io
 	, const Ptr<IHttpContentReaderListener>& listener
 	, sl_uint32 bufferSize
 	, sl_bool flagDecompress)
 {
 	Ref<_HttpContentReader_TearDown> ret = new _HttpContentReader_TearDown;
-	Ref<AsyncStream> io = _io;
 	if (io.isNull()) {
 		return ret;
 	}

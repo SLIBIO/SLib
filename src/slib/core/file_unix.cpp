@@ -14,9 +14,8 @@
 #include <errno.h>
 
 SLIB_NAMESPACE_BEGIN
-sl_file File::_open(const String& _filePath, Mode mode)
+sl_file File::_open(const String& filePath, Mode mode)
 {
-	String8 filePath = _filePath;
 	if (filePath.isEmpty()) {
 		return (sl_file)-1;
 	}
@@ -200,9 +199,8 @@ sl_uint64 File::getSize(sl_file _fd)
 	}
 }
 
-sl_uint64 File::getSize(const String& _filePath)
+sl_uint64 File::getSize(const String& filePath)
 {
-	String8 filePath = _filePath;
 	if (filePath.isEmpty()) {
 		return 0;
 	}
@@ -289,9 +287,8 @@ Time File::getModifiedTime()
 	return Time::zero();
 }
 
-Time File::getModifiedTime(const String& _filePath)
+Time File::getModifiedTime(const String& filePath)
 {
-	String8 filePath = _filePath;
 	if (filePath.isEmpty()) {
 		return Time::zero();
 	}
@@ -315,9 +312,8 @@ Time File::getAccessedTime()
 	return Time::zero();
 }
 
-Time File::getAccessedTime(const String& _filePath)
+Time File::getAccessedTime(const String& filePath)
 {
-	String8 filePath = _filePath;
 	if (filePath.isEmpty()) {
 		return Time::zero();
 	}
@@ -341,9 +337,8 @@ Time File::getCreatedTime()
 	return Time::zero();
 }
 
-Time File::getCreatedTime(const String& _filePath)
+Time File::getCreatedTime(const String& filePath)
 {
-	String8 filePath = _filePath;
 	if (filePath.isEmpty()) {
 		return Time::zero();
 	}
@@ -355,9 +350,8 @@ Time File::getCreatedTime(const String& _filePath)
 	}
 }
 
-static sl_bool _File_setAccessedAndModifiedTime(const String& _filePath, Time timeAccess, Time timeModify)
+static sl_bool _File_setAccessedAndModifiedTime(const String& filePath, Time timeAccess, Time timeModify)
 {
-	String8 filePath = _filePath;
 	if (filePath.isEmpty()) {
 		return sl_false;
 	}
@@ -369,16 +363,14 @@ static sl_bool _File_setAccessedAndModifiedTime(const String& _filePath, Time ti
 	return ::utimes(filePath.getBuf(), t) == 0;
 }
 
-sl_bool File::setModifiedTime(const String& _filePath, Time time)
+sl_bool File::setModifiedTime(const String& filePath, Time time)
 {
-	String filePath = _filePath;
 	Time timeAccess = getAccessedTime(filePath);
 	return _File_setAccessedAndModifiedTime(filePath, timeAccess, time);
 }
 
-sl_bool File::setAccessedTime(const String& _filePath, Time time)
+sl_bool File::setAccessedTime(const String& filePath, Time time)
 {
-	String filePath = _filePath;
 	Time timeModify = getModifiedTime(filePath);
 	return _File_setAccessedAndModifiedTime(filePath, time, timeModify);
 }
@@ -389,9 +381,8 @@ sl_bool File::setCreatedTime(const String& filePath, Time time)
 	return sl_false;
 }
 
-int File::getAttributes(const String& _filePath)
+int File::getAttributes(const String& filePath)
 {
-	String8 filePath = _filePath;
 	if (filePath.isEmpty()) {
 		return -1;
 	}
@@ -440,9 +431,8 @@ List<String> File::getFiles(const String& _filePath)
 	return ret;
 }
 
-sl_bool File::createDirectory(const String& _filePath)
+sl_bool File::createDirectory(const String& filePath)
 {
-	String8 filePath = _filePath;
 	if (filePath.isEmpty()) {
 		return sl_false;
 	}
@@ -450,18 +440,16 @@ sl_bool File::createDirectory(const String& _filePath)
 }
 
 
-sl_bool File::deleteFile(const String& _filePath)
+sl_bool File::deleteFile(const String& filePath)
 {
-	String8 filePath = _filePath;
 	if (filePath.isEmpty()) {
 		return sl_false;
 	}
 	return 0 == ::remove(filePath.getBuf());
 }
 
-sl_bool File::deleteDirectoryOnly(const String& _filePath)
+sl_bool File::deleteDirectoryOnly(const String& filePath)
 {
-	String filePath = _filePath;
 	if (filePath.isEmpty()) {
 		return sl_false;
 	}
@@ -469,13 +457,11 @@ sl_bool File::deleteDirectoryOnly(const String& _filePath)
 	return 0 == ::rmdir(dirPath.getBuf());
 }
 
-sl_bool File::rename(const String& _oldPath, const String& _newPath)
+sl_bool File::rename(const String& oldPath, const String& newPath)
 {
-	String8 oldPath = _oldPath;
 	if (oldPath.isEmpty()) {
 		return sl_false;
 	}
-	String8 newPath = _newPath;
 	if (newPath.isEmpty()) {
 		return sl_false;
 	}

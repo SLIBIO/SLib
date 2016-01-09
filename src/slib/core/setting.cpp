@@ -3,9 +3,13 @@
 
 SLIB_NAMESPACE_BEGIN
 
-sl_bool IniSetting::parseFromUtf8TextFile(const String& _filePath)
+void IniSetting::initialize()
 {
-	String filePath = _filePath;
+	m_mapValues.removeAll();
+}
+
+sl_bool IniSetting::parseFromUtf8TextFile(const String& filePath)
+{
 	if (File::exists(filePath)) {
 		String text = File::readUtf8Text(filePath);
 		return parseFromText(text);
@@ -14,9 +18,8 @@ sl_bool IniSetting::parseFromUtf8TextFile(const String& _filePath)
 	}
 }
 
-sl_bool IniSetting::parseFromText(const String& _text)
+sl_bool IniSetting::parseFromText(const String& text)
 {
-	String8 text = _text;
 	sl_uint32 len = text.getLength();
 	const sl_char8* buf = text.getBuf();
 	sl_int32 indexAssign = -1;

@@ -41,98 +41,66 @@ protected:
 	Ref<Referable> m_refer;
 	
 protected:
-	SLIB_INLINE CArray2D()
+	SLIB_INLINE CArray2D() {}
+	
+public:
+	SLIB_INLINE CArray2D(sl_size width, sl_size height)
 	{
+		_init(width, height);
+	}
+	
+	template <class _T>
+	SLIB_INLINE CArray2D(sl_size width, sl_size height, const _T* data, sl_size strideSrc = 0)
+	{
+		_init(width, height, data, strideSrc);
+	}
+	
+	SLIB_INLINE CArray2D(const T* data, sl_size width, sl_size height, sl_size stride, const Referable* refer)
+	{
+		_initStatic(data, width, height, stride, refer);
 	}
 
 public:
 	~CArray2D()
 	{
-		if (! m_flagStatic) {
-			T* rp = m_data;
-			if (rp) {				
-				for (sl_size i = 0; i < m_height; i++) {
-					T* p = rp;
-					for (sl_size j = 0; j < m_width; j++) {
-						p->~T();
-						p ++;
-					}
-					rp += m_stride;
-				}
-				Base::freeMemory(m_data);
-			}
-		}
+		_free();
 	}
 	
 public:
-	static _Type* create(sl_size width, sl_size height, const T* data = sl_null, sl_reg strideSrc = 0)
+	static _Type* create(sl_size width, sl_size height)
 	{
-		if (width == 0 || height == 0) {
-			return sl_null;
-		}
-		if (strideSrc == 0) {
-			strideSrc = width;
-		}
-		sl_size size = width * height * sizeof(T);
-		T* dataNew = (T*)(Base::createMemory(size));
-		if (dataNew == sl_null) {
-			return sl_null;
-		}
-		_Type* ret = new _Type;
-		if (ret) {
-			if (data) {
-				T* rp = dataNew;
-				const T* rq = data;
-				for (sl_size i = 0; i < height; i++) {
-					T* p = rp;
-					const T* q = rq;
-					for (sl_size j = 0; j < width; j++) {
-						new (p) T(*q);
-						p ++;
-						q ++;
-					}
-					rp += width;
-					rq += strideSrc;
+		if (width > 0 && height > 0) {
+			_Type* ret = new _Type(width, height);
+			if (ret) {
+				if (ret->m_data) {
+					return ret;
 				}
-			} else {
-				T* rp = dataNew;
-				for (sl_size i = 0; i < height; i++) {
-					T* p = rp;
-					for (sl_size j = 0; j < width; j++) {
-						new (p) T();
-						p ++;
-					}
-					rp += width;
-				}
+				delete ret;
 			}
-			ret->m_flagStatic = sl_false;
-			ret->m_data = dataNew;
-			ret->m_width = width;
-			ret->m_height = height;
-			ret->m_stride = width;
-		} else {
-			Base::freeMemory(dataNew);
 		}
-		return ret;
+		return sl_null;
 	}
 	
-	static _Type* createStatic(const T* data, sl_size width, sl_size height, sl_reg stride, const Ref<Referable>& refer) {
-		if (data == sl_null || width == 0 || height == 0) {
-			return sl_null;
+	template <class _T>
+	static _Type* create(sl_size width, sl_size height, const _T* data, sl_size strideSrc = 0)
+	{
+		if (width > 0 && height > 0) {
+			_Type* ret = new _Type(width, height, data, strideSrc);
+			if (ret) {
+				if (ret->m_data) {
+					return ret;
+				}
+				delete ret;
+			}
 		}
-		if (stride == 0) {
-			stride = width;
+		return sl_null;
+	}
+
+	static _Type* createStatic(const T* data, sl_size width, sl_size height, sl_reg stride, Referable* refer) {
+		if (data && width > 0 && height > 0) {
+			return new _Type(data, width, height, stride, refer);
 		}
-		_Type* ret = new _Type();
-		if (ret) {
-			ret->m_flagStatic = sl_true;
-			ret->m_data = (T*)data;
-			ret->m_width = width;
-			ret->m_height = height;
-			ret->m_stride = stride;
-			ret->m_refer = refer;
-		}
-		return ret;
+		return sl_null;
 	}
 	
 public:
@@ -233,7 +201,7 @@ public:
 			}
 			if (width > 0 && height > 0) {
 				if (m_flagStatic) {
-					return createStatic(m_data + (x + (sl_reg)y * m_stride), width, height, m_stride, m_refer);
+					return createStatic(m_data + (x + (sl_reg)y * m_stride), width, height, m_stride, m_refer.get());
 				} else {
 					return createStatic(m_data + (x + (sl_reg)y * m_stride), width, height, m_stride, this);
 				}
@@ -284,7 +252,7 @@ public:
 	template <class _T>
 	sl_size write(sl_size x, sl_size y, sl_size width, sl_size height, const _T* dataSrc, sl_reg strideSrc = 0) const
 	{
-		T* pDst = m_data
+		T* pDst = m_data;
 		const _T* pSrc = dataSrc;
 		if (pDst == sl_null || pSrc == sl_null) {
 			return 0;
@@ -352,6 +320,113 @@ public:
 	{
 		return create(m_width, m_height, m_data, m_stride);
 	}
+	
+protected:
+	void _init(sl_size width, sl_size height)
+	{
+		if (width > 0 && height > 0) {
+			sl_size size = width * height * sizeof(T);
+			T* dataNew = (T*)(Base::createMemory(size));
+			if (dataNew) {
+				T* rp = dataNew;
+				for (sl_size i = 0; i < height; i++) {
+					T* p = rp;
+					for (sl_size j = 0; j < width; j++) {
+						new (p) T();
+						p ++;
+					}
+					rp += width;
+				}
+				m_flagStatic = sl_false;
+				m_data = dataNew;
+				m_width = width;
+				m_height = height;
+				m_stride = width;
+				return;
+			}
+		}
+		m_flagStatic = sl_false;
+		m_data = sl_null;
+		m_width = 0;
+		m_height = 0;
+		m_stride = 0;
+	}
+	
+	template <class _T>
+	void _init(sl_size width, sl_size height, const _T* data, sl_reg strideSrc = 0)
+	{
+		if (width > 0 && height > 0) {
+			if (strideSrc == 0) {
+				strideSrc = width;
+			}
+			sl_size size = width * height * sizeof(T);
+			T* dataNew = (T*)(Base::createMemory(size));
+			if (dataNew) {
+				T* rp = dataNew;
+				const _T* rq = data;
+				for (sl_size i = 0; i < height; i++) {
+					T* p = rp;
+					const _T* q = rq;
+					for (sl_size j = 0; j < width; j++) {
+						new (p) T(*q);
+						p ++;
+						q ++;
+					}
+					rp += width;
+					rq += strideSrc;
+				}
+				m_flagStatic = sl_false;
+				m_data = dataNew;
+				m_width = width;
+				m_height = height;
+				m_stride = width;
+				return;
+			}
+		}
+		m_flagStatic = sl_false;
+		m_data = sl_null;
+		m_width = 0;
+		m_height = 0;
+		m_stride = 0;
+	}
+	
+	void _initStatic(const T* data, sl_size width, sl_size height, sl_reg stride, const Referable* refer)
+	{
+		if (data && width > 0 && height > 0) {
+			if (stride == 0) {
+				stride = width;
+			}
+			m_flagStatic = sl_true;
+			m_data = (T*)data;
+			m_width = width;
+			m_height = height;
+			m_stride = stride;
+			m_refer = refer;
+		}
+		m_flagStatic = sl_false;
+		m_data = sl_null;
+		m_width = 0;
+		m_height = 0;
+		m_stride = 0;
+	}
+	
+	void _free()
+	{
+		if (! m_flagStatic) {
+			T* rp = m_data;
+			if (rp) {
+				for (sl_size i = 0; i < m_height; i++) {
+					T* p = rp;
+					for (sl_size j = 0; j < m_width; j++) {
+						p->~T();
+						p ++;
+					}
+					rp += m_stride;
+				}
+				Base::freeMemory(m_data);
+			}
+		}
+	}
 };
 
 template <class T>
@@ -368,11 +443,16 @@ class SLIB_EXPORT Array2D
 	SLIB_DECLARE_OBJECT_WRAPPER(Array2D, _Type, _Obj, _Ref)
 	
 public:
-	SLIB_INLINE Array2D(sl_size width, sl_size height, const T* dataIn = sl_null, sl_reg strideIn = 0) : m_object(_Obj::create(width, height, dataIn, strideIn))
+	SLIB_INLINE Array2D(sl_size width, sl_size height) : m_object(_Obj::create(width, height))
 	{
 	}
 
-	SLIB_INLINE Array2D(const T* dataIn, sl_size width, sl_size height, sl_reg strideIn, const Ref<Referable>& refer) : m_object(_Obj::createStatic(strideIn, width, height, dataIn, refer))
+	template <class _T>
+	SLIB_INLINE Array2D(sl_size width, sl_size height, const _T* dataIn, sl_reg strideIn = 0) : m_object(_Obj::create(width, height, dataIn, strideIn))
+	{
+	}
+
+	SLIB_INLINE Array2D(const T* dataIn, sl_size width, sl_size height, sl_reg strideIn, const Referable* refer) : m_object(_Obj::createStatic(strideIn, width, height, dataIn, refer))
 	{
 	}
 
@@ -387,22 +467,28 @@ public:
 	}
 
 public:
-	SLIB_INLINE static _Type create(sl_size width, sl_size height, const T* dataIn = sl_null, sl_reg strideIn = 0)
+	SLIB_INLINE static _Type create(sl_size width, sl_size height)
+	{
+		return _Type(width, height);
+	}
+
+	template <class _T>
+	SLIB_INLINE static _Type create(sl_size width, sl_size height, const _T* dataIn, sl_reg strideIn = 0)
 	{
 		return _Type(width, height, dataIn, strideIn);
 	}
 
 	SLIB_INLINE static Array2D<T> createStatic(const T* data, sl_size width, sl_size height, sl_reg stride = 0)
 	{
-		return _Type(data, width, height, stride, Ref<Referable>::null());
+		return _Type(data, width, height, stride, sl_null);
 	}
 
-	SLIB_INLINE static Array2D<T> createStatic(const T* data, sl_size width, sl_size height, const Ref<Referable>& refer)
+	SLIB_INLINE static Array2D<T> createStatic(const T* data, sl_size width, sl_size height, const Referable* refer)
 	{
 		return _Type(data, width, height, width, refer);
 	}
 
-	SLIB_INLINE static Array2D<T> createStatic(const T* data, sl_size width, sl_size height, sl_reg stride, const Ref<Referable>& refer)
+	SLIB_INLINE static Array2D<T> createStatic(const T* data, sl_size width, sl_size height, sl_reg stride, const Referable* refer)
 	{
 		return _Type(data, width, height, stride, refer);
 	}
@@ -569,7 +655,7 @@ public:
 		return _Type::null();
 	}
 
-	sl_bool getInfo(ArrayInfo2D<T>& info)
+	sl_bool getInfo(ArrayInfo2D<T>& info) const
 	{
 		_Obj* obj = m_object.get();
 		if (obj) {
@@ -608,15 +694,16 @@ class SLIB_EXPORT SafeArray2D
 	SLIB_DECLARE_OBJECT_WRAPPER(SafeArray2D, _Type, _Obj, _Ref)
 
 public:
-	SLIB_INLINE SafeArray2D(sl_size count) : m_object(_Obj::create(count))
+	SLIB_INLINE SafeArray2D(sl_size width, sl_size height) : m_object(_Obj::create(width, height))
 	{
 	}
-
-	SLIB_INLINE SafeArray2D(const T* data, sl_size count) : m_object(_Obj::create(data, count))
+	
+	template <class _T>
+	SLIB_INLINE SafeArray2D(sl_size width, sl_size height, const _T* dataIn, sl_reg strideIn = 0) : m_object(_Obj::create(width, height, dataIn, strideIn))
 	{
 	}
-
-	SLIB_INLINE SafeArray2D(const T* data, sl_size count, const Ref<Referable>& refer) : m_object(_Obj::create(data, count, refer))
+	
+	SLIB_INLINE SafeArray2D(const T* dataIn, sl_size width, sl_size height, sl_reg strideIn, const Referable* refer) : m_object(_Obj::createStatic(strideIn, width, height, dataIn, refer))
 	{
 	}
 
@@ -760,7 +847,7 @@ public:
 		return _LocalType::null();
 	}
 
-	sl_bool getInfo(ArrayInfo2D<T>& info);
+	sl_bool getInfo(ArrayInfo2D<T>& info) const;
 };
 
 template <class T>
@@ -776,7 +863,7 @@ SLIB_INLINE Array2D<T>& Array2D<T>::operator=(const SafeArray2D<T>& other)
 }
 
 template <class T>
-SLIB_INLINE sl_bool SafeArray2D<T>::getInfo(ArrayInfo2D<T>& info)
+SLIB_INLINE sl_bool SafeArray2D<T>::getInfo(ArrayInfo2D<T>& info) const
 {
 	_LocalType obj(*this);
 	return obj.getInfo(info);

@@ -12,7 +12,7 @@ String Base64::encode(const void* buf, sl_uint32 size)
 	const sl_uint8* input = (const sl_uint8*)buf;
 	sl_uint32 last = size % 3;
 	sl_uint32 countBlock = (size / 3) + (last ? 1 : 0);
-	String8 ret = String8::memory(countBlock * 4);
+	String8 ret = String8::allocate(countBlock * 4);
 	if (ret.isEmpty()) {
 		return ret;
 	}
@@ -59,12 +59,11 @@ SLIB_INLINE sl_uint32 _Base64_index(sl_char8 c)
 	return 64;
 }
 
-sl_uint32 Base64::decode(const String& _string, void* buf, sl_uint32 size)
+sl_uint32 Base64::decode(const String& str, void* buf, sl_uint32 size)
 {
-	String8 string = _string;
 	sl_uint8* output = (sl_uint8*)buf;
-	sl_uint32 len = string.getLength();
-	const sl_char8* input = string.getBuf();
+	sl_uint32 len = str.getLength();
+	const sl_char8* input = str.getBuf();
 	// trim right (CR, LF)
 	while (len > 0) {
 		sl_char16 ch = input[len - 1];
@@ -118,9 +117,8 @@ sl_uint32 Base64::decode(const String& _string, void* buf, sl_uint32 size)
 	return 0;
 }
 
-Memory Base64::decode(const String& _base64)
+Memory Base64::decode(const String& base64)
 {
-	String8 base64 = _base64;
 	sl_uint32 len = base64.length();
 	if (len < 4) {
 		return Memory::null();

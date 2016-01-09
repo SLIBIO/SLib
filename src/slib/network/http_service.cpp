@@ -78,13 +78,15 @@ const SocketAddress& HttpServiceContext::getRemoteAddress()
 	}
 }
 
-Ref<HttpServiceContext> HttpServiceContext::create(const Ref<HttpServiceConnection>& _connection)
+Ref<HttpServiceContext> HttpServiceContext::create(const Ref<HttpServiceConnection>& connection)
 {
-	Ref<HttpServiceContext> ret = new HttpServiceContext;
-	Ref<HttpServiceConnection> connection = _connection;
-	if (ret.isNotNull()) {
-		ret->m_connection = connection;
-	}
+    Ref<HttpServiceContext> ret;
+    if (connection.isNotNull()) {
+        ret = new HttpServiceContext;
+        if (ret.isNotNull()) {
+            ret->m_connection = connection;
+        }
+    }
 	return ret;
 }
 
@@ -138,7 +140,7 @@ Ref<HttpServiceConnection> HttpServiceConnection::create(HttpService* _service, 
 
 void HttpServiceConnection::close()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (m_flagClosed) {
 		return;
 	}
@@ -282,7 +284,7 @@ void HttpServiceConnection::_processInput(const void* _data, sl_uint32 size)
 
 void HttpServiceConnection::_read()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (m_flagClosed) {
 		return;
 	}
@@ -339,9 +341,8 @@ void HttpServiceConnection::onAsyncOutputError(AsyncOutput* output)
 	close();
 }
 
-void HttpServiceConnection::sendResponse(const Memory& _mem)
+void HttpServiceConnection::sendResponse(const Memory& mem)
 {
-	Memory mem = _mem;
 	if (mem.isNotEmpty()) {
 		if (m_io->writeFromMemory(mem, Ptr<IAsyncStreamListener>::null())) {
 			return;
@@ -350,9 +351,8 @@ void HttpServiceConnection::sendResponse(const Memory& _mem)
 	close();
 }
 
-void HttpServiceConnection::sendResponseAndRestart(const Memory& _mem)
+void HttpServiceConnection::sendResponseAndRestart(const Memory& mem)
 {
-	Memory mem = _mem;
 	if (mem.isNotEmpty()) {
 		if (m_io->writeFromMemory(mem, Ptr<IAsyncStreamListener>::null())) {
 			start();
@@ -381,9 +381,8 @@ public:
 	}
 };
 
-void HttpServiceConnection::sendResponseAndClose(const Memory& _mem)
+void HttpServiceConnection::sendResponseAndClose(const Memory& mem)
 {
-	Memory mem = _mem;
 	if (mem.isNotEmpty()) {
 		Ref<_HttpServiceConnection_SendResponseAndCloseListener> listener(new _HttpServiceConnection_SendResponseAndCloseListener(this));
 		if (m_io->writeFromMemory(mem, listener)) {
@@ -453,7 +452,7 @@ public:
 
 	void release()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (m_server.isNotNull()) {
 			m_server->close();
 			m_server.setNull();
@@ -514,7 +513,7 @@ HttpService::~HttpService()
 
 void HttpService::release()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 
 	m_flagRunning = sl_false;
 	{
@@ -523,18 +522,18 @@ void HttpService::release()
 			cp[i]->release();
 		}
 	}
-	m_connectionProviders.clear();
+	m_connectionProviders.removeAll();
 
 	if (m_loop.isNotNull()) {
 		m_loop->release();
 		m_loop.setNull();
 	}
-	m_connections.clear();
+	m_connections.removeAll();
 }
 
 sl_bool HttpService::start(const HttpServiceParam& param)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 
 	if (m_flagRunning) {
 		return sl_false;
@@ -628,9 +627,8 @@ sl_bool HttpService::processResource(HttpServiceContext* context, String path)
 	return sl_false;
 }
 
-Ref<HttpServiceConnection> HttpService::addConnection(const Ref<AsyncStream>& _stream, const SocketAddress& remoteAddress, const SocketAddress& localAddress)
+Ref<HttpServiceConnection> HttpService::addConnection(const Ref<AsyncStream>& stream, const SocketAddress& remoteAddress, const SocketAddress& localAddress)
 {
-	Ref<AsyncStream> stream = _stream;
 	Ref<HttpServiceConnection> connection = HttpServiceConnection::create(this, stream.get());
 	if (connection.isNotNull()) {
 		if (m_param.flagLogDebug) {

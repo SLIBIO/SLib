@@ -86,9 +86,8 @@ sl_int32 MacAddress::parse(MacAddress* out, const sl_char16* sz, sl_uint32 posBe
 	return _MacAddress_parse(out, sz, posBegin, len, sep);
 }
 
-sl_bool MacAddress::parse(const String& _str, sl_char8 sep)
+sl_bool MacAddress::parse(const String& s, sl_char8 sep)
 {
-	String s = _str;
 	sl_uint32 n = s.getLength();
 	if (n == 0) {
 		return sl_false;

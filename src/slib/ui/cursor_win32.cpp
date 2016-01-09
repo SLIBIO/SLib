@@ -47,9 +47,8 @@ Ref<Cursor> UIPlatform::createCursor(HCURSOR hCursor, sl_bool flagDestroyOnRelea
 	return Ref<Cursor>::from(ret);
 }
 
-HCURSOR UIPlatform::getCursorHandle(const Ref<Cursor>& _cursor)
+HCURSOR UIPlatform::getCursorHandle(const Ref<Cursor>& cursor)
 {
-	Ref<Cursor> cursor = _cursor;
 	if (cursor.isNull()) {
 		return NULL;
 	}
@@ -93,9 +92,8 @@ Ref<Cursor> Cursor::getResizeUpDown()
 	return UIPlatform::createCursor(hCursor, sl_false);
 }
 
-void Cursor::setCurrent(const Ref<Cursor>& _cursor)
+void Cursor::setCurrent(const Ref<Cursor>& cursor)
 {
-	Ref<Cursor> cursor = _cursor;
 	if (cursor.isNull()) {
 		return;
 	}

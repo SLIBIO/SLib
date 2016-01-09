@@ -128,13 +128,13 @@ String LabelView::getText()
 	return m_text;
 }
 
-void LabelView::setText(const String& _text)
+void LabelView::setText(const String& text)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		Windows::setWindowText(handle, _text);
+		Windows::setWindowText(handle, text);
 	}
-	m_text = _text;
+	m_text = text;
 }
 
 sl_bool LabelView::isBorder()
@@ -237,9 +237,8 @@ void LabelView::setBackgroundColor(const Color& color)
 	m_backgroundColor = color;
 }
 
-void LabelView::setFont(const Ref<Font>& _font)
+void LabelView::setFont(const Ref<Font>& font)
 {
-	Ref<Font> font = _font;
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {

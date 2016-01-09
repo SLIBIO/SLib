@@ -287,14 +287,13 @@ void GenericViewWithDrawing::onDrawBorder(Canvas* canvas)
 	drawBorder(canvas, m_penBorder);
 }
 
-void GenericViewWithDrawing::drawBackground(Canvas *canvas, const Color &color, const Ref<Drawable>& _background)
+void GenericViewWithDrawing::drawBackground(Canvas *canvas, const Color &color, const Ref<Drawable>& background)
 {
 	Rectangle rc(Point::zero(), getSize());
 	if (color.getAlpha() > 0) {
 		Ref<Brush> brush = Brush::createSolidBrush(color);
 		canvas->fillRectangle(rc, brush);
 	}
-	Ref<Drawable> background = _background;
 	if (background.isNotNull()) {
 		sl_real width = background->getDrawableWidth();
 		sl_real height = background->getDrawableHeight();
@@ -303,10 +302,9 @@ void GenericViewWithDrawing::drawBackground(Canvas *canvas, const Color &color, 
 	}
 }
 
-void GenericViewWithDrawing::drawBorder(Canvas* canvas, const Ref<Pen>& _pen)
+void GenericViewWithDrawing::drawBorder(Canvas* canvas, const Ref<Pen>& pen)
 {
 	Rectangle rc(Point::zero(), getSize());
-	Ref<Pen> pen = _pen;
 	if (pen.isNotNull()) {
 		switch (m_boundShape) {
 			case boundShapeRoundRect:

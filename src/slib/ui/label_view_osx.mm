@@ -170,9 +170,8 @@ void LabelView::setBackgroundColor(const Color& color)
 	m_backgroundColor = color;
 }
 
-void LabelView::setFont(const Ref<Font>& _font)
+void LabelView::setFont(const Ref<Font>& font)
 {
-	Ref<Font> font = _font;
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
 		NSTextField* tv = (NSTextField*)handle;
@@ -199,7 +198,7 @@ SLIB_UI_NAMESPACE_END
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		instance->onClick();
 	}

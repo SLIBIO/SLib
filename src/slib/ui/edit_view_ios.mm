@@ -257,17 +257,17 @@ String EditView::getHintText()
 	return m_hintText;
 }
 
-void EditView::setHintText(const String& _value)
+void EditView::setHintText(const String& value)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
 		if ([handle isKindOfClass:[UITextField class]]) {
 			UITextField* tv = (UITextField*)handle;
-			NSString* value = Apple::getNSStringFromString(_value);
-			[tv setPlaceholder:value];
+			NSString* s = Apple::getNSStringFromString(value);
+			[tv setPlaceholder:s];
 		}
 	}
-	m_hintText = _value;
+	m_hintText = value;
 }
 
 sl_bool EditView::isReadOnly()
@@ -371,14 +371,13 @@ void EditView::setBackgroundColor(const Color& color)
 	m_backgroundColor = color;
 }
 
-void EditView::setFont(const Ref<Font>& _font)
+void EditView::setFont(const Ref<Font>& font)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
 		if ([handle isKindOfClass:[UITextField class]]) {
 			UITextField* tv = (UITextField*)handle;
 			Ref<FontInstance> fontInstance;
-			Ref<Font> font = _font;
 			UIFont* hFont = UIPlatform::getUIFont(font.get(), fontInstance);
 			if (hFont != nil) {
 				[tv setFont:hFont];
@@ -386,14 +385,13 @@ void EditView::setFont(const Ref<Font>& _font)
 		} else if ([handle isKindOfClass:[UITextView class]]) {
 			UITextView* tv = (UITextView*)handle;
 			Ref<FontInstance> fontInstance;
-			Ref<Font> font = _font;
 			UIFont* hFont = UIPlatform::getUIFont(font.get(), fontInstance);
 			if (hFont != nil) {
 				[tv setFont:hFont];
 			}
 		}
 	}
-	m_font = _font;
+	m_font = font;
 }
 SLIB_UI_NAMESPACE_END
 
@@ -409,7 +407,7 @@ SLIB_UI_NAMESPACE_END
 
 -(void)textFieldDidChange
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::_EditView::onChangeTextField(instance.get(), self);
 	}
@@ -439,7 +437,7 @@ SLIB_UI_NAMESPACE_END
 
 -(void)textViewDidChange:(UITextView *)textView
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::_EditView::onChangeTextArea(instance.get(), self);
 	}

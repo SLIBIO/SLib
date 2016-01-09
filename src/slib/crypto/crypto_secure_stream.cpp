@@ -341,7 +341,7 @@ public:
 	}
 
 public:
-	static Ref<_SecureStreamServer_SecureStream> create(const Ptr<IStream>& _baseStream, const SecureStreamServerParam& param)
+	static Ref<_SecureStreamServer_SecureStream> create(const Ptr<IStream>& baseStream, const SecureStreamServerParam& param)
 	{
 		Ref<_SecureStreamServer_SecureStream> ret;
 		Memory rdata = Memory::create(RDATA_SIZE);
@@ -349,7 +349,6 @@ public:
 		if (rdata.isEmpty() || sdata.isEmpty()) {
 			return ret;
 		}
-		Ptr<IStream> baseStream = _baseStream;
 		if (baseStream.isNotNull()) {
 			ret = new _SecureStreamServer_SecureStream;
 			ret->m_streamBase = baseStream;
@@ -397,7 +396,7 @@ public:
 
 	sl_bool connect()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (m_flagInited) {
 			return sl_false;
 		}
@@ -419,7 +418,7 @@ public:
 
 	void onRead(AsyncStream* _stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		Ref<AsyncStream> stream = m_streamBase;
 		if (stream.isNull()) {
 			flagError = sl_true;
@@ -535,7 +534,7 @@ public:
 
 	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (!m_flagInited) {
 			return sl_false;
 		}
@@ -548,7 +547,7 @@ public:
 
 	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (!m_flagInited) {
 			return sl_false;
 		}
@@ -567,7 +566,7 @@ public:
 
 	void close()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		_close();
 	}
 
@@ -577,14 +576,13 @@ public:
 	}
 
 public:
-	static Ref<_SecureStreamServer_AsyncStream> create(const Ref<AsyncStream>& _baseStream, const AsyncSecureStreamServerParam& param, sl_bool flagConnect)
+	static Ref<_SecureStreamServer_AsyncStream> create(const Ref<AsyncStream>& baseStream, const AsyncSecureStreamServerParam& param, sl_bool flagConnect)
 	{
 		Ref<_SecureStreamServer_AsyncStream> ret;
 		Memory rdata = Memory::create(RDATA_SIZE);
 		if (rdata.isEmpty()) {
 			return ret;
 		}
-		Ref<AsyncStream> baseStream = _baseStream;
 		if (baseStream.isNotNull()) {
 			Ref<AsyncLoop> loop = baseStream->getLoop();
 			if (loop.isNotNull()) {
@@ -946,7 +944,7 @@ public:
 	}
 
 public:
-	static Ref<_SecureStreamClient_SecureStream> create(const Ptr<IStream>& _baseStream, const SecureStreamClientParam& param)
+	static Ref<_SecureStreamClient_SecureStream> create(const Ptr<IStream>& baseStream, const SecureStreamClientParam& param)
 	{
 		Ref<_SecureStreamClient_SecureStream> ret;
 		Memory rdata = Memory::create(RDATA_SIZE);
@@ -954,7 +952,6 @@ public:
 		if (rdata.isEmpty() || sdata.isEmpty()) {
 			return ret;
 		}
-		Ptr<IStream> baseStream = _baseStream;
 		if (baseStream.isNotNull()) {
 			ret = new _SecureStreamClient_SecureStream;
 			ret->m_streamBase = baseStream;
@@ -1005,7 +1002,7 @@ public:
 
 	sl_bool connect()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (m_flagInited) {
 			return sl_false;
 		}
@@ -1031,7 +1028,7 @@ public:
 
 	void onRead(AsyncStream* _stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		Ref<AsyncStream> stream = m_streamBase;
 		if (stream.isNull()) {
 			flagError = sl_true;
@@ -1139,7 +1136,7 @@ public:
 
 	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (!m_flagInited) {
 			return sl_false;
 		}
@@ -1152,7 +1149,7 @@ public:
 
 	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (!m_flagInited) {
 			return sl_false;
 		}
@@ -1169,7 +1166,7 @@ public:
 
 	void close()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		_close();
 	}
 
@@ -1179,7 +1176,7 @@ public:
 	}
 
 public:
-	static Ref<_SecureStreamClient_AsyncStream> create(const Ref<AsyncStream>& _baseStream, const AsyncSecureStreamClientParam& param, sl_bool flagConnect)
+	static Ref<_SecureStreamClient_AsyncStream> create(const Ref<AsyncStream>& baseStream, const AsyncSecureStreamClientParam& param, sl_bool flagConnect)
 	{
 		Ref<_SecureStreamClient_AsyncStream> ret;
 		Memory sdata = Memory::create(SDATA_SIZE);
@@ -1187,7 +1184,6 @@ public:
 		if (sdata.isEmpty() || rdata.isEmpty()) {
 			return ret;
 		}
-		Ref<AsyncStream> baseStream = _baseStream;
 		if (baseStream.isNotNull()) {
 			Ref<AsyncLoop> loop = baseStream->getLoop();
 			if (loop.isNotNull()) {

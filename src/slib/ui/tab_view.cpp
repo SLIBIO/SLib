@@ -18,7 +18,7 @@ sl_uint32 TabView::getTabsCount()
 
 void TabView::setTabsCount(sl_uint32 nCount)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	m_items.setCount(nCount);
 	_refreshTabsCount();
 }
@@ -33,12 +33,11 @@ String TabView::getTabLabel(sl_uint32 index)
 	return String::null();
 }
 
-void TabView::setTabLabel(sl_uint32 index, const String& _text)
+void TabView::setTabLabel(sl_uint32 index, const String& text)
 {
 	MutexLocker lock(m_items.getLocker());
 	if (index < m_items.count()) {
 		TabViewItem* item = m_items.getItemPtr(index);
-		String text = _text;
 		item->label = text;
 		_setTabLabel(index, text);
 	}
@@ -54,12 +53,11 @@ Ref<View> TabView::getTabContentView(sl_uint32 index)
 	return Ref<View>::null();
 }
 
-void TabView::setTabContentView(sl_uint32 index, const Ref<View>& _view)
+void TabView::setTabContentView(sl_uint32 index, const Ref<View>& view)
 {
 	MutexLocker lock(m_items.getLocker());
 	if (index < m_items.count()) {
 		TabViewItem* item = m_items.getItemPtr(index);
-		Ref<View> view = _view;
 		if (item->contentView != view) {
 			Ref<View> viewOld = item->contentView;
 			if (viewOld.isNotNull()) {

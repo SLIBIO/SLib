@@ -214,11 +214,11 @@ public:
 	}
 	SLIB_INLINE void removeRequestHeader(String name)
 	{
-		m_requestHeaders.removeAllKeys(name);
+		m_requestHeaders.removeAllMatchingKeys(name);
 	}
 	SLIB_INLINE void clearRequestHeaders()
 	{
-		m_requestHeaders.clear();
+		m_requestHeaders.removeAll();
 	}
 
 	sl_uint64 getRequestContentLengthHeader() const;
@@ -365,11 +365,11 @@ public:
 	}
 	SLIB_INLINE void removeResponseHeader(String name)
 	{
-		m_responseHeaders.removeAllKeys(name);
+		m_responseHeaders.removeAllMatchingKeys(name);
 	}
 	SLIB_INLINE void clearResponseHeaders()
 	{
-		m_responseHeaders.clear();
+		m_responseHeaders.removeAll();
 	}
 
 	sl_uint64 getResponseContentLengthHeader() const;

@@ -26,9 +26,8 @@ public:
 	{
 	}
 
-	static Ref<_Unix_SocketEvent> create(const Ref<Socket>& _socket)
+	static Ref<_Unix_SocketEvent> create(const Ref<Socket>& socket)
 	{
-		Ref<Socket> socket = _socket;
 		Ref<_Unix_SocketEvent> ret;
 		if (socket.isNotNull()) {
 			Socket::initializeSocket();

@@ -77,7 +77,7 @@ protected:
 	void* m_handle;
 	Ref<Thread> m_thread;
 	Ref<ThreadPool> m_threadPool;
-	Queue< Ref<AsyncInstance>, sl_false > m_queueInstancesOrder;
+	Queue< Ref<AsyncInstance> > m_queueInstancesOrder;
 	Queue< Ref<AsyncInstance> > m_queueInstancesClosing;
 	Queue< Ref<AsyncInstance> > m_queueInstancesClosed;
 
@@ -385,9 +385,8 @@ public:
 	virtual sl_bool seek(sl_uint64 pos);
 	virtual sl_uint64 getSize();
 
-	SLIB_INLINE sl_bool readToMemory(const Memory& _mem, const Ptr<IAsyncStreamListener>& listener)
+	SLIB_INLINE sl_bool readToMemory(const Memory& mem, const Ptr<IAsyncStreamListener>& listener)
 	{
-		Memory mem = _mem;
 		sl_size size = mem.getSize();
 		if (size > 0x40000000) {
 			size = 0x40000000;
@@ -395,9 +394,8 @@ public:
 		return read(mem.getBuf(), (sl_uint32)(size), listener, mem.getReference());
 	}
 
-	SLIB_INLINE sl_bool writeFromMemory(const Memory& _mem, const Ptr<IAsyncStreamListener>& listener)
+	SLIB_INLINE sl_bool writeFromMemory(const Memory& mem, const Ptr<IAsyncStreamListener>& listener)
 	{
-		Memory mem = _mem;
 		sl_size size = mem.getSize();
 		if (size > 0x40000000) {
 			size = 0x40000000;

@@ -84,9 +84,8 @@ Ref<Image> Image::loadFromJPEG(const void* content, sl_size size)
 	return ret;
 }
 
-Memory Image::saveToJPEG(const Ref<Image>& _image, float quality)
+Memory Image::saveToJPEG(const Ref<Image>& image, float quality)
 {
-	Ref<Image> image = _image;
 	if (image.isNull()) {
 		return Memory::null();
 	}
@@ -169,9 +168,8 @@ Memory Image::saveToJPEG(const Ref<Image>& _image, float quality)
 	return ret;
 }
 
-sl_bool Image::saveToJPEG(String filePath, const Ref<Image>& _image, float quality)
+sl_bool Image::saveToJPEG(String filePath, const Ref<Image>& image, float quality)
 {
-	Ref<Image> image = _image;
 	if (image.isNull()) {
 		return sl_false;
 	}

@@ -111,10 +111,9 @@ public:
 		return ret;
 	}
 
-	sl_bool execute(const String& _sql, sl_size* pOutAffectedRowsCount)
+	sl_bool execute(const String& sql, sl_uint64* pOutAffectedRowsCount)
 	{
-		MutexLocker lock(getLocker());
-		String8 sql = _sql;
+		ObjectLocker lock(this);
 		if (0 == ::mysql_real_query(m_mysql, sql.getBuf(), sql.getLength())) {
 			if (pOutAffectedRowsCount) {
 				*pOutAffectedRowsCount = ::mysql_affected_rows(m_mysql);
@@ -147,11 +146,11 @@ public:
 			m_fields = ::mysql_fetch_fields(result);
 			for (sl_uint32 i = 0; i < cols; i++) {
 				String name(m_fields[i].name);
-				m_listColumnNames.push(name);
+				m_listColumnNames.add(name);
 				m_mapColumnIndexes.put(name, i);
 			}
 			m_nColumnNames = (sl_uint32)(m_listColumnNames.getCount());
-			m_columnNames = m_listColumnNames.getBuffer();
+			m_columnNames = m_listColumnNames.data();
 
 			m_row = NULL;
 			m_lengths = NULL;
@@ -249,11 +248,10 @@ public:
 		}
 	};
 
-	Ref<DatabaseCursor> query(const String& _sql)
+	Ref<DatabaseCursor> query(const String& sql)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		Ref<DatabaseCursor> ret;
-		String8 sql = _sql;
 		if (0 == mysql_real_query(m_mysql, sql.getBuf(), sql.getLength())) {
 			MYSQL_RES* res = ::mysql_use_result(m_mysql);
 			if (res) {
@@ -343,11 +341,11 @@ public:
 
 			for (sl_uint32 i = 0; i < cols; i++) {
 				String name(m_fields[i].name);
-				m_listColumnNames.push(name);
+				m_listColumnNames.add(name);
 				m_mapColumnIndexes.put(name, i);
 			}
 			m_nColumnNames = (sl_uint32)(m_listColumnNames.getCount());
-			m_columnNames = m_listColumnNames.getBuffer();
+			m_columnNames = m_listColumnNames.data();
 
 			db->lock();
 		}
@@ -392,7 +390,7 @@ public:
 
 		String _getStringEx(sl_uint32 index)
 		{
-			String8 s = String8::memory((sl_uint32)(m_fds[index].length));
+			String8 s = String8::allocate((sl_uint32)(m_fds[index].length));
 			if (s.isNotEmpty()) {
 				MYSQL_BIND bind = m_bind[index];
 				bind.buffer = s.getBuf();
@@ -922,9 +920,9 @@ public:
 			return sl_false;
 		}
 
-		sl_bool execute(const Variant* params, sl_uint32 nParams, sl_size* pOutAffectedRowsCount)
+		sl_bool execute(const Variant* params, sl_uint32 nParams, sl_uint64* pOutAffectedRowsCount)
 		{
-			MutexLocker lock(m_db->getLocker());
+			ObjectLocker lock(m_db.get());
 			if (_execute(params, nParams)) {
 				if (pOutAffectedRowsCount) {
 					*pOutAffectedRowsCount = ::mysql_stmt_affected_rows(m_statement);
@@ -936,7 +934,7 @@ public:
 
 		Ref<DatabaseCursor> query(const Variant* params, sl_uint32 nParams)
 		{
-			MutexLocker lock(m_db->getLocker());
+			ObjectLocker lock(m_db.get());
 			Ref<DatabaseCursor> ret;
 			if (_execute(params, nParams)) {
 				MYSQL_RES* resultMetadata = ::mysql_stmt_result_metadata(m_statement);
@@ -1036,13 +1034,12 @@ public:
 
 	};
 
-	Ref<DatabaseStatement> prepareStatement(const String& _sql)
+	Ref<DatabaseStatement> prepareStatement(const String& sql)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		Ref<DatabaseStatement> ret;
 		MYSQL_STMT* statement = ::mysql_stmt_init(m_mysql);
 		if (statement) {
-			String8 sql = _sql;
 			if (0 == ::mysql_stmt_prepare(statement, sql.getBuf(), sql.getLength())) {
 				ret = new _DatabaseStatement(this, statement);
 				if (ret.isNotNull()) {

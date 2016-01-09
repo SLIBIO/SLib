@@ -48,9 +48,8 @@ List<MacAddress> Network::findAllMacAddresses()
 }
 
 
-sl_bool Network::findInterface(const String& _name, NetworkInterfaceInfo* pInfo)
+sl_bool Network::findInterface(const String& name, NetworkInterfaceInfo* pInfo)
 {
-	String name = _name;
 	ListLocker<NetworkInterfaceInfo> devices(Network::findAllInterfaces());
 	for (sl_size i = 0; i < devices.count(); i++) {
 		if (devices[i].displayName == name) {
@@ -328,12 +327,11 @@ SLIB_NETWORK_NAMESPACE_END
 #endif
 
 SLIB_NETWORK_NAMESPACE_BEGIN
-sl_uint32 Network::getInterfaceIndexFromName(const String& _name)
+sl_uint32 Network::getInterfaceIndexFromName(const String& name)
 {
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 	Socket::initializeSocket();
 #endif
-	String8 name = _name;
 	sl_uint32 n = if_nametoindex(name.getBuf());
 	return n;
 }
@@ -352,13 +350,12 @@ String Network::getInterfaceNameFromIndex(sl_uint32 index)
 	}
 }
 
-List<IPAddress> Network::getIPAddressesFromHostName(const String& _hostName)
+List<IPAddress> Network::getIPAddressesFromHostName(const String& hostName)
 {
 	Socket::initializeSocket();
 
 	List<IPAddress> ret;
 
-	String8 hostName = _hostName;
 	addrinfo *addrs = sl_null;
 
 	SocketAddress sa;

@@ -172,7 +172,7 @@ public:
 	
 	void release()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (!m_flagOpened) {
 			return;
 		}
@@ -192,7 +192,7 @@ public:
 	
 	void start()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (!m_flagOpened) {
 			return;
 		}
@@ -207,7 +207,7 @@ public:
 	
 	void stop()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (!m_flagOpened) {
 			return;
 		}
@@ -318,7 +318,7 @@ List<AudioPlayerInfo> AudioPlayer::getPlayersList()
 	AudioPlayerInfo ret;
 	SLIB_STATIC_STRING(s, "Internal Speaker");
 	ret.name = s;
-	return List<AudioPlayerInfo>::fromElement(ret);
+	return List<AudioPlayerInfo>::createFromElement(ret);
 }
 SLIB_MEDIA_NAMESPACE_END
 

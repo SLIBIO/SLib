@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_CORE_ARRAY
 
 #include "definition.h"
+
 #include "algorithm.h"
 #include "reference.h"
 #include "iterator.h"
@@ -31,82 +32,69 @@ protected:
 	Ref<Referable> m_refer;
 	
 protected:
-	SLIB_INLINE CArray()
+	SLIB_INLINE CArray() {}
+	
+public:
+	SLIB_INLINE CArray(sl_size count)
 	{
+		_init(count);
 	}
 	
+	template <class _T>
+	SLIB_INLINE CArray(const _T* data, sl_size count)
+	{
+		_init(data, count);
+	}
+	
+	SLIB_INLINE CArray(const T* data, sl_size count, const Referable* refer)
+	{
+		_initStatic(data, count, refer);
+	}
+
 public:
 	~CArray()
 	{
-		if (! m_flagStatic) {
-			if (m_data) {
-				T* p = m_data;
-				for (sl_size i = 0; i < m_count; i++) {
-					p->~T();
-					p ++;
-				}
-				Base::freeMemory(m_data);
-			}
-		}
+		_free();
 	}
 	
 public:
-	SLIB_INLINE static _Type* create(sl_size count)
+	static _Type* create(sl_size count)
 	{
-		return create(sl_null, count);
+		if (count > 0) {
+			_Type* ret = new _Type(count);
+			if (ret) {
+				if (ret->m_data) {
+					return ret;
+				}
+				delete ret;
+			}
+		}
+		return sl_null;
 	}
 
-	static _Type* create(const T* data, sl_size count)
+	template <class _T>
+	SLIB_INLINE static _Type* create(const _T* data, sl_size count)
 	{
-		if (count == 0) {
-			return sl_null;
-		}
-		sl_size size = count * sizeof(T);
-		T* dataNew = (T*)(Base::createMemory(size));
-		if (dataNew == sl_null) {
-			return sl_null;
-		}
-		_Type* ret = new _Type;
-		if (ret) {
-			if (data) {
-				T* p = dataNew;
-				const T* q = data;
-				for (sl_size i = 0; i < count; i++) {
-					new (p) T(*q);
-					p ++;
-					q ++;
+		if (count > 0) {
+			_Type* ret = new _Type(data, count);
+			if (ret) {
+				if (ret->m_data) {
+					return ret;
 				}
-			} else {
-				T* p = dataNew;
-				for (sl_size i = 0; i < count; i++) {
-					new (p) T();
-					p ++;
-				}
+				delete ret;
 			}
-			ret->m_flagStatic = sl_false;
-			ret->m_data = dataNew;
-			ret->m_count = count;
-		} else {
-			Base::freeMemory(dataNew);
 		}
-		return ret;
+		return sl_null;
 	}
 	
-	static _Type* createStatic(const T* data, sl_size count, const Ref<Referable>& refer)
+	SLIB_INLINE static _Type* createStatic(const T* data, sl_size count, const Referable* refer)
 	{
-		if (data == sl_null || count == 0) {
-			return sl_null;
+		if (data && count > 0) {
+			return new _Type(data, count, refer);
 		}
-		_Type* ret = new ArrayObject<T>();
-		if (ret) {
-			ret->m_flagStatic = sl_true;
-			ret->m_data = (T*)data;
-			ret->m_count = count;
-			ret->m_refer = refer;
-		}
-		return ret;
+		return sl_null;
 	}
-
+	
 public:
 	SLIB_INLINE T* getData() const
 	{
@@ -188,7 +176,7 @@ public:
 			}
 			if (count > 0) {
 				if (m_flagStatic) {
-					return createStatic(m_data + start, count, m_refer);
+					return createStatic(m_data + start, count, m_refer.get());
 				} else {
 					return createStatic(m_data + start, count, this);
 				}
@@ -287,19 +275,20 @@ public:
 	template <class _T, class _COMPARE>
 	sl_size copy(sl_size startTarget, const CArray<_T, _COMPARE>* source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const
 	{
-		T* pSrc = source->data();
-		if (pSrc == sl_null) {
-			return 0;
+		if (source) {
+			T* pSrc = source->data();
+			if (pSrc) {
+				sl_size countSrc = source->count();
+				if (startSource < countSrc) {
+					sl_size lenSrc = countSrc - startSource;
+					if (len > lenSrc) {
+						len = lenSrc;
+					}
+					return write<_T>(startTarget, len, pSrc + startSource);
+				}
+			}
 		}
-		sl_size countSrc = source->count();
-		if (startSource >= countSrc) {
-			return 0;
-		}
-		sl_size lenSrc = countSrc - startSource;
-		if (len > lenSrc) {
-			len = lenSrc;
-		}
-		return write<_T>(startTarget, len, pSrc + startSource);
+		return 0;
 	}
 
 	template <class _T, class _COMPARE>
@@ -311,6 +300,82 @@ public:
 	SLIB_INLINE _Type* duplicate() const
 	{
 		return create(m_data, m_count);
+	}
+	
+protected:
+	void _init(sl_size count)
+	{
+		if (count > 0) {
+			sl_size size = count * sizeof(T);
+			T* dataNew = (T*)(Base::createMemory(size));
+			if (dataNew) {
+				T* p = dataNew;
+				for (sl_size i = 0; i < count; i++) {
+					new (p) T();
+					p ++;
+				}
+				m_flagStatic = sl_false;
+				m_data = dataNew;
+				m_count = count;
+				return;
+			}
+		}
+		m_flagStatic = sl_false;
+		m_data = sl_null;
+		m_count = 0;
+	}
+	
+	template <class _T>
+	void _init(const _T* data, sl_size count)
+	{
+		if (count > 0) {
+			sl_size size = count * sizeof(T);
+			T* dataNew = (T*)(Base::createMemory(size));
+			if (dataNew) {
+				T* p = dataNew;
+				const T* q = data;
+				for (sl_size i = 0; i < count; i++) {
+					new (p) T(*q);
+					p ++;
+					q ++;
+				}
+				m_flagStatic = sl_false;
+				m_data = dataNew;
+				m_count = count;
+				return;
+			}
+		}
+		m_flagStatic = sl_false;
+		m_data = sl_null;
+		m_count = 0;
+	}
+	
+	void _initStatic(const T* data, sl_size count, const Referable* refer)
+	{
+		if (data && count > 0) {
+			m_flagStatic = sl_true;
+			m_data = (T*)data;
+			m_count = count;
+			m_refer = refer;
+			return;
+		}
+		m_flagStatic = sl_false;
+		m_data = sl_null;
+		m_count = 0;
+	}
+	
+	void _free()
+	{
+		if (! m_flagStatic) {
+			T* p = m_data;
+			if (p) {
+				for (sl_size i = 0; i < m_count; i++) {
+					p->~T();
+					p ++;
+				}
+				Base::freeMemory(m_data);
+			}
+		}
 	}
 };
 
@@ -332,24 +397,25 @@ public:
 	{
 	}
 	
-	SLIB_INLINE Array(const T* data, sl_size count) : m_object(_Obj::create(data, count))
+	template <class _T>
+	SLIB_INLINE Array(const _T* data, sl_size count) : m_object(_Obj::create(data, count))
 	{
 	}
 
-	SLIB_INLINE Array(const T* data, sl_size count, const Ref<Referable>& refer) : m_object(_Obj::create(data, count, refer))
+	SLIB_INLINE Array(const T* data, sl_size count, const Referable* refer) : m_object(_Obj::createStatic(data, count, refer))
 	{
 	}
 
 public:
 	template <class _COMPARE>
-	SLIB_INLINE Array(const Array<T, _COMPARE>& other) : m_object(other.getReference())
+	SLIB_INLINE Array(const Array<T, _COMPARE>& other) : m_object(_Ref::from(other.getReference()))
 	{
 	}
 
 	template <class _COMPARE>
 	SLIB_INLINE _Type& operator=(const Array<T, _COMPARE>& other)
 	{
-		m_object = other.getReference();
+		m_object = _Ref::from(other.getReference());
 		return *this;
 	}
 
@@ -368,17 +434,18 @@ public:
 		return _Type(count);
 	}
 
-	SLIB_INLINE static _Type create(const T* data, sl_size count)
+	template <class _T>
+	SLIB_INLINE static _Type create(const _T* data, sl_size count)
 	{
 		return _Type(data, count);
 	}
 
 	SLIB_INLINE static _Type createStatic(const T* data, sl_size count)
 	{
-		return _Type(data, count, Ref<Referable>::null());
+		return _Type(data, count, sl_null);
 	}
 
-	SLIB_INLINE static _Type createStatic(const T* data, sl_size count, const Ref<Referable>& refer)
+	SLIB_INLINE static _Type createStatic(const T* data, sl_size count, const Referable* refer)
 	{
 		return _Type(data, count, refer);
 	}
@@ -550,9 +617,10 @@ public:
 		return _Type::null();
 	}
 
+public:
 	Iterator<T> iterator() const;
 
-	sl_bool getInfo(ArrayInfo<T>& info)
+	sl_bool getInfo(ArrayInfo<T>& info) const
 	{
 		_Obj* obj = m_object.get();
 		if (obj) {
@@ -596,12 +664,12 @@ public:
 	}
 
 	// override
-	sl_bool next(T* out)
+	sl_bool next(T* _out)
 	{
 		sl_uint32 index = m_index;
 		if (index < m_arr.count) {
-			if (out) {
-				*out = m_arr.data[index];
+			if (_out) {
+				*_out = m_arr.data[index];
 			}
 			m_index = index + 1;
 			return sl_true;
@@ -644,24 +712,25 @@ public:
 	{
 	}
 
-	SLIB_INLINE SafeArray(const T* data, sl_size count) : m_object(_Obj::create(data, count))
+	template <class _T>
+	SLIB_INLINE SafeArray(const _T* data, sl_size count) : m_object(_Obj::create(data, count))
 	{
 	}
 
-	SLIB_INLINE SafeArray(const T* data, sl_size count, const Ref<Referable>& refer) : m_object(_Obj::create(data, count, refer))
+	SLIB_INLINE SafeArray(const T* data, sl_size count, const Referable* refer) : m_object(_Obj::createStatic(data, count, refer))
 	{
 	}
 
 public:
 	template <class _COMPARE>
-	SLIB_INLINE SafeArray(const SafeArray<T, _COMPARE>& other) : m_object(other.getReference())
+	SLIB_INLINE SafeArray(const SafeArray<T, _COMPARE>& other) : m_object(_Ref::from(other.getReference()))
 	{
 	}
 
 	template <class _COMPARE>
 	SLIB_INLINE _Type& operator=(const SafeArray<T, _COMPARE>& other)
 	{
-		m_object = other.getReference();
+		m_object = _Ref::from(other.getReference());
 		return *this;
 	}
 
@@ -806,7 +875,8 @@ public:
 		return _LocalType::null();
 	}
 
-	sl_bool getInfo(ArrayInfo<T>& info);
+public:
+	sl_bool getInfo(ArrayInfo<T>& info) const;
 
 };
 
@@ -823,7 +893,7 @@ SLIB_INLINE Array<T, COMPARE>& Array<T, COMPARE>::operator=(const SafeArray<T, C
 }
 
 template <class T, class COMPARE>
-SLIB_INLINE sl_bool SafeArray<T, COMPARE>::getInfo(ArrayInfo<T>& info)
+SLIB_INLINE sl_bool SafeArray<T, COMPARE>::getInfo(ArrayInfo<T>& info) const
 {
 	_LocalType obj(*this);
 	return obj.getInfo(info);

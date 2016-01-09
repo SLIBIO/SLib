@@ -187,7 +187,7 @@ void Thread::_run()
 	}
 	m_runnable.setNull();
 
-	m_attachedObjects.clear();
+	m_attachedObjects.removeAll();
 
 #if defined(SLIB_PLATFORM_USE_JNI)
 	Jni::detachThread();

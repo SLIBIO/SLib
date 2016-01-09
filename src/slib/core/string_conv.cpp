@@ -317,13 +317,35 @@ String16 String16::fromFloat(float value, sl_int32 precision, sl_bool flagZeroPa
 	return _String_fromFloat<float, String16, sl_char16>(value, precision, flagZeroPadding, minWidthIntegral);
 }
 
+String8 String8::fromBoolean(sl_bool value)
+{
+	if (value) {
+		SLIB_STATIC_STRING8(s, "true");
+		return s;
+	} else {
+		SLIB_STATIC_STRING8(s, "false");
+		return s;
+	}
+}
+
+String16 String16::fromBoolean(sl_bool value)
+{
+	if (value) {
+		SLIB_STATIC_STRING16(s, "true");
+		return s;
+	} else {
+		SLIB_STATIC_STRING16(s, "false");
+		return s;
+	}
+}
+
 template <class ST, class CT>
 SLIB_INLINE ST _String_makeHexString(const void* buf, sl_int32 size)
 {
 	if (!buf || size <= 0) {
 		return ST::null();
 	}
-	ST str = ST::memory(size * 2);
+	ST str = ST::allocate(size * 2);
 	if (str.isEmpty()) {
 		return str;
 	}
@@ -347,7 +369,7 @@ String16 String16::makeHexString(const void* buf, sl_int32 size)
 }
 
 template <class IT, class CT>
-SLIB_INLINE sl_int32 _String_parseInt(const CT* sz, sl_uint32 i, sl_uint32 n, IT* out, sl_int32 radix)
+SLIB_INLINE sl_int32 _String_parseInt(const CT* sz, sl_uint32 i, sl_uint32 n, IT* _out, sl_int32 radix)
 {
 	if (i >= n) {
 		return SLIB_PARSE_ERROR;
@@ -384,14 +406,14 @@ SLIB_INLINE sl_int32 _String_parseInt(const CT* sz, sl_uint32 i, sl_uint32 n, IT
 	if (bMinus) {
 		v = -v;
 	}
-	if (out) {
-		*out = v;
+	if (_out) {
+		*_out = v;
 	}
 	return i;
 }
 
 template <class IT, class CT>
-SLIB_INLINE sl_int32 _String_parseUint(const CT* sz, sl_uint32 i, sl_uint32 n, IT* out, sl_int32 radix)
+SLIB_INLINE sl_int32 _String_parseUint(const CT* sz, sl_uint32 i, sl_uint32 n, IT* _out, sl_int32 radix)
 {
 	if (i >= n) {
 		return SLIB_PARSE_ERROR;
@@ -409,174 +431,174 @@ SLIB_INLINE sl_int32 _String_parseUint(const CT* sz, sl_uint32 i, sl_uint32 n, I
 			break;
 		}
 	}
-	if (out) {
-		*out = v;
+	if (_out) {
+		*_out = v;
 	}
 	return i;
 }
 
-sl_int32 String8::parseInt32(sl_int32* out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_int32 String8::parseInt32(sl_int32* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
 {
-	return _String_parseInt(sz, posBegin, len, out, radix);
+	return _String_parseInt(sz, posBegin, len, _out, radix);
 }
 
-sl_int32 String8::parseInt32(sl_int32* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_int32 String8::parseInt32(sl_int32* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
 {
-	return _String_parseInt(sz, posBegin, len, out, radix);
+	return _String_parseInt(sz, posBegin, len, _out, radix);
 }
 
-sl_bool String8::parseInt32(sl_int32* out, sl_int32 radix) const
+sl_bool String8::parseInt32(sl_int32* _out, sl_int32 radix) const
 {
 	String8 s = *this;
 	sl_uint32 n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseInt(s.getBuf(), 0, n, out, radix) == n;
+	return _String_parseInt(s.data(), 0, n, _out, radix) == n;
 }
 
-sl_int32 String16::parseInt32(sl_int32* out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_int32 String16::parseInt32(sl_int32* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
 {
-	return _String_parseInt(sz, posBegin, len, out, radix);
+	return _String_parseInt(sz, posBegin, len, _out, radix);
 }
 
-sl_int32 String16::parseInt32(sl_int32* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_int32 String16::parseInt32(sl_int32* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
 {
-	return _String_parseInt(sz, posBegin, len, out, radix);
+	return _String_parseInt(sz, posBegin, len, _out, radix);
 }
 
-sl_bool String16::parseInt32(sl_int32* out, sl_int32 radix) const
+sl_bool String16::parseInt32(sl_int32* _out, sl_int32 radix) const
 {
 	String16 s = *this;
 	sl_uint32 n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseInt(s.getBuf(), 0, n, out, radix) == n;
+	return _String_parseInt(s.data(), 0, n, _out, radix) == n;
 }
 
-sl_int32 String8::parseUint32(sl_uint32* out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_int32 String8::parseUint32(sl_uint32* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
 {
-	return _String_parseUint(sz, posBegin, len, out, radix);
+	return _String_parseUint(sz, posBegin, len, _out, radix);
 }
 
-sl_int32 String8::parseUint32(sl_uint32* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_int32 String8::parseUint32(sl_uint32* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
 {
-	return _String_parseUint(sz, posBegin, len, out, radix);
+	return _String_parseUint(sz, posBegin, len, _out, radix);
 }
 
-sl_bool String8::parseUint32(sl_uint32* out, sl_int32 radix) const
+sl_bool String8::parseUint32(sl_uint32* _out, sl_int32 radix) const
 {
 	String8 s = *this;
 	sl_uint32 n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseUint(s.getBuf(), 0, n, out, radix) == n;
+	return _String_parseUint(s.data(), 0, n, _out, radix) == n;
 }
 
-sl_int32 String16::parseUint32(sl_uint32* out, const char* sz, sl_uint32 posBegin, sl_uint32 n, sl_int32 radix)
+sl_int32 String16::parseUint32(sl_uint32* _out, const char* sz, sl_uint32 posBegin, sl_uint32 n, sl_int32 radix)
 {
-	return _String_parseUint(sz, posBegin, n, out, radix);
+	return _String_parseUint(sz, posBegin, n, _out, radix);
 }
 
-sl_int32 String16::parseUint32(sl_uint32* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 n, sl_int32 radix)
+sl_int32 String16::parseUint32(sl_uint32* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 n, sl_int32 radix)
 {
-	return _String_parseUint(sz, posBegin, n, out, radix);
+	return _String_parseUint(sz, posBegin, n, _out, radix);
 }
 
-sl_bool String16::parseUint32(sl_uint32* out, sl_int32 radix) const
+sl_bool String16::parseUint32(sl_uint32* _out, sl_int32 radix) const
 {
 	String16 s = *this;
 	sl_uint32 n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseUint(s.getBuf(), 0, n, out, radix) == n;
+	return _String_parseUint(s.data(), 0, n, _out, radix) == n;
 }
 
-sl_int32 String8::parseInt64(sl_int64* out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_int32 String8::parseInt64(sl_int64* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
 {
-	return _String_parseInt(sz, posBegin, len, out, radix);
+	return _String_parseInt(sz, posBegin, len, _out, radix);
 }
 
-sl_int32 String8::parseInt64(sl_int64* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_int32 String8::parseInt64(sl_int64* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
 {
-	return _String_parseInt(sz, posBegin, len, out, radix);
+	return _String_parseInt(sz, posBegin, len, _out, radix);
 }
 
-sl_bool String8::parseInt64(sl_int64* out, sl_int32 radix) const
+sl_bool String8::parseInt64(sl_int64* _out, sl_int32 radix) const
 {
 	String8 s = *this;
 	sl_uint32 n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseInt(s.getBuf(), 0, n, out, radix) == n;
+	return _String_parseInt(s.data(), 0, n, _out, radix) == n;
 }
 
-sl_int32 String16::parseInt64(sl_int64* out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_int32 String16::parseInt64(sl_int64* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
 {
-	return _String_parseInt(sz, posBegin, len, out, radix);
+	return _String_parseInt(sz, posBegin, len, _out, radix);
 }
 
-sl_int32 String16::parseInt64(sl_int64* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_int32 String16::parseInt64(sl_int64* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
 {
-	return _String_parseInt(sz, posBegin, len, out, radix);
+	return _String_parseInt(sz, posBegin, len, _out, radix);
 }
 
-sl_bool String16::parseInt64(sl_int64* out, sl_int32 radix) const
+sl_bool String16::parseInt64(sl_int64* _out, sl_int32 radix) const
 {
 	String16 s = *this;
 	sl_uint32 n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseInt(s.getBuf(), 0, n, out, radix) == n;
+	return _String_parseInt(s.data(), 0, n, _out, radix) == n;
 }
 
-sl_int32 String8::parseUint64(sl_uint64* out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_int32 String8::parseUint64(sl_uint64* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
 {
-	return _String_parseUint(sz, posBegin, len, out, radix);
+	return _String_parseUint(sz, posBegin, len, _out, radix);
 }
 
-sl_int32 String8::parseUint64(sl_uint64* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_int32 String8::parseUint64(sl_uint64* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
 {
-	return _String_parseUint(sz, posBegin, len, out, radix);
+	return _String_parseUint(sz, posBegin, len, _out, radix);
 }
 
-sl_bool String8::parseUint64(sl_uint64* out, sl_int32 radix) const
+sl_bool String8::parseUint64(sl_uint64* _out, sl_int32 radix) const
 {
 	String8 s = *this;
 	sl_uint32 n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseUint(s.getBuf(), 0, n, out, radix) == n;
+	return _String_parseUint(s.data(), 0, n, _out, radix) == n;
 }
 
-sl_int32 String16::parseUint64(sl_uint64* out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_int32 String16::parseUint64(sl_uint64* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
 {
-	return _String_parseUint(sz, posBegin, len, out, radix);
+	return _String_parseUint(sz, posBegin, len, _out, radix);
 }
 
-sl_int32 String16::parseUint64(sl_uint64* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_int32 String16::parseUint64(sl_uint64* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
 {
-	return _String_parseUint(sz, posBegin, len, out, radix);
+	return _String_parseUint(sz, posBegin, len, _out, radix);
 }
 
-sl_bool String16::parseUint64(sl_uint64* out, sl_int32 radix) const
+sl_bool String16::parseUint64(sl_uint64* _out, sl_int32 radix) const
 {
 	String16 s = *this;
 	sl_uint32 n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseUint(s.getBuf(), 0, n, out, radix) == n;
+	return _String_parseUint(s.data(), 0, n, _out, radix) == n;
 }
 
 template <class FT, class CT>
-SLIB_INLINE sl_int32 _String_parseFloat(const CT* sz, sl_uint32 i, sl_uint32 n, FT* out)
+SLIB_INLINE sl_int32 _String_parseFloat(const CT* sz, sl_uint32 i, sl_uint32 n, FT* _out)
 {
 	if (i >= n) {
 		return SLIB_PARSE_ERROR; // input string is empty
@@ -661,99 +683,99 @@ SLIB_INLINE sl_int32 _String_parseFloat(const CT* sz, sl_uint32 i, sl_uint32 n, 
 	if (bMinus) {
 		v = -v;
 	}
-	if (out) {
-		*out = v;
+	if (_out) {
+		*_out = v;
 	}
 	return i;
 }
 
-sl_int32 String8::parseFloat(float* out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_int32 String8::parseFloat(float* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
 {
-	return _String_parseFloat(sz, posBegin, len, out);
+	return _String_parseFloat(sz, posBegin, len, _out);
 }
 
-sl_int32 String8::parseFloat(float* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_int32 String8::parseFloat(float* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
 {
-	return _String_parseFloat(sz, posBegin, len, out);
+	return _String_parseFloat(sz, posBegin, len, _out);
 }
 
-sl_bool String8::parseFloat(float* out) const
+sl_bool String8::parseFloat(float* _out) const
 {
 	String8 s = *this;
 	sl_uint32 n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseFloat(s.getBuf(), 0, n, out) == n;
+	return _String_parseFloat(s.data(), 0, n, _out) == n;
 }
 
-sl_int32 String16::parseFloat(float* out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_int32 String16::parseFloat(float* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
 {
-	return _String_parseFloat(sz, posBegin, len, out);
+	return _String_parseFloat(sz, posBegin, len, _out);
 }
 
-sl_int32 String16::parseFloat(float* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_int32 String16::parseFloat(float* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
 {
-	return _String_parseFloat(sz, posBegin, len, out);
+	return _String_parseFloat(sz, posBegin, len, _out);
 }
 
-sl_bool String16::parseFloat(float* out) const
+sl_bool String16::parseFloat(float* _out) const
 {
 	String16 s = *this;
 	sl_uint32 n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseFloat(s.getBuf(), 0, n, out) == n;
+	return _String_parseFloat(s.data(), 0, n, _out) == n;
 }
 
-sl_int32 String8::parseDouble(double* out, const char* sz, sl_uint32 posBegin, sl_uint32 n)
+sl_int32 String8::parseDouble(double* _out, const char* sz, sl_uint32 posBegin, sl_uint32 n)
 {
-	return _String_parseFloat(sz, posBegin, n, out);
+	return _String_parseFloat(sz, posBegin, n, _out);
 }
 
-sl_int32 String8::parseDouble(double* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 n)
+sl_int32 String8::parseDouble(double* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 n)
 {
-	return _String_parseFloat(sz, posBegin, n, out);
+	return _String_parseFloat(sz, posBegin, n, _out);
 }
 
-sl_bool String8::parseDouble(double* out) const
+sl_bool String8::parseDouble(double* _out) const
 {
 	String8 s = *this;
 	sl_uint32 n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseFloat(s.getBuf(), 0, n, out) == n;
+	return _String_parseFloat(s.data(), 0, n, _out) == n;
 }
 
-sl_int32 String16::parseDouble(double* out, const char* sz, sl_uint32 posBegin, sl_uint32 n)
+sl_int32 String16::parseDouble(double* _out, const char* sz, sl_uint32 posBegin, sl_uint32 n)
 {
-	return _String_parseFloat(sz, posBegin, n, out);
+	return _String_parseFloat(sz, posBegin, n, _out);
 }
 
-sl_int32 String16::parseDouble(double* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 n)
+sl_int32 String16::parseDouble(double* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 n)
 {
-	return _String_parseFloat(sz, posBegin, n, out);
+	return _String_parseFloat(sz, posBegin, n, _out);
 }
 
-sl_bool String16::parseDouble(double* out) const
+sl_bool String16::parseDouble(double* _out) const
 {
 	String16 s = *this;
 	sl_uint32 n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseFloat(s.getBuf(), 0, n, out) == n;
+	return _String_parseFloat(s.data(), 0, n, _out) == n;
 }
 
 template <class CT>
-SLIB_INLINE sl_int32 _String_parseHexString(const CT* sz, sl_uint32 i, sl_uint32 n, void* out)
+SLIB_INLINE sl_int32 _String_parseHexString(const CT* sz, sl_uint32 i, sl_uint32 n, void* _out)
 {
 	if (i >= n) {
 		return SLIB_PARSE_ERROR;
 	}
-	sl_uint8* buf = (sl_uint8*)(out);
+	sl_uint8* buf = (sl_uint8*)(_out);
 	sl_uint32 k = 0;
 	for (; i < n; i += 2) {
 		sl_uint32 v1, v2;
@@ -786,44 +808,44 @@ SLIB_INLINE sl_int32 _String_parseHexString(const CT* sz, sl_uint32 i, sl_uint32
 	return i;
 }
 
-sl_int32 String8::parseHexString(void* out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_int32 String8::parseHexString(void* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
 {
-	return _String_parseHexString(sz, posBegin, len, out);
+	return _String_parseHexString(sz, posBegin, len, _out);
 }
 
-sl_int32 String8::parseHexString(void* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_int32 String8::parseHexString(void* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
 {
-	return _String_parseHexString(sz, posBegin, len, out);
+	return _String_parseHexString(sz, posBegin, len, _out);
 }
 
-sl_bool String8::parseHexString(void* out) const
+sl_bool String8::parseHexString(void* _out) const
 {
 	String8 s = *this;
 	sl_uint32 n = 0;
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseHexString(s.getBuf(), 0, n, out) == n;
+	return _String_parseHexString(s.data(), 0, n, _out) == n;
 }
 
-sl_int32 String16::parseHexString(void* out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_int32 String16::parseHexString(void* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
 {
-	return _String_parseHexString(sz, posBegin, len, out);
+	return _String_parseHexString(sz, posBegin, len, _out);
 }
 
-sl_int32 String16::parseHexString(void* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_int32 String16::parseHexString(void* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
 {
-	return _String_parseHexString(sz, posBegin, len, out);
+	return _String_parseHexString(sz, posBegin, len, _out);
 }
 
-sl_bool String16::parseHexString(void* out) const
+sl_bool String16::parseHexString(void* _out) const
 {
 	String16 s = *this;
 	sl_uint32 n = 0;
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseHexString(s.getBuf(), 0, n, out) == n;
+	return _String_parseHexString(s.data(), 0, n, _out) == n;
 }
 
 SLIB_NAMESPACE_END

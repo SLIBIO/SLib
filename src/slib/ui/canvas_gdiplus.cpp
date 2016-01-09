@@ -231,9 +231,8 @@ public:
 		m_graphics->SetClip(rect, Gdiplus::CombineModeIntersect);
 	}
 
-	void clipToPath(const Ref<GraphicsPath>& _path)
+	void clipToPath(const Ref<GraphicsPath>& path)
 	{
-		Ref<GraphicsPath> path = _path;
 		if (path.isNotNull()) {
 			Ref<GraphicsPathInstance> instance;
 			Gdiplus::GraphicsPath* handle = UIPlatform::getGraphicsPath(path.get(), instance);
@@ -275,7 +274,7 @@ public:
 		setMatrix(mat);
 	}
 
-	void drawText(const String& _text, sl_real x, sl_real y, const Ref<Font>& _font, const Color& _color)
+	void drawText(const String& _text, sl_real x, sl_real y, const Ref<Font>& _font, const Color& color)
 	{
 		String16 text = _text;
 		if (text.isNotEmpty()) {
@@ -288,7 +287,6 @@ public:
 				Ref<FontInstance> fontInstance;
 				Gdiplus::Font* pf = UIPlatform::getGdiplusFont(font.get(), fontInstance);
 				if (pf) {
-					Color color = _color;
 					Gdiplus::StringFormat format(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsNoClip);
 					Gdiplus::SolidBrush brush(Gdiplus::Color(color.a, color.r, color.g, color.b));
 					graphics->DrawString((const WCHAR*)(text.getBuf()), text.getLength()
@@ -345,10 +343,9 @@ public:
 		}
 	}
 
-	void drawRectangle(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& _brush)
+	void drawRectangle(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		Gdiplus::Graphics* graphics = m_graphics;
-		Ref<Brush> brush = _brush;
 		Ref<BrushInstance> brushInstance;
 		Gdiplus::Brush* hBrush = _getBrush(brush.get(), brushInstance);
 		sl_real width = rect.getWidth();
@@ -367,23 +364,22 @@ public:
 		}
 	}
 
-	void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& _pen, const Ref<Brush>& _brush)
+	void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		sl_real width = rect.getWidth();
 		sl_real height = rect.getHeight();
 		Ref<GraphicsPath> path = GraphicsPath::create();
 		if (path.isNotNull()) {
 			path->addRoundRect(rect.left, rect.top, width, height, radius.x, radius.y);
-			drawPath(path, _pen, _brush);
+			drawPath(path, _pen, brush);
 		}
 	}
 
-	void drawEllipse(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& _brush)
+	void drawEllipse(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		sl_real width = rect.getWidth();
 		sl_real height = rect.getHeight();
 		Gdiplus::Graphics* graphics = m_graphics;
-		Ref<Brush> brush = _brush;
 		Ref<BrushInstance> brushInstance;
 		Gdiplus::Brush* hBrush = _getBrush(brush.get(), brushInstance);
 		if (hBrush) {
@@ -400,13 +396,12 @@ public:
 		}
 	}
 
-	void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen, const Ref<Brush>& _brush, FillMode fillMode)
+	void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen, const Ref<Brush>& brush, FillMode fillMode)
 	{
 		if (countPoints <= 2) {
 			return;
 		}
 		Gdiplus::Graphics* graphics = m_graphics;
-		Ref<Brush> brush = _brush;
 		Ref<BrushInstance> brushInstance;
 		Gdiplus::Brush* hBrush = _getBrush(brush.get(), brushInstance);
 		if (hBrush) {
@@ -435,10 +430,9 @@ public:
 		}
 	}
 
-	void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& _pen, const Ref<Brush>& _brush)
+	void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		Gdiplus::Graphics* graphics = m_graphics;
-		Ref<Brush> brush = _brush;
 		Ref<BrushInstance> brushInstance;
 		Gdiplus::Brush* hBrush = _getBrush(brush.get(), brushInstance);
 		if (hBrush) {
@@ -457,7 +451,7 @@ public:
 		}
 	}
 
-	void drawPath(const Ref<GraphicsPath>& _path, const Ref<Pen>& _pen, const Ref<Brush>& _brush)
+	void drawPath(const Ref<GraphicsPath>& _path, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		Gdiplus::Graphics* graphics = m_graphics;
 		Ref<GraphicsPath> path = _path;
@@ -465,7 +459,6 @@ public:
 			Ref<GraphicsPathInstance> pathInstance;
 			Gdiplus::GraphicsPath* pPath = UIPlatform::getGraphicsPath(path.get(), pathInstance);
 			if (pPath) {
-				Ref<Brush> brush = _brush;
 				Ref<BrushInstance> brushInstance;
 				Gdiplus::Brush* hBrush = _getBrush(brush.get(), brushInstance);
 				if (hBrush) {

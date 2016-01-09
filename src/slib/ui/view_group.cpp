@@ -23,11 +23,10 @@ void ViewGroup::removeAllChildren()
 	}
 }
 
-void ViewGroup::removeChild(const Ref<View>& _view)
+void ViewGroup::removeChild(const Ref<View>& view)
 {
-	Ref<View> view = _view;
 	if (view.isNotNull()) {
-		MutexLocker lock(view->getLocker());
+		ObjectLocker lock(view.get());
 		Ref<ViewInstance> instanceChild = view->getViewInstance();
 		if (instanceChild.isNotNull()) {
 			removeChildInstance(instanceChild.get());
@@ -38,9 +37,8 @@ void ViewGroup::removeChild(const Ref<View>& _view)
 	}
 }
 
-void ViewGroup::addChild(const Ref<View>& _view)
+void ViewGroup::addChild(const Ref<View>& view)
 {
-	Ref<View> view = _view;
 	if (view.isNull()) {
 		return;
 	}

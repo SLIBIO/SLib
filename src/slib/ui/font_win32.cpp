@@ -52,7 +52,7 @@ public:
 
 	void _createGdiplus()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (m_flagCreatedGdiplus) {
 			return;
 		}
@@ -81,7 +81,7 @@ public:
 
 	void _createGDI()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (m_flagCreatedGDI) {
 			return;
 		}
@@ -185,11 +185,10 @@ public:
 	}
 };
 
-Size UI::getFontTextSize(const Ref<Font>& _font, const String& _text)
+Size UI::getFontTextSize(const Ref<Font>& font, const String& _text)
 {
 	Size ret(0, 0);
 
-	Ref<Font> font = _font;
 	if (font.isNull()) {
 		return ret;
 	}

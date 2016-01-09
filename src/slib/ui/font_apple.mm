@@ -54,7 +54,7 @@ public:
 	
 	void _createCoreText()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (m_flagCreatedCoreText) {
 			return;
 		}
@@ -93,7 +93,7 @@ public:
 	
 	void _createUI()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (m_flagCreatedUI) {
 			return;
 		}
@@ -187,11 +187,10 @@ UIFont* UIPlatform::getUIFont(Font* font, Ref<FontInstance>& instanceOut)
 	return nil;
 }
 
-Size UI::getFontTextSize(const Ref<Font>& _font, const String& _text)
+Size UI::getFontTextSize(const Ref<Font>& font, const String& text)
 {
 	Size ret(0, 0);
 	
-	Ref<Font> font = _font;
 	if (font.isNull()) {
 		return ret;
 	}
@@ -202,8 +201,8 @@ Size UI::getFontTextSize(const Ref<Font>& _font, const String& _text)
 		return ret;
 	}
 	
-	NSString* text = Apple::getNSStringFromString(_text);
-	CFStringRef string = (__bridge CFStringRef)text;
+	NSString* ns_text = Apple::getNSStringFromString(text);
+	CFStringRef string = (__bridge CFStringRef)ns_text;
 	
 	CFStringRef keys[] = { kCTFontAttributeName };
 	CFTypeRef values[] = { handle };

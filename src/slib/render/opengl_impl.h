@@ -147,11 +147,10 @@ void GL_BASE::setBlending(sl_bool flagEnableBlending, const RenderBlendingParam&
 	}
 }
 
-static sl_uint32 _GLES_createShader(GLenum type, const String& _source)
+static sl_uint32 _GLES_createShader(GLenum type, const String& source)
 {
 	GLuint shader = GL_ENTRY(glCreateShader)(type);
 	if (shader) {
-		String8 source = _source;
 		if (source.isNotEmpty()) {
 			const GLchar* sz = source.getBuf();
 			GLint len = (GLint)(source.getLength());
@@ -704,9 +703,8 @@ sl_uint32 GL_BASE::createTexture2D(sl_uint32 width, sl_uint32 height, const Colo
 	}
 }
 
-sl_uint32 GL_BASE::createTexture2D(const Ref<Bitmap>& _bitmap, sl_uint32 x, sl_uint32 y, sl_uint32 w, sl_uint32 h)
+sl_uint32 GL_BASE::createTexture2D(const Ref<Bitmap>& bitmap, sl_uint32 x, sl_uint32 y, sl_uint32 w, sl_uint32 h)
 {
-	Ref<Bitmap> bitmap = _bitmap;
 	if (bitmap.isNull()) {
 		return 0;
 	}
@@ -823,9 +821,8 @@ void GL_BASE::updateTexture2D(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint
 	updateTexture2D(x, y, bitmapData);
 }
 
-void GL_BASE::updateTexture2D(sl_uint32 x, sl_uint32 y, sl_uint32 w, sl_uint32 h, const Ref<Bitmap>& _bitmap, sl_uint32 bx, sl_uint32 by)
+void GL_BASE::updateTexture2D(sl_uint32 x, sl_uint32 y, sl_uint32 w, sl_uint32 h, const Ref<Bitmap>& bitmap, sl_uint32 bx, sl_uint32 by)
 {
-	Ref<Bitmap> bitmap = _bitmap;
 	if (bitmap.isNull()) {
 		return;
 	}
@@ -1059,7 +1056,7 @@ public:
 
 	void freeDirtyInstances()
 	{
-		m_listDirtyInstances.clear();
+		m_listDirtyInstances.removeAll();
 	}
 
 	void clearDirtyInstances()
@@ -1068,7 +1065,7 @@ public:
 		while (m_listDirtyInstances.pop(&instance)) {
 			instance->clear();
 		}
-		m_listDirtyInstances.clear();
+		m_listDirtyInstances.removeAll();
 	}
 
 	void useObject(RenderBaseObject* object)
@@ -1078,7 +1075,7 @@ public:
 
 	sl_bool _beginScene()
 	{
-		m_listUsedObjects.clear();
+		m_listUsedObjects.removeAll();
 		freeDirtyInstances();
 		return sl_true;
 	}

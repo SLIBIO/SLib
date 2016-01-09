@@ -223,10 +223,9 @@ Point View::convertCoordinateFromViewToScreen(const Point& ptView)
 	return _convertCoordinateFromViewToScreen(ptView);
 }
 
-void View::attach(const Ref<ViewInstance>& _instance)
+void View::attach(const Ref<ViewInstance>& instance)
 {
-	MutexLocker lock(getLocker());
-	Ref<ViewInstance> instance = _instance;
+	ObjectLocker lock(this);
 	detach();
 	if (instance.isNotNull()) {
 		m_instance = instance;
@@ -241,7 +240,7 @@ void View::attach(const Ref<ViewInstance>& _instance)
 
 void View::detach()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	Ref<ViewInstance> instance = getViewInstance();
 	if (instance.isNotNull()) {
 		instance->setView(sl_null);
@@ -249,10 +248,9 @@ void View::detach()
 	}
 }
 
-void View::attachChild(const Ref<View>& _child)
+void View::attachChild(const Ref<View>& child)
 {
 	if (m_flagGroup) {
-		Ref<View> child = _child;
 		if (child.isNotNull()) {
 			if (!(UI::isUIThread())) {
 				UI::runOnUIThread(SLIB_CALLBACK_WEAKREF(View, _attachChild, this, child));
@@ -271,9 +269,8 @@ void View::_attachChild(Ref<slib::View> view)
 	attachChild(view);
 }
 
-Ref<ViewInstance> View::attachToNewInstance(const Ref<ViewInstance>& _parent)
+Ref<ViewInstance> View::attachToNewInstance(const Ref<ViewInstance>& parent)
 {
-	Ref<ViewInstance> parent = _parent;
 	Ref<ViewInstance> instance = createInstance(parent.get());
 	if (instance.isNotNull()) {
 		attach(instance);
@@ -281,9 +278,8 @@ Ref<ViewInstance> View::attachToNewInstance(const Ref<ViewInstance>& _parent)
 	return instance;
 }
 
-void View::addChildInstance(const Ref<ViewInstance>& _instance)
+void View::addChildInstance(const Ref<ViewInstance>& instance)
 {
-	Ref<ViewInstance> instance = _instance;
 	if (instance.isNotNull()) {
 		if (UI::isUIThread()) {
 			_addChildInstance(instance.get());
@@ -298,9 +294,8 @@ void View::_addChildInstance_(Ref<ViewInstance> instance)
 	_addChildInstance(instance.get());
 }
 
-void View::removeChildInstance(const Ref<ViewInstance>& _instance)
+void View::removeChildInstance(const Ref<ViewInstance>& instance)
 {
-	Ref<ViewInstance> instance = _instance;
 	if (instance.isNotNull()) {
 		if (UI::isUIThread()) {
 			_removeChildInstance(instance.get());

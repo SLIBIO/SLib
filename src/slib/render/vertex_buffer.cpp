@@ -7,10 +7,9 @@ VertexBuffer::VertexBuffer()
 	setStatic(sl_true);
 }
 
-Ref<VertexBuffer> VertexBuffer::create(const Memory& _mem)
+Ref<VertexBuffer> VertexBuffer::create(const Memory& mem)
 {
 	Ref<VertexBuffer> ret;
-	Memory mem = _mem;
 	if (mem.isNotEmpty()) {
 		ret = new VertexBuffer();
 		if (ret.isNotNull()) {

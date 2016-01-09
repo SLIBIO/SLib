@@ -11,9 +11,8 @@ File::~File()
 	close();
 }
 
-Ref<File> File::open(const String& _filePath, Mode mode)
+Ref<File> File::open(const String& filePath, Mode mode)
 {
-	String filePath = _filePath;
 	sl_file file = _open(filePath, mode);
 	if (file != SLIB_FILE_INVALID_HANDLE) {
 		Ref<File> ret = new File();
@@ -44,9 +43,8 @@ sl_uint64 File::getSize()
 	return getSize(m_file);
 }
 
-String File::getParentDirectoryPath(const String& _pathName)
+String File::getParentDirectoryPath(const String& pathName)
 {
-	String pathName = _pathName;
 	if (pathName.isEmpty()) {
 		return String::null();
 	}
@@ -75,9 +73,8 @@ String File::getParentDirectoryPath(const String& _pathName)
 	}
 }
 
-String File::getFileName(const String& _pathName)
+String File::getFileName(const String& pathName)
 {
-	String pathName = _pathName;
 	if (pathName.isEmpty()) {
 		return String::null();
 	}
@@ -175,7 +172,7 @@ String File::readUtf8Text(const String& path)
 			_size = SLIB_STR_MAX_LEN;
 		}
 		sl_uint32 size = (sl_uint32)_size;
-		String ret = String8::memory(size);
+		String ret = String8::allocate(size);
 		if (ret.isNotEmpty()) {
 			sl_char8* buf = ret.getBuf();
 			sl_int32 n;
@@ -215,15 +212,13 @@ sl_size File::writeAllBytes(const String& path, const void* buf, sl_size size)
 	return 0;
 }
 
-sl_size File::writeAllBytes(const String& path, const Memory& _mem)
+sl_size File::writeAllBytes(const String& path, const Memory& mem)
 {
-	Memory mem = _mem;
 	return File::writeAllBytes(path, mem.getBuf(), mem.getSize());
 }
 
-sl_bool File::writeUtf8Text(const String& path, const String& _text)
+sl_bool File::writeUtf8Text(const String& path, const String& text)
 {
-	String8 text = _text;
 	sl_size n = text.getLength();
 	sl_size ret = File::writeAllBytes(path, text.getBuf(), n);
 	return ret == n;
@@ -241,23 +236,20 @@ sl_size File::appendAllBytes(const String& path, const void* buf, sl_size size)
 	return 0;
 }
 
-sl_size File::appendAllBytes(const String& path, const Memory& _mem)
+sl_size File::appendAllBytes(const String& path, const Memory& mem)
 {
-	Memory mem = _mem;
 	return File::appendAllBytes(path, mem.getBuf(), mem.getSize());
 }
 
-sl_bool File::appendUtf8Text(const String& path, const String& _text)
+sl_bool File::appendUtf8Text(const String& path, const String& text)
 {
-	String8 text = _text;
 	sl_size n = text.getLength();
 	sl_size ret = File::appendAllBytes(path, text.getBuf(), n);
 	return ret == n;
 }
 
-List<String> File::getAllDescendantFiles(const String& _dirPath)
+List<String> File::getAllDescendantFiles(const String& dirPath)
 {
-	String dirPath = _dirPath;
 	if (!isDirectory(dirPath)) {
 		return List<String>::null();
 	}
@@ -279,9 +271,8 @@ List<String> File::getAllDescendantFiles(const String& _dirPath)
 	return list;
 }
 
-sl_bool File::createDirectories(const String& _dirPath)
+sl_bool File::createDirectories(const String& dirPath)
 {
-	String dirPath = _dirPath;
 	if (File::createDirectory(dirPath)) {
 		return sl_true;
 	} else {
@@ -298,9 +289,8 @@ sl_bool File::createDirectories(const String& _dirPath)
 	}
 }
 
-sl_bool File::deleteDirectoryRecursively(const String& _dirPath)
+sl_bool File::deleteDirectoryRecursively(const String& dirPath)
 {
-	String dirPath = _dirPath;
 	if (File::isDirectory(dirPath)) {
 		String path = dirPath + "/";
 		ListLocker<String> list(File::getFiles(dirPath));
@@ -398,7 +388,7 @@ String File::findParentPathContainingFile(const String& basePath, const String& 
 		if (File::exists(path + "/" + filePath)) {
 			return path;
 		}
-		segments.segments.removeLast();
+		segments.segments.popBack();
 	}
 	return String::null();
 }
@@ -409,12 +399,10 @@ FilePathSegments::FilePathSegments()
 	parentLevel = 0;
 }
 
-void FilePathSegments::parsePath(const String& _path)
+void FilePathSegments::parsePath(const String& path)
 {
-	String8 path = _path;
-
 	parentLevel = 0;
-	segments.clear();
+	segments.removeAll();
 
 	sl_char8* buf = path.getBuf();
 	sl_uint32 len = path.getLength();
@@ -436,7 +424,7 @@ void FilePathSegments::parsePath(const String& _path)
 					if (n == 1 && buf[start] == '.') {
 					} else if (n == 2 && buf[start] == '.' && buf[start + 1] == '.') {
 						if (segments.count() > 0) {
-							segments.pop();
+							segments.popBack();
 						} else {
 							parentLevel++;
 						}

@@ -321,9 +321,8 @@ sl_bool IWriter::writeSection(const void* mem, sl_size size)
 	return sl_false;
 }
 
-sl_bool IWriter::writeString(const String& _str, sl_int32 maxLen)
+sl_bool IWriter::writeString(const String& str, sl_int32 maxLen)
 {
-	String8 str = _str;
 	return writeSection(str.getBuf(), str.getLength());
 }
 
@@ -356,7 +355,7 @@ MemoryIO::~MemoryIO()
 
 void MemoryIO::init(const void* data, sl_size size, sl_bool flagResizable)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	close();
 
 	if (size > 0) {
@@ -379,7 +378,7 @@ void MemoryIO::init(const void* data, sl_size size, sl_bool flagResizable)
 
 void MemoryIO::close()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (m_buf) {
 		Base::freeMemory(m_buf);
 		m_buf = sl_null;
@@ -393,7 +392,7 @@ sl_reg MemoryIO::read(void* buf, sl_size size)
 	if (size == 0) {
 		return 0;
 	}
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (m_offset >= m_size) {
 		return -1;
 	}
@@ -413,7 +412,7 @@ sl_reg MemoryIO::write(const void* buf, sl_size size)
 	if (size == 0) {
 		return 0;
 	}
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (m_offset >= m_size) {
 		return -1;
 	}
@@ -439,7 +438,7 @@ sl_reg MemoryIO::write(const void* buf, sl_size size)
 
 sl_bool MemoryIO::seek(sl_int64 offset, Position pos)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	sl_uint64 p = m_offset;
 	if (pos == positionBegin) {
 		p = 0;
@@ -467,7 +466,7 @@ sl_uint64 MemoryIO::getPosition()
 sl_bool MemoryIO::setSize(sl_uint64 _size)
 {
 	sl_size size = (sl_size)_size;
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (size == 0) {
 		close();
 		return sl_true;
@@ -496,10 +495,9 @@ SLIB_NAMESPACE_END
 	MemoryReader
 ****************************/
 SLIB_NAMESPACE_BEGIN
-void MemoryReader::init(const Memory& _mem)
+void MemoryReader::init(const Memory& mem)
 {
-	MutexLocker lock(getLocker());
-	Memory mem = _mem;
+	ObjectLocker lock(this);
 	m_mem = mem;
 	m_buf = mem.getBuf();
 	m_size = mem.getSize();
@@ -508,7 +506,7 @@ void MemoryReader::init(const Memory& _mem)
 
 void MemoryReader::init(const void* buf, sl_size size)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	m_buf = buf;
 	m_size = size;
 	m_offset = 0;
@@ -522,7 +520,7 @@ sl_reg MemoryReader::read(void* buf, sl_size size)
 	if (size == 0) {
 		return 0;
 	}
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (m_offset >= m_size) {
 		return -1;
 	}
@@ -539,7 +537,7 @@ sl_reg MemoryReader::read(void* buf, sl_size size)
 
 sl_bool MemoryReader::seek(sl_int64 offset, Position pos)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	sl_uint64 p = m_offset;
 	if (pos == positionBegin) {
 		p = 0;
@@ -571,16 +569,15 @@ SLIB_NAMESPACE_END
 SLIB_NAMESPACE_BEGIN
 void MemoryWriter::init()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	m_buf = sl_null;
 	m_size = 0;
 	m_offset = 0;
 }
 
-void MemoryWriter::init(const Memory& _mem)
+void MemoryWriter::init(const Memory& mem)
 {
-	MutexLocker lock(getLocker());
-	Memory mem = _mem;
+	ObjectLocker lock(this);
 	m_mem = mem;
 	m_buf = mem.getBuf();
 	m_size = mem.getSize();
@@ -589,7 +586,7 @@ void MemoryWriter::init(const Memory& _mem)
 
 void MemoryWriter::init(void* buf, sl_size size)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	m_buf = buf;
 	m_size = size;
 	m_offset = 0;
@@ -603,7 +600,7 @@ sl_reg MemoryWriter::write(const void* buf, sl_size size)
 	if (size == 0) {
 		return 0;
 	}
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (m_buf) {
 		if (m_offset >= m_size) {
 			return -1;
@@ -622,9 +619,8 @@ sl_reg MemoryWriter::write(const void* buf, sl_size size)
 	return size;
 }
 
-sl_reg MemoryWriter::write(const Memory& _mem)
+sl_reg MemoryWriter::write(const Memory& mem)
 {
-	Memory mem = _mem;
 	if (mem.getSize() == 0) {
 		return 0;
 	}
@@ -638,7 +634,7 @@ sl_reg MemoryWriter::write(const Memory& _mem)
 
 sl_bool MemoryWriter::seek(sl_int64 offset, Position pos)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (m_buf) {
 		sl_uint64 p = m_offset;
 		if (pos == positionBegin) {
@@ -659,7 +655,7 @@ sl_bool MemoryWriter::seek(sl_int64 offset, Position pos)
 
 Memory MemoryWriter::getData()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (m_buf) {
 		if (m_mem.isNotNull()) {
 			return m_mem;
@@ -692,7 +688,7 @@ DatagramStream::DatagramStream()
 
 void DatagramStream::clear()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	m_lenCurrentDatagram = 0;
 	m_posCurrentDatagram = 0;
 	m_lenBufSize = 0;
@@ -702,7 +698,7 @@ void DatagramStream::clear()
 sl_bool DatagramStream::parse(const void* _data, sl_size size, Queue<Memory>& datagrams)
 {
 	sl_uint32 maxDatagram = getMaxDatagramSize();
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	const sl_uint8* data = (const sl_uint8*)_data;
 	while (size > 0) {
 		if (m_lenCurrentDatagram == 0) {

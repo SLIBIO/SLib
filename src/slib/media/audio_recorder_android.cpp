@@ -16,7 +16,7 @@ List<AudioRecorderInfo> AudioRecorder::getRecordersList()
 	AudioRecorderInfo ret;
 	SLIB_STATIC_STRING(s, "Internal Microphone");
 	ret.name = s;
-	return List<AudioRecorderInfo>::fromElement(ret);
+	return List<AudioRecorderInfo>::createFromElement(ret);
 }
 SLIB_MEDIA_NAMESPACE_END
 

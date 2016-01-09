@@ -213,7 +213,7 @@ public:
 	
 	void release()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		stop();
 		m_session = nil;
 		m_callback = nil;
@@ -229,7 +229,7 @@ public:
 
 	void start()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		AVCaptureSession* session = m_session;
 		if (session == nil) {
 			return;
@@ -243,7 +243,7 @@ public:
 
 	void stop()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		AVCaptureSession* session = m_session;
 		if (session == nil) {
 			return;
@@ -336,7 +336,7 @@ SLIB_MEDIA_NAMESPACE_END
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
-	slib::Ref<slib::_AVFoundation_Camera> camera(m_camera.lock());
+	slib::Ref<slib::_AVFoundation_Camera> camera(m_camera);
 	if (camera.isNotNull()) {
 		camera->_onFrame(sampleBuffer);
 	}

@@ -479,13 +479,13 @@ public:
 
 	SLIB_INLINE sl_bool isMemory() const
 	{
-		return MemoryObject::checkInstance(getObject());
+		return Memory::checkInstance(getObject());
 	}
 	
 	SLIB_INLINE Memory getMemory() const
 	{
 		Ref<Referable> obj = getObject();
-		if (MemoryObject::checkInstance(obj)) {
+		if (Memory::checkInstance(obj)) {
 			return *(Memory*)(void*)(&obj);
 		} else {
 			return Memory::null();
@@ -506,13 +506,13 @@ public:
 		return List<Variant>::null();
 	}
 	
-	template <class TYPE, sl_bool flagThreadSafe>
-	SLIB_INLINE const List<TYPE, flagThreadSafe>& getList(const List<TYPE, flagThreadSafe>& def) const
+	template <class TYPE, class COMPARE>
+	SLIB_INLINE const List<TYPE, COMPARE>& getList(const List<TYPE, COMPARE>& def) const
 	{
 		Variant v = *this;
 		Ref<Referable> obj = getObject();
-		if (List<TYPE, flagThreadSafe>::checkInstance(v)) {
-			return *((List<TYPE, flagThreadSafe>*)(void*)(&obj));
+		if (List<TYPE, COMPARE>::checkInstance(v)) {
+			return *((List<TYPE, COMPARE>*)(void*)(&obj));
 		} else {
 			return def;
 		}

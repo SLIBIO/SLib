@@ -130,9 +130,9 @@ protected:
 		NodeData* data;
 		BTree* tree;
 
-		SLIB_INLINE NodeDataScope(BTree* tree, const TreeNode& node)
+		SLIB_INLINE NodeDataScope(const BTree* tree, const TreeNode& node)
 		{
-			this->tree = tree;
+			this->tree = (BTree*)tree;
 			this->data = tree->readNodeData(node);
 		}
 
@@ -177,22 +177,22 @@ public:
 	}
 
 public:
-	SLIB_INLINE sl_bool isValid()
+	SLIB_INLINE sl_bool isValid() const
 	{
 		return m_rootNode != sl_null;
 	}
 
-	SLIB_INLINE sl_uint32 getOrder()
+	SLIB_INLINE sl_uint32 getOrder() const
 	{
 		return m_order;
 	}
 
-	SLIB_INLINE sl_uint32 getMaxLength()
+	SLIB_INLINE sl_uint32 getMaxLength() const
 	{
 		return m_maxLength;
 	}
 
-	SLIB_INLINE sl_bool get(const KT& key, VT* value = sl_null)
+	SLIB_INLINE sl_bool get(const KT& key, VT* value = sl_null) const
 	{
 		TreePosition pos;
 		if (search(key, &pos)) {
@@ -203,7 +203,7 @@ public:
 		return sl_false;
 	}
 
-	SLIB_INLINE VT* getItemPtr(const KT& key)
+	SLIB_INLINE VT* getItemPtr(const KT& key) const
 	{
 		TreePosition pos;
 		if (search(key, &pos)) {
@@ -212,7 +212,7 @@ public:
 		return sl_null;
 	}
 
-	List<VT> getValues(const KT& key)
+	List<VT> getValues(const KT& key) const
 	{
 		List<VT> ret;
 		TreePosition pos;
@@ -243,12 +243,12 @@ public:
 		return ret;
 	}
 
-	SLIB_INLINE sl_bool search(const KT& key, TreePosition* pos = sl_null)
+	SLIB_INLINE sl_bool search(const KT& key, TreePosition* pos = sl_null) const
 	{
 		return searchInNode(key, getRootNode(), pos);
 	}
 
-	sl_bool search(const KT& key, TreePosition* pPosBegin, TreePosition* pPosEnd)
+	sl_bool search(const KT& key, TreePosition* pPosBegin, TreePosition* pPosEnd) const
 	{
 		TreePosition pos;
 		if (search(key, &pos)) {
@@ -281,7 +281,7 @@ public:
 		return sl_false;
 	}
 
-	sl_bool searchInNode(const KT& key, const TreeNode& node, TreePosition* pos = sl_null)
+	sl_bool searchInNode(const KT& key, const TreeNode& node, TreePosition* pos = sl_null) const
 	{
 		TreeNode link;
 		sl_uint32 item;
@@ -304,7 +304,7 @@ public:
 		}
 	}
 
-	sl_bool searchItemInNode(const KT& key, const TreeNode& node, sl_uint32& pos, TreeNode& link)
+	sl_bool searchItemInNode(const KT& key, const TreeNode& node, sl_uint32& pos, TreeNode& link) const
 	{
 		NodeDataScope data(this, node);
 		if (data.isNull()) {
@@ -333,7 +333,7 @@ public:
 		}
 	}
 
-	sl_bool getAt(const TreePosition& pos, KT* key = sl_null, VT* value = sl_null)
+	sl_bool getAt(const TreePosition& pos, KT* key = sl_null, VT* value = sl_null) const
 	{
 		NodeDataScope data(this, pos.node);
 		if (data.isNotNull()) {
@@ -350,7 +350,7 @@ public:
 		return sl_false;
 	}
 
-	VT* getValuePtrAt(const TreePosition& pos)
+	VT* getValuePtrAt(const TreePosition& pos) const
 	{
 		NodeDataScope data(this, pos.node);
 		if (data.isNotNull()) {
@@ -361,17 +361,17 @@ public:
 		return sl_null;
 	}
 
-	SLIB_INLINE sl_uint64 getCount()
+	SLIB_INLINE sl_uint64 getCount() const
 	{
 		return getCountInNode(getRootNode());
 	}
 
-	SLIB_INLINE sl_uint64 count()
+	SLIB_INLINE sl_uint64 count() const
 	{
 		return getCount();
 	}
 
-	sl_uint64 getCountInNode(const TreeNode& node)
+	sl_uint64 getCountInNode(const TreeNode& node) const
 	{
 		if (node.isNull()) {
 			return 0;
@@ -385,7 +385,7 @@ public:
 		}
 	}
 
-	sl_bool getFirstPosition(TreePosition& pos, KT* key = sl_null, VT* value = sl_null)
+	sl_bool getFirstPosition(TreePosition& pos, KT* key = sl_null, VT* value = sl_null) const
 	{
 		TreeNode node = getRootNode();
 		if (node.isNull()) {
@@ -418,7 +418,7 @@ public:
 		return sl_false;
 	}
 
-	sl_bool getNextPosition(TreePosition& pos, KT* key = sl_null, VT* value = sl_null)
+	sl_bool getNextPosition(TreePosition& pos, KT* key = sl_null, VT* value = sl_null) const
 	{
 		if (pos.isNull()) {
 			return getFirstPosition(pos, key, value);
@@ -517,7 +517,7 @@ public:
 		return sl_false;
 	}
 
-	sl_bool getLastPosition(TreePosition& pos, KT* key = sl_null, VT* value = sl_null)
+	sl_bool getLastPosition(TreePosition& pos, KT* key = sl_null, VT* value = sl_null) const
 	{
 		TreeNode node = getRootNode();
 		if (node.isNull()) {
@@ -556,7 +556,7 @@ public:
 		return sl_false;
 	}
 
-	sl_bool getPrevPosition(TreePosition& pos, KT* key = sl_null, VT* value = sl_null)
+	sl_bool getPrevPosition(TreePosition& pos, KT* key = sl_null, VT* value = sl_null) const
 	{
 		if (pos.isNull()) {
 			return getLastPosition(pos, key, value);
@@ -673,23 +673,25 @@ public:
 		return _insertItemInNode(pos.node, pos.item, link, key, value, link);
 	}
 
-	sl_bool remove(const KT& key, sl_bool flagRemoveAll = sl_false)
+	sl_size remove(const KT& key, sl_bool flagRemoveAll = sl_false)
 	{
 		TreePosition pos;
 		if (search(key, &pos)) {
-			if (!(removeAt(pos))) {
-				return sl_false;
-			}
-			if (flagRemoveAll) {
-				while (search(key, &pos)) {
-					if (!(removeAt(pos))) {
-						return sl_false;
+			if (removeAt(pos)) {
+				sl_size n = 1;
+				if (flagRemoveAll) {
+					while (search(key, &pos)) {
+						if (removeAt(pos)) {
+							n++;
+						} else {
+							break;
+						}
 					}
 				}
+				return n;
 			}
-			return sl_true;
 		}
-		return sl_false;
+		return 0;
 	}
 
 	sl_bool removeAt(const TreePosition& pos)
@@ -774,10 +776,11 @@ public:
 		return _removeNode(node, sl_true);
 	}
 
-	sl_bool clear()
+	sl_size removeAll()
 	{
 		TreeNode node = getRootNode();
 		NodeDataScope data(this, node);
+		sl_size countTotal = (sl_size)(data->countTotal);
 		if (data.isNotNull()) {
 			_removeNode(data->linkFirst, sl_false);
 			sl_uint32 n = data->countItems;
@@ -789,9 +792,11 @@ public:
 			data->countTotal = 0;
 			data->countItems = 0;
 			data->linkFirst.setNull();
-			return writeNodeData(node, data.data);
+			if (writeNodeData(node, data.data)) {
+				return countTotal;
+			}
 		}
-		return sl_false;
+		return 0;
 	}
 
 private:
@@ -804,25 +809,19 @@ private:
 			data->linkParent.setNull();
 			data->linkFirst.setNull();
 			data->keys = new KT[m_order];
-			if (!data->keys) {
-				delete data;
-				return sl_null;
-			}
-			data->values = new VT[m_order];
-			if (!data->values) {
-				delete[] data->keys;
-				delete data;
-				return sl_null;
-			}
-			data->links = new TreeNode[m_order];
-			if (!data->links) {
-				delete[] data->keys;
-				delete[] data->values;
-				delete data;
-				return sl_null;
+			if (data->keys) {
+				data->values = new VT[m_order];
+				if (data->values) {
+					data->links = new TreeNode[m_order];
+					if (data->links) {
+						return data;
+					}
+					delete[] (data->values);
+				}
+				delete[] (data->keys);
 			}
 		}
-		return data;
+		return sl_null;
 	}
 
 	void _freeNodeData(NodeData* data)
@@ -1005,7 +1004,7 @@ private:
 		}
 	}
 
-	sl_uint64 _getTotalCountInData(NodeData* data)
+	sl_uint64 _getTotalCountInData(NodeData* data) const
 	{
 		sl_uint32 n = data->countItems;
 		sl_uint64 m = n + getCountInNode(data->linkFirst);
@@ -1082,7 +1081,7 @@ protected:
 		_removeNode(getRootNode(), sl_false);
 	}
 
-	virtual TreeNode getRootNode()
+	virtual TreeNode getRootNode() const
 	{
 		TreeNode node;
 		node.position = (sl_size)m_rootNode;
@@ -1124,7 +1123,7 @@ protected:
 		return sl_true;
 	}
 
-	virtual NodeData* readNodeData(const TreeNode& node)
+	virtual NodeData* readNodeData(const TreeNode& node) const
 	{
 		NodeData* data = (NodeData*)(void*)(sl_size)(node.position);
 		return data;

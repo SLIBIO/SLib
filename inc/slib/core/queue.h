@@ -7,6 +7,7 @@
 #include "array.h"
 
 SLIB_NAMESPACE_BEGIN
+
 template <class TYPE>
 struct SLIB_EXPORT Link
 {
@@ -14,26 +15,27 @@ struct SLIB_EXPORT Link
 	Link<TYPE>* before;
 	Link<TYPE>* next;
 };
-template <class TYPE, sl_bool flagThreadSafe = sl_true, class COMPARE = Compare<TYPE> >
-class SLIB_EXPORT Deque : public Object
+
+template <class TYPE, class COMPARE = Compare<TYPE> >
+class SLIB_EXPORT LinkedList : public Object
 {
-	SLIB_DECLARE_OBJECT(Deque, Object)
+	SLIB_DECLARE_OBJECT(LinkedList, Object)
 protected:
 	Link<TYPE>* m_begin;
 	Link<TYPE>* m_end;
 	sl_size m_count;
 	
 public:
-	SLIB_INLINE Deque()
+	SLIB_INLINE LinkedList()
 	{
 		m_begin = sl_null;
 		m_end = sl_null;
 		m_count = 0;
 	}
 
-	~Deque()
+	~LinkedList()
 	{
-		clear();
+		removeAll();
 	}
 
 	SLIB_INLINE void init(Link<TYPE>* begin, Link<TYPE>* end, sl_size count)
@@ -57,6 +59,7 @@ public:
 	{
 		return m_count;
 	}
+	
 	SLIB_INLINE sl_size count() const
 	{
 		return m_count;
@@ -72,12 +75,12 @@ public:
 		return m_begin != sl_null;
 	}
 
-	void clear()
+	void removeAll()
 	{
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
+		ObjectLocker lock(this);
 		Link<TYPE>* now = m_begin;
 		_clear();
-		locker.unlock();
+		lock.unlock();
 		while (now) {
 			Link<TYPE>* next = now->next;
 			_freeItem(now);
@@ -87,7 +90,7 @@ public:
 
 	sl_bool getFirstElement(TYPE* out) const
 	{
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
+		ObjectLocker lock(this);
 		if (m_begin) {
 			*out = m_begin->value;
 			return sl_true;
@@ -98,7 +101,7 @@ public:
 
 	sl_bool getLastElement(TYPE* out) const
 	{
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
+		ObjectLocker lock(this);
 		if (m_end) {
 			*out = m_end->value;
 			return sl_true;
@@ -113,37 +116,50 @@ public:
 		if (!item) {
 			return sl_null;
 		}
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
-		Link<TYPE>* old;
-		if (countLimit > 0 && m_count >= countLimit) {
-			old = _popFrontItem();
-		} else {
-			old = sl_null;
+		ObjectLocker lock(this);
+		Link<TYPE>* old = _pushBackItem(item, countLimit);
+		lock.unlock();
+		if (old) {
+			_freeItem(old);
 		}
-		if (m_end) {
-			m_end->next = item;
-			item->before = m_end;
-			m_end = item;
-		} else {
-			m_begin = item;
-			m_end = item;
+		return item;
+	}
+	
+	Link<TYPE>* pushBack_NoLock(const TYPE& value, sl_size countLimit = 0)
+	{
+		Link<TYPE>* item = _createItem(value);
+		if (!item) {
+			return sl_null;
 		}
-		m_count++;
-		locker.unlock();
+		Link<TYPE>* old = _pushBackItem(item, countLimit);
 		if (old) {
 			_freeItem(old);
 		}
 		return item;
 	}
 
-	sl_bool popBack(TYPE* out = sl_null)
+	sl_bool popBack(TYPE* _out = sl_null)
 	{
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
+		ObjectLocker lock(this);
 		Link<TYPE>* old = _popBackItem();
-		locker.unlock();
+		lock.unlock();
 		if (old) {
-			if (out) {
-				*out = old->value;
+			if (_out) {
+				*_out = old->value;
+			}
+			_freeItem(old);
+			return sl_true;
+		} else {
+			return sl_false;
+		}
+	}
+	
+	sl_bool popBack_NoLock(TYPE* _out = sl_null)
+	{
+		Link<TYPE>* old = _popBackItem();
+		if (old) {
+			if (_out) {
+				*_out = old->value;
 			}
 			_freeItem(old);
 			return sl_true;
@@ -158,37 +174,50 @@ public:
 		if (!item) {
 			return sl_null;
 		}
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
-		Link<TYPE>* old;
-		if (countLimit > 0 && m_count >= countLimit) {
-			old = _popBackItem();
-		} else {
-			old = sl_null;
-		}
-		if (m_begin) {
-			item->next = m_begin;
-			m_begin->before = item;
-			m_begin = item;
-		} else {
-			m_begin = item;
-			m_end = item;
-		}
-		m_count++;
-		locker.unlock();
+		ObjectLocker lock(this);
+		Link<TYPE>* old = _pushFrontItem(item, countLimit);
+		lock.unlock();
 		if (old) {
 			_freeItem(old);
 		}
 		return item;
 	}
-
-	sl_bool popFront(TYPE* out = sl_null)
+	
+	Link<TYPE>* pushFront_NoLock(const TYPE& value, sl_size countLimit = 0)
 	{
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
-		Link<TYPE>* old = _popFrontItem();
-		locker.unlock();
+		Link<TYPE>* item = _createItem(value);
+		if (!item) {
+			return sl_null;
+		}
+		Link<TYPE>* old = _pushFrontItem(item, countLimit);
 		if (old) {
-			if (out) {
-				*out = old->value;
+			_freeItem(old);
+		}
+		return item;
+	}
+	
+	sl_bool popFront(TYPE* _out = sl_null)
+	{
+		ObjectLocker lock(this);
+		Link<TYPE>* old = _popFrontItem();
+		lock.unlock();
+		if (old) {
+			if (_out) {
+				*_out = old->value;
+			}
+			_freeItem(old);
+			return sl_true;
+		} else {
+			return sl_false;
+		}
+	}
+	
+	sl_bool popFront_NoLock(TYPE* _out = sl_null)
+	{
+		Link<TYPE>* old = _popFrontItem();
+		if (old) {
+			if (_out) {
+				*_out = old->value;
 			}
 			_freeItem(old);
 			return sl_true;
@@ -200,7 +229,7 @@ public:
 	void removeItem(Link<TYPE>* item)
 	{
 		if (item) {
-			MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
+			ObjectLocker lock(this);
 			m_count--;
 			Link<TYPE>* before = item->before;
 			Link<TYPE>* next = item->next;
@@ -214,10 +243,10 @@ public:
 			} else {
 				m_end = before;
 			}
-			locker.unlock();
+			lock.unlock();
 			_freeItem(item);
 		} else {
-			SLIB_ABORT("Trying to free null deque item");
+			SLIB_ABORT("Trying to free null item");
 		}
 	}
 
@@ -228,7 +257,7 @@ public:
 			if (!newItem) {
 				return sl_null;
 			}
-			MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
+			ObjectLocker lock(this);
 			newItem->next = item;
 			Link<TYPE>* before = item->before;
 			newItem->before = before;
@@ -252,7 +281,7 @@ public:
 			if (!newItem) {
 				return sl_null;
 			}
-			MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
+			ObjectLocker lock(this);
 			newItem->before = item;
 			Link<TYPE>* next = item->next;
 			newItem->next = next;
@@ -269,13 +298,13 @@ public:
 		}
 	}
 
-	template <sl_bool _flagThreadSafe, class _COMPARE>
-	void merge(Deque<TYPE, _flagThreadSafe, _COMPARE>* other)
+	template <class _COMPARE>
+	void merge(LinkedList<TYPE, _COMPARE>* other)
 	{
 		if ((void*)this == (void*)other) {
 			return;
 		}
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null, _flagThreadSafe ? other->getLocker() : sl_null);
+		ObjectLocker lock(this, other);
 		Link<TYPE>* _begin = other->getBegin();
 		Link<TYPE>* _end = other->getEnd();
 		if (_begin) {
@@ -295,7 +324,7 @@ public:
 	Array<TYPE> toArray() const
 	{
 		Array<TYPE> ret;
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
+		ObjectLocker lock(this);
 		if (m_count) {
 			ret = Array<TYPE>::create(m_count);
 			if (ret.isNotNull()) {
@@ -314,7 +343,7 @@ public:
 	List<TYPE> toList() const
 	{
 		List<TYPE> ret;
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
+		ObjectLocker lock(this);
 		if (m_count) {
 			ret = List<TYPE>::create(m_count);
 			if (ret.isNotNull()) {
@@ -333,7 +362,7 @@ public:
 
 	Link<TYPE>* findValue(const TYPE& value) const
 	{
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
+		ObjectLocker lock(this);
 		Link<TYPE>* now = m_begin;
 		while (now) {
 			if (COMPARE::equals(value, now->value)) {
@@ -346,7 +375,7 @@ public:
 
 	sl_bool removeValue(const TYPE& value, sl_bool flagAllValues = sl_false)
 	{
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
+		ObjectLocker lock(this);
 		Link<TYPE>* now = m_begin;
 		sl_bool bRet = sl_false;
 		while (now) {
@@ -381,6 +410,64 @@ protected:
 		item->value.TYPE::~TYPE();
 		Base::freeMemory(item);
 	}
+	
+	
+	SLIB_INLINE Link<TYPE>* _pushBackItem(Link<TYPE>* item, sl_size countLimit)
+	{
+		Link<TYPE>* old;
+		if (countLimit > 0 && m_count >= countLimit) {
+			old = _popFrontItem();
+		} else {
+			old = sl_null;
+		}
+		if (m_end) {
+			m_end->next = item;
+			item->before = m_end;
+			m_end = item;
+		} else {
+			m_begin = item;
+			m_end = item;
+		}
+		m_count++;
+		return old;
+	}
+	
+	SLIB_INLINE Link<TYPE>* _popBackItem()
+	{
+		Link<TYPE>* end = m_end;
+		if (end) {
+			m_count--;
+			Link<TYPE>* before = end->before;
+			if (before) {
+				before->next = sl_null;
+				m_end = before;
+			} else {
+				m_begin = sl_null;
+				m_end = sl_null;
+			}
+		}
+		return end;
+	}
+	
+	SLIB_INLINE Link<TYPE>* _pushFrontItem(Link<TYPE>* item, sl_size countLimit)
+	{
+		Link<TYPE>* old;
+		if (countLimit > 0 && m_count >= countLimit) {
+			old = _popBackItem();
+		} else {
+			old = sl_null;
+		}
+		if (m_begin) {
+			item->next = m_begin;
+			m_begin->before = item;
+			m_begin = item;
+		} else {
+			m_begin = item;
+			m_end = item;
+		}
+		m_count++;
+		return old;
+	}
 
 	SLIB_INLINE Link<TYPE>* _popFrontItem()
 	{
@@ -398,24 +485,7 @@ protected:
 		}
 		return begin;
 	}
-
-	SLIB_INLINE Link<TYPE>* _popBackItem()
-	{
-		Link<TYPE>* end = m_end;
-		if (end) {
-			m_count--;
-			Link<TYPE>* before = end->before;
-			if (before) {
-				before->next = sl_null;
-				m_end = before;
-			} else {
-				m_begin = sl_null;
-				m_end = sl_null;
-			}
-		}
-		return end;
-	}
-
+	
 public:
 	SLIB_INLINE void _clear()
 	{
@@ -424,37 +494,58 @@ public:
 	}
 };
 
-template <class TYPE, sl_bool flagThreadSafe = sl_true, class COMPARE = Compare<TYPE> >
-class SLIB_EXPORT Queue : public Deque<TYPE, flagThreadSafe, COMPARE>
+template <class TYPE, class COMPARE = Compare<TYPE> >
+class SLIB_EXPORT Queue : public LinkedList<TYPE, COMPARE>
 {
 public:
 	SLIB_INLINE Link<TYPE>* push(const TYPE& value, sl_size countLimit = 0)
 	{
 		return this->pushBack(value, countLimit);
 	}
-	SLIB_INLINE sl_bool pop(TYPE* out = sl_null)
+
+	SLIB_INLINE Link<TYPE>* push_NoLock(const TYPE& value, sl_size countLimit = 0)
 	{
-		return this->popFront(out);
+		return this->pushBack_NoLock(value, countLimit);
 	}
+	
+	SLIB_INLINE sl_bool pop(TYPE* _out = sl_null)
+	{
+		return this->popFront(_out);
+	}
+	
+	SLIB_INLINE sl_bool pop_NoLock(TYPE* _out = sl_null)
+	{
+		return this->popFront_NoLock(_out);
+	}
+
 };
 
-template <class TYPE, sl_bool flagThreadSafe = sl_true, class COMPARE = Compare<TYPE> >
-class SLIB_EXPORT Stack : public Deque<TYPE, flagThreadSafe, COMPARE>
+template <class TYPE, class COMPARE = Compare<TYPE> >
+class SLIB_EXPORT Stack : public LinkedList<TYPE, COMPARE>
 {
 public:
 	SLIB_INLINE Link<TYPE>* push(const TYPE& value, sl_size countLimit = 0)
 	{
 		return this->pushBack(value, countLimit);
 	}
-	SLIB_INLINE sl_bool pop(TYPE* out = sl_null)
+	
+	SLIB_INLINE Link<TYPE>* push_NoLock(const TYPE& value, sl_size countLimit = 0)
 	{
-		return this->popBack(out);
+		return this->pushBack_NoLock(value, countLimit);
+	}
+	
+	SLIB_INLINE sl_bool pop(TYPE* _out = sl_null)
+	{
+		return this->popBack(_out);
+	}
+	
+	SLIB_INLINE sl_bool pop_NoLock(TYPE* _out = sl_null)
+	{
+		return this->popBack_NoLock(_out);
 	}
 };
-SLIB_NAMESPACE_END
 
-SLIB_NAMESPACE_BEGIN
-template <class TYPE, sl_bool flagThreadSafe = sl_true>
+template <class TYPE>
 class SLIB_EXPORT LoopQueue : public Object
 {
 	SLIB_DECLARE_OBJECT(LoopQueue, Object)
@@ -481,11 +572,11 @@ public:
 
 	~LoopQueue()
 	{
-		release();
+		removeAll();
 	}
 
 	void release() {
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
+		ObjectLocker lock(this);
 		if (m_data) {
 			delete[] m_data;
 			m_data = sl_null;
@@ -502,7 +593,7 @@ public:
 	
 	sl_bool setQueueSize(sl_size size)
 	{
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
+		ObjectLocker lock(this);
 		release();
 		m_data = new TYPE[size];
 		if (m_data) {
@@ -514,9 +605,9 @@ public:
 		return sl_false;
 	}
     
-    void reset()
+    void removeAll()
     {
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
+		ObjectLocker lock(this);
 		m_first = 0;
 		m_count = 0;
     }
@@ -548,7 +639,7 @@ public:
 	
 	sl_bool add(const TYPE& data, sl_bool flagPush = sl_true)
 	{
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
+		ObjectLocker lock(this);
 		if (m_size == 0) {
 			return sl_false;
 		}
@@ -567,7 +658,7 @@ public:
 
 	sl_bool add(const TYPE* buffer, sl_size count, sl_bool flagPush = sl_true)
 	{
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
+		ObjectLocker lock(this);
 		if (m_size == 0) {
 			return sl_false;
 		}
@@ -605,7 +696,7 @@ public:
 	
 	sl_bool get(TYPE& output)
 	{
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
+		ObjectLocker lock(this);
 		sl_bool ret = sl_false;
 		if (m_count > m_latency) {
 			output = m_data[m_first % m_size];
@@ -618,7 +709,7 @@ public:
 		
 	sl_bool get(TYPE* buffer, sl_size count)
 	{
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
+		ObjectLocker lock(this);
 		sl_bool ret = sl_false;
 		if (count <= m_count && m_count > m_latency) {
 			sl_size n = 0;
@@ -643,7 +734,7 @@ public:
 
 	sl_size copy(TYPE* buffer, sl_size count)
 	{
-		MutexLocker locker(flagThreadSafe ? getLocker() : sl_null);
+		ObjectLocker lock(this);
 		if (count > m_count) {
 			count = m_count;
 		}

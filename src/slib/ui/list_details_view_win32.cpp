@@ -23,7 +23,7 @@ public:
 
 	void __applyColumnsCount(HWND hWnd)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		sl_uint32 nNew = (sl_uint32)(m_columns.getCount());
 		sl_uint32 nOrig = getColumnsCountFromListView(hWnd);
 		if (nOrig == nNew) {
@@ -248,9 +248,8 @@ sl_int32 ListDetailsView::getSelectedRow()
 	return -1;
 }
 
-void ListDetailsView::setFont(const Ref<Font>& _font)
+void ListDetailsView::setFont(const Ref<Font>& font)
 {
-	Ref<Font> font = _font;
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {

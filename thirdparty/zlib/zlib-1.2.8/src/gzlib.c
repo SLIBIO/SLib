@@ -15,6 +15,10 @@
 #endif
 #endif
 
+#if defined(__linux__)
+#include <unistd.h>
+#endif
+
 /* Local functions */
 local void gz_reset OF((gz_statep));
 local gzFile gz_open OF((const void *, int, const char *));

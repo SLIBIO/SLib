@@ -346,9 +346,8 @@ Ref<Bitmap> UI::createBitmap(sl_uint32 width, sl_uint32 height)
 	return Ref<Bitmap>::from(ret);
 }
 
-Ref<Drawable> UI::createDrawableFromBitmap(const Ref<Bitmap>& _bitmap)
+Ref<Drawable> UI::createDrawableFromBitmap(const Ref<Bitmap>& bitmap)
 {
-	Ref<Bitmap> bitmap = _bitmap;
 	if (bitmap.isNull()) {
 		return Ref<Drawable>::null();
 	}

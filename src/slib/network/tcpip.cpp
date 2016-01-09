@@ -215,7 +215,7 @@ Memory IPv4Fragmentation::combineFragment(const void* _ip, sl_uint32 size)
 	sl_uint32 offset = ip->getFragmentOffset() * 8;
 
 	// get packet
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	Ref<IPv4FragmentedPacket> packet;
 	if (offset == 0) {
 		packet = new IPv4FragmentedPacket;
@@ -231,7 +231,7 @@ Memory IPv4Fragmentation::combineFragment(const void* _ip, sl_uint32 size)
 		headerNew->updateChecksum();
 		packet->sizeAccumulated = 0;
 		packet->sizeContent = 0;
-		packet->fragments.clear();
+		packet->fragments.removeAll();
 		if (!(m_packets.put(id, packet))) {
 			return Memory::null();
 		}

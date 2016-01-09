@@ -62,18 +62,17 @@ void Button::setText(const String& text)
 	}
 }
 
-void Button::setFont(const Ref<Font>& _font)
+void Button::setFont(const Ref<Font>& font)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		Ref<Font> font = _font;
 		Ref<FontInstance> fontInstance;
 		jobject jfont = UIPlatform::getNativeFont(font.get(), fontInstance);
 		if (jfont) {
 			_JAndroidButton::setFont.callBoolean(sl_null, handle, jfont);
 		}
 	}
-	m_font = _font;
+	m_font = font;
 }
 
 void Button::setDefaultButton(sl_bool flag)

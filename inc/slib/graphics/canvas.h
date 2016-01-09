@@ -80,10 +80,10 @@ public:
 		drawLine(pt1, pt2, pen);
 	}
 	
-	SLIB_INLINE void drawLines(const List<Point>& _points, const Ref<Pen>& pen)
+	void drawLines(const List<Point>& _points, const Ref<Pen>& pen)
 	{
 		ListLocker<Point> points(_points);
-		drawLines(points.getBuffer(), (sl_uint32)(points.getCount()), pen);
+		drawLines(points.data(), (sl_uint32)(points.getCount()), pen);
 	}
 	
 	SLIB_INLINE void drawArc(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen)
@@ -179,10 +179,10 @@ public:
 		drawEllipse(rect, Ref<Pen>::null(), brush);
 	}
 	
-	SLIB_INLINE void drawPolygon(const List<Point>& _points, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode = fillModeAlternate)
+	void drawPolygon(const List<Point>& _points, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode = fillModeAlternate)
 	{
 		ListLocker<Point> points(_points);
-		drawPolygon(points.getBuffer(), (sl_uint32)(points.getCount()), pen, brush, fillMode);
+		drawPolygon(points.data(), (sl_uint32)(points.getCount()), pen, brush, fillMode);
 	}
 	
 	SLIB_INLINE void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen)
@@ -190,10 +190,10 @@ public:
 		drawPolygon(points, countPoints, pen, Ref<Brush>::null());
 	}
 	
-	SLIB_INLINE void drawPolygon(const List<Point>& _points, const Ref<Pen>& pen)
+	void drawPolygon(const List<Point>& _points, const Ref<Pen>& pen)
 	{
 		ListLocker<Point> points(_points);
-		drawPolygon(points.getBuffer(), (sl_uint32)(points.getCount()), pen, Ref<Brush>::null());
+		drawPolygon(points.data(), (sl_uint32)(points.getCount()), pen, Ref<Brush>::null());
 	}
 	
 	SLIB_INLINE void fillPolygon(const Point* points, sl_uint32 countPoints, const Ref<Brush>& brush)
@@ -201,10 +201,10 @@ public:
 		drawPolygon(points, countPoints, Ref<Pen>::null(), brush);
 	}
 	
-	SLIB_INLINE void fillPolygon(const List<Point>& _points, const Ref<Brush>& brush)
+	void fillPolygon(const List<Point>& _points, const Ref<Brush>& brush)
 	{
 		ListLocker<Point> points(_points);
-		drawPolygon(points.getBuffer(), (sl_uint32)(points.getCount()), Ref<Pen>::null(), brush);
+		drawPolygon(points.data(), (sl_uint32)(points.getCount()), Ref<Pen>::null(), brush);
 	}
 	
 	SLIB_INLINE void drawPie(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Ref<Brush>& brush)

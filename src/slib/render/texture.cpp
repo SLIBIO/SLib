@@ -13,10 +13,9 @@ Texture::Texture()
 	setFreeSourceOnUpdate(sl_false);
 }
 
-Ref<Texture> Texture::create(const Ref<Bitmap>& _source)
+Ref<Texture> Texture::create(const Ref<Bitmap>& source)
 {
 	Ref<Texture> ret;
-	Ref<Bitmap> source = _source;
 	if (source.isNotNull()) {
 		sl_uint32 width = source->getWidth();
 		sl_uint32 height = source->getHeight();
@@ -50,9 +49,8 @@ Ref<Texture> Texture::loadFromMemory(const void* mem, sl_size size)
 	return create(Image::loadFromMemory(mem, size));
 }
 
-Ref<Texture> Texture::loadFromMemory(const Memory& _mem)
+Ref<Texture> Texture::loadFromMemory(const Memory& mem)
 {
-	Memory mem = _mem;
 	if (mem.isEmpty()) {
 		return Ref<Texture>::null();
 	}

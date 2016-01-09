@@ -56,7 +56,7 @@ LatLon LatLon::getCenter(const LatLon* list, sl_size count)
 LatLon LatLon::getCenter(const List<LatLon>& _list)
 {
 	ListLocker<LatLon> list(_list);
-	return getCenter(list.getBuffer(), list.count());
+	return getCenter(list.data(), list.count());
 }
 
 sl_bool LatLon::checkIntersectionLineToLine(

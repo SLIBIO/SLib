@@ -121,11 +121,10 @@ sl_bool UI::isUIThread()
 
 SLIB_SAFE_STATIC_GETTER(Queue< Ref<Runnable> >, _AndroidUi_getDispatchQueue);
 
-void UI::runOnUIThread(const Ref<Runnable>& _callback)
+void UI::runOnUIThread(const Ref<Runnable>& callback)
 {
 	jobject jactivity = Android::getCurrentActivity();
 	if (jactivity) {
-		Ref<Runnable> callback = _callback;
 		if (callback.isNotNull()) {
 			Queue< Ref<Runnable> >& queue = _AndroidUi_getDispatchQueue();
 			queue.push(callback);

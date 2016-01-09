@@ -64,9 +64,8 @@ public: \
 	{ \
 		return HASH_SIZE; \
 	} \
-	SLIB_INLINE static void hash(const String& _s, void* output) \
+	SLIB_INLINE static void hash(const String& s, void* output) \
 	{ \
-		String8 s = _s; \
 		hash(s.getBuf(), s.getLength(), output); \
 	} \
 	SLIB_INLINE static void hash(Memory data, void* output) \
@@ -79,10 +78,9 @@ public: \
 		hash(input, n, v); \
 		return Memory::create(v, HASH_SIZE); \
 	} \
-	SLIB_INLINE static Memory hash(const String& _s) \
+	SLIB_INLINE static Memory hash(const String& s) \
 	{ \
 		char v[HASH_SIZE]; \
-		String8 s = _s; \
 		hash(s.getBuf(), s.getLength(), v); \
 		return Memory::create(v, HASH_SIZE); \
 	} \

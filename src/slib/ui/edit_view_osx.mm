@@ -274,15 +274,15 @@ String EditView::getHintText()
 	return m_hintText;
 }
 
-void EditView::setHintText(const String& _value)
+void EditView::setHintText(const String& value)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
 		NSTextField* tv = (NSTextField*)handle;
-		NSString* value = Apple::getNSStringFromString(_value);
-		[[tv cell] setPlaceholderString:value];
+		NSString* s = Apple::getNSStringFromString(value);
+		[[tv cell] setPlaceholderString:s];
 	}
-	m_hintText = _value;
+	m_hintText = value;
 }
 
 sl_bool EditView::isReadOnly()
@@ -395,9 +395,8 @@ void EditView::setBackgroundColor(const Color& color)
 	m_backgroundColor = color;
 }
 
-void EditView::setFont(const Ref<Font>& _font)
+void EditView::setFont(const Ref<Font>& font)
 {
-	Ref<Font> font = _font;
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
 		if ([handle isKindOfClass:[NSTextField class]]) {
@@ -423,7 +422,7 @@ SLIB_UI_NAMESPACE_END
 @implementation _Slib_OSX_TextField
 -(void)controlTextDidChange:(NSNotification *)obj
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::_EditView::onChangeTextField(instance.get(), self);
 	}
@@ -447,7 +446,7 @@ SLIB_UI_NAMESPACE_END
 
 - (void)keyUp:(NSEvent*)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagNoDefault = instance->onEventKey(sl_false, theEvent);
 		if (flagNoDefault) {
@@ -461,7 +460,7 @@ SLIB_UI_NAMESPACE_END
 @implementation _Slib_OSX_SecureTextField
 -(void)controlTextDidChange:(NSNotification *)obj
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::_EditView::onChangeTextField(instance.get(), self);
 	}
@@ -469,7 +468,7 @@ SLIB_UI_NAMESPACE_END
 
 - (void)keyUp:(NSEvent*)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagNoDefault = instance->onEventKey(sl_false, theEvent);
 		if (flagNoDefault) {
@@ -508,7 +507,7 @@ SLIB_UI_NAMESPACE_END
 
 -(void)controlTextDidChange:(NSNotification *)obj
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::_EditView::onChangeTextArea(instance.get(), self);
 	}
@@ -519,7 +518,7 @@ SLIB_UI_NAMESPACE_END
 
 - (void)keyUp:(NSEvent*)theEvent
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagNoDefault = instance->onEventKey(sl_false, theEvent);
 		if (flagNoDefault) {

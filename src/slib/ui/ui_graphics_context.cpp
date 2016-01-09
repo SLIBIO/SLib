@@ -61,9 +61,8 @@ Ref<GraphicsContext> UI::getGraphicsContext()
 	return ret;
 }
 
-Ref<Drawable> UI::createDrawableFromImage(const Ref<Image>& _image)
+Ref<Drawable> UI::createDrawableFromImage(const Ref<Image>& image)
 {
-	Ref<Image> image = _image;
 	if (image.isNotNull()) {
 		ImageDesc desc;
 		image->getDesc(desc);
@@ -72,9 +71,8 @@ Ref<Drawable> UI::createDrawableFromImage(const Ref<Image>& _image)
 	return Ref<Drawable>::null();
 }
 
-Ref<Drawable> UI::loadDrawableFromMemory(const Memory& _mem)
+Ref<Drawable> UI::loadDrawableFromMemory(const Memory& mem)
 {
-	Memory mem = _mem;
 	if (mem.isNotEmpty()) {
 		return loadDrawableFromMemory(mem.getBuf(), mem.getSize());
 	}
@@ -101,9 +99,8 @@ Ref<Bitmap> UI::createBitmapFromImage(const ImageDesc& desc)
 	return Ref<Bitmap>::null();
 }
 
-Ref<Bitmap> UI::createBitmapFromImage(const Ref<Image>& _image)
+Ref<Bitmap> UI::createBitmapFromImage(const Ref<Image>& image)
 {
-	Ref<Image> image = _image;
 	if (image.isNotNull()) {
 		ImageDesc desc;
 		image->getDesc(desc);
@@ -122,9 +119,8 @@ Ref<Drawable> UI::loadDrawableFromResource(const String& path)
 	return ret;
 }
 
-Ref<Bitmap> UI::loadBitmapFromMemory(const Memory& _mem)
+Ref<Bitmap> UI::loadBitmapFromMemory(const Memory& mem)
 {
-	Memory mem = _mem;
 	if (mem.isNotEmpty()) {
 		return loadBitmapFromMemory(mem.getBuf(), mem.getSize());
 	}

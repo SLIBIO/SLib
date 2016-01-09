@@ -15,7 +15,7 @@ void FileLogger::log(const String& tag, const String& content)
 	}
 	String s = _Log_getLineString(tag, content) + "\r\n";
 	if (s.getLength() > 0) {
-		MutexLocker locker(getLocker());
+		ObjectLocker lock(this);
 		File::appendUtf8Text(m_fileName, s);
 	}
 }
@@ -34,21 +34,17 @@ SLIB_NAMESPACE_END
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 #include <android/log.h>
 SLIB_NAMESPACE_BEGIN
-void ConsoleLogger::log(const String& _tag, const String& _content)
+void ConsoleLogger::log(const String& tag, const String& content)
 {
-	String8 tag = _tag;
-	String8 content = _content;
-	MutexLocker locker(getLocker());
+	ObjectLocker lock(this);
 	__android_log_print(ANDROID_LOG_INFO
 			, tag.getBuf()
 			, "%s"
 			, content.getBuf());
 }
-void ConsoleLogger::logError(const String& _tag, const String& _content)
+void ConsoleLogger::logError(const String& tag, const String& content)
 {
-	String8 tag = _tag;
-	String8 content = _content;
-	MutexLocker locker(getLocker());
+	ObjectLocker lock(this);
 	__android_log_print(ANDROID_LOG_ERROR
 			, tag.getBuf()
 			, "%s"
@@ -96,7 +92,7 @@ Log::Log(Ref<Logger> logger, Ref<Logger> errorLogger)
 
 void Log::clearDefaultLogger()
 {
-	m_listLoggers.clear();
+	m_listLoggers.removeAll();
 }
 void Log::addDefaultLogger(Ref<Logger> logger)
 {
@@ -109,7 +105,7 @@ void Log::removeDefaultLogger(Ref<Logger> logger)
 
 void Log::clearErrorLogger()
 {
-	m_listErrorLoggers.clear();
+	m_listErrorLoggers.removeAll();
 }
 void Log::addErrorLogger(Ref<Logger> logger)
 {

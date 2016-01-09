@@ -37,12 +37,11 @@ Ref<UIEvent> UIEvent::createMouseWheelEvent(sl_real deltaX, sl_real deltaY)
 	return ret;
 }
 
-Ref<UIEvent> UIEvent::createTouchEvent(UIEventAction action, const Array<TouchPoint>& _points)
+Ref<UIEvent> UIEvent::createTouchEvent(UIEventAction action, const Array<TouchPoint>& points)
 {
 	Ref<UIEvent> ret = new UIEvent;
 	if (ret.isNotNull()) {
 		ret->setAction(action);
-		Array<TouchPoint> points = _points;
 		ret->setTouchPoints(points);
 		if (points.count() > 0) {
 			ret->setTouchPoint(points[0]);

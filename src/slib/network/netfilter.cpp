@@ -183,7 +183,7 @@ public:
 	
 	void release()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (!m_flagRunning) {
 			return;
 		}
@@ -197,7 +197,7 @@ public:
 			m_thread.setNull();
 		}
 
-		m_queues.clear();
+		m_queues.removeAll();
 		
 		nfq_unbind_pf(m_handle, AF_INET);
 		nfq_close(m_handle);
@@ -210,7 +210,7 @@ public:
 
 	sl_bool createQueue(sl_uint16 queueNumber)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (!m_flagRunning) {
 			return sl_false;
 		}
@@ -242,7 +242,7 @@ public:
 
 	void removeQueue(sl_uint16 queueNumber)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (!m_flagRunning) {
 			return;
 		}
@@ -320,7 +320,7 @@ public:
 					break;
 				}
 			}
-			m_listRemovingQueues.clear();
+			m_listRemovingQueues.removeAll();
 		}
 	}
 };

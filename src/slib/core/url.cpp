@@ -119,9 +119,8 @@ const sl_bool _URL_unreserved_pattern_uri[128] = {
 	/*78*/	1,		1,		1,		0,		0,		0,		1,		0
 };
 
-void URL::parse(const String& _url)
+void URL::parse(const String& url)
 {
-	String8 url = _url;
 	const sl_char8* str = url.getBuf();
 	sl_int32 n = url.getLength();
 	sl_int32 indexHost = 0;
@@ -190,9 +189,8 @@ void URL::parse(const String& _url)
 	}
 }
 
-String _URL_encodePercentByUTF8(const String& _value, const sl_bool patternUnreserved[128])
+String _URL_encodePercentByUTF8(const String& value, const sl_bool patternUnreserved[128])
 {
-	String8 value = _value;
 	sl_uint32 n = value.getLength();
 	if (n > 0) {
 		const sl_char8* src = value.getBuf();
@@ -222,9 +220,8 @@ String URL::encodePercentByUTF8(const String& value)
 	return _URL_encodePercentByUTF8(value, _URL_unreserved_pattern);
 }
 
-String URL::decodePercentByUTF8(const String& _value)
+String URL::decodePercentByUTF8(const String& value)
 {
-	String8 value = _value;
 	sl_uint32 n = value.getLength();
 	if (n > 0) {
 		const sl_char8* src = value.getBuf();

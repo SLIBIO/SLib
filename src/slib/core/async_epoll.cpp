@@ -70,7 +70,7 @@ void AsyncLoop::__runLoop()
 
 		int nEvents = ::epoll_wait(handle->fdEpoll, waitEvents, ASYNC_MAX_WAIT_EVENT, 0);
 		if (nEvents == 0) {
-			m_queueInstancesClosed.clear();
+			m_queueInstancesClosed.removeAll();
 			int timeout = _getTimeout();
 			nEvents = ::epoll_wait(handle->fdEpoll, waitEvents, ASYNC_MAX_WAIT_EVENT, timeout);
 		}

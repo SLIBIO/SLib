@@ -71,12 +71,12 @@ public:
 	{
 		WeakRef<_Android_Camera> camera;
 		_AndroidCameras_get().get(instance, &camera);
-		return camera.lock();
+		return camera;
 	}
 
 	void release()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		jobject jcamera = m_camera.get();
 		if (!jcamera) {
 			return;

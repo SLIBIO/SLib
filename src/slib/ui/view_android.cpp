@@ -56,7 +56,7 @@ jboolean JNICALL _AndroidView_nativeOnTouchEvent(JNIEnv* env, jobject _this, jlo
 		if (nPts > 0) {
 			Array<TouchPoint> points = Array<TouchPoint>::create(nPts);
 			if (points.isNotNull()) {
-				TouchPoint* pts = points.getBuf();
+				TouchPoint* pts = points.data();
 				for (sl_uint32 i = 0; i < nPts; i++) {
 					JniLocal<jobject> jpt = Jni::getObjectArrayElement(jpoints, i);
 					if (jpt.isNotNull()) {

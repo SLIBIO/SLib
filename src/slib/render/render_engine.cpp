@@ -80,18 +80,16 @@ static void _RenderEngine_makeTextureTransform2D(Matrix3& mat, const Rectangle& 
 	mat.m20 = x; mat.m21 = y; mat.m22 = 1;
 }
 
-void RenderEngine::drawRectangle2D(const Matrix3& transform, const Ref<RenderProgram2D>& _program)
+void RenderEngine::drawRectangle2D(const Matrix3& transform, const Ref<RenderProgram2D>& program)
 {
-	Ref<RenderProgram2D> program = _program;
 	if (program.isNotNull()) {
 		program->setTransform(transform);
 		drawRectangle2D(program);
 	}
 }
 
-void RenderEngine::drawRectangle2D(const Rectangle& rectDst, const Ref<RenderProgram2D>& _program)
+void RenderEngine::drawRectangle2D(const Rectangle& rectDst, const Ref<RenderProgram2D>& program)
 {
-	Ref<RenderProgram2D> program = _program;
 	if (program.isNotNull()) {
 		Matrix3 matTransform;
 		_RenderEngine_makeTransform2D(matTransform, rectDst);
@@ -152,11 +150,9 @@ void RenderEngine::drawTexture2D(const Ref<RenderProgram>& program)
 	draw(program, 4, vb, Primitive::typeTriangleStrip);
 }
 
-void RenderEngine::drawTexture2D(const Matrix3& transform, const Ref<Texture>& _texture, const Rectangle& rectSrc, const Ref<RenderProgram2D>& _program)
+void RenderEngine::drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, const Ref<RenderProgram2D>& program)
 {
-	Ref<RenderProgram2D> program = _program;
 	if (program.isNotNull()) {
-		Ref<Texture> texture = _texture;
 		if (texture.isNotNull()) {
 			Matrix3 mt;
 			_RenderEngine_makeTextureTransform2D(mt, rectSrc);
@@ -168,11 +164,9 @@ void RenderEngine::drawTexture2D(const Matrix3& transform, const Ref<Texture>& _
 	}
 }
 
-void RenderEngine::drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& _texture, const Rectangle& rectSrc, const Ref<RenderProgram2D>& _program)
+void RenderEngine::drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& texture, const Rectangle& rectSrc, const Ref<RenderProgram2D>& program)
 {
-	Ref<RenderProgram2D> program = _program;
 	if (program.isNotNull()) {
-		Ref<Texture> texture = _texture;
 		if (texture.isNotNull()) {
 			Matrix3 matTransform;
 			_RenderEngine_makeTransform2D(matTransform, rectDst);
@@ -226,9 +220,8 @@ void RenderEngine::drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& t
 	}
 }
 
-void RenderEngine::drawLines(const Ref<RenderProgram>& _program, Line3* lines, sl_uint32 n)
+void RenderEngine::drawLines(const Ref<RenderProgram>& program, Line3* lines, sl_uint32 n)
 {
-	Ref<RenderProgram> program = _program;
 	if (program.isNotNull()) {
 		Ref<VertexBuffer> vb = VertexBuffer::create(lines, sizeof(Line3)*n);
 		draw(program, n * 2, vb, Primitive::typeLines);

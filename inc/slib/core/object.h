@@ -39,19 +39,17 @@ public:
 
 };
 
-class SLIB_EXPORT ObjectLocker
+class SLIB_EXPORT ObjectLocker : public MutexLocker
 {
 public:
-	MutexLocker m_locker;
-
-public:
-	SLIB_INLINE ObjectLocker(const Object* object) : m_locker(object ? object->getLocker(): sl_null)
+	SLIB_INLINE ObjectLocker(const Object* object) : MutexLocker(object ? object->getLocker(): sl_null)
 	{
 	}
 
-	SLIB_INLINE ObjectLocker(const Object* object1, const Object* object2) : m_locker(object1 ? object1->getLocker() : sl_null, object2 ? object2->getLocker() : sl_null)
+	SLIB_INLINE ObjectLocker(const Object* object1, const Object* object2) : MutexLocker(object1 ? object1->getLocker() : sl_null, object2 ? object2->getLocker() : sl_null)
 	{
 	}
+	
 };
 
 SLIB_NAMESPACE_END

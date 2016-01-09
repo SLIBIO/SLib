@@ -310,7 +310,7 @@ SLIB_UI_NAMESPACE_END
 
 - (void)drawRect:(CGRect)dirtyRect
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		instance->onDraw(dirtyRect);
 	}

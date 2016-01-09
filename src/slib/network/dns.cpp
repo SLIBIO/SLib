@@ -73,9 +73,8 @@ sl_uint32 DNS_Record::_parseName(String& nameOut, const void* _buf, sl_uint32 of
 	return 0;
 }
 
-sl_uint32 DNS_Record::_buildName(const String& _nameIn, void* _buf, sl_uint32 offset, sl_uint32 size)
+sl_uint32 DNS_Record::_buildName(const String& name, void* _buf, sl_uint32 offset, sl_uint32 size)
 {
-	String8 name = _nameIn;
 	sl_char8* bufIn = name.getBuf();
 	sl_uint32 lenIn = name.getLength();
 	sl_uint8* bufOut = (sl_uint8*)_buf;
@@ -228,10 +227,9 @@ String DNS_ResponseRecord::parseData_CNAME() const
 	return String::null();
 }
 
-sl_uint32 DNS_ResponseRecord::buildRecord_CNAME(void* buf, sl_uint32 offset, sl_uint32 size, const String& _cname)
+sl_uint32 DNS_ResponseRecord::buildRecord_CNAME(void* buf, sl_uint32 offset, sl_uint32 size, const String& cname)
 {
 	setType(type_CNAME);
-	String8 cname = _cname;
 	return buildRecord(buf, offset, size, cname.getBuf(), cname.getLength());
 }
 
@@ -247,10 +245,9 @@ String DNS_ResponseRecord::parseData_NS() const
 	return String::null();
 }
 
-sl_uint32 DNS_ResponseRecord::buildRecord_NS(void* buf, sl_uint32 offset, sl_uint32 size, const String& _ns)
+sl_uint32 DNS_ResponseRecord::buildRecord_NS(void* buf, sl_uint32 offset, sl_uint32 size, const String& ns)
 {
 	setType(type_NS);
-	String8 ns = _ns;
 	return buildRecord(buf, offset, size, ns.getBuf(), ns.getLength());
 }
 
@@ -450,7 +447,7 @@ DnsServer::~DnsServer()
 
 void DnsServer::release()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	Ref<Thread> thread = m_thread;
 	if (thread.isNotNull()) {
 		thread->finishAndWait();

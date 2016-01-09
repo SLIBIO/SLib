@@ -42,7 +42,7 @@ String16 Apple::getString16FromNSString(NSString* str)
 		return String16::null();
 	}
 	NSUInteger len = [str length];
-	String16 ret = String16::memory((sl_uint32)len);
+	String16 ret = String16::allocate((sl_uint32)len);
 	if (ret.isNull()) {
 		return ret;
 	}

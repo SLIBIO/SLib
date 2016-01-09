@@ -23,13 +23,11 @@ RenderBaseObject::~RenderBaseObject()
 	unlinkEngine();
 }
 
-void RenderBaseObject::linkEngine(const Ref<RenderEngine>& _engine, const Ref<RenderBaseObjectInstance>& _instance)
+void RenderBaseObject::linkEngine(const Ref<RenderEngine>& engine, const Ref<RenderBaseObjectInstance>& instance)
 {
-	Ref<RenderEngine> engine(_engine);
 	Ref<RenderEngine> engineOld(m_engine);
 	if (engine != engineOld) {
 		unlinkEngine();
-		Ref<RenderBaseObjectInstance> instance = _instance;
 		if (engine.isNotNull() && instance.isNotNull()) {
 			m_engine = engine;
 			m_instance = instance;

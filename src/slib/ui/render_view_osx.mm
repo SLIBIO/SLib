@@ -38,7 +38,7 @@ Ref<ViewInstance> RenderView::createInstance(ViewInstance* _parent)
 
 void RenderView::setRenderMode(RenderView::RenderMode mode)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	NSView* view = UIPlatform::getViewHandle(this);
 	if (view != nil && [view isKindOfClass:[_Slib_OSX_GLView class]]) {
 		_Slib_OSX_GLView* v = (_Slib_OSX_GLView*)view;
@@ -118,7 +118,7 @@ void _Ui_OSX_GLView_thread(_Slib_OSX_GLView* handle)
 					[context makeCurrentContext];
 					engine->setViewport(0, 0, (sl_uint32)(rect.size.width), (sl_uint32)(rect.size.height));
 					
-					Ref<OSX_ViewInstance> instance = handle->m_viewInstance.lock();
+					Ref<OSX_ViewInstance> instance = handle->m_viewInstance;
 					if (instance.isNotNull()) {
 						Ref<View> _view = instance->getView();
 						if (RenderView::checkInstance(_view)) {

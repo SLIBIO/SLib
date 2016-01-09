@@ -5,7 +5,7 @@ Database::Database()
 {
 }
 
-sl_bool Database::execute(const String& sql, const Variant* params, sl_uint32 nParams, sl_size* pOutAffectedRowsCount)
+sl_bool Database::execute(const String& sql, const Variant* params, sl_uint32 nParams, sl_uint64* pOutAffectedRowsCount)
 {
 	Ref<DatabaseStatement> statement = prepareStatement(sql);
 	if (statement.isNotNull()) {
@@ -52,7 +52,7 @@ Variant Database::getValueForQueryResult(const String& sql, const Variant* param
 	return Variant::null();
 }
 
-sl_bool Database::execute(const String& sql, sl_size* pOutAffectedRowsCount)
+sl_bool Database::execute(const String& sql, sl_uint64* pOutAffectedRowsCount)
 {
 	return execute(sql, sl_null, 0, pOutAffectedRowsCount);
 }

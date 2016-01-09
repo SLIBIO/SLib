@@ -210,7 +210,7 @@ public:
 			m_threadRender.setNull();
 		}
 
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 
 		if (m_renderEngine.isNotNull()) {
 			m_renderEngine->release();
@@ -347,7 +347,7 @@ SLIB_RENDER_NAMESPACE_END
 #else
 
 SLIB_RENDER_NAMESPACE_BEGIN
-void EGL::loadEntries(const String& _pathDll, sl_bool flagReload)
+void EGL::loadEntries(const String& pathDll, sl_bool flagReload)
 {
 }
 
@@ -370,7 +370,7 @@ Ref<Renderer> EGL::createRenderer(void* windowHandle, const RendererParam& param
 	return Ref<Renderer>::null();
 }
 
-void EGL::loadEntries(const String& _pathDll, sl_bool flagReload)
+void EGL::loadEntries(const String& pathDll, sl_bool flagReload)
 {
 }
 

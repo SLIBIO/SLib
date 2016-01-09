@@ -91,9 +91,8 @@ public:
 		CGContextClipToRect(m_graphics, rc);
 	}
 	
-	void clipToPath(const Ref<GraphicsPath>& _path)
+	void clipToPath(const Ref<GraphicsPath>& path)
 	{
-		Ref<GraphicsPath> path = _path;
 		if (path.isNotNull()) {
 			Ref<GraphicsPathInstance> instance;
 			CGPathRef handle = UIPlatform::getGraphicsPath(path.get(), instance);
@@ -142,11 +141,9 @@ public:
 		CGContextConcatCTM(m_graphics, t);
 	}
 	
-	void drawText(const String& __text, sl_real x, sl_real y, const Ref<Font>& __font, const Color& _color)
-	{
-		String _text = __text;
-		
-		if (_text.isNotEmpty()) {
+	void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& __font, const Color& _color)
+	{		
+		if (text.isNotEmpty()) {
 			
 			Ref<Font> _font = __font;
 			if (_font.isNull()) {
@@ -159,8 +156,8 @@ public:
 				
 				if (font) {
 					
-					NSString* text = Apple::getNSStringFromString(_text);
-					CFStringRef string = (__bridge CFStringRef)text;
+					NSString* ns_text = Apple::getNSStringFromString(text);
+					CFStringRef string = (__bridge CFStringRef)ns_text;
 					
 					SInt32 _underline = _font->isUnderline() ? kCTUnderlineStyleSingle: kCTUnderlineStyleNone;
 					CFNumberRef underline = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &_underline);
@@ -252,14 +249,13 @@ public:
 		}
 	}
 	
-	void drawRectangle(const Rectangle& _rect, const Ref<Pen>& _pen, const Ref<Brush>& _brush)
+	void drawRectangle(const Rectangle& _rect, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		CGRect rect;
 		rect.origin.x = _rect.left;
 		rect.origin.y = _rect.top;
 		rect.size.width = _rect.getWidth();
 		rect.size.height = _rect.getHeight();
-		Ref<Brush> brush = _brush;
 		if (brush.isNotNull()) {
 			_applyBrush(brush.get());
 			CGContextFillRect(m_graphics, rect);
@@ -275,23 +271,22 @@ public:
 		}
 	}
 	
-	void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& _pen, const Ref<Brush>& _brush)
+	void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		Ref<GraphicsPath> path = GraphicsPath::create();
 		if (path.isNotNull()) {
 			path->addRoundRect(rect, radius);
-			drawPath(path, _pen, _brush);
+			drawPath(path, _pen, brush);
 		}
 	}
 	
-	void drawEllipse(const Rectangle& _rect, const Ref<Pen>& _pen, const Ref<Brush>& _brush)
+	void drawEllipse(const Rectangle& _rect, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		CGRect rect;
 		rect.origin.x = _rect.left;
 		rect.origin.y = _rect.top;
 		rect.size.width = _rect.getWidth();
 		rect.size.height = _rect.getHeight();
-		Ref<Brush> brush = _brush;
 		if (brush.isNotNull()) {
 			_applyBrush(brush.get());
 			CGContextFillEllipseInRect(m_graphics, rect);
@@ -306,7 +301,7 @@ public:
 		}
 	}
 	
-	void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen, const Ref<Brush>& _brush, FillMode fillMode)
+	void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen, const Ref<Brush>& brush, FillMode fillMode)
 	{
 		if (countPoints <= 2) {
 			return;
@@ -319,34 +314,32 @@ public:
 			}
 			path->closeSubpath();
 			path->setFillMode(fillMode);
-			drawPath(path, _pen, _brush);
+			drawPath(path, _pen, brush);
 		}
 	}
 	
-	void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& _pen, const Ref<Brush>& _brush)
+	void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		Ref<GraphicsPath> path = GraphicsPath::create();
 		if (path.isNotNull()) {
 			path->addPie(rect, startDegrees, sweepDegrees);
-			drawPath(path, _pen, _brush);
+			drawPath(path, _pen, brush);
 		}
 	}
 	
-	void drawPath(const Ref<GraphicsPath>& _path, const Ref<Pen>& _pen, const Ref<Brush>& _brush)
+	void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
-		Ref<GraphicsPath> path = _path;
 		if (path.isNotNull()) {
 			Ref<GraphicsPathInstance> instance;
 			CGPathRef handle = UIPlatform::getGraphicsPath(path.get(), instance);
 			if (handle) {
-				_drawPath(handle, _pen, _brush, path->getFillMode());
+				_drawPath(handle, _pen, brush, path->getFillMode());
 			}
 		}
 	}
 	
-	void _drawPath(CGPathRef path, const Ref<Pen>& _pen, const Ref<Brush>& _brush, FillMode fillMode)
+	void _drawPath(CGPathRef path, const Ref<Pen>& _pen, const Ref<Brush>& brush, FillMode fillMode)
 	{
-		Ref<Brush> brush = _brush;
 		if (brush.isNotNull()) {
 			_applyBrush(brush.get());
 			CGContextBeginPath(m_graphics);

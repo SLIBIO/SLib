@@ -105,9 +105,8 @@ CGPathRef UIPlatform::getGraphicsPath(GraphicsPath* path, Ref<GraphicsPathInstan
 	return instance->m_path;
 }
 
-Rectangle UI::getPathBounds(const Ref<GraphicsPath>& _path)
+Rectangle UI::getPathBounds(const Ref<GraphicsPath>& path)
 {
-	Ref<GraphicsPath> path = _path;
 	if (path.isNull()) {
 		return Rectangle::zero();
 	}
@@ -125,9 +124,8 @@ Rectangle UI::getPathBounds(const Ref<GraphicsPath>& _path)
 	return Rectangle::zero();
 }
 
-sl_bool UI::checkPointInPath(const Ref<GraphicsPath>& _path, const Point& _pt)
+sl_bool UI::checkPointInPath(const Ref<GraphicsPath>& path, const Point& _pt)
 {
-	Ref<GraphicsPath> path = _path;
 	if (path.isNull()) {
 		return sl_false;
 	}

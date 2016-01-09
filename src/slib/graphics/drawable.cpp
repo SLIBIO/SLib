@@ -32,10 +32,9 @@ BrushDrawable::BrushDrawable()
 {
 }
 
-Ref<BrushDrawable> BrushDrawable::create(const Ref<Brush>& _brush)
+Ref<BrushDrawable> BrushDrawable::create(const Ref<Brush>& brush)
 {
 	Ref<BrushDrawable> ret;
-	Ref<Brush> brush = _brush;
 	if (brush.isNull()) {
 		return ret;
 	}

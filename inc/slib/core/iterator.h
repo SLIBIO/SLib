@@ -11,11 +11,11 @@ class SLIB_EXPORT IIterator : public Referable
 {
 	SLIB_DECLARE_ROOT_OBJECT(IIterator)
 public:
-	IIterator() {}
+	SLIB_INLINE IIterator() {}
 
 public:
 	virtual sl_bool hasNext() = 0;
-	virtual sl_bool next(TYPE* out = sl_null) = 0;
+	virtual sl_bool next(TYPE* _out = sl_null) = 0;
 	virtual sl_reg getIndex() = 0;
 };
 
@@ -48,11 +48,11 @@ public:
 		return -1;
 	}
 
-	SLIB_INLINE sl_bool next(TYPE* out) const
+	SLIB_INLINE sl_bool next(TYPE* _out) const
     {
 		_Obj* obj = m_object.get();
 		if (obj) {
-			return obj->next(out);
+			return obj->next(_out);
 		}
 		return sl_false;
 	};

@@ -30,7 +30,7 @@ class _ListDetailsView : public ListDetailsView
 public:
 	void __applyColumnsCount(_Slib_OSX_ListDetailsView* tv)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		List<NSTableColumn*> _columns = tv->m_columns;
 		sl_uint32 nOrig = (sl_uint32)(_columns.count());
 		sl_uint32 nNew = (sl_uint32)(m_columns.count());
@@ -104,7 +104,7 @@ public:
 Ref<ViewInstance> ListDetailsView::createInstance(ViewInstance* _parent)
 {
 	_Slib_OSX_ListDetailsView_TableView* table = nil;
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	OSX_VIEW_CREATE_INSTANCE_BEGIN
 	_Slib_OSX_ListDetailsView* handle = nil;
 	table = [[_Slib_OSX_ListDetailsView_TableView alloc] init];
@@ -216,9 +216,8 @@ sl_int32 ListDetailsView::getSelectedRow()
 	return -1;
 }
 
-void ListDetailsView::setFont(const Ref<Font>& _font)
+void ListDetailsView::setFont(const Ref<Font>& font)
 {
-	Ref<Font> font = _font;
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListDetailsView class]]) {
 		_Slib_OSX_ListDetailsView* tv = (_Slib_OSX_ListDetailsView*)handle;
@@ -243,7 +242,7 @@ SLIB_UI_NAMESPACE_END
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView{
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::ListDetailsView::checkInstance(view)) {
@@ -254,7 +253,7 @@ SLIB_UI_NAMESPACE_END
 }
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row{
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::ListDetailsView::checkInstance(view)) {
@@ -271,7 +270,7 @@ SLIB_UI_NAMESPACE_END
 
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::ListDetailsView::checkInstance(view)) {
@@ -293,7 +292,7 @@ SLIB_UI_NAMESPACE_END
 	NSPoint ptView = [self convertPoint:ptWindow fromView:nil];
 	NSInteger indexRow = [self rowAtPoint:ptView];
 	if (indexRow >= 0) {
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 		if (instance.isNotNull()) {
 			slib::Ref<slib::View> view = instance->getView();
 			if (slib::ListDetailsView::checkInstance(view)) {
@@ -321,7 +320,7 @@ SLIB_UI_NAMESPACE_END
 	NSPoint ptView = [self convertPoint:ptWindow fromView:nil];
 	NSInteger indexRow = [self rowAtPoint:ptView];
 	if (indexRow >= 0) {
-		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 		if (instance.isNotNull()) {
 			slib::Ref<slib::View> view = instance->getView();
 			if (slib::ListDetailsView::checkInstance(view)) {

@@ -156,7 +156,7 @@ public:
 
 	void close()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		HWND hWnd = m_handle;
 		if (hWnd) {
 			if (m_flagModal) {
@@ -189,11 +189,10 @@ public:
 		return Ref<WindowInstance>::null();
 	}
 
-	sl_bool setParent(const Ref<WindowInstance>& _window)
+	sl_bool setParent(const Ref<WindowInstance>& window)
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
-			Ref<WindowInstance> window = _window;
 			if (window.isNotNull()) {
 				_Win32_Window* w = (_Win32_Window*)(window.get());
 				HWND hWndParent = w->m_handle;

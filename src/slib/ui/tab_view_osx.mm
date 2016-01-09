@@ -23,7 +23,7 @@ class _TabView : public TabView
 public:
 	void __applyTabsCount(NSTabView* tv)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		sl_uint32 nNew = (sl_uint32)(m_items.getCount());
 		sl_uint32 nOrig = (sl_uint32)([tv numberOfTabViewItems]);
 		if (nOrig == nNew) {
@@ -62,9 +62,8 @@ public:
 		}
 	}
 	
-	void __setTabContentView(NSTabView* tv, sl_uint32 index, const Ref<View>& _view)
+	void __setTabContentView(NSTabView* tv, sl_uint32 index, const Ref<View>& view)
 	{
-		Ref<View> view = _view;
 		NSTabViewItem* item = [tv tabViewItemAtIndex:index];
 		if (item == nil) {
 			return;
@@ -111,7 +110,7 @@ public:
 
 Ref<ViewInstance> TabView::createInstance(ViewInstance* _parent)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	OSX_VIEW_CREATE_INSTANCE_BEGIN
 	_Slib_OSX_TabView* handle = [[_Slib_OSX_TabView alloc] initWithFrame: frame];
 	if (handle != nil) {
@@ -190,9 +189,8 @@ Size TabView::getContentViewSize()
 	return Size::zero();
 }
 
-void TabView::setFont(const Ref<Font>& _font)
+void TabView::setFont(const Ref<Font>& font)
 {
-	Ref<Font> font = _font;
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTabView class]]) {
 		NSTabView* tv = (NSTabView*)handle;
@@ -221,7 +219,7 @@ SLIB_UI_NAMESPACE_END
 -(void)setFrame:(NSRect)frame
 {
 	[super setFrame:frame];
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::TabView::checkInstance(view)) {
@@ -232,7 +230,7 @@ SLIB_UI_NAMESPACE_END
 
 - (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::TabView::checkInstance(view)) {

@@ -121,9 +121,8 @@ void DropDownList::_setItemTitle(sl_uint32 index, const String& title)
 	}
 }
 
-void DropDownList::setFont(const Ref<Font>& _font)
+void DropDownList::setFont(const Ref<Font>& font)
 {
-	Ref<Font> font = _font;
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_DropDownList class]]) {
 		_Slib_iOS_DropDownList* v = (_Slib_iOS_DropDownList*)handle;
@@ -234,7 +233,7 @@ SLIB_UI_NAMESPACE_END
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::DropDownList::checkInstance(view)) {
@@ -245,7 +244,7 @@ SLIB_UI_NAMESPACE_END
 
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component;
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::DropDownList::checkInstance(view)) {
@@ -257,7 +256,7 @@ SLIB_UI_NAMESPACE_END
 
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component;
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::DropDownList::checkInstance(view)) {
@@ -269,7 +268,7 @@ SLIB_UI_NAMESPACE_END
 
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)aTextField
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::DropDownList::checkInstance(view)) {
@@ -284,7 +283,7 @@ SLIB_UI_NAMESPACE_END
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
 	[self sendActionsForControlEvents:UIControlEventEditingDidBegin];
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::DropDownList::checkInstance(view)) {
@@ -312,7 +311,7 @@ SLIB_UI_NAMESPACE_END
 -(void)cancelClicked:(id)sender
 {
 	[self resignFirstResponder];
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (slib::DropDownList::checkInstance(view)) {

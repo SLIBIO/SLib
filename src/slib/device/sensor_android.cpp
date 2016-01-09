@@ -76,7 +76,7 @@ public:
 	{
 		WeakRef<_Android_Sensor> sensor;
 		_AndroidSensors_get().get(instance, &sensor);
-		return sensor.lock();
+		return sensor;
 	}
 
 	sl_bool start(const Param& param)

@@ -77,7 +77,7 @@ void AsyncLoop::__runLoop()
 			nCount = 0;
 		}
 		if (nCount == 0) {
-			m_queueInstancesClosed.clear();
+			m_queueInstancesClosed.removeAll();
 			sl_int32 _t = _getTimeout();
 			DWORD timeout;
 			if (_t >= 0) {

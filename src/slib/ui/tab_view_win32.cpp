@@ -15,7 +15,7 @@ class _TabView : public TabView
 public:
 	void __applyTabsCount(HWND hWnd)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		sl_uint32 nOrig = (sl_uint32)(::SendMessageW(hWnd, TCM_GETITEMCOUNT, 0, 0));
 		sl_uint32 nNew = (sl_uint32)(m_items.count());
 		if (nOrig == nNew) {
@@ -245,9 +245,8 @@ Size TabView::getContentViewSize()
 	return Size::zero();
 }
 
-void TabView::setFont(const Ref<Font>& _font)
+void TabView::setFont(const Ref<Font>& font)
 {
-	Ref<Font> font = _font;
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {

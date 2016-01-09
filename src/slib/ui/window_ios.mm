@@ -147,7 +147,7 @@ public:
 		return Ref<WindowInstance>::null();
 	}
 	
-	sl_bool setParent(const Ref<WindowInstance>& _window)
+	sl_bool setParent(const Ref<WindowInstance>& window)
 	{
 		return sl_false;
 	}

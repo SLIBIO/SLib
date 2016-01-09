@@ -20,13 +20,13 @@ HttpProxy::~HttpProxy()
 
 void HttpProxy::release()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	HttpService::release();
 }
 
 sl_bool HttpProxy::start(const HttpProxyParam& param)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (m_flagRunning) {
 		return sl_false;
 	}
@@ -127,7 +127,7 @@ public:
 
 	void onAsyncCopyExit(AsyncCopy* task)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		m_nCountCopy--;
 		if (m_nCountCopy == 0) {
 			lock.unlock();
@@ -216,10 +216,9 @@ public:
 	}
 
 	Memory m_memHeader;
-	Memory onRead(AsyncCopy* task, const Memory& _input)
+	Memory onRead(AsyncCopy* task, const Memory& input)
 	{
 		if (task == m_copyRemoteToLocal.get()) {
-			Memory input = _input;
 			if (m_sizeResponse == 0) {
 
 			} else if (task->getWrittenSize() >= m_sizeResponse) {
@@ -232,12 +231,12 @@ public:
 				}
 			}
 		}
-		return _input;
+		return input;
 	}
 
 	void onAsyncCopyExit(AsyncCopy* task)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		m_nCountCopy--;
 	}
 };

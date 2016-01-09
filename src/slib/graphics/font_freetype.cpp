@@ -53,7 +53,7 @@ public:
 
 	~_FreeType()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		FT_Done_Face(m_face);
 	}
 
@@ -62,9 +62,8 @@ public:
 	FT_Face m_face;
 	Memory m_mem;
 
-	static Ref<_FreeType> load(const Memory& _mem, sl_uint32 index)
+	static Ref<_FreeType> load(const Memory& mem, sl_uint32 index)
 	{
-		Memory mem = _mem;
 		if (mem.isNotEmpty()) {
 			Ref<_FreeTypeLibrary> libraryRef = new _FreeTypeLibrary;
 			if (libraryRef.isNotNull()) {
@@ -102,7 +101,7 @@ public:
 
 	sl_bool setSize(sl_uint32 width, sl_uint32 height)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		FT_Error err;
 		err = FT_Set_Pixel_Sizes(m_face, (FT_UInt)width, (FT_UInt)height);
 		if (err == 0) {
@@ -113,7 +112,7 @@ public:
 
 	Size getStringExtent(const sl_char16* sz, sl_uint32 len)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		Size ret;
 		if (len == 0) {
 			ret.x = 0;
@@ -146,13 +145,12 @@ public:
 		return ret;
 	}
 
-	void drawString(const Ref<Image>& _imageOutput, sl_int32 x, sl_int32 y, const sl_char16* sz, sl_uint32 len, const Color& color)
+	void drawString(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const sl_char16* sz, sl_uint32 len, const Color& color)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (len == 0) {
 			return;
 		}
-		Ref<Image> imageOutput = _imageOutput;
 		if (imageOutput.isNull()) {
 			return;
 		}
@@ -265,14 +263,13 @@ public:
 		_strokeString(imageOutput, x, y, sz, len, sl_true, sl_true, lineWidth, color);
 	}
 
-	void _strokeString(const Ref<Image>& _imageOutput, sl_int32 x, sl_int32 y, const sl_char16* sz, sl_uint32 len
+	void _strokeString(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const sl_char16* sz, sl_uint32 len
 		, sl_bool flagBorder, sl_bool flagOutside, sl_uint32 radius, const Color& color)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (len == 0) {
 			return;
 		}
-		Ref<Image> imageOutput = _imageOutput;
 		if (imageOutput.isNull()) {
 			return;
 		}

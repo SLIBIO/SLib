@@ -109,17 +109,17 @@ public:
 		_free();
 	}
 
-	SLIB_INLINE sl_size getCount()
+	SLIB_INLINE sl_size getCount() const
 	{
 		return m_nSize;
 	}
 
-	SLIB_INLINE sl_size getCapacity()
+	SLIB_INLINE sl_size getCapacity() const
 	{
 		return m_nCapacity;
 	}
 
-	sl_bool search(const KT& key, HashPosition* position = sl_null)
+	sl_bool search(const KT& key, HashPosition* position = sl_null) const
 	{
 		if (m_nCapacity == 0) {
 			return sl_false;
@@ -140,7 +140,7 @@ public:
 		return sl_false;
 	}
 
-	sl_bool getFirstPosition(HashPosition& position, KT* outKey = sl_null, VT* outValue = sl_null)
+	sl_bool getFirstPosition(HashPosition& position, KT* outKey = sl_null, VT* outValue = sl_null) const
 	{
 		if (m_nCapacity == 0) {
 			return sl_false;
@@ -164,7 +164,7 @@ public:
 		return sl_false;
 	}
 
-	sl_bool getNextPosition(HashPosition& position, KT* outKey = sl_null, VT* outValue = sl_null)
+	sl_bool getNextPosition(HashPosition& position, KT* outKey = sl_null, VT* outValue = sl_null) const
 	{
 		if (m_nCapacity == 0) {
 			return sl_false;
@@ -200,7 +200,7 @@ public:
 		return sl_false;
 	}
 
-	sl_bool getAt(const HashPosition& position, KT* outKey = sl_null, VT* outValue = sl_null)
+	sl_bool getAt(const HashPosition& position, KT* outKey = sl_null, VT* outValue = sl_null) const
 	{
 		if (m_nCapacity == 0) {
 			return sl_false;
@@ -218,7 +218,7 @@ public:
 		return sl_true;
 	}
 
-	sl_bool get(const KT& key, VT* value = sl_null)
+	sl_bool get(const KT& key, VT* value = sl_null) const
 	{
 		HashPosition pos;
 		if (search(key, &pos)) {
@@ -232,7 +232,7 @@ public:
 		}
 	}
 
-	VT* getItemPtr(const KT& key)
+	VT* getItemPtr(const KT& key) const
 	{
 		HashPosition pos;
 		if (search(key, &pos)) {
@@ -243,7 +243,7 @@ public:
 		}
 	}
 
-	List<VT> getValues(const KT& key)
+	List<VT> getValues(const KT& key) const
 	{
 		List<VT> ret;
 		if (m_nCapacity == 0) {
@@ -337,10 +337,10 @@ public:
 		return sl_true;
 	}
 
-	sl_bool remove(const KT& key, sl_bool flagAllKeys = sl_false)
+	sl_size remove(const KT& key, sl_bool flagAllKeys = sl_false)
 	{
 		if (m_nCapacity == 0) {
-			return sl_false;
+			return 0;
 		}
 		sl_uint32 hash = HASH::hash(key);
 		sl_uint32 index = hash & (m_nCapacity - 1);
@@ -348,6 +348,7 @@ public:
 		HashEntry** link = m_table + index;
 		HashEntry* entryDelete = sl_null;
 		HashEntry** linkDelete = &entryDelete;
+		sl_size oldSize = m_nSize;
 		while ((entry = *link)) {
 			if (entry->hash == hash && entry->key == key) {
 				*link = entry->next;
@@ -363,7 +364,7 @@ public:
 			}
 		}
 		if (!entryDelete) {
-			return sl_false;
+			return 0;
 		}
 		if (m_nSize <= m_nThresholdDown) {
 			// half capacity
@@ -387,19 +388,21 @@ public:
 			entryDelete = entryDelete->next;
 			delete entry;
 		}
-		return sl_true;
+		return oldSize - m_nSize;
 	}
 
-	void clear()
+	sl_size removeAll()
 	{
 		if (m_nCapacity == 0) {
-			return;
+			return 0;
 		}
+		sl_size oldSize = m_nSize;
 		_free();
 		_init();
+		return oldSize;
 	}
 
-	sl_bool copyFrom(HashTable<KT, VT, HASH>* other)
+	sl_bool copyFrom(const HashTable<KT, VT, HASH>* other)
 	{
 		_free();
 		m_nCapacityMin = other->m_nCapacityMin;

@@ -123,7 +123,7 @@ public:
 	
 	void release()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (!m_flagRunning) {
 			return;
 		}

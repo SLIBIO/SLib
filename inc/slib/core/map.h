@@ -8,10 +8,8 @@
 #include "hashtable.h"
 #include "tree.h"
 
-/************************************************************************/
-/* IMap Interface Declaration                                           */
-/************************************************************************/
 SLIB_NAMESPACE_BEGIN
+
 template <class KT, class VT>
 class SLIB_EXPORT Pair
 {
@@ -25,167 +23,111 @@ class SLIB_EXPORT IMap : public Object
 {
 	SLIB_DECLARE_OBJECT(IMap, Object)
 public:
-	IMap() {}
-	virtual sl_bool get(const KT& key, VT* out = sl_null) = 0;
-	virtual VT* getItemPtr(const KT& key) = 0;
-	virtual VT getValue(const KT& key, const VT& def) = 0;
-	virtual List<VT> getValues(const KT& key) = 0;
-	virtual sl_bool put(const KT& key, const VT& value, sl_bool flagReplace) = 0;
-	virtual sl_bool remove(const KT& key, sl_bool flagAllKeys) = 0;
-	virtual void clear() = 0;
-	virtual sl_bool containsKey(const KT& key) = 0;
-	virtual Iterator< Pair<KT, VT> > iterator();
-	virtual Iterator<KT> keyIterator();
-	virtual Iterator<VT> valueIterator();
-	virtual Ref< IMap<KT, VT> > duplicate() = 0;
-	virtual sl_size getCount() = 0;
-};
-
-template <class KT, class VT>
-class SLIB_EXPORT MapPairIterator : public IIterator< Pair<KT, VT> >
-{
-private:
-	Iterator<KT> m_key;
-	Iterator<VT> m_value;
-
+	SLIB_INLINE IMap() {}
+	
 public:
-	MapPairIterator(IMap<KT, VT>* map)
+	virtual sl_size getCount() const = 0;
+	
+	SLIB_INLINE sl_size count() const
 	{
-		m_key = map->keyIterator();
-		m_value = map->valueIterator();
+		return getCount();
 	}
-
-	~MapPairIterator()
+	
+	virtual VT* getItemPtr(const KT& key) const = 0;
+	
+	virtual sl_bool get(const KT& key, VT* _out = sl_null) const = 0;
+	
+	virtual VT getValue(const KT& key, const VT& def) const = 0;
+	
+	virtual List<VT> getValues(const KT& key) const = 0;
+	
+	virtual sl_bool put(const KT& key, const VT& value, sl_bool flagReplace = sl_true) = 0;
+	
+	template <class _KT, class _VT>
+	sl_bool put(IMap<_KT, _VT>* other, sl_bool flagReplace = sl_true)
 	{
-	}
-
-	sl_bool hasNext()
-	{
-		return m_key.hasNext();
-	}
-
-	sl_bool next(Pair<KT, VT>* out)
-	{
-		sl_bool b = m_key.next(&(out->key));
-		b = b && m_value.next(&(out->value));
-		return b;
-	}
-
-	sl_reg getIndex()
-	{
-		return m_key.getIndex();
-	}
-};
-
-template <class KT, class VT>
-Iterator< Pair<KT, VT> > IMap<KT, VT>::iterator()
-{
-	return new MapPairIterator<KT, VT>(this);
-}
-
-template <class KT, class VT>
-class SLIB_EXPORT MapKeyIterator : public IIterator<KT>
-{
-private:
-	Iterator< Pair<KT, VT> > m_pair;
-
-public:
-	MapKeyIterator(IMap<KT, VT>* map)
-	{
-		m_pair = map->iterator();
-	}
-
-	~MapKeyIterator()
-	{
-	}
-
-	sl_bool hasNext()
-	{
-		return m_pair.hasNext();
-	}
-
-	sl_bool next(KT* out)
-	{
-		Pair<KT, VT> pair;
-		sl_bool b = m_pair.next(&pair);
-		if (b) {
-			if (out) {
-				*out = pair.key;
+		if (!other) {
+			return sl_true;
+		}
+		if (this == other) {
+			return sl_false;
+		}
+		ObjectLocker lock(this, other);
+		Iterator< Pair<_KT,_VT> > iterator(other->iterator());
+		Pair<_KT, _VT> v;
+		while (iterator.next(&v)) {
+			if (!(put(v.key, v.value, flagReplace))) {
+				return sl_false;
 			}
 		}
-		return b;
+		return sl_true;
 	}
-
-	sl_reg getIndex()
+	
+	SLIB_INLINE sl_bool add(const KT& key, const VT& value)
 	{
-		return m_pair.getIndex();
+		return put(key, value, sl_false);
 	}
-};
+	
+	template <class _KT, class _VT>
+	SLIB_INLINE sl_bool add(const IMap<_KT, _VT>* other)
+	{
+		return put(other, sl_false);
+	}
+	
+	virtual sl_size remove(const KT& key, sl_bool flagAllKeys = sl_false) = 0;
+	
+	SLIB_INLINE sl_size removeAllMatchingKeys(const KT& key)
+	{
+		return remove(key, sl_true);
+	}
+	
+	virtual sl_size removeAll() = 0;
+	
+	virtual sl_bool containsKey(const KT& key) const = 0;
+	
+	virtual IMap<KT, VT>* duplicate() const = 0;
+	
+	
+	virtual Iterator<KT> keyIteratorWithRefer(const Referable* refer) const = 0;
+	
+	SLIB_INLINE Iterator<KT> keyIterator() const
+	{
+		return keyIteratorWithRefer(sl_null);
+	}
+	
+	virtual List<KT> keys() const = 0;
 
-template <class KT, class VT>
-Iterator<KT> IMap<KT, VT>::keyIterator()
-{
-	return new MapKeyIterator<KT, VT>(this);
-}
-
-template <class KT, class VT>
-class SLIB_EXPORT MapValueIterator : public IIterator<VT>
-{
-private:
-	Iterator< Pair<KT, VT> > m_pair;
-
+	
+	virtual Iterator<VT> valueIteratorWithRefer(const Referable* refer) const = 0;
+	
+	SLIB_INLINE Iterator<VT> valueIterator() const
+	{
+		return valueIteratorWithRefer(sl_null);
+	}
+	
+	virtual List<VT> values() const = 0;
+	
+	
+	virtual Iterator< Pair<KT, VT> > iteratorWithRefer(const Referable* refer) const = 0;
+	
+	SLIB_INLINE Iterator< Pair<KT, VT> > iterator() const
+	{
+		return iteratorWithRefer(sl_null);
+	}
+	
+	virtual List< Pair<KT, VT> > pairs() const = 0;
+	
 public:
-	MapValueIterator(IMap<KT, VT>* map)
-	{
-		m_pair = map->iterator();
-	}
+	static IMap<KT, VT>* createDefault();
 
-	~MapValueIterator()
-	{
-	}
-
-	sl_bool hasNext()
-	{
-		return m_pair.hasNext();
-	}
-
-	sl_bool next(VT* out)
-	{
-		Pair<KT, VT> pair;
-		sl_bool b = m_pair.next(&pair);
-		if (b) {
-			if (out) {
-				*out = pair.value;
-			}
-		}
-		return b;
-	}
-
-	sl_reg getIndex()
-	{
-		return m_pair.getIndex();
-	}
 };
 
-template <class KT, class VT>
-Iterator<VT> IMap<KT, VT>::valueIterator()
-{
-	return new MapValueIterator<KT, VT>(this);
-}
-SLIB_NAMESPACE_END
-
-/************************************************************************/
-/* ListMap class Definition                                             */
-/************************************************************************/
-SLIB_NAMESPACE_BEGIN
-template <class KT, class VT, class COMPARE = Compare<KT> >
+template < class KT, class VT, class COMPARE = Compare<KT> >
 class SLIB_EXPORT ListMap : public IMap<KT, VT>
 {
-	typedef IMap<KT, VT> BaseMap;
-	SLIB_DECLARE_OBJECT(ListMap, BaseMap)
-protected:
-	SLIB_INLINE ListMap(sl_size size = _SLIB_LIST_DEFAULT_SIZE) : m_list(size) {}
-	SLIB_INLINE ListMap(ListMap<KT, VT, COMPARE>* other) : m_list(&(other->m_list)) {}
+	typedef IMap<KT, VT> _Base;
+	typedef ListMap<KT, VT, COMPARE> _Type;
+	SLIB_DECLARE_OBJECT(ListMap, _Base)
 
 protected:
 	class PairCompare
@@ -201,196 +143,347 @@ protected:
 			return COMPARE::equals(a.key, b.key);
 		}
 	};
-	ListObject< Pair<KT, VT>, sl_false, PairCompare > m_list;
-
+	
+	CList< Pair<KT, VT>, PairCompare > m_list;
+	
 public:
-	static Ref< IMap<KT, VT> > create(sl_size size = _SLIB_LIST_DEFAULT_SIZE)
+	SLIB_INLINE ListMap() {}
+	
+public:
+	SLIB_INLINE static _Type* create()
 	{
-		Ref< ListMap<KT, VT, COMPARE> > ret;
-		ret = new ListMap<KT, VT, COMPARE>(size);
-		if (ret.isNotNull()) {
-			if (ret->m_list.getCapacity() == 0) {
-				ret.setNull();
-			}
-		}
-		return Ref< IMap<KT, VT> >::from(ret);
+		return new _Type;
 	}
 	
-	sl_bool get(const KT& key, VT* out)
+public:
+	// override
+	sl_size getCount() const
 	{
-		MutexLocker locker(this->getLocker());
+		return m_list.count();
+	}
+	
+	// override
+	VT* getItemPtr(const KT& key) const
+	{
 		Pair<KT, VT> pair;
 		pair.key = key;
-		sl_reg index = m_list.indexOf(pair);
+		sl_reg index = m_list.indexOf_NoLock(pair);
 		if (index >= 0) {
-			Pair<KT, VT>* p = m_list.getItemPtr(index);
-			if (out) {
-				*out = p->value;
+			Pair<KT, VT>* p = m_list.data() + index;
+			return &(p->value);
+		}
+		return sl_null;
+	}
+	
+	// override
+	sl_bool get(const KT& key, VT* _out) const
+	{
+		ObjectLocker lock(this);
+		Pair<KT, VT> pair;
+		pair.key = key;
+		sl_reg index = m_list.indexOf_NoLock(pair);
+		if (index >= 0) {
+			if (_out) {
+				*_out = m_list[index].value;
 			}
 			return sl_true;
-		} else {
-			return sl_false;
 		}
+		return sl_false;
 	}
 
-	VT* getItemPtr(const KT& key)
+	// override
+	VT getValue(const KT& key, const VT& def) const
 	{
+		ObjectLocker lock(this);
 		Pair<KT, VT> pair;
 		pair.key = key;
-		sl_reg index = m_list.indexOf(pair);
+		sl_reg index = m_list.indexOf_NoLock(pair);
 		if (index >= 0) {
-			Pair<KT, VT>* p = m_list.getItemPtr(index);
-			return &(p->value);
-		} else {
-			return sl_null;
+			return m_list[index].value;
 		}
+		return def;
 	}
 
-	VT getValue(const KT& key, const VT& def)
+	// override
+	List<VT> getValues(const KT& key) const
 	{
-		MutexLocker locker(this->getLocker());
-		Pair<KT, VT> pair;
-		pair.key = key;
-		sl_reg index = m_list.indexOf(pair);
-		if (index >= 0) {
-			Pair<KT, VT>* p = m_list.getItemPtr(index);
-			return p->value;
-		} else {
-			return def;
-		}
-	}
-
-	List<VT> getValues(const KT& key)
-	{
-		List<VT> ret;
-		MutexLocker locker(this->getLocker());
-		Pair<KT, VT>* list = m_list.getBuffer();
-		for (sl_size i = 0; i < m_list.getCount(); i++) {
-			if (COMPARE::equals(list[i].key, key)) {
-				ret.add(list[i].value);
+		CList<VT>* ret = new CList<VT>;
+		if (ret) {
+			ObjectLocker lock(this);
+			Pair<KT, VT>* data = m_list.data();
+			sl_size count = m_list.count();
+			for (sl_size i = 0; i < count; i++) {
+				if (COMPARE::equals(data[i].key, key)) {
+					ret->add_NoLock(data[i].value);
+				}
 			}
+			if (ret->count() > 0) {
+				return ret;
+			}
+			delete ret;
 		}
-		return ret;
+		return List<VT>::null();
 	}
 
+	// override
 	sl_bool put(const KT& key, const VT& value, sl_bool flagReplace = sl_true)
 	{
-		MutexLocker locker(this->getLocker());
+		ObjectLocker lock(this);
 		if (flagReplace) {
 			Pair<KT, VT> pair;
 			pair.key = key;
-			sl_reg index = m_list.indexOf(pair);
+			sl_reg index = m_list.indexOf_NoLock(pair);
 			if (index >= 0) {
-				Pair<KT, VT>* p = m_list.getItemPtr(index);
-				p->value = value;
+				m_list[index].value = value;
 				return sl_true;
 			}
 		}
 		Pair<KT, VT> pair;
 		pair.key = key;
 		pair.value = value;
-		if (!(m_list.add(pair))) {
-			return sl_false;
+		if (m_list.add_NoLock(pair)) {
+			return sl_true;
 		}
-		return sl_true;
+		return sl_false;
 	}
 
-	sl_bool remove(const KT& key, sl_bool flagAllKeys = sl_false)
+	// override
+	sl_size remove(const KT& key, sl_bool flagAllKeys = sl_false)
 	{
-		MutexLocker locker(this->getLocker());
+		ObjectLocker lock(this);
 		Pair<KT, VT> pair;
 		pair.key = key;
-		return m_list.removeValue(pair, flagAllKeys);
+		return m_list.removeValue_NoLock(pair, flagAllKeys);
 	}
 
-	void clear()
+	// override
+	sl_size removeAll()
 	{
-		MutexLocker locker(this->getLocker());
-		m_list.clear();
+		ObjectLocker lock(this);
+		return m_list.removeAll_NoLock();
 	}
 
-	sl_bool containsKey(const KT& key)
+	// override
+	sl_bool containsKey(const KT& key) const
 	{
-		MutexLocker locker(this->getLocker());
+		ObjectLocker lock(this);
 		Pair<KT, VT> pair;
 		pair.key = key;
-		return (m_list.indexOf(pair) >= 0);
+		return (m_list.indexOf_NoLock(pair) >= 0);
 	}
-
-	sl_size getCount()
+	
+	// override
+	IMap<KT, VT>* duplicate() const
 	{
-		return m_list.getCount();
+		ObjectLocker lock(this);
+		_Type* ret = new _Type;
+		if (ret) {
+			if (ret->m_list.add_NoLock(m_list.data(), m_list.count())) {
+				return ret;
+			}
+			delete ret;
+		}
+		return sl_null;
 	}
-
-	class ListIterator : public IIterator< Pair<KT, VT> >
+	
+	class ListKeyIterator : public IIterator<KT>
 	{
 	protected:
-		Ref< ListMap<KT, VT, COMPARE> > m_map;
+		const ListMap<KT, VT, COMPARE>* m_map;
 		sl_size m_index;
-
+		Ref<Referable> m_refer;
+		
 	public:
-		ListIterator(const Ref< ListMap<KT, VT, COMPARE> >& map)
+		SLIB_INLINE ListKeyIterator(const ListMap<KT, VT, COMPARE>* map, const Referable* refer)
 		{
-			m_index = 0;
 			m_map = map;
+			m_index = 0;
+			m_refer = refer;
 		}
-
-		~ListIterator()
-		{
-		}
-
+		
+	public:
+		// override
 		sl_bool hasNext()
 		{
 			return (m_index < m_map->getCount());
 		}
-
-		sl_bool next(Pair<KT, VT>* out)
+		
+		// override
+		sl_bool next(KT* _out)
 		{
-			MutexLocker lock(m_map->getLocker());
-			if (m_map->m_list.getItem(m_index, out)) {
+			Pair<KT, VT> pair;
+			if (m_map->m_list.getItem(m_index, &pair)) {
+				if (_out) {
+					*_out = pair.key;
+				}
 				m_index++;
 				return sl_true;
 			}
 			return sl_false;
 		}
-
+		
+		// override
 		sl_reg getIndex()
 		{
 			return (sl_reg)m_index - 1;
 		}
 	};
-
-	Iterator< Pair<KT, VT> > iterator()
+	
+	// override
+	Iterator<KT> keyIteratorWithRefer(const Referable* refer) const
 	{
-		return new ListIterator(this);
+		return new ListKeyIterator(this, refer);
 	}
-
-	Ref< IMap<KT, VT> > duplicate()
+	
+	// override
+	List<KT> keys() const
 	{
-		MutexLocker locker(this->getLocker());
-		Ref< ListMap<KT, VT> > ret;
-		ret = new ListMap<KT, VT>(*this);
-		if (ret.isNotNull()) {
-			if (ret->m_list.getCapacity() == 0) {
-				ret.setNull();
+		CList<KT>* ret = new CList<KT>;
+		if (ret) {
+			ObjectLocker lock(this);
+			Pair<KT, VT>* dataSrc = m_list.data();
+			sl_size count = m_list.count();
+			if (ret->setCount_NoLock(count)) {
+				KT* dataDst = ret->data();
+				for (sl_size i = 0; i < count; i++) {
+					dataDst[i] = dataSrc[i].key;
+				}
+				return ret;
 			}
+			delete ret;
 		}
-		return Ref< IMap<KT, VT> >::from(ret);
+		return List<KT>::null();
+	}
+	
+	class ListValueIterator : public IIterator<VT>
+	{
+	protected:
+		const ListMap<KT, VT, COMPARE>* m_map;
+		sl_size m_index;
+		Ref<Referable> m_refer;
+		
+	public:
+		SLIB_INLINE ListValueIterator(const ListMap<KT, VT, COMPARE>* map, const Referable* refer)
+		{
+			m_map = map;
+			m_index = 0;
+			m_refer = refer;
+		}
+		
+	public:
+		// override
+		sl_bool hasNext()
+		{
+			return (m_index < m_map->getCount());
+		}
+		
+		// override
+		sl_bool next(VT* _out)
+		{
+			Pair<KT, VT> pair;
+			if (m_map->m_list.getItem(m_index, &pair)) {
+				if (_out) {
+					*_out = pair.value;
+				}
+				m_index++;
+				return sl_true;
+			}
+			return sl_false;
+		}
+		
+		// override
+		sl_reg getIndex()
+		{
+			return (sl_reg)m_index - 1;
+		}
+	};
+	
+	// override
+	Iterator<VT> valueIteratorWithRefer(const Referable* refer) const
+	{
+		return new ListValueIterator(this, refer);
+	}
+	
+	// override
+	List<VT> values() const
+	{
+		CList<VT>* ret = new CList<VT>;
+		if (ret) {
+			ObjectLocker lock(this);
+			Pair<KT, VT>* dataSrc = m_list.data();
+			sl_size count = m_list.count();
+			if (ret->setCount_NoLock(count)) {
+				VT* dataDst = ret->data();
+				for (sl_size i = 0; i < count; i++) {
+					dataDst[i] = dataSrc[i].value;
+				}
+				return ret;
+			}
+			delete ret;
+		}
+		return List<VT>::null();
+	}
+	
+	class ListMapIterator : public IIterator< Pair<KT, VT> >
+	{
+	protected:
+		const ListMap<KT, VT, COMPARE>* m_map;
+		sl_size m_index;
+		Ref<Referable> m_refer;
+		
+	public:
+		SLIB_INLINE ListMapIterator(const ListMap<KT, VT, COMPARE>* map, const Referable* refer)
+		{
+			m_map = map;
+			m_index = 0;
+			m_refer = refer;
+		}
+		
+	public:
+		// override
+		sl_bool hasNext()
+		{
+			return (m_index < m_map->getCount());
+		}
+		
+		// override
+		sl_bool next(Pair<KT, VT>* _out)
+		{
+			if (m_map->m_list.getItem(m_index, _out)) {
+				m_index++;
+				return sl_true;
+			}
+			return sl_false;
+		}
+		
+		// override
+		sl_reg getIndex()
+		{
+			return (sl_reg)m_index - 1;
+		}
+	};
+	
+	// override
+	Iterator< Pair<KT, VT> > iteratorWithRefer(const Referable* refer) const
+	{
+		return new ListMapIterator(this, refer);
+	}
+	
+	// override
+	List< Pair<KT, VT> > pairs() const
+	{
+		return m_list.duplicate();
 	}
 
 };
-SLIB_NAMESPACE_END
 
-
-/************************************************************************
-	HashMap class Definition
-************************************************************************/
-SLIB_NAMESPACE_BEGIN
 template < class KT, class VT, class HASH = Hash<KT> >
 class SLIB_EXPORT HashMap : public IMap<KT, VT>
 {
-	typedef IMap<KT, VT> BaseMap;
-	SLIB_DECLARE_OBJECT(HashMap, BaseMap)
+	typedef IMap<KT, VT> _Base;
+	typedef HashMap<KT, VT, HASH> _Type;
+	SLIB_DECLARE_OBJECT(HashMap, _Base)
+	
 protected:
 	HashTable<KT, VT, HASH> m_table;
 
@@ -398,259 +491,363 @@ public:
 	SLIB_INLINE HashMap(sl_uint32 capacity = SLIB_HASHTABLE_DEFAULT_CAPACITY) : m_table(capacity)
 	{
 	}
+	
+public:
+	SLIB_INLINE static _Type* create(sl_uint32 capacity = SLIB_HASHTABLE_DEFAULT_CAPACITY)
+	{
+		_Type* ret = new _Type(capacity);
+		if (ret) {
+			if (ret->m_table.getCapacity() > 0) {
+				return ret;
+			}
+			delete ret;
+		}
+		return sl_null;
+	}
 
 public:
-	static Ref< IMap<KT, VT> > create(sl_uint32 capacity = SLIB_HASHTABLE_DEFAULT_CAPACITY)
+	// override
+	sl_size getCount() const
 	{
-		Ref< HashMap<KT, VT, HASH> > ret = new HashMap<KT, VT, HASH>(capacity);
-		if (ret.isNotNull()) {
-			if (ret->m_table.getCapacity()) {
-				return Ref< IMap<KT, VT> >::from(ret);
-			}
-		}
-		return Ref< IMap<KT, VT> >::null();
+		ObjectLocker lock(this);
+		return (sl_size)(m_table.getCount());
 	}
-
-	sl_bool get(const KT& key, VT* out)
-	{
-		MutexLocker locker(this->getLocker());
-		return m_table.get(key, out);
-	}
-
-	VT* getItemPtr(const KT& key)
+	
+	// override
+	VT* getItemPtr(const KT& key) const
 	{
 		return m_table.getItemPtr(key);
 	}
 
-	VT getValue(const KT& key, const VT& def)
+	// override
+	sl_bool get(const KT& key, VT* _out) const
 	{
-		MutexLocker locker(this->getLocker());
+		ObjectLocker lock(this);
+		return m_table.get(key, _out);
+	}
+
+	// override
+	VT getValue(const KT& key, const VT& def) const
+	{
+		ObjectLocker lock(this);
 		VT ret;
 		if (m_table.get(key, &ret)) {
 			return ret;
-		} else {
-			return def;
 		}
+		return def;
 	}
 
-	List<VT> getValues(const KT& key)
+	// override
+	List<VT> getValues(const KT& key) const
 	{
-		MutexLocker locker(this->getLocker());
+		ObjectLocker lock(this);
 		return m_table.getValues(key);
 	}
 
+	// override
 	sl_bool put(const KT& key, const VT& value, sl_bool flagReplace = sl_true)
 	{
-		MutexLocker locker(this->getLocker());
+		ObjectLocker lock(this);
 		return m_table.put(key, value, flagReplace);
 	}
 
-	sl_bool remove(const KT& key, sl_bool flagAllKeys = sl_false)
+	// override
+	sl_size remove(const KT& key, sl_bool flagAllKeys = sl_false)
 	{
-		MutexLocker locker(this->getLocker());
+		ObjectLocker lock(this);
 		return m_table.remove(key, flagAllKeys);
 	}
 
-	void clear()
+	// override
+	sl_size removeAll()
 	{
-		MutexLocker locker(this->getLocker());
-		m_table.clear();
+		ObjectLocker lock(this);
+		return m_table.removeAll();
 	}
 
-	sl_bool containsKey(const KT& key)
+	// override
+	sl_bool containsKey(const KT& key) const
 	{
-		MutexLocker locker(this->getLocker());
+		ObjectLocker lock(this);
 		return m_table.search(key);
+	}
+
+	// override
+	IMap<KT, VT>* duplicate() const
+	{
+		ObjectLocker lock(this);
+		_Type* ret = new _Type;
+		if (ret) {
+			if (ret->m_table.copyFrom(&m_table)) {
+				return ret;
+			}
+			delete ret;
+		}
+		return sl_null;
 	}
 
 	class HashKeyIterator : public IIterator<KT>
 	{
-	public:
+	protected:
+		const HashMap<KT, VT, HASH>* m_map;
 		HashPosition m_pos;
-		Ref< HashMap<KT, VT, HASH> > m_map;
 		sl_size m_index;
+		Ref<Referable> m_refer;
 
-		HashKeyIterator(const Ref< HashMap<KT, VT, HASH> >& map)
+	public:
+		SLIB_INLINE HashKeyIterator(const HashMap<KT, VT, HASH>* map, const Referable* refer)
 		{
 			m_map = map;
 			m_index = 0;
+			m_refer = refer;
 		}
 
-		~HashKeyIterator()
-		{
-		}
-
+	public:
+		// override
 		sl_bool hasNext()
 		{
-			MutexLocker lock(m_map->getLocker());
+			ObjectLocker lock(m_map);
 			HashPosition pos = m_pos;
 			return m_map->m_table.getNextPosition(pos);
 		}
-		sl_bool next(KT* out)
+		
+		// override
+		sl_bool next(KT* _out)
 		{
-			MutexLocker lock(m_map->getLocker());
-			if (m_map->m_table.getNextPosition(m_pos, out, sl_null)) {
+			ObjectLocker lock(m_map);
+			if (m_map->m_table.getNextPosition(m_pos, _out, sl_null)) {
 				m_index++;
 				return sl_true;
 			}
 			return sl_false;
 		}
+		
+		// override
 		sl_reg getIndex()
 		{
 			return (sl_reg)m_index - 1;
 		}
 	};
-	Iterator<KT> keyIterator()
+	
+	// override
+	Iterator<KT> keyIteratorWithRefer(const Referable* refer) const
 	{
-		return new HashKeyIterator(this);
+		return new HashKeyIterator(this, refer);
 	}
 
+	// override
+	List<KT> keys() const
+	{
+		CList<KT>* ret = new CList<KT>;
+		if (ret) {
+			ObjectLocker lock(this);
+			HashPosition pos;
+			KT key;
+			while (m_table.getNextPosition(pos, &key, sl_null)) {
+				if (!(ret->add_NoLock(key))) {
+					delete ret;
+					return List<KT>::null();
+				}
+			}
+			return ret;
+		}
+		return List<KT>::null();
+	}
+	
 	class HashValueIterator : public IIterator<VT>
 	{
-	public:
+	protected:
+		const HashMap<KT, VT, HASH>* m_map;
 		HashPosition m_pos;
-		Ref< HashMap<KT, VT, HASH> > m_map;
 		sl_size m_index;
+		Ref<Referable> m_refer;
 
-		HashValueIterator(const Ref< HashMap<KT, VT, HASH> >& map)
+	public:
+		SLIB_INLINE HashValueIterator(const HashMap<KT, VT, HASH>* map, const Referable* refer)
 		{
 			m_map = map;
 			m_index = 0;
+			m_refer = refer;
 		}
-		~HashValueIterator()
-		{
-		}
-
+		
+	public:
+		// override
 		sl_bool hasNext()
 		{
-			MutexLocker lock(m_map->getLocker());
+			ObjectLocker lock(m_map);
 			HashPosition pos = m_pos;
 			return m_map->m_table.getNextPosition(pos);
 		}
-		sl_bool next(VT* out)
+		
+		// override
+		sl_bool next(VT* _out)
 		{
-			MutexLocker lock(m_map->getLocker());
-			if (m_map->m_table.getNextPosition(m_pos, sl_null, out)) {
+			ObjectLocker lock(m_map);
+			if (m_map->m_table.getNextPosition(m_pos, sl_null, _out)) {
 				m_index++;
 				return sl_true;
 			}
 			return sl_false;
 		}
+		
+		// override
 		sl_reg getIndex()
 		{
 			return (sl_reg)m_index - 1;
 		}
 	};
-	Iterator<VT> valueIterator()
+	
+	// override
+	Iterator<VT> valueIteratorWithRefer(const Referable* refer) const
 	{
-		return new HashValueIterator(this);
+		return new HashValueIterator(this, refer);
 	}
-
+	
+	// override
+	List<VT> values() const
+	{
+		CList<VT>* ret = new CList<VT>;
+		if (ret) {
+			ObjectLocker lock(this);
+			HashPosition pos;
+			VT value;
+			while (m_table.getNextPosition(pos, sl_null, &value)) {
+				if (!(ret->add_NoLock(value))) {
+					delete ret;
+					return List<VT>::null();
+				}
+			}
+			return ret;
+		}
+		return List<VT>::null();
+	}
+	
 	class HashIterator : public IIterator< Pair<KT, VT> >
 	{
-	public:
+	protected:
+		const HashMap<KT, VT, HASH>* m_map;
 		HashPosition m_pos;
-		Ref< HashMap<KT, VT, HASH> > m_map;
 		sl_size m_index;
+		Ref<Referable> m_refer;
 
-		HashIterator(const Ref< HashMap<KT, VT, HASH> >& map)
+	public:
+		SLIB_INLINE HashIterator(const HashMap<KT, VT, HASH>* map, const Referable* refer)
 		{
 			m_map = map;
 			m_index = 0;
+			m_refer = refer;
 		}
-		~HashIterator()
-		{
-		}
-
+		
+	public:
+		// override
 		sl_bool hasNext()
 		{
-			MutexLocker lock(m_map->getLocker());
+			ObjectLocker lock(m_map);
 			HashPosition pos = m_pos;
 			return m_map->m_table.getNextPosition(pos, sl_null, sl_null);
 		}
+		
+		// override
 		sl_bool next(Pair<KT, VT>* out)
 		{
-			MutexLocker lock(m_map->getLocker());
+			ObjectLocker lock(m_map);
 			if (m_map->m_table.getNextPosition(m_pos, &(out->key), &(out->value))) {
 				m_index++;
 				return sl_true;
 			}
 			return sl_false;
 		}
+		
+		// override
 		sl_reg getIndex()
 		{
 			return (sl_reg)m_index - 1;
 		}
 	};
-	Iterator< Pair<KT, VT> > iterator()
+	
+	// override
+	Iterator< Pair<KT, VT> > iteratorWithRefer(const Referable* refer) const
 	{
-		return new HashIterator(this);
+		return new HashIterator(this, refer);
 	}
-
-	Ref< IMap<KT, VT> > duplicate()
+	
+	// override
+	List< Pair<KT, VT> > pairs() const
 	{
-		MutexLocker locker(this->getLocker());
-		Ref< HashMap<KT, VT, HASH> > ret = new HashMap<KT, VT, HASH>();
-		if (ret.isNotNull()) {
-			if (ret->m_table.copyFrom(&m_table)) {
-				return Ref< IMap<KT, VT> >::from(ret);
+		CList< Pair<KT, VT> >* ret = new CList< Pair<KT, VT> >;
+		if (ret) {
+			ObjectLocker lock(this);
+			HashPosition pos;
+			Pair<KT, VT> pair;
+			while (m_table.getNextPosition(pos, &(pair.key), &(pair.value))) {
+				if (!(ret->add_NoLock(pair))) {
+					delete ret;
+					return List< Pair<KT, VT> >::null();
+				}
 			}
+			return ret;
 		}
-		return Ref< IMap<KT, VT> >::null();
+		return List< Pair<KT, VT> >::null();
 	}
 
-	sl_size getCount()
-	{
-		MutexLocker locker(this->getLocker());
-		return (sl_size)(m_table.getCount());
-	}
 };
-SLIB_NAMESPACE_END
 
-
-/************************************************************************
+/*
  TreeMap class Definition                                             
 	Now TreeMap is based on BTree, but should be changed to Red-Black
 	Tree implementation which is a little better for in-memory structure.
-************************************************************************/
-SLIB_NAMESPACE_BEGIN
+*/
 template < class KT, class VT, class COMPARE=Compare<KT> >
 class SLIB_EXPORT TreeMap : public IMap<KT, VT>
 {
-	typedef IMap<KT, VT> BaseMap;
-	SLIB_DECLARE_OBJECT(TreeMap, BaseMap)
+	typedef IMap<KT, VT> _Base;
+	typedef TreeMap<KT, VT, COMPARE> _Type;
+	SLIB_DECLARE_OBJECT(TreeMap, _Base)
+	
 protected:
 	BTree<KT, VT, COMPARE> m_tree;
 
-protected:
+public:
 	SLIB_INLINE TreeMap() {}
 
 public:
-	static Ref< IMap<KT, VT> > create()
+	SLIB_INLINE static _Type* create()
 	{
-		Ref< TreeMap<KT, VT, COMPARE> > ret = new TreeMap<KT, VT, COMPARE>();
-		if (ret.isNotNull()) {
+		_Type* ret = new _Type;
+		if (ret) {
 			if (ret->m_tree.isValid()) {
-				return Ref< IMap<KT, VT> >::from(ret);
+				return ret;
 			}
+			delete ret;
 		}
-		return Ref< IMap<KT, VT> >::null();
+		return sl_null;
 	}
 
-	sl_bool get(const KT& key, VT* out)
+public:
+	// override
+	sl_size getCount() const
 	{
-		MutexLocker locker(this->getLocker());
-		return m_tree.get(key, out);
+		ObjectLocker lock(this);
+		return (sl_size)(m_tree.getCount());
 	}
-
-	VT* getItemPtr(const KT& key)
+	
+	// override
+	VT* getItemPtr(const KT& key) const
 	{
 		return m_tree.getItemPtr(key);
 	}
 
-	VT getValue(const KT& key, const VT& def)
+	// override
+	sl_bool get(const KT& key, VT* _out) const
 	{
-		MutexLocker locker(this->getLocker());
+		ObjectLocker lock(this);
+		return m_tree.get(key, _out);
+	}
+
+	// override
+	VT getValue(const KT& key, const VT& def) const
+	{
+		ObjectLocker lock(this);
 		VT ret;
 		if (m_tree.get(key, &ret)) {
 			return ret;
@@ -659,235 +856,337 @@ public:
 		}
 	}
 
-	List<VT> getValues(const KT& key)
+	// override
+	List<VT> getValues(const KT& key) const
 	{
-		MutexLocker locker(this->getLocker());
+		ObjectLocker lock(this);
 		return m_tree.getValues(key);
 	}
 
+	// override
 	sl_bool put(const KT& key, const VT& value, sl_bool flagReplace = sl_true)
 	{
-		MutexLocker locker(this->getLocker());
+		ObjectLocker lock(this);
 		return m_tree.insert(key, value, flagReplace);
 	}
 
-	sl_bool remove(const KT& key, sl_bool flagAllKeys = sl_false)
+	// override
+	sl_size remove(const KT& key, sl_bool flagAllKeys = sl_false)
 	{
-		MutexLocker locker(this->getLocker());
+		ObjectLocker lock(this);
 		return m_tree.remove(key, flagAllKeys);
 	}
 
-	void clear()
+	// override
+	sl_size removeAll()
 	{
-		MutexLocker locker(this->getLocker());
-		m_tree.clear();
+		ObjectLocker lock(this);
+		return m_tree.removeAll();
 	}
 
-	sl_bool containsKey(const KT& key)
+	// override
+	sl_bool containsKey(const KT& key) const
 	{
-		MutexLocker locker(this->getLocker());
+		ObjectLocker lock(this);
 		return m_tree.search(key, sl_null);
 	}
-
-	class TreeKeyIterator : public IIterator<KT>
+	
+	// override
+	IMap<KT, VT>* duplicate() const
 	{
-	public:
-		TreePosition m_pos;
-		Ref< TreeMap<KT, VT, COMPARE> > m_map;
-		sl_size m_index;
-
-		TreeKeyIterator(const Ref< TreeMap<KT, VT, COMPARE> > map)
-		{
-			m_map = map;
-			m_index = 0;
-		}
-		~TreeKeyIterator()
-		{
-		}
-
-		sl_bool hasNext()
-		{
-			MutexLocker lock(m_map->getLocker());
-			TreePosition pos = m_pos;
-			return m_map->m_tree.getNextPosition(pos);
-		}
-		sl_bool next(KT* out)
-		{
-			MutexLocker lock(m_map->getLocker());
-			if (m_map->m_tree.getNextPosition(m_pos, out, sl_null)) {
-				m_index++;
-				return sl_true;
-			}
-			return sl_false;
-		}
-		sl_reg getIndex()
-		{
-			return (sl_reg)m_index - 1;
-		}
-	};
-	Iterator<KT> keyIterator()
-	{
-		return new TreeKeyIterator(this);
-	}
-
-	class TreeValueIterator: public IIterator<VT>
-	{
-	public:
-		TreePosition m_pos;
-		Ref< TreeMap<KT, VT, COMPARE> > m_map;
-		sl_size m_index;
-
-		TreeValueIterator(const Ref< TreeMap<KT, VT, COMPARE> >& map)
-		{
-			m_map = map;
-			m_index = 0;
-		}
-		~TreeValueIterator()
-		{
-		}
-
-		sl_bool hasNext()
-		{
-			MutexLocker lock(m_map->getLocker());
-			TreePosition pos = m_pos;
-			return m_map->m_tree.getNextPosition(pos);
-		}
-		sl_bool next(VT* out)
-		{
-			MutexLocker lock(m_map->getLocker());
-			if (m_map->m_tree.getNextPosition(m_pos, sl_null, out)) {
-				m_index++;
-				return sl_true;
-			}
-			return sl_false;
-		}
-		sl_reg getIndex()
-		{
-			return (sl_reg)m_index - 1;
-		}
-	};
-	Iterator<VT> valueIterator()
-	{
-		return new TreeValueIterator(this);
-	}
-
-	class TreeIterator : public IIterator< Pair<KT, VT> >
-	{
-	public:
-		TreePosition m_pos;
-		Ref< TreeMap<KT, VT, COMPARE> > m_map;
-		sl_size m_index;
-
-		TreeIterator(const Ref< TreeMap<KT, VT, COMPARE> >& map)
-		{
-			m_map = map;
-			m_index = 0;
-		}
-		~TreeIterator()
-		{
-		}
-
-		sl_bool hasNext()
-		{
-			MutexLocker lock(m_map->getLocker());
-			TreePosition pos = m_pos;
-			return m_map->m_tree.getNextPosition(pos);
-		}
-		sl_bool next(Pair<KT, VT>* out)
-		{
-			MutexLocker lock(m_map->getLocker());
-			if (m_map->m_tree.getNextPosition(m_pos, &(out->key), &(out->value))) {
-				m_index++;
-				return sl_true;
-			}
-			return sl_false;
-		}
-		sl_reg getIndex()
-		{
-			return (sl_reg)m_index - 1;
-		}
-	};
-	Iterator< Pair<KT, VT> > iterator()
-	{
-		return new TreeIterator(this);
-	}
-
-	Ref< IMap<KT, VT> > duplicate()
-	{
-		MutexLocker locker(this->getLocker());
-		Ref< TreeMap<KT, VT, COMPARE> > ret = new TreeMap<KT, VT, COMPARE>;
-		if (ret.isNotNull()) {
+		ObjectLocker lock(this);
+		_Type* ret = new _Type;
+		if (ret) {
 			TreePosition pos;
 			KT key;
 			VT value;
 			while (m_tree.getNextPosition(pos, &key, &value)) {
 				if (!(ret->m_tree.insert(key, value, sl_false))) {
-					return Ref< IMap<KT, VT> >::null();
+					delete ret;
+					return sl_null;
 				}
 			}
-			return Ref< IMap<KT, VT> >::from(ret);
+			return ret;
 		}
-		return Ref< IMap<KT, VT> >::null();
+		return sl_null;
 	}
 
-	sl_size getCount()
+	class TreeKeyIterator : public IIterator<KT>
 	{
-		MutexLocker locker(this->getLocker());
-		return (sl_size)(m_tree.getCount());
+	protected:
+		const TreeMap<KT, VT, COMPARE>* m_map;
+		TreePosition m_pos;
+		sl_size m_index;
+		Ref<Referable> m_refer;
+
+	public:
+		SLIB_INLINE TreeKeyIterator(const TreeMap<KT, VT, COMPARE>* map, const Referable* refer)
+		{
+			m_map = map;
+			m_index = 0;
+			m_refer = refer;
+		}
+
+	public:
+		// override
+		sl_bool hasNext()
+		{
+			ObjectLocker lock(m_map);
+			TreePosition pos = m_pos;
+			return m_map->m_tree.getNextPosition(pos);
+		}
+		
+		// override
+		sl_bool next(KT* _out)
+		{
+			ObjectLocker lock(m_map);
+			if (m_map->m_tree.getNextPosition(m_pos, _out, sl_null)) {
+				m_index++;
+				return sl_true;
+			}
+			return sl_false;
+		}
+		
+		// override
+		sl_reg getIndex()
+		{
+			return (sl_reg)m_index - 1;
+		}
+	};
+	
+	// override
+	Iterator<KT> keyIteratorWithRefer(const Referable* refer) const
+	{
+		return new TreeKeyIterator(this, refer);
+	}
+	
+	// override
+	List<KT> keys() const
+	{
+		CList<KT>* ret = new CList<KT>;
+		if (ret) {
+			ObjectLocker lock(this);
+			TreePosition pos;
+			KT key;
+			while (m_tree.getNextPosition(pos, &key, sl_null)) {
+				if (!(ret->add_NoLock(key))) {
+					delete ret;
+					return List<KT>::null();
+				}
+			}
+			return ret;
+		}
+		return List<KT>::null();
+	}
+
+	class TreeValueIterator: public IIterator<VT>
+	{
+	protected:
+		const TreeMap<KT, VT, COMPARE>* m_map;
+		TreePosition m_pos;
+		sl_size m_index;
+		Ref<Referable> m_refer;
+
+	public:
+		SLIB_INLINE TreeValueIterator(const TreeMap<KT, VT, COMPARE>* map, const Referable* refer)
+		{
+			m_map = map;
+			m_index = 0;
+			m_refer = refer;
+		}
+
+	public:
+		// override
+		sl_bool hasNext()
+		{
+			ObjectLocker lock(m_map);
+			TreePosition pos = m_pos;
+			return m_map->m_tree.getNextPosition(pos);
+		}
+		
+		// override
+		sl_bool next(VT* _out)
+		{
+			ObjectLocker lock(m_map);
+			if (m_map->m_tree.getNextPosition(m_pos, sl_null, _out)) {
+				m_index++;
+				return sl_true;
+			}
+			return sl_false;
+		}
+		
+		// override
+		sl_reg getIndex()
+		{
+			return (sl_reg)m_index - 1;
+		}
+	};
+	
+	// override
+	Iterator<VT> valueIteratorWithRefer(const Referable* refer) const
+	{
+		return new TreeValueIterator(this, refer);
+	}
+	
+	// override
+	List<VT> values() const
+	{
+		CList<VT>* ret = new CList<VT>;
+		if (ret) {
+			ObjectLocker lock(this);
+			TreePosition pos;
+			VT value;
+			while (m_tree.getNextPosition(pos, sl_null, &value)) {
+				if (!(ret->add_NoLock(value))) {
+					delete ret;
+					return List<VT>::null();
+				}
+			}
+			return ret;
+		}
+		return List<VT>::null();
+	}
+
+	class TreeIterator : public IIterator< Pair<KT, VT> >
+	{
+	protected:
+		const TreeMap<KT, VT, COMPARE>* m_map;
+		TreePosition m_pos;
+		sl_size m_index;
+		Ref<Referable> m_refer;
+
+	public:
+		TreeIterator(const TreeMap<KT, VT, COMPARE>* map, const Referable* refer)
+		{
+			m_map = map;
+			m_index = 0;
+			m_refer = refer;
+		}
+
+	public:
+		// override
+		sl_bool hasNext()
+		{
+			ObjectLocker lock(m_map);
+			TreePosition pos = m_pos;
+			return m_map->m_tree.getNextPosition(pos);
+		}
+		
+		// override
+		sl_bool next(Pair<KT, VT>* _out)
+		{
+			ObjectLocker lock(m_map);
+			if (_out) {
+				if (m_map->m_tree.getNextPosition(m_pos, &(_out->key), &(_out->value))) {
+					m_index++;
+					return sl_true;
+				}
+			} else {
+				if (m_map->m_tree.getNextPosition(m_pos, sl_null, sl_null)) {
+					m_index++;
+					return sl_true;
+				}
+			}
+			return sl_false;
+		}
+		
+		// override
+		sl_reg getIndex()
+		{
+			return (sl_reg)m_index - 1;
+		}
+	};
+	
+	// override
+	Iterator< Pair<KT, VT> > iteratorWithRefer(const Referable* refer) const
+	{
+		return new TreeIterator(this, refer);
+	}
+	
+	// override
+	List< Pair<KT, VT> > pairs() const
+	{
+		CList< Pair<KT, VT> >* ret = new CList< Pair<KT, VT> >;
+		if (ret) {
+			ObjectLocker lock(this);
+			TreePosition pos;
+			Pair<KT, VT> pair;
+			while (m_tree.getNextPosition(pos, &(pair.key), &(pair.value))) {
+				if (!(ret->add_NoLock(pair))) {
+					delete ret;
+					return List< Pair<KT, VT> >::null();
+				}
+			}
+			return ret;
+		}
+		return List< Pair<KT, VT> >::null();
 	}
 };
-SLIB_NAMESPACE_END
 
+template <class KT, class VT>
+SLIB_INLINE IMap<KT, VT>* IMap<KT, VT>::createDefault()
+{
+	return HashMap<KT, VT>::create();
+}
 
-/************************************************************************/
-/* Map Class Definition                                                 */
-/************************************************************************/
-SLIB_NAMESPACE_BEGIN
+template <class KT, class VT>
+class SafeMap;
 
 /** auto-referencing object **/
 template <class KT, class VT>
 class SLIB_EXPORT Map
 {
-	typedef IMap<KT, VT> _MapObj;
-	typedef Map<KT, VT> _MapType;
-	typedef Ref< IMap<KT, VT> > _MapRef;
-	SLIB_DECLARE_OBJECT_TYPE_FROM(_MapType, _MapObj)
-	SLIB_DECLARE_OBJECT_WRAPPER(Map, _MapType, _MapObj, _MapRef)
+	typedef Map<KT, VT> _Type;
+	typedef IMap<KT, VT> _Obj;
+	typedef Ref<_Obj> _Ref;
+	SLIB_DECLARE_OBJECT_TYPE_FROM(_Type, _Obj)
+	SLIB_DECLARE_OBJECT_WRAPPER(Map, _Type, _Obj, _Ref)
 
 public:
-	SLIB_INLINE static _MapType createList(sl_uint32 size = _SLIB_LIST_DEFAULT_SIZE)
+	Map(const SafeMap<KT, VT>& other);
+	
+	_Type& operator=(const SafeMap<KT, VT>& other);
+	
+	SLIB_INLINE _Obj* getObject() const
 	{
-		return ListMap<KT, VT>::create(size);
+		return m_object.get();
+	}
+
+public:
+	SLIB_INLINE static _Type createList()
+	{
+		return ListMap<KT, VT>::create();
 	}
 
 	template <class COMPARE>
-	SLIB_INLINE static _MapType createListBy(sl_uint32 size = _SLIB_LIST_DEFAULT_SIZE)
+	SLIB_INLINE static _Type createListBy()
 	{
-		return ListMap<KT, VT, COMPARE>::create(size);
+		return ListMap<KT, VT, COMPARE>::create();
 	}
 
-	SLIB_INLINE static _MapType createHash(sl_uint32 initialCapacity = SLIB_HASHTABLE_DEFAULT_CAPACITY)
+	SLIB_INLINE static _Type createHash(sl_uint32 initialCapacity = SLIB_HASHTABLE_DEFAULT_CAPACITY)
 	{
 		return HashMap<KT, VT>::create(initialCapacity);
 	}
 
 	template <class HASH>
-	SLIB_INLINE static _MapType createHashBy(sl_uint32 initialCapacity = SLIB_HASHTABLE_DEFAULT_CAPACITY)
+	SLIB_INLINE static _Type createHashBy(sl_uint32 initialCapacity = SLIB_HASHTABLE_DEFAULT_CAPACITY)
 	{
 		return HashMap<KT, VT, HASH>::create(initialCapacity);
 	}
 
-	SLIB_INLINE static _MapType createTree()
+	SLIB_INLINE static _Type createTree()
 	{
 		return TreeMap<KT, VT>::create();
 	}
 
 	template <class COMPARE>
-	SLIB_INLINE static _MapType createTreeBy()
+	SLIB_INLINE static _Type createTreeBy()
 	{
 		return TreeMap<KT, VT, COMPARE>::create();
 	}
 
+public:
 	SLIB_INLINE void initList()
 	{
 		m_object = ListMap<KT, VT>::create();
@@ -920,15 +1219,15 @@ public:
 	{
 		m_object = TreeMap<KT, VT, COMPARE>::create();
 	}
-
+	
+public:
 	SLIB_INLINE sl_size getCount() const
 	{
-		_MapRef object(m_object);
-		if (object.isNotNull()) {
-			return object->getCount();
-		} else {
-			return 0;
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->getCount();
 		}
+		return 0;
 	}
 
 	SLIB_INLINE sl_size count() const
@@ -938,287 +1237,484 @@ public:
 
 	SLIB_INLINE sl_bool isEmpty() const
 	{
-		return getCount() == 0;
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return (obj->getCount()) == 0;
+		}
+		return sl_true;
 	}
 
 	SLIB_INLINE sl_bool isNotEmpty() const
 	{
-		return getCount() != 0;
-	}
-
-	SLIB_INLINE sl_bool get(const KT& key, VT* out = sl_null) const
-	{
-		_MapRef object(m_object);
-		if (object.isNotNull()) {
-			return object->get(key, out);
-		} else {
-			return sl_null;
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return (obj->getCount()) > 0;
 		}
+		return sl_false;
 	}
-
+	
 	SLIB_INLINE VT* getItemPtr(const KT& key) const
 	{
-		_MapRef object(m_object);
-		if (object.isNotNull()) {
-			return object->getItemPtr(key);
-		} else {
-			return sl_null;
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->getItemPtr(key);
 		}
+		return sl_null;
 	}
-
+	
 	VT* getNewItemPtr(const KT& key)
 	{
-		_MapRef object(m_object);
-		if (object.isNull()) {
-			*this = createHash();
-			object = m_object;
-		}
-		if (object.isNotNull()) {
-			VT* ret = m_object->getItemPtr(key);
-			if (!ret) {
-				VT t;
-				m_object->put(key, t);
-				ret = m_object->getItemPtr(key);
+		_Obj* obj = m_object.get();
+		if (!obj) {
+			obj = _Obj::createDefault();
+			if (obj) {
+				m_object = obj;
+			} else {
+				return sl_null;
 			}
-			return ret;
+		}
+		VT* ret = obj->getItemPtr(key);
+		if (!ret) {
+			VT t;
+			obj->put(key, t);
+			ret = obj->getItemPtr(key);
+		}
+		return ret;
+	}
+
+	SLIB_INLINE sl_bool get(const KT& key, VT* _out = sl_null) const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->get(key, _out);
 		}
 		return sl_null;
 	}
 
 	SLIB_INLINE VT getValue(const KT& key, const VT& def) const
 	{
-		_MapRef object(m_object);
-		if (object.isNotNull()) {
-			return object->getValue(key, def);
-		} else {
-			return def;
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->getValue(key, def);
 		}
+		return def;
 	}
 
 	SLIB_INLINE List<VT> getValues(const KT& key) const
 	{
-		_MapRef object(m_object);
-		if (object.isNotNull()) {
-			return object->getValues(key);
-		} else {
-			return List<VT>::null();
+		_Obj obj = m_object.get();
+		if (obj) {
+			return obj->getValues(key);
 		}
+		return List<VT>::null();
 	}
 
 	sl_bool put(const KT& key, const VT& value, sl_bool flagReplace = sl_true)
 	{
-		_MapRef object(m_object);
-		if (object.isNotNull()) {
-			return object->put(key, value, flagReplace);
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->put(key, value, flagReplace);
 		} else {
-			_MapType map(createHash());
-			if (map.isNotNull()) {
-				if (map.put(key, value, flagReplace)) {
-					*this = map;
-					return sl_true;
-				}
+			obj = _Obj::createDefault();
+			if (obj) {
+				m_object = obj;
+				return obj->put(key, value, flagReplace);
 			}
-			return sl_false;
 		}
+		return sl_false;
 	}
-
+	
+	template <class _KT, class _VT>
+	sl_bool put(const Map<_KT, _VT>& other, sl_bool flagReplace = sl_true)
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->put(other.getObject(), flagReplace);
+		} else {
+			obj = _Obj::createDefault();
+			if (obj) {
+				m_object = obj;
+				return obj->put(other.getObject(), flagReplace);
+			}
+		}
+		return sl_false;
+	}
+	
 	SLIB_INLINE sl_bool add(const KT& key, const VT& value)
 	{
 		return put(key, value, sl_false);
 	}
-
-	SLIB_INLINE void remove(const KT& key, sl_bool flagAllKeys = sl_false)
+	
+	template <class _KT, class _VT>
+	SLIB_INLINE sl_bool add(const Map<_KT, _VT>& other)
 	{
-		_MapRef object(m_object);
-		if (object.isNotNull()) {
-			object->remove(key, flagAllKeys);
-		}
-	}
-
-	SLIB_INLINE void removeAllKeys(const KT& key)
-	{
-		remove(key, sl_true);
-	}
-
-	SLIB_INLINE void clear()
-	{
-		_MapRef object(m_object);
-		if (object.isNotNull()) {
-			object->clear();
-		}
-	}
-
-	SLIB_INLINE void removeAll()
-	{
-		clear();
+		return put(other, sl_false);
 	}
 	
+	SLIB_INLINE sl_size remove(const KT& key, sl_bool flagAllKeys = sl_false) const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->remove(key, flagAllKeys);
+		}
+		return 0;
+	}
+
+	SLIB_INLINE sl_size removeAllMatchingKeys(const KT& key) const
+	{
+		return remove(key, sl_true);
+	}
+
+	SLIB_INLINE sl_size removeAll() const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->removeAll();
+		}
+		return 0;
+	}
+
 	SLIB_INLINE sl_bool containsKey(const KT& key) const
 	{
-		_MapRef object(m_object);
-		if (object.isNotNull()) {
-			return object->containsKey(key);
-		} else {
-			return sl_false;
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->containsKey(key);
 		}
+		return sl_false;
 	}
-
+	
+	SLIB_INLINE _Type duplicate() const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->duplicate();
+		}
+		return _Type::null();
+	}
+	
 	SLIB_INLINE Iterator<KT> keyIterator() const
 	{
-		_MapRef object(m_object);
-		if (object.isNotNull()) {
-			return object->keyIterator();
-		} else {
-			return Iterator<KT>::null();
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->keyIteratorWithRefer(obj);
 		}
+		return Iterator<KT>::null();
 	}
-
+	
+	SLIB_INLINE List<KT> keys() const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->keys();
+		}
+		return List<KT>::null();
+	}
+	
 	SLIB_INLINE Iterator<VT> valueIterator() const
 	{
-		_MapRef object(m_object);
-		if (object.isNotNull()) {
-			return object->valueIterator();
-		} else {
-			return Iterator<VT>::null();
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->valueIteratorWithRefer(obj);
 		}
+		return Iterator<VT>::null();
+	}
+	
+	SLIB_INLINE List<VT> values() const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->values();
+		}
+		return List<VT>::null();
 	}
 
 	SLIB_INLINE Iterator< Pair<KT, VT> > iterator() const
 	{
-		_MapRef object(m_object);
-		if (object.isNotNull()) {
-			return object->iterator();
-		} else {
-			return Iterator< Pair<KT, VT> >::null();
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->iteratorWithRefer(obj);
 		}
-	}
-
-	SLIB_INLINE _MapType duplicate() const
-	{
-		_MapRef object(m_object);
-		if (object.isNotNull()) {
-			_MapType ret(object->duplicate());
-			return ret;
-		} else {
-			return null();
-		}
+		return Iterator< Pair<KT, VT> >::null();
 	}
 	
+	SLIB_INLINE List< Pair<KT, VT> > pairs() const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->pairs();
+		}
+		return List< Pair<KT, VT> >::null();
+	}
+	
+public:
 	SLIB_INLINE const Mutex* getLocker() const
 	{
-		_MapRef object(m_object);
-		if (object.isNotNull()) {
-			return object->getLocker();
-		} else {
-			return sl_null;
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->getLocker();
 		}
+		return sl_null;
 	}
 
-	List< Pair<KT, VT> > pairs() const
+};
+
+
+/** auto-referencing object **/
+template <class KT, class VT>
+class SLIB_EXPORT SafeMap
+{
+	typedef SafeMap<KT, VT> _Type;
+	typedef IMap<KT, VT> _Obj;
+	typedef SafeRef<_Obj> _Ref;
+	typedef Map<KT, VT> _LocalType;
+	typedef Ref<_Obj> _LocalRef;
+	SLIB_DECLARE_OBJECT_TYPE_FROM(_Type, _Obj)
+	SLIB_DECLARE_OBJECT_WRAPPER(SafeMap, _Type, _Obj, _Ref)
+	
+public:
+	SLIB_INLINE SafeMap(const List<KT, VT>& other) : m_object(other.getReference())
 	{
-		_MapRef object(m_object);
-		if (object.isNotNull()) {
-			MutexLocker lock(object->getLocker());
-			Iterator< Pair<KT, VT> > iterator(object->iterator());
-			List< Pair<KT, VT> > ret;
-			Pair<KT, VT> v;
-			while (iterator.next(&v)) {
-				if (!(ret.add(v))) {
-					return List< Pair<KT, VT> >::null();
-				}
-			}
-			return ret;
-		} else {
-			return List< Pair<KT, VT> >::null();
-		}
 	}
-
-	List<KT> keys() const
+	
+	SLIB_INLINE _Type& operator=(const Map<KT, VT>& other)
 	{
-		_MapRef object(m_object);
-		if (object.isNotNull()) {
-			MutexLocker lock(object->getLocker());
-			Iterator<KT> iterator(object->keyIterator());
-			List<KT> ret;
-			KT v;
-			while (iterator.next(&v)) {
-				if (!(ret.add(v))) {
-					return List<KT>::null();
-				}
-			}
-			return ret;
-		} else {
-			return List<KT>::null();
-		}
+		m_object = other.getReference();
+		return *this;
 	}
-
-	List<VT> values() const
+	
+public:
+	SLIB_INLINE void initList()
 	{
-		_MapRef object(m_object);
-		if (object.isNotNull()) {
-			MutexLocker lock(object->getLocker());
-			Iterator<VT> iterator(object->valueIterator());
-			List<VT> ret;
-			VT v;
-			while (iterator.next(&v)) {
-				if (!(ret.add(v))) {
-					return List<VT>::null();
-				}
-			}
-			return ret;
-		} else {
-			return List<VT>::null();
-		}
+		m_object = ListMap<KT, VT>::create();
 	}
-
+	
+	template <class COMPARE>
+	SLIB_INLINE void initListBy()
+	{
+		m_object = ListMap<KT, VT, COMPARE>::create();
+	}
+	
+	SLIB_INLINE void initHash(sl_uint32 initialCapacity = SLIB_HASHTABLE_DEFAULT_CAPACITY)
+	{
+		m_object = HashMap<KT, VT>::create(initialCapacity);
+	}
+	
+	template <class HASH>
+	SLIB_INLINE void initHashBy(sl_uint32 initialCapacity = SLIB_HASHTABLE_DEFAULT_CAPACITY)
+	{
+		m_object = HashMap<KT, VT, HASH>::create(initialCapacity);
+	}
+	
+	SLIB_INLINE void initTree()
+	{
+		m_object = TreeMap<KT, VT>::create();
+	}
+	
+	template <class COMPARE>
+	SLIB_INLINE void initTreeBy()
+	{
+		m_object = TreeMap<KT, VT, COMPARE>::create();
+	}
+	
+public:
+	SLIB_INLINE sl_size getCount() const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->getCount();
+		}
+		return 0;
+	}
+	
+	SLIB_INLINE sl_size count() const
+	{
+		return getCount();
+	}
+	
+	SLIB_INLINE sl_bool isEmpty() const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return (obj->getCount()) == 0;
+		}
+		return sl_true;
+	}
+	
+	SLIB_INLINE sl_bool isNotEmpty() const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return (obj->getCount()) > 0;
+		}
+		return sl_false;
+	}
+	
+	SLIB_INLINE sl_bool get(const KT& key, VT* _out = sl_null) const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->get(key, _out);
+		}
+		return sl_null;
+	}
+	
+	SLIB_INLINE VT getValue(const KT& key, const VT& def) const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->getValue(key, def);
+		}
+		return def;
+	}
+	
+	SLIB_INLINE List<VT> getValues(const KT& key) const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->getValues(key);
+		}
+		return List<VT>::null();
+	}
+	
+	sl_bool put(const KT& key, const VT& value, sl_bool flagReplace = sl_true)
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->put(key, value, flagReplace);
+		} else {
+			SpinLocker lock(SpinLockPoolForMap::get(this));
+			obj = m_object;
+			if (obj) {
+				lock.unlock();
+				return obj->put(key, value, flagReplace);
+			}
+			obj = _Obj::createDefault();
+			if (obj) {
+				m_object = obj;
+				lock.unlock();
+				return obj->put(key, value, flagReplace);
+			}
+		}
+		return sl_false;
+	}
+	
 	template <class _KT, class _VT>
-	sl_bool put(Map<_KT, _VT>& other, sl_bool flagReplace = sl_true)
+	sl_bool put(const Map<_KT, _VT>& other, sl_bool flagReplace = sl_true)
 	{
-		_MapRef dst(m_object);
-		if (dst.isNotNull()) {
-			Ref< IMap<_KT, _VT> > src(other.m_object);
-			if ((void*)(dst.get()) == (void*)(src.get())) {
-				return sl_false;
-			}
-			if (src.isNotNull()) {
-				MutexLocker lock(dst->getLocker(), src->getLocker());
-				Iterator< Pair<_KT,_VT> > iterator(src->iterator());
-				Pair<_KT, _VT> v;
-				while (iterator.next(&v)) {
-					if (!dst->put(v.key, v.value, flagReplace)) {
-						return sl_false;
-					}
-				}
-			}
-			return sl_true;
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->put(other.getObject(), flagReplace);
 		} else {
-			_MapType map(createHash());
-			_MapRef dst(map.m_object);
-			if (dst.isNotNull()) {
-				Ref< IMap<_KT, _VT> > src(other.m_object);
-				if (src.isNotNull()) {
-					MutexLocker lock(src->getLocker());
-					Iterator< Pair<_KT, _VT> > iterator(src->iterator());
-					Pair<_KT, _VT> v;
-					while (iterator.next(&v)) {
-						if (!(dst->put(v.key, v.value, flagReplace))) {
-							return sl_false;
-						}
-					}
-				}
-				*this = map;
+			SpinLocker lock(SpinLockPoolForMap::get(this));
+			obj = m_object;
+			if (obj.isNotNull()) {
+				lock.unlock();
+				return obj->put(other.getObject(), flagReplace);
 			}
-			return sl_true;
+			obj = _Obj::createDefault();
+			if (obj.isNotNull()) {
+				m_object = obj;
+				lock.unlock();
+				return obj->put(other.getObject(), flagReplace);
+			}
 		}
+		return sl_false;
 	}
-
+	
+	SLIB_INLINE sl_bool add(const KT& key, const VT& value)
+	{
+		return put(key, value, sl_false);
+	}
+	
 	template <class _KT, class _VT>
-	SLIB_INLINE sl_bool add(Map<_KT, _VT>& other)
+	SLIB_INLINE sl_bool add(const Map<_KT, _VT>& other)
 	{
 		return put(other, sl_false);
 	}
+	
+	SLIB_INLINE sl_size remove(const KT& key, sl_bool flagAllKeys = sl_false) const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->remove(key, flagAllKeys);
+		}
+		return 0;
+	}
+	
+	SLIB_INLINE sl_size removeAllMatchingKeys(const KT& key) const
+	{
+		return remove(key, sl_true);
+	}
+	
+	SLIB_INLINE sl_size removeAll() const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->removeAll();
+		}
+		return 0;
+	}
+	
+	SLIB_INLINE sl_bool containsKey(const KT& key) const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->containsKey(key);
+		}
+		return sl_false;
+	}
+	
+	SLIB_INLINE _LocalType duplicate() const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->duplicate();
+		}
+		return _LocalType::null();
+	}
+	
+	SLIB_INLINE List<KT> keys() const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->keys();
+		}
+		return List<KT>::null();
+	}
+	
+	SLIB_INLINE List<VT> values() const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->values();
+		}
+		return List<VT>::null();
+	}
+	
+	SLIB_INLINE List< Pair<KT, VT> > pairs() const
+	{
+		_LocalRef obj(m_object);
+		if (obj.isNotNull()) {
+			return obj->pairs();
+		}
+		return List< Pair<KT, VT> >::null();
+	}
+	
 };
+
+
+template <class KT, class VT>
+SLIB_INLINE Map<KT, VT>::Map(const SafeMap<KT, VT>& other) : m_object(other.getReference())
+{
+}
+
+template <class KT, class VT>
+SLIB_INLINE Map<KT, VT>& Map<KT, VT>::operator=(const SafeMap<KT, VT>& other)
+{
+	m_object = other.getReference();
+	return *this;
+}
+
 SLIB_NAMESPACE_END
 
-
-#endif// CHECKHEADER_SLIB_CORE_MAP
+#endif

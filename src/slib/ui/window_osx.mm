@@ -168,11 +168,10 @@ public:
 		return Ref<WindowInstance>::null();
 	}
 	
-	sl_bool setParent(const Ref<WindowInstance>& _window)
+	sl_bool setParent(const Ref<WindowInstance>& windowInst)
 	{
 		NSWindow* window = m_window;
 		if (window != nil) {
-			Ref<WindowInstance> windowInst = _window;
 			if (windowInst.isNotNull()) {
 				_OSX_Window* w = (_OSX_Window*)(windowInst.get());
 				NSWindow* p = w->m_window;
@@ -883,7 +882,7 @@ SLIB_UI_NAMESPACE_END
 {
 	BOOL ret = YES;
 	m_flagClosing = sl_true;
-	slib::Ref<slib::_OSX_Window> window = m_window.lock();
+	slib::Ref<slib::_OSX_Window> window = m_window;
 	if (window.isNotNull()) {
 		if (window->onClose()) {
 			window->close();
@@ -898,7 +897,7 @@ SLIB_UI_NAMESPACE_END
 
 - (void)windowWillClose:(NSNotification *)notification
 {
-	slib::Ref<slib::_OSX_Window> window = m_window.lock();
+	slib::Ref<slib::_OSX_Window> window = m_window;
 	if (window.isNotNull()) {
 		slib::UI::runOnUIThread(SLIB_CALLBACK_REF(slib::_OSX_Window, release, window));
 	}
@@ -906,7 +905,7 @@ SLIB_UI_NAMESPACE_END
 
 - (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)frameSize
 {
-	slib::Ref<slib::_OSX_Window> window = m_window.lock();
+	slib::Ref<slib::_OSX_Window> window = m_window;
 	if (window.isNotNull()) {
 		slib::Size size(frameSize.width, frameSize.height);
 		window->onResize(size);
@@ -917,7 +916,7 @@ SLIB_UI_NAMESPACE_END
 }
 - (void)windowDidMove:(NSNotification *)notification
 {
-	slib::Ref<slib::_OSX_Window> window = m_window.lock();
+	slib::Ref<slib::_OSX_Window> window = m_window;
 	if (window.isNotNull()) {
 		window->onMove();
 	}
@@ -925,21 +924,21 @@ SLIB_UI_NAMESPACE_END
 
 - (void)windowWillMiniaturize:(NSNotification *)notification
 {
-	slib::Ref<slib::_OSX_Window> window = m_window.lock();
+	slib::Ref<slib::_OSX_Window> window = m_window;
 	if (window.isNotNull()) {
 		window->onMinimize();
 	}
 }
 - (void)windowDidDeminiaturize:(NSNotification *)notification
 {
-	slib::Ref<slib::_OSX_Window> window = m_window.lock();
+	slib::Ref<slib::_OSX_Window> window = m_window;
 	if (window.isNotNull()) {
 		window->onDeminimize();
 	}
 }
 - (BOOL)windowShouldZoom:(NSWindow *)w toFrame:(NSRect)newFrame
 {
-	slib::Ref<slib::_OSX_Window> window = m_window.lock();
+	slib::Ref<slib::_OSX_Window> window = m_window;
 	if (window.isNotNull()) {
 		if ([self isZoomed]) {
 			window->onDemaximize();

@@ -8,9 +8,8 @@ RadioGroup::RadioGroup()
 {
 }
 
-void RadioGroup::addView(const Ref<View>& _view)
+void RadioGroup::addView(const Ref<View>& view)
 {
-	Ref<View> view = _view;
 	if (view.isNotNull()) {
 		if (RadioButton::checkInstance(view)) {
 			((RadioButton*)(view.get()))->setRadioGroup(this);
@@ -31,9 +30,8 @@ void RadioGroup::removeView(const Ref<View>& view)
 	m_views.removeValue(view);
 }
 
-void RadioGroup::select(const Ref<View>& _sel)
+void RadioGroup::select(const Ref<View>& sel)
 {
-	Ref<View> sel = _sel;
 	m_viewSelected = sel;
 	ListLocker< Ref<View> > views(m_views);
 	for (sl_size i = 0; i < views.count(); i++) {

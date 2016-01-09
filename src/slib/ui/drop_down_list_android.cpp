@@ -129,18 +129,17 @@ void DropDownList::_setItemTitle(sl_uint32 index, const String& title)
 	}
 }
 
-void DropDownList::setFont(const Ref<Font>& _font)
+void DropDownList::setFont(const Ref<Font>& font)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		Ref<Font> font = _font;
 		Ref<FontInstance> fontInstance;
 		jobject jfont = UIPlatform::getNativeFont(font.get(), fontInstance);
 		if (jfont) {
 			_JAndroidDropDownList::setFont.callBoolean(sl_null, handle, jfont);
 		}
 	}
-	m_font = _font;
+	m_font = font;
 }
 
 SLIB_UI_NAMESPACE_END

@@ -484,9 +484,8 @@ sl_bool File::deleteFile(const String& _filePath)
 	return ret != 0;
 }
 
-sl_bool File::deleteDirectoryOnly(const String& _filePath)
+sl_bool File::deleteDirectoryOnly(const String& filePath)
 {
-	String filePath = _filePath;
 	if (filePath.isEmpty()) {
 		return sl_false;
 	}

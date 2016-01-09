@@ -27,10 +27,9 @@ public:
 		close();
 	}
 	
-	static Ref<_Unix_AsyncTcpSocketInstance> create(const Ref<Socket>& _socket)
+	static Ref<_Unix_AsyncTcpSocketInstance> create(const Ref<Socket>& socket)
 	{
 		Ref<_Unix_AsyncTcpSocketInstance> ret;
-		Ref<Socket> socket = _socket;
 		if (socket.isNotNull()) {
 			if (socket->setNonBlockingMode(sl_true)) {
 				sl_file handle = (sl_file)(socket->getHandle());
@@ -217,10 +216,9 @@ public:
 		close();
 	}
 	
-	static Ref<_Unix_AsyncTcpServerInstance> create(const Ref<Socket>& _socket)
+	static Ref<_Unix_AsyncTcpServerInstance> create(const Ref<Socket>& socket)
 	{
 		Ref<_Unix_AsyncTcpServerInstance> ret;
-		Ref<Socket> socket = _socket;
 		if (socket.isNotNull()) {
 			if (socket->setNonBlockingMode(sl_true)) {
 				sl_file handle = (sl_file)(socket->getHandle());
@@ -297,10 +295,9 @@ public:
 		close();
 	}
 	
-	static Ref<_Unix_AsyncUdpSocketInstance> create(const Ref<Socket>& _socket)
+	static Ref<_Unix_AsyncUdpSocketInstance> create(const Ref<Socket>& socket)
 	{
 		Ref<_Unix_AsyncUdpSocketInstance> ret;
-		Ref<Socket> socket = _socket;
 		if (socket.isNotNull()) {
 			if (socket->setNonBlockingMode(sl_true)) {
 				sl_file handle = (sl_file)(socket->getHandle());

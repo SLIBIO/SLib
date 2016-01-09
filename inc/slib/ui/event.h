@@ -324,7 +324,7 @@ public:
 	static Ref<UIEvent> createKeyEvent(UIEventAction action, Keycode keycode, sl_uint32 systemKeycode);
 	static Ref<UIEvent> createMouseEvent(UIEventAction action, sl_real x, sl_real y);
 	static Ref<UIEvent> createMouseWheelEvent(sl_real deltaX, sl_real deltaY);
-	static Ref<UIEvent> createTouchEvent(UIEventAction action, const Array<TouchPoint>& _points);
+	static Ref<UIEvent> createTouchEvent(UIEventAction action, const Array<TouchPoint>& points);
 	static Ref<UIEvent> createSetCursorEvent();
 
 	Ref<UIEvent> duplicate();

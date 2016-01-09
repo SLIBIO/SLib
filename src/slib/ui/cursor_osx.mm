@@ -34,9 +34,8 @@ Ref<Cursor> UIPlatform::createCursor(NSCursor* cursor)
 	return Ref<Cursor>::from(ret);
 }
 
-NSCursor* UIPlatform::getCursorHandle(const Ref<Cursor>& _cursor)
+NSCursor* UIPlatform::getCursorHandle(const Ref<Cursor>& cursor)
 {
-	Ref<Cursor> cursor = _cursor;
 	if (cursor.isNull()) {
 		return nil;
 	}
@@ -74,9 +73,8 @@ Ref<Cursor> Cursor::getResizeUpDown()
 	return UIPlatform::createCursor([NSCursor resizeUpDownCursor]);
 }
 
-void Cursor::setCurrent(const Ref<Cursor>& _cursor)
+void Cursor::setCurrent(const Ref<Cursor>& cursor)
 {
-	Ref<Cursor> cursor = _cursor;
 	if (cursor.isNull()) {
 		return;
 	}

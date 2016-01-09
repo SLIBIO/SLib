@@ -82,7 +82,7 @@ public:
 public:
 	Ref<Database> getDatabase();
 	
-	virtual sl_bool execute(const Variant* params = sl_null, sl_uint32 nParams = 0, sl_size* pOutAffectedRowsCount = sl_null) = 0;
+	virtual sl_bool execute(const Variant* params = sl_null, sl_uint32 nParams = 0, sl_uint64* pOutAffectedRowsCount = sl_null) = 0;
 	virtual Ref<DatabaseCursor> query(const Variant* params = sl_null, sl_uint32 nParams = 0) = 0;
 
 	virtual List< Map<String, Variant> > getListForQueryResult(const Variant* params = sl_null, sl_uint32 nParams = 0);
@@ -102,14 +102,14 @@ public:
 public:
 	virtual Ref<DatabaseStatement> prepareStatement(const String& sql) = 0;
 
-	virtual sl_bool execute(const String& sql, sl_size* pOutAffectedRowsCount = sl_null);
+	virtual sl_bool execute(const String& sql, sl_uint64* pOutAffectedRowsCount = sl_null);
 	virtual Ref<DatabaseCursor> query(const String& sql);	
 
 	virtual List< Map<String, Variant> > getListForQueryResult(const String& sql);
 	virtual Map<String, Variant> getRecordForQueryResult(const String& sql);
 	virtual Variant getValueForQueryResult(const String& sql);
 	
-	virtual sl_bool execute(const String& sql, const Variant* params, sl_uint32 nParams, sl_size* pOutAffectedRowsCount = sl_null);
+	virtual sl_bool execute(const String& sql, const Variant* params, sl_uint32 nParams, sl_uint64* pOutAffectedRowsCount = sl_null);
 	virtual Ref<DatabaseCursor> query(const String& sql, const Variant* params, sl_uint32 nParams);
 
 	virtual List< Map<String, Variant> > getListForQueryResult(const String& sql, const Variant* params, sl_uint32 nParams);

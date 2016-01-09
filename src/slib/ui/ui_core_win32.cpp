@@ -85,10 +85,9 @@ sl_bool UI::isUIThread()
 	return (_g_thread_ui == ::GetCurrentThreadId());
 }
 
-void UI::runOnUIThread(const Ref<Runnable>& _callback)
+void UI::runOnUIThread(const Ref<Runnable>& callback)
 {
 	_Win32_UI* ui = _Win32_UI::get();
-	Ref<Runnable> callback = _callback;
 	if (callback.isNotNull()) {
 		ui->m_queueDispatch.push(callback);
 		::PostThreadMessageW(_g_thread_ui, SLIB_UI_MESSAGE_DISPATCH, 0, 0);
@@ -147,7 +146,7 @@ void UI::runLoop()
 		}
 	}
 
-	ui->m_queueDispatch.clear();
+	ui->m_queueDispatch.removeAll();
 
 	UIApp::dispatchExit();
 

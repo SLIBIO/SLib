@@ -211,7 +211,7 @@ public:
 
 	void release()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (m_capture) {
 			stop();
 			SLIB_WIN32_COM_SAFE_RELEASE(m_capture);
@@ -228,7 +228,7 @@ public:
 
 	void start()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (m_flagRunning) {
 			return;
 		}
@@ -249,7 +249,7 @@ public:
 
 	void stop()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (!m_flagRunning) {
 			return;
 		}

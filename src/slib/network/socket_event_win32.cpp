@@ -23,9 +23,8 @@ public:
 		::WSACloseEvent(m_hEvent);
 	}
 
-	static Ref<_Win_SocketEvent> create(const Ref<Socket>& _socket)
+	static Ref<_Win_SocketEvent> create(const Ref<Socket>& socket)
 	{
-		Ref<Socket> socket = _socket;
 		Ref<_Win_SocketEvent> ret;
 		if (socket.isNotNull()) {
 			Socket::initializeSocket();

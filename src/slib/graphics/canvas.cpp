@@ -64,17 +64,15 @@ void Canvas::scale(sl_real sx, sl_real sy)
 	concatMatrix(mat);
 }
 
-void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& _src, const Rectangle& rectSrc)
+void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc)
 {
-	Ref<Drawable> src = _src;
 	if (src.isNotNull()) {
 		src->onDraw(this, rectDst, rectSrc);
 	}
 }
 
-void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& _src)
+void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& src)
 {
-	Ref<Drawable> src = _src;
 	if (src.isNotNull()) {
 		Rectangle rectSrc(0, 0, src->getDrawableWidth(), src->getDrawableHeight());
 		src->onDraw(this, rectDst, rectSrc);
@@ -82,9 +80,8 @@ void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& _src)
 }
 
 void Canvas::draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst
-					  , const Ref<Drawable>& _src, sl_real xSrc, sl_real ySrc, sl_real widthSrc, sl_real heightSrc)
+					  , const Ref<Drawable>& src, sl_real xSrc, sl_real ySrc, sl_real widthSrc, sl_real heightSrc)
 {
-	Ref<Drawable> src = _src;
 	if (src.isNotNull()) {
 		Rectangle rectDst(xDst, yDst, xDst + widthDst, yDst + heightDst);
 		Rectangle rectSrc(xSrc, ySrc, xSrc + widthSrc, ySrc + heightSrc);
@@ -92,9 +89,8 @@ void Canvas::draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDs
 	}
 }
 
-void Canvas::draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst, const Ref<Drawable>& _src)
+void Canvas::draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst, const Ref<Drawable>& src)
 {
-	Ref<Drawable> src = _src;
 	if (src.isNotNull()) {
 		Rectangle rectDst(xDst, yDst, xDst + widthDst, yDst + heightDst);
 		Rectangle rectSrc(0, 0, src->getDrawableWidth(), src->getDrawableHeight());
@@ -102,9 +98,8 @@ void Canvas::draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDs
 	}
 }
 
-void Canvas::draw(sl_real xDst, sl_real yDst, const Ref<Drawable>& _src)
+void Canvas::draw(sl_real xDst, sl_real yDst, const Ref<Drawable>& src)
 {
-	Ref<Drawable> src = _src;
 	if (src.isNotNull()) {
 		sl_real w = src->getDrawableWidth();
 		sl_real h = src->getDrawableHeight();
@@ -124,7 +119,7 @@ Size Canvas::getTextSize(const Ref<Font>& font, const String &text)
 	}
 }
 
-void Canvas::drawText(const String& _text, const Rectangle& rcDst, const Ref<Font>& _font, const Color& color, Alignment align)
+void Canvas::drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& _font, const Color& color, Alignment align)
 {
 	Ref<Font> font = _font;
 	if (font.isNull()) {
@@ -133,16 +128,14 @@ void Canvas::drawText(const String& _text, const Rectangle& rcDst, const Ref<Fon
 			return;
 		}
 	}
-	String text = _text;
 	Size size = getTextSize(font, text);
 	Point pt = GraphicsUtil::calculateAlignPosition(rcDst, size.x, size.y, align);
 	drawText(text, pt.x, pt.y, font, color);
 }
 
-void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& _source, ScaleType scaleType, Alignment alignment)
+void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleType scaleType, Alignment alignment)
 {
 	Canvas* canvas = this;
-	Ref<Drawable> source = _source;
 	if (source.isNotNull()) {
 		sl_real dw = rectDst.getWidth();
 		sl_real dh = rectDst.getHeight();
@@ -211,9 +204,9 @@ void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& _source, ScaleT
 	}
 }
 
-CanvasStatusScope::CanvasStatusScope(const Ref<Canvas>& _canvas)
+CanvasStatusScope::CanvasStatusScope(const Ref<Canvas>& canvas)
 {
-	m_canvas = _canvas;
+	m_canvas = canvas;
 	if (m_canvas.isNotNull()) {
 		m_canvas->save();
 	}

@@ -476,11 +476,9 @@ const char* Variant::getObjectClassTypeName() const
 static sl_bool _Variant_getVariantMapJSONString(StringBuffer& ret, const Map<String, Variant>& map, sl_bool flagJSON);
 static sl_bool _Variant_getVariantListJSONString(StringBuffer& ret, const List<Variant>& list, sl_bool flagJSON)
 {
-	List<Variant> l = list;
-	MutexLocker locker(l.getLocker());
-
+	ListLocker<Variant> l(list);
 	sl_size n = l.getCount();
-	Variant* lb = l.getBuffer();
+	Variant* lb = l.data();
 
 	ret.add("[");
 	for (sl_size i = 0; i < n; i++)

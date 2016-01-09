@@ -29,7 +29,7 @@ public:
 
 	SLIB_INLINE ~ExpiringMap()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		Ref<AsyncTimer> timer = m_timer;
 		if (timer.isNotNull()) {
 			timer->stopAndWait();
@@ -44,7 +44,7 @@ public:
 
 	void setupTimer(sl_uint32 expiring_duration_ms, const Ref<AsyncLoop>& _loop)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		clearTimer();
 		Ref<AsyncLoop> loop = _loop;
 		if (loop.isNull()) {
@@ -62,7 +62,7 @@ public:
 
 	void clearTimer()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		Ref<AsyncTimer> timer = m_timer;
 		if (timer.isNotNull()) {
 			Ref<AsyncLoop> loop = m_loop;
@@ -81,7 +81,7 @@ public:
 
 	sl_bool get(const KT& key, VT* out = sl_null, sl_bool flagUpdateLifetime = sl_true)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		VT* p = m_mapCurrent.getItemPtr(key);
 		if (p) {
 			if (out) {
@@ -105,7 +105,7 @@ public:
 
 	VT getValue(const KT& key, const VT& def, sl_bool flagUpdateLifetime = sl_true)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		VT* p = m_mapCurrent.getItemPtr(key);
 		if (p) {
 			return *p;
@@ -123,33 +123,28 @@ public:
 
 	sl_bool put(const KT& key, const VT& value)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		m_mapBackup.remove(key);
 		return m_mapCurrent.put(key, value);
 	}
 
 	void remove(const KT& key)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		m_mapCurrent.remove(key);
 		m_mapBackup.remove(key);
 	}
 
-	void clear()
+	void removeAll()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		m_mapCurrent.clear();
 		m_mapBackup.clear();
 	}
 
-	SLIB_INLINE void removeAll()
-	{
-		clear();
-	}
-
 	sl_bool containsKey(const KT& key)
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		if (m_mapCurrent.containsKey(key)) {
 			return sl_true;
 		}
@@ -162,7 +157,7 @@ public:
 protected:
 	void _update()
 	{
-		MutexLocker lock(getLocker());
+		ObjectLocker lock(this);
 		m_mapBackup = m_mapCurrent;
 		m_mapCurrent.setNull();
 	}

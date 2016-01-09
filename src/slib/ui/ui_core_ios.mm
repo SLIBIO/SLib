@@ -108,9 +108,8 @@ sl_bool UI::isUIThread()
 }
 
 
-void UI::runOnUIThread(const Ref<Runnable>& _callback)
+void UI::runOnUIThread(const Ref<Runnable>& callback)
 {
-	Ref<Runnable> callback = _callback;
 	if (callback.isNotNull()) {
 		dispatch_async(dispatch_get_main_queue(), ^{
 			callback->run();

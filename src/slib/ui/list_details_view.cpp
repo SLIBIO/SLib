@@ -46,7 +46,7 @@ sl_uint32 ListDetailsView::getColumnsCount()
 
 void ListDetailsView::setColumnsCount(sl_uint32 nCount)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	m_columns.setCount(nCount);
 	_refreshColumnsCount();
 }
@@ -58,7 +58,7 @@ sl_uint32 ListDetailsView::getRowsCount()
 
 void ListDetailsView::setRowsCount(sl_uint32 nCount)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (nCount < m_cells.count()) {
 		m_cells.setCount(nCount);
 	}
@@ -79,9 +79,9 @@ String ListDetailsView::getItemText(sl_uint32 iRow, sl_uint32 iCol)
 	return String::null();
 }
 
-void ListDetailsView::setItemText(sl_uint32 iRow, sl_uint32 iCol, const String& _text)
+void ListDetailsView::setItemText(sl_uint32 iRow, sl_uint32 iCol, const String& text)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (iRow < m_nRows) {
 		if (iRow >= m_cells.count()) {
 			if (!(m_cells.setCount(iRow + 1))) {
@@ -101,7 +101,6 @@ void ListDetailsView::setItemText(sl_uint32 iRow, sl_uint32 iCol, const String& 
 				}
 			}
 			ListDetailsViewCell* cell = row.getItemPtr(iCol);
-			String text = _text;
 			cell->text = text;
 		}
 		_refreshRowsCount();
@@ -118,11 +117,10 @@ String ListDetailsView::getHeaderText(sl_uint32 iCol)
 	return String::null();
 }
 
-void ListDetailsView::setHeaderText(sl_uint32 iCol, const String& _text)
+void ListDetailsView::setHeaderText(sl_uint32 iCol, const String& text)
 {
 	MutexLocker lock(m_columns.getLocker());
 	if (iCol < m_columns.count()) {
-		String text = _text;
 		ListDetailsViewColumn* col = m_columns.getItemPtr(iCol);
 		col->title = text;
 		_setHeaderText(iCol, text);
@@ -191,13 +189,13 @@ void ListDetailsView::setColumnAlignment(sl_uint32 iCol, Alignment align)
 
 void ListDetailsView::addRow()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	setRowsCount(m_nRows+1);
 }
 
 void ListDetailsView::insertRow(sl_uint32 iRow)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (iRow < m_cells.count()) {
 		m_cells.insert(iRow, List<ListDetailsViewCell>::null());
 	}
@@ -206,7 +204,7 @@ void ListDetailsView::insertRow(sl_uint32 iRow)
 
 void ListDetailsView::removeRow(sl_uint32 iRow)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (iRow < m_nRows) {
 		if (iRow < m_cells.count()) {
 			m_cells.remove(iRow);

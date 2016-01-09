@@ -13,10 +13,9 @@ Ref<View> ScrollView::getContentView()
 	return m_viewContent;
 }
 
-void ScrollView::setContentView(const Ref<slib::View>& _view)
+void ScrollView::setContentView(const Ref<slib::View>& view)
 {
-	MutexLocker lock(getLocker());
-	Ref<View> view = _view;
+	ObjectLocker lock(this);
 	if (m_viewContent != view) {
 		Ref<View> viewOld = m_viewContent;
 		if (viewOld.isNotNull()) {

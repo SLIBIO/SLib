@@ -137,7 +137,7 @@ Ref<HttpClientConnection> HttpClientConnection::create(HttpClient* _client, Http
 
 void HttpClientConnection::close()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (m_flagClosed) {
 		return;
 	}
@@ -159,13 +159,12 @@ void HttpClientConnection::close()
 	m_output.setNull();
 }
 
-void HttpClientConnection::addContext(const Ref<HttpClientContext>& _context)
+void HttpClientConnection::addContext(const Ref<HttpClientContext>& context)
 {
-	Ref<HttpClientContext> context = _context;
 	if (context.isNull()) {
 		return;
 	}
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (m_flagClosed) {
 		return;
 	}
@@ -322,7 +321,7 @@ void HttpClientConnection::_processInput(const void* _data, sl_uint32 size)
 
 void HttpServiceConnection::_read()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (m_flagClosed) {
 		return;
 	}

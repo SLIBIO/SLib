@@ -18,7 +18,7 @@ Ref<GraphicsPath> GraphicsPath::create()
 
 void GraphicsPath::moveTo(const Point& pt)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	m_flagBegan = sl_false;
 	m_pointBegin = pt;
 	invalidate();
@@ -26,7 +26,7 @@ void GraphicsPath::moveTo(const Point& pt)
 
 void GraphicsPath::lineTo(const Point& pt)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (!m_flagBegan) {
 		GraphicsPathPoint point;
 		point.pt = m_pointBegin;
@@ -43,7 +43,7 @@ void GraphicsPath::lineTo(const Point& pt)
 
 void GraphicsPath::cubicTo(const Point& ptControl1, const Point& ptControl2, const Point& ptEnd)
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (!m_flagBegan) {
 		GraphicsPathPoint point;
 		point.pt = m_pointBegin;
@@ -66,7 +66,7 @@ void GraphicsPath::cubicTo(const Point& ptControl1, const Point& ptControl2, con
 
 void GraphicsPath::closeSubpath()
 {
-	MutexLocker lock(getLocker());
+	ObjectLocker lock(this);
 	if (m_flagBegan) {
 		sl_size n = points.count();
 		if (n > 0) {
@@ -143,18 +143,16 @@ void GraphicsPath::addPie(const Rectangle& rect, sl_real startDegrees, sl_real s
 }
 
 
-Rectangle GraphicsPath::getBounds(const Ref<GraphicsContext>& _context)
+Rectangle GraphicsPath::getBounds(const Ref<GraphicsContext>& context)
 {
-	Ref<GraphicsContext> context = _context;
 	if (context.isNotNull()) {
 		return context->getPathBounds(this);
 	}
 	return Rectangle::zero();
 }
 
-sl_bool GraphicsPath::containsPoint(const Ref<GraphicsContext>& _context, const Point& pt)
+sl_bool GraphicsPath::containsPoint(const Ref<GraphicsContext>& context, const Point& pt)
 {
-	Ref<GraphicsContext> context = _context;
 	if (context.isNotNull()) {
 		return context->checkPointInPath(this, pt);
 	}
@@ -181,9 +179,8 @@ GraphicsPathInstance::GraphicsPathInstance()
 {
 }
 
-void GraphicsPathInstance::buildFrom(const Ref<GraphicsPath>& _path)
+void GraphicsPathInstance::buildFrom(const Ref<GraphicsPath>& path)
 {
-	Ref<GraphicsPath> path = _path;
 	if (path.isNull()) {
 		return;
 	}

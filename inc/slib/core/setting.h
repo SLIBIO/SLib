@@ -10,16 +10,14 @@ SLIB_NAMESPACE_BEGIN
 class SLIB_EXPORT IniSetting
 {
 private:
-	Map<String, String> m_mapValues;
+	HashMap<String, String> m_mapValues;
 
 public:
+	void initialize();
+	
 	sl_bool parseFromUtf8TextFile(const String& filePath);
 	sl_bool parseFromText(const String& text);
-
-	void initialize()
-	{
-		m_mapValues.clear();
-	}
+	
 	Variant getValue(const String& name);
 
 };

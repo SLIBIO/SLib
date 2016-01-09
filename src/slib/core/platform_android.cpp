@@ -46,12 +46,12 @@ void Android::finishActivity(jobject jactivity)
 	}
 }
 
-jobject Android::openAssetFile(const String& _path)
+jobject Android::openAssetFile(const String& path)
 {
 	jobject jactivity = Android::getCurrentActivity();
 	if (jactivity) {
-		JniLocal<jstring> path = Jni::getJniString(_path);
-		return _Android::openAsset.callObject(sl_null, jactivity, path.value);
+		JniLocal<jstring> jpath = Jni::getJniString(path);
+		return _Android::openAsset.callObject(sl_null, jactivity, jpath.value);
 	} else {
 		return sl_null;
 	}

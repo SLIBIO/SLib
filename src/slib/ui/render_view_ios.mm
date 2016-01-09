@@ -98,7 +98,7 @@ void _iOS_GLCallback(_Slib_iOS_GLView* handle)
 	
 	while (Thread::isNotStoppingCurrent()) {
 		
-		Ref<iOS_ViewInstance> instance = handle->m_viewInstance.lock();
+		Ref<iOS_ViewInstance> instance = handle->m_viewInstance;
 		if (instance.isNull()) {
 			return;
 		}

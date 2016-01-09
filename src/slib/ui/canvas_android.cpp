@@ -183,9 +183,8 @@ public:
 		_JAndroidGraphics::clipToRectangle.call(m_canvas, (float)(_rect.left), (float)(_rect.top), (float)(_rect.right), (float)(_rect.bottom));
 	}
 
-	void clipToPath(const Ref<GraphicsPath>& _path)
+	void clipToPath(const Ref<GraphicsPath>& path)
 	{
-		Ref<GraphicsPath> path = _path;
 		Ref<GraphicsPathInstance> instance;
 		jobject handle = UIPlatform::getGraphicsPath(path.get(), instance);
 		if (handle) {
@@ -268,9 +267,8 @@ public:
 		}
 	}
 
-	void drawRectangle(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& _brush)
+	void drawRectangle(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
-		Ref<Brush> brush = _brush;
 		Ref<Pen> pen = _pen;
 		if (brush.isNull() && pen.isNull()) {
 			pen = Pen::getDefault();
@@ -286,9 +284,8 @@ public:
 		}
 	}
 
-	void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& _pen, const Ref<Brush>& _brush)
+	void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
-		Ref<Brush> brush = _brush;
 		Ref<Pen> pen = _pen;
 		if (brush.isNull() && pen.isNull()) {
 			pen = Pen::getDefault();
@@ -304,9 +301,8 @@ public:
 		}
 	}
 
-	void drawEllipse(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& _brush)
+	void drawEllipse(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
-		Ref<Brush> brush = _brush;
 		Ref<Pen> pen = _pen;
 		if (brush.isNull() && pen.isNull()) {
 			pen = Pen::getDefault();
@@ -322,12 +318,11 @@ public:
 		}
 	}
 
-	void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen, const Ref<Brush>& _brush, FillMode fillMode)
+	void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen, const Ref<Brush>& brush, FillMode fillMode)
 	{
 		if (countPoints <= 2) {
 			return;
 		}
-		Ref<Brush> brush = _brush;
 		Ref<Pen> pen = _pen;
 		if (brush.isNull() && pen.isNull()) {
 			pen = Pen::getDefault();
@@ -345,9 +340,8 @@ public:
 		}
 	}
 
-	void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real endDegrees, const Ref<Pen>& _pen, const Ref<Brush>& _brush)
+	void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real endDegrees, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
-		Ref<Brush> brush = _brush;
 		Ref<Pen> pen = _pen;
 		if (brush.isNull() && pen.isNull()) {
 			pen = Pen::getDefault();
@@ -364,13 +358,11 @@ public:
 		}
 	}
 
-	void drawPath(const Ref<GraphicsPath>& _path, const Ref<Pen>& _pen, const Ref<Brush>& _brush)
+	void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
-		Ref<GraphicsPath> path = _path;
 		Ref<GraphicsPathInstance> pathInstance;
 		jobject hPath = UIPlatform::getGraphicsPath(path.get(), pathInstance);
 		if (hPath) {
-			Ref<Brush> brush = _brush;
 			Ref<Pen> pen = _pen;
 			if (brush.isNull() && pen.isNull()) {
 				pen = Pen::getDefault();

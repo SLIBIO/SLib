@@ -20,22 +20,22 @@ String Resource::getFilePath(const String& path)
 	return Apple::getResourceFilePath(path);
 }
 #else
-String Resource::getFilePath(const String& _path)
+String Resource::getFilePath(const String& path)
 {
-	String path = File::makeSafeFilePath(_path);
-	if (path.isNotEmpty()) {
-		return Application::getAppPath() + "/" + path;
+	String s = File::makeSafeFilePath(path);
+	if (s.isNotEmpty()) {
+		return Application::getAppPath() + "/" + s;
 	}
 	return String::null();
 }
 #endif
 
-Memory Resource::readAllBytes(const String& _path)
+Memory Resource::readAllBytes(const String& path)
 {
-	String path = Resource::getFilePath(_path);
 	Memory ret;
-	if (path.isNotEmpty()) {
-		ret = File::readAllBytes(path);
+	String s = Resource::getFilePath(path);
+	if (s.isNotEmpty()) {
+		ret = File::readAllBytes(s);
 	}
 	return ret;
 }
@@ -54,10 +54,9 @@ String Resource::getFilePath(const String& path)
 	return String::null();
 }
 
-Memory Resource::readAllBytes(const String& _path)
+Memory Resource::readAllBytes(const String& path)
 {
-	Memory ret = Android::readAllBytesFromAsset(_path);
-	return ret;
+	return Android::readAllBytesFromAsset(path);
 }
 SLIB_NAMESPACE_END
 

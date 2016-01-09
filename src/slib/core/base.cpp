@@ -17,20 +17,16 @@ SLIB_NAMESPACE_BEGIN
 void* Base::createMemory(sl_size size)
 {
 #ifndef FORCE_MEM_ALIGNED
-	void* ptr = malloc(size);
-	if (ptr == sl_null) {
-		return sl_null;
-	}
-	return ptr;
+	return malloc(size);
 #else
 	sl_reg ptr = (sl_reg)(malloc(size + 16));
-	if (ptr == sl_null) {
-		return sl_null;
+	if (ptr) {
+		sl_reg ptr_aligned = (ptr | 7) + 9;
+		*(char*)(ptr_aligned - 1) = (char)(ptr_aligned - ptr);
+		*(sl_size*)(ptr) = size;
+		return (void*)(ptr_aligned);
 	}
-	sl_reg ptr_aligned = (ptr | 7) + 9;
-	*(char*)(ptr_aligned - 1) = (char)(ptr_aligned - ptr);
-	*(sl_size*)(ptr) = size;
-	return (void*)(ptr_aligned);
+	return sl_null;
 #endif
 }
 
@@ -51,17 +47,18 @@ void* Base::reallocMemory(void* ptr, sl_size sizeNew)
 		return createMemory(0);
 	}
 #ifndef FORCE_MEM_ALIGNED
-	void* ptrNew = realloc(ptr, sizeNew);
-	if (ptrNew == sl_null) {
-		return sl_null;
+	return realloc(ptr, sizeNew);
+#else
+	sl_size sizeOld = *(sl_size*)((sl_reg)ptr - *((unsigned char*)ptr - 1));
+	if (sizeOld == sizeNew) {
+		return ptr;
+	}
+	void* ptrNew = createMemory(sizeNew);
+	if (ptrNew) {
+		copyMemory(ptrNew, ptr, sizeOld);
+		freeMemory(ptr);
 	}
 	return ptrNew;
-#else
-	void* ptr_new = createMemory(sizeNew);
-	sl_size size_old = *(sl_size*)((sl_reg)ptr - *((unsigned char*)ptr - 1));
-	copyMemory(ptr_new, ptr, size_old);
-	freeMemory(ptr);
-	return ptr_new;
 #endif
 }
 

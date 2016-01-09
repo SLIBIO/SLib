@@ -59,9 +59,9 @@ public:
 		return ret;
 	}
 	
-	Size getTextSize(const String& _text)
+	Size getTextSize(const String& text)
 	{
-		JniLocal<jstring> jtext = Jni::getJniString(_text);
+		JniLocal<jstring> jtext = Jni::getJniString(text);
 		JniLocal<jobject> size = _JAndroidFont::getTextSize.callObject(m_font, jtext.get());
 		Size ret;
 		ret.x = _JAndroidPointF::x.get(size.get());
@@ -99,9 +99,8 @@ jobject UIPlatform::getNativeFont(Font* font, Ref<FontInstance>& instanceOut)
 	return 0;
 }
 
-Size UI::getFontTextSize(const Ref<Font>& _font, const String& text)
+Size UI::getFontTextSize(const Ref<Font>& font, const String& text)
 {
-	Ref<Font> font = _font;
 	Ref<_Android_FontInstance> instance = _Android_FontInstance::getInstance(font.get());
 	if (instance.isNotNull()) {
 		return instance->getTextSize(text);

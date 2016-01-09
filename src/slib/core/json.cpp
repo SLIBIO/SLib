@@ -240,9 +240,8 @@ static Variant _Json_parseJSON(const CT* buf, sl_uint32 len, sl_uint32& pos, sl_
 	return Variant::null();
 }
 
-Variant Json::parseJSON(const String& _json, sl_bool flagSupportComments)
+Variant Json::parseJSON(const String& json, sl_bool flagSupportComments)
 {
-	String8 json = _json;
 	const sl_char8* buf = json.getBuf();
 	sl_uint32 len = json.getLength();
 	while (len > 0) {
@@ -267,9 +266,8 @@ Variant Json::parseJSON(const String& _json, sl_bool flagSupportComments)
 	return Variant::null();
 }
 
-Variant Json::parseJSON16(const String16& _json, sl_bool flagSupportComments)
+Variant Json::parseJSON16(const String16& json, sl_bool flagSupportComments)
 {
-	String16 json = _json;
 	const sl_char16* buf = json.getBuf();
 	sl_uint32 len = json.getLength();
 	while (len > 0) {

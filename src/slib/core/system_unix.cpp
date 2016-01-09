@@ -113,13 +113,12 @@ struct _SYS_GLOBAL_UNIQUE_INSTANCE
 	Ref<File> file;
 };
 
-void* System::createGlobalUniqueInstance(const String& _name)
+void* System::createGlobalUniqueInstance(const String& uniqueName)
 {
-	String name = _name;
-	if (name.isEmpty()) {
+	if (uniqueName.isEmpty()) {
 		return sl_null;
 	}
-	name = File::makeSafeFileName(name);
+	String name = File::makeSafeFileName(uniqueName);
 	List<String>& lst = _System_getGlobalUniqueInstances();
 	if (lst.indexOf(name) >= 0) {
 		return sl_null;
@@ -180,9 +179,8 @@ sl_uint32 System::getThreadId()
 }
 
 #if !defined(SLIB_PLATFORM_IS_MOBILE)
-sl_bool System::createProcess(const String& _pathExecutable, const String* cmds, sl_uint32 nCmds)
+sl_bool System::createProcess(const String& pathExecutable, const String* cmds, sl_uint32 nCmds)
 {
-	String8 pathExecutable = _pathExecutable;
 	pid_t pid = fork();
 	if (pid == -1) {
 		SLIB_LOG_ERROR("System::createProcess", "Cannot fork");
@@ -235,11 +233,9 @@ void System::yield()
 	sched_yield();
 }
 
-void System::abort(const String& _msg, const String& _file, sl_uint32 line)
+void System::abort(const String& msg, const String& file, sl_uint32 line)
 {
 #if defined(SLIB_DEBUG)
-	String8 msg = _msg;
-	String8 file = _file;
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 	__assert(file.getBuf(), line, msg.getBuf());
 #elif defined(SLIB_PLATFORM_IS_BLACKBERRY)

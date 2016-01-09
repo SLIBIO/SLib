@@ -26,7 +26,7 @@ Ref<Image> Image::loadFromPNG(const void* content, sl_size size)
 			if (mem.isNotEmpty()) {
 				png_bytep buffer = (png_bytep)(mem.getBuf());
 				if (png_image_finish_read(&image, NULL, buffer, (png_int_32)pitch, NULL)) {
-					ret = Image::createStatic(image.width, image.height, (Color*)buffer, image.width, mem.getReference());
+					ret = Image::createStatic(image.width, image.height, (Color*)buffer, image.width, mem.getObject());
 				}
 			}
 		}
@@ -49,9 +49,8 @@ static void _slib_image_png_encode_warning(png_structrp png_ptr, png_const_charp
 {
 }
 
-Memory Image::saveToPNG(const Ref<Image>& _image)
+Memory Image::saveToPNG(const Ref<Image>& image)
 {
-	Ref<Image> image = _image;
 	if (image.isNull()) {
 		return Memory::null();
 	}
@@ -103,9 +102,8 @@ Memory Image::saveToPNG(const Ref<Image>& _image)
 	return ret;
 }
 
-sl_bool Image::saveToPNG(String filePath, const Ref<Image>& _image)
+sl_bool Image::saveToPNG(String filePath, const Ref<Image>& image)
 {
-	Ref<Image> image = _image;
 	if (image.isNull()) {
 		return sl_false;
 	}

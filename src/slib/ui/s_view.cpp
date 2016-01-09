@@ -53,9 +53,8 @@ void SView::removeAllChildren()
 	}
 }
 
-void SView::removeChild(const Ref<View>& _view)
+void SView::removeChild(const Ref<View>& view)
 {
-	Ref<View> view = _view;
 	if (view.isNotNull()) {
 		if (isNativeGroup()) {
 			Ref<ViewInstance> instanceChild = view->getViewInstance();
@@ -69,9 +68,8 @@ void SView::removeChild(const Ref<View>& _view)
 	}
 }
 
-void SView::addChild(const Ref<View>& _view)
+void SView::addChild(const Ref<View>& view)
 {
-	Ref<View> view = _view;
 	if (view.isNull()) {
 		return;
 	}

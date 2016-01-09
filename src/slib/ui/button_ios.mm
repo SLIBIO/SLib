@@ -55,19 +55,18 @@ void Button::setText(const String& text)
 	m_text = text;
 }
 
-void Button::setFont(const Ref<Font>& _font)
+void Button::setFont(const Ref<Font>& font)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[UIButton class]]) {
 		UIButton* v = (UIButton*)handle;
 		Ref<FontInstance> fontInstance;
-		Ref<Font> font = _font;
 		UIFont* hFont = UIPlatform::getUIFont(font.get(), fontInstance);
 		if (hFont != nil) {
 			v.titleLabel.font = hFont;
 		}
 	}
-	m_font = _font;
+	m_font = font;
 }
 
 void Button::setDefaultButton(sl_bool flag)
@@ -87,7 +86,7 @@ SLIB_UI_NAMESPACE_END
 
 -(void)onClick
 {
-	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		instance->onClick();
 	}

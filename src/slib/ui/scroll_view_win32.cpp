@@ -53,9 +53,8 @@ public:
 		return sl_false;
 	}
 
-	void __setContentView(const Ref<View>& _viewChild, ScrollView* viewParent)
+	void __setContentView(const Ref<View>& viewChild, ScrollView* viewParent)
 	{
-		Ref<View> viewChild = _viewChild;
 		if (viewChild.isNotNull()) {
 			Ref<ViewInstance> instance = viewChild->attachToNewInstance(this);
 			if (instance.isNotNull()) {

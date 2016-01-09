@@ -55,9 +55,8 @@ void CheckBox::setText(const String& text)
 	m_text = text;
 }
 
-void CheckBox::setFont(const Ref<Font>& _font)
+void CheckBox::setFont(const Ref<Font>& font)
 {
-	Ref<Font> font = _font;
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
 		NSButton* v = (NSButton*)handle;
@@ -104,7 +103,7 @@ SLIB_UI_NAMESPACE_END
 
 -(void)onClick
 {
-	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		instance->onClick();
 	}

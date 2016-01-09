@@ -63,7 +63,7 @@ void AsyncLoop::__runLoop()
 		
 		if (nEvents == 0) {
 
-			m_queueInstancesClosed.clear();
+			m_queueInstancesClosed.removeAll();
 
 			timespec* timeout;
 			timespec _timeout;

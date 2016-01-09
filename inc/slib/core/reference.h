@@ -288,7 +288,6 @@ public:
 	{
 		if (m_object) {
 			((Referable*)m_object)->decreaseReference();
-			m_object = sl_null;
 		}
 	}
 
@@ -310,6 +309,16 @@ public:
 		}
 		m_object = object;
 	}
+	
+	Ref(const SafeRef<ObjectClass>& other);
+	
+	template <class _ObjectClass>
+	Ref(const SafeRef<_ObjectClass>& other);
+	
+	Ref(const WeakRef<ObjectClass>& other);
+	
+	template <class _ObjectClass>
+	Ref(const WeakRef<_ObjectClass>& other);
 
 	SLIB_INLINE Ref(const ObjectClass* _object)
 	{
@@ -320,16 +329,7 @@ public:
 		m_object = object;
 	}
 
-	Ref(const SafeRef<ObjectClass>& other);
-
-	template <class _ObjectClass>
-	Ref(const SafeRef<_ObjectClass>& other);
-
-	Ref(const WeakRef<ObjectClass>& other);
-
-	template <class _ObjectClass>
-	Ref(const WeakRef<_ObjectClass>& other);
-
+public:
 	SLIB_INLINE static const _Type& null()
 	{
 		return *((_Type*)((void*)(&_Ref_null)));
@@ -355,10 +355,14 @@ public:
 		return m_object;
 	}
 
+public:
 	SLIB_INLINE _Type& operator=(const _Type& other)
 	{
 		ObjectClass* object = other.m_object;
 		if (m_object != object) {
+			if (object) {
+				((Referable*)object)->increaseReference();
+			}
 			_replaceObject(object);
 		}
 		return *this;
@@ -369,20 +373,36 @@ public:
 	{
 		ObjectClass* object = other.get();
 		if (m_object != object) {
+			if (object) {
+				((Referable*)object)->increaseReference();
+			}
 			_replaceObject(object);
 		}
 		return *this;
 	}
+	
+	_Type& operator=(const SafeRef<ObjectClass>& other);
+	
+	template <class _ObjectClass>
+	_Type& operator=(const SafeRef<_ObjectClass>& other);
+	
+	_Type& operator=(const WeakRef<ObjectClass>& other);
+	
+	template <class _ObjectClass>
+	_Type& operator=(const WeakRef<_ObjectClass>& other);
 
 	SLIB_INLINE _Type& operator=(const ObjectClass* other)
 	{
 		ObjectClass* object = (ObjectClass*)other;
 		if (m_object != object) {
+			if (object) {
+				((Referable*)object)->increaseReference();
+			}
 			_replaceObject(object);
 		}
 		return *this;
 	}
-
+	
 	SLIB_INLINE sl_bool operator==(const ObjectClass* other) const
 	{
 		return (m_object == other);
@@ -435,6 +455,7 @@ public:
 		return (ObjectClass*)m_object;
 	}
 
+public:
 	template <class _ObjectClass>
 	SLIB_INLINE static const _Type& from(const Ref<_ObjectClass>& other)
 	{
@@ -450,9 +471,6 @@ public:
 	SLIB_INLINE void _replaceObject(ObjectClass* objectNew)
 	{
 		ObjectClass* objectOld = m_object;
-		if (objectNew) {
-			((Referable*)objectNew)->increaseReference();
-		}
 		m_object = objectNew;
 		if (objectOld) {
 			((Referable*)objectOld)->decreaseReference();
@@ -478,7 +496,6 @@ public:
 	{
 		if (m_object) {
 			((Referable*)m_object)->decreaseReference();
-			m_object = sl_null;
 		}
 	}
 
@@ -513,6 +530,11 @@ public:
 		}
 		m_object = object;
 	}
+	
+	SafeRef(const WeakRef<ObjectClass>& other);
+	
+	template <class _ObjectClass>
+	SafeRef(const WeakRef<_ObjectClass>& other);
 
 	SLIB_INLINE SafeRef(const ObjectClass* other)
 	{
@@ -523,11 +545,7 @@ public:
 		m_object = object;
 	}
 	
-	SafeRef(const WeakRef<ObjectClass>& other);
-
-	template <class _ObjectClass>
-	SafeRef(const WeakRef<_ObjectClass>& other);
-
+public:
 	SLIB_INLINE static const _Type& null()
 	{
 		return *((_Type*)((void*)(&_Ref_null)));
@@ -548,6 +566,7 @@ public:
 		_replaceObject(sl_null);
 	}
 
+public:
 	SLIB_INLINE _Type& operator=(const _Type& other)
 	{
 		if (m_object != other.m_object) {
@@ -591,6 +610,11 @@ public:
 		}
 		return *this;
 	}
+	
+	_Type& operator=(const WeakRef<ObjectClass>& other);
+	
+	template <class _ObjectClass>
+	_Type& operator=(const WeakRef<_ObjectClass>& other);
 
 	SLIB_INLINE _Type& operator=(const ObjectClass* other)
 	{
@@ -614,6 +638,7 @@ public:
 		return m_object != other.m_object;
 	}
 
+public:
 	SLIB_INLINE Ref<ObjectClass> toRef() const
 	{
 		ObjectClass* object = _retainObject();
@@ -728,6 +753,7 @@ public:
 		_set(other.get());
 	}
 
+public:
 	SLIB_INLINE static const _Type& null()
 	{
 		return *((_Type*)((void*)(&_Ref_null)));
@@ -806,6 +832,7 @@ public:
 		return m_weak != other.m_weak;
 	}
 
+public:
 	Ref<WeakRefObject> getWeakRefObject() const
 	{
 		return m_weak.toRef();
@@ -857,7 +884,39 @@ private:
 };
 
 template <class ObjectClass>
-SLIB_INLINE Ref<ObjectClass>::Ref(const SafeRef<ObjectClass>& _other)
+SLIB_INLINE Ref<ObjectClass>::Ref(const SafeRef<ObjectClass>& other)
+{
+	ObjectClass* object = other._retainObject();
+	m_object = object;
+}
+
+template <class ObjectClass>
+SLIB_INLINE Ref<ObjectClass>& Ref<ObjectClass>::operator=(const SafeRef<ObjectClass>& other)
+{
+	ObjectClass* object = other._retainObject();
+	_replaceObject(object);
+	return *this;
+}
+
+template <class ObjectClass>
+template <class _ObjectClass>
+SLIB_INLINE Ref<ObjectClass>::Ref(const SafeRef<_ObjectClass>& other)
+{
+	ObjectClass* object = other._retainObject();
+	m_object = object;
+}
+
+template <class ObjectClass>
+template <class _ObjectClass>
+SLIB_INLINE Ref<ObjectClass>& Ref<ObjectClass>::operator=(const SafeRef<_ObjectClass>& other)
+{
+	ObjectClass* object = other._retainObject();
+	_replaceObject(object);
+	return *this;
+}
+
+template <class ObjectClass>
+Ref<ObjectClass>::Ref(const WeakRef<ObjectClass>& _other)
 {
 	Ref<ObjectClass> other(_other.toRef());
 	ObjectClass* object = other.m_object;
@@ -868,8 +927,20 @@ SLIB_INLINE Ref<ObjectClass>::Ref(const SafeRef<ObjectClass>& _other)
 }
 
 template <class ObjectClass>
+Ref<ObjectClass>& Ref<ObjectClass>::operator=(const WeakRef<ObjectClass>& _other)
+{
+	Ref<ObjectClass> other(_other.toRef());
+	ObjectClass* object = other.m_object;
+	if (object) {
+		((Referable*)object)->increaseReference();
+	}
+	_replaceObject(object);
+	return *this;
+}
+
+template <class ObjectClass>
 template <class _ObjectClass>
-SLIB_INLINE Ref<ObjectClass>::Ref(const SafeRef<_ObjectClass>& _other)
+Ref<ObjectClass>::Ref(const WeakRef<_ObjectClass>& _other)
 {
 	Ref<_ObjectClass> other(_other.toRef());
 	ObjectClass* object = other.m_object;
@@ -880,7 +951,21 @@ SLIB_INLINE Ref<ObjectClass>::Ref(const SafeRef<_ObjectClass>& _other)
 }
 
 template <class ObjectClass>
-SLIB_INLINE Ref<ObjectClass>::Ref(const WeakRef<ObjectClass>& _other)
+template <class _ObjectClass>
+Ref<ObjectClass>& Ref<ObjectClass>::operator=(const WeakRef<_ObjectClass>& _other)
+{
+	Ref<_ObjectClass> other(_other.toRef());
+	ObjectClass* object = other.m_object;
+	if (object) {
+		((Referable*)object)->increaseReference();
+	}
+	_replaceObject(object);
+	return *this;
+}
+
+
+template <class ObjectClass>
+SafeRef<ObjectClass>::SafeRef(const WeakRef<ObjectClass>& _other)
 {
 	Ref<ObjectClass> other(_other.toRef());
 	ObjectClass* object = other.m_object;
@@ -891,32 +976,20 @@ SLIB_INLINE Ref<ObjectClass>::Ref(const WeakRef<ObjectClass>& _other)
 }
 
 template <class ObjectClass>
-template <class _ObjectClass>
-SLIB_INLINE Ref<ObjectClass>::Ref(const WeakRef<_ObjectClass>& _other)
-{
-	Ref<_ObjectClass> other(_other.toRef());
-	ObjectClass* object = other.m_object;
-	if (object) {
-		((Referable*)object)->increaseReference();
-	}
-	m_object = object;
-}
-
-
-template <class ObjectClass>
-SLIB_INLINE SafeRef<ObjectClass>::SafeRef(const WeakRef<ObjectClass>& _other)
+SafeRef<ObjectClass>& SafeRef<ObjectClass>::operator=(const WeakRef<ObjectClass>& _other)
 {
 	Ref<ObjectClass> other(_other.toRef());
 	ObjectClass* object = other.m_object;
 	if (object) {
 		((Referable*)object)->increaseReference();
 	}
-	m_object = object;
+	_replaceObject(object);
+	return *this;
 }
 
 template <class ObjectClass>
 template <class _ObjectClass>
-SLIB_INLINE SafeRef<ObjectClass>::SafeRef(const WeakRef<_ObjectClass>& _other)
+SafeRef<ObjectClass>::SafeRef(const WeakRef<_ObjectClass>& _other)
 {
 	Ref<_ObjectClass> other(_other.toRef());
 	ObjectClass* object = other.m_object;
@@ -924,6 +997,19 @@ SLIB_INLINE SafeRef<ObjectClass>::SafeRef(const WeakRef<_ObjectClass>& _other)
 		((Referable*)object)->increaseReference();
 	}
 	m_object = object;
+}
+
+template <class ObjectClass>
+template <class _ObjectClass>
+SafeRef<ObjectClass>& SafeRef<ObjectClass>::operator=(const WeakRef<_ObjectClass>& _other)
+{
+	Ref<_ObjectClass> other(_other.toRef());
+	ObjectClass* object = other.m_object;
+	if (object) {
+		((Referable*)object)->increaseReference();
+	}
+	_replaceObject(object);
+	return *this;
 }
 
 class SLIB_EXPORT _ReferableConstructor

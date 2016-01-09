@@ -7,10 +7,9 @@ IndexBuffer::IndexBuffer()
 	setStatic(sl_true);
 }
 
-Ref<IndexBuffer> IndexBuffer::create(const Memory& _mem)
+Ref<IndexBuffer> IndexBuffer::create(const Memory& mem)
 {
 	Ref<IndexBuffer> ret;
-	Memory mem = _mem;
 	if (mem.isNotEmpty()) {
 		ret = new IndexBuffer();
 		if (ret.isNotNull()) {

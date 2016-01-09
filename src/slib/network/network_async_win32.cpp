@@ -36,10 +36,9 @@ public:
 		close();
 	}
 
-	static Ref<_Win32AsyncTcpSocketInstance> create(const Ref<Socket>& _socket)
+	static Ref<_Win32AsyncTcpSocketInstance> create(const Ref<Socket>& socket)
 	{
 		Ref<_Win32AsyncTcpSocketInstance> ret;
-		Ref<Socket> socket = _socket;
 		if (socket.isNotNull()) {
 			sl_file handle = (sl_file)(socket->getHandle());
 			if (handle != SLIB_FILE_INVALID_HANDLE) {
@@ -155,7 +154,7 @@ public:
 					} else {
 						int err = ::WSAGetLastError();
 						if (err == WSAEINVAL) {
-							// ConnectEx requires the socket to be “initially bound”
+							// ConnectEx requires the socket to be ï¿½initially boundï¿½
 							sockaddr_storage saBind;
 							SocketAddress aBind;
 							aBind.port = 0;
@@ -259,10 +258,9 @@ public:
 		close();
 	}
 
-	static Ref<_Win32AsyncTcpServerInstance> create(const Ref<Socket>& _socket)
+	static Ref<_Win32AsyncTcpServerInstance> create(const Ref<Socket>& socket)
 	{
 		Ref<_Win32AsyncTcpServerInstance> ret;
-		Ref<Socket> socket = _socket;
 		if (socket.isNotNull()) {
 			sl_file handle = (sl_file)(socket->getHandle());
 			if (handle != SLIB_FILE_INVALID_HANDLE) {
@@ -437,10 +435,9 @@ public:
 		close();
 	}
 
-	static Ref<_Win32AsyncUdpSocketInstance> create(const Ref<Socket>& _socket)
+	static Ref<_Win32AsyncUdpSocketInstance> create(const Ref<Socket>& socket)
 	{
 		Ref<_Win32AsyncUdpSocketInstance> ret;
-		Ref<Socket> socket = _socket;
 		if (socket.isNotNull()) {
 			sl_file handle = (sl_file)(socket->getHandle());
 			if (handle != SLIB_FILE_INVALID_HANDLE) {

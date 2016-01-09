@@ -189,13 +189,13 @@ String EditView::getText()
 	return m_text;
 }
 
-void EditView::setText(const String& _text)
+void EditView::setText(const String& text)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		Windows::setWindowText(handle, _text);
+		Windows::setWindowText(handle, text);
 	}
-	m_text = _text;
+	m_text = text;
 }
 
 sl_bool EditView::isBorder()
@@ -364,9 +364,8 @@ void EditView::setBackgroundColor(const Color& color)
 	m_backgroundColor = color;
 }
 
-void EditView::setFont(const Ref<Font>& _font)
+void EditView::setFont(const Ref<Font>& font)
 {
-	Ref<Font> font = _font;
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
