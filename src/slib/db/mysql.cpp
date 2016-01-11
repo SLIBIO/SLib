@@ -839,7 +839,7 @@ public:
 							Base::zeroMemory(bind + i, sizeof(MYSQL_BIND));
 							const Variant& var = params[i];
 							switch (var.getType()) {
-							case Variant::typeEmpty:
+							case Variant::typeNull:
 								bind[i].buffer_type = MYSQL_TYPE_NULL;
 								break;
 							case Variant::typeBoolean:

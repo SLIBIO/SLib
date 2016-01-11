@@ -180,7 +180,7 @@ public:
 public:
 	SLIB_INLINE JniSafeGlobal<T>& operator=(const JniGlobal<T>& g)
 	{
-		m_object = g.getReference();
+		m_object = g.getRef();
 		return *this;
 	}
 	
@@ -209,7 +209,7 @@ public:
 };
 
 template <class T>
-SLIB_INLINE JniGlobal<T>::JniGlobal(const JniSafeGlobal<T>& g) : m_object(g.getReference())
+SLIB_INLINE JniGlobal<T>::JniGlobal(const JniSafeGlobal<T>& g) : m_object(g.getRef())
 {
 }
 
@@ -444,7 +444,7 @@ class SLIB_EXPORT JniSafeClass
 	SLIB_DECLARE_OBJECT_WRAPPER(JniSafeClass, JniSafeClass, _JniGlobal, SafeRef<_JniGlobal>)
     
 public:
-    SLIB_INLINE JniSafeClass(const JniClass& g) : m_object(g.getReference())
+    SLIB_INLINE JniSafeClass(const JniClass& g) : m_object(g.getRef())
     {        
     }
     
@@ -455,7 +455,7 @@ public:
 public:
     JniSafeClass& operator=(const JniClass& g)
     {
-        m_object = g.getReference();
+        m_object = g.getRef();
     }
     
 	SLIB_INLINE JniSafeClass& operator=(jclass cls)
@@ -465,13 +465,13 @@ public:
 	}
 };
 
-JniClass::JniClass(const JniSafeClass& g) : m_object(g.getReference())
+SLIB_INLINE JniClass::JniClass(const JniSafeClass& g) : m_object(g.getRef())
 {
 }
 
-JniClass& JniClass::operator=(const JniSafeClass& g)
+SLIB_INLINE JniClass& JniClass::operator=(const JniSafeClass& g)
 {
-    m_object = g.getReference();
+    m_object = g.getRef();
     return *this;
 }
 

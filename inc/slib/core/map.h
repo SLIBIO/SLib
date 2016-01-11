@@ -1472,13 +1472,13 @@ class SLIB_EXPORT SafeMap
 	SLIB_DECLARE_OBJECT_WRAPPER(SafeMap, _Type, _Obj, _Ref)
 	
 public:
-	SLIB_INLINE SafeMap(const List<KT, VT>& other) : m_object(other.getReference())
+	SLIB_INLINE SafeMap(const List<KT, VT>& other) : m_object(other.getRef())
 	{
 	}
 	
 	SLIB_INLINE _Type& operator=(const Map<KT, VT>& other)
 	{
-		m_object = other.getReference();
+		m_object = other.getRef();
 		return *this;
 	}
 	
@@ -1704,14 +1704,14 @@ public:
 
 
 template <class KT, class VT>
-SLIB_INLINE Map<KT, VT>::Map(const SafeMap<KT, VT>& other) : m_object(other.getReference())
+SLIB_INLINE Map<KT, VT>::Map(const SafeMap<KT, VT>& other) : m_object(other.getRef())
 {
 }
 
 template <class KT, class VT>
 SLIB_INLINE Map<KT, VT>& Map<KT, VT>::operator=(const SafeMap<KT, VT>& other)
 {
-	m_object = other.getReference();
+	m_object = other.getRef();
 	return *this;
 }
 

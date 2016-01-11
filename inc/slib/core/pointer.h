@@ -2,165 +2,27 @@
 #define CHECKHEADER_SLIB_CORE_POINTER
 
 #include "definition.h"
-#include "base.h"
+
 #include "reference.h"
 
 SLIB_NAMESPACE_BEGIN
 
-extern sl_ptr _RefPtr_null[2];
-
-struct SLIB_EXPORT _RefPtr_Container
+struct _Ptr_Const
 {
-	void* m_pointer;
-	Ref<Referable> m_reference;
+	void* pointer;
+	void* reference;
+	sl_int32 lock;
 };
+extern const _Ptr_Const _Ptr_Null;
 
-void _RefPtr_copy(_RefPtr_Container* target, _RefPtr_Container* source);
-void _RefPtr_set(_RefPtr_Container* target, _RefPtr_Container* source);
-void _RefPtr_set(_RefPtr_Container* target, const void* pointer);
-void _RefPtr_set(_RefPtr_Container* target, const Ref<Referable>& ref);
-void _RefPtr_set(_RefPtr_Container* target, const void* pointer, const Ref<Referable>& ref);
 
-template <class TYPE>
-class SLIB_EXPORT RefPtr
-{
-private:
-	TYPE* m_pointer;
-	Ref<Referable> m_reference;
+template <class T>
+class SafePtr;
 
-public:
-	SLIB_INLINE RefPtr()
-	{
-		m_pointer = sl_null;
-	}
-
-	SLIB_INLINE RefPtr(const RefPtr<TYPE>& other)
-	{
-		_RefPtr_copy((_RefPtr_Container*)((void*)this), (_RefPtr_Container*)((void*)(&other)));
-	}
-
-	SLIB_INLINE RefPtr(const TYPE* pointer)
-	{
-		m_pointer = (TYPE*)pointer;
-	}
-
-	template <class O>
-	SLIB_INLINE RefPtr(const Ref<O>& reference)
-	{
-		m_reference = reference;
-		m_pointer = (O*)(m_reference.get());
-	}
-	
-	template <class O>
-	SLIB_INLINE RefPtr(const TYPE* pointer, const Ref<O>& reference)
-	{
-		m_reference = reference;
-		m_pointer = (TYPE*)pointer;
-	}
-	
-public:
-	SLIB_INLINE static const RefPtr<TYPE>& null()
-	{
-		return *((RefPtr<TYPE>*)((void*)(&_RefPtr_null)));
-	}
-
-	SLIB_INLINE RefPtr<TYPE>& operator=(const RefPtr<TYPE>& other)
-	{
-		_RefPtr_set((_RefPtr_Container*)((void*)this), (_RefPtr_Container*)((void*)(&other)));
-		return *this;
-	}
-
-	SLIB_INLINE RefPtr<TYPE>& operator=(const TYPE* pointer)
-	{
-		_RefPtr_set((_RefPtr_Container*)((void*)this), pointer);
-		return *this;
-	}
-
-	SLIB_INLINE RefPtr<TYPE>& operator=(const Ref<TYPE>& reference)
-	{
-		_RefPtr_set((_RefPtr_Container*)((void*)this), Ref<Referable>::from(reference));
-		return *this;
-	}
-
-	template <class O>
-	SLIB_INLINE RefPtr<TYPE>& operator=(const Ref<O>& _reference)
-	{
-		Ref<O> reference = _reference;
-		TYPE* pointer = reference.get();
-		_RefPtr_set((_RefPtr_Container*)((void*)this), pointer, Ref<Referable>::from(reference));
-		return *this;
-	}
-
-	SLIB_INLINE sl_bool operator==(const RefPtr<TYPE>& other) const
-	{
-		return m_pointer == other.m_pointer && m_reference == other.m_reference;
-	}
-
-	SLIB_INLINE sl_bool operator!=(const RefPtr<TYPE>& other) const
-	{
-		return m_pointer != other.m_pointer || m_reference != other.m_reference;
-	}
-
-	SLIB_INLINE sl_bool isNull() const
-	{
-		return m_pointer == sl_null;
-	}
-
-	SLIB_INLINE sl_bool isNotNull() const
-	{
-		return m_pointer != sl_null;
-	}
-
-	SLIB_INLINE void setNull()
-	{
-		*this = null();
-	}
-
-	SLIB_INLINE TYPE* getValue() const
-	{
-		return m_pointer;
-	}
-
-	SLIB_INLINE TYPE* get() const
-	{
-		return m_pointer;
-	}
-
-	SLIB_INLINE TYPE& operator*()
-	{
-		return *m_pointer;
-	}
-
-	SLIB_INLINE TYPE* operator->() const
-	{
-		return m_pointer;
-	}
-
-	SLIB_INLINE const Ref<Referable>& getReference() const
-	{
-		return m_reference;
-	}
-};
-
-extern const sl_ptr _Ptr_null[2];
-
-struct SLIB_EXPORT _Ptr_Container
-{
-	void* m_pointer;
-	Ref<Referable> m_reference;
-};
-
-void _Ptr_copy(_Ptr_Container* target, _Ptr_Container* source);
-void _Ptr_set(_Ptr_Container* target, _Ptr_Container* source);
-void _Ptr_set(_Ptr_Container* target, const void* pointer);
-void _Ptr_set(_Ptr_Container* target, const Ref<Referable>& ref);
-void _Ptr_set(_Ptr_Container* target, const void* pointer, const Ref<Referable>& ref);
-void _Ptr_lock(_Ptr_Container* target, _Ptr_Container* source);
-
-template <class TYPE>
+template <class T>
 class SLIB_EXPORT Ptr {
 private:
-	TYPE* m_pointer;
+	T* m_pointer;
 	Ref<Referable> m_reference;
 
 public:
@@ -169,249 +31,809 @@ public:
 		m_pointer = sl_null;
 	}
 
-	SLIB_INLINE Ptr(const Ptr<TYPE>& other)
+	SLIB_INLINE Ptr(const Ptr<T>& other) : m_pointer(other.m_pointer), m_reference(other.m_reference)
 	{
-		_Ptr_copy((_Ptr_Container*)((void*)this), (_Ptr_Container*)((void*)(&other)));
 	}
 
 	template <class O>
-	SLIB_INLINE Ptr(const Ptr<O>& other)
+	SLIB_INLINE Ptr(const Ptr<O>& other) : m_pointer(other.get()), m_reference(other.getReference())
 	{
-		TYPE* pointer = other.getValue();
-		SLIB_UNUSED(pointer);
-		_Ptr_copy((_Ptr_Container*)((void*)this), (_Ptr_Container*)((void*)(&other)));
 	}
-
-	SLIB_INLINE Ptr(const TYPE* pointer)
+	
+	Ptr(const SafePtr<T>& other);
+	
+	template <class O>
+	Ptr(const SafePtr<O>& other);
+	
+	SLIB_INLINE Ptr(const T* pointer)
 	{
-		m_pointer = (TYPE*)pointer;
+		m_pointer = (T*)pointer;
+	}
+	
+	SLIB_INLINE Ptr(const Ref<T>& reference)
+	{
+		m_pointer = reference.get();
+		m_reference = reference;
 	}
 
 	template <class O>
 	SLIB_INLINE Ptr(const Ref<O>& reference)
 	{
-		m_reference = reference;
-		m_pointer = (O*)(m_reference.get());
-	}
-
-	template <class O>
-	SLIB_INLINE Ptr(const TYPE* pointer, const Ref<O>& reference)
-	{
-		m_pointer = (TYPE*)pointer;
+		m_pointer = reference.get();
 		m_reference = reference;
 	}
-
+	
 	template <class O>
-	SLIB_INLINE Ptr(const SafeRef<O>& reference)
+	SLIB_INLINE Ptr(const T* pointer, const Ref<O>& reference)
 	{
+		m_pointer = (T*)pointer;
 		m_reference = reference;
-		m_pointer = (O*)(m_reference.get());
 	}
-
-	template <class O>
-	SLIB_INLINE Ptr(const TYPE* pointer, const SafeRef<O>& reference)
+	
+	SLIB_INLINE Ptr(const SafeRef<T>& _reference)
 	{
-		m_pointer = (TYPE*)pointer;
+		Ref<T> reference(_reference);
+		m_pointer = reference.get();
 		m_reference = reference;
 	}
 
 	template <class O>
-	SLIB_INLINE Ptr(const WeakRef<O>& weak)
+	SLIB_INLINE Ptr(const SafeRef<O>& _reference)
 	{
-		Ref<O> o(weak);
+		Ref<O> reference(_reference);
+		m_pointer = reference.get();
+		m_reference = reference;
+	}
+	
+	template <class O>
+	SLIB_INLINE Ptr(const T* pointer, const SafeRef<O>& reference)
+	{
+		m_pointer = (T*)pointer;
+		m_reference = reference;
+	}
+	
+	Ptr(const WeakRef<T>& weak)
+	{
+		Ref<T> o(weak);
 		if (o.isNotNull()) {
-			m_pointer = (O*)(o.get());
-			m_reference = weak.getWeakRefObject();
+			m_pointer = o.get();
+			m_reference = weak.getWeakRef();
 		} else {
 			m_pointer = sl_null;
 		}
 	}
 
 	template <class O>
-	SLIB_INLINE Ptr(const TYPE* pointer, const WeakRef<O>& weak)
+	Ptr(const WeakRef<O>& weak)
 	{
-		m_pointer = (TYPE*)pointer;
-		m_reference = weak.getWeakRefObject();
+		Ref<O> o(weak);
+		if (o.isNotNull()) {
+			m_pointer = o.get();
+			m_reference = weak.getWeakRef();
+		} else {
+			m_pointer = sl_null;
+		}
+	}
+
+	template <class O>
+	SLIB_INLINE Ptr(const T* pointer, const WeakRef<O>& weak)
+	{
+		m_pointer = (T*)pointer;
+		m_reference = weak.getWeakRef();
+	}
+	
+	Ptr(const SafeWeakRef<T>& weak)
+	{
+		Ref<T> o(weak);
+		if (o.isNotNull()) {
+			m_pointer = o.get();
+			m_reference = weak.getWeakRef();
+		} else {
+			m_pointer = sl_null;
+		}
+	}
+
+	template <class O>
+	Ptr(const SafeWeakRef<O>& weak)
+	{
+		Ref<O> o(weak);
+		if (o.isNotNull()) {
+			m_pointer = o.get();
+			m_reference = weak.getWeakRef();
+		} else {
+			m_pointer = sl_null;
+		}
+	}
+	
+	template <class O>
+	SLIB_INLINE Ptr(const T* pointer, const SafeWeakRef<O>& weak)
+	{
+		m_pointer = (T*)pointer;
+		m_reference = weak.getWeakRef();
 	}
 
 public:
-	SLIB_INLINE static const Ptr<TYPE>& null()
+	SLIB_INLINE static const Ptr<T>& null()
 	{
-		return *((Ptr<TYPE>*)((void*)(&_Ptr_null)));
+		return *((Ptr<T>*)((void*)(&_Ptr_Null)));
 	}
-
-	SLIB_INLINE Ptr<TYPE>& operator=(const Ptr<TYPE>& other)
-	{
-		_Ptr_set((_Ptr_Container*)((void*)this), (_Ptr_Container*)((void*)(&other)));
-		return *this;
-	}
-
-	SLIB_INLINE Ptr<TYPE>& operator=(const TYPE* pointer)
-	{
-		_Ptr_set((_Ptr_Container*)((void*)this), pointer);
-		return *this;
-	}
-
-	SLIB_INLINE Ptr<TYPE>& operator=(const Ref<TYPE>& reference)
-	{
-		_Ptr_set((_Ptr_Container*)((void*)this), Ref<Referable>::from(reference));
-		return *this;
-	}
-
-	template <class O>
-	SLIB_INLINE Ptr<TYPE>& operator=(const Ref<O>& _reference)
-	{
-		Ref<O> reference(_reference);
-		TYPE* pointer = reference.get();
-		_Ptr_set((_Ptr_Container*)((void*)this), pointer, Ref<Referable>::from(reference));
-		return *this;
-	}
-
-	SLIB_INLINE Ptr<TYPE>& operator=(const SafeRef<TYPE>& _reference)
-	{
-		Ref<TYPE> reference(_reference);
-		_Ptr_set((_Ptr_Container*)((void*)this), Ref<Referable>::from(reference));
-		return *this;
-	}
-
-	template <class O>
-	SLIB_INLINE Ptr<TYPE>& operator=(const SafeRef<O>& _reference)
-	{
-		Ref<O> reference(_reference);
-		TYPE* pointer = reference.get();
-		_Ptr_set((_Ptr_Container*)((void*)this), pointer, Ref<Referable>::from(reference));
-		return *this;
-	}
-
-	SLIB_INLINE Ptr<TYPE>& operator=(const WeakRef<TYPE>& weak)
-	{
-		return (*this = Ptr<TYPE>(weak));
-	}
-
-	template <class O>
-	SLIB_INLINE Ptr<TYPE>& operator=(const WeakRef<O>& weak)
-	{
-		return (*this = Ptr<TYPE>(weak));
-	}
-
-	SLIB_INLINE sl_bool operator==(const Ptr<TYPE>& other) const
-	{
-		return m_pointer == other.m_pointer && m_reference == other.m_reference;
-	}
-
-	SLIB_INLINE sl_bool operator!=(const Ptr<TYPE>& other) const
-	{
-		return m_pointer != other.m_pointer || m_reference != other.m_reference;
-	}
-
-	SLIB_INLINE sl_bool isWeakReference() const
-	{
-		Ref<Referable> ref = m_reference;
-		return (WeakRefObject::checkInstance(ref));
-	}
-
+	
 	SLIB_INLINE sl_bool isNull() const
 	{
 		return m_pointer == sl_null;
 	}
-
+	
 	SLIB_INLINE sl_bool isNotNull() const
 	{
 		return m_pointer != sl_null;
 	}
-
+	
 	SLIB_INLINE void setNull()
 	{
-		*this = null();
+		m_pointer = sl_null;
+		m_reference.setNull();
 	}
 
-	SLIB_INLINE TYPE* getValue() const
+public:
+	SLIB_INLINE T* get() const
 	{
 		return m_pointer;
 	}
-
-	SLIB_INLINE TYPE* get() const
-	{
-		return m_pointer;
-	}
-
+	
 	SLIB_INLINE const Ref<Referable>& getReference() const
 	{
 		return m_reference;
 	}
-
-	SLIB_INLINE RefPtr<TYPE> lock() const
+	
+	SLIB_INLINE sl_bool isWeak() const
+	{
+		return (CWeakRef::checkInstance(m_reference));
+	}
+	
+	Ptr<T> lock() const
 	{
 		if (m_pointer) {
-			_Ptr_Container ret;
-			ret.m_pointer = sl_null;
-			_Ptr_lock(&ret, (_Ptr_Container*)((void*)this));
-			if (ret.m_pointer) {
-				return RefPtr<TYPE>((TYPE*)(ret.m_pointer), ret.m_reference);
+			Referable* ref = m_reference.get();
+			if (CWeakRef::checkInstance(ref)) {
+				CWeakRef* weak = (CWeakRef*)ref;
+				Ref<Referable> r(weak->lock());
+				if (r.isNotNull()) {
+					return Ptr<T>(m_pointer, r);
+				}
+			} else {
+				return *this;
 			}
 		}
-		return RefPtr<TYPE>::null();
+		return Ptr<T>::null();
+	}
+	
+	template <class O>
+	SLIB_INLINE static const Ptr<T>& from(const Ptr<O>& other)
+	{
+		return *((const Ptr<T>*)((void*)(&other)));
+	}
+	
+public:
+	SLIB_INLINE Ptr<T>& operator=(const Ptr<T>& other)
+	{
+		m_pointer = other.m_pointer;
+		m_reference = other.m_reference;
+		return *this;
+	}
+	
+	template <class O>
+	SLIB_INLINE Ptr<T>& operator=(const Ptr<O>& other)
+	{
+		m_pointer = other.get();
+		m_reference = other.getReference();
+		return *this;
+	}
+	
+	Ptr<T>& operator=(const SafePtr<T>& other);
+	
+	template <class O>
+	Ptr<T>& operator=(const SafePtr<O>& other);
+	
+	SLIB_INLINE Ptr<T>& operator=(const T* pointer)
+	{
+		m_pointer = pointer;
+		m_reference.setNull();
+		return *this;
+	}
+
+	SLIB_INLINE Ptr<T>& operator=(const Ref<T>& reference)
+	{
+		m_pointer = reference.get();
+		m_reference = reference;
+		return *this;
 	}
 
 	template <class O>
-	SLIB_INLINE static Ptr<TYPE> from(const Ptr<O>& _other)
+	SLIB_INLINE Ptr<T>& operator=(const Ref<O>& reference)
 	{
-		Ptr<O> other = _other;
-		return Ptr<TYPE>((TYPE*)(other.getValue()), other.getReference());
+		m_pointer = reference.get();
+		m_reference = reference;
+		return *this;
+	}
+
+	SLIB_INLINE Ptr<T>& operator=(const SafeRef<T>& _reference)
+	{
+		Ref<T> reference(_reference);
+		m_pointer = reference.get();
+		m_reference = reference;
+		return *this;
+	}
+
+	template <class O>
+	SLIB_INLINE Ptr<T>& operator=(const SafeRef<O>& _reference)
+	{
+		Ref<O> reference(_reference);
+		m_pointer = reference.get();
+		m_reference = reference;
+		return *this;
+	}
+
+	Ptr<T>& operator=(const WeakRef<T>& weak)
+	{
+		Ref<T> o(weak);
+		if (o.isNotNull()) {
+			m_pointer = o.get();
+			m_reference = weak.getWeakRef();
+		} else {
+			m_pointer = sl_null;
+		}
+		return *this;
+	}
+
+	template <class O>
+	Ptr<T>& operator=(const WeakRef<O>& weak)
+	{
+		Ref<O> o(weak);
+		if (o.isNotNull()) {
+			m_pointer = o.get();
+			m_reference = weak.getWeakRef();
+		} else {
+			m_pointer = sl_null;
+		}
+		return *this;
+	}
+	
+	Ptr<T>& operator=(const SafeWeakRef<T>& weak)
+	{
+		Ref<T> o(weak);
+		if (o.isNotNull()) {
+			m_pointer = o.get();
+			m_reference = weak.getWeakRef();
+		} else {
+			m_pointer = sl_null;
+		}
+		return *this;
+	}
+	
+	template <class O>
+	Ptr<T>& operator=(const SafeWeakRef<O>& weak)
+	{
+		Ref<O> o(weak);
+		if (o.isNotNull()) {
+			m_pointer = o.get();
+			m_reference = weak.getWeakRef();
+		} else {
+			m_pointer = sl_null;
+		}
+		return *this;
+	}
+
+public:
+	SLIB_INLINE sl_bool operator==(const Ptr<T>& other) const
+	{
+		return m_pointer == other.m_pointer;
+	}
+	
+	template <class O>
+	SLIB_INLINE sl_bool operator==(const Ptr<O>& other) const
+	{
+		return m_pointer == other.get();
+	}
+
+	sl_bool operator==(const SafePtr<T>& other) const;
+	
+	template <class O>
+	sl_bool operator==(const SafePtr<O>& other) const;
+	
+public:
+	SLIB_INLINE sl_bool operator!=(const Ptr<T>& other) const
+	{
+		return m_pointer != other.m_pointer;
+	}
+	
+	template <class O>
+	SLIB_INLINE sl_bool operator!=(const Ptr<O>& other) const
+	{
+		return m_pointer != other.get();
+	}
+	
+	sl_bool operator!=(const SafePtr<T>& other) const;
+	
+	template <class O>
+	sl_bool operator!=(const SafePtr<O>& other) const;
+	
+public:
+	SLIB_INLINE T& operator*()
+	{
+		return *m_pointer;
+	}
+	
+	SLIB_INLINE T* operator->()
+	{
+		return m_pointer;
+	}
+
+};
+
+
+template <class T>
+class SLIB_EXPORT SafePtr {
+private:
+	T* m_pointer;
+	Ref<Referable> m_reference;
+	SpinLock m_lock;
+	
+public:
+	SLIB_INLINE SafePtr()
+	{
+		m_pointer = sl_null;
+	}
+	
+	SLIB_INLINE SafePtr(const SafePtr<T>& other)
+	{
+		m_pointer = other._retain(m_reference);
+	}
+	
+	template <class O>
+	SLIB_INLINE SafePtr(const SafePtr<O>& other)
+	{
+		m_pointer = other._retain(m_reference);
+	}
+	
+	SLIB_INLINE SafePtr(const Ptr<T>& other) : m_pointer(other.m_pointer), m_reference(other.m_reference)
+	{
+	}
+	
+	template <class O>
+	SLIB_INLINE SafePtr(const Ptr<O>& other) : m_pointer(other.get()), m_reference(other.getReference())
+	{
+	}
+	
+	SLIB_INLINE SafePtr(const T* pointer)
+	{
+		m_pointer = (T*)pointer;
+	}
+	
+	SLIB_INLINE SafePtr(const Ref<T>& reference)
+	{
+		m_pointer = reference.get();
+		m_reference = reference;
+	}
+	
+	template <class O>
+	SLIB_INLINE SafePtr(const Ref<O>& reference)
+	{
+		m_pointer = reference.get();
+		m_reference = reference;
+	}
+	
+	template <class O>
+	SLIB_INLINE SafePtr(const T* pointer, const Ref<O>& reference)
+	{
+		m_pointer = (T*)pointer;
+		m_reference = reference;
+	}
+	
+	SLIB_INLINE SafePtr(const SafeRef<T>& _reference)
+	{
+		Ref<T> reference(_reference);
+		m_pointer = reference.get();
+		m_reference = reference;
+	}
+	
+	template <class O>
+	SLIB_INLINE SafePtr(const SafeRef<O>& _reference)
+	{
+		Ref<O> reference(_reference);
+		m_pointer = reference.get();
+		m_reference = reference;
+	}
+	
+	template <class O>
+	SLIB_INLINE SafePtr(const T* pointer, const SafeRef<O>& reference)
+	{
+		m_pointer = (T*)pointer;
+		m_reference = reference;
+	}
+	
+	SafePtr(const WeakRef<T>& weak)
+	{
+		Ref<T> o(weak);
+		if (o.isNotNull()) {
+			m_pointer = o.get();
+			m_reference = weak.getWeakRef();
+		} else {
+			m_pointer = sl_null;
+		}
+	}
+	
+	template <class O>
+	SafePtr(const WeakRef<O>& weak)
+	{
+		Ref<O> o(weak);
+		if (o.isNotNull()) {
+			m_pointer = o.get();
+			m_reference = weak.getWeakRef();
+		} else {
+			m_pointer = sl_null;
+		}
+	}
+	
+	template <class O>
+	SLIB_INLINE SafePtr(const T* pointer, const WeakRef<O>& weak)
+	{
+		m_pointer = (T*)pointer;
+		m_reference = weak.getWeakRef();
+	}
+	
+	SafePtr(const SafeWeakRef<T>& weak)
+	{
+		Ref<T> o(weak);
+		if (o.isNotNull()) {
+			m_pointer = o.get();
+			m_reference = weak.getWeakRef();
+		} else {
+			m_pointer = sl_null;
+		}
+	}
+	
+	template <class O>
+	SafePtr(const SafeWeakRef<O>& weak)
+	{
+		Ref<O> o(weak);
+		if (o.isNotNull()) {
+			m_pointer = o.get();
+			m_reference = weak.getWeakRef();
+		} else {
+			m_pointer = sl_null;
+		}
+	}
+	
+	template <class O>
+	SLIB_INLINE SafePtr(const T* pointer, const SafeWeakRef<O>& weak)
+	{
+		m_pointer = (T*)pointer;
+		m_reference = weak.getWeakRef();
+	}
+	
+public:
+	SLIB_INLINE static const SafePtr<T>& null()
+	{
+		return *((SafePtr<T>*)((void*)(&_Ptr_Null)));
+	}
+	
+	SLIB_INLINE sl_bool isNull() const
+	{
+		return m_pointer == sl_null;
+	}
+	
+	SLIB_INLINE sl_bool isNotNull() const
+	{
+		return m_pointer != sl_null;
+	}
+	
+	SLIB_INLINE void setNull()
+	{
+		_replace(sl_null, Ref<Referable>::null());
+	}
+	
+public:
+	SLIB_INLINE Ptr<T> lock() const
+	{
+		Ptr<T> p(*this);
+		return p.lock();
+	}
+	
+	template <class O>
+	SLIB_INLINE static const SafePtr<T>& from(const SafePtr<O>& other)
+	{
+		return *((const SafePtr<T>*)((void*)(&other)));
+	}
+	
+public:
+	SLIB_INLINE SafePtr<T>& operator=(const SafePtr<T>& other)
+	{
+		Ref<Referable> reference;
+		T* pointer = other._retain(reference);
+		_replace(pointer, reference);
+		return *this;
+	}
+	
+	template <class O>
+	SLIB_INLINE SafePtr<T>& operator=(const SafePtr<O>& other)
+	{
+		Ref<Referable> reference;
+		T* pointer = other._retain(reference);
+		_replace(pointer, reference);
+		return *this;
+	}
+
+	SLIB_INLINE SafePtr<T>& operator=(const Ptr<T>& other)
+	{
+		_replace(other.m_pointer, other.m_reference);
+		return *this;
+	}
+	
+	template <class O>
+	SLIB_INLINE SafePtr<T>& operator=(const Ptr<O>& other)
+	{
+		_replace(other.get(), other.getReference());
+		return *this;
+	}
+	
+	SLIB_INLINE SafePtr<T>& operator=(const T* pointer)
+	{
+		_replace(pointer, Ref<Referable>::null());
+		return *this;
+	}
+	
+	SLIB_INLINE SafePtr<T>& operator=(const Ref<T>& reference)
+	{
+		_replace(reference.get(), Ref<Referable>::from(reference));
+		return *this;
+	}
+	
+	template <class O>
+	SLIB_INLINE SafePtr<T>& operator=(const Ref<O>& reference)
+	{
+		_replace(reference.get(), Ref<Referable>::from(reference));
+		return *this;
+	}
+	
+	SLIB_INLINE SafePtr<T>& operator=(const SafeRef<T>& _reference)
+	{
+		Ref<T> reference(_reference);
+		_replace(reference.get(), Ref<Referable>::from(reference));
+		return *this;
+	}
+	
+	template <class O>
+	SLIB_INLINE SafePtr<T>& operator=(const SafeRef<O>& _reference)
+	{
+		Ref<O> reference(_reference);
+		_replace(reference.get(), Ref<Referable>::from(reference));
+		return *this;
+	}
+	
+	SafePtr<T>& operator=(const WeakRef<T>& weak)
+	{
+		Ref<T> o(weak);
+		if (o.isNotNull()) {
+			_replace(o.get(), Ref<Referable>::from(o));
+		} else {
+			_replace(sl_null, Ref<Referable>::null());
+		}
+		return *this;
+	}
+	
+	template <class O>
+	SafePtr<T>& operator=(const WeakRef<O>& weak)
+	{
+		Ref<O> o(weak);
+		if (o.isNotNull()) {
+			_replace(o.get(), Ref<Referable>::from(o));
+		} else {
+			_replace(sl_null, Ref<Referable>::null());
+		}
+		return *this;
+	}
+	
+	SafePtr<T>& operator=(const SafeWeakRef<T>& weak)
+	{
+		Ref<T> o(weak);
+		if (o.isNotNull()) {
+			_replace(o.get(), Ref<Referable>::from(o));
+		} else {
+			_replace(sl_null, Ref<Referable>::null());
+		}
+		return *this;
+	}
+	
+	template <class O>
+	SafePtr<T>& operator=(const SafeWeakRef<O>& weak)
+	{
+		Ref<O> o(weak);
+		if (o.isNotNull()) {
+			_replace(o.get(), Ref<Referable>::from(o));
+		} else {
+			_replace(sl_null, Ref<Referable>::null());
+		}
+		return *this;
+	}
+	
+public:
+	SLIB_INLINE sl_bool operator==(const SafePtr<T>& other) const
+	{
+		return m_pointer == other.m_pointer;
+	}
+	
+	template <class O>
+	SLIB_INLINE sl_bool operator==(const SafePtr<O>& other) const
+	{
+		return m_pointer == other._getPointer();
+	}
+	
+	SLIB_INLINE sl_bool operator==(const Ptr<T>& other) const
+	{
+		return m_pointer == other.get();
+	}
+	
+	template <class O>
+	SLIB_INLINE sl_bool operator==(const Ptr<O>& other) const
+	{
+		return m_pointer == other.get();
+	}
+	
+public:
+	SLIB_INLINE sl_bool operator!=(const SafePtr<T>& other) const
+	{
+		return m_pointer != other.m_pointer;
+	}
+	
+	template <class O>
+	SLIB_INLINE sl_bool operator!=(const SafePtr<O>& other) const
+	{
+		return m_pointer != other._getPointer();
+	}
+	
+	SLIB_INLINE sl_bool operator!=(const Ptr<T>& other) const
+	{
+		return m_pointer != other.get();
+	}
+	
+	template <class O>
+	SLIB_INLINE sl_bool operator!=(const Ptr<O>& other) const
+	{
+		return m_pointer != other.get();
+	}
+	
+public:
+	SLIB_INLINE T* _getPointer() const
+	{
+		return m_pointer;
+	}
+	
+	SLIB_INLINE const Ref<Referable>& _getReference() const
+	{
+		return m_reference;
+	}
+	
+	T* _retain(Ref<Referable>& reference) const
+	{
+		if ((void*)this == (void*)(&_Ptr_Null)) {
+			return sl_null;
+		} else {
+			SpinLocker lock(&m_lock);
+			reference = m_reference;
+			return m_pointer;
+		}
+	}
+	
+	void _replace(T* pointer, const Ref<Referable>& reference)
+	{
+		Referable* refOld;
+		{
+			SpinLocker lock(&m_lock);
+			m_pointer = pointer;
+			refOld = m_reference.get();
+			new (&m_reference) Ref<Referable>(reference);
+		}
+		if (refOld) {
+			refOld->decreaseReference();
+		}
 	}
 };
 
-template <class TYPE>
+
+template <class T>
+SLIB_INLINE Ptr<T>::Ptr(const SafePtr<T>& other)
+{
+	m_pointer = other.retain(m_reference);
+}
+
+template <class T>
+template <class O>
+SLIB_INLINE Ptr<T>::Ptr(const SafePtr<O>& other)
+{
+	m_pointer = other.retain(m_reference);
+}
+
+template <class T>
+SLIB_INLINE Ptr<T>& Ptr<T>::operator=(const SafePtr<T>& other)
+{
+	m_pointer = other.retain(m_reference);
+	return *this;
+}
+
+template <class T>
+template <class O>
+SLIB_INLINE Ptr<T>& Ptr<T>::operator=(const SafePtr<O>& other)
+{
+	m_pointer = other.retain(m_reference);
+	return *this;
+}
+
+template <class T>
+SLIB_INLINE sl_bool Ptr<T>::operator==(const SafePtr<T>& other) const
+{
+	return m_pointer == other._getPointer();
+}
+
+template <class T>
+template <class O>
+SLIB_INLINE sl_bool Ptr<T>::operator==(const SafePtr<O>& other) const
+{
+	return m_pointer == other._getPointer();
+}
+
+template <class T>
+SLIB_INLINE sl_bool Ptr<T>::operator!=(const SafePtr<T>& other) const
+{
+	return m_pointer != other._getPointer();
+}
+
+template <class T>
+template <class O>
+SLIB_INLINE sl_bool Ptr<T>::operator!=(const SafePtr<O>& other) const
+{
+	return m_pointer != other._getPointer();
+}
+
+template <class T>
 class SLIB_EXPORT PtrLocker
 {
 private:
-	RefPtr<TYPE> m_object;
-	TYPE* m_ptr;
-
+	Ptr<T> m_ptr;
+	
 public:
-	SLIB_INLINE PtrLocker(const Ptr<TYPE>& object)
+	SLIB_INLINE PtrLocker(const Ptr<T>& ptr)
 	{
-		m_object = object.lock();
-		m_ptr = m_object.getValue();
-	}
-	SLIB_INLINE ~PtrLocker()
-	{
+		m_ptr = ptr.lock();
 	}
 
 	SLIB_INLINE void unlock()
 	{
-		m_object.setNull();
-		m_ptr = sl_null;
+		m_ptr.setNull();
 	}
 
-	SLIB_INLINE TYPE* getValue()
+	SLIB_INLINE T* get()
 	{
-		return m_ptr;
+		return m_ptr.get();
 	}
-
-	SLIB_INLINE TYPE* get()
-	{
-		return m_ptr;
-	}
-
+	
 	SLIB_INLINE sl_bool isNull()
 	{
-		return m_ptr == sl_null;
+		return m_ptr.isNull();
 	}
 
 	SLIB_INLINE sl_bool isNotNull()
 	{
-		return m_ptr != sl_null;
+		return m_ptr.isNotNull();
 	}
 
-	SLIB_INLINE TYPE& operator*()
+	SLIB_INLINE T& operator*()
 	{
-		return *m_ptr;
+		return *(m_ptr.get());
 	}
 
-	SLIB_INLINE TYPE* operator->()
+	SLIB_INLINE T* operator->()
 	{
-		return m_ptr;
+		return m_ptr.get();
 	}
 };
 

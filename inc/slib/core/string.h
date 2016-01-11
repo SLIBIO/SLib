@@ -44,12 +44,12 @@
 #endif
 
 #define SLIB_STATIC_STRING8_NULL(name) \
-	static sl_char8* _static_string_buffer_##name = _String8_nullBuf; \
-	slib::String8& name = *((slib::String8*)((void*)(&_static_string_buffer_##name)));
+	static _String_Const _static_string_null_##name = {_String_Null.data, 0}; \
+	slib::String8& name = *((slib::String8*)((void*)(&_static_string_null_##name)));
 
 #define SLIB_STATIC_STRING16_NULL(name) \
-	static sl_char16* _static_string_buffer_##name = _String16_nullBuf; \
-	slib::String16& name = *((slib::String16*)((void*)(&_static_string_buffer_##name)));
+	static _String_Const _static_string_null_##name = {_String_Null.data, 0}; \
+	slib::String16& name = *((slib::String16*)((void*)(&_static_string_null_##name)));
 
 #define SLIB_STATIC_STRING SLIB_STATIC_STRING8
 
@@ -57,10 +57,13 @@
 
 SLIB_NAMESPACE_BEGIN
 
-extern sl_char8* const _String8_nullBuf;
-extern sl_char16* const _String16_nullBuf;
-extern sl_char8* const _String8_emptyBuf;
-extern sl_char16* const _String16_emptyBuf;
+struct _String_Const
+{
+	void* data;
+	sl_int32 lock;
+};
+extern const _String_Const _String_Null;
+extern const _String_Const _String_Empty;
 
 extern const char* _StringConv_radixPatternUpper;
 extern const char* _StringConv_radixPatternLower;
@@ -98,7 +101,7 @@ private:
 public:
 	SLIB_INLINE String8()
 	{
-		m_data = _String8_nullBuf;
+		m_data = (sl_char8*)(_String_Null.data);
 	}
 
 	SLIB_INLINE String8(const String8& src)
@@ -175,13 +178,13 @@ public:
 	// Returns a null string
 	SLIB_INLINE static const String8& null()
 	{
-		return *((String8*)((void*)&_String8_nullBuf));
+		return *((String8*)((void*)&_String_Null));
 	}
 	
 	// Returns an empty string
 	SLIB_INLINE static const String8& getEmpty()
 	{
-		return *((String8*)((void*)&_String8_emptyBuf));
+		return *((String8*)((void*)&_String_Empty));
 	}
 	
 	// create a string of 'len' charactors
@@ -262,12 +265,12 @@ public:
 	
 	SLIB_INLINE sl_bool isNull() const
 	{
-		return m_data == _String8_nullBuf;
+		return m_data == (sl_char8*)(_String_Null.data);
 	}
 	
 	SLIB_INLINE sl_bool isNotNull() const
 	{
-		return m_data != _String8_nullBuf;
+		return m_data != (sl_char8*)(_String_Null.data);
 	}
 	
 	SLIB_INLINE sl_bool isEmpty() const
@@ -308,21 +311,21 @@ public:
 public:
 	SLIB_INLINE void setNull()
 	{
-		if (m_data != _String8_nullBuf) {
-			_replaceContainer(_String8_nullBuf);
+		if (m_data != (sl_char8*)(_String_Null.data)) {
+			_replaceContainer((sl_char8*)(_String_Null.data));
 		}
 	}
 	
 	SLIB_INLINE void setEmpty()
 	{
-		if (m_data != _String8_emptyBuf) {
-			_replaceContainer(_String8_emptyBuf);
+		if (m_data != (sl_char8*)(_String_Empty.data)) {
+			_replaceContainer((sl_char8*)(_String_Empty.data));
 		}
 	}
 	
 	SLIB_INLINE const String8& getNotNull() const
 	{
-		if (m_data == _String8_nullBuf) {
+		if (m_data == (sl_char8*)(_String_Null.data)) {
 			return getEmpty();
 		}
 		return *this;
@@ -1287,7 +1290,7 @@ private:
 public:
 	SLIB_INLINE String16()
 	{
-		m_data = _String16_nullBuf;
+		m_data = (sl_char16*)(_String_Null.data);
 	}
 	
 	SLIB_INLINE String16(const String16& src)
@@ -1361,13 +1364,13 @@ public:
 	// Returns a null string
 	SLIB_INLINE static const String16& null()
 	{
-		return *((String16*)((void*)&_String16_nullBuf));
+		return *((String16*)((void*)&_String_Null));
 	}
 
     // Returns an empty string
 	SLIB_INLINE static const String16& getEmpty()
 	{
-		return *((String16*)((void*)&_String16_emptyBuf));
+		return *((String16*)((void*)&_String_Empty));
 	}
 	
     // create a string of 'len' charactors
@@ -1449,12 +1452,12 @@ public:
 
 	SLIB_INLINE sl_bool isNull() const
 	{
-		return m_data == _String16_nullBuf;
+		return m_data == (sl_char16*)(_String_Null.data);
 	}
 	
 	SLIB_INLINE sl_bool isNotNull() const
 	{
-		return m_data != _String16_nullBuf;
+		return m_data != (sl_char16*)(_String_Null.data);
 	}
 	
 	SLIB_INLINE sl_bool isEmpty() const
@@ -1495,21 +1498,21 @@ public:
 public:
 	SLIB_INLINE void setNull()
 	{
-		if (m_data != _String16_nullBuf) {
-			_replaceContainer(_String16_nullBuf);
+		if (m_data != (sl_char16*)(_String_Null.data)) {
+			_replaceContainer((sl_char16*)(_String_Null.data));
 		}
 	}
 	
 	SLIB_INLINE void setEmpty()
 	{
-		if (m_data != _String16_emptyBuf) {
-			_replaceContainer(_String16_emptyBuf);
+		if (m_data != (sl_char16*)(_String_Empty.data)) {
+			_replaceContainer((sl_char16*)(_String_Empty.data));
 		}
 	}
 	
 	SLIB_INLINE const String16& getNotNull() const
 	{
-		if (m_data == _String16_nullBuf) {
+		if (m_data == (sl_char16*)(_String_Null.data)) {
 			return getEmpty();
 		}
 		return *this;
@@ -2456,11 +2459,12 @@ class SLIB_EXPORT SafeString8
 private:
 	// String(Information & Data) storage
 	sl_char8* m_data;
+	SpinLock m_lock;
 	
 public:
 	SLIB_INLINE SafeString8()
 	{
-		m_data = _String8_nullBuf;
+		m_data = (sl_char8*)(_String_Null.data);
 	}
 	
 	SLIB_INLINE SafeString8(const SafeString8& src)
@@ -2531,12 +2535,12 @@ public:
 public:
 	SLIB_INLINE static const SafeString8& null()
 	{
-		return *((SafeString8*)((void*)&_String16_nullBuf));
+		return *((SafeString8*)((void*)&_String_Null));
 	}
 	
 	SLIB_INLINE static const SafeString8& getEmpty()
 	{
-		return *((SafeString8*)((void*)&_String16_emptyBuf));
+		return *((SafeString8*)((void*)&_String_Empty));
 	}
 	
 public:
@@ -2555,12 +2559,12 @@ public:
 	
 	SLIB_INLINE sl_bool isNull() const
 	{
-		return m_data == _String8_nullBuf;
+		return m_data == (sl_char8*)(_String_Null.data);
 	}
 	
 	SLIB_INLINE sl_bool isNotNull() const
 	{
-		return m_data != _String8_nullBuf;
+		return m_data != (sl_char8*)(_String_Null.data);
 	}
 	
 	SLIB_INLINE sl_bool isEmpty() const
@@ -2576,15 +2580,15 @@ public:
 public:
 	SLIB_INLINE void setNull()
 	{
-		if (m_data != _String8_nullBuf) {
-			_replaceContainer(_String8_nullBuf);
+		if (m_data != (sl_char8*)(_String_Null.data)) {
+			_replaceContainer((sl_char8*)(_String_Null.data));
 		}
 	}
 	
 	SLIB_INLINE void setEmpty()
 	{
-		if (m_data != _String8_emptyBuf) {
-			_replaceContainer(_String8_emptyBuf);
+		if (m_data != (sl_char8*)(_String_Empty.data)) {
+			_replaceContainer((sl_char8*)(_String_Empty.data));
 		}
 	}
 	
@@ -3428,11 +3432,12 @@ private:
 #else
 	sl_char16* m_data;
 #endif
+	SpinLock m_lock;
 	
 public:
 	SLIB_INLINE SafeString16()
 	{
-		m_data = _String16_nullBuf;
+		m_data = (sl_char16*)(_String_Null.data);
 	}
 	
 	SLIB_INLINE SafeString16(const SafeString16& src)
@@ -3500,12 +3505,12 @@ public:
 public:
 	SLIB_INLINE static const SafeString16& null()
 	{
-		return *((SafeString16*)((void*)&_String16_nullBuf));
+		return *((SafeString16*)((void*)&_String_Null));
 	}
 	
 	SLIB_INLINE static const SafeString16& getEmpty()
 	{
-		return *((SafeString16*)((void*)&_String16_emptyBuf));
+		return *((SafeString16*)((void*)&_String_Empty));
 	}
 
 public:
@@ -3523,12 +3528,12 @@ public:
 	
 	SLIB_INLINE sl_bool isNull() const
 	{
-		return m_data == _String16_nullBuf;
+		return m_data == (sl_char16*)(_String_Null.data);
 	}
 	
 	SLIB_INLINE sl_bool isNotNull() const
 	{
-		return m_data != _String16_nullBuf;
+		return m_data != (sl_char16*)(_String_Null.data);
 	}
 	
 	SLIB_INLINE sl_bool isEmpty() const
@@ -3544,15 +3549,15 @@ public:
 public:
 	SLIB_INLINE void setNull()
 	{
-        if (m_data != _String16_nullBuf) {
-            _replaceContainer(_String16_nullBuf);            
+        if (m_data != (sl_char16*)(_String_Null.data)) {
+            _replaceContainer((sl_char16*)(_String_Null.data));
         }
 	}
 	
 	SLIB_INLINE void setEmpty()
 	{
-        if (m_data != _String16_emptyBuf) {
-            _replaceContainer(_String16_emptyBuf);
+        if (m_data != (sl_char16*)(_String_Empty.data)) {
+            _replaceContainer((sl_char16*)(_String_Empty.data));
         }
 	}
 	
@@ -4489,6 +4494,17 @@ SLIB_INLINE int Compare<String16>::compare(const String16& a, const String16& b)
 }
 
 template<>
+SLIB_INLINE int Compare<SafeString8>::compare(const SafeString8& a, const SafeString8& b)
+{
+	return a.compare(b);
+}
+template<>
+SLIB_INLINE int Compare<SafeString16>::compare(const SafeString16& a, const SafeString16& b)
+{
+	return a.compare(b);
+}
+
+template<>
 SLIB_INLINE sl_bool Compare<String8>::equals(const String8& a, const String8& b)
 {
 	return a.equals(b);
@@ -4500,12 +4516,34 @@ SLIB_INLINE sl_bool Compare<String16>::equals(const String16& a, const String16&
 }
 
 template<>
+SLIB_INLINE sl_bool Compare<SafeString8>::equals(const SafeString8& a, const SafeString8& b)
+{
+	return a.equals(b);
+}
+template<>
+SLIB_INLINE sl_bool Compare<SafeString16>::equals(const SafeString16& a, const SafeString16& b)
+{
+	return a.equals(b);
+}
+
+template<>
 SLIB_INLINE sl_uint32 Hash<String8>::hash(const String8& v)
 {
 	return v.hashCode();
 }
 template<>
 SLIB_INLINE sl_uint32 Hash<String16>::hash(const String16& v)
+{
+	return v.hashCode();
+}
+
+template<>
+SLIB_INLINE sl_uint32 Hash<SafeString8>::hash(const SafeString8& v)
+{
+	return v.hashCode();
+}
+template<>
+SLIB_INLINE sl_uint32 Hash<SafeString16>::hash(const SafeString16& v)
 {
 	return v.hashCode();
 }

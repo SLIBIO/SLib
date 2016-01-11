@@ -10,10 +10,12 @@ SLIB_NAMESPACE_BEGIN
 
 class SafeMemory;
 
+typedef CArray<sl_uint8> CMemory;
+
 /** auto-referencing object **/
 class SLIB_EXPORT Memory
 {
-	typedef CArray<sl_uint8> _Obj;
+	typedef CMemory _Obj;
 	typedef Ref<_Obj> _Ref;
 	SLIB_DECLARE_OBJECT_TYPE_FROM(Memory, _Obj)
 	SLIB_DECLARE_OBJECT_WRAPPER(Memory, Memory, _Obj, _Ref)
@@ -185,7 +187,7 @@ public:
 /** auto-referencing object **/
 class SLIB_EXPORT SafeMemory
 {
-	typedef CArray<sl_uint8> _Obj;
+	typedef CMemory _Obj;
 	typedef SafeRef<_Obj> _Ref;
 	typedef Ref<_Obj> _LocalRef;
 	SLIB_DECLARE_OBJECT_TYPE_FROM(SafeMemory, _Obj)
@@ -205,13 +207,13 @@ public:
 	}
 	
 public:
-	SLIB_INLINE SafeMemory(const Memory& other) : m_object(other.getReference())
+	SLIB_INLINE SafeMemory(const Memory& other) : m_object(other.getRef())
 	{
 	}
 	
 	SLIB_INLINE SafeMemory& operator=(const Memory& other)
 	{
-		m_object = other.getReference();
+		m_object = other.getRef();
 		return *this;
 	}
 	
@@ -293,13 +295,13 @@ public:
 	
 };
 
-SLIB_INLINE Memory::Memory(const SafeMemory& other) : m_object(other.getReference())
+SLIB_INLINE Memory::Memory(const SafeMemory& other) : m_object(other.getRef())
 {
 }
 
 SLIB_INLINE Memory& Memory::operator=(const SafeMemory& other)
 {
-	m_object = other.getReference();
+	m_object = other.getRef();
 	return *this;
 }
 

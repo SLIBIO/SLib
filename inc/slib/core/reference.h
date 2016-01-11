@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_CORE_REFERENCE
 
 #include "definition.h"
+
 #include "base.h"
 #include "spinlock.h"
 
@@ -143,7 +144,7 @@ public: \
 	} \
 	SLIB_INLINE static const CLASS_TYPE& null() \
 	{ \
-		return *((CLASS_TYPE*)((void*)(&_Ref_null))); \
+		return *((CLASS_TYPE*)((void*)(&_Ref_Null))); \
 	} \
 	SLIB_INLINE sl_bool isNull() const \
 	{ \
@@ -157,7 +158,7 @@ public: \
 	{ \
 		m_object.setNull(); \
 	} \
-	SLIB_INLINE const REF_TYPE& getReference() const \
+	SLIB_INLINE const REF_TYPE& getRef() const \
 	{ \
 		return m_object; \
 	}
@@ -193,14 +194,17 @@ public: \
 	}
 
 
-/************************************************************************
-					Ref Class Definition
+/*
+
+ Ref Class Definition
+ 
 	Objects are required to inherit from Referable
-************************************************************************/
+
+*/
 
 SLIB_NAMESPACE_BEGIN
 
-class WeakRefObject;
+class CWeakRef;
 
 class SLIB_EXPORT Referable
 {
@@ -240,7 +244,7 @@ public:
 		return Base::interlockedDecrement(&(m_nRefCount));
 	}
 
-	WeakRefObject* _getWeak();
+	CWeakRef* _getWeak();
 
 private:
 	void _clearWeak();
@@ -255,7 +259,8 @@ private:
 
 private:
 	sl_reg m_nRefCount;
-	WeakRefObject* m_weak;
+	CWeakRef* m_weak;
+	SpinLock m_lockWeak;
 
 public:
 	virtual sl_class_type getClassType() const;
@@ -263,13 +268,21 @@ public:
 	virtual sl_bool checkClassType(sl_class_type type) const;
 };
 
-extern void* const _Ref_null;
+struct _Ref_Const
+{
+	void* value;
+	sl_int32 lock;
+};
+extern const _Ref_Const _Ref_Null;
 
 template <class ObjectClass>
 class SafeRef;
 
 template <class ObjectClass>
 class WeakRef;
+
+template <class ObjectClass>
+class SafeWeakRef;
 
 template <class ObjectClass>
 class SLIB_EXPORT Ref
@@ -319,6 +332,11 @@ public:
 	
 	template <class _ObjectClass>
 	Ref(const WeakRef<_ObjectClass>& other);
+	
+	Ref(const SafeWeakRef<ObjectClass>& other);
+	
+	template <class _ObjectClass>
+	Ref(const SafeWeakRef<_ObjectClass>& other);
 
 	SLIB_INLINE Ref(const ObjectClass* _object)
 	{
@@ -332,7 +350,7 @@ public:
 public:
 	SLIB_INLINE static const _Type& null()
 	{
-		return *((_Type*)((void*)(&_Ref_null)));
+		return *((_Type*)((void*)(&_Ref_Null)));
 	}
 
 	SLIB_INLINE sl_bool isNull() const
@@ -353,6 +371,17 @@ public:
 	SLIB_INLINE ObjectClass* get() const
 	{
 		return m_object;
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE static const _Type& from(const Ref<_ObjectClass>& other)
+	{
+		return *((_Type*)((void*)&other));
+	}
+	
+	SLIB_INLINE const Ref<Referable>& getReference() const
+	{
+		return *((Ref<Referable>*)((void*)this));
 	}
 
 public:
@@ -390,6 +419,11 @@ public:
 	
 	template <class _ObjectClass>
 	_Type& operator=(const WeakRef<_ObjectClass>& other);
+	
+	_Type& operator=(const SafeWeakRef<ObjectClass>& other);
+	
+	template <class _ObjectClass>
+	_Type& operator=(const SafeWeakRef<_ObjectClass>& other);
 
 	SLIB_INLINE _Type& operator=(const ObjectClass* other)
 	{
@@ -403,9 +437,15 @@ public:
 		return *this;
 	}
 	
+public:
 	SLIB_INLINE sl_bool operator==(const ObjectClass* other) const
 	{
 		return (m_object == other);
+	}
+	
+	SLIB_INLINE friend sl_bool operator==(const ObjectClass* a, const _Type& b)
+	{
+		return (a == b.m_object);
 	}
 
 	SLIB_INLINE sl_bool operator==(const _Type& other) const
@@ -418,10 +458,21 @@ public:
 	{
 		return ((void*)m_object == (void*)(other.get()));
 	}
+	
+	sl_bool operator==(const SafeRef<ObjectClass>& other) const;
+	
+	template <class _ObjectClass>
+	sl_bool operator==(const SafeRef<_ObjectClass>& other) const;
 
+public:
 	SLIB_INLINE sl_bool operator!=(const ObjectClass* other) const
 	{
 		return (m_object != other);
+	}
+	
+	SLIB_INLINE friend sl_bool operator!=(const ObjectClass* a, const _Type& b)
+	{
+		return (a != b.m_object);
 	}
 
 	SLIB_INLINE sl_bool operator!=(const _Type& other) const
@@ -434,17 +485,14 @@ public:
 	{
 		return ((void*)m_object != (void*)(other.get()));
 	}
+	
+	sl_bool operator!=(const SafeRef<ObjectClass>& other) const;
+	
+	template <class _ObjectClass>
+	sl_bool operator!=(const SafeRef<_ObjectClass>& other) const;
+	
 
-	SLIB_INLINE friend sl_bool operator==(const ObjectClass* a, const _Type& b)
-	{
-		return (a == b.m_object);
-	}
-
-	SLIB_INLINE friend sl_bool operator!=(const ObjectClass* a, const _Type& b)
-	{
-		return (a != b.m_object);
-	}
-
+public:
 	SLIB_INLINE ObjectClass& operator*() const
 	{
 		return *((ObjectClass*)m_object);
@@ -456,26 +504,14 @@ public:
 	}
 
 public:
-	template <class _ObjectClass>
-	SLIB_INLINE static const _Type& from(const Ref<_ObjectClass>& other)
-	{
-		return *((_Type*)((void*)&other));
-	}
-
-	SLIB_INLINE const Ref<Referable>& getReference() const
-	{
-		return *((Ref<Referable>*)((void*)this));
-	}
-
-public:
 	SLIB_INLINE void _replaceObject(ObjectClass* objectNew)
 	{
-		ObjectClass* objectOld = m_object;
-		m_object = objectNew;
-		if (objectOld) {
-			((Referable*)objectOld)->decreaseReference();
+		if (m_object) {
+			((Referable*)m_object)->decreaseReference();
 		}
+		m_object = objectNew;
 	}
+	
 };
 
 
@@ -485,6 +521,7 @@ class SLIB_EXPORT SafeRef
 	typedef SafeRef<ObjectClass> _Type;
 private:
 	ObjectClass* m_object;
+	SpinLock m_lock;
 
 public:
 	SLIB_INLINE SafeRef()
@@ -535,6 +572,11 @@ public:
 	
 	template <class _ObjectClass>
 	SafeRef(const WeakRef<_ObjectClass>& other);
+	
+	SafeRef(const SafeWeakRef<ObjectClass>& other);
+	
+	template <class _ObjectClass>
+	SafeRef(const SafeWeakRef<_ObjectClass>& other);
 
 	SLIB_INLINE SafeRef(const ObjectClass* other)
 	{
@@ -548,7 +590,7 @@ public:
 public:
 	SLIB_INLINE static const _Type& null()
 	{
-		return *((_Type*)((void*)(&_Ref_null)));
+		return *((_Type*)((void*)(&_Ref_Null)));
 	}
 
 	SLIB_INLINE sl_bool isNull() const
@@ -565,7 +607,23 @@ public:
 	{
 		_replaceObject(sl_null);
 	}
-
+	
+	SLIB_INLINE Ref<ObjectClass> lock() const
+	{
+		ObjectClass* object = _retainObject();
+		Ref<ObjectClass> ret = object;
+		if (object) {
+			((Referable*)object)->decreaseReference();
+		}
+		return ret;
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE static const _Type& from(const SafeRef<_ObjectClass>& other)
+	{
+		return *((_Type*)((void*)&other));
+	}
+	
 public:
 	SLIB_INLINE _Type& operator=(const _Type& other)
 	{
@@ -615,6 +673,11 @@ public:
 	
 	template <class _ObjectClass>
 	_Type& operator=(const WeakRef<_ObjectClass>& other);
+	
+	_Type& operator=(const SafeWeakRef<ObjectClass>& other);
+	
+	template <class _ObjectClass>
+	_Type& operator=(const SafeWeakRef<_ObjectClass>& other);
 
 	SLIB_INLINE _Type& operator=(const ObjectClass* other)
 	{
@@ -627,48 +690,86 @@ public:
 		}
 		return *this;
 	}
-
+	
+public:
+	SLIB_INLINE sl_bool operator==(const ObjectClass* other) const
+	{
+		return (m_object == other);
+	}
+	
+	SLIB_INLINE friend sl_bool operator==(const ObjectClass* a, const _Type& b)
+	{
+		return (a == b.m_object);
+	}
+	
 	SLIB_INLINE sl_bool operator==(const _Type& other) const
 	{
-		return m_object == other.m_object;
+		return ((void*)m_object == (void*)(other.m_object));
 	}
-
+	
+	template <class _ObjectClass>
+	SLIB_INLINE sl_bool operator==(const SafeRef<_ObjectClass>& other) const
+	{
+		return ((void*)m_object == (void*)(other._getObject()));
+	}
+	
+	SLIB_INLINE sl_bool operator==(const Ref<ObjectClass>& other) const
+	{
+		return ((void*)m_object == (void*)(other.get()));
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE sl_bool operator==(const Ref<_ObjectClass>& other) const
+	{
+		return ((void*)m_object == (void*)(other.get()));
+	}
+	
+public:
+	SLIB_INLINE sl_bool operator!=(const ObjectClass* other) const
+	{
+		return (m_object != other);
+	}
+	
+	SLIB_INLINE friend sl_bool operator!=(const ObjectClass* a, const _Type& b)
+	{
+		return (a != b.m_object);
+	}
+	
 	SLIB_INLINE sl_bool operator!=(const _Type& other) const
 	{
-		return m_object != other.m_object;
+		return ((void*)m_object != (void*)(other.m_object));
 	}
-
-public:
-	SLIB_INLINE Ref<ObjectClass> toRef() const
-	{
-		ObjectClass* object = _retainObject();
-		Ref<ObjectClass> ret = object;
-		if (object) {
-			((Referable*)object)->decreaseReference();
-		}
-		return ret;
-	}
-
+	
 	template <class _ObjectClass>
-	SLIB_INLINE static const _Type& from(const SafeRef<_ObjectClass>& other)
+	SLIB_INLINE sl_bool operator!=(const SafeRef<_ObjectClass>& other) const
 	{
-		return *((_Type*)((void*)&other));
+		return ((void*)m_object != (void*)(other._getObject()));
 	}
-
-	SLIB_INLINE Ref<Referable> getReference() const
+	
+	SLIB_INLINE sl_bool operator!=(const Ref<ObjectClass>& other) const
 	{
-		return toRef();
+		return ((void*)m_object != (void*)(other.get()));
 	}
-
+	
+	template <class _ObjectClass>
+	SLIB_INLINE sl_bool operator!=(const Ref<_ObjectClass>& other) const
+	{
+		return ((void*)m_object != (void*)(other.get()));
+	}
+	
 public:
+	ObjectClass* _getObject() const
+	{
+		return m_object;
+	}
+	
 	ObjectClass* _retainObject() const
 	{
-		ObjectClass* const * source = &m_object;
-		if ((void*)source == (void*)(&_Ref_null)) {
+		if ((void*)this == (void*)(&_Ref_Null)) {
 			return sl_null;
 		}
-		SpinLocker lock(SpinLockPoolForReference::get(source));
-		ObjectClass* object = *source;
+		SpinLocker lock(&m_lock);
+		ObjectClass* object = m_object;
 		if (object) {
 			((Referable*)object)->increaseReference();
 		}
@@ -677,29 +778,35 @@ public:
 
 	void _replaceObject(ObjectClass* object)
 	{
-		ObjectClass** target = &m_object;
-		SpinLocker lock(SpinLockPoolForReference::get(target));
-		ObjectClass* before = *target;
-		*target = object;
+		ObjectClass* before;
+		{
+			SpinLocker lock(&m_lock);
+			before = m_object;
+			m_object = object;
+		}
 		if (before) {
-			sl_reg nRef = ((Referable*)before)->_decreaseReference();
-			if (nRef == 0) {
-				lock.unlock();
-				((Referable*)before)->_free();
-			}
+			((Referable*)before)->decreaseReference();
 		}
 	}
 };
 
-class SLIB_EXPORT WeakRefObject : public Referable
+class SLIB_EXPORT CWeakRef : public Referable
 {
-	SLIB_DECLARE_ROOT_OBJECT(WeakRefObject)
+	SLIB_DECLARE_ROOT_OBJECT(CWeakRef)
 public:
-	WeakRefObject();
+	CWeakRef();
 
 public:
-	Referable* object;
-	SpinLock lock;
+	Referable* m_object;
+	SpinLock m_lock;
+	
+public:
+	static CWeakRef* create(const Referable* object);
+	
+public:
+	Ref<Referable> lock();
+	
+	void release();
 };
 
 template <class ObjectClass>
@@ -707,7 +814,7 @@ class SLIB_EXPORT WeakRef
 {
 	typedef WeakRef<ObjectClass> _Type;
 private:
-	SafeRef<WeakRefObject> m_weak;
+	Ref<CWeakRef> m_weak;
 
 public:
 	SLIB_INLINE WeakRef()
@@ -719,10 +826,15 @@ public:
 	}
 
 	template <class _ObjectClass>
-	SLIB_INLINE WeakRef(const WeakRef<_ObjectClass>& other) : m_weak(other.getWeakRefObject())
+	SLIB_INLINE WeakRef(const WeakRef<_ObjectClass>& other) : m_weak(other.getWeakRef())
 	{
 	}
 
+	WeakRef(const SafeWeakRef<ObjectClass>& other);
+	
+	template <class _ObjectClass>
+	WeakRef(const SafeWeakRef<_ObjectClass>& other);
+	
 	SLIB_INLINE WeakRef(const Ref<ObjectClass>& other)
 	{
 		_set(other.get());
@@ -736,14 +848,14 @@ public:
 
 	SLIB_INLINE WeakRef(const SafeRef<ObjectClass>& _other)
 	{
-		Ref<ObjectClass> other(_other.toRef());
+		Ref<ObjectClass> other(_other.lock());
 		_set(other.get());
 	}
 
 	template <class _ObjectClass>
 	SLIB_INLINE WeakRef(const SafeRef<_ObjectClass>& _other)
 	{
-		Ref<_ObjectClass> other(_other.toRef());
+		Ref<_ObjectClass> other(_other.lock());
 		_set(other.get());
 	}
 
@@ -752,28 +864,63 @@ public:
 		Ref<ObjectClass> other(_other);
 		_set(other.get());
 	}
-
+	
 public:
 	SLIB_INLINE static const _Type& null()
 	{
-		return *((_Type*)((void*)(&_Ref_null)));
+		return *((_Type*)((void*)(&_Ref_Null)));
 	}
-
+	
 	SLIB_INLINE sl_bool isNull() const
 	{
 		return m_weak.isNull();
 	}
-
+	
 	SLIB_INLINE sl_bool isNotNull() const
 	{
 		return m_weak.isNotNull();
 	}
-
+	
 	SLIB_INLINE void setNull()
 	{
 		m_weak.setNull();
 	}
+	
+	SLIB_INLINE const Ref<CWeakRef>& getWeakRef() const
+	{
+		return m_weak;
+	}
+	
+	SLIB_INLINE Ref<ObjectClass> lock() const
+	{
+		if (m_weak.isNotNull()) {
+			return Ref<ObjectClass>::from(m_weak->lock());
+		}
+		return Ref<ObjectClass>::null();
+	}
+	
+	SLIB_INLINE static _Type fromReferable(const Referable* referable)
+	{
+		if (referable) {
+			_Type ret;
+			if (CWeakRef::checkInstance(referable)) {
+				ret.m_weak = (CWeakRef*)referable;
+			} else {
+				ret.m_weak = ((Referable*)referable)->_getWeak();
+			}
+			return ret;
+		} else {
+			return _Type::null();
+		}
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE static const _Type& from(const WeakRef<_ObjectClass>& other)
+	{
+		return *((_Type*)((void*)&other));
+	}
 
+public:
 	SLIB_INLINE _Type& operator=(const _Type& other)
 	{
 		m_weak = other.m_weak;
@@ -783,9 +930,14 @@ public:
 	template <class _ObjectClass>
 	SLIB_INLINE _Type& operator=(const WeakRef<_ObjectClass>& other)
 	{
-		m_weak = other.getWeakRefObject();
+		m_weak = other.getWeakRef();
 		return *this;
 	}
+
+	_Type& operator=(const SafeWeakRef<ObjectClass>& other);
+	
+	template <class _ObjectClass>
+	_Type& operator=(const SafeWeakRef<_ObjectClass>& other);
 
 	SLIB_INLINE _Type& operator=(const Ref<ObjectClass>& other)
 	{
@@ -802,7 +954,7 @@ public:
 
 	SLIB_INLINE _Type& operator=(const SafeRef<ObjectClass>& _other)
 	{
-		Ref<ObjectClass> other(_other.toRef());
+		Ref<ObjectClass> other(_other.lock());
 		_set(other.get());
 		return *this;
 	}
@@ -810,7 +962,7 @@ public:
 	template <class _ObjectClass>
 	SLIB_INLINE _Type& operator=(const SafeRef<_ObjectClass>& _other)
 	{
-		Ref<_ObjectClass> other(_other.toRef());
+		Ref<_ObjectClass> other(_other.lock());
 		_set(other.get());
 		return *this;
 	}
@@ -822,56 +974,262 @@ public:
 		return *this;
 	}
 
+public:
 	SLIB_INLINE sl_bool operator==(const _Type& other) const
 	{
 		return m_weak == other.m_weak;
 	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE sl_bool operator==(const WeakRef<_ObjectClass>& other) const
+	{
+		return m_weak == other.getWeakRef();
+	}
+	
+	sl_bool operator==(const SafeWeakRef<ObjectClass>& other) const;
 
+	template <class _ObjectClass>
+	sl_bool operator==(const SafeWeakRef<_ObjectClass>& other) const;
+
+public:
 	SLIB_INLINE sl_bool operator!=(const _Type& other) const
 	{
 		return m_weak != other.m_weak;
 	}
-
-public:
-	Ref<WeakRefObject> getWeakRefObject() const
+	
+	template <class _ObjectClass>
+	SLIB_INLINE sl_bool operator!=(const WeakRef<_ObjectClass>& other) const
 	{
-		return m_weak.toRef();
+		return m_weak != other.getWeakRef();
 	}
+	
+	sl_bool operator!=(const SafeWeakRef<ObjectClass>& other) const;
+	
+	template <class _ObjectClass>
+	sl_bool operator!=(const SafeWeakRef<_ObjectClass>& other) const;
+	
 
-	Ref<ObjectClass> toRef() const
+private:
+	SLIB_INLINE void _set(ObjectClass* object)
 	{
-		Ref<ObjectClass> ret;
-		Ref<WeakRefObject> refWeak = m_weak.toRef();
-		if (refWeak.isNotNull()) {
-			WeakRefObject* weak = refWeak.get();
-			SpinLocker lock(&(weak->lock));
-			Referable* ref = (Referable*)(weak->object);
-			if (ref) {
-				sl_reg n = ref->_increaseReference();
-				if (n > 1) {
-					ret = (ObjectClass*)(ref);
-				}
-				ref->_decreaseReference();
-			}
-		}
-		return ret;
-	}
-
-	SLIB_INLINE static _Type from(const Referable* referable)
-	{
-		if (referable) {
-			_Type ret;
-			if (WeakRefObject::checkInstance(referable)) {
-				ret.m_weak = (WeakRefObject*)referable;
-			} else {
-				ret.m_weak = ((Referable*)referable)->_getWeak();
-			}
-			return ret;
+		if (object) {
+			m_weak = ((Referable*)object)->_getWeak();
 		} else {
-			return _Type::null();
+			m_weak.setNull();
 		}
 	}
+};
 
+
+template <class ObjectClass>
+class SLIB_EXPORT SafeWeakRef
+{
+	typedef SafeWeakRef<ObjectClass> _Type;
+private:
+	SafeRef<CWeakRef> m_weak;
+	
+public:
+	SLIB_INLINE SafeWeakRef()
+	{
+	}
+	
+	SLIB_INLINE SafeWeakRef(const _Type& other) : m_weak(other.m_weak)
+	{
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE SafeWeakRef(const SafeWeakRef<_ObjectClass>& other) : m_weak(other.getWeakRef())
+	{
+	}
+	
+	SLIB_INLINE SafeWeakRef(const WeakRef<ObjectClass>& other) : m_weak(other.getWeakRef())
+	{
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE SafeWeakRef(const WeakRef<_ObjectClass>& other) : m_weak(other.getWeakRef())
+	{
+	}
+	
+	SLIB_INLINE SafeWeakRef(const Ref<ObjectClass>& other)
+	{
+		_set(other.get());
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE SafeWeakRef(const Ref<_ObjectClass>& other)
+	{
+		_set(other.get());
+	}
+	
+	SLIB_INLINE SafeWeakRef(const SafeRef<ObjectClass>& _other)
+	{
+		Ref<ObjectClass> other(_other.lock());
+		_set(other.get());
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE SafeWeakRef(const SafeRef<_ObjectClass>& _other)
+	{
+		Ref<_ObjectClass> other(_other.lock());
+		_set(other.get());
+	}
+	
+	SLIB_INLINE SafeWeakRef(const ObjectClass* _other)
+	{
+		Ref<ObjectClass> other(_other);
+		_set(other.get());
+	}
+	
+public:
+	SLIB_INLINE static const _Type& null()
+	{
+		return *((_Type*)((void*)(&_Ref_Null)));
+	}
+	
+	SLIB_INLINE sl_bool isNull() const
+	{
+		return m_weak.isNull();
+	}
+	
+	SLIB_INLINE sl_bool isNotNull() const
+	{
+		return m_weak.isNotNull();
+	}
+	
+	SLIB_INLINE void setNull()
+	{
+		m_weak.setNull();
+	}
+	
+	SLIB_INLINE const SafeRef<CWeakRef>& getWeakRef() const
+	{
+		return m_weak;
+	}
+	
+	SLIB_INLINE Ref<ObjectClass> lock() const
+	{
+		Ref<CWeakRef> weak(m_weak);
+		if (weak.isNotNull()) {
+			return Ref<ObjectClass>::from(weak->lock());
+		}
+		return Ref<ObjectClass>::null();
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE static const _Type& from(const SafeWeakRef<_ObjectClass>& other)
+	{
+		return *((_Type*)((void*)&other));
+	}
+	
+public:
+	SLIB_INLINE _Type& operator=(const _Type& other)
+	{
+		m_weak = other.m_weak;
+		return *this;
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE _Type& operator=(const SafeWeakRef<_ObjectClass>& other)
+	{
+		m_weak = other.getWeakRef();
+		return *this;
+	}
+	
+	SLIB_INLINE _Type& operator=(const WeakRef<ObjectClass>& other)
+	{
+		m_weak = other.getWeakRef();
+		return *this;
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE _Type& operator=(const WeakRef<_ObjectClass>& other)
+	{
+		m_weak = other.getWeakRef();
+	}
+	
+	SLIB_INLINE _Type& operator=(const Ref<ObjectClass>& other)
+	{
+		_set(other.get());
+		return *this;
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE _Type& operator=(const Ref<_ObjectClass>& other)
+	{
+		_set(other.get());
+		return *this;
+	}
+	
+	SLIB_INLINE _Type& operator=(const SafeRef<ObjectClass>& _other)
+	{
+		Ref<ObjectClass> other(_other.lock());
+		_set(other.get());
+		return *this;
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE _Type& operator=(const SafeRef<_ObjectClass>& _other)
+	{
+		Ref<_ObjectClass> other(_other.lock());
+		_set(other.get());
+		return *this;
+	}
+	
+	SLIB_INLINE _Type& operator=(const ObjectClass* _other)
+	{
+		Ref<ObjectClass> other(_other);
+		_set(other.get());
+		return *this;
+	}
+	
+	
+public:
+	SLIB_INLINE sl_bool operator==(const _Type& other) const
+	{
+		return m_weak == other.m_weak;
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE sl_bool operator==(const SafeWeakRef<_ObjectClass>& other) const
+	{
+		return m_weak == other.getWeakRef();
+	}
+	
+	SLIB_INLINE sl_bool operator==(const WeakRef<ObjectClass>& other) const
+	{
+		return m_weak == other.getWeakRef();
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE sl_bool operator==(const WeakRef<_ObjectClass>& other) const
+	{
+		return m_weak == other.getWeakRef();
+	}
+	
+public:
+	SLIB_INLINE sl_bool operator!=(const _Type& other) const
+	{
+		return m_weak != other.m_weak;
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE sl_bool operator!=(const SafeWeakRef<_ObjectClass>& other) const
+	{
+		return m_weak != other.getWeakRef();
+	}
+	
+	SLIB_INLINE sl_bool operator!=(const WeakRef<ObjectClass>& other) const
+	{
+		return m_weak != other.getWeakRef();
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE sl_bool operator!=(const WeakRef<_ObjectClass>& other) const
+	{
+		return m_weak != other.getWeakRef();
+	}
+	
 private:
 	SLIB_INLINE void _set(ObjectClass* object)
 	{
@@ -918,7 +1276,7 @@ SLIB_INLINE Ref<ObjectClass>& Ref<ObjectClass>::operator=(const SafeRef<_ObjectC
 template <class ObjectClass>
 Ref<ObjectClass>::Ref(const WeakRef<ObjectClass>& _other)
 {
-	Ref<ObjectClass> other(_other.toRef());
+	Ref<ObjectClass> other(_other.lock());
 	ObjectClass* object = other.m_object;
 	if (object) {
 		((Referable*)object)->increaseReference();
@@ -929,7 +1287,7 @@ Ref<ObjectClass>::Ref(const WeakRef<ObjectClass>& _other)
 template <class ObjectClass>
 Ref<ObjectClass>& Ref<ObjectClass>::operator=(const WeakRef<ObjectClass>& _other)
 {
-	Ref<ObjectClass> other(_other.toRef());
+	Ref<ObjectClass> other(_other.lock());
 	ObjectClass* object = other.m_object;
 	if (object) {
 		((Referable*)object)->increaseReference();
@@ -942,7 +1300,7 @@ template <class ObjectClass>
 template <class _ObjectClass>
 Ref<ObjectClass>::Ref(const WeakRef<_ObjectClass>& _other)
 {
-	Ref<_ObjectClass> other(_other.toRef());
+	Ref<_ObjectClass> other(_other.lock());
 	ObjectClass* object = other.m_object;
 	if (object) {
 		((Referable*)object)->increaseReference();
@@ -954,7 +1312,7 @@ template <class ObjectClass>
 template <class _ObjectClass>
 Ref<ObjectClass>& Ref<ObjectClass>::operator=(const WeakRef<_ObjectClass>& _other)
 {
-	Ref<_ObjectClass> other(_other.toRef());
+	Ref<_ObjectClass> other(_other.lock());
 	ObjectClass* object = other.m_object;
 	if (object) {
 		((Referable*)object)->increaseReference();
@@ -963,11 +1321,85 @@ Ref<ObjectClass>& Ref<ObjectClass>::operator=(const WeakRef<_ObjectClass>& _othe
 	return *this;
 }
 
+template <class ObjectClass>
+Ref<ObjectClass>::Ref(const SafeWeakRef<ObjectClass>& _other)
+{
+	Ref<ObjectClass> other(_other.lock());
+	ObjectClass* object = other.m_object;
+	if (object) {
+		((Referable*)object)->increaseReference();
+	}
+	m_object = object;
+}
+
+template <class ObjectClass>
+Ref<ObjectClass>& Ref<ObjectClass>::operator=(const SafeWeakRef<ObjectClass>& _other)
+{
+	Ref<ObjectClass> other(_other.lock());
+	ObjectClass* object = other.m_object;
+	if (object) {
+		((Referable*)object)->increaseReference();
+	}
+	_replaceObject(object);
+	return *this;
+}
+
+template <class ObjectClass>
+template <class _ObjectClass>
+Ref<ObjectClass>::Ref(const SafeWeakRef<_ObjectClass>& _other)
+{
+	Ref<_ObjectClass> other(_other.lock());
+	ObjectClass* object = other.m_object;
+	if (object) {
+		((Referable*)object)->increaseReference();
+	}
+	m_object = object;
+}
+
+template <class ObjectClass>
+template <class _ObjectClass>
+Ref<ObjectClass>& Ref<ObjectClass>::operator=(const SafeWeakRef<_ObjectClass>& _other)
+{
+	Ref<_ObjectClass> other(_other.lock());
+	ObjectClass* object = other.m_object;
+	if (object) {
+		((Referable*)object)->increaseReference();
+	}
+	_replaceObject(object);
+	return *this;
+}
+
+template <class ObjectClass>
+SLIB_INLINE sl_bool Ref<ObjectClass>::operator==(const SafeRef<ObjectClass>& other) const
+{
+	return m_object == other._getObject();
+}
+
+template <class ObjectClass>
+template <class _ObjectClass>
+SLIB_INLINE sl_bool Ref<ObjectClass>::operator==(const SafeRef<_ObjectClass>& other) const
+{
+	return (void*)m_object == (void*)(other._getObject());
+}
+
+template <class ObjectClass>
+SLIB_INLINE sl_bool Ref<ObjectClass>::operator!=(const SafeRef<ObjectClass>& other) const
+{
+	return m_object != other._getObject();
+}
+
+template <class ObjectClass>
+template <class _ObjectClass>
+SLIB_INLINE sl_bool Ref<ObjectClass>::operator!=(const SafeRef<_ObjectClass>& other) const
+{
+	return (void*)m_object != (void*)(other._getObject());
+}
+
 
 template <class ObjectClass>
 SafeRef<ObjectClass>::SafeRef(const WeakRef<ObjectClass>& _other)
 {
-	Ref<ObjectClass> other(_other.toRef());
+	Ref<ObjectClass> other(_other.lock());
 	ObjectClass* object = other.m_object;
 	if (object) {
 		((Referable*)object)->increaseReference();
@@ -978,7 +1410,7 @@ SafeRef<ObjectClass>::SafeRef(const WeakRef<ObjectClass>& _other)
 template <class ObjectClass>
 SafeRef<ObjectClass>& SafeRef<ObjectClass>::operator=(const WeakRef<ObjectClass>& _other)
 {
-	Ref<ObjectClass> other(_other.toRef());
+	Ref<ObjectClass> other(_other.lock());
 	ObjectClass* object = other.m_object;
 	if (object) {
 		((Referable*)object)->increaseReference();
@@ -991,7 +1423,7 @@ template <class ObjectClass>
 template <class _ObjectClass>
 SafeRef<ObjectClass>::SafeRef(const WeakRef<_ObjectClass>& _other)
 {
-	Ref<_ObjectClass> other(_other.toRef());
+	Ref<_ObjectClass> other(_other.lock());
 	ObjectClass* object = other.m_object;
 	if (object) {
 		((Referable*)object)->increaseReference();
@@ -1003,7 +1435,7 @@ template <class ObjectClass>
 template <class _ObjectClass>
 SafeRef<ObjectClass>& SafeRef<ObjectClass>::operator=(const WeakRef<_ObjectClass>& _other)
 {
-	Ref<_ObjectClass> other(_other.toRef());
+	Ref<_ObjectClass> other(_other.lock());
 	ObjectClass* object = other.m_object;
 	if (object) {
 		((Referable*)object)->increaseReference();
@@ -1011,6 +1443,108 @@ SafeRef<ObjectClass>& SafeRef<ObjectClass>::operator=(const WeakRef<_ObjectClass
 	_replaceObject(object);
 	return *this;
 }
+
+template <class ObjectClass>
+SafeRef<ObjectClass>::SafeRef(const SafeWeakRef<ObjectClass>& _other)
+{
+	Ref<ObjectClass> other(_other.lock());
+	ObjectClass* object = other.m_object;
+	if (object) {
+		((Referable*)object)->increaseReference();
+	}
+	m_object = object;
+}
+
+template <class ObjectClass>
+SafeRef<ObjectClass>& SafeRef<ObjectClass>::operator=(const SafeWeakRef<ObjectClass>& _other)
+{
+	Ref<ObjectClass> other(_other.lock());
+	ObjectClass* object = other.m_object;
+	if (object) {
+		((Referable*)object)->increaseReference();
+	}
+	_replaceObject(object);
+	return *this;
+}
+
+template <class ObjectClass>
+template <class _ObjectClass>
+SafeRef<ObjectClass>::SafeRef(const SafeWeakRef<_ObjectClass>& _other)
+{
+	Ref<_ObjectClass> other(_other.lock());
+	ObjectClass* object = other.m_object;
+	if (object) {
+		((Referable*)object)->increaseReference();
+	}
+	m_object = object;
+}
+
+template <class ObjectClass>
+template <class _ObjectClass>
+SafeRef<ObjectClass>& SafeRef<ObjectClass>::operator=(const SafeWeakRef<_ObjectClass>& _other)
+{
+	Ref<_ObjectClass> other(_other.lock());
+	ObjectClass* object = other.m_object;
+	if (object) {
+		((Referable*)object)->increaseReference();
+	}
+	_replaceObject(object);
+	return *this;
+}
+
+
+template <class ObjectClass>
+SLIB_INLINE WeakRef<ObjectClass>::WeakRef(const SafeWeakRef<ObjectClass>& other) : m_weak(other.getWeakRef())
+{
+}
+
+template <class ObjectClass>
+WeakRef<ObjectClass>& WeakRef<ObjectClass>::operator=(const SafeWeakRef<ObjectClass>& other)
+{
+	m_weak = other.getWeakRef();
+	return *this;
+}
+
+template <class ObjectClass>
+template <class _ObjectClass>
+SLIB_INLINE WeakRef<ObjectClass>::WeakRef(const SafeWeakRef<_ObjectClass>& other) : m_weak(other.getWeakRef())
+{
+}
+
+template <class ObjectClass>
+template <class _ObjectClass>
+SLIB_INLINE WeakRef<ObjectClass>& WeakRef<ObjectClass>::operator=(const SafeWeakRef<_ObjectClass>& other)
+{
+	m_weak = other.getWeakRef();
+	return *this;
+}
+
+template <class ObjectClass>
+SLIB_INLINE sl_bool WeakRef<ObjectClass>::operator==(const SafeWeakRef<ObjectClass>& other) const
+{
+	return m_weak == other.getWeakRef();
+}
+
+template <class ObjectClass>
+template <class _ObjectClass>
+SLIB_INLINE sl_bool WeakRef<ObjectClass>::operator==(const SafeWeakRef<_ObjectClass>& other) const
+{
+	return m_weak == other.getWeakRef();
+}
+
+template <class ObjectClass>
+SLIB_INLINE sl_bool WeakRef<ObjectClass>::operator!=(const SafeWeakRef<ObjectClass>& other) const
+{
+	return m_weak != other.getWeakRef();
+}
+
+template <class ObjectClass>
+template <class _ObjectClass>
+SLIB_INLINE sl_bool WeakRef<ObjectClass>::operator!=(const SafeWeakRef<_ObjectClass>& other) const
+{
+	return m_weak != other.getWeakRef();
+}
+
 
 class SLIB_EXPORT _ReferableConstructor
 {
@@ -1026,6 +1560,7 @@ public:
 		m_object->_decreaseReference();
 	}
 };
+
 SLIB_NAMESPACE_END
 
 #define SLIB_REFERABLE_CONSTRUCTOR slib::_ReferableConstructor _slib_referable_constructor(this);

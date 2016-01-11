@@ -370,13 +370,17 @@ public:
 	virtual sl_bool isOpened() = 0;
 
 	virtual sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null) = 0;
-	SLIB_INLINE sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Ref<Referable> ref)
+	
+	template <class T>
+	SLIB_INLINE sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Ref<T>& ref)
 	{
 		return read(data, size, listener, ref.get());
 	}
 
 	virtual sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null) = 0;
-	SLIB_INLINE sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Ref<Referable> ref)
+	
+	template <class T>
+	SLIB_INLINE sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Ref<T>& ref)
 	{
 		return write(data, size, listener, ref.get());
 	}
@@ -391,7 +395,7 @@ public:
 		if (size > 0x40000000) {
 			size = 0x40000000;
 		}
-		return read(mem.getBuf(), (sl_uint32)(size), listener, mem.getReference());
+		return read(mem.getBuf(), (sl_uint32)(size), listener, mem.getObject());
 	}
 
 	SLIB_INLINE sl_bool writeFromMemory(const Memory& mem, const Ptr<IAsyncStreamListener>& listener)
@@ -400,11 +404,12 @@ public:
 		if (size > 0x40000000) {
 			size = 0x40000000;
 		}
-		return write(mem.getBuf(), (sl_uint32)(size), listener, mem.getReference());
+		return write(mem.getBuf(), (sl_uint32)(size), listener, mem.getObject());
 	}
 
 public:
 	static Ref<AsyncStream> create(AsyncStreamInstance* instance, const Ref<AsyncLoop>& loop);
+	
 	static Ref<AsyncStream> create(AsyncStreamInstance* instance);
 };
 
@@ -420,13 +425,17 @@ public:
 	virtual sl_bool isOpened();
 
 	virtual sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
-	SLIB_INLINE sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Ref<Referable> ref)
+	
+	template <class T>
+	SLIB_INLINE sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Ref<T>& ref)
 	{
 		return read(data, size, listener, ref.get());
 	}
 	
 	virtual sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
-	SLIB_INLINE sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Ref<Referable> ref)
+	
+	template <class T>
+	SLIB_INLINE sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Ref<T>& ref)
 	{
 		return write(data, size, listener, ref.get());
 	}
@@ -456,13 +465,17 @@ public:
 
 public:
 	virtual sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
-	SLIB_INLINE sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Ref<Referable> ref)
+	
+	template <class T>
+	SLIB_INLINE sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Ref<T>& ref)
 	{
 		return read(data, size, listener, ref.get());
 	}
 	
 	virtual sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
-	SLIB_INLINE sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Ref<Referable> ref)
+	
+	template <class T>
+	SLIB_INLINE sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Ref<T>& ref)
 	{
 		return write(data, size, listener, ref.get());
 	}

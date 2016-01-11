@@ -140,7 +140,7 @@ public:
 		frame.image.format = bitmapFormatYUV_NV21;
 		frame.image.data = mem.getBuf();
 		frame.image.pitch = 0;
-		frame.image.ref = mem.getReference();
+		frame.image.ref = mem.getObject();
 		frame.rotation = rotation_90;
 		onCaptureVideoFrame(&frame);
 	}

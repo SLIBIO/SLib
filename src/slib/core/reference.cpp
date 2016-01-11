@@ -18,7 +18,6 @@ Referable::Referable()
 #endif
 	m_nRefCount = 0;
 	m_weak = sl_null;
-	
 }
 
 Referable::~Referable()
@@ -26,13 +25,11 @@ Referable::~Referable()
 	_clearWeak();
 }
 
-WeakRefObject* Referable::_getWeak()
+CWeakRef* Referable::_getWeak()
 {
-	SpinLocker lock(SpinLockPoolForWeakReference::get(this));
+	SpinLocker lock(&m_lockWeak);
 	if (! m_weak) {
-		m_weak = new WeakRefObject;
-		m_weak->object = this;
-		m_weak->increaseReference();
+		m_weak = CWeakRef::create(this);
 	}
 	return m_weak;
 }
@@ -40,10 +37,7 @@ WeakRefObject* Referable::_getWeak()
 void Referable::_clearWeak()
 {
 	if (m_weak) {
-		SpinLocker lock(&(m_weak->lock));
-		m_weak->object = sl_null;
-		lock.unlock();
-		m_weak->decreaseReference();
+		m_weak->release();
 		m_weak = sl_null;
 	}
 }
@@ -78,10 +72,44 @@ sl_bool Referable::checkClassType(sl_class_type type) const
 	return sl_false;
 }
 
-void* const _Ref_null = sl_null;
+const _Ref_Const _Ref_Null = {0, 0};
 
-WeakRefObject::WeakRefObject()
+CWeakRef::CWeakRef()
 {
+}
+
+CWeakRef* CWeakRef::create(const Referable* object)
+{
+	CWeakRef* ret = new CWeakRef;
+	if (ret) {
+		ret->m_object = (Referable*)object;
+		ret->increaseReference();
+	}
+	return ret;
+}
+
+Ref<Referable> CWeakRef::lock()
+{
+	Ref<Referable> ret;
+	SpinLocker lock(&m_lock);
+	Referable* obj = m_object;
+	if (obj) {
+		sl_reg n = obj->_increaseReference();
+		if (n > 1) {
+			ret = obj;
+		}
+		obj->_decreaseReference();
+	}
+	return ret;
+}
+
+void CWeakRef::release()
+{
+	{
+		SpinLocker lock(&m_lock);
+		m_object = sl_null;
+	}
+	decreaseReference();
 }
 
 SLIB_NAMESPACE_END

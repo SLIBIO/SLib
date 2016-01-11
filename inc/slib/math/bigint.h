@@ -1202,7 +1202,7 @@ class SLIB_EXPORT SafeBigInt
 	SLIB_DECLARE_OBJECT_WRAPPER_NO_OP(SafeBigInt, SafeBigInt, CBigInt, SafeRef<CBigInt>)
 	
 public:
-	SLIB_INLINE SafeBigInt(const BigInt& other) : m_object(other.getReference())
+	SLIB_INLINE SafeBigInt(const BigInt& other) : m_object(other.getRef())
 	{
 	}
 	
@@ -1237,7 +1237,7 @@ public:
 	
 	SLIB_INLINE SafeBigInt& operator=(const BigInt& other)
 	{
-		m_object = other.getReference();
+		m_object = other.getRef();
 		return *this;
 	}
 	
@@ -1391,13 +1391,13 @@ public:
 	
 };
 
-SLIB_INLINE BigInt::BigInt(const SafeBigInt& other) : m_object(other.getReference())
+SLIB_INLINE BigInt::BigInt(const SafeBigInt& other) : m_object(other.getRef())
 {
 }
 
 SLIB_INLINE BigInt& BigInt::operator=(const SafeBigInt& other)
 {
-	m_object = other.getReference();
+	m_object = other.getRef();
 	return *this;
 }
 

@@ -408,14 +408,14 @@ public:
 
 public:
 	template <class _COMPARE>
-	SLIB_INLINE Array(const Array<T, _COMPARE>& other) : m_object(_Ref::from(other.getReference()))
+	SLIB_INLINE Array(const Array<T, _COMPARE>& other) : m_object(_Ref::from(other.getRef()))
 	{
 	}
 
 	template <class _COMPARE>
 	SLIB_INLINE _Type& operator=(const Array<T, _COMPARE>& other)
 	{
-		m_object = _Ref::from(other.getReference());
+		m_object = _Ref::from(other.getRef());
 		return *this;
 	}
 
@@ -723,24 +723,24 @@ public:
 
 public:
 	template <class _COMPARE>
-	SLIB_INLINE SafeArray(const SafeArray<T, _COMPARE>& other) : m_object(_Ref::from(other.getReference()))
+	SLIB_INLINE SafeArray(const SafeArray<T, _COMPARE>& other) : m_object(_Ref::from(other.getRef()))
 	{
 	}
 
 	template <class _COMPARE>
 	SLIB_INLINE _Type& operator=(const SafeArray<T, _COMPARE>& other)
 	{
-		m_object = _Ref::from(other.getReference());
+		m_object = _Ref::from(other.getRef());
 		return *this;
 	}
 
-	SLIB_INLINE SafeArray(const Array<T, COMPARE>& other) : m_object(other.getReference())
+	SLIB_INLINE SafeArray(const Array<T, COMPARE>& other) : m_object(other.getRef())
 	{
 	}
 
 	SLIB_INLINE _Type& operator=(const Array<T, COMPARE>& other)
 	{
-		m_object = other.getReference();
+		m_object = other.getRef();
 		return *this;
 	}
 
@@ -881,14 +881,14 @@ public:
 };
 
 template <class T, class COMPARE>
-SLIB_INLINE Array<T, COMPARE>::Array(const SafeArray<T, COMPARE>& other) : m_object(other.getReference())
+SLIB_INLINE Array<T, COMPARE>::Array(const SafeArray<T, COMPARE>& other) : m_object(other.getRef())
 {
 }
 
 template <class T, class COMPARE>
 SLIB_INLINE Array<T, COMPARE>& Array<T, COMPARE>::operator=(const SafeArray<T, COMPARE>& other)
 {
-	m_object = other.getReference();
+	m_object = other.getRef();
 	return *this;
 }
 

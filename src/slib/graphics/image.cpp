@@ -60,7 +60,7 @@ Ref<Image> Image::create(sl_uint32 width, sl_uint32 height, const Color* pixels,
 				ret->m_desc.width = width;
 				ret->m_desc.height = height;
 				ret->m_desc.stride = width;
-				ret->m_desc.ref = mem.getReference();
+				ret->m_desc.ref = mem.getObject();
 				ret->m_desc.colors = (Color*)(mem.getBuf());
 				Base::zeroMemory(ret->m_desc.colors, size);
 			}
@@ -86,7 +86,7 @@ Ref<Image> Image::create(const BitmapData& bitmapData)
 			ret->m_desc.width = width;
 			ret->m_desc.height = height;
 			ret->m_desc.stride = width;
-			ret->m_desc.ref = mem.getReference();
+			ret->m_desc.ref = mem.getObject();
 			ret->m_desc.colors = (Color*)(mem.getBuf());
 			BitmapData dst(width, height, (Color*)(mem.getBuf()));
 			if (bitmapData.format.isPrecomputedAlpha()) {
@@ -127,7 +127,7 @@ Ref<Image> Image::createFromBitmap(const Ref<Bitmap>& bitmap, sl_uint32 x, sl_ui
 			desc.height = height;
 			desc.stride = width;
 			desc.colors = buf;
-			desc.ref = mem.getReference();
+			desc.ref = mem.getObject();
 			return Image::createStatic(desc);
 		}
 	}
@@ -151,7 +151,7 @@ Ref<Image> Image::createFromBitmap(const Ref<Bitmap>& bitmap)
 			desc.height = height;
 			desc.stride = width;
 			desc.colors = buf;
-			desc.ref = mem.getReference();
+			desc.ref = mem.getObject();
 			return Image::createStatic(desc);
 		}
 	}

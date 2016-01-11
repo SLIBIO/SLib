@@ -35,7 +35,7 @@ protected:
 	{
 		PtrLocker<CLASS> ptr(m_object);
 		if (ptr.isNotNull()) {
-			((ptr.getValue())->*m_callback)();
+			((ptr.get())->*m_callback)();
 		}
 	}
 private:
@@ -83,7 +83,7 @@ protected: \
 	{ \
 		PtrLocker<CLASS> ptr(m_object); \
 		if (ptr.isNotNull()) { \
-			((ptr.getValue())->*m_callback)(_SLIB_RUNNABLE_CALLBACK_VALUES##ID); \
+			((ptr.get())->*m_callback)(_SLIB_RUNNABLE_CALLBACK_VALUES##ID); \
 		} \
 	} \
 private: \

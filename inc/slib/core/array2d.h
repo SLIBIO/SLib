@@ -708,13 +708,13 @@ public:
 	}
 
 public:
-	SLIB_INLINE SafeArray2D(const _LocalType& other) : m_object(other.getReference())
+	SLIB_INLINE SafeArray2D(const _LocalType& other) : m_object(other.getRef())
 	{
 	}
 
 	SLIB_INLINE _Type& operator=(const _LocalType& other)
 	{
-		m_object = other.getReference();
+		m_object = other.getRef();
 		return *this;
 	}
 
@@ -851,14 +851,14 @@ public:
 };
 
 template <class T>
-SLIB_INLINE Array2D<T>::Array2D(const SafeArray2D<T>& other) : m_object(other.getReference())
+SLIB_INLINE Array2D<T>::Array2D(const SafeArray2D<T>& other) : m_object(other.getRef())
 {
 }
 
 template <class T>
 SLIB_INLINE Array2D<T>& Array2D<T>::operator=(const SafeArray2D<T>& other)
 {
-	m_object = other.getReference();
+	m_object = other.getRef();
 	return *this;
 }
 

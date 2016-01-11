@@ -881,14 +881,14 @@ public:
 
 public:
 	template <class _COMPARE>
-	SLIB_INLINE List(const List<T, _COMPARE>& other) : m_object(_Ref::from(other.getReference()))
+	SLIB_INLINE List(const List<T, _COMPARE>& other) : m_object(_Ref::from(other.getRef()))
 	{
 	}
 
 	template <class _COMPARE>
 	SLIB_INLINE _Type& operator=(const List<T, _COMPARE>& other)
 	{
-		m_object = _Ref::from(other.getReference());
+		m_object = _Ref::from(other.getRef());
 		return *this;
 	}
 	
@@ -1604,14 +1604,14 @@ public:
 	
 public:
 	template <class _COMPARE>
-	SLIB_INLINE SafeList(const SafeList<T, _COMPARE>& other) : m_object(_Ref::from(other.getReference()))
+	SLIB_INLINE SafeList(const SafeList<T, _COMPARE>& other) : m_object(_Ref::from(other.getRef()))
 	{
 	}
 	
 	template <class _COMPARE>
 	SLIB_INLINE _Type& operator=(const SafeList<T, _COMPARE>& other)
 	{
-		m_object = _Ref::from(other.getReference());
+		m_object = _Ref::from(other.getRef());
 		return *this;
 	}
 	
@@ -1627,13 +1627,13 @@ public:
 		return *this;
 	}
 
-	SLIB_INLINE SafeList(const List<T, COMPARE>& other) : m_object(other.getReference())
+	SLIB_INLINE SafeList(const List<T, COMPARE>& other) : m_object(other.getRef())
 	{
 	}
 	
 	SLIB_INLINE _Type& operator=(const List<T, COMPARE>& other)
 	{
-		m_object = other.getReference();
+		m_object = other.getRef();
 		return *this;
 	}
 	
@@ -2002,14 +2002,14 @@ public:
 
 
 template <class T, class COMPARE>
-SLIB_INLINE List<T, COMPARE>::List(const SafeList<T, COMPARE>& other) : m_object(other.getReference())
+SLIB_INLINE List<T, COMPARE>::List(const SafeList<T, COMPARE>& other) : m_object(other.getRef())
 {
 }
 
 template <class T, class COMPARE>
 SLIB_INLINE List<T, COMPARE>& List<T, COMPARE>::operator=(const SafeList<T, COMPARE>& other)
 {
-	m_object = other.getReference();
+	m_object = other.getRef();
 	return *this;
 }
 

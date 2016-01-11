@@ -358,7 +358,7 @@ public:
 						int iRet = SQLITE_ABORT;
 						Variant& var = params[i];
 						switch (var.getType()) {
-						case Variant::typeEmpty:
+						case Variant::typeNull:
 							iRet = ::sqlite3_bind_null(m_statement, i);
 							break;
 						case Variant::typeBoolean:

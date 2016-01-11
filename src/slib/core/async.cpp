@@ -994,7 +994,7 @@ AsyncReader::~AsyncReader()
 
 sl_bool AsyncReader::isOpened()
 {
-	RefPtr<IReader> o = m_reader.lock();
+	Ptr<IReader> o = m_reader.lock();
 	return o.isNotNull();
 }
 
@@ -1060,7 +1060,7 @@ AsyncWriter::~AsyncWriter()
 
 sl_bool AsyncWriter::isOpened()
 {
-	RefPtr<IWriter> o = m_writer.lock();
+	Ptr<IWriter> o = m_writer.lock();
 	return o.isNotNull();
 }
 
@@ -1719,7 +1719,7 @@ void AsyncOutput::_write(sl_bool flagCompleted)
 		sl_uint32 size = (sl_uint32)(header.pop(m_bufWrite.getBuf(), m_bufWrite.getSize()));
 		if (size > 0) {
 			m_flagWriting = sl_true;
-			if (!(m_streamOutput->write(m_bufWrite.getBuf(), size, (WeakRef<AsyncOutput>)this, m_bufWrite.getReference()))) {
+			if (!(m_streamOutput->write(m_bufWrite.getBuf(), size, (WeakRef<AsyncOutput>)this, m_bufWrite.getObject()))) {
 				m_flagWriting = sl_false;
 				_onError();
 			}
@@ -1881,7 +1881,7 @@ void AsyncStreamFilter::addReadData(const Memory& data)
 		if (size >= 0x80000000) {
 			return;
 		}
-		addReadData(data.getBuf(), (sl_uint32)(size), data.getReference());
+		addReadData(data.getBuf(), (sl_uint32)(size), data.getObject());
 	}
 }
 

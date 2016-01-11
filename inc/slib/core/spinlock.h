@@ -94,12 +94,6 @@ public:
 template <int CATEGORY>
 sl_int32 SpinLockPool<CATEGORY>::m_locks[SLIB_SPINLOCK_POOL_SIZE] = { 0 };
 
-typedef SpinLockPool<-1> SpinLockPoolForString;
-typedef SpinLockPool<-2> SpinLockPoolForReference;
-typedef SpinLockPool<-3> SpinLockPoolForWeakReference;
-typedef SpinLockPool<-4> SpinLockPoolForPtr;
-typedef SpinLockPool<-5> SpinLockPoolForRefPtr;
-typedef SpinLockPool<-10> SpinLockPoolForVariant;
 typedef SpinLockPool<-20> SpinLockPoolForList;
 typedef SpinLockPool<-21> SpinLockPoolForMap;
 

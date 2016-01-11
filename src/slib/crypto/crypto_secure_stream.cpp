@@ -226,7 +226,7 @@ public:
 		if (stream.isNull()) {
 			return -1;
 		}
-		return _connect(stream.getValue());
+		return _connect(stream.get());
 	}
 
 	sl_bool isConnected()
@@ -243,7 +243,7 @@ public:
 		if (stream.isNull()) {
 			return -1;
 		}
-		sl_int32 n = _connect(stream.getValue());
+		sl_int32 n = _connect(stream.get());
 		if (n <= 0) {
 			return n;
 		}
@@ -283,7 +283,7 @@ public:
 		if (stream.isNull()) {
 			return -1;
 		}
-		sl_int32 n = _connect(stream.getValue());
+		sl_int32 n = _connect(stream.get());
 		if (n <= 0) {
 			return n;
 		}
@@ -469,7 +469,7 @@ public:
 							onConnected(sl_true);
 						} else {
 							WeakRef<_SecureStreamServer_AsyncStream> _this(this);
-							stream->read((sl_uint8*)(m_rdata.getBuf()) + m_sizeRdata, RDATA_SIZE - m_sizeRdata, _this, m_rdata.getReference());
+							stream->read((sl_uint8*)(m_rdata.getBuf()) + m_sizeRdata, RDATA_SIZE - m_sizeRdata, _this, m_rdata.getObject());
 						}
 					}
 				}
@@ -845,7 +845,7 @@ public:
 		if (m_flagClosed) {
 			return -1;
 		}
-		return _connect(stream.getValue());
+		return _connect(stream.get());
 	}
 
 	sl_bool isConnected()
@@ -866,7 +866,7 @@ public:
 		if (m_flagClosed) {
 			return -1;
 		}
-		sl_int32 n = _connect(stream.getValue());
+		sl_int32 n = _connect(stream.get());
 		if (n <= 0) {
 			return n;
 		}
@@ -906,7 +906,7 @@ public:
 		if (m_flagClosed) {
 			return -1;
 		}
-		sl_int32 n = _init(stream.getValue());
+		sl_int32 n = _init(stream.get());
 		if (n <= 0) {
 			return n;
 		}
@@ -1071,7 +1071,7 @@ public:
 							onConnected(sl_true);
 						} else {
 							WeakRef<_SecureStreamClient_AsyncStream> _this(this);
-							stream->read((sl_uint8*)(m_sdata.getBuf()) + m_sizeSdata, SDATA_SIZE - m_sizeSdata, _this, m_sdata.getReference());
+							stream->read((sl_uint8*)(m_sdata.getBuf()) + m_sizeSdata, SDATA_SIZE - m_sizeSdata, _this, m_sdata.getObject());
 						}
 					}
 				}
