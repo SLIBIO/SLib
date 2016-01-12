@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_CORE_MAP
 
 #include "definition.h"
+
 #include "object.h"
 #include "iterator.h"
 #include "list.h"
@@ -33,15 +34,73 @@ public:
 		return getCount();
 	}
 	
+	
 	virtual VT* getItemPtr(const KT& key) const = 0;
 	
-	virtual sl_bool get(const KT& key, VT* _out = sl_null) const = 0;
 	
-	virtual VT getValue(const KT& key, const VT& def) const = 0;
+	SLIB_INLINE sl_bool get_NoLock(const KT& key, VT* _out = sl_null) const
+	{
+		VT* p = getItemPtr(key);
+		if (p) {
+			if (_out) {
+				*_out = *p;
+			}
+			return sl_true;
+		}
+		return sl_false;
+	}
 	
-	virtual List<VT> getValues(const KT& key) const = 0;
+	sl_bool get(const KT& key, VT* _out = sl_null) const
+	{
+		ObjectLocker lock(this);
+		VT* p = getItemPtr(key);
+		if (p) {
+			if (_out) {
+				*_out = *p;
+			}
+			return sl_true;
+		}
+		return sl_false;
+	}
 	
-	virtual sl_bool put(const KT& key, const VT& value, sl_bool flagReplace = sl_true) = 0;
+	
+	SLIB_INLINE VT getValue_NoLock(const KT& key, const VT& def)
+	{
+		VT* p = getItemPtr(key);
+		if (p) {
+			return *p;
+		}
+		return def;
+	}
+	
+	VT getValue(const KT& key, const VT& def)
+	{
+		ObjectLocker lock(this);
+		VT* p = getItemPtr(key);
+		if (p) {
+			return *p;
+		}
+		return def;
+	}
+	
+	
+	virtual List<VT> getValues_NoLock(const KT& key) const = 0;
+	
+	List<VT> getValues(const KT& key) const
+	{
+		ObjectLocker lock(this);
+		return getValues_NoLock(key);
+	}
+	
+	
+	virtual sl_bool put_NoLock(const KT& key, const VT& value, sl_bool flagReplace = sl_true) = 0;
+	
+	sl_bool put(const KT& key, const VT& value, sl_bool flagReplace = sl_true)
+	{
+		ObjectLocker lock(this);
+		return put_NoLock(key, value, flagReplace);
+	}
+	
 	
 	template <class _KT, class _VT>
 	sl_bool put(IMap<_KT, _VT>* other, sl_bool flagReplace = sl_true)
@@ -56,17 +115,24 @@ public:
 		Iterator< Pair<_KT,_VT> > iterator(other->iterator());
 		Pair<_KT, _VT> v;
 		while (iterator.next(&v)) {
-			if (!(put(v.key, v.value, flagReplace))) {
+			if (!(put_NoLock(v.key, v.value, flagReplace))) {
 				return sl_false;
 			}
 		}
 		return sl_true;
 	}
 	
+	
+	SLIB_INLINE sl_bool add_NoLock(const KT& key, const VT& value)
+	{
+		return put_NoLock(key, value, sl_false);
+	}
+
 	SLIB_INLINE sl_bool add(const KT& key, const VT& value)
 	{
 		return put(key, value, sl_false);
 	}
+	
 	
 	template <class _KT, class _VT>
 	SLIB_INLINE sl_bool add(const IMap<_KT, _VT>* other)
@@ -74,18 +140,52 @@ public:
 		return put(other, sl_false);
 	}
 	
-	virtual sl_size remove(const KT& key, sl_bool flagAllKeys = sl_false) = 0;
+	
+	virtual sl_size remove_NoLock(const KT& key, sl_bool flagAllKeys = sl_false) = 0;
+	
+	sl_size remove(const KT& key, sl_bool flagAllKeys = sl_false)
+	{
+		ObjectLocker lock(this);
+		return remove_NoLock(key, flagAllKeys);
+	}
+	
+	
+	SLIB_INLINE sl_size removeAllMatchingKeys_NoLock(const KT& key)
+	{
+		return remove_NoLock(key, sl_true);
+	}
 	
 	SLIB_INLINE sl_size removeAllMatchingKeys(const KT& key)
 	{
 		return remove(key, sl_true);
 	}
 	
-	virtual sl_size removeAll() = 0;
 	
-	virtual sl_bool containsKey(const KT& key) const = 0;
+	virtual sl_size removeAll_NoLock() = 0;
 	
-	virtual IMap<KT, VT>* duplicate() const = 0;
+	sl_size removeAll()
+	{
+		ObjectLocker lock(this);
+		return removeAll_NoLock();
+	}
+	
+	
+	virtual sl_bool containsKey_NoLock(const KT& key) const = 0;
+	
+	sl_bool containsKey(const KT& key) const
+	{
+		ObjectLocker lock(this);
+		return containsKey_NoLock(key);
+	}
+	
+	
+	virtual IMap<KT, VT>* duplicate_NoLock() const = 0;
+	
+	IMap<KT, VT>* duplicate() const
+	{
+		ObjectLocker lock(this);
+		return duplicate_NoLock();
+	}
 	
 	
 	virtual Iterator<KT> keyIteratorWithRefer(const Referable* refer) const = 0;
@@ -95,7 +195,13 @@ public:
 		return keyIteratorWithRefer(sl_null);
 	}
 	
-	virtual List<KT> keys() const = 0;
+	virtual List<KT> keys_NoLock() const = 0;
+	
+	List<KT> keys() const
+	{
+		ObjectLocker lock(this);
+		return keys_NoLock();
+	}
 
 	
 	virtual Iterator<VT> valueIteratorWithRefer(const Referable* refer) const = 0;
@@ -105,7 +211,13 @@ public:
 		return valueIteratorWithRefer(sl_null);
 	}
 	
-	virtual List<VT> values() const = 0;
+	virtual List<VT> values_NoLock() const = 0;
+	
+	List<VT> values() const
+	{
+		ObjectLocker lock(this);
+		return values_NoLock();
+	}
 	
 	
 	virtual Iterator< Pair<KT, VT> > iteratorWithRefer(const Referable* refer) const = 0;
@@ -115,7 +227,14 @@ public:
 		return iteratorWithRefer(sl_null);
 	}
 	
-	virtual List< Pair<KT, VT> > pairs() const = 0;
+	virtual List< Pair<KT, VT> > pairs_NoLock() const = 0;
+	
+	List< Pair<KT, VT> > pairs() const
+	{
+		ObjectLocker lock(this);
+		return pairs_NoLock();
+	}
+
 	
 public:
 	static IMap<KT, VT>* createDefault();
@@ -176,40 +295,10 @@ public:
 	}
 	
 	// override
-	sl_bool get(const KT& key, VT* _out) const
-	{
-		ObjectLocker lock(this);
-		Pair<KT, VT> pair;
-		pair.key = key;
-		sl_reg index = m_list.indexOf_NoLock(pair);
-		if (index >= 0) {
-			if (_out) {
-				*_out = m_list[index].value;
-			}
-			return sl_true;
-		}
-		return sl_false;
-	}
-
-	// override
-	VT getValue(const KT& key, const VT& def) const
-	{
-		ObjectLocker lock(this);
-		Pair<KT, VT> pair;
-		pair.key = key;
-		sl_reg index = m_list.indexOf_NoLock(pair);
-		if (index >= 0) {
-			return m_list[index].value;
-		}
-		return def;
-	}
-
-	// override
-	List<VT> getValues(const KT& key) const
+	List<VT> getValues_NoLock(const KT& key) const
 	{
 		CList<VT>* ret = new CList<VT>;
 		if (ret) {
-			ObjectLocker lock(this);
 			Pair<KT, VT>* data = m_list.data();
 			sl_size count = m_list.count();
 			for (sl_size i = 0; i < count; i++) {
@@ -226,9 +315,8 @@ public:
 	}
 
 	// override
-	sl_bool put(const KT& key, const VT& value, sl_bool flagReplace = sl_true)
+	sl_bool put_NoLock(const KT& key, const VT& value, sl_bool flagReplace = sl_true)
 	{
-		ObjectLocker lock(this);
 		if (flagReplace) {
 			Pair<KT, VT> pair;
 			pair.key = key;
@@ -248,34 +336,30 @@ public:
 	}
 
 	// override
-	sl_size remove(const KT& key, sl_bool flagAllKeys = sl_false)
+	sl_size remove_NoLock(const KT& key, sl_bool flagAllKeys = sl_false)
 	{
-		ObjectLocker lock(this);
 		Pair<KT, VT> pair;
 		pair.key = key;
 		return m_list.removeValue_NoLock(pair, flagAllKeys);
 	}
 
 	// override
-	sl_size removeAll()
+	sl_size removeAll_NoLock()
 	{
-		ObjectLocker lock(this);
 		return m_list.removeAll_NoLock();
 	}
 
 	// override
-	sl_bool containsKey(const KT& key) const
+	sl_bool containsKey_NoLock(const KT& key) const
 	{
-		ObjectLocker lock(this);
 		Pair<KT, VT> pair;
 		pair.key = key;
 		return (m_list.indexOf_NoLock(pair) >= 0);
 	}
 	
 	// override
-	IMap<KT, VT>* duplicate() const
+	IMap<KT, VT>* duplicate_NoLock() const
 	{
-		ObjectLocker lock(this);
 		_Type* ret = new _Type;
 		if (ret) {
 			if (ret->m_list.add_NoLock(m_list.data(), m_list.count())) {
@@ -336,11 +420,10 @@ public:
 	}
 	
 	// override
-	List<KT> keys() const
+	List<KT> keys_NoLock() const
 	{
 		CList<KT>* ret = new CList<KT>;
 		if (ret) {
-			ObjectLocker lock(this);
 			Pair<KT, VT>* dataSrc = m_list.data();
 			sl_size count = m_list.count();
 			if (ret->setCount_NoLock(count)) {
@@ -405,11 +488,10 @@ public:
 	}
 	
 	// override
-	List<VT> values() const
+	List<VT> values_NoLock() const
 	{
 		CList<VT>* ret = new CList<VT>;
 		if (ret) {
-			ObjectLocker lock(this);
 			Pair<KT, VT>* dataSrc = m_list.data();
 			sl_size count = m_list.count();
 			if (ret->setCount_NoLock(count)) {
@@ -470,9 +552,9 @@ public:
 	}
 	
 	// override
-	List< Pair<KT, VT> > pairs() const
+	List< Pair<KT, VT> > pairs_NoLock() const
 	{
-		return m_list.duplicate();
+		return (CList< Pair<KT, VT> >*)((void*)(m_list.duplicate()));
 	}
 
 };
@@ -509,7 +591,6 @@ public:
 	// override
 	sl_size getCount() const
 	{
-		ObjectLocker lock(this);
 		return (sl_size)(m_table.getCount());
 	}
 	
@@ -518,64 +599,40 @@ public:
 	{
 		return m_table.getItemPtr(key);
 	}
-
+	
 	// override
-	sl_bool get(const KT& key, VT* _out) const
+	List<VT> getValues_NoLock(const KT& key) const
 	{
-		ObjectLocker lock(this);
-		return m_table.get(key, _out);
-	}
-
-	// override
-	VT getValue(const KT& key, const VT& def) const
-	{
-		ObjectLocker lock(this);
-		VT ret;
-		if (m_table.get(key, &ret)) {
-			return ret;
-		}
-		return def;
-	}
-
-	// override
-	List<VT> getValues(const KT& key) const
-	{
-		ObjectLocker lock(this);
 		return m_table.getValues(key);
 	}
 
 	// override
-	sl_bool put(const KT& key, const VT& value, sl_bool flagReplace = sl_true)
+	sl_bool put_NoLock(const KT& key, const VT& value, sl_bool flagReplace = sl_true)
 	{
-		ObjectLocker lock(this);
 		return m_table.put(key, value, flagReplace);
 	}
 
 	// override
-	sl_size remove(const KT& key, sl_bool flagAllKeys = sl_false)
+	sl_size remove_NoLock(const KT& key, sl_bool flagAllKeys = sl_false)
 	{
-		ObjectLocker lock(this);
 		return m_table.remove(key, flagAllKeys);
 	}
 
 	// override
-	sl_size removeAll()
+	sl_size removeAll_NoLock()
 	{
-		ObjectLocker lock(this);
 		return m_table.removeAll();
 	}
 
 	// override
-	sl_bool containsKey(const KT& key) const
+	sl_bool containsKey_NoLock(const KT& key) const
 	{
-		ObjectLocker lock(this);
 		return m_table.search(key);
 	}
 
 	// override
-	IMap<KT, VT>* duplicate() const
+	IMap<KT, VT>* duplicate_NoLock() const
 	{
-		ObjectLocker lock(this);
 		_Type* ret = new _Type;
 		if (ret) {
 			if (ret->m_table.copyFrom(&m_table)) {
@@ -636,11 +693,10 @@ public:
 	}
 
 	// override
-	List<KT> keys() const
+	List<KT> keys_NoLock() const
 	{
 		CList<KT>* ret = new CList<KT>;
 		if (ret) {
-			ObjectLocker lock(this);
 			HashPosition pos;
 			KT key;
 			while (m_table.getNextPosition(pos, &key, sl_null)) {
@@ -704,11 +760,10 @@ public:
 	}
 	
 	// override
-	List<VT> values() const
+	List<VT> values_NoLock() const
 	{
 		CList<VT>* ret = new CList<VT>;
 		if (ret) {
-			ObjectLocker lock(this);
 			HashPosition pos;
 			VT value;
 			while (m_table.getNextPosition(pos, sl_null, &value)) {
@@ -772,11 +827,10 @@ public:
 	}
 	
 	// override
-	List< Pair<KT, VT> > pairs() const
+	List< Pair<KT, VT> > pairs_NoLock() const
 	{
 		CList< Pair<KT, VT> >* ret = new CList< Pair<KT, VT> >;
 		if (ret) {
-			ObjectLocker lock(this);
 			HashPosition pos;
 			Pair<KT, VT> pair;
 			while (m_table.getNextPosition(pos, &(pair.key), &(pair.value))) {
@@ -827,7 +881,6 @@ public:
 	// override
 	sl_size getCount() const
 	{
-		ObjectLocker lock(this);
 		return (sl_size)(m_tree.getCount());
 	}
 	
@@ -838,63 +891,38 @@ public:
 	}
 
 	// override
-	sl_bool get(const KT& key, VT* _out) const
+	List<VT> getValues_NoLock(const KT& key) const
 	{
-		ObjectLocker lock(this);
-		return m_tree.get(key, _out);
-	}
-
-	// override
-	VT getValue(const KT& key, const VT& def) const
-	{
-		ObjectLocker lock(this);
-		VT ret;
-		if (m_tree.get(key, &ret)) {
-			return ret;
-		} else {
-			return def;
-		}
-	}
-
-	// override
-	List<VT> getValues(const KT& key) const
-	{
-		ObjectLocker lock(this);
 		return m_tree.getValues(key);
 	}
 
 	// override
-	sl_bool put(const KT& key, const VT& value, sl_bool flagReplace = sl_true)
+	sl_bool put_NoLock(const KT& key, const VT& value, sl_bool flagReplace = sl_true)
 	{
-		ObjectLocker lock(this);
 		return m_tree.insert(key, value, flagReplace);
 	}
 
 	// override
-	sl_size remove(const KT& key, sl_bool flagAllKeys = sl_false)
+	sl_size remove_NoLock(const KT& key, sl_bool flagAllKeys = sl_false)
 	{
-		ObjectLocker lock(this);
 		return m_tree.remove(key, flagAllKeys);
 	}
 
 	// override
-	sl_size removeAll()
+	sl_size removeAll_NoLock()
 	{
-		ObjectLocker lock(this);
 		return m_tree.removeAll();
 	}
 
 	// override
-	sl_bool containsKey(const KT& key) const
+	sl_bool containsKey_NoLock(const KT& key) const
 	{
-		ObjectLocker lock(this);
 		return m_tree.search(key, sl_null);
 	}
 	
 	// override
-	IMap<KT, VT>* duplicate() const
+	IMap<KT, VT>* duplicate_NoLock() const
 	{
-		ObjectLocker lock(this);
 		_Type* ret = new _Type;
 		if (ret) {
 			TreePosition pos;
@@ -961,11 +989,10 @@ public:
 	}
 	
 	// override
-	List<KT> keys() const
+	List<KT> keys_NoLock() const
 	{
 		CList<KT>* ret = new CList<KT>;
 		if (ret) {
-			ObjectLocker lock(this);
 			TreePosition pos;
 			KT key;
 			while (m_tree.getNextPosition(pos, &key, sl_null)) {
@@ -1029,11 +1056,10 @@ public:
 	}
 	
 	// override
-	List<VT> values() const
+	List<VT> values_NoLock() const
 	{
 		CList<VT>* ret = new CList<VT>;
 		if (ret) {
-			ObjectLocker lock(this);
 			TreePosition pos;
 			VT value;
 			while (m_tree.getNextPosition(pos, sl_null, &value)) {
@@ -1104,11 +1130,10 @@ public:
 	}
 	
 	// override
-	List< Pair<KT, VT> > pairs() const
+	List< Pair<KT, VT> > pairs_NoLock() const
 	{
 		CList< Pair<KT, VT> >* ret = new CList< Pair<KT, VT> >;
 		if (ret) {
-			ObjectLocker lock(this);
 			TreePosition pos;
 			Pair<KT, VT> pair;
 			while (m_tree.getNextPosition(pos, &(pair.key), &(pair.value))) {
@@ -1136,21 +1161,12 @@ class SafeMap;
 template <class KT, class VT>
 class SLIB_EXPORT Map
 {
-	typedef Map<KT, VT> _Type;
 	typedef IMap<KT, VT> _Obj;
+	typedef Map<KT, VT> _Type;
+	typedef SafeMap<KT, VT> _SafeType;
 	typedef Ref<_Obj> _Ref;
 	SLIB_DECLARE_OBJECT_TYPE_FROM(_Type, _Obj)
-	SLIB_DECLARE_OBJECT_WRAPPER(Map, _Type, _Obj, _Ref)
-
-public:
-	Map(const SafeMap<KT, VT>& other);
-	
-	_Type& operator=(const SafeMap<KT, VT>& other);
-	
-	SLIB_INLINE _Obj* getObject() const
-	{
-		return m_object.get();
-	}
+	SLIB_DECLARE_OBJECT_WRAPPER(Map, _Obj, _Type, _SafeType)
 
 public:
 	SLIB_INLINE static _Type createList()
@@ -1164,6 +1180,7 @@ public:
 		return ListMap<KT, VT, COMPARE>::create();
 	}
 
+	
 	SLIB_INLINE static _Type createHash(sl_uint32 initialCapacity = SLIB_HASHTABLE_DEFAULT_CAPACITY)
 	{
 		return HashMap<KT, VT>::create(initialCapacity);
@@ -1175,6 +1192,7 @@ public:
 		return HashMap<KT, VT, HASH>::create(initialCapacity);
 	}
 
+	
 	SLIB_INLINE static _Type createTree()
 	{
 		return TreeMap<KT, VT>::create();
@@ -1198,6 +1216,7 @@ public:
 		m_object = ListMap<KT, VT, COMPARE>::create();
 	}
 
+	
 	SLIB_INLINE void initHash(sl_uint32 initialCapacity = SLIB_HASHTABLE_DEFAULT_CAPACITY)
 	{
 		m_object = HashMap<KT, VT>::create(initialCapacity);
@@ -1209,6 +1228,7 @@ public:
 		m_object = HashMap<KT, VT, HASH>::create(initialCapacity);
 	}
 
+	
 	SLIB_INLINE void initTree()
 	{
 		m_object = TreeMap<KT, VT>::create();
@@ -1235,6 +1255,7 @@ public:
 		return getCount();
 	}
 
+	
 	SLIB_INLINE sl_bool isEmpty() const
 	{
 		_Obj* obj = m_object.get();
@@ -1252,6 +1273,7 @@ public:
 		}
 		return sl_false;
 	}
+	
 	
 	SLIB_INLINE VT* getItemPtr(const KT& key) const
 	{
@@ -1281,6 +1303,16 @@ public:
 		}
 		return ret;
 	}
+	
+	
+	SLIB_INLINE sl_bool get_NoLock(const KT& key, VT* _out = sl_null) const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->get_NoLock(key, _out);
+		}
+		return sl_null;
+	}
 
 	SLIB_INLINE sl_bool get(const KT& key, VT* _out = sl_null) const
 	{
@@ -1289,6 +1321,16 @@ public:
 			return obj->get(key, _out);
 		}
 		return sl_null;
+	}
+	
+	
+	SLIB_INLINE VT getValue_NoLock(const KT& key, const VT& def) const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->getValue_NoLock(key, def);
+		}
+		return def;
 	}
 
 	SLIB_INLINE VT getValue(const KT& key, const VT& def) const
@@ -1299,6 +1341,16 @@ public:
 		}
 		return def;
 	}
+	
+	
+	SLIB_INLINE List<VT> getValues_NoLock(const KT& key) const
+	{
+		_Obj obj = m_object.get();
+		if (obj) {
+			return obj->getValues_NoLock(key);
+		}
+		return List<VT>::null();
+	}
 
 	SLIB_INLINE List<VT> getValues(const KT& key) const
 	{
@@ -1307,6 +1359,22 @@ public:
 			return obj->getValues(key);
 		}
 		return List<VT>::null();
+	}
+	
+	
+	sl_bool put_NoLock(const KT& key, const VT& value, sl_bool flagReplace = sl_true)
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->put_NoLock(key, value, flagReplace);
+		} else {
+			obj = _Obj::createDefault();
+			if (obj) {
+				m_object = obj;
+				return obj->put_NoLock(key, value, flagReplace);
+			}
+		}
+		return sl_false;
 	}
 
 	sl_bool put(const KT& key, const VT& value, sl_bool flagReplace = sl_true)
@@ -1318,11 +1386,12 @@ public:
 			obj = _Obj::createDefault();
 			if (obj) {
 				m_object = obj;
-				return obj->put(key, value, flagReplace);
+				return obj->put_NoLock(key, value, flagReplace);
 			}
 		}
 		return sl_false;
 	}
+	
 	
 	template <class _KT, class _VT>
 	sl_bool put(const Map<_KT, _VT>& other, sl_bool flagReplace = sl_true)
@@ -1340,15 +1409,32 @@ public:
 		return sl_false;
 	}
 	
+	
+	SLIB_INLINE sl_bool add_NoLock(const KT& key, const VT& value)
+	{
+		return put_NoLock(key, value, sl_false);
+	}
+
 	SLIB_INLINE sl_bool add(const KT& key, const VT& value)
 	{
 		return put(key, value, sl_false);
 	}
 	
+	
 	template <class _KT, class _VT>
 	SLIB_INLINE sl_bool add(const Map<_KT, _VT>& other)
 	{
 		return put(other, sl_false);
+	}
+	
+	
+	SLIB_INLINE sl_size remove_NoLock(const KT& key, sl_bool flagAllKeys = sl_false) const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->remove_NoLock(key, flagAllKeys);
+		}
+		return 0;
 	}
 	
 	SLIB_INLINE sl_size remove(const KT& key, sl_bool flagAllKeys = sl_false) const
@@ -1359,10 +1445,26 @@ public:
 		}
 		return 0;
 	}
+	
+
+	SLIB_INLINE sl_size removeAllMatchingKeys_NoLock(const KT& key) const
+	{
+		return remove_NoLock(key, sl_true);
+	}
 
 	SLIB_INLINE sl_size removeAllMatchingKeys(const KT& key) const
 	{
 		return remove(key, sl_true);
+	}
+
+	
+	SLIB_INLINE sl_size removeAll_NoLock() const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->removeAll_NoLock();
+		}
+		return 0;
 	}
 
 	SLIB_INLINE sl_size removeAll() const
@@ -1374,6 +1476,16 @@ public:
 		return 0;
 	}
 
+	
+	SLIB_INLINE sl_bool containsKey_NoLock(const KT& key) const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->containsKey_NoLock(key);
+		}
+		return sl_false;
+	}
+	
 	SLIB_INLINE sl_bool containsKey(const KT& key) const
 	{
 		_Obj* obj = m_object.get();
@@ -1381,6 +1493,16 @@ public:
 			return obj->containsKey(key);
 		}
 		return sl_false;
+	}
+	
+	
+	SLIB_INLINE _Type duplicate_NoLock() const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->duplicate_NoLock();
+		}
+		return _Type::null();
 	}
 	
 	SLIB_INLINE _Type duplicate() const
@@ -1392,6 +1514,7 @@ public:
 		return _Type::null();
 	}
 	
+	
 	SLIB_INLINE Iterator<KT> keyIterator() const
 	{
 		_Obj* obj = m_object.get();
@@ -1399,6 +1522,15 @@ public:
 			return obj->keyIteratorWithRefer(obj);
 		}
 		return Iterator<KT>::null();
+	}
+	
+	SLIB_INLINE List<KT> keys_NoLock() const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->keys_NoLock();
+		}
+		return List<KT>::null();
 	}
 	
 	SLIB_INLINE List<KT> keys() const
@@ -1410,6 +1542,7 @@ public:
 		return List<KT>::null();
 	}
 	
+	
 	SLIB_INLINE Iterator<VT> valueIterator() const
 	{
 		_Obj* obj = m_object.get();
@@ -1417,6 +1550,15 @@ public:
 			return obj->valueIteratorWithRefer(obj);
 		}
 		return Iterator<VT>::null();
+	}
+
+	SLIB_INLINE List<VT> values_NoLock() const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->values_NoLock();
+		}
+		return List<VT>::null();
 	}
 	
 	SLIB_INLINE List<VT> values() const
@@ -1428,6 +1570,7 @@ public:
 		return List<VT>::null();
 	}
 
+	
 	SLIB_INLINE Iterator< Pair<KT, VT> > iterator() const
 	{
 		_Obj* obj = m_object.get();
@@ -1435,6 +1578,15 @@ public:
 			return obj->iteratorWithRefer(obj);
 		}
 		return Iterator< Pair<KT, VT> >::null();
+	}
+	
+	SLIB_INLINE List< Pair<KT, VT> > pairs_NoLock() const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->pairs_NoLock();
+		}
+		return List< Pair<KT, VT> >::null();
 	}
 	
 	SLIB_INLINE List< Pair<KT, VT> > pairs() const
@@ -1463,24 +1615,13 @@ public:
 template <class KT, class VT>
 class SLIB_EXPORT SafeMap
 {
-	typedef SafeMap<KT, VT> _Type;
 	typedef IMap<KT, VT> _Obj;
-	typedef SafeRef<_Obj> _Ref;
+	typedef SafeMap<KT, VT> _Type;
 	typedef Map<KT, VT> _LocalType;
+	typedef SafeRef<_Obj> _Ref;
 	typedef Ref<_Obj> _LocalRef;
 	SLIB_DECLARE_OBJECT_TYPE_FROM(_Type, _Obj)
-	SLIB_DECLARE_OBJECT_WRAPPER(SafeMap, _Type, _Obj, _Ref)
-	
-public:
-	SLIB_INLINE SafeMap(const List<KT, VT>& other) : m_object(other.getRef())
-	{
-	}
-	
-	SLIB_INLINE _Type& operator=(const Map<KT, VT>& other)
-	{
-		m_object = other.getRef();
-		return *this;
-	}
+	SLIB_DECLARE_OBJECT_SAFE_WRAPPER(SafeMap, _Obj, _Type, _LocalType)
 	
 public:
 	SLIB_INLINE void initList()
@@ -1584,12 +1725,12 @@ public:
 		} else {
 			SpinLocker lock(SpinLockPoolForMap::get(this));
 			obj = m_object;
-			if (obj) {
+			if (obj.isNotNull()) {
 				lock.unlock();
 				return obj->put(key, value, flagReplace);
 			}
 			obj = _Obj::createDefault();
-			if (obj) {
+			if (obj.isNotNull()) {
 				m_object = obj;
 				lock.unlock();
 				return obj->put(key, value, flagReplace);
@@ -1701,19 +1842,6 @@ public:
 	}
 	
 };
-
-
-template <class KT, class VT>
-SLIB_INLINE Map<KT, VT>::Map(const SafeMap<KT, VT>& other) : m_object(other.getRef())
-{
-}
-
-template <class KT, class VT>
-SLIB_INLINE Map<KT, VT>& Map<KT, VT>::operator=(const SafeMap<KT, VT>& other)
-{
-	m_object = other.getRef();
-	return *this;
-}
 
 SLIB_NAMESPACE_END
 

@@ -2,10 +2,12 @@
 #define CHECKHEADER_SLIB_CORE_CALLBACK
 
 #include "definition.h"
+
 #include "object.h"
 #include "pointer.h"
 
 SLIB_NAMESPACE_BEGIN
+
 class SLIB_EXPORT Runnable : public Object
 {
 	SLIB_DECLARE_OBJECT(Runnable, Object)
@@ -25,7 +27,7 @@ template <class CLASS>
 class SLIB_EXPORT _ClassCallbackRunnable : public Runnable
 {
 public:
-	_ClassCallbackRunnable(Ptr<CLASS> object, void (CLASS::*callback)())
+	_ClassCallbackRunnable(const Ptr<CLASS>& object, void (CLASS::*callback)())
 	{
 		m_object = object;
 		m_callback = callback;
@@ -44,7 +46,7 @@ private:
 };
 
 template <class CLASS>
-SLIB_EXPORT Ref<Runnable> _Runnable_createClassCallback(Ptr<CLASS> object, void (CLASS::*callback)())
+SLIB_EXPORT Ref<Runnable> _Runnable_createClassCallback(const Ptr<CLASS>& object, void (CLASS::*callback)())
 {
 	return new _ClassCallbackRunnable<CLASS>(object, callback);
 }
@@ -72,7 +74,7 @@ template <class CLASS, _SLIB_RUNNABLE_CALLBACK_TEMPLATES##ID> \
 class SLIB_EXPORT _ClassCallbackRunnable##ID : public Runnable \
 { \
 public: \
-	_ClassCallbackRunnable##ID(Ptr<CLASS> object, void (CLASS::*callback)(_SLIB_RUNNABLE_CALLBACK_PARAMS##ID), _SLIB_RUNNABLE_CALLBACK_PARAMS##ID) \
+	_ClassCallbackRunnable##ID(const Ptr<CLASS>& object, void (CLASS::*callback)(_SLIB_RUNNABLE_CALLBACK_PARAMS##ID), _SLIB_RUNNABLE_CALLBACK_PARAMS##ID) \
 	{ \
 		m_object = object; \
 		m_callback = callback; \
@@ -92,7 +94,7 @@ private: \
 	_SLIB_RUNNABLE_CALLBACK_MEMBERS##ID \
 }; \
 template <class CLASS, _SLIB_RUNNABLE_CALLBACK_TEMPLATES##ID> \
-SLIB_EXPORT Ref<Runnable> _Runnable_createClassCallback(Ptr<CLASS> object, void (CLASS::*callback)(_SLIB_RUNNABLE_CALLBACK_PARAMS##ID), _SLIB_RUNNABLE_CALLBACK_PARAMS##ID) \
+SLIB_EXPORT Ref<Runnable> _Runnable_createClassCallback(const Ptr<CLASS>& object, void (CLASS::*callback)(_SLIB_RUNNABLE_CALLBACK_PARAMS##ID), _SLIB_RUNNABLE_CALLBACK_PARAMS##ID) \
 { \
 	return new _ClassCallbackRunnable##ID<CLASS, _SLIB_RUNNABLE_CALLBACK_TYPES##ID>(object, callback, _SLIB_RUNNABLE_CALLBACK_VALUES##ID); \
 } \

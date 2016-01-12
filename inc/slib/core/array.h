@@ -386,11 +386,12 @@ class SafeArray;
 template < class T, class COMPARE = Compare<T> >
 class SLIB_EXPORT Array
 {
-	typedef Array<T, COMPARE> _Type;
 	typedef CArray<T, COMPARE> _Obj;
+	typedef Array<T, COMPARE> _Type;
+	typedef SafeArray<T, COMPARE> _SafeType;
 	typedef Ref<_Obj> _Ref;
 	SLIB_DECLARE_OBJECT_TYPE_FROM(_Type, _Obj)
-	SLIB_DECLARE_OBJECT_WRAPPER(Array, _Type, _Obj, _Ref)
+	SLIB_DECLARE_OBJECT_WRAPPER(Array, _Obj, _Type, _SafeType)
 	
 public:
 	SLIB_INLINE Array(sl_size count) : m_object(_Obj::create(count))
@@ -408,24 +409,9 @@ public:
 
 public:
 	template <class _COMPARE>
-	SLIB_INLINE Array(const Array<T, _COMPARE>& other) : m_object(_Ref::from(other.getRef()))
+	SLIB_INLINE const _Type& from(const Array<T, _COMPARE>& other)
 	{
-	}
-
-	template <class _COMPARE>
-	SLIB_INLINE _Type& operator=(const Array<T, _COMPARE>& other)
-	{
-		m_object = _Ref::from(other.getRef());
-		return *this;
-	}
-
-	Array(const SafeArray<T, COMPARE>& other);
-
-	_Type& operator=(const SafeArray<T, COMPARE>& other);
-
-	SLIB_INLINE _Obj* getObject() const
-	{
-		return m_object.get();
+		return *((_Type*)((void*)&other));
 	}
 
 public:
@@ -699,13 +685,13 @@ Iterator<T> Array<T, COMPARE>::iterator() const
 template < class T, class COMPARE = Compare<T> >
 class SLIB_EXPORT SafeArray
 {
-	typedef SafeArray<T, COMPARE> _Type;
 	typedef CArray<T, COMPARE> _Obj;
-	typedef SafeRef<_Obj> _Ref;
+	typedef SafeArray<T, COMPARE> _Type;
 	typedef Array<T, COMPARE> _LocalType;
+	typedef SafeRef<_Obj> _Ref;
 	typedef Ref<_Obj> _LocalRef;
 	SLIB_DECLARE_OBJECT_TYPE_FROM(_Type, _Obj)
-	SLIB_DECLARE_OBJECT_WRAPPER(SafeArray, _Type, _Obj, _Ref)
+	SLIB_DECLARE_OBJECT_SAFE_WRAPPER(SafeArray, _Obj, _Type, _LocalType)
 
 public:
 	SLIB_INLINE SafeArray(sl_size count) : m_object(_Obj::create(count))
@@ -723,25 +709,9 @@ public:
 
 public:
 	template <class _COMPARE>
-	SLIB_INLINE SafeArray(const SafeArray<T, _COMPARE>& other) : m_object(_Ref::from(other.getRef()))
+	SLIB_INLINE const _Type& from(const SafeArray<T, _COMPARE>& other)
 	{
-	}
-
-	template <class _COMPARE>
-	SLIB_INLINE _Type& operator=(const SafeArray<T, _COMPARE>& other)
-	{
-		m_object = _Ref::from(other.getRef());
-		return *this;
-	}
-
-	SLIB_INLINE SafeArray(const Array<T, COMPARE>& other) : m_object(other.getRef())
-	{
-	}
-
-	SLIB_INLINE _Type& operator=(const Array<T, COMPARE>& other)
-	{
-		m_object = other.getRef();
-		return *this;
+		return *((_Type*)((void*)&other));
 	}
 
 public:
@@ -881,23 +851,12 @@ public:
 };
 
 template <class T, class COMPARE>
-SLIB_INLINE Array<T, COMPARE>::Array(const SafeArray<T, COMPARE>& other) : m_object(other.getRef())
-{
-}
-
-template <class T, class COMPARE>
-SLIB_INLINE Array<T, COMPARE>& Array<T, COMPARE>::operator=(const SafeArray<T, COMPARE>& other)
-{
-	m_object = other.getRef();
-	return *this;
-}
-
-template <class T, class COMPARE>
 SLIB_INLINE sl_bool SafeArray<T, COMPARE>::getInfo(ArrayInfo<T>& info) const
 {
 	_LocalType obj(*this);
 	return obj.getInfo(info);
 }
+
 SLIB_NAMESPACE_END
 
 #endif

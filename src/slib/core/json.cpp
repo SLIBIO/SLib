@@ -2,6 +2,7 @@
 #include "../../../inc/slib/core/file.h"
 
 SLIB_NAMESPACE_BEGIN
+
 template <class ST, class CT>
 static void _Json_escapeSpaceAndComments(const CT* buf, sl_uint32 len, sl_uint32& pos, sl_bool flagSupportComments)
 {
@@ -298,8 +299,9 @@ Variant Json::parseJSONFromUtf8TextFile(const String& filePath, sl_bool flagSupp
 	return parseJSON(json, flagSupportComments);
 }
 
-String Json::toJSON(Variant var)
+String Json::toJSON(const Variant& var)
 {
 	return var.toJSON();
 }
+
 SLIB_NAMESPACE_END

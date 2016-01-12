@@ -8,6 +8,7 @@
 #include "async.h"
 
 SLIB_NAMESPACE_BEGIN
+
 template <class KT, class VT>
 class SLIB_EXPORT ExpiringMap : public Object
 {
@@ -18,23 +19,22 @@ protected:
 	Map<KT, VT> m_mapBackup;
 	
 	sl_uint32 m_duration;
+	
 	Ref<AsyncTimer> m_timer;
 	WeakRef<AsyncLoop> m_loop;
 
 public:
-	SLIB_INLINE ExpiringMap()
+	ExpiringMap()
 	{
+		m_mapCurrent.initHash();
+		m_mapBackup.initHash();
+		
 		m_duration = 0;
 	}
 
-	SLIB_INLINE ~ExpiringMap()
+	~ExpiringMap()
 	{
-		ObjectLocker lock(this);
-		Ref<AsyncTimer> timer = m_timer;
-		if (timer.isNotNull()) {
-			timer->stopAndWait();
-		}
-		clearTimer();
+		_release();
 	}
 
 	SLIB_INLINE sl_uint32 getExpiringMilliseconds() const
@@ -95,8 +95,8 @@ public:
 				*out = *p;
 			}
 			if (flagUpdateLifetime) {
-				m_mapCurrent.put(key, *p);
-				m_mapBackup.remove(key);
+				m_mapCurrent.put_NoLock(key, *p);
+				m_mapBackup.remove_NoLock(key);
 			}
 			return sl_true;
 		}
@@ -113,8 +113,8 @@ public:
 		p = m_mapBackup.getItemPtr(key);
 		if (p) {
 			if (flagUpdateLifetime) {
-				m_mapCurrent.put(key, *p);
-				m_mapBackup.remove(key);
+				m_mapCurrent.put_NoLock(key, *p);
+				m_mapBackup.remove_NoLock(key);
 			}
 			return *p;
 		}
@@ -124,31 +124,31 @@ public:
 	sl_bool put(const KT& key, const VT& value)
 	{
 		ObjectLocker lock(this);
-		m_mapBackup.remove(key);
-		return m_mapCurrent.put(key, value);
+		m_mapBackup.remove_NoLock(key);
+		return m_mapCurrent.put_NoLock(key, value);
 	}
 
 	void remove(const KT& key)
 	{
 		ObjectLocker lock(this);
-		m_mapCurrent.remove(key);
-		m_mapBackup.remove(key);
+		m_mapCurrent.remove_NoLock(key);
+		m_mapBackup.remove_NoLock(key);
 	}
 
 	void removeAll()
 	{
 		ObjectLocker lock(this);
-		m_mapCurrent.clear();
-		m_mapBackup.clear();
+		m_mapCurrent.removeAll_NoLock();
+		m_mapBackup.removeAll_NoLock();
 	}
 
 	sl_bool containsKey(const KT& key)
 	{
 		ObjectLocker lock(this);
-		if (m_mapCurrent.containsKey(key)) {
+		if (m_mapCurrent.containsKey_NoLock(key)) {
 			return sl_true;
 		}
-		if (m_mapBackup.containsKey(key)) {
+		if (m_mapBackup.containsKey_NoLock(key)) {
 			return sl_true;
 		}
 		return sl_false;
@@ -159,9 +159,19 @@ protected:
 	{
 		ObjectLocker lock(this);
 		m_mapBackup = m_mapCurrent;
-		m_mapCurrent.setNull();
+		m_mapCurrent.initHash();
+	}
+	
+	void _release()
+	{
+		ObjectLocker lock(this);
+		if (m_timer.isNotNull()) {
+			m_timer->stopAndWait();
+		}
+		clearTimer();
 	}
 };
+
 SLIB_NAMESPACE_END
 
 #endif

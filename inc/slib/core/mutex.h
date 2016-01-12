@@ -68,12 +68,18 @@ public:
 		lock(mutex_array, count);
 	}
 
+public:
 	void lock(const Mutex* mutex);
+	
 	void lock(const Mutex* mutex1, const Mutex* mutex2);
+	
 	void lock(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3);
+	
 	void lock(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3, const Mutex* mutex4);
+	
 	void lock(Mutex const* const* mutex_array, sl_size count);
 
+	
 	void unlock();
 
 private:

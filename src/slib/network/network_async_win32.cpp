@@ -95,8 +95,8 @@ public:
 			if (m_requestsRead.pop(&req)) {
 				if (req.isNotNull()) {
 					Base::zeroMemory(&m_overlappedRead, sizeof(m_overlappedRead));
-					m_bufRead.buf = (CHAR*)(req->data);
-					m_bufRead.len = req->size;
+					m_bufRead.buf = (CHAR*)(req->data());
+					m_bufRead.len = req->size();
 					m_flagsRead = 0;
 					DWORD dwRead = 0;
 					int ret = ::WSARecv((SOCKET)handle, &m_bufRead, 1, &dwRead, &m_flagsRead, &m_overlappedRead, NULL);
@@ -121,8 +121,8 @@ public:
 			if (m_requestsWrite.pop(&req)) {
 				if (req.isNotNull()) {
 					Base::zeroMemory(&m_overlappedWrite, sizeof(m_overlappedWrite));
-					m_bufWrite.buf = (CHAR*)(req->data);
-					m_bufWrite.len = req->size;
+					m_bufWrite.buf = (CHAR*)(req->data());
+					m_bufWrite.len = req->size();
 					DWORD dwWrite = 0;
 					int ret = ::WSASend((SOCKET)handle, &m_bufWrite, 1, &dwWrite, 0, &m_overlappedWrite, NULL);
 					if (ret == 0) {

@@ -127,24 +127,30 @@ public: \
 	SLIB_DECLARE_REFERABLE(CLASS, BASE) \
 	SLIB_DECLARE_CLASS_NOCOPY(CLASS)
 
-#define SLIB_DECLARE_OBJECT_WRAPPER_NO_OP(CLASS_NAME, CLASS_TYPE, OBJ_TYPE, REF_TYPE) \
-protected: \
-	REF_TYPE m_object; \
-public: \
+#define SLIB_DECLARE_OBJECT_WRAPPER_BASE(CLASS_NAME, TYPE, OBJ) \
 	SLIB_INLINE CLASS_NAME() {} \
-	SLIB_INLINE CLASS_NAME(const CLASS_TYPE& other) : m_object(other.m_object) \
+	SLIB_INLINE CLASS_NAME(const TYPE& other) : m_object(other.m_object) \
 	{ \
 	} \
-	SLIB_INLINE CLASS_NAME(const OBJ_TYPE* object) : m_object(object) \
+	SLIB_INLINE CLASS_NAME(const OBJ* object) : m_object(object) \
 	{ \
 	} \
-	template <class _ObjectClass> \
-	SLIB_INLINE CLASS_NAME(const slib::Ref<_ObjectClass>& object) : m_object(object) \
+	template <class _T> \
+	SLIB_INLINE CLASS_NAME(slib::Ref<_T>&& object) \
+	{ \
+		m_object._setObject(object._move()); \
+	} \
+	template <class _T> \
+	SLIB_INLINE CLASS_NAME(const slib::Ref<_T>& object) : m_object(object) \
 	{ \
 	} \
-	SLIB_INLINE static const CLASS_TYPE& null() \
+	template <class _T> \
+	SLIB_INLINE CLASS_NAME(const slib::SafeRef<_T>& object) : m_object(object) \
 	{ \
-		return *((CLASS_TYPE*)((void*)(&_Ref_Null))); \
+	} \
+	SLIB_INLINE static const TYPE& null() \
+	{ \
+		return *((TYPE*)((void*)(&_Ref_Null))); \
 	} \
 	SLIB_INLINE sl_bool isNull() const \
 	{ \
@@ -158,40 +164,141 @@ public: \
 	{ \
 		m_object.setNull(); \
 	} \
-	SLIB_INLINE const REF_TYPE& getRef() const \
-	{ \
-		return m_object; \
-	}
-
-#define SLIB_DECLARE_OBJECT_WRAPPER(CLASS_NAME, CLASS_TYPE, OBJ_TYPE, REF_TYPE) \
-	SLIB_DECLARE_OBJECT_WRAPPER_NO_OP(CLASS_NAME, CLASS_TYPE, OBJ_TYPE, REF_TYPE) \
-	SLIB_INLINE CLASS_NAME(const slib::Ref<OBJ_TYPE>& object) : m_object(object) \
-	{ \
-	} \
-	SLIB_INLINE sl_bool operator==(const CLASS_TYPE& other) const \
-	{ \
-		return m_object == other.m_object; \
-	} \
-	SLIB_INLINE sl_bool operator!=(const CLASS_TYPE& other) const \
-	{ \
-		return m_object != other.m_object; \
-	} \
-	SLIB_INLINE CLASS_TYPE& operator=(const CLASS_TYPE& other) \
+	SLIB_INLINE TYPE& operator=(const TYPE& other) \
 	{ \
 		m_object = other.m_object; \
 		return *this; \
 	} \
-	SLIB_INLINE CLASS_TYPE& operator=(const OBJ_TYPE* object) \
+	SLIB_INLINE TYPE& operator=(const OBJ* object) \
 	{ \
 		m_object = object; \
 		return *this; \
 	} \
-	template <class _ObjectClass> \
-	SLIB_INLINE CLASS_TYPE& operator=(const slib::Ref<_ObjectClass>& object) \
+	template <class _T> \
+	SLIB_INLINE TYPE& operator=(slib::Ref<_T>&& object) \
+	{ \
+		m_object._replaceObject(object.move()); \
+		return *this; \
+	} \
+	template <class _T> \
+	SLIB_INLINE TYPE& operator=(const slib::Ref<_T>& object) \
+	{ \
+		m_object = object; \
+		return *this; \
+	} \
+	template <class _T> \
+	SLIB_INLINE TYPE& operator=(const slib::SafeRef<_T>& object) \
 	{ \
 		m_object = object; \
 		return *this; \
 	}
+
+
+#define SLIB_DECLARE_OBJECT_WRAPPER_NO_OP(CLASS_NAME, OBJ, TYPE, SAFE_TYPE) \
+protected: \
+	slib::Ref<OBJ> m_object; \
+public: \
+	SLIB_DECLARE_OBJECT_WRAPPER_BASE(CLASS_NAME, TYPE, OBJ) \
+	SLIB_INLINE const slib::Ref<OBJ>& getRef() const \
+	{ \
+		return m_object; \
+	} \
+	SLIB_INLINE slib::Ref<OBJ>& getRef() \
+	{ \
+		return m_object; \
+	} \
+	SLIB_INLINE CLASS_NAME(TYPE&& other) \
+	{ \
+		m_object._setObject(other.m_object._move()); \
+	} \
+	SLIB_INLINE TYPE& operator=(TYPE&& other) \
+	{ \
+		m_object._replaceObject(other.m_object._move()); \
+		return *this; \
+	} \
+	SLIB_INLINE CLASS_NAME(const SAFE_TYPE& other) : m_object(*((slib::SafeRef<OBJ>*)((void*)&other))) \
+	{ \
+	} \
+	SLIB_INLINE TYPE& operator=(const SAFE_TYPE& other) \
+	{ \
+		m_object = *((slib::SafeRef<OBJ>*)((void*)&other)); \
+		return *this; \
+	} \
+	SLIB_INLINE OBJ* getObject() const \
+	{ \
+		return m_object.get(); \
+	}
+
+#define SLIB_DECLARE_OBJECT_WRAPPER(CLASS_NAME, OBJ, TYPE, SAFE_TYPE) \
+	SLIB_DECLARE_OBJECT_WRAPPER_NO_OP(CLASS_NAME, OBJ, TYPE, SAFE_TYPE) \
+	SLIB_INLINE sl_bool operator==(const TYPE& other) const \
+	{ \
+		return m_object == other.m_object; \
+	} \
+	SLIB_INLINE sl_bool operator==(const SAFE_TYPE& other) const \
+	{ \
+		return m_object == *((slib::SafeRef<OBJ>*)((void*)&other)); \
+	} \
+	SLIB_INLINE sl_bool operator!=(const TYPE& other) const \
+	{ \
+		return m_object != other.m_object; \
+	} \
+	SLIB_INLINE sl_bool operator!=(const SAFE_TYPE& other) const \
+	{ \
+		return m_object != *((slib::SafeRef<OBJ>*)((void*)&other)); \
+	}
+
+
+#define SLIB_DECLARE_OBJECT_SAFE_WRAPPER_NO_OP(CLASS_NAME, OBJ, SAFE_TYPE, TYPE) \
+protected: \
+	slib::SafeRef<OBJ> m_object; \
+public: \
+	SLIB_DECLARE_OBJECT_WRAPPER_BASE(CLASS_NAME, SAFE_TYPE, OBJ) \
+	SLIB_INLINE const slib::SafeRef<OBJ>& getRef() const \
+	{ \
+		return m_object; \
+	} \
+	SLIB_INLINE slib::SafeRef<OBJ>& getRef() \
+	{ \
+		return m_object; \
+	} \
+	SLIB_INLINE CLASS_NAME(TYPE&& other) \
+	{ \
+		m_object._setObject(other.getRef()._move()); \
+	} \
+	SLIB_INLINE SAFE_TYPE& operator=(TYPE&& other) \
+	{ \
+		m_object._replaceObject(other.getRef()._move()); \
+		return *this; \
+	} \
+	SLIB_INLINE CLASS_NAME(const TYPE& other) : m_object(other.getRef()) \
+	{ \
+	} \
+	SLIB_INLINE SAFE_TYPE& operator=(const TYPE& other) \
+	{ \
+		m_object = other.getRef(); \
+		return *this; \
+	}
+
+#define SLIB_DECLARE_OBJECT_SAFE_WRAPPER(CLASS_NAME, OBJ, SAFE_TYPE, TYPE) \
+	SLIB_DECLARE_OBJECT_SAFE_WRAPPER_NO_OP(CLASS_NAME, OBJ, SAFE_TYPE, TYPE) \
+	SLIB_INLINE sl_bool operator==(const TYPE& other) const \
+	{ \
+		return m_object == other.getRef(); \
+	} \
+	SLIB_INLINE sl_bool operator==(const SAFE_TYPE& other) const \
+	{ \
+		return m_object == other.m_object; \
+	} \
+	SLIB_INLINE sl_bool operator!=(const TYPE& other) const \
+	{ \
+		return m_object != other.getRef(); \
+	} \
+	SLIB_INLINE sl_bool operator!=(const SAFE_TYPE& other) const \
+	{ \
+		return m_object != other.m_object; \
+	}
+
 
 
 /*
@@ -303,6 +410,11 @@ public:
 			((Referable*)m_object)->decreaseReference();
 		}
 	}
+	
+	SLIB_INLINE Ref(_Type&& other)
+	{
+		m_object = other._move();
+	}
 
 	SLIB_INLINE Ref(const _Type& other)
 	{
@@ -314,6 +426,12 @@ public:
 	}
 
 	template <class _ObjectClass>
+	SLIB_INLINE Ref(Ref<_ObjectClass>&& other)
+	{
+		m_object = other._move();
+	}
+	
+	template <class _ObjectClass>
 	SLIB_INLINE Ref(const Ref<_ObjectClass>& other)
 	{
 		ObjectClass* object = other.get();
@@ -322,6 +440,7 @@ public:
 		}
 		m_object = object;
 	}
+
 	
 	Ref(const SafeRef<ObjectClass>& other);
 	
@@ -383,8 +502,16 @@ public:
 	{
 		return *((Ref<Referable>*)((void*)this));
 	}
-
+	
 public:
+	SLIB_INLINE _Type& operator=(_Type&& other)
+	{
+		if (this != &other) {
+			_replaceObject(other._move());
+		}
+		return *this;
+	}
+	
 	SLIB_INLINE _Type& operator=(const _Type& other)
 	{
 		ObjectClass* object = other.m_object;
@@ -393,6 +520,15 @@ public:
 				((Referable*)object)->increaseReference();
 			}
 			_replaceObject(object);
+		}
+		return *this;
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE _Type& operator=(Ref<_ObjectClass>&& other)
+	{
+		if ((void*)this != (void*)(&other)) {
+			_replaceObject(other._move());
 		}
 		return *this;
 	}
@@ -504,14 +640,25 @@ public:
 	}
 
 public:
-	SLIB_INLINE void _replaceObject(ObjectClass* objectNew)
+	SLIB_INLINE void _setObject(const ObjectClass* object)
+	{
+		m_object = (ObjectClass*)object;
+	}
+	
+	SLIB_INLINE void _replaceObject(const ObjectClass* object)
 	{
 		if (m_object) {
 			((Referable*)m_object)->decreaseReference();
 		}
-		m_object = objectNew;
+		m_object = (ObjectClass*)object;
 	}
 	
+	SLIB_INLINE ObjectClass* _move()
+	{
+		ObjectClass* object = m_object;
+		m_object = sl_null;
+		return object;
+	}
 };
 
 
@@ -548,7 +695,12 @@ public:
 		ObjectClass* object = other._retainObject();
 		m_object = object;
 	}
-
+	
+	SLIB_INLINE SafeRef(Ref<ObjectClass>&& other)
+	{
+		m_object = other._move();
+	}
+	
 	SLIB_INLINE SafeRef(const Ref<ObjectClass>& other)
 	{
 		ObjectClass* object = other.get();
@@ -556,6 +708,12 @@ public:
 			((Referable*)object)->increaseReference();
 		}
 		m_object = object;
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE SafeRef(Ref<_ObjectClass>&& other)
+	{
+		m_object = other._move();
 	}
 
 	template <class _ObjectClass>
@@ -643,6 +801,12 @@ public:
 		}
 		return *this;
 	}
+	
+	SLIB_INLINE _Type& operator=(Ref<ObjectClass>&& other)
+	{
+		_replaceObject(other._move());
+		return *this;
+	}
 
 	SLIB_INLINE _Type& operator=(const Ref<ObjectClass>& other)
 	{
@@ -653,6 +817,13 @@ public:
 			}
 			_replaceObject(object);
 		}
+		return *this;
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE _Type& operator=(Ref<_ObjectClass>&& other)
+	{
+		_replaceObject(other._move());
 		return *this;
 	}
 
@@ -775,14 +946,19 @@ public:
 		}
 		return object;
 	}
+	
+	void _setObject(const ObjectClass* object)
+	{
+		m_object = (ObjectClass*)object;
+	}
 
-	void _replaceObject(ObjectClass* object)
+	void _replaceObject(const ObjectClass* object)
 	{
 		ObjectClass* before;
 		{
 			SpinLocker lock(&m_lock);
 			before = m_object;
-			m_object = object;
+			m_object = (ObjectClass*)object;
 		}
 		if (before) {
 			((Referable*)before)->decreaseReference();
@@ -1010,7 +1186,7 @@ public:
 	
 
 private:
-	SLIB_INLINE void _set(ObjectClass* object)
+	SLIB_INLINE void _set(const ObjectClass* object)
 	{
 		if (object) {
 			m_weak = ((Referable*)object)->_getWeak();
@@ -1231,7 +1407,7 @@ public:
 	}
 	
 private:
-	SLIB_INLINE void _set(ObjectClass* object)
+	SLIB_INLINE void _set(const ObjectClass* object)
 	{
 		if (object) {
 			m_weak = ((Referable*)object)->_getWeak();

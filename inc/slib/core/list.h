@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_CORE_LIST
 
 #include "definition.h"
+
 #include "object.h"
 #include "iterator.h"
 #include "array.h"
@@ -863,11 +864,12 @@ class SafeList;
 template < class T, class COMPARE=Compare<T> >
 class SLIB_EXPORT List
 {
-	typedef List<T, COMPARE> _Type;
 	typedef CList<T, COMPARE> _Obj;
+	typedef List<T, COMPARE> _Type;
+	typedef SafeList<T, COMPARE> _SafeType;
 	typedef Ref<_Obj> _Ref;
 	SLIB_DECLARE_OBJECT_TYPE_FROM(_Type, _Obj)
-	SLIB_DECLARE_OBJECT_WRAPPER(List, _Type, _Obj, _Ref)
+	SLIB_DECLARE_OBJECT_WRAPPER(List, _Obj, _Type, _SafeType)
 	
 public:
 	SLIB_INLINE List(sl_size count) : m_object(_Obj::create(count))
@@ -881,36 +883,9 @@ public:
 
 public:
 	template <class _COMPARE>
-	SLIB_INLINE List(const List<T, _COMPARE>& other) : m_object(_Ref::from(other.getRef()))
+	SLIB_INLINE const _Type& from(const List<T, _COMPARE>& other)
 	{
-	}
-
-	template <class _COMPARE>
-	SLIB_INLINE _Type& operator=(const List<T, _COMPARE>& other)
-	{
-		m_object = _Ref::from(other.getRef());
-		return *this;
-	}
-	
-	template <class _COMPARE>
-	SLIB_INLINE List(const CList<T, _COMPARE>* other) : m_object((_Obj*)((void*)other))
-	{
-	}
-	
-	template <class _COMPARE>
-	SLIB_INLINE _Type& operator=(const CList<T, _COMPARE>* other)
-	{
-		m_object = (_Obj*)((void*)other);
-		return *this;
-	}
-	
-	List(const SafeList<T, COMPARE>& other);
-	
-	_Type& operator=(const SafeList<T, COMPARE>& other);
-	
-	SLIB_INLINE _Obj* getObject() const
-	{
-		return m_object.get();
+		return *((_Type*)((void*)&other));
 	}
 	
 public:
@@ -1045,6 +1020,24 @@ public:
 	}
 
 public:
+	sl_bool setCount_NoLock(sl_size count)
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->setCount_NoLock(count);
+		} else {
+			if (count == 0) {
+				return sl_true;
+			}
+			obj = _Obj::create();
+			if (obj) {
+				m_object = obj;
+				return obj->setCount_NoLock(count);
+			}
+		}
+		return sl_false;
+	}
+	
 	sl_bool setCount(sl_size count)
 	{
 		_Obj* obj = m_object.get();
@@ -1063,34 +1056,6 @@ public:
 		return sl_false;
 	}
 	
-	sl_bool setCount_NoLock(sl_size count)
-	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->setCount_NoLock(count);
-		} else {
-			if (count == 0) {
-				return sl_true;
-			}
-			obj = _Obj::create();
-			if (obj) {
-				m_object = obj;
-				return obj->setCount_NoLock(count);
-			}
-		}
-		return sl_false;
-	}
-
-	
-	template <class _T>
-	SLIB_INLINE sl_bool insert(sl_size index, const _T* values, sl_size count) const
-	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->insert(index, values, count);
-		}
-		return sl_false;
-	}
 	
 	template <class _T>
 	SLIB_INLINE sl_bool insert_NoLock(sl_size index, const _T* values, sl_size count) const
@@ -1098,6 +1063,16 @@ public:
 		_Obj* obj = m_object.get();
 		if (obj) {
 			return obj->insert_NoLock(index, values, count);
+		}
+		return sl_false;
+	}
+	
+	template <class _T>
+	SLIB_INLINE sl_bool insert(sl_size index, const _T* values, sl_size count) const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->insert(index, values, count);
 		}
 		return sl_false;
 	}
@@ -1114,15 +1089,6 @@ public:
 	}
 	
 	
-	SLIB_INLINE sl_bool insert(sl_size index, const T& value) const
-	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->insert(index, value);
-		}
-		return sl_false;
-	}
-	
 	SLIB_INLINE sl_bool insert_NoLock(sl_size index, const T& value) const
 	{
 		_Obj* obj = m_object.get();
@@ -1132,6 +1098,34 @@ public:
 		return sl_false;
 	}
 	
+	SLIB_INLINE sl_bool insert(sl_size index, const T& value) const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->insert(index, value);
+		}
+		return sl_false;
+	}
+	
+	
+	template <class _T>
+	sl_bool add_NoLock(const _T* values, sl_size count)
+	{
+		if (count == 0) {
+			return sl_true;
+		}
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->add_NoLock(values, count);
+		} else {
+			obj = _Obj::create();
+			if (obj) {
+				m_object = obj;
+				return obj->add_NoLock(values, count);
+			}
+		}
+		return sl_false;
+	}
 	
 	template <class _T>
 	sl_bool add(const _T* values, sl_size count)
@@ -1152,25 +1146,6 @@ public:
 		return sl_false;
 	}
 	
-	template <class _T>
-	sl_bool add_NoLock(const _T* values, sl_size count)
-	{
-		if (count == 0) {
-			return sl_true;
-		}
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->add_NoLock(values, count);
-		} else {
-			obj = _Obj::create();
-			if (obj) {
-				m_object = obj;
-				return obj->add_NoLock(values, count);
-			}
-		}
-		return sl_false;
-	}
-
 	
 	template <class _T, class _COMPARE>
 	sl_bool add(const List<_T, _COMPARE>& _other)
@@ -1193,21 +1168,6 @@ public:
 	}
 	
 	
-	sl_bool add(const T& value)
-	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->add(value);
-		} else {
-			obj = _Obj::create();
-			if (obj) {
-				m_object = obj;
-				return obj->add_NoLock(value);
-			}
-		}
-		return sl_false;
-	}
-	
 	sl_bool add_NoLock(const T& value)
 	{
 		_Obj* obj = m_object.get();
@@ -1223,6 +1183,36 @@ public:
 		return sl_false;
 	}
 	
+	sl_bool add(const T& value)
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->add(value);
+		} else {
+			obj = _Obj::create();
+			if (obj) {
+				m_object = obj;
+				return obj->add_NoLock(value);
+			}
+		}
+		return sl_false;
+	}
+	
+	
+	sl_bool addIfNotExist_NoLock(const T& value)
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->addIfNotExist_NoLock(value);
+		} else {
+			obj = _Obj::create();
+			if (obj) {
+				m_object = obj;
+				return obj->addIfNotExist_NoLock(value);
+			}
+		}
+		return sl_false;
+	}
 	
 	sl_bool addIfNotExist(const T& value)
 	{
@@ -1239,21 +1229,25 @@ public:
 		return sl_false;
 	}
 	
-	sl_bool addIfNotExist_NoLock(const T& value)
+	
+	template <class _T>
+	sl_bool add_NoLock(const Iterator<_T>& iterator)
 	{
+		if (iterator.isNull()) {
+			return sl_true;
+		}
 		_Obj* obj = m_object.get();
 		if (obj) {
-			return obj->addIfNotExist_NoLock(value);
+			return obj->add_NoLock(iterator);
 		} else {
 			obj = _Obj::create();
 			if (obj) {
 				m_object = obj;
-				return obj->addIfNotExist_NoLock(value);
+				return obj->add_NoLock(iterator);
 			}
 		}
 		return sl_false;
 	}
-
 	
 	template <class _T>
 	sl_bool add(const Iterator<_T>& iterator)
@@ -1274,26 +1268,16 @@ public:
 		return sl_false;
 	}
 	
-	template <class _T>
-	sl_bool add_NoLock(const Iterator<_T>& iterator)
+
+	SLIB_INLINE sl_size remove_NoLock(sl_size index, sl_size count = 1) const
 	{
-		if (iterator.isNull()) {
-			return sl_true;
-		}
 		_Obj* obj = m_object.get();
 		if (obj) {
-			return obj->add_NoLock(iterator);
-		} else {
-			obj = _Obj::create();
-			if (obj) {
-				m_object = obj;
-				return obj->add_NoLock(iterator);
-			}
+			return obj->remove_NoLock(index, count);
 		}
-		return sl_false;
+		return 0;
 	}
-
-
+	
 	SLIB_INLINE sl_size remove(sl_size index, sl_size count = 1) const
 	{
 		_Obj* obj = m_object.get();
@@ -1303,24 +1287,6 @@ public:
 		return 0;
 	}
 	
-	SLIB_INLINE sl_size remove_NoLock(sl_size index, sl_size count = 1) const
-	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->remove_NoLock(index, count);
-		}
-		return 0;
-	}
-
-	
-	SLIB_INLINE sl_size removeValue(const T& value, sl_bool flagAllValues = sl_false) const
-	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->removeValue(value, flagAllValues);
-		}
-		return 0;
-	}
 	
 	SLIB_INLINE sl_size removeValue_NoLock(const T& value, sl_bool flagAllValues = sl_false) const
 	{
@@ -1331,6 +1297,24 @@ public:
 		return 0;
 	}
 	
+	SLIB_INLINE sl_size removeValue(const T& value, sl_bool flagAllValues = sl_false) const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->removeValue(value, flagAllValues);
+		}
+		return 0;
+	}
+	
+	
+	SLIB_INLINE sl_size removeAll_NoLock() const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->removeAll_NoLock();
+		}
+		return 0;
+	}
 	
 	SLIB_INLINE sl_size removeAll() const
 	{
@@ -1341,15 +1325,15 @@ public:
 		return 0;
 	}
 	
-	SLIB_INLINE sl_size removeAll_NoLock() const
+	
+	SLIB_INLINE sl_bool popFront_NoLock(T* _out = sl_null) const
 	{
 		_Obj* obj = m_object.get();
 		if (obj) {
-			return obj->removeAll_NoLock();
+			return obj->popFront_NoLock(_out);
 		}
-		return 0;
+		return sl_false;
 	}
-
 	
 	SLIB_INLINE sl_bool popFront(T* _out = sl_null) const
 	{
@@ -1360,15 +1344,15 @@ public:
 		return sl_false;
 	}
 	
-	SLIB_INLINE sl_bool popFront_NoLock(T* _out = sl_null) const
+	
+	SLIB_INLINE sl_size popFront_NoLock(sl_size count) const
 	{
 		_Obj* obj = m_object.get();
 		if (obj) {
-			return obj->popFront_NoLock(_out);
+			return obj->popFront_NoLock(count);
 		}
-		return sl_false;
+		return 0;
 	}
-
 	
 	SLIB_INLINE sl_size popFront(sl_size count) const
 	{
@@ -1379,15 +1363,15 @@ public:
 		return 0;
 	}
 	
-	SLIB_INLINE sl_size popFront_NoLock(sl_size count) const
+	
+	SLIB_INLINE sl_bool popBack_NoLock(T* _out = sl_null) const
 	{
 		_Obj* obj = m_object.get();
 		if (obj) {
-			return obj->popFront_NoLock(count);
+			return obj->popBack_NoLock(_out);
 		}
-		return 0;
+		return sl_false;
 	}
-
 	
 	SLIB_INLINE sl_bool popBack(T* _out = sl_null) const
 	{
@@ -1398,15 +1382,15 @@ public:
 		return sl_false;
 	}
 	
-	SLIB_INLINE sl_bool popBack_NoLock(T* _out = sl_null) const
+	
+	SLIB_INLINE sl_size popBack_NoLock(sl_size count) const
 	{
 		_Obj* obj = m_object.get();
 		if (obj) {
-			return obj->popBack_NoLock(_out);
+			return obj->popBack_NoLock(count);
 		}
-		return sl_false;
+		return 0;
 	}
-
 	
 	SLIB_INLINE sl_size popBack(sl_size count) const
 	{
@@ -1417,16 +1401,16 @@ public:
 		return 0;
 	}
 	
-	SLIB_INLINE sl_size popBack_NoLock(sl_size count) const
+
+	SLIB_INLINE sl_reg indexOf_NoLock(const T& value, sl_reg start = 0) const
 	{
 		_Obj* obj = m_object.get();
 		if (obj) {
-			return obj->popBack_NoLock(count);
+			return obj->indexOf_NoLock(value, start);
 		}
-		return 0;
+		return -1;
 	}
-
-
+	
 	SLIB_INLINE sl_reg indexOf(const T& value, sl_reg start = 0) const
 	{
 		_Obj* obj = m_object.get();
@@ -1436,15 +1420,15 @@ public:
 		return -1;
 	}
 	
-	SLIB_INLINE sl_reg indexOf_NoLock(const T& value, sl_reg start = 0) const
+	
+	SLIB_INLINE sl_reg lastIndexOf_NoLock(const T& value, sl_reg start = -1) const
 	{
 		_Obj* obj = m_object.get();
 		if (obj) {
-			return obj->indexOf_NoLock(value, start);
+			return obj->lastIndexOf_NoLock(value, start);
 		}
 		return -1;
 	}
-
 	
 	SLIB_INLINE sl_reg lastIndexOf(const T& value, sl_reg start = -1) const
 	{
@@ -1455,15 +1439,15 @@ public:
 		return -1;
 	}
 	
-	SLIB_INLINE sl_reg lastIndexOf_NoLock(const T& value, sl_reg start = -1) const
+	
+	SLIB_INLINE sl_bool contains_NoLock(const T& value) const
 	{
 		_Obj* obj = m_object.get();
 		if (obj) {
-			return obj->lastIndexOf_NoLock(value, start);
+			return obj->contains_NoLock(value);
 		}
-		return -1;
+		return sl_false;
 	}
-
 	
 	SLIB_INLINE sl_bool contains(const T& value) const
 	{
@@ -1474,15 +1458,15 @@ public:
 		return sl_false;
 	}
 	
-	SLIB_INLINE sl_bool contains_NoLock(const T& value) const
+	
+	SLIB_INLINE _Type duplicate_NoLock() const
 	{
 		_Obj* obj = m_object.get();
 		if (obj) {
-			return obj->contains_NoLock(value);
+			return obj->duplicate_NoLock();
 		}
-		return sl_false;
+		return _Type::null();
 	}
-
 	
 	SLIB_INLINE _Type duplicate() const
 	{
@@ -1493,30 +1477,21 @@ public:
 		return _Type::null();
 	}
 	
-	SLIB_INLINE _Type duplicate_NoLock() const
-	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->duplicate_NoLock();
-		}
-		return _Type::null();
-	}
-
-	
-	SLIB_INLINE Array<T, COMPARE> toArray() const
-	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->toArray();
-		}
-		return Array<T, COMPARE>::null();
-	}
 	
 	SLIB_INLINE Array<T, COMPARE> toArray_NoLock() const
 	{
 		_Obj* obj = m_object.get();
 		if (obj) {
 			return obj->toArray_NoLock();
+		}
+		return Array<T, COMPARE>::null();
+	}
+	
+	SLIB_INLINE Array<T, COMPARE> toArray() const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			return obj->toArray();
 		}
 		return Array<T, COMPARE>::null();
 	}
@@ -1541,6 +1516,14 @@ public:
 	}
 
 	
+	SLIB_INLINE void sort_NoLock(sl_bool flagAscending = sl_true) const
+	{
+		_Obj* obj = m_object.get();
+		if (obj) {
+			obj->sort_NoLock(flagAscending);
+		}
+	}
+	
 	SLIB_INLINE void sort(sl_bool flagAscending = sl_true) const
 	{
 		_Obj* obj = m_object.get();
@@ -1549,14 +1532,6 @@ public:
 		}
 	}
 	
-	SLIB_INLINE void sort_NoLock(sl_bool flagAscending = sl_true) const
-	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			obj->sort_NoLock(flagAscending);
-		}
-	}
-
 	
 	SLIB_INLINE Iterator<T> iterator() const
 	{
@@ -1584,13 +1559,13 @@ public:
 template < class T, class COMPARE = Compare<T> >
 class SLIB_EXPORT SafeList
 {
-	typedef SafeList<T, COMPARE> _Type;
 	typedef CList<T, COMPARE> _Obj;
-	typedef SafeRef<_Obj> _Ref;
+	typedef SafeList<T, COMPARE> _Type;
 	typedef List<T, COMPARE> _LocalType;
+	typedef SafeRef<_Obj> _Ref;
 	typedef Ref<_Obj> _LocalRef;
 	SLIB_DECLARE_OBJECT_TYPE_FROM(_Type, _Obj)
-	SLIB_DECLARE_OBJECT_WRAPPER(SafeList, _Type, _Obj, _Ref)
+	SLIB_DECLARE_OBJECT_SAFE_WRAPPER(SafeList, _Obj, _Type, _LocalType)
 	
 public:
 	SLIB_INLINE SafeList(sl_size count) : m_object(_Obj::create(count))
@@ -1604,37 +1579,9 @@ public:
 	
 public:
 	template <class _COMPARE>
-	SLIB_INLINE SafeList(const SafeList<T, _COMPARE>& other) : m_object(_Ref::from(other.getRef()))
+	SLIB_INLINE const _Type& from(const SafeList<T, _COMPARE>& other)
 	{
-	}
-	
-	template <class _COMPARE>
-	SLIB_INLINE _Type& operator=(const SafeList<T, _COMPARE>& other)
-	{
-		m_object = _Ref::from(other.getRef());
-		return *this;
-	}
-	
-	template <class _COMPARE>
-	SLIB_INLINE SafeList(const CList<T, _COMPARE>* other) : m_object((_Obj*)((void*)other))
-	{
-	}
-	
-	template <class _COMPARE>
-	SLIB_INLINE _Type& operator=(const CList<T, _COMPARE>* other)
-	{
-		m_object = (_Obj*)((void*)other);
-		return *this;
-	}
-
-	SLIB_INLINE SafeList(const List<T, COMPARE>& other) : m_object(other.getRef())
-	{
-	}
-	
-	SLIB_INLINE _Type& operator=(const List<T, COMPARE>& other)
-	{
-		m_object = other.getRef();
-		return *this;
+		return *((_Type*)((void*)&other));
 	}
 	
 public:
@@ -2000,20 +1947,6 @@ public:
 	}
 };
 
-
-template <class T, class COMPARE>
-SLIB_INLINE List<T, COMPARE>::List(const SafeList<T, COMPARE>& other) : m_object(other.getRef())
-{
-}
-
-template <class T, class COMPARE>
-SLIB_INLINE List<T, COMPARE>& List<T, COMPARE>::operator=(const SafeList<T, COMPARE>& other)
-{
-	m_object = other.getRef();
-	return *this;
-}
-
-
 template <class T>
 class SLIB_EXPORT ListLocker : public ObjectLocker
 {
@@ -2024,15 +1957,23 @@ private:
 	
 public:
 	template <class _COMPARE>
-	ListLocker(const List<T, _COMPARE>& list) : ObjectLocker(list.getObject())
+	SLIB_INLINE ListLocker(const List<T, _COMPARE>& list) : ObjectLocker(list.getObject())
 	{
 		m_list = list;
 		m_data = list.data();
 		m_count = list.count();
 	}
 	
-	~ListLocker()
+	template <class _COMPARE>
+	SLIB_INLINE ListLocker(const SafeList<T, _COMPARE>& list) : ListLocker(List<T, _COMPARE>(list))
 	{
+	}
+
+	template <class _COMPARE>
+	SLIB_INLINE ListLocker(const CList<T, _COMPARE>& list) : ObjectLocker(&list)
+	{
+		m_data = list.data();
+		m_count = list.count();
 	}
 	
 	SLIB_INLINE sl_size getCount()
@@ -2061,6 +2002,59 @@ public:
 	}
 	
 };
+
+
+template <class T>
+class SLIB_EXPORT ListItems
+{
+private:
+	T* m_data;
+	sl_size m_count;
+	List<T> m_list;
+	
+public:
+	template <class _COMPARE>
+	SLIB_INLINE ListItems(const List<T, _COMPARE>& list)
+	{
+		m_list = list;
+		m_data = list.data();
+		m_count = list.count();
+	}
+
+	template <class _COMPARE>
+	SLIB_INLINE ListItems(const CList<T, _COMPARE>& list)
+	{
+		m_data = list.data();
+		m_count = list.count();
+	}
+
+	SLIB_INLINE sl_size getCount()
+	{
+		return m_count;
+	}
+	
+	SLIB_INLINE sl_size count()
+	{
+		return m_count;
+	}
+	
+	SLIB_INLINE T* getData()
+	{
+		return m_data;
+	}
+	
+	SLIB_INLINE T* data()
+	{
+		return m_data;
+	}
+	
+	SLIB_INLINE T& operator[](sl_size index)
+	{
+		return m_data[index];
+	}
+	
+};
+
 
 SLIB_NAMESPACE_END
 

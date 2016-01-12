@@ -2,6 +2,7 @@
 #include "../../../inc/slib/core/log.h"
 
 SLIB_NAMESPACE_BEGIN
+
 #define BASE64_CHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
 String Base64::encode(const void* buf, sl_uint32 size)
@@ -136,5 +137,6 @@ Memory Base64::decode(const String& base64)
 	Base::freeMemory(buf);
 	return ret;
 }
+
 SLIB_NAMESPACE_END
 

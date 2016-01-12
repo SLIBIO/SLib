@@ -2,13 +2,10 @@
 #define CHECKHEADER_SLIB_HASHTABLE
 
 #include "definition.h"
+
 #include "algorithm.h"
 #include "list.h"
 #include "math.h"
-
-/*************************************************
-Notice - This Data Structure is not thread-safe
-**************************************************/
 
 #define SLIB_HASHTABLE_DEFAULT_CAPACITY 32
 
@@ -91,7 +88,7 @@ private:
 	sl_uint32 m_nThresholdDown;
 
 public:
-	HashTable(sl_uint32 capacity = SLIB_HASHTABLE_DEFAULT_CAPACITY)
+	SLIB_INLINE HashTable(sl_uint32 capacity = SLIB_HASHTABLE_DEFAULT_CAPACITY)
 	{
 		if (capacity < _SLIB_HASHTABLE_MIN_CAPACITY) {
 			capacity = _SLIB_HASHTABLE_MIN_CAPACITY;
@@ -104,7 +101,7 @@ public:
 		_init();
 	}
 
-	~HashTable()
+	SLIB_INLINE ~HashTable()
 	{
 		_free();
 	}
@@ -254,7 +251,7 @@ public:
 		HashEntry* entry = m_table[index];
 		while (entry) {
 			if (entry->hash == hash && entry->key == key) {
-				ret.add(entry->value);
+				ret.add_NoLock(entry->value);
 			}
 			entry = entry->next;
 		}
@@ -488,6 +485,7 @@ private:
 	}
 
 };
+
 SLIB_NAMESPACE_END
 
 #endif

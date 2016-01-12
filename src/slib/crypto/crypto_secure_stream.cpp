@@ -432,9 +432,9 @@ public:
 				m_context.processReceive(data, sizeRead, data);
 			}
 			lock.unlock();
-			PtrLocker<IAsyncStreamListener> listener(req->listener);
+			PtrLocker<IAsyncStreamListener> listener(req->getListener());
 			if (listener.isNotNull()) {
-				listener->onRead(this, data, sizeRead, req->refData.get(), flagError);
+				listener->onRead(this, data, sizeRead, req->getDataReference(), flagError);
 			}
 		} else {
 			if (flagError) {
@@ -487,18 +487,18 @@ public:
 			return;
 		}
 		AsyncStreamRequest* req = (AsyncStreamRequest*)ref;
-		PtrLocker<IAsyncStreamListener> listener(req->listener);
+		PtrLocker<IAsyncStreamListener> listener(req->getListener());
 		if (listener.isNotNull()) {
-			listener->onWrite(this, data, sizeWritten, req->refData.get(), flagError);
+			listener->onWrite(this, data, sizeWritten, req->getDataReference(), flagError);
 		}
 	}
 
 	void processReadDone(Ref<AsyncStreamRequest> req)
 	{
 		if (req.isNotNull()) {
-			PtrLocker<IAsyncStreamListener> listener(req->listener);
+			PtrLocker<IAsyncStreamListener> listener(req->getListener());
 			if (listener.isNotNull()) {
-				listener->onRead(this, req->data, req->size, req->refData.get(), sl_false);
+				listener->onRead(this, req->data(), req->size(), req->getDataReference(), sl_false);
 			}
 		}
 	}
@@ -510,11 +510,11 @@ public:
 			if (m_context.isConnected()) {
 				if (m_sizeRdata) {
 					sl_uint32 n = m_sizeRdata;
-					if (n > req->size) {
-						n = req->size;
+					if (n > req->size()) {
+						n = req->size();
 					}
-					req->size = n;
-					Base::copyMemory(req->data, (sl_uint8*)(m_rdata.getBuf()) + m_posRdata, n);
+					req->setSize(n);
+					Base::copyMemory(req->data(), (sl_uint8*)(m_rdata.getBuf()) + m_posRdata, n);
 					m_sizeRdata -= n;
 					m_posRdata += n;
 					Ref<AsyncLoop> loop = stream->getLoop();
@@ -525,7 +525,7 @@ public:
 						m_rdata.setNull();
 					}
 				} else {
-					return stream->read(req->data, req->size, WeakRef<_SecureStreamServer_AsyncStream>(this), req);
+					return stream->read(req->data(), req->size(), WeakRef<_SecureStreamServer_AsyncStream>(this), req);
 				}
 			}
 		}
@@ -1042,9 +1042,9 @@ public:
 				m_context.processReceive(data, sizeRead, data);
 			}
 			lock.unlock();
-			PtrLocker<IAsyncStreamListener> listener(req->listener);
+			PtrLocker<IAsyncStreamListener> listener(req->getListener());
 			if (listener.isNotNull()) {
-				listener->onRead(this, data, sizeRead, req->refData.get(), flagError);
+				listener->onRead(this, data, sizeRead, req->getDataReference(), flagError);
 			}
 		} else {
 			if (flagError) {
@@ -1089,18 +1089,18 @@ public:
 			return;
 		}
 		AsyncStreamRequest* req = (AsyncStreamRequest*)ref;
-		PtrLocker<IAsyncStreamListener> listener(req->listener);
+		PtrLocker<IAsyncStreamListener> listener(req->getListener());
 		if (listener.isNotNull()) {
-			listener->onWrite(this, data, sizeWritten, req->refData.get(), flagError);
+			listener->onWrite(this, data, sizeWritten, req->getDataReference(), flagError);
 		}
 	}
 
 	void processReadDone(Ref<AsyncStreamRequest> req)
 	{
 		if (req.isNotNull()) {
-			PtrLocker<IAsyncStreamListener> listener(req->listener);
+			PtrLocker<IAsyncStreamListener> listener(req->getListener());
 			if (listener.isNotNull()) {
-				listener->onRead(this, req->data, req->size, req->refData.get(), sl_false);
+				listener->onRead(this, req->data(), req->size(), req->getDataReference(), sl_false);
 			}
 		}
 	}
@@ -1112,11 +1112,11 @@ public:
 			if (m_context.isReceivedHeader()) {
 				if (m_sizeSdata) {
 					sl_uint32 n = m_sizeSdata;
-					if (n > req->size) {
-						n = req->size;
+					if (n > req->size()) {
+						n = req->size();
 					}
-					req->size = n;
-					Base::copyMemory(req->data, (sl_uint8*)(m_sdata.getBuf()) + m_posSdata, n);
+					req->setSize(n);
+					Base::copyMemory(req->data(), (sl_uint8*)(m_sdata.getBuf()) + m_posSdata, n);
 					m_sizeSdata -= n;
 					m_posSdata += n;
 					Ref<AsyncLoop> loop = stream->getLoop();
@@ -1127,7 +1127,7 @@ public:
 						m_sdata.setNull();
 					}
 				} else {
-					return stream->read(req->data, req->size, WeakRef<_SecureStreamClient_AsyncStream>(this), req);
+					return stream->read(req->data(), req->size(), WeakRef<_SecureStreamClient_AsyncStream>(this), req);
 				}
 			}
 		}

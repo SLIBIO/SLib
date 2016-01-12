@@ -2,13 +2,13 @@
 #include "../../../inc/slib/core/map.h"
 
 SLIB_NAMESPACE_BEGIN
+
 #define GETTER_CONTENT_TYPE(NAME, CONTENT_TYPE) \
 String ContentType::get##NAME() \
 { \
 	SLIB_STATIC_STRING(s, CONTENT_TYPE); \
 	return s; \
 }
-
 
 GETTER_CONTENT_TYPE(TextPlain, "text/plain")
 GETTER_CONTENT_TYPE(TextHtml, "text/html")
@@ -103,9 +103,11 @@ struct _ContentType_Mapping
 		maps.put("gz", ContentType::getGzip());
 	}
 };
-String ContentType::fromFileExtension(String fileExt)
+
+String ContentType::fromFileExtension(const String& fileExt)
 {
 	SLIB_SAFE_STATIC(_ContentType_Mapping, t);
 	return t.maps.getValue(fileExt.toLower(), String::null());
 }
+
 SLIB_NAMESPACE_END

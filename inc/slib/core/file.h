@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_CORE_FILE
 
 #include "definition.h"
+
 #include "list.h"
 #include "io.h"
 
@@ -9,6 +10,7 @@ typedef sl_reg sl_file;
 #define SLIB_FILE_INVALID_HANDLE (sl_file)(-1)
 
 SLIB_NAMESPACE_BEGIN
+
 class SLIB_EXPORT File : public IO
 {
 	SLIB_DECLARE_OBJECT(File, IO)
@@ -179,11 +181,14 @@ class SLIB_EXPORT FilePathSegments
 {
 public:
 	sl_uint32 parentLevel;
-	List<String> segments;
+	CList<String> segments;
 
+public:
 	FilePathSegments();
 
+public:
 	void parsePath(const String& path);
+	
 	String buildPath();
 
 };

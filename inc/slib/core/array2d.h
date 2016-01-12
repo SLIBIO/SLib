@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_CORE_ARRAY2D
 
 #include "definition.h"
+
 #include "reference.h"
 #include "array.h"
 
@@ -436,11 +437,12 @@ class SafeArray2D;
 template <class T>
 class SLIB_EXPORT Array2D
 {
-	typedef Array2D<T> _Type;
 	typedef CArray2D<T> _Obj;
+	typedef Array2D<T> _Type;
+	typedef SafeArray2D<T> _SafeType;
 	typedef Ref<_Obj> _Ref;
 	SLIB_DECLARE_OBJECT_TYPE_FROM(_Type, _Obj)
-	SLIB_DECLARE_OBJECT_WRAPPER(Array2D, _Type, _Obj, _Ref)
+	SLIB_DECLARE_OBJECT_WRAPPER(Array2D, _Obj, _Type, _SafeType)
 	
 public:
 	SLIB_INLINE Array2D(sl_size width, sl_size height) : m_object(_Obj::create(width, height))
@@ -454,16 +456,6 @@ public:
 
 	SLIB_INLINE Array2D(const T* dataIn, sl_size width, sl_size height, sl_reg strideIn, const Referable* refer) : m_object(_Obj::createStatic(strideIn, width, height, dataIn, refer))
 	{
-	}
-
-public:
-	Array2D(const SafeArray2D<T>& other);
-
-	_Type& operator=(const SafeArray2D<T>& other);
-
-	SLIB_INLINE _Obj* getObject() const
-	{
-		return m_object.get();
 	}
 
 public:
@@ -685,13 +677,13 @@ public:
 template <class T>
 class SLIB_EXPORT SafeArray2D
 {
-	typedef SafeArray2D<T> _Type;
 	typedef CArray2D<T> _Obj;
-	typedef SafeRef<_Obj> _Ref;
+	typedef SafeArray2D<T> _Type;
 	typedef Array2D<T> _LocalType;
+	typedef SafeRef<_Obj> _Ref;
 	typedef Ref<_Obj> _LocalRef;
 	SLIB_DECLARE_OBJECT_TYPE_FROM(_Type, _Obj)
-	SLIB_DECLARE_OBJECT_WRAPPER(SafeArray2D, _Type, _Obj, _Ref)
+	SLIB_DECLARE_OBJECT_SAFE_WRAPPER(SafeArray2D, _Obj, _Type, _LocalType)
 
 public:
 	SLIB_INLINE SafeArray2D(sl_size width, sl_size height) : m_object(_Obj::create(width, height))
@@ -705,17 +697,6 @@ public:
 	
 	SLIB_INLINE SafeArray2D(const T* dataIn, sl_size width, sl_size height, sl_reg strideIn, const Referable* refer) : m_object(_Obj::createStatic(strideIn, width, height, dataIn, refer))
 	{
-	}
-
-public:
-	SLIB_INLINE SafeArray2D(const _LocalType& other) : m_object(other.getRef())
-	{
-	}
-
-	SLIB_INLINE _Type& operator=(const _LocalType& other)
-	{
-		m_object = other.getRef();
-		return *this;
 	}
 
 public:
@@ -849,18 +830,6 @@ public:
 
 	sl_bool getInfo(ArrayInfo2D<T>& info) const;
 };
-
-template <class T>
-SLIB_INLINE Array2D<T>::Array2D(const SafeArray2D<T>& other) : m_object(other.getRef())
-{
-}
-
-template <class T>
-SLIB_INLINE Array2D<T>& Array2D<T>::operator=(const SafeArray2D<T>& other)
-{
-	m_object = other.getRef();
-	return *this;
-}
 
 template <class T>
 SLIB_INLINE sl_bool SafeArray2D<T>::getInfo(ArrayInfo2D<T>& info) const

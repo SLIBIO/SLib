@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_CORE_SPINLOCK
 
 #include "definition.h"
+
 #include "base.h"
 
 SLIB_NAMESPACE_BEGIN

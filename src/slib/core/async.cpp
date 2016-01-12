@@ -62,7 +62,7 @@ void Async::removeTimer(const Ref<AsyncTimer>& timer)
 *************************************/
 AsyncLoop::AsyncLoop()
 {
-	m_flagRunning = sl_true;
+	m_flagRunning = sl_false;
 	m_handle = sl_null;
 	m_flagNonIO = sl_false;
 }
@@ -77,21 +77,22 @@ Ref<AsyncLoop> AsyncLoop::create()
 	Ref<AsyncLoop> ret;
 	void* handle = __createHandle();
 	if (handle) {
-		ret = new AsyncLoop;
-		if (ret.isNotNull()) {
-			ret->m_flagNonIO = sl_false;
-			ret->m_handle = handle;
-			ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(AsyncLoop, __runLoop, ret.get()));
-			if (ret->m_thread.isNull()) {
+		Ref<ThreadPool> threadPool = ThreadPool::create(0, 16);
+		if (threadPool.isNotNull()) {
+			ret = new AsyncLoop;
+			if (ret.isNotNull()) {
+				ret->m_flagNonIO = sl_false;
+				ret->m_handle = handle;
+				ret->m_threadPool = threadPool;
+				ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(AsyncLoop, __runLoop, ret.get()));
+				if (ret->m_thread.isNotNull()) {
+					ret->m_flagRunning = sl_true;
+					return ret;
+				}
 				ret.setNull();
 			}
-			ret->m_threadPool = ThreadPool::create(0, 10);
-			if (ret->m_threadPool.isNull()) {
-				ret.setNull();
-			}
-		} else {
-			__closeHandle(handle);
 		}
+		__closeHandle(handle);
 	}
 	return ret;
 }
@@ -99,15 +100,17 @@ Ref<AsyncLoop> AsyncLoop::create()
 Ref<AsyncLoop> AsyncLoop::createNonIO()
 {
 	Ref<AsyncLoop> ret;
-	ret = new AsyncLoop;
-	if (ret.isNotNull()) {
-		ret->m_flagNonIO = sl_true;
-		ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(AsyncLoop, _runLoopNonIO, ret.get()));
-		if (ret->m_thread.isNull()) {
-			ret.setNull();
-		}
-		ret->m_threadPool = ThreadPool::create(0, 10);
-		if (ret->m_threadPool.isNull()) {
+	Ref<ThreadPool> threadPool = ThreadPool::create(0, 16);
+	if (threadPool.isNotNull()) {
+		ret = new AsyncLoop;
+		if (ret.isNotNull()) {
+			ret->m_flagNonIO = sl_true;
+			ret->m_threadPool = threadPool;
+			ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(AsyncLoop, _runLoopNonIO, ret.get()));
+			if (ret->m_thread.isNotNull()) {
+				ret->m_flagRunning = sl_true;
+				return ret;
+			}
 			ret.setNull();
 		}
 	}
@@ -116,31 +119,21 @@ Ref<AsyncLoop> AsyncLoop::createNonIO()
 
 void AsyncLoop::release()
 {
-	Ref<ThreadPool> pool = m_threadPool;
-	if (pool.isNotNull()) {
-		pool->release();
-		m_threadPool.setNull();
-	}
-	
 	ObjectLocker lock(this);
-	
+	if (!m_flagRunning) {
+		return;
+	}
 	m_flagRunning = sl_false;
-
-	Ref<Thread> thread = m_thread;
-	if (thread.isNotNull()) {
-		thread->finish();
-		if (!m_flagNonIO) {
-			__wake();
-		}
-		thread->finishAndWait();
-		m_thread.setNull();
+	
+	m_threadPool->release();
+	
+	m_thread->finish();
+	if (!m_flagNonIO) {
+		__wake();
 	}
+	m_thread->finishAndWait();
 
-	void* handle = m_handle;
-	if (handle) {
-		__closeHandle(handle);
-		m_handle = sl_null;
-	}
+	__closeHandle(m_handle);
 
 	m_queueInstancesOrder.removeAll();
 	m_queueInstancesClosing.removeAll();
@@ -160,15 +153,13 @@ sl_bool AsyncLoop::isRunning()
 void AsyncLoop::wake()
 {
 	ObjectLocker lock(this);
+	if (!m_flagRunning) {
+		return;
+	}
 	if (m_flagNonIO) {
-		Ref<Thread> thread = m_thread;
-		if (thread.isNotNull()) {
-			thread->wake();
-		}
+		m_thread->wake();
 	} else {
-		if (m_handle) {
-			__wake();
-		}
+		__wake();
 	}
 }
 
@@ -180,9 +171,7 @@ sl_bool AsyncLoop::attachInstance(AsyncInstance* instance)
 	if (m_handle) {
 		if (instance && instance->isOpened()) {
 			ObjectLocker lock(this);
-			if (m_handle) {
-				return __attachInstance(instance);
-			}
+			return __attachInstance(instance);
 		}
 	}
 	return sl_false;
@@ -205,12 +194,7 @@ void AsyncLoop::requestOrder(AsyncInstance* instance)
 {
 	if (m_handle) {
 		if (instance && instance->isOpened()) {				
-			MutexLocker lock(&(instance->m_lockOrdering));
-			if (!(instance->m_flagOrdering)) {
-				instance->m_flagOrdering = sl_true;
-				m_queueInstancesOrder.push(instance);
-			}
-			lock.unlock();
+			instance->addToQueue(m_queueInstancesOrder);
 			wake();
 		}
 	}
@@ -247,8 +231,7 @@ void AsyncLoop::_stepBegin()
 		Ref<AsyncInstance> instance;
 		while (instances.pop(&instance)) {
 			if (instance.isNotNull() && instance->isOpened()) {
-				instance->m_flagOrdering = sl_false;
-				instance->onOrder();
+				instance->processOrder();
 			}
 		}
 	}
@@ -282,58 +265,32 @@ void AsyncLoop::_stepEnd()
 
 sl_uint32 AsyncLoop::getMinimumThreadsCount()
 {
-	Ref<ThreadPool> pool = m_threadPool;
-	if (pool.isNotNull()) {
-		return pool->getMinimumThreadsCount();
-	}
-	return 0;
+	return m_threadPool->getMinimumThreadsCount();
 }
 
 void AsyncLoop::setMinimumThreadCount(sl_uint32 n)
 {
-	Ref<ThreadPool> pool = m_threadPool;
-	if (pool.isNotNull()) {
-		pool->setMinimumThreadsCount(n);
-	}
+	m_threadPool->setMinimumThreadsCount(n);
 }
 
 sl_uint32 AsyncLoop::getMaximumThreadsCount()
 {
-	Ref<ThreadPool> pool = m_threadPool;
-	if (pool.isNotNull()) {
-		return pool->getMaximumThreadsCount();
-	}
-	return 0;
+	return m_threadPool->getMaximumThreadsCount();
 }
 
 void AsyncLoop::setMaximumThreadsCount(sl_uint32 n)
 {
-	Ref<ThreadPool> pool = m_threadPool;
-	if (pool.isNotNull()) {
-		pool->setMaximumThreadsCount(n);
-	}
+	m_threadPool->setMaximumThreadsCount(n);
 }
 
 sl_uint32 AsyncLoop::getThreadStackSize()
 {
-	Ref<ThreadPool> pool = m_threadPool;
-	if (pool.isNotNull()) {
-		return pool->getThreadStackSize();
-	}
-	return 0;
+	return m_threadPool->getThreadStackSize();
 }
 
 void AsyncLoop::setThreadStackSize(sl_uint32 n)
 {
-	Ref<ThreadPool> pool = m_threadPool;
-	if (pool.isNotNull()) {
-		pool->setThreadStackSize(n);
-	}
-}
-
-Ref<ThreadPool> AsyncLoop::getThreadPool()
-{
-	return m_threadPool;
+	m_threadPool->setThreadStackSize(n);
 }
 
 sl_bool AsyncLoop::addTask(const Ref<Runnable>& task, sl_bool flagRunByThreadPool)
@@ -342,11 +299,7 @@ sl_bool AsyncLoop::addTask(const Ref<Runnable>& task, sl_bool flagRunByThreadPoo
 		return sl_false;
 	}
 	if (flagRunByThreadPool) {
-		Ref<ThreadPool> pool = m_threadPool;
-		if (pool.isNotNull()) {
-			return pool->addTask(task);
-		}
-		return sl_false;
+		return m_threadPool->addTask(task);
 	} else {
 		if (m_queueTasks.push(task)) {
 			wake();
@@ -366,15 +319,12 @@ sl_int32 AsyncLoop::_getTimeout_TimeTasks()
 	sl_int32 timeout = -1;
 	TreePosition pos;
 	TimeTask timeTask;
-	Ref<ThreadPool> pool = m_threadPool;
 	Queue< Ref<Runnable> > tasks;
 	sl_uint64 t;
 	while (m_timeTasks.getFirstPosition(pos, &t, &timeTask)) {
 		if (rel >= t) {
 			if (timeTask.flagRunByThreadPool) {
-				if (pool.isNotNull()) {
-					addTask(timeTask.task);
-				}
+				m_threadPool->addTask(timeTask.task);
 			} else {
 				tasks.push(timeTask.task);
 			}
@@ -424,7 +374,6 @@ sl_int32 AsyncLoop::_getTimeout_Timer()
 	Queue< Ref<AsyncTimer> > tasks;
 
 	sl_uint64 rel = getEllapsedMilliseconds();
-	Ref<ThreadPool> pool = m_threadPool;
 	Link<Timer>* link = m_queueTimers.getBegin();
 	while (link) {
 		Ref<AsyncTimer> timer(link->value.timer);
@@ -433,9 +382,7 @@ sl_int32 AsyncLoop::_getTimeout_Timer()
 				sl_uint64 t = rel - timer->getLastRunTime();
 				if (t >= timer->getInterval()) {
 					if (link->value.flagRunByThreadPool) {
-						if (pool.isNotNull()) {
-							pool->addTask(SLIB_CALLBACK_WEAKREF(AsyncTimer, run, timer));
-						}
+						m_threadPool->addTask(SLIB_CALLBACK_WEAKREF(AsyncTimer, run, timer));
 					} else {
 						tasks.push(timer);
 					}
@@ -544,10 +491,6 @@ AsyncTimer::AsyncTimer()
 	setMaxConcurrentThread(1);
 }
 
-AsyncTimer::~AsyncTimer()
-{
-}
-
 Ref<AsyncTimer> AsyncTimer::create(const Ref<Runnable>& task, sl_uint64 interval_ms, sl_bool flagStart)
 {
 	Ref<AsyncTimer> ret;
@@ -597,10 +540,6 @@ AsyncInstance::AsyncInstance()
 	m_flagOrdering = sl_false;
 }
 
-AsyncInstance::~AsyncInstance()
-{
-}
-
 Ref<AsyncObject> AsyncInstance::getObject()
 {
 	return m_object;
@@ -613,20 +552,36 @@ void AsyncInstance::setObject(AsyncObject* object)
 
 Ref<AsyncLoop> AsyncInstance::getLoop()
 {
-	Ref<AsyncObject> object = getObject();
+	Ref<AsyncObject> object(m_object);
 	if (object.isNotNull()) {
-		Ref<AsyncLoop> loop = object->getLoop();
-		return loop;
+		return object->getLoop();
 	}
 	return Ref<AsyncLoop>::null();
 }
 
 void AsyncInstance::requestOrder()
 {
-	Ref<AsyncLoop> loop = getLoop();
+	Ref<AsyncLoop> loop(getLoop());
 	if (loop.isNotNull()) {
 		loop->requestOrder(this);
 	}
+}
+
+void AsyncInstance::addToQueue(Queue< Ref<AsyncInstance> >& queue)
+{
+	MutexLocker lock(&m_lockOrdering);
+	if (!m_flagOrdering) {
+		m_flagOrdering = sl_true;
+		queue.push(this);
+	}
+}
+
+void AsyncInstance::processOrder()
+{
+	MutexLocker lock(&m_lockOrdering);
+	m_flagOrdering = sl_false;
+	lock.unlock();
+	onOrder();
 }
 
 /*************************************
@@ -655,7 +610,7 @@ void AsyncObject::setLoop(const Ref<AsyncLoop>& loop)
 	m_loop = loop;
 }
 
-const Ref<AsyncInstance>& AsyncObject::getInstance()
+Ref<AsyncInstance> AsyncObject::getInstance()
 {
 	return m_instance;
 }
@@ -668,11 +623,11 @@ void AsyncObject::setInstance(AsyncInstance* instance)
 void AsyncObject::closeInstance()
 {
 	ObjectLocker lock(this);
-	Ref<AsyncInstance> instance = m_instance;
+	Ref<AsyncInstance> instance(m_instance);
 	if (instance.isNotNull()) {
 		Ref<AsyncLoop> loop = getLoop();
 		if (loop.isNotNull()) {
-			loop->closeInstance(m_instance.get());
+			loop->closeInstance(instance.get());
 		}
 		m_instance.setNull();
 	}
@@ -681,12 +636,8 @@ void AsyncObject::closeInstance()
 /*************************************
 	AsyncStreamInstance
 **************************************/
-AsyncStreamRequest::AsyncStreamRequest()
-{
-}
-
-AsyncStreamRequest::AsyncStreamRequest(void* _data, sl_uint32 _size, const Ref<Referable>& _refData, const Ptr<IAsyncStreamListener>& _listener, sl_bool _flagRead)
-: data(_data), size(_size), refData(_refData), listener(_listener), flagRead(_flagRead)
+AsyncStreamRequest::AsyncStreamRequest(void* data, sl_uint32 size, const Ref<Referable>& refData, const Ptr<IAsyncStreamListener>& listener, sl_bool flagRead)
+: m_data(data), m_size(size), m_refData(refData), m_listener(listener), m_flagRead(flagRead)
 {
 }
 
@@ -709,10 +660,6 @@ void IAsyncStreamListener::onWrite(AsyncStream* stream, void* data, sl_uint32 si
 }
 
 AsyncStreamInstance::AsyncStreamInstance()
-{
-}
-
-AsyncStreamInstance::~AsyncStreamInstance()
 {
 }
 
@@ -764,10 +711,6 @@ AsyncStream::AsyncStream()
 {
 }
 
-AsyncStream::~AsyncStream()
-{
-}
-
 sl_bool AsyncStream::isSeekable()
 {
 	return sl_false;
@@ -787,11 +730,7 @@ AsyncStreamBase::AsyncStreamBase()
 {
 }
 
-AsyncStreamBase::~AsyncStreamBase()
-{
-}
-
-sl_bool AsyncStreamBase::initialize(AsyncStreamInstance* instance, const Ref<AsyncLoop>& _loop)
+sl_bool AsyncStreamBase::_initialize(AsyncStreamInstance* instance, const Ref<AsyncLoop>& _loop)
 {
 	if (!instance) {
 		return sl_false;
@@ -888,7 +827,7 @@ Ref<AsyncStream> AsyncStream::create(AsyncStreamInstance* instance, const Ref<As
 	if (instance) {
 		ret = new AsyncStreamBase;
 		if (ret.isNotNull()) {
-			if (!(ret->initialize(instance, loop))) {
+			if (!(ret->_initialize(instance, loop))) {
 				ret.setNull();
 			}
 		}
@@ -910,10 +849,6 @@ Ref<AsyncStream> AsyncStream::create(AsyncStreamInstance* instance)
 AsyncStreamBaseIO::AsyncStreamBaseIO()
 {
 	m_flagProcessRequest = sl_false;
-}
-
-AsyncStreamBaseIO::~AsyncStreamBaseIO()
-{	
 }
 
 sl_bool AsyncStreamBaseIO::read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* refData)
@@ -988,10 +923,6 @@ AsyncReader::AsyncReader()
 {
 }
 
-AsyncReader::~AsyncReader()
-{
-}
-
 sl_bool AsyncReader::isOpened()
 {
 	Ptr<IReader> o = m_reader.lock();
@@ -1018,13 +949,13 @@ void AsyncReader::processRequest(AsyncStreamRequest* request)
 	PtrLocker<IReader> reader(m_reader);
 	if (reader.isNotNull()) {
 		sl_bool flagError = sl_false;
-		sl_reg size = reader->read(request->data, request->size);
+		sl_reg size = reader->read(request->data(), request->size());
 		if (size <= 0) {
 			flagError = sl_true;
 		}
-		PtrLocker<IAsyncStreamListener> listener(request->listener);
+		PtrLocker<IAsyncStreamListener> listener(request->getListener());
 		if (listener.isNotNull()) {
-			listener->onRead(this, request->data, (sl_uint32)size, request->refData.get(), flagError);
+			listener->onRead(this, request->data(), (sl_uint32)size, request->getDataReference(), flagError);
 		}
 	}
 }
@@ -1054,10 +985,6 @@ AsyncWriter::AsyncWriter()
 {
 }
 
-AsyncWriter::~AsyncWriter()
-{
-}
-
 sl_bool AsyncWriter::isOpened()
 {
 	Ptr<IWriter> o = m_writer.lock();
@@ -1084,13 +1011,13 @@ void AsyncWriter::processRequest(AsyncStreamRequest* request)
 	PtrLocker<IWriter> reader(m_writer);
 	if (reader.isNotNull()) {
 		sl_bool flagError = sl_false;
-		sl_reg size = reader->write(request->data, request->size);
+		sl_reg size = reader->write(request->data(), request->size());
 		if (size <= 0) {
 			flagError = sl_true;
 		}
-		PtrLocker<IAsyncStreamListener> listener(request->listener);
+		PtrLocker<IAsyncStreamListener> listener(request->getListener());
 		if (listener.isNotNull()) {
-			listener->onWrite(this, request->data, (sl_uint32)size, request->refData.get(), flagError);
+			listener->onWrite(this, request->data(), (sl_uint32)size, request->getDataReference(), flagError);
 		}
 	}
 }
@@ -1146,21 +1073,21 @@ void AsyncFile::processRequest(AsyncStreamRequest* request)
 	if (file.isNotNull()) {
 		sl_reg size;
 		sl_bool flagError = sl_false;
-		if (request->flagRead) {
-			size = file->read(request->data, request->size);
+		if (request->isRead()) {
+			size = file->read(request->data(), request->size());
 		} else {
-			size = file->write(request->data, request->size);
+			size = file->write(request->data(), request->size());
 		}
 		if (size <= 0) {
 			flagError = sl_true;
 			size = 0;
 		}
-		PtrLocker<IAsyncStreamListener> listener(request->listener);
+		PtrLocker<IAsyncStreamListener> listener(request->getListener());
 		if (listener.isNotNull()) {
-			if (request->flagRead) {
-				listener->onRead(this, request->data, (sl_uint32)size, request->refData.get(), flagError);
+			if (request->isRead()) {
+				listener->onRead(this, request->data(), (sl_uint32)size, request->getDataReference(), flagError);
 			} else {
-				listener->onWrite(this, request->data, (sl_uint32)size, request->refData.get(), flagError);
+				listener->onWrite(this, request->data(), (sl_uint32)size, request->getDataReference(), flagError);
 			}
 		}
 	}
@@ -1350,7 +1277,6 @@ void AsyncCopy::close()
 		}
 		m_source.setNull();
 		m_target.setNull();
-		m_listener.setNull();
 		m_bufferReading.setNull();
 		m_buffersRead.removeAll();
 		m_bufferWriting.setNull();
@@ -1802,7 +1728,7 @@ AsyncStreamFilter::~AsyncStreamFilter()
 	close();
 }
 
-const Ref<AsyncStream>& AsyncStreamFilter::getReadingStream() const
+Ref<AsyncStream> AsyncStreamFilter::getReadingStream() const
 {
 	return m_streamReading;
 }
@@ -1812,7 +1738,7 @@ void AsyncStreamFilter::setReadingStream(const Ref<AsyncStream>& stream)
 	m_streamReading = stream;
 }
 
-const Ref<AsyncStream>& AsyncStreamFilter::getWritingStream() const
+Ref<AsyncStream> AsyncStreamFilter::getWritingStream() const
 {
 	return m_streamWriting;
 }
@@ -1951,18 +1877,18 @@ void AsyncStreamFilter::_processRead(void* data, sl_uint32 size, Referable* refD
 				return;
 			}
 			if (req.isNotNull()) {
-				sl_size _m = m_bufReadConverted.pop(req->data, req->size);
+				sl_size _m = m_bufReadConverted.pop(req->data(), req->size());
 				sl_uint32 m = (sl_uint32)(_m);
 				if (m_bufReadConverted.getSize() == 0) {
-					PtrLocker<IAsyncStreamListener> listener(req->listener);
+					PtrLocker<IAsyncStreamListener> listener(req->getListener());
 					if (listener.isNotNull()) {
-						listener->onRead(this, req->data, m, req->refData.get(), m_flagReadingError);
+						listener->onRead(this, req->data(), m, req->getDataReference(), m_flagReadingError);
 					}
 					break;
 				} else {
-					PtrLocker<IAsyncStreamListener> listener(req->listener);
+					PtrLocker<IAsyncStreamListener> listener(req->getListener());
 					if (listener.isNotNull()) {
-						listener->onRead(this, req->data, m, req->refData.get(), sl_false);
+						listener->onRead(this, req->data(), m, req->getDataReference(), sl_false);
 					}
 				}
 			}
@@ -2091,9 +2017,9 @@ void AsyncStreamFilter::_closeAllReadRequests()
 	Ref<AsyncStreamRequest> req;
 	while (m_requestsRead.pop(&req)) {
 		if (req.isNotNull()) {
-			PtrLocker<IAsyncStreamListener> listener(req->listener);
+			PtrLocker<IAsyncStreamListener> listener(req->getListener());
 			if (listener.isNotNull()) {
-				listener->onRead(this, req->data, 0, req->refData.get(), sl_true);
+				listener->onRead(this, req->data(), 0, req->getDataReference(), sl_true);
 			}
 		}
 	}

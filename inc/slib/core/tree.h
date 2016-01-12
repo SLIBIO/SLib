@@ -159,6 +159,7 @@ protected:
 private:
 	sl_uint32 m_order;
 	sl_uint32 m_maxLength;
+	sl_uint64 m_totalCount;
 
 public:
 	BTree(sl_uint32 order = SLIB_BTREE_DEFAULT_ORDER)
@@ -168,6 +169,7 @@ public:
 		}
 		m_order = order;
 		m_maxLength = 0;
+		m_totalCount = 0;
 		init();
 	}
 
@@ -758,10 +760,7 @@ public:
 		if (!writeNodeData(pos.node, data.data)) {
 			return sl_false;
 		}
-		TreeNode parent = data->linkParent;
-		if (parent.isNotNull()) {
-			_changeTotalCount(parent, -1);
-		}
+		_changeParentTotalCount(data.data, -1);
 		return sl_true;
 	}
 
@@ -792,6 +791,7 @@ public:
 			data->countTotal = 0;
 			data->countItems = 0;
 			data->linkFirst.setNull();
+			m_totalCount = 0;
 			if (writeNodeData(node, data.data)) {
 				return countTotal;
 			}
@@ -868,8 +868,9 @@ private:
 			data->values[at] = value;
 			data->links[at] = link;
 			data->countItems = n + 1;
+			data->countTotal += 1;
 			if (writeNodeData(node, data.data)) {
-				_changeTotalCount(node, 1);
+				_changeParentTotalCount(data.data, 1);
 				return sl_true;
 			}
 		} else {
@@ -925,14 +926,14 @@ private:
 					valueTop = value;
 				}
 				TreeNode parent = data->linkParent;
-				sl_bool flagCreateParent = sl_false;
+				sl_bool flagCreateRoot = sl_false;
 				if (parent.isNull()) {
 					parent = createNode(sl_null);
 					if (parent.isNull()) {
 						_freeNodeData(newData);
 						return sl_false;
 					}
-					flagCreateParent = sl_true;
+					flagCreateRoot = sl_true;
 					if (! setRootNode(parent)) {
 						_freeNodeData(newData);
 						return sl_false;
@@ -970,16 +971,17 @@ private:
 							}
 						}
 					}
-					if (flagCreateParent) {
-						NodeDataScope dataParent(this, parent);
-						if (dataParent.isNotNull()) {
-							dataParent->countTotal = data->countTotal + newNodeData->countTotal + 1;
-							dataParent->countItems = 1;
-							dataParent->linkFirst = node;
-							dataParent->keys[0] = keyTop;
-							dataParent->values[0] = valueTop;
-							dataParent->links[0] = newNode;
-							flagSuccess = writeNodeData(parent, dataParent.data);
+					if (flagCreateRoot) {
+						NodeDataScope dataRoot(this, parent);
+						if (dataRoot.isNotNull()) {
+							dataRoot->countTotal = data->countTotal + newNodeData->countTotal + 1;
+							m_totalCount = dataRoot->countTotal;
+							dataRoot->countItems = 1;
+							dataRoot->linkFirst = node;
+							dataRoot->keys[0] = keyTop;
+							dataRoot->values[0] = valueTop;
+							dataRoot->links[0] = newNode;
+							flagSuccess = writeNodeData(parent, dataRoot.data);
 						}
 					} else {
 						flagSuccess = _insertItemInNode(parent, -1, node, keyTop, valueTop, newNode);
@@ -1001,6 +1003,16 @@ private:
 			if (parent.isNotNull()) {
 				_changeTotalCount(parent, n);
 			}
+		}
+	}
+	
+	void _changeParentTotalCount(NodeData* data, sl_int64 n)
+	{
+		TreeNode parent = data->linkParent;
+		if (parent.isNotNull()) {
+			_changeTotalCount(parent, n);
+		} else {
+			m_totalCount = data->countTotal;
 		}
 	}
 
@@ -1049,9 +1061,7 @@ private:
 				if (!writeNodeData(parent, parentData.data)) {
 					return sl_false;
 				}
-				if (parentData->linkParent.isNotNull()) {
-					_changeTotalCount(parentData->linkParent, -((sl_int64)(data->countTotal)));
-				}
+				_changeParentTotalCount(parentData.data, -((sl_int64)(data->countTotal)));
 			}
 		}
 		{

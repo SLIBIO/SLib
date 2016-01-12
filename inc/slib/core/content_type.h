@@ -6,6 +6,7 @@
 #include "string.h"
 
 SLIB_NAMESPACE_BEGIN
+
 class SLIB_EXPORT ContentType
 {
 public:
@@ -84,8 +85,9 @@ public:
 	static String getMultipartFormData();
 
 public:
-	static String fromFileExtension(String fileExt);
+	static String fromFileExtension(const String& fileExt);
 };
+
 SLIB_NAMESPACE_END
 
 #endif

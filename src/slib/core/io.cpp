@@ -2,10 +2,11 @@
 #include "../../../inc/slib/core/thread.h"
 #include "../../../inc/slib/core/scoped_pointer.h"
 
+SLIB_NAMESPACE_BEGIN
+
 /***************
 	IReader
-***************/
-SLIB_NAMESPACE_BEGIN
+ ***************/
 sl_int32 IReader::read32(void* buf, sl_uint32 size)
 {
 	return (sl_int32)(read(buf, size));
@@ -138,6 +139,7 @@ sl_bool IReader::readSection(void* mem, sl_size& size)
 	}
 	return sl_false;
 }
+
 sl_bool IReader::readSection(Memory* mem, sl_reg maxSize)
 {
 	sl_size size;
@@ -326,9 +328,8 @@ sl_bool IWriter::writeString(const String& str, sl_int32 maxLen)
 	return writeSection(str.getBuf(), str.getLength());
 }
 
-sl_bool IWriter::writeBigInt(const BigInt& _v, sl_int32 maxLen)
+sl_bool IWriter::writeBigInt(const BigInt& v, sl_int32 maxLen)
 {
-	BigInt v = _v;
 	sl_uint32 n = v.getSizeInBytes();
 	if (maxLen >= 0 && n > (sl_uint32)maxLen) {
 		n = (sl_uint32)maxLen;
@@ -342,12 +343,10 @@ sl_bool IWriter::writeTime(const Time& t)
 {
 	return writeInt64(t.toInt());
 }
-SLIB_NAMESPACE_END
 
 /****************************
 	MemoryIO
 ****************************/
-SLIB_NAMESPACE_BEGIN
 MemoryIO::~MemoryIO()
 {
 	close();
@@ -356,6 +355,7 @@ MemoryIO::~MemoryIO()
 void MemoryIO::init(const void* data, sl_size size, sl_bool flagResizable)
 {
 	ObjectLocker lock(this);
+	
 	close();
 
 	if (size > 0) {
@@ -373,6 +373,7 @@ void MemoryIO::init(const void* data, sl_size size, sl_bool flagResizable)
 		m_size = 0;
 	}
 	m_offset = 0;
+	
 	setAutoExpandable(flagResizable);
 }
 
@@ -489,12 +490,10 @@ sl_bool MemoryIO::setSize(sl_uint64 _size)
 		}
 	}
 }
-SLIB_NAMESPACE_END
 
 /****************************
 	MemoryReader
 ****************************/
-SLIB_NAMESPACE_BEGIN
 void MemoryReader::init(const Memory& mem)
 {
 	ObjectLocker lock(this);
@@ -561,12 +560,10 @@ sl_uint64 MemoryReader::getPosition()
 {
 	return getOffset();
 }
-SLIB_NAMESPACE_END
 
 /****************************
 	MemoryWriter
 ****************************/
-SLIB_NAMESPACE_BEGIN
 void MemoryWriter::init()
 {
 	ObjectLocker lock(this);
@@ -794,4 +791,5 @@ Memory DatagramStream::build(MemoryBuffer& input)
 	}
 	return mem;
 }
+
 SLIB_NAMESPACE_END

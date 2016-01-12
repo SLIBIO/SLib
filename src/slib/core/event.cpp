@@ -2,6 +2,7 @@
 #include "../../../inc/slib/core/thread.h"
 
 SLIB_NAMESPACE_BEGIN
+
 Event::Event()
 {
 }
@@ -35,5 +36,6 @@ sl_bool Event::wait(sl_int32 timeout)
 	}
 	return ret;
 }
+
 SLIB_NAMESPACE_END
 

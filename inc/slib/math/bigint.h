@@ -485,11 +485,9 @@ class SafeBigInt;
 class SLIB_EXPORT BigInt
 {
 	SLIB_DECLARE_OBJECT_TYPE_FROM(BigInt, CBigInt)
-	SLIB_DECLARE_OBJECT_WRAPPER_NO_OP(BigInt, BigInt, CBigInt, Ref<CBigInt>)
+	SLIB_DECLARE_OBJECT_WRAPPER_NO_OP(BigInt, CBigInt, BigInt, SafeBigInt)
 
 public:
-	BigInt(const SafeBigInt& other);
-	
 	SLIB_INLINE BigInt(sl_int32 n) : m_object(CBigInt::fromInt32(n))
 	{
 	}
@@ -507,20 +505,6 @@ public:
 	}
 
 public:
-	SLIB_INLINE BigInt& operator=(const BigInt& other)
-	{
-		m_object = other.m_object;
-		return *this;
-	}
-	
-	SLIB_INLINE BigInt& operator=(const CBigInt* other)
-	{
-		m_object = other;
-		return *this;
-	}
-	
-	BigInt& operator=(const SafeBigInt& other);
-	
 	SLIB_INLINE BigInt& operator=(sl_int32 n)
 	{
 		m_object = CBigInt::fromInt32(n);
@@ -1199,13 +1183,9 @@ public:
 class SLIB_EXPORT SafeBigInt
 {
 	SLIB_DECLARE_OBJECT_TYPE_FROM(SafeBigInt, CBigInt)
-	SLIB_DECLARE_OBJECT_WRAPPER_NO_OP(SafeBigInt, SafeBigInt, CBigInt, SafeRef<CBigInt>)
+	SLIB_DECLARE_OBJECT_SAFE_WRAPPER_NO_OP(SafeBigInt, CBigInt, SafeBigInt, BigInt)
 	
 public:
-	SLIB_INLINE SafeBigInt(const BigInt& other) : m_object(other.getRef())
-	{
-	}
-	
 	SLIB_INLINE SafeBigInt(sl_int32 n) : m_object(CBigInt::fromInt32(n))
 	{
 	}
@@ -1223,24 +1203,6 @@ public:
 	}
 	
 public:
-	SLIB_INLINE SafeBigInt& operator=(const SafeBigInt& other)
-	{
-		m_object = other.m_object;
-		return *this;
-	}
-	
-	SLIB_INLINE SafeBigInt& operator=(const CBigInt* other)
-	{
-		m_object = other;
-		return *this;
-	}
-	
-	SLIB_INLINE SafeBigInt& operator=(const BigInt& other)
-	{
-		m_object = other.getRef();
-		return *this;
-	}
-	
 	SLIB_INLINE SafeBigInt& operator=(sl_int32 n)
 	{
 		m_object = CBigInt::fromInt32(n);
@@ -1390,16 +1352,6 @@ public:
 	}
 	
 };
-
-SLIB_INLINE BigInt::BigInt(const SafeBigInt& other) : m_object(other.getRef())
-{
-}
-
-SLIB_INLINE BigInt& BigInt::operator=(const SafeBigInt& other)
-{
-	m_object = other.getRef();
-	return *this;
-}
 
 
 SLIB_INLINE sl_bool operator==(const BigInt& a, const BigInt& b)

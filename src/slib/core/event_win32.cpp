@@ -6,6 +6,7 @@
 #include "../../../inc/slib/core/platform_windows.h"
 
 SLIB_NAMESPACE_BEGIN
+
 class _Win32Event : public Event
 {
 public:
@@ -78,15 +79,14 @@ public:
 
 Ref<Event> Windows::createEvent(HANDLE hEvent, sl_bool flagCloseOnRelease)
 {
-	Ref<_Win32Event> ret = _Win32Event::create(hEvent, flagCloseOnRelease);
-	return Ref<Event>::from(ret);
+	return _Win32Event::create(hEvent, flagCloseOnRelease);
 }
 
 Ref<Event> Event::create(sl_bool flagAutoReset)
 {
-	Ref<_Win32Event> ret = _Win32Event::create(flagAutoReset);
-	return Ref<Event>::from(ret);
+	return _Win32Event::create(flagAutoReset);
 }
+
 SLIB_NAMESPACE_END
 
 #endif

@@ -1,6 +1,7 @@
 #include "../../../inc/slib/core/file.h"
 
 SLIB_NAMESPACE_BEGIN
+
 File::File()
 {
 	m_file = SLIB_FILE_INVALID_HANDLE;
@@ -136,6 +137,7 @@ String File::normalizeDirectoryPath(const String& _str)
 	}
 	return str;
 }
+
 Memory File::readAllBytes(const String& path)
 {
 	Ref<File> file = File::openForRead(path);
@@ -253,22 +255,23 @@ List<String> File::getAllDescendantFiles(const String& dirPath)
 	if (!isDirectory(dirPath)) {
 		return List<String>::null();
 	}
-	List<String> _listCurrent = getFiles(dirPath);
-	_listCurrent.sort(sl_true);
-	ListLocker<String> listCurrent(_listCurrent);
-	List<String> list;
-	for (sl_size i = 0; i < listCurrent.getCount(); i++) {
-		String item = listCurrent[i];
-		list.add(item);
+	List<String> ret;
+	List<String> listCurrent = getFiles(dirPath);
+	listCurrent.sort_NoLock(sl_true);
+	String* p = listCurrent.data();
+	sl_size n = listCurrent.count();
+	for (sl_size i = 0; i < n; i++) {
+		String& item = p[i];
+		ret.add_NoLock(item);
 		String dir = dirPath + "/" + item;
 		if (File::isDirectory(dir)) {
-			ListLocker<String> sub(File::getAllDescendantFiles(dir));
+			ListItems<String> sub(File::getAllDescendantFiles(dir));
 			for (sl_size j = 0; j < sub.getCount(); j++) {
-				list.add(item + "/" + sub[j]);
+				ret.add(item + "/" + sub[j]);
 			}
 		}
 	}
-	return list;
+	return ret;
 }
 
 sl_bool File::createDirectories(const String& dirPath)
@@ -293,7 +296,7 @@ sl_bool File::deleteDirectoryRecursively(const String& dirPath)
 {
 	if (File::isDirectory(dirPath)) {
 		String path = dirPath + "/";
-		ListLocker<String> list(File::getFiles(dirPath));
+		ListItems<String> list(File::getFiles(dirPath));
 		sl_bool ret = sl_true;
 		for (sl_size i = 0; i < list.getCount(); i++) {
 			String sub = path + list[i];

@@ -24,12 +24,11 @@ Ref<ThreadPool> ThreadPool::create(sl_uint32 minThreads, sl_uint32 maxThreads)
 
 void ThreadPool::release()
 {
+	ObjectLocker lock(this);
 	if (!m_flagRunning) {
 		return;
 	}
 	m_flagRunning = sl_false;
-
-	ObjectLocker lock(this);
 	ListLocker< Ref<Thread> > threads(m_threadWorkers.duplicate());
 	for (sl_size i = 0; i < threads.count(); i++) {
 		threads[i]->finish();
@@ -54,10 +53,10 @@ sl_bool ThreadPool::addTask(const Ref<Runnable>& task)
 	if (task.isNull()) {
 		return sl_false;
 	}
+	ObjectLocker lock(this);
 	if (!m_flagRunning) {
 		return sl_false;
 	}
-	ObjectLocker lock(this);
 	// add task
 	if (!(m_tasks.push(task))) {
 		return sl_false;

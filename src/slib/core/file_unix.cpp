@@ -14,6 +14,7 @@
 #include <errno.h>
 
 SLIB_NAMESPACE_BEGIN
+
 sl_file File::_open(const String& filePath, Mode mode)
 {
 	if (filePath.isEmpty()) {
@@ -424,7 +425,7 @@ List<String> File::getFiles(const String& _filePath)
 	if (dir) {
 		dirent* ent;
 		while ((ent = readdir(dir))) {
-			ret.add(String::fromUtf8(ent->d_name));
+			ret.add_NoLock(String::fromUtf8(ent->d_name));
 		}
 		::closedir(dir);
 	}
@@ -483,6 +484,7 @@ sl_bool File::setNonBlocking(int fd, sl_bool flagEnable)
 		return sl_false;
 	}
 }
+
 SLIB_NAMESPACE_END
 
 #endif

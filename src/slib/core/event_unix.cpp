@@ -10,6 +10,7 @@
 #include "../../../inc/slib/core/thread.h"
 
 SLIB_NAMESPACE_BEGIN
+
 class _UnixEvent : public Event
 {
 public:
@@ -118,9 +119,9 @@ public:
 
 Ref<Event> Event::create(sl_bool flagAutoReset)
 {
-	Ref<_UnixEvent> ret = _UnixEvent::create(flagAutoReset);
-	return Ref<Event>::from(ret);
+	return _UnixEvent::create(flagAutoReset);
 }
+
 SLIB_NAMESPACE_END
 
 #endif

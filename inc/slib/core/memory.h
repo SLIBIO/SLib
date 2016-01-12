@@ -18,7 +18,7 @@ class SLIB_EXPORT Memory
 	typedef CMemory _Obj;
 	typedef Ref<_Obj> _Ref;
 	SLIB_DECLARE_OBJECT_TYPE_FROM(Memory, _Obj)
-	SLIB_DECLARE_OBJECT_WRAPPER(Memory, Memory, _Obj, _Ref)
+	SLIB_DECLARE_OBJECT_WRAPPER(Memory, _Obj, Memory, SafeMemory)
 	
 public:
 	SLIB_INLINE Memory(sl_size size) : m_object(_Obj::create(size))
@@ -31,16 +31,6 @@ public:
 	
 	SLIB_INLINE Memory(const void* buf, sl_size size, const Referable* refer) : m_object(_Obj::createStatic((const sl_uint8*)buf, size, refer))
 	{
-	}
-	
-public:
-	Memory(const SafeMemory& other);
-	
-	Memory& operator=(const SafeMemory& other);
-	
-	SLIB_INLINE _Obj* getObject() const
-	{
-		return m_object.get();
 	}
 	
 public:
@@ -191,7 +181,7 @@ class SLIB_EXPORT SafeMemory
 	typedef SafeRef<_Obj> _Ref;
 	typedef Ref<_Obj> _LocalRef;
 	SLIB_DECLARE_OBJECT_TYPE_FROM(SafeMemory, _Obj)
-	SLIB_DECLARE_OBJECT_WRAPPER(SafeMemory, SafeMemory, _Obj, _Ref)
+	SLIB_DECLARE_OBJECT_SAFE_WRAPPER(SafeMemory, _Obj, SafeMemory, Memory)
 	
 public:
 	SLIB_INLINE SafeMemory(sl_size size) : m_object(_Obj::create(size))
@@ -204,17 +194,6 @@ public:
 	
 	SLIB_INLINE SafeMemory(const void* buf, sl_size size, const Referable* refer) : m_object(_Obj::createStatic((const sl_uint8*)buf, size, refer))
 	{
-	}
-	
-public:
-	SLIB_INLINE SafeMemory(const Memory& other) : m_object(other.getRef())
-	{
-	}
-	
-	SLIB_INLINE SafeMemory& operator=(const Memory& other)
-	{
-		m_object = other.getRef();
-		return *this;
 	}
 	
 public:
@@ -294,16 +273,6 @@ public:
 	}
 	
 };
-
-SLIB_INLINE Memory::Memory(const SafeMemory& other) : m_object(other.getRef())
-{
-}
-
-SLIB_INLINE Memory& Memory::operator=(const SafeMemory& other)
-{
-	m_object = other.getRef();
-	return *this;
-}
 
 class SLIB_EXPORT MemoryBuffer : public Object
 {

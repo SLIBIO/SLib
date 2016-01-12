@@ -63,7 +63,7 @@ public:
 					Base::resetMemory(&m_overlappedRead, 0, sizeof(m_overlappedRead));
 					m_overlappedRead.Offset = (DWORD)m_offset;
 					m_overlappedRead.OffsetHigh = (DWORD)(m_offset >> 32);
-					if (::ReadFile((HANDLE)handle, req->data, req->size, NULL, &m_overlappedRead)) {
+					if (::ReadFile((HANDLE)handle, req->data(), req->size(), NULL, &m_overlappedRead)) {
 						doInput(req.get(), 0, sl_true);
 					} else {
 						DWORD dwErr = ::GetLastError();
@@ -83,7 +83,7 @@ public:
 					Base::resetMemory(&m_overlappedWrite, 0, sizeof(m_overlappedWrite));
 					m_overlappedWrite.Offset = (DWORD)m_offset;
 					m_overlappedWrite.OffsetHigh = (DWORD)(m_offset >> 32);
-					if (::WriteFile((HANDLE)handle, req->data, req->size, NULL, &m_overlappedWrite)) {
+					if (::WriteFile((HANDLE)handle, req->data(), req->size(), NULL, &m_overlappedWrite)) {
 						doOutput(req.get(), 0, sl_true);
 					} else {
 						DWORD dwErr = ::GetLastError();
@@ -131,9 +131,9 @@ public:
 		if (object.isNull()) {
 			return;
 		}
-		PtrLocker<IAsyncStreamListener> listener(req->listener);
+		PtrLocker<IAsyncStreamListener> listener(req->getListener());
 		if (listener.isNotNull()) {
-			listener->onRead((AsyncStream*)(object.get()), req->data, size, req->refData.get(), flagError);
+			listener->onRead((AsyncStream*)(object.get()), req->data(), size, req->getDataReference(), flagError);
 		}
 	}
 
@@ -143,9 +143,9 @@ public:
 		if (object.isNull()) {
 			return;
 		}
-		PtrLocker<IAsyncStreamListener> listener(req->listener);
+		PtrLocker<IAsyncStreamListener> listener(req->getListener());
 		if (listener.isNotNull()) {
-			listener->onWrite((AsyncStream*)(object.get()), req->data, size, req->refData.get(), flagError);
+			listener->onWrite((AsyncStream*)(object.get()), req->data(), size, req->getDataReference(), flagError);
 		}
 	}
 

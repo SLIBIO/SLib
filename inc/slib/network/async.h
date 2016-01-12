@@ -72,12 +72,6 @@ public:
 
 	sl_bool receive(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, Referable* refData = sl_null);
 	
-	template <class T>
-	SLIB_INLINE sl_bool receive(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, const Ref<T>& ref)
-	{
-		return receive(data, size, listener, ref.get());
-	}
-
 	SLIB_INLINE sl_bool receive(const Memory& mem, const Ptr<IAsyncTcpSocketListener>& listener)
 	{
 		return receive(mem.getBuf(), (sl_uint32)(mem.getSize()), listener, mem.getObject());
@@ -85,12 +79,6 @@ public:
 
 	sl_bool send(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, Referable* refData = sl_null);
 	
-	template <class T>
-	SLIB_INLINE sl_bool send(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, const Ref<T>& ref)
-	{
-		return send(data, size, listener, ref.get());
-	}
-
 	SLIB_INLINE sl_bool send(const Memory& mem, const Ptr<IAsyncTcpSocketListener>& listener)
 	{
 		return send(mem.getBuf(), (sl_uint32)(mem.getSize()), listener, mem.getObject());
@@ -269,24 +257,12 @@ public:
 
 	sl_bool receiveFrom(void* data, sl_uint32 size, const Ptr<IAsyncUdpSocketListener>& listener, Referable* refData = sl_null);
 	
-	template <class T>
-	SLIB_INLINE sl_bool receiveFrom(void* data, sl_uint32 size, const Ptr<IAsyncUdpSocketListener>& listener, const Ref<T>& ref)
-	{
-		return receiveFrom(data, size, listener, ref.get());
-	}
-
 	SLIB_INLINE sl_bool receiveFrom(const Memory& mem, const Ptr<IAsyncUdpSocketListener>& listener)
 	{
 		return receiveFrom(mem.getBuf(), (sl_uint32)(mem.getSize()), listener, mem.getObject());
 	}
 
 	sl_bool sendTo(const SocketAddress& addressTo, void* data, sl_uint32 size, const Ptr<IAsyncUdpSocketListener>& listener, Referable* refData = sl_null);
-	
-	template <class T>
-	SLIB_INLINE sl_bool sendTo(const SocketAddress& addressTo, void* data, sl_uint32 size, const Ptr<IAsyncUdpSocketListener>& listener, const Ref<T>& ref)
-	{
-		return sendTo(addressTo, data, size, listener, ref.get());
-	}
 
 	SLIB_INLINE sl_bool sendTo(const SocketAddress& addressTo, const Memory& mem, const Ptr<IAsyncUdpSocketListener>& listener)
 	{
@@ -299,12 +275,6 @@ public:
 		return sendTo(address, data, size, listener, refData);
 	}
 	
-	template <class T>
-	SLIB_INLINE sl_bool sendBroadcast(sl_uint32 port, void* data, sl_uint32 size, const Ptr<IAsyncUdpSocketListener>& listener, const Ref<T>& ref)
-	{
-		return sendBroadcast(port, data, size, listener, ref.get());
-	}
-
 	SLIB_INLINE sl_bool sendBroadcast(sl_uint32 port, const Memory& mem, const Ptr<IAsyncUdpSocketListener>& listener)
 	{
 		return sendBroadcast(port, mem.getBuf(), (sl_uint32)(mem.getSize()), listener, mem.getObject());

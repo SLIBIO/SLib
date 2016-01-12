@@ -7,6 +7,7 @@
 #include <windows.h>
 
 SLIB_NAMESPACE_BEGIN
+
 sl_file File::_open(const String& _filePath, Mode mode)
 {
 	String16 filePath = _filePath;
@@ -453,7 +454,7 @@ List<String> File::getFiles(const String& _filePath)
 		while (c) {
 			String str((sl_char16*)(fd.cFileName));
 			if (str != p1 && str != p2) {
-				ret.add(str);
+				ret.add_NoLock(str);
 			}
 			c = ::FindNextFileW(handle, &fd);
 		}
@@ -507,5 +508,7 @@ sl_bool File::rename(const String& _oldPath, const String& _newPath)
 	BOOL ret = ::MoveFileExW((LPCWSTR)(oldPath.getBuf()), (LPCWSTR)(newPath.getBuf()), 0);
 	return ret != 0;
 }
+
 SLIB_NAMESPACE_END
+
 #endif

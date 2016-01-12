@@ -92,10 +92,13 @@ protected:
 	SLIB_INLINE _JniGlobal() {}
 public:
 	~_JniGlobal();
+	
+public:
+	static Ref<_JniGlobal> from(jobject obj);
+
 public:
 	jobject object;
 
-	static Ref<_JniGlobal> from(jobject obj);
 };
 
 
@@ -106,11 +109,9 @@ template <class T>
 class SLIB_EXPORT JniGlobal
 {
 	SLIB_DECLARE_OBJECT_TYPE_FROM(JniGlobal<T>, _JniGlobal)
-	SLIB_DECLARE_OBJECT_WRAPPER(JniGlobal, JniGlobal<T>, _JniGlobal, Ref<_JniGlobal>)
+	SLIB_DECLARE_OBJECT_WRAPPER(JniGlobal, _JniGlobal, JniGlobal<T>, JniSafeGlobal<T>)
 
 public:
-	JniGlobal(const JniSafeGlobal<T>& g);
-	
 	SLIB_INLINE JniGlobal(T obj) : m_object(_JniGlobal::from(obj))
 	{
 	}
@@ -118,28 +119,26 @@ public:
 	SLIB_INLINE JniGlobal(const JniLocal<T>& obj) : m_object(_JniGlobal::from(obj.get()))
 	{
 	}
-
-public:
-	JniGlobal<T>& operator=(const JniSafeGlobal<T>& g);
-	
-	SLIB_INLINE JniGlobal<T>& operator=(T obj)
-	{
-		m_object = _JniGlobal::from(obj);
-		return *this;
-	}
-
-	SLIB_INLINE JniGlobal<T>& operator=(const JniLocal<T>& obj)
-	{
-		m_object = _JniGlobal::from(obj.get());
-		return *this;
-	}
 	
 public:
 	SLIB_INLINE static JniGlobal<T> from(T obj)
 	{
 		return JniGlobal<T>(obj);
 	}
-
+	
+public:
+	SLIB_INLINE JniGlobal<T>& operator=(T obj)
+	{
+		m_object = _JniGlobal::from(obj);
+		return *this;
+	}
+	
+	SLIB_INLINE JniGlobal<T>& operator=(const JniLocal<T>& obj)
+	{
+		m_object = _JniGlobal::from(obj.get());
+		return *this;
+	}
+	
 public:
 	SLIB_INLINE T get() const
 	{
@@ -162,13 +161,9 @@ template <class T>
 class SLIB_EXPORT JniSafeGlobal
 {
 	SLIB_DECLARE_OBJECT_TYPE_FROM(JniSafeGlobal<T>, _JniGlobal)
-	SLIB_DECLARE_OBJECT_WRAPPER(JniSafeGlobal, JniSafeGlobal<T>, _JniGlobal, SafeRef<_JniGlobal>)
+	SLIB_DECLARE_OBJECT_SAFE_WRAPPER(JniSafeGlobal, _JniGlobal, JniSafeGlobal<T>, JniGlobal<T>)
 
 public:
-	SLIB_INLINE JniSafeGlobal(const JniGlobal<T>& g) : m_object(g.getReference())
-	{
-	}
-
 	SLIB_INLINE JniSafeGlobal(T obj) : m_object(_JniGlobal::from(obj))
 	{
 	}
@@ -178,12 +173,6 @@ public:
 	}
 
 public:
-	SLIB_INLINE JniSafeGlobal<T>& operator=(const JniGlobal<T>& g)
-	{
-		m_object = g.getRef();
-		return *this;
-	}
-	
 	SLIB_INLINE JniSafeGlobal<T>& operator=(T obj)
 	{
 		m_object = _JniGlobal::from(obj);
@@ -208,36 +197,20 @@ public:
 	}
 };
 
-template <class T>
-SLIB_INLINE JniGlobal<T>::JniGlobal(const JniSafeGlobal<T>& g) : m_object(g.getRef())
-{
-}
-
-template <class T>
-SLIB_INLINE JniGlobal<T>& JniGlobal<T>::operator=(const JniSafeGlobal<T>& g)
-{
-	m_object = g.getReference();
-	return *this;
-}
-
 
 class JniSafeClass;
 
 class SLIB_EXPORT JniClass
 {
 	SLIB_DECLARE_OBJECT_TYPE_FROM(JniClass, _JniGlobal)
-	SLIB_DECLARE_OBJECT_WRAPPER(JniClass, JniClass, _JniGlobal, Ref<_JniGlobal>)
+	SLIB_DECLARE_OBJECT_WRAPPER(JniClass, _JniGlobal, JniClass, JniSafeClass)
     
 public:
-    JniClass(const JniSafeClass& g);
-    
 	SLIB_INLINE JniClass(jclass cls) : m_object(_JniGlobal::from(cls))
 	{
 	}
 
 public:
-    JniClass& operator=(const JniSafeClass& g);
-    
 	SLIB_INLINE JniClass& operator=(jclass cls)
 	{
 		m_object = _JniGlobal::from(cls);
@@ -252,6 +225,7 @@ public:
 
 	static JniClass getClassOfObject(jobject object);
 
+public:
 	SLIB_INLINE jclass get() const
 	{
 		Ref<_JniGlobal> o = m_object;
@@ -441,39 +415,20 @@ public:
 class SLIB_EXPORT JniSafeClass
 {
 	SLIB_DECLARE_OBJECT_TYPE_FROM(JniSafeClass, _JniGlobal)
-	SLIB_DECLARE_OBJECT_WRAPPER(JniSafeClass, JniSafeClass, _JniGlobal, SafeRef<_JniGlobal>)
+	SLIB_DECLARE_OBJECT_SAFE_WRAPPER(JniSafeClass, _JniGlobal, JniSafeClass, JniClass)
     
 public:
-    SLIB_INLINE JniSafeClass(const JniClass& g) : m_object(g.getRef())
-    {        
-    }
-    
 	SLIB_INLINE JniSafeClass(jclass cls) : m_object(_JniGlobal::from(cls))
 	{
 	}
 
 public:
-    JniSafeClass& operator=(const JniClass& g)
-    {
-        m_object = g.getRef();
-    }
-    
 	SLIB_INLINE JniSafeClass& operator=(jclass cls)
 	{
 		m_object = _JniGlobal::from(cls);
 		return *this;
 	}
 };
-
-SLIB_INLINE JniClass::JniClass(const JniSafeClass& g) : m_object(g.getRef())
-{
-}
-
-SLIB_INLINE JniClass& JniClass::operator=(const JniSafeClass& g)
-{
-    m_object = g.getRef();
-    return *this;
-}
 
 
 class SLIB_EXPORT Jni

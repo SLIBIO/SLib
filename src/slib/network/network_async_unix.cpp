@@ -73,7 +73,7 @@ public:
 					return;
 				}
 			}
-			sl_int32 n = socket->receive((char*)(request->data), request->size);
+			sl_int32 n = socket->receive((char*)(request->data()), request->size());
 			if (n > 0) {
 				_onReceive(request.get(), n, flagError);
 			} else if (n < 0) {
@@ -114,12 +114,12 @@ public:
 					return;
 				}
 			}
-			sl_uint32 size = request->size - m_sizeWritten;
-			sl_int32 n = socket->send((char*)(request->data) + m_sizeWritten, size);
+			sl_uint32 size = request->size() - m_sizeWritten;
+			sl_int32 n = socket->send((char*)(request->data()) + m_sizeWritten, size);
 			if (n > 0) {
 				m_sizeWritten += n;
-				if (m_sizeWritten >= request->size) {
-					_onSend(request.get(), request->size, flagError);
+				if (m_sizeWritten >= request->size()) {
+					_onSend(request.get(), request->size(), flagError);
 				} else {
 					m_requestWriting = request;
 				}

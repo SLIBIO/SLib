@@ -78,9 +78,9 @@ void AsyncTcpSocketInstance::_onReceive(AsyncStreamRequest* req, sl_uint32 size,
 	if (object.isNull()) {
 		return;
 	}
-	PtrLocker<IAsyncStreamListener> listener(req->listener);
+	PtrLocker<IAsyncStreamListener> listener(req->getListener());
 	if (listener.isNotNull()) {
-		listener->onRead(object.get(), req->data, size, req->refData.get(), flagError);
+		listener->onRead(object.get(), req->data(), size, req->getDataReference(), flagError);
 	}
 }
 
@@ -90,12 +90,12 @@ void AsyncTcpSocketInstance::_onSend(AsyncStreamRequest* req, sl_uint32 size, sl
 	if (object.isNull()) {
 		return;
 	}
-	if (!flagError && req->size != size) {
+	if (!flagError && req->size() != size) {
 		flagError = sl_true;
 	}
-	PtrLocker<IAsyncStreamListener> listener(req->listener);
+	PtrLocker<IAsyncStreamListener> listener(req->getListener());
 	if (listener.isNotNull()) {
-		listener->onWrite(object.get(), req->data, size, req->refData.get(), flagError);
+		listener->onWrite(object.get(), req->data(), size, req->getDataReference(), flagError);
 	}
 }
 
@@ -219,7 +219,7 @@ Ref<AsyncTcpSocket> AsyncTcpSocket::create(AsyncTcpSocketInstance* instance, con
 	if (instance) {
 		ret = new AsyncTcpSocket;
 		if (ret.isNotNull()) {
-			if (!(ret->initialize(instance, loop))) {
+			if (!(ret->_initialize(instance, loop))) {
 				ret.setNull();
 			}
 		}

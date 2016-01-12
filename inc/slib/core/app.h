@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_CORE_APP
 
 #include "definition.h"
+
 #include "object.h"
 #include "string.h"
 
@@ -11,7 +12,6 @@ class SLIB_EXPORT Application : public Object
 	SLIB_DECLARE_OBJECT(Application, Object)
 public:
 	Application();
-	~Application();
 	
 	enum Type
 	{
@@ -21,6 +21,7 @@ public:
 	virtual Type getAppType() = 0;
 
 	virtual void run(const String& param);
+	
 	void run();
 
 public:

@@ -5,13 +5,9 @@
 
 SLIB_NAMESPACE_BEGIN
 
-SLIB_SAFE_STATIC_REF(Ref<Application>, _g_app);
+SLIB_SAFE_STATIC_REF(SafeRef<Application>, _g_app);
 
 Application::Application()
-{
-}
-
-Application::~Application()
 {
 }
 
