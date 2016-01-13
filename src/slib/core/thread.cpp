@@ -6,11 +6,9 @@
 #endif
 
 SLIB_NAMESPACE_BEGIN
-Thread::Thread()
-{
-	m_eventWake = Event::create(sl_true);
-	m_eventExit = Event::create(sl_false);
 
+Thread::Thread() : m_eventWake(Event::create(sl_true)), m_eventExit(Event::create(sl_false))
+{
 	m_flagRunning = sl_false;
 	m_flagRequestStop = sl_false;
 
@@ -40,11 +38,12 @@ Ref<Thread> Thread::getCurrent()
 
 sl_bool Thread::isCurrentThread()
 {
-	return getCurrent() == this;
+	return Thread::_nativeGetCurrentThread() == this;
 }
 
 sl_bool Thread::start(sl_uint32 stackSize)
 {
+	ObjectLocker lock(this);
 	if (!m_flagRunning) {
 		m_flagRunning = sl_true;
 		m_flagRequestStop = sl_false;
@@ -165,7 +164,7 @@ Ref<Referable> Thread::getAttachedObject(const String& name)
 	return m_attachedObjects.getValue(name, Ref<Referable>::null());
 }
 
-void Thread::attachObject(const String& name, const Ref<Referable>& object)
+void Thread::attachObject(const String& name, const Referable* object)
 {
 	m_attachedObjects.put(name, object);
 }
@@ -201,13 +200,12 @@ void Thread::_run()
 
 Ref<Thread> Thread::create(const Ref<Runnable>& runnable)
 {
-	Ref<Runnable> r = runnable;
-	if (r.isNull()) {
+	if (runnable.isNull()) {
 		return Ref<Thread>::null();
 	}
 	Ref<Thread> ret = new Thread();
 	if (ret.isNotNull()) {
-		ret->m_runnable = r;
+		ret->m_runnable = runnable;
 	}
 	return ret;
 }
@@ -263,4 +261,5 @@ sl_uint64 Thread::getCurrentThreadUniqueId()
 	_nativeSetCurrentThreadUniqueId(n);
 	return n;
 }
+
 SLIB_NAMESPACE_END

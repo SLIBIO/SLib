@@ -2,9 +2,11 @@
 #define CHECKHEADER_SLIB_CORE_SYSTEM
 
 #include "definition.h"
+
 #include "string.h"
 
 SLIB_NAMESPACE_BEGIN
+
 class SLIB_EXPORT System
 {
 public:
@@ -44,6 +46,7 @@ public:
 
 	static String readLine();
 };
+
 SLIB_NAMESPACE_END
 
 #endif //CHECKHEADER_SLIB_CORE_SYSTEM

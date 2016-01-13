@@ -1,5 +1,4 @@
 #include "../../../inc/slib/core/math.h"
-
 #include "../../../inc/slib/core/time.h"
 #include "../../../inc/slib/crypto/sha2.h"
 #include "../../../inc/slib/core/system.h"

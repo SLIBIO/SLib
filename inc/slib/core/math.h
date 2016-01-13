@@ -18,6 +18,7 @@
 #undef min
 
 SLIB_NAMESPACE_BEGIN
+
 class SLIB_EXPORT Math {
 public:
 	SLIB_INLINE static sl_int8 max(sl_int8 a, sl_int8 b)
@@ -422,6 +423,7 @@ public:
 	static void mul64(sl_uint64 a, sl_uint64 b, sl_uint64& o_high, sl_uint64& o_low);
 
 };
+
 SLIB_NAMESPACE_END
 
 
@@ -434,6 +436,7 @@ SLIB_NAMESPACE_END
 #endif
 
 SLIB_NAMESPACE_BEGIN
+
 SLIB_INLINE void Math::mul32(sl_uint32 a, sl_uint32 b, sl_uint32& o_high, sl_uint32& o_low)
 {
 #if defined(SLIB_COMPILER_IS_VISUALSTUDIO)
@@ -468,6 +471,7 @@ SLIB_INLINE void Math::mul64(sl_uint64 a, sl_uint64 b, sl_uint64& o_high, sl_uin
 	o_high = ah * bh + (m1 >> 32) + (m2 >> 32);
 #endif
 }
+
 SLIB_NAMESPACE_END
 
 #endif

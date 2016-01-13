@@ -7,6 +7,7 @@
 #define WAIT_SECONDS 15
 
 SLIB_NAMESPACE_BEGIN
+
 Service::Service()
 {
 }
@@ -18,8 +19,9 @@ Service::~Service()
 
 void Service::release()
 {
-	if (m_threadRun.isNotNull()) {
-		m_threadRun->finishAndWait();
+	Ref<Thread> thread = m_threadRun;
+	if (thread.isNotNull()) {
+		thread->finishAndWait();
 		m_threadRun.setNull();
 	}
 }
@@ -191,4 +193,5 @@ sl_bool Service::onStartService()
 void Service::onStopService()
 {
 }
+
 SLIB_NAMESPACE_END

@@ -29,11 +29,13 @@ void ThreadPool::release()
 		return;
 	}
 	m_flagRunning = sl_false;
-	ListLocker< Ref<Thread> > threads(m_threadWorkers.duplicate());
-	for (sl_size i = 0; i < threads.count(); i++) {
+	
+	ListItems< Ref<Thread> > threads(m_threadWorkers);
+	sl_size i;
+	for (i = 0; i < threads.count(); i++) {
 		threads[i]->finish();
 	}
-	for (sl_size i = 0; i < threads.count(); i++) {
+	for (i = 0; i < threads.count(); i++) {
 		threads[i]->finishAndWait();
 	}
 }
@@ -64,7 +66,7 @@ sl_bool ThreadPool::addTask(const Ref<Runnable>& task)
 
 	// wake a sleeping worker
 	{
-		ListLocker< Ref<Thread> > threads(m_threadWorkers);
+		ListItems< Ref<Thread> > threads(m_threadWorkers);
 		for (sl_size i = 0; i < threads.count(); i++) {
 			if (threads[i]->isWaiting()) {
 				threads[i]->wake();
@@ -79,7 +81,7 @@ sl_bool ThreadPool::addTask(const Ref<Runnable>& task)
 		if (nThreads == 0 || (nThreads < getMaximumThreadsCount())) {
 			Ref<Thread> worker = Thread::start(SLIB_CALLBACK_CLASS(ThreadPool, onRunWorker, this), getThreadStackSize());
 			if (worker.isNotNull()) {
-				m_threadWorkers.add(worker);
+				m_threadWorkers.add_NoLock(worker);
 			}
 		}
 	}
@@ -93,11 +95,13 @@ void ThreadPool::onRunWorker()
 		if (m_tasks.pop(&task)) {
 			task->run();
 		} else {
+			ObjectLocker lock(this);
 			sl_size nThreads = m_threadWorkers.getCount();
 			if (nThreads > getMinimumThreadsCount()) {
-				m_threadWorkers.removeValue(Thread::getCurrent());
+				m_threadWorkers.removeValue_NoLock(Thread::getCurrent());
 				return;
 			} else {
+				lock.unlock();
 				Thread::sleep(5000);
 			}
 		}

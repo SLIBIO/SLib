@@ -5,6 +5,7 @@
 #include "../../../inc/slib/core/win32_com.h"
 
 SLIB_NAMESPACE_BEGIN
+
 Memory Win32_COM::readAllBytesFromStream(IStream* stream)
 {
 	Memory ret;
@@ -35,5 +36,7 @@ Memory Win32_COM::readAllBytesFromStream(IStream* stream)
 	}
 	return ret;
 }
+
 SLIB_NAMESPACE_END
+
 #endif

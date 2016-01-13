@@ -8,26 +8,37 @@
 SLIB_NAMESPACE_BEGIN
 class SLIB_EXPORT SpinLock
 {
-	SLIB_DECLARE_CLASS_NOCOPY(SpinLock)
 public:
 	SLIB_INLINE SpinLock()
 	{
 		m_flagLock = 0;
 	}
+	
+	SLIB_INLINE SpinLock(const SpinLock& other)
+	{
+		m_flagLock = 0;
+	}
 
+public:
+	void lock() const;
+	
 	SLIB_INLINE sl_bool tryLock() const
 	{
 		return Base::interlockedCompareExchange32((sl_int32*)(&m_flagLock), 1, 0);
 	}
 	
-	void lock() const;
-
 	SLIB_INLINE void unlock() const
 	{
 		Base::interlockedCompareExchange32((sl_int32*)(&m_flagLock), 0, 1);
 	}
 
 	void yield(sl_uint32 ellapsed);
+	
+public:
+	SLIB_INLINE SpinLock& operator=(const SpinLock& other)
+	{
+		return *this;
+	}
 
 private:
 	sl_int32 m_flagLock;
@@ -35,10 +46,6 @@ private:
 
 class SLIB_EXPORT SpinLocker
 {
-	SLIB_DECLARE_CLASS_NOCOPY(SpinLocker)
-private:
-	const SpinLock* m_lock;
-	
 public:
 	SLIB_INLINE SpinLocker()
 	{
@@ -53,6 +60,7 @@ public:
 		}
 	}
 	
+public:
 	SLIB_INLINE void lock(const SpinLock* lock)
 	{
 		if (! m_lock) {			
@@ -75,9 +83,13 @@ public:
 	{
 		unlock();
 	}
+	
+private:
+	const SpinLock* m_lock;
 };
 
 #define SLIB_SPINLOCK_POOL_SIZE 971
+
 template <int CATEGORY>
 class SLIB_EXPORT SpinLockPool
 {

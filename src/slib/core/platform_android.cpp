@@ -3,7 +3,6 @@
 #ifdef SLIB_PLATFORM_IS_ANDROID
 
 #include "../../../inc/slib/core/platform_android.h"
-
 #include "../../../inc/slib/core/io.h"
 
 SLIB_NAMESPACE_BEGIN

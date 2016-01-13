@@ -83,13 +83,16 @@ public:
 template <class TYPE>
 class SafeStaticDestructor
 {
+private:
+	TYPE* o;
+	
 public:
-	TYPE*o;
-	SafeStaticDestructor(TYPE* p)
+	SLIB_INLINE SafeStaticDestructor(TYPE* p)
 	{
 		o = p;
 	}
-	~SafeStaticDestructor()
+	
+	SLIB_INLINE ~SafeStaticDestructor()
 	{
 #if defined(SLIB_PLATFORM_IS_WIN32)
 		o->~TYPE();
@@ -111,7 +114,7 @@ SLIB_NAMESPACE_END
 			_static_safeflag_##NAME = 1; \
 		} \
 		_static_safelock_##NAME.unlock(); \
-	}\
+	} \
 	static slib::SafeStaticDestructor<TYPE> _static_destructor_instance_##NAME(&NAME);
 
 #define SLIB_SAFE_STATIC_GETTER(TYPE, FUNC, ...) \
@@ -147,6 +150,16 @@ public: \
 		_m_property_##NAME = v; \
 	}
 
+#define SLIB_REF_PROPERTY_INLINE(TYPE, NAME) protected: \
+	slib::SafeRef<TYPE> _m_property_##NAME; \
+public: \
+	SLIB_INLINE slib::Ref<TYPE> get##NAME() const { \
+		return _m_property_##NAME; \
+	} \
+	SLIB_INLINE void set##NAME(const slib::Ref<TYPE>& v) { \
+		_m_property_##NAME = v; \
+	}
+
 #define SLIB_WEAK_PROPERTY_INLINE(TYPE, NAME) protected: \
 	slib::SafeWeakRef<TYPE> _m_property_##NAME; \
 public: \
@@ -157,15 +170,37 @@ public: \
 		_m_property_##NAME = v; \
 	}
 
-#define SLIB_REF_PROPERTY_INLINE(TYPE, NAME) protected: \
-	slib::SafeRef<TYPE> _m_property_##NAME; \
+#define SLIB_PTR_PROPERTY_INLINE(TYPE, NAME) protected: \
+	slib::SafePtr<TYPE> _m_property_##NAME; \
 public: \
-	SLIB_INLINE slib::Ref<TYPE> get##NAME() const { \
+	SLIB_INLINE slib::Ptr<TYPE> get##NAME() const { \
 		return _m_property_##NAME; \
 	} \
-	SLIB_INLINE void set##NAME(const slib::Ref<TYPE>& v) { \
+	SLIB_INLINE void set##NAME(const slib::Ptr<TYPE>& v) { \
 		_m_property_##NAME = v; \
 	}
+
+#define SLIB_STRING_PROPERTY_INLINE(NAME) protected: \
+	slib::SafeString _m_property_##NAME; \
+public: \
+	SLIB_INLINE slib::String get##NAME() const { \
+		return _m_property_##NAME; \
+	} \
+	SLIB_INLINE void set##NAME(const slib::String& v) { \
+		_m_property_##NAME = v; \
+	}
+
+#define SLIB_STRING16_PROPERTY_INLINE(NAME) protected: \
+	slib::SafeString16 _m_property_##NAME; \
+public: \
+	SLIB_INLINE slib::String16 get##NAME() const { \
+		return _m_property_##NAME; \
+	} \
+	SLIB_INLINE void set##NAME(const slib::String16& v) { \
+		_m_property_##NAME = v; \
+	}
+
+
 
 #define SLIB_PROPERTY(TYPE, NAME) protected: \
 	TYPE _m_property_##NAME; \
@@ -187,16 +222,6 @@ public: \
 		_m_property_##NAME = v; \
 	}
 
-#define SLIB_WEAK_PROPERTY(TYPE, NAME) protected: \
-	slib::SafeWeakRef<TYPE> _m_property_##NAME; \
-public: \
-	virtual slib::Ref<TYPE> get##NAME() const { \
-		return _m_property_##NAME; \
-	} \
-	virtual void set##NAME(const slib::Ref<TYPE>& v) { \
-		_m_property_##NAME = v; \
-	}
-
 #define SLIB_REF_PROPERTY(TYPE, NAME) protected: \
 	slib::SafeRef<TYPE> _m_property_##NAME; \
 public: \
@@ -207,6 +232,44 @@ public: \
 		_m_property_##NAME = v; \
 	}
 
+#define SLIB_WEAK_PROPERTY(TYPE, NAME) protected: \
+	slib::SafeWeakRef<TYPE> _m_property_##NAME; \
+public: \
+	virtual slib::Ref<TYPE> get##NAME() const { \
+		return _m_property_##NAME; \
+	} \
+	virtual void set##NAME(const slib::Ref<TYPE>& v) { \
+		_m_property_##NAME = v; \
+	}
 
+#define SLIB_PTR_PROPERTY(TYPE, NAME) protected: \
+	slib::SafePtr<TYPE> _m_property_##NAME; \
+public: \
+	virtual slib::Ptr<TYPE> get##NAME() const { \
+		return _m_property_##NAME; \
+	} \
+	virtual void set##NAME(const slib::Ptr<TYPE>& v) { \
+		_m_property_##NAME = v; \
+	}
+
+#define SLIB_STRING_PROPERTY(NAME) protected: \
+	slib::SafeString _m_property_##NAME; \
+public: \
+	virtual slib::String get##NAME() const { \
+		return _m_property_##NAME; \
+	} \
+	virtual void set##NAME(const slib::String& v) { \
+		_m_property_##NAME = v; \
+	}
+
+#define SLIB_STRING16_PROPERTY(NAME) protected: \
+	slib::SafeString16 _m_property_##NAME; \
+public: \
+	virtual slib::String16 get##NAME() const { \
+		return _m_property_##NAME; \
+	} \
+	virtual void set##NAME(const slib::String16& v) { \
+		_m_property_##NAME = v; \
+	}
 
 #endif

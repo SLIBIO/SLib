@@ -16,6 +16,13 @@ public:
 	T* data;
 	sl_size count;
 	Ref<Referable> refer;
+	
+public:
+	SLIB_INLINE T& operator[](sl_reg index) const
+	{
+		return data[index];
+	}
+	
 };
 
 template < class T, class COMPARE = Compare<T> >
@@ -594,6 +601,18 @@ public:
 		return copy(0, source, start, len);
 	}
 	
+	template <class _T, class _COMPARE>
+	SLIB_INLINE sl_size copy(sl_size startTarget, const SafeArray<_T, _COMPARE>& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const
+	{
+		return copy(startTarget, Array<_T, _COMPARE>(source), startSource, len);
+	}
+	
+	template <class _T, class _COMPARE>
+	SLIB_INLINE sl_size copy(const SafeArray<_T, _COMPARE>& source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX) const
+	{
+		return copy(Array<_T, _COMPARE>(source), start, len);
+	}
+	
 	SLIB_INLINE _Type duplicate() const
 	{
 		_Obj* obj = m_object.get();
@@ -834,6 +853,18 @@ public:
 	SLIB_INLINE sl_size copy(const Array<_T, _COMPARE>& source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX) const
 	{
 		return copy(0, source, start, len);
+	}
+	
+	template <class _T, class _COMPARE>
+	SLIB_INLINE sl_size copy(sl_size startTarget, const SafeArray<_T, _COMPARE>& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const
+	{
+		return copy(startTarget, Array<_T, _COMPARE>(source), startSource, len);
+	}
+	
+	template <class _T, class _COMPARE>
+	SLIB_INLINE sl_size copy(const SafeArray<_T, _COMPARE>& source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX) const
+	{
+		return copy(Array<_T, _COMPARE>(source), start, len);
 	}
 
 	SLIB_INLINE _LocalType duplicate() const

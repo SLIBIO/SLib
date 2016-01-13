@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_CORE_SETTING
 
 #include "definition.h"
+
 #include "map.h"
 #include "variant.h"
 

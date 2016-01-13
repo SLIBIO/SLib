@@ -283,6 +283,18 @@ void String16::_initStaticMemory(void* mem)
 	}
 }
 
+String8::String8(const SafeString8& src)
+{
+	sl_char8* data = src._retainContainer();
+	m_data = data;
+}
+
+String16::String16(const SafeString16& src)
+{
+	sl_char16* data = src._retainContainer();
+	m_data = data;
+}
+
 String8::String8(const String16& src)
 {
 	if (src.isNull()) {
@@ -303,18 +315,6 @@ String16::String16(const String8& src)
 	} else {
 		m_data = _create(src.data(), src.length());
 	}
-}
-
-String8::String8(const SafeString8& src)
-{
-	sl_char8* data = src._retainContainer();
-	m_data = data;
-}
-
-String16::String16(const SafeString16& src)
-{
-	sl_char16* data = src._retainContainer();
-	m_data = data;
 }
 
 String8::String8(const SafeString16& _src)
@@ -569,6 +569,23 @@ String16 String16::fromUtf(const void* _buf, sl_size _len)
 		}
 	}
 	return String16(buf, len);
+}
+
+
+String8& String8::operator=(const SafeString8& src)
+{
+	if (m_data != src.m_data) {
+		_replaceContainer(src._retainContainer());
+	}
+	return *this;
+}
+
+String16& String16::operator=(const SafeString16& src)
+{
+	if (m_data != src.m_data) {
+		_replaceContainer(src._retainContainer());
+	}
+	return *this;
 }
 
 String8& String8::operator=(const String16& other)

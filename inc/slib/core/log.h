@@ -2,68 +2,82 @@
 #define CHECKHEADER_SLIB_CORE_LOG
 
 #include "definition.h"
+
 #include "string.h"
 #include "object.h"
 #include "list.h"
 
 SLIB_NAMESPACE_BEGIN
+
 class SLIB_EXPORT Logger : public Object
 {
 public:
 	virtual void log(const String& tag, const String& content) = 0;
-	virtual void logError(const String& tag, const String& content)
-	{
-		log(tag, content);
-	}
+	
+	virtual void logError(const String& tag, const String& content);
+	
 };
 
 class SLIB_EXPORT FileLogger : public Logger
 {
-protected:
-	String m_fileName;
+public:
+	SLIB_INLINE FileLogger() {}
+	
+	SLIB_INLINE FileLogger(const String& fileName)
+	{
+		setFileName(fileName);
+	}
 
 public:
-	FileLogger() {}
-	FileLogger(const String& fileName)
-	{
-		m_fileName = fileName;
-	}
-
-	void setFileName(const String& fileName)
-	{
-		m_fileName = fileName;
-	}
 	void log(const String& tag, const String& content);
+	
+protected:
+	SLIB_STRING_PROPERTY_INLINE(FileName)
+
 };
 
 class SLIB_EXPORT Log : public Object
 {
-private:
-	List< Ref<Logger> > m_listLoggers;
-	List< Ref<Logger> > m_listErrorLoggers;
-
 public:
-	Log() {}
-	Log(Ref<Logger> logger, Ref<Logger> errorLogger);
-
-	void clearDefaultLogger();
-	void addDefaultLogger(Ref<Logger> logger);
-	void removeDefaultLogger(Ref<Logger> logger);
-
-	void clearErrorLogger();
-	void addErrorLogger(Ref<Logger> logger);
-	void removeErrorLogger(Ref<Logger> logger);
-
-	void log(const String& tag, const String& content);
-	void logError(const String& tag, const String& content);
-
-	static void logGlobal(const String& tag, const String& content);
-	static void logGlobalError(const String& tag, const String& content);
-
+	SLIB_INLINE Log() {}
+	
+	Log(const Ref<Logger>& logger, const Ref<Logger>& errorLogger);
+	
 public:
 	static Ref<Log> global();
+	
 	static Ref<Logger> getConsoleLogger();
+	
 	static Ref<Logger> createFileLogger(const String& fileName);
+	
+public:
+	void clearDefaultLogger();
+	
+	void addDefaultLogger(const Ref<Logger>& logger);
+	
+	void removeDefaultLogger(const Ref<Logger>& logger);
+
+	
+	void clearErrorLogger();
+	
+	void addErrorLogger(const Ref<Logger>& logger);
+	
+	void removeErrorLogger(const Ref<Logger>& logger);
+
+	
+	void log(const String& tag, const String& content);
+	
+	void logError(const String& tag, const String& content);
+
+	
+	static void logGlobal(const String& tag, const String& content);
+	
+	static void logGlobalError(const String& tag, const String& content);
+
+private:
+	CList< Ref<Logger> > m_listLoggers;
+	CList< Ref<Logger> > m_listErrorLoggers;
+	
 };
 
 SLIB_NAMESPACE_END

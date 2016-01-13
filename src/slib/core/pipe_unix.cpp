@@ -9,6 +9,7 @@
 #include "../../../inc/slib/core/pipe.h"
 
 SLIB_NAMESPACE_BEGIN
+
 sl_bool Pipe::_open(sl_pipe& hRead, sl_pipe& hWrite)
 {
 	int fd[2];
@@ -66,6 +67,7 @@ sl_int32 Pipe::write32(const void* buf, sl_uint32 size)
 	}
 	return -1;
 }
+
 SLIB_NAMESPACE_END
 
 #endif

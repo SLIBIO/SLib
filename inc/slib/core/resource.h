@@ -7,14 +7,19 @@
 #include "memory.h"
 
 SLIB_NAMESPACE_BEGIN
+
 class SLIB_EXPORT Resource
 {
 public:
 	static sl_bool isBasedOnFileSystem();
+	
 	static String getFilePath(const String& path);
 
+	
 	static Memory readAllBytes(const String& path);
+
 };
+
 SLIB_NAMESPACE_END
 
 #endif

@@ -7,10 +7,6 @@ MemoryBuffer::MemoryBuffer()
 	m_size = 0;
 }
 
-MemoryBuffer::~MemoryBuffer()
-{
-}
-
 sl_bool MemoryBuffer::add(const Memory& mem)
 {
 	ObjectLocker lock(this);
@@ -76,10 +72,6 @@ Memory MemoryBuffer::merge() const
 MemoryQueue::MemoryQueue()
 {
 	m_posCurrent = 0;
-}
-
-MemoryQueue::~MemoryQueue()
-{
 }
 
 Memory MemoryQueue::pop()

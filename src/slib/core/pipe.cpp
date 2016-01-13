@@ -57,8 +57,21 @@ PipeEvent::PipeEvent()
 	m_nSizeWritten = 0;
 }
 
-PipeEvent::~PipeEvent()
+Ref<PipeEvent> PipeEvent::create()
 {
+	Ref<Pipe> pipe = Pipe::create();
+	if (pipe.isNotNull()) {
+		Ref<PipeEvent> ret = new PipeEvent;
+		if (ret.isNotNull()) {
+			ret->m_pipe = pipe;
+#if defined(SLIB_PLATFORM_IS_UNIX)
+			File::setNonBlocking((int)(pipe->getReadHandle()), sl_true);
+			File::setNonBlocking((int)(pipe->getWriteHandle()), sl_true);
+#endif
+			return ret;
+		}
+	}
+	return Ref<PipeEvent>::null();
 }
 
 Ref<Pipe> PipeEvent::getPipe()
@@ -116,23 +129,6 @@ sl_pipe PipeEvent::getReadPipeHandle()
 sl_pipe PipeEvent::getWritePipeHandle()
 {
 	return m_pipe->getWriteHandle();
-}
-
-Ref<PipeEvent> PipeEvent::create()
-{
-	Ref<Pipe> pipe = Pipe::create();
-	if (pipe.isNotNull()) {
-		Ref<PipeEvent> ret = new PipeEvent;
-		if (ret.isNotNull()) {
-			ret->m_pipe = pipe;
-#if defined(SLIB_PLATFORM_IS_UNIX)
-			File::setNonBlocking((int)(pipe->getReadHandle()), sl_true);
-			File::setNonBlocking((int)(pipe->getWriteHandle()), sl_true);
-#endif
-			return ret;
-		}
-	}
-	return Ref<PipeEvent>::null();
 }
 
 SLIB_NAMESPACE_END

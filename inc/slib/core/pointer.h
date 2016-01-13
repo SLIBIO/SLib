@@ -805,7 +805,13 @@ public:
 	{
 		m_ptr = ptr.lock();
 	}
+	
+	SLIB_INLINE PtrLocker(const SafePtr<T>& ptr)
+	{
+		m_ptr = ptr.lock();
+	}
 
+public:
 	SLIB_INLINE void unlock()
 	{
 		m_ptr.setNull();

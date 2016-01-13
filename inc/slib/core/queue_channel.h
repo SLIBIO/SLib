@@ -2,25 +2,29 @@
 #define CHECKHEADER_SLIB_CORE_QUEUE_CHANNEL
 
 #include "definition.h"
+
 #include "queue.h"
 #include "array.h"
 
 SLIB_NAMESPACE_BEGIN
+
 template <class ITEM>
 class SLIB_EXPORT QueueChannelArray : public Object
 {
-protected:
-	typedef Ref< Queue<ITEM> > Channel;
-	Array<Channel> m_arr;
-	sl_size m_channelCurrent;
+public:
+	struct Channel
+	{
+		Ref< Queue<ITEM> > queue;
+		Mutex locker;		
+	};
 
 public:
-	QueueChannelArray()
+	SLIB_INLINE QueueChannelArray()
 	{
 		m_channelCurrent = 0;
 	}
 
-	sl_size getChannelsCount()
+	SLIB_INLINE sl_size getChannelsCount()
 	{
 		return m_arr.getCount();
 	}
@@ -42,92 +46,63 @@ public:
 		ArrayInfo<Channel> info;
 		m_arr.getInfo(info);
 		for (sl_size i = 0; i < info.count; i++) {
-			Channel channel = info.data[i];
-			if (channel.isNotNull()) {
-				count += channel->getCount();
+			Ref< Queue<ITEM> > queue(info[i].queue);
+			if (queue.isNotNull()) {
+				count += queue->getCount();
 			}
 		}
 		return count;
 	}
 
-	void clear()
+	void removeAll()
 	{
 		ArrayInfo<Channel> info;
 		m_arr.getInfo(info);
 		for (sl_size i = 0; i < info.count; i++) {
-			Channel channel = info.data[i];
-			if (channel.isNotNull()) {
-				channel->clear();
+			Ref< Queue<ITEM> > queue(info[i].queue);
+			if (queue.isNotNull()) {
+				queue->removeAll();
 			}
-		}
-	}
-
-	Channel getChannel(sl_size no)
-	{
-		ArrayInfo<Channel> info;
-		m_arr.getInfo(info);
-		if (no < info.count) {
-			Channel channel = info.data[no];
-			return channel;
-		} else {
-			return Channel::null();
-		}
-	}
-
-	Channel activateChannel(sl_size no)
-	{
-		ObjectLocker lock(this);
-		ArrayInfo<Channel> info;
-		m_arr.getInfo(info);
-		if (no < info.count) {
-			Channel channel = info.data[no];
-			if (channel.isNull()) {
-				channel = new Queue<ITEM>;
-				info.data[no] = channel;
-			}
-			return channel;
-		} else {
-			return Channel::null();
 		}
 	}
 
 	Link<ITEM>* pushBack(sl_size channelNo, const ITEM& value, sl_size countLimit = 0)
 	{
-		Channel channel = activateChannel(channelNo);
-		if (channel.isNotNull()) {
-			return channel->pushBack(value, countLimit);
+		Ref< Queue<ITEM> > queue(_activateChannelQueue(channelNo));
+		if (queue.isNotNull()) {
+			return queue->pushBack(value, countLimit);
 		}
 		return sl_null;
 	}
 
-	sl_bool popBack(sl_size channelNo, ITEM* out = sl_null)
+	sl_bool popBack(sl_size channelNo, ITEM* _out = sl_null)
 	{
-		Channel channel = getChannel(channelNo);
-		if (channel.isNotNull()) {
-			return channel->popBack(out);
+		Ref< Queue<ITEM> > queue(_getChannelQueue(channelNo));
+		if (queue.isNotNull()) {
+			return queue->popBack(_out);
 		}
 		return sl_false;
 	}
 
 	Link<ITEM>* pushFront(sl_size channelNo, const ITEM& value, sl_size countLimit = 0)
 	{
-		Channel channel = activateChannel(channelNo);
-		if (channel.isNotNull()) {
-			return channel->pushFront(value, countLimit);
+		Ref< Queue<ITEM> > queue(_activateChannelQueue(channelNo));
+		if (queue.isNotNull()) {
+			return queue->pushFront(value, countLimit);
 		}
 		return sl_null;
 	}
 
-	sl_bool popFront(sl_size channelNo, ITEM* out = sl_null)
+	sl_bool popFront(sl_size channelNo, ITEM* _out = sl_null)
 	{
-		Channel channel = getChannel(channelNo);
-		if (channel.isNotNull()) {
-			return channel->popFront(out);
+		Ref< Queue<ITEM> > queue(_getChannelQueue(channelNo));
+		if (queue.isNotNull()) {
+			return queue->popFront(_out);
 		}
 		return sl_false;
 	}
 
-	sl_bool popBack(ITEM* out = sl_null)
+	sl_bool popBack(ITEM* _out = sl_null)
 	{
 		ArrayInfo<Channel> info;
 		m_arr.getInfo(info);
@@ -140,9 +115,9 @@ public:
 			if (no >= info.count) {
 				no = 0;
 			}
-			Channel channel = info.data[no];
-			if (channel.isNotNull()) {
-				if (channel->popBack(out)) {
+			Ref< Queue<ITEM> > queue(info[no].queue);
+			if (queue.isNotNull()) {
+				if (queue->popBack(_out)) {
 					m_channelCurrent = no;
 					return sl_true;
 				}
@@ -152,7 +127,7 @@ public:
 		return sl_false;
 	}
 
-	sl_bool popFront(ITEM* out = sl_null)
+	sl_bool popFront(ITEM* _out = sl_null)
 	{
 		ArrayInfo<Channel> info;
 		m_arr.getInfo(info);
@@ -165,9 +140,9 @@ public:
 			if (no >= info.count) {
 				no = 0;
 			}
-			Channel channel = info.data[no];
-			if (channel.isNotNull()) {
-				if (channel->popFront(out)) {
+			Ref< Queue<ITEM> > queue(info[no].queue);
+			if (queue.isNotNull()) {
+				if (queue->popFront(_out)) {
 					m_channelCurrent = no;
 					return sl_true;
 				}
@@ -176,6 +151,37 @@ public:
 		m_channelCurrent = no;
 		return sl_false;
 	}
+
+protected:
+	Ref< Queue<ITEM> > _getChannelQueue(sl_size no)
+	{
+		ArrayInfo<Channel> info;
+		m_arr.getInfo(info);
+		if (no < info.count) {
+			return info[no].queue;
+		}
+		return Ref< Queue<ITEM> >::null();
+	}
+	
+	Ref< Queue<ITEM> > _activateChannelQueue(sl_size no)
+	{
+		ArrayInfo<Channel> info;
+		m_arr.getInfo(info);
+		if (no < info.count) {
+			Channel& channel = info[no];
+			MutexLocker lock(&(channel.locker));
+			if (channel.queue.isNull()) {
+				channel.queue = new Queue<ITEM>;
+			}
+			return channel.queue;
+		}
+		return Ref< Queue<ITEM> >::null();
+	}
+	
+protected:
+	SafeArray<Channel> m_arr;
+	sl_size m_channelCurrent;
+
 };
 
 SLIB_NAMESPACE_END

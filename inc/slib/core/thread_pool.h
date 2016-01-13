@@ -18,6 +18,7 @@ public:
 public:
 	static Ref<ThreadPool> create(sl_uint32 minThreads = 0, sl_uint32 maxThreads = 30);
 
+public:
 	void release();
 	sl_bool isRunning();
 	
@@ -34,7 +35,7 @@ protected:
 	void onRunWorker();
 
 protected:
-	List< Ref<Thread> > m_threadWorkers;
+	CList< Ref<Thread> > m_threadWorkers;
 	Queue< Ref<Runnable> > m_tasks;
 
 	sl_bool m_flagRunning;

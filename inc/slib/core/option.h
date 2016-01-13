@@ -40,6 +40,7 @@
 #define SLIB_COMPILER_VISUALSTUDIO_10		0x000100A0
 #define SLIB_COMPILER_VISUALSTUDIO_11		0x000100B0
 #define SLIB_COMPILER_VISUALSTUDIO_12		0x000100C0
+
 /*************************************
 	Platform Definition
 **************************************/
@@ -241,9 +242,6 @@
 #		define SLIB_ARCH_IS_X86
 #	elif (defined(_M_X64) || defined(_M_AMD64))  // AMD64(x86_64)
 #		define SLIB_ARCH_IS_X64
-#	endif
-#	ifdef SLIB_PLATFORM_IS_WP8
-#		define SLIB_ARCH_IS_32BIT
 #	endif
 #	ifdef SLIB_PLATFORM_IS_WIN64
 #		define SLIB_ARCH_IS_64BIT

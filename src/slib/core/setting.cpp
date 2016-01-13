@@ -25,6 +25,7 @@ sl_bool IniSetting::parseFromText(const String& text)
 	sl_int32 indexAssign = -1;
 	sl_int32 indexComment = -1;
 	sl_int32 indexStart = 0;
+	ObjectLocker lock(&m_mapValues);
 	for (sl_uint32 i = 0; i <= len; i++) {
 		sl_char16 ch = buf[i];
 		if (ch == '=') {
@@ -44,7 +45,7 @@ sl_bool IniSetting::parseFromText(const String& text)
 				} else {
 					value = String(buf + indexAssign + 1, indexComment - indexAssign - 1).trim();
 				}
-				m_mapValues.put(key, value);
+				m_mapValues.put_NoLock(key, value);
 			}
 			indexAssign = -1;
 			indexComment = -1;

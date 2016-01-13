@@ -6,6 +6,7 @@
 #include "../../../inc/slib/core/scoped_pointer.h"
 
 SLIB_NAMESPACE_BEGIN
+
 String Windows::getStringFromGUID(const GUID& guid)
 {
 	String ret;
@@ -293,4 +294,5 @@ LOAD_LIBRARY(kernel32, "kernel32.dll")
 GET_API(kernel32, GetQueuedCompletionStatusEx)
 
 SLIB_NAMESPACE_END
+
 #endif

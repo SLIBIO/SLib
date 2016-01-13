@@ -2,16 +2,15 @@
 #define CHECKHEADER_SLIB_CORE_SCOPED_POINTER
 
 #include "definition.h"
+
 #include "base.h"
 
 SLIB_NAMESPACE_BEGIN
+
 template <class TYPE>
 class SLIB_EXPORT ScopedPtr
 {
 	SLIB_DECLARE_CLASS_NOCOPY(ScopedPtr)
-protected:
-	TYPE* m_ptr;
-
 public:
 	SLIB_INLINE ScopedPtr()
 	{
@@ -28,6 +27,7 @@ public:
 		release();
 	}
 
+public:
 	SLIB_INLINE void release()
 	{
 		if (m_ptr) {
@@ -71,14 +71,17 @@ public:
 	{
 		return (m_ptr);
 	}
-
+	
+protected:
+	TYPE* m_ptr;
+	
 };
 
 template <class TYPE>
 class SLIB_EXPORT ScopedPtrNew : public ScopedPtr<TYPE>
 {
 public:
-	ScopedPtrNew() : ScopedPtr<TYPE>(new TYPE)
+	SLIB_INLINE ScopedPtrNew() : ScopedPtr<TYPE>(new TYPE)
 	{
 	}
 	
@@ -98,10 +101,6 @@ template <class TYPE>
 class SLIB_EXPORT ScopedArray
 {
 	SLIB_DECLARE_CLASS_NOCOPY(ScopedArray)
-protected:
-	TYPE* m_ptr;
-	sl_size m_size;
-
 public:
 	SLIB_INLINE ScopedArray()
 	{
@@ -126,6 +125,7 @@ public:
 		release();
 	}
 
+public:
 	SLIB_INLINE void release()
 	{
 		if (m_ptr) {
@@ -174,6 +174,11 @@ public:
 	{
 		return getBuffer() + offset;
 	}
+	
+protected:
+	TYPE* m_ptr;
+	sl_size m_size;
+
 };
 
 #define SLIB_SCOPED_ARRAY(TYPE, NAME, SIZE) \
@@ -185,11 +190,6 @@ template <class TYPE, sl_size sizeStack = 0>
 class SLIB_EXPORT ScopedBuffer
 {
 	SLIB_DECLARE_CLASS_NOCOPY(ScopedBuffer)
-protected:
-	TYPE* m_ptr;
-	TYPE m_stack[sizeStack];
-	sl_size m_size;
-
 public:
 	SLIB_INLINE ScopedBuffer(sl_size size)
 	{
@@ -206,6 +206,7 @@ public:
 		release();
 	}
 
+public:
 	SLIB_INLINE void release()
 	{
 		if (m_ptr) {
@@ -245,6 +246,12 @@ public:
 	{
 		return getBuffer() + offset;
 	}
+	
+protected:
+	TYPE* m_ptr;
+	TYPE m_stack[sizeStack];
+	sl_size m_size;
+	
 };
 
 #define SLIB_SCOPED_BUFFER(TYPE, STACK, NAME, SIZE) \

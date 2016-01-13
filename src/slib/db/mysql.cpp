@@ -51,7 +51,7 @@ void MySQL_Database::initThread()
 		if (ref.isNull()) {
 			ref = new _MySQL_Database_ThreadHandler;
 			if (ref.isNotNull()) {
-				thread->attachObject("MYSQL", ref);
+				thread->attachObject("MYSQL", ref.get());
 			}
 		}
 	}

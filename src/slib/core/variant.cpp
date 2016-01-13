@@ -58,12 +58,34 @@ Variant::~Variant()
 	_free(m_type, m_value);
 }
 
+Variant& Variant::operator=(Variant&& other)
+{
+	if (this != &other) {
+		_free(m_type, m_value);
+		m_type = other.m_type;
+		m_value = other.m_value;
+		other.m_type = typeNull;
+	}
+	return *this;
+}
+
 Variant& Variant::operator=(const Variant& other)
 {
 	if (this != &other) {
 		_free(m_type, m_value);
 		m_type = other.m_type;
 		_copy(m_type, other.m_value, m_value);
+	}
+	return *this;
+}
+
+Variant& Variant::operator=(SafeVariant&& other)
+{
+	if ((void*)this != (void*)(&other)) {
+		_free(m_type, m_value);
+		m_type = other.m_type;
+		m_value = other.m_value;
+		other.m_type = typeNull;
 	}
 	return *this;
 }
@@ -148,6 +170,15 @@ SafeVariant::~SafeVariant()
 	Variant::_free(m_type, m_value);
 }
 
+SafeVariant& SafeVariant::operator=(SafeVariant&& other)
+{
+	if (this != &other) {
+		_replace(other.m_type, other.m_value);
+		other.m_type = Variant::typeNull;
+	}
+	return *this;
+}
+
 SafeVariant& SafeVariant::operator=(const SafeVariant& other)
 {
 	if (this != &other) {
@@ -155,6 +186,15 @@ SafeVariant& SafeVariant::operator=(const SafeVariant& other)
 		sl_uint64 value;
 		other._retain(type, value);
 		_replace(type, value);
+	}
+	return *this;
+}
+
+SafeVariant& SafeVariant::operator=(Variant&& other)
+{
+	if ((void*)this != (void*)(&other)) {
+		_replace(other.m_type, other.m_value);
+		other.m_type = Variant::typeNull;
 	}
 	return *this;
 }

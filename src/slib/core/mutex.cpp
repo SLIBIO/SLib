@@ -1,88 +1,74 @@
 #include "../../../inc/slib/core/base.h"
 #include "../../../inc/slib/core/mutex.h"
 
-/******************************
-*	Mutex
-******************************/
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 #include <windows.h>
-SLIB_NAMESPACE_BEGIN
-Mutex::Mutex()
-{
-	m_pObject = Base::createMemory(sizeof(CRITICAL_SECTION));
-#if defined(SLIB_PLATFORM_IS_DESKTOP)
-	InitializeCriticalSection((PCRITICAL_SECTION)m_pObject);
-#elif defined(SLIB_PLATFORM_IS_MOBILE)
-	InitializeCriticalSectionEx((PCRITICAL_SECTION)m_pObject, NULL, NULL);
-#endif
-}
-
-Mutex::~Mutex()
-{
-	DeleteCriticalSection((PCRITICAL_SECTION)m_pObject);
-	Base::freeMemory(m_pObject);
-}
-
-void Mutex::lock() const
-{
-	EnterCriticalSection((PCRITICAL_SECTION)m_pObject);
-}
-
-sl_bool Mutex::tryLock() const
-{
-	return TryEnterCriticalSection((PCRITICAL_SECTION)m_pObject) != 0;
-}
-
-void Mutex::unlock() const
-{
-	LeaveCriticalSection((PCRITICAL_SECTION)m_pObject);
-}
-SLIB_NAMESPACE_END
-
 #elif defined(SLIB_PLATFORM_IS_UNIX)
-
 #include <pthread.h>
 #include <time.h>
 #include <sys/time.h>
+#endif
 
 SLIB_NAMESPACE_BEGIN
 
-Mutex::Mutex()
+void Mutex::_init()
 {
+#if defined(SLIB_PLATFORM_IS_WINDOWS)
+	m_pObject = Base::createMemory(sizeof(CRITICAL_SECTION));
+#	if defined(SLIB_PLATFORM_IS_DESKTOP)
+	InitializeCriticalSection((PCRITICAL_SECTION)m_pObject);
+#	elif defined(SLIB_PLATFORM_IS_MOBILE)
+	InitializeCriticalSectionEx((PCRITICAL_SECTION)m_pObject, NULL, NULL);
+#	endif
+#elif defined(SLIB_PLATFORM_IS_UNIX)
 	m_pObject = Base::createMemory(sizeof(pthread_mutex_t));
 	pthread_mutexattr_t attr;
 	pthread_mutexattr_init(&attr);
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
 	pthread_mutex_init((pthread_mutex_t*)(m_pObject), &attr);
 	pthread_mutexattr_destroy(&attr);
+#endif
 }
 
-Mutex::~Mutex()
+void Mutex::_free()
 {
+#if defined(SLIB_PLATFORM_IS_WINDOWS)
+	DeleteCriticalSection((PCRITICAL_SECTION)m_pObject);
+	Base::freeMemory(m_pObject);
+#elif defined(SLIB_PLATFORM_IS_UNIX)
 	pthread_mutex_destroy((pthread_mutex_t*)(m_pObject));
 	Base::freeMemory(m_pObject);
-}
-
-void Mutex::lock() const 
-{
-	pthread_mutex_lock((pthread_mutex_t*)(m_pObject));
-}
-
-sl_bool Mutex::tryLock() const 
-{
-	return pthread_mutex_trylock((pthread_mutex_t*)(m_pObject)) == 0;
-}
-
-void Mutex::unlock() const 
-{
-	pthread_mutex_unlock((pthread_mutex_t*)(m_pObject));
-}
-SLIB_NAMESPACE_END
-
 #endif
+}
+
+void Mutex::lock() const
+{
+#if defined(SLIB_PLATFORM_IS_WINDOWS)
+	EnterCriticalSection((PCRITICAL_SECTION)m_pObject);
+#elif defined(SLIB_PLATFORM_IS_UNIX)
+	pthread_mutex_lock((pthread_mutex_t*)(m_pObject));
+#endif
+}
+
+sl_bool Mutex::tryLock() const
+{
+#if defined(SLIB_PLATFORM_IS_WINDOWS)
+	return TryEnterCriticalSection((PCRITICAL_SECTION)m_pObject) != 0;
+#elif defined(SLIB_PLATFORM_IS_UNIX)
+	return pthread_mutex_trylock((pthread_mutex_t*)(m_pObject)) == 0;
+#endif
+}
+
+void Mutex::unlock() const
+{
+#if defined(SLIB_PLATFORM_IS_WINDOWS)
+	LeaveCriticalSection((PCRITICAL_SECTION)m_pObject);
+#elif defined(SLIB_PLATFORM_IS_UNIX)
+	pthread_mutex_unlock((pthread_mutex_t*)(m_pObject));
+#endif
+}
 
 
-SLIB_NAMESPACE_BEGIN
 void MutexLocker::lock(const Mutex* mutex)
 {
 	if (m_count > 0) {
@@ -94,6 +80,7 @@ void MutexLocker::lock(const Mutex* mutex)
 		mutex->lock();
 	}
 }
+
 void MutexLocker::lock(const Mutex* mutex1, const Mutex* mutex2)
 {
 	if (m_count > 0) {

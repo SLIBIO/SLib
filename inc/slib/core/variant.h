@@ -42,17 +42,28 @@ public:
 		typeWeak = 30,
 	};
 
-private:
-	sl_uint64 m_value;
-	Type m_type;
-
 public:
 	SLIB_INLINE Variant()
 	{
 		m_type = typeNull;
 	}
-
+	
+	SLIB_INLINE Variant(Variant&& other)
+	{
+		m_type = other.m_type;
+		m_value = other.m_value;
+		other.m_type = typeNull;
+	}
+	
 	Variant(const Variant& other);
+	
+	SLIB_INLINE Variant(SafeVariant&& _other)
+	{
+		Variant& other = *((Variant*)((void*)(&_other)));
+		m_type = other.m_type;
+		m_value = other.m_value;
+		other.m_type = typeNull;
+	}
 	
 	Variant(const SafeVariant& other);
 
@@ -346,7 +357,11 @@ public:
 	}
 	
 public:
+	Variant& operator=(Variant&& other);
+	
 	Variant& operator=(const Variant& other);
+	
+	Variant& operator=(SafeVariant&& other);
 	
 	Variant& operator=(const SafeVariant& other);
 	
@@ -922,6 +937,10 @@ public:
 
 	
 private:
+	sl_uint64 m_value;
+	Type m_type;
+	
+private:
 	static void _copy(Type src_type, sl_uint64 src_value, sl_uint64& dst_value);
 	
 	static void _free(Type type, sl_uint64 value);
@@ -932,18 +951,27 @@ private:
 
 class SLIB_EXPORT SafeVariant
 {
-private:
-	sl_uint64 m_value;
-	Variant::Type m_type;
-	SpinLock m_lock;
-	
 public:
 	SLIB_INLINE SafeVariant()
 	{
 		m_type = Variant::typeNull;
 	}
 	
+	SLIB_INLINE SafeVariant(SafeVariant&& other)
+	{
+		m_type = other.m_type;
+		m_value = other.m_value;
+		other.m_type = Variant::typeNull;
+	}
+	
 	SafeVariant(const SafeVariant& other);
+	
+	SLIB_INLINE SafeVariant(Variant&& other)
+	{
+		m_type = other.m_type;
+		m_value = other.m_value;
+		other.m_type = Variant::typeNull;
+	}
 	
 	SafeVariant(const Variant& other);
 	
@@ -1117,7 +1145,11 @@ public:
 	}
 	
 public:
+	SafeVariant& operator=(SafeVariant&& other);
+	
 	SafeVariant& operator=(const SafeVariant& other);
+	
+	SafeVariant& operator=(Variant&& other);
 	
 	SafeVariant& operator=(const Variant& other);
 	
@@ -1589,6 +1621,11 @@ public:
 		return var.toJSON();
 	}
 	
+private:
+	sl_uint64 m_value;
+	Variant::Type m_type;
+	SpinLock m_lock;
+
 private:
 	void _retain(Variant::Type& type, sl_uint64& value) const;
 	

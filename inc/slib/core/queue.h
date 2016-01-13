@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_CORE_QUEUE
 
 #include "definition.h"
+
 #include "object.h"
 #include "list.h"
 #include "array.h"
@@ -20,11 +21,6 @@ template <class TYPE, class COMPARE = Compare<TYPE> >
 class SLIB_EXPORT LinkedList : public Object
 {
 	SLIB_DECLARE_OBJECT(LinkedList, Object)
-protected:
-	Link<TYPE>* m_begin;
-	Link<TYPE>* m_end;
-	sl_size m_count;
-	
 public:
 	SLIB_INLINE LinkedList()
 	{
@@ -38,6 +34,7 @@ public:
 		removeAll();
 	}
 
+public:
 	SLIB_INLINE void init(Link<TYPE>* begin, Link<TYPE>* end, sl_size count)
 	{
 		m_begin = begin;
@@ -74,56 +71,71 @@ public:
 	{
 		return m_begin != sl_null;
 	}
+	
+public:
+	static void freeLink(Link<TYPE>* link)
+	{
+		while (link) {
+			Link<TYPE>* next = link->next;
+			_freeItem(link);
+			link = next;
+		}
+	}
+
+	void removeAll_NoLock()
+	{
+		Link<TYPE>* now = m_begin;
+		_init();
+		freeLink(now);
+	}
 
 	void removeAll()
 	{
-		ObjectLocker lock(this);
-		Link<TYPE>* now = m_begin;
-		_clear();
-		lock.unlock();
-		while (now) {
-			Link<TYPE>* next = now->next;
-			_freeItem(now);
-			now = next;
+		Link<TYPE>* now;
+		{
+			ObjectLocker lock(this);
+			now = m_begin;
+			_init();
 		}
-	}
-
-	sl_bool getFirstElement(TYPE* out) const
-	{
-		ObjectLocker lock(this);
-		if (m_begin) {
-			*out = m_begin->value;
-			return sl_true;
-		} else {
-			return sl_false;
-		}
-	}
-
-	sl_bool getLastElement(TYPE* out) const
-	{
-		ObjectLocker lock(this);
-		if (m_end) {
-			*out = m_end->value;
-			return sl_true;
-		} else {
-			return sl_false;
-		}
+		freeLink(now);
 	}
 	
-	Link<TYPE>* pushBack(const TYPE& value, sl_size countLimit = 0)
+	
+	SLIB_INLINE sl_bool getFirstElement_NoLock(TYPE* _out) const
 	{
-		Link<TYPE>* item = _createItem(value);
-		if (!item) {
-			return sl_null;
+		if (m_begin) {
+			if (_out) {
+				*_out = m_begin->value;
+			}
+			return sl_true;
 		}
-		ObjectLocker lock(this);
-		Link<TYPE>* old = _pushBackItem(item, countLimit);
-		lock.unlock();
-		if (old) {
-			_freeItem(old);
-		}
-		return item;
+		return sl_false;
 	}
+
+	sl_bool getFirstElement(TYPE* _out) const
+	{
+		ObjectLocker lock(this);
+		return getFirstElement_NoLock(_out);
+	}
+	
+
+	SLIB_INLINE sl_bool getLastElement_NoLock(TYPE* _out) const
+	{
+		if (m_end) {
+			if (_out) {
+				*_out = m_end->value;
+			}
+			return sl_true;
+		}
+		return sl_false;
+	}
+	
+	sl_bool getLastElement(TYPE* _out) const
+	{
+		ObjectLocker lock(this);
+		return getLastElement_NoLock(_out);
+	}
+	
 	
 	Link<TYPE>* pushBack_NoLock(const TYPE& value, sl_size countLimit = 0)
 	{
@@ -138,21 +150,23 @@ public:
 		return item;
 	}
 
-	sl_bool popBack(TYPE* _out = sl_null)
+	Link<TYPE>* pushBack(const TYPE& value, sl_size countLimit = 0)
 	{
-		ObjectLocker lock(this);
-		Link<TYPE>* old = _popBackItem();
-		lock.unlock();
-		if (old) {
-			if (_out) {
-				*_out = old->value;
-			}
-			_freeItem(old);
-			return sl_true;
-		} else {
-			return sl_false;
+		Link<TYPE>* item = _createItem(value);
+		if (!item) {
+			return sl_null;
 		}
+		Link<TYPE>* old;
+		{
+			ObjectLocker lock(this);
+			old = _pushBackItem(item, countLimit);
+		}
+		if (old) {
+			_freeItem(old);
+		}
+		return item;
 	}
+	
 	
 	sl_bool popBack_NoLock(TYPE* _out = sl_null)
 	{
@@ -168,20 +182,24 @@ public:
 		}
 	}
 
-	Link<TYPE>* pushFront(const TYPE& value, sl_size countLimit = 0)
+	sl_bool popBack(TYPE* _out = sl_null)
 	{
-		Link<TYPE>* item = _createItem(value);
-		if (!item) {
-			return sl_null;
+		Link<TYPE>* old;
+		{
+			ObjectLocker lock(this);
+			old = _popBackItem();
 		}
-		ObjectLocker lock(this);
-		Link<TYPE>* old = _pushFrontItem(item, countLimit);
-		lock.unlock();
 		if (old) {
+			if (_out) {
+				*_out = old->value;
+			}
 			_freeItem(old);
+			return sl_true;
+		} else {
+			return sl_false;
 		}
-		return item;
 	}
+	
 	
 	Link<TYPE>* pushFront_NoLock(const TYPE& value, sl_size countLimit = 0)
 	{
@@ -195,22 +213,24 @@ public:
 		}
 		return item;
 	}
-	
-	sl_bool popFront(TYPE* _out = sl_null)
+
+	Link<TYPE>* pushFront(const TYPE& value, sl_size countLimit = 0)
 	{
-		ObjectLocker lock(this);
-		Link<TYPE>* old = _popFrontItem();
-		lock.unlock();
-		if (old) {
-			if (_out) {
-				*_out = old->value;
-			}
-			_freeItem(old);
-			return sl_true;
-		} else {
-			return sl_false;
+		Link<TYPE>* item = _createItem(value);
+		if (!item) {
+			return sl_null;
 		}
+		Link<TYPE>* old;
+		{
+			ObjectLocker lock(this);
+			old = _pushFrontItem(item, countLimit);
+		}
+		if (old) {
+			_freeItem(old);
+		}
+		return item;
 	}
+	
 	
 	sl_bool popFront_NoLock(TYPE* _out = sl_null)
 	{
@@ -226,77 +246,104 @@ public:
 		}
 	}
 
-	void removeItem(Link<TYPE>* item)
+	sl_bool popFront(TYPE* _out = sl_null)
+	{
+		Link<TYPE>* old;
+		{
+			ObjectLocker lock(this);
+			old = _popFrontItem();
+		}
+		if (old) {
+			if (_out) {
+				*_out = old->value;
+			}
+			_freeItem(old);
+			return sl_true;
+		} else {
+			return sl_false;
+		}
+	}
+	
+	
+	void removeItem_NoLock(Link<TYPE>* item)
 	{
 		if (item) {
-			ObjectLocker lock(this);
-			m_count--;
-			Link<TYPE>* before = item->before;
-			Link<TYPE>* next = item->next;
-			if (before) {
-				before->next = next;
-			} else {
-				m_begin = next;
-			}
-			if (next) {
-				next->before = before;
-			} else {
-				m_end = before;
-			}
-			lock.unlock();
+			_removeItem(item);
 			_freeItem(item);
 		} else {
 			SLIB_ABORT("Trying to free null item");
 		}
 	}
 
-	Link<TYPE>* insertBefore(Link<TYPE>* item, const TYPE& value)
+	void removeItem(Link<TYPE>* item)
 	{
 		if (item) {
-			Link<TYPE>* newItem = _createItem(value);
-			if (!newItem) {
-				return sl_null;
+			{
+				ObjectLocker lock(this);
+				_removeItem(item);
 			}
-			ObjectLocker lock(this);
-			newItem->next = item;
-			Link<TYPE>* before = item->before;
-			newItem->before = before;
-			item->before = newItem;
-			if (before) {
-				before->next = newItem;
-			} else {
-				m_begin = newItem;
+			_freeItem(item);
+		} else {
+			SLIB_ABORT("Trying to free null item");
+		}
+	}
+
+
+	Link<TYPE>* insertBefore_NoLock(Link<TYPE>* itemWhere, const TYPE& value)
+	{
+		if (itemWhere) {
+			Link<TYPE>* itemNew = _createItem(value);
+			if (itemNew) {
+				_insertBefore(itemWhere, itemNew);
 			}
-			m_count++;
-			return newItem;
+			return itemNew;
+		} else {
+			return pushFront_NoLock(value);
+		}
+	}
+
+	Link<TYPE>* insertBefore(Link<TYPE>* itemWhere, const TYPE& value)
+	{
+		if (itemWhere) {
+			Link<TYPE>* itemNew = _createItem(value);
+			if (itemNew) {
+				ObjectLocker lock(this);
+				_insertBefore(itemWhere, itemNew);
+			}
+			return itemNew;
 		} else {
 			return pushFront(value);
 		}
 	}
+	
 
-	Link<TYPE>* insertAfter(Link<TYPE>* item, const TYPE& value)
+	Link<TYPE>* insertAfter_NoLock(Link<TYPE>* itemWhere, const TYPE& value)
 	{
-		if (item) {
-			Link<TYPE>* newItem = _createItem(value);
-			if (!newItem) {
-				return sl_null;
+		if (itemWhere) {
+			Link<TYPE>* itemNew = _createItem(value);
+			if (itemNew) {
+				_insertAfter(itemWhere, itemNew);
 			}
-			ObjectLocker lock(this);
-			newItem->before = item;
-			Link<TYPE>* next = item->next;
-			newItem->next = next;
-			item->next = newItem;
-			if (next) {
-				next->before = newItem;
-			} else {
-				m_end = newItem;
-			}
-			m_count++;
-			return newItem;
+			return itemNew;
 		} else {
-			return pushBack(value);
+			return pushBack_NoLock(value);
 		}
 	}
+	
+	Link<TYPE>* insertAfter(Link<TYPE>* itemWhere, const TYPE& value)
+	{
+		if (itemWhere) {
+			Link<TYPE>* itemNew = _createItem(value);
+			if (itemNew) {
+				ObjectLocker lock(this);
+				_insertAfter(itemWhere, itemNew);
+			}
+			return itemNew;
+		} else {
+			return pushBack_NoLock(value);
+		}
+	}
+
 
 	template <class _COMPARE>
 	void merge(LinkedList<TYPE, _COMPARE>* other)
@@ -316,15 +363,15 @@ public:
 				m_begin = _begin;
 			}
 			m_end = _end;
-			other->_clear();
+			((LinkedList<TYPE, COMPARE>*)((void*)other))->_init();
 			m_count = countNew;
 		}
 	}
 	
-	Array<TYPE> toArray() const
+	
+	Array<TYPE> toArray_NoLock() const
 	{
 		Array<TYPE> ret;
-		ObjectLocker lock(this);
 		if (m_count) {
 			ret = Array<TYPE>::create(m_count);
 			if (ret.isNotNull()) {
@@ -339,15 +386,20 @@ public:
 		}
 		return ret;
 	}
+	
+	Array<TYPE> toArray() const
+	{
+		ObjectLocker lock(this);
+		return toArray_NoLock();
+	}
 
-	List<TYPE> toList() const
+	List<TYPE> toList_NoLock() const
 	{
 		List<TYPE> ret;
-		ObjectLocker lock(this);
 		if (m_count) {
 			ret = List<TYPE>::create(m_count);
 			if (ret.isNotNull()) {
-				ListLocker<TYPE> list(ret);
+				ListItems<TYPE> list(ret);
 				sl_size index = 0;
 				Link<TYPE>* now = m_begin;
 				while (now) {
@@ -359,10 +411,16 @@ public:
 		}
 		return ret;
 	}
-
-	Link<TYPE>* findValue(const TYPE& value) const
+	
+	List<TYPE> toList() const
 	{
 		ObjectLocker lock(this);
+		return toList_NoLock();
+	}
+
+
+	Link<TYPE>* findValue_NoLock(const TYPE& value) const
+	{
 		Link<TYPE>* now = m_begin;
 		while (now) {
 			if (COMPARE::equals(value, now->value)) {
@@ -372,16 +430,22 @@ public:
 		}
 		return sl_null;
 	}
-
-	sl_bool removeValue(const TYPE& value, sl_bool flagAllValues = sl_false)
+	
+	Link<TYPE>* findValue(const TYPE& value) const
 	{
 		ObjectLocker lock(this);
+		return findValue_NoLock(value);
+	}
+
+
+	sl_bool removeValue_NoLock(const TYPE& value, sl_bool flagAllValues = sl_false)
+	{
 		Link<TYPE>* now = m_begin;
 		sl_bool bRet = sl_false;
 		while (now) {
 			Link<TYPE>* next = now->next;
 			if (COMPARE::equals(value, now->value)) {
-				removeItem(now);
+				removeItem_NoLock(now);
 				if (!flagAllValues) {
 					return sl_true;
 				}
@@ -391,7 +455,13 @@ public:
 		}
 		return bRet;
 	}
-
+	
+	sl_bool removeValue(const TYPE& value, sl_bool flagAllValues = sl_false)
+	{
+		ObjectLocker lock(this);
+		return removeValue_NoLock(value, flagAllValues);
+	}
+	
 protected:
 	SLIB_INLINE static Link<TYPE>* _createItem(const TYPE& value)
 	{
@@ -486,12 +556,62 @@ protected:
 		return begin;
 	}
 	
-public:
-	SLIB_INLINE void _clear()
+	SLIB_INLINE void _removeItem(Link<TYPE>* item)
+	{
+		m_count--;
+		Link<TYPE>* before = item->before;
+		Link<TYPE>* next = item->next;
+		if (before) {
+			before->next = next;
+		} else {
+			m_begin = next;
+		}
+		if (next) {
+			next->before = before;
+		} else {
+			m_end = before;
+		}
+	}
+	
+	SLIB_INLINE void _insertBefore(Link<TYPE>* itemWhere, Link<TYPE>* itemNew)
+	{
+		itemNew->next = itemWhere;
+		Link<TYPE>* before = itemWhere->before;
+		itemNew->before = before;
+		itemWhere->before = itemNew;
+		if (before) {
+			before->next = itemNew;
+		} else {
+			m_begin = itemNew;
+		}
+		m_count++;
+	}
+	
+	SLIB_INLINE void _insertAfter(Link<TYPE>* itemWhere, Link<TYPE>* itemNew)
+	{
+		itemNew->before = itemWhere;
+		Link<TYPE>* next = itemWhere->next;
+		itemNew->next = next;
+		itemWhere->next = itemNew;
+		if (next) {
+			next->before = itemNew;
+		} else {
+			m_end = itemNew;
+		}
+		m_count++;
+	}
+
+	SLIB_INLINE void _init()
 	{
 		m_begin = sl_null;
 		m_end = sl_null;
 	}
+	
+protected:
+	Link<TYPE>* m_begin;
+	Link<TYPE>* m_end;
+	sl_size m_count;
+
 };
 
 template <class TYPE, class COMPARE = Compare<TYPE> >
@@ -549,13 +669,6 @@ template <class TYPE>
 class SLIB_EXPORT LoopQueue : public Object
 {
 	SLIB_DECLARE_OBJECT(LoopQueue, Object)
-private:
-	TYPE* m_data;
-	sl_size m_size;
-	sl_size m_first;
-	sl_size m_count;
-	sl_size m_latency;
-	
 public:
 	LoopQueue(sl_size size = 10, sl_size latency = 0)
 	{
@@ -572,20 +685,10 @@ public:
 
 	~LoopQueue()
 	{
-		removeAll();
+		_release();
 	}
 
-	void release() {
-		ObjectLocker lock(this);
-		if (m_data) {
-			delete[] m_data;
-			m_data = sl_null;
-		}
-		m_size = 0;
-		m_first = 0;
-		m_count = 0;
-	}
-	
+public:
 	SLIB_INLINE sl_size getQueueSize()
 	{
 		return m_size;
@@ -594,7 +697,7 @@ public:
 	sl_bool setQueueSize(sl_size size)
 	{
 		ObjectLocker lock(this);
-		release();
+		_release();
 		m_data = new TYPE[size];
 		if (m_data) {
 			m_first = 0;
@@ -755,7 +858,24 @@ public:
 		}
 		return count;
 	}
+
+protected:
+	void _release() {
+		if (m_data) {
+			delete[] m_data;
+			m_data = sl_null;
+		}
+	}
+	
+protected:
+	TYPE* m_data;
+	sl_size m_size;
+	sl_size m_first;
+	sl_size m_count;
+	sl_size m_latency;
+
 };
+
 SLIB_NAMESPACE_END
 
 #endif

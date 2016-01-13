@@ -136,11 +136,6 @@ public: \
 	{ \
 	} \
 	template <class _T> \
-	SLIB_INLINE CLASS_NAME(slib::Ref<_T>&& object) \
-	{ \
-		m_object._setObject(object._move()); \
-	} \
-	template <class _T> \
 	SLIB_INLINE CLASS_NAME(const slib::Ref<_T>& object) : m_object(object) \
 	{ \
 	} \
@@ -209,11 +204,20 @@ public: \
 	} \
 	SLIB_INLINE CLASS_NAME(TYPE&& other) \
 	{ \
-		m_object._setObject(other.m_object._move()); \
+		m_object._move_init(&other); \
 	} \
 	SLIB_INLINE TYPE& operator=(TYPE&& other) \
 	{ \
-		m_object._replaceObject(other.m_object._move()); \
+		m_object._move_assign(&other); \
+		return *this; \
+	} \
+	SLIB_INLINE CLASS_NAME(SAFE_TYPE&& other) \
+	{ \
+		m_object._move_init(&other); \
+	} \
+	SLIB_INLINE TYPE& operator=(SAFE_TYPE&& other) \
+	{ \
+		m_object._move_assign(&other); \
 		return *this; \
 	} \
 	SLIB_INLINE CLASS_NAME(const SAFE_TYPE& other) : m_object(*((slib::SafeRef<OBJ>*)((void*)&other))) \
@@ -262,13 +266,22 @@ public: \
 	{ \
 		return m_object; \
 	} \
+	SLIB_INLINE CLASS_NAME(SAFE_TYPE&& other) \
+	{ \
+		m_object._move_init(&other); \
+	} \
+	SLIB_INLINE SAFE_TYPE& operator=(SAFE_TYPE&& other) \
+	{ \
+		m_object._move_assign(&other); \
+		return *this; \
+	} \
 	SLIB_INLINE CLASS_NAME(TYPE&& other) \
 	{ \
-		m_object._setObject(other.getRef()._move()); \
+		m_object._move_init(&other); \
 	} \
 	SLIB_INLINE SAFE_TYPE& operator=(TYPE&& other) \
 	{ \
-		m_object._replaceObject(other.getRef()._move()); \
+		m_object._move_assign(&other); \
 		return *this; \
 	} \
 	SLIB_INLINE CLASS_NAME(const TYPE& other) : m_object(other.getRef()) \
@@ -413,7 +426,7 @@ public:
 	
 	SLIB_INLINE Ref(_Type&& other)
 	{
-		m_object = other._move();
+		_move_init(&other);
 	}
 
 	SLIB_INLINE Ref(const _Type& other)
@@ -428,7 +441,7 @@ public:
 	template <class _ObjectClass>
 	SLIB_INLINE Ref(Ref<_ObjectClass>&& other)
 	{
-		m_object = other._move();
+		_move_init(&other);
 	}
 	
 	template <class _ObjectClass>
@@ -441,8 +454,18 @@ public:
 		m_object = object;
 	}
 
+	SLIB_INLINE Ref(SafeRef<ObjectClass>&& other)
+	{
+		_move_init(&other);
+	}
 	
 	Ref(const SafeRef<ObjectClass>& other);
+	
+	template <class _ObjectClass>
+	SLIB_INLINE Ref(SafeRef<_ObjectClass>&& other)
+	{
+		_move_init(&other);
+	}
 	
 	template <class _ObjectClass>
 	Ref(const SafeRef<_ObjectClass>& other);
@@ -506,9 +529,7 @@ public:
 public:
 	SLIB_INLINE _Type& operator=(_Type&& other)
 	{
-		if (this != &other) {
-			_replaceObject(other._move());
-		}
+		_move_assign(&other);
 		return *this;
 	}
 	
@@ -527,9 +548,7 @@ public:
 	template <class _ObjectClass>
 	SLIB_INLINE _Type& operator=(Ref<_ObjectClass>&& other)
 	{
-		if ((void*)this != (void*)(&other)) {
-			_replaceObject(other._move());
-		}
+		_move_assign(&other);
 		return *this;
 	}
 
@@ -546,7 +565,20 @@ public:
 		return *this;
 	}
 	
+	SLIB_INLINE _Type& operator=(SafeRef<ObjectClass>&& other)
+	{
+		_move_assign(&other);
+		return *this;
+	}
+	
 	_Type& operator=(const SafeRef<ObjectClass>& other);
+	
+	template <class _ObjectClass>
+	SLIB_INLINE _Type& operator=(SafeRef<_ObjectClass>&& other)
+	{
+		_move_assign(&other);
+		return *this;
+	}
 	
 	template <class _ObjectClass>
 	_Type& operator=(const SafeRef<_ObjectClass>& other);
@@ -640,11 +672,6 @@ public:
 	}
 
 public:
-	SLIB_INLINE void _setObject(const ObjectClass* object)
-	{
-		m_object = (ObjectClass*)object;
-	}
-	
 	SLIB_INLINE void _replaceObject(const ObjectClass* object)
 	{
 		if (m_object) {
@@ -653,11 +680,20 @@ public:
 		m_object = (ObjectClass*)object;
 	}
 	
-	SLIB_INLINE ObjectClass* _move()
+	SLIB_INLINE void _move_init(void* _other)
 	{
-		ObjectClass* object = m_object;
-		m_object = sl_null;
-		return object;
+		_Type& other = *((_Type*)_other);
+		m_object = other.m_object;
+		other.m_object = sl_null;
+	}
+	
+	SLIB_INLINE void _move_assign(void* _other)
+	{
+		if ((void*)this != _other) {
+			_Type& other = *((_Type*)_other);
+			_replaceObject(other.m_object);
+			other.m_object = sl_null;
+		}
 	}
 };
 
@@ -682,11 +718,22 @@ public:
 			((Referable*)m_object)->decreaseReference();
 		}
 	}
+	
+	SLIB_INLINE SafeRef(_Type&& other)
+	{
+		_move_init(&other);
+	}
 
 	SLIB_INLINE SafeRef(const _Type& other)
 	{
 		ObjectClass* object = other._retainObject();
 		m_object = object;
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE SafeRef(SafeRef<_ObjectClass>&& other)
+	{
+		_move_init(&other);
 	}
 
 	template <class _ObjectClass>
@@ -698,7 +745,7 @@ public:
 	
 	SLIB_INLINE SafeRef(Ref<ObjectClass>&& other)
 	{
-		m_object = other._move();
+		_move_init(&other);
 	}
 	
 	SLIB_INLINE SafeRef(const Ref<ObjectClass>& other)
@@ -713,7 +760,7 @@ public:
 	template <class _ObjectClass>
 	SLIB_INLINE SafeRef(Ref<_ObjectClass>&& other)
 	{
-		m_object = other._move();
+		_move_init(&other);
 	}
 
 	template <class _ObjectClass>
@@ -783,12 +830,25 @@ public:
 	}
 	
 public:
+	SLIB_INLINE _Type& operator=(_Type&& other)
+	{
+		_move_assign(&other);
+		return *this;
+	}
+	
 	SLIB_INLINE _Type& operator=(const _Type& other)
 	{
-		if (m_object != other.m_object) {
+		if (this != &other && m_object != other.m_object) {
 			ObjectClass* object = other._retainObject();
 			_replaceObject(object);
 		}
+		return *this;
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE _Type& operator=(SafeRef<_ObjectClass>&& other)
+	{
+		_move_assign(&other);
 		return *this;
 	}
 
@@ -804,7 +864,7 @@ public:
 	
 	SLIB_INLINE _Type& operator=(Ref<ObjectClass>&& other)
 	{
-		_replaceObject(other._move());
+		_move_assign(&other);
 		return *this;
 	}
 
@@ -823,7 +883,7 @@ public:
 	template <class _ObjectClass>
 	SLIB_INLINE _Type& operator=(Ref<_ObjectClass>&& other)
 	{
-		_replaceObject(other._move());
+		_move_assign(&other);
 		return *this;
 	}
 
@@ -947,11 +1007,6 @@ public:
 		return object;
 	}
 	
-	void _setObject(const ObjectClass* object)
-	{
-		m_object = (ObjectClass*)object;
-	}
-
 	void _replaceObject(const ObjectClass* object)
 	{
 		ObjectClass* before;
@@ -964,6 +1019,23 @@ public:
 			((Referable*)before)->decreaseReference();
 		}
 	}
+	
+	SLIB_INLINE void _move_init(void* _other)
+	{
+		_Type& other = *((_Type*)_other);
+		m_object = other.m_object;
+		other.m_object = sl_null;
+	}
+	
+	SLIB_INLINE void _move_assign(void* _other)
+	{
+		if ((void*)this != _other) {
+			_Type& other = *((_Type*)_other);
+			_replaceObject(other.m_object);
+			other.m_object = sl_null;
+		}
+	}
+
 };
 
 class SLIB_EXPORT CWeakRef : public Referable

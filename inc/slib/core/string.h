@@ -2,8 +2,8 @@
 #define CHECKHEADER_SLIB_CORE_STRING
 
 #include "definition.h"
-#include "base.h"
 
+#include "base.h"
 #include "memory.h"
 #include "algorithm.h"
 #include "list.h"
@@ -117,6 +117,20 @@ public:
 		m_data = data;
 	}
 	
+	SLIB_INLINE String8(SafeString8&& _src)
+	{
+		String8& src = *((String8*)((void*)(&_src)));
+		m_data = src.m_data;
+		src.m_data = (sl_char8*)(_String_Null.data);
+	}
+	
+	String8(const SafeString8& src);
+	
+	String8(const String16& src);
+	
+	String8(const SafeString16& src);
+	
+
 	SLIB_INLINE ~String8()
 	{
 		_decreaseReference(m_data);
@@ -129,15 +143,6 @@ private:
 	}
 	
 public:
-	// From 16bit-char String
-	String8(const String16& src);
-	
-	// From Safe-String
-	String8(const SafeString8& src);
-	
-	// From 16bit-char Safe-String
-	String8(const SafeString16& src);
-
 	// From a single charactor
 	SLIB_INLINE String8(sl_char8 ch, sl_uint32 nRepeatCount = 1)
 	{
@@ -357,12 +362,19 @@ public:
 		return *this;
 	}
 	
-	String8& operator=(const String16& other);
-	
-	SLIB_INLINE String8& operator=(const SafeString8& other)
+	SLIB_INLINE String8& operator=(SafeString8&& _other)
 	{
-		return *this = String8(other);
+		String8& other = *((String8*)((void*)(&_other)));
+		if (this != &other) {
+			_replaceContainer(other.m_data);
+			other.m_data = (sl_char8*)(_String_Null.data);
+		}
+		return *this;
 	}
+	
+	String8& operator=(const SafeString8& other);
+	
+	String8& operator=(const String16& other);
 	
 	String8& operator=(const SafeString16& other);
 	
@@ -1320,6 +1332,19 @@ public:
 		_increaseReference(data);
 		m_data = data;
 	}
+	
+	SLIB_INLINE String16(SafeString16&& _src)
+	{
+		String16& src = *((String16*)((void*)(&_src)));
+		m_data = src.m_data;
+		src.m_data = (sl_char16*)(_String_Null.data);
+	}
+	
+	String16(const SafeString16& src);
+
+	String16(const String8& src);
+	
+	String16(const SafeString8& src);
 
 	SLIB_INLINE ~String16()
 	{
@@ -1333,15 +1358,6 @@ private:
 	}
     
 public:
-	// From 8bit-char String
-	String16(const String8& src);
-
-	// From 8bit-char Safe-String
-	String16(const SafeString8& src);
-	
-	// From 16bit-char Safe-String
-	String16(const SafeString16& src);
-	
 	// From a single charactor
 	SLIB_INLINE String16(sl_char16 ch, sl_uint32 nRepeatCount = 1)
 	{
@@ -1559,12 +1575,19 @@ public:
 		return *this;
 	}
 	
-	String16& operator=(const String8& other);
+	SLIB_INLINE String16& operator=(SafeString16&& _other)
+	{
+		String16& other = *((String16*)((void*)(&_other)));
+		if (this != &other) {
+			_replaceContainer(other.m_data);
+			other.m_data = (sl_char16*)(_String_Null.data);
+		}
+		return *this;
+	}
 	
-	SLIB_INLINE String16& operator=(const SafeString16& other)
-    {
-        return *this = String16(other);
-    }
+	String16& operator=(const SafeString16& other);
+	
+	String16& operator=(const String8& other);
 	
 	String16& operator=(const SafeString8& other);
 	
@@ -2497,26 +2520,24 @@ public:
 		m_data = (sl_char8*)(_String_Null.data);
 	}
 	
+	SLIB_INLINE SafeString8(SafeString8&& src)
+	{
+		m_data = src.m_data;
+		src.m_data = (sl_char8*)(_String_Null.data);
+	}
+	
 	SLIB_INLINE SafeString8(const SafeString8& src)
 	{
 		sl_char8* data = src._retainContainer();
 		m_data = data;
 	}
 	
-	SLIB_INLINE ~SafeString8()
-	{
-		_decreaseReference(m_data);
-	}
-
-public:
-	SafeString8(const SafeString16& src);
-	
 	SLIB_INLINE SafeString8(String8&& src)
 	{
 		m_data = src.m_data;
 		src.m_data = (sl_char8*)(_String_Null.data);
 	}
-
+	
 	SLIB_INLINE SafeString8(const String8& src)
 	{
 		sl_char8* data = src.m_data;
@@ -2524,8 +2545,16 @@ public:
 		m_data = data;
 	}
 	
+	SafeString8(const SafeString16& src);
+
 	SafeString8(const String16& src);
-	
+
+	SLIB_INLINE ~SafeString8()
+	{
+		_decreaseReference(m_data);
+	}
+
+public:
 	// From a single charactor
 	SLIB_INLINE SafeString8(sl_char8 ch, sl_uint32 nRepeatCount = 1)
 	{
@@ -2629,6 +2658,15 @@ public:
 	}
 	
 public:
+	SLIB_INLINE SafeString8& operator=(SafeString8&& other)
+	{
+		if (this != &other) {
+			_replaceContainer(other.m_data);
+			other.m_data = (sl_char8*)(_String_Null.data);
+		}
+		return *this;
+	}
+
 	SLIB_INLINE SafeString8& operator=(const SafeString8& other)
 	{
 		if (this != &other && m_data != other.m_data) {
@@ -2638,27 +2676,29 @@ public:
 		return *this;
 	}
 	
-	SLIB_INLINE SafeString8& operator=(const SafeString16& _other)
-	{
-		String16 other(_other);
-		_replaceContainer(String8::_create(other.data(), other.length()));
-		return *this;
-	}
-	
 	SLIB_INLINE SafeString8& operator=(String8&& other)
 	{
-		_replaceContainer(other.m_data);
-		other.m_data = (sl_char8*)(_String_Null.data);
+		if ((void*)this != (void*)(&other)) {
+			_replaceContainer(other.m_data);
+			other.m_data = (sl_char8*)(_String_Null.data);
+		}
 		return *this;
 	}
 	
 	SLIB_INLINE SafeString8& operator=(const String8& other)
 	{
-		if (m_data != other.m_data) {
-			sl_char8* data = other.m_data;
+		sl_char8* data = other.m_data;
+		if (m_data != data) {
 			_increaseReference(data);
 			_replaceContainer(data);
 		}
+		return *this;
+	}
+
+	SLIB_INLINE SafeString8& operator=(const SafeString16& _other)
+	{
+		String16 other(_other);
+		_replaceContainer(String8::_create(other.data(), other.length()));
 		return *this;
 	}
 	
@@ -3483,35 +3523,41 @@ public:
 		m_data = (sl_char16*)(_String_Null.data);
 	}
 	
+	SLIB_INLINE SafeString16(SafeString16&& src)
+	{
+		m_data = src.m_data;
+		src.m_data = (sl_char16*)(_String_Null.data);
+	}
+	
 	SLIB_INLINE SafeString16(const SafeString16& src)
 	{
 		sl_char16* data = src._retainContainer();
 		m_data = data;
 	}
 	
+	SLIB_INLINE SafeString16(String16&& src)
+	{
+		m_data = src.m_data;
+		src.m_data = (sl_char16*)(_String_Null.data);
+	}
+	
+	SLIB_INLINE SafeString16(const String16& src)
+	{
+		sl_char16* data = src.m_data;
+		_increaseReference(data);
+		m_data = data;
+	}
+	
+	SafeString16(const SafeString8& src);
+	
+	SafeString16(const String8& src);
+
 	SLIB_INLINE ~SafeString16()
 	{
 		_decreaseReference(m_data);
 	}
 	
 public:
-	SafeString16(const SafeString8& src);
-	
-	SLIB_INLINE SafeString16(String16&& src)
-	{
-		m_data = src.m_data;
-		src.m_data = (sl_char16*)(_String_Null.data);
-	}
-
-	SLIB_INLINE SafeString16(const String16& src)
-    {
-        sl_char16* data = src.m_data;
-        _increaseReference(data);
-        m_data = data;
-    }
-	
-	SafeString16(const String8& src);
-	
 	// From a single charactor
 	SLIB_INLINE SafeString16(sl_char16 ch, sl_uint32 nRepeatCount = 1)
 	{
@@ -3611,6 +3657,15 @@ public:
 	}
 	
 public:
+	SLIB_INLINE SafeString16& operator=(SafeString16&& other)
+	{
+		if (this != &other) {
+			_replaceContainer(other.m_data);
+			other.m_data = (sl_char16*)(_String_Null.data);
+		}
+		return *this;
+	}
+
 	SLIB_INLINE SafeString16& operator=(const SafeString16& other)
 	{
 		if (this != &other && m_data != other.m_data) {
@@ -3620,28 +3675,30 @@ public:
 		return *this;
 	}
 	
+	SLIB_INLINE SafeString16& operator=(String16&& other)
+	{
+		if ((void*)this != (void*)(&other)) {
+			_replaceContainer(other.m_data);
+			other.m_data = (sl_char16*)(_String_Null.data);
+		}
+		return *this;
+	}
+	
+	SLIB_INLINE SafeString16& operator=(const String16& other)
+	{
+		sl_char16* data = other.m_data;
+		if (m_data != data) {
+			_increaseReference(data);
+			_replaceContainer(data);
+		}
+		return *this;
+	}
+
 	SLIB_INLINE SafeString16& operator=(const SafeString8& _other)
     {
         String8 other(_other);
 	   _replaceContainer(String16::_create(other.data(), other.length()));
         return *this;
-    }
-	
-	SLIB_INLINE SafeString16& operator=(String16&& other)
-	{
-		_replaceContainer(other.m_data);
-		other.m_data = (sl_char16*)(_String_Null.data);
-		return *this;
-	}
-
-	SLIB_INLINE SafeString16& operator=(const String16& other)
-    {
-        if (m_data != other.m_data) {
-			sl_char16* data = other.m_data;
-			_increaseReference(data);
-			_replaceContainer(data);
-		}
-		return *this;
     }
 	
 	SLIB_INLINE SafeString16& operator=(const String8& other)
@@ -4612,4 +4669,4 @@ typedef StringDataBuffer8 StringDataBuffer;
 
 SLIB_NAMESPACE_END
 
-#endif //CHECKHEADER_SLIB_CORE_STRING
+#endif

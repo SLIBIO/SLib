@@ -1167,6 +1167,12 @@ public:
 		return sl_false;
 	}
 	
+	template <class _T, class _COMPARE>
+	SLIB_INLINE sl_bool add(const SafeList<_T, _COMPARE>& other)
+	{
+		return add(List<_T, _COMPARE>(other));
+	}
+
 	
 	sl_bool add_NoLock(const T& value)
 	{
@@ -1751,6 +1757,12 @@ public:
 		return sl_false;
 	}
 	
+	template <class _T, class _COMPARE>
+	SLIB_INLINE sl_bool add(const SafeList<_T, _COMPARE>& other)
+	{
+		return add(List<_T, _COMPARE>(other));
+	}
+
 	sl_bool add(const T& value)
 	{
 		_LocalRef obj(m_object);
@@ -2019,6 +2031,11 @@ public:
 		m_list = list;
 		m_data = list.data();
 		m_count = list.count();
+	}
+
+	template <class _COMPARE>
+	SLIB_INLINE ListItems(const SafeList<T, _COMPARE>& list) : ListItems(List<T, _COMPARE>(list))
+	{
 	}
 
 	template <class _COMPARE>

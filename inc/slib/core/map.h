@@ -1409,6 +1409,12 @@ public:
 		return sl_false;
 	}
 	
+	template <class _KT, class _VT>
+	SLIB_INLINE sl_bool put(const SafeMap<_KT, _VT>& other, sl_bool flagReplace = sl_true)
+	{
+		return put(Map<_KT, _VT>(other), flagReplace);
+	}
+	
 	
 	SLIB_INLINE sl_bool add_NoLock(const KT& key, const VT& value)
 	{
@@ -1425,6 +1431,12 @@ public:
 	SLIB_INLINE sl_bool add(const Map<_KT, _VT>& other)
 	{
 		return put(other, sl_false);
+	}
+
+	template <class _KT, class _VT>
+	SLIB_INLINE sl_bool add(const SafeMap<_KT, _VT>& other)
+	{
+		return put(Map<_KT, _VT>(other), sl_false);
 	}
 	
 	
@@ -1717,6 +1729,7 @@ public:
 		return List<VT>::null();
 	}
 	
+	
 	sl_bool put(const KT& key, const VT& value, sl_bool flagReplace = sl_true)
 	{
 		_LocalRef obj(m_object);
@@ -1738,6 +1751,7 @@ public:
 		}
 		return sl_false;
 	}
+	
 	
 	template <class _KT, class _VT>
 	sl_bool put(const Map<_KT, _VT>& other, sl_bool flagReplace = sl_true)
@@ -1762,6 +1776,13 @@ public:
 		return sl_false;
 	}
 	
+	template <class _KT, class _VT>
+	SLIB_INLINE sl_bool put(const SafeMap<_KT, _VT>& other, sl_bool flagReplace = sl_true)
+	{
+		return put(Map<_KT, _VT>(other), flagReplace);
+	}
+	
+	
 	SLIB_INLINE sl_bool add(const KT& key, const VT& value)
 	{
 		return put(key, value, sl_false);
@@ -1772,6 +1793,13 @@ public:
 	{
 		return put(other, sl_false);
 	}
+	
+	template <class _KT, class _VT>
+	SLIB_INLINE sl_bool add(const SafeMap<_KT, _VT>& other)
+	{
+		return put(Map<_KT, _VT>(other), sl_false);
+	}
+	
 	
 	SLIB_INLINE sl_size remove(const KT& key, sl_bool flagAllKeys = sl_false) const
 	{

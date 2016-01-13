@@ -2,14 +2,11 @@
 #define CHECKHEADER_SLIB_CORE_TREE
 
 #include "definition.h"
+
 #include "algorithm.h"
 #include "list.h"
 
 #define SLIB_BTREE_DEFAULT_ORDER 16
-
-/*************************************************
-	Notice - This Data Structure is not thread-safe
-**************************************************/
 
 SLIB_NAMESPACE_BEGIN
 
@@ -223,12 +220,12 @@ public:
 			if (!(getAt(pos, sl_null, &value))) {
 				return ret;
 			}
-			ret.add(value);
+			ret.add_NoLock(value);
 			TreePosition posMid = pos;
 			KT keyItem;
 			while (getPrevPosition(pos, &keyItem, &value)) {
 				if (COMPARE::compare(keyItem, key) == 0) {
-					ret.add(value);
+					ret.add_NoLock(value);
 				} else {
 					break;
 				}
@@ -236,7 +233,7 @@ public:
 			pos = posMid;
 			while (getNextPosition(pos, &keyItem, &value)) {
 				if (COMPARE::compare(keyItem, key) == 0) {
-					ret.add(value);
+					ret.add_NoLock(value);
 				} else {
 					break;
 				}

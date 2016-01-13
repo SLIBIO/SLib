@@ -1,4 +1,3 @@
-#include "../../../inc/slib/core/base.h"
 #include "../../../inc/slib/core/reference.h"
 #include "../../../inc/slib/core/object.h"
 

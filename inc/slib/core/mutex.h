@@ -4,29 +4,52 @@
 #include "definition.h"
 
 SLIB_NAMESPACE_BEGIN
+
 class SLIB_EXPORT Mutex
 {
-	SLIB_DECLARE_CLASS_NOCOPY(Mutex)
 public:
-	Mutex();
-	~Mutex();
+	SLIB_INLINE Mutex()
+	{
+		_init();
+	}
+	
+	SLIB_INLINE Mutex(const Mutex& other)
+	{
+		_init();
+	}
+	
+	SLIB_INLINE ~Mutex()
+	{
+		_free();
+	}
 
+public:
 	sl_bool tryLock() const;
+	
 	void lock() const;
+	
 	void unlock() const;
+	
+public:
+	SLIB_INLINE Mutex& operator=(const Mutex& other)
+	{
+		return *this;
+	}
 
 private:
 	void* m_pObject;
+	
+private:
+	void _init();
+	
+	void _free();
+	
 };
 
 #define SLIB_MAX_LOCK_MUTEX 16
+
 class SLIB_EXPORT MutexLocker
 {
-	SLIB_DECLARE_CLASS_NOCOPY(MutexLocker)
-private:
-	sl_size m_count;
-	const Mutex* m_mutex[SLIB_MAX_LOCK_MUTEX];
-
 public:
 	SLIB_INLINE MutexLocker()
 	{
@@ -87,6 +110,11 @@ private:
 	{
 		m_count = 0;
 	}
+	
+private:
+	sl_size m_count;
+	const Mutex* m_mutex[SLIB_MAX_LOCK_MUTEX];
+	
 };
 
 SLIB_NAMESPACE_END

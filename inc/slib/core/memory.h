@@ -278,7 +278,6 @@ class SLIB_EXPORT MemoryBuffer : public Object
 {
 public:
 	MemoryBuffer();
-	~MemoryBuffer();
 
 public:
 	SLIB_INLINE sl_size getSize() const
@@ -305,7 +304,6 @@ class SLIB_EXPORT MemoryQueue : public MemoryBuffer
 {
 public:
 	MemoryQueue();
-	~MemoryQueue();
 
 public:
 	SLIB_INLINE sl_bool push(const Memory& mem)
