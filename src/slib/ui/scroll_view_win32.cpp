@@ -120,7 +120,7 @@ Ref<ViewInstance> ScrollView::createInstance(ViewInstance* parent)
 		ret->__setContentView(m_viewContent, this);
 		ret->m_backgroundColor = m_backgroundColor;
 	}
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 void ScrollView::onResize()

@@ -951,11 +951,11 @@ Ref<WindowInstance> UIPlatform::createWindowInstance(HWND hWnd, sl_bool flagDest
 	if (ret.isNotNull()) {
 		return ret;
 	}
-	ret = Ref<WindowInstance>::from(_Win32_Window::create(hWnd, flagDestroyOnRelease));
+	ret = _Win32_Window::create(hWnd, flagDestroyOnRelease);
 	if (ret.isNotNull()) {
 		UIPlatform::_registerWindowInstance((void*)hWnd, ret.get());
 	}
-	return Ref<WindowInstance>::from(ret);
+	return ret;
 }
 
 Ref<WindowInstance> UIPlatform::getWindowInstance(HWND hWnd)

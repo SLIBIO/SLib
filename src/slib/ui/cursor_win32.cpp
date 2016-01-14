@@ -43,8 +43,7 @@ public:
 
 Ref<Cursor> UIPlatform::createCursor(HCURSOR hCursor, sl_bool flagDestroyOnRelease)
 {
-	Ref<_Win32_Cursor> ret = _Win32_Cursor::create(hCursor, flagDestroyOnRelease);
-	return Ref<Cursor>::from(ret);
+	return _Win32_Cursor::create(hCursor, flagDestroyOnRelease);
 }
 
 HCURSOR UIPlatform::getCursorHandle(const Ref<Cursor>& cursor)

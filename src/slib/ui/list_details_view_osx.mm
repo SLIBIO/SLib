@@ -136,7 +136,7 @@ Ref<ViewInstance> ListDetailsView::createInstance(ViewInstance* _parent)
 		[table reloadData];
 	}
 	table->m_viewInstance = ret;
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 void ListDetailsView::_refreshColumnsCount()

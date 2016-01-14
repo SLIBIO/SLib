@@ -72,7 +72,7 @@ Ref<ViewInstance> RenderView::createInstance(ViewInstance* _parent)
 			_JAndroidGLView::setRenderMode.callBoolean(sl_null, handle, m_renderMode);
 		}
 	}
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 void RenderView::setRenderMode(RenderView::RenderMode mode)

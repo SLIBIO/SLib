@@ -153,7 +153,7 @@ Ref<ViewInstance> View::createInstance(ViewInstance* _parent)
 	IOS_VIEW_CREATE_INSTANCE_BEGIN
 	Slib_iOS_ViewHandle* handle = [[Slib_iOS_ViewHandle alloc] initWithFrame:frame];
 	IOS_VIEW_CREATE_INSTANCE_END
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 sl_bool View::_isValid()
@@ -331,8 +331,7 @@ Ref<ViewInstance> UIPlatform::createViewInstance(UIView* handle, sl_bool flagFre
 	if (ret.isNotNull()) {
 		return ret;
 	}
-	ret = Ref<ViewInstance>::from(iOS_ViewInstance::create(handle, flagFreeOnRelease));
-	return Ref<ViewInstance>::from(ret);
+	return iOS_ViewInstance::create(handle, flagFreeOnRelease);
 }
 
 void UIPlatform::registerViewInstance(UIView* handle, ViewInstance* instance)

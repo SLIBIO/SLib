@@ -178,7 +178,7 @@ Ref<ViewInstance> ListDetailsView::createInstance(ViewInstance* parent)
 		((_ListDetailsView*)this)->__copyColumns(handle);
 		((_ListDetailsView*)this)->__applyRowsCount(handle);
 	}
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 void ListDetailsView::_refreshColumnsCount()

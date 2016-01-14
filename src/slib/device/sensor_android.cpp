@@ -178,7 +178,7 @@ SLIB_JNI_END_CLASS_SECTION
 
 Ref<Sensor> Sensor::create()
 {
-	return Ref<Sensor>::from(_Android_Sensor::create());
+	return _Android_Sensor::create();
 }
 SLIB_DEVICE_NAMESPACE_END
 

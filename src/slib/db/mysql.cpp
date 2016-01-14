@@ -15,14 +15,10 @@ MySQL_Param::MySQL_Param()
 	flagAutoReconnect = sl_true;
 }
 
-MySQL_Database::MySQL_Database()
-{
-}
-
 class _MySQL_Database_Lib
 {
 public:
-	_MySQL_Database_Lib()
+	SLIB_INLINE _MySQL_Database_Lib()
 	{
 		::mysql_library_init(0, sl_null, sl_null);
 	}
@@ -31,7 +27,7 @@ public:
 class _MySQL_Database_ThreadHandler : public Referable
 {
 public:
-	_MySQL_Database_ThreadHandler()
+	SLIB_INLINE _MySQL_Database_ThreadHandler()
 	{
 	}
 
@@ -132,10 +128,10 @@ public:
 		MYSQL_ROW m_row;
 		unsigned long* m_lengths;
 
-		List<String> m_listColumnNames;
+		CList<String> m_listColumnNames;
 		sl_uint32 m_nColumnNames;
 		String* m_columnNames;
-		Map<String, sl_int32> m_mapColumnIndexes;
+		HashMap<String, sl_int32> m_mapColumnIndexes;
 
 		_DatabaseCursor(MySQL_Database* db, MYSQL_RES* result)
 		{
@@ -145,9 +141,8 @@ public:
 			sl_uint32 cols = (sl_uint32)(::mysql_num_fields(result));
 			m_fields = ::mysql_fetch_fields(result);
 			for (sl_uint32 i = 0; i < cols; i++) {
-				String name(m_fields[i].name);
-				m_listColumnNames.add(name);
-				m_mapColumnIndexes.put(name, i);
+				m_listColumnNames.add_NoLock(m_fields[i].name);
+				m_mapColumnIndexes.put_NoLock(m_fields[i].name, i);
 			}
 			m_nColumnNames = (sl_uint32)(m_listColumnNames.getCount());
 			m_columnNames = m_listColumnNames.data();
@@ -179,17 +174,16 @@ public:
 
 		sl_int32 getColumnIndex(const String& name)
 		{
-			return m_mapColumnIndexes.getValue(name, -1);
+			return m_mapColumnIndexes.getValue_NoLock(name, -1);
 		}
 
 		Map<String, Variant> getRow()
 		{
 			Map<String, Variant> ret;
-			if (m_row) {
-				ret = Map<String, Variant>::createHash();
+			if (m_row && m_nColumnNames > 0) {
+				ret.initHash();
 				for (sl_uint32 index = 0; index < m_nColumnNames; index++) {
-					Variant var = _getValue(index);
-					ret.put(m_columnNames[index], var);
+					ret.put_NoLock(m_columnNames[index], _getValue(index));
 				}
 			}
 			return ret;
@@ -242,9 +236,8 @@ public:
 			m_lengths = ::mysql_fetch_lengths(m_result);
 			if (m_row) {
 				return sl_true;
-			} else {
-				return sl_false;
 			}
+			return sl_false;
 		}
 	};
 
@@ -322,10 +315,10 @@ public:
 		MYSQL_BIND* m_bind;
 		_FieldDesc* m_fds;
 
-		List<String> m_listColumnNames;
+		CList<String> m_listColumnNames;
 		sl_uint32 m_nColumnNames;
 		String* m_columnNames;
-		Map<String, sl_int32> m_mapColumnIndexes;
+		HashMap<String, sl_int32> m_mapColumnIndexes;
 
 		_DatabaseStatementCursor(Database* db, DatabaseStatement* statementObj, MYSQL_STMT* statement, MYSQL_RES* resultMetadata, MYSQL_BIND* bind, _FieldDesc* fds)
 		{
@@ -340,9 +333,8 @@ public:
 			m_fds = fds;
 
 			for (sl_uint32 i = 0; i < cols; i++) {
-				String name(m_fields[i].name);
-				m_listColumnNames.add(name);
-				m_mapColumnIndexes.put(name, i);
+				m_listColumnNames.add_NoLock(m_fields[i].name);
+				m_mapColumnIndexes.put_NoLock(m_fields[i].name, i);
 			}
 			m_nColumnNames = (sl_uint32)(m_listColumnNames.getCount());
 			m_columnNames = m_listColumnNames.data();
@@ -374,16 +366,17 @@ public:
 
 		sl_int32 getColumnIndex(const String& name)
 		{
-			return m_mapColumnIndexes.getValue(name, -1);
+			return m_mapColumnIndexes.getValue_NoLock(name, -1);
 		}
 
 		Map<String, Variant> getRow()
 		{
 			Map<String, Variant> ret;
-			ret = Map<String, Variant>::createHash();
-			for (sl_uint32 index = 0; index < m_nColumnNames; index++) {
-				Variant var = _getValue(index);
-				ret.put(m_columnNames[index], var);
+			if (m_nColumnNames > 0) {
+				ret.initHash();
+				for (sl_uint32 index = 0; index < m_nColumnNames; index++) {
+					ret.put_NoLock(m_columnNames[index], _getValue(index));
+				}
 			}
 			return ret;
 		}
@@ -1059,8 +1052,7 @@ public:
 
 Ref<MySQL_Database> MySQL_Database::connect(const MySQL_Param& param, String& outErrorMessage)
 {
-	Ref<MySQL_Database> ret = _MySQL_Database::connect(param, outErrorMessage);
-	return ret;
+	return _MySQL_Database::connect(param, outErrorMessage);
 }
 
 Ref<MySQL_Database> MySQL_Database::connect(const MySQL_Param& param)
@@ -1068,6 +1060,7 @@ Ref<MySQL_Database> MySQL_Database::connect(const MySQL_Param& param)
 	String err;
 	return connect(param, err);
 }
+
 SLIB_DB_NAMESPACE_END
 
 #endif

@@ -32,7 +32,7 @@ Ref<ViewInstance> Button::createInstance(ViewInstance* _parent)
 		[handle setTitleShadowColor:[UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:1] forState:UIControlStateNormal];
 	}
 	IOS_VIEW_CREATE_INSTANCE_END
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 String Button::getText()

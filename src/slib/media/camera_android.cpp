@@ -159,8 +159,7 @@ SLIB_JNI_END_CLASS_SECTION
 
 Ref<Camera> Camera::create(const CameraParam& param)
 {
-	Ref<_Android_Camera> ret = _Android_Camera::_create(param);
-	return Ref<Camera>::from(ret);
+	return _Android_Camera::_create(param);
 }
 
 List<CameraInfo> Camera::getCamerasList()

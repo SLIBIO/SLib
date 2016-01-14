@@ -1,9 +1,6 @@
 #include "../../../inc/slib/db/database.h"
 
 SLIB_DB_NAMESPACE_BEGIN
-DatabaseCursor::DatabaseCursor()
-{
-}
 
 Ref<Database> DatabaseCursor::getDatabase()
 {
@@ -143,4 +140,5 @@ Memory DatabaseCursor::getBlob(const String& name)
 	}
 	return Memory::null();
 }
+
 SLIB_DB_NAMESPACE_END

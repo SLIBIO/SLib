@@ -494,7 +494,7 @@ public:
 				server->start((WeakRef<_DefaultHttpServiceConnectionProvider>)(ret));
 			}
 		}
-		return Ref<HttpServiceConnectionProvider>::from(ret);
+		return ret;
 	}
 };
 

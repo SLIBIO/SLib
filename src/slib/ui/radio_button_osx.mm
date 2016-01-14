@@ -30,7 +30,7 @@ Ref<ViewInstance> RadioButton::createInstance(ViewInstance* _parent)
 		}
 	}
 	OSX_VIEW_CREATE_INSTANCE_END
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 String RadioButton::getText()

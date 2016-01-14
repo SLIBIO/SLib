@@ -171,8 +171,7 @@ public:
 
 Ref<Renderer> WGL::createRenderer(void* windowHandle, const RendererParam& param)
 {
-	Ref<_WGLRendererImpl> ret = _WGLRendererImpl::create(windowHandle, param);
-	return Ref<Renderer>::from(ret);
+	return _WGLRendererImpl::create(windowHandle, param);
 }
 SLIB_RENDER_NAMESPACE_END
 

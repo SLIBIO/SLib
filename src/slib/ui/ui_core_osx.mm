@@ -69,8 +69,7 @@ public:
 
 Ref<Screen> UIPlatform::createScreen(NSScreen* screen)
 {
-	Ref<_OSX_Screen> ret = _OSX_Screen::create(screen, nil);
-	return Ref<Screen>::from(ret);
+	return _OSX_Screen::create(screen, nil);
 }
 
 NSScreen* UIPlatform::getScreenHandle(Screen* _screen)
@@ -101,8 +100,7 @@ List< Ref<Screen> > UI::getScreens()
 	NSScreen* primary = [arr objectAtIndex:0];
 	for (sl_size i = 0; i < n; i++) {
 		NSScreen* _screen = [arr objectAtIndex:i];
-		Ref<Screen> screen = Ref<Screen>::from(_OSX_Screen::create(_screen, primary));
-		ret.add(screen);
+		ret.add_NoLock(_OSX_Screen::create(_screen, primary));
 	}
 	return ret;
 }

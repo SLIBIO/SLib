@@ -1,9 +1,6 @@
 #include "../../../inc/slib/db/database.h"
 
 SLIB_DB_NAMESPACE_BEGIN
-Database::Database()
-{
-}
 
 sl_bool Database::execute(const String& sql, const Variant* params, sl_uint32 nParams, sl_uint64* pOutAffectedRowsCount)
 {
@@ -68,7 +65,7 @@ List< Map<String, Variant> > Database::getListForQueryResult(const String& sql)
 	Ref<DatabaseCursor> cursor = query(sql);
 	if (cursor.isNotNull()) {
 		while (cursor->moveNext()) {
-			ret.add(cursor->getRow());
+			ret.add_NoLock(cursor->getRow());
 		}
 	}
 	return ret;
@@ -76,25 +73,24 @@ List< Map<String, Variant> > Database::getListForQueryResult(const String& sql)
 
 Map<String, Variant> Database::getRecordForQueryResult(const String& sql)
 {
-	Map<String, Variant> ret;
 	Ref<DatabaseCursor> cursor = query(sql);
 	if (cursor.isNotNull()) {
 		if (cursor->moveNext()) {
-			ret = cursor->getRow();
+			return cursor->getRow();
 		}
 	}
-	return ret;
+	return Map<String, Variant>::null();
 }
 
 Variant Database::getValueForQueryResult(const String& sql)
 {
-	Variant ret;
 	Ref<DatabaseCursor> cursor = query(sql);
 	if (cursor.isNotNull()) {
 		if (cursor->moveNext()) {
-			ret = cursor->getValue(0);
+			return cursor->getValue(0);
 		}
 	}
-	return ret;
+	return Variant::null();
 }
+
 SLIB_DB_NAMESPACE_END

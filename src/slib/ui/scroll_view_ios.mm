@@ -50,7 +50,7 @@ Ref<ViewInstance> ScrollView::createInstance(ViewInstance* _parent)
 		((_ScrollView*)this)->__applyProperties(handle);
 	}
 	IOS_VIEW_CREATE_INSTANCE_END
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 void ScrollView::onResize()

@@ -106,7 +106,7 @@ Ref<ViewInstance> DropDownList::createInstance(ViewInstance* parent)
 
 		((_DropDownList*)this)->__copyItems(handle);
 	}
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 sl_uint32 DropDownList::getSelectedIndex()

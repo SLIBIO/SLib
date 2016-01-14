@@ -304,13 +304,13 @@ public:
 	
 	Ref<AudioPlayerBuffer> createBuffer(const AudioPlayerBufferParam& param)
 	{
-		return Ref<AudioPlayerBuffer>::from(_iOS_AudioPlayerBuffer::create(param));
+		return _iOS_AudioPlayerBuffer::create(param);
 	}
 };
 
 Ref<AudioPlayer> AudioPlayer::create(const AudioPlayerParam& param)
 {
-	return Ref<AudioPlayer>::from(_iOS_AudioPlayer::create(param));
+	return _iOS_AudioPlayer::create(param);
 }
 
 List<AudioPlayerInfo> AudioPlayer::getPlayersList()

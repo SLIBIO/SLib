@@ -111,7 +111,7 @@ public:
 				//[window setAcceptsMouseMovedEvents:TRUE];
 			}
 		}
-		return Ref<WindowInstance>::from(ret);
+		return ret;
 	}
 	
 	~_OSX_Window()
@@ -962,11 +962,11 @@ Ref<WindowInstance> UIPlatform::createWindowInstance(NSWindow* window)
 	if (ret.isNotNull()) {
 		return ret;
 	}
-	ret = Ref<WindowInstance>::from(_OSX_Window::create(window));
+	ret = _OSX_Window::create(window);
 	if (ret.isNotNull()) {
 		UIPlatform::_registerWindowInstance((__bridge void*)window, ret.get());
 	}
-	return Ref<WindowInstance>::from(ret);
+	return ret;
 }
 
 Ref<WindowInstance> UIPlatform::getWindowInstance(NSWindow* window)

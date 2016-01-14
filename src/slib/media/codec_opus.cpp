@@ -161,7 +161,7 @@ public:
 
 Ref<AudioOpusEncoder> AudioOpusEncoder::create(const AudioOpusEncoderParam& param)
 {
-	return Ref<AudioOpusEncoder>::from(_OpusAudioEncoderImpl::create(param));
+	return _OpusAudioEncoderImpl::create(param);
 }
 
 
@@ -240,7 +240,7 @@ public:
 
 Ref<AudioOpusDecoder> AudioOpusDecoder::create(const AudioOpusDecoderParam& param)
 {
-	return Ref<AudioOpusDecoder>::from(_OpusAudioDecoderImpl::create(param));
+	return _OpusAudioDecoderImpl::create(param);
 }
 
 SLIB_MEDIA_NAMESPACE_END

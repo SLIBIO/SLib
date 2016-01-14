@@ -215,7 +215,7 @@ Ref<ViewInstance> View::createInstance(ViewInstance* _parent)
 		}
 		ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 	}
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 sl_bool View::_isValid()
@@ -351,8 +351,7 @@ Ref<ViewInstance> UIPlatform::createViewInstance(jobject jhandle)
 	if (ret.isNotNull()) {
 		return ret;
 	}
-	ret = Ref<ViewInstance>::from(Android_ViewInstance::create<Android_ViewInstance>(jhandle));
-	return Ref<ViewInstance>::from(ret);
+	return Android_ViewInstance::create<Android_ViewInstance>(jhandle);
 }
 
 void UIPlatform::registerViewInstance(jobject jhandle, ViewInstance* instance)

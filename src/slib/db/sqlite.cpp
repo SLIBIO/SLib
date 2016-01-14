@@ -4,9 +4,6 @@
 #include "../../../inc/slib/core/file.h"
 
 SLIB_DB_NAMESPACE_BEGIN
-SQLiteDatabase::SQLiteDatabase()
-{
-}
 
 class _Sqlite3Database : public SQLiteDatabase
 {
@@ -61,7 +58,7 @@ public:
 		Map<String, Variant> row = Map<String, Variant>::createList();
 		for (sl_uint32 cIndex = 0; cIndex < nColumns; cIndex++) {
 			String cValue = String::fromUtf8(::sqlite3_column_text(stmt, (int)cIndex));
-			row.put(columns[cIndex], cValue);
+			row.put_NoLock(columns[cIndex], cValue);
 		}
 		return row;
 	}
@@ -72,10 +69,10 @@ public:
 		Ref<DatabaseStatement> m_statementObj;
 		sqlite3_stmt* m_statement;
 
-		List<String> m_listColumnNames;
+		CList<String> m_listColumnNames;
 		sl_uint32 m_nColumnNames;
 		String* m_columnNames;
-		Map<String, sl_int32> m_mapColumnIndexes;
+		HashMap<String, sl_int32> m_mapColumnIndexes;
 
 		_DatabaseCursor(Database* db, DatabaseStatement* statementObj, sqlite3_stmt* statement)
 		{
@@ -87,8 +84,8 @@ public:
 			for (sl_int32 i = 0; i < cols; i++) {
 				const char* buf = ::sqlite3_column_name(statement, (int)i);
 				String name(buf);
-				m_listColumnNames.add(name);
-				m_mapColumnIndexes.put(name, i);
+				m_listColumnNames.add_NoLock(name);
+				m_mapColumnIndexes.put_NoLock(name, i);
 			}
 			m_nColumnNames = (sl_uint32)(m_listColumnNames.getCount());
 			m_columnNames = m_listColumnNames.data();
@@ -118,16 +115,17 @@ public:
 
 		sl_int32 getColumnIndex(const String& name)
 		{
-			return m_mapColumnIndexes.getValue(name, -1);
+			return m_mapColumnIndexes.getValue_NoLock(name, -1);
 		}
 
 		Map<String, Variant> getRow()
 		{
 			Map<String, Variant> ret;
-			ret = Map<String, Variant>::createHash();
-			for (sl_uint32 index = 0; index < m_nColumnNames; index++) {
-				Variant var = _getValue(index);
-				ret.put(m_columnNames[index], var);
+			if (m_nColumnNames > 0) {
+				ret.initHash();
+				for (sl_uint32 index = 0; index < m_nColumnNames; index++) {
+					ret.put_NoLock(m_columnNames[index], _getValue(index));
+				}				
 			}
 			return ret;
 		}
@@ -315,9 +313,8 @@ public:
 			sl_int32 nRet = ::sqlite3_step(m_statement);
 			if (nRet == SQLITE_ROW) {
 				return sl_true;
-			} else {
-				return sl_false;
 			}
+			return sl_false;
 		}
 
 	};
@@ -455,7 +452,7 @@ public:
 
 Ref<SQLiteDatabase> SQLiteDatabase::connect(const String& path)
 {
-	Ref<SQLiteDatabase> ret = _Sqlite3Database::connect(path);
-	return ret;
+	return _Sqlite3Database::connect(path);
 }
+
 SLIB_DB_NAMESPACE_END

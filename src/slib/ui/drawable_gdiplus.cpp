@@ -77,8 +77,7 @@ public:
 
 Ref<Drawable> UIPlatform::createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease, Referable* ref)
 {
-	Ref<_Gdiplus_ImageDrawable> ret = _Gdiplus_ImageDrawable::create(image, flagFreeOnRelease, ref);
-	return Ref<Drawable>::from(ret);
+	return _Gdiplus_ImageDrawable::create(image, flagFreeOnRelease, ref);
 }
 
 Gdiplus::Image* UIPlatform::getImageDrawableHandle(Drawable* _drawable)
@@ -387,8 +386,7 @@ public:
 
 Ref<Bitmap> UI::createBitmap(sl_uint32 width, sl_uint32 height)
 {
-	Ref<_Gdiplus_Bitmap> ret = _Gdiplus_Bitmap::create(width, height);
-	return Ref<Bitmap>::from(ret);
+	return _Gdiplus_Bitmap::create(width, height);
 }
 
 Ref<Drawable> UI::createDrawableFromBitmap(const Ref<Bitmap>& bitmap)
@@ -398,8 +396,7 @@ Ref<Drawable> UI::createDrawableFromBitmap(const Ref<Bitmap>& bitmap)
 
 Ref<Bitmap> UI::loadBitmapFromMemory(const void* mem, sl_size size)
 {
-	Ref<_Gdiplus_Bitmap> ret = _Gdiplus_Bitmap::loadFromMemory(mem, size);
-	return Ref<Bitmap>::from(ret);
+	return _Gdiplus_Bitmap::loadFromMemory(mem, size);
 }
 
 SLIB_UI_NAMESPACE_END

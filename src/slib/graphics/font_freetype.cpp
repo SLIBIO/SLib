@@ -403,7 +403,7 @@ public:
 Ref<FreeType> FreeType::loadFromMemory(const Memory& mem, sl_uint32 index)
 {
 	Ref<_FreeType> ret = _FreeType::load(mem, index);
-	return Ref<FreeType>::from(ret);
+	return ret;
 }
 
 Ref<FreeType> FreeType::loadFromFile(const String& fontFilePath, sl_uint32 index)

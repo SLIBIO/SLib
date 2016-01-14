@@ -50,7 +50,7 @@ Ref<ViewInstance> ScrollView::createInstance(ViewInstance* _parent)
 			((_ScrollView*)this)->__applyProperties(handle, ret.get());
 		}
 	}
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 void ScrollView::onResize()

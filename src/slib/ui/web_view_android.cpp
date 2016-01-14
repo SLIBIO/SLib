@@ -101,7 +101,7 @@ Ref<ViewInstance> WebView::createInstance(ViewInstance* _parent)
 			((_WebView*)this)->__load(handle);
 		}
 	}
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 void WebView::onResize()

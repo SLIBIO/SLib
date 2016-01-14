@@ -539,7 +539,7 @@ Ref<ViewInstance> View::createInstance(ViewInstance* parent)
 #endif
 	}
 	Ref<Win32_ViewInstance> ret = Win32_ViewInstance::create<Win32_ViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClass)), L"", style, styleEx);
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 sl_bool View::_isValid()
@@ -700,8 +700,7 @@ Ref<ViewInstance> UIPlatform::createViewInstance(HWND hWnd, sl_bool flagDestroyO
 	if (ret.isNotNull()) {
 		return ret;
 	}
-	ret = Ref<ViewInstance>::from(Win32_ViewInstance::create<Win32_ViewInstance>(hWnd, flagDestroyOnRelease));
-	return Ref<ViewInstance>::from(ret);
+	return Win32_ViewInstance::create<Win32_ViewInstance>(hWnd, flagDestroyOnRelease);
 }
 
 void UIPlatform::registerViewInstance(HWND hWnd, ViewInstance* instance)

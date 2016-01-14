@@ -160,7 +160,7 @@ public:
 			ret->setTextColor(m_textColor);
 			ret->setBackgroundColor(m_backgroundColor);
 		}
-		return Ref<ViewInstance>::from(ret);
+		return ret;
 	}
 
 };

@@ -460,8 +460,7 @@ Ref<Canvas> UIPlatform::createCanvas(CGContextRef graphics, sl_uint32 width, sl_
 	if (!graphics) {
 		return Ref<Canvas>::null();
 	}
-	Ref<_Quartz_Canvas> ret = _Quartz_Canvas::_create(graphics, (sl_real)width, (sl_real)height, rectDirty);
-	return Ref<Canvas>::from(ret);
+	return _Quartz_Canvas::_create(graphics, (sl_real)width, (sl_real)height, rectDirty);
 }
 
 CGContextRef UIPlatform::getCanvasHandle(Canvas* _canvas)

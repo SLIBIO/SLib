@@ -42,7 +42,7 @@ Ref<ViewInstance> Button::createInstance(ViewInstance* parent)
 		}
 		m_fontInstance = fontInstance;
 	}
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 String Button::getText()

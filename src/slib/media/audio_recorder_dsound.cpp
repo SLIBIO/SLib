@@ -302,7 +302,7 @@ public:
 
 Ref<AudioRecorder> DirectSound::createRecorder(const AudioRecorderParam& param)
 {
-	return Ref<AudioRecorder>::from(_DirectSound_AudioRecorder::create(param));
+	return _DirectSound_AudioRecorder::create(param);
 }
 
 List<AudioRecorderInfo> DirectSound::getRecordersList()

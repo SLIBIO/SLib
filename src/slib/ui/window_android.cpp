@@ -472,7 +472,7 @@ Ref<WindowInstance> Window::createWindowInstance(const WindowInstanceParam& para
 {
 	JniLocal<jobject> jwindow = _Android_Window::createHandle(param);
 	if (jwindow.isNotNull()) {
-		return Ref<WindowInstance>::from(UIPlatform::createWindowInstance(jwindow));
+		return UIPlatform::createWindowInstance(jwindow);
 	}
 	return Ref<WindowInstance>::null();
 }
@@ -488,7 +488,7 @@ Ref<WindowInstance> UIPlatform::createWindowInstance(jobject jwindow)
 	if (ret.isNotNull()) {
 		UIPlatform::_registerWindowInstance((void*)(ret->m_window.get()), ret.get());
 	}
-	return Ref<WindowInstance>::from(ret);
+	return ret;
 }
 
 Ref<WindowInstance> UIPlatform::getWindowInstance(jobject jwindow)

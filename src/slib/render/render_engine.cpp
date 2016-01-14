@@ -266,7 +266,7 @@ void RenderEngine::drawDebugText()
 		}
 		m_textureDebug = texture;
 	}
-	Ref<Bitmap> bitmap = Ref<Bitmap>::from(texture->getSource());
+	Ref<Bitmap> bitmap = texture->getSource();
 	if (bitmap.isNull()) {
 		return;
 	}

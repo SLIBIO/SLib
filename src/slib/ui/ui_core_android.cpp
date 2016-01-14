@@ -93,7 +93,7 @@ Ref<Screen> UI::getPrimaryScreen()
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			JniLocal<jobject> display = _AndroidUtil::getDefaultDisplay.callObject(sl_null, jactivity);
-			ret = Ref<Screen>::from(_Android_Screen::create(display));
+			ret = _Android_Screen::create(display);
 		}
 	}
 	return ret;

@@ -121,7 +121,7 @@ Ref<ViewInstance> EditView::createInstance(ViewInstance* _parent)
 		((_EditView*)this)->applyProperties(handle);
 	}
 	IOS_VIEW_CREATE_INSTANCE_END
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 Ref<ViewInstance> PasswordView::createInstance(ViewInstance* _parent)
@@ -133,7 +133,7 @@ Ref<ViewInstance> PasswordView::createInstance(ViewInstance* _parent)
 		((_EditView*)this)->applyProperties(handle);
 	}
 	IOS_VIEW_CREATE_INSTANCE_END
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 Ref<ViewInstance> TextArea::createInstance(ViewInstance* _parent)
@@ -144,7 +144,7 @@ Ref<ViewInstance> TextArea::createInstance(ViewInstance* _parent)
 		((_EditView*)this)->applyProperties(handle);
 	}
 	IOS_VIEW_CREATE_INSTANCE_END
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 

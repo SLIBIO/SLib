@@ -190,7 +190,7 @@ Ref<ViewInstance> TabView::createInstance(ViewInstance* parent)
 
 		((_TabView*)this)->__copyTabs(handle, ret.get());
 	}
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 void TabView::_refreshTabsCount()

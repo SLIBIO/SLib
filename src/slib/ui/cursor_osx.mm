@@ -30,8 +30,7 @@ public:
 
 Ref<Cursor> UIPlatform::createCursor(NSCursor* cursor)
 {
-	Ref<_OSX_Cursor> ret = _OSX_Cursor::create(cursor);
-	return Ref<Cursor>::from(ret);
+	return _OSX_Cursor::create(cursor);
 }
 
 NSCursor* UIPlatform::getCursorHandle(const Ref<Cursor>& cursor)

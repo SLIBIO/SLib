@@ -1,9 +1,6 @@
 #include "../../../inc/slib/db/database.h"
 
 SLIB_DB_NAMESPACE_BEGIN
-DatabaseStatement::DatabaseStatement()
-{
-}
 
 Ref<Database> DatabaseStatement::getDatabase()
 {
@@ -16,7 +13,7 @@ List< Map<String, Variant> > DatabaseStatement::getListForQueryResult(const Vari
 	Ref<DatabaseCursor> cursor = query(params, nParams);
 	if (cursor.isNotNull()) {
 		while (cursor->moveNext()) {
-			ret.add(cursor->getRow());
+			ret.add_NoLock(cursor->getRow());
 		}
 	}
 	return ret;
@@ -28,21 +25,21 @@ Map<String, Variant> DatabaseStatement::getRecordForQueryResult(const Variant* p
 	Ref<DatabaseCursor> cursor = query(params, nParams);
 	if (cursor.isNotNull()) {
 		if (cursor->moveNext()) {
-			ret = cursor->getRow();
+			return cursor->getRow();
 		}
 	}
-	return ret;
+	return Map<String, Variant>::null();
 }
 
 Variant DatabaseStatement::getValueForQueryResult(const Variant* params, sl_uint32 nParams)
 {
-	Variant ret;
 	Ref<DatabaseCursor> cursor = query(params, nParams);
 	if (cursor.isNotNull()) {
 		if (cursor->moveNext()) {
-			ret = cursor->getValue(0);
+			return cursor->getValue(0);
 		}
 	}
-	return ret;
+	return Variant::null();
 }
+
 SLIB_DB_NAMESPACE_END

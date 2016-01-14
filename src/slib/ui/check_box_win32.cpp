@@ -45,7 +45,7 @@ Ref<ViewInstance> CheckBox::createInstance(ViewInstance* parent)
 		}
 		m_fontInstance = fontInstance;
 	}
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 String CheckBox::getText()

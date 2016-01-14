@@ -101,7 +101,7 @@ Ref<ViewInstance> WebView::createInstance(ViewInstance* _parent)
 		((_WebView*)this)->__applyProperties(handle);
 	}
 	IOS_VIEW_CREATE_INSTANCE_END
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 void WebView::onResize()

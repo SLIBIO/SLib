@@ -57,7 +57,7 @@ Ref<ViewInstance> LabelView::createInstance(ViewInstance* _parent)
 			((_LabelView*)this)->applyParameters(handle);
 		}
 	}
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 String LabelView::getText()

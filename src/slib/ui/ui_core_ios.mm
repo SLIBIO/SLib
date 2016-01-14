@@ -62,8 +62,7 @@ public:
 
 Ref<Screen> UIPlatform::createScreen(UIScreen* screen)
 {
-	Ref<_iOS_Screen> ret = _iOS_Screen::create(screen);
-	return Ref<Screen>::from(ret);
+	return _iOS_Screen::create(screen);
 }
 
 UIScreen* UIPlatform::getScreenHandle(Screen* _screen)
@@ -85,8 +84,7 @@ List< Ref<Screen> > UI::getScreens()
 	}
 	for (sl_size i = 0; i < n; i++) {
 		UIScreen* _screen = [arr objectAtIndex:i];
-		Ref<Screen> screen = Ref<Screen>::from(_iOS_Screen::create(_screen));
-		ret.add(screen);
+		ret.add_NoLock(_iOS_Screen::create(_screen));
 	}
 	return ret;
 }

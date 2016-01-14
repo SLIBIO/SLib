@@ -39,7 +39,7 @@ Ref<ViewInstance> RenderView::createInstance(ViewInstance* _parent)
 		[handle _init];
 		[handle _setRenderContinuously:(m_renderMode == RenderView::renderModeContinuously)];
 	}
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 void RenderView::setRenderMode(RenderView::RenderMode mode)

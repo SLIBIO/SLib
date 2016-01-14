@@ -203,8 +203,7 @@ public:
 
 Ref<NetCapture> NetCapture::createPcap(const NetCaptureParam& param)
 {
-	Ref<_NetPcapCapture> ret = _NetPcapCapture::create(param);
-	return Ref<NetCapture>::from(ret);
+	return _NetPcapCapture::create(param);
 }
 
 static void _NetCapture_parseDeviceInfo(pcap_if_t* dev, NetCaptureDevice& out)

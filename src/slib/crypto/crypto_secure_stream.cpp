@@ -366,8 +366,7 @@ public:
 
 Ref<SecureStream> SecureStreamServer::createStream(const Ptr<IStream>& baseStream, const SecureStreamServerParam& param)
 {
-	Ref<_SecureStreamServer_SecureStream> ret = _SecureStreamServer_SecureStream::create(baseStream, param);
-	return Ref<SecureStream>::from(ret);
+	return _SecureStreamServer_SecureStream::create(baseStream, param);
 }
 
 class _SecureStreamServer_AsyncStream : public AsyncSecureStream, public IAsyncStreamListener
@@ -615,8 +614,7 @@ public:
 
 Ref<AsyncSecureStream> SecureStreamServer::createAsyncStream(const Ref<AsyncStream>& baseStream, const AsyncSecureStreamServerParam& param, sl_bool flagConnect)
 {
-	Ref<_SecureStreamServer_AsyncStream> ret = _SecureStreamServer_AsyncStream::create(baseStream, param, flagConnect);
-	return Ref<AsyncSecureStream>::from(ret);
+	return _SecureStreamServer_AsyncStream::create(baseStream, param, flagConnect);
 }
 
 SecureStreamClientParam::SecureStreamClientParam()
@@ -972,8 +970,7 @@ public:
 
 Ref<SecureStream> SecureStreamClient::createStream(const Ptr<IStream>& baseStream, const SecureStreamClientParam& param)
 {
-	Ref<_SecureStreamClient_SecureStream> ret = _SecureStreamClient_SecureStream::create(baseStream, param);
-	return Ref<SecureStream>::from(ret);
+	return _SecureStreamClient_SecureStream::create(baseStream, param);
 }
 
 class _SecureStreamClient_AsyncStream : public AsyncSecureStream, public IAsyncStreamListener
@@ -1223,8 +1220,7 @@ public:
 
 Ref<AsyncSecureStream> SecureStreamClient::createAsyncStream(const Ref<AsyncStream>& baseStream, const AsyncSecureStreamClientParam& param, sl_bool flagConnect)
 {
-	Ref<_SecureStreamClient_AsyncStream> ret = _SecureStreamClient_AsyncStream::create(baseStream, param, flagConnect);
-	return Ref<AsyncSecureStream>::from(ret);
+	return _SecureStreamClient_AsyncStream::create(baseStream, param, flagConnect);
 }
 
 struct _SecureStream_DefaultKey

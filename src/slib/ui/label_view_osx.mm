@@ -66,7 +66,7 @@ Ref<ViewInstance> LabelView::createInstance(ViewInstance* _parent)
 		((_LabelView*)this)->__applyProperties(handle);
 	}
 	OSX_VIEW_CREATE_INSTANCE_END
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 String LabelView::getText()

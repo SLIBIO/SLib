@@ -84,7 +84,7 @@ Ref<ViewInstance> DropDownList::createInstance(ViewInstance* _parent)
 			}
 		}
 	}
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 sl_uint32 DropDownList::getSelectedIndex()

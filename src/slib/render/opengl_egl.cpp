@@ -288,8 +288,7 @@ public:
 
 Ref<Renderer> EGL::createRenderer(void* windowHandle, const RendererParam& param)
 {
-	Ref<_EGLRendererImpl> ret = _EGLRendererImpl::create(windowHandle, param);
-	return Ref<Renderer>::from(ret);
+	return _EGLRendererImpl::create(windowHandle, param);
 }
 SLIB_RENDER_NAMESPACE_END
 

@@ -288,7 +288,7 @@ public:
 
 Ref<AudioRecorder> AudioRecorder::create(const AudioRecorderParam& param)
 {
-	return Ref<AudioRecorder>::from(_OSX_AudioRecorder::create(param));
+	return _OSX_AudioRecorder::create(param);
 }
 
 List<AudioRecorderInfo> AudioRecorder::getRecordersList()

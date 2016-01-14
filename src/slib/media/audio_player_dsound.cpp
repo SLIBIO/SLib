@@ -294,7 +294,7 @@ public:
 
 	Ref<AudioPlayerBuffer> createBuffer(const AudioPlayerBufferParam& param)
 	{
-		return Ref<AudioPlayerBuffer>::from(_DirectSound_AudioPlayerBuffer::create(param, m_deviceID));
+		return _DirectSound_AudioPlayerBuffer::create(param, m_deviceID);
 	}
 
 	struct DeviceProperty {
@@ -331,7 +331,7 @@ public:
 
 Ref<AudioPlayer> DirectSound::createPlayer(const AudioPlayerParam& param)
 {
-	return Ref<AudioPlayer>::from(_DirectSound_AudioPlayer::create(param));
+	return _DirectSound_AudioPlayer::create(param);
 }
 
 List<AudioPlayerInfo> DirectSound::getPlayersList()

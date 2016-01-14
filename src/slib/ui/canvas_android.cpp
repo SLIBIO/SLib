@@ -433,8 +433,7 @@ Ref<Canvas> UIPlatform::createCanvas(jobject jcanvas)
 	if (!jcanvas) {
 		return Ref<Canvas>::null();
 	}
-	Ref<_Android_Canvas> canvas = _Android_Canvas::create(jcanvas);
-	return Ref<Canvas>::from(canvas);
+	return _Android_Canvas::create(jcanvas);
 }
 
 jobject UIPlatform::getCanvasHandle(Canvas* _canvas)

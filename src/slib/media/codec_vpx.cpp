@@ -324,12 +324,12 @@ public:
 
 Ref<VideoVpxEncoder> VideoVpxEncoder::create(const VideoVpxEncoderParam& param)
 {
-	return Ref<VideoVpxEncoder>::from(_VpxVideoEncoderImpl::create(param));
+	return _VpxVideoEncoderImpl::create(param);
 }
 
 Ref<VideoVpxDecoder> VideoVpxDecoder::create(const VideoVpxDecoderParam& param)
 {
-	return Ref<VideoVpxDecoder>::from(_VpxVideoDecoderImpl::create(param));
+	return _VpxVideoDecoderImpl::create(param);
 }
 SLIB_MEDIA_NAMESPACE_END
 

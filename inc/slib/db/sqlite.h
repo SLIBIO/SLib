@@ -9,7 +9,9 @@ class SLIB_EXPORT SQLiteDatabase : public Database
 {
 	SLIB_DECLARE_OBJECT(SQLiteDatabase, Database)
 protected:
-	SQLiteDatabase();
+	SLIB_INLINE SQLiteDatabase()
+	{		
+	}
 
 public:
 	static Ref<SQLiteDatabase> connect(const String& filePath);

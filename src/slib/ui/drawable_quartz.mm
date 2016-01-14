@@ -86,8 +86,7 @@ public:
 
 Ref<Drawable> UIPlatform::createImageDrawable(CGImageRef image, sl_bool flagFlipped)
 {
-	Ref<_Quartz_ImageDrawable> ret = _Quartz_ImageDrawable::create(image, flagFlipped);
-	return Ref<Drawable>::from(ret);
+	return _Quartz_ImageDrawable::create(image, flagFlipped);
 }
 
 CGImageRef UIPlatform::getImageDrawableHandle(Drawable* _drawable)
@@ -342,8 +341,7 @@ public:
 
 Ref<Bitmap> UI::createBitmap(sl_uint32 width, sl_uint32 height)
 {
-	Ref<_Quartz_Bitmap> ret = _Quartz_Bitmap::create(width, height);
-	return Ref<Bitmap>::from(ret);
+	return _Quartz_Bitmap::create(width, height);
 }
 
 Ref<Drawable> UI::createDrawableFromBitmap(const Ref<Bitmap>& bitmap)
@@ -360,8 +358,7 @@ Ref<Drawable> UI::createDrawableFromBitmap(const Ref<Bitmap>& bitmap)
 
 Ref<Bitmap> UI::loadBitmapFromMemory(const void* mem, sl_size size)
 {
-	Ref<_Quartz_Bitmap> ret = _Quartz_Bitmap::loadFromMemory(mem, size);
-	return Ref<Bitmap>::from(ret);
+	return _Quartz_Bitmap::loadFromMemory(mem, size);
 }
 
 SLIB_UI_NAMESPACE_END

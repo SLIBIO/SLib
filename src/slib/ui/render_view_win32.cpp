@@ -91,7 +91,7 @@ Ref<ViewInstance> RenderView::createInstance(ViewInstance* parent)
 		}
 		ret.setNull();
 	}
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 void RenderView::setRenderMode(RenderView::RenderMode mode)

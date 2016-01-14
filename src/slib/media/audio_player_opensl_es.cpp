@@ -275,12 +275,12 @@ public:
 
 Ref<AudioPlayerBuffer> _OpenSLES_AudioPlayerImpl::createBuffer(const AudioPlayerBufferParam& param)
 {
-	return Ref<AudioPlayerBuffer>::from(_OpenSLES_AudioPlayerBufferImpl::create(this, param));
+	return _OpenSLES_AudioPlayerBufferImpl::create(this, param);
 }
 
 Ref<AudioPlayer> OpenSL_ES::createPlayer(const AudioPlayerParam& param)
 {
-	return Ref<AudioPlayer>::from(_OpenSLES_AudioPlayerImpl::create(param));
+	return _OpenSLES_AudioPlayerImpl::create(param);
 }
 SLIB_MEDIA_NAMESPACE_END
 

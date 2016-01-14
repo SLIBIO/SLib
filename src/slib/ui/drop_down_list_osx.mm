@@ -100,7 +100,7 @@ Ref<ViewInstance> DropDownList::createInstance(ViewInstance* _parent)
 		}
 	}
 	OSX_VIEW_CREATE_INSTANCE_END
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 sl_uint32 DropDownList::getSelectedIndex()

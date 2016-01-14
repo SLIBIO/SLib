@@ -531,8 +531,7 @@ Ref<Canvas> UIPlatform::createCanvas(Gdiplus::Graphics* graphics, sl_uint32 widt
 	if (!graphics) {
 		return Ref<Canvas>::null();
 	}
-	Ref<_Gdiplus_Canvas> ret = _Gdiplus_Canvas::create(graphics, (sl_real)width, (sl_real)height, rectDirty, flagFreeOnRelease, ref);
-	return Ref<Canvas>::from(ret);
+	return _Gdiplus_Canvas::create(graphics, (sl_real)width, (sl_real)height, rectDirty, flagFreeOnRelease, ref);
 }
 
 Gdiplus::Graphics* UIPlatform::getCanvasHandle(Canvas* _canvas)

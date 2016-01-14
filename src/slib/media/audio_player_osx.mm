@@ -268,16 +268,15 @@ public:
     Ref<AudioPlayerBuffer> createBuffer(const AudioPlayerBufferParam& param)
     {
         if (m_deviceID != sl_null) {
-            return Ref<AudioPlayerBuffer>::from(_OSX_AudioPlayerBuffer::create(param, m_deviceID));
-        } else {
-            return Ref<AudioPlayerBuffer>::null();
+            return _OSX_AudioPlayerBuffer::create(param, m_deviceID);
         }
+        return Ref<AudioPlayerBuffer>::null();
     }
 };
 
 Ref<AudioPlayer> AudioPlayer::create(const AudioPlayerParam& param)
 {
-    return Ref<AudioPlayer>::from(_OSX_AudioPlayer::create(param));
+    return _OSX_AudioPlayer::create(param);
 }
 
 List<AudioPlayerInfo> AudioPlayer::getPlayersList()

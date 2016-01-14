@@ -317,8 +317,7 @@ public:
 
 Ref<Drawable> UIPlatform::createImageDrawable(jobject bitmap, sl_bool flagFreeOnRelease, Referable* ref)
 {
-	Ref<_Android_Bitmap> ret = _Android_Bitmap::create(bitmap, flagFreeOnRelease, ref);
-	return Ref<Drawable>::from(ret);
+	return _Android_Bitmap::create(bitmap, flagFreeOnRelease, ref);
 }
 
 jobject UIPlatform::getImageDrawableHandle(Drawable* _drawable)
@@ -464,18 +463,17 @@ public:
 
 Ref<Drawable> UI::createDrawableFromImage(const ImageDesc& desc)
 {
-	Ref<_Android_ImageDrawable> ret = _Android_ImageDrawable::create(desc);
-	return Ref<Drawable>::from(ret);
+	return _Android_ImageDrawable::create(desc);
 }
 
 Ref<Drawable> UI::loadDrawableFromMemory(const void* buf, sl_size size)
 {
-	return Ref<Drawable>::from(_Android_Bitmap::load(buf, size));
+	return _Android_Bitmap::load(buf, size);
 }
 
 Ref<Bitmap> UI::createBitmap(sl_uint32 width, sl_uint32 height)
 {
-	return Ref<Bitmap>::from(_Android_Bitmap::create(width, height));
+	return _Android_Bitmap::create(width, height);
 }
 
 Ref<Drawable> UI::createDrawableFromBitmap(const Ref<Bitmap>& bitmap)
@@ -485,7 +483,7 @@ Ref<Drawable> UI::createDrawableFromBitmap(const Ref<Bitmap>& bitmap)
 
 Ref<Bitmap> UI::loadBitmapFromMemory(const void* mem, sl_size size)
 {
-	return Ref<Bitmap>::from(_Android_Bitmap::load(mem, size));
+	return _Android_Bitmap::load(mem, size);
 }
 
 SLIB_UI_NAMESPACE_END

@@ -96,7 +96,7 @@ public:
 				ret->setFocus();
 			}
 		}
-		return Ref<WindowInstance>::from(ret);
+		return ret;
 	}
 	
 	~_iOS_Window()
@@ -550,11 +550,11 @@ Ref<WindowInstance> UIPlatform::createWindowInstance(UIView* window)
 	if (ret.isNotNull()) {
 		return ret;
 	}
-	ret = Ref<WindowInstance>::from(_iOS_Window::create(window));
+	ret = _iOS_Window::create(window);
 	if (ret.isNotNull()) {
 		UIPlatform::_registerWindowInstance((__bridge void*)window, ret.get());
 	}
-	return Ref<WindowInstance>::from(ret);
+	return ret;
 }
 
 Ref<WindowInstance> UIPlatform::getWindowInstance(UIView* window)

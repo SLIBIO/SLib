@@ -37,7 +37,7 @@ Ref<ViewInstance> Button::createInstance(ViewInstance* _parent)
 			}
 		}
 	}
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 String Button::getText()

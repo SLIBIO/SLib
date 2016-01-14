@@ -327,8 +327,7 @@ public:
 
 Ref<NetFilter> NetFilter::create(const NetFilterParam& param)
 {
-	Ref<_Linux_NetFilter> ret = _Linux_NetFilter::create(param);
-	return Ref<NetFilter>::from(ret);
+	return _Linux_NetFilter::create(param);
 }
 SLIB_NETWORK_NAMESPACE_END
 

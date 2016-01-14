@@ -123,7 +123,7 @@ Ref<ViewInstance> TabView::createInstance(ViewInstance* _parent)
 		[handle setFont:hFont];
 	}
 	OSX_VIEW_CREATE_INSTANCE_END
-	return Ref<ViewInstance>::from(ret);
+	return ret;
 }
 
 void TabView::_refreshTabsCount()

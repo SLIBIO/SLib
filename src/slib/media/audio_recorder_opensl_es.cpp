@@ -489,7 +489,7 @@ public:
 
 Ref<AudioRecorder> OpenSL_ES::createRecorder(const AudioRecorderParam& param)
 {
-	return Ref<AudioRecorder>::from(_OpenSLES_AudioRecorderImpl::create(param));
+	return _OpenSLES_AudioRecorderImpl::create(param);
 }
 SLIB_MEDIA_NAMESPACE_END
 

@@ -832,7 +832,7 @@ Ref<AsyncStream> AsyncStream::create(AsyncStreamInstance* instance, const Ref<As
 			}
 		}
 	}
-	return Ref<AsyncStream>::from(ret);
+	return ret;
 }
 
 Ref<AsyncStream> AsyncStream::create(AsyncStreamInstance* instance)

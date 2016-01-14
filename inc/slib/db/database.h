@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_DB_DATABASE
 
 #include "definition.h"
+
 #include "../core/object.h"
 #include "../core/list.h"
 #include "../core/map.h"
@@ -15,7 +16,9 @@ class SLIB_EXPORT DatabaseCursor : public Object
 {
 	SLIB_DECLARE_OBJECT(DatabaseCursor, Object)
 public:
-	DatabaseCursor();
+	SLIB_INLINE DatabaseCursor()
+	{		
+	}
 
 public:
 	Ref<Database> getDatabase();
@@ -77,7 +80,9 @@ class SLIB_EXPORT DatabaseStatement : public Object
 {
 	SLIB_DECLARE_OBJECT(DatabaseStatement, Object)
 public:
-	DatabaseStatement();
+	SLIB_INLINE DatabaseStatement()
+	{
+	}
 
 public:
 	Ref<Database> getDatabase();
@@ -97,7 +102,9 @@ class SLIB_EXPORT Database : public Object
 {
 	SLIB_DECLARE_OBJECT(Database, Object)
 public:
-	Database();
+	SLIB_INLINE Database()
+	{
+	}
 
 public:
 	virtual Ref<DatabaseStatement> prepareStatement(const String& sql) = 0;

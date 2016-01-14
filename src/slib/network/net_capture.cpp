@@ -204,8 +204,7 @@ public:
 
 Ref<NetCapture> NetCapture::createRawPacket(const NetCaptureParam& param)
 {
-	Ref<_NetRawPacketCapture> ret = _NetRawPacketCapture::create(param);
-	return Ref<NetCapture>::from(ret);
+	return _NetRawPacketCapture::create(param);
 }
 
 class _NetRawIPv4Capture : public NetCapture
@@ -399,8 +398,7 @@ public:
 
 Ref<NetCapture> NetCapture::createRawIPv4(const NetCaptureParam& param)
 {
-	Ref<_NetRawIPv4Capture> ret = _NetRawIPv4Capture::create(param);
-	return Ref<NetCapture>::from(ret);
+	return _NetRawIPv4Capture::create(param);
 }
 
 SLIB_NETWORK_NAMESPACE_END
