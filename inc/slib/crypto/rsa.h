@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_CRYPTO_RSA
 
 #include "definition.h"
+
 #include "hash.h"
 
 #include "../math/bigint.h"
@@ -14,6 +15,7 @@ public:
 	BigInt N; // modulus
 	BigInt E; // public exponent
 
+public:
 	SLIB_INLINE sl_uint32 getLength() const
 	{
 		return N.getSizeInBytes();
@@ -34,16 +36,18 @@ public:
 
 	sl_bool flagUseOnlyD; // Use N and D only for decryption
 
+public:
 	SLIB_INLINE RSAPrivateKey()
 	{
 		flagUseOnlyD = sl_false;
 	}
 
 	SLIB_INLINE RSAPrivateKey(const RSAPrivateKey& other)
-		: N(other.N), E(other.E), D(other.D), P(other.P), Q(other.Q), DP(other.DP), DQ(other.DQ), IQ(other.IQ)
+		: N(other.N), E(other.E), D(other.D), P(other.P), Q(other.Q), DP(other.DP), DQ(other.DQ), IQ(other.IQ), flagUseOnlyD(other.flagUseOnlyD)
 	{
 	}
 
+public:
 	SLIB_INLINE RSAPrivateKey& operator=(const RSAPrivateKey& other)
 	{
 		N = other.N;
@@ -54,6 +58,7 @@ public:
 		DP = other.DP;
 		DQ = other.DQ;
 		IQ = other.IQ;
+		flagUseOnlyD = other.flagUseOnlyD;
 		return *this;
 	}
 
@@ -67,22 +72,29 @@ class SLIB_EXPORT RSA
 {
 public:
 	static sl_bool executePublic(const RSAPublicKey& key, const void* src, void* dst);
+	
 	static sl_bool executePrivate(const RSAPrivateKey& key, const void* src, void* dst);
 
 	/*
 		PKCS#1 v1.5 Random Padding
 	*/
 	static sl_bool encryptPublic_pkcs1_v15(const RSAPublicKey& key, const void* input, sl_uint32 sizeInput, void* output);
+	
 	static sl_bool encryptPrivate_pkcs1_v15(const RSAPrivateKey& key, const void* input, sl_uint32 sizeInput, void* output);
+	
 	static sl_uint32 decryptPublic_pkcs1_v15(const RSAPublicKey& key, const void* input, void* output, sl_uint32 sizeOutputBuffer, sl_bool* pFlagSign = sl_null);
+	
 	static sl_uint32 decryptPrivate_pkcs1_v15(const RSAPrivateKey& key, const void* input, void* output, sl_uint32 sizeOutputBuffer, sl_bool* pFlagSign = sl_null);
 
 	/*
 		PKCS#1 v2.1 OAEP - Optimal Asymmetric Encryption Padding
 	*/
 	static sl_bool encryptPublic_oaep_v21(const RSAPublicKey& key, const Ref<CryptoHash>& hash, const void* input, sl_uint32 sizeInput, void* output, const void* label = 0, sl_uint32 sizeLabel = 0);
+	
 	static sl_bool encryptPrivate_oaep_v21(const RSAPrivateKey& key, const Ref<CryptoHash>& hash, const void* input, sl_uint32 sizeInput, void* output, const void* label = 0, sl_uint32 sizeLabel = 0);
+	
 	static sl_uint32 decryptPublic_oaep_v21(const RSAPublicKey& key, const Ref<CryptoHash>& hash, const void* input, void* output, sl_uint32 sizeOutputBuffer, const void* label = 0, sl_uint32 sizeLabel = 0);
+	
 	static sl_uint32 decryptPrivate_oaep_v21(const RSAPrivateKey& key, const Ref<CryptoHash>& hash, const void* input, void* output, sl_uint32 sizeOutputBuffer, const void* label = 0, sl_uint32 sizeLabel = 0);
 
 };

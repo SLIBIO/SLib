@@ -2,17 +2,13 @@
 #define CHECKHEADER_SLIB_CRYPTO_ZLIB
 
 #include "definition.h"
+
 #include "../core/object.h"
 #include "../core/memory.h"
 #include "../core/string.h"
 
-/*
-	ZlibCompress, ZlibDecompress
-
-	These classes are not thread-safe!
-*/
-
 SLIB_CRYPTO_NAMESPACE_BEGIN
+
 class SLIB_EXPORT GzipParam
 {
 public:
@@ -24,6 +20,7 @@ class SLIB_EXPORT ZlibCompress : public Object
 {
 public:
 	ZlibCompress();
+	
 	~ZlibCompress();
 
 public:
@@ -45,7 +42,9 @@ public:
 		contains gzip header
 		level = 0 ~ 9
 	*/
+	
 	sl_bool startGzip(const GzipParam& param, sl_int32 level = 6);
+	
 	SLIB_INLINE sl_bool startGzip(sl_int32 level = 6)
 	{
 		GzipParam param;
@@ -81,7 +80,9 @@ class SLIB_EXPORT ZlibDecompress : public Object
 {
 public:
 	ZlibDecompress();
+	
 	~ZlibDecompress();
+	
 public:
 	sl_bool isStarted();
 
@@ -114,32 +115,38 @@ class SLIB_EXPORT Zlib
 {
 public:
 	static sl_uint32 adler32(sl_uint32 adler, const void* data, sl_size size);
+	
 	SLIB_INLINE static sl_uint32 adler32(const void* data, sl_size size)
 	{
 		return adler32(1, data, size);
 	}
-	SLIB_INLINE static sl_uint32 adler32(sl_uint32 adler, Memory mem)
+	
+	SLIB_INLINE static sl_uint32 adler32(sl_uint32 adler, const Memory& mem)
 	{
 		return adler32(adler, mem.getBuf(), mem.getSize());
 	}
-	SLIB_INLINE static sl_uint32 adler32(Memory mem)
+	
+	SLIB_INLINE static sl_uint32 adler32(const Memory& mem)
 	{
 		return adler32(1, mem.getBuf(), mem.getSize());
 	}
 
 	/*
-	zlib crc32 : CRC32B
+		zlib crc32 : CRC32B
 	*/
 	static sl_uint32 crc32(sl_uint32 crc, const void* data, sl_size size);
+	
 	SLIB_INLINE static sl_uint32 crc32(const void* data, sl_size size)
 	{
 		return crc32(0, data, size);
 	}
-	SLIB_INLINE static sl_uint32 crc32(sl_uint32 crc, Memory mem)
+	
+	SLIB_INLINE static sl_uint32 crc32(sl_uint32 crc, const Memory& mem)
 	{
 		return crc32(crc, mem.getBuf(), mem.getSize());
 	}
-	SLIB_INLINE static sl_uint32 crc32(Memory mem)
+	
+	SLIB_INLINE static sl_uint32 crc32(const Memory& mem)
 	{
 		return crc32(0, mem.getBuf(), mem.getSize());
 	}
@@ -148,8 +155,11 @@ public:
 		Compress
 	*/
 	static Memory compress(const void* data, sl_size size, sl_int32 level = 6);
+	
 	static Memory compressRaw(const void* data, sl_size size, sl_int32 level = 6);
+	
 	static Memory compressGzip(const GzipParam& param, const void* data, sl_size size, sl_int32 level = 6);
+	
 	SLIB_INLINE static Memory compressGzip(const void* data, sl_size size, sl_int32 level = 6)
 	{
 		GzipParam param;

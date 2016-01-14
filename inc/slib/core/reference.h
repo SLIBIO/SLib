@@ -441,7 +441,7 @@ public:
 	template <class _ObjectClass>
 	SLIB_INLINE Ref(Ref<_ObjectClass>&& other)
 	{
-		_move_init(&other);
+		_move_init(&other, (_ObjectClass*)(0));
 	}
 	
 	template <class _ObjectClass>
@@ -464,7 +464,7 @@ public:
 	template <class _ObjectClass>
 	SLIB_INLINE Ref(SafeRef<_ObjectClass>&& other)
 	{
-		_move_init(&other);
+		_move_init(&other, (_ObjectClass*)(0));
 	}
 	
 	template <class _ObjectClass>
@@ -548,7 +548,7 @@ public:
 	template <class _ObjectClass>
 	SLIB_INLINE _Type& operator=(Ref<_ObjectClass>&& other)
 	{
-		_move_assign(&other);
+		_move_assign(&other, (_ObjectClass*)(0));
 		return *this;
 	}
 
@@ -576,7 +576,7 @@ public:
 	template <class _ObjectClass>
 	SLIB_INLINE _Type& operator=(SafeRef<_ObjectClass>&& other)
 	{
-		_move_assign(&other);
+		_move_assign(&other, (_ObjectClass*)(0));
 		return *this;
 	}
 	
@@ -687,6 +687,13 @@ public:
 		other.m_object = sl_null;
 	}
 	
+	SLIB_INLINE void _move_init(void* _other, ObjectClass* dummy)
+	{
+		_Type& other = *((_Type*)_other);
+		m_object = other.m_object;
+		other.m_object = sl_null;
+	}
+
 	SLIB_INLINE void _move_assign(void* _other)
 	{
 		if ((void*)this != _other) {
@@ -695,6 +702,16 @@ public:
 			other.m_object = sl_null;
 		}
 	}
+	
+	SLIB_INLINE void _move_assign(void* _other, ObjectClass* dummy)
+	{
+		if ((void*)this != _other) {
+			_Type& other = *((_Type*)_other);
+			_replaceObject(other.m_object);
+			other.m_object = sl_null;
+		}
+	}
+
 };
 
 
@@ -733,7 +750,7 @@ public:
 	template <class _ObjectClass>
 	SLIB_INLINE SafeRef(SafeRef<_ObjectClass>&& other)
 	{
-		_move_init(&other);
+		_move_init(&other, (_ObjectClass*)(0));
 	}
 
 	template <class _ObjectClass>
@@ -760,7 +777,7 @@ public:
 	template <class _ObjectClass>
 	SLIB_INLINE SafeRef(Ref<_ObjectClass>&& other)
 	{
-		_move_init(&other);
+		_move_init(&other, (_ObjectClass*)(0));
 	}
 
 	template <class _ObjectClass>
@@ -848,7 +865,7 @@ public:
 	template <class _ObjectClass>
 	SLIB_INLINE _Type& operator=(SafeRef<_ObjectClass>&& other)
 	{
-		_move_assign(&other);
+		_move_assign(&other, (_ObjectClass*)(0));
 		return *this;
 	}
 
@@ -883,7 +900,7 @@ public:
 	template <class _ObjectClass>
 	SLIB_INLINE _Type& operator=(Ref<_ObjectClass>&& other)
 	{
-		_move_assign(&other);
+		_move_assign(&other, (_ObjectClass*)(0));
 		return *this;
 	}
 
@@ -1027,7 +1044,23 @@ public:
 		other.m_object = sl_null;
 	}
 	
+	SLIB_INLINE void _move_init(void* _other, ObjectClass* dummy)
+	{
+		_Type& other = *((_Type*)_other);
+		m_object = other.m_object;
+		other.m_object = sl_null;
+	}
+
 	SLIB_INLINE void _move_assign(void* _other)
+	{
+		if ((void*)this != _other) {
+			_Type& other = *((_Type*)_other);
+			_replaceObject(other.m_object);
+			other.m_object = sl_null;
+		}
+	}
+	
+	SLIB_INLINE void _move_assign(void* _other, ObjectClass* dummy)
 	{
 		if ((void*)this != _other) {
 			_Type& other = *((_Type*)_other);
@@ -1068,17 +1101,39 @@ public:
 	SLIB_INLINE WeakRef()
 	{
 	}
-
+	
+	SLIB_INLINE WeakRef(_Type&& other)
+	{
+		m_weak._move_init(&other);
+	}
+	
 	SLIB_INLINE WeakRef(const _Type& other) : m_weak(other.m_weak)
 	{
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE WeakRef(WeakRef<_ObjectClass>&& other)
+	{
+		m_weak._move_init(&other, (_ObjectClass*)(0));
 	}
 
 	template <class _ObjectClass>
 	SLIB_INLINE WeakRef(const WeakRef<_ObjectClass>& other) : m_weak(other.getWeakRef())
 	{
 	}
+	
+	SLIB_INLINE WeakRef(SafeWeakRef<ObjectClass>&& other)
+	{
+		m_weak._move_init(&other);
+	}
 
 	WeakRef(const SafeWeakRef<ObjectClass>& other);
+	
+	template <class _ObjectClass>
+	SLIB_INLINE WeakRef(SafeWeakRef<_ObjectClass>&& other)
+	{
+		m_weak._move_init(&other, (_ObjectClass*)(0));
+	}
 	
 	template <class _ObjectClass>
 	WeakRef(const SafeWeakRef<_ObjectClass>& other);
@@ -1169,9 +1224,22 @@ public:
 	}
 
 public:
+	SLIB_INLINE _Type& operator=(_Type&& other)
+	{
+		m_weak._move_assign(&other);
+		return *this;
+	}
+	
 	SLIB_INLINE _Type& operator=(const _Type& other)
 	{
 		m_weak = other.m_weak;
+		return *this;
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE _Type& operator=(WeakRef<_ObjectClass>&& other)
+	{
+		m_weak._move_assign(&other, (_ObjectClass*)(0));
 		return *this;
 	}
 
@@ -1181,8 +1249,21 @@ public:
 		m_weak = other.getWeakRef();
 		return *this;
 	}
+	
+	SLIB_INLINE _Type& operator=(SafeWeakRef<ObjectClass>&& other)
+	{
+		m_weak._move_assign(&other);
+		return *this;
+	}
 
 	_Type& operator=(const SafeWeakRef<ObjectClass>& other);
+	
+	template <class _ObjectClass>
+	SLIB_INLINE _Type& operator=(SafeWeakRef<_ObjectClass>&& other)
+	{
+		m_weak._move_assign(&other, (_ObjectClass*)(0));
+		return *this;
+	}
 	
 	template <class _ObjectClass>
 	_Type& operator=(const SafeWeakRef<_ObjectClass>& other);
@@ -1281,8 +1362,19 @@ public:
 	{
 	}
 	
+	SLIB_INLINE SafeWeakRef(_Type&& other)
+	{
+		m_weak._move_init(&other);
+	}
+	
 	SLIB_INLINE SafeWeakRef(const _Type& other) : m_weak(other.m_weak)
 	{
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE SafeWeakRef(SafeWeakRef<_ObjectClass>&& other)
+	{
+		m_weak._move_init(&other, (_ObjectClass*)(0));
 	}
 	
 	template <class _ObjectClass>
@@ -1290,8 +1382,19 @@ public:
 	{
 	}
 	
+	SLIB_INLINE SafeWeakRef(WeakRef<ObjectClass>&& other)
+	{
+		m_weak._move_init(&other);
+	}
+	
 	SLIB_INLINE SafeWeakRef(const WeakRef<ObjectClass>& other) : m_weak(other.getWeakRef())
 	{
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE SafeWeakRef(WeakRef<_ObjectClass>&& other)
+	{
+		m_weak._move_init(&other, (_ObjectClass*)(0));
 	}
 	
 	template <class _ObjectClass>
@@ -1371,9 +1474,22 @@ public:
 	}
 	
 public:
+	SLIB_INLINE _Type& operator=(_Type&& other)
+	{
+		m_weak._move_assign(&other);
+		return *this;
+	}
+	
 	SLIB_INLINE _Type& operator=(const _Type& other)
 	{
 		m_weak = other.m_weak;
+		return *this;
+	}
+	
+	template <class _ObjectClass>
+	SLIB_INLINE _Type& operator=(SafeWeakRef<_ObjectClass>&& other)
+	{
+		m_weak._move_assign(&other, (_ObjectClass*)(0));
 		return *this;
 	}
 	
@@ -1384,6 +1500,12 @@ public:
 		return *this;
 	}
 	
+	SLIB_INLINE _Type& operator=(WeakRef<ObjectClass>&& other)
+	{
+		m_weak._move_assign(&other);
+		return *this;
+	}
+	
 	SLIB_INLINE _Type& operator=(const WeakRef<ObjectClass>& other)
 	{
 		m_weak = other.getWeakRef();
@@ -1391,9 +1513,17 @@ public:
 	}
 	
 	template <class _ObjectClass>
+	SLIB_INLINE _Type& operator=(WeakRef<_ObjectClass>&& other)
+	{
+		m_weak._move_assign(&other, (_ObjectClass*)(0));
+		return *this;
+	}
+	
+	template <class _ObjectClass>
 	SLIB_INLINE _Type& operator=(const WeakRef<_ObjectClass>& other)
 	{
 		m_weak = other.getWeakRef();
+		return *this;
 	}
 	
 	SLIB_INLINE _Type& operator=(const Ref<ObjectClass>& other)

@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_CRYPTO_MD5
 
 #include "definition.h"
+
 #include "hash.h"
 
 /*
@@ -11,16 +12,20 @@
 */
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
+
 class SLIB_EXPORT MD5 : public CryptoHash
 {
 public:
 	SLIB_CRYPTO_DEFINE_HASH(MD5, 16)
+	
 public:
 	MD5();
 
 public:
 	void start();
+	
 	void update(const void* input, sl_size n);
+	
 	void finish(void* output);
 
 private:

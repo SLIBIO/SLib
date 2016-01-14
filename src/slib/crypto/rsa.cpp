@@ -6,6 +6,7 @@
 #include "../../../inc/slib/core/scoped_pointer.h"
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
+
 sl_bool RSA::executePublic(const RSAPublicKey& key, const void* src, void* dst)
 {
 	sl_uint32 n = key.N.getSizeInBytes();
@@ -288,4 +289,5 @@ sl_uint32 RSA::decryptPrivate_oaep_v21(const RSAPrivateKey& key, const Ref<Crypt
 {
 	return _rsa_decrypt_oaep_v21(sl_null, &key, hash, input, output, sizeOutputBuffer, label, sizeLabel);
 }
+
 SLIB_CRYPTO_NAMESPACE_END

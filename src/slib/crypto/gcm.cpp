@@ -1,6 +1,7 @@
 #include "../../../inc/slib/crypto/gcm.h"
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
+
 void BlockCipher_GCM_Base::generateTable(const void* _H)
 {
 	sl_uint32 i, j;
@@ -178,4 +179,5 @@ void BlockCipher_GCM_Base::calculateCIV(const void* _IV, sl_size lenIV, void* _C
 		calculateGHash(sl_null, 0, IV, lenIV, CIV);
 	}
 }
+
 SLIB_CRYPTO_NAMESPACE_END

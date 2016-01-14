@@ -8,6 +8,7 @@
 #include "../../../inc/slib/core/mio.h"
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
+
 Ref<CryptoHash> CryptoHash::create(CryptoHash::Type type)
 {
 	switch (type) {
@@ -95,5 +96,6 @@ void CryptoHash::applyMask_MGF1(const void* seed, sl_uint32 sizeSeed, void* _tar
 		target[k] ^= h[k];
 	}
 }
+
 SLIB_CRYPTO_NAMESPACE_END
 

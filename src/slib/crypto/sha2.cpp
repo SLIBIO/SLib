@@ -3,6 +3,7 @@
 #include "../../../inc/slib/core/math.h"
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
+
 _SHA256Base::_SHA256Base()
 {
 	rdata_len = 0;
@@ -355,5 +356,6 @@ sl_uint32 SHA256::make32bitChecksum(const void* input, sl_size n)
 	}
 	return MIO::readUint32LE(hash);
 }
+
 SLIB_CRYPTO_NAMESPACE_END
 

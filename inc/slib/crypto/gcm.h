@@ -18,6 +18,7 @@ such as the Advanced Encryption Standard (AES) algorithm
 */
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
+
 class SLIB_EXPORT BlockCipher_GCM_Base
 {
 private:
@@ -41,19 +42,13 @@ public:
 template <class BlockCipher>
 class SLIB_EXPORT BlockCipher_GCM : public BlockCipher_GCM_Base
 {
-private:
-	const BlockCipher* m_cipher;
-
-	sl_uint8 CIV[16];
-	sl_uint8 GCTR0[16];
-	sl_uint8 GHASH_X[16];
-
 public:
-	BlockCipher_GCM(const BlockCipher* cipher = sl_null)
+	SLIB_INLINE BlockCipher_GCM(const BlockCipher* cipher = sl_null)
 	{
 		setCipher(cipher);
 	}
 
+public:
 	sl_bool setCipher(const BlockCipher* cipher)
 	{
 		if (cipher) {
@@ -261,6 +256,14 @@ private:
 			}
 		}
 	}
+	
+private:
+	const BlockCipher* m_cipher;
+	
+	sl_uint8 CIV[16];
+	sl_uint8 GCTR0[16];
+	sl_uint8 GHASH_X[16];
+	
 };
 
 SLIB_CRYPTO_NAMESPACE_END

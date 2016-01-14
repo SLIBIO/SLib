@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_CRYPTO_BLOCKCIPHER
 
 #include "definition.h"
+
 #include "../core/mio.h"
 #include "../core/base.h"
 #include "../core/math.h"

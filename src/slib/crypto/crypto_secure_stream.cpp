@@ -11,9 +11,10 @@
 #define OAEP_LABEL_LEN 12
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
+
 void AsyncSecureStream::onConnected(sl_bool flagError)
 {
-	PtrLocker<IAsyncSecureStreamListener> listener(getListener());
+	PtrLocker<IAsyncSecureStreamListener> listener(m_listener);
 	if (listener.isNotNull()) {
 		listener->onConnectedSecureStream(this, flagError);
 	}
@@ -372,7 +373,7 @@ Ref<SecureStream> SecureStreamServer::createStream(const Ptr<IStream>& baseStrea
 class _SecureStreamServer_AsyncStream : public AsyncSecureStream, public IAsyncStreamListener
 {
 public:
-	Ref<AsyncStream> m_streamBase;
+	SafeRef<AsyncStream> m_streamBase;
 	_SecureStreamServer_Context m_context;
 
 	Memory m_rdata;
@@ -396,14 +397,17 @@ public:
 
 	sl_bool connect()
 	{
-		ObjectLocker lock(this);
-		if (m_flagInited) {
-			return sl_false;
-		}
-		m_flagInited = sl_true;
-		WeakRef<_SecureStreamServer_AsyncStream> _this(this);
-		if (m_streamBase->readToMemory(m_rdata, _this)) {
-			return sl_true;
+		Ref<AsyncStream> streamBase = m_streamBase;
+		if (streamBase.isNotNull()) {
+			ObjectLocker lock(this);
+			if (m_flagInited) {
+				return sl_false;
+			}
+			m_flagInited = sl_true;
+			WeakRef<_SecureStreamServer_AsyncStream> _this(this);
+			if (streamBase->readToMemory(m_rdata, _this)) {
+				return sl_true;
+			}
 		}
 		return sl_false;
 	}
@@ -591,7 +595,7 @@ public:
 					ret->setLoop(baseStream->getLoop());
 					ret->m_rdata = rdata;
 					ret->m_streamBase = baseStream;
-					ret->setListener(param.listener);
+					ret->m_listener = param.listener;
 					if (ret->m_context.init(param)) {
 						if (flagConnect) {
 							if (ret->connect()) {
@@ -975,7 +979,7 @@ Ref<SecureStream> SecureStreamClient::createStream(const Ptr<IStream>& baseStrea
 class _SecureStreamClient_AsyncStream : public AsyncSecureStream, public IAsyncStreamListener
 {
 public:
-	Ref<AsyncStream> m_streamBase;
+	SafeRef<AsyncStream> m_streamBase;
 	_SecureStreamClient_Context m_context;
 
 	Memory m_sdata;
@@ -1002,17 +1006,20 @@ public:
 
 	sl_bool connect()
 	{
-		ObjectLocker lock(this);
-		if (m_flagInited) {
-			return sl_false;
-		}
-		m_flagInited = sl_true;
-		WeakRef<_SecureStreamClient_AsyncStream> _this(this);
-		Memory rdata = m_rdata.sub(0, m_sizeRdata);
-		m_rdata.setNull();
-		if (m_streamBase->writeFromMemory(rdata, _this)) {
-			if (m_streamBase->readToMemory(m_sdata, _this)) {
-				return sl_true;
+		Ref<AsyncStream> streamBase = m_streamBase;
+		if (streamBase.isNotNull()) {
+			ObjectLocker lock(this);
+			if (m_flagInited) {
+				return sl_false;
+			}
+			m_flagInited = sl_true;
+			WeakRef<_SecureStreamClient_AsyncStream> _this(this);
+			Memory rdata = m_rdata.sub(0, m_sizeRdata);
+			m_rdata.setNull();
+			if (streamBase->writeFromMemory(rdata, _this)) {
+				if (streamBase->readToMemory(m_sdata, _this)) {
+					return sl_true;
+				}
 			}
 		}
 		return sl_false;
@@ -1193,7 +1200,7 @@ public:
 					ret->m_sdata = sdata;
 					ret->m_rdata = rdata;
 					ret->m_streamBase = baseStream;
-					ret->setListener(param.listener);
+					ret->m_listener =  param.listener;
 					sl_int32 n = ret->m_context.init(param, rdata.getBuf());
 					if (n > 0) {
 						ret->m_sizeRdata = n;

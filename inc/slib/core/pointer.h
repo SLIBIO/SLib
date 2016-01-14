@@ -30,9 +30,20 @@ public:
 	{
 		m_pointer = sl_null;
 	}
+	
+	SLIB_INLINE Ptr(Ptr<T>&& other)
+	{
+		_move_init(&other);
+	}
 
 	SLIB_INLINE Ptr(const Ptr<T>& other) : m_pointer(other.m_pointer), m_reference(other.m_reference)
 	{
+	}
+	
+	template <class O>
+	SLIB_INLINE Ptr(Ptr<O>&& other)
+	{
+		_move_init(&other, (O*)(0));
 	}
 
 	template <class O>
@@ -40,7 +51,18 @@ public:
 	{
 	}
 	
+	SLIB_INLINE Ptr(SafePtr<T>&& other)
+	{
+		_move_init(&other);
+	}
+	
 	Ptr(const SafePtr<T>& other);
+	
+	template <class O>
+	SLIB_INLINE Ptr(SafePtr<O>&& other)
+	{
+		_move_init(&other, (O*)(0));
+	}
 	
 	template <class O>
 	Ptr(const SafePtr<O>& other);
@@ -214,6 +236,12 @@ public:
 	}
 	
 public:
+	SLIB_INLINE Ptr<T>& operator=(Ptr<T>&& other)
+	{
+		_move_assign(&other);
+		return *this;
+	}
+	
 	SLIB_INLINE Ptr<T>& operator=(const Ptr<T>& other)
 	{
 		m_pointer = other.m_pointer;
@@ -222,6 +250,13 @@ public:
 	}
 	
 	template <class O>
+	SLIB_INLINE Ptr<T>& operator=(Ptr<O>&& other)
+	{
+		_move_assign(&other, (O*)(0));
+		return *this;
+	}
+
+	template <class O>
 	SLIB_INLINE Ptr<T>& operator=(const Ptr<O>& other)
 	{
 		m_pointer = other.get();
@@ -229,7 +264,20 @@ public:
 		return *this;
 	}
 	
+	SLIB_INLINE Ptr<T>& operator=(SafePtr<T>&& other)
+	{
+		_move_assign(&other);
+		return *this;
+	}
+	
 	Ptr<T>& operator=(const SafePtr<T>& other);
+	
+	template <class O>
+	SLIB_INLINE Ptr<T>& operator=(SafePtr<O>&& other)
+	{
+		_move_assign(&other, (O*)(0));
+		return *this;
+	}
 	
 	template <class O>
 	Ptr<T>& operator=(const SafePtr<O>& other);
@@ -368,6 +416,38 @@ public:
 		return m_pointer;
 	}
 
+public:
+	SLIB_INLINE void _move_init(void* _other)
+	{
+		Ptr<T>& other = *((Ptr<T>*)_other);
+		m_pointer = other.m_pointer;
+		m_reference._move_init(&(other.m_reference));
+	}
+	
+	SLIB_INLINE void _move_init(void* _other, T* dummy)
+	{
+		Ptr<T>& other = *((Ptr<T>*)_other);
+		m_pointer = other.m_pointer;
+		m_reference._move_init(&(other.m_reference));
+	}
+	
+	SLIB_INLINE void _move_assign(void* _other)
+	{
+		if ((void*)this != _other) {
+			Ptr<T>& other = *((Ptr<T>*)_other);
+			m_pointer = other.m_pointer;
+			m_reference._move_assign(&(other.m_reference));
+		}
+	}
+	
+	SLIB_INLINE void _move_assign(void* _other, T* dummy)
+	{
+		if ((void*)this != _other) {
+			Ptr<T>& other = *((Ptr<T>*)_other);
+			m_pointer = other.m_pointer;
+			m_reference._move_assign(&(other.m_reference));
+		}
+	}
 };
 
 
@@ -384,21 +464,43 @@ public:
 		m_pointer = sl_null;
 	}
 	
+	SLIB_INLINE SafePtr(SafePtr<T>&& other)
+	{
+		_move_init(&other);
+	}
+	
 	SLIB_INLINE SafePtr(const SafePtr<T>& other)
 	{
 		m_pointer = other._retain(m_reference);
 	}
 	
 	template <class O>
+	SLIB_INLINE SafePtr(SafePtr<O>&& other)
+	{
+		_move_init(&other, (O*)(0));
+	}
+
+	template <class O>
 	SLIB_INLINE SafePtr(const SafePtr<O>& other)
 	{
 		m_pointer = other._retain(m_reference);
+	}
+	
+	SLIB_INLINE SafePtr(Ptr<T>&& other)
+	{
+		_move_init(&other);
 	}
 	
 	SLIB_INLINE SafePtr(const Ptr<T>& other) : m_pointer(other.m_pointer), m_reference(other.m_reference)
 	{
 	}
 	
+	template <class O>
+	SLIB_INLINE SafePtr(Ptr<O>&& other)
+	{
+		_move_init(&other, (O*)(0));
+	}
+
 	template <class O>
 	SLIB_INLINE SafePtr(const Ptr<O>& other) : m_pointer(other.get()), m_reference(other.getReference())
 	{
@@ -546,6 +648,12 @@ public:
 	}
 	
 public:
+	SLIB_INLINE SafePtr<T>& operator=(SafePtr<T>&& other)
+	{
+		_move_assign(&other);
+		return *this;
+	}
+	
 	SLIB_INLINE SafePtr<T>& operator=(const SafePtr<T>& other)
 	{
 		Ref<Referable> reference;
@@ -555,11 +663,24 @@ public:
 	}
 	
 	template <class O>
+	SLIB_INLINE SafePtr<T>& operator=(SafePtr<O>&& other)
+	{
+		_move_assign(&other, (O*)(0));
+		return *this;
+	}
+
+	template <class O>
 	SLIB_INLINE SafePtr<T>& operator=(const SafePtr<O>& other)
 	{
 		Ref<Referable> reference;
 		T* pointer = other._retain(reference);
 		_replace(pointer, reference);
+		return *this;
+	}
+	
+	SLIB_INLINE SafePtr<T>& operator=(Ptr<T>&& other)
+	{
+		_move_assign(&other);
 		return *this;
 	}
 
@@ -569,6 +690,13 @@ public:
 		return *this;
 	}
 	
+	template <class O>
+	SLIB_INLINE SafePtr<T>& operator=(Ptr<O>&& other)
+	{
+		_move_assign(&other, (O*)(0));
+		return *this;
+	}
+
 	template <class O>
 	SLIB_INLINE SafePtr<T>& operator=(const Ptr<O>& other)
 	{
@@ -737,6 +865,55 @@ public:
 			refOld->decreaseReference();
 		}
 	}
+	
+	SLIB_INLINE void _move_init(void* _other)
+	{
+		SafePtr<T>& other = *((SafePtr<T>*)(_other));
+		m_pointer = other.m_pointer;
+		m_reference._move_init(&(other.m_reference));
+	}
+	
+	SLIB_INLINE void _move_init(void* _other, T* dummy)
+	{
+		SafePtr<T>& other = *((SafePtr<T>*)(_other));
+		m_pointer = other.m_pointer;
+		m_reference._move_init(&(other.m_reference));
+	}
+	
+	SLIB_INLINE void _move_assign(void* _other)
+	{
+		if ((void*)this != _other) {
+			SafePtr<T>& other = *((SafePtr<T>*)(_other));
+			Referable* refOld;
+			{
+				SpinLocker lock(&m_lock);
+				m_pointer = other.m_pointer;
+				refOld = m_reference.get();
+				m_reference._move_init(&(other.m_reference));
+			}
+			if (refOld) {
+				refOld->decreaseReference();
+			}
+		}
+	}
+	
+	SLIB_INLINE void _move_assign(void* _other, T* dummy)
+	{
+		if ((void*)this != _other) {
+			SafePtr<T>& other = *((SafePtr<T>*)(_other));
+			Referable* refOld;
+			{
+				SpinLocker lock(&m_lock);
+				m_pointer = other.m_pointer;
+				refOld = m_reference.get();
+				m_reference._move_init(&(other.m_reference));
+			}
+			if (refOld) {
+				refOld->decreaseReference();
+			}
+		}
+	}
+
 };
 
 

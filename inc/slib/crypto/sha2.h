@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_CRYPTO_SHA2
 
 #include "definition.h"
+
 #include "hash.h"
 
 /*
@@ -15,6 +16,7 @@
 */
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
+
 class SLIB_EXPORT _SHA256Base : public CryptoHash
 {
 public:
@@ -25,7 +27,9 @@ public:
 
 protected:
 	void _start();
+	
 	void _finish();
+	
 	void _updateSection(const sl_uint8* input);
 
 protected:
@@ -39,8 +43,15 @@ class SLIB_EXPORT SHA224 : public _SHA256Base
 {
 public:
 	SLIB_CRYPTO_DEFINE_HASH(SHA224, 28)
+	
+public:
+	SLIB_INLINE SHA224()
+	{
+	}
+	
 public:
 	void start();
+	
 	void finish(void* output);
 };
 
@@ -48,9 +59,18 @@ class SLIB_EXPORT SHA256 : public _SHA256Base
 {
 public:
 	SLIB_CRYPTO_DEFINE_HASH(SHA256, 32)
+	
+public:
+	SLIB_INLINE SHA256()
+	{
+	}
+	
 public:
 	void start();
+	
 	void finish(void* output);
+	
+public:
 	static sl_uint32 make32bitChecksum(const void* input, sl_size n);
 };
 
@@ -64,7 +84,9 @@ public:
 
 protected:
 	void _start();
+	
 	void _finish();
+	
 	void _updateSection(const sl_uint8* input);
 
 protected:
@@ -78,8 +100,15 @@ class SLIB_EXPORT SHA384 : public _SHA512Base
 {
 public:
 	SLIB_CRYPTO_DEFINE_HASH(SHA384, 48)
+	
+public:
+	SLIB_INLINE SHA384()
+	{
+	}
+	
 public:
 	void start();
+	
 	void finish(void* output);
 };
 
@@ -87,8 +116,15 @@ class SLIB_EXPORT SHA512 : public _SHA512Base
 {
 public:
 	SLIB_CRYPTO_DEFINE_HASH(SHA512, 64)
+	
+public:
+	SLIB_INLINE SHA512()
+	{
+	}
+	
 public:
 	void start();
+	
 	void finish(void* output);
 };
 SLIB_CRYPTO_NAMESPACE_END

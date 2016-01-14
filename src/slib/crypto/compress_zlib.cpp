@@ -5,6 +5,7 @@
 #define GZIP_HEADER ((gz_header*)(this->m_gzipHeader))
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
+
 ZlibCompress::ZlibCompress()
 {
 	m_flagStarted = sl_false;
@@ -275,6 +276,7 @@ void ZlibDecompress::abort()
 		m_flagStarted = sl_false;
 	}
 }
+
 sl_uint32 Zlib::adler32(sl_uint32 adler, const void* _data, sl_size size)
 {
 	const char* data = (const char*)_data;
@@ -349,5 +351,6 @@ Memory Zlib::decompressRaw(const void* data, sl_size size)
 	}
 	return Memory::null();
 }
+
 SLIB_CRYPTO_NAMESPACE_END
 

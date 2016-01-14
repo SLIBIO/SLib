@@ -62,6 +62,11 @@ SLIB_CRYPTO_NAMESPACE_BEGIN
 class SLIB_EXPORT SecureStream : public Object, public IStream, public IClosable
 {
 public:
+	SLIB_INLINE SecureStream()
+	{
+	}
+	
+public:
 	/*
 		Return Value
 			>0 : Connected
@@ -69,10 +74,12 @@ public:
 			<0 : Error
 	*/
 	virtual sl_int32 connect() = 0;
+	
 	virtual sl_bool isConnected() = 0;
 
 public:
 	static const RSAPrivateKey& getDefaultPrivateKey();
+	
 	static const RSAPublicKey& getDefaultPublicKey();
 };
 
@@ -86,14 +93,27 @@ public:
 class SLIB_EXPORT AsyncSecureStream : public AsyncStream
 {
 public:
-	virtual sl_bool connect() = 0;
-	virtual sl_bool isConnected() = 0;
+	SLIB_INLINE AsyncSecureStream()
+	{
+	}
 
 public:
-	SLIB_PROPERTY_INLINE(Ptr<IAsyncSecureStreamListener>, Listener)
+	virtual sl_bool connect() = 0;
+	
+	virtual sl_bool isConnected() = 0;
+	
+public:
+	const Ptr<IAsyncSecureStreamListener>& getListener() const
+	{
+		return m_listener;
+	}
 
 protected:
 	void onConnected(sl_bool flagError);
+	
+protected:
+	Ptr<IAsyncSecureStreamListener> m_listener;
+	
 };
 
 class SLIB_EXPORT SecureStreamServerParam
@@ -105,6 +125,7 @@ public:
 public:
 	SecureStreamServerParam();
 
+public:
 	sl_bool checkParam() const;
 };
 
@@ -130,6 +151,7 @@ public:
 public:
 	SecureStreamClientParam();
 
+public:
 	sl_bool checkParam() const;
 };
 

@@ -3,6 +3,7 @@
 #include "../../../inc/slib/core/math.h"
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
+
 SHA1::SHA1()
 {
 	rdata_len = 0;
@@ -119,5 +120,6 @@ void SHA1::_updateSection(const sl_uint8* input)
 		h[i] += v[i];
 	}
 }
+
 SLIB_CRYPTO_NAMESPACE_END
 

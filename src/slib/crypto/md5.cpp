@@ -147,4 +147,5 @@ void MD5::_updateSection(const sl_uint8* input)
 	A[2] += c;
 	A[3] += d;
 }
+
 SLIB_CRYPTO_NAMESPACE_END

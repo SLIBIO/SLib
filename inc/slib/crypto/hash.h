@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_CRYPTO_HASH
 
 #include "definition.h"
+
 #include "../core/string.h"
 #include "../core/memory.h"
 #include "../core/object.h"
@@ -14,14 +15,19 @@
 */
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
+
 class SLIB_EXPORT CryptoHash : public Object
 {
 public:
 	virtual sl_uint32 getSize() const = 0;
+	
 	virtual void start() = 0;
+	
 	virtual void update(const void* input, sl_size n) = 0;
+	
 	virtual void finish(void* output) = 0;
 
+	
 	SLIB_INLINE void execute(const void* input, sl_size n, void* output)
 	{
 		start();
@@ -39,13 +45,20 @@ public:
 		typeSHA384 = 104,
 		typeSHA512 = 105
 	};
+	
 	static Ref<CryptoHash> create(Type type);
 
+	
 	static Ref<CryptoHash> md5();
+	
 	static Ref<CryptoHash> sha1();
+	
 	static Ref<CryptoHash> sha224();
+	
 	static Ref<CryptoHash> sha256();
+	
 	static Ref<CryptoHash> sha384();
+	
 	static Ref<CryptoHash> sha512();
 
 public:
@@ -68,7 +81,7 @@ public: \
 	{ \
 		hash(s.getBuf(), s.getLength(), output); \
 	} \
-	SLIB_INLINE static void hash(Memory data, void* output) \
+	SLIB_INLINE static void hash(const Memory& data, void* output) \
 	{ \
 		hash(data.getBuf(), data.getSize(), output); \
 	} \
@@ -84,7 +97,7 @@ public: \
 		hash(s.getBuf(), s.getLength(), v); \
 		return Memory::create(v, HASH_SIZE); \
 	} \
-	SLIB_INLINE static Memory hash(Memory data) \
+	SLIB_INLINE static Memory hash(const Memory& data) \
 	{ \
 		char v[HASH_SIZE]; \
 		hash(data.getBuf(), data.getSize(), v); \

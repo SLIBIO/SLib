@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_CRYPTO_AES
 
 #include "definition.h"
+
 #include "../core/string.h"
 
 #include "block_cipher.h"
@@ -18,13 +19,14 @@ SLIB_CRYPTO_NAMESPACE_BEGIN
 
 class SLIB_EXPORT AES : public Object
 {
-private:
-	sl_uint32 m_roundKeyEnc[64];
-	sl_uint32 m_roundKeyDec[64];
-	sl_uint32 m_nCountRounds;
-
+public:
+	SLIB_INLINE AES()
+	{
+	}
+	
 public:
 	sl_bool setKey(const void* key, sl_uint32 lenKey /* 16, 24, 32 bytes */);
+	
 	void setKey_SHA256(const String& key);
 
 	// Common Block Cipher Functions
@@ -32,30 +34,44 @@ public:
 	{
 		return 16;
 	}
+	
 	// 128 bit (16 byte) block
 	void encryptBlock(const void* src, void* dst) const;
+	
 	// 128 bit (16 byte) block
 	void decryptBlock(const void* src, void* dst) const;
 
 	_SLIB_BLOCKCIPHER_COMMON_BODY(AES)
+
+private:
+	sl_uint32 m_roundKeyEnc[64];
+	sl_uint32 m_roundKeyDec[64];
+	sl_uint32 m_nCountRounds;
+	
 };
 
 class SLIB_EXPORT AES_GCM : public Object, public BlockCipher_GCM<AES>
 {
-private:
-	AES m_cipher;
 public:
-	void setKey(const void* key, sl_uint32 lenKey /* 16, 24, 32 bytes */)
+	SLIB_INLINE AES_GCM()
+	{
+	}
+
+public:
+	SLIB_INLINE void setKey(const void* key, sl_uint32 lenKey /* 16, 24, 32 bytes */)
 	{
 		m_cipher.setKey(key, lenKey);
 		setCipher(&m_cipher);
 	}
 
-	void setKey_SHA256(const String& key)
+	SLIB_INLINE void setKey_SHA256(const String& key)
 	{
 		m_cipher.setKey_SHA256(key);
 		setCipher(&m_cipher);
 	}
+	
+private:
+	AES m_cipher;
 };
 
 SLIB_CRYPTO_NAMESPACE_END
