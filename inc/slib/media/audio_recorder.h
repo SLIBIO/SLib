@@ -2,6 +2,9 @@
 #define CHECKHEADER_SLIB_MEDIA_AUDIO_RECORDER
 
 #include "definition.h"
+
+#include "audio_data.h"
+
 #include "../core/object.h"
 #include "../core/event.h"
 #include "../core/queue.h"
@@ -21,69 +24,67 @@ public:
 	AudioRecorderInfo();
 };
 
-class IAudioRecorderListener;
+class AudioRecorder;
+
+class SLIB_EXPORT IAudioRecorderListener
+{
+public:
+	virtual void onRecordAudio(AudioRecorder* recorder, const AudioData& audio) = 0;
+};
+
 class SLIB_EXPORT AudioRecorderParam
 {
 public:
 	String deviceId;
 	sl_uint32 samplesPerSecond;
+	sl_uint32 channelsCount;
 	sl_uint32 frameLengthInMilliseconds;
 	sl_uint32 bufferLengthInMilliseconds;
-	Ptr<IAudioRecorderListener> listener;
+	
 	sl_bool flagAutoStart;
+	
+	Ptr<IAudioRecorderListener> listener;
+	Ref<Event> event;
 	
 public:
 	AudioRecorderParam();
 };
 
-class AudioRecorder;
-class SLIB_EXPORT IAudioRecorderListener
-{
-public:
-	virtual void onRecordFrame(AudioRecorder* recorder, const float* samples, sl_uint32 count);
-	
-	virtual sl_bool isRecordingtUint8Frame();
-	virtual void onRecordFrame(AudioRecorder* recorder, const sl_uint8* samples, sl_uint32 count);
-	
-	virtual sl_bool isRecordingInt16Frame();
-	virtual void onRecordFrame(AudioRecorder* recorder, const sl_int16* samples, sl_uint32 count);
-};
-
 class SLIB_EXPORT AudioRecorder : public Object
 {
 	SLIB_DECLARE_OBJECT(AudioRecorder, Object)
-protected:
-	AudioRecorder();
+	
 public:
-	~AudioRecorder();
+	static Ref<AudioRecorder> create(const AudioRecorderParam& param);
+
+	static List<AudioRecorderInfo> getRecordersList();
 
 public:
 	virtual void release() = 0;
+	
 	virtual sl_bool isOpened() = 0;
+	
 	virtual void start() = 0;
+	
 	virtual void stop() = 0;
+	
 	virtual sl_bool isRunning() = 0;
-	virtual sl_bool read(float* samples, sl_size count);
-
+	
 public:
-	SLIB_PROPERTY_INLINE(Ref<Event>, Event)
-	SLIB_PROPERTY_INLINE(Ptr<IAudioRecorderListener>, Listener)
+	sl_bool read(const AudioData& audio);
 	
 protected:
-	void _processFrame_S16(const sl_int16* samples, sl_uint32 count);
-	Memory _getMemProcess_U8(sl_size count);
-	Memory _getMemProcess_S16(sl_size count);
-	Memory _getMemProcess_F(sl_size count);
-
+	Array<sl_int16> _getProcessData(sl_size count);
+	
+	void _processFrame(sl_int16* s, sl_size count);
+	
 protected:
-	LoopQueue<float> m_queue;
-	Memory m_memProcess_U8;
-	Memory m_memProcess_S16;
-	Memory m_memProcess_F;
-
-public:
-	static Ref<AudioRecorder> create(const AudioRecorderParam& param);
-	static List<AudioRecorderInfo> getRecordersList();
+	LoopQueue<sl_int16> m_queue;
+	sl_uint32 m_nChannels;
+	SafeArray<sl_int16> m_processData;
+	
+	Ptr<IAudioRecorderListener> m_listener;
+	Ref<Event> m_event;
 };
 
 SLIB_MEDIA_NAMESPACE_END

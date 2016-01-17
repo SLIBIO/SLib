@@ -6,32 +6,32 @@
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
 enum PenStyle {
-	penStyleSolid = 0,
-	penStyleDot = 1,
-	penStyleDash = 2,
-	penStyleDashDot = 3,
-	penStyleDashDotDot = 4
+	penStyle_Solid = 0,
+	penStyle_Dot = 1,
+	penStyle_Dash = 2,
+	penStyle_DashDot = 3,
+	penStyle_DashDotDot = 4
 };
 
 enum LineCap {
-	lineCapFlat = 0,
-	lineCapRound = 1,
-	lineCapSquare = 2
+	lineCap_Flat = 0,
+	lineCap_Round = 1,
+	lineCap_Square = 2
 };
 
 enum LineJoin {
-	lineJoinMiter = 0,
-	lineJoinRound = 1,
-	lineJoinBevel = 2
+	lineJoin_Miter = 0,
+	lineJoin_Round = 1,
+	lineJoin_Bevel = 2
 };
 
 enum BrushStyle {
-	brushStyleSolid = 0
+	brushStyle_Solid = 0
 };
 
 enum FillMode {
-	fillModeWinding = 0,
-	fillModeAlternate = 1
+	fillMode_Winding = 0,
+	fillMode_Alternate = 1
 };
 
 enum Alignment
@@ -60,65 +60,70 @@ enum Alignment
 
 enum ImageFileType
 {
-	imageFileTypeUnknown = 0,
-	imageFileTypeJPEG = 10,
-	imageFileTypePNG = 11,
-	imageFileTypeBMP = 12,
-	imageFileTypeDDS = 13
+	imageFileType_Unknown = 0,
+	imageFileType_JPEG = 10,
+	imageFileType_PNG = 11,
+	imageFileType_BMP = 12,
+	imageFileType_DDS = 13
 };
 
 enum StretchMode
 {
-	stretchFast = 0,
-	stretchHalftone = 1
+	stretchMode_Fast = 0,
+	stretchMode_Halftone = 1
 };
 
 enum BlendMode
 {
-	blendCopy = 0,
-	blendSrcAlpha = 1
+	blendMode_Copy = 0,
+	blendMode_SrcAlpha = 1
 };
 
 enum RotationMode
 {
-	rotation_0 = 0,
-	rotation_90 = 90,
-	rotation_180 = 180,
-	rotation_270 = 270
+	rotationMode_0 = 0,
+	rotationMode_90 = 90,
+	rotationMode_180 = 180,
+	rotationMode_270 = 270
 };
 
 enum FlipMode
 {
-	flipNone = 0,
-	flipHorizontal = 1,
-	flipVertical = 2,
-	flipHorizontalAndVertical = 3
+	flipMode_None = 0,
+	flipMode_Horizontal = 1,
+	flipMode_Vertical = 2,
+	flipMode_HorizontalAndVertical = 3
 };
 
-enum ScaleType
+enum ScaleMode
 {
-	scaleTypeNone = 0,
-	scaleTypeStretch = 1,
-	scaleTypeContain = 2,
-	scaleTypeCover = 3
+	scaleMode_None = 0,
+	scaleMode_Stretch = 1,
+	scaleMode_Contain = 2,
+	scaleMode_Cover = 3
 };
 
 enum GraphicsPathPointType
 {
-	graphicsPathPointTypeBegin = 0,
-	graphicsPathPointTypeLine = 1,
-	graphicsPathPointTypeBezierCubic = 3,
-	graphicsPathPointFlagClose = 0x80
+	graphicsPathPointType_Begin = 0,
+	graphicsPathPointType_Line = 1,
+	graphicsPathPointType_BezierCubic = 3
+    
+};
+
+enum GraphicsPathPointFlag
+{
+	graphicsPathPointFlag_Close = 0x80
 };
 
 enum ColorSpace
 {
-	ColorSpace_None = 0,
-	ColorSpace_RGB = 1,
-	ColorSpace_YUV = 2,
-	ColorSpace_CMYK = 3,
-	ColorSpace_HLS = 4,
-	ColorSpace_HSV = 5
+	colorSpace_None = 0,
+	colorSpace_RGB = 1,
+	colorSpace_YUV = 2,
+	colorSpace_CMYK = 3,
+	colorSpace_HLS = 4,
+	colorSpace_HSV = 5
 };
 
 SLIB_GRAPHICS_NAMESPACE_END

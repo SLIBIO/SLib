@@ -97,7 +97,7 @@
 #           include "vp8/encoder/x86/denoising_sse2.c"
 #           include "vp8/encoder/x86/quantize_sse2.c"
 #           undef SELECT_EOB
-#           if defined(__amd64__) || defined(__x86_64__) || defined(__amd64__) || defined(__x86_64__) || defined(__aarch64__)
+#           if defined(__x86_64__) || defined(__amd64__)
 #               define __SSSE3__
 #               define __SSE4_1__
 #               include "vp8/encoder/x86/quantize_sse4.c"
@@ -107,48 +107,48 @@
 #           include "vp8/encoder/x86/vp8_enc_stubs_mmx.c"
 #           include "vp8/encoder/x86/vp8_enc_stubs_sse2.c"
 #		else
-#           include "vp8/common/arm/neon/bilinearpredict_neon.c"
-#           include "vp8/common/arm/neon/copymem_neon.c"
-#           include "vp8/common/arm/neon/dc_only_idct_add_neon.c"
-#           define cospi8sqrt2minus1 cospi8sqrt2minus1_dequant_idct_neon_c
-#           define sinpi8sqrt2 sinpi8sqrt2_dequant_idct_neon_c
-#           include "vp8/common/arm/neon/dequant_idct_neon.c"
-#           include "vp8/common/arm/neon/dequantizeb_neon.c"
-#           include "vp8/common/arm/neon/idct_blk_neon.c"
-#           include "vp8/common/arm/neon/idct_dequant_0_2x_neon.c"
+#			include "vp8/common/arm/neon/bilinearpredict_neon.c"
+#			include "vp8/common/arm/neon/copymem_neon.c"
+#			include "vp8/common/arm/neon/dc_only_idct_add_neon.c"
+#			define cospi8sqrt2minus1 cospi8sqrt2minus1_dequant_idct_neon_c
+#			define sinpi8sqrt2 sinpi8sqrt2_dequant_idct_neon_c
+#			include "vp8/common/arm/neon/dequant_idct_neon.c"
+#			include "vp8/common/arm/neon/dequantizeb_neon.c"
+#			include "vp8/common/arm/neon/idct_blk_neon.c"
+#			include "vp8/common/arm/neon/idct_dequant_0_2x_neon.c"
 
-#           undef cospi8sqrt2minus1
-#           undef sinpi8sqrt2
-#           define cospi8sqrt2minus1 cospi8sqrt2minus1_idct_dequant_full_2x_neon_c
-#           define sinpi8sqrt2 sinpi8sqrt2_idct_dequant_full_2x_neon_c
-#           include "vp8/common/arm/neon/idct_dequant_full_2x_neon.c"
-#           include "vp8/common/arm/neon/iwalsh_neon.c"
-#           include "vp8/common/arm/neon/loopfilter_neon.c"
-#           include "vp8/common/arm/neon/loopfiltersimplehorizontaledge_neon.c"
-#           include "vp8/common/arm/neon/loopfiltersimpleverticaledge_neon.c"
-#           include "vp8/common/arm/neon/mbloopfilter_neon.c"
-#           include "vp8/common/arm/neon/reconintra_neon.c"
+#			undef cospi8sqrt2minus1
+#			undef sinpi8sqrt2
+#			define cospi8sqrt2minus1 cospi8sqrt2minus1_idct_dequant_full_2x_neon_c
+#			define sinpi8sqrt2 sinpi8sqrt2_idct_dequant_full_2x_neon_c
+#			include "vp8/common/arm/neon/idct_dequant_full_2x_neon.c"
+#			include "vp8/common/arm/neon/iwalsh_neon.c"
+#			include "vp8/common/arm/neon/loopfilter_neon.c"
+#			include "vp8/common/arm/neon/loopfiltersimplehorizontaledge_neon.c"
+#			include "vp8/common/arm/neon/loopfiltersimpleverticaledge_neon.c"
+#			include "vp8/common/arm/neon/mbloopfilter_neon.c"
+#			include "vp8/common/arm/neon/reconintra_neon.c"
 
-#           include "vp8/common/arm/neon/sad_neon.c"
+#			include "vp8/common/arm/neon/sad_neon.c"
 
-#           undef cospi8sqrt2minus1
-#           undef sinpi8sqrt2
-#           define cospi8sqrt2minus1 cospi8sqrt2minus1_shortidct4x4llm_neon_c
-#           define sinpi8sqrt2 sinpi8sqrt2_shortidct4x4llm_neon_c
-#           include "vp8/common/arm/neon/shortidct4x4llm_neon.c"
-#           define vp8_sub_pel_filters vp8_sub_pel_filters_sixtappredict_neon_c
-#           include "vp8/common/arm/neon/sixtappredict_neon.c"
-#           include "vp8/common/arm/neon/variance_neon.c"
-#           include "vp8/common/arm/neon/vp8_subpixelvariance_neon.c"
-#           include "vp8/encoder/arm/neon/denoising_neon.c"
-#           include "vp8/encoder/arm/neon/fastquantizeb_neon.c"
-#           include "vp8/encoder/arm/neon/shortfdct_neon.c"
-#           include "vp8/encoder/arm/neon/subtract_neon.c"
-#           include "vp8/encoder/arm/neon/vp8_mse16x16_neon.c"
-#           include "vp8/encoder/arm/neon/vp8_shortwalsh4x4_neon.c"
-#           include "vp8/common/arm/loopfilter_arm.c"
-#           include "vp8/common/arm/variance_arm.c"
-#           include "vp8/common/arm/filter_arm.c"
+#			undef cospi8sqrt2minus1
+#			undef sinpi8sqrt2
+#			define cospi8sqrt2minus1 cospi8sqrt2minus1_shortidct4x4llm_neon_c
+#			define sinpi8sqrt2 sinpi8sqrt2_shortidct4x4llm_neon_c
+#			include "vp8/common/arm/neon/shortidct4x4llm_neon.c"
+#			define vp8_sub_pel_filters vp8_sub_pel_filters_sixtappredict_neon_c
+#			include "vp8/common/arm/neon/sixtappredict_neon.c"
+#			include "vp8/common/arm/neon/variance_neon.c"
+#			include "vp8/common/arm/neon/vp8_subpixelvariance_neon.c"
+#			include "vp8/encoder/arm/neon/denoising_neon.c"
+#			include "vp8/encoder/arm/neon/fastquantizeb_neon.c"
+#			include "vp8/encoder/arm/neon/shortfdct_neon.c"
+#			include "vp8/encoder/arm/neon/subtract_neon.c"
+#			include "vp8/encoder/arm/neon/vp8_mse16x16_neon.c"
+#			include "vp8/encoder/arm/neon/vp8_shortwalsh4x4_neon.c"
+#			include "vp8/common/arm/loopfilter_arm.c"
+#			include "vp8/common/arm/variance_arm.c"
+#			include "vp8/common/arm/filter_arm.c"
 #		endif
 #	else
 #       include "vp8/common/x86/filter_x86.c"
@@ -171,53 +171,56 @@
 #       include "vp8/encoder/x86/vp8_enc_stubs_sse2.c"
 #   endif
 #elif defined(__ANDROID__)
-#	include "vp8/common/arm/bilinearfilter_arm.c"
-#	include "vp8/common/arm/dequantize_arm.c"
-#	include "vp8/common/arm/filter_arm.c"
-#	include "vp8/common/arm/loopfilter_arm.c"
-#	include "vp8/common/arm/variance_arm.c"
-#	include "vp8/common/arm/idct_blk_v6.c"
-#	include "vp8/encoder/arm/dct_arm.c"
-// #   include "vp8/common/arm/neon/bilinearpredict_neon.c"
-// #   include "vp8/common/arm/neon/copymem_neon.c"
-// #   include "vp8/common/arm/neon/dc_only_idct_add_neon.c"
-// #   define cospi8sqrt2minus1 cospi8sqrt2minus1_dequant_idct_neon_c
-// #   define sinpi8sqrt2 sinpi8sqrt2_dequant_idct_neon_c
-// #   include "vp8/common/arm/neon/dequant_idct_neon.c"
-// #   include "vp8/common/arm/neon/dequantizeb_neon.c"
-// #   include "vp8/common/arm/neon/idct_blk_neon.c"
-// #   include "vp8/common/arm/neon/idct_dequant_0_2x_neon.c"
-// 
-// #   undef cospi8sqrt2minus1
-// #   undef sinpi8sqrt2
-// #   define cospi8sqrt2minus1 cospi8sqrt2minus1_idct_dequant_full_2x_neon_c
-// #   define sinpi8sqrt2 sinpi8sqrt2_idct_dequant_full_2x_neon_c
-// #   include "vp8/common/arm/neon/idct_dequant_full_2x_neon.c"
-// #   include "vp8/common/arm/neon/iwalsh_neon.c"
-// #   include "vp8/common/arm/neon/loopfilter_neon.c"
-// #   include "vp8/common/arm/neon/loopfiltersimplehorizontaledge_neon.c"
-// #   include "vp8/common/arm/neon/loopfiltersimpleverticaledge_neon.c"
-// #   include "vp8/common/arm/neon/mbloopfilter_neon.c"
-// #   include "vp8/common/arm/neon/reconintra_neon.c"
-// 
-// #   include "vp8/common/arm/neon/sad_neon.c"
-// 
-// #   undef cospi8sqrt2minus1
-// #   undef sinpi8sqrt2
-// #   define cospi8sqrt2minus1 cospi8sqrt2minus1_shortidct4x4llm_neon_c
-// #   define sinpi8sqrt2 sinpi8sqrt2_shortidct4x4llm_neon_c
-// #   include "vp8/common/arm/neon/shortidct4x4llm_neon.c"
-// #   define vp8_sub_pel_filters vp8_sub_pel_filters_sixtappredict_neon_c
-// #   include "vp8/common/arm/neon/sixtappredict_neon.c"
-// #   include "vp8/common/arm/neon/variance_neon.c"
-// #   include "vp8/common/arm/neon/vp8_subpixelvariance_neon.c"
-// #   include "vp8/encoder/arm/neon/denoising_neon.c"
-// #   include "vp8/encoder/arm/neon/fastquantizeb_neon.c"
-// #   include "vp8/encoder/arm/neon/shortfdct_neon.c"
-// #   include "vp8/encoder/arm/neon/subtract_neon.c"
-// #   include "vp8/encoder/arm/neon/vp8_mse16x16_neon.c"
-// #   include "vp8/encoder/arm/neon/vp8_shortwalsh4x4_neon.c"
-// #   include "vp8/common/arm/loopfilter_arm.c"
-// #   include "vp8/common/arm/variance_arm.c"
-// #   include "vp8/common/arm/filter_arm.c"
+#	if defined(__aarch64__)
+#		include "vp8/common/arm/neon/bilinearpredict_neon.c"
+#		include "vp8/common/arm/neon/copymem_neon.c"
+#		include "vp8/common/arm/neon/dc_only_idct_add_neon.c"
+#		define cospi8sqrt2minus1 cospi8sqrt2minus1_dequant_idct_neon_c
+#		define sinpi8sqrt2 sinpi8sqrt2_dequant_idct_neon_c
+#		include "vp8/common/arm/neon/dequant_idct_neon.c"
+#		include "vp8/common/arm/neon/dequantizeb_neon.c"
+#		include "vp8/common/arm/neon/idct_blk_neon.c"
+#		include "vp8/common/arm/neon/idct_dequant_0_2x_neon.c"
+
+#		undef cospi8sqrt2minus1
+#		undef sinpi8sqrt2
+#		define cospi8sqrt2minus1 cospi8sqrt2minus1_idct_dequant_full_2x_neon_c
+#		define sinpi8sqrt2 sinpi8sqrt2_idct_dequant_full_2x_neon_c
+#		include "vp8/common/arm/neon/idct_dequant_full_2x_neon.c"
+#		include "vp8/common/arm/neon/iwalsh_neon.c"
+#		include "vp8/common/arm/neon/loopfilter_neon.c"
+#		include "vp8/common/arm/neon/loopfiltersimplehorizontaledge_neon.c"
+#		include "vp8/common/arm/neon/loopfiltersimpleverticaledge_neon.c"
+#		include "vp8/common/arm/neon/mbloopfilter_neon.c"
+#		include "vp8/common/arm/neon/reconintra_neon.c"
+
+#		include "vp8/common/arm/neon/sad_neon.c"
+
+#		undef cospi8sqrt2minus1
+#		undef sinpi8sqrt2
+#		define cospi8sqrt2minus1 cospi8sqrt2minus1_shortidct4x4llm_neon_c
+#		define sinpi8sqrt2 sinpi8sqrt2_shortidct4x4llm_neon_c
+#		include "vp8/common/arm/neon/shortidct4x4llm_neon.c"
+#		define vp8_sub_pel_filters vp8_sub_pel_filters_sixtappredict_neon_c
+#		include "vp8/common/arm/neon/sixtappredict_neon.c"
+#		include "vp8/common/arm/neon/variance_neon.c"
+#		include "vp8/common/arm/neon/vp8_subpixelvariance_neon.c"
+#		include "vp8/encoder/arm/neon/denoising_neon.c"
+#		include "vp8/encoder/arm/neon/fastquantizeb_neon.c"
+#		include "vp8/encoder/arm/neon/shortfdct_neon.c"
+#		include "vp8/encoder/arm/neon/subtract_neon.c"
+#		include "vp8/encoder/arm/neon/vp8_mse16x16_neon.c"
+#		include "vp8/encoder/arm/neon/vp8_shortwalsh4x4_neon.c"
+#		include "vp8/common/arm/loopfilter_arm.c"
+#		include "vp8/common/arm/variance_arm.c"
+#		include "vp8/common/arm/filter_arm.c"
+#	elif defined(__arm__)
+#		include "vp8/common/arm/bilinearfilter_arm.c"
+#		include "vp8/common/arm/dequantize_arm.c"
+#		include "vp8/common/arm/filter_arm.c"
+#		include "vp8/common/arm/loopfilter_arm.c"
+#		include "vp8/common/arm/variance_arm.c"
+#		include "vp8/common/arm/idct_blk_v6.c"
+#		include "vp8/encoder/arm/dct_arm.c"
+#	endif
 #endif

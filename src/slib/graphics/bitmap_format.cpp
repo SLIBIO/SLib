@@ -2,7 +2,7 @@
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
-BitmapFormatValue BitmapFormat::_null = bitmapFormatNull;
+const BitmapFormatValue BitmapFormat::_null = bitmapFormat_Null;
 
 ColorSpace BitmapFormat::getColorSpace() const
 {
@@ -31,7 +31,7 @@ sl_uint32 BitmapFormat::getBitsPerSample() const
 
 sl_uint32 BitmapFormat::getBytesPerSample() const
 {
-	return (m_format >> 19) & 255;
+	return (m_format >> 19) & 31;
 }
 
 sl_uint32 BitmapFormat::getBitsPerPixel() const
@@ -41,7 +41,7 @@ sl_uint32 BitmapFormat::getBitsPerPixel() const
 
 sl_uint32 BitmapFormat::getBytesPerPixel() const
 {
-	return (m_format >> 11) & 255;
+	return (m_format >> 11) & 31;
 }
 
 sl_bool BitmapFormat::isYUV_420() const
@@ -52,20 +52,20 @@ sl_bool BitmapFormat::isYUV_420() const
 BitmapFormat BitmapFormat::getNonPrecomputedAlphaFormat() const
 {
 	switch (m_format) {
-		case bitmapFormatRGBA_PA:
-			return bitmapFormatRGBA;
-		case bitmapFormatBGRA_PA:
-			return bitmapFormatBGRA;
-		case bitmapFormatARGB_PA:
-			return bitmapFormatARGB;
-		case bitmapFormatABGR_PA:
-			return bitmapFormatABGR;
-		case bitmapFormatRGBA_PLANAR_PA:
-			return bitmapFormatRGBA_PLANAR;
-		case bitmapFormatYUVA_PA:
-			return bitmapFormatYUVA;
-		case bitmapFormatYUVA_PLANAR_PA:
-			return bitmapFormatYUVA_PLANAR;
+		case bitmapFormat_RGBA_PA:
+			return bitmapFormat_RGBA;
+		case bitmapFormat_BGRA_PA:
+			return bitmapFormat_BGRA;
+		case bitmapFormat_ARGB_PA:
+			return bitmapFormat_ARGB;
+		case bitmapFormat_ABGR_PA:
+			return bitmapFormat_ABGR;
+		case bitmapFormat_RGBA_PLANAR_PA:
+			return bitmapFormat_RGBA_PLANAR;
+		case bitmapFormat_YUVA_PA:
+			return bitmapFormat_YUVA;
+		case bitmapFormat_YUVA_PLANAR_PA:
+			return bitmapFormat_YUVA_PLANAR;
 		default:
 			break;
 	}
@@ -75,20 +75,20 @@ BitmapFormat BitmapFormat::getNonPrecomputedAlphaFormat() const
 BitmapFormat BitmapFormat::getPrecomputedAlphaFormat() const
 {
 	switch (m_format) {
-		case bitmapFormatRGBA:
-			return bitmapFormatRGBA_PA;
-		case bitmapFormatBGRA:
-			return bitmapFormatBGRA_PA;
-		case bitmapFormatARGB:
-			return bitmapFormatARGB_PA;
-		case bitmapFormatABGR:
-			return bitmapFormatABGR_PA;
-		case bitmapFormatRGBA_PLANAR:
-			return bitmapFormatRGBA_PLANAR_PA;
-		case bitmapFormatYUVA:
-			return bitmapFormatYUVA_PA;
-		case bitmapFormatYUVA_PLANAR:
-			return bitmapFormatYUVA_PLANAR_PA;
+		case bitmapFormat_RGBA:
+			return bitmapFormat_RGBA_PA;
+		case bitmapFormat_BGRA:
+			return bitmapFormat_BGRA_PA;
+		case bitmapFormat_ARGB:
+			return bitmapFormat_ARGB_PA;
+		case bitmapFormat_ABGR:
+			return bitmapFormat_ABGR_PA;
+		case bitmapFormat_RGBA_PLANAR:
+			return bitmapFormat_RGBA_PLANAR_PA;
+		case bitmapFormat_YUVA:
+			return bitmapFormat_YUVA_PA;
+		case bitmapFormat_YUVA_PLANAR:
+			return bitmapFormat_YUVA_PLANAR_PA;
 		default:
 			break;
 	}
@@ -98,22 +98,22 @@ BitmapFormat BitmapFormat::getPrecomputedAlphaFormat() const
 BitmapFormat BitmapFormat::getCompatibleRGBFormat() const
 {
 	switch (m_format) {
-		case bitmapFormatYUVA:
-			return bitmapFormatRGBA;
-		case bitmapFormatYUVA_PLANAR:
-			return bitmapFormatRGBA_PLANAR;
-		case bitmapFormatYUVA_PA:
-			return bitmapFormatRGBA_PA;
-		case bitmapFormatYUVA_PLANAR_PA:
-			return bitmapFormatRGBA_PLANAR_PA;
-		case bitmapFormatYUV444:
-			return bitmapFormatRGB;
-		case bitmapFormatYUV444_PLANAR:
-			return bitmapFormatRGB_PLANAR;
+		case bitmapFormat_YUVA:
+			return bitmapFormat_RGBA;
+		case bitmapFormat_YUVA_PLANAR:
+			return bitmapFormat_RGBA_PLANAR;
+		case bitmapFormat_YUVA_PA:
+			return bitmapFormat_RGBA_PA;
+		case bitmapFormat_YUVA_PLANAR_PA:
+			return bitmapFormat_RGBA_PLANAR_PA;
+		case bitmapFormat_YUV444:
+			return bitmapFormat_RGB;
+		case bitmapFormat_YUV444_PLANAR:
+			return bitmapFormat_RGB_PLANAR;
 		default:
 			break;
 	}
-	return bitmapFormatNull;
+	return bitmapFormat_Null;
 
 }
 SLIB_GRAPHICS_NAMESPACE_END

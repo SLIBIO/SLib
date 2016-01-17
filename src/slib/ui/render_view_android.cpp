@@ -69,21 +69,21 @@ Ref<ViewInstance> RenderView::createInstance(ViewInstance* _parent)
 		ret = Android_ViewInstance::create<_RenderViewInstance>(this, parent, handle.get());
 		if (ret.isNotNull()) {
 			jobject handle = ret->getHandle();
-			_JAndroidGLView::setRenderMode.callBoolean(sl_null, handle, m_renderMode);
+			_JAndroidGLView::setRenderMode.callBoolean(sl_null, handle, m_redrawMode);
 		}
 	}
 	return ret;
 }
 
-void RenderView::setRenderMode(RenderView::RenderMode mode)
+void RenderView::setRedrawMode(RedrawMode mode)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		if (_JAndroidGLView::setRenderMode.callBoolean(sl_null, handle, mode) != 0) {
-			m_renderMode = mode;
+			m_redrawMode = mode;
 		}
 	} else {
-		m_renderMode = mode;
+		m_redrawMode = mode;
 	}
 }
 

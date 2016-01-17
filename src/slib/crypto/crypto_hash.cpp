@@ -9,20 +9,20 @@
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
 
-Ref<CryptoHash> CryptoHash::create(CryptoHash::Type type)
+Ref<CryptoHash> CryptoHash::create(CryptoHashType type)
 {
 	switch (type) {
-	case typeMD5:
+	case cryptoHashType_MD5:
 		return new MD5();
-	case typeSHA1:
+	case cryptoHashType_SHA1:
 		return new SHA1();
-	case typeSHA224:
+	case cryptoHashType_SHA224:
 		return new SHA224();
-	case typeSHA256:
+	case cryptoHashType_SHA256:
 		return new SHA256();
-	case typeSHA384:
+	case cryptoHashType_SHA384:
 		return new SHA384();
-	case typeSHA512:
+	case cryptoHashType_SHA512:
 		return new SHA512();
 	}
 	return Ref<CryptoHash>::null();

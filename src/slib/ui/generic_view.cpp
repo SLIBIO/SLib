@@ -136,13 +136,13 @@ GenericViewWithDrawing::GenericViewWithDrawing()
 {
 	m_backgroundColor = Color::zero();
 	
-	m_boundShape = boundShapeRectangle;
+	m_boundShape = boundShape_Rectangle;
 	
 	m_roundRectBoundShapeRadius.x = 5;
 	m_roundRectBoundShapeRadius.y = 5;
 	
 	m_borderColor = Color::black();
-	m_borderStyle = penStyleSolid;
+	m_borderStyle = penStyle_Solid;
 	m_borderWidth = 0;
 }
 
@@ -307,24 +307,24 @@ void GenericViewWithDrawing::drawBorder(Canvas* canvas, const Ref<Pen>& pen)
 	Rectangle rc(Point::zero(), getSize());
 	if (pen.isNotNull()) {
 		switch (m_boundShape) {
-			case boundShapeRoundRect:
+			case boundShape_RoundRect:
 				rc.left += 1;
 				rc.top += 1;
 				rc.right -= 2;
 				rc.bottom -= 2;
 				canvas->drawRoundRect(rc, getRoundRectBoundShapeRadius(), pen);
 				break;
-			case boundShapeEllipse:
+			case boundShape_Ellipse:
 				rc.left += 1;
 				rc.top += 1;
 				rc.right -= 2;
 				rc.bottom -= 2;
 				canvas->drawEllipse(rc, pen);
 				break;
-			case boundShapePath:
+			case boundShape_Path:
 				canvas->drawPath(getBoundShapePath(), pen);
 				break;
-			case boundShapeRectangle:
+			case boundShape_Rectangle:
 			default:
 				rc.right -= 1;
 				rc.bottom -= 1;
@@ -343,20 +343,20 @@ void GenericViewWithDrawing::dispatchDraw(Canvas* canvas)
 	{
 		CanvasStatusScope scope(canvas);
 		switch (m_boundShape) {
-			case boundShapeRoundRect:
+			case boundShape_RoundRect:
 				rc.right -= 1;
 				rc.bottom -= 1;
 				canvas->clipToRoundRect(rc, getRoundRectBoundShapeRadius());
 				break;
-			case boundShapeEllipse:
+			case boundShape_Ellipse:
 				rc.right -= 1;
 				rc.bottom -= 1;
 				canvas->clipToEllipse(rc);
 				break;
-			case boundShapePath:
+			case boundShape_Path:
 				canvas->clipToPath(getBoundShapePath());
 				break;
-			case boundShapeRectangle:
+			case boundShape_Rectangle:
 			default:
 				//canvas->clipToRectangle(rc);
 				break;

@@ -26,7 +26,7 @@ public:
 		close();
 	}
 
-	static Ref<_Win32AsyncFileStreamInstance> open(const String& path, File::Mode mode)
+	static Ref<_Win32AsyncFileStreamInstance> open(const String& path, FileMode mode)
 	{
 		Ref<_Win32AsyncFileStreamInstance> ret;
 		sl_file handle = _openHandle(path, mode);
@@ -34,7 +34,7 @@ public:
 			ret = new _Win32AsyncFileStreamInstance();
 			if (ret.isNotNull()) {
 				ret->setHandle(handle);
-				if (mode == File::modeAppend) {
+				if (mode == fileMode_Append) {
 					ret->seek(File::getSize(handle));
 				}
 				return ret;
@@ -166,7 +166,7 @@ public:
 		return File::getSize(handle);
 	}
 
-	static sl_file _openHandle(const String& _filePath, File::Mode mode)
+	static sl_file _openHandle(const String& _filePath, FileMode mode)
 	{
 		String16 filePath = _filePath;
 		if (filePath.isEmpty()) {
@@ -179,23 +179,23 @@ public:
 		DWORD dwFlags = FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED;
 
 		switch (mode) {
-		case File::modeRead:
+		case fileMode_Read:
 			dwDesiredAccess = GENERIC_READ;
 			dwCreateDisposition = OPEN_EXISTING;
 			break;
-		case File::modeWrite:
+		case fileMode_Write:
 			dwDesiredAccess = GENERIC_WRITE;
 			dwCreateDisposition = CREATE_ALWAYS;
 			break;
-		case File::modeReadWrite:
+		case fileMode_ReadWrite:
 			dwDesiredAccess = GENERIC_READ | GENERIC_WRITE;
 			dwCreateDisposition = CREATE_ALWAYS;
 			break;
-		case File::modeAppend:
+		case fileMode_Append:
 			dwDesiredAccess = GENERIC_WRITE;
 			dwCreateDisposition = OPEN_ALWAYS;
 			break;
-		case File::modeRandomAccess:
+		case fileMode_RandomAccess:
 			dwDesiredAccess = GENERIC_READ | GENERIC_WRITE;
 			dwCreateDisposition = OPEN_ALWAYS;
 			dwFlags |= FILE_FLAG_RANDOM_ACCESS;
@@ -223,13 +223,13 @@ public:
 	}
 };
 
-Ref<AsyncStream> AsyncFile::openIOCP(const String& path, File::Mode mode, const Ref<AsyncLoop>& loop)
+Ref<AsyncStream> AsyncFile::openIOCP(const String& path, FileMode mode, const Ref<AsyncLoop>& loop)
 {
 	Ref<_Win32AsyncFileStreamInstance> ret = _Win32AsyncFileStreamInstance::open(path, mode);
 	return AsyncStream::create(ret.get(), loop);
 }
 
-Ref<AsyncStream> AsyncFile::openIOCP(const String& path, File::Mode mode)
+Ref<AsyncStream> AsyncFile::openIOCP(const String& path, FileMode mode)
 {
 	return AsyncFile::openIOCP(path, mode, AsyncLoop::getDefault());
 }

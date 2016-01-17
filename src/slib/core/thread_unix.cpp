@@ -68,7 +68,7 @@ void Thread::_nativeClose()
 }
 
 #define _UNIX_SCHED_POLICY SCHED_FIFO
-static int _thread_getUnixPriority(Thread::Priority priority)
+static int _thread_getUnixPriority(ThreadPriority priority)
 {
 	int min = sched_get_priority_min(_UNIX_SCHED_POLICY);
 	int max = sched_get_priority_max(_UNIX_SCHED_POLICY);
@@ -76,15 +76,15 @@ static int _thread_getUnixPriority(Thread::Priority priority)
 		return -1;
 	}
 	switch (priority) {
-	case Thread::priorityLowest:
+	case threadPriority_Lowest:
 		return min;
-	case Thread::priorityBelowNormal:
+	case threadPriority_BelowNormal:
 		return (min * 3 + max) / 4;
-	case Thread::priorityNormal:
+	case threadPriority_Normal:
 		return (min + max) / 2;
-	case Thread::priorityAboveNormal:
+	case threadPriority_AboveNormal:
 		return (min + max * 3) / 4;
-	case Thread::priorityHighest:
+	case threadPriority_Highest:
 		return max;
 	}
 	return -1;

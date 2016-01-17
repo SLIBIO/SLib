@@ -17,6 +17,7 @@ public:
 	void initialize();
 	
 	sl_bool parseFromUtf8TextFile(const String& filePath);
+	
 	sl_bool parseFromText(const String& text);
 	
 	Variant getValue(const String& name);

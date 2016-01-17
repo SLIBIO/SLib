@@ -20,6 +20,7 @@ public:
 
 public:
 	void release();
+	
 	sl_bool isRunning();
 	
 	sl_uint32 getThreadsCount();

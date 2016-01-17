@@ -41,6 +41,7 @@ public:
 		return ret;
 	}
 
+	// override
 	void __set()
 	{
 		pthread_mutex_lock(&m_mutex);
@@ -53,6 +54,7 @@ public:
 		pthread_mutex_unlock(&m_mutex);
 	}
 
+	// override
 	void __reset()
 	{
 		pthread_mutex_lock(&m_mutex);
@@ -60,6 +62,7 @@ public:
 		pthread_mutex_unlock(&m_mutex);
 	}
 
+	// override
 	sl_bool __wait(sl_int32 timeout)
 	{
 		sl_bool ret = sl_true;

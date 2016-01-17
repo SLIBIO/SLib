@@ -5,20 +5,20 @@ SLIB_RENDER_NAMESPACE_BEGIN
 
 void RenderObject::onUIEvent(UIEvent* event)
 {
-	if (getButtonState() == buttonStateDisabled) {
+	if (getButtonState() == buttonState_Disabled) {
 		return;
 	}
 	UIEventAction action = event->getAction();
 	if (action == actionLeftButtonDown || action == actionTouchBegin) {
-		setButtonState(buttonStateDown);
+		setButtonState(buttonState_Down);
 	} else if (action == actionMouseMove || action == actionTouchMove) {
 		if (hitTest(event->getPoint())) {
-			setButtonState(buttonStateHover);
+			setButtonState(buttonState_Hover);
 		} else {
-			setButtonState(buttonStateNormal);
+			setButtonState(buttonState_Normal);
 		}
 	} else if (action == actionLeftButtonUp || action == actionTouchEnd || action == actionTouchCancel) {
-		setButtonState(buttonStateNormal);
+		setButtonState(buttonState_Normal);
 		if (hitTest(event->getPoint())) {
 			dispatchClick();
 		}

@@ -19,7 +19,9 @@ public:
 	Vector3T<T> point3;
 	
 public:
-	SLIB_INLINE Triangle3T() {}
+	SLIB_INLINE Triangle3T()
+	{
+	}
 	
 	template <class O>
 	SLIB_INLINE Triangle3T(const Triangle3T<O>& other)
@@ -36,6 +38,7 @@ public:
 		point3 = _point3;
 	}
 	
+public:
 	template <class O>
 	SLIB_INLINE Triangle3T& operator=(const Triangle3T<O>& other)
 	{
@@ -45,6 +48,7 @@ public:
 		return *this;
 	}
 	
+public:
 	void transform(const Matrix4T<T>& mat)
 	{
 		point1 = mat.transformPosition(point1);

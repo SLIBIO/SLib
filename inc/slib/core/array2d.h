@@ -97,7 +97,7 @@ public:
 		return sl_null;
 	}
 
-	static _Type* createStatic(const T* data, sl_size width, sl_size height, sl_reg stride, Referable* refer) {
+	static _Type* createStatic(const T* data, sl_size width, sl_size height, sl_reg stride, const Referable* refer) {
 		if (data && width > 0 && height > 0) {
 			return new _Type(data, width, height, stride, refer);
 		}

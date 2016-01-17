@@ -25,55 +25,55 @@ SLIB_GRAPHICS_NAMESPACE_BEGIN
 
 enum BitmapFormatValue {
 	
-	bitmapFormatNull = 0,
+	bitmapFormat_Null = 0,
 	
 	// RGB
 	// 32 bit formats
-	bitmapFormatRGBA =				SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_RGB, 1, 0, 1, 32, 32, 0x01),
-	bitmapFormatBGRA =				SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_RGB, 1, 0, 1, 32, 32, 0x02),
-	bitmapFormatARGB =				SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_RGB, 1, 0, 1, 32, 32, 0x03),
-	bitmapFormatABGR =				SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_RGB, 1, 0, 1, 32, 32, 0x04),
+	bitmapFormat_RGBA =				SLIB_DEFINE_BITMAP_FORMAT(colorSpace_RGB, 1, 0, 1, 32, 32, 0x01),
+	bitmapFormat_BGRA =				SLIB_DEFINE_BITMAP_FORMAT(colorSpace_RGB, 1, 0, 1, 32, 32, 0x02),
+	bitmapFormat_ARGB =				SLIB_DEFINE_BITMAP_FORMAT(colorSpace_RGB, 1, 0, 1, 32, 32, 0x03),
+	bitmapFormat_ABGR =				SLIB_DEFINE_BITMAP_FORMAT(colorSpace_RGB, 1, 0, 1, 32, 32, 0x04),
 	
 	// 32 bit formats, precomputed alpha
-	bitmapFormatRGBA_PA =			SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_RGB, 1, 1, 1, 32, 32, 0x05),
-	bitmapFormatBGRA_PA =			SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_RGB, 1, 1, 1, 32, 32, 0x06),
-	bitmapFormatARGB_PA =			SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_RGB, 1, 1, 1, 32, 32, 0x07),
-	bitmapFormatABGR_PA =			SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_RGB, 1, 1, 1, 32, 32, 0x08),
+	bitmapFormat_RGBA_PA =			SLIB_DEFINE_BITMAP_FORMAT(colorSpace_RGB, 1, 1, 1, 32, 32, 0x05),
+	bitmapFormat_BGRA_PA =			SLIB_DEFINE_BITMAP_FORMAT(colorSpace_RGB, 1, 1, 1, 32, 32, 0x06),
+	bitmapFormat_ARGB_PA =			SLIB_DEFINE_BITMAP_FORMAT(colorSpace_RGB, 1, 1, 1, 32, 32, 0x07),
+	bitmapFormat_ABGR_PA =			SLIB_DEFINE_BITMAP_FORMAT(colorSpace_RGB, 1, 1, 1, 32, 32, 0x08),
 	
 	// 24 bit formats
-	bitmapFormatRGB =				SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_RGB, 0, 0, 1, 24, 24, 0x10),
-	bitmapFormatBGR =				SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_RGB, 0, 0, 1, 24, 24, 0x11),
+	bitmapFormat_RGB =				SLIB_DEFINE_BITMAP_FORMAT(colorSpace_RGB, 0, 0, 1, 24, 24, 0x10),
+	bitmapFormat_BGR =				SLIB_DEFINE_BITMAP_FORMAT(colorSpace_RGB, 0, 0, 1, 24, 24, 0x11),
 	
 	// 16 bit formats
-	bitmapFormatRGB565BE =			SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_RGB, 0, 0, 1, 16, 16, 0x16),
-	bitmapFormatRGB565LE =			SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_RGB, 0, 0, 1, 16, 16, 0x17),
-	bitmapFormatBGR565BE =			SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_RGB, 0, 0, 1, 16, 16, 0x18),
-	bitmapFormatBGR565LE =			SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_RGB, 0, 0, 1, 16, 16, 0x19),
+	bitmapFormat_RGB565BE =			SLIB_DEFINE_BITMAP_FORMAT(colorSpace_RGB, 0, 0, 1, 16, 16, 0x16),
+	bitmapFormat_RGB565LE =			SLIB_DEFINE_BITMAP_FORMAT(colorSpace_RGB, 0, 0, 1, 16, 16, 0x17),
+	bitmapFormat_BGR565BE =			SLIB_DEFINE_BITMAP_FORMAT(colorSpace_RGB, 0, 0, 1, 16, 16, 0x18),
+	bitmapFormat_BGR565LE =			SLIB_DEFINE_BITMAP_FORMAT(colorSpace_RGB, 0, 0, 1, 16, 16, 0x19),
 	
 	// 8 bit formats
-	bitmapFormatGRAY8 =				SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_RGB, 0, 0, 1, 8, 8, 0x20),
+	bitmapFormat_GRAY8 =			SLIB_DEFINE_BITMAP_FORMAT(colorSpace_RGB, 0, 0, 1, 8, 8, 0x20),
 	
 	// planar formats
-	bitmapFormatRGBA_PLANAR =		SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_RGB, 1, 0, 4, 8, 32, 0x30),
-	bitmapFormatRGBA_PLANAR_PA =	SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_RGB, 1, 1, 4, 8, 32, 0x31), // precomputed alpha
-	bitmapFormatRGB_PLANAR =		SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_RGB, 0, 0, 3, 8, 24, 0x32),
+	bitmapFormat_RGBA_PLANAR =		SLIB_DEFINE_BITMAP_FORMAT(colorSpace_RGB, 1, 0, 4, 8, 32, 0x30),
+	bitmapFormat_RGBA_PLANAR_PA =	SLIB_DEFINE_BITMAP_FORMAT(colorSpace_RGB, 1, 1, 4, 8, 32, 0x31), // precomputed alpha
+	bitmapFormat_RGB_PLANAR =		SLIB_DEFINE_BITMAP_FORMAT(colorSpace_RGB, 0, 0, 3, 8, 24, 0x32),
 	
 	// YUV
 	// 32 bit formats
-	bitmapFormatYUVA =				SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_YUV, 1, 0, 1, 32, 32, 0x80),
-	bitmapFormatYUVA_PA =			SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_YUV, 1, 1, 1, 32, 32, 0x81),
+	bitmapFormat_YUVA =				SLIB_DEFINE_BITMAP_FORMAT(colorSpace_YUV, 1, 0, 1, 32, 32, 0x80),
+	bitmapFormat_YUVA_PA =			SLIB_DEFINE_BITMAP_FORMAT(colorSpace_YUV, 1, 1, 1, 32, 32, 0x81),
 	// 24 bit formats
-	bitmapFormatYUV444 =			SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_YUV, 0, 0, 1, 24, 24, 0x88),
+	bitmapFormat_YUV444 =			SLIB_DEFINE_BITMAP_FORMAT(colorSpace_YUV, 0, 0, 1, 24, 24, 0x88),
 	// planar formats
-	bitmapFormatYUVA_PLANAR =		SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_YUV, 1, 0, 4, 8, 32, 0x82),
-	bitmapFormatYUVA_PLANAR_PA =	SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_YUV, 1, 1, 4, 8, 32, 0x83),
-	bitmapFormatYUV444_PLANAR =		SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_YUV, 0, 0, 3, 8, 24, 0x89),
+	bitmapFormat_YUVA_PLANAR =		SLIB_DEFINE_BITMAP_FORMAT(colorSpace_YUV, 1, 0, 4, 8, 32, 0x82),
+	bitmapFormat_YUVA_PLANAR_PA =	SLIB_DEFINE_BITMAP_FORMAT(colorSpace_YUV, 1, 1, 4, 8, 32, 0x83),
+	bitmapFormat_YUV444_PLANAR =	SLIB_DEFINE_BITMAP_FORMAT(colorSpace_YUV, 0, 0, 3, 8, 24, 0x89),
 	
 	// YUV420 planar formats
-	bitmapFormatYUV_I420 =			SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_YUV, 0, 0, 3, 0, 12, 0xB0), // 8 bit Y plane followed by 8 bit 2x2 subsampled U and V planes
-	bitmapFormatYUV_YV12 =			SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_YUV, 0, 0, 3, 0, 12, 0xB1), // 8 bit Y plane followed by 8 bit 2x2 subsampled V and U planes
-	bitmapFormatYUV_NV21 =			SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_YUV, 0, 0, 2, 0, 12, 0xB2), // 8-bit Y plane followed by an interleaved V/U plane with 2x2 subsampling (Android camera standard)
-	bitmapFormatYUV_NV12 =			SLIB_DEFINE_BITMAP_FORMAT(ColorSpace_YUV, 0, 0, 2, 0, 12, 0xB3) // 8-bit Y plane followed by an interleaved U/V plane with 2x2 subsampling
+	bitmapFormat_YUV_I420 =			SLIB_DEFINE_BITMAP_FORMAT(colorSpace_YUV, 0, 0, 3, 0, 12, 0xB0), // 8 bit Y plane followed by 8 bit 2x2 subsampled U and V planes
+	bitmapFormat_YUV_YV12 =			SLIB_DEFINE_BITMAP_FORMAT(colorSpace_YUV, 0, 0, 3, 0, 12, 0xB1), // 8 bit Y plane followed by 8 bit 2x2 subsampled V and U planes
+	bitmapFormat_YUV_NV21 =			SLIB_DEFINE_BITMAP_FORMAT(colorSpace_YUV, 0, 0, 2, 0, 12, 0xB2), // 8-bit Y plane followed by an interleaved V/U plane with 2x2 subsampling (Android camera standard)
+	bitmapFormat_YUV_NV12 =			SLIB_DEFINE_BITMAP_FORMAT(colorSpace_YUV, 0, 0, 2, 0, 12, 0xB3) // 8-bit Y plane followed by an interleaved U/V plane with 2x2 subsampling
 };
 
 
@@ -85,7 +85,7 @@ private:
 public:
 	SLIB_INLINE BitmapFormat()
 	{
-		m_format = bitmapFormatNull;
+		m_format = bitmapFormat_Null;
 	}
 	
 	SLIB_INLINE BitmapFormat(const BitmapFormat& other)
@@ -99,10 +99,10 @@ public:
 	}
 	
 private:
-	static BitmapFormatValue _null;
+	static const BitmapFormatValue _null;
 	
 public:
-	SLIB_INLINE BitmapFormatValue getValue()
+	SLIB_INLINE BitmapFormatValue getValue() const
 	{
 		return m_format;
 	}
@@ -114,17 +114,17 @@ public:
 	
 	SLIB_INLINE void setNull()
 	{
-		m_format = bitmapFormatNull;
+		m_format = bitmapFormat_Null;
 	}
 	
 	SLIB_INLINE sl_bool isNull() const
 	{
-		return m_format == bitmapFormatNull;
+		return m_format == bitmapFormat_Null;
 	}
 	
 	SLIB_INLINE sl_bool isNotNull() const
 	{
-		return m_format != bitmapFormatNull;
+		return m_format != bitmapFormat_Null;
 	}
 	
 public:

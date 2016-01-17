@@ -34,7 +34,6 @@ public:
 	
 	AudioStreamBasicDescription m_formatSrc;
 	AudioStreamBasicDescription m_formatDst;
-	sl_uint32 m_nSamplesPerFrame;
 	
 	~_iOS_AudioRecorder()
 	{
@@ -49,6 +48,10 @@ public:
 	static Ref<_iOS_AudioRecorder> create(const AudioRecorderParam& param)
 	{
 		Ref<_iOS_AudioRecorder> ret;
+		
+		if (param.channelsCount != 1 && param.channelsCount != 2) {
+			return ret;
+		}
 		
 		AudioComponentDescription desc;
 		desc.componentType = kAudioUnitType_Output;
@@ -94,7 +97,7 @@ public:
 					formatDst.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
 					formatDst.mSampleRate = param.samplesPerSecond;
 					formatDst.mBitsPerChannel = 16;
-					formatDst.mChannelsPerFrame = 1;
+					formatDst.mChannelsPerFrame = param.channelsCount;
 					formatDst.mBytesPerFrame = formatDst.mChannelsPerFrame * formatDst.mBitsPerChannel / 8;
 					formatDst.mFramesPerPacket = 1;
 					formatDst.mBytesPerPacket = formatDst.mBytesPerFrame * formatDst.mFramesPerPacket;
@@ -108,11 +111,13 @@ public:
 							
 							ret->m_audioUnitInput = audioUnitInput;
 							ret->m_converter = converter;
-							ret->m_nSamplesPerFrame = param.samplesPerSecond * param.frameLengthInMilliseconds / 1000;
-							ret->m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000);
 							ret->m_formatSrc = formatSrc;
 							ret->m_formatDst = formatDst;
-							ret->setListener(param.listener);
+							
+							ret->m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000 * param.channelsCount);
+							ret->m_nChannels = param.channelsCount;
+							ret->m_listener = param.listener;
+							ret->m_event = param.event;
 							
 							AURenderCallbackStruct cs;
 							cs.inputProc = CallbackInput;
@@ -219,11 +224,6 @@ public:
 		return m_flagRunning;
 	}
 	
-	void onFrame(sl_int16* buf, sl_uint32 n)
-	{
-		_processFrame_S16(buf, n);
-	}
-	
 	struct ConverterContext
 	{
 		sl_uint32 nBytesPerPacket;
@@ -259,27 +259,31 @@ public:
 	void onFrame(AudioBufferList* data)
 	{
 		const AudioBuffer& buffer = data->mBuffers[0];
-		sl_uint32 nFrame = buffer.mDataByteSize / m_formatSrc.mBytesPerPacket * m_formatDst.mSampleRate / m_formatSrc.mSampleRate * 2; // double buffer to be enough to convert all source packets
+		sl_uint32 nFrames = buffer.mDataByteSize / m_formatSrc.mBytesPerPacket * m_formatDst.mSampleRate / m_formatSrc.mSampleRate * 2; // double buffer to be enough to convert all source packets
 		
-		Memory mem = _getMemProcess_S16(nFrame);
-		if (mem.isNull()) {
+		sl_uint32 nChannels = m_nChannels;
+		sl_uint32 nSamples = nFrames * nChannels;
+		
+		Array<sl_int16> arrData = _getProcessData(nSamples);
+		if (arrData.isNull()) {
 			return;
 		}
-		sl_int16* output = (sl_int16*)(mem.getBuf());
+		sl_int16* output = arrData.data();
 
 		AudioBufferList bufferOutput;
 		bufferOutput.mNumberBuffers = 1;
 		bufferOutput.mBuffers[0].mData = output;
-		bufferOutput.mBuffers[0].mDataByteSize = (UInt32)(nFrame * 2);
+		bufferOutput.mBuffers[0].mDataByteSize = (UInt32)(nFrames * 2);
+		bufferOutput.mBuffers[0].mNumberChannels = nChannels;
 		
-		UInt32 sizeFrame = (UInt32)nFrame;
+		UInt32 sizeFrame = (UInt32)nFrames;
 		ConverterContext context;
 		context.flagUsed = sl_false;
 		context.data = data;
 		context.nBytesPerPacket = m_formatSrc.mBytesPerPacket;
 		OSStatus result = AudioConverterFillComplexBuffer(m_converter, ConverterInputProc, (void*)&context, &sizeFrame, &bufferOutput, NULL);
 		if (result == noErr || result == 500) {
-			onFrame(output, sizeFrame);
+			_processFrame(output, sizeFrame * nChannels);
 		}
 	}
 	
@@ -357,6 +361,7 @@ List<AudioRecorderInfo> AudioRecorder::getRecordersList()
 	ret.name = s;
 	return List<AudioRecorderInfo>::createFromElement(ret);
 }
+
 SLIB_MEDIA_NAMESPACE_END
 
 #endif

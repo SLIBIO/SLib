@@ -2,18 +2,21 @@
 #define CHECKHEADER_SLIB_GRAPHICS_BRUSH
 
 #include "definition.h"
-#include "constants.h"
 
+#include "constants.h"
 #include "color.h"
+
 #include "../core/object.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
-struct SLIB_EXPORT BrushDesc
+class SLIB_EXPORT BrushDesc
 {
+public:
 	BrushStyle style;
 	Color color;
 	
+public:
 	BrushDesc();
 };
 
@@ -23,12 +26,16 @@ class SLIB_EXPORT Brush : public Object
 {
 	SLIB_DECLARE_OBJECT(Brush, Object)
 protected:
-	Brush();
+	SLIB_INLINE Brush()
+	{
+	}
 	
 public:
 	static Ref<Brush> getDefault();
+	
 	static Ref<Brush> create(const BrushDesc& desc);
-	static Ref<Brush> createSolidBrush(Color color);
+	
+	static Ref<Brush> createSolidBrush(const Color& color);
 	
 public:
 	SLIB_INLINE void getDesc(BrushDesc& desc)
@@ -46,21 +53,15 @@ public:
 		return m_desc.color;
 	}
 	
-public:
-	const Ref<BrushInstance>& getInstance();
-	void setInstance(const Ref<BrushInstance>& instance);
-
 protected:
 	BrushDesc m_desc;
-	Ref<BrushInstance> m_instance;
+	
+	SLIB_REF_PROPERTY_INLINE(BrushInstance, Instance)
 };
 
 class SLIB_EXPORT BrushInstance : public Object
 {
 	SLIB_DECLARE_OBJECT(BrushInstance, Object)
-protected:
-	BrushInstance();
-
 };
 
 SLIB_GRAPHICS_NAMESPACE_END

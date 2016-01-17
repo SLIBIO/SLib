@@ -82,7 +82,7 @@ void Thread::_nativeClose()
 {
 }
 
-static double _thread_getMacPriority(Thread::Priority priority)
+static double _thread_getMacPriority(ThreadPriority priority)
 {
 	double min = 0;
 	double max = 1;
@@ -90,15 +90,15 @@ static double _thread_getMacPriority(Thread::Priority priority)
 		return -1;
 	}
 	switch (priority) {
-        case Thread::priorityLowest:
+        case threadPriority_Lowest:
             return min;
-        case Thread::priorityBelowNormal:
+        case threadPriority_BelowNormal:
             return (min * 3 + max) / 4;
-        case Thread::priorityNormal:
+        case threadPriority_Normal:
             return (min + max) / 2;
-        case Thread::priorityAboveNormal:
+        case threadPriority_AboveNormal:
             return (min + max * 3) / 4;
-        case Thread::priorityHighest:
+        case threadPriority_Highest:
             return max;
 	}
 	return -1;

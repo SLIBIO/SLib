@@ -30,21 +30,21 @@ Ref<ViewInstance> RenderView::createInstance(ViewInstance* _parent)
 	OSX_VIEW_CREATE_INSTANCE_BEGIN
 	_Slib_OSX_GLView* handle = [[_Slib_OSX_GLView alloc] initWithFrame:frame];
 	if (handle != nil) {
-		[handle _setRenderContinuously:(m_renderMode == RenderView::renderModeContinuously)];
+		[handle _setRenderContinuously:(m_redrawMode == redrawMode_Continuously)];
 	}
 	OSX_VIEW_CREATE_INSTANCE_END
 	return ret;
 }
 
-void RenderView::setRenderMode(RenderView::RenderMode mode)
+void RenderView::setRedrawMode(RedrawMode mode)
 {
 	ObjectLocker lock(this);
 	NSView* view = UIPlatform::getViewHandle(this);
 	if (view != nil && [view isKindOfClass:[_Slib_OSX_GLView class]]) {
 		_Slib_OSX_GLView* v = (_Slib_OSX_GLView*)view;
-		[v _setRenderContinuously:(mode == RenderView::renderModeContinuously)];
+		[v _setRenderContinuously:(mode == redrawMode_Continuously)];
 	}
-	m_renderMode = mode;
+	m_redrawMode = mode;
 }
 
 void RenderView::requestRender()

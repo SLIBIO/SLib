@@ -26,12 +26,17 @@ public:
 
 public:
 	static String encodePercentByUTF8(const String& value);
+	
 	static String decodePercentByUTF8(const String& value);
 
+	
 	static String encodeUriComponentByUTF8(const String& value);
+	
 	static String decodeUriComponentByUTF8(const String& value);
 
+	
 	static String encodeUriByUTF8(const String& value);
+	
 	static String decodeUriByUTF8(const String& value);
 
 };

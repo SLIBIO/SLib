@@ -748,7 +748,7 @@ HttpContentReader::~HttpContentReader()
 {
 }
 
-void HttpContentReader::onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError)
+void HttpContentReader::onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError)
 {
 	if (flagError) {
 		setReadingEnded();
@@ -779,7 +779,7 @@ void HttpContentReader::setError()
 	setReadingError();
 }
 
-sl_bool HttpContentReader::write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref)
+sl_bool HttpContentReader::write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref)
 {
 	return sl_false;
 }
@@ -795,7 +795,7 @@ sl_bool HttpContentReader::setDecompressing()
 	}
 }
 
-Memory HttpContentReader::decompressData(void* data, sl_uint32 size, Referable* refData)
+Memory HttpContentReader::decompressData(void* data, sl_uint32 size, const Referable* refData)
 {
 	if (m_flagDecompressing) {
 		return m_zlib.decompress(data, size);
@@ -816,7 +816,7 @@ public:
 		m_sizeRead = 0;
 	}
 
-	Memory filterRead(void* data, sl_uint32 size, Referable* refData)
+	Memory filterRead(void* data, sl_uint32 size, const Referable* refData)
 	{
 		sl_uint64 sizeRemain = m_sizeTotal - m_sizeRead;
 		if (size < sizeRemain) {
@@ -895,7 +895,7 @@ public:
 		m_sizeTrailerField = 0;
 	}
 
-	Memory filterRead(void* _data, sl_uint32 size, Referable* refData)
+	Memory filterRead(void* _data, sl_uint32 size, const Referable* refData)
 	{
 		sl_uint8* data = (sl_uint8*)_data;
 		sl_uint32 pos = 0;
@@ -1035,7 +1035,7 @@ public:
 	{
 	}
 
-	Memory filterRead(void* data, sl_uint32 size, Referable* refData)
+	Memory filterRead(void* data, sl_uint32 size, const Referable* refData)
 	{
 		return decompressData(data, size, refData);
 	}

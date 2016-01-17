@@ -6,7 +6,9 @@
 #include "../graphics/constants.h"
 
 SLIB_UI_NAMESPACE_BEGIN
-enum UIEventAction {
+
+enum UIEventAction
+{
 	actionUnknown = 0x0000,
 	// keyboard
 	actionKeyDown = 0x0101,
@@ -37,7 +39,8 @@ enum UIEventAction {
 	actionSetCursor = 0x0401
 };
 
-enum Keycode {
+enum Keycode
+{
 	keyUnknown = 0,
 	keyBackspace = 0x08,
 	keyTab = 0x09,
@@ -173,26 +176,32 @@ enum Keycode {
 
 enum BoundShape
 {
-	boundShapeRectangle = 0,
-	boundShapeEllipse = 1,
-	boundShapeRoundRect = 2,
-	boundShapePath = 10
+	boundShape_Rectangle = 0,
+	boundShape_Ellipse = 1,
+	boundShape_RoundRect = 2,
+	boundShape_Path = 10
 };
 
 enum ButtonState
 {
-	buttonStateNormal = 0,
-	buttonStateHover = 1,
-	buttonStateDown = 2,
-	buttonStateDisabled = 3,
+	buttonState_Normal = 0,
+	buttonState_Hover = 1,
+	buttonState_Down = 2,
+	buttonState_Disabled = 3,
 	
 	buttonStatesCount = 4
 };
 
 enum LayoutOrientation
 {
-	layoutOrientationHorizontal = 0,
-	layoutOrientationVertical = 1
+	layoutOrientation_Horizontal = 0,
+	layoutOrientation_Vertical = 1
+};
+
+enum RedrawMode
+{
+    redrawMode_Continuously = 0,
+    redrawMode_WhenDirty = 1
 };
 
 SLIB_UI_NAMESPACE_END

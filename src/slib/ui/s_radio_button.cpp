@@ -68,18 +68,18 @@ public:
 		Color colorCheckDisabled = Color::gray(90);
 		Color colorCheckHover = Color(0, 80, 200);
 		Color colorCheckDown = colorCheckHover;
-		categories[0].properties[buttonStateNormal].textColor = Color::black();
-		categories[0].properties[buttonStateNormal].icon = new _SRadioButton_Icon(penNormal, colorBackNormal, Color::zero());
-		categories[0].properties[buttonStateDisabled].textColor = Color::gray(90);
-		categories[0].properties[buttonStateDisabled].icon = new _SRadioButton_Icon(penDisabled, colorBackDisabled, Color::zero());
-		categories[0].properties[buttonStateHover].icon = new _SRadioButton_Icon(penHover, colorBackHover, Color::zero());
-		categories[0].properties[buttonStateDown].icon = new _SRadioButton_Icon(penDown, colorBackDown, Color::zero());
+		categories[0].properties[buttonState_Normal].textColor = Color::black();
+		categories[0].properties[buttonState_Normal].icon = new _SRadioButton_Icon(penNormal, colorBackNormal, Color::zero());
+		categories[0].properties[buttonState_Disabled].textColor = Color::gray(90);
+		categories[0].properties[buttonState_Disabled].icon = new _SRadioButton_Icon(penDisabled, colorBackDisabled, Color::zero());
+		categories[0].properties[buttonState_Hover].icon = new _SRadioButton_Icon(penHover, colorBackHover, Color::zero());
+		categories[0].properties[buttonState_Down].icon = new _SRadioButton_Icon(penDown, colorBackDown, Color::zero());
 		
 		categories[1] = categories[0];
-		categories[1].properties[buttonStateNormal].icon = new _SRadioButton_Icon(penNormal, colorBackNormal, colorCheckNormal);
-		categories[1].properties[buttonStateDisabled].icon = new _SRadioButton_Icon(penDisabled, colorBackDisabled, colorCheckDisabled);
-		categories[1].properties[buttonStateHover].icon = new _SRadioButton_Icon(penHover, colorBackHover, colorCheckHover);
-		categories[1].properties[buttonStateDown].icon = new _SRadioButton_Icon(penDown, colorBackDown, colorCheckDown);
+		categories[1].properties[buttonState_Normal].icon = new _SRadioButton_Icon(penNormal, colorBackNormal, colorCheckNormal);
+		categories[1].properties[buttonState_Disabled].icon = new _SRadioButton_Icon(penDisabled, colorBackDisabled, colorCheckDisabled);
+		categories[1].properties[buttonState_Hover].icon = new _SRadioButton_Icon(penHover, colorBackHover, colorCheckHover);
+		categories[1].properties[buttonState_Down].icon = new _SRadioButton_Icon(penDown, colorBackDown, colorCheckDown);
 	}
 	
 	static _SRadioButton_Categories* get()

@@ -90,7 +90,7 @@ public:
 	// returns the number of color components
 	sl_uint32 getColorComponentBuffers(ColorComponentBuffer* buffers) const;
 	
-	void copyPixelsFrom(const BitmapData& other);
+	void copyPixelsFrom(const BitmapData& other) const;
 	
 	void setFromColors(sl_uint32 width, sl_uint32 height, const Color* colors, sl_int32 stride = 0);
 	

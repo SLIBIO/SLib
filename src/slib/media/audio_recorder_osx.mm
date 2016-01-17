@@ -10,15 +10,6 @@ SLIB_MEDIA_NAMESPACE_BEGIN
 
 class _OSX_AudioRecorder : public AudioRecorder
 {
-private:
-	_OSX_AudioRecorder()
-	{
-		m_flagOpened = sl_true;
-		m_flagRunning = sl_false;
-		
-		m_callback = sl_null;
-	}
-
 public:
 	sl_bool m_flagOpened;
 	sl_bool m_flagRunning;
@@ -29,13 +20,22 @@ public:
 	
 	AudioStreamBasicDescription m_formatSrc;
 	AudioStreamBasicDescription m_formatDst;
-	sl_uint32 m_nSamplesPerFrame;
 	
+public:
+	_OSX_AudioRecorder()
+	{
+		m_flagOpened = sl_true;
+		m_flagRunning = sl_false;
+		
+		m_callback = sl_null;
+	}
+
 	~_OSX_AudioRecorder()
 	{
 		release();
 	}
 	
+public:
 	static void logError(String text)
 	{
 		SLIB_LOG_ERROR("AudioRecorder", text);
@@ -44,6 +44,10 @@ public:
 	static Ref<_OSX_AudioRecorder> create(const AudioRecorderParam& param)
 	{
 		Ref<_OSX_AudioRecorder> ret;
+		
+		if (param.channelsCount != 1 && param.channelsCount != 2) {
+			return ret;
+		}
 		
 		OSX_AudioDeviceInfo deviceInfo;
 		if (!(deviceInfo.selectDevice(sl_true, param.deviceId))) {
@@ -92,7 +96,7 @@ public:
 		formatDst.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
 		formatDst.mSampleRate = param.samplesPerSecond;
 		formatDst.mBitsPerChannel = 16;
-		formatDst.mChannelsPerFrame = 1;
+		formatDst.mChannelsPerFrame = param.channelsCount;
 		formatDst.mBytesPerFrame = formatDst.mChannelsPerFrame * formatDst.mBitsPerChannel / 8;
 		formatDst.mFramesPerPacket = 1;
 		formatDst.mBytesPerPacket = formatDst.mBytesPerFrame * formatDst.mFramesPerPacket;
@@ -111,11 +115,13 @@ public:
 					
 					ret->m_deviceID = deviceID;
 					ret->m_converter = converter;
-					ret->m_nSamplesPerFrame = param.samplesPerSecond * param.frameLengthInMilliseconds / 1000;
-					ret->m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000);
 					ret->m_formatSrc = formatSrc;
 					ret->m_formatDst = formatDst;
-					ret->setListener(param.listener);
+					
+					ret->m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000 * param.channelsCount);
+					ret->m_nChannels = param.channelsCount;
+					ret->m_listener = param.listener;
+					ret->m_event = param.event;
 
 					AudioDeviceIOProcID callback;
 					if (AudioDeviceCreateIOProcID(deviceID, DeviceIOProc, ret.get(), &callback) == kAudioHardwareNoError) {
@@ -208,11 +214,6 @@ public:
 		return m_flagRunning;
 	}
 	
-	void onFrame(sl_int16* buf, sl_uint32 n)
-	{
-		_processFrame_S16(buf, n);
-	}
-	
 	struct ConverterContext
 	{
 		sl_uint32 nBytesPerPacket;
@@ -248,26 +249,31 @@ public:
 	void onFrame(const AudioBufferList* data)
 	{
 		const AudioBuffer& buffer = data->mBuffers[0];
-		sl_uint32 nFrame = buffer.mDataByteSize / m_formatSrc.mBytesPerPacket * m_formatDst.mSampleRate / m_formatSrc.mSampleRate * 2; // double buffer to be enough to convert all source packets
+		sl_uint32 nFrames = buffer.mDataByteSize / m_formatSrc.mBytesPerPacket * m_formatDst.mSampleRate / m_formatSrc.mSampleRate * 2; // double buffer to be enough to convert all source packets
 		
-		Memory mem = _getMemProcess_S16(nFrame);
-		if (mem.isNull()) {
+		sl_uint32 nChannels = m_nChannels;
+		sl_uint32 nSamples = nFrames * nChannels;
+		
+		Array<sl_int16> arrData = _getProcessData(nSamples);
+		if (arrData.isNull()) {
 			return;
 		}
-		sl_int16* output = (sl_int16*)(mem.getBuf());
+		sl_int16* output = arrData.data();
 
 		AudioBufferList bufferOutput;
 		bufferOutput.mNumberBuffers = 1;
 		bufferOutput.mBuffers[0].mData = output;
-		bufferOutput.mBuffers[0].mDataByteSize = (UInt32)nFrame * 2;
-		UInt32 sizeFrame = (UInt32)nFrame;
+		bufferOutput.mBuffers[0].mDataByteSize = (UInt32)nSamples * 2;
+		bufferOutput.mBuffers[0].mNumberChannels = nChannels;
+		
+		UInt32 sizeFrame = (UInt32)nFrames;
 		ConverterContext context;
 		context.flagUsed = sl_false;
 		context.data = data;
 		context.nBytesPerPacket = m_formatSrc.mBytesPerPacket;
 		OSStatus result = AudioConverterFillComplexBuffer(m_converter, ConverterProc, (void*)&context, &sizeFrame, &bufferOutput, NULL);
 		if (result == noErr || result == 500) {
-			onFrame(output, sizeFrame);
+			_processFrame(output, sizeFrame * nChannels);
 		}
 	}
 	
@@ -293,14 +299,14 @@ Ref<AudioRecorder> AudioRecorder::create(const AudioRecorderParam& param)
 
 List<AudioRecorderInfo> AudioRecorder::getRecordersList()
 {
-	ListLocker<OSX_AudioDeviceInfo> list(OSX_AudioDeviceInfo::getAllDevices(sl_true));
+	ListItems<OSX_AudioDeviceInfo> list(OSX_AudioDeviceInfo::getAllDevices(sl_true));
 	List<AudioRecorderInfo> ret;
 	for (sl_size i = 0; i < list.count(); i++) {
 		AudioRecorderInfo info;
 		info.id = list[i].uid;
 		info.name = list[i].name;
 		info.description = list[i].manufacturer;
-		ret.add(info);
+		ret.add_NoLock(info);
 	}
 	return ret;
 }

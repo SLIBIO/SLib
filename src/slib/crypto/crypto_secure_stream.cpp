@@ -419,7 +419,7 @@ public:
 		return m_context.isConnected();
 	}
 
-	void onRead(AsyncStream* _stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError)
+	void onRead(AsyncStream* _stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError)
 	{
 		ObjectLocker lock(this);
 		Ref<AsyncStream> stream = m_streamBase;
@@ -480,7 +480,7 @@ public:
 		}
 	}
 	
-	void onWrite(AsyncStream* _stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError)
+	void onWrite(AsyncStream* _stream, void* data, sl_uint32 sizeWritten, const Referable* ref, sl_bool flagError)
 	{
 		Ref<AsyncStream> stream = m_streamBase;
 		if (stream.isNull()) {
@@ -535,7 +535,7 @@ public:
 		return sl_false;
 	}
 
-	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref)
+	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref)
 	{
 		ObjectLocker lock(this);
 		if (!m_flagInited) {
@@ -548,7 +548,7 @@ public:
 		return sl_false;
 	}
 
-	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref)
+	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref)
 	{
 		ObjectLocker lock(this);
 		if (!m_flagInited) {
@@ -1030,7 +1030,7 @@ public:
 		return m_context.isReceivedHeader();
 	}
 
-	void onRead(AsyncStream* _stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError)
+	void onRead(AsyncStream* _stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError)
 	{
 		ObjectLocker lock(this);
 		Ref<AsyncStream> stream = m_streamBase;
@@ -1083,7 +1083,7 @@ public:
 		}
 	}
 
-	void onWrite(AsyncStream* _stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError)
+	void onWrite(AsyncStream* _stream, void* data, sl_uint32 sizeWritten, const Referable* ref, sl_bool flagError)
 	{
 		Ref<AsyncStream> stream = m_streamBase;
 		if (stream.isNull()) {
@@ -1138,7 +1138,7 @@ public:
 		return sl_false;
 	}
 
-	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref)
+	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref)
 	{
 		ObjectLocker lock(this);
 		if (!m_flagInited) {
@@ -1151,7 +1151,7 @@ public:
 		return sl_false;
 	}
 
-	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref)
+	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref)
 	{
 		ObjectLocker lock(this);
 		if (!m_flagInited) {

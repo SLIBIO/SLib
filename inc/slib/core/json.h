@@ -10,13 +10,13 @@ SLIB_NAMESPACE_BEGIN
 class SLIB_EXPORT Json
 {
 public:
-	static Variant parseJSONFromUtf8TextFile(const String& filePath, sl_bool flagSupportComments = sl_true);
+	static Variant parseJsonFromUtf8TextFile(const String& filePath, sl_bool flagSupportComments = sl_true);
 	
-	static Variant parseJSON(const String& json, sl_bool flagSupportComments = sl_true);
+	static Variant parseJson(const String& json, sl_bool flagSupportComments = sl_true);
 	
-	static Variant parseJSON16(const String16& json, sl_bool flagSupportComments = sl_true);
+	static Variant parseJson16(const String16& json, sl_bool flagSupportComments = sl_true);
 	
-	static String toJSON(const Variant& var);
+	static String toJson(const Variant& var);
 };
 
 SLIB_NAMESPACE_END

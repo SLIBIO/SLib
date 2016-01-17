@@ -16,7 +16,9 @@ public:
 	PointT<T> point3;
 	
 public:
-	SLIB_INLINE TriangleT() {}
+	SLIB_INLINE TriangleT()
+	{
+	}
 	
 	template <class O>
 	SLIB_INLINE TriangleT(const TriangleT<O>& other)
@@ -33,6 +35,7 @@ public:
 		point3 = _point3;
 	}
 	
+public:
 	template <class O>
 	SLIB_INLINE TriangleT<T>& operator=(const TriangleT<O>& other)
 	{
@@ -42,6 +45,7 @@ public:
 		return *this;
 	}
 	
+public:
 	void transform(Matrix3T<T>& mat)
 	{
 		point1 = mat.transformPosition(point1);

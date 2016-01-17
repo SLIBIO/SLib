@@ -88,7 +88,7 @@ public:
 
 Ref<Screen> UI::getPrimaryScreen()
 {
-	SLIB_SAFE_STATIC_REF(Ref<Screen>, ret);
+	SLIB_SAFE_STATIC_REF(SafeRef<Screen>, ret);
 	if (ret.isNull()) {
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {

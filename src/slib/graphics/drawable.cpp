@@ -4,9 +4,6 @@
 #include "../../../inc/slib/graphics/image.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
-Drawable::Drawable()
-{
-}
 
 sl_bool Drawable::isBitmap()
 {
@@ -28,21 +25,21 @@ Ref<ColorDrawable> Drawable::createColorDrawable(const Color& color)
 	return ColorDrawable::create(color);
 }
 
-BrushDrawable::BrushDrawable()
+Ref<Drawable> Drawable::createEmptyDrawable()
 {
+	return EmptyDrawable::create();
 }
 
 Ref<BrushDrawable> BrushDrawable::create(const Ref<Brush>& brush)
 {
-	Ref<BrushDrawable> ret;
-	if (brush.isNull()) {
-		return ret;
+	if (brush.isNotNull()) {
+		Ref<BrushDrawable> ret = new BrushDrawable;
+		if (ret.isNotNull()) {
+			ret->m_brush = brush;
+			return ret;
+		}
 	}
-	ret = new BrushDrawable();
-	if (ret.isNotNull()) {
-		ret->m_brush = brush;
-	}
-	return ret;
+	return Ref<BrushDrawable>::null();
 }
 
 sl_real BrushDrawable::getDrawableWidth()
@@ -57,14 +54,7 @@ sl_real BrushDrawable::getDrawableHeight()
 
 void BrushDrawable::onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc)
 {
-	Ref<Brush> brush = m_brush;
-	if (brush.isNotNull()) {
-		canvas->drawRectangle(rectDst, Ref<Pen>::null(), brush);
-	}
-}
-
-ColorDrawable::ColorDrawable()
-{
+	canvas->drawRectangle(rectDst, Ref<Pen>::null(), m_brush);
 }
 
 Ref<ColorDrawable> ColorDrawable::create(const Color& color)
@@ -81,15 +71,9 @@ Ref<ColorDrawable> ColorDrawable::create(const Color& color)
 	return ret;
 }
 
-EmptyDrawable::EmptyDrawable()
-{
-}
-
 Ref<EmptyDrawable> EmptyDrawable::create()
 {
-	Ref<EmptyDrawable> ret;
-	ret = new EmptyDrawable();
-	return ret;
+	return new EmptyDrawable();
 }
 
 sl_real EmptyDrawable::getDrawableWidth()
@@ -106,8 +90,4 @@ void EmptyDrawable::onDraw(Canvas* canvas, const Rectangle& rectDst, const Recta
 {
 }
 
-Ref<Drawable> Drawable::createEmptyDrawable()
-{
-	return EmptyDrawable::create();
-}
 SLIB_GRAPHICS_NAMESPACE_END

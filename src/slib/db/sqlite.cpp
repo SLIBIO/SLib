@@ -355,20 +355,20 @@ public:
 						int iRet = SQLITE_ABORT;
 						Variant& var = params[i];
 						switch (var.getType()) {
-						case Variant::typeNull:
+						case variantType_Null:
 							iRet = ::sqlite3_bind_null(m_statement, i);
 							break;
-						case Variant::typeBoolean:
-						case Variant::typeInt32:
+						case variantType_Boolean:
+						case variantType_Int32:
 							iRet = ::sqlite3_bind_int(m_statement, i, var.getInt32());
 							break;
-						case Variant::typeUint32:
-						case Variant::typeInt64:
-						case Variant::typeUint64:
+						case variantType_Uint32:
+						case variantType_Int64:
+						case variantType_Uint64:
 							iRet = ::sqlite3_bind_int64(m_statement, i, var.getInt64());
 							break;
-						case Variant::typeFloat:
-						case Variant::typeDouble:
+						case variantType_Float:
+						case variantType_Double:
 							iRet = ::sqlite3_bind_double(m_statement, i, var.getDouble());
 							break;
 						default:

@@ -686,7 +686,7 @@ public:
 
 	SLIB_INLINE SafePtr<T>& operator=(const Ptr<T>& other)
 	{
-		_replace(other.m_pointer, other.m_reference);
+		_replace(other.get(), other.getReference());
 		return *this;
 	}
 	
@@ -920,20 +920,20 @@ public:
 template <class T>
 SLIB_INLINE Ptr<T>::Ptr(const SafePtr<T>& other)
 {
-	m_pointer = other.retain(m_reference);
+	m_pointer = other._retain(m_reference);
 }
 
 template <class T>
 template <class O>
 SLIB_INLINE Ptr<T>::Ptr(const SafePtr<O>& other)
 {
-	m_pointer = other.retain(m_reference);
+	m_pointer = other._retain(m_reference);
 }
 
 template <class T>
 SLIB_INLINE Ptr<T>& Ptr<T>::operator=(const SafePtr<T>& other)
 {
-	m_pointer = other.retain(m_reference);
+	m_pointer = other._retain(m_reference);
 	return *this;
 }
 
@@ -941,7 +941,7 @@ template <class T>
 template <class O>
 SLIB_INLINE Ptr<T>& Ptr<T>::operator=(const SafePtr<O>& other)
 {
-	m_pointer = other.retain(m_reference);
+	m_pointer = other._retain(m_reference);
 	return *this;
 }
 

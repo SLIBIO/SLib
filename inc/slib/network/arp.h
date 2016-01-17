@@ -24,131 +24,161 @@
 */
 
 SLIB_NETWORK_NAMESPACE_BEGIN
-class SLIB_EXPORT ARP_PacketFormat
+
+enum ArpOperation
+{
+	arpOperation_Request = 1,
+	arpOperation_Reply = 2
+};
+
+class SLIB_EXPORT ArpPacketFormat
 {
 public:
 	SLIB_INLINE sl_uint16 getHardwareType() const
 	{
 		return MIO::readUint16BE(_hardwareType);
 	}
+    
 	SLIB_INLINE void setHardwareType(sl_uint16 hardwareType)
 	{
 		MIO::writeUint16BE(_hardwareType, hardwareType);
 	}
 
+    
 	SLIB_INLINE sl_uint16 getProtocolType() const
 	{
 		return MIO::readUint16BE(_protocolType);
 	}
+    
 	SLIB_INLINE void setProtocolType(sl_uint16 protocolType)
 	{
 		MIO::writeUint16BE(_protocolType, protocolType);
 	}
 
+    
 	SLIB_INLINE sl_uint8 getHardwareAddressLength() const
 	{
 		return _hardwareAddressLength;
 	}
+    
 	SLIB_INLINE void setHardwareAddressLength(sl_uint8 length)
 	{
 		_hardwareAddressLength = length;
 	}
 
+    
 	SLIB_INLINE sl_uint8 getProtocolAddressLength() const
 	{
 		return _protocolAddressLength;
 	}
+    
 	SLIB_INLINE void setProtocolAddressLength(sl_uint8 length)
 	{
 		_protocolAddressLength = length;
 	}
 
-	enum Operation
+    
+	SLIB_INLINE ArpOperation getOperation() const
 	{
-		operationRequest = 1,
-		operationReply = 2
-	};
-	SLIB_INLINE Operation getOperation() const
-	{
-		return (Operation)(MIO::readUint16BE(_operation));
+		return (ArpOperation)(MIO::readUint16BE(_operation));
 	}
-	SLIB_INLINE void setOperation(Operation operation)
+    
+	SLIB_INLINE void setOperation(ArpOperation operation)
 	{
 		MIO::writeUint16BE(_operation, operation);
 	}
 
+    
 	SLIB_INLINE const sl_uint8* getSenderHardwareAddress() const
 	{
 		return ((const sl_uint8*)this) + 8;
 	}
+    
 	SLIB_INLINE sl_uint8* getSenderHardwareAddress()
 	{
 		return ((sl_uint8*)this) + 8;
 	}
+    
 	SLIB_INLINE MacAddress getSenderMacAddress() const
 	{
 		return MacAddress(((sl_uint8*)this) + 8);
 	}
+    
 	SLIB_INLINE void setSenderMacAddress(const MacAddress& address)
 	{
 		Base::copyMemory(((sl_uint8*)this) + 8, address.m, 6);
 	}
 
+    
 	SLIB_INLINE const sl_uint8* getSenderProtocolAddress() const
 	{
 		return ((const sl_uint8*)this) + 8 + (sl_uint32)(getHardwareAddressLength());
 	}
+    
 	SLIB_INLINE sl_uint8* getSenderProtocolAddress()
 	{
 		return ((sl_uint8*)this) + 8 + (sl_uint32)(getHardwareAddressLength());
 	}
+    
 	SLIB_INLINE IPv4Address getSenderIPv4Address() const
 	{
 		return IPv4Address(((sl_uint8*)this) + 14);
 	}
+    
 	SLIB_INLINE void setSenderIPv4Address(const IPv4Address& address)
 	{
 		address.get(((sl_uint8*)this) + 14);
 	}
 
+    
 	SLIB_INLINE const sl_uint8* getTargetHardwareAddress() const
 	{
 		return ((const sl_uint8*)this) + 8 + (sl_uint32)(getHardwareAddressLength()) + (sl_uint32)(getProtocolAddressLength());
 	}
+    
 	SLIB_INLINE sl_uint8* getTargetHardwareAddress()
 	{
 		return ((sl_uint8*)this) + 8 + (sl_uint32)(getHardwareAddressLength()) + (sl_uint32)(getProtocolAddressLength());
 	}
+    
 	SLIB_INLINE MacAddress getTargetMacAddress() const
 	{
 		return MacAddress(((sl_uint8*)this) + 18);
 	}
+    
 	SLIB_INLINE void setTargetMacAddress(const MacAddress& address)
 	{
 		Base::copyMemory(((sl_uint8*)this) + 18, address.m, 6);
 	}
 
+    
 	SLIB_INLINE const sl_uint8* getTargetProtocolAddress() const
 	{
 		return ((const sl_uint8*)this) + 8 + (sl_uint32)(getHardwareAddressLength()) * 2 + (sl_uint32)(getProtocolAddressLength());
 	}
+    
 	SLIB_INLINE sl_uint8* getTargetProtocolAddress()
 	{
 		return ((sl_uint8*)this) + 8 + (sl_uint32)(getHardwareAddressLength()) * 2 + (sl_uint32)(getProtocolAddressLength());
 	}
+    
+    
 	SLIB_INLINE IPv4Address getTargetIPv4Address() const
 	{
 		return IPv4Address(((sl_uint8*)this) + 24);
 	}
+    
 	SLIB_INLINE void setTargetIPv4Address(const IPv4Address& address)
 	{
 		address.get(((sl_uint8*)this) + 24);
 	}
 
+    
 	SLIB_INLINE static sl_uint32 getPacketSizeForEthernetIPv4()
 	{
 		return 28;
 	}
+    
 	SLIB_INLINE sl_bool isValidEthernetIPv4() const
 	{
 		return getHardwareType() == 1 && getProtocolType() == networkLinkProtocol_IPv4

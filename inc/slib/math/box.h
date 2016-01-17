@@ -18,7 +18,9 @@ public:
 	T x2, y2, z2;
 	
 public:
-	SLIB_INLINE BoxT() {}
+	SLIB_INLINE BoxT()
+	{
+	}
 	
 	template <class O>
 	SLIB_INLINE BoxT(const BoxT<O>& other)
@@ -35,6 +37,7 @@ public:
 		x2 = _x2; y2 = _y2; z2 = _z2;
 	}
 	
+public:
 	template <class O>
 	SLIB_INLINE BoxT<T>& operator=(const BoxT<O>& other)
 	{
@@ -249,16 +252,16 @@ public:
 	}
 	
 	// 8 points
-	void getCornerPoints(Vector3T<T>* out) const
+	void getCornerPoints(Vector3T<T>* _out) const
 	{
-		out[0].x = x1; out[0].y = y1; out[0].z = z1;
-		out[1].x = x2; out[1].y = y1; out[1].z = z1;
-		out[2].x = x1; out[2].y = y2; out[2].z = z1;
-		out[3].x = x2; out[3].y = y2; out[3].z = z1;
-		out[4].x = x1; out[4].y = y1; out[4].z = z2;
-		out[5].x = x2; out[5].y = y1; out[5].z = z2;
-		out[6].x = x1; out[6].y = y2; out[6].z = z2;
-		out[7].x = x2; out[7].y = y2; out[7].z = z2;
+		_out[0].x = x1; _out[0].y = y1; _out[0].z = z1;
+		_out[1].x = x2; _out[1].y = y1; _out[1].z = z1;
+		_out[2].x = x1; _out[2].y = y2; _out[2].z = z1;
+		_out[3].x = x2; _out[3].y = y2; _out[3].z = z1;
+		_out[4].x = x1; _out[4].y = y1; _out[4].z = z2;
+		_out[5].x = x2; _out[5].y = y1; _out[5].z = z2;
+		_out[6].x = x1; _out[6].y = y2; _out[6].z = z2;
+		_out[7].x = x2; _out[7].y = y2; _out[7].z = z2;
 	}
 };
 

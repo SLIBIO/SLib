@@ -71,11 +71,14 @@ public:
 	sl_pipe getWritePipeHandle();
 
 protected:
-	virtual void __set();
+	// override
+	void __set();
 	
-	virtual void __reset();
+	// override
+	void __reset();
 	
-	virtual sl_bool __wait(sl_int32 timeout);
+	// override
+	sl_bool __wait(sl_int32 timeout);
 
 protected:
 	Ref<Pipe> m_pipe;

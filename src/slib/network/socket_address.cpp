@@ -17,7 +17,7 @@
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
-const SocketAddress::_SocketAddress SocketAddress::_none = { { IPAddress::typeNone, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }, 0 };
+const SocketAddress::_SocketAddress SocketAddress::_none = { { ipAddressType_None, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }, 0 };
 
 int SocketAddress::compare(const SocketAddress& other) const
 {

@@ -15,7 +15,7 @@
 
 SLIB_NAMESPACE_BEGIN
 
-sl_file File::_open(const String& filePath, Mode mode)
+sl_file File::_open(const String& filePath, FileMode mode)
 {
 	if (filePath.isEmpty()) {
 		return (sl_file)-1;
@@ -23,20 +23,20 @@ sl_file File::_open(const String& filePath, Mode mode)
 	int flags = 0;
 	int permissions = S_IRWXU | S_IRWXG | S_IRWXO;
 	switch (mode) {
-		case modeRead:
+		case fileMode_Read:
 			flags = O_RDONLY;
 			permissions = 0;
 			break;
-		case modeWrite:
+		case fileMode_Write:
 			flags = O_WRONLY | O_CREAT | O_TRUNC;
 			break;
-		case modeReadWrite:
+		case fileMode_ReadWrite:
 			flags = O_RDWR | O_CREAT | O_TRUNC;
 			break;
-		case modeAppend:
+		case fileMode_Append:
 			flags = O_WRONLY | O_CREAT;
 			break;
-		case modeRandomAccess:
+		case fileMode_RandomAccess:
 			flags = O_RDWR | O_CREAT;
 			break;
 		default:
@@ -106,16 +106,16 @@ sl_uint64 File::getPosition()
 	return 0;
 }
 
-sl_bool File::seek(sl_int64 pos, Position from)
+sl_bool File::seek(sl_int64 pos, SeekPosition from)
 {
 	if (isOpened()) {
 		int fd = (int)m_file;
 		int origin = SEEK_SET;
-		if (from == positionBegin) {
+		if (from == seekPosition_Begin) {
 			origin = SEEK_SET;
-		} else if (from == positionCurrent) {
+		} else if (from == seekPosition_Current) {
 			origin = SEEK_CUR;
-		} else if (from == positionEnd) {
+		} else if (from == seekPosition_End) {
 			origin = SEEK_END;
 		} else {
 			return sl_false;
@@ -391,10 +391,10 @@ int File::getAttributes(const String& filePath)
 	if (0 == ::stat(filePath.getBuf(), &st)) {
 		int ret = 0;
 		if (S_ISDIR(st.st_mode)) {
-			ret |= attributeDirectory;
+			ret |= fileAttribute_Directory;
 		}
 		if (filePath.startsWith('.')) {
-			ret |= attributeHidden;
+			ret |= fileAttribute_Hidden;
 		}
 		return ret;
 	} else {

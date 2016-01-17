@@ -37,19 +37,19 @@ Ref<ViewInstance> RenderView::createInstance(ViewInstance* _parent)
 	IOS_VIEW_CREATE_INSTANCE_END
 	if (handle != nil && ret.isNotNull()) {
 		[handle _init];
-		[handle _setRenderContinuously:(m_renderMode == RenderView::renderModeContinuously)];
+		[handle _setRenderContinuously:(m_redrawMode == redrawMode_Continuously)];
 	}
 	return ret;
 }
 
-void RenderView::setRenderMode(RenderView::RenderMode mode)
+void RenderView::setRedrawMode(RedrawMode mode)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_GLView class]]) {
 		_Slib_iOS_GLView* v = (_Slib_iOS_GLView*)handle;
-		[v _setRenderContinuously:(mode == RenderView::renderModeContinuously)];
+		[v _setRenderContinuously:(mode == redrawMode_Continuously)];
 	}
-	m_renderMode = mode;
+	m_redrawMode = mode;
 }
 
 void RenderView::requestRender()

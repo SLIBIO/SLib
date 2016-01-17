@@ -23,17 +23,9 @@ void Font::setDefaultFontSize(sl_real size)
 	_g_graphics_font_default_size = size;
 }
 
-Font::Font()
-{
-}
-
 Ref<Font> Font::getDefault()
 {
-	SLIB_SAFE_STATIC_REF(Ref<Font>, defaultFont);
-	if (defaultFont.isNull()) {
-		FontDesc desc;
-		defaultFont = create(desc);
-	}
+	SLIB_SAFE_STATIC(SafeRef<Font>, defaultFont, create(FontDesc()));
 	return defaultFont;
 }
 
@@ -65,19 +57,6 @@ Size Font::getTextSize(const Ref<GraphicsContext>& context, const String& text)
 	return Size::zero();
 }
 
-const Ref<FontInstance>& Font::getInstance()
-{
-	return m_instance;
-}
-
-void Font::setInstance(const Ref<FontInstance>& instance)
-{
-	m_instance = instance;
-}
-
-FontInstance::FontInstance()
-{
-}
 SLIB_GRAPHICS_NAMESPACE_END
 
 

@@ -99,7 +99,7 @@ sl_bool IPv4HeaderFormat::checkHeader(const void* packet, sl_uint32 sizeTotal)
 	return sl_true;
 }
 
-void TCP_HeaderFormat::updateChecksum(const IPv4HeaderFormat* ipv4, sl_uint32 sizeContent)
+void TcpHeaderFormat::updateChecksum(const IPv4HeaderFormat* ipv4, sl_uint32 sizeContent)
 {
 	_checksum[0] = 0;
 	_checksum[1] = 0;
@@ -107,15 +107,15 @@ void TCP_HeaderFormat::updateChecksum(const IPv4HeaderFormat* ipv4, sl_uint32 si
 	setChecksum(checksum);
 }
 
-sl_bool TCP_HeaderFormat::checkChecksum(const IPv4HeaderFormat* ipv4, sl_uint32 sizeContent) const
+sl_bool TcpHeaderFormat::checkChecksum(const IPv4HeaderFormat* ipv4, sl_uint32 sizeContent) const
 {
 	sl_uint16 checksum = ipv4->getChecksumForContent(this, sizeContent);
 	return checksum == 0;
 }
 
-sl_bool TCP_HeaderFormat::check(IPv4HeaderFormat* ip, sl_uint32 sizeTcp) const
+sl_bool TcpHeaderFormat::check(IPv4HeaderFormat* ip, sl_uint32 sizeTcp) const
 {
-	if (sizeTcp < sizeof(TCP_HeaderFormat)) {
+	if (sizeTcp < sizeof(TcpHeaderFormat)) {
 		return sl_false;
 	}
 	if (sizeTcp < getHeaderSize()) {
@@ -127,7 +127,7 @@ sl_bool TCP_HeaderFormat::check(IPv4HeaderFormat* ip, sl_uint32 sizeTcp) const
 	return sl_true;
 }
 
-void UDP_HeaderFormat::updateChecksum(const IPv4HeaderFormat* ipv4)
+void UdpHeaderFormat::updateChecksum(const IPv4HeaderFormat* ipv4)
 {
 	_checksum[0] = 0;
 	_checksum[1] = 0;
@@ -138,7 +138,7 @@ void UDP_HeaderFormat::updateChecksum(const IPv4HeaderFormat* ipv4)
 	setChecksum(checksum);
 }
 
-sl_bool UDP_HeaderFormat::checkChecksum(const IPv4HeaderFormat* ipv4) const
+sl_bool UdpHeaderFormat::checkChecksum(const IPv4HeaderFormat* ipv4) const
 {
 	if (getChecksum() == 0) {
 		return sl_true;
@@ -147,9 +147,9 @@ sl_bool UDP_HeaderFormat::checkChecksum(const IPv4HeaderFormat* ipv4) const
 	return checksum == 0 || checksum == 0xFFFF;
 }
 
-sl_bool UDP_HeaderFormat::check(IPv4HeaderFormat* ip, sl_uint32 sizeUdp) const
+sl_bool UdpHeaderFormat::check(IPv4HeaderFormat* ip, sl_uint32 sizeUdp) const
 {
-	if (sizeUdp < sizeof(UDP_HeaderFormat)) {
+	if (sizeUdp < sizeof(UdpHeaderFormat)) {
 		return sl_false;
 	}
 	if (sizeUdp != getTotalSize()) {

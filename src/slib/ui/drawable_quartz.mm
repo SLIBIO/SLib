@@ -9,6 +9,7 @@
 #include "../../../inc/slib/ui/platform.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _Quartz_ImageDrawable : public Drawable
 {
 	SLIB_DECLARE_OBJECT(_Quartz_ImageDrawable, Drawable)
@@ -259,7 +260,7 @@ public:
 		BitmapData source;
 		source.width = m_width - x;
 		source.height = m_height - y;
-		source.format = bitmapFormatRGBA_PA;
+		source.format = bitmapFormat_RGBA_PA;
 		source.data = ((sl_uint32*)m_buf) + m_width * y + x;
 		source.pitch = m_width << 2;
 		
@@ -280,7 +281,7 @@ public:
 		BitmapData target;
 		target.width = m_width - x;
 		target.height = m_height - y;
-		target.format = bitmapFormatRGBA_PA;
+		target.format = bitmapFormat_RGBA_PA;
 		target.data = ((sl_uint32*)m_buf) + m_width * y + x;
 		target.pitch = m_width << 2;
 		

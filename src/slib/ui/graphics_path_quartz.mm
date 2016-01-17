@@ -135,7 +135,7 @@ sl_bool UI::checkPointInPath(const Ref<GraphicsPath>& path, const Point& _pt)
 		CGPoint pt;
 		pt.x = _pt.x;
 		pt.y = _pt.y;
-		return CGPathContainsPoint(handle, NULL, pt, path->getFillMode() != fillModeWinding);
+		return CGPathContainsPoint(handle, NULL, pt, path->getFillMode() != fillMode_Winding);
 	}
 	return sl_false;
 }

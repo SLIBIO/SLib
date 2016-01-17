@@ -140,27 +140,27 @@ void RenderObjectGroup2D::dispatchUIEvent(UIEvent* event)
 {
 	sl_bool flagAbort = sl_false;
 
-	if (getButtonState() == buttonStateDisabled) {
+	if (getButtonState() == buttonState_Disabled) {
 		return;
 	}
 
 	Ref<RenderObject2D> c = m_childMouseCapture;
 	if (c.isNotNull()) {
 		ButtonState s = c->getButtonState();
-		if (s == buttonStateDown || s == buttonStateHover) {
+		if (s == buttonState_Down || s == buttonState_Hover) {
 			c->dispatchUIEvent(event);
 			if (event->isStoppedPropagation()) {
 				flagAbort = sl_true;
 			}
 			s = c->getButtonState();
-			if (flagAbort || (s != buttonStateDown && s != buttonStateHover)) {
-				setButtonState(buttonStateNormal);
+			if (flagAbort || (s != buttonState_Down && s != buttonState_Hover)) {
+				setButtonState(buttonState_Normal);
 				m_childMouseCapture.setNull();
 			}
 			return;
 		}
 	}
-	setButtonState(buttonStateNormal);
+	setButtonState(buttonState_Normal);
 	m_childMouseCapture.setNull();
 	
 	Point ptWorld = event->getPoint();
@@ -178,8 +178,8 @@ void RenderObjectGroup2D::dispatchUIEvent(UIEvent* event)
 					}
 					sl_bool flagCapture = sl_false;
 					ButtonState s = r->getButtonState();
-					if (flagAbort || (s != buttonStateDown && s != buttonStateHover)) {
-						s = buttonStateNormal;
+					if (flagAbort || (s != buttonState_Down && s != buttonState_Hover)) {
+						s = buttonState_Normal;
 					} else {
 						m_childMouseCapture = r;
 						flagCapture = sl_true;
@@ -233,13 +233,13 @@ void RenderRectangle2D::setColor(const Color4f& color)
 const Color4f& RenderRectangle2D::getColorForState()
 {
 	ButtonState state = getButtonState();
-	if (state == buttonStateNormal) {
+	if (state == buttonState_Normal) {
 		return getColorForNormalState();
-	} else if (state == buttonStateDown) {
+	} else if (state == buttonState_Down) {
 		return getColorForDownState();
-	} else if (state == buttonStateHover) {
+	} else if (state == buttonState_Hover) {
 		return getColorForHoverState();
-	} else if (state == buttonStateDisabled) {
+	} else if (state == buttonState_Disabled) {
 		return getColorForDisabledState();
 	} else {
 		return getColorForNormalState();
@@ -250,14 +250,14 @@ Ref<RenderProgram2D> RenderRectangle2D::getProgramForState()
 {
 	Ref<RenderProgram2D> ret;
 	ButtonState state = getButtonState();
-	if (state == buttonStateNormal) {
+	if (state == buttonState_Normal) {
 		ret = getProgram();
 		return ret;
-	} else if (state == buttonStateDown) {
+	} else if (state == buttonState_Down) {
 		ret = getProgramForDownState();
-	} else if (state == buttonStateHover) {
+	} else if (state == buttonState_Hover) {
 		ret = getProgramForHoverState();
-	} else if (state == buttonStateDisabled) {
+	} else if (state == buttonState_Disabled) {
 		ret = getProgramForDisabledState();
 	}
 	if (ret.isNull()) {
@@ -280,7 +280,7 @@ void RenderRectangle2D::render(RenderEngine* engine)
 	program->setColor(c.xyz());
 	program->setAlpha(c.w);
 	program->setTransform(m);
-	engine->draw(program.get(), 4, _getDefaultVertexBuffer(), Primitive::typeTriangleStrip);
+	engine->draw(program.get(), 4, _getDefaultVertexBuffer(), primitiveType_TriangleStrip);
 }
 
 Ref<VertexBuffer> RenderRectangle2D::_getDefaultVertexBuffer()
@@ -305,23 +305,23 @@ Ref<Texture> RenderImage2D::getTextureForState(Rectangle& rect)
 {
 	Ref<Texture> ret;
 	ButtonState state = getButtonState();
-	if (state == buttonStateNormal) {
+	if (state == buttonState_Normal) {
 		ret = getTexture();
 		if (ret.isNotNull()) {
 			rect = getTextureRectangle();
 		}
 		return ret;
-	} else if (state == buttonStateDown) {
+	} else if (state == buttonState_Down) {
 		ret = getTextureForDownState();
 		if (ret.isNotNull()) {
 			rect = getTextureRectangleForDownState();
 		}
-	} else if (state == buttonStateHover) {
+	} else if (state == buttonState_Hover) {
 		ret = getTextureForHoverState();
 		if (ret.isNotNull()) {
 			rect = getTextureRectangleForHoverState();
 		}
-	} else if (state == buttonStateDisabled) {
+	} else if (state == buttonState_Disabled) {
 		ret = getTextureForDisabledState();
 		if (ret.isNotNull()) {
 			rect = getTextureRectangleForDisabledState();
@@ -367,7 +367,7 @@ void RenderImage2D::render(RenderEngine* engine)
 		program->setTexture(texture);
 		program->setTextureTransform(mt);
 		program->setTransform(m);
-		engine->draw(program.get(), 4, _getDefaultVertexBuffer(), Primitive::typeTriangleStrip);
+		engine->draw(program.get(), 4, _getDefaultVertexBuffer(), primitiveType_TriangleStrip);
 	}
 }
 

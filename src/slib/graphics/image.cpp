@@ -6,6 +6,7 @@
 #include "image_soil2.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
+
 Image::Image()
 {
 }
@@ -308,7 +309,7 @@ Ref<Image> Image::scale(sl_uint32 width, sl_uint32 height, StretchMode stretch) 
 {
 	Ref<Image> ret = Image::create(width, height);
 	if (ret.isNotNull()) {
-		draw(ret->m_desc, m_desc, blendCopy, stretch);
+		draw(ret->m_desc, m_desc, blendMode_Copy, stretch);
 	}
 	return ret;
 }
@@ -322,7 +323,7 @@ void Image::draw(ImageDesc& dst, const ImageDesc& src, BlendMode blend, StretchM
 		return;
 	}
 	// stretch - fast
-	if (blend == blendSrcAlpha) {
+	if (blend == blendMode_SrcAlpha) {
 		Color* colorsDst;
 		Color* colorsDstLine = dst.colors;
 		for (sl_uint32 y = 0; y < dst.height; y++) {
@@ -443,18 +444,18 @@ ImageFileType Image::getFileType(const void* _mem, sl_size size)
 {
 	sl_uint8* mem = (sl_uint8*)_mem;
 	if (size > 4 && mem[0] == 0xFF && mem[1] == 0xD8) {
-		return imageFileTypeJPEG;
+		return imageFileType_JPEG;
 	}
 	if (size > 0x08 && mem[0] == 0x89 && mem[1] == 0x50 && mem[2] == 0x4E && mem[3] == 0x47 && mem[4] == 0x0D && mem[5] == 0x0A && mem[6] == 0x1A && mem[7] == 0x0A) {
-		return imageFileTypePNG;
+		return imageFileType_PNG;
 	}
 	if (size > 12 && mem[0] == 'B' && mem[1] == 'M') {
-		return imageFileTypeBMP;
+		return imageFileType_BMP;
 	}
 	if (size > 4 && mem[0] == 'D' && mem[1] == 'D' && mem[2] == 'S' && mem[3] == ' ') {
-		return imageFileTypeDDS;
+		return imageFileType_DDS;
 	}
-	return imageFileTypeUnknown;
+	return imageFileType_Unknown;
 }
 
 Ref<Image> Image::loadFromMemory(const void* _mem, sl_size size, sl_uint32 width, sl_uint32 height)
@@ -464,13 +465,13 @@ Ref<Image> Image::loadFromMemory(const void* _mem, sl_size size, sl_uint32 width
 	ImageFileType type = getFileType(mem, size);
 	do {
 #ifdef SLIB_GRAPHICS_IMAGE_SUPPORT_JPEG
-		if (type == imageFileTypeJPEG) {
+		if (type == imageFileType_JPEG) {
 			ret = loadFromJPEG(mem, size);
 			break;
 		}
 #endif
 #ifdef SLIB_GRAPHICS_IMAGE_SUPPORT_PNG
-		if (type == imageFileTypePNG) {
+		if (type == imageFileType_PNG) {
 			ret = loadFromPNG(mem, size);
 			break;
 		}

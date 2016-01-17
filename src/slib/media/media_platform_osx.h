@@ -22,14 +22,17 @@ public:
     
 public:
 	sl_bool getDeviceInfo(AudioDeviceID deviceID, sl_bool flagInput);
+	
 	sl_bool getDefaultDevice(sl_bool flagInput);
+	
 	sl_bool selectDevice(sl_bool flagInput, String uid);
 
-	
+public:
 	static List<OSX_AudioDeviceInfo> getAllDevices(sl_bool flagInput);
 	
 private:
 	static void logError(String text);
+	
 };
 
 SLIB_MEDIA_NAMESPACE_END

@@ -2,10 +2,11 @@
 #define CHECKHEADER_SLIB_MEDIA_HEADER
 
 #include "media/audio_format.h"
+#include "media/audio_data.h"
 #include "media/audio_player.h"
 #include "media/audio_recorder.h"
 
-#include "media/video_format.h"
+#include "media/video_frame.h"
 #include "media/video_capture.h"
 #include "media/camera.h"
 

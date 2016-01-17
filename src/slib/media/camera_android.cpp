@@ -27,7 +27,7 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidCamera, "slib/platform/android/camera/SCamera")
 SLIB_JNI_END_CLASS
 
 class _Android_Camera;
-typedef Map<jlong, WeakRef<_Android_Camera> > _AndroidCameraMap;
+typedef HashMap<jlong, WeakRef<_Android_Camera> > _AndroidCameraMap;
 SLIB_SAFE_STATIC_GETTER(_AndroidCameraMap, _AndroidCameras_get);
 
 class _Android_Camera : public Camera
@@ -35,6 +35,7 @@ class _Android_Camera : public Camera
 public:
 	JniGlobal<jobject> m_camera;
 
+public:
 	_Android_Camera()
 	{
 	}
@@ -44,6 +45,7 @@ public:
 		release();
 	}
 
+public:
 	static Ref<_Android_Camera> _create(const CameraParam& param)
 	{
 		Ref<_Android_Camera> ret = new _Android_Camera();
@@ -54,7 +56,7 @@ public:
 			JniLocal<jobject> jcamera = _JAndroidCamera::create.callObject(sl_null, jid.get(), instance);
 			if (jcamera.isNotNull()) {
 				ret->m_camera = jcamera;
-				ret->setListener(param.listener);
+				ret->m_listener = param.listener;
 				_JAndroidCamera::setPreferedFrameSettings.call(jcamera,
 						param.preferedFrameWidth,
 						param.preferedFrameHeight);
@@ -137,11 +139,11 @@ public:
 		VideoCaptureFrame frame;
 		frame.image.width = (sl_uint32)(width);
 		frame.image.height = (sl_uint32)(height);
-		frame.image.format = bitmapFormatYUV_NV21;
+		frame.image.format = bitmapFormat_YUV_NV21;
 		frame.image.data = mem.getBuf();
 		frame.image.pitch = 0;
 		frame.image.ref = mem.getObject();
-		frame.rotation = rotation_90;
+		frame.rotation = rotationMode_90;
 		onCaptureVideoFrame(&frame);
 	}
 
@@ -173,7 +175,7 @@ List<CameraInfo> Camera::getCamerasList()
 			CameraInfo info;
 			info.id = _JAndroidCameraInfo::id.get(jinfo);
 			info.name = _JAndroidCameraInfo::name.get(jinfo);
-			ret.add(info);
+			ret.add_NoLock(info);
 		}
 	}
 	return ret;

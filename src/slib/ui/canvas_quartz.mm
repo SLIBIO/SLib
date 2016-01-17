@@ -35,7 +35,7 @@ public:
 			CGContextRetain(graphics);
 			ret = new _Quartz_Canvas();
 			if (ret.isNotNull()) {
-				ret->setGraphicsContext(UI::getGraphicsContext());
+				ret->m_context = UI::getGraphicsContext();
 				ret->m_graphics = graphics;
 				ret->m_width = width;
 				ret->m_height = height;
@@ -106,7 +106,7 @@ public:
 	{
 		CGContextBeginPath(m_graphics);
 		CGContextAddPath(m_graphics, path);
-		if (fillMode != fillModeWinding) {
+		if (fillMode != fillMode_Winding) {
 			CGContextEOClip(m_graphics);
 		} else {
 			CGContextClip(m_graphics);
@@ -345,10 +345,10 @@ public:
 			CGContextBeginPath(m_graphics);
 			CGContextAddPath(m_graphics, path);
 			switch (fillMode) {
-				case fillModeWinding:
+				case fillMode_Winding:
 					CGContextFillPath(m_graphics);
 					break;
-				case fillModeAlternate:
+				case fillMode_Alternate:
 				default:
 					CGContextEOFillPath(m_graphics);
 					break;
@@ -380,13 +380,13 @@ public:
 		_width = pen->getWidth();
 		
 		switch (pen->getCap()) {
-			case lineCapSquare:
+			case lineCap_Square:
 				_cap = kCGLineCapSquare;
 				break;
-			case lineCapRound:
+			case lineCap_Round:
 				_cap = kCGLineCapRound;
 				break;
-			case lineCapFlat:
+			case lineCap_Flat:
 			default:
 				_cap = kCGLineCapButt;
 				break;
@@ -394,13 +394,13 @@ public:
 		
 		switch (pen->getJoin()) {
 				break;
-			case lineJoinBevel:
+			case lineJoin_Bevel:
 				_join = kCGLineJoinBevel;
 				break;
-			case lineJoinRound:
+			case lineJoin_Round:
 				_join = kCGLineJoinRound;
 				break;
-			case lineJoinMiter:
+			case lineJoin_Miter:
 			default:
 				_join = kCGLineJoinMiter;
 				break;
@@ -414,23 +414,23 @@ public:
 		CGFloat dashStyleDashDot[] = {3*W, 2*W, W, 2*W};
 		CGFloat dashStyleDashDotDot[] = {3*W, 2*W, W, 2*W, W, 2*W};
 		switch (pen->getStyle()) {
-			case penStyleDot:
+			case penStyle_Dot:
 				_dash = dashStyleDot;
 				_dashLen = sizeof(dashStyleDot) / sizeof(CGFloat);
 				break;
-			case penStyleDash:
+			case penStyle_Dash:
 				_dash = dashStyleDash;
 				_dashLen = sizeof(dashStyleDash) / sizeof(CGFloat);
 				break;
-			case penStyleDashDot:
+			case penStyle_DashDot:
 				_dash = dashStyleDashDot;
 				_dashLen = sizeof(dashStyleDashDot) / sizeof(CGFloat);
 				break;
-			case penStyleDashDotDot:
+			case penStyle_DashDotDot:
 				_dash = dashStyleDashDotDot;
 				_dashLen = sizeof(dashStyleDashDotDot) / sizeof(CGFloat);
 				break;
-			case penStyleSolid:
+			case penStyle_Solid:
 			default:
 				_dash = 0;
 				_dashLen = 0;

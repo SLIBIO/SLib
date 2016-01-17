@@ -11,7 +11,9 @@ class SLIB_EXPORT DirectShow
 {
 public:
 	static Ref<Camera> createCamera(const CameraParam& param);
+	
 	static List<CameraInfo> getCamerasList();
+	
 };
 
 SLIB_MEDIA_NAMESPACE_END

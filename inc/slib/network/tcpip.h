@@ -195,12 +195,12 @@ public:
 		_timeToLive = TTL;
 	}
 
-	// NetworkInternetProtocolType
+	// NetworkInternetProtocol
 	SLIB_INLINE sl_uint8 getProtocol() const
 	{
 		return _protocol;
 	}
-	// NetworkInternetProtocolType
+	// NetworkInternetProtocol
 	SLIB_INLINE void setProtocol(sl_uint8 protocol)
 	{
 		_protocol = protocol;
@@ -335,7 +335,7 @@ private:
 	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 ********************************************************************/
-class SLIB_EXPORT TCP_HeaderFormat
+class SLIB_EXPORT TcpHeaderFormat
 {
 public:
 	SLIB_INLINE sl_uint16 getSourcePort() const
@@ -509,11 +509,11 @@ public:
 
 	SLIB_INLINE const sl_uint8* getOptions() const
 	{
-		return (const sl_uint8*)(this) + sizeof(TCP_HeaderFormat);
+		return (const sl_uint8*)(this) + sizeof(TcpHeaderFormat);
 	}
 	SLIB_INLINE sl_uint8* getOptions()
 	{
-		return (sl_uint8*)(this) + sizeof(TCP_HeaderFormat);
+		return (sl_uint8*)(this) + sizeof(TcpHeaderFormat);
 	}
 
 	SLIB_INLINE const sl_uint8* getContent() const
@@ -556,7 +556,7 @@ private:
 	+---------------- ...
 
 ********************************************************************/
-class SLIB_EXPORT UDP_HeaderFormat
+class SLIB_EXPORT UdpHeaderFormat
 {
 public:
 	SLIB_INLINE sl_uint16 getSourcePort() const
@@ -602,20 +602,20 @@ public:
 
 	SLIB_INLINE const sl_uint8* getContent() const
 	{
-		return (const sl_uint8*)(this) + sizeof(sizeof(UDP_HeaderFormat));
+		return (const sl_uint8*)(this) + sizeof(sizeof(UdpHeaderFormat));
 	}
 	SLIB_INLINE sl_uint8* getContent()
 	{
-		return (sl_uint8*)(this) + sizeof(sizeof(UDP_HeaderFormat));
+		return (sl_uint8*)(this) + sizeof(sizeof(UdpHeaderFormat));
 	}
 
 	SLIB_INLINE sl_uint16 getContentSize() const
 	{
-		return getTotalSize() - sizeof(UDP_HeaderFormat);
+		return getTotalSize() - sizeof(UdpHeaderFormat);
 	}
 	SLIB_INLINE void setContentSize(sl_uint16 size)
 	{
-		setTotalSize(size + sizeof(UDP_HeaderFormat));
+		setTotalSize(size + sizeof(UdpHeaderFormat));
 	}
 
 	sl_bool check(IPv4HeaderFormat* ip, sl_uint32 sizeContent) const;

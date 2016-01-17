@@ -46,7 +46,7 @@ static void _Json_escapeSpaceAndComments(const CT* buf, sl_uint32 len, sl_uint32
 }
 
 template <class ST, class CT>
-static Variant _Json_parseJSON(const CT* buf, sl_uint32 len, sl_uint32& pos, sl_bool& flagError, sl_bool flagSupportComments)
+static Variant _Json_parseJson(const CT* buf, sl_uint32 len, sl_uint32& pos, sl_bool& flagError, sl_bool flagSupportComments)
 {
 	pos = 0;
 	flagError = sl_true;
@@ -104,7 +104,7 @@ static Variant _Json_parseJSON(const CT* buf, sl_uint32 len, sl_uint32& pos, sl_
 			}
 			sl_uint32 m = 0;
 			sl_bool f = sl_false;
-			Variant item = _Json_parseJSON<ST, CT>(buf + pos, len - pos, m, f, flagSupportComments);
+			Variant item = _Json_parseJson<ST, CT>(buf + pos, len - pos, m, f, flagSupportComments);
 			pos += m;
 			if (f) {
 				return Variant::null();
@@ -183,7 +183,7 @@ static Variant _Json_parseJSON(const CT* buf, sl_uint32 len, sl_uint32& pos, sl_
 			}
 			sl_uint32 m = 0;
 			sl_bool f = sl_false;
-			Variant item = _Json_parseJSON<ST, CT>(buf + pos, len - pos, m, f, flagSupportComments);
+			Variant item = _Json_parseJson<ST, CT>(buf + pos, len - pos, m, f, flagSupportComments);
 			pos += m;
 			if (f) {
 				return Variant::null();
@@ -241,7 +241,7 @@ static Variant _Json_parseJSON(const CT* buf, sl_uint32 len, sl_uint32& pos, sl_
 	return Variant::null();
 }
 
-Variant Json::parseJSON(const String& json, sl_bool flagSupportComments)
+Variant Json::parseJson(const String& json, sl_bool flagSupportComments)
 {
 	const sl_char8* buf = json.getBuf();
 	sl_uint32 len = json.getLength();
@@ -258,7 +258,7 @@ Variant Json::parseJSON(const String& json, sl_bool flagSupportComments)
 	}
 	sl_uint32 parsed = 0;
 	sl_bool f = sl_false;
-	Variant var = _Json_parseJSON<String8, sl_char8>(buf, len, parsed, f, flagSupportComments);
+	Variant var = _Json_parseJson<String8, sl_char8>(buf, len, parsed, f, flagSupportComments);
 	if (!f) {
 		if (parsed == len) {
 			return var;
@@ -267,7 +267,7 @@ Variant Json::parseJSON(const String& json, sl_bool flagSupportComments)
 	return Variant::null();
 }
 
-Variant Json::parseJSON16(const String16& json, sl_bool flagSupportComments)
+Variant Json::parseJson16(const String16& json, sl_bool flagSupportComments)
 {
 	const sl_char16* buf = json.getBuf();
 	sl_uint32 len = json.getLength();
@@ -284,7 +284,7 @@ Variant Json::parseJSON16(const String16& json, sl_bool flagSupportComments)
 	}
 	sl_uint32 parsed = 0;
 	sl_bool f = sl_false;
-	Variant var = _Json_parseJSON<String16, sl_char16>(buf, len, parsed, f, flagSupportComments);
+	Variant var = _Json_parseJson<String16, sl_char16>(buf, len, parsed, f, flagSupportComments);
 	if (!f) {
 		if (parsed == len) {
 			return var;
@@ -293,15 +293,15 @@ Variant Json::parseJSON16(const String16& json, sl_bool flagSupportComments)
 	return Variant::null();
 }
 
-Variant Json::parseJSONFromUtf8TextFile(const String& filePath, sl_bool flagSupportComments)
+Variant Json::parseJsonFromUtf8TextFile(const String& filePath, sl_bool flagSupportComments)
 {
 	String json = File::readUtf8Text(filePath);
-	return parseJSON(json, flagSupportComments);
+	return parseJson(json, flagSupportComments);
 }
 
-String Json::toJSON(const Variant& var)
+String Json::toJson(const Variant& var)
 {
-	return var.toJSON();
+	return var.toJson();
 }
 
 SLIB_NAMESPACE_END

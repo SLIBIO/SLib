@@ -29,6 +29,7 @@ public:
 	}
 
 public:
+	// override
 	void log(const String& tag, const String& content);
 	
 protected:

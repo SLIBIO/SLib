@@ -19,7 +19,9 @@ public:
 	T c;
 	
 public:
-	SLIB_INLINE LineT() {}
+	SLIB_INLINE LineT()
+	{
+	}
 	
 	template <class O>
 	SLIB_INLINE LineT(const LineT<O>& other)
@@ -41,6 +43,7 @@ public:
 		setFromPointAndDirection(point, dir);
 	}
 	
+public:
 	template <class O>
 	SLIB_INLINE LineT<T>& operator=(const LineT<O>& other)
 	{
@@ -50,6 +53,7 @@ public:
 		return *this;
 	}
 	
+public:
 	SLIB_INLINE Vector2T<T> getDirection() const
 	{
 		return Vector2T<T>(b, -a);

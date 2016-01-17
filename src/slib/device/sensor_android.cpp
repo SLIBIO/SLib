@@ -12,24 +12,19 @@ class _Android_Sensor;
 typedef Map<jlong, WeakRef<_Android_Sensor> > _AndroidSensorMap;
 SLIB_SAFE_STATIC_GETTER(_AndroidSensorMap, _AndroidSensors_get);
 
-SLIB_JNI_BEGIN_CLASS(_JAndroidSensors, "slib/platform/android/device/Sensors")
-	SLIB_JNI_STATIC_METHOD(create, "create", "(Landroid/app/Activity;)Lslib/platform/android/device/Sensors;");
+SLIB_JNI_BEGIN_CLASS(_JAndroidSensor, "slib/platform/android/device/Sensor")
+	SLIB_JNI_STATIC_METHOD(create, "create", "(Landroid/app/Activity;ZIZZ)Lslib/platform/android/device/Sensor;");
 	SLIB_JNI_METHOD(setInstance, "setInstance", "(J)V");
-	SLIB_JNI_METHOD(start, "start", "(ZIZZ)Z");
+	SLIB_JNI_METHOD(start, "start", "()Z");
 	SLIB_JNI_METHOD(stop, "stop", "()V");
 SLIB_JNI_END_CLASS
 
 class _Android_Sensor : public Sensor
 {
 public:
-	_Android_Sensor()
-	{
-		m_flagValidLocation = sl_false;
-		m_flagValidCompassDeclination = sl_false;
-		m_flagValidAccerometer = sl_false;
-	}
-
-	JniGlobal<jobject> m_sensors;
+	JniGlobal<jobject> m_sensor;
+    
+    sl_bool m_flagRunning;
 
 	GeoLocation m_lastLocation;
 	sl_bool m_flagValidLocation;
@@ -43,6 +38,16 @@ public:
 		sl_real zAccel;
 	} m_lastAccelerometer;
 	sl_bool m_flagValidAccerometer;
+    
+public:
+	_Android_Sensor()
+	{
+        m_flagRunning = sl_false;
+        
+		m_flagValidLocation = sl_false;
+		m_flagValidCompassDeclination = sl_false;
+		m_flagValidAccerometer = sl_false;
+	}
 
 	~_Android_Sensor()
 	{
@@ -50,20 +55,26 @@ public:
 		_AndroidSensors_get().remove((jlong)this);
 	}
 
-	static Ref<_Android_Sensor> create()
+	static Ref<_Android_Sensor> create(const SensorParam& param)
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
-			JniLocal<jobject> obj = _JAndroidSensors::create.callObject(sl_null, jactivity);
+			JniLocal<jobject> obj = _JAndroidSensor::create.callObject(sl_null, jactivity,
+                                                                        param.flagUseLocation, param.locationProviderType,
+                                                                        param.flagUseCompass,
+                                                                        param.flagUseAccelerometor);
 			if (obj.isNotNull()) {
-				JniGlobal<jobject> sensors = obj;
-				if (sensors.isNotNull()) {
+				JniGlobal<jobject> sensor = obj;
+				if (sensor.isNotNull()) {
 					Ref<_Android_Sensor> ret = new _Android_Sensor;
 					if (ret.isNotNull()) {
-						ret->m_sensors = sensors;
+						ret->m_sensor = sensor;
 						jlong instance = (jlong)(ret.get());
-						_JAndroidSensors::setInstance.call(obj, instance);
+						_JAndroidSensor::setInstance.call(obj, instance);
 						_AndroidSensors_get().put(instance, ret);
+                        if (param.flagAutoStart) {
+                            ret->start();
+                        }
 						return ret;
 					}
 				}
@@ -79,25 +90,42 @@ public:
 		return sensor;
 	}
 
-	sl_bool start(const Param& param)
+	sl_bool start()
 	{
-		m_flagValidLocation = sl_false;
+        ObjectLocker lock(this);
+        if (m_flagRunning) {
+            return sl_true;
+        }
+        
+        m_flagValidLocation = sl_false;
 		m_flagValidCompassDeclination = sl_false;
 		m_flagValidAccerometer = sl_false;
-		return _JAndroidSensors::start.callBoolean(m_sensors
-				, param.flagUseLocation, param.providerType
-				, param.flagUseCompass
-				, param.flagUseAccelerometor
-				) != 0;
+        
+		if (_JAndroidSensor::start.callBoolean(m_sensor)) {
+            m_flagRunning = sl_true;
+            return sl_true;
+        }
+        return sl_false;
 	}
 
 	void stop()
 	{
+        ObjectLocker lock(this);
+        if (!m_flagRunning) {
+            return;
+        }
+        m_flagRunning = sl_false;
+        
 		m_flagValidLocation = sl_false;
 		m_flagValidCompassDeclination = sl_false;
 		m_flagValidAccerometer = sl_false;
-		_JAndroidSensors::stop.call(m_sensors);
+		_JAndroidSensor::stop.call(m_sensor);
 	}
+    
+    sl_bool isRunning()
+    {
+        return m_flagRunning;
+    }
 
 	sl_bool getLastLocation(GeoLocation& location)
 	{
@@ -107,6 +135,7 @@ public:
 		}
 		return sl_false;
 	}
+    
 	sl_bool getLastCompassDeclination(sl_real& declination)
 	{
 		if (m_flagValidCompassDeclination) {
@@ -115,6 +144,7 @@ public:
 		}
 		return sl_false;
 	}
+    
 	sl_bool getLastAccelerometer(sl_real& xAccel, sl_real& yAccel, sl_real& zAccel)
 	{
 		if (m_flagValidAccerometer) {
@@ -152,7 +182,7 @@ public:
 	}
 };
 
-SLIB_JNI_BEGIN_CLASS_SECTION(_JAndroidSensors)
+SLIB_JNI_BEGIN_CLASS_SECTION(_JAndroidSensor)
 	SLIB_JNI_NATIVE_IMPL(nativeOnChangeLocation, "nativeOnChangeLocation", "(JFFF)V", void, jlong instance, float latitude, float longitude, float altitude)
 	{
 		Ref<_Android_Sensor> sensor = _Android_Sensor::get(instance);
@@ -176,9 +206,9 @@ SLIB_JNI_BEGIN_CLASS_SECTION(_JAndroidSensors)
 	}
 SLIB_JNI_END_CLASS_SECTION
 
-Ref<Sensor> Sensor::create()
+Ref<Sensor> Sensor::create(const SensorParam& param)
 {
-	return _Android_Sensor::create();
+	return _Android_Sensor::create(param);
 }
 SLIB_DEVICE_NAMESPACE_END
 

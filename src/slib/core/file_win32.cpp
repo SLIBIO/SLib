@@ -8,7 +8,7 @@
 
 SLIB_NAMESPACE_BEGIN
 
-sl_file File::_open(const String& _filePath, Mode mode)
+sl_file File::_open(const String& _filePath, FileMode mode)
 {
 	String16 filePath = _filePath;
 	if (filePath.isEmpty()) {
@@ -21,23 +21,23 @@ sl_file File::_open(const String& _filePath, Mode mode)
 	DWORD dwFlags = FILE_ATTRIBUTE_NORMAL;
 
 	switch (mode) {
-	case modeRead:
+	case fileMode_Read:
 		dwDesiredAccess = GENERIC_READ;
 		dwCreateDisposition = OPEN_EXISTING;
 		break;
-	case modeWrite:
+	case fileMode_Write:
 		dwDesiredAccess = GENERIC_WRITE;
 		dwCreateDisposition = CREATE_ALWAYS;
 		break;
-	case modeReadWrite:
+	case fileMode_ReadWrite:
 		dwDesiredAccess = GENERIC_READ | GENERIC_WRITE;
 		dwCreateDisposition = CREATE_ALWAYS;
 		break;
-	case modeAppend:
+	case fileMode_Append:
 		dwDesiredAccess = GENERIC_WRITE;
 		dwCreateDisposition = OPEN_ALWAYS;
 		break;
-	case modeRandomAccess:
+	case fileMode_RandomAccess:
 		dwDesiredAccess = GENERIC_READ | GENERIC_WRITE;
 		dwCreateDisposition = OPEN_ALWAYS;
 		dwFlags |= FILE_FLAG_RANDOM_ACCESS;
@@ -113,16 +113,16 @@ sl_uint64 File::getPosition()
 	}
 }
 
-sl_bool File::seek(sl_int64 location, Position from)
+sl_bool File::seek(sl_int64 location, SeekPosition from)
 {
 	if (isOpened()) {
 		HANDLE handle = (HANDLE)m_file;
 		DWORD dwFrom;
-		if (from == positionCurrent) {
+		if (from == seekPosition_Current) {
 			dwFrom = FILE_CURRENT;
-		} else if (from == positionBegin) {
+		} else if (from == seekPosition_Begin) {
 			dwFrom = FILE_BEGIN;
-		} else if (from == positionEnd) {
+		} else if (from == seekPosition_End) {
 			dwFrom = FILE_END;
 		} else {
 			return sl_false;
@@ -144,10 +144,10 @@ sl_bool File::setSize(sl_uint64 size)
 {
 	if (isOpened()) {
 		sl_int64 pos_orig = getPosition();
-		if (seek(size, positionBegin)) {
+		if (seek(size, seekPosition_Begin)) {
 			HANDLE handle = (HANDLE)m_file;
 			BOOL bRet = ::SetEndOfFile(handle);
-			seek(pos_orig, positionBegin);
+			seek(pos_orig, seekPosition_Begin);
 			return bRet != 0;
 		}
 	}
@@ -403,10 +403,10 @@ int File::getAttributes(const String& _filePath)
 	} else {
 		int ret = 0;
 		if (attr & FILE_ATTRIBUTE_DIRECTORY) {
-			ret |= attributeDirectory;
+			ret |= fileAttribute_Directory;
 		}
 		if (attr & FILE_ATTRIBUTE_HIDDEN) {
-			ret |= attributeHidden;
+			ret |= fileAttribute_Hidden;
 		}
 		return ret;
 	}

@@ -1,7 +1,8 @@
 #include "../../../inc/slib/network/nat.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
-NAT_Table::NAT_Table()
+
+NatTable::NatTable()
 {
 	m_addressTarget.setZero();
 	m_portStart = 40000;
@@ -13,18 +14,18 @@ NAT_Table::NAT_Table()
 	m_icmpEchoSequenceCurrent = 0;
 }
 
-NAT_Table::~NAT_Table()
+NatTable::~NatTable()
 {
 }
 
-sl_bool NAT_Table::translateOutgoingPacket(IPv4HeaderFormat* ipHeader, void* ipContent, sl_uint32 sizeContent)
+sl_bool NatTable::translateOutgoingPacket(IPv4HeaderFormat* ipHeader, void* ipContent, sl_uint32 sizeContent)
 {
 	IPv4Address addressTarget = m_addressTarget;
 	if (addressTarget.isAny()) {
 		return sl_false;
 	}
 	if (ipHeader->isTCP()) {
-		TCP_HeaderFormat* tcp = (TCP_HeaderFormat*)(ipContent);
+		TcpHeaderFormat* tcp = (TcpHeaderFormat*)(ipContent);
 		if (tcp->check(ipHeader, sizeContent)) {
 			sl_uint32 targetPort = getMappedTcpTargetPort(SocketAddress(ipHeader->getSourceAddress(), tcp->getSourcePort()));
 			tcp->setSourcePort(targetPort);
@@ -34,7 +35,7 @@ sl_bool NAT_Table::translateOutgoingPacket(IPv4HeaderFormat* ipHeader, void* ipC
 			return sl_true;
 		}
 	} else if (ipHeader->isUDP()) {
-		UDP_HeaderFormat* udp = (UDP_HeaderFormat*)(ipContent);
+		UdpHeaderFormat* udp = (UdpHeaderFormat*)(ipContent);
 		if (udp->check(ipHeader, sizeContent)) {
 			sl_uint32 targetPort = getMappedUdpTargetPort(SocketAddress(ipHeader->getSourceAddress(), udp->getSourcePort()));
 			udp->setSourcePort(targetPort);
@@ -44,10 +45,10 @@ sl_bool NAT_Table::translateOutgoingPacket(IPv4HeaderFormat* ipHeader, void* ipC
 			return sl_true;
 		}
 	} else if (ipHeader->isICMP()) {
-		ICMP_HeaderFormat* icmp = (ICMP_HeaderFormat*)(ipContent);
+		IcmpHeaderFormat* icmp = (IcmpHeaderFormat*)(ipContent);
 		if (icmp->check(sizeContent)) {
-			if (icmp->getType() == ICMP_Type_Echo) {
-				ICMP_EchoAddress address;
+			if (icmp->getType() == icmpType_Echo) {
+				IcmpEchoAddress address;
 				address.ip = ipHeader->getSourceAddress();
 				address.identifier = icmp->getEchoIdentifier();
 				address.sequenceNumber = icmp->getEchoSequenceNumber();
@@ -64,7 +65,7 @@ sl_bool NAT_Table::translateOutgoingPacket(IPv4HeaderFormat* ipHeader, void* ipC
 	return sl_false;
 }
 
-sl_bool NAT_Table::translateIncomingPacket(IPv4HeaderFormat* ipHeader, void* ipContent, sl_uint32 sizeContent)
+sl_bool NatTable::translateIncomingPacket(IPv4HeaderFormat* ipHeader, void* ipContent, sl_uint32 sizeContent)
 {
 	IPv4Address addressTarget = m_addressTarget;
 	if (addressTarget.isAny()) {
@@ -74,7 +75,7 @@ sl_bool NAT_Table::translateIncomingPacket(IPv4HeaderFormat* ipHeader, void* ipC
 		return sl_false;
 	}
 	if (ipHeader->isTCP()) {
-		TCP_HeaderFormat* tcp = (TCP_HeaderFormat*)(ipContent);
+		TcpHeaderFormat* tcp = (TcpHeaderFormat*)(ipContent);
 		if (tcp->check(ipHeader, sizeContent)) {
 			MappingElement element;
 			if (m_mapTcpIncoming.get(tcp->getDestinationPort(), &element)) {
@@ -86,7 +87,7 @@ sl_bool NAT_Table::translateIncomingPacket(IPv4HeaderFormat* ipHeader, void* ipC
 			}
 		}
 	} else if (ipHeader->isUDP()) {
-		UDP_HeaderFormat* udp = (UDP_HeaderFormat*)(ipHeader->getContent());
+		UdpHeaderFormat* udp = (UdpHeaderFormat*)(ipHeader->getContent());
 		if (udp->check(ipHeader, sizeContent)) {
 			MappingElement element;
 			if (m_mapUdpIncoming.get(udp->getDestinationPort(), &element)) {
@@ -98,10 +99,10 @@ sl_bool NAT_Table::translateIncomingPacket(IPv4HeaderFormat* ipHeader, void* ipC
 			}
 		}
 	} else if (ipHeader->isICMP()) {
-		ICMP_HeaderFormat* icmp = (ICMP_HeaderFormat*)(ipContent);
+		IcmpHeaderFormat* icmp = (IcmpHeaderFormat*)(ipContent);
 		if (icmp->check(sizeContent)) {
 			sl_uint8 type = icmp->getType();
-			if (type == ICMP_Type_EchoReply) {
+			if (type == icmpType_EchoReply) {
 				if (icmp->getEchoIdentifier() == m_icmpEchoIdentifierTarget) {
 					IcmpEchoElement element;
 					if (m_mapIcmpEchoIncoming.get(icmp->getEchoSequenceNumber(), &element)) {
@@ -113,12 +114,12 @@ sl_bool NAT_Table::translateIncomingPacket(IPv4HeaderFormat* ipHeader, void* ipC
 						return sl_true;
 					}
 				}
-			} else if (type == ICMP_Type_DestinationUnreachable || type == ICMP_Type_TimeExceeded) {
+			} else if (type == icmpType_DestinationUnreachable || type == icmpType_TimeExceeded) {
 				IPv4HeaderFormat* ipOrig = (IPv4HeaderFormat*)(icmp->getContent());
-				sl_uint32 sizeOrig = sizeContent - sizeof(ICMP_HeaderFormat);
+				sl_uint32 sizeOrig = sizeContent - sizeof(IcmpHeaderFormat);
 				if (sizeOrig == sizeof(IPv4HeaderFormat)+8 && IPv4HeaderFormat::checkHeader(ipOrig, sizeOrig) && ipOrig->getDestinationAddress() == addressTarget) {
 					if (ipOrig->isTCP()) {
-						TCP_HeaderFormat* tcp = (TCP_HeaderFormat*)(ipOrig->getContent());
+						TcpHeaderFormat* tcp = (TcpHeaderFormat*)(ipOrig->getContent());
 						MappingElement element;
 						if (m_mapTcpIncoming.get(tcp->getDestinationPort(), &element)) {
 							ipOrig->setDestinationAddress(element.addressSource.ip.getIPv4());
@@ -130,7 +131,7 @@ sl_bool NAT_Table::translateIncomingPacket(IPv4HeaderFormat* ipHeader, void* ipC
 							return sl_true;
 						}
 					} else if (ipOrig->isUDP()) {
-						UDP_HeaderFormat* udp = (UDP_HeaderFormat*)(ipOrig->getContent());
+						UdpHeaderFormat* udp = (UdpHeaderFormat*)(ipOrig->getContent());
 						MappingElement element;
 						if (m_mapUdpIncoming.get(udp->getDestinationPort(), &element)) {
 							ipOrig->setDestinationAddress(element.addressSource.ip.getIPv4());
@@ -150,7 +151,7 @@ sl_bool NAT_Table::translateIncomingPacket(IPv4HeaderFormat* ipHeader, void* ipC
 	return sl_false;
 }
 
-sl_uint32 NAT_Table::getMappedTcpTargetPort(const SocketAddress& address)
+sl_uint32 NatTable::getMappedTcpTargetPort(const SocketAddress& address)
 {
 	MappingElement element;
 	if (m_mapTcpOutgoing.get(address, &element)) {
@@ -171,7 +172,7 @@ sl_uint32 NAT_Table::getMappedTcpTargetPort(const SocketAddress& address)
 	return port;
 }
 
-sl_uint32 NAT_Table::getMappedUdpTargetPort(const SocketAddress& address)
+sl_uint32 NatTable::getMappedUdpTargetPort(const SocketAddress& address)
 {
 	MappingElement element;
 	if (m_mapUdpOutgoing.get(address, &element)) {
@@ -192,7 +193,7 @@ sl_uint32 NAT_Table::getMappedUdpTargetPort(const SocketAddress& address)
 	return port;
 }
 
-sl_uint16 NAT_Table::getMappedIcmpEchoSequenceNumber(const ICMP_EchoAddress& address)
+sl_uint16 NatTable::getMappedIcmpEchoSequenceNumber(const IcmpEchoAddress& address)
 {
 	IcmpEchoElement element;
 	if (m_mapIcmpEchoOutgoing.get(address, &element)) {

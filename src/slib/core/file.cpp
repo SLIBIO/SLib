@@ -12,7 +12,7 @@ File::~File()
 	close();
 }
 
-Ref<File> File::open(const String& filePath, Mode mode)
+Ref<File> File::open(const String& filePath, FileMode mode)
 {
 	sl_file file = _open(filePath, mode);
 	if (file != SLIB_FILE_INVALID_HANDLE) {
@@ -20,7 +20,7 @@ Ref<File> File::open(const String& filePath, Mode mode)
 		if (ret.isNotNull()) {
 			ret->m_file = file;
 			ret->m_path = filePath;
-			if (mode == modeAppend) {
+			if (mode == fileMode_Append) {
 				ret->seekToEnd();
 			}
 			return ret;

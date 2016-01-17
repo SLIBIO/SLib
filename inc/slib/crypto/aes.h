@@ -20,11 +20,6 @@ SLIB_CRYPTO_NAMESPACE_BEGIN
 class SLIB_EXPORT AES : public Object
 {
 public:
-	SLIB_INLINE AES()
-	{
-	}
-	
-public:
 	sl_bool setKey(const void* key, sl_uint32 lenKey /* 16, 24, 32 bytes */);
 	
 	void setKey_SHA256(const String& key);
@@ -52,11 +47,6 @@ private:
 
 class SLIB_EXPORT AES_GCM : public Object, public BlockCipher_GCM<AES>
 {
-public:
-	SLIB_INLINE AES_GCM()
-	{
-	}
-
 public:
 	SLIB_INLINE void setKey(const void* key, sl_uint32 lenKey /* 16, 24, 32 bytes */)
 	{

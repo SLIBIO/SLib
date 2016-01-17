@@ -9,6 +9,7 @@
 #include "../core/string.h"
 
 SLIB_MATH_NAMESPACE_BEGIN
+
 class SLIB_EXPORT Uint128
 {
 public:
@@ -40,26 +41,31 @@ public:
 	{
 		return *((Uint128*)((void*)_zero));
 	}
+	
 	SLIB_INLINE sl_bool isZero() const
 	{
 		return high == 0 && low == 0;
 	}
+	
 	SLIB_INLINE sl_bool isNotZero() const
 	{
 		return high != 0 || low != 0;
 	}
+	
 	SLIB_INLINE void setZero()
 	{
 		high = 0;
 		low = 0;
 	}
 
+public:
 	SLIB_INLINE Uint128& operator=(const Uint128& other)
 	{
 		high = other.high;
 		low = other.low;
 		return *this;
 	}
+	
 	SLIB_INLINE Uint128& operator=(sl_uint64 num)
 	{
 		high = 0;
@@ -67,6 +73,7 @@ public:
 		return *this;
 	}
 
+public:
 	SLIB_INLINE int compare(const Uint128& other) const
 	{
 		if (high > other.high) {
@@ -78,32 +85,39 @@ public:
 		return (low < other.low) ? -1 : (low > other.low);
 	}
 
+	
 	SLIB_INLINE sl_bool operator==(const Uint128& other) const
 	{
 		return high == other.high && low == other.low;
 	}
+	
 	SLIB_INLINE sl_bool operator==(sl_uint64 num) const
 	{
 		return high == 0 && low == num;
 	}
+	
 	SLIB_INLINE friend sl_bool operator==(sl_uint64 num, const Uint128& v)
 	{
 		return v.high == 0 && v.low == num;
 	}
 
+	
 	SLIB_INLINE sl_bool operator!=(const Uint128& other) const
 	{
 		return high != other.high || low != other.low;
 	}
+	
 	SLIB_INLINE sl_bool operator!=(sl_uint64 num) const
 	{
 		return high != 0 || low != num;
 	}
+	
 	SLIB_INLINE friend sl_bool operator!=(sl_uint64 num, const Uint128& v)
 	{
 		return v.high != 0 || v.low != num;
 	}
 
+	
 	SLIB_INLINE sl_bool operator>=(const Uint128& other) const
 	{
 		if (high > other.high) {
@@ -114,15 +128,18 @@ public:
 		}
 		return low >= other.low;
 	}
+	
 	SLIB_INLINE sl_bool operator>=(sl_uint64 num) const
 	{
 		return high > 0 || low >= num;
 	}
+	
 	SLIB_INLINE friend sl_bool operator>=(sl_uint64 num, const Uint128& v)
 	{
 		return v.high == 0 && v.low <= num;
 	}
 
+	
 	SLIB_INLINE sl_bool operator<=(const Uint128& other) const
 	{
 		if (high < other.high) {
@@ -133,15 +150,18 @@ public:
 		}
 		return low <= other.low;
 	}
+	
 	SLIB_INLINE sl_bool operator<=(sl_uint64 num) const
 	{
 		return high == 0 && low <= num;
 	}
+	
 	SLIB_INLINE friend sl_bool operator<=(sl_uint64 num, const Uint128& v)
 	{
 		return v.high > 0 || v.low >= num;
 	}
 
+	
 	SLIB_INLINE sl_bool operator>(const Uint128& other) const
 	{
 		if (high > other.high) {
@@ -152,15 +172,18 @@ public:
 		}
 		return low > other.low;
 	}
+	
 	SLIB_INLINE sl_bool operator>(sl_uint64 num) const
 	{
 		return high > 0 || low > num;
 	}
+	
 	SLIB_INLINE friend sl_bool operator>(sl_uint64 num, const Uint128& v)
 	{
 		return v.high == 0 && v.low < num;
 	}
 
+	
 	SLIB_INLINE sl_bool operator<(const Uint128& other) const
 	{
 		if (high < other.high) {
@@ -171,15 +194,18 @@ public:
 		}
 		return low < other.low;
 	}
+	
 	SLIB_INLINE sl_bool operator<(sl_uint64 num) const
 	{
 		return high == 0 && low < num;
 	}
+	
 	SLIB_INLINE friend sl_bool operator<(sl_uint64 num, const Uint128& v)
 	{
 		return v.high > 0 || v.low > num;
 	}
 
+public:
 	SLIB_INLINE Uint128 operator+(const Uint128& other) const
 	{
 		Uint128 ret;
@@ -190,6 +216,7 @@ public:
 		}
 		return ret;
 	}
+	
 	SLIB_INLINE Uint128 operator+(sl_uint64 num) const
 	{
 		Uint128 ret;
@@ -200,6 +227,7 @@ public:
 		}
 		return ret;
 	}
+	
 	SLIB_INLINE friend Uint128 operator+(sl_uint64 num, const Uint128& v)
 	{
 		Uint128 ret;
@@ -211,6 +239,7 @@ public:
 		return ret;
 	}
 
+	
 	SLIB_INLINE Uint128& operator+=(const Uint128& other)
 	{
 		high += other.high;
@@ -220,6 +249,7 @@ public:
 		}
 		return *this;
 	}
+	
 	SLIB_INLINE Uint128& operator+=(sl_uint32 num)
 	{
 		low += num;
@@ -228,6 +258,7 @@ public:
 		}
 		return *this;
 	}
+	
 
 	SLIB_INLINE Uint128& operator++()
 	{
@@ -237,6 +268,7 @@ public:
 		}
 		return *this;
 	}
+	
 	SLIB_INLINE Uint128 operator++(int)
 	{
 		Uint128 ret = *this;
@@ -247,6 +279,7 @@ public:
 		return ret;
 	}
 
+	
 	SLIB_INLINE Uint128 operator-(const Uint128& other) const
 	{
 		Uint128 ret;
@@ -257,6 +290,7 @@ public:
 		ret.low = low - other.low;
 		return ret;
 	}
+	
 	SLIB_INLINE Uint128 operator-(sl_uint64 num) const
 	{
 		Uint128 ret;
@@ -267,6 +301,7 @@ public:
 		ret.low = low - num;
 		return ret;
 	}
+	
 	SLIB_INLINE friend Uint128 operator-(sl_uint64 num, const Uint128& v)
 	{
 		Uint128 ret;
@@ -278,6 +313,7 @@ public:
 		return ret;
 	}
 
+	
 	SLIB_INLINE Uint128& operator-=(const Uint128& other)
 	{
 		high -= other.high;
@@ -287,6 +323,7 @@ public:
 		low -= other.low;
 		return *this;
 	}
+	
 	SLIB_INLINE Uint128& operator-=(sl_uint64 num)
 	{
 		if (low < num) {
@@ -296,6 +333,7 @@ public:
 		return *this;
 	}
 
+	
 	SLIB_INLINE Uint128& operator--()
 	{
 		if (low == 0) {
@@ -304,6 +342,7 @@ public:
 		low--;
 		return *this;
 	}
+	
 	SLIB_INLINE Uint128 operator--(int)
 	{
 		Uint128 ret = *this;
@@ -314,6 +353,7 @@ public:
 		return ret;
 	}
 
+	
 	SLIB_INLINE Uint128 operator*(const Uint128& other) const
 	{
 		Uint128 ret;
@@ -322,6 +362,7 @@ public:
 		ret.high += (low * other.high);
 		return ret;
 	}
+	
 	SLIB_INLINE Uint128 operator*(sl_uint64 num) const
 	{
 		Uint128 ret;
@@ -329,6 +370,7 @@ public:
 		ret.high += (high * num);
 		return ret;
 	}
+	
 	SLIB_INLINE friend Uint128 operator*(sl_uint64 num, const Uint128& v)
 	{
 		Uint128 ret;
@@ -337,6 +379,7 @@ public:
 		return ret;
 	}
 
+	
 	SLIB_INLINE Uint128& operator*=(const Uint128& other)
 	{
 		sl_uint64 ml, mh;
@@ -347,6 +390,7 @@ public:
 		low = ml;
 		return *this;
 	}
+	
 	SLIB_INLINE Uint128& operator*=(sl_uint64 num)
 	{
 		sl_uint64 ml, mh;
@@ -356,6 +400,7 @@ public:
 		low = ml;
 		return *this;
 	}
+	
 	
 	sl_bool static div(const Uint128& a, const Uint128& b, Uint128* quotient = sl_null, Uint128* remainder = sl_null);
 
@@ -388,6 +433,7 @@ public:
 			return Uint128::zero();
 		}
 	}
+	
 	SLIB_INLINE sl_uint64 mod(sl_uint64 num) const
 	{
 		Uint128 ret;
@@ -398,56 +444,67 @@ public:
 		}
 	}
 
+	
 	SLIB_INLINE Uint128 operator/(const Uint128& other) const
 	{
 		return div(other);
 	}
+	
 	SLIB_INLINE Uint128 operator/(sl_uint64 num) const
 	{
 		return div(num);
 	}
+	
 	SLIB_INLINE friend Uint128 operator/(sl_uint64 num, const Uint128& v)
 	{
 		Uint128 a(num);
 		return a.div(v);
 	}
 
+	
 	SLIB_INLINE Uint128& operator/=(const Uint128& other)
 	{
 		*this = div(other);
 		return *this;
 	}
+	
 	SLIB_INLINE Uint128& operator/=(sl_uint64 num)
 	{
 		*this = div(num);
 		return *this;
 	}
 
+	
 	SLIB_INLINE Uint128 operator%(const Uint128& other) const
 	{
 		return mod(other);
 	}
+	
 	SLIB_INLINE Uint128 operator%(sl_uint64 num) const
 	{
 		return mod(num);
 	}
+	
 	SLIB_INLINE friend Uint128 operator%(sl_uint64 num, const Uint128& v)
 	{
 		Uint128 a(num);
 		return a.mod(v);
 	}
 
+	
 	SLIB_INLINE Uint128& operator%=(const Uint128& other)
 	{
 		*this = mod(other);
 		return *this;
 	}
+	
 	SLIB_INLINE Uint128& operator%=(sl_uint64 num)
 	{
 		*this = mod(num);
 		return *this;
 	}
 
+	
 	SLIB_INLINE Uint128 operator&(const Uint128& other) const
 	{
 		Uint128 ret;
@@ -455,6 +512,7 @@ public:
 		ret.low = low & other.low;
 		return ret;
 	}
+	
 	SLIB_INLINE Uint128 operator&(sl_uint64 num) const
 	{
 		Uint128 ret;
@@ -462,6 +520,7 @@ public:
 		ret.low = low & num;
 		return ret;
 	}
+	
 	SLIB_INLINE friend Uint128 operator&(sl_uint64 num, const Uint128& v)
 	{
 		Uint128 ret;
@@ -470,18 +529,21 @@ public:
 		return ret;
 	}
 
+	
 	SLIB_INLINE Uint128& operator&=(const Uint128& other)
 	{
 		high &= other.high;
 		low &= other.low;
 		return *this;
 	}
+	
 	SLIB_INLINE Uint128& operator&=(sl_uint32 num)
 	{
 		low &= num;
 		return *this;
 	}
 
+	
 	SLIB_INLINE Uint128 operator|(const Uint128& other) const
 	{
 		Uint128 ret;
@@ -489,6 +551,7 @@ public:
 		ret.low = low | other.low;
 		return ret;
 	}
+	
 	SLIB_INLINE Uint128 operator|(sl_uint64 num) const
 	{
 		Uint128 ret;
@@ -496,6 +559,7 @@ public:
 		ret.low = low | num;
 		return ret;
 	}
+	
 	SLIB_INLINE friend Uint128 operator|(sl_uint64 num, const Uint128& v)
 	{
 		Uint128 ret;
@@ -504,18 +568,21 @@ public:
 		return ret;
 	}
 
+	
 	SLIB_INLINE Uint128& operator|=(const Uint128& other)
 	{
 		high |= other.high;
 		low |= other.low;
 		return *this;
 	}
+	
 	SLIB_INLINE Uint128& operator|=(sl_uint32 num)
 	{
 		low |= num;
 		return *this;
 	}
 
+	
 	SLIB_INLINE Uint128 operator^(const Uint128& other) const
 	{
 		Uint128 ret;
@@ -523,6 +590,7 @@ public:
 		ret.low = low ^ other.low;
 		return ret;
 	}
+	
 	SLIB_INLINE Uint128 operator^(sl_uint64 num) const
 	{
 		Uint128 ret;
@@ -530,6 +598,7 @@ public:
 		ret.low = low ^ num;
 		return ret;
 	}
+	
 	SLIB_INLINE friend Uint128 operator^(sl_uint64 num, const Uint128& v)
 	{
 		Uint128 ret;
@@ -537,6 +606,7 @@ public:
 		ret.low = v.low ^ num;
 		return ret;
 	}
+	
 
 	SLIB_INLINE Uint128& operator^=(const Uint128& other)
 	{
@@ -544,12 +614,14 @@ public:
 		low ^= other.low;
 		return *this;
 	}
+	
 	SLIB_INLINE Uint128& operator^=(sl_uint32 num)
 	{
 		low ^= num;
 		return *this;
 	}
 
+	
 	SLIB_INLINE Uint128 operator>>(sl_uint32 n) const
 	{
 		Uint128 ret;
@@ -567,6 +639,7 @@ public:
 		}
 		return ret;
 	}
+	
 	SLIB_INLINE Uint128& operator>>=(sl_uint32 n)
 	{
 		if (n) {
@@ -581,6 +654,7 @@ public:
 		return *this;
 	}
 
+	
 	SLIB_INLINE Uint128 operator<<(sl_uint32 n) const
 	{
 		Uint128 ret;
@@ -598,6 +672,7 @@ public:
 		}
 		return ret;
 	}
+	
 	SLIB_INLINE Uint128& operator<<=(sl_uint32 n)
 	{
 		if (n) {
@@ -612,6 +687,7 @@ public:
 		return *this;
 	}
 
+	
 	SLIB_INLINE void shiftRight()
 	{
 		low = (high << 63) | (low >> 1);
@@ -624,6 +700,7 @@ public:
 		low <<= 1;
 	}
 
+	
 	SLIB_INLINE void makeNegative()
 	{
 		low = -(sl_int64)(low);
@@ -632,6 +709,7 @@ public:
 			high--;
 		}
 	}
+	
 	SLIB_INLINE Uint128 operator-() const
 	{
 		Uint128 ret;
@@ -643,11 +721,13 @@ public:
 		return ret;
 	}
 
+	
 	SLIB_INLINE void makeBitwiseNot()
 	{
 		low = ~low;
 		high = ~high;
 	}
+	
 	SLIB_INLINE Uint128 operator~() const
 	{
 		Uint128 ret;
@@ -658,8 +738,10 @@ public:
 
 public:
 	sl_uint32 getMostSignificantBits() const;
+	
 	sl_uint32 getLeastSignificantBits() const;
 
+	
 	// 16 bytes
 	SLIB_INLINE void getBytesBE(void* _buf)
 	{
@@ -692,16 +774,22 @@ public:
 		high = MIO::readUint64LE(buf + 8);
 	}
 
+	
 	static sl_int32 parseString(Uint128* out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_uint32 radix = 10);
+	
 	static sl_int32 parseString(Uint128* out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_uint32 radix = 10);
+	
 	sl_bool parseString(const String& str, sl_uint32 radix = 10);
+	
 	static Uint128 fromString(const String& str, sl_uint32 radix = 10);
+	
 	String toString(sl_uint32 radix = 10) const;
 
 	SLIB_INLINE static Uint128 fromHexString(const String& str)
 	{
 		return fromString(str, 16);
 	}
+	
 	SLIB_INLINE String toHexString() const
 	{
 		return toString(16);

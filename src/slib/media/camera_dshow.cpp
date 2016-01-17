@@ -86,6 +86,7 @@ public:
 		release();
 	}
 
+public:
 	static void logError(String error) {
 		SLIB_LOG("Camera", error);
 	}
@@ -147,7 +148,7 @@ public:
 																	ret->m_graph = graph;
 																	ret->m_control = control;
 																	ret->m_grabber = grabber;
-																	ret->setListener(param.listener);
+																	ret->m_listener = param.listener;
 																	if (param.flagAutoStart) {
 																		ret->start();
 																	}
@@ -292,7 +293,7 @@ public:
 				VIDEOINFOHEADER* vih = (VIDEOINFOHEADER*)(mt.pbFormat);
 				frame.image.width = vih->bmiHeader.biWidth;
 				frame.image.height = vih->bmiHeader.biHeight;
-				frame.image.format = bitmapFormatBGR;
+				frame.image.format = bitmapFormat_BGR;
 				frame.image.pitch =  - frame.image.calculatePitchAlign4(frame.image.width, 24);
 				frame.image.data = pBuffer + cbBuffer + frame.image.pitch;
 				if (frame.image.format.isNotNull()) {
@@ -384,7 +385,7 @@ public:
 									return ret;
 								}
 							} else {
-								ret.add(dev);
+								ret.add_NoLock(dev);
 							}
 						}
 						
@@ -411,8 +412,7 @@ public:
 
 Ref<Camera> DirectShow::createCamera(const CameraParam& param)
 {
-	Ref<_DShow_Camera> ret(_DShow_Camera::_create(param));
-	return ret;
+	return _DShow_Camera::_create(param);
 }
 
 List<CameraInfo> DirectShow::getCamerasList()
@@ -425,6 +425,7 @@ SLIB_MEDIA_NAMESPACE_END
 #else
 
 SLIB_MEDIA_NAMESPACE_BEGIN
+
 Ref<Camera> DirectShow::createCamera(const CameraParam& param)
 {
 	return Ref<Camera>::null();
@@ -434,6 +435,7 @@ List<CameraInfo> DirectShow::getCamerasList()
 {
 	return List<CameraInfo>::null();
 }
+
 SLIB_MEDIA_NAMESPACE_END
 
 #endif

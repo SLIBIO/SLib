@@ -6,6 +6,7 @@
 #include "../../../inc/slib/media/dsound.h"
 
 SLIB_MEDIA_NAMESPACE_BEGIN
+
 Ref<AudioRecorder> AudioRecorder::create(const AudioRecorderParam& param)
 {
 	return DirectSound::createRecorder(param);
@@ -15,6 +16,7 @@ List<AudioRecorderInfo> AudioRecorder::getRecordersList()
 {
 	return DirectSound::getRecordersList();
 }
+
 SLIB_MEDIA_NAMESPACE_END
 
 #endif

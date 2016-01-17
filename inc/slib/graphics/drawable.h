@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_GRAPHICS_DRAWABLE
 
 #include "definition.h"
+
 #include "color.h"
 #include "brush.h"
 
@@ -18,29 +19,35 @@ class ColorDrawable;
 class SLIB_EXPORT Drawable : public Object
 {
 	SLIB_DECLARE_OBJECT(Drawable, Object)
-protected:
-	Drawable();
-	
+
 public:
 	virtual sl_real getDrawableWidth() = 0;
+	
 	virtual sl_real getDrawableHeight() = 0;
+	
 	virtual void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc) = 0;
 	
 public:
-	static Ref<BrushDrawable> createBrushDrawable(const Ref<Brush>& brush);
-	static Ref<ColorDrawable> createColorDrawable(const Color& color);
-	static Ref<Drawable> createEmptyDrawable();
+	sl_bool isBitmap();
+	
+	sl_bool isImage();
 	
 public:
-	sl_bool isBitmap();
-	sl_bool isImage();
+	static Ref<BrushDrawable> createBrushDrawable(const Ref<Brush>& brush);
+	
+	static Ref<ColorDrawable> createColorDrawable(const Color& color);
+	
+	static Ref<Drawable> createEmptyDrawable();
+	
 };
 
 class SLIB_EXPORT BrushDrawable : public Drawable
 {
 	SLIB_DECLARE_OBJECT(BrushDrawable, Drawable)
 protected:
-	BrushDrawable();
+	SLIB_INLINE BrushDrawable()
+	{
+	}
 
 public:
 	static Ref<BrushDrawable> create(const Ref<Brush>& brush);
@@ -63,7 +70,9 @@ class SLIB_EXPORT ColorDrawable : public BrushDrawable
 {
 	SLIB_DECLARE_OBJECT(ColorDrawable, BrushDrawable)
 protected:
-	ColorDrawable();
+	SLIB_INLINE ColorDrawable()
+	{
+	}
 	
 public:
 	static Ref<ColorDrawable> create(const Color& color);
@@ -72,9 +81,7 @@ public:
 class SLIB_EXPORT EmptyDrawable : public Drawable
 {
 	SLIB_DECLARE_OBJECT(EmptyDrawable, Drawable)
-protected:
-	EmptyDrawable();
-	
+
 public:
 	static Ref<EmptyDrawable> create();
 	

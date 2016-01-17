@@ -7,10 +7,6 @@ SLIB_NAMESPACE_BEGIN
 
 SLIB_SAFE_STATIC_REF(SafeRef<Application>, _g_app);
 
-Application::Application()
-{
-}
-
 Ref<Application> Application::getApp()
 {
 	return _g_app;

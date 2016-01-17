@@ -2,14 +2,17 @@
 #define CHECKHEADER_SLIB_GRAPHICS_PEN
 
 #include "definition.h"
-#include "constants.h"
 
+#include "constants.h"
 #include "color.h"
+
 #include "../core/object.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
-struct SLIB_EXPORT PenDesc
+
+class SLIB_EXPORT PenDesc
 {
+public:
 	PenStyle style;
 	LineCap cap;
 	LineJoin join;
@@ -17,6 +20,7 @@ struct SLIB_EXPORT PenDesc
 	Color color;
 	sl_real miterLimit;
 	
+public:
 	PenDesc();
 };
 
@@ -26,13 +30,19 @@ class SLIB_EXPORT Pen : public Object
 {
 	SLIB_DECLARE_OBJECT(Pen, Object)
 protected:
-	Pen();
+	SLIB_INLINE Pen()
+	{
+	}
 	
 public:
 	static Ref<Pen> getDefault();
+	
 	static Ref<Pen> create(const PenDesc& desc);
+	
 	static Ref<Pen> create(PenStyle style, sl_real width = 1, Color color = Color::Black);
+	
 	static Ref<Pen> createSolidPen(sl_real width = 1, Color color = Color::Black);
+	
 	
 public:
 	SLIB_INLINE void getDesc(PenDesc& desc)
@@ -70,21 +80,17 @@ public:
 		return m_desc.miterLimit;
 	}
 
-public:
-	const Ref<PenInstance>& getInstance();
-	void setInstance(const Ref<PenInstance>& instance);
-
 protected:
 	PenDesc m_desc;
-	Ref<PenInstance> m_instance;
+	
+	SLIB_REF_PROPERTY_INLINE(PenInstance, Instance)
 };
 
 class SLIB_EXPORT PenInstance : public Object
 {
 	SLIB_DECLARE_OBJECT(PenInstance, Object)
-protected:
-	PenInstance();
 };
+
 SLIB_GRAPHICS_NAMESPACE_END
 
 #endif

@@ -28,7 +28,9 @@ public:
 
 protected:
 	virtual void __set() = 0;
+	
 	virtual void __reset() = 0;
+	
 	virtual sl_bool __wait(sl_int32 timeout) = 0;
 
 };

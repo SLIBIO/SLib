@@ -38,15 +38,15 @@ public:
 			Gdiplus::LineCap cap;
 			Gdiplus::DashCap dashCap;
 			switch (desc.cap) {
-			case lineCapSquare:
+			case lineCap_Square:
 				cap = Gdiplus::LineCapSquare;
 				dashCap = Gdiplus::DashCapFlat;
 				break;
-			case lineCapRound:
+			case lineCap_Round:
 				cap = Gdiplus::LineCapRound;
 				dashCap = Gdiplus::DashCapRound;
 				break;
-			case lineCapFlat:
+			case lineCap_Flat:
 			default:
 				cap = Gdiplus::LineCapFlat;
 				dashCap = Gdiplus::DashCapFlat;
@@ -56,13 +56,13 @@ public:
 
 			Gdiplus::LineJoin join;
 			switch (desc.join) {
-			case lineJoinBevel:
+			case lineJoin_Bevel:
 				join = Gdiplus::LineJoinBevel;
 				break;
-			case lineJoinRound:
+			case lineJoin_Round:
 				join = Gdiplus::LineJoinRound;
 				break;
-			case lineJoinMiter:
+			case lineJoin_Miter:
 			default:
 				join = Gdiplus::LineJoinMiter;
 				pen->SetMiterLimit(desc.miterLimit);
@@ -72,19 +72,19 @@ public:
 			
 			Gdiplus::DashStyle style;
 			switch (desc.style) {
-			case penStyleDot:
+			case penStyle_Dot:
 				style = Gdiplus::DashStyleDot;
 				break;
-			case penStyleDash:
+			case penStyle_Dash:
 				style = Gdiplus::DashStyleDash;
 				break;
-			case penStyleDashDot:
+			case penStyle_DashDot:
 				style = Gdiplus::DashStyleDashDot;
 				break;
-			case penStyleDashDotDot:
+			case penStyle_DashDotDot:
 				style = Gdiplus::DashStyleDashDotDot;
 				break;
-			case penStyleSolid:
+			case penStyle_Solid:
 			default:
 				style = Gdiplus::DashStyleSolid;
 				break;
@@ -122,7 +122,7 @@ public:
 		Ref<_Gdiplus_BrushInstance> ret;
 		const Color& _color = desc.color;
 		Gdiplus::Color color(_color.getAlpha(), _color.getRed(), _color.getGreen(), _color.getBlue());
-		if (desc.style == brushStyleSolid) {
+		if (desc.style == brushStyle_Solid) {
 			Gdiplus::Brush* brush = new Gdiplus::SolidBrush(color);
 			if (brush) {
 				ret = new _Gdiplus_BrushInstance();
@@ -160,13 +160,13 @@ public:
 		}
 	}
 
-	static Ref<_Gdiplus_Canvas> create(Gdiplus::Graphics* graphics, sl_real width, sl_real height, const Rectangle* rectDirty, sl_bool flagFreeOnRelease, Referable* ref)
+	static Ref<_Gdiplus_Canvas> create(Gdiplus::Graphics* graphics, sl_real width, sl_real height, const Rectangle* rectDirty, sl_bool flagFreeOnRelease, const Referable* ref)
 	{
 		Ref<_Gdiplus_Canvas> ret;
 		if (graphics) {
 			ret = new _Gdiplus_Canvas();
 			if (ret.isNotNull()) {
-				ret->setGraphicsContext(UI::getGraphicsContext());
+				ret->m_context = UI::getGraphicsContext();
 				ret->m_graphics = graphics;
 				ret->m_width = width;
 				ret->m_height = height;
@@ -407,10 +407,10 @@ public:
 		if (hBrush) {
 			Gdiplus::FillMode mode;
 			switch (fillMode) {
-			case fillModeWinding:
+			case fillMode_Winding:
 				mode = Gdiplus::FillModeWinding;
 				break;
-			case fillModeAlternate:
+			case fillMode_Alternate:
 			default:
 				mode = Gdiplus::FillModeAlternate;
 				break;
@@ -526,7 +526,7 @@ public:
 	}
 };
 
-Ref<Canvas> UIPlatform::createCanvas(Gdiplus::Graphics* graphics, sl_uint32 width, sl_uint32 height, const Rectangle* rectDirty, sl_bool flagFreeOnRelease, Referable* ref)
+Ref<Canvas> UIPlatform::createCanvas(Gdiplus::Graphics* graphics, sl_uint32 width, sl_uint32 height, const Rectangle* rectDirty, sl_bool flagFreeOnRelease, const Referable* ref)
 {
 	if (!graphics) {
 		return Ref<Canvas>::null();

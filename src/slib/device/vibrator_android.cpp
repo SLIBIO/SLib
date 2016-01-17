@@ -16,11 +16,7 @@ SLIB_JNI_END_CLASS
 class _Android_Vibrator : public Vibrator
 {
 public:
-	_Android_Vibrator(){}
-
-	~_Android_Vibrator(){}
-
-	static sl_bool vibrate(sl_int32 millisec)
+	sl_bool vibrate(sl_int32 millisec)
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
@@ -30,7 +26,7 @@ public:
 		return sl_false;
 	}
 
-	static sl_bool cancel()
+	sl_bool cancel()
 	{
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
@@ -41,15 +37,11 @@ public:
 	}
 };
 
-sl_bool Vibrator::vibrate(sl_int32 millisec)
+Ref<Vibrator> Vibrator::create()
 {
-	return _Android_Vibrator::vibrate(millisec);
+	return new _Android_Vibrator;
 }
 
-sl_bool Vibrator::cancel()
-{
-	return _Android_Vibrator::cancel();
-}
 SLIB_DEVICE_NAMESPACE_END
 
 #endif

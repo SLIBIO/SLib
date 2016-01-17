@@ -36,10 +36,10 @@ public:
 	static Gdiplus::Font* getGdiplusFont(Font* font, Ref<FontInstance>& instance);
 	static HFONT getGdiFont(Font* font, Ref<FontInstance>& instance);
 	
-	static Ref<Canvas> createCanvas(Gdiplus::Graphics* graphics, sl_uint32 width, sl_uint32 height, const Rectangle* rectDirty = sl_null, sl_bool flagFreeOnRelease = sl_true, Referable* ref = sl_null);
+	static Ref<Canvas> createCanvas(Gdiplus::Graphics* graphics, sl_uint32 width, sl_uint32 height, const Rectangle* rectDirty = sl_null, sl_bool flagFreeOnRelease = sl_true, const Referable* ref = sl_null);
 	static Gdiplus::Graphics* getCanvasHandle(Canvas* canvas);
 	
-	static Ref<Drawable> createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease = sl_true, Referable* ref = sl_null);
+	static Ref<Drawable> createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease = sl_true, const Referable* ref = sl_null);
 	static Gdiplus::Image* getImageDrawableHandle(Drawable* drawable);
 
 	static Ref<ViewInstance> createViewInstance(HWND hWnd, sl_bool flagDestroyOnRelease = sl_true);
@@ -67,7 +67,7 @@ public:
 	static Ref<Canvas> createCanvas(jobject canvas);
 	static jobject getCanvasHandle(Canvas* canvas);
 	
-	static Ref<Drawable> createImageDrawable(jobject bitmap, sl_bool flagRecycleOnRelease = sl_true, Referable* ref = sl_null);
+	static Ref<Drawable> createImageDrawable(jobject bitmap, sl_bool flagRecycleOnRelease = sl_true, const Referable* ref = sl_null);
 	static jobject getImageDrawableHandle(Drawable* drawable);
 
 	static Ref<ViewInstance> createViewInstance(jobject jhandle);

@@ -16,7 +16,9 @@ public:
 	Vector3T<T> point2;
 	
 public:
-	SLIB_INLINE Line3T() {}
+	SLIB_INLINE Line3T()
+	{
+	}
 	
 	template <class O>
 	SLIB_INLINE Line3T(const Line3T<O>& other)
@@ -41,6 +43,7 @@ public:
 		point2.z = z2;
 	}
 	
+public:
 	template <class O>
 	SLIB_INLINE Line3T<T>& operator=(const Line3T<O>& other)
 	{
@@ -49,6 +52,7 @@ public:
 		return *this;
 	}
 	
+public:
 	SLIB_INLINE Vector3T<T> getDirection() const
 	{
 		return (point2 - point1);

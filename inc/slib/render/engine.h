@@ -17,30 +17,32 @@
 
 SLIB_RENDER_NAMESPACE_BEGIN
 
+enum PrimitiveType
+{
+    primitiveType_Lines = 0,
+    primitiveType_LineStrip = 1,
+    primitiveType_Triangles = 2,
+    primitiveType_TriangleStrip = 3,
+    primitiveType_TriangleFan = 4,
+    primitiveType_Points = 5
+};
+
 struct SLIB_EXPORT Primitive
 {
-	enum Type
-	{
-		typeLines = 0,
-		typeLineStrip = 1,
-		typeTriangles = 2,
-		typeTriangleStrip = 3,
-		typeTriangleFan = 4,
-		typePoints = 5
-	};
-	Type type;
+	PrimitiveType type;
 	sl_uint32 countElements;
 	Ref<VertexBuffer> vertexBuffer;
 	Ref<IndexBuffer> indexBuffer;
 
 	SLIB_INLINE Primitive()
 	{
-		type = typeTriangles;
+		type = primitiveType_Triangles;
 		countElements = 0;
 	}
 };
 
-class SLIB_EXPORT RenderClearParam {
+class SLIB_EXPORT RenderClearParam
+{
 public:
 	sl_bool flagColor;
 	Color color;
@@ -60,47 +62,51 @@ public:
 	}
 };
 
+enum RenderBlendingOperation
+{
+    renderBlendingOperation_Add = 0,
+    renderBlendingOperation_Subtract = 1,
+    renderBlendingOperation_ReverseSubtract = 2
+};
+
+enum RenderBlendingFactor
+{
+    renderBlendingFactor_One = 0,
+    renderBlendingFactor_Zero = 1,
+    renderBlendingFactor_SrcAlpha = 2,
+    renderBlendingFactor_OneMinusSrcAlpha = 3,
+    renderBlendingFactor_DstAlpha = 4,
+    renderBlendingFactor_OneMinusDstAlpha = 5,
+    renderBlendingFactor_SrcColor = 6,
+    renderBlendingFactor_OneMinusSrcColor = 7,
+    renderBlendingFactor_DstColor = 8,
+    renderBlendingFactor_OneMinusDstColor = 9,
+    renderBlendingFactor_SrcAlphaSaturate = 10, // f = min(As, 1 - Ad)
+    renderBlendingFactor_Constant = 11,
+    renderBlendingFactor_OneMinusConstant = 12,
+    renderBlendingFactor_ConstantAlpha = 13,
+    renderBlendingFactor_OneMinusConstantAlpha = 14
+};
+
 class SLIB_EXPORT RenderBlendingParam
 {
 public:
-	enum Operation {
-		opAdd = 0,
-		opSubtract = 1,
-		opReverseSubtract = 2
-	};
-	Operation operation;
-	Operation operationAlpha;
-	enum Factor {
-		factorOne = 0,
-		factorZero = 1,
-		factorSrcAlpha = 2,
-		factorOneMinusSrcAlpha = 3,
-		factorDstAlpha = 4,
-		factorOneMinusDstAlpha = 5,
-		factorSrcColor = 6,
-		factorOneMinusSrcColor = 7,
-		factorDstColor = 8,
-		factorOneMinusDstColor = 9,
-		factorSrcAlphaSaturate = 10, // f = min(As, 1 - Ad)
-		factorConstant = 11,
-		factorOneMinusConstant = 12,
-		factorConstantAlpha = 13,
-		factorOneMinusConstantAlpha = 14
-	};
-	Factor blendSrc;
-	Factor blendSrcAlpha;
-	Factor blendDst;
-	Factor blendDstAlpha;
+	RenderBlendingOperation operation;
+	RenderBlendingOperation operationAlpha;
+	RenderBlendingFactor blendSrc;
+	RenderBlendingFactor blendSrcAlpha;
+	RenderBlendingFactor blendDst;
+	RenderBlendingFactor blendDstAlpha;
 	Vector4 blendConstant;
 
 	SLIB_INLINE RenderBlendingParam()
 	{
-		operation = opAdd;
-		operationAlpha = opAdd;
-		blendDst = factorOneMinusSrcAlpha;
-		blendDstAlpha = factorOneMinusSrcAlpha;
-		blendSrc = factorSrcAlpha;
-		blendSrcAlpha = factorSrcAlpha;
+		operation = renderBlendingOperation_Add;
+		operationAlpha = renderBlendingOperation_Add;
+		blendDst = renderBlendingFactor_OneMinusSrcAlpha;
+		blendDstAlpha = renderBlendingFactor_OneMinusSrcAlpha;
+		blendSrc = renderBlendingFactor_SrcAlpha;
+		blendSrcAlpha = renderBlendingFactor_SrcAlpha;
 	}
 };
 
@@ -115,6 +121,7 @@ public:
 	sl_int32 nStencilBits;
 	sl_bool flagMultisample;
 
+public:
 	RendererParam()
 	{
 		nRedBits = 8;
@@ -151,6 +158,14 @@ public:
 	SLIB_BOOLEAN_PROPERTY_INLINE(RenderingContinuously)
 };
 
+enum RenderEngineType
+{
+    renderEngineType_OpenGL = 0x01010001,
+    renderEngineType_OpenGL_ES = 0x01020001,
+    renderEngineType_D3D9 = 0x02010901,
+    renderEngineType_D3D11 = 0x02010B01
+};
+
 class SLIB_EXPORT RenderEngine : public Object
 {
 	SLIB_DECLARE_OBJECT(RenderEngine, Object)
@@ -158,32 +173,23 @@ protected:
 	RenderEngine();
 public:
 	~RenderEngine();
-	
-public:
-	enum EngineType
-	{
-		OPENGL = 0x01010001,
-		OPENGL_ES = 0x01020001,
-		D3D9 = 0x02010901,
-		D3D11 = 0x02010B01
-	};
 
 public:
-	virtual EngineType getEngineType() = 0;
+	virtual RenderEngineType getEngineType() = 0;
 	SLIB_INLINE sl_bool isOpenGL()
 	{
-		EngineType type = getEngineType();
-		return type == OPENGL;
+		RenderEngineType type = getEngineType();
+		return type == renderEngineType_OpenGL;
 	}
 	SLIB_INLINE sl_bool isOpenGL_ES()
 	{
-		EngineType type = getEngineType();
-		return type == OPENGL_ES;
+		RenderEngineType type = getEngineType();
+		return type == renderEngineType_OpenGL_ES;
 	}
 	SLIB_INLINE sl_bool isD3D()
 	{
-		EngineType type = getEngineType();
-		return type == D3D9 || type == D3D11;
+		RenderEngineType type = getEngineType();
+		return type == renderEngineType_D3D9 || type == renderEngineType_D3D11;
 	}
 
 protected:
@@ -345,7 +351,7 @@ public:
 public:
 	void draw(const Ref<RenderProgram>& program, Primitive* primitives, sl_uint32 count = 1);
 
-	SLIB_INLINE void draw(const Ref<RenderProgram>& program, sl_uint32 countElements, const Ref<VertexBuffer>& vb, const Ref<IndexBuffer>& ib, Primitive::Type type = Primitive::typeTriangles)
+	SLIB_INLINE void draw(const Ref<RenderProgram>& program, sl_uint32 countElements, const Ref<VertexBuffer>& vb, const Ref<IndexBuffer>& ib, PrimitiveType type = primitiveType_Triangles)
 	{
 		Primitive p;
 		p.type = type;
@@ -355,7 +361,7 @@ public:
 		draw(program, &p);
 	}
 
-	SLIB_INLINE void draw(const Ref<RenderProgram>& program, sl_uint32 countElements, const Ref<VertexBuffer>& vb, Primitive::Type type = Primitive::typeTriangles)
+	SLIB_INLINE void draw(const Ref<RenderProgram>& program, sl_uint32 countElements, const Ref<VertexBuffer>& vb, PrimitiveType type = primitiveType_Triangles)
 	{
 		Primitive p;
 		p.type = type;

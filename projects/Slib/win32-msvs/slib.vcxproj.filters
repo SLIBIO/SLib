@@ -493,9 +493,6 @@
     <ClInclude Include="..\..\..\inc\slib\media\video_codec.h">
       <Filter>inc\media</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\media\video_format.h">
-      <Filter>inc\media</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\device\definition.h">
       <Filter>inc\device</Filter>
     </ClInclude>
@@ -691,6 +688,12 @@
     <ClInclude Include="..\..\..\inc\slib\core\atomic.h">
       <Filter>inc\core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\media\audio_data.h">
+      <Filter>inc\media</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\media\video_frame.h">
+      <Filter>inc\media</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">
@@ -847,9 +850,6 @@
       <Filter>src\slib\media</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\media\codec_opus.cpp">
-      <Filter>src\slib\media</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\media\codec_vpx.cpp">
       <Filter>src\slib\media</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\media\video_capture.cpp">
@@ -1259,6 +1259,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\atomic.cpp">
       <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\codec_vp8.cpp">
+      <Filter>src\slib\media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\audio_data.cpp">
+      <Filter>src\slib\media</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

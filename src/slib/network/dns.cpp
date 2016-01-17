@@ -5,13 +5,13 @@
 #define _MAX_NAME SLIB_NETWORK_DNS_NAME_MAX_LENGTH
 
 SLIB_NETWORK_NAMESPACE_BEGIN
-DNS_Record::DNS_Record()
+DnsRecord::DnsRecord()
 {
 	_type = 0;
-	_class = class_IN;
+	_class = dnsClass_IN;
 }
 
-sl_uint32 DNS_Record::_parseName(String& nameOut, const void* _buf, sl_uint32 offset, sl_uint32 size)
+sl_uint32 DnsRecord::_parseName(String& nameOut, const void* _buf, sl_uint32 offset, sl_uint32 size)
 {
 	const sl_uint8* buf = (const sl_uint8*)(_buf);
 
@@ -73,7 +73,7 @@ sl_uint32 DNS_Record::_parseName(String& nameOut, const void* _buf, sl_uint32 of
 	return 0;
 }
 
-sl_uint32 DNS_Record::_buildName(const String& name, void* _buf, sl_uint32 offset, sl_uint32 size)
+sl_uint32 DnsRecord::_buildName(const String& name, void* _buf, sl_uint32 offset, sl_uint32 size)
 {
 	sl_char8* bufIn = name.getBuf();
 	sl_uint32 lenIn = name.getLength();
@@ -109,7 +109,7 @@ sl_uint32 DNS_Record::_buildName(const String& name, void* _buf, sl_uint32 offse
 	return 0;
 }
 
-sl_uint32 DNS_Record::_parseHeader(const void* _buf, sl_uint32 offset, sl_uint32 size)
+sl_uint32 DnsRecord::_parseHeader(const void* _buf, sl_uint32 offset, sl_uint32 size)
 {
 	const sl_uint8* buf = (const sl_uint8*)_buf;
 	String name;
@@ -126,7 +126,7 @@ sl_uint32 DNS_Record::_parseHeader(const void* _buf, sl_uint32 offset, sl_uint32
 	return pos + 4;
 }
 
-sl_uint32 DNS_Record::_buildHeader(void* _buf, sl_uint32 offset, sl_uint32 size)
+sl_uint32 DnsRecord::_buildHeader(void* _buf, sl_uint32 offset, sl_uint32 size)
 {
 	sl_uint8* buf = (sl_uint8*)_buf;
 	sl_uint32 pos = _buildName(_name, buf, offset, size);
@@ -141,17 +141,17 @@ sl_uint32 DNS_Record::_buildHeader(void* _buf, sl_uint32 offset, sl_uint32 size)
 	return pos + 4;
 }
 
-sl_uint32 DNS_QuestionRecord::parseRecord(const void* buf, sl_uint32 offset, sl_uint32 size)
+sl_uint32 DnsQuestionRecord::parseRecord(const void* buf, sl_uint32 offset, sl_uint32 size)
 {
 	return _parseHeader(buf, offset, size);
 }
 
-sl_uint32 DNS_QuestionRecord::buildRecord(void* buf, sl_uint32 offset, sl_uint32 size)
+sl_uint32 DnsQuestionRecord::buildRecord(void* buf, sl_uint32 offset, sl_uint32 size)
 {
 	return _buildHeader(buf, offset, size);
 }
 
-DNS_ResponseRecord::DNS_ResponseRecord()
+DnsResponseRecord::DnsResponseRecord()
 {
 	_message = 0;
 	_messageLength = 0;
@@ -159,7 +159,7 @@ DNS_ResponseRecord::DNS_ResponseRecord()
 	_dataLength = 0;
 }
 
-sl_uint32 DNS_ResponseRecord::parseRecord(const void* _buf, sl_uint32 offset, sl_uint32 size)
+sl_uint32 DnsResponseRecord::parseRecord(const void* _buf, sl_uint32 offset, sl_uint32 size)
 {
 	const sl_uint8* buf = (const sl_uint8*)_buf;
 	_message = buf;
@@ -183,7 +183,7 @@ sl_uint32 DNS_ResponseRecord::parseRecord(const void* _buf, sl_uint32 offset, sl
 	return pos;
 }
 
-sl_uint32 DNS_ResponseRecord::buildRecord(void* _buf, sl_uint32 offset, sl_uint32 size, const void* data, sl_uint16 sizeData)
+sl_uint32 DnsResponseRecord::buildRecord(void* _buf, sl_uint32 offset, sl_uint32 size, const void* data, sl_uint16 sizeData)
 {
 	sl_uint8* buf = (sl_uint8*)_buf;
 	sl_uint32 pos = _buildHeader(buf, offset, size);
@@ -199,25 +199,25 @@ sl_uint32 DNS_ResponseRecord::buildRecord(void* _buf, sl_uint32 offset, sl_uint3
 	return pos + 6 + sizeData;
 }
 
-IPv4Address DNS_ResponseRecord::parseData_A() const
+IPv4Address DnsResponseRecord::parseData_A() const
 {
-	if (getType() == type_A && _dataLength == 4) {
+	if (getType() == dnsRecordType_A && _dataLength == 4) {
 		return IPv4Address(_message + _dataOffset);
 	}
 	return IPv4Address::any();
 }
 
-sl_uint32 DNS_ResponseRecord::buildRecord_A(void* buf, sl_uint32 offset, sl_uint32 size, const IPv4Address& addr)
+sl_uint32 DnsResponseRecord::buildRecord_A(void* buf, sl_uint32 offset, sl_uint32 size, const IPv4Address& addr)
 {
-	setType(type_A);
+	setType(dnsRecordType_A);
 	sl_uint8 a[4];
 	addr.get(a);
 	return buildRecord(buf, offset, size, a, 4);
 }
 
-String DNS_ResponseRecord::parseData_CNAME() const
+String DnsResponseRecord::parseData_CNAME() const
 {
-	if (getType() == type_CNAME) {
+	if (getType() == dnsRecordType_CNAME) {
 		if (_message) {
 			String str;
 			_parseName(str, _message, _dataOffset, _messageLength);
@@ -227,15 +227,15 @@ String DNS_ResponseRecord::parseData_CNAME() const
 	return String::null();
 }
 
-sl_uint32 DNS_ResponseRecord::buildRecord_CNAME(void* buf, sl_uint32 offset, sl_uint32 size, const String& cname)
+sl_uint32 DnsResponseRecord::buildRecord_CNAME(void* buf, sl_uint32 offset, sl_uint32 size, const String& cname)
 {
-	setType(type_CNAME);
+	setType(dnsRecordType_CNAME);
 	return buildRecord(buf, offset, size, cname.getBuf(), cname.getLength());
 }
 
-String DNS_ResponseRecord::parseData_NS() const
+String DnsResponseRecord::parseData_NS() const
 {
-	if (getType() == type_NS) {
+	if (getType() == dnsRecordType_NS) {
 		if (_message) {
 			String str;
 			_parseName(str, _message, _dataOffset, _messageLength);
@@ -245,21 +245,21 @@ String DNS_ResponseRecord::parseData_NS() const
 	return String::null();
 }
 
-sl_uint32 DNS_ResponseRecord::buildRecord_NS(void* buf, sl_uint32 offset, sl_uint32 size, const String& ns)
+sl_uint32 DnsResponseRecord::buildRecord_NS(void* buf, sl_uint32 offset, sl_uint32 size, const String& ns)
 {
-	setType(type_NS);
+	setType(dnsRecordType_NS);
 	return buildRecord(buf, offset, size, ns.getBuf(), ns.getLength());
 }
 
-String DNS_ResponseRecord::toString() const
+String DnsResponseRecord::toString() const
 {
 	String ret = getName() + " ";
 	sl_uint32 type = getType();
-	if (type == type_A) {
+	if (type == dnsRecordType_A) {
 		ret += "A " + parseData_A().toString();
-	} else if (type == type_CNAME) {
+	} else if (type == dnsRecordType_CNAME) {
 		ret += "CNAME " + parseData_CNAME();
-	} else if (type == type_NS) {
+	} else if (type == dnsRecordType_NS) {
 		ret += "NS " + parseData_NS();
 	} else {
 		ret += String("TYPE=") + type;
@@ -282,17 +282,17 @@ DnsClient::~DnsClient()
 void DnsClient::sendQuestion(const SocketAddress& serverAddress, const DnsQuestion& question)
 {
 	char buf[1024];
-	DNS_HeaderFormat* header = (DNS_HeaderFormat*)buf;
-	Base::zeroMemory(buf, sizeof(DNS_HeaderFormat));
+	DnsHeaderFormat* header = (DnsHeaderFormat*)buf;
+	Base::zeroMemory(buf, sizeof(DnsHeaderFormat));
 	header->setQuestion(sl_true); // Question
 	header->setId(question.id);
 	header->setRD(sl_true); // Recursive Desired
-	header->setOpcode(DNS_HeaderFormat::opcodeQuery);
+	header->setOpcode(dnsOpcode_Query);
 	header->setQuestionsCount(1);
-	DNS_QuestionRecord record;
+	DnsQuestionRecord record;
 	record.setName(question.name);
-	record.setType(DNS_QuestionRecord::type_A);
-	sl_uint32 size = record.buildRecord(buf, sizeof(DNS_HeaderFormat), 1024);
+	record.setType(dnsRecordType_A);
+	sl_uint32 size = record.buildRecord(buf, sizeof(DnsHeaderFormat), 1024);
 	if (size != 0) {
 		Memory mem = Memory::create(buf, size);
 		if (mem.isNotEmpty()) {
@@ -317,10 +317,10 @@ void DnsClient::onReceiveFrom(AsyncUdpSocket* socket, void* data, sl_uint32 size
 		if (flagError) {
 			break;
 		}
-		if (size < sizeof(DNS_HeaderFormat)) {
+		if (size < sizeof(DnsHeaderFormat)) {
 			break;
 		}
-		DNS_HeaderFormat* header = (DNS_HeaderFormat*)buf;
+		DnsHeaderFormat* header = (DnsHeaderFormat*)buf;
 		if (header->isQuestion()) { // is question?
 			break;
 		}
@@ -328,11 +328,11 @@ void DnsClient::onReceiveFrom(AsyncUdpSocket* socket, void* data, sl_uint32 size
 		response.id = header->getId();
 		
 		sl_uint32 i, n;
-		sl_uint32 offset = sizeof(DNS_HeaderFormat);
+		sl_uint32 offset = sizeof(DnsHeaderFormat);
 
 		n = header->getQuestionsCount();
 		for (i = 0; i < n; i++) {
-			DNS_QuestionRecord record;
+			DnsQuestionRecord record;
 			offset = record.parseRecord(buf, offset, size);
 			if (offset == 0) {
 				break;
@@ -346,27 +346,27 @@ void DnsClient::onReceiveFrom(AsyncUdpSocket* socket, void* data, sl_uint32 size
 		}
 		n = header->getAnswersCount() + header->getAuthoritiesCount() + header->getAdditionalsCount();
 		for (i = 0; i < n; i++) {
-			DNS_ResponseRecord record;
+			DnsResponseRecord record;
 			offset = record.parseRecord(buf, offset, size);
 			if (offset == 0) {
 				break;
 			}
 			sl_uint16 type = record.getType();
-			if (type == DNS_ResponseRecord::type_A) {
+			if (type == dnsRecordType_A) {
 				DnsAnswer::Address item;
 				item.name = record.getName();
 				item.address = record.parseData_A();
 				if (!(item.address.isAny())) {
 					response.addresses.add(item);
 				}
-			} else if (type == DNS_ResponseRecord::type_CNAME) {
+			} else if (type == dnsRecordType_CNAME) {
 				DnsAnswer::Alias item;
 				item.name = record.getName();
 				item.alias = record.parseData_CNAME();
 				if (item.alias.isNotEmpty()) {
 					response.aliases.add(item);
 				}
-			} else if (type == DNS_ResponseRecord::type_NS) {
+			} else if (type == dnsRecordType_NS) {
 				DnsAnswer::NameServer item;
 				item.name = record.getName();
 				item.server = record.parseData_NS();
@@ -472,27 +472,27 @@ void DnsServer::sendHostAddressAnswer(const SocketAddress& clientAddress, const 
 
 	if (answer.isNotZero()) {
 
-		DNS_HeaderFormat* header = (DNS_HeaderFormat*)(buf);
+		DnsHeaderFormat* header = (DnsHeaderFormat*)(buf);
 		header->setId(question.id);
 		header->setQuestion(sl_false); // Response
 		header->setRD(sl_false);
-		header->setOpcode(DNS_HeaderFormat::opcodeQuery);
-		header->setResponseCode(DNS_HeaderFormat::responseNoError);
+		header->setOpcode(dnsOpcode_Query);
+		header->setResponseCode(dnsResponseCode_NoError);
 		header->setQuestionsCount(1);
 		header->setAnswersCount(1);
 		header->setAuthoritiesCount(0);
 		header->setAdditionalsCount(0);
 
-		sl_uint32 offset = sizeof(DNS_HeaderFormat);
-		DNS_QuestionRecord recordQuestion;
+		sl_uint32 offset = sizeof(DnsHeaderFormat);
+		DnsQuestionRecord recordQuestion;
 		recordQuestion.setName(question.name);
-		recordQuestion.setType(DNS_QuestionRecord::type_A);
+		recordQuestion.setType(dnsRecordType_A);
 		offset = recordQuestion.buildRecord(buf, offset, 1024);
 		if (offset == 0) {
 			return;
 		}
 
-		DNS_ResponseRecord recordResponse;
+		DnsResponseRecord recordResponse;
 		recordResponse.setName(question.name);
 		offset = recordResponse.buildRecord_A(buf, offset, 1024, answer);
 		if (offset == 0) {
@@ -503,21 +503,21 @@ void DnsServer::sendHostAddressAnswer(const SocketAddress& clientAddress, const 
 
 	} else {
 
-		DNS_HeaderFormat* header = (DNS_HeaderFormat*)(buf);
+		DnsHeaderFormat* header = (DnsHeaderFormat*)(buf);
 		header->setId(question.id);
 		header->setQuestion(sl_false); // Response
 		header->setRD(sl_false);
-		header->setOpcode(DNS_HeaderFormat::opcodeQuery);
-		header->setResponseCode(DNS_HeaderFormat::responseNameError);
+		header->setOpcode(dnsOpcode_Query);
+		header->setResponseCode(dnsResponseCode_NameError);
 		header->setQuestionsCount(1);
 		header->setAnswersCount(0);
 		header->setAuthoritiesCount(0);
 		header->setAdditionalsCount(0);
 
-		sl_uint32 offset = sizeof(DNS_HeaderFormat);
-		DNS_QuestionRecord recordQuestion;
+		sl_uint32 offset = sizeof(DnsHeaderFormat);
+		DnsQuestionRecord recordQuestion;
 		recordQuestion.setName(question.name);
-		recordQuestion.setType(DNS_QuestionRecord::type_A);
+		recordQuestion.setType(dnsRecordType_A);
 		offset = recordQuestion.buildRecord(buf, offset, 1024);
 		if (offset == 0) {
 			return;
@@ -543,18 +543,18 @@ void DnsServer::_run()
 	while (Thread::isNotStoppingCurrent()) {
 		SocketAddress address;
 		sl_int32 size = udp->receiveFrom(buf, sizeBuf, address);
-		if (size >= sizeof(DNS_HeaderFormat)) {
-			DNS_HeaderFormat* header = (DNS_HeaderFormat*)buf;
+		if (size >= sizeof(DnsHeaderFormat)) {
+			DnsHeaderFormat* header = (DnsHeaderFormat*)buf;
 			if (header->isQuestion()) { // is response?
 				if (header->getQuestionsCount() > 0) {
-					sl_uint32 offset = sizeof(DNS_HeaderFormat);
+					sl_uint32 offset = sizeof(DnsHeaderFormat);
 					while (1) {
-						DNS_QuestionRecord record;
+						DnsQuestionRecord record;
 						offset = record.parseRecord(buf, offset, size);
 						if (offset == 0) {
 							break;
 						}
-						if (record.getType() == DNS_Record::type_A) {
+						if (record.getType() == dnsRecordType_A) {
 							String host = record.getName();
 							if (host.isNotEmpty()) {
 								DnsQuestion question;
@@ -602,11 +602,11 @@ void DnsServer::_run()
 				}
 
 				sl_uint32 i, n;
-				sl_uint32 offset = sizeof(DNS_HeaderFormat);
+				sl_uint32 offset = sizeof(DnsHeaderFormat);
 
 				n = header->getQuestionsCount();
 				for (i = 0; i < n; i++) {
-					DNS_QuestionRecord record;
+					DnsQuestionRecord record;
 					offset = record.parseRecord(buf, offset, size);
 					if (offset == 0) {
 						break;
@@ -617,13 +617,13 @@ void DnsServer::_run()
 				}
 				n = header->getAnswersCount() + header->getAuthoritiesCount() + header->getAdditionalsCount();
 				for (i = 0; i < n; i++) {
-					DNS_ResponseRecord record;
+					DnsResponseRecord record;
 					offset = record.parseRecord(buf, offset, size);
 					if (offset == 0) {
 						break;
 					}
 					sl_uint16 type = record.getType();
-					if (type == DNS_ResponseRecord::type_A) {
+					if (type == dnsRecordType_A) {
 						String name = record.getName();
 						IPv4Address address = record.parseData_A();
 						if (address.isNotZero()) {
@@ -664,7 +664,7 @@ Ref<DnsServer> DnsServer::create(const DnsServerParam& param)
 	if (memReceive.isEmpty()) {
 		return ret;
 	}
-	Ref<Socket> socket = Socket::openUdp_IPv4();
+	Ref<Socket> socket = Socket::openUdp();
 	if (socket.isNotNull()) {
 		if (socket->bind(SocketAddress(IPAddress::none(), SLIB_NETWORK_DNS_PORT))) {
 			socket->setNonBlockingMode(sl_true);

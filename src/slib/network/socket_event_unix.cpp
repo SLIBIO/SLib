@@ -80,13 +80,13 @@ sl_bool SocketEvent::__waitMultipleEvents(const Ref<SocketEvent>* events, sl_uin
 				fd[cEvents * 2].fd = (int)(sock->getHandle());
 				sl_uint32 evs = 0;
 				sl_uint32 sevs = ev->m_events;
-				if (sevs & eventRead) {
+				if (sevs & socketEventType_Read) {
 					evs = evs | POLLIN | POLLPRI;
 				}
-				if (sevs & eventWrite) {
+				if (sevs & socketEventType_Write) {
 					evs = evs | POLLOUT;
 				}
-				if (sevs & eventClose) {
+				if (sevs & socketEventType_Close) {
 #if defined(SLIB_PLATFORM_IS_LINUX)
 					evs = evs | POLLERR | POLLHUP | POLLRDHUP;
 #else
@@ -115,17 +115,17 @@ sl_bool SocketEvent::__waitMultipleEvents(const Ref<SocketEvent>* events, sl_uin
 			sl_uint32 ret = 0;
 			sl_uint32 revs = fd[k*2].revents;
 			if (revs & (POLLIN | POLLPRI)) {
-				ret |= eventRead;
+				ret |= socketEventType_Read;
 			}
 			if (revs & POLLOUT) {
-				ret |= eventWrite;
+				ret |= socketEventType_Write;
 			}
 #if defined(SLIB_PLATFORM_IS_LINUX)
 			if (revs & (POLLERR | POLLHUP | POLLRDHUP)) {
 #else
 			if (revs & (POLLERR | POLLHUP)) {
 #endif
-				ret |= eventClose;
+				ret |= socketEventType_Close;
 			}
 			if (status) {
 				status[indexMap[k]] = ret;

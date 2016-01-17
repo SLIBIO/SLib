@@ -16,18 +16,18 @@ public:
 	
 	_SButton_Categories()
 	{
-		categories[0].properties[buttonStateNormal].border = Pen::create(penStyleSolid, 1, Color::gray(100));
-		categories[0].properties[buttonStateNormal].backgroundColor = Color::gray(240);
-		categories[0].properties[buttonStateNormal].textColor = Color::black();
-		categories[0].properties[buttonStateDisabled].backgroundColor = Color::gray(220);
-		categories[0].properties[buttonStateDisabled].textColor = Color::gray(110);
-		categories[0].properties[buttonStateHover].border = Pen::create(penStyleSolid, 1, Color(0, 100, 250));
-		categories[0].properties[buttonStateHover].backgroundColor = Color(220, 230, 255);
-		categories[0].properties[buttonStateDown].border = categories[0].properties[buttonStateHover].border;
-		categories[0].properties[buttonStateDown].backgroundColor = Color(180, 210, 255);
+		categories[0].properties[buttonState_Normal].border = Pen::create(penStyle_Solid, 1, Color::gray(100));
+		categories[0].properties[buttonState_Normal].backgroundColor = Color::gray(240);
+		categories[0].properties[buttonState_Normal].textColor = Color::black();
+		categories[0].properties[buttonState_Disabled].backgroundColor = Color::gray(220);
+		categories[0].properties[buttonState_Disabled].textColor = Color::gray(110);
+		categories[0].properties[buttonState_Hover].border = Pen::create(penStyle_Solid, 1, Color(0, 100, 250));
+		categories[0].properties[buttonState_Hover].backgroundColor = Color(220, 230, 255);
+		categories[0].properties[buttonState_Down].border = categories[0].properties[buttonState_Hover].border;
+		categories[0].properties[buttonState_Down].backgroundColor = Color(180, 210, 255);
 		
 		categories[1] = categories[0];
-		categories[1].properties[buttonStateNormal].border = Pen::create(penStyleSolid, 3, Color(0, 100, 250));
+		categories[1].properties[buttonState_Normal].border = Pen::create(penStyle_Solid, 3, Color(0, 100, 250));
 	}
 	
 	static _SButton_Categories* get()
@@ -41,7 +41,7 @@ SButton::SButton(sl_uint32 nCategories, SButtonCategory* categories)
 {
 	m_flagDefaultButton = sl_false;
 	
-	m_state = buttonStateNormal;
+	m_state = buttonState_Normal;
 	m_category = 0;
 	
 	m_iconSize.x = 0;
@@ -50,7 +50,7 @@ SButton::SButton(sl_uint32 nCategories, SButtonCategory* categories)
 	m_iconAlignment = alignMiddleCenter;
 	m_textAlignment = alignMiddleCenter;
 	m_flagTextBeforeIcon = sl_false;
-	m_layoutOrientation = layoutOrientationHorizontal;
+	m_layoutOrientation = layoutOrientation_Horizontal;
 	
 	m_iconMarginLeft = 0;
 	m_iconMarginTop = 0;
@@ -461,10 +461,10 @@ void SButton::onDraw(Canvas* canvas)
 	Color textColor = params.textColor;
 	Ref<Drawable> icon = params.icon;
 	if (textColor.isZero()) {
-		textColor = m_categories[m_category].properties[buttonStateNormal].textColor;
+		textColor = m_categories[m_category].properties[buttonState_Normal].textColor;
 	}
 	if (icon.isNull()) {
-		icon = m_categories[m_category].properties[buttonStateNormal].icon;
+		icon = m_categories[m_category].properties[buttonState_Normal].icon;
 	}
 	drawContent(canvas, icon, m_text, textColor);
 }
@@ -475,13 +475,13 @@ void SButton::onDrawBackground(Canvas* canvas)
 	Color color = params.backgroundColor;
 	Ref<Drawable> background = params.background;
 	if (color.isZero()) {
-		color = m_categories[m_category].properties[buttonStateNormal].backgroundColor;
+		color = m_categories[m_category].properties[buttonState_Normal].backgroundColor;
 		if (color.isZero()) {
 			color = SView::getBackgroundColor();
 		}
 	}
 	if (background.isNull()) {
-		background = m_categories[m_category].properties[buttonStateNormal].background;
+		background = m_categories[m_category].properties[buttonState_Normal].background;
 		if (background.isNull()) {
 			background = SView::getBackground();
 		}
@@ -494,7 +494,7 @@ void SButton::onDrawBorder(Canvas* canvas)
 	SButtonCategoryProperties& params = m_categories[m_category].properties[m_state];
 	Ref<Pen> pen = params.border;
 	if (pen.isNull()) {
-		pen = m_categories[m_category].properties[buttonStateNormal].border;
+		pen = m_categories[m_category].properties[buttonState_Normal].border;
 		if (pen.isNull()) {
 			pen = getBorderPen();
 		}
@@ -515,14 +515,14 @@ void SButton::_invalidateButtonState()
 {
 	if (isEnabled()) {
 		if (isDownState()) {
-			m_state = buttonStateDown;
+			m_state = buttonState_Down;
 		} else if (isHoverState()) {
-			m_state = buttonStateHover;
+			m_state = buttonState_Hover;
 		} else {
-			m_state = buttonStateNormal;
+			m_state = buttonState_Normal;
 		}
 	} else {
-		m_state = buttonStateDisabled;
+		m_state = buttonState_Disabled;
 	}
 }
 
@@ -553,7 +553,7 @@ void SButton::layoutIconAndText(GraphicsContext* gc, sl_real widthFrame, sl_real
 	sl_real widthContent = 0;
 	sl_real heightContent = 0;
 	
-	if (m_layoutOrientation == layoutOrientationHorizontal) {
+	if (m_layoutOrientation == layoutOrientation_Horizontal) {
 		
 		if (horzIcon != horzText) {
 			widthContent = widthFrame;

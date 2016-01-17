@@ -52,16 +52,19 @@ public:
 		return create(hEvent, sl_true);
 	}
 
+    // override
 	void __set()
 	{
 		::SetEvent(m_hEvent);
 	}
 
+    // override
 	void __reset()
 	{
 		::ResetEvent(m_hEvent);
 	}
 
+    // override
 	sl_bool __wait(sl_int32 timeout)
 	{
 		DWORD t = INFINITE;

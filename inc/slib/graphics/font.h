@@ -9,14 +9,16 @@
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
-struct SLIB_EXPORT FontDesc
+class SLIB_EXPORT FontDesc
 {
+public:
 	String familyName;
 	sl_real size;
 	sl_bool flagBold;
 	sl_bool flagItalic;
 	sl_bool flagUnderline;
-	
+
+public:
 	FontDesc();
 };
 
@@ -28,14 +30,19 @@ class SLIB_EXPORT Font : public Object
 {
 	SLIB_DECLARE_OBJECT(Font, Object)
 protected:
-	Font();
+	SLIB_INLINE Font()
+	{
+	}
 	
 public:
 	static Ref<Font> getDefault();
+	
 	static Ref<Font> create(const FontDesc& desc);
+	
 	static Ref<Font> create(String familyName, sl_real size, sl_bool flagBold = sl_false, sl_bool flagItalic = sl_false, sl_bool flagUnderline = sl_false);
 
 	static sl_real getDefaultFontSize();
+	
 	static void setDefaultFontSize(sl_real size);
 	
 public:
@@ -72,20 +79,15 @@ public:
 public:
 	Size getTextSize(const Ref<GraphicsContext>& context, const String& text);
 
-public:
-	const Ref<FontInstance>& getInstance();
-	void setInstance(const Ref<FontInstance>& instance);
-	
 protected:
 	FontDesc m_desc;
-	Ref<FontInstance> m_instance;
+	
+	SLIB_REF_PROPERTY_INLINE(FontInstance, Instance)
 };
 
 class SLIB_EXPORT FontInstance : public Object
 {
 	SLIB_DECLARE_OBJECT(FontInstance, Object)
-protected:
-	FontInstance();
 };
 
 SLIB_GRAPHICS_NAMESPACE_END

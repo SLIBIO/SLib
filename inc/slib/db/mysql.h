@@ -28,13 +28,10 @@ public:
 class SLIB_EXPORT MySQL_Database : public Database
 {
 	SLIB_DECLARE_OBJECT(MySQL_Database, Database)
-protected:
-	SLIB_INLINE MySQL_Database()
-	{
-	}
-
+	
 public:
 	static Ref<MySQL_Database> connect(const MySQL_Param& param);
+	
 	static Ref<MySQL_Database> connect(const MySQL_Param& param, String& outErrorMessage);
 
 	static void initThread();

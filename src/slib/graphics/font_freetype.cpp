@@ -10,9 +10,6 @@
 #include "../../../inc/thirdparty/freetype/include/ftstroke.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
-FreeType::FreeType()
-{	
-}
 
 class _FreeTypeLibrary : public Referable
 {
@@ -89,16 +86,19 @@ public:
 		return Ref<_FreeType>::null();
 	}
 
+	// override
 	sl_uint32 getFacesCount()
 	{
 		return (sl_uint32)(m_face->num_faces);
 	}
 
+	// override
 	sl_uint32 getGlyphsCount()
 	{
 		return (sl_uint32)(m_face->num_glyphs);
 	}
 
+	// override
 	sl_bool setSize(sl_uint32 width, sl_uint32 height)
 	{
 		ObjectLocker lock(this);
@@ -110,6 +110,7 @@ public:
 		return sl_false;
 	}
 
+	// override
 	Size getStringExtent(const sl_char16* sz, sl_uint32 len)
 	{
 		ObjectLocker lock(this);
@@ -144,7 +145,8 @@ public:
 		ret.y = (sl_real)sizeY;
 		return ret;
 	}
-
+	
+	// override
 	void drawString(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const sl_char16* sz, sl_uint32 len, const Color& color)
 	{
 		ObjectLocker lock(this);
@@ -248,16 +250,19 @@ public:
 		}
 	}
 
+	// override
 	void strokeString(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const sl_char16* sz, sl_uint32 len, const Color& color, sl_uint32 lineWidth)
 	{
 		_strokeString(imageOutput, x, y, sz, len, sl_false, sl_false, lineWidth, color);
 	}
 
+	// override
 	void strokeStringInside(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const sl_char16* sz, sl_uint32 len, const Color& color, sl_uint32 lineWidth)
 	{
 		_strokeString(imageOutput, x, y, sz, len, sl_true, sl_false, lineWidth, color);
 	}
-
+	
+	// override
 	void strokeStringOutside(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const sl_char16* sz, sl_uint32 len, const Color& color, sl_uint32 lineWidth)
 	{
 		_strokeString(imageOutput, x, y, sz, len, sl_true, sl_true, lineWidth, color);
@@ -402,8 +407,7 @@ public:
 
 Ref<FreeType> FreeType::loadFromMemory(const Memory& mem, sl_uint32 index)
 {
-	Ref<_FreeType> ret = _FreeType::load(mem, index);
-	return ret;
+	return _FreeType::load(mem, index);
 }
 
 Ref<FreeType> FreeType::loadFromFile(const String& fontFilePath, sl_uint32 index)

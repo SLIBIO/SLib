@@ -38,8 +38,8 @@ RenderProgram2D::~RenderProgram2D()
 Ref<RenderProgramInfo> RenderProgram2D::create(RenderEngine* engine)
 {
 	Ref<RenderProgramInfo> ret;
-	RenderEngine::EngineType type = engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		ret = new Info_GL;
 	}
 	return ret;
@@ -47,9 +47,9 @@ Ref<RenderProgramInfo> RenderProgram2D::create(RenderEngine* engine)
 
 sl_bool RenderProgram2D::onInit(RenderEngine* _engine, RenderProgramInfo* _info)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
+	RenderEngineType type = _engine->getEngineType();
 
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
@@ -90,9 +90,9 @@ sl_bool RenderProgram2D::onInit(RenderEngine* _engine, RenderProgramInfo* _info)
 
 sl_bool RenderProgram2D::onBeginProgram(RenderEngine* _engine, RenderProgramInfo* _info)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
@@ -160,8 +160,8 @@ String RenderProgram2D_PositionTexture::getGLSLFragmentShader(RenderEngine* engi
 
 sl_bool RenderProgram2D_PositionTexture::onPreRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
 		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrPosition, VertexData, position);
@@ -173,8 +173,8 @@ sl_bool RenderProgram2D_PositionTexture::onPreRender(RenderEngine* _engine, Rend
 
 void RenderProgram2D_PositionTexture::onPostRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
 		engine->disableVertexArrayAttribute(info->attrPosition);
@@ -244,8 +244,8 @@ String RenderProgram2D_PositionColor::getGLSLFragmentShader(RenderEngine* engine
 
 sl_bool RenderProgram2D_PositionColor::onPreRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
 		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrPosition, VertexData, position);
@@ -257,8 +257,8 @@ sl_bool RenderProgram2D_PositionColor::onPreRender(RenderEngine* _engine, Render
 
 void RenderProgram2D_PositionColor::onPostRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
 		engine->disableVertexArrayAttribute(info->attrPosition);
@@ -298,8 +298,8 @@ String RenderProgram2D_Position::getGLSLFragmentShader(RenderEngine* engine)
 
 sl_bool RenderProgram2D_Position::onPreRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
 		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrPosition, VertexData, position);
@@ -310,8 +310,8 @@ sl_bool RenderProgram2D_Position::onPreRender(RenderEngine* _engine, RenderProgr
 
 void RenderProgram2D_Position::onPostRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
 		engine->disableVertexArrayAttribute(info->attrPosition);
@@ -442,8 +442,8 @@ void RenderProgram3D::setViewProjectionMatrix(const Matrix4& t)
 Ref<RenderProgramInfo> RenderProgram3D::create(RenderEngine* engine)
 {
 	Ref<RenderProgramInfo> ret;
-	RenderEngine::EngineType type = engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		ret = new Info_GL;
 	}
 	return ret;
@@ -451,8 +451,9 @@ Ref<RenderProgramInfo> RenderProgram3D::create(RenderEngine* engine)
 
 sl_bool RenderProgram3D::onInit(RenderEngine* _engine, RenderProgramInfo* _info)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
@@ -519,9 +520,9 @@ sl_bool RenderProgram3D::onInit(RenderEngine* _engine, RenderProgramInfo* _info)
 
 sl_bool RenderProgram3D::onBeginProgram(RenderEngine* _engine, RenderProgramInfo* _info)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
@@ -598,8 +599,8 @@ String RenderProgram3D_PositionNormalColor_Diffuse::getGLSLFragmentShader(Render
 
 sl_bool RenderProgram3D_PositionNormalColor_Diffuse::onPreRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
 		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrPosition, VertexData, position);
@@ -612,8 +613,8 @@ sl_bool RenderProgram3D_PositionNormalColor_Diffuse::onPreRender(RenderEngine* _
 
 void RenderProgram3D_PositionNormalColor_Diffuse::onPostRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
 		engine->disableVertexArrayAttribute(info->attrPosition);
@@ -659,8 +660,8 @@ String RenderProgram3D_PositionColor::getGLSLFragmentShader(RenderEngine* engine
 
 sl_bool RenderProgram3D_PositionColor::onPreRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
 		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrPosition, VertexData, position);
@@ -672,8 +673,8 @@ sl_bool RenderProgram3D_PositionColor::onPreRender(RenderEngine* _engine, Render
 
 void RenderProgram3D_PositionColor::onPostRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
 		engine->disableVertexArrayAttribute(info->attrPosition);
@@ -731,8 +732,8 @@ String RenderProgram3D_PositionNormalTexture_Diffuse::getGLSLFragmentShader(Rend
 
 sl_bool RenderProgram3D_PositionNormalTexture_Diffuse::onPreRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
 		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrPosition, VertexData, position);
@@ -745,8 +746,8 @@ sl_bool RenderProgram3D_PositionNormalTexture_Diffuse::onPreRender(RenderEngine*
 
 void RenderProgram3D_PositionNormalTexture_Diffuse::onPostRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
 		engine->disableVertexArrayAttribute(info->attrPosition);
@@ -794,8 +795,8 @@ String RenderProgram3D_PositionTexture::getGLSLFragmentShader(RenderEngine* engi
 
 sl_bool RenderProgram3D_PositionTexture::onPreRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
 		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrPosition, VertexData, position);
@@ -807,8 +808,8 @@ sl_bool RenderProgram3D_PositionTexture::onPreRender(RenderEngine* _engine, Rend
 
 void RenderProgram3D_PositionTexture::onPostRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
 		engine->disableVertexArrayAttribute(info->attrPosition);
@@ -860,8 +861,8 @@ String RenderProgram3D_PositionNormal_Diffuse::getGLSLFragmentShader(RenderEngin
 
 sl_bool RenderProgram3D_PositionNormal_Diffuse::onPreRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
 		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrPosition, VertexData, position);
@@ -873,8 +874,8 @@ sl_bool RenderProgram3D_PositionNormal_Diffuse::onPreRender(RenderEngine* _engin
 
 void RenderProgram3D_PositionNormal_Diffuse::onPostRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
 		engine->disableVertexArrayAttribute(info->attrPosition);
@@ -915,8 +916,8 @@ String RenderProgram3D_Position::getGLSLFragmentShader(RenderEngine* engine)
 
 sl_bool RenderProgram3D_Position::onPreRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
 		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrPosition, VertexData, position);
@@ -927,12 +928,13 @@ sl_bool RenderProgram3D_Position::onPreRender(RenderEngine* _engine, RenderProgr
 
 void RenderProgram3D_Position::onPostRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
 {
-	RenderEngine::EngineType type = _engine->getEngineType();
-	if (type == RenderEngine::OPENGL_ES || type == RenderEngine::OPENGL) {
+	RenderEngineType type = _engine->getEngineType();
+	if (type == renderEngineType_OpenGL_ES || type == renderEngineType_OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
 		Info_GL* info = (Info_GL*)_info;
 		engine->disableVertexArrayAttribute(info->attrPosition);
 	}
 }
+
 SLIB_RENDER_NAMESPACE_END
 

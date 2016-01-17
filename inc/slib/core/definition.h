@@ -208,9 +208,4 @@ void sl_log_error(const char* tag, const char* msg);
 #define SLIB_ABORT(MESSAGE)
 #endif
 
-#define SLIB_DECLARE_CLASS_NOCOPY(CLASS) \
-	protected: \
-	CLASS(const CLASS& other) { SLIB_UNUSED(other); SLIB_ABORT("class " #CLASS " is not allowed to copy"); } \
-	CLASS& operator=(const CLASS& other) { SLIB_UNUSED(other); SLIB_ABORT("Class " #CLASS " is not allowed to assign"); return *this; }
-
 #endif

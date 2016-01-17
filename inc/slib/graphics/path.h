@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_GRAPHICS_PATH
 
 #include "definition.h"
+
 #include "constants.h"
 
 #include "../core/object.h"
@@ -106,31 +107,26 @@ public:
 	sl_bool containsPoint(const Ref<GraphicsContext>& context, const Point& pt);
 
 	void invalidate();
-
-	const Ref<GraphicsPathInstance>& getInstance();
-	void setInstance(const Ref<GraphicsPathInstance>& instance);
 	
 public:
-	List<GraphicsPathPoint> points;
+	CList<GraphicsPathPoint> points;
 	
 public:
 	SLIB_PROPERTY(FillMode, FillMode)
-
 	
 protected:
 	sl_bool m_flagBegan;
 	Point m_pointBegin;
 	
-	Ref<GraphicsPathInstance> m_instance;
 	sl_bool m_flagInvalidated;
+	
+	SLIB_REF_PROPERTY_INLINE(GraphicsPathInstance, Instance)
 };
 
 class SLIB_EXPORT GraphicsPathInstance : public Object
 {
 	SLIB_DECLARE_OBJECT(GraphicsPathInstance, Object)
-protected:
-	GraphicsPathInstance();
-	
+
 public:
 	virtual void moveTo(const Point& pt) = 0;
 	virtual void lineTo(const Point& pt) = 0;

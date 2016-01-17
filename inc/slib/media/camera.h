@@ -32,19 +32,19 @@ public:
 	
 public:
 	void setFrontCamera();
+	
 	sl_bool isFrontCamera();
 	
+	
 	void setBackCamera();
+	
 	sl_bool isBackCamera();
+	
 };
 
 class SLIB_EXPORT Camera : public VideoCapture
 {
 	SLIB_DECLARE_OBJECT(Camera, VideoCapture)
-protected:
-	Camera();
-public:
-	~Camera();
 	
 public:
 	static Ref<Camera> create(const CameraParam& param);

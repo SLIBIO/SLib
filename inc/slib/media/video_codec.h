@@ -3,7 +3,7 @@
 
 #include "definition.h"
 
-#include "video_format.h"
+#include "video_frame.h"
 
 #include "../core/object.h"
 
@@ -12,10 +12,12 @@ SLIB_MEDIA_NAMESPACE_BEGIN
 class SLIB_EXPORT VideoEncoder : public Object
 {
 	SLIB_DECLARE_OBJECT(VideoEncoder, Object)
-public:
+protected:
 	VideoEncoder();
 	
+public:
 	virtual Memory encode(const VideoFrame& input) = 0;
+	
 public:
 	SLIB_PROPERTY(sl_uint32, Bitrate)
 	
@@ -28,9 +30,10 @@ protected:
 class SLIB_EXPORT VideoDecoder : public Object
 {
 	SLIB_DECLARE_OBJECT(VideoDecoder, Object)
-public:
+protected:
 	VideoDecoder();
 	
+public:
 	virtual sl_bool decode(const void* input, const sl_uint32& inputSize, VideoFrame& output) = 0;
 
 protected:

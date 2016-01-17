@@ -642,21 +642,21 @@ public:
 
 #define _SLIB_NET_IPADDRESS_SIZE 16
 
+enum IPAddressType {
+    ipAddressType_None = 0,
+    ipAddressType_IPv4 = 1,
+    ipAddressType_IPv6 = 2
+};
+
 class SLIB_EXPORT IPAddress
 {
-public:
-	enum Type {
-		typeNone = 0,
-		typeIPv4 = 1,
-		typeIPv6 = 2
-	};
 private:
-	Type m_type;
+	IPAddressType m_type;
 	sl_uint8 m_data[_SLIB_NET_IPADDRESS_SIZE];
 	
 	struct _IPAddress
 	{
-		Type type;
+		IPAddressType type;
 		sl_uint8 data[_SLIB_NET_IPADDRESS_SIZE];
 	};
 	static const _IPAddress _none;
@@ -664,7 +664,7 @@ private:
 public:
 	SLIB_INLINE IPAddress()
 	{
-		m_type = typeNone;
+		m_type = ipAddressType_None;
 	}
 	
 	SLIB_INLINE IPAddress(const IPAddress& other)
@@ -686,20 +686,20 @@ public:
 	
 	SLIB_INLINE sl_bool isNone() const
 	{
-		return m_type == typeNone;
+		return m_type == ipAddressType_None;
 	}
 	
 	SLIB_INLINE sl_bool isNotNone() const
 	{
-		return m_type != typeNone;
+		return m_type != ipAddressType_None;
 	}
 
 	SLIB_INLINE void setNone()
 	{
-		m_type = typeNone;
+		m_type = ipAddressType_None;
 	}
 	
-	SLIB_INLINE Type getType() const
+	SLIB_INLINE IPAddressType getType() const
 	{
 		return m_type;
 	}
@@ -712,12 +712,12 @@ public:
 	
 	SLIB_INLINE sl_bool isIPv4() const
 	{
-		return m_type == typeIPv4;
+		return m_type == ipAddressType_IPv4;
 	}
 	
 	SLIB_INLINE IPAddress& operator=(const IPv4Address& other)
 	{
-		m_type = typeIPv4;
+		m_type = ipAddressType_IPv4;
 		*((IPv4Address*)(void*)(m_data)) = other;
 		return *this;
 	}
@@ -735,12 +735,12 @@ public:
 	
 	SLIB_INLINE sl_bool isIPv6() const
 	{
-		return m_type == typeIPv6;
+		return m_type == ipAddressType_IPv6;
 	}
 	
 	SLIB_INLINE IPAddress& operator=(const IPv6Address& other)
 	{
-		m_type = typeIPv6;
+		m_type = ipAddressType_IPv6;
 		*((IPv6Address*)(void*)(m_data)) = other;
 		return *this;
 	}
@@ -756,11 +756,11 @@ public:
 			return sl_false;
 		}
 		switch (m_type) {
-		case typeNone:
+		case ipAddressType_None:
 			return sl_true;
-		case typeIPv4:
+		case ipAddressType_IPv4:
 			return (*((IPv4Address*)(void*)(m_data)) == *((IPv4Address*)(void*)(other.m_data)));
-		case typeIPv6:
+		case ipAddressType_IPv6:
 			return (*((IPv6Address*)(void*)(m_data)) == *((IPv6Address*)(void*)(other.m_data)));
 		}
 		return sl_false;

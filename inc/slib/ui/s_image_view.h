@@ -15,8 +15,8 @@ public:
 	Ref<Drawable> getSource();
 	virtual void setSource(const Ref<Drawable>& drawable);
 	
-	ScaleType getScaleType();
-	virtual void setScaleType(ScaleType type);
+	ScaleMode getScaleMode();
+	virtual void setScaleMode(ScaleMode mode);
 	
 	Alignment getSourceAlignment();
 	virtual void setSourceAlignment(Alignment align);
@@ -27,7 +27,7 @@ public:
 	
 protected:
 	Ref<Drawable> m_source;
-	ScaleType m_scaleType;
+	ScaleMode m_scaleMode;
 	Alignment m_sourceAlignment;
 };
 SLIB_UI_NAMESPACE_END

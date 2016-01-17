@@ -9,14 +9,6 @@
 SLIB_MEDIA_NAMESPACE_BEGIN
 class _OSX_AudioPlayerBuffer : public AudioPlayerBuffer
 {
-private:
-    _OSX_AudioPlayerBuffer()
-    {
-        m_flagOpened = sl_true;
-        m_flagRunning = sl_false;
-		m_callback = sl_null;
-    }
-	
 public:
 	sl_bool m_flagOpened;
 	sl_bool m_flagRunning;
@@ -28,11 +20,20 @@ public:
     AudioStreamBasicDescription m_formatSrc;
     AudioStreamBasicDescription m_formatDst;
 	
+public:
+	_OSX_AudioPlayerBuffer()
+	{
+		m_flagOpened = sl_true;
+		m_flagRunning = sl_false;
+		m_callback = sl_null;
+	}
+
 	~_OSX_AudioPlayerBuffer()
 	{
 		release();
 	}
-    
+
+public:
     static void logError(String text)
     {
         SLIB_LOG_ERROR("AudioPlayer", text);
@@ -41,6 +42,10 @@ public:
     static Ref<_OSX_AudioPlayerBuffer> create(const AudioPlayerBufferParam& param, const AudioDeviceID deviceID)
     {
         Ref<_OSX_AudioPlayerBuffer> ret;
+		
+		if (param.channelsCount != 1 && param.channelsCount != 2) {
+			return ret;
+		}
         
         AudioObjectPropertyAddress prop;
         prop.mSelector = kAudioDevicePropertyStreamFormat;
@@ -80,7 +85,7 @@ public:
         formatSrc.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
         formatSrc.mSampleRate = param.samplesPerSecond;
         formatSrc.mBitsPerChannel = 16;
-        formatSrc.mChannelsPerFrame = 1;
+        formatSrc.mChannelsPerFrame = param.channelsCount;
         formatSrc.mBytesPerFrame = formatSrc.mChannelsPerFrame * formatSrc.mBitsPerChannel / 8;
         formatSrc.mFramesPerPacket = 1;
         formatSrc.mBytesPerPacket = formatSrc.mBytesPerFrame * formatSrc.mFramesPerPacket;
@@ -99,10 +104,13 @@ public:
 					
 					ret->m_deviceID = deviceID;
 					ret->m_converter = converter;
-					ret->m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000);
 					ret->m_formatSrc = formatSrc;
 					ret->m_formatDst = formatDst;
-					ret->setListener(param.listener);
+					
+					ret->m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000 * param.channelsCount);
+					ret->m_nChannels = param.channelsCount;
+					ret->m_listener = param.listener;
+					ret->m_event = param.event;
 					
 					AudioDeviceIOProcID callback;
 					if (AudioDeviceCreateIOProcID(deviceID, DeviceIOProc, ret.get(), &callback) == kAudioHardwareNoError) {
@@ -181,19 +189,19 @@ public:
         return m_flagRunning;
     }
     
-    Memory m_dataConvert;
+    SafeArray<sl_int16> m_dataConvert;
     void onConvert(sl_uint32 nFrames, AudioBufferList* data)
     {
-        sl_uint32 nChannels = m_formatSrc.mChannelsPerFrame;
+        sl_uint32 nChannels = m_nChannels;
         sl_uint32 nSamples = nFrames * nChannels;
 
-		m_dataConvert = _getMemProcess_S16(nFrames);
-		if (m_dataConvert.isNull()) {
+		Array<sl_int16> dataConvert = _getProcessData(nSamples);
+		m_dataConvert = dataConvert;
+		if (dataConvert.isNull()) {
 			return;
 		}
-		sl_int16* s = (sl_int16*)(m_dataConvert.getBuf());
-		
-		_processFrame_S16(s, nSamples);
+		sl_int16* s = dataConvert.data();
+		_processFrame(s, nSamples);
 		
 		data->mBuffers[0].mDataByteSize = (UInt32)nSamples * 2;
         data->mBuffers[0].mData = s;
@@ -232,19 +240,20 @@ public:
 
 class _OSX_AudioPlayer : public AudioPlayer
 {
-private:
-    _OSX_AudioPlayer()
-    {
-        m_deviceID = sl_null;
-    }
-    
 public:
     AudioDeviceID m_deviceID;
 	
-    ~_OSX_AudioPlayer()
+public:
+	_OSX_AudioPlayer()
+	{
+		m_deviceID = sl_null;
+	}
+
+	~_OSX_AudioPlayer()
     {
     }
-    
+	
+public:
     static void logError(String text)
     {
         SLIB_LOG_ERROR("AudioPlayer", text);
@@ -281,14 +290,14 @@ Ref<AudioPlayer> AudioPlayer::create(const AudioPlayerParam& param)
 
 List<AudioPlayerInfo> AudioPlayer::getPlayersList()
 {
-	ListLocker<OSX_AudioDeviceInfo> list(OSX_AudioDeviceInfo::getAllDevices(sl_false));
+	ListItems<OSX_AudioDeviceInfo> list(OSX_AudioDeviceInfo::getAllDevices(sl_false));
 	List<AudioPlayerInfo> ret;
 	for (sl_size i = 0; i < list.count(); i++) {
 		AudioPlayerInfo info;
 		info.id = list[i].uid;
 		info.name = list[i].name;
 		info.description = list[i].manufacturer;
-		ret.add(info);
+		ret.add_NoLock(info);
 	}
 	return ret;
 }

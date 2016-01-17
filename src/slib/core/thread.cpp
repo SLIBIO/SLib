@@ -13,19 +13,19 @@ Thread::Thread() : m_eventWake(Event::create(sl_true)), m_eventExit(Event::creat
 	m_flagRequestStop = sl_false;
 
 	m_handle = sl_null;
-	m_priority = Thread::priorityNormal;
+	m_priority = threadPriority_Normal;
 }
 
 Thread::~Thread()
 {
 }
 
-Thread::Priority Thread::getPriority()
+ThreadPriority Thread::getPriority()
 {
 	return m_priority;
 }
 
-void Thread::setPriority(Priority priority)
+void Thread::setPriority(ThreadPriority priority)
 {
 	m_priority = priority;
 	_nativeSetPriority();
@@ -51,7 +51,7 @@ sl_bool Thread::start(sl_uint32 stackSize)
 		m_eventWake->reset();
 		_nativeStart(stackSize);
 		if (m_handle) {
-			if (m_priority != priorityNormal) {
+			if (m_priority != threadPriority_Normal) {
 				_nativeSetPriority();
 			}
 			return sl_true;

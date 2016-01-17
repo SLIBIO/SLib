@@ -55,7 +55,7 @@ void RenderEngine::draw(const Ref<RenderProgram>& program, Primitive* primitives
 void RenderEngine::drawRectangle2D(const Ref<RenderProgram>& program)
 {
 	Ref<VertexBuffer> vb = _getDefaultVertexBufferForDrawRectangle2D();
-	draw(program, 4, vb, Primitive::typeTriangleStrip);
+	draw(program, 4, vb, primitiveType_TriangleStrip);
 }
 
 static void _RenderEngine_makeTransform2D(Matrix3& mat, const Rectangle& rectDst)
@@ -147,7 +147,7 @@ Ref<RenderProgram2D> RenderEngine::_getDefaultRenderProgramForDrawRectangle2D()
 void RenderEngine::drawTexture2D(const Ref<RenderProgram>& program)
 {
 	Ref<VertexBuffer> vb = _getDefaultVertexBufferForDrawTexture2D();
-	draw(program, 4, vb, Primitive::typeTriangleStrip);
+	draw(program, 4, vb, primitiveType_TriangleStrip);
 }
 
 void RenderEngine::drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, const Ref<RenderProgram2D>& program)
@@ -224,7 +224,7 @@ void RenderEngine::drawLines(const Ref<RenderProgram>& program, Line3* lines, sl
 {
 	if (program.isNotNull()) {
 		Ref<VertexBuffer> vb = VertexBuffer::create(lines, sizeof(Line3)*n);
-		draw(program, n * 2, vb, Primitive::typeLines);
+		draw(program, n * 2, vb, primitiveType_Lines);
 	}
 }
 

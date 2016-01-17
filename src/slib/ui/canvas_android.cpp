@@ -140,7 +140,7 @@ public:
 			int height = _JAndroidGraphics::getHeight.callInt(jcanvas);
 			ret = new _Android_Canvas();
 			if (ret.isNotNull()) {
-                ret->setGraphicsContext(UI::getGraphicsContext());
+                ret->m_context = UI::getGraphicsContext();
 				ret->m_canvas = canvas;
 				ret->m_width = width;
 				ret->m_height = height;

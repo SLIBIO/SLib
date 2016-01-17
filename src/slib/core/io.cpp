@@ -437,13 +437,13 @@ sl_reg MemoryIO::write(const void* buf, sl_size size)
 	return size;
 }
 
-sl_bool MemoryIO::seek(sl_int64 offset, Position pos)
+sl_bool MemoryIO::seek(sl_int64 offset, SeekPosition pos)
 {
 	ObjectLocker lock(this);
 	sl_uint64 p = m_offset;
-	if (pos == positionBegin) {
+	if (pos == seekPosition_Begin) {
 		p = 0;
-	} else if (pos == positionEnd) {
+	} else if (pos == seekPosition_End) {
 		p = m_size;
 	}
 	p += offset;
@@ -534,13 +534,13 @@ sl_reg MemoryReader::read(void* buf, sl_size size)
 	return size;
 }
 
-sl_bool MemoryReader::seek(sl_int64 offset, Position pos)
+sl_bool MemoryReader::seek(sl_int64 offset, SeekPosition pos)
 {
 	ObjectLocker lock(this);
 	sl_uint64 p = m_offset;
-	if (pos == positionBegin) {
+	if (pos == seekPosition_Begin) {
 		p = 0;
-	} else if (pos == positionEnd) {
+	} else if (pos == seekPosition_End) {
 		p = m_size;
 	}
 	p += offset;
@@ -629,14 +629,14 @@ sl_reg MemoryWriter::write(const Memory& mem)
 	}
 }
 
-sl_bool MemoryWriter::seek(sl_int64 offset, Position pos)
+sl_bool MemoryWriter::seek(sl_int64 offset, SeekPosition pos)
 {
 	ObjectLocker lock(this);
 	if (m_buf) {
 		sl_uint64 p = m_offset;
-		if (pos == positionBegin) {
+		if (pos == seekPosition_Begin) {
 			p = 0;
-		} else if (pos == positionEnd) {
+		} else if (pos == seekPosition_End) {
 			p = m_size;
 		}
 		p += offset;

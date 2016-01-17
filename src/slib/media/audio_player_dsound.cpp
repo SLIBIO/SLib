@@ -25,7 +25,6 @@ public:
 	HANDLE              m_hNotificationEvents[2];
 
 	sl_uint32 m_nSamplesFrame;
-	sl_uint32 m_nSamplesBuffer;
 	sl_uint32 m_nBufferSize;
 	sl_uint32 m_nOffsetNextWrite;
 	sl_uint32 m_nNotifySize;
@@ -34,6 +33,7 @@ public:
 	sl_bool m_flagRunning;
 	sl_bool m_flagOpened;
 
+public:
 	_DirectSound_AudioPlayerBuffer()
 	{
 		m_nOffsetNextWrite = m_nNotifySize = 0;
@@ -50,6 +50,7 @@ public:
 		release();
 	}
 
+public:
 	static void logError(String text)
 	{
 		SLIB_LOG_ERROR("AudioPlayer", text);
@@ -57,6 +58,10 @@ public:
 
 	static Ref<_DirectSound_AudioPlayerBuffer> create(const AudioPlayerBufferParam& param, const GUID& deviceID)
 	{
+        if (param.channelsCount != 1 && param.channelsCount != 2) {
+            return Ref<_DirectSound_AudioPlayerBuffer>::null();
+        }
+        
 		::CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
 		LPDIRECTSOUND ds;
@@ -66,7 +71,7 @@ public:
 			if (SUCCEEDED(hr)) {
 				WAVEFORMATEX wf;
 				wf.wFormatTag = WAVE_FORMAT_PCM;
-				wf.nChannels = 1;
+				wf.nChannels = param.channelsCount;
 				wf.wBitsPerSample = 16;
 				wf.nSamplesPerSec = param.samplesPerSecond;
 				wf.nBlockAlign = wf.wBitsPerSample * wf.nChannels / 8;
@@ -118,9 +123,12 @@ public:
 									ret->m_hNotificationEvents[1] = hNotificationEvents[1];
 									ret->m_nSamplesFrame = samplesPerFrame;
 									ret->m_nBufferSize = sizeBuffer;
-									ret->m_nSamplesBuffer = param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000;
-									ret->m_queue.setQueueSize(ret->m_nSamplesBuffer);
-									ret->setListener(param.listener);
+                                    
+									ret->m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000 * param.channelsCount);
+                                    ret->m_nChannels = param.channelsCount;
+									ret->m_listener = param.listener;
+                                    ret->m_event = param.event;
+                                    
 									if (param.flagAutoStart) {
 										ret->start();
 									}
@@ -231,7 +239,7 @@ public:
 			sl_uint32 nSamples = bufferSize / 2;
 			sl_int16* s = (sl_int16*)pbBuffer;
 			
-			_processFrame_S16(s, nSamples);
+			_processFrame(s, nSamples);
 			
 			m_nOffsetNextWrite += bufferSize;
 			m_nOffsetNextWrite %= m_nBufferSize;
@@ -255,6 +263,7 @@ class _DirectSound_AudioPlayer : public AudioPlayer
 public:
 	GUID m_deviceID;
 
+public:
 	_DirectSound_AudioPlayer()
 	{
 	}
@@ -263,6 +272,7 @@ public:
 	{
 	}
 
+public:
 	static void logError(String text)
 	{
 		SLIB_LOG_ERROR("AudioPlayer", text);
@@ -323,7 +333,7 @@ public:
 			prop.szGuid = Windows::getStringFromGUID(*lpGUID);
 			prop.name = (sl_char16*)lpszDrvName;
 			prop.description = (sl_char16*)lpszDesc;
-			list.add(prop);
+			list.add_NoLock(prop);
 		}
 		return TRUE;
 	}
@@ -337,22 +347,24 @@ Ref<AudioPlayer> DirectSound::createPlayer(const AudioPlayerParam& param)
 List<AudioPlayerInfo> DirectSound::getPlayersList()
 {
 	List<AudioPlayerInfo> ret;
-	ListLocker<_DirectSound_AudioPlayer::DeviceProperty> props(_DirectSound_AudioPlayer::queryDeviceInfos());
+	ListItems<_DirectSound_AudioPlayer::DeviceProperty> props(_DirectSound_AudioPlayer::queryDeviceInfos());
 	for (sl_size i = 0; i < props.count(); i++) {
 		_DirectSound_AudioPlayer::DeviceProperty& prop = props[i];
 		AudioPlayerInfo info;
 		info.id = prop.szGuid;
 		info.name = prop.name;
 		info.description = prop.description;
-		ret.add(info);
+		ret.add_NoLock(info);
 	}
 	return ret;
 }
+
 SLIB_MEDIA_NAMESPACE_END
 
 #else
 
 SLIB_MEDIA_NAMESPACE_BEGIN
+
 Ref<AudioPlayer> DirectSound::createPlayer(const AudioPlayerParam& param)
 {
 	return Ref<AudioPlayer>::null();
@@ -362,6 +374,7 @@ List<AudioPlayerInfo> DirectSound::getPlayersList()
 {
 	return List<AudioPlayerInfo>::null();
 }
+
 SLIB_MEDIA_NAMESPACE_END
 
 #endif

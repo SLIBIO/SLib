@@ -5,9 +5,6 @@
 #include "../../../inc/slib/core/resource.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
-GraphicsContext::GraphicsContext()
-{
-}
 
 Ref<Drawable> GraphicsContext::createDrawableFromImage(const Ref<Image>& image)
 {
@@ -29,22 +26,20 @@ Ref<Drawable> GraphicsContext::loadDrawableFromMemory(const Memory& mem)
 
 Ref<Drawable> GraphicsContext::loadDrawableFromFile(const String& filePath)
 {
-	Ref<Drawable> ret;
 	Memory mem = File::readAllBytes(filePath);
 	if (mem.isNotEmpty()) {
-		ret = loadDrawableFromMemory(mem);
+		return loadDrawableFromMemory(mem);
 	}
-	return ret;
+	return Ref<Drawable>::null();
 }
 
 Ref<Drawable> GraphicsContext::loadDrawableFromResource(const String& path)
 {
-	Ref<Drawable> ret;
 	Memory mem = Resource::readAllBytes(path);
 	if (mem.isNotEmpty()) {
-		ret = loadDrawableFromMemory(mem);
+		return loadDrawableFromMemory(mem);
 	}
-	return ret;
+	return Ref<Drawable>::null();
 }
 
 Ref<Bitmap> GraphicsContext::createBitmapFromImage(const ImageDesc& desc)
@@ -77,12 +72,11 @@ Ref<Bitmap> GraphicsContext::loadBitmapFromMemory(const Memory& mem)
 
 Ref<Bitmap> GraphicsContext::loadBitmapFromFile(const String& filePath)
 {
-	Ref<Bitmap> ret;
 	Memory mem = File::readAllBytes(filePath);
 	if (mem.isNotEmpty()) {
-		ret = loadBitmapFromMemory(mem);
+		return loadBitmapFromMemory(mem);
 	}
-	return ret;
+	return Ref<Bitmap>::null();
 }
 
 Ref<Bitmap> GraphicsContext::loadBitmapFromResource(const String& path)
@@ -90,9 +84,9 @@ Ref<Bitmap> GraphicsContext::loadBitmapFromResource(const String& path)
 	Ref<Bitmap> ret;
 	Memory mem = Resource::readAllBytes(path);
 	if (mem.isNotEmpty()) {
-		ret = loadBitmapFromMemory(mem);
+		return loadBitmapFromMemory(mem);
 	}
-	return ret;
+	return Ref<Bitmap>::null();
 }
 SLIB_GRAPHICS_NAMESPACE_END
 

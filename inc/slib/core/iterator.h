@@ -11,9 +11,7 @@ template <class TYPE>
 class SLIB_EXPORT IIterator : public Referable
 {
 	SLIB_DECLARE_ROOT_OBJECT(IIterator)
-public:
-	SLIB_INLINE IIterator() {}
-
+	
 public:
 	virtual sl_bool hasNext() = 0;
 	

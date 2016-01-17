@@ -7,20 +7,16 @@
 
 SLIB_MEDIA_NAMESPACE_BEGIN
 
-class SLIB_EXPORT VideoVpxEncoderParam
+enum VPXBitrateMode {
+	vpxBitrateMode_Variable,
+	vpxBitrateMode_Constant,
+	vpxBitrateMode_ConstrainedQuality,
+	vpxBitrateMode_ConstantQuality
+};
+
+class SLIB_EXPORT VP8EncoderParam
 {
 public:
-	enum Type {
-		VP8 = 0,
-		VP9 = 1
-	};
-
-	enum BitRateControlMode {
-		VPX_VBR,
-		VPX_CBR,
-		VPX_CQ,
-		VPX_Q,
-	};
 	sl_uint32 width;
 	sl_uint32 height;
 	sl_uint32 framesPerSecond;
@@ -28,46 +24,34 @@ public:
 	sl_uint32 bitrate;
 	sl_uint32 threadsCount;
 	sl_uint32 cpuUsage;
-	BitRateControlMode mode;
-	Type type;
+	VPXBitrateMode bitrateMode;
 
 public:
-	VideoVpxEncoderParam();
+	VP8EncoderParam();
 };
 
-class SLIB_EXPORT VideoVpxDecoderParam
+class SLIB_EXPORT VP8DecoderParam
 {
 public:
-	enum Type {
-		VP8 = 0,
-		VP9 = 1
-	};
-
-	Type type;
 	sl_uint32 width;
 	sl_uint32 height;
 	
 public:
-	VideoVpxDecoderParam();
+	VP8DecoderParam();
 };
 
-class SLIB_EXPORT VideoVpxEncoder : public VideoEncoder
+class SLIB_EXPORT VP8Encoder : public VideoEncoder
 {
 public:
-	VideoVpxEncoder();
-	
-public:
-	static Ref<VideoVpxEncoder> create(const VideoVpxEncoderParam& param);
+	static Ref<VP8Encoder> create(const VP8EncoderParam& param);
 };
 
-class SLIB_EXPORT VideoVpxDecoder : public VideoDecoder
+class SLIB_EXPORT VP8Decoder : public VideoDecoder
 {
 public:
-	VideoVpxDecoder();
-	
-public:
-	static Ref<VideoVpxDecoder> create(const VideoVpxDecoderParam& param);
+	static Ref<VP8Decoder> create(const VP8DecoderParam& param);
 };
+
 SLIB_MEDIA_NAMESPACE_END
 
 #endif

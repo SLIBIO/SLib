@@ -832,49 +832,49 @@ public:
 							Base::zeroMemory(bind + i, sizeof(MYSQL_BIND));
 							const Variant& var = params[i];
 							switch (var.getType()) {
-							case Variant::typeNull:
+							case variantType_Null:
 								bind[i].buffer_type = MYSQL_TYPE_NULL;
 								break;
-							case Variant::typeBoolean:
-							case Variant::typeUint32:
+							case variantType_Boolean:
+							case variantType_Uint32:
 								bind[i].buffer_type = MYSQL_TYPE_LONG;
 								bind[i].buffer_length = 4;
 								bind[i].is_unsigned = 1;
 								bind[i].buffer = &(fds[i].unum32);
 								fds[i].unum32 = var.getUint32();
 								break;
-							case Variant::typeInt32:
+							case variantType_Int32:
 								bind[i].buffer_type = MYSQL_TYPE_LONG;
 								bind[i].buffer_length = 4;
 								bind[i].buffer = &(fds[i].num32);
 								fds[i].num32 = var.getInt32();
 								break;
-							case Variant::typeUint64:
+							case variantType_Uint64:
 								bind[i].buffer_type = MYSQL_TYPE_LONGLONG;
 								bind[i].buffer_length = 8;
 								bind[i].is_unsigned = 1;
 								bind[i].buffer = &(fds[i].unum64);
 								fds[i].unum64 = var.getUint64();
 								break;
-							case Variant::typeInt64:
+							case variantType_Int64:
 								bind[i].buffer_type = MYSQL_TYPE_LONGLONG;
 								bind[i].buffer_length = 8;
 								bind[i].buffer = &(fds[i].num64);
 								fds[i].num64 = var.getInt64();
 								break;
-							case Variant::typeFloat:
+							case variantType_Float:
 								bind[i].buffer_type = MYSQL_TYPE_FLOAT;
 								bind[i].buffer_length = 4;
 								bind[i].buffer = &(fds[i].flt);
 								fds[i].flt = var.getFloat();
 								break;
-							case Variant::typeDouble:
+							case variantType_Double:
 								bind[i].buffer_type = MYSQL_TYPE_DOUBLE;
 								bind[i].buffer_length = 8;
 								bind[i].buffer = &(fds[i].dbl);
 								fds[i].dbl = var.getDouble();
 								break;
-							case Variant::typeTime:
+							case variantType_Time:
 								bind[i].buffer_type = MYSQL_TYPE_DATETIME;
 								bind[i].buffer_length = sizeof(MYSQL_TIME);
 								bind[i].buffer = &(fds[i].time);

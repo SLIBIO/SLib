@@ -98,7 +98,7 @@ public:
 	{
 		_Type* ret = create(1);
 		if (ret) {
-			if (ret->add(value)) {
+			if (ret->add_NoLock(value)) {
 				return ret;
 			}
 			delete ret;

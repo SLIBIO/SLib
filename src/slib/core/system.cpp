@@ -38,9 +38,9 @@ String System::getCachesDirectory()
 #endif
 
 #if defined(SLIB_PLATFORM_IS_MOBILE)
-static List<String>& _System_getGlobalUniqueInstances()
+static CList<String>& _System_getGlobalUniqueInstances()
 {
-	SLIB_SAFE_STATIC_REF(List<String>, lst);
+	SLIB_SAFE_STATIC(CList<String>, lst);
 	return lst;
 }
 
@@ -56,7 +56,7 @@ void* System::createGlobalUniqueInstance(const String& _name)
 		return sl_null;
 	}
 	name = File::makeSafeFileName(name);
-	List<String>& lst = _System_getGlobalUniqueInstances();
+	CList<String>& lst = _System_getGlobalUniqueInstances();
 	if (lst.indexOf(name) >= 0) {
 		return sl_null;
 	}
@@ -71,7 +71,7 @@ void System::freeGlobalUniqueInstance(void* instance)
 	if (instance) {
 		_SYS_GLOBAL_UNIQUE_INSTANCE* l = (_SYS_GLOBAL_UNIQUE_INSTANCE*)(instance);
 		if (l) {
-			List<String>& lst = _System_getGlobalUniqueInstances();
+			CList<String>& lst = _System_getGlobalUniqueInstances();
 			lst.removeValue(l->name);
 			delete l;
 		}

@@ -2,6 +2,7 @@
 #include "../../../inc/slib/media/audio_format.h"
 
 SLIB_MEDIA_NAMESPACE_BEGIN
+
 AudioRecorderInfo::AudioRecorderInfo()
 {
 }
@@ -9,119 +10,80 @@ AudioRecorderInfo::AudioRecorderInfo()
 AudioRecorderParam::AudioRecorderParam()
 {
 	samplesPerSecond = 16000;
+	channelsCount = 1;
 	frameLengthInMilliseconds = 50;
 	bufferLengthInMilliseconds = 1000;
 	flagAutoStart = sl_true;
 }
 
-void IAudioRecorderListener::onRecordFrame(AudioRecorder *recorder, const float *samples, sl_uint32 count)
+sl_bool AudioRecorder::read(const AudioData& audioOut)
 {
-}
-
-sl_bool IAudioRecorderListener::isRecordingtUint8Frame()
-{
-	return sl_false;
-}
-
-void IAudioRecorderListener::onRecordFrame(AudioRecorder *recorder, const sl_uint8 *samples, sl_uint32 count)
-{
-}
-
-sl_bool IAudioRecorderListener::isRecordingInt16Frame()
-{
-	return sl_false;
-}
-
-void IAudioRecorderListener::onRecordFrame(AudioRecorder *recorder, const sl_int16 *samples, sl_uint32 count)
-{
-}
-
-AudioRecorder::AudioRecorder()
-{
-}
-
-AudioRecorder::~AudioRecorder()
-{
-}
-
-sl_bool AudioRecorder::read(float* samples, sl_size count)
-{
-	return m_queue.get(samples, count);
-}
-
-void AudioRecorder::_processFrame_S16(const sl_int16 *samples, sl_uint32 count)
-{
-	if (count > 0) {
-		PtrLocker<IAudioRecorderListener> listener(getListener());
-		if (listener.isNotNull()) {
-			if (listener->isRecordingInt16Frame()) {
-				listener->onRecordFrame(this, samples, count);
-			} else if (listener->isRecordingtUint8Frame()) {
-				Memory mem = _getMemProcess_U8(count);
-				if (mem.isNotEmpty()) {
-					sl_uint8* buf = (sl_uint8*)(mem.getBuf());
-					AudioFormat::convertSamples(count, samples, buf);
-					listener->onRecordFrame(this, buf, count);
+	AudioFormat format;
+	sl_uint32 nChannels = m_nChannels;
+	if (nChannels == 1) {
+		format = audioFormat_Int16_Mono;
+	} else {
+		format = audioFormat_Int16_Stereo;
+	}
+	if (audioOut.format == format && (((sl_size)(audioOut.data)) & 1) == 0) {
+		return m_queue.get((sl_int16*)(audioOut.data), nChannels * audioOut.count);
+	} else {
+		sl_int16 samples[2048];
+		AudioData temp;
+		temp.format = format;
+		temp.data = samples;
+		temp.count = 1024;
+		sl_size n = audioOut.count;
+		ObjectLocker lock(&m_queue);
+		if (n > m_queue.count()) {
+			while (n > 0) {
+				sl_size m = n;
+				if (m > 1024) {
+					m = 1024;
 				}
-			} else {
-				Memory mem = _getMemProcess_F(count);
-				if (mem.isNotEmpty()) {
-					float* buf = (float*)(mem.getBuf());
-					AudioFormat::convertSamples(count, samples, buf);
-					listener->onRecordFrame(this, buf, count);
-				}
+				n -= m;
+				m_queue.get(samples, nChannels*m);
+				audioOut.copySamplesFrom(temp, m);
 			}
-		} else {
-			Memory mem = _getMemProcess_F(count);
-			if (mem.isNotEmpty()) {
-				float* buf = (float*)(mem.getBuf());
-				AudioFormat::convertSamples(count, samples, buf);
-				m_queue.add(buf, count);
-			}
+			return sl_true;
 		}
-	}	
-	Ref<Event> ev = getEvent();
-	if (ev.isNotNull()) {
-		ev->set();
+		return sl_false;
 	}
 }
 
-Memory AudioRecorder::_getMemProcess_U8(sl_size count)
+Array<sl_int16> AudioRecorder::_getProcessData(sl_size count)
 {
-	sl_size size = count;
-	Memory mem = m_memProcess_U8;
-	if (mem.getSize() >= size) {
-		return mem;
+	Array<sl_int16> data = m_processData;
+	if (data.count() >= count) {
+		return data;
 	} else {
-		mem = Memory::create(size);
-		m_memProcess_U8 = mem;
-		return mem;
+		data = Array<sl_int16>::create(count);
+		m_processData = data;
+		return data;
 	}
 }
 
-Memory AudioRecorder::_getMemProcess_S16(sl_size count)
+void AudioRecorder::_processFrame(sl_int16* s, sl_size count)
 {
-	sl_size size = count * 2;
-	Memory mem = m_memProcess_S16;
-	if (mem.getSize() >= size) {
-		return mem;
-	} else {
-		mem = Memory::create(size);
-		m_memProcess_S16 = mem;
-		return mem;
+	PtrLocker<IAudioRecorderListener> listener(m_listener);
+	if (listener.isNotNull()) {
+		AudioData audio;
+		AudioFormat format;
+		sl_uint32 nChannels = m_nChannels;
+		if (nChannels == 1) {
+			format = audioFormat_Int16_Mono;
+		} else {
+			format = audioFormat_Int16_Stereo;
+		}
+		audio.format = format;
+		audio.count = count / nChannels;
+		audio.data = s;
+		listener->onRecordAudio(this, audio);
+	}
+	m_queue.add(s, count);
+	if (m_event.isNotNull()) {
+		m_event->set();
 	}
 }
 
-Memory AudioRecorder::_getMemProcess_F(sl_size count)
-{
-	sl_size size = count * 4;
-	Memory mem = m_memProcess_F;
-	if (mem.getSize() >= size) {
-		return mem;
-	} else {
-		mem = Memory::create(size);
-		m_memProcess_F = mem;
-		return mem;
-	}
-}
 SLIB_MEDIA_NAMESPACE_END

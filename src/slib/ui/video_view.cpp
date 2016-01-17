@@ -5,7 +5,7 @@
 SLIB_UI_NAMESPACE_BEGIN
 VideoView::VideoView()
 {
-	setRenderMode(renderModeWhenDirty);
+	setRedrawMode(redrawMode_WhenDirty);
 	m_flagYUV = sl_false;
 	
 	m_programRGB = new RenderProgram2D_PositionTexture;
@@ -15,7 +15,7 @@ VideoView::VideoView()
 void VideoView::updateCurrentFrame(const VideoFrame* frame)
 {
 	ColorSpace colorSpace = frame->image.format.getColorSpace();
-	if (colorSpace != ColorSpace_RGB && colorSpace != ColorSpace_YUV) {
+	if (colorSpace != colorSpace_RGB && colorSpace != colorSpace_YUV) {
 		return;
 	}
 	Ref<Texture> texture = m_textureFrame;
@@ -30,8 +30,8 @@ void VideoView::updateCurrentFrame(const VideoFrame* frame)
 	if (texture.isNotNull()) {
 		Ref<Image> image = Ref<Image>::from(texture->getSource());
 		BitmapData bitmapData(image->getWidth(), image->getHeight(), image->getColors());
-		if (frame->image.format.getColorSpace() == ColorSpace_YUV) {
-			bitmapData.format = bitmapFormatYUVA;
+		if (frame->image.format.getColorSpace() == colorSpace_YUV) {
+			bitmapData.format = bitmapFormat_YUVA;
 			m_flagYUV = sl_true;
 		} else {
 			m_flagYUV = sl_false;

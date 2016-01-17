@@ -186,6 +186,7 @@ sl_bool Image::saveToJPEG(String filePath, const Ref<Image>& image, float qualit
 	}
 	return sl_false;
 }
+
 SLIB_GRAPHICS_NAMESPACE_END
 
 #endif

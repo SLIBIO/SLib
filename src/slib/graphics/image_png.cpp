@@ -8,6 +8,7 @@
 #include "../../../inc/thirdparty/libpng/pngstruct.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
+
 Ref<Image> Image::loadFromPNG(const void* content, sl_size size)
 {
 	png_image image;

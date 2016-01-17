@@ -16,9 +16,11 @@ class Image;
 
 class SLIB_EXPORT FreeType : public Object
 {
-protected:
-	FreeType();
-
+public:
+	static Ref<FreeType> loadFromMemory(const Memory& mem, sl_uint32 indexFace = 0);
+	
+	static Ref<FreeType> loadFromFile(const String& fontFilePath, sl_uint32 index = 0);
+	
 public:
 	virtual sl_uint32 getFacesCount() = 0;
 	
@@ -67,11 +69,6 @@ public:
 	{
 		return strokeString(imageOutput, x, y, text.getBuf(), text.getLength(), color, lineWidth);
 	}
-
-public:
-	static Ref<FreeType> loadFromMemory(const Memory& mem, sl_uint32 indexFace = 0);
-	
-	static Ref<FreeType> loadFromFile(const String& fontFilePath, sl_uint32 index = 0);
 
 };
 SLIB_GRAPHICS_NAMESPACE_END

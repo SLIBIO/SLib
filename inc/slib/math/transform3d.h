@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_MATH_TRANSFORM3D
 
 #include "definition.h"
+
 #include "vector2.h"
 #include "vector3.h"
 #include "quaternion.h"
@@ -15,17 +16,17 @@ template <class T>
 class SLIB_EXPORT Transform3T
 {
 public:
-	static void setTranslation(Matrix4T<T>& out, T x, T y, T z)
+	static void setTranslation(Matrix4T<T>& _out, T x, T y, T z)
 	{
-		out.m00 = 1; out.m01 = 0; out.m02 = 0; out.m03 = 0;
-		out.m10 = 0; out.m11 = 1; out.m12 = 0; out.m13 = 0;
-		out.m20 = 0; out.m21 = 0; out.m22 = 1; out.m23 = 0;
-		out.m30 = x; out.m31 = y; out.m32 = z; out.m33 = 1;
+		_out.m00 = 1; _out.m01 = 0; _out.m02 = 0; _out.m03 = 0;
+		_out.m10 = 0; _out.m11 = 1; _out.m12 = 0; _out.m13 = 0;
+		_out.m20 = 0; _out.m21 = 0; _out.m22 = 1; _out.m23 = 0;
+		_out.m30 = x; _out.m31 = y; _out.m32 = z; _out.m33 = 1;
 	}
 	
-	SLIB_INLINE static void setTranslation(Matrix4T<T>& out, const Vector3T<T>& v)
+	SLIB_INLINE static void setTranslation(Matrix4T<T>& _out, const Vector3T<T>& v)
 	{
-		setTranslation(out, v.x, v.y, v.z);
+		setTranslation(_out, v.x, v.y, v.z);
 	}
 	
 	SLIB_INLINE static Matrix4T<T> getTranslationMatrix(T x, T y, T z)
@@ -42,17 +43,17 @@ public:
 		return ret;
 	}
 
-	static void setScaling(Matrix4T<T>& out, T sx, T sy, T sz)
+	static void setScaling(Matrix4T<T>& _out, T sx, T sy, T sz)
 	{
-		out.m00 = sx; out.m01 = 0; out.m02 = 0; out.m03 = 0;
-		out.m10 = 0; out.m11 = sy; out.m12 = 0; out.m13 = 0;
-		out.m20 = 0; out.m21 = 0; out.m22 = sz; out.m23 = 0;
-		out.m30 = 0; out.m31 = 0; out.m32 = 0; out.m33 = 1;
+		_out.m00 = sx; _out.m01 = 0; _out.m02 = 0; _out.m03 = 0;
+		_out.m10 = 0; _out.m11 = sy; _out.m12 = 0; _out.m13 = 0;
+		_out.m20 = 0; _out.m21 = 0; _out.m22 = sz; _out.m23 = 0;
+		_out.m30 = 0; _out.m31 = 0; _out.m32 = 0; _out.m33 = 1;
 	}
 	
-	SLIB_INLINE static void setScaling(Matrix4T<T>& out, const Vector3T<T>& v)
+	SLIB_INLINE static void setScaling(Matrix4T<T>& _out, const Vector3T<T>& v)
 	{
-		setScaling(out, v.x, v.y, v.z);
+		setScaling(_out, v.x, v.y, v.z);
 	}
 	
 	SLIB_INLINE static Matrix4T<T> getScalingMatrix(T x, T y, T z)
@@ -69,37 +70,37 @@ public:
 		return ret;
 	}
 
-	static void setRotationX(Matrix4T<T>& out, T radians)
+	static void setRotationX(Matrix4T<T>& _out, T radians)
 	{
 		T c = Math::cos(radians);
 		T s = Math::sin(radians);
-		out.m00 = 1; out.m01 = 0; out.m02 = 0; out.m03 = 0;
-		out.m10 = 0; out.m11 = c; out.m12 = s; out.m13 = 0;
-		out.m20 = 0; out.m21 = -s; out.m22 = c; out.m23 = 0;
-		out.m30 = 0; out.m31 = 0; out.m32 = 0; out.m33 = 1;
+		_out.m00 = 1; _out.m01 = 0; _out.m02 = 0; _out.m03 = 0;
+		_out.m10 = 0; _out.m11 = c; _out.m12 = s; _out.m13 = 0;
+		_out.m20 = 0; _out.m21 = -s; _out.m22 = c; _out.m23 = 0;
+		_out.m30 = 0; _out.m31 = 0; _out.m32 = 0; _out.m33 = 1;
 	}
 	
-	static void setRotationY(Matrix4T<T>& out, T radians)
+	static void setRotationY(Matrix4T<T>& _out, T radians)
 	{
 		T c = Math::cos(radians);
 		T s = Math::sin(radians);
-		out.m00 = c; out.m01 = 0; out.m02 = -s; out.m03 = 0;
-		out.m10 = 0; out.m11 = 1; out.m12 = 0; out.m13 = 0;
-		out.m20 = s; out.m21 = 0; out.m22 = c; out.m23 = 0;
-		out.m30 = 0; out.m31 = 0; out.m32 = 0; out.m33 = 1;
+		_out.m00 = c; _out.m01 = 0; _out.m02 = -s; _out.m03 = 0;
+		_out.m10 = 0; _out.m11 = 1; _out.m12 = 0; _out.m13 = 0;
+		_out.m20 = s; _out.m21 = 0; _out.m22 = c; _out.m23 = 0;
+		_out.m30 = 0; _out.m31 = 0; _out.m32 = 0; _out.m33 = 1;
 	}
 	
-	static void setRotationZ(Matrix4T<T>& out, T radians)
+	static void setRotationZ(Matrix4T<T>& _out, T radians)
 	{
 		T c = Math::cos(radians);
 		T s = Math::sin(radians);
-		out.m00 = c; out.m01 = s; out.m02 = 0; out.m03 = 0;
-		out.m10 = -s; out.m11 = c; out.m12 = 0; out.m13 = 0;
-		out.m20 = 0; out.m21 = 0; out.m22 = 1; out.m23 = 0;
-		out.m30 = 0; out.m31 = 0; out.m32 = 0; out.m33 = 1;
+		_out.m00 = c; _out.m01 = s; _out.m02 = 0; _out.m03 = 0;
+		_out.m10 = -s; _out.m11 = c; _out.m12 = 0; _out.m13 = 0;
+		_out.m20 = 0; _out.m21 = 0; _out.m22 = 1; _out.m23 = 0;
+		_out.m30 = 0; _out.m31 = 0; _out.m32 = 0; _out.m33 = 1;
 	}
 	
-	static void setRotation(Matrix4T<T>& out, const QuaternionT<T>& q)
+	static void setRotation(Matrix4T<T>& _out, const QuaternionT<T>& q)
 	{
 		T d = q.getLength2p();
 		T s = 2 / d;
@@ -108,29 +109,29 @@ public:
 		T xx = q.x * x, xy = q.x * y, xz = q.x * z;
 		T yy = q.y * y, yz = q.y * z, zz = q.z * z;
 
-		out.m00 = 1 - (yy + zz);
-		out.m01 = xy - wz;
-		out.m02 = xz + wy;
-		out.m03 = 0;
-		out.m10 = xy + wz;
-		out.m11 = 1 - (xx + zz);
-		out.m12 = yz - wx;
-		out.m13 = 0;
-		out.m20 = xz - wy;
-		out.m21 = yz + wx;
-		out.m22 = 1 - (xx + yy);
-		out.m23 = 0;
-		out.m30 = 0;
-		out.m31 = 0;
-		out.m32 = 0;
-		out.m33 = 1;
+		_out.m00 = 1 - (yy + zz);
+		_out.m01 = xy - wz;
+		_out.m02 = xz + wy;
+		_out.m03 = 0;
+		_out.m10 = xy + wz;
+		_out.m11 = 1 - (xx + zz);
+		_out.m12 = yz - wx;
+		_out.m13 = 0;
+		_out.m20 = xz - wy;
+		_out.m21 = yz + wx;
+		_out.m22 = 1 - (xx + yy);
+		_out.m23 = 0;
+		_out.m30 = 0;
+		_out.m31 = 0;
+		_out.m32 = 0;
+		_out.m33 = 1;
 	}
 	
-	static void setRotation(Matrix4T<T>& out, const Vector3T<T>& vAxis, T fAngle)
+	static void setRotation(Matrix4T<T>& _out, const Vector3T<T>& vAxis, T fAngle)
 	{
 		QuaternionT<T> q;
 		q.setRotation(vAxis, fAngle);
-		setRotation(out, q);
+		setRotation(_out, q);
 	}
 	
 	SLIB_INLINE static Matrix4T<T> getRotationXMatrix(T radians)
@@ -168,11 +169,11 @@ public:
 		return ret;
 	}
 
-	static void setPerspectiveProjectionFovY(Matrix4T<T>& out, T fovY, T fAspectWH, T zNear, T zFar)
+	static void setPerspectiveProjectionFovY(Matrix4T<T>& _out, T fovY, T fAspectWH, T zNear, T zFar)
 	{
 		T sy = Math::cot(fovY / 2);
 		T sx = sy / fAspectWH;
-		setPerspectiveProjection(out, sx, sy, zNear, zFar);
+		setPerspectiveProjection(_out, sx, sy, zNear, zFar);
 	}
 	
 	SLIB_INLINE static Matrix4T<T> getPerspectiveProjectionFovYMatrix(T fovY, T fAspectWH, T zNear, T zFar)
@@ -183,12 +184,12 @@ public:
 	}
 
 	// Slib uses Left-Handed coordinate system
-	static void setPerspectiveProjection(Matrix4T<T>& out, T sx, T sy, T zNear, T zFar)
+	static void setPerspectiveProjection(Matrix4T<T>& _out, T sx, T sy, T zNear, T zFar)
 	{
-		out.m00 = sx; out.m01 = 0; out.m02 = 0; out.m03 = 0;
-		out.m10 = 0; out.m11 = sy; out.m12 = 0; out.m13 = 0;
-		out.m20 = 0; out.m21 = 0; out.m22 = zFar / (zFar - zNear); out.m23 = 1;
-		out.m30 = 0; out.m31 = 0; out.m32 = -zNear * zFar / (zFar - zNear); out.m33 = 0;
+		_out.m00 = sx; _out.m01 = 0; _out.m02 = 0; _out.m03 = 0;
+		_out.m10 = 0; _out.m11 = sy; _out.m12 = 0; _out.m13 = 0;
+		_out.m20 = 0; _out.m21 = 0; _out.m22 = zFar / (zFar - zNear); _out.m23 = 1;
+		_out.m30 = 0; _out.m31 = 0; _out.m32 = -zNear * zFar / (zFar - zNear); _out.m33 = 0;
 	}
 	
 	SLIB_INLINE static Matrix4T<T> getPerspectiveProjectionMatrix(T sx, T sy, T zNear, T zFar)
@@ -198,12 +199,12 @@ public:
 		return ret;
 	}
 
-	static void setOrthogonalProjection(Matrix4T<T>& out, T sx, T sy, T zNear, T zFar)
+	static void setOrthogonalProjection(Matrix4T<T>& _out, T sx, T sy, T zNear, T zFar)
 	{
-		out.m00 = sx; out.m01 = 0; out.m02 = 0; out.m03 = 0;
-		out.m10 = 0; out.m11 = sy; out.m12 = 0; out.m13 = 0;
-		out.m20 = 0; out.m21 = 0; out.m22 = 1 / (zFar - zNear); out.m23 = 0;
-		out.m30 = 0; out.m31 = 0; out.m32 = zNear / (zFar - zNear); out.m33 = 1;
+		_out.m00 = sx; _out.m01 = 0; _out.m02 = 0; _out.m03 = 0;
+		_out.m10 = 0; _out.m11 = sy; _out.m12 = 0; _out.m13 = 0;
+		_out.m20 = 0; _out.m21 = 0; _out.m22 = 1 / (zFar - zNear); _out.m23 = 0;
+		_out.m30 = 0; _out.m31 = 0; _out.m32 = zNear / (zFar - zNear); _out.m33 = 1;
 	}
 	
 	SLIB_INLINE static Matrix4T<T> getOrthogonalProjectionMatrix(T sx, T sy, T zNear, T zFar)
@@ -213,7 +214,7 @@ public:
 		return ret;
 	}
 
-	static void lookAt(Matrix4T<T>& out, const Vector3T<T>& eye, const Vector3T<T>& at, const Vector3T<T>& up)
+	static void lookAt(Matrix4T<T>& _out, const Vector3T<T>& eye, const Vector3T<T>& at, const Vector3T<T>& up)
 	{
 		Vector3T<T> xAxis, yAxis, zAxis;
 		zAxis = (at - eye);
@@ -230,10 +231,10 @@ public:
 		if (Math::isLessThanEpsilon(yAxis.length2p())) {
 			yAxis = Vector3T<T>::axisY();
 		}
-		out.m00 = xAxis.x; out.m01 = yAxis.x; out.m02 = zAxis.x; out.m03 = 0;
-		out.m10 = xAxis.y; out.m11 = yAxis.y; out.m12 = zAxis.y; out.m13 = 0;
-		out.m20 = xAxis.z; out.m21 = yAxis.z; out.m22 = zAxis.z; out.m23 = 0;
-		out.m30 = -xAxis.dot(eye); out.m31 = -yAxis.dot(eye); out.m32 = -zAxis.dot(eye); out.m33 = 1;
+		_out.m00 = xAxis.x; _out.m01 = yAxis.x; _out.m02 = zAxis.x; _out.m03 = 0;
+		_out.m10 = xAxis.y; _out.m11 = yAxis.y; _out.m12 = zAxis.y; _out.m13 = 0;
+		_out.m20 = xAxis.z; _out.m21 = yAxis.z; _out.m22 = zAxis.z; _out.m23 = 0;
+		_out.m30 = -xAxis.dot(eye); _out.m31 = -yAxis.dot(eye); _out.m32 = -zAxis.dot(eye); _out.m33 = 1;
 	}
 	
 	SLIB_INLINE static Matrix4T<T> getLookAtMatrix(const Vector3T<T>& eye, const Vector3T<T>& at, const Vector3T<T>& up)
@@ -243,13 +244,13 @@ public:
 		return ret;
 	}
 
-	static void makeTransform(Matrix4T<T>& out, const Vector3T<T>& position, const Vector3T<T>& scaling, const QuaternionT<T>& rotation)
+	static void makeTransform(Matrix4T<T>& _out, const Vector3T<T>& position, const Vector3T<T>& scaling, const QuaternionT<T>& rotation)
 	{
-		setRotation(out, rotation);
-		out.m00 *= scaling.x; out.m01 *= scaling.x; out.m02 *= scaling.x;
-		out.m10 *= scaling.y; out.m11 *= scaling.y; out.m12 *= scaling.y;
-		out.m20 *= scaling.z; out.m21 *= scaling.z; out.m22 *= scaling.z;
-		out.m30 = position.x; out.m31 = position.y; out.m32 *= position.z;
+		setRotation(_out, rotation);
+		_out.m00 *= scaling.x; _out.m01 *= scaling.x; _out.m02 *= scaling.x;
+		_out.m10 *= scaling.y; _out.m11 *= scaling.y; _out.m12 *= scaling.y;
+		_out.m20 *= scaling.z; _out.m21 *= scaling.z; _out.m22 *= scaling.z;
+		_out.m30 = position.x; _out.m31 = position.y; _out.m32 *= position.z;
 	}
 	
 	SLIB_INLINE static Matrix4T<T> getTransformMatrix(const Vector3T<T>& position, const Vector3T<T>& scaling, const QuaternionT<T>& rotation)
@@ -269,12 +270,12 @@ public:
 		outAngle = -Math::arccos(dirBefore.dot(dirNext));
 	}
 
-	SLIB_INLINE static void setQuaternionFromDirToDir(QuaternionT<T>& out, const Vector3T<T>& from, const Vector3T<T>& to)
+	SLIB_INLINE static void setQuaternionFromDirToDir(QuaternionT<T>& _out, const Vector3T<T>& from, const Vector3T<T>& to)
 	{
 		Vector3T<T> dirAxisRotation;
 		T angleRotation;
 		getRotationFromDirToDir(dirAxisRotation, angleRotation, from, to);
-		out.setRotation(dirAxisRotation, angleRotation);
+		_out.setRotation(dirAxisRotation, angleRotation);
 	}
 	
 	SLIB_INLINE static QuaternionT<T> getQuaternionRotationFromDirToDir(const Vector3T<T>& from, const Vector3T<T>& to)
@@ -284,11 +285,11 @@ public:
 		return ret;
 	}
 
-	SLIB_INLINE static void setTransformFromDirToDir(Matrix4T<T>& out, const Vector3T<T>& from, const Vector3T<T>& to)
+	SLIB_INLINE static void setTransformFromDirToDir(Matrix4T<T>& _out, const Vector3T<T>& from, const Vector3T<T>& to)
 	{
 		QuaternionT<T> q;
 		setQuaternionFromDirToDir(q, from, to);
-		setRotation(out, q);
+		setRotation(_out, q);
 	}
 	
 	SLIB_INLINE static Matrix4T<T> getTransformMatrixFromDirToDir(const Vector3T<T>& from, const Vector3T<T>& to)

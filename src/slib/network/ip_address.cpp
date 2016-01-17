@@ -253,7 +253,7 @@ sl_bool IPv6Address::setHostName(const String& hostName)
 	return isNotAny();
 }
 
-const IPAddress::_IPAddress IPAddress::_none = { IPAddress::typeNone, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
+const IPAddress::_IPAddress IPAddress::_none = { ipAddressType_None, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
 
 int IPAddress::compare(const IPAddress& other) const
 {
@@ -264,11 +264,11 @@ int IPAddress::compare(const IPAddress& other) const
 		return 1;
 	}
 	switch (m_type) {
-	case typeNone:
+	case ipAddressType_None:
 		return 0;
-	case typeIPv4:
+	case ipAddressType_IPv4:
 		return ((IPv4Address*)(void*)(m_data))->compare(*((IPv4Address*)(void*)(other.m_data)));
-	case typeIPv6:
+	case ipAddressType_IPv6:
 		return ((IPv6Address*)(void*)(m_data))->compare(*((IPv6Address*)(void*)(other.m_data)));
 	}
 	return 0;
@@ -277,11 +277,11 @@ int IPAddress::compare(const IPAddress& other) const
 sl_uint32 IPAddress::hashCode() const
 {
 	switch (m_type) {
-	case typeNone:
+	case ipAddressType_None:
 		return 0;
-	case typeIPv4:
+	case ipAddressType_IPv4:
 		return ((IPv4Address*)(void*)(m_data))->hashCode();
-	case typeIPv6:
+	case ipAddressType_IPv6:
 		return ((IPv6Address*)(void*)(m_data))->hashCode();
 	}
 	return 0;
@@ -291,9 +291,9 @@ String IPAddress::toString() const
 {
 	switch (m_type)
 	{
-	case typeIPv4:
+	case ipAddressType_IPv4:
 		return (*((IPv4Address*)(void*)(m_data))).toString();
-	case typeIPv6:
+	case ipAddressType_IPv6:
 		return (*((IPv6Address*)(void*)(m_data))).toString();
 	default:
 		return String::null();

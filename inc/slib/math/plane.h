@@ -22,7 +22,9 @@ public:
 	T d;
 	
 public:
-	SLIB_INLINE PlaneT() {}
+	SLIB_INLINE PlaneT()
+	{
+	}
 	
 	template <class O>
 	SLIB_INLINE PlaneT(const PlaneT<O>& other)
@@ -46,6 +48,7 @@ public:
 		setFromPointAndNormal(point, normal);
 	}
 	
+public:
 	template <class O>
 	SLIB_INLINE PlaneT<T>& operator=(const PlaneT<O>& other)
 	{
@@ -56,6 +59,7 @@ public:
 		return *this;
 	}
 	
+public:
 	SLIB_INLINE Vector3T<T> getNormal() const
 	{
 		return Vector3T<T>(a, b, c);

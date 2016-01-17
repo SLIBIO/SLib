@@ -13,21 +13,19 @@
 
 SLIB_NAMESPACE_BEGIN
 
+enum ThreadPriority {
+	threadPriority_Lowest = -2,
+	threadPriority_BelowNormal = -1,
+	threadPriority_Normal = 0,
+	threadPriority_AboveNormal = 1,
+	threadPriority_Highest = 2
+};
+
 class SLIB_EXPORT Thread : public Object
 {
 	SLIB_DECLARE_OBJECT(Thread, Object)
-public:
-	enum Priority {
-		priorityLowest = -2,
-		priorityBelowNormal = -1,
-		priorityNormal = 0,
-		priorityAboveNormal = 1,
-		priorityHighest = 2
-	};
-
 protected:
 	Thread();
-	
 public:
 	~Thread();
 
@@ -53,9 +51,9 @@ public:
 	
 	void clearWaitingEvent();
 
-	void setPriority(Priority priority);
+	void setPriority(ThreadPriority priority);
 	
-	Priority getPriority();
+	ThreadPriority getPriority();
 
 public:
 	SLIB_INLINE sl_bool isRunning()
@@ -128,7 +126,7 @@ public:
 
 private:
 	void* m_handle;
-	Thread::Priority m_priority;
+	ThreadPriority m_priority;
 
 	sl_bool m_flagRequestStop;
 	sl_bool m_flagRunning;

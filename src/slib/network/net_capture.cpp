@@ -77,10 +77,10 @@ public:
 		}
 		Ref<Socket> socket;
 		sl_uint32 deviceType = param.preferedLinkDeviceType;
-		if (deviceType == networkLinkDevice_Raw) {
+		if (deviceType == networkLinkDeviceType_Raw) {
 			socket = Socket::openPacketDatagram(networkLinkProtocol_All);
 		} else {
-			deviceType = networkLinkDevice_Ethernet;
+			deviceType = networkLinkDeviceType_Ethernet;
 			socket = Socket::openPacketRaw(networkLinkProtocol_All);
 		}
 		if (socket.isNotNull()) {
@@ -176,9 +176,9 @@ public:
 		}
 		if (m_flagRunning) {
 			L2PacketInfo info;
-			info.type = L2PacketInfo::typeOutGoing;
+			info.type = l2PacketType_OutGoing;
 			info.iface = m_ifaceIndex;
-			if (m_deviceType == networkLinkDevice_Ethernet) {
+			if (m_deviceType == networkLinkDeviceType_Ethernet) {
 				EthernetFrameFormat* frame = (EthernetFrameFormat*)buf;
 				if (size < EthernetFrameFormat::getHeaderSize()) {
 					return sl_false;
@@ -232,9 +232,9 @@ public:
 	static Ref<_NetRawIPv4Capture> create(const NetCaptureParam& param)
 	{
 		Ref<_NetRawIPv4Capture> ret;
-		Ref<Socket> socketTCP = Socket::openRaw_IPv4(networkInternetProtocol_TCP);
-		Ref<Socket> socketUDP = Socket::openRaw_IPv4(networkInternetProtocol_UDP);
-		Ref<Socket> socketICMP = Socket::openRaw_IPv4(networkInternetProtocol_ICMP);
+		Ref<Socket> socketTCP = Socket::openRaw(networkInternetProtocol_TCP);
+		Ref<Socket> socketUDP = Socket::openRaw(networkInternetProtocol_UDP);
+		Ref<Socket> socketICMP = Socket::openRaw(networkInternetProtocol_ICMP);
 		if (socketTCP.isNotNull() && socketUDP.isNotNull() && socketICMP.isNotNull()) {
 			socketTCP->setOption_IncludeIpHeader(sl_true);
 			socketUDP->setOption_IncludeIpHeader(sl_true);
@@ -364,7 +364,7 @@ public:
 
 	sl_uint32 getLinkType()
 	{
-		return networkLinkDevice_Raw;
+		return networkLinkDeviceType_Raw;
 	}
 
 	sl_bool sendPacket(const void* buf, sl_uint32 size)

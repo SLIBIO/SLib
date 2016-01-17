@@ -15,6 +15,7 @@ void OSX_AudioDeviceInfo::logError(String text)
 List<OSX_AudioDeviceInfo> OSX_AudioDeviceInfo::getAllDevices(sl_bool flagInput)
 {
 	List<OSX_AudioDeviceInfo> ret;
+	
 	AudioObjectPropertyAddress propDeviceListing;
 	propDeviceListing.mSelector = kAudioHardwarePropertyDevices;
 	propDeviceListing.mScope = kAudioObjectPropertyScopeGlobal;
@@ -46,7 +47,7 @@ List<OSX_AudioDeviceInfo> OSX_AudioDeviceInfo::getAllDevices(sl_bool flagInput)
 	for (sl_uint32 i = 0; i < nCountDevices; i++) {
 		OSX_AudioDeviceInfo info;
 		if (info.getDeviceInfo(deviceIds[i], flagInput)) {
-			ret.add(info);
+			ret.add_NoLock(info);
 		}
 	}
 	return ret;
@@ -143,7 +144,7 @@ sl_bool OSX_AudioDeviceInfo::selectDevice(sl_bool flagInput, String uid)
 	if (uid.isEmpty()) {
 		return getDefaultDevice(flagInput);
 	} else {
-		ListLocker<OSX_AudioDeviceInfo> list(getAllDevices(flagInput));
+		ListItems<OSX_AudioDeviceInfo> list(getAllDevices(flagInput));
 		for (sl_size i = 0; i < list.count(); i++) {
 			OSX_AudioDeviceInfo& element = list[i];
 			if (element.uid == uid) {

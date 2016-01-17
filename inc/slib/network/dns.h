@@ -107,7 +107,58 @@
 #define SLIB_NETWORK_DNS_RECORD_HEADER_MAX_LENGTH 263
 
 SLIB_NETWORK_NAMESPACE_BEGIN
-class SLIB_EXPORT DNS_HeaderFormat
+    
+enum DnsOpcode
+{
+    dnsOpcode_Query = 0,
+    dnsOpcode_InverseQuery = 1,
+    dnsOpcode_ServerStatusRequest = 2
+};
+
+enum DnsResponseCode
+{
+    dnsResponseCode_NoError = 0,
+    dnsResponseCode_FormatError = 1, // The name server was unable to interpret the query
+    dnsResponseCode_ServerFailure = 2, // The name server was unable to process this query due to a problem with the name server
+    dnsResponseCode_NameError = 3, // Meaningful only for responses from an authoritative name server, this code signifies that the domain name referenced in the query does not exist
+    dnsResponseCode_NotImplemented = 4, // The name server does not support the requested kind of query
+    dnsResponseCode_Refused = 5 // The name server refuses to perform the specified operation for policy reasons
+};
+
+enum DnsRecordType
+{
+    dnsRecordType_A = 1, // a host address
+    dnsRecordType_NS = 2, // an authoritative name server
+    dnsRecordType_MD = 3, // a mail destination (Obsolete - use MX)
+    dnsRecordType_MF = 4, // a mail forwarder (Obsolete - use MX)
+    dnsRecordType_CNAME = 5, // the canonical name for an alias
+    dnsRecordType_SOA = 6, // marks the start of a zone of authority
+    dnsRecordType_MB = 7, // a mailbox domain name (EXPERIMENTAL)
+    dnsRecordType_MG = 8, // a mail group member (EXPERIMENTAL)
+    dnsRecordType_MR = 9, // a mail rename domain name (EXPERIMENTAL)
+    dnsRecordType_NULL = 10, // a null RR (EXPERIMENTAL)
+    dnsRecordType_WKS = 11, // a well known service description
+    dnsRecordType_PTR = 12, // a domain name pointer
+    dnsRecordType_HINFO = 13, // host information
+    dnsRecordType_MINFO = 14, // mailbox or mail list information
+    dnsRecordType_MX = 15, // mail exchange
+    dnsRecordType_TXT = 16, // text strings
+    dnsRecordType_Question_AXFR = 252, // A request for a transfer of an entire zone
+    dnsRecordType_Question_MAILB = 253, // A request for mailbox-related records (MB, MG or MR)
+    dnsRecordType_Question_MAILA = 254, // A request for mail agent RRs (Obsolete - see MX)
+    dnsRecordType_Question_ALL = 255 // A request for all records
+};
+
+enum DnsClass
+{
+    dnsClass_IN = 1, // the Internet
+    dnsClass_CS = 2, // the CSNET class (Obsolete - used only for examples in some obsolete RFCs)
+    dnsClass_CH = 3, // the CHAOS class
+    dnsClass_HS = 4, // Hesiod [Dyer 87]
+    dnsClass_Question_ANY = 255 // any class
+};
+
+class SLIB_EXPORT DnsHeaderFormat
 {
 public:
 	SLIB_INLINE sl_uint16 getId() const
@@ -129,19 +180,13 @@ public:
 		_flags[0] = (sl_uint8)((_flags[0] & 0x7F) | (flag ? 0 : 0x80));
 	}
 
-	enum Opcode
-	{
-		opcodeQuery = 0,
-		opcodeInverseQuery = 1,
-		opcodeServerStatusRequest = 2
-	};
 	// 4 bits
-	SLIB_INLINE sl_uint32 getOpcode() const
+	SLIB_INLINE DnsOpcode getOpcode() const
 	{
-		return (_flags[0] >> 3) & 0x0F;
+		return (DnsOpcode)((_flags[0] >> 3) & 0x0F);
 	}
 	// 4 bits
-	SLIB_INLINE void setOpcode(sl_uint32 opcode)
+	SLIB_INLINE void setOpcode(DnsOpcode opcode)
 	{
 		_flags[0] = (sl_uint8)((_flags[0] & 0x87) | (((opcode & 0x0F) << 1)));
 	}
@@ -212,22 +257,13 @@ public:
 		_flags[1] = (sl_uint8)((_flags[1] & 0xEF) | (flag ? 0x10 : 0));
 	}
 
-	enum ResponseCode
-	{
-		responseNoError = 0,
-		responseFormatError = 1, // The name server was unable to interpret the query
-		responseServerFailure = 2, // The name server was unable to process this query due to a problem with the name server
-		responseNameError = 3, // Meaningful only for responses from an authoritative name server, this code signifies that the domain name referenced in the query does not exist
-		responseNotImplemented = 4, // The name server does not support the requested kind of query
-		responseRefused = 5 // The name server refuses to perform the specified operation for policy reasons
-	};
 	// 4 bits
-	SLIB_INLINE sl_uint32 getResponseCode() const
+	SLIB_INLINE DnsResponseCode getResponseCode() const
 	{
-		return _flags[1] & 0x0F;
+		return (DnsResponseCode)(_flags[1] & 0x0F);
 	}
 	// 4 bits
-	SLIB_INLINE void setResponseCode(sl_uint32 code)
+	SLIB_INLINE void setResponseCode(DnsResponseCode code)
 	{
 		_flags[1] = (sl_uint8)((_flags[1] & 0xF0) | (code & 0x0F));
 	}
@@ -284,10 +320,10 @@ private:
 	sl_uint8 _totalAdditionals[2];  // ARCOUNT
 };
 
-class SLIB_EXPORT DNS_Record
+class SLIB_EXPORT DnsRecord
 {
 public:
-	DNS_Record();
+	DnsRecord();
 
 public:
 	SLIB_INLINE const String& getName() const
@@ -299,51 +335,20 @@ public:
 		_name = name;
 	}
 
-	enum Type
+	SLIB_INLINE DnsRecordType getType() const
 	{
-		type_A = 1, // a host address
-		type_NS = 2, // an authoritative name server
-		type_MD = 3, // a mail destination (Obsolete - use MX)
-		type_MF = 4, // a mail forwarder (Obsolete - use MX)
-		type_CNAME = 5, // the canonical name for an alias
-		type_SOA = 6, // marks the start of a zone of authority
-		type_MB = 7, // a mailbox domain name (EXPERIMENTAL)
-		type_MG = 8, // a mail group member (EXPERIMENTAL)
-		type_MR = 9, // a mail rename domain name (EXPERIMENTAL)
-		type_NULL = 10, // a null RR (EXPERIMENTAL)
-		type_WKS = 11, // a well known service description
-		type_PTR = 12, // a domain name pointer
-		type_HINFO = 13, // host information
-		type_MINFO = 14, // mailbox or mail list information
-		type_MX = 15, // mail exchange
-		type_TXT = 16, // text strings
-		type_Question_AXFR = 252, // A request for a transfer of an entire zone
-		type_Question_MAILB = 253, // A request for mailbox-related records (MB, MG or MR)
-		type_Question_MAILA = 254, // A request for mail agent RRs (Obsolete - see MX)
-		type_Question_ALL = 255 // A request for all records
-	};
-	SLIB_INLINE sl_uint16 getType() const
-	{
-		return _type;
+		return (DnsRecordType)_type;
 	}
-	SLIB_INLINE void setType(sl_uint16 type)
+	SLIB_INLINE void setType(DnsRecordType type)
 	{
-		_type = type;
+		_type = (sl_uint16)type;
 	}
 
-	enum Class
+	SLIB_INLINE DnsClass getClass() const
 	{
-		class_IN = 1, // the Internet
-		class_CS = 2, // the CSNET class (Obsolete - used only for examples in some obsolete RFCs)
-		class_CH = 3, // the CHAOS class
-		class_HS = 4, // Hesiod [Dyer 87]
-		class_Question_ANY = 255 // any class
-	};
-	SLIB_INLINE sl_uint16 getClass() const
-	{
-		return _class;
+		return (DnsClass)(_class);
 	}
-	SLIB_INLINE void setClass(sl_uint16 cls)
+	SLIB_INLINE void setClass(DnsClass cls)
 	{
 		_class = cls;
 	}
@@ -360,17 +365,17 @@ private:
 	sl_uint16 _class;
 };
 
-class SLIB_EXPORT DNS_QuestionRecord : public DNS_Record
+class SLIB_EXPORT DnsQuestionRecord : public DnsRecord
 {
 public:
 	sl_uint32 parseRecord(const void* buf, sl_uint32 offset, sl_uint32 size);
 	sl_uint32 buildRecord(void* buf, sl_uint32 offset, sl_uint32 size);
 };
 
-class SLIB_EXPORT DNS_ResponseRecord : public DNS_Record
+class SLIB_EXPORT DnsResponseRecord : public DnsRecord
 {
 public:
-	DNS_ResponseRecord();
+	DnsResponseRecord();
 	
 public:
 	SLIB_INLINE sl_uint32 getTTL() const

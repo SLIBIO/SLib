@@ -53,19 +53,19 @@ void Thread::_nativeSetPriority()
 	HANDLE hThread = (HANDLE)m_handle;
 	if (hThread) {
 		switch (m_priority) {
-		case Thread::priorityNormal:
+		case threadPriority_Normal:
 			SetThreadPriority(hThread, THREAD_PRIORITY_NORMAL);
 			break;
-		case Thread::priorityAboveNormal:
+		case threadPriority_AboveNormal:
 			SetThreadPriority(hThread, THREAD_PRIORITY_ABOVE_NORMAL);
 			break;
-		case Thread::priorityHighest:
+		case threadPriority_Highest:
 			SetThreadPriority(hThread, THREAD_PRIORITY_HIGHEST);
 			break;
-		case Thread::priorityBelowNormal:
+		case threadPriority_BelowNormal:
 			SetThreadPriority(hThread, THREAD_PRIORITY_BELOW_NORMAL);
 			break;
-		case Thread::priorityLowest:
+		case threadPriority_Lowest:
 			SetThreadPriority(hThread, THREAD_PRIORITY_LOWEST);
 			break;
 		}

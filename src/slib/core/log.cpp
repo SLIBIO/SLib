@@ -37,6 +37,7 @@ public:
 	SLIB_INLINE ConsoleLogger() {}
 	
 public:
+	// override
 	void log(const String& tag, const String& content)
 	{
 #if defined(SLIB_PLATFORM_IS_ANDROID)
@@ -51,6 +52,7 @@ public:
 #endif
 	}
 	
+	// override
 	void logError(const String& tag, const String& content)
 	{
 #if defined(SLIB_PLATFORM_IS_ANDROID)

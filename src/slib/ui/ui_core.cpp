@@ -107,15 +107,15 @@ UIApp::~UIApp()
 {
 }
 
-Application::Type UIApp::getAppType()
+AppType UIApp::getAppType()
 {
-	return typeUI;
+	return appType_UI;
 }
 
 Ref<UIApp> UIApp::getApp()
 {
 	Ref<Application> app(Application::getApp());
-	if (app.isNotNull() && app->getAppType() == typeUI) {
+	if (app.isNotNull() && app->getAppType() == appType_UI) {
 		return Ref<UIApp>::from(app);
 	}
 	return Ref<UIApp>::null();

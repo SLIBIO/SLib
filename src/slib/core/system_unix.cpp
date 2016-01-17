@@ -101,9 +101,9 @@ sl_uint32 System::getTickCount()
 }
 
 #if !defined(SLIB_PLATFORM_IS_MOBILE)
-List<String>& _System_getGlobalUniqueInstances()
+CList<String>& _System_getGlobalUniqueInstances()
 {
-	SLIB_SAFE_STATIC_REF(List<String>, lst);
+	SLIB_SAFE_STATIC(CList<String>, lst);
 	return lst;
 }
 
@@ -119,7 +119,7 @@ void* System::createGlobalUniqueInstance(const String& uniqueName)
 		return sl_null;
 	}
 	String name = File::makeSafeFileName(uniqueName);
-	List<String>& lst = _System_getGlobalUniqueInstances();
+	CList<String>& lst = _System_getGlobalUniqueInstances();
 	if (lst.indexOf(name) >= 0) {
 		return sl_null;
 	}
@@ -150,7 +150,7 @@ void System::freeGlobalUniqueInstance(void* instance)
 			l->file->unlock();
 			l->file->close();
 			File::deleteFile(l->file->getPath());
-			List<String>& lst = _System_getGlobalUniqueInstances();
+			CList<String>& lst = _System_getGlobalUniqueInstances();
 			lst.removeValue(l->name);
 			delete l;
 		}

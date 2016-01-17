@@ -22,10 +22,13 @@ public:
 	SHA1();
 
 public:
+	// override
 	void start();
 	
+	// override
 	void update(const void* input, sl_size n);
 	
+	// override
 	void finish(void* output);
 
 private:

@@ -11,9 +11,7 @@ SLIB_NAMESPACE_BEGIN
 class SLIB_EXPORT Runnable : public Object
 {
 	SLIB_DECLARE_OBJECT(Runnable, Object)
-public:
-	Runnable() {}
-
+	
 public:
 	virtual void run() = 0;
 };

@@ -10,20 +10,20 @@ void IAsyncTcpSocketListener::onConnect(AsyncTcpSocket* socket, const SocketAddr
 {
 }
 
-void IAsyncTcpSocketListener::onReceive(AsyncTcpSocket* socket, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError)
+void IAsyncTcpSocketListener::onReceive(AsyncTcpSocket* socket, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError)
 {
 }
 
-void IAsyncTcpSocketListener::onSend(AsyncTcpSocket* socket, void* data, sl_uint32 sizeSent, Referable* ref, sl_bool flagError)
+void IAsyncTcpSocketListener::onSend(AsyncTcpSocket* socket, void* data, sl_uint32 sizeSent, const Referable* ref, sl_bool flagError)
 {
 }
 
-void IAsyncTcpSocketListener::onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError)
+void IAsyncTcpSocketListener::onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError)
 {
 	onReceive((AsyncTcpSocket*)stream, data, sizeRead, ref, flagError);
 }
 
-void IAsyncTcpSocketListener::onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError)
+void IAsyncTcpSocketListener::onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, const Referable* ref, sl_bool flagError)
 {
 	onSend((AsyncTcpSocket*)stream, data, sizeWritten, ref, flagError);
 }
@@ -46,7 +46,7 @@ sl_bool AsyncTcpSocketInstance::connect(const SocketAddress& address, const Ptr<
 	return sl_true;
 }
 
-sl_bool AsyncTcpSocketInstance::receive(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, Referable* refData)
+sl_bool AsyncTcpSocketInstance::receive(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, const Referable* refData)
 {
 	if (size == 0) {
 		return sl_false;
@@ -59,7 +59,7 @@ sl_bool AsyncTcpSocketInstance::receive(void* data, sl_uint32 size, const Ptr<IA
 	return sl_false;
 }
 
-sl_bool AsyncTcpSocketInstance::send(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, Referable* refData)
+sl_bool AsyncTcpSocketInstance::send(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, const Referable* refData)
 {
 	if (size == 0) {
 		return sl_false;
@@ -143,10 +143,10 @@ sl_bool AsyncTcpSocket::connect(const SocketAddress& _address, const Ptr<IAsyncT
 		Ref<Socket> socket = instance->getSocket();
 		if (socket.isNotNull()) {
 			if (instance->isSupportingConnect()) {
-				Socket::Type type = socket->getType();
+				SocketType type = socket->getType();
 				SocketAddress addr = address;
-				if (addr.ip.isIPv4() && type == Socket::typeTcp_IPv4) {
-				} else if ((addr.ip.isIPv4() || addr.ip.isIPv6()) && type == Socket::typeTcp_IPv6) {
+				if (addr.ip.isIPv4() && type == socketType_Tcp) {
+				} else if ((addr.ip.isIPv4() || addr.ip.isIPv6()) && type == socketType_TcpIPv6) {
 					if (addr.ip.isIPv4()) {
 						addr.ip = IPv6Address(addr.ip.getIPv4());
 					}
@@ -181,7 +181,7 @@ void AsyncTcpSocket::_connectCallback(SocketAddress address, Ptr<IAsyncTcpSocket
 	}
 }
 
-sl_bool AsyncTcpSocket::receive(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, Referable* refData)
+sl_bool AsyncTcpSocket::receive(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, const Referable* refData)
 {
 	Ref<AsyncLoop> loop = getLoop();
 	if (loop.isNull()) {
@@ -197,7 +197,7 @@ sl_bool AsyncTcpSocket::receive(void* data, sl_uint32 size, const Ptr<IAsyncTcpS
 	return sl_false;
 }
 
-sl_bool AsyncTcpSocket::send(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, Referable* refData)
+sl_bool AsyncTcpSocket::send(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, const Referable* refData)
 {
 	Ref<AsyncLoop> loop = getLoop();
 	if (loop.isNull()) {
@@ -254,7 +254,7 @@ Ref<AsyncTcpSocket> AsyncTcpSocket::create(const SocketAddress& _addressBind, co
 	if (addressBind.ip.isIPv6()) {
 		socket = Socket::openTcp_IPv6();
 	} else {
-		socket = Socket::openTcp_IPv4();
+		socket = Socket::openTcp();
 	}
 	if (socket.isNotNull()) {
 		if (addressBind.ip.isNotNone() || addressBind.port != 0) {
@@ -440,7 +440,7 @@ Ref<AsyncTcpServer> AsyncTcpServer::create(const SocketAddress& _addressListen, 
 	if (addressListen.ip.isIPv6()) {
 		socket = Socket::openTcp_IPv6();
 	} else {
-		socket = Socket::openTcp_IPv4();
+		socket = Socket::openTcp();
 	}
 	if (socket.isNotNull()) {
 		
@@ -504,7 +504,7 @@ AsyncUdpSocketInstance::~AsyncUdpSocketInstance()
 {
 }
 
-sl_bool AsyncUdpSocketInstance::receiveFrom(void* data, sl_uint32 size, const Ptr<IAsyncUdpSocketListener>& listener, Referable* refData)
+sl_bool AsyncUdpSocketInstance::receiveFrom(void* data, sl_uint32 size, const Ptr<IAsyncUdpSocketListener>& listener, const Referable* refData)
 {
 	if (size == 0) {
 		return sl_false;
@@ -521,7 +521,7 @@ sl_bool AsyncUdpSocketInstance::receiveFrom(void* data, sl_uint32 size, const Pt
 	return sl_false;
 }
 
-sl_bool AsyncUdpSocketInstance::sendTo(const SocketAddress& address, void* data, sl_uint32 size, const Ptr<IAsyncUdpSocketListener>& listener, Referable* refData)
+sl_bool AsyncUdpSocketInstance::sendTo(const SocketAddress& address, void* data, sl_uint32 size, const Ptr<IAsyncUdpSocketListener>& listener, const Referable* refData)
 {
 	if (size == 0) {
 		return sl_false;
@@ -598,7 +598,7 @@ void AsyncUdpSocket::setBroadcast(sl_bool flag)
 	}
 }
 
-sl_bool AsyncUdpSocket::receiveFrom(void* data, sl_uint32 size, const Ptr<IAsyncUdpSocketListener>& listener, Referable* refData)
+sl_bool AsyncUdpSocket::receiveFrom(void* data, sl_uint32 size, const Ptr<IAsyncUdpSocketListener>& listener, const Referable* refData)
 {
 	Ref<AsyncLoop> loop = getLoop();
 	if (loop.isNull()) {
@@ -614,7 +614,7 @@ sl_bool AsyncUdpSocket::receiveFrom(void* data, sl_uint32 size, const Ptr<IAsync
 	return sl_false;
 }
 
-sl_bool AsyncUdpSocket::sendTo(const SocketAddress& address, void* data, sl_uint32 size, const Ptr<IAsyncUdpSocketListener>& listener, Referable* refData)
+sl_bool AsyncUdpSocket::sendTo(const SocketAddress& address, void* data, sl_uint32 size, const Ptr<IAsyncUdpSocketListener>& listener, const Referable* refData)
 {
 	Ref<AsyncLoop> loop = getLoop();
 	if (loop.isNull()) {
@@ -667,7 +667,7 @@ Ref<AsyncUdpSocket> AsyncUdpSocket::create(const SocketAddress& _addressBind, co
 	if (addressBind.ip.isIPv6()) {
 		socket = Socket::openUdp_IPv6();
 	} else {
-		socket = Socket::openUdp_IPv4();
+		socket = Socket::openUdp();
 	}
 	if (socket.isNotNull()) {
 		if (addressBind.ip.isNotNone() || addressBind.port != 0) {

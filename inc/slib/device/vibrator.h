@@ -9,9 +9,15 @@ SLIB_DEVICE_NAMESPACE_BEGIN
 
 class SLIB_EXPORT Vibrator : public Object
 {
+	SLIB_DECLARE_OBJECT(Vibrator, Object);
+	
 public:
-	static sl_bool vibrate(sl_int32 millisec);
-	static sl_bool cancel();
+	static Ref<Vibrator> create();
+	
+public:
+	virtual sl_bool vibrate(sl_int32 millisec) = 0;
+	
+	virtual sl_bool cancel() = 0;
 };
 
 SLIB_DEVICE_NAMESPACE_END

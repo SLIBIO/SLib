@@ -145,51 +145,60 @@
 #include "tcpip.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
-enum ICMP_Type
+
+enum IcmpType
 {
-	ICMP_Type_EchoReply = 0,
-	ICMP_Type_DestinationUnreachable = 3,
-	ICMP_Type_Redirect = 5,
-	ICMP_Type_Echo = 8,
-	ICMP_Type_TimeExceeded = 11,
-	ICMP_Type_ParameterProblem = 12,
-	ICMP_Type_Timestamp = 13,
-	ICMP_Type_TimestampReply = 14
+	icmpType_EchoReply = 0,
+	icmpType_DestinationUnreachable = 3,
+	icmpType_Redirect = 5,
+	icmpType_Echo = 8,
+	icmpType_TimeExceeded = 11,
+	icmpType_ParameterProblem = 12,
+	icmpType_Timestamp = 13,
+	icmpType_TimestampReply = 14
 };
 
-class SLIB_EXPORT ICMP_HeaderFormat
+class SLIB_EXPORT IcmpHeaderFormat
 {
 public:
-	SLIB_INLINE sl_uint8 getType() const
+	SLIB_INLINE IcmpType getType() const
 	{
-		return _type;
+		return (IcmpType)_type;
 	}
-	SLIB_INLINE void setType(sl_uint8 type)
+    
+	SLIB_INLINE void setType(IcmpType type)
 	{
-		_type = type;
+		_type = (sl_uint8)type;
 	}
 
+    
 	SLIB_INLINE sl_uint8 getCode() const
 	{
 		return _code;
 	}
+    
 	SLIB_INLINE void setCode(sl_uint8 code)
 	{
 		_code = code;
 	}
 
+    
 	SLIB_INLINE sl_uint16 getChecksum() const
 	{
 		return MIO::readUint16BE(_checksum);
 	}
+    
 	SLIB_INLINE void setChecksum(sl_uint16 checksum)
 	{
 		MIO::writeUint16BE(_checksum, checksum);
 	}
 
+    
 	void updateChecksum(sl_uint32 sizeContent);
+    
 	sl_bool checkChecksum(sl_uint32 sizeContent) const;
 
+    
 	SLIB_INLINE sl_uint16 getEchoIdentifier() const
 	{
 		return MIO::readUint16BE(_rest);
@@ -200,6 +209,7 @@ public:
 		MIO::writeUint16BE(_rest, id);
 	}
 
+    
 	SLIB_INLINE sl_uint16 getEchoSequenceNumber() const
 	{
 		return MIO::readUint16BE(_rest + 2);
@@ -210,6 +220,7 @@ public:
 		MIO::writeUint16BE(_rest + 2, sn);
 	}
 
+    
 	SLIB_INLINE IPv4Address getRedirectGatewayAddress() const
 	{
 		return IPv4Address(_rest);
@@ -220,6 +231,7 @@ public:
 		address.get(_rest);
 	}
 
+    
 	SLIB_INLINE sl_uint8 getParameterProblemPointer() const
 	{
 		return _rest[0];
@@ -230,6 +242,7 @@ public:
 		_rest[0] = pointer;
 	}
 
+    
 	SLIB_INLINE sl_uint16 getTimestampIdentifier() const
 	{
 		return MIO::readUint16BE(_rest);
@@ -240,6 +253,7 @@ public:
 		MIO::writeUint16BE(_rest, id);
 	}
 
+    
 	SLIB_INLINE sl_uint16 getTimestampSequenceNumber() const
 	{
 		return MIO::readUint16BE(_rest + 2);
@@ -250,15 +264,18 @@ public:
 		MIO::writeUint16BE(_rest + 2, sn);
 	}
 
+    
 	SLIB_INLINE const sl_uint8* getContent() const
 	{
-		return (const sl_uint8*)(this) + sizeof(sizeof(ICMP_HeaderFormat));
+		return (const sl_uint8*)(this) + sizeof(sizeof(IcmpHeaderFormat));
 	}
+    
 	SLIB_INLINE sl_uint8* getContent()
 	{
-		return (sl_uint8*)(this) + sizeof(sizeof(ICMP_HeaderFormat));
+		return (sl_uint8*)(this) + sizeof(sizeof(IcmpHeaderFormat));
 	}
 
+    
 	sl_bool check(sl_uint32 sizeContent) const;
 
 private:
@@ -268,7 +285,7 @@ private:
 	sl_uint8 _rest[4];
 };
 
-class SLIB_EXPORT ICMP_EchoAddress
+class SLIB_EXPORT IcmpEchoAddress
 {
 public:
 	IPv4Address ip;
@@ -276,31 +293,32 @@ public:
 	sl_uint16 sequenceNumber;
 
 public:
-	sl_bool operator==(const ICMP_EchoAddress& other) const;
-	SLIB_INLINE sl_bool operator!=(const ICMP_EchoAddress& other) const
+	sl_bool operator==(const IcmpEchoAddress& other) const;
+    
+	SLIB_INLINE sl_bool operator!=(const IcmpEchoAddress& other) const
 	{
 		return !(*this == other);
 	}
 
-	int compare(const ICMP_EchoAddress& other) const;
+	int compare(const IcmpEchoAddress& other) const;
 
 	sl_uint32 hashCode() const;
 };
 
 template <>
-SLIB_INLINE int Compare<ICMP_EchoAddress>::compare(const ICMP_EchoAddress& a, const ICMP_EchoAddress& b)
+SLIB_INLINE int Compare<IcmpEchoAddress>::compare(const IcmpEchoAddress& a, const IcmpEchoAddress& b)
 {
 	return a.compare(b);
 }
 
 template <>
-SLIB_INLINE sl_bool Compare<ICMP_EchoAddress>::equals(const ICMP_EchoAddress& a, const ICMP_EchoAddress& b)
+SLIB_INLINE sl_bool Compare<IcmpEchoAddress>::equals(const IcmpEchoAddress& a, const IcmpEchoAddress& b)
 {
 	return a == b;
 }
 
 template <>
-SLIB_INLINE sl_uint32 Hash<ICMP_EchoAddress>::hash(const ICMP_EchoAddress& a)
+SLIB_INLINE sl_uint32 Hash<IcmpEchoAddress>::hash(const IcmpEchoAddress& a)
 {
 	return a.hashCode();
 }

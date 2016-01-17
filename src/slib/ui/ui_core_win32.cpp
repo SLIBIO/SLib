@@ -171,13 +171,13 @@ LRESULT CALLBACK _CustomizedMsgBox_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
 		::SetWindowTextW(hWndMsg, (LPCWSTR)(caption.getBuf()));
 
 		switch (param.type) {
-		case AlertParam::typeOk:
+		case alertType_Ok:
 			if (param.titleOk.isNotNull()) {
 				String16 titleOk = param.titleOk;
 				::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleOk.getBuf()));
 			}
 			break;
-		case AlertParam::typeOkCancel:
+		case alertType_OkCancel:
 			if (param.titleOk.isNotNull()) {
 				String16 titleOk = param.titleOk;
 				::SetDlgItemTextW(hWndMsg, 1, (LPCWSTR)(titleOk.getBuf()));
@@ -187,7 +187,7 @@ LRESULT CALLBACK _CustomizedMsgBox_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
 				::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleCancel.getBuf()));
 			}
 			break;
-		case AlertParam::typeYesNo:
+		case alertType_YesNo:
 			if (param.titleYes.isNotNull()) {
 				String16 titleYes = param.titleYes;
 				::SetDlgItemTextW(hWndMsg, 6, (LPCWSTR)(titleYes.getBuf()));
@@ -197,7 +197,7 @@ LRESULT CALLBACK _CustomizedMsgBox_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
 				::SetDlgItemTextW(hWndMsg, 7, (LPCWSTR)(titleNo.getBuf()));
 			}
 			break;
-		case AlertParam::typeYesNoCancel:
+		case alertType_YesNoCancel:
 			if (param.titleYes.isNotNull()) {
 				String16 titleYes = param.titleYes;
 				::SetDlgItemTextW(hWndMsg, 6, (LPCWSTR)(titleYes.getBuf()));
@@ -220,13 +220,13 @@ void _UI_AlertProc(AlertParam param)
 {
 	int style = MB_OK;
 	switch (param.type) {
-	case AlertParam::typeOkCancel:
+	case alertType_OkCancel:
 		style = MB_OKCANCEL;
 		break;
-	case AlertParam::typeYesNo:
+	case alertType_YesNo:
 		style = MB_YESNO;
 		break;
-	case AlertParam::typeYesNoCancel:
+	case alertType_YesNoCancel:
 		style = MB_YESNOCANCEL;
 		break;
 	}

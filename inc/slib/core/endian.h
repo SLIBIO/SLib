@@ -167,6 +167,7 @@ public:
 		}
 	}
 };
+
 SLIB_NAMESPACE_END
 
 #endif //CHECKHEADER_SLIB_CORE_ENDIAN

@@ -2,51 +2,67 @@
 #define CHECKHEADER_SLIB_MEDIA_CODEC_OPUS
 
 #include "definition.h"
+
 #include "audio_codec.h"
+
+/*
+	Opus audio codec (RFC 6716)
+ ------------------------------------
+ 
+ one frame is (2.5, 5, 10, 20, 40 or 60 ms) of audio data
+ 
+*/
 
 SLIB_MEDIA_NAMESPACE_BEGIN
 
-struct SLIB_EXPORT AudioOpusEncoderParam
+enum OpusEncoderType {
+	opusEncoderType_Voice = 0,
+	opusEncoderType_Music = 1
+};
+
+class SLIB_EXPORT OpusEncoderParam
 {
-	enum Type {
-		typeVoice = 0,
-		typeMusic = 1
-	};
+public:
 	sl_uint32 samplesPerSecond;
 	sl_uint32 channelsCount;
 	sl_uint32 bitsPerSecond;
-	Type type;
+	
+    OpusEncoderType type;
 
-	AudioOpusEncoderParam();
+public:
+	OpusEncoderParam();
 };
 
-class SLIB_EXPORT AudioOpusEncoder : public AudioEncoder
+class SLIB_EXPORT OpusEncoder : public AudioEncoder
 {
 public:
-	AudioOpusEncoder();
+	static Ref<OpusEncoder> create(const OpusEncoderParam& param);
 	
 public:
-	static Ref<AudioOpusEncoder> create(const AudioOpusEncoderParam& param);
 	static sl_bool isValidSamplingRate(sl_uint32 nSamplesPerSecond);
+	
 };
 
-struct SLIB_EXPORT AudioOpusDecoderParam
+class SLIB_EXPORT OpusDecoderParam
 {
+public:
 	sl_uint32 samplesPerSecond;
 	sl_uint32 channelsCount;
 
-	AudioOpusDecoderParam();
+public:
+	OpusDecoderParam();
 };
 
-class SLIB_EXPORT AudioOpusDecoder : public AudioDecoder
+class SLIB_EXPORT OpusDecoder : public AudioDecoder
 {
 public:
-	AudioOpusDecoder();
+	static Ref<OpusDecoder> create(const OpusDecoderParam& param);
 	
 public:
-	static Ref<AudioOpusDecoder> create(const AudioOpusDecoderParam& param);
 	static sl_bool isValidSamplingRate(sl_uint32 nSamplesPerSecond);
+	
 };
+
 SLIB_MEDIA_NAMESPACE_END
 
 #endif

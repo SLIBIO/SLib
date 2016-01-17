@@ -49,6 +49,7 @@ public:
 		bottom = pt.y + size.y;
 	}
 	
+public:
 	template <class O>
 	SLIB_INLINE RectangleT<T>& operator=(const RectangleT<O>& other)
 	{
@@ -350,12 +351,12 @@ public:
 	}
 	
 	// 4 points
-	void getCornerPoints(PointT<T>* out) const
+	void getCornerPoints(PointT<T>* _out) const
 	{
-		out[0].x = left; out[0].y = top;
-		out[1].x = right; out[1].y = top;
-		out[2].x = left; out[2].y = bottom;
-		out[3].x = right; out[3].y = bottom;
+		_out[0].x = left; _out[0].y = top;
+		_out[1].x = right; _out[1].y = top;
+		_out[2].x = left; _out[2].y = bottom;
+		_out[3].x = right; _out[3].y = bottom;
 	}
 };
 

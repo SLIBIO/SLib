@@ -46,12 +46,12 @@ public:
 		Base::copyMemory(_macSource, address.m, 6);
 	}
 
-	// NetworkLinkProtocolType
+	// NetworkLinkProtocol
 	SLIB_INLINE sl_uint16 getProtocol() const
 	{
 		return MIO::readUint16BE(_etherType);
 	}
-	// NetworkLinkProtocolType
+	// NetworkLinkProtocol
 	SLIB_INLINE void setProtocol(sl_uint16 type)
 	{
 		MIO::writeUint16BE(_etherType, type);

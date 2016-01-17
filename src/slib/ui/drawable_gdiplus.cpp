@@ -34,7 +34,7 @@ public:
 		}
 	}
 	
-	static Ref<_Gdiplus_ImageDrawable> create(Gdiplus::Image* image, sl_bool flagFreeOnRelease, Referable* ref)
+	static Ref<_Gdiplus_ImageDrawable> create(Gdiplus::Image* image, sl_bool flagFreeOnRelease, const Referable* ref)
 	{
 		Ref<_Gdiplus_ImageDrawable> ret;
 		if (image) {
@@ -75,7 +75,7 @@ public:
 	}
 };
 
-Ref<Drawable> UIPlatform::createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease, Referable* ref)
+Ref<Drawable> UIPlatform::createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease, const Referable* ref)
 {
 	return _Gdiplus_ImageDrawable::create(image, flagFreeOnRelease, ref);
 }
@@ -208,7 +208,7 @@ public:
 			data.PixelFormat = PixelFormat32bppARGB;
 
 			BitmapData src(dst);
-			src.format = bitmapFormatBGRA;
+			src.format = bitmapFormat_BGRA;
 
 			result = m_bitmap->LockBits(&rc, Gdiplus::ImageLockModeRead | Gdiplus::ImageLockModeUserInputBuf, PixelFormat32bppARGB, &data);
 			if (result == Gdiplus::Ok) {
@@ -237,7 +237,7 @@ public:
 			if (result == Gdiplus::Ok) {
 
 				BitmapData src(width, height, buf);
-				src.format = bitmapFormatBGRA;
+				src.format = bitmapFormat_BGRA;
 				dst.copyPixelsFrom(src);
 
 				m_bitmap->UnlockBits(&data);
@@ -276,7 +276,7 @@ public:
 		Gdiplus::Rect rc(x, y, width, height);
 		Gdiplus::Status result;
 
-		if (src.format == bitmapFormatBGRA) {
+		if (src.format == bitmapFormat_BGRA) {
 
 			Gdiplus::BitmapData data;
 			data.Width = width;
@@ -310,7 +310,7 @@ public:
 			if (result == Gdiplus::Ok) {
 
 				BitmapData dst(width, height, buf);
-				dst.format = bitmapFormatBGRA;
+				dst.format = bitmapFormat_BGRA;
 				dst.copyPixelsFrom(src);
 
 				m_bitmap->UnlockBits(&data);

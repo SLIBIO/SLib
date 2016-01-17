@@ -4,18 +4,10 @@
 #include "../../../inc/slib/math/transform2d.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
-Canvas::Canvas()
-{
-}
 
 Ref<GraphicsContext> Canvas::getGraphicsContext()
 {
 	return m_context;
-}
-
-void Canvas::setGraphicsContext(const Ref<GraphicsContext>& context)
-{
-	m_context = context;
 }
 
 void Canvas::clipToRoundRect(const Rectangle& rect, const Size& radius)
@@ -111,7 +103,7 @@ void Canvas::draw(sl_real xDst, sl_real yDst, const Ref<Drawable>& src)
 
 Size Canvas::getTextSize(const Ref<Font>& font, const String &text)
 {
-	Ref<GraphicsContext> context = getGraphicsContext();
+	Ref<GraphicsContext> context = m_context;
 	if (context.isNotNull()) {
 		return context->getFontTextSize(font, text);
 	} else {
@@ -133,7 +125,7 @@ void Canvas::drawText(const String& text, const Rectangle& rcDst, const Ref<Font
 	drawText(text, pt.x, pt.y, font, color);
 }
 
-void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleType scaleType, Alignment alignment)
+void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleMode scaleMode, Alignment alignment)
 {
 	Canvas* canvas = this;
 	if (source.isNotNull()) {
@@ -144,13 +136,13 @@ void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleTy
 		if (dw > 0 && dh > 0 && sw > 0 && sh > 0) {
 			Rectangle rectSrc;
 			Rectangle rectDraw;
-			if (scaleType == scaleTypeStretch) {
+			if (scaleMode == scaleMode_Stretch) {
 				rectSrc.left = 0;
 				rectSrc.top = 0;
 				rectSrc.right = sw;
 				rectSrc.bottom = sh;
 				rectDraw = rectDst;
-			} else if (scaleType == scaleTypeContain) {
+			} else if (scaleMode == scaleMode_Contain) {
 				sl_real fw = dw / sw;
 				sl_real fh = dh / sh;
 				sl_real tw, th;
@@ -170,7 +162,7 @@ void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleTy
 				rectDraw.top = pt.y;
 				rectDraw.right = rectDraw.left + tw;
 				rectDraw.bottom = rectDraw.top + th;
-			} else if (scaleType == scaleTypeCover) {
+			} else if (scaleMode == scaleMode_Cover) {
 				sl_real fw = sw / dw;
 				sl_real fh = sh / dh;
 				sl_real tw, th;
@@ -219,4 +211,5 @@ CanvasStatusScope::~CanvasStatusScope()
 		canvas->restore();
 	}
 }
+
 SLIB_GRAPHICS_NAMESPACE_END

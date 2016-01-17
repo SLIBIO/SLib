@@ -17,7 +17,9 @@ public:
 	T w;
 	
 public:
-	SLIB_INLINE QuaternionT() {}
+	SLIB_INLINE QuaternionT()
+	{
+	}
 	
 	SLIB_INLINE QuaternionT(T x, T y, T z, T w)
 	{
@@ -44,6 +46,7 @@ public:
 		w = other.w;
 	}
 	
+public:
 	SLIB_INLINE const Vector4T<T>& toVector4() const
 	{
 		return *((Vector4T<T>*)this);
@@ -63,6 +66,7 @@ public:
 		return *((QuaternionT<T>*)((void*)_identity));
 	}
 	
+public:
 	SLIB_INLINE sl_bool operator==(const QuaternionT<T>& other) const
 	{
 		return ((x == other.x) && (y == other.y) && (z == other.z) && (w == other.w));

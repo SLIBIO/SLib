@@ -15,9 +15,6 @@ private:
 	Mutex m_locker;
 
 public:
-	SLIB_INLINE Object() {}
-
-public:
 	SLIB_INLINE Mutex* getLocker() const
 	{
 		return (Mutex*)(&m_locker);

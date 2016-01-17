@@ -72,16 +72,17 @@ Ref<SocketEvent> SocketEvent::create(const Ref<Socket>& socket, sl_uint32 events
 
 Ref<SocketEvent> SocketEvent::createRead(const Ref<Socket>& socket)
 {
-	return SocketEvent::create(socket, eventRead | eventClose);
+	return SocketEvent::create(socket, socketEventType_Read | socketEventType_Close);
 }
 
 Ref<SocketEvent> SocketEvent::createWrite(const Ref<Socket>& socket)
 {
-	return SocketEvent::create(socket, eventWrite | eventClose);
+	return SocketEvent::create(socket, socketEventType_Write | socketEventType_Close);
 }
 
 Ref<SocketEvent> SocketEvent::createReadWrite(const Ref<Socket>& socket)
 {
-	return SocketEvent::create(socket, eventRead | eventWrite | eventClose);
+	return SocketEvent::create(socket, socketEventType_Read | socketEventType_Write | socketEventType_Close);
 }
+
 SLIB_NETWORK_NAMESPACE_END

@@ -30,6 +30,7 @@ public:
 	{
 	}
 	
+public:
 	template <class O>
 	SLIB_INLINE ViewFrustumT<T>& operator=(const ViewFrustumT<O>& other)
 	{
@@ -37,6 +38,7 @@ public:
 		return *this;
 	}
 	
+public:
 	SLIB_INLINE static const ViewFrustumT<T>& fromMVP(const Matrix4T<T>& MVP)
 	{
 		return *((ViewFrustumT<T>*)(void*)&MVP);

@@ -3,13 +3,13 @@
 SLIB_UI_NAMESPACE_BEGIN
 RenderView::RenderView()
 {
-	setPreferredEngineType(RenderEngine::OPENGL_ES);
-	m_renderMode = renderModeContinuously;
+	setPreferredEngineType(renderEngineType_OpenGL_ES);
+	m_redrawMode = redrawMode_Continuously;
 }
 
-RenderView::RenderMode RenderView::getRenderMode()
+RedrawMode RenderView::getRedrawMode()
 {
-	return m_renderMode;
+	return m_redrawMode;
 }
 
 void RenderView::onAttach()

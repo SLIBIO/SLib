@@ -2,6 +2,7 @@
 #include "../../../inc/slib/core/math.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
+
 sl_real GraphicsUtil::calculateAlignX(sl_real leftDst, sl_real rightDst, sl_real widthSrc, Alignment align)
 {
 	sl_uint32 hAlign = align & alignHorizontalMask;
@@ -61,4 +62,5 @@ Rectangle GraphicsUtil::transformRectangle(const Rectangle& rectSrc, const Recta
 	ret.bottom = ret.top + h;
 	return ret;
 }
+
 SLIB_GRAPHICS_NAMESPACE_END

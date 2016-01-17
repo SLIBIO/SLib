@@ -640,31 +640,30 @@ class SLIB_EXPORT IStream : public IReader, public IWriter
 {
 };
 
+enum SeekPosition {
+	seekPosition_Current = 1,
+	seekPosition_Begin = 2,
+	seekPosition_End = 3
+};
 
 class SLIB_EXPORT ISeekable
 {
 public:
-	enum Position {
-		positionCurrent = 1,
-		positionBegin = 2,
-		positionEnd = 3
-	};
-
 	virtual sl_uint64 getPosition() = 0;
 	
 	virtual sl_uint64 getSize() = 0;
 	
-	virtual sl_bool seek(sl_int64 offset, Position pos = positionCurrent) = 0;
+	virtual sl_bool seek(sl_int64 offset, SeekPosition pos) = 0;
 
 public:
 	sl_bool seekToBegin()
 	{
-		return seek(0, positionBegin);
+		return seek(0, seekPosition_Begin);
 	}
 	
 	sl_bool seekToEnd()
 	{
-		return seek(0, positionEnd);
+		return seek(0, seekPosition_End);
 	}
 };
 
@@ -683,9 +682,6 @@ public:
 class SLIB_EXPORT IO : public Object, public IStream, public ISeekable, public IResizable, public IClosable
 {
 	SLIB_DECLARE_OBJECT(IO, Object)
-public:
-	SLIB_INLINE IO() {}
-
 };
 
 class SLIB_EXPORT MemoryIO : public IO
@@ -709,7 +705,9 @@ public:
 	~MemoryIO();
 
 public:
-	SLIB_INLINE void init(Memory mem, sl_bool flagResizable = sl_true)
+	void init(const void* data, sl_size size, sl_bool flagResizable = sl_true);
+
+	SLIB_INLINE void init(const Memory& mem, sl_bool flagResizable = sl_true)
 	{
 		init(mem.getBuf(), mem.getSize(), flagResizable);
 	}
@@ -719,40 +717,43 @@ public:
 		init(sl_null, size, flagResizable);
 	}
 	
-	void init(const void* data, sl_size size, sl_bool flagResizable = sl_true);
-
-	void close();
-
-	
-	sl_reg read(void* buf, sl_size size);
-
-	sl_reg write(const void* buf, sl_size size);
-
-	
-	sl_uint64 getPosition();
-	
-	sl_uint64 getSize();
-	
-	sl_bool seek(sl_int64 offset, Position pos = positionCurrent);
-
-	
-	sl_bool setSize(sl_uint64 size);
-
-	
+public:
 	SLIB_INLINE sl_size getOffset()
 	{
 		return m_offset;
 	}
-
+	
 	SLIB_INLINE sl_size getLength()
 	{
 		return m_size;
 	}
-
+	
 	SLIB_INLINE char* getBuffer()
 	{
 		return (char*)m_buf;
 	}
+
+public:
+	// override
+	void close();
+
+	// override
+	sl_reg read(void* buf, sl_size size);
+
+	// override
+	sl_reg write(const void* buf, sl_size size);
+	
+	// override
+	sl_uint64 getPosition();
+	
+	// override
+	sl_uint64 getSize();
+	
+	// override
+	sl_bool seek(sl_int64 offset, SeekPosition pos = seekPosition_Current);
+
+	// override
+	sl_bool setSize(sl_uint64 size);
 
 public:
 	SLIB_BOOLEAN_PROPERTY_INLINE(AutoExpandable)
@@ -781,32 +782,35 @@ public:
 	
 	void init(const void* buf, sl_size size);
 
-	
-	sl_reg read(void* buf, sl_size size);
-
-	
-	sl_uint64 getPosition();
-	
-	sl_uint64 getSize();
-	
-	sl_bool seek(sl_int64 offset, Position pos = positionCurrent);
-
-	
+public:
 	SLIB_INLINE sl_size getOffset()
 	{
 		return m_offset;
 	}
-
+	
 	SLIB_INLINE sl_size getLength()
 	{
 		return m_size;
 	}
-
+	
 	SLIB_INLINE char* getBuffer()
 	{
 		return (char*)m_buf;
 	}
-
+	
+public:
+	// override
+	sl_reg read(void* buf, sl_size size);
+	
+	// override
+	sl_uint64 getPosition();
+	
+	// override
+	sl_uint64 getSize();
+	
+	// override
+	sl_bool seek(sl_int64 offset, SeekPosition pos);
+	
 protected:
 	const void* m_buf;
 	sl_size m_size;
@@ -839,28 +843,15 @@ public:
 	void init(const Memory& mem);
 	
 	void init(void* buf, sl_size size);
-
 	
-	sl_reg write(const void* buf, sl_size size);
-	
-	sl_reg write(const Memory& mem);
-
-	
-	sl_uint64 getPosition();
-	
-	sl_uint64 getSize();
-	
-	sl_bool seek(sl_int64 offset, Position pos = positionCurrent);
-
-	
+public:
 	Memory getData();
-
 	
 	SLIB_INLINE MemoryBuffer& getMemoryBuffer()
 	{
 		return m_buffer;
 	}
-
+	
 	SLIB_INLINE sl_size getOffset()
 	{
 		if (m_buf) {
@@ -869,7 +860,7 @@ public:
 			return m_buffer.getSize();
 		}
 	}
-
+	
 	SLIB_INLINE sl_size getLength()
 	{
 		if (m_buf) {
@@ -878,12 +869,28 @@ public:
 			return m_buffer.getSize();
 		}
 	}
-
+	
 	SLIB_INLINE char* getBuffer()
 	{
 		return (char*)m_buf;
 	}
 
+public:
+	// override
+	sl_reg write(const void* buf, sl_size size);
+	
+	sl_reg write(const Memory& mem);
+	
+	// override
+	sl_uint64 getPosition();
+	
+	// override
+	sl_uint64 getSize();
+	
+	// override
+	sl_bool seek(sl_int64 offset, SeekPosition pos);
+
+	
 protected:
 	void* m_buf;
 	sl_size m_size;

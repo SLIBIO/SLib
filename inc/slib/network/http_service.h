@@ -125,7 +125,7 @@ protected:
 	void _processContext(Ref<HttpServiceContext> context);
 
 protected:
-	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError);
+	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError);
 	void onAsyncOutputComplete(AsyncOutput* output);
 	void onAsyncOutputError(AsyncOutput* output);
 };

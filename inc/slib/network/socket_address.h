@@ -20,7 +20,7 @@ private:
 	struct _SocketAddress
 	{
 		struct {
-			IPAddress::Type type;
+			IPAddressType type;
 			sl_uint8 data[_SLIB_NET_IPADDRESS_SIZE];
 		} ip;
 		sl_int32 port;
@@ -54,14 +54,26 @@ public:
 		this->ip = other.ip;
 		this->port = other.port;
 	}
-	
+
+public:
 	SLIB_INLINE SocketAddress& operator=(const SocketAddress& other)
 	{
 		this->ip = other.ip;
 		this->port = other.port;
 		return *this;
 	}
+	
+	SLIB_INLINE sl_bool operator==(const SocketAddress& other) const
+	{
+		return port == other.port && ip == other.ip;
+	}
+	
+	SLIB_INLINE sl_bool operator!=(const SocketAddress& other) const
+	{
+		return ! (*this == other);
+	}
 
+public:
 	static SLIB_INLINE const SocketAddress& none()
 	{
 		return *((SocketAddress*)((void*)(&_none)));
@@ -77,17 +89,9 @@ public:
 		return ip.isNone() || port == 0;
 	}
 
-	SLIB_INLINE sl_bool operator==(const SocketAddress& other) const
-	{
-		return port == other.port && ip == other.ip;
-	}
-	
-	SLIB_INLINE sl_bool operator!=(const SocketAddress& other) const
-	{
-		return ! (*this == other);
-	}
-
+public:
 	int compare(const SocketAddress& other) const;
+	
 	sl_uint32 hashCode() const;
 
 	/*
@@ -98,7 +102,9 @@ public:
 	String toString() const;
 	
 	static sl_int32 parse(SocketAddress* out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	
 	static sl_int32 parse(SocketAddress* out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	
 	sl_bool parse(const String& str);
 	
 	sl_uint32 getSystemSocketAddress(void* addr);

@@ -149,7 +149,7 @@ void UI::quitLoop()
 
 void UI::showAlert(const AlertParam& param)
 {
-	AlertParam::Type type = param.type;
+	AlertType type = param.type;
 	NSString* caption = Apple::getNSStringFromString(param.caption);
 	NSString* text = Apple::getNSStringFromString(param.text);
 	NSString* titleOk = Apple::getNSStringFromString(param.titleOk);
@@ -179,17 +179,17 @@ void UI::showAlert(const AlertParam& param)
 		[alert setMessageText:text];
 		[alert setAlertStyle:NSInformationalAlertStyle];
 		[[alert window] setTitle:caption];
-		if (type == AlertParam::typeOkCancel) {
+		if (type == alertType_OkCancel) {
 			[alert addButtonWithTitle:titleOk];
 			NSButton* btnCancel = [alert addButtonWithTitle:titleCancel];
 			[btnCancel setKeyEquivalent:@"Cancel"];
 			on2 = onCancel;
-		} else if (type == AlertParam::typeYesNo) {
+		} else if (type == alertType_YesNo) {
 			[alert addButtonWithTitle:titleYes];
 			NSButton* btnNo = [alert addButtonWithTitle:titleNo];
 			[btnNo setKeyEquivalent:@"Don't Save"];
 			on2 = onNo;
-		} else if (type == AlertParam::typeYesNoCancel) {
+		} else if (type == alertType_YesNoCancel) {
 			[alert addButtonWithTitle:titleYes];
 			NSButton* btnNo = [alert addButtonWithTitle:titleNo];
 			[btnNo setKeyEquivalent:@"Don't Save"];

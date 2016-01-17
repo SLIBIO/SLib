@@ -9,6 +9,7 @@
 #include "../../../inc/slib/core/scoped_pointer.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
+
 class _Win_SocketEvent : public SocketEvent
 {
 public:
@@ -45,13 +46,13 @@ public:
 	sl_bool __setup(sl_uint32 events)
 	{
 		sl_uint32 ev = 0;
-		if (events & eventRead) {
+		if (events & socketEventType_Read) {
 			ev = ev | FD_READ | FD_ACCEPT;
 		}
-		if (events & eventWrite) {
+		if (events & socketEventType_Write) {
 			ev = ev | FD_WRITE | FD_CONNECT;
 		}
-		if (events & eventClose) {
+		if (events & socketEventType_Close) {
 			ev = ev | FD_CLOSE;
 		}
 		int ret = ::WSAEventSelect((SOCKET)(m_socket->getHandle()), m_hEvent, ev);
@@ -114,13 +115,13 @@ sl_bool SocketEvent::__waitMultipleEvents(const Ref<SocketEvent>* events, sl_uin
 				sl_uint32 st = 0;
 				sl_uint32 le = ne.lNetworkEvents;
 				if (le & (FD_CONNECT | FD_WRITE)) {
-					st |= eventWrite;
+					st |= socketEventType_Write;
 				}
 				if (le & (FD_ACCEPT | FD_READ)) {
-					st |= eventRead;
+					st |= socketEventType_Read;
 				}
 				if (le & FD_CLOSE) {
-					st |= eventClose;
+					st |= socketEventType_Close;
 				}
 				if (status) {
 					status[index] = st;
@@ -131,5 +132,7 @@ sl_bool SocketEvent::__waitMultipleEvents(const Ref<SocketEvent>* events, sl_uin
 	}
     return sl_false;
 }
+
 SLIB_NETWORK_NAMESPACE_END
+
 #endif

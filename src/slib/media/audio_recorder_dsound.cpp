@@ -20,12 +20,12 @@ public:
 	IDirectSoundCapture8* m_device;
 	IDirectSoundCaptureBuffer8* m_buffer;
 	sl_uint32 m_nSamplesFrame;
-	sl_uint32 m_nSamplesBuffer;
 	HANDLE m_events[3];
 	Ref<Thread> m_thread;
 	sl_bool m_flagRunning;
 	sl_bool m_flagOpened;
 
+public:
 	_DirectSound_AudioRecorder()
 	{
 		m_flagOpened = sl_true;
@@ -38,6 +38,7 @@ public:
 		release();
 	}
 	
+public:
 	static void logError(String text)
 	{
 		SLIB_LOG_ERROR("AudioRecorder", text);
@@ -45,6 +46,10 @@ public:
 	
 	static Ref<_DirectSound_AudioRecorder> create(const AudioRecorderParam& param)
 	{
+		if (param.channelsCount != 1 && param.channelsCount != 2) {
+			return Ref<_DirectSound_AudioRecorder>::null();
+		}
+		
 		::CoInitializeEx(NULL, COINIT_MULTITHREADED);
 		
 		String deviceID = param.deviceId;
@@ -79,14 +84,14 @@ public:
 		
 		WAVEFORMATEX wf;
 		wf.wFormatTag = WAVE_FORMAT_PCM;
-		wf.nChannels = 1;
+		wf.nChannels = param.channelsCount;
 		wf.wBitsPerSample = 16;
 		wf.nSamplesPerSec = param.samplesPerSecond;
 		wf.nBlockAlign = wf.wBitsPerSample * wf.nChannels / 8;
 		wf.nAvgBytesPerSec = wf.nSamplesPerSec * wf.nBlockAlign;
 		wf.cbSize = 0;
 		
-		sl_uint32 samplesPerFrame = wf.nSamplesPerSec * param.frameLengthInMilliseconds / 1000;
+		sl_uint32 samplesPerFrame = wf.nSamplesPerSec * param.frameLengthInMilliseconds / 1000 * param.channelsCount;
 		sl_uint32 sizeBuffer = samplesPerFrame * wf.nBlockAlign * 2;
 		DSCBUFFERDESC desc;
 		desc.dwSize = sizeof(desc);
@@ -145,9 +150,12 @@ public:
 								ret->m_events[0] = hEvent0;
 								ret->m_events[1] = hEvent1;
 								ret->m_nSamplesFrame = samplesPerFrame;
-								ret->m_nSamplesBuffer = param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000;
-								ret->m_queue.setQueueSize(ret->m_nSamplesBuffer);
-								ret->setListener(param.listener);
+								
+								ret->m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000 * param.channelsCount);
+								ret->m_nChannels = param.channelsCount;
+								ret->m_listener = param.listener;
+								ret->m_event = param.event;
+								
 								if (param.flagAutoStart) {
 									ret->start();
 								}
@@ -261,7 +269,7 @@ public:
 			prop.szGuid = Windows::getStringFromGUID(*lpGUID);
 			prop.name = (sl_char16*)lpszDrvName;
 			prop.description = (sl_char16*)lpszDesc;
-			list.add(prop);
+			list.add_NoLock(prop);
 		}
 		return TRUE;
 	}
@@ -283,7 +291,7 @@ public:
 			} else {
 				n = dwSize / 2;
 			}
-			_processFrame_S16((sl_int16*)buf, n);
+			_processFrame((sl_int16*)buf, n);
 			m_buffer->Unlock(buf, dwSize, NULL, NULL);
 		}
 	}
@@ -308,14 +316,14 @@ Ref<AudioRecorder> DirectSound::createRecorder(const AudioRecorderParam& param)
 List<AudioRecorderInfo> DirectSound::getRecordersList()
 {
 	List<AudioRecorderInfo> ret;
-	ListLocker<_DirectSound_AudioRecorder::DeviceProperty> props(_DirectSound_AudioRecorder::queryDeviceInfos());
+	ListItems<_DirectSound_AudioRecorder::DeviceProperty> props(_DirectSound_AudioRecorder::queryDeviceInfos());
 	for (sl_size i = 0; i < props.count(); i++) {
 		_DirectSound_AudioRecorder::DeviceProperty& prop = props[i];
 		AudioRecorderInfo info;
 		info.id = prop.szGuid;
 		info.name = prop.name;
 		info.description = prop.description;
-		ret.add(info);
+		ret.add_NoLock(info);
 	}
 	return ret;
 }
@@ -324,6 +332,7 @@ SLIB_MEDIA_NAMESPACE_END
 #else
 
 SLIB_MEDIA_NAMESPACE_BEGIN
+
 Ref<AudioRecorder> DirectSound::createRecorder(const AudioRecorderParam& param)
 {
 	return Ref<AudioRecorder>::null();
@@ -333,6 +342,7 @@ List<AudioRecorderInfo> DirectSound::getRecordersList()
 {
 	return List<AudioRecorderInfo>::null();
 }
+
 SLIB_MEDIA_NAMESPACE_END
 
 #endif

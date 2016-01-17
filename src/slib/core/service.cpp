@@ -14,10 +14,10 @@ Service::Service()
 
 Service::~Service()
 {
-	release();
+	_release();
 }
 
-void Service::release()
+void Service::_release()
 {
 	Ref<Thread> thread = m_threadRun;
 	if (thread.isNotNull()) {
@@ -26,18 +26,9 @@ void Service::release()
 	}
 }
 
-Ref<Thread> Service::getThread()
+AppType Service::getAppType()
 {
-	return m_threadRun;
-}
-
-Ref<Service> Service::getApp()
-{
-	Ref<Application> app = Application::getApp();
-	if (app.isNotNull() && app->getAppType() == typeService) {
-		return Ref<Service>::from(app);
-	}
-	return Ref<Service>::null();
+	return appType_Service;
 }
 
 void Service::run(const String& command)
@@ -60,9 +51,18 @@ void Service::run()
 	Application::run();
 }
 
-Application::Type Service::getAppType()
+Ref<Thread> Service::getThread()
 {
-	return typeService;
+	return m_threadRun;
+}
+
+Ref<Service> Service::getApp()
+{
+	Ref<Application> app = Application::getApp();
+	if (app.isNotNull() && app->getAppType() == appType_Service) {
+		return Ref<Service>::from(app);
+	}
+	return Ref<Service>::null();
 }
 
 #define CHECK_MOBILE \
@@ -181,7 +181,7 @@ void Service::runService()
 		}
 	}
 	onStopService();
-	release();
+	_release();
 	System::freeGlobalUniqueInstance(appInst);
 }
 

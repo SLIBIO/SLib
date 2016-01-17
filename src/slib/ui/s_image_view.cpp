@@ -1,9 +1,10 @@
 #include "../../../inc/slib/ui/s_image_view.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 SImageView::SImageView()
 {
-	m_scaleType = scaleTypeStretch;
+	m_scaleMode = scaleMode_Stretch;
 	m_sourceAlignment = alignMiddleCenter;
 }
 
@@ -18,14 +19,14 @@ void SImageView::setSource(const Ref<Drawable>& source)
 	invalidate();
 }
 
-ScaleType SImageView::getScaleType()
+ScaleMode SImageView::getScaleMode()
 {
-	return m_scaleType;
+	return m_scaleMode;
 }
 
-void SImageView::setScaleType(ScaleType type)
+void SImageView::setScaleMode(ScaleMode mode)
 {
-	m_scaleType = type;
+	m_scaleMode = mode;
 	invalidate();
 }
 
@@ -42,6 +43,7 @@ void SImageView::setSourceAlignment(Alignment align)
 
 void SImageView::onDraw(Canvas* canvas)
 {
-	canvas->draw(getContentBounds(), m_source, m_scaleType, m_sourceAlignment);
+	canvas->draw(getContentBounds(), m_source, m_scaleMode, m_sourceAlignment);
 }
+
 SLIB_UI_NAMESPACE_END

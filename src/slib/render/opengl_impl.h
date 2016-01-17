@@ -74,11 +74,11 @@ void GL_BASE::setCullFace(sl_bool flagEnableCull, sl_bool flagCullCCW)
 static GLenum _GLES_getBlendingOp(sl_uint32 op)
 {
 	switch (op) {
-	case RenderBlendingParam::opAdd:
+	case renderBlendingOperation_Add:
 		return GL_FUNC_ADD;
-	case RenderBlendingParam::opSubtract:
+	case renderBlendingOperation_Subtract:
 		return GL_FUNC_SUBTRACT;
-	case RenderBlendingParam::opReverseSubtract:
+	case renderBlendingOperation_ReverseSubtract:
 		return GL_FUNC_REVERSE_SUBTRACT;
 	}
 	return GL_FUNC_ADD;
@@ -87,35 +87,35 @@ static GLenum _GLES_getBlendingOp(sl_uint32 op)
 static GLenum _GLES_getBlendingFactor(sl_uint32 factor)
 {
 	switch (factor) {
-	case RenderBlendingParam::factorOne:
+	case renderBlendingFactor_One:
 		return GL_ONE;
-	case RenderBlendingParam::factorZero:
+	case renderBlendingFactor_Zero:
 		return GL_ZERO;
-	case RenderBlendingParam::factorSrcAlpha:
+	case renderBlendingFactor_SrcAlpha:
 		return GL_SRC_ALPHA;
-	case RenderBlendingParam::factorOneMinusSrcAlpha:
+	case renderBlendingFactor_OneMinusSrcAlpha:
 		return GL_ONE_MINUS_SRC_ALPHA;
-	case RenderBlendingParam::factorDstAlpha:
+	case renderBlendingFactor_DstAlpha:
 		return GL_DST_ALPHA;
-	case RenderBlendingParam::factorOneMinusDstAlpha:
+	case renderBlendingFactor_OneMinusDstAlpha:
 		return GL_ONE_MINUS_DST_ALPHA;
-	case RenderBlendingParam::factorSrcColor:
+	case renderBlendingFactor_SrcColor:
 		return GL_SRC_COLOR;
-	case RenderBlendingParam::factorOneMinusSrcColor:
+	case renderBlendingFactor_OneMinusSrcColor:
 		return GL_ONE_MINUS_SRC_COLOR;
-	case RenderBlendingParam::factorDstColor:
+	case renderBlendingFactor_DstColor:
 		return GL_DST_COLOR;
-	case RenderBlendingParam::factorOneMinusDstColor:
+	case renderBlendingFactor_OneMinusDstColor:
 		return GL_ONE_MINUS_DST_COLOR;
-	case RenderBlendingParam::factorSrcAlphaSaturate:
+	case renderBlendingFactor_SrcAlphaSaturate:
 		return GL_SRC_ALPHA_SATURATE;
-	case RenderBlendingParam::factorConstant:
+	case renderBlendingFactor_Constant:
 		return GL_CONSTANT_COLOR;
-	case RenderBlendingParam::factorOneMinusConstant:
+	case renderBlendingFactor_OneMinusConstant:
 		return GL_ONE_MINUS_CONSTANT_COLOR;
-	case RenderBlendingParam::factorConstantAlpha:
+	case renderBlendingFactor_ConstantAlpha:
 		return GL_CONSTANT_ALPHA;
-	case RenderBlendingParam::factorOneMinusConstantAlpha:
+	case renderBlendingFactor_OneMinusConstantAlpha:
 		return GL_ONE_MINUS_CONSTANT_ALPHA;
 	}
 	return GL_ZERO;
@@ -665,7 +665,7 @@ sl_uint32 GL_BASE::createTexture2D(const BitmapData& bitmapData)
 		sl_uint32 width = bitmapData.width;
 		sl_uint32 height = bitmapData.height;
 		GL_ENTRY(glBindTexture)(GL_TEXTURE_2D, texture);
-		if (bitmapData.format == bitmapFormatRGBA && (bitmapData.pitch == 0 || bitmapData.pitch == width << 2)) {
+		if (bitmapData.format == bitmapFormat_RGBA && (bitmapData.pitch == 0 || bitmapData.pitch == width << 2)) {
 			GL_ENTRY(glTexImage2D)(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, bitmapData.data);
 		} else {
 			sl_uint32 size = width * height;
@@ -673,7 +673,7 @@ sl_uint32 GL_BASE::createTexture2D(const BitmapData& bitmapData)
 			BitmapData temp;
 			temp.width = width;
 			temp.height = height;
-			temp.format = bitmapFormatRGBA;
+			temp.format = bitmapFormat_RGBA;
 			temp.data = glImage;
 			temp.pitch = width << 2;
 			temp.copyPixelsFrom(bitmapData);
@@ -736,7 +736,7 @@ sl_uint32 GL_BASE::createTexture2D(const Ref<Bitmap>& bitmap, sl_uint32 x, sl_ui
 		BitmapData temp;
 		temp.width = w;
 		temp.height = h;
-		temp.format = bitmapFormatRGBA;
+		temp.format = bitmapFormat_RGBA;
 		temp.data = glImage;
 		temp.pitch = w << 2;
 		if (bitmap->readPixels(x, y, temp)) {
@@ -767,7 +767,7 @@ sl_uint32 GL_BASE::createTexture2D(const Ref<Bitmap>& bitmap)
 		BitmapData temp;
 		temp.width = w;
 		temp.height = h;
-		temp.format = bitmapFormatRGBA;
+		temp.format = bitmapFormat_RGBA;
 		temp.data = glImage;
 		temp.pitch = w << 2;
 		if (bitmap->readPixels(0, 0, temp)) {
@@ -799,7 +799,7 @@ void GL_BASE::updateTexture2D(sl_uint32 x, sl_uint32 y, const BitmapData& bitmap
 {
 	sl_uint32 width = bitmapData.width;
 	sl_uint32 height = bitmapData.height;
-	if (bitmapData.format == bitmapFormatRGBA && (bitmapData.pitch == 0 || bitmapData.pitch == width << 2)) {
+	if (bitmapData.format == bitmapFormat_RGBA && (bitmapData.pitch == 0 || bitmapData.pitch == width << 2)) {
 		GL_ENTRY(glTexSubImage2D)(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, bitmapData.data);
 	} else {
 		sl_uint32 size = width * height;
@@ -807,7 +807,7 @@ void GL_BASE::updateTexture2D(sl_uint32 x, sl_uint32 y, const BitmapData& bitmap
 		BitmapData temp;
 		temp.width = width;
 		temp.height = height;
-		temp.format = bitmapFormatRGBA;
+		temp.format = bitmapFormat_RGBA;
 		temp.data = glImage;
 		temp.pitch = width << 2;
 		temp.copyPixelsFrom(bitmapData);
@@ -854,7 +854,7 @@ void GL_BASE::updateTexture2D(sl_uint32 x, sl_uint32 y, sl_uint32 w, sl_uint32 h
 		BitmapData temp;
 		temp.width = w;
 		temp.height = h;
-		temp.format = bitmapFormatRGBA;
+		temp.format = bitmapFormat_RGBA;
 		temp.data = glImage;
 		temp.pitch = w << 2;
 		if (bitmap->readPixels(bx, by, temp)) {
@@ -878,17 +878,17 @@ void GL_BASE::unbindTexture2D()
 	GL_ENTRY(glBindTexture)(GL_TEXTURE_2D, 0);
 }
 
-static GLenum _GLES_getFilter(Texture::FilterMode filter)
+static GLenum _GLES_getFilter(TextureFilterMode filter)
 {
 	switch (filter) {
-	case Texture::filterLinear:
+	case textureFilterMode_Linear:
 		return GL_LINEAR;
-	case Texture::filterPoint:
+	case textureFilterMode_Point:
 		return GL_NEAREST;
 	}
 	return GL_NONE;
 }
-void GL_BASE::setTexture2DFilterMode(Texture::FilterMode minFilter, Texture::FilterMode magFilter)
+void GL_BASE::setTexture2DFilterMode(TextureFilterMode minFilter, TextureFilterMode magFilter)
 {
 	GLenum f;
 	f = _GLES_getFilter(minFilter);
@@ -901,19 +901,19 @@ void GL_BASE::setTexture2DFilterMode(Texture::FilterMode minFilter, Texture::Fil
 	}
 }
 
-static GLenum _GLES_getWrap(Texture::WrapMode wrap)
+static GLenum _GLES_getWrap(TextureWrapMode wrap)
 {
 	switch (wrap) {
-	case Texture::wrapRepeat:
+	case textureWrapMode_Repeat:
 		return GL_REPEAT;
-	case Texture::wrapMirror:
+	case textureWrapMode_Mirror:
 		return GL_MIRRORED_REPEAT;
-	case Texture::wrapClamp:
+	case textureWrapMode_Clamp:
 		return GL_CLAMP_TO_EDGE;
 	}
 	return GL_NONE;
 }
-void GL_BASE::setTexture2DWrapMode(Texture::WrapMode wrapX, Texture::WrapMode wrapY)
+void GL_BASE::setTexture2DWrapMode(TextureWrapMode wrapX, TextureWrapMode wrapY)
 {
 	GLenum f;
 	f = _GLES_getWrap(wrapX);
@@ -968,12 +968,12 @@ public:
 		return sl_true;
 	}
 
-	EngineType getEngineType()
+	RenderEngineType getEngineType()
 	{
 #if defined(_OPENGL_ES_IMPL)
-		return OPENGL_ES;
+		return renderEngineType_OpenGL_ES;
 #else
-		return OPENGL;
+		return renderEngineType_OpenGL;
 #endif
 	}
 
@@ -1563,22 +1563,22 @@ public:
 			GL_BASE::bindVertexBuffer(vb->buffer);
 			if (program->onPreRender(this, engineProgram->info.get(), primitive)) {
 				switch (primitive->type) {
-				case Primitive::typeTriangles:
+				case primitiveType_Triangles:
 					GL_BASE::drawTriangles(primitive->countElements, ib->buffer, 0);
 					break;
-				case Primitive::typeTriangleStrip:
+				case primitiveType_TriangleStrip:
 					GL_BASE::drawTriangleStrip(primitive->countElements, ib->buffer, 0);
 					break;
-				case Primitive::typeTriangleFan:
+				case primitiveType_TriangleFan:
 					GL_BASE::drawTriangleFan(primitive->countElements, ib->buffer, 0);
 					break;
-				case Primitive::typeLines:
+				case primitiveType_Lines:
 					GL_BASE::drawLines(primitive->countElements, ib->buffer, 0);
 					break;
-				case Primitive::typeLineStrip:
+				case primitiveType_LineStrip:
 					GL_BASE::drawLineStrip(primitive->countElements, ib->buffer, 0);
 					break;
-				case Primitive::typePoints:
+				case primitiveType_Points:
 					GL_BASE::drawPoints(primitive->countElements, ib->buffer, 0);
 					break;
 				}
@@ -1589,22 +1589,22 @@ public:
 			GL_BASE::bindVertexBuffer(vb->buffer);
 			if (program->onPreRender(this, engineProgram->info.get(), primitive)) {
 				switch (primitive->type) {
-				case Primitive::typeTriangles:
+				case primitiveType_Triangles:
 					GL_BASE::drawTriangles(primitive->countElements);
 					break;
-				case Primitive::typeTriangleStrip:
+				case primitiveType_TriangleStrip:
 					GL_BASE::drawTriangleStrip(primitive->countElements);
 					break;
-				case Primitive::typeTriangleFan:
+				case primitiveType_TriangleFan:
 					GL_BASE::drawTriangleFan(primitive->countElements);
 					break;
-				case Primitive::typeLines:
+				case primitiveType_Lines:
 					GL_BASE::drawLines(primitive->countElements);
 					break;
-				case Primitive::typeLineStrip:
+				case primitiveType_LineStrip:
 					GL_BASE::drawLineStrip(primitive->countElements);
 					break;
-				case Primitive::typePoints:
+				case primitiveType_Points:
 					GL_BASE::drawPoints(primitive->countElements);
 					break;
 				}

@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_MATH_TRANSFORM2D
 
 #include "definition.h"
+
 #include "vector2.h"
 #include "matrix3.h"
 
@@ -11,16 +12,16 @@ template <class T>
 class SLIB_EXPORT Transform2T
 {
 public:
-	static void setTranslation(Matrix3T<T>& out, T x, T y)
+	static void setTranslation(Matrix3T<T>& _out, T x, T y)
 	{
-		out.m00 = 1; out.m01 = 0; out.m02 = 0;
-		out.m10 = 0; out.m11 = 1; out.m12 = 0;
-		out.m20 = x; out.m21 = y; out.m22 = 1;
+		_out.m00 = 1; _out.m01 = 0; _out.m02 = 0;
+		_out.m10 = 0; _out.m11 = 1; _out.m12 = 0;
+		_out.m20 = x; _out.m21 = y; _out.m22 = 1;
 	}
 	
-	SLIB_INLINE static void setTranslation(Matrix3T<T>& out, const Vector2T<T>& v)
+	SLIB_INLINE static void setTranslation(Matrix3T<T>& _out, const Vector2T<T>& v)
 	{
-		setTranslation(out, v.x, v.y);
+		setTranslation(_out, v.x, v.y);
 	}
 	
 	SLIB_INLINE static Matrix3T<T> getTranslationMatrix(T x, T y)
@@ -37,16 +38,16 @@ public:
 		return ret;
 	}
 
-	static void setScaling(Matrix3T<T>& out, T sx, T sy)
+	static void setScaling(Matrix3T<T>& _out, T sx, T sy)
 	{
-		out.m00 = sx; out.m01 = 0; out.m02 = 0;
-		out.m10 = 0; out.m11 = sy; out.m12 = 0;
-		out.m20 = 0; out.m21 = 0; out.m22 = 1;
+		_out.m00 = sx; _out.m01 = 0; _out.m02 = 0;
+		_out.m10 = 0; _out.m11 = sy; _out.m12 = 0;
+		_out.m20 = 0; _out.m21 = 0; _out.m22 = 1;
 	}
 	
-	SLIB_INLINE static void setScaling(Matrix3T<T>& out, const Vector2T<T>& v)
+	SLIB_INLINE static void setScaling(Matrix3T<T>& _out, const Vector2T<T>& v)
 	{
-		setScaling(out, v.x, v.y);
+		setScaling(_out, v.x, v.y);
 	}
 	
 	SLIB_INLINE static Matrix3T<T> getScalingMatrix(T x, T y)
@@ -63,28 +64,28 @@ public:
 		return ret;
 	}
 
-	static void setRotation(Matrix3T<T>& out, T radians)
+	static void setRotation(Matrix3T<T>& _out, T radians)
 	{
 		T c = Math::cos(radians);
 		T s = Math::sin(radians);
-		out.m00 = c; out.m01 = s; out.m02 = 0;
-		out.m10 = -s; out.m11 = c; out.m12 = 0;
-		out.m20 = 0; out.m21 = 0; out.m22 = 1;
+		_out.m00 = c; _out.m01 = s; _out.m02 = 0;
+		_out.m10 = -s; _out.m11 = c; _out.m12 = 0;
+		_out.m20 = 0; _out.m21 = 0; _out.m22 = 1;
 	}
 	
-	static void setRotation(Matrix3T<T>& out, T cx, T cy, T radians)
+	static void setRotation(Matrix3T<T>& _out, T cx, T cy, T radians)
 	{
 		Matrix3T<T> m;
-		setTranslation(out, -cx, -cy);
+		setTranslation(_out, -cx, -cy);
 		setRotation(m, radians);
-		out.multiply(m);
+		_out.multiply(m);
 		setTranslation(m, cx, cy);
-		out.multiply(m);
+		_out.multiply(m);
 	}
 	
-	SLIB_INLINE static void setRotation(Matrix3& out, const Vector2T<T>& pt, T radians)
+	SLIB_INLINE static void setRotation(Matrix3& _out, const Vector2T<T>& pt, T radians)
 	{
-		setRotation(out, pt.x, pt.y, radians);
+		setRotation(_out, pt.x, pt.y, radians);
 	}
 	
 	SLIB_INLINE static Matrix3T<T> getRotationMatrix(T radians)
@@ -113,9 +114,9 @@ public:
 		return to.getAngleBetween(from);
 	}
 	
-	SLIB_INLINE static void setTransformFromDirToDir(Matrix3T<T>& out, const Vector2T<T>& from, const Vector2T<T>& to)
+	SLIB_INLINE static void setTransformFromDirToDir(Matrix3T<T>& _out, const Vector2T<T>& from, const Vector2T<T>& to)
 	{
-		setRotation(out, getRotationAngleFromDirToDir(from, to));
+		setRotation(_out, getRotationAngleFromDirToDir(from, to));
 	}
 	
 	SLIB_INLINE static Matrix3T<T> getTransformMatrixFromDirToDir(const Vector2T<T>& from, const Vector2T<T>& to)

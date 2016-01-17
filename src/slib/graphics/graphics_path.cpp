@@ -4,9 +4,10 @@
 #include "../../../inc/slib/math/bezier.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
+
 GraphicsPath::GraphicsPath()
 {
-	setFillMode(fillModeWinding);
+	setFillMode(fillMode_Winding);
 	m_flagBegan = sl_false;
 	m_pointBegin = Point::zero();
 }
@@ -30,13 +31,13 @@ void GraphicsPath::lineTo(const Point& pt)
 	if (!m_flagBegan) {
 		GraphicsPathPoint point;
 		point.pt = m_pointBegin;
-		point.type = graphicsPathPointTypeBegin;
+		point.type = graphicsPathPointType_Begin;
 		points.add(point);
 		m_flagBegan = sl_true;
 	}
 	GraphicsPathPoint point;
 	point.pt = pt;
-	point.type = graphicsPathPointTypeLine;
+	point.type = graphicsPathPointType_Line;
 	points.add(point);
 	invalidate();
 }
@@ -47,19 +48,19 @@ void GraphicsPath::cubicTo(const Point& ptControl1, const Point& ptControl2, con
 	if (!m_flagBegan) {
 		GraphicsPathPoint point;
 		point.pt = m_pointBegin;
-		point.type = graphicsPathPointTypeBegin;
+		point.type = graphicsPathPointType_Begin;
 		points.add(point);
 		m_flagBegan = sl_true;
 	}
 	GraphicsPathPoint point;
 	point.pt = ptControl1;
-	point.type = graphicsPathPointTypeBezierCubic;
+	point.type = graphicsPathPointType_BezierCubic;
 	points.add(point);
 	point.pt = ptControl2;
-	point.type = graphicsPathPointTypeBezierCubic;
+	point.type = graphicsPathPointType_BezierCubic;
 	points.add(point);
 	point.pt = ptEnd;
-	point.type = graphicsPathPointTypeBezierCubic;
+	point.type = graphicsPathPointType_BezierCubic;
 	points.add(point);
 	invalidate();
 }
@@ -70,7 +71,7 @@ void GraphicsPath::closeSubpath()
 	if (m_flagBegan) {
 		sl_size n = points.count();
 		if (n > 0) {
-			points[n - 1].type |= (sl_uint8)graphicsPathPointFlagClose;
+			points[n - 1].type |= (sl_uint8)graphicsPathPointFlag_Close;
 			m_pointBegin = points[n - 1].pt;
 			m_flagBegan = sl_false;
 		}
@@ -161,22 +162,7 @@ sl_bool GraphicsPath::containsPoint(const Ref<GraphicsContext>& context, const P
 
 void GraphicsPath::invalidate()
 {
-	m_instance.setNull();
-}
-
-
-const Ref<GraphicsPathInstance>& GraphicsPath::getInstance()
-{
-	return m_instance;
-}
-
-void GraphicsPath::setInstance(const Ref<GraphicsPathInstance>& instance)
-{
-	m_instance = instance;
-}
-
-GraphicsPathInstance::GraphicsPathInstance()
-{
+	setInstance(Ref<GraphicsPathInstance>::null());
 }
 
 void GraphicsPathInstance::buildFrom(const Ref<GraphicsPath>& path)
@@ -184,19 +170,18 @@ void GraphicsPathInstance::buildFrom(const Ref<GraphicsPath>& path)
 	if (path.isNull()) {
 		return;
 	}
-
 	ListLocker<GraphicsPathPoint> points(path->points);
 	sl_uint32 nCubicCount = 0;
 	for (sl_size i = 0; i < points.count(); i++) {
 		GraphicsPathPoint& point = points[i];
 		sl_uint8 t = point.type & 0x7f;
-		if (t == graphicsPathPointTypeBegin) {
+		if (t == graphicsPathPointType_Begin) {
 			this->moveTo(point.pt);
 			nCubicCount = 0;
-		} else if (t == graphicsPathPointTypeLine) {
+		} else if (t == graphicsPathPointType_Line) {
 			this->lineTo(point.pt);
 			nCubicCount = 0;
-		} else if (t == graphicsPathPointTypeBezierCubic) {
+		} else if (t == graphicsPathPointType_BezierCubic) {
 			if (nCubicCount == 2) {
 				this->cubicTo(points[i - 2].pt, points[i - 1].pt, points[i].pt);
 				nCubicCount = 0;
@@ -204,11 +189,12 @@ void GraphicsPathInstance::buildFrom(const Ref<GraphicsPath>& path)
 				nCubicCount++;
 			}
 		}
-		if (point.type & graphicsPathPointFlagClose) {
+		if (point.type & graphicsPathPointFlag_Close) {
 			this->closeSubpath();
 		}
 	}
 }
+
 SLIB_GRAPHICS_NAMESPACE_END
 
 

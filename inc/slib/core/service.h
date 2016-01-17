@@ -16,13 +16,22 @@ public:
 	Service();
 	
 	~Service();
+	
+public:
+	// override
+	AppType getAppType();
+	
+	// override
+	void run(const String& command);
+	
+	void run();
+	
 
 protected:
 	virtual String getServiceName() = 0;
 	
 	virtual void onRunService() = 0;
 
-	
 	virtual sl_bool onStartService();
 	
 	virtual void onStopService();
@@ -37,19 +46,12 @@ public:
 	void runService();
 
 	
-	Type getAppType();
-	
-	void run();
-	
-	void run(const String& command);
-
-	
 	Ref<Thread> getThread();
 	
 	static Ref<Service> getApp();
 
 private:
-	void release();
+	void _release();
 
 private:
 	SafeRef<Thread> m_threadRun;

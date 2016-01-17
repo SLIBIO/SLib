@@ -23,6 +23,7 @@ public:
 	_SHA256Base();
 	
 public:
+	// override
 	void update(const void* input, sl_size n);
 
 protected:
@@ -41,33 +42,25 @@ protected:
 
 class SLIB_EXPORT SHA224 : public _SHA256Base
 {
-public:
 	SLIB_CRYPTO_DEFINE_HASH(SHA224, 28)
 	
 public:
-	SLIB_INLINE SHA224()
-	{
-	}
-	
-public:
+	// override
 	void start();
 	
+	// override
 	void finish(void* output);
 };
 
 class SLIB_EXPORT SHA256 : public _SHA256Base
 {
-public:
 	SLIB_CRYPTO_DEFINE_HASH(SHA256, 32)
 	
 public:
-	SLIB_INLINE SHA256()
-	{
-	}
-	
-public:
+	// override
 	void start();
 	
+	// override
 	void finish(void* output);
 	
 public:
@@ -80,6 +73,7 @@ public:
 	_SHA512Base();
 
 public:
+	// override
 	void update(const void* input, sl_size n);
 
 protected:
@@ -98,35 +92,28 @@ protected:
 
 class SLIB_EXPORT SHA384 : public _SHA512Base
 {
-public:
 	SLIB_CRYPTO_DEFINE_HASH(SHA384, 48)
 	
 public:
-	SLIB_INLINE SHA384()
-	{
-	}
-	
-public:
+	// override
 	void start();
 	
+	// override
 	void finish(void* output);
 };
 
 class SLIB_EXPORT SHA512 : public _SHA512Base
 {
-public:
 	SLIB_CRYPTO_DEFINE_HASH(SHA512, 64)
 	
 public:
-	SLIB_INLINE SHA512()
-	{
-	}
-	
-public:
+	// override
 	void start();
 	
+	// override
 	void finish(void* output);
 };
+
 SLIB_CRYPTO_NAMESPACE_END
 
 #endif

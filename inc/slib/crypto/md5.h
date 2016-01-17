@@ -22,10 +22,13 @@ public:
 	MD5();
 
 public:
+	// override
 	void start();
 	
+	// override
 	void update(const void* input, sl_size n);
 	
+	// override
 	void finish(void* output);
 
 private:
@@ -37,6 +40,7 @@ private:
 	sl_uint8 rdata[64];
 	sl_uint32 A[4];
 };
+
 SLIB_CRYPTO_NAMESPACE_END
 
 #endif

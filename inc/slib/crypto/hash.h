@@ -16,8 +16,33 @@
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
 
+enum CryptoHashType
+{
+	cryptoHashType_MD5 = 0,
+	cryptoHashType_SHA1 = 101,
+	cryptoHashType_SHA224 = 102,
+	cryptoHashType_SHA256 = 103,
+	cryptoHashType_SHA384 = 104,
+	cryptoHashType_SHA512 = 105
+};
+
 class SLIB_EXPORT CryptoHash : public Object
 {
+public:
+	static Ref<CryptoHash> create(CryptoHashType type);
+	
+	static Ref<CryptoHash> md5();
+	
+	static Ref<CryptoHash> sha1();
+	
+	static Ref<CryptoHash> sha224();
+	
+	static Ref<CryptoHash> sha256();
+	
+	static Ref<CryptoHash> sha384();
+	
+	static Ref<CryptoHash> sha512();
+
 public:
 	virtual sl_uint32 getSize() const = 0;
 	
@@ -36,34 +61,10 @@ public:
 	}
 
 public:
-	enum Type
-	{
-		typeMD5 = 0,
-		typeSHA1 = 101,
-		typeSHA224 = 102,
-		typeSHA256 = 103,
-		typeSHA384 = 104,
-		typeSHA512 = 105
-	};
-	
-	static Ref<CryptoHash> create(Type type);
-
-	
-	static Ref<CryptoHash> md5();
-	
-	static Ref<CryptoHash> sha1();
-	
-	static Ref<CryptoHash> sha224();
-	
-	static Ref<CryptoHash> sha256();
-	
-	static Ref<CryptoHash> sha384();
-	
-	static Ref<CryptoHash> sha512();
-
-public:
 	void applyMask_MGF1(const void* seed, sl_uint32 sizeSeed, void* target, sl_uint32 sizeTarget);
+	
 };
+
 SLIB_CRYPTO_NAMESPACE_END
 
 #define SLIB_CRYPTO_DEFINE_HASH(CLASS, HASH_SIZE) \

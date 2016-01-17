@@ -2,19 +2,19 @@
 
 SLIB_NAMESPACE_BEGIN
 
-const _Variant_Const _Variant_Null = {0, Variant::typeNull, 0};
+const _Variant_Const _Variant_Null = {0, variantType_Null, 0};
 
-void Variant::_copy(Type src_type, sl_uint64 src_value, sl_uint64& dst_value)
+void Variant::_copy(VariantType src_type, sl_uint64 src_value, sl_uint64& dst_value)
 {
 	switch (src_type) {
-		case typeString8:
+		case variantType_String8:
 			new ((String8*)(void*)(&dst_value)) String8(*(String8*)(void*)(&src_value));
 			break;
-		case typeString16:
+		case variantType_String16:
 			new ((String16*)(void*)(&dst_value)) String16(*(String16*)(void*)(&src_value));
 			break;
-		case typeObject:
-		case typeWeak:
+		case variantType_Object:
+		case variantType_Weak:
 			new ((Ref<Referable>*)(void*)(&dst_value)) Ref<Referable>(*(Ref<Referable>*)(void*)(&src_value));
 			break;
 		default:
@@ -23,18 +23,18 @@ void Variant::_copy(Type src_type, sl_uint64 src_value, sl_uint64& dst_value)
 	}
 }
 
-void Variant::_free(Type type, sl_uint64 value)
+void Variant::_free(VariantType type, sl_uint64 value)
 {
 	switch (type)
 	{
-		case typeString8:
+		case variantType_String8:
 			(*(String8*)(void*)(&value)).String8::~String8();
 			break;
-		case typeString16:
+		case variantType_String16:
 			(*(String16*)(void*)(&value)).String16::~String16();
 			break;
-		case typeObject:
-		case typeWeak:
+		case variantType_Object:
+		case variantType_Weak:
 			(*(Ref<Referable>*)(void*)(&value)).Ref<Referable>::~Ref();
 			break;
 		default:
@@ -64,7 +64,7 @@ Variant& Variant::operator=(Variant&& other)
 		_free(m_type, m_value);
 		m_type = other.m_type;
 		m_value = other.m_value;
-		other.m_type = typeNull;
+		other.m_type = variantType_Null;
 	}
 	return *this;
 }
@@ -85,7 +85,7 @@ Variant& Variant::operator=(SafeVariant&& other)
 		_free(m_type, m_value);
 		m_type = other.m_type;
 		m_value = other.m_value;
-		other.m_type = typeNull;
+		other.m_type = variantType_Null;
 	}
 	return *this;
 }
@@ -99,28 +99,28 @@ Variant& Variant::operator=(const SafeVariant& other)
 
 sl_bool operator==(const Variant& v1, const Variant& v2)
 {
-	Variant::Type type = v1.m_type;
+	VariantType type = v1.m_type;
 	if (type == v2.m_type) {
 		if (v1.m_value == v2.m_value) {
 			return sl_true;
 		}
 		switch (type) {
-			case Variant::typeNull:
+			case variantType_Null:
 				return sl_true;
-			case Variant::typeInt32:
-			case Variant::typeUint32:
+			case variantType_Int32:
+			case variantType_Uint32:
 				return *(sl_int32*)(void*)(&(v1.m_value)) == *(sl_int32*)(void*)(&(v2.m_value));
-			case Variant::typeFloat:
+			case variantType_Float:
 				return *(float*)(void*)(&(v1.m_value)) == *(float*)(void*)(&(v2.m_value));
-			case Variant::typeDouble:
+			case variantType_Double:
 				return *(double*)(void*)(&(v1.m_value)) == *(double*)(void*)(&(v2.m_value));
-			case Variant::typeBoolean:
+			case variantType_Boolean:
 				return *(sl_bool*)(void*)(&(v1.m_value)) == *(sl_bool*)(void*)(&(v2.m_value));
-			case Variant::typePointer:
+			case variantType_Pointer:
 				return *(void**)(void*)(&(v1.m_value)) == *(void**)(void*)(&(v2.m_value));
-			case Variant::typeString8:
+			case variantType_String8:
 				return *(String8*)(void*)(&(v1.m_value)) == *(String8*)(void*)(&(v2.m_value));
-			case Variant::typeString16:
+			case variantType_String16:
 				return *(String16*)(void*)(&(v1.m_value)) == *(String16*)(void*)(&(v2.m_value));
 			default:
 				break;
@@ -129,10 +129,10 @@ sl_bool operator==(const Variant& v1, const Variant& v2)
 	return sl_false;
 }
 
-void SafeVariant::_retain(Variant::Type& type, sl_uint64& value) const
+void SafeVariant::_retain(VariantType& type, sl_uint64& value) const
 {
 	if ((void*)(this) == (void*)(&_Variant_Null)) {
-		type = Variant::typeNull;
+		type = variantType_Null;
 	} else {
 		SpinLocker lock(&m_lock);
 		type = m_type;
@@ -140,9 +140,9 @@ void SafeVariant::_retain(Variant::Type& type, sl_uint64& value) const
 	}
 }
 
-void SafeVariant::_replace(Variant::Type type, sl_uint64 value)
+void SafeVariant::_replace(VariantType type, sl_uint64 value)
 {
-	Variant::Type typeOld;
+	VariantType typeOld;
 	sl_uint64 valueOld;
 	{
 		SpinLocker lock(&m_lock);
@@ -174,7 +174,7 @@ SafeVariant& SafeVariant::operator=(SafeVariant&& other)
 {
 	if (this != &other) {
 		_replace(other.m_type, other.m_value);
-		other.m_type = Variant::typeNull;
+		other.m_type = variantType_Null;
 	}
 	return *this;
 }
@@ -182,7 +182,7 @@ SafeVariant& SafeVariant::operator=(SafeVariant&& other)
 SafeVariant& SafeVariant::operator=(const SafeVariant& other)
 {
 	if (this != &other) {
-		Variant::Type type;
+		VariantType type;
 		sl_uint64 value;
 		other._retain(type, value);
 		_replace(type, value);
@@ -194,14 +194,14 @@ SafeVariant& SafeVariant::operator=(Variant&& other)
 {
 	if ((void*)this != (void*)(&other)) {
 		_replace(other.m_type, other.m_value);
-		other.m_type = Variant::typeNull;
+		other.m_type = variantType_Null;
 	}
 	return *this;
 }
 
 SafeVariant& SafeVariant::operator=(const Variant& other)
 {
-	Variant::Type type = other.m_type;
+	VariantType type = other.m_type;
 	sl_uint64 value;
 	Variant::_copy(type, other.m_value, value);
 	_replace(type, value);
@@ -211,21 +211,21 @@ SafeVariant& SafeVariant::operator=(const Variant& other)
 sl_int32 Variant::getInt32(sl_int32 def) const
 {
 	switch (m_type) {
-		case typeInt32:
+		case variantType_Int32:
 			return (sl_int32)(*(sl_int32*)(void*)(&m_value));
-		case typeUint32:
+		case variantType_Uint32:
 			return (sl_int32)(*(sl_uint32*)(void*)(&m_value));
-		case typeInt64:
+		case variantType_Int64:
 			return (sl_int32)(*(sl_int64*)(void*)(&m_value));
-		case typeUint64:
+		case variantType_Uint64:
 			return (sl_int32)(*(sl_uint64*)(void*)(&m_value));
-		case typeFloat:
+		case variantType_Float:
 			return (sl_int32)(*(float*)(void*)(&m_value));
-		case typeDouble:
+		case variantType_Double:
 			return (sl_int32)(*(double*)(void*)(&m_value));
-		case typeString8:
+		case variantType_String8:
 			return (*(String8*)(void*)(&m_value)).parseInt32(10, def);
-		case typeString16:
+		case variantType_String16:
 			return (*(String16*)(void*)(&m_value)).parseInt32(10, def);
 		default:
 			break;
@@ -236,21 +236,21 @@ sl_int32 Variant::getInt32(sl_int32 def) const
 sl_uint32 Variant::getUint32(sl_uint32 def) const
 {
 	switch (m_type) {
-		case typeInt32:
+		case variantType_Int32:
 			return (sl_uint32)(*(sl_int32*)(void*)(&m_value));
-		case typeUint32:
+		case variantType_Uint32:
 			return (sl_uint32)(*(sl_uint32*)(void*)(&m_value));
-		case typeInt64:
+		case variantType_Int64:
 			return (sl_uint32)(*(sl_int64*)(void*)(&m_value));
-		case typeUint64:
+		case variantType_Uint64:
 			return (sl_uint32)(*(sl_uint64*)(void*)(&m_value));
-		case typeFloat:
+		case variantType_Float:
 			return (sl_uint32)(*(float*)(void*)(&m_value));
-		case typeDouble:
+		case variantType_Double:
 			return (sl_uint32)(*(double*)(void*)(&m_value));
-		case typeString8:
+		case variantType_String8:
 			return (*(String8*)(void*)(&m_value)).parseUint32(10, def);
-		case typeString16:
+		case variantType_String16:
 			return (*(String16*)(void*)(&m_value)).parseUint32(10, def);
 		default:
 			break;
@@ -261,21 +261,21 @@ sl_uint32 Variant::getUint32(sl_uint32 def) const
 sl_int64 Variant::getInt64(sl_int64 def) const
 {
 	switch (m_type) {
-		case typeInt32:
+		case variantType_Int32:
 			return (sl_int64)(*(sl_int32*)(void*)(&m_value));
-		case typeUint32:
+		case variantType_Uint32:
 			return (sl_int64)(*(sl_uint32*)(void*)(&m_value));
-		case typeInt64:
+		case variantType_Int64:
 			return (sl_int64)(*(sl_int64*)(void*)(&m_value));
-		case typeUint64:
+		case variantType_Uint64:
 			return (sl_int64)(*(sl_uint64*)(void*)(&m_value));
-		case typeFloat:
+		case variantType_Float:
 			return (sl_int64)(*(float*)(void*)(&m_value));
-		case typeDouble:
+		case variantType_Double:
 			return (sl_int64)(*(double*)(void*)(&m_value));
-		case typeString8:
+		case variantType_String8:
 			return (*(String8*)(void*)(&m_value)).parseInt64(10, def);
-		case typeString16:
+		case variantType_String16:
 			return (*(String16*)(void*)(&m_value)).parseInt64(10, def);
 		default:
 			break;
@@ -286,21 +286,21 @@ sl_int64 Variant::getInt64(sl_int64 def) const
 sl_uint64 Variant::getUint64(sl_uint64 def) const
 {
 	switch (m_type) {
-		case typeInt32:
+		case variantType_Int32:
 			return (sl_uint64)(*(sl_int32*)(void*)(&m_value));
-		case typeUint32:
+		case variantType_Uint32:
 			return (sl_uint64)(*(sl_uint32*)(void*)(&m_value));
-		case typeInt64:
+		case variantType_Int64:
 			return (sl_uint64)(*(sl_int64*)(void*)(&m_value));
-		case typeUint64:
+		case variantType_Uint64:
 			return (sl_uint64)(*(sl_uint64*)(void*)(&m_value));
-		case typeFloat:
+		case variantType_Float:
 			return (sl_uint64)(*(float*)(void*)(&m_value));
-		case typeDouble:
+		case variantType_Double:
 			return (sl_uint64)(*(double*)(void*)(&m_value));
-		case typeString8:
+		case variantType_String8:
 			return (*(String8*)(void*)(&m_value)).parseUint64(10, def);
-		case typeString16:
+		case variantType_String16:
 			return (*(String16*)(void*)(&m_value)).parseUint64(10, def);
 		default:
 			break;
@@ -311,21 +311,21 @@ sl_uint64 Variant::getUint64(sl_uint64 def) const
 float Variant::getFloat(float def) const
 {
 	switch (m_type) {
-		case typeInt32:
+		case variantType_Int32:
 			return (float)(*(sl_int32*)(void*)(&m_value));
-		case typeUint32:
+		case variantType_Uint32:
 			return (float)(*(sl_uint32*)(void*)(&m_value));
-		case typeInt64:
+		case variantType_Int64:
 			return (float)(*(sl_int64*)(void*)(&m_value));
-		case typeUint64:
+		case variantType_Uint64:
 			return (float)(*(sl_uint64*)(void*)(&m_value));
-		case typeFloat:
+		case variantType_Float:
 			return (float)(*(float*)(void*)(&m_value));
-		case typeDouble:
+		case variantType_Double:
 			return (float)(*(double*)(void*)(&m_value));
-		case typeString8:
+		case variantType_String8:
 			return (*(String8*)(void*)(&m_value)).parseFloat(def);
-		case typeString16:
+		case variantType_String16:
 			return (*(String16*)(void*)(&m_value)).parseFloat(def);
 		default:
 			break;
@@ -336,21 +336,21 @@ float Variant::getFloat(float def) const
 double Variant::getDouble(double def) const
 {
 	switch (m_type) {
-		case typeInt32:
+		case variantType_Int32:
 			return (double)(*(sl_int32*)(void*)(&m_value));
-		case typeUint32:
+		case variantType_Uint32:
 			return (double)(*(sl_uint32*)(void*)(&m_value));
-		case typeInt64:
+		case variantType_Int64:
 			return (double)(*(sl_int64*)(void*)(&m_value));
-		case typeUint64:
+		case variantType_Uint64:
 			return (double)(*(sl_uint64*)(void*)(&m_value));
-		case typeFloat:
+		case variantType_Float:
 			return (double)(*(float*)(void*)(&m_value));
-		case typeDouble:
+		case variantType_Double:
 			return (double)(*(double*)(void*)(&m_value));
-		case typeString8:
+		case variantType_String8:
 			return (*(String8*)(void*)(&m_value)).parseDouble(def);
-		case typeString16:
+		case variantType_String16:
 			return (*(String16*)(void*)(&m_value)).parseDouble(def);
 		default:
 			break;
@@ -360,11 +360,11 @@ double Variant::getDouble(double def) const
 
 Time Variant::getTime(Time def) const
 {
-	if (m_type == typeTime) {
+	if (m_type == variantType_Time) {
 		return *(Time*)(void*)(&m_value);
-	} else if (m_type == typeString8) {
+	} else if (m_type == variantType_String8) {
 		return Time::parse((*(String8*)(void*)(&m_value)));
-	} else if (m_type == typeString16) {
+	} else if (m_type == variantType_String16) {
 		return Time::parse((*(String16*)(void*)(&m_value)));
 	}
 	return def;
@@ -372,7 +372,7 @@ Time Variant::getTime(Time def) const
 
 const void* Variant::getPointer(const void* def) const
 {
-	if (m_type == typePointer) {
+	if (m_type == variantType_Pointer) {
 		return *(const void**)(void*)(&m_value);
 	}
 	return def;
@@ -380,9 +380,9 @@ const void* Variant::getPointer(const void* def) const
 
 sl_bool Variant::getBoolean(sl_bool def) const
 {
-	if (m_type == typeBoolean) {
+	if (m_type == variantType_Boolean) {
 		return *(sl_bool*)(void*)(&m_value);
-	} else if (m_type == typeString8) {
+	} else if (m_type == variantType_String8) {
 		String8 s((*(String8*)(void*)(&m_value)).toLower());
 		SLIB_STATIC_STRING8(_true, "true");
 		SLIB_STATIC_STRING8(_false, "false");
@@ -391,7 +391,7 @@ sl_bool Variant::getBoolean(sl_bool def) const
 		} else if (s == _false) {
 			return sl_false;
 		}
-	} else if (m_type == typeString16) {
+	} else if (m_type == variantType_String16) {
 		String16 s((*(String16*)(void*)(&m_value)).toLower());
 		SLIB_STATIC_STRING16(_true, "true");
 		SLIB_STATIC_STRING16(_false, "false");
@@ -407,19 +407,19 @@ sl_bool Variant::getBoolean(sl_bool def) const
 String Variant::getString(const String& def) const
 {
 	switch (m_type) {
-		case typeInt32:
+		case variantType_Int32:
 			return String::fromInt32(*(sl_int32*)(void*)(&m_value));
-		case typeUint32:
+		case variantType_Uint32:
 			return String::fromUint32(*(sl_uint32*)(void*)(&m_value));
-		case typeInt64:
+		case variantType_Int64:
 			return String::fromInt64(*(sl_int64*)(void*)(&m_value));
-		case typeUint64:
+		case variantType_Uint64:
 			return String::fromUint64(*(sl_uint64*)(void*)(&m_value));
-		case typeFloat:
+		case variantType_Float:
 			return String::fromFloat(*(float*)(void*)(&m_value));
-		case typeDouble:
+		case variantType_Double:
 			return String::fromDouble(*(double*)(void*)(&m_value));
-		case typeBoolean:
+		case variantType_Boolean:
 			if (*(sl_bool*)(void*)(&m_value)) {
 				SLIB_STATIC_STRING(ret, "true");
 				return ret;
@@ -427,11 +427,11 @@ String Variant::getString(const String& def) const
 				SLIB_STATIC_STRING(ret, "false");
 				return ret;
 			}
-		case typeTime:
+		case variantType_Time:
 			return (*(Time*)(void*)(&m_value)).toString();
-		case typeString8:
+		case variantType_String8:
 			return (*(String8*)(void*)(&m_value));
-		case typeString16:
+		case variantType_String16:
 			return (*(String16*)(void*)(&m_value));
 		default:
 			break;
@@ -442,19 +442,19 @@ String Variant::getString(const String& def) const
 String16 Variant::getString16(const String16& def) const
 {
 	switch (m_type) {
-		case typeInt32:
+		case variantType_Int32:
 			return String16::fromInt32(*(sl_int32*)(void*)(&m_value));
-		case typeUint32:
+		case variantType_Uint32:
 			return String16::fromUint32(*(sl_uint32*)(void*)(&m_value));
-		case typeInt64:
+		case variantType_Int64:
 			return String16::fromInt64(*(sl_int64*)(void*)(&m_value));
-		case typeUint64:
+		case variantType_Uint64:
 			return String16::fromUint64(*(sl_uint64*)(void*)(&m_value));
-		case typeFloat:
+		case variantType_Float:
 			return String16::fromFloat(*(float*)(void*)(&m_value));
-		case typeDouble:
+		case variantType_Double:
 			return String16::fromDouble(*(double*)(void*)(&m_value));
-		case typeBoolean:
+		case variantType_Boolean:
 			if (*(sl_bool*)(void*)(&m_value)) {
 				SLIB_STATIC_STRING16(ret, "true");
 				return ret;
@@ -462,11 +462,11 @@ String16 Variant::getString16(const String16& def) const
 				SLIB_STATIC_STRING16(ret, "false");
 				return ret;
 			}
-		case typeTime:
+		case variantType_Time:
 			return (*(Time*)(void*)(&m_value)).toString();
-		case typeString8:
+		case variantType_String8:
 			return (*(String8*)(void*)(&m_value));
-		case typeString16:
+		case variantType_String16:
 			return (*(String16*)(void*)(&m_value));
 		default:
 			break;
@@ -475,8 +475,8 @@ String16 Variant::getString16(const String16& def) const
 }
 
 #define _MAX_VAR_STRING_LEN 20000
-static sl_bool _Variant_getVariantMapJSONString(StringBuffer& ret, const Map<String, Variant>& map, sl_bool flagJSON);
-static sl_bool _Variant_getVariantListJSONString(StringBuffer& ret, const List<Variant>& list, sl_bool flagJSON)
+static sl_bool _Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map, sl_bool flagJSON);
+static sl_bool _Variant_getVariantListJsonString(StringBuffer& ret, const List<Variant>& list, sl_bool flagJSON)
 {
 	ListLocker<Variant> l(list);
 	sl_size n = l.getCount();
@@ -489,7 +489,7 @@ static sl_bool _Variant_getVariantListJSONString(StringBuffer& ret, const List<V
 		Variant& v = lb[i];
 		if (!v.isVariantList() && !v.isVariantMap()) {
 			if (flagJSON) {
-				valueText = v.toJSON();
+				valueText = v.toJson();
 				if (valueText.isEmpty()) {
 					SLIB_STATIC_STRING(_null, "null");
 					valueText = _null;
@@ -502,11 +502,11 @@ static sl_bool _Variant_getVariantListJSONString(StringBuffer& ret, const List<V
 			ret.add(", ");
 		}
 		if (v.isVariantList()) {
-			if (!_Variant_getVariantListJSONString(ret, v.getVariantList(), flagJSON)) {
+			if (!_Variant_getVariantListJsonString(ret, v.getVariantList(), flagJSON)) {
 				return sl_false;
 			}
 		} else if (v.isVariantMap()) {
-			if (!_Variant_getVariantMapJSONString(ret, v.getVariantMap(), flagJSON)) {
+			if (!_Variant_getVariantMapJsonString(ret, v.getVariantMap(), flagJSON)) {
 				return sl_false;
 			}
 		} else {
@@ -522,7 +522,7 @@ static sl_bool _Variant_getVariantListJSONString(StringBuffer& ret, const List<V
 	return sl_true;
 }
 
-static sl_bool _Variant_getVariantMapJSONString(StringBuffer& ret, const Map<String, Variant>& map, sl_bool flagJSON)
+static sl_bool _Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map, sl_bool flagJSON)
 {
 	Iterator< Pair<String, Variant> > iterator(map.iterator());
 	ret.add("{");
@@ -533,7 +533,7 @@ static sl_bool _Variant_getVariantMapJSONString(StringBuffer& ret, const Map<Str
 		Variant& v = pair.value;
 		if (!v.isVariantList() && !v.isVariantMap()) {
 			if (flagJSON) {
-				valueText = v.toJSON();
+				valueText = v.toJson();
 				if (valueText.isEmpty()) {
 					SLIB_STATIC_STRING(_null, "null");
 					valueText = _null;
@@ -552,11 +552,11 @@ static sl_bool _Variant_getVariantMapJSONString(StringBuffer& ret, const Map<Str
 		}
 		ret.add(": ");
 		if (v.isVariantList()) {
-			if (!_Variant_getVariantListJSONString(ret, v.getVariantList(), flagJSON)) {
+			if (!_Variant_getVariantListJsonString(ret, v.getVariantList(), flagJSON)) {
 				return sl_false;
 			}
 		} else if (v.isVariantMap()) {
-			if (!_Variant_getVariantMapJSONString(ret, v.getVariantMap(), flagJSON)) {
+			if (!_Variant_getVariantMapJsonString(ret, v.getVariantMap(), flagJSON)) {
 				return sl_false;
 			}
 		} else {
@@ -576,76 +576,76 @@ static sl_bool _Variant_getVariantMapJSONString(StringBuffer& ret, const Map<Str
 String Variant::toString() const
 {
 	switch (m_type) {
-		case typeNull:
+		case variantType_Null:
 			return "<null>";
-		case typeInt32:
-		case typeUint32:
-		case typeInt64:
-		case typeUint64:
-		case typeFloat:
-		case typeDouble:
-		case typeBoolean:
+		case variantType_Int32:
+		case variantType_Uint32:
+		case variantType_Int64:
+		case variantType_Uint64:
+		case variantType_Float:
+		case variantType_Double:
+		case variantType_Boolean:
 			return getString(String::null());
-		case typeTime:
+		case variantType_Time:
 			return "\"" + (*(Time*)(void*)(&m_value)).toString() + "\"";
-		case typeString8:
+		case variantType_String8:
 			return "\"" + (*(String8*)(void*)(&m_value)) + "\"";
-		case typeString16:
+		case variantType_String16:
 			return "\"" + (*(String16*)(void*)(&m_value)) + "\"";
-		case typePointer:
+		case variantType_Pointer:
 			return "#" + String::fromPointerValue(*(const void**)(void*)(&m_value));
-		case typeObject:
+		case variantType_Object:
 			if (isVariantList()) {
 				StringBuffer ret;
-				if (!_Variant_getVariantListJSONString(ret, getVariantList(), sl_false)) {
+				if (!_Variant_getVariantListJsonString(ret, getVariantList(), sl_false)) {
 					ret.add(" ...");
 				}
 				return ret.merge();
 			} else if (isVariantMap()) {
 				StringBuffer ret;
-				if (!_Variant_getVariantMapJSONString(ret, getVariantMap(), sl_false)) {
+				if (!_Variant_getVariantMapJsonString(ret, getVariantMap(), sl_false)) {
 					ret.add(" ...");
 				}
 				return ret.merge();
 			} else {
 				return "<object:" + String::fromUtf8(getObjectClassTypeName()) + ">";
 			}
-		case typeWeak:
+		case variantType_Weak:
 			return "<weak-ref>";
 		default:
 			return "<error-type>";
 	}
 }
 
-String Variant::toJSON() const
+String Variant::toJson() const
 {
 	switch (m_type) {
-		case typeNull:
+		case variantType_Null:
 			return String::null();
-		case typeInt32:
-		case typeUint32:
-		case typeInt64:
-		case typeUint64:
-		case typeFloat:
-		case typeDouble:
-		case typeBoolean:
+		case variantType_Int32:
+		case variantType_Uint32:
+		case variantType_Int64:
+		case variantType_Uint64:
+		case variantType_Float:
+		case variantType_Double:
+		case variantType_Boolean:
 			return getString(String::null());
-		case typeTime:
-		case typeString8:
+		case variantType_Time:
+		case variantType_String8:
 			return getString(String8::null()).applyBackslashEscapes();
-		case typeString16:
+		case variantType_String16:
 			return getString16(String16::null()).applyBackslashEscapes();
-		case typeObject:
+		case variantType_Object:
 			if (isVariantList())
 			{
 				StringBuffer ret;
-				if (!_Variant_getVariantListJSONString(ret, getVariantList(), sl_true)) {
+				if (!_Variant_getVariantListJsonString(ret, getVariantList(), sl_true)) {
 					return String::null();
 				}
 				return ret.merge();
 			} else if (isVariantMap()) {
 				StringBuffer ret;
-				if (!_Variant_getVariantMapJSONString(ret, getVariantMap(), sl_true)) {
+				if (!_Variant_getVariantMapJsonString(ret, getVariantMap(), sl_true)) {
 					return String::null();
 				}
 				return ret.merge();

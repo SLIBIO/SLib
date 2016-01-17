@@ -10,7 +10,6 @@ SLIB_NAMESPACE_BEGIN
 template <class TYPE>
 class SLIB_EXPORT ScopedPtr
 {
-	SLIB_DECLARE_CLASS_NOCOPY(ScopedPtr)
 public:
 	SLIB_INLINE ScopedPtr()
 	{
@@ -100,7 +99,6 @@ public:
 template <class TYPE>
 class SLIB_EXPORT ScopedArray
 {
-	SLIB_DECLARE_CLASS_NOCOPY(ScopedArray)
 public:
 	SLIB_INLINE ScopedArray()
 	{
@@ -189,7 +187,6 @@ protected:
 template <class TYPE, sl_size sizeStack = 0>
 class SLIB_EXPORT ScopedBuffer
 {
-	SLIB_DECLARE_CLASS_NOCOPY(ScopedBuffer)
 public:
 	SLIB_INLINE ScopedBuffer(sl_size size)
 	{

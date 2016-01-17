@@ -11,12 +11,16 @@
 #endif
 
 SLIB_MEDIA_NAMESPACE_BEGIN
+
 class SLIB_EXPORT OpenSL_ES
 {
 public:
 	static Ref<AudioPlayer> createPlayer(const AudioPlayerParam& param);
+	
 	static Ref<AudioRecorder> createRecorder(const AudioRecorderParam& param);
+	
 };
+
 SLIB_MEDIA_NAMESPACE_END
 
 #endif

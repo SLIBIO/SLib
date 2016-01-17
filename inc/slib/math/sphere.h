@@ -16,21 +16,15 @@ public:
 	T radius;
 	
 public:
-	SLIB_INLINE SphereT() {}
+	SLIB_INLINE SphereT()
+	{
+	}
 	
 	template <class O>
 	SLIB_INLINE SphereT(const SphereT<O>& other)
 	{
 		center = other.center;
 		radius = (T)(other.radius);
-	}
-	
-	template <class O>
-	SLIB_INLINE SphereT& operator=(const SphereT<O>& other)
-	{
-		center = other.center;
-		radius = (T)(other.radius);
-		return *this;
 	}
 	
 	SLIB_INLINE SphereT(const Vector3T<T>& _center, T _radius)
@@ -46,7 +40,17 @@ public:
 		center.z = zc;
 		radius = _radius;
 	}
+
+public:
+	template <class O>
+	SLIB_INLINE SphereT& operator=(const SphereT<O>& other)
+	{
+		center = other.center;
+		radius = (T)(other.radius);
+		return *this;
+	}
 	
+public:
 	SLIB_INLINE sl_bool containsPoint(const Vector3T<T>& point)
 	{
 		T dx = point.x - center.x;

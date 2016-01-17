@@ -18,11 +18,12 @@
 */ 
 
 SLIB_NETWORK_NAMESPACE_BEGIN
-class SLIB_EXPORT NAT_Table : public Object
+
+class SLIB_EXPORT NatTable : public Object
 {
 public:
-	NAT_Table();
-	~NAT_Table();
+	NatTable();
+	~NatTable();
 
 public:
 	SLIB_INLINE const IPv4Address& getTargetAddress() const
@@ -67,7 +68,7 @@ public:
 
 	sl_uint32 getMappedTcpTargetPort(const SocketAddress& address);
 	sl_uint32 getMappedUdpTargetPort(const SocketAddress& address);
-	sl_uint16 getMappedIcmpEchoSequenceNumber(const ICMP_EchoAddress& address);
+	sl_uint16 getMappedIcmpEchoSequenceNumber(const IcmpEchoAddress& address);
 
 protected:
 	IPv4Address m_addressTarget;
@@ -84,18 +85,18 @@ protected:
 		SocketAddress addressSource;
 		sl_uint32 portTarget;
 	};
-	Map<SocketAddress, MappingElement> m_mapTcpOutgoing;
-	Map<sl_uint32, MappingElement> m_mapTcpIncoming;
-	Map<SocketAddress, MappingElement> m_mapUdpOutgoing;
-	Map<sl_uint32, MappingElement> m_mapUdpIncoming;
+	HashMap<SocketAddress, MappingElement> m_mapTcpOutgoing;
+	HashMap<sl_uint32, MappingElement> m_mapTcpIncoming;
+	HashMap<SocketAddress, MappingElement> m_mapUdpOutgoing;
+	HashMap<sl_uint32, MappingElement> m_mapUdpIncoming;
 
 	struct IcmpEchoElement
 	{
-		ICMP_EchoAddress addressSource;
+		IcmpEchoAddress addressSource;
 		sl_uint16 sequenceNumberTarget;
 	};
-	Map<ICMP_EchoAddress, IcmpEchoElement> m_mapIcmpEchoOutgoing;
-	Map<sl_uint32, IcmpEchoElement> m_mapIcmpEchoIncoming;
+	HashMap<IcmpEchoAddress, IcmpEchoElement> m_mapIcmpEchoOutgoing;
+	HashMap<sl_uint32, IcmpEchoElement> m_mapIcmpEchoIncoming;
 };
 
 SLIB_NETWORK_NAMESPACE_END

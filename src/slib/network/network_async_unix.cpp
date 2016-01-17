@@ -254,7 +254,7 @@ public:
 				_onAccept(socketAccept, addr);
 			} else {
 				sl_uint32 err = socket->getLastError();
-				if (err != Socket::errorWouldBlock) {
+				if (err != socketError_WouldBlock) {
 					_onError();
 				}
 				return;

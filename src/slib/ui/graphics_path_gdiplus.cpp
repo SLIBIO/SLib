@@ -75,10 +75,10 @@ public:
 	{
 		Gdiplus::FillMode fillMode;
 		switch (_mode) {
-		case fillModeWinding:
+		case fillMode_Winding:
 			fillMode = Gdiplus::FillModeWinding;
 			break;
-		case fillModeAlternate:
+		case fillMode_Alternate:
 		default:
 			fillMode = Gdiplus::FillModeAlternate;
 			break;

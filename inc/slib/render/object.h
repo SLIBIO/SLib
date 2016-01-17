@@ -39,7 +39,7 @@ public:
 	{
 		setVisible(sl_true);
 		setHitTestable(sl_true);
-		setButtonState(buttonStateNormal);
+		setButtonState(buttonState_Normal);
 	}
 
 	virtual void render(RenderEngine* engine) = 0;

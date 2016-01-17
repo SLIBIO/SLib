@@ -27,11 +27,11 @@ typedef int SOCKET;
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
-static sl_uint32 _Socket_apply_address(Socket::Type type, sockaddr_storage& addr, SocketAddress in)
+static sl_uint32 _Socket_apply_address(SocketType type, sockaddr_storage& addr, SocketAddress in)
 {
-	if (in.ip.isIPv4() && (type == Socket::typeTcp_IPv4 || type == Socket::typeUdp_IPv4 || type == Socket::typeRaw_IPv4)) {
+	if (in.ip.isIPv4() && (type == socketType_Tcp || type == socketType_Udp || type == socketType_Raw)) {
 		return in.getSystemSocketAddress(&addr);
-	} else if ((in.ip.isIPv4() || in.ip.isIPv6()) && (type == Socket::typeTcp_IPv6 || type == Socket::typeUdp_IPv6 || type == Socket::typeRaw_IPv6)) {
+	} else if ((in.ip.isIPv4() || in.ip.isIPv6()) && (type == socketType_TcpIPv6 || type == socketType_UdpIPv6 || type == socketType_RawIPv6)) {
 		if (in.ip.isIPv4()) {
 			in.ip = IPv6Address(in.ip.getIPv4());
 		}
@@ -52,8 +52,8 @@ static void _Socket_close(sl_socket socket)
 Socket::Socket()
 {
 	m_socket = SLIB_SOCKET_INVALID_HANDLE;
-	m_type = typeNone;
-	m_lastError = errorNone;
+	m_type = socketType_None;
+	m_lastError = socketError_None;
 }
 
 Socket::~Socket()
@@ -67,8 +67,8 @@ void Socket::close()
 		_Socket_close(m_socket);
 		m_socket = SLIB_SOCKET_INVALID_HANDLE;
 	}
-	m_type = typeNone;
-	m_lastError = errorNone;
+	m_type = socketType_None;
+	m_lastError = socketError_None;
 }
 
 void Socket::initializeSocket()
@@ -88,40 +88,40 @@ void Socket::initializeSocket()
 #endif
 }
 
-Ref<Socket> Socket::open(Type type, sl_uint32 _protocol)
+Ref<Socket> Socket::open(SocketType type, sl_uint32 _protocol)
 {
 	initializeSocket();
 
 	int af = 0;
 	int st = 0;
 	int protocol = 0;
-	if (type == typeTcp_IPv4) {
+	if (type == socketType_Tcp) {
 		af = AF_INET;
 		st = SOCK_STREAM;
-	} else if (type == typeUdp_IPv4) {
+	} else if (type == socketType_Udp) {
 		af = AF_INET;
 		st = SOCK_DGRAM;
-	} else if (type == typeRaw_IPv4) {
+	} else if (type == socketType_Raw) {
 		af = AF_INET;
 		st = SOCK_RAW;
 		protocol = _protocol;
-	} else if (type == typeTcp_IPv6) {
+	} else if (type == socketType_TcpIPv6) {
 		af = AF_INET6;
 		st = SOCK_STREAM;
-	} else if (type == typeUdp_IPv6) {
+	} else if (type == socketType_UdpIPv6) {
 		af = AF_INET6;
 		st = SOCK_DGRAM;
-	} else if (type == typeRaw_IPv6) {
+	} else if (type == socketType_RawIPv6) {
 		af = AF_INET6;
 		st = SOCK_RAW;
 		protocol = _protocol;
 	}
 #if defined(SLIB_PLATFORM_IS_LINUX)
-	else if (type == typePacketRaw) {
+	else if (type == socketType_PacketRaw) {
 		af = AF_PACKET;
 		st = SOCK_RAW;
 		protocol = htons(_protocol);
-	} else if (type == typePacketDatagram) {
+	} else if (type == socketType_PacketDatagram) {
 		af = AF_PACKET;
 		st = SOCK_DGRAM;
 		protocol = htons(_protocol);
@@ -154,42 +154,42 @@ Ref<Socket> Socket::open(Type type, sl_uint32 _protocol)
 String Socket::getTypeText() const
 {
 	switch (getType()) {
-	case typeTcp_IPv4:
+	case socketType_Tcp:
 		{
-			SLIB_STATIC_STRING(s, "TCP/IPv4");
+			SLIB_STATIC_STRING(s, "TCP/IP");
 			return s;
 		}
-	case typeUdp_IPv4:
+	case socketType_Udp:
 		{
-			SLIB_STATIC_STRING(s, "UDP/IPv4");
+			SLIB_STATIC_STRING(s, "UDP/IP");
 			return s;
 		}
-	case typeRaw_IPv4:
+	case socketType_Raw:
 		{
-			SLIB_STATIC_STRING(s, "RAW/IPv4");
+			SLIB_STATIC_STRING(s, "RAW/IP");
 			return s;
 		}
-	case typeTcp_IPv6:
+	case socketType_TcpIPv6:
 		{
 			SLIB_STATIC_STRING(s, "TCP/IPv6");
 			return s;
 		}
-	case typeUdp_IPv6:
+	case socketType_UdpIPv6:
 		{
 			SLIB_STATIC_STRING(s, "UDP/IPv6");
 			return s;
 		}
-	case typeRaw_IPv6:
+	case socketType_RawIPv6:
 		{
 			SLIB_STATIC_STRING(s, "RAW/IPv6");
 			return s;
 		}
-	case typePacketRaw:
+	case socketType_PacketRaw:
 		{
 			SLIB_STATIC_STRING(s, "PACKET/RAW");
 			return s;
 		}
-	case typePacketDatagram:
+	case socketType_PacketDatagram:
 		{
 			SLIB_STATIC_STRING(s, "PACKET/DATAGRAM");
 			return s;
@@ -202,13 +202,13 @@ String Socket::getTypeText() const
 	}
 }
 
-sl_bool Socket::shutdown(ShutdownMode mode)
+sl_bool Socket::shutdown(SocketShutdownMode mode)
 {
 	if (isOpened()) {
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
-		int ret = ::shutdown((SOCKET)(m_socket), mode == shutReceive ? SD_RECEIVE : mode == shutSend ? SD_SEND : SD_BOTH);
+		int ret = ::shutdown((SOCKET)(m_socket), mode == socketShutdownMode_Receive ? SD_RECEIVE : mode == socketShutdownMode_Send ? SD_SEND : SD_BOTH);
 #else
-		int ret = ::shutdown((SOCKET)(m_socket), mode == shutReceive ? SHUT_RD : mode == shutSend ? SHUT_WR : SHUT_RDWR);
+		int ret = ::shutdown((SOCKET)(m_socket), mode == socketShutdownMode_Receive ? SHUT_RD : mode == socketShutdownMode_Send ? SHUT_WR : SHUT_RDWR);
 #endif
 		if (ret == 0) {
 			return sl_true;
@@ -227,37 +227,36 @@ sl_bool Socket::bind(const SocketAddress& address)
 	if (isOpened()) {
 		sockaddr_storage addr;
         sl_uint32 size_addr = 0;
-		Type type = (Type)(m_type);
-		if (type == typeTcp_IPv4 || type == typeUdp_IPv4 || type == typeRaw_IPv4) {
+		if (m_type == socketType_Tcp || m_type == socketType_Udp || m_type == socketType_Raw) {
 			if (address.ip.isIPv4()) {
-				size_addr = _Socket_apply_address(type, addr, address);
+				size_addr = _Socket_apply_address(m_type, addr, address);
 			} else if (address.ip.isNone()) {
 				SocketAddress addrAny;
 				addrAny.ip = IPv4Address::any();
 				addrAny.port = address.port;
-				size_addr = _Socket_apply_address(type, addr, addrAny);
+				size_addr = _Socket_apply_address(m_type, addr, addrAny);
 			} else {
-				_setError(errorBindInvalidAddress);
+				_setError(socketError_BindInvalidAddress);
 				return sl_false;
 			}
-		} else if (type == typeTcp_IPv6 || type == typeUdp_IPv6 || type == typeRaw_IPv6) {
+		} else if (m_type == socketType_TcpIPv6 || m_type == socketType_UdpIPv6 || m_type == socketType_RawIPv6) {
 			if (address.ip.isIPv4()) {
 				SocketAddress addrConv;
 				addrConv.ip = IPv6Address(address.ip.getIPv4());
-				size_addr = _Socket_apply_address(type, addr, address);
+				size_addr = _Socket_apply_address(m_type, addr, address);
 			} else if (address.ip.isIPv6()) {
-				size_addr = _Socket_apply_address(type, addr, address);
+				size_addr = _Socket_apply_address(m_type, addr, address);
 			} else if (address.ip.isNone()) {
 				SocketAddress addrAny;
 				addrAny.ip = IPv6Address::any();
 				addrAny.port = address.port;
-				size_addr = _Socket_apply_address(type, addr, addrAny);
+				size_addr = _Socket_apply_address(m_type, addr, addrAny);
 			} else {
-				_setError(errorBindInvalidAddress);
+				_setError(socketError_BindInvalidAddress);
 				return sl_false;
 			}
 		} else {
-			_setError(errorBindInvalidType);
+			_setError(socketError_BindInvalidType);
 			return sl_false;
 		}
 		int ret = ::bind((SOCKET)(m_socket), (sockaddr*)&addr, (int)size_addr);
@@ -276,8 +275,8 @@ sl_bool Socket::bind(const SocketAddress& address)
 sl_bool Socket::listen()
 {
 	if (isOpened()) {
-		if (m_type != typeTcp_IPv4 && m_type != typeTcp_IPv6) {
-			_setError(errorListenIsNotSupported);
+		if (m_type != socketType_Tcp && m_type != socketType_TcpIPv6) {
+			_setError(socketError_ListenIsNotSupported);
 			return sl_false;
 		}
 		int ret = ::listen((SOCKET)(m_socket), SOMAXCONN);
@@ -296,8 +295,8 @@ sl_bool Socket::listen()
 sl_bool Socket::accept(Ref<Socket>& socketClient, SocketAddress& address)
 {
 	if (isOpened()) {
-		if (m_type != typeTcp_IPv4 && m_type != typeTcp_IPv6) {
-			_setError(errorAcceptIsNotSupported);
+		if (m_type != socketType_Tcp && m_type != socketType_TcpIPv6) {
+			_setError(socketError_AcceptIsNotSupported);
 			return sl_false;
 		}
 		sockaddr_storage addr;
@@ -332,22 +331,21 @@ sl_bool Socket::accept(Ref<Socket>& socketClient, SocketAddress& address)
 sl_bool Socket::connect(const SocketAddress& address)
 {
 	if (isOpened()) {
-		Type type = (Type)(m_type);
-		if (type != typeTcp_IPv4 && type != typeTcp_IPv6) {
-			_setError(errorConnectIsNotSupported);
+		if (m_type != socketType_Tcp && m_type != socketType_TcpIPv6) {
+			_setError(socketError_ConnectIsNotSupported);
 			return sl_false;
 		}
 		sockaddr_storage addr;
-		if (sl_uint32 addr_size = _Socket_apply_address(type, addr, address)) {
+		if (sl_uint32 addr_size = _Socket_apply_address(m_type, addr, address)) {
 			int ret = ::connect((SOCKET)(m_socket), (sockaddr*)&addr, (int)addr_size);
 			if (ret != SOCKET_ERROR) {
 				return sl_true;
 			} else {
 				sl_uint32 e = _checkError();
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
-				if (e == errorWouldBlock)
+				if (e == socketError_WouldBlock)
 #else
-				if (e == errorInProgress)
+				if (e == socketError_InProgress)
 #endif
 				{
 					return sl_true;
@@ -356,7 +354,7 @@ sl_bool Socket::connect(const SocketAddress& address)
 				}
 			}
 		} else {
-			_setError(errorConnectToInvalidAddress);
+			_setError(socketError_ConnectToInvalidAddress);
 			return sl_false;
 		}
 	} else {
@@ -371,7 +369,7 @@ sl_bool Socket::connectAndWait(const SocketAddress& address, sl_int32 timeout)
 	if (connect(address)) {
 		Ref<SocketEvent> ev = SocketEvent::createWrite(this);
 		if (ev.isNotNull()) {
-			if (ev->waitEvents(timeout) & SocketEvent::eventWrite) {
+			if (ev->waitEvents(timeout) & socketEventType_Write) {
 				if (getOption_Error() == 0) {
 					return sl_true;
 				}
@@ -387,8 +385,8 @@ sl_int32 Socket::send(const void* buf, sl_uint32 size)
 		if (size == 0) {
 			return 0;
 		}
-		if (m_type != typeTcp_IPv4 && m_type != typeTcp_IPv6) {
-			_setError(errorSendIsNotSupported);
+		if (m_type != socketType_Tcp && m_type != socketType_TcpIPv6) {
+			_setError(socketError_SendIsNotSupported);
 			return -1;
 		}
 #if	defined(SLIB_PLATFORM_IS_LINUX)
@@ -402,7 +400,7 @@ sl_int32 Socket::send(const void* buf, sl_uint32 size)
 			}
 			return ret;
 		} else {
-			if (_checkError() == errorWouldBlock) {
+			if (_checkError() == socketError_WouldBlock) {
 				return 0;
 			} else {
 				return -1;
@@ -420,8 +418,8 @@ sl_int32 Socket::receive(void* buf, sl_uint32 size)
 		if (size == 0) {
 			return 0;
 		}
-		if (m_type != typeTcp_IPv4 && m_type != typeTcp_IPv6) {
-			_setError(errorReceiveIsNotSupported);
+		if (m_type != socketType_Tcp && m_type != socketType_TcpIPv6) {
+			_setError(socketError_ReceiveIsNotSupported);
 			return -1;
 		}
 		sl_int32 ret = (sl_int32)(::recv((SOCKET)(m_socket), (char*)buf, size, 0));
@@ -431,7 +429,7 @@ sl_int32 Socket::receive(void* buf, sl_uint32 size)
 			}
 			return ret;
 		} else {
-			if (_checkError() == errorWouldBlock) {
+			if (_checkError() == socketError_WouldBlock) {
 				return 0;
 			} else {
 				return -1;
@@ -449,13 +447,12 @@ sl_int32 Socket::sendTo(const void* buf, sl_uint32 size, const SocketAddress& ad
 		if (size == 0) {
 			return 0;
 		}
-		Type type = (Type)(m_type);
-		if (type != typeUdp_IPv4 && type != typeUdp_IPv6 && type != typeRaw_IPv4 && type != typeRaw_IPv6) {
-			_setError(errorSendToIsNotSupported);
+		if (m_type != socketType_Udp && m_type != socketType_UdpIPv6 && m_type != socketType_Raw && m_type != socketType_RawIPv6) {
+			_setError(socketError_SendToIsNotSupported);
 			return -1;
 		}
 		sockaddr_storage addr;
-		if (sl_uint32 addr_size = _Socket_apply_address(type, addr, address)) {
+		if (sl_uint32 addr_size = _Socket_apply_address(m_type, addr, address)) {
 			sl_int32 ret = (sl_int32)(::sendto((SOCKET)(m_socket), (char*)buf, size, 0, (sockaddr*)&addr, (int)addr_size));
 			if (ret >= 0) {
 				if (ret == 0) {
@@ -463,14 +460,14 @@ sl_int32 Socket::sendTo(const void* buf, sl_uint32 size, const SocketAddress& ad
 				}
 				return ret;
 			} else {
-				if (_checkError() == errorWouldBlock) {
+				if (_checkError() == socketError_WouldBlock) {
 					return 0;
 				} else {
 					return -1;
 				}
 			}
 		} else {
-			_setError(errorSendToInvalidAddress);
+			_setError(socketError_SendToInvalidAddress);
 			return -1;
 		}
 	} else {
@@ -485,9 +482,8 @@ sl_int32 Socket::receiveFrom(void* buf, sl_uint32 size, SocketAddress& address)
 		if (size == 0) {
 			return 0;
 		}
-		Type type = (Type)(m_type);
-		if (type != typeUdp_IPv4 && type != typeUdp_IPv6 && type != typeRaw_IPv4 && type != typeRaw_IPv6) {
-			_setError(errorReceiveFromIsNotSupported);
+		if (m_type != socketType_Udp && m_type != socketType_UdpIPv6 && m_type != socketType_Raw && m_type != socketType_RawIPv6) {
+			_setError(socketError_ReceiveFromIsNotSupported);
 			return -1;
 		}
 		sockaddr_storage addr;
@@ -505,7 +501,7 @@ sl_int32 Socket::receiveFrom(void* buf, sl_uint32 size, SocketAddress& address)
 			}
 			return ret;
 		} else {
-			if (_checkError() == errorWouldBlock) {
+			if (_checkError() == socketError_WouldBlock) {
 				return 0;
 			} else {
 				return -1;
@@ -532,9 +528,8 @@ sl_int32 Socket::sendPacket(const void* buf, sl_uint32 size, const L2PacketInfo&
 		if (size == 0) {
 			return 0;
 		}
-		Type type = (Type)(m_type);
-		if (type != typePacketRaw && type != typePacketDatagram) {
-			_setError(errorSendPacketIsNotSupported);
+		if (m_type != socketType_PacketRaw && m_type != socketType_PacketDatagram) {
+			_setError(socketError_SendPacketIsNotSupported);
 			return -1;
 		}
 		
@@ -558,7 +553,7 @@ sl_int32 Socket::sendPacket(const void* buf, sl_uint32 size, const L2PacketInfo&
 			}
 			return ret;
 		} else {
-			if (_checkError() == errorWouldBlock) {
+			if (_checkError() == socketError_WouldBlock) {
 				return 0;
 			} else {
 				return -1;
@@ -578,9 +573,8 @@ sl_int32 Socket::receivePacket(const void* buf, sl_uint32 size, L2PacketInfo& in
 		if (size == 0) {
 			return 0;
 		}
-		Type type = (Type)(m_type);
-		if (type != typePacketRaw && type != typePacketDatagram) {
-			_setError(errorReceivePacketIsNotSupported);
+		if (m_type != socketType_PacketRaw && m_type != socketType_PacketDatagram) {
+			_setError(socketError_ReceivePacketIsNotSupported);
 			return -1;
 		}
 		sockaddr_ll addr;
@@ -590,7 +584,7 @@ sl_int32 Socket::receivePacket(const void* buf, sl_uint32 size, L2PacketInfo& in
 		if (ret >= 0) {
 			info.iface = addr.sll_ifindex;
 			info.protocol = ntohs(addr.sll_protocol);
-			info.type = (L2PacketInfo::Type)(addr.sll_pkttype);
+			info.type = (L2PacketType)(addr.sll_pkttype);
 			sl_uint32 na = addr.sll_halen;
 			if (na > 8) {
 				na = 8;
@@ -602,7 +596,7 @@ sl_int32 Socket::receivePacket(const void* buf, sl_uint32 size, L2PacketInfo& in
 			}
 			return ret;
 		} else {
-			if (_checkError() == errorWouldBlock) {
+			if (_checkError() == socketError_WouldBlock) {
 				return 0;
 			} else {
 				return -1;
@@ -732,46 +726,56 @@ sl_uint32 Socket::getOption(int level, int option) const
 	}
 }
 
+
 sl_uint32 Socket::getOption_Error() const
 {
 	return getOption(SOL_SOCKET, SO_ERROR);
 }
 
+
 sl_bool Socket::setOption_Broadcast(sl_bool flagEnable)
 {
 	return setOption(SOL_SOCKET, SO_BROADCAST, flagEnable ? 1 : 0);
 }
+
 sl_bool Socket::getOption_Broadcast() const
 {
 	return getOption(SOL_SOCKET, SO_BROADCAST) != 0;
 }
 
+
 sl_bool Socket::setOption_ReuseAddress(sl_bool flagEnable)
 {
 	return setOption(SOL_SOCKET, SO_REUSEADDR, flagEnable ? 1 : 0);
 }
+
 sl_bool Socket::getOption_ReuseAddress() const
 {
 	return getOption(SOL_SOCKET, SO_REUSEADDR) != 0;
 }
 
+
 sl_bool Socket::setOption_SendBufferSize(sl_uint32 size)
 {
 	return setOption(SOL_SOCKET, SO_SNDBUF, size);
 }
+
 sl_uint32 Socket::getOption_SendBufferSize() const
 {
 	return getOption(SOL_SOCKET, SO_SNDBUF);
 }
 
+
 sl_bool Socket::setOption_ReceiveBufferSize(sl_uint32 size)
 {
 	return setOption(SOL_SOCKET, SO_RCVBUF, size);
 }
+
 sl_uint32 Socket::getOption_ReceiveBufferSize() const
 {
 	return getOption(SOL_SOCKET, SO_RCVBUF);
 }
+
 
 sl_bool Socket::setOption_SendTimeout(sl_uint32 size)
 {
@@ -785,23 +789,28 @@ sl_bool Socket::setOption_ReceiveTimeout(sl_uint32 size)
 	return setOption(SOL_SOCKET, SO_RCVTIMEO, size);
 }
 
+
 sl_bool Socket::setOption_IPv6Only(sl_bool flagEnable)
 {
 	return setOption(IPPROTO_IPV6, IPV6_V6ONLY, flagEnable ? 1 : 0);
 }
+
 sl_bool Socket::getOption_IPv6Only() const
 {
 	return getOption(IPPROTO_IPV6, IPV6_V6ONLY) != 0;
 }
 
+
 sl_bool Socket::setOption_TcpNoDelay(sl_bool flagEnable)
 {
 	return setOption(IPPROTO_TCP, TCP_NODELAY, flagEnable ? 1 : 0);
 }
+
 sl_bool Socket::getOption_TcpNoDelay() const
 {
 	return getOption(IPPROTO_TCP, TCP_NODELAY) != 0;
 }
+
 
 sl_bool Socket::setOption_IpTTL(sl_uint32 ttl)
 {
@@ -810,24 +819,29 @@ sl_bool Socket::setOption_IpTTL(sl_uint32 ttl)
 	}
 	return setOption(IPPROTO_IP, IP_TTL, ttl);
 }
+
 sl_uint32 Socket::getOption_IpTTL() const
 {
 	return getOption(IPPROTO_IP, IP_TTL);
 }
+
 
 sl_bool Socket::getOption_IsListening() const
 {
 	return getOption(SOL_SOCKET, SO_ACCEPTCONN) != 0;
 }
 
+
 sl_bool Socket::setOption_IncludeIpHeader(sl_bool flagEnable)
 {
 	return setOption(IPPROTO_IP, IP_HDRINCL, flagEnable ? 1 : 0);
 }
+
 sl_bool Socket::getOption_IncludeIpHeader() const
 {
 	return getOption(IPPROTO_IP, IP_HDRINCL) != 0;
 }
+
 
 sl_bool Socket::setOption_bindToDevice(const String& ifname)
 {
@@ -837,6 +851,7 @@ sl_bool Socket::setOption_bindToDevice(const String& ifname)
 	return sl_false;
 #endif
 }
+
 
 sl_bool Socket::setOption_IpAddMembership(const IPv4Address& ipMulticast, const IPv4Address& ipInterface)
 {
@@ -858,6 +873,7 @@ sl_bool Socket::setOption_IpMulticastLoop(sl_bool flag)
 {
 	return setOption(IPPROTO_IP, IP_MULTICAST_LOOP, flag ? 1 : 0);
 }
+
 sl_bool Socket::getOption_IpMulticastLoop() const
 {
 	return getOption(IPPROTO_IP, IP_MULTICAST_LOOP) != 0;
@@ -870,10 +886,12 @@ sl_bool Socket::setOption_IpMulticastTTL(sl_uint32 ttl)
 	}
 	return setOption(IPPROTO_IP, IP_MULTICAST_TTL, ttl);
 }
+
 sl_uint32 Socket::getOption_IpMulticastTTL() const
 {
 	return getOption(IPPROTO_IP, IP_MULTICAST_TTL);
 }
+
 
 sl_uint32 Socket::_setError(sl_uint32 code)
 {
@@ -899,18 +917,18 @@ sl_uint32 Socket::_checkError()
 	case EAGAIN:
 #	endif
 #endif
-		ret = _setError(errorWouldBlock);
+		ret = _setError(socketError_WouldBlock);
 		break;
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 	case WSAENETDOWN:
-		ret = _setError(errorNetworkDown);
+		ret = _setError(socketError_NetworkDown);
 		break;
 #endif
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 	case WSAENETRESET:
-		ret = _setError(errorNetworkReset);
+		ret = _setError(socketError_NetworkReset);
 		break;
 #endif
 
@@ -919,7 +937,7 @@ sl_uint32 Socket::_checkError()
 #else
 	case ECONNRESET:
 #endif
-		ret = _setError(errorConnectionReset);
+		ret = _setError(socketError_ConnectionReset);
 		break;
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -927,7 +945,7 @@ sl_uint32 Socket::_checkError()
 #else
 	case ECONNABORTED:
 #endif
-		ret = _setError(errorConnectionAbort);
+		ret = _setError(socketError_ConnectionAbort);
 		break;
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -935,7 +953,7 @@ sl_uint32 Socket::_checkError()
 #else
 	case ECONNREFUSED:
 #endif
-		ret = _setError(errorConnectionRefused);
+		ret = _setError(socketError_ConnectionRefused);
 		break;
 
 
@@ -944,7 +962,7 @@ sl_uint32 Socket::_checkError()
 #else
 	case ETIMEDOUT:
 #endif
-		ret = _setError(errorTimeout);
+		ret = _setError(socketError_Timeout);
 		break;
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -953,7 +971,7 @@ sl_uint32 Socket::_checkError()
 	case ENOTSOCK:
 	case EBADF:
 #endif
-		ret = _setError(errorNotSocket);
+		ret = _setError(socketError_NotSocket);
 		break;
 
 
@@ -962,7 +980,7 @@ sl_uint32 Socket::_checkError()
 #else
 	case EADDRINUSE:
 #endif
-		ret = _setError(errorAddressAlreadyInUse);
+		ret = _setError(socketError_AddressAlreadyInUse);
 		break;
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -970,7 +988,7 @@ sl_uint32 Socket::_checkError()
 #else
 	case ENOBUFS:
 #endif
-		ret = _setError(errorNoBufs);
+		ret = _setError(socketError_NoBufs);
 		break;
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -978,7 +996,7 @@ sl_uint32 Socket::_checkError()
 #else
 	case ENOMEM:
 #endif
-		ret = _setError(errorNoMem);
+		ret = _setError(socketError_NoMem);
 		break;
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -986,7 +1004,7 @@ sl_uint32 Socket::_checkError()
 #else
 	case EINPROGRESS:
 #endif
-		ret = _setError(errorInProgress);
+		ret = _setError(socketError_InProgress);
 		break;
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -994,7 +1012,7 @@ sl_uint32 Socket::_checkError()
 #else
 	case EDESTADDRREQ:
 #endif
-		ret = _setError(errorDestinationAddressRequired);
+		ret = _setError(socketError_DestinationAddressRequired);
 		break;
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -1002,7 +1020,7 @@ sl_uint32 Socket::_checkError()
 #else
 	case EPFNOSUPPORT:
 #endif
-		ret = _setError(errorProtocolFamilyNotSupported);
+		ret = _setError(socketError_ProtocolFamilyNotSupported);
 		break;
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -1010,7 +1028,7 @@ sl_uint32 Socket::_checkError()
 #else
 	case EAFNOSUPPORT:
 #endif
-		ret = _setError(errorAddressFamilyNotSupported);
+		ret = _setError(socketError_AddressFamilyNotSupported);
 		break;
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -1018,7 +1036,7 @@ sl_uint32 Socket::_checkError()
 #else
 	case EADDRNOTAVAIL:
 #endif
-		ret = _setError(errorAddressNotAvailable);
+		ret = _setError(socketError_AddressNotAvailable);
 		break;
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -1026,7 +1044,7 @@ sl_uint32 Socket::_checkError()
 #else
 	case ENOTCONN:
 #endif
-		ret = _setError(errorNotConnected);
+		ret = _setError(socketError_NotConnected);
 		break;
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -1034,7 +1052,7 @@ sl_uint32 Socket::_checkError()
 #else
 	case ESHUTDOWN:
 #endif
-		ret = _setError(errorShutdown);
+		ret = _setError(socketError_Shutdown);
 		break;
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -1042,11 +1060,11 @@ sl_uint32 Socket::_checkError()
 #else
 	case EACCES:
 #endif
-		ret = _setError(errorAccess);
+		ret = _setError(socketError_Access);
 		break;
 
 	default:
-		ret = _setError(errorUnknown + err);
+		ret = _setError(socketError_Unknown + err);
 		break;
 	}
 	return ret;
@@ -1054,82 +1072,82 @@ sl_uint32 Socket::_checkError()
 
 void Socket::_setClosedError()
 {
-	_setError(errorClosed);
+	_setError(socketError_Closed);
 }
 
 String Socket::getErrorMessage(sl_uint32 error)
 {
 	switch (error) {
-	case errorNone:
+	case socketError_None:
 		return String::null();
-	case errorNetworkDown:
+	case socketError_NetworkDown:
 		return "NETDOWN - Network is down";
-	case errorNetworkReset:
+	case socketError_NetworkReset:
 		return "NETRESET - Network dropped connection on reset";
-	case errorConnectionReset:
+	case socketError_ConnectionReset:
 		return "CONNRESET - Connection reset by peer";
-	case errorConnectionAbort:
+	case socketError_ConnectionAbort:
 		return "CONNABORTED - Software caused connection abort";
-	case errorConnectionRefused:
+	case socketError_ConnectionRefused:
 		return "CONNREFUSED - Connection refused";
-	case errorTimeout:
+	case socketError_Timeout:
 		return "TIMEOUT - Connection timed out";
-	case errorNotSocket:
+	case socketError_NotSocket:
 		return "NOTSOCK - Socket operation on nonsocket";
-	case errorAddressAlreadyInUse:
+	case socketError_AddressAlreadyInUse:
 		return "ADDRINUSE - Address already in use";
-	case errorNoBufs:
+	case socketError_NoBufs:
 		return "NOBUFS - No buffer space available";
-	case errorNoMem:
+	case socketError_NoMem:
 		return "NOMEM - Insufficient memory available";
-	case errorInProgress:
+	case socketError_InProgress:
 		return "INPROGRESS - Operation now in progress";
-	case errorDestinationAddressRequired:
+	case socketError_DestinationAddressRequired:
 		return "DESTADDRREQ - Destination address required";
-	case errorProtocolFamilyNotSupported:
+	case socketError_ProtocolFamilyNotSupported:
 		return "PFNOSUPPORT - Protocol family not supported";
-	case errorAddressNotAvailable:
+	case socketError_AddressNotAvailable:
 		return "AFNOSUPPORT - Address family not supported by protocol family";
-	case errorNotConnected:
+	case socketError_NotConnected:
 		return "NOTCONN - Socket is not connected";
-	case errorShutdown:
+	case socketError_Shutdown:
 		return "SHUTDOWN - Cannot send after socket shutdown";
-	case errorAccess:
+	case socketError_Access:
 		return "ACCESS - Permission denied";
 
-	case errorClosed:
+	case socketError_Closed:
 		return "Socket is closed";
-	case errorBindInvalidAddress:
+	case socketError_BindInvalidAddress:
 		return "Bind to invalid address";
-	case errorBindInvalidType:
+	case socketError_BindInvalidType:
 		return "Bind invalid socket type";
-	case errorListenIsNotSupported:
+	case socketError_ListenIsNotSupported:
 		return "Listen is not supported";
-	case errorAcceptIsNotSupported:
+	case socketError_AcceptIsNotSupported:
 		return "Accept is not supported";
-	case errorConnectIsNotSupported:
+	case socketError_ConnectIsNotSupported:
 		return "Connect is not supported";
-	case errorConnectToInvalidAddress:
+	case socketError_ConnectToInvalidAddress:
 		return "Connect to invalid address";
-	case errorSendIsNotSupported:
+	case socketError_SendIsNotSupported:
 		return "Send is not supported";
-	case errorReceiveIsNotSupported:
+	case socketError_ReceiveIsNotSupported:
 		return "Receive is not supported";
-	case errorSendToIsNotSupported:
+	case socketError_SendToIsNotSupported:
 		return "SendTo is not supported";
-	case errorSendToInvalidAddress:
+	case socketError_SendToInvalidAddress:
 		return "SendTo to invalid address";
-	case errorReceiveFromIsNotSupported:
+	case socketError_ReceiveFromIsNotSupported:
 		return "ReceiveFrom is not supported";
-	case errorSendPacketIsNotSupported:
+	case socketError_SendPacketIsNotSupported:
 		return "SendPacket is not supported";
-	case errorSendPacketInvalidAddress:
+	case socketError_SendPacketInvalidAddress:
 		return "SendPacket to invalid address";
-	case errorReceivePacketIsNotSupported:
+	case socketError_ReceivePacketIsNotSupported:
 		return "ReceivePacket is not supported";
 	}
-	if (error > errorUnknown) {
-		return String("Unknown System Error: ") + (error - errorUnknown);
+	if (error > socketError_Unknown) {
+		return String("Unknown System Error: ") + (error - socketError_Unknown);
 	}
 	return String("Not Defined Error: ") + error;
 }

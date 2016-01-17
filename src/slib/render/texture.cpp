@@ -6,10 +6,10 @@
 SLIB_RENDER_NAMESPACE_BEGIN
 Texture::Texture()
 {
-	setMinFilter(filterLinear);
-	setMagFilter(filterLinear);
-	setWrapX(wrapClamp);
-	setWrapY(wrapClamp);
+	setMinFilter(textureFilterMode_Linear);
+	setMagFilter(textureFilterMode_Linear);
+	setWrapX(textureWrapMode_Clamp);
+	setWrapY(textureWrapMode_Clamp);
 	setFreeSourceOnUpdate(sl_false);
 }
 

@@ -15,17 +15,27 @@ static void _logJniError(const String& text)
 }
 
 JavaVM* _g_jvm_shared = sl_null;
-typedef SafeMap<String, JniClass> _JniClassMap;
-SLIB_SAFE_STATIC_REF(_JniClassMap, _g_jni_classes);
 
 SLIB_THREAD JNIEnv* _gt_jniCurrent = sl_null;
 
-SLIB_SAFE_STATIC_REF(SafeList<_JniSingletonClass*>, _g_jni_singleton_classes);
-SLIB_SAFE_STATIC_REF(SafeList<_JniSingletonMethod*>, _g_jni_singleton_methods);
-SLIB_SAFE_STATIC_REF(SafeList<_JniSingletonStaticMethod*>, _g_jni_singleton_static_methods);
-SLIB_SAFE_STATIC_REF(SafeList<_JniSingletonField*>, _g_jni_singleton_fields);
-SLIB_SAFE_STATIC_REF(SafeList<_JniSingletonStaticField*>, _g_jni_singleton_static_fields);
-SLIB_SAFE_STATIC_REF(SafeList<_JniNativeMethod*>, _g_jni_native_methods);
+class _Jni_Shared
+{
+public:
+    HashMap<String, JniClass> classes;
+    
+    CList<_JniSingletonClass*> singleton_classes;
+    CList<_JniSingletonMethod*> singleton_methods;
+    CList<_JniSingletonStaticMethod*> singleton_static_methods;
+    CList<_JniSingletonField*> singleton_fields;
+    CList<_JniSingletonStaticField*> singleton_static_fields;
+    CList<_JniNativeMethod*> native_methods;
+};
+
+static _Jni_Shared& _g_jni_shared()
+{
+    SLIB_SAFE_STATIC(_Jni_Shared, ret);
+    return ret;
+}
 
 void Jni::initialize(JavaVM* jvm)
 {
@@ -38,7 +48,7 @@ void Jni::initialize(JavaVM* jvm)
 
 		// singleton classes
 		{
-			ListLocker< _JniSingletonClass* > list(_g_jni_singleton_classes);
+			ListLocker< _JniSingletonClass* > list(_g_jni_shared().singleton_classes);
 			for (sl_size i = 0; i < list.count(); i++) {
 				_JniSingletonClass* obj = list[i];
 				obj->cls = Jni::getClass(obj->name);
@@ -46,7 +56,7 @@ void Jni::initialize(JavaVM* jvm)
 		}
 		// singleton methods
 		{
-			ListLocker< _JniSingletonMethod* > list(_g_jni_singleton_methods);
+			ListLocker< _JniSingletonMethod* > list(_g_jni_shared().singleton_methods);
 			for (sl_size i = 0; i < list.count(); i++) {
 				_JniSingletonMethod* obj = list[i];
 				JniClass cls = obj->gcls->cls;
@@ -58,7 +68,7 @@ void Jni::initialize(JavaVM* jvm)
 		}
 		// singleton static methods
 		{
-			ListLocker< _JniSingletonStaticMethod* > list(_g_jni_singleton_static_methods);
+			ListLocker< _JniSingletonStaticMethod* > list(_g_jni_shared().singleton_static_methods);
 			for (sl_size i = 0; i < list.count(); i++) {
 				_JniSingletonStaticMethod* obj = list[i];
 				JniClass cls = obj->gcls->cls;
@@ -70,7 +80,7 @@ void Jni::initialize(JavaVM* jvm)
 		}
 		// singleton fields
 		{
-			ListLocker< _JniSingletonField* > list(_g_jni_singleton_fields);
+			ListLocker< _JniSingletonField* > list(_g_jni_shared().singleton_fields);
 			for (sl_size i = 0; i < list.count(); i++) {
 				_JniSingletonField* obj = list[i];
 				JniClass cls = obj->gcls->cls;
@@ -82,7 +92,7 @@ void Jni::initialize(JavaVM* jvm)
 		}
 		// singleton static fields
 		{
-			ListLocker< _JniSingletonStaticField* > list(_g_jni_singleton_static_fields);
+			ListLocker< _JniSingletonStaticField* > list(_g_jni_shared().singleton_static_fields);
 			for (sl_size i = 0; i < list.count(); i++) {
 				_JniSingletonStaticField* obj = list[i];
 				JniClass cls = obj->gcls->cls;
@@ -94,7 +104,7 @@ void Jni::initialize(JavaVM* jvm)
 		}
 		// native methods
 		{
-			ListLocker< _JniNativeMethod* > list(_g_jni_native_methods);
+			ListLocker< _JniNativeMethod* > list(_g_jni_shared().native_methods);
 			for (sl_size i = 0; i < list.count(); i++) {
 				_JniNativeMethod* obj = list[i];
 				JniClass cls = obj->gcls->cls;
@@ -191,7 +201,7 @@ JniClass Jni::findClass(const char* className)
 JniClass Jni::getClass(const String& className)
 {
 	JniClass ret;
-	if (_g_jni_classes.get(className, &ret)) {
+	if (_g_jni_shared().classes.get(className, &ret)) {
 		return ret;
 	}
 	ret = Jni::findClass(className.getBuf());
@@ -203,12 +213,12 @@ JniClass Jni::getClass(const String& className)
 
 void Jni::registerClass(const String& className, jclass cls)
 {
-	_g_jni_classes.put(className, cls);
+	_g_jni_shared().classes.put(className, cls);
 }
 
 void Jni::unregisterClass(const String& className)
 {
-	_g_jni_classes.remove(className);
+	_g_jni_shared().classes.remove(className);
 }
 
 sl_bool Jni::isSameObject(jobject ref1, jobject ref2)
@@ -1688,7 +1698,7 @@ sl_bool JniClass::registerNative(const char* name, const char* sig, const void* 
 _JniSingletonClass::_JniSingletonClass(const char* name)
 {
 	this->name = name;
-	_g_jni_singleton_classes.add(this);
+	_g_jni_shared().singleton_classes.add(this);
 }
 
 _JniSingletonMethod::_JniSingletonMethod(_JniSingletonClass* gcls, const char* name, const char* sig)
@@ -1698,7 +1708,7 @@ _JniSingletonMethod::_JniSingletonMethod(_JniSingletonClass* gcls, const char* n
 	this->sig = sig;
 	this->cls = sl_null;
 	this->id = sl_null;
-	_g_jni_singleton_methods.add(this);
+	_g_jni_shared().singleton_methods.add(this);
 }
 
 _JniSingletonStaticMethod::_JniSingletonStaticMethod(_JniSingletonClass* gcls, const char* name, const char* sig)
@@ -1708,7 +1718,7 @@ _JniSingletonStaticMethod::_JniSingletonStaticMethod(_JniSingletonClass* gcls, c
 	this->sig = sig;
 	this->cls = sl_null;
 	this->id = sl_null;
-	_g_jni_singleton_static_methods.add(this);
+	_g_jni_shared().singleton_static_methods.add(this);
 }
 
 _JniSingletonField::_JniSingletonField(_JniSingletonClass* gcls, const char* name, const char* sig)
@@ -1718,7 +1728,7 @@ _JniSingletonField::_JniSingletonField(_JniSingletonClass* gcls, const char* nam
 	this->sig = sig;
 	this->cls = sl_null;
 	this->id = sl_null;
-	_g_jni_singleton_fields.add(this);
+	_g_jni_shared().singleton_fields.add(this);
 }
 
 _JniSingletonStaticField::_JniSingletonStaticField(_JniSingletonClass* gcls, const char* name, const char* sig)
@@ -1728,7 +1738,7 @@ _JniSingletonStaticField::_JniSingletonStaticField(_JniSingletonClass* gcls, con
 	this->sig = sig;
 	this->cls = sl_null;
 	this->id = sl_null;
-	_g_jni_singleton_static_fields.add(this);
+	_g_jni_shared().singleton_static_fields.add(this);
 }
 
 _JniNativeMethod::_JniNativeMethod(_JniSingletonClass* gcls, const char* name, const char* sig, const void* fn)
@@ -1737,7 +1747,7 @@ _JniNativeMethod::_JniNativeMethod(_JniSingletonClass* gcls, const char* name, c
 	this->name = name;
 	this->sig = sig;
 	this->fn = fn;
-	_g_jni_native_methods.add(this);
+	_g_jni_shared().native_methods.add(this);
 }
 SLIB_NAMESPACE_END
 

@@ -3,6 +3,7 @@
 #include "../../../inc/slib/graphics/image.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
+
 Bitmap::Bitmap()
 {
 }
@@ -73,5 +74,6 @@ sl_bool Bitmap::resetPixels(const Color& color)
 {
 	return resetPixels(0, 0, getWidth(), getHeight(), color);
 }
+
 SLIB_GRAPHICS_NAMESPACE_END
 

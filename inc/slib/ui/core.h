@@ -104,12 +104,19 @@ public:
 	UIApp();
 	~UIApp();
 
+public:
 	static Ref<UIApp> getApp();
 
-	Type getAppType();
+public:
+	// override
+	AppType getAppType();
+	
+	// override
 	void run(const String& param);
+	
 	void run();
 
+public:
 	virtual void onStart() {}
 	virtual void onExit() {}
 
@@ -143,16 +150,17 @@ private:
 	static sl_bool m_flagMobilePaused;
 };
 
+enum AlertType {
+    alertType_Ok = 0,
+    alertType_OkCancel = 1,
+    alertType_YesNo = 2,
+    alertType_YesNoCancel = 3
+};
+
 class SLIB_EXPORT AlertParam
 {
 public:
-	enum Type {
-		typeOk = 0,
-		typeOkCancel = 1,
-		typeYesNo = 2,
-		typeYesNoCancel = 3
-	};
-	Type type;
+	AlertType type;
 	String caption;
 	String text;
 
@@ -169,7 +177,7 @@ public:
 public:
 	AlertParam()
 	{
-		type = typeOk;
+		type = alertType_Ok;
 	}
 };
 

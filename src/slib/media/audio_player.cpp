@@ -2,6 +2,7 @@
 #include "../../../inc/slib/media/audio_format.h"
 
 SLIB_MEDIA_NAMESPACE_BEGIN
+
 AudioPlayerInfo::AudioPlayerInfo()
 {
 }
@@ -12,6 +13,7 @@ AudioPlayerBufferParam::AudioPlayerBufferParam()
 	channelsCount = 1;
 	frameLengthInMilliseconds = 50;
 	bufferLengthInMilliseconds = 1000;
+	
 	flagAutoStart = sl_true;
 }
 
@@ -19,130 +21,69 @@ AudioPlayerParam::AudioPlayerParam()
 {
 }
 
-void IAudioPlayerBufferListener::onPlayFrame(AudioPlayerBuffer *player, float *samples, sl_uint32 count)
-{
-}
-
-sl_bool IAudioPlayerBufferListener::isPlayingUint8Frame()
-{
-	return sl_false;
-}
-
-void IAudioPlayerBufferListener::onPlayFrame(AudioPlayerBuffer *player, sl_uint8 *samples, sl_uint32 count)
-{
-}
-
-sl_bool IAudioPlayerBufferListener::isPlayingInt16Frame()
-{
-	return sl_false;
-}
-
-void IAudioPlayerBufferListener::onPlayFrame(AudioPlayerBuffer *player, sl_int16 *samples, sl_uint32 count)
-{
-}
-
 AudioPlayerBuffer::AudioPlayerBuffer()
 {
-	m_lastSample_S16 = 0;
+	m_lastSample = 0;
 }
 
-AudioPlayerBuffer::~AudioPlayerBuffer()
+void AudioPlayerBuffer::write(const AudioData& audioIn)
 {
-}
-
-sl_bool AudioPlayerBuffer::write(float* samples, sl_size count)
-{
-	return m_queue.add(samples, count, sl_false);
-}
-
-void AudioPlayerBuffer::_processFrame_S16(sl_int16 *samples, sl_uint32 count)
-{
-	Ref<Event> ev = getEvent();
-	if (ev.isNotNull()) {
-		ev->set();
+	AudioFormat format;
+	sl_uint32 nChannels = m_nChannels;
+	if (nChannels == 1) {
+		format = audioFormat_Int16_Mono;
+	} else {
+		format = audioFormat_Int16_Stereo;
 	}
-	if (count > 0) {
-		PtrLocker<IAudioPlayerBufferListener> listener(getListener());
-		if (listener.isNotNull()) {
-			if (listener->isPlayingInt16Frame()) {
-				listener->onPlayFrame(this, samples, count);
-			} else if (listener->isPlayingUint8Frame()) {
-				Memory mem = _getMemProcess_U8(count);
-				if (mem.isNotEmpty()) {
-					sl_uint8* buf = (sl_uint8*)(mem.getBuf());
-					listener->onPlayFrame(this, buf, count);
-					AudioFormat::convertSamples(count, buf, samples);
-				}
-			} else {
-				Memory mem = _getMemProcess_F(count);
-				if (mem.isNotEmpty()) {
-					float* buf = (float*)(mem.getBuf());
-					listener->onPlayFrame(this, buf, count);
-					AudioFormat::convertSamples(count, buf, samples);
-				}
+	if (audioIn.format == format && (((sl_size)(audioIn.data)) & 1) == 0) {
+		m_queue.add((sl_int16*)(audioIn.data), nChannels * audioIn.count);
+	} else {
+		sl_int16 samples[2048];
+		AudioData temp;
+		temp.format = format;
+		temp.data = samples;
+		temp.count = 1024;
+		sl_size n = audioIn.count;
+		while (n > 0) {
+			sl_size m = n;
+			if (m > 1024) {
+				m = 1024;
 			}
-		} else {
-			Memory mem = _getMemProcess_F(count);
-			if (mem.isNotEmpty()) {
-				float* buf = (float*)(mem.getBuf());
-				if (m_queue.get(buf, count)) {
-					AudioFormat::convertSamples(count, buf, samples);
-				} else {
-					for (sl_size i = 0; i < count; i++) {
-						samples[i] = m_lastSample_S16;
-					}
-				}
-			}
+			n -= m;
+			temp.copySamplesFrom(audioIn, m);
+			m_queue.add(samples, nChannels*m);
 		}
-		m_lastSample_S16 = samples[count - 1];
 	}
 }
 
-Memory AudioPlayerBuffer::_getMemProcess_U8(sl_size count)
+Array<sl_int16> AudioPlayerBuffer::_getProcessData(sl_size count)
 {
-	sl_size size = count;
-	Memory mem = m_memProcess_U8;
-	if (mem.getSize() >= size) {
-		return mem;
+	Array<sl_int16> data = m_processData;
+	if (data.count() >= count) {
+		return data;
 	} else {
-		mem = Memory::create(size);
-		m_memProcess_U8 = mem;
-		return mem;
+		data = Array<sl_int16>::create(count);
+		m_processData = data;
+		return data;
 	}
 }
 
-Memory AudioPlayerBuffer::_getMemProcess_S16(sl_size count)
+void AudioPlayerBuffer::_processFrame(sl_int16* s, sl_size count)
 {
-	sl_size size = count * 2;
-	Memory mem = m_memProcess_S16;
-	if (mem.getSize() >= size) {
-		return mem;
-	} else {
-		mem = Memory::create(size);
-		m_memProcess_S16 = mem;
-		return mem;
+	if (m_event.isNotNull()) {
+		m_event->set();
 	}
-}
-
-Memory AudioPlayerBuffer::_getMemProcess_F(sl_size count)
-{
-	sl_size size = count * 4;
-	Memory mem = m_memProcess_F;
-	if (mem.getSize() >= size) {
-		return mem;
-	} else {
-		mem = Memory::create(size);
-		m_memProcess_F = mem;
-		return mem;
+	PtrLocker<IAudioPlayerBufferListener> listener(m_listener);
+	if (listener.isNotNull()) {
+		listener->onPlayAudio(this, count / m_nChannels);
 	}
+	if (!(m_queue.get(s, count))) {
+		for (sl_size i = 0; i < count; i++) {
+			s[i] = m_lastSample;
+		}
+	}
+	m_lastSample = s[count - 1];
 }
 
-AudioPlayer::AudioPlayer()
-{
-}
-
-AudioPlayer::~AudioPlayer()
-{
-}
 SLIB_MEDIA_NAMESPACE_END
 

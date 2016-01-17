@@ -62,11 +62,6 @@ SLIB_CRYPTO_NAMESPACE_BEGIN
 class SLIB_EXPORT SecureStream : public Object, public IStream, public IClosable
 {
 public:
-	SLIB_INLINE SecureStream()
-	{
-	}
-	
-public:
 	/*
 		Return Value
 			>0 : Connected
@@ -92,11 +87,6 @@ public:
 
 class SLIB_EXPORT AsyncSecureStream : public AsyncStream
 {
-public:
-	SLIB_INLINE AsyncSecureStream()
-	{
-	}
-
 public:
 	virtual sl_bool connect() = 0;
 	

@@ -7,6 +7,13 @@
 #include "../core/event.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
+
+enum SocketEventType {
+    socketEventType_Read = 1,		// receive, receiveFrom, accept
+    socketEventType_Write = 2,		// send, sendTo, connect
+    socketEventType_Close = 4		// close, error
+};
+
 class SLIB_EXPORT SocketEvent : public Event
 {
 	SLIB_DECLARE_OBJECT(SocketEvent, Event)
@@ -15,26 +22,20 @@ protected:
 public:
 	~SocketEvent();
 
-public:
-	enum EventType {
-		eventRead = 1,		// receive, receiveFrom, accept
-		eventWrite = 2,		// send, sendTo, connect
-		eventClose = 4		// close, error
-	};
-	
+public:	
 	sl_bool setup(sl_uint32 events);
 	
 	SLIB_INLINE sl_bool setupRead()
 	{
-		return setup(eventRead | eventClose);
+		return setup(socketEventType_Read | socketEventType_Close);
 	}
 	SLIB_INLINE sl_bool setupWrite()
 	{
-		return setup(eventWrite | eventClose);
+		return setup(socketEventType_Write | socketEventType_Close);
 	}
 	SLIB_INLINE sl_bool setupReadWrite()
 	{
-		return setup(eventRead | eventWrite | eventClose);
+		return setup(socketEventType_Read | socketEventType_Write | socketEventType_Close);
 	}
 
 	sl_uint32 waitEvents(sl_int32 timeout = -1);

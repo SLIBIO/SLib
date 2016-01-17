@@ -6,7 +6,8 @@
 SLIB_NETWORK_NAMESPACE_BEGIN
 
 // EtherType
-enum NetworkLinkProtocolType {
+enum NetworkLinkProtocol
+{
 	networkLinkProtocol_All = 0x0003,
 	networkLinkProtocol_IPv4 = 0x0800,
 	networkLinkProtocol_ARP = 0x0806,
@@ -16,17 +17,17 @@ enum NetworkLinkProtocolType {
 
 enum NetworkLinkDeviceType
 {
-	networkLinkDevice_LoopbackBSD = 0, //  BSD loopback encapsulation; the link layer header is a 4-byte field, in host byte order, containing a PF_ value from socket.h for the network-layer protocol of the packet. 
-	networkLinkDevice_Ethernet = 1, // 6 bytes destination mac, 6 bytes source mac, 2 bytes Ethertype
-	networkLinkDevice_PPP = 9, // Point-to-Point Protocol Datalink layer
-	networkLinkDevice_PPPoE = 51, // PPP over Ethernet
-	networkLinkDevice_Raw = 101, // Raw IP; the packet begins with an IPv4 or IPv6 header, with the "version" field of the header indicating whether it's an IPv4 or IPv6 header. 
-	networkLinkDevice_802_11 = 105, // IEEE 802.11 wireless LAN
-	networkLinkDevice_LoobackOpenBSD = 108, // OpenBSD loopback encapsulation; the link-layer header is a 4-byte field, in network byte order, containing a PF_ value from OpenBSD's socket.h for the network-layer protocol of the packet. 
-	networkLinkDevice_Linux = 113 //  Linux "cooked" capture encapsulation. (for "any" or PPP devices)
+	networkLinkDeviceType_LoopbackBSD = 0, //  BSD loopback encapsulation; the link layer header is a 4-byte field, in host byte order, containing a PF_ value from socket.h for the network-layer protocol of the packet. 
+	networkLinkDeviceType_Ethernet = 1, // 6 bytes destination mac, 6 bytes source mac, 2 bytes Ethertype
+	networkLinkDeviceType_PPP = 9, // Point-to-Point Protocol Datalink layer
+	networkLinkDeviceType_PPPoE = 51, // PPP over Ethernet
+	networkLinkDeviceType_Raw = 101, // Raw IP; the packet begins with an IPv4 or IPv6 header, with the "version" field of the header indicating whether it's an IPv4 or IPv6 header. 
+	networkLinkDeviceType_802_11 = 105, // IEEE 802.11 wireless LAN
+	networkLinkDeviceType_LoobackOpenBSD = 108, // OpenBSD loopback encapsulation; the link-layer header is a 4-byte field, in network byte order, containing a PF_ value from OpenBSD's socket.h for the network-layer protocol of the packet. 
+	networkLinkDeviceType_Linux = 113 //  Linux "cooked" capture encapsulation. (for "any" or PPP devices)
 };
 
-enum NetworkInternetProtocolType
+enum NetworkInternetProtocol
 {
 	networkInternetProtocol_ICMP = 1, // Internet Control Message Protocol, RFC 792
 	networkInternetProtocol_IGMP = 2, // Internet Group Management Protocol, RFC 1112

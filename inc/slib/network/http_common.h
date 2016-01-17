@@ -485,11 +485,11 @@ public:
 protected:
 	void setError();
 	void setCompleted(void* dataRemain, sl_uint32 size);
-	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError);
-	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref);
+	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError);
+	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref);
 
 	sl_bool setDecompressing();
-	Memory decompressData(void* data, sl_uint32 size, Referable* refData);
+	Memory decompressData(void* data, sl_uint32 size, const Referable* refData);
 
 protected:
 	sl_bool m_flagDecompressing;

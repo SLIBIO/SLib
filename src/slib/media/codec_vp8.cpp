@@ -13,10 +13,10 @@
 typedef vpx_codec_iface_t *(*vpx_codec_interface)(void);
 
 SLIB_MEDIA_NAMESPACE_BEGIN
-VideoVpxEncoderParam::VideoVpxEncoderParam()
+
+VP8EncoderParam::VP8EncoderParam()
 {
-	type = VP8;
-	mode = VPX_CBR;
+	bitrateMode = vpxBitrateMode_Constant;
 	width = height = 192;
 	framesPerSecond = 25;
 	bitrate = 150;
@@ -25,27 +25,13 @@ VideoVpxEncoderParam::VideoVpxEncoderParam()
 	threadsCount = 1;
 }
 
-VideoVpxDecoderParam::VideoVpxDecoderParam()
+VP8DecoderParam::VP8DecoderParam()
 {
-	type = VP8;
 	width = height = 192;
 }
 
-VideoVpxEncoder::VideoVpxEncoder()
+class _VP8EncoderImpl : public VP8Encoder
 {
-}
-
-class _VpxVideoEncoderImpl : public VideoVpxEncoder
-{
-public:
-	_VpxVideoEncoderImpl()
-	{
-		m_codec = sl_null;
-		m_codec_image = sl_null;
-		m_codec_interface = sl_null;
-		m_nProcessFrameCount = 0;
-	}
-
 public:
 	sl_uint32 m_nProcessFrameCount;
 	vpx_codec_enc_cfg_t m_codec_config;
@@ -53,13 +39,21 @@ public:
 	vpx_image_t* m_codec_image;
 	vpx_codec_interface m_codec_interface;
 
-	~_VpxVideoEncoderImpl()
+public:
+	_VP8EncoderImpl()
+	{
+		m_codec = sl_null;
+		m_codec_image = sl_null;
+		m_codec_interface = sl_null;
+		m_nProcessFrameCount = 0;
+	}
+
+	~_VP8EncoderImpl()
 	{
 		if (m_codec_image != sl_null) {
 			delete m_codec_image;
 			m_codec_image = sl_null;
 		}
-
 		if (m_codec != sl_null) {
 			vpx_codec_destroy(m_codec);
 			delete m_codec;
@@ -67,72 +61,81 @@ public:
 		}
 	}
 
+public:
 	static void logError(String str)
 	{
 		SLIB_LOG_ERROR("VideoVpxEncoder", str);
 	}
+	
+	static vpx_rc_mode _getBitrateControlMode(VPXBitrateMode mode)
+	{
+		switch (mode) {
+			case vpxBitrateMode_Variable:
+				return VPX_VBR;
+			case vpxBitrateMode_Constant:
+				return VPX_CBR;
+			case vpxBitrateMode_ConstrainedQuality:
+				return VPX_CQ;
+			case vpxBitrateMode_ConstantQuality:
+				return VPX_Q;
+		}
+		return VPX_CBR;
+	}
 
-	static Ref<_VpxVideoEncoderImpl> create(const VideoVpxEncoderParam& param)
+	static Ref<_VP8EncoderImpl> create(const VP8EncoderParam& param)
 	{
 		vpx_codec_enc_cfg_t codec_config;
-		vpx_codec_interface codec_interface = sl_null;
-		vpx_codec_ctx_t* codec = new vpx_codec_ctx_t;
-		vpx_image_t* codec_image = new vpx_image_t;
-
-		if (param.type == VideoVpxEncoderParam::VP8) {
-#if CONFIG_VP8_ENCODER
-			codec_interface = &vpx_codec_vp8_cx;
-#endif
-		} else if (param.type == VideoVpxEncoderParam::VP9) {
-#if CONFIG_VP9_ENCODER
-			codec_interface = &vpx_codec_vp9_cx;
-#endif
-		}
+		vpx_codec_interface codec_interface = &vpx_codec_vp8_cx;
 		
 		if (codec_interface != sl_null) {
-			if (vpx_img_alloc(codec_image, VPX_IMG_FMT_I420, param.width, param.height, 1)) {
-				vpx_codec_err_t res = vpx_codec_enc_config_default(codec_interface(), &codec_config, 0);
-				if (!res) {
-					codec_config.g_w = param.width;
-					codec_config.g_h = param.height;
-					codec_config.rc_end_usage = (vpx_rc_mode)param.mode;
-					codec_config.rc_target_bitrate = param.bitrate;
-					codec_config.g_threads = param.threadsCount;
-					codec_config.g_usage = param.cpuUsage;
-					codec_config.g_timebase.den = param.framesPerSecond;
-					codec_config.g_timebase.num = 1;
-
-					if (!vpx_codec_enc_init(codec, codec_interface(), &codec_config, 0)) {
-						Ref<_VpxVideoEncoderImpl> ret = new _VpxVideoEncoderImpl();
-						if (ret.isNotNull()) {
-							ret->m_codec = codec;
-							ret->m_codec_config = codec_config;
-							ret->m_codec_image = codec_image;
-							ret->m_codec_interface = codec_interface;
-							ret->m_nWidth = param.width;
-							ret->m_nHeight = param.height;
-							ret->m_nKeyFrameInterval = param.keyFrameInterval;
-							ret->setBitrate(param.bitrate);
-							return ret;
+			vpx_codec_ctx_t* codec = new vpx_codec_ctx_t;
+			if (codec) {
+				vpx_image_t* codec_image = new vpx_image_t;
+				if (codec_image) {
+					if (vpx_img_alloc(codec_image, VPX_IMG_FMT_I420, param.width, param.height, 1)) {
+						vpx_codec_err_t res = vpx_codec_enc_config_default(codec_interface(), &codec_config, 0);
+						if (!res) {
+							codec_config.g_w = param.width;
+							codec_config.g_h = param.height;
+							codec_config.rc_end_usage = _getBitrateControlMode(param.bitrateMode);
+							codec_config.rc_target_bitrate = param.bitrate;
+							codec_config.g_threads = param.threadsCount;
+							codec_config.g_usage = param.cpuUsage;
+							codec_config.g_timebase.den = param.framesPerSecond;
+							codec_config.g_timebase.num = 1;
+							
+							if (!vpx_codec_enc_init(codec, codec_interface(), &codec_config, 0)) {
+								Ref<_VP8EncoderImpl> ret = new _VP8EncoderImpl();
+								if (ret.isNotNull()) {
+									ret->m_codec = codec;
+									ret->m_codec_config = codec_config;
+									ret->m_codec_image = codec_image;
+									ret->m_codec_interface = codec_interface;
+									ret->m_nWidth = param.width;
+									ret->m_nHeight = param.height;
+									ret->m_nKeyFrameInterval = param.keyFrameInterval;
+									ret->setBitrate(param.bitrate);
+									return ret;
+								}
+								vpx_codec_destroy(codec);
+							} else {
+								logError("Failed to initialize video encoder codec.");
+							}
 						} else {
-							vpx_codec_destroy(codec);
+							logError("Failed to set default video encoder codec configuration.");
 						}
 					} else {
-						logError("Failed to initialize video encoder codec.");
+						logError("Failed to allocate video codec image");
 					}
-				} else {
-					logError("Failed to set default video encoder codec configuration.");
+					delete codec_image;
 				}
-			} else {
-				logError("Failed to allocate video codec image");
+				delete codec;
 			}
 		} else {
 			logError("Video codec is not supported");
 		}
-
-		delete codec;
-		delete codec_image;
-		return Ref<_VpxVideoEncoderImpl>::null();
+		
+		return Ref<_VP8EncoderImpl>::null();
 	}
 	
 	Memory encode(const VideoFrame& input)
@@ -142,7 +145,7 @@ public:
 			BitmapData dst;
 			dst.width = m_codec_image->w;
 			dst.height = m_codec_image->h;
-			dst.format = bitmapFormatYUV_I420;
+			dst.format = bitmapFormat_YUV_I420;
 			dst.data = m_codec_image->planes[0];
 			dst.pitch = m_codec_image->stride[0];
 			dst.data1 = m_codec_image->planes[1];
@@ -196,26 +199,23 @@ public:
 	}
 };
 
-VideoVpxDecoder::VideoVpxDecoder()
-{
-}
 
-class _VpxVideoDecoderImpl : public VideoVpxDecoder
+class _VP8DecoderImpl : public VP8Decoder
 {
-private:
-	_VpxVideoDecoderImpl()
-	{
-		m_codec = sl_null;
-		m_codec_image = sl_null;
-		m_codec_interface = sl_null;
-	}
-
 public:
 	vpx_codec_ctx_t* m_codec;
 	vpx_image_t* m_codec_image;
 	vpx_codec_interface m_codec_interface;
 
-	~_VpxVideoDecoderImpl()
+public:
+	_VP8DecoderImpl()
+	{
+		m_codec = sl_null;
+		m_codec_image = sl_null;
+		m_codec_interface = sl_null;
+	}
+	
+	~_VP8DecoderImpl()
 	{
 
 		if (m_codec_image != sl_null) {
@@ -230,51 +230,43 @@ public:
 		}
 	}
 
+public:
 	static void logError(String str)
 	{
 		SLIB_LOG_ERROR("VideoVpxDecoder", str);
 	}
 
-	static Ref<_VpxVideoDecoderImpl> create(const VideoVpxDecoderParam& param)
+	static Ref<_VP8DecoderImpl> create(const VP8DecoderParam& param)
 	{
-		vpx_codec_interface codec_interface = sl_null;
-		vpx_codec_ctx_t* codec = new vpx_codec_ctx_t;
-		vpx_image_t* codec_image = new vpx_image_t;
-
-		if (param.type == VideoVpxDecoderParam::VP8) {
-#if CONFIG_VP8_ENCODER
-			codec_interface = &vpx_codec_vp8_dx;
-#endif
-		} else if (param.type == VideoVpxDecoderParam::VP9) {
-#if CONFIG_VP9_ENCODER
-			codec_interface = &vpx_codec_vp9_dx;
-#endif
-		}
+		vpx_codec_interface codec_interface = &vpx_codec_vp8_dx;
 
 		if (codec_interface != sl_null) {
-			if (!vpx_codec_dec_init(codec, codec_interface(), NULL, 0)) {
-				Ref<_VpxVideoDecoderImpl> ret = new _VpxVideoDecoderImpl;
-				if (ret.isNotNull()) {
-					ret->m_nWidth = param.width;
-					ret->m_nHeight = param.height;
-					ret->m_codec = codec;
-					ret->m_codec_image = codec_image;
-					ret->m_codec_interface = codec_interface;
-					return ret;
-				} else {
-					vpx_codec_destroy(codec);
-					logError("Failed allocate _VpxVideoDecoderImpl.");
+			vpx_codec_ctx_t* codec = new vpx_codec_ctx_t;
+			if (codec) {
+				vpx_image_t* codec_image = new vpx_image_t;
+				if (codec_image) {
+					if (!vpx_codec_dec_init(codec, codec_interface(), NULL, 0)) {
+						Ref<_VP8DecoderImpl> ret = new _VP8DecoderImpl;
+						if (ret.isNotNull()) {
+							ret->m_nWidth = param.width;
+							ret->m_nHeight = param.height;
+							ret->m_codec = codec;
+							ret->m_codec_image = codec_image;
+							ret->m_codec_interface = codec_interface;
+							return ret;
+						}
+						vpx_codec_destroy(codec);
+					} else{
+						logError("Failed initialize video decoder codec.");
+					}
+					delete codec_image;
 				}
-			} else{
-				logError("Failed initialize video decoder codec.");
+				delete codec;
 			}
 		} else {
 			logError("Video codec is not supported");
 		}
-
-		delete codec;
-		delete codec_image;
-		return Ref<_VpxVideoDecoderImpl>::null();
+		return Ref<_VP8DecoderImpl>::null();
 	}
 
 	SLIB_INLINE sl_int32 vpx_img_plane_width(const vpx_image_t *img, sl_int32 plane) {
@@ -307,7 +299,7 @@ public:
 				BitmapData src;
 				src.width = m_codec_image->w;
 				src.height = m_codec_image->h;
-				src.format = bitmapFormatYUV_I420;
+				src.format = bitmapFormat_YUV_I420;
 				src.data = m_codec_image->planes[0];
 				src.pitch = m_codec_image->stride[0];
 				src.data1 = m_codec_image->planes[1];
@@ -322,14 +314,15 @@ public:
 	}
 };
 
-Ref<VideoVpxEncoder> VideoVpxEncoder::create(const VideoVpxEncoderParam& param)
+Ref<VP8Encoder> VP8Encoder::create(const VP8EncoderParam& param)
 {
-	return _VpxVideoEncoderImpl::create(param);
+	return _VP8EncoderImpl::create(param);
 }
 
-Ref<VideoVpxDecoder> VideoVpxDecoder::create(const VideoVpxDecoderParam& param)
+Ref<VP8Decoder> VP8Decoder::create(const VP8DecoderParam& param)
 {
-	return _VpxVideoDecoderImpl::create(param);
+	return _VP8DecoderImpl::create(param);
 }
+
 SLIB_MEDIA_NAMESPACE_END
 

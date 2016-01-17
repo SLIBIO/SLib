@@ -70,18 +70,18 @@ public:
 		Ref<Pen> penCheckHover = Pen::createSolidPen(2, Color(0, 80, 200));
 		Ref<Pen> penCheckDown = penCheckHover;
 		Ref<Pen> penCheckDisabled = Pen::createSolidPen(2, Color::gray(90));
-		categories[0].properties[buttonStateNormal].textColor = Color::black();
-		categories[0].properties[buttonStateNormal].icon = new _SCheckBox_Icon(penNormal, colorBackNormal, Ref<Pen>::null());
-		categories[0].properties[buttonStateDisabled].textColor = Color::gray(90);
-		categories[0].properties[buttonStateDisabled].icon = new _SCheckBox_Icon(penDisabled, colorBackDisabled, Ref<Pen>::null());
-		categories[0].properties[buttonStateHover].icon = new _SCheckBox_Icon(penHover, colorBackHover, Ref<Pen>::null());
-		categories[0].properties[buttonStateDown].icon = new _SCheckBox_Icon(penDown, colorBackDown, Ref<Pen>::null());
+		categories[0].properties[buttonState_Normal].textColor = Color::black();
+		categories[0].properties[buttonState_Normal].icon = new _SCheckBox_Icon(penNormal, colorBackNormal, Ref<Pen>::null());
+		categories[0].properties[buttonState_Disabled].textColor = Color::gray(90);
+		categories[0].properties[buttonState_Disabled].icon = new _SCheckBox_Icon(penDisabled, colorBackDisabled, Ref<Pen>::null());
+		categories[0].properties[buttonState_Hover].icon = new _SCheckBox_Icon(penHover, colorBackHover, Ref<Pen>::null());
+		categories[0].properties[buttonState_Down].icon = new _SCheckBox_Icon(penDown, colorBackDown, Ref<Pen>::null());
 		
 		categories[1] = categories[0];
-		categories[1].properties[buttonStateNormal].icon = new _SCheckBox_Icon(penNormal, colorBackNormal, penCheckNormal);
-		categories[1].properties[buttonStateDisabled].icon = new _SCheckBox_Icon(penDisabled, colorBackDisabled, penCheckDisabled);
-		categories[1].properties[buttonStateHover].icon = new _SCheckBox_Icon(penHover, colorBackHover, penCheckHover);
-		categories[1].properties[buttonStateDown].icon = new _SCheckBox_Icon(penDown, colorBackDown, penCheckDown);
+		categories[1].properties[buttonState_Normal].icon = new _SCheckBox_Icon(penNormal, colorBackNormal, penCheckNormal);
+		categories[1].properties[buttonState_Disabled].icon = new _SCheckBox_Icon(penDisabled, colorBackDisabled, penCheckDisabled);
+		categories[1].properties[buttonState_Hover].icon = new _SCheckBox_Icon(penHover, colorBackHover, penCheckHover);
+		categories[1].properties[buttonState_Down].icon = new _SCheckBox_Icon(penDown, colorBackDown, penCheckDown);
 	}
 	
 	static _SCheckBox_Categories* get()

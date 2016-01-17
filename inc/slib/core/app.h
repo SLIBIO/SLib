@@ -7,18 +7,19 @@
 #include "string.h"
 
 SLIB_NAMESPACE_BEGIN
+
+enum AppType
+{
+	appType_UI = 0,
+	appType_Service = 1
+};
+
 class SLIB_EXPORT Application : public Object
 {
 	SLIB_DECLARE_OBJECT(Application, Object)
-public:
-	Application();
 	
-	enum Type
-	{
-		typeUI = 0,
-		typeService = 1
-	};
-	virtual Type getAppType() = 0;
+public:
+	virtual AppType getAppType() = 0;
 
 	virtual void run(const String& param);
 	
@@ -26,15 +27,23 @@ public:
 
 public:
 	static Ref<Application> getApp();
+	
 	static void setApp(Application* app);
+	
 	static void clearApp();
 
+	
 	static void setEnvironmentPath(const String& key, const String& path);
+	
 	static String getEnvironmentPath(const String& key);
+	
 	static String parseEnvironmentPath(const String& path);
 
+	
 	static String getAppPath();
+	
 	static void setAppPath(const String& path);
+	
 	static String findFileAndSetAppPath(const String& filePath, sl_uint32 nDeep = SLIB_UINT32_MAX);
 	
 };

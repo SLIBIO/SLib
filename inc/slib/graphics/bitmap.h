@@ -21,11 +21,16 @@ protected:
 
 public:
 	virtual sl_uint32 getBitmapWidth() = 0;
+	
 	virtual sl_uint32 getBitmapHeight() = 0;
 	
+	
 	virtual sl_bool readPixels(sl_uint32 x, sl_uint32 y, BitmapData& data) = 0;
+	
 	virtual sl_bool writePixels(sl_uint32 x, sl_uint32 y, const BitmapData& data) = 0;
+	
 	virtual sl_bool resetPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color& color) = 0;
+	
 	
 	virtual Ref<Canvas> getCanvas() = 0;
 	
@@ -41,6 +46,7 @@ public:
 	
 public:
 	sl_uint32 getWidth();
+	
 	sl_uint32 getHeight();
 	
 	void update();
@@ -53,8 +59,8 @@ public:
 	sl_bool resetPixels(const Color& color);
 	
 protected:
-	Ref<Drawable> m_drawableCached;
-	WeakRef<GraphicsContext> m_contextCached;
+	SafeRef<Drawable> m_drawableCached;
+	SafeWeakRef<GraphicsContext> m_contextCached;
 };
 
 SLIB_GRAPHICS_NAMESPACE_END

@@ -15,7 +15,9 @@ public:
 	PointT<T> point2;
 	
 public:
-	SLIB_INLINE LineSegmentT() {}
+	SLIB_INLINE LineSegmentT()
+	{
+	}
 	
 	template <class O>
 	SLIB_INLINE LineSegmentT(const LineSegmentT<O>& other)
@@ -38,6 +40,7 @@ public:
 		point2.y = y2;
 	}
 	
+public:
 	template <class O>
 	SLIB_INLINE LineSegmentT<T>& operator=(const LineSegmentT<O>& other)
 	{
@@ -46,31 +49,38 @@ public:
 		return *this;
 	}
 	
+public:
 	SLIB_INLINE Vector2T<T> getDirection() const
 	{
 		return (point2 - point1);
 	}
+	
 	SLIB_INLINE Vector2T<T> direction() const
 	{
 		return getDirection();
 	}
 	
+	
 	SLIB_INLINE T getLength2p() const
 	{
 		return point1.getLength2p(point2);
 	}
+	
 	SLIB_INLINE T length2p() const
 	{
 		return getLength2p();
 	}
+	
 	SLIB_INLINE T getLength() const
 	{
 		return point1.getLength(point2);
 	}
+	
 	SLIB_INLINE T length() const
 	{
 		return getLength();
 	}
+	
 	
 	void transform(const Matrix3T<T>& mat)
 	{

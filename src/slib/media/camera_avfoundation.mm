@@ -48,6 +48,7 @@ public:
 	
 	sl_bool m_flagRunning;
 	
+public:
 	_AVFoundation_Camera()
 	{
 		m_callback = nil;
@@ -64,6 +65,7 @@ public:
 		release();
 	}
 	
+public:
 	static void logError(String error) {
 		SLIB_LOG("Camera", error);
 	}
@@ -107,7 +109,7 @@ public:
 		[output setSampleBufferDelegate:callback queue:queue];
 		
 		NSMutableDictionary *settings = [[NSMutableDictionary alloc] init];
-		if (param.preferedFrameFormat.getColorSpace() == ColorSpace_YUV) {
+		if (param.preferedFrameFormat.getColorSpace() == colorSpace_YUV) {
 			[settings setObject:@(kCVPixelFormatType_420YpCbCr8BiPlanarFullRange) forKey:(NSString*)kCVPixelBufferPixelFormatTypeKey];
 		} else {
 			[settings setObject:@(kCVPixelFormatType_32BGRA) forKey:(NSString*)kCVPixelBufferPixelFormatTypeKey];
@@ -134,7 +136,7 @@ public:
 			ret->m_device = device;
 			ret->m_input = input;
 			ret->m_output = output;
-			ret->setListener(param.listener);
+			ret->m_listener = param.listener;
 			if (param.flagAutoStart) {
 				ret->start();
 			}
@@ -286,17 +288,17 @@ public:
 				sl_uint8* base = (sl_uint8*)(baseAddress);
 				CVPlanarPixelBufferInfo_YCbCrBiPlanar* p = (CVPlanarPixelBufferInfo_YCbCrBiPlanar*)baseAddress;
 				if (p->componentInfoY.offset == 0) {
-					frame.image.format = bitmapFormatYUV_NV12;
+					frame.image.format = bitmapFormat_YUV_NV12;
 					frame.image.data = base + sizeof(CVPlanarPixelBufferInfo_YCbCrBiPlanar);
 				} else {
-					frame.image.format = bitmapFormatYUV_NV12;
+					frame.image.format = bitmapFormat_YUV_NV12;
 					frame.image.data = base + (sl_int32)(Endian::swap32LE(p->componentInfoY.offset));
 					frame.image.pitch = Endian::swap32LE(p->componentInfoY.rowBytes);
 					frame.image.data1 = base + (sl_int32)(Endian::swap32LE(p->componentInfoCbCr.offset));
 					frame.image.pitch1 = Endian::swap32LE(p->componentInfoCbCr.rowBytes);
 				}
 			} else if (type == kCVPixelFormatType_32BGRA) {
-				frame.image.format = bitmapFormatBGRA;
+				frame.image.format = bitmapFormat_BGRA;
 				frame.image.data = baseAddress;
 				frame.image.pitch = (sl_uint32)(CVPixelBufferGetBytesPerRow(imageBuffer));
 			}
@@ -305,6 +307,7 @@ public:
 		if (frame.image.format.isNotNull()) {
 			onCaptureVideoFrame(&frame);
 		}
+		
 		CVPixelBufferUnlockBaseAddress(imageBuffer,0);
 		
 	}
@@ -312,8 +315,7 @@ public:
 
 Ref<Camera> AVFoundation::createCamera(const CameraParam& param)
 {
-	Ref<_AVFoundation_Camera> ret(_AVFoundation_Camera::_create(param));
-	return ret;
+	return _AVFoundation_Camera::_create(param);
 }
 
 List<CameraInfo> AVFoundation::getCamerasList()
@@ -325,11 +327,12 @@ List<CameraInfo> AVFoundation::getCamerasList()
 			CameraInfo info;
 			info.id = Apple::getStringFromNSString([device uniqueID]);
 			info.name = Apple::getStringFromNSString([device localizedName]);
-			ret.add(info);
+			ret.add_NoLock(info);
 		}
 	}
 	return ret;
 }
+
 SLIB_MEDIA_NAMESPACE_END
 
 @implementation _AVFoundation_Camera_Callback

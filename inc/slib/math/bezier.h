@@ -30,7 +30,10 @@ public:
 	T x2, y2;
 	T x3, y3;
 
-	SLIB_INLINE CubicBezierCurveT() {}
+public:
+	SLIB_INLINE CubicBezierCurveT()
+	{
+	}
 
 	template <class O>
 	SLIB_INLINE CubicBezierCurveT(const CubicBezierCurveT<O>& other)
@@ -69,6 +72,7 @@ public:
 		y3 = P3.y;
 	}
 
+public:
 	template <class O>
 	SLIB_INLINE CubicBezierCurveT<T>& operator=(const CubicBezierCurveT<O>& other)
 	{
@@ -83,6 +87,7 @@ public:
 		return *this;
 	}
 
+public:
 	SLIB_INLINE void getPoint(T t, T& x, T& y)
 	{
 		T it = 1 - t;
@@ -209,6 +214,7 @@ public:
 		y2 = y3 - f * cos2 * ry;
 	}
 };
+
 typedef CubicBezierCurveT<sl_real> CubicBezierCurve;
 typedef CubicBezierCurveT<float> CubicBezierCurvef;
 typedef CubicBezierCurveT<double> CubicBezierCurvelf;

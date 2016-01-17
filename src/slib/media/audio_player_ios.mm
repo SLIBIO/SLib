@@ -16,16 +16,6 @@
 SLIB_MEDIA_NAMESPACE_BEGIN
 class _iOS_AudioPlayerBuffer : public AudioPlayerBuffer
 {
-private:
-	_iOS_AudioPlayerBuffer()
-	{
-		m_flagInitialized = sl_false;
-		m_flagOpened = sl_true;
-		m_flagRunning = sl_false;
-		m_lastValue = 0;
-	}
-	
-	
 public:
 	sl_bool m_flagInitialized;
 	sl_bool m_flagOpened;
@@ -36,14 +26,21 @@ public:
 	
 	AudioStreamBasicDescription m_formatSrc;
 	AudioStreamBasicDescription m_formatDst;
-	sl_uint32 m_nSamplesPerFrame;
-	sl_int16 m_lastValue;
-	
+
+public:
+	_iOS_AudioPlayerBuffer()
+	{
+		m_flagInitialized = sl_false;
+		m_flagOpened = sl_true;
+		m_flagRunning = sl_false;
+	}
+
 	~_iOS_AudioPlayerBuffer()
 	{
 		release();
 	}
 	
+public:
 	static void logError(String text)
 	{
 		SLIB_LOG_ERROR("AudioPlayer", text);
@@ -52,6 +49,10 @@ public:
 	static Ref<_iOS_AudioPlayerBuffer> create(const AudioPlayerBufferParam& param)
 	{
 		Ref<_iOS_AudioPlayerBuffer> ret;
+		
+		if (param.channelsCount != 1 && param.channelsCount != 2) {
+			return ret;
+		}
 		
 		AudioComponentDescription desc;
 		desc.componentType = kAudioUnitType_Output;
@@ -111,11 +112,13 @@ public:
 							
 							ret->m_audioUnitOutput = audioUnitOutput;
 							ret->m_converter = converter;
-							ret->m_nSamplesPerFrame = param.samplesPerSecond * param.frameLengthInMilliseconds / 1000;
-							ret->m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000);
 							ret->m_formatSrc = formatSrc;
 							ret->m_formatDst = formatDst;
-							ret->setListener(param.listener);
+							
+							ret->m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000 * param.channelsCount);
+							ret->m_nChannels = param.channelsCount;
+							ret->m_listener = param.listener;
+							ret->m_event = param.event;
 							
 							AURenderCallbackStruct cs;
 							cs.inputProc = CallbackOutput;
@@ -225,24 +228,24 @@ public:
 		return m_flagRunning;
 	}
 	
-	Memory m_dataConvert;
+	SafeArray<sl_int16> m_dataConvert;
 	void onConvert(sl_uint32 nFrames, AudioBufferList* data)
 	{
-		sl_uint32 nChannels = m_formatSrc.mChannelsPerFrame;
+		sl_uint32 nChannels = m_nChannels;
 		sl_uint32 nSamples = nFrames * nChannels;
 		
-		m_dataConvert = _getMemProcess_S16(nSamples);
-		if (m_dataConvert.isNull()) {
+		Array<sl_int16> dataConvert = _getProcessData(nSamples);
+		m_dataConvert = dataConvert;
+		if (dataConvert.isNull()) {
 			return;
 		}
+		sl_int16* s = dataConvert.data();
+		_processFrame(s, nSamples);
 		
-		sl_int16* s = (sl_int16*)(m_dataConvert.getBuf());
-		_processFrame_S16(s, nSamples);
-
 		data->mBuffers[0].mDataByteSize = (UInt32)nSamples * 2;
 		data->mBuffers[0].mData = s;
 		data->mBuffers[0].mNumberChannels = (UInt32)nChannels;
-		m_lastValue = s[nSamples - 1];
+
 	}
 	
 	static OSStatus ConverterProc(AudioConverterRef               inAudioConverter,
@@ -282,15 +285,16 @@ public:
 
 class _iOS_AudioPlayer : public AudioPlayer
 {
-private:
-	_iOS_AudioPlayer() {}
-	
 public:
+	_iOS_AudioPlayer()
+	{
+	}
 	
 	~_iOS_AudioPlayer()
 	{
 	}
 	
+public:
 	static void logError(String text)
 	{
 		SLIB_LOG_ERROR("AudioPlayer", text);
@@ -320,6 +324,7 @@ List<AudioPlayerInfo> AudioPlayer::getPlayersList()
 	ret.name = s;
 	return List<AudioPlayerInfo>::createFromElement(ret);
 }
+
 SLIB_MEDIA_NAMESPACE_END
 
 #endif

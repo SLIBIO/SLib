@@ -52,7 +52,7 @@ public:
 		}
 	}
 
-	static Ref<_Android_Bitmap> create(jobject jbitmap, sl_bool flagFreeOnRelease, Referable* ref)
+	static Ref<_Android_Bitmap> create(jobject jbitmap, sl_bool flagFreeOnRelease, const Referable* ref)
 	{
 		Ref<_Android_Bitmap> ret;
 		if (jbitmap) {
@@ -163,7 +163,7 @@ public:
 			return sl_true;
 		}
 
-		BitmapFormat formatRaw = Endian::isLE() ? bitmapFormatBGRA : bitmapFormatARGB;
+		BitmapFormat formatRaw = Endian::isLE() ? bitmapFormat_BGRA : bitmapFormat_ARGB;
 
 		BitmapData data;
 		Memory memData;
@@ -315,7 +315,7 @@ public:
 	}
 };
 
-Ref<Drawable> UIPlatform::createImageDrawable(jobject bitmap, sl_bool flagFreeOnRelease, Referable* ref)
+Ref<Drawable> UIPlatform::createImageDrawable(jobject bitmap, sl_bool flagFreeOnRelease, const Referable* ref)
 {
 	return _Android_Bitmap::create(bitmap, flagFreeOnRelease, ref);
 }

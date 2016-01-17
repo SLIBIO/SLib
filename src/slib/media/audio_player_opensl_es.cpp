@@ -12,15 +12,18 @@
 #endif
 
 SLIB_MEDIA_NAMESPACE_BEGIN
+
 class _OpenSLES_AudioPlayerImpl : public AudioPlayer
 {
-private:
-	_OpenSLES_AudioPlayerImpl() {}
-
 public:
 	SLObjectItf m_engineObject;
 	SLEngineItf m_engineInterface;
 	SLObjectItf m_mixerObject;
+
+public:
+	_OpenSLES_AudioPlayerImpl()
+	{
+	}
 
 	~_OpenSLES_AudioPlayerImpl()
 	{
@@ -28,6 +31,7 @@ public:
 		(*m_engineObject)->Destroy(m_engineObject);
 	}
 
+public:
 	static void logError(String text)
 	{
 		SLIB_LOG_ERROR("OpenSL_ES", text);
@@ -81,14 +85,6 @@ public:
 
 class _OpenSLES_AudioPlayerBufferImpl : public AudioPlayerBuffer
 {
-private:
-	_OpenSLES_AudioPlayerBufferImpl()
-	{
-		m_flagOpened = sl_true;
-		m_flagRunning = sl_false;
-		m_indexBuffer = 0;
-	}
-
 public:
 	Ref<_OpenSLES_AudioPlayerImpl> m_engine;
 	SLObjectItf m_playerObject;
@@ -102,11 +98,20 @@ public:
 	sl_uint32 m_indexBuffer;
 	sl_uint32 m_nSamplesFrame;
 
+public:
+	_OpenSLES_AudioPlayerBufferImpl()
+	{
+		m_flagOpened = sl_true;
+		m_flagRunning = sl_false;
+		m_indexBuffer = 0;
+	}
+	
 	~_OpenSLES_AudioPlayerBufferImpl()
 	{
 		release();
 	}
 
+public:
 	static void logError(String text)
 	{
 		SLIB_LOG_ERROR("OpenSL_ES_Buffer", text);
@@ -115,6 +120,11 @@ public:
 	static Ref<_OpenSLES_AudioPlayerBufferImpl> create(Ref<_OpenSLES_AudioPlayerImpl> engine, const AudioPlayerBufferParam& param)
 	{
 		Ref<_OpenSLES_AudioPlayerBufferImpl> ret;
+		
+		if (param.channelsCount != 1 && param.channelsCount != 2) {
+			return ret;
+		}
+		
 		SLEngineItf engineInterface = engine->m_engineInterface;
 
 		SLDataLocator_AndroidSimpleBufferQueue androidSBQ = {
@@ -158,9 +168,13 @@ public:
 							ret->m_playerInterface = playerInterface;
 							ret->m_bufferQueue = bufferQueue;
 							ret->m_nSamplesFrame = param.samplesPerSecond * param.frameLengthInMilliseconds / 1000 * param.channelsCount;
-							ret->m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000 * param.channelsCount);
 							ret->m_bufFrame = new sl_int16[ret->m_nSamplesFrame * 2];
-							ret->setListener(param.listener);
+							
+							ret->m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000 * param.channelsCount);
+							ret->m_nChannels = param.channelsCount;
+							ret->m_listener = param.listener;
+							ret->m_event = param.event;
+							
 							if (ret->m_bufFrame) {
 								if ((*bufferQueue)->RegisterCallback(bufferQueue, _OpenSLES_AudioPlayerBufferImpl::callback, ret.get()) == SL_RESULT_SUCCESS) {
 									if (param.flagAutoStart) {
@@ -252,7 +266,7 @@ public:
 	{
 		m_indexBuffer = (m_indexBuffer + 1) % 2;
 		sl_int16* s = m_bufFrame + m_indexBuffer * m_nSamplesFrame;
-		_processFrame_S16(s, m_nSamplesFrame);
+		_processFrame(s, m_nSamplesFrame);
 		if ((*m_bufferQueue)->Enqueue(m_bufferQueue, s, m_nSamplesFrame * 2) == SL_RESULT_SUCCESS) {
 			return sl_true;
 		} else {
@@ -282,15 +296,18 @@ Ref<AudioPlayer> OpenSL_ES::createPlayer(const AudioPlayerParam& param)
 {
 	return _OpenSLES_AudioPlayerImpl::create(param);
 }
+
 SLIB_MEDIA_NAMESPACE_END
 
 #else
 
 SLIB_MEDIA_NAMESPACE_BEGIN
+
 Ref<AudioPlayer> OpenSL_ES::createPlayer(const AudioPlayerParam& param)
 {
 	return Ref<AudioPlayer>::null();
 }
+
 SLIB_MEDIA_NAMESPACE_END
 
 #endif

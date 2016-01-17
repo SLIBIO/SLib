@@ -108,7 +108,7 @@ void BitmapData::fillDefaultValues()
 		if (height & 1) {
 			return;
 		}
-		if (format == bitmapFormatYUV_I420 || format == bitmapFormatYUV_YV12) {
+		if (format == bitmapFormat_YUV_I420 || format == bitmapFormat_YUV_YV12) {
 			sl_uint32 w2 = width >> 1;
 			sl_uint32 h2 = height >> 1;
 			if (pitch == 0) {
@@ -173,7 +173,7 @@ sl_size BitmapData::getTotalSize() const
 			return 0;
 		}
 		sl_uint32 h2 = bd.height >> 1;
-		if (bd.format == bitmapFormatYUV_I420 || bd.format == bitmapFormatYUV_YV12) {
+		if (bd.format == bitmapFormat_YUV_I420 || bd.format == bitmapFormat_YUV_YV12) {
 			return bd.pitch * bd.height + bd.pitch1 * h2 + bd.pitch2 * h2;
 		} else {
 			return bd.pitch * bd.height + bd.pitch1 * h2;
@@ -192,10 +192,10 @@ sl_uint32 BitmapData::getColorComponentBuffers(ColorComponentBuffer* buffers) co
 	BitmapData bd(*this);
 	bd.fillDefaultValues();
 	switch (bd.format.getValue()) {
-		case bitmapFormatRGBA:
-		case bitmapFormatRGBA_PA:
-		case bitmapFormatYUVA:
-		case bitmapFormatYUVA_PA:
+		case bitmapFormat_RGBA:
+		case bitmapFormat_RGBA_PA:
+		case bitmapFormat_YUVA:
+		case bitmapFormat_YUVA_PA:
 			if (buffers) {
 				for (int i = 0; i < 4; i++) {
 					buffers[i].width = bd.width;
@@ -210,8 +210,8 @@ sl_uint32 BitmapData::getColorComponentBuffers(ColorComponentBuffer* buffers) co
 				buffers[3].data = ((sl_uint8*)(bd.data)) + 3;
 			}
 			return 4;
-		case bitmapFormatBGRA:
-		case bitmapFormatBGRA_PA:
+		case bitmapFormat_BGRA:
+		case bitmapFormat_BGRA_PA:
 			if (buffers) {
 				for (int i = 0; i < 4; i++) {
 					buffers[i].width = bd.width;
@@ -226,8 +226,8 @@ sl_uint32 BitmapData::getColorComponentBuffers(ColorComponentBuffer* buffers) co
 				buffers[3].data = ((sl_uint8*)(bd.data)) + 3;
 			}
 			return 4;
-		case bitmapFormatARGB:
-		case bitmapFormatARGB_PA:
+		case bitmapFormat_ARGB:
+		case bitmapFormat_ARGB_PA:
 			if (buffers) {
 				for (int i = 0; i < 4; i++) {
 					buffers[i].width = bd.width;
@@ -242,8 +242,8 @@ sl_uint32 BitmapData::getColorComponentBuffers(ColorComponentBuffer* buffers) co
 				buffers[2].data = ((sl_uint8*)(bd.data)) + 3;
 			}
 			return 4;
-		case bitmapFormatABGR:
-		case bitmapFormatABGR_PA:
+		case bitmapFormat_ABGR:
+		case bitmapFormat_ABGR_PA:
 			if (buffers) {
 				for (int i = 0; i < 4; i++) {
 					buffers[i].width = bd.width;
@@ -258,8 +258,8 @@ sl_uint32 BitmapData::getColorComponentBuffers(ColorComponentBuffer* buffers) co
 				buffers[0].data = ((sl_uint8*)(bd.data)) + 3;
 			}
 			return 4;
-		case bitmapFormatRGB:
-		case bitmapFormatYUV444:
+		case bitmapFormat_RGB:
+		case bitmapFormat_YUV444:
 			if (buffers) {
 				for (int i = 0; i < 3; i++) {
 					buffers[i].width = bd.width;
@@ -273,7 +273,7 @@ sl_uint32 BitmapData::getColorComponentBuffers(ColorComponentBuffer* buffers) co
 				buffers[2].data = ((sl_uint8*)(bd.data)) + 2;
 			}
 			return 3;
-		case bitmapFormatBGR:
+		case bitmapFormat_BGR:
 			if (buffers) {
 				for (int i = 0; i < 3; i++) {
 					buffers[i].width = bd.width;
@@ -287,10 +287,10 @@ sl_uint32 BitmapData::getColorComponentBuffers(ColorComponentBuffer* buffers) co
 				buffers[0].data = ((sl_uint8*)(bd.data)) + 2;
 			}
 			return 3;
-		case bitmapFormatRGB565BE:
-		case bitmapFormatRGB565LE:
-		case bitmapFormatBGR565BE:
-		case bitmapFormatBGR565LE:
+		case bitmapFormat_RGB565BE:
+		case bitmapFormat_RGB565LE:
+		case bitmapFormat_BGR565BE:
+		case bitmapFormat_BGR565LE:
 			if (buffers) {
 				for (int i = 0; i < 3; i++) {
 					buffers[i].width = bd.width;
@@ -304,7 +304,7 @@ sl_uint32 BitmapData::getColorComponentBuffers(ColorComponentBuffer* buffers) co
 				buffers[2].data = ((sl_uint8*)(bd.data));
 			}
 			return 3;
-		case bitmapFormatGRAY8:
+		case bitmapFormat_GRAY8:
 			if (buffers) {
 				for (int i = 0; i < 3; i++) {
 					buffers[i].width = bd.width;
@@ -318,10 +318,10 @@ sl_uint32 BitmapData::getColorComponentBuffers(ColorComponentBuffer* buffers) co
 				buffers[2].data = ((sl_uint8*)(bd.data));
 			}
 			return 3;
-		case bitmapFormatRGBA_PLANAR:
-		case bitmapFormatRGBA_PLANAR_PA:
-		case bitmapFormatYUVA_PLANAR:
-		case bitmapFormatYUVA_PLANAR_PA:
+		case bitmapFormat_RGBA_PLANAR:
+		case bitmapFormat_RGBA_PLANAR_PA:
+		case bitmapFormat_YUVA_PLANAR:
+		case bitmapFormat_YUVA_PLANAR_PA:
 			if (buffers) {
 				for (int i = 0; i < 4; i++) {
 					buffers[i].width = bd.width;
@@ -342,8 +342,8 @@ sl_uint32 BitmapData::getColorComponentBuffers(ColorComponentBuffer* buffers) co
 				buffers[3].ref = bd.ref3;
 			}
 			return 4;
-		case bitmapFormatRGB_PLANAR:
-		case bitmapFormatYUV444_PLANAR:
+		case bitmapFormat_RGB_PLANAR:
+		case bitmapFormat_YUV444_PLANAR:
 			if (buffers) {
 				for (int i = 0; i < 3; i++) {
 					buffers[i].width = bd.width;
@@ -361,7 +361,7 @@ sl_uint32 BitmapData::getColorComponentBuffers(ColorComponentBuffer* buffers) co
 				buffers[2].ref = bd.ref2;
 			}
 			return 3;
-		case bitmapFormatYUV_I420:
+		case bitmapFormat_YUV_I420:
 			if (bd.width & 1) {
 				return 0;
 			}
@@ -387,7 +387,7 @@ sl_uint32 BitmapData::getColorComponentBuffers(ColorComponentBuffer* buffers) co
 			buffers[2].pitch = bd.pitch2;
 			buffers[2].ref = bd.ref2;
 			return 3;
-		case bitmapFormatYUV_YV12:
+		case bitmapFormat_YUV_YV12:
 			if (bd.width & 1) {
 				return 0;
 			}
@@ -413,7 +413,7 @@ sl_uint32 BitmapData::getColorComponentBuffers(ColorComponentBuffer* buffers) co
 			buffers[2].pitch = bd.pitch1;
 			buffers[2].ref = bd.ref1;
 			return 3;
-		case bitmapFormatYUV_NV21:
+		case bitmapFormat_YUV_NV21:
 			if (bd.width & 1) {
 				return 0;
 			}
@@ -439,7 +439,7 @@ sl_uint32 BitmapData::getColorComponentBuffers(ColorComponentBuffer* buffers) co
 			buffers[2].pitch = bd.pitch1;
 			buffers[2].ref = bd.ref1;
 			return 3;
-		case bitmapFormatYUV_NV12:
+		case bitmapFormat_YUV_NV12:
 			if (bd.width & 1) {
 				return 0;
 			}
@@ -1176,76 +1176,76 @@ template<class SourceProc>
 void _BitmapData_copyPixels_Normal_Step1(sl_uint32 width, sl_uint32 height, sl_uint8** src_planes, sl_int32* src_pitches, BitmapFormat dst_format, sl_uint8** dst_planes, sl_int32* dst_pitches)
 {
 	switch (dst_format.getValue()) {
-		case bitmapFormatRGBA:
+		case bitmapFormat_RGBA:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, RGBA_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGBA_PA:
+		case bitmapFormat_RGBA_PA:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, RGBA_PA_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatBGRA:
+		case bitmapFormat_BGRA:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, BGRA_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatBGRA_PA:
+		case bitmapFormat_BGRA_PA:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, BGRA_PA_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatARGB:
+		case bitmapFormat_ARGB:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, ARGB_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatARGB_PA:
+		case bitmapFormat_ARGB_PA:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, ARGB_PA_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatABGR:
+		case bitmapFormat_ABGR:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, ABGR_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatABGR_PA:
+		case bitmapFormat_ABGR_PA:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, ABGR_PA_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGB:
+		case bitmapFormat_RGB:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, RGB_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatBGR:
+		case bitmapFormat_BGR:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, BGR_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGB565BE:
+		case bitmapFormat_RGB565BE:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, RGB565BE_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGB565LE:
+		case bitmapFormat_RGB565LE:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, RGB565LE_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatBGR565BE:
+		case bitmapFormat_BGR565BE:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, BGR565BE_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatBGR565LE:
+		case bitmapFormat_BGR565LE:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, BGR565LE_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatGRAY8:
+		case bitmapFormat_GRAY8:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, GRAY8_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGBA_PLANAR:
+		case bitmapFormat_RGBA_PLANAR:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, RGBA_PLANAR_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGBA_PLANAR_PA:
+		case bitmapFormat_RGBA_PLANAR_PA:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, RGBA_PLANAR_PA_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGB_PLANAR:
+		case bitmapFormat_RGB_PLANAR:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, RGB_PLANAR_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatYUVA:
+		case bitmapFormat_YUVA:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, YUVA_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatYUVA_PA:
+		case bitmapFormat_YUVA_PA:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, YUVA_PA_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatYUVA_PLANAR:
+		case bitmapFormat_YUVA_PLANAR:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, YUVA_PLANAR_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatYUVA_PLANAR_PA:
+		case bitmapFormat_YUVA_PLANAR_PA:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, YUVA_PLANAR_PA_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatYUV444:
+		case bitmapFormat_YUV444:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, YUV444_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatYUV444_PLANAR:
+		case bitmapFormat_YUV444_PLANAR:
 			_BitmapData_copyPixels_Normal_Step2<SourceProc, YUV444_PLANAR_PROC>(width, height, src_planes, src_pitches, dst_planes, dst_pitches);
 			break;
 		default:
@@ -1256,76 +1256,76 @@ void _BitmapData_copyPixels_Normal_Step1(sl_uint32 width, sl_uint32 height, sl_u
 void _BitmapData_copyPixels_Normal(sl_uint32 width, sl_uint32 height, BitmapFormat src_format, sl_uint8** src_planes, sl_int32* src_pitches, BitmapFormat dst_format, sl_uint8** dst_planes, sl_int32* dst_pitches)
 {
 	switch (src_format.getValue()) {
-		case bitmapFormatRGBA:
+		case bitmapFormat_RGBA:
 			_BitmapData_copyPixels_Normal_Step1<RGBA_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGBA_PA:
+		case bitmapFormat_RGBA_PA:
 			_BitmapData_copyPixels_Normal_Step1<RGBA_PA_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatBGRA:
+		case bitmapFormat_BGRA:
 			_BitmapData_copyPixels_Normal_Step1<BGRA_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatBGRA_PA:
+		case bitmapFormat_BGRA_PA:
 			_BitmapData_copyPixels_Normal_Step1<BGRA_PA_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatARGB:
+		case bitmapFormat_ARGB:
 			_BitmapData_copyPixels_Normal_Step1<ARGB_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatARGB_PA:
+		case bitmapFormat_ARGB_PA:
 			_BitmapData_copyPixels_Normal_Step1<ARGB_PA_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatABGR:
+		case bitmapFormat_ABGR:
 			_BitmapData_copyPixels_Normal_Step1<ABGR_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatABGR_PA:
+		case bitmapFormat_ABGR_PA:
 			_BitmapData_copyPixels_Normal_Step1<ABGR_PA_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGB:
+		case bitmapFormat_RGB:
 			_BitmapData_copyPixels_Normal_Step1<RGB_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatBGR:
+		case bitmapFormat_BGR:
 			_BitmapData_copyPixels_Normal_Step1<BGR_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGB565BE:
+		case bitmapFormat_RGB565BE:
 			_BitmapData_copyPixels_Normal_Step1<RGB565BE_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGB565LE:
+		case bitmapFormat_RGB565LE:
 			_BitmapData_copyPixels_Normal_Step1<RGB565LE_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatBGR565BE:
+		case bitmapFormat_BGR565BE:
 			_BitmapData_copyPixels_Normal_Step1<BGR565BE_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatBGR565LE:
+		case bitmapFormat_BGR565LE:
 			_BitmapData_copyPixels_Normal_Step1<BGR565LE_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatGRAY8:
+		case bitmapFormat_GRAY8:
 			_BitmapData_copyPixels_Normal_Step1<GRAY8_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGBA_PLANAR:
+		case bitmapFormat_RGBA_PLANAR:
 			_BitmapData_copyPixels_Normal_Step1<RGBA_PLANAR_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGBA_PLANAR_PA:
+		case bitmapFormat_RGBA_PLANAR_PA:
 			_BitmapData_copyPixels_Normal_Step1<RGBA_PLANAR_PA_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGB_PLANAR:
+		case bitmapFormat_RGB_PLANAR:
 			_BitmapData_copyPixels_Normal_Step1<RGB_PLANAR_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatYUVA:
+		case bitmapFormat_YUVA:
 			_BitmapData_copyPixels_Normal_Step1<YUVA_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatYUVA_PA:
+		case bitmapFormat_YUVA_PA:
 			_BitmapData_copyPixels_Normal_Step1<YUVA_PA_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatYUVA_PLANAR:
+		case bitmapFormat_YUVA_PLANAR:
 			_BitmapData_copyPixels_Normal_Step1<YUVA_PLANAR_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatYUVA_PLANAR_PA:
+		case bitmapFormat_YUVA_PLANAR_PA:
 			_BitmapData_copyPixels_Normal_Step1<YUVA_PLANAR_PA_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatYUV444:
+		case bitmapFormat_YUV444:
 			_BitmapData_copyPixels_Normal_Step1<YUV444_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatYUV444_PLANAR:
+		case bitmapFormat_YUV444_PLANAR:
 			_BitmapData_copyPixels_Normal_Step1<YUV444_PLANAR_PROC>(width, height, src_planes, src_pitches, dst_format, dst_planes, dst_pitches);
 			break;
 		default:
@@ -1388,22 +1388,22 @@ void _BitmapData_copyPixels_YUV420ToYUV_Step1(sl_uint32 width, sl_uint32 height,
 void _BitmapData_copyPixels_YUV420ToYUV(sl_uint32 width, sl_uint32 height, BitmapData& src, BitmapFormat dst_format, sl_uint8** dst_planes, sl_int32* dst_pitches)
 {
 	switch (dst_format.getValue()) {
-		case bitmapFormatYUVA:
+		case bitmapFormat_YUVA:
 			_BitmapData_copyPixels_YUV420ToYUV_Step1<RGBA_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatYUVA_PA:
+		case bitmapFormat_YUVA_PA:
 			_BitmapData_copyPixels_YUV420ToYUV_Step1<RGBA_PA_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatYUVA_PLANAR:
+		case bitmapFormat_YUVA_PLANAR:
 			_BitmapData_copyPixels_YUV420ToYUV_Step1<RGBA_PLANAR_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatYUVA_PLANAR_PA:
+		case bitmapFormat_YUVA_PLANAR_PA:
 			_BitmapData_copyPixels_YUV420ToYUV_Step1<RGBA_PLANAR_PA_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatYUV444:
+		case bitmapFormat_YUV444:
 			_BitmapData_copyPixels_YUV420ToYUV_Step1<RGB_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatYUV444_PLANAR:
+		case bitmapFormat_YUV444_PLANAR:
 			_BitmapData_copyPixels_YUV420ToYUV_Step1<RGB_PLANAR_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
 		default:
@@ -1471,58 +1471,58 @@ void _BitmapData_copyPixels_YUV420ToOther_Step1(sl_uint32 width, sl_uint32 heigh
 void _BitmapData_copyPixels_YUV420ToOther(sl_uint32 width, sl_uint32 height, BitmapData& src, BitmapFormat dst_format, sl_uint8** dst_planes, sl_int32* dst_pitches)
 {
 	switch (dst_format.getValue()) {
-		case bitmapFormatRGBA:
+		case bitmapFormat_RGBA:
 			_BitmapData_copyPixels_YUV420ToOther_Step1<RGBA_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGBA_PA:
+		case bitmapFormat_RGBA_PA:
 			_BitmapData_copyPixels_YUV420ToOther_Step1<RGBA_PA_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatBGRA:
+		case bitmapFormat_BGRA:
 			_BitmapData_copyPixels_YUV420ToOther_Step1<BGRA_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatBGRA_PA:
+		case bitmapFormat_BGRA_PA:
 			_BitmapData_copyPixels_YUV420ToOther_Step1<BGRA_PA_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatARGB:
+		case bitmapFormat_ARGB:
 			_BitmapData_copyPixels_YUV420ToOther_Step1<ARGB_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatARGB_PA:
+		case bitmapFormat_ARGB_PA:
 			_BitmapData_copyPixels_YUV420ToOther_Step1<ARGB_PA_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatABGR:
+		case bitmapFormat_ABGR:
 			_BitmapData_copyPixels_YUV420ToOther_Step1<ABGR_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatABGR_PA:
+		case bitmapFormat_ABGR_PA:
 			_BitmapData_copyPixels_YUV420ToOther_Step1<ABGR_PA_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGB:
+		case bitmapFormat_RGB:
 			_BitmapData_copyPixels_YUV420ToOther_Step1<RGB_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatBGR:
+		case bitmapFormat_BGR:
 			_BitmapData_copyPixels_YUV420ToOther_Step1<BGR_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGB565BE:
+		case bitmapFormat_RGB565BE:
 			_BitmapData_copyPixels_YUV420ToOther_Step1<RGB565BE_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGB565LE:
+		case bitmapFormat_RGB565LE:
 			_BitmapData_copyPixels_YUV420ToOther_Step1<RGB565LE_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatBGR565BE:
+		case bitmapFormat_BGR565BE:
 			_BitmapData_copyPixels_YUV420ToOther_Step1<BGR565BE_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatBGR565LE:
+		case bitmapFormat_BGR565LE:
 			_BitmapData_copyPixels_YUV420ToOther_Step1<BGR565LE_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatGRAY8:
+		case bitmapFormat_GRAY8:
 			_BitmapData_copyPixels_YUV420ToOther_Step1<GRAY8_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGBA_PLANAR:
+		case bitmapFormat_RGBA_PLANAR:
 			_BitmapData_copyPixels_YUV420ToOther_Step1<RGBA_PLANAR_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGBA_PLANAR_PA:
+		case bitmapFormat_RGBA_PLANAR_PA:
 			_BitmapData_copyPixels_YUV420ToOther_Step1<RGBA_PLANAR_PA_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
-		case bitmapFormatRGB_PLANAR:
+		case bitmapFormat_RGB_PLANAR:
 			_BitmapData_copyPixels_YUV420ToOther_Step1<RGB_PLANAR_PROC>(width, height, src, dst_planes, dst_pitches);
 			break;
 		default:
@@ -1598,22 +1598,22 @@ void _BitmapData_copyPixels_YUVToYUV420_Step1(sl_uint32 width, sl_uint32 height,
 void _BitmapData_copyPixels_YUVToYUV420(sl_uint32 width, sl_uint32 height, BitmapFormat src_format, sl_uint8** src_planes, sl_int32* src_pitches, BitmapData& dst)
 {
 	switch (src_format.getValue()) {
-		case bitmapFormatYUVA:
+		case bitmapFormat_YUVA:
 			_BitmapData_copyPixels_YUVToYUV420_Step1<RGBA_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatYUVA_PA:
+		case bitmapFormat_YUVA_PA:
 			_BitmapData_copyPixels_YUVToYUV420_Step1<RGBA_PA_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatYUVA_PLANAR:
+		case bitmapFormat_YUVA_PLANAR:
 			_BitmapData_copyPixels_YUVToYUV420_Step1<RGBA_PLANAR_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatYUVA_PLANAR_PA:
+		case bitmapFormat_YUVA_PLANAR_PA:
 			_BitmapData_copyPixels_YUVToYUV420_Step1<RGBA_PLANAR_PA_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatYUV444:
+		case bitmapFormat_YUV444:
 			_BitmapData_copyPixels_YUVToYUV420_Step1<RGB_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatYUV444_PLANAR:
+		case bitmapFormat_YUV444_PLANAR:
 			_BitmapData_copyPixels_YUVToYUV420_Step1<RGB_PLANAR_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
 		default:
@@ -1693,58 +1693,58 @@ void _BitmapData_copyPixels_OtherToYUV420_Step1(sl_uint32 width, sl_uint32 heigh
 void _BitmapData_copyPixels_OtherToYUV420(sl_uint32 width, sl_uint32 height, BitmapFormat src_format, sl_uint8** src_planes, sl_int32* src_pitches, BitmapData& dst)
 {
 	switch (src_format.getValue()) {
-		case bitmapFormatRGBA:
+		case bitmapFormat_RGBA:
 			_BitmapData_copyPixels_OtherToYUV420_Step1<RGBA_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatRGBA_PA:
+		case bitmapFormat_RGBA_PA:
 			_BitmapData_copyPixels_OtherToYUV420_Step1<RGBA_PA_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatBGRA:
+		case bitmapFormat_BGRA:
 			_BitmapData_copyPixels_OtherToYUV420_Step1<BGRA_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatBGRA_PA:
+		case bitmapFormat_BGRA_PA:
 			_BitmapData_copyPixels_OtherToYUV420_Step1<BGRA_PA_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatARGB:
+		case bitmapFormat_ARGB:
 			_BitmapData_copyPixels_OtherToYUV420_Step1<ARGB_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatARGB_PA:
+		case bitmapFormat_ARGB_PA:
 			_BitmapData_copyPixels_OtherToYUV420_Step1<ARGB_PA_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatABGR:
+		case bitmapFormat_ABGR:
 			_BitmapData_copyPixels_OtherToYUV420_Step1<ABGR_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatABGR_PA:
+		case bitmapFormat_ABGR_PA:
 			_BitmapData_copyPixels_OtherToYUV420_Step1<ABGR_PA_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatRGB:
+		case bitmapFormat_RGB:
 			_BitmapData_copyPixels_OtherToYUV420_Step1<RGB_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatBGR:
+		case bitmapFormat_BGR:
 			_BitmapData_copyPixels_OtherToYUV420_Step1<BGR_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatRGB565BE:
+		case bitmapFormat_RGB565BE:
 			_BitmapData_copyPixels_OtherToYUV420_Step1<RGB565BE_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatRGB565LE:
+		case bitmapFormat_RGB565LE:
 			_BitmapData_copyPixels_OtherToYUV420_Step1<RGB565LE_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatBGR565BE:
+		case bitmapFormat_BGR565BE:
 			_BitmapData_copyPixels_OtherToYUV420_Step1<BGR565BE_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatBGR565LE:
+		case bitmapFormat_BGR565LE:
 			_BitmapData_copyPixels_OtherToYUV420_Step1<BGR565LE_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatGRAY8:
+		case bitmapFormat_GRAY8:
 			_BitmapData_copyPixels_OtherToYUV420_Step1<GRAY8_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatRGBA_PLANAR:
+		case bitmapFormat_RGBA_PLANAR:
 			_BitmapData_copyPixels_OtherToYUV420_Step1<RGBA_PLANAR_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatRGBA_PLANAR_PA:
+		case bitmapFormat_RGBA_PLANAR_PA:
 			_BitmapData_copyPixels_OtherToYUV420_Step1<RGBA_PLANAR_PA_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
-		case bitmapFormatRGB_PLANAR:
+		case bitmapFormat_RGB_PLANAR:
 			_BitmapData_copyPixels_OtherToYUV420_Step1<RGB_PLANAR_PROC>(width, height, src_planes, src_pitches, dst);
 			break;
 		default:
@@ -1752,7 +1752,7 @@ void _BitmapData_copyPixels_OtherToYUV420(sl_uint32 width, sl_uint32 height, Bit
 	}
 }
 
-void BitmapData::copyPixelsFrom(const BitmapData& _other)
+void BitmapData::copyPixelsFrom(const BitmapData& _other) const
 {
 	BitmapData dst(*this);
 	BitmapData src(_other);
@@ -1849,7 +1849,7 @@ void BitmapData::copyPixelsFrom(const BitmapData& _other)
 			}
 			
 		} else {
-			if (dst.format.getColorSpace() == ColorSpace_YUV) {
+			if (dst.format.getColorSpace() == colorSpace_YUV) {
 				// yuv420 -> YUV normal
 				_BitmapData_copyPixels_YUV420ToYUV(width, height, src, dst.format, dst_planes, dst_pitches);
 			} else {
@@ -1859,7 +1859,7 @@ void BitmapData::copyPixelsFrom(const BitmapData& _other)
 		}
 	} else {
 		if (dst.format.isYUV_420()) {
-			if (src.format.getColorSpace() == ColorSpace_YUV) {
+			if (src.format.getColorSpace() == colorSpace_YUV) {
 				// YUV normal -> yuv420
 				_BitmapData_copyPixels_YUVToYUV420(width, height, src.format, src_planes, src_pitches, dst);
 			} else {
@@ -1872,7 +1872,7 @@ void BitmapData::copyPixelsFrom(const BitmapData& _other)
 				src.format = src.format.getNonPrecomputedAlphaFormat();
 				dst.format = dst.format.getNonPrecomputedAlphaFormat();
 			}
-			if (src.format.getColorSpace() == ColorSpace_YUV && dst.format.getColorSpace() == ColorSpace_YUV) {
+			if (src.format.getColorSpace() == colorSpace_YUV && dst.format.getColorSpace() == colorSpace_YUV) {
 				src.format = src.format.getCompatibleRGBFormat();
 				dst.format = src.format.getCompatibleRGBFormat();
 			}
@@ -1905,7 +1905,7 @@ void BitmapData::setFromColors(sl_uint32 width, sl_uint32 height, const Color* c
 {
 	this->width = width;
 	this->height = height;
-	this->format = bitmapFormatRGBA;
+	this->format = bitmapFormat_RGBA;
 	
 	this->data = (void*)colors;
 	this->pitch = stride * 4;

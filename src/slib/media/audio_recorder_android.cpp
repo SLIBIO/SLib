@@ -6,6 +6,7 @@
 #include "../../../inc/slib/media/opensl_es.h"
 
 SLIB_MEDIA_NAMESPACE_BEGIN
+
 Ref<AudioRecorder> AudioRecorder::create(const AudioRecorderParam& param)
 {
 	return OpenSL_ES::createRecorder(param);

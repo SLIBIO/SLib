@@ -17,15 +17,11 @@ void Android::initialize(JavaVM* jvm)
 	Jni::initialize(jvm);
 }
 
-SLIB_SAFE_STATIC_REF(JniGlobal<jobject>, _g_android_current_activity);
+SLIB_SAFE_STATIC_REF(JniSafeGlobal<jobject>, _g_android_current_activity);
 
 jobject Android::getCurrentActivity()
 {
-	if (_g_android_current_activity.isNotNull()) {
-		return _g_android_current_activity;
-	} else {
-		return sl_null;
-	}
+	return _g_android_current_activity.get();
 }
 
 void Android::setCurrentActivity(jobject activity)

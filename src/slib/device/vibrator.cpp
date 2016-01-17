@@ -3,14 +3,9 @@
 #if defined(SLIB_PLATFORM_IS_DESKTOP)
 
 SLIB_DEVICE_NAMESPACE_BEGIN
-sl_bool Vibrator::vibrate(sl_int32 millisec)
+Ref<Vibrator> Vibrator::create()
 {
-	return sl_true;
-}
-
-sl_bool Vibrator::cancel()
-{
-	return sl_true;
+	return Ref<Vibrator>::null();
 }
 SLIB_DEVICE_NAMESPACE_END
 

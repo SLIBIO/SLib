@@ -64,7 +64,7 @@ public:
 			timeoutRead = 100;
 			sizeBuffer = 0x200000; // 2MB (16Mb)
 			
-			preferedLinkDeviceType = networkLinkDevice_Ethernet;
+			preferedLinkDeviceType = networkLinkDeviceType_Ethernet;
 		}
 	};
 
@@ -115,21 +115,22 @@ typedef NetCapture::NetCaptureDevice NetCaptureDevice;
 
 #define SLIB_NETWORK_LINUX_COOKED_FRAME_HEADER_SIZE 16
 
+enum LinuxCookedPacketType {
+	linuxCookedPacketType_Host = 0,
+	linuxCookedPacketType_Broadcast = 1,
+	linuxCookedPacketType_Multicast = 2,
+	linuxCookedPacketType_OtherHost = 3,
+	linuxCookedPacketType_OutGoing = 4
+};
+
 class SLIB_EXPORT LinuxCookedFrameFormat
 {
 public:
-	enum PacketType {
-		typeHost = 0,
-		typeBroadcast = 1,
-		typeMulticast = 2,
-		typeOtherHost = 3,
-		typeOutGoing = 4
-	};
-	SLIB_INLINE PacketType getPacketType() const
+	SLIB_INLINE LinuxCookedPacketType getPacketType() const
 	{
-		return (PacketType)(MIO::readUint16BE(m_packetType));
+		return (LinuxCookedPacketType)(MIO::readUint16BE(m_packetType));
 	}
-	SLIB_INLINE void setPacketType(PacketType type)
+	SLIB_INLINE void setPacketType(LinuxCookedPacketType type)
 	{
 		MIO::writeUint16BE(m_packetType, type);
 	}
@@ -163,12 +164,12 @@ public:
 		return m_address;
 	}
 
-	// NetworkLinkProtocolType
+	// NetworkLinkProtocol
 	SLIB_INLINE sl_uint16 getProtocolType() const
 	{
 		return MIO::readUint16BE(m_protocol);
 	}
-	// NetworkLinkProtocolType
+	// NetworkLinkProtocol
 	SLIB_INLINE void setProtocolType(sl_uint16 type)
 	{
 		MIO::writeUint16BE(m_protocol, type);

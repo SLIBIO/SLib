@@ -16,7 +16,9 @@ public:
 	double longitude;
 
 public:
-	SLIB_INLINE LatLon() {}
+	SLIB_INLINE LatLon()
+	{
+	}
 
 	SLIB_INLINE LatLon(const LatLon& other)
 	{
@@ -37,6 +39,7 @@ public:
 		longitude = _longitude;
 	}
 
+public:
 	SLIB_INLINE sl_bool operator==(const LatLon& other) const
 	{
 		return latitude == other.latitude && longitude == other.longitude;
@@ -47,15 +50,20 @@ public:
 		return !(*this == other);
 	}
 
+public:
 	static LatLon getCenter(const LatLon* list, sl_size count);
+	
 	static LatLon getCenter(const List<LatLon>& list);
 
+	
 	static sl_bool checkIntersectionLineToLine(
 		LatLon& pointIntersect
 		, const LatLon& line1Start, const LatLon& line1End
 		, const LatLon& line2Start, const LatLon& line2End);
 
+	
 	static double normalizeLatitude(double latitude);
+	
 	static double normalizeLongitude(double longitude);
 
 	SLIB_INLINE void normalize()
@@ -75,7 +83,9 @@ public:
 	double altitude; // Unit: m
 
 public:
-	SLIB_INLINE GeoLocation() {}
+	SLIB_INLINE GeoLocation()
+	{
+	}
 
 	SLIB_INLINE GeoLocation(const GeoLocation& other)
 	{
@@ -83,6 +93,7 @@ public:
 		longitude = other.longitude;
 		altitude = other.altitude;
 	}
+	
 	SLIB_INLINE GeoLocation& operator=(const GeoLocation& other)
 	{
 		latitude = other.latitude;
@@ -90,6 +101,7 @@ public:
 		altitude = other.altitude;
 		return *this;
 	}
+	
 	SLIB_INLINE GeoLocation& operator=(const LatLon& other)
 	{
 		latitude = other.latitude;
@@ -104,13 +116,26 @@ public:
 		longitude = _longitude;
 		altitude = _altitude;
 	}
+	
 	SLIB_INLINE GeoLocation(const LatLon& latlon, double _altitude = 0)
 	{
 		latitude = latlon.latitude;
 		longitude = latlon.longitude;
 		altitude = _altitude;
 	}
-
+	
+public:
+	SLIB_INLINE sl_bool operator==(const GeoLocation& other) const
+	{
+		return latitude == other.latitude && longitude == other.longitude && altitude == other.altitude;
+	}
+	
+	SLIB_INLINE sl_bool operator!=(const GeoLocation& other) const
+	{
+		return !(*this == other);
+	}
+	
+public:
 	LatLon getLatLon() const
 	{
 		return LatLon(latitude, longitude);
@@ -121,20 +146,11 @@ public:
 		latitude = v.latitude;
 		longitude = v.longitude;
 	}
+	
 	void setLatLon(double _latitude, double _longitude)
 	{
 		latitude = _latitude;
 		longitude = _longitude;
-	}
-
-	SLIB_INLINE sl_bool operator==(const GeoLocation& other) const
-	{
-		return latitude == other.latitude && longitude == other.longitude && altitude == other.altitude;
-	}
-
-	SLIB_INLINE sl_bool operator!=(const GeoLocation& other) const
-	{
-		return !(*this == other);
 	}
 
 	SLIB_INLINE void normalize()
@@ -152,7 +168,10 @@ public:
 	LatLon bottomLeft;
 	LatLon topRight;
 
-	SLIB_INLINE GeoRectangle() {}
+public:
+	SLIB_INLINE GeoRectangle()
+	{
+	}
 
 	SLIB_INLINE GeoRectangle(const GeoRectangle& other)
 	{
@@ -168,6 +187,7 @@ public:
 		topRight.longitude = SLIB_MAX(pt1.longitude, pt2.longitude);
 	}
 
+public:
 	SLIB_INLINE GeoRectangle& operator=(const GeoRectangle& other)
 	{
 		bottomLeft = other.bottomLeft;
@@ -175,6 +195,7 @@ public:
 		return *this;
 	}
 
+public:
 	SLIB_INLINE sl_bool contains(LatLon& pt) const
 	{
 		return (bottomLeft.latitude <= pt.latitude && bottomLeft.longitude <= pt.longitude
@@ -236,6 +257,7 @@ public:
 		eccentricitySquared = other.eccentricitySquared;
 	}
 
+public:
 	SLIB_INLINE Globe& operator=(const Globe& other)
 	{
 		radiusEquatorial = other.radiusEquatorial;
@@ -247,6 +269,7 @@ public:
 		return *this;
 	}
 
+public:
 	SLIB_INLINE double getEquatorialRadius() const
 	{
 		return radiusEquatorial;
@@ -279,27 +302,35 @@ public:
 		return eccentricitySquared;
 	}
 
+	
 	Vector3lf getSurfaceNormal(double latitude, double longitude) const;
+	
 	SLIB_INLINE Vector3lf getSurfaceNormal(const LatLon& latlon) const
 	{
 		return getSurfaceNormal(latlon.latitude, latlon.longitude);
 	}
+	
 	SLIB_INLINE Vector3lf getSurfaceNormal(const GeoLocation& location) const
 	{
 		return getSurfaceNormal(location.latitude, location.longitude);
 	}
 
+	
 	Vector3lf getNorthPointingTangent(double latitude, double longitude) const;
+	
 	SLIB_INLINE Vector3lf getNorthPointingTangent(const LatLon& latlon) const
 	{
 		return getNorthPointingTangent(latlon.latitude, latlon.longitude);
 	}
+	
 	SLIB_INLINE Vector3lf getNorthPointingTangent(const GeoLocation& location) const
 	{
 		return getNorthPointingTangent(location.latitude, location.longitude);
 	}
 
+	
 	Vector3lf getSurfaceNormalAtCartesianPosition(double x, double y, double z) const;
+	
 	SLIB_INLINE Vector3lf getSurfaceNormalAtCartesianPosition(const Vector3lf& position) const
 	{
 		return getSurfaceNormalAtCartesianPosition(position.x, position.y, position.z);
@@ -313,16 +344,20 @@ public:
 		(0, 0, 1): for LatLon(0, 180)
 	*/
 	Vector3lf getCartesianPosition(double latitude, double longitude, double altitude) const;
+	
 	SLIB_INLINE Vector3lf getCartesianPosition(const LatLon& latlon) const
 	{
 		return getCartesianPosition(latlon.latitude, latlon.longitude, 0);
 	}
+	
 	SLIB_INLINE Vector3lf getCartesianPosition(const GeoLocation& location) const
 	{
 		return getCartesianPosition(location.latitude, location.longitude, location.altitude);
 	}
 
+	
 	GeoLocation getGeoLocation(double x, double y, double z) const;
+	
 	SLIB_INLINE GeoLocation getGeoLocation(const Vector3lf& position) const
 	{
 		return getGeoLocation(position.x, position.y, position.z);
@@ -455,42 +490,50 @@ public:
 		return ret;
 	}
 
+	
 	SLIB_INLINE static Vector3lf getSurfaceNormal(double latitude, double longitude)
 	{
 		Globe globe;
 		getGlobe(&globe);
 		return globe.getSurfaceNormal(latitude, longitude);
 	}
+	
 	SLIB_INLINE static Vector3lf getSurfaceNormal(const LatLon& latlon)
 	{
 		return getSurfaceNormal(latlon.latitude, latlon.longitude);
 	}
+	
 	SLIB_INLINE static Vector3lf getSurfaceNormal(const GeoLocation& location)
 	{
 		return getSurfaceNormal(location.latitude, location.longitude);
 	}
 
+	
 	SLIB_INLINE static Vector3lf getNorthPointingTangent(double latitude, double longitude)
 	{
 		Globe globe;
 		getGlobe(&globe);
 		return globe.getNorthPointingTangent(latitude, longitude);
 	}
+	
 	SLIB_INLINE static Vector3lf getNorthPointingTangent(const LatLon& latlon)
 	{
 		return getNorthPointingTangent(latlon.latitude, latlon.longitude);
 	}
+	
 	SLIB_INLINE static Vector3lf getNorthPointingTangent(const GeoLocation& location)
 	{
 		return getNorthPointingTangent(location.latitude, location.longitude);
 	}
 
+	
 	SLIB_INLINE static Vector3lf getSurfaceNormalAtCartesianPosition(double x, double y, double z)
 	{
 		Globe globe;
 		getGlobe(&globe);
 		return globe.getSurfaceNormalAtCartesianPosition(x, y, z);
 	}
+	
 	SLIB_INLINE static Vector3lf getSurfaceNormalAtCartesianPosition(const Vector3lf& position)
 	{
 		return getSurfaceNormalAtCartesianPosition(position.x, position.y, position.z);
@@ -509,21 +552,25 @@ public:
 		getGlobe(&globe);
 		return globe.getCartesianPosition(latitude, longitude, altitude);
 	}
+	
 	SLIB_INLINE static Vector3lf getCartesianPosition(const LatLon& latlon)
 	{
 		return getCartesianPosition(latlon.latitude, latlon.longitude, 0);
 	}
+	
 	SLIB_INLINE static Vector3lf getCartesianPosition(const GeoLocation& location)
 	{
 		return getCartesianPosition(location.latitude, location.longitude, location.altitude);
 	}
 
+	
 	SLIB_INLINE static GeoLocation getGeoLocation(double x, double y, double z)
 	{
 		Globe globe;
 		getGlobe(&globe);
 		return globe.getGeoLocation(x, y, z);
 	}
+	
 	SLIB_INLINE static GeoLocation getGeoLocation(const Vector3lf& position)
 	{
 		return getGeoLocation(position.x, position.y, position.z);

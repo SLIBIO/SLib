@@ -298,7 +298,7 @@ void HttpServiceConnection::_read()
 	}
 }
 
-void HttpServiceConnection::onRead(AsyncStream* stream, void* data, sl_uint32 size, Referable* ref, sl_bool flagError)
+void HttpServiceConnection::onRead(AsyncStream* stream, void* data, sl_uint32 size, const Referable* ref, sl_bool flagError)
 {
 	m_flagReading = sl_false;
 	if (flagError) {
@@ -334,6 +334,10 @@ void HttpServiceConnection::_processContext(Ref<HttpServiceContext> context)
 	m_output->mergeBuffer(&(context->m_bufferOutput));
 	m_output->startWriting();
 	start();
+}
+
+void HttpServiceConnection::onAsyncOutputComplete(AsyncOutput* output)
+{
 }
 
 void HttpServiceConnection::onAsyncOutputError(AsyncOutput* output)
@@ -372,7 +376,7 @@ public:
 		m_connection = connection;
 	}
 
-	void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError)
+	void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, const Referable* ref, sl_bool flagError)
 	{
 		Ref<HttpServiceConnection> connection = m_connection;
 		if (connection.isNotNull()) {
