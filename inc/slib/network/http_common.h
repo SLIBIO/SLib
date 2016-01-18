@@ -139,160 +139,170 @@
 #include "async.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
+
 class SLIB_EXPORT HttpRequestHeader
 {
 public:
 	HttpRequestHeader();
 
 public:
-	SLIB_INLINE const String& getMethod() const
+	SLIB_INLINE String getMethod() const
 	{
 		return m_method;
 	}
-	SLIB_INLINE const String& getMethodUppercase() const
+	
+	SLIB_INLINE String getMethodUppercase() const
 	{
 		return m_methodUpper;
 	}
+	
 	void setMethod(const String& method);
 
-	SLIB_INLINE const String& getPath() const
+	
+	SLIB_INLINE String getPath() const
 	{
 		return m_path;
 	}
+	
 	SLIB_INLINE void setPath(const String& path)
 	{
 		m_path = path;
 	}
 
-	SLIB_INLINE const String& getQuery() const
+	
+	SLIB_INLINE String getQuery() const
 	{
 		return m_query;
 	}
+	
 	SLIB_INLINE void setQuery(String query)
 	{
 		m_query = query;
 	}
 
-	SLIB_INLINE const String& getRequestVersion() const
+	
+	SLIB_INLINE String getRequestVersion() const
 	{
 		return m_requestVersion;
 	}
+	
 	SLIB_INLINE void setRequestVersion(const String& version)
 	{
 		m_requestVersion = version;
 	}
 
 protected:
-	String m_method;
-	String m_methodUpper;
+	SafeString m_method;
+	SafeString m_methodUpper;
 
-	String m_path;
-	String m_query;
+	SafeString m_path;
+	SafeString m_query;
 	
-	String m_requestVersion;
+	SafeString m_requestVersion;
 
 public:
-	SLIB_INLINE const Map<String, String>& getRequestHeaders() const
+	SLIB_INLINE const IMap<String, String>& getRequestHeaders() const
 	{
 		return m_requestHeaders;
 	}
-	SLIB_INLINE String getRequestHeader(String name) const
-	{
-		return m_requestHeaders.getValue(name, String::null());
-	}
-	SLIB_INLINE void setRequestHeader(String name, String value)
-	{
-		m_requestHeaders.put(name, value);
-	}
-	SLIB_INLINE void addRequestHeader(String name, String value)
-	{
-		m_requestHeaders.add(name, value);
-	}
-	SLIB_INLINE sl_bool containsRequestHeader(String name) const
-	{
-		return m_requestHeaders.containsKey(name);
-	}
-	SLIB_INLINE void removeRequestHeader(String name)
-	{
-		m_requestHeaders.removeAllMatchingKeys(name);
-	}
-	SLIB_INLINE void clearRequestHeaders()
-	{
-		m_requestHeaders.removeAll();
-	}
-
+	
+	String getRequestHeader(String name) const;
+	
+	List<String> getRequestHeaderValues(String name) const;
+	
+	void setRequestHeader(String name, String value);
+	
+	void addRequestHeader(String name, String value);
+	
+	sl_bool containsRequestHeader(String name) const;
+	
+	void removeRequestHeader(String name);
+	
+	void clearRequestHeaders();
+	
+	
 	sl_uint64 getRequestContentLengthHeader() const;
+	
 	void setRequestContentLengthHeader(sl_int64 size);
 
+	
 	String getRequestContentType() const;
+	
 	void setRequestContentType(const String& type);
 
+	
 	String getRequestContentEncoding() const;
+	
 	void setRequestContentEncoding(const String& type);
 
+	
 	String getRequestTransferEncoding() const;
+	
 	void setRequestTransferEncoding(const String& type);
 
+	
 	sl_bool isChunkedRequest() const;
 
+	
 	String getHost() const;
+	
 	void setHost(const String& type);
 
 protected:
-	Map<String, String> m_requestHeaders;
+	HashMap<String, String> m_requestHeaders;
 
 public:
-	SLIB_INLINE const Map<String, String>& getParameters() const
+	SLIB_INLINE const IMap<String, String>& getParameters() const
 	{
 		return m_parameters;
 	}
-	SLIB_INLINE String getParameter(const String& name) const
-	{
-		return m_parameters.getValue(name, String::null());
-	}
-	SLIB_INLINE sl_bool containsParameter(const String& name) const
-	{
-		return m_parameters.containsKey(name);
-	}
+	
+	String getParameter(const String& name) const;
+	
+	List<String> getParameterValues(const String& name) const;
+	
+	sl_bool containsParameter(const String& name) const;
 
-	SLIB_INLINE const Map<String, String>& getQueryParameters() const
+	
+	SLIB_INLINE const IMap<String, String>& getQueryParameters() const
 	{
 		return m_queryParameters;
 	}
-	SLIB_INLINE String getQueryParameter(String name) const
-	{
-		return m_queryParameters.getValue(name, String::null());
-	}
-	SLIB_INLINE sl_bool containsQueryParameter(String name) const
-	{
-		return m_queryParameters.containsKey(name);
-	}
+	
+	String getQueryParameter(String name) const;
 
-	SLIB_INLINE const Map<String, String>& getPostParameters() const
+	List<String> getQueryParameterValues(String name) const;
+	
+	sl_bool containsQueryParameter(String name) const;
+
+	
+	SLIB_INLINE const IMap<String, String>& getPostParameters() const
 	{
 		return m_postParameters;
 	}
-	SLIB_INLINE String getPostParameter(String name) const
-	{
-		return m_postParameters.getValue(name, String::null());
-	}
-	SLIB_INLINE sl_bool containsPostParameter(String name) const
-	{
-		return m_postParameters.containsKey(name);
-	}
+	
+	String getPostParameter(String name) const;
+	
+	List<String> getPostParameterValues(String name) const;
+	
+	sl_bool containsPostParameter(String name) const;
+	
 
 protected:
-	Map<String, String> m_parameters;
-	Map<String, String> m_queryParameters;
-	Map<String, String> m_postParameters;
+	HashMap<String, String> m_parameters;
+	HashMap<String, String> m_queryParameters;
+	HashMap<String, String> m_postParameters;
 
 public:
 	void applyPostParameters(const void* data, sl_size size);
+	
 	void applyPostParameters(const String& str);
+	
 	void applyQueryToParameters();
 
 public:
 	static Map<String, String> parseParameters(const void* data, sl_size size);
+	
 	static Map<String, String> parseParameters(const String& str);
 
 public:
@@ -317,21 +327,26 @@ public:
 	{
 		return m_responseCode;
 	}
+	
 	void setResponseCode(sl_uint32 code);
 
-	SLIB_INLINE const String& getResponseMessage() const
+	
+	SLIB_INLINE String getResponseMessage() const
 	{
 		return m_responseMessage;
 	}
+	
 	SLIB_INLINE void setResponseMessage(String message)
 	{
 		m_responseMessage = message;
 	}
 
-	SLIB_INLINE const String& getResponseVersion() const
+	
+	SLIB_INLINE String getResponseVersion() const
 	{
 		return m_responseVersion;
 	}
+	
 	SLIB_INLINE void setResponseVersion(const String& version)
 	{
 		m_responseVersion = version;
@@ -339,55 +354,54 @@ public:
 
 protected:
 	sl_uint32 m_responseCode;
-	String m_responseMessage;
-	String m_responseVersion;
+	SafeString m_responseMessage;
+	SafeString m_responseVersion;
 
 public:
-	SLIB_INLINE const Map<String, String>& getResponseHeaders() const
+	SLIB_INLINE const IMap<String, String>& getResponseHeaders() const
 	{
 		return m_responseHeaders;
 	}
-	SLIB_INLINE String getResponseHeader(String name) const
-	{
-		return m_responseHeaders.getValue(name, String::null());
-	}
-	SLIB_INLINE void setResponseHeader(String name, String value)
-	{
-		m_responseHeaders.put(name, value);
-	}
-	SLIB_INLINE void addResponseHeader(String name, String value)
-	{
-		m_responseHeaders.add(name, value);
-	}
-	SLIB_INLINE sl_bool containsResponseHeader(String name) const
-	{
-		return m_responseHeaders.containsKey(name);
-	}
-	SLIB_INLINE void removeResponseHeader(String name)
-	{
-		m_responseHeaders.removeAllMatchingKeys(name);
-	}
-	SLIB_INLINE void clearResponseHeaders()
-	{
-		m_responseHeaders.removeAll();
-	}
+	
+	String getResponseHeader(String name) const;
+	
+	List<String> getResponseHeaderValues(String name) const;
+	
+	void setResponseHeader(String name, String value);
+	
+	void addResponseHeader(String name, String value);
+	
+	sl_bool containsResponseHeader(String name) const;
+	
+	void removeResponseHeader(String name);
+	
+	void clearResponseHeaders();
 
+	
 	sl_uint64 getResponseContentLengthHeader() const;
+	
 	void setResponseContentLengthHeader(sl_int64 size);
 
+	
 	String getResponseContentType() const;
+	
 	void setResponseContentType(const String& size);
 
+	
 	String getResponseContentEncoding() const;
+	
 	void setResponseContentEncoding(const String& type);
 
+	
 	String getResponseTransferEncoding() const;
+	
 	void setResponseTransferEncoding(const String& type);
 
+	
 	sl_bool isChunkedResponse() const;
 
 protected:
-	Map<String, String> m_responseHeaders;
+	HashMap<String, String> m_responseHeaders;
 
 public:
 	Memory makeResponsePacket() const;
@@ -453,7 +467,9 @@ public:
 	sl_bool add(const void* buf, sl_size size, sl_size& posBody);
 
 	Memory mergeHeader();
+	
 	sl_size getHeaderSize();
+	
 	void clear();
 
 protected:
@@ -471,51 +487,55 @@ class SLIB_EXPORT HttpContentReader : public AsyncStreamFilter
 {
 protected:
 	HttpContentReader();
+	
 public:
-	~HttpContentReader();
-
+	static Ref<HttpContentReader> createPersistent(
+												   const Ref<AsyncStream>& io
+												   , const Ptr<IHttpContentReaderListener>& listener
+												   , sl_uint64 contentLength
+												   , sl_uint32 bufferSize
+												   , sl_bool flagDecompress);
+	
+	static Ref<HttpContentReader> createChunked(
+												const Ref<AsyncStream>& io
+												, const Ptr<IHttpContentReaderListener>& listener
+												, sl_uint32 bufferSize
+												, sl_bool flagDecompress);
+	
+	static Ref<HttpContentReader> createTearDown(
+												 const Ref<AsyncStream>& io
+												 , const Ptr<IHttpContentReaderListener>& listener
+												 , sl_uint32 bufferSize
+												 , sl_bool flagDecompress);
 public:
-	SLIB_PROPERTY_INLINE(Ptr<IHttpContentReaderListener>, Listener);
-
 	SLIB_INLINE sl_bool isDecompressing()
 	{
 		return m_flagDecompressing;
 	}
 
 protected:
-	void setError();
-	void setCompleted(void* dataRemain, sl_uint32 size);
-	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError);
+	// override
 	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref);
-
+	
+	// override
+	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError);
+	
+protected:
+	void setError();
+	
+	void setCompleted(void* dataRemain, sl_uint32 size);
+	
 	sl_bool setDecompressing();
+	
 	Memory decompressData(void* data, sl_uint32 size, const Referable* refData);
 
 protected:
 	sl_bool m_flagDecompressing;
 	ZlibDecompress m_zlib;
-
-public:
-	static Ref<HttpContentReader> createPersistent(
-		const Ref<AsyncStream>& io
-		, const Ptr<IHttpContentReaderListener>& listener
-		, sl_uint64 contentLength
-		, sl_uint32 bufferSize
-		, sl_bool flagDecompress);
-
-	static Ref<HttpContentReader> createChunked(
-		const Ref<AsyncStream>& io
-		, const Ptr<IHttpContentReaderListener>& listener
-		, sl_uint32 bufferSize
-		, sl_bool flagDecompress);
-
-	static Ref<HttpContentReader> createTearDown(
-		const Ref<AsyncStream>& io
-		, const Ptr<IHttpContentReaderListener>& listener
-		, sl_uint32 bufferSize
-		, sl_bool flagDecompress);
+	Ptr<IHttpContentReaderListener> m_listener;
 
 };
+
 SLIB_NETWORK_NAMESPACE_END
 
 #endif

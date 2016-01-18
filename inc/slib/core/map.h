@@ -64,7 +64,7 @@ public:
 	}
 	
 	
-	SLIB_INLINE VT getValue_NoLock(const KT& key, const VT& def)
+	SLIB_INLINE VT getValue_NoLock(const KT& key, const VT& def) const
 	{
 		VT* p = getItemPtr(key);
 		if (p) {
@@ -73,7 +73,7 @@ public:
 		return def;
 	}
 	
-	VT getValue(const KT& key, const VT& def)
+	VT getValue(const KT& key, const VT& def) const
 	{
 		ObjectLocker lock(this);
 		VT* p = getItemPtr(key);

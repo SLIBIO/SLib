@@ -12,7 +12,8 @@ typedef int sl_socket;
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
-enum L2PacketType {
+enum L2PacketType
+{
     l2PacketType_Host = 0,
     l2PacketType_Broadcast = 1,
     l2PacketType_Multicast = 2,
@@ -61,7 +62,8 @@ public:
 	
 };
 
-enum SocketType {
+enum SocketType
+{
     socketType_None = 0,
     socketType_Tcp = 0x01,
     socketType_Udp = 0x02,
@@ -73,7 +75,8 @@ enum SocketType {
     socketType_PacketDatagram = 0x81
 };
 
-enum SocketShutdownMode {
+enum SocketShutdownMode
+{
     socketShutdownMode_Receive = 0,
     socketShutdownMode_Send = 1,
     socketShutdownMode_Both = 2

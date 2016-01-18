@@ -1,5 +1,3 @@
-#include "../../../inc/slib/core/definition.h"
-
 #include "../../../inc/slib/network/capture.h"
 #include "../../../inc/slib/core/thread.h"
 #include "../../../inc/slib/core/log.h"
@@ -15,17 +13,19 @@
 #define MAX_PACKET_SIZE 65535
 
 SLIB_NETWORK_NAMESPACE_BEGIN
-NetCapture::NetCapture()
-{
-}
 
-NetCapture::~NetCapture()
+NetCaptureParam::NetCaptureParam()
 {
+	flagPromiscuous = sl_false;
+	timeoutRead = 100;
+	sizeBuffer = 0x200000; // 2MB (16Mb)
+	
+	preferedLinkDeviceType = networkLinkDeviceType_Ethernet;
 }
 
 void NetCapture::_onCapturePacket(NetCapturePacket* packet)
 {
-	PtrLocker<INetCaptureListener> listener(getListener());
+	PtrLocker<INetCaptureListener> listener(m_listener);
 	if (listener.isNotNull()) {
 		listener->onCapturePacket(this, packet);
 	}
@@ -44,15 +44,16 @@ String NetCapture::getLastErrorMessage()
 class _NetRawPacketCapture : public NetCapture
 {
 public:
-	Ref<Socket> m_socket;
+	SafeRef<Socket> m_socket;
 	
 	sl_uint32 m_deviceType;
 	sl_uint32 m_ifaceIndex;
-	Memory m_bufPacket;	
+	Memory m_bufPacket;
 	Ref<Thread> m_thread;
 	
 	sl_bool m_flagRunning;
 	
+public:
 	_NetRawPacketCapture()
 	{	
 		m_flagRunning = sl_true;
@@ -63,6 +64,7 @@ public:
 		release();
 	}
 	
+public:
 	static Ref<_NetRawPacketCapture> create(const NetCaptureParam& param)
 	{
 		Ref<_NetRawPacketCapture> ret;
@@ -97,7 +99,7 @@ public:
 					ret->m_socket = socket;
 					ret->m_deviceType = deviceType;
 					ret->m_ifaceIndex = iface;
-					ret->setListener(param.listener);
+					ret->m_listener = param.listener;
 					ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(_NetRawPacketCapture, _run, ret.get()));
 					if (ret->m_thread.isNull()) {
 						ret.setNull();
@@ -210,15 +212,16 @@ Ref<NetCapture> NetCapture::createRawPacket(const NetCaptureParam& param)
 class _NetRawIPv4Capture : public NetCapture
 {
 public:
-	Ref<Socket> m_socketTCP;
-	Ref<Socket> m_socketUDP;
-	Ref<Socket> m_socketICMP;
+	SafeRef<Socket> m_socketTCP;
+	SafeRef<Socket> m_socketUDP;
+	SafeRef<Socket> m_socketICMP;
 	
 	Memory m_bufPacket;	
 	Ref<Thread> m_thread;
 
 	sl_bool m_flagRunning;
 	
+public:
 	_NetRawIPv4Capture()
 	{	
 		m_flagRunning = sl_true;
@@ -229,6 +232,7 @@ public:
 		release();
 	}
 	
+public:
 	static Ref<_NetRawIPv4Capture> create(const NetCaptureParam& param)
 	{
 		Ref<_NetRawIPv4Capture> ret;
@@ -247,7 +251,7 @@ public:
 					ret->m_socketTCP = socketTCP;
 					ret->m_socketUDP = socketUDP;
 					ret->m_socketICMP = socketICMP;
-					ret->setListener(param.listener);
+					ret->m_listener = param.listener;
 					ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(_NetRawIPv4Capture, _run, ret.get()));
 					if (ret->m_thread.isNull()) {
 						ret.setNull();

@@ -2,6 +2,7 @@
 #include "../../../inc/slib/network/icmp.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
+
 sl_uint16 TCP_IP::calculateOneComplementSum(const void* data, sl_size size, sl_uint32 add)
 {
 	sl_uint32 sum = add;
@@ -339,8 +340,10 @@ List<Memory> IPv4Fragmentation::makeFragments(const IPv4HeaderFormat* header, sl
 		offset += sizeFragment;
 		h->setMF(offset < sizeContent);
 		h->updateChecksum();
-		ret.add(mem);
+		
+		ret.add_NoLock(mem);
 	}
 	return ret;
 }
+
 SLIB_NETWORK_NAMESPACE_END

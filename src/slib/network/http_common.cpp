@@ -59,6 +59,42 @@ void HttpRequestHeader::setMethod(const String& method)
 	m_methodUpper = m_method.toUpper();
 }
 
+String HttpRequestHeader::getRequestHeader(String name) const
+{
+	return m_requestHeaders.getValue(name, String::null());
+}
+
+List<String> HttpRequestHeader::getRequestHeaderValues(String name) const
+{
+	return m_requestHeaders.getValues(name);
+}
+
+void HttpRequestHeader::setRequestHeader(String name, String value)
+{
+	m_requestHeaders.put(name, value);
+}
+
+void HttpRequestHeader::addRequestHeader(String name, String value)
+{
+	m_requestHeaders.add(name, value);
+}
+
+sl_bool HttpRequestHeader::containsRequestHeader(String name) const
+{
+	return m_requestHeaders.containsKey(name);
+}
+
+void HttpRequestHeader::removeRequestHeader(String name)
+{
+	m_requestHeaders.removeAllMatchingKeys(name);
+}
+
+void HttpRequestHeader::clearRequestHeaders()
+{
+	m_requestHeaders.removeAll();
+}
+
+
 sl_uint64 HttpRequestHeader::getRequestContentLengthHeader() const
 {
 	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
@@ -135,10 +171,58 @@ void HttpRequestHeader::setHost(const String& type)
 	setRequestHeader(_consts.strHost, type);
 }
 
+
+String HttpRequestHeader::getParameter(const String& name) const
+{
+	return m_parameters.getValue(name, String::null());
+}
+
+List<String> HttpRequestHeader::getParameterValues(const String& name) const
+{
+	return m_parameters.getValues(name);
+}
+
+sl_bool HttpRequestHeader::containsParameter(const String& name) const
+{
+	return m_parameters.containsKey(name);
+}
+
+String HttpRequestHeader::getQueryParameter(String name) const
+{
+	return m_queryParameters.getValue(name, String::null());
+}
+
+List<String> HttpRequestHeader::getQueryParameterValues(String name) const
+{
+	return m_queryParameters.getValues(name);
+}
+
+sl_bool HttpRequestHeader::containsQueryParameter(String name) const
+{
+	return m_queryParameters.containsKey(name);
+}
+
+String HttpRequestHeader::getPostParameter(String name) const
+{
+	return m_postParameters.getValue(name, String::null());
+}
+
+List<String> HttpRequestHeader::getPostParameterValues(String name) const
+{
+	return m_postParameters.getValues(name);
+}
+
+sl_bool HttpRequestHeader::containsPostParameter(String name) const
+{
+	return m_postParameters.containsKey(name);
+}
+
+
 void HttpRequestHeader::applyPostParameters(const void* data, sl_size size)
 {
-	m_postParameters = parseParameters(data, size);
-	m_parameters.put(m_postParameters);
+	Map<String, String> params = parseParameters(data, size);
+	m_postParameters.put(params.getObject());
+	m_parameters.put(params.getObject());
 }
 
 void HttpRequestHeader::applyPostParameters(const String& str)
@@ -148,8 +232,9 @@ void HttpRequestHeader::applyPostParameters(const String& str)
 
 void HttpRequestHeader::applyQueryToParameters()
 {
-	m_queryParameters = parseParameters(m_query);
-	m_parameters.put(m_queryParameters);
+	Map<String, String> params = parseParameters(m_query);
+	m_queryParameters.put(params.getObject());
+	m_parameters.put(params.getObject());
 }
 
 Map<String, String> HttpRequestHeader::parseParameters(const String& str)
@@ -182,11 +267,11 @@ Map<String, String> HttpRequestHeader::parseParameters(const void* data, sl_size
 				String name = String::fromUtf8(buf + start, indexSplit - start);
 				indexSplit++;
 				String value = String::fromUtf8(buf + indexSplit, pos - indexSplit);
-				value = URL::decodeUriComponentByUTF8(value);
-				ret.put(name, value);
+				value = Url::decodeUriComponentByUTF8(value);
+				ret.put_NoLock(name, value);
 			} else {
 				String name = String::fromUtf8(buf + start, pos - start);
-				ret.put(name, String::null());
+				ret.put_NoLock(name, String::null());
 			}
 			start = pos + 1;
 			indexSplit = start;
@@ -351,7 +436,7 @@ sl_reg HttpRequestHeader::parseRequestPacket(const void* packet, sl_size _size)
 				}
 				endValue--;
 			}
-			value = URL::decodeUriComponentByUTF8(String::fromUtf8(data + startValue, endValue - startValue));
+			value = Url::decodeUriComponentByUTF8(String::fromUtf8(data + startValue, endValue - startValue));
 		} else {
 			name = String::fromUtf8(data + posStart, posCurrent - posStart);
 		}
@@ -446,6 +531,41 @@ void HttpResponseHeader::setResponseContentLengthHeader(sl_int64 size)
 	}
 	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
 	setResponseHeader(_consts.strContentLength, String::fromUint64(size));
+}
+
+String HttpResponseHeader::getResponseHeader(String name) const
+{
+	return m_responseHeaders.getValue(name, String::null());
+}
+
+List<String> HttpResponseHeader::getResponseHeaderValues(String name) const
+{
+	return m_responseHeaders.getValues(name);
+}
+
+void HttpResponseHeader::setResponseHeader(String name, String value)
+{
+	m_responseHeaders.put(name, value);
+}
+
+void HttpResponseHeader::addResponseHeader(String name, String value)
+{
+	m_responseHeaders.add(name, value);
+}
+
+sl_bool HttpResponseHeader::containsResponseHeader(String name) const
+{
+	return m_responseHeaders.containsKey(name);
+}
+
+void HttpResponseHeader::removeResponseHeader(String name)
+{
+	m_responseHeaders.removeAllMatchingKeys(name);
+}
+
+void HttpResponseHeader::clearResponseHeaders()
+{
+	m_responseHeaders.removeAll();
 }
 
 Memory HttpResponseHeader::makeResponsePacket() const
@@ -587,7 +707,7 @@ sl_reg HttpResponseHeader::parseResponsePacket(const void* packet, sl_size _size
 				}
 				endValue--;
 			}
-			value = URL::decodeUriComponentByUTF8(String::fromUtf8(data + startValue, endValue - startValue));
+			value = Url::decodeUriComponentByUTF8(String::fromUtf8(data + startValue, endValue - startValue));
 		} else {
 			name = String::fromUtf8(data + posStart, posCurrent - posStart);
 		}
@@ -744,10 +864,6 @@ HttpContentReader::HttpContentReader()
 	m_flagDecompressing = sl_false;
 }
 
-HttpContentReader::~HttpContentReader()
-{
-}
-
 void HttpContentReader::onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError)
 {
 	if (flagError) {
@@ -762,7 +878,7 @@ void HttpContentReader::onRead(AsyncStream* stream, void* data, sl_uint32 sizeRe
 void HttpContentReader::setCompleted(void* dataRemain, sl_uint32 size)
 {
 	setReadingEnded();
-	PtrLocker<IHttpContentReaderListener> listener(getListener());
+	PtrLocker<IHttpContentReaderListener> listener(m_listener);
 	if (listener.isNotNull()) {
 		listener->onCompleteReadHttpContent(dataRemain, size, isReadingError());
 	}
@@ -772,7 +888,7 @@ void HttpContentReader::setCompleted(void* dataRemain, sl_uint32 size)
 void HttpContentReader::setError()
 {
 	setReadingEnded();
-	PtrLocker<IHttpContentReaderListener> listener(getListener());
+	PtrLocker<IHttpContentReaderListener> listener(m_listener);
 	if (listener.isNotNull()) {
 		listener->onCompleteReadHttpContent(sl_null, 0, sl_true);
 	}
@@ -848,7 +964,7 @@ Ref<HttpContentReader> HttpContentReader::createPersistent(
 	}
 	if (ret.isNotNull()) {
 		ret->m_sizeTotal = contentLength;
-		ret->setListener(listener);
+		ret->m_listener = listener;
 		ret->setReadingBufferSize(bufferSize);
 		ret->setReadingStream(io);
 		if (flagDecompress) {
@@ -1016,7 +1132,7 @@ Ref<HttpContentReader> HttpContentReader::createChunked(
 		return ret;
 	}
 	if (ret.isNotNull()) {
-		ret->setListener(listener);
+		ret->m_listener = listener;
 		ret->setReadingBufferSize(bufferSize);
 		ret->setReadingStream(io);
 		if (flagDecompress) {
@@ -1031,10 +1147,6 @@ Ref<HttpContentReader> HttpContentReader::createChunked(
 class _HttpContentReader_TearDown : public HttpContentReader
 {
 public:
-	_HttpContentReader_TearDown()
-	{
-	}
-
 	Memory filterRead(void* data, sl_uint32 size, const Referable* refData)
 	{
 		return decompressData(data, size, refData);
@@ -1055,7 +1167,7 @@ Ref<HttpContentReader> HttpContentReader::createTearDown(
 		return ret;
 	}
 	if (ret.isNotNull()) {
-		ret->setListener(listener);
+		ret->m_listener = listener;
 		ret->setReadingBufferSize(bufferSize);
 		ret->setReadingStream(io);
 		if (flagDecompress) {

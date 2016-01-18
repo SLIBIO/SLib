@@ -55,6 +55,7 @@ public:
 		}
 	}
 
+public:
 	SLIB_INLINE static const MacAddress& zero()
 	{
 		return *((MacAddress*)((void*)(&_zero)));
@@ -83,11 +84,6 @@ public:
 		m[3] = 0;
 		m[4] = 0;
 		m[5] = 0;
-	}
-
-	SLIB_INLINE static const MacAddress& broadcast()
-	{
-		return *((MacAddress*)((void*)(&_broadcast)));
 	}
 
 	SLIB_INLINE static const MacAddress& getBroadcast()
@@ -173,6 +169,7 @@ public:
 		return m;
 	}
 
+public:
 	SLIB_INLINE sl_uint8& operator[](int index)
 	{
 		return m[index];
@@ -207,6 +204,7 @@ public:
 		return !(*this == other);
 	}
 
+public:
 	SLIB_INLINE int compare(const MacAddress& other) const
 	{
 		return Base::compareMemory(m, other.m, 6);
@@ -221,7 +219,9 @@ public:
 	String toString(sl_char8 sep = '-') const;
 	
 	static sl_int32 parse(MacAddress* out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_char8 sep = 0);
+	
 	static sl_int32 parse(MacAddress* out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_char8 sep = 0);
+	
 	sl_bool parse(const String& str, sl_char8 sep = 0);
 
 };
@@ -243,6 +243,7 @@ SLIB_INLINE sl_uint32 Hash<MacAddress>::hash(const MacAddress& a)
 {
 	return a.hashCode();
 }
+
 SLIB_NETWORK_NAMESPACE_END
 
 #endif

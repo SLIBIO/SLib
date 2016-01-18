@@ -1,6 +1,7 @@
 #include "../../../inc/slib/network/icmp.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
+
 void IcmpHeaderFormat::updateChecksum(sl_uint32 sizeContent)
 {
 	_checksum[0] = 0;
@@ -46,4 +47,5 @@ sl_uint32 IcmpEchoAddress::hashCode() const
 	t = t * 31 + SLIB_MAKE_DWORD2(identifier, sequenceNumber);
 	return sl_hash(t);
 }
+
 SLIB_NETWORK_NAMESPACE_END

@@ -2,13 +2,6 @@
 #include "../../../inc/slib/core/thread.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
-SocketEvent::SocketEvent()
-{
-}
-
-SocketEvent::~SocketEvent()
-{
-}
 
 sl_bool SocketEvent::setup(sl_uint32 events)
 {

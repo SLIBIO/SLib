@@ -4,22 +4,31 @@ SLIB_NETWORK_NAMESPACE_BEGIN
 
 void TcpStream::close()
 {
-	if (m_socket.isNotNull()) {
-		m_socket->close();
+	Ref<Socket> socket = m_socket;
+	if (socket.isNotNull()) {
+		socket->close();
 		m_socket.setNull();
 	}
 }
 
 sl_int32 TcpStream::read32(void* buf, sl_uint32 size)
 {
-	sl_int32 n = m_socket->receive(buf, size);
-	return n;
+	Ref<Socket> socket = m_socket;
+	if (socket.isNotNull()) {
+		sl_int32 n = socket->receive(buf, size);
+		return n;
+	}
+	return -1;
 }
 
 sl_int32 TcpStream::write32(const void* buf, sl_uint32 size)
 {
-	sl_int32 n = m_socket->send(buf, size);
-	return n;
+	Ref<Socket> socket = m_socket;
+	if (socket.isNotNull()) {
+		sl_int32 n = socket->send(buf, size);
+		return n;
+	}
+	return -1;
 }
 
 SLIB_NETWORK_NAMESPACE_END

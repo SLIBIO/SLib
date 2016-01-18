@@ -45,6 +45,7 @@ public:
 		}
 	}
 
+public:
 	SLIB_INLINE sl_uint32 a() const
 	{
 		return m[0];
@@ -140,6 +141,7 @@ public:
 		addr[3] = m[3];
 	}
 	
+public:
 	// [a, b, c, d]
 	SLIB_INLINE sl_uint8 operator[](int index) const
 	{
@@ -190,6 +192,7 @@ public:
 		return toInt() < other.toInt();
 	}
 	
+public:
 	SLIB_INLINE int compare(const IPv4Address& other) const
 	{
 		return Compare<sl_uint32>::compare(toInt(), other.toInt());
@@ -204,12 +207,18 @@ public:
 	String toString() const;
 	
 	static sl_int32 parse(IPv4Address* out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	
 	static sl_int32 parse(IPv4Address* out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	
 	sl_bool parse(const String& str);
 
 	void makeNetworkMask(sl_uint32 networkPrefixLength);
+	
 	sl_uint32 getNetworkPrefixLengthFromMask() const;
 	
+	sl_bool setHostName(const String& hostName);
+	
+public:
 	SLIB_INLINE sl_bool isAny() const
 	{
 		return toInt() == 0;
@@ -297,48 +306,45 @@ public:
 	{
 		return *((IPv4Address*)((void*)(&_any)));
 	}
+	
 	SLIB_INLINE static const IPv4Address& getAny()
 	{
 		return *((IPv4Address*)((void*)(&_any)));
 	}
 
+	
 	SLIB_INLINE static const IPv4Address& zero()
 	{
 		return *((IPv4Address*)((void*)(&_any)));
 	}
+	
 	SLIB_INLINE static const IPv4Address& getZero()
 	{
 		return *((IPv4Address*)((void*)(&_any)));
 	}
 
-	SLIB_INLINE static const IPv4Address& broadcast()
-	{
-		return *((IPv4Address*)((void*)(&_broadcast)));
-	}
+	
 	SLIB_INLINE static const IPv4Address& getBroadcast()
 	{
 		return *((IPv4Address*)((void*)(&_broadcast)));
 	}
 	
-	SLIB_INLINE static const IPv4Address& loopback()
-	{
-		return *((IPv4Address*)((void*)(&_loopback)));
-	}
 	SLIB_INLINE static const IPv4Address& getLoopback()
 	{
 		return *((IPv4Address*)((void*)(&_loopback)));
 	}
 	
+	
 	SLIB_INLINE static const IPv4Address& getMulticastBegin()
 	{
 		return *((IPv4Address*)((void*)(&_multicast_begin)));
 	}
+	
 	SLIB_INLINE static const IPv4Address& getMulticastEnd()
 	{
 		return *((IPv4Address*)((void*)(&_multicast_end)));
 	}
 
-	sl_bool setHostName(const String& hostName);
 };
 
 template <>
@@ -371,19 +377,23 @@ public:
 	{
 		return address;
 	}
+	
 	SLIB_INLINE void setAddress(const IPv4Address& addr)
 	{
 		this->address = addr;
 	}
 	
+	
 	SLIB_INLINE sl_uint32 getNetworkPrefixLength() const
 	{
 		return networkPrefixLength;
 	}
+	
 	SLIB_INLINE void setNetworkPrefixLength(sl_uint32 len)
 	{
 		networkPrefixLength = len;
 	}
+	
 	
 	SLIB_INLINE IPv4Address getNetworkMask() const
 	{
@@ -391,6 +401,7 @@ public:
 		ret.makeNetworkMask(networkPrefixLength);
 		return ret;
 	}
+	
 	SLIB_INLINE void setNetworkMask(const IPv4Address& mask)
 	{
 		networkPrefixLength = mask.getNetworkPrefixLengthFromMask();
@@ -444,7 +455,7 @@ public:
 		set(0, 0, 0, 0, 0, 0xFFFF, (sl_uint16)((ip.a() << 8) | ip.b()), (sl_uint16)((ip.c() << 8) | ip.d()));
 	}
 
-	
+public:
 	SLIB_INLINE sl_uint16 get(int index) const
 	{
 		if (index < 0 || index >= 16) {
@@ -477,6 +488,7 @@ public:
 		return m;
 	}
 
+public:
 	// [s0, s1, s2, s3, s4, s5, s6, s7, s8]
 	SLIB_INLINE sl_uint16 operator[](int index) const
 	{
@@ -527,6 +539,7 @@ public:
 		return Base::compareMemory(m, other.m, 16) > 0;
 	}
 	
+public:
 	SLIB_INLINE int compare(const IPv6Address& other) const
 	{
 		return Base::compareMemory(m, other.m, 16);
@@ -541,9 +554,14 @@ public:
 	String toString() const;
 	
 	static sl_int32 parse(IPv6Address* out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	
 	static sl_int32 parse(IPv6Address* out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	
 	sl_bool parse(const String& str);
 	
+	sl_bool setHostName(const String& hostName);
+	
+public:
 	SLIB_INLINE sl_bool isAny() const
 	{
 		return Base::compareZero(m, 16) == 0;
@@ -555,6 +573,21 @@ public:
 	}
 
 	SLIB_INLINE void setAny()
+	{
+		Base::zeroMemory(m, 16);
+	}
+	
+	SLIB_INLINE sl_bool isZero() const
+	{
+		return Base::compareZero(m, 16) == 0;
+	}
+	
+	SLIB_INLINE sl_bool isNotZero() const
+	{
+		return Base::compareZero(m, 16) != 0;
+	}
+	
+	SLIB_INLINE void setZero()
 	{
 		Base::zeroMemory(m, 16);
 	}
@@ -583,25 +616,32 @@ private:
 	static const sl_uint8 _loopback[16];
 	
 public:
-	SLIB_INLINE static const IPv6Address& any()
-	{
-		return *((IPv6Address*)((void*)(&_any)));
-	}
-	SLIB_INLINE static const IPv6Address& getAny()
+	SLIB_INLINE static const IPv6Address& zero()
 	{
 		return *((IPv6Address*)((void*)(&_any)));
 	}
 	
-	SLIB_INLINE static const IPv6Address& loopback()
+	SLIB_INLINE static const IPv6Address& getZero()
 	{
-		return *((IPv6Address*)((void*)(&_loopback)));
+		return *((IPv6Address*)((void*)(&_any)));
 	}
+	
+	SLIB_INLINE static const IPv6Address& any()
+	{
+		return *((IPv6Address*)((void*)(&_any)));
+	}
+	
+	SLIB_INLINE static const IPv6Address& getAny()
+	{
+		return *((IPv6Address*)((void*)(&_any)));
+	}
+
+	
 	SLIB_INLINE static const IPv6Address& getLoopback()
 	{
 		return *((IPv6Address*)((void*)(&_loopback)));
 	}
 
-	sl_bool setHostName(const String& hostName);
 };
 
 template <>
@@ -672,13 +712,18 @@ public:
 		*this = other;
 	}
 	
-	SLIB_INLINE IPAddress& operator=(const IPAddress& other)
+	SLIB_INLINE IPAddress(const IPv4Address& other)
 	{
-		m_type = other.m_type;
-		Base::copyMemory(m_data, other.m_data, _SLIB_NET_IPADDRESS_SIZE);
-		return *this;
+		*this = other;
 	}
 	
+	SLIB_INLINE IPAddress(const IPv6Address& other)
+	{
+		*this = other;
+	}
+	
+
+public:
 	static SLIB_INLINE const IPAddress& none()
 	{
 		return *((IPAddress*)((void*)(&_none)));
@@ -704,15 +749,32 @@ public:
 		return m_type;
 	}
 
-	// IPv4Address
-	SLIB_INLINE IPAddress(const IPv4Address& other)
-	{
-		*this = other;
-	}
-	
 	SLIB_INLINE sl_bool isIPv4() const
 	{
 		return m_type == ipAddressType_IPv4;
+	}
+	
+	SLIB_INLINE const IPv4Address& getIPv4() const
+	{
+		return *((IPv4Address*)(void*)(m_data));
+	}
+
+	SLIB_INLINE sl_bool isIPv6() const
+	{
+		return m_type == ipAddressType_IPv6;
+	}
+	
+	SLIB_INLINE const IPv6Address& getIPv6() const
+	{
+		return *((IPv6Address*)(void*)(m_data));
+	}
+
+public:
+	SLIB_INLINE IPAddress& operator=(const IPAddress& other)
+	{
+		m_type = other.m_type;
+		Base::copyMemory(m_data, other.m_data, _SLIB_NET_IPADDRESS_SIZE);
+		return *this;
 	}
 	
 	SLIB_INLINE IPAddress& operator=(const IPv4Address& other)
@@ -721,23 +783,7 @@ public:
 		*((IPv4Address*)(void*)(m_data)) = other;
 		return *this;
 	}
-	
-	SLIB_INLINE const IPv4Address& getIPv4() const
-	{
-		return *((IPv4Address*)(void*)(m_data));
-	}
 
-	// IPv6Address
-	SLIB_INLINE IPAddress(const IPv6Address& other)
-	{
-		*this = other;
-	}
-	
-	SLIB_INLINE sl_bool isIPv6() const
-	{
-		return m_type == ipAddressType_IPv6;
-	}
-	
 	SLIB_INLINE IPAddress& operator=(const IPv6Address& other)
 	{
 		m_type = ipAddressType_IPv6;
@@ -745,11 +791,6 @@ public:
 		return *this;
 	}
 	
-	SLIB_INLINE const IPv6Address& getIPv6() const
-	{
-		return *((IPv6Address*)(void*)(m_data));
-	}
-
 	SLIB_INLINE sl_bool operator==(const IPAddress& other) const
 	{
 		if (m_type != other.m_type) {
@@ -771,16 +812,23 @@ public:
 		return !(*this == other);
 	}
 
+public:
 	int compare(const IPAddress& other) const;
+	
 	sl_uint32 hashCode() const;
 	
+	
 	String toString() const;
-
+	
 	static sl_int32 parse(IPAddress* out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	
 	static sl_int32 parse(IPAddress* out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	
 	sl_bool parse(const String& str);
 
+	
 	sl_bool setHostName(const String& hostName);
+	
 };
 
 template <>

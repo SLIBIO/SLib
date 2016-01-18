@@ -2,33 +2,39 @@
 #define CHECKHEADER_SLIB_NETWORK_ASYNC
 
 #include "definition.h"
+
 #include "socket.h"
 #include "../core/async.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
 class AsyncTcpSocket;
+
 class SLIB_EXPORT IAsyncTcpSocketListener : public IAsyncStreamListener
 {
 public:
 	virtual void onConnect(AsyncTcpSocket* socket, const SocketAddress& address, sl_bool flagError);
+	
 	virtual void onReceive(AsyncTcpSocket* socket, void* data, sl_uint32 sizeReceive, const Referable* refData, sl_bool flagError);
+	
 	virtual void onSend(AsyncTcpSocket* socket, void* data, sl_uint32 sizeSent, const Referable* refData, sl_bool flagError);
 
 public:
+	// override
 	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError);
+	
+	// override
 	void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, const Referable* ref, sl_bool flagError);
+	
 };
 
 class SLIB_EXPORT AsyncTcpSocketInstance : public AsyncStreamInstance
 {
 protected:
 	AsyncTcpSocketInstance();
-public:
-	~AsyncTcpSocketInstance();
 
 public:
-	SLIB_INLINE const Ref<Socket>& getSocket()
+	SLIB_INLINE Ref<Socket> getSocket()
 	{
 		return m_socket;
 	}
@@ -46,28 +52,47 @@ public:
 
 protected:
 	void _onReceive(AsyncStreamRequest* req, sl_uint32 size, sl_bool flagError);
+	
 	void _onSend(AsyncStreamRequest* req, sl_uint32 size, sl_bool flagError);
+	
 	void _onConnect(sl_bool flagError);
 
 protected:
-	Ref<Socket> m_socket;
+	SafeRef<Socket> m_socket;
 
 	sl_bool m_flagSupportingConnect;
 	sl_bool m_flagRequestConnect;
 	SocketAddress m_addressRequestConnect;
-	Ptr<IAsyncTcpSocketListener> m_listenerConnect;
+	SafePtr<IAsyncTcpSocketListener> m_listenerConnect;
 };
 
 class SLIB_EXPORT AsyncTcpSocket : public AsyncStreamBase
 {
-private:
-	AsyncTcpSocket();
 public:
-	~AsyncTcpSocket();
-
+	static Ref<AsyncTcpSocket> create(const Ref<Socket>& socket, const Ref<AsyncLoop>& loop);
+	
+	static Ref<AsyncTcpSocket> create(const Ref<Socket>& socket);
+	
+	static Ref<AsyncTcpSocket> create(const Ref<AsyncLoop>& loop, sl_bool flagIPv6 = sl_false);
+	
+	static Ref<AsyncTcpSocket> create(sl_bool flagIPv6 = sl_false);
+	
+	static Ref<AsyncTcpSocket> create(const SocketAddress& addressBind, const Ref<AsyncLoop>& loop);
+	
+	static Ref<AsyncTcpSocket> create(const SocketAddress& addressBind);
+	
+	static Ref<AsyncTcpSocket> createAndConnect(const SocketAddress& addressBind, const SocketAddress& addressConnect, const Ptr<IAsyncTcpSocketListener>& listener, const Ref<AsyncLoop>& loop);
+	
+	static Ref<AsyncTcpSocket> createAndConnect(const SocketAddress& addressBind, const SocketAddress& addressConnect, const Ptr<IAsyncTcpSocketListener>& listener);
+	
+	static Ref<AsyncTcpSocket> createAndConnect(const SocketAddress& addressConnect, const Ptr<IAsyncTcpSocketListener>& listener, const Ref<AsyncLoop>& loop);
+	
+	static Ref<AsyncTcpSocket> createAndConnect(const SocketAddress& addressConnect, const Ptr<IAsyncTcpSocketListener>& listener);
+	
 public:
 	Ref<Socket> getSocket();
 
+public:
 	sl_bool connect(const SocketAddress& address, const Ptr<IAsyncTcpSocketListener>& listener);
 
 	sl_bool receive(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, const Referable* refData = sl_null);
@@ -85,7 +110,7 @@ public:
 	}
 
 protected:
-	SLIB_INLINE const Ref<AsyncTcpSocketInstance>& getInstance()
+	SLIB_INLINE Ref<AsyncTcpSocketInstance> getInstance()
 	{
 		return Ref<AsyncTcpSocketInstance>::from(AsyncStreamBase::getInstance());
 	}
@@ -93,47 +118,35 @@ protected:
 private:
 	void _connectCallback(SocketAddress address, Ptr<IAsyncTcpSocketListener> listener);
 
-public:
-	static Ref<AsyncTcpSocket> create(const Ref<Socket>& socket, const Ref<AsyncLoop>& loop);
-	static Ref<AsyncTcpSocket> create(const Ref<Socket>& socket);
-	static Ref<AsyncTcpSocket> create(const Ref<AsyncLoop>& loop, sl_bool flagIPv6 = sl_false);
-	static Ref<AsyncTcpSocket> create(sl_bool flagIPv6 = sl_false);
-	static Ref<AsyncTcpSocket> create(const SocketAddress& addressBind, const Ref<AsyncLoop>& loop);
-	static Ref<AsyncTcpSocket> create(const SocketAddress& addressBind);
-	static Ref<AsyncTcpSocket> createAndConnect(const SocketAddress& addressBind, const SocketAddress& addressConnect, const Ptr<IAsyncTcpSocketListener>& listener, const Ref<AsyncLoop>& loop);
-	static Ref<AsyncTcpSocket> createAndConnect(const SocketAddress& addressBind, const SocketAddress& addressConnect, const Ptr<IAsyncTcpSocketListener>& listener);
-	static Ref<AsyncTcpSocket> createAndConnect(const SocketAddress& addressConnect, const Ptr<IAsyncTcpSocketListener>& listener, const Ref<AsyncLoop>& loop);
-	static Ref<AsyncTcpSocket> createAndConnect(const SocketAddress& addressConnect, const Ptr<IAsyncTcpSocketListener>& listener);
-
 private:
 	static Ref<AsyncTcpSocket> create(AsyncTcpSocketInstance* instance, const Ref<AsyncLoop>& loop);
 };
 
+
+
 class AsyncTcpServer;
+
 class SLIB_EXPORT IAsyncTcpServerListener
 {
 public:
 	virtual void onAccept(AsyncTcpServer* socketListen, const Ref<Socket>& socketAccept, const SocketAddress& address);
+	
 	virtual void onError(AsyncTcpServer* socketListen);
+	
 };
 
 class SLIB_EXPORT AsyncTcpServerInstance : public AsyncInstance
 {
-protected:
-	AsyncTcpServerInstance();
 public:
-	~AsyncTcpServerInstance();
-
-public:
-	SLIB_INLINE const Ref<Socket>& getSocket()
+	SLIB_INLINE Ref<Socket> getSocket()
 	{
 		return m_socket;
 	}
-
-	SLIB_PROPERTY_INLINE(Ptr<IAsyncTcpServerListener>, Listener)
+	
+	SLIB_PTR_PROPERTY_INLINE(IAsyncTcpServerListener, Listener)
 
 protected:
-	Ref<Socket> m_socket;
+	SafeRef<Socket> m_socket;
 
 protected:
 	void _onAccept(const Ref<Socket>& socketAccept, const SocketAddress& address);
@@ -144,15 +157,29 @@ class SLIB_EXPORT AsyncTcpServer : public AsyncObject
 {
 private:
 	AsyncTcpServer();
+	
 public:
-	~AsyncTcpServer();
+	static Ref<AsyncTcpServer> create(const Ref<Socket>& socket, const Ref<AsyncLoop>& loop);
+	
+	static Ref<AsyncTcpServer> create(const Ref<Socket>& socket);
+	
+	static Ref<AsyncTcpServer> create(const SocketAddress& addressListen, const Ref<AsyncLoop>& loop);
+	
+	static Ref<AsyncTcpServer> create(const SocketAddress& addressListen);
+	
+	static Ref<AsyncTcpServer> create(sl_uint32 portListen, const Ref<AsyncLoop>& loop, sl_bool flagIPv6 = sl_false);
+	
+	static Ref<AsyncTcpServer> create(sl_uint32 portListen, sl_bool flagIPv6 = sl_false);
 
 public:
 	Ref<Socket> getSocket();
 
+	
 	Ptr<IAsyncTcpServerListener> getListener();
+	
 	void setListener(const Ptr<IAsyncTcpServerListener>& listener);
 
+public:
 	void close();
 
 	sl_bool isOpened();
@@ -166,18 +193,10 @@ public:
 	}
 
 protected:
-	SLIB_INLINE const Ref<AsyncTcpServerInstance>& getInstance()
+	SLIB_INLINE Ref<AsyncTcpServerInstance> getInstance()
 	{
 		return Ref<AsyncTcpServerInstance>::from(AsyncObject::getInstance());
 	}
-
-public:
-	static Ref<AsyncTcpServer> create(const Ref<Socket>& socket, const Ref<AsyncLoop>& loop);
-	static Ref<AsyncTcpServer> create(const Ref<Socket>& socket);
-	static Ref<AsyncTcpServer> create(const SocketAddress& addressListen, const Ref<AsyncLoop>& loop);
-	static Ref<AsyncTcpServer> create(const SocketAddress& addressListen);
-	static Ref<AsyncTcpServer> create(sl_uint32 portListen, const Ref<AsyncLoop>& loop, sl_bool flagIPv6 = sl_false);
-	static Ref<AsyncTcpServer> create(sl_uint32 portListen, sl_bool flagIPv6 = sl_false);
 
 private:
 	static Ref<AsyncTcpServer> create(AsyncTcpServerInstance* instance, const Ref<AsyncLoop>& loop);
@@ -186,23 +205,23 @@ private:
 	sl_bool m_flagStarted;
 };
 
+
+
 class AsyncUdpSocket;
+
 class SLIB_EXPORT IAsyncUdpSocketListener
 {
 public:
 	virtual void onReceiveFrom(AsyncUdpSocket* socket, void* data, sl_uint32 sizeReceive, const SocketAddress& address, sl_bool flagError);
+
 	virtual void onSendTo(AsyncUdpSocket* socket, void* data, sl_uint32 sizeSent, const SocketAddress& address, sl_bool flagError);
+
 };
 
 class SLIB_EXPORT AsyncUdpSocketInstance : public AsyncInstance
 {
-protected:
-	AsyncUdpSocketInstance();
 public:
-	~AsyncUdpSocketInstance();
-
-public:
-	SLIB_INLINE const Ref<Socket>& getSocket()
+	SLIB_INLINE Ref<Socket> getSocket()
 	{
 		return m_socket;
 	}
@@ -234,25 +253,37 @@ protected:
 	void _onSend(SendRequest* req, sl_uint32 size, sl_bool flagError);
 
 protected:
-	Ref<Socket> m_socket;
+	SafeRef<Socket> m_socket;
 	Queue< Ref<ReceiveRequest> > m_requestsReceive;
 	Queue< Ref<SendRequest> > m_requestsSend;
 };
 
 class SLIB_EXPORT AsyncUdpSocket : public AsyncObject
 {
-private:
-	AsyncUdpSocket();
 public:
-	~AsyncUdpSocket();
-
+	static Ref<AsyncUdpSocket> create(const Ref<Socket>& socket, const Ref<AsyncLoop>& loop);
+	
+	static Ref<AsyncUdpSocket> create(const Ref<Socket>& socket);
+	
+	static Ref<AsyncUdpSocket> create(const SocketAddress& addressBind, const Ref<AsyncLoop>& loop, sl_bool flagBroadcast = sl_false);
+	
+	static Ref<AsyncUdpSocket> create(const SocketAddress& addressBind, sl_bool flagBroadcast = sl_false);
+	
+	static Ref<AsyncUdpSocket> create(sl_uint32 portBind, const Ref<AsyncLoop>& loop, sl_bool flagBroadcast = sl_false, sl_bool flagIPv6 = sl_false);
+	
+	static Ref<AsyncUdpSocket> create(sl_uint32 portBind = 0, sl_bool flagBroadcast = sl_false, sl_bool flagIPv6 = sl_false);
+	
+	static Ref<AsyncUdpSocket> create(const Ref<AsyncLoop>& loop, sl_bool flagBroadcast = sl_false, sl_bool flagIPv6 = sl_false);
+	
 public:
 	Ref<Socket> getSocket();
 
+public:
 	void close();
 
 	sl_bool isOpened();
 
+	
 	void setBroadcast(sl_bool flag);
 
 	sl_bool receiveFrom(void* data, sl_uint32 size, const Ptr<IAsyncUdpSocketListener>& listener, const Referable* refData = sl_null);
@@ -302,19 +333,10 @@ public:
 	}
 
 protected:
-	SLIB_INLINE const Ref<AsyncUdpSocketInstance>& getInstance()
+	SLIB_INLINE Ref<AsyncUdpSocketInstance> getInstance()
 	{
 		return Ref<AsyncUdpSocketInstance>::from(AsyncObject::getInstance());
 	}
-
-public:
-	static Ref<AsyncUdpSocket> create(const Ref<Socket>& socket, const Ref<AsyncLoop>& loop);
-	static Ref<AsyncUdpSocket> create(const Ref<Socket>& socket);
-	static Ref<AsyncUdpSocket> create(const SocketAddress& addressBind, const Ref<AsyncLoop>& loop, sl_bool flagBroadcast = sl_false);
-	static Ref<AsyncUdpSocket> create(const SocketAddress& addressBind, sl_bool flagBroadcast = sl_false);
-	static Ref<AsyncUdpSocket> create(sl_uint32 portBind, const Ref<AsyncLoop>& loop, sl_bool flagBroadcast = sl_false, sl_bool flagIPv6 = sl_false);
-	static Ref<AsyncUdpSocket> create(sl_uint32 portBind = 0, sl_bool flagBroadcast = sl_false, sl_bool flagIPv6 = sl_false);
-	static Ref<AsyncUdpSocket> create(const Ref<AsyncLoop>& loop, sl_bool flagBroadcast = sl_false, sl_bool flagIPv6 = sl_false);
 
 private:
 	static Ref<AsyncUdpSocket> create(AsyncUdpSocketInstance* instance, const Ref<AsyncLoop>& loop);

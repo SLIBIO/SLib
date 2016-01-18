@@ -6,21 +6,15 @@
 #define SIZE_PACKET 0x10000
 
 SLIB_NETWORK_NAMESPACE_BEGIN
-NetFilter::NetFilter()
-{
-}
-
-NetFilter::~NetFilter()
-{
-}
 
 void NetFilter::_onFilterPacket(NetFilterPacket* packet)
 {
-	PtrLocker<INetFilterListener> listener(getListener());
+	PtrLocker<INetFilterListener> listener(m_listener);
 	if (listener.isNotNull()) {
 		listener->onFilterPacket(this, packet);
 	}
 }
+
 SLIB_NETWORK_NAMESPACE_END
 
 #if defined(SLIB_PLATFORM_IS_LINUX)
@@ -132,13 +126,13 @@ public:
 	sl_bool m_flagRunning;
 	Ref<PipeEvent> m_wake;
 
-	Map< sl_uint16, Ref<_Linux_NetFilterQueue> > m_queues;
+	HashMap< sl_uint16, Ref<_Linux_NetFilterQueue> > m_queues;
 	Queue< Ref<_Linux_NetFilterQueue> > m_listRemovingQueues;
 	
+public:
 	_Linux_NetFilter()
 	{	
 		m_flagRunning = sl_true;
-		m_wake = PipeEvent::create();
 	}
 	
 	~_Linux_NetFilter()
@@ -146,6 +140,7 @@ public:
 		release();
 	}
 	
+public:
 	static int _callbackFilter(nfq_q_handle* handle, nfgenmsg* msg, nfq_data* nfad, void* data)
 	{
 		_Linux_NetFilterQueue* queue = (_Linux_NetFilterQueue*)data;
@@ -159,6 +154,10 @@ public:
 		if (bufPacket.isEmpty()) {
 			return ret;
 		}
+		Ref<PipeEvent> wake = PipeEvent::create();
+		if (wake.isNull()) {
+			return ret;
+		}
 		
 		nfq_handle* handle = nfq_open();
 		if (handle) {
@@ -169,7 +168,8 @@ public:
 				if (ret.isNotNull()) {
 					ret->m_handle = handle;
 					ret->m_bufPacket = bufPacket;
-					ret->setListener(param.listener);
+					ret->m_wake = wake;
+					ret->m_listener = param.listener;
 					ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(_Linux_NetFilter, _run, ret.get()));
 					return ret;
 				}
@@ -329,15 +329,18 @@ Ref<NetFilter> NetFilter::create(const NetFilterParam& param)
 {
 	return _Linux_NetFilter::create(param);
 }
+
 SLIB_NETWORK_NAMESPACE_END
 
 #else
 
 SLIB_NETWORK_NAMESPACE_BEGIN
+
 Ref<NetFilter> NetFilter::create(const NetFilterParam& param)
 {
 	return Ref<NetFilter>::null();
 }
+
 SLIB_NETWORK_NAMESPACE_END
 
 #endif

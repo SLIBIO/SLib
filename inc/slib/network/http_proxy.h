@@ -4,6 +4,7 @@
 #include "http_service.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
+
 class SLIB_EXPORT HttpProxyParam : public HttpServiceParam
 {
 public:
@@ -21,14 +22,20 @@ protected:
 	HttpProxy();
 public:
 	~HttpProxy();
+	
+public:
+	static Ref<HttpProxy> create(const HttpProxyParam& param);
 
 public:
 	sl_bool start(const HttpProxyParam& param);
 
 	void release();
 
+public:
+	// override
 	sl_bool preprocessRequest(HttpServiceContext* context);
 	
+public:
 	virtual sl_bool connectTo(HttpServiceConnection* connection, const String& hostAddress, const Ptr<IHttpProxyConnectListener>& listener);
 
 public:
@@ -39,14 +46,13 @@ public:
 
 protected:
 	void _processConnect(Ref<HttpServiceContext> context);
+	
 	void _processProxy(Ref<HttpServiceContext> context, String host, sl_uint32 port);
-
-public:
-	static Ref<HttpProxy> create(const HttpProxyParam& param);
 
 protected:
 	sl_bool m_flagRunning;
 };
+
 SLIB_NETWORK_NAMESPACE_END
 
 #endif

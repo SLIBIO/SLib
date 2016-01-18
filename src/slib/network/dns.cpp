@@ -5,6 +5,7 @@
 #define _MAX_NAME SLIB_NETWORK_DNS_NAME_MAX_LENGTH
 
 SLIB_NETWORK_NAMESPACE_BEGIN
+
 DnsRecord::DnsRecord()
 {
 	_type = 0;
@@ -275,10 +276,6 @@ DnsClient::DnsClient()
 	m_idLast = 0;
 }
 
-DnsClient::~DnsClient()
-{
-}
-
 void DnsClient::sendQuestion(const SocketAddress& serverAddress, const DnsQuestion& question)
 {
 	char buf[1024];
@@ -376,20 +373,22 @@ void DnsClient::onReceiveFrom(AsyncUdpSocket* socket, void* data, sl_uint32 size
 			}
 		}
 
-		onDnsAnswer(address, response);
+		_onDnsAnswer(address, response);
+		
 	} while (0);
+
 	m_udp->receiveFrom(m_memReceive, (WeakRef<DnsClient>)(this));
 }
 
-void DnsClient::onDnsAnswer(const SocketAddress& serverAddress, const DnsAnswer& response)
+void DnsClient::_onDnsAnswer(const SocketAddress& serverAddress, const DnsAnswer& response)
 {
-	PtrLocker<IDnsClientListener> listener(getListener());
+	PtrLocker<IDnsClientListener> listener(m_listener);
 	if (listener.isNotNull()) {
 		listener->onDnsAnswer(this, serverAddress, response);
 	}
 }
 
-Ref<DnsClient> DnsClient::create(const Ref<AsyncLoop>& loop)
+Ref<DnsClient> DnsClient::create(const DnsClientParam& param, const Ref<AsyncLoop>& loop)
 {
 	Ref<DnsClient> ret;
 	Memory memReceive = Memory::create(4096);
@@ -402,15 +401,16 @@ Ref<DnsClient> DnsClient::create(const Ref<AsyncLoop>& loop)
 		if (ret.isNotNull()) {
 			ret->m_udp = socket;
 			ret->m_memReceive = memReceive;
+			ret->m_listener = param.listener;
 			socket->receiveFrom(memReceive, (WeakRef<DnsClient>)(ret));
 		}
 	}
 	return ret;
 }
 
-Ref<DnsClient> DnsClient::create()
+Ref<DnsClient> DnsClient::create(const DnsClientParam& param)
 {
-	return DnsClient::create(AsyncLoop::getDefault());
+	return DnsClient::create(param, AsyncLoop::getDefault());
 }
 
 
@@ -560,7 +560,7 @@ void DnsServer::_run()
 								DnsQuestion question;
 								question.id = header->getId();
 								question.name = host;
-								IPv4Address ip = resolveDnsHost(address, question);
+								IPv4Address ip = _resolveDnsHost(address, question);
 								sl_bool flagSent = sl_false;
 								if (ip.isNotZero()) {
 									sendHostAddressAnswer(address, question, ip);
@@ -627,7 +627,7 @@ void DnsServer::_run()
 						String name = record.getName();
 						IPv4Address address = record.parseData_A();
 						if (address.isNotZero()) {
-							cacheDnsHost(name, address);
+							_cacheDnsHost(name, address);
 						}
 					}
 				}
@@ -637,21 +637,21 @@ void DnsServer::_run()
 	}
 }
 
-IPv4Address DnsServer::resolveDnsHost(const SocketAddress& clientAddress, const DnsQuestion& question)
+IPv4Address DnsServer::_resolveDnsHost(const SocketAddress& clientAddress, const DnsQuestion& question)
 {
-	PtrLocker<IDnsServerListener> listener(getListener());
+	PtrLocker<IDnsServerListener> listener(m_listener);
 	if (listener.isNotNull()) {
 		return listener->onResolveDnsHost(this, clientAddress, question);
 	}
 	return IPv4Address::zero();
 }
 
-void DnsServer::cacheDnsHost(const String& name, const IPv4Address& address)
+void DnsServer::_cacheDnsHost(const String& name, const IPv4Address& address)
 {
 	if (m_flagUseCache) {
 		m_mapDNSCache.put(name, address);
 	}
-	PtrLocker<IDnsServerListener> listener(getListener());
+	PtrLocker<IDnsServerListener> listener(m_listener);
 	if (listener.isNotNull()) {
 		listener->onCacheDnsHost(this, name, address);
 	}
@@ -673,7 +673,7 @@ Ref<DnsServer> DnsServer::create(const DnsServerParam& param)
 				ret->m_udp = socket;
 				ret->m_memReceive = memReceive;
 				ret->m_forwardTarget = param.forwardTarget;
-				ret->setListener(param.listener);
+				ret->m_listener = param.listener;
 				ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(DnsServer, _run, ret.get()));
 			}
 		} else {
@@ -682,4 +682,5 @@ Ref<DnsServer> DnsServer::create(const DnsServerParam& param)
 	}
 	return ret;
 }
+
 SLIB_NETWORK_NAMESPACE_END

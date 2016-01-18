@@ -23,6 +23,7 @@ sudo setcap 'cap_net_admin=+iep' path/to/executable
 *******************************************************/
 
 SLIB_NETWORK_NAMESPACE_BEGIN
+
 class SLIB_EXPORT NetFilterPacket
 {
 public:
@@ -40,10 +41,15 @@ public:
 	virtual sl_bool getSourceMacAddress(MacAddress& address) = 0;
 
 	virtual void doAccept(void* data, sl_uint32 len) = 0;
+	
 	virtual void doDrop() = 0;
+	
 	virtual void doRepeat(void* data, sl_uint32 len) = 0;
+	
 	virtual void doQueue(sl_uint16 queueNumber, void* data, sl_uint32 len) = 0;
+	
 	virtual void doStop() = 0;
+	
 };
 
 class NetFilter;
@@ -51,41 +57,39 @@ class SLIB_EXPORT INetFilterListener
 {
 public:
 	virtual void onFilterPacket(NetFilter* filter, NetFilterPacket* packet) = 0;
+	
 };
 
 class SLIB_EXPORT NetFilterParam
 {
 public:
 	Ptr<INetFilterListener> listener;
-	
-	NetFilterParam()
-	{
-	}
 };
 
 class SLIB_EXPORT NetFilter : public Object
 {
 	SLIB_DECLARE_OBJECT(NetFilter, Object)
-protected:
-	NetFilter();
+
 public:
-	~NetFilter();
+	static Ref<NetFilter> create(const NetFilterParam& param);
 	
 public:
 	virtual void release() = 0;
+	
 	virtual sl_bool isRunning() = 0;
 
-	virtual sl_bool createQueue(sl_uint16 queueNumber) = 0;
-	virtual void removeQueue(sl_uint16 queueNumber) = 0;
 	
-public:
-	static Ref<NetFilter> create(const NetFilterParam& param);
+	virtual sl_bool createQueue(sl_uint16 queueNumber) = 0;
+	
+	virtual void removeQueue(sl_uint16 queueNumber) = 0;
 	
 protected:
 	void _onFilterPacket(NetFilterPacket* packet);
 
-	SLIB_PROPERTY_INLINE(Ptr<INetFilterListener>, Listener)
+protected:
+	Ptr<INetFilterListener> m_listener;
 };
+
 SLIB_NETWORK_NAMESPACE_END
 
 #endif

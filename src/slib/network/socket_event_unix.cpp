@@ -11,12 +11,14 @@
 #include <poll.h>
 
 SLIB_NETWORK_NAMESPACE_BEGIN
+
 class _Unix_SocketEvent : public SocketEvent
 {
 public:
 	Ref<PipeEvent> m_pipe;
 	sl_uint32 m_events;
 
+public:
 	_Unix_SocketEvent()
 	{
 		m_events = 0;
@@ -26,6 +28,7 @@ public:
 	{
 	}
 
+public:
 	static Ref<_Unix_SocketEvent> create(const Ref<Socket>& socket)
 	{
 		Ref<_Unix_SocketEvent> ret;
@@ -139,5 +142,7 @@ sl_bool SocketEvent::__waitMultipleEvents(const Ref<SocketEvent>* events, sl_uin
 	}
     return sl_false;
 }
+
 SLIB_NETWORK_NAMESPACE_END
+
 #endif

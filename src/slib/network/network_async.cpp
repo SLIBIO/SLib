@@ -3,6 +3,7 @@
 #include "../../../inc/slib/core/log.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
+
 /*******************************************
 	AsyncSocket
 ********************************************/
@@ -32,10 +33,6 @@ AsyncTcpSocketInstance::AsyncTcpSocketInstance()
 {
 	m_flagRequestConnect = sl_false;
 	m_flagSupportingConnect = sl_true;
-}
-
-AsyncTcpSocketInstance::~AsyncTcpSocketInstance()
-{
 }
 
 sl_bool AsyncTcpSocketInstance::connect(const SocketAddress& address, const Ptr<IAsyncTcpSocketListener>& listener)
@@ -111,13 +108,6 @@ void AsyncTcpSocketInstance::_onConnect(sl_bool flagError)
 	}
 }
 
-AsyncTcpSocket::AsyncTcpSocket()
-{
-}
-
-AsyncTcpSocket::~AsyncTcpSocket()
-{
-}
 
 Ref<Socket> AsyncTcpSocket::getSocket()
 {
@@ -309,14 +299,6 @@ void IAsyncTcpServerListener::onError(AsyncTcpServer* socketListen)
 {
 }
 
-AsyncTcpServerInstance::AsyncTcpServerInstance()
-{
-}
-
-AsyncTcpServerInstance::~AsyncTcpServerInstance()
-{
-}
-
 void AsyncTcpServerInstance::_onAccept(const Ref<Socket>& socketAccept, const SocketAddress& address)
 {
 	Ref<AsyncTcpServer> server = Ref<AsyncTcpServer>::from(getObject());
@@ -344,10 +326,6 @@ void AsyncTcpServerInstance::_onError()
 AsyncTcpServer::AsyncTcpServer()
 {
 	m_flagStarted = sl_false;
-}
-
-AsyncTcpServer::~AsyncTcpServer()
-{
 }
 
 Ref<Socket> AsyncTcpServer::getSocket()
@@ -496,14 +474,6 @@ void IAsyncUdpSocketListener::onSendTo(AsyncUdpSocket* socket, void* data, sl_ui
 {
 }
 
-AsyncUdpSocketInstance::AsyncUdpSocketInstance()
-{
-}
-
-AsyncUdpSocketInstance::~AsyncUdpSocketInstance()
-{
-}
-
 sl_bool AsyncUdpSocketInstance::receiveFrom(void* data, sl_uint32 size, const Ptr<IAsyncUdpSocketListener>& listener, const Referable* refData)
 {
 	if (size == 0) {
@@ -561,14 +531,6 @@ void AsyncUdpSocketInstance::_onSend(AsyncUdpSocketInstance::SendRequest* req, s
 	if (listener.isNotNull()) {
 		listener->onSendTo(object.get(), req->data, size, req->address, flagError);
 	}
-}
-
-AsyncUdpSocket::AsyncUdpSocket()
-{
-}
-
-AsyncUdpSocket::~AsyncUdpSocket()
-{
 }
 
 Ref<Socket> AsyncUdpSocket::getSocket()

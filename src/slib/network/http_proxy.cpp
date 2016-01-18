@@ -8,6 +8,7 @@
 #define CONNECT_BUFFER_COUNT 8
 
 SLIB_NETWORK_NAMESPACE_BEGIN
+
 HttpProxy::HttpProxy()
 {
 	m_flagRunning = sl_false;
@@ -16,6 +17,17 @@ HttpProxy::HttpProxy()
 HttpProxy::~HttpProxy()
 {
 	release();
+}
+
+Ref<HttpProxy> HttpProxy::create(const HttpProxyParam& param)
+{
+	Ref<HttpProxy> ret = new HttpProxy;
+	if (ret.isNotNull()) {
+		if (ret->start(param)) {
+			return ret;
+		}
+	}
+	return Ref<HttpProxy>::null();
 }
 
 void HttpProxy::release()
@@ -90,6 +102,7 @@ public:
 	Ref<AsyncCopy> m_copyRemoteToLocal;
 	sl_int32 m_nCountCopy;
 
+public:
 	_HttpProxy_ConnectContext(HttpServiceConnection* connection, const Memory& memReceived)
 	{
 		m_connection = connection;
@@ -97,6 +110,8 @@ public:
 		m_nCountCopy = 0;
 	}
 
+public:
+	// override
 	void onConnect(HttpServiceConnection* connection, AsyncStream* streamRemote, sl_bool flagError)
 	{
 		Ref<AsyncStream> streamLocal = connection->getIO();
@@ -125,6 +140,7 @@ public:
 		m_nCountCopy = 2;
 	}
 
+	// override
 	void onAsyncCopyExit(AsyncCopy* task)
 	{
 		ObjectLocker lock(this);
@@ -168,6 +184,7 @@ public:
 	sl_int32 m_nCountCopy;
 	sl_uint64 m_sizeResponse;
 
+public:
 	_HttpProxy_ProxyContext(HttpServiceConnection* connection, HttpServiceContext* context)
 	{
 		m_connection = connection;
@@ -176,6 +193,8 @@ public:
 		m_sizeResponse = 0;
 	}
 
+public:
+	// override
 	void onConnect(HttpServiceConnection* connection, AsyncStream* streamRemote, sl_bool flagError)
 	{
 		Ref<AsyncStream> streamLocal = connection->getIO();
@@ -215,8 +234,8 @@ public:
 		m_nCountCopy++;
 	}
 
-	Memory m_memHeader;
-	Memory onRead(AsyncCopy* task, const Memory& input)
+	// override
+	Memory onAsyncCopyRead(AsyncCopy* task, const Memory& input)
 	{
 		if (task == m_copyRemoteToLocal.get()) {
 			if (m_sizeResponse == 0) {
@@ -234,6 +253,7 @@ public:
 		return input;
 	}
 
+	// override
 	void onAsyncCopyExit(AsyncCopy* task)
 	{
 		ObjectLocker lock(this);
@@ -267,12 +287,15 @@ public:
 	WeakRef<HttpServiceConnection> m_connection;
 	Ptr<IHttpProxyConnectListener> m_listener;
 
+public:
 	_HttpProxy_ConnectListener(HttpServiceConnection* connection, const Ptr<IHttpProxyConnectListener>& listener)
 	{
 		m_connection = connection;
 		m_listener = listener;
 	}
 
+public:
+	// override
 	void onConnect(AsyncTcpSocket* socket, const SocketAddress& address, sl_bool flagError)
 	{
 		Ref<HttpServiceConnection> connection = m_connection;
@@ -304,15 +327,4 @@ sl_bool HttpProxy::connectTo(HttpServiceConnection* connection, const String& ho
 	return sl_false;
 }
 
-Ref<HttpProxy> HttpProxy::create(const HttpProxyParam& param)
-{
-	Ref<HttpProxy> ret = new HttpProxy;
-	if (ret.isNotNull()) {
-		if (ret->start(param)) {
-			return ret;
-		}
-		ret.setNull();
-	}
-	return ret;
-}
 SLIB_NETWORK_NAMESPACE_END

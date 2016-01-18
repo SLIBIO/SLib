@@ -516,7 +516,7 @@ sl_int32 Socket::receiveFrom(void* buf, sl_uint32 size, SocketAddress& address)
 sl_int32 Socket::sendBroadcast(const void* buf, sl_int32 size, sl_uint32 port)
 {
 	SocketAddress addr;
-	addr.ip = IPv4Address::broadcast();
+	addr.ip = IPv4Address::getBroadcast();
 	addr.port = port;
 	return sendTo(buf, size, addr);
 }

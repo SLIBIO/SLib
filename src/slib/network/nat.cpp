@@ -14,10 +14,6 @@ NatTable::NatTable()
 	m_icmpEchoSequenceCurrent = 0;
 }
 
-NatTable::~NatTable()
-{
-}
-
 sl_bool NatTable::translateOutgoingPacket(IPv4HeaderFormat* ipHeader, void* ipContent, sl_uint32 sizeContent)
 {
 	IPv4Address addressTarget = m_addressTarget;
@@ -209,4 +205,5 @@ sl_uint16 NatTable::getMappedIcmpEchoSequenceNumber(const IcmpEchoAddress& addre
 	m_mapIcmpEchoIncoming.put(sn, element);
 	return sn;
 }
+
 SLIB_NETWORK_NAMESPACE_END

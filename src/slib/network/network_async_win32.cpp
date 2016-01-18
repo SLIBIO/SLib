@@ -18,15 +18,16 @@ public:
 	WSAOVERLAPPED m_overlappedRead;
 	WSABUF m_bufRead;
 	DWORD m_flagsRead;
-	Ref<AsyncStreamRequest> m_requestReading;
+	SafeRef<AsyncStreamRequest> m_requestReading;
 
 	WSAOVERLAPPED m_overlappedWrite;
 	WSABUF m_bufWrite;
-	Ref<AsyncStreamRequest> m_requestWriting;
+	SafeRef<AsyncStreamRequest> m_requestWriting;
 
 	WSAOVERLAPPED m_overlappedConnect;
 	LPFN_CONNECTEX m_funcConnectEx;
 
+public:
 	_Win32AsyncTcpSocketInstance()
 	{
 	}
@@ -36,6 +37,7 @@ public:
 		close();
 	}
 
+public:
 	static Ref<_Win32AsyncTcpSocketInstance> create(const Ref<Socket>& socket)
 	{
 		Ref<_Win32AsyncTcpSocketInstance> ret;
@@ -243,11 +245,12 @@ public:
 
 	WSAOVERLAPPED m_overlapped;
 	char m_bufferAccept[2 * (sizeof(SOCKADDR_IN)+16)];
-	Ref<Socket> m_socketAccept;
+	SafeRef<Socket> m_socketAccept;
 
 	LPFN_ACCEPTEX m_funcAcceptEx;
 	LPFN_GETACCEPTEXSOCKADDRS m_funcGetAcceptExSockaddrs;
 
+public:
 	_Win32AsyncTcpServerInstance()
 	{
 		m_flagListening = sl_false;
@@ -258,6 +261,7 @@ public:
 		close();
 	}
 
+public:
 	static Ref<_Win32AsyncTcpServerInstance> create(const Ref<Socket>& socket)
 	{
 		Ref<_Win32AsyncTcpServerInstance> ret;
@@ -418,14 +422,15 @@ public:
 	WSAOVERLAPPED m_overlappedReceive;
 	WSABUF m_bufReceive;
 	DWORD m_flagsReceive;
-	Ref<ReceiveRequest> m_requestReceiving;
+	SafeRef<ReceiveRequest> m_requestReceiving;
 	sockaddr_storage m_addrReceive;
 	int m_lenAddrReceive;
 
 	WSAOVERLAPPED m_overlappedSend;
 	WSABUF m_bufSend;
-	Ref<SendRequest> m_requestSending;
+	SafeRef<SendRequest> m_requestSending;
 
+public:
 	_Win32AsyncUdpSocketInstance()
 	{
 	}
@@ -435,6 +440,7 @@ public:
 		close();
 	}
 
+public:
 	static Ref<_Win32AsyncUdpSocketInstance> create(const Ref<Socket>& socket)
 	{
 		Ref<_Win32AsyncUdpSocketInstance> ret;
@@ -568,6 +574,7 @@ Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ref<Socket>& socket, const Ref<
 	Ref<_Win32AsyncUdpSocketInstance> ret = _Win32AsyncUdpSocketInstance::create(socket);
 	return AsyncUdpSocket::create(ret.get(), loop);
 }
+
 SLIB_NETWORK_NAMESPACE_END
 
 #endif

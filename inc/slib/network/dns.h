@@ -165,11 +165,13 @@ public:
 	{
 		return MIO::readUint16BE(_id);
 	}
+	
 	SLIB_INLINE void setId(sl_uint16 id)
 	{
 		MIO::writeUint16BE(_id, id);
 	}
 
+	
 	SLIB_INLINE sl_bool isQuestion() const
 	{
 		return (_flags[0] & 0x80) == 0;
@@ -180,137 +182,162 @@ public:
 		_flags[0] = (sl_uint8)((_flags[0] & 0x7F) | (flag ? 0 : 0x80));
 	}
 
+	
 	// 4 bits
 	SLIB_INLINE DnsOpcode getOpcode() const
 	{
 		return (DnsOpcode)((_flags[0] >> 3) & 0x0F);
 	}
+	
 	// 4 bits
 	SLIB_INLINE void setOpcode(DnsOpcode opcode)
 	{
 		_flags[0] = (sl_uint8)((_flags[0] & 0x87) | (((opcode & 0x0F) << 1)));
 	}
 
+	
 	// Authoritative Answer (only valid in Response)
 	SLIB_INLINE sl_bool isAA() const
 	{
 		return (_flags[0] & 0x04) != 0;
 	}
+	
 	// Authoritative Answer (only valid in Response)
 	SLIB_INLINE void setAA(sl_bool flag)
 	{
 		_flags[0] = (sl_uint8)((_flags[0] & 0xFB) | (flag ? 0x04 : 0));
 	}
 
+	
 	// TrunCation: this message was truncated due to length greater than that permitted on the transmission channel
 	SLIB_INLINE sl_bool isTC() const
 	{
 		return (_flags[0] & 0x02) != 0;
 	}
+	
 	// TrunCation: this message was truncated due to length greater than that permitted on the transmission channel
 	SLIB_INLINE void setTC(sl_bool flag)
 	{
 		_flags[0] = (sl_uint8)((_flags[0] & 0xFD) | (flag ? 0x02 : 0));
 	}
 
+	
 	// Recursion Desired: it directs the name server to pursue the query recursively
 	SLIB_INLINE sl_bool isRD() const
 	{
 		return (_flags[0] & 0x01) != 0;
 	}
+	
 	// Recursion Desired: it directs the name server to pursue the query recursively
 	SLIB_INLINE void setRD(sl_bool flag)
 	{
 		_flags[0] = (sl_uint8)((_flags[0] & 0xFE) | (flag ? 0x01 : 0));
 	}
 
+	
 	// Recursion Available: denotes whether recursive query support is available in the name server (valid in response)
 	SLIB_INLINE sl_bool isRA() const
 	{
 		return (_flags[1] & 0x80) != 0;
 	}
+	
 	// Recursion Available: denotes whether recursive query support is available in the name server (valid in response)
 	SLIB_INLINE void setRA(sl_bool flag)
 	{
 		_flags[1] = (sl_uint8)((_flags[1] & 0x7F) | (flag ? 0x80 : 0));
 	}
 
+	
 	// Authentic Data: all the data included in the answer and authority portion of the response has been authenticated by the server (valid in response)
 	SLIB_INLINE sl_bool isAD() const
 	{
 		return (_flags[1] & 0x20) != 0;
 	}
+	
 	// Authentic Data: all the data included in the answer and authority portion of the response has been authenticated by the server (valid in response)
 	SLIB_INLINE void setAD(sl_bool flag)
 	{
 		_flags[1] = (sl_uint8)((_flags[1] & 0xDF) | (flag ? 0x20 : 0));
 	}
 
+	
 	// Checking Disabled: Pending (non-authenticated) data is acceptable to the resolver sending the query
 	SLIB_INLINE sl_bool isCD() const
 	{
 		return (_flags[1] & 0x10) != 0;
 	}
+	
 	// Checking Disabled: Pending (non-authenticated) data is acceptable to the resolver sending the query
 	SLIB_INLINE void setCD(sl_bool flag)
 	{
 		_flags[1] = (sl_uint8)((_flags[1] & 0xEF) | (flag ? 0x10 : 0));
 	}
 
+	
 	// 4 bits
 	SLIB_INLINE DnsResponseCode getResponseCode() const
 	{
 		return (DnsResponseCode)(_flags[1] & 0x0F);
 	}
+	
 	// 4 bits
 	SLIB_INLINE void setResponseCode(DnsResponseCode code)
 	{
 		_flags[1] = (sl_uint8)((_flags[1] & 0xF0) | (code & 0x0F));
 	}
 
+	
 	// QDCOUNT
 	SLIB_INLINE sl_uint16 getQuestionsCount() const
 	{
 		return MIO::readUint16BE(_totalQuestions);
 	}
+	
 	// QDCOUNT
 	SLIB_INLINE void setQuestionsCount(sl_uint16 count)
 	{
 		MIO::writeUint16BE(_totalQuestions, count);
 	}
 
+	
 	// ANCOUNT
 	SLIB_INLINE sl_uint16 getAnswersCount() const
 	{
 		return MIO::readUint16BE(_totalAnswers);
 	}
+	
 	// ANCOUNT
 	SLIB_INLINE void setAnswersCount(sl_uint16 count)
 	{
 		MIO::writeUint16BE(_totalAnswers, count);
 	}
 
+	
 	// NSCOUNT
 	SLIB_INLINE sl_uint16 getAuthoritiesCount() const
 	{
 		return MIO::readUint16BE(_totalAuthorities);
 	}
+	
 	// NSCOUNT
 	SLIB_INLINE void setAuthoritiesCount(sl_uint16 count)
 	{
 		MIO::writeUint16BE(_totalAuthorities, count);
 	}
 
+	
 	// ARCOUNT
 	SLIB_INLINE sl_uint16 getAdditionalsCount() const
 	{
 		return MIO::readUint16BE(_totalAdditionals);
 	}
+	
 	// ARCOUNT
 	SLIB_INLINE void setAdditionalsCount(sl_uint16 count)
 	{
 		MIO::writeUint16BE(_totalAdditionals, count);
 	}
+	
 private:
 	sl_uint8 _id[2];
 	sl_uint8 _flags[2];
@@ -330,24 +357,29 @@ public:
 	{
 		return _name;
 	}
+	
 	SLIB_INLINE void setName(const String& name)
 	{
 		_name = name;
 	}
 
+	
 	SLIB_INLINE DnsRecordType getType() const
 	{
 		return (DnsRecordType)_type;
 	}
+	
 	SLIB_INLINE void setType(DnsRecordType type)
 	{
 		_type = (sl_uint16)type;
 	}
 
+	
 	SLIB_INLINE DnsClass getClass() const
 	{
 		return (DnsClass)(_class);
 	}
+	
 	SLIB_INLINE void setClass(DnsClass cls)
 	{
 		_class = cls;
@@ -369,7 +401,9 @@ class SLIB_EXPORT DnsQuestionRecord : public DnsRecord
 {
 public:
 	sl_uint32 parseRecord(const void* buf, sl_uint32 offset, sl_uint32 size);
+	
 	sl_uint32 buildRecord(void* buf, sl_uint32 offset, sl_uint32 size);
+	
 };
 
 class SLIB_EXPORT DnsResponseRecord : public DnsRecord
@@ -382,11 +416,13 @@ public:
 	{
 		return _TTL;
 	}
+	
 	SLIB_INLINE void setTTL(sl_uint32 TTL)
 	{
 		_TTL = TTL;
 	}
-
+	
+	
 	SLIB_INLINE sl_uint16 getDataLength() const
 	{
 		return _dataLength;
@@ -399,22 +435,30 @@ public:
 
 public:
 	sl_uint32 parseRecord(const void* buf, sl_uint32 offset, sl_uint32 size);
+	
 	sl_uint32 buildRecord(void* buf, sl_uint32 offset, sl_uint32 size, const void* data, sl_uint16 sizeData);
+	
 
 	// A 32 bit Internet address
 	IPv4Address parseData_A() const;
+	
 	//A 32 bit Internet address
 	sl_uint32 buildRecord_A(void* buf, sl_uint32 offset, sl_uint32 size, const IPv4Address& addr);
 
+	
 	// A <domain-name> which specifies the canonical or primary	name for the owner. The owner name is an alias
 	String parseData_CNAME() const;
+	
 	// A <domain-name> which specifies the canonical or primary	name for the owner. The owner name is an alias
 	sl_uint32 buildRecord_CNAME(void* buf, sl_uint32 offset, sl_uint32 size, const String& cname);
 
+	
 	// A <domain-name> which specifies a host which should be authoritative for the specified class and domain
 	String parseData_NS() const;
+	
 	// A <domain-name> which specifies a host which should be authoritative for the specified class and domain
 	sl_uint32 buildRecord_NS(void* buf, sl_uint32 offset, sl_uint32 size, const String& nameServer);
+	
 	
 	String toString() const;
 
@@ -465,47 +509,57 @@ struct SLIB_EXPORT DnsAnswer
 };
 
 class DnsClient;
+
 class SLIB_EXPORT IDnsClientListener
 {
 public:
 	virtual void onDnsAnswer(DnsClient* client, const SocketAddress& serverAddress, const DnsAnswer& answer) = 0;
 };
 
+class SLIB_EXPORT DnsClientParam
+{
+public:
+	Ptr<IDnsClientListener> listener;
+};
+
 class SLIB_EXPORT DnsClient : public Object, public IAsyncUdpSocketListener
 {
 protected:
 	DnsClient();
-public:
-	~DnsClient();
 
 public:
-	static Ref<DnsClient> create(const Ref<AsyncLoop>& loop);
-	static Ref<DnsClient> create();
+	static Ref<DnsClient> create(const DnsClientParam& param, const Ref<AsyncLoop>& loop);
+	
+	static Ref<DnsClient> create(const DnsClientParam& param);
 
 public:
 	void sendQuestion(const SocketAddress& serverAddress, const DnsQuestion& question);
+	
 	void sendQuestion(const IPv4Address& serverIp, const String& host);
 
-public:
-	SLIB_PROPERTY_INLINE(Ptr<IDnsClientListener>, Listener)
 
 protected:
 	Ref<AsyncUdpSocket> m_udp;
 	sl_uint16 m_idLast;
 	Memory m_memReceive;
+	
+	Ptr<IDnsClientListener> m_listener;
 
 protected:
-	virtual void onDnsAnswer(const SocketAddress& serverAddress, const DnsAnswer& answer);
+	void _onDnsAnswer(const SocketAddress& serverAddress, const DnsAnswer& answer);
 	
+	// override
 	virtual void onReceiveFrom(AsyncUdpSocket* socket, void* data, sl_uint32 sizeReceive, const SocketAddress& address, sl_bool flagError);
 
 };
 
 class DnsServer;
+
 class SLIB_EXPORT IDnsServerListener
 {
 public:
 	virtual IPv4Address onResolveDnsHost(DnsServer* server, const SocketAddress& clientAddress, const DnsQuestion& question);
+	
 	virtual void onCacheDnsHost(DnsServer* server, const String& name, const IPv4Address& addr);
 };
 
@@ -513,9 +567,10 @@ class SLIB_EXPORT DnsServerParam
 {
 public:
 	IPv4Address forwardTarget;
-	Ptr<IDnsServerListener> listener;
 	sl_bool flagUseCache;
 
+	Ptr<IDnsServerListener> listener;
+	
 public:
 	DnsServerParam();
 };
@@ -534,29 +589,30 @@ public:
 	void release();
 
 	void sendHostAddressAnswer(const SocketAddress& clientAddress, const DnsQuestion& question, const IPv4Address& answer);
-
-public:
-	SLIB_PROPERTY_INLINE(Ptr<IDnsServerListener>, Listener)
-
-private:
-	Ref<Socket> m_udp;
-	Memory m_memReceive;
-	Ref<Thread> m_thread;
 	
-	Map<String, IPv4Address> m_mapDNSCache;
+private:
+	SafeRef<Socket> m_udp;
+	Memory m_memReceive;
+	SafeRef<Thread> m_thread;
+	
+	HashMap<String, IPv4Address> m_mapDNSCache;
 	sl_bool m_flagUseCache;
 
-	Map<sl_uint16, sl_uint16> m_mapForwardId;
-	Map<sl_uint16, SocketAddress> m_mapForwardAddress;
+	HashMap<sl_uint16, sl_uint16> m_mapForwardId;
+	HashMap<sl_uint16, SocketAddress> m_mapForwardAddress;
 	IPv4Address m_forwardTarget;
 	sl_uint16 m_lastForwardId;
 
-
+	Ptr<IDnsServerListener> m_listener;
+	
 protected:
 	void _run();
-
-	virtual IPv4Address resolveDnsHost(const SocketAddress& clientAddress, const DnsQuestion& question);
-	virtual void cacheDnsHost(const String& name, const IPv4Address& addr);
+	
+protected:
+	IPv4Address _resolveDnsHost(const SocketAddress& clientAddress, const DnsQuestion& question);
+	
+	void _cacheDnsHost(const String& name, const IPv4Address& addr);
+	
 };
 
 SLIB_NETWORK_NAMESPACE_END

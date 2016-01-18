@@ -29,6 +29,7 @@ public:
 
 	sl_bool m_flagRunning;
 	
+public:
 	_NetPcapCapture()
 	{	
 		m_flagRunning = sl_true;
@@ -39,6 +40,7 @@ public:
 		release();
 	}
 	
+public:
 	static Ref<_NetPcapCapture> create(const NetCaptureParam& param)
 	{
 		Ref<_NetPcapCapture> ret;
@@ -67,7 +69,7 @@ public:
 				ret = new _NetPcapCapture;
 				if (ret.isNotNull()) {
 					ret->m_handle = handle;
-					ret->setListener(param.listener);
+					ret->m_listener = param.listener;
 					ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(_NetPcapCapture, _run, ret.get()));
 					return ret;
 				} 
@@ -92,7 +94,7 @@ public:
 								ret = new _NetPcapCapture;
 								if (ret.isNotNull()) {
 									ret->m_handle = handle;
-									ret->setListener(param.listener);
+									ret->m_listener = param.listener;
 									ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(_NetPcapCapture, _run, ret.get()));
 									return ret;
 								}
@@ -206,36 +208,40 @@ Ref<NetCapture> NetCapture::createPcap(const NetCaptureParam& param)
 	return _NetPcapCapture::create(param);
 }
 
-static void _NetCapture_parseDeviceInfo(pcap_if_t* dev, NetCaptureDevice& out)
+static void _NetCapture_parseDeviceInfo(pcap_if_t* dev, NetCaptureDeviceInfo& _out)
 {
-	out.name = String::fromUtf8(dev->name);
-	out.description = String::fromUtf8(dev->description);
-	out.flagLoopback = dev->flags & PCAP_IF_LOOPBACK;
+	_out.name = String::fromUtf8(dev->name);
+	_out.description = String::fromUtf8(dev->description);
+	_out.flagLoopback = dev->flags & PCAP_IF_LOOPBACK;
 
 	pcap_addr* addr = dev->addresses;
 	SocketAddress sa;
 	IPv6Address addrIp6;
 	
+	List<IPv4Address> addrs4;
+	List<IPv6Address> addrs6;
 	while (addr) {
 		if (addr->addr) {
 			switch (addr->addr->sa_family) {
 			case AF_INET:
 				sa.setSystemSocketAddress(addr->addr);
-				out.ipv4Addresses.add(sa.ip.getIPv4());
+				addrs4.add_NoLock(sa.ip.getIPv4());
 				break;
 			case AF_INET6:
 				sa.setSystemSocketAddress(addr->addr);
-				out.ipv6Addresses.add(sa.ip.getIPv6());
+				addrs6.add_NoLock(sa.ip.getIPv6());
 				break;
 			}
 		}
 		addr = addr->next;
 	}
+	_out.ipv4Addresses = addrs4;
+	_out.ipv6Addresses = addrs6;
 }
 
-List<NetCaptureDevice> NetCapture::getAllPcapDevices()
+List<NetCaptureDeviceInfo> NetCapture::getAllPcapDevices()
 {
-	List<NetCaptureDevice> list;
+	List<NetCaptureDeviceInfo> list;
 	char errBuf[PCAP_ERRBUF_SIZE] = { 0 };
 
 	pcap_if_t* devs = NULL;
@@ -243,9 +249,9 @@ List<NetCaptureDevice> NetCapture::getAllPcapDevices()
 	if (ret == 0 && devs) {
 		pcap_if_t* dev = devs;
 		while (dev) {
-			NetCaptureDevice item;
+			NetCaptureDeviceInfo item;
 			_NetCapture_parseDeviceInfo(dev, item);
-			list.add(item);
+			list.add_NoLock(item);
 			dev = dev->next;
 		}
 		pcap_freealldevs(devs);
@@ -255,7 +261,7 @@ List<NetCaptureDevice> NetCapture::getAllPcapDevices()
 	return list;
 }
 
-sl_bool NetCapture::findPcapDevice(const String& name, NetCaptureDevice& out)
+sl_bool NetCapture::findPcapDevice(const String& name, NetCaptureDeviceInfo& _out)
 {
 	char errBuf[PCAP_ERRBUF_SIZE] = { 0 };
 
@@ -265,7 +271,7 @@ sl_bool NetCapture::findPcapDevice(const String& name, NetCaptureDevice& out)
 		pcap_if_t* dev = devs;
 		while (dev) {
 			if (name == dev->name || name == dev->description) {
-				_NetCapture_parseDeviceInfo(dev, out);
+				_NetCapture_parseDeviceInfo(dev, _out);
 				return sl_true;
 			}
 			dev = dev->next;

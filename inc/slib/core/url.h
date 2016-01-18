@@ -13,7 +13,7 @@
 
 SLIB_NAMESPACE_BEGIN
 
-class SLIB_EXPORT URL
+class SLIB_EXPORT Url
 {
 public:
 	SafeString scheme;

@@ -23,40 +23,46 @@ class SLIB_EXPORT NatTable : public Object
 {
 public:
 	NatTable();
-	~NatTable();
 
 public:
 	SLIB_INLINE const IPv4Address& getTargetAddress() const
 	{
 		return m_addressTarget;
 	}
+	
 	SLIB_INLINE void setTargetAddress(const IPv4Address& targetAddress)
 	{
 		m_addressTarget = targetAddress;
 	}
 
+	
 	SLIB_INLINE sl_uint32 getTargetPortBegin() const
 	{
 		return m_portStart;
 	}
+	
 	SLIB_INLINE void setTargetPortBegin(sl_uint32 port)
 	{
 		m_portStart = port;
 	}
 
+	
 	SLIB_INLINE sl_uint32 getTargetPortEnd() const
 	{
 		return m_portEnd;
 	}
+	
 	SLIB_INLINE void setTargetPortEnd(sl_uint32 port)
 	{
 		m_portEnd = port;
 	}
 
+	
 	SLIB_INLINE sl_uint16 getTargetIcmpEchoIdentifier() const
 	{
 		return m_icmpEchoIdentifierTarget;
 	}
+	
 	SLIB_INLINE void setTargetIcmpEchoIdentifier(sl_uint16 id)
 	{
 		m_icmpEchoIdentifierTarget = id;
@@ -64,10 +70,14 @@ public:
 
 public:
 	sl_bool translateOutgoingPacket(IPv4HeaderFormat* ipHeader, void* ipContent, sl_uint32 sizeContent);
+	
 	sl_bool translateIncomingPacket(IPv4HeaderFormat* ipHeader, void* ipContent, sl_uint32 sizeContent);
 
+	
 	sl_uint32 getMappedTcpTargetPort(const SocketAddress& address);
+	
 	sl_uint32 getMappedUdpTargetPort(const SocketAddress& address);
+	
 	sl_uint16 getMappedIcmpEchoSequenceNumber(const IcmpEchoAddress& address);
 
 protected:

@@ -9,7 +9,7 @@
 SLIB_DEVICE_NAMESPACE_BEGIN
 
 class _Android_Sensor;
-typedef Map<jlong, WeakRef<_Android_Sensor> > _AndroidSensorMap;
+typedef HashMap<jlong, WeakRef<_Android_Sensor> > _AndroidSensorMap;
 SLIB_SAFE_STATIC_GETTER(_AndroidSensorMap, _AndroidSensors_get);
 
 SLIB_JNI_BEGIN_CLASS(_JAndroidSensor, "slib/platform/android/device/Sensor")
@@ -55,6 +55,7 @@ public:
 		_AndroidSensors_get().remove((jlong)this);
 	}
 
+public:
 	static Ref<_Android_Sensor> create(const SensorParam& param)
 	{
 		jobject jactivity = Android::getCurrentActivity();

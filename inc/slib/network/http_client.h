@@ -26,6 +26,7 @@ public:
 	virtual sl_size onHttpResponsePacket(HttpClientContext* context, void* data, sl_size size);
 
 	virtual void onHttpResponse(HttpClientContext* context);
+	
 };
 
 class SLIB_EXPORT HttpClientContext : public Object, public HttpRequestHeader, public HttpResponseHeader, public HttpOutputBuffer
@@ -33,18 +34,22 @@ class SLIB_EXPORT HttpClientContext : public Object, public HttpRequestHeader, p
 	SLIB_DECLARE_OBJECT(HttpClientContext, Object)
 protected:
 	HttpClientContext();
+	
 public:
-	~HttpClientContext();
+	static Ref<HttpClientContext> create();
 
 public:
 	void clearResponse();
 	
+	
 	void setUrl(const String& host, const String& path, const String& query);
+	
 	void setUrl(const String& url);
+
 
 	Ref<HttpClientConnection> getConnection();
 
-	SLIB_PROPERTY_INLINE(String, Protocol)
+	SLIB_STRING_PROPERTY_INLINE(Protocol)
 
 public:
 	SLIB_INLINE const Memory& getRawResponseHeader() const
@@ -81,9 +86,6 @@ public:
 public:
 	SLIB_PROPERTY_INLINE(Ptr<IHttpClientListener>, Listener);
 	SLIB_PROPERTY_INLINE(Ref<Event>, CompletionEvent);
-
-public:
-	static Ref<HttpClientContext> create();
 
 	friend class HttpClientConnection;
 };

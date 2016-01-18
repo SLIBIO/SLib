@@ -15,6 +15,7 @@ class _Win_SocketEvent : public SocketEvent
 public:
 	WSAEVENT m_hEvent;
 
+public:
 	_Win_SocketEvent()
 	{
 	}
@@ -24,6 +25,7 @@ public:
 		::WSACloseEvent(m_hEvent);
 	}
 
+public:
 	static Ref<_Win_SocketEvent> create(const Ref<Socket>& socket)
 	{
 		Ref<_Win_SocketEvent> ret;

@@ -10,12 +10,13 @@ SLIB_NETWORK_NAMESPACE_BEGIN
 class _Unix_AsyncTcpSocketInstance : public AsyncTcpSocketInstance
 {
 public:
-	Ref<AsyncStreamRequest> m_requestReading;
-	Ref<AsyncStreamRequest> m_requestWriting;
+	SafeRef<AsyncStreamRequest> m_requestReading;
+	SafeRef<AsyncStreamRequest> m_requestWriting;
 	sl_uint32 m_sizeWritten;
 	
 	sl_bool m_flagConnecting;
 	
+public:
 	_Unix_AsyncTcpSocketInstance()
 	{
 		m_sizeWritten = 0;
@@ -27,6 +28,7 @@ public:
 		close();
 	}
 	
+public:
 	static Ref<_Unix_AsyncTcpSocketInstance> create(const Ref<Socket>& socket)
 	{
 		Ref<_Unix_AsyncTcpSocketInstance> ret;
@@ -206,6 +208,7 @@ class _Unix_AsyncTcpServerInstance : public AsyncTcpServerInstance
 public:
 	sl_bool m_flagListening;
 	
+public:
 	_Unix_AsyncTcpServerInstance()
 	{
 		m_flagListening = sl_false;
@@ -216,6 +219,7 @@ public:
 		close();
 	}
 	
+public:
 	static Ref<_Unix_AsyncTcpServerInstance> create(const Ref<Socket>& socket)
 	{
 		Ref<_Unix_AsyncTcpServerInstance> ret;
@@ -282,10 +286,11 @@ Ref<AsyncTcpServer> AsyncTcpServer::create(const Ref<Socket>& socket, const Ref<
 class _Unix_AsyncUdpSocketInstance : public AsyncUdpSocketInstance
 {
 public:
-	Ref<ReceiveRequest> m_requestReceiving;
+	SafeRef<ReceiveRequest> m_requestReceiving;
 	
-	Ref<SendRequest> m_requestSending;
+	SafeRef<SendRequest> m_requestSending;
 	
+public:
 	_Unix_AsyncUdpSocketInstance()
 	{
 	}
@@ -295,6 +300,7 @@ public:
 		close();
 	}
 	
+public:
 	static Ref<_Unix_AsyncUdpSocketInstance> create(const Ref<Socket>& socket)
 	{
 		Ref<_Unix_AsyncUdpSocketInstance> ret;

@@ -2,13 +2,6 @@
 #include "../../../inc/slib/network/tcpip.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
-EthernetMacTable::EthernetMacTable()
-{
-}
-
-EthernetMacTable::~EthernetMacTable()
-{
-}
 
 void EthernetMacTable::add(const IPv4Address& ip, const MacAddress& mac)
 {
@@ -62,4 +55,5 @@ void EthernetMacTable::parseEthernetFrame(const void* _frame, sl_uint32 sizeFram
 		}
 	}
 }
+
 SLIB_NETWORK_NAMESPACE_END

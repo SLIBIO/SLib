@@ -1,6 +1,7 @@
 #include "../../../inc/slib/network/secure_stream.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
+
 AsyncTcpSecureStreamServer::AsyncTcpSecureStreamServer()
 {
 }
@@ -65,7 +66,6 @@ Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::create(const Ref<Asy
 		if (flagStart) {
 			server->start();
 		}
-		return ret;
 	}
 	return ret;
 }
@@ -96,8 +96,7 @@ Ref<AsyncSecureStream> AsyncTcpSecureStreamClient::create(const Ref<AsyncTcpSock
 	if (socket.isNull()) {
 		return ret;
 	}
-	ret = SecureStreamClient::createAsyncStream(socket.get(), param, flagConnect);
-	return ret;
+	return SecureStreamClient::createAsyncStream(socket.get(), param, flagConnect);
 }
 
 class _AsyncTcpSecureStreamClient_Container : public Referable, public IAsyncTcpSocketListener
@@ -105,6 +104,7 @@ class _AsyncTcpSecureStreamClient_Container : public Referable, public IAsyncTcp
 public:
 	WeakRef<AsyncSecureStream> m_stream;
 
+public:
 	void onConnect(AsyncTcpSocket* socket, const SocketAddress& address, sl_bool flagError)
 	{
 		Ref<AsyncSecureStream> stream = m_stream;
@@ -128,9 +128,9 @@ public:
 };
 
 Ref<AsyncSecureStream> AsyncTcpSecureStreamClient::create(
-	const AsyncSecureStreamClientParam& param
-	, const SocketAddress& addressBind, const SocketAddress& addressConnect
-	, const Ref<AsyncLoop>& loop)
+	const AsyncSecureStreamClientParam& param,
+	const SocketAddress& addressBind, const SocketAddress& addressConnect,
+	const Ref<AsyncLoop>& loop)
 {
 	Ref<AsyncTcpSocket> socket = AsyncTcpSocket::create(addressBind, loop);
 	Ref<AsyncSecureStream> stream = create(socket, param, sl_false);
@@ -141,29 +141,29 @@ Ref<AsyncSecureStream> AsyncTcpSecureStreamClient::create(
 			return stream;
 		}
 	}
-	stream.setNull();
-	return stream;
+	return Ref<AsyncSecureStream>::null();
 }
 
 Ref<AsyncSecureStream> AsyncTcpSecureStreamClient::create(
-	const AsyncSecureStreamClientParam& param
-	, const SocketAddress& addressBind, const SocketAddress& addressConnect)
+	const AsyncSecureStreamClientParam& param,
+	const SocketAddress& addressBind, const SocketAddress& addressConnect)
 {
 	return create(param, addressBind, addressConnect, AsyncLoop::getDefault());
 }
 
 Ref<AsyncSecureStream> AsyncTcpSecureStreamClient::create(
-	const AsyncSecureStreamClientParam& param
-	, const SocketAddress& addressConnect
-	, const Ref<AsyncLoop>& loop)
+	const AsyncSecureStreamClientParam& param,
+	const SocketAddress& addressConnect,
+	const Ref<AsyncLoop>& loop)
 {
 	return create(param, SocketAddress::none(), addressConnect, loop);
 }
 
 Ref<AsyncSecureStream> AsyncTcpSecureStreamClient::create(
-	const AsyncSecureStreamClientParam& param
-	, const SocketAddress& addressConnect)
+	const AsyncSecureStreamClientParam& param,
+	const SocketAddress& addressConnect)
 {
 	return create(param, SocketAddress::none(), addressConnect, AsyncLoop::getDefault());
 }
+
 SLIB_NETWORK_NAMESPACE_END

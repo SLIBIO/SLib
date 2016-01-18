@@ -79,6 +79,7 @@ public:
 };
 
 class AsyncSecureStream;
+
 class SLIB_EXPORT IAsyncSecureStreamListener
 {
 public:
@@ -129,7 +130,9 @@ class SLIB_EXPORT SecureStreamServer
 {
 public:
 	static Ref<SecureStream> createStream(const Ptr<IStream>& baseStream, const SecureStreamServerParam& param);
+	
 	static Ref<AsyncSecureStream> createAsyncStream(const Ref<AsyncStream>& baseStream, const AsyncSecureStreamServerParam& param, sl_bool flagConnect = sl_true);
+	
 };
 
 class SLIB_EXPORT SecureStreamClientParam
@@ -143,6 +146,7 @@ public:
 
 public:
 	sl_bool checkParam() const;
+	
 };
 
 class SLIB_EXPORT AsyncSecureStreamClientParam : public SecureStreamClientParam
@@ -155,7 +159,9 @@ class SLIB_EXPORT SecureStreamClient
 {
 public:
 	static Ref<SecureStream> createStream(const Ptr<IStream>& baseStream, const SecureStreamClientParam& param);
+	
 	static Ref<AsyncSecureStream> createAsyncStream(const Ref<AsyncStream>& baseStream, const AsyncSecureStreamClientParam& param, sl_bool flagConnect = sl_true);
+
 };
 
 SLIB_CRYPTO_NAMESPACE_END

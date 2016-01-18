@@ -3,6 +3,7 @@
 #include "../../../inc/slib/core/url.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
+
 /******************************************************
 	HttpClientContext
 ******************************************************/
@@ -30,10 +31,6 @@ HttpClientContext::HttpClientContext()
 	clearResponse();
 }
 
-HttpClientContext::~HttpClientContext()
-{
-}
-
 void HttpClientContext::clearResponse()
 {
 	m_responseCode = 0;
@@ -56,7 +53,7 @@ void HttpClientContext::setUrl(const String& host, const String& path, const Str
 
 void HttpClientContext::setUrl(const String& strUrl)
 {
-	URL url;
+	Url url;
 	url.parse(strUrl);
 	if (url.scheme.isNotEmpty()) {
 		setProtocol(url.scheme.toLower());

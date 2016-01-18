@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_NETWORK_IO
 
 #include "definition.h"
+
 #include "socket.h"
 #include "../core/io.h"
 
@@ -18,22 +19,29 @@ public:
 		m_socket = socket;
 	}
 
+public:
 	SLIB_INLINE void setSocket(const Ref<Socket>& socket)
 	{
 		m_socket = socket;
 	}
+	
 	SLIB_INLINE Ref<Socket> getSocket()
 	{
 		return m_socket;
 	}
 
+public:
+	// override
 	void close();
 
+	// override
 	sl_int32 read32(void* buf, sl_uint32 size);
+	
+	// override
 	sl_int32 write32(const void* buf, sl_uint32 size);
 
 protected:
-	Ref<Socket> m_socket;
+	SafeRef<Socket> m_socket;
 
 };
 
