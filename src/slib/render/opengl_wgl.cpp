@@ -10,19 +10,21 @@
 #pragma comment (lib, "opengl32.lib")
 
 SLIB_RENDER_NAMESPACE_BEGIN
+
 class _WGLRendererImpl : public Renderer
 {
 public:
 	sl_bool m_flagRequestRender;
-	Ref<RenderEngine> m_renderEngine;
+	SafeRef<RenderEngine> m_renderEngine;
 
 	HGLRC m_context;
 
 	HWND m_hWindow;
 	HDC m_hDC;
 
-	Ref<Thread> m_threadRender;
+	SafeRef<Thread> m_threadRender;
 
+public:
 	_WGLRendererImpl()
 	{
 		m_context = sl_null;
@@ -34,6 +36,7 @@ public:
 		release();
 	}
 
+public:
 	static Ref<_WGLRendererImpl> create(void* _windowHandle, const RendererParam& _param)
 	{
 		HWND hWnd = (HWND)_windowHandle;
@@ -76,6 +79,8 @@ public:
 
 							ret->m_threadRender = Thread::start(SLIB_CALLBACK_CLASS(_WGLRendererImpl, run, ret.get()));
 
+							ret->m_callback = param.callback;
+
 							return ret;
 						}
 
@@ -90,14 +95,17 @@ public:
 
 	void release()
 	{
-		if (m_threadRender.isNotNull()) {
-			m_threadRender->finishAndWait();
+		ObjectLocker lock(this);
+		
+		Ref<Thread> thread = m_threadRender;
+		if (thread.isNotNull()) {
+			thread->finishAndWait();
+			m_threadRender.setNull();
 		}
 
-		ObjectLocker lock(this);
-
-		if (m_renderEngine.isNotNull()) {
-			m_renderEngine->release();
+		Ref<RenderEngine> engine = m_renderEngine;
+		if (engine.isNotNull()) {
+			engine->release();
 			m_renderEngine.setNull();
 		}
 
@@ -116,13 +124,15 @@ public:
 
 		TimeCounter timer;
 		while (Thread::isNotStoppingCurrent()) {
-			if (m_renderEngine.isNull()) {
-				m_renderEngine = GL::createEngine();
-				if (m_renderEngine.isNull()) {
+			Ref<RenderEngine> engine = m_renderEngine;
+			if (engine.isNull()) {
+				engine = GL::createEngine();
+				if (engine.isNull()) {
 					return;
 				}
+				m_renderEngine = engine;
 			}
-			runStep();
+			runStep(engine.get());
 			if (Thread::isNotStoppingCurrent()) {
 				sl_uint64 t = timer.getEllapsedMilliseconds();
 				if (t < 20) {
@@ -134,9 +144,9 @@ public:
 		wglMakeCurrent(NULL, NULL);
 	}
 
-	void runStep()
+	void runStep(RenderEngine* engine)
 	{
-		PtrLocker<IRenderCallback> callback(getCallback());
+		PtrLocker<IRenderCallback> callback(m_callback);
 		if (callback.isNotNull()) {
 			if (!(Windows::isWindowVisible(m_hWindow))) {
 				return;
@@ -154,9 +164,9 @@ public:
 				RECT rect;
 				::GetClientRect(m_hWindow, &rect);
 				if (rect.right != 0 && rect.bottom != 0) {
-					m_renderEngine->setViewport(0, 0, rect.right, rect.bottom);
-					callback->onFrame(m_renderEngine.get());
-					SwapBuffers(m_hDC);
+					engine->setViewport(0, 0, rect.right, rect.bottom);
+					callback->onFrame(engine);
+					::SwapBuffers(m_hDC);
 				}
 			}
 		}
@@ -173,15 +183,18 @@ Ref<Renderer> WGL::createRenderer(void* windowHandle, const RendererParam& param
 {
 	return _WGLRendererImpl::create(windowHandle, param);
 }
+
 SLIB_RENDER_NAMESPACE_END
 
 #else
 
 SLIB_RENDER_NAMESPACE_BEGIN
+
 Ref<Renderer> WGL::createRenderer(void* windowHandle, const RendererParam& param)
 {
 	return Ref<Renderer>::null();
 }
+
 SLIB_RENDER_NAMESPACE_END
 
 #endif

@@ -20,7 +20,6 @@ class SLIB_EXPORT HttpProxy : public HttpService
 {
 protected:
 	HttpProxy();
-public:
 	~HttpProxy();
 	
 public:

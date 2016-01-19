@@ -162,7 +162,6 @@ class SLIB_EXPORT ViewInstance : public Object
 	SLIB_DECLARE_OBJECT(ViewInstance, Object)
 protected:
 	ViewInstance();
-public:
 	~ViewInstance();
 
 public:

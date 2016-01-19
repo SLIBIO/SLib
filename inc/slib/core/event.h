@@ -12,7 +12,6 @@ class SLIB_EXPORT Event : public Referable
 	SLIB_DECLARE_ROOT_OBJECT(Event)
 protected:
 	Event();
-public:
 	~Event();
 
 public:

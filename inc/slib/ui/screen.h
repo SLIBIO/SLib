@@ -11,11 +11,10 @@ SLIB_UI_NAMESPACE_BEGIN
 class SLIB_EXPORT Screen : public Object
 {
 	SLIB_DECLARE_OBJECT(Screen, Object)
-protected:
-	Screen() {}
-	
+    
 public:
 	virtual Rectangle getRegion() = 0;
+    
 };
 
 SLIB_UI_NAMESPACE_END

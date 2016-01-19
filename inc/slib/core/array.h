@@ -39,7 +39,9 @@ protected:
 	Ref<Referable> m_refer;
 	
 protected:
-	SLIB_INLINE CArray() {}
+	SLIB_INLINE CArray()
+    {
+    }
 	
 public:
 	SLIB_INLINE CArray(sl_size count)
@@ -58,7 +60,6 @@ public:
 		_initStatic(data, count, refer);
 	}
 
-public:
 	~CArray()
 	{
 		_free();

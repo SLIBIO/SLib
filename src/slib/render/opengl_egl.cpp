@@ -10,11 +10,12 @@
 #include "../../../inc/slib/core/log.h"
 
 SLIB_RENDER_NAMESPACE_BEGIN
+
 class _EGLRendererImpl : public Renderer
 {
 public:
 	sl_bool m_flagRequestRender;
-	Ref<RenderEngine> m_renderEngine;
+	SafeRef<RenderEngine> m_renderEngine;
 
 	EGLDisplay m_display;
 	EGLSurface m_surface;
@@ -23,11 +24,12 @@ public:
 
 	RendererParam m_param;
 
-	Ref<Thread> m_threadRender;
+	SafeRef<Thread> m_threadRender;
 
 	EGLNativeWindowType m_hWindow;
 	EGLNativeDisplayType m_hDisplay;
 
+public:
 	_EGLRendererImpl()
 	{
 		m_context = sl_null;
@@ -39,6 +41,8 @@ public:
 		release();
 	}
 
+public:
+	
 #if defined(SLIB_PLATFORM_IS_WIN32)
 	static EGLNativeDisplayType createDisplay(EGLNativeWindowType window)
 	{
@@ -180,6 +184,7 @@ public:
 												ret->m_surface = surface;
 												ret->m_context = context;
 												ret->m_config = config;
+												ret->m_callback = param.callback;
 
 												ret->m_threadRender = Thread::start(SLIB_CALLBACK_CLASS(_EGLRendererImpl, run, ret.get()));
 
@@ -205,15 +210,17 @@ public:
 
 	void release()
 	{
-		if (m_threadRender.isNotNull()) {
-			m_threadRender->finishAndWait();
+		ObjectLocker lock(this);
+
+		Ref<Thread> thread = m_threadRender;
+		if (thread.isNotNull()) {
+			thread->finishAndWait();
 			m_threadRender.setNull();
 		}
 
-		ObjectLocker lock(this);
-
-		if (m_renderEngine.isNotNull()) {
-			m_renderEngine->release();
+		Ref<RenderEngine> engine = m_renderEngine;
+		if (engine.isNotNull()) {
+			engine->release();
 			m_renderEngine.setNull();
 		}
 
@@ -233,13 +240,15 @@ public:
 		_EGL_ENTRY(eglMakeCurrent)(m_display, m_surface, m_surface, m_context);
 		TimeCounter timer;
 		while (Thread::isNotStoppingCurrent()) {
-			if (m_renderEngine.isNull()) {
-				m_renderEngine = GLES::createEngine();
-				if (m_renderEngine.isNull()) {
+			Ref<RenderEngine> engine = m_renderEngine;
+			if (engine.isNull()) {
+				engine = GLES::createEngine();
+				if (engine.isNull()) {
 					return;
 				}
+				m_renderEngine = engine;
 			}
-			runStep();
+			runStep(engine.get());
 			if (Thread::isNotStoppingCurrent()) {
 				sl_uint64 t = timer.getEllapsedMilliseconds();
 				if (t < 20) {
@@ -251,9 +260,9 @@ public:
 		_EGL_ENTRY(eglMakeCurrent)(NULL, NULL, NULL, NULL);
 	}
 
-	void runStep()
+	void runStep(RenderEngine* engine)
 	{
-		PtrLocker<IRenderCallback> callback(getCallback());
+		PtrLocker<IRenderCallback> callback(m_callback);
 		if (callback.isNotNull()) {
 			if (!isWindowVisible(m_hWindow)) {
 				return;
@@ -270,8 +279,8 @@ public:
 			if (flagUpdate) {
 				Sizei size = getWindowSize(m_hWindow);
 				if (size.x != 0 && size.y != 0) {
-					m_renderEngine->setViewport(0, 0, size.x, size.y);
-					callback->onFrame(m_renderEngine.get());
+					engine->setViewport(0, 0, size.x, size.y);
+					callback->onFrame(engine);
 					_EGL_ENTRY(eglSwapInterval)(m_display, 0);
 					_EGL_ENTRY(eglSwapBuffers)(m_display, m_surface);
 				}

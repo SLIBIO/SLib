@@ -96,8 +96,6 @@
 		266DD5831C11940A00D47AB0 /* opengl_impl.h in Headers */ = {isa = PBXBuildFile; fileRef = 266DD4E01C11940A00D47AB0 /* opengl_impl.h */; };
 		266DD5851C11940A00D47AB0 /* render_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4E21C11940A00D47AB0 /* render_base.cpp */; };
 		266DD5861C11940A00D47AB0 /* render_engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4E31C11940A00D47AB0 /* render_engine.cpp */; };
-		266DD5871C11940A00D47AB0 /* render_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4E41C11940A00D47AB0 /* render_object.cpp */; };
-		266DD5881C11940A00D47AB0 /* render_object2d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4E51C11940A00D47AB0 /* render_object2d.cpp */; };
 		266DD5891C11940A00D47AB0 /* render_program.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4E61C11940A00D47AB0 /* render_program.cpp */; };
 		266DD58A1C11940A00D47AB0 /* texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4E71C11940A00D47AB0 /* texture.cpp */; };
 		266DD58B1C11940A00D47AB0 /* vertex_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4E81C11940A00D47AB0 /* vertex_buffer.cpp */; };
@@ -298,8 +296,6 @@
 		266DD4E01C11940A00D47AB0 /* opengl_impl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opengl_impl.h; sourceTree = "<group>"; };
 		266DD4E21C11940A00D47AB0 /* render_base.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_base.cpp; sourceTree = "<group>"; };
 		266DD4E31C11940A00D47AB0 /* render_engine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_engine.cpp; sourceTree = "<group>"; };
-		266DD4E41C11940A00D47AB0 /* render_object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_object.cpp; sourceTree = "<group>"; };
-		266DD4E51C11940A00D47AB0 /* render_object2d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_object2d.cpp; sourceTree = "<group>"; };
 		266DD4E61C11940A00D47AB0 /* render_program.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_program.cpp; sourceTree = "<group>"; };
 		266DD4E71C11940A00D47AB0 /* texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = texture.cpp; sourceTree = "<group>"; };
 		266DD4E81C11940A00D47AB0 /* vertex_buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vertex_buffer.cpp; sourceTree = "<group>"; };
@@ -505,8 +501,6 @@
 				266DD4E01C11940A00D47AB0 /* opengl_impl.h */,
 				266DD4E21C11940A00D47AB0 /* render_base.cpp */,
 				266DD4E31C11940A00D47AB0 /* render_engine.cpp */,
-				266DD4E41C11940A00D47AB0 /* render_object.cpp */,
-				266DD4E51C11940A00D47AB0 /* render_object2d.cpp */,
 				266DD4E61C11940A00D47AB0 /* render_program.cpp */,
 				266DD4E71C11940A00D47AB0 /* texture.cpp */,
 				266DD4E81C11940A00D47AB0 /* vertex_buffer.cpp */,
@@ -984,14 +978,12 @@
 				266DD4661C11930800D47AB0 /* md5.cpp in Sources */,
 				266DD5BF1C11940A00D47AB0 /* s_check_box.cpp in Sources */,
 				266DD5C31C11940A00D47AB0 /* s_tab_view.cpp in Sources */,
-				266DD5871C11940A00D47AB0 /* render_object.cpp in Sources */,
 				266DD5D01C11940A00D47AB0 /* ui_core_osx.mm in Sources */,
 				A25F30201B03A33700854DAF /* platform_apple.mm in Sources */,
 				266DD5531C11940A00D47AB0 /* audio_recorder.cpp in Sources */,
 				266DD4A31C1193DB00D47AB0 /* int128.cpp in Sources */,
 				26D028651C48847E0083F1F3 /* audio_data.cpp in Sources */,
 				266DD5731C11940A00D47AB0 /* network_io.cpp in Sources */,
-				266DD5881C11940A00D47AB0 /* render_object2d.cpp in Sources */,
 				266DD56A1C11940A00D47AB0 /* mac_address.cpp in Sources */,
 				A25F30111B03A33700854DAF /* async_kqueue.cpp in Sources */,
 				A25F301D1B03A33700854DAF /* memory.cpp in Sources */,

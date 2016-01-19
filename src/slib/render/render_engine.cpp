@@ -7,6 +7,50 @@
 
 SLIB_RENDER_NAMESPACE_BEGIN
 
+Primitive::Primitive()
+{
+	type = primitiveType_Triangles;
+	countElements = 0;
+}
+
+RenderClearParam::RenderClearParam()
+{
+	flagColor = sl_true;
+	color = Color::blue();
+	flagDepth = sl_true;
+	depth = 1.0f;
+	flagStencil = sl_false;
+	stencil = 0;
+}
+
+RenderBlendingParam::RenderBlendingParam()
+{
+	operation = renderBlendingOperation_Add;
+	operationAlpha = renderBlendingOperation_Add;
+	blendDst = renderBlendingFactor_OneMinusSrcAlpha;
+	blendDstAlpha = renderBlendingFactor_OneMinusSrcAlpha;
+	blendSrc = renderBlendingFactor_SrcAlpha;
+	blendSrcAlpha = renderBlendingFactor_SrcAlpha;
+}
+
+RendererParam::RendererParam()
+{
+	nRedBits = 8;
+	nGreenBits = 8;
+	nBlueBits = 8;
+	nAlphaBits = 8;
+	nAccumBits = 0;
+	nDepthBits = 24;
+	nStencilBits = 8;
+	flagMultisample = sl_false;
+}
+
+Renderer::Renderer()
+{
+	setRenderingContinuously(sl_false);
+}
+
+
 RenderEngine::RenderEngine()
 {
 	m_viewportWidth = 0;
@@ -17,8 +61,32 @@ RenderEngine::RenderEngine()
 	m_nRenderMillisecondsOnLastScene = 0;
 }
 
-RenderEngine::~RenderEngine()
+sl_bool RenderEngine::isOpenGL()
 {
+	RenderEngineType type = getEngineType();
+	return type == renderEngineType_OpenGL;
+}
+
+sl_bool RenderEngine::isOpenGL_ES()
+{
+	RenderEngineType type = getEngineType();
+	return type == renderEngineType_OpenGL_ES;
+}
+
+sl_bool RenderEngine::isD3D()
+{
+	RenderEngineType type = getEngineType();
+	return type == renderEngineType_D3D9 || type == renderEngineType_D3D11;
+}
+
+void RenderEngine::release()
+{
+	_release();
+}
+
+sl_bool RenderEngine::isValid()
+{
+	return _isValid();
 }
 
 sl_bool RenderEngine::beginScene()
@@ -35,11 +103,117 @@ void RenderEngine::endScene()
 	m_nRenderMillisecondsOnLastScene = (sl_uint32)((Time::now() - m_timeBeginLastScene).getMillisecondsCount());
 }
 
+void RenderEngine::setViewport(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
+{
+	m_viewportWidth = width;
+	m_viewportHeight = height;
+	_setViewport(x, y, width, height);
+}
+
+void RenderEngine::clear(const RenderClearParam& param)
+{
+	_clear(param);
+}
+
+void RenderEngine::clearColor(const Color& color)
+{
+	RenderClearParam param;
+	param.flagColor = sl_true;
+	param.color = color;
+	param.flagDepth = sl_false;
+	_clear(param);
+}
+
+void RenderEngine::clearColorDepth(const Color& color, float depth)
+{
+	RenderClearParam param;
+	param.flagColor = sl_true;
+	param.color = color;
+	param.flagDepth = sl_true;
+	param.depth = depth;
+	_clear(param);
+}
+
+void RenderEngine::clearDepth(float depth)
+{
+	RenderClearParam param;
+	param.flagColor = sl_false;
+	param.flagDepth = sl_true;
+	param.depth = depth;
+	_clear(param);
+}
+
+void RenderEngine::setDepthTest(sl_bool flagEnableDepthTest)
+{
+	_setDepthTest(flagEnableDepthTest);
+}
+
+void RenderEngine::setDepthWriteEnabled(sl_bool flagEnableDepthWrite)
+{
+	_setDepthWriteEnabled(flagEnableDepthWrite);
+}
+
+void RenderEngine::setCullFace(sl_bool flagEnableCull, sl_bool flagCullCCW)
+{
+	_setCullFace(flagEnableCull, flagCullCCW);
+}
+
+void RenderEngine::setBlending(sl_bool flagEnableBlending, const RenderBlendingParam& param)
+{
+	_setBlending(flagEnableBlending, param);
+}
+
+void RenderEngine::setBlending(sl_bool flagEnableBlending)
+{
+	RenderBlendingParam param;
+	_setBlending(flagEnableBlending, param);
+}
+
+sl_bool RenderEngine::beginProgram(const Ref<RenderProgram>& program)
+{
+	return _beginProgram(program.get());
+}
+
+void RenderEngine::endProgram()
+{
+	_endProgram();
+}
+
 void RenderEngine::drawPrimitive(Primitive* primitive)
 {
 	_drawPrimitive(primitive);
 	m_nCountDrawnElementsOnLastScene += primitive->countElements;
 	m_nCountDrawnPrimitivesOnLastScene++;
+}
+
+void RenderEngine::applyTexture(const void* sampler, const Ref<Texture>& texture)
+{
+	_applyTexture(sampler, texture.get());
+}
+
+void RenderEngine::applyTexture(sl_reg sampler, const Ref<Texture>& texture)
+{
+	_applyTexture((void*)sampler, texture.get());
+}
+
+sl_bool RenderEngine::linkTexture(const Ref<Texture>& texture)
+{
+	return _linkTexture(texture.get());
+}
+
+sl_bool RenderEngine::linkVertexBuffer(const Ref<VertexBuffer>& vb)
+{
+	return _linkVertexBuffer(vb.get());
+}
+
+sl_bool RenderEngine::linkIndexBuffer(const Ref<IndexBuffer>& ib)
+{
+	return _linkIndexBuffer(ib.get());
+}
+
+void RenderEngine::setLineWidth(sl_real width)
+{
+	_setLineWidth(width);
 }
 
 void RenderEngine::draw(const Ref<RenderProgram>& program, Primitive* primitives, sl_uint32 count)
@@ -50,6 +224,25 @@ void RenderEngine::draw(const Ref<RenderProgram>& program, Primitive* primitives
 		}
 		endProgram();
 	}
+}
+
+void RenderEngine::draw(const Ref<RenderProgram>& program, sl_uint32 countElements, const Ref<VertexBuffer>& vb, const Ref<IndexBuffer>& ib, PrimitiveType type)
+{
+	Primitive p;
+	p.type = type;
+	p.countElements = countElements;
+	p.vertexBuffer = vb;
+	p.indexBuffer = ib;
+	draw(program, &p);
+}
+
+void RenderEngine::draw(const Ref<RenderProgram>& program, sl_uint32 countElements, const Ref<VertexBuffer>& vb, PrimitiveType type)
+{
+	Primitive p;
+	p.type = type;
+	p.countElements = countElements;
+	p.vertexBuffer = vb;
+	draw(program, &p);
 }
 
 void RenderEngine::drawRectangle2D(const Ref<RenderProgram>& program)
@@ -98,6 +291,11 @@ void RenderEngine::drawRectangle2D(const Rectangle& rectDst, const Ref<RenderPro
 	}
 }
 
+void RenderEngine::drawRectangle2D(sl_real dx, sl_real dy, sl_real dw, sl_real dh, const Ref<RenderProgram2D>& program)
+{
+	drawRectangle2D(Rectangle(dx, dy, dx + dw, dy + dh), program);
+}
+
 void RenderEngine::drawRectangle2D(const Matrix3& transform, const Color4f& color)
 {
 	Ref<RenderProgram2D> p = _getDefaultRenderProgramForDrawRectangle2D();
@@ -116,6 +314,11 @@ void RenderEngine::drawRectangle2D(const Rectangle& rectDst, const Color4f& colo
 		p->setAlpha(color.w);
 		drawRectangle2D(rectDst, p);
 	}
+}
+
+void RenderEngine::drawRectangle2D(sl_real dx, sl_real dy, sl_real dw, sl_real dh, const Color4f& color)
+{
+	drawRectangle2D(Rectangle(dx, dy, dx + dw, dy + dh), color);
 }
 
 Ref<VertexBuffer> RenderEngine::_getDefaultVertexBufferForDrawRectangle2D()
@@ -164,6 +367,18 @@ void RenderEngine::drawTexture2D(const Matrix3& transform, const Ref<Texture>& t
 	}
 }
 
+void RenderEngine::RenderEngine::drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, sl_real sx, sl_real sy, sl_real sw, sl_real sh, const Ref<RenderProgram2D>& program)
+{
+	drawTexture2D(transform, texture, Rectangle(sx, sy, sx + sw, sy + sh), program);
+}
+
+void RenderEngine::RenderEngine::drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, const Ref<RenderProgram2D>& program)
+{
+	if (texture.isNotNull()) {
+		drawTexture2D(transform, texture, Rectangle(0, 0, 1, 1), program);
+	}
+}
+
 void RenderEngine::drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& texture, const Rectangle& rectSrc, const Ref<RenderProgram2D>& program)
 {
 	if (program.isNotNull()) {
@@ -180,6 +395,21 @@ void RenderEngine::drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& t
 	}
 }
 
+void RenderEngine::drawTexture2D(sl_real dx, sl_real dy, sl_real dw, sl_real dh, const Ref<Texture>& texture, sl_real sx, sl_real sy, sl_real sw, sl_real sh, const Ref<RenderProgram2D>& program)
+{
+	drawTexture2D(Rectangle(dx, dy, dx + dw, dy + dh), texture, Rectangle(sx, sy, sx + sw, sy + sh), program);
+}
+
+void RenderEngine::drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& texture, const Ref<RenderProgram2D>& program)
+{
+	drawTexture2D(rectDst, texture, Rectangle(0, 0, 1, 1), program);
+}
+
+void RenderEngine::drawTexture2D(sl_real dx, sl_real dy, sl_real dw, sl_real dh, const Ref<Texture>& texture, const Ref<RenderProgram2D>& program)
+{
+	drawTexture2D(Rectangle(dx, dy, dx + dw, dy + dh), texture, Rectangle(0, 0, 1, 1), program);
+}
+
 void RenderEngine::drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, sl_real alpha)
 {
 	Ref<RenderProgram2D> p = _getDefaultRenderProgramForDrawTexture2D();
@@ -190,6 +420,16 @@ void RenderEngine::drawTexture2D(const Matrix3& transform, const Ref<Texture>& t
 	}
 }
 
+void RenderEngine::drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, sl_real sx, sl_real sy, sl_real sw, sl_real sh, sl_real alpha)
+{
+	drawTexture2D(transform, texture, Rectangle(sx, sy, sx + sw, sy + sh), alpha);
+}
+
+void RenderEngine::drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, sl_real alpha)
+{
+	drawTexture2D(transform, texture, Rectangle(0, 0, 1, 1), alpha);
+}
+
 void RenderEngine::drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& texture, const Rectangle& rectSrc, sl_real alpha)
 {
 	Ref<RenderProgram2D> p = _getDefaultRenderProgramForDrawTexture2D();
@@ -198,6 +438,31 @@ void RenderEngine::drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& t
 		p->setAlpha(alpha);
 		drawTexture2D(rectDst, texture, rectSrc, p);
 	}
+}
+
+void RenderEngine::drawTexture2D(sl_real dx, sl_real dy, sl_real dw, sl_real dh, const Ref<Texture>& texture, sl_real sx, sl_real sy, sl_real sw, sl_real sh, sl_real alpha)
+{
+	drawTexture2D(Rectangle(dx, dy, dx + dw, dy + dh), texture, Rectangle(sx, sy, sx + sw, sy + sh), alpha);
+}
+
+void RenderEngine::drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& texture, sl_real alpha)
+{
+	drawTexture2D(rectDst, texture, Rectangle(0, 0, 1, 1), alpha);
+}
+
+void RenderEngine::drawTexture2D(sl_real dx, sl_real dy, sl_real dw, sl_real dh, const Ref<Texture>& texture, sl_real alpha)
+{
+	drawTexture2D(Rectangle(dx, dy, dx + dw, dy + dh), texture, Rectangle(0, 0, 1, 1), alpha);
+}
+
+void RenderEngine::drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, sl_real sx, sl_real sy, sl_real sw, sl_real sh, const Color& color)
+{
+	drawTexture2D(transform, texture, Rectangle(sx, sy, sx + sw, sy + sh), color);
+}
+
+void RenderEngine::drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, const Color4f& color)
+{
+	drawTexture2D(transform, texture, Rectangle(0, 0, 1, 1), color);
 }
 
 void RenderEngine::drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, const Color4f& color)
@@ -220,12 +485,19 @@ void RenderEngine::drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& t
 	}
 }
 
-void RenderEngine::drawLines(const Ref<RenderProgram>& program, Line3* lines, sl_uint32 n)
+void RenderEngine::drawTexture2D(sl_real dx, sl_real dy, sl_real dw, sl_real dh, const Ref<Texture>& texture, sl_real sx, sl_real sy, sl_real sw, sl_real sh, const Color& color)
 {
-	if (program.isNotNull()) {
-		Ref<VertexBuffer> vb = VertexBuffer::create(lines, sizeof(Line3)*n);
-		draw(program, n * 2, vb, primitiveType_Lines);
-	}
+	drawTexture2D(Rectangle(dx, dy, dx + dw, dy + dh), texture, Rectangle(sx, sy, sx + sw, sy + sh), color);
+}
+
+void RenderEngine::drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& texture, const Color4f& color)
+{
+	drawTexture2D(rectDst, texture, Rectangle(0, 0, 1, 1), color);
+}
+
+void RenderEngine::drawTexture2D(sl_real dx, sl_real dy, sl_real dw, sl_real dh, const Ref<Texture>& texture, const Color4f& color)
+{
+	drawTexture2D(Rectangle(dx, dy, dx + dw, dy + dh), texture, Rectangle(0, 0, 1, 1), color);
 }
 
 Ref<VertexBuffer> RenderEngine::_getDefaultVertexBufferForDrawTexture2D()
@@ -252,6 +524,14 @@ Ref<RenderProgram2D> RenderEngine::_getDefaultRenderProgramForDrawTexture2D()
 		m_defaultRenderProgramForDrawTexture2D = ret;
 	}
 	return ret;
+}
+
+void RenderEngine::drawLines(const Ref<RenderProgram>& program, Line3* lines, sl_uint32 n)
+{
+	if (program.isNotNull()) {
+		Ref<VertexBuffer> vb = VertexBuffer::create(lines, sizeof(Line3)*n);
+		draw(program, n * 2, vb, primitiveType_Lines);
+	}
 }
 
 #define DEBUG_WIDTH 512

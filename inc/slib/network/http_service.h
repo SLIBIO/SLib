@@ -76,7 +76,6 @@ class SLIB_EXPORT HttpServiceConnection : public Object, public IAsyncStreamList
 {
 protected:
 	HttpServiceConnection();
-public:
 	~HttpServiceConnection();
 	
 public:
@@ -209,7 +208,6 @@ class SLIB_EXPORT HttpService : public Object
 	SLIB_DECLARE_OBJECT(HttpService, Object)
 protected:
 	HttpService();
-public:
 	~HttpService();
 	
 public:

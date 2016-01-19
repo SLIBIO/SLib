@@ -14,8 +14,6 @@ class SLIB_EXPORT Pipe : public Object, public IStream
 	SLIB_DECLARE_OBJECT(Pipe, Object)
 private:
 	Pipe();
-	
-public:
 	~Pipe();
 
 public:

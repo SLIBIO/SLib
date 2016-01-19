@@ -94,7 +94,6 @@ class SLIB_EXPORT HttpClientConnection : public Object, public IAsyncStreamListe
 {
 protected:
 	HttpClientConnection();
-public:
 	~HttpClientConnection();
 
 public:
@@ -141,7 +140,6 @@ class SLIB_EXPORT HttpClientSession : public Object
 {
 protected:
 	HttpClientSession();
-public:
 	~HttpClientSession();
 
 public:
@@ -183,7 +181,6 @@ class SLIB_EXPORT HttpClient : public Object
 {
 protected:
 	HttpClient();
-public:
 	~HttpClient();
 
 public:

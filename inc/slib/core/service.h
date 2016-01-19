@@ -14,7 +14,6 @@ class SLIB_EXPORT Service : public Application
 	SLIB_DECLARE_OBJECT(Service, Application)
 public:
 	Service();
-	
 	~Service();
 	
 public:

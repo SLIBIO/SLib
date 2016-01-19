@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_RENDER_TEXTURE
 
 #include "definition.h"
+
 #include "base.h"
 
 #include "../graphics/bitmap.h"
@@ -43,7 +44,7 @@ public:
 	static Ref<Texture> loadFromResource(const String& path);
 	
 public:
-	SLIB_INLINE const Ref<Bitmap>& getSource() const
+	SLIB_INLINE Ref<Bitmap> getSource() const
 	{
 		return m_source;
 	}
@@ -57,13 +58,12 @@ public:
 	{
 		return m_height;
 	}
-
-    
+	
+public:
 	void update(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height);
     
 	void update();
 
-    
 	void freeSource();
     
 	sl_bool setSource(const Ref<Bitmap>& source);
@@ -76,7 +76,7 @@ public:
 	SLIB_BOOLEAN_PROPERTY_INLINE(FreeSourceOnUpdate)
 
 protected:
-	Ref<Bitmap> m_source;
+	SafeRef<Bitmap> m_source;
 	sl_uint32 m_width;
 	sl_uint32 m_height;
 };

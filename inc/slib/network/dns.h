@@ -579,9 +579,8 @@ class SLIB_EXPORT DnsServer : public Object
 {
 protected:
 	DnsServer();
-public:
 	~DnsServer();
-
+    
 public:
 	static Ref<DnsServer> create(const DnsServerParam& param);
 

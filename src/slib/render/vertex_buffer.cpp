@@ -2,6 +2,7 @@
 #include "../../../inc/slib/render/engine.h"
 
 SLIB_RENDER_NAMESPACE_BEGIN
+
 VertexBuffer::VertexBuffer()
 {
 	setStatic(sl_true);
@@ -36,4 +37,5 @@ void VertexBuffer::update()
 {
 	update(0, getSize());
 }
+
 SLIB_RENDER_NAMESPACE_END

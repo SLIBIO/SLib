@@ -84,6 +84,7 @@ public:
 	{
 	}
 	
+public:
 	SLIB_INLINE TYPE& operator*()
 	{
 		return *(this->m_ptr);

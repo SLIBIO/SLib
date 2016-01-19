@@ -69,7 +69,7 @@ public:
 class SLIB_EXPORT NetFilter : public Object
 {
 	SLIB_DECLARE_OBJECT(NetFilter, Object)
-
+    
 public:
 	static Ref<NetFilter> create(const NetFilterParam& param);
 	

@@ -625,6 +625,10 @@ Ref<_JniGlobal> _JniGlobal::from(jobject obj)
 	return ret;
 }
 
+_JniGlobal::_JniGlobal()
+{
+}
+
 _JniGlobal::~_JniGlobal()
 {
 	Jni::deleteGlobalRef(object);

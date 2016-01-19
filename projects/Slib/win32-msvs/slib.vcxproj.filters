@@ -304,12 +304,6 @@
     <ClInclude Include="..\..\..\inc\slib\render\index_buffer.h">
       <Filter>inc\render</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\render\object.h">
-      <Filter>inc\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\render\object2d.h">
-      <Filter>inc\render</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\render\opengl.h">
       <Filter>inc\render</Filter>
     </ClInclude>
@@ -1060,12 +1054,6 @@
       <Filter>src\slib\render</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\render\render_engine.cpp">
-      <Filter>src\slib\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\render\render_object.cpp">
-      <Filter>src\slib\render</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\render\render_object2d.cpp">
       <Filter>src\slib\render</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\render\render_program.cpp">

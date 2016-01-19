@@ -4,6 +4,7 @@
 #include "../../../inc/slib/graphics/image.h"
 
 SLIB_RENDER_NAMESPACE_BEGIN
+
 Texture::Texture()
 {
 	setMinFilter(textureFilterMode_Linear);

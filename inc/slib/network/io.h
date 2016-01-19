@@ -7,6 +7,7 @@
 #include "../core/io.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
+
 class SLIB_EXPORT TcpStream : public Object, public IStream, public IClosable
 {
 public:

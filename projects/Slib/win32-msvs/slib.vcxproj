@@ -174,8 +174,6 @@
     <ClInclude Include="..\..\..\inc\slib\render\definition.h" />
     <ClInclude Include="..\..\..\inc\slib\render\engine.h" />
     <ClInclude Include="..\..\..\inc\slib\render\index_buffer.h" />
-    <ClInclude Include="..\..\..\inc\slib\render\object.h" />
-    <ClInclude Include="..\..\..\inc\slib\render\object2d.h" />
     <ClInclude Include="..\..\..\inc\slib\render\opengl.h" />
     <ClInclude Include="..\..\..\inc\slib\render\opengl_entries.h" />
     <ClInclude Include="..\..\..\inc\slib\render\program.h" />
@@ -353,8 +351,6 @@
     <ClCompile Include="..\..\..\src\slib\render\opengl_wgl.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\render_base.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\render_engine.cpp" />
-    <ClCompile Include="..\..\..\src\slib\render\render_object.cpp" />
-    <ClCompile Include="..\..\..\src\slib\render\render_object2d.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\render_program.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\texture.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\vertex_buffer.cpp" />

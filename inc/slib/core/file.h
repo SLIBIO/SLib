@@ -35,7 +35,6 @@ private:
 
 private:
 	File();
-public:
 	~File();
 
 public:

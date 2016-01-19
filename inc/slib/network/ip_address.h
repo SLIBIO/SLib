@@ -406,6 +406,7 @@ public:
 	{
 		networkPrefixLength = mask.getNetworkPrefixLengthFromMask();
 	}
+    
 };
 
 

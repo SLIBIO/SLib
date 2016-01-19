@@ -23,9 +23,7 @@ template <class KT, class VT>
 class SLIB_EXPORT IMap : public Object
 {
 	SLIB_DECLARE_OBJECT(IMap, Object)
-public:
-	SLIB_INLINE IMap() {}
-	
+
 public:
 	virtual sl_size getCount() const = 0;
 	
@@ -264,9 +262,6 @@ protected:
 	};
 	
 	CList< Pair<KT, VT>, PairCompare > m_list;
-	
-public:
-	SLIB_INLINE ListMap() {}
 	
 public:
 	SLIB_INLINE static _Type* create()
@@ -860,9 +855,6 @@ class SLIB_EXPORT TreeMap : public IMap<KT, VT>
 	
 protected:
 	BTree<KT, VT, COMPARE> m_tree;
-
-public:
-	SLIB_INLINE TreeMap() {}
 
 public:
 	SLIB_INLINE static _Type* create()

@@ -12,7 +12,6 @@ class SLIB_EXPORT ThreadPool : public Object
 	SLIB_DECLARE_OBJECT(ThreadPool, Object)
 private:
 	ThreadPool();
-public:
 	~ThreadPool();
 	
 public:

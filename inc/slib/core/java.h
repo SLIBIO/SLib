@@ -89,8 +89,7 @@ class SLIB_EXPORT _JniGlobal : public Referable
 {
 	SLIB_DECLARE_ROOT_OBJECT(_JniGlobal)
 protected:
-	SLIB_INLINE _JniGlobal() {}
-public:
+	_JniGlobal();
 	~_JniGlobal();
 	
 public:

@@ -2,15 +2,22 @@
 #include "../../../inc/slib/render/engine.h"
 
 SLIB_RENDER_NAMESPACE_BEGIN
-RenderBaseObjectInstance::RenderBaseObjectInstance()
-{
-}
 
 void RenderBaseObjectInstance::linkObject(RenderEngine* engine, RenderBaseObject* object)
 {
 	object->linkEngine(engine, this);
-	m_object = (Ref<RenderBaseObject>)object;
-	m_engine = (Ref<RenderEngine>)engine;
+	m_object = object;
+	m_engine = engine;
+}
+
+Ref<RenderBaseObject> RenderBaseObjectInstance::getObject()
+{
+	return m_object;
+}
+
+Ref<RenderEngine> RenderBaseObjectInstance::getEngine()
+{
+	return m_engine;
 }
 
 
@@ -38,10 +45,22 @@ void RenderBaseObject::linkEngine(const Ref<RenderEngine>& engine, const Ref<Ren
 void RenderBaseObject::unlinkEngine()
 {
 	Ref<RenderEngine> engine(m_engine);
-	if (engine.isNotNull()) {
-		engine->_onFreeInstance(m_instance.get());
+	Ref<RenderBaseObjectInstance> instance(m_instance);
+	if (engine.isNotNull() && instance.isNotNull()) {
+		engine->_onFreeInstance(instance.get());
 	}
 	m_engine.setNull();
 	m_instance.setNull();
 }
+
+Ref<RenderEngine> RenderBaseObject::getEngine()
+{
+	return m_engine;
+}
+
+Ref<RenderBaseObjectInstance> RenderBaseObject::getInstance()
+{
+	return m_instance;
+}
+
 SLIB_RENDER_NAMESPACE_END

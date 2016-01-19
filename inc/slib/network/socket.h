@@ -130,7 +130,6 @@ class SLIB_EXPORT Socket : public Referable
 	SLIB_DECLARE_ROOT_OBJECT(Socket)
 private:
 	Socket();
-public:
 	~Socket();
 	
 public:

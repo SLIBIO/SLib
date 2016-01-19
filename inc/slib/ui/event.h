@@ -14,14 +14,18 @@ SLIB_UI_NAMESPACE_BEGIN
 class Window;
 class View;
 
-struct SLIB_EXPORT TouchPoint
+class SLIB_EXPORT TouchPoint
 {
+public:
 	Point point;
 	sl_real pressure;
-	
-	SLIB_INLINE TouchPoint() {}
-	
-	SLIB_INLINE TouchPoint(const TouchPoint& other) : point(other.point)
+
+public:
+    SLIB_INLINE TouchPoint()
+    {        
+    }
+    
+    SLIB_INLINE TouchPoint(const TouchPoint& other) : point(other.point)
 	{
 		pressure = other.pressure;
 	}

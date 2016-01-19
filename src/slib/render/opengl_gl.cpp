@@ -78,10 +78,13 @@ sl_bool GL::isAvailable()
 {
 	return _g_render_GL_flagLoadedEntryPoints;
 }
+
 SLIB_RENDER_NAMESPACE_END
 
 #else
+
 SLIB_RENDER_NAMESPACE_BEGIN
+
 void GL::loadEntries(const String& pathDll, sl_bool flagReload)
 {
 }
@@ -94,12 +97,15 @@ sl_bool GL::isAvailable()
 {
 	return sl_true;
 }
+
 SLIB_RENDER_NAMESPACE_END
+
 #endif
 
 #else
 
 SLIB_RENDER_NAMESPACE_BEGIN
+
 Ref<RenderEngine> GL::createEngine()
 {
 	return Ref<RenderEngine>::null();
@@ -117,6 +123,7 @@ sl_bool GL::isAvailable()
 {
 	return sl_false;
 }
+
 SLIB_RENDER_NAMESPACE_END
 
 #endif

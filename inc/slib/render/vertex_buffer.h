@@ -7,6 +7,7 @@
 #include "../core/memory.h"
 
 SLIB_RENDER_NAMESPACE_BEGIN
+
 class SLIB_EXPORT VertexBuffer : public RenderBaseObject
 {
 	SLIB_DECLARE_OBJECT(VertexBuffer, RenderBaseObject)
@@ -37,6 +38,7 @@ public:
 protected:
 	Memory m_mem;
 };
+
 SLIB_RENDER_NAMESPACE_END
 
 #endif

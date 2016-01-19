@@ -59,10 +59,13 @@ sl_bool GLES::isAvailable()
 {
 	return _g_render_GLES_flagLoadedEntryPoints;
 }
+
 SLIB_RENDER_NAMESPACE_END
 
 #else
+
 SLIB_RENDER_NAMESPACE_BEGIN
+
 void GLES::loadEntries(const String& pathDll, sl_bool flagReload)
 {
 }
@@ -75,12 +78,15 @@ sl_bool GLES::isAvailable()
 {
 	return sl_true;
 }
+
 SLIB_RENDER_NAMESPACE_END
+
 #endif
 
 #else
 
 SLIB_RENDER_NAMESPACE_BEGIN
+
 Ref<RenderEngine> GLES::createEngine()
 {
 	return Ref<RenderEngine>::null();
@@ -98,6 +104,7 @@ sl_bool GLES::isAvailable()
 {
 	return sl_false;
 }
+
 SLIB_RENDER_NAMESPACE_END
 
 #endif

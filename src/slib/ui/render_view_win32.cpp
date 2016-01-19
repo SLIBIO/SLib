@@ -13,6 +13,7 @@ class _Win32_RenderViewInstance : public Win32_ViewInstance, public IRenderCallb
 public:
 	Ref<Renderer> m_renderer;
 
+public:
 	_Win32_RenderViewInstance()
 	{
 	}
@@ -24,11 +25,11 @@ public:
 		}
 	}
 
+public:
 	void setRenderer(const Ref<Renderer>& renderer, RedrawMode renderMode)
 	{
 		m_renderer = renderer;
 		if (m_renderer.isNotNull()) {
-			m_renderer->setCallback(WeakRef<_Win32_RenderViewInstance>(this));
 			m_renderer->setRenderingContinuously(renderMode == redrawMode_Continuously);
 		}
 	}
@@ -76,6 +77,7 @@ Ref<ViewInstance> RenderView::createInstance(ViewInstance* parent)
 		}
 		if (engineType == renderEngineType_OpenGL_ES) {
 			RendererParam rp;
+			rp.callback = WeakRef<_Win32_RenderViewInstance>(ret);
 			Ref<Renderer> renderer = EGL::createRenderer((void*)(ret->getHandle()), rp);
 			if (renderer.isNotNull()) {
 				ret->setRenderer(renderer, m_redrawMode);
@@ -83,6 +85,7 @@ Ref<ViewInstance> RenderView::createInstance(ViewInstance* parent)
 			}
 		} else if (engineType == renderEngineType_OpenGL) {
 			RendererParam rp;
+			rp.callback = WeakRef<_Win32_RenderViewInstance>(ret);
 			Ref<Renderer> renderer = WGL::createRenderer((void*)(ret->getHandle()), rp);
 			if (renderer.isNotNull()) {
 				ret->setRenderer(renderer, m_redrawMode);

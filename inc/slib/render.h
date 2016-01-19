@@ -9,7 +9,4 @@
 #include "render/texture.h"
 #include "render/program.h"
 
-#include "render/object.h"
-#include "render/object2d.h"
-
 #endif

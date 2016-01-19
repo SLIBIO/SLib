@@ -26,7 +26,6 @@ class SLIB_EXPORT Thread : public Object
 	SLIB_DECLARE_OBJECT(Thread, Object)
 protected:
 	Thread();
-public:
 	~Thread();
 
 public:

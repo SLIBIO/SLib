@@ -41,8 +41,6 @@ class SLIB_EXPORT AsyncLoop : public Object
 	SLIB_DECLARE_OBJECT(AsyncLoop, Object)
 private:
 	AsyncLoop();
-	
-public:
 	~AsyncLoop();
 
 public:
@@ -286,7 +284,6 @@ class SLIB_EXPORT AsyncObject : public Object
 	SLIB_DECLARE_OBJECT(AsyncObject, Object)
 protected:
 	AsyncObject();
-public:
 	~AsyncObject();
 
 public:
@@ -613,7 +610,6 @@ class SLIB_EXPORT AsyncFile : public AsyncStreamBaseIO
 {
 private:
 	AsyncFile();
-public:
 	~AsyncFile();
 	
 public:
@@ -693,7 +689,6 @@ class SLIB_EXPORT AsyncCopy : public Object, public IAsyncStreamListener
 {
 private:
 	AsyncCopy();
-public:
 	~AsyncCopy();
 	
 public:
@@ -891,7 +886,6 @@ class SLIB_EXPORT AsyncOutput : public AsyncOutputBuffer, public IAsyncCopyListe
 {
 protected:
 	AsyncOutput();
-public:
 	~AsyncOutput();
 	
 public:
@@ -939,7 +933,6 @@ class SLIB_EXPORT AsyncStreamFilter : public AsyncStream, public IAsyncStreamLis
 {
 protected:
 	AsyncStreamFilter();
-public:
 	~AsyncStreamFilter();
 
 public:

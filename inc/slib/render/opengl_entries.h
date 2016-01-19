@@ -4,6 +4,7 @@ Don't include this file directly from your own source
 */
 
 SLIB_RENDER_NAMESPACE_BEGIN
+
 class SLIB_EXPORT _SLIB_RENDER_ENTRIES_CLASS
 {
 public:

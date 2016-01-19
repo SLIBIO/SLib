@@ -42,7 +42,9 @@ protected:
 	Ref<Referable> m_refer;
 	
 protected:
-	SLIB_INLINE CArray2D() {}
+	SLIB_INLINE CArray2D()
+    {        
+    }
 	
 public:
 	SLIB_INLINE CArray2D(sl_size width, sl_size height)
@@ -61,7 +63,6 @@ public:
 		_initStatic(data, width, height, stride, refer);
 	}
 
-public:
 	~CArray2D()
 	{
 		_free();

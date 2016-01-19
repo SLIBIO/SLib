@@ -21,7 +21,9 @@ public:
 class SLIB_EXPORT FileLogger : public Logger
 {
 public:
-	SLIB_INLINE FileLogger() {}
+	SLIB_INLINE FileLogger()
+    {
+    }
 	
 	SLIB_INLINE FileLogger(const String& fileName)
 	{
@@ -40,7 +42,9 @@ protected:
 class SLIB_EXPORT Log : public Object
 {
 public:
-	SLIB_INLINE Log() {}
+	SLIB_INLINE Log()
+    {        
+    }
 	
 	Log(const Ref<Logger>& logger, const Ref<Logger>& errorLogger);
 	
