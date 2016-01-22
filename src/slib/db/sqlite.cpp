@@ -343,6 +343,10 @@ public:
 			::sqlite3_reset(m_statement);
 			::sqlite3_clear_bindings(m_statement);
 			m_boundParams.setNull();
+			
+			if (nParams == 0) {
+				return sl_true;
+			}
 
 			Array<Variant> params = Array<Variant>::create(_params, nParams);
 			if (params.isNull()) {

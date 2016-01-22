@@ -18,6 +18,7 @@
 @end
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _TabView : public TabView
 {
 public:
@@ -205,6 +206,7 @@ void TabView::onResize()
 {
 	View::onResize();
 }
+
 SLIB_UI_NAMESPACE_END
 
 @implementation _Slib_OSX_TabView

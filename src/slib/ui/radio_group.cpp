@@ -4,6 +4,7 @@
 #include "../../../inc/slib/ui/s_check_box.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 RadioGroup::RadioGroup()
 {
 }
@@ -60,4 +61,5 @@ void RadioGroup::_setChecked(View* view, sl_bool flag)
 		((SCheckBox*)(view))->setChecked(flag);
 	}
 }
+
 SLIB_UI_NAMESPACE_END

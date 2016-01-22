@@ -23,6 +23,7 @@ public:
 	sl_bool m_flagFreeOnRelease;
 	Ref<Referable> m_ref;
 	
+public:
 	_Gdiplus_ImageDrawable()
 	{
 	}
@@ -34,6 +35,7 @@ public:
 		}
 	}
 	
+public:
 	static Ref<_Gdiplus_ImageDrawable> create(Gdiplus::Image* image, sl_bool flagFreeOnRelease, const Referable* ref)
 	{
 		Ref<_Gdiplus_ImageDrawable> ret;
@@ -52,6 +54,7 @@ public:
 		return ret;
 	}
 	
+    // override
 	void onDraw(Canvas* _canvas, const Rectangle& rectDst, const Rectangle& rectSrc)
 	{
 		Gdiplus::Graphics* graphics = UIPlatform::getCanvasHandle(_canvas);
@@ -64,15 +67,18 @@ public:
 			, Gdiplus::UnitPixel);
 	}
 	
+    // override
 	sl_real getDrawableWidth()
 	{
 		return (sl_real)(m_image->GetWidth());
 	}
 	
+    // override
 	sl_real getDrawableHeight()
 	{
 		return (sl_real)(m_image->GetHeight());
 	}
+    
 };
 
 Ref<Drawable> UIPlatform::createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease, const Referable* ref)
@@ -114,6 +120,7 @@ class _Gdiplus_Bitmap : public Bitmap
 public:
 	Gdiplus::Bitmap* m_bitmap;
 
+public:
 	_Gdiplus_Bitmap()
 	{
 	}
@@ -123,6 +130,7 @@ public:
 		delete m_bitmap;
 	}
 	
+public:
 	static Ref<_Gdiplus_Bitmap> create(sl_uint32 width, sl_uint32 height)
 	{
 		Ref<_Gdiplus_Bitmap> ret;
@@ -161,16 +169,19 @@ public:
 		return ret;
 	}
 	
+    // override
 	sl_uint32 getBitmapWidth()
 	{
 		return m_bitmap->GetWidth();
 	}
 	
+    // override
 	sl_uint32 getBitmapHeight()
 	{
 		return m_bitmap->GetHeight();
 	}
 	
+    // override
 	sl_bool readPixels(sl_uint32 x, sl_uint32 y, BitmapData& _dst)
 	{
 		sl_uint32 w = getBitmapWidth();
@@ -249,6 +260,7 @@ public:
 		}
 	}
 	
+    // override
 	sl_bool writePixels(sl_uint32 x, sl_uint32 y, const BitmapData& _src)
 	{
 		sl_uint32 w = getBitmapWidth();
@@ -320,6 +332,7 @@ public:
 		return sl_false;
 	}
 	
+    // override
 	sl_bool resetPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color& color)
 	{
 		sl_uint32 w = getBitmapWidth();
@@ -358,6 +371,7 @@ public:
 		return sl_false;
 	}
 	
+    // override
 	Ref<Canvas> getCanvas()
 	{
 		Ref<Canvas> ret;
@@ -371,6 +385,7 @@ public:
 		return ret;
 	}
 	
+    // override
 	void onDraw(Canvas* _canvas, const Rectangle& rectDst, const Rectangle& rectSrc)
 	{
 		Gdiplus::Graphics* graphics = UIPlatform::getCanvasHandle(_canvas);

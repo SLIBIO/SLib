@@ -8,48 +8,58 @@
 #include "../../../inc/slib/core/resource.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _UI_GraphicsContext : public GraphicsContext
 {
 public:
+    // override
 	Size getFontTextSize(const Ref<Font>& font, const String& text)
 	{
 		return UI::getFontTextSize(font, text);
 	}
 	
+    // override
 	Rectangle getPathBounds(const Ref<GraphicsPath>& path)
 	{
 		return UI::getPathBounds(path);
 	}
 	
+    // override
 	sl_bool checkPointInPath(const Ref<GraphicsPath>& path, const Point& pt)
 	{
 		return UI::checkPointInPath(path, pt);
 	}
 
+    // override
 	Ref<Drawable> createDrawableFromImage(const ImageDesc& desc)
 	{
 		return UI::createDrawableFromImage(desc);
 	}
 	
+    // override
 	Ref<Drawable> loadDrawableFromMemory(const void* mem, sl_size size)
 	{
 		return UI::loadDrawableFromMemory(mem, size);
 	}
 	
+    // override
 	Ref<Bitmap> createBitmap(sl_uint32 width, sl_uint32 height)
 	{
 		return UI::createBitmap(width, height);
 	}
 	
+    // override
 	Ref<Drawable> createDrawableFromBitmap(const Ref<Bitmap>& bitmap)
 	{
 		return UI::createDrawableFromBitmap(bitmap);
 	}
 	
+    // override
 	Ref<Bitmap> loadBitmapFromMemory(const void* mem, sl_size size)
 	{
 		return UI::loadBitmapFromMemory(mem, size);
 	}
+    
 };
 
 Ref<GraphicsContext> UI::getGraphicsContext()
@@ -143,5 +153,6 @@ Ref<Bitmap> UI::loadBitmapFromResource(const String& path)
 	}
 	return ret;
 }
+
 SLIB_UI_NAMESPACE_END
 

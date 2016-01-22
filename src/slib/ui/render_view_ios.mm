@@ -18,7 +18,7 @@
 	@public sl_bool m_flagRenderingContinuously;
 	@public sl_bool m_flagRequestRender;
 	
-	slib::Ref<slib::Thread> m_thread;
+	slib::SafeRef<slib::Thread> m_thread;
 }
 
 -(void)_init;
@@ -29,6 +29,7 @@
 
 
 SLIB_UI_NAMESPACE_BEGIN
+
 Ref<ViewInstance> RenderView::createInstance(ViewInstance* _parent)
 {
 	_Slib_iOS_GLView* handle = nil;
@@ -136,7 +137,7 @@ void _iOS_GLCallback(_Slib_iOS_GLView* handle)
 					Ref<View> _view = instance->getView();
 					if (RenderView::checkInstance(_view)) {
 						RenderView* view = (RenderView*)(_view.get());
-						view->dispatchOnFrame(desc.m_engine.get());
+						view->dispatchFrame(desc.m_engine.get());
 					}
 					
 					[handle display];
@@ -157,6 +158,7 @@ void _iOS_GLCallback(_Slib_iOS_GLView* handle)
 		}
 	}
 }
+
 SLIB_UI_NAMESPACE_END
 
 @implementation _Slib_iOS_GLView
@@ -169,8 +171,9 @@ SLIB_UI_NAMESPACE_END
 
 -(void)dealloc
 {
-	if (m_thread.isNotNull()) {
-		m_thread->finishAndWait();
+	slib::Ref<slib::Thread> thread = m_thread;
+	if (thread.isNotNull()) {
+		thread->finishAndWait();
 	}
 }
 

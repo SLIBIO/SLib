@@ -20,15 +20,7 @@ public:
 	UIScreen* m_screen;
 	Rectangle m_region;
 	
-	_iOS_Screen()
-	{
-	}
-	
-	Rectangle getRegion()
-	{
-		return m_region;
-	}
-	
+public:
 	static Ref<_iOS_Screen> create(UIScreen* screen)
 	{
 		Ref<_iOS_Screen> ret;
@@ -58,6 +50,13 @@ public:
 		UIScreen* primary = [arr objectAtIndex:0];
 		return primary;
 	}
+    
+    // override
+    Rectangle getRegion()
+	{
+		return m_region;
+	}	
+
 };
 
 Ref<Screen> UIPlatform::createScreen(UIScreen* screen)
@@ -106,8 +105,9 @@ sl_bool UI::isUIThread()
 }
 
 
-void UI::runOnUIThread(const Ref<Runnable>& callback)
+void UI::runOnUIThread(const Ref<Runnable>& _callback)
 {
+    Ref<Runnable> callback = _callback;
 	if (callback.isNotNull()) {
 		dispatch_async(dispatch_get_main_queue(), ^{
 			callback->run();

@@ -8,6 +8,7 @@
 #include "../../../inc/slib/core/hashtable.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _UI_Windows_KeyMapper
 {
 private:
@@ -146,6 +147,7 @@ public:
 		map(keyContextMenu, VK_APPS);
 	}
 	
+public:
 	void map(sl_uint32 key, sl_uint32 vk)
 	{
 		if (vk == -1) {

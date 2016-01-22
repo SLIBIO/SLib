@@ -18,6 +18,7 @@ public:
 	sl_real m_moveX;
 	sl_real m_moveY;
 	
+public:
 	_Quartz_GraphicsPathInstance()
 	{
 		m_flagMoved = sl_false;
@@ -30,6 +31,7 @@ public:
 		CGPathRelease(m_path);
 	}
 	
+public:
 	static Ref<_Quartz_GraphicsPathInstance> _create()
 	{
 		Ref<_Quartz_GraphicsPathInstance> ret;
@@ -45,6 +47,7 @@ public:
 		return ret;
 	}
 	
+	// override
 	void moveTo(const Point& pt)
 	{
 		CGPathMoveToPoint(m_path, NULL, pt.x, pt.y);
@@ -53,6 +56,7 @@ public:
 		m_moveY = pt.y;
 	}
 	
+	// override
 	void lineTo(const Point& pt)
 	{
 		if (!m_flagMoved) {
@@ -64,6 +68,7 @@ public:
 		m_moveY = pt.y;
 	}
 	
+	// override
 	void cubicTo(const Point& ptControl1, const Point& ptControl2, const Point& ptEnd)
 	{
 		if (!m_flagMoved) {
@@ -75,6 +80,7 @@ public:
 		m_moveY = ptEnd.y;
 	}
 	
+	// override
 	void closeSubpath()
 	{
 		CGPathCloseSubpath(m_path);
@@ -139,6 +145,7 @@ sl_bool UI::checkPointInPath(const Ref<GraphicsPath>& path, const Point& _pt)
 	}
 	return sl_false;
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

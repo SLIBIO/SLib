@@ -125,6 +125,153 @@ HWND Win32_ViewInstance::getHandle()
 	return m_handle;
 }
 
+sl_bool Win32_ViewInstance::isValid()
+{
+	HWND hWnd = m_handle;
+	if (hWnd) {
+		if (::IsWindow(hWnd)) {
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
+void Win32_ViewInstance::setFocus()
+{
+	HWND hWnd = m_handle;
+	if (hWnd) {
+		::SetFocus(hWnd);
+	}
+}
+
+void Win32_ViewInstance::invalidate()
+{
+	HWND hWnd = m_handle;
+	if (hWnd) {
+		::InvalidateRect(hWnd, NULL, TRUE);
+	}
+}
+
+void Win32_ViewInstance::invalidate(const Rectangle& rect)
+{
+	HWND hWnd = m_handle;
+	if (hWnd) {
+		RECT rc;
+		rc.left = (int)(rect.left);
+		rc.top = (int)(rect.top);
+		rc.right = (int)(rect.right);
+		rc.bottom = (int)(rect.bottom);
+		::InvalidateRect(hWnd, &rc, TRUE);
+	}
+}
+
+Rectangle Win32_ViewInstance::getFrame()
+{
+	HWND hWnd = m_handle;
+	if (hWnd) {
+		RECT rc;
+		::GetWindowRect(hWnd, &rc);
+		Rectangle ret;
+		ret.left = (sl_real)rc.left;
+		ret.top = (sl_real)rc.top;
+		ret.right = (sl_real)rc.right;
+		ret.bottom = (sl_real)rc.bottom;
+	}
+	return Rectangle::zero();
+}
+
+void Win32_ViewInstance::setFrame(const Rectangle& frame)
+{
+	HWND hWnd = m_handle;
+	if (hWnd) {
+		::SetWindowPos(hWnd, NULL
+			, (int)(frame.left), (int)(frame.top)
+			, (int)(frame.getWidth()), (int)(frame.getHeight())
+			, SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+	}
+}
+
+void Win32_ViewInstance::setVisible(sl_bool flag)
+{
+	HWND hWnd = m_handle;
+	if (hWnd) {
+		sl_bool f1 = ::IsWindowVisible(hWnd) ? sl_true : sl_false;
+		sl_bool f2 = flag ? sl_true : sl_false;
+		if (f1 != f2) {
+			if (f2) {
+				::ShowWindowAsync(hWnd, SW_SHOW);
+			} else {
+				::ShowWindowAsync(hWnd, SW_HIDE);
+			}
+		}
+	}
+}
+
+void Win32_ViewInstance::setEnabled(sl_bool flag)
+{
+	HWND hWnd = m_handle;
+	if (hWnd) {
+		sl_bool f1 = ::IsWindowEnabled(hWnd) ? sl_true : sl_false;
+		sl_bool f2 = flag ? sl_true : sl_false;
+		if (f1 != f2) {
+			::EnableWindow(hWnd, f2);
+		}
+	}
+}
+
+void Win32_ViewInstance::setOpaque(sl_bool flag)
+{
+}
+
+Point Win32_ViewInstance::convertCoordinateFromScreenToView(const Point& ptScreen)
+{
+	HWND hWnd = m_handle;
+	if (hWnd) {
+		POINT pt;
+		pt.x = (LONG)(ptScreen.x);
+		pt.y = (LONG)(ptScreen.y);
+		::ScreenToClient(hWnd, &pt);
+		return Point((sl_real)(pt.x), (sl_real)(pt.y));
+	}
+	return ptScreen;
+}
+
+Point Win32_ViewInstance::convertCoordinateFromViewToScreen(const Point& ptView)
+{
+	HWND hWnd = m_handle;
+	if (hWnd) {
+		POINT pt;
+		pt.x = (LONG)(ptView.x);
+		pt.y = (LONG)(ptView.y);
+		::ClientToScreen(hWnd, &pt);
+		return Point((sl_real)(pt.x), (sl_real)(pt.y));
+	}
+	return ptView;
+}
+
+void Win32_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
+{
+	HWND hWnd = m_handle;
+	if (hWnd) {
+		Win32_ViewInstance* child = (Win32_ViewInstance*)(_child.get());
+		if (child) {
+			HWND hWndChild = child->getHandle();
+			if (hWndChild) {
+				::SetParent(hWndChild, hWnd);
+			}
+		}
+	}
+}
+
+void Win32_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
+{
+	Win32_ViewInstance* child = (Win32_ViewInstance*)(_child.get());
+	HWND hWnd = child->getHandle();
+	if (hWnd) {
+		::SetParent(hWnd, HWND_MESSAGE);
+	}
+}
+
 sl_bool Win32_ViewInstance::onEventKey(sl_bool flagDown, WPARAM wParam, LPARAM lParam)
 {
 	HWND hWnd = m_handle;
@@ -542,158 +689,9 @@ Ref<ViewInstance> View::createInstance(ViewInstance* parent)
 	return ret;
 }
 
-sl_bool View::_isValid()
-{
-	HWND hWnd = UIPlatform::getViewHandle(this);
-	if (hWnd) {
-		if (::IsWindow(hWnd)) {
-			return sl_true;
-		}
-	}
-	return sl_false;
-}
-
-void View::_setFocus()
-{
-	HWND hWnd = UIPlatform::getViewHandle(this);
-	if (hWnd) {
-		::SetFocus(hWnd);
-	}
-}
-
-void View::_invalidate()
-{
-	HWND hWnd = UIPlatform::getViewHandle(this);
-	if (hWnd) {
-		::InvalidateRect(hWnd, NULL, TRUE);
-	}
-}
-
-void View::_invalidate(const Rectangle& rect)
-{
-	HWND hWnd = UIPlatform::getViewHandle(this);
-	if (hWnd) {
-		RECT rc;
-		rc.left = (int)(rect.left);
-		rc.top = (int)(rect.top);
-		rc.right = (int)(rect.right);
-		rc.bottom = (int)(rect.bottom);
-		::InvalidateRect(hWnd, &rc, TRUE);
-	}
-}
-
-Rectangle View::getInstanceFrame()
-{
-	HWND hWnd = UIPlatform::getViewHandle(this);
-	if (hWnd) {
-		RECT rc;
-		::GetWindowRect(hWnd, &rc);
-		Rectangle ret;
-		ret.left = (sl_real)rc.left;
-		ret.top = (sl_real)rc.top;
-		ret.right = (sl_real)rc.right;
-		ret.bottom = (sl_real)rc.bottom;
-	}
-	return Rectangle::zero();
-}
-
-void View::_setFrame(const Rectangle& frame)
-{
-	HWND hWnd = UIPlatform::getViewHandle(this);
-	if (hWnd) {
-		::SetWindowPos(hWnd, NULL
-			, (int)(frame.left), (int)(frame.top)
-			, (int)(frame.getWidth()), (int)(frame.getHeight())
-			, SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
-	}
-}
-
-void View::_setVisible(sl_bool flag)
-{
-	HWND hWnd = UIPlatform::getViewHandle(this);
-	if (hWnd) {
-		sl_bool f1 = ::IsWindowVisible(hWnd) ? sl_true : sl_false;
-		sl_bool f2 = flag ? sl_true : sl_false;
-		if (f1 != f2) {
-			if (f2) {
-				::ShowWindowAsync(hWnd, SW_SHOW);
-			} else {
-				::ShowWindowAsync(hWnd, SW_HIDE);
-			}
-		}
-	}
-}
-
-void View::_setEnabled(sl_bool flag)
-{
-	HWND hWnd = UIPlatform::getViewHandle(this);
-	if (hWnd) {
-		sl_bool f1 = ::IsWindowEnabled(hWnd) ? sl_true : sl_false;
-		sl_bool f2 = flag ? sl_true : sl_false;
-		if (f1 != f2) {
-			::EnableWindow(hWnd, f2);
-		}
-	}
-}
-
-void View::_setOpaque(sl_bool flag)
-{
-}
-
-Point View::_convertCoordinateFromScreenToView(const Point& ptScreen)
-{
-	HWND hWnd = UIPlatform::getViewHandle(this);
-	if (hWnd) {
-		POINT pt;
-		pt.x = (LONG)(ptScreen.x);
-		pt.y = (LONG)(ptScreen.y);
-		::ScreenToClient(hWnd, &pt);
-		return Point((sl_real)(pt.x), (sl_real)(pt.y));
-	}
-	return ptScreen;
-}
-
-Point View::_convertCoordinateFromViewToScreen(const Point& ptView)
-{
-	HWND hWnd = UIPlatform::getViewHandle(this);
-	if (hWnd) {
-		POINT pt;
-		pt.x = (LONG)(ptView.x);
-		pt.y = (LONG)(ptView.y);
-		::ClientToScreen(hWnd, &pt);
-		return Point((sl_real)(pt.x), (sl_real)(pt.y));
-	}
-	return ptView;
-}
-
-void View::_addChildInstance(ViewInstance* _child)
-{
-	HWND hWnd = UIPlatform::getViewHandle(this);
-	if (hWnd) {
-		Win32_ViewInstance* child = (Win32_ViewInstance*)(_child);
-		if (child) {
-			HWND hWndChild = child->getHandle();
-			if (hWndChild) {
-				::SetParent(hWndChild, hWnd);
-			}
-		}
-	}
-}
-
-void View::_removeChildInstance(ViewInstance* _child)
-{
-	Win32_ViewInstance* child = (Win32_ViewInstance*)(_child);
-	HWND hWnd = child->getHandle();
-	if (hWnd) {
-		::SetParent(hWnd, HWND_MESSAGE);
-	}
-}
-SLIB_UI_NAMESPACE_END
-
 /******************************************
 			UIPlatform
 ******************************************/
-SLIB_UI_NAMESPACE_BEGIN
 Ref<ViewInstance> UIPlatform::createViewInstance(HWND hWnd, sl_bool flagDestroyOnRelease)
 {
 	Ref<ViewInstance> ret = UIPlatform::_getViewInstance((void*)hWnd);
@@ -739,6 +737,7 @@ HWND UIPlatform::getViewHandle(View* view)
 	}
 	return 0;
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

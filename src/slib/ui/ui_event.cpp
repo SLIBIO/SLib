@@ -4,6 +4,7 @@
 #include "../../../inc/slib/core/log.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 Ref<UIEvent> UIEvent::createKeyEvent(UIEventAction action, Keycode keycode, sl_uint32 systemKeycode)
 {
 	Ref<UIEvent> ret = new UIEvent;
@@ -263,6 +264,70 @@ String UI::getKeyName(Keycode code)
 }
 
 
+void IViewListener::onClick(View* view)
+{
+}
+
+void IViewListener::onKeyEvent(View* view, UIEvent* event)
+{
+}
+
+void IViewListener::onMouseEvent(View* view, UIEvent* event)
+{
+}
+
+void IViewListener::onTouchEvent(View* view, UIEvent* event)
+{
+}
+
+void IViewListener::onMouseWheelEvent(View* view, UIEvent* event)
+{
+}
+
+void IViewListener::onSetCursor(View* view, UIEvent* event)
+{
+}
+
+
+sl_bool IWindowListener::onClose(Window* window)
+{
+	return sl_true;
+}
+
+void IWindowListener::onActivate(Window* window)
+{
+}
+
+void IWindowListener::onDeactivate(Window* window)
+{
+}
+
+void IWindowListener::onMove(Window* window)
+{
+}
+
+void IWindowListener::onResize(Window* window, Size& size)
+{
+}
+
+void IWindowListener::onMinimize(Window* window)
+{
+}
+
+void IWindowListener::onDeminimize(Window* window)
+{
+}
+
+void IWindowListener::onMaximize(Window* window)
+{
+}
+
+void IWindowListener::onDemaximize(Window* window)
+{
+}
+
+
+
 // UIEventLogListener implementation
 void UIEventLogListener::onClick(View* view)
 {
@@ -513,9 +578,5 @@ String UI::getStatusDescription()
 	return str;
 }
 
-Ref<UIEventLogListener> UIEventLogListener::create()
-{
-	return new UIEventLogListener;
-}
 SLIB_UI_NAMESPACE_END
 

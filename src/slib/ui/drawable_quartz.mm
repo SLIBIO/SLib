@@ -17,6 +17,7 @@ public:
 	CGImageRef m_image;
 	sl_bool m_flagFlipped;
 	
+public:
 	_Quartz_ImageDrawable()
 	{
 	}
@@ -26,6 +27,7 @@ public:
 		CGImageRelease(m_image);
 	}
 	
+public:
 	static Ref<_Quartz_ImageDrawable> create(CGImageRef image, sl_bool flagFlipped)
 	{
 		Ref<_Quartz_ImageDrawable> ret;
@@ -42,6 +44,7 @@ public:
 		return ret;
 	}
 	
+	// override
 	void onDraw(Canvas* _canvas, const Rectangle& _rectDst, const Rectangle& _rectSrc)
 	{
 		CGContextRef graphics = UIPlatform::getCanvasHandle(_canvas);
@@ -74,15 +77,18 @@ public:
 		}
 	}
 	
+	// override
 	sl_real getDrawableWidth()
 	{
 		return (sl_real)(CGImageGetWidth(m_image));
 	}
 	
+	// override
 	sl_real getDrawableHeight()
 	{
 		return (sl_real)(CGImageGetHeight(m_image));
 	}
+	
 };
 
 Ref<Drawable> UIPlatform::createImageDrawable(CGImageRef image, sl_bool flagFlipped)
@@ -155,6 +161,7 @@ public:
 	sl_uint32 m_width;
 	sl_uint32 m_height;
 	
+public:
 	_Quartz_Bitmap()
 	{
 	}
@@ -164,6 +171,7 @@ public:
 		CGContextRelease(m_bitmap);
 	}
 	
+public:
 	static Ref<_Quartz_Bitmap> create(sl_uint32 width, sl_uint32 height)
 	{
 		Ref<_Quartz_Bitmap> ret;
@@ -239,16 +247,19 @@ public:
 		return ret;
 	}
 	
+	// override
 	sl_uint32 getBitmapWidth()
 	{
 		return m_width;
 	}
 	
+	// override
 	sl_uint32 getBitmapHeight()
 	{
 		return m_height;
 	}
 	
+	// override
 	sl_bool readPixels(sl_uint32 x, sl_uint32 y, BitmapData& bitmapData)
 	{
 		if (x > m_width) {
@@ -269,6 +280,7 @@ public:
 		return sl_true;
 	}
 	
+	// override
 	sl_bool writePixels(sl_uint32 x, sl_uint32 y, const BitmapData& bitmapData)
 	{
 		if (x > m_width) {
@@ -290,6 +302,7 @@ public:
 		return sl_true;
 	}
 	
+	// override
 	sl_bool resetPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color& _color)
 	{
 		if (x > m_width) {
@@ -322,10 +335,12 @@ public:
 		return sl_true;
 	}
 	
+	// override
 	Ref<Canvas> getCanvas()
 	{
 		return UIPlatform::createCanvas(m_bitmap, m_width, m_height);
 	}
+	
 	
 	Ref<Drawable> getDrawable()
 	{

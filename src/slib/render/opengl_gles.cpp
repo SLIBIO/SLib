@@ -87,9 +87,9 @@ SLIB_RENDER_NAMESPACE_END
 
 SLIB_RENDER_NAMESPACE_BEGIN
 
-Ref<RenderEngine> GLES::createEngine()
+Ref<GLRenderEngine> GLES::createEngine()
 {
-	return Ref<RenderEngine>::null();
+	return Ref<GLRenderEngine>::null();
 }
 
 void GLES::loadEntries(const String& pathDll, sl_bool flagReload)

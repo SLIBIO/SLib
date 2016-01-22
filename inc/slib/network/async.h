@@ -143,7 +143,7 @@ public:
 		return m_socket;
 	}
 	
-	SLIB_PTR_PROPERTY_INLINE(IAsyncTcpServerListener, Listener)
+	SLIB_PTR_PROPERTY(IAsyncTcpServerListener, Listener)
 
 protected:
 	SafeRef<Socket> m_socket;

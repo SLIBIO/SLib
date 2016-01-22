@@ -3,6 +3,7 @@
 #if defined(SLIB_UI_SUPPORT_NATIVE_LIST_DETAILS_VIEW)
 
 SLIB_UI_NAMESPACE_BEGIN
+
 void IListDetailsViewListener::onSelectRow(ListDetailsView* view, sl_uint32 row)
 {
 }
@@ -23,9 +24,7 @@ sl_bool IListDetailsViewListener::onGetCellText(ListDetailsView* view, sl_uint32
 {
 	return sl_false;
 }
-SLIB_UI_NAMESPACE_END
 
-SLIB_UI_NAMESPACE_BEGIN
 ListDetailsViewColumn::ListDetailsViewColumn()
 {
 	width = 40;
@@ -267,6 +266,7 @@ String ListDetailsView::onGetCellText(sl_uint32 row, sl_uint32 col)
 	}
 	return getItemText(row, col);
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

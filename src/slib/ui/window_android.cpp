@@ -56,8 +56,9 @@ class _Android_Window : public WindowInstance
 {
 public:
 	JniSafeGlobal<jobject> m_window;
-	Ref<ViewInstance> m_viewContent;
+	SafeRef<ViewInstance> m_viewContent;
 
+public:
 	_Android_Window()
 	{
 	}
@@ -67,6 +68,7 @@ public:
 		close();
 	}
 
+public:
 	static Ref<_Android_Window> create(jobject jwindow)
 	{
 		if (!jwindow) {
@@ -103,7 +105,7 @@ public:
 		return jwindow;
 	}
 
-	const Ref<ViewInstance>& getContentView()
+	Ref<ViewInstance> getContentView()
 	{
 		return m_viewContent;
 	}
@@ -147,41 +149,8 @@ public:
 		return sl_false;
 	}
 
-	String getTitle()
+	void runModal()
 	{
-		return String::null();
-	}
-
-	sl_bool setTitle(const String& title)
-	{
-		return sl_false;
-	}
-
-	Color getBackgroundColor()
-	{
-		JniGlobal<jobject> _jwindow(m_window);
-		jobject jwindow = _jwindow;
-		if (jwindow) {
-			int color = _JAndroidWindow::getBackgroundColor.callInt(jwindow);
-			Color ret;
-			ret.setARGB(color);
-			return ret;
-		}
-		return Color::zero();
-	}
-
-	sl_bool setBackgroundColor(const Color& _color)
-	{
-		JniGlobal<jobject> _jwindow(m_window);
-		jobject jwindow = _jwindow;
-		if (jwindow) {
-			Color color = _color;
-			if (color.isNotZero()) {
-				_JAndroidWindow::setBackgroundColor.call(jwindow, color.getARGB());
-				return sl_true;
-			}
-		}
-		return sl_false;
 	}
 
 	Rectangle getFrame()
@@ -241,6 +210,43 @@ public:
 		if (jwindow) {
 			_JAndroidWindow::setSize.call(jwindow, size.x, size.y);
 			return sl_true;
+		}
+		return sl_false;
+	}
+
+	String getTitle()
+	{
+		return String::null();
+	}
+
+	sl_bool setTitle(const String& title)
+	{
+		return sl_false;
+	}
+
+	Color getBackgroundColor()
+	{
+		JniGlobal<jobject> _jwindow(m_window);
+		jobject jwindow = _jwindow;
+		if (jwindow) {
+			int color = _JAndroidWindow::getBackgroundColor.callInt(jwindow);
+			Color ret;
+			ret.setARGB(color);
+			return ret;
+		}
+		return Color::zero();
+	}
+
+	sl_bool setBackgroundColor(const Color& _color)
+	{
+		JniGlobal<jobject> _jwindow(m_window);
+		jobject jwindow = _jwindow;
+		if (jwindow) {
+			Color color = _color;
+			if (color.isNotZero()) {
+				_JAndroidWindow::setBackgroundColor.call(jwindow, color.getARGB());
+				return sl_true;
+			}
 		}
 		return sl_false;
 	}
@@ -440,9 +446,6 @@ public:
 		return size;
 	}
 
-	void runModal()
-	{
-	}
 };
 
 Ref<_Android_Window> _AndroidUi_getWindow(jlong instance)

@@ -1,14 +1,10 @@
 #include "../../../inc/slib/ui/edit_view.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 /**********************
 	EditView
  ***********************/
-String IEditViewListener::onChange(EditView* edit, const String& newValue)
-{
-	return newValue;
-}
-
 EditView::EditView()
 {
 	m_textAlignment = alignMiddleCenter;
@@ -19,8 +15,18 @@ EditView::EditView()
 	m_backgroundColor = Color::white();
 }
 
-void EditView::onKeyEvent(UIEvent* ev)
+String EditView::onChange(const String& newValue)
 {
+	return newValue;
+}
+
+void EditView::onEnterAction()
+{
+}
+
+void EditView::dispatchKeyEvent(UIEvent* ev)
+{
+	View::dispatchKeyEvent(ev);
 	if (!(isMultiLine())) {
 		if (ev->getAction() == actionKeyUp) {
 			if (ev->getKeycode() == keyEnter) {
@@ -30,21 +36,23 @@ void EditView::onKeyEvent(UIEvent* ev)
 	}
 }
 
+String EditView::dispatchChange(const String& newValue)
+{
+	String value = onChange(newValue);
+	PtrLocker<IEditViewListener> listener(getListener());
+	if (listener.isNotNull()) {
+		return listener->onChange(this, value);
+	}
+	return value;
+}
+
 void EditView::dispatchEnterAction()
 {
 	Ref<Runnable> action = getEnterAction();
 	if (action.isNotNull()) {
 		action->run();
 	}
-}
-
-String EditView::onChange(const String& newValue)
-{
-	PtrLocker<IEditViewListener> listener(getListener());
-	if (listener.isNotNull()) {
-		return listener->onChange(this, newValue);
-	}
-	return newValue;
+	onEnterAction();
 }
 
 Ref<Font> EditView::getFont()
@@ -84,4 +92,5 @@ sl_bool TextArea::isMultiLine()
 void TextArea::setMultiLine(sl_bool flag)
 {
 }
+
 SLIB_UI_NAMESPACE_END

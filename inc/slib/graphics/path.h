@@ -120,7 +120,7 @@ protected:
 	
 	sl_bool m_flagInvalidated;
 	
-	SLIB_REF_PROPERTY_INLINE(GraphicsPathInstance, Instance)
+	SLIB_REF_PROPERTY(GraphicsPathInstance, Instance)
 };
 
 class SLIB_EXPORT GraphicsPathInstance : public Object
@@ -136,6 +136,7 @@ public:
 public:
 	void buildFrom(const Ref<GraphicsPath>& path);
 };
+
 SLIB_GRAPHICS_NAMESPACE_END
 
 #endif

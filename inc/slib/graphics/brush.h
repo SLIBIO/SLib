@@ -52,11 +52,13 @@ public:
 	{
 		return m_desc.color;
 	}
-	
+
+public:
+	SLIB_REF_PROPERTY(BrushInstance, Instance)
+
 protected:
 	BrushDesc m_desc;
 	
-	SLIB_REF_PROPERTY_INLINE(BrushInstance, Instance)
 };
 
 class SLIB_EXPORT BrushInstance : public Object

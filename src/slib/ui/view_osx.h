@@ -9,6 +9,7 @@
 #include "../../../inc/slib/ui/platform.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class OSX_ViewInstance : public ViewInstance
 {
 public:
@@ -17,19 +18,67 @@ public:
 	
 public:
 	static Ref<OSX_ViewInstance> create(NSView* handle, sl_bool flagFreeOnRelease);
+	
 	static Ref<OSX_ViewInstance> create(NSView* handle, NSView* parent, View* view);
 	
 public:
 	void release();
+	
 	static void freeHandle(NSView* handle);
 	
 	NSView* getHandle();
 	
+public:
+	// override
+	sl_bool isValid();
+	
+	// override
+	void setFocus();
+	
+	// override
+	void invalidate();
+	
+	// override
+	void invalidate(const Rectangle& rect);
+	
+	// override
+	Rectangle getFrame();
+	
+	// override
+	void setFrame(const Rectangle& frame);
+	
+	// override
+	void setVisible(sl_bool flag);
+	
+	// override
+	void setEnabled(sl_bool flag);
+	
+	// override
+	void setOpaque(sl_bool flag);
+	
+	// override
+	Point convertCoordinateFromScreenToView(const Point& ptScreen);
+	
+	// override
+	Point convertCoordinateFromViewToScreen(const Point& ptView);
+	
+	// override
+	void addChildInstance(const Ref<ViewInstance>& instance);
+	
+	// override
+	void removeChildInstance(const Ref<ViewInstance>& instance);
+	
+public:
 	void onDraw(NSRect rectDirty);
+	
 	sl_bool onEventKey(sl_bool flagDown, NSEvent* event);
+	
 	sl_bool onEventMouse(UIEventAction action, NSEvent* event);
+	
 	sl_bool onEventMouseWheel(NSEvent* event);
+	
 	sl_bool onEventUpdateCursor(NSEvent* event);
+	
 	void applyModifiers(UIEvent* ev, NSEvent* event);
 	
 protected:
@@ -37,6 +86,7 @@ protected:
 	sl_bool m_flagFreeOnRelease;
 	
 };
+
 SLIB_UI_NAMESPACE_END
 
 @interface Slib_OSX_ViewBase : NSView {

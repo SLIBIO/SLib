@@ -10,6 +10,7 @@
 #include "../../../inc/slib/core/platform_android.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _UI_Android_KeyMapper
 {
 private:
@@ -148,6 +149,7 @@ public:
 		map(keyContextMenu, -1);
 	}
 	
+public:
 	void map(sl_uint32 key, sl_uint32 vk)
 	{
 		if (vk == -1) {
@@ -188,6 +190,7 @@ sl_uint32 UIEvent::getSystemKeycode(Keycode key)
 {
 	return _UI_Android_KeyMapper::instance().keyToVk(key);
 }
+
 Keycode UIEvent::getKeycodeFromSystemKeycode(sl_uint32 vkey)
 {
 	return _UI_Android_KeyMapper::instance().vkToKey(vkey);
@@ -197,14 +200,17 @@ sl_bool UI::checkKeyPressed(Keycode key)
 {
 	return sl_false;
 }
+
 sl_bool UI::checkCapsLockOn()
 {
 	return sl_false;
 }
+
 sl_bool UI::checkNumLockOn()
 {
 	return sl_false;
 }
+
 sl_bool UI::checkScrollLockOn()
 {
 	return sl_false;
@@ -214,14 +220,17 @@ Point UI::getCursorPos()
 {
 	return Point(0, 0);
 }
+
 sl_bool UI::checkLeftButtonPressed()
 {
 	return sl_false;
 }
+
 sl_bool UI::checkRightButtonPressed()
 {
 	return sl_false;
 }
+
 sl_bool UI::checkMiddleButtonPressed()
 {
 	return sl_false;

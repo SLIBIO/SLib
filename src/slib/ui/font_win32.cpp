@@ -10,6 +10,7 @@
 #pragma comment (lib, "gdiplus.lib")
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _Win32_FontInstance : public FontInstance
 {
 	SLIB_DECLARE_OBJECT(_Win32_FontInstance, FontInstance)
@@ -22,6 +23,7 @@ public:
 	HFONT m_fontGDI;
 	sl_bool m_flagCreatedGDI;
 	
+public:
 	_Win32_FontInstance()
 	{
 		m_fontGdiplus = sl_null;
@@ -41,6 +43,7 @@ public:
 		}
 	}
 	
+public:
 	static Ref<_Win32_FontInstance> _create(const FontDesc& desc)
 	{
 		Ref<_Win32_FontInstance> ret = new _Win32_FontInstance();
@@ -165,6 +168,7 @@ public:
 	Gdiplus::Bitmap* image;
 	Gdiplus::Graphics* graphics;
 
+public:
 	_Win32_FontStatic()
 	{
 		graphics = sl_null;
@@ -213,6 +217,7 @@ Size UI::getFontTextSize(const Ref<Font>& font, const String& _text)
 	}
 	return ret;
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

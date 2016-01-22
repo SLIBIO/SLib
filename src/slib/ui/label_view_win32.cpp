@@ -15,6 +15,7 @@ public:
 	Color m_colorBackground;
 	HBRUSH m_hBrushBackground;
 
+public:
 	_Win32_LabelViewInstance()
 	{
 		m_hBrushBackground = NULL;
@@ -29,6 +30,7 @@ public:
 		}
 	}
 
+public:
 	void setTextColor(const Color& color)
 	{
 		HWND handle = getHandle();
@@ -50,11 +52,13 @@ public:
 		::InvalidateRect(handle, NULL, TRUE);
 	}
 
+    // override
 	sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 	{
 		return sl_false;
 	}
 
+    // override
 	sl_bool processCommand(SHORT code, LRESULT& result)
 	{
 		switch (code) {
@@ -67,6 +71,7 @@ public:
 		return sl_false;
 	}
 
+    // override
 	sl_bool processControlColor(UINT msg, HDC hDC, HBRUSH& result)
 	{
 		HBRUSH hbr = m_hBrushBackground;
@@ -80,6 +85,7 @@ public:
 		}
 	}
 
+    // override
 	void processPostControlColor(UINT msg, HDC hDC, HBRUSH& result)
 	{
 		Color c = m_colorText;
@@ -250,6 +256,7 @@ void LabelView::setFont(const Ref<Font>& font)
 	m_font = font;
 	m_fontInstance = fontInstance;
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

@@ -35,11 +35,8 @@ class _Android_GraphicsPathInstance : public GraphicsPathInstance
 public:
 	JniGlobal<jobject> m_path;
 
-	_Android_GraphicsPathInstance()
-	{
-	}
-
-	static Ref<_Android_GraphicsPathInstance> _create()
+public:
+    static Ref<_Android_GraphicsPathInstance> _create()
 	{
 		Ref<_Android_GraphicsPathInstance> ret;
 		JniLocal<jobject> jpath = _JAndroidPath::init.newObject(sl_null);
@@ -56,21 +53,19 @@ public:
 		return ret;
 	}
 
-	void setFillMode(FillMode mode)
-	{
-		_JAndroidPath::setFillMode.call(m_path, mode);
-	}
-
+    // override
 	void moveTo(const Point& pt)
 	{
 		_JAndroidPath::moveTo.call(m_path, (float)(pt.x), (float)(pt.y));
 	}
 
+    // override
 	void lineTo(const Point& pt)
 	{
 		_JAndroidPath::lineTo.call(m_path, (float)(pt.x), (float)(pt.y));
 	}
 
+    // override
 	void cubicTo(const Point& ptControl1, const Point& ptControl2, const Point& ptEnd)
 	{
 		_JAndroidPath::cubicTo.call(m_path, (float)(ptControl1.x), (float)(ptControl1.y)
@@ -78,10 +73,17 @@ public:
 				, (float)(ptEnd.x), (float)(ptEnd.y));
 	}
 
+    // override
 	void closeSubpath()
 	{
 		_JAndroidPath::closeSubpath.call(m_path);
 	}
+    
+    void setFillMode(FillMode mode)
+	{
+		_JAndroidPath::setFillMode.call(m_path, mode);
+	}
+    
 };
 
 

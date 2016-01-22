@@ -35,6 +35,7 @@ void Mutex::_free()
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 	DeleteCriticalSection((PCRITICAL_SECTION)m_pObject);
 	Base::freeMemory(m_pObject);
+	m_pObject = sl_null;
 #elif defined(SLIB_PLATFORM_IS_UNIX)
 	pthread_mutex_destroy((pthread_mutex_t*)(m_pObject));
 	Base::freeMemory(m_pObject);
@@ -43,6 +44,9 @@ void Mutex::_free()
 
 void Mutex::lock() const
 {
+	if (!m_pObject) {
+		return;
+	}
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 	EnterCriticalSection((PCRITICAL_SECTION)m_pObject);
 #elif defined(SLIB_PLATFORM_IS_UNIX)
@@ -52,6 +56,9 @@ void Mutex::lock() const
 
 sl_bool Mutex::tryLock() const
 {
+	if (!m_pObject) {
+		return sl_false;
+	}
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 	return TryEnterCriticalSection((PCRITICAL_SECTION)m_pObject) != 0;
 #elif defined(SLIB_PLATFORM_IS_UNIX)
@@ -61,6 +68,9 @@ sl_bool Mutex::tryLock() const
 
 void Mutex::unlock() const
 {
+	if (!m_pObject) {
+		return;
+	}
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 	LeaveCriticalSection((PCRITICAL_SECTION)m_pObject);
 #elif defined(SLIB_PLATFORM_IS_UNIX)

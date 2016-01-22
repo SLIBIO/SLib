@@ -1,6 +1,7 @@
 #include "../../../inc/slib/ui/render_view.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 RenderView::RenderView()
 {
 	setPreferredEngineType(renderEngineType_OpenGL_ES);
@@ -12,16 +13,11 @@ RedrawMode RenderView::getRedrawMode()
 	return m_redrawMode;
 }
 
-void RenderView::onAttach()
-{
-	requestRender();
-}
-
 void RenderView::onFrame(RenderEngine* engine)
 {
 }
 
-void RenderView::dispatchOnFrame(RenderEngine* engine)
+void RenderView::dispatchFrame(RenderEngine* engine)
 {
 	if (engine) {
 		engine->beginScene();
@@ -31,4 +27,10 @@ void RenderView::dispatchOnFrame(RenderEngine* engine)
 		engine->endScene();
 	}
 }
+
+void RenderView::onAttach()
+{
+	requestRender();
+}
+
 SLIB_UI_NAMESPACE_END

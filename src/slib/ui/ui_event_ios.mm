@@ -7,6 +7,7 @@
 #include "../../../inc/slib/ui/platform.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 sl_uint32 UIEvent::getSystemKeycode(Keycode key)
 {
 	return -1;

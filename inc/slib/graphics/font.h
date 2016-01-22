@@ -79,10 +79,12 @@ public:
 public:
 	Size getTextSize(const Ref<GraphicsContext>& context, const String& text);
 
+public:
+	SLIB_REF_PROPERTY(FontInstance, Instance)
+	
 protected:
 	FontDesc m_desc;
 	
-	SLIB_REF_PROPERTY_INLINE(FontInstance, Instance)
 };
 
 class SLIB_EXPORT FontInstance : public Object

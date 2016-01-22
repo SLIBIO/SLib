@@ -13,6 +13,7 @@
 @end
 
 SLIB_UI_NAMESPACE_BEGIN
+
 Ref<ViewInstance> RadioButton::createInstance(ViewInstance* _parent)
 {
 	OSX_VIEW_CREATE_INSTANCE_BEGIN
@@ -86,6 +87,7 @@ void RadioButton::setChecked(sl_bool flag)
 	}
 	m_flagSelected = flag;
 }
+
 SLIB_UI_NAMESPACE_END
 
 @implementation _Slib_OSX_RadioButton

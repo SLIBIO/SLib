@@ -24,6 +24,7 @@ class SLIB_EXPORT Canvas : public Object
 public:
 	Ref<GraphicsContext> getGraphicsContext();
 	
+public:
 	virtual Size getSize() = 0;
 	
 	virtual Rectangle getInvalidatedRect() = 0;
@@ -36,208 +37,129 @@ public:
 	
 	virtual void setAntiAlias(sl_bool flag) = 0;
 	
+	
 	virtual void clipToRectangle(const Rectangle& rect) = 0;
 	
+	void clipToRectangle(sl_real x, sl_real y, sl_real width, sl_real height);
+	
+	
 	virtual void clipToPath(const Ref<GraphicsPath>& path) = 0;
-
+	
+	virtual void clipToRoundRect(const Rectangle& rect, const Size& radius);
+	
+	void clipToRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real rx, sl_real ry);
+	
+	virtual void clipToEllipse(const Rectangle& rect);
+	
+	void clipToEllipse(sl_real x, sl_real y, sl_real width, sl_real height);
+	
 	
 	// concat matrix to the left (pre-concat)
 	virtual void concatMatrix(const Matrix3& matrix) = 0;
-
 	
+	virtual void translate(sl_real dx, sl_real dy);
+	
+	virtual void rotate(sl_real radians);
+	
+	virtual void rotate(sl_real cx, sl_real cy, sl_real radians);
+	
+	virtual void scale(sl_real sx, sl_real sy);
+	
+
+	Size getTextSize(const Ref<Font>& font, const String& text);
+
 	virtual void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color) = 0;
+	
+	void drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment);
 	
 	
 	virtual void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& pen) = 0;
 	
+	void drawLine(sl_real x1, sl_real y1, sl_real x2, sl_real y2, const Ref<Pen>& pen);
+	
+	
 	virtual void drawLines(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen) = 0;
+	
+	void drawLines(const List<Point>& points, const Ref<Pen>& pen);
+	
 	
 	virtual void drawArc(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen) = 0;
 
+	void drawArc(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen);
+	
 	
 	virtual void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush) = 0;
 	
+	void drawRectangle(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Pen>& pen, const Ref<Brush>& brush);
+	
+	void drawRectangle(const Rectangle& rc, const Ref<Pen>& pen);
+	
+	void drawRectangle(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Pen>& pen);
+	
+	void fillRectangle(const Rectangle& rc, const Ref<Brush>& brush);
+	
+	void fillRectangle(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Brush>& brush);
+	
+	
 	virtual void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& pen, const Ref<Brush>& brush) = 0;
+	
+	void drawRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real rx, sl_real ry, const Ref<Pen>& pen, const Ref<Brush>& brush);
+	
+	void drawRoundRect(const Rectangle& rc, const Size& radius, const Ref<Pen>& pen);
+	
+	void drawRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real rx, sl_real ry, const Ref<Pen>& pen);
+	
+	void fillRoundRect(const Rectangle& rc, const Size& radius, const Ref<Brush>& brush);
+	
+	void fillRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real rx, sl_real ry, const Ref<Brush>& brush);
+	
 	
 	virtual void drawEllipse(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush) = 0;
 	
+	void drawEllipse(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Pen>& pen, const Ref<Brush>& brush);
+	
+	void drawEllipse(const Rectangle& rc, const Ref<Pen>& pen);
+	
+	void drawEllipse(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Pen>& pen);
+	
+	void fillEllipse(const Rectangle& rc, const Ref<Brush>& brush);
+	
+	void fillEllipse(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Brush>& brush);
+	
+	
 	virtual void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode = fillMode_Alternate) = 0;
+	
+	void drawPolygon(const List<Point>& points, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode = fillMode_Alternate);
+	
+	void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen);
+	
+	void drawPolygon(const List<Point>& points, const Ref<Pen>& pen);
+	
+	void fillPolygon(const Point* points, sl_uint32 countPoints, const Ref<Brush>& brush);
+	
+	void fillPolygon(const List<Point>& points, const Ref<Brush>& brush);
+	
 	
 	virtual void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Ref<Brush>& brush) = 0;
 	
+	void drawPie(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Ref<Brush>& brush);
+	
+	void drawPie(const Rectangle& rc, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen);
+	
+	void drawPie(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen);
+	
+	void fillPie(const Rectangle& rc, sl_real startDegrees, sl_real sweepDegrees, const Ref<Brush>& brush);
+	
+	void fillPie(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, const Ref<Brush>& brush);
+	
+	
 	virtual void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen, const Ref<Brush>& brush) = 0;
 
-public:
-	SLIB_INLINE void clipToRectangle(sl_real x, sl_real y, sl_real width, sl_real height)
-	{
-		clipToRectangle(Rectangle(x, y, x + width, y + height));
-	}
+	void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen);
 	
-	SLIB_INLINE void clipToRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real rx, sl_real ry)
-	{
-		clipToRoundRect(Rectangle(x, y, x + width, y + height), Size(rx, ry));
-	}
+	void fillPath(const Ref<GraphicsPath>& path, const Ref<Brush>& brush);
 	
-	SLIB_INLINE void clipToEllipse(sl_real x, sl_real y, sl_real width, sl_real height)
-	{
-		clipToEllipse(Rectangle(x, y, x+width, y+height));
-	}
-
-	SLIB_INLINE void drawLine(sl_real x1, sl_real y1, sl_real x2, sl_real y2, const Ref<Pen>& pen)
-	{
-		drawLine(Point(x1, y1), Point(x2, y2), pen);
-	}
 	
-	void drawLines(const List<Point>& _points, const Ref<Pen>& pen)
-	{
-		ListLocker<Point> points(_points);
-		drawLines(points.data(), (sl_uint32)(points.getCount()), pen);
-	}
-	
-	SLIB_INLINE void drawArc(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen)
-	{
-		drawArc(Rectangle(x, y, x + width, y + height), startDegrees, sweepDegrees, pen);
-	}
-
-	SLIB_INLINE void drawRectangle(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Pen>& pen, const Ref<Brush>& brush)
-	{
-		drawRectangle(Rectangle(x, y, x+width, y+height), pen, brush);
-	}
-	
-	SLIB_INLINE void drawRectangle(const Rectangle& rc, const Ref<Pen>& pen)
-	{
-		drawRectangle(rc, pen, Ref<Brush>::null());
-	}
-
-	SLIB_INLINE void drawRectangle(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Pen>& pen)
-	{
-		drawRectangle(Rectangle(x, y, x+width, y+height), pen, Ref<Brush>::null());
-	}
-	
-	SLIB_INLINE void fillRectangle(const Rectangle& rc, const Ref<Brush>& brush)
-	{
-		drawRectangle(rc, Ref<Pen>::null(), brush);
-	}
-	
-	SLIB_INLINE void fillRectangle(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Brush>& brush)
-	{
-		drawRectangle(Rectangle(x, y, x+width, y+height), Ref<Pen>::null(), brush);
-	}
-	
-	SLIB_INLINE void drawRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real rx, sl_real ry, const Ref<Pen>& pen, const Ref<Brush>& brush)
-	{
-		drawRoundRect(Rectangle(x, y, x + width, y + height), Size(rx, ry), pen, brush);
-	}
-	
-	SLIB_INLINE void drawRoundRect(const Rectangle& rc, const Size& radius, const Ref<Pen>& pen)
-	{
-		drawRoundRect(rc, radius, pen, Ref<Brush>::null());
-	}
-	
-	SLIB_INLINE void drawRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real rx, sl_real ry, const Ref<Pen>& pen)
-	{
-		drawRoundRect(Rectangle(x, y, x+width, y+height), Size(rx, ry), pen, Ref<Brush>::null());
-	}
-	
-	SLIB_INLINE void fillRoundRect(const Rectangle& rc, const Size& radius, const Ref<Brush>& brush)
-	{
-		drawRoundRect(rc, radius, Ref<Pen>::null(), brush);
-	}
-	
-	SLIB_INLINE void fillRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real rx, sl_real ry, const Ref<Brush>& brush)
-	{
-		drawRoundRect(Rectangle(x, y, x+width, y+height), Size(rx, ry), Ref<Pen>::null(), brush);
-	}
-
-	SLIB_INLINE void drawEllipse(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Pen>& pen, const Ref<Brush>& brush)
-	{
-		drawEllipse(Rectangle(x, y, x+width, y+height), pen, brush);
-	}
-	
-	SLIB_INLINE void drawEllipse(const Rectangle& rc, const Ref<Pen>& pen)
-	{
-		drawEllipse(rc, pen, Ref<Brush>::null());
-	}
-	
-	SLIB_INLINE void drawEllipse(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Pen>& pen)
-	{
-		drawEllipse(Rectangle(x, y, x+width, y+height), pen, Ref<Brush>::null());
-	}
-	
-	SLIB_INLINE void fillEllipse(const Rectangle& rc, const Ref<Brush>& brush)
-	{
-		drawEllipse(rc, Ref<Pen>::null(), brush);
-	}
-	
-	SLIB_INLINE void fillEllipse(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Brush>& brush)
-	{
-		drawEllipse(Rectangle(x, y, x+width, y+height), Ref<Pen>::null(), brush);
-	}
-	
-	void drawPolygon(const List<Point>& _points, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode = fillMode_Alternate)
-	{
-		ListLocker<Point> points(_points);
-		drawPolygon(points.data(), (sl_uint32)(points.getCount()), pen, brush, fillMode);
-	}
-	
-	SLIB_INLINE void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen)
-	{
-		drawPolygon(points, countPoints, pen, Ref<Brush>::null());
-	}
-	
-	void drawPolygon(const List<Point>& _points, const Ref<Pen>& pen)
-	{
-		ListLocker<Point> points(_points);
-		drawPolygon(points.data(), (sl_uint32)(points.getCount()), pen, Ref<Brush>::null());
-	}
-	
-	SLIB_INLINE void fillPolygon(const Point* points, sl_uint32 countPoints, const Ref<Brush>& brush)
-	{
-		drawPolygon(points, countPoints, Ref<Pen>::null(), brush);
-	}
-	
-	void fillPolygon(const List<Point>& _points, const Ref<Brush>& brush)
-	{
-		ListLocker<Point> points(_points);
-		drawPolygon(points.data(), (sl_uint32)(points.getCount()), Ref<Pen>::null(), brush);
-	}
-	
-	SLIB_INLINE void drawPie(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Ref<Brush>& brush)
-	{
-		drawPie(Rectangle(x, y, x + width, y + height), startDegrees, sweepDegrees, pen, brush);
-	}
-	
-	SLIB_INLINE void drawPie(const Rectangle& rc, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen)
-	{
-		drawPie(rc, startDegrees, sweepDegrees, pen, Ref<Brush>::null());
-	}
-	
-	SLIB_INLINE void drawPie(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen)
-	{
-		drawPie(Rectangle(x, y, x+width, y+height), startDegrees, sweepDegrees, pen, Ref<Brush>::null());
-	}
-	
-	SLIB_INLINE void fillPie(const Rectangle& rc, sl_real startDegrees, sl_real sweepDegrees, const Ref<Brush>& brush)
-	{
-		drawPie(rc, startDegrees, sweepDegrees, Ref<Pen>::null(), brush);
-	}
-	
-	SLIB_INLINE void fillPie(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, const Ref<Brush>& brush)
-	{
-		drawPie(Rectangle(x, y, x+width, y+height), startDegrees, sweepDegrees, Ref<Pen>::null(), brush);
-	}
-	
-	SLIB_INLINE void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen)
-	{
-		drawPath(path, pen, Ref<Brush>::null());
-	}
-	
-	SLIB_INLINE void fillPath(const Ref<GraphicsPath>& path, const Ref<Brush>& brush)
-	{
-		drawPath(path, Ref<Pen>::null(), brush);
-	}
-
-public:
 	void draw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc);
 	
 	void draw(const Rectangle& rectDst, const Ref<Drawable>& src);
@@ -249,30 +171,11 @@ public:
 
 	void draw(sl_real xDst, sl_real yDst, const Ref<Drawable>& drawable);
 	
-public:
-	virtual void clipToRoundRect(const Rectangle& rect, const Size& radius);
-	
-	virtual void clipToEllipse(const Rectangle& rect);
-
-	
-	virtual void translate(sl_real dx, sl_real dy);
-	
-	virtual void rotate(sl_real radians);
-	
-	virtual void rotate(sl_real cx, sl_real cy, sl_real radians);
-	
-	virtual void scale(sl_real sx, sl_real sy);
-	
-public:
-	Size getTextSize(const Ref<Font>& font, const String& text);
-	
-	void drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment);
-	
-	
 	void draw(const Rectangle& rectDst, const Ref<Drawable>& src, ScaleMode scaleMode, Alignment alignment);
 	
 protected:
-	WeakRef<GraphicsContext> m_context;
+	SafeWeakRef<GraphicsContext> m_context;
+	
 };
 
 class SLIB_EXPORT CanvasStatusScope

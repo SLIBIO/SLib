@@ -80,10 +80,12 @@ public:
 		return m_desc.miterLimit;
 	}
 
+public:
+	SLIB_REF_PROPERTY(PenInstance, Instance)
+
 protected:
 	PenDesc m_desc;
 	
-	SLIB_REF_PROPERTY_INLINE(PenInstance, Instance)
 };
 
 class SLIB_EXPORT PenInstance : public Object

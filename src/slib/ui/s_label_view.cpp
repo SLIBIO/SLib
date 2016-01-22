@@ -1,6 +1,7 @@
 #include "../../../inc/slib/ui/s_label_view.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 SLabelView::SLabelView()
 {
 	m_textAlignment = alignMiddleLeft;
@@ -55,4 +56,5 @@ void SLabelView::onDraw(Canvas* canvas)
 	Rectangle bound = getContentBounds();
 	canvas->drawText(m_text, bound, m_font, m_textColor, m_textAlignment);
 }
+
 SLIB_UI_NAMESPACE_END

@@ -6,10 +6,11 @@ SLIB_UI_NAMESPACE_BEGIN
 class _SCheckBox_Icon : public Drawable
 {
 public:
-	Ref<Pen> m_penBorder;
-	Ref<Brush> m_brush;
-	Ref<Pen> m_penCheck;
+	SafeRef<Pen> m_penBorder;
+	SafeRef<Brush> m_brush;
+	SafeRef<Pen> m_penCheck;
 	
+public:
 	_SCheckBox_Icon(const Ref<Pen>& penBorder, const Color& backColor, const Ref<Pen>& penCheck)
 	{
 		m_penBorder = penBorder;
@@ -19,16 +20,20 @@ public:
 		m_penCheck = penCheck;
 	}
 	
+public:
+	// override
 	sl_real getDrawableWidth()
 	{
 		return 1;
 	}
 	
+	// override
 	sl_real getDrawableHeight()
 	{
 		return 1;
 	}
 	
+	// override
 	void onDraw(Canvas* canvas, const Rectangle& _rectDst, const Rectangle& rectSrc)
 	{
 		Rectangle rectDst = GraphicsUtil::transformRectangle(_rectDst, rectSrc, Rectangle(0, 0, 1, 1));
@@ -56,6 +61,7 @@ class _SCheckBox_Categories
 public:
 	SButtonCategory categories[2];
 	
+public:
 	_SCheckBox_Categories()
 	{
 		Color colorBackNormal = Color::white();
@@ -84,6 +90,7 @@ public:
 		categories[1].properties[buttonState_Down].icon = new _SCheckBox_Icon(penDown, colorBackDown, penCheckDown);
 	}
 	
+public:
 	static _SCheckBox_Categories* get()
 	{
 		SLIB_SAFE_STATIC(_SCheckBox_Categories, ret);
@@ -131,4 +138,5 @@ void SCheckBox::dispatchClick()
 	}
 	SButton::dispatchClick();
 }
+
 SLIB_UI_NAMESPACE_END

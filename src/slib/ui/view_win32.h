@@ -59,16 +59,66 @@ public:
 
 public:
 	virtual sl_bool preprocessWindowMessage(MSG& msg);
+
 	virtual sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result);
+
 	virtual sl_bool processCommand(SHORT code, LRESULT& result);
+
 	virtual sl_bool processNotify(NMHDR* nmhdr, LRESULT& result);
+
 	virtual sl_bool processControlColor(UINT msg, HDC hDC, HBRUSH& result);
+
 	virtual void processPostControlColor(UINT msg, HDC hDC, HBRUSH& result);
 
+public:
+	// override
+	sl_bool isValid();
+
+	// override
+	void setFocus();
+
+	// override
+	void invalidate();
+
+	// override
+	void invalidate(const Rectangle& rect);
+
+	// override
+	Rectangle getFrame();
+
+	// override
+	void setFrame(const Rectangle& frame);
+
+	// override
+	void setVisible(sl_bool flag);
+
+	// override
+	void setEnabled(sl_bool flag);
+
+	// override
+	void setOpaque(sl_bool flag);
+
+	// override
+	Point convertCoordinateFromScreenToView(const Point& ptScreen);
+
+	// override
+	Point convertCoordinateFromViewToScreen(const Point& ptView);
+
+	// override
+	void addChildInstance(const Ref<ViewInstance>& instance);
+
+	// override
+	void removeChildInstance(const Ref<ViewInstance>& instance);
+
+public:
 	sl_bool onEventKey(sl_bool flagDown, WPARAM wParam, LPARAM lParam);
+
 	sl_bool onEventMouse(UIEventAction action, WPARAM wParam, LPARAM lParam);
+
 	sl_bool onEventMouseWheel(sl_bool flagVertical, WPARAM wParam, LPARAM lParam);
+
 	sl_bool onEventSetCursor();
+
 	void applyModifiers(UIEvent* ev);
 
 protected:
@@ -84,7 +134,6 @@ class Win32_View_Shared
 public:
 	ATOM wndClass;
 	HFONT hFontDefault;
-
 
 public:
 	Win32_View_Shared();

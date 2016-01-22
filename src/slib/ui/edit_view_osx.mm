@@ -39,6 +39,7 @@
 @end
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _EditView : public EditView
 {
 public:
@@ -108,7 +109,7 @@ public:
 		if (EditView::checkInstance(_view)) {
 			_EditView* view = (_EditView*)(_view.get());
 			String text = Apple::getStringFromNSString([control stringValue]);
-			String textNew = view->onChange(text);
+			String textNew = view->dispatchChange(text);
 			if (text != textNew) {
 				NSString* str = Apple::getNSStringFromString(textNew);
 				[control setStringValue:str];
@@ -122,7 +123,7 @@ public:
 		if (EditView::checkInstance(_view)) {
 			_EditView* view = (_EditView*)(_view.get());
 			String text = Apple::getStringFromNSString([control->textView string]);
-			String textNew = view->onChange(text);
+			String textNew = view->dispatchChange(text);
 			if (text != textNew) {
 				NSString* str = Apple::getNSStringFromString(textNew);
 				[control->textView setString:str];
@@ -417,6 +418,7 @@ void EditView::setFont(const Ref<Font>& font)
 	}
 	m_font = font;
 }
+
 SLIB_UI_NAMESPACE_END
 
 @implementation _Slib_OSX_TextField

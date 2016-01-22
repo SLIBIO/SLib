@@ -14,6 +14,7 @@
 @end
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _ScrollView : public ScrollView
 {
 public:
@@ -152,6 +153,7 @@ Size ScrollView::getScrollRange()
 	}
 	return Size::zero();
 }
+
 SLIB_UI_NAMESPACE_END
 
 @implementation _Slib_OSX_ScrollView

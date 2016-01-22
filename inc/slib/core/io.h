@@ -756,7 +756,7 @@ public:
 	sl_bool setSize(sl_uint64 size);
 
 public:
-	SLIB_BOOLEAN_PROPERTY_INLINE(AutoExpandable)
+	SLIB_BOOLEAN_PROPERTY(AutoExpandable)
 
 protected:
 	void* m_buf;
@@ -924,7 +924,7 @@ public:
 	Memory build(MemoryBuffer& buf);
 
 public:
-	SLIB_PROPERTY_INLINE(sl_uint32, MaxDatagramSize)
+	SLIB_PROPERTY(sl_uint32, MaxDatagramSize)
 
 protected:
 	MemoryBuffer m_buf;

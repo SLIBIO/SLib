@@ -3,6 +3,7 @@
 #include "../../../inc/slib/ui/core.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 ViewGroup::ViewGroup()
 {
 	setGroup(sl_true);
@@ -14,26 +15,21 @@ void ViewGroup::removeAllChildren()
 		UI::runOnUIThread(SLIB_CALLBACK_WEAKREF(ViewGroup, removeAllChildren, this));
 		return;
 	}
-	ListLocker< Ref<View> > children(m_children.duplicate());
-	for (sl_size i = 0; i < children.getCount(); i++) {
-		Ref<View> child = children[i];
+	ListLocker< Ref<View> > children(m_children);
+	for (sl_size i = 0; i < children.count(); i++) {
+		const Ref<View>& child = children[i];
 		if (child.isNotNull()) {
-			removeChild(child.get());
+			_removeChild(child);
 		}
 	}
+	m_children.removeAll_NoLock();
 }
 
 void ViewGroup::removeChild(const Ref<View>& view)
 {
 	if (view.isNotNull()) {
-		ObjectLocker lock(view.get());
-		Ref<ViewInstance> instanceChild = view->getViewInstance();
-		if (instanceChild.isNotNull()) {
-			removeChildInstance(instanceChild.get());
-		}
+		_removeChild(view);
 		m_children.removeValue(view);
-		view->detach();
-		view->removeParent(this);
 	}
 }
 
@@ -58,8 +54,20 @@ void ViewGroup::onAttach()
 	}
 }
 
-const List< Ref<View> >& ViewGroup::getChildren()
+List< Ref<View> > ViewGroup::getChildren()
 {
-	return m_children;
+	return m_children.duplicate();
 }
+
+void ViewGroup::_removeChild(const Ref<View>& child)
+{
+	ObjectLocker lock(child.get());
+	Ref<ViewInstance> instanceChild = child->getViewInstance();
+	if (instanceChild.isNotNull()) {
+		removeChildInstance(instanceChild.get());
+	}
+	child->detach();
+	child->removeParent(this);
+}
+
 SLIB_UI_NAMESPACE_END

@@ -5,6 +5,7 @@
 #include "../../../inc/slib/ui/core.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 TabView::TabView()
 {
 	m_items.setCount(1);
@@ -105,9 +106,6 @@ void TabView::onSelectTab(sl_uint32 index)
 	}
 }
 
-TabView::TabViewItem::TabViewItem()
-{
-}
 SLIB_UI_NAMESPACE_END
 
 #endif

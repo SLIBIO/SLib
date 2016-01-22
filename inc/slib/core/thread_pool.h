@@ -27,9 +27,9 @@ public:
 	sl_bool addTask(const Ref<Runnable>& task);
 
 public:
-	SLIB_PROPERTY_INLINE(sl_uint32, MinimumThreadsCount)
-	SLIB_PROPERTY_INLINE(sl_uint32, MaximumThreadsCount)
-	SLIB_PROPERTY_INLINE(sl_uint32, ThreadStackSize)
+	SLIB_PROPERTY(sl_uint32, MinimumThreadsCount)
+	SLIB_PROPERTY(sl_uint32, MaximumThreadsCount)
+	SLIB_PROPERTY(sl_uint32, ThreadStackSize)
 
 protected:
 	void onRunWorker();

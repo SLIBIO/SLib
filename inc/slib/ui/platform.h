@@ -158,6 +158,7 @@ private:
 	static void _registerWindowInstance(const void* handle, WindowInstance* instance);
 	static void _removeWindowInstance(const void* handle);
 };
+
 SLIB_UI_NAMESPACE_END
 
 #if defined(SLIB_PLATFORM_IS_WIN32)

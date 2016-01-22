@@ -6,7 +6,17 @@ AudioEncoder::AudioEncoder()
 {
 	m_nSamplesPerSecond = 0;
 	m_nChannels = 0;
-	AudioEncoder::setBitrate(0);
+	m_bitrate = 0;
+}
+
+sl_uint32 AudioEncoder::getBitrate()
+{
+	return m_bitrate;
+}
+
+void AudioEncoder::setBitrate(sl_uint32 bitrate)
+{
+	m_bitrate = bitrate;
 }
 
 AudioDecoder::AudioDecoder()

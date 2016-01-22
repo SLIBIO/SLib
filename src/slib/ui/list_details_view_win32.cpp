@@ -9,6 +9,7 @@
 #include <commctrl.h>
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _ListDetailsView : public ListDetailsView
 {
 public:
@@ -87,16 +88,19 @@ public:
 class _Win32_ListDetailsViewInstance : public Win32_ViewInstance
 {
 public:
+    // override
 	sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 	{
 		return sl_false;
 	}
 
+    // override
 	sl_bool processCommand(SHORT code, LRESULT& result)
 	{
 		return sl_false;
 	}
 
+    // override
 	sl_bool processNotify(NMHDR* nmhdr, LRESULT& result)
 	{
 		Ref<View> _view = getView();
@@ -261,6 +265,7 @@ void ListDetailsView::setFont(const Ref<Font>& font)
 	m_font = font;
 	m_fontInstance = fontInstance;
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

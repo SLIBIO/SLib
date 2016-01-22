@@ -57,11 +57,14 @@ public:
 	RenderProgram2D();
 	
 public:
-	virtual Ref<RenderProgramInfo> create(RenderEngine* engine);
+	// override
+	Ref<RenderProgramInfo> create(RenderEngine* engine);
 	
-	virtual sl_bool onInit(RenderEngine* engine, RenderProgramInfo* info);
+	// override
+	sl_bool onInit(RenderEngine* engine, RenderProgramInfo* info);
 	
-	virtual sl_bool onBeginProgram(RenderEngine* engine, RenderProgramInfo* info);
+	// override
+	sl_bool onBeginProgram(RenderEngine* engine, RenderProgramInfo* info);
 	
 public:
 	Ref<Texture> getTexture(sl_uint32 no);
@@ -73,13 +76,13 @@ public:
 	void setTexture(const Ref<Texture>& texture);
 	
 public:
-	SLIB_PROPERTY_INLINE(Matrix3, Transform)
+	SLIB_PROPERTY(Matrix3, Transform)
 	
-	SLIB_PROPERTY_INLINE(Matrix3, TextureTransform)
+	SLIB_PROPERTY(Matrix3, TextureTransform)
 
-	SLIB_PROPERTY_INLINE(Color3f, Color)
+	SLIB_PROPERTY(Color3f, Color)
 	
-	SLIB_PROPERTY_INLINE(float, Alpha)
+	SLIB_PROPERTY(float, Alpha)
 
 public:
 	class Info_GL : public RenderProgramInfo
@@ -114,13 +117,17 @@ public:
 	};
     
 public:
-	virtual String getGLSLVertexShader(RenderEngine* engine);
+	// override
+	String getGLSLVertexShader(RenderEngine* engine);
 	
-	virtual String getGLSLFragmentShader(RenderEngine* engine);
+	// override
+	String getGLSLFragmentShader(RenderEngine* engine);
 	
-	virtual sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	// override
+	sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
 	
-	virtual void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	// override
+	void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
 	
 };
 
@@ -128,7 +135,8 @@ public:
 class SLIB_EXPORT RenderProgram2D_PositionTextureYUV : public RenderProgram2D_PositionTexture
 {
 public:
-	virtual String getGLSLFragmentShader(RenderEngine* engine);
+	// override
+	String getGLSLFragmentShader(RenderEngine* engine);
 	
 };
 
@@ -143,13 +151,17 @@ public:
 	};
     
 public:
-	virtual String getGLSLVertexShader(RenderEngine* engine);
+	// override
+	String getGLSLVertexShader(RenderEngine* engine);
 	
-	virtual String getGLSLFragmentShader(RenderEngine* engine);
+	// override
+	String getGLSLFragmentShader(RenderEngine* engine);
 	
-	virtual sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	// override
+	sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
 	
-	virtual void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	// override
+	void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
 	
 };
 
@@ -163,13 +175,17 @@ public:
 	};
     
 public:
-	virtual String getGLSLVertexShader(RenderEngine* engine);
+	// override
+	String getGLSLVertexShader(RenderEngine* engine);
 	
-	virtual String getGLSLFragmentShader(RenderEngine* engine);
+	// override
+	String getGLSLFragmentShader(RenderEngine* engine);
 	
-	virtual sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	// override
+	sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
 	
-	virtual void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	// override
+	void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
 	
 };
 
@@ -180,11 +196,14 @@ public:
 	RenderProgram3D();
 
 public:
-	virtual Ref<RenderProgramInfo> create(RenderEngine* engine);
+	// override
+	Ref<RenderProgramInfo> create(RenderEngine* engine);
 	
-	virtual sl_bool onInit(RenderEngine* engine, RenderProgramInfo* info);
+	// override
+	sl_bool onInit(RenderEngine* engine, RenderProgramInfo* info);
 	
-	virtual sl_bool onBeginProgram(RenderEngine* engine, RenderProgramInfo* info);
+	// override
+	sl_bool onBeginProgram(RenderEngine* engine, RenderProgramInfo* info);
 
 public:
 	const Matrix4& getModelMatrix();
@@ -235,15 +254,15 @@ public:
 	void setTextureAlpha(sl_uint32 no, float alpha);
 	
 public:
-	SLIB_PROPERTY_INLINE(Vector3, DirectionalLight)
+	SLIB_PROPERTY(Vector3, DirectionalLight)
 	
-	SLIB_PROPERTY_INLINE(Color3f, DiffuseColor)
+	SLIB_PROPERTY(Color3f, DiffuseColor)
 	
-	SLIB_PROPERTY_INLINE(Color3f, AmbientColor)
+	SLIB_PROPERTY(Color3f, AmbientColor)
 	
-	SLIB_PROPERTY_INLINE(float, Alpha)
+	SLIB_PROPERTY(float, Alpha)
 	
-	SLIB_PROPERTY_INLINE(Matrix3, TextureTransform)
+	SLIB_PROPERTY(Matrix3, TextureTransform)
 
 public:
 	class Info_GL : public RenderProgramInfo
@@ -304,13 +323,17 @@ public:
 	};
     
 public:
-	virtual String getGLSLVertexShader(RenderEngine* engine);
+	// override
+	String getGLSLVertexShader(RenderEngine* engine);
 	
-	virtual String getGLSLFragmentShader(RenderEngine* engine);
+	// override
+	String getGLSLFragmentShader(RenderEngine* engine);
 	
-	virtual sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	// override
+	sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
 	
-	virtual void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	// override
+	void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
 	
 };
 
@@ -325,13 +348,17 @@ public:
 	};
     
 public:
-	virtual String getGLSLVertexShader(RenderEngine* engine);
+	// override
+	String getGLSLVertexShader(RenderEngine* engine);
 	
-	virtual String getGLSLFragmentShader(RenderEngine* engine);
+	// override
+	String getGLSLFragmentShader(RenderEngine* engine);
 	
-	virtual sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	// override
+	sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
 	
-	virtual void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	// override
+	void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
 	
 };
 
@@ -347,13 +374,17 @@ public:
 	};
     
 public:
-	virtual String getGLSLVertexShader(RenderEngine* engine);
+	// override
+	String getGLSLVertexShader(RenderEngine* engine);
 	
-	virtual String getGLSLFragmentShader(RenderEngine* engine);
+	// override
+	String getGLSLFragmentShader(RenderEngine* engine);
 	
-	virtual sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	// override
+	sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
 	
-	virtual void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	// override
+	void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
 	
 };
 
@@ -368,13 +399,17 @@ public:
 	};
 
 public:
-	virtual String getGLSLVertexShader(RenderEngine* engine);
+	// override
+	String getGLSLVertexShader(RenderEngine* engine);
 	
-	virtual String getGLSLFragmentShader(RenderEngine* engine);
+	// override
+	String getGLSLFragmentShader(RenderEngine* engine);
 	
-	virtual sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	// override
+	sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
 	
-	virtual void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	// override
+	void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
 	
 };
 
@@ -389,13 +424,17 @@ public:
 	};
     
 public:
-	virtual String getGLSLVertexShader(RenderEngine* engine);
+	// override
+	String getGLSLVertexShader(RenderEngine* engine);
 	
-	virtual String getGLSLFragmentShader(RenderEngine* engine);
+	// override
+	String getGLSLFragmentShader(RenderEngine* engine);
 	
-	virtual sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	// override
+	sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
 	
-	virtual void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	// override
+	void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
 	
 };
 
@@ -409,13 +448,17 @@ public:
 	};
 
 public:
-	virtual String getGLSLVertexShader(RenderEngine* engine);
+	// override
+	String getGLSLVertexShader(RenderEngine* engine);
 	
-	virtual String getGLSLFragmentShader(RenderEngine* engine);
+	// override
+	String getGLSLFragmentShader(RenderEngine* engine);
 	
-	virtual sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	// override
+	sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
 	
-	virtual void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	// override
+	void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
 	
 };
 

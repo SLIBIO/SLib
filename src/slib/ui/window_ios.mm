@@ -30,16 +30,24 @@ SLIB_UI_NAMESPACE_END
 @end
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _iOS_Window : public WindowInstance
 {
 public:
 	UIView* m_window;
-	Ref<ViewInstance> m_viewContent;
+	SafeRef<ViewInstance> m_viewContent;
 	
+public:
 	_iOS_Window()
 	{
 	}
 	
+	~_iOS_Window()
+	{
+		release();
+	}
+	
+public:
 	static Ref<_iOS_Window> create(UIView* view)
 	{
 		Ref<_iOS_Window> ret;
@@ -99,11 +107,6 @@ public:
 		return ret;
 	}
 	
-	~_iOS_Window()
-	{
-		release();
-	}
-	
 	void release()
 	{
 		UIView* window = m_window;
@@ -117,7 +120,7 @@ public:
 		m_window = nil;
 	}
 	
-	const Ref<ViewInstance>& getContentView()
+	Ref<ViewInstance> getContentView()
 	{
 		return m_viewContent;
 	}
@@ -168,43 +171,8 @@ public:
 		return sl_false;
 	}
 	
-	String getTitle()
+	void runModal()
 	{
-		return String::null();
-	}
-	
-	sl_bool setTitle(const String& title)
-	{
-		return sl_false;
-	}
-	
-	Color getBackgroundColor()
-	{
-		UIView* window = m_window;
-		if (window != nil) {
-			UIColor* color = [window backgroundColor];
-			if (color == nil) {
-				return Color::zero();
-			}
-			return UIPlatform::getColorFromUIColor(color);
-		}
-		return Color::transparent();
-	}
-	
-	sl_bool setBackgroundColor(const Color& _color)
-	{
-		UIView* window = m_window;
-		if (window != nil) {
-			UIColor* color;
-			if (_color.isZero()) {
-				color = nil;
-			} else {
-				color = UIPlatform::getUIColorFromColor(_color);
-			}
-			[window setBackgroundColor:color];
-			return sl_true;
-		}
-		return sl_false;
 	}
 	
 	Rectangle getFrame()
@@ -276,6 +244,45 @@ public:
 		return sl_false;
 	}
 	
+	String getTitle()
+	{
+		return String::null();
+	}
+	
+	sl_bool setTitle(const String& title)
+	{
+		return sl_false;
+	}
+	
+	Color getBackgroundColor()
+	{
+		UIView* window = m_window;
+		if (window != nil) {
+			UIColor* color = [window backgroundColor];
+			if (color == nil) {
+				return Color::zero();
+			}
+			return UIPlatform::getColorFromUIColor(color);
+		}
+		return Color::transparent();
+	}
+	
+	sl_bool setBackgroundColor(const Color& _color)
+	{
+		UIView* window = m_window;
+		if (window != nil) {
+			UIColor* color;
+			if (_color.isZero()) {
+				color = nil;
+			} else {
+				color = UIPlatform::getUIColorFromColor(_color);
+			}
+			[window setBackgroundColor:color];
+			return sl_true;
+		}
+		return sl_false;
+	}
+
 	sl_bool isMinimized()
 	{
 		return sl_false;
@@ -527,9 +534,6 @@ public:
 		return sizeWindow;
 	}
 	
-	void runModal()
-	{
-	}
 };
 
 

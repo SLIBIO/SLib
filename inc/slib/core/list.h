@@ -29,10 +29,15 @@ public:
 	{
 		_init();
 	}
-
+	
 	SLIB_INLINE CList(sl_size count)
 	{
-		_init(count);
+		_init(count, count);
+	}
+	
+	SLIB_INLINE CList(sl_size count, sl_size capacity)
+	{
+		_init(count, capacity);
 	}
 	
 	template <class _T>
@@ -67,9 +72,25 @@ public:
 		}
 		return sl_null;
 	}
+
+	static _Type* create(sl_size count, sl_size capacity)
+	{
+		if (count > 0 || capacity > 0) {
+			_Type* ret = new _Type(count, capacity);
+			if (ret) {
+				if (ret->m_capacity > 0) {
+					return ret;
+				}
+				delete ret;
+			}
+		} else {
+			return new _Type;
+		}
+		return sl_null;
+	}
 	
 	template <class _T>
-	static _Type* create(const _T* values, sl_size count)
+	static _Type* createFromElements(const _T* values, sl_size count)
 	{
 		if (count > 0) {
 			_Type* ret = new _Type(values, count);
@@ -84,16 +105,7 @@ public:
 		}
 		return sl_null;
 	}
-	
-	template <class _T, class _COMPARE>
-	static _Type* createCopy(CList<_T, _COMPARE>* other)
-	{
-		if (other) {
-			return create(other->data(), other->count());
-		}
-		return sl_null;
-	}
-	
+
 	static _Type* createFromElement(const T& value)
 	{
 		_Type* ret = create(1);
@@ -102,6 +114,15 @@ public:
 				return ret;
 			}
 			delete ret;
+		}
+		return sl_null;
+	}
+	
+	template <class _T, class _COMPARE>
+	static _Type* createCopy(CList<_T, _COMPARE>* other)
+	{
+		if (other) {
+			return createFromElements(other->data(), other->count());
 		}
 		return sl_null;
 	}
@@ -423,7 +444,7 @@ public:
 		return add_NoLock(iterator);
 	}
 	
-	sl_size remove_NoLock(sl_size index, sl_size count)
+	sl_size remove_NoLock(sl_size index, sl_size count = 1)
 	{
 		if (index < m_count && count > 0) {
 			if (count > m_count - index) {
@@ -442,7 +463,7 @@ public:
 		return 0;
 	}
 
-	sl_size remove(sl_size index, sl_size count)
+	sl_size remove(sl_size index, sl_size count = 1)
 	{
 		ObjectLocker lock(this);
 		return remove_NoLock(index, count);
@@ -637,7 +658,7 @@ public:
 	SLIB_INLINE _Type* duplicate_NoLock() const
 	{
 		if (m_count > 0) {
-			return create(m_data, m_count);
+			return createFromElements(m_data, m_count);
 		}
 		return sl_null;
 	}
@@ -692,17 +713,20 @@ protected:
 		m_capacity = 0;
 	}
 	
-	void _init(sl_size count)
+	void _init(sl_size count, sl_size capacity)
 	{
-		if (count > 0) {
-			T* data = (T*)(Base::createMemory(count * sizeof(T)));
+		if (capacity < count) {
+			capacity = count;
+		}
+		if (capacity > 0) {
+			T* data = (T*)(Base::createMemory(capacity * sizeof(T)));
 			if (data) {
 				for (sl_size i = 0; i < count; i++) {
 					new (data + i) T();
 				}
 				m_data = data;
 				m_count = count;
-				m_capacity = count;
+				m_capacity = capacity;
 				return;
 			}
 		}
@@ -877,7 +901,7 @@ public:
 	}
 
 	template <class _T>
-	SLIB_INLINE List(const _T* data, sl_size count) : m_object(_Obj::create(data, count))
+	SLIB_INLINE List(const _T* data, sl_size count) : m_object(_Obj::createFromElements(data, count))
 	{
 	}
 
@@ -899,21 +923,26 @@ public:
 		return _Obj::create(count);
 	}
 	
-	template <class _T>
-	SLIB_INLINE static _Type create(const _T* values, sl_size count)
+	SLIB_INLINE static _Type create(sl_size count, sl_size capacity)
 	{
-		return _Obj::create(values, count);
+		return _Obj::create(count, capacity);
+	}
+	
+	template <class _T>
+	SLIB_INLINE static _Type createFromElements(const _T* values, sl_size count)
+	{
+		return _Obj::createFromElements(values, count);
+	}
+
+	SLIB_INLINE static _Type createFromElement(const T& e)
+	{
+		return _Obj::createFromElement(e);
 	}
 	
 	template <class _T, class _COMPARE>
 	SLIB_INLINE static _Type createCopy(const List<_T, _COMPARE>& other)
 	{
 		return _Obj::createCopy(other.getObject());
-	}
-
-	SLIB_INLINE static _Type createFromElement(const T& e)
-	{
-		return _Obj::createFromElement(e);
 	}
 
 public:
@@ -1579,7 +1608,7 @@ public:
 	}
 	
 	template <class _T>
-	SLIB_INLINE SafeList(const _T* data, sl_size count) : m_object(_Obj::create(data, count))
+	SLIB_INLINE SafeList(const _T* data, sl_size count) : m_object(_Obj::createFromElements(data, count))
 	{
 	}
 	
@@ -1987,7 +2016,13 @@ public:
 		m_data = list.data();
 		m_count = list.count();
 	}
+
+	SLIB_INLINE ~ListLocker()
+	{
+		unlock();
+	}
 	
+public:
 	SLIB_INLINE sl_size getCount()
 	{
 		return m_count;

@@ -58,11 +58,12 @@ public:
 	sl_bool m_flagMaximized;
 	sl_bool m_flagModal;
 
-	Ref<ViewInstance> m_viewContent;
+	SafeRef<ViewInstance> m_viewContent;
 	sl_bool m_flagDestroyOnRelease;
 
 	Color m_backgroundColor;
 
+public:
 	_Win32_Window()
 	{
 		m_flagMinimized = sl_false;
@@ -77,6 +78,7 @@ public:
 		close();
 	}
 
+public:
 	static Ref<_Win32_Window> create(HWND hWnd, sl_bool flagDestroyOnRelease)
 	{
 		Ref<_Win32_Window> ret;
@@ -149,7 +151,7 @@ public:
 		return hWnd;
 	}
 
-	const Ref<ViewInstance>& getContentView()
+	Ref<ViewInstance> getContentView()
 	{
 		return m_viewContent;
 	}
@@ -218,34 +220,16 @@ public:
 		return sl_false;
 	}
 
-	String getTitle()
+	void runModal()
 	{
-		return Windows::getWindowText(m_handle);
-	}
-
-	sl_bool setTitle(const String& title)
-	{
+		m_flagModal = sl_true;
 		HWND hWnd = m_handle;
 		if (hWnd) {
-			Windows::setWindowText(hWnd, title);
-			return sl_true;
+			HWND hWndParent = ::GetParent(hWnd);
+			if (hWndParent) {
+				::EnableWindow(hWndParent, FALSE);
+			}
 		}
-		return sl_false;
-	}
-
-	Color getBackgroundColor()
-	{
-		return m_backgroundColor;
-	}
-
-	sl_bool setBackgroundColor(const Color& color)
-	{
-		HWND hWnd = m_handle;
-		if (hWnd) {
-			m_backgroundColor = color;
-			::InvalidateRect(hWnd, NULL, TRUE);
-		}
-		return sl_false;
 	}
 
 	Rectangle getFrame()
@@ -326,6 +310,36 @@ public:
 				, (int)(dx + size.x), (int)(dy + size.y)
 				, SWP_NOMOVE | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 			return sl_true;
+		}
+		return sl_false;
+	}
+
+	String getTitle()
+	{
+		return Windows::getWindowText(m_handle);
+	}
+
+	sl_bool setTitle(const String& title)
+	{
+		HWND hWnd = m_handle;
+		if (hWnd) {
+			Windows::setWindowText(hWnd, title);
+			return sl_true;
+		}
+		return sl_false;
+	}
+
+	Color getBackgroundColor()
+	{
+		return m_backgroundColor;
+	}
+
+	sl_bool setBackgroundColor(const Color& color)
+	{
+		HWND hWnd = m_handle;
+		if (hWnd) {
+			m_backgroundColor = color;
+			::InvalidateRect(hWnd, NULL, TRUE);
 		}
 		return sl_false;
 	}
@@ -787,17 +801,6 @@ public:
 		}
 	}
 
-	void runModal()
-	{
-		m_flagModal = sl_true;
-		HWND hWnd = m_handle;
-		if (hWnd) {
-			HWND hWndParent = ::GetParent(hWnd);
-			if (hWndParent) {
-				::EnableWindow(hWndParent, FALSE);
-			}
-		}
-	}
 };
 
 LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -855,8 +858,7 @@ LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 						window->onDemaximize();
 						window->onResize(size);
 					} else {
-						// moved to WM_SIZING
-						// window->onResize(size);
+						window->onResize(size);
 					}
 				}
 				break;

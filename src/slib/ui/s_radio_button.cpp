@@ -2,6 +2,7 @@
 #include "../../../inc/slib/graphics/util.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _SRadioButton_Icon : public Drawable
 {
 public:

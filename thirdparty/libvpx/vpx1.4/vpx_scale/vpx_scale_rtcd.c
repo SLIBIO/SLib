@@ -10,9 +10,11 @@
 #include "../vpx_config.h"
 #define RTCD_C
 #include "../vpx_scale_rtcd.h"
+#define _vpx_once once_scale_rtcd
 #include "../vpx_ports/vpx_once.h"
 
 void vpx_scale_rtcd()
 {
-    once(setup_rtcd_internal);
+	_vpx_once(setup_rtcd_internal);
 }
+#undef _vpx_once

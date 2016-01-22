@@ -22,6 +22,7 @@ typedef WebView OSWebView;
 @end
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _WebView : public WebView
 {
 public:
@@ -231,6 +232,7 @@ void WebView::runJavaScript(const String& script)
 		}
 	}
 }
+
 SLIB_UI_NAMESPACE_END
 
 @implementation _Slib_OSX_WebView

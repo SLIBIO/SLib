@@ -2,10 +2,12 @@
 #define CHECKHEADER_SLIB_UI_S_CHECK_BOX
 
 #include "definition.h"
+
 #include "s_button.h"
 #include "radio_group.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class SLIB_EXPORT SCheckBox : public SButton
 {
 	SLIB_DECLARE_OBJECT(SCheckBox, SButton)
@@ -15,6 +17,7 @@ public:
 	
 public:
 	sl_bool isChecked();
+	
 	virtual void setChecked(sl_bool flag);
 	
 public:
@@ -22,11 +25,13 @@ public:
 	void dispatchClick();
 	
 public:
-	SLIB_WEAK_PROPERTY_INLINE(RadioGroup, RadioGroup)
+	SLIB_WEAK_PROPERTY(RadioGroup, RadioGroup)
 
 protected:
 	sl_bool m_flagChecked;
+	
 };
+
 SLIB_UI_NAMESPACE_END
 
 #endif

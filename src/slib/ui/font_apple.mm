@@ -25,6 +25,7 @@ public:
 #endif
 	sl_bool m_flagCreatedUI;
 	
+public:
 	_Apple_FontInstance()
 	{
 		m_fontCoreText = nil;
@@ -42,6 +43,7 @@ public:
 		m_fontUI = nil;
 	}
 	
+public:
 	static Ref<_Apple_FontInstance> _create(const FontDesc& desc)
 	{
 		Ref<_Apple_FontInstance> ret;

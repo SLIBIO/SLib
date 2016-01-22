@@ -3,6 +3,7 @@
 #include "../../../inc/slib/ui/core.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 /**********************
 	View
 **********************/
@@ -32,65 +33,37 @@ void View::setGroup(sl_bool flag)
 	m_flagGroup = flag;
 }
 
-const Ref<ViewInstance>& View::getViewInstance()
-{
-	return m_instance;
-}
-
-Ref<Window> View::getWindow()
-{
-	Ref<Window> window = m_window;
-	if (window.isNotNull()) {
-		return window;
-	}
-	Ref<View> parent = getParent();
-	if (parent.isNotNull()) {
-		return parent->getWindow();
-	}
-	return Ref<Window>::null();
-}
-
-void View::setWindow(const Ref<Window>& window)
-{
-	m_window = window;
-}
-
-Ref<View> View::getParent()
-{
-	return m_parent;
-}
-
-void View::setParent(const Ref<View>& parent)
-{
-	m_parent = parent;
-}
-
-void View::removeParent(View* _parent)
-{
-	Ref<View> parent = getParent();
-	if (parent == _parent) {
-		m_parent.setNull();
-	}
-}
-
 sl_bool View::isValid()
 {
-	return _isValid();
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		return instance->isValid();
+	}
+	return sl_false;
 }
 
 void View::setFocus()
 {
-	_setFocus();
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		instance->setFocus();
+	}
 }
 
 void View::invalidate()
 {
-	_invalidate();
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		instance->invalidate();
+	}
 }
 
 void View::invalidate(const Rectangle &rect)
 {
-	_invalidate(rect);
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		instance->invalidate(rect);
+	}
 }
 
 const Rectangle& View::getFrame()
@@ -98,12 +71,24 @@ const Rectangle& View::getFrame()
 	return m_frame;
 }
 
+Rectangle View::getInstanceFrame()
+{
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		return instance->getFrame();
+	}
+	return Rectangle::zero();
+}
+
 void View::setFrame(const Rectangle &frame)
 {
 	Size sizeOld = m_frame.getSize();
 	Size sizeNew = frame.getSize();
 	m_frame = frame;
-	_setFrame(frame);
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		instance->setFrame(frame);
+	}
 	if (!(Math::isNearZero(sizeOld.x - sizeNew.x) && Math::isNearZero(sizeOld.y - sizeNew.y))) {
 		onResize();
 	}
@@ -112,45 +97,6 @@ void View::setFrame(const Rectangle &frame)
 void View::setFrame(sl_real x, sl_real y, sl_real width, sl_real height)
 {
 	setFrame(Rectangle(x, y, x+width, y+height));
-}
-
-sl_bool View::isVisible()
-{
-	return m_flagVisible;
-}
-
-void View::setVisible(sl_bool flag)
-{
-	sl_bool flagOld = m_flagVisible;
-	m_flagVisible = flag;
-	_setVisible(flag);
-	if (flagOld != flag) {
-		if (flag) {
-			onResize();
-		}
-	}
-}
-
-sl_bool View::isEnabled()
-{
-	return m_flagEnabled;
-}
-
-void View::setEnabled(sl_bool flag)
-{
-	m_flagEnabled = flag;
-	_setEnabled(flag);
-}
-
-sl_bool View::isOpaque()
-{
-	return m_flagOpaque;
-}
-
-void View::setOpaque(sl_bool flag)
-{
-	m_flagOpaque = flag;
-	_setOpaque(flag);
 }
 
 sl_real View::getWidth()
@@ -213,14 +159,155 @@ Rectangle View::getContentBounds()
 	return Rectangle(Point::zero(), m_frame.getSize());
 }
 
+sl_bool View::isVisible()
+{
+	return m_flagVisible;
+}
+
+void View::setVisible(sl_bool flag)
+{
+	sl_bool flagOld = m_flagVisible;
+	m_flagVisible = flag;
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		instance->setVisible(flag);
+	}
+	if (flagOld != flag) {
+		if (flag) {
+			onResize();
+		}
+	}
+}
+
+sl_bool View::isEnabled()
+{
+	return m_flagEnabled;
+}
+
+void View::setEnabled(sl_bool flag)
+{
+	m_flagEnabled = flag;
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		instance->setEnabled(flag);
+	}
+}
+
+sl_bool View::isOpaque()
+{
+	return m_flagOpaque;
+}
+
+void View::setOpaque(sl_bool flag)
+{
+	m_flagOpaque = flag;
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		instance->setOpaque(flag);
+	}
+}
+
 Point View::convertCoordinateFromScreenToView(const Point& ptScreen)
 {
-	return _convertCoordinateFromScreenToView(ptScreen);
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		return instance->convertCoordinateFromScreenToView(ptScreen);
+	}
+	return ptScreen;
 }
 
 Point View::convertCoordinateFromViewToScreen(const Point& ptView)
 {
-	return _convertCoordinateFromViewToScreen(ptView);
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		return instance->convertCoordinateFromViewToScreen(ptView);
+	}
+	return ptView;
+}
+
+void View::addChildInstance(const Ref<ViewInstance>& child)
+{
+	if (child.isNotNull()) {
+		Ref<ViewInstance> instance = m_instance;
+		if (instance.isNotNull()) {
+			if (UI::isUIThread()) {
+				instance->addChildInstance(child);
+			} else {
+				UI::runOnUIThread(SLIB_CALLBACK_WEAKREF(View, _addChildInstance_, this, child));
+			}
+		}
+	}
+}
+
+void View::_addChildInstance_(Ref<ViewInstance> child)
+{
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		instance->addChildInstance(child);
+	}
+}
+
+void View::removeChildInstance(const Ref<ViewInstance>& child)
+{
+	if (child.isNotNull()) {
+		Ref<ViewInstance> instance = m_instance;
+		if (instance.isNotNull()) {
+			if (UI::isUIThread()) {
+				instance->removeChildInstance(child);
+			} else {
+				UI::runOnUIThread(SLIB_CALLBACK_WEAKREF(View, _removeChildInstance_, this, child));
+			}
+		}
+	}
+}
+
+void View::_removeChildInstance_(Ref<ViewInstance> child)
+{
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		instance->removeChildInstance(child);
+	}
+}
+
+Ref<ViewInstance> View::getViewInstance()
+{
+	return m_instance;
+}
+
+Ref<Window> View::getWindow()
+{
+	Ref<Window> window = m_window;
+	if (window.isNotNull()) {
+		return window;
+	}
+	Ref<View> parent = getParent();
+	if (parent.isNotNull()) {
+		return parent->getWindow();
+	}
+	return Ref<Window>::null();
+}
+
+void View::setWindow(const Ref<Window>& window)
+{
+	m_window = window;
+}
+
+Ref<View> View::getParent()
+{
+	return m_parent;
+}
+
+void View::setParent(const Ref<View>& parent)
+{
+	m_parent = parent;
+}
+
+void View::removeParent(View* _parent)
+{
+	Ref<View> parent = getParent();
+	if (parent == _parent) {
+		m_parent.setNull();
+	}
 }
 
 void View::attach(const Ref<ViewInstance>& instance)
@@ -253,7 +340,7 @@ void View::attachChild(const Ref<View>& child)
 	if (m_flagGroup) {
 		if (child.isNotNull()) {
 			if (!(UI::isUIThread())) {
-				UI::runOnUIThread(SLIB_CALLBACK_WEAKREF(View, _attachChild, this, child));
+				UI::runOnUIThread(SLIB_CALLBACK_WEAKREF(View, _attachChild_, this, child));
 				return;
 			}
 			Ref<ViewInstance> parentInstance = getViewInstance();
@@ -264,7 +351,7 @@ void View::attachChild(const Ref<View>& child)
 	}
 }
 
-void View::_attachChild(Ref<slib::View> view)
+void View::_attachChild_(Ref<slib::View> view)
 {
 	attachChild(view);
 }
@@ -276,38 +363,6 @@ Ref<ViewInstance> View::attachToNewInstance(const Ref<ViewInstance>& parent)
 		attach(instance);
 	}
 	return instance;
-}
-
-void View::addChildInstance(const Ref<ViewInstance>& instance)
-{
-	if (instance.isNotNull()) {
-		if (UI::isUIThread()) {
-			_addChildInstance(instance.get());
-		} else {
-			UI::runOnUIThread(SLIB_CALLBACK_WEAKREF(View, _addChildInstance_, this, instance));
-		}
-	}
-}
-
-void View::_addChildInstance_(Ref<ViewInstance> instance)
-{
-	_addChildInstance(instance.get());
-}
-
-void View::removeChildInstance(const Ref<ViewInstance>& instance)
-{
-	if (instance.isNotNull()) {
-		if (UI::isUIThread()) {
-			_removeChildInstance(instance.get());
-		} else {
-			UI::runOnUIThread(SLIB_CALLBACK_WEAKREF(View, _removeChildInstance_, this, instance));
-		}
-	}
-}
-
-void View::_removeChildInstance_(Ref<ViewInstance> instance)
-{
-	_removeChildInstance(instance.get());
 }
 
 void View::onDraw(Canvas* canvas)
@@ -454,14 +509,6 @@ void View::dispatchSetCursor(UIEvent* ev)
 /**********************
 	ViewInstance
  **********************/
-ViewInstance::ViewInstance()
-{
-}
-
-ViewInstance::~ViewInstance()
-{
-}
-
 void ViewInstance::setView(View* view)
 {
 	m_view = view;
@@ -527,4 +574,5 @@ void ViewInstance::onSetCursor(UIEvent* event)
 		view->dispatchSetCursor(event);
 	}
 }
+
 SLIB_UI_NAMESPACE_END

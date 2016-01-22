@@ -198,6 +198,127 @@ jobject Android_ViewInstance::getContext()
 	return m_context.get();
 }
 
+sl_bool Android_ViewInstance::isValid()
+{
+	return sl_true;
+}
+
+void Android_ViewInstance::setFocus()
+{
+	jobject handle = m_handle.get();
+	if (handle) {
+		_JAndroidView::setFocus.call(sl_null, handle);
+	}
+}
+
+void Android_ViewInstance::invalidate()
+{
+	jobject handle = m_handle.get();
+	if (handle) {
+		_JAndroidView::invalidate.call(sl_null, handle);
+	}
+}
+
+void Android_ViewInstance::invalidate(const Rectangle& rect)
+{
+	jobject handle = m_handle.get();
+	if (handle) {
+		_JAndroidView::invalidateRect.call(sl_null, handle, rect.left, rect.top, rect.right, rect.bottom);
+	}
+}
+
+Rectangle Android_ViewInstance::getFrame()
+{
+	jobject handle = m_handle.get();
+	if (handle) {
+		JniLocal<jobject> jrect = _JAndroidView::getFrame.callObject(sl_null, handle);
+		if (jrect.isNotNull()) {
+            Rectangle ret;
+			ret.left = _JAndroidRectF::left.get(jrect);
+			ret.top = _JAndroidRectF::top.get(jrect);
+			ret.right = _JAndroidRectF::right.get(jrect);
+			ret.bottom = _JAndroidRectF::bottom.get(jrect);
+            return ret;
+		}
+	}
+	return Rectangle::zero();
+}
+
+void Android_ViewInstance::setFrame(const Rectangle& frame)
+{
+	jobject handle = m_handle.get();
+	if (handle) {
+		_JAndroidView::setFrame.callBoolean(sl_null, handle, frame.left, frame.top, frame.right, frame.bottom);
+	}
+}
+
+void Android_ViewInstance::setVisible(sl_bool flag)
+{
+	jobject handle = m_handle.get();
+	if (handle) {
+		_JAndroidView::setVisible.call(sl_null, handle, flag);
+	}
+}
+
+void Android_ViewInstance::setEnabled(sl_bool flag)
+{
+	jobject handle = m_handle.get();
+	if (handle) {
+		_JAndroidView::setEnabled.call(sl_null, handle, flag);
+	}
+}
+
+void Android_ViewInstance::setOpaque(sl_bool flag)
+{
+}
+
+Point Android_ViewInstance::convertCoordinateFromScreenToView(const Point& ptScreen)
+{
+	jobject handle = m_handle.get();
+	if (handle) {
+		JniLocal<jobject> jpt = _JAndroidView::convertCoordinateFromScreenToView.callObject(sl_null, handle, ptScreen.x, ptScreen.y);
+		if (jpt.isNotNull()) {
+			Point ret;
+			ret.x = _JAndroidPointF::x.get(jpt);
+			ret.y = _JAndroidPointF::y.get(jpt);
+			return ret;
+		}
+	}
+	return ptScreen;
+}
+
+Point Android_ViewInstance::convertCoordinateFromViewToScreen(const Point& ptView)
+{
+	jobject handle = m_handle.get();
+	if (handle) {
+		JniLocal<jobject> jpt = _JAndroidView::convertCoordinateFromViewToScreen.callObject(sl_null, handle, ptView.x, ptView.y);
+		if (jpt.isNotNull()) {
+			Point ret;
+			ret.x = _JAndroidPointF::x.get(jpt);
+			ret.y = _JAndroidPointF::y.get(jpt);
+			return ret;
+		}
+	}
+	return ptView;
+}
+
+void Android_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
+{
+	jobject handle = m_handle.get();
+	jobject child = UIPlatform::getViewHandle(_child.get());
+	if (handle && child) {
+		_JAndroidView::addChild.call(sl_null, handle, child);
+	}
+}
+
+void Android_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
+{
+	jobject handle = m_handle.get();
+	jobject child = UIPlatform::getViewHandle(_child.get());
+	if (handle && child) {
+		_JAndroidView::removeChild.call(sl_null, handle, child);
+	}
+}
 
 /******************************************
 				View
@@ -218,133 +339,9 @@ Ref<ViewInstance> View::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-sl_bool View::_isValid()
-{
-	return sl_true;
-}
-
-void View::_setFocus()
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		_JAndroidView::setFocus.call(sl_null, handle);
-	}
-}
-
-void View::_invalidate()
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		_JAndroidView::invalidate.call(sl_null, handle);
-	}
-}
-
-void View::_invalidate(const Rectangle& rect)
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		_JAndroidView::invalidateRect.call(sl_null, handle, rect.left, rect.top, rect.right, rect.bottom);
-	}
-}
-
-Rectangle View::getInstanceFrame()
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		JniLocal<jobject> jrect = _JAndroidView::getFrame.callObject(sl_null, handle);
-		if (jrect.isNotNull()) {
-            Rectangle ret;
-			ret.left = _JAndroidRectF::left.get(jrect);
-			ret.top = _JAndroidRectF::top.get(jrect);
-			ret.right = _JAndroidRectF::right.get(jrect);
-			ret.bottom = _JAndroidRectF::bottom.get(jrect);
-            return ret;
-		}
-	}
-	return Rectangle::zero();
-}
-
-void View::_setFrame(const Rectangle& frame)
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		_JAndroidView::setFrame.callBoolean(sl_null, handle, frame.left, frame.top, frame.right, frame.bottom);
-	}
-}
-
-void View::_setVisible(sl_bool flag)
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		_JAndroidView::setVisible.call(sl_null, handle, flag);
-	}
-}
-
-void View::_setEnabled(sl_bool flag)
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		_JAndroidView::setEnabled.call(sl_null, handle, flag);
-	}
-}
-
-void View::_setOpaque(sl_bool flag)
-{
-}
-
-Point View::_convertCoordinateFromScreenToView(const Point& ptScreen)
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		JniLocal<jobject> jpt = _JAndroidView::convertCoordinateFromScreenToView.callObject(sl_null, handle, ptScreen.x, ptScreen.y);
-		if (jpt.isNotNull()) {
-			Point ret;
-			ret.x = _JAndroidPointF::x.get(jpt);
-			ret.y = _JAndroidPointF::y.get(jpt);
-			return ret;
-		}
-	}
-	return ptScreen;
-}
-
-Point View::_convertCoordinateFromViewToScreen(const Point& ptView)
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		JniLocal<jobject> jpt = _JAndroidView::convertCoordinateFromViewToScreen.callObject(sl_null, handle, ptView.x, ptView.y);
-		if (jpt.isNotNull()) {
-			Point ret;
-			ret.x = _JAndroidPointF::x.get(jpt);
-			ret.y = _JAndroidPointF::y.get(jpt);
-			return ret;
-		}
-	}
-	return ptView;
-}
-
-void View::_addChildInstance(ViewInstance* _child)
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	jobject child = UIPlatform::getViewHandle(_child);
-	if (handle && child) {
-		_JAndroidView::addChild.call(sl_null, handle, child);
-	}
-}
-
-void View::_removeChildInstance(ViewInstance* _child)
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	jobject child = UIPlatform::getViewHandle(_child);
-	if (handle && child) {
-		_JAndroidView::removeChild.call(sl_null, handle, child);
-	}
-}
-SLIB_UI_NAMESPACE_END
-
 /******************************************
 				UIPlatform
  ******************************************/
-SLIB_UI_NAMESPACE_BEGIN
 Ref<ViewInstance> UIPlatform::createViewInstance(jobject jhandle)
 {
 	Ref<ViewInstance> ret = UIPlatform::_getViewInstance((void*)jhandle);
@@ -388,6 +385,7 @@ jobject UIPlatform::getViewHandle(View* view)
 	}
 	return 0;
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

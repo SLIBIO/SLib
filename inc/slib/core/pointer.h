@@ -284,7 +284,7 @@ public:
 	
 	SLIB_INLINE Ptr<T>& operator=(const T* pointer)
 	{
-		m_pointer = pointer;
+		m_pointer = (T*)pointer;
 		m_reference.setNull();
 		return *this;
 	}
@@ -706,7 +706,7 @@ public:
 	
 	SLIB_INLINE SafePtr<T>& operator=(const T* pointer)
 	{
-		_replace(pointer, Ref<Referable>::null());
+		_replace((T*)pointer, Ref<Referable>::null());
 		return *this;
 	}
 	

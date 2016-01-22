@@ -10,6 +10,7 @@
 #include <CoreText/CoreText.h>
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _Quartz_Canvas : public Canvas
 {
 	SLIB_DECLARE_OBJECT(_Quartz_Canvas, Canvas)
@@ -19,6 +20,7 @@ public:
 	sl_real m_height;
 	Rectangle m_rectDirty;
 	
+public:
 	_Quartz_Canvas()
 	{
 	}
@@ -28,6 +30,7 @@ public:
 		CGContextRelease(m_graphics);
 	}
 	
+public:
 	static Ref<_Quartz_Canvas> _create(CGContextRef graphics, sl_real width, sl_real height, const Rectangle* rectDirty)
 	{
 		Ref<_Quartz_Canvas> ret;
@@ -51,25 +54,31 @@ public:
 		return ret;
 	}
 	
+	// override
 	Size getSize()
 	{
 		return Size(m_width, m_height);
 	}
 	
+	// override
 	Rectangle getInvalidatedRect()
 	{
 		return m_rectDirty;
 	}
 	
+	// override
 	void save()
 	{
 		CGContextSaveGState(m_graphics);
 	}
+	
+	// override
 	void restore()
 	{
 		CGContextRestoreGState(m_graphics);
 	}
 	
+	// override
 	void setAntiAlias(sl_bool flag)
 	{
 		if (flag) {
@@ -81,6 +90,7 @@ public:
 		}
 	}
 	
+	// override
 	void clipToRectangle(const Rectangle& rect)
 	{
 		CGRect rc;
@@ -91,6 +101,7 @@ public:
 		CGContextClipToRect(m_graphics, rc);
 	}
 	
+	// override
 	void clipToPath(const Ref<GraphicsPath>& path)
 	{
 		if (path.isNotNull()) {
@@ -129,6 +140,7 @@ public:
 		return ret;
 	}
 	
+	// override
 	void concatMatrix(const Matrix3& other)
 	{
 		CGAffineTransform t;
@@ -141,6 +153,7 @@ public:
 		CGContextConcatCTM(m_graphics, t);
 	}
 	
+	// override
 	void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& __font, const Color& _color)
 	{		
 		if (text.isNotEmpty()) {
@@ -205,6 +218,7 @@ public:
 		}
 	}
 	
+	// override
 	void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& _pen)
 	{
 		Ref<Pen> pen = _pen;
@@ -220,6 +234,7 @@ public:
 		}
 	}
 	
+	// override
 	void drawLines(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen)
 	{
 		if (countPoints < 2) {
@@ -240,6 +255,7 @@ public:
 		}
 	}
 	
+	// override
 	void drawArc(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& _pen)
 	{
 		Ref<GraphicsPath> path = GraphicsPath::create();
@@ -249,6 +265,7 @@ public:
 		}
 	}
 	
+	// override
 	void drawRectangle(const Rectangle& _rect, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		CGRect rect;
@@ -271,6 +288,7 @@ public:
 		}
 	}
 	
+	// override
 	void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		Ref<GraphicsPath> path = GraphicsPath::create();
@@ -280,6 +298,7 @@ public:
 		}
 	}
 	
+	// override
 	void drawEllipse(const Rectangle& _rect, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		CGRect rect;
@@ -301,6 +320,7 @@ public:
 		}
 	}
 	
+	// override
 	void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen, const Ref<Brush>& brush, FillMode fillMode)
 	{
 		if (countPoints <= 2) {
@@ -318,6 +338,7 @@ public:
 		}
 	}
 	
+	// override
 	void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		Ref<GraphicsPath> path = GraphicsPath::create();
@@ -327,6 +348,7 @@ public:
 		}
 	}
 	
+	// override
 	void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		if (path.isNotNull()) {
@@ -471,6 +493,7 @@ CGContextRef UIPlatform::getCanvasHandle(Canvas* _canvas)
 	}
 	return NULL;
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

@@ -19,6 +19,7 @@ class _Gdiplus_PenInstance : public PenInstance
 public:
 	Gdiplus::Pen* m_pen;
 
+public:
 	_Gdiplus_PenInstance()
 	{
 	}
@@ -28,6 +29,7 @@ public:
 		delete m_pen;
 	}
 
+public:
 	static Ref<_Gdiplus_PenInstance> _create(const PenDesc& desc)
 	{
 		Ref<_Gdiplus_PenInstance> ret;
@@ -108,6 +110,7 @@ class _Gdiplus_BrushInstance : public BrushInstance
 public:
 	Gdiplus::Brush* m_brush;
 
+public:
 	_Gdiplus_BrushInstance()
 	{
 	}
@@ -117,6 +120,7 @@ public:
 		delete m_brush;
 	}
 
+public:
 	static Ref<_Gdiplus_BrushInstance> _create(const BrushDesc& desc)
 	{
 		Ref<_Gdiplus_BrushInstance> ret;
@@ -149,6 +153,7 @@ public:
 	sl_bool m_flagFreeOnRelease;
 	Ref<Referable> m_ref;
 
+public:
 	_Gdiplus_Canvas()
 	{
 	}
@@ -160,6 +165,7 @@ public:
 		}
 	}
 
+public:
 	static Ref<_Gdiplus_Canvas> create(Gdiplus::Graphics* graphics, sl_real width, sl_real height, const Rectangle* rectDirty, sl_bool flagFreeOnRelease, const Referable* ref)
 	{
 		Ref<_Gdiplus_Canvas> ret;
@@ -188,21 +194,26 @@ public:
 		return ret;
 	}
 
+    // override
 	Size getSize()
 	{
 		return Size(m_width, m_height);
 	}
 
+    // override
 	Rectangle getInvalidatedRect()
 	{
 		return m_rectDirty;
 	}
 
+    // override
 	void save()
 	{
 		Gdiplus::GraphicsState state = m_graphics->Save();
 		m_stackState.push(state);
 	}
+    
+    // override
 	void restore()
 	{
 		Gdiplus::GraphicsState state;
@@ -216,6 +227,7 @@ public:
 		return m_graphics->GetSmoothingMode() == Gdiplus::SmoothingModeAntiAlias;
 	}
 
+    // override
 	void setAntiAlias(sl_bool flag)
 	{
 		if (flag) {
@@ -225,12 +237,14 @@ public:
 		}
 	}
 	
+    // override
 	void clipToRectangle(const Rectangle& _rect)
 	{
 		Gdiplus::RectF rect(_rect.left, _rect.top, _rect.getWidth(), _rect.getHeight());
 		m_graphics->SetClip(rect, Gdiplus::CombineModeIntersect);
 	}
 
+    // override
 	void clipToPath(const Ref<GraphicsPath>& path)
 	{
 		if (path.isNotNull()) {
@@ -267,6 +281,7 @@ public:
 		m_graphics->SetTransform(&m);
 	}
 
+    // override
 	void concatMatrix(const Matrix3& other)
 	{
 		Matrix3 mat = other;
@@ -274,6 +289,7 @@ public:
 		setMatrix(mat);
 	}
 
+    // override
 	void drawText(const String& _text, sl_real x, sl_real y, const Ref<Font>& _font, const Color& color)
 	{
 		String16 text = _text;
@@ -299,6 +315,7 @@ public:
 		}
 	}
 
+    // override
 	void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& _pen)
 	{
 		Ref<Pen> pen = _pen;
@@ -312,6 +329,7 @@ public:
 		}
 	}
 
+    // override
 	void drawLines(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen)
 	{
 		if (countPoints < 2) {
@@ -329,6 +347,7 @@ public:
 		}
 	}
 
+    // override
 	void drawArc(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& _pen)
 	{
 		Ref<Pen> pen = _pen;
@@ -343,6 +362,7 @@ public:
 		}
 	}
 
+    // override
 	void drawRectangle(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		Gdiplus::Graphics* graphics = m_graphics;
@@ -364,6 +384,7 @@ public:
 		}
 	}
 
+    // override
 	void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		sl_real width = rect.getWidth();
@@ -375,6 +396,7 @@ public:
 		}
 	}
 
+    // override
 	void drawEllipse(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		sl_real width = rect.getWidth();
@@ -396,6 +418,7 @@ public:
 		}
 	}
 
+    // override
 	void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen, const Ref<Brush>& brush, FillMode fillMode)
 	{
 		if (countPoints <= 2) {
@@ -430,6 +453,7 @@ public:
 		}
 	}
 
+    // override
 	void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		Gdiplus::Graphics* graphics = m_graphics;
@@ -451,6 +475,7 @@ public:
 		}
 	}
 
+    // override
 	void drawPath(const Ref<GraphicsPath>& _path, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		Gdiplus::Graphics* graphics = m_graphics;

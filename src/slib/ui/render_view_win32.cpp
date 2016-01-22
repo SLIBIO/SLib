@@ -11,7 +11,7 @@ SLIB_UI_NAMESPACE_BEGIN
 class _Win32_RenderViewInstance : public Win32_ViewInstance, public IRenderCallback
 {
 public:
-	Ref<Renderer> m_renderer;
+	SafeRef<Renderer> m_renderer;
 
 public:
 	_Win32_RenderViewInstance()
@@ -20,24 +20,29 @@ public:
 
 	~_Win32_RenderViewInstance()
 	{
-		if (m_renderer.isNotNull()) {
-			m_renderer->release();
+        Ref<Renderer> renderer = m_renderer;
+		if (renderer.isNotNull()) {
+			renderer->release();
 		}
 	}
 
 public:
-	void setRenderer(const Ref<Renderer>& renderer, RedrawMode renderMode)
+	void setRenderer(const Ref<Renderer>& renderer, RedrawMode redrawMode)
 	{
 		m_renderer = renderer;
-		if (m_renderer.isNotNull()) {
-			m_renderer->setRenderingContinuously(renderMode == redrawMode_Continuously);
+		if (renderer.isNotNull()) {
+			renderer->setRenderingContinuously(redrawMode == redrawMode_Continuously);
 		}
 	}
 
+    // override
 	sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 	{
 		if (msg == WM_PAINT) {
-			m_renderer->requestRender();
+			Ref<Renderer> renderer = m_renderer;
+			if (renderer.isNotNull()) {
+				renderer->requestRender();
+			}
 		} else if (msg == WM_ERASEBKGND) {
 			result = TRUE;
 			return sl_true;
@@ -45,13 +50,14 @@ public:
 		return Win32_ViewInstance::processWindowMessage(msg, wParam, lParam, result);
 	}
 
+    // override
 	void onFrame(RenderEngine* engine)
 	{
 		Ref<View> _view = getView();
 		if (RenderView::checkInstance(_view)) {
 			Ref<RenderView> view = Ref<RenderView>::from(_view);
 			if (view.isNotNull()) {
-				view->dispatchOnFrame(engine);
+				view->dispatchFrame(engine);
 			}
 		}
 	}

@@ -3,6 +3,7 @@
 #include "../../../inc/slib/graphics/util.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 SButtonCategoryProperties::SButtonCategoryProperties()
 {
 	textColor = Color::zero();
@@ -14,6 +15,7 @@ class _SButton_Categories
 public:
 	SButtonCategory categories[2];
 	
+public:
 	_SButton_Categories()
 	{
 		categories[0].properties[buttonState_Normal].border = Pen::create(penStyle_Solid, 1, Color::gray(100));
@@ -30,6 +32,7 @@ public:
 		categories[1].properties[buttonState_Normal].border = Pen::create(penStyle_Solid, 3, Color(0, 100, 250));
 	}
 	
+public:
 	static _SButton_Categories* get()
 	{
 		SLIB_SAFE_STATIC(_SButton_Categories, ret);

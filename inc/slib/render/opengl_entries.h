@@ -5,10 +5,12 @@ Don't include this file directly from your own source
 
 SLIB_RENDER_NAMESPACE_BEGIN
 
+class GLRenderEngine;
+
 class SLIB_EXPORT _SLIB_RENDER_ENTRIES_CLASS
 {
 public:
-	static Ref<RenderEngine> createEngine();
+	static Ref<GLRenderEngine> createEngine();
 	
 public:
 	static void setViewport(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height);

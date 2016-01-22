@@ -15,7 +15,7 @@
 	@public sl_bool m_flagUpdate;
 	@public slib::Mutex m_lockRender;
 	
-	slib::Ref<slib::Thread> m_thread;
+	slib::SafeRef<slib::Thread> m_thread;
 }
 
 -(void)_setRenderContinuously:(BOOL)flag;
@@ -25,6 +25,7 @@
 
 
 SLIB_UI_NAMESPACE_BEGIN
+
 Ref<ViewInstance> RenderView::createInstance(ViewInstance* _parent)
 {
 	OSX_VIEW_CREATE_INSTANCE_BEGIN
@@ -123,7 +124,7 @@ void _Ui_OSX_GLView_thread(_Slib_OSX_GLView* handle)
 						Ref<View> _view = instance->getView();
 						if (RenderView::checkInstance(_view)) {
 							RenderView* view = (RenderView*)(_view.get());
-							view->dispatchOnFrame(engine.get());
+							view->dispatchFrame(engine.get());
 						}
 					} else {
 						return;
@@ -156,15 +157,16 @@ SLIB_UI_NAMESPACE_END
 		m_flagRequestRender = sl_true;
 		m_flagUpdate = sl_true;
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_surfaceNeedsUpdate:) name:NSViewGlobalFrameDidChangeNotification object:self];
-		[self _runThread];
+		m_thread = slib::Thread::start(SLIB_CALLBACK(slib::_Ui_OSX_GLView_thread, self));
 	}
 	return self;
 }
 
 -(void)dealloc
 {
-	if (m_thread.isNotNull()) {
-		m_thread->finishAndWait();
+	slib::Ref<slib::Thread> thread = m_thread;
+	if (thread.isNotNull()) {
+		thread->finishAndWait();
 	}
 }
 
@@ -215,12 +217,6 @@ SLIB_UI_NAMESPACE_END
 	m_flagRequestRender = sl_true;
 }
 
--(void)_runThread
-{
-	if (m_thread.isNull()) {
-		m_thread = slib::Thread::start(SLIB_CALLBACK(slib::_Ui_OSX_GLView_thread, self));
-	}
-}
 @end
 
 #endif

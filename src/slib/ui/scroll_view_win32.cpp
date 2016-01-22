@@ -11,11 +11,14 @@
 #define _SCROLL_WHEEL_SIZE 40
 
 SLIB_UI_NAMESPACE_BEGIN
+    
 class _Win32_ScrollViewInstance : public Win32_ViewInstance
 {
 public:
 	Color m_backgroundColor;
 
+public:
+    // override
 	sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 	{
 		HWND handle = getHandle();
@@ -43,11 +46,13 @@ public:
 		return sl_false;
 	}
 
+    // override
 	sl_bool processCommand(SHORT code, LRESULT& result)
 	{
 		return sl_false;
 	}
 
+    // override
 	sl_bool processNotify(NMHDR* nmhdr, LRESULT& result)
 	{
 		return sl_false;
@@ -229,6 +234,7 @@ Size ScrollView::getScrollRange()
 	}
 	return Size::zero();
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

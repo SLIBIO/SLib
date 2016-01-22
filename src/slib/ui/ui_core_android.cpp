@@ -52,11 +52,6 @@ public:
 	sl_int32 m_width;
 	sl_int32 m_height;
 
-private:
-	_Android_Screen()
-	{
-	}
-
 public:
 	static Ref<_Android_Screen> create(jobject display)
 	{
@@ -75,6 +70,8 @@ public:
 		return ret;
 	}
 
+public:
+    // override
 	Rectangle getRegion()
 	{
 		Rectangle ret;
@@ -173,7 +170,7 @@ public:
 	Ref<Runnable> onNo;
 };
 
-typedef Map<jlong, Ref<_UiAlertResult> > _UiAlertMap;
+typedef HashMap<jlong, Ref<_UiAlertResult> > _UiAlertMap;
 SLIB_SAFE_STATIC_GETTER(_UiAlertMap, _AndroidUi_alerts);
 
 void UI::showAlert(const AlertParam& param)

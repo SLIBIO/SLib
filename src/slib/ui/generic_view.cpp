@@ -1,6 +1,7 @@
 #include "../../../inc/slib/ui/generic_view.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 GenericViewWithEvent::GenericViewWithEvent()
 {
 	m_flagFocusable = sl_false;
@@ -49,6 +50,14 @@ void GenericViewWithEvent::setHoverState(sl_bool flag)
 	m_flagHover = flag;
 }
 
+void GenericViewWithEvent::onClickView(UIEvent *ev)
+{
+	Ref<Runnable> runnable = getOnClick();
+	if (runnable.isNotNull()) {
+		runnable->run();
+	}
+	dispatchClick();
+}
 
 void GenericViewWithEvent::onSetCursor(UIEvent* ev)
 {
@@ -57,15 +66,6 @@ void GenericViewWithEvent::onSetCursor(UIEvent* ev)
 		Cursor::setCurrent(cursor);
 		ev->preventDefault();
 	}
-}
-
-void GenericViewWithEvent::onClickView(UIEvent *ev)
-{
-	Ref<Runnable> runnable = getOnClick();
-	if (runnable.isNotNull()) {
-		runnable->run();
-	}
-	dispatchClick();
 }
 
 void GenericViewWithEvent::_processEvents(UIEvent* ev)
@@ -254,7 +254,7 @@ void GenericViewWithDrawing::setRoundRectBoundShapeRadius(sl_real radius)
 	setRoundRectBoundShapeRadius(Size(radius, radius));
 }
 
-const Ref<GraphicsPath>& GenericViewWithDrawing::getBoundShapePath()
+Ref<GraphicsPath> GenericViewWithDrawing::getBoundShapePath()
 {
 	return m_boundShapePath;
 }
@@ -438,4 +438,5 @@ Rectangle GenericView::getContentBounds()
 	Rectangle ret(m_paddingLeft, m_paddingTop, size.x - m_paddingRight, size.y - m_paddingBottom);
 	return ret;
 }
+
 SLIB_UI_NAMESPACE_END

@@ -1,6 +1,19 @@
 #include "../../../inc/slib/ui/web_view.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
+void IWebViewListener::onStartLoad(WebView* view, const String& url)
+{
+}
+
+void IWebViewListener::onFinishLoad(WebView* view, const String& url, sl_bool flagFailed)
+{
+}
+
+void IWebViewListener::onMessageFromJavaScript(WebView* view, const String& msg, const String& param)
+{
+}
+
 WebView::WebView()
 {
 	m_flagOfflineContent = sl_false;
@@ -61,15 +74,4 @@ void WebView::onMessageFromJavaScript(const String& msg, const String& param)
 	}
 }
 
-void IWebViewListener::onStartLoad(WebView* view, const String& url)
-{
-}
-
-void IWebViewListener::onFinishLoad(WebView* view, const String& url, sl_bool flagFailed)
-{
-}
-
-void IWebViewListener::onMessageFromJavaScript(WebView* view, const String& msg, const String& param)
-{
-}
 SLIB_UI_NAMESPACE_END

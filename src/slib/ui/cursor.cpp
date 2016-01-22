@@ -4,10 +4,6 @@
 
 SLIB_NAMESPACE_BEGIN
 
-Cursor::Cursor()
-{	
-}
-
 #if !defined(SLIB_PLATFORM_IS_WIN32) && !defined(SLIB_PLATFORM_IS_OSX)
 
 Ref<Cursor> Cursor::getArrow()
@@ -56,6 +52,7 @@ void Cursor::show()
 void Cursor::hide()
 {
 }
+
 #endif
 
 SLIB_UI_NAMESPACE_END

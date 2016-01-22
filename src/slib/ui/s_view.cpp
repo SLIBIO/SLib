@@ -2,6 +2,7 @@
 #include "../../../inc/slib/ui/core.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 SView::SView()
 {
 	m_flagNativeParent = sl_true;
@@ -37,11 +38,11 @@ void SView::removeAllChildren()
 			UI::runOnUIThread(SLIB_CALLBACK_WEAKREF(SView, removeAllChildren, this));
 			return;
 		}
-		ListLocker< Ref<View> > children(m_children.duplicate());
+		ListLocker< Ref<View> > children(m_children);
 		for (sl_size i = 0; i < children.getCount(); i++) {
 			Ref<View> child = children[i];
 			if (child.isNotNull()) {
-				removeChild(child.get());
+				_removeChild(child.get());
 			}
 		}
 	} else {
@@ -49,11 +50,18 @@ void SView::removeAllChildren()
 		for (sl_size i = 0; i < children.getCount(); i++) {
 			children[i]->removeParent(this);
 		}
-		m_children.removeAll();
 	}
+	m_children.removeAll();
 }
 
 void SView::removeChild(const Ref<View>& view)
+{
+	if (view.isNotNull()) {
+		_removeChild(view);
+	}
+}
+
+void SView::_removeChild(const Ref<View>& view)
 {
 	if (view.isNotNull()) {
 		if (isNativeGroup()) {
@@ -64,7 +72,6 @@ void SView::removeChild(const Ref<View>& view)
 			view->detach();
 		}
 		view->removeParent(this);
-		m_children.removeValue(view);
 	}
 }
 
@@ -93,9 +100,9 @@ void SView::onAttach()
 	}
 }
 
-const List< Ref<View> >& SView::getChildren()
+List< Ref<View> > SView::getChildren()
 {
-	return m_children;
+	return m_children.duplicate();
 }
 
 SLIB_UI_NAMESPACE_END

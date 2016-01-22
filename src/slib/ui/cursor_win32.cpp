@@ -6,12 +6,14 @@
 #include "../../../inc/slib/ui/platform.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _Win32_Cursor : public Cursor
 {
 public:
 	HCURSOR m_hCursor;
 	sl_bool m_flagDestroyOnRelease;
 
+public:
 	_Win32_Cursor()
 	{
 	}
@@ -23,6 +25,7 @@ public:
 		}
 	}
 
+public:
 	static Ref<_Win32_Cursor> create(HCURSOR hCursor, sl_bool flagFreeOnDestroy)
 	{
 		Ref<_Win32_Cursor> ret;
@@ -115,6 +118,7 @@ void Cursor::hide()
 {
 	::ShowCursor(FALSE);
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

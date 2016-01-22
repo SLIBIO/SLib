@@ -14,6 +14,7 @@
 @end
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _LabelView : public LabelView
 {
 public:
@@ -185,6 +186,7 @@ void LabelView::setFont(const Ref<Font>& font)
 	}
 	m_font = font;
 }
+
 SLIB_UI_NAMESPACE_END
 
 @implementation _Slib_OSX_LabelTextField

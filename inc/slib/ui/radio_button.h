@@ -15,6 +15,7 @@
 #include "../core/callback.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class SLIB_EXPORT RadioButton : public View
 {
 	SLIB_DECLARE_OBJECT(RadioButton, View)
@@ -23,34 +24,43 @@ public:
 	
 public:
 	sl_bool isChecked();
+	
 	virtual void setChecked(sl_bool flag);
 	
 public:
 	String getText();
+	
 	virtual void setText(const String& text);
 	
-	Ref<Font> getFont();
+	
+    Ref<Font> getFont();
+	
 	virtual void setFont(const Ref<Font>& font);
 
 public:
-	SLIB_PROPERTY_INLINE(Ref<Runnable>, OnClick)
-	SLIB_WEAK_PROPERTY_INLINE(RadioGroup, RadioGroup)
+	SLIB_REF_PROPERTY(Runnable, OnClick)
+	
+	SLIB_WEAK_PROPERTY(RadioGroup, RadioGroup)
 
 public:
 	// override
-	void onClick();
+	void dispatchClick();
 	
 protected:
 	// override
 	Ref<ViewInstance> createInstance(ViewInstance* parent);
 	
 protected:
-	String m_text;
+	SafeString m_text;
 	sl_bool m_flagSelected;
-	Ref<Font> m_font;
-	Ref<FontInstance> m_fontInstance;
+	
+	SafeRef<Font> m_font;
+	SafeRef<FontInstance> m_fontInstance;
+	
 };
+
 SLIB_UI_NAMESPACE_END
+
 #else
 
 #include "s_radio_button.h"

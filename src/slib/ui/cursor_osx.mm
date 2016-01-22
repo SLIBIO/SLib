@@ -6,15 +6,13 @@
 #include "../../../inc/slib/ui/platform.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _OSX_Cursor : public Cursor
 {
 public:
 	NSCursor* m_cursor;
 	
-	_OSX_Cursor()
-	{
-	}
-	
+public:
 	static Ref<_OSX_Cursor> create(NSCursor* cursor)
 	{
 		Ref<_OSX_Cursor> ret;

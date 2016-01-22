@@ -106,9 +106,9 @@ SLIB_RENDER_NAMESPACE_END
 
 SLIB_RENDER_NAMESPACE_BEGIN
 
-Ref<RenderEngine> GL::createEngine()
+Ref<GLRenderEngine> GL::createEngine()
 {
-	return Ref<RenderEngine>::null();
+	return Ref<GLRenderEngine>::null();
 }
 
 void GL::loadEntries(const String& pathDll, sl_bool flagReload)

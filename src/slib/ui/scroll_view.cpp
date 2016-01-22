@@ -2,6 +2,7 @@
 #include "../../../inc/slib/ui/core.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 ScrollView::ScrollView()
 {
 	m_backgroundColor = Color::zero();
@@ -66,4 +67,5 @@ void ScrollView::setBackgroundColor(const Color& color)
 	m_backgroundColor = color;
 	_setBackgroundColor(color);
 }
+
 SLIB_UI_NAMESPACE_END

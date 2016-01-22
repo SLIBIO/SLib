@@ -3,6 +3,7 @@
 #include "../../../inc/slib/graphics/image.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 VideoView::VideoView()
 {
 	setRedrawMode(redrawMode_WhenDirty);
@@ -52,4 +53,5 @@ void VideoView::onFrame(RenderEngine* engine)
 		engine->drawTexture2D(-1, -1, 2, 2, m_textureFrame, m_programRGB);
 	}
 }
+
 SLIB_UI_NAMESPACE_END

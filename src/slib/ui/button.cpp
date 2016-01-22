@@ -1,13 +1,15 @@
 #include "../../../inc/slib/ui/button.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 Button::Button()
 {
 	m_flagDefaultButton = sl_false;
 }
 
-void Button::onClick()
+void Button::dispatchClick()
 {
+	View::dispatchClick();
 	Ref<Runnable> callback = getOnClick();
 	if (callback.isNotNull()) {
 		callback->run();
@@ -23,4 +25,5 @@ Ref<Font> Button::getFont()
 {
 	return m_font;
 }
+
 SLIB_UI_NAMESPACE_END

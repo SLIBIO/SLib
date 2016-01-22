@@ -7,14 +7,17 @@
 #include "view_win32.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _Win32_RadioButtonViewInstance : public Win32_ViewInstance
 {
 public:
+    // override
 	sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 	{
 		return sl_false;
 	}
 
+    // override
 	sl_bool processCommand(SHORT code, LRESULT& result)
 	{
 		if (code == BN_CLICKED) {
@@ -103,6 +106,7 @@ void RadioButton::setChecked(sl_bool flag)
 	}
 	m_flagSelected = flag;
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

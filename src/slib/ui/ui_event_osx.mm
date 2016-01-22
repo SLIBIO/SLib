@@ -10,6 +10,7 @@
 #import <Carbon/Carbon.h>
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _UI_OSX_KeyMapper
 {
 private:
@@ -148,6 +149,7 @@ public:
 		map(keyContextMenu, 0x6E);
 	}
 	
+public:
 	void map(sl_uint32 key, sl_uint32 vk)
 	{
 		if (vk == -1) {

@@ -19,26 +19,30 @@ public:
 	virtual void requestRender();
 	
 	RedrawMode getRedrawMode();
+	
 	virtual void setRedrawMode(RedrawMode mode);
+	
+public:
+	SLIB_PROPERTY(RenderEngineType, PreferredEngineType)
 
-	// override
-	void onAttach();
-	
-public:
+protected:
 	virtual void onFrame(RenderEngine* engine);
-	virtual void dispatchOnFrame(RenderEngine* engine);
 	
 public:
-	SLIB_PROPERTY_INLINE(RenderEngineType, PreferredEngineType)
+	virtual void dispatchFrame(RenderEngine* engine);
 	
 protected:
 	// override
 	Ref<ViewInstance> createInstance(ViewInstance* _parent);
 	
+	// override
+	void onAttach();
+	
 protected:
 	RedrawMode m_redrawMode;
 	
 };
+
 SLIB_UI_NAMESPACE_END
 
 #endif

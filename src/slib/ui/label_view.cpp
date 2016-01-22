@@ -9,8 +9,9 @@ LabelView::LabelView()
 	m_backgroundColor = Color::transparent();
 }
 
-void LabelView::onClick()
+void LabelView::dispatchClick()
 {
+	View::dispatchClick();
 	Ref<Runnable> callback = getOnClick();
 	if (callback.isNotNull()) {
 		callback->run();
@@ -21,4 +22,5 @@ Ref<Font> LabelView::getFont()
 {
 	return m_font;
 }
+
 SLIB_UI_NAMESPACE_END

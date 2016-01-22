@@ -19,25 +19,33 @@ class SLIB_EXPORT IListDetailsViewListener
 {
 public:
 	virtual void onSelectRow(ListDetailsView* view, sl_uint32 row);
+	
 	virtual void onClickRow(ListDetailsView* view, sl_uint32 row, const Point& pt);
+	
 	virtual void onRightButtonClickRow(ListDetailsView* view, sl_uint32 row, const Point& pt);
+	
 	virtual void onDoubleClickRow(ListDetailsView* view, sl_uint32 row, const Point& pt);
+	
 	virtual sl_bool onGetCellText(ListDetailsView* view, sl_uint32 row, sl_uint32 col, String& outText);
+
 };
 
-struct ListDetailsViewColumn
+class ListDetailsViewColumn
 {
-	String title;
+public:
+	SafeString title;
 	sl_real width;
 	Alignment align;
 	Alignment headerAlign;
 
+public:
 	ListDetailsViewColumn();
 };
 
-struct ListDetailsViewCell
+class ListDetailsViewCell
 {
-	String text;
+public:
+	SafeString text;
 };
 
 class SLIB_EXPORT ListDetailsView : public View
@@ -48,25 +56,39 @@ public:
 	
 public:
 	sl_uint32 getColumnsCount();
+	
 	virtual void setColumnsCount(sl_uint32 nCount);
 
+	
 	sl_uint32 getRowsCount();
+	
 	virtual void setRowsCount(sl_uint32 nCount);
 	
+	
 	String getItemText(sl_uint32 row, sl_uint32 col);
+	
 	virtual void setItemText(sl_uint32 row, sl_uint32 col, const String& text);
 	
+	
 	String getHeaderText(sl_uint32 col);
+	
 	virtual void setHeaderText(sl_uint32 col, const String& text);
 	
+	
 	sl_real getColumnWidth(sl_uint32 col);
+	
 	virtual void setColumnWidth(sl_uint32 col, sl_real width);
 	
+	
 	Alignment getHeaderAlignment(sl_uint32 col);
+	
 	virtual void setHeaderAlignment(sl_uint32 col, Alignment align);
 	
+
 	Alignment getColumnAlignment(sl_uint32 col);
+	
 	virtual void setColumnAlignment(sl_uint32 col, Alignment align);
+	
 	
 	sl_int32 getSelectedRow();
 	
@@ -78,17 +100,23 @@ public:
 	
 	void removeAllRows();
 	
+	
 	Ref<Font> getFont();
+	
 	virtual void setFont(const Ref<Font>& font);
 
 public:
-	SLIB_PROPERTY_INLINE(Ptr<IListDetailsViewListener>, Listener)
+	SLIB_PTR_PROPERTY(IListDetailsViewListener, Listener)
 	
 public:
 	virtual void onSelectRow(sl_uint32 row);
+	
 	virtual void onClickRow(sl_uint32 row, const Point& pt);
+	
 	virtual void onRightButtonClickRow(sl_uint32 row, const Point& pt);
+	
 	virtual void onDoubleClickRow(sl_uint32 row, const Point& pt);
+	
 	virtual String onGetCellText(sl_uint32 row, sl_uint32 col);
 	
 protected:
@@ -97,20 +125,27 @@ protected:
 	
 protected:
 	void _setHeaderText(sl_uint32 col, const String& text);
+	
 	void _setColumnWidth(sl_uint32 col, sl_real width);
+	
 	void _setHeaderAlignment(sl_uint32 col, Alignment align);
+	
 	void _setColumnAlignment(sl_uint32 col, Alignment align);
+	
 	void _refreshColumnsCount();
+	
 	void _refreshRowsCount();
 
 protected:
-	List<ListDetailsViewColumn> m_columns;
+	CList<ListDetailsViewColumn> m_columns;
 	sl_uint32 m_nRows;
-	List< List<ListDetailsViewCell> > m_cells;
+	CList< List<ListDetailsViewCell> > m_cells;
 	
-	Ref<Font> m_font;
-	Ref<FontInstance> m_fontInstance;
+	SafeRef<Font> m_font;
+	SafeRef<FontInstance> m_fontInstance;
+	
 };
+
 SLIB_UI_NAMESPACE_END
 
 #endif

@@ -20,7 +20,9 @@ public:
 	virtual Memory encode(const AudioData& input) = 0;
 	
 public:
-	SLIB_PROPERTY(sl_uint32, Bitrate)
+	sl_uint32 getBitrate();
+	
+	virtual void setBitrate(sl_uint32 bitrate);
 
 public:
 	SLIB_INLINE sl_uint32 getSamplesCountPerSecond() const
@@ -36,6 +38,7 @@ public:
 protected:
 	sl_uint32 m_nSamplesPerSecond;
 	sl_uint32 m_nChannels;
+	sl_uint32 m_bitrate;
 };
 
 class SLIB_EXPORT AudioDecoder : public Object

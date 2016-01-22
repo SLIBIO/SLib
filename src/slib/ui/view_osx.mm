@@ -8,6 +8,7 @@
 #include "../../../inc/slib/ui/view_group.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 void UI::setDefaultFontName(const String& fontName)
 {
 }
@@ -87,6 +88,179 @@ Ref<OSX_ViewInstance> OSX_ViewInstance::create(NSView* handle, NSView* parent, V
 NSView* OSX_ViewInstance::getHandle()
 {
 	return m_handle;
+}
+
+sl_bool OSX_ViewInstance::isValid()
+{
+	return sl_true;
+}
+
+void OSX_ViewInstance::setFocus()
+{
+	NSView* handle = m_handle;
+	if (handle != nil) {
+		NSWindow* window = [handle window];
+		if (window != nil) {
+			[window makeFirstResponder:handle];
+		}
+	}
+}
+
+void OSX_ViewInstance::invalidate()
+{
+	NSView* handle = m_handle;
+	if (handle != nil) {
+		[handle setNeedsDisplay: TRUE];
+	}
+}
+
+void OSX_ViewInstance::invalidate(const Rectangle& rect)
+{
+	NSView* handle = m_handle;
+	if (handle != nil) {
+		NSRect _rect;
+		_rect.origin.x = rect.left;
+		_rect.origin.y = rect.top;
+		_rect.size.width = rect.getWidth();
+		_rect.size.height = rect.getHeight();
+		[handle setNeedsDisplayInRect: _rect];
+	}
+}
+
+Rectangle OSX_ViewInstance::getFrame()
+{
+	NSView* handle = m_handle;
+	if (handle != nil) {
+		NSRect frame = handle.frame;
+		Rectangle ret;
+		ret.left = frame.origin.x;
+		ret.top = frame.origin.y;
+		ret.right = ret.left + frame.size.width;
+		ret.bottom = ret.top + frame.size.height;
+		return ret;
+	}
+	return Rectangle::zero();
+}
+
+void OSX_ViewInstance::setFrame(const Rectangle& frame)
+{
+	NSView* handle = m_handle;
+	if (handle != nil) {
+		NSRect frameNew;
+		frameNew.origin.x = frame.left;
+		frameNew.origin.y = frame.top;
+		frameNew.size.width = frame.getWidth();
+		frameNew.size.height = frame.getHeight();
+		[handle setFrame:frameNew];
+		[handle setNeedsDisplay:YES];
+	}
+}
+
+void OSX_ViewInstance::setVisible(sl_bool flag)
+{
+	NSView* handle = m_handle;
+	if (handle != nil) {
+		[handle setHidden:(flag ? NO : YES)];
+	}
+}
+
+void OSX_ViewInstance::setEnabled(sl_bool flag)
+{
+	NSView* handle = m_handle;
+	if (handle != nil) {
+		if ([handle isKindOfClass:[NSControl class]]) {
+			NSControl* control = (NSControl*)handle;
+			[control setEnabled:(flag ? YES : NO)];
+		}
+	}
+}
+
+void OSX_ViewInstance::setOpaque(sl_bool flag)
+{
+	NSView* handle = m_handle;
+	if (handle != nil) {
+		if ([handle isKindOfClass:[Slib_OSX_ViewBase class]]) {
+			Slib_OSX_ViewBase* control = (Slib_OSX_ViewBase*)handle;
+			control->m_flagOpaque = flag;
+		}
+	}
+}
+
+Point OSX_ViewInstance::convertCoordinateFromScreenToView(const Point& ptScreen)
+{
+	NSView* handle = m_handle;
+	if (handle != nil) {
+		NSWindow* window = [handle window];
+		if (window != nil) {
+			NSScreen* screen = [window screen];
+			NSRect rect;
+			rect.origin.x = ptScreen.x;
+			rect.origin.y = [screen frame].size.height - 1 - ptScreen.y;
+			rect.size.width = 0;
+			rect.size.height = 0;
+			rect = [window convertRectFromScreen:rect];
+			NSPoint pw;
+			pw.x = rect.origin.x;
+			pw.y = rect.origin.y;
+			NSPoint pt = [handle convertPoint:pw fromView:nil];
+			Point ret;
+			ret.x = (sl_real)(pt.x);
+			ret.y = (sl_real)(pt.y);
+			return ret;
+		}
+	}
+	return ptScreen;
+}
+
+Point OSX_ViewInstance::convertCoordinateFromViewToScreen(const Point& ptView)
+{
+	NSView* handle = m_handle;
+	if (handle != nil) {
+		NSWindow* window = [handle window];
+		if (window != nil) {
+			NSScreen* screen = [window screen];
+			NSPoint pt;
+			pt.x = ptView.x;
+			pt.y = ptView.y;
+			NSPoint pw = [handle convertPoint:pt toView:nil];
+			NSRect rect;
+			rect.origin.x = pw.x;
+			rect.origin.y = pw.y;
+			rect.size.width = 0;
+			rect.size.height = 0;
+			rect = [window convertRectToScreen:rect];
+			Point ret;
+			ret.x = (sl_real)(rect.origin.x);
+			ret.y = (sl_real)([screen frame].size.height - 1 - rect.origin.y);
+			return ret;
+		}
+	}
+	return ptView;
+}
+
+void OSX_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
+{
+	NSView* handle = UIPlatform::getViewHandle(this);
+	if (handle != nil) {
+		OSX_ViewInstance* child = (OSX_ViewInstance*)(_child.get());
+		if (child) {
+			NSView* child_handle = child->m_handle;
+			if (child_handle != nil) {
+				[handle addSubview:child_handle];
+			}
+		}
+	}
+}
+
+void OSX_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
+{
+	OSX_ViewInstance* child = (OSX_ViewInstance*)(_child.get());
+	if (child) {
+		NSView* child_handle = child->m_handle;
+		if (child_handle != nil) {
+			[child_handle removeFromSuperview];
+		}
+	}
 }
 
 void OSX_ViewInstance::onDraw(NSRect _rectDirty)
@@ -218,172 +392,6 @@ Ref<ViewInstance> View::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-sl_bool View::_isValid()
-{
-	return sl_true;
-}
-
-void View::_setFocus()
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil) {
-		NSWindow* window = [handle window];
-		if (window != nil) {
-			[window makeFirstResponder:handle];
-		}
-	}
-}
-
-void View::_invalidate()
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil) {
-		[handle setNeedsDisplay: TRUE];
-	}
-}
-
-void View::_invalidate(const Rectangle& rect)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil) {
-		NSRect _rect;
-		_rect.origin.x = rect.left;
-		_rect.origin.y = rect.top;
-		_rect.size.width = rect.getWidth();
-		_rect.size.height = rect.getHeight();
-		[handle setNeedsDisplayInRect: _rect];
-	}
-}
-
-Rectangle View::getInstanceFrame()
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil) {
-		NSRect frame = handle.frame;
-		Rectangle ret;
-		ret.left = frame.origin.x;
-		ret.top = frame.origin.y;
-		ret.right = ret.left + frame.size.width;
-		ret.bottom = ret.top + frame.size.height;
-		return ret;
-	}
-	return Rectangle::zero();
-}
-
-void View::_setFrame(const Rectangle& frame)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil) {
-		NSRect frameNew;
-		frameNew.origin.x = frame.left;
-		frameNew.origin.y = frame.top;
-		frameNew.size.width = frame.getWidth();
-		frameNew.size.height = frame.getHeight();
-		[handle setFrame:frameNew];
-		[handle setNeedsDisplay:YES];
-	}
-}
-
-void View::_setVisible(sl_bool flag)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil) {
-		[handle setHidden:(flag ? NO : YES)];
-	}
-}
-
-void View::_setEnabled(sl_bool flag)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil) {
-		if ([handle isKindOfClass:[NSControl class]]) {
-			NSControl* control = (NSControl*)handle;
-			[control setEnabled:(flag ? YES : NO)];
-		}
-	}
-}
-
-void View::_setOpaque(sl_bool flag)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil) {
-		if ([handle isKindOfClass:[Slib_OSX_ViewBase class]]) {
-			Slib_OSX_ViewBase* control = (Slib_OSX_ViewBase*)handle;
-			control->m_flagOpaque = flag;
-		}
-	}
-}
-
-Point View::_convertCoordinateFromScreenToView(const Point& ptScreen)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil) {
-		NSWindow* window = [handle window];
-		if (window != nil) {
-			NSScreen* screen = [window screen];
-			NSRect rect;
-			rect.origin.x = ptScreen.x;
-			rect.origin.y = [screen frame].size.height - 1 - ptScreen.y;
-			rect.size.width = 0;
-			rect.size.height = 0;
-			rect = [window convertRectFromScreen:rect];
-			NSPoint pw;
-			pw.x = rect.origin.x;
-			pw.y = rect.origin.y;
-			NSPoint pt = [handle convertPoint:pw fromView:nil];
-			Point ret;
-			ret.x = (sl_real)(pt.x);
-			ret.y = (sl_real)(pt.y);
-			return ret;
-		}
-	}
-	return ptScreen;
-}
-
-Point View::_convertCoordinateFromViewToScreen(const Point& ptView)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil) {
-		NSWindow* window = [handle window];
-		if (window != nil) {
-			NSScreen* screen = [window screen];
-			NSPoint pt;
-			pt.x = ptView.x;
-			pt.y = ptView.y;
-			NSPoint pw = [handle convertPoint:pt toView:nil];
-			NSRect rect;
-			rect.origin.x = pw.x;
-			rect.origin.y = pw.y;
-			rect.size.width = 0;
-			rect.size.height = 0;
-			rect = [window convertRectToScreen:rect];
-			Point ret;
-			ret.x = (sl_real)(rect.origin.x);
-			ret.y = (sl_real)([screen frame].size.height - 1 - rect.origin.y);
-			return ret;
-		}
-	}
-	return ptView;
-}
-
-void View::_addChildInstance(ViewInstance* _child)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil) {
-		OSX_ViewInstance* child = (OSX_ViewInstance*)(_child);
-		if (child) {
-			[handle addSubview:(child->getHandle())];
-		}
-	}
-}
-
-void View::_removeChildInstance(ViewInstance* _child)
-{
-	OSX_ViewInstance* child = (OSX_ViewInstance*)(_child);
-	if (child) {
-		[(child->getHandle()) removeFromSuperview];
-	}
-}
 SLIB_UI_NAMESPACE_END
 
 @implementation Slib_OSX_ViewBase

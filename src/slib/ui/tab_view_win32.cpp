@@ -10,6 +10,7 @@
 #include <commctrl.h>
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _TabView : public TabView
 {
 public:
@@ -135,16 +136,19 @@ public:
 class _Win32_TabViewInstance : public Win32_ViewInstance
 {
 public:
+    // override
 	sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 	{
 		return sl_false;
 	}
 
+    // override
 	sl_bool processCommand(SHORT code, LRESULT& result)
 	{
 		return sl_false;
 	}
 
+    // override
 	sl_bool processNotify(NMHDR* nmhdr, LRESULT& result)
 	{
 		HWND handle = getHandle();
@@ -267,6 +271,7 @@ void TabView::onResize()
 		((_TabView*)this)->__applyClientBounds(handle);
 	}
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

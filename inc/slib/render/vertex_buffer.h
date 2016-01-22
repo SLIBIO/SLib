@@ -33,7 +33,7 @@ public:
 	void update();
 	
 public:
-	SLIB_PROPERTY_INLINE(sl_bool, Static)
+	SLIB_PROPERTY(sl_bool, Static)
 
 protected:
 	Memory m_mem;

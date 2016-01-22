@@ -17,6 +17,7 @@
 @end
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _DropDownList : public DropDownList
 {
 public:
@@ -134,6 +135,7 @@ void DropDownList::setFont(const Ref<Font>& font)
 	}
 	m_font = font;
 }
+
 SLIB_UI_NAMESPACE_END
 
 #define DROP_ICON_WIDTH 20

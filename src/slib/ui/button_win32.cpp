@@ -10,11 +10,13 @@ SLIB_UI_NAMESPACE_BEGIN
 class _Win32_ButtonViewInstance : public Win32_ViewInstance
 {
 public:
+    // override
 	sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 	{
 		return sl_false;
 	}
 
+    // override
 	sl_bool processCommand(SHORT code, LRESULT& result)
 	{
 		if (code == BN_CLICKED) {

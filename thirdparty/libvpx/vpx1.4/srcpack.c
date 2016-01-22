@@ -76,15 +76,11 @@
 #	include "vp8/encoder/x86/quantize_ssse3.c"
 #	include "vp8/encoder/x86/vp8_enc_stubs_mmx.c"
 #	include "vp8/encoder/x86/vp8_enc_stubs_sse2.c"
-#	if defined(_WIN64)
-#		pragma comment(lib, "libvpx_asm_x64.lib")
-#	else
-#		pragma comment(lib, "libvpx_asm_x86.lib")
-#	endif
+
 #elif defined(__APPLE__) && defined(__MACH__)
 #   include <TargetConditionals.h>
 #	if TARGET_OS_IPHONE
-#		if TARGET_IPHONE_SIMULATOR
+#		if TARGET_OS_SIMULATOR
 #           include "vp8/common/x86/filter_x86.c"
 #           include "vp8/common/x86/idct_blk_mmx.c"
 #           include "vp8/common/x86/idct_blk_sse2.c"
@@ -150,7 +146,7 @@
 #			include "vp8/common/arm/variance_arm.c"
 #			include "vp8/common/arm/filter_arm.c"
 #		endif
-#	else
+#	elif defined(TARGET_OS_MAC)
 #       include "vp8/common/x86/filter_x86.c"
 #       include "vp8/common/x86/idct_blk_mmx.c"
 #       include "vp8/common/x86/idct_blk_sse2.c"

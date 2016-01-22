@@ -1862,7 +1862,7 @@ public:
 	
 };
 
-Ref<RenderEngine> GL_BASE::createEngine()
+Ref<GLRenderEngine> GL_BASE::createEngine()
 {
 	return new GL_ENGINE();
 }

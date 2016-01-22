@@ -17,15 +17,59 @@ public:
 	
 public:
 	static Ref<iOS_ViewInstance> create(UIView* handle, sl_bool flagFreeOnRelease);
+	
 	static Ref<iOS_ViewInstance> create(UIView* handle, UIView* parent, View* view);
 	
 public:
 	void release();
+	
 	static void freeHandle(UIView* handle);
 
 	UIView* getHandle();
 	
+public:
+	// override
+	sl_bool isValid();
+	
+	// override
+	void setFocus();
+	
+	// override
+	void invalidate();
+	
+	// override
+	void invalidate(const Rectangle& rect);
+	
+	// override
+	Rectangle getFrame();
+	
+	// override
+	void setFrame(const Rectangle& frame);
+	
+	// override
+	void setVisible(sl_bool flag);
+	
+	// override
+	void setEnabled(sl_bool flag);
+	
+	// override
+	void setOpaque(sl_bool flag);
+	
+	// override
+	Point convertCoordinateFromScreenToView(const Point& ptScreen);
+	
+	// override
+	Point convertCoordinateFromViewToScreen(const Point& ptView);
+	
+	// override
+	void addChildInstance(const Ref<ViewInstance>& instance);
+	
+	// override
+	void removeChildInstance(const Ref<ViewInstance>& instance);
+	
+public:
 	void onDraw(CGRect rectDirty);
+	
 	sl_bool onEventTouch(UIEventAction action, NSSet* touches, ::UIEvent* event);
 	
 protected:

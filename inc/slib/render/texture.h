@@ -69,11 +69,11 @@ public:
 	sl_bool setSource(const Ref<Bitmap>& source);
 
 public:
-	SLIB_PROPERTY_INLINE(TextureFilterMode, MinFilter)
-	SLIB_PROPERTY_INLINE(TextureFilterMode, MagFilter)
-	SLIB_PROPERTY_INLINE(TextureWrapMode, WrapX)
-	SLIB_PROPERTY_INLINE(TextureWrapMode, WrapY)
-	SLIB_BOOLEAN_PROPERTY_INLINE(FreeSourceOnUpdate)
+	SLIB_PROPERTY(TextureFilterMode, MinFilter)
+	SLIB_PROPERTY(TextureFilterMode, MagFilter)
+	SLIB_PROPERTY(TextureWrapMode, WrapX)
+	SLIB_PROPERTY(TextureWrapMode, WrapY)
+	SLIB_BOOLEAN_PROPERTY(FreeSourceOnUpdate)
 
 protected:
 	SafeRef<Bitmap> m_source;

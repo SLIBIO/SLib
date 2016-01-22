@@ -18,20 +18,21 @@
 
 	@public slib::WeakRef<slib::OSX_ViewInstance> m_viewInstance;
 		
-	@public slib::List<NSTableColumn*> m_columns;
+	@public slib::CList<NSTableColumn*> m_columns;
 	
 	@public NSFont* m_font;
 }
 @end
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _ListDetailsView : public ListDetailsView
 {
 public:
 	void __applyColumnsCount(_Slib_OSX_ListDetailsView* tv)
 	{
 		ObjectLocker lock(this);
-		List<NSTableColumn*> _columns = tv->m_columns;
+		CList<NSTableColumn*>& _columns = tv->m_columns;
 		sl_uint32 nOrig = (sl_uint32)(_columns.count());
 		sl_uint32 nNew = (sl_uint32)(m_columns.count());
 		if (nOrig == nNew) {
@@ -56,6 +57,7 @@ public:
 	
 	void __copyColumns(_Slib_OSX_ListDetailsView* tv)
 	{
+		ObjectLocker lock(this);
 		ListLocker<ListDetailsViewColumn> columns(m_columns);
 		__applyColumnsCount(tv);
 		for (sl_uint32 i = 0; i < columns.count(); i++) {
@@ -229,6 +231,7 @@ void ListDetailsView::setFont(const Ref<Font>& font)
 	}
 	m_font = font;
 }
+
 SLIB_UI_NAMESPACE_END
 
 @implementation _Slib_OSX_ListDetailsView

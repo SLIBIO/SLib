@@ -43,15 +43,59 @@ public:
 	}
 
 	sl_bool init(jobject jhandle);
+
 	sl_bool applyProperties(View* view, ViewInstance* parent);
 
+public:
 	static Ref<Android_ViewInstance> getAndroidInstance(jlong jinstance);
+
 	static Ref<View> getAndroidView(jlong jinstance);
 
 public:
 	jobject getHandle();
+
 	jobject getContext();
 	
+public:
+	// override
+	sl_bool isValid();
+
+	// override
+	void setFocus();
+
+	// override
+	void invalidate();
+
+	// override
+	void invalidate(const Rectangle& rect);
+
+	// override
+	Rectangle getFrame();
+
+	// override
+	void setFrame(const Rectangle& frame);
+
+	// override
+	void setVisible(sl_bool flag);
+
+	// override
+	void setEnabled(sl_bool flag);
+
+	// override
+	void setOpaque(sl_bool flag);
+
+	// override
+	Point convertCoordinateFromScreenToView(const Point& ptScreen);
+
+	// override
+	Point convertCoordinateFromViewToScreen(const Point& ptView);
+
+	// override
+	void addChildInstance(const Ref<ViewInstance>& instance);
+
+	// override
+	void removeChildInstance(const Ref<ViewInstance>& instance);
+
 protected:
 	JniGlobal<jobject> m_handle;
 	JniGlobal<jobject> m_context;

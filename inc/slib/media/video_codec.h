@@ -19,12 +19,15 @@ public:
 	virtual Memory encode(const VideoFrame& input) = 0;
 	
 public:
-	SLIB_PROPERTY(sl_uint32, Bitrate)
+	sl_uint32 getBitrate();
+	
+	virtual void setBitrate(sl_uint32 bitrate);
 	
 protected:
 	sl_uint32 m_nWidth;
 	sl_uint32 m_nHeight;
 	sl_uint32 m_nKeyFrameInterval;
+	sl_uint32 m_bitrate;
 };
 
 class SLIB_EXPORT VideoDecoder : public Object

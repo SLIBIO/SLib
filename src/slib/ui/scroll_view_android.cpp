@@ -122,6 +122,7 @@ Size ScrollView::getScrollRange()
 	}
 	return Size::zero();
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

@@ -55,9 +55,9 @@ public:
 	const SocketAddress& getRemoteAddress();
 	
 public:
-	SLIB_BOOLEAN_PROPERTY_INLINE(ClosingConnection);
+	SLIB_BOOLEAN_PROPERTY(ClosingConnection);
 	
-	SLIB_BOOLEAN_PROPERTY_INLINE(ProcessingByThread);
+	SLIB_BOOLEAN_PROPERTY(ProcessingByThread);
 
 protected:
 	HttpHeaderReader m_requestHeaderReader;
@@ -106,13 +106,13 @@ public:
 	void sendProxyResponse_Failed();
 
 public:
-	SLIB_PROPERTY_INLINE(SocketAddress, LocalAddress)
+	SLIB_PROPERTY(SocketAddress, LocalAddress)
 	
-	SLIB_PROPERTY_INLINE(SocketAddress, RemoteAddress)
+	SLIB_PROPERTY(SocketAddress, RemoteAddress)
 	
-	SLIB_REF_PROPERTY_INLINE(Referable, ProxyObject)
-	
-	SLIB_REF_PROPERTY_INLINE(Referable, UserObject)
+	SLIB_REF_PROPERTY(Referable, ProxyObject)
+
+	SLIB_REF_PROPERTY(Referable, UserObject)
 
 public:
 	SLIB_INLINE Ref<AsyncStream> getIO()

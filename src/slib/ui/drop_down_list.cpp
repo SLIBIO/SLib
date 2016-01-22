@@ -1,6 +1,7 @@
 #include "../../../inc/slib/ui/drop_down_list.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 DropDownList::DropDownList()
 {
 	m_indexSelected = 0;
@@ -116,4 +117,5 @@ void DropDownList::onSelectItem(sl_uint32 index)
 		listener->onSelectItem(this, index);
 	}
 }
+
 SLIB_UI_NAMESPACE_END

@@ -14,7 +14,7 @@ void JNICALL _AndroidEditView_nativeOnChange(JNIEnv* env, jobject _this, jlong i
 	if (EditView::checkInstance(_view)) {
 		EditView* view = (EditView*)(_view.get());
 		String text = view->getText();
-		String textNew = view->onChange(text);
+		String textNew = view->dispatchChange(text);
 		if (text != textNew) {
 			view->setText(text);
 		}

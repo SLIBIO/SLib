@@ -194,8 +194,8 @@ public:
 	void stopAndWait();
 
 public:
-	SLIB_PROPERTY_INLINE(sl_uint64, LastRunTime)
-	SLIB_PROPERTY_INLINE(sl_uint32, MaxConcurrentThread)
+	SLIB_PROPERTY(sl_uint64, LastRunTime)
+	SLIB_PROPERTY(sl_uint32, MaxConcurrentThread)
 
 protected:
 	sl_bool m_flagStarted;

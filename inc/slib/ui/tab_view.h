@@ -21,6 +21,15 @@ public:
 	virtual void onSelectTab(TabView* view, sl_uint32 index) = 0;
 };
 
+class TabViewItem
+{
+public:
+	SafeString label;
+	
+	SafeRef<View> contentView;
+	
+};
+
 class SLIB_EXPORT TabView : public View
 {
 	SLIB_DECLARE_OBJECT(TabView, View)
@@ -29,26 +38,36 @@ public:
 	
 public:
 	sl_uint32 getTabsCount();
+	
 	virtual void setTabsCount(sl_uint32 nCount);
 	
+	
 	String getTabLabel(sl_uint32 index);
+	
 	virtual void setTabLabel(sl_uint32 index, const String& text);
 	
+
 	Ref<View> getTabContentView(sl_uint32 index);
+	
 	virtual void setTabContentView(sl_uint32 index, const Ref<View>& view);
 	
+	
 	sl_uint32 getSelectedTabIndex();
+	
 	virtual void selectTab(sl_uint32 index);
+	
 	
 	Size getContentViewSize();
 	
+	
 	Ref<Font> getFont();
+	
 	virtual void setFont(const Ref<Font>& font);
 
 public:
-	SLIB_PROPERTY_INLINE(Ptr<ITabViewListener>, Listener)
+	SLIB_PTR_PROPERTY(ITabViewListener, Listener)
 	
-public:
+protected:
 	void onSelectTab(sl_uint32 index);
 	
 protected:
@@ -64,24 +83,20 @@ protected:
 	void _setTabLabel(sl_uint32 index, const String& text);
 	
 	void _setTabContentView(sl_uint32 index, const Ref<View>& view);
+	
 	void _setTabContentView_(sl_uint32 index, Ref<View> view);
 	
 	void _selectTab(sl_uint32 index);
 
 protected:
-	struct TabViewItem
-	{
-		String label;
-		Ref<View> contentView;
-		
-		TabViewItem();
-	};
-	List<TabViewItem> m_items;
+	CList<TabViewItem> m_items;
 	sl_uint32 m_indexSelected;
 	
-	Ref<Font> m_font;
-	Ref<FontInstance> m_fontInstance;
+	SafeRef<Font> m_font;
+	SafeRef<FontInstance> m_fontInstance;
+	
 };
+
 SLIB_UI_NAMESPACE_END
 
 #else

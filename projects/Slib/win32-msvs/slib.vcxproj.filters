@@ -1254,5 +1254,8 @@
     <ClCompile Include="..\..\..\src\slib\media\audio_data.cpp">
       <Filter>src\slib\media</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\video_frame.cpp">
+      <Filter>src\slib\media</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

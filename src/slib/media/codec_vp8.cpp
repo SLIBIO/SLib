@@ -51,6 +51,7 @@ public:
 	~_VP8EncoderImpl()
 	{
 		if (m_codec_image != sl_null) {
+			vpx_img_free(m_codec_image);
 			delete m_codec_image;
 			m_codec_image = sl_null;
 		}
@@ -86,7 +87,6 @@ public:
 	{
 		vpx_codec_enc_cfg_t codec_config;
 		vpx_codec_interface codec_interface = &vpx_codec_vp8_cx;
-		
 		if (codec_interface != sl_null) {
 			vpx_codec_ctx_t* codec = new vpx_codec_ctx_t;
 			if (codec) {
@@ -124,6 +124,7 @@ public:
 						} else {
 							logError("Failed to set default video encoder codec configuration.");
 						}
+						vpx_img_free(codec_image);
 					} else {
 						logError("Failed to allocate video codec image");
 					}
@@ -204,25 +205,15 @@ class _VP8DecoderImpl : public VP8Decoder
 {
 public:
 	vpx_codec_ctx_t* m_codec;
-	vpx_image_t* m_codec_image;
-	vpx_codec_interface m_codec_interface;
 
 public:
 	_VP8DecoderImpl()
 	{
 		m_codec = sl_null;
-		m_codec_image = sl_null;
-		m_codec_interface = sl_null;
 	}
 	
 	~_VP8DecoderImpl()
 	{
-
-		if (m_codec_image != sl_null) {
-			delete m_codec_image;
-			m_codec_image = sl_null;
-		}
-
 		if (m_codec != sl_null) {
 			vpx_codec_destroy(m_codec);
 			delete m_codec;
@@ -243,25 +234,18 @@ public:
 		if (codec_interface != sl_null) {
 			vpx_codec_ctx_t* codec = new vpx_codec_ctx_t;
 			if (codec) {
-				vpx_image_t* codec_image = new vpx_image_t;
-				if (codec_image) {
-					if (!vpx_codec_dec_init(codec, codec_interface(), NULL, 0)) {
-						Ref<_VP8DecoderImpl> ret = new _VP8DecoderImpl;
-						if (ret.isNotNull()) {
-							ret->m_nWidth = param.width;
-							ret->m_nHeight = param.height;
-							ret->m_codec = codec;
-							ret->m_codec_image = codec_image;
-							ret->m_codec_interface = codec_interface;
-							return ret;
-						}
-						vpx_codec_destroy(codec);
-					} else{
-						logError("Failed initialize video decoder codec.");
+				if (!vpx_codec_dec_init(codec, codec_interface(), NULL, 0)) {
+					Ref<_VP8DecoderImpl> ret = new _VP8DecoderImpl;
+					if (ret.isNotNull()) {
+						ret->m_nWidth = param.width;
+						ret->m_nHeight = param.height;
+						ret->m_codec = codec;
+						return ret;
 					}
-					delete codec_image;
+					vpx_codec_destroy(codec);
+				} else{
+					logError("Failed initialize video decoder codec.");
 				}
-				delete codec;
 			}
 		} else {
 			logError("Video codec is not supported");
@@ -269,18 +253,22 @@ public:
 		return Ref<_VP8DecoderImpl>::null();
 	}
 
-	SLIB_INLINE sl_int32 vpx_img_plane_width(const vpx_image_t *img, sl_int32 plane) {
-		if (plane > 0 && img->x_chroma_shift > 0)
+	SLIB_INLINE sl_int32 vpx_img_plane_width(const vpx_image_t *img, sl_int32 plane)
+	{
+		if (plane > 0 && img->x_chroma_shift > 0) {
 			return (img->d_w + 1) >> img->x_chroma_shift;
-		else
+		} else {
 			return img->d_w;
+		}
 	}
 
-	SLIB_INLINE sl_int32 vpx_img_plane_height(const vpx_image_t *img, sl_int32 plane) {
-		if (plane > 0 && img->y_chroma_shift > 0)
+	SLIB_INLINE sl_int32 vpx_img_plane_height(const vpx_image_t *img, sl_int32 plane)
+	{
+		if (plane > 0 && img->y_chroma_shift > 0) {
 			return (img->d_h + 1) >> img->y_chroma_shift;
-		else
+		} else {
 			return img->d_h;
+		}
 	}
 
 	sl_bool decode(const void* input, const sl_uint32& inputSize , VideoFrame& output)
@@ -294,18 +282,20 @@ public:
 			
 			vpx_codec_iter_t iter = NULL;
 			
-			while ((m_codec_image = vpx_codec_get_frame(m_codec, &iter)) != NULL) {
+			vpx_image_t* image;
+
+			while ((image = vpx_codec_get_frame(m_codec, &iter)) != NULL) {
 				
 				BitmapData src;
-				src.width = m_codec_image->w;
-				src.height = m_codec_image->h;
+				src.width = image->w;
+				src.height = image->h;
 				src.format = bitmapFormat_YUV_I420;
-				src.data = m_codec_image->planes[0];
-				src.pitch = m_codec_image->stride[0];
-				src.data1 = m_codec_image->planes[1];
-				src.pitch1 = m_codec_image->stride[1];
-				src.data2 = m_codec_image->planes[2];
-				src.pitch2 = m_codec_image->stride[2];
+				src.data = image->planes[0];
+				src.pitch = image->stride[0];
+				src.data1 = image->planes[1];
+				src.pitch1 = image->stride[1];
+				src.data2 = image->planes[2];
+				src.pitch2 = image->stride[2];
 				
 				output.image.copyPixelsFrom(src);				
 			}

@@ -25,10 +25,7 @@ class _Android_FontInstance : public FontInstance
 public:
 	JniGlobal<jobject> m_font;
 	
-	_Android_FontInstance()
-	{
-	}
-	
+public:	
 	static Ref<_Android_FontInstance> _create(const FontDesc& desc)
 	{
 		Ref<_Android_FontInstance> ret;
@@ -107,6 +104,7 @@ Size UI::getFontTextSize(const Ref<Font>& font, const String& text)
 	}
 	return Size::zero();
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

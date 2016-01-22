@@ -49,7 +49,7 @@ public:
 
 	Ref<HttpClientConnection> getConnection();
 
-	SLIB_STRING_PROPERTY_INLINE(Protocol)
+	SLIB_STRING_PROPERTY(Protocol)
 
 public:
 	SLIB_INLINE const Memory& getRawResponseHeader() const
@@ -84,8 +84,8 @@ public:
 	}
 
 public:
-	SLIB_PROPERTY_INLINE(Ptr<IHttpClientListener>, Listener);
-	SLIB_PROPERTY_INLINE(Ref<Event>, CompletionEvent);
+	SLIB_PROPERTY(Ptr<IHttpClientListener>, Listener);
+	SLIB_PROPERTY(Ref<Event>, CompletionEvent);
 
 	friend class HttpClientConnection;
 };

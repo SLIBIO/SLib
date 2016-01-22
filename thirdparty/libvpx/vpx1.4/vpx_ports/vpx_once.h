@@ -8,15 +8,15 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef VPX_PORTS_VPX_ONCE_H_
-#define VPX_PORTS_VPX_ONCE_H_
+//#ifndef VPX_PORTS_VPX_ONCE_H_
+//#define VPX_PORTS_VPX_ONCE_H_
 
 #include "../vpx_config.h"
 
 #if CONFIG_MULTITHREAD && defined(_WIN32)
 #include <windows.h>
 #include <stdlib.h>
-static void once(void (*func)(void))
+static void _vpx_once(void (*func)(void))
 {
     static CRITICAL_SECTION *lock;
     static LONG waiters;
@@ -76,7 +76,7 @@ static void once(void (*func)(void))
 #elif CONFIG_MULTITHREAD && defined(__OS2__)
 #define INCL_DOS
 #include <os2.h>
-static void once(void (*func)(void))
+static void _vpx_once(void (*func)(void))
 {
     static int done;
 
@@ -102,7 +102,7 @@ static void once(void (*func)(void))
 
 #elif CONFIG_MULTITHREAD && HAVE_PTHREAD_H
 #include <pthread.h>
-static void once(void (*func)(void))
+static void _vpx_once(void (*func)(void))
 {
     static pthread_once_t lock = PTHREAD_ONCE_INIT;
     pthread_once(&lock, func);
@@ -115,7 +115,7 @@ static void once(void (*func)(void))
  * no synchronization is strictly necessary.
  */
 
-static void once(void (*func)(void))
+static void _vpx_once(void (*func)(void))
 {
 	func();
     /*static int done;
@@ -128,4 +128,4 @@ static void once(void (*func)(void))
 }
 #endif
 
-#endif  // VPX_PORTS_VPX_ONCE_H_
+//#endif  // VPX_PORTS_VPX_ONCE_H_

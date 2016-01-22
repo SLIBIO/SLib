@@ -4,114 +4,153 @@
 #include "../../../inc/slib/ui/core.h"
 
 SLIB_UI_NAMESPACE_BEGIN
-WindowInstance::WindowInstance()
+
+WindowInstanceParam::WindowInstanceParam()
 {
+	flagBorderless = sl_false;
+	flagShowTitleBar = sl_false;
+	flagFullScreen = sl_true;
+	flagCenterScreen = sl_true;
+	flagDialog = sl_false;
+	
+#if defined(SLIB_PLATFORM_IS_ANDROID)
+	activity = sl_null;
+#endif
 }
 
-void WindowInstance::setWindow(Ref<Window> window)
+Rectangle WindowInstanceParam::calculateRegion(const Rectangle& screenFrame) const
 {
-	m_window = window;
-}
-
-Ref<Window> WindowInstance::getWindow()
-{
-	return m_window;
-}
-
-void WindowInstance::onCreate()
-{
-	Ref<Window> window = getWindow();
-	if (window.isNotNull()) {
-		window->onCreate();
-	}
-}
-
-sl_bool WindowInstance::onClose()
-{
-	Ref<Window> window = getWindow();
-	if (window.isNotNull()) {
-		return window->onClose();
+	Rectangle frame;
+	if (flagFullScreen) {
+		frame.setLeftTop(0, 0);
+		frame.setSize(screenFrame.getSize());
 	} else {
-		return sl_true;
+		if (flagCenterScreen) {
+			frame.setLeftTop(screenFrame.getWidth() / 2 - size.x / 2, screenFrame.getHeight() / 2 - size.y / 2);
+		} else {
+			frame.setLeftTop(location);
+		}
+		frame.setSize(size);
 	}
+	return frame;
 }
 
-void WindowInstance::onActivate()
+WindowParam::WindowParam()
 {
-	Ref<Window> window = getWindow();
-	if (window.isNotNull()) {
-		window->onActivate();
-	}
+	init();
+	flagShowTitleBar = sl_false;
+	flagFullScreen = sl_true;
 }
 
-void WindowInstance::onDeactivate()
+WindowParam::WindowParam(Rectangle _rect)
 {
-	Ref<Window> window = getWindow();
-	if (window.isNotNull()) {
-		window->onDeactivate();
-	}
+	init();
+	flagShowTitleBar = sl_false;
+	flagFullScreen = sl_false;
+	flagCenterScreen = sl_false;
+	location.x = _rect.left;
+	location.y = _rect.top;
+	size.x = _rect.getWidth();
+	size.y = _rect.getHeight();
 }
 
-void WindowInstance::onMove()
+WindowParam::WindowParam(sl_real width, sl_real height)
 {
-	Ref<Window> window = getWindow();
-	if (window.isNotNull()) {
-		window->onMove();
-	}
+	init();
+	flagShowTitleBar = sl_false;
+	flagFullScreen = sl_false;
+	flagCenterScreen = sl_true;
+	size.x = width;
+	size.y = height;
 }
 
-void WindowInstance::onResize(Size& size)
+WindowParam::WindowParam(sl_real x, sl_real y, sl_real width, sl_real height)
 {
-	Ref<Window> window = getWindow();
-	if (window.isNotNull()) {
-		window->onResize(size);
-	}
+	init();
+	flagShowTitleBar = sl_false;
+	flagFullScreen = sl_false;
+	flagCenterScreen = sl_false;
+	location.x = x;
+	location.y = y;
+	size.x = width;
+	size.y = height;
 }
 
-void WindowInstance::onMinimize()
+WindowParam::WindowParam(String _title, Rectangle _rect)
 {
-	Ref<Window> window = getWindow();
-	if (window.isNotNull()) {
-		window->onMinimize();
-	}
+	init();
+	flagShowTitleBar = sl_true;
+	title = _title;
+	flagFullScreen = sl_false;
+	flagCenterScreen = sl_false;
+	location.x = _rect.left;
+	location.y = _rect.top;
+	size.x = _rect.getWidth();
+	size.y = _rect.getHeight();
 }
 
-void WindowInstance::onDeminimize()
+WindowParam::WindowParam(String _title, sl_real width, sl_real height)
 {
-	Ref<Window> window = getWindow();
-	if (window.isNotNull()) {
-		window->onDeminimize();
-	}
+	init();
+	flagShowTitleBar = sl_true;
+	title = _title;
+	flagFullScreen = sl_false;
+	flagCenterScreen = sl_true;
+	size.x = width;
+	size.y = height;
 }
 
-void WindowInstance::onMaximize()
+WindowParam::WindowParam(String _title, sl_real x, sl_real y, sl_real width, sl_real height)
 {
-	Ref<Window> window = getWindow();
-	if (window.isNotNull()) {
-		window->onMaximize();
-	}
+	init();
+	flagShowTitleBar = sl_true;
+	title = _title;
+	flagFullScreen = sl_false;
+	flagCenterScreen = sl_false;
+	location.x = x;
+	location.y = y;
+	size.x = width;
+	size.y = height;
 }
 
-void WindowInstance::onDemaximize()
+void WindowParam::init()
 {
-	Ref<Window> window = getWindow();
-	if (window.isNotNull()) {
-		window->onDemaximize();
+	backgroundColor = Color::zero();
+	
+	flagVisible = sl_true;
+	flagMinimized = sl_false;
+	flagMaximized = sl_false;
+	
+	flagAlwaysOnTop = sl_false;
+	flagCloseButtonEnabled = sl_true;
+	flagMinimizeButtonEnabled = sl_false;
+	flagMaximizeButtonEnabled = sl_false;
+	flagResizable = sl_false;
+	alpha = 1.0f;
+	flagTransparent = sl_false;
+	
+	flagModal = sl_false;
+}
+
+void WindowParam::setParent(const Ref<Window>& parent)
+{
+	if (parent.isNotNull()) {
+		this->parent = parent->getWindowInstance();
 	}
 }
-SLIB_UI_NAMESPACE_END
 
 
 #define CHECK_INSTANCE(instance) (instance.isNotNull() && !(instance->isClosed()))
 
-// Window
-SLIB_UI_NAMESPACE_BEGIN
 Window::Window()
 {
 	SLIB_REFERABLE_CONSTRUCTOR;
 	
-	m_viewContent = new ViewGroup();
-	m_viewContent->setWindow(this);
+	Ref<ViewGroup> view = new ViewGroup;
+	if (view.isNotNull()) {
+		view->setWindow(this);
+		m_viewContent = view;
+	}
 }
 
 void Window::close()
@@ -129,31 +168,8 @@ sl_bool Window::isClosed()
 	Ref<WindowInstance> instance = m_instance;
 	if (instance.isNotNull()) {
 		return instance->isClosed();
-	} else {
-		return sl_true;
 	}
-}
-
-const Ref<ViewGroup>& Window::getContentView()
-{
-	return m_viewContent;
-}
-
-void Window::setContentView(const Ref<ViewGroup>& view)
-{
-	ObjectLocker lock(this);
-	
-	Ref<ViewGroup> orig = m_viewContent;
-	Ref<ViewInstance> instance;
-	if (orig.isNotNull()) {
-		instance = orig->getViewInstance();
-		orig->detach();
-	}
-	if (view.isNotNull() && instance.isNotNull()) {
-		view->attach(instance);
-		view->setWindow(this);
-	}
-	m_viewContent = view;
+	return sl_true;
 }
 
 Ref<WindowInstance> Window::getParentInstance()
@@ -182,11 +198,33 @@ Ref<Window> Window::getParent()
 	return Ref<Window>::null();
 }
 
-void Window::setParent(Window* parent)
+void Window::setParent(const Ref<Window>& parent)
 {
-	if (parent) {
-		setParentInstance(parent->getWindowInstance());
+	if (parent.isNotNull()) {
+		setParentInstance(parent->m_instance);
 	}
+}
+
+Ref<ViewGroup> Window::getContentView()
+{
+	return m_viewContent;
+}
+
+void Window::setContentView(const Ref<ViewGroup>& view)
+{
+	ObjectLocker lock(this);
+	
+	Ref<ViewGroup> orig = m_viewContent;
+	Ref<ViewInstance> instance;
+	if (orig.isNotNull()) {
+		instance = orig->getViewInstance();
+		orig->detach();
+	}
+	if (view.isNotNull() && instance.isNotNull()) {
+		view->attach(instance);
+		view->setWindow(this);
+	}
+	m_viewContent = view;
 }
 
 void Window::setFocus()
@@ -195,6 +233,113 @@ void Window::setFocus()
 	if (CHECK_INSTANCE(instance)) {
 		instance->setFocus();
 	}
+}
+
+void Window::runModal()
+{
+	Ref<WindowInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		UI::runOnUIThread(SLIB_CALLBACK_WEAKREF(Window, _runModal, this));
+	}
+}
+
+void Window::_runModal()
+{
+	Ref<WindowInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		instance->runModal();
+	}
+}
+
+Rectangle Window::getFrame()
+{
+	Ref<WindowInstance> instance = m_instance;
+	if (CHECK_INSTANCE(instance)) {
+		return instance->getFrame();
+	}
+	return Rectangle::zero();
+}
+
+void Window::setFrame(const Rectangle& frame)
+{
+	Ref<WindowInstance> instance = m_instance;
+	if (CHECK_INSTANCE(instance)) {
+		instance->setFrame(frame);
+	}
+}
+
+void Window::setFrame(sl_real left, sl_real top, sl_real width, sl_real height)
+{
+	Rectangle rect;
+	rect.left = left;
+	rect.top = top;
+	rect.setSize(width, height);
+	setFrame(rect);
+}
+
+Point Window::getLocation()
+{
+	return getFrame().getLocation();
+}
+
+void Window::setLocation(const Point& location)
+{
+	Rectangle frame = getFrame();
+	frame.setLocation(location);
+	setFrame(frame);
+}
+
+void Window::setLocation(sl_real x, sl_real y)
+{
+	setLocation(Point(x, y));
+}
+
+Size Window::getSize()
+{
+	return getFrame().getSize();
+}
+
+void Window::setSize(const Size& size)
+{
+	Rectangle frame = getFrame();
+	frame.setSize(size);
+	setFrame(frame);
+}
+
+void Window::setSize(sl_real width, sl_real height)
+{
+	setSize(Size(width, height));
+}
+
+Rectangle Window::getClientFrame()
+{
+	Ref<WindowInstance> instance = m_instance;
+	if (CHECK_INSTANCE(instance)) {
+		return instance->getClientFrame();
+	}
+	return Rectangle::zero();
+}
+
+Size Window::getClientSize()
+{
+	Ref<WindowInstance> instance = m_instance;
+	if (CHECK_INSTANCE(instance)) {
+		return instance->getClientSize();
+	}
+	return Size::zero();
+}
+
+void Window::setClientSize(const Size& size)
+{
+	Ref<WindowInstance> instance = m_instance;
+	if (CHECK_INSTANCE(instance)) {
+		instance->setClientSize(size);
+	}
+}
+
+void Window::setClientSize(sl_real width, sl_real height)
+{
+	setClientSize(Size(width, height));
 }
 
 String Window::getTitle()
@@ -228,49 +373,6 @@ void Window::setBackgroundColor(const Color& color)
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
 		instance->setBackgroundColor(color);
-	}
-}
-
-Rectangle Window::getFrame()
-{
-	Ref<WindowInstance> instance = m_instance;
-	if (CHECK_INSTANCE(instance)) {
-		return instance->getFrame();
-	}
-	return Rectangle::zero();
-}
-
-void Window::setFrame(const Rectangle& frame)
-{
-	Ref<WindowInstance> instance = m_instance;
-	if (CHECK_INSTANCE(instance)) {
-		instance->setFrame(frame);
-	}
-}
-
-Rectangle Window::getClientFrame()
-{
-	Ref<WindowInstance> instance = m_instance;
-	if (CHECK_INSTANCE(instance)) {
-		return instance->getClientFrame();
-	}
-	return Rectangle::zero();
-}
-
-Size Window::getClientSize()
-{
-	Ref<WindowInstance> instance = m_instance;
-	if (CHECK_INSTANCE(instance)) {
-		return instance->getClientSize();
-	}
-	return Size::zero();
-}
-
-void Window::setClientSize(const Size& size)
-{
-	Ref<WindowInstance> instance = m_instance;
-	if (CHECK_INSTANCE(instance)) {
-		instance->setClientSize(size);
 	}
 }
 
@@ -454,6 +556,14 @@ Point Window::convertCoordinateFromScreenToWindow(const Point& ptScreen)
 	}
 }
 
+Rectangle Window::convertCoordinateFromScreenToWindow(const Rectangle& rect)
+{
+	Rectangle ret;
+	ret.setLeftTop(convertCoordinateFromScreenToWindow(rect.getLeftTop()));
+	ret.setRightBottom(convertCoordinateFromScreenToWindow(rect.getRightBottom()));
+	return ret;
+}
+
 Point Window::convertCoordinateFromWindowToScreen(const Point& ptWindow)
 {
 	Ref<WindowInstance> instance = m_instance;
@@ -462,6 +572,14 @@ Point Window::convertCoordinateFromWindowToScreen(const Point& ptWindow)
 	} else {
 		return Point::zero();
 	}
+}
+
+Rectangle Window::convertCoordinateFromWindowToScreen(const Rectangle& rect)
+{
+	Rectangle ret;
+	ret.setLeftTop(convertCoordinateFromWindowToScreen(rect.getLeftTop()));
+	ret.setRightBottom(convertCoordinateFromWindowToScreen(rect.getRightBottom()));
+	return ret;
 }
 
 Point Window::convertCoordinateFromScreenToClient(const Point& ptScreen)
@@ -474,6 +592,14 @@ Point Window::convertCoordinateFromScreenToClient(const Point& ptScreen)
 	}
 }
 
+Rectangle Window::convertCoordinateFromScreenToClient(const Rectangle& rect)
+{
+	Rectangle ret;
+	ret.setLeftTop(convertCoordinateFromScreenToClient(rect.getLeftTop()));
+	ret.setRightBottom(convertCoordinateFromScreenToClient(rect.getRightBottom()));
+	return ret;
+}
+
 Point Window::convertCoordinateFromClientToScreen(const Point& ptClient)
 {
 	Ref<WindowInstance> instance = m_instance;
@@ -482,6 +608,14 @@ Point Window::convertCoordinateFromClientToScreen(const Point& ptClient)
 	} else {
 		return Point::zero();
 	}
+}
+
+Rectangle Window::convertCoordinateFromClientToScreen(const Rectangle& rect)
+{
+	Rectangle ret;
+	ret.setLeftTop(convertCoordinateFromClientToScreen(rect.getLeftTop()));
+	ret.setRightBottom(convertCoordinateFromClientToScreen(rect.getRightBottom()));
+	return ret;
 }
 
 Point Window::convertCoordinateFromWindowToClient(const Point& ptWindow)
@@ -494,6 +628,14 @@ Point Window::convertCoordinateFromWindowToClient(const Point& ptWindow)
 	}
 }
 
+Rectangle Window::convertCoordinateFromWindowToClient(const Rectangle& rect)
+{
+	Rectangle ret;
+	ret.setLeftTop(convertCoordinateFromWindowToClient(rect.getLeftTop()));
+	ret.setRightBottom(convertCoordinateFromWindowToClient(rect.getRightBottom()));
+	return ret;
+}
+
 Point Window::convertCoordinateFromClientToWindow(const Point& ptClient)
 {
 	Ref<WindowInstance> instance = m_instance;
@@ -502,6 +644,14 @@ Point Window::convertCoordinateFromClientToWindow(const Point& ptClient)
 	} else {
 		return Point::zero();
 	}
+}
+
+Rectangle Window::convertCoordinateFromClientToWindow(const Rectangle& rect)
+{
+	Rectangle ret;
+	ret.setLeftTop(convertCoordinateFromClientToWindow(rect.getLeftTop()));
+	ret.setRightBottom(convertCoordinateFromClientToWindow(rect.getRightBottom()));
+	return ret;
 }
 
 Size Window::getWindowSizeFromClientSize(const Size& sizeClient)
@@ -522,6 +672,11 @@ Size Window::getClientSizeFromWindowSize(const Size& sizeWindow)
 	} else {
 		return Point::zero();
 	}
+}
+
+Ref<WindowInstance> Window::getWindowInstance()
+{
+	return m_instance;
 }
 
 void Window::attach(const Ref<WindowInstance>& instance)
@@ -553,7 +708,10 @@ void Window::detach()
 {
 	ObjectLocker lock(this);
 	
-	m_viewContent->detach();
+	Ref<View> view = m_viewContent;
+	if (view.isNotNull()) {
+		view->detach();
+	}
 	Ref<WindowInstance> instance = m_instance;
 	if (instance.isNotNull()) {
 		instance->setWindow(Ref<Window>::null());
@@ -613,46 +771,33 @@ sl_bool Window::createWindow(const WindowParam& param)
 	return sl_false;
 }
 
-void Window::create(const WindowParam& param, const Ref<Runnable>& callbackSuccess, const Ref<Runnable>& callbackFail)
+void Window::create(const WindowParam& param)
 {
 	if (UI::isUIThread()) {
 		if (createWindow(param)) {
-			if (callbackSuccess.isNotNull()) {
-				callbackSuccess->run();
+			if (param.callbackSuccess.isNotNull()) {
+				param.callbackSuccess->run();
 			}
 		} else {
-			if (callbackFail.isNotNull()) {
-				callbackFail->run();
+			if (param.callbackFail.isNotNull()) {
+				param.callbackFail->run();
 			}
 		}
 	} else {
-		UI::runOnUIThread(SLIB_CALLBACK_REF(Window, _createCallback, this, param, callbackSuccess, callbackFail));
+		UI::runOnUIThread(SLIB_CALLBACK_REF(Window, _createCallback, this, param));
 	}
 }
 
-void Window::_createCallback(WindowParam param, Ref<Runnable> callbackSuccess, Ref<Runnable> callbackFail)
+void Window::_createCallback(WindowParam param)
 {
 	if (createWindow(param)) {
-		if (callbackSuccess.isNotNull()) {
-			callbackSuccess->run();
+		if (param.callbackSuccess.isNotNull()) {
+			param.callbackSuccess->run();
 		}
 	} else {
-		if (callbackFail.isNotNull()) {
-			callbackFail->run();
+		if (param.callbackFail.isNotNull()) {
+			param.callbackFail->run();
 		}
-	}
-}
-
-void Window::runModal()
-{
-	UI::runOnUIThread(SLIB_CALLBACK_WEAKREF(Window, _runModal, this));
-}
-
-void Window::_runModal()
-{
-	Ref<WindowInstance> instance = getWindowInstance();
-	if (instance.isNotNull()) {
-		instance->runModal();
 	}
 }
 
@@ -779,6 +924,7 @@ void Window::onDemaximize()
 
 void Window::_refreshSize()
 {
+#if !defined(SLIB_PLATFORM_IS_WIN32)
 	Ref<ViewGroup> view = m_viewContent;
 	if (view.isNotNull()) {
 		Rectangle rect;
@@ -786,139 +932,99 @@ void Window::_refreshSize()
 		rect.setSize(getClientSize());
 		view->setFrame(rect);
 	}
-}
-
-WindowInstanceParam::WindowInstanceParam()
-{
-	flagBorderless = sl_false;
-	flagShowTitleBar = sl_false;
-	flagFullScreen = sl_true;
-	flagCenterScreen = sl_true;
-	flagDialog = sl_false;
-
-#if defined(SLIB_PLATFORM_IS_ANDROID)
-	activity = sl_null;
 #endif
 }
 
-Rectangle WindowInstanceParam::calculateRegion(const Rectangle& screenFrame) const
+Ref<Window> WindowInstance::getWindow()
 {
-	Rectangle frame;
-	if (flagFullScreen) {
-		frame.setLeftTop(0, 0);
-		frame.setSize(screenFrame.getSize());
+	return m_window;
+}
+
+void WindowInstance::setWindow(const Ref<Window>& window)
+{
+	m_window = window;
+}
+
+void WindowInstance::onCreate()
+{
+	Ref<Window> window = getWindow();
+	if (window.isNotNull()) {
+		window->onCreate();
+	}
+}
+
+sl_bool WindowInstance::onClose()
+{
+	Ref<Window> window = getWindow();
+	if (window.isNotNull()) {
+		return window->onClose();
 	} else {
-		if (flagCenterScreen) {
-			frame.setLeftTop(screenFrame.getWidth() / 2 - size.x / 2, screenFrame.getHeight() / 2 - size.y / 2);
-		} else {
-			frame.setLeftTop(location);
-		}
-		frame.setSize(size);
-	}
-	return frame;
-}
-
-WindowParam::WindowParam()
-{
-	init();
-	flagShowTitleBar = sl_false;
-	flagFullScreen = sl_true;
-}
-
-WindowParam::WindowParam(Rectangle _rect)
-{
-	init();
-	flagShowTitleBar = sl_false;
-	flagFullScreen = sl_false;
-	flagCenterScreen = sl_false;
-	location.x = _rect.left;
-	location.y = _rect.top;
-	size.x = _rect.getWidth();
-	size.y = _rect.getHeight();
-}
-
-WindowParam::WindowParam(sl_real width, sl_real height)
-{
-	init();
-	flagShowTitleBar = sl_false;
-	flagFullScreen = sl_false;
-	flagCenterScreen = sl_true;
-	size.x = width;
-	size.y = height;
-}
-
-WindowParam::WindowParam(sl_real x, sl_real y, sl_real width, sl_real height)
-{
-	init();
-	flagShowTitleBar = sl_false;
-	flagFullScreen = sl_false;
-	flagCenterScreen = sl_false;
-	location.x = x;
-	location.y = y;
-	size.x = width;
-	size.y = height;
-}
-
-WindowParam::WindowParam(String _title, Rectangle _rect)
-{
-	init();
-	flagShowTitleBar = sl_true;
-	title = _title;
-	flagFullScreen = sl_false;
-	flagCenterScreen = sl_false;
-	location.x = _rect.left;
-	location.y = _rect.top;
-	size.x = _rect.getWidth();
-	size.y = _rect.getHeight();
-}
-
-WindowParam::WindowParam(String _title, sl_real width, sl_real height)
-{
-	init();
-	flagShowTitleBar = sl_true;
-	title = _title;
-	flagFullScreen = sl_false;
-	flagCenterScreen = sl_true;
-	size.x = width;
-	size.y = height;
-}
-
-WindowParam::WindowParam(String _title, sl_real x, sl_real y, sl_real width, sl_real height)
-{
-	init();
-	flagShowTitleBar = sl_true;
-	title = _title;
-	flagFullScreen = sl_false;
-	flagCenterScreen = sl_false;
-	location.x = x;
-	location.y = y;
-	size.x = width;
-	size.y = height;
-}
-
-void WindowParam::init()
-{
-	backgroundColor = Color::zero();
-	
-	flagVisible = sl_true;
-	flagMinimized = sl_false;
-	flagMaximized = sl_false;
-	
-	flagAlwaysOnTop = sl_false;
-	flagCloseButtonEnabled = sl_true;
-	flagMinimizeButtonEnabled = sl_false;
-	flagMaximizeButtonEnabled = sl_false;
-	flagResizable = sl_false;
-	alpha = 1.0f;
-	flagTransparent = sl_false;
-	
-	flagModal = sl_false;
-}
-
-void WindowParam::setParent(const Ref<Window>& parent)
-{
-	if (parent.isNotNull()) {
-		this->parent = parent->getWindowInstance();
+		return sl_true;
 	}
 }
+
+void WindowInstance::onActivate()
+{
+	Ref<Window> window = getWindow();
+	if (window.isNotNull()) {
+		window->onActivate();
+	}
+}
+
+void WindowInstance::onDeactivate()
+{
+	Ref<Window> window = getWindow();
+	if (window.isNotNull()) {
+		window->onDeactivate();
+	}
+}
+
+void WindowInstance::onMove()
+{
+	Ref<Window> window = getWindow();
+	if (window.isNotNull()) {
+		window->onMove();
+	}
+}
+
+void WindowInstance::onResize(Size& size)
+{
+	Ref<Window> window = getWindow();
+	if (window.isNotNull()) {
+		window->onResize(size);
+	}
+}
+
+void WindowInstance::onMinimize()
+{
+	Ref<Window> window = getWindow();
+	if (window.isNotNull()) {
+		window->onMinimize();
+	}
+}
+
+void WindowInstance::onDeminimize()
+{
+	Ref<Window> window = getWindow();
+	if (window.isNotNull()) {
+		window->onDeminimize();
+	}
+}
+
+void WindowInstance::onMaximize()
+{
+	Ref<Window> window = getWindow();
+	if (window.isNotNull()) {
+		window->onMaximize();
+	}
+}
+
+void WindowInstance::onDemaximize()
+{
+	Ref<Window> window = getWindow();
+	if (window.isNotNull()) {
+		window->onDemaximize();
+	}
+}
+
 SLIB_UI_NAMESPACE_END

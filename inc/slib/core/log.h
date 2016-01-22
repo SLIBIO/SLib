@@ -35,7 +35,7 @@ public:
 	void log(const String& tag, const String& content);
 	
 protected:
-	SLIB_STRING_PROPERTY_INLINE(FileName)
+	SLIB_STRING_PROPERTY(FileName)
 
 };
 

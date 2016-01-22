@@ -29,13 +29,22 @@ class _OSX_Window : public WindowInstance
 public:
 	NSWindow* m_window;
 	__weak NSWindow* m_parent;
-	sl_real m_heightScreen;
-	Ref<ViewInstance> m_viewContent;
 	
+	sl_real m_heightScreen;
+	
+	SafeRef<ViewInstance> m_viewContent;
+	
+public:
 	_OSX_Window()
 	{
 	}
 	
+	~_OSX_Window()
+	{
+		release();
+	}
+
+public:
 	static Ref<_OSX_Window> create(NSWindow* window)
 	{
 		Ref<_OSX_Window> ret;
@@ -55,7 +64,7 @@ public:
 				NSView* view = [window contentView];
 				ret->m_viewContent = UIPlatform::createViewInstance(view, sl_false);
 				if ([view isKindOfClass:[Slib_OSX_ViewHandle class]]) {
-					((Slib_OSX_ViewHandle*)view)->m_viewInstance = Ref<OSX_ViewInstance>::from(ret->m_viewContent);
+					((Slib_OSX_ViewHandle*)view)->m_viewInstance = Ref<OSX_ViewInstance>::from(Ref<ViewInstance>(ret->m_viewContent));
 				}
 			}
 		}
@@ -114,11 +123,6 @@ public:
 		return ret;
 	}
 	
-	~_OSX_Window()
-	{
-		release();
-	}
-	
 	void release()
 	{
 		NSWindow* window = m_window;
@@ -129,7 +133,7 @@ public:
 		m_window = nil;
 	}
 	
-	const Ref<ViewInstance>& getContentView()
+	Ref<ViewInstance> getContentView()
 	{
 		return m_viewContent;
 	}
@@ -202,56 +206,19 @@ public:
 		return sl_false;
 	}
 	
-	String getTitle()
+	void runModal()
 	{
-		NSWindow* window = m_window;
-		if (window != nil) {
-			NSString* title = [window title];
-			return Apple::getStringFromNSString(title);
-		}
-		return String::null();
-	}
-	
-	sl_bool setTitle(const String& title)
-	{
-		NSWindow* window = m_window;
-		if (window != nil) {
-			NSString* ntitle = Apple::getNSStringFromString(title);
-			[window setTitle: ntitle];
-			return sl_true;
-		}
-		return sl_false;
-	}
-	
-	Color getBackgroundColor()
-	{
-		NSWindow* window = m_window;
-		if (window != nil) {
-			NSColor* color = [window backgroundColor];
-			if (color == [NSColor windowBackgroundColor]) {
-				return Color::zero();
+		NSWindow* _handle = m_window;
+		if (_handle != nil && [_handle isKindOfClass:[_slib_OSX_Window class]]) {
+			_slib_OSX_Window* handle = (_slib_OSX_Window*)_handle;
+			if (handle->m_flagModal) {
+				return;
 			}
-			return UIPlatform::getColorFromNSColor(color);
+			handle->m_flagModal = sl_true;
+			[NSApp runModalForWindow:handle];
 		}
-		return Color::transparent();
 	}
-	
-	sl_bool setBackgroundColor(const Color& _color)
-	{
-		NSWindow* window = m_window;
-		if (window != nil) {
-			NSColor* color;
-			if (_color.isZero()) {
-				color = [NSColor windowBackgroundColor];
-			} else {
-				color = UIPlatform::getNSColorFromColor(_color);
-			}
-			[window setBackgroundColor:color];
-			return sl_true;
-		}
-		return sl_false;
-	}
-	
+
 	Rectangle getFrame()
 	{
 		NSWindow* window = m_window;
@@ -324,6 +291,56 @@ public:
 		return sl_false;
 	}
 	
+	String getTitle()
+	{
+		NSWindow* window = m_window;
+		if (window != nil) {
+			NSString* title = [window title];
+			return Apple::getStringFromNSString(title);
+		}
+		return String::null();
+	}
+	
+	sl_bool setTitle(const String& title)
+	{
+		NSWindow* window = m_window;
+		if (window != nil) {
+			NSString* ntitle = Apple::getNSStringFromString(title);
+			[window setTitle: ntitle];
+			return sl_true;
+		}
+		return sl_false;
+	}
+	
+	Color getBackgroundColor()
+	{
+		NSWindow* window = m_window;
+		if (window != nil) {
+			NSColor* color = [window backgroundColor];
+			if (color == [NSColor windowBackgroundColor]) {
+				return Color::zero();
+			}
+			return UIPlatform::getColorFromNSColor(color);
+		}
+		return Color::transparent();
+	}
+	
+	sl_bool setBackgroundColor(const Color& _color)
+	{
+		NSWindow* window = m_window;
+		if (window != nil) {
+			NSColor* color;
+			if (_color.isZero()) {
+				color = [NSColor windowBackgroundColor];
+			} else {
+				color = UIPlatform::getNSColorFromColor(_color);
+			}
+			[window setBackgroundColor:color];
+			return sl_true;
+		}
+		return sl_false;
+	}
+
 	sl_bool isMinimized()
 	{
 		NSWindow* window = m_window;
@@ -800,19 +817,6 @@ public:
 			return ret;
 		} else {
 			return sizeWindow;
-		}
-	}
-	
-	void runModal()
-	{
-		NSWindow* _handle = m_window;
-		if (_handle != nil && [_handle isKindOfClass:[_slib_OSX_Window class]]) {
-			_slib_OSX_Window* handle = (_slib_OSX_Window*)_handle;
-			if (handle->m_flagModal) {
-				return;
-			}
-			handle->m_flagModal = sl_true;
-			[NSApp runModalForWindow:handle];
 		}
 	}
 	

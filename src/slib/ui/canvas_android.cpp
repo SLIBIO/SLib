@@ -33,11 +33,8 @@ class _Android_PenInstance : public PenInstance
 public:
 	JniGlobal<jobject> m_pen;
 
-	_Android_PenInstance()
-	{
-	}
-
-	static Ref<_Android_PenInstance> _create(const PenDesc& desc)
+public:
+    static Ref<_Android_PenInstance> _create(const PenDesc& desc)
 	{
 		Ref<_Android_PenInstance> ret;
 		JniLocal<jobject> jpen = _JAndroidPen::init.newObject(sl_null);
@@ -75,10 +72,7 @@ class _Android_BrushInstance : public BrushInstance
 public:
 	JniGlobal<jobject> m_brush;
 
-	_Android_BrushInstance()
-	{
-	}
-
+public:
 	static Ref<_Android_BrushInstance> _create(const BrushDesc& desc)
 	{
 		Ref<_Android_BrushInstance> ret;
@@ -128,10 +122,7 @@ public:
 	int m_width;
 	int m_height;
 
-	_Android_Canvas()
-	{
-	}
-
+public:
 	static Ref<_Android_Canvas> create(jobject jcanvas) {
 		Ref<_Android_Canvas> ret;
 		JniGlobal<jobject> canvas = jcanvas;
@@ -149,20 +140,25 @@ public:
 		return ret;
 	}
 
+    // override
 	Size getSize()
 	{
 		return Size((sl_real)(m_width), (sl_real)(m_height));
 	}
 
+    // override
 	Rectangle getInvalidatedRect()
 	{
 		return Rectangle(0, 0, (sl_real)(m_width), (sl_real)(m_height));
 	}
 
+    // override
 	void save()
 	{
 		_JAndroidGraphics::save.call(m_canvas);
 	}
+    
+    // override
 	void restore()
 	{
 		_JAndroidGraphics::restore.call(m_canvas);
@@ -173,16 +169,19 @@ public:
 		return _JAndroidGraphics::flagAntiAlias.get(m_canvas);
 	}
 
+    // override
 	void setAntiAlias(sl_bool flag)
 	{
 		_JAndroidGraphics::flagAntiAlias.set(m_canvas, flag);
 	}
 
+    // override
 	void clipToRectangle(const Rectangle& _rect)
 	{
 		_JAndroidGraphics::clipToRectangle.call(m_canvas, (float)(_rect.left), (float)(_rect.top), (float)(_rect.right), (float)(_rect.bottom));
 	}
 
+    // override
 	void clipToPath(const Ref<GraphicsPath>& path)
 	{
 		Ref<GraphicsPathInstance> instance;
@@ -192,6 +191,7 @@ public:
 		}
 	}
 
+    // override
 	void concatMatrix(const Matrix3& matrix)
 	{
 		_JAndroidGraphics::concatMatrix.call(m_canvas
@@ -200,6 +200,7 @@ public:
 				, (float)(matrix.m02), (float)(matrix.m12), (float)(matrix.m22));
 	}
 
+    // override
 	void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& _font, const Color& color)
 	{
 		if (text.isNotEmpty()) {
@@ -216,6 +217,7 @@ public:
 		}
 	}
 
+    // override
 	void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& _pen)
 	{
 		Ref<Pen> pen = _pen;
@@ -231,6 +233,7 @@ public:
 		}
 	}
 
+    // override
 	void drawLines(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen)
 	{
 		if (countPoints < 2) {
@@ -251,6 +254,7 @@ public:
 		}
 	}
 
+    // override
 	void drawArc(const Rectangle& rect, sl_real startDegrees, sl_real endDegrees, const Ref<Pen>& _pen)
 	{
 		Ref<Pen> pen = _pen;
@@ -267,6 +271,7 @@ public:
 		}
 	}
 
+    // override
 	void drawRectangle(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		Ref<Pen> pen = _pen;
@@ -284,6 +289,7 @@ public:
 		}
 	}
 
+    // override
 	void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		Ref<Pen> pen = _pen;
@@ -301,6 +307,7 @@ public:
 		}
 	}
 
+    // override
 	void drawEllipse(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		Ref<Pen> pen = _pen;
@@ -318,6 +325,7 @@ public:
 		}
 	}
 
+    // override
 	void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& _pen, const Ref<Brush>& brush, FillMode fillMode)
 	{
 		if (countPoints <= 2) {
@@ -340,6 +348,7 @@ public:
 		}
 	}
 
+    // override
 	void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real endDegrees, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		Ref<Pen> pen = _pen;
@@ -358,6 +367,7 @@ public:
 		}
 	}
 
+    // override
 	void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		Ref<GraphicsPathInstance> pathInstance;
@@ -447,4 +457,5 @@ jobject UIPlatform::getCanvasHandle(Canvas* _canvas)
 }
 
 SLIB_UI_NAMESPACE_END
+
 #endif

@@ -19,6 +19,7 @@ class _Gdiplus_GraphicsPathInstance : public GraphicsPathInstance
 public:
 	Gdiplus::GraphicsPath* m_path;
 
+public:
 	_Gdiplus_GraphicsPathInstance()
 	{
 	}
@@ -28,23 +29,8 @@ public:
 		delete m_path;
 	}
 
-	void moveTo(const Point& pt)
-	{
-	}
-	
-	void lineTo(const Point& pt)
-	{
-	}
-	
-	void cubicTo(const Point& ptControl1, const Point& ptControl2, const Point& ptEnd)
-	{
-	}
-
-	void closeSubpath()
-	{
-	}
-
-	static Ref<_Gdiplus_GraphicsPathInstance> _create(GraphicsPath* path)
+public:
+    static Ref<_Gdiplus_GraphicsPathInstance> _create(GraphicsPath* path)
 	{
 		Ref<_Gdiplus_GraphicsPathInstance> ret;
 		ListLocker<GraphicsPathPoint> points(path->points);
@@ -69,6 +55,26 @@ public:
 			}
 		}
 		return ret;
+	}
+    
+    // override
+	void moveTo(const Point& pt)
+	{
+	}
+	
+    // override
+	void lineTo(const Point& pt)
+	{
+	}
+	
+    // override
+	void cubicTo(const Point& ptControl1, const Point& ptControl2, const Point& ptEnd)
+	{
+	}
+
+    // override
+	void closeSubpath()
+	{
 	}
 
 	static Gdiplus::FillMode convertFillMode(FillMode _mode)

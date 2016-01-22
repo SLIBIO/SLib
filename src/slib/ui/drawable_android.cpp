@@ -40,6 +40,7 @@ public:
 	sl_bool m_flagFreeOnRelease;
 	Ref<Referable> m_ref;
 
+public:
 	_Android_Bitmap()
 	{
 		m_flagFreeOnRelease = sl_true;
@@ -52,6 +53,7 @@ public:
 		}
 	}
 
+public:
 	static Ref<_Android_Bitmap> create(jobject jbitmap, sl_bool flagFreeOnRelease, const Referable* ref)
 	{
 		Ref<_Android_Bitmap> ret;
@@ -101,7 +103,6 @@ public:
 		return ret;
 	}
 
-
 	static jobject loadJBitmap(const void* buf, sl_size size)
 	{
 		JniLocal<jbyteArray> imageData = Jni::newByteArray(size);
@@ -132,11 +133,13 @@ public:
 		return ret;
 	}
 
+    // override
 	sl_uint32 getBitmapWidth()
 	{
 		return m_width;
 	}
 
+    // override
 	sl_uint32 getBitmapHeight()
 	{
 		return m_height;
@@ -227,16 +230,19 @@ public:
 		return ret;
 	}
 
+    // override
 	sl_bool readPixels(sl_uint32 x, sl_uint32 y, BitmapData& bitmapData)
 	{
 		return readWritePixels(sl_true, x, y, bitmapData);
 	}
 
+    // override
 	sl_bool writePixels(sl_uint32 x, sl_uint32 y, const BitmapData& bitmapData)
 	{
 		return readWritePixels(sl_false, x, y, *((BitmapData*)&bitmapData));
 	}
 
+    // override
 	sl_bool resetPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Color& color)
 	{
 		jobject jbitmap = m_bitmap;
@@ -295,6 +301,7 @@ public:
 		return ret;
 	}
 
+    // override
 	Ref<Canvas> getCanvas()
 	{
 		JniLocal<jobject> jcanvas = _JAndroidBitmap::getCanvas.callObject(m_bitmap.get());
@@ -304,6 +311,7 @@ public:
 		return Ref<Canvas>::null();
 	}
 
+    // override
 	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc)
 	{
 		jobject jcanvas = UIPlatform::getCanvasHandle(canvas);
@@ -335,11 +343,8 @@ class _Android_ImageDrawable : public Drawable
 public:
 	ImageDesc m_image;
 
-	_Android_ImageDrawable()
-	{
-	}
-
-	static Ref<_Android_ImageDrawable> create(const ImageDesc& image)
+public:
+    static Ref<_Android_ImageDrawable> create(const ImageDesc& image)
 	{
 		Ref<_Android_ImageDrawable> ret;
 		sl_uint32 width = image.width;
@@ -354,6 +359,7 @@ public:
 		return ret;
 	}
 
+    // override
 	void onDraw(Canvas* canvas, const Rectangle& _rectDst, const Rectangle& _rectSrc)
 	{
 		jobject jcanvas = UIPlatform::getCanvasHandle(canvas);
@@ -450,11 +456,13 @@ public:
 		}
 	}
 
+    // override
 	sl_real getDrawableWidth()
 	{
 		return (sl_real)(m_image.width);
 	}
 
+    // override
 	sl_real getDrawableHeight()
 	{
 		return (sl_real)(m_image.height);

@@ -29,19 +29,24 @@ public:
 
 	DWORD m_eventCookie;
 
+public:
 	_Win32_WebViewInstance();
 	~_Win32_WebViewInstance();
 
+public:
+    // override
 	sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 	{
 		return sl_false;
 	}
 
+    // override
 	sl_bool processCommand(SHORT code, LRESULT& result)
 	{
 		return sl_false;
 	}
 
+    // override
 	sl_bool processNotify(NMHDR* nmhdr, LRESULT& result)
 	{
 		return sl_false;
@@ -1077,6 +1082,7 @@ void WebView::runJavaScript(const String& _script)
 		}
 	}
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

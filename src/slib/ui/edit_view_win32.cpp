@@ -7,6 +7,7 @@
 #include "view_win32.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _Win32_EditViewInstance : public Win32_ViewInstance
 {
 	SLIB_DECLARE_OBJECT(_Win32_EditViewInstance, Win32_ViewInstance)
@@ -14,7 +15,8 @@ public:
 	Color m_colorText;
 	Color m_colorBackground;
 	HBRUSH m_hBrushBackground;
-
+    
+public:
 	_Win32_EditViewInstance()
 	{
 		m_hBrushBackground = NULL;
@@ -29,6 +31,7 @@ public:
 		}
 	}
 
+public:
 	void setTextColor(const Color& color)
 	{
 		HWND handle = getHandle();
@@ -50,6 +53,7 @@ public:
 		::InvalidateRect(handle, NULL, TRUE);
 	}
 
+    // override
 	sl_bool preprocessWindowMessage(MSG& msg)
 	{
 		if (msg.message == WM_KEYUP) {
@@ -62,11 +66,13 @@ public:
 		return sl_false;
 	}
 
+    // override
 	sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 	{
 		return sl_false;
 	}
 
+    // override
 	sl_bool processCommand(SHORT code, LRESULT& result)
 	{
 		switch (code) {
@@ -76,7 +82,7 @@ public:
 				if (EditView::checkInstance(_view)) {
 					EditView* view = (EditView*)(_view.get());
 					String text = Windows::getWindowText(m_handle);
-					String textNew = view->onChange(text);
+					String textNew = view->dispatchChange(text);
 					if (text != textNew) {
 						Windows::setWindowText(m_handle, textNew);
 					}
@@ -87,6 +93,7 @@ public:
 		return sl_false;
 	}
 
+    // override
 	sl_bool processControlColor(UINT msg, HDC hDC, HBRUSH& result)
 	{
 		HBRUSH hbr = m_hBrushBackground;
@@ -100,6 +107,7 @@ public:
 		}
 	}
 
+    // override
 	void processPostControlColor(UINT msg, HDC hDC, HBRUSH& result)
 	{
 		Color c = m_colorText;
@@ -377,6 +385,7 @@ void EditView::setFont(const Ref<Font>& font)
 	m_font = font;
 	m_fontInstance = fontInstance;
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

@@ -1,6 +1,7 @@
 #include "../../../inc/slib/ui/camera_view.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 CameraView::CameraView()
 {
 }
@@ -26,4 +27,5 @@ void CameraView::onCaptureVideoFrame(VideoCapture* capture, VideoCaptureFrame* f
 {
 	updateCurrentFrame(frame);
 }
+
 SLIB_UI_NAMESPACE_END

@@ -2,11 +2,13 @@
 #define CHECKHEADER_SLIB_UI_BUTTON
 
 #include "definition.h"
+
 #include "view.h"
 
 #include "../core/callback.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class SLIB_EXPORT Button : public View
 {
 	SLIB_DECLARE_OBJECT(Button, View)
@@ -15,33 +17,39 @@ public:
 	
 public:
 	String getText();
+	
 	virtual void setText(const String& text);
 	
-	Ref<Font> getFont();
-	virtual void setFont(const Ref<Font>& font);
 	
 	sl_bool isDefaultButton();
+	
 	virtual void setDefaultButton(sl_bool flag);
 
+	
+	Ref<Font> getFont();
+	
+	virtual void setFont(const Ref<Font>& font);
+	
 public:
-	SLIB_PROPERTY_INLINE(Ref<Runnable>, OnClick)
+	SLIB_REF_PROPERTY(Runnable, OnClick)
 	
 public:
 	// override
-	void onClick();
+	void dispatchClick();
 	
 protected:
 	// override
 	Ref<ViewInstance> createInstance(ViewInstance* parent);
 	
 protected:
-	String m_text;
-
-	Ref<Font> m_font;
-	Ref<FontInstance> m_fontInstance;
-	
+	SafeString m_text;
 	sl_bool m_flagDefaultButton;
+	
+	SafeRef<Font> m_font;
+	SafeRef<FontInstance> m_fontInstance;
+	
 };
+
 SLIB_UI_NAMESPACE_END
 
 #endif

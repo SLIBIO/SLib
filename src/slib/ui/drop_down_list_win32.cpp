@@ -7,6 +7,7 @@
 #include "view_win32.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class _DropDownList : public DropDownList
 {
 public:
@@ -69,11 +70,13 @@ public:
 class _Win32_DropDownListInstance : public Win32_ViewInstance
 {
 public:
+    // override
 	sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 	{
 		return sl_false;
 	}
 
+    // override
 	sl_bool processCommand(SHORT code, LRESULT& result)
 	{
 		if (code == CBN_SELCHANGE) {
@@ -164,6 +167,7 @@ void DropDownList::setFont(const Ref<Font>& font)
 	m_font = font;
 	m_fontInstance = fontInstance;
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

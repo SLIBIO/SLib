@@ -134,7 +134,7 @@ public:
 	virtual void requestRender() = 0;
 
 public:
-	SLIB_BOOLEAN_PROPERTY_INLINE(RenderingContinuously)
+	SLIB_BOOLEAN_PROPERTY(RenderingContinuously)
 
 protected:
 	Ptr<IRenderCallback> m_callback;

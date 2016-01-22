@@ -15,6 +15,7 @@
 @end
 
 SLIB_UI_NAMESPACE_BEGIN
+
 Ref<ViewInstance> CheckBox::createInstance(ViewInstance* _parent)
 {
 	OSX_VIEW_CREATE_INSTANCE_BEGIN
@@ -88,6 +89,7 @@ void CheckBox::setChecked(sl_bool flag)
 	}
 	m_flagChecked = flag;
 }
+
 SLIB_UI_NAMESPACE_END
 
 @implementation _Slib_OSX_CheckBox

@@ -99,19 +99,6 @@ void UI::showAlert(const String& text, const String& caption, const Ref<Runnable
 ***************************************/
 sl_bool UIApp::m_flagMobilePaused = sl_false;
 
-UIApp::UIApp()
-{
-}
-
-UIApp::~UIApp()
-{
-}
-
-AppType UIApp::getAppType()
-{
-	return appType_UI;
-}
-
 Ref<UIApp> UIApp::getApp()
 {
 	Ref<Application> app(Application::getApp());
@@ -119,6 +106,11 @@ Ref<UIApp> UIApp::getApp()
 		return Ref<UIApp>::from(app);
 	}
 	return Ref<UIApp>::null();
+}
+
+AppType UIApp::getAppType()
+{
+	return appType_UI;
 }
 
 void UIApp::run(const String& param)
@@ -129,12 +121,16 @@ void UIApp::run(const String& param)
 
 void UIApp::run()
 {
-	Application::run();
+	run(String::null());
 }
 
 void UIApp::quit()
 {
 	UI::quitLoop();
+}
+
+void UIApp::onStart()
+{
 }
 
 void UIApp::dispatchStart()
@@ -145,12 +141,20 @@ void UIApp::dispatchStart()
 	}
 }
 
+void UIApp::onExit()
+{
+}
+
 void UIApp::dispatchExit()
 {
 	Ref<UIApp> app = getApp();
 	if (app.isNotNull()) {
 		app->onExit();
 	}
+}
+
+void UIApp::onMobileCreate()
+{
 }
 
 void UIApp::dispatchMobileCreate()
@@ -161,13 +165,8 @@ void UIApp::dispatchMobileCreate()
 	}
 }
 
-void UIApp::dispatchMobileResume()
+void UIApp::onMobilePause()
 {
-	m_flagMobilePaused = sl_false;
-	Ref<UIApp> app = getApp();
-	if (app.isNotNull()) {
-		app->onMobileResume();
-	}
 }
 
 void UIApp::dispatchMobilePause()
@@ -179,12 +178,34 @@ void UIApp::dispatchMobilePause()
 	}
 }
 
+void UIApp::onMobileResume()
+{
+}
+
+void UIApp::dispatchMobileResume()
+{
+	m_flagMobilePaused = sl_false;
+	Ref<UIApp> app = getApp();
+	if (app.isNotNull()) {
+		app->onMobileResume();
+	}
+}
+
+void UIApp::onMobileDestroy()
+{
+}
+
 void UIApp::dispatchMobileDestroy()
 {
 	Ref<UIApp> app = getApp();
 	if (app.isNotNull()) {
 		app->onMobileDestroy();
 	}
+}
+
+sl_bool UIApp::onMobileBack()
+{
+	return sl_true;
 }
 
 sl_bool UIApp::dispatchMobileBack()
@@ -196,11 +217,22 @@ sl_bool UIApp::dispatchMobileBack()
 	return sl_true;
 }
 
+sl_bool UIApp::isMobilePaused()
+{
+	return m_flagMobilePaused;
+}
+
+
+AlertParam::AlertParam()
+{
+	type = alertType_Ok;
+}
+
 /**************************************
 	UIPlatform
 ***************************************/
-typedef Map<const void*, WeakRef<ViewInstance> > _UiViewInstanceMap;
-SLIB_SAFE_STATIC_GETTER(_UiViewInstanceMap, _UI_getViewInstances, _UiViewInstanceMap::createHash());
+typedef HashMap<const void*, WeakRef<ViewInstance> > _UiViewInstanceMap;
+SLIB_SAFE_STATIC_GETTER(_UiViewInstanceMap, _UI_getViewInstances);
 
 void UIPlatform::_registerViewInstance(const void* handle, ViewInstance* instance)
 {
@@ -220,8 +252,8 @@ void UIPlatform::_removeViewInstance(const void* handle)
 	map.remove(handle);
 }
 
-typedef Map<const void*, WeakRef<WindowInstance> > _UiWindowInstanceMap;
-SLIB_SAFE_STATIC_GETTER(_UiWindowInstanceMap, _UI_getWindowInstances, _UiWindowInstanceMap::createHash());
+typedef HashMap<const void*, WeakRef<WindowInstance> > _UiWindowInstanceMap;
+SLIB_SAFE_STATIC_GETTER(_UiWindowInstanceMap, _UI_getWindowInstances);
 
 void UIPlatform::_registerWindowInstance(const void* handle, WindowInstance* instance)
 {
@@ -240,5 +272,6 @@ void UIPlatform::_removeWindowInstance(const void* handle)
 	_UiWindowInstanceMap& map = _UI_getWindowInstances();
 	map.remove(handle);
 }
+
 SLIB_UI_NAMESPACE_END
 
