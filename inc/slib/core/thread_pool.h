@@ -7,6 +7,7 @@
 #include "thread.h"
 
 SLIB_NAMESPACE_BEGIN
+
 class SLIB_EXPORT ThreadPool : public Object
 {
 	SLIB_DECLARE_OBJECT(ThreadPool, Object)
@@ -40,6 +41,7 @@ protected:
 
 	sl_bool m_flagRunning;
 };
+
 SLIB_NAMESPACE_END
 
 #endif

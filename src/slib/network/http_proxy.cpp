@@ -19,11 +19,19 @@ HttpProxy::~HttpProxy()
 	release();
 }
 
+sl_bool HttpProxy::_init(const HttpProxyParam& param)
+{
+	if (HttpService::_init(param)) {
+		return sl_true;
+	}
+	return sl_false;
+}
+
 Ref<HttpProxy> HttpProxy::create(const HttpProxyParam& param)
 {
 	Ref<HttpProxy> ret = new HttpProxy;
 	if (ret.isNotNull()) {
-		if (ret->start(param)) {
+		if (ret->_init(param)) {
 			return ret;
 		}
 	}
@@ -36,18 +44,6 @@ void HttpProxy::release()
 	HttpService::release();
 }
 
-sl_bool HttpProxy::start(const HttpProxyParam& param)
-{
-	ObjectLocker lock(this);
-	if (m_flagRunning) {
-		return sl_false;
-	}
-	if (HttpService::start(param)) {
-		m_flagRunning = sl_true;
-		return sl_true;
-	}
-	return sl_false;
-}
 
 sl_bool HttpProxy::preprocessRequest(HttpServiceContext* context)
 {
@@ -315,7 +311,7 @@ sl_bool HttpProxy::connectTo(HttpServiceConnection* connection, const String& ho
 	SocketAddress address;
 	address.setHostAddress(hostAddress);
 	if (address.isValid()) {
-		Ref<AsyncTcpSocket> socket = AsyncTcpSocket::create(getAsyncLoop());
+		Ref<AsyncTcpSocket> socket = AsyncTcpSocket::create(getAsyncIoLoop());
 		if (socket.isNotNull()) {
 			Ref<_HttpProxy_ConnectListener> listenerConnect = new _HttpProxy_ConnectListener(connection, listener);
 			if (socket->connect(address, listenerConnect)) {

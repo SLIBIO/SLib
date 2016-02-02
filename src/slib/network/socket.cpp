@@ -441,7 +441,7 @@ sl_int32 Socket::receive(void* buf, sl_uint32 size)
 	}
 }
 
-sl_int32 Socket::sendTo(const void* buf, sl_uint32 size, const SocketAddress& address)
+sl_int32 Socket::sendTo(const SocketAddress& address, const void* buf, sl_uint32 size)
 {
 	if (isOpened()) {
 		if (size == 0) {
@@ -476,7 +476,7 @@ sl_int32 Socket::sendTo(const void* buf, sl_uint32 size, const SocketAddress& ad
 	}
 }
 
-sl_int32 Socket::receiveFrom(void* buf, sl_uint32 size, SocketAddress& address)
+sl_int32 Socket::receiveFrom(SocketAddress& address, void* buf, sl_uint32 size)
 {
 	if (isOpened()) {
 		if (size == 0) {
@@ -511,14 +511,6 @@ sl_int32 Socket::receiveFrom(void* buf, sl_uint32 size, SocketAddress& address)
 		_setClosedError();
 		return -1;
 	}
-}
-
-sl_int32 Socket::sendBroadcast(const void* buf, sl_int32 size, sl_uint32 port)
-{
-	SocketAddress addr;
-	addr.ip = IPv4Address::getBroadcast();
-	addr.port = port;
-	return sendTo(buf, size, addr);
 }
 
 sl_int32 Socket::sendPacket(const void* buf, sl_uint32 size, const L2PacketInfo& info)

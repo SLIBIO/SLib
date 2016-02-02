@@ -11,12 +11,43 @@ AsyncTcpSecureStreamServer::~AsyncTcpSecureStreamServer()
 	close();
 }
 
-void AsyncTcpSecureStreamServer::start()
+Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::create(const AsyncSecureStreamServerParam& param, const SocketAddress& addressListen, const Ref<AsyncIoLoop>& loop)
 {
-	ObjectLocker lock(this);
-	if (m_server.isNotNull()) {
-		m_server->start();
+	Ref<AsyncTcpSecureStreamServer> ret = new AsyncTcpSecureStreamServer;
+	if (ret.isNotNull()) {
+		ret->m_param = param;
+		Ref<AsyncTcpServer> server = AsyncTcpServer::create(addressListen, WeakRef<AsyncTcpSecureStreamServer>(ret), loop);
+		if (server.isNotNull()) {
+			ret->m_server = server;
+			return ret;
+		}
 	}
+	return ret;
+}
+
+Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::create(const AsyncSecureStreamServerParam& param, const SocketAddress& addressListen)
+{
+	return create(param, addressListen, AsyncIoLoop::getDefault());
+}
+
+Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::create(const AsyncSecureStreamServerParam& param, sl_uint32 portListen, const Ref<AsyncIoLoop>& loop)
+{
+	return create(param, SocketAddress(IPv4Address::any(), portListen), loop);
+}
+
+Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::create(const AsyncSecureStreamServerParam& param, sl_uint32 portListen)
+{
+	return create(param, portListen, AsyncIoLoop::getDefault());
+}
+
+Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::createIPv6(const AsyncSecureStreamServerParam& param, sl_uint32 portListen, const Ref<AsyncIoLoop>& loop)
+{
+	return create(param, SocketAddress(IPv6Address::any(), portListen), loop);
+}
+
+Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::createIPv6(const AsyncSecureStreamServerParam& param, sl_uint32 portListen)
+{
+	return createIPv6(param, portListen, AsyncIoLoop::getDefault());
 }
 
 void AsyncTcpSecureStreamServer::close()
@@ -50,44 +81,6 @@ void AsyncTcpSecureStreamServer::onConnectedSecureStream(AsyncSecureStream* secu
 		}
 	}
 	m_streams.remove(securedStream);
-}
-
-Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::create(const Ref<AsyncTcpServer>& server, const AsyncSecureStreamServerParam& param, sl_bool flagStart)
-{
-	Ref<AsyncTcpSecureStreamServer> ret;
-	if (server.isNull()) {
-		return ret;
-	}
-	ret = new AsyncTcpSecureStreamServer();
-	if (ret.isNotNull()) {
-		ret->m_server = server;
-		ret->m_param = param;
-		server->setListener(WeakRef<AsyncTcpSecureStreamServer>(ret));
-		if (flagStart) {
-			server->start();
-		}
-	}
-	return ret;
-}
-
-Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::create(const AsyncSecureStreamServerParam& param, const SocketAddress& addressListen, const Ref<AsyncLoop>& loop, sl_bool flagStart)
-{
-	return create(AsyncTcpServer::create(addressListen, loop), param, flagStart);
-}
-
-Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::create(const AsyncSecureStreamServerParam& param, const SocketAddress& addressListen, sl_bool flagStart)
-{
-	return create(AsyncTcpServer::create(addressListen), param, flagStart);
-}
-
-Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::create(const AsyncSecureStreamServerParam& param, sl_uint32 portListen, const Ref<AsyncLoop>& loop, sl_bool flagIPv6, sl_bool flagStart)
-{
-	return create(AsyncTcpServer::create(portListen, loop, flagIPv6), param, flagStart);
-}
-
-Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::create(const AsyncSecureStreamServerParam& param, sl_uint32 portListen, sl_bool flagIPv6, sl_bool flagStart)
-{
-	return create(AsyncTcpServer::create(portListen, flagIPv6), param, flagStart);
 }
 
 Ref<AsyncSecureStream> AsyncTcpSecureStreamClient::create(const Ref<AsyncTcpSocket>& socket, const AsyncSecureStreamClientParam& param, sl_bool flagConnect)
@@ -130,7 +123,7 @@ public:
 Ref<AsyncSecureStream> AsyncTcpSecureStreamClient::create(
 	const AsyncSecureStreamClientParam& param,
 	const SocketAddress& addressBind, const SocketAddress& addressConnect,
-	const Ref<AsyncLoop>& loop)
+	const Ref<AsyncIoLoop>& loop)
 {
 	Ref<AsyncTcpSocket> socket = AsyncTcpSocket::create(addressBind, loop);
 	Ref<AsyncSecureStream> stream = create(socket, param, sl_false);
@@ -148,13 +141,13 @@ Ref<AsyncSecureStream> AsyncTcpSecureStreamClient::create(
 	const AsyncSecureStreamClientParam& param,
 	const SocketAddress& addressBind, const SocketAddress& addressConnect)
 {
-	return create(param, addressBind, addressConnect, AsyncLoop::getDefault());
+	return create(param, addressBind, addressConnect, AsyncIoLoop::getDefault());
 }
 
 Ref<AsyncSecureStream> AsyncTcpSecureStreamClient::create(
 	const AsyncSecureStreamClientParam& param,
 	const SocketAddress& addressConnect,
-	const Ref<AsyncLoop>& loop)
+	const Ref<AsyncIoLoop>& loop)
 {
 	return create(param, SocketAddress::none(), addressConnect, loop);
 }
@@ -163,7 +156,7 @@ Ref<AsyncSecureStream> AsyncTcpSecureStreamClient::create(
 	const AsyncSecureStreamClientParam& param,
 	const SocketAddress& addressConnect)
 {
-	return create(param, SocketAddress::none(), addressConnect, AsyncLoop::getDefault());
+	return create(param, SocketAddress::none(), addressConnect, AsyncIoLoop::getDefault());
 }
 
 SLIB_NETWORK_NAMESPACE_END

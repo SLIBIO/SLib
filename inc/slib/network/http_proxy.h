@@ -26,8 +26,6 @@ public:
 	static Ref<HttpProxy> create(const HttpProxyParam& param);
 
 public:
-	sl_bool start(const HttpProxyParam& param);
-
 	void release();
 
 public:
@@ -37,19 +35,13 @@ public:
 public:
 	virtual sl_bool connectTo(HttpServiceConnection* connection, const String& hostAddress, const Ptr<IHttpProxyConnectListener>& listener);
 
-public:
-	SLIB_INLINE sl_bool isRunning()
-	{
-		return m_flagRunning;
-	}
-
 protected:
+	sl_bool _init(const HttpProxyParam& param);
+	
 	void _processConnect(Ref<HttpServiceContext> context);
 	
 	void _processProxy(Ref<HttpServiceContext> context, String host, sl_uint32 port);
 
-protected:
-	sl_bool m_flagRunning;
 };
 
 SLIB_NETWORK_NAMESPACE_END

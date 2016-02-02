@@ -5,6 +5,8 @@
 
 #include "socket_address.h"
 
+#include "../core/thread_pool.h"
+
 SLIB_NETWORK_NAMESPACE_BEGIN
 
 class HttpService;
@@ -49,6 +51,8 @@ public:
 	Ref<AsyncStream> getIO();
 	
 	Ref<AsyncLoop> getAsyncLoop();
+
+	Ref<AsyncIoLoop> getAsyncIoLoop();
 	
 	const SocketAddress& getLocalAddress();
 	
@@ -207,45 +211,37 @@ class SLIB_EXPORT HttpService : public Object
 {
 	SLIB_DECLARE_OBJECT(HttpService, Object)
 protected:
-	HttpService();
+	HttpService();	
 	~HttpService();
 	
 public:
 	static Ref<HttpService> create(const HttpServiceParam& param);
 	
 public:
-	sl_bool start(const HttpServiceParam& param);
-	
 	void release();
 	
+	sl_bool isRunning();
+	
+	Ref<AsyncLoop> getAsyncLoop();
+	
+	Ref<AsyncIoLoop> getAsyncIoLoop();
+	
+	Ref<ThreadPool> getThreadPool();
+	
+	const HttpServiceParam& getParam();
+
 public:
+	// called before processing body, returns true if the service is trying to process the connection itself.
+	virtual sl_bool preprocessRequest(HttpServiceContext* context);
+	
+	// called after inputing body
+	virtual void processRequest(HttpServiceContext* context);
+	
+	virtual sl_bool processResource(HttpServiceContext* context, String path);
+	
 	virtual Ref<HttpServiceConnection> addConnection(const Ref<AsyncStream>& stream, const SocketAddress& remoteAddress, const SocketAddress& localAddress);
 	
 	virtual void closeConnection(HttpServiceConnection* connection);
-
-	// called before processing body, returns true if the service is trying to process the connection itself.
-	virtual sl_bool preprocessRequest(HttpServiceContext* context);
-
-	// called after inputing body
-	virtual void processRequest(HttpServiceContext* context);
-
-	virtual sl_bool processResource(HttpServiceContext* context, String path);
-
-public:
-	SLIB_INLINE sl_bool isRunning()
-	{
-		return m_flagRunning;
-	}
-
-	SLIB_INLINE const Ref<AsyncLoop>& getAsyncLoop()
-	{
-		return m_loop;
-	}
-	
-	SLIB_INLINE const HttpServiceParam& getParam()
-	{
-		return m_param;
-	}
 
 public:
 	void addProcessor(const Ptr<IHttpServiceProcessor>& processor);
@@ -266,8 +262,14 @@ public:
 
 	sl_bool addHttpService(const IPAddress& addr, sl_uint32 port = 80);
 	
+	
 protected:
-	Ref<AsyncLoop> m_loop;
+	sl_bool _init(const HttpServiceParam& param);
+	
+protected:
+	SafeRef<AsyncLoop> m_loop;
+	SafeRef<AsyncIoLoop> m_ioLoop;
+	SafeRef<ThreadPool> m_threadPool;
 	sl_bool m_flagRunning;
 	
 	HashMap< HttpServiceConnection*, Ref<HttpServiceConnection> > m_connections;

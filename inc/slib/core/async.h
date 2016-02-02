@@ -4,36 +4,36 @@
 #include "definition.h"
 
 #include "object.h"
-#include "thread_pool.h"
+#include "thread.h"
 #include "file.h"
 #include "variant.h"
 
 SLIB_NAMESPACE_BEGIN
 
-class AsyncInstance;
 class AsyncTimer;
 class AsyncLoop;
 
 class SLIB_EXPORT Async
 {
 public:
-	static sl_bool runTask(const Ref<Runnable>& task, const Ref<AsyncLoop>& loop, sl_bool flagRunByThreadPool = sl_true);
+	static sl_bool runTask(const Ref<Runnable>& task, const Ref<AsyncLoop>& loop);
 	
-	static sl_bool runTask(const Ref<Runnable>& task, sl_bool flagRunByThreadPool = sl_true);
-	
-	
-	static sl_bool setTimeout(const Ref<Runnable>& task, sl_uint64 delay_ms, const Ref<AsyncLoop>& loop, sl_bool flagRunByThreadPool = sl_true);
-	
-	static sl_bool setTimeout(const Ref<Runnable>& task, sl_uint64 delay_ms, sl_bool flagRunByThreadPool = sl_true);
+	static sl_bool runTask(const Ref<Runnable>& task);
 	
 	
-	static Ref<AsyncTimer> addTimer(const Ref<Runnable>& task, sl_uint64 interval_ms, const Ref<AsyncLoop>& loop, sl_bool flagRunByThreadPool = sl_true);
+	static sl_bool setTimeout(const Ref<Runnable>& task, sl_uint64 delay_ms, const Ref<AsyncLoop>& loop);
 	
-	static Ref<AsyncTimer> addTimer(const Ref<Runnable>& task, sl_uint64 interval_ms, sl_bool flagRunByThreadPool = sl_true);
+	static sl_bool setTimeout(const Ref<Runnable>& task, sl_uint64 delay_ms);
+	
+	
+	static Ref<AsyncTimer> addTimer(const Ref<Runnable>& task, sl_uint64 interval_ms, const Ref<AsyncLoop>& loop);
+	
+	static Ref<AsyncTimer> addTimer(const Ref<Runnable>& task, sl_uint64 interval_ms);
 	
 	static void removeTimer(const Ref<AsyncTimer>& timer, const Ref<AsyncLoop>& loop);
 	
 	static void removeTimer(const Ref<AsyncTimer>& timer);
+	
 };
 
 class SLIB_EXPORT AsyncLoop : public Object
@@ -48,49 +48,18 @@ public:
 	
 	static Ref<AsyncLoop> create();
 	
-	static Ref<AsyncLoop> createNonIO();
-
 public:
 	void release();
 	
 	sl_bool isRunning();
+	
+	sl_bool addTask(const Ref<Runnable>& task);
 
-	
-	void wake();
-	
+	sl_bool setTimeout(const Ref<Runnable>& task, sl_uint64 delay_ms);
 
-	sl_bool attachInstance(AsyncInstance* instance);
+	Ref<AsyncTimer> addTimer(const Ref<Runnable>& task, sl_uint64 interval_ms);
 	
-	void closeInstance(AsyncInstance* instance);
-	
-	void requestOrder(AsyncInstance* instance);
-
-	
-	SLIB_INLINE const Ref<ThreadPool>& getThreadPool()
-	{
-		return m_threadPool;
-	}
-	
-	sl_uint32 getMinimumThreadsCount();
-	
-	void setMinimumThreadCount(sl_uint32 n);
-	
-	sl_uint32 getMaximumThreadsCount();
-	
-	void setMaximumThreadsCount(sl_uint32 n);
-	
-	sl_uint32 getThreadStackSize();
-	
-	void setThreadStackSize(sl_uint32 n);
-	
-	
-	sl_bool addTask(const Ref<Runnable>& task, sl_bool flagRunByThreadPool = sl_true);
-
-	sl_bool setTimeout(const Ref<Runnable>& task, sl_uint64 delay_ms, sl_bool flagRunByThreadPool = sl_true);
-
-	Ref<AsyncTimer> addTimer(const Ref<Runnable>& task, sl_uint64 interval_ms, sl_bool flagRunByThreadPool = sl_true);
-	
-	sl_bool addTimer(const Ref<AsyncTimer>& timer, sl_bool flagRunByThreadPool = sl_true);
+	sl_bool addTimer(const Ref<AsyncTimer>& timer);
 	
 	void removeTimer(const Ref<AsyncTimer>& timer);
 
@@ -101,15 +70,7 @@ public:
 
 protected:
 	sl_bool m_flagRunning;
-	sl_bool m_flagNonIO;
-	void* m_handle;
-	
 	Ref<Thread> m_thread;
-	Ref<ThreadPool> m_threadPool;
-	
-	Queue< Ref<AsyncInstance> > m_queueInstancesOrder;
-	Queue< Ref<AsyncInstance> > m_queueInstancesClosing;
-	Queue< Ref<AsyncInstance> > m_queueInstancesClosed;
 
 	TimeCounter m_timeCounter;
 
@@ -119,7 +80,6 @@ protected:
 	{
 		sl_uint64 time;
 		Ref<Runnable> task;
-		sl_bool flagRunByThreadPool;
 	};
 	BTree<sl_uint64, TimeTask> m_timeTasks;
 	Mutex m_lockTimeTasks;
@@ -128,134 +88,182 @@ protected:
 	{
 	public:
 		WeakRef<AsyncTimer> timer;
-		sl_bool flagRunByThreadPool;
 		
 	public:
-		sl_bool operator==(const Timer& other) const
-		{
-			return timer == other.timer;
-		}
+		sl_bool operator==(const Timer& other) const;
 	};
 	Queue<Timer> m_queueTimers;
 	Mutex m_lockTimer;
 
 protected:
-	static void* __createHandle();
-	static void __closeHandle(void* handle);
-	void __runLoop();
-	sl_bool __attachInstance(AsyncInstance* instance);
-	void __detachInstance(AsyncInstance* instance);
-	void __wake();
-
-protected:
+	void _wake();
 	sl_int32 _getTimeout();
 	sl_int32 _getTimeout_TimeTasks();
 	sl_int32 _getTimeout_Timer();
-	void _stepBegin();
-	void _stepEnd();
-	void _runLoopNonIO();
+	void _runLoop();
+
 };
 
 class SLIB_EXPORT AsyncTimer : public Object
 {
 protected:
 	AsyncTimer();
-
+	
 public:
 	static Ref<AsyncTimer> create(const Ref<Runnable>& task, sl_uint64 interval_ms, sl_bool flagStart = sl_true);
-
+	
+public:
 	SLIB_INLINE void start()
 	{
 		m_flagStarted = sl_true;
 	}
-
+	
 	SLIB_INLINE void stop()
 	{
 		m_flagStarted = sl_false;
 	}
-
+	
 	SLIB_INLINE sl_bool isStarted()
 	{
 		return m_flagStarted;
 	}
-
+	
 	SLIB_INLINE Ref<Runnable> getTask()
 	{
 		return m_task;
 	}
-
+	
 	SLIB_INLINE sl_uint64 getInterval()
 	{
 		return m_interval;
 	}
-
+	
 	void run();
-
+	
 	void stopAndWait();
-
+	
 public:
 	SLIB_PROPERTY(sl_uint64, LastRunTime)
+	
 	SLIB_PROPERTY(sl_uint32, MaxConcurrentThread)
-
+	
 protected:
 	sl_bool m_flagStarted;
 	Ref<Runnable> m_task;
 	sl_uint64 m_interval;
 	sl_int32 m_nCountRun;
+	
 };
 
-class AsyncObject;
 
-class SLIB_EXPORT AsyncInstance : public Object
+class AsyncIoInstance;
+
+enum AsyncIoMode
 {
-	SLIB_DECLARE_OBJECT(AsyncInstance, Object)
+	asyncIoMode_None = 0,
+	asyncIoMode_In = 1,
+	asyncIoMode_Out = 2,
+	asyncIoMode_InOut = 3
+};
+
+class SLIB_EXPORT AsyncIoLoop : public Object
+{
+	SLIB_DECLARE_OBJECT(AsyncIoLoop, Object)
+private:
+	AsyncIoLoop();
+	~AsyncIoLoop();
+	
 public:
-	AsyncInstance();
+	static Ref<AsyncIoLoop> getDefault();
+	
+	static Ref<AsyncIoLoop> create();
 
 public:
-	SLIB_INLINE sl_file getHandle()
-	{
-		return m_handle;
-	}
+	void release();
 	
-	SLIB_INLINE void setHandle(sl_file handle)
-	{
-		m_handle = handle;
-	}
+	sl_bool isRunning();
 	
-	SLIB_INLINE sl_bool isOpened()
-	{
-		return m_handle != SLIB_FILE_INVALID_HANDLE;
-	}
+	
+	sl_bool addTask(const Ref<Runnable>& task);
 
-	SLIB_INLINE sl_bool isClosing()
-	{
-		return m_flagClosing;
-	}
+	void wake();
 	
-	SLIB_INLINE void setClosing()
-	{
-		m_flagClosing = sl_true;
-	}
 	
-	Ref<AsyncObject> getObject();
+	sl_bool attachInstance(AsyncIoInstance* instance, AsyncIoMode mode);
 	
-	void setObject(AsyncObject* object);
+	void closeInstance(AsyncIoInstance* instance);
 	
-	Ref<AsyncLoop> getLoop();
+	void requestOrder(AsyncIoInstance* instance);
+	
+protected:
+	sl_bool m_flagRunning;
+	void* m_handle;
+	
+	Ref<Thread> m_thread;
+	
+	Queue< Ref<Runnable> > m_queueTasks;
+
+	Queue< Ref<AsyncIoInstance> > m_queueInstancesOrder;
+	Queue< Ref<AsyncIoInstance> > m_queueInstancesClosing;
+	Queue< Ref<AsyncIoInstance> > m_queueInstancesClosed;
+	
+protected:
+	static void* __createHandle();
+	static void __closeHandle(void* handle);
+	void __runLoop();
+	sl_bool __attachInstance(AsyncIoInstance* instance, AsyncIoMode mode);
+	void __detachInstance(AsyncIoInstance* instance);
+	void __wake();
+	
+protected:
+	void _stepBegin();
+	void _stepEnd();
+
+};
+
+
+class AsyncIoObject;
+
+class SLIB_EXPORT AsyncIoInstance : public Object
+{
+	SLIB_DECLARE_OBJECT(AsyncIoInstance, Object)
+public:
+	AsyncIoInstance();
+
+public:
+	Ref<AsyncIoObject> getObject();
+	
+	void setObject(AsyncIoObject* object);
+
+	Ref<AsyncIoLoop> getLoop();
+	
+	sl_file getHandle();
+	
+	sl_bool isOpened();
+
+	AsyncIoMode getMode();
+	
+	sl_bool isClosing();
+	
+	void setClosing();
+	
+	void addToQueue(Queue< Ref<AsyncIoInstance> >& queue);
 	
 	void requestOrder();
-	
-	void addToQueue(Queue< Ref<AsyncInstance> >& queue);
-	
+
 	void processOrder();
+	
+protected:
+	void setMode(AsyncIoMode mode);
+	
+	void setHandle(sl_file handle);
+
+public:
+	virtual void close() = 0;
 
 protected:
 	virtual void onOrder() = 0;
 	
-public:
-	virtual void close() = 0;
-
 	struct EventDesc
 	{
 #if defined(SLIB_PLATFORM_IS_WIN32)
@@ -270,28 +278,31 @@ public:
 	virtual void onEvent(EventDesc* pev) = 0;
 
 private:
+	SafeWeakRef<AsyncIoObject> m_object;
+	sl_file m_handle;
+	AsyncIoMode m_mode;
+
+	sl_bool m_flagClosing;
+	
 	sl_bool m_flagOrdering;
 	Mutex m_lockOrdering;
 	
-	sl_bool m_flagClosing;
-	sl_file m_handle;
-	SafeWeakRef<AsyncObject> m_object;
-	
+	friend class AsyncIoLoop;
 };
 
-class SLIB_EXPORT AsyncObject : public Object
+class SLIB_EXPORT AsyncIoObject : public Object
 {
-	SLIB_DECLARE_OBJECT(AsyncObject, Object)
+	SLIB_DECLARE_OBJECT(AsyncIoObject, Object)
 protected:
-	AsyncObject();
-	~AsyncObject();
+	AsyncIoObject();
+	~AsyncIoObject();
 
 public:
-	Ref<AsyncLoop> getLoop();
+	Ref<AsyncIoLoop> getIoLoop();
 	
-	Ref<AsyncInstance> getInstance();
+	Ref<AsyncIoInstance> getIoInstance();
 	
-	void closeInstance();
+	void closeIoInstance();
 
 	
 	SLIB_INLINE Ptr<Referable> getUserObject(const String& key)
@@ -338,13 +349,13 @@ public:
 	}
 
 protected:
-	void setLoop(const Ref<AsyncLoop>& loop);
+	void setIoLoop(const Ref<AsyncIoLoop>& loop);
 	
-	void setInstance(AsyncInstance* instance);
+	void setIoInstance(AsyncIoInstance* instance);
 
 private:
-	SafeWeakRef<AsyncLoop> m_loop;
-	SafeRef<AsyncInstance> m_instance;
+	SafeWeakRef<AsyncIoLoop> m_ioLoop;
+	SafeRef<AsyncIoInstance> m_ioInstance;
 
 	HashMap< String, Ptr<Referable> > m_mapUserObjects_s;
 	HashMap< sl_uint64, Ptr<Referable> > m_mapUserObjects_i;
@@ -361,6 +372,7 @@ public:
 	
 	// data may be changed during the I/O operations
 	virtual void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, const Referable* ref, sl_bool flagError);
+	
 };
 
 class SLIB_EXPORT AsyncStreamRequest : public Referable
@@ -414,7 +426,7 @@ private:
 
 };
 
-class SLIB_EXPORT AsyncStreamInstance : public AsyncInstance
+class SLIB_EXPORT AsyncStreamInstance : public AsyncIoInstance
 {
 public:
 	virtual sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref);
@@ -433,7 +445,7 @@ protected:
 	Queue< Ref<AsyncStreamRequest> > m_requestsWrite;
 };
 
-class SLIB_EXPORT AsyncStream : public AsyncObject
+class SLIB_EXPORT AsyncStream : public AsyncIoObject
 {
 	SLIB_DECLARE_OBJECT(AsyncStream, Object)
 	
@@ -455,28 +467,17 @@ public:
 	virtual sl_uint64 getSize();
 
 	
-	SLIB_INLINE sl_bool readToMemory(const Memory& mem, const Ptr<IAsyncStreamListener>& listener)
-	{
-		sl_size size = mem.getSize();
-		if (size > 0x40000000) {
-			size = 0x40000000;
-		}
-		return read(mem.getBuf(), (sl_uint32)(size), listener, mem.getObject());
-	}
+	sl_bool readToMemory(const Memory& mem, const Ptr<IAsyncStreamListener>& listener);
 
-	SLIB_INLINE sl_bool writeFromMemory(const Memory& mem, const Ptr<IAsyncStreamListener>& listener)
-	{
-		sl_size size = mem.getSize();
-		if (size > 0x40000000) {
-			size = 0x40000000;
-		}
-		return write(mem.getBuf(), (sl_uint32)(size), listener, mem.getObject());
-	}
+	sl_bool writeFromMemory(const Memory& mem, const Ptr<IAsyncStreamListener>& listener);
+	
+	virtual sl_bool addTask(const Ref<Runnable>& callback) = 0;
 
 public:
-	static Ref<AsyncStream> create(AsyncStreamInstance* instance, const Ref<AsyncLoop>& loop);
+	static Ref<AsyncStream> create(AsyncStreamInstance* instance, AsyncIoMode mode, const Ref<AsyncIoLoop>& loop);
 	
-	static Ref<AsyncStream> create(AsyncStreamInstance* instance);
+	static Ref<AsyncStream> create(AsyncStreamInstance* instance, AsyncIoMode mode);
+	
 };
 
 class SLIB_EXPORT AsyncStreamBase : public AsyncStream
@@ -502,15 +503,14 @@ public:
 	
 	// override
 	sl_uint64 getSize();
+	
+	// override
+	sl_bool addTask(const Ref<Runnable>& callback);
 
 protected:
-	SLIB_INLINE Ref<AsyncStreamInstance> getInstance()
-	{
-		return Ref<AsyncStreamInstance>::from(AsyncObject::getInstance());
-	}
-
-protected:
-	sl_bool _initialize(AsyncStreamInstance* instance, const Ref<AsyncLoop>& loop);
+	Ref<AsyncStreamInstance> getIoInstance();
+	
+	sl_bool _initialize(AsyncStreamInstance* instance, AsyncIoMode mode, const Ref<AsyncIoLoop>& loop);
 
 	friend class AsyncStream;
 };
@@ -521,22 +521,35 @@ protected:
 	AsyncStreamBaseIO();
 
 public:
+	Ref<AsyncLoop> getLoop();
+	
+public:
 	// override
 	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref = sl_null);
 	
 	// override
 	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref = sl_null);
 	
+	// override
+	sl_bool addTask(const Ref<Runnable>& callback);
+	
 protected:
 	virtual void processRequest(AsyncStreamRequest* request) = 0;
 
+protected:
+	void setLoop(const Ref<AsyncLoop>& loop);
+	
+protected:
+	sl_bool _addRequest(AsyncStreamRequest* request);
+	
+	void _runProcessor();
+	
 private:
 	Queue< Ref<AsyncStreamRequest> > m_requests;
 	sl_bool m_flagProcessRequest;
+	
+	SafeWeakRef<AsyncLoop> m_loop;
 
-protected:
-	sl_bool _addRequest(AsyncStreamRequest* request);
-	void _runProcessor();
 };
 
 class SLIB_EXPORT AsyncReader : public AsyncStreamBaseIO
@@ -639,7 +652,7 @@ public:
 	
 	
 #if defined(SLIB_PLATFORM_IS_WIN32)
-	static Ref<AsyncStream> openIOCP(const String& path, FileMode mode, const Ref<AsyncLoop>& loop);
+	static Ref<AsyncStream> openIOCP(const String& path, FileMode mode, const Ref<AsyncIoLoop>& loop);
 	
 	static Ref<AsyncStream> openIOCP(const String& path, FileMode mode);
 #endif
@@ -936,15 +949,10 @@ protected:
 	~AsyncStreamFilter();
 
 public:
-	Ref<AsyncStream> getReadingStream() const;
+	Ref<AsyncStream> getSourceStream() const;
 	
-	void setReadingStream(const Ref<AsyncStream>& stream); 
+	void setSourceStream(const Ref<AsyncStream>& stream);
 	
-	
-	Ref<AsyncStream> getWritingStream() const;
-	
-	void setWritingStream(const Ref<AsyncStream>& stream);
-
 	
 	// override
 	void close();
@@ -958,6 +966,9 @@ public:
 	// override
 	virtual sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref = sl_null);
 
+	// override
+	sl_bool addTask(const Ref<Runnable>& callback);
+	
 	
 	void addReadData(void* data, sl_uint32 size, const Referable* refData);
 	
@@ -968,26 +979,14 @@ public:
 	void setReadingBufferSize(sl_uint32 sizeBuffer);
 
 	
-	SLIB_INLINE sl_bool isReadingError()
-	{
-		return m_flagReadingError;
-	}
+	sl_bool isReadingError();
 	
-	SLIB_INLINE sl_bool isReadingEnded()
-	{
-		return m_flagReadingEnded;
-	}
+	sl_bool isReadingEnded();
 
 	
-	SLIB_INLINE sl_bool isWritingError()
-	{
-		return m_flagWritingError;
-	}
+	sl_bool isWritingError();
 	
-	SLIB_INLINE sl_bool isWritingEnded()
-	{
-		return m_flagWritingEnded;
-	}
+	sl_bool isWritingEnded();
 
 protected:
 	virtual Memory filterRead(void* data, sl_uint32 size, const Referable* refData);
@@ -1006,7 +1005,8 @@ protected:
 protected:
 	sl_bool m_flagOpened;
 
-	SafeRef<AsyncStream> m_streamReading;
+	SafeRef<AsyncStream> m_stream;
+	
 	MemoryQueue m_bufReadConverted;
 	Queue< Ref<AsyncStreamRequest> > m_requestsRead;
 	Mutex m_lockReading;
@@ -1015,7 +1015,6 @@ protected:
 	sl_bool m_flagReadingEnded;
 	SafeMemory m_memReading;
 
-	SafeRef<AsyncStream> m_streamWriting;
 	Mutex m_lockWriting;
 	sl_bool m_flagWritingError;
 	sl_bool m_flagWritingEnded;

@@ -54,6 +54,15 @@ Ref<AsyncLoop> HttpServiceContext::getAsyncLoop()
 	return Ref<AsyncLoop>::null();
 }
 
+Ref<AsyncIoLoop> HttpServiceContext::getAsyncIoLoop()
+{
+	Ref<HttpService> service = getService();
+	if (service.isNotNull()) {
+		return service->getAsyncIoLoop();
+	}
+	return Ref<AsyncIoLoop>::null();
+}
+
 const SocketAddress& HttpServiceContext::getLocalAddress()
 {
 	Ref<HttpServiceConnection> connection = getConnection();
@@ -248,9 +257,9 @@ void HttpServiceConnection::_processInput(const void* _data, sl_uint32 size)
 			context->setResponseContentType(s);
 				
 			if (context->isProcessingByThread()) {
-				Ref<AsyncLoop> loop = service->getAsyncLoop();
-				if (loop.isNotNull()) {
-					loop->addTask(SLIB_CALLBACK_WEAKREF(HttpServiceConnection, _processContext, this, _context));
+				Ref<ThreadPool> threadPool = service->getThreadPool();
+				if (threadPool.isNotNull()) {
+					threadPool->addTask(SLIB_CALLBACK_WEAKREF(HttpServiceConnection, _processContext, this, _context));
 				} else {
 					sendResponse_ServerError();
 					return;
@@ -424,7 +433,7 @@ class _DefaultHttpServiceConnectionProvider : public HttpServiceConnectionProvid
 {
 public:
 	Ref<AsyncTcpServer> m_server;
-	Ref<AsyncLoop> m_loop;
+	Ref<AsyncIoLoop> m_loop;
 
 public:
 	_DefaultHttpServiceConnectionProvider()
@@ -437,20 +446,22 @@ public:
 	}
 
 public:
-	static Ref<HttpServiceConnectionProvider> create(HttpService* service, const SocketAddress& addressListen, const Ref<AsyncLoop>& loop)
+	static Ref<HttpServiceConnectionProvider> create(HttpService* service, const SocketAddress& addressListen)
 	{
-		Ref<_DefaultHttpServiceConnectionProvider> ret;
-		Ref<AsyncTcpServer> server = AsyncTcpServer::create(addressListen, loop);
-		if (server.isNotNull()) {
-			ret = new _DefaultHttpServiceConnectionProvider;
+		Ref<AsyncIoLoop> loop = service->getAsyncIoLoop();
+		if (loop.isNotNull()) {
+			Ref<_DefaultHttpServiceConnectionProvider> ret = new _DefaultHttpServiceConnectionProvider;
 			if (ret.isNotNull()) {
-				ret->m_loop = server->getLoop();
-				ret->m_server = server;
+				ret->m_loop = loop;
 				ret->setService(service);
-				server->start((WeakRef<_DefaultHttpServiceConnectionProvider>)(ret));
+				Ref<AsyncTcpServer> server = AsyncTcpServer::create(addressListen, (WeakRef<_DefaultHttpServiceConnectionProvider>)(ret), loop);
+				if (server.isNotNull()) {
+					ret->m_server = server;
+					return ret;
+				}
 			}
 		}
-		return ret;
+		return Ref<_DefaultHttpServiceConnectionProvider>::null();
 	}
 	
 	void release()
@@ -465,7 +476,7 @@ public:
 	{
 		Ref<HttpService> service = getService();
 		if (service.isNotNull()) {
-			Ref<AsyncLoop> loop = m_loop;
+			Ref<AsyncIoLoop> loop = m_loop;
 			if (loop.isNull()) {
 				return;
 			}
@@ -512,11 +523,37 @@ HttpService::~HttpService()
 	release();
 }
 
+sl_bool HttpService::_init(const HttpServiceParam& param)
+{
+	Ref<AsyncLoop> loop = AsyncLoop::create();
+	if (loop.isNotNull()) {
+		Ref<AsyncIoLoop> ioLoop = AsyncIoLoop::create();
+		if (ioLoop.isNotNull()) {
+			Ref<ThreadPool> threadPool = ThreadPool::create();
+			if (threadPool.isNotNull()) {
+				threadPool->setMaximumThreadsCount(param.maxThreadsCount);
+				
+				m_loop = loop;
+				m_ioLoop = ioLoop;
+				m_threadPool = threadPool;
+				m_param = param;
+				if (param.port) {
+					if (! (addHttpService(param.addressBind, param.port))) {
+						return sl_false;
+					}
+				}
+				return sl_true;
+			}
+		}
+	}
+	return sl_false;
+}
+
 Ref<HttpService> HttpService::create(const HttpServiceParam& param)
 {
 	Ref<HttpService> ret = new HttpService;
 	if (ret.isNotNull()) {
-		if (ret->start(param)) {
+		if (ret->_init(param)) {
 			return ret;
 		}
 	}
@@ -526,7 +563,7 @@ Ref<HttpService> HttpService::create(const HttpServiceParam& param)
 void HttpService::release()
 {
 	ObjectLocker lock(this);
-
+	
 	m_flagRunning = sl_false;
 	{
 		ListLocker< Ref<HttpServiceConnectionProvider> > cp(m_connectionProviders);
@@ -535,36 +572,49 @@ void HttpService::release()
 		}
 	}
 	m_connectionProviders.removeAll();
-
-	if (m_loop.isNotNull()) {
-		m_loop->release();
+	
+	Ref<AsyncLoop> loop = m_loop;
+	if (loop.isNotNull()) {
+		loop->release();
 		m_loop.setNull();
 	}
+	Ref<AsyncIoLoop> ioLoop = m_ioLoop;
+	if (ioLoop.isNotNull()) {
+		ioLoop->release();
+		m_ioLoop.setNull();
+	}
+	Ref<ThreadPool> threadPool = m_threadPool;
+	if (threadPool.isNotNull()) {
+		threadPool->release();
+		m_threadPool.setNull();
+	}
+	
 	m_connections.removeAll();
 }
 
-sl_bool HttpService::start(const HttpServiceParam& param)
+sl_bool HttpService::isRunning()
 {
-	ObjectLocker lock(this);
+	return m_flagRunning;
+}
 
-	if (m_flagRunning) {
-		return sl_false;
-	}
+Ref<AsyncLoop> HttpService::getAsyncLoop()
+{
+	return m_loop;
+}
 
-	Ref<AsyncLoop> loop = AsyncLoop::create();
-	if (loop.isNotNull()) {
-		loop->setMaximumThreadsCount(param.maxThreadsCount);
-		m_loop = loop;
-		m_param = param;
-		if (param.port) {
-			if (! (addHttpService(param.addressBind, param.port))) {
-				m_loop.setNull();
-				return sl_false;
-			}
-		}
-		return sl_true;
-	}
-	return sl_false;
+Ref<AsyncIoLoop> HttpService::getAsyncIoLoop()
+{
+	return m_ioLoop;
+}
+
+Ref<ThreadPool> HttpService::getThreadPool()
+{
+	return m_threadPool;
+}
+
+const HttpServiceParam& HttpService::getParam()
+{
+	return m_param;
 }
 
 sl_bool HttpService::preprocessRequest(HttpServiceContext* context)
@@ -689,7 +739,7 @@ void HttpService::removeService(const Ref<HttpServiceConnectionProvider>& provid
 
 sl_bool HttpService::addHttpService(const SocketAddress& addr)
 {
-	Ref<HttpServiceConnectionProvider> provider = _DefaultHttpServiceConnectionProvider::create(this, addr, m_loop);
+	Ref<HttpServiceConnectionProvider> provider = _DefaultHttpServiceConnectionProvider::create(this, addr);
 	if (provider.isNotNull()) {
 		addConnectionProvider(provider);
 		return sl_true;

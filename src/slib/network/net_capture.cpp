@@ -328,7 +328,7 @@ public:
 		while (Thread::isNotStoppingCurrent()) {
 			while (1) {
 				SocketAddress address;
-				sl_int32 n = socketTCP->receiveFrom(buf, sizeBuf, address);
+				sl_int32 n = socketTCP->receiveFrom(address, buf, sizeBuf);
 				if (n > 0) {
 					packet.data = buf;
 					packet.length = n;
@@ -340,7 +340,7 @@ public:
 			}
 			while (1) {
 				SocketAddress address;
-				sl_int32 n = socketUDP->receiveFrom(buf, sizeBuf, address);
+				sl_int32 n = socketUDP->receiveFrom(address, buf, sizeBuf);
 				if (n > 0) {
 					packet.data = buf;
 					packet.length = n;
@@ -352,7 +352,7 @@ public:
 			}
 			while (1) {
 				SocketAddress address;
-				sl_int32 n = socketICMP->receiveFrom(buf, sizeBuf, address);
+				sl_int32 n = socketICMP->receiveFrom(address, buf, sizeBuf);
 				if (n > 0) {
 					packet.data = buf;
 					packet.length = n;
@@ -388,7 +388,7 @@ public:
 					socket = m_socketICMP;
 				}
 				if (socket.isNotNull()) {
-					sl_int32 ret = socket->sendTo(buf, size, address);
+					sl_int32 ret = socket->sendTo(address, buf, size);
 					if (ret == size) {
 						return sl_true;
 					}

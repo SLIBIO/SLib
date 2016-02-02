@@ -197,7 +197,7 @@ public:
 	}
 };
 
-Ref<AsyncTcpSocket> AsyncTcpSocket::create(const Ref<Socket>& socket, const Ref<AsyncLoop>& loop)
+Ref<AsyncTcpSocket> AsyncTcpSocket::create(const Ref<Socket>& socket, const Ref<AsyncIoLoop>& loop)
 {
 	Ref<_Unix_AsyncTcpSocketInstance> ret = _Unix_AsyncTcpSocketInstance::create(socket);
 	return AsyncTcpSocket::create(ret.get(), loop);
@@ -220,7 +220,7 @@ public:
 	}
 	
 public:
-	static Ref<_Unix_AsyncTcpServerInstance> create(const Ref<Socket>& socket)
+	static Ref<_Unix_AsyncTcpServerInstance> create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener)
 	{
 		Ref<_Unix_AsyncTcpServerInstance> ret;
 		if (socket.isNotNull()) {
@@ -231,6 +231,7 @@ public:
 					if (ret.isNotNull()) {
 						ret->m_socket = socket;
 						ret->setHandle(handle);
+						ret->m_listener = listener;
 						return ret;
 					}
 				}				
@@ -277,19 +278,14 @@ public:
 	}
 };
 
-Ref<AsyncTcpServer> AsyncTcpServer::create(const Ref<Socket>& socket, const Ref<AsyncLoop>& loop)
+Ref<AsyncTcpServer> AsyncTcpServer::create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop)
 {
-	Ref<_Unix_AsyncTcpServerInstance> ret = _Unix_AsyncTcpServerInstance::create(socket);
+	Ref<_Unix_AsyncTcpServerInstance> ret = _Unix_AsyncTcpServerInstance::create(socket, listener);
 	return AsyncTcpServer::create(ret.get(), loop);
 }
 
 class _Unix_AsyncUdpSocketInstance : public AsyncUdpSocketInstance
 {
-public:
-	SafeRef<ReceiveRequest> m_requestReceiving;
-	
-	SafeRef<SendRequest> m_requestSending;
-	
 public:
 	_Unix_AsyncUdpSocketInstance()
 	{
@@ -301,7 +297,7 @@ public:
 	}
 	
 public:
-	static Ref<_Unix_AsyncUdpSocketInstance> create(const Ref<Socket>& socket)
+	static Ref<_Unix_AsyncUdpSocketInstance> create(const Ref<Socket>& socket, const Ptr<IAsyncUdpSocketListener>& listener, const Memory& buffer)
 	{
 		Ref<_Unix_AsyncUdpSocketInstance> ret;
 		if (socket.isNotNull()) {
@@ -312,6 +308,8 @@ public:
 					if (ret.isNotNull()) {
 						ret->m_socket = socket;
 						ret->setHandle(handle);
+						ret->m_listener = listener;
+						ret->m_buffer = buffer;
 						return ret;
 					}
 				}
@@ -326,117 +324,42 @@ public:
 		m_socket.setNull();
 	}
 	
-	void processReceive(sl_bool flagError)
-	{
-		Ref<Socket> socket = m_socket;
-		if (socket.isNull()) {
-			return;
-		}
-		Ref<ReceiveRequest> request = m_requestReceiving;
-		m_requestReceiving.setNull();
-		sl_size nQueue = m_requestsReceive.count();
-		if (Thread::isNotStoppingCurrent()) {
-			if (request.isNull()) {
-				if (nQueue > 0) {
-					nQueue--;
-					m_requestsReceive.pop(&request);					
-					if (request.isNull()) {
-						return;
-					}
-				} else {
-					return;
-				}
-			}
-			SocketAddress addr;
-			sl_int32 n = socket->receiveFrom((char*)(request->data), request->size, addr);
-			if (n > 0) {
-				_onReceive(request.get(), n, addr, flagError);
-			} else if (n < 0) {
-				_onReceive(request.get(), 0, SocketAddress::none(), sl_true);
-				return;
-			} else {
-				if (flagError) {
-					_onReceive(request.get(), 0, SocketAddress::none(), sl_true);
-				} else {
-					m_requestReceiving = request;
-				}
-				return;
-			}
-			request.setNull();
-		}
-	}
-	
-	void processSend(sl_bool flagError)
-	{
-		Ref<Socket> socket = m_socket;
-		if (socket.isNull()) {
-			return;
-		}
-		Ref<SendRequest> request = m_requestSending;
-		m_requestSending.setNull();
-		sl_size nQueue = m_requestsSend.count();
-		if (Thread::isNotStoppingCurrent()) {
-			if (request.isNull()) {
-				if (nQueue > 0) {
-					nQueue--;
-					m_requestsSend.pop(&request);					
-					if (request.isNull()) {
-						return;
-					}
-				} else {
-					return;
-				}
-			}
-			sl_int32 n = socket->sendTo((char*)(request->data), request->size, request->address);
-			if (n > 0) {
-				_onSend(request.get(), n, flagError);
-			} else if (n < 0) {
-				_onSend(request.get(), 0, sl_true);
-				return;
-			} else {
-				if (flagError) {
-					_onSend(request.get(), 0, sl_true);
-				} else {
-					m_requestSending = request;
-				}
-				return;
-			}
-			request.setNull();
-		}
-	}
-	
 	void onOrder()
 	{
-		processReceive(sl_false);
-		processSend(sl_false);
+		Ref<Socket> socket = m_socket;
+		if (socket.isNull()) {
+			return;
+		}
+		void* buf = m_buffer.getBuf();
+		sl_uint32 sizeBuf = (sl_uint32)(m_buffer.getSize());
+		while (Thread::isNotStoppingCurrent()) {
+			SocketAddress addr;
+			sl_int32 n = socket->receiveFrom(addr, buf, sizeBuf);
+			if (n > 0) {
+				_onReceive(addr, n);
+			} else {
+				break;
+			}
+		}
 	}
 	
 	void onEvent(EventDesc* pev)
 	{
-		sl_bool flagProcessed = sl_false;
 		if (pev->flagIn) {
-			processReceive(pev->flagError);
-			flagProcessed = sl_true;
+			onOrder();
 		}
-		if (pev->flagOut) {
-			processSend(pev->flagError);
-			flagProcessed = sl_true;
-		}
-		if (!flagProcessed) {
-			if (pev->flagError) {
-				processReceive(sl_true);
-				processSend(sl_true);
-			}
-		}
-		requestOrder();
 	}
 
 };
 
-Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ref<Socket>& socket, const Ref<AsyncLoop>& loop)
+Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ref<Socket>& socket, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop)
 {
-	Ref<_Unix_AsyncUdpSocketInstance> ret = _Unix_AsyncUdpSocketInstance::create(socket);
-	return AsyncUdpSocket::create(ret.get(), loop);
+	Memory buffer = Memory::create(packetSize);
+	if (buffer.isNotEmpty()) {
+		Ref<_Unix_AsyncUdpSocketInstance> ret = _Unix_AsyncUdpSocketInstance::create(socket, listener, buffer);
+		return AsyncUdpSocket::create(ret.get(), loop);
+	}
+	return Ref<AsyncUdpSocket>::null();
 }
 
 SLIB_NETWORK_NAMESPACE_END

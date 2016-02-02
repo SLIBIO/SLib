@@ -14,42 +14,37 @@ class SLIB_EXPORT AsyncTcpSecureStreamServer : public Object, public IAsyncTcpSe
 {
 private:
 	AsyncTcpSecureStreamServer();
-public:
 	~AsyncTcpSecureStreamServer();
 	
 public:
 	static Ref<AsyncTcpSecureStreamServer> create(
-		const Ref<AsyncTcpServer>& server,
 		const AsyncSecureStreamServerParam& param,
-		sl_bool flagStart = sl_true);
+		const SocketAddress& addressListen,
+		const Ref<AsyncIoLoop>& loop);
 	
 	static Ref<AsyncTcpSecureStreamServer> create(
 		const AsyncSecureStreamServerParam& param,
-		const SocketAddress& addressListen,
-		const Ref<AsyncLoop>& loop,
-		sl_bool flagStart = sl_true);
-	
-	static Ref<AsyncTcpSecureStreamServer> create(
-		const AsyncSecureStreamServerParam& param,
-		const SocketAddress& addressListen,
-		sl_bool flagStart = sl_true);
+		const SocketAddress& addressListen);
 	
 	static Ref<AsyncTcpSecureStreamServer> create(
 		const AsyncSecureStreamServerParam& param,
 		sl_uint32 portListen,
-		const Ref<AsyncLoop>& loop,
-		sl_bool flagIPv6 = sl_false,
-		sl_bool flagStart = sl_true);
+		const Ref<AsyncIoLoop>& loop);
 	
 	static Ref<AsyncTcpSecureStreamServer> create(
 		const AsyncSecureStreamServerParam& param,
+		sl_uint32 portListen);
+	
+	static Ref<AsyncTcpSecureStreamServer> createIPv6(
+		const AsyncSecureStreamServerParam& param,
 		sl_uint32 portListen,
-		sl_bool flagIPv6 = sl_false,
-		sl_bool flagStart = sl_true);
+		const Ref<AsyncIoLoop>& loop);
+	
+	static Ref<AsyncTcpSecureStreamServer> createIPv6(
+		const AsyncSecureStreamServerParam& param,
+		sl_uint32 portListen);
 	
 public:
-	void start();
-	
 	void close();
 
 protected:
@@ -76,7 +71,7 @@ public:
 	static Ref<AsyncSecureStream> create(
 		const AsyncSecureStreamClientParam& param,
 		const SocketAddress& addressBind, const SocketAddress& addressConnect,
-		const Ref<AsyncLoop>& loop);
+		const Ref<AsyncIoLoop>& loop);
 
 	static Ref<AsyncSecureStream> create(
 		const AsyncSecureStreamClientParam& param,
@@ -86,7 +81,7 @@ public:
 	static Ref<AsyncSecureStream> create(
 		const AsyncSecureStreamClientParam& param,
 		const SocketAddress& addressConnect,
-		const Ref<AsyncLoop>& loop);
+		const Ref<AsyncIoLoop>& loop);
 
 	static Ref<AsyncSecureStream> create(
 		const AsyncSecureStreamClientParam& param,

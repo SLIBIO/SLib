@@ -470,14 +470,11 @@ private:
 	sl_uint32 _messageLength;
 };
 
-struct SLIB_EXPORT DnsQuestion
+class SLIB_EXPORT DnsPacket
 {
-	sl_uint16 id;
-	String name;
-};
-
-struct SLIB_EXPORT DnsAnswer
-{
+public:
+	sl_bool flagQuestion;
+	
 	sl_uint16 id;
 
 	struct Question
@@ -506,6 +503,13 @@ struct SLIB_EXPORT DnsAnswer
 		String server;
 	};
 	List<NameServer> nameServers;
+
+public:
+	sl_bool parsePacket(const void* packet, sl_uint32 len);
+	
+	static Memory buildQuestionPacket(sl_uint16 id, const String& host);
+	
+	static Memory buildHostAddressAnswerPacket(sl_uint16 id, const String& hostName, const IPv4Address& hosteAddress);
 };
 
 class DnsClient;
@@ -513,7 +517,7 @@ class DnsClient;
 class SLIB_EXPORT IDnsClientListener
 {
 public:
-	virtual void onDnsAnswer(DnsClient* client, const SocketAddress& serverAddress, const DnsAnswer& answer) = 0;
+	virtual void onDnsAnswer(DnsClient* client, const SocketAddress& serverAddress, const DnsPacket& packet) = 0;
 };
 
 class SLIB_EXPORT DnsClientParam
@@ -528,28 +532,28 @@ protected:
 	DnsClient();
 
 public:
-	static Ref<DnsClient> create(const DnsClientParam& param, const Ref<AsyncLoop>& loop);
+	static Ref<DnsClient> create(const DnsClientParam& param, const Ref<AsyncIoLoop>& loop);
 	
 	static Ref<DnsClient> create(const DnsClientParam& param);
 
 public:
-	void sendQuestion(const SocketAddress& serverAddress, const DnsQuestion& question);
+	void sendQuestion(const SocketAddress& serverAddress, const String& hostName);
 	
-	void sendQuestion(const IPv4Address& serverIp, const String& host);
+	void sendQuestion(const IPv4Address& serverIp, const String& hostName);
 
+	
+protected:
+	// override
+	virtual void onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 sizeReceive);
 
+protected:
+	void _onDnsAnswer(const SocketAddress& serverAddress, const DnsPacket& packet);
+	
 protected:
 	Ref<AsyncUdpSocket> m_udp;
 	sl_uint16 m_idLast;
-	Memory m_memReceive;
 	
 	Ptr<IDnsClientListener> m_listener;
-
-protected:
-	void _onDnsAnswer(const SocketAddress& serverAddress, const DnsAnswer& answer);
-	
-	// override
-	virtual void onReceiveFrom(AsyncUdpSocket* socket, void* data, sl_uint32 sizeReceive, const SocketAddress& address, sl_bool flagError);
 
 };
 
@@ -558,9 +562,10 @@ class DnsServer;
 class SLIB_EXPORT IDnsServerListener
 {
 public:
-	virtual IPv4Address onResolveDnsHost(DnsServer* server, const SocketAddress& clientAddress, const DnsQuestion& question);
+	virtual sl_bool resolveDnsHost(DnsServer *server, const String &hostName, IPv4Address &outAddr);
 	
-	virtual void onCacheDnsHost(DnsServer* server, const String& name, const IPv4Address& addr);
+	virtual void cacheDnsHost(DnsServer *server, const String &hostName, const IPv4Address &addr);
+
 };
 
 class SLIB_EXPORT DnsServerParam
@@ -575,43 +580,55 @@ public:
 	DnsServerParam();
 };
 
-class SLIB_EXPORT DnsServer : public Object
+class SLIB_EXPORT DnsServer : public Object, public IAsyncUdpSocketListener
 {
 protected:
 	DnsServer();
-	~DnsServer();
     
 public:
+	static Ref<DnsServer> create(const DnsServerParam& param, const Ref<AsyncIoLoop>& loop);
+
 	static Ref<DnsServer> create(const DnsServerParam& param);
+	
+protected:
+	void _processReceivedQuestion(const SocketAddress& clientAddress, sl_uint16 id, const String& hostName);
+	
+	void _processReceivedAnswer(const DnsPacket& packet);
+	
+	void _sendPacket(const SocketAddress& clientAddress, const Memory& packet);
+	
+	void _forwardPacket(const Memory& packet);
+	
+protected:
+	// override
+	virtual void onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 sizeReceive);
 
-public:
-	void release();
-
-	void sendHostAddressAnswer(const SocketAddress& clientAddress, const DnsQuestion& question, const IPv4Address& answer);
+protected:
+	sl_bool _resolveDnsHost(const String& hostName, IPv4Address& outAddr);
+	
+	void _cacheDnsHost(const String& hostName, const IPv4Address& addr);
 	
 private:
-	SafeRef<Socket> m_udp;
-	Memory m_memReceive;
-	SafeRef<Thread> m_thread;
+	Ref<AsyncUdpSocket> m_udp;
 	
-	HashMap<String, IPv4Address> m_mapDNSCache;
+	HashMap<String, IPv4Address> m_cacheAddresses;
 	sl_bool m_flagUseCache;
-
-	HashMap<sl_uint16, sl_uint16> m_mapForwardId;
-	HashMap<sl_uint16, SocketAddress> m_mapForwardAddress;
+	
 	IPv4Address m_forwardTarget;
 	sl_uint16 m_lastForwardId;
-
+	
+	struct ForwardElement
+	{
+		SocketAddress clientAddress;
+		sl_uint16 requestedId;
+		String requestedHostName;
+		String alias;
+		sl_uint32 countRequests;
+	};
+	HashMap<sl_uint16, ForwardElement> m_mapForward;
+	
 	Ptr<IDnsServerListener> m_listener;
-	
-protected:
-	void _run();
-	
-protected:
-	IPv4Address _resolveDnsHost(const SocketAddress& clientAddress, const DnsQuestion& question);
-	
-	void _cacheDnsHost(const String& name, const IPv4Address& addr);
-	
+
 };
 
 SLIB_NETWORK_NAMESPACE_END

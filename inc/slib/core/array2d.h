@@ -543,24 +543,6 @@ public:
 		return getStride();
 	}
 
-	SLIB_INLINE sl_bool isEmpty() const
-	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->width() == 0 || obj->height() == 0;
-		}
-		return sl_true;
-	}
-
-	SLIB_INLINE sl_bool isNotEmpty() const
-	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->width() != 0 && obj->height() != 0;
-		}
-		return sl_false;
-	}
-
 	SLIB_INLINE T& item(sl_reg x, sl_reg y) const
 	{
 		return (m_object->data())[y * m_object->stride() + x];

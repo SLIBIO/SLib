@@ -251,12 +251,10 @@ public:
 	
 	sl_int32 receive(void* buf, sl_uint32 size);
 	
-	sl_int32 sendTo(const void* buf, sl_uint32 size, const SocketAddress& address);
+	sl_int32 sendTo(const SocketAddress& address, const void* buf, sl_uint32 size);
 	
-	sl_int32 receiveFrom(void* buf, sl_uint32 size, SocketAddress& address);
+	sl_int32 receiveFrom(SocketAddress& address, void* buf, sl_uint32 size);
 	
-	sl_int32 sendBroadcast(const void* buf, sl_int32 size, sl_uint32 port);
-
 	sl_int32 sendPacket(const void* buf, sl_uint32 size, const L2PacketInfo& info);
 	
 	sl_int32 receivePacket(const void* buf, sl_uint32 size, L2PacketInfo& info);

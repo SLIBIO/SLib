@@ -77,12 +77,11 @@ public:
 		}
 		{
 			gettimeofday(&now, NULL);
-			to.tv_sec = now.tv_sec + _t / 1000;
-			to.tv_nsec = now.tv_usec * 1000 + (_t % 1000) * 1000 * 1000;
-			if ((to.tv_nsec / 1000000000) >= 1) {
-				to.tv_sec += to.tv_nsec / 1000000000;
-				to.tv_nsec = to.tv_nsec % 1000000000;
-			}
+			long ms = (now.tv_usec / 1000) + _t;
+			long s = now.tv_sec + (ms / 1000);
+			ms = ms % 1000;
+			to.tv_sec = s;
+			to.tv_nsec = ms * 1000000;
 		}
 
 		while (! m_signal) {
@@ -99,12 +98,11 @@ public:
 				_t = 10000;
 				{
 					gettimeofday(&now, NULL);
-					to.tv_sec = now.tv_sec + _t / 1000;
-					to.tv_nsec = now.tv_usec * 1000 + (_t % 1000) * 1000 * 1000;
-					if ((to.tv_nsec / 1000000000) >= 1) {
-						to.tv_sec += to.tv_nsec / 1000000000;
-						to.tv_nsec = to.tv_nsec % 1000000000;
-					}
+					long ms = (now.tv_usec / 1000) + _t;
+					long s = now.tv_sec + (ms / 1000);
+					ms = ms % 1000;
+					to.tv_sec = s;
+					to.tv_nsec = ms * 1000000;
 				}
 				pthread_cond_timedwait(&m_cond, &m_mutex, &to);
 #else

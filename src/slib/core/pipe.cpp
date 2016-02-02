@@ -54,7 +54,7 @@ void Pipe::close()
 ********************************************/
 PipeEvent::PipeEvent()
 {
-	m_nSizeWritten = 0;
+	m_flagSet = sl_false;
 }
 
 Ref<PipeEvent> PipeEvent::create()
@@ -81,22 +81,28 @@ Ref<Pipe> PipeEvent::getPipe()
 
 void PipeEvent::__set()
 {
-	if (m_nSizeWritten < 100) {
-		char c = 1;
-		m_pipe->write(&c, 1);
-		m_nSizeWritten++;
+	SpinLocker lock(&m_lock);
+	if (m_flagSet) {
+		return;
 	}
+	m_flagSet = sl_true;
+	char c = 1;
+	m_pipe->write(&c, 1);
 }
 
 void PipeEvent::__reset()
 {
-#if !defined(SLIB_PLATFORM_IS_UNIX)
-	if (m_nSizeWritten > 0)
-#endif
-	{
+	SpinLocker lock(&m_lock);
+	if (!m_flagSet) {
+		return;
+	}
+	m_flagSet = sl_false;
+	while (1) {
 		static char t[200];
-		m_pipe->read(t, 200);
-		m_nSizeWritten = 0;
+		sl_reg n = m_pipe->read(t, 200);
+		if (n < 200) {
+			break;
+		}
 	}
 }
 

@@ -14,13 +14,13 @@
 #endif
 
 SLIB_NAMESPACE_BEGIN
-struct _AsyncLoopHandle
+struct _AsyncIoLoopHandle
 {
 	int fdEpoll;
 	Ref<PipeEvent> eventWake;
 };
 
-void* AsyncLoop::__createHandle()
+void* AsyncIoLoop::__createHandle()
 {
 	Ref<PipeEvent> pipe = PipeEvent::create();
 	if (pipe.isNull()) {
@@ -33,14 +33,14 @@ void* AsyncLoop::__createHandle()
 	fdEpoll = ::epoll_create1(0);
 #endif
 	if (fdEpoll >= 0) {
-		_AsyncLoopHandle* handle = new _AsyncLoopHandle;
+		_AsyncIoLoopHandle* handle = new _AsyncIoLoopHandle;
 		if (handle) {
 			handle->fdEpoll = fdEpoll;
 			handle->eventWake = pipe;
 			// register wake event
 			epoll_event ev;
 			ev.data.ptr = sl_null;
-			ev.events = EPOLLIN | EPOLLPRI;
+			ev.events = EPOLLIN | EPOLLPRI | EPOLLET;
 			if (0 == epoll_ctl(fdEpoll, EPOLL_CTL_ADD, (int)(pipe->getReadPipeHandle()), &ev)) {
 				return handle;
 			}
@@ -51,16 +51,16 @@ void* AsyncLoop::__createHandle()
 	return 0;
 }
 
-void AsyncLoop::__closeHandle(void* _handle)
+void AsyncIoLoop::__closeHandle(void* _handle)
 {
-	_AsyncLoopHandle* handle = (_AsyncLoopHandle*)_handle;
+	_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)_handle;
 	::close(handle->fdEpoll);
 	delete handle;
 }
 
-void AsyncLoop::__runLoop()
+void AsyncIoLoop::__runLoop()
 {
-	_AsyncLoopHandle* handle = (_AsyncLoopHandle*)m_handle;
+	_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
 
 	epoll_event waitEvents[ASYNC_MAX_WAIT_EVENT];
 
@@ -68,36 +68,36 @@ void AsyncLoop::__runLoop()
 
 		_stepBegin();
 
-		int nEvents = ::epoll_wait(handle->fdEpoll, waitEvents, ASYNC_MAX_WAIT_EVENT, 0);
+		int nEvents = ::epoll_wait(handle->fdEpoll, waitEvents, ASYNC_MAX_WAIT_EVENT, -1);
 		if (nEvents == 0) {
 			m_queueInstancesClosed.removeAll();
-			int timeout = _getTimeout();
-			nEvents = ::epoll_wait(handle->fdEpoll, waitEvents, ASYNC_MAX_WAIT_EVENT, timeout);
 		}
 
 		for (int i = 0; m_flagRunning && i < nEvents; i++) {
 			epoll_event& ev = waitEvents[i];
-			AsyncInstance* instance = (AsyncInstance*)(ev.data.ptr);
-			if (instance && !(instance->isClosing())) {
-				AsyncInstance::EventDesc desc;
-				desc.flagIn = sl_false;
-				desc.flagOut = sl_false;
-				desc.flagError = sl_false;
-				int re = ev.events;
-				if (re & (EPOLLIN | EPOLLPRI)) {
-					desc.flagIn = sl_true;
-				}
-				if (re & (EPOLLOUT)) {
-					desc.flagOut = sl_true;
-				}
+			AsyncIoInstance* instance = (AsyncIoInstance*)(ev.data.ptr);
+			if (instance) {
+                if (!(instance->isClosing())) {
+                    AsyncIoInstance::EventDesc desc;
+                    desc.flagIn = sl_false;
+                    desc.flagOut = sl_false;
+                    desc.flagError = sl_false;
+                    int re = ev.events;
+                    if (re & (EPOLLIN | EPOLLPRI)) {
+                        desc.flagIn = sl_true;
+                    }
+                    if (re & (EPOLLOUT)) {
+                        desc.flagOut = sl_true;
+                    }
 #if defined(EPOLL_LOW)
-				if (re & (EPOLLERR | EPOLLHUP)) {
+                    if (re & (EPOLLERR | EPOLLHUP)) {
 #else
-				if (re & (EPOLLERR | EPOLLHUP | EPOLLRDHUP)) {
+                    if (re & (EPOLLERR | EPOLLHUP | EPOLLRDHUP)) {
 #endif
-					desc.flagError = sl_true;
-				}
-				instance->onEvent(&desc);
+                        desc.flagError = sl_true;
+                    }
+                    instance->onEvent(&desc);
+                }
 			} else {
 				handle->eventWake->reset();
 			}
@@ -110,23 +110,38 @@ void AsyncLoop::__runLoop()
 
 }
 
-void AsyncLoop::__wake()
+void AsyncIoLoop::__wake()
 {
-	_AsyncLoopHandle* handle = (_AsyncLoopHandle*)m_handle;
+	_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
 	handle->eventWake->set();
 }
 
-sl_bool AsyncLoop::__attachInstance(AsyncInstance* instance)
+sl_bool AsyncIoLoop::__attachInstance(AsyncIoInstance* instance, AsyncIoMode mode)
 {
-	_AsyncLoopHandle* handle = (_AsyncLoopHandle*)m_handle;
+	_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
 	int hObject = (int)(instance->getHandle());
 	epoll_event ev;
 	ev.data.ptr = (void*)instance;
+	
 #if defined(EPOLL_LOW)
-	ev.events = EPOLLIN | EPOLLPRI | EPOLLOUT | EPOLLET;
+	ev.events = EPOLLET;
 #else
-	ev.events = EPOLLIN | EPOLLPRI | EPOLLOUT | EPOLLRDHUP | EPOLLET;
+	ev.events = EPOLLRDHUP | EPOLLET;
 #endif
+    switch (mode) {
+        case asyncIoMode_In:
+            ev.events |= EPOLLIN | EPOLLPRI;
+            break;
+        case asyncIoMode_Out:
+            ev.events |= EPOLLOUT;
+            break;
+        case asyncIoMode_InOut:
+            ev.events |= EPOLLIN | EPOLLPRI | EPOLLOUT;
+            break;
+        default:
+            return sl_true;
+    }
+    
 	int ret = ::epoll_ctl(handle->fdEpoll, EPOLL_CTL_ADD, hObject, &ev);
 	if (ret == 0) {
 		return sl_true;
@@ -135,9 +150,9 @@ sl_bool AsyncLoop::__attachInstance(AsyncInstance* instance)
 	}
 }
 
-void AsyncLoop::__detachInstance(AsyncInstance* instance)
+void AsyncIoLoop::__detachInstance(AsyncIoInstance* instance)
 {
-	_AsyncLoopHandle* handle = (_AsyncLoopHandle*)m_handle;
+	_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
 	int hObject = (int)(instance->getHandle());
 	epoll_event ev;
 	int ret = ::epoll_ctl(handle->fdEpoll, EPOLL_CTL_DEL, hObject, &ev);

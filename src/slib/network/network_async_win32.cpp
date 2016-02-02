@@ -231,7 +231,7 @@ public:
 	}
 };
 
-Ref<AsyncTcpSocket> AsyncTcpSocket::create(const Ref<Socket>& socket, const Ref<AsyncLoop>& loop)
+Ref<AsyncTcpSocket> AsyncTcpSocket::create(const Ref<Socket>& socket, const Ref<AsyncIoLoop>& loop)
 {
 	Ref<_Win32AsyncTcpSocketInstance> ret = _Win32AsyncTcpSocketInstance::create(socket);
 	return AsyncTcpSocket::create(ret.get(), loop);
@@ -241,7 +241,7 @@ Ref<AsyncTcpSocket> AsyncTcpSocket::create(const Ref<Socket>& socket, const Ref<
 class _Win32AsyncTcpServerInstance : public AsyncTcpServerInstance
 {
 public:
-	sl_bool m_flagListening;
+	sl_bool m_flagAccepting;
 
 	WSAOVERLAPPED m_overlapped;
 	char m_bufferAccept[2 * (sizeof(SOCKADDR_IN)+16)];
@@ -253,7 +253,7 @@ public:
 public:
 	_Win32AsyncTcpServerInstance()
 	{
-		m_flagListening = sl_false;
+		m_flagAccepting = sl_false;
 	}
 
 	~_Win32AsyncTcpServerInstance()
@@ -262,24 +262,23 @@ public:
 	}
 
 public:
-	static Ref<_Win32AsyncTcpServerInstance> create(const Ref<Socket>& socket)
+	static Ref<_Win32AsyncTcpServerInstance> create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener)
 	{
-		Ref<_Win32AsyncTcpServerInstance> ret;
 		if (socket.isNotNull()) {
 			sl_file handle = (sl_file)(socket->getHandle());
 			if (handle != SLIB_FILE_INVALID_HANDLE) {
-				ret = new _Win32AsyncTcpServerInstance();
+				Ref<_Win32AsyncTcpServerInstance> ret = new _Win32AsyncTcpServerInstance();
 				if (ret.isNotNull()) {
 					ret->m_socket = socket;
 					ret->setHandle(handle);
-					if (!(ret->initialize())) {
-						ret.setNull();
+					if (ret->initialize()) {
+						ret->m_listener = listener;
+						return ret;
 					}
-					return ret;
 				}
 			}
 		}
-		return ret;
+		return Ref<_Win32AsyncTcpServerInstance>::null();
 	}
 
 	sl_bool initialize()
@@ -326,15 +325,18 @@ public:
 
 	void onOrder()
 	{
+		if (m_flagAccepting) {
+			return;
+		}
 		sl_file handle = getHandle();
 		if (handle == SLIB_FILE_INVALID_HANDLE) {
 			return;
 		}
-		do {
-			Ref<Socket> socket = m_socket;
-			if (socket.isNull()) {
-				break;
-			}
+		Ref<Socket> socket = m_socket;
+		if (socket.isNull()) {
+			return;
+		}
+		while (Thread::isNotStoppingCurrent()) {
 			Ref<Socket> socketAccept = Socket::open(socket->getType());
 			if (socketAccept.isNotNull()) {
 				m_socketAccept = socketAccept;
@@ -349,15 +351,18 @@ public:
 				} else {
 					int err = ::WSAGetLastError();
 					if (err = ERROR_IO_PENDING) {
-						m_flagListening = sl_true;
+						m_flagAccepting = sl_true;
 					} else {
 						processAccept(sl_true);
 					}
+					break;
 				}
 			} else {
-				processAccept(sl_true);
+				LOG_ERROR("Failed to create accept socket");
+				processAccept(sl_true);				
+				break;
 			}
-		} while (0);
+		}
 	}
 
 	void onEvent(EventDesc* pev)
@@ -371,8 +376,14 @@ public:
 		DWORD dwFlags = 0;
 		sl_bool flagError = sl_false;
 		if (::WSAGetOverlappedResult((SOCKET)handle, pOverlapped, &dwSize, FALSE, &dwFlags)) {
+			m_flagAccepting = sl_false;
 			processAccept(sl_false);
 		} else {
+			int err = ::WSAGetLastError();
+			if (err == WSA_IO_INCOMPLETE) {
+				return;
+			}
+			m_flagAccepting = sl_false;
 			processAccept(sl_true);
 		}
 		onOrder();
@@ -409,9 +420,9 @@ public:
 
 };
 
-Ref<AsyncTcpServer> AsyncTcpServer::create(const Ref<Socket>& socket, const Ref<AsyncLoop>& loop)
+Ref<AsyncTcpServer> AsyncTcpServer::create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop)
 {
-	Ref<_Win32AsyncTcpServerInstance> ret = _Win32AsyncTcpServerInstance::create(socket);
+	Ref<_Win32AsyncTcpServerInstance> ret = _Win32AsyncTcpServerInstance::create(socket, listener);
 	return AsyncTcpServer::create(ret.get(), loop);
 }
 
@@ -419,20 +430,18 @@ Ref<AsyncTcpServer> AsyncTcpServer::create(const Ref<Socket>& socket, const Ref<
 class _Win32AsyncUdpSocketInstance : public AsyncUdpSocketInstance
 {
 public:
+	sl_bool m_flagReceiving;
+
 	WSAOVERLAPPED m_overlappedReceive;
 	WSABUF m_bufReceive;
 	DWORD m_flagsReceive;
-	SafeRef<ReceiveRequest> m_requestReceiving;
 	sockaddr_storage m_addrReceive;
 	int m_lenAddrReceive;
-
-	WSAOVERLAPPED m_overlappedSend;
-	WSABUF m_bufSend;
-	SafeRef<SendRequest> m_requestSending;
 
 public:
 	_Win32AsyncUdpSocketInstance()
 	{
+		m_flagReceiving = sl_false;
 	}
 
 	~_Win32AsyncUdpSocketInstance()
@@ -441,17 +450,21 @@ public:
 	}
 
 public:
-	static Ref<_Win32AsyncUdpSocketInstance> create(const Ref<Socket>& socket)
+	static Ref<_Win32AsyncUdpSocketInstance> create(const Ref<Socket>& socket, const Ptr<IAsyncUdpSocketListener>& listener, const Memory& buffer)
 	{
 		Ref<_Win32AsyncUdpSocketInstance> ret;
 		if (socket.isNotNull()) {
-			sl_file handle = (sl_file)(socket->getHandle());
-			if (handle != SLIB_FILE_INVALID_HANDLE) {
-				ret = new _Win32AsyncUdpSocketInstance();
-				if (ret.isNotNull()) {
-					ret->m_socket = socket;
-					ret->setHandle(handle);
-					return ret;
+			if (socket->setNonBlockingMode(sl_true)) {
+				sl_file handle = (sl_file)(socket->getHandle());
+				if (handle != SLIB_FILE_INVALID_HANDLE) {
+					ret = new _Win32AsyncUdpSocketInstance();
+					if (ret.isNotNull()) {
+						ret->m_socket = socket;
+						ret->setHandle(handle);
+						ret->m_listener = listener;
+						ret->m_buffer = buffer;
+						return ret;
+					}
 				}
 			}
 		}
@@ -466,67 +479,34 @@ public:
 
 	void onOrder()
 	{
+		if (m_flagReceiving) {
+			return;
+		}
 		sl_file handle = getHandle();
 		if (handle == SLIB_FILE_INVALID_HANDLE) {
 			return;
 		}
-		if (m_requestReceiving.isNull()) {
-			Ref<ReceiveRequest> req;
-			if (m_requestsReceive.pop(&req)) {
-				if (req.isNotNull()) {
-					Base::zeroMemory(&m_overlappedReceive, sizeof(m_overlappedReceive));
-					m_bufReceive.buf = (CHAR*)(req->data);
-					m_bufReceive.len = req->size;
-					m_flagsReceive = 0;
-					DWORD dwRead = 0;
-					m_lenAddrReceive = sizeof(sockaddr_storage);
-					int ret = WSARecvFrom((SOCKET)handle, &m_bufReceive, 1, &dwRead, &m_flagsReceive
-						, (sockaddr*)&m_addrReceive, &m_lenAddrReceive, &m_overlappedReceive, NULL);
-					if (ret == 0) {
-						m_requestReceiving = req;
-						EventDesc desc;
-						desc.pOverlapped = &m_overlappedReceive;
-						onEvent(&desc);
-					} else {
-						DWORD dwErr = ::WSAGetLastError();
-						if (dwErr == WSA_IO_PENDING) {
-							m_requestReceiving = req;
-						} else {
-							_onReceive(req.get(), 0, SocketAddress::none(), sl_true);
-						}
-					}
-				}
-			}
+		Ref<Socket> socket = m_socket;
+		if (socket.isNull()) {
+			return;
 		}
-		if (m_requestSending.isNull()) {
-			Ref<SendRequest> req;
-			if (m_requestsSend.pop(&req)) {
-				if (req.isNotNull()) {
-					sockaddr_storage addr;
-					int lenAddr = req->address.getSystemSocketAddress(&addr);
-					if (lenAddr > 0) {
-						Base::zeroMemory(&m_overlappedSend, sizeof(m_overlappedSend));
-						m_bufSend.buf = (CHAR*)(req->data);
-						m_bufSend.len = req->size;
-						DWORD dwSent = 0;
-						int ret = ::WSASendTo((SOCKET)handle, &m_bufSend, 1, &dwSent, 0, (sockaddr*)&addr, lenAddr, &m_overlappedSend, NULL);
-						if (ret == 0) {
-							m_requestSending = req;
-							EventDesc desc;
-							desc.pOverlapped = &m_overlappedSend;
-							onEvent(&desc);
-						} else {
-							int dwErr = ::WSAGetLastError();
-							if (dwErr == WSA_IO_PENDING) {
-								m_requestSending = req;
-							} else {
-								_onSend(req.get(), 0, sl_true);
-							}
-						}
-					} else {
-						_onSend(req.get(), 0, sl_true);
-					}
-				}
+		void* buf = m_buffer.getBuf();
+		sl_uint32 sizeBuf = (sl_uint32)(m_buffer.getSize());
+
+		Base::zeroMemory(&m_overlappedReceive, sizeof(m_overlappedReceive));
+		m_bufReceive.buf = (CHAR*)(buf);
+		m_bufReceive.len = sizeBuf;
+		m_flagsReceive = 0;
+		DWORD dwRead = 0;
+		m_lenAddrReceive = sizeof(sockaddr_storage);
+		int ret = WSARecvFrom((SOCKET)handle, &m_bufReceive, 1, &dwRead, &m_flagsReceive
+			, (sockaddr*)&m_addrReceive, &m_lenAddrReceive, &m_overlappedReceive, NULL);
+		if (ret == 0) {
+			m_flagReceiving = sl_true;
+		} else {
+			DWORD dwErr = ::WSAGetLastError();
+			if (dwErr == WSA_IO_PENDING) {
+				m_flagReceiving = sl_true;
 			}
 		}
 	}
@@ -540,39 +520,36 @@ public:
 		OVERLAPPED* pOverlapped = (OVERLAPPED*)(pev->pOverlapped);
 		DWORD dwSize = 0;
 		DWORD dwFlags = 0;
-		sl_bool flagError = sl_false;
-		if (!::WSAGetOverlappedResult((SOCKET)handle, pOverlapped, &dwSize, FALSE, &dwFlags)) {
-			flagError = sl_true;
-			close();
-		}
-		if (dwSize == 0) {
-			flagError = sl_true;
-		}
-		if (pOverlapped == &m_overlappedReceive) {
-			Ref<ReceiveRequest> req = m_requestReceiving;
-			m_requestReceiving.setNull();
-			if (req.isNotNull()) {
+		if (::WSAGetOverlappedResult((SOCKET)handle, pOverlapped, &dwSize, FALSE, &dwFlags)) {
+			m_flagReceiving = sl_false;
+			if (dwSize > 0) {
 				SocketAddress addr;
 				if (m_lenAddrReceive > 0) {
-					addr.setSystemSocketAddress(&m_addrReceive, m_lenAddrReceive);
+					if (addr.setSystemSocketAddress(&m_addrReceive, m_lenAddrReceive)) {
+						_onReceive(addr, dwSize);
+					}
 				}
-				_onReceive(req.get(), dwSize, addr, flagError);
 			}
-		} else if (pOverlapped == &m_overlappedSend) {
-			Ref<SendRequest> req = m_requestSending;
-			m_requestSending.setNull();
-			if (req.isNotNull()) {
-				_onSend(req.get(), dwSize, flagError);
+		} else {
+			int err = ::WSAGetLastError();
+			if (err == WSA_IO_INCOMPLETE) {
+				return;
 			}
+			m_flagReceiving = sl_false;
 		}
-		requestOrder();
+		onOrder();
 	}
+
 };
 
-Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ref<Socket>& socket, const Ref<AsyncLoop>& loop)
+Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ref<Socket>& socket, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop)
 {
-	Ref<_Win32AsyncUdpSocketInstance> ret = _Win32AsyncUdpSocketInstance::create(socket);
-	return AsyncUdpSocket::create(ret.get(), loop);
+	Memory buffer = Memory::create(packetSize);
+	if (buffer.isNotEmpty()) {
+		Ref<_Win32AsyncUdpSocketInstance> ret = _Win32AsyncUdpSocketInstance::create(socket, listener, buffer);
+		return AsyncUdpSocket::create(ret.get(), loop);
+	}
+	return Ref<AsyncUdpSocket>::null();
 }
 
 SLIB_NETWORK_NAMESPACE_END

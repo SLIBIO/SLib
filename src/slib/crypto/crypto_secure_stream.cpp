@@ -389,6 +389,33 @@ public:
 		m_flagInited = sl_false;
 	}
 
+public:
+	static Ref<_SecureStreamServer_AsyncStream> create(const Ref<AsyncStream>& baseStream, const AsyncSecureStreamServerParam& param, sl_bool flagConnect)
+	{
+		if (baseStream.isNotNull()) {
+			Memory rdata = Memory::create(RDATA_SIZE);
+			if (rdata.isNotEmpty()) {
+				Ref<_SecureStreamServer_AsyncStream> ret = new _SecureStreamServer_AsyncStream;
+				if (ret.isNotNull()) {
+					ret->m_rdata = rdata;
+					ret->m_streamBase = baseStream;
+					ret->m_listener = param.listener;
+					if (ret->m_context.init(param)) {
+						if (flagConnect) {
+							if (ret->connect()) {
+								return ret;
+							}
+						} else {
+							return ret;
+						}
+					}
+				}
+			}
+			
+		}
+		return Ref<_SecureStreamServer_AsyncStream>::null();
+	}
+	
 	void _close()
 	{
 		m_streamBase.setNull();
@@ -520,10 +547,7 @@ public:
 					Base::copyMemory(req->data(), (sl_uint8*)(m_rdata.getBuf()) + m_posRdata, n);
 					m_sizeRdata -= n;
 					m_posRdata += n;
-					Ref<AsyncLoop> loop = stream->getLoop();
-					if (loop.isNotNull()) {
-						loop->addTask(SLIB_CALLBACK_WEAKREF(_SecureStreamServer_AsyncStream, processReadDone, this, Ref<AsyncStreamRequest>(req)), sl_false);
-					}
+					addTask(SLIB_CALLBACK_WEAKREF(_SecureStreamServer_AsyncStream, processReadDone, this, Ref<AsyncStreamRequest>(req)));
 					if (m_sizeRdata == 0) {
 						m_rdata.setNull();
 					}
@@ -578,37 +602,13 @@ public:
 		return m_streamBase.isNotNull();
 	}
 
-public:
-	static Ref<_SecureStreamServer_AsyncStream> create(const Ref<AsyncStream>& baseStream, const AsyncSecureStreamServerParam& param, sl_bool flagConnect)
+	sl_bool addTask(const Ref<Runnable>& callback)
 	{
-		Ref<_SecureStreamServer_AsyncStream> ret;
-		Memory rdata = Memory::create(RDATA_SIZE);
-		if (rdata.isEmpty()) {
-			return ret;
+		Ref<AsyncStream> stream = m_streamBase;
+		if (stream.isNotNull()) {
+			return stream->addTask(callback);
 		}
-		if (baseStream.isNotNull()) {
-			Ref<AsyncLoop> loop = baseStream->getLoop();
-			if (loop.isNotNull()) {
-				ret = new _SecureStreamServer_AsyncStream;
-				if (ret.isNotNull()) {
-					ret->setLoop(baseStream->getLoop());
-					ret->m_rdata = rdata;
-					ret->m_streamBase = baseStream;
-					ret->m_listener = param.listener;
-					if (ret->m_context.init(param)) {
-						if (flagConnect) {
-							if (ret->connect()) {
-								return ret;
-							}
-						} else {
-							return ret;
-						}
-					}
-					ret.setNull();
-				}
-			}
-		}
-		return ret;
+		return sl_false;
 	}
 };
 
@@ -996,6 +996,36 @@ public:
 		m_flagInited = sl_false;
 	}
 
+public:
+	static Ref<_SecureStreamClient_AsyncStream> create(const Ref<AsyncStream>& baseStream, const AsyncSecureStreamClientParam& param, sl_bool flagConnect)
+	{
+		if (baseStream.isNotNull()) {
+			Memory sdata = Memory::create(SDATA_SIZE);
+			Memory rdata = Memory::create(RDATA_SIZE);
+			if (sdata.isNotEmpty() && rdata.isNotEmpty()) {
+				Ref<_SecureStreamClient_AsyncStream> ret = new _SecureStreamClient_AsyncStream;
+				if (ret.isNotNull()) {
+					ret->m_sdata = sdata;
+					ret->m_rdata = rdata;
+					ret->m_streamBase = baseStream;
+					ret->m_listener =  param.listener;
+					sl_int32 n = ret->m_context.init(param, rdata.getBuf());
+					if (n > 0) {
+						ret->m_sizeRdata = n;
+						if (flagConnect) {
+							if (ret->connect()) {
+								return ret;
+							}
+						} else {
+							return ret;
+						}
+					}
+				}
+			}
+		}
+		return Ref<_SecureStreamClient_AsyncStream>::null();
+	}
+
 	void _close()
 	{
 		m_streamBase.setNull();
@@ -1123,10 +1153,7 @@ public:
 					Base::copyMemory(req->data(), (sl_uint8*)(m_sdata.getBuf()) + m_posSdata, n);
 					m_sizeSdata -= n;
 					m_posSdata += n;
-					Ref<AsyncLoop> loop = stream->getLoop();
-					if (loop.isNotNull()) {
-						loop->addTask(SLIB_CALLBACK_WEAKREF(_SecureStreamClient_AsyncStream, processReadDone, this, Ref<AsyncStreamRequest>(req)), sl_false);
-					}
+					addTask(SLIB_CALLBACK_WEAKREF(_SecureStreamClient_AsyncStream, processReadDone, this, Ref<AsyncStreamRequest>(req)));
 					if (m_sizeSdata == 0) {
 						m_sdata.setNull();
 					}
@@ -1178,43 +1205,16 @@ public:
 	{
 		return m_streamBase.isNotNull();
 	}
-
-public:
-	static Ref<_SecureStreamClient_AsyncStream> create(const Ref<AsyncStream>& baseStream, const AsyncSecureStreamClientParam& param, sl_bool flagConnect)
+	
+	sl_bool addTask(const Ref<Runnable>& callback)
 	{
-		Ref<_SecureStreamClient_AsyncStream> ret;
-		Memory sdata = Memory::create(SDATA_SIZE);
-		Memory rdata = Memory::create(RDATA_SIZE);
-		if (sdata.isEmpty() || rdata.isEmpty()) {
-			return ret;
+		Ref<AsyncStream> stream = m_streamBase;
+		if (stream.isNotNull()) {
+			return stream->addTask(callback);
 		}
-		if (baseStream.isNotNull()) {
-			Ref<AsyncLoop> loop = baseStream->getLoop();
-			if (loop.isNotNull()) {
-				ret = new _SecureStreamClient_AsyncStream;
-				if (ret.isNotNull()) {
-					ret->setLoop(loop);
-					ret->m_sdata = sdata;
-					ret->m_rdata = rdata;
-					ret->m_streamBase = baseStream;
-					ret->m_listener =  param.listener;
-					sl_int32 n = ret->m_context.init(param, rdata.getBuf());
-					if (n > 0) {
-						ret->m_sizeRdata = n;
-						if (flagConnect) {
-							if (ret->connect()) {
-								return ret;
-							}
-						} else {
-							return ret;
-						}
-					}
-					ret.setNull();
-				}
-			}
-		}
-		return ret;
+		return sl_false;
 	}
+	
 };
 
 

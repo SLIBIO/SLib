@@ -966,7 +966,7 @@ Ref<HttpContentReader> HttpContentReader::createPersistent(
 		ret->m_sizeTotal = contentLength;
 		ret->m_listener = listener;
 		ret->setReadingBufferSize(bufferSize);
-		ret->setReadingStream(io);
+		ret->setSourceStream(io);
 		if (flagDecompress) {
 			if (!(ret->setDecompressing())) {
 				ret.setNull();
@@ -1134,7 +1134,7 @@ Ref<HttpContentReader> HttpContentReader::createChunked(
 	if (ret.isNotNull()) {
 		ret->m_listener = listener;
 		ret->setReadingBufferSize(bufferSize);
-		ret->setReadingStream(io);
+		ret->setSourceStream(io);
 		if (flagDecompress) {
 			if (!(ret->setDecompressing())) {
 				ret.setNull();
@@ -1169,7 +1169,7 @@ Ref<HttpContentReader> HttpContentReader::createTearDown(
 	if (ret.isNotNull()) {
 		ret->m_listener = listener;
 		ret->setReadingBufferSize(bufferSize);
-		ret->setReadingStream(io);
+		ret->setSourceStream(io);
 		if (flagDecompress) {
 			if (!(ret->setDecompressing())) {
 				ret.setNull();
@@ -1178,7 +1178,5 @@ Ref<HttpContentReader> HttpContentReader::createTearDown(
 	}
 	return ret;
 }
-
-
 
 SLIB_NETWORK_NAMESPACE_END

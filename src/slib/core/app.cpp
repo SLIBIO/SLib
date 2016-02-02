@@ -94,4 +94,5 @@ String Application::findFileAndSetAppPath(const String& filePath, sl_uint32 nDee
 	}
 	return appPath;
 }
+
 SLIB_NAMESPACE_END

@@ -475,20 +475,12 @@ public:
 
 	SLIB_INLINE sl_bool isEmpty() const
 	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->count() == 0;
-		}
-		return sl_true;
+		return isNull();
 	}
 
 	SLIB_INLINE sl_bool isNotEmpty() const
 	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->count() != 0;
-		}
-		return sl_false;
+		return isNotNull();
 	}
 
 public:

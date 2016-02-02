@@ -35,6 +35,16 @@ AsyncTcpSocketInstance::AsyncTcpSocketInstance()
 	m_flagSupportingConnect = sl_true;
 }
 
+Ref<Socket> AsyncTcpSocketInstance::getSocket()
+{
+	return m_socket;
+}
+
+sl_bool AsyncTcpSocketInstance::isSupportingConnect()
+{
+	return m_flagSupportingConnect;
+}
+
 sl_bool AsyncTcpSocketInstance::connect(const SocketAddress& address, const Ptr<IAsyncTcpSocketListener>& listener)
 {
 	m_flagRequestConnect = sl_true;
@@ -108,136 +118,12 @@ void AsyncTcpSocketInstance::_onConnect(sl_bool flagError)
 	}
 }
 
-
-Ref<Socket> AsyncTcpSocket::getSocket()
-{
-	Ref<AsyncTcpSocketInstance> instance = getInstance();
-	if (instance.isNotNull()) {
-		return instance->getSocket();
-	}
-	return Ref<Socket>::null();
-}
-
-sl_bool AsyncTcpSocket::connect(const SocketAddress& _address, const Ptr<IAsyncTcpSocketListener>& listener)
-{
-	Ref<AsyncLoop> loop = getLoop();
-	if (loop.isNull()) {
-		return sl_false;
-	}
-	SocketAddress address = _address;
-	if (address.isInvalid()) {
-		return sl_false;
-	}
-	Ref<AsyncTcpSocketInstance> instance = getInstance();
-	if (instance.isNotNull()) {
-		Ref<Socket> socket = instance->getSocket();
-		if (socket.isNotNull()) {
-			if (instance->isSupportingConnect()) {
-				SocketType type = socket->getType();
-				SocketAddress addr = address;
-				if (addr.ip.isIPv4() && type == socketType_Tcp) {
-				} else if ((addr.ip.isIPv4() || addr.ip.isIPv6()) && type == socketType_TcpIPv6) {
-					if (addr.ip.isIPv4()) {
-						addr.ip = IPv6Address(addr.ip.getIPv4());
-					}
-				} else {
-					return sl_false;
-				}
-				if (instance->connect(addr, listener)) {
-					loop->requestOrder(instance.get());
-					return sl_true;
-				}
-			} else {
-				Ref<AsyncLoop> loop = getLoop();
-				if (loop.isNotNull()) {
-					loop->addTask(SLIB_CALLBACK_WEAKREF(AsyncTcpSocket, _connectCallback, this, address, listener));
-				}
-			}	
-		}
-	}
-	return sl_false;
-}
-
-void AsyncTcpSocket::_connectCallback(SocketAddress address, Ptr<IAsyncTcpSocketListener> _listener)
-{
-	Ref<Socket> socket = getSocket();
-	if (socket.isNotNull()) {
-		PtrLocker<IAsyncTcpSocketListener> listener(_listener);
-		if (socket->connectAndWait(address)) {
-			listener->onConnect(this, address, sl_false);
-		} else {
-			listener->onConnect(this, address, sl_true);
-		}
-	}
-}
-
-sl_bool AsyncTcpSocket::receive(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, const Referable* refData)
-{
-	Ref<AsyncLoop> loop = getLoop();
-	if (loop.isNull()) {
-		return sl_false;
-	}
-	Ref<AsyncTcpSocketInstance> instance = getInstance();
-	if (instance.isNotNull()) {
-		if (instance->receive(data, size, listener, refData)) {
-			loop->requestOrder(instance.get());
-			return sl_true;
-		}
-	}
-	return sl_false;
-}
-
-sl_bool AsyncTcpSocket::send(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, const Referable* refData)
-{
-	Ref<AsyncLoop> loop = getLoop();
-	if (loop.isNull()) {
-		return sl_false;
-	}
-	Ref<AsyncTcpSocketInstance> instance = getInstance();
-	if (instance.isNotNull()) {
-		if (instance->send(data, size, listener, refData)) {
-			loop->requestOrder(instance.get());
-			return sl_true;
-		}
-	}
-	return sl_false;
-}
-
-Ref<AsyncTcpSocket> AsyncTcpSocket::create(AsyncTcpSocketInstance* instance, const Ref<AsyncLoop>& loop)
-{
-	Ref<AsyncTcpSocket> ret;
-	if (instance) {
-		ret = new AsyncTcpSocket;
-		if (ret.isNotNull()) {
-			if (!(ret->_initialize(instance, loop))) {
-				ret.setNull();
-			}
-		}
-	}
-	return ret;
-}
-
 Ref<AsyncTcpSocket> AsyncTcpSocket::create(const Ref<Socket>& socket)
 {
-	return AsyncTcpSocket::create(socket, AsyncLoop::getDefault());
+	return AsyncTcpSocket::create(socket, AsyncIoLoop::getDefault());
 }
 
-Ref<AsyncTcpSocket> AsyncTcpSocket::create(const Ref<AsyncLoop>& loop, sl_bool flagIPv6)
-{
-	Ref<Socket> socket;
-	if (flagIPv6) {
-		return AsyncTcpSocket::create(SocketAddress(IPv6Address::getAny(), 0), loop);
-	} else {
-		return AsyncTcpSocket::create(SocketAddress(IPv4Address::getAny(), 0), loop);
-	}
-}
-
-Ref<AsyncTcpSocket> AsyncTcpSocket::create(sl_bool flagIPv6)
-{
-	return AsyncTcpSocket::create(AsyncLoop::getDefault(), flagIPv6);
-}
-
-Ref<AsyncTcpSocket> AsyncTcpSocket::create(const SocketAddress& _addressBind, const Ref<AsyncLoop>& loop)
+Ref<AsyncTcpSocket> AsyncTcpSocket::create(const SocketAddress& _addressBind, const Ref<AsyncIoLoop>& loop)
 {
 	SocketAddress addressBind = _addressBind;
 	Ref<Socket> socket;
@@ -259,10 +145,51 @@ Ref<AsyncTcpSocket> AsyncTcpSocket::create(const SocketAddress& _addressBind, co
 
 Ref<AsyncTcpSocket> AsyncTcpSocket::create(const SocketAddress& addressBind)
 {
-	return AsyncTcpSocket::create(addressBind, AsyncLoop::getDefault());
+	return AsyncTcpSocket::create(addressBind, AsyncIoLoop::getDefault());
 }
 
-Ref<AsyncTcpSocket> AsyncTcpSocket::createAndConnect(const SocketAddress& addressBind, const SocketAddress& addressConnect, const Ptr<IAsyncTcpSocketListener>& listener, const Ref<AsyncLoop>& loop)
+Ref<AsyncTcpSocket> AsyncTcpSocket::create(sl_uint32 port, const Ref<AsyncIoLoop>& loop)
+{
+	return AsyncTcpSocket::create(SocketAddress(IPv4Address::any(), port), loop);
+}
+
+Ref<AsyncTcpSocket> AsyncTcpSocket::create(sl_uint32 port)
+{
+	return AsyncTcpSocket::create(port, AsyncIoLoop::getDefault());
+}
+
+Ref<AsyncTcpSocket> AsyncTcpSocket::createIPv6(sl_uint32 port, const Ref<AsyncIoLoop>& loop)
+{
+	return AsyncTcpSocket::create(SocketAddress(IPv6Address::any(), port), loop);
+}
+
+Ref<AsyncTcpSocket> AsyncTcpSocket::createIPv6(sl_uint32 port)
+{
+	return AsyncTcpSocket::createIPv6(port, AsyncIoLoop::getDefault());
+}
+
+Ref<AsyncTcpSocket> AsyncTcpSocket::create(const Ref<AsyncIoLoop>& loop)
+{
+	return AsyncTcpSocket::create(SocketAddress::none(), loop);
+}
+
+Ref<AsyncTcpSocket> AsyncTcpSocket::create()
+{
+	return AsyncTcpSocket::create(AsyncIoLoop::getDefault());
+}
+
+Ref<AsyncTcpSocket> AsyncTcpSocket::createIPv6(const Ref<AsyncIoLoop>& loop)
+{
+	return AsyncTcpSocket::create(SocketAddress(IPv6Address::any(), 0), loop);
+}
+
+Ref<AsyncTcpSocket> AsyncTcpSocket::createIPv6()
+{
+	return AsyncTcpSocket::createIPv6(AsyncIoLoop::getDefault());
+}
+
+
+Ref<AsyncTcpSocket> AsyncTcpSocket::createAndConnect(const SocketAddress& addressBind, const SocketAddress& addressConnect, const Ptr<IAsyncTcpSocketListener>& listener, const Ref<AsyncIoLoop>& loop)
 {
 	Ref<AsyncTcpSocket> async = create(addressBind, loop);
 	if (async.isNotNull()) {
@@ -275,28 +202,153 @@ Ref<AsyncTcpSocket> AsyncTcpSocket::createAndConnect(const SocketAddress& addres
 
 Ref<AsyncTcpSocket> AsyncTcpSocket::createAndConnect(const SocketAddress& addressBind, const SocketAddress& addressConnect, const Ptr<IAsyncTcpSocketListener>& listener)
 {
-	return AsyncTcpSocket::createAndConnect(addressBind, addressConnect, listener, AsyncLoop::getDefault());
+	return AsyncTcpSocket::createAndConnect(addressBind, addressConnect, listener, AsyncIoLoop::getDefault());
 }
 
-Ref<AsyncTcpSocket> AsyncTcpSocket::createAndConnect(const SocketAddress& addressConnect, const Ptr<IAsyncTcpSocketListener>& listener, const Ref<AsyncLoop>& loop)
+Ref<AsyncTcpSocket> AsyncTcpSocket::createAndConnect(const SocketAddress& addressConnect, const Ptr<IAsyncTcpSocketListener>& listener, const Ref<AsyncIoLoop>& loop)
 {
-	return AsyncTcpSocket::createAndConnect(SocketAddress::none(), addressConnect, listener, loop);
+	if (addressConnect.ip.isIPv6()) {
+		return AsyncTcpSocket::createAndConnect(SocketAddress(IPv6Address::any(), 0), addressConnect, listener, loop);
+	} else {
+		return AsyncTcpSocket::createAndConnect(SocketAddress::none(), addressConnect, listener, loop);
+	}
 }
 
 Ref<AsyncTcpSocket> AsyncTcpSocket::createAndConnect(const SocketAddress& addressConnect, const Ptr<IAsyncTcpSocketListener>& listener)
 {
-	return AsyncTcpSocket::createAndConnect(addressConnect, listener, AsyncLoop::getDefault());
+	return AsyncTcpSocket::createAndConnect(addressConnect, listener, AsyncIoLoop::getDefault());
+}
+
+Ref<Socket> AsyncTcpSocket::getSocket()
+{
+	Ref<AsyncTcpSocketInstance> instance = getIoInstance();
+	if (instance.isNotNull()) {
+		return instance->getSocket();
+	}
+	return Ref<Socket>::null();
+}
+
+sl_bool AsyncTcpSocket::connect(const SocketAddress& _address, const Ptr<IAsyncTcpSocketListener>& listener)
+{
+	Ref<AsyncIoLoop> loop = getIoLoop();
+	if (loop.isNull()) {
+		return sl_false;
+	}
+	SocketAddress address = _address;
+	if (address.isInvalid()) {
+		return sl_false;
+	}
+	Ref<AsyncTcpSocketInstance> instance = getIoInstance();
+	if (instance.isNotNull()) {
+		Ref<Socket> socket = instance->getSocket();
+		if (socket.isNotNull()) {
+			if (instance->isSupportingConnect()) {
+				SocketType type = socket->getType();
+				SocketAddress addr = address;
+				if (addr.ip.isIPv4() && type == socketType_Tcp) {
+				} else if ((addr.ip.isIPv4() || addr.ip.isIPv6()) && type == socketType_TcpIPv6) {
+					if (addr.ip.isIPv4()) {
+						addr.ip = IPv6Address(addr.ip.getIPv4());
+					}
+				} else {
+					return sl_false;
+				}
+				if (instance->connect(addr, listener)) {
+					loop->requestOrder(instance.get());
+					return sl_true;
+				}
+			} else {
+				if (socket->connectAndWait(address)) {
+					if (listener.isNotNull()) {
+						listener->onConnect(this, address, sl_false);
+					}
+					return sl_true;
+				} else {
+					if (listener.isNotNull()) {
+						listener->onConnect(this, address, sl_true);
+					}
+				}
+			}
+		}
+	}
+	return sl_false;
+}
+
+sl_bool AsyncTcpSocket::receive(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, const Referable* refData)
+{
+	Ref<AsyncIoLoop> loop = getIoLoop();
+	if (loop.isNull()) {
+		return sl_false;
+	}
+	Ref<AsyncTcpSocketInstance> instance = getIoInstance();
+	if (instance.isNotNull()) {
+		if (instance->receive(data, size, listener, refData)) {
+			loop->requestOrder(instance.get());
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
+sl_bool AsyncTcpSocket::receive(const Memory& mem, const Ptr<IAsyncTcpSocketListener>& listener)
+{
+	return receive(mem.getBuf(), (sl_uint32)(mem.getSize()), listener, mem.getObject());
+}
+
+sl_bool AsyncTcpSocket::send(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, const Referable* refData)
+{
+	Ref<AsyncIoLoop> loop = getIoLoop();
+	if (loop.isNull()) {
+		return sl_false;
+	}
+	Ref<AsyncTcpSocketInstance> instance = getIoInstance();
+	if (instance.isNotNull()) {
+		if (instance->send(data, size, listener, refData)) {
+			loop->requestOrder(instance.get());
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
+sl_bool AsyncTcpSocket::send(const Memory& mem, const Ptr<IAsyncTcpSocketListener>& listener)
+{
+	return send(mem.getBuf(), (sl_uint32)(mem.getSize()), listener, mem.getObject());
+}
+
+Ref<AsyncTcpSocketInstance> AsyncTcpSocket::getIoInstance()
+{
+	return Ref<AsyncTcpSocketInstance>::from(AsyncStreamBase::getIoInstance());
+}
+
+Ref<AsyncTcpSocket> AsyncTcpSocket::create(AsyncTcpSocketInstance* instance, const Ref<AsyncIoLoop>& loop)
+{
+	if (instance) {
+		Ref<AsyncTcpSocket> ret = new AsyncTcpSocket;
+		if (ret.isNotNull()) {
+			if (ret->_initialize(instance, asyncIoMode_InOut, loop)) {
+				return ret;
+			}
+		}
+	}
+	return Ref<AsyncTcpSocket>::null();
 }
 
 /*******************************************
 	AsyncTcpServer
 ********************************************/
-void IAsyncTcpServerListener::onAccept(AsyncTcpServer* socketListen, const Ref<Socket>& socketAccept, const SocketAddress& address)
+void IAsyncTcpServerListener::onError(AsyncTcpServer* socketListen)
 {
 }
 
-void IAsyncTcpServerListener::onError(AsyncTcpServer* socketListen)
+Ref<Socket> AsyncTcpServerInstance::getSocket()
 {
+	return m_socket;
+}
+
+Ptr<IAsyncTcpServerListener> AsyncTcpServerInstance::getListener()
+{
+	return m_listener;
 }
 
 void AsyncTcpServerInstance::_onAccept(const Ref<Socket>& socketAccept, const SocketAddress& address)
@@ -323,95 +375,12 @@ void AsyncTcpServerInstance::_onError()
 	}
 }
 
-AsyncTcpServer::AsyncTcpServer()
+Ref<AsyncTcpServer> AsyncTcpServer::create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener)
 {
-	m_flagStarted = sl_false;
+	return AsyncTcpServer::create(socket, listener, AsyncIoLoop::getDefault());
 }
 
-Ref<Socket> AsyncTcpServer::getSocket()
-{
-	Ref<AsyncTcpServerInstance> instance = getInstance();
-	if (instance.isNotNull()) {
-		return instance->getSocket();
-	}
-	return Ref<Socket>::null();
-}
-
-Ptr<IAsyncTcpServerListener> AsyncTcpServer::getListener()
-{
-	Ref<AsyncTcpServerInstance> instance = getInstance();
-	if (instance.isNotNull()) {
-		return instance->getListener();
-	}
-	return Ptr<IAsyncTcpServerListener>::null();
-}
-
-void AsyncTcpServer::setListener(const Ptr<IAsyncTcpServerListener>& listener)
-{
-	Ref<AsyncTcpServerInstance> instance = getInstance();
-	if (instance.isNotNull()) {
-		instance->setListener(listener);
-	}
-}
-
-void AsyncTcpServer::close()
-{
-	closeInstance();
-}
-
-sl_bool AsyncTcpServer::isOpened()
-{
-	return getInstance().isNotNull();
-}
-
-void AsyncTcpServer::start()
-{
-	ObjectLocker lock(this);
-	if (m_flagStarted) {
-		return;
-	}
-	m_flagStarted = sl_true;
-	Ref<AsyncLoop> loop = getLoop();
-	if (loop.isNotNull()) {
-		Ref<AsyncTcpServerInstance> instance = getInstance();
-		if (instance.isNotNull()) {
-			loop->requestOrder(instance.get());
-		}
-	}
-}
-
-Ref<AsyncTcpServer> AsyncTcpServer::create(AsyncTcpServerInstance* instance, const Ref<AsyncLoop>& _loop)
-{
-	Ref<AsyncTcpServer> ret;
-	if (!instance) {
-		return ret;
-	}
-	Ref<AsyncLoop> loop = _loop;
-	if (loop.isNull()) {
-		loop = AsyncLoop::getDefault();
-		if (loop.isNull()) {
-			return ret;
-		}
-	}
-	ret = new AsyncTcpServer;
-	if (ret.isNotNull()) {
-		instance->setObject(ret.get());
-		ret->setInstance(instance);
-		ret->setLoop(loop);
-		if (!(loop->attachInstance(instance))) {
-			
-			ret.setNull();
-		}
-	}
-	return ret;
-}
-
-Ref<AsyncTcpServer> AsyncTcpServer::create(const Ref<Socket>& socket)
-{
-	return AsyncTcpServer::create(socket, AsyncLoop::getDefault());
-}
-
-Ref<AsyncTcpServer> AsyncTcpServer::create(const SocketAddress& _addressListen, const Ref<AsyncLoop>& loop)
+Ref<AsyncTcpServer> AsyncTcpServer::create(const SocketAddress& _addressListen, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop)
 {
 	SocketAddress addressListen = _addressListen;
 	Ref<Socket> socket;
@@ -428,7 +397,7 @@ Ref<AsyncTcpServer> AsyncTcpServer::create(const SocketAddress& _addressListen, 
 		
 		if (socket->bind(addressListen)) {
 			if (socket->listen()) {
-				return AsyncTcpServer::create(socket, loop);
+				return AsyncTcpServer::create(socket, listener, loop);
 			} else {
 				SLIB_STATIC_STRING(s, "Can not listen on address - ");
 				LOG_ERROR(s + addressListen.toString());
@@ -441,101 +410,197 @@ Ref<AsyncTcpServer> AsyncTcpServer::create(const SocketAddress& _addressListen, 
 	return Ref<AsyncTcpServer>::null();
 }
 
-Ref<AsyncTcpServer> AsyncTcpServer::create(const SocketAddress& addressListen)
+Ref<AsyncTcpServer> AsyncTcpServer::create(const SocketAddress& addressListen, const Ptr<IAsyncTcpServerListener>& listener)
 {
-	return AsyncTcpServer::create(addressListen, AsyncLoop::getDefault());
+	return AsyncTcpServer::create(addressListen, listener, AsyncIoLoop::getDefault());
 }
 
-Ref<AsyncTcpServer> AsyncTcpServer::create(sl_uint32 portListen, const Ref<AsyncLoop>& loop, sl_bool flagIPv6)
+Ref<AsyncTcpServer> AsyncTcpServer::create(sl_uint32 portListen, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop)
 {
 	SocketAddress address;
+	address.ip = IPv4Address::getAny();
 	address.port = portListen;
-	if (flagIPv6) {
-		address.ip = IPv6Address::getAny();
-	} else {
-		address.ip = IPv4Address::getAny();
-	}
-	return AsyncTcpServer::create(address, loop);
+	return AsyncTcpServer::create(address, listener, loop);
 }
 
-Ref<AsyncTcpServer> AsyncTcpServer::create(sl_uint32 portListen, sl_bool flagIPv6)
+Ref<AsyncTcpServer> AsyncTcpServer::create(sl_uint32 portListen, const Ptr<IAsyncTcpServerListener>& listener)
 {
-	return AsyncTcpServer::create(portListen, AsyncLoop::getDefault(), flagIPv6);
+	return AsyncTcpServer::create(portListen, listener, AsyncIoLoop::getDefault());
+}
+
+Ref<AsyncTcpServer> AsyncTcpServer::createIPv6(sl_uint32 portListen, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop)
+{
+	SocketAddress address;
+	address.ip = IPv6Address::getAny();
+	address.port = portListen;
+	return AsyncTcpServer::create(address, listener, loop);
+}
+
+Ref<AsyncTcpServer> AsyncTcpServer::createIPv6(sl_uint32 portListen, const Ptr<IAsyncTcpServerListener>& listener)
+{
+	return AsyncTcpServer::createIPv6(portListen, listener, AsyncIoLoop::getDefault());
+}
+
+Ref<Socket> AsyncTcpServer::getSocket()
+{
+	Ref<AsyncTcpServerInstance> instance = getIoInstance();
+	if (instance.isNotNull()) {
+		return instance->getSocket();
+	}
+	return Ref<Socket>::null();
+}
+
+void AsyncTcpServer::close()
+{
+	closeIoInstance();
+}
+
+sl_bool AsyncTcpServer::isOpened()
+{
+	return getIoInstance().isNotNull();
+}
+
+Ref<AsyncTcpServerInstance> AsyncTcpServer::getIoInstance()
+{
+	return Ref<AsyncTcpServerInstance>::from(AsyncIoObject::getIoInstance());
+}
+
+Ref<AsyncTcpServer> AsyncTcpServer::create(AsyncTcpServerInstance* instance, const Ref<AsyncIoLoop>& _loop)
+{
+	if (instance) {
+		Ref<AsyncIoLoop> loop = _loop;
+		if (loop.isNull()) {
+			loop = AsyncIoLoop::getDefault();
+			if (loop.isNull()) {
+				return Ref<AsyncTcpServer>::null();
+			}
+		}
+		Ref<AsyncTcpServer> ret = new AsyncTcpServer;
+		if (ret.isNotNull()) {
+			instance->setObject(ret.get());
+			ret->setIoInstance(instance);
+			ret->setIoLoop(loop);
+			if (loop->attachInstance(instance, asyncIoMode_In)) {
+				loop->requestOrder(instance);
+				return ret;
+			}
+		}
+	}
+	return Ref<AsyncTcpServer>::null();
 }
 
 /*******************************************
 	AsyncUdpSocket
 ********************************************/
-void IAsyncUdpSocketListener::onReceiveFrom(AsyncUdpSocket* socket, void* data, sl_uint32 sizeReceive, const SocketAddress& address, sl_bool flagError)
+Ref<Socket> AsyncUdpSocketInstance::getSocket()
 {
+	return m_socket;
 }
 
-void IAsyncUdpSocketListener::onSendTo(AsyncUdpSocket* socket, void* data, sl_uint32 sizeSent, const SocketAddress& address, sl_bool flagError)
-{
-}
-
-sl_bool AsyncUdpSocketInstance::receiveFrom(void* data, sl_uint32 size, const Ptr<IAsyncUdpSocketListener>& listener, const Referable* refData)
+sl_bool AsyncUdpSocketInstance::sendTo(const SocketAddress& address, void* data, sl_uint32 size)
 {
 	if (size == 0) {
 		return sl_false;
 	}
-	Ref<ReceiveRequest> req = new ReceiveRequest;
-	if (req.isNotNull()) {
-		req->data = data;
-		req->size = size;
-		req->listener = listener;
-		req->refData = refData;
-		m_requestsReceive.push(req);
-		return sl_true;
+	Ref<Socket> socket = m_socket;
+	if (socket.isNotNull()) {
+		sl_int32 n = socket->sendTo(address, data, size);
+		if (n == size) {
+			return sl_true;
+		}
 	}
 	return sl_false;
 }
 
-sl_bool AsyncUdpSocketInstance::sendTo(const SocketAddress& address, void* data, sl_uint32 size, const Ptr<IAsyncUdpSocketListener>& listener, const Referable* refData)
-{
-	if (size == 0) {
-		return sl_false;
-	}
-	Ref<SendRequest> req = new SendRequest;
-	if (req.isNotNull()) {
-		req->address = address;
-		req->data = data;
-		req->size = size;
-		req->listener = listener;
-		req->refData = refData;
-		m_requestsSend.push(req);
-		return sl_true;
-	}
-	return sl_false;
-}
-
-void AsyncUdpSocketInstance::_onReceive(AsyncUdpSocketInstance::ReceiveRequest* req, sl_uint32 size, const SocketAddress& address, sl_bool flagError)
+void AsyncUdpSocketInstance::_onReceive(const SocketAddress& address, sl_uint32 size)
 {
 	Ref<AsyncUdpSocket> object = Ref<AsyncUdpSocket>::from(getObject());
 	if (object.isNull()) {
 		return;
 	}
-	PtrLocker<IAsyncUdpSocketListener> listener(req->listener);
+	PtrLocker<IAsyncUdpSocketListener> listener(m_listener);
 	if (listener.isNotNull()) {
-		listener->onReceiveFrom(object.get(), req->data, size, address, flagError);
+		listener->onReceiveFrom(object.get(), address, m_buffer.getBuf(), size);
 	}
 }
 
-void AsyncUdpSocketInstance::_onSend(AsyncUdpSocketInstance::SendRequest* req, sl_uint32 size, sl_bool flagError)
+Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ref<Socket>& socket, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize)
 {
-	Ref<AsyncUdpSocket> object = Ref<AsyncUdpSocket>::from(getObject());
-	if (object.isNull()) {
-		return;
+	return AsyncUdpSocket::create(socket, listener, packetSize, AsyncIoLoop::getDefault());
+}
+
+Ref<AsyncUdpSocket> AsyncUdpSocket::create(const SocketAddress& addressBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagBroadcast)
+{
+	if (packetSize > 0) {
+		Ref<Socket> socket;
+		if (addressBind.ip.isIPv6()) {
+			socket = Socket::openUdp_IPv6();
+		} else {
+			socket = Socket::openUdp();
+		}
+		if (socket.isNotNull()) {
+			if (addressBind.ip.isNotNone() || addressBind.port != 0) {
+				if (!(socket->bind(addressBind))) {
+					return Ref<AsyncUdpSocket>::null();
+				}
+			}
+			if (flagBroadcast) {
+				socket->setOption_Broadcast(sl_true);
+			}
+			return AsyncUdpSocket::create(socket, listener, packetSize, loop);
+		}
 	}
-	PtrLocker<IAsyncUdpSocketListener> listener(req->listener);
-	if (listener.isNotNull()) {
-		listener->onSendTo(object.get(), req->data, size, req->address, flagError);
-	}
+	return Ref<AsyncUdpSocket>::null();
+}
+
+Ref<AsyncUdpSocket> AsyncUdpSocket::create(const SocketAddress& addressBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagBroadcast)
+{
+	return AsyncUdpSocket::create(addressBind, listener, packetSize, AsyncIoLoop::getDefault(), flagBroadcast);
+}
+
+Ref<AsyncUdpSocket> AsyncUdpSocket::create(sl_uint32 portBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagBroadcast)
+{
+	return AsyncUdpSocket::create(SocketAddress(IPv4Address::any(), portBind), listener, packetSize, loop, flagBroadcast);
+}
+
+Ref<AsyncUdpSocket> AsyncUdpSocket::create(sl_uint32 portBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagBroadcast)
+{
+	return AsyncUdpSocket::create(portBind, listener, packetSize, AsyncIoLoop::getDefault(), flagBroadcast);
+}
+
+Ref<AsyncUdpSocket> AsyncUdpSocket::createIPv6(sl_uint32 portBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagBroadcast)
+{
+	return AsyncUdpSocket::create(SocketAddress(IPv6Address::any(), portBind), listener, packetSize, loop, flagBroadcast);
+}
+
+Ref<AsyncUdpSocket> AsyncUdpSocket::createIPv6(sl_uint32 portBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagBroadcast)
+{
+	return AsyncUdpSocket::createIPv6(portBind, listener, packetSize, AsyncIoLoop::getDefault(), flagBroadcast);
+}
+
+Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagBroadcast)
+{
+	return AsyncUdpSocket::create(SocketAddress::none(), listener, packetSize, loop, flagBroadcast);
+}
+
+Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagBroadcast)
+{
+	return AsyncUdpSocket::create(listener, packetSize, AsyncIoLoop::getDefault(), flagBroadcast);
+}
+
+Ref<AsyncUdpSocket> AsyncUdpSocket::createIPv6(const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagBroadcast)
+{
+	return AsyncUdpSocket::create(SocketAddress(IPv6Address::any(), 0), listener, packetSize, loop, flagBroadcast);
+}
+
+Ref<AsyncUdpSocket> AsyncUdpSocket::createIPv6(const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagBroadcast)
+{
+	return AsyncUdpSocket::createIPv6(listener, packetSize, AsyncIoLoop::getDefault(), flagBroadcast);
 }
 
 Ref<Socket> AsyncUdpSocket::getSocket()
 {
-	Ref<AsyncUdpSocketInstance> instance = getInstance();
+	Ref<AsyncUdpSocketInstance> instance = getIoInstance();
 	if (instance.isNotNull()) {
 		return instance->getSocket();
 	}
@@ -544,12 +609,12 @@ Ref<Socket> AsyncUdpSocket::getSocket()
 
 void AsyncUdpSocket::close()
 {
-	closeInstance();
+	closeIoInstance();
 }
 
 sl_bool AsyncUdpSocket::isOpened()
 {
-	return getInstance().isNotNull();
+	return getIoInstance().isNotNull();
 }
 
 void AsyncUdpSocket::setBroadcast(sl_bool flag)
@@ -560,116 +625,49 @@ void AsyncUdpSocket::setBroadcast(sl_bool flag)
 	}
 }
 
-sl_bool AsyncUdpSocket::receiveFrom(void* data, sl_uint32 size, const Ptr<IAsyncUdpSocketListener>& listener, const Referable* refData)
+sl_bool AsyncUdpSocket::sendTo(const SocketAddress& address, void* data, sl_uint32 size)
 {
-	Ref<AsyncLoop> loop = getLoop();
-	if (loop.isNull()) {
-		return sl_false;
-	}
-	Ref<AsyncUdpSocketInstance> instance = getInstance();
+	Ref<AsyncUdpSocketInstance> instance = getIoInstance();
 	if (instance.isNotNull()) {
-		if (instance->receiveFrom(data, size, listener, refData)) {
-			loop->requestOrder(instance.get());
+		if (instance->sendTo(address, data, size)) {
 			return sl_true;
 		}
 	}
 	return sl_false;
 }
 
-sl_bool AsyncUdpSocket::sendTo(const SocketAddress& address, void* data, sl_uint32 size, const Ptr<IAsyncUdpSocketListener>& listener, const Referable* refData)
+sl_bool AsyncUdpSocket::sendTo(const SocketAddress& addressTo, const Memory& mem)
 {
-	Ref<AsyncLoop> loop = getLoop();
-	if (loop.isNull()) {
-		return sl_false;
-	}
-	Ref<AsyncUdpSocketInstance> instance = getInstance();
-	if (instance.isNotNull()) {
-		if (instance->sendTo(address, data, size, listener, refData)) {
-			loop->requestOrder(instance.get());
-			return sl_true;
-		}
-	}
-	return sl_false;
+	return sendTo(addressTo, mem.getBuf(), (sl_uint32)(mem.getSize()));
 }
 
-Ref<AsyncUdpSocket> AsyncUdpSocket::create(AsyncUdpSocketInstance* instance, const Ref<AsyncLoop>& _loop)
+Ref<AsyncUdpSocketInstance> AsyncUdpSocket::getIoInstance()
 {
-	Ref<AsyncUdpSocket> ret;
-	if (!instance) {
-		return ret;
-	}
-	Ref<AsyncLoop> loop = _loop;
-	if (loop.isNull()) {
-		loop = AsyncLoop::getDefault();
+	return Ref<AsyncUdpSocketInstance>::from(AsyncIoObject::getIoInstance());
+}
+
+Ref<AsyncUdpSocket> AsyncUdpSocket::create(AsyncUdpSocketInstance* instance, const Ref<AsyncIoLoop>& _loop)
+{
+	if (instance) {
+		Ref<AsyncIoLoop> loop = _loop;
 		if (loop.isNull()) {
-			return ret;
-		}
-	}
-	ret = new AsyncUdpSocket;
-	if (ret.isNotNull()) {
-		instance->setObject(ret.get());
-		ret->setInstance(instance);
-		ret->setLoop(loop);
-		if (!(loop->attachInstance(instance))) {
-			ret.setNull();
-		}
-	}
-	return ret;
-}
-
-Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ref<Socket>& socket)
-{
-	return AsyncUdpSocket::create(socket, AsyncLoop::getDefault());
-}
-
-Ref<AsyncUdpSocket> AsyncUdpSocket::create(const SocketAddress& _addressBind, const Ref<AsyncLoop>& loop, sl_bool flagBroadcast)
-{
-	SocketAddress addressBind = _addressBind;
-	Ref<Socket> socket;
-	if (addressBind.ip.isIPv6()) {
-		socket = Socket::openUdp_IPv6();
-	} else {
-		socket = Socket::openUdp();
-	}
-	if (socket.isNotNull()) {
-		if (addressBind.ip.isNotNone() || addressBind.port != 0) {
-			if (!(socket->bind(addressBind))) {
+			loop = AsyncIoLoop::getDefault();
+			if (loop.isNull()) {
 				return Ref<AsyncUdpSocket>::null();
 			}
 		}
-		if (flagBroadcast) {
-			socket->setOption_Broadcast(sl_true);
+		Ref<AsyncUdpSocket> ret = new AsyncUdpSocket;
+		if (ret.isNotNull()) {
+			instance->setObject(ret.get());
+			ret->setIoInstance(instance);
+			ret->setIoLoop(loop);
+			if (loop->attachInstance(instance, asyncIoMode_In)) {
+				loop->requestOrder(instance);
+				return ret;
+			}
 		}
-		return AsyncUdpSocket::create(socket, loop);
 	}
 	return Ref<AsyncUdpSocket>::null();
-}
-
-Ref<AsyncUdpSocket> AsyncUdpSocket::create(const SocketAddress& addressBind, sl_bool flagBroadcast)
-{
-	return AsyncUdpSocket::create(addressBind, AsyncLoop::getDefault(), flagBroadcast);
-}
-
-Ref<AsyncUdpSocket> AsyncUdpSocket::create(sl_uint32 portBind, const Ref<AsyncLoop>& loop, sl_bool flagBroadcast, sl_bool flagIPv6)
-{
-	SocketAddress address;
-	if (flagIPv6) {
-		address.ip = IPv6Address::getAny();
-	} else {
-		address.ip = IPv4Address::getAny();
-	}
-	address.port = portBind;
-	return AsyncUdpSocket::create(address, loop, flagBroadcast);
-}
-
-Ref<AsyncUdpSocket> AsyncUdpSocket::create(sl_uint32 portBind, sl_bool flagBroadcast, sl_bool flagIPv6)
-{
-	return AsyncUdpSocket::create(portBind, AsyncLoop::getDefault(), flagBroadcast, flagIPv6);
-}
-
-Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ref<AsyncLoop>& loop, sl_bool flagBroadcast, sl_bool flagIPv6)
-{
-	return AsyncUdpSocket::create(0, loop, flagBroadcast, flagIPv6);
 }
 
 SLIB_NETWORK_NAMESPACE_END

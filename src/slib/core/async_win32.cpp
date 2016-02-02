@@ -127,7 +127,7 @@ public:
 
 	void doInput(AsyncStreamRequest* req, sl_uint32 size, sl_bool flagError)
 	{
-		Ref<AsyncObject> object = getObject();
+		Ref<AsyncIoObject> object = getObject();
 		if (object.isNull()) {
 			return;
 		}
@@ -139,7 +139,7 @@ public:
 
 	void doOutput(AsyncStreamRequest* req, sl_uint32 size, sl_bool flagError)
 	{
-		Ref<AsyncObject> object = getObject();
+		Ref<AsyncIoObject> object = getObject();
 		if (object.isNull()) {
 			return;
 		}
@@ -223,16 +223,17 @@ public:
 	}
 };
 
-Ref<AsyncStream> AsyncFile::openIOCP(const String& path, FileMode mode, const Ref<AsyncLoop>& loop)
+Ref<AsyncStream> AsyncFile::openIOCP(const String& path, FileMode mode, const Ref<AsyncIoLoop>& loop)
 {
 	Ref<_Win32AsyncFileStreamInstance> ret = _Win32AsyncFileStreamInstance::open(path, mode);
-	return AsyncStream::create(ret.get(), loop);
+	return AsyncStream::create(ret.get(), asyncIoMode_InOut, loop);
 }
 
 Ref<AsyncStream> AsyncFile::openIOCP(const String& path, FileMode mode)
 {
-	return AsyncFile::openIOCP(path, mode, AsyncLoop::getDefault());
+	return AsyncFile::openIOCP(path, mode, AsyncIoLoop::getDefault());
 }
+
 SLIB_NAMESPACE_END
 
 #endif

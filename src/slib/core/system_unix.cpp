@@ -222,10 +222,9 @@ sl_bool System::createProcess(const String& pathExecutable, const String* cmds, 
 void System::sleep(sl_uint32 milliseconds)
 {
 	struct timespec req;
-	struct timespec rem;
 	req.tv_sec = milliseconds / 1000;
-	req.tv_nsec = (milliseconds % 1000) * 1000 * 1000;
-	nanosleep(&req, &rem);
+	req.tv_nsec = (milliseconds % 1000) * 1000000;
+	nanosleep(&req, sl_null);
 }
 
 void System::yield()

@@ -80,7 +80,8 @@ protected:
 
 protected:
 	Ref<Pipe> m_pipe;
-	sl_uint32 m_nSizeWritten;
+	sl_bool m_flagSet;
+	SpinLock m_lock;
 
 };
 

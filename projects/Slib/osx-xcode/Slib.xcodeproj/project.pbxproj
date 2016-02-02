@@ -14,6 +14,7 @@
 		265EBF261C23041600AD81D9 /* database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF211C23041600AD81D9 /* database.cpp */; };
 		265EBF271C23041600AD81D9 /* mysql.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF221C23041600AD81D9 /* mysql.cpp */; };
 		265EBF281C23041600AD81D9 /* sqlite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF231C23041600AD81D9 /* sqlite.cpp */; };
+		2666678A1C5BC5A3007A1B29 /* async_unix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266667891C5BC5A3007A1B29 /* async_unix.cpp */; };
 		266DD4581C1192E800D47AB0 /* url.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4571C1192E800D47AB0 /* url.cpp */; };
 		266DD4621C11930800D47AB0 /* aes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4591C11930800D47AB0 /* aes.cpp */; };
 		266DD4631C11930800D47AB0 /* crypto_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD45A1C11930800D47AB0 /* crypto_hash.cpp */; };
@@ -214,6 +215,7 @@
 		265EBF211C23041600AD81D9 /* database.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database.cpp; sourceTree = "<group>"; };
 		265EBF221C23041600AD81D9 /* mysql.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mysql.cpp; sourceTree = "<group>"; };
 		265EBF231C23041600AD81D9 /* sqlite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sqlite.cpp; sourceTree = "<group>"; };
+		266667891C5BC5A3007A1B29 /* async_unix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = async_unix.cpp; sourceTree = "<group>"; };
 		266DD4571C1192E800D47AB0 /* url.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = url.cpp; sourceTree = "<group>"; };
 		266DD4591C11930800D47AB0 /* aes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = aes.cpp; sourceTree = "<group>"; };
 		266DD45A1C11930800D47AB0 /* crypto_hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crypto_hash.cpp; sourceTree = "<group>"; };
@@ -668,6 +670,7 @@
 				A25F2F9D1B03A33700854DAF /* async.cpp */,
 				A25F2F9E1B03A33700854DAF /* async_config.h */,
 				A25F2FA11B03A33700854DAF /* async_kqueue.cpp */,
+				266667891C5BC5A3007A1B29 /* async_unix.cpp */,
 				26AFF77A1C34CE2B00AF9470 /* atomic.cpp */,
 				A25F2FA41B03A33700854DAF /* base.cpp */,
 				A25F2FA51B03A33700854DAF /* base64.cpp */,
@@ -983,6 +986,7 @@
 				266DD5531C11940A00D47AB0 /* audio_recorder.cpp in Sources */,
 				266DD4A31C1193DB00D47AB0 /* int128.cpp in Sources */,
 				26D028651C48847E0083F1F3 /* audio_data.cpp in Sources */,
+				2666678A1C5BC5A3007A1B29 /* async_unix.cpp in Sources */,
 				266DD5731C11940A00D47AB0 /* network_io.cpp in Sources */,
 				266DD56A1C11940A00D47AB0 /* mac_address.cpp in Sources */,
 				A25F30111B03A33700854DAF /* async_kqueue.cpp in Sources */,

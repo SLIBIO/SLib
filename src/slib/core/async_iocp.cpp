@@ -6,17 +6,17 @@
 #include "../../../inc/slib/core/platform_windows.h"
 
 SLIB_NAMESPACE_BEGIN
-struct _AsyncLoopHandle
+struct _AsyncIoLoopHandle
 {
 	HANDLE hCompletionPort;
 	OVERLAPPED overlappedWake;
 };
 
-void* AsyncLoop::__createHandle()
+void* AsyncIoLoop::__createHandle()
 {
 	HANDLE hCompletionPort = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 1);
 	if (hCompletionPort) {
-		_AsyncLoopHandle* handle = new _AsyncLoopHandle;
+		_AsyncIoLoopHandle* handle = new _AsyncIoLoopHandle;
 		if (handle) {
 			handle->hCompletionPort = hCompletionPort;
 			return handle;
@@ -26,9 +26,9 @@ void* AsyncLoop::__createHandle()
 	return sl_null;
 }
 
-void AsyncLoop::__closeHandle(void* _handle)
+void AsyncIoLoop::__closeHandle(void* _handle)
 {
-	_AsyncLoopHandle* handle = (_AsyncLoopHandle*)_handle;
+	_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)_handle;
 	::CloseHandle(handle->hCompletionPort);
 	delete handle;
 }
@@ -56,9 +56,9 @@ BOOL WINAPI _GetQueuedCompletionStatusEx_Impl(
 }
 
 
-void AsyncLoop::__runLoop()
+void AsyncIoLoop::__runLoop()
 {
-	_AsyncLoopHandle* handle = (_AsyncLoopHandle*)m_handle;
+	_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
 
 	WINAPI_GetQueuedCompletionStatusEx fGetQueuedCompletionStatusEx = Windows::getAPI_GetQueuedCompletionStatusEx();
 	if (!fGetQueuedCompletionStatusEx) {
@@ -73,28 +73,18 @@ void AsyncLoop::__runLoop()
 
 		DWORD nCount = 0;
 		
-		if (!fGetQueuedCompletionStatusEx(handle->hCompletionPort, entries, ASYNC_MAX_WAIT_EVENT, &nCount, 0, FALSE)) {
+		if (!fGetQueuedCompletionStatusEx(handle->hCompletionPort, entries, ASYNC_MAX_WAIT_EVENT, &nCount, INFINITE, FALSE)) {
 			nCount = 0;
 		}
 		if (nCount == 0) {
 			m_queueInstancesClosed.removeAll();
-			sl_int32 _t = _getTimeout();
-			DWORD timeout;
-			if (_t >= 0) {
-				timeout = _t;
-			} else {
-				timeout = INFINITE;
-			}
-			if (!fGetQueuedCompletionStatusEx(handle->hCompletionPort, entries, ASYNC_MAX_WAIT_EVENT, &nCount, timeout, FALSE)) {
-				nCount = 0;
-			}
 		}
 
 		for (DWORD i = 0; m_flagRunning && i < nCount; i++) {
 			OVERLAPPED_ENTRY& entry = entries[i];
-			AsyncInstance* instance = (AsyncInstance*)(entry.lpCompletionKey);
+			AsyncIoInstance* instance = (AsyncIoInstance*)(entry.lpCompletionKey);
 			if (instance && !(instance->isClosing())) {
-				AsyncInstance::EventDesc desc;
+				AsyncIoInstance::EventDesc desc;
 				desc.pOverlapped = entry.lpOverlapped;
 				instance->onEvent(&desc);
 			}
@@ -107,29 +97,31 @@ void AsyncLoop::__runLoop()
 
 }
 
-void AsyncLoop::__wake()
+void AsyncIoLoop::__wake()
 {
-	_AsyncLoopHandle* handle = (_AsyncLoopHandle*)m_handle;
+	_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
 	Base::resetMemory(&(handle->overlappedWake), 0, sizeof(OVERLAPPED));
 	::PostQueuedCompletionStatus(handle->hCompletionPort, 0, 0, &(handle->overlappedWake));
 }
 
-sl_bool AsyncLoop::__attachInstance(AsyncInstance* instance)
+sl_bool AsyncIoLoop::__attachInstance(AsyncIoInstance* instance, AsyncIoMode mode)
 {
-	_AsyncLoopHandle* handle = (_AsyncLoopHandle*)m_handle;
+	_AsyncIoLoopHandle* handle = (_AsyncIoLoopHandle*)m_handle;
 	HANDLE hObject = (HANDLE)(instance->getHandle());
 	HANDLE hPort = ::CreateIoCompletionPort(hObject, handle->hCompletionPort, (ULONG_PTR)instance, 0);
 	if (hPort) {
+		instance->setMode(mode);
 		return sl_true;
 	}
 	return sl_false;
 }
 
-void AsyncLoop::__detachInstance(AsyncInstance* instance)
+void AsyncIoLoop::__detachInstance(AsyncIoInstance* instance)
 {
 	HANDLE hObject = (HANDLE)(instance->getHandle());
 	::CancelIo(hObject);
 }
+
 SLIB_NAMESPACE_END
 
 #endif

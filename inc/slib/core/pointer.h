@@ -406,14 +406,145 @@ public:
 	sl_bool operator!=(const SafePtr<O>& other) const;
 	
 public:
-	SLIB_INLINE T& operator*()
+	SLIB_INLINE T& operator*() const
 	{
 		return *m_pointer;
 	}
 	
-	SLIB_INLINE T* operator->()
+	SLIB_INLINE T* operator->() const
 	{
 		return m_pointer;
+	}
+
+public:
+	SLIB_INLINE static Ptr<T> fromPointer(const T* pointer)
+	{
+		return Ptr<T>(pointer);
+	}
+
+	SLIB_INLINE static Ptr<T> fromRef(const Ref<T>& reference)
+	{
+		return Ptr<T>(reference);
+	}
+
+	template <class O>
+	SLIB_INLINE static Ptr<T> fromRef(const Ref<O>& reference)
+	{
+		return Ptr<T>(reference);
+	}
+
+	SLIB_INLINE static Ptr<T> fromRef(const SafeRef<T>& reference)
+	{
+		return Ptr<T>(reference);
+	}
+
+	template <class O>
+	SLIB_INLINE static Ptr<T> fromRef(const SafeRef<O>& reference)
+	{
+		return Ptr<T>(reference);
+	}
+
+	SLIB_INLINE static Ptr<T> fromWeak(const WeakRef<T>& weak)
+	{
+		return Ptr<T>(weak);
+	}
+
+	template <class O>
+	SLIB_INLINE static Ptr<T> fromWeak(const WeakRef<O>& weak)
+	{
+		return Ptr<T>(weak);
+	}
+
+	SLIB_INLINE static Ptr<T> fromWeak(const SafeWeakRef<T>& weak)
+	{
+		return Ptr<T>(weak);
+	}
+
+	template <class O>
+	SLIB_INLINE static Ptr<T> fromWeak(const SafeWeakRef<O>& weak)
+	{
+		return Ptr<T>(weak);
+	}
+
+public:
+	SLIB_INLINE void setPointer(const T* pointer)
+	{
+		m_pointer = (T*)pointer;
+		m_reference.setNull();
+	}
+
+	SLIB_INLINE void setRef(const Ref<T>& reference)
+	{
+		m_pointer = reference.get();
+		m_reference = reference;
+	}
+
+	template <class O>
+	SLIB_INLINE void setRef(const Ref<O>& reference)
+	{
+		m_pointer = reference.get();
+		m_reference = reference;
+	}
+
+	SLIB_INLINE void setRef(const SafeRef<T>& _reference)
+	{
+		Ref<T> reference(_reference);
+		m_pointer = reference.get();
+		m_reference = reference;
+	}
+
+	template <class O>
+	SLIB_INLINE void setRef(const SafeRef<O>& _reference)
+	{
+		Ref<O> reference(_reference);
+		m_pointer = reference.get();
+		m_reference = reference;
+	}
+
+	void setWeak(const WeakRef<T>& weak)
+	{
+		Ref<T> o(weak);
+		if (o.isNotNull()) {
+			m_pointer = o.get();
+			m_reference = weak.getWeakRef();
+		} else {
+			m_pointer = sl_null;
+		}
+	}
+
+	template <class O>
+	void setWeak(const WeakRef<O>& weak)
+	{
+		Ref<O> o(weak);
+		if (o.isNotNull()) {
+			m_pointer = o.get();
+			m_reference = weak.getWeakRef();
+		} else {
+			m_pointer = sl_null;
+		}
+	}
+
+	void setWeak(const SafeWeakRef<T>& weak)
+	{
+		Ref<T> o(weak);
+		if (o.isNotNull()) {
+			m_pointer = o.get();
+			m_reference = weak.getWeakRef();
+		} else {
+			m_pointer = sl_null;
+		}
+	}
+
+	template <class O>
+	void setWeak(const SafeWeakRef<O>& weak)
+	{
+		Ref<O> o(weak);
+		if (o.isNotNull()) {
+			m_pointer = o.get();
+			m_reference = weak.getWeakRef();
+		} else {
+			m_pointer = sl_null;
+		}
 	}
 
 public:
@@ -491,7 +622,7 @@ public:
 		_move_init(&other);
 	}
 	
-	SLIB_INLINE SafePtr(const Ptr<T>& other) : m_pointer(other.m_pointer), m_reference(other.m_reference)
+	SLIB_INLINE SafePtr(const Ptr<T>& other) : m_pointer(other.get()), m_reference(other.getReference())
 	{
 	}
 	
@@ -829,6 +960,78 @@ public:
 	{
 		return m_pointer != other.get();
 	}
+
+public:
+	SLIB_INLINE void setPointer(const T* pointer)
+	{
+		_replace((T*)pointer, Ref<Referable>::null());
+	}
+
+	SLIB_INLINE void setRef(const Ref<T>& reference)
+	{
+		_replace(reference.get(), Ref<Referable>::from(reference));
+	}
+
+	template <class O>
+	SLIB_INLINE void setRef(const Ref<O>& reference)
+	{
+		_replace(reference.get(), Ref<Referable>::from(reference));
+	}
+
+	SLIB_INLINE void setRef(const SafeRef<T>& _reference)
+	{
+		Ref<T> reference(_reference);
+		_replace(reference.get(), Ref<Referable>::from(reference));
+	}
+
+	template <class O>
+	SLIB_INLINE void setRef(const SafeRef<O>& _reference)
+	{
+		Ref<O> reference(_reference);
+		_replace(reference.get(), Ref<Referable>::from(reference));
+	}
+
+	void setWeak(const WeakRef<T>& weak)
+	{
+		Ref<T> o(weak);
+		if (o.isNotNull()) {
+			_replace(o.get(), Ref<Referable>::from(o));
+		} else {
+			_replace(sl_null, Ref<Referable>::null());
+		}
+	}
+
+	template <class O>
+	void setWeak(const WeakRef<O>& weak)
+	{
+		Ref<O> o(weak);
+		if (o.isNotNull()) {
+			_replace(o.get(), Ref<Referable>::from(o));
+		} else {
+			_replace(sl_null, Ref<Referable>::null());
+		}
+	}
+
+	void setWeak(const SafeWeakRef<T>& weak)
+	{
+		Ref<T> o(weak);
+		if (o.isNotNull()) {
+			_replace(o.get(), Ref<Referable>::from(o));
+		} else {
+			_replace(sl_null, Ref<Referable>::null());
+		}
+	}
+
+	template <class O>
+	void setWeak(const SafeWeakRef<O>& weak)
+	{
+		Ref<O> o(weak);
+		if (o.isNotNull()) {
+			_replace(o.get(), Ref<Referable>::from(o));
+		} else {
+			_replace(sl_null, Ref<Referable>::null());
+		}
+	}
 	
 public:
 	SLIB_INLINE T* _getPointer() const
@@ -1009,12 +1212,12 @@ public:
 		return m_ptr.isNotNull();
 	}
 
-	SLIB_INLINE T& operator*()
+	SLIB_INLINE T& operator*() const
 	{
 		return *(m_ptr.get());
 	}
 
-	SLIB_INLINE T* operator->()
+	SLIB_INLINE T* operator->() const
 	{
 		return m_ptr.get();
 	}
