@@ -40,16 +40,18 @@ public:
 void MySQL_Database::initThread()
 {
 	SLIB_SAFE_STATIC(_MySQL_Database_Lib, lib);
-	::mysql_thread_init();
 	Ref<Thread> thread = Thread::getCurrent();
 	if (thread.isNotNull()) {
 		Ref<Referable> ref = thread->getAttachedObject("MYSQL");
 		if (ref.isNull()) {
+			::mysql_thread_init();
 			ref = new _MySQL_Database_ThreadHandler;
 			if (ref.isNotNull()) {
 				thread->attachObject("MYSQL", ref.get());
 			}
 		}
+	} else {
+		::mysql_thread_init();
 	}
 }
 
@@ -109,6 +111,7 @@ public:
 
 	sl_bool execute(const String& sql, sl_uint64* pOutAffectedRowsCount)
 	{
+		initThread();
 		ObjectLocker lock(this);
 		if (0 == ::mysql_real_query(m_mysql, sql.getBuf(), sql.getLength())) {
 			if (pOutAffectedRowsCount) {
@@ -243,6 +246,7 @@ public:
 
 	Ref<DatabaseCursor> query(const String& sql)
 	{
+		initThread();
 		ObjectLocker lock(this);
 		Ref<DatabaseCursor> ret;
 		if (0 == mysql_real_query(m_mysql, sql.getBuf(), sql.getLength())) {
@@ -915,6 +919,7 @@ public:
 
 		sl_bool execute(const Variant* params, sl_uint32 nParams, sl_uint64* pOutAffectedRowsCount)
 		{
+			initThread();
 			ObjectLocker lock(m_db.get());
 			if (_execute(params, nParams)) {
 				if (pOutAffectedRowsCount) {
@@ -927,6 +932,7 @@ public:
 
 		Ref<DatabaseCursor> query(const Variant* params, sl_uint32 nParams)
 		{
+			initThread();
 			ObjectLocker lock(m_db.get());
 			Ref<DatabaseCursor> ret;
 			if (_execute(params, nParams)) {
@@ -1029,6 +1035,7 @@ public:
 
 	Ref<DatabaseStatement> prepareStatement(const String& sql)
 	{
+		initThread();
 		ObjectLocker lock(this);
 		Ref<DatabaseStatement> ret;
 		MYSQL_STMT* statement = ::mysql_stmt_init(m_mysql);

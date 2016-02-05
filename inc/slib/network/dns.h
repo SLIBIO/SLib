@@ -127,7 +127,7 @@ enum DnsResponseCode
 
 enum DnsRecordType
 {
-    dnsRecordType_A = 1, // a host address
+    dnsRecordType_A = 1, // a host address (IPv4)
     dnsRecordType_NS = 2, // an authoritative name server
     dnsRecordType_MD = 3, // a mail destination (Obsolete - use MX)
     dnsRecordType_MF = 4, // a mail forwarder (Obsolete - use MX)
@@ -143,6 +143,7 @@ enum DnsRecordType
     dnsRecordType_MINFO = 14, // mailbox or mail list information
     dnsRecordType_MX = 15, // mail exchange
     dnsRecordType_TXT = 16, // text strings
+	dnsRecordType_AAAA = 28, // a host address (IPv6)
     dnsRecordType_Question_AXFR = 252, // A request for a transfer of an entire zone
     dnsRecordType_Question_MAILB = 253, // A request for mailbox-related records (MB, MG or MR)
     dnsRecordType_Question_MAILA = 254, // A request for mail agent RRs (Obsolete - see MX)
@@ -460,6 +461,20 @@ public:
 	sl_uint32 buildRecord_NS(void* buf, sl_uint32 offset, sl_uint32 size, const String& nameServer);
 	
 	
+	// A 128 bit Internet address
+	IPv6Address parseData_AAAA() const;
+	
+	//A 128 bit Internet address
+	sl_uint32 buildRecord_AAAA(void* buf, sl_uint32 offset, sl_uint32 size, const IPv6Address& addr);
+	
+	
+	//  A <domain-name> which specifies a host which should be authoritative for the specified class and domain.
+	String parseData_PTR() const;
+	
+	// A <domain-name> which specifies a host which should be authoritative for the specified class and domain.
+	sl_uint32 buildRecord_PTR(void* buf, sl_uint32 offset, sl_uint32 size, const String& dname);
+	
+	
 	String toString() const;
 
 private:
@@ -480,16 +495,17 @@ public:
 	struct Question
 	{
 		String name;
+		DnsRecordType type;
 	};
 	List<Question> questions;
 	
 	struct Address
 	{
 		String name;
-		IPv4Address address;
+		IPAddress address;
 	};
 	List<Address> addresses;
-
+	
 	struct Alias
 	{
 		String name;
@@ -504,12 +520,20 @@ public:
 	};
 	List<NameServer> nameServers;
 
+	struct NamePointer
+	{
+		String name;
+		String pointer;
+	};
+	List<NamePointer> pointers;
+	
 public:
 	sl_bool parsePacket(const void* packet, sl_uint32 len);
 	
 	static Memory buildQuestionPacket(sl_uint16 id, const String& host);
 	
-	static Memory buildHostAddressAnswerPacket(sl_uint16 id, const String& hostName, const IPv4Address& hosteAddress);
+	static Memory buildHostAddressAnswerPacket(sl_uint16 id, const String& hostName, const List<IPAddress>& hostAddresses);
+
 };
 
 class DnsClient;
@@ -562,9 +586,9 @@ class DnsServer;
 class SLIB_EXPORT IDnsServerListener
 {
 public:
-	virtual sl_bool resolveDnsHost(DnsServer *server, const String &hostName, IPv4Address &outAddr);
+	virtual List<IPAddress> resolveDnsHost(DnsServer* server, const String& hostName, sl_bool& flagStatic) = 0;
 	
-	virtual void cacheDnsHost(DnsServer *server, const String &hostName, const IPv4Address &addr);
+	virtual void cacheDnsHost(DnsServer* server, const String& hostName, const IPAddress& hostAddress) = 0;
 
 };
 
@@ -572,7 +596,6 @@ class SLIB_EXPORT DnsServerParam
 {
 public:
 	IPv4Address forwardTarget;
-	sl_bool flagUseCache;
 
 	Ptr<IDnsServerListener> listener;
 	
@@ -598,21 +621,26 @@ protected:
 	void _sendPacket(const SocketAddress& clientAddress, const Memory& packet);
 	
 	void _forwardPacket(const Memory& packet);
-	
+
 protected:
 	// override
 	virtual void onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 sizeReceive);
 
 protected:
-	sl_bool _resolveDnsHost(const String& hostName, IPv4Address& outAddr);
+	List<IPAddress> _resolveDnsHost(const String& hostName, sl_bool& flagStatic);
 	
-	void _cacheDnsHost(const String& hostName, const IPv4Address& addr);
+	void _cacheDnsHost(const String& hostName, const IPAddress& hostAddress);
 	
 private:
 	Ref<AsyncUdpSocket> m_udp;
 	
-	HashMap<String, IPv4Address> m_cacheAddresses;
-	sl_bool m_flagUseCache;
+	struct CacheElement
+	{
+		sl_bool flagStatic;
+		List<IPAddress> addresses;
+		Time lastCachedTime;
+	};
+	HashMap<String, CacheElement> m_cacheAddresses;
 	
 	IPv4Address m_forwardTarget;
 	sl_uint16 m_lastForwardId;
@@ -622,8 +650,6 @@ private:
 		SocketAddress clientAddress;
 		sl_uint16 requestedId;
 		String requestedHostName;
-		String alias;
-		sl_uint32 countRequests;
 	};
 	HashMap<sl_uint16, ForwardElement> m_mapForward;
 	

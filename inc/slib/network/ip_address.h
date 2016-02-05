@@ -71,6 +71,24 @@ public:
 		return MIO::readUint32BE(m);
 	}
 	
+	SLIB_INLINE sl_uint8* bytes()
+	{
+		return m;
+	}
+	
+	SLIB_INLINE const sl_uint8* bytes() const
+	{
+		return m;
+	}
+	
+	SLIB_INLINE void get(sl_uint8* b) const
+	{
+		b[0] = m[0];
+		b[1] = m[1];
+		b[2] = m[2];
+		b[3] = m[3];
+	}
+	
 	SLIB_INLINE void set(const IPv4Address& addr)
 	{
 		set(addr.m);
@@ -89,12 +107,12 @@ public:
 		m[3] = d;
 	}
 	
-	SLIB_INLINE void set(const sl_uint8* addr)
+	SLIB_INLINE void set(const sl_uint8* b)
 	{
-		m[0] = addr[0];
-		m[1] = addr[1];
-		m[2] = addr[2];
-		m[3] = addr[3];
+		m[0] = b[0];
+		m[1] = b[1];
+		m[2] = b[2];
+		m[3] = b[3];
 	}
 	
 	SLIB_INLINE void setA(sl_uint8 a)
@@ -117,14 +135,6 @@ public:
 		m[3] = d;
 	}
 	
-	SLIB_INLINE void set(int index, sl_uint8 v)
-	{
-		if (index < 0 || index >= 4) {
-			return;
-		}
-		m[index] = v;
-	}
-	
 	SLIB_INLINE sl_uint8 get(int index) const
 	{
 		if (index < 0 || index >= 4) {
@@ -133,12 +143,12 @@ public:
 		return m[index];
 	}
 
-	SLIB_INLINE void get(sl_uint8* addr) const
+	SLIB_INLINE void set(int index, sl_uint8 v)
 	{
-		addr[0] = m[0];
-		addr[1] = m[1];
-		addr[2] = m[2];
-		addr[3] = m[3];
+		if (index < 0 || index >= 4) {
+			return;
+		}
+		m[index] = v;
 	}
 	
 public:
@@ -457,6 +467,47 @@ public:
 	}
 
 public:
+	SLIB_INLINE sl_uint8* bytes()
+	{
+		return m;
+	}
+	
+	SLIB_INLINE const sl_uint8* bytes() const
+	{
+		return m;
+	}
+	
+	SLIB_INLINE void get(sl_uint8* b) const
+	{
+		Base::copyMemory(b, m, 16);
+	}
+
+	// 8 elements
+	SLIB_INLINE void set(const sl_uint16* s)
+	{
+		for (int i = 0; i < 8; i++) {
+			set(i, s[i]);
+		}
+	}
+	
+	// 16 elements
+	SLIB_INLINE void set(const sl_uint8* b)
+	{
+		Base::copyMemory(m, b, 16);
+	}
+	
+	SLIB_INLINE void set(sl_uint16 s0, sl_uint16 s1, sl_uint16 s2, sl_uint16 s3, sl_uint16 s4, sl_uint16 s5, sl_uint16 s6, sl_uint16 s7)
+	{
+		set(0, s0);
+		set(1, s1);
+		set(2, s2);
+		set(3, s3);
+		set(4, s4);
+		set(5, s5);
+		set(6, s6);
+		set(7, s7);
+	}
+	
 	SLIB_INLINE sl_uint16 get(int index) const
 	{
 		if (index < 0 || index >= 16) {
@@ -472,23 +523,6 @@ public:
 		m[index * 2 + 1] = (sl_uint8)(s);
 	}
 	
-	SLIB_INLINE void set(sl_uint16 s0, sl_uint16 s1, sl_uint16 s2, sl_uint16 s3, sl_uint16 s4, sl_uint16 s5, sl_uint16 s6, sl_uint16 s7)
-	{
-		set(0, s0);
-		set(1, s1);
-		set(2, s2);
-		set(3, s3);
-		set(4, s4);
-		set(5, s5);
-		set(6, s6);
-		set(7, s7);
-	}
-	
-	SLIB_INLINE sl_uint8* bytes()
-	{
-		return m;
-	}
-
 public:
 	// [s0, s1, s2, s3, s4, s5, s6, s7, s8]
 	SLIB_INLINE sl_uint16 operator[](int index) const

@@ -141,6 +141,9 @@ Ref<Socket> Socket::open(SocketType type, sl_uint32 _protocol)
 		if (ret.isNotNull()) {
 			ret->m_socket = handle;
 			ret->m_type = type;
+			if (type == socketType_TcpIPv6 || type == socketType_UdpIPv6 || type == socketType_RawIPv6) {
+				ret->setOption_IPv6Only(sl_false);
+			}
 #if defined(SLIB_PLATFORM_IS_APPLE)
 			ret->setOption(SOL_SOCKET, SO_NOSIGPIPE, 1);
 #endif
@@ -241,8 +244,6 @@ sl_bool Socket::bind(const SocketAddress& address)
 			}
 		} else if (m_type == socketType_TcpIPv6 || m_type == socketType_UdpIPv6 || m_type == socketType_RawIPv6) {
 			if (address.ip.isIPv4()) {
-				SocketAddress addrConv;
-				addrConv.ip = IPv6Address(address.ip.getIPv4());
 				size_addr = _Socket_apply_address(m_type, addr, address);
 			} else if (address.ip.isIPv6()) {
 				size_addr = _Socket_apply_address(m_type, addr, address);

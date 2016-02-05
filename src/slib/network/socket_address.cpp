@@ -134,7 +134,7 @@ sl_uint32 SocketAddress::getSystemSocketAddress(void* addr)
 		return sizeof(sockaddr_in);
 	} else if (ip.isIPv6()) {
 		IPv6Address ipv6 = ip.getIPv6();
-		sockaddr_in6& out = *((sockaddr_in6*)&addr);
+		sockaddr_in6& out = *((sockaddr_in6*)addr);
 		Base::resetMemory(&out, 0, sizeof(sockaddr_in6));
 		out.sin6_family = AF_INET6;
 		for (int i = 0; i < 8; i++) {

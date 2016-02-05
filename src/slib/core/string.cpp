@@ -2517,19 +2517,21 @@ String16 String16::trimRight() const
 template <class ST>
 List<ST> _String_split(const ST& str, const ST& pattern)
 {
-	List<ST> ret;
-	if (pattern.isEmpty()) {
-		return ret;
-	}
-	sl_int32 start = 0;
-	while (1) {
-		sl_int32 index = str.indexOf(pattern, start);
-		if (index < 0) {
-			ret.add(str.substring(start));
-			break;
+	CList<ST>* ret = CList<ST>::create();
+	if (ret) {
+		if (pattern.isEmpty()) {
+			return ret;
 		}
-		ret.add_NoLock(str.substring(start, index));
-		start = index + pattern.getLength();
+		sl_int32 start = 0;
+		while (1) {
+			sl_int32 index = str.indexOf(pattern, start);
+			if (index < 0) {
+				ret->add_NoLock(str.substring(start));
+				break;
+			}
+			ret->add_NoLock(str.substring(start, index));
+			start = index + pattern.getLength();
+		}
 	}
 	return ret;
 }

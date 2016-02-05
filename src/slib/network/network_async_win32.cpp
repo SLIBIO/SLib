@@ -332,11 +332,14 @@ public:
 		if (handle == SLIB_FILE_INVALID_HANDLE) {
 			return;
 		}
-		Ref<Socket> socket = m_socket;
-		if (socket.isNull()) {
-			return;
-		}
 		while (Thread::isNotStoppingCurrent()) {
+			Ref<Socket> socket = m_socket;
+			if (socket.isNull()) {
+				return;
+			}
+			if (!(socket->isOpened())) {
+				return;
+			}
 			Ref<Socket> socketAccept = Socket::open(socket->getType());
 			if (socketAccept.isNotNull()) {
 				m_socketAccept = socketAccept;
@@ -354,12 +357,13 @@ public:
 						m_flagAccepting = sl_true;
 					} else {
 						processAccept(sl_true);
+						requestOrder();
 					}
 					break;
 				}
 			} else {
 				LOG_ERROR("Failed to create accept socket");
-				processAccept(sl_true);				
+				processAccept(sl_true);
 				break;
 			}
 		}
@@ -490,6 +494,9 @@ public:
 		if (socket.isNull()) {
 			return;
 		}
+		if (!(socket->isOpened())) {
+			return;
+		}
 		void* buf = m_buffer.getBuf();
 		sl_uint32 sizeBuf = (sl_uint32)(m_buffer.getSize());
 
@@ -507,6 +514,8 @@ public:
 			DWORD dwErr = ::WSAGetLastError();
 			if (dwErr == WSA_IO_PENDING) {
 				m_flagReceiving = sl_true;
+			} else {
+				requestOrder();
 			}
 		}
 	}
