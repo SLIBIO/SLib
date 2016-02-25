@@ -1,8 +1,8 @@
 #include "../../../inc/slib/network/dns.h"
 #include "../../../inc/slib/network/event.h"
+#include "../../../inc/slib/core/scoped_pointer.h"
 #include "../../../inc/slib/core/log.h"
 
-#include <stdlib.h>
 #define _MAX_NAME SLIB_NETWORK_DNS_NAME_MAX_LENGTH
 
 SLIB_NETWORK_NAMESPACE_BEGIN
@@ -415,24 +415,10 @@ Memory DnsPacket::buildQuestionPacket(sl_uint16 id, const String& host)
 	return Memory::null();
 }
 
-Memory DnsPacket::buildHostAddressAnswerPacket(sl_uint16 id, const String& hostName, const List<IPAddress>& _hostAddresses)
+Memory DnsPacket::buildHostAddressAnswerPacket(sl_uint16 id, const String& hostName, const IPv4Address& hostAddress)
 {
 	char buf[4096];
 	Base::zeroMemory(buf, sizeof(buf));
-	
-	IPv4Address hostAddress;
-	hostAddress.setZero();
-	{
-		ListLocker<IPAddress> addrs(_hostAddresses);
-		for (sl_size i = 0; i < addrs.count(); i++) {
-			if (addrs[i].isIPv4()) {
-				hostAddress = addrs[i].getIPv4();
-				if (hostAddress.isNotZero()) {
-					break;
-				}
-			}
-		}
-	}
 	
 	if (hostAddress.isNotZero()) {
 		
@@ -547,30 +533,95 @@ void DnsClient::_onDnsAnswer(const SocketAddress& serverAddress, const DnsPacket
 /*************************************************************
 					DnsServer
 *************************************************************/
+DnsResolveHostParam::DnsResolveHostParam()
+{
+	clientAddress.setNone();
+	hostAddress.setZero();
+	flagIgnoreRequest = sl_false;
+	forwardAddress.setNone();
+	flagEncryptForward = sl_false;
+}
+
 DnsServerParam::DnsServerParam()
 {
-	forwardTarget.setZero();
+	portDns = SLIB_NETWORK_DNS_PORT;
+
+	portEncryption = 0;
+
+	flagProxy = sl_false;
+
+	defaultForwardAddress.setNone();
+	flagEncryptDefaultForward = sl_false;
+
+	flagAutoStart = sl_true;
+}
+
+void DnsServerParam::parse(const Variant& conf)
+{
+	portDns = (sl_uint16)conf.getField("dns_port").getUint32(SLIB_NETWORK_DNS_PORT);
+	portEncryption = (sl_uint16)conf.getField("secure_port").getUint32(0);
+	encryptionKey = conf.getField("secure_key").getString();
+
+	flagProxy = conf.getField("is_proxy").getBoolean(sl_false);
+
+	IPv4Address defaultForwardAddressIp = IPv4Address(8, 8, 4, 4);
+	defaultForwardAddressIp.parse(conf.getField("forward_dns").getString());
+	defaultForwardAddress = SocketAddress(defaultForwardAddressIp, SLIB_NETWORK_DNS_PORT);
 }
 
 DnsServer::DnsServer()
 {
+	m_flagInit = sl_false;
+	m_flagRunning = sl_false;
+
 	m_lastForwardId = 0;
-	m_forwardTarget.setZero();
 }
+
+DnsServer::~DnsServer()
+{
+	release();
+}
+
+#define TAG_SERVER "DnsServer"
 
 Ref<DnsServer> DnsServer::create(const DnsServerParam& param, const Ref<AsyncIoLoop>& loop)
 {
 	Ref<DnsServer> ret = new DnsServer;
 	if (ret.isNotNull()) {
-		ret->m_forwardTarget = param.forwardTarget;
-		ret->m_listener = param.listener;
-		Ref<AsyncUdpSocket> socket = AsyncUdpSocket::create(SLIB_NETWORK_DNS_PORT, (WeakRef<DnsServer>)(ret), 4096, loop);
-		if (socket.isNotNull()) {
-			ret->m_udp = socket;
-			return ret;
-		} else {
-			SLIB_LOG_ERROR("DNS Server", "Failed to bind DNS port 53");
+
+		Ref<AsyncUdpSocket> socketDns = AsyncUdpSocket::create(param.portDns, (WeakRef<DnsServer>)(ret), 4096, loop, sl_false);
+		if (socketDns.isNull()) {
+			SLIB_LOG_ERROR(TAG_SERVER, "Failed to bind to port " + String::fromUint32(param.portDns));
+			return Ref<DnsServer>::null();
 		}
+		Ref<AsyncUdpSocket> socketEncrypt = AsyncUdpSocket::create(param.portEncryption, (WeakRef<DnsServer>)(ret), 4096, loop, sl_false);
+		if (socketEncrypt.isNull()) {
+			SLIB_LOG_ERROR(TAG_SERVER, "Failed to bind to port " + String::fromUint32(param.portEncryption));
+			return Ref<DnsServer>::null();
+		}
+
+		if (socketDns.isNotNull() || socketEncrypt.isNotNull()) {
+
+			ret->m_udpDns = socketDns;
+			ret->m_udpEncrypt = socketEncrypt;
+
+			ret->m_encrypt.setKey_SHA256(param.encryptionKey);
+
+			ret->m_flagProxy = param.flagProxy;
+
+			ret->m_defaultForwardAddress = param.defaultForwardAddress;
+			ret->m_flagEncryptDefaultForward = param.flagEncryptDefaultForward;
+
+			ret->m_listener = param.listener;
+
+			ret->m_flagInit = sl_true;
+			if (param.flagAutoStart) {
+				ret->start();
+			}
+			return ret;
+
+		}
+		
 	}
 	return Ref<DnsServer>::null();
 }
@@ -580,75 +631,122 @@ Ref<DnsServer> DnsServer::create(const DnsServerParam& param)
 	return create(param, AsyncIoLoop::getDefault());
 }
 
-void DnsServer::_processReceivedQuestion(const SocketAddress& clientAddress, sl_uint16 id, const String& hostName)
+void DnsServer::release()
 {
-	Time now = Time::now();
-	CacheElement ce;
-	sl_bool flagExistInCache = m_cacheAddresses.get(hostName, &ce);
-	if (flagExistInCache) {
-		if ((now - ce.lastCachedTime).getMillisecondsCount() < 5000) {
-			_sendPacket(clientAddress, DnsPacket::buildHostAddressAnswerPacket(id, hostName, ce.addresses));
-			return;
-		}
+	ObjectLocker lock(this);
+	if (!m_flagInit) {
+		return;
 	}
-	sl_bool flagStatic = sl_false;
-	List<IPAddress> addresses = _resolveDnsHost(hostName, flagStatic);
-	if (addresses.isNotNull()) {
-		ce.addresses = addresses;
-		ce.lastCachedTime = now;
-		ce.flagStatic = flagStatic;
-		m_cacheAddresses.put(hostName, ce);
-	} else {
-		if (flagExistInCache) {
-			addresses = ce.addresses;
-		}
+	m_flagInit = sl_false;
+
+	m_flagRunning = sl_false;
+	if (m_udpDns.isNotNull()) {
+		m_udpDns->close();
 	}
-	if (addresses.isNotNull()) {
-		_sendPacket(clientAddress, DnsPacket::buildHostAddressAnswerPacket(id, hostName, addresses));
-	} else {
-		if (m_forwardTarget.isZero()) {
-			_sendPacket(clientAddress, DnsPacket::buildHostAddressAnswerPacket(id, hostName, List<IPAddress>::null()));
-		}
+	if (m_udpEncrypt.isNotNull()) {
+		m_udpEncrypt->close();
+	}
+}
+
+void DnsServer::start()
+{
+	ObjectLocker lock(this);
+	if (!m_flagInit) {
+		return;
+	}
+	if (m_flagRunning) {
+		return;
+	}
+	if (m_udpDns.isNotNull()) {
+		m_udpDns->start();
+	}
+	if (m_udpEncrypt.isNotNull()) {
+		m_udpEncrypt->start();
+	}
+	m_flagRunning = sl_true;
+}
+
+sl_bool DnsServer::isRunning()
+{
+	return m_flagRunning;
+}
+
+void DnsServer::_processReceivedDnsQuestion(const SocketAddress& clientAddress, sl_uint16 id, const String& hostName, sl_bool flagEncryptedRequest)
+{
+	if (hostName.indexOf('.') < 0) {
+		return;
+	}
+	DnsResolveHostParam rp;
+	rp.clientAddress = clientAddress;
+	rp.hostName = hostName;
+	rp.forwardAddress = m_defaultForwardAddress;
+	rp.flagEncryptForward = m_flagEncryptDefaultForward;
+	_resolveDnsHost(rp);
+	if (rp.flagIgnoreRequest) {
+		return;
+	}
+	if (rp.forwardAddress.isInvalid()) {
+		_sendPacket(flagEncryptedRequest, clientAddress, _buildHostAddressAnswerPacket(id, hostName, rp.hostAddress, flagEncryptedRequest));
+		return;
+	}
+	if (rp.hostAddress.isNotZero()) {
+		_sendPacket(flagEncryptedRequest, clientAddress, _buildHostAddressAnswerPacket(id, hostName, rp.hostAddress, flagEncryptedRequest));
 	}
 	
-	if (!flagStatic) {
+	// forward DNS request
+	{
 		sl_uint16 idForward = m_lastForwardId++;
 		ForwardElement fe;
 		fe.requestedId = id;
 		fe.requestedHostName = hostName;
-		fe.clientAddress = clientAddress;
+		fe.flagEncrypted = flagEncryptedRequest;
+		if (rp.hostAddress.isNotZero()) {
+			fe.clientAddress.ip.setNone();
+			fe.clientAddress.port = 0;
+		} else {
+			fe.clientAddress = clientAddress;
+		}
 		m_mapForward.put(idForward, fe);
-		_forwardPacket(DnsPacket::buildQuestionPacket(idForward, hostName));
+		_sendPacket(rp.flagEncryptForward, rp.forwardAddress, _buildQuestionPacket(idForward, hostName, rp.flagEncryptForward));
 	}
 
 }
 
-void DnsServer::_processReceivedAnswer(const DnsPacket& packet)
+void DnsServer::_processReceivedDnsAnswer(const DnsPacket& packet)
 {
-	Time now = Time::now();
+
 	sl_uint16 idForward = packet.id;
+
 	ForwardElement fe;
 	if (m_mapForward.get(idForward, &fe)) {
 
+		m_mapForward.remove(idForward);
+
 		String reqNameLower = fe.requestedHostName.toLower();
 
-		List<IPAddress> resolvedAddresses;
+		IPv4Address resolvedAddress;
+		resolvedAddress.setZero();
+
 		HashMap<String, IPv4Address> aliasAddresses4;
 		HashMap<String, IPv6Address> aliasAddresses6;
 		// address
 		{
 			ListItems<DnsPacket::Address> addresses(packet.addresses);
-			for (sl_size i = 0; i < addresses.count(); i++) {
-				DnsPacket::Address& address = addresses[i];
+			sl_size n = addresses.count();
+			for (sl_size i = 0; i < n; i++) {
+				DnsPacket::Address& address = addresses[n - 1 - i];
 				if (address.address.isNotNone()) {
-					_cacheDnsHost(address.name, address.address);
-					if (address.address.isIPv4()) {
+					if (address.address.isIPv4() && address.address.getIPv4().isHost()) {
+						_cacheDnsHost(address.name, address.address);
 						aliasAddresses4.put_NoLock(address.name.toLower(), address.address.getIPv4());
 					} else if (address.address.isIPv6()) {
+						_cacheDnsHost(address.name, address.address);
 						aliasAddresses6.put_NoLock(address.name.toLower(), address.address.getIPv6());
 					}
 					if (reqNameLower == address.name.toLower()) {
-						resolvedAddresses.addIfNotExist_NoLock(address.address);
+						if (resolvedAddress.isZero()) {
+							resolvedAddress = address.address.getIPv4();
+						}
 					}
 				}
 			}
@@ -661,8 +759,9 @@ void DnsServer::_processReceivedAnswer(const DnsPacket& packet)
 				flagProcess = sl_false;
 				List<DnsPacket::Alias> aliasesNoProcess;
 				ListItems<DnsPacket::Alias> aliases(aliasesProcess);
-				for (sl_size i = 0; i < aliases.count(); i++) {
-					DnsPacket::Alias& alias = aliases[i];
+				sl_size n = aliases.count();
+				for (sl_size i = 0; i < n; i++) {
+					DnsPacket::Alias& alias = aliases[n - 1 - i];
 					IPv4Address addr4;
 					IPv6Address addr6;
 					sl_bool flagAddr = sl_false;
@@ -670,7 +769,9 @@ void DnsServer::_processReceivedAnswer(const DnsPacket& packet)
 						aliasAddresses4.put_NoLock(alias.name.toLower(), addr4);
 						_cacheDnsHost(alias.name, addr4);
 						if (reqNameLower == alias.name.toLower()) {
-							resolvedAddresses.addIfNotExist_NoLock(addr4);
+							if (resolvedAddress.isZero()) {
+								resolvedAddress = addr4;
+							}
 						}
 						flagProcess = sl_true;
 						flagAddr = sl_true;
@@ -678,9 +779,6 @@ void DnsServer::_processReceivedAnswer(const DnsPacket& packet)
 					if (aliasAddresses6.get_NoLock(alias.alias.toLower(), &addr6)) {
 						aliasAddresses6.put_NoLock(alias.name.toLower(), addr6);
 						_cacheDnsHost(alias.name, addr6);
-						if (reqNameLower == alias.name.toLower()) {
-							resolvedAddresses.addIfNotExist_NoLock(addr6);
-						}
 						flagProcess = sl_true;
 						flagAddr = sl_true;
 					}
@@ -691,57 +789,140 @@ void DnsServer::_processReceivedAnswer(const DnsPacket& packet)
 				aliasesProcess = aliasesNoProcess;
 			}
 		}
-		if (resolvedAddresses.isNotEmpty()) {
-			CacheElement ce;
-			ce.addresses = resolvedAddresses;
-			ce.lastCachedTime = now;
-			ce.flagStatic = sl_false;
-			m_cacheAddresses.put(fe.requestedHostName, ce);
+		if (fe.clientAddress.isValid()) {
+			_sendPacket(fe.flagEncrypted, fe.clientAddress, _buildHostAddressAnswerPacket(fe.requestedId, fe.requestedHostName, resolvedAddress, fe.flagEncrypted));
 		}
-		_sendPacket(fe.clientAddress, DnsPacket::buildHostAddressAnswerPacket(fe.requestedId, fe.requestedHostName, resolvedAddresses));
-
 	}
 }
 
-void DnsServer::_sendPacket(const SocketAddress& clientAddress, const Memory& packet)
+void DnsServer::_processReceivedProxyQuestion(const SocketAddress& clientAddress, void* data, sl_uint32 size, sl_bool flagEncryptedRequest)
 {
-	m_udp->sendTo(clientAddress, packet);
+	DnsHeaderFormat* header = (DnsHeaderFormat*)data;
+
+	sl_uint16 idForward = m_lastForwardId++;
+
+	ForwardElement fe;
+	fe.requestedId = header->getId();
+	fe.flagEncrypted = flagEncryptedRequest;
+	fe.clientAddress = clientAddress;
+
+	header->setId(idForward);
+	Memory packet = Memory::create(data, size);
+	if (m_flagEncryptDefaultForward) {
+		packet = m_encrypt.encrypt_CBC_PKCS7Padding(packet);
+	}
+	if (packet.isEmpty()) {
+		return;
+	}
+
+	m_mapForward.put(idForward, fe);
+
+	_sendPacket(m_flagEncryptDefaultForward, m_defaultForwardAddress, packet);
+
 }
 
-void DnsServer::_forwardPacket(const Memory& packet)
+void DnsServer::_processReceivedProxyAnswer(void* data, sl_uint32 size)
 {
-	if (m_forwardTarget.isNotZero()) {
-		m_udp->sendTo(SocketAddress(m_forwardTarget, SLIB_NETWORK_DNS_PORT), packet);
+	DnsHeaderFormat* header = (DnsHeaderFormat*)data;
+	sl_uint16 idForward = header->getId();
+	ForwardElement fe;
+	if (m_mapForward.get(idForward, &fe)) {
+
+		m_mapForward.remove(idForward);
+
+		header->setId(fe.requestedId);
+		Memory packet = Memory::create(data, size);
+		if (fe.flagEncrypted) {
+			packet = m_encrypt.encrypt_CBC_PKCS7Padding(packet);
+		}
+		if (packet.isEmpty()) {
+			return;
+		}
+
+		_sendPacket(fe.flagEncrypted, fe.clientAddress, packet);
 	}
 }
 
-void DnsServer::onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 size)
+void DnsServer::_sendPacket(sl_bool flagEncrypted, const SocketAddress& targetAddress, const Memory& packet)
 {
-	char* buf = (char*)data;
-	DnsPacket packet;
-	if (packet.parsePacket(buf, size)) {
-		if (packet.flagQuestion) {
-			if (packet.questions.count() == 1) {
-				DnsPacket::Question& question = packet.questions[0];
-				if (question.type == dnsRecordType_A) {
-					_processReceivedQuestion(address, packet.id, question.name);
-				}
-			}
+	if (packet.isNotEmpty()) {
+		Ref<AsyncUdpSocket> socket;
+		if (flagEncrypted) {
+			socket = m_udpEncrypt;
 		} else {
-			if (address.ip == m_forwardTarget && address.port == SLIB_NETWORK_DNS_PORT) {
-				_processReceivedAnswer(packet);
+			socket = m_udpDns;
+		}
+		if (socket.isNotNull()) {
+			socket->sendTo(targetAddress, packet);
+		}
+	}
+}
+
+Memory DnsServer::_buildQuestionPacket(sl_uint16 id, const String& host, sl_bool flagEncrypt)
+{
+	Memory mem = DnsPacket::buildQuestionPacket(id, host);
+	if (flagEncrypt) {
+		return m_encrypt.encrypt_CBC_PKCS7Padding(mem);
+	}
+	return mem;
+}
+
+Memory DnsServer::_buildHostAddressAnswerPacket(sl_uint16 id, const String& hostName, const IPv4Address& hostAddress, sl_bool flagEncrypt)
+{
+	Memory mem = DnsPacket::buildHostAddressAnswerPacket(id, hostName, hostAddress);
+	if (flagEncrypt) {
+		return m_encrypt.encrypt_CBC_PKCS7Padding(mem);
+	}
+	return mem;
+}
+
+void DnsServer::onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& addressFrom, void* data, sl_uint32 size)
+{
+	sl_bool flagEncrypted = sl_false;
+	Memory memDecrypt;
+	if (socket == m_udpEncrypt) {
+		flagEncrypted = sl_true;
+		memDecrypt = m_encrypt.decrypt_CBC_PKCS7Padding(data, size);
+		if (memDecrypt.isEmpty()) {
+			return;
+		}
+		data = memDecrypt.data();
+		size = (sl_uint32)(memDecrypt.size());
+	}
+	if (m_flagProxy) {
+		if (size < sizeof(DnsHeaderFormat)) {
+			return;
+		}
+		DnsHeaderFormat* header = (DnsHeaderFormat*)data;
+		if (header->isQuestion()) {
+			_processReceivedProxyQuestion(addressFrom, data, size, flagEncrypted);
+		} else {
+			_processReceivedProxyAnswer(data, size);
+		}
+	} else {
+		char* buf = (char*)data;
+		DnsPacket packet;
+		if (packet.parsePacket(buf, size)) {
+			if (packet.flagQuestion) {
+				if (packet.questions.count() == 1) {
+					DnsPacket::Question& question = packet.questions[0];
+					if (question.type == dnsRecordType_A) {
+						_processReceivedDnsQuestion(addressFrom, packet.id, question.name, flagEncrypted);
+					}
+				}
+			} else {
+				_processReceivedDnsAnswer(packet);
 			}
 		}
 	}
 }
 
-List<IPAddress> DnsServer::_resolveDnsHost(const String& hostName, sl_bool& flagStatic)
+void DnsServer::_resolveDnsHost(DnsResolveHostParam& param)
 {
 	PtrLocker<IDnsServerListener> listener(m_listener);
 	if (listener.isNotNull()) {
-		return listener->resolveDnsHost(this, hostName, flagStatic);
+		listener->resolveDnsHost(this, param);
 	}
-	return List<IPAddress>::null();
 }
 
 void DnsServer::_cacheDnsHost(const String& hostName, const IPAddress& hostAddress)

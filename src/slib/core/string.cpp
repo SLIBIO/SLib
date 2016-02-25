@@ -1879,6 +1879,28 @@ sl_int32 String16::compare(const String16& other, sl_uint32 len) const
 	return _compare16(m_data, l1, other.m_data, l2);
 }
 
+String8 String8::duplicate() const
+{
+    return String8(m_data, length());
+}
+
+String16 String16::duplicate() const
+{
+    return String16(m_data, length());
+}
+
+String8 SafeString8::duplicate() const
+{
+    String8 s(*this);
+    return s.duplicate();
+}
+
+String16 SafeString16::duplicate() const
+{
+    String16 s(*this);
+    return s.duplicate();
+}
+
 
 Memory String8::toMemory() const
 {
@@ -1889,6 +1911,19 @@ Memory String16::toMemory() const
 {
 	return Memory::create(m_data, length()*sizeof(sl_char16));
 }
+
+Memory SafeString8::toMemory() const
+{
+    String8 s(*this);
+    return s.toMemory();
+}
+
+Memory SafeString16::toMemory() const
+{
+	String16 s(*this);
+	return s.toMemory();
+}
+
 
 sl_uint32 String8::getUtf16(sl_char16* utf16, sl_int32 len) const
 {
@@ -1936,6 +1971,31 @@ StringData String16::getUtf8() const
 	return ret;
 }
 
+sl_uint32 SafeString8::getUtf16(sl_char16* utf16, sl_int32 len) const
+{
+    String8 s(*this);
+    return s.getUtf16(utf16, len);
+}
+
+StringData SafeString8::getUtf16() const
+{
+    String8 s(*this);
+    return s.getUtf16();
+}
+
+sl_uint32 SafeString16::getUtf8(sl_char8* utf8, sl_int32 len) const
+{
+	String16 s(*this);
+	return s.getUtf8(utf8, len);
+}
+
+StringData SafeString16::getUtf8() const
+{
+	String16 s(*this);
+	return s.getUtf8();
+}
+
+
 Memory String8::toUtf16() const
 {
 	sl_int32 len = _StringBase::utf8ToUtf16(m_data, length(), sl_null, -1);
@@ -1960,6 +2020,20 @@ Memory String16::toUtf8() const
 	return memory;
 }
 
+Memory SafeString8::toUtf16() const
+{
+    String8 s(*this);
+    return s.toUtf16();
+}
+
+// contains null character at last
+Memory SafeString16::toUtf8() const
+{
+	String16 s(*this);
+	return s.toUtf8();
+}
+
+
 sl_uint32 String8::getUtf32(sl_char32* utf32, sl_int32 len) const
 {
 	return _StringBase::utf8ToUtf32(m_data, length(), utf32, len);
@@ -1983,6 +2057,18 @@ StringData String8::getUtf32() const
 	return ret;
 }
 
+sl_uint32 SafeString8::getUtf32(sl_char32* utf32, sl_int32 len) const
+{
+    String8 s(*this);
+    return s.getUtf32(utf32, len);
+}
+
+StringData SafeString8::getUtf32() const
+{
+    String8 s(*this);
+    return s.getUtf32();
+}
+
 Memory String8::toUtf32() const
 {
 	sl_int32 len = _StringBase::utf8ToUtf32(m_data, length(), sl_null, -1);
@@ -1993,6 +2079,12 @@ Memory String8::toUtf32() const
 		buf[len] = 0;
 	}
 	return memory;
+}
+
+Memory SafeString8::toUtf32() const
+{
+    String8 s(*this);
+    return s.toUtf32();
 }
 
 
@@ -2031,6 +2123,88 @@ String16 String16::substring(sl_int32 start, sl_int32 end) const
 	}
 	return String16(m_data + start, end - start);
 }
+
+String8 SafeString8::substring(sl_int32 start, sl_int32 end) const
+{
+    String8 s(*this);
+    return s.substring(start, end);
+}
+
+String16 SafeString16::substring(sl_int32 start, sl_int32 end) const
+{
+	String16 s(*this);
+	return s.substring(start, end);
+}
+
+
+String8 String8::left(sl_uint32 len) const
+{
+    return substring(0, len);
+}
+
+String16 String16::left(sl_uint32 len) const
+{
+    return substring( 0, len );
+}
+
+String8 SafeString8::left(sl_uint32 len) const
+{
+    String8 s(*this);
+    return s.left(len);
+}
+
+String16 SafeString16::left(sl_uint32 len) const
+{
+	String16 s(*this);
+	return s.left(len);
+}
+
+
+String8 String8::right(sl_uint32 len) const
+{
+    return substring(length() - len);
+}
+
+String16 String16::right(sl_uint32 len) const
+{
+    return substring(length()-len);
+}
+
+String8 SafeString8::right(sl_uint32 len) const
+{
+	String8 s(*this);
+	return s.right(len);
+}
+
+String16 SafeString16::right(sl_uint32 len) const
+{
+	String16 s(*this);
+	return s.right(len);
+}
+
+
+String8 String8::mid(sl_int32 start, sl_int32 len) const
+{
+    return substring(start, start + len);
+}
+	
+String16 String16::mid(sl_int32 start, sl_int32 len) const
+{
+    return substring(start, start+len);
+}
+
+String8 SafeString8::mid(sl_int32 start, sl_int32 len) const
+{
+	String8 s(*this);
+	return s.mid(start, len);
+}
+
+String16 SafeString16::mid(sl_int32 start, sl_int32 len) const
+{
+	String16 s(*this);
+	return s.mid(start, len);
+}
+
 
 sl_int32 String8::indexOf(sl_char8 ch, sl_int32 start) const
 {
@@ -2072,39 +2246,18 @@ sl_int32 String16::indexOf(sl_char16 ch, sl_int32 start) const
 	}
 }
 
-sl_int32 String8::lastIndexOf(sl_char8 ch, sl_int32 start) const
+sl_int32 SafeString8::indexOf(sl_char8 ch, sl_int32 start) const
 {
-	sl_int32 count = length();
-	if (count == 0) {
-		return -1;
-	}
-	if (start < 0 || start >= count) {
-		start = count - 1;
-	}
-	sl_char8* pt = (sl_char8*)(Base::findMemoryReverse(m_data, ch, start + 1));
-	if (pt == sl_null) {
-		return -1;
-	} else {
-		return (sl_int32)(pt - m_data);
-	}
+	String8 s(*this);
+	return s.indexOf(ch, start);
 }
 
-sl_int32 String16::lastIndexOf(sl_char16 ch, sl_int32 start) const
+sl_int32 SafeString16::indexOf(sl_char16 ch, sl_int32 start) const
 {
-	sl_int32 count = length();
-	if (count == 0) {
-		return -1;
-	}
-	if (start < 0 || start >= count) {
-		start = count - 1;
-	}
-	sl_char16* pt = (sl_char16*)(Base::findMemoryReverse2(m_data, ch, start + 1));
-	if (pt == sl_null) {
-		return -1;
-	} else {
-		return (sl_int32)(pt - m_data);
-	}
+	String16 s(*this);
+	return s.indexOf(ch, start);
 }
+
 
 template <class ST, class CT, class TT>
 SLIB_INLINE sl_int32 _String_indexOf(const ST& str, const ST& pattern, sl_int32 start)
@@ -2148,6 +2301,66 @@ sl_int32 String16::indexOf(const String16& pattern, sl_int32 start) const
 	return _String_indexOf<String16, sl_char16, _TemplateFunc16>(*this, pattern, start);
 }
 
+sl_int32 SafeString8::indexOf(const String8& str, sl_int32 start) const
+{
+	String8 s(*this);
+	return s.indexOf(str, start);
+}
+
+sl_int32 SafeString16::indexOf(const String16& str, sl_int32 start) const
+{
+	String16 s(*this);
+	return s.indexOf(str, start);
+}
+
+
+sl_int32 String8::lastIndexOf(sl_char8 ch, sl_int32 start) const
+{
+	sl_int32 count = length();
+	if (count == 0) {
+		return -1;
+	}
+	if (start < 0 || start >= count) {
+		start = count - 1;
+	}
+	sl_char8* pt = (sl_char8*)(Base::findMemoryReverse(m_data, ch, start + 1));
+	if (pt == sl_null) {
+		return -1;
+	} else {
+		return (sl_int32)(pt - m_data);
+	}
+}
+
+sl_int32 String16::lastIndexOf(sl_char16 ch, sl_int32 start) const
+{
+	sl_int32 count = length();
+	if (count == 0) {
+		return -1;
+	}
+	if (start < 0 || start >= count) {
+		start = count - 1;
+	}
+	sl_char16* pt = (sl_char16*)(Base::findMemoryReverse2(m_data, ch, start + 1));
+	if (pt == sl_null) {
+		return -1;
+	} else {
+		return (sl_int32)(pt - m_data);
+	}
+}
+
+sl_int32 SafeString8::lastIndexOf(sl_char8 ch, sl_int32 start) const
+{
+	String8 s(*this);
+	return s.lastIndexOf(ch, start);
+}
+
+sl_int32 SafeString16::lastIndexOf(sl_char16 ch, sl_int32 start) const
+{
+	String16 s(*this);
+	return s.lastIndexOf(ch, start);
+}
+
+
 template <class ST, class CT, class TT>
 SLIB_INLINE sl_int32 _String_lastIndexOf(const ST& str, const ST& pattern, sl_int32 start)
 {
@@ -2187,6 +2400,19 @@ sl_int32 String16::lastIndexOf(const String16& pattern, sl_int32 start) const
 	return _String_lastIndexOf<String16, sl_char16, _TemplateFunc16>(*this, pattern, start);
 }
 
+sl_int32 SafeString8::lastIndexOf(const String8& str, sl_int32 start) const
+{
+	String8 s(*this);
+	return s.indexOf(str, start);
+}
+
+sl_int32 SafeString16::lastIndexOf(const String16& str, sl_int32 start) const
+{
+	String16 s(*this);
+	return s.indexOf(str, start);
+}
+
+
 sl_bool String8::startsWith(sl_char8 ch) const
 {
 	if (isEmpty()) {
@@ -2204,6 +2430,19 @@ sl_bool String16::startsWith(sl_char16 ch) const
 		return m_data[0] == ch;
 	}
 }
+
+sl_bool SafeString8::startsWith(sl_char8 ch) const
+{
+	String8 s(*this);
+	return s.startsWith(ch);
+}
+
+sl_bool SafeString16::startsWith(sl_char16 ch) const
+{
+	String16 s(*this);
+	return s.startsWith(ch);
+}
+
 
 sl_bool String8::startsWith(const String8& str) const
 {
@@ -2233,6 +2472,19 @@ sl_bool String16::startsWith(const String16& str) const
 	}
 }
 
+sl_bool SafeString8::startsWith(const String8& str) const
+{
+	String8 s(*this);
+	return s.startsWith(str);
+}
+
+sl_bool SafeString16::startsWith(const String16& str) const
+{
+	String16 s(*this);
+	return s.startsWith(str);
+}
+
+
 sl_bool String8::endsWith(sl_char8 ch) const
 {
 	sl_int32 count = length();
@@ -2252,6 +2504,19 @@ sl_bool String16::endsWith(sl_char16 ch) const
 		return m_data[count - 1] == ch;
 	}
 }
+
+sl_bool SafeString8::endsWith(sl_char8 ch) const
+{
+	String8 s(*this);
+	return s.endsWith(ch);
+}
+
+sl_bool SafeString16::endsWith(sl_char16 ch) const
+{
+	String16 s(*this);
+	return s.endsWith(ch);
+}
+
 
 sl_bool String8::endsWith(const String8& str) const
 {
@@ -2281,6 +2546,66 @@ sl_bool String16::endsWith(const String16& str) const
 	}
 }
 
+sl_bool SafeString8::endsWith(const String8& str) const
+{
+	String8 s(*this);
+	return s.endsWith(str);
+}
+
+sl_bool SafeString16::endsWith(const String16& str) const
+{
+	String16 s(*this);
+	return s.endsWith(str);
+}
+
+
+sl_bool String8::contains(sl_char8 ch) const
+{
+    return indexOf(ch) >= 0;
+}
+
+sl_bool String16::contains(sl_char16 ch) const
+{
+    return indexOf(ch) >= 0;
+}
+
+sl_bool SafeString8::constains(sl_char8 ch) const
+{
+	String8 s(*this);
+	return s.contains(ch);
+}
+
+sl_bool SafeString16::contains(sl_char16 ch) const
+{
+	String16 s(*this);
+	return s.contains(ch);
+}
+
+
+sl_bool String8::contains(const String8& str) const
+{
+    return indexOf(str) >= 0;
+}
+
+sl_bool String16::contains(const String16& str) const
+{
+    return indexOf(str) >= 0;
+}
+
+sl_bool SafeString8::contains(const String8& str) const
+{
+	String8 s(*this);
+	return s.contains(str);
+}
+
+sl_bool SafeString16::contains(const String16& str) const
+{
+	String16 s(*this);
+	return s.contains(str);
+}
+
+
+
 void String8::makeUpper()
 {
 	sl_char8* buf = m_data;
@@ -2302,6 +2627,19 @@ void String16::makeUpper()
 		}
 	}
 }
+
+void SafeString8::makeUpper()
+{
+	String8 s(*this);
+	s.makeUpper();
+}
+
+void SafeString16::makeUpper()
+{
+	String16 s(*this);
+	s.makeUpper();
+}
+
 
 void String8::makeLower()
 {
@@ -2325,6 +2663,19 @@ void String16::makeLower()
 	}
 }
 
+void SafeString8::makeLower()
+{
+	String8 s(*this);
+	s.makeLower();
+}
+
+void SafeString16::makeLower()
+{
+	String16 s(*this);
+	s.makeLower();
+}
+
+
 String8 String8::toUpper() const
 {
 	String8 ret = duplicate();
@@ -2339,6 +2690,19 @@ String16 String16::toUpper() const
 	return ret;
 }
 
+String8 SafeString8::toUpper() const
+{
+	String8 s(*this);
+	return s.toUpper();
+}
+
+String16 SafeString16::toUpper() const
+{
+	String16 s(*this);
+	return s.toUpper();
+}
+
+
 String8 String8::toLower() const
 {
 	String8 ret = duplicate();
@@ -2352,6 +2716,19 @@ String16 String16::toLower() const
 	ret.makeLower();
 	return ret;
 }
+
+String8 SafeString8::toLower() const
+{
+	String8 s(*this);
+	return s.toLower();
+}
+
+String16 SafeString16::toLower() const
+{
+	String16 s(*this);
+	return s.toLower();
+}
+
 
 struct STRING_REPLACE_SUBSET
 {
@@ -2423,6 +2800,19 @@ String16 String16::replaceAll(const String16& pattern, const String16& replaceme
 	return _String_replaceAll<String16, sl_char16, _TemplateFunc16>(*this, pattern, replacement);
 }
 
+String8 SafeString8::replaceAll(const String8& pattern, const String8& replacement) const
+{
+	String8 s(*this);
+	return s.replaceAll(pattern, replacement);
+}
+
+String16 SafeString16::replaceAll(const String16& pattern, const String16& replacement) const
+{
+	String16 s(*this);
+	return s.replaceAll(pattern, replacement);
+}
+
+
 template <class ST, class CT>
 SLIB_INLINE ST _String_trim(const ST& str)
 {
@@ -2458,6 +2848,19 @@ String16 String16::trim() const
 	return _String_trim<String16, sl_char16>(*this);
 }
 
+String8 SafeString8::trim() const
+{
+	String8 s(*this);
+	return s.trim();
+}
+
+String16 SafeString16::trim() const
+{
+	String16 s(*this);
+	return s.trim();
+}
+
+
 template <class ST, class CT>
 SLIB_INLINE ST _String_trimLeft(const ST& str)
 {
@@ -2486,6 +2889,19 @@ String16 String16::trimLeft() const
 	return _String_trimLeft<String16, sl_char16>(*this);
 }
 
+String8 SafeString8::trimLeft() const
+{
+	String8 s(*this);
+	return s.trimLeft();
+}
+
+String16 SafeString16::trimLeft() const
+{
+	String16 s(*this);
+	return s.trimLeft();
+}
+
+
 template <class ST, class CT>
 SLIB_INLINE ST _String_trimRight(const ST& str)
 {
@@ -2513,6 +2929,19 @@ String16 String16::trimRight() const
 {
 	return _String_trimRight<String16, sl_char16>(*this);
 }
+
+String8 SafeString8::trimRight() const
+{
+	String8 s(*this);
+	return s.trimRight();
+}
+
+String16 SafeString16::trimRight() const
+{
+	String16 s(*this);
+	return s.trimRight();
+}
+
 
 template <class ST>
 List<ST> _String_split(const ST& str, const ST& pattern)
@@ -2544,6 +2973,18 @@ List<String8> String8::split(const String8& pattern) const
 List<String16> String16::split(const String16& pattern) const
 {
 	return _String_split<String16>(*this, pattern);
+}
+
+List<String8> SafeString8::split(const String8& pattern) const
+{
+	String8 s(*this);
+	return s.split(pattern);
+}
+
+List<String16> SafeString16::split(const String16& pattern) const
+{
+	String16 s(*this);
+	return s.split(pattern);
 }
 
 
@@ -2591,6 +3032,19 @@ sl_uint32 String16::hashCode() const
 	}
 	return hash;
 }
+
+sl_uint32 SafeString8::hashCode() const
+{
+	String8 s(*this);
+	return s.hashCode();
+}
+
+sl_uint32 SafeString16::hashCode() const
+{
+	String16 s(*this);
+	return s.hashCode();
+}
+
 
 template <class ST, class CT>
 static sl_uint32 _String_applyBackslashEscapes(const ST& s, sl_bool flagDoubleQuote, CT* buf)
@@ -2684,6 +3138,19 @@ String16 String16::applyBackslashEscapes(sl_bool flagDoubleQuote)
 	_String_applyBackslashEscapes<String16, sl_char16>(*this, flagDoubleQuote, ret.data());
 	return ret;
 }
+
+String8 SafeString8::applyBackslashEscapes(sl_bool flagDoubleQuote)
+{
+	String8 s(*this);
+	return s.applyBackslashEscapes(flagDoubleQuote);
+}
+
+String8 SafeString16::applyBackslashEscapes(sl_bool flagDoubleQuote)
+{
+	String16 s(*this);
+	return s.applyBackslashEscapes(flagDoubleQuote);
+}
+
 
 template <class ST, class CT>
 SLIB_INLINE ST _String_parseBackslashEscapes(const CT* sz, sl_int32 n, sl_int32* lengthParsed, sl_bool* outFlagError)
@@ -2800,6 +3267,16 @@ String8 String8::parseBackslashEscapes(const sl_char8* sz, sl_int32 n, sl_int32*
 String16 String16::parseBackslashEscapes(const sl_char16* sz, sl_int32 n, sl_int32* lengthParsed, sl_bool* outFlagError)
 {
 	return _String_parseBackslashEscapes<String16, sl_char16>(sz, n, lengthParsed, outFlagError);
+}
+
+String8 String8::parseBackslashEscapes(const String8& str, sl_int32* lengthParsed, sl_bool* flagError)
+{
+    return parseBackslashEscapes(str.data(), str.length(), lengthParsed, flagError);
+}
+
+String16 String16::parseBackslashEscapes(String16& str, sl_int32* lengthParsed, sl_bool* flagError)
+{
+    return parseBackslashEscapes(str.data(), str.length(), lengthParsed, flagError);
 }
 
 
@@ -2941,6 +3418,17 @@ sl_bool StringBuffer16::add(const String16& str)
 }
 
 
+sl_int32 StringBuffer8::getLength() const
+{
+	return m_len;
+}
+
+sl_int32 StringBuffer16::getLength() const
+{
+	return m_len;
+}
+
+
 StringDataBuffer8::StringDataBuffer8()
 {
 	m_len = 0;
@@ -2950,6 +3438,7 @@ StringDataBuffer16::StringDataBuffer16()
 {
 	m_len = 0;
 }
+
 
 String8 StringDataBuffer8::merge() const
 {
@@ -2999,6 +3488,7 @@ String16 StringDataBuffer16::merge() const
 	return ret;
 }
 
+
 sl_bool StringDataBuffer8::add(const StringData& str)
 {
 	sl_int32 len = str.len;
@@ -3030,6 +3520,55 @@ sl_bool StringDataBuffer16::add(const StringData& str)
 		return sl_false;
 	}
 }
+
+
+sl_bool StringDataBuffer8::add(const sl_char8* buf, sl_uint32 length)
+{
+	StringData data;
+	data.sz8 = buf;
+	data.len = length;
+	return add(data);
+}
+
+sl_bool StringDataBuffer16::add(const sl_char16* buf, sl_uint32 length)
+{
+	StringData data;
+	data.sz16 = buf;
+	data.len = length;
+	return add(data);
+}
+
+
+sl_bool StringDataBuffer8::add(const sl_char8* buf, sl_uint32 length, const Memory& mem)
+{
+	StringData data;
+	data.sz8 = buf;
+	data.len = length;
+	data.mem = mem;
+	return add(data);
+}
+
+sl_bool StringDataBuffer16::add(const sl_char16* buf, sl_uint32 length, const Memory& mem)
+{
+	StringData data;
+	data.sz16 = buf;
+	data.len = length;
+	data.mem = mem;
+	return add(data);
+}
+
+
+sl_int32 StringDataBuffer8::getLength() const
+{
+	return m_len;
+}
+
+sl_int32 StringDataBuffer16::getLength() const
+{
+	return m_len;
+}
+
+
 
 sl_int32 _StringBase::getSz8Length(const sl_char8* utf8, sl_int32 count)
 {

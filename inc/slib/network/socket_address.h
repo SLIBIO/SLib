@@ -14,7 +14,7 @@ class SLIB_EXPORT SocketAddress
 {
 public:
 	IPAddress ip;
-	sl_int32 port;
+	sl_uint32 port;
 
 private:
 	struct _SocketAddress
@@ -23,7 +23,7 @@ private:
 			IPAddressType type;
 			sl_uint8 data[_SLIB_NET_IPADDRESS_SIZE];
 		} ip;
-		sl_int32 port;
+		sl_uint32 port;
 	};
 	static const _SocketAddress _none;
 
@@ -89,6 +89,12 @@ public:
 		return ip.isNone() || port == 0;
 	}
 
+	SLIB_INLINE void setNone()
+	{
+		ip.setNone();
+		port = 0;
+	}
+
 public:
 	int compare(const SocketAddress& other) const;
 	
@@ -105,6 +111,8 @@ public:
 	
 	static sl_int32 parse(SocketAddress* out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
+	static sl_bool parse(const String& str, SocketAddress* out);
+
 	sl_bool parse(const String& str);
 	
 	sl_uint32 getSystemSocketAddress(void* addr);
@@ -113,6 +121,12 @@ public:
 
 	// HostName:port
 	sl_bool setHostAddress(const String& address);
+
+public:
+	static sl_bool parseIPv4Range(const String& str, IPv4Address* from = sl_null, IPv4Address* to = sl_null);
+
+	static sl_bool parsePortRange(const String& str, sl_uint32* from = sl_null, sl_uint32* to = sl_null);
+
 };
 
 template <>

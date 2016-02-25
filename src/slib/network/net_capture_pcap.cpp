@@ -27,12 +27,14 @@ public:
 	
 	Ref<Thread> m_thread;
 
+	sl_bool m_flagInit;
 	sl_bool m_flagRunning;
 	
 public:
 	_NetPcapCapture()
-	{	
-		m_flagRunning = sl_true;
+	{
+		m_flagInit = sl_false;
+		m_flagRunning = sl_false;
 	}
 	
 	~_NetPcapCapture()
@@ -43,8 +45,6 @@ public:
 public:
 	static Ref<_NetPcapCapture> create(const NetCaptureParam& param)
 	{
-		Ref<_NetPcapCapture> ret;
-
 		String name = param.deviceName;		
 		String name8;
 		const char* szName;
@@ -66,19 +66,25 @@ public:
 		pcap_t* handle = pcap_open_live(szName, MAX_PACKET_SIZE, param.flagPromiscuous, param.timeoutRead, errBuf);
 		if (handle) {
 			if (pcap_setbuff(handle, param.sizeBuffer) == 0) {
-				ret = new _NetPcapCapture;
+				Ref<_NetPcapCapture> ret = new _NetPcapCapture;
 				if (ret.isNotNull()) {
 					ret->m_handle = handle;
 					ret->m_listener = param.listener;
-					ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(_NetPcapCapture, _run, ret.get()));
-					return ret;
+					ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_NetPcapCapture, _run, ret.get()));
+					if (ret->m_thread.isNotNull()) {
+						ret->m_flagInit = sl_true;
+						if (param.flagAutoStart) {
+							ret->start();
+						}
+						return ret;
+					} else {
+						SLIB_LOG_ERROR(TAG, "Failed to create thread");
+					}
 				} 
 			} else {
 				SLIB_LOG_ERROR(TAG, "Set Buffer Size Failed");
 			}
-			if (ret.isNull()) {
-				pcap_close(handle);
-			}
+			pcap_close(handle);
 		} else {
 			SLIB_LOG_ERROR(TAG, errBuf);
 		}
@@ -91,12 +97,20 @@ public:
 						if (pcap_set_timeout(handle, param.timeoutRead) == 0) {
 							int iRet = pcap_activate(handle);
 							if (iRet == 0 || iRet == PCAP_WARNING || iRet == PCAP_WARNING_PROMISC_NOTSUP || iRet == PCAP_WARNING_TSTAMP_TYPE_NOTSUP) {
-								ret = new _NetPcapCapture;
+								Ref<_NetPcapCapture> ret = new _NetPcapCapture;
 								if (ret.isNotNull()) {
 									ret->m_handle = handle;
 									ret->m_listener = param.listener;
-									ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(_NetPcapCapture, _run, ret.get()));
-									return ret;
+									ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_NetPcapCapture, _run, ret.get()));
+									if (ret->m_thread.isNotNull()) {
+										ret->m_flagInit = sl_true;
+										if (param.flagAutoStart) {
+											ret->start();
+										}
+										return ret;
+									} else {
+										SLIB_LOG_ERROR(TAG, "Failed to create thread");
+									}
 								}
 							} else {
 								SLIB_LOG_ERROR(TAG, "Activate Failed");
@@ -113,30 +127,46 @@ public:
 			} else {
 				SLIB_LOG_ERROR(TAG, "Set Snaplen Failed");
 			}
-			if (ret.isNull()) {
-				pcap_close(handle);
-			}
+			pcap_close(handle);
 		} else {
 			SLIB_LOG_ERROR(TAG, errBuf);
 		}
 #endif
-		return ret;
+		return Ref<_NetPcapCapture>::null();
 	}
 	
 	void release()
 	{
 		ObjectLocker lock(this);
-		if (!m_flagRunning) {
+		if (!m_flagInit) {
 			return;
 		}
-		m_flagRunning = sl_false;
-		
+		m_flagInit = sl_false;
+
+		m_flagRunning = sl_false;		
 		if (m_thread.isNotNull()) {
 			m_thread->finishAndWait();
 			m_thread.setNull();
 		}
 		
 		pcap_close(m_handle);
+	}
+
+	void start()
+	{
+		ObjectLocker lock(this);
+		if (!m_flagInit) {
+			return;
+		}
+
+		if (m_flagRunning) {
+			return;
+		}
+		if (m_thread.isNotNull()) {
+			if (m_thread->start()) {
+				m_flagRunning = sl_true;
+			}
+		}
 	}
 	
 	sl_bool isRunning()
@@ -148,16 +178,19 @@ public:
 	{
 		NetCapturePacket packet;
 
+		sl_uint8 buf[MAX_PACKET_SIZE];
+
 		while (Thread::isNotStoppingCurrent() && m_flagRunning) {
 			pcap_pkthdr* info = sl_null;
 			const sl_uint8* data = sl_null;
 			int ret = pcap_next_ex(m_handle, &info, &data);
 			if (ret == 1) {
-				packet.data = data;
+				packet.data = buf;
 				packet.length = info->len;
 				if (packet.length > info->caplen) {
 					packet.length = info->caplen;
 				}
+				Base::copyMemory(buf, data, packet.length);
 				sl_uint64 t = info->ts.tv_sec;
 				t = t * 1000000 + info->ts.tv_usec;
 				packet.time = t;
@@ -182,7 +215,7 @@ public:
 
 	sl_bool sendPacket(const void* buf, sl_uint32 size)
 	{
-		if (m_flagRunning) {
+		if (m_flagInit) {
 			int ret = pcap_sendpacket(m_handle, (const sl_uint8*)buf, size);
 			if (ret == 0) {
 				return sl_true;
@@ -193,7 +226,7 @@ public:
 	
 	String getLastErrorMessage()
 	{
-		if (m_flagRunning) {
+		if (m_flagInit) {
 			char* err = pcap_geterr(m_handle);
 			if (err) {
 				return err;

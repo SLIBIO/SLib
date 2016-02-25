@@ -14,7 +14,9 @@
 #	include <sys/socket.h>
 #	if defined(SLIB_PLATFORM_IS_LINUX)
 #		include <linux/tcp.h>
+#		include <linux/if.h>
 #		include <linux/if_packet.h>
+#		include <sys/ioctl.h>
 #	else
 #		include <netinet/tcp.h>
 #	endif
@@ -606,11 +608,11 @@ sl_bool _Socket_setNonBlocking(SOCKET fd, sl_bool flagEnable)
 {
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 	u_long flag = flagEnable ? 1 : 0;
-	return ioctlsocket(fd, FIONBIO, &flag) != -1;
+	return ioctlsocket(fd, FIONBIO, &flag) == 0;
 #else
 #	if defined(FIONBIO)
 	sl_int32 flag = flagEnable ? 1 : 0;
-	return ioctl(fd, FIONBIO, &flag) != -1;
+	return ioctl(fd, FIONBIO, &flag) == 0;
 #	else
 	return File::setNonBlocking(fd, flagEnable);
 #	endif
@@ -622,12 +624,46 @@ sl_bool Socket::setNonBlockingMode(sl_bool flagEnable)
 	if (isOpened()) {
 		if (_Socket_setNonBlocking((SOCKET)(m_socket), flagEnable)) {
 			return sl_true;
-		} else {
-			return sl_false;
 		}
-	} else {
-		return sl_false;
 	}
+	return sl_false;
+}
+
+sl_bool _Socket_setPromiscuousMode(SOCKET fd, const char* deviceName, sl_bool flagEnable)
+{
+#if defined(SLIB_PLATFORM_IS_LINUX)
+	ifreq ifopts;
+	Base::copyString(ifopts.ifr_name, deviceName, IFNAMSIZ-1);
+	int ret;
+	ret = ioctl(fd, SIOCGIFFLAGS, &ifopts);
+	if (ret == 0) {
+		if (flagEnable) {
+			ifopts.ifr_flags |= IFF_PROMISC;
+		} else {
+			ifopts.ifr_flags &= (~IFF_PROMISC);
+		}
+		ret = ioctl(fd, SIOCSIFFLAGS, &ifopts);
+		if (ret == 0) {
+			return sl_true;
+		}
+	}
+	return sl_false;
+#else
+	return sl_false;
+#endif
+}
+
+sl_bool Socket::setPromiscuousMode(const String& _deviceName, sl_bool flagEnable)
+{
+	if (isOpened()) {
+		String8 deviceName = _deviceName;
+		if (deviceName.isNotEmpty()) {
+			if (_Socket_setPromiscuousMode((SOCKET)(m_socket), deviceName.getBuf(), flagEnable)) {
+				return sl_true;
+			}
+		}
+	}
+	return sl_false;
 }
 
 sl_bool Socket::getLocalAddress(SocketAddress& out)

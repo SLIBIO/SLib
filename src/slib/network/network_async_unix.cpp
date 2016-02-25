@@ -242,6 +242,7 @@ public:
 	
 	void close()
 	{
+		AsyncTcpServerInstance::close();
 		m_socket.setNull();
 		setHandle(SLIB_FILE_INVALID_HANDLE);
 	}
@@ -278,10 +279,10 @@ public:
 	}
 };
 
-Ref<AsyncTcpServer> AsyncTcpServer::create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop)
+Ref<AsyncTcpServer> AsyncTcpServer::create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
 {
 	Ref<_Unix_AsyncTcpServerInstance> ret = _Unix_AsyncTcpServerInstance::create(socket, listener);
-	return AsyncTcpServer::create(ret.get(), loop);
+	return AsyncTcpServer::create(ret.get(), loop, flagAutoStart);
 }
 
 class _Unix_AsyncUdpSocketInstance : public AsyncUdpSocketInstance
@@ -320,14 +321,50 @@ public:
 	
 	void close()
 	{
+		AsyncUdpSocketInstance::close();
 		setHandle(SLIB_FILE_INVALID_HANDLE);
 		m_socket.setNull();
 	}
 	
 	void onOrder()
 	{
+		processSend();
+		processReceive();
+	}
+	
+	void onEvent(EventDesc* pev)
+	{
+		if (pev->flagIn) {
+			processReceive();
+		}
+	}
+	
+	void processSend()
+	{
 		Ref<Socket> socket = m_socket;
 		if (socket.isNull()) {
+			return;
+		}
+		if (!(socket->isOpened())) {
+			return;
+		}
+		while (Thread::isNotStoppingCurrent()) {
+			SendRequest request;
+			if (m_queueSendRequests.pop(&request)) {
+				socket->sendTo(request.addressTo, request.data.getBuf(), (sl_uint32)(request.data.size()));
+			} else {
+				break;
+			}
+		}
+	}
+	
+	void processReceive()
+	{
+		Ref<Socket> socket = m_socket;
+		if (socket.isNull()) {
+			return;
+		}
+		if (!(socket->isOpened())) {
 			return;
 		}
 		void* buf = m_buffer.getBuf();
@@ -342,22 +379,15 @@ public:
 			}
 		}
 	}
-	
-	void onEvent(EventDesc* pev)
-	{
-		if (pev->flagIn) {
-			onOrder();
-		}
-	}
 
 };
 
-Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ref<Socket>& socket, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop)
+Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ref<Socket>& socket, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
 {
 	Memory buffer = Memory::create(packetSize);
 	if (buffer.isNotEmpty()) {
 		Ref<_Unix_AsyncUdpSocketInstance> ret = _Unix_AsyncUdpSocketInstance::create(socket, listener, buffer);
-		return AsyncUdpSocket::create(ret.get(), loop);
+		return AsyncUdpSocket::create(ret.get(), loop, flagAutoStart);
 	}
 	return Ref<AsyncUdpSocket>::null();
 }

@@ -3,6 +3,7 @@
 #if defined(SLIB_DATABASE_SUPPORT_MYSQL)
 
 #include "../../../inc/thirdparty/mysql-connector/mysql.h"
+#include "../../../inc/thirdparty/mysql-connector/errmsg.h"
 
 #include "../../../inc/slib/core/thread.h"
 #include "../../../inc/slib/core/scoped_pointer.h"
@@ -13,6 +14,7 @@ MySQL_Param::MySQL_Param()
 {
 	port = 0;
 	flagAutoReconnect = sl_true;
+	flagMultipleStatements = sl_true;
 }
 
 class _MySQL_Database_Lib
@@ -40,6 +42,13 @@ public:
 void MySQL_Database::initThread()
 {
 	SLIB_SAFE_STATIC(_MySQL_Database_Lib, lib);
+#if !defined(SLIB_PLATFORM_IS_APPLE)
+	static SLIB_THREAD int check = 0;
+	if (check) {
+		return;
+	}
+	check = 1;
+#endif
 	Ref<Thread> thread = Thread::getCurrent();
 	if (thread.isNotNull()) {
 		Ref<Referable> ref = thread->getAttachedObject("MYSQL");
@@ -60,6 +69,7 @@ class _MySQL_Database : public MySQL_Database
 public:
 	MYSQL* m_mysql;
 
+public:
 	_MySQL_Database()
 	{
 		m_mysql = sl_null;
@@ -70,6 +80,7 @@ public:
 		::mysql_close(m_mysql);
 	}
 
+public:
 	static Ref<_MySQL_Database> connect(const MySQL_Param& param, String& outErrorMessage)
 	{
 		Ref<_MySQL_Database> ret;
@@ -85,7 +96,12 @@ public:
 			String8 password = param.password;
 			String8 db = param.db;
 
-			if (::mysql_real_connect(mysql, host.getBuf(), user.getBuf(), password.getBuf(), db.getBuf(), param.port, NULL, 0)) {
+			unsigned long flags = 0;
+			if (param.flagMultipleStatements) {
+				flags |= CLIENT_MULTI_STATEMENTS;
+			}
+
+			if (::mysql_real_connect(mysql, host.getBuf(), user.getBuf(), password.getBuf(), db.getBuf(), param.port, NULL, flags)) {
 
 				::mysql_set_character_set(mysql, "utf8");
 				::mysql_autocommit(mysql, 1);
@@ -107,6 +123,16 @@ public:
 			::mysql_close(mysql);
 		}
 		return ret;
+	}
+
+	sl_bool ping()
+	{
+		initThread();
+		ObjectLocker lock(this);
+		if (0 == ::mysql_ping(m_mysql)) {			
+			return sl_true;
+		}
+		return sl_false;
 	}
 
 	sl_bool execute(const String& sql, sl_uint64* pOutAffectedRowsCount)
@@ -809,20 +835,49 @@ public:
 	class _DatabaseStatement : public DatabaseStatement
 	{
 	public:
+		String m_sql;
+		MYSQL* m_mysql;
 		MYSQL_STMT* m_statement;
 
-		_DatabaseStatement(MySQL_Database* db, MYSQL_STMT* statement)
+	public:
+		_DatabaseStatement(_MySQL_Database* db, const String& sql)
 		{
 			m_db = db;
-			m_statement = statement;
+			m_sql = sql;
+			m_mysql = db->m_mysql;
+			m_statement = NULL;
 		}
 
 		~_DatabaseStatement()
 		{
-			::mysql_stmt_close(m_statement);
+			close();
 		}
 
-		sl_bool _execute(const Variant* params, sl_uint32 nParams)
+		sl_bool prepare()
+		{
+			ObjectLocker lock(m_db.get());
+			close();
+			MYSQL_STMT* statement = ::mysql_stmt_init(m_mysql);
+			if (statement) {
+				if (0 == ::mysql_stmt_prepare(statement, m_sql.getBuf(), m_sql.getLength())) {
+					m_statement = statement;
+					return sl_true;
+				}
+				::mysql_stmt_close(statement);
+			}
+			return sl_false;
+		}
+
+		void close()
+		{
+			ObjectLocker lock(m_db.get());
+			if (m_statement) {
+				::mysql_stmt_close(m_statement);
+				m_statement = NULL;
+			}
+		}
+
+		sl_bool _bind(const Variant* params, sl_uint32 nParams)
 		{
 			sl_uint32 n = (sl_uint32)(::mysql_stmt_param_count(m_statement));
 			if (n == nParams) {
@@ -903,14 +958,36 @@ public:
 							}
 						}
 						if (0 == ::mysql_stmt_bind_param(m_statement, bind)) {
-							if (0 == ::mysql_stmt_execute(m_statement)) {
-								return sl_true;
-							}
+							return sl_true;
 						}
 					}
 				} else {
-					if (0 == ::mysql_stmt_execute(m_statement)) {
-						return sl_true;
+					return sl_true;
+				}
+			}
+			return sl_false;
+		}
+
+		sl_bool _execute(const Variant* params, sl_uint32 nParams)
+		{
+			if (!m_statement) {
+				if (!(prepare())) {
+					return sl_false;
+				}
+			}
+			if (_bind(params, nParams)) {
+				if (0 == ::mysql_stmt_execute(m_statement)) {
+					return sl_true;
+				} else {
+					int err = ::mysql_stmt_errno(m_statement);
+					if (err == CR_SERVER_LOST || err == CR_SERVER_GONE_ERROR) {
+						if (prepare()) {
+							if (_bind(params, nParams)) {
+								if (0 == ::mysql_stmt_execute(m_statement)) {
+									return sl_true;
+								}
+							}
+						}
 					}
 				}
 			}
@@ -1037,18 +1114,13 @@ public:
 	{
 		initThread();
 		ObjectLocker lock(this);
-		Ref<DatabaseStatement> ret;
-		MYSQL_STMT* statement = ::mysql_stmt_init(m_mysql);
-		if (statement) {
-			if (0 == ::mysql_stmt_prepare(statement, sql.getBuf(), sql.getLength())) {
-				ret = new _DatabaseStatement(this, statement);
-				if (ret.isNotNull()) {
-					return ret;
-				}
+		Ref<_DatabaseStatement> ret = new _DatabaseStatement(this, sql);
+		if (ret.isNotNull()) {
+			if (ret->prepare()) {
+				return ret;
 			}
-			::mysql_stmt_close(statement);
 		}
-		return ret;
+		return Ref<DatabaseStatement>::null();
 	}
 
 	String getErrorMessage()

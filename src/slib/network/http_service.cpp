@@ -525,9 +525,9 @@ HttpService::~HttpService()
 
 sl_bool HttpService::_init(const HttpServiceParam& param)
 {
-	Ref<AsyncLoop> loop = AsyncLoop::create();
+	Ref<AsyncLoop> loop = AsyncLoop::create(sl_false);
 	if (loop.isNotNull()) {
-		Ref<AsyncIoLoop> ioLoop = AsyncIoLoop::create();
+		Ref<AsyncIoLoop> ioLoop = AsyncIoLoop::create(sl_false);
 		if (ioLoop.isNotNull()) {
 			Ref<ThreadPool> threadPool = ThreadPool::create();
 			if (threadPool.isNotNull()) {
@@ -542,6 +542,10 @@ sl_bool HttpService::_init(const HttpServiceParam& param)
 						return sl_false;
 					}
 				}
+				
+				loop->start();
+				ioLoop->start();
+
 				return sl_true;
 			}
 		}

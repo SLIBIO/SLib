@@ -37,6 +37,9 @@ void Service::run(const String& command)
 		startService();
 	} else if (command == "stop") {
 		stopService();
+	} else if (command == "restart") {
+		stopService();
+		startService();
 	} else if (command == "status") {
 		statusService();
 	} else if (command.isEmpty()) {
@@ -98,6 +101,14 @@ void Service::startService()
 		for (int i = 0; i < WAIT_SECONDS*10; i++) {
 			if (File::exists(pathPID)) {
 				SLIB_LOG(TAG, appName + " is STARTED");
+				Thread::sleep(5000);
+				appInst = System::createGlobalUniqueInstance(appName);
+				if (appInst) {
+					SLIB_LOG(TAG, appName + " is NOT RUNNING");
+					System::freeGlobalUniqueInstance(appInst);
+				} else {
+					SLIB_LOG(TAG, appName + " is RUNNING");
+				}
 				return;
 			}
 			System::sleep(100);
@@ -146,10 +157,10 @@ void Service::statusService()
 	String appName = getServiceName();
 	void* appInst = System::createGlobalUniqueInstance(appName);
 	if (appInst) {
-		SLIB_LOG("ServiceStatus", appName + " is NOT RUNNING");
+		SLIB_LOG(TAG, appName + " is NOT RUNNING");
 		System::freeGlobalUniqueInstance(appInst);
 	} else {
-		SLIB_LOG("ServiceStatus", appName + " is RUNNING");
+		SLIB_LOG(TAG, appName + " is RUNNING");
 	}
 }
 
@@ -172,7 +183,8 @@ void Service::runService()
 	if (onStartService()) {
 		m_threadRun = Thread::start(SLIB_CALLBACK_CLASS(Service, onRunService, this));
 	}
-	while (1)
+	Ref<Thread> thread = m_threadRun;
+	while (thread.isNotNull() && thread->isRunning())
 	{
 		if (File::exists(pidFileName)) {
 			System::sleep(500);

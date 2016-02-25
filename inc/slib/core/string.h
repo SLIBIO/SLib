@@ -273,7 +273,12 @@ public:
 	{
 		*SLIB_STR_PLEN(m_data) = len;
 	}
-	
+
+	SLIB_INLINE void setHash(sl_uint32 hash)
+	{
+		*SLIB_STR_PHASH(m_data) = hash;
+	}
+
 	SLIB_INLINE sl_bool isNull() const
 	{
 		return m_data == (sl_char8*)(_String_Null.data);
@@ -964,10 +969,7 @@ public:
 	}
 
 public:
-	SLIB_INLINE String8 duplicate() const
-	{
-		return String8(m_data, length());
-	}
+	String8 duplicate() const;
 
 	Memory toMemory() const;
 
@@ -987,20 +989,11 @@ public:
 
 	String8 substring(sl_int32 start, sl_int32 end = -1) const;
 	
-	SLIB_INLINE String8 left(sl_uint32 len) const
-	{
-		return substring(0, len);
-	}
+	String8 left(sl_uint32 len) const;
 	
-	SLIB_INLINE String8 right(sl_uint32 len) const
-	{
-		return substring(length() - len);
-	}
+	String8 right(sl_uint32 len) const;
 	
-	SLIB_INLINE String8 mid(sl_int32 start, sl_int32 len) const
-	{
-		return substring(start, start + len);
-	}
+	String8 mid(sl_int32 start, sl_int32 len) const;
 
 	sl_int32 indexOf(sl_char8 ch, sl_int32 start = 0) const;
 	
@@ -1017,14 +1010,18 @@ public:
 	sl_bool endsWith(sl_char8 ch) const;
 	
 	sl_bool endsWith(const String8& str) const;
-	
+
+	sl_bool contains(sl_char8 ch) const;
+
+	sl_bool contains(const String8& str) const;
+
 	void makeUpper();
 	
 	void makeLower();
 	
-	String8 toLower() const;
-	
 	String8 toUpper() const;
+	
+	String8 toLower() const;
 	
 	String8 replaceAll(const String8& pattern, const String8& replacement) const;
 	
@@ -1042,10 +1039,7 @@ public:
 	
 	static String8 parseBackslashEscapes(const sl_char8* input, sl_int32 len, sl_int32* lengthParsed = sl_null, sl_bool* flagError = sl_null);
 	
-	SLIB_INLINE static String8 parseBackslashEscapes(const String8& str, sl_int32* lengthParsed = sl_null, sl_bool* flagError = sl_null)
-	{
-		return parseBackslashEscapes(str.data(), str.length(), lengthParsed, flagError);
-	}
+	static String8 parseBackslashEscapes(const String8& str, sl_int32* lengthParsed = sl_null, sl_bool* flagError = sl_null);
 	
 public:
 	// radix: 2 ~ 64,   flagUpperCase only works if radix <= 36 (0~9a~z)
@@ -1057,80 +1051,76 @@ public:
 	
 	static String8 fromUint64(sl_uint64 value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false);
 	
-	SLIB_INLINE static String8 fromInt(sl_reg value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false)
-	{
-#ifdef SLIB_ARCH_IS_64BIT
-		return fromInt64(value, radix, minWidth, flagUpperCase);
-#else
-		return fromInt32(value, radix, minWidth, flagUpperCase);
-#endif
-	}
+	static String8 fromInt(sl_reg value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false);
 	
-	SLIB_INLINE static String8 fromSize(sl_size value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false)
-	{
-#ifdef SLIB_ARCH_IS_64BIT
-		return fromUint64(value, radix, minWidth, flagUpperCase);
-#else
-		return fromUint32(value, radix, minWidth, flagUpperCase);
-#endif
-	}
+	static String8 fromSize(sl_size value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false);
 
 	static String8 fromFloat(float value, sl_int32 precision = -1, sl_bool flagZeroPadding = sl_false, sl_int32 minWidthIntegral = 1);
 	
 	static String8 fromDouble(double value, sl_int32 precision = -1, sl_bool flagZeroPadding = sl_false, sl_int32 minWidthIntegral = 1);
 
-	SLIB_INLINE static String8 fromPointerValue(const void* pointer)
-	{
-#ifdef SLIB_ARCH_IS_64BIT
-		return fromUint64((sl_uint64)(pointer), 16, 16, sl_true);
-#else
-		return fromUint32((sl_uint32)(pointer), 16, 8, sl_true);
-#endif
-	}
+	static String8 fromPointerValue(const void* pointer);
 
 	static String8 fromBoolean(sl_bool value);
 	
 	static String8 makeHexString(const void* data, sl_int32 size);
 	
-	SLIB_INLINE static String8 makeHexString(Memory mem)
-	{
-		return makeHexString(mem.getBuf(), (sl_uint32)(mem.getSize()));
-	}
+	static String8 makeHexString(const Memory& mem);
 
 	
-	static sl_int32 parseInt32(sl_int32* _out, const char*sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_int32 radix = 10);
+	static sl_int32 parseInt32(sl_int32 radix, sl_int32* _out, const char*sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
-	static sl_int32 parseInt32(sl_int32* _out, const sl_char16*sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_int32 radix = 10);
+	static sl_int32 parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16*sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
-	sl_bool parseInt32(sl_int32* _out, sl_int32 radix = 10) const;
+	sl_bool parseInt32(sl_int32 radix, sl_int32* _out) const;
+
+	sl_int32 parseInt32(sl_int32 radix = 10, sl_int32 def = 0) const;
 
 	
-	static sl_int32 parseUint32(sl_uint32* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_int32 radix = 10);
+	static sl_int32 parseUint32(sl_int32 radix, sl_uint32* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
-	static sl_int32 parseUint32(sl_uint32* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_int32 radix = 10);
+	static sl_int32 parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
-	sl_bool parseUint32(sl_uint32* _out, sl_int32 radix = 10) const;
+	sl_bool parseUint32(sl_int32 radix, sl_uint32* _out) const;
+
+	sl_uint32 parseUint32(sl_int32 radix = 10, sl_uint32 def = 0) const;
+	
+
+	static sl_int32 parseInt64(sl_int32 radix, sl_int64* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	
+	static sl_int32 parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	
+	sl_bool parseInt64(sl_int32 radix, sl_int64* _out) const;
+
+	sl_int64 parseInt64(sl_int32 radix = 10, sl_int64 def = 0) const;
 
 	
-	static sl_int32 parseInt64(sl_int64* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_int32 radix = 10);
+	static sl_int32 parseUint64(sl_int32 radix, sl_uint64* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
-	static sl_int32 parseInt64(sl_int64* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_int32 radix = 10);
+	static sl_int32 parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
-	sl_bool parseInt64(sl_int64* _out, sl_int32 radix = 10) const;
+	sl_bool parseUint64(sl_int32 radix, sl_uint64* _out) const;
 
-	
-	static sl_int32 parseUint64(sl_uint64* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_int32 radix = 10);
-	
-	static sl_int32 parseUint64(sl_uint64* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_int32 radix = 10);
-	
-	sl_bool parseUint64(sl_uint64* _out, sl_int32 radix = 10) const;
+	sl_uint64 parseUint64(sl_int32 radix = 10, sl_uint64 def = 0) const;
 
-	
+
+	sl_bool parseInt(sl_int32 radix, sl_reg* _out) const;
+
+	sl_reg parseInt(sl_int32 radix = 10, sl_reg def = 0) const;
+
+
+	sl_bool parseSize(sl_int32 radix, sl_size* _out) const;
+
+	sl_size parseSize(sl_int32 radix = 10, sl_size def = 0) const;
+
+
 	static sl_int32 parseFloat(float* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
 	static sl_int32 parseFloat(float* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
 	sl_bool parseFloat(float* _out) const;
+
+	float parseFloat(float def = 0) const;
 
 	
 	static sl_int32 parseDouble(double* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
@@ -1139,6 +1129,8 @@ public:
 	
 	sl_bool parseDouble(double* _out) const;
 
+	double parseDouble(double def = 0) const;
+
 	
 	static sl_int32 parseHexString(void* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
@@ -1146,81 +1138,7 @@ public:
 	
 	sl_bool parseHexString(void* _out) const;
 
-	
-	SLIB_INLINE sl_bool parseInt(sl_reg* _out, sl_int32 radix = 10) const
-	{
-#ifdef SLIB_ARCH_IS_64BIT
-		return parseInt64(_out, radix);
-#else
-		return parseInt32(_out, radix);
-#endif
-	}
-	
-	SLIB_INLINE sl_bool parseSize(sl_size* _out, sl_int32 radix = 10) const
-	{
-#ifdef SLIB_ARCH_IS_64BIT
-		return parseUint64(_out, radix);
-#else
-		return parseUint32(_out, radix);
-#endif
-	}
 
-	SLIB_INLINE sl_int32 parseInt32(sl_int32 radix = 10, sl_int32 def = 0) const
-	{
-		sl_int32 _out = def;
-		parseInt32(&_out, radix);
-		return _out;
-	}
-	
-	SLIB_INLINE sl_uint32 parseUint32(sl_int32 radix = 10, sl_uint32 def = 0) const
-	{
-		sl_uint32 _out = def;
-		parseUint32(&_out, radix);
-		return _out;
-	}
-	
-	SLIB_INLINE sl_int64 parseInt64(sl_int32 radix = 10, sl_int64 def = 0) const
-	{
-		sl_int64 _out = def;
-		parseInt64(&_out, radix);
-		return _out;
-	}
-	
-	SLIB_INLINE sl_uint64 parseUint64(sl_int32 radix = 10, sl_uint64 def = 0) const
-	{
-		sl_uint64 _out = def;
-		parseUint64(&_out, radix);
-		return _out;
-	}
-	
-	SLIB_INLINE sl_reg parseInt(sl_int32 radix = 10, sl_reg def = 0) const
-	{
-		sl_reg _out = def;
-		parseInt(&_out, radix);
-		return _out;
-	}
-	
-	SLIB_INLINE sl_size parseSize(sl_int32 radix = 10, sl_size def = 0) const
-	{
-		sl_size _out = def;
-		parseSize(&_out, radix);
-		return _out;
-	}
-	
-	SLIB_INLINE float parseFloat(float def = 0) const
-	{
-		float _out = def;
-		parseFloat(&_out);
-		return _out;
-	}
-	
-	SLIB_INLINE double parseDouble(double def = 0) const
-	{
-		double _out = def;
-		parseDouble(&_out);
-		return _out;
-	}
-	
 public:
 	// utf8 conversion
 	static sl_int32 utf8ToUtf16(const sl_char8* utf8, sl_int32 lenUtf8, sl_char16* utf16, sl_int32 lenUtf16Buffer);
@@ -1481,10 +1399,15 @@ public:
 	{
 		return *SLIB_STR_PLEN(m_data);
 	}
-		
+	
 	SLIB_INLINE void setLength(sl_uint32 len)
 	{
 		*SLIB_STR_PLEN(m_data) = len;
+	}
+
+	SLIB_INLINE void setHash(sl_uint32 hash)
+	{
+		*SLIB_STR_PHASH(m_data) = hash;
 	}
 
 	SLIB_INLINE sl_bool isNull() const
@@ -2177,10 +2100,7 @@ public:
 	}
 
 public:
-	SLIB_INLINE String16 duplicate() const
-	{
-		return String16(m_data, length());
-	}
+	String16 duplicate() const;
 
 	Memory toMemory() const;
 
@@ -2193,20 +2113,11 @@ public:
 
 	String16 substring(sl_int32 start, sl_int32 end = -1) const;
 	
-	SLIB_INLINE String16 left(sl_uint32 len) const
-	{
-		return substring( 0, len );
-	}
+	String16 left(sl_uint32 len) const;
 	
-	SLIB_INLINE String16 right(sl_uint32 len) const
-	{
-		return substring(length()-len);
-	}
+	String16 right(sl_uint32 len) const;
 	
-	SLIB_INLINE String16 mid(sl_int32 start, sl_int32 len) const
-	{
-		return substring(start, start+len);
-	}
+	String16 mid(sl_int32 start, sl_int32 len) const;
 
 	sl_int32 indexOf(sl_char16 ch, sl_int32 start = 0) const;
 	
@@ -2223,14 +2134,18 @@ public:
 	sl_bool endsWith(sl_char16 ch) const;
 	
 	sl_bool endsWith(const String16& str) const;
+
+	sl_bool contains(sl_char16 ch) const;
+
+	sl_bool contains(const String16& str) const;
 	
 	void makeUpper();
 	
 	void makeLower();
 	
-	String16 toLower() const;
-	
 	String16 toUpper() const;
+	
+	String16 toLower() const;
 	
 	String16 replaceAll(const String16& pattern, const String16& replacement) const;
 	
@@ -2248,10 +2163,7 @@ public:
 	
 	static String16 parseBackslashEscapes(const sl_char16* input, sl_int32 len, sl_int32* lengthParsed = sl_null, sl_bool* flagError = sl_null);
 	
-	SLIB_INLINE static String16 parseBackslashEscapes(String16& str, sl_int32* lengthParsed = sl_null, sl_bool* flagError = sl_null)
-	{
-		return parseBackslashEscapes(str.data(), str.length(), lengthParsed, flagError);
-	}
+	static String16 parseBackslashEscapes(String16& str, sl_int32* lengthParsed = sl_null, sl_bool* flagError = sl_null);
 
 public:
 	// radix: 2 ~ 64,   flagUpperCase only works if radix <= 36 (0~9a~z)
@@ -2263,169 +2175,92 @@ public:
 	
 	static String16 fromUint64(sl_uint64 value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false);
 	
-	SLIB_INLINE static String16 fromInt(sl_reg value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false)
-	{
-#ifdef SLIB_ARCH_IS_64BIT
-		return fromInt64(value, radix, minWidth, flagUpperCase);
-#else
-		return fromInt32(value, radix, minWidth, flagUpperCase);
-#endif
-	}
+	static String16 fromInt(sl_reg value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false);
 	
-	SLIB_INLINE static String16 fromSize(sl_size value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false)
-	{
-#ifdef SLIB_ARCH_IS_64BIT
-		return fromUint64(value, radix, minWidth, flagUpperCase);
-#else
-		return fromUint32(value, radix, minWidth, flagUpperCase);
-#endif
-	}
+	static String16 fromSize(sl_size value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false);
 
 	static String16 fromFloat(float value, sl_int32 precision = -1, sl_bool flagZeroPadding = sl_false, sl_int32 minWidthIntegral = 1);
 	
 	static String16 fromDouble(double value, sl_int32 precision = -1, sl_bool flagZeroPadding = sl_false, sl_int32 minWidthIntegral = 1);
 
-	SLIB_INLINE static String16 fromPointerValue(const void* pointer)
-	{
-#ifdef SLIB_ARCH_IS_64BIT
-		return fromUint64((sl_uint64)(pointer), 16, 16, sl_true);
-#else
-		return fromUint32((sl_uint32)(pointer), 16, 8, sl_true);
-#endif
-	}
+	static String16 fromPointerValue(const void* pointer);
 
 	static String16 fromBoolean(sl_bool value);
 
 	static String16 makeHexString(const void* data, sl_int32 size);
 	
-	SLIB_INLINE static String16 makeHexString(Memory mem)
-	{
-		return makeHexString(mem.getBuf(), (sl_uint32)(mem.getSize()));
-	}
+	static String16 makeHexString(const Memory& mem);
 
 	
-	static sl_int32 parseInt32(sl_int32* _out, const char*sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_int32 radix = 10);
+	static sl_int32 parseInt32(sl_int32 radix, sl_int32* _out, const char*sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
-	static sl_int32 parseInt32(sl_int32* _out, const sl_char16*sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_int32 radix = 10);
+	static sl_int32 parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16*sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
-	sl_bool parseInt32(sl_int32* _out, sl_int32 radix = 10) const;
+	sl_bool parseInt32(sl_int32 radix, sl_int32* _out) const;
+
+	sl_int32 parseInt32(sl_int32 radix = 10, sl_int32 def = 0) const;
 
 	
-	static sl_int32 parseUint32(sl_uint32* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_int32 radix = 10);
+	static sl_int32 parseUint32(sl_int32 radix, sl_uint32* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
-	static sl_int32 parseUint32(sl_uint32* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_int32 radix = 10);
+	static sl_int32 parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
-	sl_bool parseUint32(sl_uint32* _out, sl_int32 radix = 10) const;
+	sl_bool parseUint32(sl_int32 radix, sl_uint32* _out) const;
+
+	sl_uint32 parseUint32(sl_int32 radix = 10, sl_uint32 def = 0) const;
 
 	
-	static sl_int32 parseInt64(sl_int64* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_int32 radix = 10);
+	static sl_int32 parseInt64(sl_int32 radix, sl_int64* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
-	static sl_int32 parseInt64(sl_int64* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_int32 radix = 10);
+	static sl_int32 parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
-	sl_bool parseInt64(sl_int64* _out, sl_int32 radix = 10) const;
+	sl_bool parseInt64(sl_int32 radix, sl_int64* _out) const;
 	
+	sl_int64 parseInt64(sl_int32 radix = 10, sl_int64 def = 0) const;
 
-	static sl_int32 parseUint64(sl_uint64* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_int32 radix = 10);
-	
-	static sl_int32 parseUint64(sl_uint64* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_int32 radix = 10);
-	
-	sl_bool parseUint64(sl_uint64* _out, sl_int32 radix = 10) const;
 
+	static sl_int32 parseUint64(sl_int32 radix, sl_uint64* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
+	static sl_int32 parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	
+	sl_bool parseUint64(sl_int32 radix, sl_uint64* _out) const;
+	
+	sl_uint64 parseUint64(sl_int32 radix = 10, sl_uint64 def = 0) const;
+
+
+	sl_bool parseInt(sl_int32 radix, sl_reg* _out) const;
+
+	sl_reg parseInt(sl_int32 radix = 10, sl_reg def = 0) const;
+
+
+	sl_bool parseSize(sl_int32 radix, sl_size* _out) const;
+
+	sl_size parseSize(sl_int32 radix = 10, sl_size def = 0) const;
+
+
 	static sl_int32 parseFloat(float* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
 	static sl_int32 parseFloat(float* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
 	sl_bool parseFloat(float* _out) const;
 
-	
+	float parseFloat(float def = 0) const;
+
+
 	static sl_int32 parseDouble(double* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
 	static sl_int32 parseDouble(double* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
 	sl_bool parseDouble(double* _out) const;
 
-	
+	double parseDouble(double def = 0) const;
+
+
 	static sl_int32 parseHexString(void* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
 	static sl_int32 parseHexString(void* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
 	sl_bool parseHexString(void* _out) const;
-
-	
-	SLIB_INLINE sl_bool parseInt(sl_reg* _out, sl_int32 radix = 10) const
-	{
-#ifdef SLIB_ARCH_IS_64BIT
-		return parseInt64(_out, radix);
-#else
-		return parseInt32(_out, radix);
-#endif
-	}
-	
-	SLIB_INLINE sl_bool parseSize(sl_size* _out, sl_int32 radix = 10) const
-	{
-#ifdef SLIB_ARCH_IS_64BIT
-		return parseUint64(_out, radix);
-#else
-		return parseUint32(_out, radix);
-#endif
-	}
-
-	SLIB_INLINE sl_int32 parseInt32(sl_int32 radix = 10, sl_int32 def = 0) const
-	{
-		sl_int32 _out = def;
-		parseInt32(&_out, radix);
-		return _out;
-	}
-	
-	SLIB_INLINE sl_uint32 parseUint32(sl_int32 radix = 10, sl_uint32 def = 0) const
-	{
-		sl_uint32 _out = def;
-		parseUint32(&_out, radix);
-		return _out;
-	}
-	
-	SLIB_INLINE sl_int64 parseInt64(sl_int32 radix = 10, sl_int64 def = 0) const
-	{
-		sl_int64 _out = def;
-		parseInt64(&_out, radix);
-		return _out;
-	}
-	
-	SLIB_INLINE sl_uint64 parseUint64(sl_int32 radix = 10, sl_uint64 def = 0) const
-	{
-		sl_uint64 _out = def;
-		parseUint64(&_out, radix);
-		return _out;
-	}
-	
-	SLIB_INLINE sl_reg parseInt(sl_int32 radix = 10, sl_reg def = 0) const
-	{
-		sl_reg _out = def;
-		parseInt(&_out, radix);
-		return _out;
-	}
-	
-	SLIB_INLINE sl_size parseSize(sl_int32 radix = 10, sl_size def = 0) const
-	{
-		sl_size _out = def;
-		parseSize(&_out, radix);
-		return _out;
-	}
-	
-	SLIB_INLINE float parseFloat(float def = 0) const
-	{
-		float _out = def;
-		parseFloat(&_out);
-		return _out;
-	}
-	
-	SLIB_INLINE double parseDouble(double def = 0) const
-	{
-		double _out = def;
-		parseDouble(&_out);
-		return _out;
-	}
 
 public:
 	// utf8 conversion
@@ -3293,194 +3128,109 @@ public:
 	}
 	
 public:
-	SLIB_INLINE String8 duplicate() const
-	{
-		String8 s(*this);
-		return s.duplicate();
-	}
+	String8 duplicate() const;
 	
-	SLIB_INLINE Memory toMemory() const
-	{
-		String8 s(*this);
-		return s.toMemory();
-	}
+	Memory toMemory() const;
 	
-	SLIB_INLINE sl_uint32 getUtf16(sl_char16* utf16, sl_int32 len) const
-	{
-		String8 s(*this);
-		return s.getUtf16(utf16, len);
-	}
+	sl_uint32 getUtf16(sl_char16* utf16, sl_int32 len) const;
 	
-	SLIB_INLINE StringData getUtf16() const
-	{
-		String8 s(*this);
-		return s.getUtf16();
-	}
+	StringData getUtf16() const;
 	
 	// contains null character at last
-	SLIB_INLINE Memory toUtf16() const
-	{
-		String8 s(*this);
-		return s.toUtf16();
-	}
+	Memory toUtf16() const;
 	
-	SLIB_INLINE sl_uint32 getUtf32(sl_char32* utf32, sl_int32 len) const
-	{
-		String8 s(*this);
-		return s.getUtf32(utf32, len);
-	}
+	sl_uint32 getUtf32(sl_char32* utf32, sl_int32 len) const;
 	
-	SLIB_INLINE StringData getUtf32() const
-	{
-		String8 s(*this);
-		return s.getUtf32();
-	}
+	StringData getUtf32() const;
 	
 	// contains null character at last
-	SLIB_INLINE Memory toUtf32() const
-	{
-		String8 s(*this);
-		return s.toUtf32();
-	}
+	Memory toUtf32() const;
 	
-	SLIB_INLINE String8 substring(sl_int32 start, sl_int32 end = -1) const
-	{
-		String8 s(*this);
-		return s.substring(start, end);
-	}
+	String8 substring(sl_int32 start, sl_int32 end = -1) const;
 	
-	SLIB_INLINE String8 left(sl_uint32 len) const
-	{
-		String8 s(*this);
-		return s.left(len);
-	}
+	String8 left(sl_uint32 len) const;
 	
-	SLIB_INLINE String8 right(sl_uint32 len) const
-	{
-		String8 s(*this);
-		return s.right(len);
-	}
+	String8 right(sl_uint32 len) const;
 	
-	SLIB_INLINE String8 mid(sl_int32 start, sl_int32 len) const
-	{
-		String8 s(*this);
-		return s.mid(start, len);
-	}
+	String8 mid(sl_int32 start, sl_int32 len) const;
 	
-	SLIB_INLINE sl_int32 indexOf(sl_char8 ch, sl_int32 start = 0) const
-	{
-		String8 s(*this);
-		return s.indexOf(ch, start);
-	}
+	sl_int32 indexOf(sl_char8 ch, sl_int32 start = 0) const;
 	
-	SLIB_INLINE sl_int32 indexOf(const String8& str, sl_int32 start = 0) const
-	{
-		String8 s(*this);
-		return s.indexOf(str, start);
-	}
+	sl_int32 indexOf(const String8& str, sl_int32 start = 0) const;
 	
-	SLIB_INLINE sl_int32 lastIndexOf(sl_char8 ch, sl_int32 start = -1) const
-	{
-		String8 s(*this);
-		return s.lastIndexOf(ch, start);
-	}
+	sl_int32 lastIndexOf(sl_char8 ch, sl_int32 start = -1) const;
 	
-	SLIB_INLINE sl_int32 lastIndexOf(const String8& str, sl_int32 start = -1) const
-	{
-		String8 s(*this);
-		return s.indexOf(str, start);
-	}
+	sl_int32 lastIndexOf(const String8& str, sl_int32 start = -1) const;
 	
-	SLIB_INLINE sl_bool startsWith(sl_char8 ch) const
-	{
-		String8 s(*this);
-		return s.startsWith(ch);
-	}
+	sl_bool startsWith(sl_char8 ch) const;
 	
-	SLIB_INLINE sl_bool startsWith(const String8& str) const
-	{
-		String8 s(*this);
-		return s.startsWith(str);
-	}
+	sl_bool startsWith(const String8& str) const;
 	
-	SLIB_INLINE sl_bool endsWith(sl_char8 ch) const
-	{
-		String8 s(*this);
-		return s.endsWith(ch);
-	}
+	sl_bool endsWith(sl_char8 ch) const;
 	
-	SLIB_INLINE sl_bool endsWith(const String8& str) const
-	{
-		String8 s(*this);
-		return s.endsWith(str);
-	}
-	
-	SLIB_INLINE void makeUpper()
-	{
-		String8 s(*this);
-		s.makeUpper();
-	}
-	
-	SLIB_INLINE void makeLower()
-	{
-		String8 s(*this);
-		s.makeLower();
-	}
-	
-	SLIB_INLINE String8 toLower() const
-	{
-		String8 s(*this);
-		return s.toLower();
-	}
-	
-	SLIB_INLINE String8 toUpper() const
-	{
-		String8 s(*this);
-		return s.toUpper();
-	}
-	
-	SLIB_INLINE String8 replaceAll(const String8& pattern, const String8& replacement) const
-	{
-		String8 s(*this);
-		return s.replaceAll(pattern, replacement);
-	}
+	sl_bool endsWith(const String8& str) const;
 
-	SLIB_INLINE String8 trim() const
-	{
-		String8 s(*this);
-		return s.trim();
-	}
+	sl_bool constains(sl_char8 ch) const;
+
+	sl_bool contains(const String8& str) const;
+
+	void makeUpper();
 	
-	SLIB_INLINE String8 trimLeft() const
-	{
-		String8 s(*this);
-		return s.trimLeft();
-	}
+	void makeLower();
 	
-	SLIB_INLINE String8 trimRight() const
-	{
-		String8 s(*this);
-		return s.trimRight();
-	}
+	String8 toUpper() const;
 	
-	SLIB_INLINE List<String8> split(const String8& pattern) const
-	{
-		String8 s(*this);
-		return s.split(pattern);
-	}
+	String8 toLower() const;
 	
-	SLIB_INLINE sl_uint32 hashCode() const
-	{
-		String8 s(*this);
-		return s.hashCode();
-	}
+	String8 replaceAll(const String8& pattern, const String8& replacement) const;
+
+	String8 trim() const;
 	
-	SLIB_INLINE String8 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true)
-	{
-		String8 s(*this);
-		return s.applyBackslashEscapes(flagDoubleQuote);
-	}
+	String8 trimLeft() const;
 	
+	String8 trimRight() const;
+	
+	List<String8> split(const String8& pattern) const;
+	
+	sl_uint32 hashCode() const;
+	
+	String8 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true);
+		
+public:
+	sl_bool parseInt32(sl_int32 radix, sl_int32* _out) const;
+
+	sl_int32 parseInt32(sl_int32 radix = 10, sl_int32 def = 0) const;
+
+	sl_bool parseUint32(sl_int32 radix, sl_uint32* _out) const;
+
+	sl_uint32 parseUint32(sl_int32 radix = 10, sl_uint32 def = 0) const;
+
+	sl_bool parseInt64(sl_int32 radix, sl_int64* _out) const;
+
+	sl_int64 parseInt64(sl_int32 radix = 10, sl_int64 def = 0) const;
+
+	sl_bool parseUint64(sl_int32 radix, sl_uint64* _out) const;
+
+	sl_uint64 parseUint64(sl_int32 radix = 10, sl_uint64 def = 0) const;
+
+	sl_bool parseInt(sl_int32 radix, sl_reg* _out) const;
+
+	sl_reg parseInt(sl_int32 radix = 10, sl_reg def = 0) const;
+
+	sl_bool parseSize(sl_int32 radix, sl_size* _out) const;
+
+	sl_size parseSize(sl_int32 radix = 10, sl_size def = 0) const;
+
+	sl_bool parseFloat(float* _out) const;
+
+	float parseFloat(float def = 0) const;
+
+	sl_bool parseDouble(double* _out) const;
+
+	double parseDouble(double def = 0) const;
+
+	sl_bool parseHexString(void* _out) const;
+
 private:
 	SLIB_INLINE static void _increaseReference(sl_char8* data)
 	{
@@ -4293,176 +4043,104 @@ public:
 	
 	
 public:
-	SLIB_INLINE String16 duplicate() const
-	{
-		String16 s(*this);
-		return s.duplicate();
-	}
+	String16 duplicate() const;
 	
-	SLIB_INLINE Memory toMemory() const
-	{
-		String16 s(*this);
-		return s.toMemory();
-	}
+	Memory toMemory() const;
 	
-	SLIB_INLINE sl_uint32 getUtf8(sl_char8* utf8, sl_int32 len) const
-	{
-		String16 s(*this);
-		return s.getUtf8(utf8, len);
-	}
+	sl_uint32 getUtf8(sl_char8* utf8, sl_int32 len) const;
 	
-	SLIB_INLINE StringData getUtf8() const
-	{
-		String16 s(*this);
-		return s.getUtf8();
-	}
+	StringData getUtf8() const;
 	
 	// contains null character at last
-	SLIB_INLINE Memory toUtf8() const
-	{
-		String16 s(*this);
-		return s.toUtf8();
-	}
+	Memory toUtf8() const;
 	
-	SLIB_INLINE String16 substring(sl_int32 start, sl_int32 end = -1) const
-	{
-		String16 s(*this);
-		return s.substring(start, end);
-	}
+	String16 substring(sl_int32 start, sl_int32 end = -1) const;
 	
-	SLIB_INLINE String16 left(sl_uint32 len) const
-	{
-		String16 s(*this);
-		return s.left(len);
-	}
+	String16 left(sl_uint32 len) const;
 	
-	SLIB_INLINE String16 right(sl_uint32 len) const
-	{
-		String16 s(*this);
-		return s.right(len);
-	}
+	String16 right(sl_uint32 len) const;
 	
-	SLIB_INLINE String16 mid(sl_int32 start, sl_int32 len) const
-	{
-		String16 s(*this);
-		return s.mid(start, len);
-	}
+	String16 mid(sl_int32 start, sl_int32 len) const;
 	
-	SLIB_INLINE sl_int32 indexOf(sl_char16 ch, sl_int32 start = 0) const
-	{
-		String16 s(*this);
-		return s.indexOf(ch, start);
-	}
+	sl_int32 indexOf(sl_char16 ch, sl_int32 start = 0) const;
 	
-	SLIB_INLINE sl_int32 indexOf(const String16& str, sl_int32 start = 0) const
-	{
-		String16 s(*this);
-		return s.indexOf(str, start);
-	}
+	sl_int32 indexOf(const String16& str, sl_int32 start = 0) const;
 	
-	SLIB_INLINE sl_int32 lastIndexOf(sl_char16 ch, sl_int32 start = -1) const
-	{
-		String16 s(*this);
-		return s.lastIndexOf(ch, start);
-	}
+	sl_int32 lastIndexOf(sl_char16 ch, sl_int32 start = -1) const;
 	
-	SLIB_INLINE sl_int32 lastIndexOf(const String16& str, sl_int32 start = -1) const
-	{
-		String16 s(*this);
-		return s.indexOf(str, start);
-	}
+	sl_int32 lastIndexOf(const String16& str, sl_int32 start = -1) const;
 	
-	SLIB_INLINE sl_bool startsWith(sl_char16 ch) const
-	{
-		String16 s(*this);
-		return s.startsWith(ch);
-	}
+	sl_bool startsWith(sl_char16 ch) const;
 	
-	SLIB_INLINE sl_bool startsWith(const String16& str) const
-	{
-		String16 s(*this);
-		return s.startsWith(str);
-	}
+	sl_bool startsWith(const String16& str) const;
 	
-	SLIB_INLINE sl_bool endsWith(sl_char16 ch) const
-	{
-		String16 s(*this);
-		return s.endsWith(ch);
-	}
+	sl_bool endsWith(sl_char16 ch) const;
 	
-	SLIB_INLINE sl_bool endsWith(const String16& str) const
-	{
-		String16 s(*this);
-		return s.endsWith(str);
-	}
+	sl_bool endsWith(const String16& str) const;
+
+	sl_bool contains(sl_char16 ch) const;
+
+	sl_bool contains(const String16& str) const;
+
+	void makeUpper();
 	
-	SLIB_INLINE void makeUpper()
-	{
-		String16 s(*this);
-		s.makeUpper();
-	}
+	void makeLower();
 	
-	SLIB_INLINE void makeLower()
-	{
-		String16 s(*this);
-		s.makeLower();
-	}
+	String16 toUpper() const;
 	
-	SLIB_INLINE String16 toLower() const
-	{
-		String16 s(*this);
-		return s.toLower();
-	}
+	String16 toLower() const;
 	
-	SLIB_INLINE String16 toUpper() const
-	{
-		String16 s(*this);
-		return s.toUpper();
-	}
+	String16 replaceAll(const String16& pattern, const String16& replacement) const;
 	
-	SLIB_INLINE String16 replaceAll(const String16& pattern, const String16& replacement) const
-	{
-		String16 s(*this);
-		return s.replaceAll(pattern, replacement);
-	}
+	String16 trim() const;
 	
-	SLIB_INLINE String16 trim() const
-	{
-		String16 s(*this);
-		return s.trim();
-	}
+	String16 trimLeft() const;
 	
-	SLIB_INLINE String16 trimLeft() const
-	{
-		String16 s(*this);
-		return s.trimLeft();
-	}
+	String16 trimRight() const;
 	
-	SLIB_INLINE String16 trimRight() const
-	{
-		String16 s(*this);
-		return s.trimRight();
-	}
+	List<String16> split(const String16& pattern) const;
 	
-	SLIB_INLINE List<String16> split(const String16& pattern) const
-	{
-		String16 s(*this);
-		return s.split(pattern);
-	}
+	sl_uint32 hashCode() const;
 	
-	SLIB_INLINE sl_uint32 hashCode() const
-	{
-		String16 s(*this);
-		return s.hashCode();
-	}
+	String8 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true);
 	
-	SLIB_INLINE String8 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true)
-	{
-		String16 s(*this);
-		return s.applyBackslashEscapes(flagDoubleQuote);
-	}
+
+public:
+	sl_bool parseInt32(sl_int32 radix, sl_int32* _out) const;
 	
+	sl_int32 parseInt32(sl_int32 radix = 10, sl_int32 def = 0) const;
 	
+	sl_bool parseUint32(sl_int32 radix, sl_uint32* _out) const;
+	
+	sl_uint32 parseUint32(sl_int32 radix = 10, sl_uint32 def = 0) const;
+	
+	sl_bool parseInt64(sl_int32 radix, sl_int64* _out) const;
+	
+	sl_int64 parseInt64(sl_int32 radix = 10, sl_int64 def = 0) const;
+	
+	sl_bool parseUint64(sl_int32 radix, sl_uint64* _out) const;
+	
+	sl_uint64 parseUint64(sl_int32 radix = 10, sl_uint64 def = 0) const;
+	
+	sl_bool parseInt(sl_int32 radix, sl_reg* _out) const;
+	
+	sl_reg parseInt(sl_int32 radix = 10, sl_reg def = 0) const;
+	
+	sl_bool parseSize(sl_int32 radix, sl_size* _out) const;
+	
+	sl_size parseSize(sl_int32 radix = 10, sl_size def = 0) const;
+	
+	sl_bool parseFloat(float* _out) const;
+	
+	float parseFloat(float def = 0) const;
+	
+	sl_bool parseDouble(double* _out) const;
+	
+	double parseDouble(double def = 0) const;
+	
+	sl_bool parseHexString(void* _out) const;
+
+
 private:
 	SLIB_INLINE static void _increaseReference(sl_char16* data)
 	{
@@ -4486,112 +4164,82 @@ private:
 
 class SLIB_EXPORT StringBuffer8 : public Object
 {
-private:
-	Queue<String8> m_queue;
-	sl_int32 m_len;
-
 public:
 	StringBuffer8();
 
+public:
 	sl_bool add(const String8& str);
 
-	SLIB_INLINE sl_int32 getLength() const
-	{
-		return m_len;
-	}
+	sl_int32 getLength() const;
 
 	String8 merge() const;
+	
+private:
+	Queue<String8> m_queue;
+	sl_int32 m_len;
+	
 };
 
 class SLIB_EXPORT StringBuffer16 : public Object
 {
-private:
-	Queue<String16> m_queue;
-	sl_int32 m_len;
-
 public:
 	StringBuffer16();
 
+public:
 	sl_bool add(const String16& str);
 
-	SLIB_INLINE sl_int32 getLength() const
-	{
-		return m_len;
-	}
-
+	sl_int32 getLength() const;
+	
 	String16 merge() const;
+
+private:
+	Queue<String16> m_queue;
+	sl_int32 m_len;
+	
 };
 
 class SLIB_EXPORT StringDataBuffer8 : public Object
 {
-private:
-	Queue<StringData> m_queue;
-	sl_int32 m_len;
-
 public:
 	StringDataBuffer8();
 
+public:
 	sl_bool add(const StringData& str);
 	
-	SLIB_INLINE sl_bool add(const sl_char8* buf, sl_uint32 length)
-	{
-		StringData data;
-		data.sz8 = buf;
-		data.len = length;
-		return add(data);
-	}
+	sl_bool add(const sl_char8* buf, sl_uint32 length);
 	
-	SLIB_INLINE sl_bool add(const sl_char8* buf, sl_uint32 length, const Memory& mem)
-	{
-		StringData data;
-		data.sz8 = buf;
-		data.len = length;
-		data.mem = mem;
-		return add(data);
-	}
+	sl_bool add(const sl_char8* buf, sl_uint32 length, const Memory& mem);
 
-	SLIB_INLINE sl_int32 getLength() const
-	{
-		return m_len;
-	}
+	sl_int32 getLength() const;
 
 	String8 merge() const;
+
+private:
+	Queue<StringData> m_queue;
+	sl_int32 m_len;
+	
 };
 
 class SLIB_EXPORT StringDataBuffer16 : public Object
 {
-private:
-	Queue<StringData> m_queue;
-	sl_int32 m_len;
-
 public:
 	StringDataBuffer16();
 
+public:
 	sl_bool add(const StringData& str);
 	
-	SLIB_INLINE sl_bool add(const sl_char16* buf, sl_uint32 length)
-	{
-		StringData data;
-		data.sz16 = buf;
-		data.len = length;
-		return add(data);
-	}
+	sl_bool add(const sl_char16* buf, sl_uint32 length);
 	
-	SLIB_INLINE sl_bool add(const sl_char16* buf, sl_uint32 length, const Memory& mem)
-	{
-		StringData data;
-		data.sz16 = buf;
-		data.len = length;
-		data.mem = mem;
-		return add(data);
-	}
+	sl_bool add(const sl_char16* buf, sl_uint32 length, const Memory& mem);
 
-	SLIB_INLINE sl_int32 getLength() const
-	{
-		return m_len;
-	}
+	sl_int32 getLength() const;
 
 	String16 merge() const;
+	
+private:
+	Queue<StringData> m_queue;
+	sl_int32 m_len;
+	
 };
 
 

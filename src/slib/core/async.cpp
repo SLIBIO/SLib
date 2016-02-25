@@ -62,6 +62,7 @@ void Async::removeTimer(const Ref<AsyncTimer>& timer)
 *************************************/
 AsyncLoop::AsyncLoop()
 {
+	m_flagInit = sl_false;
 	m_flagRunning = sl_false;
 }
 
@@ -76,35 +77,61 @@ Ref<AsyncLoop> AsyncLoop::getDefault()
 	return ret;
 }
 
-Ref<AsyncLoop> AsyncLoop::create()
+void AsyncLoop::releaseDefault()
 {
-	Ref<AsyncLoop> ret;
-	ret = new AsyncLoop;
+	Ref<AsyncLoop> loop = getDefault();
+	if (loop.isNotNull()) {
+		loop->release();
+	}
+}
+
+Ref<AsyncLoop> AsyncLoop::create(sl_bool flagAutoStart)
+{
+	Ref<AsyncLoop> ret = new AsyncLoop;
 	if (ret.isNotNull()) {
-		ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(AsyncLoop, _runLoop, ret.get()));
+		ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(AsyncLoop, _runLoop, ret.get()));
 		if (ret->m_thread.isNotNull()) {
-			ret->m_flagRunning = sl_true;
+			ret->m_flagInit = sl_true;
+			if (flagAutoStart) {
+				ret->start();
+			}
 			return ret;
 		}
-		ret.setNull();
 	}
-	return ret;
+	return Ref<AsyncLoop>::null();
 }
 
 void AsyncLoop::release()
 {
 	ObjectLocker lock(this);
-	if (!m_flagRunning) {
+	if (!m_flagInit) {
 		return;
 	}
-	m_flagRunning = sl_false;
-	
-	m_thread->finishAndWait();
+	m_flagInit = sl_false;
+
+	if (m_flagRunning) {
+		m_flagRunning = sl_false;
+		m_thread->finishAndWait();
+	}
 
 	m_queueTasks.removeAll();
 	
 	MutexLocker lockTime(&m_lockTimeTasks);
 	m_timeTasks.removeAll();
+}
+
+void AsyncLoop::start()
+{
+	ObjectLocker lock(this);
+	if (!m_flagInit) {
+		return;
+	}
+	if (m_flagRunning) {
+		return;
+	}
+	if (m_thread->start()) {
+		m_flagRunning = sl_true;
+	}
 }
 
 sl_bool AsyncLoop::isRunning()
@@ -369,6 +396,7 @@ void AsyncTimer::stopAndWait()
  *************************************/
 AsyncIoLoop::AsyncIoLoop()
 {
+	m_flagInit = sl_false;
 	m_flagRunning = sl_false;
 	m_handle = sl_null;
 }
@@ -384,37 +412,49 @@ Ref<AsyncIoLoop> AsyncIoLoop::getDefault()
 	return ret;
 }
 
-Ref<AsyncIoLoop> AsyncIoLoop::create()
+void AsyncIoLoop::releaseDefault()
 {
-	Ref<AsyncIoLoop> ret;
+	Ref<AsyncIoLoop> loop = getDefault();
+	if (loop.isNotNull()) {
+		loop->release();
+	}
+}
+
+Ref<AsyncIoLoop> AsyncIoLoop::create(sl_bool flagAutoStart)
+{
 	void* handle = __createHandle();
 	if (handle) {
-		ret = new AsyncIoLoop;
+		Ref<AsyncIoLoop> ret = new AsyncIoLoop;
 		if (ret.isNotNull()) {
 			ret->m_handle = handle;
-			ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(AsyncIoLoop, __runLoop, ret.get()));
+			ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(AsyncIoLoop, __runLoop, ret.get()));
 			if (ret->m_thread.isNotNull()) {
-				ret->m_flagRunning = sl_true;
+				ret->m_flagInit = sl_true;
+				if (flagAutoStart) {
+					ret->start();
+				}
 				return ret;
 			}
-			ret.setNull();
 		}
 		__closeHandle(handle);
 	}
-	return ret;
+	return Ref<AsyncIoLoop>::null();
 }
 
 void AsyncIoLoop::release()
 {
 	ObjectLocker lock(this);
-	if (!m_flagRunning) {
+	if (!m_flagInit) {
 		return;
 	}
-	m_flagRunning = sl_false;
-	
-	m_thread->finish();
-	__wake();
-	m_thread->finishAndWait();
+	m_flagInit = sl_false;
+
+	if (m_flagRunning) {
+		m_flagRunning = sl_false;
+		m_thread->finish();
+		__wake();
+		m_thread->finishAndWait();
+	}
 	
 	__closeHandle(m_handle);
 	
@@ -422,6 +462,20 @@ void AsyncIoLoop::release()
 	m_queueInstancesClosing.removeAll();
 	m_queueInstancesClosed.removeAll();
 	
+}
+
+void AsyncIoLoop::start()
+{
+	ObjectLocker lock(this);
+	if (!m_flagInit) {
+		return;
+	}
+	if (m_flagRunning) {
+		return;
+	}
+	if (m_thread->start()) {
+		m_flagRunning = sl_true;
+	}
 }
 
 sl_bool AsyncIoLoop::isRunning()

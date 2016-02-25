@@ -638,7 +638,7 @@ sl_reg HttpResponseHeader::parseResponsePacket(const void* packet, sl_size _size
 		return 0;
 	}
 	String strResponseCode = String::fromUtf8(data + posStart, posCurrent - posStart);
-	if (!(strResponseCode.parseUint32(&m_responseCode))) {
+	if (!(strResponseCode.parseUint32(10, &m_responseCode))) {
 		return -1;
 	}
 	posCurrent++;

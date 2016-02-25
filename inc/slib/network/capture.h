@@ -25,7 +25,7 @@ SLIB_NETWORK_NAMESPACE_BEGIN
 class SLIB_EXPORT NetCapturePacket
 {
 public:
-	const sl_uint8* data;
+	sl_uint8* data;
 	sl_uint32 length;
 	Time time;
 };
@@ -59,6 +59,8 @@ public:
 	sl_uint32 sizeBuffer; // buffer size, used in pcap mode
 	
 	sl_uint32 preferedLinkDeviceType; // NetworkLinkDeviceType, used in Packet Socket mode. now supported Ethernet and Raw
+
+	sl_bool flagAutoStart;
 	
 	Ptr<INetCaptureListener> listener;
 	
@@ -72,6 +74,8 @@ class SLIB_EXPORT NetCapture : public Object
 
 public:
 	virtual void release() = 0;
+
+	virtual void start() = 0;
 	
 	virtual sl_bool isRunning() = 0;
 

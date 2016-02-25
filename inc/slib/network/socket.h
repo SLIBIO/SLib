@@ -261,7 +261,8 @@ public:
 
 public:
 	sl_bool setNonBlockingMode(sl_bool flagEnable);
-
+	
+	sl_bool setPromiscuousMode(const String& deviceName, sl_bool flagEnable);
 	
 	sl_bool getLocalAddress(SocketAddress& _out);
 	
@@ -339,6 +340,7 @@ public:
 
 public:
 	static String getErrorMessage(sl_uint32 error);
+	
 	SLIB_INLINE void clearError()
 	{
 		_setError(socketError_None);

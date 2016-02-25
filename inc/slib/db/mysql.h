@@ -19,7 +19,9 @@ public:
 	String password;
 	String db;
 	sl_uint32 port;
+
 	sl_bool flagAutoReconnect;
+	sl_bool flagMultipleStatements;
 
 public:
 	MySQL_Param();
@@ -34,6 +36,10 @@ public:
 	
 	static Ref<MySQL_Database> connect(const MySQL_Param& param, String& outErrorMessage);
 
+public:
+	virtual sl_bool ping() = 0;
+
+public:
 	static void initThread();
 };
 

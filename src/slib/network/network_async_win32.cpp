@@ -319,6 +319,7 @@ public:
 
 	void close()
 	{
+		AsyncTcpServerInstance::close();
 		m_socket.setNull();
 		setHandle(SLIB_FILE_INVALID_HANDLE);
 	}
@@ -424,10 +425,10 @@ public:
 
 };
 
-Ref<AsyncTcpServer> AsyncTcpServer::create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop)
+Ref<AsyncTcpServer> AsyncTcpServer::create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
 {
 	Ref<_Win32AsyncTcpServerInstance> ret = _Win32AsyncTcpServerInstance::create(socket, listener);
-	return AsyncTcpServer::create(ret.get(), loop);
+	return AsyncTcpServer::create(ret.get(), loop, flagAutoStart);
 }
 
 
@@ -477,11 +478,73 @@ public:
 
 	void close()
 	{
+		AsyncUdpSocketInstance::close();
 		setHandle(SLIB_FILE_INVALID_HANDLE);
 		m_socket.setNull();
 	}
 
 	void onOrder()
+	{
+		processSend();
+		processReceive();
+	}
+
+	void onEvent(EventDesc* pev)
+	{
+		sl_file handle = getHandle();
+		if (handle == SLIB_FILE_INVALID_HANDLE) {
+			return;
+		}
+		OVERLAPPED* pOverlapped = (OVERLAPPED*)(pev->pOverlapped);
+		if (pOverlapped == &m_overlappedReceive) {
+			DWORD dwSize = 0;
+			DWORD dwFlags = 0;
+			if (::WSAGetOverlappedResult((SOCKET)handle, pOverlapped, &dwSize, FALSE, &dwFlags)) {
+				m_flagReceiving = sl_false;
+				if (dwSize > 0) {
+					SocketAddress addr;
+					if (m_lenAddrReceive > 0) {
+						if (addr.setSystemSocketAddress(&m_addrReceive, m_lenAddrReceive)) {
+							_onReceive(addr, dwSize);
+						}
+					}
+				}
+			} else {
+				int err = ::WSAGetLastError();
+				if (err == WSA_IO_INCOMPLETE) {
+					return;
+				}
+				m_flagReceiving = sl_false;
+			}
+			processReceive();
+		}
+
+	}
+
+	void processSend()
+	{
+		sl_file handle = getHandle();
+		if (handle == SLIB_FILE_INVALID_HANDLE) {
+			return;
+		}
+		Ref<Socket> socket = m_socket;
+		if (socket.isNull()) {
+			return;
+		}
+		if (!(socket->isOpened())) {
+			return;
+		}
+		while (Thread::isNotStoppingCurrent()) {
+			SendRequest request;
+			if (m_queueSendRequests.pop(&request)) {
+				socket->sendTo(request.addressTo, request.data.getBuf(), (sl_uint32)(request.data.size()));
+			} else {
+				break;
+			}
+		}
+	}
+
+	void processReceive()
 	{
 		if (m_flagReceiving) {
 			return;
@@ -520,43 +583,14 @@ public:
 		}
 	}
 
-	void onEvent(EventDesc* pev)
-	{
-		sl_file handle = getHandle();
-		if (handle == SLIB_FILE_INVALID_HANDLE) {
-			return;
-		}
-		OVERLAPPED* pOverlapped = (OVERLAPPED*)(pev->pOverlapped);
-		DWORD dwSize = 0;
-		DWORD dwFlags = 0;
-		if (::WSAGetOverlappedResult((SOCKET)handle, pOverlapped, &dwSize, FALSE, &dwFlags)) {
-			m_flagReceiving = sl_false;
-			if (dwSize > 0) {
-				SocketAddress addr;
-				if (m_lenAddrReceive > 0) {
-					if (addr.setSystemSocketAddress(&m_addrReceive, m_lenAddrReceive)) {
-						_onReceive(addr, dwSize);
-					}
-				}
-			}
-		} else {
-			int err = ::WSAGetLastError();
-			if (err == WSA_IO_INCOMPLETE) {
-				return;
-			}
-			m_flagReceiving = sl_false;
-		}
-		onOrder();
-	}
-
 };
 
-Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ref<Socket>& socket, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop)
+Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ref<Socket>& socket, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
 {
 	Memory buffer = Memory::create(packetSize);
 	if (buffer.isNotEmpty()) {
 		Ref<_Win32AsyncUdpSocketInstance> ret = _Win32AsyncUdpSocketInstance::create(socket, listener, buffer);
-		return AsyncUdpSocket::create(ret.get(), loop);
+		return AsyncUdpSocket::create(ret.get(), loop, flagAutoStart);
 	}
 	return Ref<AsyncUdpSocket>::null();
 }

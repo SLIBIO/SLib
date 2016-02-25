@@ -1,4 +1,5 @@
 #include "../../../inc/slib/network/socket_address.h"
+#include "../../../inc/slib/core/setting.h"
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 #	include <winsock2.h>
@@ -81,7 +82,7 @@ SLIB_INLINE sl_int32 _SocketAddress_parse(SocketAddress* obj, const CT* sz, sl_u
 	}
 	pos++;
 	sl_uint32 port;
-	pos = String::parseUint32(&port, sz, pos, len);
+	pos = String::parseUint32(10, &port, sz, pos, len);
 	if (pos == SLIB_PARSE_ERROR) {
 		return SLIB_PARSE_ERROR;
 	}
@@ -102,6 +103,15 @@ sl_int32 SocketAddress::parse(SocketAddress* out, const sl_char16* sz, sl_uint32
 	return _SocketAddress_parse(out, sz, posBegin, len);
 }
 
+sl_bool SocketAddress::parse(const String& s, SocketAddress* out)
+{
+	sl_uint32 n = s.getLength();
+	if (n == 0) {
+		return sl_false;
+	}
+	return _SocketAddress_parse(out, s.getBuf(), 0, n) == n;
+}
+
 sl_bool SocketAddress::parse(const String& s)
 {
 	sl_uint32 n = s.getLength();
@@ -109,18 +119,6 @@ sl_bool SocketAddress::parse(const String& s)
 		return sl_false;
 	}
 	return _SocketAddress_parse(this, s.getBuf(), 0, n) == n;
-}
-
-sl_bool SocketAddress::setHostAddress(const String& address)
-{
-	sl_int32 index = address.lastIndexOf(':');
-	if (index < 0) {
-		port = 0;
-		return ip.setHostName(address);
-	} else {
-		port = address.substring(index + 1).parseInt32();
-		return ip.setHostName(address.substring(0, index));
-	}
 }
 
 sl_uint32 SocketAddress::getSystemSocketAddress(void* addr)
@@ -171,6 +169,57 @@ sl_bool SocketAddress::setSystemSocketAddress(const void* _in, sl_uint32 size)
 		}
 	}
 	return sl_false;
+}
+
+sl_bool SocketAddress::setHostAddress(const String& address)
+{
+	sl_int32 index = address.lastIndexOf(':');
+	if (index < 0) {
+		port = 0;
+		return ip.setHostName(address);
+	} else {
+		port = address.substring(index + 1).parseInt32();
+		return ip.setHostName(address.substring(0, index));
+	}
+}
+
+sl_bool SocketAddress::parseIPv4Range(const String& str, IPv4Address* _from, IPv4Address* _to)
+{
+	IPv4Address from;
+	IPv4Address to;
+	sl_int32 index = str.indexOf('-');
+	if (index > 0) {
+		if (from.parse(str.substring(0, index))) {
+			if (to.parse(str.substring(index + 1))) {
+				if (to >= from) {
+					if (_from) {
+						*_from = from;
+					}
+					if (_to) {
+						*_to = to;
+					}
+					return sl_true;
+				}
+			}
+		}
+	} else {
+		if (from.parse(str)) {
+			to = from;
+			if (_from) {
+				*_from = from;
+			}
+			if (_to) {
+				*_to = to;
+			}
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
+sl_bool SocketAddress::parsePortRange(const String& str, sl_uint32* from, sl_uint32* to)
+{
+	return SettingUtil::parseUint32Range(str, from, to);
 }
 
 SLIB_NETWORK_NAMESPACE_END

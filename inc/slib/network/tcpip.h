@@ -253,7 +253,7 @@ public:
 	sl_bool checkChecksum() const;
 
 	
-	SLIB_INLINE IPv4Address getSourceAddress()
+	SLIB_INLINE IPv4Address getSourceAddress() const
 	{
 		return IPv4Address(_sourceIp);
 	}
@@ -264,7 +264,7 @@ public:
 	}
 
 	
-	SLIB_INLINE IPv4Address getDestinationAddress()
+	SLIB_INLINE IPv4Address getDestinationAddress() const
 	{
 		return IPv4Address(_destinationIp);
 	}
@@ -343,6 +343,8 @@ public:
 	{
 		return !(isMF());
 	}
+
+	sl_bool getPortsForTcpUdp(sl_uint16& src, sl_uint16& dst) const;
 
 private:
 	sl_uint8 _versionAndHeaderLength;
@@ -779,13 +781,15 @@ public:
 	
 	void setupExpiringDuration(sl_uint32 ms);
 
+	static sl_bool isNeededCombine(const void* ip, sl_uint32 size, sl_bool flagCheckedHeader = sl_false);
+
 	// returns a combined IP packet
-	Memory combineFragment(const void* ip, sl_uint32 size);
+	Memory combineFragment(const void* ip, sl_uint32 size, sl_bool flagCheckedHeader = sl_false);
 
 	List<Memory> makeFragments(const IPv4HeaderFormat* header, const void* ipContent, sl_uint32 sizeContent, sl_uint32 mtu = 1500);
 
 	static List<Memory> makeFragments(const IPv4HeaderFormat* header, sl_uint16 identifier, const void* ipContent, sl_uint32 sizeContent, sl_uint32 mtu = 1500);
-
+	
 protected:
 	ExpiringMap<IPv4PacketIdentifier, Ref<IPv4FragmentedPacket> > m_packets;
 	sl_int32 m_currentIdentifier;

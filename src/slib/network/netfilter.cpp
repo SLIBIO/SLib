@@ -7,6 +7,11 @@
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
+NetFilterParam::NetFilterParam()
+{
+	flagAutoStart = sl_true;
+}
+
 void NetFilter::_onFilterPacket(NetFilterPacket* packet)
 {
 	PtrLocker<INetFilterListener> listener(m_listener);
@@ -123,6 +128,7 @@ public:
 	Memory m_bufPacket;	
 	Ref<Thread> m_thread;
 
+	sl_bool m_flagInit;
 	sl_bool m_flagRunning;
 	Ref<PipeEvent> m_wake;
 
@@ -132,7 +138,8 @@ public:
 public:
 	_Linux_NetFilter()
 	{	
-		m_flagRunning = sl_true;
+		m_flagInit = sl_false;
+		m_flagRunning = sl_false;
 	}
 	
 	~_Linux_NetFilter()
@@ -149,14 +156,13 @@ public:
 	
 	static Ref<_Linux_NetFilter> create(const NetFilterParam& param)
 	{
-		Ref<_Linux_NetFilter> ret;
 		Memory bufPacket = Memory::create(SIZE_PACKET);
 		if (bufPacket.isEmpty()) {
-			return ret;
+			return Ref<_Linux_NetFilter>::null();
 		}
 		Ref<PipeEvent> wake = PipeEvent::create();
 		if (wake.isNull()) {
-			return ret;
+			return Ref<_Linux_NetFilter>::null();
 		}
 		
 		nfq_handle* handle = nfq_open();
@@ -164,31 +170,40 @@ public:
 			nfq_unbind_pf(handle, AF_INET);
 			int iRet = nfq_bind_pf(handle, AF_INET);
 			if (iRet >= 0) {
-				ret = new _Linux_NetFilter;
+				Ref<_Linux_NetFilter> ret = new _Linux_NetFilter;
 				if (ret.isNotNull()) {
 					ret->m_handle = handle;
 					ret->m_bufPacket = bufPacket;
 					ret->m_wake = wake;
 					ret->m_listener = param.listener;
-					ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(_Linux_NetFilter, _run, ret.get()));
-					return ret;
+					ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_Linux_NetFilter, _run, ret.get()));
+					if (ret->m_thread.isNotNull()) {
+						ret->m_flagInit = sl_true;
+						if (param.flagAutoStart) {
+							ret->start();
+						}
+						return ret;
+					} else {
+						SLIB_LOG_ERROR(TAG, "Failed to create thread");
+					}
 				}
 			} else {
 				SLIB_LOG_ERROR(TAG, "Failed to bind netfilter handle");
 			}
 			nfq_close(handle);
 		}
-		return ret;
+		return Ref<_Linux_NetFilter>::null();
 	}
 	
 	void release()
 	{
 		ObjectLocker lock(this);
-		if (!m_flagRunning) {
+		if (!m_flagInit) {
 			return;
 		}
-		m_flagRunning = sl_false;
+		m_flagInit = sl_false;
 		
+		m_flagRunning = sl_false;
 		if (m_wake.isNotNull()) {
 			m_wake->set();
 		}
@@ -202,6 +217,22 @@ public:
 		nfq_unbind_pf(m_handle, AF_INET);
 		nfq_close(m_handle);
 	}
+
+	void start()
+	{
+		ObjectLocker lock(this);
+		if (!m_flagInit) {
+			return;
+		}
+		if (m_flagRunning) {
+			return;
+		}
+		if (m_thread.isNotNull()) {
+			if (m_thread->start()) {
+				m_flagRunning = sl_true;
+			}
+		}
+	}
 	
 	sl_bool isRunning()
 	{
@@ -211,7 +242,7 @@ public:
 	sl_bool createQueue(sl_uint16 queueNumber)
 	{
 		ObjectLocker lock(this);
-		if (!m_flagRunning) {
+		if (!m_flagInit) {
 			return sl_false;
 		}
 		if (m_queues.containsKey(queueNumber)) {
@@ -243,7 +274,7 @@ public:
 	void removeQueue(sl_uint16 queueNumber)
 	{
 		ObjectLocker lock(this);
-		if (!m_flagRunning) {
+		if (!m_flagInit) {
 			return;
 		}
 		Ref<_Linux_NetFilterQueue> queueObj;

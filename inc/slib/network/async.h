@@ -135,6 +135,16 @@ public:
 class SLIB_EXPORT AsyncTcpServerInstance : public AsyncIoInstance
 {
 public:
+	AsyncTcpServerInstance();
+
+public:
+	// override
+	void close();
+
+	void start();
+
+	sl_bool isRunning();
+
 	Ref<Socket> getSocket();
 	
 	Ptr<IAsyncTcpServerListener> getListener();
@@ -145,6 +155,8 @@ protected:
 	void _onError();
 
 protected:
+	sl_bool m_flagRunning;
+
 	SafeRef<Socket> m_socket;
 	Ptr<IAsyncTcpServerListener> m_listener;
 	
@@ -153,35 +165,39 @@ protected:
 class SLIB_EXPORT AsyncTcpServer : public AsyncIoObject
 {
 public:
-	static Ref<AsyncTcpServer> create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop);
+	static Ref<AsyncTcpServer> create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart = sl_true);
 	
-	static Ref<AsyncTcpServer> create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener);
+	static Ref<AsyncTcpServer> create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener, sl_bool flagAutoStart = sl_true);
 	
-	static Ref<AsyncTcpServer> create(const SocketAddress& addressListen, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop);
+	static Ref<AsyncTcpServer> create(const SocketAddress& addressListen, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart = sl_true);
 	
-	static Ref<AsyncTcpServer> create(const SocketAddress& addressListen, const Ptr<IAsyncTcpServerListener>& listener);
+	static Ref<AsyncTcpServer> create(const SocketAddress& addressListen, const Ptr<IAsyncTcpServerListener>& listener, sl_bool flagAutoStart = sl_true);
 	
-	static Ref<AsyncTcpServer> create(sl_uint32 portListen, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop);
+	static Ref<AsyncTcpServer> create(sl_uint32 portListen, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart = sl_true);
 	
-	static Ref<AsyncTcpServer> create(sl_uint32 portListen, const Ptr<IAsyncTcpServerListener>& listener);
+	static Ref<AsyncTcpServer> create(sl_uint32 portListen, const Ptr<IAsyncTcpServerListener>& listener, sl_bool flagAutoStart = sl_true);
 	
-	static Ref<AsyncTcpServer> createIPv6(sl_uint32 portListen, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop);
+	static Ref<AsyncTcpServer> createIPv6(sl_uint32 portListen, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart = sl_true);
 	
-	static Ref<AsyncTcpServer> createIPv6(sl_uint32 portListen, const Ptr<IAsyncTcpServerListener>& listener);
-
-public:
-	Ref<Socket> getSocket();
+	static Ref<AsyncTcpServer> createIPv6(sl_uint32 portListen, const Ptr<IAsyncTcpServerListener>& listener, sl_bool flagAutoStart = sl_true);
 
 public:
 	void close();
 
 	sl_bool isOpened();
 
+	void start();
+
+	sl_bool isRunning();
+
+public:
+	Ref<Socket> getSocket();
+
 protected:
 	Ref<AsyncTcpServerInstance> getIoInstance();
 
 private:
-	static Ref<AsyncTcpServer> create(AsyncTcpServerInstance* instance, const Ref<AsyncIoLoop>& loop);
+	static Ref<AsyncTcpServer> create(AsyncTcpServerInstance* instance, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart);
 	
 };
 
@@ -198,60 +214,87 @@ public:
 class SLIB_EXPORT AsyncUdpSocketInstance : public AsyncIoInstance
 {
 public:
+	AsyncUdpSocketInstance();
+
+public:
+	// override
+	void close();
+
+	void start();
+
+	sl_bool isRunning();
+
 	Ref<Socket> getSocket();
 	
 	Ptr<IAsyncUdpSocketListener> getListener();
 
 public:
-	sl_bool sendTo(const SocketAddress& address, void* data, sl_uint32 size);
+	sl_bool sendTo(const SocketAddress& address, const Memory& data);
 	
 protected:
 	void _onReceive(const SocketAddress& address, sl_uint32 size);
 	
 protected:
+	sl_bool m_flagRunning;
+
 	SafeRef<Socket> m_socket;
 	Memory m_buffer;
 	
-	Ptr<IAsyncUdpSocketListener> m_listener;
+	struct SendRequest
+	{
+		SocketAddress addressTo;
+		Memory data;
+	};
+	Queue<SendRequest> m_queueSendRequests;
 	
+	Ptr<IAsyncUdpSocketListener> m_listener;
+
 };
 
 class SLIB_EXPORT AsyncUdpSocket : public AsyncIoObject
 {
 public:
-	static Ref<AsyncUdpSocket> create(const Ref<Socket>& socket, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop);
+	static Ref<AsyncUdpSocket> create(const Ref<Socket>& socket, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart = sl_true);
 	
-	static Ref<AsyncUdpSocket> create(const Ref<Socket>& socket, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize);
+	static Ref<AsyncUdpSocket> create(const Ref<Socket>& socket, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagAutoStart = sl_true);
 	
-	static Ref<AsyncUdpSocket> create(const SocketAddress& addressBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagBroadcast = sl_false);
+	static Ref<AsyncUdpSocket> create(const SocketAddress& addressBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart = sl_true);
 	
-	static Ref<AsyncUdpSocket> create(const SocketAddress& addressBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagBroadcast = sl_false);
+	static Ref<AsyncUdpSocket> create(const SocketAddress& addressBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagAutoStart = sl_true);
 	
-	static Ref<AsyncUdpSocket> create(sl_uint32 portBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagBroadcast = sl_false);
+	static Ref<AsyncUdpSocket> create(sl_uint32 portBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart = sl_true);
 	
-	static Ref<AsyncUdpSocket> create(sl_uint32 portBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagBroadcast = sl_false);
+	static Ref<AsyncUdpSocket> create(sl_uint32 portBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagAutoStart = sl_true);
 	
-	static Ref<AsyncUdpSocket> createIPv6(sl_uint32 portBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagBroadcast = sl_false);
+	static Ref<AsyncUdpSocket> createIPv6(sl_uint32 portBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart = sl_true);
 	
-	static Ref<AsyncUdpSocket> createIPv6(sl_uint32 portBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagBroadcast = sl_false);
+	static Ref<AsyncUdpSocket> createIPv6(sl_uint32 portBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagAutoStart = sl_true);
 	
-	static Ref<AsyncUdpSocket> create(const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagBroadcast = sl_false);
+	static Ref<AsyncUdpSocket> create(const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart = sl_true);
 	
-	static Ref<AsyncUdpSocket> create(const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagBroadcast = sl_false);
+	static Ref<AsyncUdpSocket> create(const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagAutoStart = sl_true);
 	
-	static Ref<AsyncUdpSocket> createIPv6(const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagBroadcast = sl_false);
+	static Ref<AsyncUdpSocket> createIPv6(const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart = sl_true);
 	
-	static Ref<AsyncUdpSocket> createIPv6(const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagBroadcast = sl_false);
+	static Ref<AsyncUdpSocket> createIPv6(const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagAutoStart = sl_true);
 	
-public:
-	Ref<Socket> getSocket();
-
 public:
 	void close();
 
 	sl_bool isOpened();
 
+	void start();
+
+	sl_bool isRunning();
+
+public:
+	Ref<Socket> getSocket();
+
 	void setBroadcast(sl_bool flag);
+
+	void setSendBufferSize(sl_uint32 size);
+
+	void setReceiveBufferSize(sl_uint32 size);
 
 	sl_bool sendTo(const SocketAddress& addressTo, void* data, sl_uint32 size);
 
@@ -261,8 +304,8 @@ protected:
 	Ref<AsyncUdpSocketInstance> getIoInstance();
 
 private:
-	static Ref<AsyncUdpSocket> create(AsyncUdpSocketInstance* instance, const Ref<AsyncIoLoop>& loop);
-	
+	static Ref<AsyncUdpSocket> create(AsyncUdpSocketInstance* instance, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart);
+
 };
 
 SLIB_NETWORK_NAMESPACE_END

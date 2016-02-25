@@ -122,9 +122,15 @@ typedef sl_uint32			sl_char32;
 
 // Unicode String Constant Definition
 #if defined(SLIB_COMPILER_IS_VISUALSTUDIO)
+
 #	define SLIB_UNICODE(quote)		(const sl_char16*)(L##quote)
 #	define SLIB_USE_UNICODE16
+
+#define SLIB_STRINGIFY(...) (#__VA_ARGS__)
+#define SLIB_STRINGIFY_UNICODE(...) SLIB_UNICODE(#__VA_ARGS__)
+
 #elif defined(SLIB_COMPILER_IS_GCC)
+
 #	if defined(__SIZEOF_WCHAR_T__) && (__SIZEOF_WCHAR_T__ == 2)
 #		define SLIB_UNICODE(quote)		(const sl_char16*)(L##quote)
 #		define SLIB_USE_UNICODE16
@@ -132,13 +138,14 @@ typedef sl_uint32			sl_char32;
 #		define SLIB_UNICODE(quote)		(const sl_char32*)(L##quote)
 #		define SLIB_USE_UNICODE32
 #	endif
+
+#define SLIB_STRINGIFY(x...) (#x)
+#define SLIB_STRINGIFY_UNICODE(x...) SLIB_UNICODE(#x)
+
 #endif
 
 SLIB_INLINE void sl_blank_proc(const void*) {}
 #define SLIB_UNUSED(x) sl_blank_proc(&x)
-
-#define SLIB_STRINGIFY(x) (#x)
-#define SLIB_STRINGIFY_UNICODE(x) SLIB_UNICODE(#x)
 
 #define SLIB_PARSE_ERROR (sl_int32)(-1)
 

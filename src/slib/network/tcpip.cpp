@@ -100,6 +100,21 @@ sl_bool IPv4HeaderFormat::checkHeader(const void* packet, sl_uint32 sizeTotal)
 	return sl_true;
 }
 
+sl_bool IPv4HeaderFormat::getPortsForTcpUdp(sl_uint16& src, sl_uint16& dst) const
+{
+	sl_uint8 protocol = getProtocol();
+	if (protocol == networkInternetProtocol_TCP || protocol == networkInternetProtocol_UDP) {
+		if (getContentSize() > 4) {
+			const sl_uint8* p = getContent();
+			src = MIO::readUint16BE(p);
+			dst = MIO::readUint16BE(p + 2);
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
+
 void TcpHeaderFormat::updateChecksum(const IPv4HeaderFormat* ipv4, sl_uint32 sizeContent)
 {
 	_checksum[0] = 0;
@@ -196,24 +211,40 @@ void IPv4Fragmentation::setupExpiringDuration(sl_uint32 ms)
 	m_packets.setupTimer(ms);
 }
 
-Memory IPv4Fragmentation::combineFragment(const void* _ip, sl_uint32 size)
+sl_bool IPv4Fragmentation::isNeededCombine(const void* _ip, sl_uint32 size, sl_bool flagCheckedHeader)
 {
 	IPv4HeaderFormat* ip = (IPv4HeaderFormat*)(_ip);
-	if (!(IPv4HeaderFormat::check(ip, size))) {
-		return Memory::null();
+	if (!flagCheckedHeader) {
+		if (!(IPv4HeaderFormat::check(ip, size))) {
+			return sl_false;
+		}
 	}
+	if (ip->getFragmentOffset() == 0 && !(ip->isMF())) {
+		return sl_false;
+	}
+	return sl_true;
+}
+
+Memory IPv4Fragmentation::combineFragment(const void* _ip, sl_uint32 size, sl_bool flagCheckedHeader)
+{
+	IPv4HeaderFormat* ip = (IPv4HeaderFormat*)(_ip);
+	if (!flagCheckedHeader) {
+		if (!(IPv4HeaderFormat::check(ip, size))) {
+			return Memory::null();
+		}
+	}
+
+	if (ip->getFragmentOffset() == 0 && !(ip->isMF())) {
+		return Memory::create(ip, ip->getTotalSize());
+	}
+
+	sl_uint32 offset = ip->getFragmentOffset() * 8;
+
 	IPv4PacketIdentifier id;
 	id.source = ip->getSourceAddress();
 	id.destination = ip->getDestinationAddress();
 	id.identification = ip->getIdentification();
 	id.protocol = ip->getProtocol();
-
-	if (ip->getFragmentOffset() == 0 && !(ip->isMF())) {
-		m_packets.remove(id);
-		return Memory::create(ip, ip->getTotalSize());
-	}
-
-	sl_uint32 offset = ip->getFragmentOffset() * 8;
 
 	// get packet
 	ObjectLocker lock(this);

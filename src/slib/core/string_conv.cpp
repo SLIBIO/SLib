@@ -148,6 +148,42 @@ String16 String16::fromUint64(sl_uint64 value, sl_int32 radix, sl_int32 minWidth
 	return _String_fromUint<sl_uint64, String16, sl_char16>(value, radix, minWidth, flagUpperCase);
 }
 
+String8 String8::fromInt(sl_reg value, sl_int32 radix, sl_int32 minWidth, sl_bool flagUpperCase)
+{
+#ifdef SLIB_ARCH_IS_64BIT
+    return fromInt64(value, radix, minWidth, flagUpperCase);
+#else
+    return fromInt32(value, radix, minWidth, flagUpperCase);
+#endif
+}
+
+String16 String16::fromInt(sl_reg value, sl_int32 radix, sl_int32 minWidth, sl_bool flagUpperCase)
+{
+#ifdef SLIB_ARCH_IS_64BIT
+    return fromInt64(value, radix, minWidth, flagUpperCase);
+#else
+    return fromInt32(value, radix, minWidth, flagUpperCase);
+#endif
+}
+
+String8 String8::fromSize(sl_size value, sl_int32 radix, sl_int32 minWidth, sl_bool flagUpperCase)
+{
+#ifdef SLIB_ARCH_IS_64BIT
+    return fromUint64(value, radix, minWidth, flagUpperCase);
+#else
+    return fromUint32(value, radix, minWidth, flagUpperCase);
+#endif
+}
+
+String16 String16::fromSize(sl_size value, sl_int32 radix, sl_int32 minWidth, sl_bool flagUpperCase)
+{
+#ifdef SLIB_ARCH_IS_64BIT
+    return fromUint64(value, radix, minWidth, flagUpperCase);
+#else
+    return fromUint32(value, radix, minWidth, flagUpperCase);
+#endif
+}
+
 template <class FT, class ST, class CT>
 SLIB_INLINE ST _String_fromFloat(FT value, sl_int32 precision, sl_bool flagZeroPadding, sl_int32 minWidthIntegral) {
 	
@@ -317,6 +353,24 @@ String16 String16::fromFloat(float value, sl_int32 precision, sl_bool flagZeroPa
 	return _String_fromFloat<float, String16, sl_char16>(value, precision, flagZeroPadding, minWidthIntegral);
 }
 
+String8 String8::fromPointerValue(const void* pointer)
+{
+#ifdef SLIB_ARCH_IS_64BIT
+    return fromUint64((sl_uint64)(pointer), 16, 16, sl_true);
+#else
+    return fromUint32((sl_uint32)(pointer), 16, 8, sl_true);
+#endif
+}
+
+String16 String16::fromPointerValue(const void* pointer)
+{
+#ifdef SLIB_ARCH_IS_64BIT
+    return fromUint64((sl_uint64)(pointer), 16, 16, sl_true);
+#else
+    return fromUint32((sl_uint32)(pointer), 16, 8, sl_true);
+#endif
+}
+
 String8 String8::fromBoolean(sl_bool value)
 {
 	if (value) {
@@ -368,8 +422,19 @@ String16 String16::makeHexString(const void* buf, sl_int32 size)
 	return _String_makeHexString<String16, sl_char16>(buf, size);
 }
 
+String8 String8::makeHexString(const Memory& mem)
+{
+    return makeHexString(mem.getBuf(), (sl_uint32)(mem.getSize()));
+}
+
+String16 String16::makeHexString(const Memory& mem)
+{
+    return makeHexString(mem.getBuf(), (sl_uint32)(mem.getSize()));
+}
+
+
 template <class IT, class CT>
-SLIB_INLINE sl_int32 _String_parseInt(const CT* sz, sl_uint32 i, sl_uint32 n, IT* _out, sl_int32 radix)
+SLIB_INLINE sl_int32 _String_parseInt(sl_int32 radix, const CT* sz, sl_uint32 i, sl_uint32 n, IT* _out)
 {
 	if (i >= n) {
 		return SLIB_PARSE_ERROR;
@@ -413,7 +478,7 @@ SLIB_INLINE sl_int32 _String_parseInt(const CT* sz, sl_uint32 i, sl_uint32 n, IT
 }
 
 template <class IT, class CT>
-SLIB_INLINE sl_int32 _String_parseUint(const CT* sz, sl_uint32 i, sl_uint32 n, IT* _out, sl_int32 radix)
+SLIB_INLINE sl_int32 _String_parseUint(sl_int32 radix, const CT* sz, sl_uint32 i, sl_uint32 n, IT* _out)
 {
 	if (i >= n) {
 		return SLIB_PARSE_ERROR;
@@ -437,165 +502,427 @@ SLIB_INLINE sl_int32 _String_parseUint(const CT* sz, sl_uint32 i, sl_uint32 n, I
 	return i;
 }
 
-sl_int32 String8::parseInt32(sl_int32* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_int32 String8::parseInt32(sl_int32 radix, sl_int32* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
 {
-	return _String_parseInt(sz, posBegin, len, _out, radix);
+	return _String_parseInt(radix, sz, posBegin, len, _out);
 }
 
-sl_int32 String8::parseInt32(sl_int32* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_int32 String16::parseInt32(sl_int32 radix, sl_int32* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
 {
-	return _String_parseInt(sz, posBegin, len, _out, radix);
+	return _String_parseInt(radix, sz, posBegin, len, _out);
 }
 
-sl_bool String8::parseInt32(sl_int32* _out, sl_int32 radix) const
+sl_int32 String8::parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
 {
-	String8 s = *this;
-	sl_uint32 n = s.getLength();
+	return _String_parseInt(radix, sz, posBegin, len, _out);
+}
+
+sl_int32 String16::parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+{
+	return _String_parseInt(radix, sz, posBegin, len, _out);
+}
+
+sl_bool String8::parseInt32(sl_int32 radix, sl_int32* _out) const
+{
+	sl_uint32 n = length();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseInt(s.data(), 0, n, _out, radix) == n;
+	return _String_parseInt(radix, data(), 0, n, _out) == n;
 }
 
-sl_int32 String16::parseInt32(sl_int32* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_bool String16::parseInt32(sl_int32 radix, sl_int32* _out) const
 {
-	return _String_parseInt(sz, posBegin, len, _out, radix);
-}
-
-sl_int32 String16::parseInt32(sl_int32* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
-{
-	return _String_parseInt(sz, posBegin, len, _out, radix);
-}
-
-sl_bool String16::parseInt32(sl_int32* _out, sl_int32 radix) const
-{
-	String16 s = *this;
-	sl_uint32 n = s.getLength();
+	sl_uint32 n = length();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseInt(s.data(), 0, n, _out, radix) == n;
+	return _String_parseInt(radix, data(), 0, n, _out) == n;
 }
 
-sl_int32 String8::parseUint32(sl_uint32* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_bool SafeString8::parseInt32(sl_int32 radix, sl_int32* _out) const
 {
-	return _String_parseUint(sz, posBegin, len, _out, radix);
+    String8 s(*this);
+    return s.parseInt32(radix, _out);
 }
 
-sl_int32 String8::parseUint32(sl_uint32* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_bool SafeString16::parseInt32(sl_int32 radix, sl_int32* _out) const
 {
-	return _String_parseUint(sz, posBegin, len, _out, radix);
+    String16 s(*this);
+    return s.parseInt32(radix, _out);
 }
 
-sl_bool String8::parseUint32(sl_uint32* _out, sl_int32 radix) const
+sl_int32 String8::parseInt32(sl_int32 radix, sl_int32 def) const
 {
-	String8 s = *this;
-	sl_uint32 n = s.getLength();
+    sl_int32 _out = def;
+    parseInt32(radix, &_out);
+    return _out;
+}
+
+sl_int32 String16::parseInt32(sl_int32 radix, sl_int32 def) const
+{
+    sl_int32 _out = def;
+    parseInt32(radix, &_out);
+    return _out;
+}
+
+sl_int32 SafeString8::parseInt32(sl_int32 radix, sl_int32 def) const
+{
+    String8 s(*this);
+    return s.parseInt32(radix, def);
+}
+
+sl_int32 SafeString16::parseInt32(sl_int32 radix, sl_int32 def) const
+{
+    String16 s(*this);
+    return s.parseInt32(radix, def);
+}
+
+
+sl_int32 String8::parseUint32(sl_int32 radix, sl_uint32* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+{
+	return _String_parseUint(radix, sz, posBegin, len, _out);
+}
+
+sl_int32 String16::parseUint32(sl_int32 radix, sl_uint32* _out, const char* sz, sl_uint32 posBegin, sl_uint32 n)
+{
+	return _String_parseUint(radix, sz, posBegin, n, _out);
+}
+
+sl_int32 String8::parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+{
+	return _String_parseUint(radix, sz, posBegin, len, _out);
+}
+
+sl_int32 String16::parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 n)
+{
+	return _String_parseUint(radix, sz, posBegin, n, _out);
+}
+
+sl_bool String8::parseUint32(sl_int32 radix, sl_uint32* _out) const
+{
+	sl_uint32 n = length();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseUint(s.data(), 0, n, _out, radix) == n;
+	return _String_parseUint(radix, data(), 0, n, _out) == n;
 }
 
-sl_int32 String16::parseUint32(sl_uint32* _out, const char* sz, sl_uint32 posBegin, sl_uint32 n, sl_int32 radix)
+sl_bool String16::parseUint32(sl_int32 radix, sl_uint32* _out) const
 {
-	return _String_parseUint(sz, posBegin, n, _out, radix);
-}
-
-sl_int32 String16::parseUint32(sl_uint32* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 n, sl_int32 radix)
-{
-	return _String_parseUint(sz, posBegin, n, _out, radix);
-}
-
-sl_bool String16::parseUint32(sl_uint32* _out, sl_int32 radix) const
-{
-	String16 s = *this;
-	sl_uint32 n = s.getLength();
+	sl_uint32 n = length();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseUint(s.data(), 0, n, _out, radix) == n;
+	return _String_parseUint(radix, data(), 0, n, _out) == n;
 }
 
-sl_int32 String8::parseInt64(sl_int64* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_bool SafeString8::parseUint32(sl_int32 radix, sl_uint32* _out) const
 {
-	return _String_parseInt(sz, posBegin, len, _out, radix);
+    String8 s(*this);
+    return s.parseUint32(radix, _out);
 }
 
-sl_int32 String8::parseInt64(sl_int64* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_bool SafeString16::parseUint32(sl_int32 radix, sl_uint32* _out) const
 {
-	return _String_parseInt(sz, posBegin, len, _out, radix);
+    String16 s(*this);
+    return s.parseUint32(radix, _out);
 }
 
-sl_bool String8::parseInt64(sl_int64* _out, sl_int32 radix) const
+sl_uint32 String8::parseUint32(sl_int32 radix, sl_uint32 def) const
 {
-	String8 s = *this;
-	sl_uint32 n = s.getLength();
+    sl_uint32 _out = def;
+    parseUint32(radix, &_out);
+    return _out;
+}
+
+sl_uint32 String16::parseUint32(sl_int32 radix, sl_uint32 def) const
+{
+    sl_uint32 _out = def;
+    parseUint32(radix, &_out);
+    return _out;
+}
+
+sl_uint32 SafeString8::parseUint32(sl_int32 radix, sl_uint32 def) const
+{
+    String8 s(*this);
+    return s.parseUint32(radix, def);
+}
+
+sl_uint32 SafeString16::parseUint32(sl_int32 radix, sl_uint32 def) const
+{
+    String16 s(*this);
+    return s.parseUint32(radix, def);
+}
+
+
+sl_int32 String8::parseInt64(sl_int32 radix, sl_int64* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+{
+	return _String_parseInt(radix, sz, posBegin, len, _out);
+}
+
+sl_int32 String16::parseInt64(sl_int32 radix, sl_int64* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+{
+	return _String_parseInt(radix, sz, posBegin, len, _out);
+}
+
+sl_int32 String8::parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+{
+	return _String_parseInt(radix, sz, posBegin, len, _out);
+}
+
+sl_int32 String16::parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+{
+	return _String_parseInt(radix, sz, posBegin, len, _out);
+}
+
+sl_bool String8::parseInt64(sl_int32 radix, sl_int64* _out) const
+{
+	sl_uint32 n = length();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseInt(s.data(), 0, n, _out, radix) == n;
+	return _String_parseInt(radix, data(), 0, n, _out) == n;
 }
 
-sl_int32 String16::parseInt64(sl_int64* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_bool String16::parseInt64(sl_int32 radix, sl_int64* _out) const
 {
-	return _String_parseInt(sz, posBegin, len, _out, radix);
-}
-
-sl_int32 String16::parseInt64(sl_int64* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
-{
-	return _String_parseInt(sz, posBegin, len, _out, radix);
-}
-
-sl_bool String16::parseInt64(sl_int64* _out, sl_int32 radix) const
-{
-	String16 s = *this;
-	sl_uint32 n = s.getLength();
+	sl_uint32 n = length();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseInt(s.data(), 0, n, _out, radix) == n;
+	return _String_parseInt(radix, data(), 0, n, _out) == n;
 }
 
-sl_int32 String8::parseUint64(sl_uint64* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_bool SafeString8::parseInt64(sl_int32 radix, sl_int64* _out) const
 {
-	return _String_parseUint(sz, posBegin, len, _out, radix);
+    String8 s(*this);
+    return s.parseInt64(radix, _out);
 }
 
-sl_int32 String8::parseUint64(sl_uint64* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_bool SafeString16::parseInt64(sl_int32 radix, sl_int64* _out) const
 {
-	return _String_parseUint(sz, posBegin, len, _out, radix);
+    String16 s(*this);
+    return s.parseInt64(radix, _out);
 }
 
-sl_bool String8::parseUint64(sl_uint64* _out, sl_int32 radix) const
+sl_int64 String8::parseInt64(sl_int32 radix, sl_int64 def) const
 {
-	String8 s = *this;
-	sl_uint32 n = s.getLength();
+    sl_int64 _out = def;
+    parseInt64(radix, &_out);
+    return _out;
+}
+
+sl_int64 String16::parseInt64(sl_int32 radix, sl_int64 def) const
+{
+    sl_int64 _out = def;
+    parseInt64(radix, &_out);
+    return _out;
+}
+
+sl_int64 SafeString8::parseInt64(sl_int32 radix, sl_int64 def) const
+{
+    String8 s(*this);
+    return s.parseInt64(radix, def);
+}
+
+sl_int64 SafeString16::parseInt64(sl_int32 radix, sl_int64 def) const
+{
+    String16 s(*this);
+    return s.parseInt64(radix, def);
+}
+
+
+sl_int32 String8::parseUint64(sl_int32 radix, sl_uint64* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+{
+	return _String_parseUint(radix, sz, posBegin, len, _out);
+}
+
+sl_int32 String16::parseUint64(sl_int32 radix, sl_uint64* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+{
+	return _String_parseUint(radix, sz, posBegin, len, _out);
+}
+
+sl_int32 String8::parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+{
+	return _String_parseUint(radix, sz, posBegin, len, _out);
+}
+
+sl_int32 String16::parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+{
+	return _String_parseUint(radix, sz, posBegin, len, _out);
+}
+
+sl_bool String8::parseUint64(sl_int32 radix, sl_uint64* _out) const
+{
+	sl_uint32 n = length();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseUint(s.data(), 0, n, _out, radix) == n;
+	return _String_parseUint(radix, data(), 0, n, _out) == n;
 }
 
-sl_int32 String16::parseUint64(sl_uint64* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
+sl_bool String16::parseUint64(sl_int32 radix, sl_uint64* _out) const
 {
-	return _String_parseUint(sz, posBegin, len, _out, radix);
-}
-
-sl_int32 String16::parseUint64(sl_uint64* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_int32 radix)
-{
-	return _String_parseUint(sz, posBegin, len, _out, radix);
-}
-
-sl_bool String16::parseUint64(sl_uint64* _out, sl_int32 radix) const
-{
-	String16 s = *this;
-	sl_uint32 n = s.getLength();
+	sl_uint32 n = length();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseUint(s.data(), 0, n, _out, radix) == n;
+	return _String_parseUint(radix, data(), 0, n, _out) == n;
 }
+
+sl_bool SafeString8::parseUint64(sl_int32 radix, sl_uint64* _out) const
+{
+    String8 s(*this);
+    return s.parseUint64(radix, _out);
+}
+
+sl_bool SafeString16::parseUint64(sl_int32 radix, sl_uint64* _out) const
+{
+    String16 s(*this);
+    return s.parseUint64(radix, _out);
+}
+
+sl_uint64 String8::parseUint64(sl_int32 radix, sl_uint64 def) const
+{
+    sl_uint64 _out = def;
+    parseUint64(radix, &_out);
+    return _out;
+}
+
+sl_uint64 String16::parseUint64(sl_int32 radix, sl_uint64 def) const
+{
+    sl_uint64 _out = def;
+    parseUint64(radix, &_out);
+    return _out;
+}
+
+sl_uint64 SafeString8::parseUint64(sl_int32 radix, sl_uint64 def) const
+{
+    String8 s(*this);
+    return s.parseUint64(radix, def);
+}
+
+sl_uint64 SafeString16::parseUint64(sl_int32 radix, sl_uint64 def) const
+{
+    String16 s(*this);
+    return s.parseUint64(radix, def);
+}
+
+
+sl_bool String8::parseInt(sl_int32 radix, sl_reg* _out) const
+{
+#ifdef SLIB_ARCH_IS_64BIT
+    return parseInt64(radix, _out);
+#else
+    return parseInt32(radix, _out);
+#endif
+}
+
+sl_bool String16::parseInt(sl_int32 radix, sl_reg* _out) const
+{
+#ifdef SLIB_ARCH_IS_64BIT
+    return parseInt64(radix, _out);
+#else
+    return parseInt32(radix, _out);
+#endif
+}
+
+sl_bool SafeString8::parseInt(sl_int32 radix, sl_reg* _out) const
+{
+    String8 s(*this);
+    return s.parseInt(radix, _out);
+}
+
+sl_bool SafeString16::parseInt(sl_int32 radix, sl_reg* _out) const
+{
+    String16 s(*this);
+    return s.parseInt(radix, _out);
+}
+
+sl_reg String8::parseInt(sl_int32 radix, sl_reg def) const
+{
+    sl_reg _out = def;
+    parseInt(radix, &_out);
+    return _out;
+}
+
+sl_reg String16::parseInt(sl_int32 radix, sl_reg def) const
+{
+    sl_reg _out = def;
+    parseInt(radix, &_out);
+    return _out;
+}
+
+sl_reg SafeString8::parseInt(sl_int32 radix, sl_reg def) const
+{
+    String8 s(*this);
+    return s.parseInt(radix, def);
+}
+
+sl_reg SafeString16::parseInt(sl_int32 radix, sl_reg def) const
+{
+    String16 s(*this);
+    return s.parseInt(radix, def);
+}
+
+
+sl_bool String8::parseSize(sl_int32 radix, sl_size* _out) const
+{
+#ifdef SLIB_ARCH_IS_64BIT
+    return parseUint64(radix, _out);
+#else
+    return parseUint32(radix, _out);
+#endif
+}
+
+sl_bool String16::parseSize(sl_int32 radix, sl_size* _out) const
+{
+#ifdef SLIB_ARCH_IS_64BIT
+    return parseUint64(radix, _out);
+#else
+    return parseUint32(radix, _out);
+#endif
+}
+
+sl_bool SafeString8::parseSize(sl_int32 radix, sl_size* _out) const
+{
+    String8 s(*this);
+    return s.parseSize(radix, _out);
+}
+
+sl_bool SafeString16::parseSize(sl_int32 radix, sl_size* _out) const
+{
+    String16 s(*this);
+    return s.parseSize(radix, _out);
+}
+
+sl_size String8::parseSize(sl_int32 radix, sl_size def) const
+{
+    sl_size _out = def;
+    parseSize(radix, &_out);
+    return _out;
+}
+
+sl_size String16::parseSize(sl_int32 radix, sl_size def) const
+{
+    sl_size _out = def;
+    parseSize(radix, &_out);
+    return _out;
+}
+
+sl_size SafeString8::parseSize(sl_int32 radix, sl_size def) const
+{
+    String8 s(*this);
+    return s.parseSize(radix, def);
+}
+
+sl_size SafeString16::parseSize(sl_int32 radix, sl_size def) const
+{
+    String16 s(*this);
+    return s.parseSize(radix, def);
+}
+
 
 template <class FT, class CT>
 SLIB_INLINE sl_int32 _String_parseFloat(const CT* sz, sl_uint32 i, sl_uint32 n, FT* _out)
@@ -694,22 +1021,12 @@ sl_int32 String8::parseFloat(float* _out, const char* sz, sl_uint32 posBegin, sl
 	return _String_parseFloat(sz, posBegin, len, _out);
 }
 
-sl_int32 String8::parseFloat(float* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_int32 String16::parseFloat(float* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
 {
 	return _String_parseFloat(sz, posBegin, len, _out);
 }
 
-sl_bool String8::parseFloat(float* _out) const
-{
-	String8 s = *this;
-	sl_uint32 n = s.getLength();
-	if (n == 0) {
-		return sl_false;
-	}
-	return _String_parseFloat(s.data(), 0, n, _out) == n;
-}
-
-sl_int32 String16::parseFloat(float* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_int32 String8::parseFloat(float* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
 {
 	return _String_parseFloat(sz, posBegin, len, _out);
 }
@@ -719,17 +1036,69 @@ sl_int32 String16::parseFloat(float* _out, const sl_char16* sz, sl_uint32 posBeg
 	return _String_parseFloat(sz, posBegin, len, _out);
 }
 
-sl_bool String16::parseFloat(float* _out) const
+sl_bool String8::parseFloat(float* _out) const
 {
-	String16 s = *this;
-	sl_uint32 n = s.getLength();
+	sl_uint32 n = length();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseFloat(s.data(), 0, n, _out) == n;
+	return _String_parseFloat(data(), 0, n, _out) == n;
 }
 
+sl_bool String16::parseFloat(float* _out) const
+{
+	sl_uint32 n = length();
+	if (n == 0) {
+		return sl_false;
+	}
+	return _String_parseFloat(data(), 0, n, _out) == n;
+}
+
+sl_bool SafeString8::parseFloat(float* _out) const
+{
+    String8 s(*this);
+    return s.parseFloat(_out);
+}
+
+sl_bool SafeString16::parseFloat(float* _out) const
+{
+    String16 s(*this);
+    return s.parseFloat(_out);
+}
+
+float String8::parseFloat(float def) const
+{
+    float _out = def;
+    parseFloat(&_out);
+    return _out;
+}
+
+float String16::parseFloat(float def) const
+{
+    float _out = def;
+    parseFloat(&_out);
+    return _out;
+}
+
+float SafeString8::parseFloat(float def) const
+{
+    String8 s(*this);
+    return s.parseFloat(def);
+}
+
+float SafeString16::parseFloat(float def) const
+{
+    String16 s(*this);
+    return s.parseFloat(def);
+}
+
+
 sl_int32 String8::parseDouble(double* _out, const char* sz, sl_uint32 posBegin, sl_uint32 n)
+{
+	return _String_parseFloat(sz, posBegin, n, _out);
+}
+
+sl_int32 String16::parseDouble(double* _out, const char* sz, sl_uint32 posBegin, sl_uint32 n)
 {
 	return _String_parseFloat(sz, posBegin, n, _out);
 }
@@ -739,35 +1108,67 @@ sl_int32 String8::parseDouble(double* _out, const sl_char16* sz, sl_uint32 posBe
 	return _String_parseFloat(sz, posBegin, n, _out);
 }
 
-sl_bool String8::parseDouble(double* _out) const
-{
-	String8 s = *this;
-	sl_uint32 n = s.getLength();
-	if (n == 0) {
-		return sl_false;
-	}
-	return _String_parseFloat(s.data(), 0, n, _out) == n;
-}
-
-sl_int32 String16::parseDouble(double* _out, const char* sz, sl_uint32 posBegin, sl_uint32 n)
-{
-	return _String_parseFloat(sz, posBegin, n, _out);
-}
-
 sl_int32 String16::parseDouble(double* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 n)
 {
 	return _String_parseFloat(sz, posBegin, n, _out);
 }
 
-sl_bool String16::parseDouble(double* _out) const
+sl_bool String8::parseDouble(double* _out) const
 {
-	String16 s = *this;
-	sl_uint32 n = s.getLength();
+	sl_uint32 n = length();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseFloat(s.data(), 0, n, _out) == n;
+	return _String_parseFloat(data(), 0, n, _out) == n;
 }
+
+sl_bool String16::parseDouble(double* _out) const
+{
+	sl_uint32 n = length();
+	if (n == 0) {
+		return sl_false;
+	}
+	return _String_parseFloat(data(), 0, n, _out) == n;
+}
+
+sl_bool SafeString8::parseDouble(double* _out) const
+{
+	String8 s(*this);
+	return s.parseDouble(_out);
+}
+
+sl_bool SafeString16::parseDouble(double* _out) const
+{
+	String16 s(*this);
+	return s.parseDouble(_out);
+}
+
+double String8::parseDouble(double def) const
+{
+    double _out = def;
+    parseDouble(&_out);
+    return _out;
+}
+
+double String16::parseDouble(double def) const
+{
+    double _out = def;
+    parseDouble(&_out);
+    return _out;
+}
+
+double SafeString8::parseDouble(double def) const
+{
+	String8 s(*this);
+	return s.parseDouble(def);
+}
+
+double SafeString16::parseDouble(double def) const
+{
+	String16 s(*this);
+	return s.parseDouble(def);
+}
+
 
 template <class CT>
 SLIB_INLINE sl_int32 _String_parseHexString(const CT* sz, sl_uint32 i, sl_uint32 n, void* _out)
@@ -813,22 +1214,12 @@ sl_int32 String8::parseHexString(void* _out, const char* sz, sl_uint32 posBegin,
 	return _String_parseHexString(sz, posBegin, len, _out);
 }
 
-sl_int32 String8::parseHexString(void* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_int32 String16::parseHexString(void* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
 {
 	return _String_parseHexString(sz, posBegin, len, _out);
 }
 
-sl_bool String8::parseHexString(void* _out) const
-{
-	String8 s = *this;
-	sl_uint32 n = 0;
-	if (n == 0) {
-		return sl_false;
-	}
-	return _String_parseHexString(s.data(), 0, n, _out) == n;
-}
-
-sl_int32 String16::parseHexString(void* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_int32 String8::parseHexString(void* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
 {
 	return _String_parseHexString(sz, posBegin, len, _out);
 }
@@ -838,14 +1229,34 @@ sl_int32 String16::parseHexString(void* _out, const sl_char16* sz, sl_uint32 pos
 	return _String_parseHexString(sz, posBegin, len, _out);
 }
 
-sl_bool String16::parseHexString(void* _out) const
+sl_bool String8::parseHexString(void* _out) const
 {
-	String16 s = *this;
-	sl_uint32 n = 0;
+	sl_uint32 n = length();
 	if (n == 0) {
 		return sl_false;
 	}
-	return _String_parseHexString(s.data(), 0, n, _out) == n;
+	return _String_parseHexString(data(), 0, n, _out) == n;
+}
+
+sl_bool String16::parseHexString(void* _out) const
+{
+	sl_uint32 n = length();
+	if (n == 0) {
+		return sl_false;
+	}
+	return _String_parseHexString(data(), 0, n, _out) == n;
+}
+
+sl_bool SafeString8::parseHexString(void* _out) const
+{
+	String8 s(*this);
+	return s.parseHexString(_out);
+}
+
+sl_bool SafeString16::parseHexString(void* _out) const
+{
+	String16 s(*this);
+	return s.parseHexString(_out);
 }
 
 SLIB_NAMESPACE_END

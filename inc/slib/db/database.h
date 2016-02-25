@@ -150,6 +150,7 @@ public:
 	virtual Variant getValueForQueryResult(const String& sql, const Variant* params, sl_uint32 nParams);
 
 	virtual String getErrorMessage() = 0;
+
 };
 
 SLIB_DB_NAMESPACE_END

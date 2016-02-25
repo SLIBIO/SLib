@@ -24,6 +24,13 @@ public:
 
 };
 
+class SLIB_EXPORT SettingUtil
+{
+public:
+	static sl_bool parseUint32Range(const String& str, sl_uint32* from = sl_null, sl_uint32* to = sl_null);
+
+};
+
 SLIB_NAMESPACE_END
 
 #endif

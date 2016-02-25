@@ -63,7 +63,13 @@ public:
 class SLIB_EXPORT NetFilterParam
 {
 public:
+	sl_bool flagAutoStart;
+
 	Ptr<INetFilterListener> listener;
+
+public:
+	NetFilterParam();
+
 };
 
 class SLIB_EXPORT NetFilter : public Object
@@ -75,6 +81,8 @@ public:
 	
 public:
 	virtual void release() = 0;
+
+	virtual void start() = 0;
 	
 	virtual sl_bool isRunning() = 0;
 

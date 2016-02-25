@@ -8,6 +8,7 @@
 
 #include "../core/mio.h"
 #include "../core/string.h"
+#include "../crypto/aes.h"
 
 /********************************************************************
 	DNS Specification from RFC 1035, RFC 1034, RFC 2535
@@ -532,7 +533,7 @@ public:
 	
 	static Memory buildQuestionPacket(sl_uint16 id, const String& host);
 	
-	static Memory buildHostAddressAnswerPacket(sl_uint16 id, const String& hostName, const List<IPAddress>& hostAddresses);
+	static Memory buildHostAddressAnswerPacket(sl_uint16 id, const String& hostName, const IPv4Address& hostAddress);
 
 };
 
@@ -583,10 +584,35 @@ protected:
 
 class DnsServer;
 
+class SLIB_EXPORT DnsResolveHostParam
+{
+public:
+	// in
+	SocketAddress clientAddress;
+
+	// in
+	String hostName;
+
+	// out
+	IPv4Address hostAddress;
+
+	// out
+	sl_bool flagIgnoreRequest;
+
+	// in, out
+	SocketAddress forwardAddress;
+
+	// in, out
+	sl_bool flagEncryptForward;
+
+public:
+	DnsResolveHostParam();
+};
+
 class SLIB_EXPORT IDnsServerListener
 {
 public:
-	virtual List<IPAddress> resolveDnsHost(DnsServer* server, const String& hostName, sl_bool& flagStatic) = 0;
+	virtual void resolveDnsHost(DnsServer* server, DnsResolveHostParam& param) = 0;
 	
 	virtual void cacheDnsHost(DnsServer* server, const String& hostName, const IPAddress& hostAddress) = 0;
 
@@ -595,54 +621,85 @@ public:
 class SLIB_EXPORT DnsServerParam
 {
 public:
-	IPv4Address forwardTarget;
+	sl_uint16 portDns;
+
+	sl_uint16 portEncryption;
+	String encryptionKey;
+
+	sl_bool flagProxy;
+
+	SocketAddress defaultForwardAddress;
+	sl_bool flagEncryptDefaultForward;
+
+	sl_bool flagAutoStart;
 
 	Ptr<IDnsServerListener> listener;
 	
 public:
 	DnsServerParam();
+
+public:
+	void parse(const Variant& config);
+
 };
+
 
 class SLIB_EXPORT DnsServer : public Object, public IAsyncUdpSocketListener
 {
 protected:
 	DnsServer();
+	~DnsServer();
     
 public:
 	static Ref<DnsServer> create(const DnsServerParam& param, const Ref<AsyncIoLoop>& loop);
 
 	static Ref<DnsServer> create(const DnsServerParam& param);
-	
+
+public:
+	void release();
+
+	void start();
+
+	sl_bool isRunning();
+
 protected:
-	void _processReceivedQuestion(const SocketAddress& clientAddress, sl_uint16 id, const String& hostName);
+	void _processReceivedDnsQuestion(const SocketAddress& clientAddress, sl_uint16 id, const String& hostName, sl_bool flagEncryptedRequest);
 	
-	void _processReceivedAnswer(const DnsPacket& packet);
+	void _processReceivedDnsAnswer(const DnsPacket& packet);
+
+	void _processReceivedProxyQuestion(const SocketAddress& clientAddress, void* data, sl_uint32 size, sl_bool flagEncryptedRequest);
+
+	void _processReceivedProxyAnswer(void* data, sl_uint32 size);
+
+	void _sendPacket(sl_bool flagEncrypted, const SocketAddress& targetAddress, const Memory& packet);
 	
-	void _sendPacket(const SocketAddress& clientAddress, const Memory& packet);
-	
-	void _forwardPacket(const Memory& packet);
+	Memory _buildQuestionPacket(sl_uint16 id, const String& host, sl_bool flagEncrypt);
+
+	Memory _buildHostAddressAnswerPacket(sl_uint16 id, const String& hostName, const IPv4Address& hostAddress, sl_bool flagEncrypt);
 
 protected:
 	// override
 	virtual void onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 sizeReceive);
 
 protected:
-	List<IPAddress> _resolveDnsHost(const String& hostName, sl_bool& flagStatic);
+	void _resolveDnsHost(DnsResolveHostParam& param);
 	
 	void _cacheDnsHost(const String& hostName, const IPAddress& hostAddress);
 	
 private:
-	Ref<AsyncUdpSocket> m_udp;
-	
-	struct CacheElement
-	{
-		sl_bool flagStatic;
-		List<IPAddress> addresses;
-		Time lastCachedTime;
-	};
-	HashMap<String, CacheElement> m_cacheAddresses;
-	
-	IPv4Address m_forwardTarget;
+	sl_bool m_flagInit;
+	sl_bool m_flagRunning;
+
+	Ref<AsyncUdpSocket> m_udpDns;
+
+	Ref<AsyncUdpSocket> m_udpEncrypt;
+	AES m_encrypt;
+
+	sl_bool m_flagProxy;
+
+	SocketAddress m_defaultForwardAddress;
+	sl_bool m_flagEncryptDefaultForward;
+
 	sl_uint16 m_lastForwardId;
 	
 	struct ForwardElement
@@ -650,9 +707,10 @@ private:
 		SocketAddress clientAddress;
 		sl_uint16 requestedId;
 		String requestedHostName;
+		sl_bool flagEncrypted;
 	};
 	HashMap<sl_uint16, ForwardElement> m_mapForward;
-	
+
 	Ptr<IDnsServerListener> m_listener;
 
 };

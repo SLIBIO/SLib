@@ -220,6 +220,8 @@ public:
 	
 	static sl_int32 parse(IPv4Address* out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
+	static sl_bool parse(const String& str, IPv4Address* _out);
+
 	sl_bool parse(const String& str);
 
 	void makeNetworkMask(sl_uint32 networkPrefixLength);
@@ -265,6 +267,14 @@ public:
 		m[3] = 0;
 	}
 
+	SLIB_INLINE void setMaximum()
+	{
+		m[0] = 255;
+		m[1] = 255;
+		m[2] = 255;
+		m[3] = 255;
+	}
+
 	SLIB_INLINE sl_bool isLoopback() const
 	{
 		return m[0] == 127;
@@ -283,7 +293,7 @@ public:
 	SLIB_INLINE sl_bool isHost() const
 	{
 		sl_uint32 n = toInt();
-		return n != 0 && n != 0xFFFFFFFF && m[0] < 224 && m[0] != 127;
+		return n != 0 && m[0] < 224 && m[0] != 127;
 	}
 
 	SLIB_INLINE sl_bool isPrivate() const
@@ -312,23 +322,34 @@ private:
 	static const sl_uint8 _multicast_end[4];
 	
 public:
+	SLIB_INLINE static const IPv4Address& zero()
+	{
+		return *((IPv4Address*)((void*)(&_any)));
+	}
+
+	SLIB_INLINE static const IPv4Address& getZero()
+	{
+		return *((IPv4Address*)((void*)(&_any)));
+	}
+
+
+	SLIB_INLINE static const IPv4Address& maximum()
+	{
+		return *((IPv4Address*)((void*)(&_broadcast)));
+	}
+
+	SLIB_INLINE static const IPv4Address& getMaximum()
+	{
+		return *((IPv4Address*)((void*)(&_broadcast)));
+	}
+
+
 	SLIB_INLINE static const IPv4Address& any()
 	{
 		return *((IPv4Address*)((void*)(&_any)));
 	}
 	
 	SLIB_INLINE static const IPv4Address& getAny()
-	{
-		return *((IPv4Address*)((void*)(&_any)));
-	}
-
-	
-	SLIB_INLINE static const IPv4Address& zero()
-	{
-		return *((IPv4Address*)((void*)(&_any)));
-	}
-	
-	SLIB_INLINE static const IPv4Address& getZero()
 	{
 		return *((IPv4Address*)((void*)(&_any)));
 	}
@@ -592,6 +613,8 @@ public:
 	
 	static sl_int32 parse(IPv6Address* out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
+	static sl_bool parse(const String& str, IPv6Address* _out);
+
 	sl_bool parse(const String& str);
 	
 	sl_bool setHostName(const String& hostName);
@@ -858,6 +881,8 @@ public:
 	static sl_int32 parse(IPAddress* out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
 	
 	static sl_int32 parse(IPAddress* out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+
+	static sl_bool parse(const String& str, IPAddress* _out);
 	
 	sl_bool parse(const String& str);
 

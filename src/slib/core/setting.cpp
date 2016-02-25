@@ -65,4 +65,39 @@ Variant IniSetting::getValue(const String& name)
 	}
 }
 
+
+sl_bool SettingUtil::parseUint32Range(const String& str, sl_uint32* _from, sl_uint32* _to)
+{
+	sl_uint32 from;
+	sl_uint32 to;
+
+	sl_int32 index = str.indexOf('-');
+	if (index > 0) {
+		if (str.substring(0, index).parseUint32(10, &from)) {
+			if (str.substring(index + 1).parseUint32(10, &to)) {
+				if (to >= from) {
+					if (_from) {
+						*_from = from;
+					}
+					if (_to) {
+						*_to = to;
+					}
+					return sl_true;
+				}
+			}
+		}
+	} else {
+		if (str.substring(0, index).parseUint32(10, &from)) {
+			if (_from) {
+				*_from = from;
+			}
+			if (_to) {
+				*_to = from;
+			}
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
 SLIB_NAMESPACE_END

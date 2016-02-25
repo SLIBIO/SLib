@@ -224,7 +224,7 @@ static Variant _Json_parseJson(const CT* buf, sl_uint32 len, sl_uint32& pos, sl_
 			return Variant::fromBoolean(sl_false);
 		}
 		sl_int64 vi64;
-		if (str.parseInt64(&vi64)) {
+		if (str.parseInt64(10, &vi64)) {
 			flagError = sl_false;
 			if (vi64 >= SLIB_INT64(-0x80000000) && vi64 < SLIB_INT64(0x7fffffff)) {
 				return (sl_int32)vi64;

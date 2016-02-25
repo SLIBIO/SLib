@@ -45,11 +45,15 @@ private:
 
 public:
 	static Ref<AsyncLoop> getDefault();
+
+	static void releaseDefault();
 	
-	static Ref<AsyncLoop> create();
+	static Ref<AsyncLoop> create(sl_bool flagAutoStart = sl_true);
 	
 public:
 	void release();
+
+	void start();
 	
 	sl_bool isRunning();
 	
@@ -69,6 +73,7 @@ public:
 	}
 
 protected:
+	sl_bool m_flagInit;
 	sl_bool m_flagRunning;
 	Ref<Thread> m_thread;
 
@@ -175,11 +180,15 @@ private:
 	
 public:
 	static Ref<AsyncIoLoop> getDefault();
+
+	static void releaseDefault();
 	
-	static Ref<AsyncIoLoop> create();
+	static Ref<AsyncIoLoop> create(sl_bool flagAutoStart = sl_true);
 
 public:
 	void release();
+
+	void start();
 	
 	sl_bool isRunning();
 	
@@ -196,6 +205,7 @@ public:
 	void requestOrder(AsyncIoInstance* instance);
 	
 protected:
+	sl_bool m_flagInit;
 	sl_bool m_flagRunning;
 	void* m_handle;
 	

@@ -21,6 +21,8 @@ NetCaptureParam::NetCaptureParam()
 	sizeBuffer = 0x200000; // 2MB (16Mb)
 	
 	preferedLinkDeviceType = networkLinkDeviceType_Ethernet;
+
+	flagAutoStart = sl_true;
 }
 
 void NetCapture::_onCapturePacket(NetCapturePacket* packet)
@@ -51,12 +53,14 @@ public:
 	Memory m_bufPacket;
 	Ref<Thread> m_thread;
 	
+	sl_bool m_flagInit;
 	sl_bool m_flagRunning;
 	
 public:
 	_NetRawPacketCapture()
 	{	
-		m_flagRunning = sl_true;
+		m_flagInit = sl_false;
+		m_flagRunning = sl_false;
 	}
 	
 	~_NetRawPacketCapture()
@@ -67,14 +71,14 @@ public:
 public:
 	static Ref<_NetRawPacketCapture> create(const NetCaptureParam& param)
 	{
-		Ref<_NetRawPacketCapture> ret;
+		
 		sl_uint32 iface = 0;
 		String deviceName = param.deviceName;
 		if (deviceName.isNotEmpty()) {
 			iface = Network::getInterfaceIndexFromName(deviceName);
 			if (iface == 0) {
-				SLIB_LOG_ERROR(TAG, "Can not find the interface index of device: " + deviceName);
-				return ret;
+				SLIB_LOG_ERROR(TAG, "Failed to find the interface index of device: " + deviceName);
+				return Ref<_NetRawPacketCapture>::null();
 			}
 		}
 		Ref<Socket> socket;
@@ -87,44 +91,73 @@ public:
 		}
 		if (socket.isNotNull()) {
 			if (iface > 0) {
+				if (param.flagPromiscuous) {
+					if (!(socket->setPromiscuousMode(deviceName, sl_true))) {
+						SLIB_LOG(TAG, "Failed to set promiscuous mode to the network device: " + deviceName);
+					}
+				}
 				if (!(socket->setOption_bindToDevice(deviceName))) {
-					SLIB_LOG(TAG, "Can not bind to the network device: " + deviceName);
+					SLIB_LOG(TAG, "Failed to bind the network device: " + deviceName);
 				}
 			}
 			Memory mem = Memory::create(MAX_PACKET_SIZE);
 			if (mem.isNotEmpty()) {
-				ret = new _NetRawPacketCapture;
+				Ref<_NetRawPacketCapture> ret = new _NetRawPacketCapture;
 				if (ret.isNotNull()) {
 					ret->m_bufPacket = mem;
 					ret->m_socket = socket;
 					ret->m_deviceType = deviceType;
 					ret->m_ifaceIndex = iface;
 					ret->m_listener = param.listener;
-					ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(_NetRawPacketCapture, _run, ret.get()));
-					if (ret->m_thread.isNull()) {
-						ret.setNull();
+					ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_NetRawPacketCapture, _run, ret.get()));
+					if (ret->m_thread.isNotNull()) {
+						ret->m_flagInit = sl_true;
+						if (param.flagAutoStart) {
+							ret->start();
+						}
+						return ret;
+					} else {
+						SLIB_LOG_ERROR(TAG, "Failed to create thread");
 					}
 				}
 			}
 		} else {
 			SLIB_LOG_ERROR(TAG, "Failed to create Packet socket");
 		}
-		return ret;
+		return Ref<_NetRawPacketCapture>::null();
 	}
 	
 	void release()
 	{
 		ObjectLocker lock(this);
-		if (!m_flagRunning) {
+		if (!m_flagInit) {
 			return;
 		}
-		m_flagRunning = sl_false;
+		m_flagInit = sl_false;
 		
+		m_flagRunning = sl_false;
 		if (m_thread.isNotNull()) {
 			m_thread->finishAndWait();
 			m_thread.setNull();
 		}
 		m_socket.setNull();
+	}
+
+	void start()
+	{
+		ObjectLocker lock(this);
+		if (!m_flagInit) {
+			return;
+		}
+		
+		if (m_flagRunning) {
+			return;
+		}
+		if (m_thread.isNotNull()) {
+			if (m_thread->start()) {
+				m_flagRunning = sl_true;
+			}
+		}
 	}
 	
 	sl_bool isRunning()
@@ -176,7 +209,7 @@ public:
 		if (m_ifaceIndex == 0) {
 			return sl_false;
 		}
-		if (m_flagRunning) {
+		if (m_flagInit) {
 			L2PacketInfo info;
 			info.type = l2PacketType_OutGoing;
 			info.iface = m_ifaceIndex;
@@ -219,12 +252,14 @@ public:
 	Memory m_bufPacket;	
 	Ref<Thread> m_thread;
 
+	sl_bool m_flagInit;
 	sl_bool m_flagRunning;
 	
 public:
 	_NetRawIPv4Capture()
 	{	
-		m_flagRunning = sl_true;
+		m_flagInit = sl_false;
+		m_flagRunning = sl_false;
 	}
 	
 	~_NetRawIPv4Capture()
@@ -235,7 +270,6 @@ public:
 public:
 	static Ref<_NetRawIPv4Capture> create(const NetCaptureParam& param)
 	{
-		Ref<_NetRawIPv4Capture> ret;
 		Ref<Socket> socketTCP = Socket::openRaw(networkInternetProtocol_TCP);
 		Ref<Socket> socketUDP = Socket::openRaw(networkInternetProtocol_UDP);
 		Ref<Socket> socketICMP = Socket::openRaw(networkInternetProtocol_ICMP);
@@ -245,31 +279,38 @@ public:
 			socketICMP->setOption_IncludeIpHeader(sl_true);
 			Memory mem = Memory::create(MAX_PACKET_SIZE);
 			if (mem.isNotEmpty()) {
-				ret = new _NetRawIPv4Capture;
+				Ref<_NetRawIPv4Capture> ret = new _NetRawIPv4Capture;
 				if (ret.isNotNull()) {
 					ret->m_bufPacket = mem;
 					ret->m_socketTCP = socketTCP;
 					ret->m_socketUDP = socketUDP;
 					ret->m_socketICMP = socketICMP;
 					ret->m_listener = param.listener;
-					ret->m_thread = Thread::start(SLIB_CALLBACK_CLASS(_NetRawIPv4Capture, _run, ret.get()));
-					if (ret->m_thread.isNull()) {
-						ret.setNull();
+					ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_NetRawIPv4Capture, _run, ret.get()));
+					if (ret->m_thread.isNotNull()) {
+						ret->m_flagInit = sl_true;
+						if (param.flagAutoStart) {
+							ret->start();
+						}
+						return ret;
+					} else {
+						SLIB_LOG_ERROR(TAG, "Failed to create thread");
 					}
 				}
 			}
 		}
-		return ret;
+		return Ref<_NetRawIPv4Capture>::null();
 	}
 	
 	void release()
 	{
 		ObjectLocker lock(this);
-		if (!m_flagRunning) {
+		if (!m_flagInit) {
 			return;
 		}
-		m_flagRunning = sl_false;
+		m_flagInit = sl_false;
 		
+		m_flagRunning = sl_false;
 		if (m_thread.isNotNull()) {
 			m_thread->finishAndWait();
 			m_thread.setNull();
@@ -277,6 +318,24 @@ public:
 		m_socketTCP.setNull();
 		m_socketUDP.setNull();
 		m_socketICMP.setNull();
+	}
+
+	void start()
+	{
+		ObjectLocker lock(this);
+		if (!m_flagInit) {
+			return;
+		}
+
+		if (m_flagRunning) {
+			return;
+		}
+
+		if (m_thread.isNotNull()) {
+			if (m_thread->start()) {
+				m_flagRunning = sl_true;
+			}
+		}
 	}
 	
 	sl_bool isRunning()
@@ -373,7 +432,7 @@ public:
 
 	sl_bool sendPacket(const void* buf, sl_uint32 size)
 	{
-		if (m_flagRunning) {
+		if (m_flagInit) {
 			SocketAddress address;
 			if (IPv4HeaderFormat::check(buf, size)) {
 				IPv4HeaderFormat* ip = (IPv4HeaderFormat*)buf;

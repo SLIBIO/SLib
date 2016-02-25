@@ -32,6 +32,16 @@ public:
 		return getCount();
 	}
 	
+	SLIB_INLINE sl_bool isEmpty() const
+	{
+		return getCount() == 0;
+	}
+
+	SLIB_INLINE sl_bool isNotEmpty() const
+	{
+		return getCount() != 0;
+	}
+
 	
 	virtual VT* getItemPtr(const KT& key) const = 0;
 	

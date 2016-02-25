@@ -479,7 +479,7 @@ sl_bool File::setNonBlocking(int fd, sl_bool flagEnable)
 			flag = flag & ~O_NONBLOCK;
 		}
 		int ret = ::fcntl(fd, F_SETFL, flag);
-		return ret != -1;
+		return ret == 0;
 	} else {
 		return sl_false;
 	}

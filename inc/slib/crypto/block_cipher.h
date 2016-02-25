@@ -6,6 +6,7 @@
 #include "../core/mio.h"
 #include "../core/base.h"
 #include "../core/math.h"
+#include "../core/memory.h"
 
 #define SLIB_CRYPTO_BLOCK_CIPHER_BLOCK_MAX_LEN 128
 
@@ -203,6 +204,19 @@ public:
 		return encrypt(crypto, dst, src, size, ((char*)dst) + block) + block;
 	}
 
+	static Memory encrypt(const BlockCipher* crypto, const void* src, sl_size size)
+	{
+		sl_uint32 block = crypto->getBlockSize();
+		Memory mem = Memory::create(size + block * 2);
+		if (mem.isNotEmpty()) {
+			sl_size n = encrypt(crypto, src, size, mem.data());
+			if (n) {
+				return mem.sub(0, n);
+			}
+		}
+		return Memory::null();
+	}
+
 	// destination buffer size must equals to or greater than size
 	static sl_size decrypt(const BlockCipher* crypto, const void* _iv, const void* _src, sl_size size, void* _dst)
 	{
@@ -243,6 +257,19 @@ public:
 		}
 		return decrypt(crypto, src, ((char*)src) + block, size - block, dst);
 	}
+
+	static Memory decrypt(const BlockCipher* crypto, const void* src, sl_size size)
+	{
+		Memory mem = Memory::create(size);
+		if (mem.isNotEmpty()) {
+			sl_size n = decrypt(crypto, src, size, mem.data());
+			if (n) {
+				return mem.sub(0, n);
+			}
+		}
+		return Memory::null();
+	}
+
 };
 
 /*
@@ -346,6 +373,14 @@ public:
 	{ return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::encrypt(this, src, size, dst); } \
 	sl_size decrypt_CBC_PKCS7Padding(const void* src, sl_size size, void* dst) const \
 	{ return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::decrypt(this, src, size, dst); } \
+	Memory encrypt_CBC_PKCS7Padding(const void* src, sl_size size) const \
+	{ return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::encrypt(this, src, size); } \
+	Memory decrypt_CBC_PKCS7Padding(const void* src, sl_size size) const \
+	{ return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::decrypt(this, src, size); } \
+	Memory encrypt_CBC_PKCS7Padding(const Memory& mem) const \
+	{ return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::encrypt(this, mem.data(), mem.size()); } \
+	Memory decrypt_CBC_PKCS7Padding(const Memory& mem) const \
+	{ return BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>::decrypt(this, mem.data(), mem.size()); } \
 	sl_size encrypt_CTR(const void* input, sl_size size, void* output, void* counter, sl_uint32 offset = 0) const \
 	{ return BlockCipher_CTR<CLASS>::encrypt(this, input, size, output, counter, offset); } \
 	sl_size encrypt_CTR(const void* iv, sl_uint64 counter, sl_uint32 offset, const void* input, sl_size size, void* output) const \
