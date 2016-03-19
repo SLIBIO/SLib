@@ -122,7 +122,7 @@ public:
 							
 							AURenderCallbackStruct cs;
 							cs.inputProc = CallbackOutput;
-							cs.inputProcRefCon = ret.get();
+							cs.inputProcRefCon = ret.ptr;
 							
 							result = AudioUnitSetProperty(audioUnitOutput,
 														  kAudioUnitProperty_SetRenderCallback,
@@ -239,7 +239,7 @@ public:
 		if (dataConvert.isNull()) {
 			return;
 		}
-		sl_int16* s = dataConvert.data();
+		sl_int16* s = dataConvert.getData();
 		_processFrame(s, nSamples);
 		
 		data->mBuffers[0].mDataByteSize = (UInt32)nSamples * 2;

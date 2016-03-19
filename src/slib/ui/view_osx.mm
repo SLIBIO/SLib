@@ -51,7 +51,7 @@ Ref<OSX_ViewInstance> OSX_ViewInstance::create(NSView* handle, sl_bool flagFreeO
 		if (ret.isNotNull()) {
 			ret->m_handle = handle;
 			ret->m_flagFreeOnRelease = flagFreeOnRelease;
-			UIPlatform::registerViewInstance(handle, ret.get());
+			UIPlatform::registerViewInstance(handle, ret.ptr);
 		} else {
 			if (flagFreeOnRelease) {
 				freeHandle(handle);
@@ -242,7 +242,7 @@ void OSX_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
-		OSX_ViewInstance* child = (OSX_ViewInstance*)(_child.get());
+		OSX_ViewInstance* child = (OSX_ViewInstance*)(_child.ptr);
 		if (child) {
 			NSView* child_handle = child->m_handle;
 			if (child_handle != nil) {
@@ -254,7 +254,7 @@ void OSX_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
 
 void OSX_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
 {
-	OSX_ViewInstance* child = (OSX_ViewInstance*)(_child.get());
+	OSX_ViewInstance* child = (OSX_ViewInstance*)(_child.ptr);
 	if (child) {
 		NSView* child_handle = child->m_handle;
 		if (child_handle != nil) {
@@ -288,7 +288,7 @@ void OSX_ViewInstance::onDraw(NSRect _rectDirty)
 			
 			Ref<Canvas> canvas = UIPlatform::createCanvas(context, (sl_uint32)(rectBound.size.width), (sl_uint32)(rectBound.size.height));
 			if (canvas.isNotNull()) {
-				ViewInstance::onDraw(canvas.get());
+				ViewInstance::onDraw(canvas.ptr);
 			}
 		}
 	}
@@ -298,20 +298,20 @@ sl_bool OSX_ViewInstance::onEventKey(sl_bool flagDown, NSEvent* event)
 {
 	NSView* handle = m_handle;
 	if (handle != nil) {
-		UIEventAction action = flagDown ? actionKeyDown : actionKeyUp;
+		UIAction action = flagDown ? UIAction::KeyDown : UIAction::KeyUp;
 		sl_uint32 vkey = [event keyCode];
 		Keycode key = UIEvent::getKeycodeFromSystemKeycode(vkey);
 		Ref<UIEvent> ev = UIEvent::createKeyEvent(action, key, vkey);
 		if (ev.isNotNull()) {
-			applyModifiers(ev.get(), event);
-			onKeyEvent(ev.get());
+			applyModifiers(ev.ptr, event);
+			onKeyEvent(ev.ptr);
 			return ev->isPreventedDefault();
 		}
 	}
 	return sl_false;
 }
 
-sl_bool OSX_ViewInstance::onEventMouse(UIEventAction action, NSEvent* event)
+sl_bool OSX_ViewInstance::onEventMouse(UIAction action, NSEvent* event)
 {
 	NSView* handle = m_handle;
 	if (handle != nil) {
@@ -323,8 +323,8 @@ sl_bool OSX_ViewInstance::onEventMouse(UIEventAction action, NSEvent* event)
 			sl_real y = (sl_real)(pt.y);
 			Ref<UIEvent> ev = UIEvent::createMouseEvent(action, x, y);
 			if (ev.isNotNull()) {
-				applyModifiers(ev.get(), event);
-				onMouseEvent(ev.get());
+				applyModifiers(ev.ptr, event);
+				onMouseEvent(ev.ptr);
 				return ev->isPreventedDefault();
 			}
 		}
@@ -343,8 +343,8 @@ sl_bool OSX_ViewInstance::onEventMouseWheel(NSEvent* event)
 		}
 		Ref<UIEvent> ev = UIEvent::createMouseWheelEvent(deltaX, deltaY);
 		if (ev.isNotNull()) {
-			applyModifiers(ev.get(), event);
-			onMouseWheelEvent(ev.get());
+			applyModifiers(ev.ptr, event);
+			onMouseWheelEvent(ev.ptr);
 			return ev->isPreventedDefault();
 		}
 	}
@@ -357,7 +357,7 @@ sl_bool OSX_ViewInstance::onEventUpdateCursor(NSEvent* event)
 	if (handle != nil) {
 		Ref<UIEvent> ev = UIEvent::createSetCursorEvent();
 		if (ev.isNotNull()) {
-			onSetCursor(ev.get());
+			onSetCursor(ev.ptr);
 			return ev->isPreventedDefault();
 		}
 	}
@@ -485,7 +485,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagNoDefault = instance->onEventMouse(slib::actionLeftButtonDown, theEvent);
+		sl_bool flagNoDefault = instance->onEventMouse(slib::UIAction::LeftButtonDown, theEvent);
 		if (flagNoDefault) {
 			return;
 		}
@@ -497,10 +497,10 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		instance->onEventMouse(slib::actionLeftButtonUp, theEvent);
+		instance->onEventMouse(slib::UIAction::LeftButtonUp, theEvent);
 		NSInteger clicks = [theEvent clickCount];
 		if (clicks == 2) {
-			sl_bool flagNoDefault = instance->onEventMouse(slib::actionLeftButtonDoubleClick, theEvent);
+			sl_bool flagNoDefault = instance->onEventMouse(slib::UIAction::LeftButtonDoubleClick, theEvent);
 			if (flagNoDefault) {
 				return;
 			}
@@ -513,7 +513,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagNoDefault = instance->onEventMouse(slib::actionLeftButtonDrag, theEvent);
+		sl_bool flagNoDefault = instance->onEventMouse(slib::UIAction::LeftButtonDrag, theEvent);
 		if (flagNoDefault) {
 			return;
 		}
@@ -525,7 +525,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagNoDefault = instance->onEventMouse(slib::actionRightButtonDown, theEvent);
+		sl_bool flagNoDefault = instance->onEventMouse(slib::UIAction::RightButtonDown, theEvent);
 		if (flagNoDefault) {
 			return;
 		}
@@ -537,10 +537,10 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		instance->onEventMouse(slib::actionRightButtonUp, theEvent);
+		instance->onEventMouse(slib::UIAction::RightButtonUp, theEvent);
 		NSInteger clicks = [theEvent clickCount];
 		if (clicks == 2) {
-			sl_bool flagNoDefault = instance->onEventMouse(slib::actionRightButtonDoubleClick, theEvent);
+			sl_bool flagNoDefault = instance->onEventMouse(slib::UIAction::RightButtonDoubleClick, theEvent);
 			if (flagNoDefault) {
 				return;
 			}
@@ -553,7 +553,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagNoDefault = instance->onEventMouse(slib::actionRightButtonDrag, theEvent);
+		sl_bool flagNoDefault = instance->onEventMouse(slib::UIAction::RightButtonDrag, theEvent);
 		if (flagNoDefault) {
 			return;
 		}
@@ -565,7 +565,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagNoDefault = instance->onEventMouse(slib::actionMiddleButtonDown, theEvent);
+		sl_bool flagNoDefault = instance->onEventMouse(slib::UIAction::MiddleButtonDown, theEvent);
 		if (flagNoDefault) {
 			return;
 		}
@@ -577,10 +577,10 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		instance->onEventMouse(slib::actionMiddleButtonUp, theEvent);
+		instance->onEventMouse(slib::UIAction::MiddleButtonUp, theEvent);
 		NSInteger clicks = [theEvent clickCount];
 		if (clicks == 2) {
-			sl_bool flagNoDefault = instance->onEventMouse(slib::actionMiddleButtonDoubleClick, theEvent);
+			sl_bool flagNoDefault = instance->onEventMouse(slib::UIAction::MiddleButtonDoubleClick, theEvent);
 			if (flagNoDefault) {
 				return;
 			}
@@ -593,7 +593,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagNoDefault = instance->onEventMouse(slib::actionMiddleButtonDrag, theEvent);
+		sl_bool flagNoDefault = instance->onEventMouse(slib::UIAction::MiddleButtonDrag, theEvent);
 		if (flagNoDefault) {
 			return;
 		}
@@ -605,7 +605,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagNoDefault = instance->onEventMouse(slib::actionMouseMove, theEvent);
+		sl_bool flagNoDefault = instance->onEventMouse(slib::UIAction::MouseMove, theEvent);
 		if (flagNoDefault) {
 			return;
 		}
@@ -617,7 +617,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagNoDefault = instance->onEventMouse(slib::actionMouseEnter, theEvent);
+		sl_bool flagNoDefault = instance->onEventMouse(slib::UIAction::MouseEnter, theEvent);
 		if (flagNoDefault) {
 			return;
 		}
@@ -629,7 +629,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		sl_bool flagNoDefault = instance->onEventMouse(slib::actionMouseLeave, theEvent);
+		sl_bool flagNoDefault = instance->onEventMouse(slib::UIAction::MouseLeave, theEvent);
 		if (flagNoDefault) {
 			return;
 		}
@@ -706,7 +706,7 @@ NSView* UIPlatform::getViewHandle(View* view)
 	if (view) {
 		Ref<ViewInstance> instance = view->getViewInstance();
 		if (instance.isNotNull()) {
-			OSX_ViewInstance* osx_instance = (OSX_ViewInstance*)(instance.get());
+			OSX_ViewInstance* osx_instance = (OSX_ViewInstance*)(instance.ptr);
 			return osx_instance->getHandle();
 		}
 	}

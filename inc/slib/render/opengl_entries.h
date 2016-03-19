@@ -18,33 +18,11 @@ public:
 	
 	static void clear(const RenderClearParam& param);
 	
-	SLIB_INLINE void clearColor(const Color& color)
-	{
-		RenderClearParam param;
-		param.flagColor = sl_true;
-		param.color = color;
-		param.flagDepth = sl_false;
-		clear(param);
-	}
+	void clearColor(const Color& color);
 	
-	SLIB_INLINE void clearColorDepth(const Color& color, float depth = 1.0f)
-	{
-		RenderClearParam param;
-		param.flagColor = sl_true;
-		param.color = color;
-		param.flagDepth = sl_true;
-		param.depth = depth;
-		clear(param);
-	}
+	void clearColorDepth(const Color& color, float depth = 1.0f);
 	
-	SLIB_INLINE void clearDepth(float depth = 1.0f)
-	{
-		RenderClearParam param;
-		param.flagColor = sl_false;
-		param.flagDepth = sl_true;
-		param.depth = depth;
-		clear(param);
-	}
+	void clearDepth(float depth = 1.0f);
 	
 	
 	static void setDepthTest(sl_bool flagEnableDepthTest);
@@ -57,11 +35,7 @@ public:
 	
 	static void setBlending(sl_bool flagEnableBlending, const RenderBlendingParam& param);
 	
-	SLIB_INLINE static void setBlending(sl_bool flagEnableBlending)
-	{
-		RenderBlendingParam param;
-		setBlending(flagEnableBlending, param);
-	}
+	static void setBlending(sl_bool flagEnableBlending);
 
 	/* objects are represented as unsigned integers (zero means null object) */
 
@@ -135,10 +109,6 @@ public:
 	static sl_uint32 createTexture2D(const Ref<Bitmap>& bitmap);
 	
 	static sl_uint32 createTexture2DFromMemory(const void* mem, sl_size size);
-	
-	static sl_uint32 createTexture2DFromFile(const String& filePath);
-	
-	static sl_uint32 createTexture2DFromResource(const String& path);
 	
 	static void updateTexture2D(sl_uint32 x, sl_uint32 y, const BitmapData& bitmapData);
 	
@@ -281,4 +251,5 @@ public:
 	static void loadEntries(sl_bool flagReload = sl_false);
 
 };
+
 SLIB_RENDER_NAMESPACE_END

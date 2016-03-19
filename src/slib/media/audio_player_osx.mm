@@ -113,7 +113,7 @@ public:
 					ret->m_event = param.event;
 					
 					AudioDeviceIOProcID callback;
-					if (AudioDeviceCreateIOProcID(deviceID, DeviceIOProc, ret.get(), &callback) == kAudioHardwareNoError) {
+					if (AudioDeviceCreateIOProcID(deviceID, DeviceIOProc, ret.ptr, &callback) == kAudioHardwareNoError) {
 						ret->m_callback = callback;
 						if (param.flagAutoStart) {
 							ret->start();
@@ -200,7 +200,7 @@ public:
 		if (dataConvert.isNull()) {
 			return;
 		}
-		sl_int16* s = dataConvert.data();
+		sl_int16* s = dataConvert.getData();
 		_processFrame(s, nSamples);
 		
 		data->mBuffers[0].mDataByteSize = (UInt32)nSamples * 2;
@@ -246,7 +246,7 @@ public:
 public:
 	_OSX_AudioPlayer()
 	{
-		m_deviceID = sl_null;
+		m_deviceID = 0;
 	}
 
 	~_OSX_AudioPlayer()
@@ -276,7 +276,7 @@ public:
     
     Ref<AudioPlayerBuffer> createBuffer(const AudioPlayerBufferParam& param)
     {
-        if (m_deviceID != sl_null) {
+        if (m_deviceID != 0) {
             return _OSX_AudioPlayerBuffer::create(param, m_deviceID);
         }
         return Ref<AudioPlayerBuffer>::null();
@@ -292,7 +292,7 @@ List<AudioPlayerInfo> AudioPlayer::getPlayersList()
 {
 	ListItems<OSX_AudioDeviceInfo> list(OSX_AudioDeviceInfo::getAllDevices(sl_false));
 	List<AudioPlayerInfo> ret;
-	for (sl_size i = 0; i < list.count(); i++) {
+	for (sl_size i = 0; i < list.count; i++) {
 		AudioPlayerInfo info;
 		info.id = list[i].uid;
 		info.name = list[i].name;

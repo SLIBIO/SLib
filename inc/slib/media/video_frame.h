@@ -17,6 +17,7 @@ public:
 	
 public:
 	VideoFrame();
+	
 };
 
 SLIB_MEDIA_NAMESPACE_END

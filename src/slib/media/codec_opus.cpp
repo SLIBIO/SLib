@@ -15,7 +15,7 @@ OpusEncoderParam::OpusEncoderParam()
 	samplesPerSecond = 16000;
 	channelsCount = 1;
 	bitsPerSecond = 8000;
-	type = opusEncoderType_Voice;
+	type = OpusEncoderType::Voice;
 }
 
 sl_bool OpusEncoder::isValidSamplingRate(sl_uint32 nSamplesPerSecond)
@@ -85,7 +85,7 @@ public:
 			::OpusEncoder* encoderBackup = (::OpusEncoder*)(Base::createMemory(sizeEncoder));
 			if (encoderBackup) {
 				int app = OPUS_APPLICATION_VOIP;
-				if (param.type == opusEncoderType_Music) {
+				if (param.type == OpusEncoderType::Music) {
 					app = OPUS_APPLICATION_AUDIO;
 				}
 				int error = ::opus_encoder_init(encoder, (opus_int32)(param.samplesPerSecond), (opus_int32)(param.channelsCount), app);
@@ -134,19 +134,19 @@ public:
 				AudioData audio;
 				audio.count = input.count;
 				
-				sl_bool flagFloat = input.format.isFloat();
+				sl_bool flagFloat = AudioFormats::isFloat(input.format);
 				
 				if (flagFloat) {
 					if (m_nChannels == 2) {
-						audio.format = audioFormat_Float_Stereo;
+						audio.format = AudioFormat::Float_Stereo;
 					} else {
-						audio.format = audioFormat_Float_Mono;
+						audio.format = AudioFormat::Float_Mono;
 					}
 				} else {
 					if (m_nChannels == 2) {
-						audio.format = audioFormat_Int16_Stereo;
+						audio.format = AudioFormat::Int16_Stereo;
 					} else {
-						audio.format = audioFormat_Int16_Mono;
+						audio.format = AudioFormat::Int16_Mono;
 					}
 				}
 				
@@ -285,19 +285,19 @@ public:
 		AudioData audio;
 		audio.count = output.count;
 		
-		sl_bool flagFloat = output.format.isFloat();
+		sl_bool flagFloat = AudioFormats::isFloat(output.format);
 		
 		if (flagFloat) {
 			if (m_nChannels == 2) {
-				audio.format = audioFormat_Float_Stereo;
+				audio.format = AudioFormat::Float_Stereo;
 			} else {
-				audio.format = audioFormat_Float_Mono;
+				audio.format = AudioFormat::Float_Mono;
 			}
 		} else {
 			if (m_nChannels == 2) {
-				audio.format = audioFormat_Int16_Stereo;
+				audio.format = AudioFormat::Int16_Stereo;
 			} else {
-				audio.format = audioFormat_Int16_Mono;
+				audio.format = AudioFormat::Int16_Mono;
 			}
 		}
 		

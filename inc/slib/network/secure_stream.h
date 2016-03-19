@@ -14,6 +14,7 @@ class SLIB_EXPORT AsyncTcpSecureStreamServer : public Object, public IAsyncTcpSe
 {
 private:
 	AsyncTcpSecureStreamServer();
+	
 	~AsyncTcpSecureStreamServer();
 	
 public:
@@ -58,6 +59,7 @@ private:
 	Ref<AsyncTcpServer> m_server;
 	AsyncSecureStreamServerParam m_param;
 	HashMap< AsyncSecureStream*, Ref<AsyncSecureStream> > m_streams;
+	
 };
 
 class SLIB_EXPORT AsyncTcpSecureStreamClient

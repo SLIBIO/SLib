@@ -11,7 +11,8 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class _Apple_FontInstance : public FontInstance
 {
-	SLIB_DECLARE_OBJECT(_Apple_FontInstance, FontInstance);
+	SLIB_DECLARE_OBJECT
+	
 public:
 	FontDesc m_desc;
 	
@@ -146,7 +147,7 @@ public:
 		Ref<_Apple_FontInstance> ret;
 		if (font) {
 			Ref<FontInstance> _instance = font->getInstance();
-			if (_Apple_FontInstance::checkInstance(_instance)) {
+			if (_Apple_FontInstance::checkInstance(_instance.ptr)) {
 				ret = Ref<_Apple_FontInstance>::from(_instance);
 			} else {
 				FontDesc desc;
@@ -161,6 +162,7 @@ public:
 	}
 };
 
+SLIB_DEFINE_OBJECT(_Apple_FontInstance, FontInstance)
 
 
 CTFontRef UIPlatform::getCoreTextFont(Font* font, Ref<FontInstance>& instanceOut)
@@ -198,7 +200,7 @@ Size UI::getFontTextSize(const Ref<Font>& font, const String& text)
 	}
 	
 	Ref<FontInstance> instance;
-	CTFontRef handle = UIPlatform::getCoreTextFont(font.get(), instance);
+	CTFontRef handle = UIPlatform::getCoreTextFont(font.ptr, instance);
 	if (!handle) {
 		return ret;
 	}

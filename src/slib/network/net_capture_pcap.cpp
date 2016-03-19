@@ -57,7 +57,7 @@ public:
 			}
 #endif
 			name8 = name;
-			szName = name8.getBuf();
+			szName = name8.getData();
 		}
 
 		char errBuf[PCAP_ERRBUF_SIZE] = { 0 };
@@ -70,7 +70,7 @@ public:
 				if (ret.isNotNull()) {
 					ret->m_handle = handle;
 					ret->m_listener = param.listener;
-					ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_NetPcapCapture, _run, ret.get()));
+					ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_NetPcapCapture, _run, ret.ptr));
 					if (ret->m_thread.isNotNull()) {
 						ret->m_flagInit = sl_true;
 						if (param.flagAutoStart) {
@@ -101,7 +101,7 @@ public:
 								if (ret.isNotNull()) {
 									ret->m_handle = handle;
 									ret->m_listener = param.listener;
-									ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_NetPcapCapture, _run, ret.get()));
+									ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_NetPcapCapture, _run, ret.ptr));
 									if (ret->m_thread.isNotNull()) {
 										ret->m_flagInit = sl_true;
 										if (param.flagAutoStart) {
@@ -201,10 +201,10 @@ public:
 		}
 	}
 
-	sl_uint32 getLinkType()
+	NetworkLinkDeviceType getLinkType()
 	{
 		sl_uint32 dt = pcap_datalink(m_handle);
-		return dt;
+		return (NetworkLinkDeviceType)dt;
 	}
 
 	sl_bool setLinkType(sl_uint32 type)
@@ -249,7 +249,6 @@ static void _NetCapture_parseDeviceInfo(pcap_if_t* dev, NetCaptureDeviceInfo& _o
 
 	pcap_addr* addr = dev->addresses;
 	SocketAddress sa;
-	IPv6Address addrIp6;
 	
 	List<IPv4Address> addrs4;
 	List<IPv6Address> addrs6;

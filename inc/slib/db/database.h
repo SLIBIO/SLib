@@ -14,7 +14,7 @@ class Database;
 
 class SLIB_EXPORT DatabaseCursor : public Object
 {
-	SLIB_DECLARE_OBJECT(DatabaseCursor, Object)
+	SLIB_DECLARE_OBJECT
 
 public:
 	Ref<Database> getDatabase();
@@ -74,31 +74,26 @@ public:
 	
 	virtual Time getTime(const String& name, const Time& defaultValue);
 
+	Time getTime(sl_uint32 index);
+	
+	Time getTime(const String& name);
+
 	
 	virtual Memory getBlob(sl_uint32 index) = 0;
 	
 	virtual Memory getBlob(const String& name);
 
 	
-	SLIB_INLINE Time getTime(sl_uint32 index)
-	{
-		return getTime(index, Time::zero());
-	}
-	
-	SLIB_INLINE Time getTime(const String& name)
-	{
-		return getTime(name, Time::zero());
-	}
-
 	virtual sl_bool moveNext() = 0;
 
 protected:
 	Ref<Database> m_db;
+	
 };
 
 class SLIB_EXPORT DatabaseStatement : public Object
 {
-	SLIB_DECLARE_OBJECT(DatabaseStatement, Object)
+	SLIB_DECLARE_OBJECT
 
 public:
 	Ref<Database> getDatabase();
@@ -117,11 +112,12 @@ public:
 
 protected:
 	Ref<Database> m_db;
+	
 };
 
 class SLIB_EXPORT Database : public Object
 {
-	SLIB_DECLARE_OBJECT(Database, Object)
+	SLIB_DECLARE_OBJECT
 	
 public:
 	virtual Ref<DatabaseStatement> prepareStatement(const String& sql) = 0;

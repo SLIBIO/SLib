@@ -62,6 +62,7 @@ public:
 	static Ref<Event> createEvent(HANDLE hEvent, sl_bool flagCloseOnRelease = sl_true);
 
 };
+
 SLIB_NAMESPACE_END
 
 #endif

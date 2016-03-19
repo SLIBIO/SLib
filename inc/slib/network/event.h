@@ -8,16 +8,17 @@
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
-enum SocketEventType
-{
-    socketEventType_Read = 1,		// receive, receiveFrom, accept
-    socketEventType_Write = 2,		// send, sendTo, connect
-    socketEventType_Close = 4		// close, error
-};
-
 class SLIB_EXPORT SocketEvent : public Event
 {
-	SLIB_DECLARE_OBJECT(SocketEvent, Event)
+	SLIB_DECLARE_OBJECT
+	
+public:
+	enum
+	{
+		Read = 1,	// receive, receiveFrom, accept
+		Write = 2,	// send, sendTo, connect
+		Close = 4	// close, error
+	};
 	
 public:
 	static Ref<SocketEvent> create(const Ref<Socket>& socket);
@@ -33,30 +34,18 @@ public:
 public:	
 	sl_bool setup(sl_uint32 events);
 	
-	SLIB_INLINE sl_bool setupRead()
-	{
-		return setup(socketEventType_Read | socketEventType_Close);
-	}
+	sl_bool setupRead();
 	
-	SLIB_INLINE sl_bool setupWrite()
-	{
-		return setup(socketEventType_Write | socketEventType_Close);
-	}
+	sl_bool setupWrite();
 	
-	SLIB_INLINE sl_bool setupReadWrite()
-	{
-		return setup(socketEventType_Read | socketEventType_Write | socketEventType_Close);
-	}
+	sl_bool setupReadWrite();
 
 	sl_uint32 waitEvents(sl_int32 timeout = -1);
 
 	// count must be less than 64
 	static sl_bool waitMultipleEvents(const Ref<SocketEvent>* events, sl_uint32* status, sl_uint32 count, sl_int32 timeout = -1);
 
-	SLIB_INLINE const Ref<Socket>& getSocket()
-	{
-		return m_socket;
-	}
+	const Ref<Socket>& getSocket();
 
 protected:
 	sl_bool __wait(sl_int32 timeout);

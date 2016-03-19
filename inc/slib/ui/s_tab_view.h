@@ -13,6 +13,7 @@ class SLIB_EXPORT STabViewListener
 {
 public:
 	virtual void onSelectTab(STabView* view, sl_uint32 index) = 0;
+	
 };
 
 class STabViewItem
@@ -26,7 +27,8 @@ public:
 
 class SLIB_EXPORT STabView : public SView
 {
-	SLIB_DECLARE_OBJECT(STabView, SView)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	STabView();
 	
@@ -162,6 +164,7 @@ private:
 	Color m_tabLabelColor;
 	Color m_selectedTabLabelColor;
 	Color m_hoverTabLabelColor;
+	
 };
 
 SLIB_UI_NAMESPACE_END

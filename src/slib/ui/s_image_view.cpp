@@ -2,10 +2,12 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(SImageView, SView)
+
 SImageView::SImageView()
 {
-	m_scaleMode = scaleMode_Stretch;
-	m_sourceAlignment = alignMiddleCenter;
+	m_scaleMode = ScaleMode::Stretch;
+	m_sourceAlignment = Alignment::MiddleCenter;
 }
 
 Ref<Drawable> SImageView::getSource()

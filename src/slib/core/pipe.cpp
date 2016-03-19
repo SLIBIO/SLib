@@ -6,13 +6,17 @@
 #endif
 
 SLIB_NAMESPACE_BEGIN
+
 /********************************************
 	Pipe
 ********************************************/
+
+SLIB_DEFINE_OBJECT(Pipe, Object)
+
 Pipe::Pipe()
 {
-	m_hRead = sl_null;
-	m_hWrite = sl_null;
+	m_hRead = SLIB_PIPE_INVALID_HANDLE;
+	m_hWrite = SLIB_PIPE_INVALID_HANDLE;
 }
 
 Pipe::~Pipe()
@@ -35,6 +39,21 @@ Ref<Pipe> Pipe::create()
 		_close(hWrite);
 	}
 	return Ref<Pipe>::null();
+}
+
+sl_bool Pipe::isOpened() const
+{
+	return m_hRead != SLIB_PIPE_INVALID_HANDLE;
+}
+
+sl_pipe Pipe::getReadHandle() const
+{
+	return m_hRead;
+}
+
+sl_pipe Pipe::getWriteHandle() const
+{
+	return m_hWrite;
 }
 
 void Pipe::close()

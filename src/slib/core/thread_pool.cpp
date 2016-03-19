@@ -1,6 +1,9 @@
 #include "../../../inc/slib/core/thread_pool.h"
 
 SLIB_NAMESPACE_BEGIN
+
+SLIB_DEFINE_OBJECT(ThreadPool, Object)
+
 ThreadPool::ThreadPool()
 {
 	setThreadStackSize(SLIB_THREAD_DEFAULT_STACK_SIZE);
@@ -32,10 +35,10 @@ void ThreadPool::release()
 	
 	ListItems< Ref<Thread> > threads(m_threadWorkers);
 	sl_size i;
-	for (i = 0; i < threads.count(); i++) {
+	for (i = 0; i < threads.count; i++) {
 		threads[i]->finish();
 	}
-	for (i = 0; i < threads.count(); i++) {
+	for (i = 0; i < threads.count; i++) {
 		threads[i]->finishAndWait();
 	}
 }
@@ -47,7 +50,7 @@ sl_bool ThreadPool::isRunning()
 
 sl_uint32 ThreadPool::getThreadsCount()
 {
-	return (sl_uint32)(m_threadWorkers.count());
+	return (sl_uint32)(m_threadWorkers.getCount());
 }
 
 sl_bool ThreadPool::addTask(const Ref<Runnable>& task)
@@ -67,7 +70,7 @@ sl_bool ThreadPool::addTask(const Ref<Runnable>& task)
 	// wake a sleeping worker
 	{
 		ListItems< Ref<Thread> > threads(m_threadWorkers);
-		for (sl_size i = 0; i < threads.count(); i++) {
+		for (sl_size i = 0; i < threads.count; i++) {
 			if (threads[i]->isWaiting()) {
 				threads[i]->wake();
 				return sl_true;
@@ -107,4 +110,5 @@ void ThreadPool::onRunWorker()
 		}
 	}
 }
+
 SLIB_NAMESPACE_END

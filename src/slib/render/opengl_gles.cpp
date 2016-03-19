@@ -39,7 +39,7 @@ void GLES::loadEntries(const String& _pathDll, sl_bool flagReload)
 			return;
 		}
 	}
-	HMODULE hDll = ::LoadLibraryW((LPCWSTR)(pathDll.getBuf()));
+	HMODULE hDll = ::LoadLibraryW((LPCWSTR)(pathDll.getData()));
 	if (!hDll) {
 		//SLIB_LOG_ERROR("GLES", "Failed to load GLES dll - " + pathDll);
 		return;

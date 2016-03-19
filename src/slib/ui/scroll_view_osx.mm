@@ -25,7 +25,7 @@ public:
 		if (viewContent.isNotNull()) {
 			Ref<ViewInstance> instance = viewContent->attachToNewInstance(Ref<ViewInstance>::null());
 			if (instance.isNotNull()) {
-				handle = UIPlatform::getViewHandle(instance.get());
+				handle = UIPlatform::getViewHandle(instance.ptr);
 			}
 		}
 		[sv setDocumentView:handle];
@@ -34,7 +34,7 @@ public:
 	void __applyProperties(NSScrollView* handle)
 	{
 		[handle setBorderType:(m_flagBorder?NSBezelBorder:NSNoBorder)];
-		if (m_backgroundColor.getAlpha() == 0) {
+		if (m_backgroundColor.a == 0) {
 			handle.drawsBackground = FALSE;
 		} else {
 			handle.drawsBackground = TRUE;
@@ -78,7 +78,7 @@ void ScrollView::_setBackgroundColor(const Color& color)
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSScrollView class]]) {
 		NSScrollView* sv = (NSScrollView*)handle;
-		if (color.getAlpha() == 0) {
+		if (color.a == 0) {
 			sv.drawsBackground = FALSE;
 		} else {
 			sv.drawsBackground = TRUE;

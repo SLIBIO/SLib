@@ -10,9 +10,11 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class SLIB_EXPORT SCheckBox : public SButton
 {
-	SLIB_DECLARE_OBJECT(SCheckBox, SButton)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	SCheckBox();
+	
 	SCheckBox(sl_uint32 nCategories, SButtonCategory* categories);
 	
 public:

@@ -29,12 +29,14 @@ public:
 
 public:
 	_NatTablePort();
+	
 };
 
 class _NatTableMapping : public Object
 {
 public:
 	_NatTableMapping();
+	
 	~_NatTableMapping();
 
 public:
@@ -84,9 +86,9 @@ public:
 	void setup(const NatTableParam& param);
 
 public:
-	sl_bool translateOutgoingPacket(IPv4HeaderFormat* ipHeader, void* ipContent, sl_uint32 sizeContent);
+	sl_bool translateOutgoingPacket(IPv4Packet* ipHeader, void* ipContent, sl_uint32 sizeContent);
 	
-	sl_bool translateIncomingPacket(IPv4HeaderFormat* ipHeader, void* ipContent, sl_uint32 sizeContent);
+	sl_bool translateIncomingPacket(IPv4Packet* ipHeader, void* ipContent, sl_uint32 sizeContent);
 
 	sl_uint16 getMappedIcmpEchoSequenceNumber(const IcmpEchoAddress& address);
 
@@ -104,6 +106,7 @@ protected:
 		IcmpEchoAddress addressSource;
 		sl_uint16 sequenceNumberTarget;
 	};
+	
 	HashMap<IcmpEchoAddress, IcmpEchoElement> m_mapIcmpEchoOutgoing;
 	HashMap<sl_uint32, IcmpEchoElement> m_mapIcmpEchoIncoming;
 

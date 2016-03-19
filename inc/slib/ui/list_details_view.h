@@ -50,7 +50,8 @@ public:
 
 class SLIB_EXPORT ListDetailsView : public View
 {
-	SLIB_DECLARE_OBJECT(ListDetailsView, View)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	ListDetailsView();
 	

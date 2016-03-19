@@ -5,14 +5,17 @@ SLIB_UI_NAMESPACE_BEGIN
 /**********************
 	EditView
  ***********************/
+
+SLIB_DEFINE_OBJECT(EditView, View)
+
 EditView::EditView()
 {
-	m_textAlignment = alignMiddleCenter;
+	m_textAlignment = Alignment::MiddleCenter;
 	m_flagBorder = sl_true;
 	m_flagReadOnly = sl_false;
 	m_flagMultiLine = sl_false;
-	m_textColor = Color::black();
-	m_backgroundColor = Color::white();
+	m_textColor = Color::Black;
+	m_backgroundColor = Color::White;
 }
 
 String EditView::onChange(const String& newValue)
@@ -28,8 +31,8 @@ void EditView::dispatchKeyEvent(UIEvent* ev)
 {
 	View::dispatchKeyEvent(ev);
 	if (!(isMultiLine())) {
-		if (ev->getAction() == actionKeyUp) {
-			if (ev->getKeycode() == keyEnter) {
+		if (ev->getAction() == UIAction::KeyUp) {
+			if (ev->getKeycode() == Keycode::Enter) {
 				dispatchEnterAction();
 			}
 		}
@@ -63,6 +66,9 @@ Ref<Font> EditView::getFont()
 /**********************
 	PasswordView
  ***********************/
+
+SLIB_DEFINE_OBJECT(PasswordView, EditView)
+
 PasswordView::PasswordView()
 {
 }
@@ -79,6 +85,9 @@ void PasswordView::setMultiLine(sl_bool flag)
 /**********************
 	TextArea
  ***********************/
+
+SLIB_DEFINE_OBJECT(TextArea, EditView)
+
 TextArea::TextArea()
 {
 	m_flagMultiLine = sl_true;

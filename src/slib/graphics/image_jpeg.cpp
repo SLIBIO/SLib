@@ -168,6 +168,11 @@ Memory Image::saveToJPEG(const Ref<Image>& image, float quality)
 	return ret;
 }
 
+Memory Image::saveToJPEG(float quality)
+{
+	return saveToJPEG(this, quality);
+}
+
 sl_bool Image::saveToJPEG(String filePath, const Ref<Image>& image, float quality)
 {
 	if (image.isNull()) {
@@ -177,7 +182,7 @@ sl_bool Image::saveToJPEG(String filePath, const Ref<Image>& image, float qualit
 	if (file.isNotNull()) {
 		Memory mem = saveToJPEG(image, quality);
 		if (mem.isNotEmpty()) {
-			if (file->write(mem.getBuf(), mem.getSize()) == mem.getSize()) {
+			if (file->write(mem.getData(), mem.getSize()) == mem.getSize()) {
 				return sl_true;
 			}
 		}
@@ -185,6 +190,11 @@ sl_bool Image::saveToJPEG(String filePath, const Ref<Image>& image, float qualit
 		File::deleteFile(filePath);
 	}
 	return sl_false;
+}
+
+sl_bool Image::saveToJPEG(String filePath, float quality)
+{
+	return saveToJPEG(filePath, this, quality);
 }
 
 SLIB_GRAPHICS_NAMESPACE_END

@@ -9,7 +9,8 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class SLIB_EXPORT SView : public GenericView
 {
-	SLIB_DECLARE_OBJECT(SView, GenericView)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	SView();
 	

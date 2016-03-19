@@ -1,8 +1,9 @@
 #include "../../../inc/slib/crypto/gcm.h"
+#include "../../../inc/slib/crypto/aes.h"
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
 
-void BlockCipher_GCM_Base::generateTable(const void* _H)
+void GCM_Table::generateTable(const void* _H)
 {
 	sl_uint32 i, j;
 	Uint128 H;
@@ -39,7 +40,7 @@ void BlockCipher_GCM_Base::generateTable(const void* _H)
 	}
 }
 
-static const sl_uint64 _BlockCipher_GCM_Base_R[16] =
+static const sl_uint64 _GCM_R[16] =
 {
 	SLIB_UINT64(0x0000000000000000)
 	, SLIB_UINT64(0x1c20000000000000)
@@ -59,12 +60,12 @@ static const sl_uint64 _BlockCipher_GCM_Base_R[16] =
 	, SLIB_UINT64(0xb5e0000000000000)
 };
 
-void BlockCipher_GCM_Base::multiplyH(const void* _X, void* _O) const
+void GCM_Table::multiplyH(const void* _X, void* _O) const
 {
 	const sl_uint8* X = (const sl_uint8*)_X;
 	sl_uint8* O = (sl_uint8*)_O;
 	Uint128 Z;
-	const sl_uint64* R = _BlockCipher_GCM_Base_R;
+	const sl_uint64* R = _GCM_R;
 	Z.setZero();
 	for (sl_uint32 i = 15; i >= 1; i--) {
 		// process low 4-bit
@@ -100,7 +101,7 @@ void BlockCipher_GCM_Base::multiplyH(const void* _X, void* _O) const
 	Z.getBytesBE(O);
 }
 
-void BlockCipher_GCM_Base::multiplyData(void* _X, const void* _D, sl_size lenD) const
+void GCM_Table::multiplyData(void* _X, const void* _D, sl_size lenD) const
 {
 	sl_uint8* X = (sl_uint8*)_X;
 	const sl_uint8* D = (const sl_uint8*)_D;
@@ -124,7 +125,7 @@ void BlockCipher_GCM_Base::multiplyData(void* _X, const void* _D, sl_size lenD) 
 	}
 }
 
-void BlockCipher_GCM_Base::multiplyLength(void* _X, sl_size len1, sl_size len2) const
+void GCM_Table::multiplyLength(void* _X, sl_size len1, sl_size len2) const
 {
 	sl_uint8* X = (sl_uint8*)_X;
 	sl_uint64 v;
@@ -149,7 +150,7 @@ void BlockCipher_GCM_Base::multiplyLength(void* _X, sl_size len1, sl_size len2) 
 	multiplyH(X, X);
 }
 
-void BlockCipher_GCM_Base::calculateGHash(const void* A, sl_size lenA, const void* C, sl_size lenC, void* _O) const
+void GCM_Table::calculateGHash(const void* A, sl_size lenA, const void* C, sl_size lenC, void* _O) const
 {
 	sl_uint8* O = (sl_uint8*)_O;
 
@@ -162,7 +163,7 @@ void BlockCipher_GCM_Base::calculateGHash(const void* A, sl_size lenA, const voi
 	multiplyLength(O, lenA, lenC);
 }
 
-void BlockCipher_GCM_Base::calculateCIV(const void* _IV, sl_size lenIV, void* _CIV) const
+void GCM_Table::calculateCIV(const void* _IV, sl_size lenIV, void* _CIV) const
 {
 	const sl_uint8* IV = (const sl_uint8*)_IV;
 	sl_uint8* CIV = (sl_uint8*)_CIV;
@@ -179,5 +180,235 @@ void BlockCipher_GCM_Base::calculateCIV(const void* _IV, sl_size lenIV, void* _C
 		calculateGHash(sl_null, 0, IV, lenIV, CIV);
 	}
 }
+
+
+void GCM_Base::increaseCIV()
+{
+	for (sl_uint32 i = 15; i >= 12; i--) {
+		if (++(CIV[i]) != 0) {
+			break;
+		}
+	}
+}
+
+void GCM_Base::putBlock(const void* src, sl_uint32 n)
+{
+	const sl_uint8* A = (const sl_uint8*)src;
+	for (sl_uint32 k = 0; k < n; k++) {
+		GHASH_X[k] ^= *A;
+		A++;
+	}
+	multiplyH(GHASH_X, GHASH_X);
+}
+
+void GCM_Base::put(const void* src, sl_size len)
+{
+	multiplyData(GHASH_X, src, len);
+}
+
+sl_bool GCM_Base::finish(sl_size lenA, sl_size lenC, void* _tag, sl_size lenTag)
+{
+	if (lenTag < 4 || lenTag > 16) {
+		return sl_false;
+	}
+	sl_uint8* tag = (sl_uint8*)_tag;
+	multiplyLength(GHASH_X, lenA, lenC);
+	for (sl_size i = 0; i < lenTag; i++) {
+		tag[i] = GHASH_X[i] ^ GCTR0[i];
+	}
+	return sl_true;
+}
+
+sl_bool GCM_Base::finishAndCheckTag(sl_size lenA, sl_size lenC, const void* _tag, sl_size lenTag)
+{
+	if (lenTag < 4 || lenTag > 16) {
+		return sl_false;
+	}
+	const sl_uint8* tag = (const sl_uint8*)_tag;
+	multiplyLength(GHASH_X, lenA, lenC);
+	for (sl_size i = 0; i < lenTag; i++) {
+		if (tag[i] != (GHASH_X[i] ^ GCTR0[i])) {
+			return sl_false;
+		}
+	}
+	return sl_true;
+}
+
+
+template <class BlockCipher>
+GCM<BlockCipher>::GCM()
+{
+	setCipher(sl_null);
+}
+
+template <class BlockCipher>
+GCM<BlockCipher>::GCM(const BlockCipher* cipher)
+{
+	setCipher(cipher);
+}
+
+template <class BlockCipher>
+sl_bool GCM<BlockCipher>::setCipher(const BlockCipher* cipher)
+{
+	if (cipher) {
+		if (cipher->getBlockSize() != 16) {
+			return sl_false;
+		}
+		sl_uint8 H[16] = { 0 };
+		cipher->encryptBlock(H, H);
+		generateTable(H);
+	}
+	m_cipher = cipher;
+	return sl_true;
+}
+
+template <class BlockCipher>
+sl_bool GCM<BlockCipher>::start(const void* IV, sl_size lenIV)
+{
+	if (!m_cipher) {
+		return sl_false;
+	}
+	calculateCIV(IV, lenIV, CIV);
+	m_cipher->encryptBlock(CIV, GCTR0);
+	Base::zeroMemory(GHASH_X, 16);
+	return sl_true;
+}
+
+template <class BlockCipher>
+void GCM<BlockCipher>::encryptBlock(const void* src, void* dst, sl_uint32 n)
+{
+	sl_uint8 GCTR[16];
+	sl_size k;
+	const sl_uint8* P = (const sl_uint8*)src;
+	sl_uint8* C = (sl_uint8*)dst;
+	increaseCIV();
+	m_cipher->encryptBlock(CIV, GCTR);
+	for (k = 0; k < n; k++) {
+		*C = *P ^ GCTR[k];
+		GHASH_X[k] ^= *C;
+		C++;
+		P++;
+	}
+	multiplyH(GHASH_X, GHASH_X);
+}
+
+template <class BlockCipher>
+void GCM<BlockCipher>::encrypt(const void* src, void *dst, sl_size len)
+{
+	sl_uint8 GCTR[16];
+	sl_size i, k, n;
+	const sl_uint8* P = (const sl_uint8*)src;
+	sl_uint8* C = (sl_uint8*)dst;
+	
+	for (i = 0; i < len; i += 16) {
+		increaseCIV();
+		m_cipher->encryptBlock(CIV, GCTR);
+		n = len - i;
+		if (n > 16) {
+			n = 16;
+		}
+		for (k = 0; k < n; k++) {
+			*C = *P ^ GCTR[k];
+			GHASH_X[k] ^= *C;
+			C++;
+			P++;
+		}
+		multiplyH(GHASH_X, GHASH_X);
+	}
+}
+
+template <class BlockCipher>
+void GCM<BlockCipher>::decryptBlock(const void* src, void* dst, sl_uint32 n)
+{
+	sl_uint8 GCTR[16];
+	sl_size k;
+	const sl_uint8* C = (const sl_uint8*)src;
+	sl_uint8* P = (sl_uint8*)dst;
+	increaseCIV();
+	m_cipher->encryptBlock(CIV, GCTR);
+	for (k = 0; k < n; k++) {
+		GHASH_X[k] ^= *C;
+		*P = *C ^ GCTR[k];
+		C++;
+		P++;
+	}
+	multiplyH(GHASH_X, GHASH_X);
+}
+
+template <class BlockCipher>
+void GCM<BlockCipher>::decrypt(const void* src, void *dst, sl_size len)
+{
+	sl_uint8 GCTR[16];
+	sl_size i, k, n;
+	const sl_uint8* C = (const sl_uint8*)src;
+	sl_uint8* P = (sl_uint8*)dst;
+	
+	for (i = 0; i < len; i += 16) {
+		increaseCIV();
+		m_cipher->encryptBlock(CIV, GCTR);
+		n = len - i;
+		if (n > 16) {
+			n = 16;
+		}
+		for (k = 0; k < n; k++) {
+			GHASH_X[k] ^= *C;
+			*P = *C ^ GCTR[k];
+			C++;
+			P++;
+		}
+		multiplyH(GHASH_X, GHASH_X);
+	}
+}
+
+template <class BlockCipher>
+sl_bool GCM<BlockCipher>::encrypt(
+				const void* IV, sl_size lenIV
+				, const void* A, sl_size lenA
+				, const void* input, void* output, sl_size len
+				, void* tag, sl_size lenTag
+)
+{
+	if (!start(IV, lenIV)) {
+		return sl_false;
+	}
+	put(A, lenA);
+	encrypt(input, output, len);
+	return finish(lenA, len, tag, lenTag);
+}
+
+template <class BlockCipher>
+sl_bool GCM<BlockCipher>::decrypt(
+				const void* IV, sl_size lenIV
+				, const void* A, sl_size lenA
+				, const void* input, void* output, sl_size len
+				, const void* tag, sl_size lenTag
+)
+{
+	if (!start(IV, lenIV)) {
+		return sl_false;
+	}
+	put(A, lenA);
+	decrypt(input, output, len);
+	return finishAndCheckTag(lenA, len, tag, lenTag);
+}
+
+template <class BlockCipher>
+sl_bool GCM<BlockCipher>::check(
+			  const void* IV, sl_size lenIV
+			  , const void* A, sl_size lenA
+			  , const void* C, sl_size lenC
+			  , const void* tag, sl_size lenTag
+)
+{
+	if (!start(IV, lenIV)) {
+		return sl_false;
+	}
+	put(A, lenA);
+	put(C, lenC);
+	return finishAndCheckTag(lenA, lenC, tag, lenTag);
+}
+
+
+template class GCM<AES>;
 
 SLIB_CRYPTO_NAMESPACE_END

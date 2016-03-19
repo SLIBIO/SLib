@@ -5,6 +5,7 @@
 #include "../../../inc/thirdparty/SOIL2/SOIL2.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
+
 Ref<Image> Image_SOIL2::loadImage(const void* content, sl_size size)
 {
 	Ref<Image> ret;
@@ -21,6 +22,7 @@ Ref<Image> Image_SOIL2::loadImage(const void* content, sl_size size)
 	}
 	return ret;
 }
+
 SLIB_GRAPHICS_NAMESPACE_END
 
 #endif

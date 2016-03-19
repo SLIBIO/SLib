@@ -18,7 +18,7 @@ public:
 	{
 		ObjectLocker lock(this);
 		sl_uint32 nOrig = (sl_uint32)(::SendMessageW(hWnd, TCM_GETITEMCOUNT, 0, 0));
-		sl_uint32 nNew = (sl_uint32)(m_items.count());
+		sl_uint32 nNew = (sl_uint32)(m_items.getCount());
 		if (nOrig == nNew) {
 			return;
 		}
@@ -43,12 +43,12 @@ public:
 	{
 		__applyTabsCount(hWnd);
 		ListLocker<TabViewItem> items(m_items);
-		for (sl_size i = 0; i < items.count(); i++) {
+		for (sl_size i = 0; i < items.count; i++) {
 			TCITEMW tci;
 			Base::zeroMemory(&tci, sizeof(tci));
 			tci.mask = TCIF_TEXT;
 			String16 label = items[i].label;
-			tci.pszText = (LPWSTR)(label.getBuf());
+			tci.pszText = (LPWSTR)(label.getData());
 			::SendMessageW(hWnd, TCM_SETITEMW, (WPARAM)i, (LPARAM)&tci);
 		}
 		__selectTab(hWnd, viewInstance, m_indexSelected);
@@ -60,13 +60,13 @@ public:
 		Base::zeroMemory(&tci, sizeof(tci));
 		tci.mask = TCIF_TEXT;
 		String16 label = _label;
-		tci.pszText = (LPWSTR)(label.getBuf());
+		tci.pszText = (LPWSTR)(label.getData());
 		::SendMessageW(hWnd, TCM_SETITEMW, (WPARAM)index, (LPARAM)(&tci));
 	}
 
 	void __selectTab(HWND hWnd, ViewInstance* viewInstance, sl_uint32 index)
 	{
-		sl_uint32 n = (sl_uint32)(m_items.count());
+		sl_uint32 n = (sl_uint32)(m_items.getCount());
 		if (index >= n) {
 			index = 0;
 		}
@@ -93,7 +93,7 @@ public:
 		Rectangle rc = __getClientBounds(hWnd);
 		sl_size sel = m_indexSelected;
 		ListLocker<TabViewItem> items(m_items);
-		for (sl_size i = 0; i < items.count(); i++) {
+		for (sl_size i = 0; i < items.count; i++) {
 			Ref<View> view = items[i].contentView;
 			if (view.isNotNull()) {
 				view->setFrame(rc);
@@ -113,7 +113,7 @@ public:
 	{
 		Rectangle rc = __getClientBounds(hWnd);
 		ListLocker<TabViewItem> items(m_items);
-		for (sl_size i = 0; i < items.count(); i++) {
+		for (sl_size i = 0; i < items.count; i++) {
 			Ref<View> view = items[i].contentView;
 			if (view.isNotNull()) {
 				view->setFrame(rc);
@@ -154,8 +154,8 @@ public:
 		HWND handle = getHandle();
 		if (handle) {
 			Ref<View> _view = getView();
-			if (TabView::checkInstance(_view)) {
-				_TabView* view = (_TabView*)(_view.get());
+			if (TabView::checkInstance(_view.ptr)) {
+				_TabView* view = (_TabView*)(_view.ptr);
 				UINT code = nmhdr->code;
 				if (code == TCN_SELCHANGE) {
 					view->__onSelectTab(handle, this);
@@ -186,13 +186,13 @@ Ref<ViewInstance> TabView::createInstance(ViewInstance* parent)
 
 		Ref<Font> font = m_font;
 		Ref<FontInstance> fontInstance;
-		HFONT hFont = UIPlatform::getGdiFont(font.get(), fontInstance);
+		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
 		m_fontInstance = fontInstance;
 
-		((_TabView*)this)->__copyTabs(handle, ret.get());
+		((_TabView*)this)->__copyTabs(handle, ret.ptr);
 	}
 	return ret;
 }
@@ -217,8 +217,8 @@ void TabView::_setTabContentView(sl_uint32 index, const Ref<View>& view)
 {
 	Ref<ViewInstance> viewInstance = getViewInstance();
 	if (viewInstance.isNotNull()) {
-		HWND handle = UIPlatform::getViewHandle(viewInstance.get());
-		((_TabView*)this)->__applyTabContents(handle, viewInstance.get());
+		HWND handle = UIPlatform::getViewHandle(viewInstance.ptr);
+		((_TabView*)this)->__applyTabContents(handle, viewInstance.ptr);
 	}
 }
 
@@ -235,8 +235,8 @@ void TabView::_selectTab(sl_uint32 index)
 {
 	Ref<ViewInstance> viewInstance = getViewInstance();
 	if (viewInstance.isNotNull()) {
-		HWND handle = UIPlatform::getViewHandle(viewInstance.get());
-		((_TabView*)this)->__selectTab(handle, viewInstance.get(), index);
+		HWND handle = UIPlatform::getViewHandle(viewInstance.ptr);
+		((_TabView*)this)->__selectTab(handle, viewInstance.ptr, index);
 	}
 }
 
@@ -254,7 +254,7 @@ void TabView::setFont(const Ref<Font>& font)
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		HFONT hFont = UIPlatform::getGdiFont(font.get(), fontInstance);
+		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}

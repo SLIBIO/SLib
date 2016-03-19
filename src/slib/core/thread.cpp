@@ -7,38 +7,42 @@
 
 SLIB_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(Thread, Object)
+
 Thread::Thread() : m_eventWake(Event::create(sl_true)), m_eventExit(Event::create(sl_false))
 {
 	m_flagRunning = sl_false;
 	m_flagRequestStop = sl_false;
 
 	m_handle = sl_null;
-	m_priority = threadPriority_Normal;
+	m_priority = ThreadPriority::Normal;
 }
 
 Thread::~Thread()
 {
 }
 
-ThreadPriority Thread::getPriority()
+Ref<Thread> Thread::create(const Ref<Runnable>& runnable)
 {
-	return m_priority;
+	if (runnable.isNull()) {
+		return Ref<Thread>::null();
+	}
+	Ref<Thread> ret = new Thread();
+	if (ret.isNotNull()) {
+		ret->m_runnable = runnable;
+	}
+	return ret;
 }
 
-void Thread::setPriority(ThreadPriority priority)
+Ref<Thread> Thread::start(const Ref<Runnable>& runnable, sl_uint32 stackSize)
 {
-	m_priority = priority;
-	_nativeSetPriority();
-}
-
-Ref<Thread> Thread::getCurrent()
-{
-	return Thread::_nativeGetCurrentThread();
-}
-
-sl_bool Thread::isCurrentThread()
-{
-	return Thread::_nativeGetCurrentThread() == this;
+	Ref<Thread> ret = create(runnable);
+	if (ret.isNotNull()) {
+		if (ret->start(stackSize)) {
+			return ret;
+		}
+	}
+	return Ref<Thread>::null();
 }
 
 sl_bool Thread::start(sl_uint32 stackSize)
@@ -51,7 +55,7 @@ sl_bool Thread::start(sl_uint32 stackSize)
 		m_eventWake->reset();
 		_nativeStart(stackSize);
 		if (m_handle) {
-			if (m_priority != threadPriority_Normal) {
+			if (m_priority != ThreadPriority::Normal) {
 				_nativeSetPriority();
 			}
 			return sl_true;
@@ -91,37 +95,29 @@ sl_bool Thread::finishAndWait(sl_int32 timeout)
 	if (timeout >= 0) {
 		if (m_flagRunning) {
 			m_flagRequestStop = sl_true;
-            while (1) {
-                wake();
-                sl_int32 t = timeout;
-                if (t > 100) {
-                    t = 100;
-                }
-                if (m_eventExit->wait(t)) {
-                    return sl_true;
-                }
-                if (timeout <= 100) {
-                    break;
-                }
-                timeout -= 100;
-            }
-        }
+			while (1) {
+				wake();
+				sl_int32 t = timeout;
+				if (t > 100) {
+					t = 100;
+				}
+				if (m_eventExit->wait(t)) {
+					return sl_true;
+				}
+				if (timeout <= 100) {
+					break;
+				}
+				timeout -= 100;
+			}
+		}
 	} else {
 		while (m_flagRunning) {
 			m_flagRequestStop = sl_true;
-            wake();
+			wake();
 			System::sleep(1);
 		}
 	}
 	return sl_false;
-}
-
-void Thread::wake()
-{
-	Ref<Event> ev = m_eventWaiting;
-	if (ev.isNotNull()) {
-		ev->set();
-	}
 }
 
 sl_bool Thread::wait(sl_int32 timeout)
@@ -134,6 +130,14 @@ sl_bool Thread::wait(sl_int32 timeout)
 	}
 }
 
+void Thread::wake()
+{
+	Ref<Event> ev = m_eventWaiting;
+	if (ev.isNotNull()) {
+		ev->set();
+	}
+}
+
 void Thread::setWaitingEvent(Event* ev)
 {
 	m_eventWaiting = ev;
@@ -142,6 +146,103 @@ void Thread::setWaitingEvent(Event* ev)
 void Thread::clearWaitingEvent()
 {
 	m_eventWaiting.setNull();
+}
+
+ThreadPriority Thread::getPriority()
+{
+	return m_priority;
+}
+
+void Thread::setPriority(ThreadPriority priority)
+{
+	m_priority = priority;
+	_nativeSetPriority();
+}
+
+sl_bool Thread::isRunning()
+{
+	return m_flagRunning;
+}
+
+sl_bool Thread::isNotRunning()
+{
+	return !m_flagRunning;
+}
+
+sl_bool Thread::isStopping()
+{
+	return m_flagRequestStop;
+}
+
+sl_bool Thread::isNotStopping()
+{
+	return !m_flagRequestStop;
+}
+
+sl_bool Thread::isWaiting()
+{
+	return m_eventWaiting.isNotNull();
+}
+
+sl_bool Thread::isNotWaiting()
+{
+	return m_eventWaiting.isNull();
+}
+
+const Ref<Runnable>& Thread::getRunnable()
+{
+	return m_runnable;
+}
+
+sl_bool Thread::sleep(sl_uint32 ms)
+{
+	Ref<Thread> thread = getCurrent();
+	if (thread.isNotNull()) {
+		return thread->wait(ms);
+	} else {
+		System::sleep(ms);
+		return sl_true;
+	}
+}
+
+sl_bool Thread::isCurrentThread()
+{
+	return Thread::_nativeGetCurrentThread() == this;
+}
+
+Ref<Thread> Thread::getCurrent()
+{
+	return Thread::_nativeGetCurrentThread();
+}
+
+sl_bool Thread::isStoppingCurrent()
+{
+	Ref<Thread> thread = getCurrent();
+	if (thread.isNotNull()) {
+		return thread->isStopping();
+	}
+	return sl_false;
+}
+
+sl_bool Thread::isNotStoppingCurrent()
+{
+	Ref<Thread> thread = getCurrent();
+	if (thread.isNotNull()) {
+		return thread->isNotStopping();
+	}
+	return sl_false;
+}
+
+sl_uint64 Thread::getCurrentThreadUniqueId()
+{
+	static sl_int32 uid = 10000;
+	sl_uint64 n = _nativeGetCurrentThreadUniqueId();
+	if (n > 0) {
+		return n;
+	}
+	n = Base::interlockedIncrement32(&uid);
+	_nativeSetCurrentThreadUniqueId(n);
+	return n;
 }
 
 Variant Thread::getProperty(const String& name)
@@ -196,70 +297,6 @@ void Thread::_run()
 	m_handle = sl_null;
 	m_flagRunning = sl_false;
 	m_eventExit->set();
-}
-
-Ref<Thread> Thread::create(const Ref<Runnable>& runnable)
-{
-	if (runnable.isNull()) {
-		return Ref<Thread>::null();
-	}
-	Ref<Thread> ret = new Thread();
-	if (ret.isNotNull()) {
-		ret->m_runnable = runnable;
-	}
-	return ret;
-}
-
-Ref<Thread> Thread::start(const Ref<Runnable>& runnable, sl_uint32 stackSize)
-{
-	Ref<Thread> ret = create(runnable);
-	if (ret.isNotNull()) {
-		if (ret->start(stackSize)) {
-			return ret;
-		}
-	}
-	return Ref<Thread>::null();
-}
-
-sl_bool Thread::sleep(sl_uint32 ms)
-{
-	Ref<Thread> thread = getCurrent();
-	if (thread.isNotNull()) {
-		return thread->wait(ms);
-	} else {
-		System::sleep(ms);
-		return sl_true;
-	}
-}
-
-sl_bool Thread::isStoppingCurrent()
-{
-	Ref<Thread> thread = getCurrent();
-	if (thread.isNotNull()) {
-		return thread->isStopping();
-	}
-	return sl_false;
-}
-
-sl_bool Thread::isNotStoppingCurrent()
-{
-	Ref<Thread> thread = getCurrent();
-	if (thread.isNotNull()) {
-		return thread->isNotStopping();
-	}
-	return sl_false;
-}
-
-sl_uint64 Thread::getCurrentThreadUniqueId()
-{
-	static sl_int32 uid = 10000;
-	sl_uint64 n = _nativeGetCurrentThreadUniqueId();
-	if (n > 0) {
-		return n;
-	}
-	n = Base::interlockedIncrement32(&uid);
-	_nativeSetCurrentThreadUniqueId(n);
-	return n;
 }
 
 SLIB_NAMESPACE_END

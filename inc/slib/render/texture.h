@@ -9,22 +9,23 @@
 
 SLIB_RENDER_NAMESPACE_BEGIN
     
-enum TextureFilterMode
+enum class TextureFilterMode
 {
-    textureFilterMode_Point,
-    textureFilterMode_Linear
+    Point,
+    Linear
 };
 
-enum TextureWrapMode
+enum class TextureWrapMode
 {
-    textureWrapMode_Repeat,
-    textureWrapMode_Mirror,
-    textureWrapMode_Clamp
+    Repeat,
+    Mirror,
+    Clamp
 };
 
 class SLIB_EXPORT Texture : public RenderBaseObject
 {
-	SLIB_DECLARE_OBJECT(Texture, RenderBaseObject)
+	SLIB_DECLARE_OBJECT
+	
 protected:
 	Texture();
 
@@ -41,32 +42,22 @@ public:
     
 	static Ref<Texture> loadFromFile(const String& filePath);
     
-	static Ref<Texture> loadFromResource(const String& path);
+	static Ref<Texture> loadFromAsset(const String& path);
 	
 public:
-	SLIB_INLINE Ref<Bitmap> getSource() const
-	{
-		return m_source;
-	}
-
-	SLIB_INLINE sl_uint32 getWidth() const
-	{
-		return m_width;
-	}
-
-	SLIB_INLINE sl_uint32 getHeight() const
-	{
-		return m_height;
-	}
+	Ref<Bitmap> getSource() const;
 	
-public:
+	sl_bool setSource(const Ref<Bitmap>& source);
+	
+	void freeSource();
+
+	sl_uint32 getWidth() const;
+
+	sl_uint32 getHeight() const;
+	
 	void update(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height);
     
 	void update();
-
-	void freeSource();
-    
-	sl_bool setSource(const Ref<Bitmap>& source);
 
 public:
 	SLIB_PROPERTY(TextureFilterMode, MinFilter)
@@ -79,6 +70,7 @@ protected:
 	SafeRef<Bitmap> m_source;
 	sl_uint32 m_width;
 	sl_uint32 m_height;
+	
 };
 
 SLIB_RENDER_NAMESPACE_END

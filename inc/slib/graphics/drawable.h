@@ -18,7 +18,7 @@ class ColorDrawable;
 
 class SLIB_EXPORT Drawable : public Object
 {
-	SLIB_DECLARE_OBJECT(Drawable, Object)
+	SLIB_DECLARE_OBJECT
 
 public:
 	virtual sl_real getDrawableWidth() = 0;
@@ -43,12 +43,8 @@ public:
 
 class SLIB_EXPORT BrushDrawable : public Drawable
 {
-	SLIB_DECLARE_OBJECT(BrushDrawable, Drawable)
-protected:
-	SLIB_INLINE BrushDrawable()
-	{
-	}
-
+	SLIB_DECLARE_OBJECT
+	
 public:
 	static Ref<BrushDrawable> create(const Ref<Brush>& brush);
 	
@@ -64,23 +60,21 @@ public:
 
 protected:
 	Ref<Brush> m_brush;
+	
 };
 
 class SLIB_EXPORT ColorDrawable : public BrushDrawable
 {
-	SLIB_DECLARE_OBJECT(ColorDrawable, BrushDrawable)
-protected:
-	SLIB_INLINE ColorDrawable()
-	{
-	}
+	SLIB_DECLARE_OBJECT
 	
 public:
 	static Ref<ColorDrawable> create(const Color& color);
+	
 };
 
 class SLIB_EXPORT EmptyDrawable : public Drawable
 {
-	SLIB_DECLARE_OBJECT(EmptyDrawable, Drawable)
+	SLIB_DECLARE_OBJECT
 
 public:
 	static Ref<EmptyDrawable> create();

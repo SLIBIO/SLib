@@ -47,7 +47,7 @@ Ref<ViewInstance> ScrollView::createInstance(ViewInstance* _parent)
 		ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 		if (ret.isNotNull()) {
 			jobject handle = ret->getHandle();
-			((_ScrollView*)this)->__applyProperties(handle, ret.get());
+			((_ScrollView*)this)->__applyProperties(handle, ret.ptr);
 		}
 	}
 	return ret;
@@ -78,9 +78,9 @@ void ScrollView::_setContentView(const Ref<View>& view)
 {
 	Ref<ViewInstance> instance = getViewInstance();
 	if (instance.isNotNull()) {
-		jobject handle = UIPlatform::getViewHandle(instance.get());
+		jobject handle = UIPlatform::getViewHandle(instance.ptr);
 		if (handle) {
-			((_ScrollView*)this)->__applyContent(handle, instance.get());
+			((_ScrollView*)this)->__applyContent(handle, instance.ptr);
 		}
 	}
 }

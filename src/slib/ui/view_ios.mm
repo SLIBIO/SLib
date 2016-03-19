@@ -43,7 +43,7 @@ Ref<iOS_ViewInstance> iOS_ViewInstance::create(UIView* handle, sl_bool flagFreeO
 		if (ret.isNotNull()) {
 			ret->m_handle = handle;
 			ret->m_flagFreeOnRelease = flagFreeOnRelease;
-			UIPlatform::registerViewInstance(handle, ret.get());
+			UIPlatform::registerViewInstance(handle, ret.ptr);
 		} else {
 			if (flagFreeOnRelease) {
 				freeHandle(handle);
@@ -214,7 +214,7 @@ Point iOS_ViewInstance::convertCoordinateFromViewToScreen(const Point& ptView)
 
 void iOS_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
 {
-	iOS_ViewInstance* child = (iOS_ViewInstance*)(_child.get());
+	iOS_ViewInstance* child = (iOS_ViewInstance*)(_child.ptr);
 	if (child) {
 		UIView* handle = m_handle;
 		if (handle != nil) {
@@ -228,7 +228,7 @@ void iOS_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
 
 void iOS_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
 {
-	iOS_ViewInstance* child = (iOS_ViewInstance*)(_child.get());
+	iOS_ViewInstance* child = (iOS_ViewInstance*)(_child.ptr);
 	if (child) {
 		UIView* child_handle = child->m_handle;
 		if (child_handle != nil) {
@@ -260,13 +260,13 @@ void iOS_ViewInstance::onDraw(CGRect _rectDirty)
 			Ref<Canvas> canvas = UIPlatform::createCanvas(context, (sl_uint32)(rectBound.size.width), (sl_uint32)(rectBound.size.height));
 			
 			if (canvas.isNotNull()) {
-				ViewInstance::onDraw(canvas.get());
+				ViewInstance::onDraw(canvas.ptr);
 			}
 		}
 	}
 }
 
-sl_bool iOS_ViewInstance::onEventTouch(UIEventAction action, NSSet* touches, ::UIEvent* event)
+sl_bool iOS_ViewInstance::onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event)
 {
 	UIView* handle = m_handle;
 	
@@ -275,12 +275,13 @@ sl_bool iOS_ViewInstance::onEventTouch(UIEventAction action, NSSet* touches, ::U
 		sl_uint32 n = (sl_uint32)([touches count]);
 		Array<TouchPoint> points(n);
 		if (points.isNotNull()) {
+			TouchPoint* pts = points.getData();
 			sl_uint32 i = 0;
 			for (UITouch* touch in touches) {
 				CGPoint pt = [touch locationInView:handle];
 				sl_real pressure = (sl_real)([touch majorRadius]);
 				TouchPoint point((sl_real)(pt.x), (sl_real)(pt.y), pressure);
-				points[i] = point;
+				pts[i] = point;
 				i++;
 				if (i >= n) {
 					break;
@@ -290,7 +291,7 @@ sl_bool iOS_ViewInstance::onEventTouch(UIEventAction action, NSSet* touches, ::U
 		
 		Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points);
 		if (ev.isNotNull()) {
-			onTouchEvent(ev.get());
+			onTouchEvent(ev.ptr);
 			if (ev->isPreventedDefault()) {
 				return sl_true;
 			}
@@ -372,7 +373,7 @@ UIView* UIPlatform::getViewHandle(View* view)
 	if (view) {
 		Ref<ViewInstance> instance = view->getViewInstance();
 		if (instance.isNotNull()) {
-			iOS_ViewInstance* osx_instance = (iOS_ViewInstance*)(instance.get());
+			iOS_ViewInstance* osx_instance = (iOS_ViewInstance*)(instance.ptr);
 			return osx_instance->getHandle();
 		}		
 	}

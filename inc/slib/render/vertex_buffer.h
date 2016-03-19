@@ -10,7 +10,8 @@ SLIB_RENDER_NAMESPACE_BEGIN
 
 class SLIB_EXPORT VertexBuffer : public RenderBaseObject
 {
-	SLIB_DECLARE_OBJECT(VertexBuffer, RenderBaseObject)
+	SLIB_DECLARE_OBJECT
+	
 protected:
 	VertexBuffer();
 	
@@ -19,17 +20,12 @@ public:
 	static Ref<VertexBuffer> create(const void* buf, sl_size size);
 	
 public:
-	SLIB_INLINE sl_size getSize() const
-	{
-		return m_mem.getSize();
-	}
+	sl_size getSize() const;
 	
-	SLIB_INLINE sl_uint8* getBuffer() const
-	{
-		return (sl_uint8*)(m_mem.getBuf());
-	}
+	sl_uint8* getBuffer() const;
 
 	void update(sl_size offset, sl_size size);
+	
 	void update();
 	
 public:
@@ -37,6 +33,7 @@ public:
 
 protected:
 	Memory m_mem;
+	
 };
 
 SLIB_RENDER_NAMESPACE_END

@@ -25,11 +25,12 @@ public:
 
 public:
 	MySQL_Param();
+	
 };
 
 class SLIB_EXPORT MySQL_Database : public Database
 {
-	SLIB_DECLARE_OBJECT(MySQL_Database, Database)
+	SLIB_DECLARE_OBJECT
 	
 public:
 	static Ref<MySQL_Database> connect(const MySQL_Param& param);
@@ -41,6 +42,7 @@ public:
 
 public:
 	static void initThread();
+	
 };
 
 SLIB_DB_NAMESPACE_END

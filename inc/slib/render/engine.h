@@ -17,14 +17,14 @@
 
 SLIB_RENDER_NAMESPACE_BEGIN
 
-enum PrimitiveType
+enum class PrimitiveType
 {
-    primitiveType_Lines = 0,
-    primitiveType_LineStrip = 1,
-    primitiveType_Triangles = 2,
-    primitiveType_TriangleStrip = 3,
-    primitiveType_TriangleFan = 4,
-    primitiveType_Points = 5
+	Lines = 0,
+	LineStrip = 1,
+	Triangles = 2,
+	TriangleStrip = 3,
+	TriangleFan = 4,
+	Points = 5
 };
 
 class SLIB_EXPORT Primitive
@@ -55,30 +55,30 @@ public:
 	
 };
 
-enum RenderBlendingOperation
+enum class RenderBlendingOperation
 {
-    renderBlendingOperation_Add = 0,
-    renderBlendingOperation_Subtract = 1,
-    renderBlendingOperation_ReverseSubtract = 2
+	Add = 0,
+	Subtract = 1,
+	ReverseSubtract = 2
 };
 
-enum RenderBlendingFactor
+enum class RenderBlendingFactor
 {
-    renderBlendingFactor_One = 0,
-    renderBlendingFactor_Zero = 1,
-    renderBlendingFactor_SrcAlpha = 2,
-    renderBlendingFactor_OneMinusSrcAlpha = 3,
-    renderBlendingFactor_DstAlpha = 4,
-    renderBlendingFactor_OneMinusDstAlpha = 5,
-    renderBlendingFactor_SrcColor = 6,
-    renderBlendingFactor_OneMinusSrcColor = 7,
-    renderBlendingFactor_DstColor = 8,
-    renderBlendingFactor_OneMinusDstColor = 9,
-    renderBlendingFactor_SrcAlphaSaturate = 10, // f = min(As, 1 - Ad)
-    renderBlendingFactor_Constant = 11,
-    renderBlendingFactor_OneMinusConstant = 12,
-    renderBlendingFactor_ConstantAlpha = 13,
-    renderBlendingFactor_OneMinusConstantAlpha = 14
+	One = 0,
+	Zero = 1,
+	SrcAlpha = 2,
+	OneMinusSrcAlpha = 3,
+	DstAlpha = 4,
+	OneMinusDstAlpha = 5,
+	SrcColor = 6,
+	OneMinusSrcColor = 7,
+	DstColor = 8,
+	OneMinusDstColor = 9,
+	SrcAlphaSaturate = 10, // f = min(As, 1 - Ad)
+	Constant = 11,
+	OneMinusConstant = 12,
+	ConstantAlpha = 13,
+	OneMinusConstantAlpha = 14
 };
 
 class SLIB_EXPORT RenderBlendingParam
@@ -124,7 +124,8 @@ public:
 
 class SLIB_EXPORT Renderer : public Object
 {
-	SLIB_DECLARE_OBJECT(Renderer, Object)
+	SLIB_DECLARE_OBJECT
+	
 protected:
 	Renderer();
 	
@@ -142,17 +143,18 @@ protected:
 };
 
 
-enum RenderEngineType
+enum class RenderEngineType
 {
-    renderEngineType_OpenGL = 0x01010001,
-    renderEngineType_OpenGL_ES = 0x01020001,
-    renderEngineType_D3D9 = 0x02010901,
-    renderEngineType_D3D11 = 0x02010B01
+    OpenGL = 0x01010001,
+    OpenGL_ES = 0x01020001,
+    D3D9 = 0x02010901,
+    D3D11 = 0x02010B01
 };
 
 class SLIB_EXPORT RenderEngine : public Object
 {
-	SLIB_DECLARE_OBJECT(RenderEngine, Object)
+	SLIB_DECLARE_OBJECT
+	
 protected:
 	RenderEngine();
 
@@ -165,7 +167,6 @@ public:
 	
 	sl_bool isD3D();
 
-public:
 	void release();
 
 	sl_bool isValid();
@@ -212,12 +213,11 @@ public:
 
 	void setLineWidth(sl_real width);
 
-public:
 	void draw(const Ref<RenderProgram>& program, Primitive* primitives, sl_uint32 count = 1);
 
-	void draw(const Ref<RenderProgram>& program, sl_uint32 countElements, const Ref<VertexBuffer>& vb, const Ref<IndexBuffer>& ib, PrimitiveType type = primitiveType_Triangles);
+	void draw(const Ref<RenderProgram>& program, sl_uint32 countElements, const Ref<VertexBuffer>& vb, const Ref<IndexBuffer>& ib, PrimitiveType type = PrimitiveType::Triangles);
 
-	void draw(const Ref<RenderProgram>& program, sl_uint32 countElements, const Ref<VertexBuffer>& vb, PrimitiveType type = primitiveType_Triangles);
+	void draw(const Ref<RenderProgram>& program, sl_uint32 countElements, const Ref<VertexBuffer>& vb, PrimitiveType type = PrimitiveType::Triangles);
 
 	// Position(0, 0, 1, 1)
 	void drawRectangle2D(const Ref<RenderProgram>& program);
@@ -299,26 +299,13 @@ public:
 	
 	Rectangle viewportToScreen(sl_real x, sl_real y, sl_real width, sl_real height);
 
-public:
-	SLIB_INLINE sl_uint32 getViewportWidth()
-	{
-		return m_viewportWidth;
-	}
+	sl_uint32 getViewportWidth();
 	
-	SLIB_INLINE sl_uint32 getViewportHeight()
-	{
-		return m_viewportHeight;
-	}
+	sl_uint32 getViewportHeight();
 
-	SLIB_INLINE sl_uint32 getCountOfDrawnElementsOnLastScene()
-	{
-		return m_nCountDrawnElementsOnLastScene;
-	}
+	sl_uint32 getCountOfDrawnElementsOnLastScene();
 
-	SLIB_INLINE sl_uint32 getCountOfDrawnPrimitivesOnLastScene()
-	{
-		return m_nCountDrawnPrimitivesOnLastScene;
-	}
+	sl_uint32 getCountOfDrawnPrimitivesOnLastScene();
 	
 protected:
 	virtual void _release() = 0;

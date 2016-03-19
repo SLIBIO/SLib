@@ -8,15 +8,15 @@
 
 SLIB_NAMESPACE_BEGIN
 
-enum AppType
+enum class AppType
 {
-	appType_UI = 0,
-	appType_Service = 1
+	UI = 0,
+	Service = 1
 };
 
 class SLIB_EXPORT Application : public Object
 {
-	SLIB_DECLARE_OBJECT(Application, Object)
+	SLIB_DECLARE_OBJECT
 	
 public:
 	virtual AppType getAppType() = 0;
@@ -50,21 +50,31 @@ public:
 SLIB_NAMESPACE_END
 
 #define SLIB_DECLARE_APPLICATION(CLASS) \
-	SLIB_DECLARE_OBJECT(CLASS, slib::Application) \
+	SLIB_DECLARE_OBJECT \
 public: \
-	SLIB_INLINE static void main(const slib::String& param) { \
+	static void main(const slib::String& param); \
+	static void main(); \
+	static slib::Ref<CLASS> getApp();
+
+
+#define SLIB_DEFINE_APPLICATION(CLASS) \
+	SLIB_DEFINE_OBJECT(CLASS, slib::Application) \
+	void CLASS::main(const slib::String& param) { \
 		slib::Ref<CLASS> app = new CLASS; \
 		if (app.isNotNull()) { \
 			app->run(param); \
 		} \
 	} \
-	SLIB_INLINE static void main() { CLASS::main(slib::String::null()); } \
-	SLIB_INLINE static slib::Ref<CLASS> getApp() { \
+	void CLASS::main() { \
+		CLASS::main(slib::String::null()); \
+	} \
+	slib::Ref<CLASS> CLASS::getApp() { \
 		slib::Ref<slib::Application> app = slib::Application::getApp(); \
-		if (app.isNotNull() && CLASS::checkInstance(app)) { \
+		if (app.isNotNull() && CLASS::checkInstance(app.ptr)) { \
 			return slib::Ref<CLASS>::from(app); \
 		} \
 		return slib::Ref<CLASS>::null(); \
 	}
+
 
 #endif

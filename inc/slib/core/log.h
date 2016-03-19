@@ -21,20 +21,15 @@ public:
 class SLIB_EXPORT FileLogger : public Logger
 {
 public:
-	SLIB_INLINE FileLogger()
-    {
-    }
+	FileLogger();
 	
-	SLIB_INLINE FileLogger(const String& fileName)
-	{
-		setFileName(fileName);
-	}
+	FileLogger(const String& fileName);
 
 public:
 	// override
 	void log(const String& tag, const String& content);
-	
-protected:
+
+public:
 	SLIB_STRING_PROPERTY(FileName)
 
 };
@@ -42,9 +37,7 @@ protected:
 class SLIB_EXPORT Log : public Object
 {
 public:
-	SLIB_INLINE Log()
-    {        
-    }
+	Log();
 	
 	Log(const Ref<Logger>& logger, const Ref<Logger>& errorLogger);
 	

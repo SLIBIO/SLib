@@ -28,9 +28,12 @@ sl_bool IListDetailsViewListener::onGetCellText(ListDetailsView* view, sl_uint32
 ListDetailsViewColumn::ListDetailsViewColumn()
 {
 	width = 40;
-	align = alignMiddleCenter;
-	headerAlign = alignMiddleCenter;
+	align = Alignment::MiddleCenter;
+	headerAlign = Alignment::MiddleCenter;
 }
+
+
+SLIB_DEFINE_OBJECT(ListDetailsView, View)
 
 ListDetailsView::ListDetailsView()
 {
@@ -40,7 +43,7 @@ ListDetailsView::ListDetailsView()
 
 sl_uint32 ListDetailsView::getColumnsCount()
 {
-	return (sl_uint32)(m_columns.count());
+	return (sl_uint32)(m_columns.getCount());
 }
 
 void ListDetailsView::setColumnsCount(sl_uint32 nCount)
@@ -58,7 +61,7 @@ sl_uint32 ListDetailsView::getRowsCount()
 void ListDetailsView::setRowsCount(sl_uint32 nCount)
 {
 	ObjectLocker lock(this);
-	if (nCount < m_cells.count()) {
+	if (nCount < m_cells.getCount()) {
 		m_cells.setCount(nCount);
 	}
 	m_nRows = nCount;
@@ -70,7 +73,7 @@ String ListDetailsView::getItemText(sl_uint32 iRow, sl_uint32 iCol)
 	List<ListDetailsViewCell> row = m_cells.getItemValue(iRow, List<ListDetailsViewCell>::null());
 	if (row.isNotNull()) {
 		MutexLocker lock(row.getLocker());
-		if (iCol < row.count()) {
+		if (iCol < row.getCount()) {
 			ListDetailsViewCell* cell = row.getItemPtr(iCol);
 			return cell->text;
 		}
@@ -82,7 +85,7 @@ void ListDetailsView::setItemText(sl_uint32 iRow, sl_uint32 iCol, const String& 
 {
 	ObjectLocker lock(this);
 	if (iRow < m_nRows) {
-		if (iRow >= m_cells.count()) {
+		if (iRow >= m_cells.getCount()) {
 			if (!(m_cells.setCount(iRow + 1))) {
 				return;
 			}
@@ -94,7 +97,7 @@ void ListDetailsView::setItemText(sl_uint32 iRow, sl_uint32 iCol, const String& 
 		}
 		if (row.isNotNull()) {
 			MutexLocker lock(row.getLocker());
-			if (iCol >= row.count()) {
+			if (iCol >= row.getCount()) {
 				if (!(row.setCount(iCol + 1))) {
 					return;
 				}
@@ -109,7 +112,7 @@ void ListDetailsView::setItemText(sl_uint32 iRow, sl_uint32 iCol, const String& 
 String ListDetailsView::getHeaderText(sl_uint32 iCol)
 {
 	MutexLocker lock(m_columns.getLocker());
-	if (iCol < m_columns.count()) {
+	if (iCol < m_columns.getCount()) {
 		ListDetailsViewColumn* col = m_columns.getItemPtr(iCol);
 		return col->title;
 	}
@@ -119,7 +122,7 @@ String ListDetailsView::getHeaderText(sl_uint32 iCol)
 void ListDetailsView::setHeaderText(sl_uint32 iCol, const String& text)
 {
 	MutexLocker lock(m_columns.getLocker());
-	if (iCol < m_columns.count()) {
+	if (iCol < m_columns.getCount()) {
 		ListDetailsViewColumn* col = m_columns.getItemPtr(iCol);
 		col->title = text;
 		_setHeaderText(iCol, text);
@@ -129,7 +132,7 @@ void ListDetailsView::setHeaderText(sl_uint32 iCol, const String& text)
 sl_real ListDetailsView::getColumnWidth(sl_uint32 iCol)
 {
 	MutexLocker lock(m_columns.getLocker());
-	if (iCol < m_columns.count()) {
+	if (iCol < m_columns.getCount()) {
 		ListDetailsViewColumn* col = m_columns.getItemPtr(iCol);
 		return col->width;
 	}
@@ -139,7 +142,7 @@ sl_real ListDetailsView::getColumnWidth(sl_uint32 iCol)
 void ListDetailsView::setColumnWidth(sl_uint32 iCol, sl_real width)
 {
 	MutexLocker lock(m_columns.getLocker());
-	if (iCol < m_columns.count()) {
+	if (iCol < m_columns.getCount()) {
 		ListDetailsViewColumn* col = m_columns.getItemPtr(iCol);
 		col->width = width;
 		_setColumnWidth(iCol, width);
@@ -149,17 +152,17 @@ void ListDetailsView::setColumnWidth(sl_uint32 iCol, sl_real width)
 Alignment ListDetailsView::getHeaderAlignment(sl_uint32 iCol)
 {
 	MutexLocker lock(m_columns.getLocker());
-	if (iCol < m_columns.count()) {
+	if (iCol < m_columns.getCount()) {
 		ListDetailsViewColumn* col = m_columns.getItemPtr(iCol);
 		return col->headerAlign;
 	}
-	return alignCenter;
+	return Alignment::Center;
 }
 
 void ListDetailsView::setHeaderAlignment(sl_uint32 iCol, Alignment align)
 {
 	MutexLocker lock(m_columns.getLocker());
-	if (iCol < m_columns.count()) {
+	if (iCol < m_columns.getCount()) {
 		ListDetailsViewColumn* col = m_columns.getItemPtr(iCol);
 		col->headerAlign = align;
 		_setHeaderAlignment(iCol, align);
@@ -169,17 +172,17 @@ void ListDetailsView::setHeaderAlignment(sl_uint32 iCol, Alignment align)
 Alignment ListDetailsView::getColumnAlignment(sl_uint32 iCol)
 {
 	MutexLocker lock(m_columns.getLocker());
-	if (iCol < m_columns.count()) {
+	if (iCol < m_columns.getCount()) {
 		ListDetailsViewColumn* col = m_columns.getItemPtr(iCol);
 		return col->align;
 	}
-	return alignCenter;
+	return Alignment::Center;
 }
 
 void ListDetailsView::setColumnAlignment(sl_uint32 iCol, Alignment align)
 {
 	MutexLocker lock(m_columns.getLocker());
-	if (iCol < m_columns.count()) {
+	if (iCol < m_columns.getCount()) {
 		ListDetailsViewColumn* col = m_columns.getItemPtr(iCol);
 		col->align = align;
 		_setColumnAlignment(iCol, align);
@@ -195,7 +198,7 @@ void ListDetailsView::addRow()
 void ListDetailsView::insertRow(sl_uint32 iRow)
 {
 	ObjectLocker lock(this);
-	if (iRow < m_cells.count()) {
+	if (iRow < m_cells.getCount()) {
 		m_cells.insert(iRow, List<ListDetailsViewCell>::null());
 	}
 	setRowsCount(m_nRows+1);
@@ -205,7 +208,7 @@ void ListDetailsView::removeRow(sl_uint32 iRow)
 {
 	ObjectLocker lock(this);
 	if (iRow < m_nRows) {
-		if (iRow < m_cells.count()) {
+		if (iRow < m_cells.getCount()) {
 			m_cells.remove(iRow);
 		}
 		setRowsCount(m_nRows - 1);

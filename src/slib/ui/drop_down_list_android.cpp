@@ -11,8 +11,8 @@ SLIB_UI_NAMESPACE_BEGIN
 void JNICALL _JAndroidDropDownList_nativeOnSelect(JNIEnv* env, jobject _this, jlong instance, jint n)
 {
 	Ref<View> _view = Android_ViewInstance::getAndroidView(instance);
-	if (DropDownList::checkInstance(_view)) {
-		DropDownList* view = (DropDownList*)(_view.get());
+	if (DropDownList::checkInstance(_view.ptr)) {
+		DropDownList* view = (DropDownList*)(_view.ptr);
 		view->onSelectItem(n);
 	}
 }
@@ -36,10 +36,10 @@ public:
 	void __copyItems(jobject jview)
 	{
 		ListLocker<String> titles(m_titles);
-		sl_uint32 n = (sl_uint32)(titles.count());
+		sl_uint32 n = (sl_uint32)(titles.count);
 		JniLocal<jobjectArray> arr = Jni::newStringArray(n);
 		if (arr.isNotNull()) {
-			for (sl_uint32 i = 0; i < titles.count(); i++) {
+			for (sl_uint32 i = 0; i < titles.count; i++) {
 				Jni::setStringArrayElement(arr, i, titles[i]);
 			}
 			titles.unlock();
@@ -78,7 +78,7 @@ Ref<ViewInstance> DropDownList::createInstance(ViewInstance* _parent)
 
 			Ref<Font> font = m_font;
 			Ref<FontInstance> fontInstance;
-			jobject jfont = UIPlatform::getNativeFont(font.get(), fontInstance);
+			jobject jfont = UIPlatform::getNativeFont(font.ptr, fontInstance);
 			if (jfont) {
 				_JAndroidDropDownList::setFont.callBoolean(sl_null, handle, jfont);
 			}
@@ -134,7 +134,7 @@ void DropDownList::setFont(const Ref<Font>& font)
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		Ref<FontInstance> fontInstance;
-		jobject jfont = UIPlatform::getNativeFont(font.get(), fontInstance);
+		jobject jfont = UIPlatform::getNativeFont(font.ptr, fontInstance);
 		if (jfont) {
 			_JAndroidDropDownList::setFont.callBoolean(sl_null, handle, jfont);
 		}

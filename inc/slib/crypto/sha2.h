@@ -42,20 +42,20 @@ protected:
 
 class SLIB_EXPORT SHA224 : public _SHA256Base
 {
-	SLIB_CRYPTO_DEFINE_HASH(SHA224, 28)
-	
 public:
 	// override
 	void start();
 	
 	// override
 	void finish(void* output);
+
+public:
+	SLIB_DECLARE_CRYPTO_HASH
+	
 };
 
 class SLIB_EXPORT SHA256 : public _SHA256Base
 {
-	SLIB_CRYPTO_DEFINE_HASH(SHA256, 32)
-	
 public:
 	// override
 	void start();
@@ -65,6 +65,10 @@ public:
 	
 public:
 	static sl_uint32 make32bitChecksum(const void* input, sl_size n);
+	
+public:
+	SLIB_DECLARE_CRYPTO_HASH
+	
 };
 
 class SLIB_EXPORT _SHA512Base : public CryptoHash
@@ -88,30 +92,35 @@ protected:
 	sl_uint32 rdata_len;
 	sl_uint8 rdata[128];
 	sl_uint64 h[8];
+	
 };
 
 class SLIB_EXPORT SHA384 : public _SHA512Base
 {
-	SLIB_CRYPTO_DEFINE_HASH(SHA384, 48)
-	
 public:
 	// override
 	void start();
 	
 	// override
 	void finish(void* output);
+	
+public:
+	SLIB_DECLARE_CRYPTO_HASH
+	
 };
 
 class SLIB_EXPORT SHA512 : public _SHA512Base
 {
-	SLIB_CRYPTO_DEFINE_HASH(SHA512, 64)
-	
 public:
 	// override
 	void start();
 	
 	// override
 	void finish(void* output);
+	
+public:
+	SLIB_DECLARE_CRYPTO_HASH
+	
 };
 
 SLIB_CRYPTO_NAMESPACE_END

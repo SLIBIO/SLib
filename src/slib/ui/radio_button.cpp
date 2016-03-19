@@ -4,6 +4,8 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(RadioButton, View)
+
 RadioButton::RadioButton()
 {
 	m_flagSelected = sl_false;

@@ -6,6 +6,7 @@
 #include "../../../inc/slib/core/platform_windows.h"
 
 SLIB_NAMESPACE_BEGIN
+
 struct _AsyncIoLoopHandle
 {
 	HANDLE hCompletionPort;

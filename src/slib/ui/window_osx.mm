@@ -3,6 +3,7 @@
 #if defined(SLIB_PLATFORM_IS_OSX)
 
 #include "../../../inc/slib/ui/window.h"
+
 #include "../../../inc/slib/ui/screen.h"
 #include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/platform.h"
@@ -83,7 +84,7 @@ public:
 				styleMask = NSClosableWindowMask;
 			}
 		}
-		NSScreen* screen = UIPlatform::getScreenHandle(param.screen.get());
+		NSScreen* screen = UIPlatform::getScreenHandle(param.screen.ptr);
 		Rectangle screenFrame;
 		Ref<Screen> _screen = param.screen;
 		if (_screen.isNotNull()) {
@@ -177,7 +178,7 @@ public:
 		NSWindow* window = m_window;
 		if (window != nil) {
 			if (windowInst.isNotNull()) {
-				_OSX_Window* w = (_OSX_Window*)(windowInst.get());
+				_OSX_Window* w = (_OSX_Window*)(windowInst.ptr);
 				NSWindow* p = w->m_window;
 				m_parent = p;
 				if (p != nil) {
@@ -322,7 +323,7 @@ public:
 			}
 			return UIPlatform::getColorFromNSColor(color);
 		}
-		return Color::transparent();
+		return Color::Transparent;
 	}
 	
 	sl_bool setBackgroundColor(const Color& _color)
@@ -960,6 +961,7 @@ SLIB_UI_NAMESPACE_END
 @end
 
 SLIB_UI_NAMESPACE_BEGIN
+
 Ref<WindowInstance> UIPlatform::createWindowInstance(NSWindow* window)
 {
 	Ref<WindowInstance> ret = UIPlatform::_getWindowInstance((__bridge void*)window);
@@ -968,7 +970,7 @@ Ref<WindowInstance> UIPlatform::createWindowInstance(NSWindow* window)
 	}
 	ret = _OSX_Window::create(window);
 	if (ret.isNotNull()) {
-		UIPlatform::_registerWindowInstance((__bridge void*)window, ret.get());
+		UIPlatform::_registerWindowInstance((__bridge void*)window, ret.ptr);
 	}
 	return ret;
 }
@@ -992,6 +994,7 @@ NSWindow* UIPlatform::getWindowHandle(WindowInstance* instance)
 		return nil;
 	}
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

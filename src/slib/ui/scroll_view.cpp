@@ -3,6 +3,8 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(ScrollView, View)
+
 ScrollView::ScrollView()
 {
 	m_backgroundColor = Color::zero();

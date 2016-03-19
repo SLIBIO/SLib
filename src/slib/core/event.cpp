@@ -3,6 +3,8 @@
 
 SLIB_NAMESPACE_BEGIN
 
+SLIB_DEFINE_ROOT_OBJECT(Event)
+
 Event::Event()
 {
 }
@@ -38,4 +40,3 @@ sl_bool Event::wait(sl_int32 timeout)
 }
 
 SLIB_NAMESPACE_END
-

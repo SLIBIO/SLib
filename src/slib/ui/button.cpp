@@ -2,6 +2,8 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(Button, View)
+
 Button::Button()
 {
 	m_flagDefaultButton = sl_false;

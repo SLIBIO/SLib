@@ -129,13 +129,13 @@ sl_bool AsyncIoLoop::__attachInstance(AsyncIoInstance* instance, AsyncIoMode mod
 	ev.events = EPOLLRDHUP | EPOLLET;
 #endif
     switch (mode) {
-        case asyncIoMode_In:
+        case AsyncIoMode::In:
             ev.events |= EPOLLIN | EPOLLPRI;
             break;
-        case asyncIoMode_Out:
+        case AsyncIoMode::Out:
             ev.events |= EPOLLOUT;
             break;
-        case asyncIoMode_InOut:
+        case AsyncIoMode::InOut:
             ev.events |= EPOLLIN | EPOLLPRI | EPOLLOUT;
             break;
         default:
@@ -158,6 +158,7 @@ void AsyncIoLoop::__detachInstance(AsyncIoInstance* instance)
 	int ret = ::epoll_ctl(handle->fdEpoll, EPOLL_CTL_DEL, hObject, &ev);
 	SLIB_UNUSED(ret);
 }
+
 SLIB_NAMESPACE_END
 
 #endif

@@ -34,11 +34,11 @@ Ref<ViewInstance> Button::createInstance(ViewInstance* parent)
 	if (m_flagDefaultButton) {
 		style |= BS_DEFPUSHBUTTON;
 	}
-	Ref<_Win32_ButtonViewInstance> ret = Win32_ViewInstance::create<_Win32_ButtonViewInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getBuf()), style, 0);
+	Ref<_Win32_ButtonViewInstance> ret = Win32_ViewInstance::create<_Win32_ButtonViewInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
 	if (ret.isNotNull()) {
 		Ref<Font> font = m_font;
 		Ref<FontInstance> fontInstance;
-		HFONT hFont = UIPlatform::getGdiFont(font.get(), fontInstance);
+		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(ret->getHandle(), WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
@@ -70,7 +70,7 @@ void Button::setFont(const Ref<Font>& font)
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		HFONT hFont = UIPlatform::getGdiFont(font.get(), fontInstance);
+		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}

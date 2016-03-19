@@ -50,7 +50,7 @@ public:
 	{
 		Ref<_Android_Camera> ret = new _Android_Camera();
 		if (ret.isNotNull()) {
-			jlong instance = (jlong)(ret.get());
+			jlong instance = (jlong)(ret.ptr);
 			_AndroidCameras_get().put(instance, ret);
 			JniLocal<jstring> jid = Jni::getJniString(param.deviceId);
 			JniLocal<jobject> jcamera = _JAndroidCamera::create.callObject(sl_null, jid.get(), instance);
@@ -135,15 +135,15 @@ public:
 			}
 			m_memFrame = mem;
 		}
-		Jni::getByteArrayRegion(jdata, 0, size, (jbyte*)(mem.getBuf()));
+		Jni::getByteArrayRegion(jdata, 0, size, (jbyte*)(mem.getData()));
 		VideoCaptureFrame frame;
 		frame.image.width = (sl_uint32)(width);
 		frame.image.height = (sl_uint32)(height);
-		frame.image.format = bitmapFormat_YUV_NV21;
-		frame.image.data = mem.getBuf();
+		frame.image.format = BitmapFormat::YUV_NV21;
+		frame.image.data = mem.getData();
 		frame.image.pitch = 0;
-		frame.image.ref = mem.getObject();
-		frame.rotation = rotationMode_90;
+		frame.image.ref = mem.ref;
+		frame.rotation = RotationMode::Rotate90;
 		onCaptureVideoFrame(&frame);
 	}
 

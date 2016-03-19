@@ -16,9 +16,6 @@ SLIB_CRYPTO_NAMESPACE_BEGIN
 class SLIB_EXPORT SHA1 : public CryptoHash
 {
 public:
-	SLIB_CRYPTO_DEFINE_HASH(SHA1, 20)
-	
-public:
 	SHA1();
 
 public:
@@ -30,6 +27,9 @@ public:
 	
 	// override
 	void finish(void* output);
+	
+public:
+	SLIB_DECLARE_CRYPTO_HASH
 
 private:
 	void _updateSection(const sl_uint8* input);
@@ -39,6 +39,7 @@ private:
 	sl_uint32 rdata_len;
 	sl_uint8 rdata[64];
 	sl_uint32 h[5];
+	
 };
 
 SLIB_CRYPTO_NAMESPACE_END

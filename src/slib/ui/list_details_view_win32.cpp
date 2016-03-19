@@ -52,10 +52,10 @@ public:
 		Base::zeroMemory(&lvc, sizeof(lvc));
 		lvc.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_FMT;
 		ListLocker<ListDetailsViewColumn> columns(m_columns);
-		for (sl_size i = 0; i < columns.count(); i++) {
+		for (sl_size i = 0; i < columns.count; i++) {
 			ListDetailsViewColumn& column = columns[i];
 			String16 title = column.title;
-			lvc.pszText = (LPWSTR)(title.getBuf());
+			lvc.pszText = (LPWSTR)(title.getData());
 			int width = (int)(column.width);
 			if (width < 0) {
 				width = 0;
@@ -74,10 +74,10 @@ public:
 
 	static int translateAlignment(Alignment _align)
 	{
-		sl_uint32 align = _align & alignHorizontalMask;
-		if (align == alignCenter) {
+		Alignment align = (Alignment)((int)_align & (int)Alignment::HorizontalMask);
+		if (align == Alignment::Center) {
 			return LVCFMT_CENTER;
-		} else if (align == alignRight) {
+		} else if (align == Alignment::Right) {
 			return LVCFMT_RIGHT;
 		}
 		return LVCFMT_LEFT;
@@ -104,8 +104,8 @@ public:
 	sl_bool processNotify(NMHDR* nmhdr, LRESULT& result)
 	{
 		Ref<View> _view = getView();
-		if (ListDetailsView::checkInstance(_view)) {
-			ListDetailsView* view = (ListDetailsView*)(_view.get());
+		if (ListDetailsView::checkInstance(_view.ptr)) {
+			ListDetailsView* view = (ListDetailsView*)(_view.ptr);
 			NMITEMACTIVATE* nm = (NMITEMACTIVATE*)nmhdr;
 			UINT code = nmhdr->code;
 			if (code == LVN_GETDISPINFOW) {
@@ -118,7 +118,7 @@ public:
 						if (n >= m) {
 							n = m - 1;
 						}
-						Base::copyMemory(disp->item.pszText, s.getBuf(), n * 2);
+						Base::copyMemory(disp->item.pszText, s.getData(), n * 2);
 						(disp->item.pszText)[n] = 0;
 					}
 				}
@@ -169,7 +169,7 @@ Ref<ViewInstance> ListDetailsView::createInstance(ViewInstance* parent)
 
 		Ref<Font> font = m_font;
 		Ref<FontInstance> fontInstance;
-		HFONT hFont = UIPlatform::getGdiFont(font.get(), fontInstance);
+		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			// You should send this message before inserting any items
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
@@ -210,7 +210,7 @@ void ListDetailsView::_setHeaderText(sl_uint32 iCol, const String& _text)
 		Base::zeroMemory(&lvc, sizeof(lvc));
 		lvc.mask = LVCF_TEXT;
 		String16 text = _text;
-		lvc.pszText = (LPWSTR)(text.getBuf());
+		lvc.pszText = (LPWSTR)(text.getData());
 		::SendMessageW(handle, LVM_SETCOLUMNW, (WPARAM)iCol, (LPARAM)(&lvc));
 	}
 }
@@ -257,7 +257,7 @@ void ListDetailsView::setFont(const Ref<Font>& font)
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		HFONT hFont = UIPlatform::getGdiFont(font.get(), fontInstance);
+		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}

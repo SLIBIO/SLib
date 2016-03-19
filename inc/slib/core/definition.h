@@ -79,7 +79,7 @@ typedef float				sl_real;
 typedef void*				sl_ptr;
 typedef const void*			sl_cptr;
 
-#define sl_null				(0)
+#define sl_null				nullptr
 
 typedef bool sl_bool;
 #define sl_true true

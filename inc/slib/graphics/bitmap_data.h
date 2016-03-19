@@ -51,38 +51,29 @@ public:
 public:
 	BitmapData();
 	
-	BitmapData(const BitmapData& other);
+	BitmapData(const BitmapData& other) = default;
 	
-	SLIB_INLINE BitmapData(sl_uint32 width, sl_uint32 height, const Color* colors, sl_int32 stride = 0)
-	{
-		setFromColors(width, height, colors, stride);
-	}
+	BitmapData(sl_uint32 width, sl_uint32 height, const Color* colors, sl_int32 stride = 0);
 	
 public:
-	BitmapData& operator=(const BitmapData& other);
+	void*& planeData(sl_uint32 plane);
 	
-public:
-	SLIB_INLINE void*& planeData(sl_uint32 plane)
-	{
-		return *(void**)(((sl_uint8*)&data) + (((sl_uint8*)&data1)-((sl_uint8*)&data)) * plane);
-	}
-	
-	SLIB_INLINE void* const& planeData(sl_uint32 plane) const
-	{
-		return *(void**)(((sl_uint8*)&data) + (((sl_uint8*)&data1)-((sl_uint8*)&data)) * plane);
-	}
+	void* const& planeData(sl_uint32 plane) const;
 
-	SLIB_INLINE sl_int32& planePitch(sl_uint32 plane)
-	{
-		return *(sl_int32*)(((sl_uint8*)&pitch) + (((sl_uint8*)&pitch1)-((sl_uint8*)&pitch)) * plane);
-	}
+	sl_int32& planePitch(sl_uint32 plane);
 	
-	SLIB_INLINE sl_int32 const& planePitch(sl_uint32 plane) const
-	{
-		return *(sl_int32*)(((sl_uint8*)&pitch) + (((sl_uint8*)&pitch1)-((sl_uint8*)&pitch)) * plane);
-	}
+	sl_int32 const& planePitch(sl_uint32 plane) const;
 	
-public:
+	static sl_int32 calculatePitchAlign1(sl_uint32 width, sl_uint32 bitsPerSample);
+	
+	static sl_int32 calculatePitchAlign2(sl_uint32 width, sl_uint32 bitsPerSample);
+	
+	static sl_int32 calculatePitchAlign4(sl_uint32 width, sl_uint32 bitsPerSample);
+	
+	static sl_int32 calculatePitchAlign8(sl_uint32 width, sl_uint32 bitsPerSample);
+	
+	static sl_int32 calculatePitchAlign16(sl_uint32 width, sl_uint32 bitsPerSample);
+
 	void fillDefaultValues();
 	
 	sl_size getTotalSize() const;
@@ -95,11 +86,8 @@ public:
 	void setFromColors(sl_uint32 width, sl_uint32 height, const Color* colors, sl_int32 stride = 0);
 	
 public:
-	static sl_int32 calculatePitchAlign1(sl_uint32 width, sl_uint32 bitsPerSample);
-	static sl_int32 calculatePitchAlign2(sl_uint32 width, sl_uint32 bitsPerSample);
-	static sl_int32 calculatePitchAlign4(sl_uint32 width, sl_uint32 bitsPerSample);
-	static sl_int32 calculatePitchAlign8(sl_uint32 width, sl_uint32 bitsPerSample);
-	static sl_int32 calculatePitchAlign16(sl_uint32 width, sl_uint32 bitsPerSample);
+	BitmapData& operator=(const BitmapData& other) = default;
+
 };
 
 SLIB_GRAPHICS_NAMESPACE_END

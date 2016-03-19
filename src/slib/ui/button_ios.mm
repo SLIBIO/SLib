@@ -23,7 +23,7 @@ Ref<ViewInstance> Button::createInstance(ViewInstance* _parent)
 		[handle setTitle:(Apple::getNSStringFromString(m_text)) forState:UIControlStateNormal];
 		Ref<FontInstance> fontInstance;
 		Ref<Font> font = m_font;
-		UIFont* hFont = UIPlatform::getUIFont(font.get(), fontInstance);
+		UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
 		if (hFont != nil) {
 			handle.titleLabel.font = hFont;
 		}
@@ -61,7 +61,7 @@ void Button::setFont(const Ref<Font>& font)
 	if (handle != nil && [handle isKindOfClass:[UIButton class]]) {
 		UIButton* v = (UIButton*)handle;
 		Ref<FontInstance> fontInstance;
-		UIFont* hFont = UIPlatform::getUIFont(font.get(), fontInstance);
+		UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
 		if (hFont != nil) {
 			v.titleLabel.font = hFont;
 		}

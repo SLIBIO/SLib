@@ -59,13 +59,13 @@ public:
 		} else {
 			ListLocker<DeviceProperty> props(queryDeviceInfos());
 			sl_size i = 0;
-			for (; i < props.count(); i++) {
+			for (; i < props.count; i++) {
 				if (deviceID == props[i].szGuid) {
 					guid = props[i].guid;
 					break;
 				}
 			}
-			if (i == props.count()) {
+			if (i == props.count) {
 				logError("Failed to find capture device");
 				return Ref<_DirectSound_AudioRecorder>::null();
 			}
@@ -317,7 +317,7 @@ List<AudioRecorderInfo> DirectSound::getRecordersList()
 {
 	List<AudioRecorderInfo> ret;
 	ListItems<_DirectSound_AudioRecorder::DeviceProperty> props(_DirectSound_AudioRecorder::queryDeviceInfos());
-	for (sl_size i = 0; i < props.count(); i++) {
+	for (sl_size i = 0; i < props.count; i++) {
 		_DirectSound_AudioRecorder::DeviceProperty& prop = props[i];
 		AudioRecorderInfo info;
 		info.id = prop.szGuid;

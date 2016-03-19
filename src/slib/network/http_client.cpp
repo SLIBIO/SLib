@@ -25,15 +25,24 @@ void IHttpClientListener::onHttpResponse(HttpClientContext* context)
 {
 }
 
+
+SLIB_DEFINE_OBJECT(HttpClientContext, Object)
+
 HttpClientContext::HttpClientContext()
 {
 	m_flagProcessing = sl_false;
-	clearResponse();
+	m_responseContentLength = 0;
+}
+
+Ref<HttpClientContext> HttpClientContext::create()
+{
+	Ref<HttpClientContext> ret = new HttpClientContext;
+	return ret;
 }
 
 void HttpClientContext::clearResponse()
 {
-	m_responseCode = 0;
+	m_responseCode = HttpStatus::OK;
 	m_responseMessage.setNull();
 	clearResponseHeaders();
 
@@ -70,10 +79,24 @@ Ref<HttpClientConnection> HttpClientContext::getConnection()
 	return m_connection;
 }
 
-Ref<HttpClientContext> HttpClientContext::create()
+const Memory& HttpClientContext::getRawResponseHeader() const
 {
-	Ref<HttpClientContext> ret = new HttpClientContext;
-	return ret;
+	return m_responseHeader;
+}
+
+sl_uint64 HttpClientContext::getResponseContentLength() const
+{
+	return m_responseContentLength;
+}
+
+const Memory& HttpClientContext::getResponseBody() const
+{
+	return m_responseBody;
+}
+
+sl_uint64 HttpClientContext::getRequestContentLength() const
+{
+	return getOutputLength();
 }
 
 /******************************************************
@@ -91,22 +114,6 @@ HttpClientConnection::HttpClientConnection()
 HttpClientConnection::~HttpClientConnection()
 {
 	close();
-}
-
-
-Ref<AsyncStream> HttpClientConnection::getIO()
-{
-	return m_io;
-}
-
-Ref<HttpClient> HttpClientConnection::getClient()
-{
-	return m_client;
-}
-
-Ref<HttpClientSession> HttpClientConnection::getSession()
-{
-	return m_session;
 }
 
 Ref<HttpClientConnection> HttpClientConnection::create(HttpClient* _client, HttpClientSession* _session, AsyncStream* _io)
@@ -130,6 +137,21 @@ Ref<HttpClientConnection> HttpClientConnection::create(HttpClient* _client, Http
 		}
 	}
 	return ret;
+}
+
+Ref<AsyncStream> HttpClientConnection::getIO()
+{
+	return m_io;
+}
+
+Ref<HttpClient> HttpClientConnection::getClient()
+{
+	return m_client;
+}
+
+Ref<HttpClientSession> HttpClientConnection::getSession()
+{
+	return m_session;
 }
 
 void HttpClientConnection::close()
@@ -166,11 +188,11 @@ void HttpClientConnection::addContext(const Ref<HttpClientContext>& context)
 		return;
 	}
 	if (!(m_queueContexts.push(context))) {
-		_onError(context.get());
+		_onError(context.ptr);
 		return;
 	}	
-	if (context->getMethodUppercase() == SLIB_HTTP_METHOD_POST && context->getRequestContentType().isEmpty()) {
-		context->setRequestContentType(SLIB_HTTP_CONTENT_TYPE_FORM);
+	if (context->getMethod() == HttpMethod::POST && context->getRequestContentType().isEmpty()) {
+		context->setRequestContentType(ContentTypes::WebForm);
 	}
 	context->clearResponse();
 	Memory memHeader = context->makeRequestPacket();
@@ -221,7 +243,7 @@ void HttpClientConnection::_processInput(const void* _data, sl_uint32 size)
 				return;
 			}
 			context->m_responseHeaderReader.clear();
-			sl_reg iRet = context->parseResponsePacket(context->m_responseHeader.getBuf(), context->m_responseHeader.getSize());
+			sl_reg iRet = context->parseResponsePacket(context->m_responseHeader.getData(), context->m_responseHeader.getSize());
 			if (iRet != context->m_responseHeader.getSize()) {
 				_onError(context);
 				return;
@@ -292,7 +314,7 @@ void HttpClientConnection::_processInput(const void* _data, sl_uint32 size)
 
 			if (context->getMethodUppercase() == "POST") {
 				if (context->getRequestContentType() == "application/x-www-form-urlencoded") {
-					context->applyPostParameters(context->m_requestBody.getBuf(), context->m_requestBody.getSize());
+					context->applyPostParameters(context->m_requestBody.getData(), context->m_requestBody.getSize());
 				}
 			}
 			SLIB_STATIC_STRING(s, "text/html; charset=UTF-8");

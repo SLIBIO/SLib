@@ -1,4 +1,5 @@
 #include "../../../inc/slib/core/base.h"
+
 #include "../../../inc/slib/core/system.h"
 #include "../../../inc/slib/core/math.h"
 
@@ -11,6 +12,14 @@
 #endif
 
 #include <stdio.h>
+
+#ifdef SLIB_PLATFORM_IS_WINDOWS
+#include <windows.h>
+#endif
+
+#if defined(SLIB_PLATFORM_IS_APPLE)
+#include <libkern/OSAtomic.h>
+#endif
 
 SLIB_NAMESPACE_BEGIN
 
@@ -402,187 +411,167 @@ sl_size Base::getStringLength4(const void* sz, sl_size limitCount)
 	}
 	return 0;
 }
-SLIB_NAMESPACE_END
 
-// Interlocked Functions (Synchronization of Atom Operations)
-#ifdef SLIB_PLATFORM_IS_WINDOWS
-
-#include <windows.h>
-
-SLIB_NAMESPACE_BEGIN
 sl_int32 Base::interlockedIncrement32(sl_int32* pValue)
 {
 	SLIB_ASSERT(SLIB_IS_ALIGNED_4(pValue));
+#ifdef SLIB_PLATFORM_IS_WINDOWS
 	return (sl_int32)InterlockedIncrement((LONG*)pValue);
+#elif defined(SLIB_PLATFORM_IS_APPLE)
+	return OSAtomicIncrement32Barrier((int32_t*)pValue);
+#elif defined(SLIB_PLATFORM_IS_UNIX)
+	return __sync_fetch_and_add(pValue, 1) + 1;
+#endif
 }
 
 sl_int32 Base::interlockedDecrement32(sl_int32* pValue)
 {
 	SLIB_ASSERT(SLIB_IS_ALIGNED_4(pValue));
+#ifdef SLIB_PLATFORM_IS_WINDOWS
 	return (sl_int32)InterlockedDecrement((LONG*)pValue);
+#elif defined(SLIB_PLATFORM_IS_APPLE)
+	return OSAtomicDecrement32Barrier((int32_t*)pValue);
+#elif defined(SLIB_PLATFORM_IS_UNIX)
+	return __sync_fetch_and_add(pValue, -1) - 1;
+#endif
 }
 
 sl_int32 Base::interlockedAdd32(sl_int32* pDst, sl_int32 value)
 {
 	SLIB_ASSERT(SLIB_IS_ALIGNED_4(pDst));
+#ifdef SLIB_PLATFORM_IS_WINDOWS
 	return ((sl_int32)InterlockedExchangeAdd((LONG*)pDst, (LONG)value)) + value;
+#elif defined(SLIB_PLATFORM_IS_APPLE)
+	return OSAtomicAdd32Barrier((int32_t)value, (int32_t*)pDst);
+#elif defined(SLIB_PLATFORM_IS_UNIX)
+	__sync_fetch_and_add(pDst, value) + value;
+#endif
 }
 
 sl_bool Base::interlockedCompareExchange32(sl_int32* pDst, sl_int32 value, sl_int32 comperand)
 {
 	SLIB_ASSERT(SLIB_IS_ALIGNED_4(pDst));
+#ifdef SLIB_PLATFORM_IS_WINDOWS
 	sl_int32 old;
-#if (SLIB_COMPILER >= SLIB_COMPILER_VISUALSTUDIO_7)
+#	if (SLIB_COMPILER >= SLIB_COMPILER_VISUALSTUDIO_7)
 	old = ((sl_int32)InterlockedCompareExchange((LONG*)pDst, (LONG)value, (LONG)comperand));
-#else
+#	else
 	old = ((sl_int32)InterlockedCompareExchange((void**)pDst, (void*)value, (void*)comperand));
-#endif
+#	endif
 	return old == comperand;
+#elif defined(SLIB_PLATFORM_IS_APPLE)
+	return OSAtomicCompareAndSwap32Barrier((int32_t)comperand, (int32_t)value, (int32_t*)pDst) != false;
+#elif defined(SLIB_PLATFORM_IS_UNIX)
+	return __sync_bool_compare_and_swap(pDst, comperand, value) != 0;
+#endif
 }
 
 #ifdef SLIB_ARCH_IS_64BIT
 sl_int64 Base::interlockedIncrement64(sl_int64* pValue)
 {
 	SLIB_ASSERT(SLIB_IS_ALIGNED_8(pValue));
+#ifdef SLIB_PLATFORM_IS_WINDOWS
 	return (sl_int64)InterlockedIncrement64((LONGLONG*)pValue);
+#elif defined(SLIB_PLATFORM_IS_APPLE)
+	return OSAtomicIncrement64Barrier(pValue);
+#elif defined(SLIB_PLATFORM_IS_UNIX)
+	return __sync_fetch_and_add(pValue, 1) + 1;
+#endif
 }
 
 sl_int64 Base::interlockedDecrement64(sl_int64* pValue)
 {
 	SLIB_ASSERT(SLIB_IS_ALIGNED_8(pValue));
+#ifdef SLIB_PLATFORM_IS_WINDOWS
 	return (sl_int64)InterlockedDecrement64((LONGLONG*)pValue);
+#elif defined(SLIB_PLATFORM_IS_APPLE)
+	return OSAtomicDecrement64Barrier(pValue);
+#elif defined(SLIB_PLATFORM_IS_UNIX)
+	return __sync_fetch_and_add(pValue, -1) - 1;
+#endif
 }
 
 sl_int64 Base::interlockedAdd64(sl_int64* pDst, sl_int64 value)
 {
 	SLIB_ASSERT(SLIB_IS_ALIGNED_8(pDst));
+#ifdef SLIB_PLATFORM_IS_WINDOWS
 	return ((sl_int64)InterlockedExchangeAdd64((LONGLONG*)pDst, (LONGLONG)value)) + value;
+#elif defined(SLIB_PLATFORM_IS_APPLE)
+	return OSAtomicAdd64Barrier(value, pDst);
+#elif defined(SLIB_PLATFORM_IS_UNIX)
+	return __sync_fetch_and_add(pDst, value) + value;
+#endif
 }
 
 sl_bool Base::interlockedCompareExchange64(sl_int64* pDst, sl_int64 value, sl_int64 comperand)
 {
 	SLIB_ASSERT(SLIB_IS_ALIGNED_8(pDst));
+#ifdef SLIB_PLATFORM_IS_WINDOWS
 	sl_int64 old = ((sl_int64)InterlockedCompareExchange64((LONGLONG*)pDst, (LONGLONG)value, (LONGLONG)comperand));
 	return old == comperand;
-}
-#endif
-
-SLIB_NAMESPACE_END
-
 #elif defined(SLIB_PLATFORM_IS_APPLE)
-
-#include <libkern/OSAtomic.h>
-
-SLIB_NAMESPACE_BEGIN
-sl_int32 Base::interlockedIncrement32(sl_int32* pValue)
-{
-	SLIB_ASSERT(SLIB_IS_ALIGNED_4(pValue));
-	return OSAtomicIncrement32Barrier((int32_t*)pValue);
-}
-
-sl_int32 Base::interlockedDecrement32(sl_int32* pValue)
-{
-	SLIB_ASSERT(SLIB_IS_ALIGNED_4(pValue));
-	return OSAtomicDecrement32Barrier((int32_t*)pValue);
-}
-
-sl_int32 Base::interlockedAdd32(sl_int32* pDst, sl_int32 value)
-{
-	SLIB_ASSERT(SLIB_IS_ALIGNED_4(pDst));
-	return OSAtomicAdd32Barrier((int32_t)value, (int32_t*)pDst);
-}
-
-sl_bool Base::interlockedCompareExchange32(sl_int32* pDst, sl_int32 value, sl_int32 comperand)
-{
-	SLIB_ASSERT(SLIB_IS_ALIGNED_4(pDst));
-	return OSAtomicCompareAndSwap32Barrier((int32_t)comperand, (int32_t)value, (int32_t*)pDst) != false;
-}
-
-#ifdef SLIB_ARCH_IS_64BIT
-sl_int64 Base::interlockedIncrement64(sl_int64* pValue)
-{
-	SLIB_ASSERT(SLIB_IS_ALIGNED_8(pValue));
-	return OSAtomicIncrement64Barrier(pValue);
-}
-
-sl_int64 Base::interlockedDecrement64(sl_int64* pValue)
-{
-	SLIB_ASSERT(SLIB_IS_ALIGNED_8(pValue));
-	return OSAtomicDecrement64Barrier(pValue);
-}
-
-sl_int64 Base::interlockedAdd64(sl_int64* pDst, sl_int64 value)
-{
-	SLIB_ASSERT(SLIB_IS_ALIGNED_8(pDst));
-	return OSAtomicAdd64Barrier(value, pDst);
-}
-
-sl_bool Base::interlockedCompareExchange64(sl_int64* pDst, sl_int64 value, sl_int64 comperand)
-{
-	SLIB_ASSERT(SLIB_IS_ALIGNED_8(pDst));
 	return OSAtomicCompareAndSwap64Barrier(comperand, value, pDst) != false;
-}
-#endif
-SLIB_NAMESPACE_END
-
 #elif defined(SLIB_PLATFORM_IS_UNIX)
-
-SLIB_NAMESPACE_BEGIN
-sl_int32 Base::interlockedIncrement32(sl_int32* pValue)
-{
-	SLIB_ASSERT(SLIB_IS_ALIGNED_4(pValue));
-	return __sync_fetch_and_add(pValue, 1) + 1;
-}
-
-sl_int32 Base::interlockedDecrement32(sl_int32* pValue)
-{
-	SLIB_ASSERT(SLIB_IS_ALIGNED_4(pValue));
-	return __sync_fetch_and_add(pValue, -1) - 1;
-}
-
-sl_int32 Base::interlockedAdd32(sl_int32* pDst, sl_int32 value)
-{
-	SLIB_ASSERT(SLIB_IS_ALIGNED_4(pDst));
-	return __sync_fetch_and_add(pDst, value) + value;
-}
-
-sl_bool Base::interlockedCompareExchange32(sl_int32* pDst, sl_int32 value, sl_int32 comperand)
-{
-	SLIB_ASSERT(SLIB_IS_ALIGNED_4(pDst));
 	return __sync_bool_compare_and_swap(pDst, comperand, value) != 0;
+#endif
 }
 
+#endif
+
+sl_reg Base::interlockedIncrement(sl_reg* pValue)
+{
 #ifdef SLIB_ARCH_IS_64BIT
-sl_int64 Base::interlockedIncrement64(sl_int64* pValue)
-{
-	SLIB_ASSERT(SLIB_IS_ALIGNED_8(pValue));
-	return __sync_fetch_and_add(pValue, 1) + 1;
-}
-
-sl_int64 Base::interlockedDecrement64(sl_int64* pValue)
-{
-	SLIB_ASSERT(SLIB_IS_ALIGNED_8(pValue));
-	return __sync_fetch_and_add(pValue, -1) - 1;
-}
-
-sl_int64 Base::interlockedAdd64(sl_int64* pDst, sl_int64 value)
-{
-	SLIB_ASSERT(SLIB_IS_ALIGNED_8(pDst));
-	return __sync_fetch_and_add(pDst, value) + value;
-}
-
-sl_bool Base::interlockedCompareExchange64(sl_int64* pDst, sl_int64 value, sl_int64 comperand)
-{
-	SLIB_ASSERT(SLIB_IS_ALIGNED_8(pDst));
-	return __sync_bool_compare_and_swap(pDst, comperand, value) != 0;
-}
+	return interlockedIncrement64(pValue);
+#else
+	return interlockedIncrement32(pValue);
 #endif
+}
 
-SLIB_NAMESPACE_END
+sl_reg Base::interlockedDecrement(sl_reg* pValue)
+{
+#ifdef SLIB_ARCH_IS_64BIT
+	return interlockedDecrement64(pValue);
+#else
+	return interlockedDecrement32(pValue);
 #endif
+}
 
+sl_reg Base::interlockedAdd(sl_reg* pDst, sl_reg value)
+{
+#ifdef SLIB_ARCH_IS_64BIT
+	return interlockedAdd64(pDst, value);
+#else
+	return interlockedAdd32(pDst, value);
+#endif
+}
 
-SLIB_NAMESPACE_BEGIN
+sl_bool Base::interlockedCompareExchange(sl_reg* pDst, sl_reg value, sl_reg comperand)
+{
+#ifdef SLIB_ARCH_IS_64BIT
+	return interlockedCompareExchange64(pDst, value, comperand);
+#else
+	return interlockedCompareExchange32(pDst, value, comperand);
+#endif
+}
+
+void* Base::interlockedAddPtr(void** pDst, sl_reg value)
+{
+#ifdef SLIB_ARCH_IS_64BIT
+	return (void*)interlockedAdd64((sl_int64*)(pDst), value);
+#else
+	return (void*)interlockedAdd32((sl_int32*)pDst, value);
+#endif
+}
+
+sl_bool Base::interlockedCompareExchangePtr(void** pDst, const void* value, const void* comperand)
+{
+#ifdef SLIB_ARCH_IS_64BIT
+	return interlockedCompareExchange64((sl_int64*)(pDst), (sl_int64)value, (sl_int64)comperand);
+#else
+	return interlockedCompareExchange32((sl_int32*)pDst, (sl_int32)value, (sl_int32)comperand);
+#endif
+}
+
 void Base::sleep(sl_uint32 millis)
 {
 	System::sleep(millis);
@@ -597,4 +586,5 @@ void Base::yield(sl_uint32 ellapsed)
 {
 	System::yield(ellapsed);
 }
+
 SLIB_NAMESPACE_END

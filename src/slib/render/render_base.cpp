@@ -1,7 +1,10 @@
 #include "../../../inc/slib/render/base.h"
+
 #include "../../../inc/slib/render/engine.h"
 
 SLIB_RENDER_NAMESPACE_BEGIN
+
+SLIB_DEFINE_OBJECT(RenderBaseObjectInstance, Object)
 
 void RenderBaseObjectInstance::linkObject(RenderEngine* engine, RenderBaseObject* object)
 {
@@ -20,6 +23,8 @@ Ref<RenderEngine> RenderBaseObjectInstance::getEngine()
 	return m_engine;
 }
 
+
+SLIB_DEFINE_OBJECT(RenderBaseObject, Object)
 
 RenderBaseObject::RenderBaseObject()
 {
@@ -47,7 +52,7 @@ void RenderBaseObject::unlinkEngine()
 	Ref<RenderEngine> engine(m_engine);
 	Ref<RenderBaseObjectInstance> instance(m_instance);
 	if (engine.isNotNull() && instance.isNotNull()) {
-		engine->_onFreeInstance(instance.get());
+		engine->_onFreeInstance(instance.ptr);
 	}
 	m_engine.setNull();
 	m_instance.setNull();

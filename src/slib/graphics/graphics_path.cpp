@@ -5,9 +5,11 @@
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(GraphicsPath, Object)
+
 GraphicsPath::GraphicsPath()
 {
-	setFillMode(fillMode_Winding);
+	m_fillMode = FillMode::Winding;
 	m_flagBegan = sl_false;
 	m_pointBegin = Point::zero();
 }
@@ -17,68 +19,94 @@ Ref<GraphicsPath> GraphicsPath::create()
 	return new GraphicsPath;
 }
 
-void GraphicsPath::moveTo(const Point& pt)
+void GraphicsPath::moveTo(sl_real x, sl_real y)
 {
 	ObjectLocker lock(this);
 	m_flagBegan = sl_false;
-	m_pointBegin = pt;
+	m_pointBegin.x = x;
+	m_pointBegin.y = y;
 	invalidate();
 }
 
-void GraphicsPath::lineTo(const Point& pt)
+void GraphicsPath::moveTo(const Point& pt)
+{
+	moveTo(pt.x, pt.y);
+}
+
+void GraphicsPath::lineTo(sl_real x, sl_real y)
 {
 	ObjectLocker lock(this);
 	if (!m_flagBegan) {
 		GraphicsPathPoint point;
 		point.pt = m_pointBegin;
-		point.type = graphicsPathPointType_Begin;
+		point.type = (sl_uint8)(GraphicsPathPointType::Begin);
 		points.add(point);
 		m_flagBegan = sl_true;
 	}
 	GraphicsPathPoint point;
-	point.pt = pt;
-	point.type = graphicsPathPointType_Line;
+	point.pt.x = x;
+	point.pt.y = y;
+	point.type = (sl_uint8)(GraphicsPathPointType::Line);
+	points.add(point);
+	invalidate();
+}
+
+void GraphicsPath::lineTo(const Point& pt)
+{
+	lineTo(pt.x, pt.y);
+}
+
+void GraphicsPath::cubicTo(sl_real xc1, sl_real yc1, sl_real xc2, sl_real yc2, sl_real xe, sl_real ye)
+{
+	ObjectLocker lock(this);
+	if (!m_flagBegan) {
+		GraphicsPathPoint point;
+		point.pt = m_pointBegin;
+		point.type = (sl_uint8)(GraphicsPathPointType::Begin);
+		points.add(point);
+		m_flagBegan = sl_true;
+	}
+	GraphicsPathPoint point;
+	point.pt.x = xc1;
+	point.pt.y = yc1;
+	point.type = (sl_uint8)(GraphicsPathPointType::BezierCubic);
+	points.add(point);
+	point.pt.x = xc2;
+	point.pt.y = yc2;
+	point.type = (sl_uint8)(GraphicsPathPointType::BezierCubic);
+	points.add(point);
+	point.pt.x = xe;
+	point.pt.y = ye;
+	point.type = (sl_uint8)(GraphicsPathPointType::BezierCubic);
 	points.add(point);
 	invalidate();
 }
 
 void GraphicsPath::cubicTo(const Point& ptControl1, const Point& ptControl2, const Point& ptEnd)
 {
-	ObjectLocker lock(this);
-	if (!m_flagBegan) {
-		GraphicsPathPoint point;
-		point.pt = m_pointBegin;
-		point.type = graphicsPathPointType_Begin;
-		points.add(point);
-		m_flagBegan = sl_true;
-	}
-	GraphicsPathPoint point;
-	point.pt = ptControl1;
-	point.type = graphicsPathPointType_BezierCubic;
-	points.add(point);
-	point.pt = ptControl2;
-	point.type = graphicsPathPointType_BezierCubic;
-	points.add(point);
-	point.pt = ptEnd;
-	point.type = graphicsPathPointType_BezierCubic;
-	points.add(point);
-	invalidate();
+	cubicTo(ptControl1.x, ptControl1.y, ptControl2.x, ptControl2.y, ptEnd.x, ptEnd.y);
 }
 
 void GraphicsPath::closeSubpath()
 {
 	ObjectLocker lock(this);
 	if (m_flagBegan) {
-		sl_size n = points.count();
+		sl_size n = points.getCount();
 		if (n > 0) {
-			points[n - 1].type |= (sl_uint8)graphicsPathPointFlag_Close;
-			m_pointBegin = points[n - 1].pt;
+			GraphicsPathPoint* list = points.getData();
+			list[n - 1].type |= (sl_uint8)(GraphicsPathPointType::FlagClose);
+			m_pointBegin = list[n - 1].pt;
 			m_flagBegan = sl_false;
 		}
 		invalidate();
 	}
 }
 
+void GraphicsPath::addArc(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, sl_bool flagMoveTo)
+{
+	Rectangle rect(x, y, x + width, y + height);
+	addArc(rect, startDegrees, sweepDegrees, flagMoveTo);
+}
 
 void GraphicsPath::addArc(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, sl_bool flagMoveTo)
 {
@@ -94,6 +122,12 @@ void GraphicsPath::addArc(const Rectangle& rect, sl_real startDegrees, sl_real s
 	}
 }
 
+void GraphicsPath::addRectangle(sl_real x, sl_real y, sl_real width, sl_real height)
+{
+	Rectangle rect(x, y, x + width, y + height);
+	addRectangle(rect);
+}
+
 void GraphicsPath::addRectangle(const Rectangle& rect)
 {
 	moveTo(rect.left, rect.top);
@@ -103,14 +137,8 @@ void GraphicsPath::addRectangle(const Rectangle& rect)
 	closeSubpath();
 }
 
-void GraphicsPath::addRoundRect(const Rectangle& rect, const Size& radius)
+void GraphicsPath::addRoundRect(sl_real x, sl_real y, sl_real w, sl_real h, sl_real rx, sl_real ry)
 {
-	sl_real rx = radius.x;
-	sl_real ry = radius.y;
-	float x = rect.left;
-	float y = rect.top;
-	float w = rect.getWidth();
-	float h = rect.getHeight();
 	float rw = rx * 2;
 	float rh = ry * 2;
 	float xr = x + w - rw;
@@ -130,19 +158,47 @@ void GraphicsPath::addRoundRect(const Rectangle& rect, const Size& radius)
 	closeSubpath();
 }
 
+void GraphicsPath::addRoundRect(const Rectangle& rect, const Size& radius)
+{
+	addRoundRect(rect.left, rect.top, rect.getWidth(), rect.getHeight(), radius.x, radius.y);
+}
+
+void GraphicsPath::addEllipse(sl_real x, sl_real y, sl_real width, sl_real height)
+{
+	Rectangle rect(x, y, x + width, y + height);
+	addArc(rect, 0, 360, sl_true);
+	closeSubpath();
+
+}
+
 void GraphicsPath::addEllipse(const Rectangle& rect)
 {
 	addArc(rect, 0, 360, sl_true);
 	closeSubpath();
 }
 
+void GraphicsPath::addPie(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees)
+{
+	Rectangle rect(x, y, x + width, y + height);
+	addPie(rect, startDegrees, sweepDegrees);
+}
+
 void GraphicsPath::addPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees)
 {
-	moveTo(rect.center());
+	moveTo(rect.getCenter());
 	addArc(rect, startDegrees, sweepDegrees, sl_false);
 	closeSubpath();
 }
 
+FillMode GraphicsPath::getFillMode()
+{
+	return m_fillMode;
+}
+
+void GraphicsPath::setFillMode(FillMode mode)
+{
+	m_fillMode = mode;
+}
 
 Rectangle GraphicsPath::getBounds(const Ref<GraphicsContext>& context)
 {
@@ -150,6 +206,11 @@ Rectangle GraphicsPath::getBounds(const Ref<GraphicsContext>& context)
 		return context->getPathBounds(this);
 	}
 	return Rectangle::zero();
+}
+
+sl_bool GraphicsPath::containsPoint(const Ref<GraphicsContext>& context, sl_real x, sl_real y)
+{
+	return containsPoint(context, Point(x, y));
 }
 
 sl_bool GraphicsPath::containsPoint(const Ref<GraphicsContext>& context, const Point& pt)
@@ -165,6 +226,9 @@ void GraphicsPath::invalidate()
 	setInstance(Ref<GraphicsPathInstance>::null());
 }
 
+
+SLIB_DEFINE_OBJECT(GraphicsPathInstance, Object)
+
 void GraphicsPathInstance::buildFrom(const Ref<GraphicsPath>& path)
 {
 	if (path.isNull()) {
@@ -172,16 +236,16 @@ void GraphicsPathInstance::buildFrom(const Ref<GraphicsPath>& path)
 	}
 	ListLocker<GraphicsPathPoint> points(path->points);
 	sl_uint32 nCubicCount = 0;
-	for (sl_size i = 0; i < points.count(); i++) {
+	for (sl_size i = 0; i < points.count; i++) {
 		GraphicsPathPoint& point = points[i];
 		sl_uint8 t = point.type & 0x7f;
-		if (t == graphicsPathPointType_Begin) {
+		if (t == (sl_uint8)(GraphicsPathPointType::Begin)) {
 			this->moveTo(point.pt);
 			nCubicCount = 0;
-		} else if (t == graphicsPathPointType_Line) {
+		} else if (t == (sl_uint8)(GraphicsPathPointType::Line)) {
 			this->lineTo(point.pt);
 			nCubicCount = 0;
-		} else if (t == graphicsPathPointType_BezierCubic) {
+		} else if (t == (sl_uint8)(GraphicsPathPointType::BezierCubic)) {
 			if (nCubicCount == 2) {
 				this->cubicTo(points[i - 2].pt, points[i - 1].pt, points[i].pt);
 				nCubicCount = 0;
@@ -189,7 +253,7 @@ void GraphicsPathInstance::buildFrom(const Ref<GraphicsPath>& path)
 				nCubicCount++;
 			}
 		}
-		if (point.type & graphicsPathPointFlag_Close) {
+		if (point.type & (sl_uint8)(GraphicsPathPointType::FlagClose)) {
 			this->closeSubpath();
 		}
 	}

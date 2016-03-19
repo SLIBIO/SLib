@@ -20,23 +20,20 @@ SLIB_CRYPTO_NAMESPACE_BEGIN
 class SLIB_EXPORT AES : public Object
 {
 public:
+	static sl_uint32 getBlockSize();
+	
 	sl_bool setKey(const void* key, sl_uint32 lenKey /* 16, 24, 32 bytes */);
 	
 	void setKey_SHA256(const String& key);
-
-	// Common Block Cipher Functions
-	SLIB_INLINE static sl_uint32 getBlockSize()
-	{
-		return 16;
-	}
 	
 	// 128 bit (16 byte) block
 	void encryptBlock(const void* src, void* dst) const;
 	
 	// 128 bit (16 byte) block
 	void decryptBlock(const void* src, void* dst) const;
-
-	_SLIB_BLOCKCIPHER_COMMON_BODY(AES)
+	
+public:
+	SLIB_DECLARE_BLOCKCIPHER_BODY
 
 private:
 	sl_uint32 m_roundKeyEnc[64];
@@ -45,23 +42,16 @@ private:
 	
 };
 
-class SLIB_EXPORT AES_GCM : public Object, public BlockCipher_GCM<AES>
+class SLIB_EXPORT AES_GCM : public Object, public GCM<AES>
 {
 public:
-	SLIB_INLINE void setKey(const void* key, sl_uint32 lenKey /* 16, 24, 32 bytes */)
-	{
-		m_cipher.setKey(key, lenKey);
-		setCipher(&m_cipher);
-	}
+	void setKey(const void* key, sl_uint32 lenKey /* 16, 24, 32 bytes */);
 
-	SLIB_INLINE void setKey_SHA256(const String& key)
-	{
-		m_cipher.setKey_SHA256(key);
-		setCipher(&m_cipher);
-	}
+	void setKey_SHA256(const String& key);
 	
 private:
 	AES m_cipher;
+	
 };
 
 SLIB_CRYPTO_NAMESPACE_END

@@ -10,7 +10,7 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class SLIB_EXPORT Screen : public Object
 {
-	SLIB_DECLARE_OBJECT(Screen, Object)
+	SLIB_DECLARE_OBJECT
     
 public:
 	virtual Rectangle getRegion() = 0;

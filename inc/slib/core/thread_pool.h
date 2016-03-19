@@ -10,9 +10,11 @@ SLIB_NAMESPACE_BEGIN
 
 class SLIB_EXPORT ThreadPool : public Object
 {
-	SLIB_DECLARE_OBJECT(ThreadPool, Object)
+	SLIB_DECLARE_OBJECT
+	
 private:
 	ThreadPool();
+	
 	~ThreadPool();
 	
 public:
@@ -40,6 +42,7 @@ protected:
 	Queue< Ref<Runnable> > m_tasks;
 
 	sl_bool m_flagRunning;
+	
 };
 
 SLIB_NAMESPACE_END

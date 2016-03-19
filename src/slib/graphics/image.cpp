@@ -1,11 +1,13 @@
 #include "../../../inc/slib/graphics/image.h"
 
 #include "../../../inc/slib/core/file.h"
-#include "../../../inc/slib/core/resource.h"
+#include "../../../inc/slib/core/asset.h"
 
 #include "image_soil2.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
+
+SLIB_DEFINE_OBJECT(Image, Bitmap)
 
 Image::Image()
 {
@@ -13,7 +15,7 @@ Image::Image()
 
 Ref<Image> Image::createStatic(const ImageDesc& desc)
 {
-	return createStatic(desc.width, desc.height, desc.colors, desc.stride, desc.ref.get());
+	return createStatic(desc.width, desc.height, desc.colors, desc.stride, desc.ref.ptr);
 }
 
 Ref<Image> Image::createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride)
@@ -61,8 +63,8 @@ Ref<Image> Image::create(sl_uint32 width, sl_uint32 height, const Color* pixels,
 				ret->m_desc.width = width;
 				ret->m_desc.height = height;
 				ret->m_desc.stride = width;
-				ret->m_desc.ref = mem.getObject();
-				ret->m_desc.colors = (Color*)(mem.getBuf());
+				ret->m_desc.ref = mem.ref;
+				ret->m_desc.colors = (Color*)(mem.getData());
 				Base::zeroMemory(ret->m_desc.colors, size);
 			}
 		}
@@ -87,11 +89,11 @@ Ref<Image> Image::create(const BitmapData& bitmapData)
 			ret->m_desc.width = width;
 			ret->m_desc.height = height;
 			ret->m_desc.stride = width;
-			ret->m_desc.ref = mem.getObject();
-			ret->m_desc.colors = (Color*)(mem.getBuf());
-			BitmapData dst(width, height, (Color*)(mem.getBuf()));
-			if (bitmapData.format.isPrecomputedAlpha()) {
-				dst.format = dst.format.getPrecomputedAlphaFormat();
+			ret->m_desc.ref = mem.ref;
+			ret->m_desc.colors = (Color*)(mem.getData());
+			BitmapData dst(width, height, (Color*)(mem.getData()));
+			if (BitmapFormats::isPrecomputedAlpha(bitmapData.format)) {
+				dst.format = BitmapFormats::getPrecomputedAlphaFormat(dst.format);
 			}
 			dst.copyPixelsFrom(bitmapData);
 		}
@@ -121,14 +123,14 @@ Ref<Image> Image::createFromBitmap(const Ref<Bitmap>& bitmap, sl_uint32 x, sl_ui
 	}
 	Memory mem = Memory::create((width*height) << 2);
 	if (mem.isNotEmpty()) {
-		Color* buf = (Color*)(mem.getBuf());
+		Color* buf = (Color*)(mem.getData());
 		if (bitmap->readPixels(x, y, width, height, buf)) {
 			ImageDesc desc;
 			desc.width = width;
 			desc.height = height;
 			desc.stride = width;
 			desc.colors = buf;
-			desc.ref = mem.getObject();
+			desc.ref = mem.ref;
 			return Image::createStatic(desc);
 		}
 	}
@@ -145,18 +147,53 @@ Ref<Image> Image::createFromBitmap(const Ref<Bitmap>& bitmap)
 	sl_uint32 height = bitmap->getHeight();
 	Memory mem = Memory::create((width*height) << 2);
 	if (mem.isNotEmpty()) {
-		Color* buf = (Color*)(mem.getBuf());
+		Color* buf = (Color*)(mem.getData());
 		if (bitmap->readPixels(0, 0, width, height, buf)) {
 			ImageDesc desc;
 			desc.width = width;
 			desc.height = height;
 			desc.stride = width;
 			desc.colors = buf;
-			desc.ref = mem.getObject();
+			desc.ref = mem.ref;
 			return Image::createStatic(desc);
 		}
 	}
 	return ret;
+}
+
+sl_uint32 Image::getWidth() const
+{
+	return m_desc.width;
+}
+
+sl_uint32 Image::getHeight() const
+{
+	return m_desc.height;
+}
+
+sl_int32 Image::getStride() const
+{
+	return m_desc.stride;
+}
+
+Color* Image::getColors() const
+{
+	return (Color*)(m_desc.colors);
+}
+
+Color* Image::getColorsAt(sl_int32 x, sl_int32 y) const
+{
+	return getColors() + x + y * m_desc.stride;
+}
+
+Color& Image::getPixel(sl_int32 x, sl_int32 y) const
+{
+	return getColors()[x + y * m_desc.stride];
+}
+
+void Image::getDesc(ImageDesc& desc) const
+{
+	desc = m_desc;
 }
 
 
@@ -282,10 +319,10 @@ Ref<Image> Image::loadFromFile(const String& filePath, sl_uint32 width, sl_uint3
 	return ret;
 }
 
-Ref<Image> Image::loadFromResource(const String& path, sl_uint32 width, sl_uint32 height)
+Ref<Image> Image::loadFromAsset(const String& path, sl_uint32 width, sl_uint32 height)
 {
 	Ref<Image> ret;
-	Memory mem = Resource::readAllBytes(path);
+	Memory mem = Assets::readAllBytes(path);
 	if (mem.isNotEmpty()) {
 		ret = loadFromMemory(mem, width, height);
 	}
@@ -309,7 +346,7 @@ Ref<Image> Image::scale(sl_uint32 width, sl_uint32 height, StretchMode stretch) 
 {
 	Ref<Image> ret = Image::create(width, height);
 	if (ret.isNotNull()) {
-		draw(ret->m_desc, m_desc, blendMode_Copy, stretch);
+		draw(ret->m_desc, m_desc, BlendMode::Copy, stretch);
 	}
 	return ret;
 }
@@ -323,7 +360,7 @@ void Image::draw(ImageDesc& dst, const ImageDesc& src, BlendMode blend, StretchM
 		return;
 	}
 	// stretch - fast
-	if (blend == blendMode_SrcAlpha) {
+	if (blend == BlendMode::SrcAlpha) {
 		Color* colorsDst;
 		Color* colorsDstLine = dst.colors;
 		for (sl_uint32 y = 0; y < dst.height; y++) {
@@ -444,18 +481,23 @@ ImageFileType Image::getFileType(const void* _mem, sl_size size)
 {
 	sl_uint8* mem = (sl_uint8*)_mem;
 	if (size > 4 && mem[0] == 0xFF && mem[1] == 0xD8) {
-		return imageFileType_JPEG;
+		return ImageFileType::JPEG;
 	}
 	if (size > 0x08 && mem[0] == 0x89 && mem[1] == 0x50 && mem[2] == 0x4E && mem[3] == 0x47 && mem[4] == 0x0D && mem[5] == 0x0A && mem[6] == 0x1A && mem[7] == 0x0A) {
-		return imageFileType_PNG;
+		return ImageFileType::PNG;
 	}
 	if (size > 12 && mem[0] == 'B' && mem[1] == 'M') {
-		return imageFileType_BMP;
+		return ImageFileType::BMP;
 	}
 	if (size > 4 && mem[0] == 'D' && mem[1] == 'D' && mem[2] == 'S' && mem[3] == ' ') {
-		return imageFileType_DDS;
+		return ImageFileType::DDS;
 	}
-	return imageFileType_Unknown;
+	return ImageFileType::Unknown;
+}
+
+ImageFileType Image::getFileType(Memory mem)
+{
+	return getFileType(mem.getData(), mem.getSize());
 }
 
 Ref<Image> Image::loadFromMemory(const void* _mem, sl_size size, sl_uint32 width, sl_uint32 height)
@@ -465,13 +507,13 @@ Ref<Image> Image::loadFromMemory(const void* _mem, sl_size size, sl_uint32 width
 	ImageFileType type = getFileType(mem, size);
 	do {
 #ifdef SLIB_GRAPHICS_IMAGE_SUPPORT_JPEG
-		if (type == imageFileType_JPEG) {
+		if (type == ImageFileType::JPEG) {
 			ret = loadFromJPEG(mem, size);
 			break;
 		}
 #endif
 #ifdef SLIB_GRAPHICS_IMAGE_SUPPORT_PNG
-		if (type == imageFileType_PNG) {
+		if (type == ImageFileType::PNG) {
 			ret = loadFromPNG(mem, size);
 			break;
 		}
@@ -493,6 +535,11 @@ Ref<Image> Image::loadFromMemory(const void* _mem, sl_size size, sl_uint32 width
 		return ret;
 	}
 	return Ref<Image>::null();
+}
+
+Ref<Image> Image::loadFromMemory(Memory mem, sl_uint32 width, sl_uint32 height)
+{
+	return loadFromMemory(mem.getData(), mem.getSize(), width, height);
 }
 
 SLIB_GRAPHICS_NAMESPACE_END

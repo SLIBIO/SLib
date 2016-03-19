@@ -1,11 +1,48 @@
 #include "../../../inc/slib/ui/event.h"
+
 #include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/core/hashtable.h"
 #include "../../../inc/slib/core/log.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
-Ref<UIEvent> UIEvent::createKeyEvent(UIEventAction action, Keycode keycode, sl_uint32 systemKeycode)
+TouchPoint::TouchPoint(const Point& _point) : point(_point), pressure(0)
+{
+}
+
+TouchPoint::TouchPoint(const Point& _point, sl_real _pressure) : point(_point), pressure(_pressure)
+{
+}
+
+TouchPoint::TouchPoint(sl_real x, sl_real y) : point(x, y), pressure(0)
+{
+}
+
+TouchPoint::TouchPoint(sl_real x, sl_real y, sl_real _pressure) : point(x, y), pressure(_pressure)
+{
+}
+
+
+enum
+{
+	flagShiftKey = 0x1,
+	flagAltKey = 0x2,
+	flagOptionKey = 0x2, // (mac)
+	flagControlKey = 0x4,
+	flagWindowsKey = 0x8,
+	flagCommandKey = 0x8, // (mac)
+	
+	flagPreventDefault = 0x10000,
+	flagStopPropagation = 0x20000
+};
+
+UIEvent::UIEvent()
+{
+	m_flags = 0;
+	m_action = UIAction::Unknown;
+}
+
+Ref<UIEvent> UIEvent::createKeyEvent(UIAction action, Keycode keycode, sl_uint32 systemKeycode)
 {
 	Ref<UIEvent> ret = new UIEvent;
 	if (ret.isNotNull()) {
@@ -16,7 +53,7 @@ Ref<UIEvent> UIEvent::createKeyEvent(UIEventAction action, Keycode keycode, sl_u
 	return ret;
 }
 
-Ref<UIEvent> UIEvent::createMouseEvent(UIEventAction action, sl_real x, sl_real y)
+Ref<UIEvent> UIEvent::createMouseEvent(UIAction action, sl_real x, sl_real y)
 {
 	Ref<UIEvent> ret = new UIEvent;
 	if (ret.isNotNull()) {
@@ -31,21 +68,21 @@ Ref<UIEvent> UIEvent::createMouseWheelEvent(sl_real deltaX, sl_real deltaY)
 {
 	Ref<UIEvent> ret = new UIEvent;
 	if (ret.isNotNull()) {
-		ret->setAction(actionMouseWheel);
+		ret->setAction(UIAction::MouseWheel);
 		ret->setDeltaX(deltaX);
 		ret->setDeltaY(deltaY);
 	}
 	return ret;
 }
 
-Ref<UIEvent> UIEvent::createTouchEvent(UIEventAction action, const Array<TouchPoint>& points)
+Ref<UIEvent> UIEvent::createTouchEvent(UIAction action, const Array<TouchPoint>& points)
 {
 	Ref<UIEvent> ret = new UIEvent;
 	if (ret.isNotNull()) {
 		ret->setAction(action);
 		ret->setTouchPoints(points);
-		if (points.count() > 0) {
-			ret->setTouchPoint(points[0]);
+		if (points.getCount() > 0) {
+			ret->setTouchPoint((points.getData())[0]);
 		}
 	}
 	return ret;
@@ -55,9 +92,314 @@ Ref<UIEvent> UIEvent::createSetCursorEvent()
 {
 	Ref<UIEvent> ret = new UIEvent;
 	if (ret.isNotNull()) {
-		ret->setAction(actionSetCursor);
+		ret->setAction(UIAction::SetCursor);
 	}
 	return ret;
+}
+
+UIAction UIEvent::getAction() const
+{
+	return m_action;
+}
+
+void UIEvent::setAction(UIAction action)
+{
+	m_action = action;
+}
+
+sl_bool UIEvent::isKeyEvent()
+{
+	return ((sl_uint32)m_action & 0xff00) == 0x0100;
+}
+
+sl_bool UIEvent::isMouseEvent()
+{
+	return ((sl_uint32)m_action & 0xff00) == 0x0200;
+}
+
+sl_bool UIEvent::isTouchEvent()
+{
+	return ((sl_uint32)m_action & 0xff00) == 0x0300;
+}
+
+Keycode UIEvent::getKeycode() const
+{
+	return m_keycode;
+}
+
+void UIEvent::setKeycode(Keycode keycode)
+{
+	m_keycode = keycode;
+}
+
+sl_uint32 UIEvent::getSystemKeycode() const
+{
+	return m_systemKeycode;
+}
+
+void UIEvent::setSystemKeycode(sl_uint32 keycode)
+{
+	m_systemKeycode = keycode;
+}
+
+const Point& UIEvent::getPoint() const
+{
+	return m_point.point;
+}
+
+void UIEvent::setPoint(const Point& pt)
+{
+	m_point.point = pt;
+}
+
+void UIEvent::setPoint(sl_real x, sl_real y)
+{
+	m_point.point.x = x;
+	m_point.point.y = y;
+}
+
+sl_real UIEvent::getX() const
+{
+	return m_point.point.x;
+}
+
+void UIEvent::setX(sl_real x)
+{
+	m_point.point.x = x;
+}
+
+sl_real UIEvent::getY() const
+{
+	return m_point.point.y;
+}
+
+void UIEvent::setY(sl_real y)
+{
+	m_point.point.y = y;
+}
+
+sl_real UIEvent::getDelta() const
+{
+	return m_point.point.y;
+}
+
+void UIEvent::setDelta(sl_real delta)
+{
+	m_point.point.y = delta;
+}
+
+sl_real UIEvent::getDeltaX() const
+{
+	return m_point.point.x;
+}
+
+void UIEvent::setDeltaX(sl_real x)
+{
+	m_point.point.x = x;
+}
+
+sl_real UIEvent::getDeltaY() const
+{
+	return m_point.point.y;
+}
+
+void UIEvent::setDeltaY(sl_real y)
+{
+	m_point.point.y = y;
+}
+
+const TouchPoint& UIEvent::getTouchPoint() const
+{
+	return m_point;
+}
+
+void UIEvent::setTouchPoint(const TouchPoint& pt)
+{
+	m_point = pt;
+}
+
+void UIEvent::setTouchPoint(const Point& pt)
+{
+	m_point.point = pt;
+	m_point.pressure = 0;
+}
+
+void UIEvent::setTouchPoint(const Point& pt, sl_real pressure)
+{
+	m_point.point = pt;
+	m_point.pressure = pressure;
+}
+
+void UIEvent::setTouchPoint(sl_real x, sl_real y)
+{
+	m_point.point.x = x;
+	m_point.point.y = y;
+	m_point.pressure = 0;
+}
+
+void UIEvent::setTouchPoint(sl_real x, sl_real y, sl_real pressure)
+{
+	m_point.point.x = x;
+	m_point.point.y = y;
+	m_point.pressure = pressure;
+}
+
+sl_real UIEvent::getPressure() const
+{
+	return m_point.pressure;
+}
+
+void UIEvent::setPressure(sl_real pressure)
+{
+	m_point.pressure = pressure;
+}
+
+Array<TouchPoint> UIEvent::getTouchPoints() const
+{
+	return m_points;
+}
+
+sl_uint32 UIEvent::getTouchPointsCount() const
+{
+	return (sl_uint32)(m_points.getCount());
+}
+
+TouchPoint UIEvent::getTouchPoint(sl_uint32 index) const
+{
+	TouchPoint pt;
+	m_points.getItem(index, &pt);
+	return pt;
+}
+
+void UIEvent::setTouchPoints(const Array<TouchPoint>& points)
+{
+	m_points = points;
+}
+
+void UIEvent::transformPoints(const Matrix3& mat)
+{
+	if (isMouseEvent() || isTouchEvent()) {
+		m_point.point = mat.transformPosition(m_point.point);
+	}
+	if (isTouchEvent()) {
+		Array<TouchPoint> points = m_points;
+		sl_size n = points.getCount();
+		TouchPoint* pts = points.getData();
+		for (sl_size i = 0; i < n; i++) {
+			pts[i].point = mat.transformPosition(pts[i].point);
+		}
+	}
+}
+
+void UIEvent::setShiftKey()
+{
+	SLIB_SET_FLAG(m_flags, (sl_uint32)flagShiftKey);
+}
+
+void UIEvent::clearShiftKey()
+{
+	SLIB_RESET_FLAG(m_flags, (sl_uint32)flagShiftKey);
+}
+
+sl_bool UIEvent::isShiftKey() const
+{
+	return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagShiftKey);
+}
+
+
+void UIEvent::setAltKey()
+{
+	SLIB_SET_FLAG(m_flags, (sl_uint32)flagAltKey);
+}
+
+void UIEvent::clearAltKey()
+{
+	SLIB_RESET_FLAG(m_flags, (sl_uint32)flagAltKey);
+}
+
+sl_bool UIEvent::isAltKey() const
+{
+	return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagAltKey);
+}
+
+void UIEvent::setOptionKey()
+{
+	SLIB_SET_FLAG(m_flags, (sl_uint32)flagOptionKey);
+}
+
+void UIEvent::clearOptionKey()
+{
+	SLIB_RESET_FLAG(m_flags, (sl_uint32)flagOptionKey);
+}
+
+sl_bool UIEvent::isOptionKey() const
+{
+	return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagOptionKey);
+}
+
+void UIEvent::setControlKey()
+{
+	SLIB_SET_FLAG(m_flags, (sl_uint32)flagControlKey);
+}
+
+void UIEvent::clearControlKey()
+{
+	SLIB_RESET_FLAG(m_flags, (sl_uint32)flagControlKey);
+}
+
+sl_bool UIEvent::isControlKey() const
+{
+	return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagControlKey);
+}
+
+void UIEvent::setWindowsKey()
+{
+	SLIB_SET_FLAG(m_flags, (sl_uint32)flagWindowsKey);
+}
+
+void UIEvent::clearWindowsKey()
+{
+	SLIB_RESET_FLAG(m_flags, (sl_uint32)flagWindowsKey);
+}
+
+sl_bool UIEvent::isWindowsKey() const
+{
+	return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagWindowsKey);
+}
+
+void UIEvent::setCommandKey()
+{
+	SLIB_SET_FLAG(m_flags, (sl_uint32)flagCommandKey);
+}
+
+void UIEvent::clearCommandKey()
+{
+	SLIB_RESET_FLAG(m_flags, (sl_uint32)flagCommandKey);
+}
+
+sl_bool UIEvent::isCommandKey() const
+{
+	return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagCommandKey);
+}
+
+void UIEvent::preventDefault()
+{
+	SLIB_SET_FLAG(m_flags, (sl_uint32)flagPreventDefault);
+}
+
+sl_bool UIEvent::isPreventedDefault() const
+{
+	return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagPreventDefault);
+}
+
+void UIEvent::stopPropagation()
+{
+	SLIB_SET_FLAG(m_flags, (sl_uint32)flagStopPropagation);
+}
+
+sl_bool UIEvent::isStoppedPropagation() const
+{
+	return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagStopPropagation);
 }
 
 Ref<UIEvent> UIEvent::duplicate()
@@ -74,25 +416,10 @@ Ref<UIEvent> UIEvent::duplicate()
 	return ret;
 }
 
-void UIEvent::transformPoints(const Matrix3& mat)
-{
-	if (isMouseEvent() || isTouchEvent()) {
-		m_point.point = mat.transformPosition(m_point.point);
-	}
-	if (isTouchEvent()) {
-		Array<TouchPoint> points = m_points;
-		sl_size n = points.count();
-		TouchPoint* pts = points.data();
-		for (sl_size i = 0; i < n; i++) {
-			pts[i].point = mat.transformPosition(pts[i].point);
-		}
-	}
-}
-
 class _UIKeyNameMapper
 {
 private:
-	HashTable<Keycode, String> map;
+	HashTable<sl_uint32, String> map;
 	String nameInvalid;
 	
 public:
@@ -100,156 +427,156 @@ public:
 #define _MAP_KEY(A, B) \
 	{ \
 		SLIB_STATIC_STRING(_s, B); \
-		map.put(A, _s); \
+		map.put((sl_uint32)(A), _s); \
 	}
 
 	_UIKeyNameMapper()
 	{
 		SLIB_STATIC_STRING(_invalid, "Invalid");
 		nameInvalid = _invalid;
-		_MAP_KEY(keyUnknown, "Unknown");
+		_MAP_KEY(Keycode::Unknown, "Unknown");
 		
-		_MAP_KEY(keyBackspace, "Backspace");
-		_MAP_KEY(keyTab, "Tab");
-		_MAP_KEY(keyEnter, "Enter");
-		_MAP_KEY(keyEscape, "Escape");
+		_MAP_KEY(Keycode::Backspace, "Backspace");
+		_MAP_KEY(Keycode::Tab, "Tab");
+		_MAP_KEY(Keycode::Enter, "Enter");
+		_MAP_KEY(Keycode::Escape, "Escape");
 		
-		_MAP_KEY(keySpace, "Space");
-		_MAP_KEY(keyGrave, "Grave");
-		_MAP_KEY(keyEqual, "Equal");
-		_MAP_KEY(keySemicolon, "Semicolon");
-		_MAP_KEY(keyBackslash, "Backslash");
-		_MAP_KEY(keyLeftBaracket, "LeftBaracket");
-		_MAP_KEY(keyRightBaracket, "RightBaracket");
-		_MAP_KEY(keyQuote, "Quote");
-		_MAP_KEY(keyComma, "Comma");
-		_MAP_KEY(keyMinus, "Minus");
-		_MAP_KEY(keyPeriod, "Period");
-		_MAP_KEY(keyDivide, "Divide");
+		_MAP_KEY(Keycode::Space, "Space");
+		_MAP_KEY(Keycode::Grave, "Grave");
+		_MAP_KEY(Keycode::Equal, "Equal");
+		_MAP_KEY(Keycode::Semicolon, "Semicolon");
+		_MAP_KEY(Keycode::Backslash, "Backslash");
+		_MAP_KEY(Keycode::LeftBaracket, "LeftBaracket");
+		_MAP_KEY(Keycode::RightBaracket, "RightBaracket");
+		_MAP_KEY(Keycode::Quote, "Quote");
+		_MAP_KEY(Keycode::Comma, "Comma");
+		_MAP_KEY(Keycode::Minus, "Minus");
+		_MAP_KEY(Keycode::Period, "Period");
+		_MAP_KEY(Keycode::Divide, "Divide");
 		
-		_MAP_KEY(key0, "0");
-		_MAP_KEY(key1, "1");
-		_MAP_KEY(key2, "2");
-		_MAP_KEY(key3, "3");
-		_MAP_KEY(key4, "4");
-		_MAP_KEY(key5, "5");
-		_MAP_KEY(key6, "6");
-		_MAP_KEY(key7, "7");
-		_MAP_KEY(key8, "8");
-		_MAP_KEY(key9, "9");
+		_MAP_KEY(Keycode::Num0, "0");
+		_MAP_KEY(Keycode::Num1, "1");
+		_MAP_KEY(Keycode::Num2, "2");
+		_MAP_KEY(Keycode::Num3, "3");
+		_MAP_KEY(Keycode::Num4, "4");
+		_MAP_KEY(Keycode::Num5, "5");
+		_MAP_KEY(Keycode::Num6, "6");
+		_MAP_KEY(Keycode::Num7, "7");
+		_MAP_KEY(Keycode::Num8, "8");
+		_MAP_KEY(Keycode::Num9, "9");
 		
-		_MAP_KEY(keyA, "A");
-		_MAP_KEY(keyB, "B");
-		_MAP_KEY(keyC, "C");
-		_MAP_KEY(keyD, "D");
-		_MAP_KEY(keyE, "E");
-		_MAP_KEY(keyF, "F");
-		_MAP_KEY(keyG, "G");
-		_MAP_KEY(keyH, "H");
-		_MAP_KEY(keyI, "I");
-		_MAP_KEY(keyJ, "J");
-		_MAP_KEY(keyK, "K");
-		_MAP_KEY(keyL, "L");
-		_MAP_KEY(keyM, "M");
-		_MAP_KEY(keyN, "N");
-		_MAP_KEY(keyO, "O");
-		_MAP_KEY(keyP, "P");
-		_MAP_KEY(keyQ, "Q");
-		_MAP_KEY(keyR, "R");
-		_MAP_KEY(keyS, "S");
-		_MAP_KEY(keyT, "T");
-		_MAP_KEY(keyU, "U");
-		_MAP_KEY(keyV, "V");
-		_MAP_KEY(keyW, "W");
-		_MAP_KEY(keyX, "X");
-		_MAP_KEY(keyY, "Y");
-		_MAP_KEY(keyZ, "Z");
+		_MAP_KEY(Keycode::A, "A");
+		_MAP_KEY(Keycode::B, "B");
+		_MAP_KEY(Keycode::C, "C");
+		_MAP_KEY(Keycode::D, "D");
+		_MAP_KEY(Keycode::E, "E");
+		_MAP_KEY(Keycode::F, "F");
+		_MAP_KEY(Keycode::G, "G");
+		_MAP_KEY(Keycode::H, "H");
+		_MAP_KEY(Keycode::I, "I");
+		_MAP_KEY(Keycode::J, "J");
+		_MAP_KEY(Keycode::K, "K");
+		_MAP_KEY(Keycode::L, "L");
+		_MAP_KEY(Keycode::M, "M");
+		_MAP_KEY(Keycode::N, "N");
+		_MAP_KEY(Keycode::O, "O");
+		_MAP_KEY(Keycode::P, "P");
+		_MAP_KEY(Keycode::Q, "Q");
+		_MAP_KEY(Keycode::R, "R");
+		_MAP_KEY(Keycode::S, "S");
+		_MAP_KEY(Keycode::T, "T");
+		_MAP_KEY(Keycode::U, "U");
+		_MAP_KEY(Keycode::V, "V");
+		_MAP_KEY(Keycode::W, "W");
+		_MAP_KEY(Keycode::X, "X");
+		_MAP_KEY(Keycode::Y, "Y");
+		_MAP_KEY(Keycode::Z, "Z");
 		
-		_MAP_KEY(keyNumpad0, "Numpad0");
-		_MAP_KEY(keyNumpad1, "Numpad1");
-		_MAP_KEY(keyNumpad2, "Numpad2");
-		_MAP_KEY(keyNumpad3, "Numpad3");
-		_MAP_KEY(keyNumpad4, "Numpad4");
-		_MAP_KEY(keyNumpad5, "Numpad5");
-		_MAP_KEY(keyNumpad6, "Numpad6");
-		_MAP_KEY(keyNumpad7, "Numpad7");
-		_MAP_KEY(keyNumpad8, "Numpad8");
-		_MAP_KEY(keyNumpad9, "Numpad9");
+		_MAP_KEY(Keycode::Numpad0, "Numpad0");
+		_MAP_KEY(Keycode::Numpad1, "Numpad1");
+		_MAP_KEY(Keycode::Numpad2, "Numpad2");
+		_MAP_KEY(Keycode::Numpad3, "Numpad3");
+		_MAP_KEY(Keycode::Numpad4, "Numpad4");
+		_MAP_KEY(Keycode::Numpad5, "Numpad5");
+		_MAP_KEY(Keycode::Numpad6, "Numpad6");
+		_MAP_KEY(Keycode::Numpad7, "Numpad7");
+		_MAP_KEY(Keycode::Numpad8, "Numpad8");
+		_MAP_KEY(Keycode::Numpad9, "Numpad9");
 		
-		_MAP_KEY(keyNumpadDivide, "NumpadDivide");
-		_MAP_KEY(keyNumpadMultiply, "NumpadMultiply");
-		_MAP_KEY(keyNumpadMinus, "NumpadMinus");
-		_MAP_KEY(keyNumpadPlus, "NumpadPlus");
-		_MAP_KEY(keyNumpadEnter, "NumpadEnter");
-		_MAP_KEY(keyNumpadDecimal, "NumpadDecimal");
+		_MAP_KEY(Keycode::NumpadDivide, "NumpadDivide");
+		_MAP_KEY(Keycode::NumpadMultiply, "NumpadMultiply");
+		_MAP_KEY(Keycode::NumpadMinus, "NumpadMinus");
+		_MAP_KEY(Keycode::NumpadPlus, "NumpadPlus");
+		_MAP_KEY(Keycode::NumpadEnter, "NumpadEnter");
+		_MAP_KEY(Keycode::NumpadDecimal, "NumpadDecimal");
 		
-		_MAP_KEY(keyF1, "F1");
-		_MAP_KEY(keyF2, "F2");
-		_MAP_KEY(keyF3, "F3");
-		_MAP_KEY(keyF4, "F4");
-		_MAP_KEY(keyF5, "F5");
-		_MAP_KEY(keyF6, "F6");
-		_MAP_KEY(keyF7, "F7");
-		_MAP_KEY(keyF8, "F8");
-		_MAP_KEY(keyF9, "F9");
-		_MAP_KEY(keyF10, "F10");
-		_MAP_KEY(keyF11, "F11");
-		_MAP_KEY(keyF12, "F12");
+		_MAP_KEY(Keycode::F1, "F1");
+		_MAP_KEY(Keycode::F2, "F2");
+		_MAP_KEY(Keycode::F3, "F3");
+		_MAP_KEY(Keycode::F4, "F4");
+		_MAP_KEY(Keycode::F5, "F5");
+		_MAP_KEY(Keycode::F6, "F6");
+		_MAP_KEY(Keycode::F7, "F7");
+		_MAP_KEY(Keycode::F8, "F8");
+		_MAP_KEY(Keycode::F9, "F9");
+		_MAP_KEY(Keycode::F10, "F10");
+		_MAP_KEY(Keycode::F11, "F11");
+		_MAP_KEY(Keycode::F12, "F12");
 		
-		_MAP_KEY(keyPageUp, "PageUp");
-		_MAP_KEY(keyPageDown, "PageDown");
-		_MAP_KEY(keyHome, "Home");
-		_MAP_KEY(keyEnd, "End");
-		_MAP_KEY(keyLeft, "Left");
-		_MAP_KEY(keyUp, "Up");
-		_MAP_KEY(keyRight, "Right");
-		_MAP_KEY(keyDown, "Down");
-		_MAP_KEY(keyPrintScreen, "PrintScreen");
-		_MAP_KEY(keyInsert, "Insert");
-		_MAP_KEY(keyDelete, "Delete");
-		_MAP_KEY(keySleep, "Sleep");
-		_MAP_KEY(keyPause, "Pause");
+		_MAP_KEY(Keycode::PageUp, "PageUp");
+		_MAP_KEY(Keycode::PageDown, "PageDown");
+		_MAP_KEY(Keycode::Home, "Home");
+		_MAP_KEY(Keycode::End, "End");
+		_MAP_KEY(Keycode::Left, "Left");
+		_MAP_KEY(Keycode::Up, "Up");
+		_MAP_KEY(Keycode::Right, "Right");
+		_MAP_KEY(Keycode::Down, "Down");
+		_MAP_KEY(Keycode::PrintScreen, "PrintScreen");
+		_MAP_KEY(Keycode::Insert, "Insert");
+		_MAP_KEY(Keycode::Delete, "Delete");
+		_MAP_KEY(Keycode::Sleep, "Sleep");
+		_MAP_KEY(Keycode::Pause, "Pause");
 		
-		_MAP_KEY(keyGoHome, "GoHome");
-		_MAP_KEY(keyGoMenu, "GoMenu");
-		_MAP_KEY(keyGoBack, "GoBack");
-		_MAP_KEY(keyCamera, "Camera");
-		_MAP_KEY(keyVolumeMute, "VolumeMute");
-		_MAP_KEY(keyVolumeDown, "VolumeDown");
-		_MAP_KEY(keyVolumeUp, "VolumeUp");
-		_MAP_KEY(keyMediaPrev, "MediaPrev");
-		_MAP_KEY(keyMediaNext, "MediaNext");
-		_MAP_KEY(keyMediaPause, "MediaPause");
-		_MAP_KEY(keyMediaStop, "MediaStop");
-		_MAP_KEY(keyPhoneStar, "Dial*");
-		_MAP_KEY(keyPhonePound, "Dial#");
+		_MAP_KEY(Keycode::GoHome, "GoHome");
+		_MAP_KEY(Keycode::GoMenu, "GoMenu");
+		_MAP_KEY(Keycode::GoBack, "GoBack");
+		_MAP_KEY(Keycode::Camera, "Camera");
+		_MAP_KEY(Keycode::VolumeMute, "VolumeMute");
+		_MAP_KEY(Keycode::VolumeDown, "VolumeDown");
+		_MAP_KEY(Keycode::VolumeUp, "VolumeUp");
+		_MAP_KEY(Keycode::MediaPrev, "MediaPrev");
+		_MAP_KEY(Keycode::MediaNext, "MediaNext");
+		_MAP_KEY(Keycode::MediaPause, "MediaPause");
+		_MAP_KEY(Keycode::MediaStop, "MediaStop");
+		_MAP_KEY(Keycode::PhoneStar, "Dial*");
+		_MAP_KEY(Keycode::PhonePound, "Dial#");
 
-		_MAP_KEY(keyLeftShift, "LeftShift");
-		_MAP_KEY(keyRightShift, "RightShift");
-		_MAP_KEY(keyLeftControl, "LeftControl");
-		_MAP_KEY(keyRightControl, "RightControl");
+		_MAP_KEY(Keycode::LeftShift, "LeftShift");
+		_MAP_KEY(Keycode::RightShift, "RightShift");
+		_MAP_KEY(Keycode::LeftControl, "LeftControl");
+		_MAP_KEY(Keycode::RightControl, "RightControl");
 #if defined(SLIB_PLATFORM_IS_OSX)
-		_MAP_KEY(keyLeftOption, "LeftOption");
-		_MAP_KEY(keyRightOption, "RightOption");
-		_MAP_KEY(keyLeftCommand, "LeftCommand");
-		_MAP_KEY(keyRightCommand, "RightCommand");
+		_MAP_KEY(Keycode::LeftOption, "LeftOption");
+		_MAP_KEY(Keycode::RightOption, "RightOption");
+		_MAP_KEY(Keycode::LeftCommand, "LeftCommand");
+		_MAP_KEY(Keycode::RightCommand, "RightCommand");
 #else
-		_MAP_KEY(keyLeftAlt, "LeftAlt");
-		_MAP_KEY(keyRightAlt, "RightAlt");
-		_MAP_KEY(keyLeftWin, "LeftWin");
-		_MAP_KEY(keyRightWin, "RightWin");
+		_MAP_KEY(Keycode::LeftAlt, "LeftAlt");
+		_MAP_KEY(Keycode::RightAlt, "RightAlt");
+		_MAP_KEY(Keycode::LeftWin, "LeftWin");
+		_MAP_KEY(Keycode::RightWin, "RightWin");
 #endif
-		_MAP_KEY(keyCapsLock, "CapsLock");
-		_MAP_KEY(keyScrollLock, "ScrollLock");
-		_MAP_KEY(keyNumLock, "NumLock");
-		_MAP_KEY(keyContextMenu, "ContextMenu");
+		_MAP_KEY(Keycode::CapsLock, "CapsLock");
+		_MAP_KEY(Keycode::ScrollLock, "ScrollLock");
+		_MAP_KEY(Keycode::NumLock, "NumLock");
+		_MAP_KEY(Keycode::ContextMenu, "ContextMenu");
 
 	}
 	
 	String get(Keycode code)
 	{
 		String ret;
-		if (map.get(code, &ret)) {
+		if (map.get((sl_uint32)code, &ret)) {
 			return ret;
 		} else {
 			return nameInvalid;
@@ -420,7 +747,7 @@ String UIEventLogListener::getModifierText(UIEvent* event)
 	if (event->isAltKey()) {
 		ret += "ALT ";
 	}
-	if (ret.length() > 0) {
+	if (ret.getLength() > 0) {
 		ret = "[" + ret.trim() + "]";
 	}
 	return ret;
@@ -429,7 +756,7 @@ String UIEventLogListener::getModifierText(UIEvent* event)
 void UIEventLogListener::processKey(String name, UIEvent* event)
 {
 	String str;
-	if (event->getAction() == actionKeyDown) {
+	if (event->getAction() == UIAction::KeyDown) {
 		str = "KeyDown ";
 	} else {
 		str = "KeyUp ";
@@ -445,49 +772,49 @@ void UIEventLogListener::processMouse(String name, UIEvent* event)
 {
 	String str;
 	switch (event->getAction()) {
-		case actionLeftButtonDown:
+		case UIAction::LeftButtonDown:
 			str = "LButtonDown";
 			break;
-		case actionLeftButtonUp:
+		case UIAction::LeftButtonUp:
 			str = "LButtonUp";
 			break;
-		case actionLeftButtonDrag:
+		case UIAction::LeftButtonDrag:
 			str = "LButtonDrag";
 			break;
-		case actionLeftButtonDoubleClick:
+		case UIAction::LeftButtonDoubleClick:
 			str = "LButtonDbl";
 			break;
-		case actionRightButtonDown:
+		case UIAction::RightButtonDown:
 			str = "RButtonDown";
 			break;
-		case actionRightButtonUp:
+		case UIAction::RightButtonUp:
 			str = "RButtonUp";
 			break;
-		case actionRightButtonDrag:
+		case UIAction::RightButtonDrag:
 			str = "RButtonDrag";
 			break;
-		case actionRightButtonDoubleClick:
+		case UIAction::RightButtonDoubleClick:
 			str = "RButtonDbl";
 			break;
-		case actionMiddleButtonDown:
+		case UIAction::MiddleButtonDown:
 			str = "MButtonDown";
 			break;
-		case actionMiddleButtonUp:
+		case UIAction::MiddleButtonUp:
 			str = "MButtonUp";
 			break;
-		case actionMiddleButtonDrag:
+		case UIAction::MiddleButtonDrag:
 			str = "MButtonDrag";
 			break;
-		case actionMiddleButtonDoubleClick:
+		case UIAction::MiddleButtonDoubleClick:
 			str = "MButtonDbl";
 			break;
-		case actionMouseMove:
+		case UIAction::MouseMove:
 			str = "MouseMove";
 			break;
-		case actionMouseEnter:
+		case UIAction::MouseEnter:
 			str = "MouseEnter";
 			break;
-		case actionMouseLeave:
+		case UIAction::MouseLeave:
 			str = "MouseLeave";
 			break;
 		default:
@@ -502,16 +829,16 @@ void UIEventLogListener::processTouch(String name, UIEvent* event)
 {
 	String str;
 	switch (event->getAction()) {
-		case actionTouchBegin:
+		case UIAction::TouchBegin:
 			str = "TouchDown";
 			break;
-		case actionTouchMove:
+		case UIAction::TouchMove:
 			str = "TouchMove";
 			break;
-		case actionTouchEnd:
+		case UIAction::TouchEnd:
 			str = "TouchUp";
 			break;
-		case actionTouchCancel:
+		case UIAction::TouchCancel:
 			str = "TouchCancel";
 			break;
 		default:
@@ -531,28 +858,28 @@ void UIEventLogListener::processMouseWheel(String name, UIEvent* event)
 String UI::getStatusDescription()
 {
 	String str;
-	if (UI::checkKeyPressed(keyLeftShift)) {
+	if (UI::checkKeyPressed(Keycode::LeftShift)) {
 		str += "LSHIFT ";
 	}
-	if (UI::checkKeyPressed(keyRightShift)) {
+	if (UI::checkKeyPressed(Keycode::RightShift)) {
 		str += "RSHIFT ";
 	}
-	if (UI::checkKeyPressed(keyLeftControl)) {
+	if (UI::checkKeyPressed(Keycode::LeftControl)) {
 		str += "LCTRL ";
 	}
-	if (UI::checkKeyPressed(keyRightControl)) {
+	if (UI::checkKeyPressed(Keycode::RightControl)) {
 		str += "RCTRL ";
 	}
-	if (UI::checkKeyPressed(keyLeftCommand)) {
+	if (UI::checkKeyPressed(Keycode::LeftCommand)) {
 		str += "LWIN ";
 	}
-	if (UI::checkKeyPressed(keyRightCommand)) {
+	if (UI::checkKeyPressed(Keycode::RightCommand)) {
 		str += "RWIN ";
 	}
-	if (UI::checkKeyPressed(keyLeftAlt)) {
+	if (UI::checkKeyPressed(Keycode::LeftAlt)) {
 		str += "LALT ";
 	}
-	if (UI::checkKeyPressed(keyRightAlt)) {
+	if (UI::checkKeyPressed(Keycode::RightAlt)) {
 		str += "RALT ";
 	}
 	if (UI::checkCapsLockOn()) {

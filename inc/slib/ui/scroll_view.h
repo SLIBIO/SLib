@@ -9,7 +9,8 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class SLIB_EXPORT ScrollView : public View
 {
-	SLIB_DECLARE_OBJECT(ScrollView, View)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	ScrollView();
 	

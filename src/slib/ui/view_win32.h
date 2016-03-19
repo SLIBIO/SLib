@@ -28,7 +28,7 @@ public:
 			if (ret.isNotNull()) {
 				ret->m_handle = hWnd;
 				ret->m_flagDestroyOnRelease = flagDestroyOnRelease;
-				UIPlatform::registerViewInstance(hWnd, ret.get());
+				UIPlatform::registerViewInstance(hWnd, ret.ptr);
 			} else {
 				if (flagDestroyOnRelease) {
 					::PostMessageW(hWnd, SLIB_UI_MESSAGE_CLOSE, 0, 0);
@@ -113,7 +113,7 @@ public:
 public:
 	sl_bool onEventKey(sl_bool flagDown, WPARAM wParam, LPARAM lParam);
 
-	sl_bool onEventMouse(UIEventAction action, WPARAM wParam, LPARAM lParam);
+	sl_bool onEventMouse(UIAction action, WPARAM wParam, LPARAM lParam);
 
 	sl_bool onEventMouseWheel(sl_bool flagVertical, WPARAM wParam, LPARAM lParam);
 
@@ -125,7 +125,7 @@ protected:
 	HWND m_handle;
 	sl_bool m_flagDestroyOnRelease;
 
-	UIEventAction m_actionMouseCapture;
+	UIAction m_actionMouseCapture;
 
 };
 

@@ -3,7 +3,6 @@
 
 #include "definition.h"
 
-#include "../core/math.h"
 #include "../math/vector3.h"
 #include "../math/vector4.h"
 
@@ -21,356 +20,6 @@ public:
 	sl_uint8 a;
 	
 public:
-	SLIB_INLINE Color()
-	{
-	}
-	
-	SLIB_INLINE Color(const Color& other)
-	{
-		r = other.r;
-		g = other.g;
-		b = other.b;
-		a = other.a;
-	}
-	
-	SLIB_INLINE Color(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a = 255)
-	{
-		r = (sl_uint8)_r;
-		g = (sl_uint8)_g;
-		b = (sl_uint8)_b;
-		a = (sl_uint8)_a;
-	}
-	
-	SLIB_INLINE Color(sl_uint32 argb)
-	{
-		setARGB(argb);
-	}
-	
-
-	Color(const Color3f& v);
-	
-	Color(const Color4f& v);
-	
-	SLIB_INLINE Color& operator=(const Color& other)
-	{
-		*((sl_uint32*)((void*)this)) = *((sl_uint32*)((void*)&other));
-		return *this;
-	}
-	
-	SLIB_INLINE sl_bool operator==(const Color& other) const
-	{
-		return *((sl_uint32*)((void*)this)) == *((sl_uint32*)((void*)&other));
-	}
-	
-	SLIB_INLINE sl_bool operator!=(const Color& other) const
-	{
-		return *((sl_uint32*)((void*)this)) != *((sl_uint32*)((void*)&other));
-	}
-
-	SLIB_INLINE operator Color3f() const
-	{
-		sl_real _r = getRed();
-		sl_real _g = getGreen();
-		sl_real _b = getBlue();
-		return Color3f(_r / 255, _g / 255, _b / 255);
-	}
-
-	SLIB_INLINE operator Color4f() const
-	{
-		sl_real _r = getRed();
-		sl_real _g = getGreen();
-		sl_real _b = getBlue();
-		sl_real _a = getAlpha();
-		return Color4f(_r / 255, _g / 255, _b / 255, _a / 255);
-	}
-
-	SLIB_INLINE sl_bool isZero() const
-	{
-		return *((sl_uint32*)((void*)this)) == 0;
-	}
-	
-	SLIB_INLINE sl_bool isNotZero() const
-	{
-		return *((sl_uint32*)((void*)this)) != 0;
-	}
-	
-	SLIB_INLINE void setZero()
-	{
-		*((sl_uint32*)((void*)this)) = 0;
-	}
-	
-private:
-	static sl_uint8 _zero[4];
-	static sl_uint8 _transparent[4];
-	static sl_uint8 _black[4];
-	static sl_uint8 _white[4];
-	static sl_uint8 _gray[4];
-	static sl_uint8 _red[4];
-	static sl_uint8 _green[4];
-	static sl_uint8 _blue[4];
-	static sl_uint8 _yellow[4];
-	static sl_uint8 _magenta[4];
-	static sl_uint8 _cyan[4];
-	
-public:
-	SLIB_INLINE static const Color& zero()
-	{
-		return *((Color*)((void*)(&_zero)));
-	}
-	
-	SLIB_INLINE static const Color& transparent()
-	{
-		return *((Color*)((void*)(&_transparent)));
-	}
-	
-	SLIB_INLINE static const Color& black()
-	{
-		return *((Color*)((void*)(&_black)));
-	}
-	
-	SLIB_INLINE static const Color& white()
-	{
-		return *((Color*)((void*)(&_white)));
-	}
-	
-	SLIB_INLINE static const Color& gray()
-	{
-		return *((Color*)((void*)(&_gray)));
-	}
-	
-	SLIB_INLINE static Color gray(sl_uint8 g)
-	{
-		return Color(g, g, g);
-	}
-
-	SLIB_INLINE static const Color& red()
-	{
-		return *((Color*)((void*)(&_red)));
-	}
-	
-	SLIB_INLINE static const Color& green()
-	{
-		return *((Color*)((void*)(&_green)));
-	}
-	
-	SLIB_INLINE static const Color& blue()
-	{
-		return *((Color*)((void*)(&_blue)));
-	}
-	
-	SLIB_INLINE static const Color& yellow()
-	{
-		return *((Color*)((void*)(&_yellow)));
-	}
-	
-	SLIB_INLINE static const Color& magenta()
-	{
-		return *((Color*)((void*)(&_magenta)));
-	}
-	
-	SLIB_INLINE static const Color& cyan()
-	{
-		return *((Color*)((void*)(&_cyan)));
-	}
-	
-public:
-	SLIB_INLINE sl_uint8 getBlue() const
-	{
-		return b;
-	}
-	
-	SLIB_INLINE sl_uint8 getGreen() const
-	{
-		return g;
-	}
-	
-	SLIB_INLINE sl_uint8 getRed() const
-	{
-		return r;
-	}
-	
-	SLIB_INLINE sl_uint8 getAlpha() const
-	{
-		return a;
-	}
-
-	SLIB_INLINE void setBlue(sl_uint8 v)
-	{
-		b = v;
-	}
-	
-	SLIB_INLINE void setGreen(sl_uint8 v)
-	{
-		g = v;
-	}
-	
-	SLIB_INLINE void setRed(sl_uint8 v)
-	{
-		r = v;
-	}
-	
-	SLIB_INLINE void setAlpha(sl_uint8 v)
-	{
-		a = v;
-	}
-	
-	SLIB_INLINE void setRGB(sl_uint8 R, sl_uint8 G, sl_uint8 B)
-	{
-		r = R;
-		g = G;
-		b = B;
-	}
-	
-	SLIB_INLINE void setRGBA(sl_uint8 R, sl_uint8 G, sl_uint8 B, sl_uint8 A)
-	{
-		r = R;
-		g = G;
-		b = B;
-		a = A;
-	}
-
-	SLIB_INLINE float getBlueF() const
-	{
-		return (float)(b) / 255.0f;
-	}
-	
-	SLIB_INLINE float getGreenF() const
-	{
-		return (float)(g) / 255.0f;
-	}
-	
-	SLIB_INLINE float getRedF() const
-	{
-		return (float)(r) / 255.0f;
-	}
-	
-	SLIB_INLINE float getAlphaF() const
-	{
-		return (float)(a) / 255.0f;
-	}
-
-	SLIB_INLINE void setBlueF(float v)
-	{
-		sl_int32 n = (sl_int32)(v * 255.0f);
-		b = (sl_uint8)(Math::clamp0_255(n));
-	}
-	
-	SLIB_INLINE void setGreenF(float v)
-	{
-		sl_int32 n = (sl_int32)(v * 255.0f);
-		g = (sl_uint8)(Math::clamp0_255(n));
-	}
-	
-	SLIB_INLINE void setRedF(float v)
-	{
-		sl_int32 n = (sl_int32)(v * 255.0f);
-		r = (sl_uint8)(Math::clamp0_255(n));
-	}
-	
-	SLIB_INLINE void setAlphaF(float v)
-	{
-		sl_int32 n = (sl_int32)(v * 255.0f);
-		a = (sl_uint8)(Math::clamp0_255(n));
-	}
-	
-	SLIB_INLINE sl_uint32 getARGB() const
-	{
-		return ((sl_uint32)(a) << 24) | ((sl_uint32)(r) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(b));
-	}
-	
-	SLIB_INLINE void setARGB(sl_uint32 v)
-	{
-		sl_uint8 _b = v & 0xFF;
-		sl_uint8 _g = (v >> 8) & 0xFF;
-		sl_uint8 _r = (v >> 16) & 0xFF;
-		sl_uint8 _a = (v >> 24) & 0xFF;
-		r = _r;
-		g = _g;
-		b = _b;
-		a = _a;
-	}
-
-	SLIB_INLINE sl_uint32 getABGR() const
-	{
-		return ((sl_uint32)(a) << 24) | ((sl_uint32)(b) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(r));
-	}
-	
-	SLIB_INLINE void setABGR(sl_uint32 v)
-	{
-		sl_uint8 _r = v & 0xFF;
-		sl_uint8 _g = (v >> 8) & 0xFF;
-		sl_uint8 _b = (v >> 16) & 0xFF;
-		sl_uint8 _a = (v >> 24) & 0xFF;
-		r = _r;
-		g = _g;
-		b = _b;
-		a = _a;
-	}
-
-	SLIB_INLINE sl_uint32 getRGBA() const
-	{
-		return ((sl_uint32)(a)) | ((sl_uint32)(r) << 24) | ((sl_uint32)(g) << 16) | ((sl_uint32)(b) << 8);
-	}
-	
-	SLIB_INLINE void setRGBA(sl_uint32 v)
-	{
-		sl_uint8 _a = v & 0xFF;
-		sl_uint8 _b = (v >> 8) & 0xFF;
-		sl_uint8 _g = (v >> 16) & 0xFF;
-		sl_uint8 _r = (v >> 24) & 0xFF;
-		r = _r;
-		g = _g;
-		b = _b;
-		a = _a;
-	}
-
-	SLIB_INLINE sl_uint32 getBGRA() const
-	{
-		return ((sl_uint32)(a)) | ((sl_uint32)(b) << 24) | ((sl_uint32)(g) << 16) | ((sl_uint32)(r) << 8);
-	}
-	
-	SLIB_INLINE void setBGRA(sl_uint32 v)
-	{
-		sl_uint8 _a = v & 0xFF;
-		sl_uint8 _r = (v >> 8) & 0xFF;
-		sl_uint8 _g = (v >> 16) & 0xFF;
-		sl_uint8 _b = (v >> 24) & 0xFF;
-		r = _r;
-		g = _g;
-		b = _b;
-		a = _a;
-	}
-
-	SLIB_INLINE sl_uint32 getRGB() const
-	{
-		return ((sl_uint32)(r) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(b));
-	}
-	
-	SLIB_INLINE void setRGB(sl_uint32 v)
-	{
-		sl_uint8 _b = v & 0xFF;
-		sl_uint8 _g = (v >> 8) & 0xFF;
-		sl_uint8 _r = (v >> 16) & 0xFF;
-		r = _r;
-		g = _g;
-		b = _b;
-	}
-
-	SLIB_INLINE sl_uint32 getBGR() const
-	{
-		return ((sl_uint32)(b) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(r));
-	}
-	
-	SLIB_INLINE void setBGR(sl_uint32 v)
-	{
-		sl_uint8 _r = v & 0xFF;
-		sl_uint8 _g = (v >> 8) & 0xFF;
-		sl_uint8 _b = (v >> 16) & 0xFF;
-		r = _r;
-		g = _g;
-		b = _b;
-	}
-	
 	enum
 	{
 		AliceBlue = 0xFFF0F8FF,
@@ -515,138 +164,225 @@ public:
 		Yellow = 0xFFFFFF00,
 		YellowGreen = 0xFF9ACD32
 	};
+
+public:
+	Color() = default;
+	
+	Color(const Color& other) = default;
+	
+	Color(sl_uint32 r, sl_uint32 g, sl_uint32 b, sl_uint32 a = 255);
+	
+	Color(sl_uint32 argb);
+
+	Color(const Color3f& v);
+	
+	Color(const Color4f& v);
+	
+public:
+	static const Color& zero();
+	
+	sl_bool isZero() const;
+	
+	sl_bool isNotZero() const;
+	
+	void setZero();
+
+	float getBlueF() const;
+	
+	void setBlueF(float v);
+	
+	float getGreenF() const;
+	
+	void setGreenF(float v);
+	
+	float getRedF() const;
+	
+	void setRedF(float v);
+	
+	float getAlphaF() const;
+	
+	void setAlphaF(float v);
+	
+	void setRGBA(sl_uint8 r, sl_uint8 g, sl_uint8 b, sl_uint8 a);
+
+	sl_uint32 getARGB() const;
+	
+	void setARGB(sl_uint32 v);
+
+	sl_uint32 getABGR() const;
+	
+	void setABGR(sl_uint32 v);
+
+	void setRGB(sl_uint8 r, sl_uint8 g, sl_uint8 b);
+	
+	sl_uint32 getRGB() const;
+	
+	void setRGB(sl_uint32 v);
+
+	sl_uint32 getBGR() const;
+	
+	void setBGR(sl_uint32 v);
+	
 	
 	// assume that` dst is premultiplied alpha, and src is non-premultiplied alpha
-	SLIB_INLINE void blend_PA_NPA(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a)
-	{
-		sl_uint32 _or = r;
-		sl_uint32 _og = g;
-		sl_uint32 _ob = b;
-		sl_uint32 _oa = a;
-		sl_uint32 sa = _a;
-		_or = (_or * (255 - sa) + _r * sa) / 255;
-		_og = (_og * (255 - sa) + _g * sa) / 255;
-		_ob = (_ob * (255 - sa) + _b * sa) / 255;
-		_oa = (_oa * (255 - sa) + 255 * sa) / 255;
-		r = (sl_uint8)(_or);
-		g = (sl_uint8)(_og);
-		b = (sl_uint8)(_ob);
-		a = (sl_uint8)(_oa);
-	}
+	void blend_PA_NPA(sl_uint32 r, sl_uint32 g, sl_uint32 b, sl_uint32 a);
 
 	// assume that dst is premultiplied alpha, and src is non-premultiplied alpha
-	SLIB_INLINE void blend_PA_NPA(const Color& src)
-	{
-		blend_PA_NPA(src.r, src.g, src.b, src.a);
-	}
+	void blend_PA_NPA(const Color& src);
 
 	// assume that dst is premultiplied alpha, and src is premultiplied alpha
-	SLIB_INLINE void blend_PA_PA(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a)
-	{
-		sl_uint32 _or = r;
-		sl_uint32 _og = g;
-		sl_uint32 _ob = b;
-		sl_uint32 oa = a;
-		sl_uint32 sa = _a;
-		_or = Math::clamp0_255(_or * (255 - sa) / 255 + _r);
-		_og = Math::clamp0_255(_og * (255 - sa) / 255 + _g);
-		_ob = Math::clamp0_255(_ob * (255 - sa) / 255 + _b);
-		oa = (oa * (255 - sa) + 255 * sa) / 255;
-		r = (sl_uint8)(_or);
-		g = (sl_uint8)(_og);
-		b = (sl_uint8)(_ob);
-		a = (sl_uint8)(oa);
-	}
+	void blend_PA_PA(sl_uint32 r, sl_uint32 g, sl_uint32 b, sl_uint32 a);
 
 	// assume that dst is premultiplied alpha, and src is premultiplied alpha
-	SLIB_INLINE void blend_PA_PA(const Color& src)
-	{
-		blend_PA_NPA(src.r, src.g, src.b, src.a);
-	}
+	void blend_PA_PA(const Color& src);
 
 	// assume that dst is non-premultiplied alpha, and src is non-premultiplied alpha
-	SLIB_INLINE void blend_NPA_NPA(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a)
-	{
-		sl_uint32 _or = r;
-		sl_uint32 _og = g;
-		sl_uint32 _ob = b;
-		sl_uint32 oa = a;
-		sl_uint32 sa = _a;
-		sl_uint32 _oa = (oa * (255 - sa) + 255 * sa) + 1;
-		_or = Math::clamp0_255((_or * oa * (255 - sa) + _r * (255 * sa + 1)) / _oa);
-		_og = Math::clamp0_255((_og * oa * (255 - sa) + _g * (255 * sa + 1)) / _oa);
-		_ob = Math::clamp0_255((_ob * oa * (255 - sa) + _b * (255 * sa + 1)) / _oa);
-		_oa = (_oa - 1) / 255;
-		r = (sl_uint8)(_or);
-		g = (sl_uint8)(_og);
-		b = (sl_uint8)(_ob);
-		a = (sl_uint8)(_oa);
-	}
-
+	void blend_NPA_NPA(sl_uint32 r, sl_uint32 g, sl_uint32 b, sl_uint32 a);
+	
 	// assume that dst is non-premultiplied alpha, and src is non-premultiplied alpha
-	SLIB_INLINE void blend_NPA_NPA(const Color& src)
-	{
-		blend_NPA_NPA(src.r, src.g, src.b, src.a);
-	}
-
+	void blend_NPA_NPA(const Color& src);
 
 	// assume that dst is non-premultiplied alpha, and src is premultiplied alpha
-	SLIB_INLINE void blend_NPA_PA(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a)
-	{
-		sl_uint32 _or = r;
-		sl_uint32 _og = g;
-		sl_uint32 _ob = b;
-		sl_uint32 oa = a;
-		sl_uint32 sa = _a;
-		sl_uint32 _oa = (oa * (255 - sa) + 255 * sa) + 1;
-		_or = Math::clamp0_255((_or * oa * (255 - sa) + (_r << 16)) / _oa);
-		_og = Math::clamp0_255((_og * oa * (255 - sa) + (_g << 16)) / _oa);
-		_ob = Math::clamp0_255((_ob * oa * (255 - sa) + (_b << 16)) / _oa);
-		_oa = (_oa - 1) / 255;
-		r = (sl_uint8)(_or);
-		g = (sl_uint8)(_og);
-		b = (sl_uint8)(_ob);
-		a = (sl_uint8)(_oa);
-	}
+	void blend_NPA_PA(sl_uint32 r, sl_uint32 g, sl_uint32 b, sl_uint32 a);
 
 	// assume that dst is non-premultiplied alpha, and src is premultiplied alpha
-	SLIB_INLINE void blend_NPA_PA(const Color& src)
-	{
-		blend_NPA_PA(src.r, src.g, src.b, src.a);
-	}
+	void blend_NPA_PA(const Color& src);
 
 
-	SLIB_INLINE void convertNPAtoPA()
-	{
-		sl_uint32 _or = r;
-		sl_uint32 _og = g;
-		sl_uint32 _ob = b;
-		sl_uint32 oa = a;
-		oa++;
-		_or = (_or * oa) >> 8;
-		_og = (_og * oa) >> 8;
-		_ob = (_ob * oa) >> 8;
-		r = (sl_uint8)(_or & 255);
-		g = (sl_uint8)(_og & 255);
-		b = (sl_uint8)(_ob & 255);
-	}
+	void convertNPAtoPA();
 
-	SLIB_INLINE void convertPAtoNPA()
-	{
-		sl_uint32 _or = r;
-		sl_uint32 _og = g;
-		sl_uint32 _ob = b;
-		sl_uint32 oa = a;
-		oa++;
-		_or = Math::clamp0_255((_or << 8) / oa);
-		_og = Math::clamp0_255((_og << 8) / oa);
-		_ob = Math::clamp0_255((_ob << 8) / oa);
-		r = (sl_uint8)(_or);
-		g = (sl_uint8)(_og);
-		b = (sl_uint8)(_ob);
-	}
+	void convertPAtoNPA();
 
+public:
+	Color& operator=(const Color& other) = default;
+	
+	sl_bool operator==(const Color& other) const;
+	
+	sl_bool operator!=(const Color& other) const;
+
+	operator Color3f() const;
+	
+	operator Color4f() const;
+	
+private:
+	static sl_uint8 _zero[4];
+	
 };
+
+SLIB_GRAPHICS_NAMESPACE_END
+
+
+SLIB_GRAPHICS_NAMESPACE_BEGIN
+
+SLIB_INLINE Color::Color(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a) : r(_r), g(_g), b(_b), a(_a)
+{
+}
+
+SLIB_INLINE Color::Color(sl_uint32 argb)
+{
+	b = (sl_uint8)(argb & 0xFF);
+	g = (sl_uint8)((argb >> 8) & 0xFF);
+	r = (sl_uint8)((argb >> 16) & 0xFF);
+	a = (sl_uint8)((argb >> 24) & 0xFF);
+}
+
+SLIB_INLINE const Color& Color::zero()
+{
+	return *((Color*)((void*)(&_zero)));
+}
+
+SLIB_INLINE sl_bool Color::isZero() const
+{
+	return r == 0 && g == 0 && b == 0 && a == 0;
+}
+
+SLIB_INLINE sl_bool Color::isNotZero() const
+{
+	return r != 0 || g != 0 || b != 0 || a != 0;
+}
+
+SLIB_INLINE void Color::setZero()
+{
+	r = 0;
+	g = 0;
+	b = 0;
+	a = 0;
+}
+
+SLIB_INLINE void Color::setRGBA(sl_uint8 _r, sl_uint8 _g, sl_uint8 _b, sl_uint8 _a)
+{
+	r = _r;
+	g = _g;
+	b = _b;
+	a = _a;
+}
+
+SLIB_INLINE sl_uint32 Color::getARGB() const
+{
+	return ((sl_uint32)(a) << 24) | ((sl_uint32)(r) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(b));
+}
+
+SLIB_INLINE void Color::setARGB(sl_uint32 v)
+{
+	b = (sl_uint8)(v & 0xFF);
+	g = (sl_uint8)((v >> 8) & 0xFF);
+	r = (sl_uint8)((v >> 16) & 0xFF);
+	a = (sl_uint8)((v >> 24) & 0xFF);
+}
+
+SLIB_INLINE sl_uint32 Color::getABGR() const
+{
+	return ((sl_uint32)(a) << 24) | ((sl_uint32)(b) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(r));
+}
+
+SLIB_INLINE void Color::setABGR(sl_uint32 v)
+{
+	r = (sl_uint8)(v & 0xFF);
+	g = (sl_uint8)((v >> 8) & 0xFF);
+	b = (sl_uint8)((v >> 16) & 0xFF);
+	a = (sl_uint8)((v >> 24) & 0xFF);
+}
+
+SLIB_INLINE void Color::setRGB(sl_uint8 _r, sl_uint8 _g, sl_uint8 _b)
+{
+	r = _r;
+	g = _g;
+	b = _b;
+}
+
+SLIB_INLINE sl_uint32 Color::getRGB() const
+{
+	return ((sl_uint32)(r) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(b));
+}
+
+SLIB_INLINE void Color::setRGB(sl_uint32 v)
+{
+	b = (sl_uint8)(v & 0xFF);
+	g = (sl_uint8)((v >> 8) & 0xFF);
+	r = (sl_uint8)((v >> 16) & 0xFF);
+}
+
+SLIB_INLINE sl_uint32 Color::getBGR() const
+{
+	return ((sl_uint32)(b) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(r));
+}
+
+SLIB_INLINE void Color::setBGR(sl_uint32 v)
+{
+	r = (sl_uint8)(v & 0xFF);
+	g = (sl_uint8)((v >> 8) & 0xFF);
+	b = (sl_uint8)((v >> 16) & 0xFF);
+}
+
+SLIB_INLINE sl_bool Color::operator==(const Color& other) const
+{
+	return r == other.r && g == other.g && b == other.b && a == other.a;
+}
+
+SLIB_INLINE sl_bool Color::operator!=(const Color& other) const
+{
+	return r != other.r || g != other.g || b != other.b || a != other.a;
+}
 
 SLIB_GRAPHICS_NAMESPACE_END
 

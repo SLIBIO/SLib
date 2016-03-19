@@ -12,21 +12,21 @@ typedef int sl_socket;
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
-enum L2PacketType
+enum class L2PacketType
 {
-    l2PacketType_Host = 0,
-    l2PacketType_Broadcast = 1,
-    l2PacketType_Multicast = 2,
-    l2PacketType_OtherHost = 3,
-    l2PacketType_OutGoing = 4,
-    l2PacketType_Loopback = 5,
-    l2PacketType_FastRoute = 6
+    Host = 0,
+    Broadcast = 1,
+    Multicast = 2,
+    OtherHost = 3,
+    OutGoing = 4,
+    Loopback = 5,
+	FastRoute = 6
 };
 
 class SLIB_EXPORT L2PacketInfo
 {
 public:
-	sl_uint16 protocol; // NetworkLinkProtocol, physical layer protocol
+	NetworkLinkProtocol protocol; // physical layer protocol
 	sl_uint32 iface; // interface number
 
 	L2PacketType type;
@@ -34,207 +34,131 @@ public:
 	sl_uint8 hardwareAddress[8];
 
 public:
-	SLIB_INLINE void setMacAddress(const MacAddress& address)
-	{
-		lenHardwareAddress = 6;
-		Base::copyMemory(hardwareAddress, address.m, 6);
-		hardwareAddress[6] = 0;
-		hardwareAddress[7] = 0;
-	}
+	void setMacAddress(const MacAddress& address);
 	
-	SLIB_INLINE sl_bool getMacAddress(MacAddress* address = sl_null)
-	{
-		if (lenHardwareAddress == 6) {
-			if (address) {
-				address->set(hardwareAddress);
-			}
-			return sl_true;
-		} else {
-			return sl_false;
-		}
-	}
+	sl_bool getMacAddress(MacAddress* address = sl_null);
 	
-	SLIB_INLINE void clearAddress()
-	{
-		lenHardwareAddress = 0;
-		Base::zeroMemory(hardwareAddress, 8);
-	}
+	void clearAddress();
 	
 };
 
-enum SocketType
+enum class SocketType
 {
-    socketType_None = 0,
-    socketType_Tcp = 0x01,
-    socketType_Udp = 0x02,
-    socketType_Raw = 0x03,
-    socketType_TcpIPv6 = 0x11,
-    socketType_UdpIPv6 = 0x12,
-    socketType_RawIPv6 = 0x13,
-    socketType_PacketRaw = 0x80,
-    socketType_PacketDatagram = 0x81
+    None = 0,
+    Tcp = 0x01,
+	Udp = 0x02,
+	Raw = 0x03,
+    TcpIPv6 = 0x11,
+    UdpIPv6 = 0x12,
+    RawIPv6 = 0x13,
+    PacketRaw = 0x80,
+    PacketDatagram = 0x81
 };
 
-enum SocketShutdownMode
+enum class SocketShutdownMode
 {
-    socketShutdownMode_Receive = 0,
-    socketShutdownMode_Send = 1,
-    socketShutdownMode_Both = 2
+    Receive = 0,
+    Send = 1,
+    Both = 2
 };
 
-enum SocketError
+enum class SocketError
 {
-    socketError_None = 0,
-    socketError_WouldBlock = 1,
-    socketError_NetworkDown = 2,
-    socketError_NetworkReset = 3,
-    socketError_ConnectionReset = 4,
-    socketError_ConnectionAbort = 5,
-    socketError_ConnectionRefused = 6,
-    socketError_Timeout = 7,
-    socketError_NotSocket = 8,
-    socketError_AddressAlreadyInUse = 9,
-    socketError_NoBufs = 10,
-    socketError_NoMem = 11,
-    socketError_InProgress = 12,
-    socketError_DestinationAddressRequired = 13, /* sendTo */
-    socketError_ProtocolFamilyNotSupported = 14,
-    socketError_AddressFamilyNotSupported = 15,
-    socketError_AddressNotAvailable = 16,
-    socketError_NotConnected = 17,
-    socketError_Shutdown = 18,
-    socketError_Access = 19, /* ex. broadcast error */
+    None = 0,
+    WouldBlock = 1,
+    NetworkDown = 2,
+    NetworkReset = 3,
+    ConnectionReset = 4,
+    ConnectionAbort = 5,
+    ConnectionRefused = 6,
+    Timeout = 7,
+    NotSocket = 8,
+    AddressAlreadyInUse = 9,
+    NoBufs = 10,
+    NoMem = 11,
+    InProgress = 12,
+    DestinationAddressRequired = 13, /* sendTo */
+    ProtocolFamilyNotSupported = 14,
+    AddressFamilyNotSupported = 15,
+    AddressNotAvailable = 16,
+    NotConnected = 17,
+    Shutdown = 18,
+    Access = 19, /* ex. broadcast error */
 
-    socketError_Closed = 101,
-    socketError_BindInvalidAddress = 102,
-    socketError_BindInvalidType = 103,
-    socketError_ListenIsNotSupported = 104,
-    socketError_AcceptIsNotSupported = 105,
-    socketError_ConnectIsNotSupported = 106,
-    socketError_ConnectToInvalidAddress = 107,
-    socketError_SendIsNotSupported = 108,
-    socketError_ReceiveIsNotSupported = 109,
-    socketError_SendToIsNotSupported = 110,
-    socketError_SendToInvalidAddress = 111,
-    socketError_ReceiveFromIsNotSupported = 112,
-    socketError_SendPacketIsNotSupported = 113,
-    socketError_SendPacketInvalidAddress = 114,
-    socketError_ReceivePacketIsNotSupported = 115,
+    Closed = 101,
+    BindInvalidAddress = 102,
+    BindInvalidType = 103,
+    ListenIsNotSupported = 104,
+    AcceptIsNotSupported = 105,
+    ConnectIsNotSupported = 106,
+    ConnectToInvalidAddress = 107,
+    SendIsNotSupported = 108,
+    ReceiveIsNotSupported = 109,
+    SendToIsNotSupported = 110,
+    SendToInvalidAddress = 111,
+    ReceiveFromIsNotSupported = 112,
+    SendPacketIsNotSupported = 113,
+    SendPacketInvalidAddress = 114,
+    ReceivePacketIsNotSupported = 115,
 
-    socketError_Unknown = 10000
+    Unknown = 10000
+	
 };
 
 
 class SLIB_EXPORT Socket : public Referable
 {
-	SLIB_DECLARE_ROOT_OBJECT(Socket)
+	SLIB_DECLARE_OBJECT
+	
 private:
 	Socket();
+	
 	~Socket();
 	
 public:
 	static Ref<Socket> open(SocketType type, sl_uint32 protocol = 0);
-
-	SLIB_INLINE static Ref<Socket> openTcp()
-	{
-		return open(socketType_Tcp);
-	}
-
-	SLIB_INLINE static Ref<Socket> openUdp()
-	{
-		return open(socketType_Udp);
-	}
-
-	// NetworkInternetProtocolType
-	SLIB_INLINE static Ref<Socket> openRaw(sl_uint32 internetProtocol)
-	{
-		return open(socketType_Raw, internetProtocol);
-	}
-
-	SLIB_INLINE static Ref<Socket> openTcp_IPv6()
-	{
-		return open(socketType_TcpIPv6);
-	}
-
-	SLIB_INLINE static Ref<Socket> openUdp_IPv6()
-	{
-		return open(socketType_UdpIPv6);
-	}
-
-	// NetworkInternetProtocolType
-	SLIB_INLINE static Ref<Socket> openRaw_IPv6(sl_uint32 internetProtocol)
-	{
-		return open(socketType_RawIPv6, internetProtocol);
-	}
-
-	// NetworLinkProtocolType
-	SLIB_INLINE static Ref<Socket> openPacketRaw(sl_uint32 linkProtocol = networkLinkProtocol_All)
-	{
-		return open(socketType_PacketRaw, linkProtocol);
-	}
-
-	// NetworLinkProtocolType
-	SLIB_INLINE static Ref<Socket> openPacketDatagram(sl_uint32 linkProtocol = networkLinkProtocol_All)
-	{
-		return open(socketType_PacketDatagram, linkProtocol);
-	}
+	
+	static Ref<Socket> openTcp();
+	
+	static Ref<Socket> openUdp();
+	
+	static Ref<Socket> openRaw(NetworkInternetProtocol internetProtocol);
+	
+	static Ref<Socket> openTcp_IPv6();
+	
+	static Ref<Socket> openUdp_IPv6();
+	
+	static Ref<Socket> openRaw_IPv6(NetworkInternetProtocol internetProtocol);
+	
+	static Ref<Socket> openPacketRaw(NetworkLinkProtocol linkProtocol = NetworkLinkProtocol::All);
+	
+	static Ref<Socket> openPacketDatagram(NetworkLinkProtocol linkProtocol = NetworkLinkProtocol::All);
 
 public:
 	void close();
 
-	SLIB_INLINE sl_bool isOpened() const
-	{
-		return m_socket != SLIB_SOCKET_INVALID_HANDLE;
-	}
+	sl_bool isOpened() const;
 
-	SLIB_INLINE sl_socket getHandle() const
-	{
-		return m_socket;
-	}
+	sl_socket getHandle() const;
 
-	SLIB_INLINE SocketType getType() const
-	{
-		return m_type;
-	}
+	SocketType getType() const;
 
 	String getTypeText() const;
 
-	SLIB_INLINE sl_bool isTcp() const
-	{
-		return m_type == socketType_Tcp || m_type == socketType_TcpIPv6;
-	}
+	sl_bool isTcp() const;
 
-	SLIB_INLINE sl_bool isUdp() const
-	{
-		return m_type == socketType_Udp || m_type == socketType_UdpIPv6;
-	}
+	sl_bool isUdp() const;
 
-	SLIB_INLINE sl_bool isRaw() const
-	{
-		return m_type == socketType_Raw || m_type == socketType_RawIPv6;
-	}
+	sl_bool isRaw() const;
 
-	SLIB_INLINE sl_bool isPacket() const
-	{
-		return m_type == socketType_PacketRaw || m_type == socketType_PacketDatagram;
-	}
+	sl_bool isPacket() const;
 
-	SLIB_INLINE sl_bool isIPv4() const
-	{
-		return m_type == socketType_Tcp || m_type == socketType_Udp || m_type == socketType_Raw;
-	}
+	sl_bool isIPv4() const;
 
-	SLIB_INLINE sl_bool isIPv6() const
-	{
-		return m_type == socketType_TcpIPv6 || m_type == socketType_UdpIPv6 || m_type == socketType_RawIPv6;
-	}
+	sl_bool isIPv6() const;
 
-	SLIB_INLINE sl_uint32 getLastError() const
-	{
-		return m_lastError;
-	}
+	SocketError getLastError() const;
 
-public:
 	sl_bool shutdown(SocketShutdownMode shutMode);
 	
 	sl_bool bind(const SocketAddress& addr);
@@ -259,7 +183,6 @@ public:
 	
 	sl_int32 receivePacket(const void* buf, sl_uint32 size, L2PacketInfo& info);
 
-public:
 	sl_bool setNonBlockingMode(sl_bool flagEnable);
 	
 	sl_bool setPromiscuousMode(const String& deviceName, sl_bool flagEnable);
@@ -267,58 +190,46 @@ public:
 	sl_bool getLocalAddress(SocketAddress& _out);
 	
 	sl_bool getRemoteAddress(SocketAddress& _out);
-
 	
 	sl_uint32 getOption_Error() const;
 
-	
 	sl_bool setOption_Broadcast(sl_bool flagEnable);
 	
 	sl_bool getOption_Broadcast() const;
 
-	
 	sl_bool setOption_ReuseAddress(sl_bool flagEnable);
 	
 	sl_bool getOption_ReuseAddress() const;
 
-	
 	sl_bool setOption_SendBufferSize(sl_uint32 size);
 	
 	sl_uint32 getOption_SendBufferSize() const;
 
-	
 	sl_bool setOption_ReceiveBufferSize(sl_uint32 size);
 	
 	sl_uint32 getOption_ReceiveBufferSize() const;
 
-	
 	sl_bool setOption_SendTimeout(sl_uint32 size); // write-only
 
 	sl_bool setOption_ReceiveTimeout(sl_uint32 size); // write-only
 
-	
 	sl_bool setOption_IPv6Only(sl_bool flagEnable);
 	
 	sl_bool getOption_IPv6Only() const;
 
-	
 	sl_bool setOption_TcpNoDelay(sl_bool flagEnable);
 	
 	sl_bool getOption_TcpNoDelay() const;
-
 	
 	sl_bool setOption_IpTTL(sl_uint32 ttl); // max - 255
 	
 	sl_uint32 getOption_IpTTL() const;
-
 	
 	sl_bool getOption_IsListening() const; // read-only
 
-	
 	sl_bool setOption_IncludeIpHeader(sl_bool flagEnable);
 	
 	sl_bool getOption_IncludeIpHeader() const;
-	
 	
 	sl_bool setOption_bindToDevice(const String& ifname);
 
@@ -338,23 +249,16 @@ public:
 
 	static void initializeSocket();
 
-public:
-	static String getErrorMessage(sl_uint32 error);
+	static String getErrorMessage(SocketError error);
 	
-	SLIB_INLINE void clearError()
-	{
-		_setError(socketError_None);
-	}
+	void clearError();
 
-	SLIB_INLINE sl_bool isListening() const
-	{
-		return getOption_IsListening();
-	}
+	sl_bool isListening() const;
 
 private:
-	sl_uint32 _setError(sl_uint32 code);
+	SocketError _setError(SocketError code);
 	void _setClosedError();
-	sl_uint32 _checkError();
+	SocketError _checkError();
 
 	sl_bool setOption(int level, int option, const void* buf, sl_uint32 bufSize);
 	sl_bool getOption(int level, int option, void* buf, sl_uint32 bufSize) const;
@@ -364,8 +268,10 @@ private:
 protected:
 	SocketType m_type;
 	sl_socket m_socket;
-	sl_uint32 m_lastError;
+	SocketError m_lastError;
+	
 };
+
 SLIB_NETWORK_NAMESPACE_END
 
 #endif

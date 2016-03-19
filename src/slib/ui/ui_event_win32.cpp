@@ -18,143 +18,143 @@ private:
 public:
 	_UI_Windows_KeyMapper()
 	{
-		map(keyTab, VK_TAB);
-		map(keyEnter, VK_RETURN);
-		map(keyEscape, VK_ESCAPE);
+		map(Keycode::Tab, VK_TAB);
+		map(Keycode::Enter, VK_RETURN);
+		map(Keycode::Escape, VK_ESCAPE);
 		
-		map(keySpace, VK_SPACE);
-		map(keyGrave, VK_OEM_3);
-		map(keyEqual, VK_OEM_PLUS);
-		map(keySemicolon, VK_OEM_1);
-		map(keyBackslash, VK_OEM_5);
-		map(keyLeftBaracket, VK_OEM_4);
-		map(keyRightBaracket, VK_OEM_6);
-		map(keyQuote, VK_OEM_7);
-		map(keyComma, VK_OEM_COMMA);
-		map(keyMinus, VK_OEM_MINUS);
-		map(keyPeriod, VK_OEM_PERIOD);
-		map(keyDivide, VK_OEM_2);
+		map(Keycode::Space, VK_SPACE);
+		map(Keycode::Grave, VK_OEM_3);
+		map(Keycode::Equal, VK_OEM_PLUS);
+		map(Keycode::Semicolon, VK_OEM_1);
+		map(Keycode::Backslash, VK_OEM_5);
+		map(Keycode::LeftBaracket, VK_OEM_4);
+		map(Keycode::RightBaracket, VK_OEM_6);
+		map(Keycode::Quote, VK_OEM_7);
+		map(Keycode::Comma, VK_OEM_COMMA);
+		map(Keycode::Minus, VK_OEM_MINUS);
+		map(Keycode::Period, VK_OEM_PERIOD);
+		map(Keycode::Divide, VK_OEM_2);
 		
-		map(key0, '0');
-		map(key1, '1');
-		map(key2, '2');
-		map(key3, '3');
-		map(key4, '4');
-		map(key5, '5');
-		map(key6, '6');
-		map(key7, '7');
-		map(key8, '8');
-		map(key9, '9');
+		map(Keycode::Num0, '0');
+		map(Keycode::Num1, '1');
+		map(Keycode::Num2, '2');
+		map(Keycode::Num3, '3');
+		map(Keycode::Num4, '4');
+		map(Keycode::Num5, '5');
+		map(Keycode::Num6, '6');
+		map(Keycode::Num7, '7');
+		map(Keycode::Num8, '8');
+		map(Keycode::Num9, '9');
 		
-		map(keyA, 'A');
-		map(keyB, 'B');
-		map(keyC, 'C');
-		map(keyD, 'D');
-		map(keyE, 'E');
-		map(keyF, 'F');
-		map(keyG, 'G');
-		map(keyH, 'H');
-		map(keyI, 'I');
-		map(keyJ, 'J');
-		map(keyK, 'K');
-		map(keyL, 'L');
-		map(keyM, 'M');
-		map(keyN, 'N');
-		map(keyO, 'O');
-		map(keyP, 'P');
-		map(keyQ, 'Q');
-		map(keyR, 'R');
-		map(keyS, 'S');
-		map(keyT, 'T');
-		map(keyU, 'U');
-		map(keyV, 'V');
-		map(keyW, 'W');
-		map(keyX, 'X');
-		map(keyY, 'Y');
-		map(keyZ, 'Z');
+		map(Keycode::A, 'A');
+		map(Keycode::B, 'B');
+		map(Keycode::C, 'C');
+		map(Keycode::D, 'D');
+		map(Keycode::E, 'E');
+		map(Keycode::F, 'F');
+		map(Keycode::G, 'G');
+		map(Keycode::H, 'H');
+		map(Keycode::I, 'I');
+		map(Keycode::J, 'J');
+		map(Keycode::K, 'K');
+		map(Keycode::L, 'L');
+		map(Keycode::M, 'M');
+		map(Keycode::N, 'N');
+		map(Keycode::O, 'O');
+		map(Keycode::P, 'P');
+		map(Keycode::Q, 'Q');
+		map(Keycode::R, 'R');
+		map(Keycode::S, 'S');
+		map(Keycode::T, 'T');
+		map(Keycode::U, 'U');
+		map(Keycode::V, 'V');
+		map(Keycode::W, 'W');
+		map(Keycode::X, 'X');
+		map(Keycode::Y, 'Y');
+		map(Keycode::Z, 'Z');
 		
-		map(keyNumpad0, VK_NUMPAD0);
-		map(keyNumpad1, VK_NUMPAD1);
-		map(keyNumpad2, VK_NUMPAD2);
-		map(keyNumpad3, VK_NUMPAD3);
-		map(keyNumpad4, VK_NUMPAD4);
-		map(keyNumpad5, VK_NUMPAD5);
-		map(keyNumpad6, VK_NUMPAD6);
-		map(keyNumpad7, VK_NUMPAD7);
-		map(keyNumpad8, VK_NUMPAD8);
-		map(keyNumpad9, VK_NUMPAD9);
+		map(Keycode::Numpad0, VK_NUMPAD0);
+		map(Keycode::Numpad1, VK_NUMPAD1);
+		map(Keycode::Numpad2, VK_NUMPAD2);
+		map(Keycode::Numpad3, VK_NUMPAD3);
+		map(Keycode::Numpad4, VK_NUMPAD4);
+		map(Keycode::Numpad5, VK_NUMPAD5);
+		map(Keycode::Numpad6, VK_NUMPAD6);
+		map(Keycode::Numpad7, VK_NUMPAD7);
+		map(Keycode::Numpad8, VK_NUMPAD8);
+		map(Keycode::Numpad9, VK_NUMPAD9);
 		
-		map(keyNumpadDivide, VK_DIVIDE);
-		map(keyNumpadMultiply, VK_MULTIPLY);
-		map(keyNumpadMinus, VK_SUBTRACT);
-		map(keyNumpadPlus, VK_ADD);
-		mapKeyToVK.put(keyNumpadEnter, VK_RETURN);
-		map(keyNumpadDecimal, VK_DECIMAL);
+		map(Keycode::NumpadDivide, VK_DIVIDE);
+		map(Keycode::NumpadMultiply, VK_MULTIPLY);
+		map(Keycode::NumpadMinus, VK_SUBTRACT);
+		map(Keycode::NumpadPlus, VK_ADD);
+		mapKeyToVK.put((int)Keycode::NumpadEnter, VK_RETURN);
+		map(Keycode::NumpadDecimal, VK_DECIMAL);
 		
-		map(keyF1, VK_F1);
-		map(keyF2, VK_F2);
-		map(keyF3, VK_F3);
-		map(keyF4, VK_F4);
-		map(keyF5, VK_F5);
-		map(keyF6, VK_F6);
-		map(keyF7, VK_F7);
-		map(keyF8, VK_F8);
-		map(keyF9, VK_F9);
-		map(keyF10, VK_F10);
-		map(keyF11, VK_F11);
-		map(keyF12, VK_F12);
+		map(Keycode::F1, VK_F1);
+		map(Keycode::F2, VK_F2);
+		map(Keycode::F3, VK_F3);
+		map(Keycode::F4, VK_F4);
+		map(Keycode::F5, VK_F5);
+		map(Keycode::F6, VK_F6);
+		map(Keycode::F7, VK_F7);
+		map(Keycode::F8, VK_F8);
+		map(Keycode::F9, VK_F9);
+		map(Keycode::F10, VK_F10);
+		map(Keycode::F11, VK_F11);
+		map(Keycode::F12, VK_F12);
 		
-		map(keyBackspace, VK_BACK);
-		map(keyPageUp, VK_PRIOR);
-		map(keyPageDown, VK_NEXT);
-		map(keyHome, VK_HOME);
-		map(keyEnd, VK_END);
-		map(keyLeft, VK_LEFT);
-		map(keyUp, VK_UP);
-		map(keyRight, VK_RIGHT);
-		map(keyDown, VK_DOWN);
-		map(keyPrintScreen, VK_SNAPSHOT);
-		map(keyInsert, VK_INSERT);
-		map(keyDelete, VK_DELETE);
-		map(keySleep, VK_SLEEP);
-		map(keyPause, VK_PAUSE);
+		map(Keycode::Backspace, VK_BACK);
+		map(Keycode::PageUp, VK_PRIOR);
+		map(Keycode::PageDown, VK_NEXT);
+		map(Keycode::Home, VK_HOME);
+		map(Keycode::End, VK_END);
+		map(Keycode::Left, VK_LEFT);
+		map(Keycode::Up, VK_UP);
+		map(Keycode::Right, VK_RIGHT);
+		map(Keycode::Down, VK_DOWN);
+		map(Keycode::PrintScreen, VK_SNAPSHOT);
+		map(Keycode::Insert, VK_INSERT);
+		map(Keycode::Delete, VK_DELETE);
+		map(Keycode::Sleep, VK_SLEEP);
+		map(Keycode::Pause, VK_PAUSE);
 		
-		map(keyGoHome, -1);
-		map(keyGoMenu, -1);
-		map(keyGoBack, -1);
-		map(keyCamera, -1);
-		map(keyVolumeMute, VK_VOLUME_MUTE);
-		map(keyVolumeDown, VK_VOLUME_DOWN);
-		map(keyVolumeUp, VK_VOLUME_UP);
-		map(keyMediaPrev, VK_MEDIA_PREV_TRACK);
-		map(keyMediaNext, VK_MEDIA_NEXT_TRACK);
-		map(keyMediaPause, VK_MEDIA_PLAY_PAUSE);
-		map(keyMediaStop, VK_MEDIA_STOP);
-		map(keyPhoneStar, -1);
-		map(keyPhonePound, -1);
+		map(Keycode::GoHome, -1);
+		map(Keycode::GoMenu, -1);
+		map(Keycode::GoBack, -1);
+		map(Keycode::Camera, -1);
+		map(Keycode::VolumeMute, VK_VOLUME_MUTE);
+		map(Keycode::VolumeDown, VK_VOLUME_DOWN);
+		map(Keycode::VolumeUp, VK_VOLUME_UP);
+		map(Keycode::MediaPrev, VK_MEDIA_PREV_TRACK);
+		map(Keycode::MediaNext, VK_MEDIA_NEXT_TRACK);
+		map(Keycode::MediaPause, VK_MEDIA_PLAY_PAUSE);
+		map(Keycode::MediaStop, VK_MEDIA_STOP);
+		map(Keycode::PhoneStar, -1);
+		map(Keycode::PhonePound, -1);
 		
-		map(keyLeftShift, VK_LSHIFT);
-		map(keyRightShift, VK_RSHIFT);
-		map(keyLeftControl, VK_LCONTROL);
-		map(keyRightControl, VK_RCONTROL);
-		map(keyLeftAlt, VK_LMENU);
-		map(keyRightAlt, VK_RMENU);
-		map(keyLeftWin, VK_LWIN);
-		map(keyRightWin, VK_RWIN);
-		map(keyCapsLock, VK_CAPITAL);
-		map(keyScrollLock, VK_SCROLL);
-		map(keyNumLock, VK_NUMLOCK);
-		map(keyContextMenu, VK_APPS);
+		map(Keycode::LeftShift, VK_LSHIFT);
+		map(Keycode::RightShift, VK_RSHIFT);
+		map(Keycode::LeftControl, VK_LCONTROL);
+		map(Keycode::RightControl, VK_RCONTROL);
+		map(Keycode::LeftAlt, VK_LMENU);
+		map(Keycode::RightAlt, VK_RMENU);
+		map(Keycode::LeftWin, VK_LWIN);
+		map(Keycode::RightWin, VK_RWIN);
+		map(Keycode::CapsLock, VK_CAPITAL);
+		map(Keycode::ScrollLock, VK_SCROLL);
+		map(Keycode::NumLock, VK_NUMLOCK);
+		map(Keycode::ContextMenu, VK_APPS);
 	}
 	
 public:
-	void map(sl_uint32 key, sl_uint32 vk)
+	void map(Keycode key, sl_uint32 vk)
 	{
 		if (vk == -1) {
 			return;
 		}
-		mapKeyToVK.put(key, vk);
-		mapVKToKey.put(vk, key);
+		mapKeyToVK.put((int)key, vk);
+		mapVKToKey.put(vk, (int)key);
 	}
 	
 	Keycode vkToKey(sl_uint32 vk)
@@ -163,14 +163,14 @@ public:
 		if (mapVKToKey.get(vk, &ret)) {
 			return (Keycode)ret;
 		} else {
-			return keyUnknown;
+			return Keycode::Unknown;
 		}
 	}
 	
 	sl_uint32 keyToVk(Keycode code)
 	{
 		sl_uint32 ret;
-		if (mapKeyToVK.get(code, &ret)) {
+		if (mapKeyToVK.get((int)code, &ret)) {
 			return ret;
 		} else {
 			return -1;

@@ -32,7 +32,7 @@ Ref<ViewInstance> CheckBox::createInstance(ViewInstance* parent)
 {
 	String16 text = m_text;
 	UINT style = BS_AUTOCHECKBOX | WS_TABSTOP;
-	Ref<_Win32_CheckBoxViewInstance> ret = Win32_ViewInstance::create<_Win32_CheckBoxViewInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getBuf()), style, 0);
+	Ref<_Win32_CheckBoxViewInstance> ret = Win32_ViewInstance::create<_Win32_CheckBoxViewInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
 	if (ret.isNotNull()) {
 		HWND handle = ret->getHandle();
 		if (m_flagChecked) {
@@ -42,7 +42,7 @@ Ref<ViewInstance> CheckBox::createInstance(ViewInstance* parent)
 		}
 		Ref<Font> font = m_font;
 		Ref<FontInstance> fontInstance;
-		HFONT hFont = UIPlatform::getGdiFont(font.get(), fontInstance);
+		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
@@ -74,7 +74,7 @@ void CheckBox::setFont(const Ref<Font>& font)
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		HFONT hFont = UIPlatform::getGdiFont(font.get(), fontInstance);
+		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}

@@ -13,7 +13,8 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class _Quartz_Canvas : public Canvas
 {
-	SLIB_DECLARE_OBJECT(_Quartz_Canvas, Canvas)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	CGContextRef m_graphics;
 	sl_real m_width;
@@ -106,7 +107,7 @@ public:
 	{
 		if (path.isNotNull()) {
 			Ref<GraphicsPathInstance> instance;
-			CGPathRef handle = UIPlatform::getGraphicsPath(path.get(), instance);
+			CGPathRef handle = UIPlatform::getGraphicsPath(path.ptr, instance);
 			if (handle) {
 				_clipToPath(handle, path->getFillMode());				
 			}
@@ -117,7 +118,7 @@ public:
 	{
 		CGContextBeginPath(m_graphics);
 		CGContextAddPath(m_graphics, path);
-		if (fillMode != fillMode_Winding) {
+		if (fillMode != FillMode::Winding) {
 			CGContextEOClip(m_graphics);
 		} else {
 			CGContextClip(m_graphics);
@@ -165,7 +166,7 @@ public:
 			if (_font.isNotNull()) {
 				
 				Ref<FontInstance> fontInstance;
-				CTFontRef font = UIPlatform::getCoreTextFont(_font.get(), fontInstance);
+				CTFontRef font = UIPlatform::getCoreTextFont(_font.ptr, fontInstance);
 				
 				if (font) {
 					
@@ -229,7 +230,7 @@ public:
 			CGContextBeginPath(m_graphics);
 			CGContextMoveToPoint(m_graphics, pt1.x, pt1.y);
 			CGContextAddLineToPoint(m_graphics, pt2.x, pt2.y);
-			_applyPen(pen.get());
+			_applyPen(pen.ptr);
 			CGContextStrokePath(m_graphics);
 		}
 	}
@@ -250,7 +251,7 @@ public:
 			for (sl_uint32 i = 1; i < countPoints; i++) {
 				CGContextAddLineToPoint(m_graphics, points[i].x, points[i].y);
 			}
-			_applyPen(pen.get());
+			_applyPen(pen.ptr);
 			CGContextStrokePath(m_graphics);
 		}
 	}
@@ -274,7 +275,7 @@ public:
 		rect.size.width = _rect.getWidth();
 		rect.size.height = _rect.getHeight();
 		if (brush.isNotNull()) {
-			_applyBrush(brush.get());
+			_applyBrush(brush.ptr);
 			CGContextFillRect(m_graphics, rect);
 		}
 		Ref<Pen> pen = _pen;
@@ -282,7 +283,7 @@ public:
 			pen = Pen::getDefault();
 		}
 		if (pen.isNotNull()) {
-			_applyPen(pen.get());
+			_applyPen(pen.ptr);
 			rect.origin.y++;
 			CGContextStrokeRect(m_graphics, rect);
 		}
@@ -307,7 +308,7 @@ public:
 		rect.size.width = _rect.getWidth();
 		rect.size.height = _rect.getHeight();
 		if (brush.isNotNull()) {
-			_applyBrush(brush.get());
+			_applyBrush(brush.ptr);
 			CGContextFillEllipseInRect(m_graphics, rect);
 		}
 		Ref<Pen> pen = _pen;
@@ -315,7 +316,7 @@ public:
 			pen = Pen::getDefault();
 		}
 		if (pen.isNotNull()) {
-			_applyPen(pen.get());
+			_applyPen(pen.ptr);
 			CGContextStrokeEllipseInRect(m_graphics, rect);
 		}
 	}
@@ -353,7 +354,7 @@ public:
 	{
 		if (path.isNotNull()) {
 			Ref<GraphicsPathInstance> instance;
-			CGPathRef handle = UIPlatform::getGraphicsPath(path.get(), instance);
+			CGPathRef handle = UIPlatform::getGraphicsPath(path.ptr, instance);
 			if (handle) {
 				_drawPath(handle, _pen, brush, path->getFillMode());
 			}
@@ -363,14 +364,14 @@ public:
 	void _drawPath(CGPathRef path, const Ref<Pen>& _pen, const Ref<Brush>& brush, FillMode fillMode)
 	{
 		if (brush.isNotNull()) {
-			_applyBrush(brush.get());
+			_applyBrush(brush.ptr);
 			CGContextBeginPath(m_graphics);
 			CGContextAddPath(m_graphics, path);
 			switch (fillMode) {
-				case fillMode_Winding:
+				case FillMode::Winding:
 					CGContextFillPath(m_graphics);
 					break;
-				case fillMode_Alternate:
+				case FillMode::Alternate:
 				default:
 					CGContextEOFillPath(m_graphics);
 					break;
@@ -381,7 +382,7 @@ public:
 			pen = Pen::getDefault();
 		}
 		if (pen.isNotNull()) {
-			_applyPen(pen.get());
+			_applyPen(pen.ptr);
 			CGContextBeginPath(m_graphics);
 			CGContextAddPath(m_graphics, path);
 			CGContextStrokePath(m_graphics);
@@ -402,13 +403,13 @@ public:
 		_width = pen->getWidth();
 		
 		switch (pen->getCap()) {
-			case lineCap_Square:
+			case LineCap::Square:
 				_cap = kCGLineCapSquare;
 				break;
-			case lineCap_Round:
+			case LineCap::Round:
 				_cap = kCGLineCapRound;
 				break;
-			case lineCap_Flat:
+			case LineCap::Flat:
 			default:
 				_cap = kCGLineCapButt;
 				break;
@@ -416,13 +417,13 @@ public:
 		
 		switch (pen->getJoin()) {
 				break;
-			case lineJoin_Bevel:
+			case LineJoin::Bevel:
 				_join = kCGLineJoinBevel;
 				break;
-			case lineJoin_Round:
+			case LineJoin::Round:
 				_join = kCGLineJoinRound;
 				break;
-			case lineJoin_Miter:
+			case LineJoin::Miter:
 			default:
 				_join = kCGLineJoinMiter;
 				break;
@@ -436,23 +437,23 @@ public:
 		CGFloat dashStyleDashDot[] = {3*W, 2*W, W, 2*W};
 		CGFloat dashStyleDashDotDot[] = {3*W, 2*W, W, 2*W, W, 2*W};
 		switch (pen->getStyle()) {
-			case penStyle_Dot:
+			case PenStyle::Dot:
 				_dash = dashStyleDot;
 				_dashLen = sizeof(dashStyleDot) / sizeof(CGFloat);
 				break;
-			case penStyle_Dash:
+			case PenStyle::Dash:
 				_dash = dashStyleDash;
 				_dashLen = sizeof(dashStyleDash) / sizeof(CGFloat);
 				break;
-			case penStyle_DashDot:
+			case PenStyle::DashDot:
 				_dash = dashStyleDashDot;
 				_dashLen = sizeof(dashStyleDashDot) / sizeof(CGFloat);
 				break;
-			case penStyle_DashDotDot:
+			case PenStyle::DashDotDot:
 				_dash = dashStyleDashDotDot;
 				_dashLen = sizeof(dashStyleDashDotDot) / sizeof(CGFloat);
 				break;
-			case penStyle_Solid:
+			case PenStyle::Solid:
 			default:
 				_dash = 0;
 				_dashLen = 0;
@@ -476,6 +477,8 @@ public:
 		CGContextSetRGBFillColor(graphics, _color.getRedF(), _color.getGreenF(), _color.getBlueF(), _color.getAlphaF());
 	}
 };
+
+SLIB_DEFINE_OBJECT(_Quartz_Canvas, Canvas)
 
 Ref<Canvas> UIPlatform::createCanvas(CGContextRef graphics, sl_uint32 width, sl_uint32 height, const Rectangle* rectDirty)
 {

@@ -5,6 +5,7 @@
 #include "media/audio_data.h"
 #include "media/audio_player.h"
 #include "media/audio_recorder.h"
+#include "media/audio_util.h"
 
 #include "media/video_frame.h"
 #include "media/video_capture.h"

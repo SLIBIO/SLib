@@ -16,7 +16,7 @@ SLIB_MEDIA_NAMESPACE_BEGIN
 
 VP8EncoderParam::VP8EncoderParam()
 {
-	bitrateMode = vpxBitrateMode_Constant;
+	bitrateMode = VPXBitrateMode::Constant;
 	width = height = 192;
 	framesPerSecond = 25;
 	bitrate = 150;
@@ -71,13 +71,13 @@ public:
 	static vpx_rc_mode _getBitrateControlMode(VPXBitrateMode mode)
 	{
 		switch (mode) {
-			case vpxBitrateMode_Variable:
+			case VPXBitrateMode::Variable:
 				return VPX_VBR;
-			case vpxBitrateMode_Constant:
+			case VPXBitrateMode::Constant:
 				return VPX_CBR;
-			case vpxBitrateMode_ConstrainedQuality:
+			case VPXBitrateMode::ConstrainedQuality:
 				return VPX_CQ;
-			case vpxBitrateMode_ConstantQuality:
+			case VPXBitrateMode::ConstantQuality:
 				return VPX_Q;
 		}
 		return VPX_CBR;
@@ -146,7 +146,7 @@ public:
 			BitmapData dst;
 			dst.width = m_codec_image->w;
 			dst.height = m_codec_image->h;
-			dst.format = bitmapFormat_YUV_I420;
+			dst.format = BitmapFormat::YUV_I420;
 			dst.data = m_codec_image->planes[0];
 			dst.pitch = m_codec_image->stride[0];
 			dst.data1 = m_codec_image->planes[1];
@@ -289,7 +289,7 @@ public:
 				BitmapData src;
 				src.width = image->w;
 				src.height = image->h;
-				src.format = bitmapFormat_YUV_I420;
+				src.format = BitmapFormat::YUV_I420;
 				src.data = image->planes[0];
 				src.pitch = image->stride[0];
 				src.data1 = image->planes[1];

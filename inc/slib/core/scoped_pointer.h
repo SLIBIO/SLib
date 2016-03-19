@@ -7,254 +7,302 @@
 
 SLIB_NAMESPACE_BEGIN
 
-template <class TYPE>
+template <class T>
 class SLIB_EXPORT ScopedPtr
 {
 public:
-	SLIB_INLINE ScopedPtr()
-	{
-		m_ptr = sl_null;
-	}
-
-	SLIB_INLINE ScopedPtr(TYPE* ptr)
-	{
-		m_ptr = ptr;
-	}
-
-	SLIB_INLINE ~ScopedPtr()
-	{
-		release();
-	}
+	T* ptr;
 
 public:
-	SLIB_INLINE void release()
-	{
-		if (m_ptr) {
-			delete m_ptr;
-			m_ptr = sl_null;
-		}
-	}
+	ScopedPtr();
 
-	SLIB_INLINE sl_bool isNull()
-	{
-		return (m_ptr == sl_null);
-	}
+	ScopedPtr(T* ptr);
 
-	SLIB_INLINE sl_bool isNotNull()
-	{
-		return (m_ptr != sl_null);
-	}
+	~ScopedPtr();
 
-	SLIB_INLINE TYPE* getValue()
-	{
-		return m_ptr;
-	}
+public:
+	void release();
 
-	SLIB_INLINE void setValue(TYPE* ptr)
-	{
-		release();
-		m_ptr = ptr;
-	}
+	sl_bool isNull();
 
-	SLIB_INLINE void setNull()
-	{
-		m_ptr = sl_null;
-	}
+	sl_bool isNotNull();
 
-	SLIB_INLINE TYPE& operator*()
-	{
-		return *(m_ptr);
-	}
+	void setNull();
 
-	SLIB_INLINE TYPE* operator->()
-	{
-		return (m_ptr);
-	}
-	
-protected:
-	TYPE* m_ptr;
+	T& operator*();
+
+	T* operator->();
 	
 };
 
-template <class TYPE>
-class SLIB_EXPORT ScopedPtrNew : public ScopedPtr<TYPE>
+template <class T>
+class SLIB_EXPORT ScopedPtrNew : public ScopedPtr<T>
 {
 public:
-	SLIB_INLINE ScopedPtrNew() : ScopedPtr<TYPE>(new TYPE)
-	{
-	}
+	ScopedPtrNew();
 	
 public:
-	SLIB_INLINE TYPE& operator*()
-	{
-		return *(this->m_ptr);
-	}
+	T& operator*();
 	
-	SLIB_INLINE TYPE* operator->()
-	{
-		return (this->m_ptr);
-	}
+	T* operator->();
 
 };
 
-template <class TYPE>
+template <class T>
 class SLIB_EXPORT ScopedArray
 {
 public:
-	SLIB_INLINE ScopedArray()
-	{
-		m_ptr = sl_null;
-		m_size = 0;
-	}
-
-	SLIB_INLINE ScopedArray(TYPE* ptr, sl_size size)
-	{
-		m_ptr = ptr;
-		m_size = size;
-	}
-	
-	SLIB_INLINE ScopedArray(sl_size size)
-	{
-		m_ptr = new TYPE[size];
-		m_size = size;
-	}
-
-	SLIB_INLINE ~ScopedArray()
-	{
-		release();
-	}
+	T* data;
+	sl_size count;
 
 public:
-	SLIB_INLINE void release()
-	{
-		if (m_ptr) {
-			delete[] m_ptr;
-			m_ptr = sl_null;
-		}
-	}
-
-	SLIB_INLINE sl_bool isNull()
-	{
-		return (m_ptr == sl_null);
-	}
-
-	SLIB_INLINE sl_bool isNotNull()
-	{
-		return (m_ptr != sl_null);
-	}
-
-	SLIB_INLINE TYPE* getBuffer()
-	{
-		return m_ptr;
-	}
+	ScopedArray();
 	
-	SLIB_INLINE sl_size getSize()
-	{
-		return m_size;
-	}
-
-	SLIB_INLINE void setBuffer(TYPE* ptr, sl_size size)
-	{
-		m_ptr = ptr;
-		m_size = size;
-	}
-
-	SLIB_INLINE void setNull()
-	{
-		m_ptr = sl_null;
-	}
-
-	SLIB_INLINE TYPE& operator[](sl_size index)
-	{
-		return m_ptr[index];
-	}
+	ScopedArray(T* data, sl_size count);
 	
-	SLIB_INLINE TYPE* operator+(sl_size offset)
-	{
-		return getBuffer() + offset;
-	}
-	
-protected:
-	TYPE* m_ptr;
-	sl_size m_size;
+	ScopedArray(sl_size count);
 
+	~ScopedArray();
+
+public:
+	void release();
+
+	sl_bool isNull();
+
+	sl_bool isNotNull();
+
+	void setNull();
+
+	T& operator[](sl_size index);
+	
+	T* operator+(sl_size offset);
+	
 };
 
-#define SLIB_SCOPED_ARRAY(TYPE, NAME, SIZE) \
-	ScopedArray<TYPE> _scoped_array__##NAME(SIZE); \
-	TYPE* NAME = _scoped_array__##NAME.getBuffer();
+#define SLIB_SCOPED_ARRAY(TYPE, NAME, COUNT) \
+	ScopedArray<TYPE> _scoped_array__##NAME(COUNT); \
+	TYPE* NAME = _scoped_array__##NAME.data;
 
 
-template <class TYPE, sl_size sizeStack = 0>
+template <class T, sl_size countStack = 0>
 class SLIB_EXPORT ScopedBuffer
 {
 public:
-	SLIB_INLINE ScopedBuffer(sl_size size)
-	{
-		if (size < sizeStack) {
-			m_ptr = m_stack;
-		} else {
-			m_ptr = new TYPE[size];
-		}
-		m_size = size;
-	}
-
-	SLIB_INLINE ~ScopedBuffer()
-	{
-		release();
-	}
+	T* data;
+	sl_size count;
+private:
+	T stack[countStack];
 
 public:
-	SLIB_INLINE void release()
-	{
-		if (m_ptr) {
-			if (m_ptr != m_stack) {
-				delete[] m_ptr;
-			}
-			m_ptr = sl_null;
-		}
-	}
+	ScopedBuffer(sl_size _count);
 
-	SLIB_INLINE sl_bool isNull()
-	{
-		return (m_ptr == sl_null);
-	}
+	~ScopedBuffer();
 
-	SLIB_INLINE sl_bool isNotNull()
-	{
-		return (m_ptr != sl_null);
-	}
+public:
+	void release();
 
-	SLIB_INLINE TYPE* getBuffer()
-	{
-		return m_ptr;
-	}
+	sl_bool isNull();
 
-	SLIB_INLINE sl_size getSize()
-	{
-		return m_size;
-	}
-
-	SLIB_INLINE TYPE& operator[](sl_size index)
-	{
-		return m_ptr[index];
-	}
-
-	SLIB_INLINE TYPE* operator+(sl_size offset)
-	{
-		return getBuffer() + offset;
-	}
+	sl_bool isNotNull();
 	
-protected:
-	TYPE* m_ptr;
-	TYPE m_stack[sizeStack];
-	sl_size m_size;
-	
+	T& operator[](sl_size index);
+
+	T* operator+(sl_size offset);
+
 };
 
-#define SLIB_SCOPED_BUFFER(TYPE, STACK, NAME, SIZE) \
-	ScopedBuffer<TYPE, STACK> _scoped_buf__##NAME(SIZE); \
-	TYPE* NAME = _scoped_buf__##NAME.getBuffer();
+#define SLIB_SCOPED_BUFFER(TYPE, STACK, NAME, COUNT) \
+	ScopedBuffer<TYPE, STACK> _scoped_buf__##NAME(COUNT); \
+	TYPE* NAME = _scoped_buf__##NAME.data;
+
+
+SLIB_NAMESPACE_END
+
+
+SLIB_NAMESPACE_BEGIN
+
+template <class T>
+SLIB_INLINE ScopedPtr<T>::ScopedPtr() : ptr(sl_null)
+{
+}
+
+template <class T>
+SLIB_INLINE ScopedPtr<T>::ScopedPtr(T* _ptr) : ptr(_ptr)
+{
+}
+
+template <class T>
+SLIB_INLINE ScopedPtr<T>::~ScopedPtr()
+{
+	release();
+}
+
+template <class T>
+SLIB_INLINE void ScopedPtr<T>::release()
+{
+	if (ptr) {
+		delete ptr;
+		ptr = sl_null;
+	}
+}
+
+template <class T>
+SLIB_INLINE sl_bool ScopedPtr<T>::isNull()
+{
+	return ptr == sl_null;
+}
+
+template <class T>
+SLIB_INLINE sl_bool ScopedPtr<T>::isNotNull()
+{
+	return ptr != sl_null;
+}
+
+template <class T>
+SLIB_INLINE T& ScopedPtr<T>::operator*()
+{
+	return *(ptr);
+}
+
+template <class T>
+SLIB_INLINE T* ScopedPtr<T>::operator->()
+{
+	return ptr;
+}
+
+
+template <class T>
+SLIB_INLINE ScopedPtrNew<T>::ScopedPtrNew() : ScopedPtr<T>(new T)
+{
+}
+
+template <class T>
+SLIB_INLINE T& ScopedPtrNew<T>::operator*()
+{
+	return *(this->ptr);
+}
+
+template <class T>
+SLIB_INLINE T* ScopedPtrNew<T>::operator->()
+{
+	return this->ptr;
+}
+
+
+template <class T>
+SLIB_INLINE ScopedArray<T>::ScopedArray() : data(sl_null), count(0)
+{
+}
+
+template <class T>
+SLIB_INLINE ScopedArray<T>::ScopedArray(T* _data, sl_size _count) : data(_data), count(_count)
+{
+}
+
+template <class T>
+SLIB_INLINE ScopedArray<T>::ScopedArray(sl_size _count)
+{
+	data = new T[_count];
+	if (data) {
+		count = _count;
+	} else {
+		count = 0;
+	}
+}
+
+template <class T>
+SLIB_INLINE ScopedArray<T>::~ScopedArray()
+{
+	release();
+}
+
+template <class T>
+SLIB_INLINE void ScopedArray<T>::release()
+{
+	if (data) {
+		delete[] data;
+		data = sl_null;
+	}
+	count = 0;
+}
+
+template <class T>
+SLIB_INLINE sl_bool ScopedArray<T>::isNull()
+{
+	return data == sl_null;
+}
+
+template <class T>
+SLIB_INLINE sl_bool ScopedArray<T>::isNotNull()
+{
+	return data != sl_null;
+}
+
+template <class T>
+SLIB_INLINE T& ScopedArray<T>::operator[](sl_size index)
+{
+	return data[index];
+}
+
+template <class T>
+SLIB_INLINE T* ScopedArray<T>::operator+(sl_size offset)
+{
+	return data + offset;
+}
+
+
+template <class T, sl_size countStack>
+SLIB_INLINE ScopedBuffer<T, countStack>::ScopedBuffer(sl_size _count)
+{
+	if (_count < countStack) {
+		data = stack;
+	} else {
+		data = new T[_count];
+	}
+	count = _count;
+}
+
+template <class T, sl_size countStack>
+SLIB_INLINE ScopedBuffer<T, countStack>::~ScopedBuffer()
+{
+	release();
+}
+
+template <class T, sl_size countStack>
+SLIB_INLINE void ScopedBuffer<T, countStack>::release()
+{
+	if (data) {
+		if (data != stack) {
+			delete[] data;
+		}
+		data = sl_null;
+	}
+	count = 0;
+}
+
+template <class T, sl_size countStack>
+SLIB_INLINE sl_bool ScopedBuffer<T, countStack>::isNull()
+{
+	return data == sl_null;
+}
+
+template <class T, sl_size countStack>
+SLIB_INLINE sl_bool ScopedBuffer<T, countStack>::isNotNull()
+{
+	return data != sl_null;
+}
+
+template <class T, sl_size countStack>
+SLIB_INLINE T& ScopedBuffer<T, countStack>::operator[](sl_size index)
+{
+	return data[index];
+}
+
+template <class T, sl_size countStack>
+SLIB_INLINE T* ScopedBuffer<T, countStack>::operator+(sl_size offset)
+{
+	return data + offset;
+}
 
 
 SLIB_NAMESPACE_END

@@ -1,4 +1,5 @@
 #include "../../../inc/slib/network/socket_address.h"
+
 #include "../../../inc/slib/core/setting.h"
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -18,7 +19,18 @@
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
-const SocketAddress::_SocketAddress SocketAddress::_none = { { ipAddressType_None, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }, 0 };
+const SocketAddress::_SocketAddress SocketAddress::_none = { { IPAddressType::None, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }, 0 };
+
+SocketAddress::SocketAddress(const String& str)
+{
+	parse(str);
+}
+
+void SocketAddress::setNone()
+{
+	ip.setNone();
+	port = 0;
+}
 
 int SocketAddress::compare(const SocketAddress& other) const
 {
@@ -109,7 +121,7 @@ sl_bool SocketAddress::parse(const String& s, SocketAddress* out)
 	if (n == 0) {
 		return sl_false;
 	}
-	return _SocketAddress_parse(out, s.getBuf(), 0, n) == n;
+	return _SocketAddress_parse(out, s.getData(), 0, n) == n;
 }
 
 sl_bool SocketAddress::parse(const String& s)
@@ -118,7 +130,7 @@ sl_bool SocketAddress::parse(const String& s)
 	if (n == 0) {
 		return sl_false;
 	}
-	return _SocketAddress_parse(this, s.getBuf(), 0, n) == n;
+	return _SocketAddress_parse(this, s.getData(), 0, n) == n;
 }
 
 sl_uint32 SocketAddress::getSystemSocketAddress(void* addr)
@@ -127,7 +139,7 @@ sl_uint32 SocketAddress::getSystemSocketAddress(void* addr)
 		sockaddr_in& out = *((sockaddr_in*)addr);
 		Base::resetMemory(&out, 0, sizeof(sockaddr_in));
 		out.sin_family = AF_INET;
-		out.sin_addr.s_addr = htonl(ip.getIPv4().toInt());
+		out.sin_addr.s_addr = htonl(ip.getIPv4().getInt());
 		out.sin_port = htons((sl_uint16)(port));
 		return sizeof(sockaddr_in);
 	} else if (ip.isIPv6()) {
@@ -137,7 +149,7 @@ sl_uint32 SocketAddress::getSystemSocketAddress(void* addr)
 		out.sin6_family = AF_INET6;
 		for (int i = 0; i < 8; i++) {
 			sl_uint16* w = (sl_uint16*)(&(out.sin6_addr));
-			w[i] = htons(ipv6.get(i));
+			w[i] = htons(ipv6.getElement(i));
 		}
 		out.sin6_port = htons((sl_uint16)(port));
 		return sizeof(sockaddr_in6);
@@ -161,7 +173,7 @@ sl_bool SocketAddress::setSystemSocketAddress(const void* _in, sl_uint32 size)
 			IPv6Address ipv6;
 			for (int i = 0; i < 8; i++) {
 				sl_uint16* w = (sl_uint16*)(&(addr.sin6_addr));
-				ipv6.set(i, ntohs(w[i]));
+				ipv6.setElement(i, ntohs(w[i]));
 			}
 			ip = ipv6;
 			port = ntohs(addr.sin6_port);
@@ -220,6 +232,34 @@ sl_bool SocketAddress::parseIPv4Range(const String& str, IPv4Address* _from, IPv
 sl_bool SocketAddress::parsePortRange(const String& str, sl_uint32* from, sl_uint32* to)
 {
 	return SettingUtil::parseUint32Range(str, from, to);
+}
+
+sl_bool SocketAddress::operator==(const SocketAddress& other) const
+{
+	return port == other.port && ip == other.ip;
+}
+
+sl_bool SocketAddress::operator!=(const SocketAddress& other) const
+{
+	return ! (*this == other);
+}
+
+template <>
+int Compare<SocketAddress>::compare(const SocketAddress& a, const SocketAddress& b)
+{
+	return a.compare(b);
+}
+
+template <>
+sl_bool Compare<SocketAddress>::equals(const SocketAddress& a, const SocketAddress& b)
+{
+	return a == b;
+}
+
+template <>
+sl_uint32 Hash<SocketAddress>::hash(const SocketAddress& a)
+{
+	return a.hashCode();
 }
 
 SLIB_NETWORK_NAMESPACE_END

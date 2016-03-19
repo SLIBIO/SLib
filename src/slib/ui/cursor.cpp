@@ -4,6 +4,8 @@
 
 SLIB_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(Cursor, Object)
+
 #if !defined(SLIB_PLATFORM_IS_WIN32) && !defined(SLIB_PLATFORM_IS_OSX)
 
 Ref<Cursor> Cursor::getArrow()

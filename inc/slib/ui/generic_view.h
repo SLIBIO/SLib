@@ -9,9 +9,11 @@
 #include "../core/callback.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class SLIB_EXPORT GenericViewWithEvent : public View
 {
-	SLIB_DECLARE_OBJECT(GenericViewWithEvent, View)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	GenericViewWithEvent();
 	
@@ -68,7 +70,8 @@ private:
 
 class SLIB_EXPORT GenericViewWithDrawing : public GenericViewWithEvent
 {
-	SLIB_DECLARE_OBJECT(GenericViewWithDrawing, GenericViewWithEvent)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	GenericViewWithDrawing();
 	
@@ -161,7 +164,8 @@ private:
 
 class SLIB_EXPORT GenericView : public GenericViewWithDrawing
 {
-	SLIB_DECLARE_OBJECT(GenericView, GenericViewWithDrawing)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	GenericView();
 	

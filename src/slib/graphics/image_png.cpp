@@ -25,9 +25,9 @@ Ref<Image> Image::loadFromPNG(const void* content, sl_size size)
 		if (size > 0) {
 			Memory mem = Memory::create(size);
 			if (mem.isNotEmpty()) {
-				png_bytep buffer = (png_bytep)(mem.getBuf());
+				png_bytep buffer = (png_bytep)(mem.getData());
 				if (png_image_finish_read(&image, NULL, buffer, (png_int_32)pitch, NULL)) {
-					ret = Image::createStatic(image.width, image.height, (Color*)buffer, image.width, mem.getObject());
+					ret = Image::createStatic(image.width, image.height, (Color*)buffer, image.width, mem.ref.ptr);
 				}
 			}
 		}
@@ -103,6 +103,11 @@ Memory Image::saveToPNG(const Ref<Image>& image)
 	return ret;
 }
 
+Memory Image::saveToPNG()
+{
+	return saveToPNG(this);
+}
+
 sl_bool Image::saveToPNG(String filePath, const Ref<Image>& image)
 {
 	if (image.isNull()) {
@@ -112,7 +117,7 @@ sl_bool Image::saveToPNG(String filePath, const Ref<Image>& image)
 	if (file.isNotNull()) {
 		Memory mem = saveToPNG(image);
 		if (mem.isNotEmpty()) {
-			if (file->write(mem.getBuf(), mem.getSize()) == mem.getSize()) {
+			if (file->write(mem.getData(), mem.getSize()) == mem.getSize()) {
 				return sl_true;
 			}
 		}
@@ -120,6 +125,11 @@ sl_bool Image::saveToPNG(String filePath, const Ref<Image>& image)
 		File::deleteFile(filePath);
 	}
 	return sl_false;
+}
+
+sl_bool Image::saveToPNG(String filePath)
+{
+	return saveToPNG(filePath, this);
 }
 
 SLIB_GRAPHICS_NAMESPACE_END

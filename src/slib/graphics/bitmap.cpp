@@ -1,8 +1,11 @@
 #include "../../../inc/slib/graphics/bitmap.h"
+
 #include "../../../inc/slib/graphics/context.h"
 #include "../../../inc/slib/graphics/image.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
+
+SLIB_DEFINE_OBJECT(Bitmap, Drawable)
 
 Bitmap::Bitmap()
 {

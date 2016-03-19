@@ -11,7 +11,8 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class SLIB_EXPORT RenderView : public GenericViewWithEvent
 {
-	SLIB_DECLARE_OBJECT(RenderView, GenericViewWithEvent)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	RenderView();
 	

@@ -44,6 +44,34 @@ void GL_BASE::clear(const RenderClearParam& param)
 	}
 }
 
+void GL_BASE::clearColor(const Color& color)
+{
+	RenderClearParam param;
+	param.flagColor = sl_true;
+	param.color = color;
+	param.flagDepth = sl_false;
+	clear(param);
+}
+
+void GL_BASE::clearColorDepth(const Color& color, float depth)
+{
+	RenderClearParam param;
+	param.flagColor = sl_true;
+	param.color = color;
+	param.flagDepth = sl_true;
+	param.depth = depth;
+	clear(param);
+}
+
+void GL_BASE::clearDepth(float depth)
+{
+	RenderClearParam param;
+	param.flagColor = sl_false;
+	param.flagDepth = sl_true;
+	param.depth = depth;
+	clear(param);
+}
+
 void GL_BASE::setDepthTest(sl_bool flag)
 {
 	if (flag) {
@@ -73,51 +101,51 @@ void GL_BASE::setCullFace(sl_bool flagEnableCull, sl_bool flagCullCCW)
 	}
 }
 
-static GLenum _GLES_getBlendingOp(sl_uint32 op)
+static GLenum _GL_getBlendingOp(RenderBlendingOperation op)
 {
 	switch (op) {
-		case renderBlendingOperation_Add:
+		case RenderBlendingOperation::Add:
 			return GL_FUNC_ADD;
-		case renderBlendingOperation_Subtract:
+		case RenderBlendingOperation::Subtract:
 			return GL_FUNC_SUBTRACT;
-		case renderBlendingOperation_ReverseSubtract:
+		case RenderBlendingOperation::ReverseSubtract:
 			return GL_FUNC_REVERSE_SUBTRACT;
 	}
 	return GL_FUNC_ADD;
 }
 
-static GLenum _GLES_getBlendingFactor(sl_uint32 factor)
+static GLenum _GL_getBlendingFactor(RenderBlendingFactor factor)
 {
 	switch (factor) {
-		case renderBlendingFactor_One:
+		case RenderBlendingFactor::One:
 			return GL_ONE;
-		case renderBlendingFactor_Zero:
+		case RenderBlendingFactor::Zero:
 			return GL_ZERO;
-		case renderBlendingFactor_SrcAlpha:
+		case RenderBlendingFactor::SrcAlpha:
 			return GL_SRC_ALPHA;
-		case renderBlendingFactor_OneMinusSrcAlpha:
+		case RenderBlendingFactor::OneMinusSrcAlpha:
 			return GL_ONE_MINUS_SRC_ALPHA;
-		case renderBlendingFactor_DstAlpha:
+		case RenderBlendingFactor::DstAlpha:
 			return GL_DST_ALPHA;
-		case renderBlendingFactor_OneMinusDstAlpha:
+		case RenderBlendingFactor::OneMinusDstAlpha:
 			return GL_ONE_MINUS_DST_ALPHA;
-		case renderBlendingFactor_SrcColor:
+		case RenderBlendingFactor::SrcColor:
 			return GL_SRC_COLOR;
-		case renderBlendingFactor_OneMinusSrcColor:
+		case RenderBlendingFactor::OneMinusSrcColor:
 			return GL_ONE_MINUS_SRC_COLOR;
-		case renderBlendingFactor_DstColor:
+		case RenderBlendingFactor::DstColor:
 			return GL_DST_COLOR;
-		case renderBlendingFactor_OneMinusDstColor:
+		case RenderBlendingFactor::OneMinusDstColor:
 			return GL_ONE_MINUS_DST_COLOR;
-		case renderBlendingFactor_SrcAlphaSaturate:
+		case RenderBlendingFactor::SrcAlphaSaturate:
 			return GL_SRC_ALPHA_SATURATE;
-		case renderBlendingFactor_Constant:
+		case RenderBlendingFactor::Constant:
 			return GL_CONSTANT_COLOR;
-		case renderBlendingFactor_OneMinusConstant:
+		case RenderBlendingFactor::OneMinusConstant:
 			return GL_ONE_MINUS_CONSTANT_COLOR;
-		case renderBlendingFactor_ConstantAlpha:
+		case RenderBlendingFactor::ConstantAlpha:
 			return GL_CONSTANT_ALPHA;
-		case renderBlendingFactor_OneMinusConstantAlpha:
+		case RenderBlendingFactor::OneMinusConstantAlpha:
 			return GL_ONE_MINUS_CONSTANT_ALPHA;
 	}
 	return GL_ZERO;
@@ -127,17 +155,17 @@ void GL_BASE::setBlending(sl_bool flagEnableBlending, const RenderBlendingParam&
 {
 	if (flagEnableBlending) {
 		GL_ENTRY(glEnable)(GL_BLEND);
-		GLenum op = _GLES_getBlendingOp(param.operation);
-		GLenum opAlpha = _GLES_getBlendingFactor(param.operationAlpha);
+		GLenum op = _GL_getBlendingOp(param.operation);
+		GLenum opAlpha = _GL_getBlendingOp(param.operationAlpha);
 		if (op != opAlpha) {
 			GL_ENTRY(glBlendEquationSeparate)(op, opAlpha);
 		} else {
 			GL_ENTRY(glBlendEquation)(op);
 		}
-		GLenum fSrc = _GLES_getBlendingFactor(param.blendSrc);
-		GLenum fDst = _GLES_getBlendingFactor(param.blendDst);
-		GLenum fSrcAlpha = _GLES_getBlendingFactor(param.blendSrcAlpha);
-		GLenum fDstAlpha = _GLES_getBlendingFactor(param.blendDstAlpha);
+		GLenum fSrc = _GL_getBlendingFactor(param.blendSrc);
+		GLenum fDst = _GL_getBlendingFactor(param.blendDst);
+		GLenum fSrcAlpha = _GL_getBlendingFactor(param.blendSrcAlpha);
+		GLenum fDstAlpha = _GL_getBlendingFactor(param.blendDstAlpha);
 		if (fSrc == fSrcAlpha && fDst == fDstAlpha) {
 			GL_ENTRY(glBlendFunc)(fSrc, fDst);
 		} else {
@@ -149,12 +177,18 @@ void GL_BASE::setBlending(sl_bool flagEnableBlending, const RenderBlendingParam&
 	}
 }
 
+void GL_BASE::setBlending(sl_bool flagEnableBlending)
+{
+	RenderBlendingParam param;
+	setBlending(flagEnableBlending, param);
+}
+
 static sl_uint32 _GLES_createShader(GLenum type, const String& source)
 {
 	GLuint shader = GL_ENTRY(glCreateShader)(type);
 	if (shader) {
 		if (source.isNotEmpty()) {
-			const GLchar* sz = source.getBuf();
+			const GLchar* sz = source.getData();
 			GLint len = (GLint)(source.getLength());
 			GL_ENTRY(glShaderSource)(shader, 1, &sz, &len);
 			GL_ENTRY(glCompileShader)(shader);
@@ -667,7 +701,7 @@ sl_uint32 GL_BASE::createTexture2D(const BitmapData& bitmapData)
 		sl_uint32 width = bitmapData.width;
 		sl_uint32 height = bitmapData.height;
 		GL_ENTRY(glBindTexture)(GL_TEXTURE_2D, texture);
-		if (bitmapData.format == bitmapFormat_RGBA && (bitmapData.pitch == 0 || bitmapData.pitch == width << 2)) {
+		if (bitmapData.format == BitmapFormat::RGBA && (bitmapData.pitch == 0 || bitmapData.pitch == width << 2)) {
 			GL_ENTRY(glTexImage2D)(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, bitmapData.data);
 		} else {
 			sl_uint32 size = width * height;
@@ -675,7 +709,7 @@ sl_uint32 GL_BASE::createTexture2D(const BitmapData& bitmapData)
 			BitmapData temp;
 			temp.width = width;
 			temp.height = height;
-			temp.format = bitmapFormat_RGBA;
+			temp.format = BitmapFormat::RGBA;
 			temp.data = glImage;
 			temp.pitch = width << 2;
 			temp.copyPixelsFrom(bitmapData);
@@ -738,7 +772,7 @@ sl_uint32 GL_BASE::createTexture2D(const Ref<Bitmap>& bitmap, sl_uint32 x, sl_ui
 		BitmapData temp;
 		temp.width = w;
 		temp.height = h;
-		temp.format = bitmapFormat_RGBA;
+		temp.format = BitmapFormat::RGBA;
 		temp.data = glImage;
 		temp.pitch = w << 2;
 		if (bitmap->readPixels(x, y, temp)) {
@@ -769,7 +803,7 @@ sl_uint32 GL_BASE::createTexture2D(const Ref<Bitmap>& bitmap)
 		BitmapData temp;
 		temp.width = w;
 		temp.height = h;
-		temp.format = bitmapFormat_RGBA;
+		temp.format = BitmapFormat::RGBA;
 		temp.data = glImage;
 		temp.pitch = w << 2;
 		if (bitmap->readPixels(0, 0, temp)) {
@@ -785,23 +819,11 @@ sl_uint32 GL_BASE::createTexture2DFromMemory(const void* mem, sl_size size)
 	return createTexture2D(image);
 }
 
-sl_uint32 GL_BASE::createTexture2DFromFile(const String& filePath)
-{
-	Ref<Image> image = Image::loadFromFile(filePath);
-	return createTexture2D(image);
-}
-
-sl_uint32 GL_BASE::createTexture2DFromResource(const String& path)
-{
-	Ref<Image> image = Image::loadFromResource(path);
-	return createTexture2D(image);
-}
-
 void GL_BASE::updateTexture2D(sl_uint32 x, sl_uint32 y, const BitmapData& bitmapData)
 {
 	sl_uint32 width = bitmapData.width;
 	sl_uint32 height = bitmapData.height;
-	if (bitmapData.format == bitmapFormat_RGBA && (bitmapData.pitch == 0 || bitmapData.pitch == width << 2)) {
+	if (bitmapData.format == BitmapFormat::RGBA && (bitmapData.pitch == 0 || bitmapData.pitch == width << 2)) {
 		GL_ENTRY(glTexSubImage2D)(GL_TEXTURE_2D, 0, x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, bitmapData.data);
 	} else {
 		sl_uint32 size = width * height;
@@ -809,7 +831,7 @@ void GL_BASE::updateTexture2D(sl_uint32 x, sl_uint32 y, const BitmapData& bitmap
 		BitmapData temp;
 		temp.width = width;
 		temp.height = height;
-		temp.format = bitmapFormat_RGBA;
+		temp.format = BitmapFormat::RGBA;
 		temp.data = glImage;
 		temp.pitch = width << 2;
 		temp.copyPixelsFrom(bitmapData);
@@ -856,7 +878,7 @@ void GL_BASE::updateTexture2D(sl_uint32 x, sl_uint32 y, sl_uint32 w, sl_uint32 h
 		BitmapData temp;
 		temp.width = w;
 		temp.height = h;
-		temp.format = bitmapFormat_RGBA;
+		temp.format = BitmapFormat::RGBA;
 		temp.data = glImage;
 		temp.pitch = w << 2;
 		if (bitmap->readPixels(bx, by, temp)) {
@@ -883,9 +905,9 @@ void GL_BASE::unbindTexture2D()
 static GLenum _GLES_getFilter(TextureFilterMode filter)
 {
 	switch (filter) {
-		case textureFilterMode_Linear:
+		case TextureFilterMode::Linear:
 			return GL_LINEAR;
-		case textureFilterMode_Point:
+		case TextureFilterMode::Point:
 			return GL_NEAREST;
 	}
 	return GL_NONE;
@@ -906,11 +928,11 @@ void GL_BASE::setTexture2DFilterMode(TextureFilterMode minFilter, TextureFilterM
 static GLenum _GLES_getWrap(TextureWrapMode wrap)
 {
 	switch (wrap) {
-		case textureWrapMode_Repeat:
+		case TextureWrapMode::Repeat:
 			return GL_REPEAT;
-		case textureWrapMode_Mirror:
+		case TextureWrapMode::Mirror:
 			return GL_MIRRORED_REPEAT;
-		case textureWrapMode_Clamp:
+		case TextureWrapMode::Clamp:
 			return GL_CLAMP_TO_EDGE;
 	}
 	return GL_NONE;
@@ -982,9 +1004,9 @@ public:
 	RenderEngineType getEngineType()
 	{
 #if defined(_OPENGL_ES_IMPL)
-		return renderEngineType_OpenGL_ES;
+		return RenderEngineType::OpenGL_ES;
 #else
-		return renderEngineType_OpenGL;
+		return RenderEngineType::OpenGL;
 #endif
 	}
 
@@ -1020,7 +1042,7 @@ public:
 				m_flagUpdated = sl_false;
 				Ref<RenderBaseObject> object = getObject();
 				if (object.isNotNull()) {
-					_update(object.get());
+					_update(object.ptr);
 				}
 			}
 		}
@@ -1057,7 +1079,7 @@ public:
 	Ref<_BaseInstance> getValidInstance(RenderBaseObject* object)
 	{
 		Ref<GL_ENGINE> engine = Ref<GL_ENGINE>::from(object->getEngine());
-		if (engine.get() == this) {
+		if (engine.ptr == this) {
 			Ref<_BaseInstance> instance = Ref<_BaseInstance>::from(object->getInstance());
 			if (instance.isNotNull() && !(instance->m_flagCleared)) {
 				instance->update(object);
@@ -1208,7 +1230,7 @@ public:
 							Ref<RenderProgramInfo> info = program->create(this);
 							if (info.isNotNull()) {
 								info->program_GL = ph;
-								if (program->onInit(this, info.get())) {
+								if (program->onInit(this, info.ptr)) {
 									ret = new _RenderProgramInstance();
 									if (ret.isNotNull()) {
 										ret->program = ph;
@@ -1292,7 +1314,7 @@ public:
 	void _onUpdateVertexBuffer(VertexBuffer* buffer, sl_size offset, sl_size size)
 	{
 		Ref<_VertexBufferInstance> _instance = Ref<_VertexBufferInstance>::from(buffer->getInstance());
-		_VertexBufferInstance* instance = _instance.get();
+		_VertexBufferInstance* instance = _instance.ptr;
 		if (instance) {
 			sl_size offsetEnd = offset + size;
 			if (instance->m_flagUpdated) {
@@ -1384,7 +1406,7 @@ public:
 	void _onUpdateIndexBuffer(IndexBuffer* buffer, sl_size offset, sl_size size)
 	{
 		Ref<_IndexBufferInstance> _instance = Ref<_IndexBufferInstance>::from(buffer->getInstance());
-		_IndexBufferInstance* instance = _instance.get();
+		_IndexBufferInstance* instance = _instance.ptr;
 		if (instance) {
 			sl_size offsetEnd = offset + size;
 			if (instance->m_flagUpdated) {
@@ -1484,7 +1506,7 @@ public:
 			return;
 		}
 		Ref<_TextureInstance> _instance = Ref<_TextureInstance>::from(texture->getInstance());
-		_TextureInstance* instance = _instance.get();
+		_TextureInstance* instance = _instance.ptr;
 		if (instance) {
 			if (instance->m_flagUpdated) {
 				instance->rectUpdate.mergeRectangle(Rectanglei(x, y, x + width, y + height));
@@ -1542,7 +1564,7 @@ public:
 		useObject(program);
 		GL_BASE::useProgram(engineProgram->program);
 		m_currentProgram = engineProgram;
-		if (program->onBeginProgram(this, engineProgram->info.get())) {
+		if (program->onBeginProgram(this, engineProgram->info.ptr)) {
 			return sl_true;
 		}
 		return sl_false;
@@ -1559,7 +1581,7 @@ public:
 		}
 		Ref<RenderProgram> p = engineProgram->getProgram();
 		if (p.isNotNull()) {
-			p->onEndProgram(this, engineProgram->info.get());
+			p->onEndProgram(this, engineProgram->info.ptr);
 		}
 		GL_BASE::useProgram(0);
 		m_currentProgram.setNull();
@@ -1581,11 +1603,11 @@ public:
 			return;
 		}
 
-		Ref<_VertexBufferInstance> vb = _getVertexBuffer(primitive->vertexBuffer.get());
+		Ref<_VertexBufferInstance> vb = _getVertexBuffer(primitive->vertexBuffer.ptr);
 		if (vb.isNull() || vb->buffer == 0) {
 			return;
 		}
-		useObject(primitive->vertexBuffer.get());
+		useObject(primitive->vertexBuffer.ptr);
 
 		Ref<_RenderProgramInstance> engineProgram = m_currentProgram;
 		if (engineProgram.isNull()) {
@@ -1596,61 +1618,61 @@ public:
 			return;
 		}
 		if (primitive->indexBuffer.isNotNull()) {
-			Ref<_IndexBufferInstance> ib = _getIndexBuffer(primitive->indexBuffer.get());
+			Ref<_IndexBufferInstance> ib = _getIndexBuffer(primitive->indexBuffer.ptr);
 			if (ib.isNull() || ib->buffer == 0) {
 				return;
 			}
-			useObject(primitive->indexBuffer.get());
+			useObject(primitive->indexBuffer.ptr);
 
 			GL_BASE::bindVertexBuffer(vb->buffer);
-			if (program->onPreRender(this, engineProgram->info.get(), primitive)) {
+			if (program->onPreRender(this, engineProgram->info.ptr, primitive)) {
 				switch (primitive->type) {
-				case primitiveType_Triangles:
+				case PrimitiveType::Triangles:
 					GL_BASE::drawTriangles(primitive->countElements, ib->buffer, 0);
 					break;
-				case primitiveType_TriangleStrip:
+				case PrimitiveType::TriangleStrip:
 					GL_BASE::drawTriangleStrip(primitive->countElements, ib->buffer, 0);
 					break;
-				case primitiveType_TriangleFan:
+				case PrimitiveType::TriangleFan:
 					GL_BASE::drawTriangleFan(primitive->countElements, ib->buffer, 0);
 					break;
-				case primitiveType_Lines:
+				case PrimitiveType::Lines:
 					GL_BASE::drawLines(primitive->countElements, ib->buffer, 0);
 					break;
-				case primitiveType_LineStrip:
+				case PrimitiveType::LineStrip:
 					GL_BASE::drawLineStrip(primitive->countElements, ib->buffer, 0);
 					break;
-				case primitiveType_Points:
+				case PrimitiveType::Points:
 					GL_BASE::drawPoints(primitive->countElements, ib->buffer, 0);
 					break;
 				}
-				program->onPostRender(this, engineProgram->info.get(), primitive);
+				program->onPostRender(this, engineProgram->info.ptr, primitive);
 			}
 			//GL_BASE::unbindVertexBuffer();
 		} else {
 			GL_BASE::bindVertexBuffer(vb->buffer);
-			if (program->onPreRender(this, engineProgram->info.get(), primitive)) {
+			if (program->onPreRender(this, engineProgram->info.ptr, primitive)) {
 				switch (primitive->type) {
-				case primitiveType_Triangles:
+				case PrimitiveType::Triangles:
 					GL_BASE::drawTriangles(primitive->countElements);
 					break;
-				case primitiveType_TriangleStrip:
+				case PrimitiveType::TriangleStrip:
 					GL_BASE::drawTriangleStrip(primitive->countElements);
 					break;
-				case primitiveType_TriangleFan:
+				case PrimitiveType::TriangleFan:
 					GL_BASE::drawTriangleFan(primitive->countElements);
 					break;
-				case primitiveType_Lines:
+				case PrimitiveType::Lines:
 					GL_BASE::drawLines(primitive->countElements);
 					break;
-				case primitiveType_LineStrip:
+				case PrimitiveType::LineStrip:
 					GL_BASE::drawLineStrip(primitive->countElements);
 					break;
-				case primitiveType_Points:
+				case PrimitiveType::Points:
 					GL_BASE::drawPoints(primitive->countElements);
 					break;
 				}
-				program->onPostRender(this, engineProgram->info.get(), primitive);
+				program->onPostRender(this, engineProgram->info.ptr, primitive);
 			}
 			//GL_BASE::unbindVertexBuffer();
 		}

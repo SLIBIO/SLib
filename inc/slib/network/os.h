@@ -5,8 +5,6 @@
 
 #include "ip_address.h"
 #include "mac_address.h"
-
-#include "../core/mio.h"
 #include "../core/string.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
@@ -19,7 +17,7 @@ public:
 	String description;
 	MacAddress macAddress;
 	List<IPv4AddressInfo> addresses_IPv4;
-	List<IPv6AddressInfo> addresses_IPv6;
+	List<IPv6Address> addresses_IPv6;
 };
 
 class SLIB_EXPORT Network

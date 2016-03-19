@@ -4,6 +4,8 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(STabView, SView)
+
 STabView::STabView()
 {
 	setGroup(sl_true);
@@ -13,12 +15,12 @@ STabView::STabView()
 	m_indexSelected = 0;
 	m_indexHover = -1;
 	
-	setBackgroundColor(Color::white());
+	setBackgroundColor(Color::White);
 	setTabBarBackgroundColor(Color(230, 230, 230));
 	setSelectedTabBackgroundColor(Color(150, 150, 150));
 	setHoverTabBackgroundColor(Color(210, 210, 210));
 	m_tabLabelColor = Color(50, 50, 50);
-	m_selectedTabLabelColor = Color::black();
+	m_selectedTabLabelColor = Color::Black;
 	m_hoverTabLabelColor = Color(0, 20, 250);
 
 	m_flagVertical = sl_false;
@@ -30,7 +32,7 @@ STabView::STabView()
 
 sl_uint32 STabView::getTabsCount()
 {
-	return (sl_uint32)(m_items.count());
+	return (sl_uint32)(m_items.getCount());
 }
 
 void STabView::setTabsCount(sl_uint32 nNew)
@@ -43,7 +45,7 @@ void STabView::setTabsCount(sl_uint32 nNew)
 	if (nNew > MAX_TABS_COUNT) {
 		nNew = MAX_TABS_COUNT;
 	}
-	sl_uint32 nOrig = (sl_uint32)(items.getCount());
+	sl_uint32 nOrig = (sl_uint32)(items.count);
 	if (nOrig == nNew) {
 		return;
 	}
@@ -60,7 +62,7 @@ void STabView::setTabsCount(sl_uint32 nNew)
 String STabView::getTabLabel(sl_uint32 index)
 {
 	ObjectLocker lock(this);
-	if (index < m_items.count()) {
+	if (index < m_items.getCount()) {
 		STabViewItem* item = m_items.getItemPtr(index);
 		return item->label;
 	}
@@ -70,7 +72,7 @@ String STabView::getTabLabel(sl_uint32 index)
 void STabView::setTabLabel(sl_uint32 index, const String& text)
 {
 	ObjectLocker lock(this);
-	if (index < m_items.count()) {
+	if (index < m_items.getCount()) {
 		STabViewItem* item = m_items.getItemPtr(index);
 		item->label = text;
 		invalidateTabBar();
@@ -80,7 +82,7 @@ void STabView::setTabLabel(sl_uint32 index, const String& text)
 Ref<View> STabView::getTabContentView(sl_uint32 index)
 {
 	ObjectLocker lock(this);
-	if (index < m_items.count()) {
+	if (index < m_items.getCount()) {
 		STabViewItem* item = m_items.getItemPtr(index);
 		return item->contentView;
 	}
@@ -90,7 +92,7 @@ Ref<View> STabView::getTabContentView(sl_uint32 index)
 void STabView::setTabContentView(sl_uint32 index, const Ref<View>& view)
 {
 	MutexLocker lock(m_items.getLocker());
-	if (index < m_items.count()) {
+	if (index < m_items.getCount()) {
 		STabViewItem* item = m_items.getItemPtr(index);
 		if (item->contentView != view) {
 			removeChild(item->contentView);
@@ -111,11 +113,11 @@ void STabView::selectTab(sl_uint32 index)
 {
 	ObjectLocker lock(this);
 	ListLocker<STabViewItem> items(m_items);
-	if (index >= items.count()) {
+	if (index >= items.count) {
 		index = 0;
 	}
 	m_indexSelected = index;
-	for (sl_size i = 0; i < items.count(); i++) {
+	for (sl_size i = 0; i < items.count; i++) {
 		Ref<View> view = items[i].contentView;
 		if (view.isNotNull()) {
 			if (i == index) {
@@ -322,7 +324,7 @@ void STabView::relayout()
 	ObjectLocker lock(this);
 	Rectangle bound = getContentBounds();
 	ListLocker<STabViewItem> items(m_items);
-	for (sl_size i = 0; i < items.count(); i++) {
+	for (sl_size i = 0; i < items.count; i++) {
 		Ref<View> view = items[i].contentView;
 		if (view.isNotNull()) {
 			view->setFrame(bound);
@@ -344,7 +346,7 @@ void STabView::onClickView(UIEvent* ev)
 	Point pt = ev->getPoint();
 	ObjectLocker lock(this);
 	ListLocker<STabViewItem> items(m_items);
-	sl_uint32 n = (sl_uint32)(items.count());
+	sl_uint32 n = (sl_uint32)(items.count);
 	for (sl_uint32 i = 0; i < n; i++) {
 		if (getTabRegion(i).containsPoint(pt)) {
 			selectTab(i);
@@ -357,14 +359,14 @@ void STabView::onClickView(UIEvent* ev)
 void STabView::onMouseEvent(UIEvent* ev)
 {
 	SView::onMouseEvent(ev);
-	if (ev->getAction() == actionMouseLeave) {
+	if (ev->getAction() == UIAction::MouseLeave) {
 		m_indexHover = -1;
 		invalidateTabBar();
-	} else if (ev->getAction() == actionMouseMove) {
+	} else if (ev->getAction() == UIAction::MouseMove) {
 		Point pt = ev->getPoint();
 		ObjectLocker lock(this);
 		ListLocker<STabViewItem> items(m_items);
-		sl_uint32 n = (sl_uint32)(items.count());
+		sl_uint32 n = (sl_uint32)(items.count);
 		for (sl_uint32 i = 0; i < n; i++) {
 			if (getTabRegion(i).containsPoint(pt)) {
 				if (i != m_indexHover) {
@@ -386,7 +388,7 @@ void STabView::onDraw(Canvas* canvas)
 	onDrawTabBarBackground(canvas);
 	ObjectLocker lock(this);
 	ListLocker<STabViewItem> items(m_items);
-	sl_uint32 n = (sl_uint32)(items.count());
+	sl_uint32 n = (sl_uint32)(items.count);
 	for (sl_uint32 i = 0; i < n; i++) {
 		onDrawTab(canvas, getTabRegion(i), i, items[i].label);
 	}
@@ -413,9 +415,9 @@ void STabView::onDrawTab(Canvas* canvas, const Rectangle& rect, sl_uint32 index,
 	if (label.isNotEmpty()) {
 		Ref<Font> font = _getFont();
 		if (m_flagVertical) {
-			canvas->drawText(label, rc, font, labelColor, alignMiddleLeft);
+			canvas->drawText(label, rc, font, labelColor, Alignment::MiddleLeft);
 		} else {
-			canvas->drawText(label, rc, font, labelColor, alignMiddleCenter);
+			canvas->drawText(label, rc, font, labelColor, Alignment::MiddleCenter);
 		}
 	}
 }

@@ -68,7 +68,7 @@ public:
 				if (library) {
 					FT_Error err;
 					FT_Face face;
-					err = FT_New_Memory_Face(library, (FT_Byte*)(mem.getBuf()), (FT_Long)(mem.getSize()), index, &face);
+					err = FT_New_Memory_Face(library, (FT_Byte*)(mem.getData()), (FT_Long)(mem.getSize()), index, &face);
 					if (err == 0 && face) {
 						Ref<_FreeType> ret = new _FreeType;
 						if (ret.isNotNull()) {
@@ -414,6 +414,36 @@ Ref<FreeType> FreeType::loadFromFile(const String& fontFilePath, sl_uint32 index
 {
 	Memory mem = File::readAllBytes(fontFilePath);
 	return loadFromMemory(mem, index);
+}
+
+void FreeType::setSize(sl_uint32 size)
+{
+	setSize(size, size);
+}
+
+Size FreeType::getStringExtent(const String16& text)
+{
+	return getStringExtent(text.getData(), text.getLength());
+}
+
+void FreeType::drawString(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const String16& text, const Color& color)
+{
+	return drawString(imageOutput, x, y, text.getData(), text.getLength(), color);
+}
+
+void FreeType::strokeString(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const String16& text, const Color& color, sl_uint32 lineWidth)
+{
+	return strokeString(imageOutput, x, y, text.getData(), text.getLength(), color, lineWidth);
+}
+
+void FreeType::strokeStringInside(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const String16& text, const Color& color, sl_uint32 lineWidth)
+{
+	return strokeStringInside(imageOutput, x, y, text.getData(), text.getLength(), color, lineWidth);
+}
+
+void FreeType::strokeStringOutside(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const String16& text, const Color& color, sl_uint32 lineWidth)
+{
+	return strokeString(imageOutput, x, y, text.getData(), text.getLength(), color, lineWidth);
 }
 
 SLIB_GRAPHICS_NAMESPACE_END

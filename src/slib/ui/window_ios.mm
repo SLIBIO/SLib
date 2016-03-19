@@ -93,7 +93,7 @@ public:
 		Ref<_iOS_Window> ret;
 		_slib_iOS_Window* window = [[_slib_iOS_Window alloc] initWithFrame:rect];
 		if (window != nil) {
-			UIScreen* screen = UIPlatform::getScreenHandle(_screen.get());
+			UIScreen* screen = UIPlatform::getScreenHandle(_screen.ptr);
 			if (screen != nil) {
 				window.screen = screen;
 			}
@@ -264,7 +264,7 @@ public:
 			}
 			return UIPlatform::getColorFromUIColor(color);
 		}
-		return Color::transparent();
+		return Color::Transparent;
 	}
 	
 	sl_bool setBackgroundColor(const Color& _color)
@@ -556,7 +556,7 @@ Ref<WindowInstance> UIPlatform::createWindowInstance(UIView* window)
 	}
 	ret = _iOS_Window::create(window);
 	if (ret.isNotNull()) {
-		UIPlatform::_registerWindowInstance((__bridge void*)window, ret.get());
+		UIPlatform::_registerWindowInstance((__bridge void*)window, ret.ptr);
 	}
 	return ret;
 }

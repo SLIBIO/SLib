@@ -11,7 +11,8 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class _Quartz_GraphicsPathInstance : public GraphicsPathInstance
 {
-	SLIB_DECLARE_OBJECT(_Quartz_GraphicsPathInstance, GraphicsPathInstance)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	CGMutablePathRef m_path;
 	sl_bool m_flagMoved;
@@ -89,6 +90,9 @@ public:
 	
 };
 
+SLIB_DEFINE_OBJECT(_Quartz_GraphicsPathInstance, GraphicsPathInstance)
+
+
 CGPathRef UIPlatform::getGraphicsPath(GraphicsPath* path, Ref<GraphicsPathInstance>& instanceOut)
 {
 	if (!path) {
@@ -96,7 +100,7 @@ CGPathRef UIPlatform::getGraphicsPath(GraphicsPath* path, Ref<GraphicsPathInstan
 	}
 	Ref<GraphicsPathInstance> _instance = path->getInstance();
 	Ref<_Quartz_GraphicsPathInstance> instance;
-	if (_Quartz_GraphicsPathInstance::checkInstance(_instance)) {
+	if (_Quartz_GraphicsPathInstance::checkInstance(_instance.ptr)) {
 		instance = Ref<_Quartz_GraphicsPathInstance>::from(_instance);
 	} else {
 		instance = _Quartz_GraphicsPathInstance::_create();
@@ -117,7 +121,7 @@ Rectangle UI::getPathBounds(const Ref<GraphicsPath>& path)
 		return Rectangle::zero();
 	}
 	Ref<GraphicsPathInstance> instance;
-	CGPathRef handle = UIPlatform::getGraphicsPath(path.get(), instance);
+	CGPathRef handle = UIPlatform::getGraphicsPath(path.ptr, instance);
 	if (handle) {
 		Rectangle ret;
 		CGRect rc = CGPathGetPathBoundingBox(handle);
@@ -136,12 +140,12 @@ sl_bool UI::checkPointInPath(const Ref<GraphicsPath>& path, const Point& _pt)
 		return sl_false;
 	}
 	Ref<GraphicsPathInstance> instance;
-	CGPathRef handle = UIPlatform::getGraphicsPath(path.get(), instance);
+	CGPathRef handle = UIPlatform::getGraphicsPath(path.ptr, instance);
 	if (handle) {
 		CGPoint pt;
 		pt.x = _pt.x;
 		pt.y = _pt.y;
-		return CGPathContainsPoint(handle, NULL, pt, path->getFillMode() != fillMode_Winding);
+		return CGPathContainsPoint(handle, NULL, pt, path->getFillMode() != FillMode::Winding);
 	}
 	return sl_false;
 }

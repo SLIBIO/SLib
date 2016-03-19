@@ -2,6 +2,8 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(GenericViewWithEvent, View)
+
 GenericViewWithEvent::GenericViewWithEvent()
 {
 	m_flagFocusable = sl_false;
@@ -73,13 +75,13 @@ void GenericViewWithEvent::_processEvents(UIEvent* ev)
 	if (ev->isPreventedDefault()) {
 		return;
 	}
-	UIEventAction action = ev->getAction();
-	if (action == actionLeftButtonDown || action == actionTouchBegin) {
+	UIAction action = ev->getAction();
+	if (action == UIAction::LeftButtonDown || action == UIAction::TouchBegin) {
 		if (isClickEnabled()) {
 			setDownState(sl_true);
 			ev->preventDefault();
 		}
-	} else if (action == actionLeftButtonUp || action == actionTouchEnd || action == actionTouchCancel) {
+	} else if (action == UIAction::LeftButtonUp || action == UIAction::TouchEnd || action == UIAction::TouchCancel) {
 		if (isClickEnabled()) {
 			if (isDownState()) {
 				if (getFrameBounds().containsPoint(ev->getPoint())) {
@@ -88,9 +90,9 @@ void GenericViewWithEvent::_processEvents(UIEvent* ev)
 			}
 		}
 		setDownState(sl_false);
-	} else if (action == actionMouseEnter) {
+	} else if (action == UIAction::MouseEnter) {
 		setHoverState(sl_true);
-	} else if (action == actionMouseLeave) {
+	} else if (action == UIAction::MouseLeave) {
 		setHoverState(sl_false);
 	}
 }
@@ -103,9 +105,9 @@ void GenericViewWithEvent::dispatchMouseEvent(UIEvent* ev)
 	if (! (isEnabled())) {
 		return;
 	}
-	UIEventAction action = ev->getAction();
+	UIAction action = ev->getAction();
 	if (m_flagFocusable) {
-		if (action == actionLeftButtonDown || action == actionRightButtonDown || action == actionMiddleButtonDown) {
+		if (action == UIAction::LeftButtonDown || action == UIAction::RightButtonDown || action == UIAction::MiddleButtonDown) {
 			setFocus();
 		}
 	}
@@ -121,9 +123,9 @@ void GenericViewWithEvent::dispatchTouchEvent(UIEvent* ev)
 	if (! (isEnabled())) {
 		return;
 	}
-	UIEventAction action = ev->getAction();
+	UIAction action = ev->getAction();
 	if (m_flagFocusable) {
-		if (action == actionTouchBegin) {
+		if (action == UIAction::TouchBegin) {
 			setFocus();
 		}
 	}
@@ -132,17 +134,19 @@ void GenericViewWithEvent::dispatchTouchEvent(UIEvent* ev)
 }
 
 
+SLIB_DEFINE_OBJECT(GenericViewWithDrawing, GenericViewWithEvent)
+
 GenericViewWithDrawing::GenericViewWithDrawing()
 {
 	m_backgroundColor = Color::zero();
 	
-	m_boundShape = boundShape_Rectangle;
+	m_boundShape = BoundShape::Rectangle;
 	
 	m_roundRectBoundShapeRadius.x = 5;
 	m_roundRectBoundShapeRadius.y = 5;
 	
-	m_borderColor = Color::black();
-	m_borderStyle = penStyle_Solid;
+	m_borderColor = Color::Black;
+	m_borderStyle = PenStyle::Solid;
 	m_borderWidth = 0;
 }
 
@@ -290,7 +294,7 @@ void GenericViewWithDrawing::onDrawBorder(Canvas* canvas)
 void GenericViewWithDrawing::drawBackground(Canvas *canvas, const Color &color, const Ref<Drawable>& background)
 {
 	Rectangle rc(Point::zero(), getSize());
-	if (color.getAlpha() > 0) {
+	if (color.a > 0) {
 		Ref<Brush> brush = Brush::createSolidBrush(color);
 		canvas->fillRectangle(rc, brush);
 	}
@@ -307,24 +311,24 @@ void GenericViewWithDrawing::drawBorder(Canvas* canvas, const Ref<Pen>& pen)
 	Rectangle rc(Point::zero(), getSize());
 	if (pen.isNotNull()) {
 		switch (m_boundShape) {
-			case boundShape_RoundRect:
+			case BoundShape::RoundRect:
 				rc.left += 1;
 				rc.top += 1;
 				rc.right -= 2;
 				rc.bottom -= 2;
 				canvas->drawRoundRect(rc, getRoundRectBoundShapeRadius(), pen);
 				break;
-			case boundShape_Ellipse:
+			case BoundShape::Ellipse:
 				rc.left += 1;
 				rc.top += 1;
 				rc.right -= 2;
 				rc.bottom -= 2;
 				canvas->drawEllipse(rc, pen);
 				break;
-			case boundShape_Path:
+			case BoundShape::Path:
 				canvas->drawPath(getBoundShapePath(), pen);
 				break;
-			case boundShape_Rectangle:
+			case BoundShape::Rectangle:
 			default:
 				rc.right -= 1;
 				rc.bottom -= 1;
@@ -343,20 +347,20 @@ void GenericViewWithDrawing::dispatchDraw(Canvas* canvas)
 	{
 		CanvasStatusScope scope(canvas);
 		switch (m_boundShape) {
-			case boundShape_RoundRect:
+			case BoundShape::RoundRect:
 				rc.right -= 1;
 				rc.bottom -= 1;
 				canvas->clipToRoundRect(rc, getRoundRectBoundShapeRadius());
 				break;
-			case boundShape_Ellipse:
+			case BoundShape::Ellipse:
 				rc.right -= 1;
 				rc.bottom -= 1;
 				canvas->clipToEllipse(rc);
 				break;
-			case boundShape_Path:
+			case BoundShape::Path:
 				canvas->clipToPath(getBoundShapePath());
 				break;
-			case boundShape_Rectangle:
+			case BoundShape::Rectangle:
 			default:
 				//canvas->clipToRectangle(rc);
 				break;
@@ -369,6 +373,8 @@ void GenericViewWithDrawing::dispatchDraw(Canvas* canvas)
 	onPostDraw(canvas);
 }
 
+
+SLIB_DEFINE_OBJECT(GenericView, GenericViewWithDrawing)
 
 GenericView::GenericView()
 {

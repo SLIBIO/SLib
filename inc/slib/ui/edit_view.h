@@ -20,7 +20,8 @@ public:
 
 class SLIB_EXPORT EditView : public View
 {
-	SLIB_DECLARE_OBJECT(EditView, View)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	EditView();
 	
@@ -108,7 +109,8 @@ protected:
 
 class PasswordView : public EditView
 {
-	SLIB_DECLARE_OBJECT(PasswordView, EditView)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	PasswordView();
 	
@@ -125,7 +127,8 @@ protected:
 
 class TextArea : public EditView
 {
-	SLIB_DECLARE_OBJECT(TextArea, EditView)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	TextArea();
 	

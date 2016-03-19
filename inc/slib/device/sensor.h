@@ -23,11 +23,11 @@ public:
 	
 };
 
-enum LocationProviderType
+enum class LocationProviderType
 {
-	locationProviderType_GPS = 0,
-	locationProviderType_MobileNetwork = 1,
-	locationProviderType_Passive = 2
+	GPS = 0,
+	MobileNetwork = 1,
+	Passive = 2
 };
 
 
@@ -46,12 +46,13 @@ public:
 	
 public:
 	SensorParam();
+	
 };
 
 
 class SLIB_EXPORT Sensor : public Object
 {
-	SLIB_DECLARE_OBJECT(Sensor, Object)
+	SLIB_DECLARE_OBJECT
 
 public:
 	static Ref<Sensor> create(const SensorParam& param);

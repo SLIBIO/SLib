@@ -60,11 +60,11 @@ sl_bool ZlibCompress::startGzip(const GzipParam& param, sl_int32 level)
 		Base::zeroMemory(GZIP_HEADER, sizeof(gz_header));
 		m_gzipFileName = param.fileName;
 		if (m_gzipFileName.isNotEmpty()) {
-			GZIP_HEADER->name = (Bytef*)(m_gzipFileName.getBuf());
+			GZIP_HEADER->name = (Bytef*)(m_gzipFileName.getData());
 		}
 		m_gzipComment = param.comment;
 		if (m_gzipComment.isNotEmpty()) {
-			GZIP_HEADER->comment = (Bytef*)(m_gzipComment.getBuf());
+			GZIP_HEADER->comment = (Bytef*)(m_gzipComment.getData());
 		}
 		GZIP_HEADER->os = 255;
 		iRet = deflateSetHeader(STREAM, GZIP_HEADER);
@@ -76,6 +76,12 @@ sl_bool ZlibCompress::startGzip(const GzipParam& param, sl_int32 level)
 		}
 	}
 	return sl_false;
+}
+
+sl_bool ZlibCompress::startGzip(sl_int32 level)
+{
+	GzipParam param;
+	return startGzip(param, level);
 }
 
 sl_int32 ZlibCompress::compress(
@@ -121,7 +127,7 @@ Memory ZlibCompress::compress(const void* _data, sl_size size, sl_bool flagFinis
 	if (memChunk.isEmpty()) {
 		return ret;
 	}
-	sl_uint8* chunk = (sl_uint8*)(memChunk.getBuf());
+	sl_uint8* chunk = (sl_uint8*)(memChunk.getData());
 
 	MemoryBuffer buffer;
 	while (1) {
@@ -132,7 +138,7 @@ Memory ZlibCompress::compress(const void* _data, sl_size size, sl_bool flagFinis
 			return ret;
 		}
 		if (sizeOutputUsed > 0) {
-			buffer.add(chunk, sizeOutputUsed);
+			buffer.add(Memory::create(chunk, sizeOutputUsed));
 		}
 		data += sizeInputPassed;
 		size -= sizeInputPassed;
@@ -243,7 +249,7 @@ Memory ZlibDecompress::decompress(const void* _data, sl_size size)
 	if (memChunk.isEmpty()) {
 		return ret;
 	}
-	sl_uint8* chunk = (sl_uint8*)(memChunk.getBuf());
+	sl_uint8* chunk = (sl_uint8*)(memChunk.getData());
 
 	MemoryBuffer buffer;
 	while (1) {
@@ -254,7 +260,7 @@ Memory ZlibDecompress::decompress(const void* _data, sl_size size)
 			return ret;
 		}
 		if (sizeOutputUsed > 0) {
-			buffer.add(chunk, sizeOutputUsed);
+			buffer.add(Memory::create(chunk, sizeOutputUsed));
 		}
 		data += sizeInputPassed;
 		size -= sizeInputPassed;
@@ -292,6 +298,21 @@ sl_uint32 Zlib::adler32(sl_uint32 adler, const void* _data, sl_size size)
 	return adler;
 }
 
+sl_uint32 Zlib::adler32(const void* data, sl_size size)
+{
+	return adler32(1, data, size);
+}
+
+sl_uint32 Zlib::adler32(sl_uint32 adler, const Memory& mem)
+{
+	return adler32(adler, mem.getData(), mem.getSize());
+}
+
+sl_uint32 Zlib::adler32(const Memory& mem)
+{
+	return adler32(1, mem.getData(), mem.getSize());
+}
+
 sl_uint32 Zlib::crc32(sl_uint32 crc, const void* _data, sl_size size)
 {
 	const char* data = (const char*)_data;
@@ -306,6 +327,22 @@ sl_uint32 Zlib::crc32(sl_uint32 crc, const void* _data, sl_size size)
 	}
 	return crc;
 }
+
+sl_uint32 Zlib::crc32(const void* data, sl_size size)
+{
+	return crc32(0, data, size);
+}
+
+sl_uint32 Zlib::crc32(sl_uint32 crc, const Memory& mem)
+{
+	return crc32(crc, mem.getData(), mem.getSize());
+}
+
+sl_uint32 Zlib::crc32(const Memory& mem)
+{
+	return crc32(0, mem.getData(), mem.getSize());
+}
+
 
 Memory Zlib::compress(const void* data, sl_size size, sl_int32 level)
 {
@@ -332,6 +369,12 @@ Memory Zlib::compressGzip(const GzipParam& param, const void* data, sl_size size
 		return zlib.compress(data, size, sl_true);
 	}
 	return Memory::null();
+}
+
+Memory Zlib::compressGzip(const void* data, sl_size size, sl_int32 level)
+{
+	GzipParam param;
+	return compressGzip(param, data, size, level);
 }
 
 Memory Zlib::decompress(const void* data, sl_size size)

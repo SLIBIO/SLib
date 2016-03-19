@@ -3,8 +3,77 @@
 
 SLIB_NAMESPACE_BEGIN
 
+JsonParseParam::JsonParseParam()
+{
+	flagSupportComments = sl_true;
+	
+	flagError = sl_false;
+	errorLine = 0;
+	errorColumn = 0;
+	errorPosition = 0;
+}
+
+String JsonParseParam::getErrorText()
+{
+	if (flagError) {
+		return "(" + String::fromUint32(errorLine) + ":" + String::fromUint32(errorColumn) + ")" + errorMessage;
+	}
+	return String::null();
+}
+
 template <class ST, class CT>
-static void _Json_escapeSpaceAndComments(const CT* buf, sl_uint32 len, sl_uint32& pos, sl_bool flagSupportComments)
+class _Json_Parser
+{
+public:
+	const CT* buf;
+	sl_uint32 len;
+	sl_bool flagSupportComments;
+	
+	sl_uint32 pos;
+	
+	sl_bool flagError;
+	String errorMessage;
+	
+	ST strNull;
+	ST strTrue;
+	ST strFalse;
+	
+public:
+	_Json_Parser();
+	
+public:
+	void escapeSpaceAndComments();
+	
+	Variant parseJson();
+
+	static Variant parseJson(const CT* buf, sl_uint32 len, JsonParseParam& param);
+	
+};
+
+template <>
+_Json_Parser<String8, sl_char8>::_Json_Parser()
+{
+	SLIB_STATIC_STRING8(_null, "null");
+	strNull = _null;
+	SLIB_STATIC_STRING8(_true, "true");
+	strTrue = _true;
+	SLIB_STATIC_STRING8(_false, "false");
+	strFalse = _false;
+}
+
+template <>
+_Json_Parser<String16, sl_char16>::_Json_Parser()
+{
+	SLIB_STATIC_STRING16_BY_ARRAY(_null, 'n', 'u', 'l', 'l');
+	strNull = _null;
+	SLIB_STATIC_STRING16_BY_ARRAY(_true, 't', 'r', 'u', 'e');
+	strTrue = _true;
+	SLIB_STATIC_STRING16_BY_ARRAY(_false, 'f', 'a', 'l', 's', 'e');
+	strFalse = _false;
+}
+
+template <class ST, class CT>
+void _Json_Parser<ST, CT>::escapeSpaceAndComments()
 {
 	sl_bool flagLineComment = sl_false;
 	sl_bool flagBlockComment = sl_false;
@@ -46,115 +115,132 @@ static void _Json_escapeSpaceAndComments(const CT* buf, sl_uint32 len, sl_uint32
 }
 
 template <class ST, class CT>
-static Variant _Json_parseJson(const CT* buf, sl_uint32 len, sl_uint32& pos, sl_bool& flagError, sl_bool flagSupportComments)
+Variant _Json_Parser<ST, CT>::parseJson()
 {
-	pos = 0;
-	flagError = sl_true;
-	_Json_escapeSpaceAndComments<ST, CT>(buf, len, pos, flagSupportComments);
+	escapeSpaceAndComments();
 	if (pos == len) {
-		flagError = sl_false;
 		return Variant::null();
 	}
+	
 	CT first = buf[pos];
+	
+	// string
 	if (first == '"' || first == '\'') {
-		sl_int32 m = 0;
+		sl_uint32 m = 0;
 		sl_bool f = sl_false;
 		ST str = ST::parseBackslashEscapes(buf + pos, len - pos, &m, &f);
 		pos += m;
 		if (f) {
+			flagError = sl_true;
+			errorMessage = "String: Missing character  \" or ' ";
 			return Variant::null();
-		} else {
-			flagError = sl_false;
-			return str;
 		}
+		return str;
 	}
+	
+	// array
 	if (first == '[') {
 		pos++;
 		if (pos == len) {
+			flagError = sl_true;
+			errorMessage = "Array: Missing character ] ";
 			return Variant::null();
 		}
 		Variant list = Variant::createVariantList();
 		sl_bool flagFirst = sl_true;
 		while (pos < len) {
-			_Json_escapeSpaceAndComments<ST, CT>(buf, len, pos, flagSupportComments);
+			escapeSpaceAndComments();
 			if (pos == len) {
+				flagError = sl_true;
+				errorMessage = "Array: Missing character ] ";
 				return Variant::null();
 			}
 			CT ch = buf[pos];
 			if (ch == ']') {
 				pos++;
-				flagError = sl_false;
 				return list;
 			}
 			if (! flagFirst) {
 				if (ch == ',') {
 					pos++;
 				} else {
+					flagError = sl_true;
+					errorMessage = "Array: Missing character , ";
 					return Variant::null();
 				}
 			}
-			_Json_escapeSpaceAndComments<ST, CT>(buf, len, pos, flagSupportComments);
+			escapeSpaceAndComments();
 			if (pos == len) {
+				flagError = sl_true;
+				errorMessage = "Array: Missing character ] ";
 				return Variant::null();
 			}
 			if (buf[pos] == ']') {
 				pos++;
-				flagError = sl_false;
 				return list;
 			}
-			sl_uint32 m = 0;
-			sl_bool f = sl_false;
-			Variant item = _Json_parseJson<ST, CT>(buf + pos, len - pos, m, f, flagSupportComments);
-			pos += m;
-			if (f) {
+			Variant item = parseJson();
+			if (flagError) {
 				return Variant::null();
 			}
 			list.addListItem(item);
 			flagFirst = sl_false;
 		}
+		flagError = sl_true;
+		errorMessage = "Array: Missing character ] ";
 		return Variant::null();
 	}
+	
+	// object
 	if (first == '{') {
 		pos++;
 		if (pos == len) {
+			flagError = sl_true;
+			errorMessage = "Object: Missing character } ";
 			return Variant::null();
 		}
 		Variant map = Variant::createVariantHashMap();
 		sl_bool flagFirst = sl_true;
 		while (pos < len) {
-			_Json_escapeSpaceAndComments<ST, CT>(buf, len, pos, flagSupportComments);
+			escapeSpaceAndComments();
 			if (pos == len) {
+				flagError = sl_true;
+				errorMessage = "Object: Missing character } ";
 				return Variant::null();
 			}
 			CT ch = buf[pos];
 			if (ch == '}') {
 				pos++;
-				flagError = sl_false;
 				return map;
 			}
 			if (!flagFirst) {
 				if (ch == ',') {
 					pos++;
 				} else {
+					flagError = sl_true;
+					errorMessage = "Object: Missing character , ";
 					return Variant::null();
 				}
 			}
-			_Json_escapeSpaceAndComments<ST, CT>(buf, len, pos, flagSupportComments);
+			escapeSpaceAndComments();
 			if (pos == len) {
+				flagError = sl_true;
+				errorMessage = "Object: Missing character } ";
 				return Variant::null();
 			}
 			ST key;
 			ch = buf[pos];
 			if (ch == '}') {
 				pos++;
-				flagError = sl_false;
 				return map;
 			} else if (ch == '"' || ch == '\'') {
-				sl_int32 m = 0;
+				sl_uint32 m = 0;
 				sl_bool f = sl_false;
 				key = ST::parseBackslashEscapes(buf + pos, len - pos, &m, &f);
 				pos += m;
 				if (f) {
+					flagError = sl_true;
+					errorMessage = "Object Item Name: Missing terminating character \" or ' ";
 					return Variant::null();
 				}
 			} else {
@@ -168,29 +254,40 @@ static Variant _Json_parseJson(const CT* buf, sl_uint32 len, sl_uint32& pos, sl_
 					}
 				}
 				if (pos == len) {
+					flagError = sl_true;
+					errorMessage = "Object: Missing character : ";
 					return Variant::null();
 				}
 				key = ST(buf + s, pos - s);
 			}
-			_Json_escapeSpaceAndComments<ST, CT>(buf, len, pos, flagSupportComments);
+			escapeSpaceAndComments();
 			if (pos == len) {
+				flagError = sl_true;
+				errorMessage = "Object: Missing character : ";
 				return Variant::null();
 			}
 			if (buf[pos] == ':') {
 				pos++;
 			} else {
+				flagError = sl_true;
+				errorMessage = "Object: Missing character : ";
 				return Variant::null();
 			}
-			sl_uint32 m = 0;
-			sl_bool f = sl_false;
-			Variant item = _Json_parseJson<ST, CT>(buf + pos, len - pos, m, f, flagSupportComments);
-			pos += m;
-			if (f) {
+			escapeSpaceAndComments();
+			if (pos == len) {
+				flagError = sl_true;
+				errorMessage = "Object: Missing Item value";
+				return Variant::null();
+			}
+			Variant item = parseJson();
+			if (flagError) {
 				return Variant::null();
 			}
 			map.putField(key, item);
 			flagFirst = sl_false;
 		}
+		flagError = sl_true;
+		errorMessage = "Object: Missing character } ";
 		return Variant::null();
 	}
 	{
@@ -204,28 +301,22 @@ static Variant _Json_parseJson(const CT* buf, sl_uint32 len, sl_uint32& pos, sl_
 			}
 		}
 		if (pos == s) {
-			flagError = sl_false;
+			flagError = sl_true;
+			errorMessage = "Invalid token";
 			return Variant::null();
 		}
 		ST str(buf + s, pos - s);
-		SLIB_SAFE_STATIC(ST, _null, "null");
-		if (str == _null) {
-			flagError = sl_false;
+		if (str == strNull) {
 			return Variant::null();
 		}
-		SLIB_SAFE_STATIC(ST, _true, "true");
-		if (str == _true) {
-			flagError = sl_false;
+		if (str == strTrue) {
 			return Variant::fromBoolean(sl_true);
 		}
-		SLIB_SAFE_STATIC(ST, _false, "false");
-		if (str == _false) {
-			flagError = sl_false;
+		if (str == strFalse) {
 			return Variant::fromBoolean(sl_false);
 		}
 		sl_int64 vi64;
 		if (str.parseInt64(10, &vi64)) {
-			flagError = sl_false;
 			if (vi64 >= SLIB_INT64(-0x80000000) && vi64 < SLIB_INT64(0x7fffffff)) {
 				return (sl_int32)vi64;
 			} else {
@@ -234,70 +325,85 @@ static Variant _Json_parseJson(const CT* buf, sl_uint32 len, sl_uint32& pos, sl_
 		}
 		double vf;
 		if (str.parseDouble(&vf)) {
-			flagError = sl_false;
 			return vf;
 		}
 	}
+	flagError = sl_true;
+	errorMessage = "Invalid token";
 	return Variant::null();
 }
 
-Variant Json::parseJson(const String& json, sl_bool flagSupportComments)
+template <class ST, class CT>
+Variant _Json_Parser<ST, CT>::parseJson(const CT* buf, sl_uint32 len, JsonParseParam& param)
 {
-	const sl_char8* buf = json.getBuf();
-	sl_uint32 len = json.getLength();
-	while (len > 0) {
-		sl_char8 ch = buf[len - 1];
-		if (ch == '\r' || ch == '\n' || ch == ' ' || ch == '\t') {
-			len--;
-		} else {
-			break;
+	param.flagError = sl_false;
+	
+	_Json_Parser<ST, CT> parser;
+	parser.buf = buf;
+	parser.len = len;
+	parser.flagSupportComments = param.flagSupportComments;
+	
+	parser.pos = 0;
+	parser.flagError = sl_false;
+	
+	Variant var = parser.parseJson();
+	if (!(parser.flagError)) {
+		parser.escapeSpaceAndComments();
+		if (parser.pos != len) {
+			parser.flagError = sl_true;
+			parser.errorMessage = "Invalid token";
 		}
-	}
-	if (len == 0) {
-		return Variant::null();
-	}
-	sl_uint32 parsed = 0;
-	sl_bool f = sl_false;
-	Variant var = _Json_parseJson<String8, sl_char8>(buf, len, parsed, f, flagSupportComments);
-	if (!f) {
-		if (parsed == len) {
+		if (!(parser.flagError)) {
 			return var;
 		}
 	}
+	
+	param.flagError = sl_true;
+	param.errorPosition = parser.pos;
+	param.errorMessage = parser.errorMessage;
+	param.errorLine = ST::countLineNumber(buf, parser.pos, &(param.errorColumn));
+	
 	return Variant::null();
+	
 }
 
-Variant Json::parseJson16(const String16& json, sl_bool flagSupportComments)
+
+Variant Json::parseJson(const String& json, JsonParseParam& param)
 {
-	const sl_char16* buf = json.getBuf();
-	sl_uint32 len = json.getLength();
-	while (len > 0) {
-		sl_char16 ch = buf[len - 1];
-		if (ch == '\r' || ch == '\n' || ch == ' ' || ch == '\t') {
-			len--;
-		} else {
-			break;
-		}
-	}
-	if (len == 0) {
-		return Variant::null();
-	}
-	sl_uint32 parsed = 0;
-	sl_bool f = sl_false;
-	Variant var = _Json_parseJson<String16, sl_char16>(buf, len, parsed, f, flagSupportComments);
-	if (!f) {
-		if (parsed == len) {
-			return var;
-		}
-	}
-	return Variant::null();
+	return _Json_Parser<String8, sl_char8>::parseJson(json.getData(), json.getLength(), param);
 }
 
-Variant Json::parseJsonFromUtf8TextFile(const String& filePath, sl_bool flagSupportComments)
+Variant Json::parseJson(const String& json)
+{
+	JsonParseParam param;
+	return parseJson(json, param);
+}
+
+
+Variant Json::parseJson16(const String16& json, JsonParseParam& param)
+{
+	return _Json_Parser<String16, sl_char16>::parseJson(json.getData(), json.getLength(), param);
+}
+
+Variant Json::parseJson16(const String16& json)
+{
+	JsonParseParam param;
+	return Json::parseJson16(json, param);
+}
+
+
+Variant Json::parseJsonFromUtf8TextFile(const String& filePath, JsonParseParam& param)
 {
 	String json = File::readUtf8Text(filePath);
-	return parseJson(json, flagSupportComments);
+	return parseJson(json, param);
 }
+
+Variant Json::parseJsonFromUtf8TextFile(const String& filePath)
+{
+	JsonParseParam param;
+	return parseJsonFromUtf8TextFile(filePath, param);
+}
+
 
 String Json::toJson(const Variant& var)
 {

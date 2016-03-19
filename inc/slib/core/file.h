@@ -13,76 +13,54 @@ SLIB_NAMESPACE_BEGIN
 
 enum FileMode
 {
-	fileMode_Read = 1,
-	fileMode_Write = 2,
-	fileMode_ReadWrite = 3,
-	fileMode_Append = 4,
-	fileMode_RandomAccess = 5
+	Read = 1,
+	Write = 2,
+	ReadWrite = 3,
+	Append = 4,
+	RandomAccess = 5
 };
 
 enum FileAttribute
 {
-	fileAttribute_Directory = 1,
-	fileAttribute_Hidden = 2
+	Directory = 1,
+	Hidden = 2
 };
 
 class SLIB_EXPORT File : public IO
 {
-	SLIB_DECLARE_OBJECT(File, IO)
+	SLIB_DECLARE_OBJECT
+
 private:
 	String m_path;
 	sl_file m_file;
 
 private:
 	File();
+
 	~File();
 
 public:
 	static Ref<File> open(const String& filePath, FileMode mode);
 	
-	SLIB_INLINE static Ref<File> openForRead(const String& filePath)
-	{
-		return open(filePath, fileMode_Read);
-	}
+	static Ref<File> openForRead(const String& filePath);
 	
-	SLIB_INLINE static Ref<File> openForWrite(const String& filePath)
-	{
-		return open(filePath, fileMode_Write);
-	}
+	static Ref<File> openForWrite(const String& filePath);
 	
-	SLIB_INLINE static Ref<File> openForReadWrite(const String& filePath)
-	{
-		return open(filePath, fileMode_ReadWrite);
-	}
+	static Ref<File> openForReadWrite(const String& filePath);
 	
-	SLIB_INLINE static Ref<File> openForAppend(const String& filePath)
-	{
-		return open(filePath, fileMode_Append);
-	}
+	static Ref<File> openForAppend(const String& filePath);
 	
-	SLIB_INLINE static Ref<File> openForRandomAccess(const String& filePath)
-	{
-		return open(filePath, fileMode_RandomAccess);
-	}
+	static Ref<File> openForRandomAccess(const String& filePath);
 
 public:
 	// override
 	void close();
 	
-	SLIB_INLINE sl_bool isOpened() const
-	{
-		return m_file != SLIB_FILE_INVALID_HANDLE;
-	}
+	sl_bool isOpened() const;
 
-	SLIB_INLINE String getPath() const
-	{
-		return m_path;
-	}
+	String getPath() const;
 
-	SLIB_INLINE sl_file getHandle() const
-	{
-		return m_file;
-	}
+	sl_file getHandle() const;
 	
 	// override
 	sl_uint64 getPosition();
@@ -100,7 +78,7 @@ public:
 	// override
 	sl_int32 write32(const void* buf, sl_uint32 size);
 
-public:
+
 	// works only if the file is already opened
 	sl_bool setSize(sl_uint64 size);
 	
@@ -108,7 +86,7 @@ public:
 	
 	sl_bool unlock();
 
-public:
+
 	static sl_uint64 getSize(sl_file fd);
 	
 	static sl_uint64 getSize(const String& path);
@@ -135,20 +113,11 @@ public:
 	
 	static int getAttributes(const String& filePath);
 	
-	SLIB_INLINE static sl_bool exists(const String& filePath)
-	{
-		return getAttributes(filePath) >= 0;
-	}
+	static sl_bool exists(const String& filePath);
 	
-	SLIB_INLINE static sl_bool isDirectory(const String& filePath)
-	{
-		return (getAttributes(filePath) & fileAttribute_Directory) != 0;
-	}
+	static sl_bool isDirectory(const String& filePath);
 	
-	SLIB_INLINE static sl_bool isHidden(const String& filePath)
-	{
-		return (getAttributes(filePath) & fileAttribute_Hidden) != 0;
-	}
+	static sl_bool isHidden(const String& filePath);
 
 	static sl_bool setHidden(const String& filePath, sl_bool flagHidden = sl_true);
 

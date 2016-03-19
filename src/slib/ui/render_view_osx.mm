@@ -31,7 +31,7 @@ Ref<ViewInstance> RenderView::createInstance(ViewInstance* _parent)
 	OSX_VIEW_CREATE_INSTANCE_BEGIN
 	_Slib_OSX_GLView* handle = [[_Slib_OSX_GLView alloc] initWithFrame:frame];
 	if (handle != nil) {
-		[handle _setRenderContinuously:(m_redrawMode == redrawMode_Continuously)];
+		[handle _setRenderContinuously:(m_redrawMode == RedrawMode::Continuously)];
 	}
 	OSX_VIEW_CREATE_INSTANCE_END
 	return ret;
@@ -43,7 +43,7 @@ void RenderView::setRedrawMode(RedrawMode mode)
 	NSView* view = UIPlatform::getViewHandle(this);
 	if (view != nil && [view isKindOfClass:[_Slib_OSX_GLView class]]) {
 		_Slib_OSX_GLView* v = (_Slib_OSX_GLView*)view;
-		[v _setRenderContinuously:(mode == redrawMode_Continuously)];
+		[v _setRenderContinuously:(mode == RedrawMode::Continuously)];
 	}
 	m_redrawMode = mode;
 }
@@ -122,9 +122,9 @@ void _Ui_OSX_GLView_thread(_Slib_OSX_GLView* handle)
 					Ref<OSX_ViewInstance> instance = handle->m_viewInstance;
 					if (instance.isNotNull()) {
 						Ref<View> _view = instance->getView();
-						if (RenderView::checkInstance(_view)) {
-							RenderView* view = (RenderView*)(_view.get());
-							view->dispatchFrame(engine.get());
+						if (RenderView::checkInstance(_view.ptr)) {
+							RenderView* view = (RenderView*)(_view.ptr);
+							view->dispatchFrame(engine.ptr);
 						}
 					} else {
 						return;

@@ -4,8 +4,8 @@ SLIB_MEDIA_NAMESPACE_BEGIN
 
 VideoFrame::VideoFrame()
 {
-	rotation = rotationMode_0;
-	flip = flipMode_None;
+	rotation = RotationMode::Rotate0;
+	flip = FlipMode::None;
 }
 
 SLIB_MEDIA_NAMESPACE_END

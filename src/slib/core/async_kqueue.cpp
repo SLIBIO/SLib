@@ -114,16 +114,16 @@ sl_bool AsyncIoLoop::__attachInstance(AsyncIoInstance* instance, AsyncIoMode mod
 	int ret = -1;
 
 	switch (mode) {
-		case asyncIoMode_InOut:
+		case AsyncIoMode::InOut:
 			EV_SET(ke, hObject, EVFILT_READ, EV_ADD | EV_CLEAR | EV_ENABLE, 0, 0, instance);
 			EV_SET(ke + 1, hObject, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_ENABLE, 0, 0, instance);
 			ret = ::kevent(handle->kq, ke, 2, sl_null, 0, sl_null);
 			break;
-		case asyncIoMode_In:
+		case AsyncIoMode::In:
 			EV_SET(ke, hObject, EVFILT_READ, EV_ADD | EV_CLEAR | EV_ENABLE, 0, 0, instance);
 			ret = ::kevent(handle->kq, ke, 1, sl_null, 0, sl_null);
 			break;
-		case asyncIoMode_Out:
+		case AsyncIoMode::Out:
 			EV_SET(ke, hObject, EVFILT_WRITE, EV_ADD | EV_CLEAR | EV_ENABLE, 0, 0, instance);
 			ret = ::kevent(handle->kq, ke, 1, sl_null, 0, sl_null);
 			break;
@@ -147,16 +147,16 @@ void AsyncIoLoop::__detachInstance(AsyncIoInstance* instance)
 	int ret = -1;
 	
 	switch (mode) {
-		case asyncIoMode_InOut:
+		case AsyncIoMode::InOut:
 			EV_SET(ke, hObject, EVFILT_READ, EV_DELETE, 0, 0, sl_null);
 			EV_SET(ke + 1, hObject, EVFILT_WRITE, EV_DELETE, 0, 0, sl_null);
 			ret = ::kevent(handle->kq, ke, 2, sl_null, 0, sl_null);
 			break;
-		case asyncIoMode_In:
+		case AsyncIoMode::In:
 			EV_SET(ke, hObject, EVFILT_READ, EV_DELETE, 0, 0, sl_null);
 			ret = ::kevent(handle->kq, ke, 1, sl_null, 0, sl_null);
 			break;
-		case asyncIoMode_Out:
+		case AsyncIoMode::Out:
 			EV_SET(ke, hObject, EVFILT_WRITE, EV_DELETE, 0, 0, sl_null);
 			ret = ::kevent(handle->kq, ke, 1, sl_null, 0, sl_null);
 			break;

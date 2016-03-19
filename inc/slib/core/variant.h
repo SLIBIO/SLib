@@ -11,21 +11,22 @@
 
 SLIB_NAMESPACE_BEGIN
 
-enum VariantType {
-	variantType_Null = 0,
-	variantType_Int32 = 1,
-	variantType_Uint32 = 2,
-	variantType_Int64 = 3,
-	variantType_Uint64 = 4,
-	variantType_Float = 5,
-	variantType_Double = 6,
-	variantType_Time = 7,
-	variantType_Pointer = 8,
-	variantType_Boolean = 9,
-	variantType_String8 = 10,
-	variantType_String16 = 11,
-	variantType_Object = 20,
-	variantType_Weak = 30,
+enum class VariantType
+{
+	Null = 0,
+	Int32 = 1,
+	Uint32 = 2,
+	Int64 = 3,
+	Uint64 = 4,
+	Float = 5,
+	Double = 6,
+	Time = 7,
+	Pointer = 8,
+	Boolean = 9,
+	String8 = 10,
+	String16 = 11,
+	Object = 20,
+	Weak = 30
 };
 
 struct _Variant_Const
@@ -42,318 +43,136 @@ class SafeVariant;
 class SLIB_EXPORT Variant
 {
 public:
-	SLIB_INLINE Variant()
-	{
-		m_type = variantType_Null;
-	}
+	sl_uint64 _value;
+	VariantType _type;
+
+public:
+	Variant();
 	
-	SLIB_INLINE Variant(Variant&& other)
-	{
-		m_type = other.m_type;
-		m_value = other.m_value;
-		other.m_type = variantType_Null;
-	}
+	Variant(Variant&& other);
 	
 	Variant(const Variant& other);
 	
-	SLIB_INLINE Variant(SafeVariant&& _other)
-	{
-		Variant& other = *((Variant*)((void*)(&_other)));
-		m_type = other.m_type;
-		m_value = other.m_value;
-		other.m_type = variantType_Null;
-	}
+	Variant(SafeVariant&& _other);
 	
 	Variant(const SafeVariant& other);
 
 	~Variant();
 	
 public:
-	SLIB_INLINE Variant(sl_int32 value)
-	{
-		m_type = variantType_Int32;
-		*(sl_int32*)(void*)(&m_value) = value;
-	}
+	Variant(sl_int32 value);
 	
-	SLIB_INLINE Variant(sl_uint32 value)
-	{
-		m_type = variantType_Uint32;
-		*(sl_uint32*)(void*)(&m_value) = value;
-	}
+	Variant(sl_uint32 value);
 	
-	SLIB_INLINE Variant(sl_int64 value)
-	{
-		m_type = variantType_Int64;
-		*(sl_int64*)(void*)(&m_value) = value;
-	}
+	Variant(sl_int64 value);
 	
-	SLIB_INLINE Variant(sl_uint64 value)
-	{
-		m_type = variantType_Uint64;
-		*(sl_uint64*)(void*)(&m_value) = value;
-	}
+	Variant(sl_uint64 value);
 	
-	SLIB_INLINE Variant(float value)
-	{
-		m_type = variantType_Float;
-		*(float*)(void*)(&m_value) = value;
-	}
+	Variant(float value);
 
-	SLIB_INLINE Variant(double value)
-	{
-		m_type = variantType_Double;
-		*(double*)(void*)(&m_value) = value;
-	}
+	Variant(double value);
 	
-	SLIB_INLINE Variant(const Time& value)
-	{
-		m_type = variantType_Time;
-		*(Time*)(void*)(&m_value) = value;
-	}
+	Variant(const Time& value);
 	
-	SLIB_INLINE Variant(const void* ptr)
-	{
-		m_type = variantType_Pointer;
-		*(const void**)(void*)(&m_value) = ptr;
-	}
+	Variant(const void* ptr);
 	
-	SLIB_INLINE Variant(const sl_bool value)
-	{
-		m_type = variantType_Boolean;
-		*(sl_bool*)(void*)(&m_value) = value;
-	}
+	Variant(const sl_bool value);
 	
-	SLIB_INLINE Variant(const String8& value)
-	{
-		m_type = variantType_String8;
-		new ((String8*)(void*)(&m_value)) String8(value);
-	}
+	Variant(const String8& value);
 	
-	SLIB_INLINE Variant(const SafeString8& value)
-	{
-		m_type = variantType_String8;
-		new ((String8*)(void*)(&m_value)) String8(value);
-	}
+	Variant(const SafeString8& value);
 	
-	SLIB_INLINE Variant(const String16& value)
-	{
-		m_type = variantType_String16;
-		new ((String16*)(void*)(&m_value)) String16(value);
-	}
+	Variant(const String16& value);
 	
-	SLIB_INLINE Variant(const SafeString16& value)
-	{
-		m_type = variantType_String16;
-		new ((String16*)(void*)(&m_value)) String16(value);
-	}
+	Variant(const SafeString16& value);
 
 	template <class T>
-	SLIB_INLINE Variant(const Ref<T>& ref)
-	{
-		m_type = variantType_Object;
-		new ((Ref<T>*)(void*)(&m_value)) Ref<T>(ref);
-	}
+	Variant(const Ref<T>& ref);
 	
 	template <class T>
-	SLIB_INLINE Variant(const SafeRef<T>& ref)
-	{
-		m_type = variantType_Object;
-		new ((Ref<T>*)(void*)(&m_value)) Ref<T>(ref);
-	}
+	Variant(const SafeRef<T>& ref);
 	
-	SLIB_INLINE Variant(const Memory& mem)
-	{
-		m_type = variantType_Object;
-		new ((Memory*)(void*)(&m_value)) Memory(mem);
-	}
+	Variant(const Memory& mem);
 	
-	SLIB_INLINE Variant(const SafeMemory& mem)
-	{
-		m_type = variantType_Object;
-		new ((Memory*)(void*)(&m_value)) Memory(mem);
-	}
+	Variant(const SafeMemory& mem);
 	
 	template <class T, class COMPARE>
-	SLIB_INLINE Variant(const Array<T, COMPARE>& object)
-	{
-		m_type = variantType_Object;
-		new ((Array<T, COMPARE>*)(void*)(&m_value)) Array<T, COMPARE>(object);
-	}
+	Variant(const Array<T, COMPARE>& object);
 	
 	template <class T, class COMPARE>
-	SLIB_INLINE Variant(const SafeArray<T, COMPARE>& object)
-	{
-		m_type = variantType_Object;
-		new ((Array<T, COMPARE>*)(void*)(&m_value)) Array<T, COMPARE>(object);
-	}
+	Variant(const SafeArray<T, COMPARE>& object);
 
 	template <class T, class COMPARE>
-	SLIB_INLINE Variant(const List<T, COMPARE>& object)
-	{
-		m_type = variantType_Object;
-		new ((List<T, COMPARE>*)(void*)(&m_value)) List<T, COMPARE>(object);
-	}
+	Variant(const List<T, COMPARE>& object);
 	
 	template <class T, class COMPARE>
-	SLIB_INLINE Variant(const SafeList<T, COMPARE>& object)
-	{
-		m_type = variantType_Object;
-		new ((List<T, COMPARE>*)(void*)(&m_value)) List<T, COMPARE>(object);
-	}
+	Variant(const SafeList<T, COMPARE>& object);
 	
 	template <class KT, class VT>
-	SLIB_INLINE Variant(const Map<KT, VT>& object)
-	{
-		m_type = variantType_Object;
-		new ((Map<KT, VT>*)(void*)(&m_value)) Map<KT, VT>(object);
-	}
+	Variant(const Map<KT, VT>& object);
 	
 	template <class KT, class VT>
-	SLIB_INLINE Variant(const SafeMap<KT, VT>& object)
-	{
-		m_type = variantType_Object;
-		new ((Map<KT, VT>*)(void*)(&m_value)) Map<KT, VT>(object);
-	}
+	Variant(const SafeMap<KT, VT>& object);
 	
 	template <class T>
-	SLIB_INLINE Variant(const WeakRef<T>& weak)
-	{
-		m_type = variantType_Weak;
-		new ((WeakRef<T>*)(void*)(&m_value)) WeakRef<T>(weak);
-	}
+	Variant(const WeakRef<T>& weak);
 	
 	template <class T>
-	SLIB_INLINE Variant(const SafeWeakRef<T>& weak)
-	{
-		m_type = variantType_Weak;
-		new ((WeakRef<T>*)(void*)(&m_value)) WeakRef<T>(weak);
-	}
+	Variant(const SafeWeakRef<T>& weak);
 
 public:
-	SLIB_INLINE static const Variant& null()
-	{
-		return *((Variant*)((void*)(&_Variant_Null)));
-	}
+	static const Variant& null();
 
-	SLIB_INLINE static Variant fromInt32(sl_int32 value)
-	{
-		return value;
-	}
+	static Variant fromInt32(sl_int32 value);
 	
-	SLIB_INLINE static Variant fromUint32(sl_uint32 value)
-	{
-		return value;
-	}
+	static Variant fromUint32(sl_uint32 value);
 	
-	SLIB_INLINE static Variant fromInt64(sl_int64 value)
-	{
-		return value;
-	}
+	static Variant fromInt64(sl_int64 value);
 	
-	SLIB_INLINE static Variant fromUint64(sl_uint64 value)
-	{
-		return value;
-	}
+	static Variant fromUint64(sl_uint64 value);
 	
-	SLIB_INLINE static Variant fromFloat(float value)
-	{
-		return value;
-	}
+	static Variant fromFloat(float value);
 	
-	SLIB_INLINE static Variant fromDouble(double value)
-	{
-		return value;
-	}
+	static Variant fromDouble(double value);
 	
-	SLIB_INLINE static Variant fromTime(const Time& value)
-	{
-		return value;
-	}
+	static Variant fromTime(const Time& value);
 	
-	SLIB_INLINE static Variant fromPointer(const void* value)
-	{
-		return value;
-	}
+	static Variant fromPointer(const void* value);
 	
-	SLIB_INLINE static Variant fromBoolean(sl_bool value)
-	{
-		return value;
-	}
+	static Variant fromBoolean(sl_bool value);
 	
-	SLIB_INLINE static Variant fromString(const String8& value)
-	{
-		return value;
-	}
+	static Variant fromString(const String8& value);
 	
-	SLIB_INLINE static Variant fromString(const String16& value)
-	{
-		return value;
-	}
+	static Variant fromString(const String16& value);
 	
 	template <class T>
-	SLIB_INLINE static Variant fromRef(const Ref<T>& ref)
-	{
-		return ref;
-	}
+	static Variant fromRef(const Ref<T>& ref);
 	
-	SLIB_INLINE static Variant fromMemory(const Memory& mem)
-	{
-		return mem;
-	}
+	static Variant fromMemory(const Memory& mem);
 	
 	template <class T, class COMPARE>
-	SLIB_INLINE static Variant fromArray(const Array<T, COMPARE>& value)
-	{
-		return value;
-	}
+	static Variant fromArray(const Array<T, COMPARE>& value);
 	
 	template <class T, class COMPARE>
-	SLIB_INLINE static Variant fromList(const List<T, COMPARE>& value)
-	{
-		return value;
-	}
+	static Variant fromList(const List<T, COMPARE>& value);
 	
-	SLIB_INLINE static Variant fromVariantList(const List<Variant>& value)
-	{
-		return value;
-	}
+	static Variant fromVariantList(const List<Variant>& value);
 	
-	SLIB_INLINE static Variant createVariantList()
-	{
-		return List<Variant>::create();
-	}
+	static Variant createVariantList();
 
 	template <class KT, class VT>
-	SLIB_INLINE static Variant fromMap(const Map<KT, VT>& value)
-	{
-		return value;
-	}
+	static Variant fromMap(const Map<KT, VT>& value);
 
-	SLIB_INLINE static Variant fromVariantMap(const Map<String, Variant>& value)
-	{
-		return value;
-	}
+	static Variant fromVariantMap(const Map<String, Variant>& value);
 	
-	SLIB_INLINE static Variant createVariantListMap()
-	{
-		return Map<String, Variant>::createList();
-	}
+	static Variant createVariantListMap();
 	
-	SLIB_INLINE static Variant createVariantTreeMap()
-	{
-		return Map<String, Variant>::createTree();
-	}
+	static Variant createVariantTreeMap();
 	
-	SLIB_INLINE static Variant createVariantHashMap()
-	{
-		return Map<String, Variant>::createHash();
-	}
+	static Variant createVariantHashMap();
 	
 	template <class T>
-	SLIB_INLINE static Variant fromWeakRef(const WeakRef<T>& weak)
-	{
-		return weak;
-	}
+	static Variant fromWeakRef(const WeakRef<T>& weak);
 	
 public:
 	Variant& operator=(Variant&& other);
@@ -364,784 +183,288 @@ public:
 	
 	Variant& operator=(const SafeVariant& other);
 	
-public:
-	SLIB_INLINE Variant& operator=(sl_int32 value)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Int32;
-		*(sl_int32*)(void*)(&m_value) = value;
-		return *this;
-	}
+	Variant& operator=(sl_int32 value);
 	
-	SLIB_INLINE Variant& operator=(sl_uint32 value)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Uint32;
-		*(sl_uint32*)(void*)(&m_value) = value;
-		return *this;
-	}
+	Variant& operator=(sl_uint32 value);
 	
-	SLIB_INLINE Variant& operator=(sl_int64 value)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Int64;
-		*(sl_int64*)(void*)(&m_value) = value;
-		return *this;
-	}
+	Variant& operator=(sl_int64 value);
 	
-	SLIB_INLINE Variant& operator=(sl_uint64 value)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Uint64;
-		*(sl_uint64*)(void*)(&m_value) = value;
-		return *this;
-	}
+	Variant& operator=(sl_uint64 value);
 	
-	SLIB_INLINE Variant& operator=(float value)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Float;
-		*(float*)(void*)(&m_value) = value;
-		return *this;
-	}
+	Variant& operator=(float value);
 	
-	SLIB_INLINE Variant& operator=(double value)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Double;
-		*(double*)(void*)(&m_value) = value;
-		return *this;
-	}
+	Variant& operator=(double value);
 	
-	SLIB_INLINE Variant& operator=(const Time& value)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Time;
-		*(Time*)(void*)(&m_value) = value;
-		return *this;
-	}
+	Variant& operator=(const Time& value);
 	
-	SLIB_INLINE Variant& operator=(const void* ptr)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Pointer;
-		*(const void**)(void*)(&m_value) = ptr;
-		return *this;
-	}
+	Variant& operator=(const void* ptr);
 	
-	SLIB_INLINE Variant& operator=(const sl_bool value)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Boolean;
-		*(sl_bool*)(void*)(&m_value) = value;
-		return *this;
-	}
+	Variant& operator=(const sl_bool value);
 	
-	SLIB_INLINE Variant& operator=(const String8& value)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_String8;
-		new ((String8*)(void*)(&m_value)) String8(value);
-		return *this;
-	}
+	Variant& operator=(const String8& value);
 	
-	SLIB_INLINE Variant& operator=(const SafeString8& value)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_String8;
-		new ((String8*)(void*)(&m_value)) String8(value);
-		return *this;
-	}
+	Variant& operator=(const SafeString8& value);
 	
-	SLIB_INLINE Variant& operator=(const String16& value)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_String16;
-		new ((String16*)(void*)(&m_value)) String16(value);
-		return *this;
-	}
+	Variant& operator=(const String16& value);
 	
-	SLIB_INLINE Variant& operator=(const SafeString16& value)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_String16;
-		new ((String16*)(void*)(&m_value)) String16(value);
-		return *this;
-	}
+	Variant& operator=(const SafeString16& value);
 	
 	template <class T>
-	SLIB_INLINE Variant& operator=(const Ref<T>& ref)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Object;
-		new ((Ref<T>*)(void*)(&m_value)) Ref<T>(ref);
-		return *this;
-	}
+	Variant& operator=(const Ref<T>& ref);
 	
 	template <class T>
-	SLIB_INLINE Variant& operator=(const SafeRef<T>& ref)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Object;
-		new ((Ref<T>*)(void*)(&m_value)) Ref<T>(ref);
-		return *this;
-	}
+	Variant& operator=(const SafeRef<T>& ref);
 	
-	SLIB_INLINE Variant& operator=(const Memory& mem)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Object;
-		new ((Memory*)(void*)(&m_value)) Memory(mem);
-		return *this;
-	}
+	Variant& operator=(const Memory& mem);
 	
-	SLIB_INLINE Variant& operator=(const SafeMemory& mem)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Object;
-		new ((Memory*)(void*)(&m_value)) Memory(mem);
-		return *this;
-	}
+	Variant& operator=(const SafeMemory& mem);
 	
 	template <class T, class COMPARE>
-	SLIB_INLINE Variant& operator=(const Array<T, COMPARE>& object)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Object;
-		new ((Array<T, COMPARE>*)(void*)(&m_value)) Array<T, COMPARE>(object);
-		return *this;
-	}
+	Variant& operator=(const Array<T, COMPARE>& object);
 	
 	template <class T, class COMPARE>
-	SLIB_INLINE Variant& operator=(const SafeArray<T, COMPARE>& object)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Object;
-		new ((Array<T, COMPARE>*)(void*)(&m_value)) Array<T, COMPARE>(object);
-		return *this;
-	}
+	Variant& operator=(const SafeArray<T, COMPARE>& object);
 
 	template <class T, class COMPARE>
-	SLIB_INLINE Variant& operator=(const List<T, COMPARE>& object)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Object;
-		new ((List<T, COMPARE>*)(void*)(&m_value)) List<T, COMPARE>(object);
-		return *this;
-	}
+	Variant& operator=(const List<T, COMPARE>& object);
 	
 	template <class T, class COMPARE>
-	SLIB_INLINE Variant& operator=(const SafeList<T, COMPARE>& object)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Object;
-		new ((List<T, COMPARE>*)(void*)(&m_value)) List<T, COMPARE>(object);
-		return *this;
-	}
+	Variant& operator=(const SafeList<T, COMPARE>& object);
 	
 	template <class KT, class VT>
-	SLIB_INLINE Variant& operator=(const Map<KT, VT>& object)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Object;
-		new ((Map<KT, VT>*)(void*)(&m_value)) Map<KT, VT>(object);
-		return *this;
-	}
+	Variant& operator=(const Map<KT, VT>& object);
 	
 	template <class KT, class VT>
-	SLIB_INLINE Variant& operator=(const SafeMap<KT, VT>& object)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Object;
-		new ((Map<KT, VT>*)(void*)(&m_value)) Map<KT, VT>(object);
-		return *this;
-	}
+	Variant& operator=(const SafeMap<KT, VT>& object);
 	
 	template <class T>
-	SLIB_INLINE Variant& operator=(const WeakRef<T>& weak)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Weak;
-		new ((WeakRef<T>*)(void*)(&m_value)) WeakRef<T>(weak);
-		return *this;
-	}
+	Variant& operator=(const WeakRef<T>& weak);
 	
 	template <class T>
-	SLIB_INLINE Variant& operator=(const SafeWeakRef<T>& weak)
-	{
-		_free(m_type, m_value);
-		m_type = variantType_Weak;
-		new ((WeakRef<T>*)(void*)(&m_value)) WeakRef<T>(weak);
-		return *this;
-	}
+	Variant& operator=(const SafeWeakRef<T>& weak);
 	
 public:
-	friend sl_bool operator==(const Variant& v1, const Variant& v2);
-
-public:
-	SLIB_INLINE VariantType getType() const
-	{
-		return m_type;
-	}
+	VariantType getType() const;
 	
-	SLIB_INLINE void setNull()
-	{
-		*this = Variant::null();
-	}
+	void setNull();
 	
-	SLIB_INLINE sl_bool isNull() const
-	{
-		return m_type == variantType_Null;
-	}
+	sl_bool isNull() const;
 	
-	SLIB_INLINE sl_bool isNotNull() const
-	{
-		return m_type != variantType_Null;
-	}
+	sl_bool isNotNull() const;
 	
-public:
-	SLIB_INLINE sl_bool isInt32() const
-	{
-		return m_type == variantType_Int32;
-	}
+	
+	sl_bool isInt32() const;
 
 	sl_int32 getInt32(sl_int32 def = 0) const;
 
-	SLIB_INLINE sl_bool isUint32() const
-	{
-		return m_type == variantType_Uint32;
-	}
+	sl_bool isUint32() const;
 
 	sl_uint32 getUint32(sl_uint32 def = 0) const;
 
-	SLIB_INLINE sl_bool isInt64() const
-	{
-		return m_type == variantType_Int64;
-	}
+	sl_bool isInt64() const;
 
 	sl_int64 getInt64(sl_int64 def = 0) const;
 
-	SLIB_INLINE sl_bool isUint64() const
-	{
-		return m_type == variantType_Uint64;
-	}
+	sl_bool isUint64() const;
 
 	sl_uint64 getUint64(sl_uint64 def = 0) const;
 
-	SLIB_INLINE sl_bool isInteger() const
-	{
-		return m_type == variantType_Int32 || m_type == variantType_Uint32 || m_type == variantType_Int64 || m_type == variantType_Uint64;
-	}
+	sl_bool isInteger() const;
 
-	SLIB_INLINE sl_bool isFloat() const
-	{
-		return m_type == variantType_Float;
-	}
+	sl_bool isFloat() const;
 
 	float getFloat(float def = 0) const;
 
-	SLIB_INLINE sl_bool isDouble() const
-	{
-		return m_type == variantType_Double;
-	}
+	sl_bool isDouble() const;
 
 	double getDouble(double def = 0) const;
 
-	SLIB_INLINE sl_bool isNumber() const
-	{
-		return isInteger() || m_type == variantType_Float || m_type == variantType_Double;
-	}
+	sl_bool isNumber() const;
 
-public:
-	SLIB_INLINE sl_bool isTime() const
-	{
-		return m_type == variantType_Time;
-	}
+	
+	sl_bool isTime() const;
 
 	Time getTime(Time def) const;
 
-	Time getTime() const
-	{
-		return getTime(Time::zero());
-	}
+	Time getTime() const;
+	
+	
+	sl_bool isPointer() const;
 
-public:
-	SLIB_INLINE sl_bool isPointer() const
-	{
-		return m_type == variantType_Pointer;
-	}
+	void* getPointer(const void* def = sl_null) const;
 
-	const void* getPointer(const void* def = sl_null) const;
-
-public:
-	SLIB_INLINE sl_bool isBoolean() const
-	{
-		return m_type == variantType_Boolean;
-	}
+	
+	sl_bool isBoolean() const;
 
 	sl_bool getBoolean(sl_bool def) const;
 
-public:
-	SLIB_INLINE sl_bool isString() const
-	{
-		return m_type == variantType_String8 || m_type == variantType_String16;
-	}
+	
+	sl_bool isString() const;
 
-	SLIB_INLINE sl_bool isString8() const
-	{
-		return m_type == variantType_String8;
-	}
+	sl_bool isString8() const;
 
-	SLIB_INLINE sl_bool isString16() const
-	{
-		return m_type == variantType_String16;
-	}
+	sl_bool isString16() const;
 
 	String getString(const String& def) const;
+	
+	String getString() const;
+	
+	String8 getString8(const String8& def) const;
+	
+	String8 getString8() const;
 
 	String16 getString16(const String16& def) const;
 
-	SLIB_INLINE String getString() const
-	{
-		return getString(String::null());
-	}
+	String16 getString16() const;
 
-	SLIB_INLINE String16 getString16() const
-	{
-		return getString16(String16::null());
-	}
+	
+	sl_bool isObject() const;
 
-public:
-	SLIB_INLINE sl_bool isObject() const
-	{
-		return m_type == variantType_Object;
-	}
-
-	SLIB_INLINE Ref<Referable> getObject() const
-	{
-		if (m_type == variantType_Object) {
-			return *((Ref<Referable>*)(void*)(&m_value));
-		}
-		return Ref<Referable>::null();
-	}
+	Ref<Referable> getObject() const;
 
 	template <class T>
-	SLIB_INLINE Ref<T> getObject(const Ref<T>& def) const
-	{
-		if (m_type == variantType_Object) {
-			return *((Ref<T>*)(void*)(&m_value));
-		}
-		return def;
-	}
+	Ref<T> getObject(const Ref<T>& def) const;
 	
-	SLIB_INLINE sl_bool isObjectNotNull() const
-	{
-		if (m_type == variantType_Object) {
-			return (*((Ref<Referable>*)(void*)(&m_value))).isNotNull();
-		}
-		return sl_false;
-	}
+	sl_bool isObjectNotNull() const;
 	
-	SLIB_INLINE sl_bool isObjectNull() const
-	{
-		if (m_type == variantType_Object) {
-			return (*((Ref<Referable>*)(void*)(&m_value))).isNull();
-		}
-		return sl_true;
-	}
+	sl_bool isObjectNull() const;
 	
-	SLIB_INLINE sl_class_type getObjectClassType() const
-	{
-		if (m_type == variantType_Object) {
-			return (*((Referable**)(void*)(&m_value)))->getClassType();
-		}
-		return 0;
-	}
+	sl_class_type getObjectClassType() const;
 	
-	SLIB_INLINE const char* getObjectClassTypeName() const
-	{
-		if (m_type == variantType_Object) {
-			return (*((Referable**)(void*)(&m_value)))->getClassTypeName();
-		}
-		return 0;
-	}
+	sl_bool isMemory() const;
+	
+	Memory getMemory() const;
 
-	SLIB_INLINE sl_bool isMemory() const
-	{
-		if (m_type == variantType_Object) {
-			return Memory::checkInstance(*((Referable**)(void*)(&m_value)));
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE Memory getMemory() const
-	{
-		if (m_type == variantType_Object) {
-			Referable* ref = *((Referable**)(void*)(&m_value));
-			if (Memory::checkInstance(ref)) {
-				return (CMemory*)ref;
-			}
-		}
-		return Memory::null();
-	}
-
-	SLIB_INLINE sl_bool isVariantList() const
-	{
-		if (m_type == variantType_Object) {
-			return List<Variant>::checkInstance(*((Referable**)(void*)(&m_value)));
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE List<Variant> getVariantList() const
-	{
-		if (m_type == variantType_Object) {
-			Referable* ref = *((Referable**)(void*)(&m_value));
-			if (List<Variant>::checkInstance(ref)) {
-				return (CList<Variant>*)ref;
-			}
-		}
-		return List<Variant>::null();
-	}
-	
 	template <class TYPE, class COMPARE>
-	SLIB_INLINE const List<TYPE, COMPARE>& getList(const List<TYPE, COMPARE>& def) const
-	{
-		if (m_type == variantType_Object) {
-			Referable* ref = *((Referable**)(void*)(&m_value));
-			if (List<TYPE, COMPARE>::checkInstance(ref)) {
-				return (CList<TYPE, COMPARE>*)ref;
-			}
-		}
-		return def;
-	}
-
-	SLIB_INLINE sl_bool isVariantMap() const
-	{
-		if (m_type == variantType_Object) {
-			return Map<String, Variant>::checkInstance(*((Referable**)(void*)(&m_value)));
-		}
-		return sl_false;
-	}
-	
-	SLIB_INLINE Map<String, Variant> getVariantMap() const
-	{
-		if (m_type == variantType_Object) {
-			Referable* ref = *((Referable**)(void*)(&m_value));
-			if (Map<String, Variant>::checkInstance(ref)) {
-				return (IMap<String, Variant>*)ref;
-			}
-		}
-		return Map<String, Variant>::null();
-	}
+	List<TYPE, COMPARE> getList(const List<TYPE, COMPARE>& def) const;
 	
 	template <class KT, class VT>
-	SLIB_INLINE const Map<KT, VT>& getMap(const Map<KT, VT>& def) const
-	{
-		if (m_type == variantType_Object) {
-			Referable* ref = *((Referable**)(void*)(&m_value));
-			if (Map<KT, VT>::checkInstance(ref)) {
-				return (IMap<KT, VT>*)ref;
-			}
-		}
-		return def;
-	}
-	
-	SLIB_INLINE sl_size getListItemsCount() const
-	{
-		if (m_type == variantType_Object) {
-			Referable* ref = *((Referable**)(void*)(&m_value));
-			if (List<Variant>::checkInstance(ref)) {
-				return ((CList<Variant>*)ref)->count();
-			}
-		}
-		return 0;
+	Map<KT, VT> getMap(const Map<KT, VT>& def) const;
 
-	}
-
-	SLIB_INLINE Variant getListItem(sl_size index) const
-	{
-		if (m_type == variantType_Object) {
-			Referable* ref = *((Referable**)(void*)(&m_value));
-			if (List<Variant>::checkInstance(ref)) {
-				return ((CList<Variant>*)ref)->getItemValue(index, Variant::null());
-			}
-		}
-		return Variant::null();
-	}
-
-	SLIB_INLINE sl_bool setListItem(sl_size index, const Variant& value)
-	{
-		if (m_type == variantType_Object) {
-			Referable* ref = *((Referable**)(void*)(&m_value));
-			if (List<Variant>::checkInstance(ref)) {
-				return ((CList<Variant>*)ref)->setItem(index, value);
-			}
-		}
-		return sl_false;
-	}
-
-	SLIB_INLINE sl_bool addListItem(const Variant& value)
-	{
-		if (m_type == variantType_Object) {
-			Referable* ref = *((Referable**)(void*)(&m_value));
-			if (List<Variant>::checkInstance(ref)) {
-				return ((CList<Variant>*)ref)->add(value);
-			}
-		}
-		return sl_false;
-	}
-
-	SLIB_INLINE Variant getField(const String& key) const
-	{
-		if (m_type == variantType_Object) {
-			Referable* ref = *((Referable**)(void*)(&m_value));
-			if (Map<String, Variant>::checkInstance(ref)) {
-				return ((IMap<String, Variant>*)ref)->getValue(key, Variant::null());
-			}
-		}
-		return Variant::null();
-	}
-
-	SLIB_INLINE sl_bool putField(const String& key, const Variant& value)
-	{
-		if (m_type == variantType_Object) {
-			Referable* ref = *((Referable**)(void*)(&m_value));
-			if (Map<String, Variant>::checkInstance(ref)) {
-				return ((IMap<String, Variant>*)ref)->put(key, value);
-			}
-		}
-		return sl_false;
-	}
-
-public:
-	SLIB_INLINE sl_bool isWeak() const
-	{
-		return m_type == variantType_Weak;
-	}
+	sl_bool isWeak() const;
 	
 	template <class T>
-	SLIB_INLINE const WeakRef<T> getWeak(const WeakRef<T>& def) const
-	{
-		if (m_type == variantType_Weak) {
-			return *((WeakRef<T>*)(void*)(&m_value));
-		}
-		return def;
-	}
+	WeakRef<T> getWeak(const WeakRef<T>& def) const;
 	
-public:
+
+	sl_bool isVariantList() const;
+	
+	List<Variant> getVariantList() const;
+
+	sl_bool isVariantMap() const;
+	
+	Map<String, Variant> getVariantMap() const;
+	
+	sl_size getListItemsCount() const;
+	
+	Variant getListItem(sl_size index) const;
+
+	sl_bool setListItem(sl_size index, const Variant& value);
+
+	sl_bool addListItem(const Variant& value);
+
+	Variant getField(const String& key) const;
+
+	sl_bool putField(const String& key, const Variant& value);
+
+	
 	String toString() const;
 
 	String toJson() const;
 
 	
 private:
-	sl_uint64 m_value;
-	VariantType m_type;
-	
-private:
-	static void _copy(VariantType src_type, sl_uint64 src_value, sl_uint64& dst_value);
-	
 	static void _free(VariantType type, sl_uint64 value);
 	
 	friend class SafeVariant;
+	
 };
 
 
 class SLIB_EXPORT SafeVariant
 {
 public:
-	SLIB_INLINE SafeVariant()
-	{
-		m_type = variantType_Null;
-	}
+	sl_uint64 _value;
+	VariantType _type;
+private:
+	SpinLock m_lock;
 	
-	SLIB_INLINE SafeVariant(SafeVariant&& other)
-	{
-		m_type = other.m_type;
-		m_value = other.m_value;
-		other.m_type = variantType_Null;
-	}
+public:
+	SafeVariant();
+	
+	SafeVariant(SafeVariant&& other);
 	
 	SafeVariant(const SafeVariant& other);
 	
-	SLIB_INLINE SafeVariant(Variant&& other)
-	{
-		m_type = other.m_type;
-		m_value = other.m_value;
-		other.m_type = variantType_Null;
-	}
+	SafeVariant(Variant&& other);
 	
 	SafeVariant(const Variant& other);
 	
 	~SafeVariant();
 	
 public:
-	SLIB_INLINE SafeVariant(sl_int32 value)
-	{
-		m_type = variantType_Int32;
-		*(sl_int32*)(void*)(&m_value) = value;
-	}
+	SafeVariant(sl_int32 value);
 	
-	SLIB_INLINE SafeVariant(sl_uint32 value)
-	{
-		m_type = variantType_Uint32;
-		*(sl_uint32*)(void*)(&m_value) = value;
-	}
+	SafeVariant(sl_uint32 value);
 	
-	SLIB_INLINE SafeVariant(sl_int64 value)
-	{
-		m_type = variantType_Int64;
-		*(sl_int64*)(void*)(&m_value) = value;
-	}
+	SafeVariant(sl_int64 value);
 	
-	SLIB_INLINE SafeVariant(sl_uint64 value)
-	{
-		m_type = variantType_Uint64;
-		*(sl_uint64*)(void*)(&m_value) = value;
-	}
+	SafeVariant(sl_uint64 value);
 	
-	SLIB_INLINE SafeVariant(float value)
-	{
-		m_type = variantType_Float;
-		*(float*)(void*)(&m_value) = value;
-	}
+	SafeVariant(float value);
 	
-	SLIB_INLINE SafeVariant(double value)
-	{
-		m_type = variantType_Double;
-		*(double*)(void*)(&m_value) = value;
-	}
+	SafeVariant(double value);
 	
-	SLIB_INLINE SafeVariant(const Time& value)
-	{
-		m_type = variantType_Time;
-		*(Time*)(void*)(&m_value) = value;
-	}
+	SafeVariant(const Time& value);
 	
-	SLIB_INLINE SafeVariant(const void* ptr)
-	{
-		m_type = variantType_Pointer;
-		*(const void**)(void*)(&m_value) = ptr;
-	}
+	SafeVariant(const void* ptr);
 	
-	SLIB_INLINE SafeVariant(const sl_bool value)
-	{
-		m_type = variantType_Boolean;
-		*(sl_bool*)(void*)(&m_value) = value;
-	}
+	SafeVariant(const sl_bool value);
 	
-	SLIB_INLINE SafeVariant(const String8& value)
-	{
-		m_type = variantType_String8;
-		new ((String8*)(void*)(&m_value)) String8(value);
-	}
+	SafeVariant(const String8& value);
 	
-	SLIB_INLINE SafeVariant(const SafeString8& value)
-	{
-		m_type = variantType_String8;
-		new ((String8*)(void*)(&m_value)) String8(value);
-	}
+	SafeVariant(const SafeString8& value);
 
-	SLIB_INLINE SafeVariant(const String16& value)
-	{
-		m_type = variantType_String16;
-		new ((String16*)(void*)(&m_value)) String16(value);
-	}
+	SafeVariant(const String16& value);
 	
-	SLIB_INLINE SafeVariant(const SafeString16& value)
-	{
-		m_type = variantType_String16;
-		new ((String16*)(void*)(&m_value)) String16(value);
-	}
+	SafeVariant(const SafeString16& value);
 
 	template <class T>
-	SLIB_INLINE SafeVariant(const Ref<T>& ref)
-	{
-		m_type = variantType_Object;
-		new ((Ref<T>*)(void*)(&m_value)) Ref<T>(ref);
-	}
+	SafeVariant(const Ref<T>& ref);
 	
 	template <class T>
-	SLIB_INLINE SafeVariant(const SafeRef<T>& ref)
-	{
-		m_type = variantType_Object;
-		new ((Ref<T>*)(void*)(&m_value)) Ref<T>(ref);
-	}
+	SafeVariant(const SafeRef<T>& ref);
 	
-	SLIB_INLINE SafeVariant(const Memory& mem)
-	{
-		m_type = variantType_Object;
-		new ((Memory*)(void*)(&m_value)) Memory(mem);
-	}
+	SafeVariant(const Memory& mem);
 	
-	SLIB_INLINE SafeVariant(const SafeMemory& mem)
-	{
-		m_type = variantType_Object;
-		new ((Memory*)(void*)(&m_value)) Memory(mem);
-	}
+	SafeVariant(const SafeMemory& mem);
 	
 	template <class T, class COMPARE>
-	SLIB_INLINE SafeVariant(const Array<T, COMPARE>& object)
-	{
-		m_type = variantType_Object;
-		new ((Array<T, COMPARE>*)(void*)(&m_value)) Array<T, COMPARE>(object);
-	}
+	SafeVariant(const Array<T, COMPARE>& object);
 	
 	template <class T, class COMPARE>
-	SLIB_INLINE SafeVariant(const SafeArray<T, COMPARE>& object)
-	{
-		m_type = variantType_Object;
-		new ((Array<T, COMPARE>*)(void*)(&m_value)) Array<T, COMPARE>(object);
-	}
+	SafeVariant(const SafeArray<T, COMPARE>& object);
 	
 	template <class T, class COMPARE>
-	SLIB_INLINE SafeVariant(const List<T, COMPARE>& object)
-	{
-		m_type = variantType_Object;
-		new ((List<T, COMPARE>*)(void*)(&m_value)) List<T, COMPARE>(object);
-	}
+	SafeVariant(const List<T, COMPARE>& object);
 	
 	template <class T, class COMPARE>
-	SLIB_INLINE SafeVariant(const SafeList<T, COMPARE>& object)
-	{
-		m_type = variantType_Object;
-		new ((List<T, COMPARE>*)(void*)(&m_value)) List<T, COMPARE>(object);
-	}
+	SafeVariant(const SafeList<T, COMPARE>& object);
 
 	template <class KT, class VT>
-	SLIB_INLINE SafeVariant(const Map<KT, VT>& object)
-	{
-		m_type = variantType_Object;
-		new ((Map<KT, VT>*)(void*)(&m_value)) Map<KT, VT>(object);
-	}
+	SafeVariant(const Map<KT, VT>& object);
 	
 	template <class KT, class VT>
-	SLIB_INLINE SafeVariant(const SafeMap<KT, VT>& object)
-	{
-		m_type = variantType_Object;
-		new ((Map<KT, VT>*)(void*)(&m_value)) Map<KT, VT>(object);
-	}
+	SafeVariant(const SafeMap<KT, VT>& object);
 	
 	template <class T>
-	SLIB_INLINE SafeVariant(const WeakRef<T>& weak)
-	{
-		m_type = variantType_Weak;
-		new ((WeakRef<T>*)(void*)(&m_value)) WeakRef<T>(weak);
-	}
+	SafeVariant(const WeakRef<T>& weak);
 	
 	template <class T>
-	SLIB_INLINE SafeVariant(const SafeWeakRef<T>& weak)
-	{
-		m_type = variantType_Weak;
-		new ((WeakRef<T>*)(void*)(&m_value)) WeakRef<T>(weak);
-	}
+	SafeVariant(const SafeWeakRef<T>& weak);
 	
 public:
-	SLIB_INLINE static const SafeVariant& null()
-	{
-		return *((SafeVariant*)((void*)(&_Variant_Null)));
-	}
+	static const SafeVariant& null();
 	
 public:
 	SafeVariant& operator=(SafeVariant&& other);
@@ -1152,488 +475,673 @@ public:
 	
 	SafeVariant& operator=(const Variant& other);
 	
-public:
-	SLIB_INLINE SafeVariant& operator=(sl_int32 value)
-	{
-		return *this = Variant(value);
-	}
+	SafeVariant& operator=(sl_int32 value);
 	
-	SLIB_INLINE SafeVariant& operator=(sl_uint32 value)
-	{
-		return *this = Variant(value);
-	}
+	SafeVariant& operator=(sl_uint32 value);
 	
-	SLIB_INLINE SafeVariant& operator=(sl_int64 value)
-	{
-		return *this = Variant(value);
-	}
+	SafeVariant& operator=(sl_int64 value);
 	
-	SLIB_INLINE SafeVariant& operator=(sl_uint64 value)
-	{
-		return *this = Variant(value);
-	}
+	SafeVariant& operator=(sl_uint64 value);
 	
-	SLIB_INLINE SafeVariant& operator=(float value)
-	{
-		return *this = Variant(value);
-	}
+	SafeVariant& operator=(float value);
 	
-	SLIB_INLINE SafeVariant& operator=(double value)
-	{
-		return *this = Variant(value);
-	}
+	SafeVariant& operator=(double value);
 	
-	SLIB_INLINE SafeVariant& operator=(const Time& value)
-	{
-		return *this = Variant(value);
-	}
+	SafeVariant& operator=(const Time& value);
 	
-	SLIB_INLINE SafeVariant& operator=(const void* ptr)
-	{
-		return *this = Variant(ptr);
-	}
+	SafeVariant& operator=(const void* ptr);
 	
-	SLIB_INLINE SafeVariant& operator=(const sl_bool value)
-	{
-		return *this = Variant(value);
-	}
+	SafeVariant& operator=(const sl_bool value);
 	
-	SLIB_INLINE SafeVariant& operator=(const String8& value)
-	{
-		return *this = Variant(value);
-	}
+	SafeVariant& operator=(const String8& value);
 	
-	SLIB_INLINE SafeVariant& operator=(const SafeString8& value)
-	{
-		return *this = Variant(value);
-	}
+	SafeVariant& operator=(const SafeString8& value);
 	
-	SLIB_INLINE SafeVariant& operator=(const String16& value)
-	{
-		return *this = Variant(value);
-	}
+	SafeVariant& operator=(const String16& value);
 	
-	SLIB_INLINE SafeVariant& operator=(const SafeString16& value)
-	{
-		return *this = Variant(value);
-	}
+	SafeVariant& operator=(const SafeString16& value);
 	
 	template <class T>
-	SLIB_INLINE SafeVariant& operator=(const Ref<T>& ref)
-	{
-		return *this = Variant(ref);
-	}
+	SafeVariant& operator=(const Ref<T>& ref);
 	
 	template <class T>
-	SLIB_INLINE SafeVariant& operator=(const SafeRef<T>& ref)
-	{
-		return *this = Variant(ref);
-	}
+	SafeVariant& operator=(const SafeRef<T>& ref);
 	
-	SLIB_INLINE SafeVariant& operator=(const Memory& mem)
-	{
-		return *this = Variant(mem);
-	}
+	SafeVariant& operator=(const Memory& mem);
 	
-	SLIB_INLINE SafeVariant& operator=(const SafeMemory& mem)
-	{
-		return *this = Variant(mem);
-	}
+	SafeVariant& operator=(const SafeMemory& mem);
 	
 	template <class T, class COMPARE>
-	SLIB_INLINE SafeVariant& operator=(const Array<T, COMPARE>& object)
-	{
-		return *this = Variant(object);
-	}
+	SafeVariant& operator=(const Array<T, COMPARE>& object);
 	
 	template <class T, class COMPARE>
-	SLIB_INLINE SafeVariant& operator=(const SafeArray<T, COMPARE>& object)
-	{
-		return *this = Variant(object);
-	}
+	SafeVariant& operator=(const SafeArray<T, COMPARE>& object);
 	
 	template <class T, class COMPARE>
-	SLIB_INLINE SafeVariant& operator=(const List<T, COMPARE>& object)
-	{
-		return *this = Variant(object);
-	}
+	SafeVariant& operator=(const List<T, COMPARE>& object);
 	
 	template <class T, class COMPARE>
-	SLIB_INLINE SafeVariant& operator=(const SafeList<T, COMPARE>& object)
-	{
-		return *this = Variant(object);
-	}
+	SafeVariant& operator=(const SafeList<T, COMPARE>& object);
 
 	template <class KT, class VT>
-	SLIB_INLINE SafeVariant& operator=(const Map<KT, VT>& object)
-	{
-		return *this = Variant(object);
-	}
+	SafeVariant& operator=(const Map<KT, VT>& object);
 	
 	template <class KT, class VT>
-	SLIB_INLINE SafeVariant& operator=(const SafeMap<KT, VT>& object)
-	{
-		return *this = Variant(object);
-	}
+	SafeVariant& operator=(const SafeMap<KT, VT>& object);
 	
 	template <class T>
-	SLIB_INLINE SafeVariant& operator=(const WeakRef<T>& weak)
-	{
-		return *this = Variant(weak);
-	}
+	SafeVariant& operator=(const WeakRef<T>& weak);
 	
 	template <class T>
-	SLIB_INLINE SafeVariant& operator=(const SafeWeakRef<T>& weak)
-	{
-		return *this = Variant(weak);
-	}
+	SafeVariant& operator=(const SafeWeakRef<T>& weak);
 	
 public:
-	SLIB_INLINE VariantType getType() const
-	{
-		return m_type;
-	}
+	VariantType getType() const;
 	
-	SLIB_INLINE void setNull()
-	{
-		*this = Variant::null();
-	}
+	void setNull();
 	
-	SLIB_INLINE sl_bool isNull() const
-	{
-		return m_type == variantType_Null;
-	}
+	sl_bool isNull() const;
 	
-	SLIB_INLINE sl_bool isNotNull() const
-	{
-		return m_type != variantType_Null;
-	}
+	sl_bool isNotNull() const;
 	
 public:
-	SLIB_INLINE sl_bool isInt32() const
-	{
-		return m_type == variantType_Int32;
-	}
+	sl_bool isInt32() const;
 	
-	SLIB_INLINE sl_int32 getInt32(sl_int32 def = 0) const
-	{
-		Variant var(*this);
-		return var.getInt32(def);
-	}
+	sl_int32 getInt32(sl_int32 def = 0) const;
 	
-	SLIB_INLINE sl_bool isUint32() const
-	{
-		return m_type == variantType_Uint32;
-	}
+	sl_bool isUint32() const;
 	
-	SLIB_INLINE sl_uint32 getUint32(sl_uint32 def = 0) const
-	{
-		Variant var(*this);
-		return var.getUint32(def);
-	}
+	sl_uint32 getUint32(sl_uint32 def = 0) const;
 	
-	SLIB_INLINE sl_bool isInt64() const
-	{
-		return m_type == variantType_Int64;
-	}
+	sl_bool isInt64() const;
 	
-	SLIB_INLINE sl_int64 getInt64(sl_int64 def = 0) const
-	{
-		Variant var(*this);
-		return var.getInt64(def);
-	}
+	sl_int64 getInt64(sl_int64 def = 0) const;
 	
-	SLIB_INLINE sl_bool isUint64() const
-	{
-		return m_type == variantType_Uint64;
-	}
+	sl_bool isUint64() const;
 	
-	SLIB_INLINE sl_uint64 getUint64(sl_uint64 def = 0) const
-	{
-		Variant var(*this);
-		return var.getUint64(def);
-	}
+	sl_uint64 getUint64(sl_uint64 def = 0) const;
 	
-	SLIB_INLINE sl_bool isInteger() const
-	{
-		return m_type == variantType_Int32 || m_type == variantType_Uint32 || m_type == variantType_Int64 || m_type == variantType_Uint64;
-	}
+	sl_bool isInteger() const;
 	
-	SLIB_INLINE sl_bool isFloat() const
-	{
-		return m_type == variantType_Float;
-	}
+	sl_bool isFloat() const;
 	
-	SLIB_INLINE float getFloat(float def = 0) const
-	{
-		Variant var(*this);
-		return var.getFloat(def);
-	}
+	float getFloat(float def = 0) const;
 	
-	SLIB_INLINE sl_bool isDouble() const
-	{
-		return m_type == variantType_Double;
-	}
+	sl_bool isDouble() const;
 	
-	SLIB_INLINE double getDouble(double def = 0) const
-	{
-		Variant var(*this);
-		return var.getDouble(def);
-	}
+	double getDouble(double def = 0) const;
 	
-	SLIB_INLINE sl_bool isNumber() const
-	{
-		return isInteger() || m_type == variantType_Float || m_type == variantType_Double;
-	}
+	sl_bool isNumber() const;
 	
-public:
-	SLIB_INLINE sl_bool isTime() const
-	{
-		return m_type == variantType_Time;
-	}
 	
-	SLIB_INLINE Time getTime(Time def) const
-	{
-		Variant var(*this);
-		return var.getTime(def);
-	}
+	sl_bool isTime() const;
 	
-	Time getTime() const
-	{
-		return getTime(Time::zero());
-	}
+	Time getTime(Time def) const;
 	
-public:
-	SLIB_INLINE sl_bool isPointer() const
-	{
-		return m_type == variantType_Pointer;
-	}
+	Time getTime() const;
 	
-	SLIB_INLINE const void* getPointer(const void* def = sl_null) const
-	{
-		Variant var(*this);
-		return var.getPointer(def);
-	}
 	
-public:
-	SLIB_INLINE sl_bool isBoolean() const
-	{
-		return m_type == variantType_Boolean;
-	}
+	sl_bool isPointer() const;
 	
-	SLIB_INLINE sl_bool getBoolean(sl_bool def) const
-	{
-		Variant var(*this);
-		return var.getBoolean(def);
-	}
+	void* getPointer(const void* def = sl_null) const;
 	
-public:
-	SLIB_INLINE sl_bool isString() const
-	{
-		return m_type == variantType_String8 || m_type == variantType_String16;
-	}
 	
-	SLIB_INLINE sl_bool isString8() const
-	{
-		return m_type == variantType_String8;
-	}
+	sl_bool isBoolean() const;
 	
-	SLIB_INLINE sl_bool isString16() const
-	{
-		return m_type == variantType_String16;
-	}
+	sl_bool getBoolean(sl_bool def) const;
 	
-	SLIB_INLINE String getString(const String& def) const
-	{
-		Variant var(*this);
-		return var.getString(def);
-	}
 	
-	SLIB_INLINE String16 getString16(const String16& def) const
-	{
-		Variant var(*this);
-		return var.getString(def);
-	}
+	sl_bool isString() const;
 	
-	SLIB_INLINE String getString() const
-	{
-		return getString(String::null());
-	}
+	sl_bool isString8() const;
 	
-	SLIB_INLINE String16 getString16() const
-	{
-		return getString16(String16::null());
-	}
+	sl_bool isString16() const;
 	
-public:
-	SLIB_INLINE sl_bool isObject() const
-	{
-		return m_type == variantType_Object;
-	}
+	String getString(const String& def) const;
 	
-	SLIB_INLINE Ref<Referable> getObject() const
-	{
-		Variant var(*this);
-		return var.getObject();
-	}
+	String getString() const;
+	
+	String8 getString8(const String8& def) const;
+	
+	String8 getString8() const;
+	
+	String16 getString16(const String16& def) const;
+	
+	String16 getString16() const;
+	
+	
+	sl_bool isObject() const;
+	
+	Ref<Referable> getObject() const;
 	
 	template <class T>
-	SLIB_INLINE Ref<T> getObject(const Ref<T>& def) const
-	{
-		Variant var(*this);
-		return var.getObject(def);
-	}
+	Ref<T> getObject(const Ref<T>& def) const;
 	
-	SLIB_INLINE sl_bool isObjectNotNull() const
-	{
-		Variant var(*this);
-		return var.isObjectNotNull();
-	}
+	sl_bool isObjectNotNull() const;
 	
-	SLIB_INLINE sl_bool isObjectNull() const
-	{
-		Variant var(*this);
-		return var.isObjectNull();
-	}
+	sl_bool isObjectNull() const;
 	
-	SLIB_INLINE sl_class_type getObjectClassType() const
-	{
-		Variant var(*this);
-		return var.getObjectClassType();
-	}
+	sl_class_type getObjectClassType() const;
 	
-	SLIB_INLINE const char* getObjectClassTypeName() const
-	{
-		Variant var(*this);
-		return var.getObjectClassTypeName();
-	}
+	sl_bool isMemory() const;
 	
-	SLIB_INLINE sl_bool isMemory() const
-	{
-		Variant var(*this);
-		return var.isMemory();
-	}
-	
-	SLIB_INLINE Memory getMemory() const
-	{
-		Variant var(*this);
-		return var.getMemory();
-	}
-	
-	SLIB_INLINE sl_bool isVariantList() const
-	{
-		Variant var(*this);
-		return var.isVariantList();
-	}
-	
-	SLIB_INLINE List<Variant> getVariantList() const
-	{
-		Variant var(*this);
-		return var.getVariantList();
-	}
+	Memory getMemory() const;
 	
 	template <class TYPE, class COMPARE>
-	SLIB_INLINE const List<TYPE, COMPARE>& getList(const List<TYPE, COMPARE>& def) const
-	{
-		Variant var(*this);
-		return var.getList(def);
-	}
-	
-	SLIB_INLINE sl_bool isVariantMap() const
-	{
-		Variant var(*this);
-		return var.isVariantMap();
-	}
-	
-	SLIB_INLINE Map<String, Variant> getVariantMap() const
-	{
-		Variant var(*this);
-		return var.getVariantMap();
-	}
+	List<TYPE, COMPARE> getList(const List<TYPE, COMPARE>& def) const;
 	
 	template <class KT, class VT>
-	SLIB_INLINE const Map<KT, VT>& getMap(const Map<KT, VT>& def) const
-	{
-		Variant var(*this);
-		return var.getMap(def);
-	}
-	
-	SLIB_INLINE sl_size getListItemsCount() const
-	{
-		Variant var(*this);
-		return var.getListItemsCount();
-	}
-	
-	SLIB_INLINE Variant getListItem(sl_size index) const
-	{
-		Variant var(*this);
-		return var.getListItem(index);
-	}
-	
-	SLIB_INLINE sl_bool setListItem(sl_size index, const Variant& value)
-	{
-		Variant var(*this);
-		return var.setListItem(index, value);
-	}
-	
-	SLIB_INLINE sl_bool addListItem(const Variant& value)
-	{
-		Variant var(*this);
-		return var.addListItem(value);
-	}
-	
-	SLIB_INLINE Variant getField(const String& key) const
-	{
-		Variant var(*this);
-		return var.getField(key);
-	}
-	
-	SLIB_INLINE sl_bool putField(const String& key, const Variant& value)
-	{
-		Variant var(*this);
-		return var.putField(key, value);
-	}
-	
-public:
-	SLIB_INLINE sl_bool isWeak() const
-	{
-		return m_type == variantType_Weak;
-	}
+	Map<KT, VT> getMap(const Map<KT, VT>& def) const;
+
+	sl_bool isWeak() const;
 	
 	template <class T>
-	SLIB_INLINE const WeakRef<T> getWeak(const WeakRef<T>& def) const
-	{
-		Variant var(*this);
-		return var.getWeak(def);
-	}
+	WeakRef<T> getWeak(const WeakRef<T>& def) const;
 	
-public:
-	SLIB_INLINE String toString() const
-	{
-		Variant var(*this);
-		return var.toString();
-	}
 	
-	SLIB_INLINE String toJson() const
-	{
-		Variant var(*this);
-		return var.toJson();
-	}
+	sl_bool isVariantList() const;
 	
-private:
-	sl_uint64 m_value;
-	VariantType m_type;
-	SpinLock m_lock;
-
+	List<Variant> getVariantList() const;
+	
+	sl_bool isVariantMap() const;
+	
+	Map<String, Variant> getVariantMap() const;
+	
+	sl_size getListItemsCount() const;
+	
+	Variant getListItem(sl_size index) const;
+	
+	sl_bool setListItem(sl_size index, const Variant& value);
+	
+	sl_bool addListItem(const Variant& value);
+	
+	Variant getField(const String& key) const;
+	
+	sl_bool putField(const String& key, const Variant& value);
+	
+	
+	String toString() const;
+	
+	String toJson() const;
+	
 private:
 	void _retain(VariantType& type, sl_uint64& value) const;
 	
 	void _replace(VariantType type, sl_uint64 value);
 	
 	friend class Variant;
+	
 };
 
 sl_bool operator==(const Variant& v1, const Variant& v2);
+
+sl_bool operator!=(const Variant& v1, const Variant& v2);
+
+
+template <>
+sl_int32 Compare<Variant>::compare(const Variant &a, const Variant &b);
+
+template <>
+sl_class_type IMap<String, Variant>::ClassType();
+
+template <>
+sl_class_type IMap<String, Variant>::getClassType() const;
+
+template <>
+sl_bool IMap<String, Variant>::checkClassType(sl_class_type type) const;
+
+template <>
+sl_class_type CList<Variant>::ClassType();
+
+template <>
+sl_class_type CList<Variant>::getClassType() const;
+
+template <>
+sl_bool CList<Variant>::checkClassType(sl_class_type type) const;
+
+SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_LIST(Variant)
+SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_MAP(String, Variant)
+SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_MAP(sl_uint64, Variant)
+
+SLIB_NAMESPACE_END
+
+
+SLIB_NAMESPACE_BEGIN
+
+SLIB_INLINE Variant::Variant() : _type(VariantType::Null)
+{
+}
+
+template <class T>
+Variant::Variant(const Ref<T>& ref)
+{
+	_type = VariantType::Object;
+	new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+}
+
+template <class T>
+Variant::Variant(const SafeRef<T>& ref)
+{
+	_type = VariantType::Object;
+	new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+}
+
+template <class T, class COMPARE>
+Variant::Variant(const Array<T, COMPARE>& object)
+{
+	_type = VariantType::Object;
+	new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+}
+
+template <class T, class COMPARE>
+Variant::Variant(const SafeArray<T, COMPARE>& object)
+{
+	_type = VariantType::Object;
+	new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+}
+
+template <class T, class COMPARE>
+Variant::Variant(const List<T, COMPARE>& object)
+{
+	_type = VariantType::Object;
+	new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+}
+
+template <class T, class COMPARE>
+Variant::Variant(const SafeList<T, COMPARE>& object)
+{
+	_type = VariantType::Object;
+	new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+}
+
+template <class KT, class VT>
+Variant::Variant(const Map<KT, VT>& object)
+{
+	_type = VariantType::Object;
+	new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+}
+
+template <class KT, class VT>
+Variant::Variant(const SafeMap<KT, VT>& object)
+{
+	_type = VariantType::Object;
+	new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+}
+
+template <class T>
+Variant::Variant(const WeakRef<T>& weak)
+{
+	_type = VariantType::Weak;
+	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+}
+
+template <class T>
+Variant::Variant(const SafeWeakRef<T>& weak)
+{
+	_type = VariantType::Weak;
+	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+}
+
+SLIB_INLINE const Variant& Variant::null()
+{
+	return *((Variant*)((void*)(&_Variant_Null)));
+}
+
+template <class T>
+Variant Variant::fromRef(const Ref<T>& ref)
+{
+	return ref;
+}
+
+template <class T, class COMPARE>
+static Variant fromArray(const Array<T, COMPARE>& value)
+{
+	return value;
+}
+
+template <class T, class COMPARE>
+static Variant fromList(const List<T, COMPARE>& value)
+{
+	return value;
+}
+
+template <class KT, class VT>
+static Variant fromMap(const Map<KT, VT>& value)
+{
+	return value;
+}
+
+template <class T>
+static Variant fromWeakRef(const WeakRef<T>& weak)
+{
+	return weak;
+}
+
+template <class T>
+Variant& Variant::operator=(const Ref<T>& ref)
+{
+	_free(_type, _value);
+	_type = VariantType::Object;
+	new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+	return *this;
+}
+
+template <class T>
+Variant& Variant::operator=(const SafeRef<T>& ref)
+{
+	_free(_type, _value);
+	_type = VariantType::Object;
+	new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+	return *this;
+}
+
+template <class T, class COMPARE>
+Variant& Variant::operator=(const Array<T, COMPARE>& object)
+{
+	_free(_type, _value);
+	_type = VariantType::Object;
+	new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+	return *this;
+}
+
+template <class T, class COMPARE>
+Variant& Variant::operator=(const SafeArray<T, COMPARE>& object)
+{
+	_free(_type, _value);
+	_type = VariantType::Object;
+	new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+	return *this;
+}
+
+template <class T, class COMPARE>
+Variant& Variant::operator=(const List<T, COMPARE>& object)
+{
+	_free(_type, _value);
+	_type = VariantType::Object;
+	new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+	return *this;
+}
+
+template <class T, class COMPARE>
+Variant& Variant::operator=(const SafeList<T, COMPARE>& object)
+{
+	_free(_type, _value);
+	_type = VariantType::Object;
+	new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+	return *this;
+}
+
+template <class KT, class VT>
+Variant& Variant::operator=(const Map<KT, VT>& object)
+{
+	_free(_type, _value);
+	_type = VariantType::Object;
+	new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+	return *this;
+}
+
+template <class KT, class VT>
+Variant& Variant::operator=(const SafeMap<KT, VT>& object)
+{
+	_free(_type, _value);
+	_type = VariantType::Object;
+	new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+	return *this;
+}
+
+template <class T>
+Variant& Variant::operator=(const WeakRef<T>& weak)
+{
+	_free(_type, _value);
+	_type = VariantType::Weak;
+	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+	return *this;
+}
+
+template <class T>
+Variant& Variant::operator=(const SafeWeakRef<T>& weak)
+{
+	_free(_type, _value);
+	_type = VariantType::Weak;
+	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+	return *this;
+}
+
+SLIB_INLINE VariantType Variant::getType() const
+{
+	return _type;
+}
+
+SLIB_INLINE sl_bool Variant::isNull() const
+{
+	return _type == VariantType::Null;
+}
+
+SLIB_INLINE sl_bool Variant::isNotNull() const
+{
+	return _type != VariantType::Null;
+}
+
+template <class T>
+Ref<T> Variant::getObject(const Ref<T>& def) const
+{
+	if (_type == VariantType::Object) {
+		return *((Ref<T>*)(void*)(&_value));
+	}
+	return def;
+}
+
+template <class TYPE, class COMPARE>
+List<TYPE, COMPARE> Variant::getList(const List<TYPE, COMPARE>& def) const
+{
+	if (_type == VariantType::Object) {
+		Referable* ref = *((Referable**)(void*)(&_value));
+		return (CList<TYPE, COMPARE>*)ref;
+	}
+	return def;
+}
+
+template <class KT, class VT>
+Map<KT, VT> Variant::getMap(const Map<KT, VT>& def) const
+{
+	if (_type == VariantType::Object) {
+		Referable* ref = *((Referable**)(void*)(&_value));
+		return (IMap<KT, VT>*)ref;
+	}
+	return def;
+}
+
+template <class T>
+WeakRef<T> Variant::getWeak(const WeakRef<T>& def) const
+{
+	if (_type == VariantType::Weak) {
+		return *((WeakRef<T>*)(void*)(&_value));
+	}
+	return def;
+}
+
+
+SLIB_INLINE SafeVariant::SafeVariant() : _type(VariantType::Null)
+{
+}
+
+template <class T>
+SafeVariant::SafeVariant(const Ref<T>& ref)
+{
+	_type = VariantType::Object;
+	new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+}
+
+template <class T>
+SafeVariant::SafeVariant(const SafeRef<T>& ref)
+{
+	_type = VariantType::Object;
+	new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+}
+
+template <class T, class COMPARE>
+SafeVariant::SafeVariant(const Array<T, COMPARE>& object)
+{
+	_type = VariantType::Object;
+	new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+}
+
+template <class T, class COMPARE>
+SafeVariant::SafeVariant(const SafeArray<T, COMPARE>& object)
+{
+	_type = VariantType::Object;
+	new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+}
+
+template <class T, class COMPARE>
+SafeVariant::SafeVariant(const List<T, COMPARE>& object)
+{
+	_type = VariantType::Object;
+	new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+}
+
+template <class T, class COMPARE>
+SafeVariant::SafeVariant(const SafeList<T, COMPARE>& object)
+{
+	_type = VariantType::Object;
+	new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+}
+
+template <class KT, class VT>
+SafeVariant::SafeVariant(const Map<KT, VT>& object)
+{
+	_type = VariantType::Object;
+	new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+}
+
+template <class KT, class VT>
+SafeVariant::SafeVariant(const SafeMap<KT, VT>& object)
+{
+	_type = VariantType::Object;
+	new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+}
+
+template <class T>
+SafeVariant::SafeVariant(const WeakRef<T>& weak)
+{
+	_type = VariantType::Weak;
+	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+}
+
+template <class T>
+SafeVariant::SafeVariant(const SafeWeakRef<T>& weak)
+{
+	_type = VariantType::Weak;
+	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+}
+
+SLIB_INLINE const SafeVariant& SafeVariant::null()
+{
+	return *((SafeVariant*)((void*)(&_Variant_Null)));
+}
+
+template <class T>
+SafeVariant& SafeVariant::operator=(const Ref<T>& ref)
+{
+	return *this = Variant(ref);
+}
+
+template <class T>
+SafeVariant& SafeVariant::operator=(const SafeRef<T>& ref)
+{
+	return *this = Variant(ref);
+}
+
+template <class T, class COMPARE>
+SafeVariant& SafeVariant::operator=(const Array<T, COMPARE>& object)
+{
+	return *this = Variant(object);
+}
+
+template <class T, class COMPARE>
+SafeVariant& SafeVariant::operator=(const SafeArray<T, COMPARE>& object)
+{
+	return *this = Variant(object);
+}
+
+template <class T, class COMPARE>
+SafeVariant& SafeVariant::operator=(const List<T, COMPARE>& object)
+{
+	return *this = Variant(object);
+}
+
+template <class T, class COMPARE>
+SafeVariant& SafeVariant::operator=(const SafeList<T, COMPARE>& object)
+{
+	return *this = Variant(object);
+}
+
+template <class KT, class VT>
+SafeVariant& SafeVariant::operator=(const Map<KT, VT>& object)
+{
+	return *this = Variant(object);
+}
+
+template <class KT, class VT>
+SafeVariant& SafeVariant::operator=(const SafeMap<KT, VT>& object)
+{
+	return *this = Variant(object);
+}
+
+template <class T>
+SafeVariant& SafeVariant::operator=(const WeakRef<T>& weak)
+{
+	return *this = Variant(weak);
+}
+
+template <class T>
+SafeVariant& SafeVariant::operator=(const SafeWeakRef<T>& weak)
+{
+	return *this = Variant(weak);
+}
+
+SLIB_INLINE VariantType SafeVariant::getType() const
+{
+	return _type;
+}
+
+SLIB_INLINE sl_bool SafeVariant::isNull() const
+{
+	return _type == VariantType::Null;
+}
+
+SLIB_INLINE sl_bool SafeVariant::isNotNull() const
+{
+	return _type != VariantType::Null;
+}
+
+template <class T>
+Ref<T> SafeVariant::getObject(const Ref<T>& def) const
+{
+	Variant var(*this);
+	return var.getObject(def);
+}
+
+template <class TYPE, class COMPARE>
+List<TYPE, COMPARE> SafeVariant::getList(const List<TYPE, COMPARE>& def) const
+{
+	Variant var(*this);
+	return var.getList(def);
+}
+
+template <class KT, class VT>
+Map<KT, VT> SafeVariant::getMap(const Map<KT, VT>& def) const
+{
+	Variant var(*this);
+	return var.getMap(def);
+}
+
+template <class T>
+WeakRef<T> SafeVariant::getWeak(const WeakRef<T>& def) const
+{
+	Variant var(*this);
+	return var.getWeak(def);
+}
 
 SLIB_NAMESPACE_END
 

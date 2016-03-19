@@ -15,7 +15,7 @@ public:
 	{
 		ObjectLocker lock(this);
 		sl_uint32 nOrig = (sl_uint32)(::SendMessageW(hWnd, CB_GETCOUNT, 0, 0));
-		sl_uint32 nNew = (sl_uint32)(m_titles.count());
+		sl_uint32 nNew = (sl_uint32)(m_titles.getCount());
 		if (nOrig == nNew) {
 			return;
 		}
@@ -30,7 +30,7 @@ public:
 		} else {
 			for (sl_uint32 i = nOrig; i < nNew; i++) {
 				String16 s = m_titles.getItemValue(i, String::null());
-				::SendMessageW(hWnd, CB_ADDSTRING, 0, (LPARAM)(s.getBuf()));
+				::SendMessageW(hWnd, CB_ADDSTRING, 0, (LPARAM)(s.getData()));
 			}
 		}
 	}
@@ -39,7 +39,7 @@ public:
 	{
 		::SendMessageW(hWnd, CB_RESETCONTENT, 0, 0);
 		__applyItemsCount(hWnd);
-		sl_uint32 n = (sl_uint32)(m_titles.count());
+		sl_uint32 n = (sl_uint32)(m_titles.getCount());
 		if (m_indexSelected >= n) {
 			m_indexSelected = 0;
 		}
@@ -52,7 +52,7 @@ public:
 	{
 		String16 s = title;
 		::SendMessageW(hWnd, CB_DELETESTRING, (WPARAM)index, 0);
-		::SendMessageW(hWnd, CB_INSERTSTRING, (WPARAM)index, (LPARAM)(s.getBuf()));
+		::SendMessageW(hWnd, CB_INSERTSTRING, (WPARAM)index, (LPARAM)(s.getData()));
 	}
 
 	sl_uint32 __getSelectedIndex(HWND hWnd)
@@ -81,8 +81,8 @@ public:
 	{
 		if (code == CBN_SELCHANGE) {
 			Ref<View> view = getView();
-			if (DropDownList::checkInstance(view)) {
-				((_DropDownList*)(view.get()))->__onSelectItem(m_handle);
+			if (DropDownList::checkInstance(view.ptr)) {
+				((_DropDownList*)(view.ptr))->__onSelectItem(m_handle);
 			}
 			return sl_true;
 		}
@@ -101,7 +101,7 @@ Ref<ViewInstance> DropDownList::createInstance(ViewInstance* parent)
 
 		Ref<Font> font = m_font;
 		Ref<FontInstance> fontInstance;
-		HFONT hFont = UIPlatform::getGdiFont(font.get(), fontInstance);
+		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
@@ -159,7 +159,7 @@ void DropDownList::setFont(const Ref<Font>& font)
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		HFONT hFont = UIPlatform::getGdiFont(font.get(), fontInstance);
+		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}

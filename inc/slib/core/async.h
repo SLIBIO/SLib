@@ -10,8 +10,23 @@
 
 SLIB_NAMESPACE_BEGIN
 
-class AsyncTimer;
+enum class AsyncIoMode
+{
+	None = 0,
+	In = 1,
+	Out = 2,
+	InOut = 3
+};
+
 class AsyncLoop;
+class AsyncTimer;
+class AsyncIoLoop;
+class AsyncIoInstance;
+class AsyncIoObject;
+class AsyncStreamInstance;
+class AsyncStream;
+class AsyncStreamRequest;
+
 
 class SLIB_EXPORT Async
 {
@@ -38,9 +53,11 @@ public:
 
 class SLIB_EXPORT AsyncLoop : public Object
 {
-	SLIB_DECLARE_OBJECT(AsyncLoop, Object)
+	SLIB_DECLARE_OBJECT
+	
 private:
 	AsyncLoop();
+	
 	~AsyncLoop();
 
 public:
@@ -67,10 +84,7 @@ public:
 	
 	void removeTimer(const Ref<AsyncTimer>& timer);
 
-	SLIB_INLINE sl_uint64 getEllapsedMilliseconds()
-	{
-		return m_timeCounter.getEllapsedMilliseconds();
-	}
+	sl_uint64 getEllapsedMilliseconds();
 
 protected:
 	sl_bool m_flagInit;
@@ -109,8 +123,11 @@ protected:
 
 };
 
+
 class SLIB_EXPORT AsyncTimer : public Object
 {
+	SLIB_DECLARE_OBJECT
+	
 protected:
 	AsyncTimer();
 	
@@ -118,30 +135,15 @@ public:
 	static Ref<AsyncTimer> create(const Ref<Runnable>& task, sl_uint64 interval_ms, sl_bool flagStart = sl_true);
 	
 public:
-	SLIB_INLINE void start()
-	{
-		m_flagStarted = sl_true;
-	}
+	void start();
 	
-	SLIB_INLINE void stop()
-	{
-		m_flagStarted = sl_false;
-	}
+	void stop();
 	
-	SLIB_INLINE sl_bool isStarted()
-	{
-		return m_flagStarted;
-	}
+	sl_bool isStarted();
 	
-	SLIB_INLINE Ref<Runnable> getTask()
-	{
-		return m_task;
-	}
+	Ref<Runnable> getTask();
 	
-	SLIB_INLINE sl_uint64 getInterval()
-	{
-		return m_interval;
-	}
+	sl_uint64 getInterval();
 	
 	void run();
 	
@@ -161,21 +163,13 @@ protected:
 };
 
 
-class AsyncIoInstance;
-
-enum AsyncIoMode
-{
-	asyncIoMode_None = 0,
-	asyncIoMode_In = 1,
-	asyncIoMode_Out = 2,
-	asyncIoMode_InOut = 3
-};
-
 class SLIB_EXPORT AsyncIoLoop : public Object
 {
-	SLIB_DECLARE_OBJECT(AsyncIoLoop, Object)
+	SLIB_DECLARE_OBJECT
+	
 private:
 	AsyncIoLoop();
+	
 	~AsyncIoLoop();
 	
 public:
@@ -236,7 +230,8 @@ class AsyncIoObject;
 
 class SLIB_EXPORT AsyncIoInstance : public Object
 {
-	SLIB_DECLARE_OBJECT(AsyncIoInstance, Object)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	AsyncIoInstance();
 
@@ -300,11 +295,14 @@ private:
 	friend class AsyncIoLoop;
 };
 
+
 class SLIB_EXPORT AsyncIoObject : public Object
 {
-	SLIB_DECLARE_OBJECT(AsyncIoObject, Object)
+	SLIB_DECLARE_OBJECT
+	
 protected:
 	AsyncIoObject();
+	
 	~AsyncIoObject();
 
 public:
@@ -315,48 +313,24 @@ public:
 	void closeIoInstance();
 
 	
-	SLIB_INLINE Ptr<Referable> getUserObject(const String& key)
-	{
-		return m_mapUserObjects_s.getValue(key, Ptr<Referable>::null());
-	}
+	Ref<Referable> getUserObject(const String& key);
 	
-	SLIB_INLINE void setUserObject(const String& key, const Ptr<Referable>& object)
-	{
-		m_mapUserObjects_s.put(key, object);
-	}
+	void setUserObject(const String& key, const Ref<Referable>& object);
 
 	
-	SLIB_INLINE Ptr<Referable> getUserObject(sl_uint64 key)
-	{
-		return m_mapUserObjects_i.getValue(key, Ptr<Referable>::null());
-	}
+	Ref<Referable> getUserObject(sl_uint64 key);
 	
-	SLIB_INLINE void setUserObject(sl_uint64 key, const Ptr<Referable>& object)
-	{
-		m_mapUserObjects_i.put(key, object);
-	}
+	void setUserObject(sl_uint64 key, const Ref<Referable>& object);
 
 	
-	SLIB_INLINE Variant getUserData(const String& key)
-	{
-		return m_mapUserData_s.getValue(key, Variant::null());
-	}
+	Variant getUserData(const String& key);
 	
-	SLIB_INLINE void setUserData(const String& key, const Variant& data)
-	{
-		m_mapUserData_s.put(key, data);
-	}
+	void setUserData(const String& key, const Variant& data);
 
 	
-	SLIB_INLINE Variant getUserData(sl_uint64 key)
-	{
-		return m_mapUserData_i.getValue(key, Variant::null());
-	}
+	Variant getUserData(sl_uint64 key);
 	
-	SLIB_INLINE void setUserData(sl_uint64 key, const Variant& object)
-	{
-		m_mapUserData_i.put(key, object);
-	}
+	void setUserData(sl_uint64 key, const Variant& object);
 
 protected:
 	void setIoLoop(const Ref<AsyncIoLoop>& loop);
@@ -367,13 +341,14 @@ private:
 	SafeWeakRef<AsyncIoLoop> m_ioLoop;
 	SafeRef<AsyncIoInstance> m_ioInstance;
 
-	HashMap< String, Ptr<Referable> > m_mapUserObjects_s;
-	HashMap< sl_uint64, Ptr<Referable> > m_mapUserObjects_i;
+	HashMap< String, Ref<Referable> > m_mapUserObjects_s;
+	HashMap< sl_uint64, Ref<Referable> > m_mapUserObjects_i;
 	HashMap<String, Variant> m_mapUserData_s;
 	HashMap<sl_uint64, Variant> m_mapUserData_i;
+	
 };
 
-class AsyncStream;
+
 class SLIB_EXPORT IAsyncStreamListener
 {
 public:
@@ -387,7 +362,15 @@ public:
 
 class SLIB_EXPORT AsyncStreamRequest : public Referable
 {
-	SLIB_DECLARE_ROOT_OBJECT(AsyncStreamRequest)
+	SLIB_DECLARE_OBJECT
+	
+public:
+	void* data;
+	sl_uint32 size;
+	Ref<Referable> refData;
+	Ptr<IAsyncStreamListener> listener;
+	sl_bool flagRead;
+	
 protected:
 	AsyncStreamRequest(void* data, sl_uint32 size, const Referable* refData, const Ptr<IAsyncStreamListener>& listener, sl_bool flagRead);
 
@@ -396,48 +379,13 @@ public:
 	
 	static Ref<AsyncStreamRequest> createWrite(void* data, sl_uint32 size, const Referable* refData, const Ptr<IAsyncStreamListener>& listener);
 
-public:
-	SLIB_INLINE void* data() const
-	{
-		return m_data;
-	}
-	
-	SLIB_INLINE sl_uint32 size() const
-	{
-		return m_size;
-	}
-	
-	SLIB_INLINE void setSize(sl_uint32 size)
-	{
-		m_size = size;
-	}
-	
-	SLIB_INLINE Referable* getDataReference() const
-	{
-		return m_refData.get();
-	}
-	
-	SLIB_INLINE const Ptr<IAsyncStreamListener>& getListener() const
-	{
-		return m_listener;
-	}
-	
-	SLIB_INLINE sl_bool isRead()
-	{
-		return m_flagRead;
-	}
-	
-private:
-	void* m_data;
-	sl_uint32 m_size;
-	Ref<Referable> m_refData;
-	Ptr<IAsyncStreamListener> m_listener;
-	sl_bool m_flagRead;
-
 };
+
 
 class SLIB_EXPORT AsyncStreamInstance : public AsyncIoInstance
 {
+	SLIB_DECLARE_OBJECT
+	
 public:
 	virtual sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref);
 	
@@ -457,7 +405,7 @@ protected:
 
 class SLIB_EXPORT AsyncStream : public AsyncIoObject
 {
-	SLIB_DECLARE_OBJECT(AsyncStream, Object)
+	SLIB_DECLARE_OBJECT
 	
 public:
 	virtual void close() = 0;
@@ -565,9 +513,7 @@ private:
 class SLIB_EXPORT AsyncReader : public AsyncStreamBaseIO
 {
 protected:
-	SLIB_INLINE AsyncReader()
-	{
-	}
+	AsyncReader();
 	
 public:
 	static Ref<AsyncReader> create(const Ptr<IReader>& reader, const Ref<AsyncLoop>& loop);
@@ -598,9 +544,7 @@ private:
 class SLIB_EXPORT AsyncWriter : public AsyncStreamBaseIO
 {
 protected:
-	SLIB_INLINE AsyncWriter()
-	{
-	}
+	AsyncWriter();
 	
 public:
 	static Ref<AsyncWriter> create(const Ptr<IWriter>& writer, const Ref<AsyncLoop>& loop);
@@ -633,6 +577,7 @@ class SLIB_EXPORT AsyncFile : public AsyncStreamBaseIO
 {
 private:
 	AsyncFile();
+	
 	~AsyncFile();
 	
 public:
@@ -692,6 +637,7 @@ protected:
 
 private:
 	SafeRef<File> m_file;
+	
 };
 
 
@@ -712,6 +658,7 @@ class SLIB_EXPORT AsyncCopy : public Object, public IAsyncStreamListener
 {
 private:
 	AsyncCopy();
+	
 	~AsyncCopy();
 	
 public:
@@ -725,70 +672,31 @@ public:
 
 	void close();
 
-	SLIB_INLINE sl_bool isRunning()
-	{
-		return m_flagRunning;
-	}
+	sl_bool isRunning();
 
-	SLIB_INLINE Ref<AsyncStream> getSource()
-	{
-		return m_source;
-	}
+	Ref<AsyncStream> getSource();
 
-	SLIB_INLINE Ref<AsyncStream> getTarget()
-	{
-		return m_target;
-	}
+	Ref<AsyncStream> getTarget();
 
-	SLIB_INLINE sl_uint64 getTotalSize()
-	{
-		return m_sizeTotal;
-	}
+	sl_uint64 getTotalSize();
 
-	SLIB_INLINE sl_uint64 getReadSize()
-	{
-		return m_sizeRead;
-	}
+	sl_uint64 getReadSize();
 
-	SLIB_INLINE sl_uint64 getWrittenSize()
-	{
-		return m_sizeWritten;
-	}
+	sl_uint64 getWrittenSize();
 
-	SLIB_INLINE sl_bool isCompleted()
-	{
-		return m_sizeWritten == m_sizeTotal;
-	}
+	sl_bool isCompleted();
 
-	SLIB_INLINE sl_bool isErrorOccured()
-	{
-		return m_flagReadError || m_flagWriteError;
-	}
+	sl_bool isErrorOccured();
 
-	SLIB_INLINE sl_bool isReadingErrorOccured()
-	{
-		return m_flagReadError;
-	}
+	sl_bool isReadingErrorOccured();
 
-	SLIB_INLINE sl_bool isWritingErrorOccured()
-	{
-		return m_flagWriteError;
-	}
+	sl_bool isWritingErrorOccured();
 
-	SLIB_INLINE sl_bool isReading()
-	{
-		return m_bufferReading.isNotNull();
-	}
+	sl_bool isReading();
 
-	SLIB_INLINE sl_bool isWriting()
-	{
-		return m_bufferWriting.isNotNull();
-	}
+	sl_bool isWriting();
 
-	SLIB_INLINE const Ptr<IAsyncCopyListener>& getListener()
-	{
-		return m_listener;
-	}
+	const Ptr<IAsyncCopyListener>& getListener();
 
 protected:
 	// override
@@ -823,6 +731,7 @@ protected:
 	SafeRef<Buffer> m_bufferReading;
 	Queue< Ref<Buffer> > m_buffersWrite;
 	SafeRef<Buffer> m_bufferWriting;
+
 };
 
 class SLIB_EXPORT AsyncOutputBufferElement : public Referable
@@ -844,21 +753,11 @@ public:
 	
 	void setBody(AsyncStream* stream, sl_uint64 size);
 
-	
-	SLIB_INLINE MemoryQueue& getHeader()
-	{
-		return m_header;
-	}
+	MemoryQueue& getHeader();
 
-	SLIB_INLINE Ref<AsyncStream> getBody()
-	{
-		return m_body;
-	}
+	Ref<AsyncStream> getBody();
 
-	SLIB_INLINE sl_uint64 getBodySize()
-	{
-		return m_sizeBody;
-	}
+	sl_uint64 getBodySize();
 
 protected:
 	MemoryQueue m_header;
@@ -882,10 +781,7 @@ public:
 	
 	sl_bool copyFromFile(const String& path);
 
-	SLIB_INLINE sl_uint64 getOutputLength() const
-	{
-		return m_lengthOutput;
-	}
+	sl_uint64 getOutputLength() const;
 
 protected:
 	sl_uint64 m_lengthOutput;
@@ -903,22 +799,21 @@ public:
 	virtual void onAsyncOutputError(AsyncOutput* output);
 	
 	virtual void onAsyncOutputComplete(AsyncOutput* output);
+	
 };
 
 class SLIB_EXPORT AsyncOutput : public AsyncOutputBuffer, public IAsyncCopyListener, public IAsyncStreamListener
 {
 protected:
 	AsyncOutput();
+	
 	~AsyncOutput();
 	
 public:
 	static Ref<AsyncOutput> create(const Ref<AsyncStream>& streamOutput, const Ptr<IAsyncOutputListener>& listener, sl_uint32 sizeBuffer = 0x10000);
 	
-	SLIB_INLINE static Ref<AsyncOutput> create(const Ref<AsyncStream>& streamOutput, sl_uint32 sizeBuffer = 0x10000)
-	{
-		return create(streamOutput, Ptr<IAsyncOutputListener>::null(), sizeBuffer);
-	}
-	
+	static Ref<AsyncOutput> create(const Ref<AsyncStream>& streamOutput, sl_uint32 sizeBuffer = 0x10000);
+
 public:
 	void mergeBuffer(AsyncOutputBuffer* buffer);
 	
@@ -956,6 +851,7 @@ class SLIB_EXPORT AsyncStreamFilter : public AsyncStream, public IAsyncStreamLis
 {
 protected:
 	AsyncStreamFilter();
+	
 	~AsyncStreamFilter();
 
 public:

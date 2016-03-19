@@ -13,7 +13,8 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class _Win32_FontInstance : public FontInstance
 {
-	SLIB_DECLARE_OBJECT(_Win32_FontInstance, FontInstance)
+	SLIB_DECLARE_OBJECT
+
 public:
 	FontDesc m_desc;
 
@@ -75,7 +76,7 @@ public:
 		}
 		String16 fontName = desc.familyName;
 		Gdiplus::Font* font = new Gdiplus::Font(
-			(LPCWSTR)(fontName.getBuf())
+			(LPCWSTR)(fontName.getData())
 			, desc.size
 			, style
 			, Gdiplus::UnitPixel);
@@ -116,7 +117,7 @@ public:
 			, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS
 			, ANTIALIASED_QUALITY
 			, DEFAULT_PITCH
-			, (LPCWSTR)(fontName.getBuf()));
+			, (LPCWSTR)(fontName.getData()));
 		m_fontGDI = hFont;
 	}
 
@@ -125,7 +126,7 @@ public:
 		Ref<_Win32_FontInstance> ret;
 		if (font) {
 			Ref<FontInstance> _instance = font->getInstance();
-			if (_Win32_FontInstance::checkInstance(_instance)) {
+			if (_Win32_FontInstance::checkInstance(_instance.ptr)) {
 				ret = Ref<_Win32_FontInstance>::from(_instance);
 			} else {
 				FontDesc desc;
@@ -139,6 +140,8 @@ public:
 		return ret;
 	}
 };
+
+SLIB_DEFINE_OBJECT(_Win32_FontInstance, FontInstance)
 
 Gdiplus::Font* UIPlatform::getGdiplusFont(Font* font, Ref<FontInstance>& instanceOut)
 {
@@ -198,7 +201,7 @@ Size UI::getFontTextSize(const Ref<Font>& font, const String& _text)
 	}
 
 	Ref<FontInstance> instance;
-	Gdiplus::Font* handle = UIPlatform::getGdiplusFont(font.get(), instance);
+	Gdiplus::Font* handle = UIPlatform::getGdiplusFont(font.ptr, instance);
 	if (!handle) {
 		return ret;
 	}
@@ -209,7 +212,7 @@ Size UI::getFontTextSize(const Ref<Font>& font, const String& _text)
 		Gdiplus::StringFormat format(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsNoClip);
 		Gdiplus::RectF bound;
 		Gdiplus::PointF origin(0, 0);
-		Gdiplus::Status result = fs.graphics->MeasureString((WCHAR*)(text.getBuf()), text.getLength(), handle, origin, &format, &bound);
+		Gdiplus::Status result = fs.graphics->MeasureString((WCHAR*)(text.getData()), text.getLength(), handle, origin, &format, &bound);
 		if (result == Gdiplus::Ok) {
 			ret.x = bound.Width;
 			ret.y = bound.Height;

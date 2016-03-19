@@ -9,9 +9,11 @@ SLIB_NAMESPACE_BEGIN
 
 class SLIB_EXPORT Event : public Referable
 {
-	SLIB_DECLARE_ROOT_OBJECT(Event)
+	SLIB_DECLARE_OBJECT
+	
 protected:
 	Event();
+	
 	~Event();
 
 public:

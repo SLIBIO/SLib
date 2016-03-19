@@ -11,6 +11,21 @@
 
 SLIB_NAMESPACE_BEGIN
 
+Mutex::Mutex()
+{
+	_init();
+}
+
+Mutex::Mutex(const Mutex& other)
+{
+	_init();
+}
+
+Mutex::~Mutex()
+{
+	_free();
+}
+
 void Mutex::_init()
 {
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -78,6 +93,52 @@ void Mutex::unlock() const
 #endif
 }
 
+Mutex& Mutex::operator=(const Mutex& other)
+{
+	return *this;
+}
+
+
+
+MutexLocker::MutexLocker()
+{
+	m_count = 0;
+}
+
+MutexLocker::~MutexLocker()
+{
+	unlock();
+}
+
+MutexLocker::MutexLocker(const Mutex* mutex)
+{
+	m_count = 0;
+	lock(mutex);
+}
+
+MutexLocker::MutexLocker(const Mutex* mutex1, const Mutex* mutex2)
+{
+	m_count = 0;
+	lock(mutex1, mutex2);
+}
+
+MutexLocker::MutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3)
+{
+	m_count = 0;
+	lock(mutex1, mutex2, mutex3);
+}
+
+MutexLocker::MutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3, const Mutex* mutex4)
+{
+	m_count = 0;
+	lock(mutex1, mutex2, mutex3, mutex4);
+}
+
+MutexLocker::MutexLocker(Mutex const* const* mutex_array, sl_size count)
+{
+	m_count = 0;
+	lock(mutex_array, count);
+}
 
 void MutexLocker::lock(const Mutex* mutex)
 {

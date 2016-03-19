@@ -32,7 +32,7 @@ Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::create(const AsyncSe
 
 Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::create(const AsyncSecureStreamServerParam& param, sl_uint32 portListen, const Ref<AsyncIoLoop>& loop)
 {
-	return create(param, SocketAddress(IPv4Address::any(), portListen), loop);
+	return create(param, SocketAddress(IPv4Address::zero(), portListen), loop);
 }
 
 Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::create(const AsyncSecureStreamServerParam& param, sl_uint32 portListen)
@@ -42,7 +42,7 @@ Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::create(const AsyncSe
 
 Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::createIPv6(const AsyncSecureStreamServerParam& param, sl_uint32 portListen, const Ref<AsyncIoLoop>& loop)
 {
-	return create(param, SocketAddress(IPv6Address::any(), portListen), loop);
+	return create(param, SocketAddress(IPv6Address::zero(), portListen), loop);
 }
 
 Ref<AsyncTcpSecureStreamServer> AsyncTcpSecureStreamServer::createIPv6(const AsyncSecureStreamServerParam& param, sl_uint32 portListen)
@@ -65,9 +65,9 @@ void AsyncTcpSecureStreamServer::onAccept(AsyncTcpServer* socketListen, const Re
 	if (socket.isNotNull()) {
 		AsyncSecureStreamServerParam param = m_param;
 		param.listener = (WeakRef<AsyncTcpSecureStreamServer>)(this);
-		Ref<AsyncSecureStream> stream = SecureStreamServer::createAsyncStream(socket.get(), param);
+		Ref<AsyncSecureStream> stream = SecureStreamServer::createAsyncStream(socket, param);
 		if (stream.isNotNull()) {
-			m_streams.put(stream.get(), stream);
+			m_streams.put(stream.ptr, stream);
 		}
 	}
 }
@@ -89,7 +89,7 @@ Ref<AsyncSecureStream> AsyncTcpSecureStreamClient::create(const Ref<AsyncTcpSock
 	if (socket.isNull()) {
 		return ret;
 	}
-	return SecureStreamClient::createAsyncStream(socket.get(), param, flagConnect);
+	return SecureStreamClient::createAsyncStream(socket, param, flagConnect);
 }
 
 class _AsyncTcpSecureStreamClient_Container : public Referable, public IAsyncTcpSocketListener
@@ -107,13 +107,13 @@ public:
 		if (flagError) {
 			PtrLocker<IAsyncSecureStreamListener> listener(stream->getListener());
 			if (listener.isNotNull()) {
-				listener->onConnectedSecureStream(stream.get(), sl_true);
+				listener->onConnectedSecureStream(stream.ptr, sl_true);
 			}
 		} else {
 			if (!(stream->connect())) {
 				PtrLocker<IAsyncSecureStreamListener> listener(stream->getListener());
 				if (listener.isNotNull()) {
-					listener->onConnectedSecureStream(stream.get(), sl_true);
+					listener->onConnectedSecureStream(stream.ptr, sl_true);
 				}
 			}
 		}

@@ -73,7 +73,7 @@ public:
 	
 	sl_bool onEventKey(sl_bool flagDown, NSEvent* event);
 	
-	sl_bool onEventMouse(UIEventAction action, NSEvent* event);
+	sl_bool onEventMouse(UIAction action, NSEvent* event);
 	
 	sl_bool onEventMouseWheel(NSEvent* event);
 	

@@ -9,7 +9,8 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class SLIB_EXPORT RadioGroup : public Object
 {
-	SLIB_DECLARE_OBJECT(RadioGroup, Object)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	RadioGroup();
 	

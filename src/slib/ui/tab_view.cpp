@@ -6,6 +6,8 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(TabView, View)
+
 TabView::TabView()
 {
 	m_items.setCount(1);
@@ -14,7 +16,7 @@ TabView::TabView()
 
 sl_uint32 TabView::getTabsCount()
 {
-	return (sl_uint32)(m_items.count());
+	return (sl_uint32)(m_items.getCount());
 }
 
 void TabView::setTabsCount(sl_uint32 nCount)
@@ -27,7 +29,7 @@ void TabView::setTabsCount(sl_uint32 nCount)
 String TabView::getTabLabel(sl_uint32 index)
 {
 	MutexLocker lock(m_items.getLocker());
-	if (index < m_items.count()) {
+	if (index < m_items.getCount()) {
 		TabViewItem* item = m_items.getItemPtr(index);
 		return item->label;
 	}
@@ -37,7 +39,7 @@ String TabView::getTabLabel(sl_uint32 index)
 void TabView::setTabLabel(sl_uint32 index, const String& text)
 {
 	MutexLocker lock(m_items.getLocker());
-	if (index < m_items.count()) {
+	if (index < m_items.getCount()) {
 		TabViewItem* item = m_items.getItemPtr(index);
 		item->label = text;
 		_setTabLabel(index, text);
@@ -47,7 +49,7 @@ void TabView::setTabLabel(sl_uint32 index, const String& text)
 Ref<View> TabView::getTabContentView(sl_uint32 index)
 {
 	MutexLocker lock(m_items.getLocker());
-	if (index < m_items.count()) {
+	if (index < m_items.getCount()) {
 		TabViewItem* item = m_items.getItemPtr(index);
 		return item->contentView;
 	}
@@ -57,7 +59,7 @@ Ref<View> TabView::getTabContentView(sl_uint32 index)
 void TabView::setTabContentView(sl_uint32 index, const Ref<View>& view)
 {
 	MutexLocker lock(m_items.getLocker());
-	if (index < m_items.count()) {
+	if (index < m_items.getCount()) {
 		TabViewItem* item = m_items.getItemPtr(index);
 		if (item->contentView != view) {
 			Ref<View> viewOld = item->contentView;
@@ -83,7 +85,7 @@ void TabView::_setTabContentView_(sl_uint32 index, Ref<View> view)
 
 void TabView::selectTab(sl_uint32 index)
 {
-	if (index < m_items.count()) {
+	if (index < m_items.getCount()) {
 		_selectTab(index);
 		m_indexSelected = index;
 	} else {

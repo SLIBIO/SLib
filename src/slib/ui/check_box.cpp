@@ -4,6 +4,8 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(CheckBox, View)
+
 CheckBox::CheckBox()
 {
 	m_flagChecked = sl_false;

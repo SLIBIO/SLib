@@ -2,6 +2,24 @@
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
+TcpStream::TcpStream()
+{
+}
+
+TcpStream::TcpStream(const Ref<Socket>& socket) : m_socket(socket)
+{
+}
+
+Ref<Socket> TcpStream::getSocket()
+{
+	return m_socket;
+}
+
+void TcpStream::setSocket(const Ref<Socket>& socket)
+{
+	m_socket = socket;
+}
+
 void TcpStream::close()
 {
 	Ref<Socket> socket = m_socket;

@@ -9,7 +9,7 @@ CameraParam::CameraParam()
 {
 	preferedFrameWidth = 0;
 	preferedFrameHeight = 0;
-	preferedFrameFormat = bitmapFormat_YUV_NV21;
+	preferedFrameFormat = BitmapFormat::YUV_NV21;
 }
 
 void CameraParam::setFrontCamera()
@@ -31,6 +31,9 @@ sl_bool CameraParam::isBackCamera()
 {
 	return deviceId == "BACK";
 }
+
+
+SLIB_DEFINE_OBJECT(Camera, VideoCapture)
 
 SLIB_MEDIA_NAMESPACE_END
 

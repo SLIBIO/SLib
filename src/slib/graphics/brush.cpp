@@ -4,9 +4,12 @@ SLIB_GRAPHICS_NAMESPACE_BEGIN
 
 BrushDesc::BrushDesc()
 {
-    style = brushStyle_Solid;
-    color = Color::white();
+    style = BrushStyle::Solid;
+    color = Color::White;
 }
+
+
+SLIB_DEFINE_OBJECT(Brush, Object)
 
 Ref<Brush> Brush::getDefault()
 {
@@ -29,5 +32,23 @@ Ref<Brush> Brush::createSolidBrush(const Color& color)
 	desc.color = color;
 	return create(desc);
 }
+
+void Brush::getDesc(BrushDesc& desc)
+{
+	desc = m_desc;
+}
+
+BrushStyle Brush::getStyle()
+{
+	return m_desc.style;
+}
+
+Color Brush::getColor()
+{
+	return m_desc.color;
+}
+
+
+SLIB_DEFINE_OBJECT(BrushInstance, Object)
 
 SLIB_GRAPHICS_NAMESPACE_END

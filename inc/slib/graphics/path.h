@@ -25,7 +25,8 @@ struct SLIB_EXPORT GraphicsPathPoint
 
 class SLIB_EXPORT GraphicsPath : public Object
 {
-	SLIB_DECLARE_OBJECT(GraphicsPath, Object)
+	SLIB_DECLARE_OBJECT
+	
 protected:
 	GraphicsPath();
 	
@@ -33,90 +34,59 @@ public:
 	static Ref<GraphicsPath> create();
 
 public:
+	void moveTo(sl_real x, sl_real y);
+	
 	void moveTo(const Point& pt);
 	
-	SLIB_INLINE void moveTo(sl_real x, sl_real y)
-	{
-		moveTo(Point(x, y));
-	}
+	void lineTo(sl_real x, sl_real y);
 	
 	void lineTo(const Point& pt);
 	
-	SLIB_INLINE void lineTo(sl_real x, sl_real y)
-	{
-		lineTo(Point(x, y));
-	}
-	
+	void cubicTo(sl_real xc1, sl_real yc1, sl_real xc2, sl_real yc2, sl_real xe, sl_real ye);
+
 	void cubicTo(const Point& ptControl1, const Point& ptControl2, const Point& ptEnd);
 	
-	SLIB_INLINE void cubicTo(sl_real xc1, sl_real yc1, sl_real xc2, sl_real yc2, sl_real xe, sl_real ye)
-	{
-		cubicTo(Point(xc1, yc1), Point(xc2, yc2), Point(xe, ye));
-	}
-
 	void closeSubpath();
 	
-	SLIB_INLINE sl_bool containsPoint(const Ref<GraphicsContext>& context, sl_real x, sl_real y)
-	{
-		return containsPoint(context, Point(x, y));
-	}
-
+	void addArc(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, sl_bool flagMoveTo = sl_true);
+	
 	void addArc(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, sl_bool flagMoveTo = sl_true);
 	
-	SLIB_INLINE void addArc(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, sl_bool flagMoveTo = sl_true)
-	{
-		Rectangle rect(x, y, x + width, y + height);
-		addArc(rect, startDegrees, sweepDegrees, flagMoveTo);
-	}
-	
+	void addRectangle(sl_real x, sl_real y, sl_real width, sl_real height);
+
 	void addRectangle(const Rectangle& rect);
 	
-	SLIB_INLINE void addRectangle(sl_real x, sl_real y, sl_real width, sl_real height)
-	{
-		Rectangle rect(x, y, x + width, y + height);
-		addRectangle(rect);
-	}
+	void addRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real rx, sl_real ry);
 	
 	void addRoundRect(const Rectangle& rect, const Size& radius);
 	
-	SLIB_INLINE void addRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real rx, sl_real ry)
-	{
-		Rectangle rect(x, y, x + width, y + height);
-		Size radius(rx, ry);
-		addRoundRect(rect, radius);
-	}
-
+	void addEllipse(sl_real x, sl_real y, sl_real width, sl_real height);
+	
 	void addEllipse(const Rectangle& rect);
 	
-	SLIB_INLINE void addEllipse(sl_real x, sl_real y, sl_real width, sl_real height)
-	{
-		Rectangle rect(x, y, x + width, y + height);
-		addEllipse(rect);
-	}
+	void addPie(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees);
 	
 	void addPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees);
 	
-	SLIB_INLINE void addPie(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees)
-	{
-		Rectangle rect(x, y, x + width, y + height);
-		addPie(rect, startDegrees, sweepDegrees);
-	}
+	FillMode getFillMode();
+	
+	void setFillMode(FillMode mode);
 	
 	Rectangle getBounds(const Ref<GraphicsContext>& context);
 	
+	sl_bool containsPoint(const Ref<GraphicsContext>& context, sl_real x, sl_real y);
+	
 	sl_bool containsPoint(const Ref<GraphicsContext>& context, const Point& pt);
-
+	
 	void invalidate();
 	
 public:
 	CList<GraphicsPathPoint> points;
 	
-public:
-	SLIB_PROPERTY(FillMode, FillMode)
-	
 protected:
 	sl_bool m_flagBegan;
 	Point m_pointBegin;
+	FillMode m_fillMode;
 	
 	sl_bool m_flagInvalidated;
 	
@@ -125,7 +95,7 @@ protected:
 
 class SLIB_EXPORT GraphicsPathInstance : public Object
 {
-	SLIB_DECLARE_OBJECT(GraphicsPathInstance, Object)
+	SLIB_DECLARE_OBJECT
 
 public:
 	virtual void moveTo(const Point& pt) = 0;
@@ -135,6 +105,7 @@ public:
 
 public:
 	void buildFrom(const Ref<GraphicsPath>& path);
+	
 };
 
 SLIB_GRAPHICS_NAMESPACE_END

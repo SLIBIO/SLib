@@ -3,6 +3,34 @@
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(SocketEvent, Event)
+
+Ref<SocketEvent> SocketEvent::create(const Ref<Socket>& socket, sl_uint32 events)
+{
+	Ref<SocketEvent> ev = SocketEvent::create(socket);
+	if (ev.isNotNull()) {
+		if (ev->setup(events)) {
+			return ev;
+		}
+	}
+	return Ref<SocketEvent>::null();
+}
+
+Ref<SocketEvent> SocketEvent::createRead(const Ref<Socket>& socket)
+{
+	return SocketEvent::create(socket, SocketEvent::Read | SocketEvent::Close);
+}
+
+Ref<SocketEvent> SocketEvent::createWrite(const Ref<Socket>& socket)
+{
+	return SocketEvent::create(socket, SocketEvent::Write | SocketEvent::Close);
+}
+
+Ref<SocketEvent> SocketEvent::createReadWrite(const Ref<Socket>& socket)
+{
+	return SocketEvent::create(socket, SocketEvent::Read | SocketEvent::Write | SocketEvent::Close);
+}
+
 sl_bool SocketEvent::setup(sl_uint32 events)
 {
 	Ref<Socket> socket = m_socket;
@@ -12,6 +40,21 @@ sl_bool SocketEvent::setup(sl_uint32 events)
 		}
 	}
 	return sl_false;
+}
+
+sl_bool SocketEvent::setupRead()
+{
+	return setup(SocketEvent::Read | SocketEvent::Close);
+}
+
+sl_bool SocketEvent::setupWrite()
+{
+	return setup(SocketEvent::Write | SocketEvent::Close);
+}
+
+sl_bool SocketEvent::setupReadWrite()
+{
+	return setup(SocketEvent::Read | SocketEvent::Write | SocketEvent::Close);
 }
 
 sl_uint32 SocketEvent::waitEvents(sl_int32 timeout)
@@ -43,7 +86,7 @@ sl_bool SocketEvent::waitMultipleEvents(const Ref<SocketEvent>* events, sl_uint3
 		if (thread->isStopping()) {
 			return sl_false;
 		}
-		thread->setWaitingEvent(events[0].get());
+		thread->setWaitingEvent(events[0].ptr);
 	}
 	sl_bool ret = __waitMultipleEvents(events, status, count, timeout);
 	if (thread.isNotNull()) {
@@ -52,30 +95,9 @@ sl_bool SocketEvent::waitMultipleEvents(const Ref<SocketEvent>* events, sl_uint3
 	return ret;
 }
 
-Ref<SocketEvent> SocketEvent::create(const Ref<Socket>& socket, sl_uint32 events)
+const Ref<Socket>& SocketEvent::getSocket()
 {
-	Ref<SocketEvent> ev = SocketEvent::create(socket);
-	if (ev.isNotNull()) {
-		if (ev->setup(events)) {
-			return ev;
-		}
-	}
-	return Ref<SocketEvent>::null();
-}
-
-Ref<SocketEvent> SocketEvent::createRead(const Ref<Socket>& socket)
-{
-	return SocketEvent::create(socket, socketEventType_Read | socketEventType_Close);
-}
-
-Ref<SocketEvent> SocketEvent::createWrite(const Ref<Socket>& socket)
-{
-	return SocketEvent::create(socket, socketEventType_Write | socketEventType_Close);
-}
-
-Ref<SocketEvent> SocketEvent::createReadWrite(const Ref<Socket>& socket)
-{
-	return SocketEvent::create(socket, socketEventType_Read | socketEventType_Write | socketEventType_Close);
+	return m_socket;
 }
 
 SLIB_NETWORK_NAMESPACE_END

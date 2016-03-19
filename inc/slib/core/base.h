@@ -93,7 +93,6 @@ public:
 	static sl_bool interlockedCompareExchange32(sl_int32* pDst, sl_int32 value, sl_int32 comperand);
 	
 #ifdef SLIB_ARCH_IS_64BIT
-	
 	static sl_int64 interlockedIncrement64(sl_int64* pValue);
 	
 	static sl_int64 interlockedDecrement64(sl_int64* pValue);
@@ -101,76 +100,27 @@ public:
 	static sl_int64 interlockedAdd64(sl_int64* pDst, sl_int64 value);
 	
 	static sl_bool interlockedCompareExchange64(sl_int64* pDst, sl_int64 value, sl_int64 comperand);
-
-	SLIB_INLINE static sl_reg interlockedIncrement(sl_reg* pValue)
-	{
-		return interlockedIncrement64(pValue);
-	}
-	
-	SLIB_INLINE static sl_reg interlockedDecrement(sl_reg* pValue)
-	{
-		return interlockedDecrement64(pValue);
-	}
-	
-	SLIB_INLINE static sl_reg interlockedAdd(sl_reg* pDst, sl_reg value)
-	{
-		return interlockedAdd64(pDst, value);
-	}
-	
-	SLIB_INLINE static sl_bool interlockedCompareExchange(sl_reg* pDst, sl_reg value, sl_reg comperand)
-	{
-		return interlockedCompareExchange64(pDst, value, comperand);
-	}
-	
-	SLIB_INLINE static void* interlockedAddPtr(void** pDst, sl_reg value)
-	{
-		return (void*)interlockedAdd64((sl_int64*)(pDst), value);
-	}
-	
-	SLIB_INLINE static sl_bool interlockedCompareExchangePtr(void** pDst, const void* value, const void* comperand)
-	{
-		return interlockedCompareExchange64((sl_int64*)(pDst), (sl_int64)value, (sl_int64)comperand);
-	}
-	
-#else
-	
-	SLIB_INLINE static sl_reg interlockedIncrement(sl_reg* pValue)
-	{
-		return interlockedIncrement32(pValue);
-	}
-	
-	SLIB_INLINE static sl_reg interlockedDecrement(sl_reg* pValue)
-	{
-		return interlockedDecrement32(pValue);
-	}
-	
-	SLIB_INLINE static sl_reg interlockedAdd(sl_reg* pDst, sl_reg value)
-	{
-		return interlockedAdd32(pDst, value);
-	}
-	
-	SLIB_INLINE static sl_bool interlockedCompareExchange(sl_reg* pDst, sl_reg value, sl_reg comperand)
-	{
-		return interlockedCompareExchange32(pDst, value, comperand);
-	}
-	
-	SLIB_INLINE static void* interlockedAddPtr(void** pDst, sl_reg value)
-	{
-		return (void*)interlockedAdd32((sl_int32*)pDst, value);
-	}
-	
-	SLIB_INLINE static sl_bool interlockedCompareExchangePtr(void** pDst, const void* value, const void* comperand)
-	{
-		return interlockedCompareExchange32((sl_int32*)pDst, (sl_int32)value, (sl_int32)comperand);
-	}
-	
 #endif
 
+	static sl_reg interlockedIncrement(sl_reg* pValue);
+	
+	static sl_reg interlockedDecrement(sl_reg* pValue);
+	
+	static sl_reg interlockedAdd(sl_reg* pDst, sl_reg value);
+	
+	static sl_bool interlockedCompareExchange(sl_reg* pDst, sl_reg value, sl_reg comperand);
+	
+	static void* interlockedAddPtr(void** pDst, sl_reg value);
+	
+	static sl_bool interlockedCompareExchangePtr(void** pDst, const void* value, const void* comperand);
+	
+	
 	static void sleep(sl_uint32 millis);
 	
 	static void yield();
 	
 	static void yield(sl_uint32 ellapsed);
+	
 };
 
 SLIB_NAMESPACE_END
@@ -204,5 +154,5 @@ SLIB_INLINE void(operator delete[])(void* in_pVoid, void* in_pWhere)
 #endif
 
 
-#endif //CHECKHEADER_SLIB_CORE_BASE
+#endif
 

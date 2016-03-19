@@ -4,8 +4,6 @@
 #include "definition.h"
 
 #include "ip_address.h"
-
-#include "../core/mio.h"
 #include "../core/string.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
@@ -16,86 +14,26 @@ public:
 	IPAddress ip;
 	sl_uint32 port;
 
-private:
-	struct _SocketAddress
-	{
-		struct {
-			IPAddressType type;
-			sl_uint8 data[_SLIB_NET_IPADDRESS_SIZE];
-		} ip;
-		sl_uint32 port;
-	};
-	static const _SocketAddress _none;
+public:
+	SocketAddress();
+	
+	SocketAddress(const SocketAddress& other) = default;
+
+	SocketAddress(sl_int32 port);
+
+	SocketAddress(const IPAddress& ip, sl_int32 port);
+	
+	SocketAddress(const String& str);
 
 public:
-	SLIB_INLINE SocketAddress()
-	{
-		port = 0;
-	}
+	static const SocketAddress& none();
 
-	SLIB_INLINE SocketAddress(sl_int32 _port)
-	{
-		port = _port;
-	}
+	void setNone();
 
-	SLIB_INLINE SocketAddress(const IPAddress& _ip, sl_int32 _port)
-	{
-		this->ip = _ip;
-		this->port = _port;
-	}
+	sl_bool isValid() const;
 	
-	SLIB_INLINE SocketAddress(const String& str)
-	{
-		parse(str);
-	}
-
-	SLIB_INLINE SocketAddress(const SocketAddress& other)
-	{
-		this->ip = other.ip;
-		this->port = other.port;
-	}
-
-public:
-	SLIB_INLINE SocketAddress& operator=(const SocketAddress& other)
-	{
-		this->ip = other.ip;
-		this->port = other.port;
-		return *this;
-	}
+	sl_bool isInvalid() const;
 	
-	SLIB_INLINE sl_bool operator==(const SocketAddress& other) const
-	{
-		return port == other.port && ip == other.ip;
-	}
-	
-	SLIB_INLINE sl_bool operator!=(const SocketAddress& other) const
-	{
-		return ! (*this == other);
-	}
-
-public:
-	static SLIB_INLINE const SocketAddress& none()
-	{
-		return *((SocketAddress*)((void*)(&_none)));
-	}
-
-	SLIB_INLINE sl_bool isValid() const
-	{
-		return ip.isNotNone() && port != 0;
-	}
-	
-	SLIB_INLINE sl_bool isInvalid() const
-	{
-		return ip.isNone() || port == 0;
-	}
-
-	SLIB_INLINE void setNone()
-	{
-		ip.setNone();
-		port = 0;
-	}
-
-public:
 	int compare(const SocketAddress& other) const;
 	
 	sl_uint32 hashCode() const;
@@ -122,29 +60,70 @@ public:
 	// HostName:port
 	sl_bool setHostAddress(const String& address);
 
-public:
 	static sl_bool parseIPv4Range(const String& str, IPv4Address* from = sl_null, IPv4Address* to = sl_null);
 
 	static sl_bool parsePortRange(const String& str, sl_uint32* from = sl_null, sl_uint32* to = sl_null);
-
+	
+public:
+	SocketAddress& operator=(const SocketAddress& other) = default;
+	
+	sl_bool operator==(const SocketAddress& other) const;
+	
+	sl_bool operator!=(const SocketAddress& other) const;
+	
+private:
+	struct _SocketAddress
+	{
+		struct {
+			IPAddressType type;
+			sl_uint8 data[_SLIB_NET_IPADDRESS_SIZE];
+		} ip;
+		sl_uint32 port;
+	};
+	
+	static const _SocketAddress _none;
+	
 };
 
 template <>
-SLIB_INLINE int Compare<SocketAddress>::compare(const SocketAddress& a, const SocketAddress& b)
-{
-	return a.compare(b);
-}
+int Compare<SocketAddress>::compare(const SocketAddress& a, const SocketAddress& b);
 
 template <>
-SLIB_INLINE sl_bool Compare<SocketAddress>::equals(const SocketAddress& a, const SocketAddress& b)
-{
-	return a == b;
-}
+sl_bool Compare<SocketAddress>::equals(const SocketAddress& a, const SocketAddress& b);
 
 template <>
-SLIB_INLINE sl_uint32 Hash<SocketAddress>::hash(const SocketAddress& a)
+sl_uint32 Hash<SocketAddress>::hash(const SocketAddress& a);
+
+SLIB_NETWORK_NAMESPACE_END
+
+
+SLIB_NETWORK_NAMESPACE_BEGIN
+
+SLIB_INLINE SocketAddress::SocketAddress() : port(0)
 {
-	return a.hashCode();
+}
+
+SLIB_INLINE SocketAddress::SocketAddress(sl_int32 _port) : port(_port)
+{
+}
+
+SLIB_INLINE SocketAddress::SocketAddress(const IPAddress& _ip, sl_int32 _port) : ip(_ip), port(_port)
+{
+}
+
+SLIB_INLINE const SocketAddress& SocketAddress::none()
+{
+	return *((SocketAddress*)((void*)(&_none)));
+}
+
+SLIB_INLINE sl_bool SocketAddress::isValid() const
+{
+	return ip.isNotNone() && port != 0;
+}
+
+SLIB_INLINE sl_bool SocketAddress::isInvalid() const
+{
+	return ip.isNone() || port == 0;
 }
 
 SLIB_NETWORK_NAMESPACE_END

@@ -90,15 +90,15 @@ static double _thread_getMacPriority(ThreadPriority priority)
 		return -1;
 	}
 	switch (priority) {
-        case threadPriority_Lowest:
+        case ThreadPriority::Lowest:
             return min;
-        case threadPriority_BelowNormal:
+        case ThreadPriority::BelowNormal:
             return (min * 3 + max) / 4;
-        case threadPriority_Normal:
+        case ThreadPriority::Normal:
             return (min + max) / 2;
-        case threadPriority_AboveNormal:
+        case ThreadPriority::AboveNormal:
             return (min + max * 3) / 4;
-        case threadPriority_Highest:
+        case ThreadPriority::Highest:
             return max;
 	}
 	return -1;

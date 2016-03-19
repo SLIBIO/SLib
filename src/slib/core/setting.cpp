@@ -21,7 +21,7 @@ sl_bool IniSetting::parseFromUtf8TextFile(const String& filePath)
 sl_bool IniSetting::parseFromText(const String& text)
 {
 	sl_uint32 len = text.getLength();
-	const sl_char8* buf = text.getBuf();
+	const sl_char8* buf = text.getData();
 	sl_int32 indexAssign = -1;
 	sl_int32 indexComment = -1;
 	sl_int32 indexStart = 0;

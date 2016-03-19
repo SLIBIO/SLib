@@ -7,7 +7,7 @@
 
 #include "../core/object.h"
 #include "../core/event.h"
-#include "../core/queue.h"
+#include "../core/loop_queue.h"
 #include "../core/string.h"
 #include "../core/pointer.h"
 
@@ -22,6 +22,7 @@ public:
 
 public:
 	AudioRecorderInfo();
+	
 };
 
 class AudioRecorder;
@@ -48,11 +49,12 @@ public:
 	
 public:
 	AudioRecorderParam();
+	
 };
 
 class SLIB_EXPORT AudioRecorder : public Object
 {
-	SLIB_DECLARE_OBJECT(AudioRecorder, Object)
+	SLIB_DECLARE_OBJECT
 	
 public:
 	static Ref<AudioRecorder> create(const AudioRecorderParam& param);
@@ -85,6 +87,7 @@ protected:
 	
 	Ptr<IAudioRecorderListener> m_listener;
 	Ref<Event> m_event;
+	
 };
 
 SLIB_MEDIA_NAMESPACE_END

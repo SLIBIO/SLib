@@ -12,6 +12,8 @@ NetFilterParam::NetFilterParam()
 	flagAutoStart = sl_true;
 }
 
+SLIB_DEFINE_OBJECT(NetFilter, Object)
+
 void NetFilter::_onFilterPacket(NetFilterPacket* packet)
 {
 	PtrLocker<INetFilterListener> listener(m_listener);
@@ -176,7 +178,7 @@ public:
 					ret->m_bufPacket = bufPacket;
 					ret->m_wake = wake;
 					ret->m_listener = param.listener;
-					ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_Linux_NetFilter, _run, ret.get()));
+					ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_Linux_NetFilter, _run, ret.ptr));
 					if (ret->m_thread.isNotNull()) {
 						ret->m_flagInit = sl_true;
 						if (param.flagAutoStart) {
@@ -250,7 +252,7 @@ public:
 		}
 		Ref<_Linux_NetFilterQueue> queueObj = new _Linux_NetFilterQueue;
 		if (queueObj.isNotNull()) {
-			nfq_q_handle* queue = nfq_create_queue(m_handle, queueNumber, &_Linux_NetFilter::_callbackFilter, queueObj.get());
+			nfq_q_handle* queue = nfq_create_queue(m_handle, queueNumber, &_Linux_NetFilter::_callbackFilter, queueObj.ptr);
 			if (queue) {
 				nfq_set_queue_maxlen(queue, 1024*10);
 				queueObj->m_filter = this;
@@ -321,7 +323,7 @@ public:
 			return;
 		}
 		
-		void* buf = m_bufPacket.getBuf();
+		void* buf = m_bufPacket.getData();
 		sl_uint32 sizeBuf = (sl_uint32)(m_bufPacket.getSize());
 		
 		nfnl_rcvbufsiz(nfq_nfnlh(m_handle), 1024*1024*100);

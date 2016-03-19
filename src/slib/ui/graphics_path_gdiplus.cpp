@@ -15,7 +15,7 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class _Gdiplus_GraphicsPathInstance : public GraphicsPathInstance
 {
-	SLIB_DECLARE_OBJECT(_Gdiplus_GraphicsPathInstance, GraphicsPathInstance)
+	SLIB_DECLARE_OBJECT
 public:
 	Gdiplus::GraphicsPath* m_path;
 
@@ -34,7 +34,7 @@ public:
 	{
 		Ref<_Gdiplus_GraphicsPathInstance> ret;
 		ListLocker<GraphicsPathPoint> points(path->points);
-		sl_size n = points.getCount();
+		sl_size n = points.count;
 		if (n > 0) {
 			SLIB_SCOPED_BUFFER(Gdiplus::PointF, 1024, pts, n);
 			SLIB_SCOPED_BUFFER(BYTE, 1024, types, n);
@@ -81,10 +81,10 @@ public:
 	{
 		Gdiplus::FillMode fillMode;
 		switch (_mode) {
-		case fillMode_Winding:
+		case FillMode::Winding:
 			fillMode = Gdiplus::FillModeWinding;
 			break;
-		case fillMode_Alternate:
+		case FillMode::Alternate:
 		default:
 			fillMode = Gdiplus::FillModeAlternate;
 			break;
@@ -93,6 +93,8 @@ public:
 	}
 };
 
+SLIB_DEFINE_OBJECT(_Gdiplus_GraphicsPathInstance, GraphicsPathInstance)
+
 Gdiplus::GraphicsPath* UIPlatform::getGraphicsPath(GraphicsPath* path, Ref<GraphicsPathInstance>& instanceOut)
 {
 	if (!path) {
@@ -100,7 +102,7 @@ Gdiplus::GraphicsPath* UIPlatform::getGraphicsPath(GraphicsPath* path, Ref<Graph
 	}
 	Ref<GraphicsPathInstance> _instance = path->getInstance();
 	Ref<_Gdiplus_GraphicsPathInstance> instance;
-	if (_Gdiplus_GraphicsPathInstance::checkInstance(_instance)) {
+	if (_Gdiplus_GraphicsPathInstance::checkInstance(_instance.ptr)) {
 		instance = Ref<_Gdiplus_GraphicsPathInstance>::from(_instance);
 	} else {
 		instance = _Gdiplus_GraphicsPathInstance::_create(path);
@@ -127,7 +129,7 @@ Rectangle UI::getPathBounds(const Ref<GraphicsPath>& path)
 		return Rectangle::zero();
 	}
 	Ref<GraphicsPathInstance> instance;
-	Gdiplus::GraphicsPath* handle = UIPlatform::getGraphicsPath(path.get(), instance);
+	Gdiplus::GraphicsPath* handle = UIPlatform::getGraphicsPath(path.ptr, instance);
 	if (handle) {
 		Rectangle ret;
 		Gdiplus::RectF rc;
@@ -147,7 +149,7 @@ sl_bool UI::checkPointInPath(const Ref<GraphicsPath>& path, const Point& _pt)
 		return sl_false;
 	}
 	Ref<GraphicsPathInstance> instance;
-	Gdiplus::GraphicsPath* handle = UIPlatform::getGraphicsPath(path.get(), instance);
+	Gdiplus::GraphicsPath* handle = UIPlatform::getGraphicsPath(path.ptr, instance);
 	if (handle) {
 		return (handle->IsVisible(_pt.x, _pt.y)) != FALSE;
 	}

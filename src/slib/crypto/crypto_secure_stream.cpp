@@ -12,6 +12,11 @@
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
 
+const Ptr<IAsyncSecureStreamListener>& AsyncSecureStream::getListener() const
+{
+	return m_listener;
+}
+
 void AsyncSecureStream::onConnected(sl_bool flagError)
 {
 	PtrLocker<IAsyncSecureStreamListener> listener(m_listener);
@@ -182,8 +187,8 @@ public:
 			return -1;
 		}
 
-		sl_uint8* bufRdata = (sl_uint8*)(m_rdata.getBuf());
-		sl_uint8* bufSdata = (sl_uint8*)(m_sdata.getBuf());
+		sl_uint8* bufRdata = (sl_uint8*)(m_rdata.getData());
+		sl_uint8* bufSdata = (sl_uint8*)(m_sdata.getData());
 		while (!(m_context.isConnected())) {
 			sl_int32 n = stream->read32(bufRdata + m_sizeRdata, RDATA_SIZE - m_sizeRdata);
 			if (n > 0) {
@@ -257,7 +262,7 @@ public:
 		}
 		sl_uint8* buf = (sl_uint8*)_buf;
 		if (m_sizeRdata > 0) {
-			sl_uint8* bufRdata = (sl_uint8*)(m_rdata.getBuf());
+			sl_uint8* bufRdata = (sl_uint8*)(m_rdata.getData());
 			if (size < m_sizeRdata) {
 				n = size;
 			} else {
@@ -296,7 +301,7 @@ public:
 			return 0;
 		}
 		const sl_uint8* buf = (const sl_uint8*)_buf;
-		sl_uint8* bufSdata = (sl_uint8*)(m_sdata.getBuf());
+		sl_uint8* bufSdata = (sl_uint8*)(m_sdata.getData());
 		while (0 < m_sizeSdata) {
 			n = stream->write32(bufSdata + m_posSdata, m_sizeSdata);
 			if (n > 0) {
@@ -462,9 +467,9 @@ public:
 				m_context.processReceive(data, sizeRead, data);
 			}
 			lock.unlock();
-			PtrLocker<IAsyncStreamListener> listener(req->getListener());
+			PtrLocker<IAsyncStreamListener> listener(req->listener);
 			if (listener.isNotNull()) {
-				listener->onRead(this, data, sizeRead, req->getDataReference(), flagError);
+				listener->onRead(this, data, sizeRead, req->refData.ptr, flagError);
 			}
 		} else {
 			if (flagError) {
@@ -475,12 +480,12 @@ public:
 				if (sizeRead > 0) {
 					char bufSend[SDATA_SIZE];
 					m_sizeRdata += sizeRead;
-					sl_int32 n = m_context.processConnect(m_rdata.getBuf(), m_sizeRdata, bufSend);
+					sl_int32 n = m_context.processConnect(m_rdata.getData(), m_sizeRdata, bufSend);
 					if (n > 0) {
 						m_posRdata = n;
 						m_sizeRdata -= n;
 						if (m_sizeRdata > 0) {
-							sl_uint8* p = (sl_uint8*)(m_rdata.getBuf()) + m_posRdata;
+							sl_uint8* p = (sl_uint8*)(m_rdata.getData()) + m_posRdata;
 							m_context.processReceive(p, m_sizeRdata, p);
 						}
 						
@@ -499,7 +504,7 @@ public:
 							onConnected(sl_true);
 						} else {
 							WeakRef<_SecureStreamServer_AsyncStream> _this(this);
-							stream->read((sl_uint8*)(m_rdata.getBuf()) + m_sizeRdata, RDATA_SIZE - m_sizeRdata, _this, m_rdata.getObject());
+							stream->read((sl_uint8*)(m_rdata.getData()) + m_sizeRdata, RDATA_SIZE - m_sizeRdata, _this, m_rdata.ref.ptr);
 						}
 					}
 				}
@@ -517,18 +522,18 @@ public:
 			return;
 		}
 		AsyncStreamRequest* req = (AsyncStreamRequest*)ref;
-		PtrLocker<IAsyncStreamListener> listener(req->getListener());
+		PtrLocker<IAsyncStreamListener> listener(req->listener);
 		if (listener.isNotNull()) {
-			listener->onWrite(this, data, sizeWritten, req->getDataReference(), flagError);
+			listener->onWrite(this, data, sizeWritten, req->refData.ptr, flagError);
 		}
 	}
 
 	void processReadDone(Ref<AsyncStreamRequest> req)
 	{
 		if (req.isNotNull()) {
-			PtrLocker<IAsyncStreamListener> listener(req->getListener());
+			PtrLocker<IAsyncStreamListener> listener(req->listener);
 			if (listener.isNotNull()) {
-				listener->onRead(this, req->data(), req->size(), req->getDataReference(), sl_false);
+				listener->onRead(this, req->data, req->size, req->refData.ptr, sl_false);
 			}
 		}
 	}
@@ -540,11 +545,11 @@ public:
 			if (m_context.isConnected()) {
 				if (m_sizeRdata) {
 					sl_uint32 n = m_sizeRdata;
-					if (n > req->size()) {
-						n = req->size();
+					if (n > req->size) {
+						n = req->size;
 					}
-					req->setSize(n);
-					Base::copyMemory(req->data(), (sl_uint8*)(m_rdata.getBuf()) + m_posRdata, n);
+					req->size = n;
+					Base::copyMemory(req->data, (sl_uint8*)(m_rdata.getData()) + m_posRdata, n);
 					m_sizeRdata -= n;
 					m_posRdata += n;
 					addTask(SLIB_CALLBACK_WEAKREF(_SecureStreamServer_AsyncStream, processReadDone, this, Ref<AsyncStreamRequest>(req)));
@@ -552,7 +557,7 @@ public:
 						m_rdata.setNull();
 					}
 				} else {
-					return stream->read(req->data(), req->size(), WeakRef<_SecureStreamServer_AsyncStream>(this), req);
+					return stream->read(req->data, req->size, WeakRef<_SecureStreamServer_AsyncStream>(this), req);
 				}
 			}
 		}
@@ -567,7 +572,7 @@ public:
 		}
 		Ref<AsyncStreamRequest> req = AsyncStreamRequest::createRead(data, size, ref, listener);
 		if (req.isNotNull()) {
-			return _read(req.get());
+			return _read(req.ptr);
 		}
 		return sl_false;
 	}
@@ -584,7 +589,7 @@ public:
 			if (req.isNotNull()) {
 				if (m_context.isConnected()) {
 					m_context.processSend(data, size, data);
-					return stream->write(data, size, WeakRef<_SecureStreamServer_AsyncStream>(this), req.get());
+					return stream->write(data, size, WeakRef<_SecureStreamServer_AsyncStream>(this), req.ptr);
 				}
 			}
 		}
@@ -766,7 +771,7 @@ public:
 
 	sl_bool init(const SecureStreamClientParam& param)
 	{
-		sl_int32 n = m_context.init(param, m_rdata.getBuf());
+		sl_int32 n = m_context.init(param, m_rdata.getData());
 		if (n <= 0) {
 			return sl_false;
 		}
@@ -776,7 +781,7 @@ public:
 
 	sl_int32 _init(IStream* stream)
 	{
-		sl_uint8* bufRdata = (sl_uint8*)(m_rdata.getBuf());
+		sl_uint8* bufRdata = (sl_uint8*)(m_rdata.getData());
 		while (0 < m_sizeRdata) {
 			sl_int32 n = stream->write32(bufRdata + m_posRdata, m_sizeRdata);
 			if (n > 0) {
@@ -809,7 +814,7 @@ public:
 				return n;
 			}
 		}
-		sl_uint8* bufSdata = (sl_uint8*)(m_sdata.getBuf());
+		sl_uint8* bufSdata = (sl_uint8*)(m_sdata.getData());
 		while (!(m_context.isReceivedHeader())) {
 			sl_int32 n = stream->read32(bufSdata + m_sizeSdata, SDATA_SIZE - m_sizeSdata);
 			if (n > 0) {
@@ -877,7 +882,7 @@ public:
 		}
 		sl_uint8* buf = (sl_uint8*)_buf;
 		if (m_sizeSdata > 0) {
-			sl_uint8* bufSdata = (sl_uint8*)(m_sdata.getBuf());
+			sl_uint8* bufSdata = (sl_uint8*)(m_sdata.getData());
 			if (size < m_sizeSdata) {
 				n = size;
 			} else {
@@ -1009,7 +1014,7 @@ public:
 					ret->m_rdata = rdata;
 					ret->m_streamBase = baseStream;
 					ret->m_listener =  param.listener;
-					sl_int32 n = ret->m_context.init(param, rdata.getBuf());
+					sl_int32 n = ret->m_context.init(param, rdata.getData());
 					if (n > 0) {
 						ret->m_sizeRdata = n;
 						if (flagConnect) {
@@ -1076,9 +1081,9 @@ public:
 				m_context.processReceive(data, sizeRead, data);
 			}
 			lock.unlock();
-			PtrLocker<IAsyncStreamListener> listener(req->getListener());
+			PtrLocker<IAsyncStreamListener> listener(req->listener);
 			if (listener.isNotNull()) {
-				listener->onRead(this, data, sizeRead, req->getDataReference(), flagError);
+				listener->onRead(this, data, sizeRead, req->refData.ptr, flagError);
 			}
 		} else {
 			if (flagError) {
@@ -1088,12 +1093,12 @@ public:
 			} else {
 				if (sizeRead > 0) {
 					m_sizeSdata += sizeRead;
-					sl_int32 n = m_context.receiveHeader(m_sdata.getBuf(), m_sizeSdata);
+					sl_int32 n = m_context.receiveHeader(m_sdata.getData(), m_sizeSdata);
 					if (n > 0) {
 						m_sizeSdata -= n;
 						m_posSdata = n;
 						if (m_sizeSdata > 0) {
-							sl_uint8* p = (sl_uint8*)(m_sdata.getBuf()) + m_posSdata;
+							sl_uint8* p = (sl_uint8*)(m_sdata.getData()) + m_posSdata;
 							m_context.processReceive(p, m_sizeSdata, p);
 						}
 						lock.unlock();
@@ -1105,7 +1110,7 @@ public:
 							onConnected(sl_true);
 						} else {
 							WeakRef<_SecureStreamClient_AsyncStream> _this(this);
-							stream->read((sl_uint8*)(m_sdata.getBuf()) + m_sizeSdata, SDATA_SIZE - m_sizeSdata, _this, m_sdata.getObject());
+							stream->read((sl_uint8*)(m_sdata.getData()) + m_sizeSdata, SDATA_SIZE - m_sizeSdata, _this, m_sdata.ref.ptr);
 						}
 					}
 				}
@@ -1123,18 +1128,18 @@ public:
 			return;
 		}
 		AsyncStreamRequest* req = (AsyncStreamRequest*)ref;
-		PtrLocker<IAsyncStreamListener> listener(req->getListener());
+		PtrLocker<IAsyncStreamListener> listener(req->listener);
 		if (listener.isNotNull()) {
-			listener->onWrite(this, data, sizeWritten, req->getDataReference(), flagError);
+			listener->onWrite(this, data, sizeWritten, req->refData.ptr, flagError);
 		}
 	}
 
 	void processReadDone(Ref<AsyncStreamRequest> req)
 	{
 		if (req.isNotNull()) {
-			PtrLocker<IAsyncStreamListener> listener(req->getListener());
+			PtrLocker<IAsyncStreamListener> listener(req->listener);
 			if (listener.isNotNull()) {
-				listener->onRead(this, req->data(), req->size(), req->getDataReference(), sl_false);
+				listener->onRead(this, req->data, req->size, req->refData.ptr, sl_false);
 			}
 		}
 	}
@@ -1146,11 +1151,11 @@ public:
 			if (m_context.isReceivedHeader()) {
 				if (m_sizeSdata) {
 					sl_uint32 n = m_sizeSdata;
-					if (n > req->size()) {
-						n = req->size();
+					if (n > req->size) {
+						n = req->size;
 					}
-					req->setSize(n);
-					Base::copyMemory(req->data(), (sl_uint8*)(m_sdata.getBuf()) + m_posSdata, n);
+					req->size = n;
+					Base::copyMemory(req->data, (sl_uint8*)(m_sdata.getData()) + m_posSdata, n);
 					m_sizeSdata -= n;
 					m_posSdata += n;
 					addTask(SLIB_CALLBACK_WEAKREF(_SecureStreamClient_AsyncStream, processReadDone, this, Ref<AsyncStreamRequest>(req)));
@@ -1158,7 +1163,7 @@ public:
 						m_sdata.setNull();
 					}
 				} else {
-					return stream->read(req->data(), req->size(), WeakRef<_SecureStreamClient_AsyncStream>(this), req);
+					return stream->read(req->data, req->size, WeakRef<_SecureStreamClient_AsyncStream>(this), req);
 				}
 			}
 		}
@@ -1173,7 +1178,7 @@ public:
 		}
 		Ref<AsyncStreamRequest> req = AsyncStreamRequest::createRead(data, size, ref, listener);
 		if (req.isNotNull()) {
-			return _read(req.get());
+			return _read(req.ptr);
 		}
 		return sl_false;
 	}
@@ -1189,7 +1194,7 @@ public:
 			Ref<AsyncStreamRequest> req = AsyncStreamRequest::createWrite(data, size, ref, listener);
 			if (req.isNotNull()) {
 				m_context.processSend(data, size, data);
-				return stream->write(data, size, WeakRef<_SecureStreamClient_AsyncStream>(this), req.get());
+				return stream->write(data, size, WeakRef<_SecureStreamClient_AsyncStream>(this), req.ptr);
 			}
 		}
 		return sl_false;

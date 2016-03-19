@@ -20,143 +20,143 @@ private:
 public:
 	_UI_Android_KeyMapper()
 	{
-		map(keyTab, 61);
-		map(keyEnter, 66);
-		map(keyEscape, 111);
+		map(Keycode::Tab, 61);
+		map(Keycode::Enter, 66);
+		map(Keycode::Escape, 111);
 		
-		map(keySpace, 62);
-		map(keyGrave, 68);
-		map(keyEqual, 70);
-		map(keySemicolon, 74);
-		map(keyBackslash, 73);
-		map(keyLeftBaracket, 71);
-		map(keyRightBaracket, 72);
-		map(keyQuote, 75);
-		map(keyComma, 55);
-		map(keyMinus, 69);
-		map(keyPeriod, 56);
-		map(keyDivide, 76);
+		map(Keycode::Space, 62);
+		map(Keycode::Grave, 68);
+		map(Keycode::Equal, 70);
+		map(Keycode::Semicolon, 74);
+		map(Keycode::Backslash, 73);
+		map(Keycode::LeftBaracket, 71);
+		map(Keycode::RightBaracket, 72);
+		map(Keycode::Quote, 75);
+		map(Keycode::Comma, 55);
+		map(Keycode::Minus, 69);
+		map(Keycode::Period, 56);
+		map(Keycode::Divide, 76);
 		
-		map(key0, 7);
-		map(key1, 8);
-		map(key2, 9);
-		map(key3, 10);
-		map(key4, 11);
-		map(key5, 12);
-		map(key6, 13);
-		map(key7, 14);
-		map(key8, 15);
-		map(key9, 16);
+		map(Keycode::Num0, 7);
+		map(Keycode::Num1, 8);
+		map(Keycode::Num2, 9);
+		map(Keycode::Num3, 10);
+		map(Keycode::Num4, 11);
+		map(Keycode::Num5, 12);
+		map(Keycode::Num6, 13);
+		map(Keycode::Num7, 14);
+		map(Keycode::Num8, 15);
+		map(Keycode::Num9, 16);
 		
-		map(keyA, 29);
-		map(keyB, 30);
-		map(keyC, 31);
-		map(keyD, 32);
-		map(keyE, 33);
-		map(keyF, 34);
-		map(keyG, 35);
-		map(keyH, 36);
-		map(keyI, 37);
-		map(keyJ, 38);
-		map(keyK, 39);
-		map(keyL, 40);
-		map(keyM, 41);
-		map(keyN, 42);
-		map(keyO, 43);
-		map(keyP, 44);
-		map(keyQ, 45);
-		map(keyR, 46);
-		map(keyS, 47);
-		map(keyT, 48);
-		map(keyU, 49);
-		map(keyV, 50);
-		map(keyW, 51);
-		map(keyX, 52);
-		map(keyY, 53);
-		map(keyZ, 54);
+		map(Keycode::A, 29);
+		map(Keycode::B, 30);
+		map(Keycode::C, 31);
+		map(Keycode::D, 32);
+		map(Keycode::E, 33);
+		map(Keycode::F, 34);
+		map(Keycode::G, 35);
+		map(Keycode::H, 36);
+		map(Keycode::I, 37);
+		map(Keycode::J, 38);
+		map(Keycode::K, 39);
+		map(Keycode::L, 40);
+		map(Keycode::M, 41);
+		map(Keycode::N, 42);
+		map(Keycode::O, 43);
+		map(Keycode::P, 44);
+		map(Keycode::Q, 45);
+		map(Keycode::R, 46);
+		map(Keycode::S, 47);
+		map(Keycode::T, 48);
+		map(Keycode::U, 49);
+		map(Keycode::V, 50);
+		map(Keycode::W, 51);
+		map(Keycode::X, 52);
+		map(Keycode::Y, 53);
+		map(Keycode::Z, 54);
 		
-		map(keyNumpad0, 144);
-		map(keyNumpad1, 145);
-		map(keyNumpad2, 146);
-		map(keyNumpad3, 147);
-		map(keyNumpad4, 148);
-		map(keyNumpad5, 149);
-		map(keyNumpad6, 150);
-		map(keyNumpad7, 151);
-		map(keyNumpad8, 152);
-		map(keyNumpad9, 153);
+		map(Keycode::Numpad0, 144);
+		map(Keycode::Numpad1, 145);
+		map(Keycode::Numpad2, 146);
+		map(Keycode::Numpad3, 147);
+		map(Keycode::Numpad4, 148);
+		map(Keycode::Numpad5, 149);
+		map(Keycode::Numpad6, 150);
+		map(Keycode::Numpad7, 151);
+		map(Keycode::Numpad8, 152);
+		map(Keycode::Numpad9, 153);
 		
-		map(keyNumpadDivide, 154);
-		map(keyNumpadMultiply, 155);
-		map(keyNumpadMinus, 156);
-		map(keyNumpadPlus, 157);
-		map(keyNumpadEnter, 160);
-		map(keyNumpadDecimal, 158);
+		map(Keycode::NumpadDivide, 154);
+		map(Keycode::NumpadMultiply, 155);
+		map(Keycode::NumpadMinus, 156);
+		map(Keycode::NumpadPlus, 157);
+		map(Keycode::NumpadEnter, 160);
+		map(Keycode::NumpadDecimal, 158);
 		
-		map(keyF1, 131);
-		map(keyF2, 132);
-		map(keyF3, 133);
-		map(keyF4, 134);
-		map(keyF5, 135);
-		map(keyF6, 136);
-		map(keyF7, 137);
-		map(keyF8, 138);
-		map(keyF9, 139);
-		map(keyF10, 140);
-		map(keyF11, 141);
-		map(keyF12, 142);
+		map(Keycode::F1, 131);
+		map(Keycode::F2, 132);
+		map(Keycode::F3, 133);
+		map(Keycode::F4, 134);
+		map(Keycode::F5, 135);
+		map(Keycode::F6, 136);
+		map(Keycode::F7, 137);
+		map(Keycode::F8, 138);
+		map(Keycode::F9, 139);
+		map(Keycode::F10, 140);
+		map(Keycode::F11, 141);
+		map(Keycode::F12, 142);
 		
-		map(keyBackspace, 67);
-		map(keyPageUp, 92);
-		map(keyPageDown, 93);
-		map(keyHome, 122);
-		map(keyEnd, 123);
-		map(keyLeft, 21);
-		map(keyUp, 19);
-		map(keyRight, 22);
-		map(keyDown, 20);
-		map(keyPrintScreen, 120);
-		map(keyInsert, 124);
-		map(keyDelete, 112);
-		map(keySleep, -1);
-		map(keyPause, 121);
+		map(Keycode::Backspace, 67);
+		map(Keycode::PageUp, 92);
+		map(Keycode::PageDown, 93);
+		map(Keycode::Home, 122);
+		map(Keycode::End, 123);
+		map(Keycode::Left, 21);
+		map(Keycode::Up, 19);
+		map(Keycode::Right, 22);
+		map(Keycode::Down, 20);
+		map(Keycode::PrintScreen, 120);
+		map(Keycode::Insert, 124);
+		map(Keycode::Delete, 112);
+		map(Keycode::Sleep, -1);
+		map(Keycode::Pause, 121);
 		
-		map(keyGoHome, -1);
-		map(keyGoMenu, 82);
-		map(keyGoBack, 4);
-		map(keyCamera, 27);
-		map(keyVolumeMute, 164);
-		map(keyVolumeDown, 25);
-		map(keyVolumeUp, 24);
-		map(keyMediaPrev, 88);
-		map(keyMediaNext, 87);
-		map(keyMediaPause, 85);
-		map(keyMediaStop, 86);
-		map(keyPhoneStar, 17);
-		map(keyPhonePound, 18);
+		map(Keycode::GoHome, -1);
+		map(Keycode::GoMenu, 82);
+		map(Keycode::GoBack, 4);
+		map(Keycode::Camera, 27);
+		map(Keycode::VolumeMute, 164);
+		map(Keycode::VolumeDown, 25);
+		map(Keycode::VolumeUp, 24);
+		map(Keycode::MediaPrev, 88);
+		map(Keycode::MediaNext, 87);
+		map(Keycode::MediaPause, 85);
+		map(Keycode::MediaStop, 86);
+		map(Keycode::PhoneStar, 17);
+		map(Keycode::PhonePound, 18);
 
-		map(keyLeftShift, 59);
-		map(keyRightShift, 60);
-		map(keyLeftControl, 113);
-		map(keyRightControl, 114);
-		map(keyLeftAlt, 57);
-		map(keyRightAlt, 58);
-		map(keyLeftWin, 117);
-		map(keyRightWin, 118);
-		map(keyCapsLock, 115);
-		map(keyScrollLock, 116);
-		map(keyNumLock, 143);
-		map(keyContextMenu, -1);
+		map(Keycode::LeftShift, 59);
+		map(Keycode::RightShift, 60);
+		map(Keycode::LeftControl, 113);
+		map(Keycode::RightControl, 114);
+		map(Keycode::LeftAlt, 57);
+		map(Keycode::RightAlt, 58);
+		map(Keycode::LeftWin, 117);
+		map(Keycode::RightWin, 118);
+		map(Keycode::CapsLock, 115);
+		map(Keycode::ScrollLock, 116);
+		map(Keycode::NumLock, 143);
+		map(Keycode::ContextMenu, -1);
 	}
 	
 public:
-	void map(sl_uint32 key, sl_uint32 vk)
+	void map(Keycode key, sl_uint32 vk)
 	{
 		if (vk == -1) {
 			return;
 		}
-		mapKeyToVK.put(key, vk);
-		mapVKToKey.put(vk, key);
+		mapKeyToVK.put((int)key, vk);
+		mapVKToKey.put(vk, (int)key);
 	}
 	
 	Keycode vkToKey(sl_uint32 vk)
@@ -165,14 +165,14 @@ public:
 		if (mapVKToKey.get(vk, &ret)) {
 			return (Keycode)ret;
 		} else {
-			return keyUnknown;
+			return Keycode::Unknown;
 		}
 	}
 	
 	sl_uint32 keyToVk(Keycode code)
 	{
 		sl_uint32 ret;
-		if (mapKeyToVK.get(code, &ret)) {
+		if (mapKeyToVK.get((int)code, &ret)) {
 			return ret;
 		} else {
 			return -1;

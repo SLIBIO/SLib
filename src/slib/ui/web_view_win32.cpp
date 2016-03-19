@@ -89,8 +89,8 @@ public:
 	void __onBeforeNavigate2(BSTR szURL, VARIANT_BOOL* pFlagCancel)
 	{
 		Ref<View> _view = getView();
-		if (WebView::checkInstance(_view)) {
-			WebView* view = (WebView*)(_view.get());
+		if (WebView::checkInstance(_view.ptr)) {
+			WebView* view = (WebView*)(_view.ptr);
 			view->onStartLoad(szURL);
 			*pFlagCancel = 0;
 		}
@@ -99,8 +99,8 @@ public:
 	void __onNavigateComplete(BSTR szURL)
 	{
 		Ref<View> _view = getView();
-		if (WebView::checkInstance(_view)) {
-			WebView* view = (WebView*)(_view.get());
+		if (WebView::checkInstance(_view.ptr)) {
+			WebView* view = (WebView*)(_view.ptr);
 			__installExternal();
 		}
 	}
@@ -108,8 +108,8 @@ public:
 	void __onDocumentComplete(BSTR szURL)
 	{
 		Ref<View> _view = getView();
-		if (WebView::checkInstance(_view)) {
-			WebView* view = (WebView*)(_view.get());
+		if (WebView::checkInstance(_view.ptr)) {
+			WebView* view = (WebView*)(_view.ptr);
 			view->onFinishLoad(szURL, sl_false);
 		}
 	}
@@ -454,8 +454,8 @@ public:
 			{
 				sl_uint32 n = (sl_uint32)(pDispParams->cArgs);
 				Ref<View> _view = m_viewInstance->getView();
-				if (WebView::checkInstance(_view)) {
-					WebView* view = (WebView*)(_view.get());
+				if (WebView::checkInstance(_view.ptr)) {
+					WebView* view = (WebView*)(_view.ptr);
 					List<String> params;
 					for (sl_uint32 i = 0; i < n; i++) {
 						VARIANT& var = pDispParams->rgvarg[n - 1 - i];
@@ -481,7 +481,7 @@ public:
 					/*
 					::VariantInit(pVarResult);
 					pVarResult->vt = VT_BSTR;
-					pVarResult->bstrVal = ::SysAllocString(ret.getBuf());
+					pVarResult->bstrVal = ::SysAllocString(ret.getData());
 					*/
 				}
 			}
@@ -759,10 +759,10 @@ public:
 	HRESULT STDMETHODCALLTYPE GetDisplayName(IBindCtx *pbc, IMoniker *pmkToLeft, LPOLESTR *ppszDisplayName)
 	{
 		String16 name = m_displayName;
-		DWORD size = name.length() * 2 + 2;
+		DWORD size = name.getLength() * 2 + 2;
 		sl_char16* buf = (sl_char16*)(::CoTaskMemAlloc(size));
 		if (buf) {
-			Base::copyMemory(buf, name.getBuf(), size);
+			Base::copyMemory(buf, name.getData(), size);
 			*ppszDisplayName = buf;
 			return S_OK;
 		} else {
@@ -786,7 +786,7 @@ void _WebView_writeHTML(IHTMLDocument2* doc, String16 content, String16 baseURL)
 {
 	if (baseURL.isNotEmpty()) {
 		HRESULT hr;
-		IStream* stream = ::SHCreateMemStream((BYTE*)(content.getBuf()), (sl_uint32)(content.getLength() * 2));
+		IStream* stream = ::SHCreateMemStream((BYTE*)(content.getData()), (sl_uint32)(content.getLength() * 2));
 		if (stream) {
 			IPersistMoniker* persistMoniker = NULL;
 			hr = doc->QueryInterface(IID_IPersistMoniker, (void**)(&persistMoniker));
@@ -822,7 +822,7 @@ void _WebView_writeHTML(IHTMLDocument2* doc, String16 content, String16 baseURL)
 			HRESULT hr = ::SafeArrayAccessData(sa, (void**)(&varArr));
 			if (hr == S_OK) {
 				varArr[0].vt = VT_BSTR;
-				varArr[0].bstrVal = ::SysAllocString((BSTR)(content.getBuf()));
+				varArr[0].bstrVal = ::SysAllocString((BSTR)(content.getData()));
 				doc->write(sa);
 				doc->close();
 			}
@@ -887,7 +887,7 @@ public:
 					VARIANT varURL;
 					::VariantInit(&varURL);
 					varURL.vt = VT_BSTR;
-					varURL.bstrVal = (BSTR)(url.getBuf());
+					varURL.bstrVal = (BSTR)(url.getData());
 					browser->Navigate2(&varURL, NULL, NULL, NULL, NULL);
 				}
 			}
@@ -904,8 +904,8 @@ Ref<ViewInstance> WebView::createInstance(ViewInstance* parent)
 	Ref<_Win32_WebViewInstance> ret = Win32_ViewInstance::create<_Win32_WebViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClass)), L"", style, styleEx);
 	if (ret.isNotNull()) {
 		ret->_initialize();
-		((_WebView*)this)->__init(ret.get());
-		((_WebView*)this)->__load(ret.get());
+		((_WebView*)this)->__init(ret.ptr);
+		((_WebView*)this)->__load(ret.ptr);
 	}
 	return ret;
 }
@@ -914,8 +914,8 @@ void WebView::onResize()
 {
 	View::onResize();
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_WebViewInstance::checkInstance(_instance)) {
-		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.get());
+	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
+		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.ptr);
 		instance->_resize();
 	}
 }
@@ -923,8 +923,8 @@ void WebView::onResize()
 void WebView::_load()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_WebViewInstance::checkInstance(_instance)) {
-		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.get());
+	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
+		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.ptr);
 		((_WebView*)this)->__load(instance);
 	}
 }
@@ -932,8 +932,8 @@ void WebView::_load()
 String WebView::getURL()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_WebViewInstance::checkInstance(_instance)) {
-		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.get());
+	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
+		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.ptr);
 		IHTMLDocument2* doc2 = instance->getDoc();
 		if (doc2) {
 			String ret;
@@ -955,8 +955,8 @@ String WebView::getURL()
 String WebView::getPageTitle()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_WebViewInstance::checkInstance(_instance)) {
-		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.get());
+	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
+		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.ptr);
 		IHTMLDocument2* doc2 = instance->getDoc();
 		if (doc2) {
 			String ret;
@@ -978,8 +978,8 @@ String WebView::getPageTitle()
 void WebView::goBack()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_WebViewInstance::checkInstance(_instance)) {
-		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.get());
+	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
+		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.ptr);
 		IWebBrowser2* browser = instance->m_browser;
 		if (browser) {
 			browser->GoBack();
@@ -990,8 +990,8 @@ void WebView::goBack()
 void WebView::goForward()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_WebViewInstance::checkInstance(_instance)) {
-		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.get());
+	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
+		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.ptr);
 		IWebBrowser2* browser = instance->m_browser;
 		if (browser) {
 			browser->GoForward();
@@ -1002,8 +1002,8 @@ void WebView::goForward()
 void WebView::reload()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_WebViewInstance::checkInstance(_instance)) {
-		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.get());
+	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
+		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.ptr);
 		IWebBrowser2* browser = instance->m_browser;
 		if (browser) {
 			browser->Refresh();
@@ -1031,7 +1031,7 @@ String _WebView_evalJavascript(IHTMLWindow2* win, const String& _script)
 			String16 script = _script;
 			::VariantInit(&(vars[0]));
 			vars[0].vt = VT_BSTR;
-			vars[0].bstrVal = ::SysAllocString(script.getBuf());
+			vars[0].bstrVal = ::SysAllocString(script.getData());
 			disp->InvokeEx(dispid, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &params, &var, NULL, NULL);
 			if (var.vt == VT_BSTR) {
 				ret = String((sl_char16*)(var.bstrVal));
@@ -1057,8 +1057,8 @@ void WebView::runJavaScript(const String& _script)
 	String16 script = _script;
 	if (script.isNotEmpty()) {
 		Ref<ViewInstance> _instance = getViewInstance();
-		if (_Win32_WebViewInstance::checkInstance(_instance)) {
-			_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.get());
+		if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
+			_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.ptr);
 			IHTMLDocument2* doc2 = instance->getDoc();
 			if (doc2) {
 				HRESULT hr;
@@ -1066,7 +1066,7 @@ void WebView::runJavaScript(const String& _script)
 				hr = doc2->get_parentWindow(&win);
 				if (hr == S_OK) {
 					//_WebView_evalJavascript(win, _script);
-					BSTR s = (BSTR)(::SysAllocString(script.getBuf()));
+					BSTR s = (BSTR)(::SysAllocString(script.getData()));
 					if (s) {
 						VARIANT var;
 						::VariantInit(&var);

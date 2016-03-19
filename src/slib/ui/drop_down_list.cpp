@@ -2,6 +2,8 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(DropDownList, View)
+
 DropDownList::DropDownList()
 {
 	m_indexSelected = 0;
@@ -9,7 +11,7 @@ DropDownList::DropDownList()
 
 sl_uint32 DropDownList::getItemsCount()
 {
-	return (sl_uint32)(m_titles.count());
+	return (sl_uint32)(m_titles.getCount());
 }
 
 void DropDownList::setItemsCount(sl_uint32 n)
@@ -54,7 +56,7 @@ String DropDownList::getItemTitle(sl_uint32 index)
 
 void DropDownList::setItemTitle(sl_uint32 index, const String& title)
 {
-	if (index < m_titles.count()) {
+	if (index < m_titles.getCount()) {
 		m_titles.setItem(index, title);
 		_setItemTitle(index, title);
 	}
@@ -69,7 +71,7 @@ void DropDownList::setTitles(const List<String>& list)
 {
 	m_titles = list;
 	_refreshItemsContent();
-	sl_uint32 n = (sl_uint32)(m_titles.count());
+	sl_uint32 n = (sl_uint32)(m_titles.getCount());
 	if (m_indexSelected >= n) {
 		selectIndex(0);
 	}
@@ -77,7 +79,7 @@ void DropDownList::setTitles(const List<String>& list)
 
 void DropDownList::selectIndex(sl_uint32 index)
 {
-	if (index < m_titles.count()) {
+	if (index < m_titles.getCount()) {
 		_select(index);
 		m_indexSelected = index;
 	} else {

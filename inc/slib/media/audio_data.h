@@ -35,10 +35,7 @@ public:
 public:
 	AudioData();
 	
-	AudioData(const AudioData& other);
-	
-public:
-	AudioData& operator=(const AudioData& other);
+	AudioData(const AudioData& other) = default;
 	
 public:
 	sl_size getSizeForChannel() const;
@@ -50,10 +47,11 @@ public:
 	
 	void copySamplesFrom(const AudioData& other, sl_size count) const;
 	
-	SLIB_INLINE void copySamplesFrom(const AudioData& other) const
-	{
-		copySamplesFrom(other, count);
-	}
+	void copySamplesFrom(const AudioData& other) const;
+	
+public:
+	AudioData& operator=(const AudioData& other) = default;
+
 };
 
 SLIB_MEDIA_NAMESPACE_END

@@ -31,7 +31,7 @@ public:
 	{
 		m_renderer = renderer;
 		if (renderer.isNotNull()) {
-			renderer->setRenderingContinuously(redrawMode == redrawMode_Continuously);
+			renderer->setRenderingContinuously(redrawMode == RedrawMode::Continuously);
 		}
 	}
 
@@ -54,7 +54,7 @@ public:
 	void onFrame(RenderEngine* engine)
 	{
 		Ref<View> _view = getView();
-		if (RenderView::checkInstance(_view)) {
+		if (RenderView::checkInstance(_view.ptr)) {
 			Ref<RenderView> view = Ref<RenderView>::from(_view);
 			if (view.isNotNull()) {
 				view->dispatchFrame(engine);
@@ -71,17 +71,17 @@ Ref<ViewInstance> RenderView::createInstance(ViewInstance* parent)
 	Ref<_Win32_RenderViewInstance> ret = Win32_ViewInstance::create<_Win32_RenderViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClass)), L"", style, styleEx);
 	if (ret.isNotNull()) {
 		RenderEngineType engineType = getPreferredEngineType();
-		if (engineType == renderEngineType_OpenGL_ES) {
+		if (engineType == RenderEngineType::OpenGL_ES) {
 			EGL::loadEntries();
 			GLES::loadEntries();
 			if (!(EGL::isAvailable() && GLES::isAvailable())) {
-				engineType = renderEngineType_OpenGL;
+				engineType = RenderEngineType::OpenGL;
 			}
-		} else if (engineType == renderEngineType_OpenGL) {
+		} else if (engineType == RenderEngineType::OpenGL) {
 		} else {
-			engineType = renderEngineType_OpenGL;
+			engineType = RenderEngineType::OpenGL;
 		}
-		if (engineType == renderEngineType_OpenGL_ES) {
+		if (engineType == RenderEngineType::OpenGL_ES) {
 			RendererParam rp;
 			rp.callback = WeakRef<_Win32_RenderViewInstance>(ret);
 			Ref<Renderer> renderer = EGL::createRenderer((void*)(ret->getHandle()), rp);
@@ -89,7 +89,7 @@ Ref<ViewInstance> RenderView::createInstance(ViewInstance* parent)
 				ret->setRenderer(renderer, m_redrawMode);
 				return ret;
 			}
-		} else if (engineType == renderEngineType_OpenGL) {
+		} else if (engineType == RenderEngineType::OpenGL) {
 			RendererParam rp;
 			rp.callback = WeakRef<_Win32_RenderViewInstance>(ret);
 			Ref<Renderer> renderer = WGL::createRenderer((void*)(ret->getHandle()), rp);
@@ -109,7 +109,7 @@ void RenderView::setRedrawMode(RedrawMode mode)
 	if (instance.isNotNull()) {
 		Ref<Renderer> renderer = instance->m_renderer;
 		if (renderer.isNotNull()) {
-			renderer->setRenderingContinuously(mode == redrawMode_Continuously);
+			renderer->setRenderingContinuously(mode == RedrawMode::Continuously);
 		}
 	}
 	m_redrawMode = mode;

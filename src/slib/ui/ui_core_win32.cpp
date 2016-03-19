@@ -168,47 +168,47 @@ LRESULT CALLBACK _CustomizedMsgBox_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
 		}
 		AlertParam& param = *((AlertParam*)lParam);
 		String16 caption = param.caption;
-		::SetWindowTextW(hWndMsg, (LPCWSTR)(caption.getBuf()));
+		::SetWindowTextW(hWndMsg, (LPCWSTR)(caption.getData()));
 
 		switch (param.type) {
 		case alertType_Ok:
 			if (param.titleOk.isNotNull()) {
 				String16 titleOk = param.titleOk;
-				::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleOk.getBuf()));
+				::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleOk.getData()));
 			}
 			break;
 		case alertType_OkCancel:
 			if (param.titleOk.isNotNull()) {
 				String16 titleOk = param.titleOk;
-				::SetDlgItemTextW(hWndMsg, 1, (LPCWSTR)(titleOk.getBuf()));
+				::SetDlgItemTextW(hWndMsg, 1, (LPCWSTR)(titleOk.getData()));
 			}
 			if (param.titleCancel.isNotNull()) {
 				String16 titleCancel = param.titleCancel;
-				::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleCancel.getBuf()));
+				::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleCancel.getData()));
 			}
 			break;
 		case alertType_YesNo:
 			if (param.titleYes.isNotNull()) {
 				String16 titleYes = param.titleYes;
-				::SetDlgItemTextW(hWndMsg, 6, (LPCWSTR)(titleYes.getBuf()));
+				::SetDlgItemTextW(hWndMsg, 6, (LPCWSTR)(titleYes.getData()));
 			}
 			if (param.titleNo.isNotNull()) {
 				String16 titleNo = param.titleNo;
-				::SetDlgItemTextW(hWndMsg, 7, (LPCWSTR)(titleNo.getBuf()));
+				::SetDlgItemTextW(hWndMsg, 7, (LPCWSTR)(titleNo.getData()));
 			}
 			break;
 		case alertType_YesNoCancel:
 			if (param.titleYes.isNotNull()) {
 				String16 titleYes = param.titleYes;
-				::SetDlgItemTextW(hWndMsg, 6, (LPCWSTR)(titleYes.getBuf()));
+				::SetDlgItemTextW(hWndMsg, 6, (LPCWSTR)(titleYes.getData()));
 			}
 			if (param.titleNo.isNotNull()) {
 				String16 titleNo = param.titleNo;
-				::SetDlgItemTextW(hWndMsg, 7, (LPCWSTR)(titleNo.getBuf()));
+				::SetDlgItemTextW(hWndMsg, 7, (LPCWSTR)(titleNo.getData()));
 			}
 			if (param.titleCancel.isNotNull()) {
 				String16 titleCancel = param.titleCancel;
-				::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleCancel.getBuf()));
+				::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleCancel.getData()));
 			}
 			break;
 		}
@@ -248,10 +248,10 @@ void _UI_AlertProc(AlertParam param)
 	String16 text = param.text;
 	if (hWndMsgBoxCustom) {
 		::PostMessage(hWndMsgBoxCustom, CMB_MSG_INIT, 0, (LPARAM)(&param));
-		result = ::MessageBoxW(hWndParent, (LPCWSTR)(text.getBuf()), L"CustomizedMsgBox", style);
+		result = ::MessageBoxW(hWndParent, (LPCWSTR)(text.getData()), L"CustomizedMsgBox", style);
 	} else {
 		String16 caption = param.caption;
-		result = ::MessageBoxW(hWndParent, (LPCWSTR)(text.getBuf()), (LPCWSTR)(caption.getBuf()), style);
+		result = ::MessageBoxW(hWndParent, (LPCWSTR)(text.getData()), (LPCWSTR)(caption.getData()), style);
 	}
 
 	switch (result) {

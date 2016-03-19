@@ -22,8 +22,8 @@ class Canvas;
 
 class SLIB_EXPORT GraphicsContext : public Object
 {
-	SLIB_DECLARE_OBJECT(GraphicsContext, Object)
-
+	SLIB_DECLARE_OBJECT
+	
 public:
 	virtual Size getFontTextSize(const Ref<Font>& font, const String& text) = 0;
 	
@@ -49,20 +49,12 @@ public:
 	
 	Ref<Drawable> loadDrawableFromMemory(const Memory& mem);
 	
-	Ref<Drawable> loadDrawableFromFile(const String& filePath);
-	
-	Ref<Drawable> loadDrawableFromResource(const String& path);
-	
 	
 	Ref<Bitmap> createBitmapFromImage(const ImageDesc& desc);
 	
 	Ref<Bitmap> createBitmapFromImage(const Ref<Image>& image);
 	
 	Ref<Bitmap> loadBitmapFromMemory(const Memory& mem);
-	
-	Ref<Bitmap> loadBitmapFromFile(const String& filePath);
-	
-	Ref<Bitmap> loadBitmapFromResource(const String& path);
 	
 };
 

@@ -21,7 +21,7 @@ SLIB_JNI_END_CLASS
 
 class _Android_FontInstance : public FontInstance
 {
-	SLIB_DECLARE_OBJECT(_Android_FontInstance, FontInstance)
+	SLIB_DECLARE_OBJECT
 public:
 	JniGlobal<jobject> m_font;
 	
@@ -71,7 +71,7 @@ public:
 		Ref<_Android_FontInstance> ret;
 		if (font) {
 			Ref<FontInstance> _instance = font->getInstance();
-			if (_Android_FontInstance::checkInstance(_instance)) {
+			if (_Android_FontInstance::checkInstance(_instance.ptr)) {
 				ret = Ref<_Android_FontInstance>::from(_instance);
 			} else {
 				FontDesc desc;
@@ -86,19 +86,21 @@ public:
 	}
 };
 
+SLIB_DEFINE_OBJECT(_Android_FontInstance, FontInstance)
+
 jobject UIPlatform::getNativeFont(Font* font, Ref<FontInstance>& instanceOut)
 {
 	Ref<_Android_FontInstance> instance = _Android_FontInstance::getInstance(font);
 	instanceOut = instance;
 	if (instance.isNotNull()) {
-		return instance->m_font.get();
+		return instance->m_font;
 	}
 	return 0;
 }
 
 Size UI::getFontTextSize(const Ref<Font>& font, const String& text)
 {
-	Ref<_Android_FontInstance> instance = _Android_FontInstance::getInstance(font.get());
+	Ref<_Android_FontInstance> instance = _Android_FontInstance::getInstance(font.ptr);
 	if (instance.isNotNull()) {
 		return instance->getTextSize(text);
 	}

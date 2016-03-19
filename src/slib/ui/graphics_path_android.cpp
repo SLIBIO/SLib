@@ -31,7 +31,7 @@ SLIB_JNI_END_CLASS
 
 class _Android_GraphicsPathInstance : public GraphicsPathInstance
 {
-	SLIB_DECLARE_OBJECT(_Android_GraphicsPathInstance, GraphicsPathInstance)
+	SLIB_DECLARE_OBJECT
 public:
 	JniGlobal<jobject> m_path;
 
@@ -86,6 +86,7 @@ public:
     
 };
 
+SLIB_DEFINE_OBJECT(_Android_GraphicsPathInstance, GraphicsPathInstance)
 
 jobject UIPlatform::getGraphicsPath(GraphicsPath* path, Ref<GraphicsPathInstance>& instanceOut)
 {
@@ -94,7 +95,7 @@ jobject UIPlatform::getGraphicsPath(GraphicsPath* path, Ref<GraphicsPathInstance
 	}
 	Ref<GraphicsPathInstance> _instance = path->getInstance();
 	Ref<_Android_GraphicsPathInstance> instance;
-	if (_Android_GraphicsPathInstance::checkInstance(_instance)) {
+	if (_Android_GraphicsPathInstance::checkInstance(_instance.ptr)) {
 		instance = Ref<_Android_GraphicsPathInstance>::from(_instance);
 	} else {
 		instance = _Android_GraphicsPathInstance::_create();
@@ -118,7 +119,7 @@ Rectangle UI::getPathBounds(const Ref<GraphicsPath>& path)
 		return Rectangle::zero();
 	}
 	Ref<GraphicsPathInstance> instance;
-	jobject handle = UIPlatform::getGraphicsPath(path.get(), instance);
+	jobject handle = UIPlatform::getGraphicsPath(path.ptr, instance);
 	if (handle) {
 		JniLocal<jobject> jrect = _JAndroidPath::getBounds.callObject(handle);
 		if (jrect.isNotNull()) {
@@ -139,7 +140,7 @@ sl_bool UI::checkPointInPath(const Ref<GraphicsPath>& path, const Point& pt)
 		return sl_false;
 	}
 	Ref<GraphicsPathInstance> instance;
-	jobject handle = UIPlatform::getGraphicsPath(path.get(), instance);
+	jobject handle = UIPlatform::getGraphicsPath(path.ptr, instance);
 	if (handle) {
 		return (_JAndroidPath::containsPoint.callBoolean(handle, pt.x, pt.y)) != 0;
 	}

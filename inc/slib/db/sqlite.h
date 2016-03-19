@@ -7,7 +7,7 @@ SLIB_DB_NAMESPACE_BEGIN
 
 class SLIB_EXPORT SQLiteDatabase : public Database
 {
-	SLIB_DECLARE_OBJECT(SQLiteDatabase, Database)
+	SLIB_DECLARE_OBJECT
 
 public:
 	static Ref<SQLiteDatabase> connect(const String& filePath);

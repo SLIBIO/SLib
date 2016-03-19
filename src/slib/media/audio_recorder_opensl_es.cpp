@@ -129,7 +129,7 @@ public:
 								
 								if (ret->m_bufFrame) {
 									Base::zeroMemory(ret->m_bufFrame, sizeof(sl_int16) * ret->m_nSamplesFrame * 2);
-									if ((*bufferQueue)->RegisterCallback(bufferQueue, _OpenSLES_AudioRecorderImpl::callback, ret.get()) == SL_RESULT_SUCCESS) {
+									if ((*bufferQueue)->RegisterCallback(bufferQueue, _OpenSLES_AudioRecorderImpl::callback, ret.ptr) == SL_RESULT_SUCCESS) {
 										if (param.flagAutoStart) {
 											ret->start();
 										}

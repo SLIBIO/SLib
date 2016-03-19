@@ -121,7 +121,7 @@ public:
 							
 							AURenderCallbackStruct cs;
 							cs.inputProc = CallbackInput;
-							cs.inputProcRefCon = ret.get();
+							cs.inputProcRefCon = ret.ptr;
 							
 							result = AudioUnitSetProperty(audioUnitInput,
 														  kAudioOutputUnitProperty_SetInputCallback,
@@ -268,7 +268,7 @@ public:
 		if (arrData.isNull()) {
 			return;
 		}
-		sl_int16* output = arrData.data();
+		sl_int16* output = arrData.getData();
 
 		AudioBufferList bufferOutput;
 		bufferOutput.mNumberBuffers = 1;
@@ -317,7 +317,7 @@ public:
 			return 0;
 		}
 		
-		char* buf = (char*)(mem.getBuf());
+		char* buf = (char*)(mem.getData());
 		
 		char _abList[sizeof(AudioBufferList) * 2];
 		AudioBufferList& abList = *((AudioBufferList*)_abList);

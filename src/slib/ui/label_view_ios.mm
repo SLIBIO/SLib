@@ -31,7 +31,7 @@ public:
 		[handle setBackgroundColor:(UIPlatform::getUIColorFromColor(m_backgroundColor))];
 		Ref<FontInstance> fontInstance;
 		Ref<Font> font = m_font;
-		UIFont* hFont = UIPlatform::getUIFont(font.get(), fontInstance);
+		UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
@@ -39,10 +39,10 @@ public:
 	
 	static NSTextAlignment translateAlignment(Alignment _align)
 	{
-		sl_uint32 align = _align & alignHorizontalMask;
-		if (align == alignCenter) {
+		Alignment align = (Alignment)((int)_align & (int)Alignment::HorizontalMask);
+		if (align == Alignment::Center) {
 			return NSTextAlignmentCenter;
-		} else if (align == alignRight) {
+		} else if (align == Alignment::Right) {
 			return NSTextAlignmentRight;
 		}
 		return NSTextAlignmentLeft;
@@ -51,11 +51,11 @@ public:
 	static Alignment translateAlignmentReverse(NSTextAlignment align)
 	{
 		if (align == NSTextAlignmentCenter) {
-			return alignCenter;
+			return Alignment::Center;
 		} else if (align == NSTextAlignmentRight) {
-			return alignRight;
+			return Alignment::Right;
 		}
-		return alignLeft;
+		return Alignment::Left;
 	}
 };
 
@@ -182,7 +182,7 @@ void LabelView::setFont(const Ref<Font>& font)
 	if (handle != nil && [handle isKindOfClass:[UILabel class]]) {
 		UILabel* tv = (UILabel*)handle;
 		Ref<FontInstance> fontInstance;
-		UIFont* hFont = UIPlatform::getUIFont(font.get(), fontInstance);
+		UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
 		if (hFont != nil) {
 			[tv setFont:hFont];
 		}

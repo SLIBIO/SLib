@@ -30,170 +30,111 @@ public:
 	T value;
 
 public:
-	SLIB_INLINE JniLocal()
-	{
-		this->value = sl_null;
-	}
+	JniLocal();
 
-	SLIB_INLINE JniLocal(T value)
-	{
-		this->value = value;
-	}
+	JniLocal(T value);
 
-	SLIB_INLINE ~JniLocal()
-	{
-		free();
-	}
+	~JniLocal();
 
 public:
-	SLIB_INLINE T get() const
-	{
-		return value;
-	}
+	operator T&();
 
-	SLIB_INLINE operator T&()
-	{
-		return value;
-	}
+	operator T() const;
 
-	SLIB_INLINE operator T() const
-	{
-		return value;
-	}
+	T operator=(T value);
 
-	SLIB_INLINE T operator=(T value)
-	{
-		this->value = value;
-		return value;
-	}
+	T get() const;
 
-	SLIB_INLINE sl_bool isNotNull() const
-	{
-		return value != sl_null;
-	}
+	sl_bool isNotNull() const;
 
-	SLIB_INLINE sl_bool isNull() const
-	{
-		return value == sl_null;
-	}
+	sl_bool isNull() const;
 
-	SLIB_INLINE void setNull()
-	{
-		this->value = sl_null;
-	}
+	void setNull();
 
 	void free();
+
 };
 
-class SLIB_EXPORT _JniGlobal : public Referable
+class SLIB_EXPORT _JniGlobalBase
 {
-	SLIB_DECLARE_ROOT_OBJECT(_JniGlobal)
+	SLIB_DECLARE_OBJECT
+};
+
+template <class T>
+class SLIB_EXPORT _JniGlobal : public _JniGlobalBase
+{
 protected:
-	_JniGlobal();
+	_JniGlobal() = default;
+
 	~_JniGlobal();
 	
 public:
-	static Ref<_JniGlobal> from(jobject obj);
+	static Ref< _JniGlobal<T> > from(T obj);
 
 public:
-	jobject object;
+	T object;
 
 };
+
+extern template class _JniGlobal<jobject>;
+extern template class _JniGlobal<jclass>;
+extern template class _JniGlobal<jstring>;
 
 
 template <class T>
 class JniSafeGlobal;
 
+#define SLIB_TEMPLATE_DEF_PARAMS__JniGlobal class T
+#define SLIB_TEMPLATE_PARAMS__JniGlobal T
+
 template <class T>
 class SLIB_EXPORT JniGlobal
 {
-	SLIB_DECLARE_OBJECT_TYPE_FROM(JniGlobal<T>, _JniGlobal)
-	SLIB_DECLARE_OBJECT_WRAPPER(JniGlobal, _JniGlobal, JniGlobal<T>, JniSafeGlobal<T>)
+public:
+	Ref< _JniGlobal<T> > ref;
+	SLIB_DECLARE_TEMPLATE_REF_WRAPPER(JniGlobal, JniSafeGlobal, _JniGlobal)
 
 public:
-	SLIB_INLINE JniGlobal(T obj) : m_object(_JniGlobal::from(obj))
-	{
-	}
+	JniGlobal(T obj);
 
-	SLIB_INLINE JniGlobal(const JniLocal<T>& obj) : m_object(_JniGlobal::from(obj.get()))
-	{
-	}
+	JniGlobal(const JniLocal<T>& obj);
 	
 public:
-	SLIB_INLINE static JniGlobal<T> from(T obj)
-	{
-		return JniGlobal<T>(obj);
-	}
+	static JniGlobal<T> from(T obj);
 	
 public:
-	SLIB_INLINE JniGlobal<T>& operator=(T obj)
-	{
-		m_object = _JniGlobal::from(obj);
-		return *this;
-	}
-	
-	SLIB_INLINE JniGlobal<T>& operator=(const JniLocal<T>& obj)
-	{
-		m_object = _JniGlobal::from(obj.get());
-		return *this;
-	}
-	
-public:
-	SLIB_INLINE T get() const
-	{
-		_JniGlobal* o = m_object.get();
-		if (o) {
-			return (T)(o->object);
-		} else {
-			return 0;
-		}
-	}
+	JniGlobal<T>& operator=(T obj);
 
-	SLIB_INLINE operator T() const
-	{
-		return get();
-	}
+	JniGlobal<T>& operator=(const JniLocal<T>& obj);
+	
+public:
+	T get() const;
+
+	operator T() const;
+
 };
 
 
 template <class T>
 class SLIB_EXPORT JniSafeGlobal
 {
-	SLIB_DECLARE_OBJECT_TYPE_FROM(JniSafeGlobal<T>, _JniGlobal)
-	SLIB_DECLARE_OBJECT_SAFE_WRAPPER(JniSafeGlobal, _JniGlobal, JniSafeGlobal<T>, JniGlobal<T>)
+public:
+	SafeRef< _JniGlobal<T> > ref;
+	SLIB_DECLARE_TEMPLATE_REF_WRAPPER(JniSafeGlobal, JniGlobal, _JniGlobal)
 
 public:
-	SLIB_INLINE JniSafeGlobal(T obj) : m_object(_JniGlobal::from(obj))
-	{
-	}
+	JniSafeGlobal(T obj);
 		
-	SLIB_INLINE JniSafeGlobal(JniLocal<T>& obj) : m_object(_JniGlobal::from(obj.get()))
-	{
-	}
+	JniSafeGlobal(JniLocal<T>& obj);
 
 public:
-	SLIB_INLINE JniSafeGlobal<T>& operator=(T obj)
-	{
-		m_object = _JniGlobal::from(obj);
-		return *this;
-	}
+	JniSafeGlobal<T>& operator=(T obj);
 	
-	SLIB_INLINE JniSafeGlobal<T>& operator=(JniLocal<T>& obj)
-	{
-		m_object = _JniGlobal::from(obj.get());
-		return *this;
-	}
+	JniSafeGlobal<T>& operator=(JniLocal<T>& obj);
 
 public:
-	SLIB_INLINE T get() const
-	{
-		Ref<_JniGlobal> o = m_object;
-		if (o.isNotNull()) {
-			return (T)(o->object);
-		} else {
-			return 0;
-		}
-	}
+	T get() const;
+
 };
 
 
@@ -201,44 +142,25 @@ class JniSafeClass;
 
 class SLIB_EXPORT JniClass
 {
-	SLIB_DECLARE_OBJECT_TYPE_FROM(JniClass, _JniGlobal)
-	SLIB_DECLARE_OBJECT_WRAPPER(JniClass, _JniGlobal, JniClass, JniSafeClass)
+public:
+	Ref< _JniGlobal<jclass> > ref;
+	SLIB_DECLARE_REF_WRAPPER(JniClass, JniSafeClass, _JniGlobal<jclass>)
     
 public:
-	SLIB_INLINE JniClass(jclass cls) : m_object(_JniGlobal::from(cls))
-	{
-	}
+	JniClass(jclass cls);
 
 public:
-	SLIB_INLINE JniClass& operator=(jclass cls)
-	{
-		m_object = _JniGlobal::from(cls);
-		return *this;
-	}
+	JniClass& operator=(jclass cls);
 
 public:
-	SLIB_INLINE static JniClass from(jclass cls)
-	{
-		return JniClass(cls);
-	}
+	static JniClass from(jclass cls);
 
 	static JniClass getClassOfObject(jobject object);
 
 public:
-	SLIB_INLINE jclass get() const
-	{
-		Ref<_JniGlobal> o = m_object;
-		if (o.isNotNull()) {
-			return (jclass)(o->object);
-		} else {
-			return 0;
-		}
-	}
+	jclass get() const;
 
-	SLIB_INLINE operator jclass() const
-	{
-		return get();
-	}
+	operator jclass() const;
 
 public:
 	sl_bool isInstanceOf(jobject obj) const;
@@ -413,20 +335,16 @@ public:
 
 class SLIB_EXPORT JniSafeClass
 {
-	SLIB_DECLARE_OBJECT_TYPE_FROM(JniSafeClass, _JniGlobal)
-	SLIB_DECLARE_OBJECT_SAFE_WRAPPER(JniSafeClass, _JniGlobal, JniSafeClass, JniClass)
+public:
+	SafeRef< _JniGlobal<jclass> > ref;
+	SLIB_DECLARE_REF_WRAPPER(JniSafeClass, JniClass, _JniGlobal<jclass>)
     
 public:
-	SLIB_INLINE JniSafeClass(jclass cls) : m_object(_JniGlobal::from(cls))
-	{
-	}
+	JniSafeClass(jclass cls);
 
 public:
-	SLIB_INLINE JniSafeClass& operator=(jclass cls)
-	{
-		m_object = _JniGlobal::from(cls);
-		return *this;
-	}
+	JniSafeClass& operator=(jclass cls);
+
 };
 
 
@@ -548,15 +466,6 @@ public:
 
 };
 
-template <class T>
-void JniLocal<T>::free()
-{
-	if (value) {
-		Jni::deleteLocalRef(value);
-		value = sl_null;
-	}
-}
-
 class SLIB_EXPORT _JniSingletonClass
 {
 public:
@@ -659,46 +568,35 @@ public:
 	jfieldID id;
 };
 
+
 class SLIB_EXPORT _JniSingletonObjectField : protected _JniSingletonField
 {
 public:
-	SLIB_INLINE _JniSingletonObjectField(_JniSingletonClass* gcls, const char* name, const char* sig) : _JniSingletonField(gcls, name, sig) {} \
-	SLIB_INLINE jobject get(jobject _this)
-	{
-		return getObject(_this);
-	}
-	SLIB_INLINE void set(jobject _this, jobject value)
-	{
-		setObject(_this, value);
-	}
+	_JniSingletonObjectField(_JniSingletonClass* gcls, const char* name, const char* sig);
+public:
+	jobject get(jobject _this);
+	void set(jobject _this, jobject value);
 };
 
-
-#define _SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(TYPE, NAME, SIG) \
+#define _SLIB_JNI_DECLARE_SINGLETON_FIELD_TYPE(TYPE, NAME) \
 class _JniSingleton##NAME##Field : protected _JniSingletonField \
 { \
 public: \
-	SLIB_INLINE _JniSingleton##NAME##Field(_JniSingletonClass* gcls, const char* name) : _JniSingletonField(gcls, name, SIG) {} \
-	SLIB_INLINE TYPE get(jobject _this) \
-	{ \
-		return get##NAME(_this); \
-	} \
-	SLIB_INLINE void set(jobject _this, TYPE value) \
-	{ \
-		set##NAME(_this, value); \
-	} \
+	_JniSingleton##NAME##Field(_JniSingletonClass* gcls, const char* name); \
+	TYPE get(jobject _this); \
+	void set(jobject _this, TYPE value); \
 };
 
-_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(jboolean, Boolean, "Z")
-_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(sl_int8, Byte, "B")
-_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(sl_uint16, Char, "C")
-_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(sl_int16, Short, "S")
-_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(sl_int32, Int, "I")
-_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(sl_int64, Long, "J")
-_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(float, Float, "F")
-_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(double, Double, "D")
-_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(String, String, "Ljava/lang/String;")
-_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(String16, String16, "Ljava/lang/String;")
+_SLIB_JNI_DECLARE_SINGLETON_FIELD_TYPE(jboolean, Boolean)
+_SLIB_JNI_DECLARE_SINGLETON_FIELD_TYPE(sl_int8, Byte)
+_SLIB_JNI_DECLARE_SINGLETON_FIELD_TYPE(sl_uint16, Char)
+_SLIB_JNI_DECLARE_SINGLETON_FIELD_TYPE(sl_int16, Short)
+_SLIB_JNI_DECLARE_SINGLETON_FIELD_TYPE(sl_int32, Int)
+_SLIB_JNI_DECLARE_SINGLETON_FIELD_TYPE(sl_int64, Long)
+_SLIB_JNI_DECLARE_SINGLETON_FIELD_TYPE(float, Float)
+_SLIB_JNI_DECLARE_SINGLETON_FIELD_TYPE(double, Double)
+_SLIB_JNI_DECLARE_SINGLETON_FIELD_TYPE(String, String)
+_SLIB_JNI_DECLARE_SINGLETON_FIELD_TYPE(String16, String16)
 
 class SLIB_EXPORT _JniSingletonStaticField
 {
@@ -740,43 +638,33 @@ public:
 class SLIB_EXPORT _JniSingletonStaticObjectField : protected _JniSingletonStaticField
 {
 public:
-	SLIB_INLINE _JniSingletonStaticObjectField(_JniSingletonClass* gcls, const char* name, const char* sig) : _JniSingletonStaticField(gcls, name, sig) {} \
-	SLIB_INLINE jobject get()
-	{
-		return getObject(sl_null);
-	}
-	SLIB_INLINE void set(jobject value)
-	{
-		setObject(sl_null, value);
-	}
+	_JniSingletonStaticObjectField(_JniSingletonClass* gcls, const char* name, const char* sig);
+public:
+	jobject get();
+	void set(jobject value);
 };
 
 
-#define _SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(TYPE, NAME, SIG) \
+#define _SLIB_JNI_DECLARE_SINGLETON_STATIC_FIELD_TYPE(TYPE, NAME) \
 class _JniSingletonStatic##NAME##Field : protected _JniSingletonStaticField \
 { \
 public: \
-	SLIB_INLINE _JniSingletonStatic##NAME##Field(_JniSingletonClass* gcls, const char* name) : _JniSingletonStaticField(gcls, name, SIG) {} \
-	SLIB_INLINE TYPE get() \
-	{ \
-		return get##NAME(sl_null); \
-	} \
-	SLIB_INLINE void set(TYPE value) \
-	{ \
-		set##NAME(sl_null, value); \
-	} \
+	_JniSingletonStatic##NAME##Field(_JniSingletonClass* gcls, const char* name); \
+	TYPE get(); \
+	void set(TYPE value); \
 };
 
-_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(jboolean, Boolean, "Z")
-_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(sl_int8, Byte, "B")
-_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(sl_uint16, Char, "C")
-_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(sl_int16, Short, "S")
-_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(sl_int32, Int, "I")
-_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(sl_int64, Long, "J")
-_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(float, Float, "F")
-_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(double, Double, "D")
-_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(String, String, "Ljava/lang/String;")
-_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(String16, String16, "Ljava/lang/String;")
+_SLIB_JNI_DECLARE_SINGLETON_STATIC_FIELD_TYPE(jboolean, Boolean)
+_SLIB_JNI_DECLARE_SINGLETON_STATIC_FIELD_TYPE(sl_int8, Byte)
+_SLIB_JNI_DECLARE_SINGLETON_STATIC_FIELD_TYPE(sl_uint16, Char)
+_SLIB_JNI_DECLARE_SINGLETON_STATIC_FIELD_TYPE(sl_int16, Short)
+_SLIB_JNI_DECLARE_SINGLETON_STATIC_FIELD_TYPE(sl_int32, Int)
+_SLIB_JNI_DECLARE_SINGLETON_STATIC_FIELD_TYPE(sl_int64, Long)
+_SLIB_JNI_DECLARE_SINGLETON_STATIC_FIELD_TYPE(float, Float)
+_SLIB_JNI_DECLARE_SINGLETON_STATIC_FIELD_TYPE(double, Double)
+_SLIB_JNI_DECLARE_SINGLETON_STATIC_FIELD_TYPE(String, String)
+_SLIB_JNI_DECLARE_SINGLETON_STATIC_FIELD_TYPE(String16, String16)
+
 
 class SLIB_EXPORT _JniNativeMethod
 {
@@ -844,6 +732,197 @@ namespace CLASS \
 	RET JNICALL __jniNativeImpl_##VAR(JNIEnv* env, jobject _this, ##__VA_ARGS__); \
 	static slib::_JniNativeMethod VAR(&_gcls, NAME, SIG, (const void*)(__jniNativeImpl_##VAR)); \
 	RET JNICALL __jniNativeImpl_##VAR(JNIEnv* env, jobject _this, ##__VA_ARGS__)
+
+SLIB_NAMESPACE_END
+
+
+SLIB_NAMESPACE_BEGIN
+
+template <class T>
+SLIB_INLINE JniLocal<T>::JniLocal() : value(sl_null)
+{
+}
+
+template <class T>
+SLIB_INLINE JniLocal<T>::JniLocal(T _value) : value(_value)
+{
+}
+
+template <class T>
+SLIB_INLINE JniLocal<T>::~JniLocal()
+{
+	free();
+}
+
+template <class T>
+SLIB_INLINE JniLocal<T>::operator T&()
+{
+	return value;
+}
+
+template <class T>
+SLIB_INLINE JniLocal<T>::operator T() const
+{
+	return value;
+}
+
+template <class T>
+SLIB_INLINE T JniLocal<T>::operator=(T value)
+{
+	this->value = value;
+	return value;
+}
+
+template <class T>
+SLIB_INLINE T JniLocal<T>::get() const
+{
+	return value;
+}
+
+template <class T>
+SLIB_INLINE sl_bool JniLocal<T>::isNotNull() const
+{
+	return value != sl_null;
+}
+
+template <class T>
+SLIB_INLINE sl_bool JniLocal<T>::isNull() const
+{
+	return value == sl_null;
+}
+
+template <class T>
+SLIB_INLINE void JniLocal<T>::setNull()
+{
+	this->value = sl_null;
+}
+
+template <class T>
+SLIB_INLINE void JniLocal<T>::free()
+{
+	if (value) {
+		Jni::deleteLocalRef(value);
+		value = sl_null;
+	}
+}
+
+
+template <class T>
+_JniGlobal<T>::~_JniGlobal()
+{
+	Jni::deleteGlobalRef(object);
+}
+
+template <class T>
+Ref< _JniGlobal<T> > _JniGlobal<T>::from(T obj)
+{
+	Ref< _JniGlobal<T> > ret;
+	if (obj) {
+		jobject jglobal = Jni::newGlobalRef(obj);
+		if (jglobal) {
+			ret = new _JniGlobal<T>();
+			if (ret.isNotNull()) {
+				ret->object = (T)jglobal;
+				return ret;
+			}
+			Jni::deleteGlobalRef(jglobal);
+		}
+	}
+	return ret;
+}
+
+
+SLIB_DEFINE_TEMPLATE_REF_WRAPPER(JniGlobal, JniSafeGlobal, _JniGlobal, ref)
+
+template <class T>
+SLIB_INLINE JniGlobal<T>::JniGlobal(T obj) : ref(_JniGlobal<T>::from(obj))
+{
+}
+
+template <class T>
+SLIB_INLINE JniGlobal<T>::JniGlobal(const JniLocal<T>& obj) : ref(_JniGlobal<T>::from(obj.value))
+{
+}
+
+template <class T>
+SLIB_INLINE JniGlobal<T> JniGlobal<T>::from(T obj)
+{
+	return JniGlobal<T>(obj);
+}
+
+template <class T>
+SLIB_INLINE JniGlobal<T>& JniGlobal<T>::operator=(T obj)
+{
+	ref = _JniGlobal<T>::from(obj);
+	return *this;
+}
+
+template <class T>
+SLIB_INLINE JniGlobal<T>& JniGlobal<T>::operator=(const JniLocal<T>& obj)
+{
+	ref = _JniGlobal<T>::from(obj.value);
+	return *this;
+}
+
+template <class T>
+SLIB_INLINE T JniGlobal<T>::get() const
+{
+	_JniGlobal<T>* o = ref.ptr;
+	if (o) {
+		return o->object;
+	} else {
+		return 0;
+	}
+}
+
+template <class T>
+SLIB_INLINE JniGlobal<T>::operator T() const
+{
+	_JniGlobal<T>* o = ref.ptr;
+	if (o) {
+		return o->object;
+	} else {
+		return 0;
+	}
+}
+
+
+SLIB_DEFINE_TEMPLATE_REF_WRAPPER(JniSafeGlobal, JniGlobal, _JniGlobal, ref)
+
+template <class T>
+SLIB_INLINE JniSafeGlobal<T>::JniSafeGlobal(T obj) : ref(_JniGlobal<T>::from(obj))
+{
+}
+
+template <class T>
+SLIB_INLINE JniSafeGlobal<T>::JniSafeGlobal(JniLocal<T>& obj) : ref(_JniGlobal<T>::from(obj.value))
+{
+}
+
+template <class T>
+JniSafeGlobal<T>& JniSafeGlobal<T>::operator=(T obj)
+{
+	ref = _JniGlobal<T>::from(obj);
+	return *this;
+}
+
+template <class T>
+JniSafeGlobal<T>& JniSafeGlobal<T>::operator=(JniLocal<T>& obj)
+{
+	ref = _JniGlobal<T>::from(obj.value);
+	return *this;
+}
+
+template <class T>
+T JniSafeGlobal<T>::get() const
+{
+	Ref< _JniGlobal<T> > o(ref);
+	if (o.isNotNull()) {
+		return o->object;
+	} else {
+		return 0;
+	}
+}
 
 SLIB_NAMESPACE_END
 

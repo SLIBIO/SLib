@@ -15,7 +15,7 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class _Gdiplus_PenInstance : public PenInstance
 {
-	SLIB_DECLARE_OBJECT(_Gdiplus_PenInstance, PenInstance)
+	SLIB_DECLARE_OBJECT
 public:
 	Gdiplus::Pen* m_pen;
 
@@ -34,21 +34,21 @@ public:
 	{
 		Ref<_Gdiplus_PenInstance> ret;
 		const Color& _color = desc.color;
-		Gdiplus::Color color(_color.getAlpha(), _color.getRed(), _color.getGreen(), _color.getBlue());
+		Gdiplus::Color color(_color.a, _color.r, _color.g, _color.b);
 		Gdiplus::Pen* pen = new Gdiplus::Pen(color, desc.width);
 		if (pen) {
 			Gdiplus::LineCap cap;
 			Gdiplus::DashCap dashCap;
 			switch (desc.cap) {
-			case lineCap_Square:
+			case LineCap::Square:
 				cap = Gdiplus::LineCapSquare;
 				dashCap = Gdiplus::DashCapFlat;
 				break;
-			case lineCap_Round:
+			case LineCap::Round:
 				cap = Gdiplus::LineCapRound;
 				dashCap = Gdiplus::DashCapRound;
 				break;
-			case lineCap_Flat:
+			case LineCap::Flat:
 			default:
 				cap = Gdiplus::LineCapFlat;
 				dashCap = Gdiplus::DashCapFlat;
@@ -58,13 +58,13 @@ public:
 
 			Gdiplus::LineJoin join;
 			switch (desc.join) {
-			case lineJoin_Bevel:
+			case LineJoin::Bevel:
 				join = Gdiplus::LineJoinBevel;
 				break;
-			case lineJoin_Round:
+			case LineJoin::Round:
 				join = Gdiplus::LineJoinRound;
 				break;
-			case lineJoin_Miter:
+			case LineJoin::Miter:
 			default:
 				join = Gdiplus::LineJoinMiter;
 				pen->SetMiterLimit(desc.miterLimit);
@@ -74,19 +74,19 @@ public:
 			
 			Gdiplus::DashStyle style;
 			switch (desc.style) {
-			case penStyle_Dot:
+			case PenStyle::Dot:
 				style = Gdiplus::DashStyleDot;
 				break;
-			case penStyle_Dash:
+			case PenStyle::Dash:
 				style = Gdiplus::DashStyleDash;
 				break;
-			case penStyle_DashDot:
+			case PenStyle::DashDot:
 				style = Gdiplus::DashStyleDashDot;
 				break;
-			case penStyle_DashDotDot:
+			case PenStyle::DashDotDot:
 				style = Gdiplus::DashStyleDashDotDot;
 				break;
-			case penStyle_Solid:
+			case PenStyle::Solid:
 			default:
 				style = Gdiplus::DashStyleSolid;
 				break;
@@ -104,9 +104,11 @@ public:
 	}
 };
 
+SLIB_DEFINE_OBJECT(_Gdiplus_PenInstance, PenInstance)
+
 class _Gdiplus_BrushInstance : public BrushInstance
 {
-	SLIB_DECLARE_OBJECT(_Gdiplus_BrushInstance, BrushInstance)
+	SLIB_DECLARE_OBJECT
 public:
 	Gdiplus::Brush* m_brush;
 
@@ -125,8 +127,8 @@ public:
 	{
 		Ref<_Gdiplus_BrushInstance> ret;
 		const Color& _color = desc.color;
-		Gdiplus::Color color(_color.getAlpha(), _color.getRed(), _color.getGreen(), _color.getBlue());
-		if (desc.style == brushStyle_Solid) {
+		Gdiplus::Color color(_color.a, _color.r, _color.g, _color.b);
+		if (desc.style == BrushStyle::Solid) {
 			Gdiplus::Brush* brush = new Gdiplus::SolidBrush(color);
 			if (brush) {
 				ret = new _Gdiplus_BrushInstance();
@@ -141,9 +143,11 @@ public:
 	}
 };
 
+SLIB_DEFINE_OBJECT(_Gdiplus_BrushInstance, BrushInstance)
+
 class _Gdiplus_Canvas : public Canvas
 {
-	SLIB_DECLARE_OBJECT(_Gdiplus_Canvas, Canvas)
+	SLIB_DECLARE_OBJECT
 public:
 	Gdiplus::Graphics* m_graphics;
 	sl_real m_width;
@@ -249,7 +253,7 @@ public:
 	{
 		if (path.isNotNull()) {
 			Ref<GraphicsPathInstance> instance;
-			Gdiplus::GraphicsPath* handle = UIPlatform::getGraphicsPath(path.get(), instance);
+			Gdiplus::GraphicsPath* handle = UIPlatform::getGraphicsPath(path.ptr, instance);
 			if (handle) {
 				m_graphics->SetClip(handle, Gdiplus::CombineModeIntersect);
 			}
@@ -301,11 +305,11 @@ public:
 			}
 			if (font.isNotNull()) {
 				Ref<FontInstance> fontInstance;
-				Gdiplus::Font* pf = UIPlatform::getGdiplusFont(font.get(), fontInstance);
+				Gdiplus::Font* pf = UIPlatform::getGdiplusFont(font.ptr, fontInstance);
 				if (pf) {
 					Gdiplus::StringFormat format(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsNoClip);
 					Gdiplus::SolidBrush brush(Gdiplus::Color(color.a, color.r, color.g, color.b));
-					graphics->DrawString((const WCHAR*)(text.getBuf()), text.getLength()
+					graphics->DrawString((const WCHAR*)(text.getData()), text.getLength()
 						, pf
 						, Gdiplus::PointF(x, y + 1)
 						, &format
@@ -323,7 +327,7 @@ public:
 			pen = Pen::getDefault();
 		}
 		Ref<PenInstance> penInstance;
-		Gdiplus::Pen* hPen = _getPen(pen.get(), penInstance);
+		Gdiplus::Pen* hPen = _getPen(pen.ptr, penInstance);
 		if (hPen) {
 			m_graphics->DrawLine(hPen, Gdiplus::PointF(pt1.x, pt1.y), Gdiplus::PointF(pt2.x, pt2.y));
 		}
@@ -340,7 +344,7 @@ public:
 			pen = Pen::getDefault();
 		}
 		Ref<PenInstance> penInstance;
-		Gdiplus::Pen* hPen = _getPen(pen.get(), penInstance);
+		Gdiplus::Pen* hPen = _getPen(pen.ptr, penInstance);
 		if (hPen) {
 			Gdiplus::PointF* pts = (Gdiplus::PointF*)points;
 			m_graphics->DrawLines(hPen, pts, countPoints);
@@ -355,7 +359,7 @@ public:
 			pen = Pen::getDefault();
 		}
 		Ref<PenInstance> penInstance;
-		Gdiplus::Pen* hPen = _getPen(pen.get(), penInstance);
+		Gdiplus::Pen* hPen = _getPen(pen.ptr, penInstance);
 		if (hPen) {
 			m_graphics->DrawArc(hPen, rect.left, rect.top, rect.getWidth(), rect.getHeight()
 				, startDegrees, sweepDegrees);
@@ -367,7 +371,7 @@ public:
 	{
 		Gdiplus::Graphics* graphics = m_graphics;
 		Ref<BrushInstance> brushInstance;
-		Gdiplus::Brush* hBrush = _getBrush(brush.get(), brushInstance);
+		Gdiplus::Brush* hBrush = _getBrush(brush.ptr, brushInstance);
 		sl_real width = rect.getWidth();
 		sl_real height = rect.getHeight();
 		if (hBrush) {
@@ -378,7 +382,7 @@ public:
 			pen = Pen::getDefault();
 		}
 		Ref<PenInstance> penInstance;
-		Gdiplus::Pen* hPen = _getPen(pen.get(), penInstance);
+		Gdiplus::Pen* hPen = _getPen(pen.ptr, penInstance);
 		if (hPen) {
 			graphics->DrawRectangle(hPen, rect.left, rect.top, width, height);
 		}
@@ -403,7 +407,7 @@ public:
 		sl_real height = rect.getHeight();
 		Gdiplus::Graphics* graphics = m_graphics;
 		Ref<BrushInstance> brushInstance;
-		Gdiplus::Brush* hBrush = _getBrush(brush.get(), brushInstance);
+		Gdiplus::Brush* hBrush = _getBrush(brush.ptr, brushInstance);
 		if (hBrush) {
 			graphics->FillEllipse(hBrush, rect.left, rect.top, width, height);
 		}
@@ -412,7 +416,7 @@ public:
 			pen = Pen::getDefault();
 		}
 		Ref<PenInstance> penInstance;
-		Gdiplus::Pen* hPen = _getPen(pen.get(), penInstance);
+		Gdiplus::Pen* hPen = _getPen(pen.ptr, penInstance);
 		if (hPen) {
 			graphics->DrawEllipse(hPen, rect.left, rect.top, width, height);
 		}
@@ -426,14 +430,14 @@ public:
 		}
 		Gdiplus::Graphics* graphics = m_graphics;
 		Ref<BrushInstance> brushInstance;
-		Gdiplus::Brush* hBrush = _getBrush(brush.get(), brushInstance);
+		Gdiplus::Brush* hBrush = _getBrush(brush.ptr, brushInstance);
 		if (hBrush) {
 			Gdiplus::FillMode mode;
 			switch (fillMode) {
-			case fillMode_Winding:
+			case FillMode::Winding:
 				mode = Gdiplus::FillModeWinding;
 				break;
-			case fillMode_Alternate:
+			case FillMode::Alternate:
 			default:
 				mode = Gdiplus::FillModeAlternate;
 				break;
@@ -446,7 +450,7 @@ public:
 			pen = Pen::getDefault();
 		}
 		Ref<PenInstance> penInstance;
-		Gdiplus::Pen* hPen = _getPen(pen.get(), penInstance);
+		Gdiplus::Pen* hPen = _getPen(pen.ptr, penInstance);
 		if (hPen) {
 			Gdiplus::PointF* pts = (Gdiplus::PointF*)points;
 			graphics->DrawPolygon(hPen, pts, countPoints);
@@ -458,7 +462,7 @@ public:
 	{
 		Gdiplus::Graphics* graphics = m_graphics;
 		Ref<BrushInstance> brushInstance;
-		Gdiplus::Brush* hBrush = _getBrush(brush.get(), brushInstance);
+		Gdiplus::Brush* hBrush = _getBrush(brush.ptr, brushInstance);
 		if (hBrush) {
 			graphics->FillPie(hBrush, rect.left, rect.top, rect.getWidth(), rect.getHeight()
 				, startDegrees, sweepDegrees);
@@ -468,7 +472,7 @@ public:
 			pen = Pen::getDefault();
 		}
 		Ref<PenInstance> penInstance;
-		Gdiplus::Pen* hPen = _getPen(pen.get(), penInstance);
+		Gdiplus::Pen* hPen = _getPen(pen.ptr, penInstance);
 		if (hPen) {
 			graphics->DrawPie(hPen, rect.left, rect.top, rect.getWidth(), rect.getHeight()
 				, startDegrees, sweepDegrees);
@@ -482,10 +486,10 @@ public:
 		Ref<GraphicsPath> path = _path;
 		if (path.isNotNull()) {
 			Ref<GraphicsPathInstance> pathInstance;
-			Gdiplus::GraphicsPath* pPath = UIPlatform::getGraphicsPath(path.get(), pathInstance);
+			Gdiplus::GraphicsPath* pPath = UIPlatform::getGraphicsPath(path.ptr, pathInstance);
 			if (pPath) {
 				Ref<BrushInstance> brushInstance;
-				Gdiplus::Brush* hBrush = _getBrush(brush.get(), brushInstance);
+				Gdiplus::Brush* hBrush = _getBrush(brush.ptr, brushInstance);
 				if (hBrush) {
 					graphics->FillPath(hBrush, pPath);
 				}
@@ -494,7 +498,7 @@ public:
 					pen = Pen::getDefault();
 				}
 				Ref<PenInstance> penInstance;
-				Gdiplus::Pen* hPen = _getPen(pen.get(), penInstance);
+				Gdiplus::Pen* hPen = _getPen(pen.ptr, penInstance);
 				if (hPen) {
 					graphics->DrawPath(hPen, pPath);
 				}
@@ -507,7 +511,7 @@ public:
 		if (pen) {
 			Ref<PenInstance> _instance = pen->getInstance();
 			Ref<_Gdiplus_PenInstance> instance;
-			if (_Gdiplus_PenInstance::checkInstance(_instance)) {
+			if (_Gdiplus_PenInstance::checkInstance(_instance.ptr)) {
 				instance = Ref<_Gdiplus_PenInstance>::from(_instance);
 			}
 			if (instance.isNull()) {
@@ -531,7 +535,7 @@ public:
 		if (brush) {
 			Ref<BrushInstance> _instance = brush->getInstance();
 			Ref<_Gdiplus_BrushInstance> instance;
-			if (_Gdiplus_BrushInstance::checkInstance(_instance)) {
+			if (_Gdiplus_BrushInstance::checkInstance(_instance.ptr)) {
 				instance = Ref<_Gdiplus_BrushInstance>::from(_instance);
 			}
 			if (instance.isNull()) {
@@ -550,6 +554,8 @@ public:
 		return NULL;
 	}
 };
+
+SLIB_DEFINE_OBJECT(_Gdiplus_Canvas, Canvas)
 
 Ref<Canvas> UIPlatform::createCanvas(Gdiplus::Graphics* graphics, sl_uint32 width, sl_uint32 height, const Rectangle* rectDirty, sl_bool flagFreeOnRelease, const Referable* ref)
 {

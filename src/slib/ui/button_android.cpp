@@ -31,7 +31,7 @@ Ref<ViewInstance> Button::createInstance(ViewInstance* _parent)
 			_JAndroidButton::setText.callBoolean(sl_null, handle, jtext.get());
 			Ref<Font> font = m_font;
 			Ref<FontInstance> fontInstance;
-			jobject jfont = UIPlatform::getNativeFont(font.get(), fontInstance);
+			jobject jfont = UIPlatform::getNativeFont(font.ptr, fontInstance);
 			if (jfont) {
 				_JAndroidButton::setFont.callBoolean(sl_null, handle, jfont);
 			}
@@ -67,7 +67,7 @@ void Button::setFont(const Ref<Font>& font)
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		Ref<FontInstance> fontInstance;
-		jobject jfont = UIPlatform::getNativeFont(font.get(), fontInstance);
+		jobject jfont = UIPlatform::getNativeFont(font.ptr, fontInstance);
 		if (jfont) {
 			_JAndroidButton::setFont.callBoolean(sl_null, handle, jfont);
 		}

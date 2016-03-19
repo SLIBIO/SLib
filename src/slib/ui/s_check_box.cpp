@@ -14,7 +14,7 @@ public:
 	_SCheckBox_Icon(const Ref<Pen>& penBorder, const Color& backColor, const Ref<Pen>& penCheck)
 	{
 		m_penBorder = penBorder;
-		if (backColor.getAlpha() > 0) {
+		if (backColor.a > 0) {
 			m_brush = Brush::createSolidBrush(backColor);
 		}
 		m_penCheck = penCheck;
@@ -64,30 +64,30 @@ public:
 public:
 	_SCheckBox_Categories()
 	{
-		Color colorBackNormal = Color::white();
-		Color colorBackHover = Color::white();
+		Color colorBackNormal = Color::White;
+		Color colorBackHover = Color::White;
 		Color colorBackDown(220, 230, 255);
-		Color colorBackDisabled = Color::gray(220);
-		Ref<Pen> penNormal = Pen::createSolidPen(1, Color::black());
+		Color colorBackDisabled(220, 220, 220);
+		Ref<Pen> penNormal = Pen::createSolidPen(1, Color::Black);
 		Ref<Pen> penHover = Pen::createSolidPen(1, Color(0, 80, 200));
 		Ref<Pen> penDown = penHover;
-		Ref<Pen> penDisabled = Pen::createSolidPen(1, Color::gray(90));
-		Ref<Pen> penCheckNormal = Pen::createSolidPen(2, Color::black());
+		Ref<Pen> penDisabled = Pen::createSolidPen(1, Color(90, 90, 90));
+		Ref<Pen> penCheckNormal = Pen::createSolidPen(2, Color::Black);
 		Ref<Pen> penCheckHover = Pen::createSolidPen(2, Color(0, 80, 200));
 		Ref<Pen> penCheckDown = penCheckHover;
-		Ref<Pen> penCheckDisabled = Pen::createSolidPen(2, Color::gray(90));
-		categories[0].properties[buttonState_Normal].textColor = Color::black();
-		categories[0].properties[buttonState_Normal].icon = new _SCheckBox_Icon(penNormal, colorBackNormal, Ref<Pen>::null());
-		categories[0].properties[buttonState_Disabled].textColor = Color::gray(90);
-		categories[0].properties[buttonState_Disabled].icon = new _SCheckBox_Icon(penDisabled, colorBackDisabled, Ref<Pen>::null());
-		categories[0].properties[buttonState_Hover].icon = new _SCheckBox_Icon(penHover, colorBackHover, Ref<Pen>::null());
-		categories[0].properties[buttonState_Down].icon = new _SCheckBox_Icon(penDown, colorBackDown, Ref<Pen>::null());
+		Ref<Pen> penCheckDisabled = Pen::createSolidPen(2, Color(90, 90, 90));
+		categories[0].properties[(int)ButtonState::Normal].textColor = Color::Black;
+		categories[0].properties[(int)ButtonState::Normal].icon = new _SCheckBox_Icon(penNormal, colorBackNormal, Ref<Pen>::null());
+		categories[0].properties[(int)ButtonState::Disabled].textColor = Color(90, 90, 90);
+		categories[0].properties[(int)ButtonState::Disabled].icon = new _SCheckBox_Icon(penDisabled, colorBackDisabled, Ref<Pen>::null());
+		categories[0].properties[(int)ButtonState::Hover].icon = new _SCheckBox_Icon(penHover, colorBackHover, Ref<Pen>::null());
+		categories[0].properties[(int)ButtonState::Down].icon = new _SCheckBox_Icon(penDown, colorBackDown, Ref<Pen>::null());
 		
 		categories[1] = categories[0];
-		categories[1].properties[buttonState_Normal].icon = new _SCheckBox_Icon(penNormal, colorBackNormal, penCheckNormal);
-		categories[1].properties[buttonState_Disabled].icon = new _SCheckBox_Icon(penDisabled, colorBackDisabled, penCheckDisabled);
-		categories[1].properties[buttonState_Hover].icon = new _SCheckBox_Icon(penHover, colorBackHover, penCheckHover);
-		categories[1].properties[buttonState_Down].icon = new _SCheckBox_Icon(penDown, colorBackDown, penCheckDown);
+		categories[1].properties[(int)ButtonState::Normal].icon = new _SCheckBox_Icon(penNormal, colorBackNormal, penCheckNormal);
+		categories[1].properties[(int)ButtonState::Disabled].icon = new _SCheckBox_Icon(penDisabled, colorBackDisabled, penCheckDisabled);
+		categories[1].properties[(int)ButtonState::Hover].icon = new _SCheckBox_Icon(penHover, colorBackHover, penCheckHover);
+		categories[1].properties[(int)ButtonState::Down].icon = new _SCheckBox_Icon(penDown, colorBackDown, penCheckDown);
 	}
 	
 public:
@@ -98,14 +98,16 @@ public:
 	}
 };
 
+SLIB_DEFINE_OBJECT(SCheckBox, SButton)
+
 SCheckBox::SCheckBox() : SButton(2, _SCheckBox_Categories::get()->categories)
 {
 	setIconSize(Font::getDefaultFontSize());
 	setIconMargin(2);
 	setTextMargin(2, 0, 2, 2);
-	setContentAlignment(alignMiddleLeft);
-	setIconAlignment(alignMiddleLeft);
-	setTextAlignment(alignMiddleLeft);
+	setContentAlignment(Alignment::MiddleLeft);
+	setIconAlignment(Alignment::MiddleLeft);
+	setTextAlignment(Alignment::MiddleLeft);
 }
 
 SCheckBox::SCheckBox(sl_uint32 nCategories, SButtonCategory* categories) : SButton(nCategories, categories)
@@ -113,9 +115,9 @@ SCheckBox::SCheckBox(sl_uint32 nCategories, SButtonCategory* categories) : SButt
 	setIconSize(Font::getDefaultFontSize());
 	setIconMargin(2);
 	setTextMargin(2, 0, 2, 2);
-	setContentAlignment(alignMiddleLeft);
-	setIconAlignment(alignMiddleLeft);
-	setTextAlignment(alignMiddleLeft);
+	setContentAlignment(Alignment::MiddleLeft);
+	setIconAlignment(Alignment::MiddleLeft);
+	setTextAlignment(Alignment::MiddleLeft);
 }
 
 sl_bool SCheckBox::isChecked()

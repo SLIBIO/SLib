@@ -11,7 +11,8 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class SLIB_EXPORT VideoView : public RenderView
 {
-	SLIB_DECLARE_OBJECT(VideoView, RenderView)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	VideoView();
 	

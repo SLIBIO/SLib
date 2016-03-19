@@ -17,6 +17,9 @@ void ISensorListener::onAccelerometerChanged(Sensor* sensor, sl_real xAccel, sl_
 {
 }
 
+
+SLIB_DEFINE_OBJECT(Sensor, Object)
+
 void Sensor::_onLocationChanged(const GeoLocation& location)
 {
 	PtrLocker<ISensorListener> listener(m_listener);
@@ -44,7 +47,7 @@ void Sensor::_onAccelerometerChanged(sl_real xAccel, sl_real yAccel, sl_real zAc
 SensorParam::SensorParam()
 {
 	flagUseLocation = sl_true;
-	locationProviderType = locationProviderType_GPS;
+	locationProviderType = LocationProviderType::GPS;
 	
 	flagUseCompass = sl_false;
 	flagUseAccelerometor = sl_false;
@@ -76,10 +79,12 @@ SLIB_DEVICE_NAMESPACE_END
 #if defined(SLIB_PLATFORM_IS_DESKTOP)
 
 SLIB_DEVICE_NAMESPACE_BEGIN
+
 Ref<Sensor> Sensor::create(const SensorParam& param)
 {
 	return Ref<Sensor>::null();
 }
+
 SLIB_DEVICE_NAMESPACE_END
 
 #endif

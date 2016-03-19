@@ -23,14 +23,16 @@ public:
 class SLIB_EXPORT SButtonCategory
 {
 public:
-	SButtonCategoryProperties properties[buttonStatesCount];
+	SButtonCategoryProperties properties[(int)(ButtonState::Count)];
 };
 
 class SLIB_EXPORT SButton : public SView
 {
-	SLIB_DECLARE_OBJECT(SButton, SView)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	SButton(sl_uint32 nCategories = 2, SButtonCategory* categories = sl_null);
+	
 	~SButton();
 	
 public:

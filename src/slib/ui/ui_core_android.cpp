@@ -189,7 +189,7 @@ void UI::showAlert(const AlertParam& param)
 				_JAndroidAlert::type.set(jparam, param.type);
 				_JAndroidAlert::caption.set(jparam, param.caption);
 				_JAndroidAlert::text.set(jparam, param.text);
-				jlong lresult = (jlong)(result.get());
+				jlong lresult = (jlong)(result.ptr);
 				_JAndroidAlert::nativeObject.set(jparam, lresult);
 				_JAndroidAlert::titleOk.set(jparam, param.titleOk);
 				_JAndroidAlert::titleCancel.set(jparam, param.titleCancel);

@@ -9,872 +9,863 @@
 
 SLIB_NAMESPACE_BEGIN
 
-template <class TYPE>
+template <class T>
 struct SLIB_EXPORT Link
 {
-	TYPE value;
-	Link<TYPE>* before;
-	Link<TYPE>* next;
+	Link<T>* before;
+	Link<T>* next;
+	T value;
 };
 
-template <class TYPE, class COMPARE = Compare<TYPE> >
-class SLIB_EXPORT LinkedList : public Object
+class SLIB_EXPORT LinkedListBase : public Object
 {
-	SLIB_DECLARE_OBJECT(LinkedList, Object)
-public:
-	SLIB_INLINE LinkedList()
-	{
-		m_begin = sl_null;
-		m_end = sl_null;
-		m_count = 0;
-	}
+	SLIB_DECLARE_OBJECT
+};
 
-	~LinkedList()
-	{
-		removeAll();
-	}
-
-public:
-	SLIB_INLINE void init(Link<TYPE>* begin, Link<TYPE>* end, sl_size count)
-	{
-		m_begin = begin;
-		m_end = end;
-		m_count = count;
-	}
-
-	SLIB_INLINE Link<TYPE>* getBegin() const
-	{
-		return m_begin;
-	}
-
-	SLIB_INLINE Link<TYPE>* getEnd() const
-	{
-		return m_end;
-	}
-
-	SLIB_INLINE sl_size getCount() const
-	{
-		return m_count;
-	}
-	
-	SLIB_INLINE sl_size count() const
-	{
-		return m_count;
-	}
-
-	SLIB_INLINE sl_bool isEmpty() const
-	{
-		return m_begin == sl_null;
-	}
-
-	SLIB_INLINE sl_bool isNotEmpty() const
-	{
-		return m_begin != sl_null;
-	}
+template <class T, class COMPARE = Compare<T> >
+class SLIB_EXPORT LinkedList : public LinkedListBase
+{
+protected:
+	Link<T>* m_begin;
+	Link<T>* m_end;
+	sl_size m_count;
 	
 public:
-	static void freeLink(Link<TYPE>* link)
-	{
-		while (link) {
-			Link<TYPE>* next = link->next;
-			_freeItem(link);
-			link = next;
-		}
-	}
+	LinkedList();
+	
+	~LinkedList();
+	
+public:
+	void init(Link<T>* begin, Link<T>* end, sl_size count);
+	
+	Link<T>* getBegin() const;
 
-	void removeAll_NoLock()
-	{
-		Link<TYPE>* now = m_begin;
-		_init();
-		freeLink(now);
-	}
+	Link<T>* getEnd() const;
 
-	void removeAll()
-	{
-		Link<TYPE>* now;
-		{
-			ObjectLocker lock(this);
-			now = m_begin;
-			_init();
-		}
-		freeLink(now);
-	}
+	sl_size getCount() const;
 	
-	
-	SLIB_INLINE sl_bool getFirstElement_NoLock(TYPE* _out) const
-	{
-		if (m_begin) {
-			if (_out) {
-				*_out = m_begin->value;
-			}
-			return sl_true;
-		}
-		return sl_false;
-	}
+	sl_bool isEmpty() const;
 
-	sl_bool getFirstElement(TYPE* _out) const
-	{
-		ObjectLocker lock(this);
-		return getFirstElement_NoLock(_out);
-	}
+	sl_bool isNotEmpty() const;
 	
-
-	SLIB_INLINE sl_bool getLastElement_NoLock(TYPE* _out) const
-	{
-		if (m_end) {
-			if (_out) {
-				*_out = m_end->value;
-			}
-			return sl_true;
-		}
-		return sl_false;
-	}
+public:
+	static void freeLink(Link<T>* link);
 	
-	sl_bool getLastElement(TYPE* _out) const
-	{
-		ObjectLocker lock(this);
-		return getLastElement_NoLock(_out);
-	}
+	void removeAll_NoLock();
 	
+	void removeAll();
 	
-	Link<TYPE>* pushBack_NoLock(const TYPE& value, sl_size countLimit = 0)
-	{
-		Link<TYPE>* item = _createItem(value);
-		if (!item) {
-			return sl_null;
-		}
-		Link<TYPE>* old = _pushBackItem(item, countLimit);
-		if (old) {
-			_freeItem(old);
-		}
-		return item;
-	}
-
-	Link<TYPE>* pushBack(const TYPE& value, sl_size countLimit = 0)
-	{
-		Link<TYPE>* item = _createItem(value);
-		if (!item) {
-			return sl_null;
-		}
-		Link<TYPE>* old;
-		{
-			ObjectLocker lock(this);
-			old = _pushBackItem(item, countLimit);
-		}
-		if (old) {
-			_freeItem(old);
-		}
-		return item;
-	}
+	sl_bool getFirstElement_NoLock(T* _out) const;
 	
+	sl_bool getFirstElement(T* _out) const;
 	
-	sl_bool popBack_NoLock(TYPE* _out = sl_null)
-	{
-		Link<TYPE>* old = _popBackItem();
-		if (old) {
-			if (_out) {
-				*_out = old->value;
-			}
-			_freeItem(old);
-			return sl_true;
-		} else {
-			return sl_false;
-		}
-	}
-
-	sl_bool popBack(TYPE* _out = sl_null)
-	{
-		Link<TYPE>* old;
-		{
-			ObjectLocker lock(this);
-			old = _popBackItem();
-		}
-		if (old) {
-			if (_out) {
-				*_out = old->value;
-			}
-			_freeItem(old);
-			return sl_true;
-		} else {
-			return sl_false;
-		}
-	}
+	sl_bool getLastElement_NoLock(T* _out) const;
 	
+	sl_bool getLastElement(T* _out) const;
 	
-	Link<TYPE>* pushFront_NoLock(const TYPE& value, sl_size countLimit = 0)
-	{
-		Link<TYPE>* item = _createItem(value);
-		if (!item) {
-			return sl_null;
-		}
-		Link<TYPE>* old = _pushFrontItem(item, countLimit);
-		if (old) {
-			_freeItem(old);
-		}
-		return item;
-	}
-
-	Link<TYPE>* pushFront(const TYPE& value, sl_size countLimit = 0)
-	{
-		Link<TYPE>* item = _createItem(value);
-		if (!item) {
-			return sl_null;
-		}
-		Link<TYPE>* old;
-		{
-			ObjectLocker lock(this);
-			old = _pushFrontItem(item, countLimit);
-		}
-		if (old) {
-			_freeItem(old);
-		}
-		return item;
-	}
+	Link<T>* pushBack_NoLock(const T& value, sl_size countLimit = 0);
 	
+	Link<T>* pushBack(const T& value, sl_size countLimit = 0);
 	
-	sl_bool popFront_NoLock(TYPE* _out = sl_null)
-	{
-		Link<TYPE>* old = _popFrontItem();
-		if (old) {
-			if (_out) {
-				*_out = old->value;
-			}
-			_freeItem(old);
-			return sl_true;
-		} else {
-			return sl_false;
-		}
-	}
-
-	sl_bool popFront(TYPE* _out = sl_null)
-	{
-		Link<TYPE>* old;
-		{
-			ObjectLocker lock(this);
-			old = _popFrontItem();
-		}
-		if (old) {
-			if (_out) {
-				*_out = old->value;
-			}
-			_freeItem(old);
-			return sl_true;
-		} else {
-			return sl_false;
-		}
-	}
+	sl_bool popBack_NoLock(T* _out = sl_null);
 	
+	sl_bool popBack(T* _out = sl_null);
 	
-	void removeItem_NoLock(Link<TYPE>* item)
-	{
-		if (item) {
-			_removeItem(item);
-			_freeItem(item);
-		} else {
-			SLIB_ABORT("Trying to free null item");
-		}
-	}
-
-	void removeItem(Link<TYPE>* item)
-	{
-		if (item) {
-			{
-				ObjectLocker lock(this);
-				_removeItem(item);
-			}
-			_freeItem(item);
-		} else {
-			SLIB_ABORT("Trying to free null item");
-		}
-	}
-
-
-	Link<TYPE>* insertBefore_NoLock(Link<TYPE>* itemWhere, const TYPE& value)
-	{
-		if (itemWhere) {
-			Link<TYPE>* itemNew = _createItem(value);
-			if (itemNew) {
-				_insertBefore(itemWhere, itemNew);
-			}
-			return itemNew;
-		} else {
-			return pushFront_NoLock(value);
-		}
-	}
-
-	Link<TYPE>* insertBefore(Link<TYPE>* itemWhere, const TYPE& value)
-	{
-		if (itemWhere) {
-			Link<TYPE>* itemNew = _createItem(value);
-			if (itemNew) {
-				ObjectLocker lock(this);
-				_insertBefore(itemWhere, itemNew);
-			}
-			return itemNew;
-		} else {
-			return pushFront(value);
-		}
-	}
+	Link<T>* pushFront_NoLock(const T& value, sl_size countLimit = 0);
 	
-
-	Link<TYPE>* insertAfter_NoLock(Link<TYPE>* itemWhere, const TYPE& value)
-	{
-		if (itemWhere) {
-			Link<TYPE>* itemNew = _createItem(value);
-			if (itemNew) {
-				_insertAfter(itemWhere, itemNew);
-			}
-			return itemNew;
-		} else {
-			return pushBack_NoLock(value);
-		}
-	}
+	Link<T>* pushFront(const T& value, sl_size countLimit = 0);
 	
-	Link<TYPE>* insertAfter(Link<TYPE>* itemWhere, const TYPE& value)
-	{
-		if (itemWhere) {
-			Link<TYPE>* itemNew = _createItem(value);
-			if (itemNew) {
-				ObjectLocker lock(this);
-				_insertAfter(itemWhere, itemNew);
-			}
-			return itemNew;
-		} else {
-			return pushBack_NoLock(value);
-		}
-	}
-
+	sl_bool popFront_NoLock(T* _out = sl_null);
+	
+	sl_bool popFront(T* _out = sl_null);
+	
+	void removeItem_NoLock(Link<T>* item);
+	
+	void removeItem(Link<T>* item);
+	
+	Link<T>* insertBefore_NoLock(Link<T>* itemWhere, const T& value);
+	
+	Link<T>* insertBefore(Link<T>* itemWhere, const T& value);
+	
+	Link<T>* insertAfter_NoLock(Link<T>* itemWhere, const T& value);
+	
+	Link<T>* insertAfter(Link<T>* itemWhere, const T& value);
+	
+	void merge(LinkedList<T, COMPARE>* other);
 
 	template <class _COMPARE>
-	void merge(LinkedList<TYPE, _COMPARE>* other)
-	{
-		if ((void*)this == (void*)other) {
-			return;
-		}
-		ObjectLocker lock(this, other);
-		Link<TYPE>* _begin = other->getBegin();
-		Link<TYPE>* _end = other->getEnd();
-		if (_begin) {
-			sl_size countNew = m_count + other->getCount();
-			if (m_end) {
-				m_end->next = _begin;
-				_begin->before = m_end;
-			} else {
-				m_begin = _begin;
-			}
-			m_end = _end;
-			((LinkedList<TYPE, COMPARE>*)((void*)other))->_init();
-			m_count = countNew;
-		}
+	void merge(LinkedList<T, _COMPARE>* other);
+	
+	Array<T> toArray_NoLock() const;
+	
+	Array<T> toArray() const;
+	
+	List<T> toList_NoLock() const;
+	
+	List<T> toList() const;
+	
+	Link<T>* findValue_NoLock(const T& value) const;
+	
+	Link<T>* findValue(const T& value) const;
+	
+	sl_bool removeValue_NoLock(const T& value, sl_bool flagAllValues = sl_false);
+	
+	sl_bool removeValue(const T& value, sl_bool flagAllValues = sl_false);
+	
+protected:
+	static Link<T>* _createItem(const T& value);
+	
+	static void _freeItem(Link<T>* item);
+	
+	Link<T>* _pushBackItem(Link<T>* item, sl_size countLimit);
+	
+	Link<T>* _popBackItem();
+	
+	Link<T>* _pushFrontItem(Link<T>* item, sl_size countLimit);
+	
+	Link<T>* _popFrontItem();
+	
+	void _removeItem(Link<T>* item);
+	
+	void _insertBefore(Link<T>* itemWhere, Link<T>* itemNew);
+	
+	void _insertAfter(Link<T>* itemWhere, Link<T>* itemNew);
+	
+	void _init();
+	
+};
+
+template <class T, class COMPARE = Compare<T> >
+class SLIB_EXPORT Queue : public LinkedList<T, COMPARE>
+{
+public:
+	Link<T>* push(const T& value, sl_size countLimit = 0);
+
+	Link<T>* push_NoLock(const T& value, sl_size countLimit = 0);
+	
+	sl_bool pop(T* _out = sl_null);
+	
+	sl_bool pop_NoLock(T* _out = sl_null);
+
+};
+
+template <class T, class COMPARE = Compare<T> >
+class SLIB_EXPORT Stack : public LinkedList<T, COMPARE>
+{
+public:
+	Link<T>* push(const T& value, sl_size countLimit = 0);
+	
+	Link<T>* push_NoLock(const T& value, sl_size countLimit = 0);
+	
+	sl_bool pop(T* _out = sl_null);
+	
+	sl_bool pop_NoLock(T* _out = sl_null);
+	
+};
+
+
+#define SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_QUEUE(...) \
+	extern template class LinkedList<__VA_ARGS__>; \
+	extern template class Queue<__VA_ARGS__>; \
+	extern template class Stack<__VA_ARGS__>;
+
+#define SLIB_DEFINE_EXPLICIT_INSTANTIATIONS_FOR_QUEUE(...) \
+	template class LinkedList<__VA_ARGS__>; \
+	template class Queue<__VA_ARGS__>; \
+	template class Stack<__VA_ARGS__>;
+
+
+SLIB_NAMESPACE_END
+
+
+SLIB_NAMESPACE_BEGIN
+
+template <class T, class COMPARE>
+SLIB_INLINE LinkedList<T, COMPARE>::LinkedList()
+{
+	m_begin = sl_null;
+	m_end = sl_null;
+	m_count = 0;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE LinkedList<T, COMPARE>::~LinkedList()
+{
+	removeAll();
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE void LinkedList<T, COMPARE>::init(Link<T>* begin, Link<T>* end, sl_size count)
+{
+	m_begin = begin;
+	m_end = end;
+	m_count = count;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE Link<T>* LinkedList<T, COMPARE>::getBegin() const
+{
+	return m_begin;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE Link<T>* LinkedList<T, COMPARE>::getEnd() const
+{
+	return m_end;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE sl_size LinkedList<T, COMPARE>::getCount() const
+{
+	return m_count;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE sl_bool LinkedList<T, COMPARE>::isEmpty() const
+{
+	return m_begin == sl_null;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE sl_bool LinkedList<T, COMPARE>::isNotEmpty() const
+{
+	return m_begin != sl_null;
+}
+
+template <class T, class COMPARE>
+void LinkedList<T, COMPARE>::freeLink(Link<T>* link)
+{
+	while (link) {
+		Link<T>* next = link->next;
+		_freeItem(link);
+		link = next;
 	}
-	
-	
-	Array<TYPE> toArray_NoLock() const
-	{
-		Array<TYPE> ret;
-		if (m_count) {
-			ret = Array<TYPE>::create(m_count);
-			if (ret.isNotNull()) {
-				sl_size index = 0;
-				Link<TYPE>* now = m_begin;
-				while (now) {
-					ret[index] = now->value;
-					now = now->next;
-					index++;
-				}
-			}
-		}
-		return ret;
-	}
-	
-	Array<TYPE> toArray() const
+}
+
+template <class T, class COMPARE>
+void LinkedList<T, COMPARE>::removeAll_NoLock()
+{
+	Link<T>* now = m_begin;
+	_init();
+	freeLink(now);
+}
+
+template <class T, class COMPARE>
+void LinkedList<T, COMPARE>::removeAll()
+{
+	Link<T>* now;
 	{
 		ObjectLocker lock(this);
-		return toArray_NoLock();
+		now = m_begin;
+		_init();
 	}
+	freeLink(now);
+}
 
-	List<TYPE> toList_NoLock() const
-	{
-		List<TYPE> ret;
-		if (m_count) {
-			ret = List<TYPE>::create(m_count);
-			if (ret.isNotNull()) {
-				ListItems<TYPE> list(ret);
-				sl_size index = 0;
-				Link<TYPE>* now = m_begin;
-				while (now) {
-					list[index] = now->value;
-					now = now->next;
-					index++;
-				}
-			}
+template <class T, class COMPARE>
+sl_bool LinkedList<T, COMPARE>::getFirstElement_NoLock(T* _out) const
+{
+	if (m_begin) {
+		if (_out) {
+			*_out = m_begin->value;
 		}
-		return ret;
+		return sl_true;
 	}
-	
-	List<TYPE> toList() const
-	{
-		ObjectLocker lock(this);
-		return toList_NoLock();
-	}
+	return sl_false;
+}
 
+template <class T, class COMPARE>
+sl_bool LinkedList<T, COMPARE>::getFirstElement(T* _out) const
+{
+	ObjectLocker lock(this);
+	return getFirstElement_NoLock(_out);
+}
 
-	Link<TYPE>* findValue_NoLock(const TYPE& value) const
-	{
-		Link<TYPE>* now = m_begin;
-		while (now) {
-			if (COMPARE::equals(value, now->value)) {
-				return now;
-			}
-			now = now->next;
+template <class T, class COMPARE>
+sl_bool LinkedList<T, COMPARE>::getLastElement_NoLock(T* _out) const
+{
+	if (m_end) {
+		if (_out) {
+			*_out = m_end->value;
 		}
+		return sl_true;
+	}
+	return sl_false;
+}
+
+template <class T, class COMPARE>
+sl_bool LinkedList<T, COMPARE>::getLastElement(T* _out) const
+{
+	ObjectLocker lock(this);
+	return getLastElement_NoLock(_out);
+}
+
+template <class T, class COMPARE>
+Link<T>* LinkedList<T, COMPARE>::pushBack_NoLock(const T& value, sl_size countLimit)
+{
+	Link<T>* item = _createItem(value);
+	if (!item) {
 		return sl_null;
 	}
-	
-	Link<TYPE>* findValue(const TYPE& value) const
+	Link<T>* old = _pushBackItem(item, countLimit);
+	if (old) {
+		_freeItem(old);
+	}
+	return item;
+}
+
+template <class T, class COMPARE>
+Link<T>* LinkedList<T, COMPARE>::pushBack(const T& value, sl_size countLimit)
+{
+	Link<T>* item = _createItem(value);
+	if (!item) {
+		return sl_null;
+	}
+	Link<T>* old;
 	{
 		ObjectLocker lock(this);
-		return findValue_NoLock(value);
+		old = _pushBackItem(item, countLimit);
 	}
+	if (old) {
+		_freeItem(old);
+	}
+	return item;
+}
 
-
-	sl_bool removeValue_NoLock(const TYPE& value, sl_bool flagAllValues = sl_false)
-	{
-		Link<TYPE>* now = m_begin;
-		sl_bool bRet = sl_false;
-		while (now) {
-			Link<TYPE>* next = now->next;
-			if (COMPARE::equals(value, now->value)) {
-				removeItem_NoLock(now);
-				if (!flagAllValues) {
-					return sl_true;
-				}
-				bRet = sl_true;
-			}
-			now = next;
-		}
-		return bRet;
-	}
-	
-	sl_bool removeValue(const TYPE& value, sl_bool flagAllValues = sl_false)
-	{
-		ObjectLocker lock(this);
-		return removeValue_NoLock(value, flagAllValues);
-	}
-	
-protected:
-	SLIB_INLINE static Link<TYPE>* _createItem(const TYPE& value)
-	{
-		Link<TYPE>* item = (Link<TYPE>*)(Base::createMemory(sizeof(Link<TYPE>)));
-		if (!item) {
-			return sl_null;
-		}
-		item->next = sl_null;
-		item->before = sl_null;
-		new (&(item->value)) TYPE(value);
-		return item;
-	}
-
-	SLIB_INLINE static void _freeItem(Link<TYPE>* item)
-	{
-		item->value.TYPE::~TYPE();
-		Base::freeMemory(item);
-	}
-	
-	
-	SLIB_INLINE Link<TYPE>* _pushBackItem(Link<TYPE>* item, sl_size countLimit)
-	{
-		Link<TYPE>* old;
-		if (countLimit > 0 && m_count >= countLimit) {
-			old = _popFrontItem();
-		} else {
-			old = sl_null;
-		}
-		if (m_end) {
-			m_end->next = item;
-			item->before = m_end;
-			m_end = item;
-		} else {
-			m_begin = item;
-			m_end = item;
-		}
-		m_count++;
-		return old;
-	}
-	
-	SLIB_INLINE Link<TYPE>* _popBackItem()
-	{
-		Link<TYPE>* end = m_end;
-		if (end) {
-			m_count--;
-			Link<TYPE>* before = end->before;
-			if (before) {
-				before->next = sl_null;
-				m_end = before;
-			} else {
-				m_begin = sl_null;
-				m_end = sl_null;
-			}
-		}
-		return end;
-	}
-	
-	SLIB_INLINE Link<TYPE>* _pushFrontItem(Link<TYPE>* item, sl_size countLimit)
-	{
-		Link<TYPE>* old;
-		if (countLimit > 0 && m_count >= countLimit) {
-			old = _popBackItem();
-		} else {
-			old = sl_null;
-		}
-		if (m_begin) {
-			item->next = m_begin;
-			m_begin->before = item;
-			m_begin = item;
-		} else {
-			m_begin = item;
-			m_end = item;
-		}
-		m_count++;
-		return old;
-	}
-
-	SLIB_INLINE Link<TYPE>* _popFrontItem()
-	{
-		Link<TYPE>* begin = m_begin;
-		if (begin) {
-			m_count--;
-			Link<TYPE>* next = begin->next;
-			if (next) {
-				next->before = sl_null;
-				m_begin = next;
-			} else {
-				m_begin = sl_null;
-				m_end = sl_null;
-			}
-		}
-		return begin;
-	}
-	
-	SLIB_INLINE void _removeItem(Link<TYPE>* item)
-	{
-		m_count--;
-		Link<TYPE>* before = item->before;
-		Link<TYPE>* next = item->next;
-		if (before) {
-			before->next = next;
-		} else {
-			m_begin = next;
-		}
-		if (next) {
-			next->before = before;
-		} else {
-			m_end = before;
-		}
-	}
-	
-	SLIB_INLINE void _insertBefore(Link<TYPE>* itemWhere, Link<TYPE>* itemNew)
-	{
-		itemNew->next = itemWhere;
-		Link<TYPE>* before = itemWhere->before;
-		itemNew->before = before;
-		itemWhere->before = itemNew;
-		if (before) {
-			before->next = itemNew;
-		} else {
-			m_begin = itemNew;
-		}
-		m_count++;
-	}
-	
-	SLIB_INLINE void _insertAfter(Link<TYPE>* itemWhere, Link<TYPE>* itemNew)
-	{
-		itemNew->before = itemWhere;
-		Link<TYPE>* next = itemWhere->next;
-		itemNew->next = next;
-		itemWhere->next = itemNew;
-		if (next) {
-			next->before = itemNew;
-		} else {
-			m_end = itemNew;
-		}
-		m_count++;
-	}
-
-	SLIB_INLINE void _init()
-	{
-		m_begin = sl_null;
-		m_end = sl_null;
-	}
-	
-protected:
-	Link<TYPE>* m_begin;
-	Link<TYPE>* m_end;
-	sl_size m_count;
-
-};
-
-template <class TYPE, class COMPARE = Compare<TYPE> >
-class SLIB_EXPORT Queue : public LinkedList<TYPE, COMPARE>
+template <class T, class COMPARE>
+sl_bool LinkedList<T, COMPARE>::popBack_NoLock(T* _out)
 {
-public:
-	SLIB_INLINE Link<TYPE>* push(const TYPE& value, sl_size countLimit = 0)
-	{
-		return this->pushBack(value, countLimit);
-	}
-
-	SLIB_INLINE Link<TYPE>* push_NoLock(const TYPE& value, sl_size countLimit = 0)
-	{
-		return this->pushBack_NoLock(value, countLimit);
-	}
-	
-	SLIB_INLINE sl_bool pop(TYPE* _out = sl_null)
-	{
-		return this->popFront(_out);
-	}
-	
-	SLIB_INLINE sl_bool pop_NoLock(TYPE* _out = sl_null)
-	{
-		return this->popFront_NoLock(_out);
-	}
-
-};
-
-template <class TYPE, class COMPARE = Compare<TYPE> >
-class SLIB_EXPORT Stack : public LinkedList<TYPE, COMPARE>
-{
-public:
-	SLIB_INLINE Link<TYPE>* push(const TYPE& value, sl_size countLimit = 0)
-	{
-		return this->pushBack(value, countLimit);
-	}
-	
-	SLIB_INLINE Link<TYPE>* push_NoLock(const TYPE& value, sl_size countLimit = 0)
-	{
-		return this->pushBack_NoLock(value, countLimit);
-	}
-	
-	SLIB_INLINE sl_bool pop(TYPE* _out = sl_null)
-	{
-		return this->popBack(_out);
-	}
-	
-	SLIB_INLINE sl_bool pop_NoLock(TYPE* _out = sl_null)
-	{
-		return this->popBack_NoLock(_out);
-	}
-};
-
-template <class TYPE>
-class SLIB_EXPORT LoopQueue : public Object
-{
-	SLIB_DECLARE_OBJECT(LoopQueue, Object)
-public:
-	LoopQueue(sl_size size = 10, sl_size latency = 0)
-	{
-		m_first = 0;
-		m_count = 0;
-		m_latency = latency;
-		m_data = new TYPE[size];
-		if (m_data) {
-			m_size = size;
-		} else {
-			m_size = 0;
+	Link<T>* old = _popBackItem();
+	if (old) {
+		if (_out) {
+			*_out = old->value;
 		}
-	}
-
-	~LoopQueue()
-	{
-		_release();
-	}
-
-public:
-	SLIB_INLINE sl_size getQueueSize()
-	{
-		return m_size;
-	}
-	
-	sl_bool setQueueSize(sl_size size)
-	{
-		ObjectLocker lock(this);
-		_release();
-		m_data = new TYPE[size];
-		if (m_data) {
-			m_first = 0;
-			m_count = 0;
-			m_size = size;
-			return sl_true;
-		}
+		_freeItem(old);
+		return sl_true;
+	} else {
 		return sl_false;
 	}
-    
-    void removeAll()
-    {
-		ObjectLocker lock(this);
-		m_first = 0;
-		m_count = 0;
-    }
+}
 
-	TYPE* getBuffer()
-	{
-		return m_data;
-	}
-	
-	sl_size getCount()
-	{
-		return m_count;
-	}
-	
-	sl_size count()
-	{
-		return m_count;
-	}
-	
-	void setLatency(sl_size latency)
-	{
-		m_latency = latency;
-	}
-	
-	sl_size getLatency()
-	{
-		return m_latency;
-	}
-	
-	sl_bool add(const TYPE& data, sl_bool flagPush = sl_true)
+template <class T, class COMPARE>
+sl_bool LinkedList<T, COMPARE>::popBack(T* _out)
+{
+	Link<T>* old;
 	{
 		ObjectLocker lock(this);
-		if (m_size == 0) {
-			return sl_false;
+		old = _popBackItem();
+	}
+	if (old) {
+		if (_out) {
+			*_out = old->value;
 		}
-		if (m_count == m_size && ! flagPush) {
-			return sl_false;
-		}
-		sl_size last = m_first + m_count;
-		m_data[last % m_size] = data;
-		m_count ++;
-		if (m_count > m_size) {
-			m_count = m_size;
-			m_first = (last + 1) % m_size;
-		}
+		_freeItem(old);
 		return sl_true;
+	} else {
+		return sl_false;
 	}
+}
 
-	sl_bool add(const TYPE* buffer, sl_size count, sl_bool flagPush = sl_true)
+template <class T, class COMPARE>
+Link<T>* LinkedList<T, COMPARE>::pushFront_NoLock(const T& value, sl_size countLimit)
+{
+	Link<T>* item = _createItem(value);
+	if (!item) {
+		return sl_null;
+	}
+	Link<T>* old = _pushFrontItem(item, countLimit);
+	if (old) {
+		_freeItem(old);
+	}
+	return item;
+}
+
+template <class T, class COMPARE>
+Link<T>* LinkedList<T, COMPARE>::pushFront(const T& value, sl_size countLimit)
+{
+	Link<T>* item = _createItem(value);
+	if (!item) {
+		return sl_null;
+	}
+	Link<T>* old;
 	{
 		ObjectLocker lock(this);
-		if (m_size == 0) {
-			return sl_false;
+		old = _pushFrontItem(item, countLimit);
+	}
+	if (old) {
+		_freeItem(old);
+	}
+	return item;
+}
+
+template <class T, class COMPARE>
+sl_bool LinkedList<T, COMPARE>::popFront_NoLock(T* _out)
+{
+	Link<T>* old = _popFrontItem();
+	if (old) {
+		if (_out) {
+			*_out = old->value;
 		}
-		if (m_count + count > m_size && !flagPush) {
-			return sl_false;
-		}
-		sl_size last = m_first + m_count;
-		if (count > m_size) {
-			buffer += (count - m_size);
-			last += (count - m_size);
-			m_count += (count - m_size);
-			count = m_size;
-		}
-		sl_size i = last % m_size;
-		sl_size n = 0;
-		while (i < m_size && n < count) {
-			m_data[i] = buffer[n];
-			i ++;
-			n ++;
-		}
-		i = 0;
-		while (n < count) {
-			m_data[i] = buffer[n];
-			i ++;
-			n ++;
-		}
-		m_count += count;
-		if (m_count > m_size) {
-			m_first = (m_first + m_count) % m_size;
-			m_count = m_size;
-		}
+		_freeItem(old);
 		return sl_true;
+	} else {
+		return sl_false;
 	}
+}
 
-	
-	sl_bool get(TYPE& output)
+template <class T, class COMPARE>
+sl_bool LinkedList<T, COMPARE>::popFront(T* _out)
+{
+	Link<T>* old;
 	{
 		ObjectLocker lock(this);
-		sl_bool ret = sl_false;
-		if (m_count > m_latency) {
-			output = m_data[m_first % m_size];
-			m_first = (m_first + 1) % m_size;
-			m_count --;
-			ret = sl_true;
-		}
-		return ret;
+		old = _popFrontItem();
 	}
-		
-	sl_bool get(TYPE* buffer, sl_size count)
-	{
-		ObjectLocker lock(this);
-		sl_bool ret = sl_false;
-		if (count <= m_count && m_count > m_latency) {
-			sl_size n = 0;
-			sl_size i = m_first;
-			while (i < m_size && n < count) {
-				buffer[n] = m_data[i];
-				i ++;
-				n ++;
-			}
-			i = 0;
-			while (n < count) {
-				buffer[n] = m_data[i];
-				i ++;
-				n ++;
-			}
-			m_first = (m_first + count) % m_size;
-			m_count -= count;
-			ret = sl_true;
+	if (old) {
+		if (_out) {
+			*_out = old->value;
 		}
-		return ret;
+		_freeItem(old);
+		return sl_true;
+	} else {
+		return sl_false;
 	}
+}
 
-	sl_size copy(TYPE* buffer, sl_size count)
-	{
-		ObjectLocker lock(this);
-		if (count > m_count) {
-			count = m_count;
-		}
+template <class T, class COMPARE>
+void LinkedList<T, COMPARE>::removeItem_NoLock(Link<T>* item)
+{
+	if (item) {
+		_removeItem(item);
+		_freeItem(item);
+	} else {
+		SLIB_ABORT("Trying to free null item");
+	}
+}
+
+template <class T, class COMPARE>
+void LinkedList<T, COMPARE>::removeItem(Link<T>* item)
+{
+	if (item) {
 		{
-			sl_size n = 0;
-			sl_size i = m_first;
-			while (i < m_size && n < count) {
-				buffer[n] = m_data[i];
-				i++;
-				n++;
-			}
-			i = 0;
-			while (n < count) {
-				buffer[n] = m_data[i];
-				i++;
-				n++;
+			ObjectLocker lock(this);
+			_removeItem(item);
+		}
+		_freeItem(item);
+	} else {
+		SLIB_ABORT("Trying to free null item");
+	}
+}
+
+template <class T, class COMPARE>
+Link<T>* LinkedList<T, COMPARE>::insertBefore_NoLock(Link<T>* itemWhere, const T& value)
+{
+	if (itemWhere) {
+		Link<T>* itemNew = _createItem(value);
+		if (itemNew) {
+			_insertBefore(itemWhere, itemNew);
+		}
+		return itemNew;
+	} else {
+		return pushFront_NoLock(value);
+	}
+}
+
+template <class T, class COMPARE>
+Link<T>* LinkedList<T, COMPARE>::insertBefore(Link<T>* itemWhere, const T& value)
+{
+	if (itemWhere) {
+		Link<T>* itemNew = _createItem(value);
+		if (itemNew) {
+			ObjectLocker lock(this);
+			_insertBefore(itemWhere, itemNew);
+		}
+		return itemNew;
+	} else {
+		return pushFront(value);
+	}
+}
+
+template <class T, class COMPARE>
+Link<T>* LinkedList<T, COMPARE>::insertAfter_NoLock(Link<T>* itemWhere, const T& value)
+{
+	if (itemWhere) {
+		Link<T>* itemNew = _createItem(value);
+		if (itemNew) {
+			_insertAfter(itemWhere, itemNew);
+		}
+		return itemNew;
+	} else {
+		return pushBack_NoLock(value);
+	}
+}
+
+template <class T, class COMPARE>
+Link<T>* LinkedList<T, COMPARE>::insertAfter(Link<T>* itemWhere, const T& value)
+{
+	if (itemWhere) {
+		Link<T>* itemNew = _createItem(value);
+		if (itemNew) {
+			ObjectLocker lock(this);
+			_insertAfter(itemWhere, itemNew);
+		}
+		return itemNew;
+	} else {
+		return pushBack_NoLock(value);
+	}
+}
+
+template <class T, class COMPARE>
+void LinkedList<T, COMPARE>::merge(LinkedList<T, COMPARE>* other)
+{
+	if ((void*)this == (void*)other) {
+		return;
+	}
+	ObjectLocker lock(this, other);
+	Link<T>* _begin = other->getBegin();
+	Link<T>* _end = other->getEnd();
+	if (_begin) {
+		sl_size countNew = m_count + other->getCount();
+		if (m_end) {
+			m_end->next = _begin;
+			_begin->before = m_end;
+		} else {
+			m_begin = _begin;
+		}
+		m_end = _end;
+		((LinkedList<T, COMPARE>*)((void*)other))->_init();
+		m_count = countNew;
+	}
+}
+
+template <class T, class COMPARE>
+template <class _COMPARE>
+void LinkedList<T, COMPARE>::merge(LinkedList<T, _COMPARE>* other)
+{
+	if ((void*)this == (void*)other) {
+		return;
+	}
+	ObjectLocker lock(this, other);
+	Link<T>* _begin = other->getBegin();
+	Link<T>* _end = other->getEnd();
+	if (_begin) {
+		sl_size countNew = m_count + other->getCount();
+		if (m_end) {
+			m_end->next = _begin;
+			_begin->before = m_end;
+		} else {
+			m_begin = _begin;
+		}
+		m_end = _end;
+		((LinkedList<T, COMPARE>*)((void*)other))->_init();
+		m_count = countNew;
+	}
+}
+
+template <class T, class COMPARE>
+Array<T> LinkedList<T, COMPARE>::toArray_NoLock() const
+{
+	Array<T> ret;
+	if (m_count) {
+		ret = Array<T>::create(m_count);
+		if (ret.isNotNull()) {
+			T* buf = ret.getData();
+			sl_size index = 0;
+			Link<T>* now = m_begin;
+			while (now) {
+				buf[index] = now->value;
+				now = now->next;
+				index++;
 			}
 		}
-		return count;
 	}
+	return ret;
+}
 
-protected:
-	void _release() {
-		if (m_data) {
-			delete[] m_data;
-			m_data = sl_null;
+template <class T, class COMPARE>
+Array<T> LinkedList<T, COMPARE>::toArray() const
+{
+	ObjectLocker lock(this);
+	return toArray_NoLock();
+}
+
+template <class T, class COMPARE>
+List<T> LinkedList<T, COMPARE>::toList_NoLock() const
+{
+	List<T> ret;
+	if (m_count) {
+		ret = List<T>::create(m_count);
+		if (ret.isNotNull()) {
+			ListItems<T> list(ret);
+			sl_size index = 0;
+			Link<T>* now = m_begin;
+			while (now) {
+				list[index] = now->value;
+				now = now->next;
+				index++;
+			}
 		}
 	}
-	
-protected:
-	TYPE* m_data;
-	sl_size m_size;
-	sl_size m_first;
-	sl_size m_count;
-	sl_size m_latency;
+	return ret;
+}
 
-};
+template <class T, class COMPARE>
+List<T> LinkedList<T, COMPARE>::toList() const
+{
+	ObjectLocker lock(this);
+	return toList_NoLock();
+}
+
+template <class T, class COMPARE>
+Link<T>* LinkedList<T, COMPARE>::findValue_NoLock(const T& value) const
+{
+	Link<T>* now = m_begin;
+	while (now) {
+		if (COMPARE::equals(value, now->value)) {
+			return now;
+		}
+		now = now->next;
+	}
+	return sl_null;
+}
+
+template <class T, class COMPARE>
+Link<T>* LinkedList<T, COMPARE>::findValue(const T& value) const
+{
+	ObjectLocker lock(this);
+	return findValue_NoLock(value);
+}
+
+template <class T, class COMPARE>
+sl_bool LinkedList<T, COMPARE>::removeValue_NoLock(const T& value, sl_bool flagAllValues)
+{
+	Link<T>* now = m_begin;
+	sl_bool bRet = sl_false;
+	while (now) {
+		Link<T>* next = now->next;
+		if (COMPARE::equals(value, now->value)) {
+			removeItem_NoLock(now);
+			if (!flagAllValues) {
+				return sl_true;
+			}
+			bRet = sl_true;
+		}
+		now = next;
+	}
+	return bRet;
+}
+
+template <class T, class COMPARE>
+sl_bool LinkedList<T, COMPARE>::removeValue(const T& value, sl_bool flagAllValues)
+{
+	ObjectLocker lock(this);
+	return removeValue_NoLock(value, flagAllValues);
+}
+
+template <class T, class COMPARE>
+Link<T>* LinkedList<T, COMPARE>::_createItem(const T& value)
+{
+	Link<T>* item = (Link<T>*)(Base::createMemory(sizeof(Link<T>)));
+	if (!item) {
+		return sl_null;
+	}
+	item->next = sl_null;
+	item->before = sl_null;
+	new (&(item->value)) T(value);
+	return item;
+}
+
+template <class T, class COMPARE>
+void LinkedList<T, COMPARE>::_freeItem(Link<T>* item)
+{
+	item->value.T::~T();
+	Base::freeMemory(item);
+}
+
+
+template <class T, class COMPARE>
+Link<T>* LinkedList<T, COMPARE>::_pushBackItem(Link<T>* item, sl_size countLimit)
+{
+	Link<T>* old;
+	if (countLimit > 0 && m_count >= countLimit) {
+		old = _popFrontItem();
+	} else {
+		old = sl_null;
+	}
+	if (m_end) {
+		m_end->next = item;
+		item->before = m_end;
+		m_end = item;
+	} else {
+		m_begin = item;
+		m_end = item;
+	}
+	m_count++;
+	return old;
+}
+
+template <class T, class COMPARE>
+Link<T>* LinkedList<T, COMPARE>::_popBackItem()
+{
+	Link<T>* end = m_end;
+	if (end) {
+		m_count--;
+		Link<T>* before = end->before;
+		if (before) {
+			before->next = sl_null;
+			m_end = before;
+		} else {
+			m_begin = sl_null;
+			m_end = sl_null;
+		}
+	}
+	return end;
+}
+
+template <class T, class COMPARE>
+Link<T>* LinkedList<T, COMPARE>::_pushFrontItem(Link<T>* item, sl_size countLimit)
+{
+	Link<T>* old;
+	if (countLimit > 0 && m_count >= countLimit) {
+		old = _popBackItem();
+	} else {
+		old = sl_null;
+	}
+	if (m_begin) {
+		item->next = m_begin;
+		m_begin->before = item;
+		m_begin = item;
+	} else {
+		m_begin = item;
+		m_end = item;
+	}
+	m_count++;
+	return old;
+}
+
+template <class T, class COMPARE>
+Link<T>* LinkedList<T, COMPARE>::_popFrontItem()
+{
+	Link<T>* begin = m_begin;
+	if (begin) {
+		m_count--;
+		Link<T>* next = begin->next;
+		if (next) {
+			next->before = sl_null;
+			m_begin = next;
+		} else {
+			m_begin = sl_null;
+			m_end = sl_null;
+		}
+	}
+	return begin;
+}
+
+template <class T, class COMPARE>
+void LinkedList<T, COMPARE>::_removeItem(Link<T>* item)
+{
+	m_count--;
+	Link<T>* before = item->before;
+	Link<T>* next = item->next;
+	if (before) {
+		before->next = next;
+	} else {
+		m_begin = next;
+	}
+	if (next) {
+		next->before = before;
+	} else {
+		m_end = before;
+	}
+}
+
+template <class T, class COMPARE>
+void LinkedList<T, COMPARE>::_insertBefore(Link<T>* itemWhere, Link<T>* itemNew)
+{
+	itemNew->next = itemWhere;
+	Link<T>* before = itemWhere->before;
+	itemNew->before = before;
+	itemWhere->before = itemNew;
+	if (before) {
+		before->next = itemNew;
+	} else {
+		m_begin = itemNew;
+	}
+	m_count++;
+}
+
+template <class T, class COMPARE>
+void LinkedList<T, COMPARE>::_insertAfter(Link<T>* itemWhere, Link<T>* itemNew)
+{
+	itemNew->before = itemWhere;
+	Link<T>* next = itemWhere->next;
+	itemNew->next = next;
+	itemWhere->next = itemNew;
+	if (next) {
+		next->before = itemNew;
+	} else {
+		m_end = itemNew;
+	}
+	m_count++;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE void LinkedList<T, COMPARE>::_init()
+{
+	m_begin = sl_null;
+	m_end = sl_null;
+}
+
+
+template <class T, class COMPARE>
+Link<T>* Queue<T, COMPARE>::push(const T& value, sl_size countLimit)
+{
+	return this->pushBack(value, countLimit);
+}
+
+template <class T, class COMPARE>
+Link<T>* Queue<T, COMPARE>::push_NoLock(const T& value, sl_size countLimit)
+{
+	return this->pushBack_NoLock(value, countLimit);
+}
+
+template <class T, class COMPARE>
+sl_bool Queue<T, COMPARE>::pop(T* _out)
+{
+	return this->popFront(_out);
+}
+
+template <class T, class COMPARE>
+sl_bool Queue<T, COMPARE>::pop_NoLock(T* _out)
+{
+	return this->popFront_NoLock(_out);
+}
+
+
+template <class T, class COMPARE>
+Link<T>* Stack<T, COMPARE>::push(const T& value, sl_size countLimit)
+{
+	return this->pushBack(value, countLimit);
+}
+
+template <class T, class COMPARE>
+Link<T>* Stack<T, COMPARE>::push_NoLock(const T& value, sl_size countLimit)
+{
+	return this->pushBack_NoLock(value, countLimit);
+}
+
+template <class T, class COMPARE>
+sl_bool Stack<T, COMPARE>::pop(T* _out)
+{
+	return this->popBack(_out);
+}
+
+template <class T, class COMPARE>
+sl_bool Stack<T, COMPARE>::pop_NoLock(T* _out)
+{
+	return this->popBack_NoLock(_out);
+}
+
 
 SLIB_NAMESPACE_END
 

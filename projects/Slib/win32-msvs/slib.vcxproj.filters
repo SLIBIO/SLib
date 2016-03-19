@@ -187,9 +187,6 @@
     <ClInclude Include="..\..\..\inc\slib\core\reference.h">
       <Filter>inc\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\resource.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\core\scoped_pointer.h">
       <Filter>inc\core</Filter>
     </ClInclude>
@@ -688,6 +685,18 @@
     <ClInclude Include="..\..\..\inc\slib\media\video_frame.h">
       <Filter>inc\media</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\asset.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\resource.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\locale.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\loop_queue.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">
@@ -706,9 +715,6 @@
       <Filter>src\slib\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\reference.cpp">
-      <Filter>src\slib\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\core\resource.cpp">
       <Filter>src\slib\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\service.cpp">
@@ -751,9 +757,6 @@
       <Filter>src\slib\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\file_win32.cpp">
-      <Filter>src\slib\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\core\string_conv.cpp">
       <Filter>src\slib\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\thirdparty\thirdparty_freetype.c">
@@ -1256,6 +1259,102 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\media\video_frame.cpp">
       <Filter>src\slib\media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\asset.cpp">
+      <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\resource.cpp">
+      <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\array.cpp">
+      <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\list.cpp">
+      <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\map.cpp">
+      <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\object.cpp">
+      <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\locale.cpp">
+      <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\queue.cpp">
+      <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\crypto\block_cipher.cpp">
+      <Filter>src\slib\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\vector2.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\vector3.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\vector4.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\matrix2.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\matrix3.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\matrix4.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\quaternion.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\line.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\line_segment.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\line3.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\rectangle.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\plane.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\bezier.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\box.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\sphere.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\transform2d.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\transform3d.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\triangle.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\triangle3.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\math\view_frustum.cpp">
+      <Filter>src\slib\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\yuv.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\audio_util.cpp">
+      <Filter>src\slib\media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\arp.cpp">
+      <Filter>src\slib\network</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

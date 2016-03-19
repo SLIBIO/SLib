@@ -18,7 +18,8 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class SLIB_EXPORT CheckBox : public View
 {
-	SLIB_DECLARE_OBJECT(CheckBox, View)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	CheckBox();
 	

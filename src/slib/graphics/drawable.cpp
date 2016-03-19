@@ -5,6 +5,8 @@
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(Drawable, Object)
+
 sl_bool Drawable::isBitmap()
 {
 	return Bitmap::checkInstance(this);
@@ -29,6 +31,9 @@ Ref<Drawable> Drawable::createEmptyDrawable()
 {
 	return EmptyDrawable::create();
 }
+
+
+SLIB_DEFINE_OBJECT(BrushDrawable, Drawable)
 
 Ref<BrushDrawable> BrushDrawable::create(const Ref<Brush>& brush)
 {
@@ -57,6 +62,9 @@ void BrushDrawable::onDraw(Canvas* canvas, const Rectangle& rectDst, const Recta
 	canvas->drawRectangle(rectDst, Ref<Pen>::null(), m_brush);
 }
 
+
+SLIB_DEFINE_OBJECT(ColorDrawable, BrushDrawable)
+
 Ref<ColorDrawable> ColorDrawable::create(const Color& color)
 {
 	Ref<ColorDrawable> ret;
@@ -70,6 +78,9 @@ Ref<ColorDrawable> ColorDrawable::create(const Color& color)
 	}
 	return ret;
 }
+
+
+SLIB_DEFINE_OBJECT(EmptyDrawable, Drawable)
 
 Ref<EmptyDrawable> EmptyDrawable::create()
 {

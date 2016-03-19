@@ -49,7 +49,7 @@ void Jni::initialize(JavaVM* jvm)
 		// singleton classes
 		{
 			ListLocker< _JniSingletonClass* > list(_g_jni_shared().singleton_classes);
-			for (sl_size i = 0; i < list.count(); i++) {
+			for (sl_size i = 0; i < list.count; i++) {
 				_JniSingletonClass* obj = list[i];
 				obj->cls = Jni::getClass(obj->name);
 			}
@@ -57,7 +57,7 @@ void Jni::initialize(JavaVM* jvm)
 		// singleton methods
 		{
 			ListLocker< _JniSingletonMethod* > list(_g_jni_shared().singleton_methods);
-			for (sl_size i = 0; i < list.count(); i++) {
+			for (sl_size i = 0; i < list.count; i++) {
 				_JniSingletonMethod* obj = list[i];
 				JniClass cls = obj->gcls->cls;
 				if (cls.isNotNull()) {
@@ -69,7 +69,7 @@ void Jni::initialize(JavaVM* jvm)
 		// singleton static methods
 		{
 			ListLocker< _JniSingletonStaticMethod* > list(_g_jni_shared().singleton_static_methods);
-			for (sl_size i = 0; i < list.count(); i++) {
+			for (sl_size i = 0; i < list.count; i++) {
 				_JniSingletonStaticMethod* obj = list[i];
 				JniClass cls = obj->gcls->cls;
 				if (cls.isNotNull()) {
@@ -81,7 +81,7 @@ void Jni::initialize(JavaVM* jvm)
 		// singleton fields
 		{
 			ListLocker< _JniSingletonField* > list(_g_jni_shared().singleton_fields);
-			for (sl_size i = 0; i < list.count(); i++) {
+			for (sl_size i = 0; i < list.count; i++) {
 				_JniSingletonField* obj = list[i];
 				JniClass cls = obj->gcls->cls;
 				if (cls.isNotNull()) {
@@ -93,7 +93,7 @@ void Jni::initialize(JavaVM* jvm)
 		// singleton static fields
 		{
 			ListLocker< _JniSingletonStaticField* > list(_g_jni_shared().singleton_static_fields);
-			for (sl_size i = 0; i < list.count(); i++) {
+			for (sl_size i = 0; i < list.count; i++) {
 				_JniSingletonStaticField* obj = list[i];
 				JniClass cls = obj->gcls->cls;
 				if (cls.isNotNull()) {
@@ -105,7 +105,7 @@ void Jni::initialize(JavaVM* jvm)
 		// native methods
 		{
 			ListLocker< _JniNativeMethod* > list(_g_jni_shared().native_methods);
-			for (sl_size i = 0; i < list.count(); i++) {
+			for (sl_size i = 0; i < list.count; i++) {
 				_JniNativeMethod* obj = list[i];
 				JniClass cls = obj->gcls->cls;
 				if (cls.isNotNull()) {
@@ -204,7 +204,7 @@ JniClass Jni::getClass(const String& className)
 	if (_g_jni_shared().classes.get(className, &ret)) {
 		return ret;
 	}
-	ret = Jni::findClass(className.getBuf());
+	ret = Jni::findClass(className.getData());
 	if (ret.isNotNull()) {
 		Jni::registerClass(className, ret);
 	}
@@ -325,7 +325,7 @@ jstring Jni::getJniString(const String& str)
 	if (str.isNotNull()) {
 		JNIEnv* env = Jni::getCurrent();
 		if (env) {
-			ret = env->NewStringUTF(str.getBuf());
+			ret = env->NewStringUTF(str.getData());
 		}
 	}
 	return ret;
@@ -337,7 +337,7 @@ jstring Jni::getJniString16(const String16& str)
 	if (str.isNotNull()) {
 		JNIEnv* env = Jni::getCurrent();
 		if (env) {
-			ret = env->NewString((jchar*)(str.getBuf()), str.getLength());
+			ret = env->NewString((jchar*)(str.getData()), str.getLength());
 		}
 	}
 	return ret;
@@ -606,37 +606,60 @@ void Jni::closeInputStream(jobject stream)
 }
 
 /************************************************
-	JniGlobal
+	JniClass
 **************************************************/
-Ref<_JniGlobal> _JniGlobal::from(jobject obj)
+
+SLIB_DEFINE_ROOT_OBJECT(_JniGlobalBase)
+
+template class _JniGlobal<jobject>;
+template class _JniGlobal<jclass>;
+template class _JniGlobal<jstring>;
+
+SLIB_DEFINE_REF_WRAPPER(JniClass, JniSafeClass, _JniGlobal<jclass>, ref)
+
+JniClass::JniClass(jclass cls) : ref(_JniGlobal<jclass>::from(cls))
 {
-	Ref<_JniGlobal> ret;
+}
+
+JniClass& JniClass::operator=(jclass cls)
+{
+	ref = _JniGlobal<jclass>::from(cls);
+	return *this;
+}
+
+JniClass JniClass::from(jclass cls)
+{
+	return JniClass(cls);
+}
+
+JniClass JniClass::getClassOfObject(jobject obj)
+{
+	JniClass ret;
 	if (obj) {
-		jobject jglobal = Jni::newGlobalRef(obj);
-		if (jglobal) {
-			ret = new _JniGlobal();
-			if (ret.isNotNull()) {
-				ret->object = jglobal;
-				return ret;
-			}
-			Jni::deleteGlobalRef(jglobal);
+		JNIEnv* env = Jni::getCurrent();
+		if (env) {
+			JniLocal<jclass> cls = env->GetObjectClass(obj);
+			ret = JniClass::from(cls);
 		}
 	}
 	return ret;
 }
 
-_JniGlobal::_JniGlobal()
+jclass JniClass::get() const
 {
+	_JniGlobal<jclass>* o = ref.ptr;
+	if (ref.isNotNull()) {
+		return o->object;
+	} else {
+		return 0;
+	}
 }
 
-_JniGlobal::~_JniGlobal()
+JniClass::operator jclass() const
 {
-	Jni::deleteGlobalRef(object);
+	return get();
 }
 
-/************************************************
-	JniClass
-**************************************************/
 sl_bool JniClass::isInstanceOf(jobject obj) const
 {
 	jclass cls = get();
@@ -1311,7 +1334,6 @@ void JniClass::set##NAME##Field(const char* name, const char* sig, jobject _this
 } \
 void JniClass::setStatic##NAME##Field(jfieldID field, TYPE value) const \
 { \
-	TYPE ret = sl_null; \
 	if (field) { \
 		jclass cls = get(); \
 		JNIEnv* env = Jni::getCurrent(); \
@@ -1322,7 +1344,6 @@ void JniClass::setStatic##NAME##Field(jfieldID field, TYPE value) const \
 } \
 void JniClass::setStatic##NAME##Field(const char* name, const char* sig, TYPE value) const \
 { \
-	TYPE ret = sl_null; \
 	jclass cls = get(); \
 	jfieldID field = getStaticFieldID(name, sig); \
 	if (field) { \
@@ -1669,19 +1690,6 @@ void _JniSingletonStaticField::setString16(jobject _null, const String16& value)
 	}
 }
 
-JniClass JniClass::getClassOfObject(jobject obj)
-{
-	JniClass ret;
-	if (obj) {
-		JNIEnv* env = Jni::getCurrent();
-		if (env) {
-			JniLocal<jclass> cls = env->GetObjectClass(obj);
-			ret = JniClass::from(cls);
-		}
-	}
-	return ret;
-}
-
 sl_bool JniClass::registerNative(const char* name, const char* sig, const void* fn) const
 {
 	jclass cls = get();
@@ -1697,6 +1705,16 @@ sl_bool JniClass::registerNative(const char* name, const char* sig, const void* 
 		}
 	}
 	return sl_false;
+}
+
+JniSafeClass::JniSafeClass(jclass cls) : ref(_JniGlobal<jclass>::from(cls))
+{
+}
+
+JniSafeClass& JniSafeClass::operator=(jclass cls)
+{
+	ref = _JniGlobal<jclass>::from(cls);
+	return *this;
 }
 
 _JniSingletonClass::_JniSingletonClass(const char* name)
@@ -1735,6 +1753,48 @@ _JniSingletonField::_JniSingletonField(_JniSingletonClass* gcls, const char* nam
 	_g_jni_shared().singleton_fields.add(this);
 }
 
+_JniSingletonObjectField::_JniSingletonObjectField(_JniSingletonClass* gcls, const char* name, const char* sig)
+	: _JniSingletonField(gcls, name, sig)
+{
+}
+
+jobject _JniSingletonObjectField::get(jobject _this)
+{
+	return getObject(_this);
+}
+
+void _JniSingletonObjectField::set(jobject _this, jobject value)
+{
+	setObject(_this, value);
+}
+
+
+#define _SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(TYPE, NAME, SIG) \
+	_JniSingleton##NAME##Field::_JniSingleton##NAME##Field(_JniSingletonClass* gcls, const char* name) \
+		: _JniSingletonField(gcls, name, SIG) \
+	{ \
+	} \
+	TYPE _JniSingleton##NAME##Field::get(jobject _this) \
+	{ \
+		return get##NAME(_this); \
+	} \
+	void _JniSingleton##NAME##Field::set(jobject _this, TYPE value) \
+	{ \
+		set##NAME(_this, value); \
+	} \
+
+_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(jboolean, Boolean, "Z")
+_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(sl_int8, Byte, "B")
+_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(sl_uint16, Char, "C")
+_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(sl_int16, Short, "S")
+_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(sl_int32, Int, "I")
+_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(sl_int64, Long, "J")
+_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(float, Float, "F")
+_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(double, Double, "D")
+_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(String, String, "Ljava/lang/String;")
+_SLIB_JNI_DEFINE_SINGLETON_FIELD_TYPE(String16, String16, "Ljava/lang/String;")
+
+
 _JniSingletonStaticField::_JniSingletonStaticField(_JniSingletonClass* gcls, const char* name, const char* sig)
 {
 	this->gcls = gcls;
@@ -1745,6 +1805,49 @@ _JniSingletonStaticField::_JniSingletonStaticField(_JniSingletonClass* gcls, con
 	_g_jni_shared().singleton_static_fields.add(this);
 }
 
+
+_JniSingletonStaticObjectField::_JniSingletonStaticObjectField(_JniSingletonClass* gcls, const char* name, const char* sig)
+	: _JniSingletonStaticField(gcls, name, sig)
+{
+}
+
+jobject _JniSingletonStaticObjectField::get()
+{
+	return getObject(sl_null);
+}
+
+void _JniSingletonStaticObjectField::set(jobject value)
+{
+	setObject(sl_null, value);
+}
+
+
+#define _SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(TYPE, NAME, SIG) \
+	_JniSingletonStatic##NAME##Field::_JniSingletonStatic##NAME##Field(_JniSingletonClass* gcls, const char* name) \
+		: _JniSingletonStaticField(gcls, name, SIG) \
+	{ \
+	} \
+	TYPE _JniSingletonStatic##NAME##Field::get() \
+	{ \
+		return get##NAME(sl_null); \
+	} \
+	void _JniSingletonStatic##NAME##Field::set(TYPE value) \
+	{ \
+		set##NAME(sl_null, value); \
+	} \
+
+_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(jboolean, Boolean, "Z")
+_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(sl_int8, Byte, "B")
+_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(sl_uint16, Char, "C")
+_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(sl_int16, Short, "S")
+_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(sl_int32, Int, "I")
+_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(sl_int64, Long, "J")
+_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(float, Float, "F")
+_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(double, Double, "D")
+_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(String, String, "Ljava/lang/String;")
+_SLIB_JNI_DEFINE_SINGLETON_STATIC_FIELD_TYPE(String16, String16, "Ljava/lang/String;")
+
+
 _JniNativeMethod::_JniNativeMethod(_JniSingletonClass* gcls, const char* name, const char* sig, const void* fn)
 {
 	this->gcls = gcls;
@@ -1753,6 +1856,7 @@ _JniNativeMethod::_JniNativeMethod(_JniSingletonClass* gcls, const char* name, c
 	this->fn = fn;
 	_g_jni_shared().native_methods.add(this);
 }
+
 SLIB_NAMESPACE_END
 
 #endif

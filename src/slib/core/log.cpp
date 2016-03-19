@@ -18,6 +18,15 @@ static String _Log_getLineString(const String& tag, const String& content)
 	return Time::now().toString() + " " + tag + " - " + content;
 }
 
+FileLogger::FileLogger()
+{
+}
+
+FileLogger::FileLogger(const String& fileName)
+{
+	setFileName(fileName);
+}
+
 void FileLogger::log(const String& tag, const String& content)
 {
 	String fileName = getFileName();
@@ -43,9 +52,9 @@ public:
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 		ObjectLocker lock(this);
 		__android_log_print(ANDROID_LOG_INFO
-							, tag.getBuf()
+							, tag.getData()
 							, "%s"
-							, content.getBuf());
+							, content.getData());
 #else
 		String s = _Log_getLineString(tag, content);
 		Console::println(s);
@@ -58,15 +67,19 @@ public:
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 		ObjectLocker lock(this);
 		__android_log_print(ANDROID_LOG_ERROR
-							, tag.getBuf()
+							, tag.getData()
 							, "%s"
-							, content.getBuf());
+							, content.getData());
 #else
 		log(tag, content);
 #endif
 	}
 };
 
+
+Log::Log()
+{
+}
 
 Log::Log(const Ref<Logger>& logger, const Ref<Logger>& errorLogger)
 {
@@ -127,7 +140,7 @@ void Log::removeErrorLogger(const Ref<Logger>& logger)
 void Log::log(const String& tag, const String& content)
 {
 	ListLocker< Ref<Logger> > list(m_listLoggers);
-	for (sl_size i = 0; i < list.getCount(); i++) {
+	for (sl_size i = 0; i < list.count; i++) {
 		list[i]->log(tag, content);
 	}
 }
@@ -135,7 +148,7 @@ void Log::log(const String& tag, const String& content)
 void Log::logError(const String& tag, const String& content)
 {
 	ListLocker< Ref<Logger> > list(m_listLoggers);
-	for (sl_size i = 0; i < list.getCount(); i++) {
+	for (sl_size i = 0; i < list.count; i++) {
 		list[i]->logError(tag, content);
 	}
 }

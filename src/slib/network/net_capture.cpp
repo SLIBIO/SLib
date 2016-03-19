@@ -1,14 +1,15 @@
 #include "../../../inc/slib/network/capture.h"
+
 #include "../../../inc/slib/core/thread.h"
+#include "../../../inc/slib/core/mio.h"
 #include "../../../inc/slib/core/log.h"
-
-#define TAG "NetCapture"
-
 #include "../../../inc/slib/network/os.h"
 #include "../../../inc/slib/network/socket.h"
 #include "../../../inc/slib/network/event.h"
 #include "../../../inc/slib/network/tcpip.h"
 #include "../../../inc/slib/network/ethernet.h"
+
+#define TAG "NetCapture"
 
 #define MAX_PACKET_SIZE 65535
 
@@ -20,10 +21,13 @@ NetCaptureParam::NetCaptureParam()
 	timeoutRead = 100;
 	sizeBuffer = 0x200000; // 2MB (16Mb)
 	
-	preferedLinkDeviceType = networkLinkDeviceType_Ethernet;
+	preferedLinkDeviceType = NetworkLinkDeviceType::Ethernet;
 
 	flagAutoStart = sl_true;
 }
+
+
+SLIB_DEFINE_OBJECT(NetCapture, Object)
 
 void NetCapture::_onCapturePacket(NetCapturePacket* packet)
 {
@@ -48,7 +52,7 @@ class _NetRawPacketCapture : public NetCapture
 public:
 	SafeRef<Socket> m_socket;
 	
-	sl_uint32 m_deviceType;
+	NetworkLinkDeviceType m_deviceType;
 	sl_uint32 m_ifaceIndex;
 	Memory m_bufPacket;
 	Ref<Thread> m_thread;
@@ -82,12 +86,12 @@ public:
 			}
 		}
 		Ref<Socket> socket;
-		sl_uint32 deviceType = param.preferedLinkDeviceType;
-		if (deviceType == networkLinkDeviceType_Raw) {
-			socket = Socket::openPacketDatagram(networkLinkProtocol_All);
+		NetworkLinkDeviceType deviceType = param.preferedLinkDeviceType;
+		if (deviceType == NetworkLinkDeviceType::Raw) {
+			socket = Socket::openPacketDatagram(NetworkLinkProtocol::All);
 		} else {
-			deviceType = networkLinkDeviceType_Ethernet;
-			socket = Socket::openPacketRaw(networkLinkProtocol_All);
+			deviceType = NetworkLinkDeviceType::Ethernet;
+			socket = Socket::openPacketRaw(NetworkLinkProtocol::All);
 		}
 		if (socket.isNotNull()) {
 			if (iface > 0) {
@@ -109,7 +113,7 @@ public:
 					ret->m_deviceType = deviceType;
 					ret->m_ifaceIndex = iface;
 					ret->m_listener = param.listener;
-					ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_NetRawPacketCapture, _run, ret.get()));
+					ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_NetRawPacketCapture, _run, ret.ptr));
 					if (ret->m_thread.isNotNull()) {
 						ret->m_flagInit = sl_true;
 						if (param.flagAutoStart) {
@@ -179,7 +183,7 @@ public:
 			return;
 		}
 		
-		sl_uint8* buf = (sl_uint8*)(m_bufPacket.getBuf());
+		sl_uint8* buf = (sl_uint8*)(m_bufPacket.getData());
 		sl_uint32 sizeBuf = (sl_uint32)(m_bufPacket.getSize());
 		
 		while (Thread::isNotStoppingCurrent()) {
@@ -199,7 +203,7 @@ public:
 		}
 	}
 
-	sl_uint32 getLinkType()
+	NetworkLinkDeviceType getLinkType()
 	{
 		return m_deviceType;
 	}
@@ -211,17 +215,17 @@ public:
 		}
 		if (m_flagInit) {
 			L2PacketInfo info;
-			info.type = l2PacketType_OutGoing;
+			info.type = L2PacketType::OutGoing;
 			info.iface = m_ifaceIndex;
-			if (m_deviceType == networkLinkDeviceType_Ethernet) {
-				EthernetFrameFormat* frame = (EthernetFrameFormat*)buf;
-				if (size < EthernetFrameFormat::getHeaderSize()) {
+			if (m_deviceType == NetworkLinkDeviceType::Ethernet) {
+				EthernetFrame* frame = (EthernetFrame*)buf;
+				if (size < EthernetFrame::HeaderSize) {
 					return sl_false;
 				}
 				info.protocol = frame->getProtocol();
 				info.setMacAddress(frame->getDestinationAddress());
 			} else {
-				info.protocol = networkLinkProtocol_IPv4;
+				info.protocol = NetworkLinkProtocol::IPv4;
 				info.clearAddress();
 			}
 			Ref<Socket> socket = m_socket;
@@ -270,9 +274,9 @@ public:
 public:
 	static Ref<_NetRawIPv4Capture> create(const NetCaptureParam& param)
 	{
-		Ref<Socket> socketTCP = Socket::openRaw(networkInternetProtocol_TCP);
-		Ref<Socket> socketUDP = Socket::openRaw(networkInternetProtocol_UDP);
-		Ref<Socket> socketICMP = Socket::openRaw(networkInternetProtocol_ICMP);
+		Ref<Socket> socketTCP = Socket::openRaw(NetworkInternetProtocol::TCP);
+		Ref<Socket> socketUDP = Socket::openRaw(NetworkInternetProtocol::UDP);
+		Ref<Socket> socketICMP = Socket::openRaw(NetworkInternetProtocol::ICMP);
 		if (socketTCP.isNotNull() && socketUDP.isNotNull() && socketICMP.isNotNull()) {
 			socketTCP->setOption_IncludeIpHeader(sl_true);
 			socketUDP->setOption_IncludeIpHeader(sl_true);
@@ -286,7 +290,7 @@ public:
 					ret->m_socketUDP = socketUDP;
 					ret->m_socketICMP = socketICMP;
 					ret->m_listener = param.listener;
-					ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_NetRawIPv4Capture, _run, ret.get()));
+					ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_NetRawIPv4Capture, _run, ret.ptr));
 					if (ret->m_thread.isNotNull()) {
 						ret->m_flagInit = sl_true;
 						if (param.flagAutoStart) {
@@ -382,7 +386,7 @@ public:
 		events[1] = eventUDP;
 		events[2] = eventICMP;
 		
-		sl_uint8* buf = (sl_uint8*)(m_bufPacket.getBuf());
+		sl_uint8* buf = (sl_uint8*)(m_bufPacket.getData());
 		sl_uint32 sizeBuf = (sl_uint32)(m_bufPacket.getSize());
 		while (Thread::isNotStoppingCurrent()) {
 			while (1) {
@@ -425,17 +429,17 @@ public:
 		}
 	}
 
-	sl_uint32 getLinkType()
+	NetworkLinkDeviceType getLinkType()
 	{
-		return networkLinkDeviceType_Raw;
+		return NetworkLinkDeviceType::Raw;
 	}
 
 	sl_bool sendPacket(const void* buf, sl_uint32 size)
 	{
 		if (m_flagInit) {
 			SocketAddress address;
-			if (IPv4HeaderFormat::check(buf, size)) {
-				IPv4HeaderFormat* ip = (IPv4HeaderFormat*)buf;
+			if (IPv4Packet::check(buf, size)) {
+				IPv4Packet* ip = (IPv4Packet*)buf;
 				address.ip = ip->getDestinationAddress();
 				address.port = 0;
 				Ref<Socket> socket;
@@ -462,6 +466,67 @@ public:
 Ref<NetCapture> NetCapture::createRawIPv4(const NetCaptureParam& param)
 {
 	return _NetRawIPv4Capture::create(param);
+}
+
+
+LinuxCookedPacketType LinuxCookedFrame::getPacketType() const
+{
+	return (LinuxCookedPacketType)(MIO::readUint16BE(m_packetType));
+}
+
+void LinuxCookedFrame::setPacketType(LinuxCookedPacketType type)
+{
+	MIO::writeUint16BE(m_packetType, (sl_uint32)type);
+}
+
+NetworkLinkDeviceType LinuxCookedFrame::getDeviceType() const
+{
+	return (NetworkLinkDeviceType)(MIO::readUint16BE(m_deviceType));
+}
+
+void LinuxCookedFrame::setDeviceType(NetworkLinkDeviceType type)
+{
+	MIO::writeUint16BE(m_deviceType, (sl_uint32)type);
+}
+
+sl_uint16 LinuxCookedFrame::getAddressLength() const
+{
+	return MIO::readUint16BE(m_lenAddress);
+}
+
+void LinuxCookedFrame::setAddressLength(sl_uint16 len)
+{
+	MIO::writeUint16BE(m_lenAddress, len);
+}
+
+const sl_uint8* LinuxCookedFrame::getAddress() const
+{
+	return m_address;
+}
+
+sl_uint8* LinuxCookedFrame::getAddress()
+{
+	return m_address;
+}
+
+NetworkLinkProtocol LinuxCookedFrame::getProtocolType() const
+{
+	return (NetworkLinkProtocol)(MIO::readUint16BE(m_protocol));
+}
+
+void LinuxCookedFrame::setProtocolType(NetworkLinkProtocol type)
+{
+	MIO::writeUint16BE(m_protocol, (sl_uint32)type);
+}
+
+const sl_uint8* LinuxCookedFrame::getContent() const
+{
+	return ((const sl_uint8*)this) + HeaderSize;
+}
+
+sl_uint8* LinuxCookedFrame::getContent()
+{
+	return ((sl_uint8*)this) + HeaderSize;
 }
 
 SLIB_NETWORK_NAMESPACE_END

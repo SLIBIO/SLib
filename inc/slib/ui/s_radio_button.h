@@ -9,7 +9,8 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class SLIB_EXPORT SRadioButton : public SCheckBox
 {
-	SLIB_DECLARE_OBJECT(SRadioButton, SCheckBox)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	SRadioButton();
 	

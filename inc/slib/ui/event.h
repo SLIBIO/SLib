@@ -22,388 +22,160 @@ public:
 	sl_real pressure;
 
 public:
-    SLIB_INLINE TouchPoint()
-    {        
-    }
-    
-    SLIB_INLINE TouchPoint(const TouchPoint& other) : point(other.point)
-	{
-		pressure = other.pressure;
-	}
-	
-	SLIB_INLINE TouchPoint& operator=(const TouchPoint& other)
-	{
-		point = other.point;
-		pressure = other.pressure;
-		return *this;
-	}
-	
-	SLIB_INLINE TouchPoint(const Point& _point) : point(_point)
-	{
-		pressure = 0;
-	}
+	TouchPoint() = default;
 
-	SLIB_INLINE TouchPoint(const Point& _point, sl_real _pressure) : point(_point)
-	{
-		pressure = _pressure;
-	}
+	TouchPoint(const TouchPoint& other) = default;
 	
-	SLIB_INLINE TouchPoint(sl_real x, sl_real y) : point(x, y)
-	{
-		pressure = 0;
-	}
+	TouchPoint(const Point& point);
+	
+	TouchPoint(const Point& point, sl_real pressure);
+	
+	TouchPoint(sl_real x, sl_real y);
+	
+	TouchPoint(sl_real x, sl_real y, sl_real pressure);
+	
+public:
+	TouchPoint& operator=(const TouchPoint& other) = default;
 
-	SLIB_INLINE TouchPoint(sl_real x, sl_real y, sl_real _pressure) : point(x, y)
-	{
-		pressure = _pressure;
-	}
 };
 
 class SLIB_EXPORT UIEvent : public Referable
 {	
 protected:
-	SLIB_INLINE UIEvent()
-	{
-		m_flags = 0;
-		m_action = actionUnknown;
-	}
+	UIEvent();
 	
 public:
-	static Ref<UIEvent> createKeyEvent(UIEventAction action, Keycode keycode, sl_uint32 systemKeycode);
+	static Ref<UIEvent> createKeyEvent(UIAction action, Keycode keycode, sl_uint32 systemKeycode);
 	
-	static Ref<UIEvent> createMouseEvent(UIEventAction action, sl_real x, sl_real y);
+	static Ref<UIEvent> createMouseEvent(UIAction action, sl_real x, sl_real y);
 	
 	static Ref<UIEvent> createMouseWheelEvent(sl_real deltaX, sl_real deltaY);
 	
-	static Ref<UIEvent> createTouchEvent(UIEventAction action, const Array<TouchPoint>& points);
+	static Ref<UIEvent> createTouchEvent(UIAction action, const Array<TouchPoint>& points);
 	
 	static Ref<UIEvent> createSetCursorEvent();
 	
-protected:
-	enum
-	{
-		flagShiftKey = 0x1,
-		flagAltKey = 0x2,
-		flagOptionKey = 0x2, // (mac)
-		flagControlKey = 0x4,
-		flagWindowsKey = 0x8,
-		flagCommandKey = 0x8, // (mac)
-		
-		flagPreventDefault = 0x10000,
-		flagStopPropagation = 0x20000
-	};
-	
 public:
-	SLIB_INLINE UIEventAction getAction() const
-	{
-		return m_action;
-	}
+	UIAction getAction() const;
 	
-	SLIB_INLINE void setAction(UIEventAction action)
-	{
-		m_action = action;
-	}
+	void setAction(UIAction action);
 	
+	sl_bool isKeyEvent();
 	
-	SLIB_INLINE sl_bool isKeyEvent()
-	{
-		return (m_action & 0xff00) == 0x0100;
-	}
+	sl_bool isMouseEvent();
 	
-	SLIB_INLINE sl_bool isMouseEvent()
-	{
-		return (m_action & 0xff00) == 0x0200;
-	}
+	sl_bool isTouchEvent();
 	
-	SLIB_INLINE sl_bool isTouchEvent()
-	{
-		return (m_action & 0xff00) == 0x0300;
-	}
+	// key
+	Keycode getKeycode() const;
 	
-
-	// keyboard
-	SLIB_INLINE Keycode getKeycode() const
-	{
-		return m_keycode;
-	}
+	void setKeycode(Keycode keycode);
 	
-	SLIB_INLINE void setKeycode(Keycode keycode)
-	{
-		m_keycode = keycode;
-	}
+	sl_uint32 getSystemKeycode() const;
 	
-	SLIB_INLINE sl_uint32 getSystemKeycode() const
-	{
-		return m_systemKeycode;
-	}
-	
-	SLIB_INLINE void setSystemKeycode(sl_uint32 keycode)
-	{
-		m_systemKeycode = keycode;
-	}
-	
+	void setSystemKeycode(sl_uint32 keycode);
 	
 	// mouse, touch
-	SLIB_INLINE const Point& getPoint() const
-	{
-		return m_point.point;
-	}
+	const Point& getPoint() const;
 	
-	SLIB_INLINE void setPoint(const Point& pt)
-	{
-		m_point.point = pt;
-	}
+	void setPoint(const Point& pt);
 	
-	SLIB_INLINE void setPoint(sl_real x, sl_real y)
-	{
-		m_point.point.x = x;
-		m_point.point.y = y;
-	}
+	void setPoint(sl_real x, sl_real y);
 	
-	SLIB_INLINE sl_real getX() const
-	{
-		return m_point.point.x;
-	}
+	sl_real getX() const;
 	
-	SLIB_INLINE void setX(sl_real x)
-	{
-		m_point.point.x = x;
-	}
+	void setX(sl_real x);
 	
-	SLIB_INLINE sl_real getY() const
-	{
-		return m_point.point.y;
-	}
+	sl_real getY() const;
 	
-	SLIB_INLINE void setY(sl_real y)
-	{
-		m_point.point.y = y;
-	}
-	
+	void setY(sl_real y);
 	
 	// mouse wheel
-	SLIB_INLINE sl_real getDelta() const
-	{
-		return m_point.point.y;
-	}
+	sl_real getDelta() const;
 	
-	SLIB_INLINE void setDelta(sl_real delta)
-	{
-		m_point.point.y = delta;
-	}
+	void setDelta(sl_real delta);
 	
-	SLIB_INLINE sl_real getDeltaX() const
-	{
-		return m_point.point.x;
-	}
+	sl_real getDeltaX() const;
 	
-	SLIB_INLINE void setDeltaX(sl_real x)
-	{
-		m_point.point.x = x;
-	}
+	void setDeltaX(sl_real x);
 	
-	SLIB_INLINE sl_real getDeltaY() const
-	{
-		return m_point.point.y;
-	}
+	sl_real getDeltaY() const;
 	
-	SLIB_INLINE void setDeltaY(sl_real y)
-	{
-		m_point.point.y = y;
-	}
-	
+	void setDeltaY(sl_real y);
 	
 	// touch
-	SLIB_INLINE const TouchPoint& getTouchPoint() const
-	{
-		return m_point;
-	}
+	const TouchPoint& getTouchPoint() const;
 	
-	SLIB_INLINE void setTouchPoint(const TouchPoint& pt)
-	{
-		m_point = pt;
-	}
+	void setTouchPoint(const TouchPoint& pt);
 	
-	SLIB_INLINE void setTouchPoint(const Point& pt)
-	{
-		m_point.point = pt;
-		m_point.pressure = 0;
-	}
+	void setTouchPoint(const Point& pt);
 	
-	SLIB_INLINE void setTouchPoint(const Point& pt, sl_real pressure)
-	{
-		m_point.point = pt;
-		m_point.pressure = pressure;
-	}
+	void setTouchPoint(const Point& pt, sl_real pressure);
 	
-	SLIB_INLINE void setTouchPoint(sl_real x, sl_real y)
-	{
-		m_point.point.x = x;
-		m_point.point.y = y;
-		m_point.pressure = 0;
-	}
+	void setTouchPoint(sl_real x, sl_real y);
 	
-	SLIB_INLINE void setTouchPoint(sl_real x, sl_real y, sl_real pressure)
-	{
-		m_point.point.x = x;
-		m_point.point.y = y;
-		m_point.pressure = pressure;
-	}
+	void setTouchPoint(sl_real x, sl_real y, sl_real pressure);
 	
-	SLIB_INLINE sl_real getPressure() const
-	{
-		return m_point.pressure;
-	}
+	sl_real getPressure() const;
 	
-	SLIB_INLINE void setPressure(sl_real pressure)
-	{
-		m_point.pressure = pressure;
-	}
+	void setPressure(sl_real pressure);
 	
-	SLIB_INLINE Array<TouchPoint> getTouchPoints() const
-	{
-		return m_points;
-	}
+	Array<TouchPoint> getTouchPoints() const;
 	
-	SLIB_INLINE sl_uint32 getTouchPointsCount() const
-	{
-		return (sl_uint32)(m_points.count());
-	}
+	sl_uint32 getTouchPointsCount() const;
 	
-	SLIB_INLINE TouchPoint getTouchPoint(sl_uint32 index) const
-	{
-		TouchPoint pt;
-		m_points.getItem(index, &pt);
-		return pt;
-	}
+	TouchPoint getTouchPoint(sl_uint32 index) const;
 	
-	SLIB_INLINE void setTouchPoints(const Array<TouchPoint>& points)
-	{
-		m_points = points;
-	}
+	void setTouchPoints(const Array<TouchPoint>& points);
 
 	void transformPoints(const Matrix3& mat);
 	
-	
 	// modifiers
-	SLIB_INLINE void setShiftKey()
-	{
-		SLIB_SET_FLAG(m_flags, (sl_uint32)flagShiftKey);
-	}
+	void setShiftKey();
 	
-	SLIB_INLINE void clearShiftKey()
-	{
-		SLIB_RESET_FLAG(m_flags, (sl_uint32)flagShiftKey);
-	}
+	void clearShiftKey();
 	
-	SLIB_INLINE sl_bool isShiftKey() const
-	{
-		return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagShiftKey);
-	}
+	sl_bool isShiftKey() const;
 	
+	void setAltKey();
 	
-	SLIB_INLINE void setAltKey()
-	{
-		SLIB_SET_FLAG(m_flags, (sl_uint32)flagAltKey);
-	}
+	void clearAltKey();
 	
-	SLIB_INLINE void clearAltKey()
-	{
-		SLIB_RESET_FLAG(m_flags, (sl_uint32)flagAltKey);
-	}
+	sl_bool isAltKey() const;
 	
-	SLIB_INLINE sl_bool isAltKey() const
-	{
-		return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagAltKey);
-	}
+	void setOptionKey();
 	
+	void clearOptionKey();
 	
-	SLIB_INLINE void setOptionKey()
-	{
-		SLIB_SET_FLAG(m_flags, (sl_uint32)flagOptionKey);
-	}
+	sl_bool isOptionKey() const;
 	
-	SLIB_INLINE void clearOptionKey()
-	{
-		SLIB_RESET_FLAG(m_flags, (sl_uint32)flagOptionKey);
-	}
+	void setControlKey();
 	
-	SLIB_INLINE sl_bool isOptionKey() const
-	{
-		return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagOptionKey);
-	}
+	void clearControlKey();
 	
+	sl_bool isControlKey() const;
 	
-	SLIB_INLINE void setControlKey()
-	{
-		SLIB_SET_FLAG(m_flags, (sl_uint32)flagControlKey);
-	}
+	void setWindowsKey();
 	
-	SLIB_INLINE void clearControlKey()
-	{
-		SLIB_RESET_FLAG(m_flags, (sl_uint32)flagControlKey);
-	}
+	void clearWindowsKey();
 	
-	SLIB_INLINE sl_bool isControlKey() const
-	{
-		return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagControlKey);
-	}
+	sl_bool isWindowsKey() const;
 	
+	void setCommandKey();
 	
-	SLIB_INLINE void setWindowsKey()
-	{
-		SLIB_SET_FLAG(m_flags, (sl_uint32)flagWindowsKey);
-	}
+	void clearCommandKey();
 	
-	SLIB_INLINE void clearWindowsKey()
-	{
-		SLIB_RESET_FLAG(m_flags, (sl_uint32)flagWindowsKey);
-	}
-	
-	SLIB_INLINE sl_bool isWindowsKey() const
-	{
-		return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagWindowsKey);
-	}
-	
-	
-	SLIB_INLINE void setCommandKey()
-	{
-		SLIB_SET_FLAG(m_flags, (sl_uint32)flagCommandKey);
-	}
-	
-	SLIB_INLINE void clearCommandKey()
-	{
-		SLIB_RESET_FLAG(m_flags, (sl_uint32)flagCommandKey);
-	}
-	
-	SLIB_INLINE sl_bool isCommandKey() const
-	{
-		return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagCommandKey);
-	}
-	
+	sl_bool isCommandKey() const;
 	
 	// event management
-	SLIB_INLINE void preventDefault()
-	{
-		SLIB_SET_FLAG(m_flags, (sl_uint32)flagPreventDefault);
-	}
+	void preventDefault();
 	
-	SLIB_INLINE sl_bool isPreventedDefault() const
-	{
-		return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagPreventDefault);
-	}
+	sl_bool isPreventedDefault() const;
 	
-	SLIB_INLINE void stopPropagation()
-	{
-		SLIB_SET_FLAG(m_flags, (sl_uint32)flagStopPropagation);
-	}
+	void stopPropagation();
 	
-	SLIB_INLINE sl_bool isStoppedPropagation() const
-	{
-		return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagStopPropagation);
-	}
+	sl_bool isStoppedPropagation() const;
 	
-public:
 	Ref<UIEvent> duplicate();
 	
 	static sl_uint32 getSystemKeycode(Keycode key);
@@ -412,7 +184,7 @@ public:
 
 protected:
 	sl_uint32 m_flags;
-	UIEventAction m_action;
+	UIAction m_action;
 	
 	// keyboard
 	Keycode m_keycode;
@@ -423,6 +195,7 @@ protected:
 	
 	// touch
 	Array<TouchPoint> m_points;
+	
 };
 
 class SLIB_EXPORT IViewListener

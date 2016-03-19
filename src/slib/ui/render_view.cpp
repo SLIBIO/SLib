@@ -2,10 +2,12 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(RenderView, GenericViewWithEvent)
+
 RenderView::RenderView()
 {
-	setPreferredEngineType(renderEngineType_OpenGL_ES);
-	m_redrawMode = redrawMode_Continuously;
+	setPreferredEngineType(RenderEngineType::OpenGL_ES);
+	m_redrawMode = RedrawMode::Continuously;
 }
 
 RedrawMode RenderView::getRedrawMode()

@@ -4,9 +4,11 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(VideoView, RenderView)
+
 VideoView::VideoView()
 {
-	setRedrawMode(redrawMode_WhenDirty);
+	setRedrawMode(RedrawMode::WhenDirty);
 	m_flagYUV = sl_false;
 	
 	m_programRGB = new RenderProgram2D_PositionTexture;
@@ -15,8 +17,8 @@ VideoView::VideoView()
 
 void VideoView::updateCurrentFrame(const VideoFrame* frame)
 {
-	ColorSpace colorSpace = frame->image.format.getColorSpace();
-	if (colorSpace != colorSpace_RGB && colorSpace != colorSpace_YUV) {
+	ColorSpace colorSpace = BitmapFormats::getColorSpace(frame->image.format);
+	if (colorSpace != ColorSpace::RGB && colorSpace != ColorSpace::YUV) {
 		return;
 	}
 	Ref<Texture> texture = m_textureFrame;
@@ -31,8 +33,8 @@ void VideoView::updateCurrentFrame(const VideoFrame* frame)
 	if (texture.isNotNull()) {
 		Ref<Image> image = Ref<Image>::from(texture->getSource());
 		BitmapData bitmapData(image->getWidth(), image->getHeight(), image->getColors());
-		if (frame->image.format.getColorSpace() == colorSpace_YUV) {
-			bitmapData.format = bitmapFormat_YUVA;
+		if (BitmapFormats::getColorSpace(frame->image.format) == ColorSpace::YUV) {
+			bitmapData.format = BitmapFormat::YUVA;
 			m_flagYUV = sl_true;
 		} else {
 			m_flagYUV = sl_false;
@@ -46,7 +48,7 @@ void VideoView::updateCurrentFrame(const VideoFrame* frame)
 
 void VideoView::onFrame(RenderEngine* engine)
 {
-	engine->clearColor(Color::black());
+	engine->clearColor(Color::Black);
 	if (m_flagYUV) {
 		engine->drawTexture2D(-1, -1, 2, 2, m_textureFrame, m_programYUV);
 	} else {

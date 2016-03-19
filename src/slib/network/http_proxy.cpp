@@ -49,10 +49,10 @@ sl_bool HttpProxy::preprocessRequest(HttpServiceContext* context)
 {
 	Ref<HttpServiceConnection> connection = context->getConnection();
 	if (connection.isNotNull()) {
-		String method = context->getMethod();
-		if (method.toUpper() == SLIB_HTTP_METHOD_CONNECT) {
+		HttpMethod method = context->getMethod();
+		if (method == HttpMethod::CONNECT) {
 			if (m_param.flagLogDebug) {
-				SLIB_LOG(SERVICE_TAG, "[" + String::fromPointerValue(connection.get()) + "] PROXY CONNECT - Host: " + context->getPath());
+				SLIB_LOG(SERVICE_TAG, "[" + String::fromPointerValue(connection.ptr) + "] PROXY CONNECT - Host: " + context->getPath());
 			}
 			Ref<AsyncLoop> loop = getAsyncLoop();
 			if (loop.isNotNull()) {
@@ -60,23 +60,20 @@ sl_bool HttpProxy::preprocessRequest(HttpServiceContext* context)
 			}
 			return sl_true;
 		}
-		SLIB_STATIC_STRING(schemaHttp, "http://");
-		SLIB_STATIC_STRING(schemaFtp, "ftp://");
 		sl_uint32 portProxy = 0;
 		sl_bool flagProxy = sl_false;
 		String path = context->getPath();
-		if (path.startsWith(schemaHttp)) {
+		if (path.startsWith("http://")) {
 			flagProxy = sl_true;
 			portProxy = 80;
-		} else if (path.startsWith(schemaFtp)) {
+		} else if (path.startsWith("ftp://")) {
 			flagProxy = sl_true;
 			portProxy = 21;
 		}
 		if (flagProxy) {
 			String host = context->getHost();
 			if (m_param.flagLogDebug) {
-				String method = context->getMethod();
-				SLIB_LOG(SERVICE_TAG, "[" + String::fromPointerValue(connection.get()) + "] PROXY " + method + " - Host: " + host);
+				SLIB_LOG(SERVICE_TAG, "[" + String::fromPointerValue(connection.ptr) + "] PROXY " + context->getMethodText() + " - Host: " + host);
 			}
 			Ref<AsyncLoop> loop = getAsyncLoop();
 			if (loop.isNotNull()) {
@@ -120,8 +117,8 @@ public:
 		}
 
 		WeakRef<_HttpProxy_ConnectContext> _this(this);
-		m_copyLocalToRemote = AsyncCopy::create(streamLocal.get(), streamRemote, SLIB_SIZE_MAX, _this, CONNECT_BUFFER_SIZE, CONNECT_BUFFER_COUNT, sl_false);
-		m_copyRemoteToLocal = AsyncCopy::create(streamRemote, streamLocal.get(), SLIB_SIZE_MAX, _this, CONNECT_BUFFER_SIZE, CONNECT_BUFFER_COUNT, sl_false);
+		m_copyLocalToRemote = AsyncCopy::create(streamLocal, streamRemote, SLIB_SIZE_MAX, _this, CONNECT_BUFFER_SIZE, CONNECT_BUFFER_COUNT, sl_false);
+		m_copyRemoteToLocal = AsyncCopy::create(streamRemote, streamLocal, SLIB_SIZE_MAX, _this, CONNECT_BUFFER_SIZE, CONNECT_BUFFER_COUNT, sl_false);
 		if (m_copyLocalToRemote.isNull() || m_copyRemoteToLocal.isNull()) {
 			connection->sendConnectResponse_Failed();
 			return;
@@ -159,10 +156,10 @@ void HttpProxy::_processConnect(Ref<HttpServiceContext> context)
 		return;
 	}
 	String host = context->getPath();
-	Ref<_HttpProxy_ConnectContext> connectContext = new _HttpProxy_ConnectContext(connection.get(), context->getRequestBody());
+	Ref<_HttpProxy_ConnectContext> connectContext = new _HttpProxy_ConnectContext(connection.ptr, context->getRequestBody());
 	if (connectContext.isNotNull()) {
-		if (connectTo(connection.get(), host, WeakRef<_HttpProxy_ConnectContext>(connectContext))) {
-			connection->setProxyObject(connectContext.get());
+		if (connectTo(connection.ptr, host, WeakRef<_HttpProxy_ConnectContext>(connectContext))) {
+			connection->setProxyObject(connectContext.ptr);
 			return;
 		}
 	}
@@ -207,13 +204,13 @@ public:
 		sl_int64 sizeRequest = m_context->getRequestContentLength();
 		sizeRequest -= m_context->getRequestBody().getSize();
 		if (sizeRequest > 0) {
-			m_copyLocalToRemote = AsyncCopy::create(streamLocal.get(), streamRemote, sizeRequest, _this, CONNECT_BUFFER_SIZE, CONNECT_BUFFER_COUNT, sl_false);
+			m_copyLocalToRemote = AsyncCopy::create(streamLocal, streamRemote, sizeRequest, _this, CONNECT_BUFFER_SIZE, CONNECT_BUFFER_COUNT, sl_false);
 			if (m_copyLocalToRemote.isNull()) {
 				connection->sendProxyResponse_Failed();
 				return;
 			}
 		}
-		m_copyRemoteToLocal = AsyncCopy::create(streamRemote, streamLocal.get(), SLIB_SIZE_MAX, _this, CONNECT_BUFFER_SIZE, CONNECT_BUFFER_COUNT, sl_false);
+		m_copyRemoteToLocal = AsyncCopy::create(streamRemote, streamLocal, SLIB_SIZE_MAX, _this, CONNECT_BUFFER_SIZE, CONNECT_BUFFER_COUNT, sl_false);
 		if (m_copyRemoteToLocal.isNull()) {
 			connection->sendProxyResponse_Failed();
 			return;
@@ -233,7 +230,7 @@ public:
 	// override
 	Memory onAsyncCopyRead(AsyncCopy* task, const Memory& input)
 	{
-		if (task == m_copyRemoteToLocal.get()) {
+		if (task == m_copyRemoteToLocal.ptr) {
 			if (m_sizeResponse == 0) {
 
 			} else if (task->getWrittenSize() >= m_sizeResponse) {
@@ -267,10 +264,10 @@ void HttpProxy::_processProxy(Ref<HttpServiceContext> context, String host, sl_u
 		host += ":";
 		host += port;
 	}
-	Ref<_HttpProxy_ProxyContext> proxyContext = new _HttpProxy_ProxyContext(connection.get(), context.get());
+	Ref<_HttpProxy_ProxyContext> proxyContext = new _HttpProxy_ProxyContext(connection.ptr, context.ptr);
 	if (proxyContext.isNotNull()) {
-		if (connectTo(connection.get(), host, WeakRef<_HttpProxy_ProxyContext>(proxyContext))) {
-			connection->setProxyObject(proxyContext.get());
+		if (connectTo(connection.ptr, host, WeakRef<_HttpProxy_ProxyContext>(proxyContext))) {
+			connection->setProxyObject(proxyContext.ptr);
 			return;
 		}
 	}
@@ -301,7 +298,7 @@ public:
 		connection->setUserObject(Ref<Referable>::null());
 		PtrLocker<IHttpProxyConnectListener> listener(m_listener);
 		if (listener.isNotNull()) {
-			listener->onConnect(connection.get(), socket, flagError);
+			listener->onConnect(connection.ptr, socket, flagError);
 		}
 	}
 };
@@ -315,7 +312,7 @@ sl_bool HttpProxy::connectTo(HttpServiceConnection* connection, const String& ho
 		if (socket.isNotNull()) {
 			Ref<_HttpProxy_ConnectListener> listenerConnect = new _HttpProxy_ConnectListener(connection, listener);
 			if (socket->connect(address, listenerConnect)) {
-				connection->setUserObject(socket.get());
+				connection->setUserObject(socket.ptr);
 				return sl_true;
 			}
 		}

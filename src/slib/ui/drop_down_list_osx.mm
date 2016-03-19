@@ -23,7 +23,7 @@ public:
 	{
 		ObjectLocker lock(this);
 		sl_uint32 nOrig = (sl_uint32)([v numberOfItems]);
-		sl_uint32 nNew = (sl_uint32)(m_titles.count());
+		sl_uint32 nNew = (sl_uint32)(m_titles.getCount());
 		if (nOrig == nNew) {
 			return;
 		}
@@ -54,7 +54,7 @@ public:
 	{
 		[v removeAllItems];
 		__applyItemsCount(v);
-		if (m_indexSelected >= m_titles.count()) {
+		if (m_indexSelected >= m_titles.getCount()) {
 			m_indexSelected = 0;
 		}
 		if ([v numberOfItems] > 0) {
@@ -95,7 +95,7 @@ Ref<ViewInstance> DropDownList::createInstance(ViewInstance* _parent)
 		
 		Ref<Font> font = m_font;
 		Ref<FontInstance> fontInstance;
-		NSFont* hFont = UIPlatform::getNSFont(font.get(), fontInstance);
+		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
@@ -157,7 +157,7 @@ void DropDownList::setFont(const Ref<Font>& font)
 	if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
 		NSPopUpButton* v = (NSPopUpButton*)handle;
 		Ref<FontInstance> fontInstance;
-		NSFont* hFont = UIPlatform::getNSFont(font.get(), fontInstance);
+		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
 		if (hFont != nil) {
 			[v setFont:hFont];
 		}
@@ -183,8 +183,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::DropDownList::checkInstance(view)) {
-			((slib::_DropDownList*)(view.get()))->__onSelectItem(self);
+		if (slib::DropDownList::checkInstance(view.ptr)) {
+			((slib::_DropDownList*)(view.ptr))->__onSelectItem(self);
 		}
 	}
 }

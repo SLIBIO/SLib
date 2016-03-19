@@ -8,6 +8,7 @@
 #include "java.h"
 
 SLIB_NAMESPACE_BEGIN
+
 class SLIB_EXPORT Android
 {
 public:
@@ -29,6 +30,7 @@ public:
 	static Memory readAllBytesFromAsset(const String& path);
 	
 };
+
 SLIB_NAMESPACE_END
 
 #endif

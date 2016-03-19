@@ -51,7 +51,7 @@ public:
 	{
 		ListLocker<TabViewItem> items(m_items);
 		__applyTabsCount(tv);
-		for (sl_uint32 i = 0; i < items.count(); i++) {
+		for (sl_uint32 i = 0; i < items.count; i++) {
 			NSTabViewItem* t = [tv tabViewItemAtIndex:i];
 			if (t != nil) {
 				[t setLabel:Apple::getNSStringFromString(items[i].label)];
@@ -73,7 +73,7 @@ public:
 		if (view.isNotNull()) {
 			Ref<ViewInstance> instance = view->attachToNewInstance(Ref<ViewInstance>::null());
 			if (instance.isNotNull()) {
-				handle = UIPlatform::getViewHandle(instance.get());
+				handle = UIPlatform::getViewHandle(instance.ptr);
 			}
 			NSRect rc = [tv contentRect];
 			view->setFrame((sl_real)(rc.origin.x), (sl_real)(rc.origin.y), (sl_real)(rc.size.width), (sl_real)(rc.size.height));
@@ -100,7 +100,7 @@ public:
 		frame.right = frame.left + w;
 		frame.bottom = frame.top + h;
 		ListLocker<TabViewItem> items(m_items);
-		for (sl_size i = 0; i < items.count(); i++) {
+		for (sl_size i = 0; i < items.count; i++) {
 			Ref<View> view = items[i].contentView;
 			if (view.isNotNull()) {
 				view->setFrame(frame);
@@ -120,7 +120,7 @@ Ref<ViewInstance> TabView::createInstance(ViewInstance* _parent)
 		
 		Ref<Font> font = m_font;
 		Ref<FontInstance> fontInstance;
-		NSFont* hFont = UIPlatform::getNSFont(font.get(), fontInstance);
+		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
 		[handle setFont:hFont];
 	}
 	OSX_VIEW_CREATE_INSTANCE_END
@@ -196,7 +196,7 @@ void TabView::setFont(const Ref<Font>& font)
 	if (handle != nil && [handle isKindOfClass:[NSTabView class]]) {
 		NSTabView* tv = (NSTabView*)handle;
 		Ref<FontInstance> fontInstance;
-		NSFont* hFont = UIPlatform::getNSFont(font.get(), fontInstance);
+		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
 		[tv setFont:hFont];
 	}
 	m_font = font;
@@ -224,8 +224,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::TabView::checkInstance(view)) {
-			((slib::_TabView*)(view.get()))->__updateContentViewSize(self);
+		if (slib::TabView::checkInstance(view.ptr)) {
+			((slib::_TabView*)(view.ptr))->__updateContentViewSize(self);
 		}
 	}
 }
@@ -235,8 +235,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::TabView::checkInstance(view)) {
-			((slib::_TabView*)(view.get()))->__onSelectTab(self);
+		if (slib::TabView::checkInstance(view.ptr)) {
+			((slib::_TabView*)(view.ptr))->__onSelectTab(self);
 		}
 	}
 }

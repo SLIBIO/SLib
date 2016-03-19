@@ -12,7 +12,7 @@ class RenderBaseObject;
 
 class SLIB_EXPORT RenderBaseObjectInstance : public Object
 {
-	SLIB_DECLARE_OBJECT(RenderBaseObjectInstance, Object)
+	SLIB_DECLARE_OBJECT
 
 public:
 	void linkObject(RenderEngine* engine, RenderBaseObject* object);
@@ -29,9 +29,11 @@ protected:
 
 class SLIB_EXPORT RenderBaseObject : public Object
 {
-	SLIB_DECLARE_OBJECT(RenderBaseObject, Object)
+	SLIB_DECLARE_OBJECT
+	
 protected:
 	RenderBaseObject();
+	
 	~RenderBaseObject();
 
 public:

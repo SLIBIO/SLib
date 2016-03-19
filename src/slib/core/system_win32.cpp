@@ -66,13 +66,13 @@ void* System::createGlobalUniqueInstance(const String& _name)
 	SLIB_STATIC_STRING16(g, "Global\\");
 	name = g + File::makeSafeFileName(name);
 
-	HANDLE hMutex = ::OpenMutexW(MUTEX_ALL_ACCESS, FALSE, (LPCWSTR)(name.getBuf()));
+	HANDLE hMutex = ::OpenMutexW(MUTEX_ALL_ACCESS, FALSE, (LPCWSTR)(name.getData()));
 	if (hMutex != NULL)
 	{
 		::CloseHandle(hMutex);
 		return sl_null;
 	}
-	hMutex = ::CreateMutexW(NULL, FALSE, (LPCWSTR)(name.getBuf()));
+	hMutex = ::CreateMutexW(NULL, FALSE, (LPCWSTR)(name.getData()));
 	if (hMutex) {
 		return (void*)(hMutex);
 	} else {
@@ -122,8 +122,8 @@ sl_bool System::createProcess(const String& _pathExecutable, const String* comma
 
 	PROCESS_INFORMATION pi;
 	ZeroMemory(&pi, sizeof(pi));
-	BOOL bRet = CreateProcessW((LPCWSTR)(pathExecutable.getBuf())
-		, (LPWSTR)(cmd.getBuf())
+	BOOL bRet = CreateProcessW((LPCWSTR)(pathExecutable.getData())
+		, (LPWSTR)(cmd.getData())
 		, NULL, NULL, FALSE
 		, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi);
 	if (bRet) {
@@ -155,15 +155,15 @@ void System::abort(const String& _msg, const String& _file, sl_uint32 line)
 #if defined(SLIB_DEBUG)
 	String16 msg = _msg;
 	String16 file = _file;
-	_wassert((wchar_t*)(msg.getBuf()), (wchar_t*)(file.getBuf()), line);
+	_wassert((wchar_t*)(msg.getData()), (wchar_t*)(file.getData()), line);
 #endif
 }
 
 void Console::print(const String& _s)
 {
 	String16 s = _s;
-	wprintf(L"%s", s.getBuf());
-	OutputDebugStringW((LPCWSTR)s.getBuf());
+	wprintf(L"%s", s.getData());
+	OutputDebugStringW((LPCWSTR)s.getData());
 }
 
 #if defined(SLIB_PLATFORM_IS_WIN32)

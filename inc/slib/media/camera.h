@@ -16,6 +16,7 @@ public:
 
 public:
 	CameraInfo();
+	
 };
 
 class SLIB_EXPORT CameraParam : public VideoCaptureParam
@@ -44,10 +45,11 @@ public:
 
 class SLIB_EXPORT Camera : public VideoCapture
 {
-	SLIB_DECLARE_OBJECT(Camera, VideoCapture)
+	SLIB_DECLARE_OBJECT
 	
 public:
 	static Ref<Camera> create(const CameraParam& param);
+	
 	static List<CameraInfo> getCamerasList();
 	
 };

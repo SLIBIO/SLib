@@ -17,7 +17,7 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class _Gdiplus_ImageDrawable : public Drawable
 {
-	SLIB_DECLARE_OBJECT(_Gdiplus_ImageDrawable, Drawable)
+	SLIB_DECLARE_OBJECT
 public:
 	Gdiplus::Image* m_image;
 	sl_bool m_flagFreeOnRelease;
@@ -81,6 +81,8 @@ public:
     
 };
 
+SLIB_DEFINE_OBJECT(_Gdiplus_ImageDrawable, Drawable)
+
 Ref<Drawable> UIPlatform::createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease, const Referable* ref)
 {
 	return _Gdiplus_ImageDrawable::create(image, flagFreeOnRelease, ref);
@@ -116,7 +118,7 @@ Ref<Drawable> UI::loadDrawableFromMemory(const void* buf, sl_size size)
 
 class _Gdiplus_Bitmap : public Bitmap
 {
-	SLIB_DECLARE_OBJECT(_Gdiplus_Bitmap, Bitmap)
+	SLIB_DECLARE_OBJECT
 public:
 	Gdiplus::Bitmap* m_bitmap;
 
@@ -209,7 +211,7 @@ public:
 		Gdiplus::Rect rc(x, y, width, height);
 		Gdiplus::Status result;
 
-		if (dst.format.getBitsPerSample() == 32 && dst.format.getPlanesCount() == 1) {
+		if (BitmapFormats::getBitsPerSample(dst.format) == 32 && BitmapFormats::getPlanesCount(dst.format) == 1) {
 
 			Gdiplus::BitmapData data;
 			data.Width = width;
@@ -219,7 +221,7 @@ public:
 			data.PixelFormat = PixelFormat32bppARGB;
 
 			BitmapData src(dst);
-			src.format = bitmapFormat_BGRA;
+			src.format = BitmapFormat::BGRA;
 
 			result = m_bitmap->LockBits(&rc, Gdiplus::ImageLockModeRead | Gdiplus::ImageLockModeUserInputBuf, PixelFormat32bppARGB, &data);
 			if (result == Gdiplus::Ok) {
@@ -248,7 +250,7 @@ public:
 			if (result == Gdiplus::Ok) {
 
 				BitmapData src(width, height, buf);
-				src.format = bitmapFormat_BGRA;
+				src.format = BitmapFormat::BGRA;
 				dst.copyPixelsFrom(src);
 
 				m_bitmap->UnlockBits(&data);
@@ -288,7 +290,7 @@ public:
 		Gdiplus::Rect rc(x, y, width, height);
 		Gdiplus::Status result;
 
-		if (src.format == bitmapFormat_BGRA) {
+		if (src.format == BitmapFormat::BGRA) {
 
 			Gdiplus::BitmapData data;
 			data.Width = width;
@@ -322,7 +324,7 @@ public:
 			if (result == Gdiplus::Ok) {
 
 				BitmapData dst(width, height, buf);
-				dst.format = bitmapFormat_BGRA;
+				dst.format = BitmapFormat::BGRA;
 				dst.copyPixelsFrom(src);
 
 				m_bitmap->UnlockBits(&data);
@@ -398,6 +400,8 @@ public:
 			, Gdiplus::UnitPixel);
 	}
 };
+
+SLIB_DEFINE_OBJECT(_Gdiplus_Bitmap, Bitmap)
 
 Ref<Bitmap> UI::createBitmap(sl_uint32 width, sl_uint32 height)
 {

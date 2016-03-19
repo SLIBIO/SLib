@@ -32,7 +32,8 @@ public:
 
 class SLIB_EXPORT TabView : public View
 {
-	SLIB_DECLARE_OBJECT(TabView, View)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	TabView();
 	

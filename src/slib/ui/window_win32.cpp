@@ -139,7 +139,7 @@ public:
 			hWnd = ::CreateWindowExW(
 				styleEx // ex-style
 				, (LPCWSTR)((LONG_PTR)(ui->wndClass))
-				, (LPCWSTR)(title.getBuf())
+				, (LPCWSTR)(title.getData())
 				, style
 				, (int)(frameWindow.left), (int)(frameWindow.top)
 				, (int)(frameWindow.getWidth()), (int)(frameWindow.getHeight())
@@ -196,7 +196,7 @@ public:
 		HWND hWnd = m_handle;
 		if (hWnd) {
 			if (window.isNotNull()) {
-				_Win32_Window* w = (_Win32_Window*)(window.get());
+				_Win32_Window* w = (_Win32_Window*)(window.ptr);
 				HWND hWndParent = w->m_handle;
 				if (hWndParent) {
 					::SetWindowLongPtr(hWnd, GWLP_HWNDPARENT, (LONG_PTR)hWndParent);
@@ -806,7 +806,7 @@ public:
 LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	Ref<WindowInstance> _window = UIPlatform::getWindowInstance(hWnd);
-	_Win32_Window* window = (_Win32_Window*)(_window.get());
+	_Win32_Window* window = (_Win32_Window*)(_window.ptr);
 	if (window && window->m_handle) {
 		switch (uMsg) {
 		case WM_CLOSE:
@@ -955,7 +955,7 @@ Ref<WindowInstance> UIPlatform::createWindowInstance(HWND hWnd, sl_bool flagDest
 	}
 	ret = _Win32_Window::create(hWnd, flagDestroyOnRelease);
 	if (ret.isNotNull()) {
-		UIPlatform::_registerWindowInstance((void*)hWnd, ret.get());
+		UIPlatform::_registerWindowInstance((void*)hWnd, ret.ptr);
 	}
 	return ret;
 }

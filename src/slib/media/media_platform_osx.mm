@@ -145,7 +145,7 @@ sl_bool OSX_AudioDeviceInfo::selectDevice(sl_bool flagInput, String uid)
 		return getDefaultDevice(flagInput);
 	} else {
 		ListItems<OSX_AudioDeviceInfo> list(getAllDevices(flagInput));
-		for (sl_size i = 0; i < list.count(); i++) {
+		for (sl_size i = 0; i < list.count; i++) {
 			OSX_AudioDeviceInfo& element = list[i];
 			if (element.uid == uid) {
 				*this = element;

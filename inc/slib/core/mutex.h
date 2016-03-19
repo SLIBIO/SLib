@@ -8,20 +8,11 @@ SLIB_NAMESPACE_BEGIN
 class SLIB_EXPORT Mutex
 {
 public:
-	SLIB_INLINE Mutex()
-	{
-		_init();
-	}
+	Mutex();
 	
-	SLIB_INLINE Mutex(const Mutex& other)
-	{
-		_init();
-	}
+	Mutex(const Mutex& other);
 	
-	SLIB_INLINE ~Mutex()
-	{
-		_free();
-	}
+	~Mutex();
 
 public:
 	sl_bool tryLock() const;
@@ -31,10 +22,7 @@ public:
 	void unlock() const;
 	
 public:
-	SLIB_INLINE Mutex& operator=(const Mutex& other)
-	{
-		return *this;
-	}
+	Mutex& operator=(const Mutex& other);
 
 private:
 	void* m_pObject;
@@ -51,45 +39,19 @@ private:
 class SLIB_EXPORT MutexLocker
 {
 public:
-	SLIB_INLINE MutexLocker()
-	{
-		init();
-	}
+	MutexLocker();
 
-	SLIB_INLINE ~MutexLocker()
-	{
-		unlock();
-	}
+	~MutexLocker();
 
-	SLIB_INLINE MutexLocker(const Mutex* mutex)
-	{
-		init();
-		lock(mutex);
-	}
+	MutexLocker(const Mutex* mutex);
 
-	SLIB_INLINE MutexLocker(const Mutex* mutex1, const Mutex* mutex2)
-	{
-		init();
-		lock(mutex1, mutex2);
-	}
+	MutexLocker(const Mutex* mutex1, const Mutex* mutex2);
+	
+	MutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3);
 
-	SLIB_INLINE MutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3)
-	{
-		init();
-		lock(mutex1, mutex2, mutex3);
-	}
+	MutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3, const Mutex* mutex4);
 
-	SLIB_INLINE MutexLocker(const Mutex* mutex1, const Mutex* mutex2, const Mutex* mutex3, const Mutex* mutex4)
-	{
-		init();
-		lock(mutex1, mutex2, mutex3, mutex4);
-	}
-
-	SLIB_INLINE MutexLocker(Mutex const* const* mutex_array, sl_size count)
-	{
-		init();
-		lock(mutex_array, count);
-	}
+	MutexLocker(Mutex const* const* mutex_array, sl_size count);
 
 public:
 	void lock(const Mutex* mutex);
@@ -104,12 +66,6 @@ public:
 
 	
 	void unlock();
-
-private:
-	SLIB_INLINE void init()
-	{
-		m_count = 0;
-	}
 	
 private:
 	sl_size m_count;

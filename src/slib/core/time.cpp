@@ -555,7 +555,7 @@ void Time::parseTime(const String& date, int* out)
 {
 	Base::resetMemory(out, 0, 6 * sizeof(int));
 
-	const sl_char8* ch = date.getBuf();
+	const sl_char8* ch = date.getData();
 	sl_uint32 len = date.getLength();
 
 	sl_uint32 index = 0;
@@ -587,6 +587,12 @@ String Time::toString() const
 	SLIB_STATIC_STRING(FMT, "%Y-%M-%D %H:%I:%S");
 	return format(FMT);
 }
+
+Time Time::parse(const String& str)
+{
+	return str;
+}
+
 SLIB_NAMESPACE_END
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)

@@ -21,7 +21,7 @@ sl_bool Windows::getGUIDFromString(const String& _str, GUID* pguid)
 {
 	String16 str = _str;
 	CLSID clsid;
-	HRESULT hr = ::CLSIDFromString((LPWSTR)(str.getBuf()), &clsid);
+	HRESULT hr = ::CLSIDFromString((LPWSTR)(str.getData()), &clsid);
 	if (hr == NOERROR) {
 		if (pguid) {
 			*pguid = clsid;
@@ -87,7 +87,7 @@ void Windows::setWindowText(HWND hWnd, const String& _str)
 {
 	if (hWnd) {
 		String16 str = _str;
-		::SetWindowTextW(hWnd, (LPCWSTR)(str.getBuf()));
+		::SetWindowTextW(hWnd, (LPCWSTR)(str.getData()));
 	}
 }
 
@@ -258,7 +258,7 @@ HMODULE Windows::loadLibrary(const String& _path)
 {
 	String16 path = _path;
 	if (path.isNotEmpty()) {
-		return ::LoadLibraryW((LPCWSTR)(path.getBuf()));
+		return ::LoadLibraryW((LPCWSTR)(path.getData()));
 	} else {
 		return 0;
 	}

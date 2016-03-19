@@ -6,7 +6,6 @@
 #include "socket_address.h"
 #include "async.h"
 
-#include "../core/mio.h"
 #include "../core/string.h"
 #include "../crypto/aes.h"
 
@@ -109,236 +108,144 @@
 
 SLIB_NETWORK_NAMESPACE_BEGIN
     
-enum DnsOpcode
+enum class DnsOpcode
 {
-    dnsOpcode_Query = 0,
-    dnsOpcode_InverseQuery = 1,
-    dnsOpcode_ServerStatusRequest = 2
+	Query = 0,
+	InverseQuery = 1,
+	ServerStatusRequest = 2
 };
 
-enum DnsResponseCode
+enum class DnsResponseCode
 {
-    dnsResponseCode_NoError = 0,
-    dnsResponseCode_FormatError = 1, // The name server was unable to interpret the query
-    dnsResponseCode_ServerFailure = 2, // The name server was unable to process this query due to a problem with the name server
-    dnsResponseCode_NameError = 3, // Meaningful only for responses from an authoritative name server, this code signifies that the domain name referenced in the query does not exist
-    dnsResponseCode_NotImplemented = 4, // The name server does not support the requested kind of query
-    dnsResponseCode_Refused = 5 // The name server refuses to perform the specified operation for policy reasons
+	NoError = 0,
+	FormatError = 1, // The name server was unable to interpret the query
+	ServerFailure = 2, // The name server was unable to process this query due to a problem with the name server
+	NameError = 3, // Meaningful only for responses from an authoritative name server, this code signifies that the domain name referenced in the query does not exist
+	NotImplemented = 4, // The name server does not support the requested kind of query
+	Refused = 5 // The name server refuses to perform the specified operation for policy reasons
 };
 
-enum DnsRecordType
+enum class DnsRecordType
 {
-    dnsRecordType_A = 1, // a host address (IPv4)
-    dnsRecordType_NS = 2, // an authoritative name server
-    dnsRecordType_MD = 3, // a mail destination (Obsolete - use MX)
-    dnsRecordType_MF = 4, // a mail forwarder (Obsolete - use MX)
-    dnsRecordType_CNAME = 5, // the canonical name for an alias
-    dnsRecordType_SOA = 6, // marks the start of a zone of authority
-    dnsRecordType_MB = 7, // a mailbox domain name (EXPERIMENTAL)
-    dnsRecordType_MG = 8, // a mail group member (EXPERIMENTAL)
-    dnsRecordType_MR = 9, // a mail rename domain name (EXPERIMENTAL)
-    dnsRecordType_NULL = 10, // a null RR (EXPERIMENTAL)
-    dnsRecordType_WKS = 11, // a well known service description
-    dnsRecordType_PTR = 12, // a domain name pointer
-    dnsRecordType_HINFO = 13, // host information
-    dnsRecordType_MINFO = 14, // mailbox or mail list information
-    dnsRecordType_MX = 15, // mail exchange
-    dnsRecordType_TXT = 16, // text strings
-	dnsRecordType_AAAA = 28, // a host address (IPv6)
-    dnsRecordType_Question_AXFR = 252, // A request for a transfer of an entire zone
-    dnsRecordType_Question_MAILB = 253, // A request for mailbox-related records (MB, MG or MR)
-    dnsRecordType_Question_MAILA = 254, // A request for mail agent RRs (Obsolete - see MX)
-    dnsRecordType_Question_ALL = 255 // A request for all records
+	None = 0,
+	A = 1, // a host address (IPv4)
+	NS = 2, // an authoritative name server
+	MD = 3, // a mail destination (Obsolete - use MX)
+	MF = 4, // a mail forwarder (Obsolete - use MX)
+	CNAME = 5, // the canonical name for an alias
+	SOA = 6, // marks the start of a zone of authority
+	MB = 7, // a mailbox domain name (EXPERIMENTAL)
+	MG = 8, // a mail group member (EXPERIMENTAL)
+	MR = 9, // a mail rename domain name (EXPERIMENTAL)
+	Null = 10, // a null RR (EXPERIMENTAL)
+	WKS = 11, // a well known service description
+	PTR = 12, // a domain name pointer
+	HINFO = 13, // host information
+	MINFO = 14, // mailbox or mail list information
+	MX = 15, // mail exchange
+	TXT = 16, // text strings
+	AAAA = 28, // a host address (IPv6)
+	Question_AXFR = 252, // A request for a transfer of an entire zone
+	Question_MAILB = 253, // A request for mailbox-related records (MB, MG or MR)
+	Question_MAILA = 254, // A request for mail agent RRs (Obsolete - see MX)
+	Question_ALL = 255 // A request for all records
 };
 
-enum DnsClass
+#ifdef IN
+#undef IN
+#endif
+
+enum class DnsClass
 {
-    dnsClass_IN = 1, // the Internet
-    dnsClass_CS = 2, // the CSNET class (Obsolete - used only for examples in some obsolete RFCs)
-    dnsClass_CH = 3, // the CHAOS class
-    dnsClass_HS = 4, // Hesiod [Dyer 87]
-    dnsClass_Question_ANY = 255 // any class
+	IN = 1, // the Internet
+	CS = 2, // the CSNET class (Obsolete - used only for examples in some obsolete RFCs)
+	CH = 3, // the CHAOS class
+	HS = 4, // Hesiod [Dyer 87]
+	Question_ANY = 255 // any class
 };
 
-class SLIB_EXPORT DnsHeaderFormat
+class SLIB_EXPORT DnsHeader
 {
 public:
-	SLIB_INLINE sl_uint16 getId() const
-	{
-		return MIO::readUint16BE(_id);
-	}
+	sl_uint16 getId() const;
 	
-	SLIB_INLINE void setId(sl_uint16 id)
-	{
-		MIO::writeUint16BE(_id, id);
-	}
+	void setId(sl_uint16 id);
 
-	
-	SLIB_INLINE sl_bool isQuestion() const
-	{
-		return (_flags[0] & 0x80) == 0;
-	}
+	sl_bool isQuestion() const;
 
-	SLIB_INLINE void setQuestion(sl_bool flag)
-	{
-		_flags[0] = (sl_uint8)((_flags[0] & 0x7F) | (flag ? 0 : 0x80));
-	}
-
+	void setQuestion(sl_bool flag);
 	
 	// 4 bits
-	SLIB_INLINE DnsOpcode getOpcode() const
-	{
-		return (DnsOpcode)((_flags[0] >> 3) & 0x0F);
-	}
+	DnsOpcode getOpcode() const;
 	
 	// 4 bits
-	SLIB_INLINE void setOpcode(DnsOpcode opcode)
-	{
-		_flags[0] = (sl_uint8)((_flags[0] & 0x87) | (((opcode & 0x0F) << 1)));
-	}
-
+	void setOpcode(DnsOpcode opcode);
 	
 	// Authoritative Answer (only valid in Response)
-	SLIB_INLINE sl_bool isAA() const
-	{
-		return (_flags[0] & 0x04) != 0;
-	}
+	sl_bool isAA() const;
 	
 	// Authoritative Answer (only valid in Response)
-	SLIB_INLINE void setAA(sl_bool flag)
-	{
-		_flags[0] = (sl_uint8)((_flags[0] & 0xFB) | (flag ? 0x04 : 0));
-	}
-
+	void setAA(sl_bool flag);
 	
 	// TrunCation: this message was truncated due to length greater than that permitted on the transmission channel
-	SLIB_INLINE sl_bool isTC() const
-	{
-		return (_flags[0] & 0x02) != 0;
-	}
+	sl_bool isTC() const;
 	
 	// TrunCation: this message was truncated due to length greater than that permitted on the transmission channel
-	SLIB_INLINE void setTC(sl_bool flag)
-	{
-		_flags[0] = (sl_uint8)((_flags[0] & 0xFD) | (flag ? 0x02 : 0));
-	}
-
+	void setTC(sl_bool flag);
 	
 	// Recursion Desired: it directs the name server to pursue the query recursively
-	SLIB_INLINE sl_bool isRD() const
-	{
-		return (_flags[0] & 0x01) != 0;
-	}
+	sl_bool isRD() const;
 	
 	// Recursion Desired: it directs the name server to pursue the query recursively
-	SLIB_INLINE void setRD(sl_bool flag)
-	{
-		_flags[0] = (sl_uint8)((_flags[0] & 0xFE) | (flag ? 0x01 : 0));
-	}
+	void setRD(sl_bool flag);
 
+	// Recursion Available: denotes whether recursive query support is available in the name server (valid in response)
+	sl_bool isRA() const;
 	
 	// Recursion Available: denotes whether recursive query support is available in the name server (valid in response)
-	SLIB_INLINE sl_bool isRA() const
-	{
-		return (_flags[1] & 0x80) != 0;
-	}
-	
-	// Recursion Available: denotes whether recursive query support is available in the name server (valid in response)
-	SLIB_INLINE void setRA(sl_bool flag)
-	{
-		_flags[1] = (sl_uint8)((_flags[1] & 0x7F) | (flag ? 0x80 : 0));
-	}
-
+	void setRA(sl_bool flag);
 	
 	// Authentic Data: all the data included in the answer and authority portion of the response has been authenticated by the server (valid in response)
-	SLIB_INLINE sl_bool isAD() const
-	{
-		return (_flags[1] & 0x20) != 0;
-	}
+	sl_bool isAD() const;
 	
 	// Authentic Data: all the data included in the answer and authority portion of the response has been authenticated by the server (valid in response)
-	SLIB_INLINE void setAD(sl_bool flag)
-	{
-		_flags[1] = (sl_uint8)((_flags[1] & 0xDF) | (flag ? 0x20 : 0));
-	}
-
+	void setAD(sl_bool flag);
 	
 	// Checking Disabled: Pending (non-authenticated) data is acceptable to the resolver sending the query
-	SLIB_INLINE sl_bool isCD() const
-	{
-		return (_flags[1] & 0x10) != 0;
-	}
+	sl_bool isCD() const;
 	
 	// Checking Disabled: Pending (non-authenticated) data is acceptable to the resolver sending the query
-	SLIB_INLINE void setCD(sl_bool flag)
-	{
-		_flags[1] = (sl_uint8)((_flags[1] & 0xEF) | (flag ? 0x10 : 0));
-	}
-
+	void setCD(sl_bool flag);
 	
 	// 4 bits
-	SLIB_INLINE DnsResponseCode getResponseCode() const
-	{
-		return (DnsResponseCode)(_flags[1] & 0x0F);
-	}
+	DnsResponseCode getResponseCode() const;
 	
 	// 4 bits
-	SLIB_INLINE void setResponseCode(DnsResponseCode code)
-	{
-		_flags[1] = (sl_uint8)((_flags[1] & 0xF0) | (code & 0x0F));
-	}
-
+	void setResponseCode(DnsResponseCode code);
 	
 	// QDCOUNT
-	SLIB_INLINE sl_uint16 getQuestionsCount() const
-	{
-		return MIO::readUint16BE(_totalQuestions);
-	}
+	sl_uint16 getQuestionsCount() const;
 	
 	// QDCOUNT
-	SLIB_INLINE void setQuestionsCount(sl_uint16 count)
-	{
-		MIO::writeUint16BE(_totalQuestions, count);
-	}
-
+	void setQuestionsCount(sl_uint16 count);
 	
 	// ANCOUNT
-	SLIB_INLINE sl_uint16 getAnswersCount() const
-	{
-		return MIO::readUint16BE(_totalAnswers);
-	}
+	sl_uint16 getAnswersCount() const;
 	
 	// ANCOUNT
-	SLIB_INLINE void setAnswersCount(sl_uint16 count)
-	{
-		MIO::writeUint16BE(_totalAnswers, count);
-	}
+	void setAnswersCount(sl_uint16 count);
 
+	// NSCOUNT
+	sl_uint16 getAuthoritiesCount() const;
 	
 	// NSCOUNT
-	SLIB_INLINE sl_uint16 getAuthoritiesCount() const
-	{
-		return MIO::readUint16BE(_totalAuthorities);
-	}
-	
-	// NSCOUNT
-	SLIB_INLINE void setAuthoritiesCount(sl_uint16 count)
-	{
-		MIO::writeUint16BE(_totalAuthorities, count);
-	}
-
+	void setAuthoritiesCount(sl_uint16 count);
 	
 	// ARCOUNT
-	SLIB_INLINE sl_uint16 getAdditionalsCount() const
-	{
-		return MIO::readUint16BE(_totalAdditionals);
-	}
+	sl_uint16 getAdditionalsCount() const;
 	
 	// ARCOUNT
-	SLIB_INLINE void setAdditionalsCount(sl_uint16 count)
-	{
-		MIO::writeUint16BE(_totalAdditionals, count);
-	}
+	void setAdditionalsCount(sl_uint16 count);
 	
 private:
 	sl_uint8 _id[2];
@@ -347,6 +254,7 @@ private:
 	sl_uint8 _totalAnswers[2]; // ANCOUNT
 	sl_uint8 _totalAuthorities[2]; // NSCOUNT
 	sl_uint8 _totalAdditionals[2];  // ARCOUNT
+	
 };
 
 class SLIB_EXPORT DnsRecord
@@ -355,48 +263,32 @@ public:
 	DnsRecord();
 
 public:
-	SLIB_INLINE const String& getName() const
-	{
-		return _name;
-	}
+	const String& getName() const;
 	
-	SLIB_INLINE void setName(const String& name)
-	{
-		_name = name;
-	}
-
+	void setName(const String& name);
 	
-	SLIB_INLINE DnsRecordType getType() const
-	{
-		return (DnsRecordType)_type;
-	}
+	DnsRecordType getType() const;
 	
-	SLIB_INLINE void setType(DnsRecordType type)
-	{
-		_type = (sl_uint16)type;
-	}
-
+	void setType(DnsRecordType type);
 	
-	SLIB_INLINE DnsClass getClass() const
-	{
-		return (DnsClass)(_class);
-	}
+	DnsClass getClass() const;
 	
-	SLIB_INLINE void setClass(DnsClass cls)
-	{
-		_class = cls;
-	}
+	void setClass(DnsClass cls);
 
 protected:
 	static sl_uint32 _parseName(String& nameOut, const void* buf, sl_uint32 offset, sl_uint32 sizeName);
+	
 	static sl_uint32 _buildName(const String& nameIn, void* buf, sl_uint32 offset, sl_uint32 sizeName);
+	
 	sl_uint32 _parseHeader(const void* buf, sl_uint32 offset, sl_uint32 size);
+	
 	sl_uint32 _buildHeader(void* buf, sl_uint32 offset, sl_uint32 size);
 
 private:
 	String _name;
-	sl_uint16 _type;
-	sl_uint16 _class;
+	DnsRecordType _type;
+	DnsClass _class;
+	
 };
 
 class SLIB_EXPORT DnsQuestionRecord : public DnsRecord
@@ -414,39 +306,23 @@ public:
 	DnsResponseRecord();
 	
 public:
-	SLIB_INLINE sl_uint32 getTTL() const
-	{
-		return _TTL;
-	}
+	sl_uint32 getTTL() const;
 	
-	SLIB_INLINE void setTTL(sl_uint32 TTL)
-	{
-		_TTL = TTL;
-	}
+	void setTTL(sl_uint32 TTL);
 	
-	
-	SLIB_INLINE sl_uint16 getDataLength() const
-	{
-		return _dataLength;
-	}
+	sl_uint16 getDataLength() const;
 
-	SLIB_INLINE sl_uint16 getDataOffset() const
-	{
-		return _dataOffset;
-	}
+	sl_uint16 getDataOffset() const;
 
-public:
 	sl_uint32 parseRecord(const void* buf, sl_uint32 offset, sl_uint32 size);
 	
 	sl_uint32 buildRecord(void* buf, sl_uint32 offset, sl_uint32 size, const void* data, sl_uint16 sizeData);
 	
-
 	// A 32 bit Internet address
 	IPv4Address parseData_A() const;
 	
 	//A 32 bit Internet address
 	sl_uint32 buildRecord_A(void* buf, sl_uint32 offset, sl_uint32 size, const IPv4Address& addr);
-
 	
 	// A <domain-name> which specifies the canonical or primary	name for the owner. The owner name is an alias
 	String parseData_CNAME() const;
@@ -454,13 +330,11 @@ public:
 	// A <domain-name> which specifies the canonical or primary	name for the owner. The owner name is an alias
 	sl_uint32 buildRecord_CNAME(void* buf, sl_uint32 offset, sl_uint32 size, const String& cname);
 
-	
 	// A <domain-name> which specifies a host which should be authoritative for the specified class and domain
 	String parseData_NS() const;
 	
 	// A <domain-name> which specifies a host which should be authoritative for the specified class and domain
 	sl_uint32 buildRecord_NS(void* buf, sl_uint32 offset, sl_uint32 size, const String& nameServer);
-	
 	
 	// A 128 bit Internet address
 	IPv6Address parseData_AAAA() const;
@@ -468,13 +342,11 @@ public:
 	//A 128 bit Internet address
 	sl_uint32 buildRecord_AAAA(void* buf, sl_uint32 offset, sl_uint32 size, const IPv6Address& addr);
 	
-	
 	//  A <domain-name> which specifies a host which should be authoritative for the specified class and domain.
 	String parseData_PTR() const;
 	
 	// A <domain-name> which specifies a host which should be authoritative for the specified class and domain.
 	sl_uint32 buildRecord_PTR(void* buf, sl_uint32 offset, sl_uint32 size, const String& dname);
-	
 	
 	String toString() const;
 
@@ -484,6 +356,7 @@ private:
 	sl_uint16 _dataOffset;
 	const sl_uint8* _message;
 	sl_uint32 _messageLength;
+	
 };
 
 class SLIB_EXPORT DnsPacket
@@ -549,6 +422,7 @@ class SLIB_EXPORT DnsClientParam
 {
 public:
 	Ptr<IDnsClientListener> listener;
+	
 };
 
 class SLIB_EXPORT DnsClient : public Object, public IAsyncUdpSocketListener
@@ -566,7 +440,6 @@ public:
 	
 	void sendQuestion(const IPv4Address& serverIp, const String& hostName);
 
-	
 protected:
 	// override
 	virtual void onReceiveFrom(AsyncUdpSocket* socket, const SocketAddress& address, void* data, sl_uint32 sizeReceive);
@@ -607,6 +480,7 @@ public:
 
 public:
 	DnsResolveHostParam();
+	
 };
 
 class SLIB_EXPORT IDnsServerListener
@@ -648,6 +522,7 @@ class SLIB_EXPORT DnsServer : public Object, public IAsyncUdpSocketListener
 {
 protected:
 	DnsServer();
+	
 	~DnsServer();
     
 public:

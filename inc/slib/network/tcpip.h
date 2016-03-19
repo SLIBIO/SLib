@@ -6,7 +6,6 @@
 #include "constants.h"
 #include "ip_address.h"
 
-#include "../core/mio.h"
 #include "../core/expire.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
@@ -50,262 +49,112 @@ public:
 
 ********************************************************************/
 
-class SLIB_EXPORT IPv4HeaderFormat
+class SLIB_EXPORT IPv4Packet
 {
 public:
-	SLIB_INLINE static sl_bool isIPv4Header(const void* header)
-	{
-		return ((IPv4HeaderFormat*)header)->getVersion() == 4;
-	}
-
+	static sl_bool isIPv4Header(const void* header);
 	
 	// 4 bits, version is 4 for IPv4
-	SLIB_INLINE sl_uint32 getVersion() const
-	{
-		return (_versionAndHeaderLength >> 4) & 0x0F;
-	}
+	sl_uint32 getVersion() const;
 	
 	// 4 bits, version is 4 for IPv4
-	SLIB_INLINE void setVersion(sl_uint32 version = 4)
-	{
-		_versionAndHeaderLength = (sl_uint8)((_versionAndHeaderLength & 0x0F) | (version << 4));
-	}
+	void setVersion(sl_uint32 version = 4);
 
-	
 	// 4 bits, get the count of 32bit words for the header including options and padding
-	SLIB_INLINE sl_uint32 getHeaderLength() const
-	{
-		return _versionAndHeaderLength & 0x0F;
-	}
+	sl_uint32 getHeaderLength() const;
 	
 	// 4 bits, set the count of 32bit words for the header including options and padding (5 if no option is included)
-	SLIB_INLINE void setHeaderLength(sl_uint32 length = 5)
-	{
-		_versionAndHeaderLength = (sl_uint8)((_versionAndHeaderLength & 0xF0) | (length & 0x0F));
-	}
-
+	void setHeaderLength(sl_uint32 length = 5);
 	
 	// header size in bytes
-	SLIB_INLINE sl_uint32 getHeaderSize() const
-	{
-		return getHeaderLength() << 2;
-	}
+	sl_uint32 getHeaderSize() const;
 	
 	// header size in bytes
-	SLIB_INLINE void setHeaderSize(sl_uint32 size)
-	{
-		setHeaderLength((size + 3) >> 2);
-	}
-
+	void setHeaderSize(sl_uint32 size);
 	
 	// 8 bits, TOS is deprecated and replaced with DSCP&ECN
-	SLIB_INLINE sl_uint8 getTypeOfService() const
-	{
-		return _TOS_DSCP_ECN;
-	}
+	sl_uint8 getTypeOfService() const;
 	
 	// 8 bits, TOS is deprecated and replaced with DSCP&ECN
-	SLIB_INLINE void setTypeOfService(sl_uint8 TOS)
-	{
-		_TOS_DSCP_ECN = TOS;
-	}
-
+	void setTypeOfService(sl_uint8 TOS);
 	
 	// 6 bits
-	SLIB_INLINE sl_uint32 getDSCP() const
-	{
-		return ((_TOS_DSCP_ECN >> 2) & 0x3F);
-	}
+	sl_uint32 getDSCP() const;
 	
 	// 6 bits
-	SLIB_INLINE void setDSCP(sl_uint32 DSCP)
-	{
-		_TOS_DSCP_ECN = (sl_uint8)((_TOS_DSCP_ECN & 3) | ((DSCP & 0x3F) << 2));
-	}
-
+	void setDSCP(sl_uint32 DSCP);
 	
 	// 2 bits
-	SLIB_INLINE sl_uint32 getECN() const
-	{
-		return (_TOS_DSCP_ECN & 3);
-	}
+	sl_uint32 getECN() const;
 	
 	// 2 bits
-	SLIB_INLINE void setECN(sl_uint32 ECN)
-	{
-		_TOS_DSCP_ECN = (sl_uint8)((_TOS_DSCP_ECN & 0xFC) | (ECN & 3));
-	}
-
+	void setECN(sl_uint32 ECN);
 	
 	// 16 bits, total size (including header and data) in bytes
-	SLIB_INLINE sl_uint16 getTotalSize() const
-	{
-		return MIO::readUint16BE(_totalLength);
-	}
+	sl_uint16 getTotalSize() const;
 	
 	// 16 bits, total size (including header and data) in bytes
-	SLIB_INLINE void setTotalSize(sl_uint16 size)
-	{
-		MIO::writeUint16BE(_totalLength, size);
-	}
+	void setTotalSize(sl_uint16 size);
 
+	// 16 bits
+	sl_uint16 getIdentification() const;
 	
 	// 16 bits
-	SLIB_INLINE sl_uint16 getIdentification() const
-	{
-		return MIO::readUint16BE(_identification);
-	}
-	
-	// 16 bits
-	SLIB_INLINE void setIdentification(sl_uint16 identification)
-	{
-		MIO::writeUint16BE(_identification, identification);
-	}
+	void setIdentification(sl_uint16 identification);
 
+	// true = Do not fragment, false = Fragment
+	sl_bool isDF() const;
 	
 	// true = Do not fragment, false = Fragment
-	SLIB_INLINE sl_bool isDF() const
-	{
-		return (_flagsAndFlagmentOffset[0] & 0x40) != 0;
-	}
-	
-	// true = Do not fragment, false = Fragment
-	SLIB_INLINE void setDF(sl_bool flag)
-	{
-		_flagsAndFlagmentOffset[0] = (sl_uint8)((_flagsAndFlagmentOffset[0] & 0xBF) | (flag ? 0x40 : 0));
-	}
+	void setDF(sl_bool flag);
 
+	// true = More Fragment, false = Last Fragment
+	sl_bool isMF() const;
 	
 	// true = More Fragment, false = Last Fragment
-	SLIB_INLINE sl_bool isMF() const
-	{
-		return (_flagsAndFlagmentOffset[0] & 0x20) != 0;
-	}
-	
-	// true = More Fragment, false = Last Fragment
-	SLIB_INLINE void setMF(sl_bool flag)
-	{
-		_flagsAndFlagmentOffset[0] = (sl_uint8)((_flagsAndFlagmentOffset[0] & 0xDF) | (flag ? 0x20 : 0));
-	}
-
+	void setMF(sl_bool flag);
 	
 	// 13 bits, the fragment offset measured in units of 8 octets (64 bits)
-	SLIB_INLINE sl_uint32 getFragmentOffset() const
-	{
-		return (((sl_uint32)(_flagsAndFlagmentOffset[0] & 0x1F)) << 8) | _flagsAndFlagmentOffset[1];
-	}
+	sl_uint32 getFragmentOffset() const;
 	
 	// 13 bits, the fragment offset measured in units of 8 octets (64 bits)
-	SLIB_INLINE void setFragmentOffset(sl_uint32 offset)
-	{
-		_flagsAndFlagmentOffset[1] = (sl_uint8)offset;
-		_flagsAndFlagmentOffset[0] = (sl_uint8)((_flagsAndFlagmentOffset[0] & 0xE0) | ((offset >> 8) & 0x1F));
-	}
-
+	void setFragmentOffset(sl_uint32 offset);
 	
-	SLIB_INLINE sl_uint8 getTTL() const
-	{
-		return _timeToLive;
-	}
+	// Time To Live
+	sl_uint8 getTTL() const;
 	
-	SLIB_INLINE sl_uint8 getTimeToLive() const
-	{
-		return _timeToLive;
-	}
+	// Time To Live
+	void setTTL(sl_uint8 TTL);
 	
-	SLIB_INLINE void setTTL(sl_uint8 TTL)
-	{
-		_timeToLive = TTL;
-	}
+	NetworkInternetProtocol getProtocol() const;
 	
-	SLIB_INLINE void setTimeToLive(sl_uint8 TTL)
-	{
-		_timeToLive = TTL;
-	}
-
+	void setProtocol(NetworkInternetProtocol protocol);
 	
-	// NetworkInternetProtocol
-	SLIB_INLINE sl_uint8 getProtocol() const
-	{
-		return _protocol;
-	}
+	sl_uint16 getChecksum() const;
 	
-	// NetworkInternetProtocol
-	SLIB_INLINE void setProtocol(sl_uint8 protocol)
-	{
-		_protocol = protocol;
-	}
-
-	
-	SLIB_INLINE sl_uint16 getChecksum() const
-	{
-		return MIO::readUint16BE(_headerChecksum);
-	}
-	
-	SLIB_INLINE void setChecksum(sl_uint16 checksum)
-	{
-		MIO::writeUint16BE(_headerChecksum, checksum);
-	}
-
+	void setChecksum(sl_uint16 checksum);
 	
 	void updateChecksum();
 	
 	sl_bool checkChecksum() const;
 
+	IPv4Address getSourceAddress() const;
 	
-	SLIB_INLINE IPv4Address getSourceAddress() const
-	{
-		return IPv4Address(_sourceIp);
-	}
+	void setSourceAddress(const IPv4Address& address);
 	
-	SLIB_INLINE void setSourceAddress(const IPv4Address& address)
-	{
-		address.get(_sourceIp);
-	}
-
+	IPv4Address getDestinationAddress() const;
 	
-	SLIB_INLINE IPv4Address getDestinationAddress() const
-	{
-		return IPv4Address(_destinationIp);
-	}
+	void setDestinationAddress(const IPv4Address& address);
 	
-	SLIB_INLINE void setDestinationAddress(const IPv4Address& address)
-	{
-		address.get(_destinationIp);
-	}
-
+	const sl_uint8* getOptions() const;
 	
-	SLIB_INLINE const sl_uint8* getOptions() const
-	{
-		return (const sl_uint8*)(this) + sizeof(IPv4HeaderFormat);
-	}
+	sl_uint8* getOptions();
 	
-	SLIB_INLINE sl_uint8* getOptions()
-	{
-		return (sl_uint8*)(this) + sizeof(IPv4HeaderFormat);
-	}
-
+	const sl_uint8* getContent() const;
 	
-	SLIB_INLINE const sl_uint8* getContent() const
-	{
-		return (const sl_uint8*)(this) + getHeaderSize();
-	}
+	sl_uint8* getContent();
 	
-	SLIB_INLINE sl_uint8* getContent()
-	{
-		return (sl_uint8*)(this) + getHeaderSize();
-	}
-	
-	SLIB_INLINE sl_uint16 getContentSize() const
-	{
-		return getTotalSize() - getHeaderSize();
-	}
-	
-	SLIB_INLINE void setContentSize(sl_uint16 size)
-	{
-		setTotalSize(size + getHeaderSize());
-	}
-
+	sl_uint16 getContentSize() const;
 	
 	// used in TCP/UDP protocol
 	sl_uint16 getChecksumForContent(const void* content, sl_uint16 size) const;
@@ -319,31 +168,16 @@ public:
 	
 	static sl_bool checkHeader(const void* packetIP, sl_uint32 sizeTotal);
 
-	SLIB_INLINE sl_bool isTCP() const
-	{
-		return getProtocol() == networkInternetProtocol_TCP;
-	}
+	sl_bool isTCP() const;
 	
-	SLIB_INLINE sl_bool isUDP() const
-	{
-		return getProtocol() == networkInternetProtocol_UDP;
-	}
+	sl_bool isUDP() const;
 	
-	SLIB_INLINE sl_bool isICMP() const
-	{
-		return getProtocol() == networkInternetProtocol_ICMP;
-	}
+	sl_bool isICMP() const;
 
-	SLIB_INLINE sl_bool isFirstFragment() const
-	{
-		return getFragmentOffset() == 0;
-	}
-
-	SLIB_INLINE sl_bool isLastFragment() const
-	{
-		return !(isMF());
-	}
-
+	sl_bool isFirstFragment() const;
+	
+	sl_bool isLastFragment() const;
+	
 	sl_bool getPortsForTcpUdp(sl_uint16& src, sl_uint16& dst) const;
 
 private:
@@ -358,6 +192,7 @@ private:
 	sl_uint8 _sourceIp[4];
 	sl_uint8 _destinationIp[4];
 	// options and padding
+	
 };
 
 /********************************************************************
@@ -384,239 +219,99 @@ private:
 	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 ********************************************************************/
-class SLIB_EXPORT TcpHeaderFormat
+
+class SLIB_EXPORT TcpSegment
 {
 public:
-	SLIB_INLINE sl_uint16 getSourcePort() const
-	{
-		return MIO::readUint16BE(_sourcePort);
-	}
+	sl_uint16 getSourcePort() const;
 	
-	SLIB_INLINE void setSourcePort(sl_uint16 port)
-	{
-		MIO::writeUint16BE(_sourcePort, port);
-	}
+	void setSourcePort(sl_uint16 port);
+	
+	sl_uint16 getDestinationPort() const;
+	
+	void setDestinationPort(sl_uint16 port);
+	
+	sl_uint32 getSequenceNumber() const;
+	
+	void setSequenceNumber(sl_uint32 num);
 
+	sl_uint32 getAcknowledgmentNumber() const;
 	
-	SLIB_INLINE sl_uint16 getDestinationPort() const
-	{
-		return MIO::readUint16BE(_destinationPort);
-	}
-	
-	SLIB_INLINE void setDestinationPort(sl_uint16 port)
-	{
-		MIO::writeUint16BE(_destinationPort, port);
-	}
-
-	
-	SLIB_INLINE sl_uint32 getSequenceNumber() const
-	{
-		return MIO::readUint32BE(_sequenceNumber);
-	}
-	
-	SLIB_INLINE void setSequenceNumber(sl_uint32 num)
-	{
-		MIO::writeUint32BE(_sequenceNumber, num);
-	}
-
-	
-	SLIB_INLINE sl_uint32 getAcknowledgmentNumber() const
-	{
-		return MIO::readUint32BE(_acknowledgmentNumber);
-	}
-	
-	SLIB_INLINE void setAcknowledgmentNumber(sl_uint32 num)
-	{
-		MIO::writeUint32BE(_acknowledgmentNumber, num);
-	}
-
+	void setAcknowledgmentNumber(sl_uint32 num);
 	
 	// 4 bits, the size of the TCP header in 32-bit words
-	SLIB_INLINE sl_uint32 getHeaderLength() const
-	{
-		return _dataOffsetAndFlags[0] >> 4;
-	}
+	sl_uint32 getHeaderLength() const;
 	
 	// 4 bits, the size of the TCP header in 32-bit words
-	SLIB_INLINE void setHeaderLength(sl_uint32 length = 5)
-	{
-		_dataOffsetAndFlags[0] = (sl_uint8)((_dataOffsetAndFlags[0] & 0x0F) | (length << 4));
-	}
+	void setHeaderLength(sl_uint32 length = 5);
 
+	// header size in bytes
+	sl_uint32 getHeaderSize() const;
 	
 	// header size in bytes
-	SLIB_INLINE sl_uint32 getHeaderSize() const
-	{
-		return getHeaderLength() << 2;
-	}
-	
-	// header size in bytes
-	SLIB_INLINE void setHeaderSize(sl_uint32 size)
-	{
-		setHeaderLength((size + 3) >> 2);
-	}
+	void setHeaderSize(sl_uint32 size);
 
+	sl_bool isNS() const;
 	
-	SLIB_INLINE sl_bool isNS() const
-	{
-		return (_dataOffsetAndFlags[0] & 1) != 0;
-	}
+	void setNS(sl_bool flag);
 	
-	SLIB_INLINE void setNS(sl_bool flag)
-	{
-		_dataOffsetAndFlags[0] = (sl_uint8)((_dataOffsetAndFlags[0] & 0xFE) | (flag ? 1 : 0));
-	}
+	sl_bool isCWR() const;
+	
+	void setCWR(sl_bool flag);
+	
+	sl_bool isECE() const;
+	
+	void setECE(sl_bool flag);
+	
+	sl_bool isURG() const;
+	
+	void setURG(sl_bool flag);
+	
+	sl_bool isACK() const;
+	
+	void setACK(sl_bool flag);
 
+	sl_bool isPSH() const;
 	
-	SLIB_INLINE sl_bool isCWR() const
-	{
-		return (_dataOffsetAndFlags[1] & 0x80) != 0;
-	}
+	void setPSH(sl_bool flag);
 	
-	SLIB_INLINE void setCWR(sl_bool flag)
-	{
-		_dataOffsetAndFlags[1] = (sl_uint8)((_dataOffsetAndFlags[0] & 0x7F) | (flag ? 0x80 : 0));
-	}
+	sl_bool isRST() const;
+	
+	void setRST(sl_bool flag);
+	
+	sl_bool isSYN() const;
+	
+	void setSYN(sl_bool flag);
 
+	sl_bool isFIN() const;
 	
-	SLIB_INLINE sl_bool isECE() const
-	{
-		return (_dataOffsetAndFlags[1] & 0x40) != 0;
-	}
+	void setFIN(sl_bool flag);
 	
-	SLIB_INLINE void setECE(sl_bool flag)
-	{
-		_dataOffsetAndFlags[1] = (sl_uint8)((_dataOffsetAndFlags[0] & 0xBF) | (flag ? 0x40 : 0));
-	}
+	sl_uint16 getWindowSize() const;
+	
+	void setWindowSize(sl_uint16 size);
+	
+	sl_uint16 getChecksum() const;
+	
+	void setChecksum(sl_uint16 checksum);
 
+	void updateChecksum(const IPv4Packet* ipv4, sl_uint32 sizeContent);
 	
-	SLIB_INLINE sl_bool isURG() const
-	{
-		return (_dataOffsetAndFlags[1] & 0x20) != 0;
-	}
-	
-	SLIB_INLINE void setURG(sl_bool flag)
-	{
-		_dataOffsetAndFlags[1] = (sl_uint8)((_dataOffsetAndFlags[0] & 0xDF) | (flag ? 0x20 : 0));
-	}
+	sl_bool checkChecksum(const IPv4Packet* ipv4, sl_uint32 sizeContent) const;
 
-	
-	SLIB_INLINE sl_bool isACK() const
-	{
-		return (_dataOffsetAndFlags[1] & 0x10) != 0;
-	}
-	
-	SLIB_INLINE void setACK(sl_bool flag)
-	{
-		_dataOffsetAndFlags[1] = (sl_uint8)((_dataOffsetAndFlags[0] & 0xEF) | (flag ? 0x10 : 0));
-	}
+	sl_bool check(IPv4Packet* ip, sl_uint32 sizeContent) const;
 
+	sl_uint16 getUrgentPointer() const;
 	
-	SLIB_INLINE sl_bool isPSH() const
-	{
-		return (_dataOffsetAndFlags[1] & 0x08) != 0;
-	}
+	void setUrgentPointer(sl_uint16 urgentPointer);
 	
-	SLIB_INLINE void setPSH(sl_bool flag)
-	{
-		_dataOffsetAndFlags[1] = (sl_uint8)((_dataOffsetAndFlags[0] & 0xF7) | (flag ? 0x08 : 0));
-	}
-
+	const sl_uint8* getOptions() const;
 	
-	SLIB_INLINE sl_bool isRST() const
-	{
-		return (_dataOffsetAndFlags[1] & 0x04) != 0;
-	}
+	sl_uint8* getOptions();
 	
-	SLIB_INLINE void setRST(sl_bool flag)
-	{
-		_dataOffsetAndFlags[1] = (sl_uint8)((_dataOffsetAndFlags[0] & 0xFB) | (flag ? 0x04 : 0));
-	}
-
+	const sl_uint8* getContent() const;
 	
-	SLIB_INLINE sl_bool isSYN() const
-	{
-		return (_dataOffsetAndFlags[1] & 0x02) != 0;
-	}
-	
-	SLIB_INLINE void setSYN(sl_bool flag)
-	{
-		_dataOffsetAndFlags[1] = (sl_uint8)((_dataOffsetAndFlags[0] & 0xFD) | (flag ? 0x02 : 0));
-	}
-
-	
-	SLIB_INLINE sl_bool isFIN() const
-	{
-		return (_dataOffsetAndFlags[1] & 0x01) != 0;
-	}
-	
-	SLIB_INLINE void setFIN(sl_bool flag)
-	{
-		_dataOffsetAndFlags[1] = (sl_uint8)((_dataOffsetAndFlags[0] & 0xFE) | (flag ? 0x01 : 0));
-	}
-
-	
-	SLIB_INLINE sl_uint16 getWindowSize() const
-	{
-		return MIO::readUint16BE(_windowSize);
-	}
-	
-	SLIB_INLINE void setWindowSize(sl_uint16 size)
-	{
-		MIO::writeUint16BE(_windowSize, size);
-	}
-
-	
-	SLIB_INLINE sl_uint16 getChecksum() const
-	{
-		return MIO::readUint16BE(_checksum);
-	}
-	
-	SLIB_INLINE void setChecksum(sl_uint16 checksum)
-	{
-		MIO::writeUint16BE(_checksum, checksum);
-	}
-	
-
-	void updateChecksum(const IPv4HeaderFormat* ipv4, sl_uint32 sizeContent);
-	
-	sl_bool checkChecksum(const IPv4HeaderFormat* ipv4, sl_uint32 sizeContent) const;
-
-	
-	SLIB_INLINE sl_uint16 getUrgentPointer() const
-	{
-		return MIO::readUint16BE(_urgentPointer);
-	}
-	
-	SLIB_INLINE void setUrgentPointer(sl_uint16 urgentPointer)
-	{
-		MIO::writeUint16BE(_urgentPointer, urgentPointer);
-	}
-
-	
-	SLIB_INLINE const sl_uint8* getOptions() const
-	{
-		return (const sl_uint8*)(this) + sizeof(TcpHeaderFormat);
-	}
-	
-	SLIB_INLINE sl_uint8* getOptions()
-	{
-		return (sl_uint8*)(this) + sizeof(TcpHeaderFormat);
-	}
-
-	
-	SLIB_INLINE const sl_uint8* getContent() const
-	{
-		return (const sl_uint8*)(this) + getHeaderSize();
-	}
-	
-	SLIB_INLINE sl_uint8* getContent()
-	{
-		return (sl_uint8*)(this) + getHeaderSize();
-	}
-
-	
-	sl_bool check(IPv4HeaderFormat* ip, sl_uint32 sizeContent) const;
+	sl_uint8* getContent();
 
 private:
 	sl_uint8 _sourcePort[2];
@@ -628,6 +323,7 @@ private:
 	sl_uint8 _checksum[2];
 	sl_uint8 _urgentPointer[2];
 	// options and padding
+	
 };
 
 
@@ -647,90 +343,54 @@ private:
 	+---------------- ...
 
 ********************************************************************/
-class SLIB_EXPORT UdpHeaderFormat
+
+class SLIB_EXPORT UdpDatagram
 {
 public:
-	SLIB_INLINE sl_uint16 getSourcePort() const
+	enum
 	{
-		return MIO::readUint16BE(_sourcePort);
-	}
+		HeaderSize = 8
+	};
 	
-	SLIB_INLINE void setSourcePort(sl_uint16 port)
-	{
-		MIO::writeUint16BE(_sourcePort, port);
-	}
-
+public:
+	sl_uint16 getSourcePort() const;
 	
-	SLIB_INLINE sl_uint16 getDestinationPort() const
-	{
-		return MIO::readUint16BE(_destinationPort);
-	}
+	void setSourcePort(sl_uint16 port);
 	
-	SLIB_INLINE void setDestinationPort(sl_uint16 port)
-	{
-		MIO::writeUint16BE(_destinationPort, port);
-	}
-
+	sl_uint16 getDestinationPort() const;
+	
+	void setDestinationPort(sl_uint16 port);
 	
 	// including header and data
-	SLIB_INLINE sl_uint16 getTotalSize() const
-	{
-		return MIO::readUint16BE(_length);
-	}
+	sl_uint16 getTotalSize() const;
 	
 	// including header and data
-	SLIB_INLINE void setTotalSize(sl_uint16 size)
-	{
-		MIO::writeUint16BE(_length, size);
-	}
+	void setTotalSize(sl_uint16 size);
 
+	sl_uint16 getChecksum() const;
 	
-	SLIB_INLINE sl_uint16 getChecksum() const
-	{
-		return MIO::readUint16BE(_checksum);
-	}
+	void setChecksum(sl_uint16 checksum);
 	
-	SLIB_INLINE void setChecksum(sl_uint16 checksum)
-	{
-		MIO::writeUint16BE(_checksum, checksum);
-	}
+	void updateChecksum(const IPv4Packet* ipv4);
+	
+	sl_bool checkChecksum(const IPv4Packet* ipv4) const;
 
+	sl_bool check(IPv4Packet* ip, sl_uint32 sizeContent) const;
 	
-	void updateChecksum(const IPv4HeaderFormat* ipv4);
+	const sl_uint8* getContent() const;
 	
-	sl_bool checkChecksum(const IPv4HeaderFormat* ipv4) const;
-
+	sl_uint8* getContent();
 	
-	SLIB_INLINE const sl_uint8* getContent() const
-	{
-		return (const sl_uint8*)(this) + sizeof(sizeof(UdpHeaderFormat));
-	}
+	sl_uint16 getContentSize() const;
 	
-	SLIB_INLINE sl_uint8* getContent()
-	{
-		return (sl_uint8*)(this) + sizeof(sizeof(UdpHeaderFormat));
-	}
-
-	
-	SLIB_INLINE sl_uint16 getContentSize() const
-	{
-		return getTotalSize() - sizeof(UdpHeaderFormat);
-	}
-	
-	SLIB_INLINE void setContentSize(sl_uint16 size)
-	{
-		setTotalSize(size + sizeof(UdpHeaderFormat));
-	}
-
-	
-	sl_bool check(IPv4HeaderFormat* ip, sl_uint32 sizeContent) const;
-
 private:
 	sl_uint8 _sourcePort[2];
 	sl_uint8 _destinationPort[2];
 	sl_uint8 _length[2];
 	sl_uint8 _checksum[2];
+	
 };
+
 
 class SLIB_EXPORT IPv4PacketIdentifier
 {
@@ -738,7 +398,7 @@ public:
 	IPv4Address source;
 	IPv4Address destination;
 	sl_uint16 identification;
-	sl_uint8 protocol;
+	NetworkInternetProtocol protocol;
 
 public:
 	sl_bool operator==(const IPv4PacketIdentifier& other) const;
@@ -749,10 +409,8 @@ public:
 };
 
 template <>
-SLIB_INLINE sl_uint32 Hash<IPv4PacketIdentifier>::hash(const IPv4PacketIdentifier& v)
-{
-	return v.hashCode();
-}
+sl_uint32 Hash<IPv4PacketIdentifier>::hash(const IPv4PacketIdentifier& v);
+
 
 struct SLIB_EXPORT IPv4Fragment
 {
@@ -774,6 +432,7 @@ class SLIB_EXPORT IPv4Fragmentation : public Object
 {
 public:
 	IPv4Fragmentation();
+	
 	~IPv4Fragmentation();
 
 public:
@@ -786,14 +445,223 @@ public:
 	// returns a combined IP packet
 	Memory combineFragment(const void* ip, sl_uint32 size, sl_bool flagCheckedHeader = sl_false);
 
-	List<Memory> makeFragments(const IPv4HeaderFormat* header, const void* ipContent, sl_uint32 sizeContent, sl_uint32 mtu = 1500);
+	List<Memory> makeFragments(const IPv4Packet* header, const void* ipContent, sl_uint32 sizeContent, sl_uint32 mtu = 1500);
 
-	static List<Memory> makeFragments(const IPv4HeaderFormat* header, sl_uint16 identifier, const void* ipContent, sl_uint32 sizeContent, sl_uint32 mtu = 1500);
+	static List<Memory> makeFragments(const IPv4Packet* header, sl_uint16 identifier, const void* ipContent, sl_uint32 sizeContent, sl_uint32 mtu = 1500);
 	
 protected:
 	ExpiringMap<IPv4PacketIdentifier, Ref<IPv4FragmentedPacket> > m_packets;
 	sl_int32 m_currentIdentifier;
+	
 };
+
+SLIB_NETWORK_NAMESPACE_END
+
+
+SLIB_NETWORK_NAMESPACE_BEGIN
+
+SLIB_INLINE sl_bool IPv4Packet::isIPv4Header(const void* header)
+{
+	return ((IPv4Packet*)header)->getVersion() == 4;
+}
+
+SLIB_INLINE sl_uint32 IPv4Packet::getHeaderLength() const
+{
+	return _versionAndHeaderLength & 0x0F;
+}
+
+SLIB_INLINE void IPv4Packet::setHeaderLength(sl_uint32 length)
+{
+	_versionAndHeaderLength = (sl_uint8)((_versionAndHeaderLength & 0xF0) | (length & 0x0F));
+}
+
+SLIB_INLINE sl_uint32 IPv4Packet::getHeaderSize() const
+{
+	return ((sl_uint32)(_versionAndHeaderLength & 0x0F)) << 2;
+}
+
+SLIB_INLINE void IPv4Packet::setHeaderSize(sl_uint32 size)
+{
+	setHeaderLength((size + 3) >> 2);
+}
+
+SLIB_INLINE sl_uint16 IPv4Packet::getTotalSize() const
+{
+	return ((sl_uint16)(_totalLength[0]) << 8) | ((sl_uint16)(_totalLength[1]));
+}
+
+SLIB_INLINE void IPv4Packet::setTotalSize(sl_uint16 size)
+{
+	_totalLength[0] = (sl_uint8)(size >> 8);
+	_totalLength[1] = (sl_uint8)(size);
+}
+
+SLIB_INLINE NetworkInternetProtocol IPv4Packet::getProtocol() const
+{
+	return (NetworkInternetProtocol)_protocol;
+}
+
+SLIB_INLINE void IPv4Packet::setProtocol(NetworkInternetProtocol protocol)
+{
+	_protocol = (sl_uint8)(protocol);
+}
+
+SLIB_INLINE IPv4Address IPv4Packet::getSourceAddress() const
+{
+	return {_sourceIp[0], _sourceIp[1], _sourceIp[2], _sourceIp[3]};
+}
+
+SLIB_INLINE void IPv4Packet::setSourceAddress(const IPv4Address& address)
+{
+	_sourceIp[0] = address.a;
+	_sourceIp[1] = address.b;
+	_sourceIp[2] = address.c;
+	_sourceIp[3] = address.d;
+}
+
+SLIB_INLINE IPv4Address IPv4Packet::getDestinationAddress() const
+{
+	return {_destinationIp[0], _destinationIp[1], _destinationIp[2], _destinationIp[3]};
+}
+
+SLIB_INLINE void IPv4Packet::setDestinationAddress(const IPv4Address& address)
+{
+	_destinationIp[0] = address.a;
+	_destinationIp[1] = address.b;
+	_destinationIp[2] = address.c;
+	_destinationIp[3] = address.d;
+}
+SLIB_INLINE const sl_uint8* IPv4Packet::getContent() const
+{
+	return (const sl_uint8*)(this) + getHeaderSize();
+}
+
+SLIB_INLINE sl_uint8* IPv4Packet::getContent()
+{
+	return (sl_uint8*)(this) + getHeaderSize();
+}
+
+SLIB_INLINE sl_uint16 IPv4Packet::getContentSize() const
+{
+	return getTotalSize() - getHeaderSize();
+}
+
+SLIB_INLINE sl_bool IPv4Packet::isTCP() const
+{
+	return getProtocol() == NetworkInternetProtocol::TCP;
+}
+
+SLIB_INLINE sl_bool IPv4Packet::isUDP() const
+{
+	return getProtocol() == NetworkInternetProtocol::UDP;
+}
+
+SLIB_INLINE sl_bool IPv4Packet::isICMP() const
+{
+	return getProtocol() == NetworkInternetProtocol::ICMP;
+}
+
+
+SLIB_INLINE sl_uint16 TcpSegment::getSourcePort() const
+{
+	return ((sl_uint16)(_sourcePort[0]) << 8) | ((sl_uint16)(_sourcePort[1]));
+}
+
+SLIB_INLINE void TcpSegment::setSourcePort(sl_uint16 port)
+{
+	_sourcePort[0] = (sl_uint8)(port >> 8);
+	_sourcePort[1] = (sl_uint8)(port);
+}
+
+SLIB_INLINE sl_uint16 TcpSegment::getDestinationPort() const
+{
+	return ((sl_uint16)(_destinationPort[0]) << 8) | ((sl_uint16)(_destinationPort[1]));
+}
+
+SLIB_INLINE void TcpSegment::setDestinationPort(sl_uint16 port)
+{
+	_destinationPort[0] = (sl_uint8)(port >> 8);
+	_destinationPort[1] = (sl_uint8)(port);
+}
+
+SLIB_INLINE sl_uint32 TcpSegment::getHeaderLength() const
+{
+	return _dataOffsetAndFlags[0] >> 4;
+}
+
+SLIB_INLINE void TcpSegment::setHeaderLength(sl_uint32 length)
+{
+	_dataOffsetAndFlags[0] = (sl_uint8)((_dataOffsetAndFlags[0] & 0x0F) | (length << 4));
+}
+
+SLIB_INLINE sl_uint32 TcpSegment::getHeaderSize() const
+{
+	return (_dataOffsetAndFlags[0] >> 4) << 2;
+}
+
+SLIB_INLINE void TcpSegment::setHeaderSize(sl_uint32 size)
+{
+	setHeaderLength((size + 3) >> 2);
+}
+
+SLIB_INLINE const sl_uint8* TcpSegment::getContent() const
+{
+	return (const sl_uint8*)(this) + getHeaderSize();
+}
+
+SLIB_INLINE sl_uint8* TcpSegment::getContent()
+{
+	return (sl_uint8*)(this) + getHeaderSize();
+}
+
+
+SLIB_INLINE sl_uint16 UdpDatagram::getSourcePort() const
+{
+	return ((sl_uint16)(_sourcePort[0]) << 8) | ((sl_uint16)(_sourcePort[1]));
+}
+
+SLIB_INLINE void UdpDatagram::setSourcePort(sl_uint16 port)
+{
+	_sourcePort[0] = (sl_uint8)(port >> 8);
+	_sourcePort[1] = (sl_uint8)(port);
+}
+
+SLIB_INLINE sl_uint16 UdpDatagram::getDestinationPort() const
+{
+	return ((sl_uint16)(_destinationPort[0]) << 8) | ((sl_uint16)(_destinationPort[1]));
+}
+
+SLIB_INLINE void UdpDatagram::setDestinationPort(sl_uint16 port)
+{
+	_destinationPort[0] = (sl_uint8)(port >> 8);
+	_destinationPort[1] = (sl_uint8)(port);
+}
+
+SLIB_INLINE sl_uint16 UdpDatagram::getTotalSize() const
+{
+	return ((sl_uint16)(_length[0]) << 8) | ((sl_uint16)(_length[1]));
+}
+
+SLIB_INLINE void UdpDatagram::setTotalSize(sl_uint16 size)
+{
+	_length[0] = (sl_uint8)(size >> 8);
+	_length[1] = (sl_uint8)(size);
+}
+
+SLIB_INLINE const sl_uint8* UdpDatagram::getContent() const
+{
+	return (const sl_uint8*)(this) + HeaderSize;
+}
+
+SLIB_INLINE sl_uint8* UdpDatagram::getContent()
+{
+	return (sl_uint8*)(this) + HeaderSize;
+}
+
+SLIB_INLINE sl_uint16 UdpDatagram::getContentSize() const
+{
+	return getTotalSize() - HeaderSize;
+}
 
 SLIB_NETWORK_NAMESPACE_END
 

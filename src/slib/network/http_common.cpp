@@ -3,154 +3,301 @@
 #include "../../../inc/slib/core/url.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
-struct _Http_StaticConsts
-{
-	Memory memSp;
-	Memory memCr;
-	Memory memColon;
-	Memory memSlash;
-	Memory memQuestion;
-	String strHttp1_1;
-	String strContentLength;
-	String strContentType;
-	String strTransferEncoding;
-	String strContentEncoding;
-	String strHost;
-	String strGet;
-	String strChunked;
 
-	_Http_StaticConsts()
+#define HTTP_STATUS_CASE(name, text) \
+	case HttpStatus::name: \
+	{ SLIB_STATIC_STRING(s, text); return s; }
+
+String HttpStatuses::toString(HttpStatus status)
+{
+	switch (status) {
+		
+		HTTP_STATUS_CASE(Continue, "Continue");
+		HTTP_STATUS_CASE(SwitchingProtocols, "Switching Protocols");
+		
+		HTTP_STATUS_CASE(OK, "OK");
+		HTTP_STATUS_CASE(Created, "Created");
+		HTTP_STATUS_CASE(Accepted, "Accepted");
+		HTTP_STATUS_CASE(NonAuthInfo, "Non-Authoritative Information");
+		HTTP_STATUS_CASE(NoContent, "No Content");
+		HTTP_STATUS_CASE(ResetContent, "Reset Content");
+		HTTP_STATUS_CASE(PartialContent, "Partial Content");
+		
+		HTTP_STATUS_CASE(MultipleChoices, "Multiple Choices");
+		HTTP_STATUS_CASE(MovedPermanently, "Moved Permanently");
+		HTTP_STATUS_CASE(Found, "Found");
+		HTTP_STATUS_CASE(SeeOther, "See Other");
+		HTTP_STATUS_CASE(NotModified, "Not Modified");
+		HTTP_STATUS_CASE(UseProxy, "Use Proxy");
+		HTTP_STATUS_CASE(TemporaryRedirect, "Temporary Redirect");
+		
+		HTTP_STATUS_CASE(BadRequest, "Bad Request");
+		HTTP_STATUS_CASE(Unauthorized, "Unauthorized");
+		HTTP_STATUS_CASE(PaymentRequired, "Payment Required");
+		HTTP_STATUS_CASE(Forbidden, "Forbidden");
+		HTTP_STATUS_CASE(NotFound, "Not Found");
+		HTTP_STATUS_CASE(MethodNotAllowed, "Method Not Allowed");
+		HTTP_STATUS_CASE(NotAcceptable, "Not Acceptable");
+		HTTP_STATUS_CASE(ProxyAuthenticationRequired, "Proxy Authentication Required");
+		HTTP_STATUS_CASE(RequestTimeout, "Request Time-out");
+		HTTP_STATUS_CASE(Conflict, "Conflict");
+		HTTP_STATUS_CASE(Gone, "Gone");
+		HTTP_STATUS_CASE(LengthRequired, "Length Required");
+		HTTP_STATUS_CASE(PreconditionFailed, "Precondition Failed");
+		HTTP_STATUS_CASE(RequestEntityTooLarge, "Request Entity Too Large");
+		HTTP_STATUS_CASE(RequestUriTooLarge, "Request-URI Too Large");
+		HTTP_STATUS_CASE(UnsupportedMediaType, "Unsupported Media Type");
+		HTTP_STATUS_CASE(RequestRangeNotSatisfiable, "Requested range not satisfiable");
+		HTTP_STATUS_CASE(ExpectationFailed, "Expectation Failed");
+		
+		HTTP_STATUS_CASE(InternalServerError, "Internal Server Error");
+		HTTP_STATUS_CASE(NotImplemented, "Not Implemented");
+		HTTP_STATUS_CASE(BadGateway, "Bad Gateway");
+		HTTP_STATUS_CASE(ServiceUnavailable, "Service Unavailable");
+		HTTP_STATUS_CASE(GatewayTimeout, "Gateway Time-out");
+		HTTP_STATUS_CASE(HttpVersionNotSupported, "HTTP Version not supported");
+		
+	}
+	return String::null();
+}
+
+
+SLIB_STATIC_STRING(_g_sz_http_method_GET, "GET");
+SLIB_STATIC_STRING(_g_sz_http_method_HEAD, "HEAD");
+SLIB_STATIC_STRING(_g_sz_http_method_POST, "POST");
+SLIB_STATIC_STRING(_g_sz_http_method_PUT, "PUT");
+SLIB_STATIC_STRING(_g_sz_http_method_DELETE, "DELETE");
+SLIB_STATIC_STRING(_g_sz_http_method_CONNECT, "CONNECT");
+SLIB_STATIC_STRING(_g_sz_http_method_OPTIONS, "OPTIONS");
+SLIB_STATIC_STRING(_g_sz_http_method_TRACE, "TRACE");
+
+String HttpMethods::toString(HttpMethod method)
+{
+	switch (method) {
+		case HttpMethod::GET:
+			return _g_sz_http_method_GET;
+		case HttpMethod::HEAD:
+			return _g_sz_http_method_HEAD;
+		case HttpMethod::POST:
+			return _g_sz_http_method_POST;
+		case HttpMethod::PUT:
+			return _g_sz_http_method_PUT;
+		case HttpMethod::DELETE:
+			return _g_sz_http_method_DELETE;
+		case HttpMethod::CONNECT:
+			return _g_sz_http_method_CONNECT;
+		case HttpMethod::OPTIONS:
+			return _g_sz_http_method_OPTIONS;
+		case HttpMethod::TRACE:
+			return _g_sz_http_method_TRACE;
+		default:
+			break;
+	}
+	return String::null();
+}
+
+class _HttpMethod_Mapping
+{
+public:
+	HashMap<String, HttpMethod> maps;
+	
+	_HttpMethod_Mapping()
 	{
-		memSp = Memory::createStatic(" ", 1);
-		memCr = Memory::createStatic("\r\n", 2);
-		memColon = Memory::createStatic(": ", 2);
-		memSlash = Memory::createStatic("/", 1);
-		memQuestion = Memory::createStatic("?", 1);
-		strHttp1_1 = "HTTP/1.1";
-		strContentLength = SLIB_HTTP_HEADER_CONTENT_LENGTH;
-		strContentType = SLIB_HTTP_HEADER_CONTENT_TYPE;
-		strTransferEncoding = SLIB_HTTP_HEADER_TRANSFER_ENCODING;
-		strContentEncoding = SLIB_HTTP_HEADER_CONTENT_ENCODING;
-		strHost = SLIB_HTTP_HEADER_HOST;
-		strGet = SLIB_HTTP_METHOD_GET;
-		strChunked = "chunked";
+		maps.put(_g_sz_http_method_GET, HttpMethod::GET);
+		maps.put(_g_sz_http_method_HEAD, HttpMethod::HEAD);
+		maps.put(_g_sz_http_method_POST, HttpMethod::POST);
+		maps.put(_g_sz_http_method_PUT, HttpMethod::PUT);
+		maps.put(_g_sz_http_method_DELETE, HttpMethod::DELETE);
+		maps.put(_g_sz_http_method_CONNECT, HttpMethod::CONNECT);
+		maps.put(_g_sz_http_method_OPTIONS, HttpMethod::OPTIONS);
+		maps.put(_g_sz_http_method_TRACE, HttpMethod::TRACE);
 	}
 };
-_Http_StaticConsts& _Http_StaticConsts_get()
+
+HttpMethod HttpMethods::fromString(const String& method)
 {
-	SLIB_SAFE_STATIC(_Http_StaticConsts, ret);
-	return ret;
+	SLIB_SAFE_STATIC(_HttpMethod_Mapping, t);
+	return t.maps.getValue(method, HttpMethod::Unknown);
 }
+
+
+#define DEFINE_HTTP_HEADER(name, value) \
+	SLIB_STATIC_STRING(static_##name, value); \
+	const String& HttpHeaders::name = static_##name;
+
+DEFINE_HTTP_HEADER(ContentLength, "Content-Length")
+DEFINE_HTTP_HEADER(ContentType, "Content-Type")
+DEFINE_HTTP_HEADER(Host, "Host")
+DEFINE_HTTP_HEADER(AcceptEncoding, "Accept-Encoding")
+DEFINE_HTTP_HEADER(TransferEncoding, "Transfer-Encoding")
+DEFINE_HTTP_HEADER(ContentEncoding, "Content-Encoding")
+
 
 /***********************************************************************
-	HttpRequestHeader
+	HttpRequest
 ***********************************************************************/
-HttpRequestHeader::HttpRequestHeader()
+HttpRequest::HttpRequest()
 {
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	m_requestVersion = _consts.strHttp1_1;
-	m_method = _consts.strGet;
-	m_methodUpper = _consts.strGet;
+	SLIB_STATIC_STRING(s1, "HTTP/1.1");
+	m_requestVersion = s1;
+	m_method = HttpMethod::GET;
+	SLIB_STATIC_STRING(s2, "GET");
+	m_methodText = s2;
+	m_methodTextUpper = s2;
 }
 
-void HttpRequestHeader::setMethod(const String& method)
+HttpMethod HttpRequest::getMethod() const
+{
+	return m_method;
+}
+
+String HttpRequest::getMethodText() const
+{
+	return m_methodText;
+}
+
+String HttpRequest::getMethodTextUppercase() const
+{
+	return m_methodTextUpper;
+}
+
+void HttpRequest::setMethod(HttpMethod method)
 {
 	m_method = method;
-	m_methodUpper = m_method.toUpper();
+	m_methodText = HttpMethods::toString(method);
+	m_methodTextUpper = m_methodText;
 }
 
-String HttpRequestHeader::getRequestHeader(String name) const
+void HttpRequest::setMethod(const String& method)
+{
+	m_methodText = method;
+	m_methodTextUpper = method.toUpper();
+	m_method = HttpMethods::fromString(m_methodTextUpper);
+}
+
+String HttpRequest::getPath() const
+{
+	return m_path;
+}
+
+void HttpRequest::setPath(const String& path)
+{
+	m_path = path;
+}
+
+String HttpRequest::getQuery() const
+{
+	return m_query;
+}
+
+void HttpRequest::setQuery(String query)
+{
+	m_query = query;
+}
+
+String HttpRequest::getRequestVersion() const
+{
+	return m_requestVersion;
+}
+
+void HttpRequest::setRequestVersion(const String& version)
+{
+	m_requestVersion = version;
+}
+
+const IMap<String, String>& HttpRequest::getRequestHeaders() const
+{
+	return m_requestHeaders;
+}
+
+String HttpRequest::getRequestHeader(String name) const
 {
 	return m_requestHeaders.getValue(name, String::null());
 }
 
-List<String> HttpRequestHeader::getRequestHeaderValues(String name) const
+List<String> HttpRequest::getRequestHeaderValues(String name) const
 {
 	return m_requestHeaders.getValues(name);
 }
 
-void HttpRequestHeader::setRequestHeader(String name, String value)
+void HttpRequest::setRequestHeader(String name, String value)
 {
 	m_requestHeaders.put(name, value);
 }
 
-void HttpRequestHeader::addRequestHeader(String name, String value)
+void HttpRequest::addRequestHeader(String name, String value)
 {
 	m_requestHeaders.add(name, value);
 }
 
-sl_bool HttpRequestHeader::containsRequestHeader(String name) const
+sl_bool HttpRequest::containsRequestHeader(String name) const
 {
 	return m_requestHeaders.containsKey(name);
 }
 
-void HttpRequestHeader::removeRequestHeader(String name)
+void HttpRequest::removeRequestHeader(String name)
 {
 	m_requestHeaders.removeAllMatchingKeys(name);
 }
 
-void HttpRequestHeader::clearRequestHeaders()
+void HttpRequest::clearRequestHeaders()
 {
 	m_requestHeaders.removeAll();
 }
 
-
-sl_uint64 HttpRequestHeader::getRequestContentLengthHeader() const
+sl_uint64 HttpRequest::getRequestContentLengthHeader() const
 {
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	String headerContentLength = getRequestHeader(_consts.strContentLength);
+	String headerContentLength = getRequestHeader(HttpHeaders::ContentLength);
 	if (headerContentLength.isNotEmpty()) {
 		return headerContentLength.parseUint64();
 	}
 	return 0;
 }
 
-void HttpRequestHeader::setRequestContentLengthHeader(sl_int64 size)
+void HttpRequest::setRequestContentLengthHeader(sl_int64 size)
 {
 	if (size < 0) {
 		size = 0;
 	}
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	setRequestHeader(_consts.strContentLength, String::fromUint64(size));
+	setRequestHeader(HttpHeaders::ContentLength, String::fromUint64(size));
 }
 
-String HttpRequestHeader::getRequestContentType() const
+String HttpRequest::getRequestContentType() const
 {
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	return getRequestHeader(_consts.strContentType);
+	return getRequestHeader(HttpHeaders::ContentType);
 }
 
-void HttpRequestHeader::setRequestContentType(const String& type)
+void HttpRequest::setRequestContentType(const String& type)
 {
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	setRequestHeader(_consts.strContentType, type);
+	setRequestHeader(HttpHeaders::ContentType, type);
 }
 
-String HttpRequestHeader::getRequestContentEncoding() const
+void HttpRequest::setRequestContentType(ContentType type)
 {
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	return getRequestHeader(_consts.strContentEncoding);
+	setRequestHeader(HttpHeaders::ContentType, ContentTypes::toString(type));
 }
 
-void HttpRequestHeader::setRequestContentEncoding(const String& type)
+String HttpRequest::getRequestContentEncoding() const
 {
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	setRequestHeader(_consts.strContentEncoding, type);
+	return getRequestHeader(HttpHeaders::ContentEncoding);
 }
 
-String HttpRequestHeader::getRequestTransferEncoding() const
+void HttpRequest::setRequestContentEncoding(const String& type)
 {
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	return getRequestHeader(_consts.strTransferEncoding);
+	setRequestHeader(HttpHeaders::ContentEncoding, type);
 }
 
-void HttpRequestHeader::setRequestTransferEncoding(const String& type)
+String HttpRequest::getRequestTransferEncoding() const
 {
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	setRequestHeader(_consts.strTransferEncoding, type);
+	return getRequestHeader(HttpHeaders::TransferEncoding);
 }
 
-sl_bool HttpRequestHeader::isChunkedRequest() const
+void HttpRequest::setRequestTransferEncoding(const String& type)
+{
+	setRequestHeader(HttpHeaders::TransferEncoding, type);
+}
+
+sl_bool HttpRequest::isChunkedRequest() const
 {
 	String te = getRequestTransferEncoding();
 	if (te.endsWith("chunked")) {
@@ -159,90 +306,101 @@ sl_bool HttpRequestHeader::isChunkedRequest() const
 	return sl_false;
 }
 
-String HttpRequestHeader::getHost() const
+String HttpRequest::getHost() const
 {
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	return getRequestHeader(_consts.strHost);
+	return getRequestHeader(HttpHeaders::Host);
 }
 
-void HttpRequestHeader::setHost(const String& type)
+void HttpRequest::setHost(const String& type)
 {
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	setRequestHeader(_consts.strHost, type);
+	setRequestHeader(HttpHeaders::Host, type);
 }
 
+const IMap<String, String>& HttpRequest::getParameters() const
+{
+	return m_parameters;
+}
 
-String HttpRequestHeader::getParameter(const String& name) const
+String HttpRequest::getParameter(const String& name) const
 {
 	return m_parameters.getValue(name, String::null());
 }
 
-List<String> HttpRequestHeader::getParameterValues(const String& name) const
+List<String> HttpRequest::getParameterValues(const String& name) const
 {
 	return m_parameters.getValues(name);
 }
 
-sl_bool HttpRequestHeader::containsParameter(const String& name) const
+sl_bool HttpRequest::containsParameter(const String& name) const
 {
 	return m_parameters.containsKey(name);
 }
 
-String HttpRequestHeader::getQueryParameter(String name) const
+const IMap<String, String>& HttpRequest::getQueryParameters() const
+{
+	return m_queryParameters;
+}
+
+String HttpRequest::getQueryParameter(String name) const
 {
 	return m_queryParameters.getValue(name, String::null());
 }
 
-List<String> HttpRequestHeader::getQueryParameterValues(String name) const
+List<String> HttpRequest::getQueryParameterValues(String name) const
 {
 	return m_queryParameters.getValues(name);
 }
 
-sl_bool HttpRequestHeader::containsQueryParameter(String name) const
+sl_bool HttpRequest::containsQueryParameter(String name) const
 {
 	return m_queryParameters.containsKey(name);
 }
 
-String HttpRequestHeader::getPostParameter(String name) const
+const IMap<String, String>& HttpRequest::getPostParameters() const
+{
+	return m_postParameters;
+}
+
+String HttpRequest::getPostParameter(String name) const
 {
 	return m_postParameters.getValue(name, String::null());
 }
 
-List<String> HttpRequestHeader::getPostParameterValues(String name) const
+List<String> HttpRequest::getPostParameterValues(String name) const
 {
 	return m_postParameters.getValues(name);
 }
 
-sl_bool HttpRequestHeader::containsPostParameter(String name) const
+sl_bool HttpRequest::containsPostParameter(String name) const
 {
 	return m_postParameters.containsKey(name);
 }
 
-
-void HttpRequestHeader::applyPostParameters(const void* data, sl_size size)
+void HttpRequest::applyPostParameters(const void* data, sl_size size)
 {
 	Map<String, String> params = parseParameters(data, size);
-	m_postParameters.put(params.getObject());
-	m_parameters.put(params.getObject());
+	m_postParameters.put(params.ref.ptr);
+	m_parameters.put(params.ref.ptr);
 }
 
-void HttpRequestHeader::applyPostParameters(const String& str)
+void HttpRequest::applyPostParameters(const String& str)
 {
-	applyPostParameters(str.getBuf(), str.getLength());
+	applyPostParameters(str.getData(), str.getLength());
 }
 
-void HttpRequestHeader::applyQueryToParameters()
+void HttpRequest::applyQueryToParameters()
 {
 	Map<String, String> params = parseParameters(m_query);
-	m_queryParameters.put(params.getObject());
-	m_parameters.put(params.getObject());
+	m_queryParameters.put(params.ref.ptr);
+	m_parameters.put(params.ref.ptr);
 }
 
-Map<String, String> HttpRequestHeader::parseParameters(const String& str)
+Map<String, String> HttpRequest::parseParameters(const String& str)
 {
-	return parseParameters(str.getBuf(), str.getLength());
+	return parseParameters(str.getData(), str.getLength());
 }
 
-Map<String, String> HttpRequestHeader::parseParameters(const void* data, sl_size _len)
+Map<String, String> HttpRequest::parseParameters(const void* data, sl_size _len)
 {
 	Map<String, String> ret;
 	sl_char8* buf = (sl_char8*)data;
@@ -280,45 +438,44 @@ Map<String, String> HttpRequestHeader::parseParameters(const void* data, sl_size
 	return ret;
 }
 
-Memory HttpRequestHeader::makeRequestPacket() const
+Memory HttpRequest::makeRequestPacket() const
 {
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
 	String8 str;
 	MemoryBuffer msg;
-	str = m_method;
-	msg.add(str.toMemory());
-	msg.add(_consts.memSp);
+	str = m_methodText;
+	msg.addStatic(str.getData(), str.getLength());
+	msg.addStatic(" ", 1);
 	str = m_path;
 	if (str.isEmpty()) {
-		msg.add(_consts.memSlash);
+		msg.addStatic("/", 1);
 	} else {
-		msg.add(str.toMemory());
+		msg.addStatic(str.getData(), str.getLength());
 	}
 	if (m_query.isNotEmpty()) {
-		msg.add(_consts.memQuestion);
+		msg.addStatic("?", 1);
 		str = m_query;
-		msg.add(str.toMemory());
+		msg.addStatic(str.getData(), str.getLength());
 	}
-	msg.add(_consts.memSp);
+	msg.addStatic(" ", 1);
 	str = m_requestVersion;
-	msg.add(str.toMemory());
-	msg.add(_consts.memCr);
+	msg.addStatic(str.getData(), str.getLength());
+	msg.addStatic("\r\n", 2);
 
 	Iterator< Pair<String, String> > iterator = m_requestHeaders.iterator();
 	Pair<String, String> pair;
 	while (iterator.next(&pair)) {
 		str = pair.key;
-		msg.add(str.toMemory());
-		msg.add(_consts.memColon);
+		msg.addStatic(str.getData(), str.getLength());
+		msg.addStatic(": ", 2);
 		str = pair.value;
-		msg.add(str.toMemory());
-		msg.add(_consts.memCr);
+		msg.addStatic(str.getData(), str.getLength());
+		msg.addStatic("\r\n", 2);
 	}
-	msg.add(_consts.memCr);
+	msg.addStatic("\r\n", 2);
 	return msg.merge();
 }
 
-sl_reg HttpRequestHeader::parseRequestPacket(const void* packet, sl_size _size)
+sl_reg HttpRequest::parseRequestPacket(const void* packet, sl_size _size)
 {
 	const sl_char8* data = (const sl_char8*)packet;
 	if (_size > SLIB_STR_MAX_LEN) {
@@ -448,155 +605,179 @@ sl_reg HttpRequestHeader::parseRequestPacket(const void* packet, sl_size _size)
 
 
 /***********************************************************************
-	HttpResponseHeader
+	HttpResponse
 ***********************************************************************/
-HttpResponseHeader::HttpResponseHeader()
+
+HttpResponse::HttpResponse()
 {
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	m_responseVersion = _consts.strHttp1_1;
-	m_responseCode = SLIB_HTTP_STATUS_200_OK;
-	SLIB_STATIC_STRING(s, SLIB_HTTP_MSG_200_OK);
-	m_responseMessage = s;
+	SLIB_STATIC_STRING(s1, "HTTP/1.1");
+	m_responseVersion = s1;
+	m_responseCode = HttpStatus::OK;
+	SLIB_STATIC_STRING(s2, "OK");
+	m_responseMessage = s2;
 }
 
-#define _RESPONSE_CASE(CODE, MSG) \
-	case CODE: \
-{ \
-	SLIB_STATIC_STRING(s, MSG); \
-	m_responseMessage = s; \
-	break; \
+HttpStatus HttpResponse::getResponseCode() const
+{
+	return m_responseCode;
 }
 
-void HttpResponseHeader::setResponseCode(sl_uint32 code)
+void HttpResponse::setResponseCode(HttpStatus code)
 {
 	m_responseCode = code;
-	switch (code) {
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_100_CONTINUE, SLIB_HTTP_MSG_100_CONTINUE);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_101_SWITCHING_PROTOCOLS, SLIB_HTTP_MSG_101_SWITCHING_PROTOCOLS);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_200_OK, SLIB_HTTP_MSG_200_OK);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_201_CREATED, SLIB_HTTP_MSG_201_CREATED);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_202_ACCEPTED, SLIB_HTTP_MSG_202_ACCEPTED);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_203_NON_AUTH_INFO, SLIB_HTTP_MSG_203_NON_AUTH_INFO);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_204_NO_CONTENT, SLIB_HTTP_MSG_204_NO_CONTENT);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_205_RESET_CONTENT, SLIB_HTTP_MSG_205_RESET_CONTENT);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_206_PARTIAL_CONTENT, SLIB_HTTP_MSG_206_PARTIAL_CONTENT);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_300_MULTIPLE_CHOICES, SLIB_HTTP_MSG_300_MULTIPLE_CHOICES);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_301_MOVED_PERMANENTLY, SLIB_HTTP_MSG_301_MOVED_PERMANENTLY);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_302_FOUND, SLIB_HTTP_MSG_302_FOUND);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_303_SEE_OTHER, SLIB_HTTP_MSG_303_SEE_OTHER);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_304_NOT_MODIFIED, SLIB_HTTP_MSG_304_NOT_MODIFIED);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_305_USE_PROXY, SLIB_HTTP_MSG_305_USE_PROXY);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_307_TEMP_REDIRECT, SLIB_HTTP_MSG_307_TEMP_REDIRECT);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_400_BAD_REQUEST, SLIB_HTTP_MSG_400_BAD_REQUEST);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_401_UNAUTHROIZED, SLIB_HTTP_MSG_401_UNAUTHROIZED);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_402_PAYMENT_REQUIRED, SLIB_HTTP_MSG_402_PAYMENT_REQUIRED);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_403_FORBIDDEN, SLIB_HTTP_MSG_403_FORBIDDEN);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_404_NOT_FOUND, SLIB_HTTP_MSG_404_NOT_FOUND);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_405_METHOD_NOT_ALLOWED, SLIB_HTTP_MSG_405_METHOD_NOT_ALLOWED);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_406_NOT_ACCEPTABLE, SLIB_HTTP_MSG_406_NOT_ACCEPTABLE);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_407_PROXY_AUTH_REQUIRED, SLIB_HTTP_MSG_407_PROXY_AUTH_REQUIRED);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_408_REQUEST_TIMEOUT, SLIB_HTTP_MSG_408_REQUEST_TIMEOUT);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_409_CONFLICT, SLIB_HTTP_MSG_409_CONFLICT);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_410_GONE, SLIB_HTTP_MSG_410_GONE);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_411_LENGTH_REQUIRED, SLIB_HTTP_MSG_411_LENGTH_REQUIRED);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_412_PRECONDITION_FAILED, SLIB_HTTP_MSG_412_PRECONDITION_FAILED);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_413_REQUEST_ENTITY_LARGE, SLIB_HTTP_MSG_413_REQUEST_ENTITY_LARGE);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_414_REQUEST_URI_LARGE, SLIB_HTTP_MSG_414_REQUEST_URI_LARGE);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_415_UNSUPPORTED_MEDIA_TYPE, SLIB_HTTP_MSG_415_UNSUPPORTED_MEDIA_TYPE);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_416_REQUESTED_RANGE_NOT_SATISFIABLE, SLIB_HTTP_MSG_416_REQUESTED_RANGE_NOT_SATISFIABLE);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_417_EXPECTATION_FAILED, SLIB_HTTP_MSG_417_EXPECTATION_FAILED);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_500_INTERNAL_SERVER_ERROR, SLIB_HTTP_MSG_500_INTERNAL_SERVER_ERROR);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_501_NOT_IMPLEMENTED, SLIB_HTTP_MSG_501_NOT_IMPLEMENTED);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_502_BAD_GATEWAY, SLIB_HTTP_MSG_502_BAD_GATEWAY);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_503_SERVICE_UNAVAILABLE, SLIB_HTTP_MSG_503_SERVICE_UNAVAILABLE);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_504_GATEWAY_TIMEOUT, SLIB_HTTP_MSG_504_GATEWAY_TIMEOUT);
-		_RESPONSE_CASE(SLIB_HTTP_STATUS_505_HTTP_VERSION_NOT_SUPPORTED, SLIB_HTTP_MSG_505_HTTP_VERSION_NOT_SUPPORTED);
-	}
+	m_responseMessage = HttpStatuses::toString(code);
 }
 
-sl_uint64 HttpResponseHeader::getResponseContentLengthHeader() const
+String HttpResponse::getResponseMessage() const
 {
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	String headerContentLength = getResponseHeader(_consts.strContentLength);
+	return m_responseMessage;
+}
+
+void HttpResponse::setResponseMessage(String message)
+{
+	m_responseMessage = message;
+}
+
+String HttpResponse::getResponseVersion() const
+{
+	return m_responseVersion;
+}
+
+void HttpResponse::setResponseVersion(const String& version)
+{
+	m_responseVersion = version;
+}
+
+const IMap<String, String>& HttpResponse::getResponseHeaders() const
+{
+	return m_responseHeaders;
+}
+
+String HttpResponse::getResponseHeader(String name) const
+{
+	return m_responseHeaders.getValue(name, String::null());
+}
+
+List<String> HttpResponse::getResponseHeaderValues(String name) const
+{
+	return m_responseHeaders.getValues(name);
+}
+
+void HttpResponse::setResponseHeader(String name, String value)
+{
+	m_responseHeaders.put(name, value);
+}
+
+void HttpResponse::addResponseHeader(String name, String value)
+{
+	m_responseHeaders.add(name, value);
+}
+
+sl_bool HttpResponse::containsResponseHeader(String name) const
+{
+	return m_responseHeaders.containsKey(name);
+}
+
+void HttpResponse::removeResponseHeader(String name)
+{
+	m_responseHeaders.removeAllMatchingKeys(name);
+}
+
+void HttpResponse::clearResponseHeaders()
+{
+	m_responseHeaders.removeAll();
+}
+
+sl_uint64 HttpResponse::getResponseContentLengthHeader() const
+{
+	String headerContentLength = getResponseHeader(HttpHeaders::ContentLength);
 	if (headerContentLength.isNotEmpty()) {
 		return headerContentLength.parseUint64();
 	}
 	return 0;
 }
 
-void HttpResponseHeader::setResponseContentLengthHeader(sl_int64 size)
+void HttpResponse::setResponseContentLengthHeader(sl_int64 size)
 {
 	if (size < 0) {
 		size = 0;
 	}
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	setResponseHeader(_consts.strContentLength, String::fromUint64(size));
+	setResponseHeader(HttpHeaders::ContentLength, String::fromUint64(size));
 }
 
-String HttpResponseHeader::getResponseHeader(String name) const
+String HttpResponse::getResponseContentType() const
 {
-	return m_responseHeaders.getValue(name, String::null());
+	return getResponseHeader(HttpHeaders::ContentType);
 }
 
-List<String> HttpResponseHeader::getResponseHeaderValues(String name) const
+void HttpResponse::setResponseContentType(const String& type)
 {
-	return m_responseHeaders.getValues(name);
+	setResponseHeader(HttpHeaders::ContentType, type);
 }
 
-void HttpResponseHeader::setResponseHeader(String name, String value)
+void HttpResponse::setResponseContentType(ContentType type)
 {
-	m_responseHeaders.put(name, value);
+	setResponseHeader(HttpHeaders::ContentType, ContentTypes::toString(type));
 }
 
-void HttpResponseHeader::addResponseHeader(String name, String value)
+String HttpResponse::getResponseContentEncoding() const
 {
-	m_responseHeaders.add(name, value);
+	return getResponseHeader(HttpHeaders::ContentEncoding);
 }
 
-sl_bool HttpResponseHeader::containsResponseHeader(String name) const
+void HttpResponse::setResponseContentEncoding(const String& type)
 {
-	return m_responseHeaders.containsKey(name);
+	setResponseHeader(HttpHeaders::ContentEncoding, type);
 }
 
-void HttpResponseHeader::removeResponseHeader(String name)
+String HttpResponse::getResponseTransferEncoding() const
 {
-	m_responseHeaders.removeAllMatchingKeys(name);
+	return getResponseHeader(HttpHeaders::TransferEncoding);
 }
 
-void HttpResponseHeader::clearResponseHeaders()
+void HttpResponse::setResponseTransferEncoding(const String& type)
 {
-	m_responseHeaders.removeAll();
+	setResponseHeader(HttpHeaders::TransferEncoding, type);
 }
 
-Memory HttpResponseHeader::makeResponsePacket() const
+sl_bool HttpResponse::isChunkedResponse() const
 {
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
+	String te = getResponseTransferEncoding();
+	if (te.endsWith("chunked")) {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+Memory HttpResponse::makeResponsePacket() const
+{
 	String8 str;
 	MemoryBuffer msg;
 	str = m_responseVersion;
-	msg.add(str.toMemory());
-	msg.add(_consts.memSp);
-	msg.add(String8::fromUint32(m_responseCode).toMemory());
-	msg.add(_consts.memSp);
+	msg.addStatic(str.getData(), str.getLength());
+	msg.addStatic(" ", 1);
+	str = String8::fromUint32((sl_uint32)m_responseCode);
+	msg.addStatic(str.getData(), str.getLength());
+	msg.addStatic(" ", 1);
 	str = m_responseMessage;
-	msg.add(str.toMemory());
-	msg.add(_consts.memCr);
+	msg.addStatic(str.getData(), str.getLength());
+	msg.addStatic("\r\n", 2);
 
 	Iterator< Pair<String, String> > iterator = m_responseHeaders.iterator();
 	Pair<String, String> pair;
 	while (iterator.next(&pair)) {
 		str = pair.key;
-		msg.add(str.toMemory());
-		msg.add(_consts.memColon);
+		msg.addStatic(str.getData(), str.getLength());
+		msg.addStatic(": ", 2);
 		str = pair.value;
-		msg.add(str.toMemory());
-		msg.add(_consts.memCr);
+		msg.addStatic(str.getData(), str.getLength());
+		msg.addStatic("\r\n", 2);
 	}
-	msg.add(_consts.memCr);
+	msg.addStatic("\r\n", 2);
 	return msg.merge();
 }
 
-sl_reg HttpResponseHeader::parseResponsePacket(const void* packet, sl_size _size)
+sl_reg HttpResponse::parseResponsePacket(const void* packet, sl_size _size)
 {
 	const sl_char8* data = (const sl_char8*)packet;
 	if (_size > SLIB_STR_MAX_LEN) {
@@ -638,9 +819,11 @@ sl_reg HttpResponseHeader::parseResponsePacket(const void* packet, sl_size _size
 		return 0;
 	}
 	String strResponseCode = String::fromUtf8(data + posStart, posCurrent - posStart);
-	if (!(strResponseCode.parseUint32(10, &m_responseCode))) {
+	sl_uint32 code;
+	if (!(strResponseCode.parseUint32(10, &code))) {
 		return -1;
 	}
+	m_responseCode = (HttpStatus)code;
 	posCurrent++;
 
 	// response message
@@ -717,51 +900,6 @@ sl_reg HttpResponseHeader::parseResponsePacket(const void* packet, sl_size _size
 	return posCurrent;
 }
 
-String HttpResponseHeader::getResponseContentType() const
-{
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	return getResponseHeader(_consts.strContentType);
-}
-
-void HttpResponseHeader::setResponseContentType(const String& type)
-{
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	setResponseHeader(_consts.strContentType, type);
-}
-
-String HttpResponseHeader::getResponseContentEncoding() const
-{
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	return getResponseHeader(_consts.strContentEncoding);
-}
-
-void HttpResponseHeader::setResponseContentEncoding(const String& type)
-{
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	setResponseHeader(_consts.strContentEncoding, type);
-}
-
-String HttpResponseHeader::getResponseTransferEncoding() const
-{
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	return getResponseHeader(_consts.strTransferEncoding);
-}
-
-void HttpResponseHeader::setResponseTransferEncoding(const String& type)
-{
-	_Http_StaticConsts& _consts = _Http_StaticConsts_get();
-	setResponseHeader(_consts.strTransferEncoding, type);
-}
-
-sl_bool HttpResponseHeader::isChunkedResponse() const
-{
-	String te = getResponseTransferEncoding();
-	if (te.endsWith("chunked")) {
-		return sl_true;
-	}
-	return sl_false;
-}
-
 /***********************************************************************
 	HttpOutputBuffer
 ***********************************************************************/
@@ -769,9 +907,39 @@ HttpOutputBuffer::HttpOutputBuffer()
 {
 }
 
+void HttpOutputBuffer::clearOutput()
+{
+	m_bufferOutput.clearOutput();
+}
+
+void HttpOutputBuffer::write(const void* buf, sl_size size)
+{
+	m_bufferOutput.write(buf, size);
+}
+
 void HttpOutputBuffer::write(const String& str)
 {
-	write(str.getBuf(), str.getLength());
+	write(str.getData(), str.getLength());
+}
+
+void HttpOutputBuffer::write(const Memory& mem)
+{
+	m_bufferOutput.write(mem);
+}
+
+void HttpOutputBuffer::copyFrom(AsyncStream* stream, sl_uint64 size)
+{
+	m_bufferOutput.copyFrom(stream, size);
+}
+
+void HttpOutputBuffer::copyFromFile(const String& path)
+{
+	m_bufferOutput.copyFromFile(path);
+}
+
+sl_uint64 HttpOutputBuffer::getOutputLength() const
+{
+	return m_bufferOutput.getOutputLength();
 }
 
 /***********************************************************************
@@ -813,12 +981,12 @@ sl_bool HttpHeaderReader::add(const void* _buf, sl_size size, sl_size& posBody)
 		}
 	}
 	if (flagFound) {
-		m_buffer.add(buf, posBody);
+		m_buffer.add(Memory::create(buf, posBody));
 		m_last[0] = 0;
 		m_last[1] = 0;
 		m_last[2] = 0;
 	} else {
-		m_buffer.add(buf, size);
+		m_buffer.add(Memory::create(buf, size));
 		if (size < 3) {
 			if (size == 1) {
 				m_last[0] = m_last[1];
@@ -864,62 +1032,6 @@ HttpContentReader::HttpContentReader()
 	m_flagDecompressing = sl_false;
 }
 
-void HttpContentReader::onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError)
-{
-	if (flagError) {
-		setReadingEnded();
-	}
-	AsyncStreamFilter::onRead(stream, data, sizeRead, ref, flagError);
-	if (flagError) {
-		setError();
-	}
-}
-
-void HttpContentReader::setCompleted(void* dataRemain, sl_uint32 size)
-{
-	setReadingEnded();
-	PtrLocker<IHttpContentReaderListener> listener(m_listener);
-	if (listener.isNotNull()) {
-		listener->onCompleteReadHttpContent(dataRemain, size, isReadingError());
-	}
-	setReadingError();
-}
-
-void HttpContentReader::setError()
-{
-	setReadingEnded();
-	PtrLocker<IHttpContentReaderListener> listener(m_listener);
-	if (listener.isNotNull()) {
-		listener->onCompleteReadHttpContent(sl_null, 0, sl_true);
-	}
-	setReadingError();
-}
-
-sl_bool HttpContentReader::write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref)
-{
-	return sl_false;
-}
-
-sl_bool HttpContentReader::setDecompressing()
-{
-	if (m_zlib.start()) {
-		m_flagDecompressing = sl_true;
-		return sl_true;
-	} else {
-		m_flagDecompressing = sl_false;
-		return sl_false;
-	}
-}
-
-Memory HttpContentReader::decompressData(void* data, sl_uint32 size, const Referable* refData)
-{
-	if (m_flagDecompressing) {
-		return m_zlib.decompress(data, size);
-	} else {
-		return Memory::createStatic(data, size, refData);
-	}
-}
-
 class _HttpContentReader_Persistent : public HttpContentReader
 {
 public:
@@ -948,12 +1060,11 @@ public:
 	}
 };
 
-Ref<HttpContentReader> HttpContentReader::createPersistent(
-	const Ref<AsyncStream>& io
-	, const Ptr<IHttpContentReaderListener>& listener
-	, sl_uint64 contentLength
-	, sl_uint32 bufferSize
-	, sl_bool flagDecompress)
+Ref<HttpContentReader> HttpContentReader::createPersistent(const Ref<AsyncStream>& io,
+														   const Ptr<IHttpContentReaderListener>& listener,
+														   sl_uint64 contentLength,
+														   sl_uint32 bufferSize,
+														   sl_bool flagDecompress)
 {
 	Ref<_HttpContentReader_Persistent> ret = new _HttpContentReader_Persistent;
 	if (io.isNull()) {
@@ -1118,11 +1229,10 @@ public:
 	}
 };
 
-Ref<HttpContentReader> HttpContentReader::createChunked(
-	const Ref<AsyncStream>& io
-	, const Ptr<IHttpContentReaderListener>& listener
-	, sl_uint32 bufferSize
-	, sl_bool flagDecompress)
+Ref<HttpContentReader> HttpContentReader::createChunked(const Ref<AsyncStream>& io,
+														const Ptr<IHttpContentReaderListener>& listener,
+														sl_uint32 bufferSize,
+														sl_bool flagDecompress)
 {
 	Ref<_HttpContentReader_Chunked> ret = new _HttpContentReader_Chunked;
 	if (io.isNull()) {
@@ -1153,11 +1263,10 @@ public:
 	}
 };
 
-Ref<HttpContentReader> HttpContentReader::createTearDown(
-	const Ref<AsyncStream>& io
-	, const Ptr<IHttpContentReaderListener>& listener
-	, sl_uint32 bufferSize
-	, sl_bool flagDecompress)
+Ref<HttpContentReader> HttpContentReader::createTearDown(const Ref<AsyncStream>& io,
+														 const Ptr<IHttpContentReaderListener>& listener,
+														 sl_uint32 bufferSize,
+														 sl_bool flagDecompress)
 {
 	Ref<_HttpContentReader_TearDown> ret = new _HttpContentReader_TearDown;
 	if (io.isNull()) {
@@ -1177,6 +1286,67 @@ Ref<HttpContentReader> HttpContentReader::createTearDown(
 		}
 	}
 	return ret;
+}
+
+sl_bool HttpContentReader::isDecompressing()
+{
+	return m_flagDecompressing;
+}
+
+void HttpContentReader::onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError)
+{
+	if (flagError) {
+		setReadingEnded();
+	}
+	AsyncStreamFilter::onRead(stream, data, sizeRead, ref, flagError);
+	if (flagError) {
+		setError();
+	}
+}
+
+void HttpContentReader::setCompleted(void* dataRemain, sl_uint32 size)
+{
+	setReadingEnded();
+	PtrLocker<IHttpContentReaderListener> listener(m_listener);
+	if (listener.isNotNull()) {
+		listener->onCompleteReadHttpContent(dataRemain, size, isReadingError());
+	}
+	setReadingError();
+}
+
+void HttpContentReader::setError()
+{
+	setReadingEnded();
+	PtrLocker<IHttpContentReaderListener> listener(m_listener);
+	if (listener.isNotNull()) {
+		listener->onCompleteReadHttpContent(sl_null, 0, sl_true);
+	}
+	setReadingError();
+}
+
+sl_bool HttpContentReader::write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref)
+{
+	return sl_false;
+}
+
+sl_bool HttpContentReader::setDecompressing()
+{
+	if (m_zlib.start()) {
+		m_flagDecompressing = sl_true;
+		return sl_true;
+	} else {
+		m_flagDecompressing = sl_false;
+		return sl_false;
+	}
+}
+
+Memory HttpContentReader::decompressData(void* data, sl_uint32 size, const Referable* refData)
+{
+	if (m_flagDecompressing) {
+		return m_zlib.decompress(data, size);
+	} else {
+		return Memory::createStatic(data, size, refData);
+	}
 }
 
 SLIB_NETWORK_NAMESPACE_END

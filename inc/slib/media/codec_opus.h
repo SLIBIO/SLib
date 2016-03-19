@@ -15,9 +15,10 @@
 
 SLIB_MEDIA_NAMESPACE_BEGIN
 
-enum OpusEncoderType {
-	opusEncoderType_Voice = 0,
-	opusEncoderType_Music = 1
+enum class OpusEncoderType
+{
+	Voice = 0,
+	Music = 1
 };
 
 class SLIB_EXPORT OpusEncoderParam
@@ -31,6 +32,7 @@ public:
 
 public:
 	OpusEncoderParam();
+	
 };
 
 class SLIB_EXPORT OpusEncoder : public AudioEncoder
@@ -51,6 +53,7 @@ public:
 
 public:
 	OpusDecoderParam();
+	
 };
 
 class SLIB_EXPORT OpusDecoder : public AudioDecoder

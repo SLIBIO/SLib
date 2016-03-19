@@ -200,12 +200,12 @@ sl_bool System::createProcess(const String& pathExecutable, const String* cmds, 
 
 			signal(SIGHUP, SIG_IGN);
 
-			char* exe = strdup(pathExecutable.getBuf());
+			char* exe = strdup(pathExecutable.getData());
 			char** args = (char**)(Base::createMemory((nCmds + 2) * sizeof(char*)));
 			args[0] = exe;
 			for (sl_size i = 0; i < nCmds; i++) {
 				String8 param = cmds[i];
-				args[i+1] = strdup(param.getBuf());
+				args[i+1] = strdup(param.getData());
 			}
 			args[nCmds+1] = 0;
 
@@ -236,11 +236,11 @@ void System::abort(const String& msg, const String& file, sl_uint32 line)
 {
 #if defined(SLIB_DEBUG)
 #if defined(SLIB_PLATFORM_IS_ANDROID)
-	__assert(file.getBuf(), line, msg.getBuf());
+	__assert(file.getData(), line, msg.getData());
 #elif defined(SLIB_PLATFORM_IS_BLACKBERRY)
-	std::__assert(msg.getBuf(), file.getBuf(), line, 0);
+	std::__assert(msg.getData(), file.getData(), line, 0);
 #else
-	__assert(msg.getBuf(), file.getBuf(), line);
+	__assert(msg.getData(), file.getData(), line);
 #endif
 #endif
 }
@@ -252,10 +252,10 @@ void Console::print(const String& s)
 	Log::getConsoleLogger()->log(c, s);
 #elif defined(SLIB_PLATFORM_IS_BLACKBERRY)
 	String8 _s = s;
-	qDebug() << _s.getBuf() << endl;
+	qDebug() << _s.getData() << endl;
 #else
 	String8 _s = s;
-	printf("%s", _s.getBuf());
+	printf("%s", _s.getData());
 #endif
 }
 

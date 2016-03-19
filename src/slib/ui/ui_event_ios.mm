@@ -15,7 +15,7 @@ sl_uint32 UIEvent::getSystemKeycode(Keycode key)
 
 Keycode UIEvent::getKeycodeFromSystemKeycode(sl_uint32 vkey)
 {
-	return keyUnknown;
+	return Keycode::Unknown;
 }
 
 sl_bool UI::checkKeyPressed(Keycode key)

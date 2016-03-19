@@ -33,7 +33,7 @@ Ref<ViewInstance> RadioButton::createInstance(ViewInstance* parent)
 {
 	String16 text = m_text;
 	UINT style = BS_RADIOBUTTON | WS_TABSTOP;
-	Ref<_Win32_RadioButtonViewInstance> ret = Win32_ViewInstance::create<_Win32_RadioButtonViewInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getBuf()), style, 0);
+	Ref<_Win32_RadioButtonViewInstance> ret = Win32_ViewInstance::create<_Win32_RadioButtonViewInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
 	if (ret.isNotNull()) {
 		HWND handle = ret->getHandle();
 		if (m_flagSelected) {
@@ -43,7 +43,7 @@ Ref<ViewInstance> RadioButton::createInstance(ViewInstance* parent)
 		}
 		Ref<Font> font = m_font;
 		Ref<FontInstance> fontInstance;
-		HFONT hFont = UIPlatform::getGdiFont(font.get(), fontInstance);
+		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
@@ -75,7 +75,7 @@ void RadioButton::setFont(const Ref<Font>& font)
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		HFONT hFont = UIPlatform::getGdiFont(font.get(), fontInstance);
+		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}

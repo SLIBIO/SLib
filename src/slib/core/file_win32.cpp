@@ -21,23 +21,23 @@ sl_file File::_open(const String& _filePath, FileMode mode)
 	DWORD dwFlags = FILE_ATTRIBUTE_NORMAL;
 
 	switch (mode) {
-	case fileMode_Read:
+	case FileMode::Read:
 		dwDesiredAccess = GENERIC_READ;
 		dwCreateDisposition = OPEN_EXISTING;
 		break;
-	case fileMode_Write:
+	case FileMode::Write:
 		dwDesiredAccess = GENERIC_WRITE;
 		dwCreateDisposition = CREATE_ALWAYS;
 		break;
-	case fileMode_ReadWrite:
+	case FileMode::ReadWrite:
 		dwDesiredAccess = GENERIC_READ | GENERIC_WRITE;
 		dwCreateDisposition = CREATE_ALWAYS;
 		break;
-	case fileMode_Append:
+	case FileMode::Append:
 		dwDesiredAccess = GENERIC_WRITE;
 		dwCreateDisposition = OPEN_ALWAYS;
 		break;
-	case fileMode_RandomAccess:
+	case FileMode::RandomAccess:
 		dwDesiredAccess = GENERIC_READ | GENERIC_WRITE;
 		dwCreateDisposition = OPEN_ALWAYS;
 		dwFlags |= FILE_FLAG_RANDOM_ACCESS;
@@ -45,7 +45,7 @@ sl_file File::_open(const String& _filePath, FileMode mode)
 	}
 
 	HANDLE handle = ::CreateFileW(
-		(LPCWSTR)(filePath.getBuf())
+		(LPCWSTR)(filePath.getData())
 		, dwDesiredAccess
 		, dwShareMode
 		, NULL
@@ -118,11 +118,11 @@ sl_bool File::seek(sl_int64 location, SeekPosition from)
 	if (isOpened()) {
 		HANDLE handle = (HANDLE)m_file;
 		DWORD dwFrom;
-		if (from == seekPosition_Current) {
+		if (from == SeekPosition::Current) {
 			dwFrom = FILE_CURRENT;
-		} else if (from == seekPosition_Begin) {
+		} else if (from == SeekPosition::Begin) {
 			dwFrom = FILE_BEGIN;
-		} else if (from == seekPosition_End) {
+		} else if (from == SeekPosition::End) {
 			dwFrom = FILE_END;
 		} else {
 			return sl_false;
@@ -144,10 +144,10 @@ sl_bool File::setSize(sl_uint64 size)
 {
 	if (isOpened()) {
 		sl_int64 pos_orig = getPosition();
-		if (seek(size, seekPosition_Begin)) {
+		if (seek(size, SeekPosition::Begin)) {
 			HANDLE handle = (HANDLE)m_file;
 			BOOL bRet = ::SetEndOfFile(handle);
-			seek(pos_orig, seekPosition_Begin);
+			seek(pos_orig, SeekPosition::Begin);
 			return bRet != 0;
 		}
 	}
@@ -206,7 +206,7 @@ sl_uint64 File::getSize(const String& _filePath)
 	if (filePath.isEmpty()) {
 		return 0;
 	}
-	HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getBuf()), 0, 0, NULL, OPEN_EXISTING, 0, NULL);
+	HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getData()), 0, 0, NULL, OPEN_EXISTING, 0, NULL);
 	if (handle != INVALID_HANDLE_VALUE) {
 		return getSize((sl_file)handle);
 	} else {
@@ -271,7 +271,7 @@ Time File::getModifiedTime(const String& _filePath)
 	if (filePath.isEmpty()) {
 		return Time::zero();
 	}
-	HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getBuf()), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+	HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
 	if (handle != INVALID_HANDLE_VALUE) {
 		Time ret = _File_getModifiedTime(handle);
 		::CloseHandle(handle);
@@ -296,7 +296,7 @@ Time File::getAccessedTime(const String& _filePath)
 	if (filePath.isEmpty()) {
 		return Time::zero();
 	}
-	HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getBuf()), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+	HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
 	if (handle != INVALID_HANDLE_VALUE) {
 		Time ret = _File_getAccessedTime(handle);
 		::CloseHandle(handle);
@@ -321,7 +321,7 @@ Time File::getCreatedTime(const String& _filePath)
 	if (filePath.isEmpty()) {
 		return Time::zero();
 	}
-	HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getBuf()), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
+	HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
 	if (handle != INVALID_HANDLE_VALUE) {
 		Time ret = _File_getCreatedTime(handle);
 		::CloseHandle(handle);
@@ -337,7 +337,7 @@ sl_bool File::setModifiedTime(const String& _filePath, Time time)
 	if (filePath.isEmpty()) {
 		return sl_false;
 	}
-	HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getBuf()), GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+	HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
 	if (handle != INVALID_HANDLE_VALUE) {
 		FILETIME lft;
 		FILETIME ft;
@@ -357,7 +357,7 @@ sl_bool File::setAccessedTime(const String& _filePath, Time time)
 	if (filePath.isEmpty()) {
 		return sl_false;
 	}
-	HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getBuf()), GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+	HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
 	if (handle != INVALID_HANDLE_VALUE) {
 		FILETIME lft;
 		FILETIME ft;
@@ -377,7 +377,7 @@ sl_bool File::setCreatedTime(const String& _filePath, Time time)
 	if (filePath.isEmpty()) {
 		return sl_false;
 	}
-	HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getBuf()), GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+	HANDLE handle = ::CreateFileW((LPCWSTR)(filePath.getData()), GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
 	if (handle != INVALID_HANDLE_VALUE) {
 		FILETIME lft;
 		FILETIME ft;
@@ -397,16 +397,16 @@ int File::getAttributes(const String& _filePath)
 	if (filePath.isEmpty()) {
 		return -1;
 	}
-	DWORD attr = ::GetFileAttributesW((LPCWSTR)(filePath.getBuf()));
+	DWORD attr = ::GetFileAttributesW((LPCWSTR)(filePath.getData()));
 	if (attr == -1) {
 		return -1;
 	} else {
 		int ret = 0;
 		if (attr & FILE_ATTRIBUTE_DIRECTORY) {
-			ret |= fileAttribute_Directory;
+			ret |= FileAttribute::Directory;
 		}
 		if (attr & FILE_ATTRIBUTE_HIDDEN) {
-			ret |= fileAttribute_Hidden;
+			ret |= FileAttribute::Hidden;
 		}
 		return ret;
 	}
@@ -418,7 +418,7 @@ sl_bool File::setHidden(const String& _filePath, sl_bool flagHidden)
 	if (filePath.isEmpty()) {
 		return sl_false;
 	}
-	DWORD attr = ::GetFileAttributesW((LPCWSTR)(filePath.getBuf()));
+	DWORD attr = ::GetFileAttributesW((LPCWSTR)(filePath.getData()));
 	if (attr == -1) {
 		return sl_false;
 	}
@@ -427,7 +427,7 @@ sl_bool File::setHidden(const String& _filePath, sl_bool flagHidden)
 	} else {
 		attr &= (~FILE_ATTRIBUTE_HIDDEN);
 	}
-	return ::SetFileAttributesW((LPCWSTR)(filePath.getBuf()), attr) != 0;
+	return ::SetFileAttributesW((LPCWSTR)(filePath.getData()), attr) != 0;
 }
 
 List<String> File::getFiles(const String& _filePath)
@@ -445,7 +445,7 @@ List<String> File::getFiles(const String& _filePath)
 	SLIB_STATIC_STRING(t, "/*");
 	String16 query = filePath + t;
 	WIN32_FIND_DATAW fd;
-	HANDLE handle = ::FindFirstFileW((LPCWSTR)(query.getBuf()), &fd);
+	HANDLE handle = ::FindFirstFileW((LPCWSTR)(query.getData()), &fd);
 	if (handle != INVALID_HANDLE_VALUE) {
 		List<String> ret;
 		BOOL c = TRUE;
@@ -471,7 +471,7 @@ sl_bool File::createDirectory(const String& _filePath)
 	if (filePath.isEmpty()) {
 		return sl_false;
 	}
-	BOOL ret = ::CreateDirectoryW((LPCWSTR)(filePath.getBuf()), NULL);
+	BOOL ret = ::CreateDirectoryW((LPCWSTR)(filePath.getData()), NULL);
 	return ret != 0;
 }
 
@@ -481,7 +481,7 @@ sl_bool File::deleteFile(const String& _filePath)
 	if (filePath.isEmpty()) {
 		return sl_false;
 	}
-	BOOL ret = ::DeleteFileW((LPCWSTR)(filePath.getBuf()));
+	BOOL ret = ::DeleteFileW((LPCWSTR)(filePath.getData()));
 	return ret != 0;
 }
 
@@ -491,7 +491,7 @@ sl_bool File::deleteDirectoryOnly(const String& filePath)
 		return sl_false;
 	}
 	String16 dirPath = normalizeDirectoryPath(filePath);
-	BOOL ret = ::RemoveDirectoryW((LPCWSTR)(dirPath.getBuf()));
+	BOOL ret = ::RemoveDirectoryW((LPCWSTR)(dirPath.getData()));
 	return ret != 0;
 }
 
@@ -505,7 +505,7 @@ sl_bool File::rename(const String& _oldPath, const String& _newPath)
 	if (newPath.isEmpty()) {
 		return sl_false;
 	}
-	BOOL ret = ::MoveFileExW((LPCWSTR)(oldPath.getBuf()), (LPCWSTR)(newPath.getBuf()), 0);
+	BOOL ret = ::MoveFileExW((LPCWSTR)(oldPath.getData()), (LPCWSTR)(newPath.getData()), 0);
 	return ret != 0;
 }
 

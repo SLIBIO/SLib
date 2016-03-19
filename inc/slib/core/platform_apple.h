@@ -19,6 +19,7 @@
 #endif
 
 SLIB_NAMESPACE_BEGIN
+
 // specific functions for OSX & iOS
 class SLIB_EXPORT Apple
 {
@@ -37,7 +38,7 @@ public:
 	static CGImageRef loadCGImage(const void* buf, sl_size size);
 #endif
 	
-	static String getResourceFilePath(const String& path);
+	static String getAssetFilePath(const String& path);
 	
 	static String getSystemVersion();
 	
@@ -46,6 +47,7 @@ public:
 	static sl_uint32 getSystemMinorVersion();
 
 };
+
 SLIB_NAMESPACE_END
 
 #endif // APPLE

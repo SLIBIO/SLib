@@ -12,17 +12,17 @@ SLIB_CRYPTO_NAMESPACE_BEGIN
 Ref<CryptoHash> CryptoHash::create(CryptoHashType type)
 {
 	switch (type) {
-	case cryptoHashType_MD5:
+	case CryptoHashType::MD5:
 		return new MD5();
-	case cryptoHashType_SHA1:
+	case CryptoHashType::SHA1:
 		return new SHA1();
-	case cryptoHashType_SHA224:
+	case CryptoHashType::SHA224:
 		return new SHA224();
-	case cryptoHashType_SHA256:
+	case CryptoHashType::SHA256:
 		return new SHA256();
-	case cryptoHashType_SHA384:
+	case CryptoHashType::SHA384:
 		return new SHA384();
-	case cryptoHashType_SHA512:
+	case CryptoHashType::SHA512:
 		return new SHA512();
 	}
 	return Ref<CryptoHash>::null();
@@ -57,6 +57,14 @@ Ref<CryptoHash> CryptoHash::sha512()
 {
 	return new SHA512();
 }
+
+void CryptoHash::execute(const void* input, sl_size n, void* output)
+{
+	start();
+	update(input, n);
+	finish(output);
+}
+
 
 /*
 	Public-Key Cryptography Standards (PKCS) #1: RSA Cryptography Specifications Version 2.1

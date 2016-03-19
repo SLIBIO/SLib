@@ -10,7 +10,7 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class _Win32_EditViewInstance : public Win32_ViewInstance
 {
-	SLIB_DECLARE_OBJECT(_Win32_EditViewInstance, Win32_ViewInstance)
+	SLIB_DECLARE_OBJECT
 public:
 	Color m_colorText;
 	Color m_colorBackground;
@@ -47,7 +47,7 @@ public:
 			::DeleteObject(m_hBrushBackground);
 			m_hBrushBackground = NULL;
 		}
-		if (color.getAlpha() != 0) {
+		if (color.a != 0) {
 			m_hBrushBackground = ::CreateSolidBrush(UIPlatform::getColorRef(color));
 		}
 		::InvalidateRect(handle, NULL, TRUE);
@@ -79,8 +79,8 @@ public:
 		case EN_CHANGE:
 			{
 				Ref<View> _view = getView();
-				if (EditView::checkInstance(_view)) {
-					EditView* view = (EditView*)(_view.get());
+				if (EditView::checkInstance(_view.ptr)) {
+					EditView* view = (EditView*)(_view.ptr);
 					String text = Windows::getWindowText(m_handle);
 					String textNew = view->dispatchChange(text);
 					if (text != textNew) {
@@ -130,10 +130,10 @@ public:
 		if (m_flagBorder) {
 			style |= WS_BORDER;
 		}
-		sl_uint32 align = m_textAlignment & alignHorizontalMask;
-		if (align == alignCenter) {
+		Alignment align = (Alignment)((int)m_textAlignment & (int)Alignment::HorizontalMask);
+		if (align == Alignment::Center) {
 			style |= ES_CENTER;
-		} else if (align == alignRight) {
+		} else if (align == Alignment::Right) {
 			style |= ES_RIGHT;
 		}
 		if (type == 0) {
@@ -150,21 +150,21 @@ public:
 		}		
 		style |= ES_AUTOHSCROLL;
 		String16 text = m_text;
-		Ref<_Win32_EditViewInstance> ret = Win32_ViewInstance::create<_Win32_EditViewInstance>(this, parent, L"EDIT", (LPCWSTR)(text.getBuf()), style, 0);
+		Ref<_Win32_EditViewInstance> ret = Win32_ViewInstance::create<_Win32_EditViewInstance>(this, parent, L"EDIT", (LPCWSTR)(text.getData()), style, 0);
 		if (ret.isNotNull()) {
 			
 			HWND handle = ret->getHandle();
 			
 			Ref<Font> font = m_font;
 			Ref<FontInstance> fontInstance;
-			HFONT hFont = UIPlatform::getGdiFont(font.get(), fontInstance);
+			HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 			if (hFont) {
 				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 			}
 			m_fontInstance = fontInstance;
 
 			String16 hintText = m_hintText;
-			::SendMessageW(handle, 0x1501 /*EM_SETCUEBANNER*/, FALSE, (LPARAM)(LPCWSTR)(hintText.getBuf()));
+			::SendMessageW(handle, 0x1501 /*EM_SETCUEBANNER*/, FALSE, (LPARAM)(LPCWSTR)(hintText.getData()));
 			ret->setTextColor(m_textColor);
 			ret->setBackgroundColor(m_backgroundColor);
 		}
@@ -172,6 +172,8 @@ public:
 	}
 
 };
+
+SLIB_DEFINE_OBJECT(_Win32_EditViewInstance, Win32_ViewInstance)
 
 Ref<ViewInstance> EditView::createInstance(ViewInstance* parent)
 {
@@ -238,11 +240,11 @@ Alignment EditView::getTextAlignment()
 	if (handle) {
 		LONG style = ::GetWindowLongW(handle, GWL_STYLE);
 		if (style & ES_CENTER) {
-			m_textAlignment = alignCenter;
+			m_textAlignment = Alignment::Center;
 		} else if (style & ES_RIGHT) {
-			m_textAlignment = alignRight;
+			m_textAlignment = Alignment::Right;
 		} else {
-			m_textAlignment = alignLeft;
+			m_textAlignment = Alignment::Left;
 		}
 	}
 	return m_textAlignment;
@@ -253,10 +255,10 @@ void EditView::setTextAlignment(Alignment _align)
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		LONG style = ::GetWindowLongW(handle, GWL_STYLE) & (~(ES_RIGHT | ES_CENTER));
-		sl_uint32 align = _align & alignHorizontalMask;
-		if (align == alignCenter) {
+		Alignment align = (Alignment)((int)_align & (int)Alignment::HorizontalMask);
+		if (align == Alignment::Center) {
 			style |= ES_CENTER;
-		} else if (align == alignRight) {
+		} else if (align == Alignment::Right) {
 			style |= ES_RIGHT;
 		}
 		::SetWindowLongW(handle, GWL_STYLE, style);
@@ -282,7 +284,7 @@ void EditView::setHintText(const String& _value)
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		String16 value = _value;
-		::SendMessageW(handle, 0x1501 /*EM_SETCUEBANNER*/, FALSE, (LPARAM)(LPCWSTR)(value.getBuf()));
+		::SendMessageW(handle, 0x1501 /*EM_SETCUEBANNER*/, FALSE, (LPARAM)(LPCWSTR)(value.getData()));
 	}
 	m_hintText = _value;
 }
@@ -335,8 +337,8 @@ void EditView::setMultiLine(sl_bool flag)
 Color EditView::getTextColor()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_EditViewInstance::checkInstance(_instance)) {
-		_Win32_EditViewInstance* instance = ((_Win32_EditViewInstance*)(_instance.get()));
+	if (_Win32_EditViewInstance::checkInstance(_instance.ptr)) {
+		_Win32_EditViewInstance* instance = ((_Win32_EditViewInstance*)(_instance.ptr));
 		m_textColor = instance->m_colorText;
 	}
 	return m_textColor;
@@ -345,8 +347,8 @@ Color EditView::getTextColor()
 void EditView::setTextColor(const Color& color)
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_EditViewInstance::checkInstance(_instance)) {
-		_Win32_EditViewInstance* instance = ((_Win32_EditViewInstance*)(_instance.get()));
+	if (_Win32_EditViewInstance::checkInstance(_instance.ptr)) {
+		_Win32_EditViewInstance* instance = ((_Win32_EditViewInstance*)(_instance.ptr));
 		instance->setTextColor(color); 
 	}
 	m_textColor = color;
@@ -355,8 +357,8 @@ void EditView::setTextColor(const Color& color)
 Color EditView::getBackgroundColor()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_EditViewInstance::checkInstance(_instance)) {
-		_Win32_EditViewInstance* instance = ((_Win32_EditViewInstance*)(_instance.get()));
+	if (_Win32_EditViewInstance::checkInstance(_instance.ptr)) {
+		_Win32_EditViewInstance* instance = ((_Win32_EditViewInstance*)(_instance.ptr));
 		m_backgroundColor = instance->m_colorBackground;
 	}
 	return m_backgroundColor;
@@ -365,8 +367,8 @@ Color EditView::getBackgroundColor()
 void EditView::setBackgroundColor(const Color& color)
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_EditViewInstance::checkInstance(_instance)) {
-		_Win32_EditViewInstance* instance = ((_Win32_EditViewInstance*)(_instance.get()));
+	if (_Win32_EditViewInstance::checkInstance(_instance.ptr)) {
+		_Win32_EditViewInstance* instance = ((_Win32_EditViewInstance*)(_instance.ptr));
 		instance->setBackgroundColor(color);
 	}
 	m_backgroundColor = color;
@@ -377,7 +379,7 @@ void EditView::setFont(const Ref<Font>& font)
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		HFONT hFont = UIPlatform::getGdiFont(font.get(), fontInstance);
+		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}

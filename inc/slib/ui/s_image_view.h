@@ -9,7 +9,8 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class SLIB_EXPORT SImageView : public SView
 {
-	SLIB_DECLARE_OBJECT(SImageView, SView)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	SImageView();
 	

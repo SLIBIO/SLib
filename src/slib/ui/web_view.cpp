@@ -14,6 +14,9 @@ void IWebViewListener::onMessageFromJavaScript(WebView* view, const String& msg,
 {
 }
 
+
+SLIB_DEFINE_OBJECT(WebView, View)
+
 WebView::WebView()
 {
 	m_flagOfflineContent = sl_false;

@@ -24,6 +24,7 @@
 #include "core/list.h"
 #include "core/map.h"
 #include "core/queue.h"
+#include "core/loop_queue.h"
 #include "core/queue_channel.h"
 #include "core/expire.h"
 
@@ -35,21 +36,24 @@
 #include "core/event.h"
 #include "core/thread.h"
 #include "core/thread_pool.h"
-#include "core/service.h"
-#include "core/app.h"
 #include "core/log.h"
-#include "core/resource.h"
+#include "core/asset.h"
 
 #include "core/io.h"
 #include "core/file.h"
 #include "core/pipe.h"
 #include "core/async.h"
 
+#include "core/app.h"
+#include "core/service.h"
 #include "core/content_type.h"
+#include "core/locale.h"
+#include "core/resource.h"
 #include "core/setting.h"
+#include "core/url.h"
+
 #include "core/json.h"
 #include "core/base64.h"
-#include "core/url.h"
 
 #endif
 

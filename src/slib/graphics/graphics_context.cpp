@@ -1,10 +1,9 @@
 #include "../../../inc/slib/graphics/context.h"
 #include "../../../inc/slib/graphics/image.h"
 
-#include "../../../inc/slib/core/file.h"
-#include "../../../inc/slib/core/resource.h"
-
 SLIB_GRAPHICS_NAMESPACE_BEGIN
+
+SLIB_DEFINE_OBJECT(GraphicsContext, Object)
 
 Ref<Drawable> GraphicsContext::createDrawableFromImage(const Ref<Image>& image)
 {
@@ -19,28 +18,11 @@ Ref<Drawable> GraphicsContext::createDrawableFromImage(const Ref<Image>& image)
 Ref<Drawable> GraphicsContext::loadDrawableFromMemory(const Memory& mem)
 {
 	if (mem.isNotEmpty()) {
-		return loadDrawableFromMemory(mem.getBuf(), mem.getSize());
+		return loadDrawableFromMemory(mem.getData(), mem.getSize());
 	}
 	return Ref<Drawable>::null();
 }
 
-Ref<Drawable> GraphicsContext::loadDrawableFromFile(const String& filePath)
-{
-	Memory mem = File::readAllBytes(filePath);
-	if (mem.isNotEmpty()) {
-		return loadDrawableFromMemory(mem);
-	}
-	return Ref<Drawable>::null();
-}
-
-Ref<Drawable> GraphicsContext::loadDrawableFromResource(const String& path)
-{
-	Memory mem = Resource::readAllBytes(path);
-	if (mem.isNotEmpty()) {
-		return loadDrawableFromMemory(mem);
-	}
-	return Ref<Drawable>::null();
-}
 
 Ref<Bitmap> GraphicsContext::createBitmapFromImage(const ImageDesc& desc)
 {
@@ -65,29 +47,11 @@ Ref<Bitmap> GraphicsContext::createBitmapFromImage(const Ref<Image>& image)
 Ref<Bitmap> GraphicsContext::loadBitmapFromMemory(const Memory& mem)
 {
 	if (mem.isNotEmpty()) {
-		return loadBitmapFromMemory(mem.getBuf(), mem.getSize());
+		return loadBitmapFromMemory(mem.getData(), mem.getSize());
 	}
 	return Ref<Bitmap>::null();
 }
 
-Ref<Bitmap> GraphicsContext::loadBitmapFromFile(const String& filePath)
-{
-	Memory mem = File::readAllBytes(filePath);
-	if (mem.isNotEmpty()) {
-		return loadBitmapFromMemory(mem);
-	}
-	return Ref<Bitmap>::null();
-}
-
-Ref<Bitmap> GraphicsContext::loadBitmapFromResource(const String& path)
-{
-	Ref<Bitmap> ret;
-	Memory mem = Resource::readAllBytes(path);
-	if (mem.isNotEmpty()) {
-		return loadBitmapFromMemory(mem);
-	}
-	return Ref<Bitmap>::null();
-}
 SLIB_GRAPHICS_NAMESPACE_END
 
 

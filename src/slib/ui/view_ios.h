@@ -70,7 +70,7 @@ public:
 public:
 	void onDraw(CGRect rectDirty);
 	
-	sl_bool onEventTouch(UIEventAction action, NSSet* touches, ::UIEvent* event);
+	sl_bool onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event);
 	
 protected:
 	UIView* m_handle;
@@ -114,7 +114,7 @@ SLIB_UI_NAMESPACE_END
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \
-		sl_bool flagPreventDefault = instance->onEventTouch(slib::actionTouchBegin, touches, theEvent); \
+		sl_bool flagPreventDefault = instance->onEventTouch(slib::UIAction::TouchBegin, touches, theEvent); \
 		if (flagPreventDefault) { \
 			return; \
 		} \
@@ -125,7 +125,7 @@ SLIB_UI_NAMESPACE_END
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \
-		sl_bool flagPreventDefault = instance->onEventTouch(slib::actionTouchMove, touches, theEvent); \
+		sl_bool flagPreventDefault = instance->onEventTouch(slib::UIAction::TouchMove, touches, theEvent); \
 		if (flagPreventDefault) { \
 			return; \
 		} \
@@ -136,7 +136,7 @@ SLIB_UI_NAMESPACE_END
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \
-		sl_bool flagPreventDefault = instance->onEventTouch(slib::actionTouchEnd, touches, theEvent); \
+		sl_bool flagPreventDefault = instance->onEventTouch(slib::UIAction::TouchEnd, touches, theEvent); \
 		if (flagPreventDefault) { \
 			return; \
 		} \
@@ -147,7 +147,7 @@ SLIB_UI_NAMESPACE_END
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \
-		sl_bool flagPreventDefault = instance->onEventTouch(slib::actionTouchCancel, touches, theEvent); \
+		sl_bool flagPreventDefault = instance->onEventTouch(slib::UIAction::TouchCancel, touches, theEvent); \
 		if (flagPreventDefault) { \
 			return; \
 		} \

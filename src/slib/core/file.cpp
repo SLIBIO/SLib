@@ -2,6 +2,8 @@
 
 SLIB_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(File, IO)
+
 File::File()
 {
 	m_file = SLIB_FILE_INVALID_HANDLE;
@@ -20,7 +22,7 @@ Ref<File> File::open(const String& filePath, FileMode mode)
 		if (ret.isNotNull()) {
 			ret->m_file = file;
 			ret->m_path = filePath;
-			if (mode == fileMode_Append) {
+			if (mode == FileMode::Append) {
 				ret->seekToEnd();
 			}
 			return ret;
@@ -28,6 +30,32 @@ Ref<File> File::open(const String& filePath, FileMode mode)
 		_close(file);
 	}
 	return Ref<File>::null();
+}
+
+
+Ref<File> File::openForRead(const String& filePath)
+{
+	return open(filePath, FileMode::Read);
+}
+
+Ref<File> File::openForWrite(const String& filePath)
+{
+	return open(filePath, FileMode::Write);
+}
+
+Ref<File> File::openForReadWrite(const String& filePath)
+{
+	return open(filePath, FileMode::ReadWrite);
+}
+
+Ref<File> File::openForAppend(const String& filePath)
+{
+	return open(filePath, FileMode::Append);
+}
+
+Ref<File> File::openForRandomAccess(const String& filePath)
+{
+	return open(filePath, FileMode::RandomAccess);
 }
 
 void File::close()
@@ -39,9 +67,39 @@ void File::close()
 	}
 }
 
+sl_bool File::isOpened() const
+{
+	return m_file != SLIB_FILE_INVALID_HANDLE;
+}
+
+String File::getPath() const
+{
+	return m_path;
+}
+
+sl_file File::getHandle() const
+{
+	return m_file;
+}
+
 sl_uint64 File::getSize()
 {
 	return getSize(m_file);
+}
+
+sl_bool File::exists(const String& filePath)
+{
+	return getAttributes(filePath) >= 0;
+}
+
+sl_bool File::isDirectory(const String& filePath)
+{
+	return (getAttributes(filePath) & FileAttribute::Directory) != 0;
+}
+
+sl_bool File::isHidden(const String& filePath)
+{
+	return (getAttributes(filePath) & FileAttribute::Hidden) != 0;
 }
 
 String File::getParentDirectoryPath(const String& pathName)
@@ -153,7 +211,7 @@ Memory File::readAllBytes(const String& path)
 #endif
 		Memory ret = Memory::create(size);
 		if (ret.isNotNull()) {
-			char* buf = (char*)(ret.getBuf());
+			char* buf = (char*)(ret.getData());
 			sl_reg n = file->read(buf, size);
 			if (n != size) {
 				return Memory::null();
@@ -176,7 +234,7 @@ String File::readUtf8Text(const String& path)
 		sl_uint32 size = (sl_uint32)_size;
 		String ret = String8::allocate(size);
 		if (ret.isNotEmpty()) {
-			sl_char8* buf = ret.getBuf();
+			sl_char8* buf = ret.getData();
 			sl_int32 n;
 			if (size >= 3) {
 				n = file->read32(buf, 3);
@@ -216,13 +274,13 @@ sl_size File::writeAllBytes(const String& path, const void* buf, sl_size size)
 
 sl_size File::writeAllBytes(const String& path, const Memory& mem)
 {
-	return File::writeAllBytes(path, mem.getBuf(), mem.getSize());
+	return File::writeAllBytes(path, mem.getData(), mem.getSize());
 }
 
 sl_bool File::writeUtf8Text(const String& path, const String& text)
 {
 	sl_size n = text.getLength();
-	sl_size ret = File::writeAllBytes(path, text.getBuf(), n);
+	sl_size ret = File::writeAllBytes(path, text.getData(), n);
 	return ret == n;
 }
 
@@ -240,13 +298,13 @@ sl_size File::appendAllBytes(const String& path, const void* buf, sl_size size)
 
 sl_size File::appendAllBytes(const String& path, const Memory& mem)
 {
-	return File::appendAllBytes(path, mem.getBuf(), mem.getSize());
+	return File::appendAllBytes(path, mem.getData(), mem.getSize());
 }
 
 sl_bool File::appendUtf8Text(const String& path, const String& text)
 {
 	sl_size n = text.getLength();
-	sl_size ret = File::appendAllBytes(path, text.getBuf(), n);
+	sl_size ret = File::appendAllBytes(path, text.getData(), n);
 	return ret == n;
 }
 
@@ -258,15 +316,15 @@ List<String> File::getAllDescendantFiles(const String& dirPath)
 	List<String> ret;
 	List<String> listCurrent = getFiles(dirPath);
 	listCurrent.sort_NoLock(sl_true);
-	String* p = listCurrent.data();
-	sl_size n = listCurrent.count();
+	String* p = listCurrent.getData();
+	sl_size n = listCurrent.getCount();
 	for (sl_size i = 0; i < n; i++) {
 		String& item = p[i];
 		ret.add_NoLock(item);
 		String dir = dirPath + "/" + item;
 		if (File::isDirectory(dir)) {
 			ListItems<String> sub(File::getAllDescendantFiles(dir));
-			for (sl_size j = 0; j < sub.getCount(); j++) {
+			for (sl_size j = 0; j < sub.count; j++) {
 				ret.add(item + "/" + sub[j]);
 			}
 		}
@@ -298,7 +356,7 @@ sl_bool File::deleteDirectoryRecursively(const String& dirPath)
 		String path = dirPath + "/";
 		ListItems<String> list(File::getFiles(dirPath));
 		sl_bool ret = sl_true;
-		for (sl_size i = 0; i < list.getCount(); i++) {
+		for (sl_size i = 0; i < list.count; i++) {
 			String sub = path + list[i];
 			if (File::exists(sub)) {
 				if (File::isDirectory(sub)) {
@@ -321,7 +379,7 @@ String File::makeSafeFileName(const String& fileName)
 	if (ret.isEmpty()) {
 		return ret;
 	}
-	sl_char8* buf = ret.getBuf();
+	sl_char8* buf = ret.getData();
 	sl_uint32 len = ret.getLength();
 	for (sl_uint32 i = 0; i < len; i++) {
 		sl_uint32 ch = (sl_uint8)(buf[i]);
@@ -354,7 +412,7 @@ String File::makeSafeFilePath(const String& filePath)
 	if (ret.isEmpty()) {
 		return ret;
 	}
-	sl_char8* buf = ret.getBuf();
+	sl_char8* buf = ret.getData();
 	sl_uint32 len = ret.getLength();
 	for (sl_uint32 i = 0; i < len; i++) {
 		sl_uint32 ch = (sl_uint8)(buf[i]);
@@ -407,7 +465,7 @@ void FilePathSegments::parsePath(const String& path)
 	parentLevel = 0;
 	segments.removeAll();
 
-	sl_char8* buf = path.getBuf();
+	sl_char8* buf = path.getData();
 	sl_uint32 len = path.getLength();
 	sl_uint32 pos = 0;
 	sl_uint32 start = 0;
@@ -426,7 +484,7 @@ void FilePathSegments::parsePath(const String& path)
 				if (n > 0) {
 					if (n == 1 && buf[start] == '.') {
 					} else if (n == 2 && buf[start] == '.' && buf[start + 1] == '.') {
-						if (segments.count() > 0) {
+						if (segments.getCount() > 0) {
 							segments.popBack();
 						} else {
 							parentLevel++;
@@ -448,18 +506,18 @@ String FilePathSegments::buildPath()
 	SLIB_STATIC_STRING(sep, "/");
 	sl_bool flagFirst = sl_true;
 	{
-		SLIB_STATIC_STRING(p, "..");
 		for (sl_uint32 i = 0; i < parentLevel; i++) {
 			if (!flagFirst) {
 				ret.add(sep);
 			}
+			SLIB_STATIC_STRING(p, "..");
 			ret.add(p);
 			flagFirst = sl_false;
 		}
 	}
 	{
 		ListLocker<String> list(segments);
-		for (sl_size i = 0; i < list.count(); i++) {
+		for (sl_size i = 0; i < list.count; i++) {
 			if (!flagFirst) {
 				ret.add(sep);
 			}

@@ -11,7 +11,8 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class SLIB_EXPORT Button : public View
 {
-	SLIB_DECLARE_OBJECT(Button, View)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	Button();
 	

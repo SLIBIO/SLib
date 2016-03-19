@@ -124,7 +124,7 @@ public:
 					ret->m_event = param.event;
 
 					AudioDeviceIOProcID callback;
-					if (AudioDeviceCreateIOProcID(deviceID, DeviceIOProc, ret.get(), &callback) == kAudioHardwareNoError) {
+					if (AudioDeviceCreateIOProcID(deviceID, DeviceIOProc, ret.ptr, &callback) == kAudioHardwareNoError) {
 						ret->m_callback = callback;
 						if (param.flagAutoStart) {
 							ret->start();
@@ -258,7 +258,7 @@ public:
 		if (arrData.isNull()) {
 			return;
 		}
-		sl_int16* output = arrData.data();
+		sl_int16* output = arrData.getData();
 
 		AudioBufferList bufferOutput;
 		bufferOutput.mNumberBuffers = 1;
@@ -301,7 +301,7 @@ List<AudioRecorderInfo> AudioRecorder::getRecordersList()
 {
 	ListItems<OSX_AudioDeviceInfo> list(OSX_AudioDeviceInfo::getAllDevices(sl_true));
 	List<AudioRecorderInfo> ret;
-	for (sl_size i = 0; i < list.count(); i++) {
+	for (sl_size i = 0; i < list.count; i++) {
 		AudioRecorderInfo info;
 		info.id = list[i].uid;
 		info.name = list[i].name;

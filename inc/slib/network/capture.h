@@ -28,6 +28,7 @@ public:
 	sl_uint8* data;
 	sl_uint32 length;
 	Time time;
+	
 };
 
 class SLIB_EXPORT NetCaptureDeviceInfo
@@ -39,6 +40,7 @@ public:
 	
 	List<IPv4Address> ipv4Addresses;
 	List<IPv6Address> ipv6Addresses;
+	
 };
 
 class NetCapture;
@@ -47,6 +49,7 @@ class SLIB_EXPORT INetCaptureListener
 {
 public:
 	virtual void onCapturePacket(NetCapture* capture, NetCapturePacket* packet) = 0;
+	
 };
 
 class SLIB_EXPORT NetCaptureParam
@@ -58,7 +61,7 @@ public:
 	sl_uint32 timeoutRead; // read timeout, in milliseconds, used in pcap mode
 	sl_uint32 sizeBuffer; // buffer size, used in pcap mode
 	
-	sl_uint32 preferedLinkDeviceType; // NetworkLinkDeviceType, used in Packet Socket mode. now supported Ethernet and Raw
+	NetworkLinkDeviceType preferedLinkDeviceType; // NetworkLinkDeviceType, used in Packet Socket mode. now supported Ethernet and Raw
 
 	sl_bool flagAutoStart;
 	
@@ -66,27 +69,12 @@ public:
 	
 public:
 	NetCaptureParam();
+	
 };
 
 class SLIB_EXPORT NetCapture : public Object
 {
-	SLIB_DECLARE_OBJECT(NetCapture, Object)
-
-public:
-	virtual void release() = 0;
-
-	virtual void start() = 0;
-	
-	virtual sl_bool isRunning() = 0;
-
-	virtual sl_uint32 getLinkType() = 0;
-	
-	virtual sl_bool setLinkType(sl_uint32 type);
-
-	// send a L2-packet
-	virtual sl_bool sendPacket(const void* buf, sl_uint32 size) = 0;
-	
-	virtual String getLastErrorMessage();
+	SLIB_DECLARE_OBJECT
 
 public:
 	// libpcap capturing engine
@@ -98,6 +86,22 @@ public:
 	// raw socket
 	static Ref<NetCapture> createRawIPv4(const NetCaptureParam& param);
 
+public:
+	virtual void release() = 0;
+
+	virtual void start() = 0;
+	
+	virtual sl_bool isRunning() = 0;
+
+	virtual NetworkLinkDeviceType getLinkType() = 0;
+	
+	virtual sl_bool setLinkType(sl_uint32 type);
+
+	// send a L2-packet
+	virtual sl_bool sendPacket(const void* buf, sl_uint32 size) = 0;
+	
+	virtual String getLastErrorMessage();
+
 	// Pcap Utiltities
 	static List<NetCaptureDeviceInfo> getAllPcapDevices();
 	
@@ -108,97 +112,51 @@ protected:
 
 protected:
 	Ptr<INetCaptureListener> m_listener;
+	
 };
 
 
-#define SLIB_NETWORK_LINUX_COOKED_FRAME_HEADER_SIZE 16
-
-enum LinuxCookedPacketType
+enum class LinuxCookedPacketType
 {
-	linuxCookedPacketType_Host = 0,
-	linuxCookedPacketType_Broadcast = 1,
-	linuxCookedPacketType_Multicast = 2,
-	linuxCookedPacketType_OtherHost = 3,
-	linuxCookedPacketType_OutGoing = 4
+	Host = 0,
+	Broadcast = 1,
+	Multicast = 2,
+	OtherHost = 3,
+	OutGoing = 4
 };
 
-class SLIB_EXPORT LinuxCookedFrameFormat
+class SLIB_EXPORT LinuxCookedFrame
 {
 public:
-	SLIB_INLINE LinuxCookedPacketType getPacketType() const
+	enum
 	{
-		return (LinuxCookedPacketType)(MIO::readUint16BE(m_packetType));
-	}
+		HeaderSize = 16
+	};
 	
-	SLIB_INLINE void setPacketType(LinuxCookedPacketType type)
-	{
-		MIO::writeUint16BE(m_packetType, type);
-	}
+public:
+	LinuxCookedPacketType getPacketType() const;
+	
+	void setPacketType(LinuxCookedPacketType type);
 
+	NetworkLinkDeviceType getDeviceType() const;
 	
-	// NetworkLinkDeviceType
-	SLIB_INLINE sl_uint16 getDeviceType() const
-	{
-		return MIO::readUint16BE(m_deviceType);
-	}
-	
-	// NetworkLinkDeviceType
-	SLIB_INLINE void setDeviceType(sl_uint16 type)
-	{
-		MIO::writeUint16BE(m_deviceType, type);
-	}
+	void setDeviceType(NetworkLinkDeviceType type);
 
+	sl_uint16 getAddressLength() const;
 	
-	SLIB_INLINE sl_uint16 getAddressLength() const
-	{
-		return MIO::readUint16BE(m_lenAddress);
-	}
+	void setAddressLength(sl_uint16 len);
 	
-	SLIB_INLINE void setAddressLength(sl_uint16 len)
-	{
-		MIO::writeUint16BE(m_lenAddress, len);
-	}
-
+	const sl_uint8* getAddress() const;
 	
-	SLIB_INLINE const sl_uint8* getAddress() const
-	{
-		return m_address;
-	}
+	sl_uint8* getAddress();
 	
-	SLIB_INLINE sl_uint8* getAddress()
-	{
-		return m_address;
-	}
-
+	NetworkLinkProtocol getProtocolType() const;
 	
-	// NetworkLinkProtocol
-	SLIB_INLINE sl_uint16 getProtocolType() const
-	{
-		return MIO::readUint16BE(m_protocol);
-	}
+	void setProtocolType(NetworkLinkProtocol type);
 	
-	// NetworkLinkProtocol
-	SLIB_INLINE void setProtocolType(sl_uint16 type)
-	{
-		MIO::writeUint16BE(m_protocol, type);
-	}
-
+	const sl_uint8* getContent() const;
 	
-	SLIB_INLINE static sl_uint32 getHeaderSize()
-	{
-		return SLIB_NETWORK_LINUX_COOKED_FRAME_HEADER_SIZE;
-	}
-
-	
-	SLIB_INLINE const sl_uint8* getContent() const
-	{
-		return ((const sl_uint8*)this) + SLIB_NETWORK_LINUX_COOKED_FRAME_HEADER_SIZE;
-	}
-	
-	SLIB_INLINE sl_uint8* getContent()
-	{
-		return ((sl_uint8*)this) + SLIB_NETWORK_LINUX_COOKED_FRAME_HEADER_SIZE;
-	}
+	sl_uint8* getContent();
 
 private:
 	sl_uint8 m_packetType[2];
@@ -206,6 +164,7 @@ private:
 	sl_uint8 m_lenAddress[2];
 	sl_uint8 m_address[8];
 	sl_uint8 m_protocol[2];
+	
 };
 
 SLIB_NETWORK_NAMESPACE_END

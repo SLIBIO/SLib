@@ -5,13 +5,16 @@ SLIB_GRAPHICS_NAMESPACE_BEGIN
 PenDesc::PenDesc()
 {
     width = 1;
-    color = Color::black();
+    color = Color::Black;
 
-    style = penStyle_Solid;
-    cap = lineCap_Flat;
-    join = lineJoin_Miter;
+    style = PenStyle::Solid;
+    cap = LineCap::Flat;
+    join = LineJoin::Miter;
     miterLimit = 10;
 }
+
+
+SLIB_DEFINE_OBJECT(Pen, Object)
 
 Ref<Pen> Pen::getDefault()
 {
@@ -44,6 +47,43 @@ Ref<Pen> Pen::createSolidPen(sl_real width, Color color)
 	desc.color = color;
 	return create(desc);
 }
+
+void Pen::getDesc(PenDesc& desc)
+{
+	desc = m_desc;
+}
+
+PenStyle Pen::getStyle()
+{
+	return m_desc.style;
+}
+
+sl_real Pen::getWidth()
+{
+	return m_desc.width;
+}
+
+Color Pen::getColor()
+{
+	return m_desc.color;
+}
+
+LineCap Pen::getCap()
+{
+	return m_desc.cap;
+}
+
+LineJoin Pen::getJoin()
+{
+	return m_desc.join;
+}
+
+sl_real Pen::getMiterLimit()
+{
+	return m_desc.miterLimit;
+}
+
+SLIB_DEFINE_OBJECT(PenInstance, Object)
 
 SLIB_GRAPHICS_NAMESPACE_END
 

@@ -1,6 +1,38 @@
 #include "../../../inc/slib/network/icmp.h"
 
+#include "../../../inc/slib/core/mio.h"
+
 SLIB_NETWORK_NAMESPACE_BEGIN
+
+IcmpType IcmpHeaderFormat::getType() const
+{
+	return (IcmpType)_type;
+}
+
+void IcmpHeaderFormat::setType(IcmpType type)
+{
+	_type = (sl_uint8)type;
+}
+
+sl_uint8 IcmpHeaderFormat::getCode() const
+{
+	return _code;
+}
+
+void IcmpHeaderFormat::setCode(sl_uint8 code)
+{
+	_code = code;
+}
+
+sl_uint16 IcmpHeaderFormat::getChecksum() const
+{
+	return MIO::readUint16BE(_checksum);
+}
+
+void IcmpHeaderFormat::setChecksum(sl_uint16 checksum)
+{
+	MIO::writeUint16BE(_checksum, checksum);
+}
 
 void IcmpHeaderFormat::updateChecksum(sl_uint32 sizeContent)
 {
@@ -27,10 +59,76 @@ sl_bool IcmpHeaderFormat::check(sl_uint32 sizeContent) const
 	return sl_true;
 }
 
-sl_bool IcmpEchoAddress::operator == (const IcmpEchoAddress& other) const
+sl_uint16 IcmpHeaderFormat::getEchoIdentifier() const
 {
-	return ip == other.ip && identifier == other.identifier && sequenceNumber == other.sequenceNumber;
+	return MIO::readUint16BE(_rest);
 }
+
+void IcmpHeaderFormat::setEchoIdentifier(sl_uint16 id)
+{
+	MIO::writeUint16BE(_rest, id);
+}
+
+sl_uint16 IcmpHeaderFormat::getEchoSequenceNumber() const
+{
+	return MIO::readUint16BE(_rest + 2);
+}
+
+void IcmpHeaderFormat::setEchoSequenceNumber(sl_uint16 sn)
+{
+	MIO::writeUint16BE(_rest + 2, sn);
+}
+
+IPv4Address IcmpHeaderFormat::getRedirectGatewayAddress() const
+{
+	return IPv4Address(_rest);
+}
+
+void IcmpHeaderFormat::setRedirectGatewayAddress(const IPv4Address& address)
+{
+	address.getBytes(_rest);
+}
+
+sl_uint8 IcmpHeaderFormat::getParameterProblemPointer() const
+{
+	return _rest[0];
+}
+
+void IcmpHeaderFormat::setParameterProblemPointer(sl_uint8 pointer)
+{
+	_rest[0] = pointer;
+}
+
+sl_uint16 IcmpHeaderFormat::getTimestampIdentifier() const
+{
+	return MIO::readUint16BE(_rest);
+}
+
+void IcmpHeaderFormat::setTimestampIdentifier(sl_uint16 id)
+{
+	MIO::writeUint16BE(_rest, id);
+}
+
+sl_uint16 IcmpHeaderFormat::getTimestampSequenceNumber() const
+{
+	return MIO::readUint16BE(_rest + 2);
+}
+
+void IcmpHeaderFormat::setTimestampSequenceNumber(sl_uint16 sn)
+{
+	MIO::writeUint16BE(_rest + 2, sn);
+}
+
+const sl_uint8* IcmpHeaderFormat::getContent() const
+{
+	return (const sl_uint8*)(this) + sizeof(sizeof(IcmpHeaderFormat));
+}
+
+sl_uint8* IcmpHeaderFormat::getContent()
+{
+	return (sl_uint8*)(this) + sizeof(sizeof(IcmpHeaderFormat));
+}
+
 
 int IcmpEchoAddress::compare(const IcmpEchoAddress& other) const
 {
@@ -46,6 +144,34 @@ sl_uint32 IcmpEchoAddress::hashCode() const
 	sl_uint64 t = ip.hashCode();
 	t = t * 31 + SLIB_MAKE_DWORD2(identifier, sequenceNumber);
 	return sl_hash(t);
+}
+
+sl_bool IcmpEchoAddress::operator == (const IcmpEchoAddress& other) const
+{
+	return ip == other.ip && identifier == other.identifier && sequenceNumber == other.sequenceNumber;
+}
+
+sl_bool IcmpEchoAddress::operator!=(const IcmpEchoAddress& other) const
+{
+	return !(*this == other);
+}
+
+template <>
+int Compare<IcmpEchoAddress>::compare(const IcmpEchoAddress& a, const IcmpEchoAddress& b)
+{
+	return a.compare(b);
+}
+
+template <>
+sl_bool Compare<IcmpEchoAddress>::equals(const IcmpEchoAddress& a, const IcmpEchoAddress& b)
+{
+	return a == b;
+}
+
+template <>
+sl_uint32 Hash<IcmpEchoAddress>::hash(const IcmpEchoAddress& a)
+{
+	return a.hashCode();
 }
 
 SLIB_NETWORK_NAMESPACE_END

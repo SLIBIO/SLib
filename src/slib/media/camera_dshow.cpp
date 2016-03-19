@@ -142,7 +142,7 @@ public:
 														if (SUCCEEDED(hr)) {
 															ret = new _DShow_Camera();
 															if (ret.isNotNull()) {
-																hr = grabber->SetCallback(ret.get(), 0);
+																hr = grabber->SetCallback(ret.ptr, 0);
 																if (SUCCEEDED(hr)) {
 																	ret->m_capture = capture;
 																	ret->m_graph = graph;
@@ -293,10 +293,10 @@ public:
 				VIDEOINFOHEADER* vih = (VIDEOINFOHEADER*)(mt.pbFormat);
 				frame.image.width = vih->bmiHeader.biWidth;
 				frame.image.height = vih->bmiHeader.biHeight;
-				frame.image.format = bitmapFormat_BGR;
+				frame.image.format = BitmapFormat::BGR;
 				frame.image.pitch =  - frame.image.calculatePitchAlign4(frame.image.width, 24);
 				frame.image.data = pBuffer + cbBuffer + frame.image.pitch;
-				if (frame.image.format.isNotNull()) {
+				if (frame.image.format != BitmapFormat::None) {
 					onCaptureVideoFrame(&frame);
 				}
 			}

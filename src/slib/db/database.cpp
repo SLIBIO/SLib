@@ -2,6 +2,8 @@
 
 SLIB_DB_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(Database, Object)
+
 sl_bool Database::execute(const String& sql, const Variant* params, sl_uint32 nParams, sl_uint64* pOutAffectedRowsCount)
 {
 	Ref<DatabaseStatement> statement = prepareStatement(sql);

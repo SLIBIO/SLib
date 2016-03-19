@@ -12,6 +12,7 @@
 SLIB_MEDIA_NAMESPACE_BEGIN
 
 class IVideoCaptureListener;
+
 class SLIB_EXPORT VideoCaptureParam
 {
 public:
@@ -21,6 +22,7 @@ public:
 	
 public:
 	VideoCaptureParam();
+	
 };
 
 class VideoCaptureFrame : public VideoFrame
@@ -38,7 +40,7 @@ public:
 
 class SLIB_EXPORT VideoCapture : public Object
 {
-	SLIB_DECLARE_OBJECT(VideoCapture, Object)
+	SLIB_DECLARE_OBJECT
 
 public:
 	virtual void release() = 0;
@@ -56,6 +58,7 @@ protected:
 
 protected:
 	Ptr<IVideoCaptureListener> m_listener;
+	
 };
 
 SLIB_MEDIA_NAMESPACE_END

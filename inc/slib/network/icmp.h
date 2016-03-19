@@ -146,143 +146,73 @@
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
-enum IcmpType
+enum class IcmpType
 {
-	icmpType_EchoReply = 0,
-	icmpType_DestinationUnreachable = 3,
-	icmpType_Redirect = 5,
-	icmpType_Echo = 8,
-	icmpType_TimeExceeded = 11,
-	icmpType_ParameterProblem = 12,
-	icmpType_Timestamp = 13,
-	icmpType_TimestampReply = 14
+	EchoReply = 0,
+	DestinationUnreachable = 3,
+	Redirect = 5,
+	Echo = 8,
+	TimeExceeded = 11,
+	ParameterProblem = 12,
+	Timestamp = 13,
+	TimestampReply = 14
 };
 
 class SLIB_EXPORT IcmpHeaderFormat
 {
 public:
-	SLIB_INLINE IcmpType getType() const
-	{
-		return (IcmpType)_type;
-	}
+	IcmpType getType() const;
     
-	SLIB_INLINE void setType(IcmpType type)
-	{
-		_type = (sl_uint8)type;
-	}
-
+	void setType(IcmpType type);
     
-	SLIB_INLINE sl_uint8 getCode() const
-	{
-		return _code;
-	}
+	sl_uint8 getCode() const;
     
-	SLIB_INLINE void setCode(sl_uint8 code)
-	{
-		_code = code;
-	}
-
+	void setCode(sl_uint8 code);
     
-	SLIB_INLINE sl_uint16 getChecksum() const
-	{
-		return MIO::readUint16BE(_checksum);
-	}
+	sl_uint16 getChecksum() const;
     
-	SLIB_INLINE void setChecksum(sl_uint16 checksum)
-	{
-		MIO::writeUint16BE(_checksum, checksum);
-	}
-
+	void setChecksum(sl_uint16 checksum);
     
 	void updateChecksum(sl_uint32 sizeContent);
     
 	sl_bool checkChecksum(sl_uint32 sizeContent) const;
-
-    
-	SLIB_INLINE sl_uint16 getEchoIdentifier() const
-	{
-		return MIO::readUint16BE(_rest);
-	}
-
-	SLIB_INLINE void setEchoIdentifier(sl_uint16 id)
-	{
-		MIO::writeUint16BE(_rest, id);
-	}
-
-    
-	SLIB_INLINE sl_uint16 getEchoSequenceNumber() const
-	{
-		return MIO::readUint16BE(_rest + 2);
-	}
-
-	SLIB_INLINE void setEchoSequenceNumber(sl_uint16 sn)
-	{
-		MIO::writeUint16BE(_rest + 2, sn);
-	}
-
-    
-	SLIB_INLINE IPv4Address getRedirectGatewayAddress() const
-	{
-		return IPv4Address(_rest);
-	}
-
-	SLIB_INLINE void setRedirectGatewayAddress(const IPv4Address& address)
-	{
-		address.get(_rest);
-	}
-
-    
-	SLIB_INLINE sl_uint8 getParameterProblemPointer() const
-	{
-		return _rest[0];
-	}
-
-	SLIB_INLINE void setParameterProblemPointer(sl_uint8 pointer)
-	{
-		_rest[0] = pointer;
-	}
-
-    
-	SLIB_INLINE sl_uint16 getTimestampIdentifier() const
-	{
-		return MIO::readUint16BE(_rest);
-	}
-
-	SLIB_INLINE void setTimestampIdentifier(sl_uint16 id)
-	{
-		MIO::writeUint16BE(_rest, id);
-	}
-
-    
-	SLIB_INLINE sl_uint16 getTimestampSequenceNumber() const
-	{
-		return MIO::readUint16BE(_rest + 2);
-	}
-
-	SLIB_INLINE void setTimestampSequenceNumber(sl_uint16 sn)
-	{
-		MIO::writeUint16BE(_rest + 2, sn);
-	}
-
-    
-	SLIB_INLINE const sl_uint8* getContent() const
-	{
-		return (const sl_uint8*)(this) + sizeof(sizeof(IcmpHeaderFormat));
-	}
-    
-	SLIB_INLINE sl_uint8* getContent()
-	{
-		return (sl_uint8*)(this) + sizeof(sizeof(IcmpHeaderFormat));
-	}
-
-    
+	
 	sl_bool check(sl_uint32 sizeContent) const;
 
+	sl_uint16 getEchoIdentifier() const;
+	
+	void setEchoIdentifier(sl_uint16 id);
+	
+	sl_uint16 getEchoSequenceNumber() const;
+	
+	void setEchoSequenceNumber(sl_uint16 sn);
+	
+	IPv4Address getRedirectGatewayAddress() const;
+	
+	void setRedirectGatewayAddress(const IPv4Address& address);
+	
+	sl_uint8 getParameterProblemPointer() const;
+	
+	void setParameterProblemPointer(sl_uint8 pointer);
+	
+	sl_uint16 getTimestampIdentifier() const;
+	
+	void setTimestampIdentifier(sl_uint16 id);
+	
+	sl_uint16 getTimestampSequenceNumber() const;
+	
+	void setTimestampSequenceNumber(sl_uint16 sn);
+	
+	const sl_uint8* getContent() const;
+	
+	sl_uint8* getContent();
+	
 private:
 	sl_uint8 _type;
 	sl_uint8 _code;
 	sl_uint8 _checksum[2];
 	sl_uint8 _rest[4];
+	
 };
 
 class SLIB_EXPORT IcmpEchoAddress
@@ -293,35 +223,25 @@ public:
 	sl_uint16 sequenceNumber;
 
 public:
+	int compare(const IcmpEchoAddress& other) const;
+	
+	sl_uint32 hashCode() const;
+
+public:
 	sl_bool operator==(const IcmpEchoAddress& other) const;
     
-	SLIB_INLINE sl_bool operator!=(const IcmpEchoAddress& other) const
-	{
-		return !(*this == other);
-	}
-
-	int compare(const IcmpEchoAddress& other) const;
-
-	sl_uint32 hashCode() const;
+	sl_bool operator!=(const IcmpEchoAddress& other) const;
+	
 };
 
 template <>
-SLIB_INLINE int Compare<IcmpEchoAddress>::compare(const IcmpEchoAddress& a, const IcmpEchoAddress& b)
-{
-	return a.compare(b);
-}
+int Compare<IcmpEchoAddress>::compare(const IcmpEchoAddress& a, const IcmpEchoAddress& b);
 
 template <>
-SLIB_INLINE sl_bool Compare<IcmpEchoAddress>::equals(const IcmpEchoAddress& a, const IcmpEchoAddress& b)
-{
-	return a == b;
-}
+sl_bool Compare<IcmpEchoAddress>::equals(const IcmpEchoAddress& a, const IcmpEchoAddress& b);
 
 template <>
-SLIB_INLINE sl_uint32 Hash<IcmpEchoAddress>::hash(const IcmpEchoAddress& a)
-{
-	return a.hashCode();
-}
+sl_uint32 Hash<IcmpEchoAddress>::hash(const IcmpEchoAddress& a);
 
 SLIB_NETWORK_NAMESPACE_END
 

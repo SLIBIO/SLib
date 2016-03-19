@@ -5,11 +5,9 @@
 
 #include "vector2.h"
 
-#include "../core/math.h"
-
 SLIB_MATH_NAMESPACE_BEGIN
 
-template <class T>
+template <class T, class FT = T>
 class SLIB_EXPORT Vector3T
 {
 public:
@@ -18,277 +16,135 @@ public:
 	T z;
 
 public:
-	SLIB_INLINE Vector3T()
-	{
-	}
+	Vector3T() = default;
+	
+	Vector3T(const Vector3T<T, FT>& other) = default;
 
-	template <class O>
-	SLIB_INLINE Vector3T(const Vector3T<O>& other)
-	{
-		x = (T)(other.x);
-		y = (T)(other.y);
-		z = (T)(other.z);
-	}
+	template <class O, class FO>
+	Vector3T(const Vector3T<O, FO>& other);
 
-	SLIB_INLINE Vector3T(T x, T y, T z)
-	{
-		this->x = x;
-		this->y = y;
-		this->z = z;
-	}
-
-	SLIB_INLINE Vector3T(const Vector2T<T>& xy, T z)
-	{
-		this->x = xy.x;
-		this->y = xy.y;
-		this->z = z;
-	}
-
+	Vector3T(T x, T y, T z);
+	
 public:
-	SLIB_INLINE Vector2T<T> xy() const
-	{
-		return Vector2T<T>(x, y);
-	}
+	static const Vector3T<T, FT>& zero();
 	
-	SLIB_INLINE Vector2T<T> xz() const
-	{
-		return Vector2T<T>(x, z);
-	}
+	static Vector3T<T, FT> fromLocation(const Vector2T<T>& v);
 	
-	SLIB_INLINE Vector2T<T> yx() const
-	{
-		return Vector2T<T>(y, x);
-	}
+	static Vector3T<T, FT> fromDirection(const Vector2T<T>& v);
 	
-	SLIB_INLINE Vector2T<T> yz() const
-	{
-		return Vector2T<T>(y, z);
-	}
+	T dot(const Vector3T<T, FT>& other) const;
 	
-	SLIB_INLINE Vector2T<T> zx() const
-	{
-		return Vector2T<T>(z, x);
-	}
+	Vector3T<T, FT> cross(const Vector3T<T, FT>& other) const;
 	
-	SLIB_INLINE Vector2T<T> zy() const
-	{
-		return Vector2T<T>(z, y);
-	}
-
+	T getLength2p() const;
+	
+	FT getLength() const;
+	
+	T getLength2p(const Vector3T<T, FT>& other) const;
+	
+	FT getLength(const Vector3T<T, FT>& other) const;
+	
+	void normalize();
+	
+	Vector3T<T, FT> getNormalized();
+	
+	FT getCosBetween(const Vector3T<T, FT>& other) const;
+	
+	FT getAngleBetween(const Vector3T<T, FT>& other) const;
+	
+public:
+	Vector3T<T, FT>& operator=(const Vector3T<T, FT>& other) = default;
+	
+	template <class O, class FO>
+	Vector3T<T, FT>& operator=(const Vector3T<O, FO>& other);
+	
+	Vector3T<T, FT> operator+(const Vector3T<T, FT>& other) const;
+	
+	Vector3T<T, FT>& operator+=(const Vector3T<T, FT>& other);
+	
+	Vector3T<T, FT> operator-(const Vector3T<T, FT>& other) const;
+	
+	Vector3T<T, FT>& operator-=(const Vector3T<T, FT>& other);
+	
+	Vector3T<T, FT> operator*(T f) const;
+	
+	Vector3T<T, FT>& operator*=(T f);
+	
+	Vector3T<T, FT> operator*(const Vector3T<T, FT>& other) const;
+	
+	Vector3T<T, FT>& operator*=(const Vector3T<T, FT>& other);
+	
+	Vector3T<T, FT> operator/(T f) const;
+	
+	Vector3T<T, FT>& operator/=(T f);
+	
+	Vector3T<T, FT> operator/(const Vector3T<T, FT>& other) const;
+	
+	Vector3T<T, FT>& operator/(const Vector3T<T, FT>& other);
+	
+	Vector3T<T, FT> operator-() const;
+	
+	sl_bool operator==(const Vector3T<T, FT>& other) const;
+	
+	sl_bool operator!=(const Vector3T<T, FT>& other) const;
+	
 private:
 	static T _zero[3];
 	
-public:
-	SLIB_INLINE static const Vector3T<T>& zero()
-	{
-		return *((Vector3T<T>*)((void*)(_zero)));
-	}
-	
-	SLIB_INLINE static Vector3T<T> fromLocation(const Vector2T<T>& v)
-	{
-		return Vector3T<T>(v.x, v.y, 1);
-	}
-	
-	SLIB_INLINE static Vector3T<T> fromDirection(const Vector2T<T>& v)
-	{
-		return Vector3T<T>(v.x, v.y, 0);
-	}
-
-public:
-	template <class O>
-	SLIB_INLINE Vector3T<T>& operator=(const Vector3T<O>& other)
-	{
-		x = (T)(other.x);
-		y = (T)(other.y);
-		z = (T)(other.z);
-		return *this;
-	}
-	
-	SLIB_INLINE Vector3T<T> operator+(const Vector3T<T>& other) const
-	{
-		return Vector3T<T>(x + other.x, y + other.y, z + other.z);
-	}
-	
-	SLIB_INLINE Vector3T<T>& operator+=(const Vector3T<T>& other)
-	{
-		x += other.x;
-		y += other.y;
-		z += other.z;
-		return *this;
-	}
-	
-	SLIB_INLINE Vector3T<T> operator-(const Vector3T<T>& other) const
-	{
-		return Vector3T<T>(x - other.x, y - other.y, z - other.z);
-	}
-	
-	SLIB_INLINE Vector3T<T>& operator-=(const Vector3T<T>& other)
-	{
-		x -= other.x;
-		y -= other.y;
-		z -= other.z;
-		return *this;
-	}
-	SLIB_INLINE Vector3T<T> operator*(T f) const
-	{
-		return Vector3T<T>(x * f, y * f, z * f);
-	}
-	
-	SLIB_INLINE Vector3T<T>& operator*=(T f)
-	{
-		x *= f;
-		y *= f;
-		z *= f;
-		return *this;
-	}
-	
-	SLIB_INLINE friend Vector3T<T> operator*(T f, const Vector3T<T>& v)
-	{
-		return Vector3T<T>(f * v.x, f * v.y, f * v.z);
-	}
-	
-	SLIB_INLINE Vector3T<T> operator*(const Vector3T<T>& other) const
-	{
-		return Vector3T<T>(x * other.x, y * other.y, z * other.z);
-	}
-	
-	SLIB_INLINE Vector3T<T>& operator*=(const Vector3T<T>& other)
-	{
-		x *= other.x;
-		y *= other.y;
-		z *= other.z;
-		return *this;
-	}
-	
-	SLIB_INLINE Vector3T<T> operator/(T f) const
-	{
-		return Vector3T<T>(x / f, y / f, z / f);
-	}
-	
-	SLIB_INLINE Vector3T<T>& operator/=(T f)
-	{
-		x /= f;
-		y /= f;
-		z /= f;
-		return *this;
-	}
-	
-	SLIB_INLINE friend Vector3T<T> operator/(T f, const Vector3T<T>& v)
-	{
-		return Vector3T<T>(f / v.x, f / v.y, f / v.z);
-	}
-	
-	SLIB_INLINE Vector3T<T> operator/(const Vector3T<T>& other) const
-	{
-		return Vector3T<T>(x / other.x, y / other.y, z / other.z);
-	}
-	
-	SLIB_INLINE Vector3T<T>& operator/(const Vector3T<T>& other)
-	{
-		x /= other.x;
-		y /= other.y;
-		z /= other.z;
-		return *this;
-	}
-	
-	SLIB_INLINE Vector3T<T> operator-() const
-	{
-		return Vector3T<T>(-x, -y, -z);
-	}
-	
-	SLIB_INLINE sl_bool operator==(const Vector3T<T>& other) const
-	{
-		return (x == other.x && y == other.y && z == other.z);
-	}
-	
-	SLIB_INLINE sl_bool operator!=(const Vector3T<T>& other) const
-	{
-		return !(*this == other);
-	}
-
-public:
-	SLIB_INLINE T dot(const Vector3T<T>& other) const
-	{
-		return x * other.x + y * other.y + z * other.z;
-	}
-
-	Vector3T<T> cross(const Vector3T<T>& other) const
-	{
-		Vector3T<T> ret;
-		ret.x = y*other.z - z*other.y;
-		ret.y = z*other.x - x*other.z;
-		ret.z = x*other.y - y*other.x;
-		return ret;
-	}
-
-	SLIB_INLINE T getLength2p() const
-	{
-		return x * x + y * y + z * z;
-	}
-	
-	SLIB_INLINE T length2p() const
-	{
-		return getLength2p();
-	}
-
-	SLIB_INLINE T getLength() const
-	{
-		return Math::sqrt(getLength2p());
-	}
-	
-	SLIB_INLINE T length() const
-	{
-		return getLength();
-	}
-
-	SLIB_INLINE T getLength2p(const Vector3T<T>& other) const
-	{
-		T dx = x - other.x;
-		T dy = y - other.y;
-		T dz = z - other.z;
-		return dx * dx + dy * dy + dz * dz;
-	}
-	
-	SLIB_INLINE T getLength(const Vector3T<T>& other) const
-	{
-		return Math::sqrt(getLength2p(other));
-	}
-
-	SLIB_INLINE void normalize()
-	{
-		T l = x * x + y * y + z * z;
-		if (l > 0) {
-			l = Math::sqrt(l);
-			x /= l;
-			y /= l;
-			z /= l;
-		}
-	}
-
-	SLIB_INLINE Vector3T<T> getNormalized()
-	{
-		Vector3T<T> ret = *this;
-		ret.normalize();
-		return ret;
-	}
-
-	T getCosBetween(const Vector3T<T>& other) const
-	{
-		return dot(other) / Math::sqrt(getLength2p() * other.getLength2p());
-	}
-
-	T getAngleBetween(const Vector3T<T>& other) const
-	{
-		return Math::arccos(dot(other) / Math::sqrt(getLength2p() * other.getLength2p()));
-	}
 };
 
-template <class T>
-T Vector3T<T>::_zero[3] = {0, 0, 0};
+SLIB_DECLARE_GEOMETRY_TYPE_EX(Vector3)
 
-typedef Vector3T<sl_real> Vector3;
-typedef Vector3T<float> Vector3f;
-typedef Vector3T<double> Vector3lf;
+template <class T, class FT>
+Vector3T<T, FT> operator*(T f, const Vector3T<T, FT>& v);
+
+template <class T, class FT>
+Vector3T<T, FT> operator/(T f, const Vector3T<T, FT>& v);
+
+
+SLIB_MATH_NAMESPACE_END
+
+
+SLIB_MATH_NAMESPACE_BEGIN
+
+template <class T, class FT>
+template <class O, class FO>
+SLIB_INLINE Vector3T<T, FT>::Vector3T(const Vector3T<O, FO>& other) : x((T)(other.x)), y((T)(other.y)), z((T)(other.z))
+{
+}
+
+template <class T, class FT>
+SLIB_INLINE Vector3T<T, FT>::Vector3T(T _x, T _y, T _z) : x(_x), y(_y), z(_z)
+{
+}
+
+template <class T, class FT>
+template <class O, class FO>
+SLIB_INLINE Vector3T<T, FT>& Vector3T<T, FT>::operator=(const Vector3T<O, FO>& other)
+{
+	x = (T)(other.x);
+	y = (T)(other.y);
+	z = (T)(other.z);
+	return *this;
+}
+
+template <class T, class FT>
+SLIB_INLINE const Vector3T<T, FT>& Vector3T<T, FT>::zero()
+{
+	return *((Vector3T<T, FT>*)((void*)(_zero)));
+}
+
+template <class T, class FT>
+Vector3T<T, FT> operator*(T f, const Vector3T<T, FT>& v)
+{
+	return {f * v.x, f * v.y, f * v.z};
+}
+
+template <class T, class FT>
+Vector3T<T, FT> operator/(T f, const Vector3T<T, FT>& v)
+{
+	return {f / v.x, f / v.y, f / v.z};
+}
 
 SLIB_MATH_NAMESPACE_END
 

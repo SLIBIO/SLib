@@ -24,11 +24,10 @@ class BrushInstance;
 
 class SLIB_EXPORT Brush : public Object
 {
-	SLIB_DECLARE_OBJECT(Brush, Object)
+	SLIB_DECLARE_OBJECT
+	
 protected:
-	SLIB_INLINE Brush()
-	{
-	}
+	Brush() = default;
 	
 public:
 	static Ref<Brush> getDefault();
@@ -38,24 +37,15 @@ public:
 	static Ref<Brush> createSolidBrush(const Color& color);
 	
 public:
-	SLIB_INLINE void getDesc(BrushDesc& desc)
-	{
-		desc = m_desc;
-	}
-
-	SLIB_INLINE BrushStyle getStyle()
-	{
-		return m_desc.style;
-	}
-
-	SLIB_INLINE Color getColor()
-	{
-		return m_desc.color;
-	}
-
+	void getDesc(BrushDesc& desc);
+	
+	BrushStyle getStyle();
+	
+	Color getColor();
+	
 public:
 	SLIB_REF_PROPERTY(BrushInstance, Instance)
-
+	
 protected:
 	BrushDesc m_desc;
 	
@@ -63,7 +53,7 @@ protected:
 
 class SLIB_EXPORT BrushInstance : public Object
 {
-	SLIB_DECLARE_OBJECT(BrushInstance, Object)
+	SLIB_DECLARE_OBJECT
 };
 
 SLIB_GRAPHICS_NAMESPACE_END

@@ -74,7 +74,7 @@ public:
 
 class SLIB_EXPORT NetFilter : public Object
 {
-	SLIB_DECLARE_OBJECT(NetFilter, Object)
+	SLIB_DECLARE_OBJECT
     
 public:
 	static Ref<NetFilter> create(const NetFilterParam& param);
@@ -96,6 +96,7 @@ protected:
 
 protected:
 	Ptr<INetFilterListener> m_listener;
+	
 };
 
 SLIB_NETWORK_NAMESPACE_END

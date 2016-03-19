@@ -186,7 +186,7 @@ public:
 												ret->m_config = config;
 												ret->m_callback = param.callback;
 
-												ret->m_threadRender = Thread::start(SLIB_CALLBACK_CLASS(_EGLRendererImpl, run, ret.get()));
+												ret->m_threadRender = Thread::start(SLIB_CALLBACK_CLASS(_EGLRendererImpl, run, ret.ptr));
 
 												return ret;
 											}
@@ -248,7 +248,7 @@ public:
 				}
 				m_renderEngine = engine;
 			}
-			runStep(engine.get());
+			runStep(engine.ptr);
 			if (Thread::isNotStoppingCurrent()) {
 				sl_uint64 t = timer.getEllapsedMilliseconds();
 				if (t < 20) {
@@ -328,7 +328,7 @@ void EGL::loadEntries(const String& _pathDll, sl_bool flagReload)
 		}
 	}
 	HMODULE hDll;
-	hDll = ::LoadLibraryW((LPCWSTR)(pathDll.getBuf()));
+	hDll = ::LoadLibraryW((LPCWSTR)(pathDll.getData()));
 	if (!hDll) {
 		//SLIB_LOG_ERROR("GLES", "Failed to load EGL dll - " + pathEGL);
 		return;

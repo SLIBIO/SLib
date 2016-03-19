@@ -3,21 +3,15 @@
 
 #include "definition.h"
 
-#include "string.h"
-#include "memory.h"
+#include "map.h"
 
 SLIB_NAMESPACE_BEGIN
 
-class SLIB_EXPORT Resource
+class Resources
 {
 public:
-	static sl_bool isBasedOnFileSystem();
 	
-	static String getFilePath(const String& path);
-
 	
-	static Memory readAllBytes(const String& path);
-
 };
 
 SLIB_NAMESPACE_END

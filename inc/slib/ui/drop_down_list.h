@@ -18,7 +18,8 @@ public:
 
 class SLIB_EXPORT DropDownList : public View
 {
-	SLIB_DECLARE_OBJECT(DropDownList, View)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	DropDownList();
 	

@@ -14,7 +14,7 @@ void JNICALL _AndroidView_nativeOnDraw(JNIEnv* env, jobject _this, jlong jinstan
 	if (instance.isNotNull()) {
 		Ref<Canvas> canvas = UIPlatform::createCanvas(jcanvas);
 		if (canvas.isNotNull()) {
-			instance->onDraw(canvas.get());
+			instance->onDraw(canvas.ptr);
 		}
 	}
 }
@@ -24,7 +24,7 @@ jboolean JNICALL _AndroidView_nativeOnKeyEvent(JNIEnv* env, jobject _this, jlong
 {
 	Ref<Android_ViewInstance> instance = Android_ViewInstance::getAndroidInstance(jinstance);
 	if (instance.isNotNull()) {
-		UIEventAction action = flagDown ? actionKeyDown : actionKeyUp;
+		UIAction action = flagDown ? UIAction::KeyDown : UIAction::KeyUp;
 		sl_uint32 vkey = keycode;
 		Keycode key = UIEvent::getKeycodeFromSystemKeycode(keycode);
 		Ref<UIEvent> ev = UIEvent::createKeyEvent(action, key, vkey);
@@ -41,7 +41,7 @@ jboolean JNICALL _AndroidView_nativeOnKeyEvent(JNIEnv* env, jobject _this, jlong
 			if (flagWin) {
 				ev->setWindowsKey();
 			}
-			instance->onKeyEvent(ev.get());
+			instance->onKeyEvent(ev.ptr);
 		}
 	}
 	return 1;
@@ -51,12 +51,12 @@ jboolean JNICALL _AndroidView_nativeOnTouchEvent(JNIEnv* env, jobject _this, jlo
 {
 	Ref<Android_ViewInstance> instance = Android_ViewInstance::getAndroidInstance(jinstance);
 	if (instance.isNotNull()) {
-		UIEventAction action = (UIEventAction)_action;
+		UIAction action = (UIAction)_action;
 		sl_uint32 nPts = Jni::getArrayLength(jpoints);
 		if (nPts > 0) {
 			Array<TouchPoint> points = Array<TouchPoint>::create(nPts);
 			if (points.isNotNull()) {
-				TouchPoint* pts = points.data();
+				TouchPoint* pts = points.getData();
 				for (sl_uint32 i = 0; i < nPts; i++) {
 					JniLocal<jobject> jpt = Jni::getObjectArrayElement(jpoints, i);
 					if (jpt.isNotNull()) {
@@ -67,7 +67,7 @@ jboolean JNICALL _AndroidView_nativeOnTouchEvent(JNIEnv* env, jobject _this, jlo
 				}
 				Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points);
 				if (ev.isNotNull()) {
-					instance->onTouchEvent(ev.get());
+					instance->onTouchEvent(ev.ptr);
 				}
 			}
 		}
@@ -305,7 +305,7 @@ Point Android_ViewInstance::convertCoordinateFromViewToScreen(const Point& ptVie
 void Android_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
 {
 	jobject handle = m_handle.get();
-	jobject child = UIPlatform::getViewHandle(_child.get());
+	jobject child = UIPlatform::getViewHandle(_child.ptr);
 	if (handle && child) {
 		_JAndroidView::addChild.call(sl_null, handle, child);
 	}
@@ -314,7 +314,7 @@ void Android_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
 void Android_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
 {
 	jobject handle = m_handle.get();
-	jobject child = UIPlatform::getViewHandle(_child.get());
+	jobject child = UIPlatform::getViewHandle(_child.ptr);
 	if (handle && child) {
 		_JAndroidView::removeChild.call(sl_null, handle, child);
 	}

@@ -28,11 +28,10 @@ class FontInstance;
 
 class SLIB_EXPORT Font : public Object
 {
-	SLIB_DECLARE_OBJECT(Font, Object)
+	SLIB_DECLARE_OBJECT
+	
 protected:
-	SLIB_INLINE Font()
-	{
-	}
+	Font() = default;
 	
 public:
 	static Ref<Font> getDefault();
@@ -46,37 +45,18 @@ public:
 	static void setDefaultFontSize(sl_real size);
 	
 public:
-	SLIB_INLINE void getDesc(FontDesc& desc)
-	{
-		desc = m_desc;
-	}
+	void getDesc(FontDesc& desc);
 	
-	SLIB_INLINE String getFamilyName()
-	{
-		return m_desc.familyName;
-	}
+	String getFamilyName();
 	
-	SLIB_INLINE sl_real getSize()
-	{
-		return m_desc.size;
-	}
+	sl_real getSize();
 	
-	SLIB_INLINE sl_bool isBold()
-	{
-		return m_desc.flagBold;
-	}
+	sl_bool isBold();
 	
-	SLIB_INLINE sl_bool isItalic()
-	{
-		return m_desc.flagItalic;
-	}
+	sl_bool isItalic();
 	
-	SLIB_INLINE sl_bool isUnderline()
-	{
-		return m_desc.flagUnderline;
-	}
+	sl_bool isUnderline();
 	
-public:
 	Size getTextSize(const Ref<GraphicsContext>& context, const String& text);
 
 public:
@@ -89,7 +69,7 @@ protected:
 
 class SLIB_EXPORT FontInstance : public Object
 {
-	SLIB_DECLARE_OBJECT(FontInstance, Object)
+	SLIB_DECLARE_OBJECT
 };
 
 SLIB_GRAPHICS_NAMESPACE_END

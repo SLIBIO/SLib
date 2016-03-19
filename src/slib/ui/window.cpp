@@ -1,4 +1,5 @@
 #include "../../../inc/slib/ui/window.h"
+
 #include "../../../inc/slib/ui/view.h"
 #include "../../../inc/slib/ui/view_group.h"
 #include "../../../inc/slib/ui/core.h"
@@ -141,6 +142,8 @@ void WindowParam::setParent(const Ref<Window>& parent)
 
 
 #define CHECK_INSTANCE(instance) (instance.isNotNull() && !(instance->isClosed()))
+
+SLIB_DEFINE_OBJECT(Window, Object)
 
 Window::Window()
 {
@@ -934,6 +937,9 @@ void Window::_refreshSize()
 	}
 #endif
 }
+
+
+SLIB_DEFINE_OBJECT(WindowInstance, Object)
 
 Ref<Window> WindowInstance::getWindow()
 {

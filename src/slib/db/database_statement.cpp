@@ -2,6 +2,8 @@
 
 SLIB_DB_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(DatabaseStatement, Object)
+
 Ref<Database> DatabaseStatement::getDatabase()
 {
 	return m_db;

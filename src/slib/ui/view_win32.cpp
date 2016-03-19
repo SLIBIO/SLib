@@ -57,7 +57,7 @@ void UI::setDefaultFontName(const String& _fontName)
 		, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS
 		, ANTIALIASED_QUALITY
 		, DEFAULT_PITCH
-		, (LPCWSTR)(fontName.getBuf()));
+		, (LPCWSTR)(fontName.getData()));
 	Win32_View_Shared::get()->hFontDefault = hFont;
 }
 
@@ -68,7 +68,7 @@ Win32_ViewInstance::Win32_ViewInstance()
 {
 	m_handle = NULL;
 	m_flagDestroyOnRelease = sl_false;
-	m_actionMouseCapture = actionMouseMove;
+	m_actionMouseCapture = UIAction::MouseMove;
 }
 
 Win32_ViewInstance::~Win32_ViewInstance()
@@ -253,7 +253,7 @@ void Win32_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
 {
 	HWND hWnd = m_handle;
 	if (hWnd) {
-		Win32_ViewInstance* child = (Win32_ViewInstance*)(_child.get());
+		Win32_ViewInstance* child = (Win32_ViewInstance*)(_child.ptr);
 		if (child) {
 			HWND hWndChild = child->getHandle();
 			if (hWndChild) {
@@ -265,7 +265,7 @@ void Win32_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
 
 void Win32_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
 {
-	Win32_ViewInstance* child = (Win32_ViewInstance*)(_child.get());
+	Win32_ViewInstance* child = (Win32_ViewInstance*)(_child.ptr);
 	HWND hWnd = child->getHandle();
 	if (hWnd) {
 		::SetParent(hWnd, HWND_MESSAGE);
@@ -276,7 +276,7 @@ sl_bool Win32_ViewInstance::onEventKey(sl_bool flagDown, WPARAM wParam, LPARAM l
 {
 	HWND hWnd = m_handle;
 	if (hWnd) {
-		UIEventAction action = flagDown ? actionKeyDown : actionKeyUp;
+		UIAction action = flagDown ? UIAction::KeyDown : UIAction::KeyUp;
 		sl_uint32 vkey = (sl_uint32)wParam;
 		UINT scancode = (lParam & 0x00ff0000) >> 16;
 		int extended = (lParam & 0x01000000) != 0;
@@ -294,8 +294,8 @@ sl_bool Win32_ViewInstance::onEventKey(sl_bool flagDown, WPARAM wParam, LPARAM l
 		Keycode key = UIEvent::getKeycodeFromSystemKeycode(vkey);
 		Ref<UIEvent> ke = UIEvent::createKeyEvent(action, key, vkey);
 		if (ke.isNotNull()) {
-			applyModifiers(ke.get());
-			onKeyEvent(ke.get());
+			applyModifiers(ke.ptr);
+			onKeyEvent(ke.ptr);
 			if (ke->isPreventedDefault()) {
 				return sl_true;
 			}
@@ -304,7 +304,7 @@ sl_bool Win32_ViewInstance::onEventKey(sl_bool flagDown, WPARAM wParam, LPARAM l
 	return sl_false;
 }
 
-sl_bool Win32_ViewInstance::onEventMouse(UIEventAction action, WPARAM wParam, LPARAM lParam)
+sl_bool Win32_ViewInstance::onEventMouse(UIAction action, WPARAM wParam, LPARAM lParam)
 {
 	HWND hWnd = m_handle;
 	if (hWnd) {
@@ -316,8 +316,8 @@ sl_bool Win32_ViewInstance::onEventMouse(UIEventAction action, WPARAM wParam, LP
 
 		Ref<UIEvent> me = UIEvent::createMouseEvent(action, x, y);
 		if (me.isNotNull()) {
-			applyModifiers(me.get());
-			onMouseEvent(me.get());
+			applyModifiers(me.ptr);
+			onMouseEvent(me.ptr);
 			if (me->isPreventedDefault()) {
 				return sl_true;
 			}
@@ -341,8 +341,8 @@ sl_bool Win32_ViewInstance::onEventMouseWheel(sl_bool flagVertical, WPARAM wPara
 		}
 		Ref<UIEvent> me = UIEvent::createMouseWheelEvent(deltaX, deltaY);
 		if (me.isNotNull()) {
-			applyModifiers(me.get());
-			onMouseWheelEvent(me.get());
+			applyModifiers(me.ptr);
+			onMouseWheelEvent(me.ptr);
 			if (me->isPreventedDefault()) {
 				return sl_true;
 			}
@@ -357,7 +357,7 @@ sl_bool Win32_ViewInstance::onEventSetCursor()
 	if (hWnd) {
 		Ref<UIEvent> ev = UIEvent::createSetCursorEvent();
 		if (ev.isNotNull()) {
-			onSetCursor(ev.get());
+			onSetCursor(ev.ptr);
 			if (ev->isPreventedDefault()) {
 				return sl_true;
 			}
@@ -395,10 +395,10 @@ sl_bool Win32_ViewInstance::processWindowMessage(UINT msg, WPARAM wParam, LPARAM
 #if defined(_SLIB_UI_WIN32_USE_CLIP_CHILDREN)
 			{
 				Ref<View> _view = getView();
-				if (ViewGroup::checkInstance(_view)) {
-					ViewGroup* view = (ViewGroup*)(_view.get());
+				if (ViewGroup::checkInstance(_view.ptr)) {
+					ViewGroup* view = (ViewGroup*)(_view.ptr);
 					Color color = view->getBackgroundColor();
-					if (color.getAlpha() == 0) {
+					if (color.a == 0) {
 						return sl_false;
 					}
 				} else if (_view.isNotNull()) {
@@ -409,20 +409,20 @@ sl_bool Win32_ViewInstance::processWindowMessage(UINT msg, WPARAM wParam, LPARAM
 					_view = _view->getParent();
 					Color color;
 					sl_bool flagClear = sl_false;
-					if (ViewGroup::checkInstance(_view)) {
-						ViewGroup* view = (ViewGroup*)(_view.get());
+					if (ViewGroup::checkInstance(_view.ptr)) {
+						ViewGroup* view = (ViewGroup*)(_view.ptr);
 						color = view->getBackgroundColor();
 						flagClear = sl_true;
-					} else if (ScrollView::checkInstance(_view)) {
-						ScrollView* view = (ScrollView*)(_view.get());
+					} else if (ScrollView::checkInstance(_view.ptr)) {
+						ScrollView* view = (ScrollView*)(_view.ptr);
 						color = view->getBackgroundColor();
 						flagClear = sl_true;
 					}
 					if (flagClear) {
-						if (color.getAlpha() == 0) {
+						if (color.a == 0) {
 							return sl_false;
 						} else {
-							HBRUSH hbr = ::CreateSolidBrush(RGB(color.getRed(), color.getGreen(), color.getBlue()));
+							HBRUSH hbr = ::CreateSolidBrush(RGB(color.r, color.g, color.b));
 							if (hbr) {
 								HDC hDC = (HDC)(wParam);
 								RECT rc;
@@ -453,7 +453,7 @@ sl_bool Win32_ViewInstance::processWindowMessage(UINT msg, WPARAM wParam, LPARAM
 						Ref<Canvas> graphics = UIPlatform::createCanvas(_graphics, rect.right, rect.bottom, &rcDirty);
 						if (graphics.isNotNull()) {
 							_graphics->SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
-							onDraw(graphics.get());
+							onDraw(graphics.ptr);
 						}
 					}
 					::EndPaint(hWnd, &ps);
@@ -472,52 +472,52 @@ sl_bool Win32_ViewInstance::processWindowMessage(UINT msg, WPARAM wParam, LPARAM
 			}
 		case WM_LBUTTONDOWN:
 			{
-				sl_bool flag = onEventMouse(actionLeftButtonDown, wParam, lParam);
-				m_actionMouseCapture = actionLeftButtonDown;
+				sl_bool flag = onEventMouse(UIAction::LeftButtonDown, wParam, lParam);
+				m_actionMouseCapture = UIAction::LeftButtonDown;
 				::SetCapture(hWnd);
 				return flag;
 			}
 		case WM_LBUTTONDBLCLK:
 			{
-				return onEventMouse(actionLeftButtonDoubleClick, wParam, lParam);
+				return onEventMouse(UIAction::LeftButtonDoubleClick, wParam, lParam);
 			}
 		case WM_LBUTTONUP:
 			{
-				sl_bool flag = onEventMouse(actionLeftButtonUp, wParam, lParam);
+				sl_bool flag = onEventMouse(UIAction::LeftButtonUp, wParam, lParam);
 				::ReleaseCapture();
 				return flag;
 			}
 		case WM_RBUTTONDOWN:
 			{
-				sl_bool flag = onEventMouse(actionRightButtonDown, wParam, lParam);
-				m_actionMouseCapture = actionRightButtonDown;
+				sl_bool flag = onEventMouse(UIAction::RightButtonDown, wParam, lParam);
+				m_actionMouseCapture = UIAction::RightButtonDown;
 				::SetCapture(hWnd);
 				return flag;
 			}
 		case WM_RBUTTONDBLCLK:
 			{
-				return onEventMouse(actionRightButtonDoubleClick, wParam, lParam);
+				return onEventMouse(UIAction::RightButtonDoubleClick, wParam, lParam);
 			}
 		case WM_RBUTTONUP:
 			{
-				sl_bool flag = onEventMouse(actionRightButtonUp, wParam, lParam);
+				sl_bool flag = onEventMouse(UIAction::RightButtonUp, wParam, lParam);
 				::ReleaseCapture();
 				return flag;
 			}
 		case WM_MBUTTONDOWN:
 			{
-				sl_bool flag = onEventMouse(actionMiddleButtonDown, wParam, lParam);
-				m_actionMouseCapture = actionMiddleButtonDown;
+				sl_bool flag = onEventMouse(UIAction::MiddleButtonDown, wParam, lParam);
+				m_actionMouseCapture = UIAction::MiddleButtonDown;
 				::SetCapture(hWnd);
 				return flag;
 			}
 		case WM_MBUTTONDBLCLK:
 			{
-				return onEventMouse(actionMiddleButtonDoubleClick, wParam, lParam);
+				return onEventMouse(UIAction::MiddleButtonDoubleClick, wParam, lParam);
 			}
 		case WM_MBUTTONUP:
 			{
-				sl_bool flag = onEventMouse(actionMiddleButtonUp, wParam, lParam);
+				sl_bool flag = onEventMouse(UIAction::MiddleButtonUp, wParam, lParam);
 				::ReleaseCapture();
 				return flag;
 			}
@@ -535,27 +535,27 @@ sl_bool Win32_ViewInstance::processWindowMessage(UINT msg, WPARAM wParam, LPARAM
 					track.hwndTrack = hWnd;
 					track.dwHoverTime = HOVER_DEFAULT;
 					::TrackMouseEvent(&track);
-					onEventMouse(actionMouseEnter, wParam, lParam);
+					onEventMouse(UIAction::MouseEnter, wParam, lParam);
 				}
 
 				if (::GetCapture() == hWnd) {
-					if (m_actionMouseCapture == actionLeftButtonDown) {
-						return onEventMouse(actionLeftButtonDrag, wParam, lParam);
-					} else if (m_actionMouseCapture == actionRightButtonDown) {
-						return onEventMouse(actionRightButtonDrag, wParam, lParam);
-					} else if (m_actionMouseCapture == actionMiddleButtonDown) {
-						return onEventMouse(actionMiddleButtonDrag, wParam, lParam);
+					if (m_actionMouseCapture == UIAction::LeftButtonDown) {
+						return onEventMouse(UIAction::LeftButtonDrag, wParam, lParam);
+					} else if (m_actionMouseCapture == UIAction::RightButtonDown) {
+						return onEventMouse(UIAction::RightButtonDrag, wParam, lParam);
+					} else if (m_actionMouseCapture == UIAction::MiddleButtonDown) {
+						return onEventMouse(UIAction::MiddleButtonDrag, wParam, lParam);
 					} else {
-						return onEventMouse(actionMouseMove, wParam, lParam);
+						return onEventMouse(UIAction::MouseMove, wParam, lParam);
 					}
 				} else {
-					return onEventMouse(actionMouseMove, wParam, lParam);
+					return onEventMouse(UIAction::MouseMove, wParam, lParam);
 				}
 				break;
 			}
 		case WM_MOUSELEAVE:
 			{
-				onEventMouse(actionMouseLeave, wParam, lParam);
+				onEventMouse(UIAction::MouseLeave, wParam, lParam);
 				return sl_true;
 			}
 		case WM_MOUSEWHEEL:
@@ -730,7 +730,7 @@ HWND UIPlatform::getViewHandle(View* view)
 {
 	if (view) {
 		Ref<ViewInstance> _instance = view->getViewInstance();
-		Win32_ViewInstance* instance = (Win32_ViewInstance*)(_instance.get());
+		Win32_ViewInstance* instance = (Win32_ViewInstance*)(_instance.ptr);
 		if (instance) {
 			return instance->getHandle();
 		}

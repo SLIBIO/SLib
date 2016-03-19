@@ -24,13 +24,65 @@ Referable::~Referable()
 	_clearWeak();
 }
 
-CWeakRef* Referable::_getWeak()
+sl_reg Referable::increaseReference()
+{
+	if (m_nRefCount >= 0) {
+#ifdef SLIB_DEBUG_REFERENCE
+		_checkValid();
+#endif
+		return Base::interlockedIncrement(&m_nRefCount);
+	}
+	return 1;
+}
+
+sl_reg Referable::decreaseReference()
+{
+	if (m_nRefCount > 0) {
+#ifdef SLIB_DEBUG_REFERENCE
+		_checkValid();
+#endif
+		sl_reg nRef = Base::interlockedDecrement(&m_nRefCount);
+		if (nRef == 0) {
+			_free();
+		}
+		return nRef;
+	}
+	return 1;
+}
+
+sl_reg Referable::decreaseReferenceNoFree()
+{
+	if (m_nRefCount > 0) {
+#ifdef SLIB_DEBUG_REFERENCE
+		_checkValid();
+#endif
+		return Base::interlockedDecrement(&m_nRefCount);
+	}
+	return 1;
+}
+
+CWeakRef* Referable::getWeakObject()
 {
 	SpinLocker lock(&m_lockWeak);
 	if (! m_weak) {
 		m_weak = CWeakRef::create(this);
 	}
 	return m_weak;
+}
+
+void Referable::makeNeverFree()
+{
+	m_nRefCount = -1;
+}
+
+sl_class_type Referable::getClassType() const
+{
+	return 0;
+}
+
+sl_bool Referable::checkClassType(sl_class_type type) const
+{
+	return sl_false;
 }
 
 void Referable::_clearWeak()
@@ -56,22 +108,10 @@ void Referable::_checkValid()
 }
 #endif
 
-sl_class_type Referable::getClassType() const
-{
-	return 0;
-}
-
-const char* Referable::getClassTypeName() const
-{
-	return "unknown";
-}
-
-sl_bool Referable::checkClassType(sl_class_type type) const
-{
-	return sl_false;
-}
-
 const _Ref_Const _Ref_Null = {0, 0};
+
+
+SLIB_DEFINE_ROOT_OBJECT(CWeakRef)
 
 CWeakRef::CWeakRef()
 {
@@ -93,11 +133,11 @@ Ref<Referable> CWeakRef::lock()
 	SpinLocker lock(&m_lock);
 	Referable* obj = m_object;
 	if (obj) {
-		sl_reg n = obj->_increaseReference();
+		sl_reg n = obj->increaseReference();
 		if (n > 1) {
 			ret = obj;
 		}
-		obj->_decreaseReference();
+		obj->decreaseReferenceNoFree();
 	}
 	return ret;
 }

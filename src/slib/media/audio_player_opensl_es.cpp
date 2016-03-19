@@ -176,7 +176,7 @@ public:
 							ret->m_event = param.event;
 							
 							if (ret->m_bufFrame) {
-								if ((*bufferQueue)->RegisterCallback(bufferQueue, _OpenSLES_AudioPlayerBufferImpl::callback, ret.get()) == SL_RESULT_SUCCESS) {
+								if ((*bufferQueue)->RegisterCallback(bufferQueue, _OpenSLES_AudioPlayerBufferImpl::callback, ret.ptr) == SL_RESULT_SUCCESS) {
 									if (param.flagAutoStart) {
 										ret->start();
 									}

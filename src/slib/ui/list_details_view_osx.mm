@@ -33,21 +33,21 @@ public:
 	{
 		ObjectLocker lock(this);
 		CList<NSTableColumn*>& _columns = tv->m_columns;
-		sl_uint32 nOrig = (sl_uint32)(_columns.count());
-		sl_uint32 nNew = (sl_uint32)(m_columns.count());
+		sl_uint32 nOrig = (sl_uint32)(_columns.getCount());
+		sl_uint32 nNew = (sl_uint32)(m_columns.getCount());
 		if (nOrig == nNew) {
 			return;
 		}
 		if (nOrig > nNew) {
 			ListLocker<NSTableColumn*> columns(_columns);
-			for (sl_uint32 i = nNew; i < columns.count(); i++) {
+			for (sl_uint32 i = nNew; i < columns.count; i++) {
 				[tv->table removeTableColumn:(columns[i])];
 			}
 			_columns.setCount(nNew);
 		} else {
 			_columns.setCount(nNew);
 			ListLocker<NSTableColumn*> columns(_columns);
-			for (sl_uint32 i = nOrig; i < columns.count(); i++) {
+			for (sl_uint32 i = nOrig; i < columns.count; i++) {
 				NSTableColumn* column = [[NSTableColumn alloc] initWithIdentifier:[NSString stringWithFormat:@"%d",i]];
 				[tv->table addTableColumn:column];
 				columns[i] = column;
@@ -60,7 +60,7 @@ public:
 		ObjectLocker lock(this);
 		ListLocker<ListDetailsViewColumn> columns(m_columns);
 		__applyColumnsCount(tv);
-		for (sl_uint32 i = 0; i < columns.count(); i++) {
+		for (sl_uint32 i = 0; i < columns.count; i++) {
 			NSTableColumn* tc = tv->m_columns.getItemValue(i, nil);
 			if (tc != nil) {
 				[tc setTitle:(Apple::getNSStringFromString(columns[i].title))];
@@ -79,7 +79,7 @@ public:
 		NSFont* font = tv->m_font;
 		if (font != nil) {
 			ListLocker<ListDetailsViewColumn> columns(m_columns);
-			for (sl_uint32 i = 0; i < columns.count(); i++) {
+			for (sl_uint32 i = 0; i < columns.count; i++) {
 				NSTableColumn* tc = tv->m_columns.getItemValue(i, nil);
 				if (tc != nil) {
 					NSCell* dataCell = [tc dataCell];
@@ -92,10 +92,10 @@ public:
 	
 	static NSTextAlignment translateAlignment(Alignment _align)
 	{
-		sl_uint32 align = _align & alignHorizontalMask;
-		if (align == alignCenter) {
+		Alignment align = (Alignment)((int)_align & (int)Alignment::HorizontalMask);
+		if (align == Alignment::Center) {
 			return NSCenterTextAlignment;
-		} else if (align == alignRight) {
+		} else if (align == Alignment::Right) {
 			return NSRightTextAlignment;
 		}
 		return NSLeftTextAlignment;
@@ -119,7 +119,7 @@ Ref<ViewInstance> ListDetailsView::createInstance(ViewInstance* _parent)
 			
 			Ref<Font> font = m_font;
 			Ref<FontInstance> fontInstance;
-			NSFont* hFont = UIPlatform::getNSFont(font.get(), fontInstance);
+			NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
 			handle->m_font = hFont;
 			((_ListDetailsView*)this)->__copyColumns(handle);
 			[table setRowSizeStyle:NSTableViewRowSizeStyleCustom];
@@ -224,7 +224,7 @@ void ListDetailsView::setFont(const Ref<Font>& font)
 	if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListDetailsView class]]) {
 		_Slib_OSX_ListDetailsView* tv = (_Slib_OSX_ListDetailsView*)handle;
 		Ref<FontInstance> fontInstance;
-		NSFont* hFont = UIPlatform::getNSFont(font.get(), fontInstance);
+		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
 		tv->m_font = hFont;
 		((_ListDetailsView*)this)->__applyFont(tv);
 		[tv->table reloadData];
@@ -248,8 +248,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::ListDetailsView::checkInstance(view)) {
-			return ((slib::_ListDetailsView*)(view.get()))->getRowsCount();
+		if (slib::ListDetailsView::checkInstance(view.ptr)) {
+			return ((slib::_ListDetailsView*)(view.ptr))->getRowsCount();
 		}
 	}
 	return 0;
@@ -259,12 +259,12 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::ListDetailsView::checkInstance(view)) {
+		if (slib::ListDetailsView::checkInstance(view.ptr)) {
 			NSString* _id = tableColumn.identifier;
 			if (_id != nil) {
 				sl_uint32 iRow = (sl_uint32)(row);
 				sl_uint32 iCol = (sl_uint32)(_id.intValue);
-				return slib::Apple::getNSStringFromString(((slib::_ListDetailsView*)(view.get()))->onGetCellText(iRow, iCol));
+				return slib::Apple::getNSStringFromString(((slib::_ListDetailsView*)(view.ptr))->onGetCellText(iRow, iCol));
 			}
 		}
 	}
@@ -276,10 +276,10 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::ListDetailsView::checkInstance(view)) {
+		if (slib::ListDetailsView::checkInstance(view.ptr)) {
 			sl_int32 n = (sl_int32)([table selectedRow]);
 			if (n >= 0) {
-				((slib::_ListDetailsView*)(view.get()))->onSelectRow(n);
+				((slib::_ListDetailsView*)(view.ptr))->onSelectRow(n);
 			}
 		}
 	}
@@ -298,18 +298,18 @@ SLIB_UI_NAMESPACE_END
 		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 		if (instance.isNotNull()) {
 			slib::Ref<slib::View> view = instance->getView();
-			if (slib::ListDetailsView::checkInstance(view)) {
+			if (slib::ListDetailsView::checkInstance(view.ptr)) {
 				if (indexRow == indexRowBefore) {
 					// don't call event callback when it is new selection because it is already called by default
-					((slib::_ListDetailsView*)(view.get()))->onSelectRow((sl_uint32)(indexRow));
+					((slib::_ListDetailsView*)(view.ptr))->onSelectRow((sl_uint32)(indexRow));
 				}
 				sl_real x = (sl_real)(ptView.x);
 				sl_real y = (sl_real)(ptView.y);
 				NSInteger clicks = [theEvent clickCount];
 				if (clicks == 1) {
-					((slib::_ListDetailsView*)(view.get()))->onClickRow((sl_uint32)(indexRow), slib::Point(x, y));
+					((slib::_ListDetailsView*)(view.ptr))->onClickRow((sl_uint32)(indexRow), slib::Point(x, y));
 				} else if (clicks == 2) {
-					((slib::_ListDetailsView*)(view.get()))->onDoubleClickRow((sl_uint32)(indexRow), slib::Point(x, y));
+					((slib::_ListDetailsView*)(view.ptr))->onDoubleClickRow((sl_uint32)(indexRow), slib::Point(x, y));
 				}
 			}
 		}
@@ -326,10 +326,10 @@ SLIB_UI_NAMESPACE_END
 		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 		if (instance.isNotNull()) {
 			slib::Ref<slib::View> view = instance->getView();
-			if (slib::ListDetailsView::checkInstance(view)) {
+			if (slib::ListDetailsView::checkInstance(view.ptr)) {
 				sl_real x = (sl_real)(ptView.x);
 				sl_real y = (sl_real)(ptView.y);
-				((slib::_ListDetailsView*)(view.get()))->onRightButtonClickRow((sl_uint32)(indexRow), slib::Point(x, y));
+				((slib::_ListDetailsView*)(view.ptr))->onRightButtonClickRow((sl_uint32)(indexRow), slib::Point(x, y));
 			}
 		}
 	}

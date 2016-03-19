@@ -1,4 +1,5 @@
 #include "../../../inc/slib/network/ethernet.h"
+
 #include "../../../inc/slib/network/tcpip.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
@@ -27,12 +28,12 @@ sl_bool EthernetMacTable::getMacAddress(const IPv4Address& ip, MacAddress* out)
 
 void EthernetMacTable::parseEthernetFrame(const void* _frame, sl_uint32 sizeFrame, sl_bool flagUseSource, sl_bool flagUseDestination)
 {
-	if (sizeFrame > EthernetFrameFormat::getHeaderSize()) {
-		EthernetFrameFormat* frame = (EthernetFrameFormat*)_frame;
-		if (frame->getProtocol() == networkLinkProtocol_IPv4) {
-			IPv4HeaderFormat* ip = (IPv4HeaderFormat*)(frame->getContent());
-			sl_uint32 sizeIP = sizeFrame - EthernetFrameFormat::getHeaderSize();
-			if (IPv4HeaderFormat::check(ip, sizeIP)) {
+	if (sizeFrame > EthernetFrame::HeaderSize) {
+		EthernetFrame* frame = (EthernetFrame*)_frame;
+		if (frame->getProtocol() == NetworkLinkProtocol::IPv4) {
+			IPv4Packet* ip = (IPv4Packet*)(frame->getContent());
+			sl_uint32 sizeIP = sizeFrame - EthernetFrame::HeaderSize;
+			if (IPv4Packet::check(ip, sizeIP)) {
 				if (flagUseSource) {
 					MacAddress mac = frame->getSourceAddress();
 					if (mac.isNotMulticast()) {

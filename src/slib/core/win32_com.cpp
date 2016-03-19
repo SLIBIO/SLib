@@ -25,7 +25,7 @@ Memory Win32_COM::readAllBytesFromStream(IStream* stream)
 				ret = Memory::create(size);
 				if (ret.isNotEmpty()) {
 					ULONG nRead = 0;
-					hr = stream->Read(ret.getBuf(), size, &nRead);
+					hr = stream->Read(ret.getData(), size, &nRead);
 					if (hr == S_OK && nRead == size) {
 						return ret;
 					}

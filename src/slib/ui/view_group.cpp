@@ -4,6 +4,8 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(ViewGroup, GenericViewWithDrawing)
+
 ViewGroup::ViewGroup()
 {
 	setGroup(sl_true);
@@ -16,7 +18,7 @@ void ViewGroup::removeAllChildren()
 		return;
 	}
 	ListLocker< Ref<View> > children(m_children);
-	for (sl_size i = 0; i < children.count(); i++) {
+	for (sl_size i = 0; i < children.count; i++) {
 		const Ref<View>& child = children[i];
 		if (child.isNotNull()) {
 			_removeChild(child);
@@ -46,7 +48,7 @@ void ViewGroup::addChild(const Ref<View>& view)
 void ViewGroup::onAttach()
 {
 	ListLocker< Ref<View> > children(m_children);
-	for (sl_size i = 0; i < children.getCount(); i++) {
+	for (sl_size i = 0; i < children.count; i++) {
 		Ref<View> child = children[i];
 		if (child.isNotNull()) {
 			attachChild(child);
@@ -61,10 +63,10 @@ List< Ref<View> > ViewGroup::getChildren()
 
 void ViewGroup::_removeChild(const Ref<View>& child)
 {
-	ObjectLocker lock(child.get());
+	ObjectLocker lock(child.ptr);
 	Ref<ViewInstance> instanceChild = child->getViewInstance();
 	if (instanceChild.isNotNull()) {
-		removeChildInstance(instanceChild.get());
+		removeChildInstance(instanceChild.ptr);
 	}
 	child->detach();
 	child->removeParent(this);

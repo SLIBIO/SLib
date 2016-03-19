@@ -25,7 +25,7 @@ public:
 		if (viewContent.isNotNull()) {
 			Ref<ViewInstance> instance = viewContent->attachToNewInstance(Ref<ViewInstance>::null());
 			if (instance.isNotNull()) {
-				handle = UIPlatform::getViewHandle(instance.get());
+				handle = UIPlatform::getViewHandle(instance.ptr);
 			}
 			viewContent->setParent(this);
 			Size sizeContent = viewContent->getSize();

@@ -5,28 +5,32 @@ SLIB_GRAPHICS_NAMESPACE_BEGIN
 
 sl_real GraphicsUtil::calculateAlignX(sl_real leftDst, sl_real rightDst, sl_real widthSrc, Alignment align)
 {
-	sl_uint32 hAlign = align & alignHorizontalMask;
+	Alignment hAlign = Alignment((sl_uint32)(align) & (sl_uint32)(Alignment::HorizontalMask));
 	switch (hAlign) {
-		case alignLeft:
+		case Alignment::Left:
 			break;
-		case alignCenter:
+		case Alignment::Center:
 			return leftDst + (rightDst - leftDst - widthSrc) / 2;
-		case alignRight:
+		case Alignment::Right:
 			return rightDst - widthSrc;
+		default:
+			break;
 	}
 	return leftDst;
 }
 
 sl_real GraphicsUtil::calculateAlignY(sl_real topDst, sl_real bottomDst, sl_real heightSrc, Alignment align)
 {
-	sl_uint32 vAlign = align & alignVerticalMask;
+	Alignment vAlign = (Alignment)((sl_uint32)(align) & (sl_uint32)(Alignment::VerticalMask));
 	switch (vAlign) {
-		case alignTop:
+		case Alignment::Top:
 			break;
-		case alignMiddle:
+		case Alignment::Middle:
 			return topDst + (bottomDst - topDst - heightSrc) / 2;
-		case alignBottom:
+		case Alignment::Bottom:
 			return bottomDst - heightSrc;
+		default:
+			break;
 	}
 	return topDst;
 }

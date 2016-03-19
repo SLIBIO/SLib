@@ -9,7 +9,8 @@
 SLIB_UI_NAMESPACE_BEGIN
 class _Win32_LabelViewInstance : public Win32_ViewInstance
 {
-	SLIB_DECLARE_OBJECT(_Win32_LabelViewInstance, Win32_ViewInstance)
+	SLIB_DECLARE_OBJECT
+
 public:
 	Color m_colorText;
 	Color m_colorBackground;
@@ -46,7 +47,7 @@ public:
 			::DeleteObject(m_hBrushBackground);
 			m_hBrushBackground = NULL;
 		}
-		if (color.getAlpha() != 0) {
+		if (color.a != 0) {
 			m_hBrushBackground = ::CreateSolidBrush(UIPlatform::getColorRef(color));
 		}
 		::InvalidateRect(handle, NULL, TRUE);
@@ -93,27 +94,29 @@ public:
 	}
 };
 
+SLIB_DEFINE_OBJECT(_Win32_LabelViewInstance, Win32_ViewInstance)
+
 Ref<ViewInstance> LabelView::createInstance(ViewInstance* parent)
 {
 	int style = SS_NOTIFY;
 	if (m_flagBorder) {
 		style |= WS_BORDER;
 	}
-	sl_uint32 align = m_textAlignment & alignHorizontalMask;
-	if (align == alignCenter) {
+	Alignment align = (Alignment)((int)m_textAlignment & (int)Alignment::HorizontalMask);
+	if (align == Alignment::Center) {
 		style |= SS_CENTER;
-	} else if (align == alignRight) {
+	} else if (align == Alignment::Right) {
 		style |= SS_RIGHT;
 	}
 	String16 text = m_text;
-	Ref<_Win32_LabelViewInstance> ret = Win32_ViewInstance::create<_Win32_LabelViewInstance>(this, parent, L"STATIC", (LPCWSTR)(text.getBuf()), style, 0);
+	Ref<_Win32_LabelViewInstance> ret = Win32_ViewInstance::create<_Win32_LabelViewInstance>(this, parent, L"STATIC", (LPCWSTR)(text.getData()), style, 0);
 	if (ret.isNotNull()) {
 
 		HWND handle = ret->getHandle();
 
 		Ref<Font> font = m_font;
 		Ref<FontInstance> fontInstance;
-		HFONT hFont = UIPlatform::getGdiFont(font.get(), fontInstance);
+		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
@@ -175,11 +178,11 @@ Alignment LabelView::getTextAlignment()
 	if (handle) {
 		LONG style = ::GetWindowLongW(handle, GWL_STYLE);
 		if (style & SS_CENTER) {
-			m_textAlignment = alignCenter;
+			m_textAlignment = Alignment::Center;
 		} else if (style & SS_RIGHT) {
-			m_textAlignment = alignRight;
+			m_textAlignment = Alignment::Right;
 		} else {
-			m_textAlignment = alignLeft;
+			m_textAlignment = Alignment::Left;
 		}
 	}
 	return m_textAlignment;
@@ -190,10 +193,10 @@ void LabelView::setTextAlignment(Alignment _align)
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		LONG style = ::GetWindowLongW(handle, GWL_STYLE) & (~(SS_RIGHT | SS_CENTER));
-		sl_uint32 align = _align & alignHorizontalMask;
-		if (align == alignCenter) {
+		Alignment align = (Alignment)((int)_align & (int)Alignment::HorizontalMask);
+		if (align == Alignment::Center) {
 			style |= SS_CENTER;
-		} else if (align == alignRight) {
+		} else if (align == Alignment::Right) {
 			style |= SS_RIGHT;
 		}
 		::SetWindowLongW(handle, GWL_STYLE, style);
@@ -206,8 +209,8 @@ void LabelView::setTextAlignment(Alignment _align)
 Color LabelView::getTextColor()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_LabelViewInstance::checkInstance(_instance)) {
-		_Win32_LabelViewInstance* instance = ((_Win32_LabelViewInstance*)(_instance.get()));
+	if (_Win32_LabelViewInstance::checkInstance(_instance.ptr)) {
+		_Win32_LabelViewInstance* instance = ((_Win32_LabelViewInstance*)(_instance.ptr));
 		m_textColor = instance->m_colorText;
 	}
 	return m_textColor;
@@ -216,8 +219,8 @@ Color LabelView::getTextColor()
 void LabelView::setTextColor(const Color& color)
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_LabelViewInstance::checkInstance(_instance)) {
-		_Win32_LabelViewInstance* instance = ((_Win32_LabelViewInstance*)(_instance.get()));
+	if (_Win32_LabelViewInstance::checkInstance(_instance.ptr)) {
+		_Win32_LabelViewInstance* instance = ((_Win32_LabelViewInstance*)(_instance.ptr));
 		instance->setTextColor(color); 
 	}
 	m_textColor = color;
@@ -226,8 +229,8 @@ void LabelView::setTextColor(const Color& color)
 Color LabelView::getBackgroundColor()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_LabelViewInstance::checkInstance(_instance)) {
-		_Win32_LabelViewInstance* instance = ((_Win32_LabelViewInstance*)(_instance.get()));
+	if (_Win32_LabelViewInstance::checkInstance(_instance.ptr)) {
+		_Win32_LabelViewInstance* instance = ((_Win32_LabelViewInstance*)(_instance.ptr));
 		m_backgroundColor = instance->m_colorBackground;
 	}
 	return m_backgroundColor;
@@ -236,8 +239,8 @@ Color LabelView::getBackgroundColor()
 void LabelView::setBackgroundColor(const Color& color)
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_LabelViewInstance::checkInstance(_instance)) {
-		_Win32_LabelViewInstance* instance = ((_Win32_LabelViewInstance*)(_instance.get()));
+	if (_Win32_LabelViewInstance::checkInstance(_instance.ptr)) {
+		_Win32_LabelViewInstance* instance = ((_Win32_LabelViewInstance*)(_instance.ptr));
 		instance->setBackgroundColor(color);
 	}
 	m_backgroundColor = color;
@@ -248,7 +251,7 @@ void LabelView::setFont(const Ref<Font>& font)
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		HFONT hFont = UIPlatform::getGdiFont(font.get(), fontInstance);
+		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}

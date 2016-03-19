@@ -1,4 +1,5 @@
 #include "../../../inc/slib/core/service.h"
+
 #include "../../../inc/slib/core/system.h"
 #include "../../../inc/slib/core/log.h"
 #include "../../../inc/slib/core/file.h"
@@ -7,6 +8,8 @@
 #define WAIT_SECONDS 15
 
 SLIB_NAMESPACE_BEGIN
+
+SLIB_DEFINE_OBJECT(Service, Object)
 
 Service::Service()
 {
@@ -28,7 +31,7 @@ void Service::_release()
 
 AppType Service::getAppType()
 {
-	return appType_Service;
+	return AppType::Service;
 }
 
 void Service::run(const String& command)
@@ -62,7 +65,7 @@ Ref<Thread> Service::getThread()
 Ref<Service> Service::getApp()
 {
 	Ref<Application> app = Application::getApp();
-	if (app.isNotNull() && app->getAppType() == appType_Service) {
+	if (app.isNotNull() && app->getAppType() == AppType::Service) {
 		return Ref<Service>::from(app);
 	}
 	return Ref<Service>::null();

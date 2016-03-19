@@ -1,4 +1,5 @@
 #include "../../../inc/slib/ui/s_button.h"
+
 #include "../../../inc/slib/graphics/context.h"
 #include "../../../inc/slib/graphics/util.h"
 
@@ -18,18 +19,18 @@ public:
 public:
 	_SButton_Categories()
 	{
-		categories[0].properties[buttonState_Normal].border = Pen::create(penStyle_Solid, 1, Color::gray(100));
-		categories[0].properties[buttonState_Normal].backgroundColor = Color::gray(240);
-		categories[0].properties[buttonState_Normal].textColor = Color::black();
-		categories[0].properties[buttonState_Disabled].backgroundColor = Color::gray(220);
-		categories[0].properties[buttonState_Disabled].textColor = Color::gray(110);
-		categories[0].properties[buttonState_Hover].border = Pen::create(penStyle_Solid, 1, Color(0, 100, 250));
-		categories[0].properties[buttonState_Hover].backgroundColor = Color(220, 230, 255);
-		categories[0].properties[buttonState_Down].border = categories[0].properties[buttonState_Hover].border;
-		categories[0].properties[buttonState_Down].backgroundColor = Color(180, 210, 255);
+		categories[0].properties[(int)(ButtonState::Normal)].border = Pen::create(PenStyle::Solid, 1, Color(100, 100, 100));
+		categories[0].properties[(int)(ButtonState::Normal)].backgroundColor = Color(240, 240, 240);
+		categories[0].properties[(int)(ButtonState::Normal)].textColor = Color::Black;
+		categories[0].properties[(int)(ButtonState::Disabled)].backgroundColor = Color(220, 220, 220);
+		categories[0].properties[(int)(ButtonState::Disabled)].textColor = Color(110, 110, 110);
+		categories[0].properties[(int)(ButtonState::Hover)].border = Pen::create(PenStyle::Solid, 1, Color(0, 100, 250));
+		categories[0].properties[(int)(ButtonState::Hover)].backgroundColor = Color(220, 230, 255);
+		categories[0].properties[(int)(ButtonState::Down)].border = categories[0].properties[(int)(ButtonState::Hover)].border;
+		categories[0].properties[(int)(ButtonState::Down)].backgroundColor = Color(180, 210, 255);
 		
 		categories[1] = categories[0];
-		categories[1].properties[buttonState_Normal].border = Pen::create(penStyle_Solid, 3, Color(0, 100, 250));
+		categories[1].properties[(int)(ButtonState::Normal)].border = Pen::create(PenStyle::Solid, 3, Color(0, 100, 250));
 	}
 	
 public:
@@ -40,20 +41,22 @@ public:
 	}
 };
 
+SLIB_DEFINE_OBJECT(SButton, SView)
+
 SButton::SButton(sl_uint32 nCategories, SButtonCategory* categories)
 {
 	m_flagDefaultButton = sl_false;
 	
-	m_state = buttonState_Normal;
+	m_state = ButtonState::Normal;
 	m_category = 0;
 	
 	m_iconSize.x = 0;
 	m_iconSize.y = 0;
-	m_contentAlignment = alignMiddleCenter;
-	m_iconAlignment = alignMiddleCenter;
-	m_textAlignment = alignMiddleCenter;
+	m_contentAlignment = Alignment::MiddleCenter;
+	m_iconAlignment = Alignment::MiddleCenter;
+	m_textAlignment = Alignment::MiddleCenter;
 	m_flagTextBeforeIcon = sl_false;
-	m_layoutOrientation = layoutOrientation_Horizontal;
+	m_layoutOrientation = LayoutOrientation::Horizontal;
 	
 	m_iconMarginLeft = 0;
 	m_iconMarginTop = 0;
@@ -335,7 +338,7 @@ void SButton::setTextMarginBottom(sl_real margin)
 Color SButton::getTextColor(ButtonState state, sl_uint32 category)
 {
 	if (category < m_nCategories) {
-		return m_categories[category].properties[state].textColor;
+		return m_categories[category].properties[(int)state].textColor;
 	} else {
 		return Color::zero();
 	}
@@ -344,7 +347,7 @@ Color SButton::getTextColor(ButtonState state, sl_uint32 category)
 void SButton::setTextColor(const Color& color, ButtonState state, sl_uint32 category)
 {
 	if (category < m_nCategories) {
-		m_categories[category].properties[state].textColor = color;
+		m_categories[category].properties[(int)state].textColor = color;
 		invalidate();
 	}
 }
@@ -352,7 +355,7 @@ void SButton::setTextColor(const Color& color, ButtonState state, sl_uint32 cate
 Color SButton::getBackgroundColor(ButtonState state, sl_uint32 category)
 {
 	if (category < m_nCategories) {
-		return m_categories[category].properties[state].backgroundColor;
+		return m_categories[category].properties[(int)state].backgroundColor;
 	} else {
 		return Color::zero();
 	}
@@ -361,7 +364,7 @@ Color SButton::getBackgroundColor(ButtonState state, sl_uint32 category)
 void SButton::setBackgroundColor(const Color& color, ButtonState state, sl_uint32 category)
 {
 	if (category < m_nCategories) {
-		m_categories[category].properties[state].backgroundColor = color;
+		m_categories[category].properties[(int)state].backgroundColor = color;
 		invalidate();
 	}
 }
@@ -369,7 +372,7 @@ void SButton::setBackgroundColor(const Color& color, ButtonState state, sl_uint3
 Ref<Drawable> SButton::getBackground(ButtonState state, sl_uint32 category)
 {
 	if (category < m_nCategories) {
-		return m_categories[category].properties[state].background;
+		return m_categories[category].properties[(int)state].background;
 	} else {
 		return Ref<Drawable>::null();
 	}
@@ -378,7 +381,7 @@ Ref<Drawable> SButton::getBackground(ButtonState state, sl_uint32 category)
 void SButton::setBackground(const Ref<Drawable>& background, ButtonState state, sl_uint32 category)
 {
 	if (category < m_nCategories) {
-		m_categories[category].properties[state].background = background;
+		m_categories[category].properties[(int)state].background = background;
 		invalidate();
 	}
 }
@@ -386,7 +389,7 @@ void SButton::setBackground(const Ref<Drawable>& background, ButtonState state, 
 Ref<Drawable> SButton::getIcon(ButtonState state, sl_uint32 category)
 {
 	if (category < m_nCategories) {
-		return m_categories[category].properties[state].icon;
+		return m_categories[category].properties[(int)state].icon;
 	} else {
 		return Ref<Drawable>::null();
 	}
@@ -395,7 +398,7 @@ Ref<Drawable> SButton::getIcon(ButtonState state, sl_uint32 category)
 void SButton::setIcon(const Ref<Drawable>& icon, ButtonState state, sl_uint32 category)
 {
 	if (category < m_nCategories) {
-		m_categories[category].properties[state].icon = icon;
+		m_categories[category].properties[(int)state].icon = icon;
 		invalidate();
 	}
 }
@@ -403,7 +406,7 @@ void SButton::setIcon(const Ref<Drawable>& icon, ButtonState state, sl_uint32 ca
 Ref<Pen> SButton::getBorder(ButtonState state, sl_uint32 category)
 {
 	if (category < m_nCategories) {
-		return m_categories[category].properties[state].border;
+		return m_categories[category].properties[(int)state].border;
 	} else {
 		return Ref<Pen>::null();
 	}
@@ -412,7 +415,7 @@ Ref<Pen> SButton::getBorder(ButtonState state, sl_uint32 category)
 void SButton::setBorder(const Ref<Pen>& pen, ButtonState state, sl_uint32 category)
 {
 	if (category < m_nCategories) {
-		m_categories[category].properties[state].border = pen;
+		m_categories[category].properties[(int)state].border = pen;
 		invalidate();
 	}
 }
@@ -460,31 +463,31 @@ void SButton::setHoverState(sl_bool flag)
 
 void SButton::onDraw(Canvas* canvas)
 {
-	SButtonCategoryProperties& params = m_categories[m_category].properties[m_state];
+	SButtonCategoryProperties& params = m_categories[m_category].properties[(int)m_state];
 	Color textColor = params.textColor;
 	Ref<Drawable> icon = params.icon;
 	if (textColor.isZero()) {
-		textColor = m_categories[m_category].properties[buttonState_Normal].textColor;
+		textColor = m_categories[m_category].properties[(int)ButtonState::Normal].textColor;
 	}
 	if (icon.isNull()) {
-		icon = m_categories[m_category].properties[buttonState_Normal].icon;
+		icon = m_categories[m_category].properties[(int)ButtonState::Normal].icon;
 	}
 	drawContent(canvas, icon, m_text, textColor);
 }
 
 void SButton::onDrawBackground(Canvas* canvas)
 {
-	SButtonCategoryProperties& params = m_categories[m_category].properties[m_state];
+	SButtonCategoryProperties& params = m_categories[m_category].properties[(int)m_state];
 	Color color = params.backgroundColor;
 	Ref<Drawable> background = params.background;
 	if (color.isZero()) {
-		color = m_categories[m_category].properties[buttonState_Normal].backgroundColor;
+		color = m_categories[m_category].properties[(int)ButtonState::Normal].backgroundColor;
 		if (color.isZero()) {
 			color = SView::getBackgroundColor();
 		}
 	}
 	if (background.isNull()) {
-		background = m_categories[m_category].properties[buttonState_Normal].background;
+		background = m_categories[m_category].properties[(int)ButtonState::Normal].background;
 		if (background.isNull()) {
 			background = SView::getBackground();
 		}
@@ -494,10 +497,10 @@ void SButton::onDrawBackground(Canvas* canvas)
 
 void SButton::onDrawBorder(Canvas* canvas)
 {
-	SButtonCategoryProperties& params = m_categories[m_category].properties[m_state];
+	SButtonCategoryProperties& params = m_categories[m_category].properties[(int)m_state];
 	Ref<Pen> pen = params.border;
 	if (pen.isNull()) {
-		pen = m_categories[m_category].properties[buttonState_Normal].border;
+		pen = m_categories[m_category].properties[(int)ButtonState::Normal].border;
 		if (pen.isNull()) {
 			pen = getBorderPen();
 		}
@@ -518,14 +521,14 @@ void SButton::_invalidateButtonState()
 {
 	if (isEnabled()) {
 		if (isDownState()) {
-			m_state = buttonState_Down;
+			m_state = ButtonState::Down;
 		} else if (isHoverState()) {
-			m_state = buttonState_Hover;
+			m_state = ButtonState::Hover;
 		} else {
-			m_state = buttonState_Normal;
+			m_state = ButtonState::Normal;
 		}
 	} else {
-		m_state = buttonState_Disabled;
+		m_state = ButtonState::Disabled;
 	}
 }
 
@@ -540,12 +543,12 @@ void SButton::layoutIconAndText(GraphicsContext* gc, sl_real widthFrame, sl_real
 	sl_real heightText = sizeText.y + m_textMarginTop + m_textMarginBottom;
 	
 	Alignment alignIcon = m_iconAlignment;
-	sl_uint32 horzIcon = alignIcon & alignHorizontalMask;
-	sl_uint32 vertIcon = alignIcon & alignVerticalMask;
+	Alignment horzIcon = (Alignment)((sl_uint32)alignIcon & (sl_uint32)(Alignment::HorizontalMask));
+	Alignment vertIcon = (Alignment)((sl_uint32)alignIcon & (sl_uint32)(Alignment::VerticalMask));
 	
 	Alignment alignText = m_textAlignment;
-	sl_uint32 horzText = alignText & alignHorizontalMask;
-	sl_uint32 vertText = alignText & alignVerticalMask;
+	Alignment horzText = (Alignment)((sl_uint32)alignText & (sl_uint32)(Alignment::HorizontalMask));
+	Alignment vertText = (Alignment)((sl_uint32)alignText & (sl_uint32)(Alignment::VerticalMask));
 	
 	sl_real xIcon = 0;
 	sl_real yIcon = 0;
@@ -556,21 +559,21 @@ void SButton::layoutIconAndText(GraphicsContext* gc, sl_real widthFrame, sl_real
 	sl_real widthContent = 0;
 	sl_real heightContent = 0;
 	
-	if (m_layoutOrientation == layoutOrientation_Horizontal) {
+	if (m_layoutOrientation == LayoutOrientation::Horizontal) {
 		
 		if (horzIcon != horzText) {
 			widthContent = widthFrame;
 			if (widthContent >= 0) {
 				if (m_flagTextBeforeIcon) {
 					xText = GraphicsUtil::calculateAlignX(0, widthContent, widthText, alignText);
-					if (horzText == alignRight) {
+					if (horzText == Alignment::Right) {
 						xIcon = GraphicsUtil::calculateAlignX(0, xText, widthIcon, alignIcon);
 					} else {
 						xIcon = GraphicsUtil::calculateAlignX(xText + widthText, widthContent, widthIcon, alignIcon);
 					}
 				} else {
 					xIcon = GraphicsUtil::calculateAlignX(0, widthContent, widthIcon, alignIcon);
-					if (horzIcon == alignRight) {
+					if (horzIcon == Alignment::Right) {
 						xText = GraphicsUtil::calculateAlignX(0, xIcon, widthText, alignText);
 					} else {
 						xText = GraphicsUtil::calculateAlignX(xIcon + widthIcon, widthContent, widthText, alignText);
@@ -614,14 +617,14 @@ void SButton::layoutIconAndText(GraphicsContext* gc, sl_real widthFrame, sl_real
 			if (heightContent >= 0) {
 				if (m_flagTextBeforeIcon) {
 					yText = GraphicsUtil::calculateAlignY(0, heightContent, heightText, alignText);
-					if (vertText == alignBottom) {
+					if (vertText == Alignment::Bottom) {
 						yIcon = GraphicsUtil::calculateAlignY(0, yText, heightIcon, alignIcon);
 					} else {
 						yIcon = GraphicsUtil::calculateAlignY(yText + heightText, heightContent, heightIcon, alignIcon);
 					}
 				} else {
 					yIcon = GraphicsUtil::calculateAlignY(0, heightContent, heightIcon, alignIcon);
-					if (vertIcon == alignBottom) {
+					if (vertIcon == Alignment::Bottom) {
 						yText = GraphicsUtil::calculateAlignY(0, yIcon, heightText, alignText);
 					} else {
 						yText = GraphicsUtil::calculateAlignY(yIcon + heightIcon, heightContent, heightText, alignText);
@@ -677,7 +680,7 @@ void SButton::drawContent(Canvas* canvas, const Ref<Drawable>& icon, const Strin
 	}
 	Size sizeContent;
 	Rectangle rcIcon, rcText;
-	layoutIconAndText(gc.get(), bound.getWidth(), bound.getHeight(), sizeContent, rcIcon, rcText);
+	layoutIconAndText(gc.ptr, bound.getWidth(), bound.getHeight(), sizeContent, rcIcon, rcText);
 	Point pt = GraphicsUtil::calculateAlignPosition(bound, sizeContent.x, sizeContent.y, m_contentAlignment);
 	rcIcon.left += pt.x;
 	rcIcon.top += pt.y;

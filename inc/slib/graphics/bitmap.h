@@ -15,7 +15,8 @@ class GraphicsContext;
 
 class SLIB_EXPORT Bitmap : public Drawable
 {
-	SLIB_DECLARE_OBJECT(Bitmap, Drawable)
+	SLIB_DECLARE_OBJECT
+
 protected:
 	Bitmap();
 
@@ -61,6 +62,7 @@ public:
 protected:
 	SafeRef<Drawable> m_drawableCached;
 	SafeWeakRef<GraphicsContext> m_contextCached;
+	
 };
 
 SLIB_GRAPHICS_NAMESPACE_END

@@ -16,9 +16,6 @@ SLIB_CRYPTO_NAMESPACE_BEGIN
 class SLIB_EXPORT MD5 : public CryptoHash
 {
 public:
-	SLIB_CRYPTO_DEFINE_HASH(MD5, 16)
-	
-public:
 	MD5();
 
 public:
@@ -30,6 +27,9 @@ public:
 	
 	// override
 	void finish(void* output);
+	
+public:
+	SLIB_DECLARE_CRYPTO_HASH
 
 private:
 	void _updateSection(const sl_uint8* input);

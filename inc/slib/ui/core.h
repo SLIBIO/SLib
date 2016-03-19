@@ -50,7 +50,7 @@ public:
 	
 	static Ref<Drawable> loadDrawableFromFile(const String& filePath);
 	
-	static Ref<Drawable> loadDrawableFromResource(const String& path);
+	static Ref<Drawable> loadDrawableFromAsset(const String& path);
 	
 	static Ref<Bitmap> createBitmapFromImage(const ImageDesc& desc);
 	
@@ -60,7 +60,7 @@ public:
 	
 	static Ref<Bitmap> loadBitmapFromFile(const String& filePath);
 	
-	static Ref<Bitmap> loadBitmapFromResource(const String& path);
+	static Ref<Bitmap> loadBitmapFromAsset(const String& path);
 
 	
 	// Screens (Platform Specific)
@@ -131,7 +131,7 @@ public:
 
 class SLIB_EXPORT UIApp : public Application
 {
-	SLIB_DECLARE_OBJECT(UIApp, Application)
+	SLIB_DECLARE_OBJECT
 
 public:
 	static Ref<UIApp> getApp();
@@ -182,6 +182,7 @@ public:
 
 private:
 	static sl_bool m_flagMobilePaused;
+	
 };
 
 enum AlertType {

@@ -9,7 +9,7 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class SLIB_EXPORT Cursor : public Object
 {
-	SLIB_DECLARE_OBJECT(Cursor, Object)
+	SLIB_DECLARE_OBJECT
 	
 public:
 	static Ref<Cursor> getArrow();

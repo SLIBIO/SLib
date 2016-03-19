@@ -12,7 +12,8 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class _Quartz_ImageDrawable : public Drawable
 {
-	SLIB_DECLARE_OBJECT(_Quartz_ImageDrawable, Drawable)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	CGImageRef m_image;
 	sl_bool m_flagFlipped;
@@ -91,6 +92,9 @@ public:
 	
 };
 
+SLIB_DEFINE_OBJECT(_Quartz_ImageDrawable, Drawable)
+
+
 Ref<Drawable> UIPlatform::createImageDrawable(CGImageRef image, sl_bool flagFlipped)
 {
 	return _Quartz_ImageDrawable::create(image, flagFlipped);
@@ -120,7 +124,7 @@ Ref<Drawable> UI::createDrawableFromImage(const ImageDesc& desc)
 	Ref<Drawable> ret;
 	Ref<Referable> refData = desc.ref;
 	refData->increaseReference();
-	CGDataProviderRef provider = CGDataProviderCreateWithData(refData.get(), desc.colors, (stride * height) << 2, _Drawable_DataProviderRelease);
+	CGDataProviderRef provider = CGDataProviderCreateWithData(refData.ptr, desc.colors, (stride * height) << 2, _Drawable_DataProviderRelease);
 	if (provider) {
 		CGColorSpaceRef colorSpaceRef = CGColorSpaceCreateDeviceRGB();
 		if (colorSpaceRef) {
@@ -153,7 +157,8 @@ Ref<Drawable> UI::loadDrawableFromMemory(const void* mem, sl_size size)
 
 class _Quartz_Bitmap : public Bitmap
 {
-	SLIB_DECLARE_OBJECT(_Quartz_Bitmap, Bitmap)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	CGContextRef m_bitmap;
 	Memory m_mem;
@@ -184,12 +189,12 @@ public:
 			
 			if (mem.isNotNull()) {
 				
-				Base::resetMemory(mem.getBuf(), 0, mem.getSize());
+				Base::resetMemory(mem.getData(), 0, mem.getSize());
 				
 				CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 				
 				if (colorSpace) {
-					CGContextRef bitmap = CGBitmapContextCreate(mem.getBuf(), width, height, 8, width << 2, colorSpace, kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast);
+					CGContextRef bitmap = CGBitmapContextCreate(mem.getData(), width, height, 8, width << 2, colorSpace, kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast);
 					
 					if (bitmap) {
 						
@@ -201,7 +206,7 @@ public:
 							ret->m_width = width;
 							ret->m_height = height;
 							ret->m_mem = mem;
-							ret->m_buf = mem.getBuf();
+							ret->m_buf = mem.getData();
 							
 							CGContextTranslateCTM(ret->m_bitmap, 0, height - 1);
 							CGContextScaleCTM(ret->m_bitmap, 1, -1);
@@ -271,7 +276,7 @@ public:
 		BitmapData source;
 		source.width = m_width - x;
 		source.height = m_height - y;
-		source.format = bitmapFormat_RGBA_PA;
+		source.format = BitmapFormat::RGBA_PA;
 		source.data = ((sl_uint32*)m_buf) + m_width * y + x;
 		source.pitch = m_width << 2;
 		
@@ -293,7 +298,7 @@ public:
 		BitmapData target;
 		target.width = m_width - x;
 		target.height = m_height - y;
-		target.format = bitmapFormat_RGBA_PA;
+		target.format = BitmapFormat::RGBA_PA;
 		target.data = ((sl_uint32*)m_buf) + m_width * y + x;
 		target.pitch = m_width << 2;
 		
@@ -354,6 +359,8 @@ public:
 	}
 };
 
+SLIB_DEFINE_OBJECT(_Quartz_Bitmap, Bitmap)
+
 
 Ref<Bitmap> UI::createBitmap(sl_uint32 width, sl_uint32 height)
 {
@@ -365,8 +372,8 @@ Ref<Drawable> UI::createDrawableFromBitmap(const Ref<Bitmap>& bitmap)
 	if (bitmap.isNull()) {
 		return Ref<Drawable>::null();
 	}
-	if (_Quartz_Bitmap::checkInstance(bitmap)) {
-		_Quartz_Bitmap* p = (_Quartz_Bitmap*)(bitmap.get());
+	if (_Quartz_Bitmap::checkInstance(bitmap.ptr)) {
+		_Quartz_Bitmap* p = (_Quartz_Bitmap*)(bitmap.ptr);
 		return p->getDrawable();
 	}
 	return Ref<Drawable>::null();

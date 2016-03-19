@@ -3,6 +3,8 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(SView, GenericView)
+
 SView::SView()
 {
 	m_flagNativeParent = sl_true;
@@ -39,15 +41,15 @@ void SView::removeAllChildren()
 			return;
 		}
 		ListLocker< Ref<View> > children(m_children);
-		for (sl_size i = 0; i < children.getCount(); i++) {
+		for (sl_size i = 0; i < children.count; i++) {
 			Ref<View> child = children[i];
 			if (child.isNotNull()) {
-				_removeChild(child.get());
+				_removeChild(child.ptr);
 			}
 		}
 	} else {
 		ListLocker< Ref<View> > children(m_children);
-		for (sl_size i = 0; i < children.getCount(); i++) {
+		for (sl_size i = 0; i < children.count; i++) {
 			children[i]->removeParent(this);
 		}
 	}
@@ -67,7 +69,7 @@ void SView::_removeChild(const Ref<View>& view)
 		if (isNativeGroup()) {
 			Ref<ViewInstance> instanceChild = view->getViewInstance();
 			if (instanceChild.isNotNull()) {
-				removeChildInstance(instanceChild.get());
+				removeChildInstance(instanceChild.ptr);
 			}
 			view->detach();
 		}
@@ -91,7 +93,7 @@ void SView::onAttach()
 {
 	if (isNativeGroup()) {
 		ListLocker< Ref<View> > children(m_children);
-		for (sl_size i = 0; i < children.count(); i++) {
+		for (sl_size i = 0; i < children.count; i++) {
 			Ref<View> child = children[i];
 			if (child.isNotNull()) {
 				attachChild(child);

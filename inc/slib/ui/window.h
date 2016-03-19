@@ -96,7 +96,8 @@ private:
 
 class SLIB_EXPORT Window : public Object
 {
-	SLIB_DECLARE_OBJECT(Window, Object)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	Window();
 	
@@ -264,7 +265,7 @@ public:
 	
 	void removeAllViews();
 	
-protected:
+	
 	virtual Ref<WindowInstance> createWindowInstance(const WindowInstanceParam& param);
 
 public:
@@ -303,9 +304,10 @@ private:
 	SafeRef<ViewGroup> m_viewContent;
 };
 
+
 class SLIB_EXPORT WindowInstance : public Object
 {
-	SLIB_DECLARE_OBJECT(WindowInstance, Object)
+	SLIB_DECLARE_OBJECT
 	
 public:
 	Ref<Window> getWindow();

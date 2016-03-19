@@ -19,7 +19,7 @@ class GraphicsContext;
 
 class SLIB_EXPORT Canvas : public Object
 {
-	SLIB_DECLARE_OBJECT(Canvas, Object)
+	SLIB_DECLARE_OBJECT
 
 public:
 	Ref<GraphicsContext> getGraphicsContext();
@@ -127,9 +127,9 @@ public:
 	void fillEllipse(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Brush>& brush);
 	
 	
-	virtual void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode = fillMode_Alternate) = 0;
+	virtual void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode = FillMode::Alternate) = 0;
 	
-	void drawPolygon(const List<Point>& points, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode = fillMode_Alternate);
+	void drawPolygon(const List<Point>& points, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode = FillMode::Alternate);
 	
 	void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen);
 	
@@ -187,6 +187,7 @@ public:
 	
 private:
 	Ref<Canvas> m_canvas;
+	
 };
 
 SLIB_GRAPHICS_NAMESPACE_END

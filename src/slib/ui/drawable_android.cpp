@@ -30,7 +30,7 @@ SLIB_JNI_END_CLASS
 
 class _Android_Bitmap : public Bitmap
 {
-	SLIB_DECLARE_OBJECT(_Android_Bitmap, Bitmap)
+	SLIB_DECLARE_OBJECT
 public:
 	JniGlobal<jobject> m_bitmap;
 
@@ -166,7 +166,7 @@ public:
 			return sl_true;
 		}
 
-		BitmapFormat formatRaw = Endian::isLE() ? bitmapFormat_BGRA : bitmapFormat_ARGB;
+		BitmapFormat formatRaw = Endian::isLE() ? BitmapFormat::BGRA : BitmapFormat::ARGB;
 
 		BitmapData data;
 		Memory memData;
@@ -181,7 +181,7 @@ public:
 			if (memData.isNull()) {
 				return sl_false;
 			}
-			data.data = memData.getBuf();
+			data.data = memData.getData();
 			data.pitch = width << 2;
 		}
 		if (!flagRead) {
@@ -323,6 +323,9 @@ public:
 	}
 };
 
+SLIB_DEFINE_OBJECT(_Android_Bitmap, Bitmap)
+
+
 Ref<Drawable> UIPlatform::createImageDrawable(jobject bitmap, sl_bool flagFreeOnRelease, const Referable* ref)
 {
 	return _Android_Bitmap::create(bitmap, flagFreeOnRelease, ref);
@@ -339,7 +342,7 @@ jobject UIPlatform::getImageDrawableHandle(Drawable* _drawable)
 
 class _Android_ImageDrawable : public Drawable
 {
-	SLIB_DECLARE_OBJECT(_Android_ImageDrawable, Drawable);
+	SLIB_DECLARE_OBJECT
 public:
 	ImageDesc m_image;
 
@@ -468,6 +471,8 @@ public:
 		return (sl_real)(m_image.height);
 	}
 };
+
+SLIB_DEFINE_OBJECT(_Android_ImageDrawable, Drawable);
 
 Ref<Drawable> UI::createDrawableFromImage(const ImageDesc& desc)
 {

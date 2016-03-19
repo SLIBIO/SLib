@@ -94,11 +94,8 @@ public:
 	virtual sl_bool isConnected() = 0;
 	
 public:
-	const Ptr<IAsyncSecureStreamListener>& getListener() const
-	{
-		return m_listener;
-	}
-
+	const Ptr<IAsyncSecureStreamListener>& getListener() const;
+	
 protected:
 	void onConnected(sl_bool flagError);
 	

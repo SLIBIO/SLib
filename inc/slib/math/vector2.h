@@ -3,11 +3,9 @@
 
 #include "definition.h"
 
-#include "../core/math.h"
-
 SLIB_MATH_NAMESPACE_BEGIN
 
-template <class T>
+template <class T, class FT = T>
 class SLIB_EXPORT Vector2T
 {
 public:
@@ -15,228 +13,133 @@ public:
 	T y;
 
 public:
-	SLIB_INLINE Vector2T()
-	{
-	}
+	Vector2T() = default;
+	
+	Vector2T(const Vector2T<T, FT>& other) = default;
 
-	template <class O>
-	SLIB_INLINE Vector2T(const Vector2T<O>& other)
-	{
-		x = (T)(other.x);
-		y = (T)(other.y);
-	}
+	template <class O, class FO>
+	Vector2T(const Vector2T<O, FO>& other);
 
-	SLIB_INLINE Vector2T(T x, T y)
-	{
-		this->x = x;
-		this->y = y;
-	}
+	Vector2T(T x, T y);
+	
+public:
+	static const Vector2T<T, FT>& zero();
+	
+	T dot(const Vector2T<T, FT>& other) const;
+	
+	T cross(const Vector2T<T, FT>& other) const;
+	
+	T getLength2p() const;
+	
+	FT getLength() const;
+	
+	T getLength2p(const Vector2T<T, FT>& other) const;
+	
+	FT getLength(const Vector2T<T, FT>& other) const;
+	
+	void normalize();
+	
+	Vector2T<T, FT> getNormalized();
+	
+	FT getCosBetween(const Vector2T& other) const;
+	
+	FT getAbsAngleBetween(const Vector2T& other) const;
+	
+	FT getAngleBetween(const Vector2T& other) const;
 
+public:
+	Vector2T<T, FT>& operator=(const Vector2T<T, FT>& other) = default;
+	
+	template <class O, class FO>
+	Vector2T<T, FT>& operator=(const Vector2T<O, FO>& other);
+	
+	Vector2T<T, FT> operator+(const Vector2T<T, FT>& other) const;
+	
+	Vector2T<T, FT>& operator+=(const Vector2T<T, FT>& other);
+	
+	Vector2T<T, FT> operator-(const Vector2T<T, FT>& other) const;
+	
+	Vector2T<T, FT>& operator-=(const Vector2T<T, FT>& other);
+	
+	Vector2T<T, FT> operator*(T f) const;
+	
+	Vector2T<T, FT>& operator*=(T f);
+	
+	Vector2T<T, FT> operator*(const Vector2T<T, FT>& other) const;
+	
+	Vector2T<T, FT>& operator*=(const Vector2T<T, FT>& other);
+	
+	Vector2T<T, FT> operator/(T f) const;
+	
+	Vector2T<T, FT>& operator/=(T f);
+	
+	Vector2T<T, FT> operator/(const Vector2T<T, FT>& other) const;
+	
+	Vector2T<T, FT>& operator/(const Vector2T<T, FT>& other);
+	
+	Vector2T<T, FT> operator-() const;
+	
+	sl_bool operator==(const Vector2T<T, FT>& other) const;
+	
+	sl_bool operator!=(const Vector2T<T, FT>& other) const;
+	
 private:
 	static T _zero[2];
 	
-public:
-	SLIB_INLINE static const Vector2T<T>& zero()
-	{
-		return *((Vector2T<T>*)((void*)(_zero)));
-	}
-	
-public:
-	template <class O>
-	SLIB_INLINE Vector2T<T>& operator=(const Vector2T<O>& other)
-	{
-		x = (T)(other.x);
-		y = (T)(other.y);
-		return *this;
-	}
-	
-	SLIB_INLINE Vector2T<T> operator+(const Vector2T<T>& other) const
-	{
-		return Vector2T<T>(x + other.x, y + other.y);
-	}
-	
-	SLIB_INLINE Vector2T<T>& operator+=(const Vector2T<T>& other)
-	{
-		x += other.x;
-		y += other.y;
-		return *this;
-	}
-	
-	SLIB_INLINE Vector2T<T> operator-(const Vector2T<T>& other) const
-	{
-		return Vector2T<T>(x - other.x, y - other.y);
-	}
-	
-	SLIB_INLINE Vector2T<T>& operator-=(const Vector2T<T>& other)
-	{
-		x -= other.x;
-		y -= other.y;
-		return *this;
-	}
-	
-	SLIB_INLINE Vector2T<T> operator*(T f) const
-	{
-		return Vector2T<T>(x * f, y * f);
-	}
-	
-	SLIB_INLINE Vector2T<T>& operator*=(T f)
-	{
-		x *= f;
-		y *= f;
-		return *this;
-	}
-	
-	SLIB_INLINE friend Vector2T<T> operator*(T f, const Vector2T<T>& v)
-	{
-		return Vector2T<T>(f * v.x, f * v.y);
-	}
-	
-	SLIB_INLINE Vector2T<T> operator*(const Vector2T<T>& other) const
-	{
-		return Vector2T<T>(x * other.x, y * other.y);
-	}
-	
-	SLIB_INLINE Vector2T<T>& operator*=(const Vector2T<T>& other)
-	{
-		x *= other.x;
-		y *= other.y;
-		return *this;
-	}
-	
-	SLIB_INLINE Vector2T<T> operator/(T f) const
-	{
-		return Vector2T<T>(x / f, y / f);
-	}
-	
-	SLIB_INLINE Vector2T<T>& operator/=(T f)
-	{
-		x /= f;
-		y /= f;
-		return *this;
-	}
-	
-	SLIB_INLINE friend Vector2T<T> operator/(T f, const Vector2T<T>& v)
-	{
-		return Vector2T<T>(f / v.x, f / v.y);
-	}
-	
-	SLIB_INLINE Vector2T<T> operator/(const Vector2T<T>& other) const
-	{
-		return Vector2T<T>(x / other.x, y / other.y);
-	}
-	
-	SLIB_INLINE Vector2T<T>& operator/(const Vector2T<T>& other)
-	{
-		x /= other.x;
-		y /= other.y;
-		return *this;
-	}
-	
-	SLIB_INLINE Vector2T<T> operator-() const
-	{
-		return Vector2T<T>(-x, -y);
-	}
-	
-	SLIB_INLINE sl_bool operator==(const Vector2T<T>& other) const
-	{
-		return (x == other.x && y == other.y);
-	}
-	
-	SLIB_INLINE sl_bool operator!=(const Vector2T<T>& other) const
-	{
-		return !(*this == other);
-	}
-
-public:
-	SLIB_INLINE T dot(const Vector2T<T>& other) const
-	{
-		return x * other.x + y * other.y;
-	}
-	
-	SLIB_INLINE T cross(const Vector2T<T>& other) const
-	{
-		return x*other.y - y*other.x;
-	}
-
-	SLIB_INLINE T getLength2p() const
-	{
-		return x * x + y * y;
-	}
-	
-	SLIB_INLINE T length2p() const
-	{
-		return getLength2p();
-	}
-
-	SLIB_INLINE T getLength() const
-	{
-		return Math::sqrt(getLength2p());
-	}
-	
-	SLIB_INLINE T length() const
-	{
-		return getLength();
-	}
-
-	SLIB_INLINE T getLength2p(const Vector2T<T>& other) const
-	{
-		T dx = x - other.x;
-		T dy = y - other.y;
-		return dx * dx + dy * dy;
-	}
-	
-	SLIB_INLINE T getLength(const Vector2T<T>& other) const
-	{
-		return Math::sqrt(getLength2p(other));
-	}
-
-	void normalize()
-	{
-		T l = x * x + y * y;
-		if (l > 0) {
-			l = Math::sqrt(l);
-			x /= l;
-			y /= l;
-		}
-	}
-
-	SLIB_INLINE Vector2T<T> getNormalized()
-	{
-		Vector2T<T> ret = *this;
-		ret.normalize();
-		return ret;
-	}
-
-	SLIB_INLINE T getCosBetween(const Vector2T& other) const
-	{
-		T ret = dot(other) / Math::sqrt(getLength2p() * other.getLength2p());
-		if (ret > 1) {
-			ret = 1;
-		}
-		return ret;
-	}
-
-	SLIB_INLINE T getAbsAngleBetween(const Vector2T& other) const
-	{
-		return Math::arccos(getCosBetween(other));
-	}
-
-	T getAngleBetween(const Vector2T& other) const
-	{
-		sl_real a = getAbsAngleBetween(other);
-		if (cross(other) > 0) {
-			a = -a;
-		}
-		return a;
-	}
 };
 
-template <class T>
-T Vector2T<T>::_zero[2] = {0, 0};
 
-typedef Vector2T<sl_real> Vector2;
-typedef Vector2T<float> Vector2f;
-typedef Vector2T<double> Vector2lf;
+SLIB_DECLARE_GEOMETRY_TYPE_EX(Vector2)
+
+template <class T, class FT>
+Vector2T<T, FT> operator*(T f, const Vector2T<T, FT>& v);
+
+template <class T, class FT>
+Vector2T<T, FT> operator/(T f, const Vector2T<T, FT>& v);
+
+
+SLIB_MATH_NAMESPACE_END
+
+
+SLIB_MATH_NAMESPACE_BEGIN
+
+template <class T, class FT>
+template <class O, class FO>
+SLIB_INLINE Vector2T<T, FT>::Vector2T(const Vector2T<O, FO>& other) : x((T)(other.x)), y((T)(other.y))
+{
+}
+
+template <class T, class FT>
+SLIB_INLINE Vector2T<T, FT>::Vector2T(T _x, T _y) : x(_x), y(_y)
+{
+}
+
+template <class T, class FT>
+SLIB_INLINE const Vector2T<T, FT>& Vector2T<T, FT>::zero()
+{
+	return *((Vector2T<T, FT>*)((void*)(_zero)));
+}
+
+template <class T, class FT>
+template <class O, class FO>
+SLIB_INLINE Vector2T<T, FT>& Vector2T<T, FT>::operator=(const Vector2T<O, FO>& other)
+{
+	x = (T)(other.x);
+	y = (T)(other.y);
+	return *this;
+}
+
+template <class T, class FT>
+Vector2T<T, FT> operator*(T f, const Vector2T<T, FT>& v)
+{
+	return {f * v.x, f * v.y};
+}
+
+template <class T, class FT>
+Vector2T<T, FT> operator/(T f, const Vector2T<T, FT>& v)
+{
+	return {f / v.x, f / v.y};
+}
 
 SLIB_MATH_NAMESPACE_END
 

@@ -12,9 +12,10 @@ SLIB_NETWORK_NAMESPACE_BEGIN
 class HttpService;
 class HttpServiceConnection;
 
-class SLIB_EXPORT HttpServiceContext : public Object, public HttpRequestHeader, public HttpResponseHeader, public HttpOutputBuffer
+class SLIB_EXPORT HttpServiceContext : public Object, public HttpRequest, public HttpResponse, public HttpOutputBuffer
 {
-	SLIB_DECLARE_OBJECT(HttpServiceContext, Object)
+	SLIB_DECLARE_OBJECT
+	
 protected:
 	HttpServiceContext();
 	
@@ -22,28 +23,14 @@ public:
 	static Ref<HttpServiceContext> create(const Ref<HttpServiceConnection>& connection);
 
 public:
-	SLIB_INLINE Memory getRawRequestHeader() const
-	{
-		return m_requestHeader;
-	}
+	Memory getRawRequestHeader() const;
 
-	SLIB_INLINE sl_uint64 getRequestContentLength() const
-	{
-		return m_requestContentLength;
-	}
+	sl_uint64 getRequestContentLength() const;
 
-	SLIB_INLINE Memory getRequestBody() const
-	{
-		return m_requestBody;
-	}
+	Memory getRequestBody() const;
 	
-public:
-	SLIB_INLINE sl_uint64 getResponseContentLength() const
-	{
-		return getOutputLength();
-	}
+	sl_uint64 getResponseContentLength() const;
 	
-public:
 	Ref<HttpService> getService();
 	
 	Ref<HttpServiceConnection> getConnection();
@@ -60,7 +47,6 @@ public:
 	
 public:
 	SLIB_BOOLEAN_PROPERTY(ClosingConnection);
-	
 	SLIB_BOOLEAN_PROPERTY(ProcessingByThread);
 
 protected:
@@ -74,12 +60,14 @@ private:
 	WeakRef<HttpServiceConnection> m_connection;
 
 	friend class HttpServiceConnection;
+	
 };
 
 class SLIB_EXPORT HttpServiceConnection : public Object, public IAsyncStreamListener, public IAsyncOutputListener, public IClosable
 {
 protected:
 	HttpServiceConnection();
+	
 	~HttpServiceConnection();
 	
 public:
@@ -90,15 +78,19 @@ public:
 	void close();
 	
 	void start(const void* data = sl_null, sl_uint32 size = 0);
-
-public:
+	
+	Ref<AsyncStream> getIO();
+	
+	Ref<HttpService> getService();
+	
+	Ref<HttpServiceContext> getCurrentContext();
+	
 	void sendResponse(const Memory& mem);
 	
 	void sendResponseAndRestart(const Memory& mem);
 	
 	void sendResponseAndClose(const Memory& mem);
 
-	
 	void sendResponse_BadRequest();
 	
 	void sendResponse_ServerError();
@@ -111,28 +103,9 @@ public:
 
 public:
 	SLIB_PROPERTY(SocketAddress, LocalAddress)
-	
 	SLIB_PROPERTY(SocketAddress, RemoteAddress)
-	
 	SLIB_REF_PROPERTY(Referable, ProxyObject)
-
 	SLIB_REF_PROPERTY(Referable, UserObject)
-
-public:
-	SLIB_INLINE Ref<AsyncStream> getIO()
-	{
-		return m_io;
-	}
-	
-	SLIB_INLINE Ref<HttpService> getService()
-	{
-		return m_service;
-	}
-
-	SLIB_INLINE Ref<HttpServiceContext> getCurrentContext()
-	{
-		return m_contextCurrent;
-	}
 
 protected:
 	WeakRef<HttpService> m_service;
@@ -161,6 +134,7 @@ protected:
 	
 	// override
 	void onAsyncOutputError(AsyncOutput* output);
+	
 };
 
 
@@ -176,6 +150,7 @@ public:
 	
 private:
 	WeakRef<HttpService> m_service;
+	
 };
 
 
@@ -194,8 +169,8 @@ public:
 	sl_uint32 maxThreadsCount;
 	sl_bool flagProcessByThreads;
 
-	sl_bool flagUseResource;
-	String prefixResource;
+	sl_bool flagUseAsset;
+	String prefixAsset;
 
 	sl_uint64 maxRequestHeadersSize;
 	sl_uint64 maxRequestBodySize;
@@ -209,9 +184,11 @@ public:
 
 class SLIB_EXPORT HttpService : public Object
 {
-	SLIB_DECLARE_OBJECT(HttpService, Object)
+	SLIB_DECLARE_OBJECT
 protected:
-	HttpService();	
+	
+	HttpService();
+	
 	~HttpService();
 	
 public:
@@ -237,7 +214,7 @@ public:
 	// called after inputing body
 	virtual void processRequest(HttpServiceContext* context);
 	
-	virtual sl_bool processResource(HttpServiceContext* context, String path);
+	virtual sl_bool processAsset(HttpServiceContext* context, String path);
 	
 	virtual Ref<HttpServiceConnection> addConnection(const Ref<AsyncStream>& stream, const SocketAddress& remoteAddress, const SocketAddress& localAddress);
 	

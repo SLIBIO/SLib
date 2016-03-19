@@ -11,9 +11,11 @@ SLIB_NAMESPACE_BEGIN
 
 class SLIB_EXPORT Service : public Application
 {
-	SLIB_DECLARE_OBJECT(Service, Application)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	Service();
+	
 	~Service();
 	
 public:

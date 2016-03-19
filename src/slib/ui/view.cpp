@@ -1,4 +1,5 @@
 #include "../../../inc/slib/ui/view.h"
+
 #include "../../../inc/slib/ui/window.h"
 #include "../../../inc/slib/ui/core.h"
 
@@ -7,6 +8,9 @@ SLIB_UI_NAMESPACE_BEGIN
 /**********************
 	View
 **********************/
+
+SLIB_DEFINE_OBJECT(View, Object)
+
 View::View()
 {
 	m_flagGroup = sl_false;
@@ -358,7 +362,7 @@ void View::_attachChild_(Ref<slib::View> view)
 
 Ref<ViewInstance> View::attachToNewInstance(const Ref<ViewInstance>& parent)
 {
-	Ref<ViewInstance> instance = createInstance(parent.get());
+	Ref<ViewInstance> instance = createInstance(parent.ptr);
 	if (instance.isNotNull()) {
 		attach(instance);
 	}
@@ -509,14 +513,17 @@ void View::dispatchSetCursor(UIEvent* ev)
 /**********************
 	ViewInstance
  **********************/
-void ViewInstance::setView(View* view)
-{
-	m_view = view;
-}
+
+SLIB_DEFINE_OBJECT(ViewInstance, Object)
 
 Ref<View> ViewInstance::getView()
 {
 	return m_view;
+}
+
+void ViewInstance::setView(View* view)
+{
+	m_view = view;
 }
 
 void ViewInstance::onDraw(Canvas* canvas)

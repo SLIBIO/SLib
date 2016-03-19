@@ -1,4 +1,5 @@
 #include "../../../inc/slib/ui/s_radio_button.h"
+
 #include "../../../inc/slib/graphics/util.h"
 
 SLIB_UI_NAMESPACE_BEGIN
@@ -13,10 +14,10 @@ public:
 	_SRadioButton_Icon(const Ref<Pen>& penBorder, const Color& backColor, const Color& checkColor)
 	{
 		m_penBorder = penBorder;
-		if (backColor.getAlpha() > 0) {
+		if (backColor.a > 0) {
 			m_brushBack = Brush::createSolidBrush(backColor);
 		}
-		if (checkColor.getAlpha() > 0) {
+		if (checkColor.a > 0) {
 			m_brushCheck = Brush::createSolidBrush(checkColor);
 		}
 	}
@@ -57,30 +58,30 @@ public:
 	
 	_SRadioButton_Categories()
 	{
-		Color colorBackNormal = Color::white();
-		Color colorBackHover = Color::white();
+		Color colorBackNormal = Color::White;
+		Color colorBackHover = Color::White;
 		Color colorBackDown(220, 230, 255);
-		Color colorBackDisabled = Color::gray(220);
-		Ref<Pen> penNormal = Pen::createSolidPen(1, Color::black());
+		Color colorBackDisabled = Color(220, 220, 220);
+		Ref<Pen> penNormal = Pen::createSolidPen(1, Color::Black);
 		Ref<Pen> penHover = Pen::createSolidPen(1, Color(0, 80, 200));
 		Ref<Pen> penDown = penHover;
-		Ref<Pen> penDisabled = Pen::createSolidPen(1, Color::gray(90));
-		Color colorCheckNormal = Color::black();
-		Color colorCheckDisabled = Color::gray(90);
+		Ref<Pen> penDisabled = Pen::createSolidPen(1, Color(90, 90, 90));
+		Color colorCheckNormal = Color::Black;
+		Color colorCheckDisabled = Color(90, 90, 90);
 		Color colorCheckHover = Color(0, 80, 200);
 		Color colorCheckDown = colorCheckHover;
-		categories[0].properties[buttonState_Normal].textColor = Color::black();
-		categories[0].properties[buttonState_Normal].icon = new _SRadioButton_Icon(penNormal, colorBackNormal, Color::zero());
-		categories[0].properties[buttonState_Disabled].textColor = Color::gray(90);
-		categories[0].properties[buttonState_Disabled].icon = new _SRadioButton_Icon(penDisabled, colorBackDisabled, Color::zero());
-		categories[0].properties[buttonState_Hover].icon = new _SRadioButton_Icon(penHover, colorBackHover, Color::zero());
-		categories[0].properties[buttonState_Down].icon = new _SRadioButton_Icon(penDown, colorBackDown, Color::zero());
+		categories[0].properties[(int)ButtonState::Normal].textColor = Color::Black;
+		categories[0].properties[(int)ButtonState::Normal].icon = new _SRadioButton_Icon(penNormal, colorBackNormal, Color::zero());
+		categories[0].properties[(int)ButtonState::Disabled].textColor = Color(90, 90, 90);
+		categories[0].properties[(int)ButtonState::Disabled].icon = new _SRadioButton_Icon(penDisabled, colorBackDisabled, Color::zero());
+		categories[0].properties[(int)ButtonState::Hover].icon = new _SRadioButton_Icon(penHover, colorBackHover, Color::zero());
+		categories[0].properties[(int)ButtonState::Down].icon = new _SRadioButton_Icon(penDown, colorBackDown, Color::zero());
 		
 		categories[1] = categories[0];
-		categories[1].properties[buttonState_Normal].icon = new _SRadioButton_Icon(penNormal, colorBackNormal, colorCheckNormal);
-		categories[1].properties[buttonState_Disabled].icon = new _SRadioButton_Icon(penDisabled, colorBackDisabled, colorCheckDisabled);
-		categories[1].properties[buttonState_Hover].icon = new _SRadioButton_Icon(penHover, colorBackHover, colorCheckHover);
-		categories[1].properties[buttonState_Down].icon = new _SRadioButton_Icon(penDown, colorBackDown, colorCheckDown);
+		categories[1].properties[(int)ButtonState::Normal].icon = new _SRadioButton_Icon(penNormal, colorBackNormal, colorCheckNormal);
+		categories[1].properties[(int)ButtonState::Disabled].icon = new _SRadioButton_Icon(penDisabled, colorBackDisabled, colorCheckDisabled);
+		categories[1].properties[(int)ButtonState::Hover].icon = new _SRadioButton_Icon(penHover, colorBackHover, colorCheckHover);
+		categories[1].properties[(int)ButtonState::Down].icon = new _SRadioButton_Icon(penDown, colorBackDown, colorCheckDown);
 	}
 	
 	static _SRadioButton_Categories* get()
@@ -89,6 +90,9 @@ public:
 		return &ret;
 	}
 };
+
+
+SLIB_DEFINE_OBJECT(SRadioButton, SCheckBox)
 
 SRadioButton::SRadioButton() : SCheckBox(2, _SRadioButton_Categories::get()->categories)
 {

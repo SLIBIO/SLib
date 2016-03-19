@@ -2,6 +2,8 @@
 
 SLIB_MEDIA_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(VideoEncoder, Object)
+
 VideoEncoder::VideoEncoder()
 {
 	m_nWidth = 0;
@@ -19,6 +21,9 @@ void VideoEncoder::setBitrate(sl_uint32 bitrate)
 {
 	m_bitrate = bitrate;
 }
+
+
+SLIB_DEFINE_OBJECT(VideoDecoder, Object)
 
 VideoDecoder::VideoDecoder()
 {

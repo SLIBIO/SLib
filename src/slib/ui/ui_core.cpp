@@ -1,11 +1,16 @@
 #include "../../../inc/slib/ui/core.h"
+
 #include "../../../inc/slib/ui/screen.h"
 #include "../../../inc/slib/ui/platform.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 /**************************************
 	UI Core
 ***************************************/
+
+SLIB_DEFINE_OBJECT(Screen, Object)
+
 Rectangle UI::getScreenRegion()
 {
 	return UI::getScreenRegion(Ref<Screen>::null());
@@ -97,12 +102,15 @@ void UI::showAlert(const String& text, const String& caption, const Ref<Runnable
 /**************************************
 	UIApplication
 ***************************************/
+
 sl_bool UIApp::m_flagMobilePaused = sl_false;
+
+SLIB_DEFINE_OBJECT(UIApp, Application)
 
 Ref<UIApp> UIApp::getApp()
 {
 	Ref<Application> app(Application::getApp());
-	if (app.isNotNull() && app->getAppType() == appType_UI) {
+	if (app.isNotNull() && app->getAppType() == AppType::UI) {
 		return Ref<UIApp>::from(app);
 	}
 	return Ref<UIApp>::null();
@@ -110,7 +118,7 @@ Ref<UIApp> UIApp::getApp()
 
 AppType UIApp::getAppType()
 {
-	return appType_UI;
+	return AppType::UI;
 }
 
 void UIApp::run(const String& param)

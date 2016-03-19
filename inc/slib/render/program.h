@@ -25,7 +25,7 @@ public:
 
 class SLIB_EXPORT RenderProgram : public RenderBaseObject
 {
-	SLIB_DECLARE_OBJECT(RenderProgram, RenderBaseObject)
+	SLIB_DECLARE_OBJECT
 
 public:
 	virtual Ref<RenderProgramInfo> create(RenderEngine* engine) = 0;
@@ -80,7 +80,7 @@ public:
 	
 	SLIB_PROPERTY(Matrix3, TextureTransform)
 
-	SLIB_PROPERTY(Color3f, Color)
+	SLIB_PROPERTY(Color, Color)
 	
 	SLIB_PROPERTY(float, Alpha)
 
@@ -256,9 +256,9 @@ public:
 public:
 	SLIB_PROPERTY(Vector3, DirectionalLight)
 	
-	SLIB_PROPERTY(Color3f, DiffuseColor)
+	SLIB_PROPERTY(Color, DiffuseColor)
 	
-	SLIB_PROPERTY(Color3f, AmbientColor)
+	SLIB_PROPERTY(Color, AmbientColor)
 	
 	SLIB_PROPERTY(float, Alpha)
 	

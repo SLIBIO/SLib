@@ -7,7 +7,8 @@
 
 SLIB_NAMESPACE_BEGIN
 
-struct SLIB_EXPORT DATE {
+struct SLIB_EXPORT DATE
+{
 	int year;
 	int month;
 	int day;
@@ -17,194 +18,76 @@ struct SLIB_EXPORT DATE {
 class SLIB_EXPORT Time
 {
 public:
-	SLIB_INLINE Time()
-	{
-	}
-	
-	SLIB_INLINE Time(Time&& other)
-	{
-		m_time = other.m_time;
-	}
+	Time();
 
-	SLIB_INLINE Time(const Time& other)
-	{
-		m_time = other.m_time;
-	}
+	Time(const Time& other);
 	
-	SLIB_INLINE Time(sl_int64 time)
-	{
-		m_time = time;
-	}
+	Time(sl_int64 time);
 
-	SLIB_INLINE Time(int year, int month, int date)
-	{
-		set(year, month, date, 0, 0, 0);
-	}
+	Time(int year, int month, int date);
 	
-	SLIB_INLINE Time(int year, int month, int date, int hour, int minute, int second)
-	{
-		set(year, month, date, hour, minute, second);
-	}
+	Time(int year, int month, int date, int hour, int minute, int second);
 	
-	SLIB_INLINE Time(const String& str)
-	{
-		set(str);
-	}
+	Time(const String& str);
 
 public:
-	SLIB_INLINE static Time now()
-	{
-		Time ret;
-		ret.setNow();
-		return ret;
-	}
+	static Time now();
 	
-	SLIB_INLINE static Time zero()
-	{
-		return 0;
-	}
+	static Time zero();
 	
-	SLIB_INLINE void setZero()
-	{
-		m_time = 0;
-	}
+	void setZero();
 	
-	SLIB_INLINE sl_bool isZero() const
-	{
-		return m_time == 0;
-	}
+	sl_bool isZero() const;
 	
-	SLIB_INLINE sl_bool isNotZero() const
-	{
-		return m_time != 0;
-	}
+	sl_bool isNotZero() const;
 	
-	SLIB_INLINE sl_int64 toInt() const
-	{
-		return m_time;
-	}
+	sl_int64 toInt() const;
 
-	SLIB_INLINE void set(sl_int64 time)
-	{
-		m_time = time;
-	}
+	void set(sl_int64 time);
 
-	SLIB_INLINE void set(const Time& other)
-	{
-		m_time = other.m_time;
-	}
+	void set(const Time& other);
 	
-	SLIB_INLINE void add(sl_int64 time)
-	{
-		m_time += time;
-	}
+	void add(sl_int64 time);
 	
-	SLIB_INLINE void add(const Time& other)
-	{
-		m_time += other.m_time;
-	}
+	void add(const Time& other);
 	
 public:
-	SLIB_INLINE Time& operator=(Time&& other)
-	{
-		m_time = other.m_time;
-		return *this;
-	}
+	Time& operator=(const Time& other);
 	
-	SLIB_INLINE Time& operator=(const Time& other)
-	{
-		m_time = other.m_time;
-		return *this;
-	}
+	Time& operator=(sl_int64 time);
 	
-	SLIB_INLINE Time& operator=(sl_int64 time)
-	{
-		m_time = time;
-		return *this;
-	}
-	
-	SLIB_INLINE Time& operator=(const String& time)
-	{
-		set(time);
-		return *this;
-	}
+	Time& operator=(const String& time);
 
-public:
-	SLIB_INLINE sl_bool operator==(const Time& other) const
-	{
-		return m_time == other.m_time;
-	}
 	
-	SLIB_INLINE sl_bool operator<=(const Time& other) const
-	{
-		return m_time <= other.m_time;
-	}
+	sl_bool operator==(const Time& other) const;
 	
-	SLIB_INLINE sl_bool operator>=(const Time& other) const
-	{
-		return m_time >= other.m_time;
-	}
+	sl_bool operator<=(const Time& other) const;
 	
-	SLIB_INLINE sl_bool operator!=(const Time& other) const
-	{
-		return m_time != other.m_time;
-	}
+	sl_bool operator>=(const Time& other) const;
 	
-	SLIB_INLINE sl_bool operator<(const Time& other) const
-	{
-		return m_time < other.m_time;
-	}
+	sl_bool operator!=(const Time& other) const;
 	
-	SLIB_INLINE sl_bool operator>(const Time& other) const
-	{
-		return m_time > other.m_time;
-	}
+	sl_bool operator<(const Time& other) const;
+	
+	sl_bool operator>(const Time& other) const;
 
-public:
-	SLIB_INLINE Time operator+(sl_int64 time) const
-	{
-		return m_time + time;
-	}
 	
-	SLIB_INLINE Time operator+(const Time& time) const
-	{
-		return m_time + time.m_time;
-	}
+	Time operator+(sl_int64 time) const;
 	
-	SLIB_INLINE Time& operator+=(sl_int64 time)
-	{
-		m_time += time;
-		return *this;
-	}
+	Time operator+(const Time& time) const;
 	
-	SLIB_INLINE Time& operator+=(const Time& time)
-	{
-		m_time += time.m_time;
-		return *this;
-	}
+	Time& operator+=(sl_int64 time);
+	
+	Time& operator+=(const Time& time);
 
-public:
-	SLIB_INLINE Time operator-(sl_int64 time) const
-	{
-		return m_time - time;
-	}
 	
-	SLIB_INLINE Time operator-(const Time& time) const
-	{
-		return m_time - time.m_time;
-	}
+	Time operator-(sl_int64 time) const;
 	
-	SLIB_INLINE Time& operator-=(sl_int64 time)
-	{
-		m_time -= time;
-		return *this;
-	}
+	Time operator-(const Time& time) const;
 	
-	SLIB_INLINE Time& operator-=(const Time& time)
-	{
-		m_time -= time.m_time;
-		return *this;
-	}
+	Time& operator-=(sl_int64 time);
+	
+	Time& operator-=(const Time& time);
 
 public:
 	void get(DATE* date) const;
@@ -384,10 +267,7 @@ public:
 	
 	String toString() const;
 	
-	SLIB_INLINE static Time parse(const String& str)
-	{
-		return str;
-	}
+	static Time parse(const String& str);
 	
 private:
 	sl_int64 m_time; // microseconds
@@ -413,6 +293,184 @@ protected:
 	sl_uint64 m_relStart;
 	
 };
+
+SLIB_NAMESPACE_END
+
+
+SLIB_NAMESPACE_BEGIN
+
+SLIB_INLINE Time::Time()
+{
+}
+
+SLIB_INLINE Time::Time(const Time& other)
+{
+	m_time = other.m_time;
+}
+
+SLIB_INLINE Time::Time(sl_int64 time)
+{
+	m_time = time;
+}
+
+SLIB_INLINE Time::Time(int year, int month, int date)
+{
+	set(year, month, date, 0, 0, 0);
+}
+
+SLIB_INLINE Time::Time(int year, int month, int date, int hour, int minute, int second)
+{
+	set(year, month, date, hour, minute, second);
+}
+
+SLIB_INLINE Time::Time(const String& str)
+{
+	set(str);
+}
+
+SLIB_INLINE Time Time::now()
+{
+	Time ret;
+	ret.setNow();
+	return ret;
+}
+
+SLIB_INLINE Time Time::zero()
+{
+	return 0;
+}
+
+SLIB_INLINE void Time::setZero()
+{
+	m_time = 0;
+}
+
+SLIB_INLINE sl_bool Time::isZero() const
+{
+	return m_time == 0;
+}
+
+SLIB_INLINE sl_bool Time::isNotZero() const
+{
+	return m_time != 0;
+}
+
+SLIB_INLINE sl_int64 Time::toInt() const
+{
+	return m_time;
+}
+
+SLIB_INLINE void Time::set(sl_int64 time)
+{
+	m_time = time;
+}
+
+SLIB_INLINE void Time::set(const Time& other)
+{
+	m_time = other.m_time;
+}
+
+SLIB_INLINE void Time::add(sl_int64 time)
+{
+	m_time += time;
+}
+
+SLIB_INLINE void Time::add(const Time& other)
+{
+	m_time += other.m_time;
+}
+
+SLIB_INLINE Time& Time::operator=(const Time& other)
+{
+	m_time = other.m_time;
+	return *this;
+}
+
+SLIB_INLINE Time& Time::operator=(sl_int64 time)
+{
+	m_time = time;
+	return *this;
+}
+
+SLIB_INLINE Time& Time::operator=(const String& time)
+{
+	set(time);
+	return *this;
+}
+
+SLIB_INLINE sl_bool Time::operator==(const Time& other) const
+{
+	return m_time == other.m_time;
+}
+
+SLIB_INLINE sl_bool Time::operator<=(const Time& other) const
+{
+	return m_time <= other.m_time;
+}
+
+SLIB_INLINE sl_bool Time::operator>=(const Time& other) const
+{
+	return m_time >= other.m_time;
+}
+
+SLIB_INLINE sl_bool Time::operator!=(const Time& other) const
+{
+	return m_time != other.m_time;
+}
+
+SLIB_INLINE sl_bool Time::operator<(const Time& other) const
+{
+	return m_time < other.m_time;
+}
+
+SLIB_INLINE sl_bool Time::operator>(const Time& other) const
+{
+	return m_time > other.m_time;
+}
+
+SLIB_INLINE Time Time::operator+(sl_int64 time) const
+{
+	return m_time + time;
+}
+
+SLIB_INLINE Time Time::operator+(const Time& time) const
+{
+	return m_time + time.m_time;
+}
+
+SLIB_INLINE Time& Time::operator+=(sl_int64 time)
+{
+	m_time += time;
+	return *this;
+}
+
+SLIB_INLINE Time& Time::operator+=(const Time& time)
+{
+	m_time += time.m_time;
+	return *this;
+}
+
+SLIB_INLINE Time Time::operator-(sl_int64 time) const
+{
+	return m_time - time;
+}
+
+SLIB_INLINE Time Time::operator-(const Time& time) const
+{
+	return m_time - time.m_time;
+}
+
+SLIB_INLINE Time& Time::operator-=(sl_int64 time)
+{
+	m_time -= time;
+	return *this;
+}
+
+SLIB_INLINE Time& Time::operator-=(const Time& time)
+{
+	m_time -= time.m_time;
+	return *this;
+}
 
 SLIB_NAMESPACE_END
 

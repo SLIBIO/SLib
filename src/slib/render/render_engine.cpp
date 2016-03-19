@@ -1,6 +1,6 @@
 #include "../../../inc/slib/render/engine.h"
-#include "../../../inc/slib/render/program.h"
 
+#include "../../../inc/slib/render/program.h"
 #include "../../../inc/slib/graphics/canvas.h"
 #include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/math/transform3d.h"
@@ -9,14 +9,14 @@ SLIB_RENDER_NAMESPACE_BEGIN
 
 Primitive::Primitive()
 {
-	type = primitiveType_Triangles;
+	type = PrimitiveType::Triangles;
 	countElements = 0;
 }
 
 RenderClearParam::RenderClearParam()
 {
 	flagColor = sl_true;
-	color = Color::blue();
+	color = Color::Blue;
 	flagDepth = sl_true;
 	depth = 1.0f;
 	flagStencil = sl_false;
@@ -25,12 +25,12 @@ RenderClearParam::RenderClearParam()
 
 RenderBlendingParam::RenderBlendingParam()
 {
-	operation = renderBlendingOperation_Add;
-	operationAlpha = renderBlendingOperation_Add;
-	blendDst = renderBlendingFactor_OneMinusSrcAlpha;
-	blendDstAlpha = renderBlendingFactor_OneMinusSrcAlpha;
-	blendSrc = renderBlendingFactor_SrcAlpha;
-	blendSrcAlpha = renderBlendingFactor_SrcAlpha;
+	operation = RenderBlendingOperation::Add;
+	operationAlpha = RenderBlendingOperation::Add;
+	blendDst = RenderBlendingFactor::OneMinusSrcAlpha;
+	blendDstAlpha = RenderBlendingFactor::OneMinusSrcAlpha;
+	blendSrc = RenderBlendingFactor::SrcAlpha;
+	blendSrcAlpha = RenderBlendingFactor::SrcAlpha;
 }
 
 RendererParam::RendererParam()
@@ -45,11 +45,16 @@ RendererParam::RendererParam()
 	flagMultisample = sl_false;
 }
 
+
+SLIB_DEFINE_OBJECT(Renderer, Object)
+
 Renderer::Renderer()
 {
 	setRenderingContinuously(sl_false);
 }
 
+
+SLIB_DEFINE_OBJECT(RenderEngine, Object)
 
 RenderEngine::RenderEngine()
 {
@@ -64,19 +69,19 @@ RenderEngine::RenderEngine()
 sl_bool RenderEngine::isOpenGL()
 {
 	RenderEngineType type = getEngineType();
-	return type == renderEngineType_OpenGL;
+	return type == RenderEngineType::OpenGL;
 }
 
 sl_bool RenderEngine::isOpenGL_ES()
 {
 	RenderEngineType type = getEngineType();
-	return type == renderEngineType_OpenGL_ES;
+	return type == RenderEngineType::OpenGL_ES;
 }
 
 sl_bool RenderEngine::isD3D()
 {
 	RenderEngineType type = getEngineType();
-	return type == renderEngineType_D3D9 || type == renderEngineType_D3D11;
+	return type == RenderEngineType::D3D9 || type == RenderEngineType::D3D11;
 }
 
 void RenderEngine::release()
@@ -171,7 +176,7 @@ void RenderEngine::setBlending(sl_bool flagEnableBlending)
 
 sl_bool RenderEngine::beginProgram(const Ref<RenderProgram>& program)
 {
-	return _beginProgram(program.get());
+	return _beginProgram(program.ptr);
 }
 
 void RenderEngine::endProgram()
@@ -188,27 +193,27 @@ void RenderEngine::drawPrimitive(Primitive* primitive)
 
 void RenderEngine::applyTexture(const void* sampler, const Ref<Texture>& texture)
 {
-	_applyTexture(sampler, texture.get());
+	_applyTexture(sampler, texture.ptr);
 }
 
 void RenderEngine::applyTexture(sl_reg sampler, const Ref<Texture>& texture)
 {
-	_applyTexture((void*)sampler, texture.get());
+	_applyTexture((void*)sampler, texture.ptr);
 }
 
 sl_bool RenderEngine::linkTexture(const Ref<Texture>& texture)
 {
-	return _linkTexture(texture.get());
+	return _linkTexture(texture.ptr);
 }
 
 sl_bool RenderEngine::linkVertexBuffer(const Ref<VertexBuffer>& vb)
 {
-	return _linkVertexBuffer(vb.get());
+	return _linkVertexBuffer(vb.ptr);
 }
 
 sl_bool RenderEngine::linkIndexBuffer(const Ref<IndexBuffer>& ib)
 {
-	return _linkIndexBuffer(ib.get());
+	return _linkIndexBuffer(ib.ptr);
 }
 
 void RenderEngine::setLineWidth(sl_real width)
@@ -248,7 +253,7 @@ void RenderEngine::draw(const Ref<RenderProgram>& program, sl_uint32 countElemen
 void RenderEngine::drawRectangle2D(const Ref<RenderProgram>& program)
 {
 	Ref<VertexBuffer> vb = _getDefaultVertexBufferForDrawRectangle2D();
-	draw(program, 4, vb, primitiveType_TriangleStrip);
+	draw(program, 4, vb, PrimitiveType::TriangleStrip);
 }
 
 static void _RenderEngine_makeTransform2D(Matrix3& mat, const Rectangle& rectDst)
@@ -350,7 +355,7 @@ Ref<RenderProgram2D> RenderEngine::_getDefaultRenderProgramForDrawRectangle2D()
 void RenderEngine::drawTexture2D(const Ref<RenderProgram>& program)
 {
 	Ref<VertexBuffer> vb = _getDefaultVertexBufferForDrawTexture2D();
-	draw(program, 4, vb, primitiveType_TriangleStrip);
+	draw(program, 4, vb, PrimitiveType::TriangleStrip);
 }
 
 void RenderEngine::drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, const Ref<RenderProgram2D>& program)
@@ -414,7 +419,7 @@ void RenderEngine::drawTexture2D(const Matrix3& transform, const Ref<Texture>& t
 {
 	Ref<RenderProgram2D> p = _getDefaultRenderProgramForDrawTexture2D();
 	if (p.isNotNull()) {
-		p->setColor(Color::white());
+		p->setColor(Color::White);
 		p->setAlpha(alpha);
 		drawTexture2D(transform, texture, rectSrc, p);
 	}
@@ -434,7 +439,7 @@ void RenderEngine::drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& t
 {
 	Ref<RenderProgram2D> p = _getDefaultRenderProgramForDrawTexture2D();
 	if (p.isNotNull()) {
-		p->setColor(Color::white());
+		p->setColor(Color::White);
 		p->setAlpha(alpha);
 		drawTexture2D(rectDst, texture, rectSrc, p);
 	}
@@ -530,7 +535,7 @@ void RenderEngine::drawLines(const Ref<RenderProgram>& program, Line3* lines, sl
 {
 	if (program.isNotNull()) {
 		Ref<VertexBuffer> vb = VertexBuffer::create(lines, sizeof(Line3)*n);
-		draw(program, n * 2, vb, primitiveType_Lines);
+		draw(program, n * 2, vb, PrimitiveType::Lines);
 	}
 }
 
@@ -572,13 +577,13 @@ void RenderEngine::drawDebugText()
 	text += " Primitives: ";
 	text += m_nCountDrawnPrimitivesOnLastScene;
 	Size size = Size::zero();
-	bitmap->resetPixels(Color::black());
+	bitmap->resetPixels(Color::Black);
 	{
 		Ref<Canvas> canvas = bitmap->getCanvas();
 		if (canvas.isNotNull()) {
 			size = canvas->getTextSize(font, text);
 			size.x += 5;
-			canvas->drawText(text, 0, 3, font, Color::red());
+			canvas->drawText(text, 0, 3, font, Color::Red);
 		}
 	}
 	texture->update(0, 0, (sl_uint32)(size.x) + 1, DEBUG_HEIGHT);
@@ -626,6 +631,26 @@ Rectangle RenderEngine::viewportToScreen(const Rectangle& rc)
 Rectangle RenderEngine::viewportToScreen(sl_real x, sl_real y, sl_real width, sl_real height)
 {
 	return Transform3::convertViewportToScreen(Rectangle(x, y, x + width, y + height), (sl_real)m_viewportWidth, (sl_real)m_viewportHeight);
+}
+
+sl_uint32 RenderEngine::getViewportWidth()
+{
+	return m_viewportWidth;
+}
+
+sl_uint32 RenderEngine::getViewportHeight()
+{
+	return m_viewportHeight;
+}
+
+sl_uint32 RenderEngine::getCountOfDrawnElementsOnLastScene()
+{
+	return m_nCountDrawnElementsOnLastScene;
+}
+
+sl_uint32 RenderEngine::getCountOfDrawnPrimitivesOnLastScene()
+{
+	return m_nCountDrawnPrimitivesOnLastScene;
 }
 
 SLIB_RENDER_NAMESPACE_END

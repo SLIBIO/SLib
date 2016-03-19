@@ -29,9 +29,10 @@ public:
 	
 };
 
-class SLIB_EXPORT HttpClientContext : public Object, public HttpRequestHeader, public HttpResponseHeader, public HttpOutputBuffer
+class SLIB_EXPORT HttpClientContext : public Object, public HttpRequest, public HttpResponse, public HttpOutputBuffer
 {
-	SLIB_DECLARE_OBJECT(HttpClientContext, Object)
+	SLIB_DECLARE_OBJECT
+	
 protected:
 	HttpClientContext();
 	
@@ -41,32 +42,25 @@ public:
 public:
 	void clearResponse();
 	
-	
 	void setUrl(const String& host, const String& path, const String& query);
 	
 	void setUrl(const String& url);
 
-
 	Ref<HttpClientConnection> getConnection();
 
-	SLIB_STRING_PROPERTY(Protocol)
-
+	const Memory& getRawResponseHeader() const;
+	
+	sl_uint64 getResponseContentLength() const;
+	
+	const Memory& getResponseBody() const;
+	
+	sl_uint64 getRequestContentLength() const;
+	
 public:
-	SLIB_INLINE const Memory& getRawResponseHeader() const
-	{
-		return m_responseHeader;
-	}
-
-	SLIB_INLINE sl_uint64 getResponseContentLength() const
-	{
-		return m_responseContentLength;
-	}
-
-	SLIB_INLINE const Memory& getResponseBody() const
-	{
-		return m_responseBody;
-	}
-
+	SLIB_STRING_PROPERTY(Protocol)
+	SLIB_PROPERTY(Ptr<IHttpClientListener>, Listener);
+	SLIB_PROPERTY(Ref<Event>, CompletionEvent);
+	
 protected:
 	HttpHeaderReader m_responseHeaderReader;
 	Memory m_responseHeader;
@@ -77,16 +71,6 @@ protected:
 	sl_bool m_flagProcessing;
 	WeakRef<HttpClientConnection> m_connection;
 
-public:
-	SLIB_INLINE sl_uint64 getRequestContentLength() const
-	{
-		return getOutputLength();
-	}
-
-public:
-	SLIB_PROPERTY(Ptr<IHttpClientListener>, Listener);
-	SLIB_PROPERTY(Ref<Event>, CompletionEvent);
-
 	friend class HttpClientConnection;
 };
 
@@ -94,19 +78,22 @@ class SLIB_EXPORT HttpClientConnection : public Object, public IAsyncStreamListe
 {
 protected:
 	HttpClientConnection();
+	
 	~HttpClientConnection();
-
+	
+public:
+	static Ref<HttpClientConnection> create(HttpClient* client, HttpClientSession* session, AsyncStream* io);
+	
 public:
 	Ref<AsyncStream> getIO();
 
 	Ref<HttpClient> getClient();
+	
 	Ref<HttpClientSession> getSession();
 
 	void close();
+	
 	void addContext(const Ref<HttpClientContext>& context);
-
-public:
-	static Ref<HttpClientConnection> create(HttpClient* client, HttpClientSession* session, AsyncStream* io);
 
 protected:
 	WeakRef<HttpClient> m_client;

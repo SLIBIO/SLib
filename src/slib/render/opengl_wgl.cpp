@@ -77,7 +77,7 @@ public:
 							ret->m_hDC = hDC;
 							ret->m_context = context;
 
-							ret->m_threadRender = Thread::start(SLIB_CALLBACK_CLASS(_WGLRendererImpl, run, ret.get()));
+							ret->m_threadRender = Thread::start(SLIB_CALLBACK_CLASS(_WGLRendererImpl, run, ret.ptr));
 
 							ret->m_callback = param.callback;
 
@@ -132,7 +132,7 @@ public:
 				}
 				m_renderEngine = engine;
 			}
-			runStep(engine.get());
+			runStep(engine.ptr);
 			if (Thread::isNotStoppingCurrent()) {
 				sl_uint64 t = timer.getEllapsedMilliseconds();
 				if (t < 20) {

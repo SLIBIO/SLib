@@ -8,261 +8,146 @@
 
 SLIB_NAMESPACE_BEGIN
 
-class SafeMemory;
+class MemoryData;
 
-typedef CArray<sl_uint8> CMemory;
+class CMemory : public CArray<sl_uint8>
+{
+	SLIB_DECLARE_OBJECT
+	
+protected:
+	CMemory() = default;
+	
+public:
+	CMemory(sl_size count);
+	
+	CMemory(const sl_uint8* data, sl_size size);
+	
+	CMemory(const sl_uint8* data, sl_size size, const Referable* refer);
+	
+public:
+	static CMemory* create(sl_size size);
+	
+	static CMemory* create(const sl_uint8* data, sl_size size);
+	
+	static CMemory* createStatic(const sl_uint8* data, sl_size size, const Referable* refer);
+
+public:
+	CMemory* sub(sl_size start, sl_size size = SLIB_SIZE_MAX) const;
+	
+	CMemory* duplicate() const;
+	
+};
+
+
+class SafeMemory;
 
 /** auto-referencing object **/
 class SLIB_EXPORT Memory
 {
-	typedef CMemory _Obj;
-	typedef Ref<_Obj> _Ref;
-	SLIB_DECLARE_OBJECT_TYPE_FROM(Memory, _Obj)
-	SLIB_DECLARE_OBJECT_WRAPPER(Memory, _Obj, Memory, SafeMemory)
+public:
+	Ref<CMemory> ref;
+	SLIB_DECLARE_REF_WRAPPER(Memory, SafeMemory, CMemory)
 	
 public:
-	SLIB_INLINE Memory(sl_size size) : m_object(_Obj::create(size))
-	{
-	}
+	Memory(sl_size size);
 	
-	SLIB_INLINE Memory(const void* buf, sl_size size) : m_object(_Obj::create((sl_uint8*)buf, size))
-	{
-	}
+	Memory(const void* buf, sl_size size);
 	
-	SLIB_INLINE Memory(const void* buf, sl_size size, const Referable* refer) : m_object(_Obj::createStatic((const sl_uint8*)buf, size, refer))
-	{
-	}
+	Memory(const void* buf, sl_size size, const Referable* refer);
 	
 public:
-	SLIB_INLINE static Memory create(sl_size count)
-	{
-		return Memory(count);
-	}
+	static Memory create(sl_size count);
 	
-	SLIB_INLINE static Memory create(const void* buf, sl_size count)
-	{
-		return Memory(buf, count);
-	}
+	static Memory create(const void* buf, sl_size size);
 	
-	SLIB_INLINE static Memory createStatic(const void* buf, sl_size count)
-	{
-		return Memory(buf, count, sl_null);
-	}
+	static Memory createStatic(const void* buf, sl_size size);
 	
-	SLIB_INLINE static Memory createStatic(const void* buf, sl_size count, const Referable* refer)
-	{
-		return Memory(buf, count, refer);
-	}
+	static Memory createStatic(const void* buf, sl_size size, const Referable* refer);
 	
 public:
-	SLIB_INLINE sl_uint8* getData() const
-	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->data();
-		}
-		return sl_null;
-	}
+	void* getData() const;
 	
-	SLIB_INLINE sl_uint8* data() const
-	{
-		return getData();
-	}
+	sl_size getSize() const;
 	
-	SLIB_INLINE void* getBuf() const
-	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->data();
-		}
-		return sl_null;
-	}
+	sl_bool isEmpty() const;
 	
-	SLIB_INLINE void* buf() const
-	{
-		return getBuf();
-	}
+	sl_bool isNotEmpty() const;
 	
-	SLIB_INLINE sl_size getSize() const
-	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->count();
-		}
-		return 0;
-	}
+	Memory sub(sl_size start, sl_size size = SLIB_SIZE_MAX) const;
 	
-	SLIB_INLINE sl_size size() const
-	{
-		return getSize();
-	}
+	sl_size read(sl_size startSource, sl_size size, void* bufDst) const;
 	
-	SLIB_INLINE sl_bool isEmpty() const
-	{
-		return isNull();
-	}
+	sl_size write(sl_size startTarget, sl_size size, const void* bufSrc) const;
 	
-	SLIB_INLINE sl_bool isNotEmpty() const
-	{
-		return isNotNull();
-	}
+	sl_size copy(sl_size startTarget, const Memory& source, sl_size startSource = 0, sl_size size = SLIB_SIZE_MAX) const;
 	
-public:
-	SLIB_INLINE sl_uint8& operator[](sl_reg index) const
-	{
-		return *(m_object->data() + index);
-	}
+	sl_size copy(const Memory& source, sl_size start = 0, sl_size size = SLIB_SIZE_MAX) const;
 	
-public:
-	SLIB_INLINE Memory sub(sl_size start, sl_size size = SLIB_SIZE_MAX) const
-	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->sub(start, size);
-		}
-		return Memory::null();
-	}
+	Memory duplicate() const;
 	
-	SLIB_INLINE sl_size read(sl_size startSource, sl_size len, void* bufDst) const
-	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->read(startSource, len, (sl_uint8*)bufDst);
-		}
-		return 0;
-	}
-	
-	SLIB_INLINE sl_size write(sl_size startTarget, sl_size len, const void* bufSrc) const
-	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->write(startTarget, len, (const sl_uint8*)bufSrc);
-		}
-		return 0;
-	}
-	
-	sl_size copy(sl_size startTarget, const Memory& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const
-	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->copy(startTarget, source.getObject(), startSource, len);
-		}
-		return 0;
-	}
-	
-	SLIB_INLINE sl_size copy(const Memory& source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX) const
-	{
-		return copy(0, source, start, len);
-	}
-	
-	SLIB_INLINE Memory duplicate() const
-	{
-		_Obj* obj = m_object.get();
-		if (obj) {
-			return obj->duplicate();
-		}
-		return Memory::null();
-	}
+	sl_bool getData(MemoryData& data) const;
 	
 };
+
+template <>
+int Compare<Memory>::compare(const Memory& a, const Memory& b);
+
+template <>
+sl_bool Compare<Memory>::equals(const Memory& a, const Memory& b);
+
+
+SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_LIST(Memory)
+SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_QUEUE(Memory)
+
 
 /** auto-referencing object **/
 class SLIB_EXPORT SafeMemory
 {
-	typedef CMemory _Obj;
-	typedef SafeRef<_Obj> _Ref;
-	typedef Ref<_Obj> _LocalRef;
-	SLIB_DECLARE_OBJECT_TYPE_FROM(SafeMemory, _Obj)
-	SLIB_DECLARE_OBJECT_SAFE_WRAPPER(SafeMemory, _Obj, SafeMemory, Memory)
+public:
+	SafeRef<CMemory> ref;
+	SLIB_DECLARE_REF_WRAPPER(SafeMemory, Memory, CMemory)
 	
 public:
-	SLIB_INLINE SafeMemory(sl_size size) : m_object(_Obj::create(size))
-	{
-	}
+	SafeMemory(sl_size size);
 	
-	SLIB_INLINE SafeMemory(const void* buf, sl_size size) : m_object(_Obj::create((const sl_uint8*)buf, size))
-	{
-	}
+	SafeMemory(const void* buf, sl_size size);
 	
-	SLIB_INLINE SafeMemory(const void* buf, sl_size size, const Referable* refer) : m_object(_Obj::createStatic((const sl_uint8*)buf, size, refer))
-	{
-	}
+	SafeMemory(const void* buf, sl_size size, const Referable* refer);
 	
 public:
-	SLIB_INLINE sl_size getSize() const
-	{
-		_LocalRef obj(m_object);
-		if (obj.isNotNull()) {
-			return obj->count();
-		}
-		return 0;
-	}
+	sl_size getSize() const;
 	
-	SLIB_INLINE sl_size size() const
-	{
-		return getSize();
-	}
+	sl_bool isEmpty() const;
 	
-	SLIB_INLINE sl_bool isEmpty() const
-	{
-		return getSize() == 0;
-	}
+	sl_bool isNotEmpty() const;
 	
-	SLIB_INLINE sl_bool isNotEmpty() const
-	{
-		return getSize() != 0;
-	}
+	Memory sub(sl_size start, sl_size count = SLIB_SIZE_MAX) const;
+	
+	sl_size read(sl_size startSource, sl_size len, void* bufDst) const;
+	
+	sl_size write(sl_size startTarget, sl_size len, const void* bufSrc) const;
+	
+	sl_size copy(sl_size startTarget, const Memory& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const;
+	
+	sl_size copy(const Memory& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const;
+	
+	Memory duplicate() const;
+	
+	sl_bool getData(MemoryData& data) const;
+
+};
+
+class SLIB_EXPORT MemoryData
+{
+public:
+	void* data;
+	sl_size size;
+	Ref<Referable> refer;
 	
 public:
-	SLIB_INLINE Memory sub(sl_size start, sl_size count = SLIB_SIZE_MAX) const
-	{
-		_LocalRef obj(m_object);
-		if (obj.isNotNull()) {
-			return obj->sub(start, count);
-		}
-		return Memory::null();
-	}
+	Memory getMemory() const;
 	
-	SLIB_INLINE sl_size read(sl_size startSource, sl_size len, void* bufDst) const
-	{
-		_LocalRef obj(m_object);
-		if (obj.isNotNull()) {
-			return obj->read(startSource, len, (sl_uint8*)bufDst);
-		}
-		return 0;
-	}
-	
-	SLIB_INLINE sl_size write(sl_size startTarget, sl_size len, const void* bufSrc) const
-	{
-		_LocalRef obj(m_object);
-		if (obj.isNotNull()) {
-			return obj->write(startTarget, len, (const sl_uint8*)bufSrc);
-		}
-		return 0;
-	}
-	
-	SLIB_INLINE sl_size copy(sl_size startTarget, const Memory& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const
-	{
-		_LocalRef obj(m_object);
-		if (obj.isNotNull()) {
-			return obj->copy(startTarget, source.getObject(), startSource, len);
-		}
-		return 0;
-	}
-	
-	SLIB_INLINE sl_size copy(const Memory& source, sl_size start = 0, sl_size len = SLIB_SIZE_MAX) const
-	{
-		return copy(0, source, start, len);
-	}
-	
-	SLIB_INLINE Memory duplicate() const
-	{
-		_LocalRef obj(m_object);
-		if (obj.isNotNull()) {
-			return obj->duplicate();
-		}
-		return Memory::null();
-	}
+	Memory sub(sl_size start, sl_size size = SLIB_SIZE_MAX) const;
 	
 };
 
@@ -272,14 +157,13 @@ public:
 	MemoryBuffer();
 
 public:
-	SLIB_INLINE sl_size getSize() const
-	{
-		return m_size;
-	}
+	sl_size getSize() const;
+	
+	sl_bool add(const MemoryData& mem);
 
 	sl_bool add(const Memory& mem);
 	
-	sl_bool add(const void* buf, sl_size size);
+	sl_bool addStatic(const void* buf, sl_size size);
 
 	void link(MemoryBuffer& buf);
 
@@ -288,8 +172,9 @@ public:
 	Memory merge() const;
 
 protected:
-	Queue<Memory> m_queue;
+	Queue<MemoryData> m_queue;
 	sl_size m_size;
+	
 };
 
 class SLIB_EXPORT MemoryQueue : public MemoryBuffer
@@ -298,25 +183,16 @@ public:
 	MemoryQueue();
 
 public:
-	SLIB_INLINE sl_bool push(const Memory& mem)
-	{
-		return add(mem);
-	}
-
-	SLIB_INLINE sl_bool push(const void* buf, sl_size size)
-	{
-		return add(buf, size);
-	}
-
-	Memory pop();
+	sl_bool pop(MemoryData& data);
 
 	sl_size pop(void* buf, sl_size size);
 
 	Memory merge() const;
 
 private:
-	Memory m_memCurrent;
+	MemoryData m_memCurrent;
 	sl_size m_posCurrent;
+	
 };
 
 SLIB_NAMESPACE_END

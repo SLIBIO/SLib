@@ -8,7 +8,7 @@
 #include "../core/object.h"
 #include "../core/event.h"
 #include "../core/array.h"
-#include "../core/queue.h"
+#include "../core/loop_queue.h"
 #include "../core/string.h"
 #include "../core/pointer.h"
 
@@ -23,6 +23,7 @@ public:
 
 public:
 	AudioPlayerInfo();
+	
 };
 
 class AudioPlayerBuffer;
@@ -48,6 +49,7 @@ public:
 	
 public:
 	AudioPlayerBufferParam();
+	
 };
 
 class SLIB_EXPORT AudioPlayerParam
@@ -57,11 +59,12 @@ public:
 	
 public:
 	AudioPlayerParam();
+	
 };
 
 class SLIB_EXPORT AudioPlayerBuffer : public Object
 {
-	SLIB_DECLARE_OBJECT(AudioPlayerBuffer, Object)
+	SLIB_DECLARE_OBJECT
 
 protected:
 	AudioPlayerBuffer();
@@ -93,11 +96,12 @@ protected:
 	
 	Ptr<IAudioPlayerBufferListener> m_listener;
 	Ref<Event> m_event;
+	
 };
 
 class SLIB_EXPORT AudioPlayer : public Object
 {
-	SLIB_DECLARE_OBJECT(AudioPlayer, Object)
+	SLIB_DECLARE_OBJECT
 	
 public:
 	static Ref<AudioPlayer> create(const AudioPlayerParam& param);
@@ -106,6 +110,7 @@ public:
 	
 public:
 	virtual Ref<AudioPlayerBuffer> createBuffer(const AudioPlayerBufferParam& param) = 0;
+	
 };
 
 SLIB_MEDIA_NAMESPACE_END

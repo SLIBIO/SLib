@@ -17,9 +17,11 @@ class ViewInstance;
 
 class SLIB_EXPORT View : public Object
 {
-	SLIB_DECLARE_OBJECT(View, Object)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	View();
+	
 	~View();
 	
 public:
@@ -115,7 +117,6 @@ public:
 	
 	Ref<ViewInstance> attachToNewInstance(const Ref<ViewInstance>& parent);
 	
-protected:
 	virtual Ref<ViewInstance> createInstance(ViewInstance* parent);
 	
 public:
@@ -175,13 +176,13 @@ private:
 	sl_bool m_flagEnabled;
 	sl_bool m_flagOpaque;
 	
-protected:
 	friend class Window;
+	
 };
 
 class SLIB_EXPORT ViewInstance : public Object
 {
-	SLIB_DECLARE_OBJECT(ViewInstance, Object)
+	SLIB_DECLARE_OBJECT
 
 public:
 	Ref<View> getView();

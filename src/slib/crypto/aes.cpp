@@ -1,6 +1,6 @@
 #include "../../../inc/slib/crypto/aes.h"
 #include "../../../inc/slib/crypto/sha2.h"
-#include "../../../inc/slib/core/io.h"
+#include "../../../inc/slib/core/mio.h"
 
 /*
 	AES - Advanced Encryption Standard
@@ -9,6 +9,11 @@
 */
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
+
+sl_uint32 AES::getBlockSize()
+{
+	return 16;
+}
 
 #define _BYTE(x) ((sl_uint8)(x))
 
@@ -493,6 +498,19 @@ void AES::setKey_SHA256(const String& key)
 	char sig[32];
 	SHA256::hash(key, sig);
 	setKey(sig, 32);
+}
+
+
+void AES_GCM::setKey(const void* key, sl_uint32 lenKey)
+{
+	m_cipher.setKey(key, lenKey);
+	setCipher(&m_cipher);
+}
+
+void AES_GCM::setKey_SHA256(const String& key)
+{
+	m_cipher.setKey_SHA256(key);
+	setCipher(&m_cipher);
 }
 
 SLIB_CRYPTO_NAMESPACE_END

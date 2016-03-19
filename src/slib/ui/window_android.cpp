@@ -489,7 +489,7 @@ Ref<WindowInstance> UIPlatform::createWindowInstance(jobject jwindow)
 	}
 	Ref<_Android_Window> ret = _Android_Window::create(jwindow);
 	if (ret.isNotNull()) {
-		UIPlatform::_registerWindowInstance((void*)(ret->m_window.get()), ret.get());
+		UIPlatform::_registerWindowInstance((void*)(ret->m_window.get()), ret.ptr);
 	}
 	return ret;
 }

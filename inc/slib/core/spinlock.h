@@ -3,89 +3,47 @@
 
 #include "definition.h"
 
-#include "base.h"
-
 SLIB_NAMESPACE_BEGIN
+
 class SLIB_EXPORT SpinLock
 {
 public:
-	SLIB_INLINE SpinLock()
-	{
-		m_flagLock = 0;
-	}
+	SpinLock();
 	
-	SLIB_INLINE SpinLock(const SpinLock& other)
-	{
-		m_flagLock = 0;
-	}
-
+	SpinLock(const SpinLock& other);
+	
 public:
 	void lock() const;
 	
-	SLIB_INLINE sl_bool tryLock() const
-	{
-		return Base::interlockedCompareExchange32((sl_int32*)(&m_flagLock), 1, 0);
-	}
+	sl_bool tryLock() const;
 	
-	SLIB_INLINE void unlock() const
-	{
-		Base::interlockedCompareExchange32((sl_int32*)(&m_flagLock), 0, 1);
-	}
+	void unlock() const;
 
-	void yield(sl_uint32 ellapsed);
-	
 public:
-	SLIB_INLINE SpinLock& operator=(const SpinLock& other)
-	{
-		return *this;
-	}
+	SpinLock& operator=(const SpinLock& other);
 
 private:
 	sl_int32 m_flagLock;
+	
 };
 
 class SLIB_EXPORT SpinLocker
 {
 public:
-	SLIB_INLINE SpinLocker()
-	{
-		m_lock = sl_null;
-	}
+	SpinLocker();
 	
-	SLIB_INLINE SpinLocker(const SpinLock* lock)
-	{
-		m_lock = lock;
-		if (lock) {
-			lock->lock();
-		}
-	}
+	SpinLocker(const SpinLock* lock);
+	
+	~SpinLocker();
 	
 public:
-	SLIB_INLINE void lock(const SpinLock* lock)
-	{
-		if (! m_lock) {			
-			m_lock = lock;
-			if (lock) {
-				lock->lock();
-			}
-		}
-	}
+	void lock(const SpinLock* lock);
 	
-	SLIB_INLINE void unlock()
-	{
-		if (m_lock) {
-			m_lock->unlock();
-			m_lock = sl_null;
-		}
-	}
-	
-	SLIB_INLINE ~SpinLocker()
-	{
-		unlock();
-	}
+	void unlock();
 	
 private:
 	const SpinLock* m_lock;
+	
 };
 
 #define SLIB_SPINLOCK_POOL_SIZE 971
@@ -97,18 +55,26 @@ private:
 	static sl_int32 m_locks[SLIB_SPINLOCK_POOL_SIZE];
 
 public:
-	static SpinLock* get(const void* ptr)
-	{
-		sl_size index = ((sl_size)(ptr)) % SLIB_SPINLOCK_POOL_SIZE;
-		return (SpinLock*)((void*)(m_locks + index));
-	}
+	static SpinLock* get(const void* ptr);
+	
 };
+
+extern template class SpinLockPool<-20>;
+typedef SpinLockPool<-20> SpinLockPoolForList;
+
+extern template class SpinLockPool<-21>;
+typedef SpinLockPool<-21> SpinLockPoolForMap;
+
 
 template <int CATEGORY>
 sl_int32 SpinLockPool<CATEGORY>::m_locks[SLIB_SPINLOCK_POOL_SIZE] = { 0 };
 
-typedef SpinLockPool<-20> SpinLockPoolForList;
-typedef SpinLockPool<-21> SpinLockPoolForMap;
+template <int CATEGORY>
+SLIB_INLINE SpinLock* SpinLockPool<CATEGORY>::get(const void* ptr)
+{
+	sl_size index = ((sl_size)(ptr)) % SLIB_SPINLOCK_POOL_SIZE;
+	return (SpinLock*)((void*)(m_locks + index));
+}
 
 SLIB_NAMESPACE_END
 

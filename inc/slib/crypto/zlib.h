@@ -45,11 +45,7 @@ public:
 	
 	sl_bool startGzip(const GzipParam& param, sl_int32 level = 6);
 	
-	SLIB_INLINE sl_bool startGzip(sl_int32 level = 6)
-	{
-		GzipParam param;
-		return startGzip(param, level);
-	}
+	sl_bool startGzip(sl_int32 level = 6);
 
 	/*
 		returns
@@ -58,9 +54,9 @@ public:
 			>0: Success
 	*/
 	sl_int32 compress(
-		const void* input, sl_uint32 sizeInputAvailable, sl_uint32& sizeInputPassed
-		, void* output, sl_uint32 sizeOutputAvailable, sl_uint32& sizeOutputUsed
-		, sl_bool flagFinish);
+		const void* input, sl_uint32 sizeInputAvailable, sl_uint32& sizeInputPassed,
+		void* output, sl_uint32 sizeOutputAvailable, sl_uint32& sizeOutputUsed,
+		sl_bool flagFinish);
 
 	Memory compress(const void* data, sl_size size, sl_bool flagFinish);
 
@@ -74,6 +70,7 @@ private:
 	String8 m_gzipComment;
 
 	sl_bool m_flagStarted;
+	
 };
 
 class SLIB_EXPORT ZlibDecompress : public Object
@@ -99,8 +96,8 @@ public:
 			>0: Success
 	*/
 	sl_int32 decompress(
-		const void* input, sl_uint32 sizeInputAvailable, sl_uint32& sizeInputPassed
-		, void* output, sl_uint32 sizeOutputAvailable, sl_uint32& sizeOutputUsed);
+		const void* input, sl_uint32 sizeInputAvailable, sl_uint32& sizeInputPassed,
+		void* output, sl_uint32 sizeOutputAvailable, sl_uint32& sizeOutputUsed);
 	
 	Memory decompress(const void* data, sl_size size);
 
@@ -109,6 +106,7 @@ public:
 private:
 	sl_uint8 m_stream[128]; // bigger than sizeof(z_stream)
 	sl_bool m_flagStarted;
+	
 };
 
 class SLIB_EXPORT Zlib
@@ -116,41 +114,23 @@ class SLIB_EXPORT Zlib
 public:
 	static sl_uint32 adler32(sl_uint32 adler, const void* data, sl_size size);
 	
-	SLIB_INLINE static sl_uint32 adler32(const void* data, sl_size size)
-	{
-		return adler32(1, data, size);
-	}
+	static sl_uint32 adler32(const void* data, sl_size size);
 	
-	SLIB_INLINE static sl_uint32 adler32(sl_uint32 adler, const Memory& mem)
-	{
-		return adler32(adler, mem.getBuf(), mem.getSize());
-	}
+	static sl_uint32 adler32(sl_uint32 adler, const Memory& mem);
 	
-	SLIB_INLINE static sl_uint32 adler32(const Memory& mem)
-	{
-		return adler32(1, mem.getBuf(), mem.getSize());
-	}
+	static sl_uint32 adler32(const Memory& mem);
 
 	/*
 		zlib crc32 : CRC32B
 	*/
 	static sl_uint32 crc32(sl_uint32 crc, const void* data, sl_size size);
 	
-	SLIB_INLINE static sl_uint32 crc32(const void* data, sl_size size)
-	{
-		return crc32(0, data, size);
-	}
+	static sl_uint32 crc32(const void* data, sl_size size);
 	
-	SLIB_INLINE static sl_uint32 crc32(sl_uint32 crc, const Memory& mem)
-	{
-		return crc32(crc, mem.getBuf(), mem.getSize());
-	}
+	static sl_uint32 crc32(sl_uint32 crc, const Memory& mem);
 	
-	SLIB_INLINE static sl_uint32 crc32(const Memory& mem)
-	{
-		return crc32(0, mem.getBuf(), mem.getSize());
-	}
-
+	static sl_uint32 crc32(const Memory& mem);
+	
 	/*
 		Compress
 	*/
@@ -160,11 +140,7 @@ public:
 	
 	static Memory compressGzip(const GzipParam& param, const void* data, sl_size size, sl_int32 level = 6);
 	
-	SLIB_INLINE static Memory compressGzip(const void* data, sl_size size, sl_int32 level = 6)
-	{
-		GzipParam param;
-		return compressGzip(param, data, size, level);
-	}
+	static Memory compressGzip(const void* data, sl_size size, sl_int32 level = 6);
 
 	/*
 		Decompress

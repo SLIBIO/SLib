@@ -24,8 +24,8 @@ public:
 		HWND handle = getHandle();
 		if (msg == WM_ERASEBKGND) {
 			Color color = m_backgroundColor;
-			if (color.getAlpha() > 0) {
-				HBRUSH hbr = ::CreateSolidBrush(RGB(color.getRed(), color.getGreen(), color.getBlue()));
+			if (color.a > 0) {
+				HBRUSH hbr = ::CreateSolidBrush(RGB(color.r, color.g, color.b));
 				if (hbr) {
 					HDC hDC = (HDC)(wParam);
 					RECT rc;
@@ -38,8 +38,8 @@ public:
 			}
 		} else if (Windows::processWindowScrollEvents(handle, msg, wParam, lParam, _SCROLL_LINE_SIZE, _SCROLL_WHEEL_SIZE)) {
 			Ref<View> view = getView();
-			if (ScrollView::checkInstance(view)) {
-				__refreshContentPosition((ScrollView*)(view.get()));
+			if (ScrollView::checkInstance(view.ptr)) {
+				__refreshContentPosition((ScrollView*)(view.ptr));
 			}
 			return sl_true;
 		}
@@ -132,16 +132,16 @@ void ScrollView::onResize()
 {
 	View::onResize();
 	Ref<ViewInstance> instance = getViewInstance();
-	if (_Win32_ScrollViewInstance::checkInstance(instance)) {
-		((_Win32_ScrollViewInstance*)(instance.get()))->__refreshContentSize(this);
+	if (_Win32_ScrollViewInstance::checkInstance(instance.ptr)) {
+		((_Win32_ScrollViewInstance*)(instance.ptr))->__refreshContentSize(this);
 	}
 }
 
 void ScrollView::onResizeChild(View* child)
 {
 	Ref<ViewInstance> instance = getViewInstance();
-	if (_Win32_ScrollViewInstance::checkInstance(instance)) {
-		((_Win32_ScrollViewInstance*)(instance.get()))->__refreshContentSize(this);
+	if (_Win32_ScrollViewInstance::checkInstance(instance.ptr)) {
+		((_Win32_ScrollViewInstance*)(instance.ptr))->__refreshContentSize(this);
 	}
 }
 
@@ -163,16 +163,16 @@ void ScrollView::_setBorder(sl_bool flag)
 void ScrollView::_setBackgroundColor(const Color& color)
 {
 	Ref<ViewInstance> instance = getViewInstance();
-	if (_Win32_ScrollViewInstance::checkInstance(instance)) {
-		((_Win32_ScrollViewInstance*)(instance.get()))->m_backgroundColor = m_backgroundColor;
+	if (_Win32_ScrollViewInstance::checkInstance(instance.ptr)) {
+		((_Win32_ScrollViewInstance*)(instance.ptr))->m_backgroundColor = m_backgroundColor;
 	}
 }
 
 void ScrollView::_setContentView(const Ref<View>& view)
 {
 	Ref<ViewInstance> instance = getViewInstance();
-	if (_Win32_ScrollViewInstance::checkInstance(instance)) {
-		((_Win32_ScrollViewInstance*)(instance.get()))->__setContentView(view, this);
+	if (_Win32_ScrollViewInstance::checkInstance(instance.ptr)) {
+		((_Win32_ScrollViewInstance*)(instance.ptr))->__setContentView(view, this);
 	}
 }
 
@@ -189,8 +189,8 @@ void ScrollView::scrollTo(sl_real x, sl_real y)
 		si.nPos = (int)y;
 		::SetScrollInfo(handle, SB_VERT, &si, TRUE);
 		Ref<ViewInstance> instance = getViewInstance();
-		if (_Win32_ScrollViewInstance::checkInstance(instance)) {
-			((_Win32_ScrollViewInstance*)(instance.get()))->__refreshContentPosition(this);
+		if (_Win32_ScrollViewInstance::checkInstance(instance.ptr)) {
+			((_Win32_ScrollViewInstance*)(instance.ptr))->__refreshContentPosition(this);
 		}
 	}
 }

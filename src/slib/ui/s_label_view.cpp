@@ -2,9 +2,11 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(SLabelView, SView)
+
 SLabelView::SLabelView()
 {
-	m_textAlignment = alignMiddleLeft;
+	m_textAlignment = Alignment::MiddleLeft;
 }
 
 String SLabelView::getText()

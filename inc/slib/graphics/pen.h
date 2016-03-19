@@ -28,11 +28,10 @@ class PenInstance;
 
 class SLIB_EXPORT Pen : public Object
 {
-	SLIB_DECLARE_OBJECT(Pen, Object)
+	SLIB_DECLARE_OBJECT;
+	
 protected:
-	SLIB_INLINE Pen()
-	{
-	}
+	Pen() = default;
 	
 public:
 	static Ref<Pen> getDefault();
@@ -43,42 +42,20 @@ public:
 	
 	static Ref<Pen> createSolidPen(sl_real width = 1, Color color = Color::Black);
 	
-	
 public:
-	SLIB_INLINE void getDesc(PenDesc& desc)
-	{
-		desc = m_desc;
-	}
+	void getDesc(PenDesc& desc);
 
-	SLIB_INLINE PenStyle getStyle()
-	{
-		return m_desc.style;
-	}
+	PenStyle getStyle();
 
-	SLIB_INLINE sl_real getWidth()
-	{
-		return m_desc.width;
-	}
+	sl_real getWidth();
 
-	SLIB_INLINE Color getColor()
-	{
-		return m_desc.color;
-	}
+	Color getColor();
 
-	SLIB_INLINE LineCap getCap()
-	{
-		return m_desc.cap;
-	}
+	LineCap getCap();
 
-	SLIB_INLINE LineJoin getJoin()
-	{
-		return m_desc.join;
-	}
+	LineJoin getJoin();
 
-	SLIB_INLINE sl_real getMiterLimit()
-	{
-		return m_desc.miterLimit;
-	}
+	sl_real getMiterLimit();
 
 public:
 	SLIB_REF_PROPERTY(PenInstance, Instance)
@@ -90,7 +67,7 @@ protected:
 
 class SLIB_EXPORT PenInstance : public Object
 {
-	SLIB_DECLARE_OBJECT(PenInstance, Object)
+	SLIB_DECLARE_OBJECT
 };
 
 SLIB_GRAPHICS_NAMESPACE_END

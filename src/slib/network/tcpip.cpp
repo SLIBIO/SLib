@@ -1,5 +1,7 @@
 #include "../../../inc/slib/network/tcpip.h"
+
 #include "../../../inc/slib/network/icmp.h"
+#include "../../../inc/slib/core/mio.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
@@ -32,20 +34,132 @@ sl_uint16 TCP_IP::calculateChecksum(const void* data, sl_size size)
 	return (sl_uint16)(~sum); // 1's complement
 }
 
-void IPv4HeaderFormat::updateChecksum()
+
+sl_uint32 IPv4Packet::getVersion() const
+{
+	return (_versionAndHeaderLength >> 4) & 0x0F;
+}
+
+void IPv4Packet::setVersion(sl_uint32 version)
+{
+	_versionAndHeaderLength = (sl_uint8)((_versionAndHeaderLength & 0x0F) | (version << 4));
+}
+
+sl_uint8 IPv4Packet::getTypeOfService() const
+{
+	return _TOS_DSCP_ECN;
+}
+
+void IPv4Packet::setTypeOfService(sl_uint8 TOS)
+{
+	_TOS_DSCP_ECN = TOS;
+}
+
+sl_uint32 IPv4Packet::getDSCP() const
+{
+	return ((_TOS_DSCP_ECN >> 2) & 0x3F);
+}
+
+void IPv4Packet::setDSCP(sl_uint32 DSCP)
+{
+	_TOS_DSCP_ECN = (sl_uint8)((_TOS_DSCP_ECN & 3) | ((DSCP & 0x3F) << 2));
+}
+
+sl_uint32 IPv4Packet::getECN() const
+{
+	return (_TOS_DSCP_ECN & 3);
+}
+
+void IPv4Packet::setECN(sl_uint32 ECN)
+{
+	_TOS_DSCP_ECN = (sl_uint8)((_TOS_DSCP_ECN & 0xFC) | (ECN & 3));
+}
+
+sl_uint16 IPv4Packet::getIdentification() const
+{
+	return MIO::readUint16BE(_identification);
+}
+
+void IPv4Packet::setIdentification(sl_uint16 identification)
+{
+	MIO::writeUint16BE(_identification, identification);
+}
+
+sl_bool IPv4Packet::isDF() const
+{
+	return (_flagsAndFlagmentOffset[0] & 0x40) != 0;
+}
+
+void IPv4Packet::setDF(sl_bool flag)
+{
+	_flagsAndFlagmentOffset[0] = (sl_uint8)((_flagsAndFlagmentOffset[0] & 0xBF) | (flag ? 0x40 : 0));
+}
+
+sl_bool IPv4Packet::isMF() const
+{
+	return (_flagsAndFlagmentOffset[0] & 0x20) != 0;
+}
+
+void IPv4Packet::setMF(sl_bool flag)
+{
+	_flagsAndFlagmentOffset[0] = (sl_uint8)((_flagsAndFlagmentOffset[0] & 0xDF) | (flag ? 0x20 : 0));
+}
+
+sl_uint32 IPv4Packet::getFragmentOffset() const
+{
+	return (((sl_uint32)(_flagsAndFlagmentOffset[0] & 0x1F)) << 8) | _flagsAndFlagmentOffset[1];
+}
+
+void IPv4Packet::setFragmentOffset(sl_uint32 offset)
+{
+	_flagsAndFlagmentOffset[1] = (sl_uint8)offset;
+	_flagsAndFlagmentOffset[0] = (sl_uint8)((_flagsAndFlagmentOffset[0] & 0xE0) | ((offset >> 8) & 0x1F));
+}
+
+sl_uint8 IPv4Packet::getTTL() const
+{
+	return _timeToLive;
+}
+
+void IPv4Packet::setTTL(sl_uint8 TTL)
+{
+	_timeToLive = TTL;
+}
+
+sl_uint16 IPv4Packet::getChecksum() const
+{
+	return MIO::readUint16BE(_headerChecksum);
+}
+
+void IPv4Packet::setChecksum(sl_uint16 checksum)
+{
+	MIO::writeUint16BE(_headerChecksum, checksum);
+}
+
+void IPv4Packet::updateChecksum()
 {
 	_headerChecksum[0] = 0;
 	_headerChecksum[1] = 0;
-	setChecksum(TCP_IP::calculateChecksum(this, getHeaderSize()));
+	MIO::writeUint16BE(_headerChecksum, TCP_IP::calculateChecksum(this, getHeaderSize()));
 }
 
-sl_bool IPv4HeaderFormat::checkChecksum() const
+sl_bool IPv4Packet::checkChecksum() const
 {
 	sl_uint16 checksum = TCP_IP::calculateChecksum(this, getHeaderSize());
 	return checksum == 0;
 }
 
-sl_uint16 IPv4HeaderFormat::getChecksumForContent(const void* content, sl_uint16 sizeContent) const
+const sl_uint8* IPv4Packet::getOptions() const
+{
+	return (const sl_uint8*)(this) + sizeof(IPv4Packet);
+}
+
+sl_uint8* IPv4Packet::getOptions()
+{
+	return (sl_uint8*)(this) + sizeof(IPv4Packet);
+}
+
+sl_uint16 IPv4Packet::getChecksumForContent(const void* content, sl_uint16 sizeContent) const
 {
 	sl_uint32 sum = 0;
 	sum = MIO::readUint16BE(_sourceIp);
@@ -58,7 +172,7 @@ sl_uint16 IPv4HeaderFormat::getChecksumForContent(const void* content, sl_uint16
 	return (sl_uint16)(~sum);
 }
 
-sl_uint16 IPv4HeaderFormat::getChecksumForContent() const
+sl_uint16 IPv4Packet::getChecksumForContent() const
 {
 	sl_uint16 sizeTotal = getTotalSize();
 	sl_uint16 sizeHeader = getHeaderSize();
@@ -67,27 +181,27 @@ sl_uint16 IPv4HeaderFormat::getChecksumForContent() const
 	return getChecksumForContent(content, sizeContent);
 }
 
-sl_bool IPv4HeaderFormat::check(const void* packet, sl_uint32 sizeTotal)
+sl_bool IPv4Packet::check(const void* packet, sl_uint32 sizeTotal)
 {
 	if (!(checkHeader(packet, sizeTotal))) {
 		return sl_false;
 	}
-	const IPv4HeaderFormat* header = (const IPv4HeaderFormat*)(packet);
+	const IPv4Packet* header = (const IPv4Packet*)(packet);
 	if (header->getTotalSize() > sizeTotal) {
 		return sl_false;
 	}
 	return sl_true;
 }
 
-sl_bool IPv4HeaderFormat::checkHeader(const void* packet, sl_uint32 sizeTotal)
+sl_bool IPv4Packet::checkHeader(const void* packet, sl_uint32 sizeTotal)
 {
 	if (!packet) {
 		return sl_false;
 	}
-	if (sizeTotal < sizeof(IPv4HeaderFormat)) {
+	if (sizeTotal < sizeof(IPv4Packet)) {
 		return sl_false;
 	}
-	const IPv4HeaderFormat* header = (const IPv4HeaderFormat*)(packet);
+	const IPv4Packet* header = (const IPv4Packet*)(packet);
 	if (header->getVersion() != 4) {
 		return sl_false;
 	}
@@ -100,10 +214,20 @@ sl_bool IPv4HeaderFormat::checkHeader(const void* packet, sl_uint32 sizeTotal)
 	return sl_true;
 }
 
-sl_bool IPv4HeaderFormat::getPortsForTcpUdp(sl_uint16& src, sl_uint16& dst) const
+sl_bool IPv4Packet::isFirstFragment() const
 {
-	sl_uint8 protocol = getProtocol();
-	if (protocol == networkInternetProtocol_TCP || protocol == networkInternetProtocol_UDP) {
+	return getFragmentOffset() == 0;
+}
+
+sl_bool IPv4Packet::isLastFragment() const
+{
+	return !(isMF());
+}
+
+sl_bool IPv4Packet::getPortsForTcpUdp(sl_uint16& src, sl_uint16& dst) const
+{
+	NetworkInternetProtocol protocol = getProtocol();
+	if (protocol == NetworkInternetProtocol::TCP || protocol == NetworkInternetProtocol::UDP) {
 		if (getContentSize() > 4) {
 			const sl_uint8* p = getContent();
 			src = MIO::readUint16BE(p);
@@ -115,23 +239,153 @@ sl_bool IPv4HeaderFormat::getPortsForTcpUdp(sl_uint16& src, sl_uint16& dst) cons
 }
 
 
-void TcpHeaderFormat::updateChecksum(const IPv4HeaderFormat* ipv4, sl_uint32 sizeContent)
+sl_uint32 TcpSegment::getSequenceNumber() const
+{
+	return MIO::readUint32BE(_sequenceNumber);
+}
+
+void TcpSegment::setSequenceNumber(sl_uint32 num)
+{
+	MIO::writeUint32BE(_sequenceNumber, num);
+}
+
+sl_uint32 TcpSegment::getAcknowledgmentNumber() const
+{
+	return MIO::readUint32BE(_acknowledgmentNumber);
+}
+
+void TcpSegment::setAcknowledgmentNumber(sl_uint32 num)
+{
+	MIO::writeUint32BE(_acknowledgmentNumber, num);
+}
+
+sl_bool TcpSegment::isNS() const
+{
+	return (_dataOffsetAndFlags[0] & 1) != 0;
+}
+
+void TcpSegment::setNS(sl_bool flag)
+{
+	_dataOffsetAndFlags[0] = (sl_uint8)((_dataOffsetAndFlags[0] & 0xFE) | (flag ? 1 : 0));
+}
+
+sl_bool TcpSegment::isCWR() const
+{
+	return (_dataOffsetAndFlags[1] & 0x80) != 0;
+}
+
+void TcpSegment::setCWR(sl_bool flag)
+{
+	_dataOffsetAndFlags[1] = (sl_uint8)((_dataOffsetAndFlags[0] & 0x7F) | (flag ? 0x80 : 0));
+}
+
+sl_bool TcpSegment::isECE() const
+{
+	return (_dataOffsetAndFlags[1] & 0x40) != 0;
+}
+
+void TcpSegment::setECE(sl_bool flag)
+{
+	_dataOffsetAndFlags[1] = (sl_uint8)((_dataOffsetAndFlags[0] & 0xBF) | (flag ? 0x40 : 0));
+}
+
+sl_bool TcpSegment::isURG() const
+{
+	return (_dataOffsetAndFlags[1] & 0x20) != 0;
+}
+
+void TcpSegment::setURG(sl_bool flag)
+{
+	_dataOffsetAndFlags[1] = (sl_uint8)((_dataOffsetAndFlags[0] & 0xDF) | (flag ? 0x20 : 0));
+}
+
+sl_bool TcpSegment::isACK() const
+{
+	return (_dataOffsetAndFlags[1] & 0x10) != 0;
+}
+
+void TcpSegment::setACK(sl_bool flag)
+{
+	_dataOffsetAndFlags[1] = (sl_uint8)((_dataOffsetAndFlags[0] & 0xEF) | (flag ? 0x10 : 0));
+}
+
+sl_bool TcpSegment::isPSH() const
+{
+	return (_dataOffsetAndFlags[1] & 0x08) != 0;
+}
+
+void TcpSegment::setPSH(sl_bool flag)
+{
+	_dataOffsetAndFlags[1] = (sl_uint8)((_dataOffsetAndFlags[0] & 0xF7) | (flag ? 0x08 : 0));
+}
+
+sl_bool TcpSegment::isRST() const
+{
+	return (_dataOffsetAndFlags[1] & 0x04) != 0;
+}
+
+void TcpSegment::setRST(sl_bool flag)
+{
+	_dataOffsetAndFlags[1] = (sl_uint8)((_dataOffsetAndFlags[0] & 0xFB) | (flag ? 0x04 : 0));
+}
+
+sl_bool TcpSegment::isSYN() const
+{
+	return (_dataOffsetAndFlags[1] & 0x02) != 0;
+}
+
+void TcpSegment::setSYN(sl_bool flag)
+{
+	_dataOffsetAndFlags[1] = (sl_uint8)((_dataOffsetAndFlags[0] & 0xFD) | (flag ? 0x02 : 0));
+}
+
+sl_bool TcpSegment::isFIN() const
+{
+	return (_dataOffsetAndFlags[1] & 0x01) != 0;
+}
+
+void TcpSegment::setFIN(sl_bool flag)
+{
+	_dataOffsetAndFlags[1] = (sl_uint8)((_dataOffsetAndFlags[0] & 0xFE) | (flag ? 0x01 : 0));
+}
+
+sl_uint16 TcpSegment::getWindowSize() const
+{
+	return MIO::readUint16BE(_windowSize);
+}
+
+void TcpSegment::setWindowSize(sl_uint16 size)
+{
+	MIO::writeUint16BE(_windowSize, size);
+}
+
+sl_uint16 TcpSegment::getChecksum() const
+{
+	return MIO::readUint16BE(_checksum);
+}
+
+void TcpSegment::setChecksum(sl_uint16 checksum)
+{
+	MIO::writeUint16BE(_checksum, checksum);
+}
+
+void TcpSegment::updateChecksum(const IPv4Packet* ipv4, sl_uint32 sizeContent)
 {
 	_checksum[0] = 0;
 	_checksum[1] = 0;
 	sl_uint16 checksum = ipv4->getChecksumForContent(this, sizeContent);
-	setChecksum(checksum);
+	MIO::writeUint16BE(_checksum, checksum);
 }
 
-sl_bool TcpHeaderFormat::checkChecksum(const IPv4HeaderFormat* ipv4, sl_uint32 sizeContent) const
+sl_bool TcpSegment::checkChecksum(const IPv4Packet* ipv4, sl_uint32 sizeContent) const
 {
 	sl_uint16 checksum = ipv4->getChecksumForContent(this, sizeContent);
 	return checksum == 0;
 }
 
-sl_bool TcpHeaderFormat::check(IPv4HeaderFormat* ip, sl_uint32 sizeTcp) const
+sl_bool TcpSegment::check(IPv4Packet* ip, sl_uint32 sizeTcp) const
 {
-	if (sizeTcp < sizeof(TcpHeaderFormat)) {
+	if (sizeTcp < sizeof(TcpSegment)) {
 		return sl_false;
 	}
 	if (sizeTcp < getHeaderSize()) {
@@ -143,7 +397,38 @@ sl_bool TcpHeaderFormat::check(IPv4HeaderFormat* ip, sl_uint32 sizeTcp) const
 	return sl_true;
 }
 
-void UdpHeaderFormat::updateChecksum(const IPv4HeaderFormat* ipv4)
+sl_uint16 TcpSegment::getUrgentPointer() const
+{
+	return MIO::readUint16BE(_urgentPointer);
+}
+
+void TcpSegment::setUrgentPointer(sl_uint16 urgentPointer)
+{
+	MIO::writeUint16BE(_urgentPointer, urgentPointer);
+}
+
+const sl_uint8* TcpSegment::getOptions() const
+{
+	return (const sl_uint8*)(this) + sizeof(TcpSegment);
+}
+
+sl_uint8* TcpSegment::getOptions()
+{
+	return (sl_uint8*)(this) + sizeof(TcpSegment);
+}
+
+
+sl_uint16 UdpDatagram::getChecksum() const
+{
+	return MIO::readUint16BE(_checksum);
+}
+
+void UdpDatagram::setChecksum(sl_uint16 checksum)
+{
+	MIO::writeUint16BE(_checksum, checksum);
+}
+
+void UdpDatagram::updateChecksum(const IPv4Packet* ipv4)
 {
 	_checksum[0] = 0;
 	_checksum[1] = 0;
@@ -154,7 +439,7 @@ void UdpHeaderFormat::updateChecksum(const IPv4HeaderFormat* ipv4)
 	setChecksum(checksum);
 }
 
-sl_bool UdpHeaderFormat::checkChecksum(const IPv4HeaderFormat* ipv4) const
+sl_bool UdpDatagram::checkChecksum(const IPv4Packet* ipv4) const
 {
 	if (getChecksum() == 0) {
 		return sl_true;
@@ -163,9 +448,9 @@ sl_bool UdpHeaderFormat::checkChecksum(const IPv4HeaderFormat* ipv4) const
 	return checksum == 0 || checksum == 0xFFFF;
 }
 
-sl_bool UdpHeaderFormat::check(IPv4HeaderFormat* ip, sl_uint32 sizeUdp) const
+sl_bool UdpDatagram::check(IPv4Packet* ip, sl_uint32 sizeUdp) const
 {
-	if (sizeUdp < sizeof(UdpHeaderFormat)) {
+	if (sizeUdp < HeaderSize) {
 		return sl_false;
 	}
 	if (sizeUdp != getTotalSize()) {
@@ -176,6 +461,7 @@ sl_bool UdpHeaderFormat::check(IPv4HeaderFormat* ip, sl_uint32 sizeUdp) const
 	}
 	return sl_true;
 }
+
 
 sl_bool IPv4PacketIdentifier::operator==(const IPv4PacketIdentifier& other) const
 {
@@ -191,6 +477,13 @@ sl_uint32 IPv4PacketIdentifier::hashCode() const
 	t += SLIB_MAKE_DWORD2(identification, protocol);
 	return sl_hash(t);
 }
+
+template <>
+sl_uint32 Hash<IPv4PacketIdentifier>::hash(const IPv4PacketIdentifier& v)
+{
+	return v.hashCode();
+}
+
 
 IPv4Fragmentation::IPv4Fragmentation()
 {
@@ -213,9 +506,9 @@ void IPv4Fragmentation::setupExpiringDuration(sl_uint32 ms)
 
 sl_bool IPv4Fragmentation::isNeededCombine(const void* _ip, sl_uint32 size, sl_bool flagCheckedHeader)
 {
-	IPv4HeaderFormat* ip = (IPv4HeaderFormat*)(_ip);
+	IPv4Packet* ip = (IPv4Packet*)(_ip);
 	if (!flagCheckedHeader) {
-		if (!(IPv4HeaderFormat::check(ip, size))) {
+		if (!(IPv4Packet::check(ip, size))) {
 			return sl_false;
 		}
 	}
@@ -227,9 +520,9 @@ sl_bool IPv4Fragmentation::isNeededCombine(const void* _ip, sl_uint32 size, sl_b
 
 Memory IPv4Fragmentation::combineFragment(const void* _ip, sl_uint32 size, sl_bool flagCheckedHeader)
 {
-	IPv4HeaderFormat* ip = (IPv4HeaderFormat*)(_ip);
+	IPv4Packet* ip = (IPv4Packet*)(_ip);
 	if (!flagCheckedHeader) {
-		if (!(IPv4HeaderFormat::check(ip, size))) {
+		if (!(IPv4Packet::check(ip, size))) {
 			return Memory::null();
 		}
 	}
@@ -258,7 +551,7 @@ Memory IPv4Fragmentation::combineFragment(const void* _ip, sl_uint32 size, sl_bo
 		if (packet->header.isEmpty()) {
 			return Memory::null();
 		}
-		IPv4HeaderFormat* headerNew = (IPv4HeaderFormat*)(packet->header.getBuf());
+		IPv4Packet* headerNew = (IPv4Packet*)(packet->header.getData());
 		headerNew->setMF(sl_false);
 		headerNew->updateChecksum();
 		packet->sizeAccumulated = 0;
@@ -291,7 +584,7 @@ Memory IPv4Fragmentation::combineFragment(const void* _ip, sl_uint32 size, sl_bo
 	// check overlapping
 	if (sizeContent > 0) {
 		ListLocker<IPv4Fragment> fragments(packet->fragments);
-		for (sl_size i = 0; i < fragments.count(); i++) {
+		for (sl_size i = 0; i < fragments.count; i++) {
 			if (fragments[i].start <= start && start < fragments[i].end) {
 				start = fragments[i].end;
 			}
@@ -316,11 +609,11 @@ Memory IPv4Fragmentation::combineFragment(const void* _ip, sl_uint32 size, sl_bo
 		m_packets.remove(id);
 		Memory mem = Memory::create(packet->header.getSize() + packet->sizeContent);
 		if (mem.isNotEmpty()) {
-			Base::copyMemory(mem.getBuf(), packet->header.getBuf(), packet->header.getSize());
-			data = (sl_uint8*)(mem.getBuf()) + packet->header.getSize();
+			Base::copyMemory(mem.getData(), packet->header.getData(), packet->header.getSize());
+			data = (sl_uint8*)(mem.getData()) + packet->header.getSize();
 			ListLocker<IPv4Fragment> fragments(packet->fragments);
-			for (sl_size i = 0; i < fragments.count(); i++) {
-				Base::copyMemory(data + fragments[i].start, fragments[i].data.getBuf(), fragments[i].end - fragments[i].start);
+			for (sl_size i = 0; i < fragments.count; i++) {
+				Base::copyMemory(data + fragments[i].start, fragments[i].data.getData(), fragments[i].end - fragments[i].start);
 			}
 			return mem;
 		}
@@ -328,13 +621,13 @@ Memory IPv4Fragmentation::combineFragment(const void* _ip, sl_uint32 size, sl_bo
 	return Memory::null();
 }
 
-List<Memory> IPv4Fragmentation::makeFragments(const IPv4HeaderFormat* header, const void* ipContent, sl_uint32 sizeContent, sl_uint32 mtu)
+List<Memory> IPv4Fragmentation::makeFragments(const IPv4Packet* header, const void* ipContent, sl_uint32 sizeContent, sl_uint32 mtu)
 {
 	sl_int32 id = Base::interlockedIncrement32(&m_currentIdentifier);
 	return makeFragments(header, (sl_uint16)id, ipContent, sizeContent, mtu);
 }
 
-List<Memory> IPv4Fragmentation::makeFragments(const IPv4HeaderFormat* header, sl_uint16 identifier, const void* ipContent, sl_uint32 sizeContent, sl_uint32 mtu)
+List<Memory> IPv4Fragmentation::makeFragments(const IPv4Packet* header, sl_uint16 identifier, const void* ipContent, sl_uint32 sizeContent, sl_uint32 mtu)
 {
 	List<Memory> ret;
 	sl_uint32 sizeHeader = header->getHeaderSize();
@@ -360,12 +653,12 @@ List<Memory> IPv4Fragmentation::makeFragments(const IPv4HeaderFormat* header, sl
 		if (mem.isEmpty()) {
 			return List<Memory>::null();
 		}
-		sl_uint8* buf = (sl_uint8*)(mem.getBuf());
+		sl_uint8* buf = (sl_uint8*)(mem.getData());
 		Base::copyMemory(buf, header, sizeHeader);
 		Base::copyMemory(buf + sizeHeader, data + offset, n);
-		IPv4HeaderFormat* h = (IPv4HeaderFormat*)buf;
+		IPv4Packet* h = (IPv4Packet*)buf;
 		h->setIdentification(identifier);
-		h->setContentSize(n);
+		h->setTotalSize(sizeHeader + n);
 		h->setDF(sl_false);
 		h->setFragmentOffset(offset >> 3);
 		offset += sizeFragment;

@@ -97,8 +97,8 @@ public:
 			if (m_requestsRead.pop(&req)) {
 				if (req.isNotNull()) {
 					Base::zeroMemory(&m_overlappedRead, sizeof(m_overlappedRead));
-					m_bufRead.buf = (CHAR*)(req->data());
-					m_bufRead.len = req->size();
+					m_bufRead.buf = (CHAR*)(req->data);
+					m_bufRead.len = req->size;
 					m_flagsRead = 0;
 					DWORD dwRead = 0;
 					int ret = ::WSARecv((SOCKET)handle, &m_bufRead, 1, &dwRead, &m_flagsRead, &m_overlappedRead, NULL);
@@ -112,7 +112,7 @@ public:
 						if (dwErr == WSA_IO_PENDING) {
 							m_requestReading = req;
 						} else {
-							_onReceive(req.get(), 0, sl_true);
+							_onReceive(req.ptr, 0, sl_true);
 						}
 					}
 				}
@@ -123,8 +123,8 @@ public:
 			if (m_requestsWrite.pop(&req)) {
 				if (req.isNotNull()) {
 					Base::zeroMemory(&m_overlappedWrite, sizeof(m_overlappedWrite));
-					m_bufWrite.buf = (CHAR*)(req->data());
-					m_bufWrite.len = req->size();
+					m_bufWrite.buf = (CHAR*)(req->data);
+					m_bufWrite.len = req->size;
 					DWORD dwWrite = 0;
 					int ret = ::WSASend((SOCKET)handle, &m_bufWrite, 1, &dwWrite, 0, &m_overlappedWrite, NULL);
 					if (ret == 0) {
@@ -137,7 +137,7 @@ public:
 						if (dwErr == WSA_IO_PENDING) {
 							m_requestWriting = req;
 						} else {
-							_onSend(req.get(), 0, sl_true);
+							_onSend(req.ptr, 0, sl_true);
 						}
 					}
 				}
@@ -161,9 +161,9 @@ public:
 							SocketAddress aBind;
 							aBind.port = 0;
 							if (socket->isIPv6()) {
-								aBind.ip = IPv6Address::getAny();
+								aBind.ip = IPv6Address::zero();
 							} else {
-								aBind.ip = IPv4Address::getAny();
+								aBind.ip = IPv4Address::zero();
 							}
 							sl_uint32 nSaBind = aBind.getSystemSocketAddress(&saBind);
 							::bind(handle, (SOCKADDR*)&saBind, nSaBind);
@@ -209,7 +209,7 @@ public:
 			Ref<AsyncStreamRequest> req = m_requestReading;
 			m_requestReading.setNull();
 			if (req.isNotNull()) {
-				_onReceive(req.get(), dwSize, flagError);
+				_onReceive(req.ptr, dwSize, flagError);
 			}
 		} else if (pOverlapped == &m_overlappedWrite) {
 			if (dwSize == 0) {
@@ -218,7 +218,7 @@ public:
 			Ref<AsyncStreamRequest> req = m_requestWriting;
 			m_requestWriting.setNull();
 			if (req.isNotNull()) {
-				_onSend(req.get(), dwSize, flagError);
+				_onSend(req.ptr, dwSize, flagError);
 			}
 		} else if (pOverlapped == &m_overlappedConnect) {
 			if (flagError) {
@@ -234,7 +234,7 @@ public:
 Ref<AsyncTcpSocket> AsyncTcpSocket::create(const Ref<Socket>& socket, const Ref<AsyncIoLoop>& loop)
 {
 	Ref<_Win32AsyncTcpSocketInstance> ret = _Win32AsyncTcpSocketInstance::create(socket);
-	return AsyncTcpSocket::create(ret.get(), loop);
+	return AsyncTcpSocket::create(ret.ptr, loop);
 }
 
 
@@ -428,7 +428,7 @@ public:
 Ref<AsyncTcpServer> AsyncTcpServer::create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
 {
 	Ref<_Win32AsyncTcpServerInstance> ret = _Win32AsyncTcpServerInstance::create(socket, listener);
-	return AsyncTcpServer::create(ret.get(), loop, flagAutoStart);
+	return AsyncTcpServer::create(ret.ptr, loop, flagAutoStart);
 }
 
 
@@ -537,7 +537,7 @@ public:
 		while (Thread::isNotStoppingCurrent()) {
 			SendRequest request;
 			if (m_queueSendRequests.pop(&request)) {
-				socket->sendTo(request.addressTo, request.data.getBuf(), (sl_uint32)(request.data.size()));
+				socket->sendTo(request.addressTo, request.data.getData(), (sl_uint32)(request.data.getSize()));
 			} else {
 				break;
 			}
@@ -560,7 +560,7 @@ public:
 		if (!(socket->isOpened())) {
 			return;
 		}
-		void* buf = m_buffer.getBuf();
+		void* buf = m_buffer.getData();
 		sl_uint32 sizeBuf = (sl_uint32)(m_buffer.getSize());
 
 		Base::zeroMemory(&m_overlappedReceive, sizeof(m_overlappedReceive));
@@ -590,7 +590,7 @@ Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ref<Socket>& socket, const Ptr<
 	Memory buffer = Memory::create(packetSize);
 	if (buffer.isNotEmpty()) {
 		Ref<_Win32AsyncUdpSocketInstance> ret = _Win32AsyncUdpSocketInstance::create(socket, listener, buffer);
-		return AsyncUdpSocket::create(ret.get(), loop, flagAutoStart);
+		return AsyncUdpSocket::create(ret.ptr, loop, flagAutoStart);
 	}
 	return Ref<AsyncUdpSocket>::null();
 }

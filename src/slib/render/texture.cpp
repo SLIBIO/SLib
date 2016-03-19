@@ -1,16 +1,18 @@
 #include "../../../inc/slib/render/texture.h"
-#include "../../../inc/slib/render/engine.h"
 
+#include "../../../inc/slib/render/engine.h"
 #include "../../../inc/slib/graphics/image.h"
 
 SLIB_RENDER_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(Texture, RenderBaseObject)
+
 Texture::Texture()
 {
-	setMinFilter(textureFilterMode_Linear);
-	setMagFilter(textureFilterMode_Linear);
-	setWrapX(textureWrapMode_Clamp);
-	setWrapY(textureWrapMode_Clamp);
+	setMinFilter(TextureFilterMode::Linear);
+	setMagFilter(TextureFilterMode::Linear);
+	setWrapX(TextureWrapMode::Clamp);
+	setWrapY(TextureWrapMode::Clamp);
 	setFreeSourceOnUpdate(sl_false);
 }
 
@@ -55,7 +57,7 @@ Ref<Texture> Texture::loadFromMemory(const Memory& mem)
 	if (mem.isEmpty()) {
 		return Ref<Texture>::null();
 	}
-	return loadFromMemory(mem.getBuf(), mem.getSize());
+	return loadFromMemory(mem.getData(), mem.getSize());
 }
 
 Ref<Texture> Texture::loadFromFile(const String& filePath)
@@ -63,14 +65,14 @@ Ref<Texture> Texture::loadFromFile(const String& filePath)
 	return create(Image::loadFromFile(filePath));
 }
 
-Ref<Texture> Texture::loadFromResource(const String& path)
+Ref<Texture> Texture::loadFromAsset(const String& path)
 {
-	return create(Image::loadFromResource(path));
+	return create(Image::loadFromAsset(path));
 }
 
-void Texture::freeSource()
+Ref<Bitmap> Texture::getSource() const
 {
-	m_source.setNull();
+	return m_source;
 }
 
 sl_bool Texture::setSource(const Ref<Bitmap>& source)
@@ -84,6 +86,21 @@ sl_bool Texture::setSource(const Ref<Bitmap>& source)
 	m_source = source;
 	update();
 	return sl_true;
+}
+
+void Texture::freeSource()
+{
+	m_source.setNull();
+}
+
+sl_uint32 Texture::getWidth() const
+{
+	return m_width;
+}
+
+sl_uint32 Texture::getHeight() const
+{
+	return m_height;
 }
 
 void Texture::update(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)

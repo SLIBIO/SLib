@@ -5,7 +5,7 @@
 #include "../../../inc/slib/ui/platform.h"
 
 #include "../../../inc/slib/core/file.h"
-#include "../../../inc/slib/core/resource.h"
+#include "../../../inc/slib/core/asset.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -81,7 +81,7 @@ Ref<Drawable> UI::createDrawableFromImage(const Ref<Image>& image)
 Ref<Drawable> UI::loadDrawableFromMemory(const Memory& mem)
 {
 	if (mem.isNotEmpty()) {
-		return loadDrawableFromMemory(mem.getBuf(), mem.getSize());
+		return loadDrawableFromMemory(mem.getData(), mem.getSize());
 	}
 	return Ref<Drawable>::null();
 }
@@ -116,10 +116,10 @@ Ref<Bitmap> UI::createBitmapFromImage(const Ref<Image>& image)
 	return Ref<Bitmap>::null();
 }
 
-Ref<Drawable> UI::loadDrawableFromResource(const String& path)
+Ref<Drawable> UI::loadDrawableFromAsset(const String& path)
 {
 	Ref<Drawable> ret;
-	Memory mem = Resource::readAllBytes(path);
+	Memory mem = Assets::readAllBytes(path);
 	if (mem.isNotEmpty()) {
 		ret = loadDrawableFromMemory(mem);
 	}
@@ -129,7 +129,7 @@ Ref<Drawable> UI::loadDrawableFromResource(const String& path)
 Ref<Bitmap> UI::loadBitmapFromMemory(const Memory& mem)
 {
 	if (mem.isNotEmpty()) {
-		return loadBitmapFromMemory(mem.getBuf(), mem.getSize());
+		return loadBitmapFromMemory(mem.getData(), mem.getSize());
 	}
 	return Ref<Bitmap>::null();
 }
@@ -144,10 +144,10 @@ Ref<Bitmap> UI::loadBitmapFromFile(const String& filePath)
 	return ret;
 }
 
-Ref<Bitmap> UI::loadBitmapFromResource(const String& path)
+Ref<Bitmap> UI::loadBitmapFromAsset(const String& path)
 {
 	Ref<Bitmap> ret;
-	Memory mem = Resource::readAllBytes(path);
+	Memory mem = Assets::readAllBytes(path);
 	if (mem.isNotEmpty()) {
 		ret = loadBitmapFromMemory(mem);
 	}

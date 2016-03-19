@@ -1,9 +1,12 @@
 #include "../../../inc/slib/graphics/canvas.h"
+
 #include "../../../inc/slib/graphics/context.h"
 #include "../../../inc/slib/graphics/util.h"
 #include "../../../inc/slib/math/transform2d.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
+
+SLIB_DEFINE_OBJECT(Canvas, Object)
 
 Ref<GraphicsContext> Canvas::getGraphicsContext()
 {
@@ -102,7 +105,7 @@ void Canvas::drawLine(sl_real x1, sl_real y1, sl_real x2, sl_real y2, const Ref<
 void Canvas::drawLines(const List<Point>& _points, const Ref<Pen>& pen)
 {
 	ListLocker<Point> points(_points);
-	drawLines(points.data(), (sl_uint32)(points.getCount()), pen);
+	drawLines(points.data, (sl_uint32)(points.count), pen);
 }
 
 void Canvas::drawArc(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen)
@@ -188,7 +191,7 @@ void Canvas::fillEllipse(sl_real x, sl_real y, sl_real width, sl_real height, co
 void Canvas::drawPolygon(const List<Point>& _points, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode)
 {
 	ListLocker<Point> points(_points);
-	drawPolygon(points.data(), (sl_uint32)(points.getCount()), pen, brush, fillMode);
+	drawPolygon(points.data, (sl_uint32)(points.count), pen, brush, fillMode);
 }
 
 void Canvas::drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen)
@@ -199,7 +202,7 @@ void Canvas::drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<P
 void Canvas::drawPolygon(const List<Point>& _points, const Ref<Pen>& pen)
 {
 	ListLocker<Point> points(_points);
-	drawPolygon(points.data(), (sl_uint32)(points.getCount()), pen, Ref<Brush>::null());
+	drawPolygon(points.data, (sl_uint32)(points.count), pen, Ref<Brush>::null());
 }
 
 void Canvas::fillPolygon(const Point* points, sl_uint32 countPoints, const Ref<Brush>& brush)
@@ -210,7 +213,7 @@ void Canvas::fillPolygon(const Point* points, sl_uint32 countPoints, const Ref<B
 void Canvas::fillPolygon(const List<Point>& _points, const Ref<Brush>& brush)
 {
 	ListLocker<Point> points(_points);
-	drawPolygon(points.data(), (sl_uint32)(points.getCount()), Ref<Pen>::null(), brush);
+	drawPolygon(points.data, (sl_uint32)(points.count), Ref<Pen>::null(), brush);
 }
 
 void Canvas::drawPie(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Ref<Brush>& brush)
@@ -304,13 +307,13 @@ void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleMo
 		if (dw > 0 && dh > 0 && sw > 0 && sh > 0) {
 			Rectangle rectSrc;
 			Rectangle rectDraw;
-			if (scaleMode == scaleMode_Stretch) {
+			if (scaleMode == ScaleMode::Stretch) {
 				rectSrc.left = 0;
 				rectSrc.top = 0;
 				rectSrc.right = sw;
 				rectSrc.bottom = sh;
 				rectDraw = rectDst;
-			} else if (scaleMode == scaleMode_Contain) {
+			} else if (scaleMode == ScaleMode::Contain) {
 				sl_real fw = dw / sw;
 				sl_real fh = dh / sh;
 				sl_real tw, th;
@@ -330,7 +333,7 @@ void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleMo
 				rectDraw.top = pt.y;
 				rectDraw.right = rectDraw.left + tw;
 				rectDraw.bottom = rectDraw.top + th;
-			} else if (scaleMode == scaleMode_Cover) {
+			} else if (scaleMode == ScaleMode::Cover) {
 				sl_real fw = sw / dw;
 				sl_real fh = sh / dh;
 				sl_real tw, th;

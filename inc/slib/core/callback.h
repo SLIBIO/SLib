@@ -8,18 +8,21 @@
 
 SLIB_NAMESPACE_BEGIN
 
+
 class SLIB_EXPORT Runnable : public Object
 {
-	SLIB_DECLARE_OBJECT(Runnable, Object)
+	SLIB_DECLARE_OBJECT
 	
 public:
 	virtual void run() = 0;
+	
 };
 
 #define SLIB_CALLBACK(CALLBACK, ...) slib::_Runnable_createCallback(CALLBACK, ##__VA_ARGS__)
 #define SLIB_CALLBACK_CLASS(CLASS, CALLBACK, OBJECT, ...) slib::_Runnable_createClassCallback(slib::Ptr<CLASS>(OBJECT), &CLASS::CALLBACK, ##__VA_ARGS__)
 #define SLIB_CALLBACK_REF(CLASS, CALLBACK, OBJECT, ...) slib::_Runnable_createClassCallback(slib::Ptr<CLASS>(slib::Ref<CLASS>(OBJECT)), &CLASS::CALLBACK, ##__VA_ARGS__)
 #define SLIB_CALLBACK_WEAKREF(CLASS, CALLBACK, OBJECT, ...) slib::_Runnable_createClassCallback(slib::Ptr<CLASS>(slib::WeakRef<CLASS>(OBJECT)), &CLASS::CALLBACK, ##__VA_ARGS__)
+
 
 template <class CLASS>
 class SLIB_EXPORT _ClassCallbackRunnable : public Runnable

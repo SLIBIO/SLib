@@ -2,6 +2,8 @@
 
 SLIB_DB_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(DatabaseCursor, Object)
+
 Ref<Database> DatabaseCursor::getDatabase()
 {
 	return m_db;
@@ -130,6 +132,16 @@ Time DatabaseCursor::getTime(const String& name, const Time& defaultValue)
 		return getTime(index, defaultValue);
 	}
 	return defaultValue;
+}
+
+Time DatabaseCursor::getTime(sl_uint32 index)
+{
+	return getTime(index, Time::zero());
+}
+
+Time DatabaseCursor::getTime(const String& name)
+{
+	return getTime(name, Time::zero());
 }
 
 Memory DatabaseCursor::getBlob(const String& name)

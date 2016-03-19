@@ -36,7 +36,7 @@ public:
 		[handle setEnabled:(m_flagReadOnly ? NO : YES)];
 		Ref<FontInstance> fontInstance;
 		Ref<Font> font = m_font;
-		UIFont* hFont = UIPlatform::getUIFont(font.get(), fontInstance);
+		UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
@@ -58,7 +58,7 @@ public:
 		[handle setSelectable:TRUE];
 		Ref<FontInstance> fontInstance;
 		Ref<Font> font = m_font;
-		UIFont* hFont = UIPlatform::getUIFont(font.get(), fontInstance);
+		UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
@@ -66,10 +66,10 @@ public:
 	
 	static NSTextAlignment translateAlignment(Alignment _align)
 	{
-		sl_uint32 align = _align & alignHorizontalMask;
-		if (align == alignCenter) {
+		Alignment align = (Alignment)((int)_align & (int)Alignment::HorizontalMask);
+		if (align == Alignment::Center) {
 			return NSTextAlignmentCenter;
-		} else if (align == alignRight) {
+		} else if (align == Alignment::Right) {
 			return NSTextAlignmentRight;
 		}
 		return NSTextAlignmentLeft;
@@ -78,18 +78,18 @@ public:
 	static Alignment translateAlignmentReverse(NSTextAlignment align)
 	{
 		if (align == NSTextAlignmentCenter) {
-			return alignCenter;
+			return Alignment::Center;
 		} else if (align == NSTextAlignmentRight) {
-			return alignRight;
+			return Alignment::Right;
 		}
-		return alignLeft;
+		return Alignment::Left;
 	}
 	
 	static void onChangeTextField(iOS_ViewInstance* instance, UITextField* control)
 	{
 		Ref<View> _view = instance->getView();
-		if (EditView::checkInstance(_view)) {
-			_EditView* view = (_EditView*)(_view.get());
+		if (EditView::checkInstance(_view.ptr)) {
+			_EditView* view = (_EditView*)(_view.ptr);
 			String text = Apple::getStringFromNSString([control text]);
 			String textNew = view->dispatchChange(text);
 			if (text != textNew) {
@@ -102,8 +102,8 @@ public:
 	static void onChangeTextArea(iOS_ViewInstance* instance, UITextView* control)
 	{
 		Ref<View> _view = instance->getView();
-		if (EditView::checkInstance(_view)) {
-			_EditView* view = (_EditView*)(_view.get());
+		if (EditView::checkInstance(_view.ptr)) {
+			_EditView* view = (_EditView*)(_view.ptr);
 			String text = Apple::getStringFromNSString([control text]);
 			String textNew = view->dispatchChange(text);
 			if (text != textNew) {
@@ -379,14 +379,14 @@ void EditView::setFont(const Ref<Font>& font)
 		if ([handle isKindOfClass:[UITextField class]]) {
 			UITextField* tv = (UITextField*)handle;
 			Ref<FontInstance> fontInstance;
-			UIFont* hFont = UIPlatform::getUIFont(font.get(), fontInstance);
+			UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
 			if (hFont != nil) {
 				[tv setFont:hFont];
 			}
 		} else if ([handle isKindOfClass:[UITextView class]]) {
 			UITextView* tv = (UITextView*)handle;
 			Ref<FontInstance> fontInstance;
-			UIFont* hFont = UIPlatform::getUIFont(font.get(), fontInstance);
+			UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
 			if (hFont != nil) {
 				[tv setFont:hFont];
 			}
@@ -411,7 +411,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_EditView::onChangeTextField(instance.get(), self);
+		slib::_EditView::onChangeTextField(instance.ptr, self);
 	}
 }
 
@@ -441,7 +441,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_EditView::onChangeTextArea(instance.get(), self);
+		slib::_EditView::onChangeTextArea(instance.ptr, self);
 	}
 }
 @end

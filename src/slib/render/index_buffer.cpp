@@ -1,7 +1,10 @@
 #include "../../../inc/slib/render/index_buffer.h"
+
 #include "../../../inc/slib/render/engine.h"
 
 SLIB_RENDER_NAMESPACE_BEGIN
+
+SLIB_DEFINE_OBJECT(IndexBuffer, RenderBaseObject)
 
 IndexBuffer::IndexBuffer()
 {
@@ -32,7 +35,7 @@ sl_size IndexBuffer::getSize() const
 
 sl_uint8* IndexBuffer::getBuffer() const
 {
-	return (sl_uint8*)(m_mem.getBuf());
+	return (sl_uint8*)(m_mem.getData());
 }
 
 void IndexBuffer::update(sl_size offset, sl_size size)

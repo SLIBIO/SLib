@@ -16,10 +16,8 @@ public:
 	BigInt E; // public exponent
 
 public:
-	SLIB_INLINE sl_uint32 getLength() const
-	{
-		return N.getSizeInBytes();
-	}
+	sl_uint32 getLength() const;
+	
 };
 
 class SLIB_EXPORT RSAPrivateKey
@@ -33,39 +31,13 @@ public:
 	BigInt DP; // exponent1, D mod (P-1)
 	BigInt DQ; // exponent2, D mod (Q-1)
 	BigInt IQ; // Q^-1 mod P
-
-	sl_bool flagUseOnlyD; // Use N and D only for decryption
-
-public:
-	SLIB_INLINE RSAPrivateKey()
-	{
-		flagUseOnlyD = sl_false;
-	}
-
-	SLIB_INLINE RSAPrivateKey(const RSAPrivateKey& other)
-		: N(other.N), E(other.E), D(other.D), P(other.P), Q(other.Q), DP(other.DP), DQ(other.DQ), IQ(other.IQ), flagUseOnlyD(other.flagUseOnlyD)
-	{
-	}
+	
+	// Use N and D only for decryption
+	sl_bool flagUseOnlyD = sl_false;
 
 public:
-	SLIB_INLINE RSAPrivateKey& operator=(const RSAPrivateKey& other)
-	{
-		N = other.N;
-		E = other.E;
-		D = other.D;
-		P = other.P;
-		Q = other.Q;
-		DP = other.DP;
-		DQ = other.DQ;
-		IQ = other.IQ;
-		flagUseOnlyD = other.flagUseOnlyD;
-		return *this;
-	}
-
-	SLIB_INLINE sl_uint32 getLength() const
-	{
-		return N.getSizeInBytes();
-	}
+	sl_uint32 getLength() const;
+	
 };
 
 class SLIB_EXPORT RSA
@@ -98,6 +70,21 @@ public:
 	static sl_uint32 decryptPrivate_oaep_v21(const RSAPrivateKey& key, const Ref<CryptoHash>& hash, const void* input, void* output, sl_uint32 sizeOutputBuffer, const void* label = 0, sl_uint32 sizeLabel = 0);
 
 };
+
+SLIB_CRYPTO_NAMESPACE_END
+
+
+SLIB_CRYPTO_NAMESPACE_BEGIN
+
+SLIB_INLINE sl_uint32 RSAPublicKey::getLength() const
+{
+	return N.getMostSignificantBytes();
+}
+
+SLIB_INLINE sl_uint32 RSAPrivateKey::getLength() const
+{
+	return N.getMostSignificantBytes();
+}
 
 SLIB_CRYPTO_NAMESPACE_END
 

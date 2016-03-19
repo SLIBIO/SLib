@@ -15,5 +15,8 @@ void VideoCapture::onCaptureVideoFrame(VideoCaptureFrame* frame)
 	}
 }
 
+
+SLIB_DEFINE_OBJECT(VideoCapture, Object)
+
 SLIB_MEDIA_NAMESPACE_END
 

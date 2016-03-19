@@ -17,6 +17,9 @@ MySQL_Param::MySQL_Param()
 	flagMultipleStatements = sl_true;
 }
 
+
+SLIB_DEFINE_OBJECT(MySQL_Database, Database)
+
 class _MySQL_Database_Lib
 {
 public:
@@ -56,7 +59,7 @@ void MySQL_Database::initThread()
 			::mysql_thread_init();
 			ref = new _MySQL_Database_ThreadHandler;
 			if (ref.isNotNull()) {
-				thread->attachObject("MYSQL", ref.get());
+				thread->attachObject("MYSQL", ref.ptr);
 			}
 		}
 	} else {
@@ -101,7 +104,7 @@ public:
 				flags |= CLIENT_MULTI_STATEMENTS;
 			}
 
-			if (::mysql_real_connect(mysql, host.getBuf(), user.getBuf(), password.getBuf(), db.getBuf(), param.port, NULL, flags)) {
+			if (::mysql_real_connect(mysql, host.getData(), user.getData(), password.getData(), db.getData(), param.port, NULL, flags)) {
 
 				::mysql_set_character_set(mysql, "utf8");
 				::mysql_autocommit(mysql, 1);
@@ -139,7 +142,7 @@ public:
 	{
 		initThread();
 		ObjectLocker lock(this);
-		if (0 == ::mysql_real_query(m_mysql, sql.getBuf(), sql.getLength())) {
+		if (0 == ::mysql_real_query(m_mysql, sql.getData(), sql.getLength())) {
 			if (pOutAffectedRowsCount) {
 				*pOutAffectedRowsCount = ::mysql_affected_rows(m_mysql);
 			}
@@ -174,7 +177,7 @@ public:
 				m_mapColumnIndexes.put_NoLock(m_fields[i].name, i);
 			}
 			m_nColumnNames = (sl_uint32)(m_listColumnNames.getCount());
-			m_columnNames = m_listColumnNames.data();
+			m_columnNames = m_listColumnNames.getData();
 
 			m_row = NULL;
 			m_lengths = NULL;
@@ -275,7 +278,7 @@ public:
 		initThread();
 		ObjectLocker lock(this);
 		Ref<DatabaseCursor> ret;
-		if (0 == mysql_real_query(m_mysql, sql.getBuf(), sql.getLength())) {
+		if (0 == mysql_real_query(m_mysql, sql.getData(), sql.getLength())) {
 			MYSQL_RES* res = ::mysql_use_result(m_mysql);
 			if (res) {
 				ret = new _DatabaseCursor(this, res);
@@ -367,7 +370,7 @@ public:
 				m_mapColumnIndexes.put_NoLock(m_fields[i].name, i);
 			}
 			m_nColumnNames = (sl_uint32)(m_listColumnNames.getCount());
-			m_columnNames = m_listColumnNames.data();
+			m_columnNames = m_listColumnNames.getData();
 
 			db->lock();
 		}
@@ -416,7 +419,7 @@ public:
 			String8 s = String8::allocate((sl_uint32)(m_fds[index].length));
 			if (s.isNotEmpty()) {
 				MYSQL_BIND bind = m_bind[index];
-				bind.buffer = s.getBuf();
+				bind.buffer = s.getData();
 				bind.buffer_length = s.getLength();
 				if (0 == mysql_stmt_fetch_column(m_statement, &bind, index, 0)) {
 					return s;
@@ -430,7 +433,7 @@ public:
 			Memory mem = Memory::create(m_fds[index].length);
 			if (mem.isNotEmpty()) {
 				MYSQL_BIND bind = m_bind[index];
-				bind.buffer = mem.getBuf();
+				bind.buffer = mem.getData();
 				bind.buffer_length = (sl_uint32)(mem.getSize());
 				if (0 == mysql_stmt_fetch_column(m_statement, &bind, index, 0)) {
 					return mem;
@@ -855,11 +858,11 @@ public:
 
 		sl_bool prepare()
 		{
-			ObjectLocker lock(m_db.get());
+			ObjectLocker lock(m_db.ptr);
 			close();
 			MYSQL_STMT* statement = ::mysql_stmt_init(m_mysql);
 			if (statement) {
-				if (0 == ::mysql_stmt_prepare(statement, m_sql.getBuf(), m_sql.getLength())) {
+				if (0 == ::mysql_stmt_prepare(statement, m_sql.getData(), m_sql.getLength())) {
 					m_statement = statement;
 					return sl_true;
 				}
@@ -870,7 +873,7 @@ public:
 
 		void close()
 		{
-			ObjectLocker lock(m_db.get());
+			ObjectLocker lock(m_db.ptr);
 			if (m_statement) {
 				::mysql_stmt_close(m_statement);
 				m_statement = NULL;
@@ -891,49 +894,49 @@ public:
 							Base::zeroMemory(bind + i, sizeof(MYSQL_BIND));
 							const Variant& var = params[i];
 							switch (var.getType()) {
-							case variantType_Null:
+							case VariantType::Null:
 								bind[i].buffer_type = MYSQL_TYPE_NULL;
 								break;
-							case variantType_Boolean:
-							case variantType_Uint32:
+							case VariantType::Boolean:
+							case VariantType::Uint32:
 								bind[i].buffer_type = MYSQL_TYPE_LONG;
 								bind[i].buffer_length = 4;
 								bind[i].is_unsigned = 1;
 								bind[i].buffer = &(fds[i].unum32);
 								fds[i].unum32 = var.getUint32();
 								break;
-							case variantType_Int32:
+							case VariantType::Int32:
 								bind[i].buffer_type = MYSQL_TYPE_LONG;
 								bind[i].buffer_length = 4;
 								bind[i].buffer = &(fds[i].num32);
 								fds[i].num32 = var.getInt32();
 								break;
-							case variantType_Uint64:
+							case VariantType::Uint64:
 								bind[i].buffer_type = MYSQL_TYPE_LONGLONG;
 								bind[i].buffer_length = 8;
 								bind[i].is_unsigned = 1;
 								bind[i].buffer = &(fds[i].unum64);
 								fds[i].unum64 = var.getUint64();
 								break;
-							case variantType_Int64:
+							case VariantType::Int64:
 								bind[i].buffer_type = MYSQL_TYPE_LONGLONG;
 								bind[i].buffer_length = 8;
 								bind[i].buffer = &(fds[i].num64);
 								fds[i].num64 = var.getInt64();
 								break;
-							case variantType_Float:
+							case VariantType::Float:
 								bind[i].buffer_type = MYSQL_TYPE_FLOAT;
 								bind[i].buffer_length = 4;
 								bind[i].buffer = &(fds[i].flt);
 								fds[i].flt = var.getFloat();
 								break;
-							case variantType_Double:
+							case VariantType::Double:
 								bind[i].buffer_type = MYSQL_TYPE_DOUBLE;
 								bind[i].buffer_length = 8;
 								bind[i].buffer = &(fds[i].dbl);
 								fds[i].dbl = var.getDouble();
 								break;
-							case variantType_Time:
+							case VariantType::Time:
 								bind[i].buffer_type = MYSQL_TYPE_DATETIME;
 								bind[i].buffer_length = sizeof(MYSQL_TIME);
 								bind[i].buffer = &(fds[i].time);
@@ -944,14 +947,14 @@ public:
 									blobs[i] = var.getMemory();
 									bind[i].buffer_type = MYSQL_TYPE_BLOB;
 									bind[i].buffer_length = (sl_uint32)(blobs[i].getSize());
-									bind[i].buffer = blobs[i].getBuf();
+									bind[i].buffer = blobs[i].getData();
 									bind[i].length = &(fds[i].length);
 									fds[i].length = bind[i].buffer_length;
 								} else {
 									strings[i] = var.getString();
 									bind[i].buffer_type = MYSQL_TYPE_STRING;
 									bind[i].buffer_length = (sl_uint32)(strings[i].getLength());
-									bind[i].buffer = strings[i].getBuf();
+									bind[i].buffer = strings[i].getData();
 									bind[i].length = &(fds[i].length);
 									fds[i].length = bind[i].buffer_length;
 								}
@@ -997,7 +1000,7 @@ public:
 		sl_bool execute(const Variant* params, sl_uint32 nParams, sl_uint64* pOutAffectedRowsCount)
 		{
 			initThread();
-			ObjectLocker lock(m_db.get());
+			ObjectLocker lock(m_db.ptr);
 			if (_execute(params, nParams)) {
 				if (pOutAffectedRowsCount) {
 					*pOutAffectedRowsCount = ::mysql_stmt_affected_rows(m_statement);
@@ -1010,7 +1013,7 @@ public:
 		Ref<DatabaseCursor> query(const Variant* params, sl_uint32 nParams)
 		{
 			initThread();
-			ObjectLocker lock(m_db.get());
+			ObjectLocker lock(m_db.ptr);
 			Ref<DatabaseCursor> ret;
 			if (_execute(params, nParams)) {
 				MYSQL_RES* resultMetadata = ::mysql_stmt_result_metadata(m_statement);
@@ -1093,7 +1096,7 @@ public:
 								}
 							}
 							if (0 == ::mysql_stmt_bind_result(m_statement, bind)) {
-								ret = new _DatabaseStatementCursor(m_db.get(), this, m_statement, resultMetadata, bind, fds);
+								ret = new _DatabaseStatementCursor(m_db.ptr, this, m_statement, resultMetadata, bind, fds);
 								if (ret.isNotNull()) {
 									return ret;
 								}

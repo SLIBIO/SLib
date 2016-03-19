@@ -11,7 +11,8 @@ SLIB_RENDER_NAMESPACE_BEGIN
 
 class SLIB_EXPORT IndexBuffer : public RenderBaseObject
 {
-	SLIB_DECLARE_OBJECT(IndexBuffer, RenderBaseObject)
+	SLIB_DECLARE_OBJECT
+	
 protected:
 	IndexBuffer();
 

@@ -13,19 +13,22 @@
 
 SLIB_NAMESPACE_BEGIN
 
-enum ThreadPriority {
-	threadPriority_Lowest = -2,
-	threadPriority_BelowNormal = -1,
-	threadPriority_Normal = 0,
-	threadPriority_AboveNormal = 1,
-	threadPriority_Highest = 2
+enum class ThreadPriority
+{
+	Lowest = -2,
+	BelowNormal = -1,
+	Normal = 0,
+	AboveNormal = 1,
+	Highest = 2
 };
 
 class SLIB_EXPORT Thread : public Object
 {
-	SLIB_DECLARE_OBJECT(Thread, Object)
+	SLIB_DECLARE_OBJECT
+	
 protected:
 	Thread();
+	
 	~Thread();
 
 public:
@@ -50,59 +53,42 @@ public:
 	
 	void clearWaitingEvent();
 
-	void setPriority(ThreadPriority priority);
-	
 	ThreadPriority getPriority();
 
-public:
-	SLIB_INLINE sl_bool isRunning()
-	{
-		return m_flagRunning;
-	}
+	void setPriority(ThreadPriority priority);
+
+	sl_bool isRunning();
 	
-	SLIB_INLINE sl_bool isNotRunning()
-	{
-		return !m_flagRunning;
-	}
+	sl_bool isNotRunning();
 	
+	sl_bool isStopping();
 	
-	SLIB_INLINE sl_bool isStopping()
-	{
-		return m_flagRequestStop;
-	}
+	sl_bool isNotStopping();
 	
-	SLIB_INLINE sl_bool isNotStopping()
-	{
-		return !m_flagRequestStop;
-	}
+	sl_bool isWaiting();
 	
+	sl_bool isNotWaiting();
 	
-	SLIB_INLINE sl_bool isWaiting()
-	{
-		return m_eventWaiting.isNotNull();
-	}
+	const Ref<Runnable>& getRunnable();
 	
-	SLIB_INLINE sl_bool isNotWaiting()
-	{
-		return m_eventWaiting.isNull();
-	}
-	
-	
-	SLIB_INLINE const Ref<Runnable>& getRunnable()
-	{
-		return m_runnable;
-	}
-	
+	static sl_bool sleep(sl_uint32 ms);
 	
 	sl_bool isCurrentThread();
 	
+	static Ref<Thread> getCurrent();
+	
+	static sl_bool isStoppingCurrent();
+	
+	static sl_bool isNotStoppingCurrent();
+	
+	static sl_uint64 getCurrentThreadUniqueId();
 
+	
 	Variant getProperty(const String& name);
 	
 	void setProperty(const String& name, const Variant& value);
 	
 	void clearProperty(const String& name);
-
 	
 	// attached objects are removed when the thread is exited
 	Ref<Referable> getAttachedObject(const String& name);
@@ -111,18 +97,6 @@ public:
 	
 	void removeAttachedObject(const String& name);
 	
-public:
-	static Ref<Thread> getCurrent();
-	
-	static sl_bool sleep(sl_uint32 ms);
-	
-	static sl_bool isStoppingCurrent();
-	
-	static sl_bool isNotStoppingCurrent();
-	
-	static sl_uint64 getCurrentThreadUniqueId();
-	
-
 private:
 	void* m_handle;
 	ThreadPriority m_priority;

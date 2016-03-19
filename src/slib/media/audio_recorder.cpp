@@ -16,14 +16,17 @@ AudioRecorderParam::AudioRecorderParam()
 	flagAutoStart = sl_true;
 }
 
+
+SLIB_DEFINE_OBJECT(AudioRecorder, Object)
+
 sl_bool AudioRecorder::read(const AudioData& audioOut)
 {
 	AudioFormat format;
 	sl_uint32 nChannels = m_nChannels;
 	if (nChannels == 1) {
-		format = audioFormat_Int16_Mono;
+		format = AudioFormat::Int16_Mono;
 	} else {
-		format = audioFormat_Int16_Stereo;
+		format = AudioFormat::Int16_Stereo;
 	}
 	if (audioOut.format == format && (((sl_size)(audioOut.data)) & 1) == 0) {
 		return m_queue.get((sl_int16*)(audioOut.data), nChannels * audioOut.count);
@@ -35,7 +38,7 @@ sl_bool AudioRecorder::read(const AudioData& audioOut)
 		temp.count = 1024;
 		sl_size n = audioOut.count;
 		ObjectLocker lock(&m_queue);
-		if (n > m_queue.count()) {
+		if (n > m_queue.getCount()) {
 			while (n > 0) {
 				sl_size m = n;
 				if (m > 1024) {
@@ -54,7 +57,7 @@ sl_bool AudioRecorder::read(const AudioData& audioOut)
 Array<sl_int16> AudioRecorder::_getProcessData(sl_size count)
 {
 	Array<sl_int16> data = m_processData;
-	if (data.count() >= count) {
+	if (data.getCount() >= count) {
 		return data;
 	} else {
 		data = Array<sl_int16>::create(count);
@@ -71,9 +74,9 @@ void AudioRecorder::_processFrame(sl_int16* s, sl_size count)
 		AudioFormat format;
 		sl_uint32 nChannels = m_nChannels;
 		if (nChannels == 1) {
-			format = audioFormat_Int16_Mono;
+			format = AudioFormat::Int16_Mono;
 		} else {
-			format = audioFormat_Int16_Stereo;
+			format = AudioFormat::Int16_Stereo;
 		}
 		audio.format = format;
 		audio.count = count / nChannels;

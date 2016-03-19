@@ -10,93 +10,72 @@ SLIB_NAMESPACE_BEGIN
 
 class SLIB_EXPORT Object : public Referable
 {
-	SLIB_DECLARE_ROOT_OBJECT(Object)
+	SLIB_DECLARE_OBJECT
+	
 private:
 	Mutex m_locker;
 
 public:
-	SLIB_INLINE Mutex* getLocker() const
-	{
-		return (Mutex*)(&m_locker);
-	}
+	Mutex* getLocker() const;
+	
+	void lock() const;
 
-	SLIB_INLINE void lock() const
-	{
-		m_locker.lock();
-	}
+	void unlock() const;
 
-	SLIB_INLINE void unlock() const
-	{
-		m_locker.unlock();
-	}
-
-	SLIB_INLINE sl_bool tryLock() const
-	{
-		return m_locker.tryLock();
-	}
+	sl_bool tryLock() const;
 
 };
 
 class SLIB_EXPORT ObjectLocker : public MutexLocker
 {
 public:
-	SLIB_INLINE ObjectLocker()
-	{
-	}
+	ObjectLocker();
 	
-	SLIB_INLINE ObjectLocker(const Object* object) : MutexLocker(object ? object->getLocker(): sl_null)
-	{
-	}
+	ObjectLocker(const Object* object);
 
-	SLIB_INLINE ObjectLocker(const Object* object1, const Object* object2) : MutexLocker(object1 ? object1->getLocker() : sl_null, object2 ? object2->getLocker() : sl_null)
-	{
-	}
+	ObjectLocker(const Object* object1, const Object* object2);
 	
 public:
-	SLIB_INLINE void lock(const Object* object)
-	{
-		if (object) {
-			MutexLocker::lock(object->getLocker());
-		}
-	}
+	void lock(const Object* object);
 	
-	void lock(const Object* object1, const Object* object2)
-	{
-		if (object1) {
-			if (object2) {
-				MutexLocker::lock(object1->getLocker(), object2->getLocker());
-			} else {
-				MutexLocker::lock(object1->getLocker());
-			}
-		} else {
-			if (object2) {
-				MutexLocker::lock(object2->getLocker());
-			}
-		}
-	}
-
+	void lock(const Object* object1, const Object* object2);
+	
 };
 
+SLIB_NAMESPACE_END
+
 #if defined(SLIB_PLATFORM_IS_WIN32)
-template <class TYPE>
+
+SLIB_NAMESPACE_BEGIN
+
+template <class T>
 class SafeStaticDestructor
 {
 public:
-	TYPE* object;
+	T* object;
 	sl_bool flagFreed;
 	
 public:
-	SLIB_INLINE SafeStaticDestructor(TYPE* p) : flagFreed(sl_false)
-	{
-		object = p;
-	}
+	SafeStaticDestructor(T* p);
 	
-	SLIB_INLINE ~SafeStaticDestructor()
-	{
-		flagFreed = sl_true;
-		object->~TYPE();
-	}
+	~SafeStaticDestructor();
+	
 };
+
+template <class T>
+SLIB_INLINE SafeStaticDestructor<T>::SafeStaticDestructor(T* p) : flagFreed(sl_false)
+{
+	object = p;
+}
+
+template <class T>
+SLIB_INLINE SafeStaticDestructor<T>::~SafeStaticDestructor()
+{
+	flagFreed = sl_true;
+	object->~T();
+}
+
+SLIB_NAMESPACE_END
 
 #define SLIB_SAFE_STATIC_DESTRUCTOR(TYPE, NAME) \
 	static slib::SafeStaticDestructor<TYPE> _static_destructor_instance_##NAME(&NAME);
@@ -106,8 +85,6 @@ public:
 #define SLIB_SAFE_STATIC_DESTRUCTOR(TYPE, NAME)
 
 #endif
-
-SLIB_NAMESPACE_END
 
 #define SLIB_SAFE_STATIC(TYPE, NAME, ...) \
 	static sl_uint8 _static_safemem_##NAME[sizeof(TYPE)]; \
@@ -220,3 +197,4 @@ public: \
 
 
 #endif
+

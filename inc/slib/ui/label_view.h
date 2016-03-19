@@ -11,7 +11,8 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class SLIB_EXPORT LabelView : public View
 {
-	SLIB_DECLARE_OBJECT(LabelView, View)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	LabelView();
 	

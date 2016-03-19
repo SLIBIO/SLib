@@ -3,67 +3,78 @@
 
 #include "definition.h"
 
-#include "base.h"
 #include "memory.h"
 #include "algorithm.h"
 #include "list.h"
+#include "map.h"
 #include "queue.h"
-
-#define SLIB_STR_MAX_LEN 0x10000000
-
-#define SLIB_CHAR_IS_ALPHA(c) (((c) >= 'A' && (c) <= 'Z') || ((c) >= 'a' && (c) <= 'z'))
-#define SLIB_CHAR_IS_ALPHA_UPPER(c) ((c) >= 'A' && (c) <= 'Z')
-#define SLIB_CHAR_IS_ALPHA_LOWER(c) ((c) >= 'a' && (c) <= 'z')
-#define SLIB_CHAR_IS_DIGIT(c) ((c) >= '0' && (c) <= '9')
-#define SLIB_CHAR_IS_ALNUM(c) (((c) >= '0' && (c) <= '9') || ((c) >= 'A' && (c) <= 'Z') || ((c) >= 'a' && (c) <= 'z'))
-#define SLIB_CHAR_IS_HEX(c) (((c) >= '0' && (c) <= '9') || ((c) >= 'A' && (c) <= 'F') || ((c) >= 'a' && (c) <= 'f'))
-
-#define SLIB_CHAR_DIGIT_TO_INT(c) (((c) >= '0' && (c) <= '9') ? ((c) - '0') : 10)
-#define SLIB_CHAR_HEX_TO_INT(c) (((c) >= '0' && (c) <= '9') ? ((c) - '0') : (((c) >= 'A' && (c) <= 'F') ? ((c) -  55) : ((c) >= 'a' && (c) <= 'f') ? ((c) -  87) : 16))
-
-#define SLIB_STR_PREF(buf) ((sl_reg*)(((char*)buf)-16))
-#define SLIB_STR_PHASH(buf) ((sl_uint32*)(((char*)buf)-8))
-#define SLIB_STR_PLEN(buf) ((sl_uint32*)(((char*)buf)-4))
-#define SLIB_STR_HEADER_LEN 16
-
-#define SLIB_STATIC_STRING8(name, str) \
-	SLIB_ALIGN(static char _static_string_buf_##name[], 8) = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0" str; \
-	static void* _static_string_container_##name = ((char*)_static_string_buf_##name) + SLIB_STR_HEADER_LEN; \
-	slib::String8::_initStaticMemory(_static_string_container_##name); \
-	slib::String8& name = *((slib::String8*)((void*)(&_static_string_container_##name)));
-
-#if defined(SLIB_USE_UNICODE32)
-#define SLIB_STATIC_STRING16(name, str) \
-	SLIB_SAFE_STATIC(slib::String16, name, SLIB_UNICODE(str));
-#else
-#define SLIB_STATIC_STRING16(name, str) \
-	SLIB_ALIGN(static wchar_t _static_string_buf_##name[], 8) = L"\0\0\0\0\0\0\0\0" L##str; \
-	static void* _static_string_container_##name = ((char*)_static_string_buf_##name) + SLIB_STR_HEADER_LEN; \
-	slib::String16::_initStaticMemory(_static_string_container_##name); \
-	slib::String16& name = *((slib::String16*)((void*)(&_static_string_container_##name)));
-#endif
-
-#define SLIB_STATIC_STRING8_NULL(name) \
-	static _String_Const _static_string_null_##name = {_String_Null.data, 0}; \
-	slib::String8& name = *((slib::String8*)((void*)(&_static_string_null_##name)));
-
-#define SLIB_STATIC_STRING16_NULL(name) \
-	static _String_Const _static_string_null_##name = {_String_Null.data, 0}; \
-	slib::String16& name = *((slib::String16*)((void*)(&_static_string_null_##name)));
-
-#define SLIB_STATIC_STRING SLIB_STATIC_STRING8
-
-#define SLIB_STATIC_STRING_NULL SLIB_STATIC_STRING8_NULL
 
 SLIB_NAMESPACE_BEGIN
 
-struct _String_Const
+#define SLIB_STR_MAX_LEN 0x10000000
+
+class SLIB_EXPORT StringData
 {
-	void* data;
+public:
+	union {
+		const sl_char8* sz8;
+		const sl_char16* sz16;
+		const sl_char32* sz32;
+	};
+	sl_uint32 len;
+	Memory mem;
+};
+
+class SLIB_EXPORT StringContainer8
+{
+public:
+	sl_char8* sz;
+	sl_uint32 len;
+	sl_uint32 hash;
+	sl_reg ref;
+	
+public:
+	sl_reg increaseReference();
+	
+	sl_reg decreaseReference();
+	
+};
+
+class SLIB_EXPORT StringContainer16
+{
+public:
+	union {
+		sl_char16* sz;
+		wchar_t* szDebug;
+	};
+	sl_uint32 len;
+	sl_uint32 hash;
+	sl_reg ref;
+	
+public:
+	sl_reg increaseReference();
+	
+	sl_reg decreaseReference();
+	
+};
+
+struct _String8_Const
+{
+	StringContainer8* container;
 	sl_int32 lock;
 };
-extern const _String_Const _String_Null;
-extern const _String_Const _String_Empty;
+
+extern const _String8_Const _String8_Null;
+extern const _String8_Const _String8_Empty;
+
+struct _String16_Const
+{
+	StringContainer16* container;
+	sl_int32 lock;
+};
+
+extern const _String16_Const _String16_Null;
+extern const _String16_Const _String16_Empty;
 
 extern const char* _StringConv_radixPatternUpper;
 extern const char* _StringConv_radixPatternLower;
@@ -75,307 +86,127 @@ class String16;
 class SafeString8;
 class SafeString16;
 
-struct SLIB_EXPORT StringData
-{
-	union {
-		const sl_char8* sz8;
-		const sl_char16* sz16;
-		const sl_char32* sz32;
-	};
-	sl_uint32 len;
-	Memory mem;
-};
-
-struct SLIB_EXPORT StringContainer
-{
-	sl_char8 data[1];
-};
-
 /** auto-referencing object **/
 class SLIB_EXPORT String8
 {
 private:
-	// String(Information & Data) storage
-	sl_char8* m_data;
-
+	StringContainer8* m_container;
+	
+private:
+	String8(StringContainer8* container);
+	
 public:
-	SLIB_INLINE String8()
-	{
-		m_data = (sl_char8*)(_String_Null.data);
-	}
+	String8();
 	
-	SLIB_INLINE String8(String8&& src)
-	{
-		m_data = src.m_data;
-		src.m_data = (sl_char8*)(_String_Null.data);
-	}
+	String8(String8&& src);
 	
-	SLIB_INLINE String8(const String8& src)
-	{
-		sl_char8* data = src.m_data;
-		_increaseReference(data);
-		m_data = data;
-	}
+	String8(SafeString8&& _src);
 	
-	SLIB_INLINE String8(SafeString8&& _src)
-	{
-		String8& src = *((String8*)((void*)(&_src)));
-		m_data = src.m_data;
-		src.m_data = (sl_char8*)(_String_Null.data);
-	}
+	String8(const String8& src);
 	
 	String8(const SafeString8& src);
 	
 	String8(const String16& src);
 	
 	String8(const SafeString16& src);
-	
 
-	SLIB_INLINE ~String8()
-	{
-		_decreaseReference(m_data);
-	}
-	
-private:
-	SLIB_INLINE String8(StringContainer* container)
-	{
-		m_data = (sl_char8*)((void*)container);
-	}
+	~String8();
 	
 public:
 	// From a single charactor
-	SLIB_INLINE String8(sl_char8 ch, sl_uint32 nRepeatCount = 1)
-	{
-		m_data = _create(ch, nRepeatCount);
-	}
+	String8(sl_char8 ch, sl_uint32 nRepeatCount);
 	
 	// From an utf-8 string
-	SLIB_INLINE String8(const sl_char8* strUtf8)
-	{
-		m_data = _create(strUtf8);
-	}
+	String8(const sl_char8* strUtf8);
 	
 	// From an utf-8 string
-	SLIB_INLINE String8(const sl_char8* strUtf8, sl_int32 length)
-	{
-		m_data = _create(strUtf8, length);
-	}
+	String8(const sl_char8* strUtf8, sl_int32 length);
 	
 	// From an utf-16 string
-	SLIB_INLINE String8(const sl_char16* strUtf16)
-	{
-		m_data = _create(strUtf16);
-	}
+	String8(const sl_char16* strUtf16);
 	
 	// From an utf-16 string
-	SLIB_INLINE String8(const sl_char16* strUtf16, sl_int32 length)
-	{
-		m_data = _create(strUtf16, length);
-	}
+	String8(const sl_char16* strUtf16, sl_int32 length);
 	
 	// From an utf-32 string
-	SLIB_INLINE String8(const sl_char32* strUtf32)
-	{
-		m_data = _create(strUtf32);
-	}
+	String8(const sl_char32* strUtf32);
 	
 	// From an utf-32 string
-	SLIB_INLINE String8(const sl_char32* strUtf32, sl_int32 length)
-	{
-		m_data = _create(strUtf32, length);
-	}
+	String8(const sl_char32* strUtf32, sl_int32 length);
 
 public:
-	// Returns a null string
-	SLIB_INLINE static const String8& null()
-	{
-		return *((String8*)((void*)&_String_Null));
-	}
-	
-	// Returns an empty string
-	SLIB_INLINE static const String8& getEmpty()
-	{
-		return *((String8*)((void*)&_String_Empty));
-	}
-	
 	// create a string of 'len' charactors
-	SLIB_INLINE static String8 allocate(sl_uint32 len)
-	{
-		return (StringContainer*)(_alloc(len));
-	}
+	static String8 allocate(sl_uint32 len);
+	
+	static String8 fromStatic(const sl_char8* sz8, sl_int32 len = -1);
 
-	SLIB_INLINE static String8 fromUtf8(const void* utf8, sl_int32 len = -1)
-	{
-		return String8((const sl_char8*)utf8, len);
-	}
+	static String8 fromUtf8(const void* utf8, sl_int32 len = -1);
 	
-	SLIB_INLINE static String8 fromUtf8(const Memory& mem)
-	{
-		return fromUtf8(mem.getBuf(), (sl_int32)(mem.getSize()));
-	}
+	static String8 fromUtf8(const Memory& mem);
 	
-	SLIB_INLINE static String8 fromUtf16(const void* utf16, sl_int32 len = -1)
-	{
-		return String8((const sl_char16*)utf16, len);
-	}
+	static String8 fromUtf16(const void* utf16, sl_int32 len = -1);
 	
-	SLIB_INLINE static String8 fromUtf16(const Memory& mem)
-	{
-		return fromUtf16(mem.getBuf(), (sl_int32)(mem.getSize()));
-	}
+	static String8 fromUtf16(const Memory& mem);
 	
-	SLIB_INLINE static String8 fromUtf32(const void* utf32, sl_int32 len = -1)
-	{
-		return String8((const sl_char32*)utf32, len);
-	}
+	static String8 fromUtf32(const void* utf32, sl_int32 len = -1);
 	
-	SLIB_INLINE static String8 fromUtf32(const Memory& mem)
-	{
-		return fromUtf32(mem.getBuf(), (sl_int32)(mem.getSize()));
-	}
+	static String8 fromUtf32(const Memory& mem);
 
 	static String8 fromUtf16BE(const void* utf16, sl_int32 len = -1);
 
-	SLIB_INLINE static String8 fromUtf16BE(const Memory& mem)
-	{
-		return fromUtf16BE(mem.getBuf(), (sl_int32)(mem.getSize()));
-	}
-
+	static String8 fromUtf16BE(const Memory& mem);
+	
 	static String8 fromUtf16LE(const void* utf16, sl_int32 len = -1);
 
-	SLIB_INLINE static String8 fromUtf16LE(const Memory& mem)
-	{
-		return fromUtf16LE(mem.getBuf(), (sl_int32)(mem.getSize()));
-	}
+	static String8 fromUtf16LE(const Memory& mem);
 
 	// process UTF16BE, UTF16LE, UTF8 strings automatically
 	static String8 fromUtf(const void* buf, sl_size len);
 
-	SLIB_INLINE static String8 fromUtf(const Memory& mem)
-	{
-		return fromUtf(mem.getBuf(), mem.getSize());
-	}
+	static String8 fromUtf(const Memory& mem);
 
 public:
-	// Length of String
-	SLIB_INLINE sl_uint32 getLength() const
-	{
-		return *SLIB_STR_PLEN(m_data);
-	}
+	// Returns a null string
+	static const String8& null();
 	
-	// Length of String
-	SLIB_INLINE sl_uint32 length() const
-	{
-		return *SLIB_STR_PLEN(m_data);
-	}
+	// Returns an empty string
+	static const String8& getEmpty();
 	
-	SLIB_INLINE void setLength(sl_uint32 len)
-	{
-		*SLIB_STR_PLEN(m_data) = len;
-	}
+	const String8& getNotNull() const;
+	
+	sl_bool isNull() const;
+	
+	sl_bool isNotNull() const;
+	
+	sl_bool isEmpty() const;
+	
+	sl_bool isNotEmpty() const;
 
-	SLIB_INLINE void setHash(sl_uint32 hash)
-	{
-		*SLIB_STR_PHASH(m_data) = hash;
-	}
-
-	SLIB_INLINE sl_bool isNull() const
-	{
-		return m_data == (sl_char8*)(_String_Null.data);
-	}
+	void setNull();
 	
-	SLIB_INLINE sl_bool isNotNull() const
-	{
-		return m_data != (sl_char8*)(_String_Null.data);
-	}
-	
-	SLIB_INLINE sl_bool isEmpty() const
-	{
-		return (getLength() == 0);
-	}
-	
-	SLIB_INLINE sl_bool isNotEmpty() const
-	{
-		return (getLength() != 0);
-	}
-	
-	SLIB_INLINE sl_char8 getAt(sl_int32 index) const
-	{
-		return m_data[index];
-	}
-	
-	SLIB_INLINE void setAt(sl_int32 index, sl_char8 ch)
-	{
-		m_data[index] = ch;
-	}
-	
-	SLIB_INLINE sl_char8* getBuf() const
-	{
-		return m_data;
-	}
-	
-	SLIB_INLINE sl_char8* getData() const
-	{
-		return m_data;
-	}
-	
-	SLIB_INLINE sl_char8* data() const
-	{
-		return m_data;
-	}
-
-public:
-	SLIB_INLINE void setNull()
-	{
-		if (m_data != (sl_char8*)(_String_Null.data)) {
-			_replaceContainer((sl_char8*)(_String_Null.data));
-		}
-	}
-	
-	SLIB_INLINE void setEmpty()
-	{
-		if (m_data != (sl_char8*)(_String_Empty.data)) {
-			_replaceContainer((sl_char8*)(_String_Empty.data));
-		}
-	}
-	
-	SLIB_INLINE const String8& getNotNull() const
-	{
-		if (m_data == (sl_char8*)(_String_Null.data)) {
-			return getEmpty();
-		}
-		return *this;
-	}
+	void setEmpty();
 	
 public:
-	SLIB_INLINE String8& operator=(String8&& other)
-	{
-		if (this != &other) {
-			_replaceContainer(other.m_data);
-			other.m_data = (sl_char8*)(_String_Null.data);
-		}
-		return *this;
-	}
-
-	SLIB_INLINE String8& operator=(const String8& other)
-	{
-		sl_char8* data = other.m_data;
-		if (m_data != data) {
-			_increaseReference(data);
-			_replaceContainer(data);
-		}
-		return *this;
-	}
+	sl_char8* getData() const;
 	
-	SLIB_INLINE String8& operator=(SafeString8&& _other)
-	{
-		String8& other = *((String8*)((void*)(&_other)));
-		if (this != &other) {
-			_replaceContainer(other.m_data);
-			other.m_data = (sl_char8*)(_String_Null.data);
-		}
-		return *this;
-	}
+	sl_uint32 getLength() const;
+	
+	void setLength(sl_uint32 len);
+	
+	sl_uint32 getHashCode() const;
+	
+	void setHashCode(sl_uint32 hash);
+
+	sl_char8 getAt(sl_int32 index) const;
+	
+	sl_bool setAt(sl_int32 index, sl_char8 ch);
+	
+public:
+	String8& operator=(String8&& other);
+	
+	String8& operator=(SafeString8&& _other);
+
+	String8& operator=(const String8& other);
 	
 	String8& operator=(const SafeString8& other);
 	
@@ -383,55 +214,39 @@ public:
 	
 	String8& operator=(const SafeString16& other);
 	
-	SLIB_INLINE String8& operator=(const sl_char8* utf8)
-	{
-		_replaceContainer(_create(utf8));
-		return *this;
-	}
+	String8& operator=(const sl_char8* utf8);
 	
-	SLIB_INLINE String8& operator=(const sl_char16* utf16)
-	{
-		_replaceContainer(_create(utf16));
-		return *this;
-	}
+	String8& operator=(const sl_char16* utf16);
 	
-	SLIB_INLINE String8& operator=(const sl_char32* utf32)
-	{
-		_replaceContainer(_create(utf32));
-		return *this;
-	}
-
-public:
-	SLIB_INLINE sl_char8 operator[](sl_int32 index) const
-	{
-		return m_data[index];
-	}
-	
-	SLIB_INLINE sl_char8& operator[](sl_int32 index)
-	{
-		return m_data[index];
-	}
+	String8& operator=(const sl_char32* utf32);
 
 public:
 	String8 operator+(const String8& other) const;
+	
 	String8& operator+=(const String8& other);
 	
 	String8 operator+(const String16& other) const;
+	
 	String8& operator+=(const String16& other);
 	
 	String8 operator+(const SafeString8& _other) const;
+	
 	String8& operator+=(const SafeString8& other);
 	
 	String8 operator+(const SafeString16& other) const;
+	
 	String8& operator+=(const SafeString16& other);
 	
 	String8 operator+(const sl_char8* utf8) const;
+	
 	String8& operator+=(const sl_char8* utf8);
 	
 	String8 operator+(const sl_char16* utf16) const;
+	
 	String8& operator+=(const sl_char16* utf16);
 
 	String8 operator+(const sl_char32* utf32) const;
+	
 	String8& operator+=(const sl_char32* utf32);
 
 	friend String8 operator+(const sl_char8* utf8, const String8& second);
@@ -441,533 +256,213 @@ public:
 	friend String8 operator+(const sl_char32* utf32, const String8& second);
 
 public:
-	SLIB_INLINE String8 operator+(sl_int32 number) const
-	{
-		return *this + String8::fromInt32(number);
-	}
+	String8 operator+(sl_int32 number) const;
 	
-	SLIB_INLINE String8& operator+=(sl_int32 number)
-	{
-		return (*this += String8::fromInt32(number));
-	}
+	String8& operator+=(sl_int32 number);
 	
-	SLIB_INLINE friend String8 operator+(sl_int32 number, const String8& other)
-	{
-		return String8::fromInt32(number) + other;
-	}
+	friend String8 operator+(sl_int32 number, const String8& other);
 	
 	
-	SLIB_INLINE String8 operator+(sl_uint32 number) const
-	{
-		return *this + String8::fromUint32(number);
-	}
+	String8 operator+(sl_uint32 number) const;
 	
-	SLIB_INLINE String8& operator+=(sl_uint32 number)
-	{
-		return (*this += String8::fromUint32(number));
-	}
+	String8& operator+=(sl_uint32 number);
 
-	SLIB_INLINE friend String8 operator+(sl_uint32 number, const String8& other)
-	{
-		return String8::fromUint32(number) + other;
-	}
+	friend String8 operator+(sl_uint32 number, const String8& other);
 	
 	
-	SLIB_INLINE String8 operator+(sl_int64 number) const
-	{
-		return *this + String8::fromInt64(number);
-	}
+	String8 operator+(sl_int64 number) const;
 	
-	SLIB_INLINE String8& operator+=(sl_int64 number)
-	{
-		return (*this += String8::fromInt64(number));
-	}
+	String8& operator+=(sl_int64 number);
 
-	SLIB_INLINE friend String8 operator+(sl_int64 number, const String8& other)
-	{
-		return String8::fromInt64(number) + other;
-	}
+	friend String8 operator+(sl_int64 number, const String8& other);
 	
 	
-	SLIB_INLINE String8 operator+(sl_uint64 number) const
-	{
-		return *this + String8::fromUint64(number);
-	}
+	String8 operator+(sl_uint64 number) const;
 	
-	SLIB_INLINE String8& operator+=(sl_uint64 number)
-	{
-		return (*this += String8::fromUint64(number));
-	}
+	String8& operator+=(sl_uint64 number);
 	
-	SLIB_INLINE friend String8 operator+(sl_uint64 number, const String8& other)
-	{
-		return String8::fromUint64(number) + other;
-	}
+	friend String8 operator+(sl_uint64 number, const String8& other);
 	
 	
-	SLIB_INLINE String8 operator+(float number) const
-	{
-		return *this + String8::fromFloat(number);
-	}
+	String8 operator+(float number) const;
 	
-	SLIB_INLINE String8& operator+=(float number)
-	{
-		return (*this += String8::fromFloat(number));
-	}
+	String8& operator+=(float number);
 
-	SLIB_INLINE friend String8 operator+(float number, const String8& other)
-	{
-		return String8::fromFloat(number) + other;
-	}
+	friend String8 operator+(float number, const String8& other);
 	
 	
-	SLIB_INLINE String8 operator+(double number) const
-	{
-		return *this + String8::fromDouble(number);
-	}
+	String8 operator+(double number) const;
 	
-	SLIB_INLINE String8& operator+=(double number)
-	{
-		return (*this += String8::fromDouble(number));
-	}
+	String8& operator+=(double number);
 
-	SLIB_INLINE friend String8 operator+(double number, const String8& other)
-	{
-		return String8::fromDouble(number) + other;
-	}
+	friend String8 operator+(double number, const String8& other);
 	
 	
-	SLIB_INLINE String8 operator+(sl_bool value) const
-	{
-		return *this + String8::fromBoolean(value);
-	}
+	String8 operator+(sl_bool value) const;
 	
-	SLIB_INLINE String8& operator+=(sl_bool value)
-	{
-		return (*this += String8::fromBoolean(value));
-	}
-
-	SLIB_INLINE friend String8 operator+(sl_bool value, const String8& other)
-	{
-		return String8::fromBoolean(value) + other;
-	}
+	String8& operator+=(sl_bool value);
+	
+	friend String8 operator+(sl_bool value, const String8& other);
 
 public:
-	SLIB_INLINE sl_bool equals(const String8& other) const
-	{
-		if (m_data == other.m_data) {
-			return sl_true;
-		}
-		if (length() != other.length()) {
-			return sl_false;
-		}
-		return _equals8(m_data, length(), other.m_data, other.length());
-	}
+	sl_bool equals(const String8& other) const;
 	
-	SLIB_INLINE sl_bool equals(const String16& _other) const
-	{
-		String8 other(_other);
-		if (length() != other.length()) {
-			return sl_false;
-		}
-		return _equals8(m_data, length(), other.m_data, other.length());
-	}
+	sl_bool equals(const String16& other) const;
 	
-	SLIB_INLINE sl_bool equals(const SafeString8& _other) const
-	{
-		String8 other(_other);
-		if (m_data == other.m_data) {
-			return sl_true;
-		}
-		if (length() != other.length()) {
-			return sl_false;
-		}
-		return _equals8(m_data, length(), other.m_data, other.length());
-	}
+	sl_bool equals(const SafeString8& other) const;
 	
-	SLIB_INLINE sl_bool equals(const SafeString16& _other) const
-	{
-		String8 other(_other);
-		if (length() != other.length()) {
-			return sl_false;
-		}
-		return _equals8(m_data, length(), other.m_data, other.length());
-	}
+	sl_bool equals(const SafeString16& other) const;
 	
-	SLIB_INLINE sl_bool equals(const sl_char8* utf8) const
-	{
-		if (m_data == utf8) {
-			return sl_true;
-		}
-		return _equals8(data(), length(), utf8, -1);
-	}
+	sl_bool equals(const sl_char8* utf8) const;
 	
-	SLIB_INLINE sl_bool equals(const sl_char16* utf16) const
-	{
-		return _equals16(data(), length(), utf16, -1);
-	}
+	sl_bool equals(const sl_char16* utf16) const;
 	
-	SLIB_INLINE sl_bool equals(const sl_char32* utf32) const
-	{
-		return _equals32(data(), length(), utf32, -1);
-	}
-
-public:
+	sl_bool equals(const sl_char32* utf32) const;
+	
+	
+	sl_int32 compare(const String8& other) const;
+	
+	sl_int32 compare(const String16& other) const;
+	
+	sl_int32 compare(const SafeString8& other) const;
+	
+	sl_int32 compare(const SafeString16& other) const;
+	
+	sl_int32 compare(const sl_char8* utf8) const;
+	
+	sl_int32 compare(const sl_char16* utf16) const;
+	
+	sl_int32 compare(const sl_char32* utf32) const;
+	
 	sl_int32 compare(const String8& other, sl_uint32 len) const;
 	
-	SLIB_INLINE sl_int32 compare(const String8& other) const
-	{
-		if (m_data == other.m_data) {
-			return 0;
-		}
-		return _compare8(m_data, length(), other.m_data, other.length());
-	}
-	
-	SLIB_INLINE sl_int32 compare(const String16& _other) const
-	{
-		String8 other(_other);
-		return _compare8(m_data, length(), other.m_data, other.length());
-	}
-	
-	SLIB_INLINE sl_int32 compare(const SafeString8& _other) const
-	{
-		String8 other(_other);
-		if (m_data == other.m_data) {
-			return 0;
-		}
-		return _compare8(m_data, length(), other.m_data, other.length());
-	}
-	
-	SLIB_INLINE sl_int32 compare(const SafeString16& _other) const
-	{
-		String8 other(_other);
-		return _compare8(m_data, length(), other.m_data, other.length());
-	}
-	
-	SLIB_INLINE sl_int32 compare(const sl_char8* utf8) const
-	{
-		if (m_data == utf8) {
-			return 0;
-		}
-		return _compare8(data(), length(), utf8, -1);
-	}
-	
-	SLIB_INLINE sl_int32 compare(const sl_char16* utf16) const
-	{
-		return _compare16(data(), length(), utf16, -1);
-	}
-	
-	SLIB_INLINE sl_int32 compare(const sl_char32* utf32) const
-	{
-		return _compare32(data(), length(), utf32, -1);
-	}
 
 public:
-	SLIB_INLINE sl_bool operator==(const String8& other) const
-	{
-		return equals(other);
-	}
+	sl_bool operator==(const String8& other) const;
 	
-	SLIB_INLINE sl_bool operator==(const String16& other) const
-	{
-		return equals(other);
-	}
+	sl_bool operator==(const String16& other) const;
 	
-	SLIB_INLINE sl_bool operator==(const SafeString8& other) const
-	{
-		return equals(other);
-	}
+	sl_bool operator==(const SafeString8& other) const;
 	
-	SLIB_INLINE sl_bool operator==(const SafeString16& other) const
-	{
-		return equals(other);
-	}
+	sl_bool operator==(const SafeString16& other) const;
 
-	SLIB_INLINE sl_bool operator==(const sl_char8* utf8) const
-	{
-		return equals(utf8);
-	}
+	sl_bool operator==(const sl_char8* utf8) const;
 	
-	SLIB_INLINE sl_bool operator==(const sl_char16* utf16) const
-	{
-		return equals(utf16);
-	}
+	sl_bool operator==(const sl_char16* utf16) const;
 	
-	SLIB_INLINE sl_bool operator==(const sl_char32* utf32) const
-	{
-		return equals(utf32);
-	}
+	sl_bool operator==(const sl_char32* utf32) const;
 	
-	SLIB_INLINE friend sl_bool operator==(const sl_char8* utf8, const String8& second)
-	{
-		return second == utf8;
-	}
+	friend sl_bool operator==(const sl_char8* utf8, const String8& second);
 	
-	SLIB_INLINE friend sl_bool operator==(const sl_char16* utf16, const String8& second)
-	{
-		return second == utf16;
-	}
+	friend sl_bool operator==(const sl_char16* utf16, const String8& second);
 	
-	SLIB_INLINE friend sl_bool operator==(const sl_char32* utf32, const String8& second)
-	{
-		return second == utf32;
-	}
+	friend sl_bool operator==(const sl_char32* utf32, const String8& second);
 	
-public:
-	SLIB_INLINE sl_bool operator!=(const String8& other) const
-	{
-		return !(*this == other);
-	}
 	
-	SLIB_INLINE sl_bool operator!=(const String16& other) const
-	{
-		return !(*this == other);
-	}
+	sl_bool operator!=(const String8& other) const;
 	
-	SLIB_INLINE sl_bool operator!=(const SafeString8& other) const
-	{
-		return !(*this == other);
-	}
+	sl_bool operator!=(const String16& other) const;
 	
-	SLIB_INLINE sl_bool operator!=(const SafeString16& other) const
-	{
-		return !(*this == other);
-	}
+	sl_bool operator!=(const SafeString8& other) const;
+	
+	sl_bool operator!=(const SafeString16& other) const;
 
-	SLIB_INLINE sl_bool operator!=(const sl_char8* utf8) const
-	{
-		return !(*this == utf8);
-	}
+	sl_bool operator!=(const sl_char8* utf8) const;
 	
-	SLIB_INLINE sl_bool operator!=(const sl_char16* utf16) const
-	{
-		return !(*this == utf16);
-	}
+	sl_bool operator!=(const sl_char16* utf16) const;
 	
-	SLIB_INLINE sl_bool operator!=(const sl_char32* utf32) const
-	{
-		return !(*this == utf32);
-	}
+	sl_bool operator!=(const sl_char32* utf32) const;
 	
-	SLIB_INLINE friend sl_bool operator!=(const sl_char8* utf8, const String8& second)
-	{
-		return second != utf8;
-	}
+	friend sl_bool operator!=(const sl_char8* utf8, const String8& second);
 	
-	SLIB_INLINE friend sl_bool operator!=(const sl_char16* utf16, const String8& second)
-	{
-		return second != utf16;
-	}
+	friend sl_bool operator!=(const sl_char16* utf16, const String8& second);
 	
-	SLIB_INLINE friend sl_bool operator!=(const sl_char32* utf32, const String8& second)
-	{
-		return second != utf32;
-	}
+	friend sl_bool operator!=(const sl_char32* utf32, const String8& second);
 	
-public:
-	SLIB_INLINE sl_bool operator>=(const String8& other) const
-	{
-		return compare(other) >= 0;
-	}
 	
-	SLIB_INLINE sl_bool operator>=(const String16& other) const
-	{
-		return compare(other) >= 0;
-	}
+	sl_bool operator>=(const String8& other) const;
 	
-	SLIB_INLINE sl_bool operator>=(const SafeString8& other) const
-	{
-		return compare(other) >= 0;
-	}
+	sl_bool operator>=(const String16& other) const;
 	
-	SLIB_INLINE sl_bool operator>=(const SafeString16& other) const
-	{
-		return compare(other) >= 0;
-	}
+	sl_bool operator>=(const SafeString8& other) const;
 	
-	SLIB_INLINE sl_bool operator>=(const sl_char8* utf8) const
-	{
-		return compare(utf8) >= 0;
-	}
+	sl_bool operator>=(const SafeString16& other) const;
 	
-	SLIB_INLINE sl_bool operator>=(const sl_char16* utf16) const
-	{
-		return compare(utf16) >= 0;
-	}
+	sl_bool operator>=(const sl_char8* utf8) const;
 	
-	SLIB_INLINE sl_bool operator>=(const sl_char32* utf32) const
-	{
-		return compare(utf32) >= 0;
-	}
+	sl_bool operator>=(const sl_char16* utf16) const;
 	
-	SLIB_INLINE friend sl_bool operator>=(const sl_char8* utf8, const String8& second)
-	{
-		return second.compare(utf8) <= 0;
-	}
+	sl_bool operator>=(const sl_char32* utf32) const;
 	
-	SLIB_INLINE friend sl_bool operator>=(const sl_char16* utf16, const String8& second)
-	{
-		return second.compare(utf16) <= 0;
-	}
+	friend sl_bool operator>=(const sl_char8* utf8, const String8& second);
 	
-	SLIB_INLINE friend sl_bool operator>=(const sl_char32* utf32, const String8& second)
-	{
-		return second.compare(utf32) <= 0;
-	}
+	friend sl_bool operator>=(const sl_char16* utf16, const String8& second);
 	
-public:
-	SLIB_INLINE sl_bool operator<=(const String8& other) const
-	{
-		return compare(other) <= 0;
-	}
+	friend sl_bool operator>=(const sl_char32* utf32, const String8& second);
+	
+	
+	sl_bool operator<=(const String8& other) const;
+	
+	sl_bool operator<=(const String16& other) const;
+	
+	sl_bool operator<=(const SafeString8& other) const;
+	
+	sl_bool operator<=(const SafeString16& other) const;
+	
+	sl_bool operator<=(const sl_char8* utf8) const;
+	
+	sl_bool operator<=(const sl_char16* utf16) const;
+	
+	sl_bool operator<=(const sl_char32* utf32) const;
+	
+	friend sl_bool operator<=(const sl_char8* utf8, const String8& second);
+	
+	friend sl_bool operator<=(const sl_char16* utf16, const String8& second);
+	
+	friend sl_bool operator<=(const sl_char32* utf32, const String8& second);
 
-	SLIB_INLINE sl_bool operator<=(const String16& other) const
-	{
-		return compare(other) <= 0;
-	}
 	
-	SLIB_INLINE sl_bool operator<=(const SafeString8& other) const
-	{
-		return compare(other) <= 0;
-	}
+	sl_bool operator>(const String8& other) const;
 	
-	SLIB_INLINE sl_bool operator<=(const SafeString16& other) const
-	{
-		return compare(other) <= 0;
-	}
-
-	SLIB_INLINE sl_bool operator<=(const sl_char8* utf8) const
-	{
-		return compare(utf8) <= 0;
-	}
+	sl_bool operator>(const String16& other) const;
 	
-	SLIB_INLINE sl_bool operator<=(const sl_char16* utf16) const
-	{
-		return compare(utf16) <= 0;
-	}
+	sl_bool operator>(const SafeString8& other) const;
 	
-	SLIB_INLINE sl_bool operator<=(const sl_char32* utf32) const
-	{
-		return compare(utf32) <= 0;
-	}
+	sl_bool operator>(const SafeString16& other) const;
 	
-	SLIB_INLINE friend sl_bool operator<=(const sl_char8* utf8, const String8& second)
-	{
-		return second.compare(utf8) >= 0;
-	}
+	sl_bool operator>(const sl_char8* utf8) const;
 	
-	SLIB_INLINE friend sl_bool operator<=(const sl_char16* utf16, const String8& second)
-	{
-		return second.compare(utf16) >= 0;
-	}
+	sl_bool operator>(const sl_char16* utf16) const;
 	
-	SLIB_INLINE friend sl_bool operator<=(const sl_char32* utf32, const String8& second)
-	{
-		return second.compare(utf32) >= 0;
-	}
+	sl_bool operator>(const sl_char32* utf32) const;
 	
-public:
-	SLIB_INLINE sl_bool operator>(const String8& other) const
-	{
-		return compare(other) > 0;
-	}
+	friend sl_bool operator>(const sl_char8* utf8, const String8& second);
 	
-	SLIB_INLINE sl_bool operator>(const String16& other) const
-	{
-		return compare(other) > 0;
-	}
+	friend sl_bool operator>(const sl_char16* utf16, const String8& second);
 	
-	SLIB_INLINE sl_bool operator>(const SafeString8& other) const
-	{
-		return compare(other) > 0;
-	}
+	friend sl_bool operator>(const sl_char32* utf32, const String8& second);
 	
-	SLIB_INLINE sl_bool operator>(const SafeString16& other) const
-	{
-		return compare(other) > 0;
-	}
 	
-	SLIB_INLINE sl_bool operator>(const sl_char8* utf8) const
-	{
-		return compare(utf8) > 0;
-	}
+	sl_bool operator<(const String8& other) const;
 	
-	SLIB_INLINE sl_bool operator>(const sl_char16* utf16) const
-	{
-		return compare(utf16) > 0;
-	}
+	sl_bool operator<(const String16& other) const;
 	
-	SLIB_INLINE sl_bool operator>(const sl_char32* utf32) const
-	{
-		return compare(utf32) > 0;
-	}
+	sl_bool operator<(const SafeString8& other) const;
 	
-	SLIB_INLINE friend sl_bool operator>(const sl_char8* utf8, const String8& second)
-	{
-		return second.compare(utf8) < 0;
-	}
+	sl_bool operator<(const SafeString16& other) const;
 	
-	SLIB_INLINE friend sl_bool operator>(const sl_char16* utf16, const String8& second)
-	{
-		return second.compare(utf16) < 0;
-	}
+	sl_bool operator<(const sl_char8* utf8) const;
 	
-	SLIB_INLINE friend sl_bool operator>(const sl_char32* utf32, const String8& second)
-	{
-		return second.compare(utf32) < 0;
-	}
+	sl_bool operator<(const sl_char16* utf16) const;
 	
-public:
-	SLIB_INLINE sl_bool operator<(const String8& other) const
-	{
-		return compare(other) < 0;
-	}
+	sl_bool operator<(const sl_char32* utf32) const;
 	
-	SLIB_INLINE sl_bool operator<(const String16& other) const
-	{
-		return compare(other) < 0;
-	}
+	friend sl_bool operator<(const sl_char8* utf8, const String8& second);
 	
-	SLIB_INLINE sl_bool operator<(const SafeString8& other) const
-	{
-		return compare(other) < 0;
-	}
+	friend sl_bool operator<(const sl_char16* utf16, const String8& second);
 	
-	SLIB_INLINE sl_bool operator<(const SafeString16& other) const
-	{
-		return compare(other) < 0;
-	}
+	friend sl_bool operator<(const sl_char32* utf32, const String8& second);
 	
-	SLIB_INLINE sl_bool operator<(const sl_char8* utf8) const
-	{
-		return compare(utf8) < 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<(const sl_char16* utf16) const
-	{
-		return compare(utf16) < 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<(const sl_char32* utf32) const
-	{
-		return compare(utf32) < 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator<(const sl_char8* utf8, const String8& second)
-	{
-		return second.compare(utf8) > 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator<(const sl_char16* utf16, const String8& second)
-	{
-		return second.compare(utf16) > 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator<(const sl_char32* utf32, const String8& second)
-	{
-		return second.compare(utf32) > 0;
-	}
-
 public:
 	String8 duplicate() const;
 
@@ -1033,13 +528,15 @@ public:
 	
 	List<String8> split(const String8& pattern) const;
 	
-	sl_uint32 hashCode() const;
-	
 	String8 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true);
 	
-	static String8 parseBackslashEscapes(const sl_char8* input, sl_int32 len, sl_int32* lengthParsed = sl_null, sl_bool* flagError = sl_null);
+	static String8 parseBackslashEscapes(const sl_char8* input, sl_uint32 len, sl_uint32* lengthParsed = sl_null, sl_bool* flagError = sl_null);
 	
-	static String8 parseBackslashEscapes(const String8& str, sl_int32* lengthParsed = sl_null, sl_bool* flagError = sl_null);
+	String8 parseBackslashEscapes(sl_uint32* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
+	
+	static sl_uint32 countLineNumber(const sl_char8* input, sl_uint32 len, sl_uint32* columnLast = sl_null);
+	
+	sl_uint32 countLineNumber(sl_uint32 pos, sl_uint32* column = sl_null) const;
 	
 public:
 	// radix: 2 ~ 64,   flagUpperCase only works if radix <= 36 (0~9a~z)
@@ -1150,51 +647,30 @@ public:
 	static sl_int32 utf32ToUtf8(const sl_char32* utf32, sl_int32 lenUtf32, sl_char8* utf8, sl_int32 lenUtf8Buffer);
 	
 private:
-	SLIB_INLINE static void _increaseReference(sl_char8* data)
-	{
-		Base::interlockedIncrement(SLIB_STR_PREF(data));
-	}
-
-	SLIB_INLINE static void _decreaseReference(sl_char8* data)
-	{
-		sl_reg iRef = Base::interlockedDecrement(SLIB_STR_PREF(data));
-		if (iRef == 0) {
-			_destroy(data);
-		}
-	}
-	
-	SLIB_INLINE void _replaceContainer(sl_char8* data)
-	{
-		_decreaseReference(m_data);
-		m_data = data;
-	}
-	
-	
-	// Deallocates memory allocated for this string
-	static void _destroy(sl_char8* data);
-
 	// Allocates memory required for a string for the specified length
-	static sl_char8* _alloc(sl_uint32& length);
+	static StringContainer8* _alloc(sl_uint32& length);
+	
+	void _replaceContainer(StringContainer8* container);
 	
 	
-	static sl_char8* _create(sl_char8 ch, sl_uint32 nRepeatCount);
+	static StringContainer8* _create(sl_char8 ch, sl_uint32 nRepeatCount);
 	
-	static sl_char8* _create(const sl_char8* strUtf8, sl_int32 length = -1);
+	static StringContainer8* _create(const sl_char8* strUtf8, sl_int32 length);
 	
-	static sl_char8* _create(const sl_char16* strUtf16, sl_int32 length = -1);
+	static StringContainer8* _create(const sl_char16* strUtf16, sl_int32 length);
 	
-	static sl_char8* _create(const sl_char32* strUtf32, sl_int32 length = -1);
+	static StringContainer8* _create(const sl_char32* strUtf32, sl_int32 length);
 	
 	
-	static sl_char8* _merge8(const sl_char8* s1, sl_int32 len1, const sl_char8* s2, sl_int32 len2);
+	static StringContainer8* _merge8(const sl_char8* s1, sl_int32 len1, const sl_char8* s2, sl_int32 len2);
 	
-	static sl_char8* _merge16(const sl_char8* s1, sl_int32 len1, const sl_char16* s2, sl_int32 len2);
+	static StringContainer8* _merge16(const sl_char8* s1, sl_int32 len1, const sl_char16* s2, sl_int32 len2);
 	
-	static sl_char8* _merge16(const sl_char16* s1, sl_int32 len1, const sl_char8* s2, sl_int32 len2);
+	static StringContainer8* _merge16(const sl_char16* s1, sl_int32 len1, const sl_char8* s2, sl_int32 len2);
 	
-	static sl_char8* _merge32(const sl_char8* s1, sl_int32 len1, const sl_char32* s2, sl_int32 len2);
+	static StringContainer8* _merge32(const sl_char8* s1, sl_int32 len1, const sl_char32* s2, sl_int32 len2);
 	
-	static sl_char8* _merge32(const sl_char32* s1, sl_int32 len1, const sl_char8* s2, sl_int32 len2);
+	static StringContainer8* _merge32(const sl_char32* s1, sl_int32 len1, const sl_char8* s2, sl_int32 len2);
 	
 	
 	// Check two unicode string is Equal
@@ -1213,50 +689,27 @@ private:
 	static sl_int32 _compare32(const sl_char8* str1, sl_int32 len1, const sl_char32* str2, sl_int32 len2);
 	
 public:
-	static void _initStaticMemory(void* mem);
-
 	friend class SafeString8;
+	
 };
 
 /** auto-referencing object **/
 class SLIB_EXPORT String16
 {
 private:
-	// String(Information & Data) storage
-#if defined(SLIB_USE_UNICODE16)
-	union {
-		sl_char16* m_data;
-		wchar_t* m_dataDebug;
-	};
-#else
-	sl_char16* m_data;
-#endif
+	StringContainer16* m_container;
+	
+private:
+	String16(StringContainer16* container);
 
 public:
-	SLIB_INLINE String16()
-	{
-		m_data = (sl_char16*)(_String_Null.data);
-	}
+	String16();
 	
-	SLIB_INLINE String16(String16&& src)
-	{
-		m_data = src.m_data;
-		src.m_data = (sl_char16*)(_String_Null.data);
-	}
+	String16(String16&& src);
 	
-	SLIB_INLINE String16(const String16& src)
-	{
-		sl_char16* data = src.m_data;
-		_increaseReference(data);
-		m_data = data;
-	}
+	String16(SafeString16&& _src);
 	
-	SLIB_INLINE String16(SafeString16&& _src)
-	{
-		String16& src = *((String16*)((void*)(&_src)));
-		m_data = src.m_data;
-		src.m_data = (sl_char16*)(_String_Null.data);
-	}
+	String16(const String16& src);
 	
 	String16(const SafeString16& src);
 
@@ -1264,249 +717,100 @@ public:
 	
 	String16(const SafeString8& src);
 
-	SLIB_INLINE ~String16()
-	{
-		_decreaseReference(m_data);
-	}
+	~String16();
 	
-private:
-	SLIB_INLINE String16(StringContainer* container)
-	{
-		m_data = (sl_char16*)((void*)container);
-	}
-    
 public:
 	// From a single charactor
-	SLIB_INLINE String16(sl_char16 ch, sl_uint32 nRepeatCount = 1)
-	{
-		m_data = _create(ch, nRepeatCount);
-	}
+	String16(sl_char16 ch, sl_uint32 nRepeatCount);
 	
 	// From an utf-8 string
-	SLIB_INLINE String16(const sl_char8* strUtf8)
-	{
-		m_data = _create(strUtf8);
-	}
+	String16(const sl_char8* strUtf8);
 	
-	SLIB_INLINE String16(const sl_char8* strUtf8, sl_int32 length)
-	{
-		m_data = _create(strUtf8, length);
-	}
+	String16(const sl_char8* strUtf8, sl_int32 length);
 	
 	// From an utf-16 string
-	SLIB_INLINE String16(const sl_char16* strUtf16)
-	{
-		m_data = _create(strUtf16);
-	}
+	String16(const sl_char16* strUtf16);
 	
-	SLIB_INLINE String16(const sl_char16* strUtf16, sl_int32 length)
-	{
-		m_data = _create(strUtf16, length);
-	}
+	String16(const sl_char16* strUtf16, sl_int32 length);
 	
 	// From an utf-32 string
-	SLIB_INLINE String16(const sl_char32* strUtf32)
-	{
-		m_data = _create(strUtf32);
-	}
+	String16(const sl_char32* strUtf32);
 	
-	SLIB_INLINE String16(const sl_char32* strUtf32, sl_int32 length)
-	{
-		m_data = _create(strUtf32, length);
-	}
+	String16(const sl_char32* strUtf32, sl_int32 length);
 
 public:
-	// Returns a null string
-	SLIB_INLINE static const String16& null()
-	{
-		return *((String16*)((void*)&_String_Null));
-	}
-
-    // Returns an empty string
-	SLIB_INLINE static const String16& getEmpty()
-	{
-		return *((String16*)((void*)&_String_Empty));
-	}
+	// create a string of 'len' charactors
+	static String16 allocate(sl_uint32 len);
 	
-    // create a string of 'len' charactors
-	SLIB_INLINE static String16 allocate(sl_uint32 len)
-	{
-		return (StringContainer*)(_alloc(len));
-	}
+	static String16 fromStatic(const sl_char16* sz16, sl_int32 len = -1);
 
-	SLIB_INLINE static String16 fromUtf8(const void* utf8, sl_int32 len = -1)
-	{
-		return String16((const sl_char8*)utf8, len);
-	}
+	static String16 fromUtf8(const void* utf8, sl_int32 len = -1);
 
-	SLIB_INLINE static String16 fromUtf8(const Memory& mem)
-	{
-		return fromUtf8(mem.getBuf(), (sl_int32)(mem.getSize()));
-	}
+	static String16 fromUtf8(const Memory& mem);
 
-	SLIB_INLINE static String16 fromUtf16(const void* utf16, sl_int32 len = -1)
-	{
-		String16 str((const sl_char16*)utf16, len);
-		return str;
-	}
+	static String16 fromUtf16(const void* utf16, sl_int32 len = -1);
 
-	SLIB_INLINE static String16 fromUtf16(const Memory& mem)
-	{
-		return fromUtf16(mem.getBuf(), (sl_int32)(mem.getSize()));
-	}
+	static String16 fromUtf16(const Memory& mem);
 
-	SLIB_INLINE static String16 fromUtf32(const void* utf32, sl_int32 len = -1)
-	{
-		String16 str((const sl_char32*)utf32, len);
-		return str;
-	}
+	static String16 fromUtf32(const void* utf32, sl_int32 len = -1);
 
-	SLIB_INLINE static String16 fromUtf32(const Memory& mem)
-	{
-		return fromUtf32(mem.getBuf(), (sl_int32)(mem.getSize()));
-	}
+	static String16 fromUtf32(const Memory& mem);
 
 	static String16 fromUtf16BE(const void* utf16, sl_int32 len = -1);
 
-	SLIB_INLINE static String16 fromUtf16BE(const Memory& mem)
-	{
-		return fromUtf16BE(mem.getBuf(), (sl_int32)(mem.getSize()));
-	}
+	static String16 fromUtf16BE(const Memory& mem);
 
 	static String16 fromUtf16LE(const void* utf16, sl_int32 len = -1);
 
-	SLIB_INLINE static String16 fromUtf16LE(const Memory& mem)
-	{
-		return fromUtf16LE(mem.getBuf(), (sl_int32)(mem.getSize()));
-	}
+	static String16 fromUtf16LE(const Memory& mem);
 
 	// process UTF16BE, UTF16LE, UTF8 strings automatically
 	static String16 fromUtf(const void* buf, sl_size len);
 
-	SLIB_INLINE static String16 fromUtf(const Memory& mem)
-	{
-		return fromUtf(mem.getBuf(), (sl_int32)(mem.getSize()));
-	}
+	static String16 fromUtf(const Memory& mem);
+	
+public:
+	// Returns a null string
+	static const String16& null();
+	
+	// Returns an empty string
+	static const String16& getEmpty();
+	
+	const String16& getNotNull() const;
+	
+	sl_bool isNull() const;
+	
+	sl_bool isNotNull() const;
+	
+	sl_bool isEmpty() const;
+	
+	sl_bool isNotEmpty() const;
+	
+	void setNull();
+	
+	void setEmpty();
 
 public:
-	// Length of String
-	SLIB_INLINE sl_uint32 getLength() const
-	{
-		return *SLIB_STR_PLEN(m_data);
-	}
+	sl_char16* getData() const;
 	
-	SLIB_INLINE sl_uint32 length() const
-	{
-		return *SLIB_STR_PLEN(m_data);
-	}
+	sl_uint32 getLength() const;
 	
-	SLIB_INLINE void setLength(sl_uint32 len)
-	{
-		*SLIB_STR_PLEN(m_data) = len;
-	}
-
-	SLIB_INLINE void setHash(sl_uint32 hash)
-	{
-		*SLIB_STR_PHASH(m_data) = hash;
-	}
-
-	SLIB_INLINE sl_bool isNull() const
-	{
-		return m_data == (sl_char16*)(_String_Null.data);
-	}
+	void setLength(sl_uint32 len);
 	
-	SLIB_INLINE sl_bool isNotNull() const
-	{
-		return m_data != (sl_char16*)(_String_Null.data);
-	}
+	sl_uint32 getHashCode() const;
 	
-	SLIB_INLINE sl_bool isEmpty() const
-	{
-		return (getLength()==0);
-	}
+	void setHashCode(sl_uint32 hash);
 	
-	SLIB_INLINE sl_bool isNotEmpty() const
-	{
-		return (getLength() != 0);
-	}
+	sl_char16 getAt(sl_int32 index) const;
 	
-	SLIB_INLINE sl_char16 getAt(sl_int32 index) const
-	{
-		return m_data[index];
-	}
+	sl_bool setAt(sl_int32 index, sl_char16 ch);
 	
-	SLIB_INLINE void setAt(sl_int32 index, sl_char16 ch)
-	{
-		m_data[index] = ch;
-	}
-	
-	SLIB_INLINE sl_char16* getBuf() const
-	{
-		return m_data;
-	}
-	
-	SLIB_INLINE sl_char16* getData() const
-	{
-		return m_data;
-	}
-	
-	SLIB_INLINE sl_char16* data() const
-	{
-		return m_data;
-	}
-
 public:
-	SLIB_INLINE void setNull()
-	{
-		if (m_data != (sl_char16*)(_String_Null.data)) {
-			_replaceContainer((sl_char16*)(_String_Null.data));
-		}
-	}
+	String16& operator=(String16&& other);
 	
-	SLIB_INLINE void setEmpty()
-	{
-		if (m_data != (sl_char16*)(_String_Empty.data)) {
-			_replaceContainer((sl_char16*)(_String_Empty.data));
-		}
-	}
-	
-	SLIB_INLINE const String16& getNotNull() const
-	{
-		if (m_data == (sl_char16*)(_String_Null.data)) {
-			return getEmpty();
-		}
-		return *this;
-	}
+	String16& operator=(SafeString16&& _other);
 
-public:
-	SLIB_INLINE String16& operator=(String16&& other)
-	{
-		if (this != &other) {
-			_replaceContainer(other.m_data);
-			other.m_data = (sl_char16*)(_String_Null.data);
-		}
-		return *this;
-	}
-
-	SLIB_INLINE String16& operator=(const String16& other)
-	{
-		sl_char16* data = other.m_data;
-		if (m_data != data) {
-			_increaseReference(data);
-			_replaceContainer(data);
-		}
-		return *this;
-	}
-	
-	SLIB_INLINE String16& operator=(SafeString16&& _other)
-	{
-		String16& other = *((String16*)((void*)(&_other)));
-		if (this != &other) {
-			_replaceContainer(other.m_data);
-			other.m_data = (sl_char16*)(_String_Null.data);
-		}
-		return *this;
-	}
+	String16& operator=(const String16& other);
 	
 	String16& operator=(const SafeString16& other);
 	
@@ -1514,55 +818,39 @@ public:
 	
 	String16& operator=(const SafeString8& other);
 	
-	SLIB_INLINE String16& operator=(const sl_char8* utf8)
-    {
-        _replaceContainer(_create(utf8));
-        return *this;
-    }
+	String16& operator=(const sl_char8* utf8);
 	
-	SLIB_INLINE String16& operator=(const sl_char16* utf16)
-    {
-        _replaceContainer(_create(utf16));
-        return *this;
-    }
+	String16& operator=(const sl_char16* utf16);
 	
-	SLIB_INLINE String16& operator=(const sl_char32* utf32)
-    {
-        _replaceContainer(_create(utf32));
-        return *this;
-    }
-	
-public:
-	SLIB_INLINE sl_char16 operator[](sl_int32 index) const
-	{
-		return m_data[index];
-	}
-	
-	SLIB_INLINE sl_char16& operator[](sl_int32 index)
-	{
-		return m_data[index];
-	}
+	String16& operator=(const sl_char32* utf32);
 	
 public:
 	String16 operator+(const String16& other) const;
+	
 	String16& operator+=(const String16& other);
 
 	String16 operator+(const String8& other) const;
+	
 	String16& operator+=(const String8& other);
 
 	String16 operator+(const SafeString16& _other) const;
+	
 	String16& operator+=(const SafeString16& other);
 
 	String16 operator+(const SafeString8& other) const;
+	
 	String16& operator+=(const SafeString8& other);
 
 	String16 operator+(const sl_char8* utf8) const;
+	
 	String16& operator+=(const sl_char8* utf8);
 
 	String16 operator+(const sl_char16* utf16) const;
+	
 	String16& operator+=(const sl_char16* utf16);
 
 	String16 operator+(const sl_char32* utf32) const;
+	
 	String16& operator+=(const sl_char32* utf32);
 
 	friend String16 operator+(const sl_char8* utf8, const String16& second);
@@ -1572,532 +860,211 @@ public:
 	friend String16 operator+(const sl_char32* utf32, const String16& second);
 
 public:
-	SLIB_INLINE String16 operator+(sl_int32 number) const
-	{
-		return *this + String16::fromInt32(number);
-	}
+	String16 operator+(sl_int32 number) const;
 	
-	SLIB_INLINE String16& operator+=(sl_int32 number)
-	{
-		return (*this += String16::fromInt32(number));
-	}
+	String16& operator+=(sl_int32 number);
 
-	SLIB_INLINE friend String16 operator+(sl_int32 number, const String16& other)
-	{
-		return String16::fromInt32(number) + other;
-	}
+	friend String16 operator+(sl_int32 number, const String16& other);
 	
 	
-	SLIB_INLINE String16 operator+(sl_uint32 number) const
-	{
-		return *this + String16::fromUint32(number);
-	}
+	String16 operator+(sl_uint32 number) const;
 	
-	SLIB_INLINE String16& operator+=(sl_uint32 number)
-	{
-		return (*this += String16::fromUint32(number));
-	}
+	String16& operator+=(sl_uint32 number);
 
-	SLIB_INLINE friend String16 operator+(sl_uint32 number, const String16& other)
-	{
-		return String16::fromUint32(number) + other;
-	}
+	friend String16 operator+(sl_uint32 number, const String16& other);
 	
 	
-	SLIB_INLINE String16 operator+(sl_int64 number) const
-	{
-		return *this + String16::fromInt64(number);
-	}
+	String16 operator+(sl_int64 number) const;
 	
-	SLIB_INLINE String16& operator+=(sl_int64 number)
-	{
-		return (*this += String16::fromInt64(number));
-	}
+	String16& operator+=(sl_int64 number);
 
-	SLIB_INLINE friend String16 operator+(sl_int64 number, const String16& other)
-	{
-		return String16::fromInt64(number) + other;
-	}
+	friend String16 operator+(sl_int64 number, const String16& other);
 	
 	
-	SLIB_INLINE String16 operator+(sl_uint64 number) const
-	{
-		return *this + String16::fromUint64(number);
-	}
+	String16 operator+(sl_uint64 number) const;
 	
-	SLIB_INLINE String16& operator+=(sl_uint64 number)
-	{
-		return (*this += String16::fromUint64(number));
-	}
+	String16& operator+=(sl_uint64 number);
 
-	SLIB_INLINE friend String16 operator+(sl_uint64 number, const String16& other)
-	{
-		return String16::fromUint64(number) + other;
-	}
+	friend String16 operator+(sl_uint64 number, const String16& other);
 	
 	
-	SLIB_INLINE String16 operator+(float number) const
-	{
-		return *this + String16::fromFloat(number);
-	}
+	String16 operator+(float number) const;
 	
-	SLIB_INLINE String16& operator+=(float number)
-	{
-		return (*this += String16::fromFloat(number));
-	}
+	String16& operator+=(float number);
 	
-	SLIB_INLINE friend String16 operator+(float number, const String16& other)
-	{
-		return String16::fromFloat(number) + other;
-	}
+	friend String16 operator+(float number, const String16& other);
 	
 	
-	SLIB_INLINE String16 operator+(double number) const
-	{
-		return *this + String16::fromDouble(number);
-	}
+	String16 operator+(double number) const;
 	
-	SLIB_INLINE String16& operator+=(double number)
-	{
-		return (*this += String16::fromDouble(number));
-	}
+	String16& operator+=(double number);
 
-	SLIB_INLINE friend String16 operator+(double number, const String16& other)
-	{
-		return String16::fromDouble(number) + other;
-	}
+	friend String16 operator+(double number, const String16& other);
 	
 	
-	SLIB_INLINE String16 operator+(sl_bool value) const
-	{
-		return *this + String16::fromBoolean(value);
-	}
+	String16 operator+(sl_bool value) const;
 	
-	SLIB_INLINE String16& operator+=(sl_bool value)
-	{
-		return (*this += String16::fromBoolean(value));
-	}
+	String16& operator+=(sl_bool value);
 	
-	SLIB_INLINE friend String16 operator+(sl_bool value, const String16& other)
-	{
-		return String16::fromBoolean(value) + other;
-	}
+	friend String16 operator+(sl_bool value, const String16& other);
 	
 public:
-	SLIB_INLINE sl_bool equals(const String16& other) const
-	{
-		if (m_data == other.m_data) {
-			return sl_true;
-		}
-		if (length() != other.length()) {
-			return sl_false;
-		}
-		return _equals16(m_data, length(), other.m_data, other.length());
-	}
+	sl_bool equals(const String16& other) const;
 	
-	SLIB_INLINE sl_bool equals(const String8& _other) const
-	{
-		String16 other(_other);
-		if (length() != other.length()) {
-			return sl_false;
-		}
-		return _equals16(m_data, length(), other.m_data, other.length());
-	}
+	sl_bool equals(const String8& other) const;
 	
-	SLIB_INLINE sl_bool equals(const SafeString16& _other) const
-	{
-		String16 other(_other);
-		if (m_data == other.m_data) {
-			return sl_true;
-		}
-		if (length() != other.length()) {
-			return sl_false;
-		}
-		return _equals16(m_data, length(), other.m_data, other.length());
-	}
+	sl_bool equals(const SafeString16& other) const;
 	
-	SLIB_INLINE sl_bool equals(const SafeString8& _other) const
-	{
-		String16 other(_other);
-		if (length() != other.length()) {
-			return sl_false;
-		}
-		return _equals16(m_data, length(), other.m_data, other.length());
-	}
+	sl_bool equals(const SafeString8& other) const;
 	
-	SLIB_INLINE sl_bool equals(const sl_char8* utf8) const
-	{
-		return _equals8(data(), length(), utf8, -1);
-	}
+	sl_bool equals(const sl_char8* utf8) const;
 	
-	SLIB_INLINE sl_bool equals(const sl_char16* utf16) const
-	{
-		if (m_data == utf16) {
-			return sl_true;
-		}
-		return _equals16(data(), length(), utf16, -1);
-	}
+	sl_bool equals(const sl_char16* utf16) const;
 	
-	SLIB_INLINE sl_bool equals(const sl_char32* utf32) const
-	{
-		return _equals32(data(), length(), utf32, -1);
-	}
-
-public:
+	sl_bool equals(const sl_char32* utf32) const;
+	
+	
+	sl_int32 compare(const String16& other) const;
+	
+	sl_int32 compare(const String8& other) const;
+	
+	sl_int32 compare(const SafeString16& other) const;
+	
+	sl_int32 compare(const SafeString8& other) const;
+	
+	sl_int32 compare(const sl_char8* utf8) const;
+	
+	sl_int32 compare(const sl_char16* utf16) const;
+	
+	sl_int32 compare(const sl_char32* utf32) const;
+	
 	sl_int32 compare(const String16& other, sl_uint32 len) const;
 	
-	SLIB_INLINE sl_int32 compare(const String16& other) const
-	{
-		if (m_data == other.m_data) {
-			return 0;
-		}
-		return _compare16(m_data, length(), other.m_data, other.length());
-	}
-	
-	SLIB_INLINE sl_int32 compare(const String8& _other) const
-	{
-		String16 other(_other);
-		return _compare16(m_data, length(), other.data(), other.length());
-	}
-	
-	SLIB_INLINE sl_int32 compare(const SafeString16& _other) const
-	{
-		String16 other(_other);
-		if (m_data == other.m_data) {
-			return 0;
-		}
-		return _compare16(m_data, length(), other.m_data, other.length());
-	}
-	
-	SLIB_INLINE sl_int32 compare(const SafeString8& _other) const
-	{
-		String16 other(_other);
-		return _compare16(m_data, length(), other.m_data, other.length());
-	}
-
-	SLIB_INLINE sl_int32 compare(const sl_char8* utf8) const
-	{
-		return _compare8(data(), length(), utf8, -1);
-	}
-	
-	SLIB_INLINE sl_int32 compare(const sl_char16* utf16) const
-	{
-		if (m_data == utf16) {
-			return 0;
-		}
-		return _compare16(data(), length(), utf16, -1);
-	}
-	
-	SLIB_INLINE sl_int32 compare(const sl_char32* utf32) const
-	{
-		return _compare32(data(), length(), utf32, -1);
-	}
-
 public:
-	SLIB_INLINE sl_bool operator==(const String16& other) const
-	{
-		return equals(other);
-	}
+	sl_bool operator==(const String8& other) const;
 	
-	SLIB_INLINE sl_bool operator==(const String8& other) const
-	{
-		return equals(other);
-	}
+	sl_bool operator==(const String16& other) const;
 	
-	SLIB_INLINE sl_bool operator==(const SafeString16& other) const
-	{
-		return equals(other);
-	}
+	sl_bool operator==(const SafeString8& other) const;
 	
-	SLIB_INLINE sl_bool operator==(const SafeString8& other) const
-	{
-		return equals(other);
-	}
+	sl_bool operator==(const SafeString16& other) const;
 	
-	SLIB_INLINE sl_bool operator==(const sl_char8* utf8) const
-	{
-		return equals(utf8);
-	}
+	sl_bool operator==(const sl_char8* utf8) const;
 	
-	SLIB_INLINE sl_bool operator==(const sl_char16* utf16) const
-	{
-		return equals(utf16);
-	}
+	sl_bool operator==(const sl_char16* utf16) const;
 	
-	SLIB_INLINE sl_bool operator==(const sl_char32* utf32) const
-	{
-		return equals(utf32);
-	}
+	sl_bool operator==(const sl_char32* utf32) const;
 	
-	SLIB_INLINE friend sl_bool operator==(const sl_char8* utf8, const String16& second)
-	{
-		return second == utf8;
-	}
+	friend sl_bool operator==(const sl_char8* utf8, const String16& second);
 	
-	SLIB_INLINE friend sl_bool operator==(const sl_char16* utf16, const String16& second)
-	{
-		return second == utf16;
-	}
+	friend sl_bool operator==(const sl_char16* utf16, const String16& second);
 	
-	SLIB_INLINE friend sl_bool operator==(const sl_char32* utf32, const String16& second)
-	{
-		return second == utf32;
-	}
+	friend sl_bool operator==(const sl_char32* utf32, const String16& second);
 	
-public:
-	SLIB_INLINE sl_bool operator!=(const String16& other) const
-	{
-		return !(*this == other);
-	}
 	
-	SLIB_INLINE sl_bool operator!=(const String8& other) const
-	{
-		return !(*this == other);
-	}
+	sl_bool operator!=(const String8& other) const;
 	
-	SLIB_INLINE sl_bool operator!=(const SafeString16& other) const
-	{
-		return !(*this == other);
-	}
+	sl_bool operator!=(const String16& other) const;
 	
-	SLIB_INLINE sl_bool operator!=(const SafeString8& other) const
-	{
-		return !(*this == other);
-	}
+	sl_bool operator!=(const SafeString8& other) const;
 	
-	SLIB_INLINE sl_bool operator!=(const sl_char8* utf8) const
-	{
-		return !(*this == utf8);
-	}
+	sl_bool operator!=(const SafeString16& other) const;
 	
-	SLIB_INLINE sl_bool operator!=(const sl_char16* utf16) const
-	{
-		return !(*this == utf16);
-	}
+	sl_bool operator!=(const sl_char8* utf8) const;
 	
-	SLIB_INLINE sl_bool operator!=(const sl_char32* utf32) const
-	{
-		return !(*this == utf32);
-	}
+	sl_bool operator!=(const sl_char16* utf16) const;
 	
-	SLIB_INLINE friend sl_bool operator!=(const sl_char8* utf8, const String16& second)
-	{
-		return second != utf8;
-	}
+	sl_bool operator!=(const sl_char32* utf32) const;
 	
-	SLIB_INLINE friend sl_bool operator!=(const sl_char16* utf16, const String16& second)
-	{
-		return second != utf16;
-	}
+	friend sl_bool operator!=(const sl_char8* utf8, const String16& second);
 	
-	SLIB_INLINE friend sl_bool operator!=(const sl_char32* utf32, const String16& second)
-	{
-		return second != utf32;
-	}
+	friend sl_bool operator!=(const sl_char16* utf16, const String16& second);
 	
-public:
-	SLIB_INLINE sl_bool operator>=(const String16& other) const
-	{
-		return compare(other) >= 0;
-	}
+	friend sl_bool operator!=(const sl_char32* utf32, const String16& second);
 	
-	SLIB_INLINE sl_bool operator>=(const String8& other) const
-	{
-		return compare(other) >= 0;
-	}
 	
-	SLIB_INLINE sl_bool operator>=(const SafeString16& other) const
-	{
-		return compare(other) >= 0;
-	}
+	sl_bool operator>=(const String8& other) const;
 	
-	SLIB_INLINE sl_bool operator>=(const SafeString8& other) const
-	{
-		return compare(other) >= 0;
-	}
+	sl_bool operator>=(const String16& other) const;
 	
-	SLIB_INLINE sl_bool operator>=(const sl_char8* utf8) const
-	{
-		return compare(utf8) >= 0;
-	}
+	sl_bool operator>=(const SafeString8& other) const;
 	
-	SLIB_INLINE sl_bool operator>=(const sl_char16* utf16) const
-	{
-		return compare(utf16) >= 0;
-	}
+	sl_bool operator>=(const SafeString16& other) const;
 	
-	SLIB_INLINE sl_bool operator>=(const sl_char32* utf32) const
-	{
-		return compare(utf32) >= 0;
-	}
+	sl_bool operator>=(const sl_char8* utf8) const;
 	
-	SLIB_INLINE friend sl_bool operator>=(const sl_char8* utf8, const String16& second)
-	{
-		return second.compare(utf8) <= 0;
-	}
+	sl_bool operator>=(const sl_char16* utf16) const;
 	
-	SLIB_INLINE friend sl_bool operator>=(const sl_char16* utf16, const String16& second)
-	{
-		return second.compare(utf16) <= 0;
-	}
+	sl_bool operator>=(const sl_char32* utf32) const;
 	
-	SLIB_INLINE friend sl_bool operator>=(const sl_char32* utf32, const String16& second)
-	{
-		return second.compare(utf32) <= 0;
-	}
+	friend sl_bool operator>=(const sl_char8* utf8, const String16& second);
 	
-public:
-	SLIB_INLINE sl_bool operator<=(const String16& other) const
-	{
-		return compare(other) <= 0;
-	}
+	friend sl_bool operator>=(const sl_char16* utf16, const String16& second);
 	
-	SLIB_INLINE sl_bool operator<=(const String8& other) const
-	{
-		return compare(other) <= 0;
-	}
+	friend sl_bool operator>=(const sl_char32* utf32, const String16& second);
 	
-	SLIB_INLINE sl_bool operator<=(const SafeString16& other) const
-	{
-		return compare(other) <= 0;
-	}
 	
-	SLIB_INLINE sl_bool operator<=(const SafeString8& other) const
-	{
-		return compare(other) <= 0;
-	}
+	sl_bool operator<=(const String8& other) const;
 	
-	SLIB_INLINE sl_bool operator<=(const sl_char8* utf8) const
-	{
-		return compare(utf8) <= 0;
-	}
+	sl_bool operator<=(const String16& other) const;
 	
-	SLIB_INLINE sl_bool operator<=(const sl_char16* utf16) const
-	{
-		return compare(utf16) <= 0;
-	}
+	sl_bool operator<=(const SafeString8& other) const;
 	
-	SLIB_INLINE sl_bool operator<=(const sl_char32* utf32) const
-	{
-		return compare(utf32) <= 0;
-	}
+	sl_bool operator<=(const SafeString16& other) const;
 	
-	SLIB_INLINE friend sl_bool operator<=(const sl_char8* utf8, const String16& second)
-	{
-		return second.compare(utf8) >= 0;
-	}
+	sl_bool operator<=(const sl_char8* utf8) const;
 	
-	SLIB_INLINE friend sl_bool operator<=(const sl_char16* utf16, const String16& second)
-	{
-		return second.compare(utf16) >= 0;
-	}
+	sl_bool operator<=(const sl_char16* utf16) const;
 	
-	SLIB_INLINE friend sl_bool operator<=(const sl_char32* utf32, const String16& second)
-	{
-		return second.compare(utf32) >= 0;
-	}
+	sl_bool operator<=(const sl_char32* utf32) const;
 	
-public:
-	SLIB_INLINE sl_bool operator>(const String16& other) const
-	{
-		return compare(other) > 0;
-	}
+	friend sl_bool operator<=(const sl_char8* utf8, const String16& second);
 	
-	SLIB_INLINE sl_bool operator>(const String8& other) const
-	{
-		return compare(other) > 0;
-	}
-
-	SLIB_INLINE sl_bool operator>(const SafeString16& other) const
-	{
-		return compare(other) > 0;
-	}
+	friend sl_bool operator<=(const sl_char16* utf16, const String16& second);
 	
-	SLIB_INLINE sl_bool operator>(const SafeString8& other) const
-	{
-		return compare(other) > 0;
-	}
+	friend sl_bool operator<=(const sl_char32* utf32, const String16& second);
 	
-	SLIB_INLINE sl_bool operator>(const sl_char8* utf8) const
-	{
-		return compare(utf8) > 0;
-	}
 	
-	SLIB_INLINE sl_bool operator>(const sl_char16* utf16) const
-	{
-		return compare(utf16) > 0;
-	}
+	sl_bool operator>(const String8& other) const;
 	
-	SLIB_INLINE sl_bool operator>(const sl_char32* utf32) const
-	{
-		return compare(utf32) > 0;
-	}
+	sl_bool operator>(const String16& other) const;
 	
-	SLIB_INLINE friend sl_bool operator>(const sl_char8* utf8, const String16& second)
-	{
-		return second.compare(utf8) < 0;
-	}
+	sl_bool operator>(const SafeString8& other) const;
 	
-	SLIB_INLINE friend sl_bool operator>(const sl_char16* utf16, const String16& second)
-	{
-		return second.compare(utf16) < 0;
-	}
+	sl_bool operator>(const SafeString16& other) const;
 	
-	SLIB_INLINE friend sl_bool operator>(const sl_char32* utf32, const String16& second)
-	{
-		return second.compare(utf32) < 0;
-	}
+	sl_bool operator>(const sl_char8* utf8) const;
 	
-public:
-	SLIB_INLINE sl_bool operator<(const String16& other) const
-	{
-		return compare(other) < 0;
-	}
+	sl_bool operator>(const sl_char16* utf16) const;
 	
-	SLIB_INLINE sl_bool operator<(const String8& other) const
-	{
-		return compare(other) < 0;
-	}
+	sl_bool operator>(const sl_char32* utf32) const;
 	
-	SLIB_INLINE sl_bool operator<(const SafeString16& other) const
-	{
-		return compare(other) < 0;
-	}
+	friend sl_bool operator>(const sl_char8* utf8, const String16& second);
 	
-	SLIB_INLINE sl_bool operator<(const SafeString8& other) const
-	{
-		return compare(other) < 0;
-	}
+	friend sl_bool operator>(const sl_char16* utf16, const String16& second);
 	
-	SLIB_INLINE sl_bool operator<(const sl_char8* utf8) const
-	{
-		return compare(utf8) < 0;
-	}
+	friend sl_bool operator>(const sl_char32* utf32, const String16& second);
 	
-	SLIB_INLINE sl_bool operator<(const sl_char16* utf16) const
-	{
-		return compare(utf16) < 0;
-	}
 	
-	SLIB_INLINE sl_bool operator<(const sl_char32* utf32) const
-	{
-		return compare(utf32) < 0;
-	}
+	sl_bool operator<(const String8& other) const;
 	
-	SLIB_INLINE friend sl_bool operator<(const sl_char8* utf8, const String16& second)
-	{
-		return second.compare(utf8) > 0;
-	}
+	sl_bool operator<(const String16& other) const;
 	
-	SLIB_INLINE friend sl_bool operator<(const sl_char16* utf16, const String16& second)
-	{
-		return second.compare(utf16) > 0;
-	}
+	sl_bool operator<(const SafeString8& other) const;
 	
-	SLIB_INLINE friend sl_bool operator<(const sl_char32* utf32, const String16& second)
-	{
-		return second.compare(utf32) > 0;
-	}
+	sl_bool operator<(const SafeString16& other) const;
+	
+	sl_bool operator<(const sl_char8* utf8) const;
+	
+	sl_bool operator<(const sl_char16* utf16) const;
+	
+	sl_bool operator<(const sl_char32* utf32) const;
+	
+	friend sl_bool operator<(const sl_char8* utf8, const String16& second);
+	
+	friend sl_bool operator<(const sl_char16* utf16, const String16& second);
+	
+	friend sl_bool operator<(const sl_char32* utf32, const String16& second);
 
 public:
 	String16 duplicate() const;
@@ -2157,13 +1124,15 @@ public:
 	
 	List<String16> split(const String16& pattern) const;
 	
-	sl_uint32 hashCode() const;
-	
 	String16 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true);
 	
-	static String16 parseBackslashEscapes(const sl_char16* input, sl_int32 len, sl_int32* lengthParsed = sl_null, sl_bool* flagError = sl_null);
+	static String16 parseBackslashEscapes(const sl_char16* input, sl_uint32 len, sl_uint32* lengthParsed = sl_null, sl_bool* flagError = sl_null);
 	
-	static String16 parseBackslashEscapes(String16& str, sl_int32* lengthParsed = sl_null, sl_bool* flagError = sl_null);
+	String16 parseBackslashEscapes(sl_uint32* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
+	
+	static sl_uint32 countLineNumber(const sl_char16* input, sl_uint32 len, sl_uint32* columnLast = sl_null);
+	
+	sl_uint32 countLineNumber(sl_uint32 pos, sl_uint32* column = sl_null) const;
 
 public:
 	// radix: 2 ~ 64,   flagUpperCase only works if radix <= 36 (0~9a~z)
@@ -2272,52 +1241,31 @@ public:
 	
 	static sl_int32 utf32ToUtf8(const sl_char32* utf32, sl_int32 lenUtf32, sl_char8* utf8, sl_int32 lenUtf8Buffer);
 
-private:
-	SLIB_INLINE static void _increaseReference(sl_char16* data)
-	{
-		Base::interlockedIncrement(SLIB_STR_PREF(data));
-	}
-
-	SLIB_INLINE static void _decreaseReference(sl_char16* data)
-	{
-		sl_reg iRef = Base::interlockedDecrement(SLIB_STR_PREF(data));
-		if (iRef == 0) {
-			_destroy(data);
-		}
-	}
-	
-	SLIB_INLINE void _replaceContainer(sl_char16* data)
-	{
-		_decreaseReference(m_data);
-		m_data = data;
-	}
-	
-    
-	// Deallocates memory allocated for this string
-	static void _destroy(sl_char16* data);
-
+private:	
 	// Allocates memory required for a string for the specified length
-	static sl_char16* _alloc(sl_uint32& length);
+	static StringContainer16* _alloc(sl_uint32& length);
+	
+	void _replaceContainer(StringContainer16* container);
 	
     
-	static sl_char16* _create(sl_char16 ch, sl_uint32 nRepeatCount = 1);
+	static StringContainer16* _create(sl_char16 ch, sl_uint32 nRepeatCount);
 	
-	static sl_char16* _create(const sl_char8* strUtf8, sl_int32 length = -1);
+	static StringContainer16* _create(const sl_char8* strUtf8, sl_int32 length);
 	
-	static sl_char16* _create(const sl_char16* strUtf16, sl_int32 length = -1);
+	static StringContainer16* _create(const sl_char16* strUtf16, sl_int32 length);
 	
-	static sl_char16* _create(const sl_char32* strUtf32, sl_int32 length = -1);
+	static StringContainer16* _create(const sl_char32* strUtf32, sl_int32 length);
 
     
-	static sl_char16* _merge16(const sl_char16* s1, sl_int32 len1, const sl_char16* s2, sl_int32 len2);
+	static StringContainer16* _merge16(const sl_char16* s1, sl_int32 len1, const sl_char16* s2, sl_int32 len2);
 	
-	static sl_char16* _merge8(const sl_char16* s1, sl_int32 len1, const sl_char8* s2, sl_int32 len2);
+	static StringContainer16* _merge8(const sl_char16* s1, sl_int32 len1, const sl_char8* s2, sl_int32 len2);
 	
-	static sl_char16* _merge8(const sl_char8* s1, sl_int32 len1, const sl_char16* s2, sl_int32 len2);
+	static StringContainer16* _merge8(const sl_char8* s1, sl_int32 len1, const sl_char16* s2, sl_int32 len2);
 	
-	static sl_char16* _merge32(const sl_char16* s1, sl_int32 len1, const sl_char32* s2, sl_int32 len2);
+	static StringContainer16* _merge32(const sl_char16* s1, sl_int32 len1, const sl_char32* s2, sl_int32 len2);
 	
-	static sl_char16* _merge32(const sl_char32* s1, sl_int32 len1, const sl_char16* s2, sl_int32 len2);
+	static StringContainer16* _merge32(const sl_char32* s1, sl_int32 len1, const sl_char16* s2, sl_int32 len2);
     
 	
 	// Check two unicode string is Equal
@@ -2335,9 +1283,8 @@ private:
 	static sl_int32 _compare32(const sl_char16* str1, sl_int32 len1, const sl_char32* str2, sl_int32 len2);
 	
 public:
-	static void _initStaticMemory(void* mem);
-	
 	friend class SafeString16;
+	
 };
 
 
@@ -2345,242 +1292,116 @@ public:
 class SLIB_EXPORT SafeString8
 {
 private:
-	// String(Information & Data) storage
-	sl_char8* m_data;
+	StringContainer8* m_container;
 	SpinLock m_lock;
 	
 public:
-	SLIB_INLINE SafeString8()
-	{
-		m_data = (sl_char8*)(_String_Null.data);
-	}
+	SafeString8();
 	
-	SLIB_INLINE SafeString8(SafeString8&& src)
-	{
-		m_data = src.m_data;
-		src.m_data = (sl_char8*)(_String_Null.data);
-	}
+	SafeString8(SafeString8&& src);
 	
-	SLIB_INLINE SafeString8(const SafeString8& src)
-	{
-		sl_char8* data = src._retainContainer();
-		m_data = data;
-	}
+	SafeString8(String8&& src);
 	
-	SLIB_INLINE SafeString8(String8&& src)
-	{
-		m_data = src.m_data;
-		src.m_data = (sl_char8*)(_String_Null.data);
-	}
+	SafeString8(const String8& src);
 	
-	SLIB_INLINE SafeString8(const String8& src)
-	{
-		sl_char8* data = src.m_data;
-		_increaseReference(data);
-		m_data = data;
-	}
+	SafeString8(const SafeString8& src);
+	
+	SafeString8(const String16& src);
 	
 	SafeString8(const SafeString16& src);
 
-	SafeString8(const String16& src);
-
-	SLIB_INLINE ~SafeString8()
-	{
-		_decreaseReference(m_data);
-	}
+	~SafeString8();
 
 public:
 	// From a single charactor
-	SLIB_INLINE SafeString8(sl_char8 ch, sl_uint32 nRepeatCount = 1)
-	{
-		m_data = String8::_create(ch, nRepeatCount);
-	}
+	SafeString8(sl_char8 ch, sl_uint32 nRepeatCount);
 	
 	// From an utf-8 string
-	SLIB_INLINE SafeString8(const sl_char8* strUtf8)
-	{
-		m_data = String8::_create(strUtf8);
-	}
+	SafeString8(const sl_char8* strUtf8);
 	
 	// From an utf-8 string
-	SLIB_INLINE SafeString8(const sl_char8* strUtf8, sl_int32 length)
-	{
-		m_data = String8::_create(strUtf8, length);
-	}
+	SafeString8(const sl_char8* strUtf8, sl_int32 length);
 	
 	// From an utf-16 string
-	SLIB_INLINE SafeString8(const sl_char16* strUtf16)
-	{
-		m_data = String8::_create(strUtf16);
-	}
+	SafeString8(const sl_char16* strUtf16);
 	
 	// From an utf-16 string
-	SLIB_INLINE SafeString8(const sl_char16* strUtf16, sl_int32 length)
-	{
-		m_data = String8::_create(strUtf16, length);
-	}
+	SafeString8(const sl_char16* strUtf16, sl_int32 length);
 	
 	// From an utf-32 string
-	SLIB_INLINE SafeString8(const sl_char32* strUtf32)
-	{
-		m_data = String8::_create(strUtf32);
-	}
+	SafeString8(const sl_char32* strUtf32);
 	
 	// From an utf-32 string
-	SLIB_INLINE SafeString8(const sl_char32* strUtf32, sl_int32 length)
-	{
-		m_data = String8::_create(strUtf32, length);
-	}
+	SafeString8(const sl_char32* strUtf32, sl_int32 length);
 	
 public:
-	SLIB_INLINE static const SafeString8& null()
-	{
-		return *((SafeString8*)((void*)&_String_Null));
-	}
+	static const SafeString8& null();
 	
-	SLIB_INLINE static const SafeString8& getEmpty()
-	{
-		return *((SafeString8*)((void*)&_String_Empty));
-	}
+	static const SafeString8& getEmpty();
 	
-public:
-	// Length of String
-	SLIB_INLINE sl_uint32 getLength() const
-	{
-		String8 s(*this);
-		return s.length();
-	}
+	sl_bool isNull() const;
 	
-	// Length of String
-	SLIB_INLINE sl_uint32 length() const
-	{
-		return getLength();
-	}
+	sl_bool isNotNull() const;
 	
-	SLIB_INLINE sl_bool isNull() const
-	{
-		return m_data == (sl_char8*)(_String_Null.data);
-	}
+	sl_bool isEmpty() const;
 	
-	SLIB_INLINE sl_bool isNotNull() const
-	{
-		return m_data != (sl_char8*)(_String_Null.data);
-	}
+	sl_bool isNotEmpty() const;
 	
-	SLIB_INLINE sl_bool isEmpty() const
-	{
-		return (getLength() == 0);
-	}
+	void setNull();
 	
-	SLIB_INLINE sl_bool isNotEmpty() const
-	{
-		return (getLength() != 0);
-	}
-	
-public:
-	SLIB_INLINE void setNull()
-	{
-		if (m_data != (sl_char8*)(_String_Null.data)) {
-			_replaceContainer((sl_char8*)(_String_Null.data));
-		}
-	}
-	
-	SLIB_INLINE void setEmpty()
-	{
-		if (m_data != (sl_char8*)(_String_Empty.data)) {
-			_replaceContainer((sl_char8*)(_String_Empty.data));
-		}
-	}
-	
-public:
-	SLIB_INLINE SafeString8& operator=(SafeString8&& other)
-	{
-		if (this != &other) {
-			_replaceContainer(other.m_data);
-			other.m_data = (sl_char8*)(_String_Null.data);
-		}
-		return *this;
-	}
+	void setEmpty();
 
-	SLIB_INLINE SafeString8& operator=(const SafeString8& other)
-	{
-		if (this != &other && m_data != other.m_data) {
-			sl_char8* data = other._retainContainer();
-			_replaceContainer(data);
-		}
-		return *this;
-	}
+public:
+	sl_uint32 getLength() const;
 	
-	SLIB_INLINE SafeString8& operator=(String8&& other)
-	{
-		if ((void*)this != (void*)(&other)) {
-			_replaceContainer(other.m_data);
-			other.m_data = (sl_char8*)(_String_Null.data);
-		}
-		return *this;
-	}
-	
-	SLIB_INLINE SafeString8& operator=(const String8& other)
-	{
-		sl_char8* data = other.m_data;
-		if (m_data != data) {
-			_increaseReference(data);
-			_replaceContainer(data);
-		}
-		return *this;
-	}
-
-	SLIB_INLINE SafeString8& operator=(const SafeString16& _other)
-	{
-		String16 other(_other);
-		_replaceContainer(String8::_create(other.data(), other.length()));
-		return *this;
-	}
-	
-	SLIB_INLINE SafeString8& operator=(const String16& other)
-	{
-		_replaceContainer(String8::_create(other.data(), other.length()));
-		return *this;
-	}
-	
-	SLIB_INLINE SafeString8& operator=(const sl_char8* utf8)
-	{
-		_replaceContainer(String8::_create(utf8));
-		return *this;
-	}
-	
-	SLIB_INLINE SafeString8& operator=(const sl_char16* utf16)
-	{
-		_replaceContainer(String8::_create(utf16));
-		return *this;
-	}
-	
-	SLIB_INLINE SafeString8& operator=(const sl_char32* utf32)
-	{
-		_replaceContainer(String8::_create(utf32));
-		return *this;
-	}
+	sl_uint32 getHashCode() const;
 	
 public:
-	String8 operator+(const SafeString8& other) const;
-	SafeString8& operator+=(const SafeString8& other);
+	SafeString8& operator=(SafeString8&& other);
 	
-	String8 operator+(const SafeString16& other) const;
-	SafeString8& operator+=(const SafeString16& other);
-
+	SafeString8& operator=(String8&& other);
+	
+	SafeString8& operator=(const String8& other);
+	
+	SafeString8& operator=(const SafeString8& other);
+	
+	SafeString8& operator=(const String16& other);
+	
+	SafeString8& operator=(const SafeString16& _other);
+	
+	SafeString8& operator=(const sl_char8* utf8);
+	
+	SafeString8& operator=(const sl_char16* utf16);
+	
+	SafeString8& operator=(const sl_char32* utf32);
+	
+public:
 	String8 operator+(const String8& other) const;
+	
 	SafeString8& operator+=(const String8& other);
 	
 	String8 operator+(const String16& other) const;
+	
 	SafeString8& operator+=(const String16& other);
 	
+	String8 operator+(const SafeString8& other) const;
+	
+	SafeString8& operator+=(const SafeString8& other);
+	
+	String8 operator+(const SafeString16& other) const;
+	
+	SafeString8& operator+=(const SafeString16& other);
+	
 	String8 operator+(const sl_char8* utf8) const;
+	
 	SafeString8& operator+=(const sl_char8* utf8);
 
 	String8 operator+(const sl_char16* utf16) const;
+	
 	SafeString8& operator+=(const sl_char16* utf16);
 
 	String8 operator+(const sl_char32* utf32) const;
+	
 	SafeString8& operator+=(const sl_char32* utf32);
 
 	friend String8 operator+(const sl_char8* utf8, const SafeString8& second);
@@ -2590,542 +1411,212 @@ public:
 	friend String8 operator+(const sl_char32* utf32, const SafeString8& second);
 	
 public:
-	SLIB_INLINE String8 operator+(sl_int32 number) const
-	{
-		return *this + String8::fromInt32(number);
-	}
+	String8 operator+(sl_int32 number) const;
 	
-	SLIB_INLINE SafeString8& operator+=(sl_int32 number)
-	{
-		return (*this += String8::fromInt32(number));
-	}
+	SafeString8& operator+=(sl_int32 number);
 	
-	SLIB_INLINE friend String8 operator+(sl_int32 number, const SafeString8& other)
-	{
-		return String8::fromInt32(number) + other;
-	}
+	friend String8 operator+(sl_int32 number, const SafeString8& other);
 	
 	
-	SLIB_INLINE String8 operator+(sl_uint32 number) const
-	{
-		return *this + String8::fromUint32(number);
-	}
+	String8 operator+(sl_uint32 number) const;
 	
-	SLIB_INLINE SafeString8& operator+=(sl_uint32 number)
-	{
-		return (*this += String8::fromUint32(number));
-	}
+	SafeString8& operator+=(sl_uint32 number);
 	
-	SLIB_INLINE friend String8 operator+(sl_uint32 number, const SafeString8& other)
-	{
-		return String8::fromUint32(number) + other;
-	}
+	friend String8 operator+(sl_uint32 number, const SafeString8& other);
 	
 	
-	SLIB_INLINE String8 operator+(sl_int64 number) const
-	{
-		return *this + String8::fromInt64(number);
-	}
+	String8 operator+(sl_int64 number) const;
 	
-	SLIB_INLINE SafeString8& operator+=(sl_int64 number)
-	{
-		return (*this += String8::fromInt64(number));
-	}
+	SafeString8& operator+=(sl_int64 number);
 	
-	SLIB_INLINE friend String8 operator+(sl_int64 number, const SafeString8& other)
-	{
-		return String8::fromInt64(number) + other;
-	}
+	friend String8 operator+(sl_int64 number, const SafeString8& other);
 	
 	
-	SLIB_INLINE String8 operator+(sl_uint64 number) const
-	{
-		return *this + String8::fromUint64(number);
-	}
+	String8 operator+(sl_uint64 number) const;
 	
-	SLIB_INLINE SafeString8& operator+=(sl_uint64 number)
-	{
-		return (*this += String8::fromUint64(number));
-	}
+	SafeString8& operator+=(sl_uint64 number);
 	
-	SLIB_INLINE friend String8 operator+(sl_uint64 number, const SafeString8& other)
-	{
-		return String8::fromUint64(number) + other;
-	}
+	friend String8 operator+(sl_uint64 number, const SafeString8& other);
 	
 	
-	SLIB_INLINE String8 operator+(float number) const
-	{
-		return *this + String8::fromFloat(number);
-	}
+	String8 operator+(float number) const;
 	
-	SLIB_INLINE SafeString8& operator+=(float number)
-	{
-		return (*this += String8::fromFloat(number));
-	}
+	SafeString8& operator+=(float number);
 	
-	SLIB_INLINE friend String8 operator+(float number, const SafeString8& other)
-	{
-		return String8::fromFloat(number) + other;
-	}
+	friend String8 operator+(float number, const SafeString8& other);
 	
 	
-	SLIB_INLINE String8 operator+(double number) const
-	{
-		return *this + String8::fromDouble(number);
-	}
+	String8 operator+(double number) const;
 	
-	SLIB_INLINE SafeString8& operator+=(double number)
-	{
-		return (*this += String8::fromDouble(number));
-	}
+	SafeString8& operator+=(double number);
 	
-	SLIB_INLINE friend String8 operator+(double number, const SafeString8& other)
-	{
-		return String8::fromDouble(number) + other;
-	}
+	friend String8 operator+(double number, const SafeString8& other);
 	
 	
-	SLIB_INLINE String8 operator+(sl_bool value) const
-	{
-		return *this + String8::fromBoolean(value);
-	}
+	String8 operator+(sl_bool value) const;
 	
-	SLIB_INLINE SafeString8& operator+=(sl_bool value)
-	{
-		return (*this += String8::fromBoolean(value));
-	}
+	SafeString8& operator+=(sl_bool value);
 	
-	SLIB_INLINE friend String8 operator+(sl_bool value, const SafeString8& other)
-	{
-		return String8::fromBoolean(value) + other;
-	}
+	friend String8 operator+(sl_bool value, const SafeString8& other);
 	
 public:
-	SLIB_INLINE sl_bool equals(const SafeString8& other) const
-	{
-		String8 s1(*this);
-		String8 s2(other);
-		if (s1.m_data == s2.m_data) {
-			return sl_true;
-		}
-		if (s1.length() != s2.length()) {
-			return sl_false;
-		}
-		return String8::_equals8(s1.m_data, s1.length(), s2.m_data, s2.length());
-	}
+	sl_bool equals(const String8& other) const;
 	
-	SLIB_INLINE sl_bool equals(const SafeString16& other) const
-	{
-		String8 s1(*this);
-		String16 s2(other);
-		return String8::_equals16(s1.m_data, s1.length(), s2.data(), s2.length());
-	}
+	sl_bool equals(const String16& other) const;
 	
-	SLIB_INLINE sl_bool equals(const String8& other) const
-	{
-		String8 s(*this);
-		if (s.m_data == other.m_data) {
-			return sl_true;
-		}
-		if (s.length() != other.length()) {
-			return sl_false;
-		}
-		return String8::_equals8(s.m_data, s.length(), other.m_data, other.length());
-	}
+	sl_bool equals(const SafeString8& other) const;
 	
-	SLIB_INLINE sl_bool equals(const String16& other) const
-	{
-		String8 s(*this);
-		return String8::_equals16(s.m_data, s.length(), other.data(), other.length());
-	}
+	sl_bool equals(const SafeString16& other) const;
+
+	sl_bool equals(const sl_char8* utf8) const;
 	
-	SLIB_INLINE sl_bool equals(const sl_char8* utf8) const
-	{
-		String8 s(*this);
-		if (s.m_data == utf8) {
-			return sl_true;
-		}
-		return String8::_equals8(s.m_data, s.length(), utf8, -1);
-	}
+	sl_bool equals(const sl_char16* utf16) const;
 	
-	SLIB_INLINE sl_bool equals(const sl_char16* utf16) const
-	{
-		String8 s(*this);
-		return String8::_equals16(s.m_data, s.length(), utf16, -1);
-	}
+	sl_bool equals(const sl_char32* utf32) const;
 	
-	SLIB_INLINE sl_bool equals(const sl_char32* utf32) const
-	{
-		String8 s(*this);
-		return String8::_equals32(s.m_data, s.length(), utf32, -1);
-	}
 	
+	sl_int32 compare(const String8& other) const;
+	
+	sl_int32 compare(const String16& other) const;
+	
+	sl_int32 compare(const SafeString8& other) const;
+	
+	sl_int32 compare(const SafeString16& other) const;
+	
+	sl_int32 compare(const sl_char8* utf8) const;
+	
+	sl_int32 compare(const sl_char16* utf16) const;
+	
+	sl_int32 compare(const sl_char32* utf32) const;
+	
+	sl_int32 compare(const String8& other, sl_uint32 len) const;
+	
+
 public:
-	SLIB_INLINE sl_int32 compare(const String8& other, sl_uint32 len) const
-	{
-		String8 s(*this);
-		return s.compare(other, len);
-	}
-	
-	SLIB_INLINE sl_int32 compare(const SafeString8& other) const
-	{
-		String8 s1(*this);
-		String8 s2(other);
-		if (s1.m_data == s2.m_data) {
-			return 0;
-		}
-		return String8::_compare8(s1.m_data, s1.length(), s2.m_data, s2.length());
-	}
-	
-	SLIB_INLINE sl_int32 compare(const SafeString16& other) const
-	{
-		String8 s1(*this);
-		String16 s2(other);
-		return String8::_compare16(s1.m_data, s1.length(), s2.data(), s2.length());
-	}
-	
-	SLIB_INLINE sl_int32 compare(const String8& other) const
-	{
-		String8 s(*this);
-		if (s.m_data == other.m_data) {
-			return 0;
-		}
-		return String8::_compare8(s.m_data, s.length(), other.m_data, other.length());
-	}
-	
-	SLIB_INLINE sl_int32 compare(const String16& other) const
-	{
-		String8 s(*this);
-		return String8::_compare16(s.m_data, s.length(), other.data(), other.length());
-	}
-	
-	SLIB_INLINE sl_int32 compare(const sl_char8* utf8) const
-	{
-		String8 s(*this);
-		if (s.m_data == utf8) {
-			return 0;
-		}
-		return String8::_compare8(s.m_data, s.length(), utf8, -1);
-	}
-	
-	SLIB_INLINE sl_int32 compare(const sl_char16* utf16) const
-	{
-		String8 s(*this);
-		return String8::_compare16(s.m_data, s.length(), utf16, -1);
-	}
-	
-	SLIB_INLINE sl_int32 compare(const sl_char32* utf32) const
-	{
-		String8 s(*this);
-		return String8::_compare32(s.m_data, s.length(), utf32, -1);
-	}
-	
-public:
-	SLIB_INLINE sl_bool operator==(const String8& other) const
-	{
-		return equals(other);
-	}
-	
-	SLIB_INLINE sl_bool operator==(const String16& other) const
-	{
-		return equals(other);
-	}
-	
-	SLIB_INLINE sl_bool operator==(const SafeString8& other) const
-	{
-		return equals(other);
-	}
-	
-	SLIB_INLINE sl_bool operator==(const SafeString16& other) const
-	{
-		return equals(other);
-	}
-	
-	SLIB_INLINE sl_bool operator==(const sl_char8* utf8) const
-	{
-		return equals(utf8);
-	}
-	
-	SLIB_INLINE sl_bool operator==(const sl_char16* utf16) const
-	{
-		return equals(utf16);
-	}
-	
-	SLIB_INLINE sl_bool operator==(const sl_char32* utf32) const
-	{
-		return equals(utf32);
-	}
-	
-	SLIB_INLINE friend sl_bool operator==(const sl_char8* utf8, const SafeString8& second)
-	{
-		return second == utf8;
-	}
-	
-	SLIB_INLINE friend sl_bool operator==(const sl_char16* utf16, const SafeString8& second)
-	{
-		return second == utf16;
-	}
-	
-	SLIB_INLINE friend sl_bool operator==(const sl_char32* utf32, const SafeString8& second)
-	{
-		return second == utf32;
-	}
-	
-public:
-	SLIB_INLINE sl_bool operator!=(const String8& other) const
-	{
-		return !(*this == other);
-	}
-	
-	SLIB_INLINE sl_bool operator!=(const String16& other) const
-	{
-		return !(*this == other);
-	}
-	
-	SLIB_INLINE sl_bool operator!=(const SafeString8& other) const
-	{
-		return !(*this == other);
-	}
-	
-	SLIB_INLINE sl_bool operator!=(const SafeString16& other) const
-	{
-		return !(*this == other);
-	}
-	
-	SLIB_INLINE sl_bool operator!=(const sl_char8* utf8) const
-	{
-		return !(*this == utf8);
-	}
-	
-	SLIB_INLINE sl_bool operator!=(const sl_char16* utf16) const
-	{
-		return !(*this == utf16);
-	}
-	
-	SLIB_INLINE sl_bool operator!=(const sl_char32* utf32) const
-	{
-		return !(*this == utf32);
-	}
-	
-	SLIB_INLINE friend sl_bool operator!=(const sl_char8* utf8, const SafeString8& second)
-	{
-		return second != utf8;
-	}
-	
-	SLIB_INLINE friend sl_bool operator!=(const sl_char16* utf16, const SafeString8& second)
-	{
-		return second != utf16;
-	}
-	
-	SLIB_INLINE friend sl_bool operator!=(const sl_char32* utf32, const SafeString8& second)
-	{
-		return second != utf32;
-	}
-	
-public:
-	SLIB_INLINE sl_bool operator>=(const String8& other) const
-	{
-		return compare(other) >= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>=(const String16& other) const
-	{
-		return compare(other) >= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>=(const SafeString8& other) const
-	{
-		return compare(other) >= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>=(const SafeString16& other) const
-	{
-		return compare(other) >= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>=(const sl_char8* utf8) const
-	{
-		return compare(utf8) >= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>=(const sl_char16* utf16) const
-	{
-		return compare(utf16) >= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>=(const sl_char32* utf32) const
-	{
-		return compare(utf32) >= 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator>=(const sl_char8* utf8, const SafeString8& second)
-	{
-		return second.compare(utf8) <= 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator>=(const sl_char16* utf16, const SafeString8& second)
-	{
-		return second.compare(utf16) <= 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator>=(const sl_char32* utf32, const SafeString8& second)
-	{
-		return second.compare(utf32) <= 0;
-	}
-	
-public:
-	SLIB_INLINE sl_bool operator<=(const String8& other) const
-	{
-		return compare(other) <= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<=(const String16& other) const
-	{
-		return compare(other) <= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<=(const SafeString8& other) const
-	{
-		return compare(other) <= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<=(const SafeString16& other) const
-	{
-		return compare(other) <= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<=(const sl_char8* utf8) const
-	{
-		return compare(utf8) <= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<=(const sl_char16* utf16) const
-	{
-		return compare(utf16) <= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<=(const sl_char32* utf32) const
-	{
-		return compare(utf32) <= 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator<=(const sl_char8* utf8, const SafeString8& second)
-	{
-		return second.compare(utf8) >= 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator<=(const sl_char16* utf16, const SafeString8& second)
-	{
-		return second.compare(utf16) >= 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator<=(const sl_char32* utf32, const SafeString8& second)
-	{
-		return second.compare(utf32) >= 0;
-	}
-	
-public:
-	SLIB_INLINE sl_bool operator>(const String8& other) const
-	{
-		return compare(other) > 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>(const String16& other) const
-	{
-		return compare(other) > 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>(const SafeString8& other) const
-	{
-		return compare(other) > 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>(const SafeString16& other) const
-	{
-		return compare(other) > 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>(const sl_char8* utf8) const
-	{
-		return compare(utf8) > 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>(const sl_char16* utf16) const
-	{
-		return compare(utf16) > 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>(const sl_char32* utf32) const
-	{
-		return compare(utf32) > 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator>(const sl_char8* utf8, const SafeString8& second)
-	{
-		return second.compare(utf8) < 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator>(const sl_char16* utf16, const SafeString8& second)
-	{
-		return second.compare(utf16) < 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator>(const sl_char32* utf32, const SafeString8& second)
-	{
-		return second.compare(utf32) < 0;
-	}
-	
-public:
-	SLIB_INLINE sl_bool operator<(const String8& other) const
-	{
-		return compare(other) < 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<(const String16& other) const
-	{
-		return compare(other) < 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<(const SafeString8& other) const
-	{
-		return compare(other) < 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<(const SafeString16& other) const
-	{
-		return compare(other) < 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<(const sl_char8* utf8) const
-	{
-		return compare(utf8) < 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<(const sl_char16* utf16) const
-	{
-		return compare(utf16) < 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<(const sl_char32* utf32) const
-	{
-		return compare(utf32) < 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator<(const sl_char8* utf8, const SafeString8& second)
-	{
-		return second.compare(utf8) > 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator<(const sl_char16* utf16, const SafeString8& second)
-	{
-		return second.compare(utf16) > 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator<(const sl_char32* utf32, const SafeString8& second)
-	{
-		return second.compare(utf32) > 0;
-	}
+	sl_bool operator==(const String8& other) const;
+	
+	sl_bool operator==(const String16& other) const;
+	
+	sl_bool operator==(const SafeString8& other) const;
+	
+	sl_bool operator==(const SafeString16& other) const;
+	
+	sl_bool operator==(const sl_char8* utf8) const;
+	
+	sl_bool operator==(const sl_char16* utf16) const;
+	
+	sl_bool operator==(const sl_char32* utf32) const;
+	
+	friend sl_bool operator==(const sl_char8* utf8, const SafeString8& second);
+	
+	friend sl_bool operator==(const sl_char16* utf16, const SafeString8& second);
+	
+	friend sl_bool operator==(const sl_char32* utf32, const SafeString8& second);
+	
+	
+	sl_bool operator!=(const String8& other) const;
+	
+	sl_bool operator!=(const String16& other) const;
+	
+	sl_bool operator!=(const SafeString8& other) const;
+	
+	sl_bool operator!=(const SafeString16& other) const;
+	
+	sl_bool operator!=(const sl_char8* utf8) const;
+	
+	sl_bool operator!=(const sl_char16* utf16) const;
+	
+	sl_bool operator!=(const sl_char32* utf32) const;
+	
+	friend sl_bool operator!=(const sl_char8* utf8, const SafeString8& second);
+	
+	friend sl_bool operator!=(const sl_char16* utf16, const SafeString8& second);
+	
+	friend sl_bool operator!=(const sl_char32* utf32, const SafeString8& second);
+	
+	
+	sl_bool operator>=(const String8& other) const;
+	
+	sl_bool operator>=(const String16& other) const;
+	
+	sl_bool operator>=(const SafeString8& other) const;
+	
+	sl_bool operator>=(const SafeString16& other) const;
+	
+	sl_bool operator>=(const sl_char8* utf8) const;
+	
+	sl_bool operator>=(const sl_char16* utf16) const;
+	
+	sl_bool operator>=(const sl_char32* utf32) const;
+	
+	friend sl_bool operator>=(const sl_char8* utf8, const SafeString8& second);
+	
+	friend sl_bool operator>=(const sl_char16* utf16, const SafeString8& second);
+	
+	friend sl_bool operator>=(const sl_char32* utf32, const SafeString8& second);
+	
+	
+	sl_bool operator<=(const String8& other) const;
+	
+	sl_bool operator<=(const String16& other) const;
+	
+	sl_bool operator<=(const SafeString8& other) const;
+	
+	sl_bool operator<=(const SafeString16& other) const;
+	
+	sl_bool operator<=(const sl_char8* utf8) const;
+	
+	sl_bool operator<=(const sl_char16* utf16) const;
+	
+	sl_bool operator<=(const sl_char32* utf32) const;
+	
+	friend sl_bool operator<=(const sl_char8* utf8, const SafeString8& second);
+	
+	friend sl_bool operator<=(const sl_char16* utf16, const SafeString8& second);
+	
+	friend sl_bool operator<=(const sl_char32* utf32, const SafeString8& second);
+	
+	
+	sl_bool operator>(const String8& other) const;
+	
+	sl_bool operator>(const String16& other) const;
+	
+	sl_bool operator>(const SafeString8& other) const;
+	
+	sl_bool operator>(const SafeString16& other) const;
+	
+	sl_bool operator>(const sl_char8* utf8) const;
+	
+	sl_bool operator>(const sl_char16* utf16) const;
+	
+	sl_bool operator>(const sl_char32* utf32) const;
+	
+	friend sl_bool operator>(const sl_char8* utf8, const SafeString8& second);
+	
+	friend sl_bool operator>(const sl_char16* utf16, const SafeString8& second);
+	
+	friend sl_bool operator>(const sl_char32* utf32, const SafeString8& second);
+	
+	
+	sl_bool operator<(const String8& other) const;
+	
+	sl_bool operator<(const String16& other) const;
+	
+	sl_bool operator<(const SafeString8& other) const;
+	
+	sl_bool operator<(const SafeString16& other) const;
+	
+	sl_bool operator<(const sl_char8* utf8) const;
+	
+	sl_bool operator<(const sl_char16* utf16) const;
+	
+	sl_bool operator<(const sl_char32* utf32) const;
+	
+	friend sl_bool operator<(const sl_char8* utf8, const SafeString8& second);
+	
+	friend sl_bool operator<(const sl_char16* utf16, const SafeString8& second);
+	
+	friend sl_bool operator<(const sl_char32* utf32, const SafeString8& second);
 	
 public:
 	String8 duplicate() const;
@@ -3192,10 +1683,12 @@ public:
 	
 	List<String8> split(const String8& pattern) const;
 	
-	sl_uint32 hashCode() const;
-	
 	String8 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true);
-		
+	
+	String8 parseBackslashEscapes(sl_uint32* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
+	
+	sl_uint32 countLineNumber(sl_uint32 pos, sl_uint32* column = sl_null) const;
+	
 public:
 	sl_bool parseInt32(sl_int32 radix, sl_int32* _out) const;
 
@@ -3232,22 +1725,9 @@ public:
 	sl_bool parseHexString(void* _out) const;
 
 private:
-	SLIB_INLINE static void _increaseReference(sl_char8* data)
-	{
-		Base::interlockedIncrement(SLIB_STR_PREF(data));
-	}
+	StringContainer8* _retainContainer() const;
 	
-	SLIB_INLINE static void _decreaseReference(sl_char8* data)
-	{
-		sl_reg iRef = Base::interlockedDecrement(SLIB_STR_PREF(data));
-		if (iRef == 0) {
-			String8::_destroy(data);
-		}
-	}
-	
-	sl_char8* _retainContainer() const;
-	
-	void _replaceContainer(sl_char8* other);
+	void _replaceContainer(StringContainer8* other);
 
 	friend class String8;
 };
@@ -3256,245 +1736,113 @@ private:
 class SLIB_EXPORT SafeString16
 {
 private:
-	// String(Information & Data) storage
-#if defined(SLIB_USE_UNICODE16)
-	union {
-		sl_char16* m_data;
-		wchar_t* m_dataDebug;
-	};
-#else
-	sl_char16* m_data;
-#endif
+	StringContainer16* m_container;
 	SpinLock m_lock;
 	
 public:
-	SLIB_INLINE SafeString16()
-	{
-		m_data = (sl_char16*)(_String_Null.data);
-	}
+	SafeString16();
 	
-	SLIB_INLINE SafeString16(SafeString16&& src)
-	{
-		m_data = src.m_data;
-		src.m_data = (sl_char16*)(_String_Null.data);
-	}
+	SafeString16(SafeString16&& src);
 	
-	SLIB_INLINE SafeString16(const SafeString16& src)
-	{
-		sl_char16* data = src._retainContainer();
-		m_data = data;
-	}
+	SafeString16(String16&& src);
 	
-	SLIB_INLINE SafeString16(String16&& src)
-	{
-		m_data = src.m_data;
-		src.m_data = (sl_char16*)(_String_Null.data);
-	}
+	SafeString16(const String16& src);
 	
-	SLIB_INLINE SafeString16(const String16& src)
-	{
-		sl_char16* data = src.m_data;
-		_increaseReference(data);
-		m_data = data;
-	}
+	SafeString16(const SafeString16& src);
+	
+	SafeString16(const String8& src);
 	
 	SafeString16(const SafeString8& src);
 	
-	SafeString16(const String8& src);
-
-	SLIB_INLINE ~SafeString16()
-	{
-		_decreaseReference(m_data);
-	}
+	~SafeString16();
 	
 public:
 	// From a single charactor
-	SLIB_INLINE SafeString16(sl_char16 ch, sl_uint32 nRepeatCount = 1)
-	{
-		m_data = String16::_create(ch, nRepeatCount);
-	}
+	SafeString16(sl_char16 ch, sl_uint32 nRepeatCount);
 	
 	// From an utf-8 string
-	SLIB_INLINE SafeString16(const sl_char8* strUtf8)
-	{
-		m_data = String16::_create(strUtf8);
-	}
+	SafeString16(const sl_char8* strUtf8);
 	
-	SLIB_INLINE SafeString16(const sl_char8* strUtf8, sl_int32 length)
-	{
-		m_data = String16::_create(strUtf8, length);
-	}
+	SafeString16(const sl_char8* strUtf8, sl_int32 length);
 	
 	// From an utf-16 string
-	SLIB_INLINE SafeString16(const sl_char16* strUtf16)
-	{
-		m_data = String16::_create(strUtf16);
-	}
+	SafeString16(const sl_char16* strUtf16);
 	
-	SLIB_INLINE SafeString16(const sl_char16* strUtf16, sl_int32 length)
-	{
-		m_data = String16::_create(strUtf16, length);
-	}
+	SafeString16(const sl_char16* strUtf16, sl_int32 length);
 	
 	// From an utf-32 string
-	SLIB_INLINE SafeString16(const sl_char32* strUtf32)
-	{
-		m_data = String16::_create(strUtf32);
-	}
+	SafeString16(const sl_char32* strUtf32);
 	
-	SLIB_INLINE SafeString16(const sl_char32* strUtf32, sl_int32 length)
-	{
-		m_data = String16::_create(strUtf32, length);
-	}
+	SafeString16(const sl_char32* strUtf32, sl_int32 length);
 	
 public:
-	SLIB_INLINE static const SafeString16& null()
-	{
-		return *((SafeString16*)((void*)&_String_Null));
-	}
+	static const SafeString16& null();
 	
-	SLIB_INLINE static const SafeString16& getEmpty()
-	{
-		return *((SafeString16*)((void*)&_String_Empty));
-	}
+	static const SafeString16& getEmpty();
+	
+	sl_bool isNull() const;
+	
+	sl_bool isNotNull() const;
+	
+	sl_bool isEmpty() const;
+	
+	sl_bool isNotEmpty() const;
+	
+	void setNull();
+	
+	void setEmpty();
+	
+public:
+	sl_uint32 getLength() const;
+	
+	sl_uint32 getHashCode() const;
 
 public:
-	// Length of String
-	SLIB_INLINE sl_uint32 getLength() const
-	{
-		String16 s(*this);
-		return s.length();
-	}
+	SafeString16& operator=(SafeString16&& other);
 	
-	SLIB_INLINE sl_uint32 length() const
-	{
-		return getLength();
-	}
-	
-	SLIB_INLINE sl_bool isNull() const
-	{
-		return m_data == (sl_char16*)(_String_Null.data);
-	}
-	
-	SLIB_INLINE sl_bool isNotNull() const
-	{
-		return m_data != (sl_char16*)(_String_Null.data);
-	}
-	
-	SLIB_INLINE sl_bool isEmpty() const
-	{
-		return (getLength()==0);
-	}
-	
-	SLIB_INLINE sl_bool isNotEmpty() const
-	{
-		return (getLength() != 0);
-	}
-	
-public:
-	SLIB_INLINE void setNull()
-	{
-        if (m_data != (sl_char16*)(_String_Null.data)) {
-            _replaceContainer((sl_char16*)(_String_Null.data));
-        }
-	}
-	
-	SLIB_INLINE void setEmpty()
-	{
-        if (m_data != (sl_char16*)(_String_Empty.data)) {
-            _replaceContainer((sl_char16*)(_String_Empty.data));
-        }
-	}
-	
-public:
-	SLIB_INLINE SafeString16& operator=(SafeString16&& other)
-	{
-		if (this != &other) {
-			_replaceContainer(other.m_data);
-			other.m_data = (sl_char16*)(_String_Null.data);
-		}
-		return *this;
-	}
+	SafeString16& operator=(String16&& other);
 
-	SLIB_INLINE SafeString16& operator=(const SafeString16& other)
-	{
-		if (this != &other && m_data != other.m_data) {
-			sl_char16* data = other._retainContainer();
-			_replaceContainer(data);
-		}
-		return *this;
-	}
+	SafeString16& operator=(const String16& other);
 	
-	SLIB_INLINE SafeString16& operator=(String16&& other)
-	{
-		if ((void*)this != (void*)(&other)) {
-			_replaceContainer(other.m_data);
-			other.m_data = (sl_char16*)(_String_Null.data);
-		}
-		return *this;
-	}
+	SafeString16& operator=(const SafeString16& other);
 	
-	SLIB_INLINE SafeString16& operator=(const String16& other)
-	{
-		sl_char16* data = other.m_data;
-		if (m_data != data) {
-			_increaseReference(data);
-			_replaceContainer(data);
-		}
-		return *this;
-	}
-
-	SLIB_INLINE SafeString16& operator=(const SafeString8& _other)
-    {
-        String8 other(_other);
-	   _replaceContainer(String16::_create(other.data(), other.length()));
-        return *this;
-    }
+	SafeString16& operator=(const String8& other);
 	
-	SLIB_INLINE SafeString16& operator=(const String8& other)
-    {
-		_replaceContainer(String16::_create(other.data(), other.length()));
-		return *this;
-	}
+	SafeString16& operator=(const SafeString8& _other);
 	
-	SLIB_INLINE SafeString16& operator=(const sl_char8* utf8)
-    {
-		_replaceContainer(String16::_create(utf8));
-		return *this;
-	}
+	SafeString16& operator=(const sl_char8* utf8);
 	
-	SLIB_INLINE SafeString16& operator=(const sl_char16* utf16)
-    {
-		_replaceContainer(String16::_create(utf16));
-		return *this;
-	}
+	SafeString16& operator=(const sl_char16* utf16);
 	
-	SLIB_INLINE SafeString16& operator=(const sl_char32* utf32)	
-    {
-		_replaceContainer(String16::_create(utf32));
-		return *this;
-	}
+	SafeString16& operator=(const sl_char32* utf32);
     
 public:
 	String16 operator+(const String16& other) const;
+	
 	SafeString16& operator+=(const SafeString16& other);
 
 	String16 operator+(const String8& other) const;
+	
 	SafeString16& operator+=(const SafeString8& other);
 
 	String16 operator+(const SafeString16& other) const;
+	
 	SafeString16& operator+=(const String16& other);
 
 	String16 operator+(const SafeString8& other) const;
+	
 	SafeString16& operator+=(const String8& other);
 
 	String16 operator+(const sl_char8* utf8) const;
+	
 	SafeString16& operator+=(const sl_char8* utf8);
 
 	String16 operator+(const sl_char16* utf16) const;
+	
 	SafeString16& operator+=(const sl_char16* utf16);
 
 	String16 operator+(const sl_char32* utf32) const;
+	
 	SafeString16& operator+=(const sl_char32* utf32);
 
 	friend String16 operator+(const sl_char8* utf8, const SafeString16& second);
@@ -3504,543 +1852,211 @@ public:
 	friend String16 operator+(const sl_char32* utf32, const SafeString16& second);
 	
 public:
-	SLIB_INLINE String16 operator+(sl_int32 number) const
-	{
-		return *this + String16::fromInt32(number);
-	}
+	String16 operator+(sl_int32 number) const;
 	
-	SLIB_INLINE SafeString16& operator+=(sl_int32 number)
-	{
-		return (*this += String16::fromInt32(number));
-	}
+	SafeString16& operator+=(sl_int32 number);
 	
-	SLIB_INLINE friend String16 operator+(sl_int32 number, const SafeString16& other)
-	{
-		return String16::fromInt32(number) + other;
-	}
+	friend String16 operator+(sl_int32 number, const SafeString16& other);
 	
 	
-	SLIB_INLINE String16 operator+(sl_uint32 number) const
-	{
-		return *this + String16::fromUint32(number);
-	}
+	String16 operator+(sl_uint32 number) const;
 	
-	SLIB_INLINE SafeString16& operator+=(sl_uint32 number)
-	{
-		return (*this += String16::fromUint32(number));
-	}
+	SafeString16& operator+=(sl_uint32 number);
 	
-	SLIB_INLINE friend String16 operator+(sl_uint32 number, const SafeString16& other)
-	{
-		return String16::fromUint32(number) + other;
-	}
+	friend String16 operator+(sl_uint32 number, const SafeString16& other);
 	
 	
-	SLIB_INLINE String16 operator+(sl_int64 number) const
-	{
-		return *this + String16::fromInt64(number);
-	}
+	String16 operator+(sl_int64 number) const;
 	
-	SLIB_INLINE SafeString16& operator+=(sl_int64 number)
-	{
-		return (*this += String16::fromInt64(number));
-	}
+	SafeString16& operator+=(sl_int64 number);
 	
-	SLIB_INLINE friend String16 operator+(sl_int64 number, const SafeString16& other)
-	{
-		return String16::fromInt64(number) + other;
-	}
+	friend String16 operator+(sl_int64 number, const SafeString16& other);
 	
 	
-	SLIB_INLINE String16 operator+(sl_uint64 number) const
-	{
-		return *this + String16::fromUint64(number);
-	}
+	String16 operator+(sl_uint64 number) const;
 	
-	SLIB_INLINE SafeString16& operator+=(sl_uint64 number)
-	{
-		return (*this += String16::fromUint64(number));
-	}
+	SafeString16& operator+=(sl_uint64 number);
 	
-	SLIB_INLINE friend String16 operator+(sl_uint64 number, const SafeString16& other)
-	{
-		return String16::fromUint64(number) + other;
-	}
+	friend String16 operator+(sl_uint64 number, const SafeString16& other);
 	
 	
-	SLIB_INLINE String16 operator+(float number) const
-	{
-		return *this + String16::fromFloat(number);
-	}
+	String16 operator+(float number) const;
 	
-	SLIB_INLINE SafeString16& operator+=(float number)
-	{
-		return (*this += String16::fromFloat(number));
-	}
+	SafeString16& operator+=(float number);
 	
-	SLIB_INLINE friend String16 operator+(float number, const SafeString16& other)
-	{
-		return String16::fromFloat(number) + other;
-	}
+	friend String16 operator+(float number, const SafeString16& other);
 	
 	
-	SLIB_INLINE String16 operator+(double number) const
-	{
-		return *this + String16::fromDouble(number);
-	}
+	String16 operator+(double number) const;
 	
-	SLIB_INLINE SafeString16& operator+=(double number)
-	{
-		return (*this += String16::fromDouble(number));
-	}
+	SafeString16& operator+=(double number);
 	
-	SLIB_INLINE friend String16 operator+(double number, const SafeString16& other)
-	{
-		return String16::fromDouble(number) + other;
-	}
+	friend String16 operator+(double number, const SafeString16& other);
 	
 	
-	SLIB_INLINE String16 operator+(sl_bool value) const
-	{
-		return *this + String16::fromBoolean(value);
-	}
+	String16 operator+(sl_bool value) const;
 	
-	SLIB_INLINE SafeString16& operator+=(sl_bool value)
-	{
-		return (*this += String16::fromBoolean(value));
-	}
+	SafeString16& operator+=(sl_bool value);
 	
-	SLIB_INLINE friend String16 operator+(sl_bool value, const SafeString16& other)
-	{
-		return String16::fromBoolean(value) + other;
-	}
+	friend String16 operator+(sl_bool value, const SafeString16& other);
 	
 public:
-	SLIB_INLINE sl_bool equals(const SafeString16& other) const
-	{
-		String16 s1(*this);
-		String16 s2(other);
-		if (s1.m_data == s2.m_data) {
-			return sl_true;
-		}
-		if (s1.length() != s2.length()) {
-			return sl_false;
-		}
-		return String16::_equals16(s1.m_data, s1.length(), s2.m_data, s2.length());
-	}
+	sl_bool equals(const String16& other) const;
 	
-	SLIB_INLINE sl_bool equals(const SafeString8& other) const
-	{
-		String16 s1(*this);
-		String8 s2(other);
-		return String16::_equals8(s1.m_data, s1.length(), s2.data(), s2.length());
-	}
+	sl_bool equals(const String8& other) const;
 	
-	SLIB_INLINE sl_bool equals(const String16& other) const
-	{
-		String16 s(*this);
-		if (s.m_data == other.m_data) {
-			return sl_true;
-		}
-		if (s.length() != other.length()) {
-			return sl_false;
-		}
-		return String16::_equals16(s.m_data, s.length(), other.data(), other.length());
-	}
+	sl_bool equals(const SafeString16& other) const;
 	
-	SLIB_INLINE sl_bool equals(const String8& other) const
-	{
-		String16 s(*this);
-		return String16::_equals8(s.m_data, s.length(), other.data(), other.length());
-	}
+	sl_bool equals(const SafeString8& other) const;
 	
-	SLIB_INLINE sl_bool equals(const sl_char8* utf8) const
-	{
-		String16 s(*this);
-		return String16::_equals8(s.m_data, s.length(), utf8, -1);
-	}
+	sl_bool equals(const sl_char8* utf8) const;
 	
-	SLIB_INLINE sl_bool equals(const sl_char16* utf16) const
-	{
-		String16 s(*this);
-		if (s.m_data == utf16) {
-			return sl_true;
-		}
-		return String16::_equals16(s.m_data, s.length(), utf16, -1);
-	}
+	sl_bool equals(const sl_char16* utf16) const;
 	
-	SLIB_INLINE sl_bool equals(const sl_char32* utf32) const
-	{
-		String16 s(*this);
-		return String16::_equals32(s.m_data, s.length(), utf32, -1);
-	}
+	sl_bool equals(const sl_char32* utf32) const;
 	
+	
+	sl_int32 compare(const String16& other) const;
+	
+	sl_int32 compare(const String8& other) const;
+	
+	sl_int32 compare(const SafeString16& other) const;
+	
+	sl_int32 compare(const SafeString8& other) const;
+	
+	sl_int32 compare(const sl_char8* utf8) const;
+	
+	sl_int32 compare(const sl_char16* utf16) const;
+	
+	sl_int32 compare(const sl_char32* utf32) const;
+	
+	sl_int32 compare(const String16& other, sl_uint32 len) const;
+
 public:
-	SLIB_INLINE sl_int32 compare(const String16& other, sl_uint32 len) const
-	{
-		String16 s(*this);
-		return s.compare(other, len);
-	}
-	
-	SLIB_INLINE sl_int32 compare(const SafeString16& other) const
-	{
-		String16 s1(*this);
-		String16 s2(other);
-		if (s1.m_data == s2.m_data) {
-			return 0;
-		}
-		return String16::_compare16(s1.m_data, s1.length(), s2.m_data, s2.length());
-	}
-	
-	SLIB_INLINE sl_int32 compare(const SafeString8& other) const
-	{
-		String16 s1(*this);
-		String8 s2(other);
-		return String16::_compare8(s1.m_data, s1.length(), s2.data(), s2.length());
-	}
-	
-	SLIB_INLINE sl_int32 compare(const String16& other) const
-	{
-		String16 s(*this);
-		if (s.m_data == other.m_data) {
-			return 0;
-		}
-		return String16::_compare16(s.m_data, s.length(), other.data(), other.length());
-	}
-	
-	SLIB_INLINE sl_int32 compare(const String8& other) const
-	{
-		String16 s(*this);
-		return String16::_compare8(s.m_data, s.length(), other.data(), other.length());
-	}
-	
-	SLIB_INLINE sl_int32 compare(const sl_char8* utf8) const
-	{
-		String16 s(*this);
-		return String16::_compare8(s.m_data, s.length(), utf8, -1);
-	}
-	
-	SLIB_INLINE sl_int32 compare(const sl_char16* utf16) const
-	{
-		String16 s(*this);
-		if (s.m_data == utf16) {
-			return 0;
-		}
-		return String16::_compare16(s.m_data, s.length(), utf16, -1);
-	}
-	
-	SLIB_INLINE sl_int32 compare(const sl_char32* utf32) const
-	{
-		String16 s(*this);
-		return String16::_compare32(s.m_data, s.length(), utf32, -1);
-	}
-	
-public:
-	SLIB_INLINE sl_bool operator==(const String16& other) const
-	{
-		return equals(other);
-	}
-	
-	SLIB_INLINE sl_bool operator==(const String8& other) const
-	{
-		return equals(other);
-	}
-	
-	SLIB_INLINE sl_bool operator==(const SafeString16& other) const
-	{
-		return equals(other);
-	}
-	
-	SLIB_INLINE sl_bool operator==(const SafeString8& other) const
-	{
-		return equals(other);
-	}
-	
-	SLIB_INLINE sl_bool operator==(const sl_char8* utf8) const
-	{
-		return equals(utf8);
-	}
-	
-	SLIB_INLINE sl_bool operator==(const sl_char16* utf16) const
-	{
-		return equals(utf16);
-	}
-	
-	SLIB_INLINE sl_bool operator==(const sl_char32* utf32) const
-	{
-		return equals(utf32);
-	}
-	
-	SLIB_INLINE friend sl_bool operator==(const sl_char8* utf8, const SafeString16& second)
-	{
-		return second == utf8;
-	}
-	
-	SLIB_INLINE friend sl_bool operator==(const sl_char16* utf16, const SafeString16& second)
-	{
-		return second == utf16;
-	}
-	
-	SLIB_INLINE friend sl_bool operator==(const sl_char32* utf32, const SafeString16& second)
-	{
-		return second == utf32;
-	}
-	
-public:
-	SLIB_INLINE sl_bool operator!=(const String16& other) const
-	{
-		return !(*this == other);
-	}
-	
-	SLIB_INLINE sl_bool operator!=(const String8& other) const
-	{
-		return !(*this == other);
-	}
-	
-	SLIB_INLINE sl_bool operator!=(const SafeString16& other) const
-	{
-		return !(*this == other);
-	}
-	
-	SLIB_INLINE sl_bool operator!=(const SafeString8& other) const
-	{
-		return !(*this == other);
-	}
-	
-	SLIB_INLINE sl_bool operator!=(const sl_char8* utf8) const
-	{
-		return !(*this == utf8);
-	}
-	
-	SLIB_INLINE sl_bool operator!=(const sl_char16* utf16) const
-	{
-		return !(*this == utf16);
-	}
-	
-	SLIB_INLINE sl_bool operator!=(const sl_char32* utf32) const
-	{
-		return !(*this == utf32);
-	}
-	
-	SLIB_INLINE friend sl_bool operator!=(const sl_char8* utf8, const SafeString16& second)
-	{
-		return second != utf8;
-	}
-	
-	SLIB_INLINE friend sl_bool operator!=(const sl_char16* utf16, const SafeString16& second)
-	{
-		return second != utf16;
-	}
-	
-	SLIB_INLINE friend sl_bool operator!=(const sl_char32* utf32, const SafeString16& second)
-	{
-		return second != utf32;
-	}
-	
-public:
-	SLIB_INLINE sl_bool operator>=(const String16& other) const
-	{
-		return compare(other) >= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>=(const String8& other) const
-	{
-		return compare(other) >= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>=(const SafeString16& other) const
-	{
-		return compare(other) >= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>=(const SafeString8& other) const
-	{
-		return compare(other) >= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>=(const sl_char8* utf8) const
-	{
-		return compare(utf8) >= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>=(const sl_char16* utf16) const
-	{
-		return compare(utf16) >= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>=(const sl_char32* utf32) const
-	{
-		return compare(utf32) >= 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator>=(const sl_char8* utf8, const SafeString16& second)
-	{
-		return second.compare(utf8) <= 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator>=(const sl_char16* utf16, const SafeString16& second)
-	{
-		return second.compare(utf16) <= 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator>=(const sl_char32* utf32, const SafeString16& second)
-	{
-		return second.compare(utf32) <= 0;
-	}
-	
-public:
-	SLIB_INLINE sl_bool operator<=(const String16& other) const
-	{
-		return compare(other) <= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<=(const String8& other) const
-	{
-		return compare(other) <= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<=(const SafeString16& other) const
-	{
-		return compare(other) <= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<=(const SafeString8& other) const
-	{
-		return compare(other) <= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<=(const sl_char8* utf8) const
-	{
-		return compare(utf8) <= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<=(const sl_char16* utf16) const
-	{
-		return compare(utf16) <= 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<=(const sl_char32* utf32) const
-	{
-		return compare(utf32) <= 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator<=(const sl_char8* utf8, const SafeString16& second)
-	{
-		return second.compare(utf8) >= 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator<=(const sl_char16* utf16, const SafeString16& second)
-	{
-		return second.compare(utf16) >= 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator<=(const sl_char32* utf32, const SafeString16& second)
-	{
-		return second.compare(utf32) >= 0;
-	}
-	
-public:
-	SLIB_INLINE sl_bool operator>(const String16& other) const
-	{
-		return compare(other) > 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>(const String8& other) const
-	{
-		return compare(other) > 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>(const SafeString16& other) const
-	{
-		return compare(other) > 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>(const SafeString8& other) const
-	{
-		return compare(other) > 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>(const sl_char8* utf8) const
-	{
-		return compare(utf8) > 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>(const sl_char16* utf16) const
-	{
-		return compare(utf16) > 0;
-	}
-	
-	SLIB_INLINE sl_bool operator>(const sl_char32* utf32) const
-	{
-		return compare(utf32) > 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator>(const sl_char8* utf8, const SafeString16& second)
-	{
-		return second.compare(utf8) < 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator>(const sl_char16* utf16, const SafeString16& second)
-	{
-		return second.compare(utf16) < 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator>(const sl_char32* utf32, const SafeString16& second)
-	{
-		return second.compare(utf32) < 0;
-	}
-	
-public:
-	SLIB_INLINE sl_bool operator<(const String16& other) const
-	{
-		return compare(other) < 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<(const String8& other) const
-	{
-		return compare(other) < 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<(const SafeString16& other) const
-	{
-		return compare(other) < 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<(const SafeString8& other) const
-	{
-		return compare(other) < 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<(const sl_char8* utf8) const
-	{
-		return compare(utf8) < 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<(const sl_char16* utf16) const
-	{
-		return compare(utf16) < 0;
-	}
-	
-	SLIB_INLINE sl_bool operator<(const sl_char32* utf32) const
-	{
-		return compare(utf32) < 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator<(const sl_char8* utf8, const SafeString16& second)
-	{
-		return second.compare(utf8) > 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator<(const sl_char16* utf16, const SafeString16& second)
-	{
-		return second.compare(utf16) > 0;
-	}
-	
-	SLIB_INLINE friend sl_bool operator<(const sl_char32* utf32, const SafeString16& second)
-	{
-		return second.compare(utf32) > 0;
-	}
+	sl_bool operator==(const String8& other) const;
 	
+	sl_bool operator==(const String16& other) const;
+	
+	sl_bool operator==(const SafeString8& other) const;
+	
+	sl_bool operator==(const SafeString16& other) const;
+	
+	sl_bool operator==(const sl_char8* utf8) const;
+	
+	sl_bool operator==(const sl_char16* utf16) const;
+	
+	sl_bool operator==(const sl_char32* utf32) const;
+	
+	friend sl_bool operator==(const sl_char8* utf8, const SafeString16& second);
+	
+	friend sl_bool operator==(const sl_char16* utf16, const SafeString16& second);
+	
+	friend sl_bool operator==(const sl_char32* utf32, const SafeString16& second);
+	
+	
+	sl_bool operator!=(const String8& other) const;
+	
+	sl_bool operator!=(const String16& other) const;
+	
+	sl_bool operator!=(const SafeString8& other) const;
+	
+	sl_bool operator!=(const SafeString16& other) const;
+	
+	sl_bool operator!=(const sl_char8* utf8) const;
+	
+	sl_bool operator!=(const sl_char16* utf16) const;
+	
+	sl_bool operator!=(const sl_char32* utf32) const;
+	
+	friend sl_bool operator!=(const sl_char8* utf8, const SafeString16& second);
+	
+	friend sl_bool operator!=(const sl_char16* utf16, const SafeString16& second);
+	
+	friend sl_bool operator!=(const sl_char32* utf32, const SafeString16& second);
+	
+	
+	sl_bool operator>=(const String8& other) const;
+	
+	sl_bool operator>=(const String16& other) const;
+	
+	sl_bool operator>=(const SafeString8& other) const;
+	
+	sl_bool operator>=(const SafeString16& other) const;
+	
+	sl_bool operator>=(const sl_char8* utf8) const;
+	
+	sl_bool operator>=(const sl_char16* utf16) const;
+	
+	sl_bool operator>=(const sl_char32* utf32) const;
+	
+	friend sl_bool operator>=(const sl_char8* utf8, const SafeString16& second);
+	
+	friend sl_bool operator>=(const sl_char16* utf16, const SafeString16& second);
+	
+	friend sl_bool operator>=(const sl_char32* utf32, const SafeString16& second);
+	
+	
+	sl_bool operator<=(const String8& other) const;
+	
+	sl_bool operator<=(const String16& other) const;
+	
+	sl_bool operator<=(const SafeString8& other) const;
+	
+	sl_bool operator<=(const SafeString16& other) const;
+	
+	sl_bool operator<=(const sl_char8* utf8) const;
+	
+	sl_bool operator<=(const sl_char16* utf16) const;
+	
+	sl_bool operator<=(const sl_char32* utf32) const;
+	
+	friend sl_bool operator<=(const sl_char8* utf8, const SafeString16& second);
+	
+	friend sl_bool operator<=(const sl_char16* utf16, const SafeString16& second);
+	
+	friend sl_bool operator<=(const sl_char32* utf32, const SafeString16& second);
+	
+	
+	sl_bool operator>(const String8& other) const;
+	
+	sl_bool operator>(const String16& other) const;
+	
+	sl_bool operator>(const SafeString8& other) const;
+	
+	sl_bool operator>(const SafeString16& other) const;
+	
+	sl_bool operator>(const sl_char8* utf8) const;
+	
+	sl_bool operator>(const sl_char16* utf16) const;
+	
+	sl_bool operator>(const sl_char32* utf32) const;
+	
+	friend sl_bool operator>(const sl_char8* utf8, const SafeString16& second);
+	
+	friend sl_bool operator>(const sl_char16* utf16, const SafeString16& second);
+	
+	friend sl_bool operator>(const sl_char32* utf32, const SafeString16& second);
+	
+	
+	sl_bool operator<(const String8& other) const;
+	
+	sl_bool operator<(const String16& other) const;
+	
+	sl_bool operator<(const SafeString8& other) const;
+	
+	sl_bool operator<(const SafeString16& other) const;
+	
+	sl_bool operator<(const sl_char8* utf8) const;
+	
+	sl_bool operator<(const sl_char16* utf16) const;
+	
+	sl_bool operator<(const sl_char32* utf32) const;
+	
+	friend sl_bool operator<(const sl_char8* utf8, const SafeString16& second);
+	
+	friend sl_bool operator<(const sl_char16* utf16, const SafeString16& second);
+	
+	friend sl_bool operator<(const sl_char32* utf32, const SafeString16& second);
 	
 public:
 	String16 duplicate() const;
@@ -4100,10 +2116,11 @@ public:
 	
 	List<String16> split(const String16& pattern) const;
 	
-	sl_uint32 hashCode() const;
+	String16 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true);
 	
-	String8 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true);
+	String16 parseBackslashEscapes(sl_uint32* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
 	
+	sl_uint32 countLineNumber(sl_uint32 pos, sl_uint32* column = sl_null) const;
 
 public:
 	sl_bool parseInt32(sl_int32 radix, sl_int32* _out) const;
@@ -4142,25 +2159,59 @@ public:
 
 
 private:
-	SLIB_INLINE static void _increaseReference(sl_char16* data)
-	{
-		Base::interlockedIncrement(SLIB_STR_PREF(data));
-	}
+	StringContainer16* _retainContainer() const;
 	
-	SLIB_INLINE static void _decreaseReference(sl_char16* data)
-	{
-		sl_reg iRef = Base::interlockedDecrement(SLIB_STR_PREF(data));
-		if (iRef == 0) {
-			String16::_destroy(data);
-		}
-	}
-	
-	sl_char16* _retainContainer() const;
-	
-	void _replaceContainer(sl_char16* other);
+	void _replaceContainer(StringContainer16* other);
 	
 	friend class String16;
 };
+
+
+template <>
+int Compare<String8>::compare(const String8& a, const String8& b);
+
+template <>
+int Compare<String16>::compare(const String16& a, const String16& b);
+
+template <>
+int Compare<SafeString8>::compare(const SafeString8& a, const SafeString8& b);
+
+template <>
+int Compare<SafeString16>::compare(const SafeString16& a, const SafeString16& b);
+
+
+template <>
+sl_bool Compare<String8>::equals(const String8& a, const String8& b);
+
+template <>
+sl_bool Compare<String16>::equals(const String16& a, const String16& b);
+
+template <>
+sl_bool Compare<SafeString8>::equals(const SafeString8& a, const SafeString8& b);
+
+template <>
+sl_bool Compare<SafeString16>::equals(const SafeString16& a, const SafeString16& b);
+
+
+template <>
+sl_uint32 Hash<String8>::hash(const String8& v);
+
+template <>
+sl_uint32 Hash<String16>::hash(const String16& v);
+
+template <>
+sl_uint32 Hash<SafeString8>::hash(const SafeString8& v);
+
+template <>
+sl_uint32 Hash<SafeString16>::hash(const SafeString16& v);
+
+typedef String8 String;
+typedef SafeString8 SafeString;
+
+SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_LIST(String)
+SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_MAP(String, Ref<Referable>)
+SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_MAP(String, String)
+
 
 class SLIB_EXPORT StringBuffer8 : public Object
 {
@@ -4242,78 +2293,290 @@ private:
 	
 };
 
-
-template<>
-SLIB_INLINE int Compare<String8>::compare(const String8& a, const String8& b)
-{
-	return a.compare(b);
-}
-template<>
-SLIB_INLINE int Compare<String16>::compare(const String16& a, const String16& b)
-{
-	return a.compare(b);
-}
-
-template<>
-SLIB_INLINE int Compare<SafeString8>::compare(const SafeString8& a, const SafeString8& b)
-{
-	return a.compare(b);
-}
-template<>
-SLIB_INLINE int Compare<SafeString16>::compare(const SafeString16& a, const SafeString16& b)
-{
-	return a.compare(b);
-}
-
-template<>
-SLIB_INLINE sl_bool Compare<String8>::equals(const String8& a, const String8& b)
-{
-	return a.equals(b);
-}
-template<>
-SLIB_INLINE sl_bool Compare<String16>::equals(const String16& a, const String16& b)
-{
-	return a.equals(b);
-}
-
-template<>
-SLIB_INLINE sl_bool Compare<SafeString8>::equals(const SafeString8& a, const SafeString8& b)
-{
-	return a.equals(b);
-}
-template<>
-SLIB_INLINE sl_bool Compare<SafeString16>::equals(const SafeString16& a, const SafeString16& b)
-{
-	return a.equals(b);
-}
-
-template<>
-SLIB_INLINE sl_uint32 Hash<String8>::hash(const String8& v)
-{
-	return v.hashCode();
-}
-template<>
-SLIB_INLINE sl_uint32 Hash<String16>::hash(const String16& v)
-{
-	return v.hashCode();
-}
-
-template<>
-SLIB_INLINE sl_uint32 Hash<SafeString8>::hash(const SafeString8& v)
-{
-	return v.hashCode();
-}
-template<>
-SLIB_INLINE sl_uint32 Hash<SafeString16>::hash(const SafeString16& v)
-{
-	return v.hashCode();
-}
-
-
-typedef String8 String;
-typedef SafeString8 SafeString;
 typedef StringBuffer8 StringBuffer;
 typedef StringDataBuffer8 StringDataBuffer;
+
+
+
+#define SLIB_CHAR_IS_ALPHA(c) (((c) >= 'A' && (c) <= 'Z') || ((c) >= 'a' && (c) <= 'z'))
+#define SLIB_CHAR_IS_ALPHA_UPPER(c) ((c) >= 'A' && (c) <= 'Z')
+#define SLIB_CHAR_IS_ALPHA_LOWER(c) ((c) >= 'a' && (c) <= 'z')
+#define SLIB_CHAR_IS_DIGIT(c) ((c) >= '0' && (c) <= '9')
+#define SLIB_CHAR_IS_ALNUM(c) (((c) >= '0' && (c) <= '9') || ((c) >= 'A' && (c) <= 'Z') || ((c) >= 'a' && (c) <= 'z'))
+#define SLIB_CHAR_IS_HEX(c) (((c) >= '0' && (c) <= '9') || ((c) >= 'A' && (c) <= 'F') || ((c) >= 'a' && (c) <= 'f'))
+
+#define SLIB_CHAR_DIGIT_TO_INT(c) (((c) >= '0' && (c) <= '9') ? ((c) - '0') : 10)
+#define SLIB_CHAR_HEX_TO_INT(c) (((c) >= '0' && (c) <= '9') ? ((c) - '0') : (((c) >= 'A' && (c) <= 'F') ? ((c) -  55) : ((c) >= 'a' && (c) <= 'f') ? ((c) -  87) : 16))
+
+
+#define SLIB_STATIC_STRING8(name, str) \
+	static sl_char8 _static_string_buf_##name[] = str; \
+	static slib::StringContainer8 _static_string_container_##name = {_static_string_buf_##name, sizeof(_static_string_buf_##name)-1, 0, -1}; \
+	static slib::StringContainer8* _static_string_##name = &_static_string_container_##name; \
+	static slib::String8& name = *((slib::String8*)((void*)(&_static_string_##name)));
+
+#if !defined(SLIB_USE_UNICODE32)
+#define SLIB_STATIC_STRING16(name, str) \
+	static wchar_t _static_string_buf_##name[] = L##str; \
+	static slib::StringContainer16 _static_string_container_##name = {(sl_char16*)_static_string_buf_##name, (sizeof(_static_string_buf_##name)/2)-1, 0, -1}; \
+	static slib::StringContainer16* _static_string_##name = &_static_string_container_##name; \
+	static slib::String16& name = *((slib::String16*)((void*)(&_static_string_##name)));
+#endif
+
+#define SLIB_STATIC_STRING8_BY_ARRAY(name, ...) \
+	static sl_char8 _static_string_buf_##name[] = {__VA_ARGS__, 0}; \
+	static slib::StringContainer8 _static_string_container_##name = {_static_string_buf_##name, sizeof(_static_string_buf_##name)-1, 0, -1}; \
+	static slib::StringContainer8* _static_string_##name = &_static_string_container_##name; \
+	static slib::String8& name = *((slib::String8*)((void*)(&_static_string_##name)));
+
+#define SLIB_STATIC_STRING16_BY_ARRAY(name, ...) \
+	static sl_char16 _static_string_buf_##name[] = {__VA_ARGS__, 0}; \
+	static slib::StringContainer16 _static_string_container_##name = {_static_string_buf_##name, (sizeof(_static_string_buf_##name)/2)-1, 0, -1}; \
+	static slib::StringContainer16* _static_string_##name = &_static_string_container_##name; \
+	static slib::String16& name = *((slib::String16*)((void*)(&_static_string_##name)));
+
+#define SLIB_STATIC_STRING8_NULL(name) \
+	static slib::_String8_Const _static_string_null_##name = {slib::_String8_Null.container, 0}; \
+	static slib::String8& name = *((slib::String8*)((void*)(&_static_string_null_##name)));
+
+#define SLIB_STATIC_STRING16_NULL(name) \
+	static slib::_String16_Const _static_string_null_##name = {slib::_String16_Null.container, 0}; \
+	static slib::String16& name = *((slib::String16*)((void*)(&_static_string_null_##name)));
+
+#define SLIB_STATIC_STRING SLIB_STATIC_STRING8
+#define SLIB_STATIC_STRING_BY_ARRAY SLIB_STATIC_STRING8_BY_ARRAY
+#define SLIB_STATIC_STRING_NULL SLIB_STATIC_STRING8_NULL
+
+
+SLIB_NAMESPACE_END
+
+
+SLIB_NAMESPACE_BEGIN
+
+SLIB_INLINE String8::String8(StringContainer8* container) : m_container(container)
+{
+}
+
+SLIB_INLINE String16::String16(StringContainer16* container) : m_container(container)
+{
+}
+
+
+SLIB_INLINE String8::String8() : m_container(_String8_Null.container)
+{
+}
+
+SLIB_INLINE String16::String16() : m_container(_String16_Null.container)
+{
+}
+
+SLIB_INLINE SafeString8::SafeString8() : m_container(_String8_Null.container)
+{
+}
+
+SLIB_INLINE SafeString16::SafeString16() : m_container(_String16_Null.container)
+{
+}
+
+
+SLIB_INLINE String8::String8(String8&& src)
+{
+	m_container = src.m_container;
+	src.m_container = _String8_Null.container;
+}
+
+SLIB_INLINE String16::String16(String16&& src)
+{
+	m_container = src.m_container;
+	src.m_container = _String16_Null.container;
+}
+
+SLIB_INLINE SafeString8::SafeString8(SafeString8&& src)
+{
+	m_container = src.m_container;
+	src.m_container = _String8_Null.container;
+}
+
+SLIB_INLINE SafeString16::SafeString16(SafeString16&& src)
+{
+	m_container = src.m_container;
+	src.m_container = _String16_Null.container;
+}
+
+
+SLIB_INLINE String8::String8(SafeString8&& _src)
+{
+	String8& src = *((String8*)((void*)(&_src)));
+	m_container = src.m_container;
+	src.m_container = _String8_Null.container;
+}
+
+SLIB_INLINE String16::String16(SafeString16&& _src)
+{
+	String16& src = *((String16*)((void*)(&_src)));
+	m_container = src.m_container;
+	src.m_container = _String16_Null.container;
+}
+
+SLIB_INLINE SafeString8::SafeString8(String8&& _src)
+{
+	SafeString8& src = *((SafeString8*)((void*)(&_src)));
+	m_container = src.m_container;
+	src.m_container = _String8_Null.container;
+}
+
+SLIB_INLINE SafeString16::SafeString16(String16&& _src)
+{
+	SafeString16& src = *((SafeString16*)((void*)(&_src)));
+	m_container = src.m_container;
+	src.m_container = _String16_Null.container;
+}
+
+
+SLIB_INLINE const String8& String8::null()
+{
+	return *((String8*)((void*)&_String8_Null));
+}
+
+SLIB_INLINE const String16& String16::null()
+{
+	return *((String16*)((void*)&_String16_Null));
+}
+
+SLIB_INLINE const SafeString8& SafeString8::null()
+{
+	return *((SafeString8*)((void*)&_String8_Null));
+}
+
+SLIB_INLINE const SafeString16& SafeString16::null()
+{
+	return *((SafeString16*)((void*)&_String16_Null));
+}
+
+
+SLIB_INLINE const String8& String8::getEmpty()
+{
+	return *((String8*)((void*)&_String8_Empty));
+}
+
+SLIB_INLINE const String16& String16::getEmpty()
+{
+	return *((String16*)((void*)&_String16_Empty));
+}
+
+SLIB_INLINE const SafeString8& SafeString8::getEmpty()
+{
+	return *((SafeString8*)((void*)&_String8_Empty));
+}
+
+SLIB_INLINE const SafeString16& SafeString16::getEmpty()
+{
+	return *((SafeString16*)((void*)&_String16_Empty));
+}
+
+
+SLIB_INLINE const String8& String8::getNotNull() const
+{
+	if (m_container == _String8_Null.container) {
+		return *((String8*)((void*)&_String8_Empty));
+	}
+	return *this;
+}
+
+SLIB_INLINE const String16& String16::getNotNull() const
+{
+	if (m_container == _String16_Null.container) {
+		return *((String16*)((void*)&_String16_Empty));
+	}
+	return *this;
+}
+
+
+SLIB_INLINE sl_bool String8::isNull() const
+{
+	return m_container == _String8_Null.container;
+}
+
+SLIB_INLINE sl_bool String16::isNull() const
+{
+	return m_container == _String16_Null.container;
+}
+
+SLIB_INLINE sl_bool SafeString8::isNull() const
+{
+	return m_container == _String8_Null.container;
+}
+
+SLIB_INLINE sl_bool SafeString16::isNull() const
+{
+	return m_container == _String16_Null.container;
+}
+
+
+SLIB_INLINE sl_bool String8::isNotNull() const
+{
+	return m_container != _String8_Null.container;
+}
+
+SLIB_INLINE sl_bool String16::isNotNull() const
+{
+	return m_container != _String16_Null.container;
+}
+
+SLIB_INLINE sl_bool SafeString8::isNotNull() const
+{
+	return m_container != _String8_Null.container;
+}
+
+SLIB_INLINE sl_bool SafeString16::isNotNull() const
+{
+	return m_container != _String16_Null.container;
+}
+
+
+SLIB_INLINE sl_bool String8::isEmpty() const
+{
+	return (m_container->len == 0);
+}
+
+SLIB_INLINE sl_bool String16::isEmpty() const
+{
+	return (m_container->len == 0);
+}
+
+
+SLIB_INLINE sl_bool String8::isNotEmpty() const
+{
+	return (m_container->len != 0);
+}
+
+SLIB_INLINE sl_bool String16::isNotEmpty() const
+{
+	return (m_container->len != 0);
+}
+
+
+SLIB_INLINE sl_char8* String8::getData() const
+{
+	return m_container->sz;
+}
+
+SLIB_INLINE sl_char16* String16::getData() const
+{
+	return m_container->sz;
+}
+
+
+SLIB_INLINE sl_uint32 String8::getLength() const
+{
+	return m_container->len;
+}
+
+SLIB_INLINE sl_uint32 String16::getLength() const
+{
+	return m_container->len;
+}
+
 
 SLIB_NAMESPACE_END
 

@@ -5,6 +5,8 @@
 
 SLIB_DB_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(SQLiteDatabase, Database)
+
 class _Sqlite3Database : public SQLiteDatabase
 {
 public:
@@ -25,7 +27,7 @@ public:
 		Ref<_Sqlite3Database> ret;
 		sqlite3* db = sl_null;
 		if (File::exists(filePath)) {
-			sl_int32 iResult = ::sqlite3_open(filePath.data(), &db);
+			sl_int32 iResult = ::sqlite3_open(filePath.getData(), &db);
 			if (SQLITE_OK == iResult) {
 				ret = new _Sqlite3Database();
 				if (ret.isNotNull()) {
@@ -42,7 +44,7 @@ public:
 	{
 		ObjectLocker lock(this);
 		char* zErrMsg = 0;
-		if (SQLITE_OK == ::sqlite3_exec(m_db, sql.data(), 0, 0, &zErrMsg)) {
+		if (SQLITE_OK == ::sqlite3_exec(m_db, sql.getData(), 0, 0, &zErrMsg)) {
 			if (pOutAffectedRowsCount) {
 				*pOutAffectedRowsCount = ::sqlite3_changes(m_db);
 			}
@@ -88,7 +90,7 @@ public:
 				m_mapColumnIndexes.put_NoLock(name, i);
 			}
 			m_nColumnNames = (sl_uint32)(m_listColumnNames.getCount());
-			m_columnNames = m_listColumnNames.data();
+			m_columnNames = m_listColumnNames.getData();
 
 			db->lock();
 		}
@@ -357,22 +359,22 @@ public:
 				if (n > 0) {
 					for (sl_uint32 i = 0; i < n; i++) {
 						int iRet = SQLITE_ABORT;
-						Variant& var = params[i];
+						Variant& var = (params.getData())[i];
 						switch (var.getType()) {
-						case variantType_Null:
+						case VariantType::Null:
 							iRet = ::sqlite3_bind_null(m_statement, i);
 							break;
-						case variantType_Boolean:
-						case variantType_Int32:
+						case VariantType::Boolean:
+						case VariantType::Int32:
 							iRet = ::sqlite3_bind_int(m_statement, i, var.getInt32());
 							break;
-						case variantType_Uint32:
-						case variantType_Int64:
-						case variantType_Uint64:
+						case VariantType::Uint32:
+						case VariantType::Int64:
+						case VariantType::Uint64:
 							iRet = ::sqlite3_bind_int64(m_statement, i, var.getInt64());
 							break;
-						case variantType_Float:
-						case variantType_Double:
+						case VariantType::Float:
+						case VariantType::Double:
 							iRet = ::sqlite3_bind_double(m_statement, i, var.getDouble());
 							break;
 						default:
@@ -380,14 +382,14 @@ public:
 								Memory mem = var.getMemory();
 								sl_size size = mem.getSize();
 								if (size > 0x7fffffff) {
-									iRet = ::sqlite3_bind_blob64(m_statement, i, mem.getBuf(), size, SQLITE_STATIC);
+									iRet = ::sqlite3_bind_blob64(m_statement, i, mem.getData(), size, SQLITE_STATIC);
 								} else {
-									iRet = ::sqlite3_bind_blob(m_statement, i, mem.getBuf(), (sl_uint32)size, SQLITE_STATIC);
+									iRet = ::sqlite3_bind_blob(m_statement, i, mem.getData(), (sl_uint32)size, SQLITE_STATIC);
 								}
 							} else {
 								String8 str = var.getString();
 								var = str;
-								iRet = ::sqlite3_bind_text(m_statement, i, str.data(), str.getLength(), SQLITE_STATIC);
+								iRet = ::sqlite3_bind_text(m_statement, i, str.getData(), str.getLength(), SQLITE_STATIC);
 							}
 						}
 						if (iRet != SQLITE_OK) {
@@ -403,7 +405,7 @@ public:
 
 		sl_bool execute(const Variant* params, sl_uint32 nParams, sl_uint64* pOutAffectedRowsCount)
 		{
-			ObjectLocker lock(m_db.get());
+			ObjectLocker lock(m_db.ptr);
 			if (_execute(params, nParams)) {
 				if (::sqlite3_step(m_statement) == SQLITE_DONE) {
 					::sqlite3_reset(m_statement);
@@ -419,10 +421,10 @@ public:
 
 		Ref<DatabaseCursor> query(const Variant* params, sl_uint32 nParams)
 		{
-			ObjectLocker lock(m_db.get());
+			ObjectLocker lock(m_db.ptr);
 			Ref<DatabaseCursor> ret;
 			if (_execute(params, nParams)) {
-				ret = new _DatabaseCursor(m_db.get(), this, m_statement);
+				ret = new _DatabaseCursor(m_db.ptr, this, m_statement);
 				if (ret.isNotNull()) {
 					return ret;
 				}
@@ -438,7 +440,7 @@ public:
 		ObjectLocker lock(this);
 		Ref<DatabaseStatement> ret;
 		sqlite3_stmt* statement = sl_null;
-		if (SQLITE_OK == ::sqlite3_prepare_v2(m_db, sql.data(), -1, &statement, sl_null)) {
+		if (SQLITE_OK == ::sqlite3_prepare_v2(m_db, sql.getData(), -1, &statement, sl_null)) {
 			ret = new _DatabaseStatement(this, statement);
 			if (ret.isNotNull()) {
 				return ret;

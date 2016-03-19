@@ -5,125 +5,125 @@
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
-enum PenStyle {
-	penStyle_Solid = 0,
-	penStyle_Dot = 1,
-	penStyle_Dash = 2,
-	penStyle_DashDot = 3,
-	penStyle_DashDotDot = 4
-};
-
-enum LineCap {
-	lineCap_Flat = 0,
-	lineCap_Round = 1,
-	lineCap_Square = 2
-};
-
-enum LineJoin {
-	lineJoin_Miter = 0,
-	lineJoin_Round = 1,
-	lineJoin_Bevel = 2
-};
-
-enum BrushStyle {
-	brushStyle_Solid = 0
-};
-
-enum FillMode {
-	fillMode_Winding = 0,
-	fillMode_Alternate = 1
-};
-
-enum Alignment
+enum class PenStyle
 {
-	alignHorizontalMask = 3,
-	alignVerticalMask = 12,
+	Solid = 0,
+	Dot = 1,
+	Dash = 2,
+	DashDot = 3,
+	DashDotDot = 4
+};
+
+enum class LineCap
+{
+	Flat = 0,
+	Round = 1,
+	Square = 2
+};
+
+enum class LineJoin
+{
+	Miter = 0,
+	Round = 1,
+	Bevel = 2
+};
+
+enum class BrushStyle
+{
+	Solid = 0
+};
+
+enum class FillMode
+{
+	Winding = 0,
+	Alternate = 1
+};
+
+enum class Alignment
+{
+	HorizontalMask = 3,
+	VerticalMask = 12,
 	
-	alignCenter = 0,
-	alignLeft = 1,
-	alignRight = 2,
+	Center = 0,
+	Left = 1,
+	Right = 2,
 	
-	alignMiddle = 0,
-	alignTop = 4,
-	alignBottom = 8,
+	Middle = 0,
+	Top = 4,
+	Bottom = 8,
 	
-	alignMiddleCenter = 0,
-	alignMiddleLeft = 1,
-	alignMiddleRight = 2,
-	alignTopCenter = 4,
-	alignTopLeft = 5,
-	alignTopRight = 6,
-	alignBottomCenter = 8,
-	alignBottomLeft = 9,
-	alignBottomRight = 10
+	MiddleCenter = 0,
+	MiddleLeft = 1,
+	MiddleRight = 2,
+	TopCenter = 4,
+	TopLeft = 5,
+	TopRight = 6,
+	BottomCenter = 8,
+	BottomLeft = 9,
+	BottomRight = 10
 };
 
-enum ImageFileType
+enum class ImageFileType
 {
-	imageFileType_Unknown = 0,
-	imageFileType_JPEG = 10,
-	imageFileType_PNG = 11,
-	imageFileType_BMP = 12,
-	imageFileType_DDS = 13
+	Unknown = 0,
+	JPEG = 10,
+	PNG = 11,
+	BMP = 12,
+	DDS = 13
 };
 
-enum StretchMode
+enum class StretchMode
 {
-	stretchMode_Fast = 0,
-	stretchMode_Halftone = 1
+	Fast = 0,
+	Halftone = 1
 };
 
-enum BlendMode
+enum class BlendMode
 {
-	blendMode_Copy = 0,
-	blendMode_SrcAlpha = 1
+	Copy = 0,
+	SrcAlpha = 1
 };
 
-enum RotationMode
+enum class RotationMode
 {
-	rotationMode_0 = 0,
-	rotationMode_90 = 90,
-	rotationMode_180 = 180,
-	rotationMode_270 = 270
+	Rotate0 = 0,
+	Rotate90 = 90,
+	Rotate180 = 180,
+	Rotate270 = 270
 };
 
-enum FlipMode
+enum class FlipMode
 {
-	flipMode_None = 0,
-	flipMode_Horizontal = 1,
-	flipMode_Vertical = 2,
-	flipMode_HorizontalAndVertical = 3
+	None = 0,
+	Horizontal = 1,
+	Vertical = 2,
+	HorizontalAndVertical = 3
 };
 
-enum ScaleMode
+enum class ScaleMode
 {
-	scaleMode_None = 0,
-	scaleMode_Stretch = 1,
-	scaleMode_Contain = 2,
-	scaleMode_Cover = 3
+	None = 0,
+	Stretch = 1,
+	Contain = 2,
+	Cover = 3
 };
 
-enum GraphicsPathPointType
+enum class GraphicsPathPointType
 {
-	graphicsPathPointType_Begin = 0,
-	graphicsPathPointType_Line = 1,
-	graphicsPathPointType_BezierCubic = 3
-    
+	Begin = 0,
+	Line = 1,
+	BezierCubic = 3,
+	FlagClose = 0x80
 };
 
-enum GraphicsPathPointFlag
+enum class ColorSpace
 {
-	graphicsPathPointFlag_Close = 0x80
-};
-
-enum ColorSpace
-{
-	colorSpace_None = 0,
-	colorSpace_RGB = 1,
-	colorSpace_YUV = 2,
-	colorSpace_CMYK = 3,
-	colorSpace_HLS = 4,
-	colorSpace_HSV = 5
+	None = 0,
+	RGB = 1,
+	YUV = 2,
+	CMYK = 3,
+	HLS = 4,
+	HSV = 5
 };
 
 SLIB_GRAPHICS_NAMESPACE_END

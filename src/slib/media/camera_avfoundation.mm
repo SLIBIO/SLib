@@ -109,7 +109,7 @@ public:
 		[output setSampleBufferDelegate:callback queue:queue];
 		
 		NSMutableDictionary *settings = [[NSMutableDictionary alloc] init];
-		if (param.preferedFrameFormat.getColorSpace() == colorSpace_YUV) {
+		if (BitmapFormats::getColorSpace(param.preferedFrameFormat) == ColorSpace::YUV) {
 			[settings setObject:@(kCVPixelFormatType_420YpCbCr8BiPlanarFullRange) forKey:(NSString*)kCVPixelBufferPixelFormatTypeKey];
 		} else {
 			[settings setObject:@(kCVPixelFormatType_32BGRA) forKey:(NSString*)kCVPixelBufferPixelFormatTypeKey];
@@ -288,23 +288,23 @@ public:
 				sl_uint8* base = (sl_uint8*)(baseAddress);
 				CVPlanarPixelBufferInfo_YCbCrBiPlanar* p = (CVPlanarPixelBufferInfo_YCbCrBiPlanar*)baseAddress;
 				if (p->componentInfoY.offset == 0) {
-					frame.image.format = bitmapFormat_YUV_NV12;
+					frame.image.format = BitmapFormat::YUV_NV12;
 					frame.image.data = base + sizeof(CVPlanarPixelBufferInfo_YCbCrBiPlanar);
 				} else {
-					frame.image.format = bitmapFormat_YUV_NV12;
+					frame.image.format = BitmapFormat::YUV_NV12;
 					frame.image.data = base + (sl_int32)(Endian::swap32LE(p->componentInfoY.offset));
 					frame.image.pitch = Endian::swap32LE(p->componentInfoY.rowBytes);
 					frame.image.data1 = base + (sl_int32)(Endian::swap32LE(p->componentInfoCbCr.offset));
 					frame.image.pitch1 = Endian::swap32LE(p->componentInfoCbCr.rowBytes);
 				}
 			} else if (type == kCVPixelFormatType_32BGRA) {
-				frame.image.format = bitmapFormat_BGRA;
+				frame.image.format = BitmapFormat::BGRA;
 				frame.image.data = baseAddress;
 				frame.image.pitch = (sl_uint32)(CVPixelBufferGetBytesPerRow(imageBuffer));
 			}
 		} while (0);
 		
-		if (frame.image.format.isNotNull()) {
+		if (frame.image.format != BitmapFormat::None) {
 			onCaptureVideoFrame(&frame);
 		}
 		

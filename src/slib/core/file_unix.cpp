@@ -23,26 +23,26 @@ sl_file File::_open(const String& filePath, FileMode mode)
 	int flags = 0;
 	int permissions = S_IRWXU | S_IRWXG | S_IRWXO;
 	switch (mode) {
-		case fileMode_Read:
+		case FileMode::Read:
 			flags = O_RDONLY;
 			permissions = 0;
 			break;
-		case fileMode_Write:
+		case FileMode::Write:
 			flags = O_WRONLY | O_CREAT | O_TRUNC;
 			break;
-		case fileMode_ReadWrite:
+		case FileMode::ReadWrite:
 			flags = O_RDWR | O_CREAT | O_TRUNC;
 			break;
-		case fileMode_Append:
+		case FileMode::Append:
 			flags = O_WRONLY | O_CREAT;
 			break;
-		case fileMode_RandomAccess:
+		case FileMode::RandomAccess:
 			flags = O_RDWR | O_CREAT;
 			break;
 		default:
 			return SLIB_FILE_INVALID_HANDLE;
 	}
-	int fd = ::open(filePath.getBuf(), flags, permissions);
+	int fd = ::open(filePath.getData(), flags, permissions);
 	return (sl_file)fd;
 }
 
@@ -111,11 +111,11 @@ sl_bool File::seek(sl_int64 pos, SeekPosition from)
 	if (isOpened()) {
 		int fd = (int)m_file;
 		int origin = SEEK_SET;
-		if (from == seekPosition_Begin) {
+		if (from == SeekPosition::Begin) {
 			origin = SEEK_SET;
-		} else if (from == seekPosition_Current) {
+		} else if (from == SeekPosition::Current) {
 			origin = SEEK_CUR;
-		} else if (from == seekPosition_End) {
+		} else if (from == SeekPosition::End) {
 			origin = SEEK_END;
 		} else {
 			return sl_false;
@@ -206,7 +206,7 @@ sl_uint64 File::getSize(const String& filePath)
 		return 0;
 	}
 	struct stat st;
-	if (0 == ::stat(filePath.getBuf(), &st)) {
+	if (0 == ::stat(filePath.getData(), &st)) {
 		return st.st_size;
 	} else {
 		return 0;
@@ -294,7 +294,7 @@ Time File::getModifiedTime(const String& filePath)
 		return Time::zero();
 	}
 	struct stat st;
-	if (0 == ::stat(filePath.getBuf(), &st)) {
+	if (0 == ::stat(filePath.getData(), &st)) {
 		return _File_getModifiedTime(st);
 	} else {
 		return Time::zero();
@@ -319,7 +319,7 @@ Time File::getAccessedTime(const String& filePath)
 		return Time::zero();
 	}
 	struct stat st;
-	if (0 == ::stat(filePath.getBuf(), &st)) {
+	if (0 == ::stat(filePath.getData(), &st)) {
 		return _File_getAccessedTime(st);
 	} else {
 		return Time::zero();
@@ -344,7 +344,7 @@ Time File::getCreatedTime(const String& filePath)
 		return Time::zero();
 	}
 	struct stat st;
-	if (0 == ::stat(filePath.getBuf(), &st)) {
+	if (0 == ::stat(filePath.getData(), &st)) {
 		return _File_getCreatedTime(st);
 	} else {
 		return Time::zero();
@@ -361,7 +361,7 @@ static sl_bool _File_setAccessedAndModifiedTime(const String& filePath, Time tim
 	t[0].tv_usec = (int)(timeAccess.toInt() % 1000000);
 	t[1].tv_sec = (int)(timeModify.toInt() / 1000000);
 	t[1].tv_usec = (int)(timeModify.toInt() % 1000000);
-	return ::utimes(filePath.getBuf(), t) == 0;
+	return ::utimes(filePath.getData(), t) == 0;
 }
 
 sl_bool File::setModifiedTime(const String& filePath, Time time)
@@ -388,13 +388,13 @@ int File::getAttributes(const String& filePath)
 		return -1;
 	}
 	struct stat st;
-	if (0 == ::stat(filePath.getBuf(), &st)) {
+	if (0 == ::stat(filePath.getData(), &st)) {
 		int ret = 0;
 		if (S_ISDIR(st.st_mode)) {
-			ret |= fileAttribute_Directory;
+			ret |= FileAttribute::Directory;
 		}
 		if (filePath.startsWith('.')) {
-			ret |= fileAttribute_Hidden;
+			ret |= FileAttribute::Hidden;
 		}
 		return ret;
 	} else {
@@ -421,7 +421,7 @@ List<String> File::getFiles(const String& _filePath)
 	}
 	List<String> ret;
 	String8 dirPath = filePath;
-	DIR* dir = ::opendir(dirPath.getBuf());
+	DIR* dir = ::opendir(dirPath.getData());
 	if (dir) {
 		dirent* ent;
 		while ((ent = readdir(dir))) {
@@ -437,7 +437,7 @@ sl_bool File::createDirectory(const String& filePath)
 	if (filePath.isEmpty()) {
 		return sl_false;
 	}
-	return 0 == ::mkdir(filePath.getBuf(), 0777);
+	return 0 == ::mkdir(filePath.getData(), 0777);
 }
 
 
@@ -446,7 +446,7 @@ sl_bool File::deleteFile(const String& filePath)
 	if (filePath.isEmpty()) {
 		return sl_false;
 	}
-	return 0 == ::remove(filePath.getBuf());
+	return 0 == ::remove(filePath.getData());
 }
 
 sl_bool File::deleteDirectoryOnly(const String& filePath)
@@ -455,7 +455,7 @@ sl_bool File::deleteDirectoryOnly(const String& filePath)
 		return sl_false;
 	}
 	String8 dirPath = normalizeDirectoryPath(filePath);
-	return 0 == ::rmdir(dirPath.getBuf());
+	return 0 == ::rmdir(dirPath.getData());
 }
 
 sl_bool File::rename(const String& oldPath, const String& newPath)
@@ -466,7 +466,7 @@ sl_bool File::rename(const String& oldPath, const String& newPath)
 	if (newPath.isEmpty()) {
 		return sl_false;
 	}
-	return 0 == ::rename(oldPath.getBuf(), newPath.getBuf());
+	return 0 == ::rename(oldPath.getData(), newPath.getData());
 }
 
 sl_bool File::setNonBlocking(int fd, sl_bool flagEnable)

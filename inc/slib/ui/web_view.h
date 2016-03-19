@@ -23,7 +23,8 @@ public:
 
 class SLIB_EXPORT WebView : public View
 {
-	SLIB_DECLARE_OBJECT(WebView, View)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	WebView();
 	

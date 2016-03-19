@@ -18,7 +18,8 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class SLIB_EXPORT RadioButton : public View
 {
-	SLIB_DECLARE_OBJECT(RadioButton, View)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	RadioButton();
 	

@@ -23,7 +23,7 @@ class _DropDownList : public DropDownList
 public:
 	sl_uint32 __getItemsCount()
 	{
-		return (sl_uint32)(m_titles.count());
+		return (sl_uint32)(m_titles.getCount());
 	}
 	
 	NSString* __getItemTitle(sl_uint32 row)
@@ -71,7 +71,7 @@ Ref<ViewInstance> DropDownList::createInstance(ViewInstance* _parent)
 		
 		Ref<Font> font = m_font;
 		Ref<FontInstance> fontInstance;
-		UIFont* hFont = UIPlatform::getUIFont(font.get(), fontInstance);
+		UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
@@ -128,7 +128,7 @@ void DropDownList::setFont(const Ref<Font>& font)
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_DropDownList class]]) {
 		_Slib_iOS_DropDownList* v = (_Slib_iOS_DropDownList*)handle;
 		Ref<FontInstance> fontInstance;
-		UIFont* hFont = UIPlatform::getUIFont(font.get(), fontInstance);
+		UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
 		if (hFont != nil) {
 			[v setFont:hFont];
 		}
@@ -238,8 +238,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::DropDownList::checkInstance(view)) {
-			((slib::_DropDownList*)(view.get()))->__onSelectItem(self, (sl_uint32)row);
+		if (slib::DropDownList::checkInstance(view.ptr)) {
+			((slib::_DropDownList*)(view.ptr))->__onSelectItem(self, (sl_uint32)row);
 		}
 	}
 }
@@ -249,8 +249,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::DropDownList::checkInstance(view)) {
-			return (NSInteger)(((slib::_DropDownList*)(view.get()))->__getItemsCount());
+		if (slib::DropDownList::checkInstance(view.ptr)) {
+			return (NSInteger)(((slib::_DropDownList*)(view.ptr))->__getItemsCount());
 		}
 	}
 	return 0;
@@ -261,8 +261,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::DropDownList::checkInstance(view)) {
-			return ((slib::_DropDownList*)(view.get()))->__getItemTitle((sl_uint32)row);
+		if (slib::DropDownList::checkInstance(view.ptr)) {
+			return ((slib::_DropDownList*)(view.ptr))->__getItemTitle((sl_uint32)row);
 		}
 	}
 	return @"";
@@ -273,8 +273,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::DropDownList::checkInstance(view)) {
-			if ((NSInteger)(((slib::_DropDownList*)(view.get()))->__getItemsCount()) > 0) {
+		if (slib::DropDownList::checkInstance(view.ptr)) {
+			if ((NSInteger)(((slib::_DropDownList*)(view.ptr))->__getItemsCount()) > 0) {
 				return YES;
 			}
 		}
@@ -288,8 +288,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::DropDownList::checkInstance(view)) {
-			((slib::_DropDownList*)(view.get()))->__onStartSelection(self);
+		if (slib::DropDownList::checkInstance(view.ptr)) {
+			((slib::_DropDownList*)(view.ptr))->__onStartSelection(self);
 		}
 	}
 }
@@ -316,8 +316,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::DropDownList::checkInstance(view)) {
-			((slib::_DropDownList*)(view.get()))->__onCancelSelection(self);
+		if (slib::DropDownList::checkInstance(view.ptr)) {
+			((slib::_DropDownList*)(view.ptr))->__onCancelSelection(self);
 		}
 	}
 }

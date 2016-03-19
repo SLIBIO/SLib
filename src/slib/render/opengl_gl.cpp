@@ -53,7 +53,7 @@ void GL::loadEntries(const String& _pathDll, sl_bool flagReload)
 	if (pathDll.isEmpty()) {
 		hDll = NULL;
 	} else {
-		hDll = ::LoadLibraryW((LPCWSTR)(pathDll.getBuf()));
+		hDll = ::LoadLibraryW((LPCWSTR)(pathDll.getData()));
 		if (!hDll) {
 			//SLIB_LOG_ERROR("GLES", "Failed to load OpenGL dll - " + pathDll);
 			return;

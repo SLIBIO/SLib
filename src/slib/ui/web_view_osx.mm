@@ -332,8 +332,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::WebView::checkInstance(view)) {
-			((slib::_WebView*)(view.get()))->__onStartLoad(self);
+		if (slib::WebView::checkInstance(view.ptr)) {
+			((slib::_WebView*)(view.ptr))->__onStartLoad(self);
 		}
 	}
 }
@@ -351,8 +351,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::WebView::checkInstance(view)) {
-			((slib::_WebView*)(view.get()))->__onFinishLoad(self);
+		if (slib::WebView::checkInstance(view.ptr)) {
+			((slib::_WebView*)(view.ptr))->__onFinishLoad(self);
 		}
 	}
 }
@@ -370,8 +370,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::WebView::checkInstance(view)) {
-			((slib::_WebView*)(view.get()))->__onLoadError(self, error);
+		if (slib::WebView::checkInstance(view.ptr)) {
+			((slib::_WebView*)(view.ptr))->__onLoadError(self, error);
 		}
 	}
 }
@@ -390,8 +390,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::WebView::checkInstance(view)) {
-			((slib::_WebView*)(view.get()))->__onLoadError(self, error);
+		if (slib::WebView::checkInstance(view.ptr)) {
+			((slib::_WebView*)(view.ptr))->__onLoadError(self, error);
 		}
 	}
 }
@@ -403,8 +403,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::WebView::checkInstance(view)) {
-			((slib::_WebView*)(view.get()))->__onInvokeMethod(self, body);
+		if (slib::WebView::checkInstance(view.ptr)) {
+			((slib::_WebView*)(view.ptr))->__onInvokeMethod(self, body);
 		}
 	}
 }
@@ -419,8 +419,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::WebView::checkInstance(view)) {
-			((slib::_WebView*)(view.get()))->__onInvokeMethod(self, args);
+		if (slib::WebView::checkInstance(view.ptr)) {
+			((slib::_WebView*)(view.ptr))->__onInvokeMethod(self, args);
 		}
 	}
 	return nil;

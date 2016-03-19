@@ -13,7 +13,7 @@ NSString* Apple::getNSStringFromString(const String& str, NSString* def)
 	if (s.isNull()) {
 		return def;
 	}
-	NSString* ret = [[NSString alloc] initWithUTF8String:s.getBuf()];
+	NSString* ret = [[NSString alloc] initWithUTF8String:s.getData()];
 	return ret;
 }
 
@@ -23,7 +23,7 @@ NSString* Apple::getNSStringFromString16(const String16& str, NSString* def)
 	if (s.isNull()) {
 		return def;
 	}
-	NSString* ret = [[NSString alloc] initWithCharacters:(unichar*)s.getBuf() length:s.getLength()];
+	NSString* ret = [[NSString alloc] initWithCharacters:(unichar*)s.getData() length:s.getLength()];
 	return ret;
 }
 
@@ -49,7 +49,7 @@ String16 Apple::getString16FromNSString(NSString* str)
 	NSRange range;
 	range.length = len;
 	range.location = 0;
-	[str getCharacters:ret.getBuf() range:range];
+	[str getCharacters:ret.getData() range:range];
 	return ret;
 }
 
@@ -74,7 +74,7 @@ CGImageRef Apple::loadCGImage(const void* buf, sl_size size)
 	return ret;
 }
 
-String Apple::getResourceFilePath(const String &path)
+String Apple::getAssetFilePath(const String &path)
 {
 	String fileExt = File::getFileExtension(path);
 	String fileName = File::getFileNameOnly(path);
@@ -124,9 +124,9 @@ void _Apple_initSystemVersion()
 		String version = Apple::getStringFromNSString(_version);
 		if (version.isNotEmpty()) {
 			ListLocker<String> list(version.split("."));
-			if (list.count() > 0) {
+			if (list.count > 0) {
 				_g_system_version_major = list[0].parseUint32();
-				if (list.count() > 1) {
+				if (list.count > 1) {
 					_g_system_version_minor = list[1].parseUint32();
 				}
 			}

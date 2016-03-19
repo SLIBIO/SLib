@@ -48,13 +48,13 @@ public:
 	sl_bool __setup(sl_uint32 events)
 	{
 		sl_uint32 ev = 0;
-		if (events & socketEventType_Read) {
+		if (events & SocketEvent::Read) {
 			ev = ev | FD_READ | FD_ACCEPT;
 		}
-		if (events & socketEventType_Write) {
+		if (events & SocketEvent::Write) {
 			ev = ev | FD_WRITE | FD_CONNECT;
 		}
-		if (events & socketEventType_Close) {
+		if (events & SocketEvent::Close) {
 			ev = ev | FD_CLOSE;
 		}
 		int ret = ::WSAEventSelect((SOCKET)(m_socket->getHandle()), m_hEvent, ev);
@@ -117,13 +117,13 @@ sl_bool SocketEvent::__waitMultipleEvents(const Ref<SocketEvent>* events, sl_uin
 				sl_uint32 st = 0;
 				sl_uint32 le = ne.lNetworkEvents;
 				if (le & (FD_CONNECT | FD_WRITE)) {
-					st |= socketEventType_Write;
+					st |= SocketEvent::Write;
 				}
 				if (le & (FD_ACCEPT | FD_READ)) {
-					st |= socketEventType_Read;
+					st |= SocketEvent::Read;
 				}
 				if (le & FD_CLOSE) {
-					st |= socketEventType_Close;
+					st |= SocketEvent::Close;
 				}
 				if (status) {
 					status[index] = st;

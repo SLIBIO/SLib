@@ -11,27 +11,15 @@ SLIB_NETWORK_NAMESPACE_BEGIN
 class SLIB_EXPORT TcpStream : public Object, public IStream, public IClosable
 {
 public:
-	SLIB_INLINE TcpStream()
-	{
-	}
-
-	SLIB_INLINE TcpStream(const Ref<Socket>& socket)
-	{
-		m_socket = socket;
-	}
-
-public:
-	SLIB_INLINE void setSocket(const Ref<Socket>& socket)
-	{
-		m_socket = socket;
-	}
+	TcpStream();
 	
-	SLIB_INLINE Ref<Socket> getSocket()
-	{
-		return m_socket;
-	}
+	TcpStream(const Ref<Socket>& socket);
 
 public:
+	void setSocket(const Ref<Socket>& socket);
+	
+	Ref<Socket> getSocket();
+
 	// override
 	void close();
 

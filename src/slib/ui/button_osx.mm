@@ -24,7 +24,7 @@ Ref<ViewInstance> Button::createInstance(ViewInstance* _parent)
 		
 		Ref<Font> font = m_font;
 		Ref<FontInstance> fontInstance;
-		NSFont* hFont = UIPlatform::getNSFont(font.get(), fontInstance);
+		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
@@ -67,7 +67,7 @@ void Button::setFont(const Ref<Font>& font)
 	if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
 		NSButton* v = (NSButton*)handle;
 		Ref<FontInstance> fontInstance;
-		NSFont* hFont = UIPlatform::getNSFont(font.get(), fontInstance);
+		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
 		if (hFont != nil) {
 			[v setFont:hFont];
 		}

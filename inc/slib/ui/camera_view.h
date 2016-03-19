@@ -11,7 +11,8 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class SLIB_EXPORT CameraView : public VideoView, public IVideoCaptureListener
 {
-	SLIB_DECLARE_OBJECT(CameraView, VideoView)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	CameraView();
 	

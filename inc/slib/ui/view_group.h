@@ -9,7 +9,8 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class SLIB_EXPORT ViewGroup : public GenericViewWithDrawing
 {
-	SLIB_DECLARE_OBJECT(ViewGroup, GenericViewWithDrawing)
+	SLIB_DECLARE_OBJECT
+	
 public:
 	ViewGroup();
 	
