@@ -97,16 +97,16 @@ void LabelView::setBorder(sl_bool flag)
 	m_flagBorder = flag;
 }
 
-Alignment LabelView::getTextAlignment()
+Alignments LabelView::getTextAlignment()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		m_textAlignment = (Alignment)(_JAndroidEditView::getAlignment.callInt(sl_null, handle));
+		m_textAlignment = _JAndroidEditView::getAlignment.callInt(sl_null, handle);
 	}
 	return m_textAlignment;
 }
 
-void LabelView::setTextAlignment(Alignment align)
+void LabelView::setTextAlignment(Alignments align)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {

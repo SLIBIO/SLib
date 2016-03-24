@@ -186,7 +186,7 @@ void UI::showAlert(const AlertParam& param)
 
 			JniLocal<jobject> jparam = _JAndroidAlert::init.newObject(sl_null);
 			if (jparam.isNotNull()) {
-				_JAndroidAlert::type.set(jparam, param.type);
+				_JAndroidAlert::type.set(jparam, (int)(param.type));
 				_JAndroidAlert::caption.set(jparam, param.caption);
 				_JAndroidAlert::text.set(jparam, param.text);
 				jlong lresult = (jlong)(result.ptr);

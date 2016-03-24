@@ -39,14 +39,14 @@ void GraphicsPath::lineTo(sl_real x, sl_real y)
 	if (!m_flagBegan) {
 		GraphicsPathPoint point;
 		point.pt = m_pointBegin;
-		point.type = (sl_uint8)(GraphicsPathPointType::Begin);
+		point.type = GraphicsPathPoint::Begin;
 		points.add(point);
 		m_flagBegan = sl_true;
 	}
 	GraphicsPathPoint point;
 	point.pt.x = x;
 	point.pt.y = y;
-	point.type = (sl_uint8)(GraphicsPathPointType::Line);
+	point.type = GraphicsPathPoint::Line;
 	points.add(point);
 	invalidate();
 }
@@ -62,22 +62,22 @@ void GraphicsPath::cubicTo(sl_real xc1, sl_real yc1, sl_real xc2, sl_real yc2, s
 	if (!m_flagBegan) {
 		GraphicsPathPoint point;
 		point.pt = m_pointBegin;
-		point.type = (sl_uint8)(GraphicsPathPointType::Begin);
+		point.type = GraphicsPathPoint::Begin;
 		points.add(point);
 		m_flagBegan = sl_true;
 	}
 	GraphicsPathPoint point;
 	point.pt.x = xc1;
 	point.pt.y = yc1;
-	point.type = (sl_uint8)(GraphicsPathPointType::BezierCubic);
+	point.type = GraphicsPathPoint::BezierCubic;
 	points.add(point);
 	point.pt.x = xc2;
 	point.pt.y = yc2;
-	point.type = (sl_uint8)(GraphicsPathPointType::BezierCubic);
+	point.type = GraphicsPathPoint::BezierCubic;
 	points.add(point);
 	point.pt.x = xe;
 	point.pt.y = ye;
-	point.type = (sl_uint8)(GraphicsPathPointType::BezierCubic);
+	point.type = GraphicsPathPoint::BezierCubic;
 	points.add(point);
 	invalidate();
 }
@@ -94,7 +94,7 @@ void GraphicsPath::closeSubpath()
 		sl_size n = points.getCount();
 		if (n > 0) {
 			GraphicsPathPoint* list = points.getData();
-			list[n - 1].type |= (sl_uint8)(GraphicsPathPointType::FlagClose);
+			list[n - 1].type |= GraphicsPathPoint::FlagClose;
 			m_pointBegin = list[n - 1].pt;
 			m_flagBegan = sl_false;
 		}
@@ -239,13 +239,13 @@ void GraphicsPathInstance::buildFrom(const Ref<GraphicsPath>& path)
 	for (sl_size i = 0; i < points.count; i++) {
 		GraphicsPathPoint& point = points[i];
 		sl_uint8 t = point.type & 0x7f;
-		if (t == (sl_uint8)(GraphicsPathPointType::Begin)) {
+		if (t == GraphicsPathPoint::Begin) {
 			this->moveTo(point.pt);
 			nCubicCount = 0;
-		} else if (t == (sl_uint8)(GraphicsPathPointType::Line)) {
+		} else if (t == GraphicsPathPoint::Line) {
 			this->lineTo(point.pt);
 			nCubicCount = 0;
-		} else if (t == (sl_uint8)(GraphicsPathPointType::BezierCubic)) {
+		} else if (t == GraphicsPathPoint::BezierCubic) {
 			if (nCubicCount == 2) {
 				this->cubicTo(points[i - 2].pt, points[i - 1].pt, points[i].pt);
 				nCubicCount = 0;
@@ -253,7 +253,7 @@ void GraphicsPathInstance::buildFrom(const Ref<GraphicsPath>& path)
 				nCubicCount++;
 			}
 		}
-		if (point.type & (sl_uint8)(GraphicsPathPointType::FlagClose)) {
+		if (point.type & GraphicsPathPoint::FlagClose) {
 			this->closeSubpath();
 		}
 	}

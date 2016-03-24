@@ -27,9 +27,9 @@ public:
 	virtual void setTextColor(const Color& color);
 	
 	
-	Alignment getTextAlignment();
+	Alignments getTextAlignment();
 	
-	virtual void setTextAlignment(Alignment align);
+	virtual void setTextAlignment(Alignments align);
 	
 	
 	Ref<Font> getFont();
@@ -60,7 +60,7 @@ protected:
 protected:
 	SafeString m_text;
 	sl_bool m_flagBorder;
-	Alignment m_textAlignment;
+	Alignments m_textAlignment;
 	Color m_textColor;
 	Color m_backgroundColor;
 	

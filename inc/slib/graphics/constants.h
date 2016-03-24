@@ -39,29 +39,33 @@ enum class FillMode
 	Alternate = 1
 };
 
-enum class Alignment
+namespace Alignment
 {
-	HorizontalMask = 3,
-	VerticalMask = 12,
-	
-	Center = 0,
-	Left = 1,
-	Right = 2,
-	
-	Middle = 0,
-	Top = 4,
-	Bottom = 8,
-	
-	MiddleCenter = 0,
-	MiddleLeft = 1,
-	MiddleRight = 2,
-	TopCenter = 4,
-	TopLeft = 5,
-	TopRight = 6,
-	BottomCenter = 8,
-	BottomLeft = 9,
-	BottomRight = 10
+	enum
+	{
+		HorizontalMask = 3,
+		VerticalMask = 12,
+		
+		Center = 0,
+		Left = 1,
+		Right = 2,
+		
+		Middle = 0,
+		Top = 4,
+		Bottom = 8,
+		
+		MiddleCenter = 0,
+		MiddleLeft = 1,
+		MiddleRight = 2,
+		TopCenter = 4,
+		TopLeft = 5,
+		TopRight = 6,
+		BottomCenter = 8,
+		BottomLeft = 9,
+		BottomRight = 10
+	};
 };
+typedef sl_uint32 Alignments;
 
 enum class ImageFileType
 {
@@ -108,13 +112,6 @@ enum class ScaleMode
 	Cover = 3
 };
 
-enum class GraphicsPathPointType
-{
-	Begin = 0,
-	Line = 1,
-	BezierCubic = 3,
-	FlagClose = 0x80
-};
 
 enum class ColorSpace
 {

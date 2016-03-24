@@ -11,7 +11,7 @@ typedef sl_reg sl_file;
 
 SLIB_NAMESPACE_BEGIN
 
-enum FileMode
+enum class FileMode
 {
 	Read = 1,
 	Write = 2,
@@ -20,11 +20,14 @@ enum FileMode
 	RandomAccess = 5
 };
 
-enum FileAttribute
+namespace FileAttribute
 {
-	Directory = 1,
-	Hidden = 2
+	enum {
+		Directory = 1,
+		Hidden = 2
+	};
 };
+typedef int FileAttributes;
 
 class SLIB_EXPORT File : public IO
 {
@@ -111,7 +114,7 @@ public:
 	static sl_bool setCreatedTime(const String& filePath, Time time);
 
 	
-	static int getAttributes(const String& filePath);
+	static FileAttributes getAttributes(const String& filePath);
 	
 	static sl_bool exists(const String& filePath);
 	

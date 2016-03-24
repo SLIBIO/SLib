@@ -83,7 +83,7 @@ Size Canvas::getTextSize(const Ref<Font>& font, const String &text)
 	return Size::zero();
 }
 
-void Canvas::drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& _font, const Color& color, Alignment align)
+void Canvas::drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& _font, const Color& color, Alignments align)
 {
 	Ref<Font> font = _font;
 	if (font.isNull()) {
@@ -296,7 +296,7 @@ void Canvas::draw(sl_real xDst, sl_real yDst, const Ref<Drawable>& src)
 	}
 }
 
-void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleMode scaleMode, Alignment alignment)
+void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleMode scaleMode, Alignments alignment)
 {
 	Canvas* canvas = this;
 	if (source.isNotNull()) {

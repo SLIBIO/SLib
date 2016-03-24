@@ -64,9 +64,9 @@ public:
 		}
 	}
 	
-	static NSTextAlignment translateAlignment(Alignment _align)
+	static NSTextAlignment translateAlignment(Alignments _align)
 	{
-		Alignment align = (Alignment)((int)_align & (int)Alignment::HorizontalMask);
+		Alignments align = _align & Alignment::HorizontalMask;
 		if (align == Alignment::Center) {
 			return NSTextAlignmentCenter;
 		} else if (align == Alignment::Right) {
@@ -75,7 +75,7 @@ public:
 		return NSTextAlignmentLeft;
 	}
 	
-	static Alignment translateAlignmentReverse(NSTextAlignment align)
+	static Alignments translateAlignmentReverse(NSTextAlignment align)
 	{
 		if (align == NSTextAlignmentCenter) {
 			return Alignment::Center;
@@ -216,7 +216,7 @@ void EditView::setBorder(sl_bool flag)
 	m_flagBorder = flag;
 }
 
-Alignment EditView::getTextAlignment()
+Alignments EditView::getTextAlignment()
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
@@ -231,7 +231,7 @@ Alignment EditView::getTextAlignment()
 	return m_textAlignment;
 }
 
-void EditView::setTextAlignment(Alignment align)
+void EditView::setTextAlignment(Alignments align)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {

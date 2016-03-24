@@ -172,34 +172,34 @@ void SButton::setIconSize(sl_real size)
 	setIconSize(Size(size, size));
 }
 
-Alignment SButton::getContentAlignment()
+Alignments SButton::getContentAlignment()
 {
 	return m_contentAlignment;
 }
 
-void SButton::setContentAlignment(Alignment align)
+void SButton::setContentAlignment(Alignments align)
 {
 	m_contentAlignment = align;
 	invalidate();
 }
 
-Alignment SButton::getIconAlignment()
+Alignments SButton::getIconAlignment()
 {
 	return m_iconAlignment;
 }
 
-void SButton::setIconAlignment(Alignment align)
+void SButton::setIconAlignment(Alignments align)
 {
 	m_iconAlignment = align;
 	invalidate();
 }
 
-Alignment SButton::getTextAlignment()
+Alignments SButton::getTextAlignment()
 {
 	return m_textAlignment;
 }
 
-void SButton::setTextAlignment(Alignment align)
+void SButton::setTextAlignment(Alignments align)
 {
 	m_textAlignment = align;
 	invalidate();
@@ -542,13 +542,13 @@ void SButton::layoutIconAndText(GraphicsContext* gc, sl_real widthFrame, sl_real
 	sl_real widthText = sizeText.x + m_textMarginLeft + m_textMarginRight;
 	sl_real heightText = sizeText.y + m_textMarginTop + m_textMarginBottom;
 	
-	Alignment alignIcon = m_iconAlignment;
-	Alignment horzIcon = (Alignment)((sl_uint32)alignIcon & (sl_uint32)(Alignment::HorizontalMask));
-	Alignment vertIcon = (Alignment)((sl_uint32)alignIcon & (sl_uint32)(Alignment::VerticalMask));
+	Alignments alignIcon = m_iconAlignment;
+	Alignments horzIcon = alignIcon & Alignment::HorizontalMask;
+	Alignments vertIcon = alignIcon & Alignment::VerticalMask;
 	
-	Alignment alignText = m_textAlignment;
-	Alignment horzText = (Alignment)((sl_uint32)alignText & (sl_uint32)(Alignment::HorizontalMask));
-	Alignment vertText = (Alignment)((sl_uint32)alignText & (sl_uint32)(Alignment::VerticalMask));
+	Alignments alignText = m_textAlignment;
+	Alignments horzText = alignText & Alignment::HorizontalMask;
+	Alignments vertText = alignText & Alignment::VerticalMask;
 	
 	sl_real xIcon = 0;
 	sl_real yIcon = 0;

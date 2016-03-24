@@ -32,12 +32,12 @@ void SImageView::setScaleMode(ScaleMode mode)
 	invalidate();
 }
 
-Alignment SImageView::getSourceAlignment()
+Alignments SImageView::getSourceAlignment()
 {
 	return m_sourceAlignment;
 }
 
-void SImageView::setSourceAlignment(Alignment align)
+void SImageView::setSourceAlignment(Alignments align)
 {
 	m_sourceAlignment = align;
 	invalidate();

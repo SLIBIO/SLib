@@ -185,11 +185,11 @@ private:
 	
 };
 
-enum AlertType {
-    alertType_Ok = 0,
-    alertType_OkCancel = 1,
-    alertType_YesNo = 2,
-    alertType_YesNoCancel = 3
+enum class AlertType {
+	Ok = 0,
+	OkCancel = 1,
+	YesNo = 2,
+	YesNoCancel = 3
 };
 
 class SLIB_EXPORT AlertParam

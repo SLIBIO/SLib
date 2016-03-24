@@ -233,7 +233,7 @@ sl_bool UIApp::isMobilePaused()
 
 AlertParam::AlertParam()
 {
-	type = alertType_Ok;
+	type = AlertType::Ok;
 }
 
 /**************************************

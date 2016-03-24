@@ -151,16 +151,16 @@ void EditView::setBorder(sl_bool flag)
 	m_flagBorder = flag;
 }
 
-Alignment EditView::getTextAlignment()
+Alignments EditView::getTextAlignment()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		m_textAlignment = (Alignment)(_JAndroidEditView::getAlignment.callInt(sl_null, handle));
+		m_textAlignment = _JAndroidEditView::getAlignment.callInt(sl_null, handle);
 	}
 	return m_textAlignment;
 }
 
-void EditView::setTextAlignment(Alignment align)
+void EditView::setTextAlignment(Alignments align)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {

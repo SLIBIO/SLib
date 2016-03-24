@@ -180,17 +180,17 @@ void UI::showAlert(const AlertParam& param)
 		[alert setMessageText:text];
 		[alert setAlertStyle:NSInformationalAlertStyle];
 		[[alert window] setTitle:caption];
-		if (type == alertType_OkCancel) {
+		if (type == AlertType::OkCancel) {
 			[alert addButtonWithTitle:titleOk];
 			NSButton* btnCancel = [alert addButtonWithTitle:titleCancel];
 			[btnCancel setKeyEquivalent:@"Cancel"];
 			on2 = onCancel;
-		} else if (type == alertType_YesNo) {
+		} else if (type == AlertType::YesNo) {
 			[alert addButtonWithTitle:titleYes];
 			NSButton* btnNo = [alert addButtonWithTitle:titleNo];
 			[btnNo setKeyEquivalent:@"Don't Save"];
 			on2 = onNo;
-		} else if (type == alertType_YesNoCancel) {
+		} else if (type == AlertType::YesNoCancel) {
 			[alert addButtonWithTitle:titleYes];
 			NSButton* btnNo = [alert addButtonWithTitle:titleNo];
 			[btnNo setKeyEquivalent:@"Don't Save"];

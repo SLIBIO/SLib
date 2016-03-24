@@ -70,19 +70,19 @@ public:
 	void setIconSize(sl_real size);
 	
 	
-	Alignment getContentAlignment();
+	Alignments getContentAlignment();
 	
-	virtual void setContentAlignment(Alignment align);
-	
-	
-	Alignment getIconAlignment();
-	
-	virtual void setIconAlignment(Alignment align);
+	virtual void setContentAlignment(Alignments align);
 	
 	
-	Alignment getTextAlignment();
+	Alignments getIconAlignment();
 	
-	virtual void setTextAlignment(Alignment align);
+	virtual void setIconAlignment(Alignments align);
+	
+	
+	Alignments getTextAlignment();
+	
+	virtual void setTextAlignment(Alignments align);
 	
 	
 	sl_bool isTextBeforeIcon();
@@ -223,9 +223,9 @@ private:
 	sl_uint32 m_category;
 	
 	Size m_iconSize;
-	Alignment m_contentAlignment;
-	Alignment m_iconAlignment;
-	Alignment m_textAlignment;
+	Alignments m_contentAlignment;
+	Alignments m_iconAlignment;
+	Alignments m_textAlignment;
 	sl_bool m_flagTextBeforeIcon;
 	LayoutOrientation m_layoutOrientation;
 	sl_real m_iconMarginLeft;

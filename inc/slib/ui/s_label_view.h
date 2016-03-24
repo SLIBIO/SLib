@@ -25,9 +25,9 @@ protected:
 	virtual void setTextColor(const Color& color);
 	
 	
-	Alignment getTextAlignment();
+	Alignments getTextAlignment();
 	
-	virtual void setTextAlignment(Alignment align);
+	virtual void setTextAlignment(Alignments align);
 
 	
 	Ref<Font> getFont();
@@ -41,7 +41,7 @@ public:
 protected:
 	SafeString m_text;
 	Color m_textColor;
-	Alignment m_textAlignment;
+	Alignments m_textAlignment;
 	SafeRef<Font> m_font;
 	
 };

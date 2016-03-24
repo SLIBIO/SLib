@@ -90,9 +90,9 @@ public:
 		[tv->table setRowHeight:([font pointSize] - [font descender])];
 	}
 	
-	static NSTextAlignment translateAlignment(Alignment _align)
+	static NSTextAlignment translateAlignment(Alignments _align)
 	{
-		Alignment align = (Alignment)((int)_align & (int)Alignment::HorizontalMask);
+		Alignments align = _align & Alignment::HorizontalMask;
 		if (align == Alignment::Center) {
 			return NSCenterTextAlignment;
 		} else if (align == Alignment::Right) {
@@ -184,7 +184,7 @@ void ListDetailsView::_setColumnWidth(sl_uint32 iCol, sl_real width)
 	}
 }
 
-void ListDetailsView::_setHeaderAlignment(sl_uint32 iCol, Alignment align)
+void ListDetailsView::_setHeaderAlignment(sl_uint32 iCol, Alignments align)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListDetailsView class]]) {
@@ -196,7 +196,7 @@ void ListDetailsView::_setHeaderAlignment(sl_uint32 iCol, Alignment align)
 	}
 }
 
-void ListDetailsView::_setColumnAlignment(sl_uint32 iCol, Alignment align)
+void ListDetailsView::_setColumnAlignment(sl_uint32 iCol, Alignments align)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListDetailsView class]]) {

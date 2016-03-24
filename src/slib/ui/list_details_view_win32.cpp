@@ -72,9 +72,9 @@ public:
 		::SendMessageW(hWnd, LVM_SETITEMCOUNT, (WPARAM)nNew, LVSICF_NOINVALIDATEALL | LVSICF_NOSCROLL);
 	}
 
-	static int translateAlignment(Alignment _align)
+	static int translateAlignment(Alignments _align)
 	{
-		Alignment align = (Alignment)((int)_align & (int)Alignment::HorizontalMask);
+		Alignments align = _align & Alignment::HorizontalMask;
 		if (align == Alignment::Center) {
 			return LVCFMT_CENTER;
 		} else if (align == Alignment::Right) {
@@ -226,11 +226,11 @@ void ListDetailsView::_setColumnWidth(sl_uint32 iCol, sl_real width)
 	}
 }
 
-void ListDetailsView::_setHeaderAlignment(sl_uint32 iCol, Alignment align)
+void ListDetailsView::_setHeaderAlignment(sl_uint32 iCol, Alignments align)
 {
 }
 
-void ListDetailsView::_setColumnAlignment(sl_uint32 iCol, Alignment align)
+void ListDetailsView::_setColumnAlignment(sl_uint32 iCol, Alignments align)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {

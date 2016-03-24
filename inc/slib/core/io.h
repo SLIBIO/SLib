@@ -10,7 +10,7 @@
 
 SLIB_NAMESPACE_BEGIN
 
-enum SeekPosition
+enum class SeekPosition
 {
 	Current = 1,
 	Begin = 2,

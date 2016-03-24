@@ -382,7 +382,7 @@ sl_bool File::setCreatedTime(const String& filePath, Time time)
 	return sl_false;
 }
 
-int File::getAttributes(const String& filePath)
+FileAttributes File::getAttributes(const String& filePath)
 {
 	if (filePath.isEmpty()) {
 		return -1;

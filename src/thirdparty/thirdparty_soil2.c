@@ -7,6 +7,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
+#pragma comment(lib, "opengl32.lib")
+
 #include "../../thirdparty/SOIL2/etc1_utils.c"
 #include "../../thirdparty/SOIL2/image_helper.c"
 #include "../../thirdparty/SOIL2/image_DXT.c"

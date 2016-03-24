@@ -155,7 +155,7 @@ void UI::showAlert(const AlertParam& param)
 	dispatch_async(dispatch_get_main_queue(), ^{
 		
 		UIAlertController* alert = [UIAlertController alertControllerWithTitle:caption message:text preferredStyle:UIAlertControllerStyleAlert];
-		if (type == alertType_OkCancel) {
+		if (type == AlertType::OkCancel) {
 			UIAlertAction* actionOK = [UIAlertAction actionWithTitle:titleOk style:UIAlertActionStyleDefault handler:
 									   ^(UIAlertAction *) {
 										   [alert dismissViewControllerAnimated:YES completion:nil];
@@ -172,7 +172,7 @@ void UI::showAlert(const AlertParam& param)
 										   }];
 			[alert addAction:actionOK];
 			[alert addAction:actionCancel];
-		} else if (type == alertType_YesNo) {
+		} else if (type == AlertType::YesNo) {
 			UIAlertAction* actionYes = [UIAlertAction actionWithTitle:titleYes style:UIAlertActionStyleDefault handler:
 									   ^(UIAlertAction *) {
 										   [alert dismissViewControllerAnimated:YES completion:nil];
@@ -189,7 +189,7 @@ void UI::showAlert(const AlertParam& param)
 										   }];
 			[alert addAction:actionYes];
 			[alert addAction:actionNo];
-		} else if (type == alertType_YesNoCancel) {
+		} else if (type == AlertType::YesNoCancel) {
 			UIAlertAction* actionYes = [UIAlertAction actionWithTitle:titleYes style:UIAlertActionStyleDefault handler:
 										^(UIAlertAction *) {
 											[alert dismissViewControllerAnimated:YES completion:nil];

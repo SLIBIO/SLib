@@ -21,6 +21,15 @@ struct SLIB_EXPORT GraphicsPathPoint
 
 	// flags from GraphicsPathPointType
 	sl_uint8 type;
+	
+	enum : sl_uint8
+	{
+		Begin = 0,
+		Line = 1,
+		BezierCubic = 3,
+		FlagClose = 0x80
+	};
+	
 };
 
 class SLIB_EXPORT GraphicsPath : public Object
