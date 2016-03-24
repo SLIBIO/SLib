@@ -58,7 +58,7 @@ public:
 		}
 		if (m_requestOperating.isNull()) {
 			Ref<AsyncStreamRequest> req;
-			if (m_requestsRead.pop(&req)) {
+			if (popReadRequest(req)) {
 				if (req.isNotNull()) {
 					Base::resetMemory(&m_overlappedRead, 0, sizeof(m_overlappedRead));
 					m_overlappedRead.Offset = (DWORD)m_offset;
@@ -78,7 +78,7 @@ public:
 		}
 		if (m_requestOperating.isNull()) {
 			Ref<AsyncStreamRequest> req;
-			if (m_requestsWrite.pop(&req)) {
+			if (popWriteRequest(req)) {
 				if (req.isNotNull()) {
 					Base::resetMemory(&m_overlappedWrite, 0, sizeof(m_overlappedWrite));
 					m_overlappedWrite.Offset = (DWORD)m_offset;

@@ -401,6 +401,7 @@ protected:
 	sl_uint32 m_posCurrentDatagram;
 	sl_uint8 m_bufSize[4];
 	sl_uint32 m_lenBufSize;
+	
 };
 
 SLIB_NAMESPACE_END

@@ -94,7 +94,7 @@ public:
 		}
 		if (m_requestReading.isNull()) {
 			Ref<AsyncStreamRequest> req;
-			if (m_requestsRead.pop(&req)) {
+			if (popReadRequest(req)) {
 				if (req.isNotNull()) {
 					Base::zeroMemory(&m_overlappedRead, sizeof(m_overlappedRead));
 					m_bufRead.buf = (CHAR*)(req->data);
@@ -120,7 +120,7 @@ public:
 		}
 		if (m_requestWriting.isNull()) {
 			Ref<AsyncStreamRequest> req;
-			if (m_requestsWrite.pop(&req)) {
+			if (popWriteRequest(req)) {
 				if (req.isNotNull()) {
 					Base::zeroMemory(&m_overlappedWrite, sizeof(m_overlappedWrite));
 					m_bufWrite.buf = (CHAR*)(req->data);

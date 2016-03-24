@@ -7,7 +7,7 @@
 
 SLIB_NAMESPACE_BEGIN
 
-enum class LanguageCode
+enum class Culture
 {
 	
 };

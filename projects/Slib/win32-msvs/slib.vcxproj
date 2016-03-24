@@ -152,6 +152,7 @@
     <ClInclude Include="..\..\..\inc\slib\network\async.h" />
     <ClInclude Include="..\..\..\inc\slib\network\capture.h" />
     <ClInclude Include="..\..\..\inc\slib\network\constants.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\datagram.h" />
     <ClInclude Include="..\..\..\inc\slib\network\definition.h" />
     <ClInclude Include="..\..\..\inc\slib\network\dns.h" />
     <ClInclude Include="..\..\..\inc\slib\network\ethernet.h" />
@@ -355,6 +356,7 @@
     <ClCompile Include="..\..\..\src\slib\media\video_codec.cpp" />
     <ClCompile Include="..\..\..\src\slib\media\video_frame.cpp" />
     <ClCompile Include="..\..\..\src\slib\network\arp.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\datagram.cpp" />
     <ClCompile Include="..\..\..\src\slib\network\dns.cpp" />
     <ClCompile Include="..\..\..\src\slib\network\ethernet.cpp" />
     <ClCompile Include="..\..\..\src\slib\network\http_client.cpp" />

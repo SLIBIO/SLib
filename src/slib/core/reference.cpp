@@ -1,11 +1,6 @@
 #include "../../../inc/slib/core/reference.h"
 #include "../../../inc/slib/core/object.h"
 
-sl_bool sl_compare_class_type(sl_class_type a, sl_class_type b)
-{
-	return a == b;
-}
-
 SLIB_NAMESPACE_BEGIN
 
 #define _SIGNATURE 0x15181289

@@ -459,6 +459,8 @@ Memory MemoryBuffer::merge() const
 
 MemoryQueue::MemoryQueue()
 {
+	m_memCurrent.data = sl_null;
+	m_memCurrent.size = 0;
 	m_posCurrent = 0;
 }
 

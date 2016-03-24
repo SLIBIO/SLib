@@ -72,6 +72,12 @@ void AsyncIoLoop::__runLoop()
 		if (nEvents == 0) {
 			m_queueInstancesClosed.removeAll();
 		}
+		if (nEvents < 0) {
+			int err = errno;
+			if (err == EBADF || err == EFAULT || err == EINVAL) {
+				//break;
+			}
+		}
 
 		for (int i = 0; m_flagRunning && i < nEvents; i++) {
 			epoll_event& ev = waitEvents[i];

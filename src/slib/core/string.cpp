@@ -5147,8 +5147,8 @@ String16 SafeString16::parseBackslashEscapes(sl_uint32* lengthParsed, sl_bool* f
 template <class CT>
 SLIB_INLINE sl_uint32 _String_countLineNumber(const CT* input, sl_uint32 len, sl_uint32* columnLast)
 {
-	sl_uint32 line = 0;
-	sl_uint32 col = 0;
+	sl_uint32 line = 1;
+	sl_uint32 col = 1;
 	for (sl_uint32 i = 0; i < len; i++) {
 		CT ch = input[i];
 		if (ch == '\r') {

@@ -60,7 +60,7 @@ sl_bool AsyncTcpSocketInstance::receive(void* data, sl_uint32 size, const Ptr<IA
 		if (size > 0) {
 			Ref<AsyncStreamRequest> req = AsyncStreamRequest::createRead(data, size, refData, listener);
 			if (req.isNotNull()) {
-				if (m_requestsRead.push(req)) {
+				if (addReadRequest(req)) {
 					return sl_true;
 				}
 			}
@@ -75,7 +75,7 @@ sl_bool AsyncTcpSocketInstance::send(void* data, sl_uint32 size, const Ptr<IAsyn
 		if (size > 0) {
 			Ref<AsyncStreamRequest> req = AsyncStreamRequest::createWrite(data, size, refData, listener);
 			if (req.isNotNull()) {
-				if (m_requestsWrite.push(req)) {
+				if (addWriteRequest(req)) {
 					return sl_true;
 				}
 			}
@@ -150,47 +150,47 @@ Ref<AsyncTcpSocket> AsyncTcpSocket::create(const SocketAddress& _addressBind, co
 
 Ref<AsyncTcpSocket> AsyncTcpSocket::create(const SocketAddress& addressBind)
 {
-	return AsyncTcpSocket::create(addressBind, AsyncIoLoop::getDefault());
+	return create(addressBind, AsyncIoLoop::getDefault());
 }
 
 Ref<AsyncTcpSocket> AsyncTcpSocket::create(sl_uint32 port, const Ref<AsyncIoLoop>& loop)
 {
-	return AsyncTcpSocket::create(SocketAddress(IPv4Address::zero(), port), loop);
+	return create(SocketAddress(IPv4Address::zero(), port), loop);
 }
 
 Ref<AsyncTcpSocket> AsyncTcpSocket::create(sl_uint32 port)
 {
-	return AsyncTcpSocket::create(port, AsyncIoLoop::getDefault());
+	return create(port, AsyncIoLoop::getDefault());
 }
 
 Ref<AsyncTcpSocket> AsyncTcpSocket::createIPv6(sl_uint32 port, const Ref<AsyncIoLoop>& loop)
 {
-	return AsyncTcpSocket::create(SocketAddress(IPv6Address::zero(), port), loop);
+	return create(SocketAddress(IPv6Address::zero(), port), loop);
 }
 
 Ref<AsyncTcpSocket> AsyncTcpSocket::createIPv6(sl_uint32 port)
 {
-	return AsyncTcpSocket::createIPv6(port, AsyncIoLoop::getDefault());
+	return createIPv6(port, AsyncIoLoop::getDefault());
 }
 
 Ref<AsyncTcpSocket> AsyncTcpSocket::create(const Ref<AsyncIoLoop>& loop)
 {
-	return AsyncTcpSocket::create(SocketAddress::none(), loop);
+	return create(SocketAddress::none(), loop);
 }
 
 Ref<AsyncTcpSocket> AsyncTcpSocket::create()
 {
-	return AsyncTcpSocket::create(AsyncIoLoop::getDefault());
+	return create(AsyncIoLoop::getDefault());
 }
 
 Ref<AsyncTcpSocket> AsyncTcpSocket::createIPv6(const Ref<AsyncIoLoop>& loop)
 {
-	return AsyncTcpSocket::create(SocketAddress(IPv6Address::zero(), 0), loop);
+	return create(SocketAddress(IPv6Address::zero(), 0), loop);
 }
 
 Ref<AsyncTcpSocket> AsyncTcpSocket::createIPv6()
 {
-	return AsyncTcpSocket::createIPv6(AsyncIoLoop::getDefault());
+	return createIPv6(AsyncIoLoop::getDefault());
 }
 
 
@@ -207,21 +207,21 @@ Ref<AsyncTcpSocket> AsyncTcpSocket::createAndConnect(const SocketAddress& addres
 
 Ref<AsyncTcpSocket> AsyncTcpSocket::createAndConnect(const SocketAddress& addressBind, const SocketAddress& addressConnect, const Ptr<IAsyncTcpSocketListener>& listener)
 {
-	return AsyncTcpSocket::createAndConnect(addressBind, addressConnect, listener, AsyncIoLoop::getDefault());
+	return createAndConnect(addressBind, addressConnect, listener, AsyncIoLoop::getDefault());
 }
 
 Ref<AsyncTcpSocket> AsyncTcpSocket::createAndConnect(const SocketAddress& addressConnect, const Ptr<IAsyncTcpSocketListener>& listener, const Ref<AsyncIoLoop>& loop)
 {
 	if (addressConnect.ip.isIPv6()) {
-		return AsyncTcpSocket::createAndConnect(SocketAddress(IPv6Address::zero(), 0), addressConnect, listener, loop);
+		return createAndConnect(SocketAddress(IPv6Address::zero(), 0), addressConnect, listener, loop);
 	} else {
-		return AsyncTcpSocket::createAndConnect(SocketAddress::none(), addressConnect, listener, loop);
+		return createAndConnect(SocketAddress::none(), addressConnect, listener, loop);
 	}
 }
 
 Ref<AsyncTcpSocket> AsyncTcpSocket::createAndConnect(const SocketAddress& addressConnect, const Ptr<IAsyncTcpSocketListener>& listener)
 {
-	return AsyncTcpSocket::createAndConnect(addressConnect, listener, AsyncIoLoop::getDefault());
+	return createAndConnect(addressConnect, listener, AsyncIoLoop::getDefault());
 }
 
 Ref<Socket> AsyncTcpSocket::getSocket()
@@ -407,14 +407,13 @@ void AsyncTcpServerInstance::_onError()
 
 Ref<AsyncTcpServer> AsyncTcpServer::create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener, sl_bool flagAutoStart)
 {
-	return AsyncTcpServer::create(socket, listener, AsyncIoLoop::getDefault(), flagAutoStart);
+	return create(socket, listener, Ref<AsyncIoLoop>::null(), flagAutoStart);
 }
 
-Ref<AsyncTcpServer> AsyncTcpServer::create(const SocketAddress& _addressListen, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
+Ref<AsyncTcpServer> AsyncTcpServer::create(const AsyncTcpServerParam& param)
 {
-	SocketAddress addressListen = _addressListen;
 	Ref<Socket> socket;
-	if (addressListen.ip.isIPv6()) {
+	if (param.bindAddress.ip.isIPv6()) {
 		socket = Socket::openTcp_IPv6();
 	} else {
 		socket = Socket::openTcp();
@@ -425,50 +424,78 @@ Ref<AsyncTcpServer> AsyncTcpServer::create(const SocketAddress& _addressListen, 
 		// So, we set ReuseAddress flag on Server sockets to avoid this issue
 		socket->setOption_ReuseAddress(sl_true);
 		
-		if (socket->bind(addressListen)) {
+		if (socket->bind(param.bindAddress)) {
 			if (socket->listen()) {
-				return AsyncTcpServer::create(socket, listener, loop, flagAutoStart);
+				return create(socket, param.listener, param.ioLoop, param.flagAutoStart);
 			} else {
 				SLIB_STATIC_STRING(s, "Can not listen on address - ");
-				LOG_ERROR(s + addressListen.toString());
+				LOG_ERROR(s + param.bindAddress.toString());
 			}
 		} else {
 			SLIB_STATIC_STRING(s, "Can not bind to address - ");
-			LOG_ERROR(s + addressListen.toString());
+			LOG_ERROR(s + param.bindAddress.toString());
 		}
 	}
 	return Ref<AsyncTcpServer>::null();
 }
 
+Ref<AsyncTcpServer> AsyncTcpServer::create(const SocketAddress& addressListen, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
+{
+	AsyncTcpServerParam param;
+	param.bindAddress = addressListen;
+	param.listener = listener;
+	param.ioLoop = loop;
+	param.flagAutoStart = flagAutoStart;
+	return create(param);
+}
+
 Ref<AsyncTcpServer> AsyncTcpServer::create(const SocketAddress& addressListen, const Ptr<IAsyncTcpServerListener>& listener, sl_bool flagAutoStart)
 {
-	return AsyncTcpServer::create(addressListen, listener, AsyncIoLoop::getDefault(), flagAutoStart);
+	AsyncTcpServerParam param;
+	param.bindAddress = addressListen;
+	param.listener = listener;
+	param.flagAutoStart = flagAutoStart;
+	return create(param);
 }
 
 Ref<AsyncTcpServer> AsyncTcpServer::create(sl_uint32 portListen, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
 {
-	SocketAddress address;
-	address.ip = IPv4Address::zero();
-	address.port = portListen;
-	return AsyncTcpServer::create(address, listener, loop, flagAutoStart);
+	AsyncTcpServerParam param;
+	param.bindAddress.port = portListen;
+	param.listener = listener;
+	param.ioLoop = loop;
+	param.flagAutoStart = flagAutoStart;
+	return create(param);
 }
 
 Ref<AsyncTcpServer> AsyncTcpServer::create(sl_uint32 portListen, const Ptr<IAsyncTcpServerListener>& listener, sl_bool flagAutoStart)
 {
-	return AsyncTcpServer::create(portListen, listener, AsyncIoLoop::getDefault(), flagAutoStart);
+	AsyncTcpServerParam param;
+	param.bindAddress.port = portListen;
+	param.listener = listener;
+	param.flagAutoStart = flagAutoStart;
+	return create(param);
 }
 
 Ref<AsyncTcpServer> AsyncTcpServer::createIPv6(sl_uint32 portListen, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
 {
-	SocketAddress address;
-	address.ip = IPv6Address::zero();
-	address.port = portListen;
-	return AsyncTcpServer::create(address, listener, loop, flagAutoStart);
+	AsyncTcpServerParam param;
+	param.bindAddress.ip = IPv6Address::zero();
+	param.bindAddress.port = portListen;
+	param.listener = listener;
+	param.ioLoop = loop;
+	param.flagAutoStart = flagAutoStart;
+	return create(param);
 }
 
 Ref<AsyncTcpServer> AsyncTcpServer::createIPv6(sl_uint32 portListen, const Ptr<IAsyncTcpServerListener>& listener, sl_bool flagAutoStart)
 {
-	return AsyncTcpServer::createIPv6(portListen, listener, AsyncIoLoop::getDefault(), flagAutoStart);
+	AsyncTcpServerParam param;
+	param.bindAddress.ip = IPv6Address::zero();
+	param.bindAddress.port = portListen;
+	param.listener = listener;
+	param.flagAutoStart = flagAutoStart;
+	return create(param);
 }
 
 void AsyncTcpServer::close()
@@ -612,70 +639,130 @@ Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ref<Socket>& socket, const Ptr<
 	return AsyncUdpSocket::create(socket, listener, packetSize, AsyncIoLoop::getDefault(), flagAutoStart);
 }
 
-Ref<AsyncUdpSocket> AsyncUdpSocket::create(const SocketAddress& addressBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
+Ref<AsyncUdpSocket> AsyncUdpSocket::create(const AsyncUdpSocketParam& param)
 {
-	if (packetSize > 0) {
+	if (param.packetSize > 0) {
 		Ref<Socket> socket;
-		if (addressBind.ip.isIPv6()) {
+		if (param.bindAddress.ip.isIPv6()) {
 			socket = Socket::openUdp_IPv6();
 		} else {
 			socket = Socket::openUdp();
 		}
 		if (socket.isNotNull()) {
-			if (addressBind.ip.isNotNone() || addressBind.port != 0) {
-				if (!(socket->bind(addressBind))) {
+			if (param.bindAddress.ip.isNotNone() || param.bindAddress.port != 0) {
+				if (!(socket->bind(param.bindAddress))) {
 					return Ref<AsyncUdpSocket>::null();
 				}
 			}
-			return AsyncUdpSocket::create(socket, listener, packetSize, loop, flagAutoStart);
+			return AsyncUdpSocket::create(socket, param.listener, param.packetSize, param.ioLoop, param.flagAutoStart);
 		}
 	}
 	return Ref<AsyncUdpSocket>::null();
 }
 
+Ref<AsyncUdpSocket> AsyncUdpSocket::create(const SocketAddress& addressBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
+{
+	AsyncUdpSocketParam param;
+	param.bindAddress = addressBind;
+	param.listener = listener;
+	param.packetSize = packetSize;
+	param.ioLoop = loop;
+	param.flagAutoStart = flagAutoStart;
+	return create(param);
+}
+
 Ref<AsyncUdpSocket> AsyncUdpSocket::create(const SocketAddress& addressBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagAutoStart)
 {
-	return AsyncUdpSocket::create(addressBind, listener, packetSize, AsyncIoLoop::getDefault(), flagAutoStart);
+	AsyncUdpSocketParam param;
+	param.bindAddress = addressBind;
+	param.listener = listener;
+	param.packetSize = packetSize;
+	param.flagAutoStart = flagAutoStart;
+	return create(param);
 }
 
 Ref<AsyncUdpSocket> AsyncUdpSocket::create(sl_uint32 portBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
 {
-	return AsyncUdpSocket::create(SocketAddress(IPv4Address::zero(), portBind), listener, packetSize, loop, flagAutoStart);
+	AsyncUdpSocketParam param;
+	param.bindAddress.port = portBind;
+	param.listener = listener;
+	param.packetSize = packetSize;
+	param.ioLoop = loop;
+	param.flagAutoStart = flagAutoStart;
+	return create(param);
 }
 
 Ref<AsyncUdpSocket> AsyncUdpSocket::create(sl_uint32 portBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagAutoStart)
 {
-	return AsyncUdpSocket::create(portBind, listener, packetSize, AsyncIoLoop::getDefault(), flagAutoStart);
+	AsyncUdpSocketParam param;
+	param.bindAddress.port = portBind;
+	param.listener = listener;
+	param.packetSize = packetSize;
+	param.flagAutoStart = flagAutoStart;
+	return create(param);
 }
 
 Ref<AsyncUdpSocket> AsyncUdpSocket::createIPv6(sl_uint32 portBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
 {
-	return AsyncUdpSocket::create(SocketAddress(IPv6Address::zero(), portBind), listener, packetSize, loop, flagAutoStart);
+	AsyncUdpSocketParam param;
+	param.bindAddress.ip = IPv6Address::zero();
+	param.bindAddress.port = portBind;
+	param.listener = listener;
+	param.packetSize = packetSize;
+	param.ioLoop = loop;
+	param.flagAutoStart = flagAutoStart;
+	return create(param);
 }
 
 Ref<AsyncUdpSocket> AsyncUdpSocket::createIPv6(sl_uint32 portBind, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagAutoStart)
 {
-	return AsyncUdpSocket::createIPv6(portBind, listener, packetSize, AsyncIoLoop::getDefault(), flagAutoStart);
+	AsyncUdpSocketParam param;
+	param.bindAddress.ip = IPv6Address::zero();
+	param.bindAddress.port = portBind;
+	param.listener = listener;
+	param.packetSize = packetSize;
+	param.flagAutoStart = flagAutoStart;
+	return create(param);
 }
 
 Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
 {
-	return AsyncUdpSocket::create(SocketAddress::none(), listener, packetSize, loop, flagAutoStart);
+	AsyncUdpSocketParam param;
+	param.listener = listener;
+	param.packetSize = packetSize;
+	param.ioLoop = loop;
+	param.flagAutoStart = flagAutoStart;
+	return create(param);
 }
 
 Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagAutoStart)
 {
-	return AsyncUdpSocket::create(listener, packetSize, AsyncIoLoop::getDefault(), flagAutoStart);
+	AsyncUdpSocketParam param;
+	param.listener = listener;
+	param.packetSize = packetSize;
+	param.flagAutoStart = flagAutoStart;
+	return create(param);
 }
 
 Ref<AsyncUdpSocket> AsyncUdpSocket::createIPv6(const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
 {
-	return AsyncUdpSocket::create(SocketAddress(IPv6Address::zero(), 0), listener, packetSize, loop, flagAutoStart);
+	AsyncUdpSocketParam param;
+	param.bindAddress.ip = IPv6Address::zero();
+	param.listener = listener;
+	param.packetSize = packetSize;
+	param.ioLoop = loop;
+	param.flagAutoStart = flagAutoStart;
+	return create(param);
 }
 
 Ref<AsyncUdpSocket> AsyncUdpSocket::createIPv6(const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, sl_bool flagAutoStart)
 {
-	return AsyncUdpSocket::createIPv6(listener, packetSize, AsyncIoLoop::getDefault(), flagAutoStart);
+	AsyncUdpSocketParam param;
+	param.bindAddress.ip = IPv6Address::zero();
+	param.listener = listener;
+	param.packetSize = packetSize;
+	param.flagAutoStart = flagAutoStart;
+	return create(param);
 }
 
 void AsyncUdpSocket::close()

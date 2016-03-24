@@ -179,6 +179,7 @@
 		26AFF77B1C34CE2B00AF9470 /* atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26AFF77A1C34CE2B00AF9470 /* atomic.cpp */; };
 		26B0AF851C13E08600CD8673 /* bitmap_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B0AF831C13E08600CD8673 /* bitmap_data.cpp */; };
 		26B0AF861C13E08600CD8673 /* bitmap_format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B0AF841C13E08600CD8673 /* bitmap_format.cpp */; };
+		26C70E9C1CA168EB005B1768 /* datagram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C70E9B1CA168EB005B1768 /* datagram.cpp */; };
 		26CA8D791C23B4C90049A658 /* system_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26CA8D781C23B4C90049A658 /* system_apple.mm */; };
 		26D028651C48847E0083F1F3 /* audio_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D028641C48847E0083F1F3 /* audio_data.cpp */; };
 		26D3A1A41C85894A00FB8DBD /* resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D3A1A31C85894A00FB8DBD /* resource.cpp */; };
@@ -410,6 +411,7 @@
 		26AFF77A1C34CE2B00AF9470 /* atomic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = atomic.cpp; sourceTree = "<group>"; };
 		26B0AF831C13E08600CD8673 /* bitmap_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_data.cpp; sourceTree = "<group>"; };
 		26B0AF841C13E08600CD8673 /* bitmap_format.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_format.cpp; sourceTree = "<group>"; };
+		26C70E9B1CA168EB005B1768 /* datagram.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = datagram.cpp; sourceTree = "<group>"; };
 		26CA8D781C23B4C90049A658 /* system_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = system_apple.mm; sourceTree = "<group>"; };
 		26D028641C48847E0083F1F3 /* audio_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_data.cpp; sourceTree = "<group>"; };
 		26D3A1A31C85894A00FB8DBD /* resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = resource.cpp; sourceTree = "<group>"; };
@@ -524,6 +526,7 @@
 			isa = PBXGroup;
 			children = (
 				26694BF81C9B2CBC0047E67C /* arp.cpp */,
+				26C70E9B1CA168EB005B1768 /* datagram.cpp */,
 				266DD4BE1C11940A00D47AB0 /* dns.cpp */,
 				266DD4BF1C11940A00D47AB0 /* ethernet.cpp */,
 				266DD4C01C11940A00D47AB0 /* http_client.cpp */,
@@ -1072,6 +1075,7 @@
 				266DD46A1C11930800D47AB0 /* compress_zlib.cpp in Sources */,
 				266DD5711C11940A00D47AB0 /* network_async_unix.cpp in Sources */,
 				266DD56C1C11940A00D47AB0 /* net_capture.cpp in Sources */,
+				26C70E9C1CA168EB005B1768 /* datagram.cpp in Sources */,
 				A25F301A1B03A33700854DAF /* io.cpp in Sources */,
 				266DD55F1C11940A00D47AB0 /* media_platform_osx.mm in Sources */,
 				26E376DF1C98739200B178E6 /* matrix3.cpp in Sources */,

@@ -845,6 +845,11 @@ void IAsyncStreamListener::onWrite(AsyncStream* stream, void* data, sl_uint32 si
 
 SLIB_DEFINE_OBJECT(AsyncStreamInstance, AsyncIoInstance)
 
+AsyncStreamInstance::AsyncStreamInstance()
+{
+	m_sizeWriteWaiting = 0;
+}
+
 sl_bool AsyncStreamInstance::read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* refData)
 {
 	if (size == 0) {
@@ -886,11 +891,76 @@ sl_uint64 AsyncStreamInstance::getSize()
 	return 0;
 }
 
+sl_size AsyncStreamInstance::getWaitingSizeForWrite()
+{
+	return m_sizeWriteWaiting;
+}
+
+sl_bool AsyncStreamInstance::addReadRequest(const Ref<AsyncStreamRequest>& request)
+{
+	return m_requestsRead.push(request) != sl_null;
+}
+
+sl_bool AsyncStreamInstance::popReadRequest(Ref<AsyncStreamRequest>& request)
+{
+	return m_requestsRead.pop(&request);
+}
+
+sl_size AsyncStreamInstance::getReadRequestsCount()
+{
+	return m_requestsRead.getCount();
+}
+
+sl_bool AsyncStreamInstance::addWriteRequest(const Ref<AsyncStreamRequest>& request)
+{
+	if (m_requestsWrite.push(request)) {
+		Base::interlockedAdd(&m_sizeWriteWaiting, request->size);
+		return sl_true;
+	}
+	return sl_false;
+}
+
+sl_bool AsyncStreamInstance::popWriteRequest(Ref<AsyncStreamRequest>& request)
+{
+	if (m_requestsWrite.pop(&request)) {
+		Base::interlockedAdd(&m_sizeWriteWaiting, -((sl_reg)(request->size)));
+		return sl_true;
+	}
+	return sl_false;
+}
+
+sl_size AsyncStreamInstance::getWriteRequestsCount()
+{
+	return m_requestsWrite.getCount();
+}
+
 /*************************************
 	AsyncStream
 **************************************/
 
 SLIB_DEFINE_OBJECT(AsyncStream, Object)
+
+Ref<AsyncStream> AsyncStream::create(AsyncStreamInstance* instance, AsyncIoMode mode, const Ref<AsyncIoLoop>& loop)
+{
+	Ref<AsyncStreamBase> ret;
+	if (instance) {
+		ret = new AsyncStreamBase;
+		if (ret.isNotNull()) {
+			if (!(ret->_initialize(instance, mode, loop))) {
+				ret.setNull();
+			}
+		}
+	}
+	return ret;
+}
+
+Ref<AsyncStream> AsyncStream::create(AsyncStreamInstance* instance, AsyncIoMode mode)
+{
+	if (instance) {
+		return create(instance, mode, AsyncIoLoop::getDefault());
+	}
+	return Ref<AsyncStream>::null();
+}
 
 sl_bool AsyncStream::isSeekable()
 {
@@ -923,28 +993,6 @@ sl_bool AsyncStream::writeFromMemory(const Memory& mem, const Ptr<IAsyncStreamLi
 		size = 0x40000000;
 	}
 	return write(mem.getData(), (sl_uint32)(size), listener, mem.ref.ptr);
-}
-
-Ref<AsyncStream> AsyncStream::create(AsyncStreamInstance* instance, AsyncIoMode mode, const Ref<AsyncIoLoop>& loop)
-{
-	Ref<AsyncStreamBase> ret;
-	if (instance) {
-		ret = new AsyncStreamBase;
-		if (ret.isNotNull()) {
-			if (!(ret->_initialize(instance, mode, loop))) {
-				ret.setNull();
-			}
-		}
-	}
-	return ret;
-}
-
-Ref<AsyncStream> AsyncStream::create(AsyncStreamInstance* instance, AsyncIoMode mode)
-{
-	if (instance) {
-		return create(instance, mode, AsyncIoLoop::getDefault());
-	}
-	return Ref<AsyncStream>::null();
 }
 
 /*************************************
@@ -1037,6 +1085,15 @@ sl_bool AsyncStreamBase::seek(sl_uint64 pos)
 	return sl_false;
 }
 
+sl_uint64 AsyncStreamBase::getSize()
+{
+	Ref<AsyncStreamInstance> instance = getIoInstance();
+	if (instance.isNotNull()) {
+		return instance->getSize();
+	}
+	return sl_false;
+}
+
 sl_bool AsyncStreamBase::addTask(const Ref<Runnable>& callback)
 {
 	Ref<AsyncIoLoop> loop = getIoLoop();
@@ -1046,13 +1103,13 @@ sl_bool AsyncStreamBase::addTask(const Ref<Runnable>& callback)
 	return sl_false;
 }
 
-sl_uint64 AsyncStreamBase::getSize()
+sl_size AsyncStreamBase::getWaitingSizeForWrite()
 {
 	Ref<AsyncStreamInstance> instance = getIoInstance();
 	if (instance.isNotNull()) {
-		return instance->getSize();
+		return instance->getWaitingSizeForWrite();
 	}
-	return sl_false;
+	return 0;
 }
 
 /*************************************

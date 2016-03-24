@@ -697,6 +697,9 @@
     <ClInclude Include="..\..\..\inc\slib\core\loop_queue.h">
       <Filter>inc\core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\datagram.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">
@@ -1354,6 +1357,9 @@
       <Filter>src\slib\media</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\network\arp.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\datagram.cpp">
       <Filter>src\slib\network</Filter>
     </ClCompile>
   </ItemGroup>

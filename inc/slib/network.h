@@ -24,5 +24,6 @@
 
 #include "network/http.h"
 #include "network/secure_stream.h"
+#include "network/datagram.h"
 
 #endif

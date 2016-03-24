@@ -440,31 +440,31 @@ Map<String, String> HttpRequest::parseParameters(const void* data, sl_size _len)
 
 Memory HttpRequest::makeRequestPacket() const
 {
-	String8 str;
 	MemoryBuffer msg;
-	str = m_methodText;
-	msg.addStatic(str.getData(), str.getLength());
+	String8 strMethod = m_methodText;
+	msg.addStatic(strMethod.getData(), strMethod.getLength());
 	msg.addStatic(" ", 1);
-	str = m_path;
-	if (str.isEmpty()) {
+	String8 strPath = m_path;
+	if (strPath.isEmpty()) {
 		msg.addStatic("/", 1);
 	} else {
-		msg.addStatic(str.getData(), str.getLength());
+		msg.addStatic(strPath.getData(), strPath.getLength());
 	}
+	String8 strQuery;
 	if (m_query.isNotEmpty()) {
 		msg.addStatic("?", 1);
-		str = m_query;
-		msg.addStatic(str.getData(), str.getLength());
+		strQuery = m_query;
+		msg.addStatic(strQuery.getData(), strQuery.getLength());
 	}
 	msg.addStatic(" ", 1);
-	str = m_requestVersion;
-	msg.addStatic(str.getData(), str.getLength());
+	String8 strVersion = m_requestVersion;
+	msg.addStatic(strVersion.getData(), strVersion.getLength());
 	msg.addStatic("\r\n", 2);
 
 	Iterator< Pair<String, String> > iterator = m_requestHeaders.iterator();
 	Pair<String, String> pair;
 	while (iterator.next(&pair)) {
-		str = pair.key;
+		String str = pair.key;
 		msg.addStatic(str.getData(), str.getLength());
 		msg.addStatic(": ", 2);
 		str = pair.value;
@@ -751,22 +751,21 @@ sl_bool HttpResponse::isChunkedResponse() const
 
 Memory HttpResponse::makeResponsePacket() const
 {
-	String8 str;
 	MemoryBuffer msg;
-	str = m_responseVersion;
-	msg.addStatic(str.getData(), str.getLength());
+	String8 strVersion = m_responseVersion;
+	msg.addStatic(strVersion.getData(), strVersion.getLength());
 	msg.addStatic(" ", 1);
-	str = String8::fromUint32((sl_uint32)m_responseCode);
-	msg.addStatic(str.getData(), str.getLength());
+	String8 strCode = String8::fromUint32((sl_uint32)m_responseCode);
+	msg.addStatic(strCode.getData(), strCode.getLength());
 	msg.addStatic(" ", 1);
-	str = m_responseMessage;
-	msg.addStatic(str.getData(), str.getLength());
+	String8 strMessage = m_responseMessage;
+	msg.addStatic(strMessage.getData(), strMessage.getLength());
 	msg.addStatic("\r\n", 2);
 
 	Iterator< Pair<String, String> > iterator = m_responseHeaders.iterator();
 	Pair<String, String> pair;
 	while (iterator.next(&pair)) {
-		str = pair.key;
+		String str = pair.key;
 		msg.addStatic(str.getData(), str.getLength());
 		msg.addStatic(": ", 2);
 		str = pair.value;

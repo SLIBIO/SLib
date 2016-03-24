@@ -62,12 +62,12 @@ public:
 		}
 		Ref<AsyncStreamRequest> request = m_requestReading;
 		m_requestReading.setNull();
-		sl_size nQueue = m_requestsRead.getCount();
+		sl_size nQueue = getReadRequestsCount();
 		if (Thread::isNotStoppingCurrent()) {
 			if (request.isNull()) {
 				if (nQueue > 0) {
 					nQueue--;
-					m_requestsRead.pop(&request);					
+					popReadRequest(request);
 					if (request.isNull()) {
 						return;
 					}
@@ -101,12 +101,12 @@ public:
 		}
 		Ref<AsyncStreamRequest> request = m_requestWriting;
 		m_requestWriting.setNull();
-		sl_size nQueue = m_requestsWrite.getCount();
+		sl_size nQueue = getWriteRequestsCount();
 		if (Thread::isNotStoppingCurrent()) {
 			if (request.isNull()) {
 				if (nQueue > 0) {
 					nQueue--;
-					m_requestsWrite.pop(&request);					
+					popWriteRequest(request);
 					if (request.isNull()) {
 						return;
 					} else {

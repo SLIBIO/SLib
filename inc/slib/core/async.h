@@ -387,20 +387,39 @@ class SLIB_EXPORT AsyncStreamInstance : public AsyncIoInstance
 	SLIB_DECLARE_OBJECT
 	
 public:
+	AsyncStreamInstance();
+	
+public:
 	virtual sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref);
 	
 	virtual sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref);
 
-	
 	virtual sl_bool isSeekable();
 	
 	virtual sl_bool seek(sl_uint64 pos);
 	
 	virtual sl_uint64 getSize();
-
+	
+	sl_size getWaitingSizeForWrite();
+	
 protected:
+	sl_bool addReadRequest(const Ref<AsyncStreamRequest>& request);
+	
+	sl_bool popReadRequest(Ref<AsyncStreamRequest>& request);
+	
+	sl_size getReadRequestsCount();
+
+	sl_bool addWriteRequest(const Ref<AsyncStreamRequest>& request);
+	
+	sl_bool popWriteRequest(Ref<AsyncStreamRequest>& request);
+	
+	sl_size getWriteRequestsCount();
+
+private:
 	Queue< Ref<AsyncStreamRequest> > m_requestsRead;
 	Queue< Ref<AsyncStreamRequest> > m_requestsWrite;
+	sl_reg m_sizeWriteWaiting;
+	
 };
 
 class SLIB_EXPORT AsyncStream : public AsyncIoObject
@@ -408,33 +427,30 @@ class SLIB_EXPORT AsyncStream : public AsyncIoObject
 	SLIB_DECLARE_OBJECT
 	
 public:
+	static Ref<AsyncStream> create(AsyncStreamInstance* instance, AsyncIoMode mode, const Ref<AsyncIoLoop>& loop);
+	
+	static Ref<AsyncStream> create(AsyncStreamInstance* instance, AsyncIoMode mode);
+
+public:
 	virtual void close() = 0;
 	
 	virtual sl_bool isOpened() = 0;
-
 	
 	virtual sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref = sl_null) = 0;
 	
 	virtual sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref = sl_null) = 0;
-	
 	
 	virtual sl_bool isSeekable();
 	
 	virtual sl_bool seek(sl_uint64 pos);
 	
 	virtual sl_uint64 getSize();
-
 	
 	sl_bool readToMemory(const Memory& mem, const Ptr<IAsyncStreamListener>& listener);
 
 	sl_bool writeFromMemory(const Memory& mem, const Ptr<IAsyncStreamListener>& listener);
 	
 	virtual sl_bool addTask(const Ref<Runnable>& callback) = 0;
-
-public:
-	static Ref<AsyncStream> create(AsyncStreamInstance* instance, AsyncIoMode mode, const Ref<AsyncIoLoop>& loop);
-	
-	static Ref<AsyncStream> create(AsyncStreamInstance* instance, AsyncIoMode mode);
 	
 };
 
@@ -464,6 +480,8 @@ public:
 	
 	// override
 	sl_bool addTask(const Ref<Runnable>& callback);
+	
+	sl_size getWaitingSizeForWrite();
 
 protected:
 	Ref<AsyncStreamInstance> getIoInstance();
