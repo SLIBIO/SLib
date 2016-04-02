@@ -9,7 +9,7 @@ SLIB_CRYPTO_NAMESPACE_BEGIN
 
 sl_bool RSA::executePublic(const RSAPublicKey& key, const void* src, void* dst)
 {
-	sl_uint32 n = key.N.getMostSignificantBytes();
+	sl_size n = key.N.getMostSignificantBytes();
 	BigInt T = BigInt::fromBytesBE(src, n);
 	if (T >= key.N) {
 		return sl_false;
@@ -25,7 +25,7 @@ sl_bool RSA::executePublic(const RSAPublicKey& key, const void* src, void* dst)
 
 sl_bool RSA::executePrivate(const RSAPrivateKey& key, const void* src, void* dst)
 {
-	sl_uint32 n = key.N.getMostSignificantBytes();
+	sl_size n = key.N.getMostSignificantBytes();
 	BigInt T = BigInt::fromBytesBE(src, n);
 	if (T >= key.N) {
 		return sl_false;

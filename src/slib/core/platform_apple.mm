@@ -41,8 +41,8 @@ String16 Apple::getString16FromNSString(NSString* str)
 	if (str == nil) {
 		return String16::null();
 	}
-	NSUInteger len = [str length];
-	String16 ret = String16::allocate((sl_uint32)len);
+	sl_size len = (sl_size)([str length]);
+	String16 ret = String16::allocate(len);
 	if (ret.isNull()) {
 		return ret;
 	}

@@ -309,7 +309,7 @@ public:
 				if (pf) {
 					Gdiplus::StringFormat format(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsNoClip);
 					Gdiplus::SolidBrush brush(Gdiplus::Color(color.a, color.r, color.g, color.b));
-					graphics->DrawString((const WCHAR*)(text.getData()), text.getLength()
+					graphics->DrawString((const WCHAR*)(text.getData()), (INT)(text.getLength())
 						, pf
 						, Gdiplus::PointF(x, y + 1)
 						, &format

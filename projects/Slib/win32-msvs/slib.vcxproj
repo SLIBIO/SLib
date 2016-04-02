@@ -74,6 +74,7 @@
     <ClInclude Include="..\..\..\inc\slib\core\url.h" />
     <ClInclude Include="..\..\..\inc\slib\core\variant.h" />
     <ClInclude Include="..\..\..\inc\slib\core\win32_com.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\xml.h" />
     <ClInclude Include="..\..\..\inc\slib\crypto.h" />
     <ClInclude Include="..\..\..\inc\slib\db.h" />
     <ClInclude Include="..\..\..\inc\slib\db\database.h" />
@@ -276,6 +277,7 @@
     <ClCompile Include="..\..\..\src\slib\core\url.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\variant.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\win32_com.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\xml.cpp" />
     <ClCompile Include="..\..\..\src\slib\crypto\aes.cpp" />
     <ClCompile Include="..\..\..\src\slib\crypto\block_cipher.cpp" />
     <ClCompile Include="..\..\..\src\slib\crypto\compress_zlib.cpp" />

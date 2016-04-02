@@ -13,16 +13,9 @@ SLIB_NAMESPACE_BEGIN
 class SLIB_EXPORT TreeNode
 {
 public:
-	sl_uint64 position;
+	sl_uint64 position = 0;
 
 public:
-	TreeNode();
-
-	TreeNode(const TreeNode& other);
-	
-public:
-	TreeNode& operator=(const TreeNode& other);
-
 	sl_bool operator==(const TreeNode& other) const;
 
 	sl_bool operator!=(const TreeNode& other) const;
@@ -39,16 +32,9 @@ class SLIB_EXPORT TreePosition
 {
 public:
 	TreeNode node;
-	sl_uint32 item;
+	sl_uint32 item = 0;
 
 public:
-	TreePosition();
-
-	TreePosition(const TreePosition& other);
-
-public:
-	TreePosition& operator=(const TreePosition& other);
-
 	sl_bool operator==(const TreePosition& other) const;
 	
 	sl_bool operator!=(const TreePosition& other) const;
@@ -83,6 +69,8 @@ public:
 	List<VT> getValues(const KT& key) const;
 	
 	sl_bool search(const KT& key, TreePosition* pos = sl_null) const;
+	
+	sl_bool search(const KT& key, const VT& value, TreePosition* pos = sl_null) const;
 
 	sl_bool search(const KT& key, TreePosition* pPosBegin, TreePosition* pPosEnd) const;
 	
@@ -106,9 +94,13 @@ public:
 	
 	sl_bool getPrevPosition(TreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
 	
-	sl_bool insert(const KT& key, const VT& value, sl_bool flagReplace = sl_true);
+	sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 	
-	sl_size remove(const KT& key, sl_bool flagRemoveAll = sl_false);
+	sl_bool addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist = sl_null);
+	
+	sl_size remove(const KT& key, sl_bool flagRemoveAllMatches = sl_false);
+	
+	sl_size remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
 	
 	sl_bool removeAt(const TreePosition& pos);
 	
@@ -202,22 +194,6 @@ SLIB_NAMESPACE_END
 
 SLIB_NAMESPACE_BEGIN
 
-SLIB_INLINE TreeNode::TreeNode()
-{
-	position = 0;
-}
-
-SLIB_INLINE TreeNode::TreeNode(const TreeNode& other)
-{
-	position = other.position;
-}
-
-SLIB_INLINE TreeNode& TreeNode::operator=(const TreeNode& other)
-{
-	position = other.position;
-	return *this;
-}
-
 SLIB_INLINE sl_bool TreeNode::operator==(const TreeNode& other) const
 {
 	return position == other.position;
@@ -243,24 +219,6 @@ SLIB_INLINE void TreeNode::setNull()
 	position = 0;
 }
 
-
-SLIB_INLINE TreePosition::TreePosition()
-{
-	item = 0;
-}
-
-SLIB_INLINE TreePosition::TreePosition(const TreePosition& other)
-{
-	node = other.node;
-	item = other.item;
-}
-
-SLIB_INLINE TreePosition& TreePosition::operator=(const TreePosition& other)
-{
-	node = other.node;
-	item = other.item;
-	return *this;
-}
 
 SLIB_INLINE sl_bool TreePosition::operator==(const TreePosition& other) const
 {
@@ -381,6 +339,63 @@ template <class KT, class VT, class COMPARE>
 sl_bool BTree<KT, VT, COMPARE>::search(const KT& key, TreePosition* pos) const
 {
 	return searchInNode(key, getRootNode(), pos);
+}
+
+template <class KT, class VT, class COMPARE>
+sl_bool BTree<KT, VT, COMPARE>::search(const KT& key, const VT& value, TreePosition* pPos) const
+{
+	List<VT> ret;
+	TreePosition pos;
+	if (search(key, &pos)) {
+		VT v;
+		if (!(getAt(pos, sl_null, &v))) {
+			if (pPos) {
+				*pPos = pos;
+			}
+			return sl_false;
+		}
+		if (value == v) {
+			if (pPos) {
+				*pPos = pos;
+			}
+			return sl_true;
+		}
+		TreePosition posMid = pos;
+		KT keyItem;
+		while (getPrevPosition(pos, &keyItem, &v)) {
+			if (COMPARE::compare(keyItem, key) == 0) {
+				if (value == v) {
+					if (pPos) {
+						*pPos = pos;
+					}
+					return sl_true;
+				}
+			} else {
+				break;
+			}
+		}
+		pos = posMid;
+		while (getNextPosition(pos, &keyItem, &v)) {
+			if (COMPARE::compare(keyItem, key) == 0) {
+				if (value == v) {
+					if (pPos) {
+						*pPos = pos;
+					}
+					return sl_true;
+				}
+			} else {
+				break;
+			}
+		}
+		if (pPos) {
+			*pPos = posMid;
+		}
+	} else {
+		if (pPos) {
+			*pPos = pos;
+		}
+	}
+	return sl_false;
 }
 
 template <class KT, class VT, class COMPARE>
@@ -796,11 +811,20 @@ sl_bool BTree<KT, VT, COMPARE>::getPrevPosition(TreePosition& pos, KT* key, VT* 
 }
 
 template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::insert(const KT& key, const VT& value, sl_bool flagReplace)
+sl_bool BTree<KT, VT, COMPARE>::put(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
 {
+	if (pFlagExist) {
+		*pFlagExist = sl_false;
+	}
 	TreePosition pos;
 	if (search(key, &pos)) {
-		if (flagReplace) {
+		if (pFlagExist) {
+			*pFlagExist = sl_true;
+		}
+		if (mode != MapPutMode::AddAlways) {
+			if (mode == MapPutMode::AddNew) {
+				return sl_false;
+			}
 			NodeDataScope data(this, pos.node);
 			if (data.isNotNull()) {
 				if (pos.item < data->countItems) {
@@ -811,19 +835,61 @@ sl_bool BTree<KT, VT, COMPARE>::insert(const KT& key, const VT& value, sl_bool f
 			}
 		}
 	}
+	if (mode == MapPutMode::ReplaceExisting) {
+		return sl_false;
+	}
 	TreeNode link;
 	return _insertItemInNode(pos.node, pos.item, link, key, value, link);
 }
 
 template <class KT, class VT, class COMPARE>
-sl_size BTree<KT, VT, COMPARE>::remove(const KT& key, sl_bool flagRemoveAll)
+sl_bool BTree<KT, VT, COMPARE>::addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist)
+{
+	if (pFlagExist) {
+		*pFlagExist = sl_false;
+	}
+	TreePosition pos;
+	if (search(key, value, &pos)) {
+		if (pFlagExist) {
+			*pFlagExist = sl_true;
+		}
+		return sl_false;
+	}
+	TreeNode link;
+	return _insertItemInNode(pos.node, pos.item, link, key, value, link);
+}
+
+template <class KT, class VT, class COMPARE>
+sl_size BTree<KT, VT, COMPARE>::remove(const KT& key, sl_bool flagRemoveAllMatches)
 {
 	TreePosition pos;
 	if (search(key, &pos)) {
 		if (removeAt(pos)) {
 			sl_size n = 1;
-			if (flagRemoveAll) {
+			if (flagRemoveAllMatches) {
 				while (search(key, &pos)) {
+					if (removeAt(pos)) {
+						n++;
+					} else {
+						break;
+					}
+				}
+			}
+			return n;
+		}
+	}
+	return 0;
+}
+
+template <class KT, class VT, class COMPARE>
+sl_size BTree<KT, VT, COMPARE>::remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
+{
+	TreePosition pos;
+	if (search(key, value, &pos)) {
+		if (removeAt(pos)) {
+			sl_size n = 1;
+			if (flagRemoveAllMatches) {
+				while (search(key, value, &pos)) {
 					if (removeAt(pos)) {
 						n++;
 					} else {

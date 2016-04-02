@@ -224,7 +224,7 @@ sl_bool AsyncLoop::setTimeout(const Ref<Runnable>& task, sl_uint64 ms)
 	TimeTask tt;
 	tt.time = getEllapsedMilliseconds() + ms;
 	tt.task = task;
-	if (m_timeTasks.insert(tt.time, tt, sl_false)) {
+	if (m_timeTasks.put(tt.time, tt, MapPutMode::AddAlways)) {
 		_wake();
 		return sl_true;
 	}

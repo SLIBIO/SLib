@@ -52,9 +52,9 @@
 
 SLIB_MATH_NAMESPACE_BEGIN
 
-SLIB_INLINE static sl_int32 _cbigint_compare(const sl_uint32* a, const sl_uint32* b, sl_uint32 n)
+SLIB_INLINE static sl_int32 _cbigint_compare(const sl_uint32* a, const sl_uint32* b, sl_size n)
 {
-	for (sl_uint32 i = n; i > 0; i--) {
+	for (sl_size i = n; i > 0; i--) {
 		if (a[i - 1] > b[i - 1]) {
 			return 1;
 		}
@@ -66,10 +66,10 @@ SLIB_INLINE static sl_int32 _cbigint_compare(const sl_uint32* a, const sl_uint32
 }
 
 // returns 0, 1 (overflow)
-SLIB_INLINE static sl_uint32 _cbigint_add(sl_uint32* c, const sl_uint32* a, const sl_uint32* b, sl_uint32 n, sl_uint32 _of)
+SLIB_INLINE static sl_uint32 _cbigint_add(sl_uint32* c, const sl_uint32* a, const sl_uint32* b, sl_size n, sl_uint32 _of)
 {
 	sl_uint32 of = _of;
-	for (sl_uint32 i = 0; i < n; i++) {
+	for (sl_size i = 0; i < n; i++) {
 		sl_uint32 sum = a[i] + of;
 		of = sum < of ? 1 : 0;
 		sl_uint32 t = b[i];
@@ -81,17 +81,17 @@ SLIB_INLINE static sl_uint32 _cbigint_add(sl_uint32* c, const sl_uint32* a, cons
 }
 
 // returns 0, 1 (overflow)
-SLIB_INLINE static sl_uint32 _cbigint_add_uint32(sl_uint32* c, const sl_uint32* a, sl_uint32 n, sl_uint32 b)
+SLIB_INLINE static sl_uint32 _cbigint_add_uint32(sl_uint32* c, const sl_uint32* a, sl_size n, sl_uint32 b)
 {
 	sl_uint32 of = b;
 	if (c == a) {
-		for (sl_uint32 i = 0; i < n && of; i++) {
+		for (sl_size i = 0; i < n && of; i++) {
 			sl_uint32 sum = a[i] + of;
 			of = sum < of ? 1 : 0;
 			c[i] = sum;
 		}
 	} else {
-		for (sl_uint32 i = 0; i < n; i++) {
+		for (sl_size i = 0; i < n; i++) {
 			sl_uint32 sum = a[i] + of;
 			of = sum < of ? 1 : 0;
 			c[i] = sum;
@@ -101,10 +101,10 @@ SLIB_INLINE static sl_uint32 _cbigint_add_uint32(sl_uint32* c, const sl_uint32* 
 }
 
 // returns 0, 1 (overflow)
-SLIB_INLINE static sl_uint32 _cbigint_sub(sl_uint32* c, const sl_uint32* a, const sl_uint32* b, sl_uint32 n, sl_uint32 _of)
+SLIB_INLINE static sl_uint32 _cbigint_sub(sl_uint32* c, const sl_uint32* a, const sl_uint32* b, sl_size n, sl_uint32 _of)
 {
 	sl_uint32 of = _of;
-	for (sl_uint32 i = 0; i < n; i++) {
+	for (sl_size i = 0; i < n; i++) {
 		sl_uint32 k1 = a[i];
 		sl_uint32 k2 = b[i];
 		sl_uint32 o = k1 < of ? 1 : 0;
@@ -117,11 +117,11 @@ SLIB_INLINE static sl_uint32 _cbigint_sub(sl_uint32* c, const sl_uint32* a, cons
 }
 
 // returns 0, 1 (overflow)
-SLIB_INLINE static sl_uint32 _cbigint_sub_uint32(sl_uint32* c, const sl_uint32* a, sl_uint32 n, sl_uint32 b)
+SLIB_INLINE static sl_uint32 _cbigint_sub_uint32(sl_uint32* c, const sl_uint32* a, sl_size n, sl_uint32 b)
 {
 	sl_uint32 of = b;
 	if (c == a) {
-		for (sl_uint32 i = 0; i < n && of; i++) {
+		for (sl_size i = 0; i < n && of; i++) {
 			sl_uint32 k = a[i];
 			sl_uint32 o = k < of ? 1 : 0;
 			k -= of;
@@ -129,7 +129,7 @@ SLIB_INLINE static sl_uint32 _cbigint_sub_uint32(sl_uint32* c, const sl_uint32* 
 			c[i] = k;
 		}
 	} else {
-		for (sl_uint32 i = 0; i < n; i++) {
+		for (sl_size i = 0; i < n; i++) {
 			sl_uint32 k = a[i];
 			sl_uint32 o = k < of ? 1 : 0;
 			k -= of;
@@ -141,10 +141,10 @@ SLIB_INLINE static sl_uint32 _cbigint_sub_uint32(sl_uint32* c, const sl_uint32* 
 }
 
 // returns overflow
-SLIB_INLINE static sl_uint32 _cbigint_mul_uint32(sl_uint32* c, const sl_uint32* a, sl_uint32 n, sl_uint32 b, sl_uint32 o)
+SLIB_INLINE static sl_uint32 _cbigint_mul_uint32(sl_uint32* c, const sl_uint32* a, sl_size n, sl_uint32 b, sl_uint32 o)
 {
 	sl_uint32 of = o;
-	for (sl_uint32 i = 0; i < n; i++) {
+	for (sl_size i = 0; i < n; i++) {
 		sl_uint64 k = a[i];
 		k *= b;
 		k += of;
@@ -156,11 +156,11 @@ SLIB_INLINE static sl_uint32 _cbigint_mul_uint32(sl_uint32* c, const sl_uint32* 
 
 
 // c = c + a * b
-SLIB_INLINE static sl_uint32 _cbigint_muladd_uint32(sl_uint32* c, const sl_uint32* s, sl_uint32 m, const sl_uint32* a, sl_uint32 n, sl_uint32 b, sl_uint32 o)
+SLIB_INLINE static sl_uint32 _cbigint_muladd_uint32(sl_uint32* c, const sl_uint32* s, sl_size m, const sl_uint32* a, sl_size n, sl_uint32 b, sl_uint32 o)
 {
 	n = Math::min(m, n);
 	sl_uint32 of = o;
-	sl_uint32 i;
+	sl_size i;
 	for (i = 0; i < n; i++) {
 		sl_uint64 k = a[i];
 		k *= b;
@@ -187,11 +187,11 @@ SLIB_INLINE static sl_uint32 _cbigint_muladd_uint32(sl_uint32* c, const sl_uint3
 
 
 // returns remainder
-SLIB_INLINE static sl_uint32 _cbigint_div_uint32(sl_uint32* q, const sl_uint32* a, sl_uint32 n, sl_uint32 b, sl_uint32 o)
+SLIB_INLINE static sl_uint32 _cbigint_div_uint32(sl_uint32* q, const sl_uint32* a, sl_size n, sl_uint32 b, sl_uint32 o)
 {
-	sl_uint32 j = n - 1;
+	sl_size j = n - 1;
 	if (q) {
-		for (sl_uint32 i = 0; i < n; i++) {
+		for (sl_size i = 0; i < n; i++) {
 			sl_uint64 k = o;
 			k <<= 32;
 			k |= a[j];
@@ -200,7 +200,7 @@ SLIB_INLINE static sl_uint32 _cbigint_div_uint32(sl_uint32* q, const sl_uint32* 
 			j--;
 		}
 	} else {
-		for (sl_uint32 i = 0; i < n; i++) {
+		for (sl_size i = 0; i < n; i++) {
 			sl_uint64 k = o;
 			k <<= 32;
 			k |= a[j];
@@ -213,11 +213,11 @@ SLIB_INLINE static sl_uint32 _cbigint_div_uint32(sl_uint32* q, const sl_uint32* 
 
 // shift 0~31 bits
 // returns overflow
-SLIB_INLINE static sl_uint32 _cbigint_shiftLeft(sl_uint32* c, const sl_uint32* a, sl_uint32 n, sl_uint32 shift, sl_uint32 valueRight)
+SLIB_INLINE static sl_uint32 _cbigint_shiftLeft(sl_uint32* c, const sl_uint32* a, sl_size n, sl_uint32 shift, sl_uint32 valueRight)
 {
 	sl_uint32 rs = 32 - shift;
 	sl_uint32 of = valueRight >> rs;
-	for (sl_uint32 i = 0; i < n; i++) {
+	for (sl_size i = 0; i < n; i++) {
 		sl_uint32 t = a[i];
 		c[i] = (t << shift) | of;
 		of = t >> rs;
@@ -227,11 +227,11 @@ SLIB_INLINE static sl_uint32 _cbigint_shiftLeft(sl_uint32* c, const sl_uint32* a
 
 // shift 0~31 bits
 // returns overflow
-SLIB_INLINE static sl_uint32 _cbigint_shiftRight(sl_uint32* c, const sl_uint32* a, sl_uint32 n, sl_uint32 shift, sl_uint32 valueLeft)
+SLIB_INLINE static sl_uint32 _cbigint_shiftRight(sl_uint32* c, const sl_uint32* a, sl_size n, sl_uint32 shift, sl_uint32 valueLeft)
 {
 	sl_uint32 rs = 32 - shift;
 	sl_uint32 of = valueLeft << rs;
-	for (sl_uint32 i = n; i > 0; i--) {
+	for (sl_size i = n; i > 0; i--) {
 		sl_uint32 t = a[i - 1];
 		c[i - 1] = (t >> shift) | of;
 		of = t << rs;
@@ -239,9 +239,9 @@ SLIB_INLINE static sl_uint32 _cbigint_shiftRight(sl_uint32* c, const sl_uint32* 
 	return of;
 }
 
-SLIB_INLINE static sl_uint32 _cbigint_mse(const sl_uint32* a, sl_uint32 n)
+SLIB_INLINE static sl_size _cbigint_mse(const sl_uint32* a, sl_size n)
 {
-	for (sl_uint32 ni = n; ni > 0; ni--) {
+	for (sl_size ni = n; ni > 0; ni--) {
 		if (a[ni - 1] != 0) {
 			return ni;
 		}
@@ -249,9 +249,9 @@ SLIB_INLINE static sl_uint32 _cbigint_mse(const sl_uint32* a, sl_uint32 n)
 	return 0;
 }
 
-SLIB_INLINE static sl_uint32 _cbigint_lse(const sl_uint32* a, sl_uint32 n)
+SLIB_INLINE static sl_size _cbigint_lse(const sl_uint32* a, sl_size n)
 {
-	for (sl_uint32 ni = 0; ni < n; ni++) {
+	for (sl_size ni = 0; ni < n; ni++) {
 		if (a[ni] != 0) {
 			return ni + 1;
 		}
@@ -259,9 +259,9 @@ SLIB_INLINE static sl_uint32 _cbigint_lse(const sl_uint32* a, sl_uint32 n)
 	return 0;
 }
 
-SLIB_INLINE static sl_uint32 _cbigint_msbytes(const sl_uint32* a, sl_uint32 n)
+SLIB_INLINE static sl_size _cbigint_msbytes(const sl_uint32* a, sl_size n)
 {
-	for (sl_uint32 ni = n; ni > 0; ni--) {
+	for (sl_size ni = n; ni > 0; ni--) {
 		sl_uint32 e = a[ni - 1];
 		if (e != 0) {
 			for (sl_uint32 nB = 4; nB > 0; nB--) {
@@ -275,9 +275,9 @@ SLIB_INLINE static sl_uint32 _cbigint_msbytes(const sl_uint32* a, sl_uint32 n)
 	return 0;
 }
 
-SLIB_INLINE static sl_uint32 _cbigint_lsbytes(const sl_uint32* a, sl_uint32 n)
+SLIB_INLINE static sl_size _cbigint_lsbytes(const sl_uint32* a, sl_size n)
 {
-	for (sl_uint32 ni = 0; ni < n; ni++) {
+	for (sl_size ni = 0; ni < n; ni++) {
 		sl_uint32 e = a[ni];
 		if (e != 0) {
 			for (sl_uint32 nB = 0; nB < 4; nB++) {
@@ -291,9 +291,9 @@ SLIB_INLINE static sl_uint32 _cbigint_lsbytes(const sl_uint32* a, sl_uint32 n)
 	return 0;
 }
 
-SLIB_INLINE static sl_uint32 _cbigint_msbits(const sl_uint32* a, sl_uint32 n)
+SLIB_INLINE static sl_size _cbigint_msbits(const sl_uint32* a, sl_size n)
 {
-	for (sl_uint32 ni = n; ni > 0; ni--) {
+	for (sl_size ni = n; ni > 0; ni--) {
 		sl_uint32 e = a[ni - 1];
 		if (e != 0) {
 			for (sl_uint32 nb = 32; nb > 0; nb--) {
@@ -307,9 +307,9 @@ SLIB_INLINE static sl_uint32 _cbigint_msbits(const sl_uint32* a, sl_uint32 n)
 	return 0;
 }
 
-SLIB_INLINE static sl_uint32 _cbigint_lsbits(const sl_uint32* a, sl_uint32 n)
+SLIB_INLINE static sl_size _cbigint_lsbits(const sl_uint32* a, sl_size n)
 {
-	for (sl_uint32 ni = 0; ni < n; ni++) {
+	for (sl_size ni = 0; ni < n; ni++) {
 		sl_uint32 e = a[ni];
 		if (e != 0) {
 			for (sl_uint32 nb = 0; nb < 32; nb++) {
@@ -352,7 +352,7 @@ CBigInt::~CBigInt()
 	_free();
 }
 
-void CBigInt::setUserDataElements(sl_uint32* elements, sl_uint32 n)
+void CBigInt::setUserDataElements(sl_uint32* elements, sl_size n)
 {
 	_free();
 	if (n > 0) {
@@ -368,7 +368,7 @@ sl_int32 CBigInt::makeNagative()
 	return sign;
 }
 
-sl_bool CBigInt::getBit(sl_uint32 pos) const
+sl_bool CBigInt::getBit(sl_size pos) const
 {
 	if (pos < (length << 5)) {
 		return ((elements[pos >> 5] >> (pos & 0x1F)) & 1) != 0;
@@ -377,11 +377,11 @@ sl_bool CBigInt::getBit(sl_uint32 pos) const
 	}
 }
 
-void CBigInt::setBit(sl_uint32 pos, sl_bool bit)
+void CBigInt::setBit(sl_size pos, sl_bool bit)
 {
 	if (growLength((pos + 31) >> 5)) {
-		sl_uint32 ni = pos >> 5;
-		sl_uint32 nb = pos & 0x1F;
+		sl_size ni = pos >> 5;
+		sl_uint32 nb = (sl_uint32)(pos & 0x1F);
 		if (bit) {
 			elements[ni] |= (((sl_uint32)(1)) << nb);
 		} else {
@@ -390,7 +390,7 @@ void CBigInt::setBit(sl_uint32 pos, sl_bool bit)
 	}
 }
 
-sl_uint32 CBigInt::getMostSignificantElements() const
+sl_size CBigInt::getMostSignificantElements() const
 {
 	if (elements) {
 		return _cbigint_mse(elements, length);
@@ -398,7 +398,7 @@ sl_uint32 CBigInt::getMostSignificantElements() const
 	return 0;
 }
 
-sl_uint32 CBigInt::getLeastSignificantElements() const
+sl_size CBigInt::getLeastSignificantElements() const
 {
 	if (elements) {
 		return _cbigint_lse(elements, length);
@@ -406,7 +406,7 @@ sl_uint32 CBigInt::getLeastSignificantElements() const
 	return 0;
 }
 
-sl_uint32 CBigInt::getMostSignificantBytes() const
+sl_size CBigInt::getMostSignificantBytes() const
 {
 	if (elements) {
 		return _cbigint_msbytes(elements, length);
@@ -414,7 +414,7 @@ sl_uint32 CBigInt::getMostSignificantBytes() const
 	return 0;
 }
 
-sl_uint32 CBigInt::getLeastSignificantBytes() const
+sl_size CBigInt::getLeastSignificantBytes() const
 {
 	if (elements) {
 		return _cbigint_lsbytes(elements, length);
@@ -422,7 +422,7 @@ sl_uint32 CBigInt::getLeastSignificantBytes() const
 	return 0;
 }
 
-sl_uint32 CBigInt::getMostSignificantBits() const
+sl_size CBigInt::getMostSignificantBits() const
 {
 	if (elements) {
 		return _cbigint_msbits(elements, length);
@@ -430,7 +430,7 @@ sl_uint32 CBigInt::getMostSignificantBits() const
 	return 0;
 }
 
-sl_uint32 CBigInt::getLeastSignificantBits() const
+sl_size CBigInt::getLeastSignificantBits() const
 {
 	if (elements) {
 		return _cbigint_lsbits(elements, length);
@@ -455,7 +455,7 @@ void CBigInt::setZero()
 	}
 }
 
-CBigInt* CBigInt::allocate(sl_uint32 length)
+CBigInt* CBigInt::allocate(sl_size length)
 {
 	CBigInt* newObject = new CBigInt;
 	if (newObject) {
@@ -476,11 +476,11 @@ CBigInt* CBigInt::allocate(sl_uint32 length)
 	return sl_null;
 }
 
-CBigInt* CBigInt::duplicate(sl_uint32 newLength) const
+CBigInt* CBigInt::duplicate(sl_size newLength) const
 {
 	CBigInt* ret = allocate(length);
 	if (ret) {
-		sl_uint32 n = Math::min(length, newLength);
+		sl_size n = Math::min(length, newLength);
 		if (n > 0) {
 			Base::copyMemory(ret->elements, elements, n * 4);
 		}
@@ -506,7 +506,7 @@ sl_bool CBigInt::copyAbsFrom(const CBigInt& other)
 	if (this == &other) {
 		return sl_true;
 	}
-	sl_uint32 n = other.getMostSignificantElements();
+	sl_size n = other.getMostSignificantElements();
 	if (growLength(n)) {
 		if (other.elements) {
 			Base::copyMemory(elements, other.elements, n * 4);
@@ -534,7 +534,7 @@ sl_bool CBigInt::compact()
 	return setLength(getMostSignificantElements());
 }
 
-sl_bool CBigInt::growLength(sl_uint32 newLength)
+sl_bool CBigInt::growLength(sl_size newLength)
 {
 	if (length >= newLength) {
 		return sl_true;
@@ -559,7 +559,7 @@ sl_bool CBigInt::growLength(sl_uint32 newLength)
 	}
 }
 
-sl_bool CBigInt::setLength(sl_uint32 newLength)
+sl_bool CBigInt::setLength(sl_size newLength)
 {
 	if (length < newLength) {
 		return growLength(newLength);
@@ -595,11 +595,11 @@ sl_bool CBigInt::setLength(sl_uint32 newLength)
 	}
 }
 
-sl_bool CBigInt::setValueFromElements(const sl_uint32* _data, sl_uint32 n)
+sl_bool CBigInt::setValueFromElements(const sl_uint32* _data, sl_size n)
 {
-	sl_uint32 nd = getMostSignificantElements();
+	sl_size nd = getMostSignificantElements();
 	if (growLength(n)) {
-		sl_uint32 i;
+		sl_size i;
 		for (i = 0; i < n; i++) {
 			elements[i] = _data[i];
 		}
@@ -611,12 +611,12 @@ sl_bool CBigInt::setValueFromElements(const sl_uint32* _data, sl_uint32 n)
 	return sl_false;
 }
 
-sl_bool CBigInt::setBytesLE(const void* _bytes, sl_uint32 nBytes)
+sl_bool CBigInt::setBytesLE(const void* _bytes, sl_size nBytes)
 {
 	sl_uint8* bytes = (sl_uint8*)_bytes;
 	// remove zeros
 	{
-		sl_uint32 n;
+		sl_size n;
 		for (n = nBytes; n > 0; n--) {
 			if (bytes[n - 1]) {
 				break;
@@ -627,7 +627,7 @@ sl_bool CBigInt::setBytesLE(const void* _bytes, sl_uint32 nBytes)
 	setZero();
 	if (nBytes) {
 		if (growLength((nBytes + 3) >> 2)) {
-			for (sl_uint32 i = 0; i < nBytes; i++) {
+			for (sl_size i = 0; i < nBytes; i++) {
 				elements[i >> 2] |= ((sl_uint32)(bytes[i])) << ((i & 3) << 3);
 			}
 			return sl_true;
@@ -638,10 +638,10 @@ sl_bool CBigInt::setBytesLE(const void* _bytes, sl_uint32 nBytes)
 
 void CBigInt::setBytesLE(const Memory& mem)
 {
-	setBytesLE(mem.getData(), (sl_uint32)(mem.getSize()));
+	setBytesLE(mem.getData(), mem.getSize());
 }
 
-CBigInt* CBigInt::fromBytesLE(const void* bytes, sl_uint32 nBytes)
+CBigInt* CBigInt::fromBytesLE(const void* bytes, sl_size nBytes)
 {
 	CBigInt* ret = CBigInt::allocate((nBytes + 3) >> 2);
 	if (ret) {
@@ -655,17 +655,17 @@ CBigInt* CBigInt::fromBytesLE(const void* bytes, sl_uint32 nBytes)
 
 CBigInt* CBigInt::fromBytesLE(const Memory& mem)
 {
-	return fromBytesLE(mem.getData(), (sl_uint32)(mem.getSize()));
+	return fromBytesLE(mem.getData(), mem.getSize());
 }
 
-sl_bool CBigInt::getBytesLE(void* _bytes, sl_uint32 n) const
+sl_bool CBigInt::getBytesLE(void* _bytes, sl_size n) const
 {
-	sl_uint32 size = getMostSignificantBytes();
+	sl_size size = getMostSignificantBytes();
 	if (n < size) {
 		return sl_false;
 	}
 	sl_uint8* bytes = (sl_uint8*)_bytes;
-	sl_uint32 i;
+	sl_size i;
 	for (i = 0; i < size; i++) {
 		bytes[i] = (sl_uint8)(elements[i >> 2] >> ((i & 3) << 3));
 	}
@@ -677,23 +677,23 @@ sl_bool CBigInt::getBytesLE(void* _bytes, sl_uint32 n) const
 
 Memory CBigInt::getBytesLE() const
 {
-	sl_uint32 size = getMostSignificantBytes();
+	sl_size size = getMostSignificantBytes();
 	Memory mem = Memory::create(size);
 	if (mem.isNotEmpty()) {
 		sl_uint8* bytes = (sl_uint8*)(mem.getData());
-		for (sl_uint32 i = 0; i < size; i++) {
+		for (sl_size i = 0; i < size; i++) {
 			bytes[i] = (sl_uint8)(elements[i >> 2] >> ((i & 3) << 3));
 		}
 	}
 	return mem;
 }
 
-sl_bool CBigInt::setBytesBE(const void* _bytes, sl_uint32 nBytes)
+sl_bool CBigInt::setBytesBE(const void* _bytes, sl_size nBytes)
 {
 	sl_uint8* bytes = (sl_uint8*)_bytes;
 	// remove zeros
 	{
-		sl_uint32 n;
+		sl_size n;
 		for (n = 0; n < nBytes; n++) {
 			if (bytes[n]) {
 				break;
@@ -705,8 +705,8 @@ sl_bool CBigInt::setBytesBE(const void* _bytes, sl_uint32 nBytes)
 	setZero();
 	if (nBytes) {
 		if (growLength((nBytes + 3) >> 2)) {
-			sl_uint32 m = nBytes - 1;
-			for (sl_uint32 i = 0; i < nBytes; i++) {
+			sl_size m = nBytes - 1;
+			for (sl_size i = 0; i < nBytes; i++) {
 				elements[i >> 2] |= ((sl_uint32)(bytes[m])) << ((i & 3) << 3);
 				m--;
 			}
@@ -718,10 +718,10 @@ sl_bool CBigInt::setBytesBE(const void* _bytes, sl_uint32 nBytes)
 
 void CBigInt::setBytesBE(const Memory& mem)
 {
-	setBytesBE(mem.getData(), (sl_uint32)(mem.getSize()));
+	setBytesBE(mem.getData(), mem.getSize());
 }
 
-CBigInt* CBigInt::fromBytesBE(const void* bytes, sl_uint32 nBytes)
+CBigInt* CBigInt::fromBytesBE(const void* bytes, sl_size nBytes)
 {
 	CBigInt* ret = CBigInt::allocate((nBytes + 3) >> 2);
 	if (ret) {
@@ -735,18 +735,18 @@ CBigInt* CBigInt::fromBytesBE(const void* bytes, sl_uint32 nBytes)
 
 CBigInt* CBigInt::fromBytesBE(const Memory& mem)
 {
-	return fromBytesBE(mem.getData(), (sl_uint32)(mem.getSize()));
+	return fromBytesBE(mem.getData(), mem.getSize());
 }
 
-sl_bool CBigInt::getBytesBE(void* _bytes, sl_uint32 n) const
+sl_bool CBigInt::getBytesBE(void* _bytes, sl_size n) const
 {
-	sl_uint32 size = getMostSignificantBytes();
+	sl_size size = getMostSignificantBytes();
 	if (n < size) {
 		return sl_false;
 	}
 	sl_uint8* bytes = (sl_uint8*)_bytes;
-	sl_uint32 i;
-	sl_uint32 m = n - 1;
+	sl_size i;
+	sl_size m = n - 1;
 	for (i = 0; i < size; i++) {
 		bytes[m] = (sl_uint8)(elements[i >> 2] >> ((i & 3) << 3));
 		m--;
@@ -760,12 +760,12 @@ sl_bool CBigInt::getBytesBE(void* _bytes, sl_uint32 n) const
 
 Memory CBigInt::getBytesBE() const
 {
-	sl_uint32 size = getMostSignificantBytes();
+	sl_size size = getMostSignificantBytes();
 	Memory mem = Memory::create(size);
 	if (mem.isNotEmpty()) {
 		sl_uint8* bytes = (sl_uint8*)(mem.getData());
-		sl_uint32 m = size - 1;
-		for (sl_uint32 i = 0; i < size; i++) {
+		sl_size m = size - 1;
+		for (sl_size i = 0; i < size; i++) {
 			bytes[m] = (sl_uint8)(elements[i >> 2] >> ((i & 3) << 3));
 			m--;
 		}
@@ -876,13 +876,13 @@ CBigInt* CBigInt::fromUint64(sl_uint64 v)
 }
 
 template <class CT>
-sl_int32 _CBigInt_parseString(CBigInt* out, const CT* sz, sl_uint32 posBegin, sl_uint32 len, sl_uint32 radix)
+sl_reg _CBigInt_parseString(CBigInt* out, const CT* sz, sl_size posBegin, sl_size len, sl_uint32 radix)
 {
 	if (radix < 2 || radix > 64) {
 		return SLIB_PARSE_ERROR;;
 	}
 	sl_int32 sign;
-	sl_uint32 pos = posBegin;
+	sl_size pos = posBegin;
 	if (pos < len && sz[pos] == '-') {
 		pos++;
 		sign = -1;
@@ -895,7 +895,7 @@ sl_int32 _CBigInt_parseString(CBigInt* out, const CT* sz, sl_uint32 posBegin, sl
 			break;
 		}
 	}
-	sl_uint32 end = pos;
+	sl_size end = pos;
 	const sl_uint8* pattern = radix <= 36 ? _StringConv_radixInversePatternSmall : _StringConv_radixInversePatternBig;
 	for (; end < len; end++) {
 		sl_uint32 c = (sl_uint8)(sz[end]);
@@ -913,33 +913,33 @@ sl_int32 _CBigInt_parseString(CBigInt* out, const CT* sz, sl_uint32 posBegin, sl
 	out->sign = sign;
 	if (radix == 16) {
 		out->setZero();
-		sl_uint32 nh = end - pos;
-		sl_uint32 ne = ((nh << 2) + 31) >> 5;
+		sl_size nh = end - pos;
+		sl_size ne = ((nh << 2) + 31) >> 5;
 		if (!(out->growLength(ne))) {
 			return SLIB_PARSE_ERROR;
 		}
 		sl_uint32* elements = out->elements;
-		sl_uint32 ih = nh - 1;
+		sl_size ih = nh - 1;
 		for (; pos < end; pos++) {
 			sl_uint32 c = (sl_uint8)(sz[pos]);
 			sl_uint32 v = c < 128 ? pattern[c] : 255;
 			if (v >= radix) {
 				break;
 			}
-			sl_uint32 ie = ih >> 3;
-			sl_uint32 ib = (ih << 2) & 31;
+			sl_size ie = ih >> 3;
+			sl_uint32 ib = (sl_uint32)((ih << 2) & 31);
 			elements[ie] |= (v << ib);
 			ih--;
 		}
 		return pos;
 	} else {
-		sl_uint32 nb = (sl_uint32)(Math::ceil(Math::log2((double)radix) * len));
-		sl_uint32 ne = (nb + 31) >> 5;
+		sl_size nb = (sl_size)(Math::ceil(Math::log2((double)radix) * len));
+		sl_size ne = (nb + 31) >> 5;
 		SLIB_SCOPED_BUFFER(sl_uint32, STACK_BUFFER_SIZE, a, ne);
 		if (!a) {
 			return SLIB_PARSE_ERROR;
 		}
-		sl_uint32 n = 0;
+		sl_size n = 0;
 		for (; pos < end; pos++) {
 			sl_uint32 c = (sl_uint8)(sz[pos]);
 			sl_uint32 v = c < 128 ? pattern[c] : 255;
@@ -959,19 +959,19 @@ sl_int32 _CBigInt_parseString(CBigInt* out, const CT* sz, sl_uint32 posBegin, sl
 	}
 }
 
-sl_int32 CBigInt::parseString(CBigInt* out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_uint32 radix)
+sl_reg CBigInt::parseString(CBigInt* out, const char* sz, sl_size posBegin, sl_size len, sl_uint32 radix)
 {
 	return _CBigInt_parseString(out, sz, posBegin, len, radix);
 }
 
-sl_int32 CBigInt::parseString(CBigInt* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_uint32 radix)
+sl_reg CBigInt::parseString(CBigInt* out, const sl_char16* sz, sl_size posBegin, sl_size len, sl_uint32 radix)
 {
 	return _CBigInt_parseString(out, sz, posBegin, len, radix);
 }
 
 sl_bool CBigInt::parseString(const String& s, sl_uint32 radix)
 {
-	sl_uint32 n = s.getLength();
+	sl_size n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -992,14 +992,14 @@ String CBigInt::toString(sl_uint32 radix) const
 	if (radix < 2 || radix > 64) {
 		return String::null();
 	}
-	sl_uint32 nb = getMostSignificantBits();
+	sl_size nb = getMostSignificantBits();
 	if (nb == 0) {
 		SLIB_STATIC_STRING(s, "0");
 		return s;
 	}
 	if (radix == 16) {
-		sl_uint32 nh = (nb + 3) >> 2;
-		sl_uint32 ns;
+		sl_size nh = (nb + 3) >> 2;
+		sl_size ns;
 		if (sign < 0) {
 			ns = nh + 1;
 		} else {
@@ -1012,11 +1012,11 @@ String CBigInt::toString(sl_uint32 radix) const
 				buf[0] = '-';
 				buf++;
 			}
-			sl_uint32 ih = nh - 1;
-			for (sl_uint32 i = 0; i < nh; i++) {
-				sl_uint32 ie = ih >> 3;
-				sl_uint32 ib = (ih << 2) & 31;
-				sl_uint32 vh = (elements[ie] >> ib) & 15;
+			sl_size ih = nh - 1;
+			for (sl_size i = 0; i < nh; i++) {
+				sl_size ie = ih >> 3;
+				sl_uint32 ib = (sl_uint32)((ih << 2) & 31);
+				sl_uint32 vh = (sl_uint32)((elements[ie] >> ib) & 15);
 				if (vh < 10) {
 					buf[i] = (sl_char8)(vh + 0x30);
 				} else {
@@ -1027,8 +1027,8 @@ String CBigInt::toString(sl_uint32 radix) const
 		}
 		return ret;
 	} else {
-		sl_uint32 ne = (nb + 31) >> 5;
-		sl_uint32 n = (sl_uint32)(Math::ceil((nb + 1) / Math::log2((double)radix))) + 1;
+		sl_size ne = (nb + 31) >> 5;
+		sl_size n = (sl_size)(Math::ceil((nb + 1) / Math::log2((double)radix))) + 1;
 		SLIB_SCOPED_BUFFER(sl_uint32, STACK_BUFFER_SIZE, a, ne);
 		if (!a) {
 			return String::null();
@@ -1040,7 +1040,7 @@ String CBigInt::toString(sl_uint32 radix) const
 		s = s + n;
 		s[1] = 0;
 		Base::copyMemory(a, elements, ne * 4);
-		sl_uint32 l = 0;
+		sl_size l = 0;
 		for (; ne > 0;) {
 			sl_uint32 v = _cbigint_div_uint32(a, a, ne, radix, 0);
 			ne = _cbigint_mse(a, ne);
@@ -1075,8 +1075,8 @@ sl_int32 CBigInt::compareAbs(const CBigInt& other) const
 {
 	const CBigInt& a = *this;
 	const CBigInt& b = other;
-	sl_uint32 na = a.getMostSignificantElements();
-	sl_uint32 nb = b.getMostSignificantElements();
+	sl_size na = a.getMostSignificantElements();
+	sl_size nb = b.getMostSignificantElements();
 	if (na > nb) {
 		return 1;
 	} else if (na < nb) {
@@ -1089,8 +1089,8 @@ sl_int32 CBigInt::compare(const CBigInt& other) const
 {
 	const CBigInt& a = *this;
 	const CBigInt& b = other;
-	sl_uint32 na = a.getMostSignificantElements();
-	sl_uint32 nb = b.getMostSignificantElements();
+	sl_size na = a.getMostSignificantElements();
+	sl_size nb = b.getMostSignificantElements();
 	if (na == 0) {
 		if (nb == 0) {
 			return 0;
@@ -1141,8 +1141,8 @@ sl_int32 CBigInt::compare(sl_uint64 v) const
 
 sl_bool CBigInt::addAbs(const CBigInt& a, const CBigInt& b)
 {
-	sl_uint32 na = a.getMostSignificantElements();
-	sl_uint32 nb = b.getMostSignificantElements();
+	sl_size na = a.getMostSignificantElements();
+	sl_size nb = b.getMostSignificantElements();
 	if (na == 0) {
 		if (nb) {
 			if (this != &b) {
@@ -1159,7 +1159,7 @@ sl_bool CBigInt::addAbs(const CBigInt& a, const CBigInt& b)
 		}
 		return sl_true;
 	}
-	sl_uint32 nd;
+	sl_size nd;
 	if (&a == this) {
 		nd = na;
 	} else if (&b == this) {
@@ -1169,7 +1169,7 @@ sl_bool CBigInt::addAbs(const CBigInt& a, const CBigInt& b)
 	}
 	const CBigInt* _p;
 	const CBigInt* _q;
-	sl_uint32 np, nq;
+	sl_size np, nq;
 	if (na > nb) {
 		_p = &b;
 		np = nb;
@@ -1200,7 +1200,7 @@ sl_bool CBigInt::addAbs(const CBigInt& a, const CBigInt& b)
 				Base::copyMemory(elements + np, q.elements + np, (nq - np) * 4);
 			}
 		}
-		for (sl_uint32 i = nq; i < nd; i++) {
+		for (sl_size i = nq; i < nd; i++) {
 			elements[i] = 0;
 		}
 		return sl_true;
@@ -1287,8 +1287,8 @@ sl_bool CBigInt::add(sl_uint64 v)
 
 sl_bool CBigInt::subAbs(const CBigInt& a, const CBigInt& b)
 {
-	sl_uint32 na = a.getMostSignificantElements();
-	sl_uint32 nb = b.getMostSignificantElements();
+	sl_size na = a.getMostSignificantElements();
+	sl_size nb = b.getMostSignificantElements();
 	if (nb == 0) {
 		if (this != &a) {
 			return copyAbsFrom(a);
@@ -1298,7 +1298,7 @@ sl_bool CBigInt::subAbs(const CBigInt& a, const CBigInt& b)
 	if (na < nb) {
 		return sl_false;
 	}
-	sl_uint32 nd;
+	sl_size nd;
 	if (&a == this) {
 		nd = na;
 	} else if (&b == this) {
@@ -1323,7 +1323,7 @@ sl_bool CBigInt::subAbs(const CBigInt& a, const CBigInt& b)
 			Base::copyMemory(elements + nb, a.elements + nb, (na - nb) * 4);
 		}
 	}
-	for (sl_uint32 i = na; i < nd; i++) {
+	for (sl_size i = na; i < nd; i++) {
 		elements[i] = 0;
 	}
 	return sl_true;
@@ -1408,13 +1408,13 @@ sl_bool CBigInt::sub(sl_uint64 v)
 
 sl_bool CBigInt::mulAbs(const CBigInt& a, const CBigInt& b)
 {
-	sl_uint32 na = a.getMostSignificantElements();
-	sl_uint32 nb = b.getMostSignificantElements();
+	sl_size na = a.getMostSignificantElements();
+	sl_size nb = b.getMostSignificantElements();
 	if (na == 0 || nb == 0) {
 		setZero();
 		return sl_true;
 	}
-	sl_uint32 nd;
+	sl_size nd;
 	if (&a == this) {
 		nd = na;
 	} else if (&b == this) {
@@ -1422,14 +1422,14 @@ sl_bool CBigInt::mulAbs(const CBigInt& a, const CBigInt& b)
 	} else {
 		nd = getMostSignificantElements();
 	}
-	sl_uint32 n = na + nb;
+	sl_size n = na + nb;
 	SLIB_SCOPED_BUFFER(sl_uint64, STACK_BUFFER_SIZE, out, n);
 	if (!out) {
 		return sl_false;
 	}
 	Base::zeroMemory(out, 8 * n);
-	for (sl_uint32 ib = 0; ib < nb; ib++) {
-		for (sl_uint32 ia = 0; ia < na; ia++) {
+	for (sl_size ib = 0; ib < nb; ib++) {
+		for (sl_size ia = 0; ia < na; ia++) {
 			sl_uint64 c = a.elements[ia];
 			c *= b.elements[ib];
 			out[ia + ib] += (sl_uint32)c;
@@ -1437,8 +1437,8 @@ sl_bool CBigInt::mulAbs(const CBigInt& a, const CBigInt& b)
 		}
 	}
 	sl_uint32 o = 0;
-	sl_uint32 i;
-	sl_uint32 m = 0;
+	sl_size i;
+	sl_size m = 0;
 	for (i = 0; i < n; i++) {
 		sl_uint64 c = out[i] + o;
 		sl_uint32 t = (sl_uint32)c;
@@ -1468,18 +1468,18 @@ sl_bool CBigInt::mul(const CBigInt& a, const CBigInt& b)
 
 sl_bool CBigInt::mulAbs(const CBigInt& a, sl_uint32 b)
 {
-	sl_uint32 na = a.getMostSignificantElements();
+	sl_size na = a.getMostSignificantElements();
 	if (na == 0 || b == 0) {
 		setZero();
 		return sl_true;
 	}
-	sl_uint32 nd;
+	sl_size nd;
 	if (&a == this) {
 		nd = na;
 	} else {
 		nd = getMostSignificantElements();
 	}
-	sl_uint32 n = na + 1;
+	sl_size n = na + 1;
 	SLIB_SCOPED_BUFFER(sl_uint32, STACK_BUFFER_SIZE, out, n);
 	if (!out) {
 		return sl_false;
@@ -1548,8 +1548,8 @@ sl_bool CBigInt::mul(sl_uint64 v)
 
 sl_bool CBigInt::divAbs(const CBigInt& a, const CBigInt& b, CBigInt* quotient, CBigInt* remainder)
 {
-	sl_uint32 nba = a.getMostSignificantBits();
-	sl_uint32 nbb = b.getMostSignificantBits();
+	sl_size nba = a.getMostSignificantBits();
+	sl_size nbb = b.getMostSignificantBits();
 	if (nbb == 0) {
 		return sl_false;
 	}
@@ -1573,17 +1573,17 @@ sl_bool CBigInt::divAbs(const CBigInt& a, const CBigInt& b, CBigInt* quotient, C
 		}
 		return sl_true;
 	}
-	sl_uint32 na = (nba + 31) >> 5;
-	sl_uint32 nb = (nbb + 31) >> 5;
-	sl_uint32 nbc = nba - nbb;
+	sl_size na = (nba + 31) >> 5;
+	sl_size nb = (nbb + 31) >> 5;
+	sl_size nbc = nba - nbb;
 	SLIB_SCOPED_BUFFER(sl_uint32, STACK_BUFFER_SIZE, _tmem, (nb + 1) * 31);
 	if (!_tmem) {
 		return sl_false;
 	}
 	sl_uint32* tb[32];
-	sl_uint32 tl[32];
+	sl_size tl[32];
 	{
-		sl_uint32 n = Math::min(31u, nbc);
+		sl_uint32 n = (sl_uint32)(Math::min((sl_size)31, nbc));
 		tb[0] = (sl_uint32*)(b.elements);
 		tl[0] = nb;
 		for (sl_uint32 i = 1; i <= n; i++) {
@@ -1602,13 +1602,13 @@ sl_bool CBigInt::divAbs(const CBigInt& a, const CBigInt& b, CBigInt* quotient, C
 	Base::copyMemory(rem, a.elements, na * 4);
 	sl_uint32* q = rem + na;
 	Base::zeroMemory(q, na * 4);
-	sl_uint32 nbr = nba;
-	sl_uint32 shift = nbc;
-	sl_uint32 nq = 0;
-	for (sl_uint32 i = 0; i <= nbc; i++) {
-		sl_uint32 se = shift >> 5;
-		sl_uint32 sb = shift & 31;
-		sl_uint32 nbs = nbb + shift;
+	sl_size nbr = nba;
+	sl_size shift = nbc;
+	sl_size nq = 0;
+	for (sl_size i = 0; i <= nbc; i++) {
+		sl_size se = shift >> 5;
+		sl_size sb = shift & 31;
+		sl_size nbs = nbb + shift;
 		if (nbs < nbr || (nbs == nbr && _cbigint_compare(rem + se, tb[sb], tl[sb]) >= 0)) {
 			if (_cbigint_sub(rem + se, rem + se, tb[sb], tl[sb], 0)) {
 				rem[se + tl[sb]] = 0;
@@ -1626,7 +1626,7 @@ sl_bool CBigInt::divAbs(const CBigInt& a, const CBigInt& b, CBigInt* quotient, C
 			return sl_false;
 		}
 	}
-	sl_uint32 nr = (nbr + 31) >> 5;
+	sl_size nr = (nbr + 31) >> 5;
 	if (remainder) {
 		if (! remainder->setValueFromElements(rem, nr)) {
 			return sl_false;
@@ -1640,7 +1640,7 @@ sl_bool CBigInt::divAbs(const CBigInt& a, sl_uint32 b, CBigInt* quotient, sl_uin
 	if (b == 0) {
 		return sl_false;
 	}
-	sl_uint32 na = a.getMostSignificantElements();
+	sl_size na = a.getMostSignificantElements();
 	if (na == 0) {
 		if (remainder) {
 			*remainder = 0;
@@ -1806,26 +1806,26 @@ sl_bool CBigInt::div(const CBigInt& a, sl_uint64 b, CBigInt* quotient, sl_uint64
 	}
 }
 
-sl_bool CBigInt::shiftLeft(const CBigInt& a, sl_uint32 shift)
+sl_bool CBigInt::shiftLeft(const CBigInt& a, sl_size shift)
 {
 	if (shift == 0) {
 		return copyFrom(a);
 	}
-	sl_uint32 nba = a.getMostSignificantBits();
-	sl_uint32 nd;
+	sl_size nba = a.getMostSignificantBits();
+	sl_size nd;
 	if (&a == this) {
 		nd = (nba + 31) >> 5;
 	} else {
 		sign = a.sign;
 		nd = getMostSignificantElements();
 	}
-	sl_uint32 nbt = nba + shift;
-	sl_uint32 nt = (nbt + 31) >> 5;
+	sl_size nbt = nba + shift;
+	sl_size nt = (nbt + 31) >> 5;
 	if (growLength(nt)) {
-		sl_uint32 se = shift >> 5;
-		sl_uint32 sb = shift & 31;
+		sl_size se = shift >> 5;
+		sl_uint32 sb = (sl_uint32)(shift & 31);
 		if (se > 0 || elements != a.elements) {
-			sl_uint32 i;
+			sl_size i;
 			for (i = nt; i > se; i--) {
 				elements[i - 1] = a.elements[i - 1 - se];
 			}
@@ -1836,7 +1836,7 @@ sl_bool CBigInt::shiftLeft(const CBigInt& a, sl_uint32 shift)
 		if (sb > 0) {
 			_cbigint_shiftLeft(elements, elements, nt, sb, 0);
 		}
-		for (sl_uint32 i = nt; i < nd; i++) {
+		for (sl_size i = nt; i < nd; i++) {
 			elements[i] = 0;
 		}
 		return sl_true;
@@ -1845,30 +1845,30 @@ sl_bool CBigInt::shiftLeft(const CBigInt& a, sl_uint32 shift)
 	}
 }
 
-sl_bool CBigInt::shiftRight(const CBigInt& a, sl_uint32 shift)
+sl_bool CBigInt::shiftRight(const CBigInt& a, sl_size shift)
 {
 	if (shift == 0) {
 		return copyFrom(a);
 	}	
-	sl_uint32 nba = a.getMostSignificantBits();
+	sl_size nba = a.getMostSignificantBits();
 	if (nba <= shift) {
 		setZero();
 		return sl_true;
 	}
-	sl_uint32 nd;
+	sl_size nd;
 	if (&a == this) {
 		nd = (nba + 31) >> 5;
 	} else {
 		sign = a.sign;
 		nd = getMostSignificantElements();
 	}
-	sl_uint32 nbt = nba - shift;
-	sl_uint32 nt = (nbt + 31) >> 5;
+	sl_size nbt = nba - shift;
+	sl_size nt = (nbt + 31) >> 5;
 	if (growLength(nt)) {
-		sl_uint32 se = shift >> 5;
-		sl_uint32 sb = shift & 31;
+		sl_size se = shift >> 5;
+		sl_uint32 sb = (sl_uint32)(shift & 31);
 		if (se > 0 || elements != a.elements) {
-			sl_uint32 i;
+			sl_size i;
 			for (i = 0; i < nt; i++) {
 				elements[i] = a.elements[i + se];
 			}
@@ -1882,7 +1882,7 @@ sl_bool CBigInt::shiftRight(const CBigInt& a, sl_uint32 shift)
 			}
 			_cbigint_shiftRight(elements, elements, nt, sb, l);
 		}
-		for (sl_uint32 i = nt; i < nd; i++) {
+		for (sl_size i = nt; i < nd; i++) {
 			elements[i] = 0;
 		}
 		return sl_true;
@@ -1891,12 +1891,12 @@ sl_bool CBigInt::shiftRight(const CBigInt& a, sl_uint32 shift)
 	}
 }
 
-sl_bool CBigInt::shiftLeft(sl_uint32 n)
+sl_bool CBigInt::shiftLeft(sl_size n)
 {
 	return shiftLeft(*this, n);
 }
 
-sl_bool CBigInt::shiftRight(sl_uint32 n)
+sl_bool CBigInt::shiftRight(sl_size n)
 {
 	return shiftRight(*this, n);
 }
@@ -1904,12 +1904,12 @@ sl_bool CBigInt::shiftRight(sl_uint32 n)
 sl_bool CBigInt::pow(const CBigInt& A, const CBigInt& E, const CBigInt* pM)
 {
 	if (pM) {
-		sl_uint32 nM = pM->getMostSignificantElements();
+		sl_size nM = pM->getMostSignificantElements();
 		if (nM == 0) {
 			return sl_false;
 		}
 	}
-	sl_uint32 nbE = E.getMostSignificantBits();
+	sl_size nbE = E.getMostSignificantBits();
 	if (nbE == 0) {
 		if (!setValue((sl_uint32)1)) {
 			return sl_false;
@@ -1920,7 +1920,7 @@ sl_bool CBigInt::pow(const CBigInt& A, const CBigInt& E, const CBigInt* pM)
 	if (E.sign < 0) {
 		return sl_false;
 	}
-	sl_uint32 nA = A.getMostSignificantElements();
+	sl_size nA = A.getMostSignificantElements();
 	if (nA == 0) {
 		setZero();
 		return sl_true;
@@ -1942,10 +1942,10 @@ sl_bool CBigInt::pow(const CBigInt& A, const CBigInt& E, const CBigInt* pM)
 	if (!setValue((sl_uint32)1)) {
 		return sl_false;
 	}
-	for (sl_uint32 ib = 0; ib < nbE; ib++) {
-		sl_uint32 ke = ib >> 5;
-		sl_uint32 kb = ib & 31;
-		if ((TE->elements[ke] >> kb) & 1) {
+	for (sl_size ib = 0; ib < nbE; ib++) {
+		sl_size ke = ib >> 5;
+		sl_uint32 kb = (sl_uint32)(ib & 31);
+		if (((TE->elements[ke]) >> kb) & 1) {
 			if (!mul(*this, T)) {
 				return sl_false;
 			}
@@ -2008,16 +2008,16 @@ sl_bool CBigInt::pow(sl_uint32 E)
 */
 static sl_bool _cbigint_mont_mul(CBigInt& A, const CBigInt& B, const CBigInt& M, sl_uint32 MI)
 {
-	sl_uint32 nM = M.length;
-	sl_uint32 nB = Math::min(nM, B.length);
+	sl_size nM = M.length;
+	sl_size nB = Math::min(nM, B.length);
 	
-	sl_uint32 nOut = nM * 2 + 1;
+	sl_size nOut = nM * 2 + 1;
 	SLIB_SCOPED_BUFFER(sl_uint32, STACK_BUFFER_SIZE, out, nOut);
 	if (!out) {
 		return sl_false;
 	}
 	Base::zeroMemory(out, nOut * 4);
-	for (sl_uint32 i = 0; i < nM; i++) {
+	for (sl_size i = 0; i < nM; i++) {
 		// T = (T + cB*B + cM*M) / 2^(32*nM)
 		sl_uint32 cB = i < A.length ? A.elements[i] : 0;
 		sl_uint32 cM = (out[0] + cB * B.elements[0]) * MI;
@@ -2054,7 +2054,7 @@ sl_bool CBigInt::pow_montgomery(const CBigInt& A, const CBigInt& _E, const CBigI
 	if (!M.compact()) {
 		return sl_false;
 	}
-	sl_uint32 nM = M.getMostSignificantElements();
+	sl_size nM = M.getMostSignificantElements();
 	if (nM == 0) {
 		return sl_false;
 	}
@@ -2072,7 +2072,7 @@ sl_bool CBigInt::pow_montgomery(const CBigInt& A, const CBigInt& _E, const CBigI
 		pE = &_E;
 	}
 	const CBigInt& E = *pE;
-	sl_uint32 nE = E.getMostSignificantElements();
+	sl_size nE = E.getMostSignificantElements();
 	if (nE == 0) {
 		if (!setValue((sl_uint32)1)) {
 			return sl_false;
@@ -2083,7 +2083,7 @@ sl_bool CBigInt::pow_montgomery(const CBigInt& A, const CBigInt& _E, const CBigI
 	if (E.sign < 0) {
 		return sl_false;
 	}
-	sl_uint32 nA = A.getMostSignificantElements();
+	sl_size nA = A.getMostSignificantElements();
 	if (nA == 0) {
 		setZero();
 		return sl_true;
@@ -2135,11 +2135,11 @@ sl_bool CBigInt::pow_montgomery(const CBigInt& A, const CBigInt& _E, const CBigI
 		return sl_false;
 	}
 
-	sl_uint32 nbE = E.getMostSignificantBits();
-	for (sl_uint32 ib = 0; ib < nbE; ib++) {
-		sl_uint32 ke = ib >> 5;
-		sl_uint32 kb = ib & 31;
-		if ((E.elements[ke] >> kb) & 1) {
+	sl_size nbE = E.getMostSignificantBits();
+	for (sl_size ib = 0; ib < nbE; ib++) {
+		sl_size ke = ib >> 5;
+		sl_uint32 kb = (sl_uint32)(ib & 31);
+		if (((E.elements[ke]) >> kb) & 1) {
 			// C = C * T * R^-1 mod M
 			if (!_cbigint_mont_mul(*this, T, M, MI)) {
 				return sl_false;
@@ -2171,14 +2171,14 @@ sl_bool CBigInt::pow_montgomery(const CBigInt& E, const CBigInt& M)
 
 sl_bool CBigInt::inverseMod(const CBigInt& A, const CBigInt& M)
 {
-	sl_uint32 nM = M.getMostSignificantElements();
+	sl_size nM = M.getMostSignificantElements();
 	if (nM == 0) {
 		return sl_false;
 	}
 	if (M.sign < 0) {
 		return sl_false;
 	}
-	sl_uint32 nA = A.getMostSignificantElements();
+	sl_size nA = A.getMostSignificantElements();
 	if (nA == 0) {
 		return sl_false;
 	}
@@ -2302,13 +2302,13 @@ sl_bool CBigInt::gcd(const CBigInt& _A, const CBigInt& _B)
 		sign = 1;
 		return copyAbsFrom(_A);
 	}
-	sl_uint32 lbA = _A.getLeastSignificantBits();
-	sl_uint32 lbB = _B.getLeastSignificantBits();
+	sl_size lbA = _A.getLeastSignificantBits();
+	sl_size lbB = _B.getLeastSignificantBits();
 	if (lbA == 0 || lbB == 0) {
 		setZero();
 		return sl_true;
 	}
-	sl_uint32 min_p2 = Math::min(lbA - 1, lbB - 1);
+	sl_size min_p2 = Math::min(lbA - 1, lbB - 1);
 	CBigInt A, B;
 	if (!A.shiftRight(_A, min_p2)) {
 		return sl_false;
@@ -2401,24 +2401,24 @@ BigInt BigInt::fromUint64(sl_uint64 v)
 	return CBigInt::fromUint64(v);
 }
 
-BigInt BigInt::fromBytesLE(const void* bytes, sl_uint32 nBytes)
+BigInt BigInt::fromBytesLE(const void* bytes, sl_size nBytes)
 {
 	return CBigInt::fromBytesLE(bytes, nBytes);
 }
 
 BigInt BigInt::fromBytesLE(const Memory& mem)
 {
-	return CBigInt::fromBytesLE(mem.getData(), (sl_uint32)(mem.getSize()));
+	return CBigInt::fromBytesLE(mem.getData(), mem.getSize());
 }
 
-BigInt BigInt::fromBytesBE(const void* bytes, sl_uint32 nBytes)
+BigInt BigInt::fromBytesBE(const void* bytes, sl_size nBytes)
 {
 	return CBigInt::fromBytesBE(bytes, nBytes);
 }
 
 BigInt BigInt::fromBytesBE(const Memory& mem)
 {
-	return CBigInt::fromBytesBE(mem.getData(), (sl_uint32)(mem.getSize()));
+	return CBigInt::fromBytesBE(mem.getData(), mem.getSize());
 }
 
 BigInt BigInt::fromString(const String& str, sl_uint32 radix)
@@ -2454,7 +2454,7 @@ BigInt BigInt::compact() const
 	return BigInt::null();
 }
 
-sl_uint32 BigInt::getElementsCount() const
+sl_size BigInt::getElementsCount() const
 {
 	CBigInt* o = ref.ptr;
 	if (o) {
@@ -2490,7 +2490,7 @@ sl_bool BigInt::getBit(sl_uint32 pos) const
 	return sl_false;
 }
 
-sl_uint32 BigInt::getMostSignificantElements() const
+sl_size BigInt::getMostSignificantElements() const
 {
 	CBigInt* o = ref.ptr;
 	if (o) {
@@ -2499,7 +2499,7 @@ sl_uint32 BigInt::getMostSignificantElements() const
 	return 0;
 }
 
-sl_uint32 BigInt::getLeastSignificantElements() const
+sl_size BigInt::getLeastSignificantElements() const
 {
 	CBigInt* o = ref.ptr;
 	if (o) {
@@ -2508,7 +2508,7 @@ sl_uint32 BigInt::getLeastSignificantElements() const
 	return 0;
 }
 
-sl_uint32 BigInt::getMostSignificantBytes() const
+sl_size BigInt::getMostSignificantBytes() const
 {
 	CBigInt* o = ref.ptr;
 	if (o) {
@@ -2517,7 +2517,7 @@ sl_uint32 BigInt::getMostSignificantBytes() const
 	return 0;
 }
 
-sl_uint32 BigInt::getLeastSignificantBytes() const
+sl_size BigInt::getLeastSignificantBytes() const
 {
 	CBigInt* o = ref.ptr;
 	if (o) {
@@ -2526,7 +2526,7 @@ sl_uint32 BigInt::getLeastSignificantBytes() const
 	return 0;
 }
 
-sl_uint32 BigInt::getMostSignificantBits() const
+sl_size BigInt::getMostSignificantBits() const
 {
 	CBigInt* o = ref.ptr;
 	if (o) {
@@ -2535,7 +2535,7 @@ sl_uint32 BigInt::getMostSignificantBits() const
 	return 0;
 }
 
-sl_uint32 BigInt::getLeastSignificantBits() const
+sl_size BigInt::getLeastSignificantBits() const
 {
 	CBigInt* o = ref.ptr;
 	if (o) {
@@ -2562,7 +2562,7 @@ sl_bool BigInt::isNotZero() const
 	return sl_false;
 }
 
-sl_bool BigInt::getBytesLE(void* buf, sl_uint32 n) const
+sl_bool BigInt::getBytesLE(void* buf, sl_size n) const
 {
 	CBigInt* o = ref.ptr;
 	if (o) {
@@ -2580,7 +2580,7 @@ Memory BigInt::getBytesLE() const
 	return Memory::null();
 }
 
-sl_bool BigInt::getBytesBE(void* buf, sl_uint32 n) const
+sl_bool BigInt::getBytesBE(void* buf, sl_size n) const
 {
 	CBigInt* o = ref.ptr;
 	if (o) {
@@ -3586,7 +3586,7 @@ sl_uint64 BigInt::mod(const BigInt& A, sl_uint64 v)
 	return 0;
 }
 
-BigInt BigInt::shiftLeft(const BigInt& A, sl_uint32 n)
+BigInt BigInt::shiftLeft(const BigInt& A, sl_size n)
 {
 	CBigInt* a = A.ref.ptr;
 	if (n) {
@@ -3605,7 +3605,7 @@ BigInt BigInt::shiftLeft(const BigInt& A, sl_uint32 n)
 	return BigInt::null();
 }
 
-sl_bool BigInt::shiftLeft(sl_uint32 n)
+sl_bool BigInt::shiftLeft(sl_size n)
 {
 	CBigInt* a = ref.ptr;
 	if (n) {
@@ -3620,7 +3620,7 @@ sl_bool BigInt::shiftLeft(sl_uint32 n)
 	return sl_false;
 }
 
-BigInt BigInt::shiftRight(const BigInt& A, sl_uint32 n)
+BigInt BigInt::shiftRight(const BigInt& A, sl_size n)
 {
 	CBigInt* a = A.ref.ptr;
 	if (n) {
@@ -3639,7 +3639,7 @@ BigInt BigInt::shiftRight(const BigInt& A, sl_uint32 n)
 	return BigInt::null();
 }
 
-sl_bool BigInt::shiftRight(sl_uint32 n)
+sl_bool BigInt::shiftRight(sl_size n)
 {
 	CBigInt* a = ref.ptr;
 	if (n) {
@@ -4142,7 +4142,7 @@ sl_bool SafeBigInt::isNotZero() const
 	return sl_false;
 }
 
-sl_bool SafeBigInt::getBytesLE(void* buf, sl_uint32 n) const
+sl_bool SafeBigInt::getBytesLE(void* buf, sl_size n) const
 {
 	Ref<CBigInt> o(ref);
 	if (o.isNotNull()) {
@@ -4160,7 +4160,7 @@ Memory SafeBigInt::getBytesLE() const
 	return Memory::null();
 }
 
-sl_bool SafeBigInt::getBytesBE(void* buf, sl_uint32 n) const
+sl_bool SafeBigInt::getBytesBE(void* buf, sl_size n) const
 {
 	Ref<CBigInt> o(ref);
 	if (o.isNotNull()) {
@@ -4758,12 +4758,12 @@ BigInt operator%(sl_uint64 v, const BigInt& b)
 }
 
 
-BigInt operator<<(const BigInt& a, sl_uint32 n)
+BigInt operator<<(const BigInt& a, sl_size n)
 {
 	return BigInt::shiftLeft(a, n);
 }
 
-BigInt operator>>(const BigInt& a, sl_uint32 n)
+BigInt operator>>(const BigInt& a, sl_size n)
 {
 	return BigInt::shiftRight(a, n);
 }

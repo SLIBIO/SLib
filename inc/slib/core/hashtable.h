@@ -57,6 +57,8 @@ public:
 
 	sl_bool search(const KT& key, HashPosition* position = sl_null) const;
 	
+	sl_bool search(const KT& key, const VT& value, HashPosition* position = sl_null) const;
+	
 	sl_bool getFirstPosition(HashPosition& position, KT* outKey = sl_null, VT* outValue = sl_null) const;
 	
 	sl_bool getNextPosition(HashPosition& position, KT* outKey = sl_null, VT* outValue = sl_null) const;
@@ -69,9 +71,13 @@ public:
 	
 	List<VT> getValues(const KT& key) const;
 	
-	sl_bool put(const KT& key, const VT& value, sl_bool flagReplace = sl_true, sl_bool* pFlagReplaced = sl_null);
+	sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 	
-	sl_size remove(const KT& key, sl_bool flagAllKeys = sl_false);
+	sl_bool addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist = sl_null);
+	
+	sl_size remove(const KT& key, sl_bool flagRemoveAllMatches = sl_false);
+	
+	sl_size remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
 	
 	sl_size removeAll();
 	
@@ -101,6 +107,8 @@ private:
 	void _free();
 	
 	sl_bool _createTable(sl_uint32 capacity);
+	
+	sl_bool _addEntry(sl_uint32 index, sl_uint32 hash, HashEntry* first, const KT& key, const VT& value);
 	
 };
 
@@ -197,6 +205,28 @@ sl_bool HashTable<KT, VT, HASH>::search(const KT& key, HashPosition* position) c
 	HashEntry* entry = m_table[index];
 	while (entry) {
 		if (entry->hash == hash && entry->key == key) {
+			if (position) {
+				position->node = entry;
+				position->index = index;
+			}
+			return sl_true;
+		}
+		entry = entry->next;
+	}
+	return sl_false;
+}
+
+template <class KT, class VT, class HASH>
+sl_bool HashTable<KT, VT, HASH>::search(const KT& key, const VT& value, HashPosition* position) const
+{
+	if (m_nCapacity == 0) {
+		return sl_false;
+	}
+	sl_uint32 hash = HASH::hash(key);
+	sl_uint32 index = hash & (m_nCapacity - 1);
+	HashEntry* entry = m_table[index];
+	while (entry) {
+		if (entry->hash == hash && entry->key == key && entry->value == value) {
 			if (position) {
 				position->node = entry;
 				position->index = index;
@@ -336,44 +366,20 @@ List<VT> HashTable<KT, VT, HASH>::getValues(const KT& key) const
 }
 
 template <class KT, class VT, class HASH>
-sl_bool HashTable<KT, VT, HASH>::put(const KT& key, const VT& value, sl_bool flagReplace, sl_bool* pFlagReplaced)
+sl_bool HashTable<KT, VT, HASH>::_addEntry(sl_uint32 index, sl_uint32 hash, HashEntry* first, const KT& key, const VT& value)
 {
-	if (m_nCapacity == 0) {
+	HashEntry* entry = new HashEntry;
+	if (!entry) {
 		return sl_false;
 	}
-	sl_uint32 hash = HASH::hash(key);
-	sl_uint32 index = hash & (m_nCapacity - 1);
-	HashEntry* first = m_table[index];
-	HashEntry* entry;
-	if (flagReplace) {
-		entry = first;
-		while (entry) {
-			if (entry->hash == hash && entry->key == key) {
-				entry->value = value;
-				if (pFlagReplaced) {
-					*pFlagReplaced = sl_true;
-				}
-				return sl_true;
-			}
-			entry = entry->next;
-		}
-	}
-	// insert new entry
-	{
-		entry = new HashEntry;
-		if (!entry) {
-			return sl_false;
-		}
-		if (pFlagReplaced) {
-			*pFlagReplaced = sl_false;
-		}
-		entry->hash = hash;
-		entry->key = key;
-		entry->value = value;
-		entry->next = first;
-		m_table[index] = entry;
-		m_nSize++;
-	}
+	entry->hash = hash;
+	entry->key = key;
+	entry->value = value;
+	entry->next = first;
+	
+	m_table[index] = entry;
+	m_nSize++;
+
 	if (m_nSize >= m_nThresholdUp) {
 		// double capacity
 		HashEntry** tableOld = m_table;
@@ -413,7 +419,74 @@ sl_bool HashTable<KT, VT, HASH>::put(const KT& key, const VT& value, sl_bool fla
 }
 
 template <class KT, class VT, class HASH>
-sl_size HashTable<KT, VT, HASH>::remove(const KT& key, sl_bool flagAllKeys)
+sl_bool HashTable<KT, VT, HASH>::put(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
+{
+	if (pFlagExist) {
+		*pFlagExist = sl_false;
+	}
+	if (m_nCapacity == 0) {
+		return sl_false;
+	}
+	
+	sl_uint32 hash = HASH::hash(key);
+	sl_uint32 index = hash & (m_nCapacity - 1);
+	HashEntry* first = m_table[index];
+	
+	if (mode != MapPutMode::AddAlways) {
+		HashEntry* entry = first;
+		while (entry) {
+			if (entry->hash == hash && entry->key == key) {
+				if (pFlagExist) {
+					*pFlagExist = sl_true;
+				}
+				if (mode == MapPutMode::AddNew) {
+					return sl_false;
+				}
+				entry->value = value;
+				return sl_true;
+			}
+			entry = entry->next;
+		}
+		if (mode == MapPutMode::ReplaceExisting) {
+			return sl_false;
+		}
+	}
+	
+	return _addEntry(index, hash, first, key, value);
+	
+}
+
+template <class KT, class VT, class HASH>
+sl_bool HashTable<KT, VT, HASH>::addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist)
+{
+	if (pFlagExist) {
+		*pFlagExist = sl_false;
+	}
+	if (m_nCapacity == 0) {
+		return sl_false;
+	}
+	
+	sl_uint32 hash = HASH::hash(key);
+	sl_uint32 index = hash & (m_nCapacity - 1);
+	HashEntry* first = m_table[index];
+
+	HashEntry* entry = first;
+	while (entry) {
+		if (entry->hash == hash && entry->key == key && entry->value == value) {
+			if (pFlagExist) {
+				*pFlagExist = sl_true;
+			}
+			return sl_false;
+		}
+		entry = entry->next;
+	}
+	
+	return _addEntry(index, hash, first, key, value);
+}
+
+
+template <class KT, class VT, class HASH>
+sl_size HashTable<KT, VT, HASH>::remove(const KT& key, sl_bool flagRemoveAllMatches)
 {
 	if (m_nCapacity == 0) {
 		return 0;
@@ -432,7 +505,62 @@ sl_size HashTable<KT, VT, HASH>::remove(const KT& key, sl_bool flagAllKeys)
 			*linkDelete = entry;
 			entry->next = sl_null;
 			linkDelete = &(entry->next);
-			if (!flagAllKeys) {
+			if (!flagRemoveAllMatches) {
+				break;
+			}
+		} else {
+			link = &(entry->next);
+		}
+	}
+	if (!entryDelete) {
+		return 0;
+	}
+	if (m_nSize <= m_nThresholdDown) {
+		// half capacity
+		HashEntry** tableOld = m_table;
+		sl_uint32 n = m_nCapacity >> 1;
+		if (_createTable(n)) {
+			HashEntry** table = m_table;
+			for (sl_uint32 i = 0; i < n; i++) {
+				table[i] = tableOld[i];
+				link = table + i;
+				while ((entry = *link)) {
+					link = &(entry->next);
+				}
+				*link = tableOld[i | n];
+			}
+			delete[] tableOld;
+		}
+	}
+	while (entryDelete) {
+		entry = entryDelete;
+		entryDelete = entryDelete->next;
+		delete entry;
+	}
+	return oldSize - m_nSize;
+}
+
+template <class KT, class VT, class HASH>
+sl_size HashTable<KT, VT, HASH>::remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
+{
+	if (m_nCapacity == 0) {
+		return 0;
+	}
+	sl_uint32 hash = HASH::hash(key);
+	sl_uint32 index = hash & (m_nCapacity - 1);
+	HashEntry* entry;
+	HashEntry** link = m_table + index;
+	HashEntry* entryDelete = sl_null;
+	HashEntry** linkDelete = &entryDelete;
+	sl_size oldSize = m_nSize;
+	while ((entry = *link)) {
+		if (entry->hash == hash && entry->key == key && entry->value == value) {
+			*link = entry->next;
+			m_nSize--;
+			*linkDelete = entry;
+			entry->next = sl_null;
+			linkDelete = &(entry->next);
+			if (!flagRemoveAllMatches) {
 				break;
 			}
 		} else {

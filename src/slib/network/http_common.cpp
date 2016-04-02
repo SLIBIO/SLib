@@ -227,17 +227,17 @@ void HttpRequest::setRequestHeader(String name, String value)
 
 void HttpRequest::addRequestHeader(String name, String value)
 {
-	m_requestHeaders.add(name, value);
+	m_requestHeaders.put(name, value, MapPutMode::AddAlways);
 }
 
 sl_bool HttpRequest::containsRequestHeader(String name) const
 {
-	return m_requestHeaders.containsKey(name);
+	return m_requestHeaders.contains(name);
 }
 
 void HttpRequest::removeRequestHeader(String name)
 {
-	m_requestHeaders.removeAllMatchingKeys(name);
+	m_requestHeaders.remove(name, sl_true);
 }
 
 void HttpRequest::clearRequestHeaders()
@@ -333,7 +333,7 @@ List<String> HttpRequest::getParameterValues(const String& name) const
 
 sl_bool HttpRequest::containsParameter(const String& name) const
 {
-	return m_parameters.containsKey(name);
+	return m_parameters.contains(name);
 }
 
 const IMap<String, String>& HttpRequest::getQueryParameters() const
@@ -353,7 +353,7 @@ List<String> HttpRequest::getQueryParameterValues(String name) const
 
 sl_bool HttpRequest::containsQueryParameter(String name) const
 {
-	return m_queryParameters.containsKey(name);
+	return m_queryParameters.contains(name);
 }
 
 const IMap<String, String>& HttpRequest::getPostParameters() const
@@ -373,7 +373,7 @@ List<String> HttpRequest::getPostParameterValues(String name) const
 
 sl_bool HttpRequest::containsPostParameter(String name) const
 {
-	return m_postParameters.containsKey(name);
+	return m_postParameters.contains(name);
 }
 
 void HttpRequest::applyPostParameters(const void* data, sl_size size)
@@ -400,17 +400,13 @@ Map<String, String> HttpRequest::parseParameters(const String& str)
 	return parseParameters(str.getData(), str.getLength());
 }
 
-Map<String, String> HttpRequest::parseParameters(const void* data, sl_size _len)
+Map<String, String> HttpRequest::parseParameters(const void* data, sl_size len)
 {
 	Map<String, String> ret;
 	sl_char8* buf = (sl_char8*)data;
-	sl_uint32 start = 0;
-	sl_uint32 indexSplit = 0;
-	sl_uint32 pos = 0;
-	if (_len > SLIB_STR_MAX_LEN) {
-		_len = SLIB_STR_MAX_LEN;		
-	}
-	sl_uint32 len = (sl_uint32)_len;
+	sl_size start = 0;
+	sl_size indexSplit = 0;
+	sl_size pos = 0;
 	for (; pos <= len; pos++) {
 		sl_char8 ch;
 		if (pos == len) {
@@ -475,15 +471,11 @@ Memory HttpRequest::makeRequestPacket() const
 	return msg.merge();
 }
 
-sl_reg HttpRequest::parseRequestPacket(const void* packet, sl_size _size)
+sl_reg HttpRequest::parseRequestPacket(const void* packet, sl_size size)
 {
 	const sl_char8* data = (const sl_char8*)packet;
-	if (_size > SLIB_STR_MAX_LEN) {
-		_size = SLIB_STR_MAX_LEN;
-	}
-	sl_uint32 size = (sl_uint32)(_size);
-	sl_uint32 posCurrent = 0;
-	sl_uint32 posStart = 0;
+	sl_size posCurrent = 0;
+	sl_size posStart = 0;
 	// method
 	while (posCurrent < size) {
 		sl_char8 ch = data[posCurrent];
@@ -503,7 +495,7 @@ sl_reg HttpRequest::parseRequestPacket(const void* packet, sl_size _size)
 
 	// uri
 	posStart = posCurrent;
-	sl_uint32 posQuery = 0;
+	sl_size posQuery = 0;
 	while (posCurrent < size) {
 		sl_char8 ch = data[posCurrent];
 		if (ch == ' ') {
@@ -550,7 +542,7 @@ sl_reg HttpRequest::parseRequestPacket(const void* packet, sl_size _size)
 	// headers
 	for (;;) {
 		posStart = posCurrent;
-		sl_uint32 indexSplit = 0;
+		sl_size indexSplit = 0;
 		while (posCurrent < size) {
 			sl_char8 ch = data[posCurrent];
 			if (ch == '\r') {
@@ -579,8 +571,8 @@ sl_reg HttpRequest::parseRequestPacket(const void* packet, sl_size _size)
 		String value;
 		if (indexSplit != 0) {
 			name = String::fromUtf8(data + posStart, indexSplit - posStart);
-			sl_uint32 startValue = indexSplit + 1;
-			sl_uint32 endValue = posCurrent;
+			sl_size startValue = indexSplit + 1;
+			sl_size endValue = posCurrent;
 			while (startValue < endValue) {
 				if (data[startValue] != ' ' && data[startValue] != '\t') {
 					break;
@@ -597,7 +589,7 @@ sl_reg HttpRequest::parseRequestPacket(const void* packet, sl_size _size)
 		} else {
 			name = String::fromUtf8(data + posStart, posCurrent - posStart);
 		}
-		m_requestHeaders.add(name, value);
+		m_requestHeaders.put(name, value, MapPutMode::AddAlways);
 		posCurrent += 2;
 	}
 	return posCurrent;
@@ -670,17 +662,17 @@ void HttpResponse::setResponseHeader(String name, String value)
 
 void HttpResponse::addResponseHeader(String name, String value)
 {
-	m_responseHeaders.add(name, value);
+	m_responseHeaders.put(name, value, MapPutMode::AddAlways);
 }
 
 sl_bool HttpResponse::containsResponseHeader(String name) const
 {
-	return m_responseHeaders.containsKey(name);
+	return m_responseHeaders.contains(name);
 }
 
 void HttpResponse::removeResponseHeader(String name)
 {
-	m_responseHeaders.removeAllMatchingKeys(name);
+	m_responseHeaders.remove(name, sl_true);
 }
 
 void HttpResponse::clearResponseHeaders()
@@ -776,15 +768,11 @@ Memory HttpResponse::makeResponsePacket() const
 	return msg.merge();
 }
 
-sl_reg HttpResponse::parseResponsePacket(const void* packet, sl_size _size)
+sl_reg HttpResponse::parseResponsePacket(const void* packet, sl_size size)
 {
 	const sl_char8* data = (const sl_char8*)packet;
-	if (_size > SLIB_STR_MAX_LEN) {
-		_size = SLIB_STR_MAX_LEN;
-	}
-	sl_uint32 size = (sl_uint32)(_size);
-	sl_uint32 posCurrent = 0;
-	sl_uint32 posStart = 0;
+	sl_size posCurrent = 0;
+	sl_size posStart = 0;
 	// version
 	while (posCurrent < size) {
 		sl_char8 ch = data[posCurrent];
@@ -846,7 +834,7 @@ sl_reg HttpResponse::parseResponsePacket(const void* packet, sl_size _size)
 	// headers
 	for (;;) {
 		posStart = posCurrent;
-		sl_uint32 indexSplit = 0;
+		sl_size indexSplit = 0;
 		while (posCurrent < size) {
 			sl_char8 ch = data[posCurrent];
 			if (ch == '\r') {
@@ -875,8 +863,8 @@ sl_reg HttpResponse::parseResponsePacket(const void* packet, sl_size _size)
 		String value;
 		if (indexSplit != 0) {
 			name = String::fromUtf8(data + posStart, indexSplit - posStart);
-			sl_uint32 startValue = indexSplit + 1;
-			sl_uint32 endValue = posCurrent;
+			sl_size startValue = indexSplit + 1;
+			sl_size endValue = posCurrent;
 			while (startValue < endValue) {
 				if (data[startValue] != ' ' && data[startValue] != '\t') {
 					break;
@@ -893,7 +881,7 @@ sl_reg HttpResponse::parseResponsePacket(const void* packet, sl_size _size)
 		} else {
 			name = String::fromUtf8(data + posStart, posCurrent - posStart);
 		}
-		m_responseHeaders.add(name, value);
+		m_responseHeaders.put(name, value, MapPutMode::AddAlways);
 		posCurrent += 2;
 	}
 	return posCurrent;

@@ -46,39 +46,26 @@ public:
 	
 	List<VT> getValues(const KT& key) const;
 	
-	virtual sl_bool put_NoLock(const KT& key, const VT& value, sl_bool flagReplace = sl_true) = 0;
+	virtual sl_bool put_NoLock(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null) = 0;
 	
-	sl_bool put(const KT& key, const VT& value, sl_bool flagReplace = sl_true);
+	sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 	
-	sl_bool put(IMap<KT, VT>* other, sl_bool flagReplace = sl_true);
-	
-	template <class _KT, class _VT>
-	sl_bool put(IMap<_KT, _VT>* other, sl_bool flagReplace = sl_true);
-	
-	sl_bool add_NoLock(const KT& key, const VT& value);
-
-	sl_bool add(const KT& key, const VT& value);
-	
-	sl_bool add(IMap<KT, VT>* other);
+	void put(IMap<KT, VT>* other, MapPutMode mode = MapPutMode::Default);
 	
 	template <class _KT, class _VT>
-	sl_bool add(IMap<_KT, _VT>* other);
+	void put(IMap<_KT, _VT>* other, MapPutMode mode = MapPutMode::Default);
 	
-	virtual sl_size remove_NoLock(const KT& key, sl_bool flagAllKeys = sl_false) = 0;
+	virtual sl_size remove_NoLock(const KT& key, sl_bool flagRemoveAllMatches = sl_false) = 0;
 	
-	sl_size remove(const KT& key, sl_bool flagAllKeys = sl_false);
-	
-	sl_size removeAllMatchingKeys_NoLock(const KT& key);
-	
-	sl_size removeAllMatchingKeys(const KT& key);
+	sl_size remove(const KT& key, sl_bool flagRemoveAllMatches = sl_false);
 	
 	virtual sl_size removeAll_NoLock() = 0;
 	
 	sl_size removeAll();
 	
-	virtual sl_bool containsKey_NoLock(const KT& key) const = 0;
+	virtual sl_bool contains_NoLock(const KT& key) const = 0;
 	
-	sl_bool containsKey(const KT& key) const;
+	sl_bool contains(const KT& key) const;
 	
 	virtual IMap<KT, VT>* duplicate_NoLock() const = 0;
 	
@@ -115,16 +102,19 @@ template < class KT, class VT, class COMPARE = Compare<KT> >
 class SLIB_EXPORT ListMap : public IMap<KT, VT>
 {
 public:
+	class PairKeyCompare
+	{
+	public:
+		static sl_bool equals(const Pair<KT, VT>& a, const KT& b);
+	};
+	
 	class PairCompare
 	{
 	public:
-		static int compare(const Pair<KT, VT>& a, const Pair<KT, VT>& b);
-
 		static sl_bool equals(const Pair<KT, VT>& a, const Pair<KT, VT>& b);
-		
 	};
-	
-	CList< Pair<KT, VT>, PairCompare > list;
+
+	CList< Pair<KT, VT> > list;
 	
 public:
 	static ListMap<KT, VT, COMPARE>* create();
@@ -139,16 +129,32 @@ public:
 	List<VT> getValues_NoLock(const KT& key) const;
 	
 	// override
-	sl_bool put_NoLock(const KT& key, const VT& value, sl_bool flagReplace = sl_true);
+	sl_bool put_NoLock(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
+	
+	sl_bool addIfNewKeyAndValue_NoLock(const KT& key, const VT& value, sl_bool* pFlagExist = sl_null);
+	
+	sl_bool addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist = sl_null);
 	
 	// override
-	sl_size remove_NoLock(const KT& key, sl_bool flagAllKeys = sl_false);
+	sl_size remove_NoLock(const KT& key, sl_bool flagRemoveAllMatches = sl_false);
+	
+	sl_size remove(const KT& key, sl_bool flagRemoveAllMatches = sl_false);
+	
+	sl_size remove_NoLock(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
+	
+	sl_size remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
 	
 	// override
 	sl_size removeAll_NoLock();
 	
 	// override
-	sl_bool containsKey_NoLock(const KT& key) const;
+	sl_bool contains_NoLock(const KT& key) const;
+	
+	sl_bool contains(const KT& key) const;
+	
+	sl_bool contains_NoLock(const KT& key, const VT& value) const;
+	
+	sl_bool contains(const KT& key, const VT& value) const;
 	
 	// override
 	IMap<KT, VT>* duplicate_NoLock() const;
@@ -196,16 +202,32 @@ public:
 	List<VT> getValues_NoLock(const KT& key) const;
 
 	// override
-	sl_bool put_NoLock(const KT& key, const VT& value, sl_bool flagReplace = sl_true);
+	sl_bool put_NoLock(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 
+	sl_bool addIfNewKeyAndValue_NoLock(const KT& key, const VT& value, sl_bool* pFlagExist = sl_null);
+	
+	sl_bool addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist = sl_null);
+	
 	// override
-	sl_size remove_NoLock(const KT& key, sl_bool flagAllKeys = sl_false);
+	sl_size remove_NoLock(const KT& key, sl_bool flagRemoveAllMatches = sl_false);
+	
+	sl_size remove(const KT& key, sl_bool flagRemoveAllMatches = sl_false);
+	
+	sl_size remove_NoLock(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
+	
+	sl_size remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
 
 	// override
 	sl_size removeAll_NoLock();
 
 	// override
-	sl_bool containsKey_NoLock(const KT& key) const;
+	sl_bool contains_NoLock(const KT& key) const;
+	
+	sl_bool contains(const KT& key) const;
+	
+	sl_bool contains_NoLock(const KT& key, const VT& value) const;
+	
+	sl_bool contains(const KT& key, const VT& value) const;
 
 	// override
 	IMap<KT, VT>* duplicate_NoLock() const;
@@ -255,16 +277,32 @@ public:
 	List<VT> getValues_NoLock(const KT& key) const;
 	
 	// override
-	sl_bool put_NoLock(const KT& key, const VT& value, sl_bool flagReplace = sl_true);
+	sl_bool put_NoLock(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
+
+	sl_bool addIfNewKeyAndValue_NoLock(const KT& key, const VT& value, sl_bool* pFlagExist = sl_null);
+	
+	sl_bool addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist = sl_null);
 	
 	// override
-	sl_size remove_NoLock(const KT& key, sl_bool flagAllKeys = sl_false);
+	sl_size remove_NoLock(const KT& key, sl_bool flagRemoveAllMatches = sl_false);
+
+	sl_size remove(const KT& key, sl_bool flagRemoveAllMatches = sl_false);
+	
+	sl_size remove_NoLock(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
+	
+	sl_size remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
 	
 	// override
 	sl_size removeAll_NoLock();
 	
 	// override
-	sl_bool containsKey_NoLock(const KT& key) const;
+	sl_bool contains_NoLock(const KT& key) const;
+
+	sl_bool contains(const KT& key) const;
+	
+	sl_bool contains_NoLock(const KT& key, const VT& value) const;
+	
+	sl_bool contains(const KT& key, const VT& value) const;
 	
 	// override
 	IMap<KT, VT>* duplicate_NoLock() const;
@@ -359,49 +397,31 @@ public:
 	
 	List<VT> getValues(const KT& key) const;
 	
-	sl_bool put_NoLock(const KT& key, const VT& value, sl_bool flagReplace = sl_true);
+	sl_bool put_NoLock(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 	
-	sl_bool put(const KT& key, const VT& value, sl_bool flagReplace = sl_true);
+	sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 	
-	sl_bool put(const Map<KT, VT>& other, sl_bool flagReplace = sl_true);
-	
-	template <class _KT, class _VT>
-	sl_bool put(const Map<_KT, _VT>& other, sl_bool flagReplace = sl_true);
-	
-	sl_bool put(const SafeMap<KT, VT>& other, sl_bool flagReplace = sl_true);
+	void put(const Map<KT, VT>& other, MapPutMode mode = MapPutMode::Default);
 	
 	template <class _KT, class _VT>
-	sl_bool put(const SafeMap<_KT, _VT>& other, sl_bool flagReplace = sl_true);
+	void put(const Map<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
 	
-	sl_bool add_NoLock(const KT& key, const VT& value);
-	
-	sl_bool add(const KT& key, const VT& value);
-	
-	sl_bool add(const Map<KT, VT>& other);
+	void put(const SafeMap<KT, VT>& other, MapPutMode mode = MapPutMode::Default);
 	
 	template <class _KT, class _VT>
-	sl_bool add(const Map<_KT, _VT>& other);
+	void put(const SafeMap<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
 	
-	sl_bool add(const SafeMap<KT, VT>& other);
+	sl_size remove_NoLock(const KT& key, sl_bool flagRemoveAllMatches = sl_false) const;
 	
-	template <class _KT, class _VT>
-	sl_bool add(const SafeMap<_KT, _VT>& other);
-	
-	sl_size remove_NoLock(const KT& key, sl_bool flagAllKeys = sl_false) const;
-	
-	sl_size remove(const KT& key, sl_bool flagAllKeys = sl_false) const;
-	
-	sl_size removeAllMatchingKeys_NoLock(const KT& key) const;
-	
-	sl_size removeAllMatchingKeys(const KT& key) const;
+	sl_size remove(const KT& key, sl_bool flagRemoveAllMatches = sl_false) const;
 	
 	sl_size removeAll_NoLock() const;
 	
 	sl_size removeAll() const;
 	
-	sl_bool containsKey_NoLock(const KT& key) const;
+	sl_bool contains_NoLock(const KT& key) const;
 	
-	sl_bool containsKey(const KT& key) const;
+	sl_bool contains(const KT& key) const;
 	
 	Map<KT, VT> duplicate_NoLock() const;
 	
@@ -467,38 +487,24 @@ public:
 	
 	List<VT> getValues(const KT& key) const;
 	
-	sl_bool put(const KT& key, const VT& value, sl_bool flagReplace = sl_true);
+	sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 	
-	sl_bool put(const Map<KT, VT>& other, sl_bool flagReplace = sl_true);
-	
-	template <class _KT, class _VT>
-	sl_bool put(const Map<_KT, _VT>& other, sl_bool flagReplace = sl_true);
-	
-	sl_bool put(const SafeMap<KT, VT>& other, sl_bool flagReplace = sl_true);
+	void put(const Map<KT, VT>& other, MapPutMode mode = MapPutMode::Default);
 	
 	template <class _KT, class _VT>
-	sl_bool put(const SafeMap<_KT, _VT>& other, sl_bool flagReplace = sl_true);
+	void put(const Map<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
 	
-	sl_bool add(const KT& key, const VT& value);
-	
-	sl_bool add(const Map<KT, VT>& other);
+	void put(const SafeMap<KT, VT>& other, MapPutMode mode = MapPutMode::Default);
 	
 	template <class _KT, class _VT>
-	sl_bool add(const Map<_KT, _VT>& other);
+	void put(const SafeMap<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
 	
-	sl_bool add(const SafeMap<KT, VT>& other);
-	
-	template <class _KT, class _VT>
-	sl_bool add(const SafeMap<_KT, _VT>& other);
-	
-	sl_size remove(const KT& key, sl_bool flagAllKeys = sl_false) const;
-	
-	sl_size removeAllMatchingKeys(const KT& key) const;
+	sl_size remove(const KT& key, sl_bool flagRemoveAllMatches = sl_false) const;
 	
 	sl_size removeAll() const;
 	
-	sl_bool containsKey(const KT& key) const;
-	
+	sl_bool contains(const KT& key) const;
+
 	Map<KT, VT> duplicate() const;
 	
 	List<KT> keys() const;
@@ -838,97 +844,52 @@ List<VT> IMap<KT, VT>::getValues(const KT& key) const
 }
 
 template <class KT, class VT>
-sl_bool IMap<KT, VT>::put(const KT& key, const VT& value, sl_bool flagReplace)
+sl_bool IMap<KT, VT>::put(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
 {
 	ObjectLocker lock(this);
-	return put_NoLock(key, value, flagReplace);
+	return put_NoLock(key, value, mode, pFlagExist);
 }
 
 template <class KT, class VT>
-sl_bool IMap<KT, VT>::put(IMap<KT, VT>* other, sl_bool flagReplace)
+void IMap<KT, VT>::put(IMap<KT, VT>* other, MapPutMode mode)
 {
 	if (!other) {
-		return sl_true;
+		return;
 	}
 	if (this == other) {
-		return sl_false;
+		return;
 	}
 	ObjectLocker lock(this, other);
 	Iterator< Pair<KT, VT> > iterator(other->iterator());
 	Pair<KT, VT> v;
 	while (iterator.next(&v)) {
-		if (!(put_NoLock(v.key, v.value, flagReplace))) {
-			return sl_false;
-		}
+		put_NoLock(v.key, v.value, mode);
 	}
-	return sl_true;
 }
 
 template <class KT, class VT>
 template <class _KT, class _VT>
-sl_bool IMap<KT, VT>::put(IMap<_KT, _VT>* other, sl_bool flagReplace)
+void IMap<KT, VT>::put(IMap<_KT, _VT>* other, MapPutMode mode)
 {
 	if (!other) {
-		return sl_true;
+		return;
 	}
 	if (this == other) {
-		return sl_false;
+		return;
 	}
 	ObjectLocker lock(this, other);
 	Iterator< Pair<_KT,_VT> > iterator(other->iterator());
 	Pair<_KT, _VT> v;
 	while (iterator.next(&v)) {
-		if (!(put_NoLock(v.key, v.value, flagReplace))) {
-			return sl_false;
-		}
+		put_NoLock(v.key, v.value, mode);
 	}
-	return sl_true;
 }
 
 template <class KT, class VT>
-sl_bool IMap<KT, VT>::add_NoLock(const KT& key, const VT& value)
-{
-	return put_NoLock(key, value, sl_false);
-}
-
-template <class KT, class VT>
-sl_bool IMap<KT, VT>::add(const KT& key, const VT& value)
-{
-	return put(key, value, sl_false);
-}
-
-
-template <class KT, class VT>
-sl_bool IMap<KT, VT>::add(IMap<KT, VT>* other)
-{
-	return put(other, sl_false);
-}
-
-template <class KT, class VT>
-template <class _KT, class _VT>
-sl_bool IMap<KT, VT>::add(IMap<_KT, _VT>* other)
-{
-	return put(other, sl_false);
-}
-
-template <class KT, class VT>
-sl_size IMap<KT, VT>::remove(const KT& key, sl_bool flagAllKeys)
+sl_size IMap<KT, VT>::remove(const KT& key, sl_bool flagRemoveAllMatches)
 {
 	ObjectLocker lock(this);
-	return remove_NoLock(key, flagAllKeys);
-}
-
-
-template <class KT, class VT>
-sl_size IMap<KT, VT>::removeAllMatchingKeys_NoLock(const KT& key)
-{
-	return remove_NoLock(key, sl_true);
-}
-
-template <class KT, class VT>
-sl_size IMap<KT, VT>::removeAllMatchingKeys(const KT& key)
-{
-	return remove(key, sl_true);
+	return remove_NoLock(key, flagRemoveAllMatches);
 }
 
 template <class KT, class VT>
@@ -939,10 +900,10 @@ sl_size IMap<KT, VT>::removeAll()
 }
 
 template <class KT, class VT>
-sl_bool IMap<KT, VT>::containsKey(const KT& key) const
+sl_bool IMap<KT, VT>::contains(const KT& key) const
 {
 	ObjectLocker lock(this);
-	return containsKey_NoLock(key);
+	return contains_NoLock(key);
 }
 
 template <class KT, class VT>
@@ -993,16 +954,17 @@ List< Pair<KT, VT> > IMap<KT, VT>::pairs() const
 
 
 template <class KT, class VT, class COMPARE>
-SLIB_INLINE int ListMap<KT, VT, COMPARE>::PairCompare::compare(const Pair<KT, VT>& a, const Pair<KT, VT>& b)
+SLIB_INLINE sl_bool ListMap<KT, VT, COMPARE>::PairKeyCompare::equals(const Pair<KT, VT>& a, const KT& b)
 {
-	return COMPARE::compare(a.key, b.key);
+	return COMPARE::equals(a.key, b);
 }
 
 template <class KT, class VT, class COMPARE>
 SLIB_INLINE sl_bool ListMap<KT, VT, COMPARE>::PairCompare::equals(const Pair<KT, VT>& a, const Pair<KT, VT>& b)
 {
-	return COMPARE::equals(a.key, b.key);
+	return COMPARE::equals(a.key, b.key) && a.value == b.value;
 }
+
 
 template <class KT, class VT, class COMPARE>
 ListMap<KT, VT, COMPARE>* ListMap<KT, VT, COMPARE>::create()
@@ -1019,9 +981,7 @@ sl_size ListMap<KT, VT, COMPARE>::getCount() const
 template <class KT, class VT, class COMPARE>
 VT* ListMap<KT, VT, COMPARE>::getItemPtr(const KT& key) const
 {
-	Pair<KT, VT> pair;
-	pair.key = key;
-	sl_reg index = list.indexOf_NoLock(pair);
+	sl_reg index = list.template indexOfT_NoLock<KT, PairKeyCompare>(key);
 	if (index >= 0) {
 		Pair<KT, VT>* p = list.getData() + index;
 		return &(p->value);
@@ -1050,15 +1010,26 @@ List<VT> ListMap<KT, VT, COMPARE>::getValues_NoLock(const KT& key) const
 }
 
 template <class KT, class VT, class COMPARE>
-sl_bool ListMap<KT, VT, COMPARE>::put_NoLock(const KT& key, const VT& value, sl_bool flagReplace)
+sl_bool ListMap<KT, VT, COMPARE>::put_NoLock(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
 {
-	if (flagReplace) {
-		Pair<KT, VT> pair;
-		pair.key = key;
-		sl_reg index = list.indexOf_NoLock(pair);
+	if (pFlagExist) {
+		*pFlagExist = sl_false;
+	}
+	Pair<KT, VT>* items = list.getData();
+	if (mode != MapPutMode::AddAlways) {
+		sl_reg index = list.template indexOfT_NoLock<KT, PairKeyCompare>(key);
 		if (index >= 0) {
-			list.getData()[index].value = value;
+			if (pFlagExist) {
+				*pFlagExist = sl_true;
+			}
+			if (mode == MapPutMode::AddNew) {
+				return sl_false;
+			}
+			items[index].value = value;
 			return sl_true;
+		}
+		if (mode == MapPutMode::ReplaceExisting) {
+			return sl_false;
 		}
 	}
 	Pair<KT, VT> pair;
@@ -1071,11 +1042,61 @@ sl_bool ListMap<KT, VT, COMPARE>::put_NoLock(const KT& key, const VT& value, sl_
 }
 
 template <class KT, class VT, class COMPARE>
-sl_size ListMap<KT, VT, COMPARE>::remove_NoLock(const KT& key, sl_bool flagAllKeys)
+sl_bool ListMap<KT, VT, COMPARE>::addIfNewKeyAndValue_NoLock(const KT& key, const VT& value, sl_bool* pFlagExist)
+{
+	if (pFlagExist) {
+		*pFlagExist = sl_false;
+	}
+	Pair<KT, VT> pair;
+	pair.key = key;
+	pair.value = value;
+	sl_reg index = list.template indexOfT_NoLock<Pair<KT, VT>, PairCompare>(pair);
+	if (index >= 0) {
+		if (pFlagExist) {
+			*pFlagExist = sl_true;
+		}
+		return sl_false;
+	}
+	if (list.add_NoLock(pair)) {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+template <class KT, class VT, class COMPARE>
+sl_bool ListMap<KT, VT, COMPARE>::addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist)
+{
+	ObjectLocker lock(this);
+	return addIfNewKeyAndValue_NoLock(key, value, pFlagExist);
+}
+
+template <class KT, class VT, class COMPARE>
+sl_size ListMap<KT, VT, COMPARE>::remove_NoLock(const KT& key, sl_bool flagRemoveAllMatches)
+{
+	return list.template removeValueT_NoLock<KT, PairKeyCompare>(key, flagRemoveAllMatches);
+}
+
+template <class KT, class VT, class COMPARE>
+sl_size ListMap<KT, VT, COMPARE>::remove(const KT& key, sl_bool flagRemoveAllMatches)
+{
+	ObjectLocker lock(this);
+	return remove_NoLock(key, flagRemoveAllMatches);
+}
+
+template <class KT, class VT, class COMPARE>
+sl_size ListMap<KT, VT, COMPARE>::remove_NoLock(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
 {
 	Pair<KT, VT> pair;
 	pair.key = key;
-	return list.removeValue_NoLock(pair, flagAllKeys);
+	pair.value = value;
+	return list.template removeValueT_NoLock<Pair<KT, VT>, PairCompare>(pair, flagRemoveAllMatches);
+}
+
+template <class KT, class VT, class COMPARE>
+sl_size ListMap<KT, VT, COMPARE>::remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
+{
+	ObjectLocker lock(this);
+	return remove_NoLock(key, value, flagRemoveAllMatches);
 }
 
 template <class KT, class VT, class COMPARE>
@@ -1085,11 +1106,32 @@ sl_size ListMap<KT, VT, COMPARE>::removeAll_NoLock()
 }
 
 template <class KT, class VT, class COMPARE>
-sl_bool ListMap<KT, VT, COMPARE>::containsKey_NoLock(const KT& key) const
+sl_bool ListMap<KT, VT, COMPARE>::contains_NoLock(const KT& key) const
+{
+	return list.template indexOfT_NoLock<KT, PairKeyCompare>(key) >= 0;
+}
+
+template <class KT, class VT, class COMPARE>
+sl_bool ListMap<KT, VT, COMPARE>::contains(const KT& key) const
+{
+	ObjectLocker lock(this);
+	return list.template indexOfT_NoLock<KT, PairKeyCompare>(key) >= 0;
+}
+
+template <class KT, class VT, class COMPARE>
+sl_bool ListMap<KT, VT, COMPARE>::contains_NoLock(const KT& key, const VT& value) const
 {
 	Pair<KT, VT> pair;
 	pair.key = key;
-	return (list.indexOf_NoLock(pair) >= 0);
+	pair.value = value;
+	return list.template indexOfT_NoLock<Pair<KT, VT>, PairCompare>(pair) >= 0;
+}
+
+template <class KT, class VT, class COMPARE>
+sl_bool ListMap<KT, VT, COMPARE>::contains(const KT& key, const VT& value) const
+{
+	ObjectLocker lock(this);
+	return contains_NoLock(key, value);
 }
 
 template <class KT, class VT, class COMPARE>
@@ -1205,15 +1247,48 @@ List<VT> HashMap<KT, VT, HASH>::getValues_NoLock(const KT& key) const
 }
 
 template <class KT, class VT, class HASH>
-sl_bool HashMap<KT, VT, HASH>::put_NoLock(const KT& key, const VT& value, sl_bool flagReplace)
+sl_bool HashMap<KT, VT, HASH>::put_NoLock(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
 {
-	return table.put(key, value, flagReplace);
+	return table.put(key, value, mode, pFlagExist);
 }
 
 template <class KT, class VT, class HASH>
-sl_size HashMap<KT, VT, HASH>::remove_NoLock(const KT& key, sl_bool flagAllKeys)
+sl_bool HashMap<KT, VT, HASH>::addIfNewKeyAndValue_NoLock(const KT& key, const VT& value, sl_bool* pFlagExist)
 {
-	return table.remove(key, flagAllKeys);
+	return table.addIfNewKeyAndValue(key, value, pFlagExist);
+}
+
+template <class KT, class VT, class HASH>
+sl_bool HashMap<KT, VT, HASH>::addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist)
+{
+	ObjectLocker lock(this);
+	return table.addIfNewKeyAndValue(key, value, pFlagExist);
+}
+
+template <class KT, class VT, class HASH>
+sl_size HashMap<KT, VT, HASH>::remove_NoLock(const KT& key, sl_bool flagRemoveAllMatches)
+{
+	return table.remove(key, flagRemoveAllMatches);
+}
+
+template <class KT, class VT, class HASH>
+sl_size HashMap<KT, VT, HASH>::remove(const KT& key, sl_bool flagRemoveAllMatches)
+{
+	ObjectLocker lock(this);
+	return table.remove(key, flagRemoveAllMatches);
+}
+
+template <class KT, class VT, class HASH>
+sl_size HashMap<KT, VT, HASH>::remove_NoLock(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
+{
+	return table.remove(key, value, flagRemoveAllMatches);
+}
+
+template <class KT, class VT, class HASH>
+sl_size HashMap<KT, VT, HASH>::remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
+{
+	ObjectLocker lock(this);
+	return table.remove(key, value, flagRemoveAllMatches);
 }
 
 template <class KT, class VT, class HASH>
@@ -1223,9 +1298,29 @@ sl_size HashMap<KT, VT, HASH>::removeAll_NoLock()
 }
 
 template <class KT, class VT, class HASH>
-sl_bool HashMap<KT, VT, HASH>::containsKey_NoLock(const KT& key) const
+sl_bool HashMap<KT, VT, HASH>::contains_NoLock(const KT& key) const
 {
 	return table.search(key);
+}
+
+template <class KT, class VT, class HASH>
+sl_bool HashMap<KT, VT, HASH>::contains(const KT& key) const
+{
+	ObjectLocker lock(this);
+	return table.search(key);
+}
+
+template <class KT, class VT, class HASH>
+sl_bool HashMap<KT, VT, HASH>::contains_NoLock(const KT& key, const VT& value) const
+{
+	return table.search(key, value);
+}
+
+template <class KT, class VT, class HASH>
+sl_bool HashMap<KT, VT, HASH>::contains(const KT& key, const VT& value) const
+{
+	ObjectLocker lock(this);
+	return table.search(key, value);
 }
 
 template <class KT, class VT, class HASH>
@@ -1346,15 +1441,48 @@ List<VT> TreeMap<KT, VT, COMPARE>::getValues_NoLock(const KT& key) const
 }
 
 template <class KT, class VT, class COMPARE>
-sl_bool TreeMap<KT, VT, COMPARE>::put_NoLock(const KT& key, const VT& value, sl_bool flagReplace)
+sl_bool TreeMap<KT, VT, COMPARE>::put_NoLock(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
 {
-	return tree.insert(key, value, flagReplace);
+	return tree.put(key, value, mode, pFlagExist);
 }
 
 template <class KT, class VT, class COMPARE>
-sl_size TreeMap<KT, VT, COMPARE>::remove_NoLock(const KT& key, sl_bool flagAllKeys)
+sl_bool TreeMap<KT, VT, COMPARE>::addIfNewKeyAndValue_NoLock(const KT& key, const VT& value, sl_bool* pFlagExist)
 {
-	return tree.remove(key, flagAllKeys);
+	return tree.addIfNewKeyAndValue(key, value, pFlagExist);
+}
+
+template <class KT, class VT, class COMPARE>
+sl_bool TreeMap<KT, VT, COMPARE>::addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist)
+{
+	ObjectLocker lock(this);
+	return tree.addIfNewKeyAndValue(key, value, pFlagExist);
+}
+
+template <class KT, class VT, class COMPARE>
+sl_size TreeMap<KT, VT, COMPARE>::remove_NoLock(const KT& key, sl_bool flagRemoveAllMatches)
+{
+	return tree.remove(key, flagRemoveAllMatches);
+}
+
+template <class KT, class VT, class COMPARE>
+sl_size TreeMap<KT, VT, COMPARE>::remove(const KT& key, sl_bool flagRemoveAllMatches)
+{
+	ObjectLocker lock(this);
+	return tree.remove(key, flagRemoveAllMatches);
+}
+
+template <class KT, class VT, class COMPARE>
+sl_size TreeMap<KT, VT, COMPARE>::remove_NoLock(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
+{
+	return tree.remove(key, value, flagRemoveAllMatches);
+}
+
+template <class KT, class VT, class COMPARE>
+sl_size TreeMap<KT, VT, COMPARE>::remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
+{
+	ObjectLocker lock(this);
+	return tree.remove(key, value, flagRemoveAllMatches);
 }
 
 template <class KT, class VT, class COMPARE>
@@ -1364,9 +1492,29 @@ sl_size TreeMap<KT, VT, COMPARE>::removeAll_NoLock()
 }
 
 template <class KT, class VT, class COMPARE>
-sl_bool TreeMap<KT, VT, COMPARE>::containsKey_NoLock(const KT& key) const
+sl_bool TreeMap<KT, VT, COMPARE>::contains_NoLock(const KT& key) const
 {
 	return tree.search(key, sl_null);
+}
+
+template <class KT, class VT, class COMPARE>
+sl_bool TreeMap<KT, VT, COMPARE>::contains(const KT& key) const
+{
+	ObjectLocker lock(this);
+	return tree.search(key, sl_null);
+}
+
+template <class KT, class VT, class COMPARE>
+sl_bool TreeMap<KT, VT, COMPARE>::contains_NoLock(const KT& key, const VT& value) const
+{
+	return tree.search(key, value, sl_null);
+}
+
+template <class KT, class VT, class COMPARE>
+sl_bool TreeMap<KT, VT, COMPARE>::contains(const KT& key, const VT& value) const
+{
+	ObjectLocker lock(this);
+	return tree.search(key, value, sl_null);
 }
 
 template <class KT, class VT, class COMPARE>
@@ -1378,7 +1526,7 @@ IMap<KT, VT>* TreeMap<KT, VT, COMPARE>::duplicate_NoLock() const
 		KT key;
 		VT value;
 		while (tree.getNextPosition(pos, &key, &value)) {
-			if (!(ret->tree.insert(key, value, sl_false))) {
+			if (!(ret->tree.put(key, value, MapPutMode::AddAlways))) {
 				delete ret;
 				return sl_null;
 			}
@@ -1663,151 +1811,107 @@ List<VT> Map<KT, VT>::getValues(const KT& key) const
 }
 
 template <class KT, class VT>
-sl_bool Map<KT, VT>::put_NoLock(const KT& key, const VT& value, sl_bool flagReplace)
+sl_bool Map<KT, VT>::put_NoLock(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
 {
 	IMap<KT, VT>* obj = ref.ptr;
 	if (obj) {
-		return obj->put_NoLock(key, value, flagReplace);
+		return obj->put_NoLock(key, value, mode, pFlagExist);
 	} else {
-		obj = IMap<KT, VT>::createDefault();
-		if (obj) {
-			ref = obj;
-			return obj->put_NoLock(key, value, flagReplace);
+		if (mode != MapPutMode::ReplaceExisting) {
+			obj = IMap<KT, VT>::createDefault();
+			if (obj) {
+				ref = obj;
+				return obj->put_NoLock(key, value, mode, pFlagExist);
+			}
 		}
 	}
 	return sl_false;
 }
 
 template <class KT, class VT>
-sl_bool Map<KT, VT>::put(const KT& key, const VT& value, sl_bool flagReplace)
+sl_bool Map<KT, VT>::put(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
 {
 	IMap<KT, VT>* obj = ref.ptr;
 	if (obj) {
-		return obj->put(key, value, flagReplace);
+		return obj->put(key, value, mode, pFlagExist);
 	} else {
-		obj = IMap<KT, VT>::createDefault();
-		if (obj) {
-			ref = obj;
-			return obj->put_NoLock(key, value, flagReplace);
+		if (mode != MapPutMode::ReplaceExisting) {
+			obj = IMap<KT, VT>::createDefault();
+			if (obj) {
+				ref = obj;
+				return obj->put_NoLock(key, value, mode, pFlagExist);
+			}
 		}
 	}
 	return sl_false;
 }
 
 template <class KT, class VT>
-sl_bool Map<KT, VT>::put(const Map<KT, VT>& other, sl_bool flagReplace)
+void Map<KT, VT>::put(const Map<KT, VT>& other, MapPutMode mode)
 {
 	IMap<KT, VT>* obj = ref.ptr;
 	if (obj) {
-		return obj->put(other.ref.ptr, flagReplace);
+		obj->put(other.ref.ptr, mode);
 	} else {
-		obj = IMap<KT, VT>::createDefault();
-		if (obj) {
-			ref = obj;
-			return obj->put(other.ref.ptr, flagReplace);
+		if (mode != MapPutMode::ReplaceExisting) {
+			obj = IMap<KT, VT>::createDefault();
+			if (obj) {
+				ref = obj;
+				obj->put(other.ref.ptr, mode);
+			}
 		}
 	}
-	return sl_false;
 }
 
 template <class KT, class VT>
 template <class _KT, class _VT>
-sl_bool Map<KT, VT>::put(const Map<_KT, _VT>& other, sl_bool flagReplace)
+void Map<KT, VT>::put(const Map<_KT, _VT>& other, MapPutMode mode)
 {
 	IMap<KT, VT>* obj = ref.ptr;
 	if (obj) {
-		return obj->put(other.ref.ptr, flagReplace);
+		obj->put(other.ref.ptr, mode);
 	} else {
-		obj = IMap<KT, VT>::createDefault();
-		if (obj) {
-			ref = obj;
-			return obj->put(other.ref.ptr, flagReplace);
+		if (mode != MapPutMode::ReplaceExisting) {
+			obj = IMap<KT, VT>::createDefault();
+			if (obj) {
+				ref = obj;
+				obj->put(other.ref.ptr, mode);
+			}
 		}
 	}
-	return sl_false;
 }
 
 template <class KT, class VT>
-sl_bool Map<KT, VT>::put(const SafeMap<KT, VT>& other, sl_bool flagReplace)
+void Map<KT, VT>::put(const SafeMap<KT, VT>& other, MapPutMode mode)
 {
-	return put(Map<KT, VT>(other), flagReplace);
+	put(Map<KT, VT>(other), mode);
 }
 
 template <class KT, class VT>
 template <class _KT, class _VT>
-sl_bool Map<KT, VT>::put(const SafeMap<_KT, _VT>& other, sl_bool flagReplace)
+void Map<KT, VT>::put(const SafeMap<_KT, _VT>& other, MapPutMode mode)
 {
-	return put(Map<_KT, _VT>(other), flagReplace);
+	put(Map<_KT, _VT>(other), mode);
 }
 
 template <class KT, class VT>
-sl_bool Map<KT, VT>::add_NoLock(const KT& key, const VT& value)
-{
-	return put_NoLock(key, value, sl_false);
-}
-
-template <class KT, class VT>
-sl_bool Map<KT, VT>::add(const KT& key, const VT& value)
-{
-	return put(key, value, sl_false);
-}
-
-template <class KT, class VT>
-sl_bool Map<KT, VT>::add(const Map<KT, VT>& other)
-{
-	return put(other, sl_false);
-}
-
-template <class KT, class VT>
-template <class _KT, class _VT>
-sl_bool Map<KT, VT>::add(const Map<_KT, _VT>& other)
-{
-	return put(other, sl_false);
-}
-
-template <class KT, class VT>
-sl_bool Map<KT, VT>::add(const SafeMap<KT, VT>& other)
-{
-	return put(Map<KT, VT>(other), sl_false);
-}
-
-template <class KT, class VT>
-template <class _KT, class _VT>
-sl_bool Map<KT, VT>::add(const SafeMap<_KT, _VT>& other)
-{
-	return put(Map<_KT, _VT>(other), sl_false);
-}
-
-template <class KT, class VT>
-sl_size Map<KT, VT>::remove_NoLock(const KT& key, sl_bool flagAllKeys) const
+sl_size Map<KT, VT>::remove_NoLock(const KT& key, sl_bool flagRemoveAllMatches) const
 {
 	IMap<KT, VT>* obj = ref.ptr;
 	if (obj) {
-		return obj->remove_NoLock(key, flagAllKeys);
+		return obj->remove_NoLock(key, flagRemoveAllMatches);
 	}
 	return 0;
 }
 
 template <class KT, class VT>
-sl_size Map<KT, VT>::remove(const KT& key, sl_bool flagAllKeys) const
+sl_size Map<KT, VT>::remove(const KT& key, sl_bool flagRemoveAllMatches) const
 {
 	IMap<KT, VT>* obj = ref.ptr;
 	if (obj) {
-		return obj->remove(key, flagAllKeys);
+		return obj->remove(key, flagRemoveAllMatches);
 	}
 	return 0;
-}
-
-template <class KT, class VT>
-sl_size Map<KT, VT>::removeAllMatchingKeys_NoLock(const KT& key) const
-{
-	return remove_NoLock(key, sl_true);
-}
-
-template <class KT, class VT>
-sl_size Map<KT, VT>::removeAllMatchingKeys(const KT& key) const
-{
-	return remove(key, sl_true);
 }
 
 template <class KT, class VT>
@@ -1831,21 +1935,21 @@ sl_size Map<KT, VT>::removeAll() const
 }
 
 template <class KT, class VT>
-sl_bool Map<KT, VT>::containsKey_NoLock(const KT& key) const
+sl_bool Map<KT, VT>::contains_NoLock(const KT& key) const
 {
 	IMap<KT, VT>* obj = ref.ptr;
 	if (obj) {
-		return obj->containsKey_NoLock(key);
+		return obj->contains_NoLock(key);
 	}
 	return sl_false;
 }
 
 template <class KT, class VT>
-sl_bool Map<KT, VT>::containsKey(const KT& key) const
+sl_bool Map<KT, VT>::contains(const KT& key) const
 {
 	IMap<KT, VT>* obj = ref.ptr;
 	if (obj) {
-		return obj->containsKey(key);
+		return obj->contains(key);
 	}
 	return sl_false;
 }
@@ -2073,134 +2177,100 @@ List<VT> SafeMap<KT, VT>::getValues(const KT& key) const
 }
 
 template <class KT, class VT>
-sl_bool SafeMap<KT, VT>::put(const KT& key, const VT& value, sl_bool flagReplace)
+sl_bool SafeMap<KT, VT>::put(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->put(key, value, flagReplace);
+		return obj->put(key, value, mode, pFlagExist);
 	} else {
-		SpinLocker lock(SpinLockPoolForMap::get(this));
-		obj = ref;
-		if (obj.isNotNull()) {
-			lock.unlock();
-			return obj->put(key, value, flagReplace);
-		}
-		obj = IMap<KT, VT>::createDefault();
-		if (obj.isNotNull()) {
-			ref = obj;
-			lock.unlock();
-			return obj->put(key, value, flagReplace);
+		if (mode != MapPutMode::ReplaceExisting) {
+			SpinLocker lock(SpinLockPoolForMap::get(this));
+			obj = ref;
+			if (obj.isNotNull()) {
+				lock.unlock();
+				return obj->put(key, value, mode, pFlagExist);
+			}
+			obj = IMap<KT, VT>::createDefault();
+			if (obj.isNotNull()) {
+				ref = obj;
+				lock.unlock();
+				return obj->put(key, value, mode, pFlagExist);
+			}
 		}
 	}
 	return sl_false;
 }
 
 template <class KT, class VT>
-sl_bool SafeMap<KT, VT>::put(const Map<KT, VT>& other, sl_bool flagReplace)
+void SafeMap<KT, VT>::put(const Map<KT, VT>& other, MapPutMode mode)
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->put(other.ref.ptr, flagReplace);
+		obj->put(other.ref.ptr, mode);
 	} else {
-		SpinLocker lock(SpinLockPoolForMap::get(this));
-		obj = ref;
-		if (obj.isNotNull()) {
-			lock.unlock();
-			return obj->put(other.ref.ptr, flagReplace);
-		}
-		obj = IMap<KT, VT>::createDefault();
-		if (obj.isNotNull()) {
-			ref = obj;
-			lock.unlock();
-			return obj->put(other.ref.ptr, flagReplace);
+		if (mode != MapPutMode::ReplaceExisting) {
+			SpinLocker lock(SpinLockPoolForMap::get(this));
+			obj = ref;
+			if (obj.isNotNull()) {
+				lock.unlock();
+				obj->put(other.ref.ptr, mode);
+			}
+			obj = IMap<KT, VT>::createDefault();
+			if (obj.isNotNull()) {
+				ref = obj;
+				lock.unlock();
+				obj->put(other.ref.ptr, mode);
+			}
 		}
 	}
-	return sl_false;
 }
 
 template <class KT, class VT>
 template <class _KT, class _VT>
-sl_bool SafeMap<KT, VT>::put(const Map<_KT, _VT>& other, sl_bool flagReplace)
+void SafeMap<KT, VT>::put(const Map<_KT, _VT>& other, MapPutMode mode)
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->put(other.ref.ptr, flagReplace);
+		obj->put(other.ref.ptr, mode);
 	} else {
-		SpinLocker lock(SpinLockPoolForMap::get(this));
-		obj = ref;
-		if (obj.isNotNull()) {
-			lock.unlock();
-			return obj->put(other.ref.ptr, flagReplace);
-		}
-		obj = IMap<KT, VT>::createDefault();
-		if (obj.isNotNull()) {
-			ref = obj;
-			lock.unlock();
-			return obj->put(other.ref.ptr, flagReplace);
+		if (mode != MapPutMode::ReplaceExisting) {
+			SpinLocker lock(SpinLockPoolForMap::get(this));
+			obj = ref;
+			if (obj.isNotNull()) {
+				lock.unlock();
+				obj->put(other.ref.ptr, mode);
+			}
+			obj = IMap<KT, VT>::createDefault();
+			if (obj.isNotNull()) {
+				ref = obj;
+				lock.unlock();
+				obj->put(other.ref.ptr, mode);
+			}
 		}
 	}
-	return sl_false;
 }
 
 template <class KT, class VT>
-sl_bool SafeMap<KT, VT>::put(const SafeMap<KT, VT>& other, sl_bool flagReplace)
+void SafeMap<KT, VT>::put(const SafeMap<KT, VT>& other, MapPutMode mode)
 {
-	return put(Map<KT, VT>(other), flagReplace);
+	put(Map<KT, VT>(other), mode);
 }
 
 template <class KT, class VT>
 template <class _KT, class _VT>
-sl_bool SafeMap<KT, VT>::put(const SafeMap<_KT, _VT>& other, sl_bool flagReplace)
+void SafeMap<KT, VT>::put(const SafeMap<_KT, _VT>& other, MapPutMode mode)
 {
-	return put(Map<_KT, _VT>(other), flagReplace);
+	put(Map<_KT, _VT>(other), mode);
 }
 
 template <class KT, class VT>
-sl_bool SafeMap<KT, VT>::add(const KT& key, const VT& value)
-{
-	return put(key, value, sl_false);
-}
-
-template <class KT, class VT>
-sl_bool SafeMap<KT, VT>::add(const Map<KT, VT>& other)
-{
-	return put(other, sl_false);
-}
-
-template <class KT, class VT>
-template <class _KT, class _VT>
-sl_bool SafeMap<KT, VT>::add(const Map<_KT, _VT>& other)
-{
-	return put(other, sl_false);
-}
-
-template <class KT, class VT>
-sl_bool SafeMap<KT, VT>::add(const SafeMap<KT, VT>& other)
-{
-	return put(Map<KT, VT>(other), sl_false);
-}
-
-template <class KT, class VT>
-template <class _KT, class _VT>
-sl_bool SafeMap<KT, VT>::add(const SafeMap<_KT, _VT>& other)
-{
-	return put(Map<_KT, _VT>(other), sl_false);
-}
-
-template <class KT, class VT>
-sl_size SafeMap<KT, VT>::remove(const KT& key, sl_bool flagAllKeys) const
+sl_size SafeMap<KT, VT>::remove(const KT& key, sl_bool flagRemoveAllMatches) const
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->remove(key, flagAllKeys);
+		return obj->remove(key, flagRemoveAllMatches);
 	}
 	return 0;
-}
-
-template <class KT, class VT>
-sl_size SafeMap<KT, VT>::removeAllMatchingKeys(const KT& key) const
-{
-	return remove(key, sl_true);
 }
 
 template <class KT, class VT>
@@ -2214,11 +2284,11 @@ sl_size SafeMap<KT, VT>::removeAll() const
 }
 
 template <class KT, class VT>
-sl_bool SafeMap<KT, VT>::containsKey(const KT& key) const
+sl_bool SafeMap<KT, VT>::contains(const KT& key) const
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->containsKey(key);
+		return obj->contains(key);
 	}
 	return sl_false;
 }

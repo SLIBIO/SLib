@@ -458,7 +458,7 @@ Memory IReader::readToMemory(sl_size size)
 	return mem;
 }
 
-sl_bool IReader::readSection(void* mem, sl_size& size)
+sl_bool IReader::readSectionData(void* mem, sl_size& size)
 {
 	sl_size sizeBuf = size;
 	if (readSizeCVLI(&size)) {
@@ -473,11 +473,11 @@ sl_bool IReader::readSection(void* mem, sl_size& size)
 	return sl_false;
 }
 
-sl_bool IReader::readSection(Memory* mem, sl_reg maxSize)
+sl_bool IReader::readSection(Memory* mem, sl_size maxSize)
 {
 	sl_size size;
 	if (readSizeCVLI(&size)) {
-		if (maxSize >= 0 && size > (sl_size)maxSize) {
+		if (size > maxSize) {
 			return sl_false;
 		}
 		if (size == 0) {
@@ -495,27 +495,25 @@ sl_bool IReader::readSection(Memory* mem, sl_reg maxSize)
 	return sl_false;
 }
 
-Memory IReader::readSection(const Memory& def)
-{
-	Memory ret;
-	if (readSection(&ret)) {
-		return ret;
-	} else {
-		return def;
-	}
-}
-
-Memory IReader::readSection(sl_reg maxSize)
+Memory IReader::readSection(const Memory& def, sl_size maxSize)
 {
 	Memory ret;
 	if (readSection(&ret, maxSize)) {
 		return ret;
-	} else {
-		return Memory::null();
 	}
+	return def;
 }
 
-sl_bool IReader::readString(String* str, sl_int32 maxLen)
+Memory IReader::readSection(sl_size maxSize)
+{
+	Memory ret;
+	if (readSection(&ret, maxSize)) {
+		return ret;
+	}
+	return Memory::null();
+}
+
+sl_bool IReader::readString(String* str, sl_size maxLen)
 {
 	Memory mem;
 	if (readSection(&mem, maxLen)) {
@@ -524,10 +522,7 @@ sl_bool IReader::readString(String* str, sl_int32 maxLen)
 			return sl_true;
 		}
 		sl_size len = mem.getSize();
-		if (len >= SLIB_STR_MAX_LEN) {
-			return sl_false;
-		}
-		String ret((char*)(mem.getData()), (sl_uint32)len);
+		String ret((char*)(mem.getData()), len);
 		if (ret.isNotNull()) {
 			*str = ret;
 			return sl_true;
@@ -536,17 +531,7 @@ sl_bool IReader::readString(String* str, sl_int32 maxLen)
 	return sl_false;
 }
 
-String IReader::readString(const String& def)
-{
-	String ret;
-	if (readString(&ret)) {
-		return ret;
-	} else {
-		return def;
-	}
-}
-
-String IReader::readString(sl_int32 maxLen, const String& def)
+String IReader::readString(const String& def, sl_size maxLen)
 {
 	String ret;
 	if (readString(&ret, maxLen)) {
@@ -556,7 +541,7 @@ String IReader::readString(sl_int32 maxLen, const String& def)
 	}
 }
 
-String IReader::readString(sl_int32 maxLen)
+String IReader::readString(sl_size maxLen)
 {
 	String ret;
 	if (readString(&ret, maxLen)) {
@@ -566,7 +551,7 @@ String IReader::readString(sl_int32 maxLen)
 	}
 }
 
-sl_bool IReader::readBigInt(BigInt* v, sl_int32 maxLen)
+sl_bool IReader::readBigInt(BigInt* v, sl_size maxLen)
 {
 	Memory mem;
 	if (readSection(&mem, maxLen)) {
@@ -575,10 +560,7 @@ sl_bool IReader::readBigInt(BigInt* v, sl_int32 maxLen)
 			return sl_true;
 		}
 		sl_size len = mem.getSize();
-		if (len >= SLIB_STR_MAX_LEN) {
-			return sl_false;
-		}
-		BigInt ret = BigInt::fromBytesLE(mem.getData(), (sl_uint32)len);
+		BigInt ret = BigInt::fromBytesLE(mem.getData(), len);
 		if (ret.isNotNull()) {
 			*v = ret;
 			return sl_true;
@@ -587,17 +569,7 @@ sl_bool IReader::readBigInt(BigInt* v, sl_int32 maxLen)
 	return sl_false;
 }
 
-BigInt IReader::readBigInt(const BigInt& def)
-{
-	BigInt ret;
-	if (readBigInt(&ret)) {
-		return ret;
-	} else {
-		return def;
-	}
-}
-
-BigInt IReader::readBigInt(sl_int32 maxLen, const BigInt& def)
+BigInt IReader::readBigInt(const BigInt& def, sl_size maxLen)
 {
 	BigInt ret;
 	if (readBigInt(&ret, maxLen)) {
@@ -607,7 +579,7 @@ BigInt IReader::readBigInt(sl_int32 maxLen, const BigInt& def)
 	}
 }
 
-BigInt IReader::readBigInt(sl_int32 maxLen)
+BigInt IReader::readBigInt(sl_size maxLen)
 {
 	BigInt ret;
 	if (readBigInt(&ret, maxLen)) {
@@ -869,16 +841,16 @@ sl_bool IWriter::writeSection(const Memory& mem)
 	return writeSection(mem.getData(), mem.getSize());
 }
 
-sl_bool IWriter::writeString(const String& str, sl_int32 maxLen)
+sl_bool IWriter::writeString(const String& str, sl_size maxLen)
 {
 	return writeSection(str.getData(), str.getLength());
 }
 
-sl_bool IWriter::writeBigInt(const BigInt& v, sl_int32 maxLen)
+sl_bool IWriter::writeBigInt(const BigInt& v, sl_size maxLen)
 {
-	sl_uint32 n = v.getMostSignificantBytes();
-	if (maxLen >= 0 && n > (sl_uint32)maxLen) {
-		n = (sl_uint32)maxLen;
+	sl_size n = v.getMostSignificantBytes();
+	if (n > maxLen) {
+		n = maxLen;
 	}
 	SLIB_SCOPED_BUFFER(char, 1024, buf, n);
 	v.getBytesLE(buf, n);

@@ -111,7 +111,7 @@ public:
 			if (code == LVN_GETDISPINFOW) {
 				NMLVDISPINFOW* disp = (NMLVDISPINFOW*)nmhdr;
 				String16 s = view->onGetCellText(disp->item.iItem, disp->item.iSubItem);
-				sl_uint32 n = s.getLength();
+				sl_uint32 n = (sl_uint32)(s.getLength());
 				if (n > 0) {
 					sl_uint32 m = (sl_uint32)(disp->item.cchTextMax);
 					if (m > 0) {

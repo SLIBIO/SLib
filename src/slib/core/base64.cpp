@@ -5,21 +5,21 @@ SLIB_NAMESPACE_BEGIN
 
 #define BASE64_CHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
-String Base64::encode(const void* buf, sl_uint32 size)
+String Base64::encode(const void* buf, sl_size size)
 {
 	if (size == 0) {
 		return String::null();
 	}
 	const sl_uint8* input = (const sl_uint8*)buf;
-	sl_uint32 last = size % 3;
-	sl_uint32 countBlock = (size / 3) + (last ? 1 : 0);
+	sl_uint32 last = (sl_uint32)(size % 3);
+	sl_size countBlock = (size / 3) + (last ? 1 : 0);
 	String8 ret = String8::allocate(countBlock * 4);
 	if (ret.isEmpty()) {
 		return ret;
 	}
 	sl_char8* output = ret.getData();
 	sl_uint32 n = 0;
-	for (sl_uint32 iBlock = 0; iBlock < countBlock; iBlock++) {
+	for (sl_size iBlock = 0; iBlock < countBlock; iBlock++) {
 		sl_uint8 n0 = input[0];
 		sl_uint8 n1 = (n + 1 < size) ? input[1] : 0;
 		sl_uint8 n2 = (n + 2 < size) ? input[2] : 0;
@@ -38,6 +38,11 @@ String Base64::encode(const void* buf, sl_uint32 size)
 		*(output - 1) = '=';
 	}
 	return ret;
+}
+
+String Base64::encode(const Memory &mem)
+{
+	return encode(mem.getData(), mem.getSize());
 }
 
 SLIB_INLINE sl_uint32 _Base64_index(sl_char8 c)
@@ -60,10 +65,10 @@ SLIB_INLINE sl_uint32 _Base64_index(sl_char8 c)
 	return 64;
 }
 
-sl_uint32 Base64::decode(const String& str, void* buf, sl_uint32 size)
+sl_size Base64::decode(const String& str, void* buf, sl_size size)
 {
 	sl_uint8* output = (sl_uint8*)buf;
-	sl_uint32 len = str.getLength();
+	sl_size len = str.getLength();
 	const sl_char8* input = str.getData();
 	// trim right (CR, LF)
 	while (len > 0) {
@@ -78,8 +83,8 @@ sl_uint32 Base64::decode(const String& str, void* buf, sl_uint32 size)
 		return 0;
 	}
 	sl_uint32 data[4];
-	sl_uint32 indexInput = 0;
-	sl_uint32 indexBlock = 0;
+	sl_size indexInput = 0;
+	sl_size indexBlock = 0;
 	sl_uint32 posInBlock = 0;
 	sl_uint32 countPadding = 0;
 	if (input[len - 1] == '=') {
@@ -104,7 +109,7 @@ sl_uint32 Base64::decode(const String& str, void* buf, sl_uint32 size)
 		data[posInBlock++] = sig;
 		if (posInBlock >= 4) {
 			posInBlock = 0;
-			sl_uint32 p = indexBlock * 3;
+			sl_size p = indexBlock * 3;
 			output[p] = (sl_uint8)((data[0] << 2) + ((data[1] & 0x30) >> 4));
 			output[p + 1] = (sl_uint8)(((data[1] & 0xf) << 4) + ((data[2] & 0x3c) >> 2));
 			output[p + 2] = (sl_uint8)(((data[2] & 0x3) << 6) + data[3]);
@@ -120,22 +125,20 @@ sl_uint32 Base64::decode(const String& str, void* buf, sl_uint32 size)
 
 Memory Base64::decode(const String& base64)
 {
-	sl_uint32 len = base64.getLength();
+	sl_size len = base64.getLength();
 	if (len < 4) {
 		return Memory::null();
 	}
-	sl_uint32 size = len / 4 * 3;
-	sl_uint8* buf = (sl_uint8*)(Base::createMemory(size));
-	if (!buf) {
+	sl_size size = len / 4 * 3;
+	Memory mem = Memory::create(size);
+	if (mem.isEmpty()) {
 		return Memory::null();
 	}
-	sl_uint32 sizeOutput = decode(base64, buf, size);
-	Memory ret;
+	sl_size sizeOutput = decode(base64, mem.getData(), size);
 	if (sizeOutput > 0) {
-		ret = Memory::create(buf, sizeOutput);
+		return mem.sub(0, sizeOutput);
 	}
-	Base::freeMemory(buf);
-	return ret;
+	return Memory::null();
 }
 
 SLIB_NAMESPACE_END

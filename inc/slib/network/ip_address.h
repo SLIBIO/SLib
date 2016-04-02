@@ -76,9 +76,9 @@ public:
 	// "a.b.c.d"
 	String toString() const;
 	
-	static sl_int32 parse(IPv4Address* out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parse(IPv4Address* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_int32 parse(IPv4Address* out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parse(IPv4Address* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	static sl_bool parse(const String& str, IPv4Address* _out);
 	
@@ -220,9 +220,9 @@ public:
 	// "s0:s1:s2:s3:s4:s5:s6:s7"
 	String toString() const;
 	
-	static sl_int32 parse(IPv6Address* out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parse(IPv6Address* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_int32 parse(IPv6Address* out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parse(IPv6Address* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	static sl_bool parse(const String& str, IPv6Address* _out);
 	
@@ -317,9 +317,9 @@ public:
 	
 	String toString() const;
 	
-	static sl_int32 parse(IPAddress* out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parse(IPAddress* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_int32 parse(IPAddress* out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parse(IPAddress* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	static sl_bool parse(const String& str, IPAddress* _out);
 	

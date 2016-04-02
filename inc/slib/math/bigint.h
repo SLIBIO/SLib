@@ -23,7 +23,7 @@ public:
 	sl_uint32* elements;
 	
 	// count of elements
-	sl_uint32 length;
+	sl_size length;
 	
 	// 1 : positive,  -1 : negative
 	sl_int32 sign;
@@ -37,28 +37,28 @@ public:
 	~CBigInt();
 
 public:
-	void setUserDataElements(sl_uint32* data, sl_uint32 n);
+	void setUserDataElements(sl_uint32* data, sl_size n);
 	
 	sl_int32 makeNagative();
 
-	sl_bool getBit(sl_uint32 pos) const;
+	sl_bool getBit(sl_size pos) const;
 	
-	void setBit(sl_uint32 pos, sl_bool bit);
+	void setBit(sl_size pos, sl_bool bit);
 
 	// get size in elements
-	sl_uint32 getMostSignificantElements() const;
+	sl_size getMostSignificantElements() const;
 	
-	sl_uint32 getLeastSignificantElements() const;
+	sl_size getLeastSignificantElements() const;
 	
 	// get size in bytes
-	sl_uint32 getMostSignificantBytes() const;
+	sl_size getMostSignificantBytes() const;
 	
-	sl_uint32 getLeastSignificantBytes() const;
+	sl_size getLeastSignificantBytes() const;
 	
 	// get size in bits
-	sl_uint32 getMostSignificantBits() const;
+	sl_size getMostSignificantBits() const;
 	
-	sl_uint32 getLeastSignificantBits() const;
+	sl_size getLeastSignificantBits() const;
 
 	sl_bool isZero() const;
 	
@@ -67,9 +67,9 @@ public:
 	void setZero();
 	
 	
-	static CBigInt* allocate(sl_uint32 length);
+	static CBigInt* allocate(sl_size length);
 	
-	CBigInt* duplicate(sl_uint32 newLength) const;
+	CBigInt* duplicate(sl_size newLength) const;
 	
 	CBigInt* duplicate() const;
 	
@@ -81,35 +81,35 @@ public:
 	
 	sl_bool compact();
 	
-	sl_bool growLength(sl_uint32 newLength);
+	sl_bool growLength(sl_size newLength);
 	
-	sl_bool setLength(sl_uint32 newLength);
+	sl_bool setLength(sl_size newLength);
 	
-	sl_bool setValueFromElements(const sl_uint32* data, sl_uint32 n);
+	sl_bool setValueFromElements(const sl_uint32* data, sl_size n);
 	
 	// set/get data from/to bytes buffer (Little Endian), the sign is not changed
-	sl_bool setBytesLE(const void* bytes, sl_uint32 nBytes);
+	sl_bool setBytesLE(const void* bytes, sl_size nBytes);
 	
 	void setBytesLE(const Memory& mem);
 	
-	static CBigInt* fromBytesLE(const void* bytes, sl_uint32 nBytes);
+	static CBigInt* fromBytesLE(const void* bytes, sl_size nBytes);
 	
 	static CBigInt* fromBytesLE(const Memory& mem);
 	
-	sl_bool getBytesLE(void* buf, sl_uint32 n) const;
+	sl_bool getBytesLE(void* buf, sl_size n) const;
 	
 	Memory getBytesLE() const;
 	
 	// set/get data from/to bytes buffer (Big Endian), the sign is not changed
-	sl_bool setBytesBE(const void* bytes, sl_uint32 nBytes);
+	sl_bool setBytesBE(const void* bytes, sl_size nBytes);
 	
 	void setBytesBE(const Memory& mem);
 	
-	static CBigInt* fromBytesBE(const void* bytes, sl_uint32 nBytes);
+	static CBigInt* fromBytesBE(const void* bytes, sl_size nBytes);
 	
 	static CBigInt* fromBytesBE(const Memory& mem);
 	
-	sl_bool getBytesBE(void* buf, sl_uint32 n) const;
+	sl_bool getBytesBE(void* buf, sl_size n) const;
 	
 	Memory getBytesBE() const;
 	
@@ -130,9 +130,9 @@ public:
 	
 	static CBigInt* fromUint64(sl_uint64 v);
 	
-	static sl_int32 parseString(CBigInt* out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_uint32 radix = 10);
+	static sl_reg parseString(CBigInt* out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX, sl_uint32 radix = 10);
 	
-	static sl_int32 parseString(CBigInt* out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_uint32 radix = 10);
+	static sl_reg parseString(CBigInt* out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX, sl_uint32 radix = 10);
 	
 	sl_bool parseString(const String& str, sl_uint32 radix = 10);
 	
@@ -254,13 +254,13 @@ public:
 	static sl_bool div(const CBigInt& a, sl_uint64 b, CBigInt* quotient = sl_null, sl_uint64* remainder = sl_null);
 
 	
-	sl_bool shiftLeft(const CBigInt& other, sl_uint32 n);
+	sl_bool shiftLeft(const CBigInt& other, sl_size n);
 	
-	sl_bool shiftRight(const CBigInt& other, sl_uint32 n);
+	sl_bool shiftRight(const CBigInt& other, sl_size n);
 	
-	sl_bool shiftLeft(sl_uint32 n);
+	sl_bool shiftLeft(sl_size n);
 	
-	sl_bool shiftRight(sl_uint32 n);
+	sl_bool shiftRight(sl_size n);
 
 	/*
 		E > 0
@@ -344,11 +344,11 @@ public:
 	
 	static BigInt fromUint64(sl_uint64 v);
 	
-	static BigInt fromBytesLE(const void* bytes, sl_uint32 nBytes);
+	static BigInt fromBytesLE(const void* bytes, sl_size nBytes);
 	
 	static BigInt fromBytesLE(const Memory& mem);
 	
-	static BigInt fromBytesBE(const void* bytes, sl_uint32 nBytes);
+	static BigInt fromBytesBE(const void* bytes, sl_size nBytes);
 	
 	static BigInt fromBytesBE(const Memory& mem);
 	
@@ -362,7 +362,7 @@ public:
 	
 	BigInt compact() const;
 	
-	sl_uint32 getElementsCount() const;
+	sl_size getElementsCount() const;
 	
 	sl_uint32* getElements() const;
 	
@@ -370,27 +370,27 @@ public:
 	
 	sl_bool getBit(sl_uint32 pos) const;
 	
-	sl_uint32 getMostSignificantElements() const;
+	sl_size getMostSignificantElements() const;
 	
-	sl_uint32 getLeastSignificantElements() const;
+	sl_size getLeastSignificantElements() const;
 	
-	sl_uint32 getMostSignificantBytes() const;
+	sl_size getMostSignificantBytes() const;
 	
-	sl_uint32 getLeastSignificantBytes() const;
+	sl_size getLeastSignificantBytes() const;
 	
-	sl_uint32 getMostSignificantBits() const;
+	sl_size getMostSignificantBits() const;
 	
-	sl_uint32 getLeastSignificantBits() const;
+	sl_size getLeastSignificantBits() const;
 		
 	sl_bool isZero() const;
 	
 	sl_bool isNotZero() const;
 	
-	sl_bool getBytesLE(void* buf, sl_uint32 n) const;
+	sl_bool getBytesLE(void* buf, sl_size n) const;
 	
 	Memory getBytesLE() const;
 	
-	sl_bool getBytesBE(void* buf, sl_uint32 n) const;
+	sl_bool getBytesBE(void* buf, sl_size n) const;
 	
 	Memory getBytesBE() const;
 	
@@ -518,13 +518,13 @@ public:
 	static sl_uint64 mod(const BigInt& A, sl_uint64 v);
 
 	
-	static BigInt shiftLeft(const BigInt& A, sl_uint32 n);
+	static BigInt shiftLeft(const BigInt& A, sl_size n);
 	
-	sl_bool shiftLeft(sl_uint32 n);
+	sl_bool shiftLeft(sl_size n);
 	
-	static BigInt shiftRight(const BigInt& A, sl_uint32 n);
+	static BigInt shiftRight(const BigInt& A, sl_size n);
 	
-	sl_bool shiftRight(sl_uint32 n);
+	sl_bool shiftRight(sl_size n);
 
 	
 	/*
@@ -672,11 +672,11 @@ public:
 	
 	sl_bool isNotZero() const;
 	
-	sl_bool getBytesLE(void* buf, sl_uint32 n) const;
+	sl_bool getBytesLE(void* buf, sl_size n) const;
 	
 	Memory getBytesLE() const;
 	
-	sl_bool getBytesBE(void* buf, sl_uint32 n) const;
+	sl_bool getBytesBE(void* buf, sl_size n) const;
 	
 	Memory getBytesBE() const;
 	
@@ -921,9 +921,9 @@ sl_uint64 operator%(const BigInt& a, sl_uint64 v);
 BigInt operator%(sl_uint64 v, const BigInt& b);
 
 
-BigInt operator<<(const BigInt& a, sl_uint32 n);
+BigInt operator<<(const BigInt& a, sl_size n);
 
-BigInt operator>>(const BigInt& a, sl_uint32 n);
+BigInt operator>>(const BigInt& a, sl_size n);
 
 
 SLIB_MATH_NAMESPACE_END

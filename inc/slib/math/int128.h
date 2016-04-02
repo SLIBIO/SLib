@@ -223,9 +223,9 @@ public:
 	// 16 bytes
 	void setBytesLE(const void* buf);
 	
-	static sl_int32 parseString(Uint128* out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_uint32 radix = 10);
+	static sl_reg parseString(Uint128* out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX, sl_uint32 radix = 10);
 	
-	static sl_int32 parseString(Uint128* out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX, sl_uint32 radix = 10);
+	static sl_reg parseString(Uint128* out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX, sl_uint32 radix = 10);
 	
 	sl_bool parseString(const String& str, sl_uint32 radix = 10);
 	

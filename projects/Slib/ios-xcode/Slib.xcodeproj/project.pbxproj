@@ -129,6 +129,7 @@
 		266DD5F61C11E09B00D47AB0 /* camera_avfoundation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5F51C11E09B00D47AB0 /* camera_avfoundation.mm */; };
 		2683BFAE1C39710C0068AC42 /* atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2683BFAD1C39710C0068AC42 /* atomic.cpp */; };
 		268916341C182AC8009FD75E /* camera_dshow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268916331C182AC8009FD75E /* camera_dshow.cpp */; };
+		2694620A1CAD1C47001B2130 /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269462091CAD1C47001B2130 /* xml.cpp */; };
 		26948C491C1EBA2700FD141A /* radio_group.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26948C481C1EBA2700FD141A /* radio_group.cpp */; };
 		26A9B7621C172BCC004C9B0E /* camera_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A9B7611C172BCC004C9B0E /* camera_view.cpp */; };
 		26A9B7641C172BDE004C9B0E /* video_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A9B7631C172BDE004C9B0E /* video_view.cpp */; };
@@ -367,6 +368,7 @@
 		266DD5F51C11E09B00D47AB0 /* camera_avfoundation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = camera_avfoundation.mm; path = media/camera_avfoundation.mm; sourceTree = "<group>"; };
 		2683BFAD1C39710C0068AC42 /* atomic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = atomic.cpp; sourceTree = "<group>"; };
 		268916331C182AC8009FD75E /* camera_dshow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = camera_dshow.cpp; path = media/camera_dshow.cpp; sourceTree = "<group>"; };
+		269462091CAD1C47001B2130 /* xml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = xml.cpp; sourceTree = "<group>"; };
 		26948C481C1EBA2700FD141A /* radio_group.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = radio_group.cpp; sourceTree = "<group>"; };
 		26A9B7611C172BCC004C9B0E /* camera_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera_view.cpp; sourceTree = "<group>"; };
 		26A9B7631C172BDE004C9B0E /* video_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_view.cpp; sourceTree = "<group>"; };
@@ -646,6 +648,7 @@
 				A25F2EEB1B039EF600854DAF /* time.cpp */,
 				266DD3B91C11804E00D47AB0 /* url.cpp */,
 				A25F2EEC1B039EF600854DAF /* variant.cpp */,
+				269462091CAD1C47001B2130 /* xml.cpp */,
 			);
 			path = core;
 			sourceTree = "<group>";
@@ -965,6 +968,7 @@
 				266DD3751C1171E400D47AB0 /* audio_recorder_ios.mm in Sources */,
 				A25F2F481B039EF600854DAF /* mutex.cpp in Sources */,
 				A2774E2A1B1CBBFD00538A7B /* ui_core.cpp in Sources */,
+				2694620A1CAD1C47001B2130 /* xml.cpp in Sources */,
 				26A9B7621C172BCC004C9B0E /* camera_view.cpp in Sources */,
 				266DD3831C117A3100D47AB0 /* gcm.cpp in Sources */,
 				266DD3A31C117AE300D47AB0 /* graphics_context.cpp in Sources */,

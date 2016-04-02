@@ -115,7 +115,7 @@ String MacAddress::toString(sl_char8 sep) const
 }
 
 template <class CT>
-SLIB_INLINE sl_int32 _MacAddress_parse(MacAddress* obj, const CT* sz, sl_uint32 i, sl_uint32 n, sl_char8 sep)
+SLIB_INLINE sl_reg _MacAddress_parse(MacAddress* obj, const CT* sz, sl_size i, sl_size n, sl_char8 sep)
 {
 	sl_char8 sep1 = sep;
 	sl_char8 sep2 = sep;
@@ -173,19 +173,19 @@ SLIB_INLINE sl_int32 _MacAddress_parse(MacAddress* obj, const CT* sz, sl_uint32 
 	return i;
 }
 
-sl_int32 MacAddress::parse(MacAddress* out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_char8 sep)
+sl_reg MacAddress::parse(MacAddress* out, const char* sz, sl_size posBegin, sl_size len, sl_char8 sep)
 {
 	return _MacAddress_parse(out, sz, posBegin, len, sep);
 }
 
-sl_int32 MacAddress::parse(MacAddress* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_char8 sep)
+sl_reg MacAddress::parse(MacAddress* out, const sl_char16* sz, sl_size posBegin, sl_size len, sl_char8 sep)
 {
 	return _MacAddress_parse(out, sz, posBegin, len, sep);
 }
 
 sl_bool MacAddress::parse(const String& s, sl_char8 sep)
 {
-	sl_uint32 n = s.getLength();
+	sl_size n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}

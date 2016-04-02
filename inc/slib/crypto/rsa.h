@@ -78,12 +78,12 @@ SLIB_CRYPTO_NAMESPACE_BEGIN
 
 SLIB_INLINE sl_uint32 RSAPublicKey::getLength() const
 {
-	return N.getMostSignificantBytes();
+	return (sl_uint32)(N.getMostSignificantBytes());
 }
 
 SLIB_INLINE sl_uint32 RSAPrivateKey::getLength() const
 {
-	return N.getMostSignificantBytes();
+	return (sl_uint32)(N.getMostSignificantBytes());
 }
 
 SLIB_CRYPTO_NAMESPACE_END

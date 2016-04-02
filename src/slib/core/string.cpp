@@ -13,15 +13,15 @@ SLIB_DEFINE_EXPLICIT_INSTANTIATIONS_FOR_MAP(String, String)
 class _StringBase
 {
 public:
-	static sl_int32 getSz8Length(const sl_char8* utf8, sl_int32 count = -1);
-	static sl_int32 getSz16Length(const sl_char16* utf16, sl_int32 count = -1);
-	static sl_int32 getSz32Length(const sl_char32* utf32, sl_int32 count = -1);
+	static sl_size getSz8Length(const sl_char8* utf8, sl_reg count = -1);
+	static sl_size getSz16Length(const sl_char16* utf16, sl_reg count = -1);
+	static sl_size getSz32Length(const sl_char32* utf32, sl_reg count = -1);
 	
 	// utf8 conversion
-	static sl_uint32 utf8ToUtf16(const sl_char8* utf8, sl_int32 lenUtf8, sl_char16* utf16, sl_int32 lenUtf16Buffer);
-	static sl_uint32 utf8ToUtf32(const sl_char8* utf8, sl_int32 lenUtf8, sl_char32* utf32, sl_int32 lenUtf32Buffer);
-	static sl_uint32 utf16ToUtf8(const sl_char16* utf16, sl_int32 lenUtf16, sl_char8* utf8, sl_int32 lenUtf8Buffer);
-	static sl_uint32 utf32ToUtf8(const sl_char32* utf32, sl_int32 lenUtf32, sl_char8* utf8, sl_int32 lenUtf8Buffer);
+	static sl_size utf8ToUtf16(const sl_char8* utf8, sl_reg lenUtf8, sl_char16* utf16, sl_reg lenUtf16Buffer);
+	static sl_size utf8ToUtf32(const sl_char8* utf8, sl_reg lenUtf8, sl_char32* utf32, sl_reg lenUtf32Buffer);
+	static sl_size utf16ToUtf8(const sl_char16* utf16, sl_reg lenUtf16, sl_char8* utf8, sl_reg lenUtf8Buffer);
+	static sl_size utf32ToUtf8(const sl_char32* utf32, sl_reg lenUtf32, sl_char8* utf8, sl_reg lenUtf8Buffer);
 };
 
 class _TemplateFunc8
@@ -133,13 +133,10 @@ public:
 };
 
 
-SLIB_INLINE StringContainer8* String8::_alloc(sl_uint32& len)
+SLIB_INLINE StringContainer8* String8::_alloc(sl_size len)
 {
 	if (len == 0) {
 		return _String8_Empty.container;
-	}
-	if (len > SLIB_STR_MAX_LEN) {
-		len = SLIB_STR_MAX_LEN;
 	}
 	sl_char8* buf = (sl_char8*)(Base::createMemory(sizeof(StringContainer8) + len + 1));
 	if (buf) {
@@ -154,13 +151,10 @@ SLIB_INLINE StringContainer8* String8::_alloc(sl_uint32& len)
 	return _String8_Null.container;
 }
 
-SLIB_INLINE StringContainer16* String16::_alloc(sl_uint32& len)
+SLIB_INLINE StringContainer16* String16::_alloc(sl_size len)
 {
 	if (len == 0) {
 		return _String16_Empty.container;
-	}
-	if (len > SLIB_STR_MAX_LEN) {
-		len = SLIB_STR_MAX_LEN;
 	}
 	sl_char8* buf = (sl_char8*)(Base::createMemory(sizeof(StringContainer8) + ((len + 1) << 1)));
 	if (buf) {
@@ -240,49 +234,49 @@ SLIB_INLINE void SafeString16::_replaceContainer(StringContainer16* container)
 }
 
 
-SLIB_INLINE StringContainer8* String8::_create(sl_char8 ch, sl_uint32 nRepeatCount)
+SLIB_INLINE StringContainer8* String8::_create(sl_char8 ch, sl_size nRepeatCount)
 {
 	StringContainer8* container = _alloc(nRepeatCount);
-	if (nRepeatCount > 0) {
+	if (container != _String8_Null.container) {
 		Base::resetMemory(container->sz, ch, nRepeatCount);
 	}
 	return container;
 }
 
-SLIB_INLINE StringContainer16* String16::_create(sl_char16 ch, sl_uint32 nRepeatCount)
+SLIB_INLINE StringContainer16* String16::_create(sl_char16 ch, sl_size nRepeatCount)
 {
 	StringContainer16* container = _alloc(nRepeatCount);
-	if (nRepeatCount > 0) {
+	if (container != _String16_Null.container) {
 		Base::resetMemory2(container->sz, ch, nRepeatCount);
 	}
 	return container;
 }
 
-SLIB_INLINE StringContainer8* String8::_create(const sl_char8* utf8, sl_int32 lenUtf8)
+SLIB_INLINE StringContainer8* String8::_create(const sl_char8* utf8, sl_reg lenUtf8)
 {
 	if (utf8) {
 		if (lenUtf8 < 0) {
-			lenUtf8 = _StringBase::getSz8Length(utf8, SLIB_STR_MAX_LEN);
+			lenUtf8 = _StringBase::getSz8Length(utf8);
 		}
-		sl_uint32 len = lenUtf8;
+		sl_size len = lenUtf8;
 		StringContainer8* container = _alloc(len);
-		if (len > 0) {
-			Base::copyMemory(container->sz, utf8, len*sizeof(sl_char8));
+		if (container != _String8_Null.container) {
+			Base::copyMemory(container->sz, utf8, len);
 		}
 		return container;
 	}
 	return _String8_Null.container;
 }
 
-SLIB_INLINE StringContainer16* String16::_create(const sl_char8* utf8, sl_int32 lenUtf8)
+SLIB_INLINE StringContainer16* String16::_create(const sl_char8* utf8, sl_reg lenUtf8)
 {
 	if (utf8) {
 		if (lenUtf8 < 0) {
-			lenUtf8 = _StringBase::getSz8Length(utf8, SLIB_STR_MAX_LEN);
+			lenUtf8 = _StringBase::getSz8Length(utf8);
 		}
-		sl_uint32 len = _StringBase::utf8ToUtf16(utf8, lenUtf8, sl_null, -1);
+		sl_size len = _StringBase::utf8ToUtf16(utf8, lenUtf8, sl_null, -1);
 		StringContainer16* container = _alloc(len);
-		if (len > 0) {
+		if (container != _String16_Null.container) {
 			_StringBase::utf8ToUtf16(utf8, lenUtf8, container->sz, len);
 			container->sz[len] = 0;
 		}
@@ -291,15 +285,15 @@ SLIB_INLINE StringContainer16* String16::_create(const sl_char8* utf8, sl_int32 
 	return _String16_Null.container;
 }
 
-SLIB_INLINE StringContainer8* String8::_create(const sl_char16* utf16, sl_int32 lenUtf16)
+SLIB_INLINE StringContainer8* String8::_create(const sl_char16* utf16, sl_reg lenUtf16)
 {
 	if (utf16) {
 		if (lenUtf16 < 0) {
-			lenUtf16 = _StringBase::getSz16Length(utf16, SLIB_STR_MAX_LEN);
+			lenUtf16 = _StringBase::getSz16Length(utf16);
 		}
-		sl_uint32 len = _StringBase::utf16ToUtf8(utf16, lenUtf16, sl_null, -1);
+		sl_size len = _StringBase::utf16ToUtf8(utf16, lenUtf16, sl_null, -1);
 		StringContainer8* container = _alloc(len);
-		if (len > 0) {
+		if (container != _String8_Null.container) {
 			_StringBase::utf16ToUtf8(utf16, lenUtf16, container->sz, len);
 			container->sz[len] = 0;
 		}
@@ -308,15 +302,15 @@ SLIB_INLINE StringContainer8* String8::_create(const sl_char16* utf16, sl_int32 
 	return _String8_Null.container;
 }
 
-SLIB_INLINE StringContainer16* String16::_create(const sl_char16* utf16, sl_int32 lenUtf16)
+SLIB_INLINE StringContainer16* String16::_create(const sl_char16* utf16, sl_reg lenUtf16)
 {
 	if (utf16) {
 		if (lenUtf16 < 0) {
-			lenUtf16 = _StringBase::getSz16Length(utf16, SLIB_STR_MAX_LEN);
+			lenUtf16 = _StringBase::getSz16Length(utf16);
 		}
-		sl_uint32 len = lenUtf16;
+		sl_size len = lenUtf16;
 		StringContainer16* container = _alloc(len);
-		if (len > 0) {
+		if (container != _String16_Null.container) {
 			Base::copyMemory(container->sz, utf16, len*sizeof(sl_char16));
 		}
 		return container;
@@ -324,15 +318,15 @@ SLIB_INLINE StringContainer16* String16::_create(const sl_char16* utf16, sl_int3
 	return _String16_Null.container;
 }
 
-SLIB_INLINE StringContainer8* String8::_create(const sl_char32* utf32, sl_int32 lenUtf32)
+SLIB_INLINE StringContainer8* String8::_create(const sl_char32* utf32, sl_reg lenUtf32)
 {
 	if (utf32) {
 		if (lenUtf32 < 0) {
-			lenUtf32 = _StringBase::getSz32Length(utf32, SLIB_STR_MAX_LEN);
+			lenUtf32 = _StringBase::getSz32Length(utf32);
 		}
-		sl_uint32 len = _StringBase::utf32ToUtf8(utf32, lenUtf32, sl_null, -1);
+		sl_size len = _StringBase::utf32ToUtf8(utf32, lenUtf32, sl_null, -1);
 		StringContainer8* container = _alloc(len);
-		if (len > 0) {
+		if (container != _String8_Null.container) {
 			_StringBase::utf32ToUtf8(utf32, lenUtf32, container->sz, len);
 			container->sz[len] = 0;
 		}
@@ -341,23 +335,23 @@ SLIB_INLINE StringContainer8* String8::_create(const sl_char32* utf32, sl_int32 
 	return _String8_Null.container;
 }
 
-SLIB_INLINE void _String_copyUtf32ToUtf16(sl_char16* utf16, const sl_char32* utf32, sl_int32 count)
+SLIB_INLINE void _String_copyUtf32ToUtf16(sl_char16* utf16, const sl_char32* utf32, sl_size count)
 {
-	for (sl_int32 i = 0; i < count; i++) {
+	for (sl_size i = 0; i < count; i++) {
 		sl_char16 ch = (sl_char16)(utf32[i]);
 		utf16[i] = ch;
 	}
 }
 
-SLIB_INLINE StringContainer16* String16::_create(const sl_char32* utf32, sl_int32 lenUtf32)
+SLIB_INLINE StringContainer16* String16::_create(const sl_char32* utf32, sl_reg lenUtf32)
 {
 	if (utf32) {
 		if (lenUtf32 < 0) {
-			lenUtf32 = _StringBase::getSz32Length(utf32, SLIB_STR_MAX_LEN);
+			lenUtf32 = _StringBase::getSz32Length(utf32);
 		}
-		sl_uint32 len = lenUtf32;
+		sl_size len = lenUtf32;
 		StringContainer16* container = _alloc(len);
-		if (len > 0) {
+		if (container != _String16_Null.container) {
 			_String_copyUtf32ToUtf16(container->sz, utf32, len);
 		}
 		return container;
@@ -366,217 +360,187 @@ SLIB_INLINE StringContainer16* String16::_create(const sl_char32* utf32, sl_int3
 }
 
 
-SLIB_INLINE StringContainer8* String8::_merge8(const sl_char8* s1, sl_int32 len1, const sl_char8* s2, sl_int32 len2)
+SLIB_INLINE StringContainer8* String8::_merge8(const sl_char8* s1, sl_reg len1, const sl_char8* s2, sl_reg len2)
 {
 	if (len1 < 0) {
-		len1 = _StringBase::getSz8Length(s1, SLIB_STR_MAX_LEN);
+		len1 = _StringBase::getSz8Length(s1);
 	}
 	if (len2 < 0) {
-		len2 = _StringBase::getSz8Length(s2, SLIB_STR_MAX_LEN);
+		len2 = _StringBase::getSz8Length(s2);
 	}
-	sl_uint32 len = len1 + len2;
+	sl_size len = len1 + len2;
 	StringContainer8* s = _alloc(len);
-	if (len > 0) {
-		if ((sl_uint32)len1 > len) {
-			len1 = len;
-		}
-		Base::copyMemory(s->sz, s1, len1*sizeof(sl_char8));
-		Base::copyMemory(s->sz + len1, s2, (len-len1)*sizeof(sl_char8));
+	if (s != _String8_Null.container) {
+		Base::copyMemory(s->sz, s1, len1);
+		Base::copyMemory(s->sz + len1, s2, len2);
 		s->sz[len] = 0;
 	}
 	return s;
 }
 
-SLIB_INLINE StringContainer16* String16::_merge16(const sl_char16* s1, sl_int32 len1, const sl_char16* s2, sl_int32 len2)
+SLIB_INLINE StringContainer16* String16::_merge16(const sl_char16* s1, sl_reg len1, const sl_char16* s2, sl_reg len2)
 {
 	if (len1 < 0) {
-		len1 = _StringBase::getSz16Length(s1, SLIB_STR_MAX_LEN);
+		len1 = _StringBase::getSz16Length(s1);
 	}
 	if (len2 < 0) {
-		len2 = _StringBase::getSz16Length(s2, SLIB_STR_MAX_LEN);
+		len2 = _StringBase::getSz16Length(s2);
 	}
-	sl_uint32 len = len1 + len2;
+	sl_size len = len1 + len2;
 	StringContainer16* s = _alloc(len);
-	if (len > 0) {
-		if ((sl_uint32)len1 > len) {
-			len1 = len;
-		}
+	if (s != _String16_Null.container) {
 		Base::copyMemory(s->sz, s1, len1*sizeof(sl_char16));
-		Base::copyMemory(s->sz + len1, s2, (len-len1)*sizeof(sl_char16));
+		Base::copyMemory(s->sz + len1, s2, len2*sizeof(sl_char16));
 		s->sz[len] = 0;
 	}
 	return s;
 }
 
-SLIB_INLINE StringContainer8* String8::_merge16(const sl_char8* s1, sl_int32 len1, const sl_char16* s2_u16, sl_int32 len2_u16)
+SLIB_INLINE StringContainer8* String8::_merge16(const sl_char8* s1, sl_reg len1, const sl_char16* s2_u16, sl_reg len2_u16)
 {
 	if (len1 < 0) {
-		len1 = _StringBase::getSz8Length(s1, SLIB_STR_MAX_LEN);
+		len1 = _StringBase::getSz8Length(s1);
 	}
-	sl_uint32 len2 = _StringBase::utf16ToUtf8(s2_u16, len2_u16, sl_null, -1);
-	sl_uint32 len = len1 + len2;
+	sl_size len2 = _StringBase::utf16ToUtf8(s2_u16, len2_u16, sl_null, -1);
+	sl_size len = len1 + len2;
 	StringContainer8* s = _alloc(len);
-	if (len > 0) {
-		if ((sl_uint32)len1 > len) {
-			len1 = len;
-		}
-		Base::copyMemory(s->sz, s1, len1*sizeof(sl_char8));
-		_StringBase::utf16ToUtf8(s2_u16, len2_u16, s->sz + len1, len-len1);
+	if (s != _String8_Null.container) {
+		Base::copyMemory(s->sz, s1, len1);
+		_StringBase::utf16ToUtf8(s2_u16, len2_u16, s->sz + len1, len2);
 		s->sz[len] = 0;
 	}
 	return s;
 }
 
-SLIB_INLINE StringContainer8* String8::_merge16(const sl_char16* s1_u16, sl_int32 len1_u16, const sl_char8* s2, sl_int32 len2)
+SLIB_INLINE StringContainer8* String8::_merge16(const sl_char16* s1_u16, sl_reg len1_u16, const sl_char8* s2, sl_reg len2)
 {
-	sl_uint32 len1 = _StringBase::utf16ToUtf8(s1_u16, len1_u16, sl_null, -1);
+	sl_size len1 = _StringBase::utf16ToUtf8(s1_u16, len1_u16, sl_null, -1);
 	if (len2 < 0) {
-		len2 = _StringBase::getSz8Length(s2, SLIB_STR_MAX_LEN);
+		len2 = _StringBase::getSz8Length(s2);
 	}
-	sl_uint32 len = len1 + len2;
+	sl_size len = len1 + len2;
 	StringContainer8* s = _alloc(len);
-	if (len > 0) {
-		if (len1 > len) {
-			len1 = len;
-		}
+	if (s != _String8_Null.container) {
 		_StringBase::utf16ToUtf8(s1_u16, len1_u16, s->sz, len1);
-		Base::copyMemory(s->sz + len1, s2, (len-len1)*sizeof(sl_char8));
+		Base::copyMemory(s->sz + len1, s2, len2);
 		s->sz[len] = 0;
 	}
 	return s;
 }
 
-SLIB_INLINE StringContainer8* String8::_merge32(const sl_char8* s1, sl_int32 len1, const sl_char32* s2_u32, sl_int32 len2_u32)
+SLIB_INLINE StringContainer8* String8::_merge32(const sl_char8* s1, sl_reg len1, const sl_char32* s2_u32, sl_reg len2_u32)
 {
 	if (len1 < 0) {
-		len1 = _StringBase::getSz8Length(s1, SLIB_STR_MAX_LEN);
+		len1 = _StringBase::getSz8Length(s1);
 	}
-	sl_uint32 len2 = _StringBase::utf32ToUtf8(s2_u32, len2_u32, sl_null, -1);
-	sl_uint32 len = len1 + len2;
+	sl_size len2 = _StringBase::utf32ToUtf8(s2_u32, len2_u32, sl_null, -1);
+	sl_size len = len1 + len2;
 	StringContainer8* s = _alloc(len);
-	if (len > 0) {
-		if ((sl_uint32)len1 > len) {
-			len1 = len;
-		}
+	if (s != _String8_Null.container) {
 		Base::copyMemory(s->sz, s1, len1*sizeof(sl_char8));
-		_StringBase::utf32ToUtf8(s2_u32, len2_u32, s->sz + len1, len-len1);
+		_StringBase::utf32ToUtf8(s2_u32, len2_u32, s->sz + len1, len2);
 		s->sz[len] = 0;
 	}
 	return s;
 }
 
-SLIB_INLINE StringContainer8* String8::_merge32(const sl_char32* s1_u32, sl_int32 len1_u32, const sl_char8* s2, sl_int32 len2)
+SLIB_INLINE StringContainer8* String8::_merge32(const sl_char32* s1_u32, sl_reg len1_u32, const sl_char8* s2, sl_reg len2)
 {
-	sl_uint32 len1 = _StringBase::utf32ToUtf8(s1_u32, len1_u32, sl_null, -1);
+	sl_size len1 = _StringBase::utf32ToUtf8(s1_u32, len1_u32, sl_null, -1);
 	if (len2 < 0) {
-		len2 = _StringBase::getSz8Length(s2, SLIB_STR_MAX_LEN);
+		len2 = _StringBase::getSz8Length(s2);
 	}
-	sl_uint32 len = len1 + len2;
+	sl_size len = len1 + len2;
 	StringContainer8* s = _alloc(len);
-	if (len > 0) {
-		if (len1 > len) {
-			len1 = len;
-		}
+	if (s != _String8_Null.container) {
 		_StringBase::utf32ToUtf8(s1_u32, len1_u32, s->sz, len1);
-		Base::copyMemory(s->sz + len1, s2, (len-len1)*sizeof(sl_char8));
+		Base::copyMemory(s->sz + len1, s2, len2);
 		s->sz[len] = 0;
 	}
 	return s;
 }
 
-SLIB_INLINE StringContainer16* String16::_merge8(const sl_char16* s1, sl_int32 len1, const sl_char8* s2_u8, sl_int32 len2_u8)
+SLIB_INLINE StringContainer16* String16::_merge8(const sl_char16* s1, sl_reg len1, const sl_char8* s2_u8, sl_reg len2_u8)
 {
 	if (len1 < 0) {
-		len1 = _StringBase::getSz16Length(s1, SLIB_STR_MAX_LEN);
+		len1 = _StringBase::getSz16Length(s1);
 	}
-	sl_uint32 len2 = _StringBase::utf8ToUtf16(s2_u8, len2_u8, sl_null, -1);
-	sl_uint32 len = len1 + len2;
+	sl_size len2 = _StringBase::utf8ToUtf16(s2_u8, len2_u8, sl_null, -1);
+	sl_size len = len1 + len2;
 	StringContainer16* s = _alloc(len);
-	if (len > 0) {
-		if ((sl_uint32)len1 > len) {
-			len1 = len;
-		}
+	if (s != _String16_Null.container) {
 		Base::copyMemory(s->sz, s1, len1*sizeof(sl_char16));
-		_StringBase::utf8ToUtf16(s2_u8, len2_u8, s->sz + len1, len-len1);
+		_StringBase::utf8ToUtf16(s2_u8, len2_u8, s->sz + len1, len2);
 		s->sz[len] = 0;
 	}
 	return s;
 }
 
-SLIB_INLINE StringContainer16* String16::_merge8(const sl_char8* s1_u8, sl_int32 len1_u8, const sl_char16* s2, sl_int32 len2)
+SLIB_INLINE StringContainer16* String16::_merge8(const sl_char8* s1_u8, sl_reg len1_u8, const sl_char16* s2, sl_reg len2)
 {
-	sl_uint32 len1 = _StringBase::utf8ToUtf16(s1_u8, len1_u8, sl_null, -1);
+	sl_size len1 = _StringBase::utf8ToUtf16(s1_u8, len1_u8, sl_null, -1);
 	if (len2 < 0) {
-		len2 = _StringBase::getSz16Length(s2, SLIB_STR_MAX_LEN);
+		len2 = _StringBase::getSz16Length(s2);
 	}
-	sl_uint32 len = len1 + len2;
+	sl_size len = len1 + len2;
 	StringContainer16* s = _alloc(len);
-	if (len > 0) {
-		if (len1 > len) {
-			len1 = len;
-		}
+	if (s != _String16_Null.container) {
 		_StringBase::utf8ToUtf16(s1_u8, len1_u8, s->sz, len1);
-		Base::copyMemory(s->sz + len1, s2, (len-len1)*sizeof(sl_char16));
+		Base::copyMemory(s->sz + len1, s2, len2*sizeof(sl_char16));
 		s->sz[len] = 0;
 	}
 	return s;
 }
 
-SLIB_INLINE StringContainer16* String16::_merge32(const sl_char16* s1, sl_int32 len1, const sl_char32* s2, sl_int32 len2)
+SLIB_INLINE StringContainer16* String16::_merge32(const sl_char16* s1, sl_reg len1, const sl_char32* s2, sl_reg len2)
 {
 	if (len1 < 0) {
-		len1 = _StringBase::getSz16Length(s1, SLIB_STR_MAX_LEN);
+		len1 = _StringBase::getSz16Length(s1);
 	}
 	if (len2 < 0) {
-		len2 = _StringBase::getSz32Length(s2, SLIB_STR_MAX_LEN);
+		len2 = _StringBase::getSz32Length(s2);
 	}
-	sl_uint32 len = len1 + len2;
+	sl_size len = len1 + len2;
 	StringContainer16* s = _alloc(len);
-	if (len > 0) {
-		if ((sl_uint32)len1 > len) {
-			len1 = len;
-		}
+	if (s != _String16_Null.container) {
 		Base::copyMemory(s->sz, s1, len1*sizeof(sl_char16));
-		_String_copyUtf32ToUtf16(s->sz + len1, s2, len-len1);
+		_String_copyUtf32ToUtf16(s->sz + len1, s2, len2);
 		s->sz[len] = 0;
 	}
 	return s;
 }
 
-SLIB_INLINE StringContainer16* String16::_merge32(const sl_char32* s1, sl_int32 len1, const sl_char16* s2, sl_int32 len2)
+SLIB_INLINE StringContainer16* String16::_merge32(const sl_char32* s1, sl_reg len1, const sl_char16* s2, sl_reg len2)
 {
 	if (len1 < 0) {
-		len1 = _StringBase::getSz32Length(s1, SLIB_STR_MAX_LEN);
+		len1 = _StringBase::getSz32Length(s1);
 	}
 	if (len2 < 0) {
-		len2 = _StringBase::getSz16Length(s2, SLIB_STR_MAX_LEN);
+		len2 = _StringBase::getSz16Length(s2);
 	}
-	sl_uint32 len = len1 + len2;
+	sl_size len = len1 + len2;
 	StringContainer16* s = _alloc(len);
-	if (len > 0) {
-		if ((sl_uint32)len1 > len) {
-			len1 = len;
-		}
+	if (s != _String16_Null.container) {
 		_String_copyUtf32ToUtf16(s->sz, s1, len1);
-		Base::copyMemory(s->sz + len1, s2, (len-len1)*sizeof(sl_char16));
+		Base::copyMemory(s->sz + len1, s2, len2*sizeof(sl_char16));
 		s->sz[len] = 0;
 	}
 	return s;
 }
 
 
-SLIB_INLINE sl_bool String8::_equals8(const sl_char8* str1, sl_int32 len1, const sl_char8* str2, sl_int32 len2)
+SLIB_INLINE sl_bool String8::_equals8(const sl_char8* str1, sl_reg len1, const sl_char8* str2, sl_reg len2)
 {
 	if (len1 < 0) {
-		len1 = SLIB_STR_MAX_LEN;
+		len1 = SLIB_REG_MAX;
 	}
 	if (len2 < 0) {
-		len2 = SLIB_STR_MAX_LEN;
+		len2 = SLIB_REG_MAX;
 	}
-	sl_int32 len = SLIB_MIN(len1, len2);
+	sl_size len = SLIB_MIN(len1, len2);
 	sl_uint8* s1 = (sl_uint8*)str1;
 	sl_uint8* s2 = (sl_uint8*)str2;
-	for (sl_int32 i = 0; i < len; i++) {
+	for (sl_size i = 0; i < len; i++) {
 		sl_uint8 c1 = s1[i];
 		sl_uint8 c2 = s2[i];
 		if (c1 != c2) {
@@ -603,18 +567,18 @@ SLIB_INLINE sl_bool String8::_equals8(const sl_char8* str1, sl_int32 len1, const
 	return sl_true;
 }
 
-SLIB_INLINE sl_bool String16::_equals16(const sl_char16* str1, sl_int32 len1, const sl_char16* str2, sl_int32 len2)
+SLIB_INLINE sl_bool String16::_equals16(const sl_char16* str1, sl_reg len1, const sl_char16* str2, sl_reg len2)
 {
 	if (len1 < 0) {
-		len1 = SLIB_STR_MAX_LEN;
+		len1 = SLIB_REG_MAX;
 	}
 	if (len2 < 0) {
-		len2 = SLIB_STR_MAX_LEN;
+		len2 = SLIB_REG_MAX;
 	}
-	sl_int32 len = SLIB_MIN(len1, len2);
+	sl_size len = SLIB_MIN(len1, len2);
 	sl_uint16* s1 = (sl_uint16*)str1;
 	sl_uint16* s2 = (sl_uint16*)str2;
-	for (sl_int32 i = 0; i < len; i++) {
+	for (sl_size i = 0; i < len; i++) {
 		sl_uint16 c1 = s1[i];
 		sl_uint16 c2 = s2[i];
 		if (c1 != c2) {
@@ -641,42 +605,42 @@ SLIB_INLINE sl_bool String16::_equals16(const sl_char16* str1, sl_int32 len1, co
 	return sl_true;
 }
 
-SLIB_INLINE sl_bool String8::_equals16(const sl_char8* str1, sl_int32 len1, const sl_char16* str2, sl_int32 len2)
+SLIB_INLINE sl_bool String8::_equals16(const sl_char8* str1, sl_reg len1, const sl_char16* str2, sl_reg len2)
 {
 	String8 other(str2, len2);
 	return _equals8(str1, len1, other.getData(), other.getLength());
 }
 
-SLIB_INLINE sl_bool String16::_equals8(const sl_char16* str1, sl_int32 len1, const sl_char8* str2, sl_int32 len2)
+SLIB_INLINE sl_bool String16::_equals8(const sl_char16* str1, sl_reg len1, const sl_char8* str2, sl_reg len2)
 {
 	String16 other(str2, len2);
 	return _equals16(str1, len1, other.getData(), other.getLength());
 }
 
-SLIB_INLINE sl_bool String8::_equals32(const sl_char8* str1, sl_int32 len1, const sl_char32* str2, sl_int32 len2)
+SLIB_INLINE sl_bool String8::_equals32(const sl_char8* str1, sl_reg len1, const sl_char32* str2, sl_reg len2)
 {
 	String8 other(str2, len2);
 	return _equals8(str1, len1, other.getData(), other.getLength());
 }
 
-SLIB_INLINE sl_bool String16::_equals32(const sl_char16* str1, sl_int32 len1, const sl_char32* str2, sl_int32 len2)
+SLIB_INLINE sl_bool String16::_equals32(const sl_char16* str1, sl_reg len1, const sl_char32* str2, sl_reg len2)
 {
 	return _compare32(str1, len1, str2, len2) == 0;
 }
 
 
-SLIB_INLINE sl_int32 String8::_compare8(const sl_char8* str1, sl_int32 len1, const sl_char8* str2, sl_int32 len2)
+SLIB_INLINE sl_int32 String8::_compare8(const sl_char8* str1, sl_reg len1, const sl_char8* str2, sl_reg len2)
 {
 	if (len1 < 0) {
-		len1 = SLIB_STR_MAX_LEN;
+		len1 = SLIB_REG_MAX;
 	}
 	if (len2 < 0) {
-		len2 = SLIB_STR_MAX_LEN;
+		len2 = SLIB_REG_MAX;
 	}
-	sl_int32 len = SLIB_MIN(len1, len2);
+	sl_size len = SLIB_MIN(len1, len2);
 	sl_uint8* s1 = (sl_uint8*)str1;
 	sl_uint8* s2 = (sl_uint8*)str2;
-	for (sl_int32 i = 0; i < len; i++) {
+	for (sl_size i = 0; i < len; i++) {
 		sl_uint8 c1 = s1[i];
 		sl_uint8 c2 = s2[i];
 		if (c1 < c2) {
@@ -706,18 +670,18 @@ SLIB_INLINE sl_int32 String8::_compare8(const sl_char8* str1, sl_int32 len1, con
 	return 0;
 }
 
-SLIB_INLINE sl_int32 String16::_compare16(const sl_char16* str1, sl_int32 len1, const sl_char16* str2, sl_int32 len2)
+SLIB_INLINE sl_int32 String16::_compare16(const sl_char16* str1, sl_reg len1, const sl_char16* str2, sl_reg len2)
 {
 	if (len1 < 0) {
-		len1 = SLIB_STR_MAX_LEN;
+		len1 = SLIB_REG_MAX;
 	}
 	if (len2 < 0) {
-		len2 = SLIB_STR_MAX_LEN;
+		len2 = SLIB_REG_MAX;
 	}
-	sl_int32 len = SLIB_MIN(len1, len2);
+	sl_size len = SLIB_MIN(len1, len2);
 	sl_uint16* s1 = (sl_uint16*)str1;
 	sl_uint16* s2 = (sl_uint16*)str2;
-	for (sl_int32 i = 0; i < len; i++) {
+	for (sl_size i = 0; i < len; i++) {
 		sl_uint16 c1 = s1[i];
 		sl_uint16 c2 = s2[i];
 		if (c1 < c2) {
@@ -747,36 +711,36 @@ SLIB_INLINE sl_int32 String16::_compare16(const sl_char16* str1, sl_int32 len1, 
 	return 0;
 }
 
-SLIB_INLINE sl_int32 String8::_compare16(const sl_char8* str1, sl_int32 len1, const sl_char16* str2, sl_int32 len2)
+SLIB_INLINE sl_int32 String8::_compare16(const sl_char8* str1, sl_reg len1, const sl_char16* str2, sl_reg len2)
 {
 	String8 other(str2, len2);
 	return _compare8(str1, len1, other.getData(), other.getLength());
 }
 
-SLIB_INLINE sl_int32 String16::_compare8(const sl_char16* str1, sl_int32 len1, const sl_char8* str2, sl_int32 len2)
+SLIB_INLINE sl_int32 String16::_compare8(const sl_char16* str1, sl_reg len1, const sl_char8* str2, sl_reg len2)
 {
 	String16 other(str2, len2);
 	return _compare16(str1, len1, other.getData(), other.getLength());
 }
 
-SLIB_INLINE sl_int32 String8::_compare32(const sl_char8* str1, sl_int32 len1, const sl_char32* str2, sl_int32 len2)
+SLIB_INLINE sl_int32 String8::_compare32(const sl_char8* str1, sl_reg len1, const sl_char32* str2, sl_reg len2)
 {
 	String8 other(str2, len2);
 	return _compare8(str1, len1, other.getData(), other.getLength());
 }
 
-SLIB_INLINE sl_int32 String16::_compare32(const sl_char16* m1, sl_int32 len1, const sl_char32* m2, sl_int32 len2)
+SLIB_INLINE sl_int32 String16::_compare32(const sl_char16* m1, sl_reg len1, const sl_char32* m2, sl_reg len2)
 {
 	if (len1 < 0) {
-		len1 = SLIB_STR_MAX_LEN;
+		len1 = SLIB_REG_MAX;
 	}
 	if (len2 < 0) {
-		len2 = SLIB_STR_MAX_LEN;
+		len2 = SLIB_REG_MAX;
 	}
-	sl_int32 len = SLIB_MIN(len1, len2);
+	sl_size len = SLIB_MIN(len1, len2);
 	sl_uint16* s1 = (sl_uint16*)m1;
 	sl_uint32* s2 = (sl_uint32*)m2;
-	for (sl_int32 i = 0; i < len; i++) {
+	for (sl_size i = 0; i < len; i++) {
 		sl_uint32 c1 = s1[i];
 		sl_uint32 c2 = s2[i];
 		if (c1 < c2) {
@@ -862,7 +826,7 @@ String8::String8(const String16& src)
 	if (src.isNull()) {
 		m_container = _String8_Null.container;
 	} else {
-		sl_uint32 len = src.getLength();
+		sl_size len = src.getLength();
 		if (len == 0) {
 			m_container = _String8_Empty.container;
 		} else {
@@ -876,7 +840,7 @@ String16::String16(const String8& src)
 	if (src.isNull()) {
 		m_container = _String16_Null.container;
 	} else {
-		sl_uint32 len = src.getLength();
+		sl_size len = src.getLength();
 		if (len == 0) {
 			m_container = _String16_Empty.container;
 		} else {
@@ -890,7 +854,7 @@ SafeString8::SafeString8(const String16& src)
 	if (src.isNull()) {
 		m_container = _String8_Null.container;
 	} else {
-		sl_uint32 len = src.getLength();
+		sl_size len = src.getLength();
 		if (len == 0) {
 			m_container = _String8_Empty.container;
 		} else {
@@ -904,7 +868,7 @@ SafeString16::SafeString16(const String8& src)
 	if (src.isNull()) {
 		m_container = _String16_Null.container;
 	} else {
-		sl_uint32 len = src.getLength();
+		sl_size len = src.getLength();
 		if (len == 0) {
 			m_container = _String16_Empty.container;
 		} else {
@@ -920,7 +884,7 @@ String8::String8(const SafeString16& _src)
 	if (src.isNull()) {
 		m_container = _String8_Null.container;
 	} else {
-		sl_uint32 len = src.getLength();
+		sl_size len = src.getLength();
 		if (len == 0) {
 			m_container = _String8_Empty.container;
 		} else {
@@ -935,7 +899,7 @@ String16::String16(const SafeString8& _src)
 	if (src.isNull()) {
 		m_container = _String16_Null.container;
 	} else {
-		sl_uint32 len = src.getLength();
+		sl_size len = src.getLength();
 		if (len == 0) {
 			m_container = _String16_Empty.container;
 		} else {
@@ -950,7 +914,7 @@ SafeString8::SafeString8(const SafeString16& _src)
 	if (src.isNull()) {
 		m_container = _String8_Null.container;
 	} else {
-		sl_uint32 len = src.getLength();
+		sl_size len = src.getLength();
 		if (len == 0) {
 			m_container = _String8_Empty.container;
 		} else {
@@ -965,7 +929,7 @@ SafeString16::SafeString16(const SafeString8& _src)
 	if (src.isNull()) {
 		m_container = _String16_Null.container;
 	} else {
-		sl_uint32 len = src.getLength();
+		sl_size len = src.getLength();
 		if (len == 0) {
 			m_container = _String16_Empty.container;
 		} else {
@@ -996,22 +960,22 @@ SafeString16::~SafeString16()
 }
 
 
-String8::String8(sl_char8 ch, sl_uint32 nRepeatCount)
+String8::String8(sl_char8 ch, sl_size nRepeatCount)
 {
 	m_container = _create(ch, nRepeatCount);
 }
 
-SafeString8::SafeString8(sl_char8 ch, sl_uint32 nRepeatCount)
+SafeString8::SafeString8(sl_char8 ch, sl_size nRepeatCount)
 {
 	m_container = String8::_create(ch, nRepeatCount);
 }
 
-String16::String16(sl_char16 ch, sl_uint32 nRepeatCount)
+String16::String16(sl_char16 ch, sl_size nRepeatCount)
 {
 	m_container = _create(ch, nRepeatCount);
 }
 
-SafeString16::SafeString16(sl_char16 ch, sl_uint32 nRepeatCount)
+SafeString16::SafeString16(sl_char16 ch, sl_size nRepeatCount)
 {
 	m_container = String16::_create(ch, nRepeatCount);
 }
@@ -1022,7 +986,7 @@ String8::String8(const sl_char8* strUtf8)
 	m_container = _create(strUtf8, -1);
 }
 
-String8::String8(const sl_char8* strUtf8, sl_int32 length)
+String8::String8(const sl_char8* strUtf8, sl_reg length)
 {
 	m_container = _create(strUtf8, length);
 }
@@ -1032,7 +996,7 @@ SafeString8::SafeString8(const sl_char8* strUtf8)
 	m_container = String8::_create(strUtf8, -1);
 }
 
-SafeString8::SafeString8(const sl_char8* strUtf8, sl_int32 length)
+SafeString8::SafeString8(const sl_char8* strUtf8, sl_reg length)
 {
 	m_container = String8::_create(strUtf8, length);
 }
@@ -1042,7 +1006,7 @@ String16::String16(const sl_char8* strUtf8)
 	m_container = _create(strUtf8, -1);
 }
 
-String16::String16(const sl_char8* strUtf8, sl_int32 length)
+String16::String16(const sl_char8* strUtf8, sl_reg length)
 {
 	m_container = _create(strUtf8, length);
 }
@@ -1052,7 +1016,7 @@ SafeString16::SafeString16(const sl_char8* strUtf8)
 	m_container = String16::_create(strUtf8, -1);
 }
 
-SafeString16::SafeString16(const sl_char8* strUtf8, sl_int32 length)
+SafeString16::SafeString16(const sl_char8* strUtf8, sl_reg length)
 {
 	m_container = String16::_create(strUtf8, length);
 }
@@ -1063,7 +1027,7 @@ String8::String8(const sl_char16* strUtf16)
 	m_container = _create(strUtf16, -1);
 }
 
-String8::String8(const sl_char16* strUtf16, sl_int32 length)
+String8::String8(const sl_char16* strUtf16, sl_reg length)
 {
 	m_container = _create(strUtf16, length);
 }
@@ -1073,7 +1037,7 @@ SafeString8::SafeString8(const sl_char16* strUtf16)
 	m_container = String8::_create(strUtf16, -1);
 }
 
-SafeString8::SafeString8(const sl_char16* strUtf16, sl_int32 length)
+SafeString8::SafeString8(const sl_char16* strUtf16, sl_reg length)
 {
 	m_container = String8::_create(strUtf16, length);
 }
@@ -1083,7 +1047,7 @@ String16::String16(const sl_char16* strUtf16)
 	m_container = _create(strUtf16, -1);
 }
 
-String16::String16(const sl_char16* strUtf16, sl_int32 length)
+String16::String16(const sl_char16* strUtf16, sl_reg length)
 {
 	m_container = _create(strUtf16, length);
 }
@@ -1093,7 +1057,7 @@ SafeString16::SafeString16(const sl_char16* strUtf16)
 	m_container = String16::_create(strUtf16, -1);
 }
 
-SafeString16::SafeString16(const sl_char16* strUtf16, sl_int32 length)
+SafeString16::SafeString16(const sl_char16* strUtf16, sl_reg length)
 {
 	m_container = String16::_create(strUtf16, length);
 }
@@ -1104,7 +1068,7 @@ String8::String8(const sl_char32* strUtf32)
 	m_container = _create(strUtf32, -1);
 }
 
-String8::String8(const sl_char32* strUtf32, sl_int32 length)
+String8::String8(const sl_char32* strUtf32, sl_reg length)
 {
 	m_container = _create(strUtf32, length);
 }
@@ -1114,7 +1078,7 @@ SafeString8::SafeString8(const sl_char32* strUtf32)
 	m_container = String8::_create(strUtf32, -1);
 }
 
-SafeString8::SafeString8(const sl_char32* strUtf32, sl_int32 length)
+SafeString8::SafeString8(const sl_char32* strUtf32, sl_reg length)
 {
 	m_container = String8::_create(strUtf32, length);
 }
@@ -1124,7 +1088,7 @@ String16::String16(const sl_char32* strUtf32)
 	m_container = _create(strUtf32, -1);
 }
 
-String16::String16(const sl_char32* strUtf32, sl_int32 length)
+String16::String16(const sl_char32* strUtf32, sl_reg length)
 {
 	m_container = _create(strUtf32, length);
 }
@@ -1134,24 +1098,24 @@ SafeString16::SafeString16(const sl_char32* strUtf32)
 	m_container = String16::_create(strUtf32, -1);
 }
 
-SafeString16::SafeString16(const sl_char32* strUtf32, sl_int32 length)
+SafeString16::SafeString16(const sl_char32* strUtf32, sl_reg length)
 {
 	m_container = String16::_create(strUtf32, length);
 }
 
 
-String8 String8::allocate(sl_uint32 len)
+String8 String8::allocate(sl_size len)
 {
 	return _alloc(len);
 }
 
-String16 String16::allocate(sl_uint32 len)
+String16 String16::allocate(sl_size len)
 {
 	return _alloc(len);
 }
 
 
-String8 String8::fromStatic(const sl_char8 *sz, sl_int32 len)
+String8 String8::fromStatic(const sl_char8 *sz, sl_reg len)
 {
 	if (sz) {
 		if (len == 0) {
@@ -1169,7 +1133,7 @@ String8 String8::fromStatic(const sl_char8 *sz, sl_int32 len)
 	return _String8_Null.container;
 }
 
-String16 String16::fromStatic(const sl_char16 *sz, sl_int32 len)
+String16 String16::fromStatic(const sl_char16 *sz, sl_reg len)
 {
 	if (sz) {
 		if (len == 0) {
@@ -1188,38 +1152,38 @@ String16 String16::fromStatic(const sl_char16 *sz, sl_int32 len)
 }
 
 
-String8 String8::fromUtf8(const void* utf8, sl_int32 len)
+String8 String8::fromUtf8(const void* utf8, sl_reg len)
 {
 	return String8((const sl_char8*)utf8, len);
 }
 
 String8 String8::fromUtf8(const Memory& mem)
 {
-	return fromUtf8(mem.getData(), (sl_int32)(mem.getSize()));
+	return fromUtf8(mem.getData(), mem.getSize());
 }
 
-String16 String16::fromUtf8(const void* utf8, sl_int32 len)
+String16 String16::fromUtf8(const void* utf8, sl_reg len)
 {
 	return String16((const sl_char8*)utf8, len);
 }
 
 String16 String16::fromUtf8(const Memory& mem)
 {
-	return fromUtf8(mem.getData(), (sl_int32)(mem.getSize()));
+	return fromUtf8(mem.getData(), mem.getSize());
 }
 
 
-String8 String8::fromUtf16(const void* utf16, sl_int32 len)
+String8 String8::fromUtf16(const void* utf16, sl_reg len)
 {
 	return String8((const sl_char16*)utf16, len);
 }
 
 String8 String8::fromUtf16(const Memory& mem)
 {
-	return fromUtf16(mem.getData(), (sl_int32)(mem.getSize()));
+	return fromUtf16(mem.getData(), mem.getSize());
 }
 
-String16 String16::fromUtf16(const void* utf16, sl_int32 len)
+String16 String16::fromUtf16(const void* utf16, sl_reg len)
 {
 	String16 str((const sl_char16*)utf16, len);
 	return str;
@@ -1227,21 +1191,21 @@ String16 String16::fromUtf16(const void* utf16, sl_int32 len)
 
 String16 String16::fromUtf16(const Memory& mem)
 {
-	return fromUtf16(mem.getData(), (sl_int32)(mem.getSize()));
+	return fromUtf16(mem.getData(), mem.getSize());
 }
 
 
-String8 String8::fromUtf32(const void* utf32, sl_int32 len)
+String8 String8::fromUtf32(const void* utf32, sl_reg len)
 {
 	return String8((const sl_char32*)utf32, len);
 }
 
 String8 String8::fromUtf32(const Memory& mem)
 {
-	return fromUtf32(mem.getData(), (sl_int32)(mem.getSize()));
+	return fromUtf32(mem.getData(), mem.getSize());
 }
 
-String16 String16::fromUtf32(const void* utf32, sl_int32 len)
+String16 String16::fromUtf32(const void* utf32, sl_reg len)
 {
 	String16 str((const sl_char32*)utf32, len);
 	return str;
@@ -1249,21 +1213,21 @@ String16 String16::fromUtf32(const void* utf32, sl_int32 len)
 
 String16 String16::fromUtf32(const Memory& mem)
 {
-	return fromUtf32(mem.getData(), (sl_int32)(mem.getSize()));
+	return fromUtf32(mem.getData(), mem.getSize());
 }
 
 
 
-String8 String8::fromUtf16BE(const void* _utf16, sl_int32 len)
+String8 String8::fromUtf16BE(const void* _utf16, sl_reg len)
 {
 	sl_char16* utf16 = (sl_char16*)_utf16;
 	if (utf16) {
 		if (Endian::isLE()) {
 			if (len < 0) {
-				len = _StringBase::getSz16Length(utf16, SLIB_STR_MAX_LEN);
+				len = _StringBase::getSz16Length(utf16);
 			}
 			SLIB_SCOPED_BUFFER(sl_char16, 1024, buf, len);
-			for (sl_int32 i = 0; i < len; i++) {
+			for (sl_reg i = 0; i < len; i++) {
 				buf[i] = Endian::swap16(utf16[i]);
 			}
 			return String8(buf, len);
@@ -1276,18 +1240,18 @@ String8 String8::fromUtf16BE(const void* _utf16, sl_int32 len)
 
 String8 String8::fromUtf16BE(const Memory& mem)
 {
-	return fromUtf16BE(mem.getData(), (sl_int32)(mem.getSize()));
+	return fromUtf16BE(mem.getData(), mem.getSize());
 }
 
-String16 String16::fromUtf16BE(const void* _utf16, sl_int32 len)
+String16 String16::fromUtf16BE(const void* _utf16, sl_reg len)
 {
 	sl_char16* utf16 = (sl_char16*)_utf16;
 	if (utf16) {
 		String16 ret(utf16, len);
 		if (Endian::isLE()) {
 			sl_char16* buf = ret.getData();
-			sl_uint32 n = ret.getLength();
-			for (sl_uint32 i = 0; i < n; i++) {
+			sl_size n = ret.getLength();
+			for (sl_size i = 0; i < n; i++) {
 				buf[i] = Endian::swap16(buf[i]);
 			}
 		}
@@ -1298,20 +1262,20 @@ String16 String16::fromUtf16BE(const void* _utf16, sl_int32 len)
 
 String16 String16::fromUtf16BE(const Memory& mem)
 {
-	return fromUtf16BE(mem.getData(), (sl_int32)(mem.getSize()));
+	return fromUtf16BE(mem.getData(), mem.getSize());
 }
 
 
-String8 String8::fromUtf16LE(const void* _utf16, sl_int32 len)
+String8 String8::fromUtf16LE(const void* _utf16, sl_reg len)
 {
 	sl_char16* utf16 = (sl_char16*)_utf16;
 	if (utf16) {
 		if (Endian::isBE()) {
 			if (len < 0) {
-				len = _StringBase::getSz16Length(utf16, SLIB_STR_MAX_LEN);
+				len = _StringBase::getSz16Length(utf16);
 			}
 			SLIB_SCOPED_BUFFER(sl_char16, 1024, buf, len);
-			for (sl_int32 i = 0; i < len; i++) {
+			for (sl_reg i = 0; i < len; i++) {
 				buf[i] = Endian::swap16(utf16[i]);
 			}
 			return String8(buf, len);
@@ -1324,18 +1288,18 @@ String8 String8::fromUtf16LE(const void* _utf16, sl_int32 len)
 
 String8 String8::fromUtf16LE(const Memory& mem)
 {
-	return fromUtf16LE(mem.getData(), (sl_int32)(mem.getSize()));
+	return fromUtf16LE(mem.getData(), mem.getSize());
 }
 
-String16 String16::fromUtf16LE(const void* _utf16, sl_int32 len)
+String16 String16::fromUtf16LE(const void* _utf16, sl_reg len)
 {
 	sl_char16* utf16 = (sl_char16*)_utf16;
 	if (utf16) {
 		String16 ret(utf16, len);
 		if (Endian::isBE()) {
 			sl_char16* buf = ret.getData();
-			sl_uint32 n = ret.getLength();
-			for (sl_uint32 i = 0; i < n; i++) {
+			sl_size n = ret.getLength();
+			for (sl_size i = 0; i < n; i++) {
 				buf[i] = Endian::swap16(buf[i]);
 			}
 		}
@@ -1346,24 +1310,19 @@ String16 String16::fromUtf16LE(const void* _utf16, sl_int32 len)
 
 String16 String16::fromUtf16LE(const Memory& mem)
 {
-	return fromUtf16LE(mem.getData(), (sl_int32)(mem.getSize()));
+	return fromUtf16LE(mem.getData(), mem.getSize());
 }
 
 
-String8 String8::fromUtf(const void* _buf, sl_size _len)
+String8 String8::fromUtf(const void* _buf, sl_size len)
 {
 	sl_char8* buf = (sl_char8*)_buf;
 	if (!buf) {
 		return String8::null();
 	}
-	if (_len == 0) {
+	if (len == 0) {
 		return String8::getEmpty();
 	}
-	sl_size _max = SLIB_STR_MAX_LEN << 1;
-	if (_len > _max) {
-		_len = _max;
-	}
-	sl_int32 len = (sl_int32)_len;
 	if (len >= 2) {
 		if (buf[0] == (sl_char8)0xFF && buf[1] == (sl_char8)0xFE) {
 			return String8::fromUtf16LE(buf, (len - 2) >> 1);
@@ -1382,23 +1341,18 @@ String8 String8::fromUtf(const void* _buf, sl_size _len)
 
 String8 String8::fromUtf(const Memory& mem)
 {
-	return fromUtf(mem.getData(), (sl_int32)(mem.getSize()));
+	return fromUtf(mem.getData(), mem.getSize());
 }
 
-String16 String16::fromUtf(const void* _buf, sl_size _len)
+String16 String16::fromUtf(const void* _buf, sl_size len)
 {
 	sl_char8* buf = (sl_char8*)_buf;
 	if (!buf) {
 		return String16::null();
 	}
-	if (_len == 0) {
+	if (len == 0) {
 		return String16::getEmpty();
 	}
-	sl_size _max = SLIB_STR_MAX_LEN << 1;
-	if (_len > _max) {
-		_len = _max;
-	}
-	sl_int32 len = (sl_int32)_len;
 	if (len >= 2) {
 		if (buf[0] == (sl_char8)0xFF && buf[1] == (sl_char8)0xFE) {
 			return String16::fromUtf16LE(buf, (len - 2) >> 1);
@@ -1417,7 +1371,7 @@ String16 String16::fromUtf(const void* _buf, sl_size _len)
 
 String16 String16::fromUtf(const Memory& mem)
 {
-	return fromUtf(mem.getData(), (sl_int32)(mem.getSize()));
+	return fromUtf(mem.getData(), mem.getSize());
 }
 
 
@@ -1505,35 +1459,35 @@ void SafeString16::setEmpty()
 }
 
 
-sl_uint32 SafeString8::getLength() const
+sl_size SafeString8::getLength() const
 {
 	String8 s(*this);
 	return s.getLength();
 }
 
-sl_uint32 SafeString16::getLength() const
+sl_size SafeString16::getLength() const
 {
 	String16 s(*this);
 	return s.getLength();
 }
 
 
-void String8::setLength(sl_uint32 len)
+void String8::setLength(sl_size len)
 {
 	m_container->len = len;
 }
 
-void String16::setLength(sl_uint32 len)
+void String16::setLength(sl_size len)
 {
 	m_container->len = len;
 }
 
 
 template <class CT>
-SLIB_INLINE sl_uint32 _String_calcHash(const CT* buf, sl_uint32 len)
+SLIB_INLINE sl_uint32 _String_calcHash(const CT* buf, sl_size len)
 {
 	sl_uint32 hash = 0;
-	for (sl_uint32 i = 0; i < len; i++) {
+	for (sl_size i = 0; i < len; i++) {
 		sl_uint32 ch = buf[i];
 		hash = hash * 31 + ch;
 	}
@@ -1543,7 +1497,7 @@ SLIB_INLINE sl_uint32 _String_calcHash(const CT* buf, sl_uint32 len)
 
 sl_uint32 String8::getHashCode() const
 {
-	sl_uint32 n = m_container->len;
+	sl_size n = m_container->len;
 	if (n == 0) {
 		return 0;
 	}
@@ -1557,7 +1511,7 @@ sl_uint32 String8::getHashCode() const
 
 sl_uint32 String16::getHashCode() const
 {
-	sl_uint32 n = m_container->len;
+	sl_size n = m_container->len;
 	if (n == 0) {
 		return 0;
 	}
@@ -1593,35 +1547,35 @@ void String16::setHashCode(sl_uint32 hash)
 }
 
 
-sl_char8 String8::getAt(sl_int32 index) const
+sl_char8 String8::getAt(sl_reg index) const
 {
-	if (index >= 0 && index < (sl_int32)(m_container->len)) {
+	if (index >= 0 && index < (sl_reg)(m_container->len)) {
 		return m_container->sz[index];
 	}
 	return 0;
 }
 
-sl_char16 String16::getAt(sl_int32 index) const
+sl_char16 String16::getAt(sl_reg index) const
 {
-	if (index >= 0 && index < (sl_int32)(m_container->len)) {
+	if (index >= 0 && index < (sl_reg)(m_container->len)) {
 		return m_container->sz[index];
 	}
 	return 0;
 }
 
 
-sl_bool String8::setAt(sl_int32 index, sl_char8 ch)
+sl_bool String8::setAt(sl_reg index, sl_char8 ch)
 {
-	if (index >= 0 && index < (sl_int32)(m_container->len)) {
+	if (index >= 0 && index < (sl_reg)(m_container->len)) {
 		m_container->sz[index] = ch;
 		return sl_true;
 	}
 	return sl_false;
 }
 
-sl_bool String16::setAt(sl_int32 index, sl_char16 ch)
+sl_bool String16::setAt(sl_reg index, sl_char16 ch)
 {
-	if (index >= 0 && index < (sl_int32)(m_container->len)) {
+	if (index >= 0 && index < (sl_reg)(m_container->len)) {
 		m_container->sz[index] = ch;
 		return sl_true;
 	}
@@ -1782,7 +1736,7 @@ String8& String8::operator=(const String16& other)
 	if (other.isNull()) {
 		setNull();
 	} else {
-		sl_uint32 len = other.getLength();
+		sl_size len = other.getLength();
 		if (len == 0) {
 			setEmpty();
 		} else {
@@ -1797,7 +1751,7 @@ String16& String16::operator=(const String8& other)
 	if (other.isNull()) {
 		setNull();
 	} else {
-		sl_uint32 len = other.getLength();
+		sl_size len = other.getLength();
 		if (len == 0) {
 			setEmpty();
 		} else {
@@ -1812,7 +1766,7 @@ SafeString8& SafeString8::operator=(const String16& other)
 	if (other.isNull()) {
 		setNull();
 	} else {
-		sl_uint32 len = other.getLength();
+		sl_size len = other.getLength();
 		if (len == 0) {
 			setEmpty();
 		} else {
@@ -1827,7 +1781,7 @@ SafeString16& SafeString16::operator=(const String8& other)
 	if (other.isNull()) {
 		setNull();
 	} else {
-		sl_uint32 len = other.getLength();
+		sl_size len = other.getLength();
 		if (len == 0) {
 			setEmpty();
 		} else {
@@ -1844,7 +1798,7 @@ String8& String8::operator=(const SafeString16& _other)
 	if (other.isNull()) {
 		setNull();
 	} else {
-		sl_uint32 len = other.getLength();
+		sl_size len = other.getLength();
 		if (len == 0) {
 			setEmpty();
 		} else {
@@ -1860,7 +1814,7 @@ String16& String16::operator=(const SafeString8& _other)
 	if (other.isNull()) {
 		setNull();
 	} else {
-		sl_uint32 len = other.getLength();
+		sl_size len = other.getLength();
 		if (len == 0) {
 			setEmpty();
 		} else {
@@ -1876,7 +1830,7 @@ SafeString8& SafeString8::operator=(const SafeString16& _other)
 	if (other.isNull()) {
 		setNull();
 	} else {
-		sl_uint32 len = other.getLength();
+		sl_size len = other.getLength();
 		if (len == 0) {
 			setEmpty();
 		} else {
@@ -1892,7 +1846,7 @@ SafeString16& SafeString16::operator=(const SafeString8& _other)
 	if (other.isNull()) {
 		setNull();
 	} else {
-		sl_uint32 len = other.getLength();
+		sl_size len = other.getLength();
 		if (len == 0) {
 			setEmpty();
 		} else {
@@ -2028,56 +1982,48 @@ SafeString16& SafeString16::operator=(const sl_char32* utf32)
 
 String8 String8::operator+(const String8& other) const
 {
-	sl_uint32 n = getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		if (n == 0) {
-			return other.getNotNull();
-		}
-		if (other.isNotEmpty()) {
-			return _merge8(getData(), n, other.getData(), other.getLength());
-		}
+	sl_size n = getLength();
+	if (n == 0) {
+		return other.getNotNull();
+	}
+	if (other.isNotEmpty()) {
+		return _merge8(getData(), n, other.getData(), other.getLength());
 	}
 	return getNotNull();
 }
 
 String8& String8::operator+=(const String8& other)
 {
-	sl_uint32 n = getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		if (n == 0) {
-			return (*this = other.getNotNull());
-		}
-		if (other.isNotEmpty()) {
-			_replaceContainer(_merge8(getData(), n, other.getData(), other.getLength()));
-		}
+	sl_size n = getLength();
+	if (n == 0) {
+		return (*this = other.getNotNull());
+	}
+	if (other.isNotEmpty()) {
+		_replaceContainer(_merge8(getData(), n, other.getData(), other.getLength()));
 	}
 	return *this;
 }
 
 String16 String16::operator+(const String16& other) const
 {
-	sl_uint32 n = getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		if (n == 0) {
-			return other.getNotNull();
-		}
-		if (other.isNotEmpty()) {
-			return _merge16(getData(), n, other.getData(), other.getLength());
-		}
+	sl_size n = getLength();
+	if (n == 0) {
+		return other.getNotNull();
+	}
+	if (other.isNotEmpty()) {
+		return _merge16(getData(), n, other.getData(), other.getLength());
 	}
 	return getNotNull();
 }
 
 String16& String16::operator+=(const String16& other)
 {
-	sl_uint32 n = getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		if (n == 0) {
-			return (*this = other.getNotNull());
-		}
-		if (other.isNotEmpty()) {
-			_replaceContainer(_merge16(getData(), n, other.getData(), other.getLength()));
-		}
+	sl_size n = getLength();
+	if (n == 0) {
+		return (*this = other.getNotNull());
+	}
+	if (other.isNotEmpty()) {
+		_replaceContainer(_merge16(getData(), n, other.getData(), other.getLength()));
 	}
 	return *this;
 }
@@ -2085,14 +2031,12 @@ String16& String16::operator+=(const String16& other)
 String8 SafeString8::operator+(const String8& other) const
 {
 	String8 s(*this);
-	sl_uint32 n = s.getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		if (n == 0) {
-			return other.getNotNull();
-		}
-		if (other.isNotEmpty()) {
-			return String8::_merge8(s.getData(), n, other.getData(), other.getLength());
-		}
+	sl_size n = s.getLength();
+	if (n == 0) {
+		return other.getNotNull();
+	}
+	if (other.isNotEmpty()) {
+		return String8::_merge8(s.getData(), n, other.getData(), other.getLength());
 	}
 	return s.getNotNull();
 }
@@ -2100,14 +2044,12 @@ String8 SafeString8::operator+(const String8& other) const
 SafeString8& SafeString8::operator+=(const String8& other)
 {
 	String8 s(*this);
-	sl_uint32 n = s.getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		if (n == 0) {
-			return (*this = other.getNotNull());
-		}
-		if (other.isNotEmpty()) {
-			_replaceContainer(String8::_merge8(s.getData(), n, other.getData(), other.getLength()));
-		}
+	sl_size n = s.getLength();
+	if (n == 0) {
+		return (*this = other.getNotNull());
+	}
+	if (other.isNotEmpty()) {
+		_replaceContainer(String8::_merge8(s.getData(), n, other.getData(), other.getLength()));
 	}
 	return *this;
 }
@@ -2115,14 +2057,12 @@ SafeString8& SafeString8::operator+=(const String8& other)
 String16 SafeString16::operator+(const String16& other) const
 {
 	String16 s(*this);
-	sl_uint32 n = s.getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		if (n == 0) {
-			return other.getNotNull();
-		}
-		if (other.isNotEmpty()) {
-			return String16::_merge16(s.getData(), n, other.getData(), other.getLength());
-		}
+	sl_size n = s.getLength();
+	if (n == 0) {
+		return other.getNotNull();
+	}
+	if (other.isNotEmpty()) {
+		return String16::_merge16(s.getData(), n, other.getData(), other.getLength());
 	}
 	return s.getNotNull();
 }
@@ -2130,14 +2070,12 @@ String16 SafeString16::operator+(const String16& other) const
 SafeString16& SafeString16::operator+=(const String16& other)
 {
 	String16 s(*this);
-	sl_uint32 n = s.getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		if (n == 0) {
-			return (*this = other.getNotNull());
-		}
-		if (other.isNotEmpty()) {
-			_replaceContainer(String16::_merge16(s.getData(), n, other.getData(), other.getLength()));
-		}
+	sl_size n = s.getLength();
+	if (n == 0) {
+		return (*this = other.getNotNull());
+	}
+	if (other.isNotEmpty()) {
+		_replaceContainer(String16::_merge16(s.getData(), n, other.getData(), other.getLength()));
 	}
 	return *this;
 }
@@ -2145,44 +2083,32 @@ SafeString16& SafeString16::operator+=(const String16& other)
 
 String8 String8::operator+(const String16& other) const
 {
-	sl_uint32 n = getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		if (other.isNotEmpty()) {
-			return _merge16(getData(), n, other.getData(), other.getLength());
-		}
+	if (other.isNotEmpty()) {
+		return _merge16(getData(), getLength(), other.getData(), other.getLength());
 	}
 	return getNotNull();
 }
 
 String8& String8::operator+=(const String16& other)
 {
-	sl_uint32 n = getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		if (other.isNotEmpty()) {
-			_replaceContainer(_merge16(getData(), n, other.getData(), other.getLength()));
-		}
+	if (other.isNotEmpty()) {
+		_replaceContainer(_merge16(getData(), getLength(), other.getData(), other.getLength()));
 	}
 	return *this;
 }
 
 String16 String16::operator+(const String8& other) const
 {
-	sl_uint32 n = getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		if (other.isNotEmpty()) {
-			return _merge8(getData(), n, other.getData(), other.getLength());
-		}
+	if (other.isNotEmpty()) {
+		return _merge8(getData(), getLength(), other.getData(), other.getLength());
 	}
 	return getNotNull();
 }
 
 String16& String16::operator+=(const String8& other)
 {
-	sl_uint32 n = getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		if (other.isNotEmpty()) {
-			_replaceContainer(_merge8(getData(), n, other.getData(), other.getLength()));
-		}
+	if (other.isNotEmpty()) {
+		_replaceContainer(_merge8(getData(), getLength(), other.getData(), other.getLength()));
 	}
 	return *this;
 }
@@ -2190,23 +2116,17 @@ String16& String16::operator+=(const String8& other)
 String8 SafeString8::operator+(const String16& other) const
 {
 	String8 s(*this);
-	sl_uint32 n = s.getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		if (other.isNotEmpty()) {
-			return String8::_merge16(s.getData(), n, other.getData(), other.getLength());
-		}
+	if (other.isNotEmpty()) {
+		return String8::_merge16(s.getData(), s.getLength(), other.getData(), other.getLength());
 	}
 	return s.getNotNull();
 }
 
 SafeString8& SafeString8::operator+=(const String16& other)
 {
-	String8 s(*this);
-	sl_uint32 n = s.getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		if (other.isNotEmpty()) {
-			_replaceContainer(String8::_merge16(s.getData(), n, other.getData(), other.getLength()));
-		}
+	if (other.isNotEmpty()) {
+		String8 s(*this);
+		_replaceContainer(String8::_merge16(s.getData(), s.getLength(), other.getData(), other.getLength()));
 	}
 	return *this;
 }
@@ -2214,23 +2134,17 @@ SafeString8& SafeString8::operator+=(const String16& other)
 String16 SafeString16::operator+(const String8& other) const
 {
 	String16 s(*this);
-	sl_uint32 n = s.getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		if (other.isNotEmpty()) {
-			return String16::_merge8(s.getData(), n, other.getData(), other.getLength());
-		}
+	if (other.isNotEmpty()) {
+		return String16::_merge8(s.getData(), s.getLength(), other.getData(), other.getLength());
 	}
 	return s.getNotNull();
 }
 
 SafeString16& SafeString16::operator+=(const String8& other)
 {
-	String16 s(*this);
-	sl_uint32 n = s.getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		if (other.isNotEmpty()) {
-			_replaceContainer(String16::_merge8(s.getData(), n, other.getData(), other.getLength()));
-		}
+	if (other.isNotEmpty()) {
+		String16 s(*this);
+		_replaceContainer(String16::_merge8(s.getData(), s.getLength(), other.getData(), other.getLength()));
 	}
 	return *this;
 }
@@ -2238,60 +2152,52 @@ SafeString16& SafeString16::operator+=(const String8& other)
 
 String8 String8::operator+(const SafeString8& _other) const
 {
-	sl_uint32 n = getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		String8 other(_other);
-		if (n == 0) {
-			return other.getNotNull();
-		}
-		if (other.isNotEmpty()) {
-			return _merge8(getData(), n, other.getData(), other.getLength());
-		}
+	sl_size n = getLength();
+	String8 other(_other);
+	if (n == 0) {
+		return other.getNotNull();
+	}
+	if (other.isNotEmpty()) {
+		return _merge8(getData(), n, other.getData(), other.getLength());
 	}
 	return getNotNull();
 }
 
 String8& String8::operator+=(const SafeString8& _other)
 {
-	sl_uint32 n = getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		String8 other(_other);
-		if (n == 0) {
-			return (*this = other.getNotNull());
-		}
-		if (other.isNotEmpty()) {
-			_replaceContainer(_merge8(getData(), n, other.getData(), other.getLength()));
-		}
+	sl_size n = getLength();
+	String8 other(_other);
+	if (n == 0) {
+		return (*this = other.getNotNull());
+	}
+	if (other.isNotEmpty()) {
+		_replaceContainer(_merge8(getData(), n, other.getData(), other.getLength()));
 	}
 	return *this;
 }
 
 String16 String16::operator+(const SafeString16& _other) const
 {
-	sl_uint32 n = getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		String16 other(_other);
-		if (n == 0) {
-			return other.getNotNull();
-		}
-		if (other.isNotEmpty()) {
-			return _merge16(getData(), n, other.getData(), other.getLength());
-		}
+	sl_size n = getLength();
+	String16 other(_other);
+	if (n == 0) {
+		return other.getNotNull();
+	}
+	if (other.isNotEmpty()) {
+		return _merge16(getData(), n, other.getData(), other.getLength());
 	}
 	return getNotNull();
 }
 
 String16& String16::operator+=(const SafeString16& _other)
 {
-	sl_uint32 n = getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		String16 other(_other);
-		if (n == 0) {
-			return (*this = other.getNotNull());
-		}
-		if (other.isNotEmpty()) {
-			_replaceContainer(_merge16(getData(), n, other.getData(), other.getLength()));
-		}
+	sl_size n = getLength();
+	String16 other(_other);
+	if (n == 0) {
+		return (*this = other.getNotNull());
+	}
+	if (other.isNotEmpty()) {
+		_replaceContainer(_merge16(getData(), n, other.getData(), other.getLength()));
 	}
 	return *this;
 }
@@ -2299,15 +2205,13 @@ String16& String16::operator+=(const SafeString16& _other)
 String8 SafeString8::operator+(const SafeString8& _other) const
 {
 	String8 s(*this);
-	sl_uint32 n = s.getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		String8 other(_other);
-		if (n == 0) {
-			return other.getNotNull();
-		}
-		if (other.isNotEmpty()) {
-			return String8::_merge8(s.getData(), n, other.getData(), other.getLength());
-		}
+	sl_size n = s.getLength();
+	String8 other(_other);
+	if (n == 0) {
+		return other.getNotNull();
+	}
+	if (other.isNotEmpty()) {
+		return String8::_merge8(s.getData(), n, other.getData(), other.getLength());
 	}
 	return s.getNotNull();
 }
@@ -2315,15 +2219,13 @@ String8 SafeString8::operator+(const SafeString8& _other) const
 SafeString8& SafeString8::operator+=(const SafeString8& _other)
 {
 	String8 s(*this);
-	sl_uint32 n = s.getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		String8 other(_other);
-		if (n == 0) {
-			return (*this = other.getNotNull());
-		}
-		if (other.isNotEmpty()) {
-			_replaceContainer(String8::_merge8(s.getData(), n, other.getData(), other.getLength()));
-		}
+	sl_size n = s.getLength();
+	String8 other(_other);
+	if (n == 0) {
+		return (*this = other.getNotNull());
+	}
+	if (other.isNotEmpty()) {
+		_replaceContainer(String8::_merge8(s.getData(), n, other.getData(), other.getLength()));
 	}
 	return *this;
 }
@@ -2331,15 +2233,13 @@ SafeString8& SafeString8::operator+=(const SafeString8& _other)
 String16 SafeString16::operator+(const SafeString16& _other) const
 {
 	String16 s(*this);
-	sl_uint32 n = s.getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		String16 other(_other);
-		if (n == 0) {
-			return other.getNotNull();
-		}
-		if (other.isNotEmpty()) {
-			return String16::_merge16(s.getData(), n, other.getData(), other.getLength());
-		}
+	sl_size n = s.getLength();
+	String16 other(_other);
+	if (n == 0) {
+		return other.getNotNull();
+	}
+	if (other.isNotEmpty()) {
+		return String16::_merge16(s.getData(), n, other.getData(), other.getLength());
 	}
 	return s.getNotNull();
 }
@@ -2347,15 +2247,13 @@ String16 SafeString16::operator+(const SafeString16& _other) const
 SafeString16& SafeString16::operator+=(const SafeString16& _other)
 {
 	String16 s(*this);
-	sl_uint32 n = s.getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		String16 other(_other);
-		if (n == 0) {
-			return (*this = other.getNotNull());
-		}
-		if (other.isNotEmpty()) {
-			_replaceContainer(String16::_merge16(s.getData(), n, other.getData(), other.getLength()));
-		}
+	sl_size n = s.getLength();
+	String16 other(_other);
+	if (n == 0) {
+		return (*this = other.getNotNull());
+	}
+	if (other.isNotEmpty()) {
+		_replaceContainer(String16::_merge16(s.getData(), n, other.getData(), other.getLength()));
 	}
 	return *this;
 }
@@ -2363,48 +2261,36 @@ SafeString16& SafeString16::operator+=(const SafeString16& _other)
 
 String8 String8::operator+(const SafeString16& _other) const
 {
-	sl_uint32 n = getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		String16 other(_other);
-		if (other.isNotEmpty()) {
-			return _merge16(getData(), n, other.getData(), other.getLength());
-		}
+	String16 other(_other);
+	if (other.isNotEmpty()) {
+		return _merge16(getData(), getLength(), other.getData(), other.getLength());
 	}
 	return getNotNull();
 }
 
 String8& String8::operator+=(const SafeString16& _other)
 {
-	sl_uint32 n = getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		String16 other(_other);
-		if (other.isNotEmpty()) {
-			_replaceContainer(_merge16(getData(), n, other.getData(), other.getLength()));
-		}
+	String16 other(_other);
+	if (other.isNotEmpty()) {
+		_replaceContainer(_merge16(getData(), getLength(), other.getData(), other.getLength()));
 	}
 	return *this;
 }
 
 String16 String16::operator+(const SafeString8& _other) const
 {
-	sl_uint32 n = getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		String8 other(_other);
-		if (other.isNotEmpty()) {
-			return _merge8(getData(), n, other.getData(), other.getLength());
-		}
+	String8 other(_other);
+	if (other.isNotEmpty()) {
+		return _merge8(getData(), getLength(), other.getData(), other.getLength());
 	}
 	return getNotNull();
 }
 
 String16& String16::operator+=(const SafeString8& _other)
 {
-	sl_uint32 n = getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		String8 other(_other);
-		if (other.isNotEmpty()) {
-			_replaceContainer(_merge8(getData(), n, other.getData(), other.getLength()));
-		}
+	String8 other(_other);
+	if (other.isNotEmpty()) {
+		_replaceContainer(_merge8(getData(), getLength(), other.getData(), other.getLength()));
 	}
 	return *this;
 }
@@ -2412,25 +2298,19 @@ String16& String16::operator+=(const SafeString8& _other)
 String8 SafeString8::operator+(const SafeString16& _other) const
 {
 	String8 s(*this);
-	sl_uint32 n = s.getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		String16 other(_other);
-		if (other.isNotEmpty()) {
-			return String8::_merge16(s.getData(), n, other.getData(), other.getLength());
-		}
+	String16 other(_other);
+	if (other.isNotEmpty()) {
+		return String8::_merge16(s.getData(), s.getLength(), other.getData(), other.getLength());
 	}
 	return s.getNotNull();
 }
 
 SafeString8& SafeString8::operator+=(const SafeString16& _other)
 {
-	String8 s(*this);
-	sl_uint32 n = s.getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		String16 other(_other);
-		if (other.isNotEmpty()) {
-			_replaceContainer(String8::_merge16(s.getData(), n, other.getData(), other.getLength()));
-		}
+	String16 other(_other);
+	if (other.isNotEmpty()) {
+		String8 s(*this);
+		_replaceContainer(String8::_merge16(s.getData(), s.getLength(), other.getData(), other.getLength()));
 	}
 	return *this;
 }
@@ -2438,12 +2318,9 @@ SafeString8& SafeString8::operator+=(const SafeString16& _other)
 String16 SafeString16::operator+(const SafeString8& _other) const
 {
 	String16 s(*this);
-	sl_uint32 n = s.getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		String8 other(_other);
-		if (other.isNotEmpty()) {
-			return String16::_merge8(s.getData(), n, other.getData(), other.getLength());
-		}
+	String8 other(_other);
+	if (other.isNotEmpty()) {
+		return String16::_merge8(s.getData(), s.getLength(), other.getData(), other.getLength());
 	}
 	return s.getNotNull();
 }
@@ -2451,12 +2328,9 @@ String16 SafeString16::operator+(const SafeString8& _other) const
 SafeString16& SafeString16::operator+=(const SafeString8& _other)
 {
 	String16 s(*this);
-	sl_uint32 n = s.getLength();
-	if (n < SLIB_STR_MAX_LEN) {
-		String8 other(_other);
-		if (other.isNotEmpty()) {
-			_replaceContainer(String16::_merge8(s.getData(), n, other.getData(), other.getLength()));
-		}
+	String8 other(_other);
+	if (other.isNotEmpty()) {
+		_replaceContainer(String16::_merge8(s.getData(), s.getLength(), other.getData(), other.getLength()));
 	}
 	return *this;
 }
@@ -2465,10 +2339,7 @@ SafeString16& SafeString16::operator+=(const SafeString8& _other)
 String8 String8::operator+(const sl_char8* utf8) const
 {
 	if (utf8) {
-		sl_uint32 n = getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			return _merge8(getData(), n, utf8, -1);
-		}
+		return _merge8(getData(), getLength(), utf8, -1);
 	}
 	return getNotNull();
 }
@@ -2476,10 +2347,7 @@ String8 String8::operator+(const sl_char8* utf8) const
 String8& String8::operator+=(const sl_char8* utf8)
 {
 	if (utf8) {
-		sl_uint32 n = getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			_replaceContainer(_merge8(getData(), n, utf8, -1));
-		}
+		_replaceContainer(_merge8(getData(), getLength(), utf8, -1));
 	}
 	return *this;
 }
@@ -2487,10 +2355,7 @@ String8& String8::operator+=(const sl_char8* utf8)
 String16 String16::operator+(const sl_char8* utf8) const
 {
 	if (utf8) {
-		sl_uint32 n = getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			return _merge8(getData(), n, utf8, -1);
-		}
+		return _merge8(getData(), getLength(), utf8, -1);
 	}
 	return getNotNull();
 }
@@ -2498,10 +2363,7 @@ String16 String16::operator+(const sl_char8* utf8) const
 String16& String16::operator+=(const sl_char8* utf8)
 {
 	if (utf8) {
-		sl_uint32 n = getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			_replaceContainer(_merge8(getData(), n, utf8, -1));
-		}
+		_replaceContainer(_merge8(getData(), getLength(), utf8, -1));
 	}
 	return *this;
 }
@@ -2510,10 +2372,7 @@ String8 SafeString8::operator+(const sl_char8* utf8) const
 {
 	String8 s(*this);
 	if (utf8) {
-		sl_uint32 n = s.getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			return String8::_merge8(s.getData(), n, utf8, -1);
-		}
+		return String8::_merge8(s.getData(), s.getLength(), utf8, -1);
 	}
 	return s.getNotNull();
 }
@@ -2522,10 +2381,7 @@ SafeString8& SafeString8::operator+=(const sl_char8* utf8)
 {
 	String8 s(*this);
 	if (utf8) {
-		sl_uint32 n = s.getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			_replaceContainer(String8::_merge8(s.getData(), n, utf8, -1));
-		}
+		_replaceContainer(String8::_merge8(s.getData(), s.getLength(), utf8, -1));
 	}
 	return *this;
 }
@@ -2534,10 +2390,7 @@ String16 SafeString16::operator+(const sl_char8* utf8) const
 {
 	String16 s(*this);
 	if (utf8) {
-		sl_uint32 n = s.getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			return String16::_merge8(s.getData(), n, utf8, -1);
-		}
+		return String16::_merge8(s.getData(), s.getLength(), utf8, -1);
 	}
 	return s.getNotNull();
 }
@@ -2546,10 +2399,7 @@ SafeString16& SafeString16::operator+=(const sl_char8* utf8)
 {
 	String16 s(*this);
 	if (utf8) {
-		sl_uint32 n = s.getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			_replaceContainer(String16::_merge8(s.getData(), n, utf8, -1));
-		}
+		_replaceContainer(String16::_merge8(s.getData(), s.getLength(), utf8, -1));
 	}
 	return *this;
 }
@@ -2558,10 +2408,7 @@ SafeString16& SafeString16::operator+=(const sl_char8* utf8)
 String8 String8::operator+(const sl_char16* utf16) const
 {
 	if (utf16) {
-		sl_uint32 n = getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			return _merge16(getData(), n, utf16, -1);
-		}
+		return _merge16(getData(), getLength(), utf16, -1);
 	}
 	return getNotNull();
 }
@@ -2569,10 +2416,7 @@ String8 String8::operator+(const sl_char16* utf16) const
 String8& String8::operator+=(const sl_char16* utf16)
 {
 	if (utf16) {
-		sl_uint32 n = getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			_replaceContainer(_merge16(getData(), n, utf16, -1));
-		}
+		_replaceContainer(_merge16(getData(), getLength(), utf16, -1));
 	}
 	return *this;
 }
@@ -2580,10 +2424,7 @@ String8& String8::operator+=(const sl_char16* utf16)
 String16 String16::operator+(const sl_char16* utf16) const
 {
 	if (utf16) {
-		sl_uint32 n = getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			return _merge16(getData(), n, utf16, -1);
-		}
+		return _merge16(getData(), getLength(), utf16, -1);
 	}
 	return getNotNull();
 }
@@ -2591,10 +2432,7 @@ String16 String16::operator+(const sl_char16* utf16) const
 String16& String16::operator+=(const sl_char16* utf16)
 {
 	if (utf16) {
-		sl_uint32 n = getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			_replaceContainer(_merge16(getData(), n, utf16, -1));
-		}
+		_replaceContainer(_merge16(getData(), getLength(), utf16, -1));
 	}
 	return *this;
 }
@@ -2603,10 +2441,7 @@ String8 SafeString8::operator+(const sl_char16* utf16) const
 {
 	String8 s(*this);
 	if (utf16) {
-		sl_uint32 n = s.getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			return String8::_merge16(s.getData(), n, utf16, -1);
-		}
+		return String8::_merge16(s.getData(), s.getLength(), utf16, -1);
 	}
 	return s.getNotNull();
 }
@@ -2615,10 +2450,7 @@ SafeString8& SafeString8::operator+=(const sl_char16* utf16)
 {
 	String8 s(*this);
 	if (utf16) {
-		sl_uint32 n = s.getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			_replaceContainer(String8::_merge16(s.getData(), n, utf16, -1));
-		}
+		_replaceContainer(String8::_merge16(s.getData(), s.getLength(), utf16, -1));
 	}
 	return *this;
 }
@@ -2627,10 +2459,7 @@ String16 SafeString16::operator+(const sl_char16* utf16) const
 {
 	String16 s(*this);
 	if (utf16) {
-		sl_uint32 n = s.getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			return String16::_merge16(s.getData(), n, utf16, -1);
-		}
+		return String16::_merge16(s.getData(), s.getLength(), utf16, -1);
 	}
 	return s.getNotNull();
 }
@@ -2639,10 +2468,7 @@ SafeString16& SafeString16::operator+=(const sl_char16* utf16)
 {
 	String16 s(*this);
 	if (utf16) {
-		sl_uint32 n = s.getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			_replaceContainer(String16::_merge16(s.getData(), n, utf16, -1));
-		}
+		_replaceContainer(String16::_merge16(s.getData(), s.getLength(), utf16, -1));
 	}
 	return *this;
 }
@@ -2651,10 +2477,7 @@ SafeString16& SafeString16::operator+=(const sl_char16* utf16)
 String8 String8::operator+(const sl_char32* utf32) const
 {
 	if (utf32) {
-		sl_uint32 n = getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			return _merge32(getData(), n, utf32, -1);
-		}
+		return _merge32(getData(), getLength(), utf32, -1);
 	}
 	return getNotNull();
 }
@@ -2662,10 +2485,7 @@ String8 String8::operator+(const sl_char32* utf32) const
 String8& String8::operator+=(const sl_char32* utf32)
 {
 	if (utf32) {
-		sl_uint32 n = getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			_replaceContainer(_merge32(getData(), n, utf32, -1));
-		}
+		_replaceContainer(_merge32(getData(), getLength(), utf32, -1));
 	}
 	return *this;
 }
@@ -2673,10 +2493,7 @@ String8& String8::operator+=(const sl_char32* utf32)
 String16 String16::operator+(const sl_char32* utf32) const
 {
 	if (utf32) {
-		sl_uint32 n = getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			return _merge32(getData(), n, utf32, -1);
-		}
+		return _merge32(getData(), getLength(), utf32, -1);
 	}
 	return getNotNull();
 }
@@ -2684,10 +2501,7 @@ String16 String16::operator+(const sl_char32* utf32) const
 String16& String16::operator+=(const sl_char32* utf32)
 {
 	if (utf32) {
-		sl_uint32 n = getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			_replaceContainer(_merge32(getData(), n, utf32, -1));
-		}
+		_replaceContainer(_merge32(getData(), getLength(), utf32, -1));
 	}
 	return *this;
 }
@@ -2696,10 +2510,7 @@ String8 SafeString8::operator+(const sl_char32* utf32) const
 {
 	String8 s(*this);
 	if (utf32) {
-		sl_uint32 n = s.getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			return String8::_merge32(s.getData(), n, utf32, -1);
-		}
+		return String8::_merge32(s.getData(), s.getLength(), utf32, -1);
 	}
 	return s.getNotNull();
 }
@@ -2708,10 +2519,7 @@ SafeString8& SafeString8::operator+=(const sl_char32* utf32)
 {
 	String8 s(*this);
 	if (utf32) {
-		sl_uint32 n = s.getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			_replaceContainer(String8::_merge32(s.getData(), n, utf32, -1));
-		}
+		_replaceContainer(String8::_merge32(s.getData(), s.getLength(), utf32, -1));
 	}
 	return *this;
 }
@@ -2720,10 +2528,7 @@ String16 SafeString16::operator+(const sl_char32* utf32) const
 {
 	String16 s(*this);
 	if (utf32) {
-		sl_uint32 n = s.getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			return String16::_merge32(s.getData(), n, utf32, -1);
-		}
+		return String16::_merge32(s.getData(), s.getLength(), utf32, -1);
 	}
 	return s.getNotNull();
 }
@@ -2732,10 +2537,7 @@ SafeString16& SafeString16::operator+=(const sl_char32* utf32)
 {
 	String16 s(*this);
 	if (utf32) {
-		sl_uint32 n = s.getLength();
-		if (n < SLIB_STR_MAX_LEN) {
-			_replaceContainer(String16::_merge32(s.getData(), n, utf32, -1));
-		}
+		_replaceContainer(String16::_merge32(s.getData(), s.getLength(), utf32, -1));
 	}
 	return *this;
 }
@@ -3256,8 +3058,8 @@ sl_bool String8::equals(const String8& other) const
 	if (s1 == s2) {
 		return sl_true;
 	}
-	sl_uint32 l1 = getLength();
-	sl_uint32 l2 = other.getLength();
+	sl_size l1 = getLength();
+	sl_size l2 = other.getLength();
 	if (l1 != l2) {
 		return sl_false;
 	}
@@ -3271,8 +3073,8 @@ sl_bool String16::equals(const String16& other) const
 	if (s1 == s2) {
 		return sl_true;
 	}
-	sl_uint32 l1 = getLength();
-	sl_uint32 l2 = other.getLength();
+	sl_size l1 = getLength();
+	sl_size l2 = other.getLength();
 	if (l1 != l2) {
 		return sl_false;
 	}
@@ -3295,8 +3097,8 @@ sl_bool SafeString16::equals(const String16& other) const
 sl_bool String8::equals(const String16& _other) const
 {
 	String8 other(_other);
-	sl_uint32 l1 = getLength();
-	sl_uint32 l2 = other.getLength();
+	sl_size l1 = getLength();
+	sl_size l2 = other.getLength();
 	if (l1 != l2) {
 		return sl_false;
 	}
@@ -3308,8 +3110,8 @@ sl_bool String8::equals(const String16& _other) const
 sl_bool String16::equals(const String8& _other) const
 {
 	String16 other(_other);
-	sl_uint32 l1 = getLength();
-	sl_uint32 l2 = other.getLength();
+	sl_size l1 = getLength();
+	sl_size l2 = other.getLength();
 	if (l1 != l2) {
 		return sl_false;
 	}
@@ -3659,49 +3461,49 @@ sl_int32 SafeString16::compare(const sl_char32* utf32) const
 }
 
 
-sl_int32 String8::compare(const String8& other, sl_uint32 len) const
+sl_int32 String8::compare(const String8& other, sl_size len) const
 {
 	sl_char8* s1 = getData();
 	sl_char8* s2 = other.getData();
 	if (s1 == s2) {
 		return 0;
 	}
-	sl_uint32 l1 = getLength();
+	sl_size l1 = getLength();
 	if (l1 > len) {
 		l1 = len;
 	}
-	sl_uint32 l2 = other.getLength();
+	sl_size l2 = other.getLength();
 	if (l2 > len) {
 		l2 = len;
 	}
 	return _compare8(s1, l1, s2, l2);
 }
 
-sl_int32 String16::compare(const String16& other, sl_uint32 len) const
+sl_int32 String16::compare(const String16& other, sl_size len) const
 {
 	sl_char16* s1 = getData();
 	sl_char16* s2 = other.getData();
 	if (s1 == s2) {
 		return 0;
 	}
-	sl_uint32 l1 = getLength();
+	sl_size l1 = getLength();
 	if (l1 > len) {
 		l1 = len;
 	}
-	sl_uint32 l2 = other.getLength();
+	sl_size l2 = other.getLength();
 	if (l2 > len) {
 		l2 = len;
 	}
 	return _compare16(s1, l1, s2, l2);
 }
 
-sl_int32 SafeString8::compare(const String8& other, sl_uint32 len) const
+sl_int32 SafeString8::compare(const String8& other, sl_size len) const
 {
 	String8 s(*this);
 	return s.compare(other, len);
 }
 
-sl_int32 SafeString16::compare(const String16& other, sl_uint32 len) const
+sl_int32 SafeString16::compare(const String16& other, sl_size len) const
 {
 	String16 s(*this);
 	return s.compare(other, len);
@@ -3827,82 +3629,87 @@ Memory SafeString16::toMemory() const
 }
 
 
-sl_uint32 String8::getUtf16(sl_char16* utf16, sl_int32 len) const
+sl_size String8::getUtf16(sl_char16* utf16, sl_size len) const
 {
 	return _StringBase::utf8ToUtf16(getData(), getLength(), utf16, len);
 }
 
-sl_uint32 String16::getUtf8(sl_char8* utf8, sl_int32 len) const
+sl_size String16::getUtf8(sl_char8* utf8, sl_size len) const
 {
 	return _StringBase::utf16ToUtf8(getData(), getLength(), utf8, len);
 }
 
-StringData String8::getUtf16() const
+sl_bool String8::getUtf16(StringData& output) const
 {
-	StringData ret;
-	ret.mem = toUtf16();
-	if (ret.mem.isNotEmpty()) {
-		ret.sz16 = (const sl_char16*)(ret.mem.getData());
-		ret.len = (sl_uint32)(ret.mem.getSize() / 2 - 1);
-		if (!ret.sz16) {
-			ret.sz16 = (sl_char16*)("\0\0");
-			ret.len = 0;
-		}
-	} else {
-		ret.sz16 = (sl_char16*)("\0\0");
-		ret.len = 0;
+	if (isEmpty()) {
+		output.sz16 = (sl_char16*)("\0\0");
+		output.len = 0;
+		return sl_true;
 	}
-	return ret;
+	Memory mem = toUtf16();
+	output.refer = mem.ref;
+	if (mem.isNotEmpty()) {
+		output.sz16 = (const sl_char16*)(mem.getData());
+		output.len = mem.getSize() / 2 - 1;
+		if (output.sz16) {
+			return sl_true;
+		}
+	}
+	output.sz16 = (sl_char16*)("\0\0");
+	output.len = 0;
+	return sl_false;
 }
 
-StringData String16::getUtf8() const
+sl_bool String16::getUtf8(StringData& output) const
 {
-	StringData ret;
-	ret.mem = toUtf8();
-	if (ret.mem.isNotEmpty()) {
-		ret.sz8 = (const sl_char8*)(ret.mem.getData());
-		ret.len = (sl_uint32)(ret.mem.getSize() - 1);
-		if (!ret.sz8) {
-			ret.sz8 = "";
-			ret.len = 0;
-		}
-	} else {
-		ret.sz8 = "";
-		ret.len = 0;
+	if (isEmpty()) {
+		output.sz8 = "";
+		output.len = 0;
+		return sl_true;
 	}
-	return ret;
+	Memory mem = toUtf8();
+	if (mem.isNotEmpty()) {
+		output.sz8 = (const sl_char8*)(mem.getData());
+		output.len = mem.getSize() - 1;
+		if (output.sz8) {
+			return sl_true;
+		}
+	}
+	output.sz8 = "";
+	output.len = 0;
+	return sl_false;
 }
 
-sl_uint32 SafeString8::getUtf16(sl_char16* utf16, sl_int32 len) const
+sl_size SafeString8::getUtf16(sl_char16* utf16, sl_size len) const
 {
     String8 s(*this);
     return s.getUtf16(utf16, len);
 }
 
-StringData SafeString8::getUtf16() const
+sl_bool SafeString8::getUtf16(StringData& output) const
 {
     String8 s(*this);
-    return s.getUtf16();
+    return s.getUtf16(output);
 }
 
-sl_uint32 SafeString16::getUtf8(sl_char8* utf8, sl_int32 len) const
+sl_size SafeString16::getUtf8(sl_char8* utf8, sl_size len) const
 {
 	String16 s(*this);
 	return s.getUtf8(utf8, len);
 }
 
-StringData SafeString16::getUtf8() const
+sl_bool SafeString16::getUtf8(StringData& output) const
 {
 	String16 s(*this);
-	return s.getUtf8();
+	return s.getUtf8(output);
 }
 
 
 Memory String8::toUtf16() const
 {
 	sl_char8* sz8 = getData();
-	sl_uint32 len8 = getLength();
-	sl_int32 len16 = _StringBase::utf8ToUtf16(sz8, len8, sl_null, -1);
+	sl_size len8 = getLength();
+	sl_size len16 = _StringBase::utf8ToUtf16(sz8, len8, sl_null, -1);
 	Memory memory = Memory::create(2 * (len16 + 1));
 	if (memory.isNotEmpty()) {
 		sl_char16* buf = (sl_char16*)(memory.getData());
@@ -3915,8 +3722,8 @@ Memory String8::toUtf16() const
 Memory String16::toUtf8() const
 {
 	sl_char16* sz16 = getData();
-	sl_uint32 len16 = getLength();
-	sl_int32 len8 = _StringBase::utf16ToUtf8(sz16, len16, sl_null, -1);
+	sl_size len16 = getLength();
+	sl_size len8 = _StringBase::utf16ToUtf8(sz16, len16, sl_null, -1);
 	Memory memory = Memory::create(len8 + 1);
 	if (memory.isNotEmpty()) {
 		sl_char8* buf = (sl_char8*)(memory.getData());
@@ -3939,46 +3746,48 @@ Memory SafeString16::toUtf8() const
 }
 
 
-sl_uint32 String8::getUtf32(sl_char32* utf32, sl_int32 len) const
+sl_size String8::getUtf32(sl_char32* utf32, sl_size len) const
 {
 	return _StringBase::utf8ToUtf32(getData(), getLength(), utf32, len);
 }
 
-StringData String8::getUtf32() const
+sl_bool String8::getUtf32(StringData& output) const
 {
-	StringData ret;
-	ret.mem = toUtf32();
-	if (ret.mem.isNotEmpty()) {
-		ret.sz32 = (const sl_char32*)(ret.mem.getData());
-		ret.len = (sl_uint32)(ret.mem.getSize() / 4 - 1);
-		if (!ret.sz32) {
-			ret.sz32 = (sl_char32*)("\0\0\0\0");
-			ret.len = 0;
-		}
-	} else {
-		ret.sz32 = (sl_char32*)("\0\0\0\0");
-		ret.len = 0;
+	if (isEmpty()) {
+		output.sz32 = (sl_char32*)("\0\0\0\0");
+		output.len = 0;
+		return sl_true;
 	}
-	return ret;
+	Memory mem = toUtf32();
+	if (mem.isNotEmpty()) {
+		output.sz32 = (const sl_char32*)(mem.getData());
+		output.len = mem.getSize() / 4 - 1;
+		if (output.sz32) {
+			return sl_true;
+		}
+	}
+	output.sz32 = (sl_char32*)("\0\0\0\0");
+	output.len = 0;
+	return sl_false;
 }
 
-sl_uint32 SafeString8::getUtf32(sl_char32* utf32, sl_int32 len) const
+sl_size SafeString8::getUtf32(sl_char32* utf32, sl_size len) const
 {
     String8 s(*this);
     return s.getUtf32(utf32, len);
 }
 
-StringData SafeString8::getUtf32() const
+sl_bool SafeString8::getUtf32(StringData& output) const
 {
     String8 s(*this);
-    return s.getUtf32();
+    return s.getUtf32(output);
 }
 
 Memory String8::toUtf32() const
 {
 	sl_char8* sz8 = getData();
-	sl_uint32 len8 = getLength();
-	sl_int32 len32 = _StringBase::utf8ToUtf32(sz8, len8, sl_null, -1);
+	sl_size len8 = getLength();
+	sl_size len32 = _StringBase::utf8ToUtf32(sz8, len8, sl_null, -1);
 	Memory memory = Memory::create(4 * (len32 + 1));
 	if (memory.isNotEmpty()) {
 		sl_char32* buf = (sl_char32*)(memory.getData());
@@ -3995,9 +3804,9 @@ Memory SafeString8::toUtf32() const
 }
 
 
-String8 String8::substring(sl_int32 start, sl_int32 end) const
+String8 String8::substring(sl_reg start, sl_reg end) const
 {
-	sl_int32 count = getLength();
+	sl_reg count = getLength();
 	if (start < 0) {
 		start = 0;
 	}
@@ -4013,9 +3822,9 @@ String8 String8::substring(sl_int32 start, sl_int32 end) const
 	return String8(getData() + start, end - start);
 }
 
-String16 String16::substring(sl_int32 start, sl_int32 end) const
+String16 String16::substring(sl_reg start, sl_reg end) const
 {
-	sl_int32 count = getLength();
+	sl_reg count = getLength();
 	if (start < 0) {
 		start = 0;
 	}
@@ -4031,91 +3840,91 @@ String16 String16::substring(sl_int32 start, sl_int32 end) const
 	return String16(getData() + start, end - start);
 }
 
-String8 SafeString8::substring(sl_int32 start, sl_int32 end) const
+String8 SafeString8::substring(sl_reg start, sl_reg end) const
 {
     String8 s(*this);
     return s.substring(start, end);
 }
 
-String16 SafeString16::substring(sl_int32 start, sl_int32 end) const
+String16 SafeString16::substring(sl_reg start, sl_reg end) const
 {
 	String16 s(*this);
 	return s.substring(start, end);
 }
 
 
-String8 String8::left(sl_uint32 len) const
+String8 String8::left(sl_reg len) const
 {
     return substring(0, len);
 }
 
-String16 String16::left(sl_uint32 len) const
+String16 String16::left(sl_reg len) const
 {
     return substring( 0, len );
 }
 
-String8 SafeString8::left(sl_uint32 len) const
+String8 SafeString8::left(sl_reg len) const
 {
     String8 s(*this);
     return s.left(len);
 }
 
-String16 SafeString16::left(sl_uint32 len) const
+String16 SafeString16::left(sl_reg len) const
 {
 	String16 s(*this);
 	return s.left(len);
 }
 
 
-String8 String8::right(sl_uint32 len) const
+String8 String8::right(sl_reg len) const
 {
     return substring(getLength() - len);
 }
 
-String16 String16::right(sl_uint32 len) const
+String16 String16::right(sl_reg len) const
 {
-    return substring(getLength()-len);
+    return substring(getLength() - len);
 }
 
-String8 SafeString8::right(sl_uint32 len) const
+String8 SafeString8::right(sl_reg len) const
 {
 	String8 s(*this);
 	return s.right(len);
 }
 
-String16 SafeString16::right(sl_uint32 len) const
+String16 SafeString16::right(sl_reg len) const
 {
 	String16 s(*this);
 	return s.right(len);
 }
 
 
-String8 String8::mid(sl_int32 start, sl_int32 len) const
+String8 String8::mid(sl_reg start, sl_reg len) const
 {
     return substring(start, start + len);
 }
 	
-String16 String16::mid(sl_int32 start, sl_int32 len) const
+String16 String16::mid(sl_reg start, sl_reg len) const
 {
     return substring(start, start+len);
 }
 
-String8 SafeString8::mid(sl_int32 start, sl_int32 len) const
+String8 SafeString8::mid(sl_reg start, sl_reg len) const
 {
 	String8 s(*this);
 	return s.mid(start, len);
 }
 
-String16 SafeString16::mid(sl_int32 start, sl_int32 len) const
+String16 SafeString16::mid(sl_reg start, sl_reg len) const
 {
 	String16 s(*this);
 	return s.mid(start, len);
 }
 
 
-sl_int32 String8::indexOf(sl_char8 ch, sl_int32 start) const
+sl_reg String8::indexOf(sl_char8 ch, sl_reg start) const
 {
-	sl_int32 count = getLength();
+	sl_reg count = getLength();
 	if (count == 0) {
 		return -1;
 	}
@@ -4130,13 +3939,13 @@ sl_int32 String8::indexOf(sl_char8 ch, sl_int32 start) const
 	if (pt == sl_null) {
 		return -1;
 	} else {
-		return (sl_int32)(pt - sz);
+		return (sl_reg)(pt - sz);
 	}
 }
 
-sl_int32 String16::indexOf(sl_char16 ch, sl_int32 start) const
+sl_reg String16::indexOf(sl_char16 ch, sl_reg start) const
 {
-	sl_int32 count = getLength();
+	sl_reg count = getLength();
 	if (count == 0) {
 		return -1;
 	}
@@ -4151,17 +3960,17 @@ sl_int32 String16::indexOf(sl_char16 ch, sl_int32 start) const
 	if (pt == sl_null) {
 		return -1;
 	} else {
-		return (sl_int32)(pt - sz);
+		return (sl_reg)(pt - sz);
 	}
 }
 
-sl_int32 SafeString8::indexOf(sl_char8 ch, sl_int32 start) const
+sl_reg SafeString8::indexOf(sl_char8 ch, sl_reg start) const
 {
 	String8 s(*this);
 	return s.indexOf(ch, start);
 }
 
-sl_int32 SafeString16::indexOf(sl_char16 ch, sl_int32 start) const
+sl_reg SafeString16::indexOf(sl_char16 ch, sl_reg start) const
 {
 	String16 s(*this);
 	return s.indexOf(ch, start);
@@ -4169,13 +3978,13 @@ sl_int32 SafeString16::indexOf(sl_char16 ch, sl_int32 start) const
 
 
 template <class ST, class CT, class TT>
-SLIB_INLINE sl_int32 _String_indexOf(const ST& str, const ST& pattern, sl_int32 start)
+SLIB_INLINE sl_reg _String_indexOf(const ST& str, const ST& pattern, sl_reg start)
 {
-	sl_int32 countPat = pattern.getLength();
+	sl_reg countPat = pattern.getLength();
 	if (countPat == 0) {
 		return 0;
 	}
-	sl_int32 count = str.getLength();
+	sl_reg count = str.getLength();
 	if (count == 0) {
 		return -1;
 	}
@@ -4192,40 +4001,40 @@ SLIB_INLINE sl_int32 _String_indexOf(const ST& str, const ST& pattern, sl_int32 
 		if (pt == sl_null)
 			return -1;
 		if (TT::compareMemory(pt + 1, bufPat + 1, countPat - 1) == 0) {
-			return (sl_int32)(pt - buf);
+			return (sl_reg)(pt - buf);
 		} else {
-			start = (sl_int32)(pt - buf + 1);
+			start = (sl_reg)(pt - buf + 1);
 		}
 	}
 	return -1;
 }
 
-sl_int32 String8::indexOf(const String8& pattern, sl_int32 start) const
+sl_reg String8::indexOf(const String8& pattern, sl_reg start) const
 {
 	return _String_indexOf<String8, sl_char8, _TemplateFunc8>(*this, pattern, start);
 }
 
-sl_int32 String16::indexOf(const String16& pattern, sl_int32 start) const
+sl_reg String16::indexOf(const String16& pattern, sl_reg start) const
 {
 	return _String_indexOf<String16, sl_char16, _TemplateFunc16>(*this, pattern, start);
 }
 
-sl_int32 SafeString8::indexOf(const String8& str, sl_int32 start) const
+sl_reg SafeString8::indexOf(const String8& str, sl_reg start) const
 {
 	String8 s(*this);
 	return s.indexOf(str, start);
 }
 
-sl_int32 SafeString16::indexOf(const String16& str, sl_int32 start) const
+sl_reg SafeString16::indexOf(const String16& str, sl_reg start) const
 {
 	String16 s(*this);
 	return s.indexOf(str, start);
 }
 
 
-sl_int32 String8::lastIndexOf(sl_char8 ch, sl_int32 start) const
+sl_reg String8::lastIndexOf(sl_char8 ch, sl_reg start) const
 {
-	sl_int32 count = getLength();
+	sl_reg count = getLength();
 	if (count == 0) {
 		return -1;
 	}
@@ -4237,13 +4046,13 @@ sl_int32 String8::lastIndexOf(sl_char8 ch, sl_int32 start) const
 	if (pt == sl_null) {
 		return -1;
 	} else {
-		return (sl_int32)(pt - sz);
+		return (sl_reg)(pt - sz);
 	}
 }
 
-sl_int32 String16::lastIndexOf(sl_char16 ch, sl_int32 start) const
+sl_reg String16::lastIndexOf(sl_char16 ch, sl_reg start) const
 {
-	sl_int32 count = getLength();
+	sl_reg count = getLength();
 	if (count == 0) {
 		return -1;
 	}
@@ -4255,17 +4064,17 @@ sl_int32 String16::lastIndexOf(sl_char16 ch, sl_int32 start) const
 	if (pt == sl_null) {
 		return -1;
 	} else {
-		return (sl_int32)(pt - sz);
+		return (sl_reg)(pt - sz);
 	}
 }
 
-sl_int32 SafeString8::lastIndexOf(sl_char8 ch, sl_int32 start) const
+sl_reg SafeString8::lastIndexOf(sl_char8 ch, sl_reg start) const
 {
 	String8 s(*this);
 	return s.lastIndexOf(ch, start);
 }
 
-sl_int32 SafeString16::lastIndexOf(sl_char16 ch, sl_int32 start) const
+sl_reg SafeString16::lastIndexOf(sl_char16 ch, sl_reg start) const
 {
 	String16 s(*this);
 	return s.lastIndexOf(ch, start);
@@ -4273,13 +4082,13 @@ sl_int32 SafeString16::lastIndexOf(sl_char16 ch, sl_int32 start) const
 
 
 template <class ST, class CT, class TT>
-SLIB_INLINE sl_int32 _String_lastIndexOf(const ST& str, const ST& pattern, sl_int32 start)
+SLIB_INLINE sl_reg _String_lastIndexOf(const ST& str, const ST& pattern, sl_reg start)
 {
-	sl_int32 countPat = pattern.getLength();
+	sl_reg countPat = pattern.getLength();
 	if (countPat == 0) {
 		return -1;
 	}
-	sl_int32 count = str.getLength();
+	sl_reg count = str.getLength();
 	if (count == 0) {
 		return -1;
 	}
@@ -4293,31 +4102,31 @@ SLIB_INLINE sl_int32 _String_lastIndexOf(const ST& str, const ST& pattern, sl_in
 		if (pt == sl_null)
 			return -1;
 		if (TT::compareMemory(pt + 1, bufPat + 1, countPat - 1) == 0) {
-			return (sl_int32)(pt - buf);
+			return (sl_reg)(pt - buf);
 		} else {
-			start = (sl_int32)(pt - buf - 1);
+			start = (sl_reg)(pt - buf - 1);
 		}
 	}
 	return -1;
 }
 
-sl_int32 String8::lastIndexOf(const String8& pattern, sl_int32 start) const
+sl_reg String8::lastIndexOf(const String8& pattern, sl_reg start) const
 {
 	return _String_lastIndexOf<String8, sl_char8, _TemplateFunc8>(*this, pattern, start);
 }
 
-sl_int32 String16::lastIndexOf(const String16& pattern, sl_int32 start) const
+sl_reg String16::lastIndexOf(const String16& pattern, sl_reg start) const
 {
 	return _String_lastIndexOf<String16, sl_char16, _TemplateFunc16>(*this, pattern, start);
 }
 
-sl_int32 SafeString8::lastIndexOf(const String8& str, sl_int32 start) const
+sl_reg SafeString8::lastIndexOf(const String8& str, sl_reg start) const
 {
 	String8 s(*this);
 	return s.indexOf(str, start);
 }
 
-sl_int32 SafeString16::lastIndexOf(const String16& str, sl_int32 start) const
+sl_reg SafeString16::lastIndexOf(const String16& str, sl_reg start) const
 {
 	String16 s(*this);
 	return s.indexOf(str, start);
@@ -4357,11 +4166,11 @@ sl_bool SafeString16::startsWith(sl_char16 ch) const
 
 sl_bool String8::startsWith(const String8& str) const
 {
-	sl_int32 count2 = str.getLength();
+	sl_size count2 = str.getLength();
 	if (count2 == 0) {
 		return sl_true;
 	}
-	sl_int32 count1 = getLength();
+	sl_size count1 = getLength();
 	if (count1 < count2) {
 		return sl_false;
 	} else {
@@ -4371,11 +4180,11 @@ sl_bool String8::startsWith(const String8& str) const
 
 sl_bool String16::startsWith(const String16& str) const
 {
-	sl_int32 count2 = str.getLength();
+	sl_size count2 = str.getLength();
 	if (count2 == 0) {
 		return sl_true;
 	}
-	sl_int32 count1 = getLength();
+	sl_size count1 = getLength();
 	if (count1 < count2) {
 		return sl_false;
 	} else {
@@ -4398,7 +4207,7 @@ sl_bool SafeString16::startsWith(const String16& str) const
 
 sl_bool String8::endsWith(sl_char8 ch) const
 {
-	sl_int32 count = getLength();
+	sl_size count = getLength();
 	if (count < 1) {
 		return sl_false;
 	} else {
@@ -4408,7 +4217,7 @@ sl_bool String8::endsWith(sl_char8 ch) const
 
 sl_bool String16::endsWith(sl_char16 ch) const
 {
-	sl_int32 count = getLength();
+	sl_size count = getLength();
 	if (count < 1) {
 		return sl_false;
 	} else {
@@ -4431,11 +4240,11 @@ sl_bool SafeString16::endsWith(sl_char16 ch) const
 
 sl_bool String8::endsWith(const String8& str) const
 {
-	sl_int32 count2 = str.getLength();
+	sl_size count2 = str.getLength();
 	if (count2 == 0) {
 		return sl_true;
 	}
-	sl_int32 count1 = getLength();
+	sl_size count1 = getLength();
 	if (count1 < count2) {
 		return sl_false;
 	} else {
@@ -4445,11 +4254,11 @@ sl_bool String8::endsWith(const String8& str) const
 
 sl_bool String16::endsWith(const String16& str) const
 {
-	sl_int32 count2 = str.getLength();
+	sl_size count2 = str.getLength();
 	if (count2 == 0) {
 		return sl_true;
 	}
-	sl_int32 count1 = getLength();
+	sl_size count1 = getLength();
 	if (count1 < count2) {
 		return sl_false;
 	} else {
@@ -4520,8 +4329,8 @@ sl_bool SafeString16::contains(const String16& str) const
 void String8::makeUpper()
 {
 	sl_char8* buf = getData();
-	sl_int32 n = getLength();
-	for (sl_int32 i = 0; i < n; i++) {
+	sl_size n = getLength();
+	for (sl_size i = 0; i < n; i++) {
 		if (buf[i] >= 'a' && buf[i] <= 'z') {
 			buf[i] = buf[i] - ('a' - 'A');
 		}
@@ -4531,8 +4340,8 @@ void String8::makeUpper()
 void String16::makeUpper()
 {
 	sl_char16* buf = getData();
-	sl_int32 n = getLength();
-	for (sl_int32 i = 0; i < n; i++) {
+	sl_size n = getLength();
+	for (sl_size i = 0; i < n; i++) {
 		if (buf[i] >= 'a' && buf[i] <= 'z') {
 			buf[i] = buf[i] - ('a' - 'A');
 		}
@@ -4555,8 +4364,8 @@ void SafeString16::makeUpper()
 void String8::makeLower()
 {
 	sl_char8* buf = getData();
-	sl_int32 n = getLength();
-	for (sl_int32 i = 0; i < n; i++) {
+	sl_size n = getLength();
+	for (sl_size i = 0; i < n; i++) {
 		if (buf[i] >= 'A' && buf[i] <= 'Z') {
 			buf[i] = buf[i] + ('a' - 'A');
 		}
@@ -4566,8 +4375,8 @@ void String8::makeLower()
 void String16::makeLower()
 {
 	sl_char16* buf = getData();
-	sl_int32 n = getLength();
-	for (sl_int32 i = 0; i < n; i++) {
+	sl_size n = getLength();
+	for (sl_size i = 0; i < n; i++) {
 		if (buf[i] >= 'A' && buf[i] <= 'Z') {
 			buf[i] = buf[i] + ('a' - 'A');
 		}
@@ -4643,37 +4452,30 @@ String16 SafeString16::toLower() const
 
 struct STRING_REPLACE_SUBSET
 {
-	sl_int32 start;
-	sl_int32 len;
-
-	SLIB_INLINE STRING_REPLACE_SUBSET() {}
-	
-	SLIB_INLINE STRING_REPLACE_SUBSET(const STRING_REPLACE_SUBSET& o)
-	{
-		start = o.start;
-		len = o.len;
-	}
+	sl_reg start;
+	sl_reg len;
 };
+
 template <class ST, class CT, class TT>
 SLIB_INLINE ST _String_replaceAll(const ST& str, const ST& pattern, const ST& replacement)
 {
-	sl_int32 countPat = pattern.getLength();
+	sl_reg countPat = pattern.getLength();
 	if (countPat == 0) {
 		return ST::null();
 	}
-	sl_int32 count = str.getLength();
+	sl_reg count = str.getLength();
 	if (count == 0) {
 		return ST::null();
 	}
 	Queue<STRING_REPLACE_SUBSET> queue;
 	STRING_REPLACE_SUBSET subset;
-	sl_int32 countReplace = replacement.getLength();
+	sl_reg countReplace = replacement.getLength();
 	const CT* buf = str.getData();
 	const CT* bufReplace = replacement.getData();
-	sl_int32 size = 0;
-	sl_int32 start = 0;
+	sl_reg size = 0;
+	sl_reg start = 0;
 	while (start <= count + countPat - 1) {
-		sl_int32 index = str.indexOf(pattern, start);
+		sl_reg index = str.indexOf(pattern, start);
 		if (index < 0) {
 			index = count;
 		} else {
@@ -4728,8 +4530,8 @@ template <class ST, class CT>
 SLIB_INLINE ST _String_trim(const ST& str)
 {
 	const CT* sz = str.getData();
-	sl_uint32 n = str.getLength();
-	sl_uint32 i = 0;
+	sl_size n = str.getLength();
+	sl_size i = 0;
 	for (; i < n; i++) {
 		CT c = sz[i];
 		if (c != ' ' && c != '\t' && c != '\r' && c != '\n') {
@@ -4739,7 +4541,7 @@ SLIB_INLINE ST _String_trim(const ST& str)
 	if (i >= n) {
 		return ST::null();
 	}
-	sl_uint32 j = n - 1;
+	sl_size j = n - 1;
 	for (; j >= i; j--) {
 		CT c = sz[j];
 		if (c != ' ' && c != '\t' && c != '\r' && c != '\n') {
@@ -4776,8 +4578,8 @@ template <class ST, class CT>
 SLIB_INLINE ST _String_trimLeft(const ST& str)
 {
 	const CT* sz = str.getData();
-	sl_uint32 n = str.getLength();
-	sl_uint32 i = 0;
+	sl_size n = str.getLength();
+	sl_size i = 0;
 	for (; i < n; i++) {
 		CT c = sz[i];
 		if (c != ' ' && c != '\t' && c != '\r' && c != '\n') {
@@ -4817,8 +4619,8 @@ template <class ST, class CT>
 SLIB_INLINE ST _String_trimRight(const ST& str)
 {
 	const CT* sz = str.getData();
-	sl_uint32 n = str.getLength();
-	sl_uint32 j = n;
+	sl_size n = str.getLength();
+	sl_size j = n;
 	for (; j > 0; j--) {
 		CT c = sz[j-1];
 		if (c != ' ' && c != '\t' && c != '\r' && c != '\n') {
@@ -4862,9 +4664,9 @@ List<ST> _String_split(const ST& str, const ST& pattern)
 		if (pattern.isEmpty()) {
 			return ret;
 		}
-		sl_int32 start = 0;
+		sl_reg start = 0;
 		while (1) {
-			sl_int32 index = str.indexOf(pattern, start);
+			sl_reg index = str.indexOf(pattern, start);
 			if (index < 0) {
 				ret->add_NoLock(str.substring(start));
 				break;
@@ -4900,15 +4702,15 @@ List<String16> SafeString16::split(const String16& pattern) const
 
 
 template <class ST, class CT>
-static sl_uint32 _String_applyBackslashEscapes(const ST& s, sl_bool flagDoubleQuote, CT* buf)
+static sl_size _String_applyBackslashEscapes(const ST& s, sl_bool flagDoubleQuote, CT* buf)
 {
 	const CT* ch = s.getData();
-	sl_uint32 len = s.getLength();
-	sl_uint32 d = 1;
+	sl_size len = s.getLength();
+	sl_size d = 1;
 	if (buf) {
 		buf[0] = flagDoubleQuote ? '"' : '\'';
 	}
-	for (sl_uint32 i = 0; i < len; i++) {
+	for (sl_size i = 0; i < len; i++) {
 		CT c = ch[i];
 		CT r = 0;
 		switch (c) {
@@ -4972,7 +4774,7 @@ static sl_uint32 _String_applyBackslashEscapes(const ST& s, sl_bool flagDoubleQu
 
 String8 String8::applyBackslashEscapes(sl_bool flagDoubleQuote)
 {
-	sl_uint32 n = _String_applyBackslashEscapes<String8, sl_char8>(*this, flagDoubleQuote, sl_null);
+	sl_size n = _String_applyBackslashEscapes<String8, sl_char8>(*this, flagDoubleQuote, sl_null);
 	String8 ret = allocate(n);
 	if (ret.isEmpty()) {
 		return String8::null();
@@ -4983,7 +4785,7 @@ String8 String8::applyBackslashEscapes(sl_bool flagDoubleQuote)
 
 String16 String16::applyBackslashEscapes(sl_bool flagDoubleQuote)
 {
-	sl_uint32 n = _String_applyBackslashEscapes<String16, sl_char16>(*this, flagDoubleQuote, sl_null);
+	sl_size n = _String_applyBackslashEscapes<String16, sl_char16>(*this, flagDoubleQuote, sl_null);
 	String16 ret = allocate(n);
 	if (ret.isEmpty()) {
 		return String16::null();
@@ -5006,7 +4808,7 @@ String16 SafeString16::applyBackslashEscapes(sl_bool flagDoubleQuote)
 
 
 template <class ST, class CT>
-SLIB_INLINE ST _String_parseBackslashEscapes(const CT* sz, sl_uint32 n, sl_uint32* lengthParsed, sl_bool* outFlagError)
+SLIB_INLINE ST _String_parseBackslashEscapes(const CT* sz, sl_size n, sl_size* lengthParsed, sl_bool* outFlagError)
 {
 	if (lengthParsed) {
 		*lengthParsed = 0;
@@ -5032,9 +4834,9 @@ SLIB_INLINE ST _String_parseBackslashEscapes(const CT* sz, sl_uint32 n, sl_uint3
 	if (buf == sl_null) {
 		return ST::null();
 	}
-	sl_uint32 len = 0;
+	sl_size len = 0;
 	sl_bool flagSuccess = sl_false;
-	sl_uint32 i = 1;
+	sl_size i = 1;
 	for (; i < n; i++) {
 		CT ch = sz[i];
 		sl_bool flagError = sl_false;
@@ -5112,44 +4914,44 @@ SLIB_INLINE ST _String_parseBackslashEscapes(const CT* sz, sl_uint32 n, sl_uint3
 	return ret;
 }
 
-String8 String8::parseBackslashEscapes(const sl_char8* sz, sl_uint32 n, sl_uint32* lengthParsed, sl_bool* outFlagError)
+String8 String8::parseBackslashEscapes(const sl_char8* sz, sl_size n, sl_size* lengthParsed, sl_bool* outFlagError)
 {
 	return _String_parseBackslashEscapes<String8, sl_char8>(sz, n, lengthParsed, outFlagError);
 }
 
-String16 String16::parseBackslashEscapes(const sl_char16* sz, sl_uint32 n, sl_uint32* lengthParsed, sl_bool* outFlagError)
+String16 String16::parseBackslashEscapes(const sl_char16* sz, sl_size n, sl_size* lengthParsed, sl_bool* outFlagError)
 {
 	return _String_parseBackslashEscapes<String16, sl_char16>(sz, n, lengthParsed, outFlagError);
 }
 
-String8 String8::parseBackslashEscapes(sl_uint32* lengthParsed, sl_bool* flagError) const
+String8 String8::parseBackslashEscapes(sl_size* lengthParsed, sl_bool* flagError) const
 {
     return parseBackslashEscapes(getData(), getLength(), lengthParsed, flagError);
 }
 
-String16 String16::parseBackslashEscapes(sl_uint32* lengthParsed, sl_bool* flagError) const
+String16 String16::parseBackslashEscapes(sl_size* lengthParsed, sl_bool* flagError) const
 {
 	return parseBackslashEscapes(getData(), getLength(), lengthParsed, flagError);
 }
 
-String8 SafeString8::parseBackslashEscapes(sl_uint32* lengthParsed, sl_bool* flagError) const
+String8 SafeString8::parseBackslashEscapes(sl_size* lengthParsed, sl_bool* flagError) const
 {
 	String8 s(*this);
 	return s.parseBackslashEscapes(lengthParsed, flagError);
 }
 
-String16 SafeString16::parseBackslashEscapes(sl_uint32* lengthParsed, sl_bool* flagError) const
+String16 SafeString16::parseBackslashEscapes(sl_size* lengthParsed, sl_bool* flagError) const
 {
 	String16 s(*this);
 	return s.parseBackslashEscapes(lengthParsed, flagError);
 }
 
 template <class CT>
-SLIB_INLINE sl_uint32 _String_countLineNumber(const CT* input, sl_uint32 len, sl_uint32* columnLast)
+SLIB_INLINE sl_size _String_countLineNumber(const CT* input, sl_size len, sl_size* columnLast)
 {
-	sl_uint32 line = 1;
-	sl_uint32 col = 1;
-	for (sl_uint32 i = 0; i < len; i++) {
+	sl_size line = 1;
+	sl_size col = 1;
+	for (sl_size i = 0; i < len; i++) {
 		CT ch = input[i];
 		if (ch == '\r') {
 			line++;
@@ -5169,75 +4971,75 @@ SLIB_INLINE sl_uint32 _String_countLineNumber(const CT* input, sl_uint32 len, sl
 	return line;
 }
 
-sl_uint32 String8::countLineNumber(const sl_char8* input, sl_uint32 len, sl_uint32* columnLast)
+sl_size String8::countLineNumber(const sl_char8* input, sl_size len, sl_size* columnLast)
 {
 	return _String_countLineNumber(input, len, columnLast);
 }
 
-sl_uint32 String16::countLineNumber(const sl_char16* input, sl_uint32 len, sl_uint32* columnLast)
+sl_size String16::countLineNumber(const sl_char16* input, sl_size len, sl_size* columnLast)
 {
 	return _String_countLineNumber(input, len, columnLast);
 }
 
-sl_uint32 String8::countLineNumber(sl_uint32 pos, sl_uint32* column) const
+sl_size String8::countLineNumber(sl_size pos, sl_size* column) const
 {
 	return countLineNumber(getData(), Math::min(getLength(), pos), column);
 }
 
-sl_uint32 String16::countLineNumber(sl_uint32 pos, sl_uint32* column) const
+sl_size String16::countLineNumber(sl_size pos, sl_size* column) const
 {
 	return countLineNumber(getData(), Math::min(getLength(), pos), column);
 }
 
-sl_uint32 SafeString8::countLineNumber(sl_uint32 pos, sl_uint32* column) const
+sl_size SafeString8::countLineNumber(sl_size pos, sl_size* column) const
 {
 	String8 s(*this);
 	return s.countLineNumber(pos, column);
 }
 
-sl_uint32 SafeString16::countLineNumber(sl_uint32 pos, sl_uint32* column) const
+sl_size SafeString16::countLineNumber(sl_size pos, sl_size* column) const
 {
 	String16 s(*this);
 	return s.countLineNumber(pos, column);
 }
 
 
-sl_int32 String8::utf8ToUtf16(const sl_char8* utf8, sl_int32 lenUtf8, sl_char16* utf16, sl_int32 lenUtf16Buffer)
+sl_size String8::utf8ToUtf16(const sl_char8* utf8, sl_reg lenUtf8, sl_char16* utf16, sl_reg lenUtf16Buffer)
 {
 	return _StringBase::utf8ToUtf16(utf8, lenUtf8, utf16, lenUtf16Buffer);
 }
 
-sl_int32 String16::utf8ToUtf16(const sl_char8* utf8, sl_int32 lenUtf8, sl_char16* utf16, sl_int32 lenUtf16Buffer)
+sl_size String16::utf8ToUtf16(const sl_char8* utf8, sl_reg lenUtf8, sl_char16* utf16, sl_reg lenUtf16Buffer)
 {
 	return _StringBase::utf8ToUtf16(utf8, lenUtf8, utf16, lenUtf16Buffer);
 }
 
-sl_int32 String8::utf8ToUtf32(const sl_char8* utf8, sl_int32 lenUtf8, sl_char32* utf32, sl_int32 lenUtf32Buffer)
+sl_size String8::utf8ToUtf32(const sl_char8* utf8, sl_reg lenUtf8, sl_char32* utf32, sl_reg lenUtf32Buffer)
 {
 	return _StringBase::utf8ToUtf32(utf8, lenUtf8, utf32, lenUtf32Buffer);
 }
 
-sl_int32 String16::utf8ToUtf32(const sl_char8* utf8, sl_int32 lenUtf8, sl_char32* utf32, sl_int32 lenUtf32Buffer)
+sl_size String16::utf8ToUtf32(const sl_char8* utf8, sl_reg lenUtf8, sl_char32* utf32, sl_reg lenUtf32Buffer)
 {
 	return _StringBase::utf8ToUtf32(utf8, lenUtf8, utf32, lenUtf32Buffer);
 }
 
-sl_int32 String8::utf16ToUtf8(const sl_char16* utf16, sl_int32 lenUtf16, sl_char8* utf8, sl_int32 lenUtf8Buffer)
+sl_size String8::utf16ToUtf8(const sl_char16* utf16, sl_reg lenUtf16, sl_char8* utf8, sl_reg lenUtf8Buffer)
 {
 	return _StringBase::utf16ToUtf8(utf16, lenUtf16, utf8, lenUtf8Buffer);
 }
 
-sl_int32 String16::utf16ToUtf8(const sl_char16* utf16, sl_int32 lenUtf16, sl_char8* utf8, sl_int32 lenUtf8Buffer)
+sl_size String16::utf16ToUtf8(const sl_char16* utf16, sl_reg lenUtf16, sl_char8* utf8, sl_reg lenUtf8Buffer)
 {
 	return _StringBase::utf16ToUtf8(utf16, lenUtf16, utf8, lenUtf8Buffer);
 }
 
-sl_int32 String8::utf32ToUtf8(const sl_char32* utf32, sl_int32 lenUtf32, sl_char8* utf8, sl_int32 lenUtf8Buffer)
+sl_size String8::utf32ToUtf8(const sl_char32* utf32, sl_reg lenUtf32, sl_char8* utf8, sl_reg lenUtf8Buffer)
 {
 	return _StringBase::utf32ToUtf8(utf32, lenUtf32, utf8, lenUtf8Buffer);
 }
 
-sl_int32 String16::utf32ToUtf8(const sl_char32* utf32, sl_int32 lenUtf32, sl_char8* utf8, sl_int32 lenUtf8Buffer)
+sl_size String16::utf32ToUtf8(const sl_char32* utf32, sl_reg lenUtf32, sl_char8* utf8, sl_reg lenUtf8Buffer)
 {
 	return _StringBase::utf32ToUtf8(utf32, lenUtf32, utf8, lenUtf8Buffer);
 }
@@ -5320,6 +5122,7 @@ sl_uint32 Hash<SafeString16>::hash(const SafeString16& v)
 /**********************************************************
 					String Buffer
 **********************************************************/
+
 StringBuffer8::StringBuffer8()
 {
 	m_len = 0;
@@ -5330,26 +5133,121 @@ StringBuffer16::StringBuffer16()
 	m_len = 0;
 }
 
+sl_bool StringBuffer8::add(const String8& str)
+{
+	sl_size len = str.getLength();
+	if (len == 0) {
+		return sl_true;
+	}
+	ObjectLocker lock(this);
+	StringData data;
+	data.sz8 = str.getData();
+	data.len = len;
+	data.str8 = str;
+	if (m_queue.push(data)) {
+		m_len += len;
+		return sl_true;
+	}
+	return sl_false;
+}
+
+sl_bool StringBuffer16::add(const String16& str)
+{
+	sl_size len = str.getLength();
+	if (len == 0) {
+		return sl_true;
+	}
+	ObjectLocker lock(this);
+	StringData data;
+	data.sz16 = str.getData();
+	data.len = len;
+	data.str16 = str;
+	if (m_queue.push(data)) {
+		m_len += len;
+		return sl_true;
+	}
+	return sl_false;
+}
+
+sl_bool StringBuffer8::add(const StringData& data)
+{
+	sl_size len = data.len;
+	if (len == 0) {
+		return sl_true;
+	}
+	if (data.sz8) {
+		ObjectLocker lock(this);
+		if (m_queue.push(data)) {
+			m_len += len;
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
+sl_bool StringBuffer16::add(const StringData& data)
+{
+	sl_size len = data.len;
+	if (len == 0) {
+		return sl_true;
+	}
+	if (data.sz16) {
+		ObjectLocker lock(this);
+		if (m_queue.push(data)) {
+			m_len += len;
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
+sl_bool StringBuffer8::addStatic(const sl_char8* buf, sl_size length)
+{
+	StringData data;
+	data.sz8 = buf;
+	data.len = length;
+	return add(data);
+}
+
+sl_bool StringBuffer16::addStatic(const sl_char16* buf, sl_size length)
+{
+	StringData data;
+	data.sz16 = buf;
+	data.len = length;
+	return add(data);
+}
+
+sl_size StringBuffer8::getLength() const
+{
+	return m_len;
+}
+
+sl_size StringBuffer16::getLength() const
+{
+	return m_len;
+}
+
 String8 StringBuffer8::merge() const
 {
 	ObjectLocker lock(this);
 	if (m_queue.getCount() == 0) {
-		return String16::null();
+		return String8::getEmpty();
 	}
-	Link<String8>* begin = m_queue.getBegin();
-	if (m_queue.getCount() == 1) {
-		return begin->value;
-	}
-	sl_uint32 total = m_len;
+	Link<StringData>* begin = m_queue.getBegin();
+	sl_size total = m_len;
 	String8 ret = String8::allocate(total);
 	if (ret.isNotEmpty()) {
 		sl_char8* buf = (sl_char8*)(ret.getData());
-		sl_uint32 offset = 0;
-		Link<String8>* item = begin;
+		sl_size offset = 0;
+		Link<StringData>* item = begin;
 		while (item) {
-			String8& s = item->value;
-			sl_uint32 t = s.getLength();
-			Base::copyMemory(buf + offset, s.getData(), t * sizeof(sl_char8));
+			StringData& s = item->value;
+			sl_size t = s.len;
+			if (offset + t > total) {
+				Base::copyMemory(buf + offset, s.sz8, total - offset);
+				return ret;
+			}
+			Base::copyMemory(buf + offset, s.sz8, t);
 			offset += t;
 			item = item->next;
 		}
@@ -5361,124 +5259,22 @@ String16 StringBuffer16::merge() const
 {
 	ObjectLocker lock(this);
 	if (m_queue.getCount() == 0) {
-		return String16::null();
+		return String16::getEmpty();
 	}
-	Link<String16>* begin = m_queue.getBegin();
-	if (m_queue.getCount() ==1) {
-		return begin->value;
-	}
-	sl_uint32 total = m_len;
+	Link<StringData>* begin = m_queue.getBegin();
+	sl_size total = m_len;
 	String16 ret = String16::allocate(total);
 	if (ret.isNotEmpty()) {
 		sl_char16* buf = (sl_char16*)(ret.getData());
-		sl_uint32 offset = 0;
-		Link<String16>* item = begin;
-		while (item) {
-			String16& s = item->value;
-			sl_uint32 t = s.getLength();
-			Base::copyMemory(buf + offset, s.getData(), t * 2);
-			offset += t;
-			item = item->next;
-		}
-	}
-	return ret;
-}
-
-sl_bool StringBuffer8::add(const String8& str)
-{
-	sl_int32 len = str.getLength();
-	if (len == 0) {
-		return sl_true;
-	}
-	ObjectLocker lock(this);
-	if (m_len + len < SLIB_STR_MAX_LEN) {
-		m_queue.push(str);
-		m_len += len;
-		return sl_true;
-	} else {
-		return sl_false;
-	}
-}
-
-sl_bool StringBuffer16::add(const String16& str)
-{
-	sl_int32 len = str.getLength();
-	if (len == 0) {
-		return sl_true;
-	}
-	ObjectLocker lock(this);
-	if (m_len + len < SLIB_STR_MAX_LEN) {
-		m_queue.push(str);
-		m_len += len;
-		return sl_true;
-	} else {
-		return sl_false;
-	}
-}
-
-
-sl_int32 StringBuffer8::getLength() const
-{
-	return m_len;
-}
-
-sl_int32 StringBuffer16::getLength() const
-{
-	return m_len;
-}
-
-
-StringDataBuffer8::StringDataBuffer8()
-{
-	m_len = 0;
-}
-
-StringDataBuffer16::StringDataBuffer16()
-{
-	m_len = 0;
-}
-
-
-String8 StringDataBuffer8::merge() const
-{
-	ObjectLocker lock(this);
-	if (m_queue.getCount() == 0) {
-		return String16::null();
-	}
-	Link<StringData>* begin = m_queue.getBegin();
-	sl_uint32 total = m_len;
-	String8 ret = String8::allocate(total);
-	if (ret.isNotEmpty()) {
-		sl_char8* buf = (sl_char8*)(ret.getData());
-		sl_uint32 offset = 0;
+		sl_size offset = 0;
 		Link<StringData>* item = begin;
 		while (item) {
 			StringData& s = item->value;
-			sl_uint32 t = s.len;
-			Base::copyMemory(buf + offset, s.sz8, t * sizeof(sl_char8));
-			offset += t;
-			item = item->next;
-		}
-	}
-	return ret;
-}
-
-String16 StringDataBuffer16::merge() const
-{
-	ObjectLocker lock(this);
-	if (m_queue.getCount() == 0) {
-		return String16::null();
-	}
-	Link<StringData>* begin = m_queue.getBegin();
-	sl_uint32 total = m_len;
-	String16 ret = String16::allocate(total);
-	if (ret.isNotEmpty()) {
-		sl_char16* buf = (sl_char16*)(ret.getData());
-		sl_uint32 offset = 0;
-		Link<StringData>* item = begin;
-		while (item) {
-			StringData& s = item->value;
-			sl_uint32 t = s.len;
+			sl_size t = s.len;
+			if (offset + t > total) {
+				Base::copyMemory(buf + offset, s.sz16, (total - offset) * 2);
+				return ret;
+			}
 			Base::copyMemory(buf + offset, s.sz16, t * 2);
 			offset += t;
 			item = item->next;
@@ -5487,145 +5283,128 @@ String16 StringDataBuffer16::merge() const
 	return ret;
 }
 
-
-sl_bool StringDataBuffer8::add(const StringData& str)
+Memory StringBuffer8::mergeToMemory() const
 {
-	sl_int32 len = str.len;
-	if (len == 0) {
-		return sl_true;
-	}
 	ObjectLocker lock(this);
-	if (m_len + len < SLIB_STR_MAX_LEN) {
-		m_queue.push(str);
-		m_len += len;
-		return sl_true;
-	} else {
-		return sl_false;
+	if (m_queue.getCount() == 0) {
+		return Memory::null();
 	}
+	Link<StringData>* begin = m_queue.getBegin();
+	sl_size total = m_len;
+	Memory ret = Memory::create(total);
+	if (ret.isNotEmpty()) {
+		sl_char8* buf = (sl_char8*)(ret.getData());
+		sl_size offset = 0;
+		Link<StringData>* item = begin;
+		while (item) {
+			StringData& s = item->value;
+			sl_size t = s.len;
+			Base::copyMemory(buf + offset, s.sz8, t);
+			offset += t;
+			item = item->next;
+		}
+	}
+	return ret;
 }
 
-sl_bool StringDataBuffer16::add(const StringData& str)
+Memory StringBuffer16::mergeToMemory() const
 {
-	sl_int32 len = str.len;
-	if (len == 0) {
-		return sl_true;
-	}
 	ObjectLocker lock(this);
-	if (m_len + len < SLIB_STR_MAX_LEN) {
-		m_queue.push(str);
-		m_len += len;
-		return sl_true;
-	} else {
-		return sl_false;
+	if (m_queue.getCount() == 0) {
+		return Memory::null();
 	}
+	Link<StringData>* begin = m_queue.getBegin();
+	sl_size total = m_len;
+	Memory ret = Memory::create(total * 2);
+	if (ret.isNotEmpty()) {
+		sl_char16* buf = (sl_char16*)(ret.getData());
+		sl_size offset = 0;
+		Link<StringData>* item = begin;
+		while (item) {
+			StringData& s = item->value;
+			sl_size t = s.len;
+			Base::copyMemory(buf + offset, s.sz16, t * 2);
+			offset += t;
+			item = item->next;
+		}
+	}
+	return ret;
 }
-
-
-sl_bool StringDataBuffer8::add(const sl_char8* buf, sl_uint32 length)
-{
-	StringData data;
-	data.sz8 = buf;
-	data.len = length;
-	return add(data);
-}
-
-sl_bool StringDataBuffer16::add(const sl_char16* buf, sl_uint32 length)
-{
-	StringData data;
-	data.sz16 = buf;
-	data.len = length;
-	return add(data);
-}
-
-
-sl_bool StringDataBuffer8::add(const sl_char8* buf, sl_uint32 length, const Memory& mem)
-{
-	StringData data;
-	data.sz8 = buf;
-	data.len = length;
-	data.mem = mem;
-	return add(data);
-}
-
-sl_bool StringDataBuffer16::add(const sl_char16* buf, sl_uint32 length, const Memory& mem)
-{
-	StringData data;
-	data.sz16 = buf;
-	data.len = length;
-	data.mem = mem;
-	return add(data);
-}
-
-
-sl_int32 StringDataBuffer8::getLength() const
-{
-	return m_len;
-}
-
-sl_int32 StringDataBuffer16::getLength() const
-{
-	return m_len;
-}
-
 
 /**********************************************************
 					String Base
 **********************************************************/
-sl_int32 _StringBase::getSz8Length(const sl_char8* utf8, sl_int32 count)
+
+sl_size _StringBase::getSz8Length(const sl_char8* utf8, sl_reg count)
 {
 	if (count == 0) {
 		return 0;
 	}
 	if (count < 0) {
-		count = SLIB_STR_MAX_LEN - 1;
-	}
-	for (sl_int32 i = 0; i < count; i++) {
-		if (utf8[i] == 0) {
-			return i;
+		for (sl_reg i = 0; ; i++) {
+			if (utf8[i] == 0) {
+				return i;
+			}
+		}
+	} else {
+		for (sl_reg i = 0; i < count; i++) {
+			if (utf8[i] == 0) {
+				return i;
+			}
 		}
 	}
 	return count;
 }
 
-sl_int32 _StringBase::getSz16Length(const sl_char16* utf16, sl_int32 count)
+sl_size _StringBase::getSz16Length(const sl_char16* utf16, sl_reg count)
 {
 	if (count == 0) {
 		return 0;
 	}
 	if (count < 0) {
-		count = SLIB_STR_MAX_LEN - 1;
-	}
-	for (sl_int32 i = 0; i < count; i++) {
-		if (utf16[i] == 0) {
-			return i;
+		for (sl_reg i = 0; ; i++) {
+			if (utf16[i] == 0) {
+				return i;
+			}
+		}
+	} else {
+		for (sl_reg i = 0; i < count; i++) {
+			if (utf16[i] == 0) {
+				return i;
+			}
 		}
 	}
 	return count;
 }
 
-sl_int32 _StringBase::getSz32Length(const sl_char32* utf32, sl_int32 count)
+sl_size _StringBase::getSz32Length(const sl_char32* utf32, sl_reg count)
 {
 	if (count == 0) {
 		return 0;
 	}
 	if (count < 0) {
-		count = SLIB_STR_MAX_LEN - 1;
-	}
-	for (sl_int32 i = 0; i < count; i++) {
-		if (utf32[i] == 0) {
-			return i;
+		for (sl_reg i = 0; ; i++) {
+			if (utf32[i] == 0) {
+				return i;
+			}
+		}
+	} else {
+		for (sl_reg i = 0; i < count; i++) {
+			if (utf32[i] == 0) {
+				return i;
+			}
 		}
 	}
 	return count;
 }
 
-sl_uint32 _StringBase::utf8ToUtf16(const sl_char8* utf8, sl_int32 lenUtf8, sl_char16* utf16, sl_int32 lenUtf16Buffer)
+sl_size _StringBase::utf8ToUtf16(const sl_char8* utf8, sl_reg lenUtf8, sl_char16* utf16, sl_reg lenUtf16Buffer)
 {
 	if (lenUtf8 < 0) {
 		lenUtf8 = _StringBase::getSz8Length(utf8, -1) + 1;
 	}
-	sl_int32 n = 0;
-	for (sl_int32 i = 0; i < lenUtf8 && (lenUtf16Buffer < 0 || n < lenUtf16Buffer); i++) {
+	sl_reg n = 0;
+	for (sl_reg i = 0; i < lenUtf8 && (lenUtf16Buffer < 0 || n < lenUtf16Buffer); i++) {
 		sl_uint32 ch = (sl_uint32)((sl_uint8)utf8[i]);
 		if (ch < 0x80) {
 			if (utf16) {
@@ -5663,13 +5442,13 @@ sl_uint32 _StringBase::utf8ToUtf16(const sl_char8* utf8, sl_int32 lenUtf8, sl_ch
 	return n;
 }
 
-sl_uint32 _StringBase::utf8ToUtf32(const sl_char8* utf8, sl_int32 lenUtf8, sl_char32* utf32, sl_int32 lenUtf32Buffer)
+sl_size _StringBase::utf8ToUtf32(const sl_char8* utf8, sl_reg lenUtf8, sl_char32* utf32, sl_reg lenUtf32Buffer)
 {
 	if (lenUtf8 < 0) {
 		lenUtf8 = _StringBase::getSz8Length(utf8, -1) + 1;
 	}
-	sl_int32 n = 0;
-	for (sl_int32 i = 0; i < lenUtf8 && (lenUtf32Buffer < 0 || n < lenUtf32Buffer); i++) {
+	sl_reg n = 0;
+	for (sl_reg i = 0; i < lenUtf8 && (lenUtf32Buffer < 0 || n < lenUtf32Buffer); i++) {
 		sl_uint32 ch = (sl_uint32)((sl_uint8)utf8[i]);
 		if (ch < 0x80) {
 			if (utf32) {
@@ -5749,13 +5528,13 @@ sl_uint32 _StringBase::utf8ToUtf32(const sl_char8* utf8, sl_int32 lenUtf8, sl_ch
 	return n;
 }
 
-sl_uint32 _StringBase::utf16ToUtf8(const sl_char16* utf16, sl_int32 lenUtf16, sl_char8* utf8, sl_int32 lenUtf8Buffer)
+sl_size _StringBase::utf16ToUtf8(const sl_char16* utf16, sl_reg lenUtf16, sl_char8* utf8, sl_reg lenUtf8Buffer)
 {
 	if (lenUtf16 < 0) {
 		lenUtf16 = _StringBase::getSz16Length(utf16, -1) + 1;
 	}
-	sl_int32 n = 0;
-	for (sl_int32 i = 0; i < lenUtf16 && (lenUtf8Buffer < 0 || n < lenUtf8Buffer); i++) {
+	sl_reg n = 0;
+	for (sl_reg i = 0; i < lenUtf16 && (lenUtf8Buffer < 0 || n < lenUtf8Buffer); i++) {
 		sl_uint32 ch = (sl_uint32)(utf16[i]);
 		if (ch < 0x80) {
 			if (utf8) {
@@ -5787,13 +5566,13 @@ sl_uint32 _StringBase::utf16ToUtf8(const sl_char16* utf16, sl_int32 lenUtf16, sl
 	return n;
 }
 
-sl_uint32 _StringBase::utf32ToUtf8(const sl_char32* utf32, sl_int32 lenUtf32, sl_char8* utf8, sl_int32 lenUtf8Buffer)
+sl_size _StringBase::utf32ToUtf8(const sl_char32* utf32, sl_reg lenUtf32, sl_char8* utf8, sl_reg lenUtf8Buffer)
 {
 	if (lenUtf32 < 0) {
 		lenUtf32 = _StringBase::getSz32Length(utf32, -1) + 1;
 	}
-	sl_int32 n = 0;
-	for (sl_int32 i = 0; i < lenUtf32 && (lenUtf8Buffer < 0 || n < lenUtf8Buffer); i++) {
+	sl_reg n = 0;
+	for (sl_reg i = 0; i < lenUtf32 && (lenUtf8Buffer < 0 || n < lenUtf8Buffer); i++) {
 		sl_uint32 ch = (sl_uint32)(utf32[i]);
 		if (ch < 0x80) {
 			if (utf8) {
@@ -6048,7 +5827,8 @@ String16 String16::fromSize(sl_size value, sl_int32 radix, sl_int32 minWidth, sl
 }
 
 template <class FT, class ST, class CT>
-SLIB_INLINE ST _String_fromFloat(FT value, sl_int32 precision, sl_bool flagZeroPadding, sl_int32 minWidthIntegral) {
+SLIB_INLINE ST _String_fromFloat(FT value, sl_int32 precision, sl_bool flagZeroPadding, sl_int32 minWidthIntegral)
+{
 	
 	CT buf[MAX_NUMBER_STR_LEN];
 	
@@ -6257,7 +6037,7 @@ String16 String16::fromBoolean(sl_bool value)
 }
 
 template <class ST, class CT>
-SLIB_INLINE ST _String_makeHexString(const void* buf, sl_int32 size)
+SLIB_INLINE ST _String_makeHexString(const void* buf, sl_size size)
 {
 	if (!buf || size <= 0) {
 		return ST::null();
@@ -6267,7 +6047,7 @@ SLIB_INLINE ST _String_makeHexString(const void* buf, sl_int32 size)
 		return str;
 	}
 	CT* sz = (CT*)(str.getData());
-	for (sl_int32 i = 0; i < size; i++) {
+	for (sl_size i = 0; i < size; i++) {
 		sl_uint8 v = ((sl_uint8*)(buf))[i];
 		sz[i << 1] = _string_conv_radix_pattern_lower[v >> 4];
 		sz[(i << 1) + 1] = _string_conv_radix_pattern_lower[v & 15];
@@ -6275,29 +6055,29 @@ SLIB_INLINE ST _String_makeHexString(const void* buf, sl_int32 size)
 	return str;
 }
 
-String8 String8::makeHexString(const void* buf, sl_int32 size)
+String8 String8::makeHexString(const void* buf, sl_size size)
 {
 	return _String_makeHexString<String8, sl_char8>(buf, size);
 }
 
-String16 String16::makeHexString(const void* buf, sl_int32 size)
+String16 String16::makeHexString(const void* buf, sl_size size)
 {
 	return _String_makeHexString<String16, sl_char16>(buf, size);
 }
 
 String8 String8::makeHexString(const Memory& mem)
 {
-	return makeHexString(mem.getData(), (sl_uint32)(mem.getSize()));
+	return makeHexString(mem.getData(), mem.getSize());
 }
 
 String16 String16::makeHexString(const Memory& mem)
 {
-	return makeHexString(mem.getData(), (sl_uint32)(mem.getSize()));
+	return makeHexString(mem.getData(), mem.getSize());
 }
 
 
 template <class IT, class CT>
-SLIB_INLINE sl_int32 _String_parseInt(sl_int32 radix, const CT* sz, sl_uint32 i, sl_uint32 n, IT* _out)
+SLIB_INLINE sl_reg _String_parseInt(sl_int32 radix, const CT* sz, sl_size i, sl_size n, IT* _out)
 {
 	if (i >= n) {
 		return SLIB_PARSE_ERROR;
@@ -6313,14 +6093,14 @@ SLIB_INLINE sl_int32 _String_parseInt(sl_int32 radix, const CT* sz, sl_uint32 i,
 		bMinus = sl_true;
 	}
 	for (; i < n; i++) {
-		sl_int32 c = (sl_uint32)(sz[i]);
+		sl_uint32 c = (sl_uint32)(sz[i]);
 		if (c != '\t' && c != ' ') {
 			break;
 		}
 	}
 	for (; i < n; i++) {
-		sl_int32 c = (sl_uint32)(sz[i]);
-		sl_int32 m = c < 128 ? pattern[c] : 255;
+		sl_uint32 c = (sl_uint32)(sz[i]);
+		sl_uint32 m = c < 128 ? pattern[c] : 255;
 		if (m < r) {
 			v = v * r + m;
 			bEmpty = sl_false;
@@ -6341,23 +6121,27 @@ SLIB_INLINE sl_int32 _String_parseInt(sl_int32 radix, const CT* sz, sl_uint32 i,
 }
 
 template <class IT, class CT>
-SLIB_INLINE sl_int32 _String_parseUint(sl_int32 radix, const CT* sz, sl_uint32 i, sl_uint32 n, IT* _out)
+SLIB_INLINE sl_reg _String_parseUint(sl_int32 radix, const CT* sz, sl_size i, sl_size n, IT* _out)
 {
 	if (i >= n) {
 		return SLIB_PARSE_ERROR;
 	}
 	sl_uint32 r = radix;
-	
+	sl_bool bEmpty = sl_true;
 	const sl_uint8* pattern = r <= 36 ? _string_conv_radix_inverse_pattern_small : _string_conv_radix_inverse_pattern_big;
 	IT v = 0;
 	for (; i < n; i++) {
-		sl_int32 c = (sl_uint32)(sz[i]);
+		sl_uint32 c = (sl_uint32)(sz[i]);
 		sl_uint32 m = c < 128 ? pattern[c] : 255;
 		if (m < r) {
 			v = v * r + m;
+			bEmpty = sl_false;
 		} else {
 			break;
 		}
+	}
+	if (bEmpty) {
+		return SLIB_PARSE_ERROR;
 	}
 	if (_out) {
 		*_out = v;
@@ -6365,29 +6149,29 @@ SLIB_INLINE sl_int32 _String_parseUint(sl_int32 radix, const CT* sz, sl_uint32 i
 	return i;
 }
 
-sl_int32 String8::parseInt32(sl_int32 radix, sl_int32* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String8::parseInt32(sl_int32 radix, sl_int32* _out, const char* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseInt(radix, sz, posBegin, len, _out);
 }
 
-sl_int32 String16::parseInt32(sl_int32 radix, sl_int32* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String16::parseInt32(sl_int32 radix, sl_int32* _out, const char* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseInt(radix, sz, posBegin, len, _out);
 }
 
-sl_int32 String8::parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String8::parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseInt(radix, sz, posBegin, len, _out);
 }
 
-sl_int32 String16::parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String16::parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseInt(radix, sz, posBegin, len, _out);
 }
 
 sl_bool String8::parseInt32(sl_int32 radix, sl_int32* _out) const
 {
-	sl_uint32 n = getLength();
+	sl_size n = getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -6396,7 +6180,7 @@ sl_bool String8::parseInt32(sl_int32 radix, sl_int32* _out) const
 
 sl_bool String16::parseInt32(sl_int32 radix, sl_int32* _out) const
 {
-	sl_uint32 n = getLength();
+	sl_size n = getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -6442,29 +6226,29 @@ sl_int32 SafeString16::parseInt32(sl_int32 radix, sl_int32 def) const
 }
 
 
-sl_int32 String8::parseUint32(sl_int32 radix, sl_uint32* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String8::parseUint32(sl_int32 radix, sl_uint32* _out, const char* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseUint(radix, sz, posBegin, len, _out);
 }
 
-sl_int32 String16::parseUint32(sl_int32 radix, sl_uint32* _out, const char* sz, sl_uint32 posBegin, sl_uint32 n)
-{
-	return _String_parseUint(radix, sz, posBegin, n, _out);
-}
-
-sl_int32 String8::parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String16::parseUint32(sl_int32 radix, sl_uint32* _out, const char* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseUint(radix, sz, posBegin, len, _out);
 }
 
-sl_int32 String16::parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 n)
+sl_reg String8::parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
 {
-	return _String_parseUint(radix, sz, posBegin, n, _out);
+	return _String_parseUint(radix, sz, posBegin, len, _out);
+}
+
+sl_reg String16::parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
+{
+	return _String_parseUint(radix, sz, posBegin, len, _out);
 }
 
 sl_bool String8::parseUint32(sl_int32 radix, sl_uint32* _out) const
 {
-	sl_uint32 n = getLength();
+	sl_size n = getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -6473,7 +6257,7 @@ sl_bool String8::parseUint32(sl_int32 radix, sl_uint32* _out) const
 
 sl_bool String16::parseUint32(sl_int32 radix, sl_uint32* _out) const
 {
-	sl_uint32 n = getLength();
+	sl_size n = getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -6519,29 +6303,29 @@ sl_uint32 SafeString16::parseUint32(sl_int32 radix, sl_uint32 def) const
 }
 
 
-sl_int32 String8::parseInt64(sl_int32 radix, sl_int64* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String8::parseInt64(sl_int32 radix, sl_int64* _out, const char* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseInt(radix, sz, posBegin, len, _out);
 }
 
-sl_int32 String16::parseInt64(sl_int32 radix, sl_int64* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String16::parseInt64(sl_int32 radix, sl_int64* _out, const char* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseInt(radix, sz, posBegin, len, _out);
 }
 
-sl_int32 String8::parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String8::parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseInt(radix, sz, posBegin, len, _out);
 }
 
-sl_int32 String16::parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String16::parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseInt(radix, sz, posBegin, len, _out);
 }
 
 sl_bool String8::parseInt64(sl_int32 radix, sl_int64* _out) const
 {
-	sl_uint32 n = getLength();
+	sl_size n = getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -6550,7 +6334,7 @@ sl_bool String8::parseInt64(sl_int32 radix, sl_int64* _out) const
 
 sl_bool String16::parseInt64(sl_int32 radix, sl_int64* _out) const
 {
-	sl_uint32 n = getLength();
+	sl_size n = getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -6596,29 +6380,29 @@ sl_int64 SafeString16::parseInt64(sl_int32 radix, sl_int64 def) const
 }
 
 
-sl_int32 String8::parseUint64(sl_int32 radix, sl_uint64* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String8::parseUint64(sl_int32 radix, sl_uint64* _out, const char* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseUint(radix, sz, posBegin, len, _out);
 }
 
-sl_int32 String16::parseUint64(sl_int32 radix, sl_uint64* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String16::parseUint64(sl_int32 radix, sl_uint64* _out, const char* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseUint(radix, sz, posBegin, len, _out);
 }
 
-sl_int32 String8::parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String8::parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseUint(radix, sz, posBegin, len, _out);
 }
 
-sl_int32 String16::parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String16::parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseUint(radix, sz, posBegin, len, _out);
 }
 
 sl_bool String8::parseUint64(sl_int32 radix, sl_uint64* _out) const
 {
-	sl_uint32 n = getLength();
+	sl_size n = getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -6627,7 +6411,7 @@ sl_bool String8::parseUint64(sl_int32 radix, sl_uint64* _out) const
 
 sl_bool String16::parseUint64(sl_int32 radix, sl_uint64* _out) const
 {
-	sl_uint32 n = getLength();
+	sl_size n = getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -6788,7 +6572,7 @@ sl_size SafeString16::parseSize(sl_int32 radix, sl_size def) const
 
 
 template <class FT, class CT>
-SLIB_INLINE sl_int32 _String_parseFloat(const CT* sz, sl_uint32 i, sl_uint32 n, FT* _out)
+SLIB_INLINE sl_reg _String_parseFloat(const CT* sz, sl_size i, sl_size n, FT* _out)
 {
 	if (i >= n) {
 		return SLIB_PARSE_ERROR; // input string is empty
@@ -6803,13 +6587,13 @@ SLIB_INLINE sl_int32 _String_parseFloat(const CT* sz, sl_uint32 i, sl_uint32 n, 
 		bMinus = sl_true;
 	}
 	for (; i < n; i++) {
-		sl_int32 c = (sl_uint32)(sz[i]);
+		sl_uint32 c = (sl_uint32)(sz[i]);
 		if (c != '\t' && c != ' ') {
 			break;
 		}
 	}
 	for (; i < n; i++) {
-		sl_int32 c = (sl_uint32)sz[i];
+		sl_uint32 c = (sl_uint32)sz[i];
 		if (c >= '0' && c <= '9') {
 			v = v * 10 + (c - '0');
 			bEmpty = sl_false;
@@ -6826,7 +6610,7 @@ SLIB_INLINE sl_int32 _String_parseFloat(const CT* sz, sl_uint32 i, sl_uint32 n, 
 			bEmpty = sl_true;
 			FT weight = (FT)(0.1);
 			for (; i < n; i++) {
-				sl_int32 c = (sl_uint32)sz[i];
+				sl_uint32 c = (sl_uint32)sz[i];
 				if (c >= '0' && c <= '9') {
 					v = v + (c - '0') * weight;
 					weight /= 10;
@@ -6852,7 +6636,7 @@ SLIB_INLINE sl_int32 _String_parseFloat(const CT* sz, sl_uint32 i, sl_uint32 n, 
 					i++;
 				}
 				for (; i < n; i++) {
-					sl_int32 c = (sl_uint32)sz[i];
+					sl_uint32 c = (sl_uint32)sz[i];
 					if (c >= '0' && c <= '9') {
 						exp = exp * 10 + (c - '0');
 						bEmpty = sl_false;
@@ -6879,29 +6663,29 @@ SLIB_INLINE sl_int32 _String_parseFloat(const CT* sz, sl_uint32 i, sl_uint32 n, 
 	return i;
 }
 
-sl_int32 String8::parseFloat(float* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String8::parseFloat(float* _out, const char* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseFloat(sz, posBegin, len, _out);
 }
 
-sl_int32 String16::parseFloat(float* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String16::parseFloat(float* _out, const char* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseFloat(sz, posBegin, len, _out);
 }
 
-sl_int32 String8::parseFloat(float* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String8::parseFloat(float* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseFloat(sz, posBegin, len, _out);
 }
 
-sl_int32 String16::parseFloat(float* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String16::parseFloat(float* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseFloat(sz, posBegin, len, _out);
 }
 
 sl_bool String8::parseFloat(float* _out) const
 {
-	sl_uint32 n = getLength();
+	sl_size n = getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -6910,7 +6694,7 @@ sl_bool String8::parseFloat(float* _out) const
 
 sl_bool String16::parseFloat(float* _out) const
 {
-	sl_uint32 n = getLength();
+	sl_size n = getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -6956,29 +6740,29 @@ float SafeString16::parseFloat(float def) const
 }
 
 
-sl_int32 String8::parseDouble(double* _out, const char* sz, sl_uint32 posBegin, sl_uint32 n)
+sl_reg String8::parseDouble(double* _out, const char* sz, sl_size posBegin, sl_size n)
 {
 	return _String_parseFloat(sz, posBegin, n, _out);
 }
 
-sl_int32 String16::parseDouble(double* _out, const char* sz, sl_uint32 posBegin, sl_uint32 n)
+sl_reg String16::parseDouble(double* _out, const char* sz, sl_size posBegin, sl_size n)
 {
 	return _String_parseFloat(sz, posBegin, n, _out);
 }
 
-sl_int32 String8::parseDouble(double* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 n)
+sl_reg String8::parseDouble(double* _out, const sl_char16* sz, sl_size posBegin, sl_size n)
 {
 	return _String_parseFloat(sz, posBegin, n, _out);
 }
 
-sl_int32 String16::parseDouble(double* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 n)
+sl_reg String16::parseDouble(double* _out, const sl_char16* sz, sl_size posBegin, sl_size n)
 {
 	return _String_parseFloat(sz, posBegin, n, _out);
 }
 
 sl_bool String8::parseDouble(double* _out) const
 {
-	sl_uint32 n = getLength();
+	sl_size n = getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -6987,7 +6771,7 @@ sl_bool String8::parseDouble(double* _out) const
 
 sl_bool String16::parseDouble(double* _out) const
 {
-	sl_uint32 n = getLength();
+	sl_size n = getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -7034,13 +6818,13 @@ double SafeString16::parseDouble(double def) const
 
 
 template <class CT>
-SLIB_INLINE sl_int32 _String_parseHexString(const CT* sz, sl_uint32 i, sl_uint32 n, void* _out)
+SLIB_INLINE sl_reg _String_parseHexString(const CT* sz, sl_size i, sl_size n, void* _out)
 {
 	if (i >= n) {
 		return SLIB_PARSE_ERROR;
 	}
 	sl_uint8* buf = (sl_uint8*)(_out);
-	sl_uint32 k = 0;
+	sl_size k = 0;
 	for (; i < n; i += 2) {
 		sl_uint32 v1, v2;
 		{
@@ -7072,29 +6856,29 @@ SLIB_INLINE sl_int32 _String_parseHexString(const CT* sz, sl_uint32 i, sl_uint32
 	return i;
 }
 
-sl_int32 String8::parseHexString(void* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String8::parseHexString(void* _out, const char* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseHexString(sz, posBegin, len, _out);
 }
 
-sl_int32 String16::parseHexString(void* _out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String16::parseHexString(void* _out, const char* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseHexString(sz, posBegin, len, _out);
 }
 
-sl_int32 String8::parseHexString(void* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String8::parseHexString(void* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseHexString(sz, posBegin, len, _out);
 }
 
-sl_int32 String16::parseHexString(void* _out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg String16::parseHexString(void* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
 {
 	return _String_parseHexString(sz, posBegin, len, _out);
 }
 
 sl_bool String8::parseHexString(void* _out) const
 {
-	sl_uint32 n = getLength();
+	sl_size n = getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -7103,7 +6887,7 @@ sl_bool String8::parseHexString(void* _out) const
 
 sl_bool String16::parseHexString(void* _out) const
 {
-	sl_uint32 n = getLength();
+	sl_size n = getLength();
 	if (n == 0) {
 		return sl_false;
 	}

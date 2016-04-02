@@ -556,10 +556,10 @@ void Time::parseTime(const String& date, int* out)
 	Base::resetMemory(out, 0, 6 * sizeof(int));
 
 	const sl_char8* ch = date.getData();
-	sl_uint32 len = date.getLength();
+	sl_size len = date.getLength();
 
-	sl_uint32 index = 0;
-	sl_uint32 i = 0;
+	sl_size index = 0;
+	sl_size i = 0;
 
 	while (i < len && index < 6) {
 		int value = 0;

@@ -251,7 +251,7 @@ sl_uint32 DnsRecord::_parseName(String& nameOut, const void* _buf, sl_uint32 off
 sl_uint32 DnsRecord::_buildName(const String& name, void* _buf, sl_uint32 offset, sl_uint32 size)
 {
 	sl_char8* bufIn = name.getData();
-	sl_uint32 lenIn = name.getLength();
+	sl_uint32 lenIn = (sl_uint32)(name.getLength());
 	sl_uint8* bufOut = (sl_uint8*)_buf;
 	if (lenIn + 2 + offset > size) {
 		return 0;

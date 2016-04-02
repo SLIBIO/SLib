@@ -1077,7 +1077,9 @@ static sl_bool _Variant_getVariantListJsonString(StringBuffer& ret, const List<V
 	sl_size n = l.count;
 	Variant* lb = l.data;
 	
-	ret.add("[");
+	if (!(ret.addStatic("[", 1))) {
+		return sl_false;
+	}
 	for (sl_size i = 0; i < n; i++)
 	{
 		String valueText;
@@ -1094,7 +1096,9 @@ static sl_bool _Variant_getVariantListJsonString(StringBuffer& ret, const List<V
 			}
 		}
 		if (i) {
-			ret.add(", ");
+			if (!(ret.addStatic(", ", 2))) {
+				return sl_false;
+			}
 		}
 		if (v.isVariantList()) {
 			if (!_Variant_getVariantListJsonString(ret, v.getVariantList(), flagJSON)) {
@@ -1105,7 +1109,9 @@ static sl_bool _Variant_getVariantListJsonString(StringBuffer& ret, const List<V
 				return sl_false;
 			}
 		} else {
-			ret.add(valueText);
+			if (!(ret.add(valueText))) {
+				return sl_false;
+			}
 		}
 		if (!flagJSON) {
 			if (ret.getLength() > _MAX_VAR_STRING_LEN) {
@@ -1113,14 +1119,18 @@ static sl_bool _Variant_getVariantListJsonString(StringBuffer& ret, const List<V
 			}
 		}
 	}
-	ret.add("]");
+	if (!(ret.addStatic("]", 1))) {
+		return sl_false;
+	}
 	return sl_true;
 }
 
 static sl_bool _Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map, sl_bool flagJSON)
 {
 	Iterator< Pair<String, Variant> > iterator(map.iterator());
-	ret.add("{");
+	if (!(ret.addStatic("{", 1))) {
+		return sl_false;
+	}
 	sl_bool flagFirst = sl_true;
 	Pair<String, Variant> pair;
 	while (iterator.next(&pair)) {
@@ -1138,14 +1148,22 @@ static sl_bool _Variant_getVariantMapJsonString(StringBuffer& ret, const Map<Str
 			}
 		}
 		if (!flagFirst) {
-			ret.add(", ");
+			if (!(ret.addStatic(", ", 2))) {
+				return sl_false;
+			}
 		}
 		if (flagJSON) {
-			ret.add(pair.key.applyBackslashEscapes());
+			if (!(ret.add(pair.key.applyBackslashEscapes()))) {
+				return sl_false;
+			}
 		} else {
-			ret.add(pair.key);
+			if (!(ret.add(pair.key))) {
+				return sl_false;
+			}
 		}
-		ret.add(": ");
+		if (!(ret.addStatic(": ", 2))) {
+			return sl_false;
+		}
 		if (v.isVariantList()) {
 			if (!_Variant_getVariantListJsonString(ret, v.getVariantList(), flagJSON)) {
 				return sl_false;
@@ -1155,7 +1173,9 @@ static sl_bool _Variant_getVariantMapJsonString(StringBuffer& ret, const Map<Str
 				return sl_false;
 			}
 		} else {
-			ret.add(valueText);
+			if (!(ret.add(valueText))) {
+				return sl_false;
+			}
 		}
 		if (!flagJSON) {
 			if (ret.getLength() > _MAX_VAR_STRING_LEN) {
@@ -1164,7 +1184,9 @@ static sl_bool _Variant_getVariantMapJsonString(StringBuffer& ret, const Map<Str
 		}
 		flagFirst = sl_false;
 	}
-	ret.add("}");
+	if (!(ret.addStatic("}", 1))) {
+		return sl_false;
+	}
 	return sl_true;
 }
 
@@ -1172,7 +1194,10 @@ String Variant::toString() const
 {
 	switch (_type) {
 		case VariantType::Null:
-			return "<null>";
+			{
+				SLIB_STATIC_STRING(s, "<null>");
+				return s;
+			}
 		case VariantType::Int32:
 		case VariantType::Uint32:
 		case VariantType::Int64:
@@ -1193,13 +1218,13 @@ String Variant::toString() const
 			if (isVariantList()) {
 				StringBuffer ret;
 				if (!_Variant_getVariantListJsonString(ret, getVariantList(), sl_false)) {
-					ret.add(" ...");
+					ret.addStatic(" ...", 4);
 				}
 				return ret.merge();
 			} else if (isVariantMap()) {
 				StringBuffer ret;
 				if (!_Variant_getVariantMapJsonString(ret, getVariantMap(), sl_false)) {
-					ret.add(" ...");
+					ret.addStatic(" ...", 4);
 				}
 				return ret.merge();
 			} else {

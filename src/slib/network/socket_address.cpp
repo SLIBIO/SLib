@@ -60,7 +60,7 @@ String SocketAddress::toString() const
 }
 
 template <class CT>
-SLIB_INLINE sl_int32 _SocketAddress_parse(SocketAddress* obj, const CT* sz, sl_uint32 pos, sl_uint32 len)
+SLIB_INLINE sl_reg _SocketAddress_parse(SocketAddress* obj, const CT* sz, sl_size pos, sl_size len)
 {
 	if (pos >= len) {
 		return SLIB_PARSE_ERROR;
@@ -105,19 +105,19 @@ SLIB_INLINE sl_int32 _SocketAddress_parse(SocketAddress* obj, const CT* sz, sl_u
 	return pos;
 }
 
-sl_int32 SocketAddress::parse(SocketAddress* out, const char* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg SocketAddress::parse(SocketAddress* out, const char* sz, sl_size posBegin, sl_size len)
 {
 	return _SocketAddress_parse(out, sz, posBegin, len);
 }
 
-sl_int32 SocketAddress::parse(SocketAddress* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len)
+sl_reg SocketAddress::parse(SocketAddress* out, const sl_char16* sz, sl_size posBegin, sl_size len)
 {
 	return _SocketAddress_parse(out, sz, posBegin, len);
 }
 
 sl_bool SocketAddress::parse(const String& s, SocketAddress* out)
 {
-	sl_uint32 n = s.getLength();
+	sl_size n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -126,7 +126,7 @@ sl_bool SocketAddress::parse(const String& s, SocketAddress* out)
 
 sl_bool SocketAddress::parse(const String& s)
 {
-	sl_uint32 n = s.getLength();
+	sl_size n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -185,7 +185,7 @@ sl_bool SocketAddress::setSystemSocketAddress(const void* _in, sl_uint32 size)
 
 sl_bool SocketAddress::setHostAddress(const String& address)
 {
-	sl_int32 index = address.lastIndexOf(':');
+	sl_reg index = address.lastIndexOf(':');
 	if (index < 0) {
 		port = 0;
 		return ip.setHostName(address);
@@ -199,7 +199,7 @@ sl_bool SocketAddress::parseIPv4Range(const String& str, IPv4Address* _from, IPv
 {
 	IPv4Address from;
 	IPv4Address to;
-	sl_int32 index = str.indexOf('-');
+	sl_reg index = str.indexOf('-');
 	if (index > 0) {
 		if (from.parse(str.substring(0, index))) {
 			if (to.parse(str.substring(index + 1))) {

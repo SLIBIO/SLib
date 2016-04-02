@@ -700,6 +700,9 @@
     <ClInclude Include="..\..\..\inc\slib\network\datagram.h">
       <Filter>inc\network</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\xml.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">
@@ -1361,6 +1364,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\network\datagram.cpp">
       <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\xml.cpp">
+      <Filter>src\slib\core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

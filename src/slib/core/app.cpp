@@ -55,7 +55,7 @@ String Application::parseEnvironmentPath(const String& _path)
 {
 	String path = _path;
 	if (path.startsWith('<')) {
-		sl_int32 index = path.indexOf('>', 1);
+		sl_reg index = path.indexOf('>', 1);
 		if (index > 2) {
 			String key = path.substring(1, index);
 			String v;

@@ -759,7 +759,7 @@ public:
 	HRESULT STDMETHODCALLTYPE GetDisplayName(IBindCtx *pbc, IMoniker *pmkToLeft, LPOLESTR *ppszDisplayName)
 	{
 		String16 name = m_displayName;
-		DWORD size = name.getLength() * 2 + 2;
+		DWORD size = (DWORD)(name.getLength()) * 2 + 2;
 		sl_char16* buf = (sl_char16*)(::CoTaskMemAlloc(size));
 		if (buf) {
 			Base::copyMemory(buf, name.getData(), size);

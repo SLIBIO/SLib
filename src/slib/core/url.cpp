@@ -122,11 +122,11 @@ const sl_bool _URL_unreserved_pattern_uri[128] = {
 void Url::parse(const String& url)
 {
 	const sl_char8* str = url.getData();
-	sl_int32 n = url.getLength();
-	sl_int32 indexHost = 0;
-	sl_int32 indexPath = -1;
-	sl_int32 indexQuery = -1;
-	sl_int32 index = 0;
+	sl_reg n = url.getLength();
+	sl_reg indexHost = 0;
+	sl_reg indexPath = -1;
+	sl_reg indexQuery = -1;
+	sl_reg index = 0;
 	while (index < n) {
 		sl_char8 ch = str[index];
 		do {
@@ -191,15 +191,15 @@ void Url::parse(const String& url)
 
 String _URL_encodePercentByUTF8(const String& value, const sl_bool patternUnreserved[128])
 {
-	sl_uint32 n = value.getLength();
+	sl_size n = value.getLength();
 	if (n > 0) {
 		const sl_char8* src = value.getData();
 		SLIB_SCOPED_BUFFER(sl_char8, 1024, dst, n * 3);
 		if (dst == sl_null) {
 			return String::null();
 		}
-		sl_int32 k = 0;
-		for (sl_uint32 i = 0; i < n; i++) {
+		sl_size k = 0;
+		for (sl_size i = 0; i < n; i++) {
 			sl_uint32 v = (sl_uint32)(sl_uint8)(src[i]);
 			if (v < 128 && patternUnreserved[v]) {
 				dst[k++] = (sl_char8)(v);
@@ -222,12 +222,12 @@ String Url::encodePercentByUTF8(const String& value)
 
 String Url::decodePercentByUTF8(const String& value)
 {
-	sl_uint32 n = value.getLength();
+	sl_size n = value.getLength();
 	if (n > 0) {
 		const sl_char8* src = value.getData();
 		sl_char8* dst = (sl_char8*)(Base::createMemory(n));
-		sl_int32 k = 0;
-		for (sl_uint32 i = 0; i < n; i++) {
+		sl_size k = 0;
+		for (sl_size i = 0; i < n; i++) {
 			sl_uint32 v = (sl_uint32)(src[i]);
 			if (v == '%') {
 				if (i < n - 2) {

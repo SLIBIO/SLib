@@ -66,7 +66,7 @@ sl_bool IPv4Address::isBroadcast() const
 sl_bool IPv4Address::isHost() const
 {
 	sl_uint32 n = getInt();
-	return n != 0 && a < 224 && b != 127;
+	return n != 0 && a < 224 && a != 127;
 }
 
 sl_bool IPv4Address::isPrivate() const
@@ -106,7 +106,7 @@ String IPv4Address::toString() const
 }
 
 template <class CT>
-SLIB_INLINE sl_int32 _IPv4Address_parse(IPv4Address* obj, const CT* sz, sl_uint32 i, sl_uint32 n)
+SLIB_INLINE sl_reg _IPv4Address_parse(IPv4Address* obj, const CT* sz, sl_size i, sl_size n)
 {
 	if (i >= n) {
 		return SLIB_PARSE_ERROR;
@@ -147,19 +147,19 @@ SLIB_INLINE sl_int32 _IPv4Address_parse(IPv4Address* obj, const CT* sz, sl_uint3
 	return i;
 }
 
-sl_int32 IPv4Address::parse(IPv4Address* out, const char* sz, sl_uint32 posBegin, sl_uint32 n)
+sl_reg IPv4Address::parse(IPv4Address* out, const char* sz, sl_size posBegin, sl_size n)
 {
 	return _IPv4Address_parse(out, sz, posBegin, n);
 }
 
-sl_int32 IPv4Address::parse(IPv4Address* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 n)
+sl_reg IPv4Address::parse(IPv4Address* out, const sl_char16* sz, sl_size posBegin, sl_size n)
 {
 	return _IPv4Address_parse(out, sz, posBegin, n);
 }
 
 sl_bool IPv4Address::parse(const String& s, IPv4Address* out)
 {
-	sl_uint32 n = s.getLength();
+	sl_size n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -168,7 +168,7 @@ sl_bool IPv4Address::parse(const String& s, IPv4Address* out)
 
 sl_bool IPv4Address::parse(const String& s)
 {
-	sl_uint32 n = s.getLength();
+	sl_size n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -447,13 +447,13 @@ String IPv6Address::toString() const
 }
 
 template <class CT>
-SLIB_INLINE sl_int32 _IPv6Address_parse(IPv6Address* obj, const CT* sz, sl_uint32 i, sl_uint32 n)
+SLIB_INLINE sl_reg _IPv6Address_parse(IPv6Address* obj, const CT* sz, sl_size i, sl_size n)
 {
 	if (i >= n) {
 		return SLIB_PARSE_ERROR;
 	}
 	int k = 0;
-	int v[8];
+	sl_uint16 v[8];
 	int skip_START = -1;
 	for (k = 0; k < 8;) {
 		int t = 0;
@@ -482,7 +482,7 @@ SLIB_INLINE sl_int32 _IPv6Address_parse(IPv6Address* obj, const CT* sz, sl_uint3
 					return SLIB_PARSE_ERROR;
 				}
 			} else {
-				v[k] = s;
+				v[k] = (sl_uint16)s;
 				k++;
 			}
 			break;
@@ -503,7 +503,7 @@ SLIB_INLINE sl_int32 _IPv6Address_parse(IPv6Address* obj, const CT* sz, sl_uint3
 				i++;
 			}
 		} else {
-			v[k] = s;
+			v[k] = (sl_uint16)s;
 			k++;
 			i++;
 		}
@@ -540,19 +540,19 @@ SLIB_INLINE sl_int32 _IPv6Address_parse(IPv6Address* obj, const CT* sz, sl_uint3
 	return i;
 }
 
-sl_int32 IPv6Address::parse(IPv6Address* out, const char* sz, sl_uint32 posStart, sl_uint32 n)
+sl_reg IPv6Address::parse(IPv6Address* out, const char* sz, sl_size posStart, sl_size n)
 {
 	return _IPv6Address_parse(out, sz, posStart, n);
 }
 
-sl_int32 IPv6Address::parse(IPv6Address* out, const sl_char16* sz, sl_uint32 posStart, sl_uint32 n)
+sl_reg IPv6Address::parse(IPv6Address* out, const sl_char16* sz, sl_size posStart, sl_size n)
 {
 	return _IPv6Address_parse(out, sz, posStart, n);
 }
 
 sl_bool IPv6Address::parse(const String& s, IPv6Address* out)
 {
-	sl_uint32 n = s.getLength();
+	sl_size n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -561,7 +561,7 @@ sl_bool IPv6Address::parse(const String& s, IPv6Address* out)
 
 sl_bool IPv6Address::parse(const String& s)
 {
-	sl_uint32 n = s.getLength();
+	sl_size n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -722,12 +722,12 @@ String IPAddress::toString() const
 }
 
 template <class CT>
-SLIB_INLINE sl_int32 _IPAddress_parse(IPAddress* obj, const CT* sz, sl_uint32 posStart, sl_uint32 len)
+SLIB_INLINE sl_reg _IPAddress_parse(IPAddress* obj, const CT* sz, sl_size posStart, sl_size len)
 {
 	if (posStart >= len) {
 		return SLIB_PARSE_ERROR;
 	}
-	sl_int32 index;
+	sl_reg index;
 	IPv4Address a4;
 	index = IPv4Address::parse(&a4, sz, posStart, len);
 	if (index != SLIB_PARSE_ERROR) {
@@ -747,19 +747,19 @@ SLIB_INLINE sl_int32 _IPAddress_parse(IPAddress* obj, const CT* sz, sl_uint32 po
 	return SLIB_PARSE_ERROR;
 }
 
-sl_int32 IPAddress::parse(IPAddress* out, const char* sz, sl_uint32 posStart, sl_uint32 len)
+sl_reg IPAddress::parse(IPAddress* out, const char* sz, sl_size posStart, sl_size len)
 {
 	return _IPAddress_parse(out, sz, posStart, len);
 }
 
-sl_int32 IPAddress::parse(IPAddress* out, const sl_char16* sz, sl_uint32 posStart, sl_uint32 len)
+sl_reg IPAddress::parse(IPAddress* out, const sl_char16* sz, sl_size posStart, sl_size len)
 {
 	return _IPAddress_parse(out, sz, posStart, len);
 }
 
 sl_bool IPAddress::parse(const String& s, IPAddress* out)
 {
-	sl_uint32 n = s.getLength();
+	sl_size n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}
@@ -768,7 +768,7 @@ sl_bool IPAddress::parse(const String& s, IPAddress* out)
 
 sl_bool IPAddress::parse(const String& s)
 {
-	sl_uint32 n = s.getLength();
+	sl_size n = s.getLength();
 	if (n == 0) {
 		return sl_false;
 	}

@@ -16,11 +16,11 @@ public:
 	// out
 	sl_bool flagError;
 	// out
-	sl_uint32 errorPosition;
+	sl_size errorPosition;
 	// out
-	sl_uint32 errorLine;
+	sl_size errorLine;
 	// out
-	sl_uint32 errorColumn;
+	sl_size errorColumn;
 	// out
 	String errorMessage;
 	
@@ -35,10 +35,18 @@ public:
 class SLIB_EXPORT Json
 {
 public:
+	static Variant parseJson(const sl_char8* sz, sl_size len, JsonParseParam& param);
+	
+	static Variant parseJson(const sl_char8* sz, sl_size len);
+	
 	static Variant parseJson(const String& json, JsonParseParam& param);
 	
 	static Variant parseJson(const String& json);
 	
+	
+	static Variant parseJson16(const sl_char16* sz, sl_size len, JsonParseParam& param);
+	
+	static Variant parseJson16(const sl_char16* sz, sl_size len);
 	
 	static Variant parseJson16(const String16& json, JsonParseParam& param);
 	

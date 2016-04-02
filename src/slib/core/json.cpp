@@ -16,7 +16,7 @@ JsonParseParam::JsonParseParam()
 String JsonParseParam::getErrorText()
 {
 	if (flagError) {
-		return "(" + String::fromUint32(errorLine) + ":" + String::fromUint32(errorColumn) + ")" + errorMessage;
+		return "(" + String::fromSize(errorLine) + ":" + String::fromSize(errorColumn) + ") " + errorMessage;
 	}
 	return String::null();
 }
@@ -26,10 +26,10 @@ class _Json_Parser
 {
 public:
 	const CT* buf;
-	sl_uint32 len;
+	sl_size len;
 	sl_bool flagSupportComments;
 	
-	sl_uint32 pos;
+	sl_size pos;
 	
 	sl_bool flagError;
 	String errorMessage;
@@ -46,7 +46,7 @@ public:
 	
 	Variant parseJson();
 
-	static Variant parseJson(const CT* buf, sl_uint32 len, JsonParseParam& param);
+	static Variant parseJson(const CT* buf, sl_size len, JsonParseParam& param);
 	
 };
 
@@ -126,7 +126,7 @@ Variant _Json_Parser<ST, CT>::parseJson()
 	
 	// string
 	if (first == '"' || first == '\'') {
-		sl_uint32 m = 0;
+		sl_size m = 0;
 		sl_bool f = sl_false;
 		ST str = ST::parseBackslashEscapes(buf + pos, len - pos, &m, &f);
 		pos += m;
@@ -234,7 +234,7 @@ Variant _Json_Parser<ST, CT>::parseJson()
 				pos++;
 				return map;
 			} else if (ch == '"' || ch == '\'') {
-				sl_uint32 m = 0;
+				sl_size m = 0;
 				sl_bool f = sl_false;
 				key = ST::parseBackslashEscapes(buf + pos, len - pos, &m, &f);
 				pos += m;
@@ -244,7 +244,7 @@ Variant _Json_Parser<ST, CT>::parseJson()
 					return Variant::null();
 				}
 			} else {
-				sl_uint32 s = pos;
+				sl_size s = pos;
 				while (pos < len) {
 					CT ch = buf[pos];
 					if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z') || ch == '_' || (pos != s && ch >= '0' && ch <= '9')) {
@@ -291,7 +291,7 @@ Variant _Json_Parser<ST, CT>::parseJson()
 		return Variant::null();
 	}
 	{
-		sl_uint32 s = pos;
+		sl_size s = pos;
 		while (pos < len) {
 			CT ch = buf[pos];
 			if (ch == '\r' || ch == '\n' || ch == ' ' || ch == '\t' || ch == '/' || ch == ']' || ch == '}' || ch == ',') {
@@ -334,7 +334,7 @@ Variant _Json_Parser<ST, CT>::parseJson()
 }
 
 template <class ST, class CT>
-Variant _Json_Parser<ST, CT>::parseJson(const CT* buf, sl_uint32 len, JsonParseParam& param)
+Variant _Json_Parser<ST, CT>::parseJson(const CT* buf, sl_size len, JsonParseParam& param)
 {
 	param.flagError = sl_false;
 	
@@ -368,6 +368,17 @@ Variant _Json_Parser<ST, CT>::parseJson(const CT* buf, sl_uint32 len, JsonParseP
 }
 
 
+Variant Json::parseJson(const sl_char8* sz, sl_size len, JsonParseParam& param)
+{
+	return _Json_Parser<String8, sl_char8>::parseJson(sz, len, param);
+}
+
+Variant Json::parseJson(const sl_char8* sz, sl_size len)
+{
+	JsonParseParam param;
+	return parseJson(sz, len, param);
+}
+
 Variant Json::parseJson(const String& json, JsonParseParam& param)
 {
 	return _Json_Parser<String8, sl_char8>::parseJson(json.getData(), json.getLength(), param);
@@ -379,6 +390,17 @@ Variant Json::parseJson(const String& json)
 	return parseJson(json, param);
 }
 
+
+Variant Json::parseJson16(const sl_char16* sz, sl_size len, JsonParseParam& param)
+{
+	return _Json_Parser<String16, sl_char16>::parseJson(sz, len, param);
+}
+
+Variant Json::parseJson16(const sl_char16* sz, sl_size len)
+{
+	JsonParseParam param;
+	return Json::parseJson16(sz, len, param);
+}
 
 Variant Json::parseJson16(const String16& json, JsonParseParam& param)
 {

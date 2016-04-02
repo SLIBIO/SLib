@@ -212,7 +212,7 @@ Size UI::getFontTextSize(const Ref<Font>& font, const String& _text)
 		Gdiplus::StringFormat format(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsNoClip);
 		Gdiplus::RectF bound;
 		Gdiplus::PointF origin(0, 0);
-		Gdiplus::Status result = fs.graphics->MeasureString((WCHAR*)(text.getData()), text.getLength(), handle, origin, &format, &bound);
+		Gdiplus::Status result = fs.graphics->MeasureString((WCHAR*)(text.getData()), (INT)(text.getLength()), handle, origin, &format, &bound);
 		if (result == Gdiplus::Ok) {
 			ret.x = bound.Width;
 			ret.y = bound.Height;

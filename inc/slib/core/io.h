@@ -95,30 +95,27 @@ public:
 	
 	Memory readToMemory(sl_size size);
 
-	sl_bool readSection(void* mem, sl_size& size);
+	sl_bool readSectionData(void* data, sl_size& size);
 	
-	sl_bool readSection(Memory* mem, sl_reg maxSize = -1);
+	sl_bool readSection(Memory* output, sl_size maxSize = SLIB_SIZE_MAX);
 	
-	Memory readSection(const Memory& def);
-	
-	Memory readSection(sl_reg maxSize = -1);
+	Memory readSection(const Memory& def, sl_size maxSize = SLIB_SIZE_MAX);
 
+	Memory readSection(sl_size maxLen = SLIB_SIZE_MAX);
+	
 	// maxLen means the maximum length of utf-8 string
-	sl_bool readString(String* str, sl_int32 maxLen = -1);
+	sl_bool readString(String* output, sl_size maxLen = SLIB_SIZE_MAX);
 	
-	String readString(const String& def);
+	// maxLen means the maximum length of utf-8 string
+	String readString(const String& def, sl_size maxLen = SLIB_SIZE_MAX);
 	
-	String readString(sl_int32 maxLen, const String& def);
-	
-	String readString(sl_int32 maxLen = -1);
+	String readString(sl_size maxLen = SLIB_SIZE_MAX);
 
-	sl_bool readBigInt(BigInt* v, sl_int32 maxLen = -1);
+	sl_bool readBigInt(BigInt* v, sl_size maxLen = SLIB_SIZE_MAX);
 	
-	BigInt readBigInt(const BigInt& def);
+	BigInt readBigInt(const BigInt& def, sl_size maxLen = SLIB_SIZE_MAX);
 	
-	BigInt readBigInt(sl_int32 maxLen, const BigInt& def);
-	
-	BigInt readBigInt(sl_int32 maxLen = -1);
+	BigInt readBigInt(sl_size maxLen = SLIB_SIZE_MAX);
 	
 	sl_bool readTime(Time* output);
 	
@@ -179,9 +176,9 @@ public:
 	sl_bool writeSection(const Memory& mem);
 
 	// maxLen means the maximum length of utf-8 string
-	sl_bool writeString(const String& str, sl_int32 maxLen = -1);
+	sl_bool writeString(const String& str, sl_size maxLen = SLIB_SIZE_MAX);
 
-	sl_bool writeBigInt(const BigInt& v, sl_int32 maxLen = -1);
+	sl_bool writeBigInt(const BigInt& v, sl_size maxLen = SLIB_SIZE_MAX);
 
 	sl_bool writeTime(const Time& t);
 

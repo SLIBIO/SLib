@@ -53,6 +53,7 @@
 #include "core/url.h"
 
 #include "core/json.h"
+#include "core/xml.h"
 #include "core/base64.h"
 
 #endif

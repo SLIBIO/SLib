@@ -423,27 +423,27 @@ void FreeType::setSize(sl_uint32 size)
 
 Size FreeType::getStringExtent(const String16& text)
 {
-	return getStringExtent(text.getData(), text.getLength());
+	return getStringExtent(text.getData(), (sl_uint32)(text.getLength()));
 }
 
 void FreeType::drawString(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const String16& text, const Color& color)
 {
-	return drawString(imageOutput, x, y, text.getData(), text.getLength(), color);
+	return drawString(imageOutput, x, y, text.getData(), (sl_uint32)(text.getLength()), color);
 }
 
 void FreeType::strokeString(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const String16& text, const Color& color, sl_uint32 lineWidth)
 {
-	return strokeString(imageOutput, x, y, text.getData(), text.getLength(), color, lineWidth);
+	return strokeString(imageOutput, x, y, text.getData(), (sl_uint32)(text.getLength()), color, lineWidth);
 }
 
 void FreeType::strokeStringInside(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const String16& text, const Color& color, sl_uint32 lineWidth)
 {
-	return strokeStringInside(imageOutput, x, y, text.getData(), text.getLength(), color, lineWidth);
+	return strokeStringInside(imageOutput, x, y, text.getData(), (sl_uint32)(text.getLength()), color, lineWidth);
 }
 
 void FreeType::strokeStringOutside(const Ref<Image>& imageOutput, sl_int32 x, sl_int32 y, const String16& text, const Color& color, sl_uint32 lineWidth)
 {
-	return strokeString(imageOutput, x, y, text.getData(), text.getLength(), color, lineWidth);
+	return strokeString(imageOutput, x, y, text.getData(), (sl_uint32)(text.getLength()), color, lineWidth);
 }
 
 SLIB_GRAPHICS_NAMESPACE_END

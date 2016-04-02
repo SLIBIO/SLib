@@ -20,13 +20,13 @@ sl_bool IniSetting::parseFromUtf8TextFile(const String& filePath)
 
 sl_bool IniSetting::parseFromText(const String& text)
 {
-	sl_uint32 len = text.getLength();
+	sl_size len = text.getLength();
 	const sl_char8* buf = text.getData();
-	sl_int32 indexAssign = -1;
-	sl_int32 indexComment = -1;
-	sl_int32 indexStart = 0;
+	sl_reg indexAssign = -1;
+	sl_reg indexComment = -1;
+	sl_reg indexStart = 0;
 	ObjectLocker lock(&m_mapValues);
-	for (sl_uint32 i = 0; i <= len; i++) {
+	for (sl_size i = 0; i <= len; i++) {
 		sl_char16 ch = buf[i];
 		if (ch == '=') {
 			if (indexAssign < 0 && indexComment < 0) {
@@ -71,7 +71,7 @@ sl_bool SettingUtil::parseUint32Range(const String& str, sl_uint32* _from, sl_ui
 	sl_uint32 from;
 	sl_uint32 to;
 
-	sl_int32 index = str.indexOf('-');
+	sl_reg index = str.indexOf('-');
 	if (index > 0) {
 		if (str.substring(0, index).parseUint32(10, &from)) {
 			if (str.substring(index + 1).parseUint32(10, &to)) {

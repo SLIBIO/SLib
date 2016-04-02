@@ -5,9 +5,8 @@
 #if defined(_MSC_VER)
 #define inline __inline
 #define _CRT_SECURE_NO_WARNINGS
-#endif
-
 #pragma comment(lib, "opengl32.lib")
+#endif
 
 #include "../../thirdparty/SOIL2/etc1_utils.c"
 #include "../../thirdparty/SOIL2/image_helper.c"

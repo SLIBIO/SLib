@@ -389,7 +389,7 @@ public:
 							} else {
 								String8 str = var.getString();
 								var = str;
-								iRet = ::sqlite3_bind_text(m_statement, i, str.getData(), str.getLength(), SQLITE_STATIC);
+								iRet = ::sqlite3_bind_text(m_statement, i, str.getData(), (sl_uint32)(str.getLength()), SQLITE_STATIC);
 							}
 						}
 						if (iRet != SQLITE_OK) {

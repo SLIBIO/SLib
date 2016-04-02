@@ -763,12 +763,12 @@ void Uint128::setBytesLE(const void* _buf)
 }
 
 template <class CT>
-sl_int32 _Uint128_parseString(Uint128* out, const CT* sz, sl_uint32 posBegin, sl_uint32 len, sl_uint32 radix)
+sl_reg _Uint128_parseString(Uint128* out, const CT* sz, sl_size posBegin, sl_size len, sl_uint32 radix)
 {
 	if (radix < 2 || radix > 64) {
 		return SLIB_PARSE_ERROR;
 	}
-	sl_uint32 pos = posBegin;
+	sl_size pos = posBegin;
 	Uint128 m;
 	m.setZero();
 	const sl_uint8* pattern = radix <= 36 ? _StringConv_radixInversePatternSmall : _StringConv_radixInversePatternBig;
@@ -802,19 +802,19 @@ sl_int32 _Uint128_parseString(Uint128* out, const CT* sz, sl_uint32 posBegin, sl
 	return pos;
 }
 
-sl_int32 Uint128::parseString(Uint128* out, const char* sz, sl_uint32 posBegin, sl_uint32 len, sl_uint32 radix)
+sl_reg Uint128::parseString(Uint128* out, const char* sz, sl_size posBegin, sl_size len, sl_uint32 radix)
 {
 	return _Uint128_parseString(out, sz, posBegin, len, radix);
 }
 
-sl_int32 Uint128::parseString(Uint128* out, const sl_char16* sz, sl_uint32 posBegin, sl_uint32 len, sl_uint32 radix)
+sl_reg Uint128::parseString(Uint128* out, const sl_char16* sz, sl_size posBegin, sl_size len, sl_uint32 radix)
 {
 	return _Uint128_parseString(out, sz, posBegin, len, radix);
 }
 
 sl_bool Uint128::parseString(const String& str, sl_uint32 radix)
 {
-	sl_uint32 n = str.getLength();
+	sl_size n = str.getLength();
 	if (n == 0) {
 		return sl_false;
 	}

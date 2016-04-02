@@ -45,9 +45,9 @@ public:
 	*/
 	String toString() const;
 	
-	static sl_int32 parse(SocketAddress* out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parse(SocketAddress* out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_int32 parse(SocketAddress* out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parse(SocketAddress* out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	static sl_bool parse(const String& str, SocketAddress* out);
 

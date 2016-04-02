@@ -247,7 +247,7 @@ public:
 		if (!m_flagInit) {
 			return sl_false;
 		}
-		if (m_queues.containsKey(queueNumber)) {
+		if (m_queues.contains(queueNumber)) {
 			return sl_true;
 		}
 		Ref<_Linux_NetFilterQueue> queueObj = new _Linux_NetFilterQueue;

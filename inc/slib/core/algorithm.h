@@ -5,6 +5,15 @@
 
 SLIB_NAMESPACE_BEGIN
 
+enum class MapPutMode
+{
+	AddOrReplace = 0,
+	ReplaceExisting = 1,
+	AddNew = 2,
+	AddAlways = 3,
+	Default = AddOrReplace
+};
+
 /*************************************************************************
 	Compare<TYPE>::compare(v1, v2) returns
 		negative: v1 < v2
@@ -32,6 +41,7 @@ SLIB_INLINE sl_bool Compare<TYPE1, TYPE2>::equals(const TYPE1& a, const TYPE2& b
 {
 	return a == b;
 }
+
 
 template <class TYPE1, class TYPE2=TYPE1>
 class SLIB_EXPORT CompareDescending

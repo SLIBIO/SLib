@@ -78,7 +78,7 @@ public:
 		NSString* s = [NSString stringWithFormat:@"%@", body];
 		String msg = Apple::getStringFromNSString(s);
 		String param;
-		sl_int32 index = msg.indexOf("::");
+		sl_reg index = msg.indexOf("::");
 		if (index >= 0) {
 			param = msg.substring(index+2);
 			msg = msg.substring(0, index);

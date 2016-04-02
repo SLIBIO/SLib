@@ -11,25 +11,11 @@
 
 SLIB_NAMESPACE_BEGIN
 
-#define SLIB_STR_MAX_LEN 0x10000000
-
-class SLIB_EXPORT StringData
-{
-public:
-	union {
-		const sl_char8* sz8;
-		const sl_char16* sz16;
-		const sl_char32* sz32;
-	};
-	sl_uint32 len;
-	Memory mem;
-};
-
 class SLIB_EXPORT StringContainer8
 {
 public:
 	sl_char8* sz;
-	sl_uint32 len;
+	sl_size len;
 	sl_uint32 hash;
 	sl_reg ref;
 	
@@ -47,7 +33,7 @@ public:
 		sl_char16* sz;
 		wchar_t* szDebug;
 	};
-	sl_uint32 len;
+	sl_size len;
 	sl_uint32 hash;
 	sl_reg ref;
 	
@@ -85,6 +71,7 @@ class String8;
 class String16;
 class SafeString8;
 class SafeString16;
+class StringData;
 
 /** auto-referencing object **/
 class SLIB_EXPORT String8
@@ -114,49 +101,49 @@ public:
 	
 public:
 	// From a single charactor
-	String8(sl_char8 ch, sl_uint32 nRepeatCount);
+	String8(sl_char8 ch, sl_size nRepeatCount);
 	
 	// From an utf-8 string
 	String8(const sl_char8* strUtf8);
 	
 	// From an utf-8 string
-	String8(const sl_char8* strUtf8, sl_int32 length);
+	String8(const sl_char8* strUtf8, sl_reg length);
 	
 	// From an utf-16 string
 	String8(const sl_char16* strUtf16);
 	
 	// From an utf-16 string
-	String8(const sl_char16* strUtf16, sl_int32 length);
+	String8(const sl_char16* strUtf16, sl_reg length);
 	
 	// From an utf-32 string
 	String8(const sl_char32* strUtf32);
 	
 	// From an utf-32 string
-	String8(const sl_char32* strUtf32, sl_int32 length);
+	String8(const sl_char32* strUtf32, sl_reg length);
 
 public:
 	// create a string of 'len' charactors
-	static String8 allocate(sl_uint32 len);
+	static String8 allocate(sl_size len);
 	
-	static String8 fromStatic(const sl_char8* sz8, sl_int32 len = -1);
+	static String8 fromStatic(const sl_char8* sz8, sl_reg len = -1);
 
-	static String8 fromUtf8(const void* utf8, sl_int32 len = -1);
+	static String8 fromUtf8(const void* utf8, sl_reg len = -1);
 	
 	static String8 fromUtf8(const Memory& mem);
 	
-	static String8 fromUtf16(const void* utf16, sl_int32 len = -1);
+	static String8 fromUtf16(const void* utf16, sl_reg len = -1);
 	
 	static String8 fromUtf16(const Memory& mem);
 	
-	static String8 fromUtf32(const void* utf32, sl_int32 len = -1);
+	static String8 fromUtf32(const void* utf32, sl_reg len = -1);
 	
 	static String8 fromUtf32(const Memory& mem);
 
-	static String8 fromUtf16BE(const void* utf16, sl_int32 len = -1);
+	static String8 fromUtf16BE(const void* utf16, sl_reg len = -1);
 
 	static String8 fromUtf16BE(const Memory& mem);
 	
-	static String8 fromUtf16LE(const void* utf16, sl_int32 len = -1);
+	static String8 fromUtf16LE(const void* utf16, sl_reg len = -1);
 
 	static String8 fromUtf16LE(const Memory& mem);
 
@@ -189,17 +176,17 @@ public:
 public:
 	sl_char8* getData() const;
 	
-	sl_uint32 getLength() const;
+	sl_size getLength() const;
 	
-	void setLength(sl_uint32 len);
+	void setLength(sl_size len);
 	
 	sl_uint32 getHashCode() const;
 	
 	void setHashCode(sl_uint32 hash);
 
-	sl_char8 getAt(sl_int32 index) const;
+	sl_char8 getAt(sl_reg index) const;
 	
-	sl_bool setAt(sl_int32 index, sl_char8 ch);
+	sl_bool setAt(sl_reg index, sl_char8 ch);
 	
 public:
 	String8& operator=(String8&& other);
@@ -334,7 +321,7 @@ public:
 	
 	sl_int32 compare(const sl_char32* utf32) const;
 	
-	sl_int32 compare(const String8& other, sl_uint32 len) const;
+	sl_int32 compare(const String8& other, sl_size len) const;
 	
 
 public:
@@ -468,35 +455,35 @@ public:
 
 	Memory toMemory() const;
 
-	sl_uint32 getUtf16(sl_char16* utf16, sl_int32 len) const;
+	sl_size getUtf16(sl_char16* utf16, sl_size len) const;
 
-	StringData getUtf16() const;
+	sl_bool getUtf16(StringData& output) const;
 
 	// contains null character at last
 	Memory toUtf16() const;
 
-	sl_uint32 getUtf32(sl_char32* utf32, sl_int32 len) const;
+	sl_size getUtf32(sl_char32* utf32, sl_size len) const;
 
-	StringData getUtf32() const;
+	sl_bool getUtf32(StringData& output) const;
 
 	// contains null character at last
 	Memory toUtf32() const;
 
-	String8 substring(sl_int32 start, sl_int32 end = -1) const;
+	String8 substring(sl_reg start, sl_reg end = -1) const;
 	
-	String8 left(sl_uint32 len) const;
+	String8 left(sl_reg len) const;
 	
-	String8 right(sl_uint32 len) const;
+	String8 right(sl_reg len) const;
 	
-	String8 mid(sl_int32 start, sl_int32 len) const;
+	String8 mid(sl_reg start, sl_reg len) const;
 
-	sl_int32 indexOf(sl_char8 ch, sl_int32 start = 0) const;
+	sl_reg indexOf(sl_char8 ch, sl_reg start = 0) const;
 	
-	sl_int32 indexOf(const String8& str, sl_int32 start = 0) const;
+	sl_reg indexOf(const String8& str, sl_reg start = 0) const;
 	
-	sl_int32 lastIndexOf(sl_char8 ch, sl_int32 start = -1) const;
+	sl_reg lastIndexOf(sl_char8 ch, sl_reg start = -1) const;
 	
-	sl_int32 lastIndexOf(const String8& str, sl_int32 start = -1) const;
+	sl_reg lastIndexOf(const String8& str, sl_reg start = -1) const;
 	
 	sl_bool startsWith(sl_char8 ch) const;
 	
@@ -530,13 +517,13 @@ public:
 	
 	String8 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true);
 	
-	static String8 parseBackslashEscapes(const sl_char8* input, sl_uint32 len, sl_uint32* lengthParsed = sl_null, sl_bool* flagError = sl_null);
+	static String8 parseBackslashEscapes(const sl_char8* input, sl_size len, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null);
 	
-	String8 parseBackslashEscapes(sl_uint32* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
+	String8 parseBackslashEscapes(sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
 	
-	static sl_uint32 countLineNumber(const sl_char8* input, sl_uint32 len, sl_uint32* columnLast = sl_null);
+	static sl_size countLineNumber(const sl_char8* input, sl_size len, sl_size* columnLast = sl_null);
 	
-	sl_uint32 countLineNumber(sl_uint32 pos, sl_uint32* column = sl_null) const;
+	sl_size countLineNumber(sl_size pos, sl_size* column = sl_null) const;
 	
 public:
 	// radix: 2 ~ 64,   flagUpperCase only works if radix <= 36 (0~9a~z)
@@ -560,41 +547,41 @@ public:
 
 	static String8 fromBoolean(sl_bool value);
 	
-	static String8 makeHexString(const void* data, sl_int32 size);
+	static String8 makeHexString(const void* data, sl_size size);
 	
 	static String8 makeHexString(const Memory& mem);
 
 	
-	static sl_int32 parseInt32(sl_int32 radix, sl_int32* _out, const char*sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseInt32(sl_int32 radix, sl_int32* _out, const char*sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_int32 parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16*sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16*sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseInt32(sl_int32 radix, sl_int32* _out) const;
 
 	sl_int32 parseInt32(sl_int32 radix = 10, sl_int32 def = 0) const;
 
 	
-	static sl_int32 parseUint32(sl_int32 radix, sl_uint32* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseUint32(sl_int32 radix, sl_uint32* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_int32 parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseUint32(sl_int32 radix, sl_uint32* _out) const;
 
 	sl_uint32 parseUint32(sl_int32 radix = 10, sl_uint32 def = 0) const;
 	
 
-	static sl_int32 parseInt64(sl_int32 radix, sl_int64* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseInt64(sl_int32 radix, sl_int64* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_int32 parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseInt64(sl_int32 radix, sl_int64* _out) const;
 
 	sl_int64 parseInt64(sl_int32 radix = 10, sl_int64 def = 0) const;
 
 	
-	static sl_int32 parseUint64(sl_int32 radix, sl_uint64* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseUint64(sl_int32 radix, sl_uint64* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_int32 parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseUint64(sl_int32 radix, sl_uint64* _out) const;
 
@@ -611,82 +598,82 @@ public:
 	sl_size parseSize(sl_int32 radix = 10, sl_size def = 0) const;
 
 
-	static sl_int32 parseFloat(float* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseFloat(float* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_int32 parseFloat(float* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseFloat(float* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseFloat(float* _out) const;
 
 	float parseFloat(float def = 0) const;
 
 	
-	static sl_int32 parseDouble(double* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseDouble(double* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_int32 parseDouble(double* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseDouble(double* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseDouble(double* _out) const;
 
 	double parseDouble(double def = 0) const;
 
 	
-	static sl_int32 parseHexString(void* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseHexString(void* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_int32 parseHexString(void* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseHexString(void* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseHexString(void* _out) const;
 
 
 public:
 	// utf8 conversion
-	static sl_int32 utf8ToUtf16(const sl_char8* utf8, sl_int32 lenUtf8, sl_char16* utf16, sl_int32 lenUtf16Buffer);
+	static sl_size utf8ToUtf16(const sl_char8* utf8, sl_reg lenUtf8, sl_char16* utf16, sl_reg lenUtf16Buffer);
 	
-	static sl_int32 utf8ToUtf32(const sl_char8* utf8, sl_int32 lenUtf8, sl_char32* utf32, sl_int32 lenUtf32Buffer);
+	static sl_size utf8ToUtf32(const sl_char8* utf8, sl_reg lenUtf8, sl_char32* utf32, sl_reg lenUtf32Buffer);
 	
-	static sl_int32 utf16ToUtf8(const sl_char16* utf16, sl_int32 lenUtf16, sl_char8* utf8, sl_int32 lenUtf8Buffer);
+	static sl_size utf16ToUtf8(const sl_char16* utf16, sl_reg lenUtf16, sl_char8* utf8, sl_reg lenUtf8Buffer);
 	
-	static sl_int32 utf32ToUtf8(const sl_char32* utf32, sl_int32 lenUtf32, sl_char8* utf8, sl_int32 lenUtf8Buffer);
+	static sl_size utf32ToUtf8(const sl_char32* utf32, sl_reg lenUtf32, sl_char8* utf8, sl_reg lenUtf8Buffer);
 	
 private:
 	// Allocates memory required for a string for the specified length
-	static StringContainer8* _alloc(sl_uint32& length);
+	static StringContainer8* _alloc(sl_size length);
 	
 	void _replaceContainer(StringContainer8* container);
 	
 	
-	static StringContainer8* _create(sl_char8 ch, sl_uint32 nRepeatCount);
+	static StringContainer8* _create(sl_char8 ch, sl_size nRepeatCount);
 	
-	static StringContainer8* _create(const sl_char8* strUtf8, sl_int32 length);
+	static StringContainer8* _create(const sl_char8* strUtf8, sl_reg length);
 	
-	static StringContainer8* _create(const sl_char16* strUtf16, sl_int32 length);
+	static StringContainer8* _create(const sl_char16* strUtf16, sl_reg length);
 	
-	static StringContainer8* _create(const sl_char32* strUtf32, sl_int32 length);
+	static StringContainer8* _create(const sl_char32* strUtf32, sl_reg length);
 	
 	
-	static StringContainer8* _merge8(const sl_char8* s1, sl_int32 len1, const sl_char8* s2, sl_int32 len2);
+	static StringContainer8* _merge8(const sl_char8* s1, sl_reg len1, const sl_char8* s2, sl_reg len2);
 	
-	static StringContainer8* _merge16(const sl_char8* s1, sl_int32 len1, const sl_char16* s2, sl_int32 len2);
+	static StringContainer8* _merge16(const sl_char8* s1, sl_reg len1, const sl_char16* s2, sl_reg len2);
 	
-	static StringContainer8* _merge16(const sl_char16* s1, sl_int32 len1, const sl_char8* s2, sl_int32 len2);
+	static StringContainer8* _merge16(const sl_char16* s1, sl_reg len1, const sl_char8* s2, sl_reg len2);
 	
-	static StringContainer8* _merge32(const sl_char8* s1, sl_int32 len1, const sl_char32* s2, sl_int32 len2);
+	static StringContainer8* _merge32(const sl_char8* s1, sl_reg len1, const sl_char32* s2, sl_reg len2);
 	
-	static StringContainer8* _merge32(const sl_char32* s1, sl_int32 len1, const sl_char8* s2, sl_int32 len2);
+	static StringContainer8* _merge32(const sl_char32* s1, sl_reg len1, const sl_char8* s2, sl_reg len2);
 	
 	
 	// Check two unicode string is Equal
-	static sl_bool _equals8(const sl_char8* str1, sl_int32 len1, const sl_char8* str2, sl_int32 len2);
+	static sl_bool _equals8(const sl_char8* str1, sl_reg len1, const sl_char8* str2, sl_reg len2);
 	
-	static sl_bool _equals16(const sl_char8* str1, sl_int32 len1, const sl_char16* str2, sl_int32 len2);
+	static sl_bool _equals16(const sl_char8* str1, sl_reg len1, const sl_char16* str2, sl_reg len2);
 	
-	static sl_bool _equals32(const sl_char8* str1, sl_int32 len1, const sl_char32* str2, sl_int32 len2);
+	static sl_bool _equals32(const sl_char8* str1, sl_reg len1, const sl_char32* str2, sl_reg len2);
 
 	
 	// Compare two unicode string
-	static sl_int32 _compare8(const sl_char8* str1, sl_int32 len1, const sl_char8* str2, sl_int32 len2);
+	static sl_int32 _compare8(const sl_char8* str1, sl_reg len1, const sl_char8* str2, sl_reg len2);
 	
-	static sl_int32 _compare16(const sl_char8* str1, sl_int32 len1, const sl_char16* str2, sl_int32 len2);
+	static sl_int32 _compare16(const sl_char8* str1, sl_reg len1, const sl_char16* str2, sl_reg len2);
 	
-	static sl_int32 _compare32(const sl_char8* str1, sl_int32 len1, const sl_char32* str2, sl_int32 len2);
+	static sl_int32 _compare32(const sl_char8* str1, sl_reg len1, const sl_char32* str2, sl_reg len2);
 	
 public:
 	friend class SafeString8;
@@ -721,46 +708,46 @@ public:
 	
 public:
 	// From a single charactor
-	String16(sl_char16 ch, sl_uint32 nRepeatCount);
+	String16(sl_char16 ch, sl_size nRepeatCount);
 	
 	// From an utf-8 string
 	String16(const sl_char8* strUtf8);
 	
-	String16(const sl_char8* strUtf8, sl_int32 length);
+	String16(const sl_char8* strUtf8, sl_reg length);
 	
 	// From an utf-16 string
 	String16(const sl_char16* strUtf16);
 	
-	String16(const sl_char16* strUtf16, sl_int32 length);
+	String16(const sl_char16* strUtf16, sl_reg length);
 	
 	// From an utf-32 string
 	String16(const sl_char32* strUtf32);
 	
-	String16(const sl_char32* strUtf32, sl_int32 length);
+	String16(const sl_char32* strUtf32, sl_reg length);
 
 public:
 	// create a string of 'len' charactors
-	static String16 allocate(sl_uint32 len);
+	static String16 allocate(sl_size len);
 	
-	static String16 fromStatic(const sl_char16* sz16, sl_int32 len = -1);
+	static String16 fromStatic(const sl_char16* sz16, sl_reg len = -1);
 
-	static String16 fromUtf8(const void* utf8, sl_int32 len = -1);
+	static String16 fromUtf8(const void* utf8, sl_reg len = -1);
 
 	static String16 fromUtf8(const Memory& mem);
 
-	static String16 fromUtf16(const void* utf16, sl_int32 len = -1);
+	static String16 fromUtf16(const void* utf16, sl_reg len = -1);
 
 	static String16 fromUtf16(const Memory& mem);
 
-	static String16 fromUtf32(const void* utf32, sl_int32 len = -1);
+	static String16 fromUtf32(const void* utf32, sl_reg len = -1);
 
 	static String16 fromUtf32(const Memory& mem);
 
-	static String16 fromUtf16BE(const void* utf16, sl_int32 len = -1);
+	static String16 fromUtf16BE(const void* utf16, sl_reg len = -1);
 
 	static String16 fromUtf16BE(const Memory& mem);
 
-	static String16 fromUtf16LE(const void* utf16, sl_int32 len = -1);
+	static String16 fromUtf16LE(const void* utf16, sl_reg len = -1);
 
 	static String16 fromUtf16LE(const Memory& mem);
 
@@ -793,17 +780,17 @@ public:
 public:
 	sl_char16* getData() const;
 	
-	sl_uint32 getLength() const;
+	sl_size getLength() const;
 	
-	void setLength(sl_uint32 len);
+	void setLength(sl_size len);
 	
 	sl_uint32 getHashCode() const;
 	
 	void setHashCode(sl_uint32 hash);
 	
-	sl_char16 getAt(sl_int32 index) const;
+	sl_char16 getAt(sl_reg index) const;
 	
-	sl_bool setAt(sl_int32 index, sl_char16 ch);
+	sl_bool setAt(sl_reg index, sl_char16 ch);
 	
 public:
 	String16& operator=(String16&& other);
@@ -938,7 +925,7 @@ public:
 	
 	sl_int32 compare(const sl_char32* utf32) const;
 	
-	sl_int32 compare(const String16& other, sl_uint32 len) const;
+	sl_int32 compare(const String16& other, sl_size len) const;
 	
 public:
 	sl_bool operator==(const String8& other) const;
@@ -1071,28 +1058,28 @@ public:
 
 	Memory toMemory() const;
 
-	sl_uint32 getUtf8(sl_char8* utf8, sl_int32 len) const;
+	sl_size getUtf8(sl_char8* utf8, sl_size len) const;
 
-	StringData getUtf8() const;
+	sl_bool getUtf8(StringData& output) const;
 
 	// contains null character at last
 	Memory toUtf8() const;
 
-	String16 substring(sl_int32 start, sl_int32 end = -1) const;
+	String16 substring(sl_reg start, sl_reg end = -1) const;
 	
-	String16 left(sl_uint32 len) const;
+	String16 left(sl_reg len) const;
 	
-	String16 right(sl_uint32 len) const;
+	String16 right(sl_reg len) const;
 	
-	String16 mid(sl_int32 start, sl_int32 len) const;
+	String16 mid(sl_reg start, sl_reg len) const;
 
-	sl_int32 indexOf(sl_char16 ch, sl_int32 start = 0) const;
+	sl_reg indexOf(sl_char16 ch, sl_reg start = 0) const;
 	
-	sl_int32 indexOf(const String16& str, sl_int32 start = 0) const;
+	sl_reg indexOf(const String16& str, sl_reg start = 0) const;
 	
-	sl_int32 lastIndexOf(sl_char16 ch, sl_int32 start = -1) const;
+	sl_reg lastIndexOf(sl_char16 ch, sl_reg start = -1) const;
 	
-	sl_int32 lastIndexOf(const String16& str, sl_int32 start = -1) const;
+	sl_reg lastIndexOf(const String16& str, sl_reg start = -1) const;
 	
 	sl_bool startsWith(sl_char16 ch) const;
 	
@@ -1126,13 +1113,13 @@ public:
 	
 	String16 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true);
 	
-	static String16 parseBackslashEscapes(const sl_char16* input, sl_uint32 len, sl_uint32* lengthParsed = sl_null, sl_bool* flagError = sl_null);
+	static String16 parseBackslashEscapes(const sl_char16* input, sl_size len, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null);
 	
-	String16 parseBackslashEscapes(sl_uint32* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
+	String16 parseBackslashEscapes(sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
 	
-	static sl_uint32 countLineNumber(const sl_char16* input, sl_uint32 len, sl_uint32* columnLast = sl_null);
+	static sl_size countLineNumber(const sl_char16* input, sl_size len, sl_size* columnLast = sl_null);
 	
-	sl_uint32 countLineNumber(sl_uint32 pos, sl_uint32* column = sl_null) const;
+	sl_size countLineNumber(sl_size pos, sl_size* column = sl_null) const;
 
 public:
 	// radix: 2 ~ 64,   flagUpperCase only works if radix <= 36 (0~9a~z)
@@ -1156,41 +1143,41 @@ public:
 
 	static String16 fromBoolean(sl_bool value);
 
-	static String16 makeHexString(const void* data, sl_int32 size);
+	static String16 makeHexString(const void* data, sl_size size);
 	
 	static String16 makeHexString(const Memory& mem);
 
 	
-	static sl_int32 parseInt32(sl_int32 radix, sl_int32* _out, const char*sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseInt32(sl_int32 radix, sl_int32* _out, const char*sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_int32 parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16*sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16*sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseInt32(sl_int32 radix, sl_int32* _out) const;
 
 	sl_int32 parseInt32(sl_int32 radix = 10, sl_int32 def = 0) const;
 
 	
-	static sl_int32 parseUint32(sl_int32 radix, sl_uint32* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseUint32(sl_int32 radix, sl_uint32* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_int32 parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseUint32(sl_int32 radix, sl_uint32* _out) const;
 
 	sl_uint32 parseUint32(sl_int32 radix = 10, sl_uint32 def = 0) const;
 
 	
-	static sl_int32 parseInt64(sl_int32 radix, sl_int64* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseInt64(sl_int32 radix, sl_int64* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_int32 parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseInt64(sl_int32 radix, sl_int64* _out) const;
 	
 	sl_int64 parseInt64(sl_int32 radix = 10, sl_int64 def = 0) const;
 
 
-	static sl_int32 parseUint64(sl_int32 radix, sl_uint64* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseUint64(sl_int32 radix, sl_uint64* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_int32 parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseUint64(sl_int32 radix, sl_uint64* _out) const;
 	
@@ -1207,80 +1194,80 @@ public:
 	sl_size parseSize(sl_int32 radix = 10, sl_size def = 0) const;
 
 
-	static sl_int32 parseFloat(float* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseFloat(float* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_int32 parseFloat(float* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseFloat(float* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseFloat(float* _out) const;
 
 	float parseFloat(float def = 0) const;
 
 
-	static sl_int32 parseDouble(double* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseDouble(double* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_int32 parseDouble(double* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseDouble(double* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseDouble(double* _out) const;
 
 	double parseDouble(double def = 0) const;
 
 
-	static sl_int32 parseHexString(void* _out, const char* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseHexString(void* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_int32 parseHexString(void* _out, const sl_char16* sz, sl_uint32 posBegin = 0, sl_uint32 len = SLIB_INT32_MAX);
+	static sl_reg parseHexString(void* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseHexString(void* _out) const;
 
 public:
 	// utf8 conversion
-	static sl_int32 utf8ToUtf16(const sl_char8* utf8, sl_int32 lenUtf8, sl_char16* utf16, sl_int32 lenUtf16Buffer);
+	static sl_size utf8ToUtf16(const sl_char8* utf8, sl_reg lenUtf8, sl_char16* utf16, sl_reg lenUtf16Buffer);
 	
-	static sl_int32 utf8ToUtf32(const sl_char8* utf8, sl_int32 lenUtf8, sl_char32* utf32, sl_int32 lenUtf32Buffer);
+	static sl_size utf8ToUtf32(const sl_char8* utf8, sl_reg lenUtf8, sl_char32* utf32, sl_reg lenUtf32Buffer);
 	
-	static sl_int32 utf16ToUtf8(const sl_char16* utf16, sl_int32 lenUtf16, sl_char8* utf8, sl_int32 lenUtf8Buffer);
+	static sl_size utf16ToUtf8(const sl_char16* utf16, sl_reg lenUtf16, sl_char8* utf8, sl_reg lenUtf8Buffer);
 	
-	static sl_int32 utf32ToUtf8(const sl_char32* utf32, sl_int32 lenUtf32, sl_char8* utf8, sl_int32 lenUtf8Buffer);
+	static sl_size utf32ToUtf8(const sl_char32* utf32, sl_reg lenUtf32, sl_char8* utf8, sl_reg lenUtf8Buffer);
 
 private:	
 	// Allocates memory required for a string for the specified length
-	static StringContainer16* _alloc(sl_uint32& length);
+	static StringContainer16* _alloc(sl_size length);
 	
 	void _replaceContainer(StringContainer16* container);
 	
     
-	static StringContainer16* _create(sl_char16 ch, sl_uint32 nRepeatCount);
+	static StringContainer16* _create(sl_char16 ch, sl_size nRepeatCount);
 	
-	static StringContainer16* _create(const sl_char8* strUtf8, sl_int32 length);
+	static StringContainer16* _create(const sl_char8* strUtf8, sl_reg length);
 	
-	static StringContainer16* _create(const sl_char16* strUtf16, sl_int32 length);
+	static StringContainer16* _create(const sl_char16* strUtf16, sl_reg length);
 	
-	static StringContainer16* _create(const sl_char32* strUtf32, sl_int32 length);
+	static StringContainer16* _create(const sl_char32* strUtf32, sl_reg length);
 
     
-	static StringContainer16* _merge16(const sl_char16* s1, sl_int32 len1, const sl_char16* s2, sl_int32 len2);
+	static StringContainer16* _merge16(const sl_char16* s1, sl_reg len1, const sl_char16* s2, sl_reg len2);
 	
-	static StringContainer16* _merge8(const sl_char16* s1, sl_int32 len1, const sl_char8* s2, sl_int32 len2);
+	static StringContainer16* _merge8(const sl_char16* s1, sl_reg len1, const sl_char8* s2, sl_reg len2);
 	
-	static StringContainer16* _merge8(const sl_char8* s1, sl_int32 len1, const sl_char16* s2, sl_int32 len2);
+	static StringContainer16* _merge8(const sl_char8* s1, sl_reg len1, const sl_char16* s2, sl_reg len2);
 	
-	static StringContainer16* _merge32(const sl_char16* s1, sl_int32 len1, const sl_char32* s2, sl_int32 len2);
+	static StringContainer16* _merge32(const sl_char16* s1, sl_reg len1, const sl_char32* s2, sl_reg len2);
 	
-	static StringContainer16* _merge32(const sl_char32* s1, sl_int32 len1, const sl_char16* s2, sl_int32 len2);
+	static StringContainer16* _merge32(const sl_char32* s1, sl_reg len1, const sl_char16* s2, sl_reg len2);
     
 	
 	// Check two unicode string is Equal
-	static sl_bool _equals16(const sl_char16* str1, sl_int32 len1, const sl_char16* str2, sl_int32 len2);
+	static sl_bool _equals16(const sl_char16* str1, sl_reg len1, const sl_char16* str2, sl_reg len2);
 	
-	static sl_bool _equals8(const sl_char16* str1, sl_int32 len1, const sl_char8* str2, sl_int32 len2);
+	static sl_bool _equals8(const sl_char16* str1, sl_reg len1, const sl_char8* str2, sl_reg len2);
 	
-	static sl_bool _equals32(const sl_char16* str1, sl_int32 len1, const sl_char32* str2, sl_int32 len2);
+	static sl_bool _equals32(const sl_char16* str1, sl_reg len1, const sl_char32* str2, sl_reg len2);
 	
 	// Compare two unicode string
-	static sl_int32 _compare8(const sl_char16* str1, sl_int32 len1, const sl_char8* str2, sl_int32 len2);
+	static sl_int32 _compare8(const sl_char16* str1, sl_reg len1, const sl_char8* str2, sl_reg len2);
 	
-	static sl_int32 _compare16(const sl_char16* str1, sl_int32 len1, const sl_char16* str2, sl_int32 len2);
+	static sl_int32 _compare16(const sl_char16* str1, sl_reg len1, const sl_char16* str2, sl_reg len2);
 	
-	static sl_int32 _compare32(const sl_char16* str1, sl_int32 len1, const sl_char32* str2, sl_int32 len2);
+	static sl_int32 _compare32(const sl_char16* str1, sl_reg len1, const sl_char32* str2, sl_reg len2);
 	
 public:
 	friend class SafeString16;
@@ -1314,25 +1301,25 @@ public:
 
 public:
 	// From a single charactor
-	SafeString8(sl_char8 ch, sl_uint32 nRepeatCount);
+	SafeString8(sl_char8 ch, sl_size nRepeatCount);
 	
 	// From an utf-8 string
 	SafeString8(const sl_char8* strUtf8);
 	
 	// From an utf-8 string
-	SafeString8(const sl_char8* strUtf8, sl_int32 length);
+	SafeString8(const sl_char8* strUtf8, sl_reg length);
 	
 	// From an utf-16 string
 	SafeString8(const sl_char16* strUtf16);
 	
 	// From an utf-16 string
-	SafeString8(const sl_char16* strUtf16, sl_int32 length);
+	SafeString8(const sl_char16* strUtf16, sl_reg length);
 	
 	// From an utf-32 string
 	SafeString8(const sl_char32* strUtf32);
 	
 	// From an utf-32 string
-	SafeString8(const sl_char32* strUtf32, sl_int32 length);
+	SafeString8(const sl_char32* strUtf32, sl_reg length);
 	
 public:
 	static const SafeString8& null();
@@ -1352,7 +1339,7 @@ public:
 	void setEmpty();
 
 public:
-	sl_uint32 getLength() const;
+	sl_size getLength() const;
 	
 	sl_uint32 getHashCode() const;
 	
@@ -1489,7 +1476,7 @@ public:
 	
 	sl_int32 compare(const sl_char32* utf32) const;
 	
-	sl_int32 compare(const String8& other, sl_uint32 len) const;
+	sl_int32 compare(const String8& other, sl_size len) const;
 	
 
 public:
@@ -1623,35 +1610,35 @@ public:
 	
 	Memory toMemory() const;
 	
-	sl_uint32 getUtf16(sl_char16* utf16, sl_int32 len) const;
+	sl_size getUtf16(sl_char16* utf16, sl_size len) const;
 	
-	StringData getUtf16() const;
+	sl_bool getUtf16(StringData& output) const;
 	
 	// contains null character at last
 	Memory toUtf16() const;
 	
-	sl_uint32 getUtf32(sl_char32* utf32, sl_int32 len) const;
+	sl_size getUtf32(sl_char32* utf32, sl_size len) const;
 	
-	StringData getUtf32() const;
+	sl_bool getUtf32(StringData& output) const;
 	
 	// contains null character at last
 	Memory toUtf32() const;
 	
-	String8 substring(sl_int32 start, sl_int32 end = -1) const;
+	String8 substring(sl_reg start, sl_reg end = -1) const;
 	
-	String8 left(sl_uint32 len) const;
+	String8 left(sl_reg len) const;
 	
-	String8 right(sl_uint32 len) const;
+	String8 right(sl_reg len) const;
 	
-	String8 mid(sl_int32 start, sl_int32 len) const;
+	String8 mid(sl_reg start, sl_reg len) const;
 	
-	sl_int32 indexOf(sl_char8 ch, sl_int32 start = 0) const;
+	sl_reg indexOf(sl_char8 ch, sl_reg start = 0) const;
 	
-	sl_int32 indexOf(const String8& str, sl_int32 start = 0) const;
+	sl_reg indexOf(const String8& str, sl_reg start = 0) const;
 	
-	sl_int32 lastIndexOf(sl_char8 ch, sl_int32 start = -1) const;
+	sl_reg lastIndexOf(sl_char8 ch, sl_reg start = -1) const;
 	
-	sl_int32 lastIndexOf(const String8& str, sl_int32 start = -1) const;
+	sl_reg lastIndexOf(const String8& str, sl_reg start = -1) const;
 	
 	sl_bool startsWith(sl_char8 ch) const;
 	
@@ -1685,9 +1672,9 @@ public:
 	
 	String8 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true);
 	
-	String8 parseBackslashEscapes(sl_uint32* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
+	String8 parseBackslashEscapes(sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
 	
-	sl_uint32 countLineNumber(sl_uint32 pos, sl_uint32* column = sl_null) const;
+	sl_size countLineNumber(sl_size pos, sl_size* column = sl_null) const;
 	
 public:
 	sl_bool parseInt32(sl_int32 radix, sl_int32* _out) const;
@@ -1758,22 +1745,22 @@ public:
 	
 public:
 	// From a single charactor
-	SafeString16(sl_char16 ch, sl_uint32 nRepeatCount);
+	SafeString16(sl_char16 ch, sl_size nRepeatCount);
 	
 	// From an utf-8 string
 	SafeString16(const sl_char8* strUtf8);
 	
-	SafeString16(const sl_char8* strUtf8, sl_int32 length);
+	SafeString16(const sl_char8* strUtf8, sl_reg length);
 	
 	// From an utf-16 string
 	SafeString16(const sl_char16* strUtf16);
 	
-	SafeString16(const sl_char16* strUtf16, sl_int32 length);
+	SafeString16(const sl_char16* strUtf16, sl_reg length);
 	
 	// From an utf-32 string
 	SafeString16(const sl_char32* strUtf32);
 	
-	SafeString16(const sl_char32* strUtf32, sl_int32 length);
+	SafeString16(const sl_char32* strUtf32, sl_reg length);
 	
 public:
 	static const SafeString16& null();
@@ -1793,7 +1780,7 @@ public:
 	void setEmpty();
 	
 public:
-	sl_uint32 getLength() const;
+	sl_size getLength() const;
 	
 	sl_uint32 getHashCode() const;
 
@@ -1930,7 +1917,7 @@ public:
 	
 	sl_int32 compare(const sl_char32* utf32) const;
 	
-	sl_int32 compare(const String16& other, sl_uint32 len) const;
+	sl_int32 compare(const String16& other, sl_size len) const;
 
 public:
 	sl_bool operator==(const String8& other) const;
@@ -2063,28 +2050,28 @@ public:
 	
 	Memory toMemory() const;
 	
-	sl_uint32 getUtf8(sl_char8* utf8, sl_int32 len) const;
+	sl_size getUtf8(sl_char8* utf8, sl_size len) const;
 	
-	StringData getUtf8() const;
+	sl_bool getUtf8(StringData& output) const;
 	
 	// contains null character at last
 	Memory toUtf8() const;
 	
-	String16 substring(sl_int32 start, sl_int32 end = -1) const;
+	String16 substring(sl_reg start, sl_reg end = -1) const;
 	
-	String16 left(sl_uint32 len) const;
+	String16 left(sl_reg len) const;
 	
-	String16 right(sl_uint32 len) const;
+	String16 right(sl_reg len) const;
 	
-	String16 mid(sl_int32 start, sl_int32 len) const;
+	String16 mid(sl_reg start, sl_reg len) const;
 	
-	sl_int32 indexOf(sl_char16 ch, sl_int32 start = 0) const;
+	sl_reg indexOf(sl_char16 ch, sl_reg start = 0) const;
 	
-	sl_int32 indexOf(const String16& str, sl_int32 start = 0) const;
+	sl_reg indexOf(const String16& str, sl_reg start = 0) const;
 	
-	sl_int32 lastIndexOf(sl_char16 ch, sl_int32 start = -1) const;
+	sl_reg lastIndexOf(sl_char16 ch, sl_reg start = -1) const;
 	
-	sl_int32 lastIndexOf(const String16& str, sl_int32 start = -1) const;
+	sl_reg lastIndexOf(const String16& str, sl_reg start = -1) const;
 	
 	sl_bool startsWith(sl_char16 ch) const;
 	
@@ -2118,9 +2105,9 @@ public:
 	
 	String16 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true);
 	
-	String16 parseBackslashEscapes(sl_uint32* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
+	String16 parseBackslashEscapes(sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
 	
-	sl_uint32 countLineNumber(sl_uint32 pos, sl_uint32* column = sl_null) const;
+	sl_size countLineNumber(sl_size pos, sl_size* column = sl_null) const;
 
 public:
 	sl_bool parseInt32(sl_int32 radix, sl_int32* _out) const;
@@ -2213,6 +2200,20 @@ SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_MAP(String, Ref<Referable>)
 SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_MAP(String, String)
 
 
+class SLIB_EXPORT StringData
+{
+public:
+	union {
+		const sl_char8* sz8;
+		const sl_char16* sz16;
+		const sl_char32* sz32;
+	};
+	sl_size len;
+	Ref<Referable> refer;
+	String8 str8;
+	String16 str16;
+};
+
 class SLIB_EXPORT StringBuffer8 : public Object
 {
 public:
@@ -2220,14 +2221,20 @@ public:
 
 public:
 	sl_bool add(const String8& str);
-
-	sl_int32 getLength() const;
+	
+	sl_bool add(const StringData& str);
+	
+	sl_bool addStatic(const sl_char8* buf, sl_size length);
+	
+	sl_size getLength() const;
 
 	String8 merge() const;
 	
+	Memory mergeToMemory() const;
+	
 private:
-	Queue<String8> m_queue;
-	sl_int32 m_len;
+	Queue<StringData> m_queue;
+	sl_size m_len;
 	
 };
 
@@ -2238,63 +2245,24 @@ public:
 
 public:
 	sl_bool add(const String16& str);
-
-	sl_int32 getLength() const;
 	
-	String16 merge() const;
-
-private:
-	Queue<String16> m_queue;
-	sl_int32 m_len;
-	
-};
-
-class SLIB_EXPORT StringDataBuffer8 : public Object
-{
-public:
-	StringDataBuffer8();
-
-public:
 	sl_bool add(const StringData& str);
 	
-	sl_bool add(const sl_char8* buf, sl_uint32 length);
+	sl_bool addStatic(const sl_char16* buf, sl_size length);
+
+	sl_size getLength() const;
 	
-	sl_bool add(const sl_char8* buf, sl_uint32 length, const Memory& mem);
-
-	sl_int32 getLength() const;
-
-	String8 merge() const;
-
-private:
-	Queue<StringData> m_queue;
-	sl_int32 m_len;
-	
-};
-
-class SLIB_EXPORT StringDataBuffer16 : public Object
-{
-public:
-	StringDataBuffer16();
-
-public:
-	sl_bool add(const StringData& str);
-	
-	sl_bool add(const sl_char16* buf, sl_uint32 length);
-	
-	sl_bool add(const sl_char16* buf, sl_uint32 length, const Memory& mem);
-
-	sl_int32 getLength() const;
-
 	String16 merge() const;
+	
+	Memory mergeToMemory() const;
 	
 private:
 	Queue<StringData> m_queue;
-	sl_int32 m_len;
+	sl_size m_len;
 	
 };
 
 typedef StringBuffer8 StringBuffer;
-typedef StringDataBuffer8 StringDataBuffer;
 
 
 
@@ -2304,6 +2272,7 @@ typedef StringDataBuffer8 StringDataBuffer;
 #define SLIB_CHAR_IS_DIGIT(c) ((c) >= '0' && (c) <= '9')
 #define SLIB_CHAR_IS_ALNUM(c) (((c) >= '0' && (c) <= '9') || ((c) >= 'A' && (c) <= 'Z') || ((c) >= 'a' && (c) <= 'z'))
 #define SLIB_CHAR_IS_HEX(c) (((c) >= '0' && (c) <= '9') || ((c) >= 'A' && (c) <= 'F') || ((c) >= 'a' && (c) <= 'f'))
+#define SLIB_CHAR_IS_WHITE_SPACE(c) (c == ' ' || c == '\t' || c == '\r' || c == '\n')
 
 #define SLIB_CHAR_DIGIT_TO_INT(c) (((c) >= '0' && (c) <= '9') ? ((c) - '0') : 10)
 #define SLIB_CHAR_HEX_TO_INT(c) (((c) >= '0' && (c) <= '9') ? ((c) - '0') : (((c) >= 'A' && (c) <= 'F') ? ((c) -  55) : ((c) >= 'a' && (c) <= 'f') ? ((c) -  87) : 16))
@@ -2567,12 +2536,12 @@ SLIB_INLINE sl_char16* String16::getData() const
 }
 
 
-SLIB_INLINE sl_uint32 String8::getLength() const
+SLIB_INLINE sl_size String8::getLength() const
 {
 	return m_container->len;
 }
 
-SLIB_INLINE sl_uint32 String16::getLength() const
+SLIB_INLINE sl_size String16::getLength() const
 {
 	return m_container->len;
 }

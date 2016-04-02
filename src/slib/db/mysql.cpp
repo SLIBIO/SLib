@@ -142,7 +142,7 @@ public:
 	{
 		initThread();
 		ObjectLocker lock(this);
-		if (0 == ::mysql_real_query(m_mysql, sql.getData(), sql.getLength())) {
+		if (0 == ::mysql_real_query(m_mysql, sql.getData(), (sl_uint32)(sql.getLength()))) {
 			if (pOutAffectedRowsCount) {
 				*pOutAffectedRowsCount = ::mysql_affected_rows(m_mysql);
 			}
@@ -278,7 +278,7 @@ public:
 		initThread();
 		ObjectLocker lock(this);
 		Ref<DatabaseCursor> ret;
-		if (0 == mysql_real_query(m_mysql, sql.getData(), sql.getLength())) {
+		if (0 == mysql_real_query(m_mysql, sql.getData(), (sl_uint32)(sql.getLength()))) {
 			MYSQL_RES* res = ::mysql_use_result(m_mysql);
 			if (res) {
 				ret = new _DatabaseCursor(this, res);
@@ -420,7 +420,7 @@ public:
 			if (s.isNotEmpty()) {
 				MYSQL_BIND bind = m_bind[index];
 				bind.buffer = s.getData();
-				bind.buffer_length = s.getLength();
+				bind.buffer_length = (sl_uint32)(s.getLength());
 				if (0 == mysql_stmt_fetch_column(m_statement, &bind, index, 0)) {
 					return s;
 				}
@@ -475,7 +475,7 @@ public:
 					case MYSQL_TYPE_DATETIME:
 						return fromMySQLTime(m_fds[index].time);
 					case MYSQL_TYPE_STRING:
-						return String::fromUtf8(m_fds[index].buf, (sl_int32)(m_fds[index].length));
+						return String::fromUtf8(m_fds[index].buf, m_fds[index].length);
 					case MYSQL_TYPE_BLOB:
 						return Memory::create(m_fds[index].buf, m_fds[index].length);
 					default:
@@ -526,7 +526,7 @@ public:
 						case MYSQL_TYPE_DATETIME:
 							return fromMySQLTime(m_fds[index].time).toString();
 						case MYSQL_TYPE_STRING:
-							return String::fromUtf8(m_fds[index].buf, (sl_int32)(m_fds[index].length));
+							return String::fromUtf8(m_fds[index].buf, m_fds[index].length);
 						default:
 							break;
 						}
@@ -567,7 +567,7 @@ public:
 					case MYSQL_TYPE_DATETIME:
 						return fromMySQLTime(m_fds[index].time).toInt();
 					case MYSQL_TYPE_STRING:
-						return String::fromUtf8(m_fds[index].buf, (sl_int32)(m_fds[index].length)).parseInt64(10, defaultValue);
+						return String::fromUtf8(m_fds[index].buf, m_fds[index].length).parseInt64(10, defaultValue);
 					default:
 						break;
 					}
@@ -608,7 +608,7 @@ public:
 						case MYSQL_TYPE_DATETIME:
 							return fromMySQLTime(m_fds[index].time).toInt();
 						case MYSQL_TYPE_STRING:
-							return String::fromUtf8(m_fds[index].buf, (sl_int32)(m_fds[index].length)).parseUint64(10, defaultValue);
+							return String::fromUtf8(m_fds[index].buf, m_fds[index].length).parseUint64(10, defaultValue);
 						default:
 							break;
 						}
@@ -648,7 +648,7 @@ public:
 						case MYSQL_TYPE_DOUBLE:
 							return (sl_int32)(m_fds[index].dbl);
 						case MYSQL_TYPE_STRING:
-							return String::fromUtf8(m_fds[index].buf, (sl_int32)(m_fds[index].length)).parseInt32(10, defaultValue);
+							return String::fromUtf8(m_fds[index].buf, m_fds[index].length).parseInt32(10, defaultValue);
 						default:
 							break;
 						}
@@ -688,7 +688,7 @@ public:
 						case MYSQL_TYPE_DOUBLE:
 							return (sl_uint32)(m_fds[index].dbl);
 						case MYSQL_TYPE_STRING:
-							return String::fromUtf8(m_fds[index].buf, (sl_int32)(m_fds[index].length)).parseUint32(10, defaultValue);
+							return String::fromUtf8(m_fds[index].buf, m_fds[index].length).parseUint32(10, defaultValue);
 						default:
 							break;
 						}
@@ -728,7 +728,7 @@ public:
 						case MYSQL_TYPE_DOUBLE:
 							return (float)(m_fds[index].dbl);
 						case MYSQL_TYPE_STRING:
-							return String::fromUtf8(m_fds[index].buf, (sl_int32)(m_fds[index].length)).parseFloat(defaultValue);
+							return String::fromUtf8(m_fds[index].buf, m_fds[index].length).parseFloat(defaultValue);
 						default:
 							break;
 						}
@@ -768,7 +768,7 @@ public:
 						case MYSQL_TYPE_DOUBLE:
 							return (m_fds[index].dbl);
 						case MYSQL_TYPE_STRING:
-							return String::fromUtf8(m_fds[index].buf, (sl_int32)(m_fds[index].length)).parseDouble(defaultValue);
+							return String::fromUtf8(m_fds[index].buf, m_fds[index].length).parseDouble(defaultValue);
 						default:
 							break;
 						}
@@ -792,7 +792,7 @@ public:
 						case MYSQL_TYPE_DATETIME:
 							return fromMySQLTime(m_fds[index].time);
 						case MYSQL_TYPE_STRING:
-							return Time(String::fromUtf8(m_fds[index].buf, (sl_int32)(m_fds[index].length)));
+							return Time(String::fromUtf8(m_fds[index].buf, m_fds[index].length));
 						default:
 							break;
 						}
@@ -862,7 +862,7 @@ public:
 			close();
 			MYSQL_STMT* statement = ::mysql_stmt_init(m_mysql);
 			if (statement) {
-				if (0 == ::mysql_stmt_prepare(statement, m_sql.getData(), m_sql.getLength())) {
+				if (0 == ::mysql_stmt_prepare(statement, m_sql.getData(), (sl_uint32)(m_sql.getLength()))) {
 					m_statement = statement;
 					return sl_true;
 				}
