@@ -29,10 +29,10 @@ void ScrollView::setContentView(const Ref<slib::View>& view)
 		if (view.isNotNull()) {
 			view->setParent(this);
 		}
-		if (UI::isUIThread()) {
+		if (UI::isUiThread()) {
 			_setContentView(view);
 		} else {
-			UI::runOnUIThread(SLIB_CALLBACK_REF(ScrollView, _setContentView_Safe, this, view));
+			UI::dispatchToUiThread(SLIB_CALLBACK_REF(ScrollView, _setContentView_Safe, this, view));
 		}
 	}
 }

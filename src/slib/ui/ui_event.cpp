@@ -6,6 +6,10 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+TouchPoint::TouchPoint() = default;
+
+TouchPoint::TouchPoint(const TouchPoint& other) = default;
+
 TouchPoint::TouchPoint(const Point& _point) : point(_point), pressure(0)
 {
 }
@@ -22,18 +26,73 @@ TouchPoint::TouchPoint(sl_real x, sl_real y, sl_real _pressure) : point(x, y), p
 {
 }
 
+TouchPoint& TouchPoint::operator=(const TouchPoint& other) = default;
+
+
+#define DEFINE_MODIFIER_FUNCS(NAME) \
+void KeycodeAndModifiers::set##NAME##Key() \
+{ \
+	SLIB_SET_FLAG(value, Modifiers::NAME); \
+} \
+void KeycodeAndModifiers::clear##NAME##Key() \
+{ \
+	SLIB_RESET_FLAG(value, Modifiers::NAME); \
+} \
+sl_bool KeycodeAndModifiers::is##NAME##Key() const \
+{ \
+	return SLIB_CHECK_FLAG(value, Modifiers::NAME); \
+} \
+void UIEvent::set##NAME##Key() \
+{ \
+	SLIB_SET_FLAG(m_keycodeAndModifiers.value, Modifiers::NAME); \
+} \
+void UIEvent::clear##NAME##Key() \
+{ \
+	SLIB_RESET_FLAG(m_keycodeAndModifiers.value, Modifiers::NAME); \
+} \
+sl_bool UIEvent::is##NAME##Key() const \
+{ \
+	return SLIB_CHECK_FLAG(m_keycodeAndModifiers.value, Modifiers::NAME); \
+}
+
+DEFINE_MODIFIER_FUNCS(Shift)
+DEFINE_MODIFIER_FUNCS(Alt)
+DEFINE_MODIFIER_FUNCS(Option)
+DEFINE_MODIFIER_FUNCS(Control)
+DEFINE_MODIFIER_FUNCS(Windows)
+DEFINE_MODIFIER_FUNCS(Command)
+
+String KeycodeAndModifiers::toString() const
+{
+	StringBuffer sb;
+	if (isWindowsKey()) {
+#if defined(SLIB_PLATFORM_IS_APPLE)
+		sb.addStatic("Command+", 8);
+#else
+		sb.addStatic("Win+", 4);
+#endif
+	}
+	if (isControlKey()) {
+		sb.addStatic("Ctrl+", 5);
+	}
+	if (isShiftKey()) {
+		sb.addStatic("Shift+", 6);
+	}
+	if (isAltKey()) {
+#if defined(SLIB_PLATFORM_IS_APPLE)
+		sb.addStatic("Option+", 8);
+#else
+		sb.addStatic("Alt+", 4);
+#endif
+	}
+	sb.add(UI::getKeyName(getKeycode(), sl_true));
+	return sb.merge();
+}
 
 enum
 {
-	flagShiftKey = 0x1,
-	flagAltKey = 0x2,
-	flagOptionKey = 0x2, // (mac)
-	flagControlKey = 0x4,
-	flagWindowsKey = 0x8,
-	flagCommandKey = 0x8, // (mac)
-	
-	flagPreventDefault = 0x10000,
-	flagStopPropagation = 0x20000
+	flagPreventDefault = 0x1,
+	flagStopPropagation = 0x2
 };
 
 UIEvent::UIEvent()
@@ -122,14 +181,34 @@ sl_bool UIEvent::isTouchEvent()
 	return ((sl_uint32)m_action & 0xff00) == 0x0300;
 }
 
+const KeycodeAndModifiers& UIEvent::getKeycodeAndModifiers() const
+{
+	return m_keycodeAndModifiers;
+}
+
+void UIEvent::setKeycodeAndModifiers(const KeycodeAndModifiers& km)
+{
+	m_keycodeAndModifiers = km;
+}
+
 Keycode UIEvent::getKeycode() const
 {
-	return m_keycode;
+	return m_keycodeAndModifiers.getKeycode();
 }
 
 void UIEvent::setKeycode(Keycode keycode)
 {
-	m_keycode = keycode;
+	m_keycodeAndModifiers.setKeycode(keycode);
+}
+
+Modifiers UIEvent::getModifiers() const
+{
+	return m_keycodeAndModifiers.getModifiers();
+}
+
+void UIEvent::setModifiers(const Modifiers& modifiers)
+{
+	m_keycodeAndModifiers.setModifiers(modifiers);
 }
 
 sl_uint32 UIEvent::getSystemKeycode() const
@@ -291,97 +370,6 @@ void UIEvent::transformPoints(const Matrix3& mat)
 	}
 }
 
-void UIEvent::setShiftKey()
-{
-	SLIB_SET_FLAG(m_flags, (sl_uint32)flagShiftKey);
-}
-
-void UIEvent::clearShiftKey()
-{
-	SLIB_RESET_FLAG(m_flags, (sl_uint32)flagShiftKey);
-}
-
-sl_bool UIEvent::isShiftKey() const
-{
-	return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagShiftKey);
-}
-
-
-void UIEvent::setAltKey()
-{
-	SLIB_SET_FLAG(m_flags, (sl_uint32)flagAltKey);
-}
-
-void UIEvent::clearAltKey()
-{
-	SLIB_RESET_FLAG(m_flags, (sl_uint32)flagAltKey);
-}
-
-sl_bool UIEvent::isAltKey() const
-{
-	return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagAltKey);
-}
-
-void UIEvent::setOptionKey()
-{
-	SLIB_SET_FLAG(m_flags, (sl_uint32)flagOptionKey);
-}
-
-void UIEvent::clearOptionKey()
-{
-	SLIB_RESET_FLAG(m_flags, (sl_uint32)flagOptionKey);
-}
-
-sl_bool UIEvent::isOptionKey() const
-{
-	return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagOptionKey);
-}
-
-void UIEvent::setControlKey()
-{
-	SLIB_SET_FLAG(m_flags, (sl_uint32)flagControlKey);
-}
-
-void UIEvent::clearControlKey()
-{
-	SLIB_RESET_FLAG(m_flags, (sl_uint32)flagControlKey);
-}
-
-sl_bool UIEvent::isControlKey() const
-{
-	return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagControlKey);
-}
-
-void UIEvent::setWindowsKey()
-{
-	SLIB_SET_FLAG(m_flags, (sl_uint32)flagWindowsKey);
-}
-
-void UIEvent::clearWindowsKey()
-{
-	SLIB_RESET_FLAG(m_flags, (sl_uint32)flagWindowsKey);
-}
-
-sl_bool UIEvent::isWindowsKey() const
-{
-	return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagWindowsKey);
-}
-
-void UIEvent::setCommandKey()
-{
-	SLIB_SET_FLAG(m_flags, (sl_uint32)flagCommandKey);
-}
-
-void UIEvent::clearCommandKey()
-{
-	SLIB_RESET_FLAG(m_flags, (sl_uint32)flagCommandKey);
-}
-
-sl_bool UIEvent::isCommandKey() const
-{
-	return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagCommandKey);
-}
-
 void UIEvent::preventDefault()
 {
 	SLIB_SET_FLAG(m_flags, (sl_uint32)flagPreventDefault);
@@ -408,7 +396,7 @@ Ref<UIEvent> UIEvent::duplicate()
 	if (ret.isNotNull()) {
 		ret->m_flags = m_flags;
 		ret->m_action = m_action;
-		ret->m_keycode = m_keycode;
+		ret->m_keycodeAndModifiers = m_keycodeAndModifiers;
 		ret->m_systemKeycode = m_systemKeycode;
 		ret->m_point = m_point;
 		ret->m_points = m_points.duplicate();
@@ -419,7 +407,8 @@ Ref<UIEvent> UIEvent::duplicate()
 class _UIKeyNameMapper
 {
 private:
-	HashTable<sl_uint32, String> map;
+	HashTable<sl_uint32, String> mapLong;
+	HashTable<sl_uint32, String> mapShort;
 	String nameInvalid;
 	
 public:
@@ -427,7 +416,15 @@ public:
 #define _MAP_KEY(A, B) \
 	{ \
 		SLIB_STATIC_STRING(_s, B); \
-		map.put((sl_uint32)(A), _s); \
+		mapLong.put((sl_uint32)(A), _s); \
+		mapShort.put((sl_uint32)(A), _s); \
+	}
+#define _MAP_KEY2(A, B, C) \
+	{ \
+		SLIB_STATIC_STRING(_s1, B); \
+		mapLong.put((sl_uint32)(A), _s1); \
+		SLIB_STATIC_STRING(_s2, C); \
+		mapShort.put((sl_uint32)(A), _s2); \
 	}
 
 	_UIKeyNameMapper()
@@ -436,23 +433,23 @@ public:
 		nameInvalid = _invalid;
 		_MAP_KEY(Keycode::Unknown, "Unknown");
 		
-		_MAP_KEY(Keycode::Backspace, "Backspace");
+		_MAP_KEY2(Keycode::Backspace, "Backspace", "Back");
 		_MAP_KEY(Keycode::Tab, "Tab");
 		_MAP_KEY(Keycode::Enter, "Enter");
-		_MAP_KEY(Keycode::Escape, "Escape");
+		_MAP_KEY2(Keycode::Escape, "Escape", "Esc");
 		
 		_MAP_KEY(Keycode::Space, "Space");
-		_MAP_KEY(Keycode::Grave, "Grave");
-		_MAP_KEY(Keycode::Equal, "Equal");
-		_MAP_KEY(Keycode::Semicolon, "Semicolon");
-		_MAP_KEY(Keycode::Backslash, "Backslash");
-		_MAP_KEY(Keycode::LeftBaracket, "LeftBaracket");
-		_MAP_KEY(Keycode::RightBaracket, "RightBaracket");
-		_MAP_KEY(Keycode::Quote, "Quote");
-		_MAP_KEY(Keycode::Comma, "Comma");
-		_MAP_KEY(Keycode::Minus, "Minus");
-		_MAP_KEY(Keycode::Period, "Period");
-		_MAP_KEY(Keycode::Divide, "Divide");
+		_MAP_KEY2(Keycode::Grave, "Grave", "`");
+		_MAP_KEY2(Keycode::Equal, "Equal", "=");
+		_MAP_KEY2(Keycode::Semicolon, "Semicolon", ";");
+		_MAP_KEY2(Keycode::Backslash, "Backslash", "\\");
+		_MAP_KEY2(Keycode::LeftBaracket, "LeftBaracket", "[");
+		_MAP_KEY2(Keycode::RightBaracket, "RightBaracket", "]");
+		_MAP_KEY2(Keycode::Quote, "Quote", "'");
+		_MAP_KEY2(Keycode::Comma, "Comma", ",");
+		_MAP_KEY2(Keycode::Minus, "Minus", "-");
+		_MAP_KEY2(Keycode::Period, "Period", ".");
+		_MAP_KEY2(Keycode::Divide, "Divide", "/");
 		
 		_MAP_KEY(Keycode::Num0, "0");
 		_MAP_KEY(Keycode::Num1, "1");
@@ -503,12 +500,12 @@ public:
 		_MAP_KEY(Keycode::Numpad8, "Numpad8");
 		_MAP_KEY(Keycode::Numpad9, "Numpad9");
 		
-		_MAP_KEY(Keycode::NumpadDivide, "NumpadDivide");
-		_MAP_KEY(Keycode::NumpadMultiply, "NumpadMultiply");
-		_MAP_KEY(Keycode::NumpadMinus, "NumpadMinus");
-		_MAP_KEY(Keycode::NumpadPlus, "NumpadPlus");
+		_MAP_KEY2(Keycode::NumpadDivide, "NumpadDivide", "Numpad /");
+		_MAP_KEY2(Keycode::NumpadMultiply, "NumpadMultiply", "Numpad *");
+		_MAP_KEY2(Keycode::NumpadMinus, "NumpadMinus", "Numpad -");
+		_MAP_KEY2(Keycode::NumpadPlus, "NumpadPlus", "Numpad +");
 		_MAP_KEY(Keycode::NumpadEnter, "NumpadEnter");
-		_MAP_KEY(Keycode::NumpadDecimal, "NumpadDecimal");
+		_MAP_KEY2(Keycode::NumpadDecimal, "NumpadDecimal", "Numpad .");
 		
 		_MAP_KEY(Keycode::F1, "F1");
 		_MAP_KEY(Keycode::F2, "F2");
@@ -532,8 +529,8 @@ public:
 		_MAP_KEY(Keycode::Right, "Right");
 		_MAP_KEY(Keycode::Down, "Down");
 		_MAP_KEY(Keycode::PrintScreen, "PrintScreen");
-		_MAP_KEY(Keycode::Insert, "Insert");
-		_MAP_KEY(Keycode::Delete, "Delete");
+		_MAP_KEY2(Keycode::Insert, "Insert", "Ins");
+		_MAP_KEY2(Keycode::Delete, "Delete", "Del");
 		_MAP_KEY(Keycode::Sleep, "Sleep");
 		_MAP_KEY(Keycode::Pause, "Pause");
 		
@@ -553,9 +550,9 @@ public:
 
 		_MAP_KEY(Keycode::LeftShift, "LeftShift");
 		_MAP_KEY(Keycode::RightShift, "RightShift");
-		_MAP_KEY(Keycode::LeftControl, "LeftControl");
-		_MAP_KEY(Keycode::RightControl, "RightControl");
-#if defined(SLIB_PLATFORM_IS_OSX)
+		_MAP_KEY2(Keycode::LeftControl, "LeftControl", "LeftCtrl");
+		_MAP_KEY2(Keycode::RightControl, "RightControl", "RightCtrl");
+#if defined(SLIB_PLATFORM_IS_APPLE)
 		_MAP_KEY(Keycode::LeftOption, "LeftOption");
 		_MAP_KEY(Keycode::RightOption, "RightOption");
 		_MAP_KEY(Keycode::LeftCommand, "LeftCommand");
@@ -573,21 +570,26 @@ public:
 
 	}
 	
-	String get(Keycode code)
+	String get(Keycode code, sl_bool flagShort)
 	{
 		String ret;
-		if (map.get((sl_uint32)code, &ret)) {
-			return ret;
+		if (flagShort) {
+			if (mapShort.get((sl_uint32)code, &ret)) {
+				return ret;
+			}
 		} else {
-			return nameInvalid;
+			if (mapLong.get((sl_uint32)code, &ret)) {
+				return ret;
+			}
 		}
+		return nameInvalid;
 	}
 };
 
-String UI::getKeyName(Keycode code)
+String UI::getKeyName(Keycode code, sl_bool flagShort)
 {
 	SLIB_SAFE_STATIC(_UIKeyNameMapper, mapper);
-	return mapper.get(code);
+	return mapper.get(code, flagShort);
 }
 
 

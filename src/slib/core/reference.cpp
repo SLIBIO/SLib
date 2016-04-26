@@ -14,6 +14,15 @@ Referable::Referable()
 	m_weak = sl_null;
 }
 
+Referable::Referable(const Referable& other)
+{
+#ifdef SLIB_DEBUG_REFERENCE
+	m_signature = _SIGNATURE;
+#endif
+	m_nRefCount = 0;
+	m_weak = sl_null;
+}
+
 Referable::~Referable()
 {
 	_clearWeak();

@@ -31,6 +31,16 @@ sl_uint32 Bitmap::getHeight()
 	return getBitmapHeight();
 }
 
+sl_bool Bitmap::isEmpty()
+{
+	return getBitmapWidth() == 0 || getBitmapHeight() == 0;
+}
+
+sl_bool Bitmap::isNotEmpty()
+{
+	return getBitmapWidth() != 0 && getBitmapHeight() != 0;
+}
+
 void Bitmap::onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc)
 {
 	Ref<GraphicsContext> context = canvas->getGraphicsContext();

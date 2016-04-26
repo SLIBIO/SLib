@@ -117,12 +117,12 @@ Ref<Screen> UI::getFocusedScreen()
 	return UIPlatform::createScreen(screen);
 }
 
-sl_bool UI::isUIThread()
+sl_bool UI::isUiThread()
 {
 	return [NSThread isMainThread];
 }
 
-void UI::runOnUIThread(const Ref<Runnable>& _callback)
+void UI::dispatchToUiThread(const Ref<Runnable>& _callback)
 {
 	Ref<Runnable> callback = _callback;
 	if (callback.isNotNull()) {
@@ -132,7 +132,34 @@ void UI::runOnUIThread(const Ref<Runnable>& _callback)
 	}
 }
 
-void UI::runLoop()
+void UIPlatform::runLoop(sl_uint32 level)
+{
+	while (1) {
+		NSEvent* ev = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:nil inMode:NSDefaultRunLoopMode dequeue:YES];
+		if ([ev type] == NSApplicationDefined) {
+			if ([ev subtype] == NSPowerOffEventType) {
+				break;
+			}
+		}
+		[NSApp sendEvent:ev];
+	}
+}
+
+void UIPlatform::quitLoop()
+{
+	NSEvent* ev = [NSEvent otherEventWithType: NSApplicationDefined
+										location: NSMakePoint(0,0)
+								   modifierFlags: 0
+									   timestamp: 0.0
+									windowNumber: 0
+										 context: nil
+										 subtype: NSPowerOffEventType
+										   data1: 0
+										   data2: 0];
+	[NSApp postEvent:ev atStart:YES];
+}
+
+void UIPlatform::runApp()
 {
 	[NSApplication sharedApplication];
 	[NSBundle loadNibNamed:@"MainMenu" owner:NSApp];
@@ -141,80 +168,10 @@ void UI::runLoop()
 	[NSApp run];
 }
 
-void UI::quitLoop()
+void UIPlatform::quitApp()
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[NSApp terminate:nil];
-	});
-}
-
-void UI::showAlert(const AlertParam& param)
-{
-	AlertType type = param.type;
-	NSString* caption = Apple::getNSStringFromString(param.caption);
-	NSString* text = Apple::getNSStringFromString(param.text);
-	NSString* titleOk = Apple::getNSStringFromString(param.titleOk);
-	if ([titleOk length] == 0) {
-		titleOk = @"OK";
-	}
-	NSString* titleCancel = Apple::getNSStringFromString(param.titleCancel);
-	if ([titleCancel length] == 0) {
-		titleCancel = @"Cancel";
-	}
-	NSString* titleYes = Apple::getNSStringFromString(param.titleYes);
-	if ([titleYes length] == 0) {
-		titleYes = @"Yes";
-	}
-	NSString* titleNo = Apple::getNSStringFromString(param.titleNo);
-	if ([titleNo length] == 0) {
-		titleNo = @"No";
-	}
-	Ref<Runnable> onOk = param.onOk;
-	Ref<Runnable> onCancel = param.onCancel;
-	Ref<Runnable> onYes = param.onYes;
-	Ref<Runnable> onNo = param.onNo;
-	
-	dispatch_async(dispatch_get_main_queue(), ^{
-		Ref<Runnable> on2, on3;
-		NSAlert* alert = [[NSAlert alloc] init];
-		[alert setMessageText:text];
-		[alert setAlertStyle:NSInformationalAlertStyle];
-		[[alert window] setTitle:caption];
-		if (type == AlertType::OkCancel) {
-			[alert addButtonWithTitle:titleOk];
-			NSButton* btnCancel = [alert addButtonWithTitle:titleCancel];
-			[btnCancel setKeyEquivalent:@"Cancel"];
-			on2 = onCancel;
-		} else if (type == AlertType::YesNo) {
-			[alert addButtonWithTitle:titleYes];
-			NSButton* btnNo = [alert addButtonWithTitle:titleNo];
-			[btnNo setKeyEquivalent:@"Don't Save"];
-			on2 = onNo;
-		} else if (type == AlertType::YesNoCancel) {
-			[alert addButtonWithTitle:titleYes];
-			NSButton* btnNo = [alert addButtonWithTitle:titleNo];
-			[btnNo setKeyEquivalent:@"Don't Save"];
-			NSButton* btnCancel = [alert addButtonWithTitle:titleCancel];
-			[btnCancel setKeyEquivalent:@"Cancel"];
-			on2 = onNo;
-			on3 = onCancel;
-		} else {
-			[alert addButtonWithTitle:titleOk];
-		}
-		NSInteger result = [alert runModal];
-		if (result == NSAlertFirstButtonReturn) {
-			if (onOk.isNotNull()) {
-				onOk->run();
-			}
-		} else if (result == NSAlertSecondButtonReturn) {
-			if (on2.isNotNull()) {
-				on2->run();
-			}
-		} else if (result == NSAlertThirdButtonReturn) {
-			if (on3.isNotNull()) {
-				on3->run();
-			}
-		}
 	});
 }
 

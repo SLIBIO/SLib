@@ -69,10 +69,10 @@ void TabView::setTabContentView(sl_uint32 index, const Ref<View>& view)
 			}
 			item->contentView = view;
 			view->setParent(this);
-			if (UI::isUIThread()) {
+			if (UI::isUiThread()) {
 				_setTabContentView(index, view);
 			} else {
-				UI::runOnUIThread(SLIB_CALLBACK_WEAKREF(TabView, _setTabContentView_, this, index, view));
+				UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(TabView, _setTabContentView_, this, index, view));
 			}
 		}
 	}

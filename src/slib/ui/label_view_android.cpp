@@ -33,7 +33,7 @@ public:
 		JniLocal<jstring> jtext = Jni::getJniString(m_text);
 		_JAndroidEditView::setText.callBoolean(sl_null, handle, jtext.get());
 		_JAndroidEditView::setBorder.callBoolean(sl_null, handle, m_flagBorder);
-		_JAndroidEditView::setAlignment.callBoolean(sl_null, handle, m_textAlignment);
+		_JAndroidEditView::setAlignment.callBoolean(sl_null, handle, m_textAlignment.value);
 		_JAndroidEditView::setTextColor.callBoolean(sl_null, handle, m_textColor.getARGB());
 		_JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, m_backgroundColor.getARGB());
 		Ref<Font> font = m_font;
@@ -97,7 +97,7 @@ void LabelView::setBorder(sl_bool flag)
 	m_flagBorder = flag;
 }
 
-Alignments LabelView::getTextAlignment()
+Alignment LabelView::getTextAlignment()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -106,11 +106,11 @@ Alignments LabelView::getTextAlignment()
 	return m_textAlignment;
 }
 
-void LabelView::setTextAlignment(Alignments align)
+void LabelView::setTextAlignment(Alignment align)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		_JAndroidEditView::setAlignment.callBoolean(sl_null, handle, align);
+		_JAndroidEditView::setAlignment.callBoolean(sl_null, handle, align.value);
 	}
 	m_textAlignment = align;
 }

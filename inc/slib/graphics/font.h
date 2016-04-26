@@ -31,7 +31,7 @@ class SLIB_EXPORT Font : public Object
 	SLIB_DECLARE_OBJECT
 	
 protected:
-	Font() = default;
+	Font();
 	
 public:
 	static Ref<Font> getDefault();

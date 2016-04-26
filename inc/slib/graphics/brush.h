@@ -27,7 +27,7 @@ class SLIB_EXPORT Brush : public Object
 	SLIB_DECLARE_OBJECT
 	
 protected:
-	Brush() = default;
+	Brush();
 	
 public:
 	static Ref<Brush> getDefault();

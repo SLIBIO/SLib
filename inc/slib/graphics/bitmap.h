@@ -49,6 +49,10 @@ public:
 	sl_uint32 getWidth();
 	
 	sl_uint32 getHeight();
+
+	sl_bool isEmpty();
+
+	sl_bool isNotEmpty();
 	
 	void update();
 	

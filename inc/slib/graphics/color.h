@@ -166,9 +166,9 @@ public:
 	};
 
 public:
-	Color() = default;
+	SLIB_INLINE Color() = default;
 	
-	Color(const Color& other) = default;
+	SLIB_INLINE Color(const Color& other) = default;
 	
 	Color(sl_uint32 r, sl_uint32 g, sl_uint32 b, sl_uint32 a = 255);
 	
@@ -254,7 +254,7 @@ public:
 	void convertPAtoNPA();
 
 public:
-	Color& operator=(const Color& other) = default;
+	SLIB_INLINE Color& operator=(const Color& other) = default;
 	
 	sl_bool operator==(const Color& other) const;
 	

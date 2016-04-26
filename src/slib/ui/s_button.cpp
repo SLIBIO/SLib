@@ -72,7 +72,7 @@ SButton::SButton(sl_uint32 nCategories, SButtonCategory* categories)
 		nCategories = 1;
 	}
 	m_nCategories = nCategories;
-	m_categories = new SButtonCategory[nCategories];
+	m_categories = New<SButtonCategory>::create(nCategories);
 	if (!categories) {
 		categories = _SButton_Categories::get()->categories;
 		if (nCategories > 2) {
@@ -87,7 +87,7 @@ SButton::SButton(sl_uint32 nCategories, SButtonCategory* categories)
 
 SButton::~SButton()
 {
-	delete[] m_categories;
+	New<SButtonCategory>::free(m_categories, m_nCategories);
 }
 
 String SButton::getText()
@@ -172,34 +172,34 @@ void SButton::setIconSize(sl_real size)
 	setIconSize(Size(size, size));
 }
 
-Alignments SButton::getContentAlignment()
+Alignment SButton::getContentAlignment()
 {
 	return m_contentAlignment;
 }
 
-void SButton::setContentAlignment(Alignments align)
+void SButton::setContentAlignment(Alignment align)
 {
 	m_contentAlignment = align;
 	invalidate();
 }
 
-Alignments SButton::getIconAlignment()
+Alignment SButton::getIconAlignment()
 {
 	return m_iconAlignment;
 }
 
-void SButton::setIconAlignment(Alignments align)
+void SButton::setIconAlignment(Alignment align)
 {
 	m_iconAlignment = align;
 	invalidate();
 }
 
-Alignments SButton::getTextAlignment()
+Alignment SButton::getTextAlignment()
 {
 	return m_textAlignment;
 }
 
-void SButton::setTextAlignment(Alignments align)
+void SButton::setTextAlignment(Alignment align)
 {
 	m_textAlignment = align;
 	invalidate();
@@ -542,13 +542,13 @@ void SButton::layoutIconAndText(GraphicsContext* gc, sl_real widthFrame, sl_real
 	sl_real widthText = sizeText.x + m_textMarginLeft + m_textMarginRight;
 	sl_real heightText = sizeText.y + m_textMarginTop + m_textMarginBottom;
 	
-	Alignments alignIcon = m_iconAlignment;
-	Alignments horzIcon = alignIcon & Alignment::HorizontalMask;
-	Alignments vertIcon = alignIcon & Alignment::VerticalMask;
+	Alignment alignIcon = m_iconAlignment;
+	Alignment horzIcon = alignIcon & Alignment::HorizontalMask;
+	Alignment vertIcon = alignIcon & Alignment::VerticalMask;
 	
-	Alignments alignText = m_textAlignment;
-	Alignments horzText = alignText & Alignment::HorizontalMask;
-	Alignments vertText = alignText & Alignment::VerticalMask;
+	Alignment alignText = m_textAlignment;
+	Alignment horzText = alignText & Alignment::HorizontalMask;
+	Alignment vertText = alignText & Alignment::VerticalMask;
 	
 	sl_real xIcon = 0;
 	sl_real yIcon = 0;

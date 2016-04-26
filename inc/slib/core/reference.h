@@ -47,6 +47,8 @@ class SLIB_EXPORT Referable
 public:
 	Referable();
 	
+	Referable(const Referable& other);
+	
 	virtual ~Referable();
 	
 public:

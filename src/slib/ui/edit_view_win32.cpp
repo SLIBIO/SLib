@@ -130,7 +130,7 @@ public:
 		if (m_flagBorder) {
 			style |= WS_BORDER;
 		}
-		Alignments align = m_textAlignment & Alignment::HorizontalMask;
+		Alignment align = m_textAlignment & Alignment::HorizontalMask;
 		if (align == Alignment::Center) {
 			style |= ES_CENTER;
 		} else if (align == Alignment::Right) {
@@ -234,7 +234,7 @@ void EditView::setBorder(sl_bool flag)
 	m_flagBorder = flag;
 }
 
-Alignments EditView::getTextAlignment()
+Alignment EditView::getTextAlignment()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -250,12 +250,12 @@ Alignments EditView::getTextAlignment()
 	return m_textAlignment;
 }
 
-void EditView::setTextAlignment(Alignments _align)
+void EditView::setTextAlignment(Alignment _align)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		LONG style = ::GetWindowLongW(handle, GWL_STYLE) & (~(ES_RIGHT | ES_CENTER));
-		Alignments align = _align & Alignment::HorizontalMask;
+		Alignment align = _align & Alignment::HorizontalMask;
 		if (align == Alignment::Center) {
 			style |= ES_CENTER;
 		} else if (align == Alignment::Right) {

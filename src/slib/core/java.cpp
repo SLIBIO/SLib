@@ -37,6 +37,8 @@ static _Jni_Shared& _g_jni_shared()
     return ret;
 }
 
+//#define JNI_LOG_INIT_LOAD
+
 void Jni::initialize(JavaVM* jvm)
 {
 	static sl_bool flagInit = sl_false;
@@ -51,33 +53,17 @@ void Jni::initialize(JavaVM* jvm)
 			ListLocker< _JniSingletonClass* > list(_g_jni_shared().singleton_classes);
 			for (sl_size i = 0; i < list.count; i++) {
 				_JniSingletonClass* obj = list[i];
+#if defined(JNI_LOG_INIT_LOAD)
+				SLIB_LOG("LOADING JAVA CLASS", obj->name);
+#endif
 				obj->cls = Jni::getClass(obj->name);
-			}
-		}
-		// singleton methods
-		{
-			ListLocker< _JniSingletonMethod* > list(_g_jni_shared().singleton_methods);
-			for (sl_size i = 0; i < list.count; i++) {
-				_JniSingletonMethod* obj = list[i];
-				JniClass cls = obj->gcls->cls;
-				if (cls.isNotNull()) {
-					obj->cls = cls;
-					obj->id = cls.getMethodID(obj->name, obj->sig);
+				if (obj->cls.isNull()) {
+					SLIB_LOG("LOADING JAVA CLASS FAILED", obj->name);
 				}
 			}
 		}
-		// singleton static methods
-		{
-			ListLocker< _JniSingletonStaticMethod* > list(_g_jni_shared().singleton_static_methods);
-			for (sl_size i = 0; i < list.count; i++) {
-				_JniSingletonStaticMethod* obj = list[i];
-				JniClass cls = obj->gcls->cls;
-				if (cls.isNotNull()) {
-					obj->cls = cls;
-					obj->id = cls.getStaticMethodID(obj->name, obj->sig);
-				}
-			}
-		}
+
+
 		// singleton fields
 		{
 			ListLocker< _JniSingletonField* > list(_g_jni_shared().singleton_fields);
@@ -85,8 +71,14 @@ void Jni::initialize(JavaVM* jvm)
 				_JniSingletonField* obj = list[i];
 				JniClass cls = obj->gcls->cls;
 				if (cls.isNotNull()) {
+#if defined(JNI_LOG_INIT_LOAD)
+					SLIB_LOG("LOADING JAVA FIELD", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
+#endif
 					obj->cls = cls;
 					obj->id = cls.getFieldID(obj->name, obj->sig);
+					if (obj->id == sl_null) {
+						SLIB_LOG("LOADING JAVA FIELD FAILED", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
+					}
 				}
 			}
 		}
@@ -97,8 +89,50 @@ void Jni::initialize(JavaVM* jvm)
 				_JniSingletonStaticField* obj = list[i];
 				JniClass cls = obj->gcls->cls;
 				if (cls.isNotNull()) {
+#if defined(JNI_LOG_INIT_LOAD)
+					SLIB_LOG("LOADING JAVA STATIC FIELD", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
+#endif
 					obj->cls = cls;
 					obj->id = cls.getStaticFieldID(obj->name, obj->sig);
+					if (obj->id == sl_null) {
+						SLIB_LOG("LOADING JAVA STATIC FIELD FAILED", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
+					}
+				}
+			}
+		}
+		// singleton methods
+		{
+			ListLocker< _JniSingletonMethod* > list(_g_jni_shared().singleton_methods);
+			for (sl_size i = 0; i < list.count; i++) {
+				_JniSingletonMethod* obj = list[i];
+				JniClass cls = obj->gcls->cls;
+				if (cls.isNotNull()) {
+#if defined(JNI_LOG_INIT_LOAD)
+					SLIB_LOG("LOADING JAVA METHOD", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
+#endif
+					obj->cls = cls;
+					obj->id = cls.getMethodID(obj->name, obj->sig);
+					if (obj->id == sl_null) {
+						SLIB_LOG("LOADING JAVA METHOD FAILED", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
+					}
+				}
+			}
+		}
+		// singleton static methods
+		{
+			ListLocker< _JniSingletonStaticMethod* > list(_g_jni_shared().singleton_static_methods);
+			for (sl_size i = 0; i < list.count; i++) {
+				_JniSingletonStaticMethod* obj = list[i];
+				JniClass cls = obj->gcls->cls;
+				if (cls.isNotNull()) {
+#if defined(JNI_LOG_INIT_LOAD)
+					SLIB_LOG("LOADING JAVA STATIC METHOD", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
+#endif
+					obj->cls = cls;
+					obj->id = cls.getStaticMethodID(obj->name, obj->sig);
+					if (obj->id == sl_null) {
+						SLIB_LOG("LOADING JAVA STATIC METHOD FAILED", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
+					}
 				}
 			}
 		}
@@ -109,8 +143,11 @@ void Jni::initialize(JavaVM* jvm)
 				_JniNativeMethod* obj = list[i];
 				JniClass cls = obj->gcls->cls;
 				if (cls.isNotNull()) {
+#if defined(JNI_LOG_INIT_LOAD)
+					SLIB_LOG("REGISTERING JAVA NATIVE", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
+#endif
 					if (!cls.registerNative(obj->name, obj->sig, obj->fn)) {
-						_logJniError(String("Failed to register JNI native function - ") + obj->name + ":" + obj->sig);
+						SLIB_LOG("REGISTERING JAVA NATIVE FAILED", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
 					}
 				}
 			}
@@ -181,7 +218,6 @@ void Jni::detachThread(JavaVM* jvm)
 
 JniClass Jni::findClass(const char* className)
 {
-	JniClass ret;
 	JNIEnv *env = getCurrent();
 	if (env) {
 		JniLocal<jclass> cls = env->FindClass(className);
@@ -191,11 +227,11 @@ JniClass Jni::findClass(const char* className)
 			Jni::clearException();
 		} else {
 			if (cls.isNotNull()) {
-				ret = JniClass::from(cls);
+				return JniClass::from(cls);
 			}
 		}
 	}
-	return ret;
+	return JniClass::null();
 }
 
 JniClass Jni::getClass(const String& className)
@@ -616,6 +652,8 @@ template class _JniGlobal<jclass>;
 template class _JniGlobal<jstring>;
 
 SLIB_DEFINE_REF_WRAPPER(JniClass, JniSafeClass, _JniGlobal<jclass>, ref)
+
+SLIB_DEFINE_REF_WRAPPER(JniSafeClass, JniClass, _JniGlobal<jclass>, ref)
 
 JniClass::JniClass(jclass cls) : ref(_JniGlobal<jclass>::from(cls))
 {

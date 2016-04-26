@@ -49,6 +49,7 @@
     <ClInclude Include="..\..\..\inc\slib\core\memory.h" />
     <ClInclude Include="..\..\..\inc\slib\core\mio.h" />
     <ClInclude Include="..\..\..\inc\slib\core\mutex.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\new.h" />
     <ClInclude Include="..\..\..\inc\slib\core\object.h" />
     <ClInclude Include="..\..\..\inc\slib\core\option.h" />
     <ClInclude Include="..\..\..\inc\slib\core\pipe.h" />
@@ -189,6 +190,7 @@
     <ClInclude Include="..\..\..\inc\slib\ui\button.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\camera_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\check_box.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\common_dialogs.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\constants.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\core.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\cursor.h" />
@@ -200,6 +202,7 @@
     <ClInclude Include="..\..\..\inc\slib\ui\image_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\label_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\list_details_view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\menu.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\platform.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\radio_button.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\radio_group.h" />
@@ -227,6 +230,7 @@
     <ClInclude Include="..\..\..\src\slib\render\opengl_gl.h" />
     <ClInclude Include="..\..\..\src\slib\render\opengl_gles.h" />
     <ClInclude Include="..\..\..\src\slib\render\opengl_impl.h" />
+    <ClInclude Include="..\..\..\src\slib\ui\ui_core_win32.h" />
     <ClInclude Include="..\..\..\src\slib\ui\view_win32.h" />
   </ItemGroup>
   <ItemGroup>
@@ -398,6 +402,8 @@
     <ClCompile Include="..\..\..\src\slib\ui\canvas_gdiplus.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\check_box.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\check_box_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\common_dialogs.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\common_dialogs_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\cursor.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\cursor_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\drawable_gdiplus.cpp" />
@@ -433,6 +439,8 @@
     <ClCompile Include="..\..\..\src\slib\ui\ui_event.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\ui_event_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\ui_graphics_context.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_menu.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_menu_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\video_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\view_group.cpp" />

@@ -9,57 +9,11 @@
 #include "../../../inc/slib/ui/scroll_view.h"
 
 SLIB_UI_NAMESPACE_BEGIN
-/******************************************
-		_Win32_View_Static
-******************************************/
-
-LRESULT CALLBACK _Win32_ViewWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-LRESULT CALLBACK _Win32_ViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 class _View : public View
 {
 	friend class Win32_ViewInstance;
 };
-
-Win32_View_Shared::Win32_View_Shared()
-{
-	HINSTANCE hInst = ::GetModuleHandleW(NULL);
-	// register view class
-	{
-		WNDCLASSEXW wc;
-		::ZeroMemory(&wc, sizeof(wc));
-		wc.cbSize = sizeof(wc);
-		wc.style = CS_DBLCLKS | CS_PARENTDC;
-		wc.lpfnWndProc = _Win32_ViewProc;
-		wc.cbClsExtra = 0;
-		wc.cbWndExtra = 0;
-		wc.hInstance = hInst;
-		wc.hIcon = NULL;
-		wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-		wc.lpszMenuName = NULL;
-		wc.lpszClassName = L"SLIBUIVIEW";
-		wc.hIconSm = NULL;
-		wndClass = ::RegisterClassExW(&wc);
-	}
-}
-
-Win32_View_Shared* Win32_View_Shared::get()
-{
-	SLIB_SAFE_STATIC(Win32_View_Shared, ret);
-	return &ret;
-}
-
-void UI::setDefaultFontName(const String& _fontName)
-{
-	String16 fontName = _fontName;
-	HFONT hFont = ::CreateFontW(14, 0, 0, 0, 200, FALSE, FALSE
-		, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS
-		, ANTIALIASED_QUALITY
-		, DEFAULT_PITCH
-		, (LPCWSTR)(fontName.getData()));
-	Win32_View_Shared::get()->hFontDefault = hFont;
-}
 
 /******************************************
 		Win32_ViewInstance
@@ -107,7 +61,7 @@ HWND Win32_ViewInstance::createHandle(
 			, hInst
 			, NULL);
 		if (hWnd) {
-			HFONT hFont = Win32_View_Shared::get()->hFontDefault;
+			HFONT hFont = Win32_UI_Shared::get()->hFontDefault;
 			if (hFont) {
 				::SendMessageW(hWnd, WM_SETFONT, (WPARAM)hFont, TRUE);
 			}
@@ -673,7 +627,7 @@ LRESULT CALLBACK _Win32_ViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 ******************************************/
 Ref<ViewInstance> View::createInstance(ViewInstance* parent)
 {
-	Win32_View_Shared* shared = Win32_View_Shared::get();
+	Win32_UI_Shared* shared = Win32_UI_Shared::get();
 	DWORD styleEx = 0;
 	DWORD style = 0;
 	if (m_flagGroup) {
@@ -685,7 +639,7 @@ Ref<ViewInstance> View::createInstance(ViewInstance* parent)
 		style |= (WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
 #endif
 	}
-	Ref<Win32_ViewInstance> ret = Win32_ViewInstance::create<Win32_ViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClass)), L"", style, styleEx);
+	Ref<Win32_ViewInstance> ret = Win32_ViewInstance::create<Win32_ViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
 	return ret;
 }
 

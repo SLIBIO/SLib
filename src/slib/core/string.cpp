@@ -401,6 +401,9 @@ SLIB_INLINE StringContainer8* String8::_merge16(const sl_char8* s1, sl_reg len1,
 	if (len1 < 0) {
 		len1 = _StringBase::getSz8Length(s1);
 	}
+	if (len2_u16 < 0) {
+		len2_u16 = _StringBase::getSz16Length(s2_u16);
+	}
 	sl_size len2 = _StringBase::utf16ToUtf8(s2_u16, len2_u16, sl_null, -1);
 	sl_size len = len1 + len2;
 	StringContainer8* s = _alloc(len);
@@ -414,10 +417,13 @@ SLIB_INLINE StringContainer8* String8::_merge16(const sl_char8* s1, sl_reg len1,
 
 SLIB_INLINE StringContainer8* String8::_merge16(const sl_char16* s1_u16, sl_reg len1_u16, const sl_char8* s2, sl_reg len2)
 {
-	sl_size len1 = _StringBase::utf16ToUtf8(s1_u16, len1_u16, sl_null, -1);
+	if (len1_u16 < 0) {
+		len1_u16 = _StringBase::getSz16Length(s1_u16);
+	}
 	if (len2 < 0) {
 		len2 = _StringBase::getSz8Length(s2);
 	}
+	sl_size len1 = _StringBase::utf16ToUtf8(s1_u16, len1_u16, sl_null, -1);
 	sl_size len = len1 + len2;
 	StringContainer8* s = _alloc(len);
 	if (s != _String8_Null.container) {
@@ -433,6 +439,9 @@ SLIB_INLINE StringContainer8* String8::_merge32(const sl_char8* s1, sl_reg len1,
 	if (len1 < 0) {
 		len1 = _StringBase::getSz8Length(s1);
 	}
+	if (len2_u32 < 0) {
+		len2_u32 = _StringBase::getSz32Length(s2_u32);
+	}
 	sl_size len2 = _StringBase::utf32ToUtf8(s2_u32, len2_u32, sl_null, -1);
 	sl_size len = len1 + len2;
 	StringContainer8* s = _alloc(len);
@@ -446,10 +455,13 @@ SLIB_INLINE StringContainer8* String8::_merge32(const sl_char8* s1, sl_reg len1,
 
 SLIB_INLINE StringContainer8* String8::_merge32(const sl_char32* s1_u32, sl_reg len1_u32, const sl_char8* s2, sl_reg len2)
 {
-	sl_size len1 = _StringBase::utf32ToUtf8(s1_u32, len1_u32, sl_null, -1);
+	if (len1_u32 < 0) {
+		len1_u32 = _StringBase::getSz32Length(s1_u32);
+	}
 	if (len2 < 0) {
 		len2 = _StringBase::getSz8Length(s2);
 	}
+	sl_size len1 = _StringBase::utf32ToUtf8(s1_u32, len1_u32, sl_null, -1);
 	sl_size len = len1 + len2;
 	StringContainer8* s = _alloc(len);
 	if (s != _String8_Null.container) {
@@ -465,6 +477,9 @@ SLIB_INLINE StringContainer16* String16::_merge8(const sl_char16* s1, sl_reg len
 	if (len1 < 0) {
 		len1 = _StringBase::getSz16Length(s1);
 	}
+	if (len2_u8 < 0) {
+		len2_u8 = _StringBase::getSz8Length(s2_u8);
+	}
 	sl_size len2 = _StringBase::utf8ToUtf16(s2_u8, len2_u8, sl_null, -1);
 	sl_size len = len1 + len2;
 	StringContainer16* s = _alloc(len);
@@ -478,10 +493,13 @@ SLIB_INLINE StringContainer16* String16::_merge8(const sl_char16* s1, sl_reg len
 
 SLIB_INLINE StringContainer16* String16::_merge8(const sl_char8* s1_u8, sl_reg len1_u8, const sl_char16* s2, sl_reg len2)
 {
-	sl_size len1 = _StringBase::utf8ToUtf16(s1_u8, len1_u8, sl_null, -1);
+	if (len1_u8 < 0) {
+		len1_u8 = _StringBase::getSz8Length(s1_u8);
+	}
 	if (len2 < 0) {
 		len2 = _StringBase::getSz16Length(s2);
 	}
+	sl_size len1 = _StringBase::utf8ToUtf16(s1_u8, len1_u8, sl_null, -1);
 	sl_size len = len1 + len2;
 	StringContainer16* s = _alloc(len);
 	if (s != _String16_Null.container) {
@@ -6101,7 +6119,7 @@ SLIB_INLINE sl_reg _String_parseInt(sl_int32 radix, const CT* sz, sl_size i, sl_
 	for (; i < n; i++) {
 		sl_uint32 c = (sl_uint32)(sz[i]);
 		sl_uint32 m = c < 128 ? pattern[c] : 255;
-		if (m < r) {
+		if (m < (sl_uint32)r) {
 			v = v * r + m;
 			bEmpty = sl_false;
 		} else {

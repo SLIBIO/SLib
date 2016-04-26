@@ -22,9 +22,9 @@ public:
 	sl_real pressure;
 
 public:
-	TouchPoint() = default;
+	TouchPoint();
 
-	TouchPoint(const TouchPoint& other) = default;
+	TouchPoint(const TouchPoint& other);
 	
 	TouchPoint(const Point& point);
 	
@@ -35,9 +35,79 @@ public:
 	TouchPoint(sl_real x, sl_real y, sl_real pressure);
 	
 public:
-	TouchPoint& operator=(const TouchPoint& other) = default;
+	TouchPoint& operator=(const TouchPoint& other);
 
 };
+
+template<>
+SLIB_INLINE sl_uint32 Hash<Keycode>::hash(const Keycode& code)
+{
+	return sl_hash((sl_uint32)code);
+}
+
+class SLIB_EXPORT KeycodeAndModifiers
+{
+public:
+	SLIB_DECLARE_PRIMITIVE_WRAPPER(int, KeycodeAndModifiers)
+	
+public:
+	KeycodeAndModifiers();
+	
+	KeycodeAndModifiers(Keycode keycode);
+	
+	KeycodeAndModifiers(Keycode keycode, const Modifiers& modifiers);
+
+public:
+	Keycode getKeycode() const;
+	
+	void setKeycode(Keycode keycode);
+	
+	Modifiers getModifiers() const;
+	
+	void setModifiers(const Modifiers& modifiers);
+	
+	void setShiftKey();
+	
+	void clearShiftKey();
+	
+	sl_bool isShiftKey() const;
+	
+	void setAltKey();
+	
+	void clearAltKey();
+	
+	sl_bool isAltKey() const;
+	
+	void setOptionKey();
+	
+	void clearOptionKey();
+	
+	sl_bool isOptionKey() const;
+	
+	void setControlKey();
+	
+	void clearControlKey();
+	
+	sl_bool isControlKey() const;
+	
+	void setWindowsKey();
+	
+	void clearWindowsKey();
+	
+	sl_bool isWindowsKey() const;
+	
+	void setCommandKey();
+	
+	void clearCommandKey();
+	
+	sl_bool isCommandKey() const;
+
+	String toString() const;
+	
+};
+
+KeycodeAndModifiers operator|(Keycode keycode, const Modifiers& modifiers);
+
 
 class SLIB_EXPORT UIEvent : public Referable
 {	
@@ -67,10 +137,18 @@ public:
 	sl_bool isTouchEvent();
 	
 	// key
+	const KeycodeAndModifiers& getKeycodeAndModifiers() const;
+	
+	void setKeycodeAndModifiers(const KeycodeAndModifiers& km);
+	
 	Keycode getKeycode() const;
 	
 	void setKeycode(Keycode keycode);
 	
+	Modifiers getModifiers() const;
+	
+	void setModifiers(const Modifiers& modifiers);
+
 	sl_uint32 getSystemKeycode() const;
 	
 	void setSystemKeycode(sl_uint32 keycode);
@@ -187,7 +265,7 @@ protected:
 	UIAction m_action;
 	
 	// keyboard
-	Keycode m_keycode;
+	KeycodeAndModifiers m_keycodeAndModifiers;
 	sl_uint32 m_systemKeycode;
 	
 	// mouse, touch
@@ -203,15 +281,15 @@ class SLIB_EXPORT IViewListener
 public:
 	virtual void onClick(View* view);
 	
-	virtual void onKeyEvent(View* view, UIEvent* event);
+	virtual void onKeyEvent(View* view, UIEvent* ev);
 	
-	virtual void onMouseEvent(View* view, UIEvent* event);
+	virtual void onMouseEvent(View* view, UIEvent* ev);
 	
-	virtual void onTouchEvent(View* view, UIEvent* event);
+	virtual void onTouchEvent(View* view, UIEvent* ev);
 	
-	virtual void onMouseWheelEvent(View* view, UIEvent* event);
+	virtual void onMouseWheelEvent(View* view, UIEvent* ev);
 	
-	virtual void onSetCursor(View* view, UIEvent* event);
+	virtual void onSetCursor(View* view, UIEvent* ev);
 
 };
 
@@ -243,15 +321,15 @@ class SLIB_EXPORT UIEventLogListener : public Referable, public IWindowListener,
 public:
 	void onClick(View* view);
 	
-	void onKeyEvent(View* view, UIEvent* event);
+	void onKeyEvent(View* view, UIEvent* ev);
 	
-	void onMouseEvent(View* view, UIEvent* event);
+	void onMouseEvent(View* view, UIEvent* ev);
 	
-	void onMouseWheelEvent(View* view, UIEvent* event);
+	void onMouseWheelEvent(View* view, UIEvent* ev);
 	
-	void onTouchEvent(View* view, UIEvent* event);
+	void onTouchEvent(View* view, UIEvent* ev);
 	
-	void onSetCursor(View* view, UIEvent* event);
+	void onSetCursor(View* view, UIEvent* ev);
 	
 	
 	// window related events
@@ -274,17 +352,60 @@ public:
 	void onDemaximize(Window* window);
 	
 private:
-	void processKey(String name, UIEvent* event);
+	void processKey(String name, UIEvent* ev);
 	
-	void processMouse(String name, UIEvent* event);
+	void processMouse(String name, UIEvent* ev);
 	
-	void processMouseWheel(String name, UIEvent* event);
+	void processMouseWheel(String name, UIEvent* ev);
 	
-	void processTouch(String name, UIEvent* event);
+	void processTouch(String name, UIEvent* ev);
 	
-	String getModifierText(UIEvent* event);
+	String getModifierText(UIEvent* ev);
 	
 };
+
+SLIB_UI_NAMESPACE_END
+
+
+SLIB_UI_NAMESPACE_BEGIN
+
+SLIB_INLINE KeycodeAndModifiers::KeycodeAndModifiers() : value(0)
+{
+}
+
+SLIB_INLINE KeycodeAndModifiers::KeycodeAndModifiers(Keycode keycode, const Modifiers& modifiers) : value((int)keycode | modifiers)
+{
+}
+
+SLIB_INLINE Keycode KeycodeAndModifiers::getKeycode() const
+{
+	return (Keycode)(value & 0xFFFF);
+}
+
+SLIB_INLINE void KeycodeAndModifiers::setKeycode(Keycode keycode)
+{
+	value = (value & Modifiers::Mask) | (int)(keycode);
+}
+
+SLIB_INLINE Modifiers KeycodeAndModifiers::getModifiers() const
+{
+	return value & Modifiers::Mask;
+}
+
+SLIB_INLINE void KeycodeAndModifiers::setModifiers(const Modifiers& modifiers)
+{
+	value = modifiers | (value & 0xFFFF);
+}
+
+SLIB_INLINE KeycodeAndModifiers operator|(Keycode keycode, int modifiers)
+{
+	return KeycodeAndModifiers(keycode, modifiers);
+}
+
+SLIB_INLINE KeycodeAndModifiers operator|(int modifiers, Keycode keycode)
+{
+	return KeycodeAndModifiers(keycode, modifiers);
+}
 
 SLIB_UI_NAMESPACE_END
 

@@ -20,14 +20,16 @@ enum class FileMode
 	RandomAccess = 5
 };
 
-namespace FileAttribute
+class FileAttributes
 {
+	SLIB_DECLARE_FLAGS(FileAttributes)
+public:
 	enum {
 		Directory = 1,
-		Hidden = 2
+		Hidden = 2,
+		NotExist = 0x80000000
 	};
 };
-typedef int FileAttributes;
 
 class SLIB_EXPORT File : public IO
 {

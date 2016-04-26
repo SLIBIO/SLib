@@ -16,13 +16,12 @@ SLIB_UI_NAMESPACE_BEGIN
 class Window;
 class Screen;
 class Cursor;
-
-class AlertParam;
+class Menu;
 
 class SLIB_EXPORT UI
 {
 public:
-	// Graphics (Platform Specific)
+	// Graphics
 	static void setDefaultFontName(const String& fontName);
 
 	static Size getFontTextSize(const Ref<Font>& font, const String& text);
@@ -41,7 +40,6 @@ public:
 	
 	static Ref<Bitmap> loadBitmapFromMemory(const void* mem, sl_size size);
 
-	// Graphics
 	static Ref<GraphicsContext> getGraphicsContext();
 	
 	static Ref<Drawable> createDrawableFromImage(const Ref<Image>& image);
@@ -62,15 +60,14 @@ public:
 	
 	static Ref<Bitmap> loadBitmapFromAsset(const String& path);
 
-	
-	// Screens (Platform Specific)
+
+	// Screens
 	static List< Ref<Screen> > getScreens();
 	
 	static Ref<Screen> getPrimaryScreen();
 	
 	static Ref<Screen> getFocusedScreen();
 	
-	// Screens
 	static Rectangle getScreenRegion();
 	
 	static Rectangle getScreenRegion(const Ref<Screen>& screen);
@@ -83,27 +80,18 @@ public:
 	
 	static Size getScreenSize(const Ref<Screen>& screen);
 	
-	// UI Thread (Platform Specific)
-	static sl_bool isUIThread();
-
-	static void runOnUIThread(const Ref<Runnable>& callback);
-	
-	// Run Loop (Platform Specific, only for desktop apps)
-	static void runLoop();
-	
-	static void quitLoop();
-	
-	// Message Box (Platform Specific)
-	static void showAlert(const AlertParam& param);
 	
 	// Message Box
-	static void showAlert(const String& text);
+	// Run on UI thread
+	static void alert(const String& text);
+	
+	// Run on UI thread
+	static void alert(const String& caption, const String& text);
 	
 	static void showAlert(const String& text, const Ref<Runnable>& onOk);
 	
-	static void showAlert(const String& text, const String& caption);
+	static void showAlert(const String& caption, const String& text, const Ref<Runnable>& onOk);
 	
-	static void showAlert(const String& text, const String& caption, const Ref<Runnable>& onOk);
 	
 	// HID related functions (Platform Specific, only for desktop apps)
 	static sl_bool checkKeyPressed(Keycode key);
@@ -124,8 +112,36 @@ public:
 	
 	static String getStatusDescription();
 	
+	
 	// HID related functions
-	static String getKeyName(Keycode key);
+	static String getKeyName(Keycode key, sl_bool flagShort = sl_false);
+
+	
+	// UI Thread
+	static sl_bool isUiThread();
+	
+	static void dispatchToUiThread(const Ref<Runnable>& callback);
+	
+	static void runOnUiThread(const Ref<Runnable>& callback);
+	
+	
+	// Run Loop
+	static void runLoop();
+	
+	static void quitLoop();
+	
+	static void runApp();
+	
+	static void quitApp();
+
+	// App related
+	static Ref<Window> getMainWindow();
+
+	static void setMainWindow(const Ref<Window>& window);
+
+	static Ref<Menu> getApplicationMenu();
+
+	static void setApplicationMenu(const Ref<Menu>& menu);
 
 };
 
@@ -180,37 +196,17 @@ public:
 
 	static sl_bool isMobilePaused();
 
+	static Ref<Window> getMainWindow();
+
+	static void setMainWindow(const Ref<Window>& window);
+
+	// Menu Bar (Mainly used in OSX)
+	static Ref<Menu> getMenu();
+
+	static void setMenu(const Ref<Menu>& menu);
+
 private:
 	static sl_bool m_flagMobilePaused;
-	
-};
-
-enum class AlertType {
-	Ok = 0,
-	OkCancel = 1,
-	YesNo = 2,
-	YesNoCancel = 3
-};
-
-class SLIB_EXPORT AlertParam
-{
-public:
-	AlertType type;
-	String caption;
-	String text;
-
-	String titleOk;
-	String titleCancel;
-	String titleYes;
-	String titleNo;
-
-	Ref<Runnable> onOk;
-	Ref<Runnable> onCancel;
-	Ref<Runnable> onYes;
-	Ref<Runnable> onNo;
-
-public:
-	AlertParam();
 
 };
 

@@ -21,6 +21,20 @@ SLIB_NETWORK_NAMESPACE_BEGIN
 
 const SocketAddress::_SocketAddress SocketAddress::_none = { { IPAddressType::None, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }, 0 };
 
+SocketAddress::SocketAddress() : port(0)
+{
+}
+
+SocketAddress::SocketAddress(sl_int32 _port) : port(_port)
+{
+}
+
+SocketAddress::SocketAddress(const SocketAddress& other) = default;
+
+SocketAddress::SocketAddress(const IPAddress& _ip, sl_int32 _port) : ip(_ip), port(_port)
+{
+}
+
 SocketAddress::SocketAddress(const String& str)
 {
 	parse(str);
@@ -30,6 +44,21 @@ void SocketAddress::setNone()
 {
 	ip.setNone();
 	port = 0;
+}
+
+const SocketAddress& SocketAddress::none()
+{
+	return *((SocketAddress*)((void*)(&_none)));
+}
+
+sl_bool SocketAddress::isValid() const
+{
+	return ip.isNotNone() && port != 0;
+}
+
+sl_bool SocketAddress::isInvalid() const
+{
+	return ip.isNone() || port == 0;
 }
 
 int SocketAddress::compare(const SocketAddress& other) const

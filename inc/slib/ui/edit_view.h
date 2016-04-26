@@ -36,9 +36,9 @@ public:
 	virtual void setBorder(sl_bool flag);
 	
 	
-	Alignments getTextAlignment();
+	Alignment getTextAlignment();
 	
-	virtual void setTextAlignment(Alignments align);
+	virtual void setTextAlignment(Alignment align);
 	
 	
 	String getHintText();
@@ -95,7 +95,7 @@ public:
 protected:
 	SafeString m_text;
 	sl_bool m_flagBorder;
-	Alignments m_textAlignment;
+	Alignment m_textAlignment;
 	SafeString m_hintText;
 	sl_bool m_flagReadOnly;
 	sl_bool m_flagMultiLine;

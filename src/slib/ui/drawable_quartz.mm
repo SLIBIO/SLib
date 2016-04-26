@@ -384,6 +384,38 @@ Ref<Bitmap> UI::loadBitmapFromMemory(const void* mem, sl_size size)
 	return _Quartz_Bitmap::loadFromMemory(mem, size);
 }
 
+
+#if defined(SLIB_PLATFORM_IS_OSX)
+
+NSImage* UIPlatform::getNSImageFromBitmap(const Ref<Bitmap>& bitmap)
+{
+	if (bitmap.isNotNull() && bitmap->isNotEmpty()) {
+		sl_uint32 width = bitmap->getWidth();
+		sl_uint32 height = bitmap->getHeight();
+		NSBitmapImageRep* rep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:width pixelsHigh:height bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:FALSE colorSpaceName:NSDeviceRGBColorSpace bitmapFormat:0 bytesPerRow:0 bitsPerPixel:0];
+		if (rep != nil) {
+			BitmapData bd;
+			bd.data = rep.bitmapData;
+			bd.format = BitmapFormat::RGBA;
+			bd.width = width;
+			bd.height = height;
+			if (bitmap->readPixels(0, 0, bd)) {
+				NSSize size;
+				size.width = width;
+				size.height = height;
+				NSImage* image = [[NSImage alloc] initWithSize:size];
+				if (image != nil) {
+					[image addRepresentation:rep];
+					return image;
+				}
+			}
+		}
+	}
+	return nil;
+}
+
+#endif
+
 SLIB_UI_NAMESPACE_END
 
 #endif

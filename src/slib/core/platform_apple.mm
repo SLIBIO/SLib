@@ -53,25 +53,53 @@ String16 Apple::getString16FromNSString(NSString* str)
 	return ret;
 }
 
+String Apple::getFilePathFromNSURL(NSURL* url)
+{
+	if (url != nil) {
+		SLIB_STATIC_STRING(prefix, "file://");
+		String path = Apple::getStringFromNSString([url path]);
+		if (path.startsWith(prefix)) {
+			path = path.substring(7);
+		}
+		return path;
+	}
+	return String::null();
+}
+
+#if defined(SLIB_PLATFORM_IS_OSX)
+NSImage* Apple::loadImage(const void* buf, sl_size size)
+{
+	NSData* data = [NSData dataWithBytesNoCopy:(void*)buf length:size freeWhenDone:FALSE];
+	return [[NSImage alloc] initWithData:data];
+}
+#elif defined(SLIB_PLATFORM_IS_IOS)
+UIImage* Apple::loadImage(const void* buf, sl_size size)
+{
+	NSData* data = [NSData dataWithBytesNoCopy:(void*)buf length:size freeWhenDone:FALSE];
+	return [UIImage imageWithData:data];
+}
+#endif
+
 CGImageRef Apple::loadCGImage(const void* buf, sl_size size)
 {
 	CGImageRef ret;
-	NSData* data = [NSData dataWithBytesNoCopy:(void*)buf length:size freeWhenDone:FALSE];
 #if defined(SLIB_PLATFORM_IS_OSX)
-	NSImage* image = [[NSImage alloc] initWithData:data];
+	NSImage* image = loadImage(buf, size);
 	if (image == nil) {
 		return NULL;
 	}
 	ret = [image CGImageForProposedRect:NULL context:NULL hints:NULL];
+	CGImageRetain(ret);
+	return ret;
 #elif defined(SLIB_PLATFORM_IS_IOS)
-	UIImage* image = [UIImage imageWithData:data];
+	UIImage* image = loadImage(buf, size);
 	if (image == nil) {
 		return NULL;
 	}
 	ret = image.CGImage;
-#endif
 	CGImageRetain(ret);
 	return ret;
+#endif
 }
 
 String Apple::getAssetFilePath(const String &path)

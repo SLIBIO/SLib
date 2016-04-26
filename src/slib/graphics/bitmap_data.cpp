@@ -23,6 +23,8 @@ BitmapData::BitmapData()
 	pitch3 = 0;
 }
 
+BitmapData::BitmapData(const BitmapData& other) = default;
+
 BitmapData::BitmapData(sl_uint32 width, sl_uint32 height, const Color* colors, sl_int32 stride)
 {
 	setFromColors(width, height, colors, stride);
@@ -1899,6 +1901,8 @@ void BitmapData::setFromColors(sl_uint32 width, sl_uint32 height, const Color* c
 	this->data3 = sl_null;
 	this->pitch3 = 0;
 }
+
+BitmapData& BitmapData::operator=(const BitmapData& other) = default;
 
 SLIB_GRAPHICS_NAMESPACE_END
 

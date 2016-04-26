@@ -51,7 +51,7 @@ public:
 public:
 	BitmapData();
 	
-	BitmapData(const BitmapData& other) = default;
+	BitmapData(const BitmapData& other);
 	
 	BitmapData(sl_uint32 width, sl_uint32 height, const Color* colors, sl_int32 stride = 0);
 	
@@ -86,7 +86,7 @@ public:
 	void setFromColors(sl_uint32 width, sl_uint32 height, const Color* colors, sl_int32 stride = 0);
 	
 public:
-	BitmapData& operator=(const BitmapData& other) = default;
+	BitmapData& operator=(const BitmapData& other);
 
 };
 

@@ -36,8 +36,8 @@ void SView::setNativeParent(sl_bool flag)
 void SView::removeAllChildren()
 {
 	if (isNativeGroup()) {
-		if (!(UI::isUIThread())) {
-			UI::runOnUIThread(SLIB_CALLBACK_WEAKREF(SView, removeAllChildren, this));
+		if (!(UI::isUiThread())) {
+			UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(SView, removeAllChildren, this));
 			return;
 		}
 		ListLocker< Ref<View> > children(m_children);

@@ -13,8 +13,8 @@ ViewGroup::ViewGroup()
 
 void ViewGroup::removeAllChildren()
 {
-	if (!(UI::isUIThread())) {
-		UI::runOnUIThread(SLIB_CALLBACK_WEAKREF(ViewGroup, removeAllChildren, this));
+	if (!(UI::isUiThread())) {
+		UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(ViewGroup, removeAllChildren, this));
 		return;
 	}
 	ListLocker< Ref<View> > children(m_children);

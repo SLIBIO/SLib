@@ -234,10 +234,10 @@ void View::addChildInstance(const Ref<ViewInstance>& child)
 	if (child.isNotNull()) {
 		Ref<ViewInstance> instance = m_instance;
 		if (instance.isNotNull()) {
-			if (UI::isUIThread()) {
+			if (UI::isUiThread()) {
 				instance->addChildInstance(child);
 			} else {
-				UI::runOnUIThread(SLIB_CALLBACK_WEAKREF(View, _addChildInstance_, this, child));
+				UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, _addChildInstance_, this, child));
 			}
 		}
 	}
@@ -256,10 +256,10 @@ void View::removeChildInstance(const Ref<ViewInstance>& child)
 	if (child.isNotNull()) {
 		Ref<ViewInstance> instance = m_instance;
 		if (instance.isNotNull()) {
-			if (UI::isUIThread()) {
+			if (UI::isUiThread()) {
 				instance->removeChildInstance(child);
 			} else {
-				UI::runOnUIThread(SLIB_CALLBACK_WEAKREF(View, _removeChildInstance_, this, child));
+				UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, _removeChildInstance_, this, child));
 			}
 		}
 	}
@@ -321,10 +321,10 @@ void View::attach(const Ref<ViewInstance>& instance)
 	if (instance.isNotNull()) {
 		m_instance = instance;
 		instance->setView(this);
-		if (UI::isUIThread()) {
+		if (UI::isUiThread()) {
 			onAttach();
 		} else {
-			UI::runOnUIThread(SLIB_CALLBACK_WEAKREF(View, onAttach, this));
+			UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, onAttach, this));
 		}
 	}
 }
@@ -343,8 +343,8 @@ void View::attachChild(const Ref<View>& child)
 {
 	if (m_flagGroup) {
 		if (child.isNotNull()) {
-			if (!(UI::isUIThread())) {
-				UI::runOnUIThread(SLIB_CALLBACK_WEAKREF(View, _attachChild_, this, child));
+			if (!(UI::isUiThread())) {
+				UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, _attachChild_, this, child));
 				return;
 			}
 			Ref<ViewInstance> parentInstance = getViewInstance();

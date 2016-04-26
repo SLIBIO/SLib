@@ -28,9 +28,9 @@ public:
 	};
 	
 public:
-	IPv4Address() = default;
+	SLIB_INLINE IPv4Address() = default;
 	
-	IPv4Address(const IPv4Address& other) = default;
+	SLIB_INLINE IPv4Address(const IPv4Address& other) = default;
 
 	IPv4Address(const sl_uint8* addr);
 	
@@ -91,7 +91,7 @@ public:
 	sl_bool setHostName(const String& hostName);
 	
 public:
-	IPv4Address& operator=(const IPv4Address& other) = default;
+	SLIB_INLINE IPv4Address& operator=(const IPv4Address& other) = default;
 	
 	IPv4Address& operator=(sl_uint32 addr);
 
@@ -158,9 +158,9 @@ public:
 	sl_uint8 m[16];
 
 public:
-	IPv6Address() = default;
+	IPv6Address();
 	
-	IPv6Address(const IPv6Address& other) = default;
+	IPv6Address(const IPv6Address& other);
 
 	// 8 elements
 	IPv6Address(const sl_uint16* s);
@@ -231,7 +231,7 @@ public:
 	sl_bool setHostName(const String& hostName);
 
 public:
-	IPv6Address& operator=(const IPv6Address& other) = default;
+	IPv6Address& operator=(const IPv6Address& other);
 	
 	IPv6Address& operator=(const String& address);
 
@@ -284,7 +284,7 @@ public:
 public:
 	IPAddress();
 	
-	IPAddress(const IPAddress& other) = default;
+	IPAddress(const IPAddress& other);
 	
 	IPAddress(const IPv4Address& other);
 	
@@ -328,7 +328,7 @@ public:
 	sl_bool setHostName(const String& hostName);
 	
 public:
-	IPAddress& operator=(const IPAddress& other) = default;
+	IPAddress& operator=(const IPAddress& other);
 	
 	IPAddress& operator=(const IPv4Address& other);
 

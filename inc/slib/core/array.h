@@ -3,6 +3,7 @@
 
 #include "definition.h"
 
+#include "new.h"
 #include "algorithm.h"
 #include "reference.h"
 #include "iterator.h"
@@ -341,14 +342,8 @@ template <class T, class COMPARE>
 CArray<T, COMPARE>::CArray(sl_size count)
 {
 	if (count > 0) {
-		sl_size size = count * sizeof(T);
-		T* dataNew = (T*)(Base::createMemory(size));
+		T* dataNew = New<T>::create(count);
 		if (dataNew) {
-			T* p = dataNew;
-			for (sl_size i = 0; i < count; i++) {
-				new (p) T();
-				p ++;
-			}
 			m_flagStatic = sl_false;
 			m_data = dataNew;
 			m_count = count;
@@ -364,16 +359,8 @@ template <class T, class COMPARE>
 CArray<T, COMPARE>::CArray(const T* data, sl_size count)
 {
 	if (count > 0) {
-		sl_size size = count * sizeof(T);
-		T* dataNew = (T*)(Base::createMemory(size));
+		T* dataNew = New<T>::create(data, count);
 		if (dataNew) {
-			T* p = dataNew;
-			const T* q = data;
-			for (sl_size i = 0; i < count; i++) {
-				new (p) T(*q);
-				p ++;
-				q ++;
-			}
 			m_flagStatic = sl_false;
 			m_data = dataNew;
 			m_count = count;
@@ -390,16 +377,8 @@ template <class _T>
 CArray<T, COMPARE>::CArray(const _T* data, sl_size count)
 {
 	if (count > 0) {
-		sl_size size = count * sizeof(T);
-		T* dataNew = (T*)(Base::createMemory(size));
+		T* dataNew = New<T>::create(data, count);
 		if (dataNew) {
-			T* p = dataNew;
-			const _T* q = data;
-			for (sl_size i = 0; i < count; i++) {
-				new (p) T(*q);
-				p ++;
-				q ++;
-			}
 			m_flagStatic = sl_false;
 			m_data = dataNew;
 			m_count = count;
@@ -430,14 +409,7 @@ template <class T, class COMPARE>
 CArray<T, COMPARE>::~CArray()
 {
 	if (! m_flagStatic) {
-		T* p = m_data;
-		if (p) {
-			for (sl_size i = 0; i < m_count; i++) {
-				p->~T();
-				p ++;
-			}
-			Base::freeMemory(m_data);
-		}
+		New<T>::free(m_data, m_count);
 	}
 }
 

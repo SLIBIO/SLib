@@ -299,6 +299,10 @@ SLIB_DEFINE_EXPLICIT_INSTANTIATIONS_FOR_LIST(IPv6Address)
 const sl_uint8 IPv6Address::_zero[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 const sl_uint8 IPv6Address::_loopback[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
 
+IPv6Address::IPv6Address() = default;
+
+IPv6Address::IPv6Address(const IPv6Address& other) = default;
+
 IPv6Address::IPv6Address(const sl_uint16* s)
 {
 	for (int i = 0; i < 8; i++) {
@@ -574,6 +578,8 @@ sl_bool IPv6Address::setHostName(const String& hostName)
 	return isNotZero();
 }
 
+IPv6Address& IPv6Address::operator=(const IPv6Address& other) = default;
+
 IPv6Address& IPv6Address::operator=(const String& address)
 {
 	if (! parse(address)) {
@@ -634,6 +640,8 @@ sl_uint32 Hash<IPv6Address>::hash(const IPv6Address& a)
 SLIB_DEFINE_EXPLICIT_INSTANTIATIONS_FOR_LIST(IPAddress)
 
 const IPAddress::_IPAddress IPAddress::_none = { IPAddressType::None, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
+
+IPAddress::IPAddress(const IPAddress& other) = default;
 
 IPAddress::IPAddress(const IPv4Address& other)
 {
@@ -780,6 +788,8 @@ sl_bool IPAddress::setHostName(const String& hostName)
 	*this = Network::getIPAddressFromHostName(hostName);
 	return isNotNone();
 }
+
+IPAddress& IPAddress::operator=(const IPAddress& other) = default;
 
 IPAddress& IPAddress::operator=(const IPv4Address& other)
 {

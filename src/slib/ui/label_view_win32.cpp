@@ -102,7 +102,7 @@ Ref<ViewInstance> LabelView::createInstance(ViewInstance* parent)
 	if (m_flagBorder) {
 		style |= WS_BORDER;
 	}
-	Alignments align = m_textAlignment & Alignment::HorizontalMask;
+	Alignment align = m_textAlignment & Alignment::HorizontalMask;
 	if (align == Alignment::Center) {
 		style |= SS_CENTER;
 	} else if (align == Alignment::Right) {
@@ -172,7 +172,7 @@ void LabelView::setBorder(sl_bool flag)
 	m_flagBorder = flag;
 }
 
-Alignments LabelView::getTextAlignment()
+Alignment LabelView::getTextAlignment()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -188,12 +188,12 @@ Alignments LabelView::getTextAlignment()
 	return m_textAlignment;
 }
 
-void LabelView::setTextAlignment(Alignments _align)
+void LabelView::setTextAlignment(Alignment _align)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		LONG style = ::GetWindowLongW(handle, GWL_STYLE) & (~(SS_RIGHT | SS_CENTER));
-		Alignments align = _align & Alignment::HorizontalMask;
+		Alignment align = _align & Alignment::HorizontalMask;
 		if (align == Alignment::Center) {
 			style |= SS_CENTER;
 		} else if (align == Alignment::Right) {

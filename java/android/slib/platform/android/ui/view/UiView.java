@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import slib.platform.android.Logger;
 import slib.platform.android.ui.Graphics;
-import slib.platform.android.ui.Util;
+import slib.platform.android.ui.UiThread;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -73,7 +73,7 @@ public class UiView {
 	}
 
 	public static void invalidate(View view) {
-		if (Util.isUiThread()) {
+		if (UiThread.isUiThread()) {
 			view.invalidate();
 		} else {
 			view.postInvalidate();			
@@ -81,7 +81,7 @@ public class UiView {
 	}
 	
 	public static void invalidateRect(View view, float left, float top, float right, float bottom) {
-		if (Util.isUiThread()) {
+		if (UiThread.isUiThread()) {
 			view.invalidate((int)left, (int)top, (int)right, (int)bottom);			
 		} else {
 			view.postInvalidate((int)left, (int)top, (int)right, (int)bottom);			

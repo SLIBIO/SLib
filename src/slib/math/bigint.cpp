@@ -330,7 +330,7 @@ SLIB_INLINE void CBigInt::_free()
 {
 	if (elements) {
 		if (!m_flagUserData) {
-			delete[] elements;
+			Base::freeMemory(elements);
 		}
 		elements = sl_null;
 	}
@@ -460,7 +460,7 @@ CBigInt* CBigInt::allocate(sl_size length)
 	CBigInt* newObject = new CBigInt;
 	if (newObject) {
 		if (length > 0) {
-			sl_uint32* elements = new sl_uint32[length];
+			sl_uint32* elements = (sl_uint32*)(Base::createMemory(length * 4));
 			if (elements) {
 				newObject->m_flagUserData = sl_false;
 				newObject->length = length;
@@ -539,13 +539,13 @@ sl_bool CBigInt::growLength(sl_size newLength)
 	if (length >= newLength) {
 		return sl_true;
 	}
-	sl_uint32* newData = new sl_uint32[newLength];
+	sl_uint32* newData = (sl_uint32*)(Base::createMemory(newLength * 4));
 	if (newData) {
 		if (elements) {
 			Base::copyMemory(newData, elements, length * 4);
 			Base::zeroMemory(newData + length, (newLength - length) * 4);
 			if (!m_flagUserData) {
-				delete[] elements;
+				Base::freeMemory(elements);
 			}
 		} else {
 			Base::zeroMemory(newData, newLength * 4);
@@ -567,12 +567,12 @@ sl_bool CBigInt::setLength(sl_size newLength)
 		return sl_true;
 	} else {
 		if (newLength) {
-			sl_uint32* newData = new sl_uint32[newLength];
+			sl_uint32* newData = (sl_uint32*)(Base::createMemory(newLength * 4));
 			if (newData) {
 				if (elements) {
 					Base::copyMemory(newData, elements, newLength * 4);
 					if (!m_flagUserData) {
-						delete[] elements;
+						Base::freeMemory(elements);
 					}
 				}
 				m_flagUserData = sl_false;
@@ -585,7 +585,7 @@ sl_bool CBigInt::setLength(sl_size newLength)
 		} else {
 			if (elements) {
 				if (!m_flagUserData) {
-					delete[] elements;
+					Base::freeMemory(elements);
 				}
 			}
 			length = 0;

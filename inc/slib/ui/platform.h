@@ -17,6 +17,8 @@
 #include <CoreText/CoreText.h>
 #endif
 
+#include "event.h"
+
 SLIB_UI_NAMESPACE_BEGIN
 
 class Screen;
@@ -25,12 +27,19 @@ class View;
 class WindowInstance;
 class Window;
 class Cursor;
+class Menu;
+class MenuItem;
 
 class SLIB_EXPORT UIPlatform
 {
 public:
+	static void runLoop(sl_uint32 level);
+	static void quitLoop();
+	static void runApp();
+	static void quitApp();
+	
 #if defined(SLIB_PLATFORM_IS_WIN32)
-
+	
 	static Gdiplus::GraphicsPath* getGraphicsPath(GraphicsPath* path, Ref<GraphicsPathInstance>& instance);
 
 	static Gdiplus::Font* getGdiplusFont(Font* font, Ref<FontInstance>& instance);
@@ -53,11 +62,17 @@ public:
 	static Ref<WindowInstance> getWindowInstance(HWND hWnd);
 	static void removeWindowInstance(HWND hWnd);
 	static HWND getWindowHandle(WindowInstance* instance);
-	
+	static HWND getWindowHandle(Window* window);
+
+	static COLORREF getColorRef(const Color& color);
+
+	static HBITMAP createDIBFromBitmap(const Ref<Bitmap>& bitmap);
+
 	static Ref<Cursor> createCursor(HCURSOR hCursor, sl_bool flagDestroyOnRelease = sl_true);
 	static HCURSOR getCursorHandle(const Ref<Cursor>& cursor);
 
-	static COLORREF getColorRef(const Color& color);
+	static HMENU getMenuHandle(const Ref<Menu>& menu);
+	static Ref<Menu> getMenu(HMENU hMenu);
 
 #elif defined(SLIB_PLATFORM_IS_ANDROID)
 
@@ -109,6 +124,7 @@ public:
 	static Ref<WindowInstance> getWindowInstance(NSWindow* handle);
 	static void removeWindowInstance(NSWindow* handle);
 	static NSWindow* getWindowHandle(WindowInstance* instance);
+	static NSWindow* getWindowHandle(Window* window);
 	
 	static Ref<Screen> createScreen(NSScreen* handle);
 	static NSScreen* getScreenHandle(Screen* screen);
@@ -117,8 +133,15 @@ public:
 	static NSColor* getNSColorFromColor(const Color& color);
 	static Color getColorFromNSColor(NSColor* color);
 	
+	static NSImage* getNSImageFromBitmap(const Ref<Bitmap>& bitmap);
+	
+	static NSString* getKeyEquivalent(const KeycodeAndModifiers& km, NSUInteger& outMask);
+	
 	static Ref<Cursor> createCursor(NSCursor* handle);
 	static NSCursor* getCursorHandle(const Ref<Cursor>& cursor);
+	
+	static NSMenu* getMenuHandle(const Ref<Menu>& menu);
+	static NSMenuItem* getMenuItemHandle(const Ref<MenuItem>& menu);
 
 #		elif defined(SLIB_PLATFORM_IS_IOS)
 	
@@ -163,8 +186,10 @@ SLIB_UI_NAMESPACE_END
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 
-#define SLIB_UI_MESSAGE_CLOSE (WM_USER+1)
-#define SLIB_UI_MESSAGE_DISPATCH (WM_USER+2)
+#define SLIB_UI_MESSAGE_BEGIN 0x7100
+#define SLIB_UI_MESSAGE_CLOSE SLIB_UI_MESSAGE_BEGIN
+#define SLIB_UI_MESSAGE_DISPATCH (SLIB_UI_MESSAGE_BEGIN+1)
+#define SLIB_UI_MESSAGE_CUSTOM_MSGBOX (SLIB_UI_MESSAGE_BEGIN+2)
 
 #endif
 

@@ -153,6 +153,5 @@ SLIB_INLINE void(operator delete[])(void* in_pVoid, void* in_pWhere)
 
 #endif
 
-
 #endif
 

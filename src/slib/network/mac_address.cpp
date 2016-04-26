@@ -5,6 +5,8 @@ SLIB_NETWORK_NAMESPACE_BEGIN
 const sl_uint8 MacAddress::_zero[6] = { 0 };
 const sl_uint8 MacAddress::_broadcast[6] = { 255, 255, 255, 255, 255, 255 };
 
+MacAddress::MacAddress(const MacAddress& other) = default;
+
 MacAddress::MacAddress(const sl_uint8* _m)
 {
 	m[0] = _m[0];
@@ -191,6 +193,8 @@ sl_bool MacAddress::parse(const String& s, sl_char8 sep)
 	}
 	return _MacAddress_parse(this, s.getData(), 0, n, sep) == n;
 }
+
+MacAddress& MacAddress::operator=(const MacAddress& other) = default;
 
 MacAddress& MacAddress::operator=(const String& address)
 {

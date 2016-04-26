@@ -10,7 +10,7 @@
 /* SLIB Native Type Declarations                                        */
 /************************************************************************/
 
-#if defined(SLIB_COMPILER_IS_VISUALSTUDIO)
+#if defined(SLIB_COMPILER_IS_VC)
 
 #if defined (_DEBUG)
 #define SLIB_DEBUG
@@ -113,7 +113,7 @@ typedef sl_int32			sl_reg;
 #endif
 
 typedef char				sl_char8;
-#if defined(SLIB_COMPILER_IS_VISUALSTUDIO)
+#if defined(SLIB_COMPILER_IS_VC)
 typedef wchar_t				sl_char16;
 #else
 typedef sl_uint16			sl_char16;
@@ -121,7 +121,7 @@ typedef sl_uint16			sl_char16;
 typedef sl_uint32			sl_char32;
 
 // Unicode String Constant Definition
-#if defined(SLIB_COMPILER_IS_VISUALSTUDIO)
+#if defined(SLIB_COMPILER_IS_VC)
 
 #	define SLIB_UNICODE(quote)		(const sl_char16*)(L##quote)
 #	define SLIB_USE_UNICODE16
@@ -165,9 +165,28 @@ SLIB_INLINE void sl_swap(T& a, T& b)
 }
 #define SLIB_SWAP(a, b) sl_swap(a, b);
 
+#define SLIB_DECLARE_PRIMITIVE_WRAPPER(TYPE, CLASS) \
+public: \
+	TYPE value; \
+public: \
+	SLIB_INLINE CLASS(const CLASS& other) : value(other.value) {} \
+	SLIB_INLINE CLASS(TYPE _value) : value(_value) {} \
+	SLIB_INLINE operator TYPE() const { return value; } \
+	SLIB_INLINE CLASS& operator=(const CLASS& other) { value = other.value; return *this; } \
+	SLIB_INLINE CLASS& operator=(TYPE _value) { value = _value; return *this; } \
+	SLIB_INLINE sl_bool operator==(TYPE _value) { return value == _value; } \
+	SLIB_INLINE sl_bool operator!=(TYPE _value) { return value != _value; }
+
 #define SLIB_CHECK_FLAG(v, flag) (((v) & (flag)) != 0)
 #define SLIB_SET_FLAG(v, flag) v |= (flag);
 #define SLIB_RESET_FLAG(v, flag) v &= (~(flag));
+
+#define SLIB_DECLARE_FLAGS(CLASS) \
+	SLIB_DECLARE_PRIMITIVE_WRAPPER(int, CLASS) \
+	SLIB_INLINE CLASS() = default; \
+	SLIB_INLINE CLASS& operator|=(int _value) { value |= _value; return *this; } \
+	SLIB_INLINE CLASS& operator&=(int _value) { value &= _value; return *this; }
+
 
 #define SLIB_GET_BYTE(A,n) ((sl_uint8)((A) >> (n << 3)))
 #define SLIB_GET_BYTE0(A) ((sl_uint8)(A))

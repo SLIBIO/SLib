@@ -17,18 +17,20 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidPoint, "android/graphics/Point")
 	SLIB_JNI_INT_FIELD(y);
 SLIB_JNI_END_CLASS
 
-void _AndroidUi_runDispatchCallback(JNIEnv* env, jobject _this);
-void _AndroidUi_runShowAlertResult(JNIEnv* env, jobject _this, jlong _alert, int result);
-
 SLIB_JNI_BEGIN_CLASS(_AndroidUtil, "slib/platform/android/ui/Util")
 	SLIB_JNI_STATIC_METHOD(getDefaultDisplay, "getDefaultDisplay", "(Lslib/platform/android/SlibActivity;)Landroid/view/Display;");
 	SLIB_JNI_STATIC_METHOD(getDisplaySize, "getDisplaySize", "(Landroid/view/Display;)Landroid/graphics/Point;");
-	SLIB_JNI_STATIC_METHOD(isUiThread, "isUiThread", "()Z");
-	SLIB_JNI_STATIC_METHOD(dispatch, "dispatch", "(Lslib/platform/android/SlibActivity;)V");
-	SLIB_JNI_STATIC_METHOD(showAlert, "showAlert", "(Lslib/platform/android/SlibActivity;Lslib/platform/android/ui/Alert;)V");
+SLIB_JNI_END_CLASS
 
-	SLIB_JNI_NATIVE(nativeDispatchCallback, "nativeDispatchCallback", "()V", _AndroidUi_runDispatchCallback);
-	SLIB_JNI_NATIVE(nativeShowAlertResult, "nativeShowAlertResult", "(JI)V", _AndroidUi_runShowAlertResult);
+void _AndroidUiThread_runDispatchCallback(JNIEnv* env, jobject _this);
+
+SLIB_JNI_BEGIN_CLASS(_AndroidUiThread, "slib/platform/android/ui/UiThread")
+	SLIB_JNI_STATIC_METHOD(isUiThread, "isUiThread", "()Z");
+	SLIB_JNI_STATIC_METHOD(dispatch, "dispatch", "()V");
+	SLIB_JNI_STATIC_METHOD(runLoop, "runLoop", "()V");
+	SLIB_JNI_STATIC_METHOD(quitLoop, "quitLoop", "()V");
+
+	SLIB_JNI_NATIVE(nativeDispatchCallback, "nativeDispatchCallback", "()V", _AndroidUiThread_runDispatchCallback);
 SLIB_JNI_END_CLASS
 
 void _Android_onCreateActivity(JNIEnv* env, jobject _this, jobject activity);
@@ -111,25 +113,23 @@ List< Ref<Screen> > UI::getScreens()
 	return ret;
 }
 
-sl_bool UI::isUIThread()
+sl_bool UI::isUiThread()
 {
-	return _AndroidUtil::isUiThread.callBoolean(sl_null) != 0;
+	return _AndroidUiThread::isUiThread.callBoolean(sl_null) != 0;
 }
 
 SLIB_SAFE_STATIC_GETTER(Queue< Ref<Runnable> >, _AndroidUi_getDispatchQueue);
 
-void UI::runOnUIThread(const Ref<Runnable>& callback)
+void UI::dispatchToUiThread(const Ref<Runnable>& callback)
 {
-	jobject jactivity = Android::getCurrentActivity();
-	if (jactivity) {
-		if (callback.isNotNull()) {
-			Queue< Ref<Runnable> >& queue = _AndroidUi_getDispatchQueue();
-			queue.push(callback);
-			_AndroidUtil::dispatch.call(sl_null, jactivity);
-		}
+	if (callback.isNotNull()) {
+		Queue< Ref<Runnable> >& queue = _AndroidUi_getDispatchQueue();
+		queue.push(callback);
+		_AndroidUiThread::dispatch.call(sl_null);
 	}
 }
-void _AndroidUi_runDispatchCallback(JNIEnv* env, jobject _this)
+
+void _AndroidUiThread_runDispatchCallback(JNIEnv* env, jobject _this)
 {
 	Queue< Ref<Runnable> >& queue = _AndroidUi_getDispatchQueue();
 	Ref<Runnable> callback;
@@ -140,97 +140,22 @@ void _AndroidUi_runDispatchCallback(JNIEnv* env, jobject _this)
 	}
 }
 
-void UI::runLoop()
+void UIPlatform::runLoop(sl_uint32 level)
+{
+	_AndroidUiThread::runLoop.call(sl_null);
+}
+
+void UIPlatform::quitLoop()
+{
+	_AndroidUiThread::quitLoop.call(sl_null);
+}
+
+void UIPlatform::runApp()
 {
 }
 
-void UI::quitLoop()
+void UIPlatform::quitApp()
 {
-}
-
-
-SLIB_JNI_BEGIN_CLASS(_JAndroidAlert, "slib/platform/android/ui/Alert")
-	SLIB_JNI_NEW(init, "()V");
-	SLIB_JNI_INT_FIELD(type);
-	SLIB_JNI_STRING_FIELD(text);
-	SLIB_JNI_STRING_FIELD(caption);
-	SLIB_JNI_STRING_FIELD(titleOk);
-	SLIB_JNI_STRING_FIELD(titleCancel);
-	SLIB_JNI_STRING_FIELD(titleYes);
-	SLIB_JNI_STRING_FIELD(titleNo);
-	SLIB_JNI_LONG_FIELD(nativeObject);
-SLIB_JNI_END_CLASS
-
-class _UiAlertResult : public Referable
-{
-public:
-	Ref<Runnable> onOk;
-	Ref<Runnable> onCancel;
-	Ref<Runnable> onYes;
-	Ref<Runnable> onNo;
-};
-
-typedef HashMap<jlong, Ref<_UiAlertResult> > _UiAlertMap;
-SLIB_SAFE_STATIC_GETTER(_UiAlertMap, _AndroidUi_alerts);
-
-void UI::showAlert(const AlertParam& param)
-{
-	jobject jactivity = Android::getCurrentActivity();
-	if (jactivity) {
-		Ref<_UiAlertResult> result = new _UiAlertResult();
-		if (result.isNotNull()) {
-			result->onOk = param.onOk;
-			result->onCancel = param.onCancel;
-			result->onYes = param.onYes;
-			result->onNo = param.onNo;
-
-			JniLocal<jobject> jparam = _JAndroidAlert::init.newObject(sl_null);
-			if (jparam.isNotNull()) {
-				_JAndroidAlert::type.set(jparam, (int)(param.type));
-				_JAndroidAlert::caption.set(jparam, param.caption);
-				_JAndroidAlert::text.set(jparam, param.text);
-				jlong lresult = (jlong)(result.ptr);
-				_JAndroidAlert::nativeObject.set(jparam, lresult);
-				_JAndroidAlert::titleOk.set(jparam, param.titleOk);
-				_JAndroidAlert::titleCancel.set(jparam, param.titleCancel);
-				_JAndroidAlert::titleYes.set(jparam, param.titleYes);
-				_JAndroidAlert::titleNo.set(jparam, param.titleNo);
-				_AndroidUi_alerts().put(lresult, result);
-				_AndroidUtil::showAlert.call(sl_null, jactivity, jparam.value);
-			}
-		}
-	}
-}
-
-void _AndroidUi_runShowAlertResult(JNIEnv* env, jobject _this, jlong _alert, int result)
-{
-	Ref<_UiAlertResult> alert;
-	_AndroidUi_alerts().get(_alert, &alert);
-	if (alert.isNotNull()) {
-		_AndroidUi_alerts().remove(_alert);
-		switch (result) {
-		case 0: // OK
-			if (alert->onOk.isNotNull()) {
-				alert->onOk->run();
-			}
-			break;
-		case 1: // Cancel
-			if (alert->onCancel.isNotNull()) {
-				alert->onCancel->run();
-			}
-			break;
-		case 2: // Yes
-			if (alert->onYes.isNotNull()) {
-				alert->onYes->run();
-			}
-			break;
-		case 3: // No
-			if (alert->onNo.isNotNull()) {
-				alert->onNo->run();
-			}
-			break;
-		}
-	}
 }
 
 void _Android_onCreateActivity(JNIEnv* env, jobject _this, jobject activity)

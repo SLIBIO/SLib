@@ -2,7 +2,7 @@ package slib.platform.android.ui.window;
 
 import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
-import slib.platform.android.ui.Util;
+import slib.platform.android.ui.UiThread;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -100,7 +100,7 @@ public class UiWindow extends FrameLayout {
 			final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams((int)(right - left), (int)(bottom - top));
 			params.leftMargin = (int)left;
 			params.topMargin = (int)top;
-			if (Util.isUiThread()) {
+			if (UiThread.isUiThread()) {
 				setLayoutParams(params);
 			} else {
 				activity.runOnUiThread(new Runnable() {
@@ -128,7 +128,7 @@ public class UiWindow extends FrameLayout {
 				params.width = (int)width;
 				params.height = (int)height;
 			}
-			if (Util.isUiThread()) {
+			if (UiThread.isUiThread()) {
 				setLayoutParams(params);
 			} else {
 				activity.runOnUiThread(new Runnable() {

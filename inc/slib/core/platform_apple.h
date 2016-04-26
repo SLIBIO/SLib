@@ -29,11 +29,17 @@ public:
 	
 	static NSString* getNSStringFromString16(const String16& str, NSString* def = @"");
 
-	
 	static String8 getStringFromNSString(NSString* str);
 	
 	static String16 getString16FromNSString(NSString* str);
 	
+	static String getFilePathFromNSURL(NSURL* url);
+	
+#if defined(SLIB_PLATFORM_IS_OSX)
+	static NSImage* loadImage(const void* buf, sl_size size);
+#elif defined(SLIB_PLATFORM_IS_IOS)
+	static UIImage* loadImage(const void* buf, sl_size size);
+#endif
 	
 	static CGImageRef loadCGImage(const void* buf, sl_size size);
 #endif

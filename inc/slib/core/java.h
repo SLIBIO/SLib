@@ -55,7 +55,7 @@ public:
 
 };
 
-class SLIB_EXPORT _JniGlobalBase
+class SLIB_EXPORT _JniGlobalBase : public Referable
 {
 	SLIB_DECLARE_OBJECT
 };
@@ -828,7 +828,7 @@ Ref< _JniGlobal<T> > _JniGlobal<T>::from(T obj)
 			Jni::deleteGlobalRef(jglobal);
 		}
 	}
-	return ret;
+	return Ref< _JniGlobal<T> >::null();
 }
 
 

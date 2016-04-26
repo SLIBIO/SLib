@@ -39,8 +39,10 @@ enum class FillMode
 	Alternate = 1
 };
 
-namespace Alignment
+class Alignment
 {
+	SLIB_DECLARE_FLAGS(Alignment)
+public:
 	enum
 	{
 		HorizontalMask = 3,
@@ -65,7 +67,6 @@ namespace Alignment
 		BottomRight = 10
 	};
 };
-typedef sl_uint32 Alignments;
 
 enum class ImageFileType
 {

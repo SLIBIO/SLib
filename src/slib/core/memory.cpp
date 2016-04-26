@@ -7,6 +7,10 @@ SLIB_DEFINE_OBJECT(CMemory, CArray<sl_uint8>)
 SLIB_DEFINE_EXPLICIT_INSTANTIATIONS_FOR_LIST(Memory)
 SLIB_DEFINE_EXPLICIT_INSTANTIATIONS_FOR_QUEUE(Memory)
 
+CMemory::CMemory()
+{
+}
+
 CMemory::CMemory(sl_size count) : CArray(count)
 {
 }

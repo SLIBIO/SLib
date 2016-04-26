@@ -35,8 +35,8 @@ class ListDetailsViewColumn
 public:
 	SafeString title;
 	sl_real width;
-	Alignments align;
-	Alignments headerAlign;
+	Alignment align;
+	Alignment headerAlign;
 
 public:
 	ListDetailsViewColumn();
@@ -81,14 +81,14 @@ public:
 	virtual void setColumnWidth(sl_uint32 col, sl_real width);
 	
 	
-	Alignments getHeaderAlignment(sl_uint32 col);
+	Alignment getHeaderAlignment(sl_uint32 col);
 	
-	virtual void setHeaderAlignment(sl_uint32 col, Alignments align);
+	virtual void setHeaderAlignment(sl_uint32 col, Alignment align);
 	
 
-	Alignments getColumnAlignment(sl_uint32 col);
+	Alignment getColumnAlignment(sl_uint32 col);
 	
-	virtual void setColumnAlignment(sl_uint32 col, Alignments align);
+	virtual void setColumnAlignment(sl_uint32 col, Alignment align);
 	
 	
 	sl_int32 getSelectedRow();
@@ -129,9 +129,9 @@ protected:
 	
 	void _setColumnWidth(sl_uint32 col, sl_real width);
 	
-	void _setHeaderAlignment(sl_uint32 col, Alignments align);
+	void _setHeaderAlignment(sl_uint32 col, Alignment align);
 	
-	void _setColumnAlignment(sl_uint32 col, Alignments align);
+	void _setColumnAlignment(sl_uint32 col, Alignment align);
 	
 	void _refreshColumnsCount();
 	

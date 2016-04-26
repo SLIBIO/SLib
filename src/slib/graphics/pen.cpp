@@ -16,6 +16,10 @@ PenDesc::PenDesc()
 
 SLIB_DEFINE_OBJECT(Pen, Object)
 
+Pen::Pen()
+{
+}
+
 Ref<Pen> Pen::getDefault()
 {
 	SLIB_SAFE_STATIC(Ref<Pen>, defaultPen, create(PenDesc()));

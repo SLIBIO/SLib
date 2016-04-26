@@ -51,6 +51,10 @@ public:
 	sl_uint32 getWidth() const;
 	
 	sl_uint32 getHeight() const;
+
+	sl_bool isEmpty() const;
+
+	sl_bool isNotEmpty() const;
 	
 	sl_int32 getStride() const;
 	

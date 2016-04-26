@@ -6,7 +6,8 @@
 #if defined(SLIB_PLATFORM_IS_WIN32)
 
 #include "../../../inc/slib/ui/view.h"
-#include "../../../inc/slib/ui/platform.h"
+
+#include "ui_core_win32.h"
 
 //#define _SLIB_UI_WIN32_USE_COMPOSITE_VIEWS
 #define _SLIB_UI_WIN32_USE_CLIP_CHILDREN
@@ -129,18 +130,6 @@ protected:
 
 };
 
-class Win32_View_Shared
-{
-public:
-	ATOM wndClass;
-	HFONT hFontDefault;
-
-public:
-	Win32_View_Shared();
-
-public:
-	static Win32_View_Shared* get();
-};
 SLIB_UI_NAMESPACE_END
 
 #endif

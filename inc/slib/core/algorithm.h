@@ -617,4 +617,4 @@ void QuickSort<TYPE, COMPARE>::sort(TYPE* list, sl_size size, sl_bool flagAsc)
 
 SLIB_NAMESPACE_END
 
-#endif// CHECKHEADER_SLIB_CORE_LIST
+#endif

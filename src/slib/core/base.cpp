@@ -453,7 +453,7 @@ sl_bool Base::interlockedCompareExchange32(sl_int32* pDst, sl_int32 value, sl_in
 	SLIB_ASSERT(SLIB_IS_ALIGNED_4(pDst));
 #ifdef SLIB_PLATFORM_IS_WINDOWS
 	sl_int32 old;
-#	if (SLIB_COMPILER >= SLIB_COMPILER_VISUALSTUDIO_7)
+#	if (SLIB_COMPILER >= SLIB_COMPILER_VC7)
 	old = ((sl_int32)InterlockedCompareExchange((LONG*)pDst, (LONG)value, (LONG)comperand));
 #	else
 	old = ((sl_int32)InterlockedCompareExchange((void**)pDst, (void*)value, (void*)comperand));

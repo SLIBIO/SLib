@@ -379,8 +379,8 @@ public:
 		{
 			::mysql_free_result(m_resultMetadata);
 			::mysql_stmt_free_result(m_statement);
-			delete[] m_fds;
-			delete[] m_bind;
+			Base::freeMemory(m_fds);
+			Base::freeMemory(m_bind);
 			m_db->unlock();
 		}
 
@@ -1020,9 +1020,9 @@ public:
 				if (resultMetadata) {
 					sl_uint32 nFields = (sl_uint32)(::mysql_num_fields(resultMetadata));
 					MYSQL_FIELD* fields = ::mysql_fetch_fields(resultMetadata);
-					MYSQL_BIND* bind = new MYSQL_BIND[nFields];
+					MYSQL_BIND* bind = (MYSQL_BIND*)(Base::createMemory(sizeof(MYSQL_BIND)*nFields));
 					if (bind) {
-						_FieldDesc* fds = new _FieldDesc[nFields];
+						_FieldDesc* fds = (_FieldDesc*)(Base::createMemory(sizeof(_FieldDesc)*nFields));
 						if (fds) {
 							Base::zeroMemory(bind, sizeof(MYSQL_BIND)*nFields);
 							Base::zeroMemory(fds, sizeof(_FieldDesc)*nFields);
@@ -1101,9 +1101,9 @@ public:
 									return ret;
 								}
 							}
-							delete[] fds;
+							Base::freeMemory(fds);
 						}
-						delete[] bind;
+						Base::freeMemory(bind);
 					}
 					::mysql_free_result(resultMetadata);
 				}

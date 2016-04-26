@@ -128,7 +128,7 @@ public class UiBitmap {
 	static Vector<int[]> arrayBufferForNonUi = new Vector<int[]>();
 	public static int[] getArrayBuffer() {
 		try {
-			if (Util.isUiThread()) {
+			if (UiThread.isUiThread()) {
 				if (arrayBufferForUi == null) {
 					arrayBufferForUi = new int[1024 * 1024];
 				}

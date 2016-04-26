@@ -15,6 +15,10 @@ sl_real _g_graphics_font_default_size = 12;
 
 SLIB_DEFINE_OBJECT(Font, Object)
 
+Font::Font()
+{
+}
+
 sl_real Font::getDefaultFontSize()
 {
 	return _g_graphics_font_default_size;

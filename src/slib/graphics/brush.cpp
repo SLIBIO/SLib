@@ -11,6 +11,10 @@ BrushDesc::BrushDesc()
 
 SLIB_DEFINE_OBJECT(Brush, Object)
 
+Brush::Brush()
+{
+}
+
 Ref<Brush> Brush::getDefault()
 {
 	SLIB_SAFE_STATIC(Ref<Brush>, defaultBrush, create(BrushDesc()));

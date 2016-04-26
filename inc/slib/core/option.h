@@ -26,20 +26,20 @@
 #define SLIB_PLATFORM_VERSION		(SLIB_PLATFORM & 0x0000FFFF)
 
 /* Compilers */
-#define SLIB_COMPILER_VISUALSTUDIO			0x00010000
-#define SLIB_COMPILER_GCC					0x00020000
-#define SLIB_COMPILER_OBJC					0x00030000
+#define SLIB_COMPILER_VC		0x00010000
+#define SLIB_COMPILER_GCC		0x00020000
+#define SLIB_COMPILER_OBJC		0x00030000
 
-#define SLIB_COMPILER_TYPE					(SLIB_COMPILER & 0xFFFF0000)
-#define SLIB_COMPILER_VERSION				(SLIB_COMPILER & 0x0000FFFF)
+#define SLIB_COMPILER_TYPE		(SLIB_COMPILER & 0xFFFF0000)
+#define SLIB_COMPILER_VERSION	(SLIB_COMPILER & 0x0000FFFF)
 
-#define SLIB_COMPILER_VISUALSTUDIO_6		0x00010060
-#define SLIB_COMPILER_VISUALSTUDIO_7		0x00010070
-#define SLIB_COMPILER_VISUALSTUDIO_8		0x00010080
-#define SLIB_COMPILER_VISUALSTUDIO_9		0x00010090
-#define SLIB_COMPILER_VISUALSTUDIO_10		0x000100A0
-#define SLIB_COMPILER_VISUALSTUDIO_11		0x000100B0
-#define SLIB_COMPILER_VISUALSTUDIO_12		0x000100C0
+#define SLIB_COMPILER_VC6		0x00010060
+#define SLIB_COMPILER_VC7		0x00010070
+#define SLIB_COMPILER_VC8		0x00010080
+#define SLIB_COMPILER_VC9		0x00010090
+#define SLIB_COMPILER_VC10		0x000100A0
+#define SLIB_COMPILER_VC11		0x000100B0
+#define SLIB_COMPILER_VC12		0x000100C0
 
 /*************************************
 	Platform Definition
@@ -163,12 +163,74 @@
 #   define SLIB_PLATFORM_IS_MOBILE
 #endif
 
+
+#if defined(SLIB_PLATFORM_IS_DESKTOP)
+#	define SLIB_IF_PLATFORM_IS_DESKTOP(Y, N) Y
+#else
+#	define SLIB_IF_PLATFORM_IS_DESKTOP(Y, N) N
+#endif
+
+#if defined(SLIB_PLATFORM_IS_MOBILE)
+#	define SLIB_IF_PLATFORM_IS_MOBILE(Y, N) Y
+#else
+#	define SLIB_IF_PLATFORM_IS_MOBILE(Y, N) N
+#endif
+
+#if defined(SLIB_PLATFORM_IS_WINDOWS)
+#	define SLIB_IF_PLATFORM_IS_WINDOWS(Y, N) Y
+#else
+#	define SLIB_IF_PLATFORM_IS_WINDOWS(Y, N) N
+#endif
+
+#if defined(SLIB_PLATFORM_IS_WIN32)
+#	define SLIB_IF_PLATFORM_IS_WIN32(Y, N) Y
+#else
+#	define SLIB_IF_PLATFORM_IS_WIN32(Y, N) N
+#endif
+
+#if defined(SLIB_PLATFORM_IS_UNIX)
+#	define SLIB_IF_PLATFORM_IS_UNIX(Y, N) Y
+#else
+#	define SLIB_IF_PLATFORM_IS_UNIX(Y, N) N
+#endif
+
+#if defined(SLIB_PLATFORM_IS_LINUX)
+#	define SLIB_IF_PLATFORM_IS_LINUX(Y, N) Y
+#else
+#	define SLIB_IF_PLATFORM_IS_LINUX(Y, N) N
+#endif
+
+#if defined(SLIB_PLATFORM_IS_ANDROID)
+#	define SLIB_IF_PLATFORM_IS_ANDROID(Y, N) Y
+#else
+#	define SLIB_IF_PLATFORM_IS_ANDROID(Y, N) N
+#endif
+
+#if defined(SLIB_PLATFORM_IS_APPLE)
+#	define SLIB_IF_PLATFORM_IS_APPLE(Y, N) Y
+#else
+#	define SLIB_IF_PLATFORM_IS_APPLE(Y, N) N
+#endif
+
+#if defined(SLIB_PLATFORM_IS_OSX)
+#	define SLIB_IF_PLATFORM_IS_OSX(Y, N) Y
+#else
+#	define SLIB_IF_PLATFORM_IS_OSX(Y, N) N
+#endif
+
+#if defined(SLIB_PLATFORM_IS_IOS)
+#	define SLIB_IF_PLATFORM_IS_IOS(Y, N) Y
+#else
+#	define SLIB_IF_PLATFORM_IS_IOS(Y, N) N
+#endif
+
+
 /*************************************
 	Compiler Definition
 **************************************/
 #ifndef SLIB_COMPILER
 #	if defined(_MSC_VER)
-#		define SLIB_COMPILER		SLIB_COMPILER_VISUALSTUDIO
+#		define SLIB_COMPILER		SLIB_COMPILER_VC
 #	elif defined(__GNUC__)
 #		if defined(__OBJC__)
 #			define SLIB_COMPILER	SLIB_COMPILER_OBJC
@@ -178,28 +240,28 @@
 #	endif
 #endif
 // Microsoft Visual Studio Sub-versions
-#if (SLIB_COMPILER == SLIB_COMPILER_VISUALSTUDIO)
+#if (SLIB_COMPILER == SLIB_COMPILER_VC)
 #undef SLIB_COMPILER
 #	ifdef _MSC_VER
 #		if _MSC_VER >= 1800
-#			define SLIB_COMPILER				SLIB_COMPILER_VISUALSTUDIO_12
+#			define SLIB_COMPILER				SLIB_COMPILER_VC12
 #		elif _MSC_VER >= 1700
-#			define SLIB_COMPILER				SLIB_COMPILER_VISUALSTUDIO_11
+#			define SLIB_COMPILER				SLIB_COMPILER_VC11
 #		elif _MSC_VER >= 1600
-#			define SLIB_COMPILER				SLIB_COMPILER_VISUALSTUDIO_10
+#			define SLIB_COMPILER				SLIB_COMPILER_VC10
 #		elif _MSC_VER >= 1500
-#			define SLIB_COMPILER				SLIB_COMPILER_VISUALSTUDIO_9
+#			define SLIB_COMPILER				SLIB_COMPILER_VC9
 #		elif _MSC_VER >= 1400
-#			define SLIB_COMPILER				SLIB_COMPILER_VISUALSTUDIO_8
+#			define SLIB_COMPILER				SLIB_COMPILER_VC8
 #		elif _MSC_VER >= 1300
-#			define SLIB_COMPILER				SLIB_COMPILER_VISUALSTUDIO_7
+#			define SLIB_COMPILER				SLIB_COMPILER_VC7
 #		elif _MSC_VER >= 1200
-#			define SLIB_COMPILER				SLIB_COMPILER_VISUALSTUDIO_6
+#			define SLIB_COMPILER				SLIB_COMPILER_VC6
 #		endif
 #	endif
 #endif
-#if (SLIB_COMPILER_TYPE == SLIB_COMPILER_VISUALSTUDIO)
-#	define SLIB_COMPILER_IS_VISUALSTUDIO
+#if (SLIB_COMPILER_TYPE == SLIB_COMPILER_VC)
+#	define SLIB_COMPILER_IS_VC
 #endif
 #if (SLIB_COMPILER_TYPE == SLIB_COMPILER_GCC)
 #	define SLIB_COMPILER_IS_GCC
@@ -209,6 +271,23 @@
 #	define SLIB_COMPILER_IS_OBJC
 #endif
 
+#if defined(SLIB_COMPILER_IS_VC)
+#	define SLIB_IF_COMPILER_IS_VC(Y, N) Y
+#else
+#	define SLIB_IF_COMPILER_IS_VC(Y, N) N
+#endif
+
+#if defined(SLIB_COMPILER_IS_GCC)
+#	define SLIB_IF_COMPILER_IS_GCC(Y, N) Y
+#else
+#	define SLIB_IF_COMPILER_IS_GCC(Y, N) N
+#endif
+
+#if defined(SLIB_COMPILER_IS_OBJC)
+#	define SLIB_IF_COMPILER_IS_OBJC(Y, N) Y
+#else
+#	define SLIB_IF_COMPILER_IS_OBJC(Y, N) N
+#endif
 
 /*************************************
 	Architecture Definition
@@ -233,7 +312,7 @@
 #	else
 #		define SLIB_ARCH_IS_32BIT
 #	endif
-#elif defined(SLIB_COMPILER_IS_VISUALSTUDIO)
+#elif defined(SLIB_COMPILER_IS_VC)
 #	if (defined(_M_ARM)) // arm
 #		define SLIB_ARCH_IS_ARM
 #	elif (defined(_M_IA64)) // itanium (IA64)
@@ -250,6 +329,36 @@
 #			define SLIB_ARCH_IS_32BIT
 #		endif
 #	endif
+#endif
+
+#if defined(SLIB_ARCH_IS_32BIT)
+#	define SLIB_IF_ARCH_IS_32BIT(Y, N) Y
+#else
+#	define SLIB_IF_ARCH_IS_32BIT(Y, N) N
+#endif
+
+#if defined(SLIB_ARCH_IS_64BIT)
+#	define SLIB_IF_ARCH_IS_64BIT(Y, N) Y
+#else
+#	define SLIB_IF_ARCH_IS_64BIT(Y, N) N
+#endif
+
+#if defined(SLIB_ARCH_IS_ARM)
+#	define SLIB_IF_ARCH_IS_ARM(Y, N) Y
+#else
+#	define SLIB_IF_ARCH_IS_ARM(Y, N) N
+#endif
+
+#if defined(SLIB_ARCH_IS_X86)
+#	define SLIB_IF_ARCH_IS_X86(Y, N) Y
+#else
+#	define SLIB_IF_ARCH_IS_X86(Y, N) N
+#endif
+
+#if defined(SLIB_ARCH_IS_X64)
+#	define SLIB_IF_ARCH_IS_X64(Y, N) Y
+#else
+#	define SLIB_IF_ARCH_IS_X64(Y, N) N
 #endif
 
 #endif // CHECKHEADER_SLIB_OPTION

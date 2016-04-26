@@ -193,7 +193,7 @@ String Locale::getLanguageName(Language lang)
 		DEFINE_LANGUAGE_CASE(yo, "Yoruba")
 		DEFINE_LANGUAGE_CASE(za, "Zhuang")
 		DEFINE_LANGUAGE_CASE(zu, "Zulu")
-		case Language::None:
+		case Language::Unknown:
 			break;
 	}
 	return String::null();
@@ -209,7 +209,7 @@ Language Locale::getLanguageFromCode(const String& code)
 	if (code.getLength() == 2) {
 		return getLanguageFromCode(code.getData());
 	}
-	return Language::None;
+	return Language::Unknown;
 }
 
 String Locale::getLanguageCode(Language language)
@@ -478,7 +478,7 @@ String Locale::getCountryName(Country country)
 		DEFINE_COUNTRY_CASE(ZA, "South Africa")
 		DEFINE_COUNTRY_CASE(ZM, "Zambia")
 		DEFINE_COUNTRY_CASE(ZW, "Zimbabwe")
-		case Country::None:
+		case Country::Unknown:
 			break;
 	}
 	return String::null();
@@ -525,7 +525,7 @@ Country Locale::getCountryFromCode(const String& code)
 	if (code.getLength() == 2) {
 		return getCountryFromCode(code.getData());
 	}
-	return Country::None;
+	return Country::Unknown;
 }
 
 String Locale::getCountryCode(Country country)
@@ -538,11 +538,7 @@ String Locale::getCountryCode(Country country)
 }
 
 
-Locale::Locale() : value(Locale::None)
-{
-}
-
-Locale::Locale(sl_uint32 _value) : value(_value)
+Locale::Locale() : value(Locale::Unknown)
 {
 }
 
@@ -553,7 +549,7 @@ Locale::Locale(Language language, Country country)
 
 Locale::Locale(const char* code)
 {
-	value = None;
+	value = Unknown;
 	if (code[0] != 0 && code[1] != 0) {
 		if (code[2] == 0) {
 			value = (sl_uint32)(getLanguageFromCode(code));
@@ -568,17 +564,6 @@ Locale::Locale(const char* code)
 Locale::Locale(const String& code) : Locale(code.getData())
 {
 }
-
-sl_bool Locale::isNone() const
-{
-	return value == None;
-}
-
-sl_bool Locale::isNotNone() const
-{
-	return value != None;
-}
-
 
 Language Locale::getLanguage() const
 {
@@ -622,7 +607,7 @@ String Locale::getCode() const
 	sz[0] = (char)(((sl_uint32)(lang)));
 	sz[1] = (char)(((sl_uint32)(lang)) >> 8);
 	Country country = getCountry();
-	if (country == Country::None) {
+	if (country == Country::Unknown) {
 		sz[2] = 0;
 	} else {
 		sz[2] = '_';
@@ -642,41 +627,4 @@ Locale Locale::getFromCode(const String& code)
 	return Locale(code);
 }
 
-Locale& Locale::operator=(sl_uint32 _value)
-{
-	value = _value;
-	return *this;
-}
-
-sl_bool Locale::operator==(const Locale& other) const
-{
-	return value == other.value;
-}
-
-sl_bool Locale::operator!=(const Locale& other) const
-{
-	return value != other.value;
-}
-
-sl_bool Locale::operator==(sl_uint32 _value) const
-{
-	return value == _value;
-}
-
-sl_bool Locale::operator!=(sl_uint32 _value) const
-{
-	return value != _value;
-}
-
-sl_bool operator==(sl_uint32 value, const Locale& other)
-{
-	return value == other.value;
-}
-
-sl_bool operator!=(sl_uint32 value, const Locale& other)
-{
-	return value != other.value;
-}
-
 SLIB_NAMESPACE_END
-

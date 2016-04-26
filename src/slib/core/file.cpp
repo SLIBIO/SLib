@@ -89,17 +89,17 @@ sl_uint64 File::getSize()
 
 sl_bool File::exists(const String& filePath)
 {
-	return getAttributes(filePath) >= 0;
+	return (getAttributes(filePath) & FileAttributes::NotExist) == 0;
 }
 
 sl_bool File::isDirectory(const String& filePath)
 {
-	return (getAttributes(filePath) & FileAttribute::Directory) != 0;
+	return (getAttributes(filePath) & FileAttributes::Directory) != 0;
 }
 
 sl_bool File::isHidden(const String& filePath)
 {
-	return (getAttributes(filePath) & FileAttribute::Hidden) != 0;
+	return (getAttributes(filePath) & FileAttributes::Hidden) != 0;
 }
 
 String File::getParentDirectoryPath(const String& pathName)

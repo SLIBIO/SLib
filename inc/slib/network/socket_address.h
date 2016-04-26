@@ -17,7 +17,7 @@ public:
 public:
 	SocketAddress();
 	
-	SocketAddress(const SocketAddress& other) = default;
+	SocketAddress(const SocketAddress& other);
 
 	SocketAddress(sl_int32 port);
 
@@ -93,38 +93,6 @@ sl_bool Compare<SocketAddress>::equals(const SocketAddress& a, const SocketAddre
 
 template <>
 sl_uint32 Hash<SocketAddress>::hash(const SocketAddress& a);
-
-SLIB_NETWORK_NAMESPACE_END
-
-
-SLIB_NETWORK_NAMESPACE_BEGIN
-
-SLIB_INLINE SocketAddress::SocketAddress() : port(0)
-{
-}
-
-SLIB_INLINE SocketAddress::SocketAddress(sl_int32 _port) : port(_port)
-{
-}
-
-SLIB_INLINE SocketAddress::SocketAddress(const IPAddress& _ip, sl_int32 _port) : ip(_ip), port(_port)
-{
-}
-
-SLIB_INLINE const SocketAddress& SocketAddress::none()
-{
-	return *((SocketAddress*)((void*)(&_none)));
-}
-
-SLIB_INLINE sl_bool SocketAddress::isValid() const
-{
-	return ip.isNotNone() && port != 0;
-}
-
-SLIB_INLINE sl_bool SocketAddress::isInvalid() const
-{
-	return ip.isNone() || port == 0;
-}
 
 SLIB_NETWORK_NAMESPACE_END
 

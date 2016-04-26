@@ -11,6 +11,9 @@
 		260252001BF18BCF00DEFAB1 /* thread_pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260251FF1BF18BCF00DEFAB1 /* thread_pool.cpp */; };
 		260252021BF18BE200DEFAB1 /* callback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260252011BF18BE200DEFAB1 /* callback.cpp */; };
 		260252261BF18D4300DEFAB1 /* ui_graphics_context.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260252251BF18D4300DEFAB1 /* ui_graphics_context.cpp */; };
+		2621F7211CCF174B00C4615C /* ui_menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2621F7201CCF174B00C4615C /* ui_menu.cpp */; };
+		2649C23B1CBBD7BF003E7561 /* common_dialogs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2649C23A1CBBD7BF003E7561 /* common_dialogs.cpp */; };
+		2649C23D1CBBD7D4003E7561 /* common_dialogs_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2649C23C1CBBD7D4003E7561 /* common_dialogs_ios.mm */; };
 		265EBF2E1C23051F00AD81D9 /* database_cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF2A1C23051F00AD81D9 /* database_cursor.cpp */; };
 		265EBF2F1C23051F00AD81D9 /* database_statement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF2B1C23051F00AD81D9 /* database_statement.cpp */; };
 		265EBF301C23051F00AD81D9 /* database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF2C1C23051F00AD81D9 /* database.cpp */; };
@@ -243,6 +246,9 @@
 		260251FF1BF18BCF00DEFAB1 /* thread_pool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_pool.cpp; sourceTree = "<group>"; };
 		260252011BF18BE200DEFAB1 /* callback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = callback.cpp; sourceTree = "<group>"; };
 		260252251BF18D4300DEFAB1 /* ui_graphics_context.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_graphics_context.cpp; sourceTree = "<group>"; };
+		2621F7201CCF174B00C4615C /* ui_menu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_menu.cpp; sourceTree = "<group>"; };
+		2649C23A1CBBD7BF003E7561 /* common_dialogs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = common_dialogs.cpp; sourceTree = "<group>"; };
+		2649C23C1CBBD7D4003E7561 /* common_dialogs_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = common_dialogs_ios.mm; sourceTree = "<group>"; };
 		265EBF2A1C23051F00AD81D9 /* database_cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database_cursor.cpp; sourceTree = "<group>"; };
 		265EBF2B1C23051F00AD81D9 /* database_statement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database_statement.cpp; sourceTree = "<group>"; };
 		265EBF2C1C23051F00AD81D9 /* database.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database.cpp; sourceTree = "<group>"; };
@@ -773,6 +779,8 @@
 				26A9B7611C172BCC004C9B0E /* camera_view.cpp */,
 				266DD41E1C118E9600D47AB0 /* canvas_quartz.mm */,
 				266DD4351C11901A00D47AB0 /* check_box.cpp */,
+				2649C23A1CBBD7BF003E7561 /* common_dialogs.cpp */,
+				2649C23C1CBBD7D4003E7561 /* common_dialogs_ios.mm */,
 				266DD41A1C118E4A00D47AB0 /* cursor.cpp */,
 				266DD4201C118EB000D47AB0 /* drawable_quartz.mm */,
 				266DD4371C11905F00D47AB0 /* drop_down_list.cpp */,
@@ -804,6 +812,7 @@
 				A25F2F291B039EF600854DAF /* ui_event.cpp */,
 				A2774E271B1CBBF600538A7B /* ui_event_ios.mm */,
 				260252251BF18D4300DEFAB1 /* ui_graphics_context.cpp */,
+				2621F7201CCF174B00C4615C /* ui_menu.cpp */,
 				26A9B7631C172BDE004C9B0E /* video_view.cpp */,
 				266DD4281C118F6D00D47AB0 /* view.cpp */,
 				266DD4261C118F2500D47AB0 /* view_group.cpp */,
@@ -956,6 +965,7 @@
 				266DD5EE1C11CEBB00D47AB0 /* camera_ios.mm in Sources */,
 				266DD44E1C1191B900D47AB0 /* scroll_view_ios.mm in Sources */,
 				266DD4071C118B9900D47AB0 /* render_program.cpp in Sources */,
+				2621F7211CCF174B00C4615C /* ui_menu.cpp in Sources */,
 				266DD36E1C1171B800D47AB0 /* audio_player_dsound.cpp in Sources */,
 				A2DE1DA31B383E8B00A74698 /* pipe_unix.cpp in Sources */,
 				A2498C7A1AFA9C3200C76201 /* thirdparty_sqlite3.c in Sources */,
@@ -1042,6 +1052,7 @@
 				266DD4381C11905F00D47AB0 /* drop_down_list.cpp in Sources */,
 				A25F2F561B039EF600854DAF /* thread_apple.mm in Sources */,
 				266DD4421C11910F00D47AB0 /* label_view_ios.mm in Sources */,
+				2649C23B1CBBD7BF003E7561 /* common_dialogs.cpp in Sources */,
 				A24142F71BA85F4500D7AB80 /* thirdparty_soil2.c in Sources */,
 				266DD3651C1170BD00D47AB0 /* audio_recorder.cpp in Sources */,
 				266DD4131C118E2100D47AB0 /* s_button.cpp in Sources */,
@@ -1061,6 +1072,7 @@
 				266DD3DA1C1181B500D47AB0 /* http_service.cpp in Sources */,
 				A25F2F441B039EF600854DAF /* io.cpp in Sources */,
 				A25F2F491B039EF600854DAF /* platform_android.cpp in Sources */,
+				2649C23D1CBBD7D4003E7561 /* common_dialogs_ios.mm in Sources */,
 				2683BFAE1C39710C0068AC42 /* atomic.cpp in Sources */,
 				260252021BF18BE200DEFAB1 /* callback.cpp in Sources */,
 				26B571751C9D44720099E69B /* transform3d.cpp in Sources */,

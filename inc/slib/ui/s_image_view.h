@@ -25,9 +25,9 @@ public:
 	virtual void setScaleMode(ScaleMode mode);
 	
 	
-	Alignments getSourceAlignment();
+	Alignment getSourceAlignment();
 	
-	virtual void setSourceAlignment(Alignments align);
+	virtual void setSourceAlignment(Alignment align);
 	
 public:
 	// override
@@ -36,7 +36,7 @@ public:
 protected:
 	SafeRef<Drawable> m_source;
 	ScaleMode m_scaleMode;
-	Alignments m_sourceAlignment;
+	Alignment m_sourceAlignment;
 	
 };
 

@@ -65,10 +65,10 @@ public:
 
 Ref<ViewInstance> RenderView::createInstance(ViewInstance* parent)
 {
-	Win32_View_Shared* shared = Win32_View_Shared::get();
+	Win32_UI_Shared* shared = Win32_UI_Shared::get();
 	DWORD styleEx = 0;
 	DWORD style = 0;
-	Ref<_Win32_RenderViewInstance> ret = Win32_ViewInstance::create<_Win32_RenderViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClass)), L"", style, styleEx);
+	Ref<_Win32_RenderViewInstance> ret = Win32_ViewInstance::create<_Win32_RenderViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
 	if (ret.isNotNull()) {
 		RenderEngineType engineType = getPreferredEngineType();
 		if (engineType == RenderEngineType::OpenGL_ES) {

@@ -4,6 +4,7 @@
 #include "definition.h"
 
 #include "event.h"
+#include "menu.h"
 
 #include "../core/string.h"
 #include "../core/object.h"
@@ -24,6 +25,7 @@ class SLIB_EXPORT WindowInstanceParam
 {
 public:
 	Ref<Screen> screen;
+	Ref<Menu> menu;
 	sl_bool flagBorderless;
 	sl_bool flagFullScreen;
 	sl_bool flagCenterScreen;
@@ -34,63 +36,14 @@ public:
 	String title;
 	sl_bool flagShowTitleBar;
 
-#if defined(SLIB_PLATFORM_IS_ANDROID)
 	// jobject
 	void* activity;
-#endif
 
 public:
 	WindowInstanceParam();
 	
 public:
 	Rectangle calculateRegion(const Rectangle& screenFrame) const;
-	
-};
-
-class SLIB_EXPORT WindowParam : public WindowInstanceParam
-{
-public:
-	Ref<WindowInstance> parent;
-	
-	Color backgroundColor;
-	
-	sl_bool flagVisible;
-	sl_bool flagMinimized;
-	sl_bool flagMaximized;
-	
-	sl_bool flagAlwaysOnTop;
-	sl_bool flagCloseButtonEnabled;
-	sl_bool flagMinimizeButtonEnabled;
-	sl_bool flagMaximizeButtonEnabled;
-	sl_bool flagResizable;
-	sl_real alpha;
-	sl_bool flagTransparent;
-
-	sl_bool flagModal;
-	
-	Ref<Runnable> callbackSuccess;
-	Ref<Runnable> callbackFail;
-
-public:
-	WindowParam();
-	
-	WindowParam(Rectangle _rect);
-	
-	WindowParam(sl_real width, sl_real height);
-	
-	WindowParam(sl_real x, sl_real y, sl_real width, sl_real height);
-	
-	WindowParam(String title, Rectangle rect);
-	
-	WindowParam(String title, sl_real width, sl_real height);
-	
-	WindowParam(String title, sl_real x, sl_real y, sl_real width, sl_real height);
-	
-public:
-	void setParent(const Ref<Window>& parent);
-	
-private:
-	void init();
 	
 };
 
@@ -107,19 +60,24 @@ public:
 	sl_bool isClosed();
 	
 	
-	Ref<WindowInstance> getParentInstance();
-	
-	virtual void setParentInstance(const Ref<WindowInstance>& parent);
-
-	
 	Ref<Window> getParent();
 	
 	virtual void setParent(const Ref<Window>& parent);
+	
+	
+	Ref<Screen> getScreen();
+	
+	void setScreen(const Ref<Screen>& screen);
 
 	
 	Ref<ViewGroup> getContentView();
 	
 	virtual void setContentView(const Ref<ViewGroup>& view);
+	
+	
+	Ref<Menu> getMenu();
+	
+	virtual void setMenu(const Ref<Menu>& menu);
 	
 	
 	virtual void setFocus();
@@ -242,7 +200,42 @@ public:
 	virtual Size getWindowSizeFromClientSize(const Size& sizeClient);
 	
 	virtual Size getClientSizeFromWindowSize(const Size& sizeWindow);
+
 	
+	sl_bool isModal();
+	
+	void setModal(sl_bool flag);
+	
+
+	sl_bool isDialog();
+	
+	void setDialog(sl_bool flag);
+	
+	
+	sl_bool isBorderless();
+	
+	void setBorderless(sl_bool flag);
+	
+	
+	sl_bool isTitleBarVisible();
+	
+	void setTitleBarVisible(sl_bool flag);
+
+	
+	sl_bool isFullScreenOnCreate();
+	
+	void setFullScreenOnCreate(sl_bool flag);
+	
+	
+	sl_bool isCenterScreenOnCreate();
+	
+	void setCenterScreenOnCreate(sl_bool flag);
+	
+	
+	void* getActivity();
+	
+	void setActivity(void* activity);
+
 	
 public:
 	Ref<WindowInstance> getWindowInstance();
@@ -251,10 +244,7 @@ public:
 
 	void detach();
 
-	
-	virtual sl_bool createWindow(const WindowParam& param);
-	
-	void create(const WindowParam& param);
+	void create();
 	
 	
 	void addView(const Ref<View>& view);
@@ -264,15 +254,14 @@ public:
 	List< Ref<View> > getViews();
 	
 	void removeAllViews();
-	
-	
-	virtual Ref<WindowInstance> createWindowInstance(const WindowInstanceParam& param);
 
 public:
 	SLIB_PTR_PROPERTY(IWindowListener, EventListener)
 	
 public:
 	virtual void onCreate();
+	
+	virtual void onCreateFailed();
 	
 	virtual sl_bool onClose();
 	
@@ -293,15 +282,47 @@ public:
 	virtual void onDemaximize();
 
 private:
+	Ref<WindowInstance> createWindowInstance(const WindowInstanceParam& param);
+
 	void _runModal();
 	
-	void _createCallback(WindowParam param);
+	void _create();
 	
 	void _refreshSize();
 	
 private:
 	SafeRef<WindowInstance> m_instance;
+	SafeWeakRef<Window> m_parent;
+	SafeRef<Screen> m_screen;
 	SafeRef<ViewGroup> m_viewContent;
+	SafeRef<Menu> m_menu;
+	
+	Rectangle m_frame;
+	SafeString m_title;
+	Color m_backgroundColor;
+	
+	sl_bool m_flagVisible;
+	sl_bool m_flagMinimized;
+	sl_bool m_flagMaximized;
+	
+	sl_bool m_flagAlwaysOnTop;
+	sl_bool m_flagCloseButtonEnabled;
+	sl_bool m_flagMinimizeButtonEnabled;
+	sl_bool m_flagMaximizeButtonEnabled;
+	sl_bool m_flagResizable;
+	sl_real m_alpha;
+	sl_bool m_flagTransparent;
+	
+	sl_bool m_flagModal;
+	sl_bool m_flagDialog;
+	sl_bool m_flagBorderless;
+	sl_bool m_flagShowTitleBar;
+	sl_bool m_flagFullScreenOnCreate;
+	sl_bool m_flagCenterScreenOnCreate;
+
+	// jobject
+	void* m_activity;
+	
 };
 
 
@@ -319,13 +340,12 @@ public:
 	
 	virtual sl_bool isClosed() = 0;
 	
-	
-	virtual Ref<WindowInstance> getParent() = 0;
-	
+
 	virtual sl_bool setParent(const Ref<WindowInstance>& parent) = 0;
 	
-	
 	virtual Ref<ViewInstance> getContentView() = 0;
+	
+	virtual void setMenu(const Ref<Menu>& menu);
 	
 	
 	virtual sl_bool setFocus() = 0;
@@ -343,13 +363,8 @@ public:
 	
 	virtual sl_bool setClientSize(const Size& size) = 0;
 	
-	
-	virtual String getTitle() = 0;
-	
+
 	virtual sl_bool setTitle(const String& title) = 0;
-	
-	
-	virtual Color getBackgroundColor() = 0;
 	
 	virtual sl_bool setBackgroundColor(const Color& color) = 0;
 
@@ -364,42 +379,19 @@ public:
 	virtual sl_bool setMaximized(sl_bool flag) = 0;
 	
 	
-	virtual sl_bool isVisible() = 0;
-	
 	virtual sl_bool setVisible(sl_bool flag) = 0;
-	
-	
-	virtual sl_bool isAlwaysOnTop() = 0;
-	
+
 	virtual sl_bool setAlwaysOnTop(sl_bool flag) = 0;
-	
-	
-	virtual sl_bool isCloseButtonEnabled() = 0;
 	
 	virtual sl_bool setCloseButtonEnabled(sl_bool flag) = 0;
 	
-	
-	virtual sl_bool isMinimizeButtonEnabled() = 0;
-	
 	virtual sl_bool setMinimizeButtonEnabled(sl_bool flag) = 0;
-	
-	
-	virtual sl_bool isMaximizeButtonEnabled() = 0;
 	
 	virtual sl_bool setMaximizeButtonEnabled(sl_bool flag) = 0;
 	
-	
-	virtual sl_bool isResizable() = 0;
-	
 	virtual sl_bool setResizable(sl_bool flag) = 0;
 	
-	
-	virtual sl_real getAlpha() = 0;
-	
 	virtual sl_bool setAlpha(sl_real alpha) = 0;
-	
-	
-	virtual sl_bool isTransparent() = 0;
 	
 	virtual sl_bool setTransparent(sl_bool flag) = 0;
 

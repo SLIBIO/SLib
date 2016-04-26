@@ -15,9 +15,9 @@ public:
 	sl_uint8 m[6];
 
 public:
-	MacAddress() = default;
+	SLIB_INLINE MacAddress() = default;
 	
-	MacAddress(const MacAddress& other) = default;
+	MacAddress(const MacAddress& other);
 
 	MacAddress(const sl_uint8* m);
 	
@@ -68,7 +68,7 @@ public:
 	sl_bool parse(const String& str, sl_char8 sep = 0);
 	
 public:
-	MacAddress& operator=(const MacAddress& other) = default;
+	MacAddress& operator=(const MacAddress& other);
 	
 	MacAddress& operator=(const String& address);
 
@@ -135,6 +135,7 @@ SLIB_INLINE sl_bool MacAddress::isNotMulticast() const
 {
 	return (m[0] & 1) == 0;
 }
+
 SLIB_INLINE sl_bool MacAddress::operator==(const MacAddress& other) const
 {
 	return m[0] == other.m[0] && m[1] == other.m[1] && m[2] == other.m[2] && m[3] == other.m[3] && m[4] == other.m[4] && m[5] == other.m[5];

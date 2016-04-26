@@ -2,7 +2,7 @@
 
 SLIB_NAMESPACE_BEGIN
 
-static Locale _g_resource_current_locale = Locale::None;
+static Locale _g_resource_current_locale = Locale::Unknown;
 
 Locale Resources::getCurrentLocale()
 {

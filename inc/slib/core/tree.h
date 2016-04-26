@@ -5,6 +5,7 @@
 
 #include "algorithm.h"
 #include "list.h"
+#include "new.h"
 
 #define SLIB_BTREE_DEFAULT_ORDER 16
 
@@ -1048,17 +1049,17 @@ typename BTree<KT, VT, COMPARE>::NodeData* BTree<KT, VT, COMPARE>::_createNodeDa
 		data->countItems = 0;
 		data->linkParent.setNull();
 		data->linkFirst.setNull();
-		data->keys = new KT[m_order];
+		data->keys = New<KT>::create(m_order);
 		if (data->keys) {
-			data->values = new VT[m_order];
+			data->values = New<VT>::create(m_order);
 			if (data->values) {
-				data->links = new TreeNode[m_order];
+				data->links = New<TreeNode>::create(m_order);
 				if (data->links) {
 					return data;
 				}
-				delete[] (data->values);
+				New<VT>::free(data->values, m_order);
 			}
-			delete[] (data->keys);
+			New<KT>::free(data->keys, m_order);
 		}
 	}
 	return sl_null;
@@ -1068,10 +1069,9 @@ template <class KT, class VT, class COMPARE>
 void BTree<KT, VT, COMPARE>::_freeNodeData(NodeData* data)
 {
 	if (data) {
-		delete[] data->keys;
-		delete[] data->values;
-		delete[] data->links;
-		delete data;
+		New<KT>::free(data->keys, m_order);
+		New<VT>::free(data->values, m_order);
+		New<TreeNode>::free(data->links, m_order);
 	}
 }
 

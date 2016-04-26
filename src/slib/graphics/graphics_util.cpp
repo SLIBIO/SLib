@@ -3,9 +3,9 @@
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
-sl_real GraphicsUtil::calculateAlignX(sl_real leftDst, sl_real rightDst, sl_real widthSrc, Alignments align)
+sl_real GraphicsUtil::calculateAlignX(sl_real leftDst, sl_real rightDst, sl_real widthSrc, Alignment align)
 {
-	Alignments hAlign = align & Alignment::HorizontalMask;
+	Alignment hAlign = align & Alignment::HorizontalMask;
 	switch (hAlign) {
 		case Alignment::Left:
 			break;
@@ -19,9 +19,9 @@ sl_real GraphicsUtil::calculateAlignX(sl_real leftDst, sl_real rightDst, sl_real
 	return leftDst;
 }
 
-sl_real GraphicsUtil::calculateAlignY(sl_real topDst, sl_real bottomDst, sl_real heightSrc, Alignments align)
+sl_real GraphicsUtil::calculateAlignY(sl_real topDst, sl_real bottomDst, sl_real heightSrc, Alignment align)
 {
-	Alignments vAlign = align & Alignment::VerticalMask;
+	Alignment vAlign = align & Alignment::VerticalMask;
 	switch (vAlign) {
 		case Alignment::Top:
 			break;
@@ -35,7 +35,7 @@ sl_real GraphicsUtil::calculateAlignY(sl_real topDst, sl_real bottomDst, sl_real
 	return topDst;
 }
 
-Point GraphicsUtil::calculateAlignPosition(const Rectangle &rcDst, sl_real widthSrc, sl_real heightSrc, Alignments align)
+Point GraphicsUtil::calculateAlignPosition(const Rectangle &rcDst, sl_real widthSrc, sl_real heightSrc, Alignment align)
 {
 	Point ret;
 	ret.x = calculateAlignX(rcDst.left, rcDst.right, widthSrc, align);

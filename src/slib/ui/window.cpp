@@ -36,111 +36,6 @@ Rectangle WindowInstanceParam::calculateRegion(const Rectangle& screenFrame) con
 	return frame;
 }
 
-WindowParam::WindowParam()
-{
-	init();
-	flagShowTitleBar = sl_false;
-	flagFullScreen = sl_true;
-}
-
-WindowParam::WindowParam(Rectangle _rect)
-{
-	init();
-	flagShowTitleBar = sl_false;
-	flagFullScreen = sl_false;
-	flagCenterScreen = sl_false;
-	location.x = _rect.left;
-	location.y = _rect.top;
-	size.x = _rect.getWidth();
-	size.y = _rect.getHeight();
-}
-
-WindowParam::WindowParam(sl_real width, sl_real height)
-{
-	init();
-	flagShowTitleBar = sl_false;
-	flagFullScreen = sl_false;
-	flagCenterScreen = sl_true;
-	size.x = width;
-	size.y = height;
-}
-
-WindowParam::WindowParam(sl_real x, sl_real y, sl_real width, sl_real height)
-{
-	init();
-	flagShowTitleBar = sl_false;
-	flagFullScreen = sl_false;
-	flagCenterScreen = sl_false;
-	location.x = x;
-	location.y = y;
-	size.x = width;
-	size.y = height;
-}
-
-WindowParam::WindowParam(String _title, Rectangle _rect)
-{
-	init();
-	flagShowTitleBar = sl_true;
-	title = _title;
-	flagFullScreen = sl_false;
-	flagCenterScreen = sl_false;
-	location.x = _rect.left;
-	location.y = _rect.top;
-	size.x = _rect.getWidth();
-	size.y = _rect.getHeight();
-}
-
-WindowParam::WindowParam(String _title, sl_real width, sl_real height)
-{
-	init();
-	flagShowTitleBar = sl_true;
-	title = _title;
-	flagFullScreen = sl_false;
-	flagCenterScreen = sl_true;
-	size.x = width;
-	size.y = height;
-}
-
-WindowParam::WindowParam(String _title, sl_real x, sl_real y, sl_real width, sl_real height)
-{
-	init();
-	flagShowTitleBar = sl_true;
-	title = _title;
-	flagFullScreen = sl_false;
-	flagCenterScreen = sl_false;
-	location.x = x;
-	location.y = y;
-	size.x = width;
-	size.y = height;
-}
-
-void WindowParam::init()
-{
-	backgroundColor = Color::zero();
-	
-	flagVisible = sl_true;
-	flagMinimized = sl_false;
-	flagMaximized = sl_false;
-	
-	flagAlwaysOnTop = sl_false;
-	flagCloseButtonEnabled = sl_true;
-	flagMinimizeButtonEnabled = sl_false;
-	flagMaximizeButtonEnabled = sl_false;
-	flagResizable = sl_false;
-	alpha = 1.0f;
-	flagTransparent = sl_false;
-	
-	flagModal = sl_false;
-}
-
-void WindowParam::setParent(const Ref<Window>& parent)
-{
-	if (parent.isNotNull()) {
-		this->parent = parent->getWindowInstance();
-	}
-}
-
-
 #define CHECK_INSTANCE(instance) (instance.isNotNull() && !(instance->isClosed()))
 
 SLIB_DEFINE_OBJECT(Window, Object)
@@ -154,6 +49,36 @@ Window::Window()
 		view->setWindow(this);
 		m_viewContent = view;
 	}
+	
+	m_frame.left = 100;
+	m_frame.top = 100;
+	m_frame.right = 500;
+	m_frame.bottom = 400;
+	
+	m_backgroundColor = Color::zero();
+	
+	m_flagVisible = sl_true;
+	m_flagMinimized = sl_false;
+	m_flagMaximized = sl_false;
+	
+	m_flagAlwaysOnTop = sl_false;
+	m_flagCloseButtonEnabled = sl_true;
+	m_flagMinimizeButtonEnabled = sl_false;
+	m_flagMaximizeButtonEnabled = sl_false;
+	m_flagResizable = sl_false;
+	
+	m_alpha = 1.0;
+	m_flagTransparent = sl_false;
+	
+	m_flagModal = sl_false;
+	m_flagDialog = sl_false;
+	m_flagBorderless = sl_false;
+	m_flagShowTitleBar = sl_true;
+	m_flagFullScreenOnCreate = SLIB_IF_PLATFORM_IS_MOBILE(sl_true, sl_false);
+	m_flagCenterScreenOnCreate = sl_false;
+	
+	m_activity = sl_null;
+	
 }
 
 void Window::close()
@@ -175,37 +100,32 @@ sl_bool Window::isClosed()
 	return sl_true;
 }
 
-Ref<WindowInstance> Window::getParentInstance()
-{
-	Ref<WindowInstance> instance = m_instance;
-	if (CHECK_INSTANCE(instance)) {
-		return instance->getParent();
-	}
-	return Ref<WindowInstance>::null();
-}
-
-void Window::setParentInstance(const Ref<WindowInstance>& parent)
-{
-	Ref<WindowInstance> instance = m_instance;
-	if (CHECK_INSTANCE(instance)) {
-		instance->setParent(parent);
-	}
-}
-
 Ref<Window> Window::getParent()
 {
-	Ref<WindowInstance> instance = getParentInstance();
-	if (instance.isNotNull()) {
-		return instance->getWindow();
-	}
-	return Ref<Window>::null();
+	return m_parent;
 }
 
 void Window::setParent(const Ref<Window>& parent)
 {
-	if (parent.isNotNull()) {
-		setParentInstance(parent->m_instance);
+	m_parent = parent;
+	Ref<WindowInstance> instance = m_instance;
+	if (CHECK_INSTANCE(instance)) {
+		if (parent.isNotNull()) {
+			instance->setParent(parent->m_instance);
+		} else {
+			instance->setParent(Ref<WindowInstance>::null());
+		}
 	}
+}
+
+Ref<Screen> Window::getScreen()
+{
+	return m_screen;
+}
+
+void Window::setScreen(const Ref<Screen>& screen)
+{
+	m_screen = screen;
 }
 
 Ref<ViewGroup> Window::getContentView()
@@ -230,6 +150,22 @@ void Window::setContentView(const Ref<ViewGroup>& view)
 	m_viewContent = view;
 }
 
+
+Ref<Menu> Window::getMenu()
+{
+	return m_menu;
+}
+
+void Window::setMenu(const Ref<Menu>& menu)
+{
+	m_menu = menu;
+	Ref<WindowInstance> instance = m_instance;
+	if (CHECK_INSTANCE(instance)) {
+		instance->setMenu(menu);
+	}
+}
+
+
 void Window::setFocus()
 {
 	Ref<WindowInstance> instance = m_instance;
@@ -242,7 +178,7 @@ void Window::runModal()
 {
 	Ref<WindowInstance> instance = m_instance;
 	if (instance.isNotNull()) {
-		UI::runOnUIThread(SLIB_CALLBACK_WEAKREF(Window, _runModal, this));
+		UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(Window, _runModal, this));
 	}
 }
 
@@ -258,13 +194,14 @@ Rectangle Window::getFrame()
 {
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
-		return instance->getFrame();
+		m_frame = instance->getFrame();
 	}
-	return Rectangle::zero();
+	return m_frame;
 }
 
 void Window::setFrame(const Rectangle& frame)
 {
+	m_frame = frame;
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
 		instance->setFrame(frame);
@@ -347,15 +284,12 @@ void Window::setClientSize(sl_real width, sl_real height)
 
 String Window::getTitle()
 {
-	Ref<WindowInstance> instance = m_instance;
-	if (CHECK_INSTANCE(instance)) {
-		return instance->getTitle();
-	}
-	return String::null();
+	return m_title;
 }
 
 void Window::setTitle(const String& title)
 {
+	m_title = title;
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
 		instance->setTitle(title);
@@ -364,15 +298,12 @@ void Window::setTitle(const String& title)
 
 Color Window::getBackgroundColor()
 {
-	Ref<WindowInstance> instance = m_instance;
-	if (CHECK_INSTANCE(instance)) {
-		return instance->getBackgroundColor();
-	}
-	return Color::zero();
+	return m_backgroundColor;
 }
 
 void Window::setBackgroundColor(const Color& color)
 {
+	m_backgroundColor = color;
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
 		instance->setBackgroundColor(color);
@@ -383,13 +314,14 @@ sl_bool Window::isMinimized()
 {
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
-		return instance->isMinimized();
+		m_flagMinimized = instance->isMinimized();
 	}
-	return sl_false;
+	return m_flagMinimized;
 }
 
 void Window::setMinimized(sl_bool flag)
 {
+	m_flagMinimized = flag;
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
 		instance->setMinimized(flag);
@@ -400,13 +332,14 @@ sl_bool Window::isMaximized()
 {
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
-		return instance->isMaximized();
+		m_flagMaximized = instance->isMaximized();
 	}
-	return sl_false;
+	return m_flagMaximized;
 }
 
 void Window::setMaximized(sl_bool flag)
 {
+	m_flagMaximized = flag;
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
 		instance->setMaximized(flag);
@@ -415,15 +348,12 @@ void Window::setMaximized(sl_bool flag)
 
 sl_bool Window::isVisible()
 {
-	Ref<WindowInstance> instance = m_instance;
-	if (CHECK_INSTANCE(instance)) {
-		return instance->isVisible();
-	}
-	return sl_false;
+	return m_flagVisible;
 }
 
 void Window::setVisible(sl_bool flag)
 {
+	m_flagVisible = flag;
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
 		instance->setVisible(flag);
@@ -432,15 +362,12 @@ void Window::setVisible(sl_bool flag)
 
 sl_bool Window::isAlwaysOnTop()
 {
-	Ref<WindowInstance> instance = m_instance;
-	if (CHECK_INSTANCE(instance)) {
-		return instance->isAlwaysOnTop();
-	}
-	return sl_false;
+	return m_flagAlwaysOnTop;
 }
 
 void Window::setAlwaysOnTop(sl_bool flag)
 {
+	m_flagAlwaysOnTop = flag;
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
 		instance->setAlwaysOnTop(flag);
@@ -449,15 +376,12 @@ void Window::setAlwaysOnTop(sl_bool flag)
 
 sl_bool Window::isCloseButtonEnabled()
 {
-	Ref<WindowInstance> instance = m_instance;
-	if (CHECK_INSTANCE(instance)) {
-		return instance->isCloseButtonEnabled();
-	}
-	return sl_false;
+	return m_flagCloseButtonEnabled;
 }
 
 void Window::setCloseButtonEnabled(sl_bool flag)
 {
+	m_flagCloseButtonEnabled = flag;
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
 		instance->setCloseButtonEnabled(flag);
@@ -466,15 +390,12 @@ void Window::setCloseButtonEnabled(sl_bool flag)
 
 sl_bool Window::isMinimizeButtonEnabled()
 {
-	Ref<WindowInstance> instance = m_instance;
-	if (CHECK_INSTANCE(instance)) {
-		return instance->isMinimizeButtonEnabled();
-	}
-	return sl_false;
+	return m_flagMinimizeButtonEnabled;
 }
 
 void Window::setMinimizeButtonEnabled(sl_bool flag)
 {
+	m_flagMinimizeButtonEnabled = flag;
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
 		instance->setMinimizeButtonEnabled(flag);
@@ -483,15 +404,12 @@ void Window::setMinimizeButtonEnabled(sl_bool flag)
 
 sl_bool Window::isMaximizeButtonEnabled()
 {
-	Ref<WindowInstance> instance = m_instance;
-	if (CHECK_INSTANCE(instance)) {
-		return instance->isMaximizeButtonEnabled();
-	}
-	return sl_false;
+	return m_flagMaximizeButtonEnabled;
 }
 
 void Window::setMaximizeButtonEnabled(sl_bool flag)
 {
+	m_flagMaximizeButtonEnabled = flag;
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
 		instance->setMaximizeButtonEnabled(flag);
@@ -500,15 +418,12 @@ void Window::setMaximizeButtonEnabled(sl_bool flag)
 
 sl_bool Window::isResizable()
 {
-	Ref<WindowInstance> instance = m_instance;
-	if (CHECK_INSTANCE(instance)) {
-		return instance->isResizable();
-	}
-	return sl_false;
+	return m_flagResizable;
 }
 
 void Window::setResizable(sl_bool flag)
 {
+	m_flagResizable = flag;
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
 		instance->setResizable(flag);
@@ -517,15 +432,12 @@ void Window::setResizable(sl_bool flag)
 
 sl_real Window::getAlpha()
 {
-	Ref<WindowInstance> instance = m_instance;
-	if (CHECK_INSTANCE(instance)) {
-		return instance->getAlpha();
-	}
-	return 1;
+	return m_alpha;
 }
 
 void Window::setAlpha(sl_real alpha)
 {
+	m_alpha = alpha;
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
 		instance->setAlpha(alpha);
@@ -534,15 +446,12 @@ void Window::setAlpha(sl_real alpha)
 
 sl_bool Window::isTransparent()
 {
-	Ref<WindowInstance> instance = m_instance;
-	if (CHECK_INSTANCE(instance)) {
-		return instance->isTransparent();
-	}
-	return sl_false;
+	return m_flagTransparent;
 }
 
 void Window::setTransparent(sl_bool flag)
 {
+	m_flagTransparent = flag;
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
 		instance->setTransparent(flag);
@@ -677,6 +586,76 @@ Size Window::getClientSizeFromWindowSize(const Size& sizeWindow)
 	}
 }
 
+sl_bool Window::isModal()
+{
+	return m_flagModal;
+}
+
+void Window::setModal(sl_bool flag)
+{
+	m_flagModal = flag;
+}
+
+sl_bool Window::isDialog()
+{
+	return m_flagDialog;
+}
+
+void Window::setDialog(sl_bool flag)
+{
+	m_flagDialog = flag;
+}
+
+sl_bool Window::isBorderless()
+{
+	return m_flagBorderless;
+}
+
+void Window::setBorderless(sl_bool flag)
+{
+	m_flagBorderless = flag;
+}
+
+sl_bool Window::isTitleBarVisible()
+{
+	return m_flagShowTitleBar;
+}
+
+void Window::setTitleBarVisible(sl_bool flag)
+{
+	m_flagShowTitleBar = flag;
+}
+
+sl_bool Window::isFullScreenOnCreate()
+{
+	return m_flagFullScreenOnCreate;
+}
+
+void Window::setFullScreenOnCreate(sl_bool flag)
+{
+	m_flagFullScreenOnCreate = flag;
+}
+
+sl_bool Window::isCenterScreenOnCreate()
+{
+	return m_flagCenterScreenOnCreate;
+}
+
+void Window::setCenterScreenOnCreate(sl_bool flag)
+{
+	m_flagCenterScreenOnCreate = flag;
+}
+
+void* Window::getActivity()
+{
+	return m_activity;
+}
+
+void Window::setActivity(void* activity)
+{
+	m_activity = activity;
+}
+
 Ref<WindowInstance> Window::getWindowInstance()
 {
 	return m_instance;
@@ -711,6 +690,11 @@ void Window::detach()
 {
 	ObjectLocker lock(this);
 	
+	// save current window's properties
+	getFrame();
+	isMaximized();
+	isMinimized();
+	
 	Ref<View> view = m_viewContent;
 	if (view.isNotNull()) {
 		view->detach();
@@ -722,32 +706,59 @@ void Window::detach()
 	m_instance.setNull();
 }
 
-sl_bool Window::createWindow(const WindowParam& param)
+void Window::create()
 {
-	if (! (UI::isUIThread())) {
-		return sl_false;
+	if (UI::isUiThread()) {
+		_create();
+	} else {
+		UI::dispatchToUiThread(SLIB_CALLBACK_REF(Window, _create, this));
 	}
+}
+
+void Window::_create()
+{
+	if (m_instance.isNotNull()) {
+		return;
+	}
+	
+	WindowInstanceParam param;
+	param.screen = m_screen;
+	param.menu = m_menu;
+	param.flagBorderless = m_flagBorderless;
+	param.flagFullScreen = m_flagFullScreenOnCreate;
+	param.flagCenterScreen = m_flagCenterScreenOnCreate;
+	param.flagDialog = m_flagDialog;
+	param.location = m_frame.getLocation();
+	param.size = m_frame.getSize();
+	param.title = m_title;
+	param.flagShowTitleBar = m_flagShowTitleBar;
+	param.activity = m_activity;
 	
 	Ref<WindowInstance> window = createWindowInstance(param);
 	
 	if (window.isNotNull()) {
-
-		window->setParent(param.parent);
 		
-		window->setBackgroundColor(param.backgroundColor);
+		Ref<Window> parent = m_parent;
+		if (parent.isNotNull()) {
+			window->setParent(parent->m_instance);
+		} else {
+			window->setParent(Ref<WindowInstance>::null());
+		}
 		
-		window->setVisible(param.flagVisible);
-		window->setMinimized(param.flagMinimized);
-		window->setMaximized(param.flagMaximized);
+		window->setBackgroundColor(m_backgroundColor);
 		
-		window->setAlwaysOnTop(param.flagAlwaysOnTop);
-		window->setCloseButtonEnabled(param.flagCloseButtonEnabled);
-		window->setMinimizeButtonEnabled(param.flagMinimizeButtonEnabled);
-		window->setMaximizeButtonEnabled(param.flagMaximizeButtonEnabled);
-		window->setResizable(param.flagResizable);
-		window->setAlpha(param.alpha);
-		window->setTransparent(param.flagTransparent);
-
+		window->setVisible(m_flagVisible);
+		window->setMinimized(m_flagMinimized);
+		window->setMaximized(m_flagMaximized);
+		
+		window->setAlwaysOnTop(m_flagAlwaysOnTop);
+		window->setCloseButtonEnabled(m_flagCloseButtonEnabled);
+		window->setMinimizeButtonEnabled(m_flagMinimizeButtonEnabled);
+		window->setMaximizeButtonEnabled(m_flagMaximizeButtonEnabled);
+		window->setResizable(m_flagResizable);
+		window->setAlpha(m_alpha);
+		window->setTransparent(m_flagTransparent);
+		
 		window->setVisible(sl_true);
 		
 		attach(window);
@@ -764,44 +775,15 @@ sl_bool Window::createWindow(const WindowParam& param)
 			}
 		}
 #endif
-
-		if (param.flagModal) {
+		
+		if (m_flagModal) {
 			_runModal();
 		}
 		
-		return sl_true;
 	}
-	return sl_false;
-}
-
-void Window::create(const WindowParam& param)
-{
-	if (UI::isUIThread()) {
-		if (createWindow(param)) {
-			if (param.callbackSuccess.isNotNull()) {
-				param.callbackSuccess->run();
-			}
-		} else {
-			if (param.callbackFail.isNotNull()) {
-				param.callbackFail->run();
-			}
-		}
-	} else {
-		UI::runOnUIThread(SLIB_CALLBACK_REF(Window, _createCallback, this, param));
-	}
-}
-
-void Window::_createCallback(WindowParam param)
-{
-	if (createWindow(param)) {
-		if (param.callbackSuccess.isNotNull()) {
-			param.callbackSuccess->run();
-		}
-	} else {
-		if (param.callbackFail.isNotNull()) {
-			param.callbackFail->run();
-		}
-	}
+	
+	onCreateFailed();
+	
 }
 
 void Window::addView(const Ref<View>& child)
@@ -842,6 +824,10 @@ void Window::removeAllViews()
 }
 
 void Window::onCreate()
+{
+}
+
+void Window::onCreateFailed()
 {
 }
 
@@ -949,6 +935,10 @@ Ref<Window> WindowInstance::getWindow()
 void WindowInstance::setWindow(const Ref<Window>& window)
 {
 	m_window = window;
+}
+
+void WindowInstance::setMenu(const Ref<Menu>& menu)
+{
 }
 
 void WindowInstance::onCreate()

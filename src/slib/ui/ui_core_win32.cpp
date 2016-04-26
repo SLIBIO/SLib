@@ -2,13 +2,11 @@
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 
-#include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/ui/screen.h"
-#include "../../../inc/slib/ui/platform.h"
-
-#include "../../../inc/slib/core/queue.h"
-
+#include "ui_core_win32.h"
 #include "view_win32.h"
+
+#include "../../../inc/slib/ui/screen.h"
+#include "../../../inc/slib/core/queue.h"
 
 #include <commctrl.h>
 
@@ -80,12 +78,12 @@ Ref<Screen> UI::getFocusedScreen()
 	return ui->m_screenPrimary;
 }
 
-sl_bool UI::isUIThread()
+sl_bool UI::isUiThread()
 {
 	return (_g_thread_ui == ::GetCurrentThreadId());
 }
 
-void UI::runOnUIThread(const Ref<Runnable>& callback)
+void UI::dispatchToUiThread(const Ref<Runnable>& callback)
 {
 	_Win32_UI* ui = _Win32_UI::get();
 	if (callback.isNotNull()) {
@@ -94,22 +92,24 @@ void UI::runOnUIThread(const Ref<Runnable>& callback)
 	}
 }
 
-void UI::runLoop()
+void _Win32_processMenuCommand(WPARAM wParam, LPARAM lParam);
+void _Win32_processCustomMsgBox(WPARAM wParam, LPARAM lParam);
+
+LRESULT CALLBACK _Win32_MessageProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	if (uMsg == SLIB_UI_MESSAGE_CUSTOM_MSGBOX) {
+		_Win32_processCustomMsgBox(wParam, lParam);
+		return 0;
+	} else if (uMsg == WM_MENUCOMMAND) {
+		_Win32_processMenuCommand(wParam, lParam);
+		return 0;
+	}
+	return DefWindowProc(hWnd, uMsg, wParam, lParam);
+}
+
+void UIPlatform::runLoop(sl_uint32 level)
 {
 	_Win32_UI* ui = _Win32_UI::get();
-	_g_thread_ui = ::GetCurrentThreadId();
-
-	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-	ULONG_PTR gdiplusToken;
-	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-
-	::OleInitialize(NULL);
-
-	INITCOMMONCONTROLSEX icex;
-	icex.dwICC = ICC_LISTVIEW_CLASSES | ICC_TAB_CLASSES;
-	InitCommonControlsEx(&icex);
-
-	UIApp::dispatchStart();
 
 	MSG msg;
 	while (::GetMessageW(&msg, NULL, 0, 0)) {
@@ -125,12 +125,16 @@ void UI::runLoop()
 			}
 		} else if (msg.message == SLIB_UI_MESSAGE_CLOSE) {
 			::DestroyWindow(msg.hwnd);
+		} else if (msg.message == WM_MENUCOMMAND) {
+			_Win32_processMenuCommand(msg.wParam, msg.lParam);
 		} else {
 			HWND hWnd = ::GetActiveWindow();
 			sl_bool flagDefaultProcess = sl_true;
 			if (hWnd) {
-				if (::IsDialogMessageW(hWnd, &msg)) {
-					flagDefaultProcess = sl_false;
+				if (::GetWindowLongW(hWnd, GWL_STYLE) & WS_POPUP) {
+					if (::IsDialogMessageW(hWnd, &msg)) {
+						flagDefaultProcess = sl_false;
+					}
 				}
 			}
 			Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(msg.hwnd));
@@ -148,139 +152,52 @@ void UI::runLoop()
 
 	ui->m_queueDispatch.removeAll();
 
+}
+
+void UIPlatform::quitLoop()
+{
+	::PostQuitMessage(0);
+}
+
+void UIPlatform::runApp()
+{
+	_g_thread_ui = ::GetCurrentThreadId();
+
+	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+	ULONG_PTR gdiplusToken;
+	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+
+	::OleInitialize(NULL);
+
+	INITCOMMONCONTROLSEX icex;
+	icex.dwICC = ICC_LISTVIEW_CLASSES | ICC_TAB_CLASSES;
+	InitCommonControlsEx(&icex);
+
+	UIApp::dispatchStart();
+
+	runLoop(0);
+
 	UIApp::dispatchExit();
 
 	//Gdiplus::GdiplusShutdown(gdiplusToken);
 }
 
-void UI::quitLoop()
+void UIPlatform::quitApp()
 {
 	::PostQuitMessage(0);
 }
 
-#define CMB_MSG_INIT (WM_USER+1218)
-LRESULT CALLBACK _CustomizedMsgBox_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+void UI::setDefaultFontName(const String& _fontName)
 {
-	if (uMsg == CMB_MSG_INIT) {
-		HWND hWndMsg = ::FindWindowW(NULL, L"CustomizedMsgBox");
-		if (hWndMsg == NULL) {
-			return 0;
-		}
-		AlertParam& param = *((AlertParam*)lParam);
-		String16 caption = param.caption;
-		::SetWindowTextW(hWndMsg, (LPCWSTR)(caption.getData()));
-
-		switch (param.type) {
-		case AlertType::Ok:
-			if (param.titleOk.isNotNull()) {
-				String16 titleOk = param.titleOk;
-				::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleOk.getData()));
-			}
-			break;
-		case AlertType::OkCancel:
-			if (param.titleOk.isNotNull()) {
-				String16 titleOk = param.titleOk;
-				::SetDlgItemTextW(hWndMsg, 1, (LPCWSTR)(titleOk.getData()));
-			}
-			if (param.titleCancel.isNotNull()) {
-				String16 titleCancel = param.titleCancel;
-				::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleCancel.getData()));
-			}
-			break;
-		case AlertType::YesNo:
-			if (param.titleYes.isNotNull()) {
-				String16 titleYes = param.titleYes;
-				::SetDlgItemTextW(hWndMsg, 6, (LPCWSTR)(titleYes.getData()));
-			}
-			if (param.titleNo.isNotNull()) {
-				String16 titleNo = param.titleNo;
-				::SetDlgItemTextW(hWndMsg, 7, (LPCWSTR)(titleNo.getData()));
-			}
-			break;
-		case AlertType::YesNoCancel:
-			if (param.titleYes.isNotNull()) {
-				String16 titleYes = param.titleYes;
-				::SetDlgItemTextW(hWndMsg, 6, (LPCWSTR)(titleYes.getData()));
-			}
-			if (param.titleNo.isNotNull()) {
-				String16 titleNo = param.titleNo;
-				::SetDlgItemTextW(hWndMsg, 7, (LPCWSTR)(titleNo.getData()));
-			}
-			if (param.titleCancel.isNotNull()) {
-				String16 titleCancel = param.titleCancel;
-				::SetDlgItemTextW(hWndMsg, 2, (LPCWSTR)(titleCancel.getData()));
-			}
-			break;
-		}
-		return 0;
-	}
-	return DefWindowProc(hWnd, uMsg, wParam, lParam);
+	String16 fontName = _fontName;
+	HFONT hFont = ::CreateFontW(14, 0, 0, 0, 200, FALSE, FALSE
+		, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS
+		, ANTIALIASED_QUALITY
+		, DEFAULT_PITCH
+		, (LPCWSTR)(fontName.getData()));
+	Win32_UI_Shared::get()->setDefaultFont(hFont);
 }
-void _UI_AlertProc(AlertParam param)
-{
-	int style = MB_OK;
-	switch (param.type) {
-	case AlertType::OkCancel:
-		style = MB_OKCANCEL;
-		break;
-	case AlertType::YesNo:
-		style = MB_YESNO;
-		break;
-	case AlertType::YesNoCancel:
-		style = MB_YESNOCANCEL;
-		break;
-	}
 
-	HWND hWndParent = ::GetActiveWindow();
-
-	static HWND hWndMsgBoxCustom = NULL;
-	if (!hWndMsgBoxCustom) {
-		WNDCLASSW wc;
-		::ZeroMemory(&wc, sizeof(wc));
-		wc.hbrBackground = (HBRUSH)(::GetStockObject(BLACK_BRUSH));
-		wc.hInstance = ::GetModuleHandleW(NULL);
-		wc.lpfnWndProc = _CustomizedMsgBox_WndProc;
-		wc.lpszClassName = L"CustomizedMsgBoxInitializer";
-		::RegisterClassW(&wc);
-		hWndMsgBoxCustom = ::CreateWindowW(wc.lpszClassName, L"", WS_POPUP, 0, 0, 0, 0, NULL, 0, wc.hInstance, 0);
-	}
-	int result;
-	String16 text = param.text;
-	if (hWndMsgBoxCustom) {
-		::PostMessage(hWndMsgBoxCustom, CMB_MSG_INIT, 0, (LPARAM)(&param));
-		result = ::MessageBoxW(hWndParent, (LPCWSTR)(text.getData()), L"CustomizedMsgBox", style);
-	} else {
-		String16 caption = param.caption;
-		result = ::MessageBoxW(hWndParent, (LPCWSTR)(text.getData()), (LPCWSTR)(caption.getData()), style);
-	}
-
-	switch (result) {
-	case IDOK:
-		if (param.onOk.isNotNull()) {
-			param.onOk->run();
-		}
-		break;
-	case IDCANCEL:
-		if (param.onCancel.isNotNull()) {
-			param.onCancel->run();
-		}
-		break;
-	case IDYES:
-		if (param.onYes.isNotNull()) {
-			param.onYes->run();
-		}
-		break;
-	case IDNO:
-		if (param.onNo.isNotNull()) {
-			param.onNo->run();
-		}
-		break;
-	}
-}
-void UI::showAlert(const AlertParam& param)
-{
-	UI::runOnUIThread(SLIB_CALLBACK(_UI_AlertProc, param));
-}
 
 _Win32_UI::_Win32_UI()
 {
@@ -291,6 +208,91 @@ COLORREF UIPlatform::getColorRef(const Color& color)
 {
 	return (COLORREF)(color.getBGR());
 }
+
+LRESULT CALLBACK _Win32_ViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+Win32_UI_Shared::Win32_UI_Shared()
+{
+	hInstance = ::GetModuleHandleW(NULL);
+
+	hFontDefault = NULL;
+
+	// register view class
+	{
+		WNDCLASSEXW wc;
+		::ZeroMemory(&wc, sizeof(wc));
+		wc.cbSize = sizeof(wc);
+		wc.style = CS_DBLCLKS | CS_PARENTDC;
+		wc.lpfnWndProc = _Win32_ViewProc;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hInstance = hInstance;
+		wc.hIcon = NULL;
+		wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
+		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+		wc.lpszMenuName = NULL;
+		wc.lpszClassName = L"SLIBUIVIEW";
+		wc.hIconSm = NULL;
+		wndClassForView = ::RegisterClassExW(&wc);
+	}
+
+	// register window class
+	{
+		WNDCLASSEXW wc;
+		::ZeroMemory(&wc, sizeof(wc));
+		wc.cbSize = sizeof(wc);
+		wc.style = CS_DBLCLKS;
+		wc.lpfnWndProc = _Win32_WindowProc;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hInstance = hInstance;
+		wc.hIcon = ::LoadIcon(hInstance, IDI_APPLICATION);
+		wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
+		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
+		wc.lpszMenuName = NULL;
+		wc.lpszClassName = L"SLIBUIWINDOW";
+		wc.hIconSm = NULL;
+		wndClassForWindow = ::RegisterClassExW(&wc);
+	}
+
+	// Mesage Window
+	{
+		WNDCLASSW wc;
+		::ZeroMemory(&wc, sizeof(wc));
+		wc.hInstance = hInstance;
+		wc.lpfnWndProc = _Win32_MessageProc;
+		wc.lpszClassName = L"SLIBMESSAGEHANDLER";
+		m_wndClassForMessage = ::RegisterClassW(&wc);
+		hWndMessage = ::CreateWindowExW(0, (LPCWSTR)((LONG_PTR)m_wndClassForMessage), L"", 0, 0, 0, 0, 0, HWND_MESSAGE, 0, hInstance, 0);
+	}
+
+}
+
+Win32_UI_Shared::~Win32_UI_Shared()
+{
+	if (hFontDefault) {
+		::DeleteObject(hFontDefault);
+	}
+	if (hWndMessage) {
+		::DestroyWindow(hWndMessage);
+	}
+}
+
+Win32_UI_Shared* Win32_UI_Shared::get()
+{
+	SLIB_SAFE_STATIC(Win32_UI_Shared, ret);
+	return &ret;
+}
+
+void Win32_UI_Shared::setDefaultFont(HFONT hFont)
+{
+	if (hFontDefault) {
+		::DeleteObject(hFontDefault);
+	}
+	hFontDefault = hFont;
+}
+
 SLIB_UI_NAMESPACE_END
 
 #endif

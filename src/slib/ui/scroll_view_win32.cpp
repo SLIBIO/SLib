@@ -108,7 +108,7 @@ public:
 
 Ref<ViewInstance> ScrollView::createInstance(ViewInstance* parent)
 {
-	Win32_View_Shared* shared = Win32_View_Shared::get();
+	Win32_UI_Shared* shared = Win32_UI_Shared::get();
 	DWORD style = WS_HSCROLL | WS_VSCROLL;
 	DWORD styleEx = WS_EX_CONTROLPARENT;
 #if defined(_SLIB_UI_WIN32_USE_COMPOSITE_VIEWS)
@@ -120,7 +120,7 @@ Ref<ViewInstance> ScrollView::createInstance(ViewInstance* parent)
 	if (m_flagBorder) {
 		style |= WS_BORDER;
 	}
-	Ref<_Win32_ScrollViewInstance> ret = Win32_ViewInstance::create<_Win32_ScrollViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClass)), L"", style, styleEx);
+	Ref<_Win32_ScrollViewInstance> ret = Win32_ViewInstance::create<_Win32_ScrollViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
 	if (ret.isNotNull()) {
 		ret->__setContentView(m_viewContent, this);
 		ret->m_backgroundColor = m_backgroundColor;

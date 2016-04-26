@@ -412,7 +412,7 @@ sl_bool HashTable<KT, VT, HASH>::_addEntry(sl_uint32 index, sl_uint32 hash, Hash
 					}
 				}
 			}
-			delete[] tableOld;
+			Base::freeMemory(tableOld);
 		}
 	}
 	return sl_true;
@@ -529,7 +529,7 @@ sl_size HashTable<KT, VT, HASH>::remove(const KT& key, sl_bool flagRemoveAllMatc
 				}
 				*link = tableOld[i | n];
 			}
-			delete[] tableOld;
+			Base::freeMemory(tableOld);
 		}
 	}
 	while (entryDelete) {
@@ -584,7 +584,7 @@ sl_size HashTable<KT, VT, HASH>::remove(const KT& key, const VT& value, sl_bool 
 				}
 				*link = tableOld[i | n];
 			}
-			delete[] tableOld;
+			Base::freeMemory(tableOld);
 		}
 	}
 	while (entryDelete) {
@@ -673,7 +673,7 @@ void HashTable<KT, VT, HASH>::_free()
 				entry = next;
 			}
 		}
-		delete[] table;
+		Base::freeMemory(table);
 	}
 }
 
@@ -683,7 +683,7 @@ sl_bool HashTable<KT, VT, HASH>::_createTable(sl_uint32 capacity)
 	if (capacity > _SLIB_HASHTABLE_MAX_CAPACITY || capacity < m_nCapacityMin) {
 		return sl_false;
 	}
-	HashEntry** table = new HashEntry*[capacity];
+	HashEntry** table = (HashEntry**)(Base::createMemory(sizeof(HashEntry*)*capacity));
 	if (table) {
 		m_table = table;
 		m_nCapacity = capacity;

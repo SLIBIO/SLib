@@ -11,44 +11,6 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
-LRESULT CALLBACK _Win32_ViewWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-class _Win32_Window_Static
-{
-public:
-	ATOM wndClass;
-
-	_Win32_Window_Static()
-	{
-		HINSTANCE hInst = ::GetModuleHandleW(NULL);
-		// register view class
-		{
-			WNDCLASSEXW wc;
-			::ZeroMemory(&wc, sizeof(wc));
-			wc.cbSize = sizeof(wc);
-			wc.style = CS_DBLCLKS;
-			wc.lpfnWndProc = _Win32_WindowProc;
-			wc.cbClsExtra = 0;
-			wc.cbWndExtra = 0;
-			wc.hInstance = hInst;
-			wc.hIcon = ::LoadIcon(hInst, IDI_APPLICATION);
-			wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-			wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
-			wc.lpszMenuName = NULL;
-			wc.lpszClassName = L"SLIBUIWINDOW";
-			wc.hIconSm = NULL;
-			wndClass = ::RegisterClassExW(&wc);
-		}
-	}
-
-	static _Win32_Window_Static* get()
-	{
-		SLIB_SAFE_STATIC(_Win32_Window_Static, ret);
-		return &ret;
-	}
-};
-
 class _Win32_Window : public WindowInstance
 {
 public:
@@ -99,7 +61,7 @@ public:
 
 	static HWND createHandle(const WindowInstanceParam& param)
 	{
-		_Win32_Window_Static* ui = _Win32_Window_Static::get();
+		Win32_UI_Shared* ui = Win32_UI_Shared::get();
 		HINSTANCE hInst = ::GetModuleHandleW(NULL);
 
 		// create handle
@@ -138,13 +100,13 @@ public:
 			String16 title = param.title;
 			hWnd = ::CreateWindowExW(
 				styleEx // ex-style
-				, (LPCWSTR)((LONG_PTR)(ui->wndClass))
+				, (LPCWSTR)((LONG_PTR)(ui->wndClassForWindow))
 				, (LPCWSTR)(title.getData())
 				, style
 				, (int)(frameWindow.left), (int)(frameWindow.top)
 				, (int)(frameWindow.getWidth()), (int)(frameWindow.getHeight())
 				, NULL // parent
-				, NULL // menu
+				, UIPlatform::getMenuHandle(param.menu) // menu
 				, hInst
 				, NULL);
 		}
@@ -208,6 +170,14 @@ public:
 			}
 		}
 		return sl_false;
+	}
+
+	void setMenu(const Ref<Menu>& menu)
+	{
+		HWND hWnd = m_handle;
+		if (hWnd) {
+			::SetMenu(hWnd, UIPlatform::getMenuHandle(menu));
+		}
 	}
 
 	sl_bool setFocus()
@@ -803,6 +773,8 @@ public:
 
 };
 
+LRESULT CALLBACK _Win32_ViewWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
 LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	Ref<WindowInstance> _window = UIPlatform::getWindowInstance(hWnd);
@@ -978,6 +950,18 @@ HWND UIPlatform::getWindowHandle(WindowInstance* instance)
 	} else {
 		return 0;
 	}
+}
+
+HWND UIPlatform::getWindowHandle(Window* window)
+{
+	if (window) {
+		Ref<WindowInstance> _instance = window->getWindowInstance();
+		_Win32_Window* instance = (_Win32_Window*)(_instance.ptr);
+		if (instance) {
+			return instance->m_handle;
+		}
+	}
+	return 0;
 }
 
 SLIB_UI_NAMESPACE_END

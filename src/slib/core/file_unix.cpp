@@ -385,20 +385,20 @@ sl_bool File::setCreatedTime(const String& filePath, Time time)
 FileAttributes File::getAttributes(const String& filePath)
 {
 	if (filePath.isEmpty()) {
-		return -1;
+		return FileAttributes::NotExist;
 	}
 	struct stat st;
 	if (0 == ::stat(filePath.getData(), &st)) {
 		int ret = 0;
 		if (S_ISDIR(st.st_mode)) {
-			ret |= FileAttribute::Directory;
+			ret |= FileAttributes::Directory;
 		}
 		if (filePath.startsWith('.')) {
-			ret |= FileAttribute::Hidden;
+			ret |= FileAttributes::Hidden;
 		}
 		return ret;
 	} else {
-		return -1;
+		return FileAttributes::NotExist;
 	}
 }
 

@@ -19,7 +19,7 @@ SLIB_NAMESPACE_BEGIN
 
 enum class Language
 {
-	None = 0,
+	Unknown = 0,
 	SLIB_DEFINE_LANGUAGE_CODE(ab, Abkhaz),
 	SLIB_DEFINE_LANGUAGE_CODE(aa, Afar),
 	SLIB_DEFINE_LANGUAGE_CODE(af, Afrikaans),
@@ -248,7 +248,7 @@ enum class Language
 
 enum class Country
 {
-	None = 0,
+	Unknown = 0,
 	SLIB_DEFINE_COUNTRY_CODE(AD, Andorra),
 	SLIB_DEFINE_COUNTRY_CODE(AE, UnitedArabEmirates),
 	UAE = UnitedArabEmirates,
@@ -511,18 +511,19 @@ enum class Country
 
 class Locale
 {
+	SLIB_DECLARE_PRIMITIVE_WRAPPER(sl_uint32, Locale)
 public:
 	enum {
-		None = 0,
-		ar = SLIB_DEFINE_LOCALE_CODE(Language::Arabic, Country::None),
+		Unknown = 0,
+		ar = SLIB_DEFINE_LOCALE_CODE(Language::Arabic, Country::Unknown),
 		Arabic = ar,
-		zh = SLIB_DEFINE_LOCALE_CODE(Language::Chinese, Country::None),
+		zh = SLIB_DEFINE_LOCALE_CODE(Language::Chinese, Country::Unknown),
 		Chinese = zh,
 		zh_CN = SLIB_DEFINE_LOCALE_CODE(Language::Chinese, Country::China),
 		China = zh_CN,
 		zh_TW = SLIB_DEFINE_LOCALE_CODE(Language::Chinese, Country::Taiwan),
 		Taiwan = zh_TW,
-		en = SLIB_DEFINE_LOCALE_CODE(Language::English, Country::None),
+		en = SLIB_DEFINE_LOCALE_CODE(Language::English, Country::Unknown),
 		English = en,
 		en_GB = SLIB_DEFINE_LOCALE_CODE(Language::English, Country::UnitedKingdom),
 		UnitedKingdom = en_GB,
@@ -530,47 +531,41 @@ public:
 		en_US = SLIB_DEFINE_LOCALE_CODE(Language::English, Country::UnitedStates),
 		UnitedStates = en_US,
 		US = en_US,
-		fr = SLIB_DEFINE_LOCALE_CODE(Language::French, Country::None),
+		fr = SLIB_DEFINE_LOCALE_CODE(Language::French, Country::Unknown),
 		French = fr,
 		fr_FR = SLIB_DEFINE_LOCALE_CODE(Language::French, Country::France),
 		France = fr_FR,
-		de = SLIB_DEFINE_LOCALE_CODE(Language::German, Country::None),
+		de = SLIB_DEFINE_LOCALE_CODE(Language::German, Country::Unknown),
 		German = de,
 		de_DE = SLIB_DEFINE_LOCALE_CODE(Language::German, Country::Germany),
 		Germany = de_DE,
-		it = SLIB_DEFINE_LOCALE_CODE(Language::Italian, Country::None),
+		it = SLIB_DEFINE_LOCALE_CODE(Language::Italian, Country::Unknown),
 		Italian = it,
 		it_IT = SLIB_DEFINE_LOCALE_CODE(Language::Italian, Country::Italy),
 		Italy = it_IT,
-		ja = SLIB_DEFINE_LOCALE_CODE(Language::Japanese, Country::None),
+		ja = SLIB_DEFINE_LOCALE_CODE(Language::Japanese, Country::Unknown),
 		Japanese = ja,
 		ja_JP = SLIB_DEFINE_LOCALE_CODE(Language::Japanese, Country::Japan),
 		Japan = ja_JP,
-		ko = SLIB_DEFINE_LOCALE_CODE(Language::Korean, Country::None),
+		ko = SLIB_DEFINE_LOCALE_CODE(Language::Korean, Country::Unknown),
 		Korean = ko,
 		ko_KP = SLIB_DEFINE_LOCALE_CODE(Language::Korean, Country::NorthKorea),
 		NorthKorea = ko_KP,
 		DPRK = ko_KP,
 		ko_KR = SLIB_DEFINE_LOCALE_CODE(Language::Korean, Country::SouthKorea),
 		SouthKorea = ko_KR,
-		es = SLIB_DEFINE_LOCALE_CODE(Language::Spanish, Country::None),
+		es = SLIB_DEFINE_LOCALE_CODE(Language::Spanish, Country::Unknown),
 		Spanish = es,
 		es_ES = SLIB_DEFINE_LOCALE_CODE(Language::Spanish, Country::Spain),
 		Spain = es_ES,
-		ru = SLIB_DEFINE_LOCALE_CODE(Language::Russian, Country::None),
+		ru = SLIB_DEFINE_LOCALE_CODE(Language::Russian, Country::Unknown),
 		Russian = ru,
 		ru_RU = SLIB_DEFINE_LOCALE_CODE(Language::Russian, Country::Russia),
 		Russia = ru_RU
 	};
 	
-	sl_uint32 value;
-	
 public:
 	Locale();
-	
-	Locale(const Locale& locale) = default;
-	
-	Locale(sl_uint32 value);
 	
 	Locale(Language language, Country country);
 	
@@ -581,10 +576,6 @@ public:
 	Locale(const String& code);
 	
 public:
-	sl_bool isNone() const;
-	
-	sl_bool isNotNone() const;
-	
 	Language getLanguage() const;
 	
 	// ISO 639-1
@@ -635,23 +626,6 @@ public:
 	// ISO 3166-1 alpha-2
 	static String getCountryCode(Country country);
 	
-public:
-	Locale& operator=(const Locale& locale) = default;
-	
-	Locale& operator=(sl_uint32 value);
-	
-	sl_bool operator==(const Locale& other) const;
-	
-	sl_bool operator!=(const Locale& other) const;
-
-	sl_bool operator==(sl_uint32 value) const;
-	
-	sl_bool operator!=(sl_uint32 value) const;
-
-	friend sl_bool operator==(sl_uint32 value, const Locale& other);
-	
-	friend sl_bool operator!=(sl_uint32 value, const Locale& other);
-
 };
 
 

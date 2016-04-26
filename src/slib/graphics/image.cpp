@@ -171,6 +171,16 @@ sl_uint32 Image::getHeight() const
 	return m_desc.height;
 }
 
+sl_bool Image::isEmpty() const
+{
+	return m_desc.width == 0 || m_desc.height == 0;
+}
+
+sl_bool Image::isNotEmpty() const
+{
+	return m_desc.width != 0 && m_desc.height != 0;
+}
+
 sl_int32 Image::getStride() const
 {
 	return m_desc.stride;

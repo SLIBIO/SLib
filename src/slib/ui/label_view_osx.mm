@@ -35,9 +35,9 @@ public:
 		}
 	}
 	
-	static NSTextAlignment translateAlignment(Alignments _align)
+	static NSTextAlignment translateAlignment(Alignment _align)
 	{
-		Alignments align = _align & Alignment::HorizontalMask;
+		Alignment align = _align & Alignment::HorizontalMask;
 		if (align == Alignment::Center) {
 			return NSCenterTextAlignment;
 		} else if (align == Alignment::Right) {
@@ -46,7 +46,7 @@ public:
 		return NSLeftTextAlignment;
 	}
 	
-	static Alignments translateAlignmentReverse(NSTextAlignment align)
+	static Alignment translateAlignmentReverse(NSTextAlignment align)
 	{
 		if (align == NSCenterTextAlignment) {
 			return Alignment::Center;
@@ -111,7 +111,7 @@ void LabelView::setBorder(sl_bool flag)
 	m_flagBorder = flag;
 }
 
-Alignments LabelView::getTextAlignment()
+Alignment LabelView::getTextAlignment()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
@@ -121,7 +121,7 @@ Alignments LabelView::getTextAlignment()
 	return m_textAlignment;
 }
 
-void LabelView::setTextAlignment(Alignments align)
+void LabelView::setTextAlignment(Alignment align)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {

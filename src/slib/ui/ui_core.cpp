@@ -1,6 +1,8 @@
 #include "../../../inc/slib/ui/core.h"
 
 #include "../../../inc/slib/ui/screen.h"
+#include "../../../inc/slib/ui/common_dialogs.h"
+
 #include "../../../inc/slib/ui/platform.h"
 
 SLIB_UI_NAMESPACE_BEGIN
@@ -64,40 +66,99 @@ Size UI::getScreenSize(const Ref<Screen>& _screen)
 	return Size(region.getWidth(), region.getHeight());
 }
 
-void UI::showAlert(const String& text)
+void UI::alert(const String& text)
 {
-	AlertParam param;
-	param.text = text;
-	param.caption = "Alert";
-	showAlert(param);
+	AlertDialog::run(text);
+}
+
+void UI::alert(const String& caption, const String& text)
+{
+	AlertDialog::run(caption, text);
 }
 
 void UI::showAlert(const String& text, const Ref<Runnable>& onOk)
 {
-	AlertParam param;
-	param.text = text;
-	param.caption = "Alert";
-	param.onOk = onOk;
-	showAlert(param);
+	AlertDialog::show(text, onOk);
 }
 
-void UI::showAlert(const String& text, const String& caption)
+void UI::showAlert(const String& caption, const String& text, const Ref<Runnable>& onOk)
 {
-	AlertParam param;
-	param.text = text;
-	param.caption = caption;
-	showAlert(param);
+	AlertDialog::show(caption, text, onOk);
 }
 
-void UI::showAlert(const String& text, const String& caption, const Ref<Runnable>& onOk)
+void UI::runOnUiThread(const Ref<Runnable> &callback)
 {
-	AlertParam param;
-	param.text = text;
-	param.caption = caption;
-	param.onOk = onOk;
-	showAlert(param);
+	if (UI::isUiThread()) {
+		callback->run();
+		return;
+	}
+	UI::dispatchToUiThread(callback);
 }
 
+static sl_int32 _g_ui_run_loop_level = 0;
+static sl_bool _g_ui_flag_quit_app = 0;
+
+void UI::runLoop()
+{
+	if (!(UI::isUiThread())) {
+		return;
+	}
+	_g_ui_run_loop_level++;
+	UIPlatform::runLoop(_g_ui_run_loop_level);
+	_g_ui_run_loop_level--;
+	if (_g_ui_flag_quit_app) {
+		if (_g_ui_run_loop_level > 0) {
+			UIPlatform::quitLoop();			
+		} else {
+			UIPlatform::quitApp();
+		}
+	}
+}
+
+void UI::quitLoop()
+{
+	if (!(UI::isUiThread())) {
+		UI::dispatchToUiThread(SLIB_CALLBACK(UI::quitLoop));
+		return;
+	}
+	if (_g_ui_run_loop_level > 0) {
+		UIPlatform::quitLoop();
+	} else {
+		quitApp();
+	}
+}
+
+void UI::runApp()
+{
+	UIPlatform::runApp();
+}
+
+void UI::quitApp()
+{
+	if (_g_ui_flag_quit_app) {
+		return;
+	}
+	if (!(UI::isUiThread())) {
+		UI::dispatchToUiThread(SLIB_CALLBACK(UI::quitApp));
+		return;
+	}
+	_g_ui_flag_quit_app = sl_true;
+	if (_g_ui_run_loop_level > 0) {
+		UIPlatform::quitLoop();
+	} else {
+		UIPlatform::quitApp();
+	}
+}
+
+Ref<Window> UI::getMainWindow()
+{
+	return UIApp::getMainWindow();
+}
+
+void UI::setMainWindow(const Ref<Window>& window)
+{
+	UIApp::setMainWindow(window);
+}
 
 /**************************************
 	UIApplication
@@ -124,7 +185,7 @@ AppType UIApp::getAppType()
 void UIApp::run(const String& param)
 {
 	Application::run(param);
-	UI::runLoop();
+	UI::runApp();
 }
 
 void UIApp::run()
@@ -134,7 +195,7 @@ void UIApp::run()
 
 void UIApp::quit()
 {
-	UI::quitLoop();
+	UI::quitApp();
 }
 
 void UIApp::onStart()
@@ -230,15 +291,32 @@ sl_bool UIApp::isMobilePaused()
 	return m_flagMobilePaused;
 }
 
+SLIB_SAFE_STATIC_REF(WeakRef<Window>, _UIApp_mainWindow);
 
-AlertParam::AlertParam()
+Ref<Window> UIApp::getMainWindow()
 {
-	type = AlertType::Ok;
+	return _UIApp_mainWindow;
+}
+
+void UIApp::setMainWindow(const Ref<Window>& window)
+{
+	_UIApp_mainWindow = window;
+}
+
+Ref<Menu> UI::getApplicationMenu()
+{
+	return UIApp::getMenu();
+}
+
+void UI::setApplicationMenu(const Ref<Menu>& menu)
+{
+	UIApp::setMenu(menu);
 }
 
 /**************************************
 	UIPlatform
 ***************************************/
+
 typedef HashMap<const void*, WeakRef<ViewInstance> > _UiViewInstanceMap;
 SLIB_SAFE_STATIC_GETTER(_UiViewInstanceMap, _UI_getViewInstances);
 

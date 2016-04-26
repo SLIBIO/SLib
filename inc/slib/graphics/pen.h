@@ -31,7 +31,7 @@ class SLIB_EXPORT Pen : public Object
 	SLIB_DECLARE_OBJECT;
 	
 protected:
-	Pen() = default;
+	Pen();
 	
 public:
 	static Ref<Pen> getDefault();

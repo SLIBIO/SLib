@@ -149,7 +149,7 @@ void ListDetailsView::setColumnWidth(sl_uint32 iCol, sl_real width)
 	}
 }
 
-Alignments ListDetailsView::getHeaderAlignment(sl_uint32 iCol)
+Alignment ListDetailsView::getHeaderAlignment(sl_uint32 iCol)
 {
 	MutexLocker lock(m_columns.getLocker());
 	if (iCol < m_columns.getCount()) {
@@ -159,7 +159,7 @@ Alignments ListDetailsView::getHeaderAlignment(sl_uint32 iCol)
 	return Alignment::Center;
 }
 
-void ListDetailsView::setHeaderAlignment(sl_uint32 iCol, Alignments align)
+void ListDetailsView::setHeaderAlignment(sl_uint32 iCol, Alignment align)
 {
 	MutexLocker lock(m_columns.getLocker());
 	if (iCol < m_columns.getCount()) {
@@ -169,7 +169,7 @@ void ListDetailsView::setHeaderAlignment(sl_uint32 iCol, Alignments align)
 	}
 }
 
-Alignments ListDetailsView::getColumnAlignment(sl_uint32 iCol)
+Alignment ListDetailsView::getColumnAlignment(sl_uint32 iCol)
 {
 	MutexLocker lock(m_columns.getLocker());
 	if (iCol < m_columns.getCount()) {
@@ -179,7 +179,7 @@ Alignments ListDetailsView::getColumnAlignment(sl_uint32 iCol)
 	return Alignment::Center;
 }
 
-void ListDetailsView::setColumnAlignment(sl_uint32 iCol, Alignments align)
+void ListDetailsView::setColumnAlignment(sl_uint32 iCol, Alignment align)
 {
 	MutexLocker lock(m_columns.getLocker());
 	if (iCol < m_columns.getCount()) {

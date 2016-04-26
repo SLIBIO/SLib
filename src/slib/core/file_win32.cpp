@@ -395,18 +395,18 @@ FileAttributes File::getAttributes(const String& _filePath)
 {
 	String16 filePath = _filePath;
 	if (filePath.isEmpty()) {
-		return -1;
+		return FileAttributes::NotExist;
 	}
 	DWORD attr = ::GetFileAttributesW((LPCWSTR)(filePath.getData()));
 	if (attr == -1) {
-		return -1;
+		return FileAttributes::NotExist;
 	} else {
 		int ret = 0;
 		if (attr & FILE_ATTRIBUTE_DIRECTORY) {
-			ret |= FileAttribute::Directory;
+			ret |= FileAttributes::Directory;
 		}
 		if (attr & FILE_ATTRIBUTE_HIDDEN) {
-			ret |= FileAttribute::Hidden;
+			ret |= FileAttributes::Hidden;
 		}
 		return ret;
 	}

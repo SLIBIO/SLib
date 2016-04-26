@@ -15,9 +15,9 @@ public:
 	sl_uint64 low;
 
 public:
-	Uint128() = default;
+	SLIB_INLINE Uint128() = default;
 
-	Uint128(const Uint128& num) = default;;
+	SLIB_INLINE Uint128(const Uint128& num) = default;;
 
 	Uint128(sl_uint64 num);
 
@@ -54,7 +54,7 @@ public:
 	void makeBitwiseNot();
 
 public:
-	Uint128& operator=(const Uint128& other) = default;
+	SLIB_INLINE Uint128& operator=(const Uint128& other) = default;
 	
 	Uint128& operator=(sl_uint64 num);
 

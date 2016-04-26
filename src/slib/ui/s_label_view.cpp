@@ -31,12 +31,12 @@ void SLabelView::setTextColor(const Color& color)
 	invalidate();
 }
 
-Alignments SLabelView::getTextAlignment()
+Alignment SLabelView::getTextAlignment()
 {
 	return m_textAlignment;
 }
 
-void SLabelView::setTextAlignment(Alignments align)
+void SLabelView::setTextAlignment(Alignment align)
 {
 	m_textAlignment = align;
 	invalidate();

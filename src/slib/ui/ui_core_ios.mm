@@ -99,13 +99,12 @@ Ref<Screen> UI::getFocusedScreen()
 	return getPrimaryScreen();
 }
 
-sl_bool UI::isUIThread()
+sl_bool UI::isUiThread()
 {
 	return [NSThread isMainThread];
 }
 
-
-void UI::runOnUIThread(const Ref<Runnable>& _callback)
+void UI::dispatchToUiThread(const Ref<Runnable>& _callback)
 {
     Ref<Runnable> callback = _callback;
 	if (callback.isNotNull()) {
@@ -115,122 +114,25 @@ void UI::runOnUIThread(const Ref<Runnable>& _callback)
 	}
 }
 
-void UI::runLoop()
+void UIPlatform::runLoop(sl_uint32 level)
+{
+	CFRunLoopRun();
+}
+
+void UIPlatform::quitLoop()
+{
+	CFRunLoopStop(CFRunLoopGetCurrent());
+}
+
+void UIPlatform::runApp()
 {
 	@autoreleasepool {
 		UIApplicationMain(0, nil, nil, NSStringFromClass([_slib_iOS_AppDelegate class]));
 	}
 }
 
-void UI::quitLoop()
+void UIPlatform::quitApp()
 {
-}
-
-void UI::showAlert(const AlertParam& param)
-{
-	AlertType type = param.type;
-	NSString* caption = Apple::getNSStringFromString(param.caption);
-	NSString* text = Apple::getNSStringFromString(param.text);
-	NSString* titleOk = Apple::getNSStringFromString(param.titleOk);
-	if ([titleOk length] == 0) {
-		titleOk = @"OK";
-	}
-	NSString* titleCancel = Apple::getNSStringFromString(param.titleCancel);
-	if ([titleCancel length] == 0) {
-		titleCancel = @"Cancel";
-	}
-	NSString* titleYes = Apple::getNSStringFromString(param.titleYes);
-	if ([titleYes length] == 0) {
-		titleYes = @"Yes";
-	}
-	NSString* titleNo = Apple::getNSStringFromString(param.titleNo);
-	if ([titleNo length] == 0) {
-		titleNo = @"No";
-	}
-	Ref<Runnable> onOk = param.onOk;
-	Ref<Runnable> onCancel = param.onCancel;
-	Ref<Runnable> onYes = param.onYes;
-	Ref<Runnable> onNo = param.onNo;
-	
-	dispatch_async(dispatch_get_main_queue(), ^{
-		
-		UIAlertController* alert = [UIAlertController alertControllerWithTitle:caption message:text preferredStyle:UIAlertControllerStyleAlert];
-		if (type == AlertType::OkCancel) {
-			UIAlertAction* actionOK = [UIAlertAction actionWithTitle:titleOk style:UIAlertActionStyleDefault handler:
-									   ^(UIAlertAction *) {
-										   [alert dismissViewControllerAnimated:YES completion:nil];
-										   if (onOk.isNotNull()) {
-											   onOk->run();
-										   }
-									   }];
-			UIAlertAction* actionCancel = [UIAlertAction actionWithTitle:titleCancel style:UIAlertActionStyleCancel handler:
-										   ^(UIAlertAction *) {
-											   [alert dismissViewControllerAnimated:YES completion:nil];
-											   if (onCancel.isNotNull()) {
-												   onCancel->run();
-											   }
-										   }];
-			[alert addAction:actionOK];
-			[alert addAction:actionCancel];
-		} else if (type == AlertType::YesNo) {
-			UIAlertAction* actionYes = [UIAlertAction actionWithTitle:titleYes style:UIAlertActionStyleDefault handler:
-									   ^(UIAlertAction *) {
-										   [alert dismissViewControllerAnimated:YES completion:nil];
-										   if (onYes.isNotNull()) {
-											   onYes->run();
-										   }
-									   }];
-			UIAlertAction* actionNo = [UIAlertAction actionWithTitle:titleNo style:UIAlertActionStyleDestructive handler:
-										   ^(UIAlertAction *) {
-											   [alert dismissViewControllerAnimated:YES completion:nil];
-											   if (onNo.isNotNull()) {
-												   onNo->run();
-											   }
-										   }];
-			[alert addAction:actionYes];
-			[alert addAction:actionNo];
-		} else if (type == AlertType::YesNoCancel) {
-			UIAlertAction* actionYes = [UIAlertAction actionWithTitle:titleYes style:UIAlertActionStyleDefault handler:
-										^(UIAlertAction *) {
-											[alert dismissViewControllerAnimated:YES completion:nil];
-											if (onYes.isNotNull()) {
-												onYes->run();
-											}
-										}];
-			UIAlertAction* actionNo = [UIAlertAction actionWithTitle:titleNo style:UIAlertActionStyleDestructive handler:
-									   ^(UIAlertAction *) {
-										   [alert dismissViewControllerAnimated:YES completion:nil];
-										   if (onNo.isNotNull()) {
-											   onNo->run();
-										   }
-									   }];
-			UIAlertAction* actionCancel = [UIAlertAction actionWithTitle:titleCancel style:UIAlertActionStyleCancel handler:
-										   ^(UIAlertAction *) {
-											   [alert dismissViewControllerAnimated:YES completion:nil];
-											   if (onCancel.isNotNull()) {
-												   onCancel->run();
-											   }
-										   }];
-			[alert addAction:actionYes];
-			[alert addAction:actionNo];
-			[alert addAction:actionCancel];
-		} else {
-			UIAlertAction* actionOK = [UIAlertAction actionWithTitle:titleOk style:UIAlertActionStyleCancel handler:
-									   ^(UIAlertAction *) {
-										   [alert dismissViewControllerAnimated:YES completion:nil];
-										   if (onOk.isNotNull()) {
-											   onOk->run();
-										   }
-									   }];
-			[alert addAction:actionOK];
-		}
-		
-		UIWindow* window = UIPlatform::getKeyWindow();
-		if (window != nil) {
-			UIViewController* rootController = [window rootViewController];
-			[rootController presentViewController:alert animated:YES completion:nil];
-		}
-	});
 }
 
 UIColor* UIPlatform::getUIColorFromColor(const Color& color)

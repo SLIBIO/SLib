@@ -174,6 +174,22 @@ enum class Keycode
 	ContextMenu = 0xF3
 };
 
+class Modifiers
+{
+	SLIB_DECLARE_FLAGS(Modifiers)
+public:
+	enum {
+		Mask = 0xFFFF0000,
+		
+		Control = 0x00010000,
+		Alt = 0x00020000,
+		Option = Alt,
+		Shift = 0x00040000,
+		Windows = 0x00080000,
+		Command = Windows
+	};
+};
+
 enum class BoundShape
 {
 	Rectangle = 0,
@@ -202,6 +218,20 @@ enum class RedrawMode
 {
     Continuously = 0,
     WhenDirty = 1
+};
+
+class DialogResult
+{
+	SLIB_DECLARE_PRIMITIVE_WRAPPER(int, DialogResult)
+public:
+	SLIB_INLINE DialogResult() = default;
+	
+	enum {
+		Ok = 0,
+		Yes = 0,
+		No = 1,
+		Cancel = 2
+	};
 };
 
 SLIB_UI_NAMESPACE_END

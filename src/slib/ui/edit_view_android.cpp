@@ -53,7 +53,7 @@ public:
 		JniLocal<jstring> jtext = Jni::getJniString(m_text);
 		_JAndroidEditView::setText.callBoolean(sl_null, handle, jtext.get());
 		_JAndroidEditView::setBorder.callBoolean(sl_null, handle, m_flagBorder);
-		_JAndroidEditView::setAlignment.callBoolean(sl_null, handle, m_textAlignment);
+		_JAndroidEditView::setAlignment.callBoolean(sl_null, handle, m_textAlignment.value);
 		JniLocal<jstring> jhintText = Jni::getJniString(m_hintText);
 		_JAndroidEditView::setHintText.callBoolean(sl_null, handle, jhintText.get());
 		_JAndroidEditView::setReadOnly.callBoolean(sl_null, handle, m_flagReadOnly);
@@ -151,7 +151,7 @@ void EditView::setBorder(sl_bool flag)
 	m_flagBorder = flag;
 }
 
-Alignments EditView::getTextAlignment()
+Alignment EditView::getTextAlignment()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -160,11 +160,11 @@ Alignments EditView::getTextAlignment()
 	return m_textAlignment;
 }
 
-void EditView::setTextAlignment(Alignments align)
+void EditView::setTextAlignment(Alignment align)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		_JAndroidEditView::setAlignment.callBoolean(sl_null, handle, align);
+		_JAndroidEditView::setAlignment.callBoolean(sl_null, handle, align.value);
 	}
 	m_textAlignment = align;
 }

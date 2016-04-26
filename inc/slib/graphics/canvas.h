@@ -70,7 +70,7 @@ public:
 
 	virtual void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color) = 0;
 	
-	void drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignments alignment);
+	void drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment);
 	
 	
 	virtual void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& pen) = 0;
@@ -171,7 +171,7 @@ public:
 
 	void draw(sl_real xDst, sl_real yDst, const Ref<Drawable>& drawable);
 	
-	void draw(const Rectangle& rectDst, const Ref<Drawable>& src, ScaleMode scaleMode, Alignments alignment);
+	void draw(const Rectangle& rectDst, const Ref<Drawable>& src, ScaleMode scaleMode, Alignment alignment);
 	
 protected:
 	SafeWeakRef<GraphicsContext> m_context;

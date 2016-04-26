@@ -3,6 +3,7 @@
 
 #include "definition.h"
 
+#include "new.h"
 #include "object.h"
 #include "iterator.h"
 #include "array.h"
@@ -698,11 +699,8 @@ template <class T, class COMPARE>
 CList<T, COMPARE>::CList(sl_size count)
 {
 	if (count > 0) {
-		T* data = (T*)(Base::createMemory(count * sizeof(T)));
+		T* data = New<T>::create(count);
 		if (data) {
-			for (sl_size i = 0; i < count; i++) {
-				new (data + i) T();
-			}
 			m_data = data;
 			m_count = count;
 			m_capacity = count;
@@ -721,11 +719,8 @@ CList<T, COMPARE>::CList(sl_size count, sl_size capacity)
 		capacity = count;
 	}
 	if (capacity > 0) {
-		T* data = (T*)(Base::createMemory(capacity * sizeof(T)));
+		T* data = New<T>::create(capacity);
 		if (data) {
-			for (sl_size i = 0; i < count; i++) {
-				new (data + i) T();
-			}
 			m_data = data;
 			m_count = count;
 			m_capacity = capacity;
@@ -741,11 +736,8 @@ template <class T, class COMPARE>
 CList<T, COMPARE>::CList(const T* values, sl_size count)
 {
 	if (count > 0) {
-		T* data = (T*)(Base::createMemory(count * sizeof(T)));
+		T* data = New<T>::create(values, count);
 		if (data) {
-			for (sl_size i = 0; i < count; i++) {
-				new (data + i) T(values[i]);
-			}
 			m_data = data;
 			m_count = count;
 			m_capacity = count;
@@ -762,11 +754,8 @@ template <class _T>
 CList<T, COMPARE>::CList(const _T* values, sl_size count)
 {
 	if (count > 0) {
-		T* data = (T*)(Base::createMemory(count * sizeof(T)));
+		T* data = New<T>::create(values, count);
 		if (data) {
-			for (sl_size i = 0; i < count; i++) {
-				new (data + i) T(values[i]);
-			}
 			m_data = data;
 			m_count = count;
 			m_capacity = count;
@@ -781,13 +770,7 @@ CList<T, COMPARE>::CList(const _T* values, sl_size count)
 template <class T, class COMPARE>
 CList<T, COMPARE>::~CList()
 {
-	if (m_data) {
-		sl_size n = m_count;
-		for (sl_size i = 0; i < n; i++) {
-			(m_data + i)->~T();
-		}
-		Base::freeMemory(m_data);
-	}
+	New<T>::free(m_data, m_count);
 }
 
 template <class T, class COMPARE>
@@ -868,7 +851,7 @@ CList<T, COMPARE>* CList<T, COMPARE>::createFromElements(const _T* values, sl_si
 template <class T, class COMPARE>
 CList<T, COMPARE>* CList<T, COMPARE>::createFromElement(const T& value)
 {
-	CList<T, COMPARE>* ret = create(1);
+	CList<T, COMPARE>* ret = create(0, 1);
 	if (ret) {
 		if (ret->add_NoLock(value)) {
 			return ret;
@@ -1765,13 +1748,7 @@ sl_bool CList<T, COMPARE>::_setCountInner(sl_size count)
 		return sl_true;
 	}
 	if (count < oldCount) {
-		T* data = m_data + count;
-		sl_size n = oldCount - count;
-		while (n) {
-			data->~T();
-			data++;
-			n--;
-		}
+		New<T>::destructor(m_data + count, oldCount - count);
 		m_count = count;
 	}
 	if (m_capacity < count) {
@@ -1814,13 +1791,7 @@ sl_bool CList<T, COMPARE>::_setCountInner(sl_size count)
 		}
 	}
 	if (count > oldCount) {
-		T* data = m_data + oldCount;
-		sl_size n = count - oldCount;
-		while (n) {
-			new (data) T();
-			data++;
-			n--;
-		}
+		New<T>::constructor(m_data + oldCount, count - oldCount);
 		m_count = count;
 	}
 	return sl_true;

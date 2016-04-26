@@ -23,8 +23,8 @@ SLIB_UI_NAMESPACE_END
 }
 @end
 
-
 SLIB_UI_NAMESPACE_BEGIN
+
 class _OSX_Window : public WindowInstance
 {
 public:
@@ -904,7 +904,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::_OSX_Window> window = m_window;
 	if (window.isNotNull()) {
-		slib::UI::runOnUIThread(SLIB_CALLBACK_REF(slib::_OSX_Window, release, window));
+		slib::UI::dispatchToUiThread(SLIB_CALLBACK_REF(slib::_OSX_Window, release, window));
 	}
 }
 
@@ -993,6 +993,20 @@ NSWindow* UIPlatform::getWindowHandle(WindowInstance* instance)
 	} else {
 		return nil;
 	}
+}
+
+NSWindow* UIPlatform::getWindowHandle(Window* window)
+{
+	if (window) {
+		Ref<WindowInstance> instance = window->getWindowInstance();
+		if (instance.isNotNull()) {
+			_OSX_Window* _instance = (_OSX_Window*)(instance.ptr);
+			if (_instance) {
+				return _instance->m_window;
+			}
+		}
+	}
+	return nil;
 }
 
 SLIB_UI_NAMESPACE_END

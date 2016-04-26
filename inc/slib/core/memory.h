@@ -15,7 +15,7 @@ class CMemory : public CArray<sl_uint8>
 	SLIB_DECLARE_OBJECT
 	
 protected:
-	CMemory() = default;
+	CMemory();
 	
 public:
 	CMemory(sl_size count);
