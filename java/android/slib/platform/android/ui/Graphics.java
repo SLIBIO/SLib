@@ -5,6 +5,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.graphics.Rect;
 
 public class Graphics {
 
@@ -30,6 +31,11 @@ public class Graphics {
 	
 	public void restore() {
 		canvas.restore();
+	}
+	
+	public Rect getClipBounds()
+	{
+		return canvas.getClipBounds();
 	}
 	
 	public void clipToRectangle(float left, float top, float right, float bottom) {

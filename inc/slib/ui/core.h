@@ -17,12 +17,15 @@ class Window;
 class Screen;
 class Cursor;
 class Menu;
+class UIApp;
+class Font;
 
 class SLIB_EXPORT UI
 {
 public:
-	// Graphics
-	static void setDefaultFontName(const String& fontName);
+	static Ref<Font> getDefaultFont();
+
+	static void setDefaultFont(const Ref<Font>& font);
 
 	static Size getFontTextSize(const Ref<Font>& font, const String& text);
 	
@@ -135,6 +138,8 @@ public:
 	static void quitApp();
 
 	// App related
+	static Ref<UIApp> getApp();
+	
 	static Ref<Window> getMainWindow();
 
 	static void setMainWindow(const Ref<Window>& window);

@@ -33,7 +33,6 @@ public:
 	
 	virtual void loadHTML(const String& html, const String& baseURL);
 	
-	
 	sl_bool isOfflineContent();
 	
 	String getOriginURL();
@@ -41,7 +40,6 @@ public:
 	String getURL();
 	
 	String getPageTitle();
-	
 	
 	virtual void goBack();
 
@@ -56,21 +54,42 @@ public:
 public:
 	SLIB_PTR_PROPERTY(IWebViewListener, Listener)
 	
-public:
+protected:
 	virtual void onStartLoad(const String& url);
 	
 	virtual void onFinishLoad(const String& url, sl_bool flagFailed);
 	
 	virtual void onMessageFromJavaScript(const String& msg, const String& param);
 
-protected:
 	// override
-	Ref<ViewInstance> createInstance(ViewInstance* parent);
+	void onResize(sl_real width, sl_real height);
 	
+public:
 	// override
-	void onResize();
+	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+
+	void dispatchStartLoad(const String& url);
 	
-	void _load();
+	void dispatchFinishLoad(const String& url, sl_bool flagFailed);
+	
+	void dispatchMessageFromJavaScript(const String& msg, const String& param);
+
+private:
+	void _refreshSize_NW();
+
+	void _load_NW();
+	
+	String _getURL_NW();
+	
+	String _getPageTitle_NW();
+	
+	void _goBack_NW();
+	
+	void _goForward_NW();
+	
+	void _reload_NW();
+	
+	void _runJavaScript_NW(const String& script);
 	
 protected:
 	SafeString m_urlOrigin;

@@ -4,8 +4,6 @@
 
 #include "view_android.h"
 
-#include "../../../inc/slib/ui/view_group.h"
-
 SLIB_UI_NAMESPACE_BEGIN
 
 void JNICALL _AndroidView_nativeOnDraw(JNIEnv* env, jobject _this, jlong jinstance, jobject jcanvas)
@@ -63,6 +61,7 @@ jboolean JNICALL _AndroidView_nativeOnTouchEvent(JNIEnv* env, jobject _this, jlo
 						pts[i].point.x = _JAndroidTouchPoint::x.get(jpt);
 						pts[i].point.y = _JAndroidTouchPoint::y.get(jpt);
 						pts[i].pressure = _JAndroidTouchPoint::pressure.get(jpt);
+						pts[i].phase = (TouchPhase)(_JAndroidTouchPoint::phase.get(jpt));
 					}
 				}
 				Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points);
@@ -323,13 +322,13 @@ void Android_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
 /******************************************
 				View
  ******************************************/
-Ref<ViewInstance> View::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> View::createGenericInstance(ViewInstance* _parent)
 {
 	Ref<Android_ViewInstance> ret;
 	Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 	if (parent) {
 		JniLocal<jobject> handle;
-		if (isGroup()) {
+		if (m_flagCreatingChildInstances) {
 			handle = _JAndroidView::createGroup.callObject(sl_null, parent->getContext());
 		} else {
 			handle = _JAndroidView::createGeneric.callObject(sl_null, parent->getContext());

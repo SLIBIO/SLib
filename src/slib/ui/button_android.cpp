@@ -18,7 +18,7 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidButton, "slib/platform/android/ui/view/UiButton")
 
 SLIB_JNI_END_CLASS
 
-Ref<ViewInstance> Button::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> Button::createNativeWidget(ViewInstance* _parent)
 {
 	Ref<Android_ViewInstance> ret;
 	Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
@@ -29,7 +29,7 @@ Ref<ViewInstance> Button::createInstance(ViewInstance* _parent)
 			jobject handle = ret->getHandle();
 			JniLocal<jstring> jtext = Jni::getJniString(m_text);
 			_JAndroidButton::setText.callBoolean(sl_null, handle, jtext.get());
-			Ref<Font> font = m_font;
+			Ref<Font> font = getFont();
 			Ref<FontInstance> fontInstance;
 			jobject jfont = UIPlatform::getNativeFont(font.ptr, fontInstance);
 			if (jfont) {
@@ -40,29 +40,20 @@ Ref<ViewInstance> Button::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-String Button::getText()
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		m_text = _JAndroidButton::getText.callString(sl_null, handle);
-	}
-	return m_text;
-}
-
-void Button::setText(const String& text)
+void Button::_setText_NW(const String& text)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		JniLocal<jstring> jstr = Jni::getJniString(text);
-		if (_JAndroidButton::setText.callBoolean(sl_null, handle, jstr.get()) != 0) {
-			m_text = text;
-		}
-	} else {
-		m_text = text;
+		_JAndroidButton::setText.callBoolean(sl_null, handle, jstr.get());
 	}
 }
 
-void Button::setFont(const Ref<Font>& font)
+void Button::_setDefaultButton_NW(sl_bool flag)
+{
+}
+
+void Button::_setFont_NW(const Ref<Font>& font)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -72,11 +63,6 @@ void Button::setFont(const Ref<Font>& font)
 			_JAndroidButton::setFont.callBoolean(sl_null, handle, jfont);
 		}
 	}
-	m_font = font;
-}
-
-void Button::setDefaultButton(sl_bool flag)
-{
 }
 
 SLIB_UI_NAMESPACE_END

@@ -213,6 +213,34 @@ sl_bool RectangleT<T, FT>::containsRectangle(const RectangleT<T, FT>& other) con
 }
 
 template <class T, class FT>
+sl_bool RectangleT<T, FT>::intersectRectangle(const RectangleT<T, FT>& other, RectangleT<T, FT>* outIntersect) const
+{
+	if (outIntersect) {
+		T _left = SLIB_MAX(left, other.left);
+		T _right = SLIB_MIN(right, other.right);
+		T _top = SLIB_MAX(top, other.top);
+		T _bottom = SLIB_MIN(bottom, other.bottom);
+		outIntersect->left = _left;
+		outIntersect->right = _right;
+		outIntersect->top = _top;
+		outIntersect->bottom = _bottom;
+		return _left <= _right && _top <= _bottom;
+	} else {
+		T _left = SLIB_MAX(left, other.left);
+		T _right = SLIB_MIN(right, other.right);
+		if (_left > _right) {
+			return sl_false;
+		}
+		T _top = SLIB_MAX(top, other.top);
+		T _bottom = SLIB_MIN(bottom, other.bottom);
+		if (_top > _bottom) {
+			return sl_false;
+		}
+		return sl_true;
+	}
+}
+
+template <class T, class FT>
 void RectangleT<T, FT>::setFromPoint(T x, T y)
 {
 	left = right = x;

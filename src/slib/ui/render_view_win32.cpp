@@ -63,7 +63,7 @@ public:
 	}
 };
 
-Ref<ViewInstance> RenderView::createInstance(ViewInstance* parent)
+Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* parent)
 {
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
 	DWORD styleEx = 0;
@@ -103,7 +103,7 @@ Ref<ViewInstance> RenderView::createInstance(ViewInstance* parent)
 	return ret;
 }
 
-void RenderView::setRedrawMode(RedrawMode mode)
+void RenderView::_setRedrawMode_NW(RedrawMode mode)
 {
 	Ref<_Win32_RenderViewInstance> instance = Ref<_Win32_RenderViewInstance>::from(getViewInstance());
 	if (instance.isNotNull()) {
@@ -112,10 +112,9 @@ void RenderView::setRedrawMode(RedrawMode mode)
 			renderer->setRenderingContinuously(mode == RedrawMode::Continuously);
 		}
 	}
-	m_redrawMode = mode;
 }
 
-void RenderView::requestRender()
+void RenderView::_requestRender_NW()
 {
 	Ref<_Win32_RenderViewInstance> instance = Ref<_Win32_RenderViewInstance>::from(getViewInstance());
 	if (instance.isNotNull()) {

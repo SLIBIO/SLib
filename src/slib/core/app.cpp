@@ -7,7 +7,7 @@ SLIB_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(Application, Object)
 
-SLIB_SAFE_STATIC_REF(SafeRef<Application>, _g_app);
+SLIB_SAFE_STATIC_REF(SafeWeakRef<Application>, _g_app);
 
 Ref<Application> Application::getApp()
 {
@@ -17,11 +17,6 @@ Ref<Application> Application::getApp()
 void Application::setApp(Application* app)
 {
 	_g_app = app;
-}
-
-void Application::clearApp()
-{
-	_g_app.setNull();
 }
 
 void Application::run(const String& param)

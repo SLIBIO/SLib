@@ -52,15 +52,15 @@ public:
 	{
 		JniLocal<jstring> jtext = Jni::getJniString(m_text);
 		_JAndroidEditView::setText.callBoolean(sl_null, handle, jtext.get());
-		_JAndroidEditView::setBorder.callBoolean(sl_null, handle, m_flagBorder);
+		_JAndroidEditView::setBorder.callBoolean(sl_null, handle, isBorder());
 		_JAndroidEditView::setAlignment.callBoolean(sl_null, handle, m_textAlignment.value);
 		JniLocal<jstring> jhintText = Jni::getJniString(m_hintText);
 		_JAndroidEditView::setHintText.callBoolean(sl_null, handle, jhintText.get());
 		_JAndroidEditView::setReadOnly.callBoolean(sl_null, handle, m_flagReadOnly);
 		_JAndroidEditView::setMultiLine.callBoolean(sl_null, handle, m_flagMultiLine);
 		_JAndroidEditView::setTextColor.callBoolean(sl_null, handle, m_textColor.getARGB());
-		_JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, m_backgroundColor.getARGB());
-		Ref<Font> font = m_font;
+		_JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, getBackgroundColor().getARGB());
+		Ref<Font> font = getFont();
 		Ref<FontInstance> fontInstance;
 		jobject jfont = UIPlatform::getNativeFont(font.ptr, fontInstance);
 		if (jfont) {
@@ -69,7 +69,7 @@ public:
 	}
 };
 
-Ref<ViewInstance> EditView::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> EditView::createNativeWidget(ViewInstance* _parent)
 {
 	Ref<Android_ViewInstance> ret;
 	Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
@@ -84,7 +84,7 @@ Ref<ViewInstance> EditView::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-Ref<ViewInstance> PasswordView::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> PasswordView::createNativeWidget(ViewInstance* _parent)
 {
 	Ref<Android_ViewInstance> ret;
 	Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
@@ -99,7 +99,7 @@ Ref<ViewInstance> PasswordView::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-Ref<ViewInstance> TextArea::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> TextArea::createNativeWidget(ViewInstance* _parent)
 {
 	Ref<Android_ViewInstance> ret;
 	Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
@@ -114,145 +114,113 @@ Ref<ViewInstance> TextArea::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-String EditView::getText()
+void EditView::_getText_NW()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		m_text = _JAndroidEditView::getText.callString(sl_null, handle);
 	}
-	return m_text;
 }
 
-void EditView::setText(const String& text)
+void EditView::_setText_NW(const String& text)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		JniLocal<jstring> jstr = Jni::getJniString(text);
 		_JAndroidEditView::setText.callBoolean(sl_null, handle, jstr.get());
 	}
-    m_text = text;
 }
 
-sl_bool EditView::isBorder()
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		m_flagBorder = _JAndroidEditView::isBorder.callBoolean(sl_null, handle);
-	}
-	return m_flagBorder;
-}
-
-void EditView::setBorder(sl_bool flag)
+void EditView::_setBorder_NW(sl_bool flag)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		_JAndroidEditView::setBorder.callBoolean(sl_null, handle, flag);
 	}
-	m_flagBorder = flag;
 }
 
-Alignment EditView::getTextAlignment()
+void EditView::_getTextAlignment_NW()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		m_textAlignment = _JAndroidEditView::getAlignment.callInt(sl_null, handle);
 	}
-	return m_textAlignment;
 }
 
-void EditView::setTextAlignment(Alignment align)
+void EditView::_setTextAlignment_NW(Alignment align)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		_JAndroidEditView::setAlignment.callBoolean(sl_null, handle, align.value);
 	}
-	m_textAlignment = align;
 }
 
-String EditView::getHintText()
+void EditView::_getHintText_NW()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		m_hintText = _JAndroidEditView::getHintText.callString(sl_null, handle);
 	}
-	return m_hintText;
 }
 
-void EditView::setHintText(const String& text)
+void EditView::_setHintText_NW(const String& text)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		JniLocal<jstring> jstr = Jni::getJniString(text);
 		_JAndroidEditView::setHintText.callBoolean(sl_null, handle, jstr.get());
 	}
-	m_hintText = text;
 }
 
-sl_bool EditView::isReadOnly()
+void EditView::_isReadOnly_NW()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		m_flagReadOnly = _JAndroidEditView::isReadOnly.callBoolean(sl_null, handle) != 0;
 	}
-	return m_flagReadOnly;
 }
 
-void EditView::setReadOnly(sl_bool flag)
+void EditView::_setReadOnly_NW(sl_bool flag)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		_JAndroidEditView::setReadOnly.callBoolean(sl_null, handle, flag);
 	}
-	m_flagReadOnly = flag;
 }
 
-sl_bool EditView::isMultiLine()
+void EditView::_isMultiLine_NW()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		m_flagMultiLine = _JAndroidEditView::isMultiLine.callBoolean(sl_null, handle) != 0;
 	}
-	return m_flagMultiLine;
 }
 
-void EditView::setMultiLine(sl_bool flag)
+void EditView::_setMultiLine_NW(sl_bool flag)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		_JAndroidEditView::setMultiLine.callBoolean(sl_null, handle, flag);
 	}
-	m_flagMultiLine = flag;
 }
 
-Color EditView::getTextColor()
-{
-	return m_textColor;
-}
-
-void EditView::setTextColor(const Color& color)
+void EditView::_setTextColor_NW(const Color& color)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		_JAndroidEditView::setTextColor.callBoolean(sl_null, handle, color.getARGB());
 	}
-	m_textColor = color;
 }
 
-Color EditView::getBackgroundColor()
-{
-	return m_backgroundColor;
-}
-
-void EditView::setBackgroundColor(const Color& color)
+void EditView::_setBackgroundColor_NW(const Color& color)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		_JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, color.getARGB());
 	}
-	m_backgroundColor = color;
 }
 
-void EditView::setFont(const Ref<Font>& font)
+void EditView::_setFont_NW(const Ref<Font>& font)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -262,7 +230,6 @@ void EditView::setFont(const Ref<Font>& font)
 			_JAndroidEditView::setFont.callBoolean(sl_null, handle, jfont);
 		}
 	}
-	m_font = font;
 }
 
 SLIB_UI_NAMESPACE_END

@@ -25,8 +25,6 @@ public:
 	virtual void onRightButtonClickRow(ListDetailsView* view, sl_uint32 row, const Point& pt);
 	
 	virtual void onDoubleClickRow(ListDetailsView* view, sl_uint32 row, const Point& pt);
-	
-	virtual sl_bool onGetCellText(ListDetailsView* view, sl_uint32 row, sl_uint32 col, String& outText);
 
 };
 
@@ -58,58 +56,46 @@ public:
 public:
 	sl_uint32 getColumnsCount();
 	
-	virtual void setColumnsCount(sl_uint32 nCount);
+	virtual void setColumnsCount(sl_uint32 nCount, sl_bool flagRedraw = sl_true);
 
-	
 	sl_uint32 getRowsCount();
 	
-	virtual void setRowsCount(sl_uint32 nCount);
+	virtual void setRowsCount(sl_uint32 nCount, sl_bool flagRedraw = sl_true);
+
+	virtual String getItemText(sl_uint32 row, sl_uint32 col);
 	
-	
-	String getItemText(sl_uint32 row, sl_uint32 col);
-	
-	virtual void setItemText(sl_uint32 row, sl_uint32 col, const String& text);
-	
+	virtual void setItemText(sl_uint32 row, sl_uint32 col, const String& text, sl_bool flagRedraw = sl_true);
 	
 	String getHeaderText(sl_uint32 col);
 	
-	virtual void setHeaderText(sl_uint32 col, const String& text);
-	
+	virtual void setHeaderText(sl_uint32 col, const String& text, sl_bool flagRedraw = sl_true);
 	
 	sl_real getColumnWidth(sl_uint32 col);
 	
-	virtual void setColumnWidth(sl_uint32 col, sl_real width);
-	
+	virtual void setColumnWidth(sl_uint32 col, sl_real width, sl_bool flagRedraw = sl_true);
 	
 	Alignment getHeaderAlignment(sl_uint32 col);
 	
-	virtual void setHeaderAlignment(sl_uint32 col, Alignment align);
+	virtual void setHeaderAlignment(sl_uint32 col, Alignment align, sl_bool flagRedraw = sl_true);
 	
-
 	Alignment getColumnAlignment(sl_uint32 col);
 	
-	virtual void setColumnAlignment(sl_uint32 col, Alignment align);
-	
+	virtual void setColumnAlignment(sl_uint32 col, Alignment align, sl_bool flagRedraw = sl_true);
 	
 	sl_int32 getSelectedRow();
 	
-	virtual void addRow();
+	virtual void addRow(sl_bool flagRedraw = sl_true);
 	
-	virtual void insertRow(sl_uint32 row);
+	virtual void insertRow(sl_uint32 row, sl_bool flagRedraw = sl_true);
 	
-	virtual void removeRow(sl_uint32 row);
+	virtual void removeRow(sl_uint32 row, sl_bool flagRedraw = sl_true);
 	
-	void removeAllRows();
+	virtual void removeAllRows(sl_bool flagRedraw = sl_true);
 	
-	
-	Ref<Font> getFont();
-	
-	virtual void setFont(const Ref<Font>& font);
-
 public:
 	SLIB_PTR_PROPERTY(IListDetailsViewListener, Listener)
 	
-public:
+protected:
 	virtual void onSelectRow(sl_uint32 row);
 	
 	virtual void onClickRow(sl_uint32 row, const Point& pt);
@@ -118,32 +104,41 @@ public:
 	
 	virtual void onDoubleClickRow(sl_uint32 row, const Point& pt);
 	
-	virtual String onGetCellText(sl_uint32 row, sl_uint32 col);
-	
-protected:
+public:
 	// override
-	Ref<ViewInstance> createInstance(ViewInstance* parent);
+	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
 	
+	void dispatchSelectRow(sl_uint32 row);
+	
+	void dispatchClickRow(sl_uint32 row, const Point& pt);
+	
+	void dispatchRightButtonClickRow(sl_uint32 row, const Point& pt);
+	
+	void dispatchDoubleClickRow(sl_uint32 row, const Point& pt);
+
 protected:
-	void _setHeaderText(sl_uint32 col, const String& text);
+	void _refreshColumnsCount_NW();
 	
-	void _setColumnWidth(sl_uint32 col, sl_real width);
+	void _refreshRowsCount_NW();
 	
-	void _setHeaderAlignment(sl_uint32 col, Alignment align);
+	void _setHeaderText_NW(sl_uint32 col, const String& text);
 	
-	void _setColumnAlignment(sl_uint32 col, Alignment align);
+	void _setColumnWidth_NW(sl_uint32 col, sl_real width);
 	
-	void _refreshColumnsCount();
+	void _setHeaderAlignment_NW(sl_uint32 col, Alignment align);
 	
-	void _refreshRowsCount();
+	void _setColumnAlignment_NW(sl_uint32 col, Alignment align);
+	
+	void _getSelectedRow_NW();
+	
+	// override
+	void _setFont_NW(const Ref<Font>& font);
 
 protected:
 	CList<ListDetailsViewColumn> m_columns;
 	sl_uint32 m_nRows;
 	CList< List<ListDetailsViewCell> > m_cells;
-	
-	SafeRef<Font> m_font;
-	SafeRef<FontInstance> m_fontInstance;
+	sl_int32 m_selectedRow;
 	
 };
 

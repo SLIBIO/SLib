@@ -28,9 +28,9 @@ public:
 	}
 };
 
-Ref<ViewInstance> CheckBox::createInstance(ViewInstance* parent)
+Ref<ViewInstance> CheckBox::createNativeWidget(ViewInstance* parent)
 {
-	String16 text = m_text;
+	String16 text = getText();
 	UINT style = BS_AUTOCHECKBOX | WS_TABSTOP;
 	Ref<_Win32_CheckBoxViewInstance> ret = Win32_ViewInstance::create<_Win32_CheckBoxViewInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
 	if (ret.isNotNull()) {
@@ -40,60 +40,27 @@ Ref<ViewInstance> CheckBox::createInstance(ViewInstance* parent)
 		} else {
 			::SendMessageW(handle, BM_SETCHECK, BST_UNCHECKED, 0);
 		}
-		Ref<Font> font = m_font;
+		Ref<Font> font = getFont();
 		Ref<FontInstance> fontInstance;
 		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
-		m_fontInstance = fontInstance;
+		_setFontInstance(fontInstance);
 	}
 	return ret;
 }
 
-String CheckBox::getText()
-{
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		m_text = Windows::getWindowText(handle);
-	}
-	return m_text;
-}
-
-void CheckBox::setText(const String& text)
-{
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		Windows::setWindowText(handle, text);
-	}
-	m_text = text;
-}
-
-void CheckBox::setFont(const Ref<Font>& font)
-{
-	Ref<FontInstance> fontInstance;
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
-		if (hFont) {
-			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
-		}
-	}
-	m_font = font;
-	m_fontInstance = fontInstance;
-}
-
-sl_bool CheckBox::isChecked()
+void CheckBox::_getChecked_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		LRESULT lr = ::SendMessageW(handle, BM_GETCHECK, 0, 0);
 		m_flagChecked = (lr == BST_CHECKED);
 	}
-	return m_flagChecked;
 }
 
-void CheckBox::setChecked(sl_bool flag)
+void CheckBox::_setChecked_NW(sl_bool flag)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -103,7 +70,6 @@ void CheckBox::setChecked(sl_bool flag)
 			::SendMessageW(handle, BM_SETCHECK, BST_UNCHECKED, 0);
 		}
 	}
-	m_flagChecked = flag;
 }
 
 SLIB_UI_NAMESPACE_END

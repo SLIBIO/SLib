@@ -5,8 +5,6 @@
 
 #include "view.h"
 
-#include "../core/callback.h"
-
 SLIB_UI_NAMESPACE_BEGIN
 
 class EditView;
@@ -28,56 +26,32 @@ public:
 public:
 	String getText();
 	
-	virtual void setText(const String& text);
-
-	
-	sl_bool isBorder();
-	
-	virtual void setBorder(sl_bool flag);
-	
+	virtual void setText(const String& text, sl_bool flagRedraw = sl_true);
 	
 	Alignment getTextAlignment();
 	
-	virtual void setTextAlignment(Alignment align);
-	
+	virtual void setTextAlignment(Alignment align, sl_bool flagRedraw = sl_true);
 	
 	String getHintText();
 	
-	virtual void setHintText(const String& str);
-	
+	virtual void setHintText(const String& str, sl_bool flagRedraw = sl_true);
 	
 	sl_bool isReadOnly();
 	
-	virtual void setReadOnly(sl_bool flag);
+	virtual void setReadOnly(sl_bool flag, sl_bool flagRedraw = sl_true);
 	
-	
-	sl_bool isMultiLine();
+	virtual sl_bool isMultiLine();
 
-	virtual void setMultiLine(sl_bool flag);
-	
+	virtual void setMultiLine(sl_bool flag, sl_bool flagRedraw = sl_true);
 	
 	Color getTextColor();
 	
-	virtual void setTextColor(const Color& color);
-	
-	
-	Color getBackgroundColor();
-	
-	virtual void setBackgroundColor(const Color& color);
-	
-	
-	Ref<Font> getFont();
-	
-	virtual void setFont(const Ref<Font>& font);
+	virtual void setTextColor(const Color& color, sl_bool flagRedraw = sl_true);
 	
 public:
 	SLIB_PTR_PROPERTY(IEditViewListener, Listener)
 	
 	SLIB_REF_PROPERTY(Runnable, EnterAction)
-	
-protected:
-	// override
-	Ref<ViewInstance> createInstance(ViewInstance* parent);
 	
 protected:
 	virtual String onChange(const String& newValue);
@@ -86,25 +60,55 @@ protected:
 	
 public:
 	// override
+	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+	
+	// override
 	void dispatchKeyEvent(UIEvent* ev);
 	
 	String dispatchChange(const String& newValue);
 	
 	void dispatchEnterAction();
+	
+private:
+	void _getText_NW();
+	
+	void _setText_NW(const String& text);
+	
+	void _getTextAlignment_NW();
+	
+	void _setTextAlignment_NW(Alignment align);
+	
+	void _getHintText_NW();
+	
+	void _setHintText_NW(const String& str);
+	
+	void _isReadOnly_NW();
+	
+	void _setReadOnly_NW(sl_bool flag);
+	
+	void _isMultiLine_NW();
+	
+	void _setMultiLine_NW(sl_bool flag);
+	
+	void _setTextColor_NW(const Color& color);
 
+	// override
+	void _setFont_NW(const Ref<Font>& font);
+	
+	// override
+	void _setBorder_NW(sl_bool flag);
+	
+	// override
+	void _setBackgroundColor_NW(const Color& color);
+	
 protected:
 	SafeString m_text;
-	sl_bool m_flagBorder;
 	Alignment m_textAlignment;
 	SafeString m_hintText;
 	sl_bool m_flagReadOnly;
 	sl_bool m_flagMultiLine;
 	Color m_textColor;
-	Color m_backgroundColor;
-	
-	SafeRef<Font> m_font;
-	SafeRef<FontInstance> m_fontInstance;
-	
+
 };
 
 class PasswordView : public EditView
@@ -115,13 +119,15 @@ public:
 	PasswordView();
 	
 public:
+	// override
 	sl_bool isMultiLine();
 	
-	virtual void setMultiLine(sl_bool flag);
+	// override
+	virtual void setMultiLine(sl_bool flag, sl_bool flagRedraw = sl_true);
 
-protected:
-    // override
-	Ref<ViewInstance> createInstance(ViewInstance* parent);
+public:
+	// override
+	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
 	
 };
 
@@ -133,14 +139,16 @@ public:
 	TextArea();
 	
 public:
+	// override
 	sl_bool isMultiLine();
 	
-	virtual void setMultiLine(sl_bool flag);
-	
-protected:
-    // override
-	Ref<ViewInstance> createInstance(ViewInstance* parent);
+	// override
+	void setMultiLine(sl_bool flag, sl_bool flagRedraw = sl_true);
 
+public:
+	// override
+	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+	
 };
 
 SLIB_UI_NAMESPACE_END

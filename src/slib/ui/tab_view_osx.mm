@@ -77,16 +77,18 @@ public:
 			}
 			NSRect rc = [tv contentRect];
 			view->setFrame((sl_real)(rc.origin.x), (sl_real)(rc.origin.y), (sl_real)(rc.size.width), (sl_real)(rc.size.height));
+			view->setParent(this);
 		}
 		if (handle == nil) {
 			handle = [[_Slib_OSX_TabView_EmptyView alloc] init];
 		}
+		[handle setHidden:NO];
 		[item setView:handle];
 	}
 	
 	void __onSelectTab(NSTabView* tv)
 	{
-		onSelectTab((sl_uint32)([tv indexOfTabViewItem:[tv selectedTabViewItem]]));
+		dispatchSelectTab((sl_uint32)([tv indexOfTabViewItem:[tv selectedTabViewItem]]));
 	}
 	
 	void __updateContentViewSize(_Slib_OSX_TabView* tv)
@@ -109,7 +111,7 @@ public:
 	}
 };
 
-Ref<ViewInstance> TabView::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> TabView::createNativeWidget(ViewInstance* _parent)
 {
 	ObjectLocker lock(this);
 	OSX_VIEW_CREATE_INSTANCE_BEGIN
@@ -118,7 +120,7 @@ Ref<ViewInstance> TabView::createInstance(ViewInstance* _parent)
 		[handle setDelegate:handle];
 		((_TabView*)this)->__copyTabs(handle);
 		
-		Ref<Font> font = m_font;
+		Ref<Font> font = getFont();
 		Ref<FontInstance> fontInstance;
 		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
 		[handle setFont:hFont];
@@ -127,7 +129,7 @@ Ref<ViewInstance> TabView::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-void TabView::_refreshTabsCount()
+void TabView::_refreshTabsCount_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_OSX_TabView class]]) {
@@ -136,7 +138,11 @@ void TabView::_refreshTabsCount()
 	}
 }
 
-void TabView::_setTabLabel(sl_uint32 index, const String& text)
+void TabView::_refreshSize_NW()
+{
+}
+
+void TabView::_setTabLabel_NW(sl_uint32 index, const String& text)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTabView class]]) {
@@ -148,7 +154,7 @@ void TabView::_setTabLabel(sl_uint32 index, const String& text)
 	}
 }
 
-void TabView::_setTabContentView(sl_uint32 index, const Ref<View>& view)
+void TabView::_setTabContentView_NW(sl_uint32 index, const Ref<View>& view)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_OSX_TabView class]]) {
@@ -157,17 +163,16 @@ void TabView::_setTabContentView(sl_uint32 index, const Ref<View>& view)
 	}
 }
 
-sl_uint32 TabView::getSelectedTabIndex()
+void TabView::_getSelectedTabIndex_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTabView class]]) {
 		NSTabView* tv = (NSTabView*)handle;
 		m_indexSelected = (sl_uint32)([tv indexOfTabViewItem:[tv selectedTabViewItem]]);
 	}
-	return m_indexSelected;
 }
 
-void TabView::_selectTab(sl_uint32 index)
+void TabView::_selectTab_NW(sl_uint32 index)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTabView class]]) {
@@ -176,7 +181,7 @@ void TabView::_selectTab(sl_uint32 index)
 	}
 }
 
-Size TabView::getContentViewSize()
+Size TabView::_getContentViewSize_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTabView class]]) {
@@ -190,7 +195,7 @@ Size TabView::getContentViewSize()
 	return Size::zero();
 }
 
-void TabView::setFont(const Ref<Font>& font)
+void TabView::_setFont_NW(const Ref<Font>& font)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTabView class]]) {
@@ -199,12 +204,6 @@ void TabView::setFont(const Ref<Font>& font)
 		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
 		[tv setFont:hFont];
 	}
-	m_font = font;
-}
-
-void TabView::onResize()
-{
-	View::onResize();
 }
 
 SLIB_UI_NAMESPACE_END

@@ -84,7 +84,7 @@ public:
 	{
 		sl_uint32 index = __getSelectedIndex(hWnd);
 		m_indexSelected = index;
-		onSelectTab(index);
+		dispatchSelectTab(index);
 		__applyTabContents(hWnd, viewInstance);
 	}
 
@@ -124,10 +124,10 @@ public:
 	Rectangle __getClientBounds(HWND hWnd)
 	{
 		RECT rc;
-		rc.left = 0;
+		rc.left = -2;
 		rc.top = 0;
 		rc.right = (int)(getWidth());
-		rc.bottom = (int)(getHeight());
+		rc.bottom = (int)(getHeight()) + 1;
 		::SendMessageW(hWnd, TCM_ADJUSTRECT, FALSE, (LPARAM)(&rc));
 		return Rectangle((sl_real)(rc.left), (sl_real)(rc.top), (sl_real)(rc.right), (sl_real)(rc.bottom));
 	}
@@ -167,7 +167,7 @@ public:
 	}
 };
 
-Ref<ViewInstance> TabView::createInstance(ViewInstance* parent)
+Ref<ViewInstance> TabView::createNativeWidget(ViewInstance* parent)
 {
 	DWORD style = 0;
 	DWORD styleEx = WS_EX_CONTROLPARENT;
@@ -184,20 +184,20 @@ Ref<ViewInstance> TabView::createInstance(ViewInstance* parent)
 
 		HWND handle = ret->getHandle();
 
-		Ref<Font> font = m_font;
+		Ref<Font> font = getFont();
 		Ref<FontInstance> fontInstance;
 		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
-		m_fontInstance = fontInstance;
+		_setFontInstance(fontInstance);
 
 		((_TabView*)this)->__copyTabs(handle, ret.ptr);
 	}
 	return ret;
 }
 
-void TabView::_refreshTabsCount()
+void TabView::_refreshTabsCount_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -205,7 +205,15 @@ void TabView::_refreshTabsCount()
 	}
 }
 
-void TabView::_setTabLabel(sl_uint32 index, const String& text)
+void TabView::_refreshSize_NW()
+{
+	HWND handle = UIPlatform::getViewHandle(this);
+	if (handle) {
+		((_TabView*)this)->__applyClientBounds(handle);
+	}
+}
+
+void TabView::_setTabLabel_NW(sl_uint32 index, const String& text)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -213,7 +221,7 @@ void TabView::_setTabLabel(sl_uint32 index, const String& text)
 	}
 }
 
-void TabView::_setTabContentView(sl_uint32 index, const Ref<View>& view)
+void TabView::_setTabContentView_NW(sl_uint32 index, const Ref<View>& view)
 {
 	Ref<ViewInstance> viewInstance = getViewInstance();
 	if (viewInstance.isNotNull()) {
@@ -222,16 +230,15 @@ void TabView::_setTabContentView(sl_uint32 index, const Ref<View>& view)
 	}
 }
 
-sl_uint32 TabView::getSelectedTabIndex()
+void TabView::_getSelectedTabIndex_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		m_indexSelected = (sl_uint32)(((_TabView*)this)->__getSelectedIndex(handle));
 	}
-	return m_indexSelected;
 }
 
-void TabView::_selectTab(sl_uint32 index)
+void TabView::_selectTab_NW(sl_uint32 index)
 {
 	Ref<ViewInstance> viewInstance = getViewInstance();
 	if (viewInstance.isNotNull()) {
@@ -240,7 +247,7 @@ void TabView::_selectTab(sl_uint32 index)
 	}
 }
 
-Size TabView::getContentViewSize()
+Size TabView::_getContentViewSize_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -249,7 +256,7 @@ Size TabView::getContentViewSize()
 	return Size::zero();
 }
 
-void TabView::setFont(const Ref<Font>& font)
+void TabView::_setFont_NW(const Ref<Font>& font)
 {
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
@@ -259,17 +266,7 @@ void TabView::setFont(const Ref<Font>& font)
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
 	}
-	m_font = font;
-	m_fontInstance = fontInstance;
-}
-
-void TabView::onResize()
-{
-	View::onResize();
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		((_TabView*)this)->__applyClientBounds(handle);
-	}
+	_setFontInstance(fontInstance);
 }
 
 SLIB_UI_NAMESPACE_END

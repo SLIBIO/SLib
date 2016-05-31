@@ -134,7 +134,7 @@ public:
 	FileDialog(const FileDialog& other);
 	
 public:
-	DialogResult run();
+	sl_bool run();
 
 	// To specify multiple filter patterns for a single display string, use a semicolon to separate the patterns (for example, "*.TXT;*.DOC;*.BAK").
 	void addFilter(const String& title, const String& patterns);
@@ -158,10 +158,10 @@ public:
 	List<String> selectedPaths;
 	
 public:
-	DialogResult _run();
+	sl_bool _run();
 	
 protected:
-	DialogResult _runOnUiThread();
+	sl_bool _runOnUiThread();
 	
 };
 

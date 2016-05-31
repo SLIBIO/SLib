@@ -103,7 +103,7 @@ public:
 	
 };
 
-Ref<ViewInstance> ListDetailsView::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> ListDetailsView::createNativeWidget(ViewInstance* _parent)
 {
 	_Slib_OSX_ListDetailsView_TableView* table = nil;
 	ObjectLocker lock(this);
@@ -117,7 +117,7 @@ Ref<ViewInstance> ListDetailsView::createInstance(ViewInstance* _parent)
 			[table setDelegate:handle];
 			[table setDataSource:handle];
 			
-			Ref<Font> font = m_font;
+			Ref<Font> font = getFont();
 			Ref<FontInstance> fontInstance;
 			NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
 			handle->m_font = hFont;
@@ -141,7 +141,7 @@ Ref<ViewInstance> ListDetailsView::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-void ListDetailsView::_refreshColumnsCount()
+void ListDetailsView::_refreshColumnsCount_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListDetailsView class]]) {
@@ -151,7 +151,7 @@ void ListDetailsView::_refreshColumnsCount()
 	}
 }
 
-void ListDetailsView::_refreshRowsCount()
+void ListDetailsView::_refreshRowsCount_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListDetailsView class]]) {
@@ -160,7 +160,7 @@ void ListDetailsView::_refreshRowsCount()
 	}
 }
 
-void ListDetailsView::_setHeaderText(sl_uint32 iCol, const String& text)
+void ListDetailsView::_setHeaderText_NW(sl_uint32 iCol, const String& text)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListDetailsView class]]) {
@@ -172,7 +172,7 @@ void ListDetailsView::_setHeaderText(sl_uint32 iCol, const String& text)
 	}
 }
 
-void ListDetailsView::_setColumnWidth(sl_uint32 iCol, sl_real width)
+void ListDetailsView::_setColumnWidth_NW(sl_uint32 iCol, sl_real width)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListDetailsView class]]) {
@@ -184,7 +184,7 @@ void ListDetailsView::_setColumnWidth(sl_uint32 iCol, sl_real width)
 	}
 }
 
-void ListDetailsView::_setHeaderAlignment(sl_uint32 iCol, Alignment align)
+void ListDetailsView::_setHeaderAlignment_NW(sl_uint32 iCol, Alignment align)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListDetailsView class]]) {
@@ -196,7 +196,7 @@ void ListDetailsView::_setHeaderAlignment(sl_uint32 iCol, Alignment align)
 	}
 }
 
-void ListDetailsView::_setColumnAlignment(sl_uint32 iCol, Alignment align)
+void ListDetailsView::_setColumnAlignment_NW(sl_uint32 iCol, Alignment align)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListDetailsView class]]) {
@@ -208,17 +208,16 @@ void ListDetailsView::_setColumnAlignment(sl_uint32 iCol, Alignment align)
 	}
 }
 
-sl_int32 ListDetailsView::getSelectedRow()
+void ListDetailsView::_getSelectedRow_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListDetailsView class]]) {
 		_Slib_OSX_ListDetailsView* tv = (_Slib_OSX_ListDetailsView*)handle;
-		return (sl_int32)([tv->table selectedRow]);
+		m_selectedRow = (sl_int32)([tv->table selectedRow]);
 	}
-	return -1;
 }
 
-void ListDetailsView::setFont(const Ref<Font>& font)
+void ListDetailsView::_setFont_NW(const Ref<Font>& font)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListDetailsView class]]) {
@@ -229,7 +228,6 @@ void ListDetailsView::setFont(const Ref<Font>& font)
 		((_ListDetailsView*)this)->__applyFont(tv);
 		[tv->table reloadData];
 	}
-	m_font = font;
 }
 
 SLIB_UI_NAMESPACE_END
@@ -264,7 +262,7 @@ SLIB_UI_NAMESPACE_END
 			if (_id != nil) {
 				sl_uint32 iRow = (sl_uint32)(row);
 				sl_uint32 iCol = (sl_uint32)(_id.intValue);
-				return slib::Apple::getNSStringFromString(((slib::_ListDetailsView*)(view.ptr))->onGetCellText(iRow, iCol));
+				return slib::Apple::getNSStringFromString(((slib::_ListDetailsView*)(view.ptr))->getItemText(iRow, iCol));
 			}
 		}
 	}
@@ -279,7 +277,7 @@ SLIB_UI_NAMESPACE_END
 		if (slib::ListDetailsView::checkInstance(view.ptr)) {
 			sl_int32 n = (sl_int32)([table selectedRow]);
 			if (n >= 0) {
-				((slib::_ListDetailsView*)(view.ptr))->onSelectRow(n);
+				((slib::_ListDetailsView*)(view.ptr))->dispatchSelectRow(n);
 			}
 		}
 	}
@@ -301,15 +299,15 @@ SLIB_UI_NAMESPACE_END
 			if (slib::ListDetailsView::checkInstance(view.ptr)) {
 				if (indexRow == indexRowBefore) {
 					// don't call event callback when it is new selection because it is already called by default
-					((slib::_ListDetailsView*)(view.ptr))->onSelectRow((sl_uint32)(indexRow));
+					((slib::_ListDetailsView*)(view.ptr))->dispatchSelectRow((sl_uint32)(indexRow));
 				}
 				sl_real x = (sl_real)(ptView.x);
 				sl_real y = (sl_real)(ptView.y);
 				NSInteger clicks = [theEvent clickCount];
 				if (clicks == 1) {
-					((slib::_ListDetailsView*)(view.ptr))->onClickRow((sl_uint32)(indexRow), slib::Point(x, y));
+					((slib::_ListDetailsView*)(view.ptr))->dispatchClickRow((sl_uint32)(indexRow), slib::Point(x, y));
 				} else if (clicks == 2) {
-					((slib::_ListDetailsView*)(view.ptr))->onDoubleClickRow((sl_uint32)(indexRow), slib::Point(x, y));
+					((slib::_ListDetailsView*)(view.ptr))->dispatchDoubleClickRow((sl_uint32)(indexRow), slib::Point(x, y));
 				}
 			}
 		}
@@ -329,7 +327,7 @@ SLIB_UI_NAMESPACE_END
 			if (slib::ListDetailsView::checkInstance(view.ptr)) {
 				sl_real x = (sl_real)(ptView.x);
 				sl_real y = (sl_real)(ptView.y);
-				((slib::_ListDetailsView*)(view.ptr))->onRightButtonClickRow((sl_uint32)(indexRow), slib::Point(x, y));
+				((slib::_ListDetailsView*)(view.ptr))->dispatchRightButtonClickRow((sl_uint32)(indexRow), slib::Point(x, y));
 			}
 		}
 	}

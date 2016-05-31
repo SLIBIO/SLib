@@ -5,8 +5,6 @@
 
 #include "view.h"
 
-#include "../core/callback.h"
-
 SLIB_UI_NAMESPACE_BEGIN
 
 class SLIB_EXPORT LabelView : public View
@@ -19,54 +17,45 @@ public:
 public:
 	String getText();
 	
-	virtual void setText(const String& text);
-	
+	virtual void setText(const String& text, sl_bool flagRedraw = sl_true);
 	
 	Color getTextColor();
 	
-	virtual void setTextColor(const Color& color);
-	
+	virtual void setTextColor(const Color& color, sl_bool flagRedraw = sl_true);
 	
 	Alignment getTextAlignment();
 	
-	virtual void setTextAlignment(Alignment align);
-	
-	
-	Ref<Font> getFont();
-	
-	virtual void setFont(const Ref<Font>& font);
-
-public:
-	Color getBackgroundColor();
-	
-	virtual void setBackgroundColor(const Color& color);
-	
-	
-	sl_bool isBorder();
-	
-	virtual void setBorder(sl_bool flag);
-	
-public:
-	SLIB_REF_PROPERTY(Runnable, OnClick)
+	virtual void setTextAlignment(Alignment align, sl_bool flagRedraw = sl_true);
 	
 public:
 	// override
-	void dispatchClick();
-
+	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+	
 protected:
 	// override
-	Ref<ViewInstance> createInstance(ViewInstance* parent);
+	void onDraw(Canvas* canvas);
+	
+private:
+	void _setText_NW(const String& text);
+	
+	void _setTextColor_NW(const Color& color);
+	
+	void _setTextAlignment_NW(Alignment align);
+	
+	// override
+	void _setFont_NW(const Ref<Font>& font);
+
+	// override
+	void _setBorder_NW(sl_bool flag);
+	
+	// override
+	void _setBackgroundColor_NW(const Color& color);
 	
 protected:
 	SafeString m_text;
-	sl_bool m_flagBorder;
-	Alignment m_textAlignment;
 	Color m_textColor;
-	Color m_backgroundColor;
-	
-	SafeRef<Font> m_font;
-	SafeRef<FontInstance> m_fontInstance;
-	
+	Alignment m_textAlignment;
+
 };
 
 SLIB_UI_NAMESPACE_END

@@ -32,11 +32,11 @@ public:
 	{
 		JniLocal<jstring> jtext = Jni::getJniString(m_text);
 		_JAndroidEditView::setText.callBoolean(sl_null, handle, jtext.get());
-		_JAndroidEditView::setBorder.callBoolean(sl_null, handle, m_flagBorder);
+		_JAndroidEditView::setBorder.callBoolean(sl_null, handle, isBorder());
 		_JAndroidEditView::setAlignment.callBoolean(sl_null, handle, m_textAlignment.value);
 		_JAndroidEditView::setTextColor.callBoolean(sl_null, handle, m_textColor.getARGB());
-		_JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, m_backgroundColor.getARGB());
-		Ref<Font> font = m_font;
+		_JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, getBackgroundColor().getARGB());
+		Ref<Font> font = getFont();
 		Ref<FontInstance> fontInstance;
 		jobject jfont = UIPlatform::getNativeFont(font.ptr, fontInstance);
 		if (jfont) {
@@ -45,7 +45,7 @@ public:
 	}
 };
 
-Ref<ViewInstance> LabelView::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> LabelView::createNativeWidget(ViewInstance* _parent)
 {
 	Ref<Android_ViewInstance> ret;
 	Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
@@ -60,90 +60,32 @@ Ref<ViewInstance> LabelView::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-String LabelView::getText()
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		m_text = _JAndroidEditView::getText.callString(sl_null, handle);
-	}
-	return m_text;
-}
-
-void LabelView::setText(const String& text)
+void LabelView::_setText_NW(const String& text)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		JniLocal<jstring> jstr = Jni::getJniString(text);
 		_JAndroidEditView::setText.callBoolean(sl_null, handle, jstr.get());
 	}
-	m_text = text;
 }
 
-sl_bool LabelView::isBorder()
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		m_flagBorder = _JAndroidEditView::isBorder.callBoolean(sl_null, handle);
-	}
-	return m_flagBorder;
-}
-
-void LabelView::setBorder(sl_bool flag)
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		_JAndroidEditView::setBorder.callBoolean(sl_null, handle, flag);
-	}
-	m_flagBorder = flag;
-}
-
-Alignment LabelView::getTextAlignment()
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		m_textAlignment = _JAndroidEditView::getAlignment.callInt(sl_null, handle);
-	}
-	return m_textAlignment;
-}
-
-void LabelView::setTextAlignment(Alignment align)
+void LabelView::_setTextAlignment_NW(Alignment align)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		_JAndroidEditView::setAlignment.callBoolean(sl_null, handle, align.value);
 	}
-	m_textAlignment = align;
 }
 
-Color LabelView::getTextColor()
-{
-	return m_textColor;
-}
-
-void LabelView::setTextColor(const Color& color)
+void LabelView::_setTextColor_NW(const Color& color)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		_JAndroidEditView::setTextColor.callBoolean(sl_null, handle, color.getARGB());
 	}
-	m_textColor = color;
 }
 
-Color LabelView::getBackgroundColor()
-{
-	return m_backgroundColor;
-}
-
-void LabelView::setBackgroundColor(const Color& color)
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		_JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, color.getARGB());
-	}
-	m_backgroundColor = color;
-}
-
-void LabelView::setFont(const Ref<Font>& font)
+void LabelView::_setFont_NW(const Ref<Font>& font)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -153,8 +95,24 @@ void LabelView::setFont(const Ref<Font>& font)
 			_JAndroidEditView::setFont.callBoolean(sl_null, handle, jfont);
 		}
 	}
-	m_font = font;
 }
+
+void LabelView::_setBorder_NW(sl_bool flag)
+{
+	jobject handle = UIPlatform::getViewHandle(this);
+	if (handle) {
+		_JAndroidEditView::setBorder.callBoolean(sl_null, handle, flag);
+	}
+}
+
+void LabelView::_setBackgroundColor_NW(const Color& color)
+{
+	jobject handle = UIPlatform::getViewHandle(this);
+	if (handle) {
+		_JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, color.getARGB());
+	}
+}
+
 SLIB_UI_NAMESPACE_END
 
 #endif

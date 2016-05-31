@@ -19,7 +19,6 @@ public:
 	CGContextRef m_graphics;
 	sl_real m_width;
 	sl_real m_height;
-	Rectangle m_rectDirty;
 	
 public:
 	_Quartz_Canvas()
@@ -32,7 +31,7 @@ public:
 	}
 	
 public:
-	static Ref<_Quartz_Canvas> _create(CGContextRef graphics, sl_real width, sl_real height, const Rectangle* rectDirty)
+	static Ref<_Quartz_Canvas> _create(CGContextRef graphics, sl_real width, sl_real height, const Rectangle* rectClip)
 	{
 		Ref<_Quartz_Canvas> ret;
 		if (graphics) {
@@ -43,10 +42,10 @@ public:
 				ret->m_graphics = graphics;
 				ret->m_width = width;
 				ret->m_height = height;
-				if (rectDirty) {
-					ret->m_rectDirty = *rectDirty;
+				if (rectClip) {
+					CGContextClipToRect(graphics, CGRectMake(rectClip->left, rectClip->top, rectClip->getWidth(), rectClip->getHeight()));
 				} else {
-					ret->m_rectDirty = Rectangle(0, 0, width, height);
+					CGContextClipToRect(graphics, CGRectMake(0, 0, width, height));
 				}
 				return ret;
 			}
@@ -62,9 +61,9 @@ public:
 	}
 	
 	// override
-	Rectangle getInvalidatedRect()
+	sl_bool isBuffer()
 	{
-		return m_rectDirty;
+		return sl_true;
 	}
 	
 	// override
@@ -91,6 +90,13 @@ public:
 		}
 	}
 	
+	// override
+	Rectangle getClipBounds()
+	{
+		CGRect rc = CGContextGetClipBoundingBox(m_graphics);
+		return Rectangle((sl_real)(rc.origin.x), (sl_real)(rc.origin.y), (sl_real)(rc.origin.x + rc.size.width), (sl_real)(rc.origin.y + rc.size.height));
+	}
+
 	// override
 	void clipToRectangle(const Rectangle& rect)
 	{
@@ -480,12 +486,12 @@ public:
 
 SLIB_DEFINE_OBJECT(_Quartz_Canvas, Canvas)
 
-Ref<Canvas> UIPlatform::createCanvas(CGContextRef graphics, sl_uint32 width, sl_uint32 height, const Rectangle* rectDirty)
+Ref<Canvas> UIPlatform::createCanvas(CGContextRef graphics, sl_uint32 width, sl_uint32 height, const Rectangle* rectClip)
 {
 	if (!graphics) {
 		return Ref<Canvas>::null();
 	}
-	return _Quartz_Canvas::_create(graphics, (sl_real)width, (sl_real)height, rectDirty);
+	return _Quartz_Canvas::_create(graphics, (sl_real)width, (sl_real)height, rectClip);
 }
 
 CGContextRef UIPlatform::getCanvasHandle(Canvas* _canvas)

@@ -1,7 +1,6 @@
 #include "../../../inc/slib/ui/window.h"
 
 #include "../../../inc/slib/ui/view.h"
-#include "../../../inc/slib/ui/view_group.h"
 #include "../../../inc/slib/ui/core.h"
 
 SLIB_UI_NAMESPACE_BEGIN
@@ -44,7 +43,7 @@ Window::Window()
 {
 	SLIB_REFERABLE_CONSTRUCTOR;
 	
-	Ref<ViewGroup> view = new ViewGroup;
+	Ref<View> view = new ViewGroup;
 	if (view.isNotNull()) {
 		view->setWindow(this);
 		m_viewContent = view;
@@ -128,16 +127,16 @@ void Window::setScreen(const Ref<Screen>& screen)
 	m_screen = screen;
 }
 
-Ref<ViewGroup> Window::getContentView()
+Ref<View> Window::getContentView()
 {
 	return m_viewContent;
 }
 
-void Window::setContentView(const Ref<ViewGroup>& view)
+void Window::setContentView(const Ref<View>& view)
 {
 	ObjectLocker lock(this);
 	
-	Ref<ViewGroup> orig = m_viewContent;
+	Ref<View> orig = m_viewContent;
 	Ref<ViewInstance> instance;
 	if (orig.isNotNull()) {
 		instance = orig->getViewInstance();
@@ -676,7 +675,7 @@ void Window::attach(const Ref<WindowInstance>& instance)
 			Rectangle rect;
 			rect.setLeftTop(Point::zero());
 			rect.setSize(instance->getClientSize());
-			Ref<ViewGroup> view = m_viewContent;
+			Ref<View> view = m_viewContent;
 			if (view.isNotNull()) {
 				view->attach(contentViewInstance);
 				view->m_frame = rect;
@@ -789,7 +788,7 @@ void Window::_create()
 void Window::addView(const Ref<View>& child)
 {
 	if (child.isNotNull()) {
-		Ref<ViewGroup> view = m_viewContent;
+		Ref<View> view = m_viewContent;
 		if (view.isNotNull()) {
 			view->addChild(child);
 		}
@@ -799,7 +798,7 @@ void Window::addView(const Ref<View>& child)
 void Window::removeView(const Ref<View>& child)
 {
 	if (child.isNotNull()) {
-		Ref<ViewGroup> view = m_viewContent;
+		Ref<View> view = m_viewContent;
 		if (view.isNotNull()) {
 			view->removeChild(child);
 		}
@@ -808,7 +807,7 @@ void Window::removeView(const Ref<View>& child)
 
 List< Ref<View> > Window::getViews()
 {
-	Ref<ViewGroup> view = m_viewContent;
+	Ref<View> view = m_viewContent;
 	if (view.isNotNull()) {
 		return view->getChildren();
 	}
@@ -817,7 +816,7 @@ List< Ref<View> > Window::getViews()
 
 void Window::removeAllViews()
 {
-	Ref<ViewGroup> view = m_viewContent;
+	Ref<View> view = m_viewContent;
 	if (view.isNotNull()) {
 		view->removeAllChildren();
 	}
@@ -914,7 +913,7 @@ void Window::onDemaximize()
 void Window::_refreshSize()
 {
 #if !defined(SLIB_PLATFORM_IS_WIN32)
-	Ref<ViewGroup> view = m_viewContent;
+	Ref<View> view = m_viewContent;
 	if (view.isNotNull()) {
 		Rectangle rect;
 		rect.setLeftTop(Point::zero());

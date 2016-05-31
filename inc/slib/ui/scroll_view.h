@@ -17,51 +17,51 @@ public:
 public:
 	Ref<View> getContentView();
 	
-	virtual void setContentView(const Ref<View>& view);
+	virtual void setContentView(const Ref<View>& view, sl_bool flagRedraw = sl_true);
 	
-	
-	virtual void scrollTo(sl_real x, sl_real y);
-	
-	void scrollTo(const Point& pt);
-	
-	
-	Size getScrollRange();
-	
+	// override
 	Point getScrollPosition();
 	
+	// override
+	Size getScrollRange();
+	
 public:
-	sl_bool isBorder();
+	// override
+	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
 	
-	virtual void setBorder(sl_bool flag);
-	
-	
-	Color getBackgroundColor();
-	
-	virtual void setBackgroundColor(const Color& color);
+	// override
+	void dispatchScroll(sl_real x, sl_real y);
 
 protected:
 	// override
-	Ref<ViewInstance> createInstance(ViewInstance* parent);
+	void onResize(sl_real width, sl_real height);
 	
 	// override
-	void onResize();
-
+	void onResizeChild(View* child, sl_real width, sl_real height);
+	
+private:
+	void _scrollTo(sl_real x, sl_real y, sl_bool flagRedraw);
+	
+	void _refreshContentSize_NW();
+	
+	void _setContentView_NW(const Ref<View>& view);
+	
+	void _setContentView_NW_OnUiThread(const Ref<View> view);
+	
+	void _scrollTo_NW(sl_real x, sl_real y);
+	
+	Point _getScrollPosition_NW();
+	
+	Size _getScrollRange_NW();
+	
 	// override
-	void onResizeChild(View* child);
+	void _setBorder_NW(sl_bool flag);
 	
-protected:
-	void _setContentView(const Ref<View>& view);
-	
-	void _setContentView_Safe(const Ref<View> view);
-	
-	void _setBorder(sl_bool flag);
-	
-	void _setBackgroundColor(const Color& color);
+	// override
+	void _setBackgroundColor_NW(const Color& color);
 	
 protected:
 	SafeRef<View> m_viewContent;
-	sl_bool m_flagBorder;
-	Color m_backgroundColor;
 	
 };
 

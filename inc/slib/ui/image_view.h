@@ -3,10 +3,43 @@
 
 #include "definition.h"
 
-#include "s_image_view.h"
+#include "view.h"
 
 SLIB_UI_NAMESPACE_BEGIN
-typedef SImageView ImageView;
+
+class SLIB_EXPORT ImageView : public View
+{
+	SLIB_DECLARE_OBJECT
+	
+public:
+	ImageView();
+	
+public:
+	Ref<Drawable> getSource();
+	
+	virtual void setSource(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	
+	
+	ScaleMode getScaleMode();
+	
+	virtual void setScaleMode(ScaleMode mode, sl_bool flagRedraw = sl_true);
+	
+	
+	Alignment getSourceAlignment();
+	
+	virtual void setSourceAlignment(Alignment align, sl_bool flagRedraw = sl_true);
+	
+public:
+	// override
+	void onDraw(Canvas* canvas);
+	
+protected:
+	SafeRef<Drawable> m_source;
+	ScaleMode m_scaleMode;
+	Alignment m_sourceAlignment;
+	
+};
+
 SLIB_UI_NAMESPACE_END
 
 #endif

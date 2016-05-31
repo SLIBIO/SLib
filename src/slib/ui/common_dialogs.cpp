@@ -408,7 +408,7 @@ class _FileDialog_RunOnUIThread
 public:
 	FileDialog* dlg;
 	Ref<Event> event;
-	DialogResult result = DialogResult::Cancel;
+	sl_bool result = sl_false;
 	
 	void run()
 	{
@@ -418,7 +418,7 @@ public:
 	
 };
 
-DialogResult FileDialog::_runOnUiThread()
+sl_bool FileDialog::_runOnUiThread()
 {
 	if (UI::isUiThread()) {
 		return _run();
@@ -432,7 +432,7 @@ DialogResult FileDialog::_runOnUiThread()
 		ev->wait();
 		return m.result;
 	}
-	return DialogResult::Cancel;
+	return sl_false;
 }
 
 List<String> FileDialog::openFiles(const Ref<Window>& parent)
@@ -440,8 +440,7 @@ List<String> FileDialog::openFiles(const Ref<Window>& parent)
 	FileDialog dlg;
 	dlg.type = FileDialogType::OpenFiles;
 	dlg.parent = parent;
-	DialogResult result = dlg.run();
-	if (result == DialogResult::Ok) {
+	if (dlg.run()) {
 		return dlg.selectedPaths;
 	}
 	return List<String>::null();
@@ -452,8 +451,7 @@ String FileDialog::openFile(const Ref<Window>& parent)
 	FileDialog dlg;
 	dlg.type = FileDialogType::OpenFile;
 	dlg.parent = parent;
-	DialogResult result = dlg.run();
-	if (result == DialogResult::Ok) {
+	if (dlg.run()) {
 		return dlg.selectedPath;
 	}
 	return String::null();
@@ -464,8 +462,7 @@ String FileDialog::saveFile(const Ref<Window>& parent)
 	FileDialog dlg;
 	dlg.type = FileDialogType::SaveFile;
 	dlg.parent = parent;
-	DialogResult result = dlg.run();
-	if (result == DialogResult::Ok) {
+	if (dlg.run()) {
 		return dlg.selectedPath;
 	}
 	return String::null();
@@ -476,8 +473,7 @@ String FileDialog::selectDirectory(const Ref<Window>& parent)
 	FileDialog dlg;
 	dlg.type = FileDialogType::SelectDirectory;
 	dlg.parent = parent;
-	DialogResult result = dlg.run();
-	if (result == DialogResult::Ok) {
+	if (dlg.run()) {
 		return dlg.selectedPath;
 	}
 	return String::null();

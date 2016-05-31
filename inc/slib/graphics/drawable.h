@@ -4,6 +4,7 @@
 #include "definition.h"
 
 #include "color.h"
+#include "pen.h"
 #include "brush.h"
 
 #include "../core/object.h"
@@ -21,11 +22,13 @@ class SLIB_EXPORT Drawable : public Object
 	SLIB_DECLARE_OBJECT
 
 public:
-	virtual sl_real getDrawableWidth() = 0;
+	virtual sl_real getDrawableWidth();
 	
-	virtual sl_real getDrawableHeight() = 0;
+	virtual sl_real getDrawableHeight();
 	
-	virtual void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc) = 0;
+	virtual void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc);
+	
+	virtual void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
 	
 public:
 	sl_bool isBitmap();
@@ -49,12 +52,6 @@ public:
 	static Ref<BrushDrawable> create(const Ref<Brush>& brush);
 	
 public:
-	// override
-	sl_real getDrawableWidth();
-	
-	// override
-	sl_real getDrawableHeight();
-	
 	// override
 	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc);
 
@@ -81,16 +78,27 @@ public:
 	
 public:
 	// override
-	sl_real getDrawableWidth();
-	
-	// override
-	sl_real getDrawableHeight();
-	
-	// override
 	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc);
 	
 protected:
 	Ref<Brush> m_brush;
+};
+
+class SLIB_EXPORT RectangleDrawable : public Drawable
+{
+	SLIB_DECLARE_OBJECT
+	
+public:
+	static Ref<RectangleDrawable> create(const Ref<Pen>& pen, const Ref<Brush>& brush);
+	
+public:
+	// override
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	
+protected:
+	Ref<Pen> m_pen;
+	Ref<Brush> m_brush;
+	
 };
 
 SLIB_GRAPHICS_NAMESPACE_END

@@ -48,6 +48,11 @@ public:
 	template <class _T>
 	static CList<T, COMPARE>* createFromElements(const _T* values, sl_size count);
 	
+	static CList<T, COMPARE>* createFromArray(const Array<T, COMPARE>& array);
+	
+	template <class _T,  class _COMPARE>
+	static CList<T, COMPARE>* createFromArray(const Array<_T, _COMPARE>& array);
+	
 	static CList<T, COMPARE>* createFromElement(const T& value);
 	
 	static CList<T, COMPARE>* createCopy(CList<T, COMPARE>* other);
@@ -266,6 +271,11 @@ public:
 	
 	template <class _T>
 	static List<T, COMPARE> createFromElements(const _T* values, sl_size count);
+	
+	static List<T, COMPARE> createFromArray(const Array<T, COMPARE>& array);
+	
+	template <class _T,  class _COMPARE>
+	static List<T, COMPARE> createFromArray(const Array<_T, _COMPARE>& array);
 	
 	static List<T, COMPARE> createFromElement(const T& e);
 	
@@ -846,6 +856,19 @@ CList<T, COMPARE>* CList<T, COMPARE>::createFromElements(const _T* values, sl_si
 		return new CList<T, COMPARE>;
 	}
 	return sl_null;
+}
+
+template <class T, class COMPARE>
+CList<T, COMPARE>* CList<T, COMPARE>::createFromArray(const Array<T, COMPARE>& array)
+{
+	return createFromElements(array.getData(), array.getCount());
+}
+
+template <class T, class COMPARE>
+template <class _T, class _COMPARE>
+CList<T, COMPARE>* CList<T, COMPARE>::createFromArray(const Array<_T, _COMPARE>& array)
+{
+	return createFromElements(array.getData(), array.getCount());
 }
 
 template <class T, class COMPARE>
@@ -1852,6 +1875,19 @@ template <class _T>
 List<T, COMPARE> List<T, COMPARE>::createFromElements(const _T* values, sl_size count)
 {
 	return CList<T, COMPARE>::createFromElements(values, count);
+}
+
+template <class T, class COMPARE>
+List<T, COMPARE> List<T, COMPARE>::createFromArray(const Array<T, COMPARE>& array)
+{
+	return createFromElements(array.getData(), array.getCount());
+}
+
+template <class T, class COMPARE>
+template <class _T, class _COMPARE>
+List<T, COMPARE> List<T, COMPARE>::createFromArray(const Array<_T, _COMPARE>& array)
+{
+	return createFromElements(array.getData(), array.getCount());
 }
 
 template <class T, class COMPARE>

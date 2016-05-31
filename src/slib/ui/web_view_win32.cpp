@@ -91,7 +91,7 @@ public:
 		Ref<View> _view = getView();
 		if (WebView::checkInstance(_view.ptr)) {
 			WebView* view = (WebView*)(_view.ptr);
-			view->onStartLoad(szURL);
+			view->dispatchStartLoad(szURL);
 			*pFlagCancel = 0;
 		}
 	}
@@ -110,7 +110,7 @@ public:
 		Ref<View> _view = getView();
 		if (WebView::checkInstance(_view.ptr)) {
 			WebView* view = (WebView*)(_view.ptr);
-			view->onFinishLoad(szURL, sl_false);
+			view->dispatchFinishLoad(szURL, sl_false);
 		}
 	}
 
@@ -476,7 +476,7 @@ public:
 					String msg = params.getItemValue(0, String::null());
 					if (msg.isNotEmpty()) {
 						String param = params.getItemValue(1, String::null());
-						view->onMessageFromJavaScript(msg, param);
+						view->dispatchMessageFromJavaScript(msg, param);
 					}
 					/*
 					::VariantInit(pVarResult);
@@ -896,7 +896,7 @@ public:
 
 };
 
-Ref<ViewInstance> WebView::createInstance(ViewInstance* parent)
+Ref<ViewInstance> WebView::createNativeWidget(ViewInstance* parent)
 {
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
 	DWORD style = 0;
@@ -910,9 +910,8 @@ Ref<ViewInstance> WebView::createInstance(ViewInstance* parent)
 	return ret;
 }
 
-void WebView::onResize()
+void WebView::_refreshSize_NW()
 {
-	View::onResize();
 	Ref<ViewInstance> _instance = getViewInstance();
 	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
 		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.ptr);
@@ -920,7 +919,7 @@ void WebView::onResize()
 	}
 }
 
-void WebView::_load()
+void WebView::_load_NW()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
 	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
@@ -929,7 +928,7 @@ void WebView::_load()
 	}
 }
 
-String WebView::getURL()
+String WebView::_getURL_NW()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
 	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
@@ -952,7 +951,7 @@ String WebView::getURL()
 	return m_urlOrigin;
 }
 
-String WebView::getPageTitle()
+String WebView::_getPageTitle_NW()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
 	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
@@ -975,7 +974,7 @@ String WebView::getPageTitle()
 	return String::null();
 }
 
-void WebView::goBack()
+void WebView::_goBack_NW()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
 	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
@@ -987,7 +986,7 @@ void WebView::goBack()
 	}
 }
 
-void WebView::goForward()
+void WebView::_goForward_NW()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
 	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
@@ -999,7 +998,7 @@ void WebView::goForward()
 	}
 }
 
-void WebView::reload()
+void WebView::_reload_NW()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
 	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
@@ -1052,7 +1051,7 @@ String _WebView_evalJavascript(IHTMLWindow2* win, const String& _script)
 	return ret;
 }
 
-void WebView::runJavaScript(const String& _script)
+void WebView::_runJavaScript_NW(const String& _script)
 {
 	String16 script = _script;
 	if (script.isNotEmpty()) {

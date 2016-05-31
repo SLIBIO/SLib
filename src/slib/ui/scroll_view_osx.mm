@@ -33,18 +33,19 @@ public:
 	
 	void __applyProperties(NSScrollView* handle)
 	{
-		[handle setBorderType:(m_flagBorder?NSBezelBorder:NSNoBorder)];
-		if (m_backgroundColor.a == 0) {
+		[handle setBorderType:(isBorder()?NSBezelBorder:NSNoBorder)];
+		Color backgroundColor = getBackgroundColor();
+		if (backgroundColor.a == 0) {
 			handle.drawsBackground = FALSE;
 		} else {
 			handle.drawsBackground = TRUE;
-			handle.backgroundColor = UIPlatform::getNSColorFromColor(m_backgroundColor);
+			handle.backgroundColor = UIPlatform::getNSColorFromColor(backgroundColor);
 		}
 		__applyContent(handle);
 	}
 };
 
-Ref<ViewInstance> ScrollView::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* _parent)
 {
 	OSX_VIEW_CREATE_INSTANCE_BEGIN
 	_Slib_OSX_ScrollView* handle = [[_Slib_OSX_ScrollView alloc] initWithFrame:frame];
@@ -55,39 +56,11 @@ Ref<ViewInstance> ScrollView::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-void ScrollView::onResize()
-{
-	View::onResize();
-}
-
-void ScrollView::onResizeChild(View* child)
+void ScrollView::_refreshContentSize_NW()
 {
 }
 
-void ScrollView::_setBorder(sl_bool flag)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSScrollView class]]) {
-		NSScrollView* sv = (NSScrollView*)handle;
-		[sv setBorderType:(flag?NSBezelBorder:NSNoBorder)];
-	}
-}
-
-void ScrollView::_setBackgroundColor(const Color& color)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSScrollView class]]) {
-		NSScrollView* sv = (NSScrollView*)handle;
-		if (color.a == 0) {
-			sv.drawsBackground = FALSE;
-		} else {
-			sv.drawsBackground = TRUE;
-			sv.backgroundColor = UIPlatform::getNSColorFromColor(color);
-		}
-	}
-}
-
-void ScrollView::_setContentView(const Ref<View>& view)
+void ScrollView::_setContentView_NW(const Ref<View>& view)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSScrollView class]]) {
@@ -96,7 +69,7 @@ void ScrollView::_setContentView(const Ref<View>& view)
 	}
 }
 
-void ScrollView::scrollTo(sl_real x, sl_real y)
+void ScrollView::_scrollTo_NW(sl_real x, sl_real y)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSScrollView class]]) {
@@ -112,7 +85,7 @@ void ScrollView::scrollTo(sl_real x, sl_real y)
 	}
 }
 
-Point ScrollView::getScrollPosition()
+Point ScrollView::_getScrollPosition_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSScrollView class]]) {
@@ -129,7 +102,7 @@ Point ScrollView::getScrollPosition()
 	return Point::zero();
 }
 
-Size ScrollView::getScrollRange()
+Size ScrollView::_getScrollRange_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSScrollView class]]) {
@@ -152,6 +125,29 @@ Size ScrollView::getScrollRange()
 		}
 	}
 	return Size::zero();
+}
+
+void ScrollView::_setBorder_NW(sl_bool flag)
+{
+	NSView* handle = UIPlatform::getViewHandle(this);
+	if (handle != nil && [handle isKindOfClass:[NSScrollView class]]) {
+		NSScrollView* sv = (NSScrollView*)handle;
+		[sv setBorderType:(flag?NSBezelBorder:NSNoBorder)];
+	}
+}
+
+void ScrollView::_setBackgroundColor_NW(const Color& color)
+{
+	NSView* handle = UIPlatform::getViewHandle(this);
+	if (handle != nil && [handle isKindOfClass:[NSScrollView class]]) {
+		NSScrollView* sv = (NSScrollView*)handle;
+		if (color.a == 0) {
+			sv.drawsBackground = FALSE;
+		} else {
+			sv.drawsBackground = TRUE;
+			sv.backgroundColor = UIPlatform::getNSColorFromColor(color);
+		}
+	}
 }
 
 SLIB_UI_NAMESPACE_END

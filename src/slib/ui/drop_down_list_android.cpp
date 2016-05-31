@@ -64,7 +64,7 @@ public:
 
 };
 
-Ref<ViewInstance> DropDownList::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> DropDownList::createNativeWidget(ViewInstance* _parent)
 {
 	Ref<Android_ViewInstance> ret;
 	Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
@@ -76,7 +76,7 @@ Ref<ViewInstance> DropDownList::createInstance(ViewInstance* _parent)
 
 			((_DropDownList*)this)->__copyItems(handle);
 
-			Ref<Font> font = m_font;
+			Ref<Font> font = getFont();
 			Ref<FontInstance> fontInstance;
 			jobject jfont = UIPlatform::getNativeFont(font.ptr, fontInstance);
 			if (jfont) {
@@ -87,25 +87,23 @@ Ref<ViewInstance> DropDownList::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-sl_uint32 DropDownList::getSelectedIndex()
+void DropDownList::_getSelectedIndex_NW()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		m_indexSelected = ((_DropDownList*)this)->__getSelectedIndex(handle);
 	}
-	return m_indexSelected;
 }
 
-void DropDownList::_select(sl_uint32 index)
+void DropDownList::_select_NW(sl_uint32 index)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		((_DropDownList*)this)->__select(handle, index);
 	}
-	m_indexSelected = index;
 }
 
-void DropDownList::_refreshItemsCount()
+void DropDownList::_refreshItemsCount_NW()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -113,7 +111,7 @@ void DropDownList::_refreshItemsCount()
 	}
 }
 
-void DropDownList::_refreshItemsContent()
+void DropDownList::_refreshItemsContent_NW()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -121,7 +119,7 @@ void DropDownList::_refreshItemsContent()
 	}
 }
 
-void DropDownList::_setItemTitle(sl_uint32 index, const String& title)
+void DropDownList::_setItemTitle_NW(sl_uint32 index, const String& title)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -129,7 +127,7 @@ void DropDownList::_setItemTitle(sl_uint32 index, const String& title)
 	}
 }
 
-void DropDownList::setFont(const Ref<Font>& font)
+void DropDownList::_setFont_NW(const Ref<Font>& font)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -139,7 +137,6 @@ void DropDownList::setFont(const Ref<Font>& font)
 			_JAndroidDropDownList::setFont.callBoolean(sl_null, handle, jfont);
 		}
 	}
-	m_font = font;
 }
 
 SLIB_UI_NAMESPACE_END

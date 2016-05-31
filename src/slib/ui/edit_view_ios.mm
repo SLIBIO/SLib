@@ -29,13 +29,13 @@ public:
 	{
 		[handle setText:(Apple::getNSStringFromString(m_text))];
 		[handle setTextAlignment:translateAlignment(m_textAlignment)];
-		[handle setBorderStyle:(m_flagBorder?UITextBorderStyleBezel:UITextBorderStyleNone)];
+		[handle setBorderStyle:(isBorder()?UITextBorderStyleBezel:UITextBorderStyleNone)];
 		[handle setPlaceholder:(Apple::getNSStringFromString(m_hintText))];
 		[handle setTextColor:(UIPlatform::getUIColorFromColor(m_textColor))];
-		[handle setBackgroundColor:(UIPlatform::getUIColorFromColor(m_backgroundColor))];
+		[handle setBackgroundColor:(UIPlatform::getUIColorFromColor(getBackgroundColor()))];
 		[handle setEnabled:(m_flagReadOnly ? NO : YES)];
 		Ref<FontInstance> fontInstance;
-		Ref<Font> font = m_font;
+		Ref<Font> font = getFont();
 		UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
 		if (hFont != nil) {
 			[handle setFont:hFont];
@@ -46,18 +46,18 @@ public:
 	{
 		[handle setText:(Apple::getNSStringFromString(m_text))];
 		[handle setTextAlignment:translateAlignment(m_textAlignment)];
-		if (m_flagBorder) {
+		if (isBorder()) {
 			[handle.layer setBorderColor:([[UIColor grayColor] CGColor])];
 			[handle.layer setBorderWidth:1];
 		} else {
 			[handle.layer setBorderWidth:0];
 		}
 		[handle setTextColor:(UIPlatform::getUIColorFromColor(m_textColor))];
-		[handle setBackgroundColor:(UIPlatform::getUIColorFromColor(m_backgroundColor))];
+		[handle setBackgroundColor:(UIPlatform::getUIColorFromColor(getBackgroundColor()))];
 		[handle setEditable:(m_flagReadOnly?FALSE:TRUE)];
 		[handle setSelectable:TRUE];
 		Ref<FontInstance> fontInstance;
-		Ref<Font> font = m_font;
+		Ref<Font> font = getFont();
 		UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
 		if (hFont != nil) {
 			[handle setFont:hFont];
@@ -114,7 +114,7 @@ public:
 	}
 };
 
-Ref<ViewInstance> EditView::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> EditView::createNativeWidget(ViewInstance* _parent)
 {
 	IOS_VIEW_CREATE_INSTANCE_BEGIN
 	_Slib_iOS_TextField* handle = [[_Slib_iOS_TextField alloc] initWithFrame:frame];
@@ -125,7 +125,7 @@ Ref<ViewInstance> EditView::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-Ref<ViewInstance> PasswordView::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> PasswordView::createNativeWidget(ViewInstance* _parent)
 {
 	IOS_VIEW_CREATE_INSTANCE_BEGIN
 	_Slib_iOS_TextField* handle = [[_Slib_iOS_TextField alloc] initWithFrame:frame];
@@ -137,7 +137,7 @@ Ref<ViewInstance> PasswordView::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-Ref<ViewInstance> TextArea::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> TextArea::createNativeWidget(ViewInstance* _parent)
 {
 	IOS_VIEW_CREATE_INSTANCE_BEGIN
 	_Slib_iOS_TextArea* handle = [[_Slib_iOS_TextArea alloc] initWithFrame:frame];
@@ -149,7 +149,7 @@ Ref<ViewInstance> TextArea::createInstance(ViewInstance* _parent)
 }
 
 
-String EditView::getText()
+void EditView::_getText_NW()
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
@@ -163,10 +163,9 @@ String EditView::getText()
 			m_text = Apple::getStringFromNSString(s);
 		}
 	}
-	return m_text;
 }
 
-void EditView::setText(const String& value)
+void EditView::_setText_NW(const String& value)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
@@ -178,25 +177,9 @@ void EditView::setText(const String& value)
 			[tv setText:(Apple::getNSStringFromString(value))];
 		}
 	}
-	m_text = value;
 }
 
-sl_bool EditView::isBorder()
-{
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil) {
-		if ([handle isKindOfClass:[UITextField class]]) {
-			UITextField* tv = (UITextField*)handle;
-			m_flagBorder = tv.borderStyle != UITextBorderStyleNone;
-		} else if ([handle isKindOfClass:[UITextView class]]) {
-			UITextView* tv = (UITextView*)handle;
-			m_flagBorder = [tv.layer borderWidth] > 0;
-		}
-	}
-	return m_flagBorder;
-}
-
-void EditView::setBorder(sl_bool flag)
+void EditView::_setBorder_NW(sl_bool flag)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (flag) {
@@ -213,10 +196,9 @@ void EditView::setBorder(sl_bool flag)
 			}
 		}
 	}
-	m_flagBorder = flag;
 }
 
-Alignment EditView::getTextAlignment()
+void EditView::_getTextAlignment_NW()
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
@@ -228,10 +210,9 @@ Alignment EditView::getTextAlignment()
 			m_textAlignment = _EditView::translateAlignmentReverse([tv textAlignment]);
 		}
 	}
-	return m_textAlignment;
 }
 
-void EditView::setTextAlignment(Alignment align)
+void EditView::_setTextAlignment_NW(Alignment align)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
@@ -243,10 +224,9 @@ void EditView::setTextAlignment(Alignment align)
 			[tv setTextAlignment:_EditView::translateAlignment(align)];
 		}
 	}
-	m_textAlignment = align;
 }
 
-String EditView::getHintText()
+void EditView::_getHintText_NW()
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
@@ -255,10 +235,9 @@ String EditView::getHintText()
 			m_hintText = Apple::getStringFromNSString(tv.placeholder);
 		}
 	}
-	return m_hintText;
 }
 
-void EditView::setHintText(const String& value)
+void EditView::_setHintText_NW(const String& value)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
@@ -268,10 +247,9 @@ void EditView::setHintText(const String& value)
 			[tv setPlaceholder:s];
 		}
 	}
-	m_hintText = value;
 }
 
-sl_bool EditView::isReadOnly()
+void EditView::_isReadOnly_NW()
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
@@ -283,10 +261,9 @@ sl_bool EditView::isReadOnly()
 			m_flagReadOnly = tv.editable ? FALSE : TRUE;
 		}
 	}
-	return m_flagReadOnly;
 }
 
-void EditView::setReadOnly(sl_bool flag)
+void EditView::_setReadOnly_NW(sl_bool flag)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
@@ -298,36 +275,17 @@ void EditView::setReadOnly(sl_bool flag)
 			[tv setEditable:(flag?NO:YES)];
 		}
 	}
-	m_flagReadOnly = flag;
 }
 
-sl_bool EditView::isMultiLine()
+void EditView::_isMultiLine_NW()
 {
-	m_flagMultiLine = sl_false;
-	return m_flagMultiLine;
 }
 
-void EditView::setMultiLine(sl_bool flag)
+void EditView::_setMultiLine_NW(sl_bool flag)
 {
-	m_flagMultiLine = sl_false;
 }
 
-Color EditView::getTextColor()
-{
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil) {
-		if ([handle isKindOfClass:[UITextField class]]) {
-			UITextField* tv = (UITextField*)handle;
-			m_textColor = UIPlatform::getColorFromUIColor(tv.textColor);
-		} else if ([handle isKindOfClass:[UITextView class]]) {
-			UITextView* tv = (UITextView*)handle;
-			m_textColor = UIPlatform::getColorFromUIColor(tv.textColor);
-		}
-	}
-	return m_textColor;
-}
-
-void EditView::setTextColor(const Color& color)
+void EditView::_setTextColor_NW(const Color& color)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
@@ -339,25 +297,9 @@ void EditView::setTextColor(const Color& color)
 			[tv setTextColor:(UIPlatform::getUIColorFromColor(color))];
 		}
 	}
-	m_textColor = color;
 }
 
-Color EditView::getBackgroundColor()
-{
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil) {
-		if ([handle isKindOfClass:[UITextField class]]) {
-			UITextField* tv = (UITextField*)handle;
-			m_backgroundColor = UIPlatform::getColorFromUIColor(tv.backgroundColor);
-		} else if ([handle isKindOfClass:[UITextView class]]) {
-			UITextView* tv = (UITextView*)handle;
-			m_backgroundColor = UIPlatform::getColorFromUIColor(tv.backgroundColor);
-		}
-	}
-	return m_backgroundColor;
-}
-
-void EditView::setBackgroundColor(const Color& color)
+void EditView::_setBackgroundColor_NW(const Color& color)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
@@ -369,10 +311,9 @@ void EditView::setBackgroundColor(const Color& color)
 			[tv setBackgroundColor:(UIPlatform::getUIColorFromColor(color))];
 		}
 	}
-	m_backgroundColor = color;
 }
 
-void EditView::setFont(const Ref<Font>& font)
+void EditView::_setFont_NW(const Ref<Font>& font)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
@@ -392,7 +333,6 @@ void EditView::setFont(const Ref<Font>& font)
 			}
 		}
 	}
-	m_font = font;
 }
 
 SLIB_UI_NAMESPACE_END

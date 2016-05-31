@@ -127,7 +127,7 @@ public:
 	Ref<ViewInstance> __createInstance(ViewInstance* parent, int type)
 	{
 		int style = WS_TABSTOP;
-		if (m_flagBorder) {
+		if (isBorder()) {
 			style |= WS_BORDER;
 		}
 		Alignment align = m_textAlignment & Alignment::HorizontalMask;
@@ -155,18 +155,18 @@ public:
 			
 			HWND handle = ret->getHandle();
 			
-			Ref<Font> font = m_font;
+			Ref<Font> font = getFont();
 			Ref<FontInstance> fontInstance;
 			HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 			if (hFont) {
 				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 			}
-			m_fontInstance = fontInstance;
+			_setFontInstance(fontInstance);
 
 			String16 hintText = m_hintText;
 			::SendMessageW(handle, 0x1501 /*EM_SETCUEBANNER*/, FALSE, (LPARAM)(LPCWSTR)(hintText.getData()));
 			ret->setTextColor(m_textColor);
-			ret->setBackgroundColor(m_backgroundColor);
+			ret->setBackgroundColor(getBackgroundColor());
 		}
 		return ret;
 	}
@@ -175,66 +175,38 @@ public:
 
 SLIB_DEFINE_OBJECT(_Win32_EditViewInstance, Win32_ViewInstance)
 
-Ref<ViewInstance> EditView::createInstance(ViewInstance* parent)
+Ref<ViewInstance> EditView::createNativeWidget(ViewInstance* parent)
 {
 	return ((_EditView*)this)->__createInstance(parent, 0);
 }
 
-Ref<ViewInstance> PasswordView::createInstance(ViewInstance* parent)
+Ref<ViewInstance> PasswordView::createNativeWidget(ViewInstance* parent)
 {
 	return ((_EditView*)this)->__createInstance(parent, 1);
 }
 
-Ref<ViewInstance> TextArea::createInstance(ViewInstance* parent)
+Ref<ViewInstance> TextArea::createNativeWidget(ViewInstance* parent)
 {
 	return ((_EditView*)this)->__createInstance(parent, 2);
 }
 
-String EditView::getText()
+void EditView::_getText_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		m_text = Windows::getWindowText(handle);
 	}
-	return m_text;
 }
 
-void EditView::setText(const String& text)
+void EditView::_setText_NW(const String& text)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		Windows::setWindowText(handle, text);
 	}
-	m_text = text;
 }
 
-sl_bool EditView::isBorder()
-{
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		LONG style = ::GetWindowLongW(handle, GWL_STYLE);
-		m_flagBorder = (style & WS_BORDER) ? sl_true : sl_false;
-	}
-	return m_flagBorder;
-}
-
-void EditView::setBorder(sl_bool flag)
-{
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		LONG old = ::GetWindowLongW(handle, GWL_STYLE);
-		if (flag) {
-			::SetWindowLongW(handle, GWL_STYLE, old | WS_BORDER);
-		} else {
-			::SetWindowLongW(handle, GWL_STYLE, old & (~WS_BORDER));
-		}
-		::SetWindowPos(handle, NULL, 0, 0, 0, 0
-			, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
-	}
-	m_flagBorder = flag;
-}
-
-Alignment EditView::getTextAlignment()
+void EditView::_getTextAlignment_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -247,10 +219,9 @@ Alignment EditView::getTextAlignment()
 			m_textAlignment = Alignment::Left;
 		}
 	}
-	return m_textAlignment;
 }
 
-void EditView::setTextAlignment(Alignment _align)
+void EditView::_setTextAlignment_NW(Alignment _align)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -265,10 +236,9 @@ void EditView::setTextAlignment(Alignment _align)
 		::SetWindowPos(handle, NULL, 0, 0, 0, 0
 			, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 	}
-	m_textAlignment = _align;
 }
 
-String EditView::getHintText()
+void EditView::_getHintText_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -276,49 +246,44 @@ String EditView::getHintText()
 		::SendMessageW(handle, 0x1502 /*EM_GETCUEBANNER*/, (WPARAM)buf, 1024);
 		m_hintText = String16(buf, 1024);
 	}
-	return m_hintText;
 }
 
-void EditView::setHintText(const String& _value)
+void EditView::_setHintText_NW(const String& _value)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		String16 value = _value;
 		::SendMessageW(handle, 0x1501 /*EM_SETCUEBANNER*/, FALSE, (LPARAM)(LPCWSTR)(value.getData()));
 	}
-	m_hintText = _value;
 }
 
-sl_bool EditView::isReadOnly()
+void EditView::_isReadOnly_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		LONG style = ::GetWindowLongW(handle, GWL_STYLE);
 		m_flagReadOnly = (style & ES_READONLY) ? sl_true : sl_false;
 	}
-	return m_flagReadOnly;
 }
 
-void EditView::setReadOnly(sl_bool flag)
+void EditView::_setReadOnly_NW(sl_bool flag)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		::SendMessageW(handle, EM_SETREADONLY, (WPARAM)(flag ? TRUE : FALSE), 0);
 	}
-	m_flagReadOnly = flag;
 }
 
-sl_bool EditView::isMultiLine()
+void EditView::_isMultiLine_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		LONG style = ::GetWindowLongW(handle, GWL_STYLE);
 		m_flagMultiLine = (style & ES_MULTILINE) ? sl_true : sl_false;
 	}
-	return m_flagMultiLine;
 }
 
-void EditView::setMultiLine(sl_bool flag)
+void EditView::_setMultiLine_NW(sl_bool flag)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -331,50 +296,18 @@ void EditView::setMultiLine(sl_bool flag)
 		::SetWindowPos(handle, NULL, 0, 0, 0, 0
 			, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 	}
-	m_flagMultiLine = flag;
 }
 
-Color EditView::getTextColor()
-{
-	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_EditViewInstance::checkInstance(_instance.ptr)) {
-		_Win32_EditViewInstance* instance = ((_Win32_EditViewInstance*)(_instance.ptr));
-		m_textColor = instance->m_colorText;
-	}
-	return m_textColor;
-}
-
-void EditView::setTextColor(const Color& color)
+void EditView::_setTextColor_NW(const Color& color)
 {
 	Ref<ViewInstance> _instance = getViewInstance();
 	if (_Win32_EditViewInstance::checkInstance(_instance.ptr)) {
 		_Win32_EditViewInstance* instance = ((_Win32_EditViewInstance*)(_instance.ptr));
 		instance->setTextColor(color); 
 	}
-	m_textColor = color;
 }
 
-Color EditView::getBackgroundColor()
-{
-	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_EditViewInstance::checkInstance(_instance.ptr)) {
-		_Win32_EditViewInstance* instance = ((_Win32_EditViewInstance*)(_instance.ptr));
-		m_backgroundColor = instance->m_colorBackground;
-	}
-	return m_backgroundColor;
-}
-
-void EditView::setBackgroundColor(const Color& color)
-{
-	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_EditViewInstance::checkInstance(_instance.ptr)) {
-		_Win32_EditViewInstance* instance = ((_Win32_EditViewInstance*)(_instance.ptr));
-		instance->setBackgroundColor(color);
-	}
-	m_backgroundColor = color;
-}
-
-void EditView::setFont(const Ref<Font>& font)
+void EditView::_setFont_NW(const Ref<Font>& font)
 {
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
@@ -384,8 +317,31 @@ void EditView::setFont(const Ref<Font>& font)
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
 	}
-	m_font = font;
-	m_fontInstance = fontInstance;
+	_setFontInstance(fontInstance);
+}
+
+void EditView::_setBorder_NW(sl_bool flag)
+{
+	HWND handle = UIPlatform::getViewHandle(this);
+	if (handle) {
+		LONG old = ::GetWindowLongW(handle, GWL_STYLE);
+		if (flag) {
+			::SetWindowLongW(handle, GWL_STYLE, old | WS_BORDER);
+		} else {
+			::SetWindowLongW(handle, GWL_STYLE, old & (~WS_BORDER));
+		}
+		::SetWindowPos(handle, NULL, 0, 0, 0, 0
+			, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+	}
+}
+
+void EditView::_setBackgroundColor_NW(const Color& color)
+{
+	Ref<ViewInstance> _instance = getViewInstance();
+	if (_Win32_EditViewInstance::checkInstance(_instance.ptr)) {
+		_Win32_EditViewInstance* instance = ((_Win32_EditViewInstance*)(_instance.ptr));
+		instance->setBackgroundColor(color);
+	}
 }
 
 SLIB_UI_NAMESPACE_END

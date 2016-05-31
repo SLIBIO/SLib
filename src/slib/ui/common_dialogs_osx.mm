@@ -104,12 +104,12 @@ void AlertDialog::_show()
 		FileDialog
 ***************************************/
 
-DialogResult FileDialog::run()
+sl_bool FileDialog::run()
 {
 	return _runOnUiThread();
 }
 
-DialogResult FileDialog::_run()
+sl_bool FileDialog::_run()
 {
 	NSSavePanel* panel;
 	if (type == FileDialogType::SelectDirectory) {
@@ -196,19 +196,19 @@ DialogResult FileDialog::_run()
 				if (paths.getCount() > 0) {
 					selectedPath = paths.getItemValue(0, String::null());
 					selectedPaths = paths;
-					return DialogResult::Ok;
+					return sl_true;
 				}
 			} else {
 				String path = Apple::getFilePathFromNSURL([panel URL]);
 				if (path.isNotEmpty()) {
 					selectedPath = path;
 					selectedPaths = List<String>::createFromElement(path);
-					return DialogResult::Ok;
+					return sl_true;
 				}
 			}
 		}
 	}
-	return DialogResult::Cancel;
+	return sl_false;
 }
 
 SLIB_UI_NAMESPACE_END

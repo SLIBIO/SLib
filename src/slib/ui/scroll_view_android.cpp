@@ -33,12 +33,12 @@ public:
 	
 	void __applyProperties(jobject handle, ViewInstance* scrollViewInstance)
 	{
-		_JAndroidScrollView::setBackgroundColor.call(sl_null, handle, m_backgroundColor.getARGB());
+		_JAndroidScrollView::setBackgroundColor.call(sl_null, handle, getBackgroundColor().getARGB());
 		__applyContent(handle, scrollViewInstance);
 	}
 };
 
-Ref<ViewInstance> ScrollView::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* _parent)
 {
 	Ref<Android_ViewInstance> ret;
 	Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
@@ -53,28 +53,11 @@ Ref<ViewInstance> ScrollView::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-void ScrollView::onResize()
-{
-	View::onResize();
-}
-
-void ScrollView::onResizeChild(View* child)
+void ScrollView::_refreshContentSize_NW()
 {
 }
 
-void ScrollView::_setBorder(sl_bool flag)
-{
-}
-
-void ScrollView::_setBackgroundColor(const Color& color)
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		_JAndroidScrollView::setBackgroundColor.call(sl_null, handle, color.getARGB());
-	}
-}
-
-void ScrollView::_setContentView(const Ref<View>& view)
+void ScrollView::_setContentView_NW(const Ref<View>& view)
 {
 	Ref<ViewInstance> instance = getViewInstance();
 	if (instance.isNotNull()) {
@@ -85,7 +68,7 @@ void ScrollView::_setContentView(const Ref<View>& view)
 	}
 }
 
-void ScrollView::scrollTo(sl_real x, sl_real y)
+void ScrollView::_scrollTo_NW(sl_real x, sl_real y)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -93,7 +76,7 @@ void ScrollView::scrollTo(sl_real x, sl_real y)
 	}
 }
 
-Point ScrollView::getScrollPosition()
+Point ScrollView::_getScrollPosition_NW()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -105,7 +88,7 @@ Point ScrollView::getScrollPosition()
 	return Point::zero();
 }
 
-Size ScrollView::getScrollRange()
+Size ScrollView::_getScrollRange_NW()
 {
 	Ref<View> content = m_viewContent;
 	if (content.isNotNull()) {
@@ -121,6 +104,18 @@ Size ScrollView::getScrollRange()
 		return ret;
 	}
 	return Size::zero();
+}
+
+void ScrollView::_setBorder_NW(sl_bool flag)
+{
+}
+
+void ScrollView::_setBackgroundColor_NW(const Color& color)
+{
+	jobject handle = UIPlatform::getViewHandle(this);
+	if (handle) {
+		_JAndroidScrollView::setBackgroundColor.call(sl_null, handle, color.getARGB());
+	}
 }
 
 SLIB_UI_NAMESPACE_END

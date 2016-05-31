@@ -3,13 +3,13 @@
 
 #include "definition.h"
 
-#include "generic_view.h"
+#include "view.h"
 
 #include "../render/engine.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
-class SLIB_EXPORT RenderView : public GenericViewWithEvent
+class SLIB_EXPORT RenderView : public View
 {
 	SLIB_DECLARE_OBJECT
 	
@@ -17,11 +17,11 @@ public:
 	RenderView();
 	
 public:
-	virtual void requestRender();
-	
 	RedrawMode getRedrawMode();
 	
-	virtual void setRedrawMode(RedrawMode mode);
+	void setRedrawMode(RedrawMode mode);
+	
+	void requestRender();
 	
 public:
 	SLIB_PROPERTY(RenderEngineType, PreferredEngineType)
@@ -29,15 +29,19 @@ public:
 protected:
 	virtual void onFrame(RenderEngine* engine);
 	
-public:
-	virtual void dispatchFrame(RenderEngine* engine);
-	
-protected:
-	// override
-	Ref<ViewInstance> createInstance(ViewInstance* _parent);
-	
 	// override
 	void onAttach();
+	
+public:
+	// override
+	Ref<ViewInstance> createNativeWidget(ViewInstance* _parent);
+	
+	virtual void dispatchFrame(RenderEngine* engine);
+	
+private:
+	void _setRedrawMode_NW(RedrawMode mode);
+
+	void _requestRender_NW();
 	
 protected:
 	RedrawMode m_redrawMode;

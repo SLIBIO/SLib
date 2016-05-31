@@ -129,7 +129,7 @@ void AlertDialog::_show()
 		FileDialog
 ***************************************/
 
-DialogResult FileDialog::run()
+sl_bool FileDialog::run()
 {
 	return _runOnUiThread();
 }
@@ -152,12 +152,11 @@ static int CALLBACK _FileDialog_BrowseDirCallback(HWND hwnd, UINT uMsg, LPARAM l
 	return 0;
 }
 
-
-DialogResult FileDialog::_run()
+sl_bool FileDialog::_run()
 {
 	if (type == FileDialogType::SelectDirectory) {
 		IMalloc* pMalloc;
-		DialogResult result = DialogResult::Cancel;
+		sl_bool result = sl_false;
 		if (SUCCEEDED(SHGetMalloc(&pMalloc))) {
 			BROWSEINFOW bi;
 			Base::zeroMemory(&bi, sizeof(bi));
@@ -183,7 +182,7 @@ DialogResult FileDialog::_run()
 				if (SHGetPathFromIDListW(pidl, szPath)) {
 					selectedPath = szPath;
 					selectedPaths = List<String>::createFromElement(selectedPath);
-					result = DialogResult::Ok;
+					result = sl_true;
 				}
 				pMalloc->Free(pidl);
 			}
@@ -274,7 +273,7 @@ DialogResult FileDialog::_run()
 			if (::GetOpenFileNameW(&ofn)) {
 				selectedPath = ofn.lpstrFile;
 				selectedPaths = List<String>::createFromElement(selectedPath);
-				return DialogResult::Ok;
+				return sl_true;
 			}
 		} else if (type == FileDialogType::OpenFiles) {
 			ofn.Flags |= OFN_FILEMUSTEXIST | OFN_ALLOWMULTISELECT;
@@ -301,13 +300,13 @@ DialogResult FileDialog::_run()
 							if (files.isNotEmpty()) {
 								selectedPaths = files;
 								selectedPath = files.getItemValue(0, String::null());
-								return DialogResult::Ok;
+								return sl_true;
 							}
 						}
 					} else {
 						selectedPath = ofn.lpstrFile;
 						selectedPaths = List<String>::createFromElement(selectedPath);
-						return DialogResult::Ok;
+						return sl_true;
 					}
 				}
 			}
@@ -316,11 +315,11 @@ DialogResult FileDialog::_run()
 			if (::GetSaveFileNameW(&ofn)) {
 				selectedPath = ofn.lpstrFile;
 				selectedPaths = List<String>::createFromElement(selectedPath);
-				return DialogResult::Ok;
+				return sl_true;
 			}
 		}
 	}
-	return DialogResult::Cancel;
+	return sl_false;
 }
 
 SLIB_UI_NAMESPACE_END

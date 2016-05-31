@@ -98,6 +98,8 @@ public:
 	
 	sl_bool containsRectangle(const RectangleT<T, FT>& other) const;
 	
+	sl_bool intersectRectangle(const RectangleT<T, FT>& other, RectangleT<T, FT>* outIntersect = sl_null) const;
+	
 	void setFromPoint(T x, T y);
 	
 	void setFromPoint(const PointT<T, FT>& pt);

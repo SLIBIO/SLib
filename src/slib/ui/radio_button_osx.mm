@@ -14,16 +14,16 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
-Ref<ViewInstance> RadioButton::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> RadioButton::createNativeWidget(ViewInstance* _parent)
 {
 	OSX_VIEW_CREATE_INSTANCE_BEGIN
 	_Slib_OSX_RadioButton* handle = [[_Slib_OSX_RadioButton alloc] initWithFrame:frame];
 	if (handle != nil) {
-		handle.title = Apple::getNSStringFromString(m_text);
+		handle.title = Apple::getNSStringFromString(getText());
 		[handle setButtonType:NSRadioButton];
-		[handle setState: (m_flagSelected ? NSOnState : NSOffState)];
+		[handle setState: (isChecked() ? NSOnState : NSOffState)];
 		
-		Ref<Font> font = m_font;
+		Ref<Font> font = getFont();
 		Ref<FontInstance> fontInstance;
 		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
 		if (hFont != nil) {
@@ -32,60 +32,6 @@ Ref<ViewInstance> RadioButton::createInstance(ViewInstance* _parent)
 	}
 	OSX_VIEW_CREATE_INSTANCE_END
 	return ret;
-}
-
-String RadioButton::getText()
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
-		NSButton* v = (NSButton*)handle;
-		m_text = Apple::getStringFromNSString(v.title);
-	}
-	return m_text;
-}
-
-void RadioButton::setText(const String& text)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
-		NSButton* v = (NSButton*)handle;
-		v.title = Apple::getNSStringFromString(text);
-	}
-	m_text = text;
-}
-
-void RadioButton::setFont(const Ref<Font>& font)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
-		NSButton* v = (NSButton*)handle;
-		Ref<FontInstance> fontInstance;
-		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
-		if (hFont != nil) {
-			[v setFont:hFont];
-		}
-	}
-	m_font = font;
-}
-
-sl_bool RadioButton::isChecked()
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
-		NSButton* v = (NSButton*)handle;
-		m_flagSelected = (v.state == NSOnState ? sl_true : sl_false);
-	}
-	return m_flagSelected;
-}
-
-void RadioButton::setChecked(sl_bool flag)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
-		NSButton* v = (NSButton*)handle;
-		[v setState: (flag ? NSOnState : NSOffState)];
-	}
-	m_flagSelected = flag;
 }
 
 SLIB_UI_NAMESPACE_END

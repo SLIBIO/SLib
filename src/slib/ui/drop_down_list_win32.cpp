@@ -90,7 +90,7 @@ public:
 	}
 };
 
-Ref<ViewInstance> DropDownList::createInstance(ViewInstance* parent)
+Ref<ViewInstance> DropDownList::createNativeWidget(ViewInstance* parent)
 {
 	UINT style = CBS_DROPDOWNLIST | WS_TABSTOP;
 	Ref<_Win32_DropDownListInstance> ret = Win32_ViewInstance::create<_Win32_DropDownListInstance>(this, parent, L"COMBOBOX", L"", style, 0);
@@ -99,38 +99,36 @@ Ref<ViewInstance> DropDownList::createInstance(ViewInstance* parent)
 
 		HWND handle = ret->getHandle();
 
-		Ref<Font> font = m_font;
+		Ref<Font> font = getFont();
 		Ref<FontInstance> fontInstance;
 		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
-		m_fontInstance = fontInstance;
+		_setFontInstance(fontInstance);
 
 		((_DropDownList*)this)->__copyItems(handle);
 	}
 	return ret;
 }
 
-sl_uint32 DropDownList::getSelectedIndex()
+void DropDownList::_getSelectedIndex_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		return ((_DropDownList*)this)->__getSelectedIndex(handle);
+		m_indexSelected = ((_DropDownList*)this)->__getSelectedIndex(handle);
 	}
-	return m_indexSelected;
 }
 
-void DropDownList::_select(sl_uint32 index)
+void DropDownList::_select_NW(sl_uint32 index)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		::SendMessageW(handle, CB_SETCURSEL, (WPARAM)index, 0);
 	}
-	m_indexSelected = index;
 }
 
-void DropDownList::_refreshItemsCount()
+void DropDownList::_refreshItemsCount_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -138,7 +136,7 @@ void DropDownList::_refreshItemsCount()
 	}
 }
 
-void DropDownList::_refreshItemsContent()
+void DropDownList::_refreshItemsContent_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -146,7 +144,7 @@ void DropDownList::_refreshItemsContent()
 	}
 }
 
-void DropDownList::_setItemTitle(sl_uint32 index, const String& title)
+void DropDownList::_setItemTitle_NW(sl_uint32 index, const String& title)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -154,7 +152,7 @@ void DropDownList::_setItemTitle(sl_uint32 index, const String& title)
 	}
 }
 
-void DropDownList::setFont(const Ref<Font>& font)
+void DropDownList::_setFont_NW(const Ref<Font>& font)
 {
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
@@ -164,8 +162,7 @@ void DropDownList::setFont(const Ref<Font>& font)
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
 	}
-	m_font = font;
-	m_fontInstance = fontInstance;
+	_setFontInstance(fontInstance);
 }
 
 SLIB_UI_NAMESPACE_END

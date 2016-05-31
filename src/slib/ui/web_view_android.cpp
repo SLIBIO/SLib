@@ -19,7 +19,7 @@ public:
 		if (WebView::checkInstance(_view.ptr)) {
 			_WebView* view = (_WebView*)(_view.ptr);
 			String url = Jni::getString(jurl);
-			view->onStartLoad(url);
+			view->dispatchStartLoad(url);
 		}
 	}
 
@@ -29,7 +29,7 @@ public:
 		if (WebView::checkInstance(_view.ptr)) {
 			_WebView* view = (_WebView*)(_view.ptr);
 			String url = Jni::getString(jurl);
-			view->onFinishLoad(url, sl_false);
+			view->dispatchFinishLoad(url, sl_false);
 		}
 	}
 
@@ -40,7 +40,7 @@ public:
 			_WebView* view = (_WebView*)(_view.ptr);
 			view->m_lastErrorMessage = Jni::getString(jerror);
 			String url = Jni::getString(jurl);
-			view->onFinishLoad(url, sl_true);
+			view->dispatchFinishLoad(url, sl_true);
 		}
 	}
 
@@ -52,7 +52,7 @@ public:
 			String msg = Jni::getString(jmsg);
 			if (msg.isNotEmpty()) {
 				String param = Jni::getString(jparam);
-				view->onMessageFromJavaScript(msg, param);
+				view->dispatchMessageFromJavaScript(msg, param);
 			}
 		}
 	}
@@ -89,7 +89,7 @@ void _WebView::__load(jobject handle)
 	}
 }
 
-Ref<ViewInstance> WebView::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> WebView::createNativeWidget(ViewInstance* _parent)
 {
 	Ref<Android_ViewInstance> ret;
 	Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
@@ -104,12 +104,11 @@ Ref<ViewInstance> WebView::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-void WebView::onResize()
+void WebView::_refreshSize_NW()
 {
-	View::onResize();
 }
 
-void WebView::_load()
+void WebView::_load_NW()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -117,7 +116,7 @@ void WebView::_load()
 	}
 }
 
-String WebView::getURL()
+String WebView::_getURL_NW()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -126,7 +125,7 @@ String WebView::getURL()
 	return String::null();
 }
 
-String WebView::getPageTitle()
+String WebView::_getPageTitle_NW()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -135,7 +134,7 @@ String WebView::getPageTitle()
 	return String::null();
 }
 
-void WebView::goBack()
+void WebView::_goBack_NW()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -143,7 +142,7 @@ void WebView::goBack()
 	}
 }
 
-void WebView::goForward()
+void WebView::_goForward_NW()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -151,7 +150,7 @@ void WebView::goForward()
 	}
 }
 
-void WebView::reload()
+void WebView::_reload_NW()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -159,7 +158,7 @@ void WebView::reload()
 	}
 }
 
-void WebView::runJavaScript(const String& script)
+void WebView::_runJavaScript_NW(const String& script)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {

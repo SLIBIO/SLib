@@ -62,14 +62,14 @@ public:
 	}
 };
 
-Ref<ViewInstance> DropDownList::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> DropDownList::createNativeWidget(ViewInstance* _parent)
 {
 	IOS_VIEW_CREATE_INSTANCE_BEGIN
 	_Slib_iOS_DropDownList* handle = [[_Slib_iOS_DropDownList alloc] initWithFrame:frame];
 	if (handle != nil) {
 		((_DropDownList*)this)->__selectItem(handle, m_indexSelected);
 		
-		Ref<Font> font = m_font;
+		Ref<Font> font = getFont();
 		Ref<FontInstance> fontInstance;
 		UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
 		if (hFont != nil) {
@@ -80,22 +80,20 @@ Ref<ViewInstance> DropDownList::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-sl_uint32 DropDownList::getSelectedIndex()
+void DropDownList::_getSelectedIndex_NW()
 {
-	return m_indexSelected;
 }
 
-void DropDownList::_select(sl_uint32 index)
+void DropDownList::_select_NW(sl_uint32 index)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_DropDownList class]]) {
 		_Slib_iOS_DropDownList* v = (_Slib_iOS_DropDownList*)handle;
 		((_DropDownList*)this)->__selectItem(v, index);
 	}
-	m_indexSelected = index;
 }
 
-void DropDownList::_refreshItemsCount()
+void DropDownList::_refreshItemsCount_NW()
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_DropDownList class]]) {
@@ -104,7 +102,7 @@ void DropDownList::_refreshItemsCount()
 	}
 }
 
-void DropDownList::_refreshItemsContent()
+void DropDownList::_refreshItemsContent_NW()
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_DropDownList class]]) {
@@ -113,7 +111,7 @@ void DropDownList::_refreshItemsContent()
 	}
 }
 
-void DropDownList::_setItemTitle(sl_uint32 index, const String& title)
+void DropDownList::_setItemTitle_NW(sl_uint32 index, const String& title)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_DropDownList class]]) {
@@ -122,7 +120,7 @@ void DropDownList::_setItemTitle(sl_uint32 index, const String& title)
 	}
 }
 
-void DropDownList::setFont(const Ref<Font>& font)
+void DropDownList::_setFont_NW(const Ref<Font>& font)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_DropDownList class]]) {
@@ -133,7 +131,6 @@ void DropDownList::setFont(const Ref<Font>& font)
 			[v setFont:hFont];
 		}
 	}
-	m_font = font;
 }
 
 SLIB_UI_NAMESPACE_END

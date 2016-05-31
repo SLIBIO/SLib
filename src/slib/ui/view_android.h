@@ -118,6 +118,7 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidTouchPoint, "slib/platform/android/ui/view/UiTouch
 	SLIB_JNI_FLOAT_FIELD(x);
 	SLIB_JNI_FLOAT_FIELD(y);
 	SLIB_JNI_FLOAT_FIELD(pressure);
+	SLIB_JNI_INT_FIELD(phase);
 SLIB_JNI_END_CLASS
 
 SLIB_UI_NAMESPACE_END

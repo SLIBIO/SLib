@@ -106,7 +106,7 @@ public:
 	}
 };
 
-Ref<ViewInstance> ScrollView::createInstance(ViewInstance* parent)
+Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* parent)
 {
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
 	DWORD style = WS_HSCROLL | WS_VSCROLL;
@@ -117,27 +117,18 @@ Ref<ViewInstance> ScrollView::createInstance(ViewInstance* parent)
 #if defined(_SLIB_UI_WIN32_USE_CLIP_CHILDREN)
 	style |= (WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
 #endif
-	if (m_flagBorder) {
+	if (isBorder()) {
 		style |= WS_BORDER;
 	}
 	Ref<_Win32_ScrollViewInstance> ret = Win32_ViewInstance::create<_Win32_ScrollViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
 	if (ret.isNotNull()) {
 		ret->__setContentView(m_viewContent, this);
-		ret->m_backgroundColor = m_backgroundColor;
+		ret->m_backgroundColor = getBackgroundColor();
 	}
 	return ret;
 }
 
-void ScrollView::onResize()
-{
-	View::onResize();
-	Ref<ViewInstance> instance = getViewInstance();
-	if (_Win32_ScrollViewInstance::checkInstance(instance.ptr)) {
-		((_Win32_ScrollViewInstance*)(instance.ptr))->__refreshContentSize(this);
-	}
-}
-
-void ScrollView::onResizeChild(View* child)
+void ScrollView::_refreshContentSize_NW()
 {
 	Ref<ViewInstance> instance = getViewInstance();
 	if (_Win32_ScrollViewInstance::checkInstance(instance.ptr)) {
@@ -145,30 +136,7 @@ void ScrollView::onResizeChild(View* child)
 	}
 }
 
-void ScrollView::_setBorder(sl_bool flag)
-{
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		LONG old = ::GetWindowLongW(handle, GWL_STYLE);
-		if (flag) {
-			::SetWindowLongW(handle, GWL_STYLE, old | WS_BORDER);
-		} else {
-			::SetWindowLongW(handle, GWL_STYLE, old & (~WS_BORDER));
-		}
-		::SetWindowPos(handle, NULL, 0, 0, 0, 0
-			, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
-	}
-}
-
-void ScrollView::_setBackgroundColor(const Color& color)
-{
-	Ref<ViewInstance> instance = getViewInstance();
-	if (_Win32_ScrollViewInstance::checkInstance(instance.ptr)) {
-		((_Win32_ScrollViewInstance*)(instance.ptr))->m_backgroundColor = m_backgroundColor;
-	}
-}
-
-void ScrollView::_setContentView(const Ref<View>& view)
+void ScrollView::_setContentView_NW(const Ref<View>& view)
 {
 	Ref<ViewInstance> instance = getViewInstance();
 	if (_Win32_ScrollViewInstance::checkInstance(instance.ptr)) {
@@ -176,7 +144,7 @@ void ScrollView::_setContentView(const Ref<View>& view)
 	}
 }
 
-void ScrollView::scrollTo(sl_real x, sl_real y)
+void ScrollView::_scrollTo_NW(sl_real x, sl_real y)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -195,7 +163,7 @@ void ScrollView::scrollTo(sl_real x, sl_real y)
 	}
 }
 
-Point ScrollView::getScrollPosition()
+Point ScrollView::_getScrollPosition_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -212,7 +180,7 @@ Point ScrollView::getScrollPosition()
 	return Point::zero();
 }
 
-Size ScrollView::getScrollRange()
+Size ScrollView::_getScrollRange_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -233,6 +201,29 @@ Size ScrollView::getScrollRange()
 		return Size((sl_real)w, (sl_real)h);
 	}
 	return Size::zero();
+}
+
+void ScrollView::_setBorder_NW(sl_bool flag)
+{
+	HWND handle = UIPlatform::getViewHandle(this);
+	if (handle) {
+		LONG old = ::GetWindowLongW(handle, GWL_STYLE);
+		if (flag) {
+			::SetWindowLongW(handle, GWL_STYLE, old | WS_BORDER);
+		} else {
+			::SetWindowLongW(handle, GWL_STYLE, old & (~WS_BORDER));
+		}
+		::SetWindowPos(handle, NULL, 0, 0, 0, 0
+			, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+	}
+}
+
+void ScrollView::_setBackgroundColor_NW(const Color& color)
+{
+	Ref<ViewInstance> instance = getViewInstance();
+	if (_Win32_ScrollViewInstance::checkInstance(instance.ptr)) {
+		((_Win32_ScrollViewInstance*)(instance.ptr))->m_backgroundColor = color;
+	}
 }
 
 SLIB_UI_NAMESPACE_END

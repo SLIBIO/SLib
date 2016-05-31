@@ -3,73 +3,55 @@
 
 #include "definition.h"
 
-#if defined(SLIB_PLATFORM_IS_WIN32) || defined(SLIB_PLATFORM_IS_OSX)
-#define SLIB_UI_SUPPORT_NATIVE_RADIO_BUTTON
-#endif
-
-#if defined(SLIB_UI_SUPPORT_NATIVE_RADIO_BUTTON)
-
-#include "view.h"
-#include "radio_group.h"
-
-#include "../core/callback.h"
+#include "check_box.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
-class SLIB_EXPORT RadioButton : public View
+class RadioGroup;
+
+class SLIB_EXPORT RadioButton : public CheckBox
 {
 	SLIB_DECLARE_OBJECT
 	
 public:
 	RadioButton();
 	
-public:
-	sl_bool isChecked();
-	
-	virtual void setChecked(sl_bool flag);
-	
-public:
-	String getText();
-	
-	virtual void setText(const String& text);
-	
-	
-    Ref<Font> getFont();
-	
-	virtual void setFont(const Ref<Font>& font);
+	RadioButton(sl_uint32 nCategories, ButtonCategory* categories);
 
 public:
-	SLIB_REF_PROPERTY(Runnable, OnClick)
+	// override
+	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
 	
+	// override
+	void dispatchClick(UIEvent* ev);
+	
+public:
 	SLIB_WEAK_PROPERTY(RadioGroup, RadioGroup)
+	
+};
 
+class SLIB_EXPORT RadioGroup : public Object
+{
+	SLIB_DECLARE_OBJECT
+	
 public:
-	// override
-	void dispatchClick();
+	RadioGroup();
+	
+public:
+	void add(const Ref<RadioButton>& view);
+	
+	void remove(const Ref<RadioButton>& view);
+	
+	void select(const Ref<RadioButton>& view);
+	
+	Ref<RadioButton> getSelected();
 	
 protected:
-	// override
-	Ref<ViewInstance> createInstance(ViewInstance* parent);
-	
-protected:
-	SafeString m_text;
-	sl_bool m_flagSelected;
-	
-	SafeRef<Font> m_font;
-	SafeRef<FontInstance> m_fontInstance;
+	CList< Ref<RadioButton> > m_views;
+	SafeRef<RadioButton> m_viewSelected;
 	
 };
 
 SLIB_UI_NAMESPACE_END
-
-#else
-
-#include "s_radio_button.h"
-
-SLIB_UI_NAMESPACE_BEGIN
-typedef SRadioButton RadioButton;
-SLIB_UI_NAMESPACE_END
-
-#endif
 
 #endif

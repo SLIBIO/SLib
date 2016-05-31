@@ -59,18 +59,18 @@ public:
 	
 	void __onStartLoad(OSWebView* handle)
 	{
-		onStartLoad(getURL());
+		dispatchStartLoad(getURL());
 	}
 	
 	void __onFinishLoad(OSWebView* handle)
 	{
-		onFinishLoad(getURL(), sl_false);
+		dispatchFinishLoad(getURL(), sl_false);
 	}
 	
 	void __onLoadError(OSWebView* handle, NSError* error)
 	{
 		m_lastErrorMessage = Apple::getStringFromNSString([error localizedDescription]);
-		onFinishLoad(getURL(), sl_true);
+		dispatchFinishLoad(getURL(), sl_true);
 	}
 	
 	void __onInvokeMethod(OSWebView* handle, id body)
@@ -84,7 +84,7 @@ public:
 			msg = msg.substring(0, index);
 		}
 		if (msg.isNotEmpty()) {
-			onMessageFromJavaScript(msg, param);
+			dispatchMessageFromJavaScript(msg, param);
 		}
 	}
 	
@@ -100,7 +100,7 @@ public:
 		String msg = params.getItemValue(0, String::null());
 		if (msg.isNotEmpty()) {
 			String param = params.getItemValue(0, String::null());
-			onMessageFromJavaScript(msg, param);
+			dispatchMessageFromJavaScript(msg, param);
 		}
 	}
 	
@@ -132,7 +132,7 @@ public:
 #endif
 };
 
-Ref<ViewInstance> WebView::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> WebView::createNativeWidget(ViewInstance* _parent)
 {
 	OSX_VIEW_CREATE_INSTANCE_BEGIN
 	_Slib_OSX_WebView* handle = [[_Slib_OSX_WebView alloc] initWithFrame:frame];
@@ -143,12 +143,11 @@ Ref<ViewInstance> WebView::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-void WebView::onResize()
+void WebView::_refreshSize_NW()
 {
-	View::onResize();
 }
 
-void WebView::_load()
+void WebView::_load_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
@@ -157,7 +156,7 @@ void WebView::_load()
 	}
 }
 
-String WebView::getURL()
+String WebView::_getURL_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
@@ -172,7 +171,7 @@ String WebView::getURL()
 	return m_urlOrigin;
 }
 
-String WebView::getPageTitle()
+String WebView::_getPageTitle_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
@@ -190,7 +189,7 @@ String WebView::getPageTitle()
 	return String::null();
 }
 
-void WebView::goBack()
+void WebView::_goBack_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
@@ -199,7 +198,7 @@ void WebView::goBack()
 	}
 }
 
-void WebView::goForward()
+void WebView::_goForward_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
@@ -208,7 +207,7 @@ void WebView::goForward()
 	}
 }
 
-void WebView::reload()
+void WebView::_reload_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
@@ -217,7 +216,7 @@ void WebView::reload()
 	}
 }
 
-void WebView::runJavaScript(const String& script)
+void WebView::_runJavaScript_NW(const String& script)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {

@@ -279,8 +279,19 @@ sl_bool iOS_ViewInstance::onEventTouch(UIAction action, NSSet* touches, ::UIEven
 			sl_uint32 i = 0;
 			for (UITouch* touch in touches) {
 				CGPoint pt = [touch locationInView:handle];
-				sl_real pressure = (sl_real)([touch majorRadius]);
-				TouchPoint point((sl_real)(pt.x), (sl_real)(pt.y), pressure);
+				sl_real pressure = (sl_real)([touch force]);
+				UITouchPhase _phase = [touch phase];
+				TouchPhase phase;
+				if (_phase == UITouchPhaseBegan) {
+					phase = TouchPhase::Begin;
+				} else if (_phase == UITouchPhaseEnded) {
+					phase = TouchPhase::End;
+				} else if (_phase == UITouchPhaseCancelled) {
+					phase = TouchPhase::Cancel;
+				} else {
+					phase = TouchPhase::Move;
+				}
+				TouchPoint point((sl_real)(pt.x), (sl_real)(pt.y), pressure, phase);
 				pts[i] = point;
 				i++;
 				if (i >= n) {
@@ -305,7 +316,7 @@ sl_bool iOS_ViewInstance::onEventTouch(UIAction action, NSSet* touches, ::UIEven
 /******************************************
 				View
 ******************************************/
-Ref<ViewInstance> View::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> View::createGenericInstance(ViewInstance* _parent)
 {
 	IOS_VIEW_CREATE_INSTANCE_BEGIN
 	Slib_iOS_ViewHandle* handle = [[Slib_iOS_ViewHandle alloc] initWithFrame:frame];

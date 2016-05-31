@@ -3,12 +3,6 @@
 
 #include "definition.h"
 
-#if defined(SLIB_PLATFORM_IS_WIN32) || defined(SLIB_PLATFORM_IS_OSX)
-#define SLIB_UI_SUPPORT_NATIVE_TAB_VIEW
-#endif
-
-#if defined(SLIB_UI_SUPPORT_NATIVE_TAB_VIEW)
-
 #include "view.h"
 
 SLIB_UI_NAMESPACE_BEGIN
@@ -40,75 +34,141 @@ public:
 public:
 	sl_uint32 getTabsCount();
 	
-	virtual void setTabsCount(sl_uint32 nCount);
-	
+	virtual void setTabsCount(sl_uint32 count, sl_bool flagRedraw = sl_true);
 	
 	String getTabLabel(sl_uint32 index);
 	
-	virtual void setTabLabel(sl_uint32 index, const String& text);
+	virtual void setTabLabel(sl_uint32 index, const String& text, sl_bool flagRedraw = sl_true);
 	
-
 	Ref<View> getTabContentView(sl_uint32 index);
 	
-	virtual void setTabContentView(sl_uint32 index, const Ref<View>& view);
-	
+	virtual void setTabContentView(sl_uint32 index, const Ref<View>& view, sl_bool flagRedraw = sl_true);
 	
 	sl_uint32 getSelectedTabIndex();
 	
-	virtual void selectTab(sl_uint32 index);
-	
+	virtual void selectTab(sl_uint32 index, sl_bool flagRedraw = sl_true);
 	
 	Size getContentViewSize();
 	
+	sl_bool isVerticalTabBar();
 	
-	Ref<Font> getFont();
+	void setVerticalTabBar(sl_bool flag, sl_bool flagRedraw = sl_true);
 	
-	virtual void setFont(const Ref<Font>& font);
-
+	sl_real getTabWidth();
+	
+	virtual void setTabWidth(sl_real width, sl_bool flagRedraw = sl_true);
+	
+	sl_real getTabHeight();
+	
+	virtual void setTabHeight(sl_real height, sl_bool flagRedraw = sl_true);
+	
+	Ref<Drawable> getTabBarBackground();
+	
+	void setTabBarBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	
+	void setTabBarBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
+	
+	Ref<Drawable> getSelectedTabBackground();
+	
+	void setSelectedTabBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	
+	void setSelectedTabBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
+	
+	Ref<Drawable> getHoverTabBackground();
+	
+	void setHoverTabBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	
+	void setHoverTabBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
+	
+	Color getTabLabelColor();
+	
+	void setTabLabelColor(const Color& color, sl_bool flagRedraw = sl_true);
+	
+	Color getSelectedTabLabelColor();
+	
+	void setSelectedTabLabelColor(const Color& color, sl_bool flagRedraw = sl_true);
+	
+	Color getHoverTabLabelColor();
+	
+	void setHoverTabLabelColor(const Color& color, sl_bool flagRedraw = sl_true);
+	
+	virtual Rectangle getTabBarRegion();
+	
+	virtual Rectangle getTabRegion(sl_uint32 index);
+	
+	virtual Rectangle getTabContentRegion();
+	
 public:
 	SLIB_PTR_PROPERTY(ITabViewListener, Listener)
 	
-protected:
-	void onSelectTab(sl_uint32 index);
-	
-protected:
+public:
 	// override
-	Ref<ViewInstance> createInstance(ViewInstance* parent);
+	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+	
+	void dispatchSelectTab(sl_uint32 index);
+	
+protected:
+	virtual void onSelectTab(sl_uint32 index);
 	
 	// override
-	void onResize();
-
+	void onClickView(UIEvent* ev);
+	
+	// override
+	void onMouseEvent(UIEvent* ev);
+	
+	// override
+	void onDraw(Canvas* canvas);
+	
+	// override
+	void onResize(sl_real width, sl_real height);
+	
+	virtual void onDrawTabBarBackground(Canvas* canvas);
+	
+	virtual void onDrawTab(Canvas* canvas, const Rectangle& rect, sl_uint32 index, const String& label);
+	
 protected:
-	void _refreshTabsCount();
-
-	void _setTabLabel(sl_uint32 index, const String& text);
+	void _invalidateTabBar();
 	
-	void _setTabContentView(sl_uint32 index, const Ref<View>& view);
+	void _relayout(sl_bool flagRedraw);
 	
-	void _setTabContentView_(sl_uint32 index, Ref<View> view);
+private:
+	void _refreshTabsCount_NW();
 	
-	void _selectTab(sl_uint32 index);
-
+	void _refreshSize_NW();
+	
+	void _setTabLabel_NW(sl_uint32 index, const String& text);
+	
+	void _setTabContentView_NW(sl_uint32 index, const Ref<View>& view);
+	
+	void _setTabContentView_NW_OnUiThread(sl_uint32 index, Ref<View> view);
+	
+	void _getSelectedTabIndex_NW();
+	
+	Size _getContentViewSize_NW();
+	
+	void _selectTab_NW(sl_uint32 index);
+	
+	// override
+	void _setFont_NW(const Ref<Font>& font);
+	
 protected:
 	CList<TabViewItem> m_items;
 	sl_uint32 m_indexSelected;
+	sl_int32 m_indexHover;
 	
-	SafeRef<Font> m_font;
-	SafeRef<FontInstance> m_fontInstance;
+	sl_bool m_flagVertical;
+	sl_real m_tabWidth;
+	sl_real m_tabHeight;
+	
+	SafeRef<Drawable> m_tabBarBackground;
+	SafeRef<Drawable> m_selectedTabBackground;
+	SafeRef<Drawable> m_hoverTabBackground;
+	Color m_tabLabelColor;
+	Color m_selectedTabLabelColor;
+	Color m_hoverTabLabelColor;
 	
 };
 
 SLIB_UI_NAMESPACE_END
-
-#else
-
-#include "s_tab_view.h"
-
-SLIB_UI_NAMESPACE_BEGIN
-typedef STabView TabView;
-typedef STabViewListener ITabViewListener;
-SLIB_UI_NAMESPACE_END
-
-#endif
 
 #endif

@@ -3,73 +3,41 @@
 
 #include "definition.h"
 
-#if defined(SLIB_PLATFORM_IS_WIN32) || defined(SLIB_PLATFORM_IS_OSX)
-#define SLIB_UI_SUPPORT_NATIVE_CHECK_BOX
-#endif
-
-#if defined(SLIB_UI_SUPPORT_NATIVE_CHECK_BOX)
-
-#include "view.h"
-#include "radio_group.h"
-
-#include "../core/callback.h"
+#include "button.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
-class SLIB_EXPORT CheckBox : public View
+class SLIB_EXPORT CheckBox : public Button
 {
 	SLIB_DECLARE_OBJECT
 	
 public:
 	CheckBox();
 	
+	CheckBox(sl_uint32 nCategories, ButtonCategory* categories);
+	
 public:
 	sl_bool isChecked();
 	
-	virtual void setChecked(sl_bool flag);
+	virtual void setChecked(sl_bool flag, sl_bool flagRedraw = sl_true);
 	
-public:
-	String getText();
-	
-	virtual void setText(const String& text);
-	
-	
-	Ref<Font> getFont();
-	
-	virtual void setFont(const Ref<Font>& font);
-
-public:
-	SLIB_REF_PROPERTY(Runnable, OnClick)
-	
-	SLIB_WEAK_PROPERTY(RadioGroup, RadioGroup)
-
 public:
 	// override
-	void dispatchClick();
+	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
 	
-protected:
 	// override
-	Ref<ViewInstance> createInstance(ViewInstance* parent);
+	void dispatchClick(UIEvent* ev);
 	
+public:
+	void _getChecked_NW();
+	
+	void _setChecked_NW(sl_bool flag);
+
 protected:
-	SafeString m_text;
 	sl_bool m_flagChecked;
-	
-	SafeRef<Font> m_font;
-	SafeRef<FontInstance> m_fontInstance;
 	
 };
 
 SLIB_UI_NAMESPACE_END
-
-#else
-
-#include "s_check_box.h"
-
-SLIB_UI_NAMESPACE_BEGIN
-typedef SCheckBox CheckBox;
-SLIB_UI_NAMESPACE_END
-
-#endif
 
 #endif

@@ -5,7 +5,6 @@
 #include "view_win32.h"
 
 #include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/ui/view_group.h"
 #include "../../../inc/slib/ui/scroll_view.h"
 
 SLIB_UI_NAMESPACE_BEGIN
@@ -61,10 +60,6 @@ HWND Win32_ViewInstance::createHandle(
 			, hInst
 			, NULL);
 		if (hWnd) {
-			HFONT hFont = Win32_UI_Shared::get()->hFontDefault;
-			if (hFont) {
-				::SendMessageW(hWnd, WM_SETFONT, (WPARAM)hFont, TRUE);
-			}
 			if (!(view->isEnabled())) {
 				::EnableWindow(hWnd, FALSE);
 			}
@@ -309,7 +304,12 @@ sl_bool Win32_ViewInstance::onEventSetCursor()
 {
 	HWND hWnd = m_handle;
 	if (hWnd) {
-		Ref<UIEvent> ev = UIEvent::createSetCursorEvent();
+		const DWORD lParam = ::GetMessagePos();
+		POINT pt;
+		pt.x = (short)(lParam & 0xffff);
+		pt.y = (short)((lParam >> 16) & 0xffff);
+		::ScreenToClient(hWnd, &pt);
+		Ref<UIEvent> ev = UIEvent::createSetCursorEvent((sl_real)(pt.x), (sl_real)(pt.y));
 		if (ev.isNotNull()) {
 			onSetCursor(ev.ptr);
 			if (ev->isPreventedDefault()) {
@@ -556,8 +556,15 @@ void Win32_ViewInstance::processPostControlColor(UINT msg, HDC hDC, HBRUSH& resu
 {
 }
 
-LRESULT CALLBACK _Win32_ViewWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK _Win32_ViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(hWnd));
+	if (instance.isNotNull()) {
+		LRESULT result = 0;
+		if (instance->processWindowMessage(uMsg, wParam, lParam, result)) {
+			return result;
+		}
+	}
 	switch (uMsg) {
 		case WM_COMMAND:
 			{
@@ -598,7 +605,7 @@ LRESULT CALLBACK _Win32_ViewWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 				if (instance.isNotNull()) {
 					HDC hDC = (HDC)(wParam);
 					HBRUSH result = NULL;
-					if (! (instance->processControlColor(uMsg, hDC, result))) {
+					if (!(instance->processControlColor(uMsg, hDC, result))) {
 						result = (HBRUSH)(::DefWindowProcW(hWnd, uMsg, wParam, lParam));
 					}
 					instance->processPostControlColor(uMsg, hDC, result);
@@ -610,27 +617,15 @@ LRESULT CALLBACK _Win32_ViewWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 	return ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK _Win32_ViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(hWnd));
-	if (instance.isNotNull()) {
-		LRESULT result = 0;
-		if (instance->processWindowMessage(uMsg, wParam, lParam, result)) {
-			return result;
-		}
-	}
-	return _Win32_ViewWindowProc(hWnd, uMsg, wParam, lParam);
-}
-
 /******************************************
 				View
 ******************************************/
-Ref<ViewInstance> View::createInstance(ViewInstance* parent)
+Ref<ViewInstance> View::createGenericInstance(ViewInstance* parent)
 {
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
 	DWORD styleEx = 0;
 	DWORD style = 0;
-	if (m_flagGroup) {
+	if (m_flagCreatingChildInstances) {
 		styleEx = WS_EX_CONTROLPARENT;
 #if defined(_SLIB_UI_WIN32_USE_COMPOSITE_VIEWS)
 		styleEx |= WS_EX_COMPOSITED;

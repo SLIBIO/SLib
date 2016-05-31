@@ -45,7 +45,7 @@ public:
 	static Gdiplus::Font* getGdiplusFont(Font* font, Ref<FontInstance>& instance);
 	static HFONT getGdiFont(Font* font, Ref<FontInstance>& instance);
 	
-	static Ref<Canvas> createCanvas(Gdiplus::Graphics* graphics, sl_uint32 width, sl_uint32 height, const Rectangle* rectDirty = sl_null, sl_bool flagFreeOnRelease = sl_true, const Referable* ref = sl_null);
+	static Ref<Canvas> createCanvas(Gdiplus::Graphics* graphics, sl_uint32 width, sl_uint32 height, const Rectangle* rectClip = sl_null, sl_bool flagFreeOnRelease = sl_true, const Referable* ref = sl_null, sl_bool flagBuffer = sl_false);
 	static Gdiplus::Graphics* getCanvasHandle(Canvas* canvas);
 	
 	static Ref<Drawable> createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease = sl_true, const Referable* ref = sl_null);
@@ -102,7 +102,7 @@ public:
 	static CGPathRef getGraphicsPath(GraphicsPath* path, Ref<GraphicsPathInstance>& instance);
 	static CTFontRef getCoreTextFont(Font* font, Ref<FontInstance>& instance);
 	
-	static Ref<Canvas> createCanvas(CGContextRef graphics, sl_uint32 width, sl_uint32 height, const Rectangle* rectDirty = sl_null);
+	static Ref<Canvas> createCanvas(CGContextRef graphics, sl_uint32 width, sl_uint32 height, const Rectangle* rectClip = sl_null);
 	static CGContextRef getCanvasHandle(Canvas* canvas);
 	
 	static Ref<Drawable> createImageDrawable(CGImageRef image, sl_bool flagFlipped = sl_false);

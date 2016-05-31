@@ -15,14 +15,15 @@
 @end
 
 SLIB_UI_NAMESPACE_BEGIN
-Ref<ViewInstance> Button::createInstance(ViewInstance* _parent)
+
+Ref<ViewInstance> Button::createNativeWidget(ViewInstance* _parent)
 {
 	IOS_VIEW_CREATE_INSTANCE_BEGIN
 	_Slib_iOS_Button* handle = [[_Slib_iOS_Button alloc] initWithFrame:frame];
 	if (handle != nil) {
 		[handle setTitle:(Apple::getNSStringFromString(m_text)) forState:UIControlStateNormal];
 		Ref<FontInstance> fontInstance;
-		Ref<Font> font = m_font;
+		Ref<Font> font = getFont();
 		UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
 		if (hFont != nil) {
 			handle.titleLabel.font = hFont;
@@ -35,27 +36,20 @@ Ref<ViewInstance> Button::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-String Button::getText()
-{
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[UIButton class]]) {
-		UIButton* v = (UIButton*)handle;
-		m_text = Apple::getStringFromNSString([v titleForState:UIControlStateNormal]);
-	}
-	return m_text;
-}
-
-void Button::setText(const String& text)
+void Button::_setText_NW(const String& text)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[UIButton class]]) {
 		UIButton* v = (UIButton*)handle;
 		[v setTitle: (Apple::getNSStringFromString(text)) forState:UIControlStateNormal];
 	}
-	m_text = text;
 }
 
-void Button::setFont(const Ref<Font>& font)
+void Button::_setDefaultButton_NW(sl_bool flag)
+{
+}
+
+void Button::_setFont_NW(const Ref<Font>& font)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[UIButton class]]) {
@@ -66,12 +60,8 @@ void Button::setFont(const Ref<Font>& font)
 			v.titleLabel.font = hFont;
 		}
 	}
-	m_font = font;
 }
 
-void Button::setDefaultButton(sl_bool flag)
-{
-}
 SLIB_UI_NAMESPACE_END
 
 @implementation _Slib_iOS_Button

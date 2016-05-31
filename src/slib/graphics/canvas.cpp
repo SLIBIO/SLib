@@ -49,7 +49,7 @@ void Canvas::clipToEllipse(sl_real x, sl_real y, sl_real width, sl_real height)
 void Canvas::translate(sl_real dx, sl_real dy)
 {
 	Matrix3 mat;
-	Transform2::setTranslation(mat,dx, dy);
+	Transform2::setTranslation(mat, dx, dy);
 	concatMatrix(mat);
 }
 
@@ -367,19 +367,35 @@ void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleMo
 	}
 }
 
+CanvasStatusScope::CanvasStatusScope()
+{
+}
+
 CanvasStatusScope::CanvasStatusScope(const Ref<Canvas>& canvas)
 {
+	save(canvas);
+}
+
+CanvasStatusScope::~CanvasStatusScope()
+{
+	restore();
+}
+
+void CanvasStatusScope::save(const Ref<Canvas>& canvas)
+{
+	restore();
 	m_canvas = canvas;
 	if (m_canvas.isNotNull()) {
 		m_canvas->save();
 	}
 }
 
-CanvasStatusScope::~CanvasStatusScope()
+void CanvasStatusScope::restore()
 {
 	Ref<Canvas> canvas = m_canvas;
 	if (canvas.isNotNull()) {
 		canvas->restore();
+		m_canvas.setNull();
 	}
 }
 

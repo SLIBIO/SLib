@@ -162,7 +162,7 @@ public:
 
 
 #define SLIB_DECLARE_MENU_BEGIN(NAME) \
-class NAME : public Referable { \
+class NAME : public slib::Referable { \
 public: \
 	static const NAME& get(); \
 	NAME(); \

@@ -61,7 +61,7 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidGLView, "slib/platform/android/ui/view/UiGLView")
 
 SLIB_JNI_END_CLASS
 
-Ref<ViewInstance> RenderView::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* _parent)
 {
 	Ref<Android_ViewInstance> ret;
 	Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
@@ -76,19 +76,15 @@ Ref<ViewInstance> RenderView::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-void RenderView::setRedrawMode(RedrawMode mode)
+void RenderView::_setRedrawMode_NW(RedrawMode mode)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		if (_JAndroidGLView::setRenderMode.callBoolean(sl_null, handle, mode) != 0) {
-			m_redrawMode = mode;
-		}
-	} else {
-		m_redrawMode = mode;
+		_JAndroidGLView::setRenderMode.callBoolean(sl_null, handle, mode);
 	}
 }
 
-void RenderView::requestRender()
+void RenderView::_requestRender_NW()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {

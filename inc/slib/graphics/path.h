@@ -90,6 +90,11 @@ public:
 	void invalidate();
 	
 public:
+	static sl_bool containsPointInRoundRect(const Point& pt, const Rectangle& rect, const Size& radius);
+	
+	static sl_bool containsPointInEllipse(const Point& pt, const Rectangle& rect);
+
+public:
 	CList<GraphicsPathPoint> points;
 	
 protected:

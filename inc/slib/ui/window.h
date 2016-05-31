@@ -17,7 +17,6 @@ SLIB_UI_NAMESPACE_BEGIN
 class Screen;
 class View;
 class ViewInstance;
-class ViewGroup;
 class Window;
 class WindowInstance;
 
@@ -70,9 +69,9 @@ public:
 	void setScreen(const Ref<Screen>& screen);
 
 	
-	Ref<ViewGroup> getContentView();
+	Ref<View> getContentView();
 	
-	virtual void setContentView(const Ref<ViewGroup>& view);
+	virtual void setContentView(const Ref<View>& view);
 	
 	
 	Ref<Menu> getMenu();
@@ -272,7 +271,7 @@ public:
 	virtual void onMove();
 	
 	virtual void onResize(Size& size);
-	
+
 	virtual void onMinimize();
 	
 	virtual void onDeminimize();
@@ -294,7 +293,7 @@ private:
 	SafeRef<WindowInstance> m_instance;
 	SafeWeakRef<Window> m_parent;
 	SafeRef<Screen> m_screen;
-	SafeRef<ViewGroup> m_viewContent;
+	SafeRef<View> m_viewContent;
 	SafeRef<Menu> m_menu;
 	
 	Rectangle m_frame;

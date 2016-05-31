@@ -115,14 +115,14 @@ void _AndroidAlert_runShowResult(JNIEnv* env, jobject _this, jlong _alert, int r
 }
 
 
-DialogResult FileDialog::run()
+sl_bool FileDialog::run()
 {
-	return DialogResult::Cancel;
+	return sl_false;
 }
 
-DialogResult FileDialog::_run()
+sl_bool FileDialog::_run()
 {
-	return DialogResult::Cancel;
+	return sl_false;
 }
 
 SLIB_UI_NAMESPACE_END

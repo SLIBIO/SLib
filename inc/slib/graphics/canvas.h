@@ -27,7 +27,7 @@ public:
 public:
 	virtual Size getSize() = 0;
 	
-	virtual Rectangle getInvalidatedRect() = 0;
+	virtual sl_bool isBuffer() = 0;
 	
 	
 	virtual void save() = 0;
@@ -37,6 +37,8 @@ public:
 	
 	virtual void setAntiAlias(sl_bool flag) = 0;
 	
+	
+	virtual Rectangle getClipBounds() = 0;
 	
 	virtual void clipToRectangle(const Rectangle& rect) = 0;
 	
@@ -181,9 +183,16 @@ protected:
 class SLIB_EXPORT CanvasStatusScope
 {
 public:
+	CanvasStatusScope();
+	
 	CanvasStatusScope(const Ref<Canvas>& canvas);
 	
 	~CanvasStatusScope();
+	
+public:
+	void save(const Ref<Canvas>& canvas);
+	
+	void restore();
 	
 private:
 	Ref<Canvas> m_canvas;

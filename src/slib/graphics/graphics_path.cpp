@@ -226,6 +226,66 @@ void GraphicsPath::invalidate()
 	setInstance(Ref<GraphicsPathInstance>::null());
 }
 
+sl_bool GraphicsPath::containsPointInRoundRect(const Point& pt, const Rectangle& rect, const Size& radius)
+{
+	sl_real x = pt.x;
+	sl_real y = pt.y;
+	if (x < rect.left) {
+		return sl_false;
+	}
+	if (x > rect.right) {
+		return sl_false;
+	}
+	if (y < rect.top) {
+		return sl_false;
+	}
+	if (y > rect.bottom) {
+		return sl_false;
+	}
+	x -= rect.left;
+	if (x > radius.x) {
+		sl_real t = rect.right - rect.left - radius.x;
+		if (x < t) {
+			return sl_true;
+		}
+		x = radius.x + x - t;
+	}
+	y -= rect.top;
+	if (y > radius.y) {
+		sl_real t = rect.bottom - rect.top - radius.y;
+		if (y < t) {
+			return sl_true;
+		}
+		y = radius.y + y - t;
+	}
+	if (Math::isNearZero(radius.x)) {
+		return sl_false;
+	}
+	if (Math::isNearZero(radius.y)) {
+		return sl_false;
+	}
+	sl_real rx2 = radius.x * radius.x;
+	sl_real ry2 = radius.y * radius.y;
+	return x * x * ry2 + y * y * rx2 <= rx2 * ry2;
+}
+
+sl_bool GraphicsPath::containsPointInEllipse(const Point& pt, const Rectangle& rect)
+{
+	sl_real rx = rect.right - rect.left;
+	if (Math::isNearZero(rx)) {
+		return sl_false;
+	}
+	sl_real ry = rect.bottom - rect.top;
+	if (Math::isNearZero(ry)) {
+		return sl_false;
+	}
+	sl_real rx2 = rx * rx;
+	sl_real ry2 = ry * ry;
+	sl_real x = (pt.x - (rect.right + rect.left) / 2);
+	sl_real y = (pt.y - (rect.top + rect.bottom) / 2);
+	return 4 * (x * x * ry2 + y * y * rx2) <= rx2 * ry2;
+}
+
 
 SLIB_DEFINE_OBJECT(GraphicsPathInstance, Object)
 

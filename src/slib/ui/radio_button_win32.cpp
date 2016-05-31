@@ -29,82 +29,27 @@ public:
 	}
 };
 
-Ref<ViewInstance> RadioButton::createInstance(ViewInstance* parent)
+Ref<ViewInstance> RadioButton::createNativeWidget(ViewInstance* parent)
 {
-	String16 text = m_text;
+	String16 text = getText();
 	UINT style = BS_RADIOBUTTON | WS_TABSTOP;
 	Ref<_Win32_RadioButtonViewInstance> ret = Win32_ViewInstance::create<_Win32_RadioButtonViewInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
 	if (ret.isNotNull()) {
 		HWND handle = ret->getHandle();
-		if (m_flagSelected) {
+		if (isChecked()) {
 			::SendMessageW(handle, BM_SETCHECK, BST_CHECKED, 0);
 		} else {
 			::SendMessageW(handle, BM_SETCHECK, BST_UNCHECKED, 0);
 		}
-		Ref<Font> font = m_font;
+		Ref<Font> font = getFont();
 		Ref<FontInstance> fontInstance;
 		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
-		m_fontInstance = fontInstance;
+		_setFontInstance(fontInstance);
 	}
 	return ret;
-}
-
-String RadioButton::getText()
-{
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		m_text = Windows::getWindowText(handle);
-	}
-	return m_text;
-}
-
-void RadioButton::setText(const String& text)
-{
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		Windows::setWindowText(handle, text);
-	}
-	m_text = text;
-}
-
-void RadioButton::setFont(const Ref<Font>& font)
-{
-	Ref<FontInstance> fontInstance;
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
-		if (hFont) {
-			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
-		}
-	}
-	m_font = font;
-	m_fontInstance = fontInstance;
-}
-
-sl_bool RadioButton::isChecked()
-{
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		LRESULT lr = ::SendMessageW(handle, BM_GETCHECK, 0, 0);
-		m_flagSelected = (lr == BST_CHECKED);
-	}
-	return m_flagSelected;
-}
-
-void RadioButton::setChecked(sl_bool flag)
-{
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		if (flag) {
-			::SendMessageW(handle, BM_SETCHECK, BST_CHECKED, 0);
-		} else {
-			::SendMessageW(handle, BM_SETCHECK, BST_UNCHECKED, 0);
-		}
-	}
-	m_flagSelected = flag;
 }
 
 SLIB_UI_NAMESPACE_END

@@ -10,7 +10,7 @@ SLIB_UI_NAMESPACE_BEGIN
 enum class UIAction
 {
 	Unknown = 0x0000,
-	// board
+	// keyboard
 	KeyDown = 0x0101,
 	KeyUp = 0x0102,
 	// mouse
@@ -29,6 +29,7 @@ enum class UIAction
 	LeftButtonDoubleClick = 0x020d,
 	RightButtonDoubleClick = 0x020e,
 	MiddleButtonDoubleClick = 0x020f,
+	// mouse wheel
 	MouseWheel = 0x0210,
 	// touch
 	TouchBegin = 0x0301,
@@ -37,6 +38,14 @@ enum class UIAction
 	TouchCancel = 0x0304,
 	// other
 	SetCursor = 0x0401
+};
+
+enum class TouchPhase
+{
+	Move = 0,
+	Begin = 1,
+	End = 2,
+	Cancel = 3
 };
 
 enum class Keycode

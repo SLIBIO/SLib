@@ -13,8 +13,6 @@ SLIB_UI_NAMESPACE_BEGIN
 class Win32_UI_Shared
 {
 public:
-	HFONT hFontDefault;
-
 	HINSTANCE hInstance;
 	ATOM wndClassForView;
 	ATOM wndClassForWindow;
@@ -29,8 +27,6 @@ public:
 
 public:
 	static Win32_UI_Shared* get();
-
-	void setDefaultFont(HFONT hFont);
 
 };
 

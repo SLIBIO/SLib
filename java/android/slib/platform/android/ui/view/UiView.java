@@ -251,11 +251,14 @@ public class UiView {
 		long instance = getInstance(view);
 		if (instance != 0) {
 			int action = 0;
-			switch (event.getAction()) {
+			int _action = event.getActionMasked();
+			switch (_action) {
 			case MotionEvent.ACTION_DOWN:
 				action = 0x0301;
 				break;
 			case MotionEvent.ACTION_MOVE:
+			case MotionEvent.ACTION_POINTER_DOWN:
+			case MotionEvent.ACTION_POINTER_UP:
 				action = 0x0302;
 				break;
 			case MotionEvent.ACTION_UP:
@@ -269,12 +272,32 @@ public class UiView {
 			}
 			int n = event.getPointerCount();
 			if (n > 0) {
+				int actionIndex = event.getActionIndex();
 				UiTouchPoint[] pts = new UiTouchPoint[n];
 				for (int i = 0; i < n; i++) {
 					UiTouchPoint pt = new UiTouchPoint();
 					pt.x = event.getX(i);
 					pt.y = event.getY(i);
 					pt.pressure = event.getPressure(i);
+					if (_action == MotionEvent.ACTION_DOWN) {
+						pt.phase = 1;
+					} else if (_action == MotionEvent.ACTION_UP) {
+						pt.phase = 2;
+					} else if (_action == MotionEvent.ACTION_CANCEL) {
+						pt.phase = 3;
+					} else {
+						if (actionIndex == i) {
+							if (_action == MotionEvent.ACTION_POINTER_DOWN) {
+								pt.phase = 1;
+							} else if (_action == MotionEvent.ACTION_POINTER_UP) {
+								pt.phase = 2;
+							} else {
+								pt.phase = 0;
+							}
+						} else {
+							pt.phase = 0;
+						}
+					}
 					pts[i] = pt;
 				}
 				return nativeOnTouchEvent(instance, action, pts);

@@ -11,9 +11,11 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
-SLIB_JNI_BEGIN_CLASS(_JAndroidPointF, "android/graphics/PointF")
-	SLIB_JNI_FLOAT_FIELD(x);
-	SLIB_JNI_FLOAT_FIELD(y);
+SLIB_JNI_BEGIN_CLASS(_JAndroidRect, "android/graphics/Rect")
+	SLIB_JNI_INT_FIELD(left);
+	SLIB_JNI_INT_FIELD(top);
+	SLIB_JNI_INT_FIELD(right);
+	SLIB_JNI_INT_FIELD(bottom);
 SLIB_JNI_END_CLASS
 
 SLIB_JNI_BEGIN_CLASS(_JAndroidPen, "slib/platform/android/ui/UiPen")
@@ -103,6 +105,7 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidGraphics, "slib/platform/android/ui/Graphics")
 	SLIB_JNI_METHOD(getHeight, "getHeight", "()I");
 	SLIB_JNI_METHOD(save, "save", "()V");
 	SLIB_JNI_METHOD(restore, "restore", "()V");
+	SLIB_JNI_METHOD(getClipBounds, "getClipBounds", "()Landroid/graphics/Rect;");
 	SLIB_JNI_METHOD(clipToRectangle, "clipToRectangle", "(FFFF)V");
 	SLIB_JNI_METHOD(clipToPath, "clipToPath", "(Lslib/platform/android/ui/UiPath;)V");
 	SLIB_JNI_METHOD(concatMatrix, "concatMatrix", "(FFFFFFFFF)V");
@@ -139,6 +142,7 @@ public:
 				ret->m_canvas = canvas;
 				ret->m_width = width;
 				ret->m_height = height;
+				ret->clipToRectangle(Rectangle(0, 0, width, height));
 			}
 		}
 		return ret;
@@ -149,11 +153,11 @@ public:
 	{
 		return Size((sl_real)(m_width), (sl_real)(m_height));
 	}
-
-    // override
-	Rectangle getInvalidatedRect()
+	
+	// override
+	sl_bool isBuffer()
 	{
-		return Rectangle(0, 0, (sl_real)(m_width), (sl_real)(m_height));
+		return sl_true;
 	}
 
     // override
@@ -177,6 +181,21 @@ public:
 	void setAntiAlias(sl_bool flag)
 	{
 		_JAndroidGraphics::flagAntiAlias.set(m_canvas, flag);
+	}
+
+    // override
+	Rectangle getClipBounds()
+	{
+		JniLocal<jobject> rect(_JAndroidGraphics::getClipBounds.callObject(m_canvas));
+		if (rect.isNotNull()) {
+			Rectangle ret;
+			ret.left = _JAndroidRect::left.get(rect);
+			ret.top = _JAndroidRect::top.get(rect);
+			ret.right = _JAndroidRect::right.get(rect);
+			ret.bottom = _JAndroidRect::bottom.get(rect);
+			return ret;
+		}
+		return Rectangle(0, 0, m_width, m_height);
 	}
 
     // override

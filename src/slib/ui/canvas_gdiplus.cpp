@@ -152,10 +152,10 @@ public:
 	Gdiplus::Graphics* m_graphics;
 	sl_real m_width;
 	sl_real m_height;
-	Rectangle m_rectDirty;
 	Stack<Gdiplus::GraphicsState> m_stackState;
 	sl_bool m_flagFreeOnRelease;
 	Ref<Referable> m_ref;
+	sl_bool m_flagBuffer;
 
 public:
 	_Gdiplus_Canvas()
@@ -170,7 +170,7 @@ public:
 	}
 
 public:
-	static Ref<_Gdiplus_Canvas> create(Gdiplus::Graphics* graphics, sl_real width, sl_real height, const Rectangle* rectDirty, sl_bool flagFreeOnRelease, const Referable* ref)
+	static Ref<_Gdiplus_Canvas> create(Gdiplus::Graphics* graphics, sl_real width, sl_real height, const Rectangle* rectClip, sl_bool flagFreeOnRelease, const Referable* ref, sl_bool flagBuffer)
 	{
 		Ref<_Gdiplus_Canvas> ret;
 		if (graphics) {
@@ -180,15 +180,16 @@ public:
 				ret->m_graphics = graphics;
 				ret->m_width = width;
 				ret->m_height = height;
-				if (rectDirty) {
-					ret->m_rectDirty = *rectDirty;
-				} else {
-					ret->m_rectDirty = Rectangle(0, 0, width, height);
-				}
 				ret->m_flagFreeOnRelease = flagFreeOnRelease;
 				ret->m_ref = ref;
+				ret->m_flagBuffer = flagBuffer;
 				graphics->SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
 				ret->setMatrix(Matrix3::identity());
+				if (rectClip) {
+					ret->clipToRectangle(*rectClip);
+				} else {
+					ret->clipToRectangle(Rectangle(0, 0, width, height));
+				}
 				return ret;
 			}
 			if (flagFreeOnRelease) {
@@ -204,10 +205,10 @@ public:
 		return Size(m_width, m_height);
 	}
 
-    // override
-	Rectangle getInvalidatedRect()
+	// override
+	sl_bool isBuffer()
 	{
-		return m_rectDirty;
+		return m_flagBuffer;
 	}
 
     // override
@@ -240,12 +241,23 @@ public:
 			m_graphics->SetSmoothingMode(Gdiplus::SmoothingModeNone);
 		}
 	}
-	
+
+	// override
+	Rectangle getClipBounds()
+	{
+		Gdiplus::RectF rc;
+		Gdiplus::Status status = m_graphics->GetClipBounds(&rc);
+		if (status == Gdiplus::Ok) {
+			return Rectangle(rc.X, rc.Y, rc.X + rc.Width, rc.Y + rc.Height);
+		}
+		return Rectangle::zero();
+	}
+
     // override
 	void clipToRectangle(const Rectangle& _rect)
 	{
 		Gdiplus::RectF rect(_rect.left, _rect.top, _rect.getWidth(), _rect.getHeight());
-		m_graphics->SetClip(rect, Gdiplus::CombineModeIntersect);
+		m_graphics->IntersectClip(rect);
 	}
 
     // override
@@ -557,12 +569,12 @@ public:
 
 SLIB_DEFINE_OBJECT(_Gdiplus_Canvas, Canvas)
 
-Ref<Canvas> UIPlatform::createCanvas(Gdiplus::Graphics* graphics, sl_uint32 width, sl_uint32 height, const Rectangle* rectDirty, sl_bool flagFreeOnRelease, const Referable* ref)
+Ref<Canvas> UIPlatform::createCanvas(Gdiplus::Graphics* graphics, sl_uint32 width, sl_uint32 height, const Rectangle* rectClip, sl_bool flagFreeOnRelease, const Referable* ref, sl_bool flagBuffer)
 {
 	if (!graphics) {
 		return Ref<Canvas>::null();
 	}
-	return _Gdiplus_Canvas::create(graphics, (sl_real)width, (sl_real)height, rectDirty, flagFreeOnRelease, ref);
+	return _Gdiplus_Canvas::create(graphics, (sl_real)width, (sl_real)height, rectClip, flagFreeOnRelease, ref, flagBuffer);
 }
 
 Gdiplus::Graphics* UIPlatform::getCanvasHandle(Canvas* _canvas)

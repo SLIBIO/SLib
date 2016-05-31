@@ -27,7 +27,7 @@ public:
 	}
 };
 
-Ref<ViewInstance> Button::createInstance(ViewInstance* parent)
+Ref<ViewInstance> Button::createNativeWidget(ViewInstance* parent)
 {
 	String16 text = m_text;
 	DWORD style = WS_TABSTOP;
@@ -36,50 +36,26 @@ Ref<ViewInstance> Button::createInstance(ViewInstance* parent)
 	}
 	Ref<_Win32_ButtonViewInstance> ret = Win32_ViewInstance::create<_Win32_ButtonViewInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
 	if (ret.isNotNull()) {
-		Ref<Font> font = m_font;
+		Ref<Font> font = getFont();
 		Ref<FontInstance> fontInstance;
 		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(ret->getHandle(), WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
-		m_fontInstance = fontInstance;
+		_setFontInstance(fontInstance);
 	}
 	return ret;
 }
 
-String Button::getText()
-{
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		m_text = Windows::getWindowText(handle);
-	}
-	return m_text;
-}
-
-void Button::setText(const String& text)
+void Button::_setText_NW(const String& text)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		Windows::setWindowText(handle, text);
 	}
-	m_text = text;
 }
 
-void Button::setFont(const Ref<Font>& font)
-{
-	Ref<FontInstance> fontInstance;
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
-		if (hFont) {
-			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
-		}
-	}
-	m_font = font;
-	m_fontInstance = fontInstance;
-}
-
-void Button::setDefaultButton(sl_bool flag)
+void Button::_setDefaultButton_NW(sl_bool flag)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -92,8 +68,21 @@ void Button::setDefaultButton(sl_bool flag)
 		::SetWindowPos(handle, NULL, 0, 0, 0, 0
 			, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 	}
-	m_flagDefaultButton = flag;
 }
+
+void Button::_setFont_NW(const Ref<Font>& font)
+{
+	Ref<FontInstance> fontInstance;
+	HWND handle = UIPlatform::getViewHandle(this);
+	if (handle) {
+		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
+		if (hFont) {
+			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
+		}
+	}
+	_setFontInstance(fontInstance);
+}
+
 SLIB_UI_NAMESPACE_END
 
 #endif

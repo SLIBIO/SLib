@@ -72,9 +72,9 @@ private:
 public:
 	void _free();
 	
-#if defined(SLIB_DEBUG_REFERENCE)
 private:
 	sl_reg m_signature;
+#if defined(SLIB_DEBUG_REFERENCE)
 	void _checkValid();
 #endif
 	

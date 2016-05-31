@@ -150,8 +150,10 @@ void UIPlatform::quitLoop()
 	_AndroidUiThread::quitLoop.call(sl_null);
 }
 
+static Ref<UIApp> _g_mobile_app;
 void UIPlatform::runApp()
 {
+	_g_mobile_app = UI::getApp();
 }
 
 void UIPlatform::quitApp()

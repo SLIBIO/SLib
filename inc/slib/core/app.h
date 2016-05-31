@@ -30,8 +30,6 @@ public:
 	
 	static void setApp(Application* app);
 	
-	static void clearApp();
-
 	
 	static void setEnvironmentPath(const String& key, const String& path);
 	

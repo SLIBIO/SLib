@@ -5,6 +5,8 @@
 
 #include "../../../inc/slib/ui/platform.h"
 
+#include "../../../inc/slib/graphics/font.h"
+
 SLIB_UI_NAMESPACE_BEGIN
 
 /**************************************
@@ -12,6 +14,22 @@ SLIB_UI_NAMESPACE_BEGIN
 ***************************************/
 
 SLIB_DEFINE_OBJECT(Screen, Object)
+
+SLIB_SAFE_STATIC_REF(SafeRef<Font>, _g_ui_core_default_font)
+
+Ref<Font> UI::getDefaultFont()
+{
+	Ref<Font> font = _g_ui_core_default_font;
+	if (font.isNotNull()) {
+		return font;
+	}
+	return Font::getDefault();
+}
+
+void UI::setDefaultFont(const Ref<Font>& font)
+{
+	_g_ui_core_default_font = font;
+}
 
 Rectangle UI::getScreenRegion()
 {
@@ -148,6 +166,11 @@ void UI::quitApp()
 	} else {
 		UIPlatform::quitApp();
 	}
+}
+
+Ref<UIApp> UI::getApp()
+{
+	return UIApp::getApp();
 }
 
 Ref<Window> UI::getMainWindow()

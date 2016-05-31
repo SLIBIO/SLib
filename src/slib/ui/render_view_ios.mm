@@ -30,7 +30,7 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
-Ref<ViewInstance> RenderView::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* _parent)
 {
 	_Slib_iOS_GLView* handle = nil;
 	IOS_VIEW_CREATE_INSTANCE_BEGIN
@@ -43,17 +43,16 @@ Ref<ViewInstance> RenderView::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-void RenderView::setRedrawMode(RedrawMode mode)
+void RenderView::_setRedrawMode_NW(RedrawMode mode)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_GLView class]]) {
 		_Slib_iOS_GLView* v = (_Slib_iOS_GLView*)handle;
 		[v _setRenderContinuously:(mode == RedrawMode::Continuously)];
 	}
-	m_redrawMode = mode;
 }
 
-void RenderView::requestRender()
+void RenderView::_requestRender_NW()
 {
 	UIView* view = UIPlatform::getViewHandle(this);
 	if (view != nil && [view isKindOfClass:[_Slib_iOS_GLView class]]) {

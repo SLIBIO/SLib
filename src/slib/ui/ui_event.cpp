@@ -10,19 +10,23 @@ TouchPoint::TouchPoint() = default;
 
 TouchPoint::TouchPoint(const TouchPoint& other) = default;
 
-TouchPoint::TouchPoint(const Point& _point) : point(_point), pressure(0)
+TouchPoint::TouchPoint(const Point& _point) : point(_point), pressure(0), phase(TouchPhase::Move)
 {
 }
 
-TouchPoint::TouchPoint(const Point& _point, sl_real _pressure) : point(_point), pressure(_pressure)
+TouchPoint::TouchPoint(const Point& _point, sl_real _pressure, TouchPhase _phase) : point(_point), pressure(_pressure), phase(_phase)
 {
 }
 
-TouchPoint::TouchPoint(sl_real x, sl_real y) : point(x, y), pressure(0)
+TouchPoint::TouchPoint(sl_real x, sl_real y) : point(x, y), pressure(0), phase(TouchPhase::Move)
 {
 }
 
-TouchPoint::TouchPoint(sl_real x, sl_real y, sl_real _pressure) : point(x, y), pressure(_pressure)
+TouchPoint::TouchPoint(sl_real x, sl_real y, sl_real _pressure) : point(x, y), pressure(_pressure), phase(TouchPhase::Move)
+{
+}
+
+TouchPoint::TouchPoint(sl_real x, sl_real y, sl_real _pressure, TouchPhase _phase) : point(x, y), pressure(_pressure), phase(_phase)
 {
 }
 
@@ -92,7 +96,8 @@ String KeycodeAndModifiers::toString() const
 enum
 {
 	flagPreventDefault = 0x1,
-	flagStopPropagation = 0x2
+	flagStopPropagation = 0x2,
+	flagPassToNext = 0x4
 };
 
 UIEvent::UIEvent()
@@ -147,11 +152,12 @@ Ref<UIEvent> UIEvent::createTouchEvent(UIAction action, const Array<TouchPoint>&
 	return ret;
 }
 
-Ref<UIEvent> UIEvent::createSetCursorEvent()
+Ref<UIEvent> UIEvent::createSetCursorEvent(sl_real x, sl_real y)
 {
 	Ref<UIEvent> ret = new UIEvent;
 	if (ret.isNotNull()) {
 		ret->setAction(UIAction::SetCursor);
+		ret->setPoint(x, y);
 	}
 	return ret;
 }
@@ -370,6 +376,11 @@ void UIEvent::transformPoints(const Matrix3& mat)
 	}
 }
 
+void UIEvent::resetStatus()
+{
+	m_flags = 0;
+}
+
 void UIEvent::preventDefault()
 {
 	SLIB_SET_FLAG(m_flags, (sl_uint32)flagPreventDefault);
@@ -380,6 +391,15 @@ sl_bool UIEvent::isPreventedDefault() const
 	return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagPreventDefault);
 }
 
+void UIEvent::setPreventedDefault(sl_bool flag)
+{
+	if (flag) {
+		SLIB_SET_FLAG(m_flags, (sl_uint32)flagPreventDefault);
+	} else {
+		SLIB_RESET_FLAG(m_flags, (sl_uint32)flagPreventDefault);
+	}
+}
+
 void UIEvent::stopPropagation()
 {
 	SLIB_SET_FLAG(m_flags, (sl_uint32)flagStopPropagation);
@@ -388,6 +408,34 @@ void UIEvent::stopPropagation()
 sl_bool UIEvent::isStoppedPropagation() const
 {
 	return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagStopPropagation);
+}
+
+void UIEvent::setStoppedPropagation(sl_bool flag)
+{
+	if (flag) {
+		SLIB_SET_FLAG(m_flags, (sl_uint32)flagStopPropagation);
+	} else {
+		SLIB_RESET_FLAG(m_flags, (sl_uint32)flagStopPropagation);
+	}
+}
+
+void UIEvent::passToNext()
+{
+	SLIB_SET_FLAG(m_flags, (sl_uint32)flagPassToNext);
+}
+
+sl_bool UIEvent::isPassedToNext()
+{
+	return SLIB_CHECK_FLAG(m_flags, (sl_uint32)flagPassToNext);
+}
+
+void UIEvent::setPassedToNext(sl_bool flag)
+{
+	if (flag) {
+		SLIB_SET_FLAG(m_flags, (sl_uint32)flagPassToNext);
+	} else {
+		SLIB_RESET_FLAG(m_flags, (sl_uint32)flagPassToNext);
+	}
 }
 
 Ref<UIEvent> UIEvent::duplicate()
@@ -592,15 +640,6 @@ String UI::getKeyName(Keycode code, sl_bool flagShort)
 	return mapper.get(code, flagShort);
 }
 
-
-void IViewListener::onClick(View* view)
-{
-}
-
-void IViewListener::onKeyEvent(View* view, UIEvent* event)
-{
-}
-
 void IViewListener::onMouseEvent(View* view, UIEvent* event)
 {
 }
@@ -613,7 +652,27 @@ void IViewListener::onMouseWheelEvent(View* view, UIEvent* event)
 {
 }
 
+void IViewListener::onKeyEvent(View* view, UIEvent* event)
+{
+}
+
+void IViewListener::onClick(View* view, UIEvent* event)
+{
+}
+
 void IViewListener::onSetCursor(View* view, UIEvent* event)
+{
+}
+
+void IViewListener::onResize(View* view, sl_real width, sl_real height)
+{
+}
+
+void IViewListener::onShow(View* view)
+{
+}
+
+void IViewListener::onHide(View* view)
 {
 }
 
@@ -658,16 +717,6 @@ void IWindowListener::onDemaximize(Window* window)
 
 
 // UIEventLogListener implementation
-void UIEventLogListener::onClick(View* view)
-{
-	SLIB_LOG("View", "onClick");
-}
-
-void UIEventLogListener::onKeyEvent(View* view, UIEvent* event)
-{
-	processKey("View", event);
-}
-
 void UIEventLogListener::onMouseEvent(View* view, UIEvent* event)
 {
 	processMouse("View", event);
@@ -681,6 +730,16 @@ void UIEventLogListener::onTouchEvent(View* view, UIEvent* event)
 void UIEventLogListener::onMouseWheelEvent(View* view, UIEvent* event)
 {
 	processMouseWheel("View", event);
+}
+
+void UIEventLogListener::onKeyEvent(View* view, UIEvent* event)
+{
+	processKey("View", event);
+}
+
+void UIEventLogListener::onClick(View* view, UIEvent* event)
+{
+	SLIB_LOG("View", "onClick");
 }
 
 void UIEventLogListener::onSetCursor(View* view, UIEvent* event)

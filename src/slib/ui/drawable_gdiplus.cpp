@@ -381,8 +381,7 @@ public:
 		if (g) {
 			sl_uint32 w = getBitmapWidth();
 			sl_uint32 h = getBitmapHeight();
-			Rectangle rc = { 0, 0, (sl_real)w, (sl_real)h };
-			ret = UIPlatform::createCanvas(g, w, h, &rc, sl_true, this);
+			ret = UIPlatform::createCanvas(g, w, h, sl_null, sl_true, this, sl_true);
 		}
 		return ret;
 	}

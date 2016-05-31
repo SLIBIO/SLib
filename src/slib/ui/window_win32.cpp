@@ -773,7 +773,7 @@ public:
 
 };
 
-LRESULT CALLBACK _Win32_ViewWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK _Win32_ViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -896,7 +896,7 @@ LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			{
 				HDC hDC = (HDC)(wParam);
 				Color color = window->m_backgroundColor;
-				if (color.isNotZero()) {
+				if (color.a != 0) {
 					HBRUSH hBrush = ::CreateSolidBrush(UIPlatform::getColorRef(color));
 					if (hBrush) {
 						RECT rect;
@@ -906,11 +906,11 @@ LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 						return TRUE;
 					}
 				}
-				break;
+				return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 			}
 		}
 	}
-	return _Win32_ViewWindowProc(hWnd, uMsg, wParam, lParam);
+	return _Win32_ViewProc(hWnd, uMsg, wParam, lParam);
 }
 
 Ref<WindowInstance> Window::createWindowInstance(const WindowInstanceParam& param)

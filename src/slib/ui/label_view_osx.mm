@@ -22,12 +22,12 @@ public:
 	{
 		[handle setStringValue:(Apple::getNSStringFromString(m_text))];
 		[handle setAlignment:translateAlignment(m_textAlignment)];
-		[handle setBordered: (m_flagBorder ? TRUE : FALSE)];
-		[handle setBezeled: (m_flagBorder ? TRUE : FALSE)];
+		[handle setBordered: (isBorder() ? TRUE : FALSE)];
+		[handle setBezeled: (isBorder() ? TRUE : FALSE)];
 		[handle setTextColor:(UIPlatform::getNSColorFromColor(m_textColor))];
-		[handle setBackgroundColor:(UIPlatform::getNSColorFromColor(m_backgroundColor))];
+		[handle setBackgroundColor:(UIPlatform::getNSColorFromColor(getBackgroundColor()))];
 		
-		Ref<Font> font = m_font;
+		Ref<Font> font = getFont();
 		Ref<FontInstance> fontInstance;
 		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
 		if (hFont != nil) {
@@ -57,7 +57,7 @@ public:
 	}
 };
 
-Ref<ViewInstance> LabelView::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> LabelView::createNativeWidget(ViewInstance* _parent)
 {
 	OSX_VIEW_CREATE_INSTANCE_BEGIN
 	_Slib_OSX_LabelTextField* handle = [[_Slib_OSX_LabelTextField alloc] initWithFrame:frame];
@@ -70,121 +70,63 @@ Ref<ViewInstance> LabelView::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-String LabelView::getText()
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
-		NSTextField* tv = (NSTextField*)handle;
-		NSString* s = [tv stringValue];
-		m_text = Apple::getStringFromNSString(s);
-	}
-	return m_text;
-}
-
-void LabelView::setText(const String& value)
+void LabelView::_setText_NW(const String& value)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
 		NSTextField* tv = (NSTextField*)handle;
 		[tv setStringValue:(Apple::getNSStringFromString(value))];
 	}
-	m_text = value;
 }
 
-sl_bool LabelView::isBorder()
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
-		NSTextField* tv = (NSTextField*)handle;
-		m_flagBorder = tv.bordered ? sl_true : sl_false;
-	}
-	return m_flagBorder;
-}
-
-void LabelView::setBorder(sl_bool flag)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
-		NSTextField* tv = (NSTextField*)handle;
-		[tv setBordered:(flag?TRUE:FALSE)];
-	}
-	m_flagBorder = flag;
-}
-
-Alignment LabelView::getTextAlignment()
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
-		NSTextField* tv = (NSTextField*)handle;
-		m_textAlignment = _LabelView::translateAlignmentReverse(tv.alignment);
-	}
-	return m_textAlignment;
-}
-
-void LabelView::setTextAlignment(Alignment align)
+void LabelView::_setTextAlignment_NW(Alignment align)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
 		NSTextField* tv = (NSTextField*)handle;
 		[tv setAlignment:_LabelView::translateAlignment(align)];
 	}
-	m_textAlignment = align;
 }
 
-Color LabelView::getTextColor()
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
-		NSTextField* tv = (NSTextField*)handle;
-		m_textColor = UIPlatform::getColorFromNSColor(tv.textColor);
-	}
-	return m_textColor;
-}
-
-void LabelView::setTextColor(const Color& color)
+void LabelView::_setTextColor_NW(const Color& color)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
 		NSTextField* tv = (NSTextField*)handle;
 		[tv setTextColor:(UIPlatform::getNSColorFromColor(color))];
 	}
-	m_textColor = color;
 }
 
-Color LabelView::getBackgroundColor()
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
-		NSTextField* tv = (NSTextField*)handle;
-		m_backgroundColor = UIPlatform::getColorFromNSColor(tv.backgroundColor);
-	}
-	return m_backgroundColor;
-}
-
-void LabelView::setBackgroundColor(const Color& color)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
-		NSTextField* tv = (NSTextField*)handle;
-		[tv setBackgroundColor:(UIPlatform::getNSColorFromColor(color))];
-	}
-	m_backgroundColor = color;
-}
-
-void LabelView::setFont(const Ref<Font>& font)
+void LabelView::_setFont_NW(const Ref<Font>& font)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
 		NSTextField* tv = (NSTextField*)handle;
 		
-		Ref<Font> font = m_font;
 		Ref<FontInstance> fontInstance;
 		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
 		if (hFont != nil) {
 			[tv setFont:hFont];
 		}
 	}
-	m_font = font;
+}
+
+void LabelView::_setBorder_NW(sl_bool flag)
+{
+	NSView* handle = UIPlatform::getViewHandle(this);
+	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
+		NSTextField* tv = (NSTextField*)handle;
+		[tv setBordered:(flag?TRUE:FALSE)];
+	}
+}
+
+void LabelView::_setBackgroundColor_NW(const Color& color)
+{
+	NSView* handle = UIPlatform::getViewHandle(this);
+	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
+		NSTextField* tv = (NSTextField*)handle;
+		[tv setBackgroundColor:(UIPlatform::getNSColorFromColor(color))];
+	}
 }
 
 SLIB_UI_NAMESPACE_END

@@ -110,7 +110,7 @@ public:
 			UINT code = nmhdr->code;
 			if (code == LVN_GETDISPINFOW) {
 				NMLVDISPINFOW* disp = (NMLVDISPINFOW*)nmhdr;
-				String16 s = view->onGetCellText(disp->item.iItem, disp->item.iSubItem);
+				String16 s = view->getItemText(disp->item.iItem, disp->item.iSubItem);
 				sl_uint32 n = (sl_uint32)(s.getLength());
 				if (n > 0) {
 					sl_uint32 m = (sl_uint32)(disp->item.cchTextMax);
@@ -127,7 +127,7 @@ public:
 				NMLISTVIEW* v = (NMLISTVIEW*)(nm);
 				if (v->hdr.hwndFrom == getHandle()) {
 					if (!(v->uOldState & LVIS_SELECTED) && (v->uNewState & LVIS_SELECTED)) {
-						view->onSelectRow(v->iItem);
+						view->dispatchSelectRow(v->iItem);
 					}
 				}
 				return sl_true;
@@ -140,11 +140,11 @@ public:
 				sl_int32 n = (sl_int32)(::SendMessageW(getHandle(), LVM_HITTEST, 0, (LPARAM)(&lvhi)));
 				if (n >= 0) {
 					if (code == NM_CLICK) {
-						view->onClickRow(n, pt);
+						view->dispatchClickRow(n, pt);
 					} else if (code == NM_RCLICK) {
-						view->onRightButtonClickRow(n, pt);
+						view->dispatchRightButtonClickRow(n, pt);
 					} else if (code == NM_DBLCLK) {
-						view->onDoubleClickRow(n, pt);
+						view->dispatchDoubleClickRow(n, pt);
 					}
 				}
 				return sl_true;
@@ -154,7 +154,7 @@ public:
 	}
 };
 
-Ref<ViewInstance> ListDetailsView::createInstance(ViewInstance* parent)
+Ref<ViewInstance> ListDetailsView::createNativeWidget(ViewInstance* parent)
 {
 	DWORD style = LVS_REPORT | LVS_SINGLESEL | LVS_OWNERDATA | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_BORDER;
 	DWORD styleEx = 0;
@@ -167,14 +167,14 @@ Ref<ViewInstance> ListDetailsView::createInstance(ViewInstance* parent)
 
 		HWND handle = ret->getHandle();
 
-		Ref<Font> font = m_font;
+		Ref<Font> font = getFont();
 		Ref<FontInstance> fontInstance;
 		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			// You should send this message before inserting any items
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
-		m_fontInstance = fontInstance;
+		_setFontInstance(fontInstance);
 
 		UINT exStyle = LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVS_EX_ONECLICKACTIVATE;
 		::SendMessageW(handle, LVM_SETEXTENDEDLISTVIEWSTYLE, exStyle, exStyle);
@@ -185,7 +185,7 @@ Ref<ViewInstance> ListDetailsView::createInstance(ViewInstance* parent)
 	return ret;
 }
 
-void ListDetailsView::_refreshColumnsCount()
+void ListDetailsView::_refreshColumnsCount_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -193,7 +193,7 @@ void ListDetailsView::_refreshColumnsCount()
 	}
 }
 
-void ListDetailsView::_refreshRowsCount()
+void ListDetailsView::_refreshRowsCount_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -202,7 +202,7 @@ void ListDetailsView::_refreshRowsCount()
 	}
 }
 
-void ListDetailsView::_setHeaderText(sl_uint32 iCol, const String& _text)
+void ListDetailsView::_setHeaderText_NW(sl_uint32 iCol, const String& _text)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -215,7 +215,7 @@ void ListDetailsView::_setHeaderText(sl_uint32 iCol, const String& _text)
 	}
 }
 
-void ListDetailsView::_setColumnWidth(sl_uint32 iCol, sl_real width)
+void ListDetailsView::_setColumnWidth_NW(sl_uint32 iCol, sl_real width)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -226,11 +226,11 @@ void ListDetailsView::_setColumnWidth(sl_uint32 iCol, sl_real width)
 	}
 }
 
-void ListDetailsView::_setHeaderAlignment(sl_uint32 iCol, Alignment align)
+void ListDetailsView::_setHeaderAlignment_NW(sl_uint32 iCol, Alignment align)
 {
 }
 
-void ListDetailsView::_setColumnAlignment(sl_uint32 iCol, Alignment align)
+void ListDetailsView::_setColumnAlignment_NW(sl_uint32 iCol, Alignment align)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -242,17 +242,15 @@ void ListDetailsView::_setColumnAlignment(sl_uint32 iCol, Alignment align)
 	}
 }
 
-sl_int32 ListDetailsView::getSelectedRow()
+void ListDetailsView::_getSelectedRow_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		sl_int32 n = (sl_int32)(::SendMessageW(handle, LVM_GETNEXTITEM, (WPARAM)(-1), LVNI_SELECTED));
-		return n;
+		m_selectedRow = (sl_int32)(::SendMessageW(handle, LVM_GETNEXTITEM, (WPARAM)(-1), LVNI_SELECTED));
 	}
-	return -1;
 }
 
-void ListDetailsView::setFont(const Ref<Font>& font)
+void ListDetailsView::_setFont_NW(const Ref<Font>& font)
 {
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
@@ -262,8 +260,7 @@ void ListDetailsView::setFont(const Ref<Font>& font)
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
 	}
-	m_font = font;
-	m_fontInstance = fontInstance;
+	_setFontInstance(fontInstance);
 }
 
 SLIB_UI_NAMESPACE_END

@@ -85,10 +85,32 @@ sl_bool UI::isUiThread()
 
 void UI::dispatchToUiThread(const Ref<Runnable>& callback)
 {
+	if (callback.isNull()) {
+		return;
+	}
 	_Win32_UI* ui = _Win32_UI::get();
-	if (callback.isNotNull()) {
-		ui->m_queueDispatch.push(callback);
-		::PostThreadMessageW(_g_thread_ui, SLIB_UI_MESSAGE_DISPATCH, 0, 0);
+	if (!ui) {
+		return;
+	}
+	Win32_UI_Shared* shared = Win32_UI_Shared::get();
+	if (!shared) {
+		return;
+	}
+	ui->m_queueDispatch.push(callback);
+	::PostMessageW(shared->hWndMessage, SLIB_UI_MESSAGE_DISPATCH, 0, 0);
+}
+
+void _Win32_processUiDispatchQueue()
+{
+	_Win32_UI* ui = _Win32_UI::get();
+	if (!ui) {
+		return;
+	}
+	Ref<Runnable> callback;
+	while (ui->m_queueDispatch.pop(&callback)) {
+		if (callback.isNotNull()) {
+			callback->run();
+		}
 	}
 }
 
@@ -97,7 +119,9 @@ void _Win32_processCustomMsgBox(WPARAM wParam, LPARAM lParam);
 
 LRESULT CALLBACK _Win32_MessageProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	if (uMsg == SLIB_UI_MESSAGE_CUSTOM_MSGBOX) {
+	if (uMsg == SLIB_UI_MESSAGE_DISPATCH) {
+		_Win32_processUiDispatchQueue();
+	} else if (uMsg == SLIB_UI_MESSAGE_CUSTOM_MSGBOX) {
 		_Win32_processCustomMsgBox(wParam, lParam);
 		return 0;
 	} else if (uMsg == WM_MENUCOMMAND) {
@@ -117,12 +141,7 @@ void UIPlatform::runLoop(sl_uint32 level)
 			break;
 		}
 		if (msg.message == SLIB_UI_MESSAGE_DISPATCH) {
-			Ref<Runnable> callback;
-			while (ui->m_queueDispatch.pop(&callback)) {
-				if (callback.isNotNull()) {
-					callback->run();
-				}
-			}
+			_Win32_processUiDispatchQueue();
 		} else if (msg.message == SLIB_UI_MESSAGE_CLOSE) {
 			::DestroyWindow(msg.hwnd);
 		} else if (msg.message == WM_MENUCOMMAND) {
@@ -161,6 +180,8 @@ void UIPlatform::quitLoop()
 
 void UIPlatform::runApp()
 {
+	Win32_UI_Shared::get();
+
 	_g_thread_ui = ::GetCurrentThreadId();
 
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
@@ -187,18 +208,6 @@ void UIPlatform::quitApp()
 	::PostQuitMessage(0);
 }
 
-void UI::setDefaultFontName(const String& _fontName)
-{
-	String16 fontName = _fontName;
-	HFONT hFont = ::CreateFontW(14, 0, 0, 0, 200, FALSE, FALSE
-		, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS
-		, ANTIALIASED_QUALITY
-		, DEFAULT_PITCH
-		, (LPCWSTR)(fontName.getData()));
-	Win32_UI_Shared::get()->setDefaultFont(hFont);
-}
-
-
 _Win32_UI::_Win32_UI()
 {
 	m_screenPrimary = new _Win32_Screen();
@@ -215,9 +224,7 @@ LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 Win32_UI_Shared::Win32_UI_Shared()
 {
 	hInstance = ::GetModuleHandleW(NULL);
-
-	hFontDefault = NULL;
-
+	
 	// register view class
 	{
 		WNDCLASSEXW wc;
@@ -230,7 +237,7 @@ Win32_UI_Shared::Win32_UI_Shared()
 		wc.hInstance = hInstance;
 		wc.hIcon = NULL;
 		wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
 		wc.lpszMenuName = NULL;
 		wc.lpszClassName = L"SLIBUIVIEW";
 		wc.hIconSm = NULL;
@@ -271,9 +278,6 @@ Win32_UI_Shared::Win32_UI_Shared()
 
 Win32_UI_Shared::~Win32_UI_Shared()
 {
-	if (hFontDefault) {
-		::DeleteObject(hFontDefault);
-	}
 	if (hWndMessage) {
 		::DestroyWindow(hWndMessage);
 	}
@@ -283,14 +287,6 @@ Win32_UI_Shared* Win32_UI_Shared::get()
 {
 	SLIB_SAFE_STATIC(Win32_UI_Shared, ret);
 	return &ret;
-}
-
-void Win32_UI_Shared::setDefaultFont(HFONT hFont)
-{
-	if (hFontDefault) {
-		::DeleteObject(hFontDefault);
-	}
-	hFontDefault = hFont;
 }
 
 SLIB_UI_NAMESPACE_END

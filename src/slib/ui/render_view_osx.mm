@@ -26,7 +26,7 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
-Ref<ViewInstance> RenderView::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* _parent)
 {
 	OSX_VIEW_CREATE_INSTANCE_BEGIN
 	_Slib_OSX_GLView* handle = [[_Slib_OSX_GLView alloc] initWithFrame:frame];
@@ -37,7 +37,7 @@ Ref<ViewInstance> RenderView::createInstance(ViewInstance* _parent)
 	return ret;
 }
 
-void RenderView::setRedrawMode(RedrawMode mode)
+void RenderView::_setRedrawMode_NW(RedrawMode mode)
 {
 	ObjectLocker lock(this);
 	NSView* view = UIPlatform::getViewHandle(this);
@@ -45,10 +45,9 @@ void RenderView::setRedrawMode(RedrawMode mode)
 		_Slib_OSX_GLView* v = (_Slib_OSX_GLView*)view;
 		[v _setRenderContinuously:(mode == RedrawMode::Continuously)];
 	}
-	m_redrawMode = mode;
 }
 
-void RenderView::requestRender()
+void RenderView::_requestRender_NW()
 {
 	NSView* view = UIPlatform::getViewHandle(this);
 	if (view != nil && [view isKindOfClass:[_Slib_OSX_GLView class]]) {
@@ -83,7 +82,7 @@ void _Ui_OSX_GLView_thread(_Slib_OSX_GLView* handle)
 	while (Thread::isNotStoppingCurrent()) {
 		do {
 			MutexLocker lock(&(handle->m_lockRender));
-			if ([handle isHidden] || handle.window == nil) {
+			if ([handle isHidden] || handle.visibleRect.size.width < 1 || handle.visibleRect.size.height < 1 || handle.window == nil) {
 				if (context != nil) {
 					[context clearDrawable];
 					context = nil;

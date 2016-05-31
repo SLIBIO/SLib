@@ -5,13 +5,9 @@
 #include "view_osx.h"
 
 #include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/ui/view_group.h"
+#include "../../../inc/slib/ui/view.h"
 
 SLIB_UI_NAMESPACE_BEGIN
-
-void UI::setDefaultFontName(const String& fontName)
-{
-}
 
 /******************************************
 			OSX_ViewInstance
@@ -281,11 +277,7 @@ void OSX_ViewInstance::onDraw(NSRect _rectDirty)
 		if (_graphics != nil) {
 			
 			CGContextRef context = (CGContextRef)([_graphics graphicsPort]);
-			
-			/* flipping */
-			//CGContextTranslateCTM(context, 0, rectBound.size.height);
-			//CGContextScaleCTM(context, 1.0f, -1.0f);
-			
+						
 			Ref<Canvas> canvas = UIPlatform::createCanvas(context, (sl_uint32)(rectBound.size.width), (sl_uint32)(rectBound.size.height));
 			if (canvas.isNotNull()) {
 				ViewInstance::onDraw(canvas.ptr);
@@ -355,7 +347,11 @@ sl_bool OSX_ViewInstance::onEventUpdateCursor(NSEvent* event)
 {
 	NSView* handle = m_handle;
 	if (handle != nil) {
-		Ref<UIEvent> ev = UIEvent::createSetCursorEvent();
+		NSPoint pw = [event locationInWindow];
+		NSPoint pt = [handle convertPoint:pw fromView:nil];
+		sl_real x = (sl_real)(pt.x);
+		sl_real y = (sl_real)(pt.y);
+		Ref<UIEvent> ev = UIEvent::createSetCursorEvent(x, y);
 		if (ev.isNotNull()) {
 			onSetCursor(ev.ptr);
 			return ev->isPreventedDefault();
@@ -384,7 +380,7 @@ void OSX_ViewInstance::applyModifiers(UIEvent* ev, NSEvent* event)
 /******************************************
 				View
  ******************************************/
-Ref<ViewInstance> View::createInstance(ViewInstance* _parent)
+Ref<ViewInstance> View::createGenericInstance(ViewInstance* _parent)
 {
 	OSX_VIEW_CREATE_INSTANCE_BEGIN
 	Slib_OSX_ViewHandle* handle = [[Slib_OSX_ViewHandle alloc] initWithFrame:frame];
@@ -712,6 +708,7 @@ NSView* UIPlatform::getViewHandle(View* view)
 	}
 	return nil;
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

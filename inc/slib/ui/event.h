@@ -20,6 +20,7 @@ class SLIB_EXPORT TouchPoint
 public:
 	Point point;
 	sl_real pressure;
+	TouchPhase phase;
 
 public:
 	TouchPoint();
@@ -30,9 +31,13 @@ public:
 	
 	TouchPoint(const Point& point, sl_real pressure);
 	
+	TouchPoint(const Point& point, sl_real pressure, TouchPhase phase);
+	
 	TouchPoint(sl_real x, sl_real y);
 	
 	TouchPoint(sl_real x, sl_real y, sl_real pressure);
+	
+	TouchPoint(sl_real x, sl_real y, sl_real pressure, TouchPhase phase);
 	
 public:
 	TouchPoint& operator=(const TouchPoint& other);
@@ -123,7 +128,7 @@ public:
 	
 	static Ref<UIEvent> createTouchEvent(UIAction action, const Array<TouchPoint>& points);
 	
-	static Ref<UIEvent> createSetCursorEvent();
+	static Ref<UIEvent> createSetCursorEvent(sl_real x, sl_real y);
 	
 public:
 	UIAction getAction() const;
@@ -246,13 +251,25 @@ public:
 	sl_bool isCommandKey() const;
 	
 	// event management
+	void resetStatus();
+	
 	void preventDefault();
 	
 	sl_bool isPreventedDefault() const;
 	
+	void setPreventedDefault(sl_bool flag);
+	
 	void stopPropagation();
 	
 	sl_bool isStoppedPropagation() const;
+	
+	void setStoppedPropagation(sl_bool flag);
+	
+	void passToNext();
+	
+	sl_bool isPassedToNext();
+	
+	void setPassedToNext(sl_bool flag);
 	
 	Ref<UIEvent> duplicate();
 	
@@ -279,17 +296,23 @@ protected:
 class SLIB_EXPORT IViewListener
 {
 public:
-	virtual void onClick(View* view);
-	
-	virtual void onKeyEvent(View* view, UIEvent* ev);
-	
 	virtual void onMouseEvent(View* view, UIEvent* ev);
 	
 	virtual void onTouchEvent(View* view, UIEvent* ev);
 	
 	virtual void onMouseWheelEvent(View* view, UIEvent* ev);
 	
+	virtual void onKeyEvent(View* view, UIEvent* ev);
+	
+	virtual void onClick(View* view, UIEvent* ev);
+	
 	virtual void onSetCursor(View* view, UIEvent* ev);
+
+	virtual void onResize(View* view, sl_real width, sl_real height);
+	
+	virtual void onShow(View* view);
+	
+	virtual void onHide(View* view);
 
 };
 
@@ -319,15 +342,15 @@ public:
 class SLIB_EXPORT UIEventLogListener : public Referable, public IWindowListener, public IViewListener
 {
 public:
-	void onClick(View* view);
-	
-	void onKeyEvent(View* view, UIEvent* ev);
-	
 	void onMouseEvent(View* view, UIEvent* ev);
 	
 	void onMouseWheelEvent(View* view, UIEvent* ev);
 	
 	void onTouchEvent(View* view, UIEvent* ev);
+	
+	void onKeyEvent(View* view, UIEvent* ev);
+	
+	void onClick(View* view, UIEvent* ev);
 	
 	void onSetCursor(View* view, UIEvent* ev);
 	

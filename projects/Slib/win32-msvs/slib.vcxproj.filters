@@ -346,9 +346,6 @@
     <ClInclude Include="..\..\..\inc\slib\ui\event.h">
       <Filter>inc\ui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\ui\generic_view.h">
-      <Filter>inc\ui</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\image_view.h">
       <Filter>inc\ui</Filter>
     </ClInclude>
@@ -364,24 +361,6 @@
     <ClInclude Include="..\..\..\inc\slib\ui\render_view.h">
       <Filter>inc\ui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\ui\s_button.h">
-      <Filter>inc\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\ui\s_check_box.h">
-      <Filter>inc\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\ui\s_image_view.h">
-      <Filter>inc\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\ui\s_label_view.h">
-      <Filter>inc\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\ui\s_radio_button.h">
-      <Filter>inc\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\ui\s_view.h">
-      <Filter>inc\ui</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\screen.h">
       <Filter>inc\ui</Filter>
     </ClInclude>
@@ -392,9 +371,6 @@
       <Filter>inc\ui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\view.h">
-      <Filter>inc\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\ui\view_group.h">
       <Filter>inc\ui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\drop_down_list.h">
@@ -415,13 +391,7 @@
     <ClInclude Include="..\..\..\inc\slib\core\win32_com.h">
       <Filter>inc\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\ui\s_tab_view.h">
-      <Filter>inc\ui</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\camera_view.h">
-      <Filter>inc\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\ui\s_camera_view.h">
       <Filter>inc\ui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\slib\graphics\image_soil2.h">
@@ -667,9 +637,6 @@
     <ClInclude Include="..\..\..\inc\slib\media\dshow.h">
       <Filter>inc\media</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\ui\radio_group.h">
-      <Filter>inc\ui</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\db\mysql.h">
       <Filter>inc\db</Filter>
     </ClInclude>
@@ -714,6 +681,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\core\new.h">
       <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\ui\scroll_bar.h">
+      <Filter>inc\ui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1143,9 +1113,6 @@
     <ClCompile Include="..\..\..\src\slib\ui\font_win32.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\generic_view.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\graphics_path_gdiplus.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
@@ -1171,27 +1138,6 @@
       <Filter>src\slib\ui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\render_view_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\s_button.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\s_check_box.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\s_image_view.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\s_label_view.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\s_radio_button.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\s_tab_view.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\s_view.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\scroll_view.cpp">
@@ -1224,9 +1170,6 @@
     <ClCompile Include="..\..\..\src\slib\ui\view.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\view_group.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\camera_view.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
@@ -1247,9 +1190,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\graphics\bitmap_format.cpp">
       <Filter>src\slib\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\radio_group.cpp">
-      <Filter>src\slib\ui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\db\mysql.cpp">
       <Filter>src\slib\db</Filter>
@@ -1390,6 +1330,9 @@
       <Filter>src\slib\ui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\common_dialogs_win32.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\scroll_bar.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
   </ItemGroup>

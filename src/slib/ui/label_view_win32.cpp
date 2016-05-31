@@ -96,10 +96,10 @@ public:
 
 SLIB_DEFINE_OBJECT(_Win32_LabelViewInstance, Win32_ViewInstance)
 
-Ref<ViewInstance> LabelView::createInstance(ViewInstance* parent)
+Ref<ViewInstance> LabelView::createNativeWidget(ViewInstance* parent)
 {
 	int style = SS_NOTIFY;
-	if (m_flagBorder) {
+	if (isBorder()) {
 		style |= WS_BORDER;
 	}
 	Alignment align = m_textAlignment & Alignment::HorizontalMask;
@@ -114,81 +114,29 @@ Ref<ViewInstance> LabelView::createInstance(ViewInstance* parent)
 
 		HWND handle = ret->getHandle();
 
-		Ref<Font> font = m_font;
+		Ref<Font> font = getFont();
 		Ref<FontInstance> fontInstance;
 		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
-		m_fontInstance = fontInstance;
+		_setFontInstance(fontInstance);
 
 		ret->setTextColor(m_textColor);
-		ret->setBackgroundColor(m_backgroundColor);
+		ret->setBackgroundColor(getBackgroundColor());
 	}
 	return ret;
 }
 
-String LabelView::getText()
-{
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		m_text = Windows::getWindowText(handle);
-	}
-	return m_text;
-}
-
-void LabelView::setText(const String& text)
+void LabelView::_setText_NW(const String& text)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		Windows::setWindowText(handle, text);
 	}
-	m_text = text;
 }
 
-sl_bool LabelView::isBorder()
-{
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		LONG style = ::GetWindowLongW(handle, GWL_STYLE);
-		m_flagBorder = (style & WS_BORDER) ? sl_true : sl_false;
-	}
-	return m_flagBorder;
-}
-
-void LabelView::setBorder(sl_bool flag)
-{
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		LONG old = ::GetWindowLongW(handle, GWL_STYLE);
-		if (flag) {
-			::SetWindowLongW(handle, GWL_STYLE, old | WS_BORDER);
-		} else {
-			::SetWindowLongW(handle, GWL_STYLE, old & (~WS_BORDER));
-		}
-		::SetWindowPos(handle, NULL, 0, 0, 0, 0
-			, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
-	}
-	m_flagBorder = flag;
-}
-
-Alignment LabelView::getTextAlignment()
-{
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		LONG style = ::GetWindowLongW(handle, GWL_STYLE);
-		if (style & SS_CENTER) {
-			m_textAlignment = Alignment::Center;
-		} else if (style & SS_RIGHT) {
-			m_textAlignment = Alignment::Right;
-		} else {
-			m_textAlignment = Alignment::Left;
-		}
-	}
-	return m_textAlignment;
-}
-
-void LabelView::setTextAlignment(Alignment _align)
+void LabelView::_setTextAlignment_NW(Alignment _align)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -203,50 +151,18 @@ void LabelView::setTextAlignment(Alignment _align)
 		::SetWindowPos(handle, NULL, 0, 0, 0, 0
 			, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 	}
-	m_textAlignment = _align;
 }
 
-Color LabelView::getTextColor()
-{
-	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_LabelViewInstance::checkInstance(_instance.ptr)) {
-		_Win32_LabelViewInstance* instance = ((_Win32_LabelViewInstance*)(_instance.ptr));
-		m_textColor = instance->m_colorText;
-	}
-	return m_textColor;
-}
-
-void LabelView::setTextColor(const Color& color)
+void LabelView::_setTextColor_NW(const Color& color)
 {
 	Ref<ViewInstance> _instance = getViewInstance();
 	if (_Win32_LabelViewInstance::checkInstance(_instance.ptr)) {
 		_Win32_LabelViewInstance* instance = ((_Win32_LabelViewInstance*)(_instance.ptr));
 		instance->setTextColor(color); 
 	}
-	m_textColor = color;
 }
 
-Color LabelView::getBackgroundColor()
-{
-	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_LabelViewInstance::checkInstance(_instance.ptr)) {
-		_Win32_LabelViewInstance* instance = ((_Win32_LabelViewInstance*)(_instance.ptr));
-		m_backgroundColor = instance->m_colorBackground;
-	}
-	return m_backgroundColor;
-}
-
-void LabelView::setBackgroundColor(const Color& color)
-{
-	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_LabelViewInstance::checkInstance(_instance.ptr)) {
-		_Win32_LabelViewInstance* instance = ((_Win32_LabelViewInstance*)(_instance.ptr));
-		instance->setBackgroundColor(color);
-	}
-	m_backgroundColor = color;
-}
-
-void LabelView::setFont(const Ref<Font>& font)
+void LabelView::_setFont_NW(const Ref<Font>& font)
 {
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
@@ -256,8 +172,31 @@ void LabelView::setFont(const Ref<Font>& font)
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
 	}
-	m_font = font;
-	m_fontInstance = fontInstance;
+	_setFontInstance(fontInstance);
+}
+
+void LabelView::_setBorder_NW(sl_bool flag)
+{
+	HWND handle = UIPlatform::getViewHandle(this);
+	if (handle) {
+		LONG old = ::GetWindowLongW(handle, GWL_STYLE);
+		if (flag) {
+			::SetWindowLongW(handle, GWL_STYLE, old | WS_BORDER);
+		} else {
+			::SetWindowLongW(handle, GWL_STYLE, old & (~WS_BORDER));
+		}
+		::SetWindowPos(handle, NULL, 0, 0, 0, 0
+			, SWP_FRAMECHANGED | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+	}
+}
+
+void LabelView::_setBackgroundColor_NW(const Color& color)
+{
+	Ref<ViewInstance> _instance = getViewInstance();
+	if (_Win32_LabelViewInstance::checkInstance(_instance.ptr)) {
+		_Win32_LabelViewInstance* instance = ((_Win32_LabelViewInstance*)(_instance.ptr));
+		instance->setBackgroundColor(color);
+	}
 }
 
 SLIB_UI_NAMESPACE_END
