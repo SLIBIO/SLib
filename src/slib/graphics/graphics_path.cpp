@@ -258,10 +258,10 @@ sl_bool GraphicsPath::containsPointInRoundRect(const Point& pt, const Rectangle&
 		}
 		y = radius.y + y - t;
 	}
-	if (Math::isNearZero(radius.x)) {
+	if (Math::isAlmostZero(radius.x)) {
 		return sl_false;
 	}
-	if (Math::isNearZero(radius.y)) {
+	if (Math::isAlmostZero(radius.y)) {
 		return sl_false;
 	}
 	sl_real rx2 = radius.x * radius.x;
@@ -272,11 +272,11 @@ sl_bool GraphicsPath::containsPointInRoundRect(const Point& pt, const Rectangle&
 sl_bool GraphicsPath::containsPointInEllipse(const Point& pt, const Rectangle& rect)
 {
 	sl_real rx = rect.right - rect.left;
-	if (Math::isNearZero(rx)) {
+	if (Math::isAlmostZero(rx)) {
 		return sl_false;
 	}
 	sl_real ry = rect.bottom - rect.top;
-	if (Math::isNearZero(ry)) {
+	if (Math::isAlmostZero(ry)) {
 		return sl_false;
 	}
 	sl_real rx2 = rx * rx;

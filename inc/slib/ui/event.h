@@ -124,7 +124,7 @@ public:
 	
 	static Ref<UIEvent> createMouseEvent(UIAction action, sl_real x, sl_real y);
 	
-	static Ref<UIEvent> createMouseWheelEvent(sl_real deltaX, sl_real deltaY);
+	static Ref<UIEvent> createMouseWheelEvent(sl_real mouseX, sl_real mouseY, sl_real deltaX, sl_real deltaY);
 	
 	static Ref<UIEvent> createTouchEvent(UIAction action, const Array<TouchPoint>& points);
 	
@@ -285,8 +285,12 @@ protected:
 	KeycodeAndModifiers m_keycodeAndModifiers;
 	sl_uint32 m_systemKeycode;
 	
-	// mouse, touch
+	// mouse, touch, mouse wheel
 	TouchPoint m_point;
+	
+	// mouse wheel
+	sl_real m_deltaX;
+	sl_real m_deltaY;
 	
 	// touch
 	Array<TouchPoint> m_points;
@@ -310,9 +314,7 @@ public:
 
 	virtual void onResize(View* view, sl_real width, sl_real height);
 	
-	virtual void onShow(View* view);
-	
-	virtual void onHide(View* view);
+	virtual void onChangeVisibility(View* view, Visibility oldVisibility, Visibility newVisibility);
 
 };
 

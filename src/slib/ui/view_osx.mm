@@ -330,10 +330,14 @@ sl_bool OSX_ViewInstance::onEventMouseWheel(NSEvent* event)
 	if (handle != nil) {
 		sl_real deltaX = (sl_real)([event deltaX]);
 		sl_real deltaY = (sl_real)([event deltaY]);
-		if (Math::isNearZero(deltaX) && Math::isNearZero(deltaY)) {
+		if (Math::isAlmostZero(deltaX) && Math::isAlmostZero(deltaY)) {
 			return sl_false;
 		}
-		Ref<UIEvent> ev = UIEvent::createMouseWheelEvent(deltaX, deltaY);
+		NSPoint pw = [event locationInWindow];
+		NSPoint pt = [handle convertPoint:pw fromView:nil];
+		sl_real x = (sl_real)(pt.x);
+		sl_real y = (sl_real)(pt.y);
+		Ref<UIEvent> ev = UIEvent::createMouseWheelEvent(x, y, deltaX, deltaY);
 		if (ev.isNotNull()) {
 			applyModifiers(ev.ptr, event);
 			onMouseWheelEvent(ev.ptr);

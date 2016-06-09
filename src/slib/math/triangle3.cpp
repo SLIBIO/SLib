@@ -50,7 +50,7 @@ Vector3T<T> Triangle3T<T>::projectPoint(const Vector3T<T>& point, T* pDist, T* p
 	Vector3T<T> Q = triangle.point3 - triangle.point1;
 	Vector3T<T> N = P.cross(Q);
 	T LN = N.getLength();
-	if (Math::isNearZero(LN)) {
+	if (Math::isAlmostZero(LN)) {
 		if (pDist) {
 			*pDist = 0;
 		}
@@ -92,7 +92,7 @@ sl_bool Triangle3T<T>::intersectLine(
 {
 	const Triangle3T<T>& triangle = *this;
 	T L = line.getLength();
-	if (Math::isNearZero(L)) {
+	if (Math::isAlmostZero(L)) {
 		if (pFlagParallel) {
 			*pFlagParallel = sl_false;
 		}
@@ -104,7 +104,7 @@ sl_bool Triangle3T<T>::intersectLine(
 		}
 		T dist, u, v;
 		Vector3T<T> P = projectPoint(line.point1, &dist, &u, &v);
-		if (Math::isNearZero(dist)) {
+		if (Math::isAlmostZero(dist)) {
 			if (outIntersectPoint) {
 				*outIntersectPoint = P;
 			}
@@ -135,7 +135,7 @@ sl_bool Triangle3T<T>::intersectLine(
 	Vector3T<T> DQ = D.cross(Q);
 	T det = DQ.dot(P);
 	
-	if (Math::isNearZero(det)) {
+	if (Math::isAlmostZero(det)) {
 		if (pFlagParallel) {
 			*pFlagParallel = sl_true;
 		}
@@ -147,7 +147,7 @@ sl_bool Triangle3T<T>::intersectLine(
 		}
 		T dist, u, v;
 		Vector3T<T> P = projectPoint(line.point1, &dist, &u, &v);
-		if (Math::isNearZero(dist)) {
+		if (Math::isAlmostZero(dist)) {
 			if (outIntersectPoint) {
 				*outIntersectPoint = P;
 			}

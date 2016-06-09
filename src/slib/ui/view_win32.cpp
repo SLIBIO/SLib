@@ -288,7 +288,12 @@ sl_bool Win32_ViewInstance::onEventMouseWheel(sl_bool flagVertical, WPARAM wPara
 			deltaX = (sl_real)delta;
 			deltaY = 0;
 		}
-		Ref<UIEvent> me = UIEvent::createMouseWheelEvent(deltaX, deltaY);
+		const DWORD lParam = ::GetMessagePos();
+		POINT pt;
+		pt.x = (short)(lParam & 0xffff);
+		pt.y = (short)((lParam >> 16) & 0xffff);
+		::ScreenToClient(hWnd, &pt);
+		Ref<UIEvent> me = UIEvent::createMouseWheelEvent((sl_real)(pt.x), (sl_real)(pt.y), deltaX, deltaY);
 		if (me.isNotNull()) {
 			applyModifiers(me.ptr);
 			onMouseWheelEvent(me.ptr);
@@ -346,53 +351,25 @@ sl_bool Win32_ViewInstance::processWindowMessage(UINT msg, WPARAM wParam, LPARAM
 	HWND hWnd = m_handle;
 	switch (msg) {
 		case WM_ERASEBKGND:
-#if defined(_SLIB_UI_WIN32_USE_CLIP_CHILDREN)
 			{
-				Ref<View> _view = getView();
-				if (ViewGroup::checkInstance(_view.ptr)) {
-					ViewGroup* view = (ViewGroup*)(_view.ptr);
-					Color color = view->getBackgroundColor();
-					if (color.a == 0) {
-						return sl_false;
-					}
-				} else if (_view.isNotNull()) {
-					if (_view->isOpaque()) {
+				Ref<View> view = getView();
+				if (view.isNotNull()) {
+					if (view->isDoubleBuffering()) {
 						result = TRUE;
 						return sl_true;
 					}
-					_view = _view->getParent();
-					Color color;
-					sl_bool flagClear = sl_false;
-					if (ViewGroup::checkInstance(_view.ptr)) {
-						ViewGroup* view = (ViewGroup*)(_view.ptr);
-						color = view->getBackgroundColor();
-						flagClear = sl_true;
-					} else if (ScrollView::checkInstance(_view.ptr)) {
-						ScrollView* view = (ScrollView*)(_view.ptr);
-						color = view->getBackgroundColor();
-						flagClear = sl_true;
+					if (view->isOpaque()) {
+						result = TRUE;
+						return sl_true;
 					}
-					if (flagClear) {
-						if (color.a == 0) {
-							return sl_false;
-						} else {
-							HBRUSH hbr = ::CreateSolidBrush(RGB(color.r, color.g, color.b));
-							if (hbr) {
-								HDC hDC = (HDC)(wParam);
-								RECT rc;
-								::GetClientRect(hWnd, &rc);
-								::FillRect(hDC, &rc, hbr);
-								::DeleteObject(hbr);
-								result = TRUE;
-								return sl_true;
-							}
-						}
+					Color backgroundColor = view->getBackgroundColor();
+					if (backgroundColor.a == 255) {
+						result = TRUE;
+						return sl_true;
 					}
 				}
 			}
-#endif
-			result = TRUE;
-			return sl_true;
+			return sl_false;
 
 		case WM_PAINT:
 			{

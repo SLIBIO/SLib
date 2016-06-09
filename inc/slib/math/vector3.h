@@ -52,6 +52,10 @@ public:
 	
 	FT getAngleBetween(const Vector3T<T, FT>& other) const;
 	
+	sl_bool equals(const Vector3T<T, FT>& other) const;
+	
+	sl_bool isAlmostEqual(const Vector3T<T, FT>& other) const;
+
 public:
 	Vector3T<T, FT>& operator=(const Vector3T<T, FT>& other) = default;
 	

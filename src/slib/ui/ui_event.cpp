@@ -128,11 +128,13 @@ Ref<UIEvent> UIEvent::createMouseEvent(UIAction action, sl_real x, sl_real y)
 	return ret;
 }
 
-Ref<UIEvent> UIEvent::createMouseWheelEvent(sl_real deltaX, sl_real deltaY)
+Ref<UIEvent> UIEvent::createMouseWheelEvent(sl_real mouseX, sl_real mouseY, sl_real deltaX, sl_real deltaY)
 {
 	Ref<UIEvent> ret = new UIEvent;
 	if (ret.isNotNull()) {
 		ret->setAction(UIAction::MouseWheel);
+		ret->setX(mouseX);
+		ret->setY(mouseY);
 		ret->setDeltaX(deltaX);
 		ret->setDeltaY(deltaY);
 	}
@@ -265,32 +267,32 @@ void UIEvent::setY(sl_real y)
 
 sl_real UIEvent::getDelta() const
 {
-	return m_point.point.y;
+	return m_deltaY;
 }
 
 void UIEvent::setDelta(sl_real delta)
 {
-	m_point.point.y = delta;
+	m_deltaY = delta;
 }
 
 sl_real UIEvent::getDeltaX() const
 {
-	return m_point.point.x;
+	return m_deltaX;
 }
 
 void UIEvent::setDeltaX(sl_real x)
 {
-	m_point.point.x = x;
+	m_deltaX = x;
 }
 
 sl_real UIEvent::getDeltaY() const
 {
-	return m_point.point.y;
+	return m_deltaY;
 }
 
 void UIEvent::setDeltaY(sl_real y)
 {
-	m_point.point.y = y;
+	m_deltaY = y;
 }
 
 const TouchPoint& UIEvent::getTouchPoint() const
@@ -447,6 +449,8 @@ Ref<UIEvent> UIEvent::duplicate()
 		ret->m_keycodeAndModifiers = m_keycodeAndModifiers;
 		ret->m_systemKeycode = m_systemKeycode;
 		ret->m_point = m_point;
+		ret->m_deltaX = m_deltaX;
+		ret->m_deltaY = m_deltaY;
 		ret->m_points = m_points.duplicate();
 	}
 	return ret;
@@ -668,14 +672,9 @@ void IViewListener::onResize(View* view, sl_real width, sl_real height)
 {
 }
 
-void IViewListener::onShow(View* view)
+void IViewListener::onChangeVisibility(View* view, Visibility oldVisibility, Visibility newVisibility)
 {
 }
-
-void IViewListener::onHide(View* view)
-{
-}
-
 
 sl_bool IWindowListener::onClose(Window* window)
 {

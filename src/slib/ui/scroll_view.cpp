@@ -7,10 +7,14 @@ SLIB_DEFINE_OBJECT(ScrollView, View)
 
 ScrollView::ScrollView()
 {
+	SLIB_REFERABLE_CONSTRUCTOR
+	
 	setCreatingNativeWidget(sl_true);
 	
 	createScrollBars();
 	setBorder(sl_true);
+	setDoubleBuffering(sl_true, sl_false);
+
 }
 
 Ref<View> ScrollView::getContentView()
@@ -23,11 +27,7 @@ void ScrollView::setContentView(const Ref<slib::View>& view, sl_bool flagRedraw)
 	ObjectLocker lock(this);
 	if (m_viewContent != view) {
 		Ref<View> viewOld = m_viewContent;
-		if (viewOld.isNotNull()) {
-			viewOld->removeParent(this);
-			viewOld->detach();
-		}
-		removeAllChildren();
+		removeChild(viewOld);
 		m_viewContent = view;
 		if (view.isNotNull()) {
 			view->setParent(this);
@@ -88,9 +88,11 @@ void ScrollView::onResize(sl_real width, sl_real height)
 
 void ScrollView::onResizeChild(View* child, sl_real width, sl_real height)
 {
-	setContentSize(width, height);
-	if (isNativeWidget()) {
-		_refreshContentSize_NW();
+	if (child == m_viewContent) {
+		setContentSize(width, height);
+		if (isNativeWidget()) {
+			_refreshContentSize_NW();
+		}
 	}
 }
 

@@ -47,12 +47,12 @@ Rectangle GraphicsUtil::transformRectangle(const Rectangle& rectSrc, const Recta
 {
 	sl_real w1 = rectFrom.getWidth();
 	sl_real h1 = rectFrom.getHeight();
-	if (Math::isNearZero(w1) || Math::isNearZero(h1)) {
+	if (Math::isAlmostZero(w1) || Math::isAlmostZero(h1)) {
 		return Rectangle::zero();
 	}
 	sl_real w2 = rectTo.getWidth();
 	sl_real h2 = rectTo.getHeight();
-	if (Math::isNearZero(w2) || Math::isNearZero(h2)) {
+	if (Math::isAlmostZero(w2) || Math::isAlmostZero(h2)) {
 		return Rectangle::zero();
 	}
 	sl_real sw = rectSrc.getWidth();

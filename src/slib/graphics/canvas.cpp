@@ -356,7 +356,7 @@ void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleMo
 				rectSrc.top = 0;
 				rectSrc.right = sw;
 				rectSrc.bottom = sh;
-				Point pt = GraphicsUtil::calculateAlignPosition(rectSrc, sw, sh, alignment);
+				Point pt = GraphicsUtil::calculateAlignPosition(rectDst, sw, sh, alignment);
 				rectDraw.left = pt.x;
 				rectDraw.top = pt.y;
 				rectDraw.right = rectDraw.left + sw;

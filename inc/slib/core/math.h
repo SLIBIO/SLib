@@ -140,9 +140,9 @@ public:
 	
 	static sl_int32 clamp0_65535(sl_int32 v);
 
-	static sl_bool isNearZero(float f);
+	static sl_bool isAlmostZero(float f);
 	
-	static sl_bool isNearZero(double f);
+	static sl_bool isAlmostZero(double f);
 
 	static sl_bool isLessThanEpsilon(float f);
 	
@@ -318,12 +318,12 @@ SLIB_INLINE sl_int32 Math::clamp0_65535(sl_int32 v)
 	return v;
 }
 
-SLIB_INLINE sl_bool Math::isNearZero(float f)
+SLIB_INLINE sl_bool Math::isAlmostZero(float f)
 {
 	return f > -SLIB_EPSILON && f < SLIB_EPSILON;
 }
 
-SLIB_INLINE sl_bool Math::isNearZero(double f)
+SLIB_INLINE sl_bool Math::isAlmostZero(double f)
 {
 	return f > -SLIB_EPSILON_LONG && f < SLIB_EPSILON_LONG;
 }

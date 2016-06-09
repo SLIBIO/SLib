@@ -300,7 +300,7 @@ template <class T>
 SLIB_INLINE static T _Math_convertAngleFromEllipseToCircle(T angle, T radiusX, T radiusY)
 {
 	T _cos = Math::cos(angle);
-	if (Math::isNearZero(_cos) || Math::isNearZero(Math::sin(angle))) {
+	if (Math::isAlmostZero(_cos) || Math::isAlmostZero(Math::sin(angle))) {
 		return angle;
 	}
 	T PI;

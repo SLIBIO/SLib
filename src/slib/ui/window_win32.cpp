@@ -894,6 +894,22 @@ LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			}
 		case WM_ERASEBKGND:
 			{
+				Ref<ViewInstance> contentInst = window->getContentView();
+				if (contentInst.isNotNull()) {
+					Ref<View> content = contentInst->getView();
+					if (content.isNotNull()) {
+						if (content->isDoubleBuffering()) {
+							return TRUE;
+						}
+						if (content->isOpaque()) {
+							return TRUE;
+						}
+						Color color = content->getBackgroundColor();
+						if (color.a == 255) {
+							return TRUE;
+						}
+					}
+				}
 				HDC hDC = (HDC)(wParam);
 				Color color = window->m_backgroundColor;
 				if (color.a != 0) {

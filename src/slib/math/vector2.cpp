@@ -70,7 +70,7 @@ Vector2T<T, FT> Vector2T<T, FT>::getNormalized()
 }
 
 template <class T, class FT>
-FT Vector2T<T, FT>::getCosBetween(const Vector2T& other) const
+FT Vector2T<T, FT>::getCosBetween(const Vector2T<T, FT>& other) const
 {
 	FT ret = (FT)(dot(other)) / Math::sqrt((FT)(getLength2p() * other.getLength2p()));
 	if (ret > 1) {
@@ -80,19 +80,31 @@ FT Vector2T<T, FT>::getCosBetween(const Vector2T& other) const
 }
 
 template <class T, class FT>
-FT Vector2T<T, FT>::getAbsAngleBetween(const Vector2T& other) const
+FT Vector2T<T, FT>::getAbsAngleBetween(const Vector2T<T, FT>& other) const
 {
 	return Math::arccos(getCosBetween(other));
 }
 
 template <class T, class FT>
-FT Vector2T<T, FT>::getAngleBetween(const Vector2T& other) const
+FT Vector2T<T, FT>::getAngleBetween(const Vector2T<T, FT>& other) const
 {
 	FT a = getAbsAngleBetween(other);
 	if (cross(other) > 0) {
 		a = -a;
 	}
 	return a;
+}
+
+template <class T, class FT>
+sl_bool Vector2T<T, FT>::equals(const Vector2T<T, FT>& other) const
+{
+	return x == other.x && y == other.y;
+}
+
+template <class T, class FT>
+sl_bool Vector2T<T, FT>::isAlmostEqual(const Vector2T<T, FT>& other) const
+{
+	return Math::isAlmostZero((FT)(x - other.x)) && Math::isAlmostZero((FT)(y - other.y));
 }
 
 template <class T, class FT>

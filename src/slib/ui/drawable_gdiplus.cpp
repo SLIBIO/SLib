@@ -362,10 +362,14 @@ public:
 		data.Scan0 = sl_null;
 		Gdiplus::Status result = m_bitmap->LockBits(&rc, Gdiplus::ImageLockModeWrite, PixelFormat32bppARGB, &data);
 		if (result == Gdiplus::Ok) {
-			sl_uint32 size = width * height;
-			Color* pixels = (Color*)(data.Scan0);
-			for (sl_uint32 i = 0; i < size; i++) {
-				pixels[i] = color;
+			DWORD _color = color.getARGB();
+			sl_uint8* row = (sl_uint8*)(data.Scan0);
+			for (sl_uint32 i = 0; i < height; i++) {
+				DWORD* pixels = (DWORD*)row;
+				for (sl_uint32 j = 0; j < width; j++) {
+					pixels[j] = _color;
+				}
+				row += data.Stride;
 			}
 			result = m_bitmap->UnlockBits(&data);
 			return result == Gdiplus::Ok;

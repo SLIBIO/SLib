@@ -126,7 +126,7 @@ sl_bool PlaneT<T>::intersectLine(
 	// distances from line end points
 	T len = line.getLength();
 	T d1 = getDistanceFromPointOnNormalized(line.point1);
-	if (Math::isNearZero(len)) {
+	if (Math::isAlmostZero(len)) {
 		if (pFlagParallel) {
 			*pFlagParallel = sl_false;
 		}
@@ -136,7 +136,7 @@ sl_bool PlaneT<T>::intersectLine(
 		if (pFlagExtendPoint2) {
 			*pFlagExtendPoint2 = sl_false;
 		}
-		if (Math::isNearZero(d1)) {
+		if (Math::isAlmostZero(d1)) {
 			return sl_true;
 		} else {
 			return sl_false;
@@ -144,7 +144,7 @@ sl_bool PlaneT<T>::intersectLine(
 	}
 	T d2 = getDistanceFromPointOnNormalized(line.point2);
 	T dd = d1 - d2;
-	if (Math::isNearZero(dd)) {
+	if (Math::isAlmostZero(dd)) {
 		if (pFlagParallel) {
 			*pFlagParallel = sl_true;
 		}
@@ -154,7 +154,7 @@ sl_bool PlaneT<T>::intersectLine(
 		if (pFlagExtendPoint2) {
 			*pFlagExtendPoint2 = sl_false;
 		}
-		if (Math::isNearZero(d1)) {
+		if (Math::isAlmostZero(d1)) {
 			return sl_true;
 		} else {
 			return sl_false;
@@ -207,15 +207,15 @@ sl_bool PlaneT<T>::intersectPlane(const PlaneT<T>& plane, Line3T<T>* outIntersec
 	T D2 = plane2.d;
 	Vector3T<T> vStart;
 	Vector3T<T> vDirection = N1.cross(N2);
-	if (Math::isNearZero(vDirection.x)) {
-		if (Math::isNearZero(vDirection.y)) {
-			if (Math::isNearZero(vDirection.z)) {
+	if (Math::isAlmostZero(vDirection.x)) {
+		if (Math::isAlmostZero(vDirection.y)) {
+			if (Math::isAlmostZero(vDirection.z)) {
 				if (pFlagParallel) {
 					*pFlagParallel = sl_true;
 				}
 				plane1.normalize();
 				plane2.normalize();
-				if (Math::isNearZero(D1 - D2)) {
+				if (Math::isAlmostZero(D1 - D2)) {
 					return sl_true;
 				} else {
 					return sl_false;

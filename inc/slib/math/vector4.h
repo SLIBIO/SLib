@@ -57,6 +57,10 @@ public:
 	
 	FT getAngleBetween(const Vector4T<T, FT>& other) const;
 	
+	sl_bool equals(const Vector4T<T, FT>& other) const;
+
+	sl_bool isAlmostEqual(const Vector4T<T, FT>& other) const;
+
 public:
 	Vector4T<T, FT>& operator=(const Vector4T<T, FT>& other) = default;
 	

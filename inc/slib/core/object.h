@@ -195,6 +195,16 @@ public: \
 		_m_property_##NAME = v; \
 	}
 
+#define SLIB_VARIANT_PROPERTY(NAME) protected: \
+	slib::SafeVariant _m_property_##NAME; \
+public: \
+	SLIB_INLINE slib::Variant get##NAME() const { \
+		return _m_property_##NAME; \
+	} \
+	SLIB_INLINE void set##NAME(const slib::Variant& v) { \
+		_m_property_##NAME = v; \
+	}
+
 
 #endif
 

@@ -20,16 +20,20 @@ class SLIB_EXPORT ScrollBar : public View
 	SLIB_DECLARE_OBJECT
 	
 public:
-	ScrollBar();
+	ScrollBar(LayoutOrientation orientation = LayoutOrientation::Horizontal);
 	
 public:
+	LayoutOrientation getOrientation();
+	
+	void setOrientation(LayoutOrientation orientation, sl_bool flagRedraw = sl_true);
+	
 	sl_bool isVertical();
 	
-	void setVertical(sl_bool flag, sl_bool flagRedraw = sl_true);
+	void setVertical(sl_bool flagRedraw = sl_true);
 	
 	sl_bool isHorizontal();
 	
-	void setHorizontal(sl_bool flag, sl_bool flagRedraw = sl_true);
+	void setHorizontal(sl_bool flagRedraw = sl_true);
 	
 	sl_real getValue();
 	
@@ -83,9 +87,6 @@ public:
 	
 protected:
 	// override
-	void onDrawBackground(Canvas* canvas);
-	
-	// override
 	void onDraw(Canvas* canvas);
 
 	// override
@@ -103,7 +104,7 @@ public:
 	SLIB_PTR_PROPERTY(IScrollBarListener, Listener);
 
 protected:
-	sl_bool m_flagVertical;
+	LayoutOrientation m_orientation;
 	sl_real m_value;
 	sl_real m_page;
 	sl_real m_line;

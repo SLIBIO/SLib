@@ -123,6 +123,10 @@ public:
 	// 4 points
 	void getCornerPoints(PointT<T, FT>* _out) const;
 	
+	sl_bool equals(const RectangleT<T, FT>& other) const;
+	
+	sl_bool isAlmostEqual(const RectangleT<T, FT>& other) const;
+	
 public:
 	RectangleT<T, FT>& operator=(const RectangleT<T, FT>& other) = default;
 	

@@ -22,7 +22,9 @@ public:
 	void onDrawAll(Canvas* canvas, const Rectangle& rectDst)
 	{
 		sl_real r = Math::min(rectDst.getWidth(), rectDst.getHeight()) * 0.5f;
-		canvas->drawRoundRect(rectDst, Size(r, r), Ref<Pen>::null(), m_brush);
+		sl_real padding = 2;
+		r -= padding;
+		canvas->drawRoundRect(Rectangle(rectDst.left + padding, rectDst.top + padding, rectDst.right - padding, rectDst.bottom - padding), Size(r, r), Ref<Pen>::null(), m_brush);
 	}
 };
 
@@ -34,8 +36,8 @@ public:
 
 	_ScrollBar_Static()
 	{
-		defaultBar = new _ScrollBar_Bar(Color(0, 0, 0, 200));
-		defaultClickedBar = new _ScrollBar_Bar(Color(0, 0, 0, 240));
+		defaultBar = new _ScrollBar_Bar(Color(0, 0, 0, 110));
+		defaultClickedBar = new _ScrollBar_Bar(Color(0, 0, 0, 160));
 	}
 	
 	static _ScrollBar_Static& get()
@@ -45,9 +47,9 @@ public:
 	}
 };
 
-ScrollBar::ScrollBar()
+ScrollBar::ScrollBar(LayoutOrientation orientation)
 {
-	m_flagVertical = sl_false;
+	m_orientation = orientation;
 	m_value = 0;
 	m_page = 0;
 	m_line = 0;
@@ -63,30 +65,37 @@ ScrollBar::ScrollBar()
 	m_bar_len_ratio_min = 2;
 }
 
-sl_bool ScrollBar::isVertical()
+LayoutOrientation ScrollBar::getOrientation()
 {
-	return m_flagVertical;
+	return m_orientation;
 }
 
-void ScrollBar::setVertical(sl_bool flag, sl_bool flagRedraw)
+void ScrollBar::setOrientation(LayoutOrientation orientation, sl_bool flagRedraw)
 {
-	m_flagVertical = flag;
+	m_orientation = orientation;
 	if (flagRedraw) {
 		invalidate();
 	}
+}
+
+sl_bool ScrollBar::isVertical()
+{
+	return m_orientation == LayoutOrientation::Vertical;
+}
+
+void ScrollBar::setVertical(sl_bool flagRedraw)
+{
+	setOrientation(LayoutOrientation::Vertical, flagRedraw);
 }
 
 sl_bool ScrollBar::isHorizontal()
 {
-	return !m_flagVertical;
+	return m_orientation == LayoutOrientation::Horizontal;
 }
 
-void ScrollBar::setHorizontal(sl_bool flag, sl_bool flagRedraw)
+void ScrollBar::setHorizontal(sl_bool flagRedraw)
 {
-	m_flagVertical = !flag;
-	if (flagRedraw) {
-		invalidate();
-	}
+	setOrientation(LayoutOrientation::Horizontal, flagRedraw);
 }
 
 sl_real ScrollBar::getValue()
@@ -103,7 +112,7 @@ void ScrollBar::setValue(sl_real value, sl_bool flagRedraw)
 	if (value < m_value_min) {
 		value = m_value_min;
 	}
-	if (Math::isNearZero(value - m_value)) {
+	if (Math::isAlmostZero(value - m_value)) {
 		m_value = value;
 		return;
 	}
@@ -155,7 +164,7 @@ sl_real ScrollBar::getMinimumValue()
 
 void ScrollBar::setMinimumValue(sl_real value, sl_bool flagRedraw)
 {
-	m_value_max = value;
+	m_value_min = value;
 	setValue(m_value, sl_false);
 	if (flagRedraw) {
 		invalidate();
@@ -169,7 +178,7 @@ sl_real ScrollBar::getMaximumValue()
 
 void ScrollBar::setMaximumValue(sl_real value, sl_bool flagRedraw)
 {
-	m_value_min = value;
+	m_value_max = value;
 	setValue(m_value, sl_false);
 	if (flagRedraw) {
 		invalidate();
@@ -243,10 +252,10 @@ void ScrollBar::setMinimumBarLengthRatio(sl_real ratio)
 	if (page < 0) { \
 		return __VA_ARGS__; \
 	} \
-	if (range < page + SLIB_EPSILON) { \
+	if (range - page < SLIB_EPSILON) { \
 		return __VA_ARGS__; \
 	} \
-	sl_bool flagVertical = m_flagVertical; \
+	sl_bool flagVertical = m_orientation == LayoutOrientation::Vertical; \
 	sl_real width = getWidth(); \
 	if (width < 1) { \
 		return __VA_ARGS__; \
@@ -271,7 +280,7 @@ void ScrollBar::setMinimumBarLengthRatio(sl_real ratio)
 	if (bar_len < min_bar_len) { \
 		bar_len = min_bar_len; \
 	} \
-	if (length < bar_len + SLIB_EPSILON) { \
+	if (length - bar_len < SLIB_EPSILON) { \
 		return __VA_ARGS__; \
 	} \
 	sl_real ratioValuePos = (range - page) / (length - bar_len);
@@ -300,7 +309,7 @@ sl_bool ScrollBar::getBarRegion(Rectangle& region)
 {
 	sl_real pos_begin, pos_end;
 	if (getBarPositionRange(pos_begin, pos_end)) {
-		if (m_flagVertical) {
+		if (isVertical()) {
 			region.left = 0;
 			region.right = getWidth();
 			region.top = pos_begin;
@@ -328,7 +337,7 @@ sl_bool ScrollBar::isValid()
 	return sl_true;
 }
 
-void ScrollBar::onDrawBackground(Canvas* canvas)
+void ScrollBar::onDraw(Canvas* canvas)
 {
 	Rectangle barRegion;
 	if (getBarRegion(barRegion)) {
@@ -337,13 +346,6 @@ void ScrollBar::onDrawBackground(Canvas* canvas)
 		} else {
 			drawBackground(canvas, getBackgroundColor(), getBackground());
 		}
-	}
-}
-
-void ScrollBar::onDraw(Canvas* canvas)
-{
-	Rectangle barRegion;
-	if (getBarRegion(barRegion)) {
 		if (isDownState()) {
 			canvas->draw(barRegion, m_clickedBar);
 		} else {
@@ -354,16 +356,13 @@ void ScrollBar::onDraw(Canvas* canvas)
 
 void ScrollBar::onMouseEvent(UIEvent* ev)
 {
-	if (ev->isPreventedDefault()) {
-		return;
-	}
 	ev->preventDefault();
 	CHECK_STATUS()
 	ev->setPreventedDefault(sl_false);
 	
 	UIAction action = ev->getAction();
 	sl_real pos;
-	if (m_flagVertical) {
+	if (isVertical()) {
 		pos = ev->getY();
 	} else {
 		pos = ev->getX();
@@ -381,34 +380,34 @@ void ScrollBar::onMouseEvent(UIEvent* ev)
 					setValue(m_valueDown);
 				}
 			} else if (pos <= pos_end) {
-				if (isDownState()) {
-					m_valueDown = value;
-				}
+				m_valueDown = value;
 			} else {
-				if (isDownState()) {
-					m_valueDown = getValueFromBarPosition(pos);
-					if (page > 0) {
-						setValue(value + page);
-					} else {
-						setValue(m_valueDown);
-					}					
+				m_valueDown = getValueFromBarPosition(pos);
+				if (page > 0) {
+					setValue(value + page);
+				} else {
+					setValue(m_valueDown);
 				}
 			}
 		} else if (action == UIAction::LeftButtonDrag || action == UIAction::TouchMove) {
-			setValue(m_valueDown + (pos - m_posDown) * ratioValuePos);
-		} else if (action == UIAction::LeftButtonUp || action == UIAction::TouchEnd || action == UIAction::TouchCancel) {
-			if (!(Math::isNearZero(m_posDown - pos))) {
+			if (isDownState()) {
 				setValue(m_valueDown + (pos - m_posDown) * ratioValuePos);
+			}
+		} else if (action == UIAction::LeftButtonUp || action == UIAction::TouchEnd || action == UIAction::TouchCancel) {
+			if (isDownState()) {
+				if (!(Math::isAlmostZero(m_posDown - pos))) {
+					setValue(m_valueDown + (pos - m_posDown) * ratioValuePos);
+				}
 			}
 		}
 	}
+	
+	ev->stopPropagation();
+	
 }
 
 void ScrollBar::onMouseWheelEvent(UIEvent* ev)
 {
-	if (ev->isPreventedDefault()) {
-		return;
-	}
 	ev->preventDefault();
 	CHECK_STATUS()
 	ev->setPreventedDefault(sl_false);
@@ -428,11 +427,12 @@ void ScrollBar::onMouseWheelEvent(UIEvent* ev)
 		delta = ev->getDeltaX();
 	}
 	if (delta > SLIB_EPSILON) {
-		setValue(value + line);
-	} else if (delta < -SLIB_EPSILON) {
 		setValue(value - line);
+	} else if (delta < -SLIB_EPSILON) {
+		setValue(value + line);
 	}
 	
+	ev->stopPropagation();
 }
 
 void ScrollBar::onScroll(sl_real value)

@@ -41,11 +41,15 @@ public:
 	
 	Vector2T<T, FT> getNormalized();
 	
-	FT getCosBetween(const Vector2T& other) const;
+	FT getCosBetween(const Vector2T<T, FT>& other) const;
 	
-	FT getAbsAngleBetween(const Vector2T& other) const;
+	FT getAbsAngleBetween(const Vector2T<T, FT>& other) const;
 	
-	FT getAngleBetween(const Vector2T& other) const;
+	FT getAngleBetween(const Vector2T<T, FT>& other) const;
+	
+	sl_bool equals(const Vector2T<T, FT>& other) const;
+	
+	sl_bool isAlmostEqual(const Vector2T<T, FT>& other) const;
 
 public:
 	Vector2T<T, FT>& operator=(const Vector2T<T, FT>& other) = default;

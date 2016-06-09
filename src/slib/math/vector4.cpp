@@ -98,6 +98,18 @@ FT Vector4T<T, FT>::getAngleBetween(const Vector4T<T, FT>& other) const
 }
 
 template <class T, class FT>
+sl_bool Vector4T<T, FT>::equals(const Vector4T<T, FT>& other) const
+{
+	return x == other.x && y == other.y && z == other.z && w == other.w;
+}
+
+template <class T, class FT>
+sl_bool Vector4T<T, FT>::isAlmostEqual(const Vector4T<T, FT>& other) const
+{
+	return Math::isAlmostZero((FT)(x - other.x)) && Math::isAlmostZero((FT)(y - other.y)) && Math::isAlmostZero((FT)(z - other.z)) && Math::isAlmostZero((FT)(w - other.w));
+}
+
+template <class T, class FT>
 Vector4T<T, FT> Vector4T<T, FT>::operator+(const Vector4T<T, FT>& other) const
 {
 	return {x + other.x, y + other.y, z + other.z, w + other.w};

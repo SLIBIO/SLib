@@ -217,16 +217,40 @@ enum class ButtonState
 	Count = 4
 };
 
+enum class RedrawMode
+{
+	Continuously = 0,
+	WhenDirty = 1
+};
+
+enum class Visibility
+{
+	Visible = 0,
+	Hidden = 1,
+	Gone = 2,
+};
+
 enum class LayoutOrientation
 {
 	Horizontal = 0,
 	Vertical = 1
 };
 
-enum class RedrawMode
+enum class SizeMode
 {
-    Continuously = 0,
-    WhenDirty = 1
+	Fixed = 0,
+	Filling = 1,
+	Wrapping = 2
+};
+
+enum class PositionMode
+{
+	Fixed = 0,
+	ParentEdge = 1,
+	OtherStart = 2,
+	OtherEnd = 3,
+	CenterInParent = 4,
+	CenterInOther = 5
 };
 
 class DialogResult

@@ -1,4 +1,5 @@
 #include "../../../inc/slib/math/rectangle.h"
+#include "../../../inc/slib/core/math.h"
 
 SLIB_MATH_NAMESPACE_BEGIN
 
@@ -364,6 +365,21 @@ void RectangleT<T, FT>::getCornerPoints(PointT<T, FT>* _out) const
 	_out[1].x = right; _out[1].y = top;
 	_out[2].x = left; _out[2].y = bottom;
 	_out[3].x = right; _out[3].y = bottom;
+}
+
+template <class T, class FT>
+sl_bool RectangleT<T, FT>::equals(const RectangleT<T, FT>& other) const
+{
+	return left == other.left && top == other.top && right == other.right && bottom == other.bottom;
+}
+
+template <class T, class FT>
+sl_bool RectangleT<T, FT>::isAlmostEqual(const RectangleT<T, FT>& other) const
+{
+	return Math::isAlmostZero((FT)(left - other.left)) &&
+		Math::isAlmostZero((FT)(top - other.top)) &&
+		Math::isAlmostZero((FT)(right - other.right)) &&
+		Math::isAlmostZero((FT)(bottom - other.bottom));
 }
 
 SLIB_DEFINE_GEOMETRY_TYPE_EX(Rectangle)

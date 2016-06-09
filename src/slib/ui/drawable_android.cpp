@@ -378,12 +378,12 @@ public:
 		Rectangle rectSrc = _rectSrc;
 		sl_real osw = rectSrc.getWidth();
 		sl_real osh = rectSrc.getHeight();
-		if (Math::isNearZero(osw) || Math::isNearZero(osh)) {
+		if (Math::isAlmostZero(osw) || Math::isAlmostZero(osh)) {
 			return;
 		}
 		sl_real odw = rectDst.getWidth();
 		sl_real odh = rectDst.getHeight();
-		if (Math::isNearZero(odw) || Math::isNearZero(odh)) {
+		if (Math::isAlmostZero(odw) || Math::isAlmostZero(odh)) {
 			return;
 		}
 		if (rectSrc.right < rectSrc.left || rectSrc.bottom < rectSrc.top) {

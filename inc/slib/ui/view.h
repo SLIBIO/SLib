@@ -19,6 +19,8 @@ class Window;
 class ViewInstance;
 class ScrollBar;
 
+struct ViewPrepareLayoutParam;
+
 class SLIB_EXPORT View : public Object
 {
 	SLIB_DECLARE_OBJECT
@@ -75,11 +77,21 @@ public:
 	
 	Ref<ViewInstance> attachToNewInstance(const Ref<ViewInstance>& parent);
 	
+		
+	String getId();
+	
+	void setId(const String& _id);
 	
 	List< Ref<View> > getChildren();
 	
+	sl_size getChildrenCount();
+	
 	void addChild(const Ref<View>& view, sl_bool flagRedraw = sl_true);
 	
+	void insertChild(sl_size index, const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	
+	void removeChild(sl_size index, sl_bool flagRedraw = sl_true);
+
 	void removeChild(const Ref<View>& view, sl_bool flagRedraw = sl_true);
 	
 	void removeAllChildren(sl_bool flagRedraw = sl_true);
@@ -88,12 +100,26 @@ public:
 	
 	Ref<View> getChildAt(const Point& point);
 	
+	Ref<View> getChildById(const String& _id);
+	
+	Ref<View> getRootView();
+	
+	sl_bool isRootView();
+	
 	void attachChild(const Ref<View>& child);
 	
 	void addChildInstance(const Ref<ViewInstance>& instance);
 	
 	void removeChildInstance(const Ref<ViewInstance>& instance);
 	
+	sl_bool isOnAddChildEnabled();
+	
+	void setOnAddChildEnabled(sl_bool flagEnabled);
+	
+	sl_bool isOnRemoveChildEnabled();
+	
+	void setOnRemoveChildEnabled(sl_bool flagEnabled);
+
 	
 	void invalidate();
 
@@ -115,7 +141,11 @@ public:
 	
 	sl_real getWidth();
 	
+	void setWidth(sl_real width, sl_bool flagRedraw = sl_true);
+	
 	sl_real getHeight();
+	
+	void setHeight(sl_real height, sl_bool flagRedraw = sl_true);
 	
 	Size getSize();
 	
@@ -157,26 +187,9 @@ public:
 	Rectangle getBoundsInParent(const Rectangle& boundsLocal);
 	
 	
-	sl_real getPaddingLeft();
+	Visibility getVisibility();
 	
-	void setPaddingLeft(sl_real padding, sl_bool flagRedraw = sl_true);
-	
-	sl_real getPaddingTop();
-	
-	void setPaddingTop(sl_real padding, sl_bool flagRedraw = sl_true);
-	
-	sl_real getPaddingRight();
-	
-	void setPaddingRight(sl_real padding, sl_bool flagRedraw = sl_true);
-	
-	sl_real getPaddingBottom();
-	
-	void setPaddingBottom(sl_real padding, sl_bool flagRedraw = sl_true);
-	
-	void setPadding(sl_real left, sl_real top, sl_real right, sl_real bottom, sl_bool flagRedraw = sl_true);
-	
-	void setPadding(sl_real padding, sl_bool flagRedraw = sl_true);
-	
+	void setVisibility(Visibility visibility, sl_bool flagRedraw = sl_true);
 	
 	sl_bool isVisible();
 	
@@ -204,7 +217,7 @@ public:
 	
 	sl_bool isFocusable();
 	
-	void setFocusable(sl_bool flagFocusable, sl_bool flagRedraw = sl_true);
+	void setFocusable(sl_bool flagFocusable);
 	
 	sl_bool isFocused();
 	
@@ -230,6 +243,207 @@ public:
 	
 	void setCursor(const Ref<Cursor>& cursor);
 
+	
+	void measureLayout();
+	
+	sl_real getMeasuredWidth();
+	
+	void setMeasuredWidth(sl_real width);
+	
+	sl_real getMeasuredHeight();
+	
+	void setMeasuredHeight(sl_real height);
+
+	void requestLayout(sl_bool flagRedraw = sl_true);
+	
+	void requestParentLayout(sl_bool flagRedraw = sl_true);
+	
+	void requestParentAndSelfLayout(sl_bool flagRedraw = sl_true);
+	
+	sl_bool isLayoutEnabled();
+	
+	void setLayoutEnabled(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
+	
+	Rectangle getLayoutFrame();
+	
+	void setLayoutFrame(const Rectangle& rect);
+	
+	sl_bool isOnPrepareLayoutEnabled();
+	
+	void setOnPrepareLayoutEnabled(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
+	
+	sl_bool isOnMakeLayoutEnabled();
+	
+	void setOnMakeLayoutEnabled(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
+	
+	SizeMode getWidthMode();
+	
+	SizeMode getHeightMode();
+	
+	sl_bool isWidthFixed();
+	
+	void setWidthFixed(sl_bool flagRedraw = sl_true);
+	
+	sl_bool isHeightFixed();
+	
+	void setHeightFixed(sl_bool flagRedraw = sl_true);
+	
+	void setSizeFixed(sl_bool flagRedraw = sl_true);
+	
+	sl_bool isWidthFilling();
+	
+	sl_real getWidthFillingWeight();
+	
+	void setWidthFilling(sl_real weight = 1, sl_bool flagRedraw = sl_true);
+	
+	sl_bool isHeightFilling();
+	
+	sl_real getHeightFillingWeight();
+	
+	void setHeightFilling(sl_real weight = 1, sl_bool flagRedraw = sl_true);
+	
+	void setSizeFilling(sl_real widthWeight = 1, sl_real heightWeight = 1, sl_bool flagRedraw = sl_true);
+	
+	sl_bool isWidthWrapping();
+	
+	void setWidthWrapping(sl_bool flagRedraw = sl_true);
+	
+	sl_bool isHeightWrapping();
+	
+	void setHeightWrapping(sl_bool flagRedraw = sl_true);
+	
+	void setSizeWrapping(sl_bool flagRedraw = sl_true);
+	
+	sl_bool isLayoutLeftFixed();
+	
+	void setLayoutLeftFixed(sl_bool flagRedraw = sl_true);
+	
+	sl_bool isAlignParentLeft();
+	
+	void setAlignParentLeft(sl_bool flagRedraw = sl_true);
+	
+	sl_bool isAlignLeft();
+	
+	void setAlignLeft(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	
+	sl_bool isRightOf();
+	
+	void setRightOf(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	
+	Ref<View> getLayoutLeftReferingView();
+	
+	sl_bool isLayoutRightFixed();
+	
+	void setLayoutRightFixed(sl_bool flagRedraw = sl_true);
+	
+	sl_bool isAlignParentRight();
+	
+	void setAlignParentRight(sl_bool flagRedraw = sl_true);
+	
+	sl_bool isAlignRight();
+	
+	void setAlignRight(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	
+	sl_bool isLeftOf();
+	
+	void setLeftOf(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	
+	Ref<View> getLayoutRightReferingView();
+
+	sl_bool isLayoutTopFixed();
+	
+	void setLayoutTopFixed(sl_bool flagRedraw = sl_true);
+	
+	sl_bool isAlignParentTop();
+	
+	void setAlignParentTop(sl_bool flagRedraw = sl_true);
+	
+	sl_bool isAlignTop();
+	
+	void setAlignTop(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	
+	sl_bool isBelow();
+	
+	void setBelow(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	
+	Ref<View> getLayoutTopReferingView();
+	
+	sl_bool isLayoutBottomFixed();
+	
+	void setLayoutBottomFixed(sl_bool flagRedraw = sl_true);
+	
+	sl_bool isAlignParentBottom();
+	
+	void setAlignParentBottom(sl_bool flagRedraw = sl_true);
+	
+	sl_bool isAlignBottom();
+	
+	void setAlignBottom(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	
+	sl_bool isAbove();
+	
+	void setAbove(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+
+	Ref<View> getLayoutBottomReferingView();
+	
+	sl_bool isCenterHorizontal();
+	
+	void setCenterHorizontal(sl_bool flagRedraw = sl_true);
+	
+	sl_bool isCenterVertical();
+	
+	void setCenterVertical(sl_bool flagRedraw = sl_true);
+	
+	void setCenterInParent(sl_bool flagRedraw = sl_true);
+	
+	sl_bool isAlignCenterHorizontal();
+	
+	void setAlignCenterHorizontal(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	
+	sl_bool isAlignCenterVertical();
+	
+	void setAlignCenterVertical(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	
+	sl_real getPaddingLeft();
+	
+	void setPaddingLeft(sl_real padding, sl_bool flagRedraw = sl_true);
+	
+	sl_real getPaddingTop();
+	
+	void setPaddingTop(sl_real padding, sl_bool flagRedraw = sl_true);
+	
+	sl_real getPaddingRight();
+	
+	void setPaddingRight(sl_real padding, sl_bool flagRedraw = sl_true);
+	
+	sl_real getPaddingBottom();
+	
+	void setPaddingBottom(sl_real padding, sl_bool flagRedraw = sl_true);
+	
+	void setPadding(sl_real left, sl_real top, sl_real right, sl_real bottom, sl_bool flagRedraw = sl_true);
+	
+	void setPadding(sl_real padding, sl_bool flagRedraw = sl_true);
+	
+	sl_real getMarginLeft();
+	
+	void setMarginLeft(sl_real margin, sl_bool flagRedraw = sl_true);
+	
+	sl_real getMarginTop();
+	
+	void setMarginTop(sl_real margin, sl_bool flagRedraw = sl_true);
+	
+	sl_real getMarginRight();
+	
+	void setMarginRight(sl_real margin, sl_bool flagRedraw = sl_true);
+	
+	sl_real getMarginBottom();
+	
+	void setMarginBottom(sl_real margin, sl_bool flagRedraw = sl_true);
+	
+	void setMargin(sl_real left, sl_real top, sl_real right, sl_real bottom, sl_bool flagRedraw = sl_true);
+	
+	void setMargin(sl_real margin, sl_bool flagRedraw = sl_true);
+	
 	
 	sl_bool isTransformEnabled();
 	
@@ -264,6 +478,14 @@ public:
 	void setAnchorOffset(sl_real x, sl_real y, sl_bool flagSetTransform = sl_true);
 	
 	void setAnchorOffset(const Point& pt, sl_bool flagSetTransform = sl_true);
+	
+	sl_real getAnchorOffsetX();
+	
+	void setAnchorOffsetX(sl_real x, sl_bool flagSetTransform = sl_true);
+	
+	sl_real getAnchorOffsetY();
+	
+	void setAnchorOffsetY(sl_real y, sl_bool flagSetTransform = sl_true);
 	
 
 	Point convertCoordinateFromScreen(const Point& ptScreen);
@@ -322,11 +544,11 @@ public:
 	
 	sl_bool isPreDrawEnabled();
 	
-	void setPreDrawEnabled(sl_bool flagEnable, sl_bool flagRedraw = sl_true);
+	void setPreDrawEnabled(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
 	
 	sl_bool isPostDrawEnabled();
 	
-	void setPostDrawEnabled(sl_bool flagEnable, sl_bool flagRedraw = sl_true);
+	void setPostDrawEnabled(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
 	
 	sl_bool isClippingBounds();
 	
@@ -334,8 +556,14 @@ public:
 	
 	sl_bool isDoubleBuffering();
 	
-	void setDoubleBuffering(sl_bool flagEnable, sl_bool flagRedraw = sl_true);
+	void setDoubleBuffering(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
+
 	
+	Ref<Font> getFont();
+	
+	virtual void setFont(const Ref<Font>& font, sl_bool flagRedraw = sl_true);
+	
+
 
 	Ref<ScrollBar> getHorizontalScrollBar();
 	
@@ -414,11 +642,6 @@ public:
 	
 	void setContentScrollingByKeyboard(sl_bool flag);
 
-
-	Ref<Font> getFont();
-
-	virtual void setFont(const Ref<Font>& font, sl_bool flagRedraw = sl_true);
-	
 	
 	sl_bool isMultiTouchMode();
 	
@@ -428,8 +651,6 @@ public:
 	
 	void setPassingEventsToChildren(sl_bool flag);
 	
-	
-	Ref<View> getRootView();
 	
 	Ref<View> getNextFocusableView();
 	
@@ -495,15 +716,27 @@ protected:
 	
 	virtual void onResizeChild(View* child, sl_real width, sl_real height);
 	
-	virtual void onShow();
+	virtual void onChangeVisibility(Visibility oldVisibility, Visibility newVisibility);
 	
-	virtual void onHide();
+	virtual void onChangeVisibilityOfChild(View* child, Visibility oldVisibility, Visibility newVisibility);
 	
 	virtual void onScroll(sl_real x, sl_real y);
 	
 	virtual void onResizeContent(sl_real width, sl_real height);
 	
 	virtual void onAttach();
+	
+	virtual void onAddChild(View* child);
+	
+	virtual void onRemoveChild(View* child);
+	
+	virtual void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
+	
+	virtual void onPrepareLayout(ViewPrepareLayoutParam& param);
+	
+	virtual void onMakeLayout();
+	
+	virtual void onChangePadding();
 	
 public:
 	virtual void dispatchDraw(Canvas* canvas);
@@ -542,15 +775,14 @@ public:
 	
 	virtual void dispatchResize(sl_real width, sl_real height);
 	
-	virtual void dispatchShow();
-	
-	virtual void dispatchHide();
+	virtual void dispatchChangeVisibility(Visibility oldVisibility, Visibility newVisibility);
 	
 	virtual void dispatchScroll(sl_real x, sl_real y);
 	
 private:
 	void _processAttachOnUiThread();
-
+	
+	void _addChild(const Ref<View>& view, sl_bool flagRedraw);
 	
 	void _removeChild(const Ref<View>& view);
 	
@@ -560,21 +792,29 @@ private:
 	
 	void _removeChildInstanceOnUiThread(Ref<ViewInstance> instance);
 	
-	
 	void _killFocusFromParent();
 	
 	void _setFocusedChild(View* child, sl_bool flagRedraw);
 	
+	void _setFrame(const Rectangle& frame, sl_bool flagRedraw, sl_bool flagLayouting);
+	
+	void _prepareLayout(ViewPrepareLayoutParam& param);
+	
+	void _makeLayout(sl_bool flagApplyLayout);
+	
+	void _requestInvalidateLayout();
+	
+	void _requestInvalidateMeasure(sl_bool flagWidth, sl_bool flagHeight);
+
+	void _initializeLayout();
 	
 	void _initializeTransform();
 	
 	void _applyTransform();
 	
-	
 	void _initializeDraw();
 	
 	void _refreshBorderPen(sl_bool flagRedraw);
-	
 	
 	void _initializeScroll();
 	
@@ -584,12 +824,15 @@ private:
 	
 	void _refreshScroll(sl_bool flagRedraw);
 	
+	void _getScrollBars(Ref<View> views[2]);
 	
 	void _processEventForStateAndClick(UIEvent* ev);
 	
 	void _processContentScrollingEvents(UIEvent* ev);
 	
 protected:
+	CList< Ref<View> >& _getChildren();
+
 	void _setFontInstance(const Ref<FontInstance>& instance);
 
 	virtual void _setBorder_NW(sl_bool flag);
@@ -608,26 +851,78 @@ private:
 	sl_bool m_flagCreatingNativeWidget;
 	
 	Rectangle m_frame;
-	sl_real m_paddingLeft;
-	sl_real m_paddingTop;
-	sl_real m_paddingRight;
-	sl_real m_paddingBottom;
 	
-	sl_bool m_flagVisible;
+	Visibility m_visibility;
 	sl_bool m_flagEnabled;
 	sl_bool m_flagOpaque;
-	
 	sl_bool m_flagHitTestable;
-	
 	sl_bool m_flagFocusable;
+
 	sl_bool m_flagFocused;
-	SafeRef<View> m_childFocused;
-	
 	sl_bool m_flagDown;
 	sl_bool m_flagHover;
 	sl_bool m_flagOccurringClick;
 	
 	SafeRef<Cursor> m_cursor;
+	
+	SafeString m_id;
+	CList< Ref<View> > m_children;
+	SafeList< Ref<View> > m_childrenMultiTouch;
+	SafeRef<View> m_childMouseMove;
+	SafeRef<View> m_childMouseDown;
+	UIAction m_actionMouseDown;
+	sl_bool m_flagMultiTouchMode;
+	sl_bool m_flagPassEventToChildren;
+	SafeRef<View> m_childFocused;
+	
+	sl_bool m_flagOnAddChild;
+	sl_bool m_flagOnRemoveChild;
+	
+	sl_bool m_flagProcessingTabStop;
+	SafeWeakRef<View> m_viewNextTabStop;
+	SafeWeakRef<View> m_viewPrevTabStop;
+	
+	class LayoutAttributes : public Referable
+	{
+	public:
+		sl_bool flagEnabled;
+		
+		SizeMode widthMode;
+		SizeMode heightMode;
+		sl_real widthFillingWeight;
+		sl_real heightFillingWeight;
+		
+		PositionMode leftMode;
+		PositionMode topMode;
+		PositionMode rightMode;
+		PositionMode bottomMode;
+		SafeWeakRef<View> leftReferingView;
+		SafeWeakRef<View> topReferingView;
+		SafeWeakRef<View> rightReferingView;
+		SafeWeakRef<View> bottomReferingView;
+		
+		sl_real measuredWidth;
+		sl_real measuredHeight;
+		Rectangle frame;
+		
+		sl_bool flagOnPrepareLayout;
+		sl_bool flagOnMakeLayout;
+		
+		sl_real paddingLeft;
+		sl_real paddingTop;
+		sl_real paddingRight;
+		sl_real paddingBottom;
+
+		sl_real marginLeft;
+		sl_real marginTop;
+		sl_real marginRight;
+		sl_real marginBottom;
+		
+		sl_bool flagInvalidMeasure;
+		sl_bool flagInvalidLayout;
+		
+	};
+	SafeRef<LayoutAttributes> m_layout;
 	
 	class TransformAttributes : public Referable
 	{
@@ -657,21 +952,26 @@ private:
 		BoundShape boundShape;
 		Size roundRectBoundShapeRadius;
 		SafeRef<GraphicsPath> boundShapePath;
+		
+		sl_bool flagPreDrawEnabled;
+		sl_bool flagPostDrawEnabled;
+		sl_bool flagDoubleBuffer;
+		sl_bool flagClippingBounds;
+		SafeRef<Bitmap> bitmapDoubleBuffer;
+		SafeRef<Canvas> canvasDoubleBuffer;
+		
+		SafeRef<Font> font;
+		SafeRef<FontInstance> fontInstance;
 	};
 	SafeRef<DrawAttributes> m_draw;
 	
-	sl_bool m_flagPreDrawEnabled;
-	sl_bool m_flagPostDrawEnabled;
-	sl_bool m_flagDoubleBuffer;
-	sl_bool m_flagClippingBounds;
-	SafeRef<Bitmap> m_bitmapDoubleBuffer;
-	SafeRef<Canvas> m_canvasDoubleBuffer;
-
 	class ScrollAttributes : public Referable
 	{
 	public:
 		SafeRef<ScrollBar> horz;
 		SafeRef<ScrollBar> vert;
+		sl_bool flagValidHorz;
+		sl_bool flagValidVert;
 		sl_real x;
 		sl_real y;
 		sl_real contentWidth;
@@ -689,24 +989,14 @@ private:
 		sl_real mouseY_DownContent;
 	};
 	SafeRef<ScrollAttributes> m_scroll;
-
-	SafeRef<Font> m_font;
-	SafeRef<FontInstance> m_fontInstance;
-	
-	CList< Ref<View> > m_children;
-	SafeList< Ref<View> > m_childrenMultiTouch;
-	SafeRef<View> m_childMouseMove;
-	SafeRef<View> m_childMouseDown;
-	UIAction m_actionMouseDown;
-	sl_bool m_flagMultiTouchMode;
-	sl_bool m_flagPassEventToChildren;
-	
-	sl_bool m_flagProcessingTabStop;
-	SafeRef<View> m_viewNextTabStop;
-	SafeRef<View> m_viewPrevTabStop;
 	
 	friend class Window;
 	
+};
+
+struct ViewPrepareLayoutParam
+{
+	Rectangle parentContentFrame;
 };
 
 class SLIB_EXPORT ViewInstance : public Object

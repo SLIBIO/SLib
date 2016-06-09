@@ -165,6 +165,8 @@
 		26C0A3581C133969005690FE /* bitmap_format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A3571C133969005690FE /* bitmap_format.cpp */; };
 		26C9BEB31CA4674400E597DC /* datagram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C9BEB21CA4674400E597DC /* datagram.cpp */; };
 		26CA8D711C23A61D0049A658 /* system_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26CA8D701C23A61D0049A658 /* system_apple.mm */; };
+		26CB94C91D0126ED00D8A472 /* linear_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CB94C81D0126ED00D8A472 /* linear_view.cpp */; };
+		26CB94CB1D0126F900D8A472 /* tree_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CB94CA1D0126F900D8A472 /* tree_view.cpp */; };
 		26DA34FD1C4B8B1D004DC204 /* audio_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26DA34FC1C4B8B1D004DC204 /* audio_data.cpp */; };
 		26DA34FF1C4B8B2D004DC204 /* video_frame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26DA34FE1C4B8B2D004DC204 /* video_frame.cpp */; };
 		26FD28F61CFCB67D003E95FB /* scroll_bar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FD28F51CFCB67D003E95FB /* scroll_bar.cpp */; };
@@ -398,6 +400,8 @@
 		26C0A3571C133969005690FE /* bitmap_format.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_format.cpp; sourceTree = "<group>"; };
 		26C9BEB21CA4674400E597DC /* datagram.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = datagram.cpp; sourceTree = "<group>"; };
 		26CA8D701C23A61D0049A658 /* system_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = system_apple.mm; sourceTree = "<group>"; };
+		26CB94C81D0126ED00D8A472 /* linear_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = linear_view.cpp; sourceTree = "<group>"; };
+		26CB94CA1D0126F900D8A472 /* tree_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tree_view.cpp; sourceTree = "<group>"; };
 		26DA34FC1C4B8B1D004DC204 /* audio_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = audio_data.cpp; path = media/audio_data.cpp; sourceTree = "<group>"; };
 		26DA34FE1C4B8B2D004DC204 /* video_frame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = video_frame.cpp; path = media/video_frame.cpp; sourceTree = "<group>"; };
 		26FD28F51CFCB67D003E95FB /* scroll_bar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scroll_bar.cpp; sourceTree = "<group>"; };
@@ -773,6 +777,7 @@
 				266DD4241C118EE800D47AB0 /* graphics_path_quartz.mm */,
 				266DD43F1C1190E800D47AB0 /* label_view.cpp */,
 				266DD4411C11910F00D47AB0 /* label_view_ios.mm */,
+				26CB94C81D0126ED00D8A472 /* linear_view.cpp */,
 				266DD4431C11912B00D47AB0 /* list_details_view.cpp */,
 				266DD4451C11914200D47AB0 /* radio_button.cpp */,
 				266DD4471C11917700D47AB0 /* render_view.cpp */,
@@ -781,6 +786,7 @@
 				266DD44B1C1191B000D47AB0 /* scroll_view.cpp */,
 				266DD44D1C1191B900D47AB0 /* scroll_view_ios.mm */,
 				266DD44F1C1191D400D47AB0 /* tab_view.cpp */,
+				26CB94CA1D0126F900D8A472 /* tree_view.cpp */,
 				A2774E291B1CBBFD00538A7B /* ui_core.cpp */,
 				A25F2F261B039EF600854DAF /* ui_core_ios.mm */,
 				A25F2F291B039EF600854DAF /* ui_event.cpp */,
@@ -985,6 +991,7 @@
 				AE75B9B21B0F2600004A70EE /* thirdparty_libvpx_dec.c in Sources */,
 				266DD44C1C1191B000D47AB0 /* scroll_view.cpp in Sources */,
 				26B5716A1C9D44720099E69B /* line_segment.cpp in Sources */,
+				26CB94C91D0126ED00D8A472 /* linear_view.cpp in Sources */,
 				A25F2F4C1B039EF600854DAF /* platform_windows.cpp in Sources */,
 				26B571701C9D44720099E69B /* plane.cpp in Sources */,
 				266DD3D51C1181B500D47AB0 /* dns.cpp in Sources */,
@@ -1049,6 +1056,7 @@
 				26C0A3511C128D80005690FE /* sensor.cpp in Sources */,
 				266DD4521C1191F300D47AB0 /* web_view.cpp in Sources */,
 				266DD3AA1C117AE300D47AB0 /* pen.cpp in Sources */,
+				26CB94CB1D0126F900D8A472 /* tree_view.cpp in Sources */,
 				26B571481C9D43D70099E69B /* list.cpp in Sources */,
 				26A9B7641C172BDE004C9B0E /* video_view.cpp in Sources */,
 				A2498C771AFA9C3200C76201 /* thirdparty_libjpeg.c in Sources */,
