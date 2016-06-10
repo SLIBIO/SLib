@@ -2,10 +2,10 @@
 
 #if defined(SLIB_PLATFORM_IS_IOS)
 
-#include "../../../inc/slib/core/app.h"
 #include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/render_view.h"
 #include "../../../inc/slib/render/opengl.h"
+#include "../../../inc/slib/ui/mobile_app.h"
 
 #include "view_ios.h"
 
@@ -103,7 +103,7 @@ void _iOS_GLCallback(_Slib_iOS_GLView* handle)
 			return;
 		}
 		
-		if (handle.superview != nil && handle.hidden == NO && !(UIApp::isMobilePaused())) {
+		if (handle.superview != nil && handle.hidden == NO && !(MobileApp::isPaused())) {
 			
 			if (desc.m_context == nil) {
 				if (!(desc.create())) {
@@ -187,6 +187,10 @@ SLIB_UI_NAMESPACE_END
 }
 
 - (void)drawRect:(CGRect)dirtyRect
+{
+}
+
+- (void)setNeedsDisplay
 {
 }
 

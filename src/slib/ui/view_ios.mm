@@ -386,7 +386,7 @@ UIView* UIPlatform::getViewHandle(View* view)
 		if (instance.isNotNull()) {
 			iOS_ViewInstance* osx_instance = (iOS_ViewInstance*)(instance.ptr);
 			return osx_instance->getHandle();
-		}		
+		}
 	}
 	return nil;
 }

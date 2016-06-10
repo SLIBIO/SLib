@@ -5,6 +5,7 @@
 #include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/screen.h"
 #include "../../../inc/slib/ui/platform.h"
+#include "../../../inc/slib/ui/mobile_app.h"
 
 #include "../../../inc/slib/core/map.h"
 #include "../../../inc/slib/core/io.h"
@@ -153,7 +154,7 @@ void UIPlatform::quitLoop()
 static Ref<UIApp> _g_mobile_app;
 void UIPlatform::runApp()
 {
-	_g_mobile_app = UI::getApp();
+	_g_mobile_app = UIApp::getApp();
 }
 
 void UIPlatform::quitApp()
@@ -169,35 +170,35 @@ void _Android_onCreateActivity(JNIEnv* env, jobject _this, jobject activity)
 		static sl_bool flagStartApp = sl_false;
 		if (! flagStartApp) {
 			flagStartApp = sl_true;
-			UIApp::dispatchStart();
+			UIApp::dispatchStartToApp();
 		}
-		UIApp::dispatchMobileCreate();
+		MobileApp::dispatchCreateActivityToApp();
 	}
 }
 
 void _Android_onDestroyActivity(JNIEnv* env, jobject _this, jobject activity)
 {
 	SLIB_LOG("Activity", "Destroyed");
-	UIApp::dispatchMobileDestroy();
+	MobileApp::dispatchDestroyActivityToApp();
 }
 
 void _Android_onResumeActivity(JNIEnv* env, jobject _this, jobject activity)
 {
 	SLIB_LOG("Activity", "Resumed");
 	Android::setCurrentActivity(activity);
-	UIApp::dispatchMobileResume();
+	MobileApp::dispatchResumeToApp();
 }
 
 void _Android_onPauseActivity(JNIEnv* env, jobject _this, jobject activity)
 {
 	SLIB_LOG("Activity", "Paused");
-	UIApp::dispatchMobilePause();
+	MobileApp::dispatchPauseToApp();
 }
 
 jboolean _Android_onBack(JNIEnv* env, jobject _this, jobject activity)
 {
 	SLIB_LOG("Activity", "BackPressed");
-	return (jboolean)(UIApp::dispatchMobileBack());
+	return (jboolean)(MobileApp::dispatchBackToApp());
 }
 
 SLIB_UI_NAMESPACE_END

@@ -5,10 +5,8 @@
 
 #include "event.h"
 
-#include "../core/app.h"
 #include "../core/string.h"
 #include "../core/thread.h"
-
 #include "../graphics/context.h"
 
 SLIB_UI_NAMESPACE_BEGIN
@@ -136,82 +134,6 @@ public:
 	static void runApp();
 	
 	static void quitApp();
-
-	// App related
-	static Ref<UIApp> getApp();
-	
-	static Ref<Window> getMainWindow();
-
-	static void setMainWindow(const Ref<Window>& window);
-
-	static Ref<Menu> getApplicationMenu();
-
-	static void setApplicationMenu(const Ref<Menu>& menu);
-
-};
-
-class SLIB_EXPORT UIApp : public Application
-{
-	SLIB_DECLARE_OBJECT
-
-public:
-	static Ref<UIApp> getApp();
-
-public:
-	// override
-	AppType getAppType();
-	
-	// override
-	void run(const String& param);
-	
-	void run();
-
-public:
-	virtual void onStart();
-	
-	static void dispatchStart();
-	
-	virtual void onExit();
-	
-	static void dispatchExit();
-
-public:
-	// mobile
-	virtual void onMobileCreate();
-	
-	static void dispatchMobileCreate();
-	
-	virtual void onMobilePause();
-	
-	static void dispatchMobilePause();
-
-	virtual void onMobileResume();
-	
-	static void dispatchMobileResume();
-
-	virtual void onMobileDestroy();
-	
-	static void dispatchMobileDestroy();
-	
-	virtual sl_bool onMobileBack();
-
-	static sl_bool dispatchMobileBack();
-
-	static void quit();
-
-	static sl_bool isMobilePaused();
-
-	static Ref<Window> getMainWindow();
-
-	static void setMainWindow(const Ref<Window>& window);
-
-	// Menu Bar (Mainly used in OSX)
-	static Ref<Menu> getMenu();
-
-	static void setMenu(const Ref<Menu>& menu);
-
-private:
-	static sl_bool m_flagMobilePaused;
 
 };
 

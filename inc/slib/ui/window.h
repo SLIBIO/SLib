@@ -257,12 +257,12 @@ public:
 public:
 	SLIB_PTR_PROPERTY(IWindowListener, EventListener)
 	
-public:
+protected:
 	virtual void onCreate();
 	
 	virtual void onCreateFailed();
 	
-	virtual sl_bool onClose();
+	virtual void onClose(UIEvent* ev);
 	
 	virtual void onActivate();
 	
@@ -279,6 +279,29 @@ public:
 	virtual void onMaximize();
 	
 	virtual void onDemaximize();
+	
+public:
+	virtual void dispatchCreate();
+	
+	virtual void dispatchCreateFailed();
+	
+	virtual void dispatchClose(UIEvent* ev);
+	
+	virtual void dispatchActivate();
+	
+	virtual void dispatchDeactivate();
+	
+	virtual void dispatchMove();
+	
+	virtual void dispatchResize(Size& size);
+	
+	virtual void dispatchMinimize();
+	
+	virtual void dispatchDeminimize();
+	
+	virtual void dispatchMaximize();
+	
+	virtual void dispatchDemaximize();
 
 private:
 	Ref<WindowInstance> createWindowInstance(const WindowInstanceParam& param);

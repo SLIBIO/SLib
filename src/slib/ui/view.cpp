@@ -400,6 +400,14 @@ sl_bool View::isRootView()
 	return m_parent.isNull();
 }
 
+void View::removeFromParent()
+{
+	Ref<View> parent = m_parent;
+	if (parent.isNotNull()) {
+		parent->removeChild(this);
+	}
+}
+
 void View::attachChild(const Ref<View>& child)
 {
 	if (m_flagCreatingChildInstances) {
@@ -1322,13 +1330,20 @@ void View::_makeLayout(sl_bool flagApplyLayout)
 	if (!(layout->flagEnabled)) {
 		return;
 	}
-	if (!(layout->flagInvalidLayout)) {
-		return;
-	}
 	
 	if (flagApplyLayout) {
+		if (layout->frame.isAlmostEqual(m_frame)) {
+			return;
+		}
+		Size oldSize = m_frame.getSize();
 		_setFrame(layout->frame, sl_false, sl_true);
+		if (layout->frame.getSize().isAlmostEqual(oldSize)) {
+			return;
+		}
 	} else {
+		if (!(layout->flagInvalidLayout)) {
+			return;
+		}
 		if (layout->widthMode == SizeMode::Wrapping || layout->heightMode == SizeMode::Wrapping) {
 			measureLayout();
 			Rectangle frame = layout->frame;
@@ -1355,7 +1370,7 @@ void View::_makeLayout(sl_bool flagApplyLayout)
 	}
 	{
 		ListLocker< Ref<View> > children(m_children);
-		for (sl_size i = 0; children.count; i++) {
+		for (sl_size i = 0; i < children.count; i++) {
 			Ref<View>& child = children[i];
 			if (child.isNotNull()) {
 				child->_prepareLayout(param);
@@ -1367,7 +1382,7 @@ void View::_makeLayout(sl_bool flagApplyLayout)
 	}
 	{
 		ListLocker< Ref<View> > children(m_children);
-		for (sl_size i = 0; children.count; i++) {
+		for (sl_size i = 0; i < children.count; i++) {
 			Ref<View>& child = children[i];
 			if (child.isNotNull()) {
 				child->_prepareLayout(param);
@@ -1455,7 +1470,7 @@ void View::setLayoutEnabled(sl_bool flagEnabled, sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
-		
+		layout->flagEnabled = flagEnabled;
 		if (flagRedraw) {
 			invalidate();
 		}
@@ -1523,7 +1538,7 @@ void View::setOnMakeLayoutEnabled(sl_bool flagEnabled, sl_bool flagRedraw)
 SizeMode View::getWidthMode()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->widthMode;
 	}
 	return SizeMode::Fixed;
@@ -1532,7 +1547,7 @@ SizeMode View::getWidthMode()
 SizeMode View::getHeightMode()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->heightMode;
 	}
 	return SizeMode::Fixed;
@@ -1541,7 +1556,7 @@ SizeMode View::getHeightMode()
 sl_bool View::isWidthFixed()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->widthMode == SizeMode::Fixed;
 	}
 	return sl_true;
@@ -1552,6 +1567,7 @@ void View::setWidthFixed(sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->widthMode = SizeMode::Fixed;
 		requestParentAndSelfLayout(flagRedraw);
 	}
@@ -1560,7 +1576,7 @@ void View::setWidthFixed(sl_bool flagRedraw)
 sl_bool View::isHeightFixed()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->heightMode == SizeMode::Fixed;
 	}
 	return sl_true;
@@ -1571,6 +1587,7 @@ void View::setHeightFixed(sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->heightMode = SizeMode::Fixed;
 		requestParentAndSelfLayout(flagRedraw);
 	}
@@ -1581,6 +1598,7 @@ void View::setSizeFixed(sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->widthMode = SizeMode::Fixed;
 		layout->heightMode = SizeMode::Fixed;
 		requestParentAndSelfLayout(flagRedraw);
@@ -1590,7 +1608,7 @@ void View::setSizeFixed(sl_bool flagRedraw)
 sl_bool View::isWidthFilling()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->widthMode == SizeMode::Filling;
 	}
 	return sl_false;
@@ -1610,6 +1628,7 @@ void View::setWidthFilling(sl_real weight, sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->widthMode = SizeMode::Filling;
 		if (weight < 0) {
 			weight = 1;
@@ -1622,7 +1641,7 @@ void View::setWidthFilling(sl_real weight, sl_bool flagRedraw)
 sl_bool View::isHeightFilling()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->heightMode == SizeMode::Filling;
 	}
 	return sl_false;
@@ -1642,6 +1661,7 @@ void View::setHeightFilling(sl_real weight, sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->heightMode = SizeMode::Filling;
 		if (weight < 0) {
 			weight = 1;
@@ -1656,6 +1676,7 @@ void View::setSizeFilling(sl_real widthWeight, sl_real heightWeight, sl_bool fla
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->widthMode = SizeMode::Filling;
 		if (widthWeight < 0) {
 			widthWeight = 1;
@@ -1673,7 +1694,7 @@ void View::setSizeFilling(sl_real widthWeight, sl_real heightWeight, sl_bool fla
 sl_bool View::isWidthWrapping()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->widthMode == SizeMode::Wrapping;
 	}
 	return sl_false;
@@ -1684,6 +1705,7 @@ void View::setWidthWrapping(sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->widthMode = SizeMode::Wrapping;
 		requestParentAndSelfLayout(flagRedraw);
 	}
@@ -1692,7 +1714,7 @@ void View::setWidthWrapping(sl_bool flagRedraw)
 sl_bool View::isHeightWrapping()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->heightMode == SizeMode::Wrapping;
 	}
 	return sl_false;
@@ -1703,6 +1725,7 @@ void View::setHeightWrapping(sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->heightMode = SizeMode::Wrapping;
 		requestParentAndSelfLayout(flagRedraw);
 	}
@@ -1713,6 +1736,7 @@ void View::setSizeWrapping(sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->widthMode = SizeMode::Wrapping;
 		layout->heightMode = SizeMode::Wrapping;
 		requestParentAndSelfLayout(flagRedraw);
@@ -1722,17 +1746,18 @@ void View::setSizeWrapping(sl_bool flagRedraw)
 sl_bool View::isLayoutLeftFixed()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->leftMode == PositionMode::Fixed;
 	}
 	return sl_true;
 }
 
-void View::setLayoutLeftFixed(sl_bool flagRedraw )
+void View::setLayoutLeftFixed(sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->leftMode = PositionMode::Fixed;
 		requestParentLayout(flagRedraw);
 	}
@@ -1741,7 +1766,7 @@ void View::setLayoutLeftFixed(sl_bool flagRedraw )
 sl_bool View::isAlignParentLeft()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->leftMode == PositionMode::ParentEdge;
 	}
 	return sl_false;
@@ -1752,6 +1777,7 @@ void View::setAlignParentLeft(sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->leftMode = PositionMode::ParentEdge;
 		requestParentLayout(flagRedraw);
 	}
@@ -1760,7 +1786,7 @@ void View::setAlignParentLeft(sl_bool flagRedraw)
 sl_bool View::isAlignLeft()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->leftMode == PositionMode::OtherStart;
 	}
 	return sl_false;
@@ -1774,6 +1800,7 @@ void View::setAlignLeft(const Ref<View>& view, sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->leftMode = PositionMode::OtherStart;
 		layout->leftReferingView = view;
 		requestParentLayout(flagRedraw);
@@ -1783,7 +1810,7 @@ void View::setAlignLeft(const Ref<View>& view, sl_bool flagRedraw)
 sl_bool View::isRightOf()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->leftMode == PositionMode::OtherEnd;
 	}
 	return sl_false;
@@ -1797,6 +1824,7 @@ void View::setRightOf(const Ref<View>& view, sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->leftMode = PositionMode::OtherEnd;
 		layout->leftReferingView = view;
 		requestParentLayout(flagRedraw);
@@ -1815,7 +1843,7 @@ Ref<View> View::getLayoutLeftReferingView()
 sl_bool View::isLayoutRightFixed()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->rightMode == PositionMode::Fixed;
 	}
 	return sl_true;
@@ -1826,6 +1854,7 @@ void View::setLayoutRightFixed(sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->rightMode = PositionMode::Fixed;
 		requestParentLayout(flagRedraw);
 	}
@@ -1834,7 +1863,7 @@ void View::setLayoutRightFixed(sl_bool flagRedraw)
 sl_bool View::isAlignParentRight()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->rightMode == PositionMode::ParentEdge;
 	}
 	return sl_false;
@@ -1845,6 +1874,7 @@ void View::setAlignParentRight(sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->rightMode = PositionMode::ParentEdge;
 		requestParentLayout(flagRedraw);
 	}
@@ -1853,7 +1883,7 @@ void View::setAlignParentRight(sl_bool flagRedraw)
 sl_bool View::isAlignRight()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->rightMode == PositionMode::OtherEnd;
 	}
 	return sl_false;
@@ -1867,6 +1897,7 @@ void View::setAlignRight(const Ref<View>& view, sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->rightMode = PositionMode::OtherEnd;
 		layout->rightReferingView = view;
 		requestParentLayout(flagRedraw);
@@ -1876,7 +1907,7 @@ void View::setAlignRight(const Ref<View>& view, sl_bool flagRedraw)
 sl_bool View::isLeftOf()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->rightMode == PositionMode::OtherStart;
 	}
 	return sl_false;
@@ -1890,6 +1921,7 @@ void View::setLeftOf(const Ref<View>& view, sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->rightMode = PositionMode::OtherStart;
 		layout->rightReferingView = view;
 		requestParentLayout(flagRedraw);
@@ -1908,7 +1940,7 @@ Ref<View> View::getLayoutRightReferingView()
 sl_bool View::isLayoutTopFixed()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->topMode == PositionMode::Fixed;
 	}
 	return sl_true;
@@ -1919,6 +1951,7 @@ void View::setLayoutTopFixed(sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->topMode = PositionMode::Fixed;
 		requestParentLayout(flagRedraw);
 	}
@@ -1928,7 +1961,7 @@ void View::setLayoutTopFixed(sl_bool flagRedraw)
 sl_bool View::isAlignParentTop()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->topMode == PositionMode::ParentEdge;
 	}
 	return sl_false;
@@ -1939,6 +1972,7 @@ void View::setAlignParentTop(sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->topMode = PositionMode::ParentEdge;
 		requestParentLayout(flagRedraw);
 	}
@@ -1947,7 +1981,7 @@ void View::setAlignParentTop(sl_bool flagRedraw)
 sl_bool View::isAlignTop()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->topMode == PositionMode::OtherStart;
 	}
 	return sl_false;
@@ -1961,6 +1995,7 @@ void View::setAlignTop(const Ref<View>& view, sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->topMode = PositionMode::OtherStart;
 		layout->topReferingView = view;
 		requestParentLayout(flagRedraw);
@@ -1970,7 +2005,7 @@ void View::setAlignTop(const Ref<View>& view, sl_bool flagRedraw)
 sl_bool View::isBelow()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->topMode == PositionMode::OtherEnd;
 	}
 	return sl_false;
@@ -1984,6 +2019,7 @@ void View::setBelow(const Ref<View>& view, sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->topMode = PositionMode::OtherEnd;
 		layout->topReferingView = view;
 		requestParentLayout(flagRedraw);
@@ -2002,7 +2038,7 @@ Ref<View> View::getLayoutTopReferingView()
 sl_bool View::isLayoutBottomFixed()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->bottomMode == PositionMode::Fixed;
 	}
 	return sl_true;
@@ -2013,6 +2049,7 @@ void View::setLayoutBottomFixed(sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->bottomMode = PositionMode::Fixed;
 		requestParentLayout(flagRedraw);
 	}
@@ -2021,7 +2058,7 @@ void View::setLayoutBottomFixed(sl_bool flagRedraw)
 sl_bool View::isAlignParentBottom()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->bottomMode == PositionMode::ParentEdge;
 	}
 	return sl_false;
@@ -2032,6 +2069,7 @@ void View::setAlignParentBottom(sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->bottomMode = PositionMode::ParentEdge;
 		requestParentLayout(flagRedraw);
 	}
@@ -2040,7 +2078,7 @@ void View::setAlignParentBottom(sl_bool flagRedraw)
 sl_bool View::isAlignBottom()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->bottomMode == PositionMode::OtherEnd;
 	}
 	return sl_false;
@@ -2054,6 +2092,7 @@ void View::setAlignBottom(const Ref<View>& view, sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->bottomMode = PositionMode::OtherEnd;
 		layout->bottomReferingView = view;
 		requestParentLayout(flagRedraw);
@@ -2063,7 +2102,7 @@ void View::setAlignBottom(const Ref<View>& view, sl_bool flagRedraw)
 sl_bool View::isAbove()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->bottomMode == PositionMode::OtherStart;
 	}
 	return sl_false;
@@ -2077,6 +2116,7 @@ void View::setAbove(const Ref<View>& view, sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->bottomMode = PositionMode::OtherStart;
 		layout->bottomReferingView = view;
 		requestParentLayout(flagRedraw);
@@ -2095,7 +2135,7 @@ Ref<View> View::getLayoutBottomReferingView()
 sl_bool View::isCenterHorizontal()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->leftMode == PositionMode::CenterInParent;
 	}
 	return sl_false;
@@ -2106,6 +2146,7 @@ void View::setCenterHorizontal(sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->leftMode = PositionMode::CenterInParent;
 		requestParentLayout(flagRedraw);
 	}
@@ -2114,7 +2155,7 @@ void View::setCenterHorizontal(sl_bool flagRedraw)
 sl_bool View::isCenterVertical()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->topMode == PositionMode::CenterInParent;
 	}
 	return sl_false;
@@ -2125,6 +2166,7 @@ void View::setCenterVertical(sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->topMode = PositionMode::CenterInParent;
 		requestParentLayout(flagRedraw);
 	}
@@ -2135,6 +2177,7 @@ void View::setCenterInParent(sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->leftMode = PositionMode::CenterInParent;
 		layout->topMode = PositionMode::CenterInParent;
 		requestParentLayout(flagRedraw);
@@ -2144,7 +2187,7 @@ void View::setCenterInParent(sl_bool flagRedraw)
 sl_bool View::isAlignCenterHorizontal()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->leftMode == PositionMode::CenterInOther;
 	}
 	return sl_false;
@@ -2158,6 +2201,7 @@ void View::setAlignCenterHorizontal(const Ref<View>& view, sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->leftMode = PositionMode::CenterInOther;
 		layout->leftReferingView = view;
 		requestParentLayout(flagRedraw);
@@ -2167,7 +2211,7 @@ void View::setAlignCenterHorizontal(const Ref<View>& view, sl_bool flagRedraw)
 sl_bool View::isAlignCenterVertical()
 {
 	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
+	if (layout.isNotNull() && layout->flagEnabled) {
 		return layout->topMode == PositionMode::CenterInOther;
 	}
 	return sl_false;
@@ -2181,6 +2225,7 @@ void View::setAlignCenterVertical(const Ref<View>& view, sl_bool flagRedraw)
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
+		layout->flagEnabled = sl_true;
 		layout->topMode = PositionMode::CenterInOther;
 		layout->topReferingView = view;
 		requestParentLayout(flagRedraw);
@@ -3903,18 +3948,22 @@ void View::draw(Canvas *canvas)
 			}
 		}
 		
+		Ref<View> scrollBars[2];
+		if (scroll.isNotNull()) {
+			_getScrollBars(scrollBars);
+		}
+
+		sl_bool flagSaveStatus = sl_false;
 		if (m_children.getCount() > 0) {
-			{
-				CanvasStatusScope scopeContent(canvas);
-				if (scroll.isNotNull()) {
-					if(!(Math::isAlmostZero(scroll->x)) || !(Math::isAlmostZero(scroll->y))) {
-						canvas->translate(-(scroll->x), -(scroll->y));
-					}
-				}
-				onDraw(canvas);
-			}
-			onDrawChildren(canvas);
-		} else {
+			flagSaveStatus = sl_true;
+		} else if (scrollBars[0].isNotNull() || scrollBars[1].isNotNull()) {
+			flagSaveStatus = sl_true;
+		} else if (attr.isNotNull() && attr->penBorder.isNotNull() && scopeClip.getCanvas().isNull()) {
+			flagSaveStatus = sl_true;
+		}
+		
+		{
+			CanvasStatusScope scopeContent(flagSaveStatus ? canvas : sl_null);
 			if (scroll.isNotNull()) {
 				if(!(Math::isAlmostZero(scroll->x)) || !(Math::isAlmostZero(scroll->y))) {
 					canvas->translate(-(scroll->x), -(scroll->y));
@@ -3922,15 +3971,15 @@ void View::draw(Canvas *canvas)
 			}
 			onDraw(canvas);
 		}
+		if (m_children.getCount() > 0) {
+			onDrawChildren(canvas);
+		}
+		if (scrollBars[0].isNotNull() || scrollBars[1].isNotNull()) {
+			drawChildren(canvas, scrollBars, 2);
+		}
 		
 	} while (0);
 	
-	// draw scrollbars
-	if (scroll.isNotNull()) {
-		Ref<View> bars[2];
-		_getScrollBars(bars);
-		drawChildren(canvas, bars, 2);
-	}
 	
 	if (attr.isNotNull()) {
 		if (attr->penBorder.isNotNull()) {
@@ -5112,6 +5161,7 @@ SLIB_DEFINE_OBJECT(ViewInstance, Object)
 ViewInstance::ViewInstance()
 {
 	m_flagNativeWidget = sl_false;
+	m_flagWindowContent = sl_false;
 }
 
 Ref<View> ViewInstance::getView()
@@ -5132,6 +5182,16 @@ sl_bool ViewInstance::isNativeWidget()
 void ViewInstance::setNativeWidget(sl_bool flag)
 {
 	m_flagNativeWidget = flag;
+}
+
+sl_bool ViewInstance::isWindowContent()
+{
+	return m_flagWindowContent;
+}
+
+void ViewInstance::setWindowContent(sl_bool flag)
+{
+	m_flagWindowContent = flag;
 }
 
 void ViewInstance::onDraw(Canvas* canvas)
@@ -5195,6 +5255,7 @@ SLIB_DEFINE_OBJECT(ViewGroup, View)
 ViewGroup::ViewGroup(sl_bool flagCreatingChildInstances)
 {
 	setCreatingChildInstances(flagCreatingChildInstances);
+	setLayoutEnabled(sl_true, sl_false);
 }
 
 #if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID))

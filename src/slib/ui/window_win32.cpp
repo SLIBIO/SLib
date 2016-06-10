@@ -49,7 +49,11 @@ public:
 			if (ret.isNotNull()) {
 				ret->m_handle = hWnd;
 				ret->m_flagDestroyOnRelease = flagDestroyOnRelease;
-				ret->m_viewContent = UIPlatform::createViewInstance(hWnd, sl_false);
+				Ref<ViewInstance> content = UIPlatform::createViewInstance(hWnd, sl_false);
+				if (content.isNotNull()) {
+					content->setWindowContent(sl_true);
+				}
+				ret->m_viewContent = content;
 				return ret;
 			}
 			if (flagDestroyOnRelease) {

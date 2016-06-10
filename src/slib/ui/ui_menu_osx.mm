@@ -5,6 +5,7 @@
 #include "../../../inc/slib/ui/menu.h"
 #include "../../../inc/slib/ui/platform.h"
 #include "../../../inc/slib/ui/core.h"
+#include "../../../inc/slib/ui/app.h"
 
 @interface _OSX_MenuItemHandle : NSMenuItem
 {
@@ -291,16 +292,9 @@ NSMenuItem* UIPlatform::getMenuItemHandle(const Ref<MenuItem>& menu)
 	return nil;
 }
 
-SLIB_SAFE_STATIC_REF(SafeRef<Menu>, _g_ui_app_menu)
-
-Ref<Menu> UIApp::getMenu()
-{
-	return _g_ui_app_menu;
-}
-
 void UIApp::setMenu(const Ref<Menu>& menu)
 {
-	_g_ui_app_menu = menu;
+	m_mainMenu = menu;
 	[[NSApplication sharedApplication] setMainMenu: UIPlatform::getMenuHandle(menu)];
 }
 

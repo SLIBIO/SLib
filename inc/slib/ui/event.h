@@ -120,6 +120,8 @@ protected:
 	UIEvent();
 	
 public:
+	static Ref<UIEvent> create(UIAction action);
+	
 	static Ref<UIEvent> createKeyEvent(UIAction action, Keycode keycode, sl_uint32 systemKeycode);
 	
 	static Ref<UIEvent> createMouseEvent(UIAction action, sl_real x, sl_real y);
@@ -321,7 +323,7 @@ public:
 class SLIB_EXPORT IWindowListener
 {
 public:
-	virtual sl_bool onClose(Window* window);
+	virtual void onClose(Window* window, UIEvent* ev);
 	
 	virtual void onActivate(Window* window);
 	
@@ -358,7 +360,7 @@ public:
 	
 	
 	// window related events
-	sl_bool onClose(Window* window);
+	void onClose(Window* window, UIEvent* ev);
 	
 	void onActivate(Window* window);
 	

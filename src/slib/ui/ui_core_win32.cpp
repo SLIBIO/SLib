@@ -6,6 +6,7 @@
 #include "view_win32.h"
 
 #include "../../../inc/slib/ui/screen.h"
+#include "../../../inc/slib/ui/app.h"
 #include "../../../inc/slib/core/queue.h"
 
 #include <commctrl.h>
@@ -194,11 +195,11 @@ void UIPlatform::runApp()
 	icex.dwICC = ICC_LISTVIEW_CLASSES | ICC_TAB_CLASSES;
 	InitCommonControlsEx(&icex);
 
-	UIApp::dispatchStart();
+	UIApp::dispatchStartToApp();
 
 	runLoop(0);
 
-	UIApp::dispatchExit();
+	UIApp::dispatchExitToApp();
 
 	//Gdiplus::GdiplusShutdown(gdiplusToken);
 }

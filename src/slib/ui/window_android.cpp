@@ -80,6 +80,7 @@ public:
 			JniGlobal<jobject> window = jwindow;
 			Ref<ViewInstance> content = UIPlatform::createViewInstance(jcontent);
 			if (window.isNotNull() && content.isNotNull()) {
+				content->setWindowContent(sl_true);
 				ret->m_window = window;
 				ret->m_viewContent = content;
 				jlong instance = (jlong)(window.get());

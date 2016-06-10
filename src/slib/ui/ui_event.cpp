@@ -106,6 +106,15 @@ UIEvent::UIEvent()
 	m_action = UIAction::Unknown;
 }
 
+Ref<UIEvent> UIEvent::create(UIAction action)
+{
+	Ref<UIEvent> ret = new UIEvent;
+	if (ret.isNotNull()) {
+		ret->setAction(action);
+	}
+	return ret;
+}
+
 Ref<UIEvent> UIEvent::createKeyEvent(UIAction action, Keycode keycode, sl_uint32 systemKeycode)
 {
 	Ref<UIEvent> ret = new UIEvent;
@@ -676,9 +685,8 @@ void IViewListener::onChangeVisibility(View* view, Visibility oldVisibility, Vis
 {
 }
 
-sl_bool IWindowListener::onClose(Window* window)
+void IWindowListener::onClose(Window* window, UIEvent* ev)
 {
-	return sl_true;
 }
 
 void IWindowListener::onActivate(Window* window)
@@ -746,10 +754,9 @@ void UIEventLogListener::onSetCursor(View* view, UIEvent* event)
 	SLIB_LOG("View", "OnSetCursor");
 }
 
-sl_bool UIEventLogListener::onClose(Window* window)
+void UIEventLogListener::onClose(Window* window, UIEvent* ev)
 {
 	SLIB_LOG("Window", "OnClose");
-	return sl_true;
 }
 
 void UIEventLogListener::onActivate(Window* window)

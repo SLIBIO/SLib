@@ -59,17 +59,6 @@ HWND Windows::getRootWindow(HWND hWnd)
 	}
 }
 
-static HWND _g_app_main_window_win32 = 0;
-HWND Windows::getAppMainWindow()
-{
-	return _g_app_main_window_win32;
-}
-
-void Windows::setAppMainWindow(HWND hWnd)
-{
-	_g_app_main_window_win32 = hWnd;
-}
-
 String Windows::getWindowText(HWND hWnd)
 {
 	sl_int32 len = ::GetWindowTextLengthW(hWnd);

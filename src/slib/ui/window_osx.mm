@@ -48,7 +48,6 @@ public:
 public:
 	static Ref<_OSX_Window> create(NSWindow* window)
 	{
-		Ref<_OSX_Window> ret;
 		if (window != nil) {
 			sl_real heightScreen;
 			NSScreen* screen = [window screen];
@@ -58,18 +57,25 @@ public:
 			} else {
 				heightScreen = 0;
 			}
-			ret = new _OSX_Window();
+			Ref<_OSX_Window> ret = new _OSX_Window();
 			if (ret.isNotNull()) {
 				ret->m_window = window;
 				ret->m_heightScreen = heightScreen;
 				NSView* view = [window contentView];
-				ret->m_viewContent = UIPlatform::createViewInstance(view, sl_false);
-				if ([view isKindOfClass:[Slib_OSX_ViewHandle class]]) {
-					((Slib_OSX_ViewHandle*)view)->m_viewInstance = Ref<OSX_ViewInstance>::from(Ref<ViewInstance>(ret->m_viewContent));
+				if (view != nil) {
+					Ref<ViewInstance> content = UIPlatform::createViewInstance(view, sl_false);
+					if (content.isNotNull()) {
+						content->setWindowContent(sl_true);
+						ret->m_viewContent = content;
+						if ([view isKindOfClass:[Slib_OSX_ViewHandle class]]) {
+							((Slib_OSX_ViewHandle*)view)->m_viewInstance = Ref<OSX_ViewInstance>::from(content);
+						}
+					}
 				}
+				return ret;
 			}
 		}
-		return ret;
+		return Ref<_OSX_Window>::null();
 	}
 	
 	static Ref<WindowInstance> create(const WindowInstanceParam& param)
@@ -102,14 +108,13 @@ public:
 		
 		rect = [NSWindow contentRectForFrameRect:rect styleMask:styleMask];
 
-		Ref<_OSX_Window> ret;
 		_slib_OSX_Window* window = [[_slib_OSX_Window alloc] initWithContentRect:rect styleMask:styleMask backing:NSBackingStoreBuffered defer:YES screen:screen];
 		if (window != nil) {
 			window->m_flagClosing = sl_false;
 			window->m_flagModal = sl_false;
 			[window setReleasedWhenClosed:NO];
 			[window setContentView:[[Slib_OSX_ViewHandle alloc] init]];
-			ret = Ref<_OSX_Window>::from(UIPlatform::createWindowInstance(window));
+			Ref<_OSX_Window> ret = Ref<_OSX_Window>::from(UIPlatform::createWindowInstance(window));
 			if (ret.isNotNull()) {
 				window->m_window = ret;
 				{
@@ -119,9 +124,11 @@ public:
 				[window makeKeyAndOrderFront:NSApp];
 				[window setDelegate: window];
 				//[window setAcceptsMouseMovedEvents:TRUE];
+				
+				return ret;
 			}
 		}
-		return ret;
+		return Ref<_OSX_Window>::null();
 	}
 	
 	void release()

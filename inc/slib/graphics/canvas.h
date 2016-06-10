@@ -194,6 +194,8 @@ public:
 	
 	void restore();
 	
+	Ref<Canvas> getCanvas();
+	
 private:
 	Ref<Canvas> m_canvas;
 	

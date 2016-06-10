@@ -1,5 +1,4 @@
 #include "../../../inc/slib/ui/menu.h"
-#include "../../../inc/slib/ui/core.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -232,21 +231,5 @@ Ref<MenuItem> Menu::addSubmenu(Ref<Menu>& submenu, const String& title, const Re
 	param.submenu = submenu;
 	return addMenuItem(param);
 }
-
-#if !defined(SLIB_PLATFORM_IS_OSX)
-
-SLIB_SAFE_STATIC_REF(SafeRef<Menu>, _g_ui_app_menu)
-
-Ref<Menu> UIApp::getMenu()
-{
-	return _g_ui_app_menu;
-}
-
-void UIApp::setMenu(const Ref<Menu>& menu)
-{
-	_g_ui_app_menu = menu;
-}
-
-#endif
 
 SLIB_UI_NAMESPACE_END

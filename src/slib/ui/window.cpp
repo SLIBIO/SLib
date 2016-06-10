@@ -677,8 +677,10 @@ void Window::attach(const Ref<WindowInstance>& instance)
 			rect.setSize(instance->getClientSize());
 			Ref<View> view = m_viewContent;
 			if (view.isNotNull()) {
+				view->removeParent();
+				view->detach();
+				view->setFrame(rect);
 				view->attach(contentViewInstance);
-				view->m_frame = rect;
 			}
 		}
 	}
@@ -768,7 +770,7 @@ void Window::_create()
 		Size sizeOld = getSize();
 		if (sizeOld.x > 0 && sizeOld.y > 0) {
 			Size size = sizeOld;
-			onResize(size);
+			dispatchResize(size);
 			if (size != sizeOld) {
 				setSize(size);
 			}
@@ -781,7 +783,7 @@ void Window::_create()
 		
 	}
 	
-	onCreateFailed();
+	dispatchCreateFailed();
 	
 }
 
@@ -830,80 +832,134 @@ void Window::onCreateFailed()
 {
 }
 
-sl_bool Window::onClose()
+void Window::onClose(UIEvent* ev)
 {
-	PtrLocker<IWindowListener> listener(getEventListener());
-	sl_bool flagClose = sl_true;
-	if (listener.isNotNull()) {
-		flagClose = listener->onClose(this);
-	}
-	if (flagClose) {
-		detach();
-	}
-	return flagClose;
 }
 
 void Window::onActivate()
 {
+}
+
+void Window::onDeactivate()
+{
+}
+
+void Window::onMove()
+{
+}
+
+void Window::onResize(Size& size)
+{
+}
+
+void Window::onMinimize()
+{
+}
+
+void Window::onDeminimize()
+{
+}
+
+void Window::onMaximize()
+{
+}
+
+void Window::onDemaximize()
+{
+}
+
+void Window::dispatchCreate()
+{
+	onCreate();
+}
+
+void Window::dispatchCreateFailed()
+{
+	onCreateFailed();
+}
+
+void Window::dispatchClose(UIEvent* ev)
+{
+	onClose(ev);
+	PtrLocker<IWindowListener> listener(getEventListener());
+	if (listener.isNotNull()) {
+		listener->onClose(this, ev);
+	}
+	if (ev->isPreventedDefault()) {
+		return;
+	}
+	detach();
+}
+
+void Window::dispatchActivate()
+{
+	onActivate();
 	PtrLocker<IWindowListener> listener(getEventListener());
 	if (listener.isNotNull()) {
 		listener->onActivate(this);
 	}
 }
 
-void Window::onDeactivate()
+void Window::dispatchDeactivate()
 {
+	onDeactivate();
 	PtrLocker<IWindowListener> listener(getEventListener());
 	if (listener.isNotNull()) {
 		listener->onDeactivate(this);
 	}
 }
 
-void Window::onMove()
+void Window::dispatchMove()
 {
+	onMove();
 	PtrLocker<IWindowListener> listener(getEventListener());
 	if (listener.isNotNull()) {
 		listener->onMove(this);
 	}
 }
 
-void Window::onResize(Size& size)
+void Window::dispatchResize(Size& size)
 {
 	_refreshSize();
+	onResize(size);
 	PtrLocker<IWindowListener> listener(getEventListener());
 	if (listener.isNotNull()) {
 		listener->onResize(this, size);
 	}
 }
 
-void Window::onMinimize()
+void Window::dispatchMinimize()
 {
+	onMinimize();
 	PtrLocker<IWindowListener> listener(getEventListener());
 	if (listener.isNotNull()) {
 		listener->onMinimize(this);
 	}
 }
 
-void Window::onDeminimize()
+void Window::dispatchDeminimize()
 {
+	onDeminimize();
 	PtrLocker<IWindowListener> listener(getEventListener());
 	if (listener.isNotNull()) {
 		listener->onDeminimize(this);
 	}
 }
 
-void Window::onMaximize()
+void Window::dispatchMaximize()
 {
 	_refreshSize();
+	onMaximize();
 	PtrLocker<IWindowListener> listener(getEventListener());
 	if (listener.isNotNull()) {
 		listener->onMaximize(this);
 	}
 }
 
-void Window::onDemaximize()
+void Window::dispatchDemaximize()
 {
 	_refreshSize();
+	onDemaximize();
 	PtrLocker<IWindowListener> listener(getEventListener());
 	if (listener.isNotNull()) {
 		listener->onDemaximize(this);
@@ -912,7 +968,6 @@ void Window::onDemaximize()
 
 void Window::_refreshSize()
 {
-#if !defined(SLIB_PLATFORM_IS_WIN32)
 	Ref<View> view = m_viewContent;
 	if (view.isNotNull()) {
 		Rectangle rect;
@@ -920,7 +975,6 @@ void Window::_refreshSize()
 		rect.setSize(getClientSize());
 		view->setFrame(rect);
 	}
-#endif
 }
 
 
@@ -944,7 +998,7 @@ void WindowInstance::onCreate()
 {
 	Ref<Window> window = getWindow();
 	if (window.isNotNull()) {
-		window->onCreate();
+		window->dispatchCreate();
 	}
 }
 
@@ -952,17 +1006,22 @@ sl_bool WindowInstance::onClose()
 {
 	Ref<Window> window = getWindow();
 	if (window.isNotNull()) {
-		return window->onClose();
-	} else {
-		return sl_true;
+		Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
+		if (ev.isNotNull()) {
+			window->dispatchClose(ev.ptr);
+			if (ev->isPreventedDefault()) {
+				return sl_false;
+			}
+		}
 	}
+	return sl_true;
 }
 
 void WindowInstance::onActivate()
 {
 	Ref<Window> window = getWindow();
 	if (window.isNotNull()) {
-		window->onActivate();
+		window->dispatchActivate();
 	}
 }
 
@@ -970,7 +1029,7 @@ void WindowInstance::onDeactivate()
 {
 	Ref<Window> window = getWindow();
 	if (window.isNotNull()) {
-		window->onDeactivate();
+		window->dispatchDeactivate();
 	}
 }
 
@@ -978,7 +1037,7 @@ void WindowInstance::onMove()
 {
 	Ref<Window> window = getWindow();
 	if (window.isNotNull()) {
-		window->onMove();
+		window->dispatchMove();
 	}
 }
 
@@ -986,7 +1045,7 @@ void WindowInstance::onResize(Size& size)
 {
 	Ref<Window> window = getWindow();
 	if (window.isNotNull()) {
-		window->onResize(size);
+		window->dispatchResize(size);
 	}
 }
 
@@ -994,7 +1053,7 @@ void WindowInstance::onMinimize()
 {
 	Ref<Window> window = getWindow();
 	if (window.isNotNull()) {
-		window->onMinimize();
+		window->dispatchMinimize();
 	}
 }
 
@@ -1002,7 +1061,7 @@ void WindowInstance::onDeminimize()
 {
 	Ref<Window> window = getWindow();
 	if (window.isNotNull()) {
-		window->onDeminimize();
+		window->dispatchDeminimize();
 	}
 }
 
@@ -1010,7 +1069,7 @@ void WindowInstance::onMaximize()
 {
 	Ref<Window> window = getWindow();
 	if (window.isNotNull()) {
-		window->onMaximize();
+		window->dispatchMaximize();
 	}
 }
 
@@ -1018,7 +1077,7 @@ void WindowInstance::onDemaximize()
 {
 	Ref<Window> window = getWindow();
 	if (window.isNotNull()) {
-		window->onDemaximize();
+		window->dispatchDemaximize();
 	}
 }
 

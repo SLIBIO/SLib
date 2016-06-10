@@ -131,6 +131,9 @@ Rectangle Win32_ViewInstance::getFrame()
 
 void Win32_ViewInstance::setFrame(const Rectangle& frame)
 {
+	if (isWindowContent()) {
+		return;
+	}
 	HWND hWnd = m_handle;
 	if (hWnd) {
 		::SetWindowPos(hWnd, NULL

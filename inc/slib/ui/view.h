@@ -106,6 +106,8 @@ public:
 	
 	sl_bool isRootView();
 	
+	void removeFromParent();
+	
 	void attachChild(const Ref<View>& child);
 	
 	void addChildInstance(const Ref<ViewInstance>& instance);
@@ -990,8 +992,6 @@ private:
 	};
 	SafeRef<ScrollAttributes> m_scroll;
 	
-	friend class Window;
-	
 };
 
 struct ViewPrepareLayoutParam
@@ -1014,7 +1014,11 @@ public:
 	sl_bool isNativeWidget();
 	
 	void setNativeWidget(sl_bool flag);
-	
+
+	sl_bool isWindowContent();
+
+	void setWindowContent(sl_bool flag);
+
 public:
 	virtual sl_bool isValid() = 0;
 	
@@ -1061,6 +1065,7 @@ protected:
 	SafeWeakRef<View> m_view;
 	SafeWeakRef<GraphicsContext> m_graphicsContext;
 	sl_bool m_flagNativeWidget;
+	sl_bool m_flagWindowContent;
 
 };
 

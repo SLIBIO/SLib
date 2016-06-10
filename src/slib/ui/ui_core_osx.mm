@@ -6,7 +6,7 @@
 #include "../../../inc/slib/ui/screen.h"
 #include "../../../inc/slib/ui/window.h"
 #include "../../../inc/slib/ui/platform.h"
-#include "../../../inc/slib/core/app.h"
+#include "../../../inc/slib/ui/app.h"
 
 @interface _slib_OSX_AppDelegate : NSObject <NSApplicationDelegate>
 @end
@@ -195,11 +195,11 @@ SLIB_UI_NAMESPACE_END
 
 @implementation _slib_OSX_AppDelegate
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-	slib::UIApp::dispatchStart();
+	slib::UIApp::dispatchStartToApp();
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
-	slib::UIApp::dispatchExit();
+	slib::UIApp::dispatchExitToApp();
 }
 @end
 

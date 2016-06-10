@@ -3,6 +3,7 @@ package slib.platform.android.ui.window;
 import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
 import slib.platform.android.ui.UiThread;
+import slib.platform.android.ui.view.UiGroupView;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -16,7 +17,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
 
-public class UiWindow extends FrameLayout {
+public class UiWindow extends UiGroupView {
 
 	Activity activity;
 	public long instance;

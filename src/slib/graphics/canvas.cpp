@@ -384,10 +384,10 @@ CanvasStatusScope::~CanvasStatusScope()
 void CanvasStatusScope::save(const Ref<Canvas>& canvas)
 {
 	restore();
-	m_canvas = canvas;
-	if (m_canvas.isNotNull()) {
-		m_canvas->save();
+	if (canvas.isNotNull()) {
+		canvas->save();
 	}
+	m_canvas = canvas;
 }
 
 void CanvasStatusScope::restore()
@@ -397,6 +397,11 @@ void CanvasStatusScope::restore()
 		canvas->restore();
 		m_canvas.setNull();
 	}
+}
+
+Ref<Canvas> CanvasStatusScope::getCanvas()
+{
+	return m_canvas;
 }
 
 SLIB_GRAPHICS_NAMESPACE_END

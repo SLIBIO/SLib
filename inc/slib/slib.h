@@ -13,4 +13,4 @@
 #include "device.h"
 #include "db.h"
 
-#endif //CHECKHEADER_SLIB_MAIN_HEADER
+#endif

@@ -55,8 +55,8 @@ public: \
 	static slib::Ref<CLASS> getApp();
 
 
-#define SLIB_DEFINE_APPLICATION(CLASS) \
-	SLIB_DEFINE_OBJECT(CLASS, slib::Application) \
+#define SLIB_DEFINE_APPLICATION(CLASS, BASE) \
+	SLIB_DEFINE_OBJECT(CLASS, BASE) \
 	void CLASS::main(const slib::String& param) { \
 		slib::Ref<CLASS> app = new CLASS; \
 		if (app.isNotNull()) { \
@@ -67,8 +67,8 @@ public: \
 		CLASS::main(slib::String::null()); \
 	} \
 	slib::Ref<CLASS> CLASS::getApp() { \
-		slib::Ref<slib::Application> app = slib::Application::getApp(); \
-		if (app.isNotNull() && CLASS::checkInstance(app.ptr)) { \
+		slib::Ref<slib::Application> app(slib::Application::getApp()); \
+		if (CLASS::checkInstance(app.ptr)) { \
 			return slib::Ref<CLASS>::from(app); \
 		} \
 		return slib::Ref<CLASS>::null(); \

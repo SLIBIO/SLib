@@ -7,7 +7,7 @@ SLIB_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(Application, Object)
 
-SLIB_SAFE_STATIC_REF(SafeWeakRef<Application>, _g_app);
+SLIB_SAFE_STATIC_REF(SafeWeakRef<Application>, _g_app)
 
 Ref<Application> Application::getApp()
 {

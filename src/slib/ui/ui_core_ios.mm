@@ -5,6 +5,7 @@
 #include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/screen.h"
 #include "../../../inc/slib/ui/platform.h"
+#include "../../../inc/slib/ui/mobile_app.h"
 
 #include "../../../inc/slib/core/log.h"
 
@@ -190,9 +191,9 @@ SLIB_UI_NAMESPACE_END
 	
 	SLIB_LOG("App", "Finished Launching");
 
-	slib::UIApp::dispatchStart();
+	slib::UIApp::dispatchStartToApp();
 	
-	slib::UIApp::dispatchMobileCreate();
+	slib::MobileApp::dispatchCreateActivityToApp();
 	
 	return YES;
 }
@@ -203,7 +204,7 @@ SLIB_UI_NAMESPACE_END
 	
 	SLIB_LOG("App", "Resign Active");
 
-	slib::UIApp::dispatchMobilePause();
+	slib::MobileApp::dispatchPauseToApp();
 
 }
 
@@ -227,15 +228,17 @@ SLIB_UI_NAMESPACE_END
 
 	SLIB_LOG("App", "Become Active");
 
-	slib::UIApp::dispatchMobileResume();
+	slib::MobileApp::dispatchResumeToApp();
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
 	// Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 
 	SLIB_LOG("App", "Terminate");
+	
+	slib::MobileApp::dispatchDestroyActivityToApp();
 
-	slib::UIApp::dispatchExit();
+	slib::UIApp::dispatchExitToApp();
 }
 
 @end

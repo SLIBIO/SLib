@@ -8,6 +8,8 @@
 #include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/platform.h"
 
+#include "view_ios.h"
+
 SLIB_UI_NAMESPACE_BEGIN
 class _iOS_Window;
 SLIB_UI_NAMESPACE_END
@@ -19,13 +21,6 @@ SLIB_UI_NAMESPACE_END
 
 @interface _slib_iOS_Window_RootViewController : UIViewController
 {
-}
-@end
-
-@implementation _slib_iOS_Window_RootViewController
-- (BOOL)prefersStatusBarHidden
-{
-	return NO;
 }
 @end
 
@@ -48,26 +43,32 @@ public:
 	}
 	
 public:
-	static Ref<_iOS_Window> create(UIView* view)
+	static Ref<_iOS_Window> create(UIView* window)
 	{
-		Ref<_iOS_Window> ret;
-		if (view != nil) {
-			ret = new _iOS_Window();
+		if (window != nil) {
+			Ref<_iOS_Window> ret = new _iOS_Window();
 			if (ret.isNotNull()) {
-				ret->m_window = view;
-				if ([view isKindOfClass:[UIWindow class]]) {
-					UIWindow* window = (UIWindow*)view;
-					view = window.rootViewController.view;
-					if (view == nil) {
-						window.rootViewController = [[_slib_iOS_Window_RootViewController alloc] init];
-						view = [[UIView alloc] init];
-						window.rootViewController.view = view;
+				ret->m_window = window;
+				UIView* view;
+				if ([window isKindOfClass:[UIWindow class]]) {
+					view = ((UIWindow*)window).rootViewController.view;
+				} else {
+					view = window;
+				}
+				if (view != nil) {
+					Ref<ViewInstance> content = UIPlatform::createViewInstance(view);
+					if (content.isNotNull()) {
+						content->setWindowContent(sl_true);
+						ret->m_viewContent = content;
+						if ([view isKindOfClass:[Slib_iOS_ViewHandle class]]) {
+							((Slib_iOS_ViewHandle*)view)->m_viewInstance = Ref<iOS_ViewInstance>::from(content);
+						}
 					}
 				}
-				ret->m_viewContent = UIPlatform::createViewInstance(view);
+				return ret;
 			}
 		}
-		return ret;
+		return Ref<_iOS_Window>::null();
 	}
 	
 	static Ref<WindowInstance> create(const WindowInstanceParam& param)
@@ -90,7 +91,6 @@ public:
 		rect.origin.y = _rect.top;
 		rect.size.width = _rect.getWidth();
 		rect.size.height = _rect.getHeight();
-		Ref<_iOS_Window> ret;
 		_slib_iOS_Window* window = [[_slib_iOS_Window alloc] initWithFrame:rect];
 		if (window != nil) {
 			UIScreen* screen = UIPlatform::getScreenHandle(_screen.ptr);
@@ -98,13 +98,23 @@ public:
 				window.screen = screen;
 			}
 			window.windowLevel = UIWindowLevelNormal + 1;
-			ret = Ref<_iOS_Window>::from(UIPlatform::createWindowInstance(window));
-			if (ret.isNotNull()) {
-				window->m_window = ret;
-				ret->setFocus();
+			_slib_iOS_Window_RootViewController* controller = [[_slib_iOS_Window_RootViewController alloc] init];
+			if (controller != nil) {
+				Slib_iOS_ViewHandle* view = [[Slib_iOS_ViewHandle alloc] init];
+				if (view != nil) {
+					view.opaque = NO;
+					controller.view = view;
+					window.rootViewController = controller;
+					Ref<_iOS_Window> ret = Ref<_iOS_Window>::from(UIPlatform::createWindowInstance(window));
+					if (ret.isNotNull()) {
+						window->m_window = ret;
+						ret->setFocus();
+						return ret;
+					}
+				}
 			}
 		}
-		return ret;
+		return Ref<_iOS_Window>::null();
 	}
 	
 	void release()
@@ -545,9 +555,46 @@ Ref<WindowInstance> Window::createWindowInstance(const WindowInstanceParam& para
 SLIB_UI_NAMESPACE_END
 
 @implementation _slib_iOS_Window
+
 @end
 
+
+@implementation _slib_iOS_Window_RootViewController
+
+- (BOOL)prefersStatusBarHidden
+{
+	return NO;
+}
+
+- (void)viewWillTransitionToSize:(CGSize)_size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+{
+	[super viewWillTransitionToSize:_size withTransitionCoordinator:coordinator];
+	UIWindow* _window = self.view.window;
+	if (_window != nil && [_window isKindOfClass:[_slib_iOS_Window class]]) {
+		_slib_iOS_Window* window = (_slib_iOS_Window*)_window;
+		slib::Ref<slib::_iOS_Window> w = window->m_window;
+		if (w.isNotNull()) {
+			slib::Size size;
+			size.x = (sl_real)(_size.width);
+			size.y = (sl_real)(_size.height);
+			CGRect r = window.frame;
+			r.size = _size;
+			window.frame = r;
+			w->onResize(size);
+		}
+	}
+}
+
+- (BOOL)shouldAutorotate
+{
+	return YES;
+}
+
+@end
+
+
 SLIB_UI_NAMESPACE_BEGIN
+
 Ref<WindowInstance> UIPlatform::createWindowInstance(UIView* window)
 {
 	Ref<WindowInstance> ret = UIPlatform::_getWindowInstance((__bridge void*)window);
@@ -580,6 +627,7 @@ UIView* UIPlatform::getWindowHandle(WindowInstance* instance)
 		return nil;
 	}
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

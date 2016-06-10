@@ -14,6 +14,10 @@
 		2620412F1C88AF9300AF48F2 /* map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2620412E1C88AF9300AF48F2 /* map.cpp */; };
 		2640BC391CAA65EF004AA780 /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2640BC381CAA65EF004AA780 /* xml.cpp */; };
 		26483B2C1C99D8F3009075BF /* yuv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26483B2B1C99D8F3009075BF /* yuv.cpp */; };
+		2648D5421D0965C400819E09 /* mobile_game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2648D5411D0965C400819E09 /* mobile_game.cpp */; };
+		2648D5441D096A7000819E09 /* mobile_app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2648D5431D096A7000819E09 /* mobile_app.cpp */; };
+		2648D5461D096A8B00819E09 /* ui_app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2648D5451D096A8B00819E09 /* ui_app.cpp */; };
+		2648D5801D0999F700819E09 /* ui_platform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2648D57F1D0999F700819E09 /* ui_platform.cpp */; };
 		2649C2351CBBCB54003E7561 /* common_dialogs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2649C2341CBBCB54003E7561 /* common_dialogs.cpp */; };
 		2649C2371CBBCB7E003E7561 /* common_dialogs_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2649C2361CBBCB7E003E7561 /* common_dialogs_osx.mm */; };
 		264A5D7C1CB6C9BF00FB0B08 /* ui_menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264A5D7B1CB6C9BF00FB0B08 /* ui_menu.cpp */; };
@@ -245,6 +249,10 @@
 		2620412E1C88AF9300AF48F2 /* map.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = map.cpp; sourceTree = "<group>"; };
 		2640BC381CAA65EF004AA780 /* xml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = xml.cpp; sourceTree = "<group>"; };
 		26483B2B1C99D8F3009075BF /* yuv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yuv.cpp; sourceTree = "<group>"; };
+		2648D5411D0965C400819E09 /* mobile_game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mobile_game.cpp; sourceTree = "<group>"; };
+		2648D5431D096A7000819E09 /* mobile_app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mobile_app.cpp; sourceTree = "<group>"; };
+		2648D5451D096A8B00819E09 /* ui_app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_app.cpp; sourceTree = "<group>"; };
+		2648D57F1D0999F700819E09 /* ui_platform.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_platform.cpp; sourceTree = "<group>"; };
 		2649C2341CBBCB54003E7561 /* common_dialogs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = common_dialogs.cpp; sourceTree = "<group>"; };
 		2649C2361CBBCB7E003E7561 /* common_dialogs_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = common_dialogs_osx.mm; sourceTree = "<group>"; };
 		264A5D7B1CB6C9BF00FB0B08 /* ui_menu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_menu.cpp; sourceTree = "<group>"; };
@@ -599,6 +607,8 @@
 				26C7E37D1D00097000C0A769 /* linear_view.cpp */,
 				266DD5111C11940A00D47AB0 /* list_details_view.cpp */,
 				266DD5121C11940A00D47AB0 /* list_details_view_osx.mm */,
+				2648D5431D096A7000819E09 /* mobile_app.cpp */,
+				2648D5411D0965C400819E09 /* mobile_game.cpp */,
 				266DD5141C11940A00D47AB0 /* radio_button.cpp */,
 				266DD5151C11940A00D47AB0 /* radio_button_osx.mm */,
 				266DD5171C11940A00D47AB0 /* render_view.cpp */,
@@ -609,13 +619,15 @@
 				266DD5281C11940A00D47AB0 /* tab_view.cpp */,
 				266DD5291C11940A00D47AB0 /* tab_view_osx.mm */,
 				26A4ECCE1CFE7FB700288A0B /* tree_view.cpp */,
-				264A5D7D1CB6C9C800FB0B08 /* ui_menu_osx.mm */,
+				2648D5451D096A8B00819E09 /* ui_app.cpp */,
 				266DD52B1C11940A00D47AB0 /* ui_core.cpp */,
 				266DD52E1C11940A00D47AB0 /* ui_core_osx.mm */,
 				266DD5301C11940A00D47AB0 /* ui_event.cpp */,
 				266DD5331C11940A00D47AB0 /* ui_event_osx.mm */,
 				266DD5351C11940A00D47AB0 /* ui_graphics_context.cpp */,
 				264A5D7B1CB6C9BF00FB0B08 /* ui_menu.cpp */,
+				264A5D7D1CB6C9C800FB0B08 /* ui_menu_osx.mm */,
+				2648D57F1D0999F700819E09 /* ui_platform.cpp */,
 				2688DD841C16F6E200973672 /* video_view.cpp */,
 				266DD5361C11940A00D47AB0 /* view.cpp */,
 				266DD53C1C11940A00D47AB0 /* view_osx.h */,
@@ -931,6 +943,7 @@
 				266DD5B91C11940A00D47AB0 /* render_view.cpp in Sources */,
 				266DD4581C1192E800D47AB0 /* url.cpp in Sources */,
 				A2DE1D891B383BA600A74698 /* pipe.cpp in Sources */,
+				2648D5461D096A8B00819E09 /* ui_app.cpp in Sources */,
 				266DD5641C11940A00D47AB0 /* http_client.cpp in Sources */,
 				266DD5811C11940A00D47AB0 /* opengl_gles.cpp in Sources */,
 				266DD4A11C1193DB00D47AB0 /* bigint.cpp in Sources */,
@@ -947,6 +960,7 @@
 				266DD5A21C11940A00D47AB0 /* edit_view.cpp in Sources */,
 				26AE7BFE1C9934740026C2D9 /* triangle3.cpp in Sources */,
 				262041271C8895C900AF48F2 /* array.cpp in Sources */,
+				2648D5421D0965C400819E09 /* mobile_game.cpp in Sources */,
 				266DD56D1C11940A00D47AB0 /* net_capture_pcap.cpp in Sources */,
 				266DD56E1C11940A00D47AB0 /* netfilter.cpp in Sources */,
 				A25F30181B03A33700854DAF /* file_unix.cpp in Sources */,
@@ -971,11 +985,13 @@
 				26B0AF851C13E08600CD8673 /* bitmap_data.cpp in Sources */,
 				26599DBC1BEA5DDF008659BB /* callback.cpp in Sources */,
 				266DD55D1C11940A00D47AB0 /* codec_vp8.cpp in Sources */,
+				2648D5441D096A7000819E09 /* mobile_app.cpp in Sources */,
 				266DD5B61C11940A00D47AB0 /* radio_button.cpp in Sources */,
 				266DD4A21C1193DB00D47AB0 /* geograph.cpp in Sources */,
 				266DD5891C11940A00D47AB0 /* render_program.cpp in Sources */,
 				26E376DB1C985EA100B178E6 /* vector4.cpp in Sources */,
 				266DD58A1C11940A00D47AB0 /* texture.cpp in Sources */,
+				2648D5801D0999F700819E09 /* ui_platform.cpp in Sources */,
 				26E376E11C987F6200B178E6 /* matrix4.cpp in Sources */,
 				26D53C451BDF25090010BDA4 /* math.cpp in Sources */,
 				266DD4901C1193C400D47AB0 /* canvas.cpp in Sources */,

@@ -34,10 +34,6 @@ public:
 	static sl_bool isWindowVisible(HWND hWnd);
 	
 	static HWND getRootWindow(HWND hWnd);
-	
-	static HWND getAppMainWindow();
-	
-	static void setAppMainWindow(HWND hWnd);
 
 	
 	static String getWindowText(HWND hWnd);
