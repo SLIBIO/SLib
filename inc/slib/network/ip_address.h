@@ -41,7 +41,7 @@ public:
 	IPv4Address(const String& address);
 
 public:
-	void set(sl_uint8 a, sl_uint8 b, sl_uint8 c, sl_uint8 d);
+	void setElements(sl_uint8 a, sl_uint8 b, sl_uint8 c, sl_uint8 d);
 	
 	sl_uint32 getInt() const;
 	
@@ -76,7 +76,9 @@ public:
 	// "a.b.c.d"
 	String toString() const;
 	
-	static sl_reg parse(IPv4Address* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+	sl_bool setString(const String& str);
+
+	static sl_reg parse(IPv4Address* _out, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	static sl_reg parse(IPv4Address* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
@@ -220,7 +222,9 @@ public:
 	// "s0:s1:s2:s3:s4:s5:s6:s7"
 	String toString() const;
 	
-	static sl_reg parse(IPv6Address* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+	sl_bool setString(const String& str);
+
+	static sl_reg parse(IPv6Address* _out, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	static sl_reg parse(IPv6Address* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
@@ -290,6 +294,8 @@ public:
 	
 	IPAddress(const IPv6Address& other);
 	
+	IPAddress(const String& address);
+	
 public:
 	static const IPAddress& none();
 	
@@ -317,7 +323,9 @@ public:
 	
 	String toString() const;
 	
-	static sl_reg parse(IPAddress* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+	sl_bool setString(const String& str);
+
+	static sl_reg parse(IPAddress* _out, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	static sl_reg parse(IPAddress* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
@@ -333,6 +341,8 @@ public:
 	IPAddress& operator=(const IPv4Address& other);
 
 	IPAddress& operator=(const IPv6Address& other);
+	
+	IPAddress& operator=(const String& address);
 	
 	sl_bool operator==(const IPAddress& other) const;
 	

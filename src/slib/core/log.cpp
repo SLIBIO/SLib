@@ -36,7 +36,7 @@ void FileLogger::log(const String& tag, const String& content)
 	String s = _Log_getLineString(tag, content) + "\r\n";
 	if (s.getLength() > 0) {
 		ObjectLocker lock(this);
-		File::appendUtf8Text(fileName, s);
+		File::appendAllTextUTF8(fileName, s);
 	}
 }
 

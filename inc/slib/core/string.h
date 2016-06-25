@@ -3,6 +3,7 @@
 
 #include "definition.h"
 
+#include "charset.h"
 #include "memory.h"
 #include "algorithm.h"
 #include "list.h"
@@ -72,6 +73,7 @@ class String16;
 class SafeString8;
 class SafeString16;
 class StringData;
+class Variant;
 
 /** auto-referencing object **/
 class SLIB_EXPORT String8
@@ -131,13 +133,9 @@ public:
 	
 	static String8 fromUtf8(const Memory& mem);
 	
-	static String8 fromUtf16(const void* utf16, sl_reg len = -1);
+	static String8 fromUtf16(const sl_char16* utf16, sl_reg len = -1);
 	
-	static String8 fromUtf16(const Memory& mem);
-	
-	static String8 fromUtf32(const void* utf32, sl_reg len = -1);
-	
-	static String8 fromUtf32(const Memory& mem);
+	static String8 fromUtf32(const sl_char32* utf32, sl_reg len = -1);
 
 	static String8 fromUtf16BE(const void* utf16, sl_reg len = -1);
 
@@ -249,13 +247,11 @@ public:
 	
 	friend String8 operator+(sl_int32 number, const String8& other);
 	
-	
 	String8 operator+(sl_uint32 number) const;
 	
 	String8& operator+=(sl_uint32 number);
 
 	friend String8 operator+(sl_uint32 number, const String8& other);
-	
 	
 	String8 operator+(sl_int64 number) const;
 	
@@ -263,13 +259,11 @@ public:
 
 	friend String8 operator+(sl_int64 number, const String8& other);
 	
-	
 	String8 operator+(sl_uint64 number) const;
 	
 	String8& operator+=(sl_uint64 number);
 	
 	friend String8 operator+(sl_uint64 number, const String8& other);
-	
 	
 	String8 operator+(float number) const;
 	
@@ -277,13 +271,11 @@ public:
 
 	friend String8 operator+(float number, const String8& other);
 	
-	
 	String8 operator+(double number) const;
 	
 	String8& operator+=(double number);
 
 	friend String8 operator+(double number, const String8& other);
-	
 	
 	String8 operator+(sl_bool value) const;
 	
@@ -481,21 +473,31 @@ public:
 	
 	sl_reg indexOf(const String8& str, sl_reg start = 0) const;
 	
+	sl_reg indexOf(const sl_char8* str, sl_reg start = 0) const;
+	
 	sl_reg lastIndexOf(sl_char8 ch, sl_reg start = -1) const;
 	
 	sl_reg lastIndexOf(const String8& str, sl_reg start = -1) const;
+	
+	sl_reg lastIndexOf(const sl_char8* str, sl_reg start = -1) const;
 	
 	sl_bool startsWith(sl_char8 ch) const;
 	
 	sl_bool startsWith(const String8& str) const;
 	
+	sl_bool startsWith(const sl_char8* str) const;
+	
 	sl_bool endsWith(sl_char8 ch) const;
 	
 	sl_bool endsWith(const String8& str) const;
 
+	sl_bool endsWith(const sl_char8* str) const;
+	
 	sl_bool contains(sl_char8 ch) const;
-
+	
 	sl_bool contains(const String8& str) const;
+	
+	sl_bool contains(const sl_char8* str) const;
 
 	void makeUpper();
 	
@@ -507,6 +509,12 @@ public:
 	
 	String8 replaceAll(const String8& pattern, const String8& replacement) const;
 	
+	String8 replaceAll(const String8& pattern, const sl_char8* replacement) const;
+	
+	String8 replaceAll(const sl_char8* pattern, const String8& replacement) const;
+	
+	String8 replaceAll(const sl_char8* pattern, const sl_char8* replacement) const;
+	
 	String8 trim() const;
 	
 	String8 trimLeft() const;
@@ -514,6 +522,8 @@ public:
 	String8 trimRight() const;
 	
 	List<String8> split(const String8& pattern) const;
+	
+	List<String8> split(const sl_char8* pattern) const;
 	
 	String8 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true);
 	
@@ -526,112 +536,152 @@ public:
 	sl_size countLineNumber(sl_size pos, sl_size* column = sl_null) const;
 	
 public:
-	// radix: 2 ~ 64,   flagUpperCase only works if radix <= 36 (0~9a~z)
-	static String8 fromInt32(sl_int32 value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false);
-	
-	static String8 fromUint32(sl_uint32 value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false);
-	
-	static String8 fromInt64(sl_int64 value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false);
-	
-	static String8 fromUint64(sl_uint64 value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false);
-	
-	static String8 fromInt(sl_reg value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false);
-	
-	static String8 fromSize(sl_size value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false);
-
-	static String8 fromFloat(float value, sl_int32 precision = -1, sl_bool flagZeroPadding = sl_false, sl_int32 minWidthIntegral = 1);
-	
-	static String8 fromDouble(double value, sl_int32 precision = -1, sl_bool flagZeroPadding = sl_false, sl_int32 minWidthIntegral = 1);
-
-	static String8 fromPointerValue(const void* pointer);
-
-	static String8 fromBoolean(sl_bool value);
-	
-	static String8 makeHexString(const void* data, sl_size size);
-	
-	static String8 makeHexString(const Memory& mem);
-
-	
-	static sl_reg parseInt32(sl_int32 radix, sl_int32* _out, const char*sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
-	static sl_reg parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16*sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+	static sl_reg parseInt32(sl_int32 radix, sl_int32* _out, const sl_char8*sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseInt32(sl_int32 radix, sl_int32* _out) const;
 
 	sl_int32 parseInt32(sl_int32 radix = 10, sl_int32 def = 0) const;
 
-	
-	static sl_reg parseUint32(sl_int32 radix, sl_uint32* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
-	static sl_reg parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+	static sl_reg parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseUint32(sl_int32 radix, sl_uint32* _out) const;
 
 	sl_uint32 parseUint32(sl_int32 radix = 10, sl_uint32 def = 0) const;
-	
 
-	static sl_reg parseInt64(sl_int32 radix, sl_int64* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
-	static sl_reg parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+	static sl_reg parseInt64(sl_int32 radix, sl_int64* _out, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseInt64(sl_int32 radix, sl_int64* _out) const;
 
 	sl_int64 parseInt64(sl_int32 radix = 10, sl_int64 def = 0) const;
-
 	
-	static sl_reg parseUint64(sl_int32 radix, sl_uint64* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
-	static sl_reg parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+	static sl_reg parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseUint64(sl_int32 radix, sl_uint64* _out) const;
 
 	sl_uint64 parseUint64(sl_int32 radix = 10, sl_uint64 def = 0) const;
 
-
 	sl_bool parseInt(sl_int32 radix, sl_reg* _out) const;
 
 	sl_reg parseInt(sl_int32 radix = 10, sl_reg def = 0) const;
-
 
 	sl_bool parseSize(sl_int32 radix, sl_size* _out) const;
 
 	sl_size parseSize(sl_int32 radix = 10, sl_size def = 0) const;
 
-
-	static sl_reg parseFloat(float* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
-	static sl_reg parseFloat(float* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+	static sl_reg parseFloat(float* _out, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseFloat(float* _out) const;
 
 	float parseFloat(float def = 0) const;
-
 	
-	static sl_reg parseDouble(double* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
-	static sl_reg parseDouble(double* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+	static sl_reg parseDouble(double* _out, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseDouble(double* _out) const;
 
 	double parseDouble(double def = 0) const;
 
+	static sl_reg parseBoolean(sl_bool* _out, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_reg parseHexString(void* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+	sl_bool parseBoolean(sl_bool* _out) const;
 	
-	static sl_reg parseHexString(void* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+	sl_bool parseBoolean(sl_bool def = sl_false) const;
+
+	static sl_reg parseHexString(void* _out, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseHexString(void* _out) const;
 
-
-public:
-	// utf8 conversion
-	static sl_size utf8ToUtf16(const sl_char8* utf8, sl_reg lenUtf8, sl_char16* utf16, sl_reg lenUtf16Buffer);
 	
-	static sl_size utf8ToUtf32(const sl_char8* utf8, sl_reg lenUtf8, sl_char32* utf32, sl_reg lenUtf32Buffer);
+	// radix: 2 ~ 64,   flagUpperCase only works if radix <= 36 (0~9a~z)
+	static String8 fromInt32(sl_int32 value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
 	
-	static sl_size utf16ToUtf8(const sl_char16* utf16, sl_reg lenUtf16, sl_char8* utf8, sl_reg lenUtf8Buffer);
+	static String8 fromUint32(sl_uint32 value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
 	
-	static sl_size utf32ToUtf8(const sl_char32* utf32, sl_reg lenUtf32, sl_char8* utf8, sl_reg lenUtf8Buffer);
+	static String8 fromInt64(sl_int64 value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
+	
+	static String8 fromUint64(sl_uint64 value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
+	
+	static String8 fromInt(sl_reg value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
+	
+	static String8 fromSize(sl_size value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
+	
+	static String8 fromFloat(float value, sl_int32 precision = -1, sl_bool flagZeroPadding = sl_false, sl_uint32 minWidthIntegral = 1);
+	
+	static String8 fromDouble(double value, sl_int32 precision = -1, sl_bool flagZeroPadding = sl_false, sl_uint32 minWidthIntegral = 1);
+	
+	static String8 fromPointerValue(const void* pointer);
+	
+	static String8 fromBoolean(sl_bool value);
+	
+	static String8 makeHexString(const void* data, sl_size size);
+	
+	static String8 makeHexString(const Memory& mem);
+	
+	
+	static String8 formatv(const String8& strFormat, const Variant* params, sl_size nParams);
+	
+	static String8 formatv(const sl_char8* szFormat, const Variant* params, sl_size nParams);
+	
+	String8 argv(const Variant* params, sl_size nParams);
+	
+	static String8 format(const String8& szFormat, const Variant& param);
+	
+	static String8 format(const sl_char8* szFormat, const Variant& param);
+	
+	String8 arg(const Variant& param);
+	
+	static String8 format(const String8& szFormat, const Variant& param1, const Variant& param2);
+	
+	static String8 format(const sl_char8* szFormat, const Variant& param1, const Variant& param2);
+	
+	String8 arg(const Variant& param1, const Variant& param2);
+	
+	static String8 format(const String8& szFormat, const Variant& param1, const Variant& param2, const Variant& param3);
+	
+	static String8 format(const sl_char8* szFormat, const Variant& param1, const Variant& param2, const Variant& param3);
+	
+	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3);
+	
+	static String8 format(const String8& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4);
+	
+	static String8 format(const sl_char8* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4);
+	
+	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4);
+	
+	static String8 format(const String8& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5);
+	
+	static String8 format(const sl_char8* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5);
+	
+	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5);
+	
+	static String8 format(const String8& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6);
+	
+	static String8 format(const sl_char8* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6);
+	
+	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6);
+	
+	static String8 format(const String8& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7);
+	
+	static String8 format(const sl_char8* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7);
+	
+	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7);
+	
+	static String8 format(const String8& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8);
+	
+	static String8 format(const sl_char8* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8);
+	
+	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8);
+	
+	static String8 format(const String8& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9);
+	
+	static String8 format(const sl_char8* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9);
+	
+	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9);
+	
+	static String8 format(const String8& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9, const Variant& param10);
+	
+	static String8 format(const sl_char8* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9, const Variant& param10);
+	
+	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9, const Variant& param10);
 	
 private:
 	// Allocates memory required for a string for the specified length
@@ -735,13 +785,9 @@ public:
 
 	static String16 fromUtf8(const Memory& mem);
 
-	static String16 fromUtf16(const void* utf16, sl_reg len = -1);
+	static String16 fromUtf16(const sl_char16* utf16, sl_reg len = -1);
 
-	static String16 fromUtf16(const Memory& mem);
-
-	static String16 fromUtf32(const void* utf32, sl_reg len = -1);
-
-	static String16 fromUtf32(const Memory& mem);
+	static String16 fromUtf32(const sl_char32* utf32, sl_reg len = -1);
 
 	static String16 fromUtf16BE(const void* utf16, sl_reg len = -1);
 
@@ -853,13 +899,11 @@ public:
 
 	friend String16 operator+(sl_int32 number, const String16& other);
 	
-	
 	String16 operator+(sl_uint32 number) const;
 	
 	String16& operator+=(sl_uint32 number);
 
 	friend String16 operator+(sl_uint32 number, const String16& other);
-	
 	
 	String16 operator+(sl_int64 number) const;
 	
@@ -867,13 +911,11 @@ public:
 
 	friend String16 operator+(sl_int64 number, const String16& other);
 	
-	
 	String16 operator+(sl_uint64 number) const;
 	
 	String16& operator+=(sl_uint64 number);
 
 	friend String16 operator+(sl_uint64 number, const String16& other);
-	
 	
 	String16 operator+(float number) const;
 	
@@ -881,13 +923,11 @@ public:
 	
 	friend String16 operator+(float number, const String16& other);
 	
-	
 	String16 operator+(double number) const;
 	
 	String16& operator+=(double number);
 
 	friend String16 operator+(double number, const String16& other);
-	
 	
 	String16 operator+(sl_bool value) const;
 	
@@ -1077,21 +1117,31 @@ public:
 	
 	sl_reg indexOf(const String16& str, sl_reg start = 0) const;
 	
+	sl_reg indexOf(const sl_char16* str, sl_reg start = 0) const;
+	
 	sl_reg lastIndexOf(sl_char16 ch, sl_reg start = -1) const;
 	
 	sl_reg lastIndexOf(const String16& str, sl_reg start = -1) const;
+	
+	sl_reg lastIndexOf(const sl_char16* str, sl_reg start = -1) const;
 	
 	sl_bool startsWith(sl_char16 ch) const;
 	
 	sl_bool startsWith(const String16& str) const;
 	
+	sl_bool startsWith(const sl_char16* str) const;
+	
 	sl_bool endsWith(sl_char16 ch) const;
 	
 	sl_bool endsWith(const String16& str) const;
 
+	sl_bool endsWith(const sl_char16* str) const;
+	
 	sl_bool contains(sl_char16 ch) const;
 
 	sl_bool contains(const String16& str) const;
+	
+	sl_bool contains(const sl_char16* str) const;
 	
 	void makeUpper();
 	
@@ -1103,6 +1153,12 @@ public:
 	
 	String16 replaceAll(const String16& pattern, const String16& replacement) const;
 	
+	String16 replaceAll(const String16& pattern, const sl_char16* replacement) const;
+	
+	String16 replaceAll(const sl_char16* pattern, const String16& replacement) const;
+	
+	String16 replaceAll(const sl_char16* pattern, const sl_char16* replacement) const;
+	
 	String16 trim() const;
 	
 	String16 trimLeft() const;
@@ -1110,6 +1166,8 @@ public:
 	String16 trimRight() const;
 	
 	List<String16> split(const String16& pattern) const;
+	
+	List<String16> split(const sl_char16* pattern) const;
 	
 	String16 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true);
 	
@@ -1120,44 +1178,13 @@ public:
 	static sl_size countLineNumber(const sl_char16* input, sl_size len, sl_size* columnLast = sl_null);
 	
 	sl_size countLineNumber(sl_size pos, sl_size* column = sl_null) const;
-
+	
 public:
-	// radix: 2 ~ 64,   flagUpperCase only works if radix <= 36 (0~9a~z)
-	static String16 fromInt32(sl_int32 value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false);
-	
-	static String16 fromUint32(sl_uint32 value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false);
-	
-	static String16 fromInt64(sl_int64 value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false);
-	
-	static String16 fromUint64(sl_uint64 value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false);
-	
-	static String16 fromInt(sl_reg value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false);
-	
-	static String16 fromSize(sl_size value, sl_int32 radix = 10, sl_int32 minWidth = 0, sl_bool flagUpperCase = sl_false);
-
-	static String16 fromFloat(float value, sl_int32 precision = -1, sl_bool flagZeroPadding = sl_false, sl_int32 minWidthIntegral = 1);
-	
-	static String16 fromDouble(double value, sl_int32 precision = -1, sl_bool flagZeroPadding = sl_false, sl_int32 minWidthIntegral = 1);
-
-	static String16 fromPointerValue(const void* pointer);
-
-	static String16 fromBoolean(sl_bool value);
-
-	static String16 makeHexString(const void* data, sl_size size);
-	
-	static String16 makeHexString(const Memory& mem);
-
-	
-	static sl_reg parseInt32(sl_int32 radix, sl_int32* _out, const char*sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
 	static sl_reg parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16*sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseInt32(sl_int32 radix, sl_int32* _out) const;
 
 	sl_int32 parseInt32(sl_int32 radix = 10, sl_int32 def = 0) const;
-
-	
-	static sl_reg parseUint32(sl_int32 radix, sl_uint32* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	static sl_reg parseUint32(sl_int32 radix, sl_uint32* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
@@ -1165,69 +1192,141 @@ public:
 
 	sl_uint32 parseUint32(sl_int32 radix = 10, sl_uint32 def = 0) const;
 
-	
-	static sl_reg parseInt64(sl_int32 radix, sl_int64* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
 	static sl_reg parseInt64(sl_int32 radix, sl_int64* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseInt64(sl_int32 radix, sl_int64* _out) const;
 	
 	sl_int64 parseInt64(sl_int32 radix = 10, sl_int64 def = 0) const;
 
-
-	static sl_reg parseUint64(sl_int32 radix, sl_uint64* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
 	static sl_reg parseUint64(sl_int32 radix, sl_uint64* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseUint64(sl_int32 radix, sl_uint64* _out) const;
 	
 	sl_uint64 parseUint64(sl_int32 radix = 10, sl_uint64 def = 0) const;
 
-
 	sl_bool parseInt(sl_int32 radix, sl_reg* _out) const;
 
 	sl_reg parseInt(sl_int32 radix = 10, sl_reg def = 0) const;
-
 
 	sl_bool parseSize(sl_int32 radix, sl_size* _out) const;
 
 	sl_size parseSize(sl_int32 radix = 10, sl_size def = 0) const;
 
-
-	static sl_reg parseFloat(float* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
 	static sl_reg parseFloat(float* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseFloat(float* _out) const;
 
 	float parseFloat(float def = 0) const;
 
-
-	static sl_reg parseDouble(double* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
 	static sl_reg parseDouble(double* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseDouble(double* _out) const;
 
 	double parseDouble(double def = 0) const;
-
-
-	static sl_reg parseHexString(void* _out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
+	static sl_reg parseBoolean(sl_bool* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+	
+	sl_bool parseBoolean(sl_bool* _out) const;
+	
+	sl_bool parseBoolean(sl_bool def = sl_false) const;
+
 	static sl_reg parseHexString(void* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	sl_bool parseHexString(void* _out) const;
 
-public:
-	// utf8 conversion
-	static sl_size utf8ToUtf16(const sl_char8* utf8, sl_reg lenUtf8, sl_char16* utf16, sl_reg lenUtf16Buffer);
 	
-	static sl_size utf8ToUtf32(const sl_char8* utf8, sl_reg lenUtf8, sl_char32* utf32, sl_reg lenUtf32Buffer);
+	// radix: 2 ~ 64,   flagUpperCase only works if radix <= 36 (0~9a~z)
+	static String16 fromInt32(sl_int32 value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
 	
-	static sl_size utf16ToUtf8(const sl_char16* utf16, sl_reg lenUtf16, sl_char8* utf8, sl_reg lenUtf8Buffer);
+	static String16 fromUint32(sl_uint32 value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
 	
-	static sl_size utf32ToUtf8(const sl_char32* utf32, sl_reg lenUtf32, sl_char8* utf8, sl_reg lenUtf8Buffer);
-
+	static String16 fromInt64(sl_int64 value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
+	
+	static String16 fromUint64(sl_uint64 value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
+	
+	static String16 fromInt(sl_reg value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
+	
+	static String16 fromSize(sl_size value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
+	
+	static String16 fromFloat(float value, sl_int32 precision = -1, sl_bool flagZeroPadding = sl_false, sl_uint32 minWidthIntegral = 1);
+	
+	static String16 fromDouble(double value, sl_int32 precision = -1, sl_bool flagZeroPadding = sl_false, sl_uint32 minWidthIntegral = 1);
+	
+	static String16 fromPointerValue(const void* pointer);
+	
+	static String16 fromBoolean(sl_bool value);
+	
+	static String16 makeHexString(const void* data, sl_size size);
+	
+	static String16 makeHexString(const Memory& mem);
+	
+	
+	static String16 formatv(const sl_char16* szFormat, const Variant* params, sl_size nParams);
+	
+	static String16 formatv(const String16& strFormat, const Variant* params, sl_size nParams);
+	
+	String16 argv(const Variant* params, sl_size nParams);
+	
+	static String16 format(const String16& szFormat, const Variant& param);
+	
+	static String16 format(const sl_char16* szFormat, const Variant& param);
+	
+	String16 arg(const Variant& param);
+	
+	static String16 format(const String16& szFormat, const Variant& param1, const Variant& param2);
+	
+	static String16 format(const sl_char16* szFormat, const Variant& param1, const Variant& param2);
+	
+	String16 arg(const Variant& param1, const Variant& param2);
+	
+	static String16 format(const String16& szFormat, const Variant& param1, const Variant& param2, const Variant& param3);
+	
+	static String16 format(const sl_char16* szFormat, const Variant& param1, const Variant& param2, const Variant& param3);
+	
+	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3);
+	
+	static String16 format(const String16& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4);
+	
+	static String16 format(const sl_char16* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4);
+	
+	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4);
+	
+	static String16 format(const String16& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5);
+	
+	static String16 format(const sl_char16* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5);
+	
+	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5);
+	
+	static String16 format(const String16& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6);
+	
+	static String16 format(const sl_char16* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6);
+	
+	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6);
+	
+	static String16 format(const String16& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7);
+	
+	static String16 format(const sl_char16* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7);
+	
+	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7);
+	
+	static String16 format(const String16& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8);
+	
+	static String16 format(const sl_char16* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8);
+	
+	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8);
+	
+	static String16 format(const String16& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9);
+	
+	static String16 format(const sl_char16* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9);
+	
+	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9);
+	
+	static String16 format(const String16& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9, const Variant& param10);
+	
+	static String16 format(const sl_char16* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9, const Variant& param10);
+	
+	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9, const Variant& param10);
+	
 private:	
 	// Allocates memory required for a string for the specified length
 	static StringContainer16* _alloc(sl_size length);
@@ -1404,13 +1503,11 @@ public:
 	
 	friend String8 operator+(sl_int32 number, const SafeString8& other);
 	
-	
 	String8 operator+(sl_uint32 number) const;
 	
 	SafeString8& operator+=(sl_uint32 number);
 	
 	friend String8 operator+(sl_uint32 number, const SafeString8& other);
-	
 	
 	String8 operator+(sl_int64 number) const;
 	
@@ -1418,13 +1515,11 @@ public:
 	
 	friend String8 operator+(sl_int64 number, const SafeString8& other);
 	
-	
 	String8 operator+(sl_uint64 number) const;
 	
 	SafeString8& operator+=(sl_uint64 number);
 	
 	friend String8 operator+(sl_uint64 number, const SafeString8& other);
-	
 	
 	String8 operator+(float number) const;
 	
@@ -1432,13 +1527,11 @@ public:
 	
 	friend String8 operator+(float number, const SafeString8& other);
 	
-	
 	String8 operator+(double number) const;
 	
 	SafeString8& operator+=(double number);
 	
 	friend String8 operator+(double number, const SafeString8& other);
-	
 	
 	String8 operator+(sl_bool value) const;
 	
@@ -1636,21 +1729,31 @@ public:
 	
 	sl_reg indexOf(const String8& str, sl_reg start = 0) const;
 	
+	sl_reg indexOf(const sl_char8* str, sl_reg start = 0) const;
+	
 	sl_reg lastIndexOf(sl_char8 ch, sl_reg start = -1) const;
 	
 	sl_reg lastIndexOf(const String8& str, sl_reg start = -1) const;
+	
+	sl_reg lastIndexOf(const sl_char8* str, sl_reg start = -1) const;
 	
 	sl_bool startsWith(sl_char8 ch) const;
 	
 	sl_bool startsWith(const String8& str) const;
 	
+	sl_bool startsWith(const sl_char8* str) const;
+	
 	sl_bool endsWith(sl_char8 ch) const;
 	
 	sl_bool endsWith(const String8& str) const;
+	
+	sl_bool endsWith(const sl_char8* str) const;
 
 	sl_bool constains(sl_char8 ch) const;
 
 	sl_bool contains(const String8& str) const;
+	
+	sl_bool contains(const sl_char8* str) const;
 
 	void makeUpper();
 	
@@ -1662,6 +1765,12 @@ public:
 	
 	String8 replaceAll(const String8& pattern, const String8& replacement) const;
 
+	String8 replaceAll(const String8& pattern, const sl_char8* replacement) const;
+	
+	String8 replaceAll(const sl_char8* pattern, const String8& replacement) const;
+	
+	String8 replaceAll(const sl_char8* pattern, const sl_char8* replacement) const;
+	
 	String8 trim() const;
 	
 	String8 trimLeft() const;
@@ -1670,12 +1779,14 @@ public:
 	
 	List<String8> split(const String8& pattern) const;
 	
+	List<String8> split(const sl_char8* pattern) const;
+	
 	String8 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true);
 	
 	String8 parseBackslashEscapes(sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
 	
 	sl_size countLineNumber(sl_size pos, sl_size* column = sl_null) const;
-	
+
 public:
 	sl_bool parseInt32(sl_int32 radix, sl_int32* _out) const;
 
@@ -1708,9 +1819,36 @@ public:
 	sl_bool parseDouble(double* _out) const;
 
 	double parseDouble(double def = 0) const;
+	
+	sl_bool parseBoolean(sl_bool* _out) const;
+	
+	sl_bool parseBoolean(sl_bool def = sl_false) const;
 
 	sl_bool parseHexString(void* _out) const;
-
+	
+	
+	String8 argv(const Variant* params, sl_size nParams);
+	
+	String8 arg(const Variant& param);
+	
+	String8 arg(const Variant& param1, const Variant& param2);
+	
+	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3);
+	
+	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4);
+	
+	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5);
+	
+	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6);
+	
+	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7);
+	
+	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8);
+	
+	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9);
+	
+	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9, const Variant& param10);
+	
 private:
 	StringContainer8* _retainContainer() const;
 	
@@ -1845,13 +1983,11 @@ public:
 	
 	friend String16 operator+(sl_int32 number, const SafeString16& other);
 	
-	
 	String16 operator+(sl_uint32 number) const;
 	
 	SafeString16& operator+=(sl_uint32 number);
 	
 	friend String16 operator+(sl_uint32 number, const SafeString16& other);
-	
 	
 	String16 operator+(sl_int64 number) const;
 	
@@ -1859,13 +1995,11 @@ public:
 	
 	friend String16 operator+(sl_int64 number, const SafeString16& other);
 	
-	
 	String16 operator+(sl_uint64 number) const;
 	
 	SafeString16& operator+=(sl_uint64 number);
 	
 	friend String16 operator+(sl_uint64 number, const SafeString16& other);
-	
 	
 	String16 operator+(float number) const;
 	
@@ -1873,13 +2007,11 @@ public:
 	
 	friend String16 operator+(float number, const SafeString16& other);
 	
-	
 	String16 operator+(double number) const;
 	
 	SafeString16& operator+=(double number);
 	
 	friend String16 operator+(double number, const SafeString16& other);
-	
 	
 	String16 operator+(sl_bool value) const;
 	
@@ -2069,21 +2201,31 @@ public:
 	
 	sl_reg indexOf(const String16& str, sl_reg start = 0) const;
 	
+	sl_reg indexOf(const sl_char16* str, sl_reg start = 0) const;
+	
 	sl_reg lastIndexOf(sl_char16 ch, sl_reg start = -1) const;
 	
 	sl_reg lastIndexOf(const String16& str, sl_reg start = -1) const;
+	
+	sl_reg lastIndexOf(const sl_char16* str, sl_reg start = -1) const;
 	
 	sl_bool startsWith(sl_char16 ch) const;
 	
 	sl_bool startsWith(const String16& str) const;
 	
+	sl_bool startsWith(const sl_char16* str) const;
+	
 	sl_bool endsWith(sl_char16 ch) const;
 	
 	sl_bool endsWith(const String16& str) const;
+	
+	sl_bool endsWith(const sl_char16* str) const;
 
 	sl_bool contains(sl_char16 ch) const;
 
 	sl_bool contains(const String16& str) const;
+	
+	sl_bool contains(const sl_char16* str) const;
 
 	void makeUpper();
 	
@@ -2095,6 +2237,12 @@ public:
 	
 	String16 replaceAll(const String16& pattern, const String16& replacement) const;
 	
+	String16 replaceAll(const String16& pattern, const sl_char16* replacement) const;
+	
+	String16 replaceAll(const sl_char16* pattern, const String16& replacement) const;
+	
+	String16 replaceAll(const sl_char16* pattern, const sl_char16* replacement) const;
+	
 	String16 trim() const;
 	
 	String16 trimLeft() const;
@@ -2103,12 +2251,14 @@ public:
 	
 	List<String16> split(const String16& pattern) const;
 	
+	List<String16> split(const sl_char16* pattern) const;
+	
 	String16 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true);
 	
 	String16 parseBackslashEscapes(sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
 	
 	sl_size countLineNumber(sl_size pos, sl_size* column = sl_null) const;
-
+	
 public:
 	sl_bool parseInt32(sl_int32 radix, sl_int32* _out) const;
 	
@@ -2142,9 +2292,35 @@ public:
 	
 	double parseDouble(double def = 0) const;
 	
+	sl_bool parseBoolean(sl_bool* _out) const;
+	
+	sl_bool parseBoolean(sl_bool def = sl_false) const;
+	
 	sl_bool parseHexString(void* _out) const;
-
-
+	
+	
+	String16 argv(const Variant* params, sl_size nParams);
+	
+	String16 arg(const Variant& param);
+	
+	String16 arg(const Variant& param1, const Variant& param2);
+	
+	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3);
+	
+	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4);
+	
+	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5);
+	
+	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6);
+	
+	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7);
+	
+	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8);
+	
+	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9);
+	
+	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9, const Variant& param10);
+	
 private:
 	StringContainer16* _retainContainer() const;
 	
@@ -2273,6 +2449,7 @@ typedef StringBuffer8 StringBuffer;
 #define SLIB_CHAR_IS_ALNUM(c) (((c) >= '0' && (c) <= '9') || ((c) >= 'A' && (c) <= 'Z') || ((c) >= 'a' && (c) <= 'z'))
 #define SLIB_CHAR_IS_HEX(c) (((c) >= '0' && (c) <= '9') || ((c) >= 'A' && (c) <= 'F') || ((c) >= 'a' && (c) <= 'f'))
 #define SLIB_CHAR_IS_WHITE_SPACE(c) (c == ' ' || c == '\t' || c == '\r' || c == '\n')
+#define SLIB_CHAR_IS_C_NAME(c) (((c) >= '0' && (c) <= '9') || ((c) >= 'A' && (c) <= 'Z') || ((c) >= 'a' && (c) <= 'z') || c == '_')
 
 #define SLIB_CHAR_DIGIT_TO_INT(c) (((c) >= '0' && (c) <= '9') ? ((c) - '0') : 10)
 #define SLIB_CHAR_HEX_TO_INT(c) (((c) >= '0' && (c) <= '9') ? ((c) - '0') : (((c) >= 'A' && (c) <= 'F') ? ((c) -  55) : ((c) >= 'a' && (c) <= 'f') ? ((c) -  87) : 16))

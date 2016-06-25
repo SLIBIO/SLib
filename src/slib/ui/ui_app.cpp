@@ -42,7 +42,10 @@ Ref<Window> UIApp::getMainWindow()
 
 void UIApp::setMainWindow(const Ref<Window>& window)
 {
-	m_mainWindow = window;
+	void* _thiz = this;
+	if (_thiz) {
+		m_mainWindow = window;
+	}
 }
 
 Ref<Menu> UIApp::getMenu()

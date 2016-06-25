@@ -283,7 +283,9 @@ void ScrollBar::setMinimumBarLengthRatio(sl_real ratio)
 	if (length - bar_len < SLIB_EPSILON) { \
 		return __VA_ARGS__; \
 	} \
-	sl_real ratioValuePos = (range - page) / (length - bar_len);
+	sl_real ratioValuePos = (range - page) / (length - bar_len); \
+	SLIB_UNUSED(ratioValuePos) \
+	SLIB_UNUSED(value)
 
 sl_bool ScrollBar::getBarPositionRange(sl_real& pos_begin, sl_real& pos_end)
 {

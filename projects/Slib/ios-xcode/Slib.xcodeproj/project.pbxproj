@@ -171,6 +171,7 @@
 		26CA8D711C23A61D0049A658 /* system_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26CA8D701C23A61D0049A658 /* system_apple.mm */; };
 		26CB94C91D0126ED00D8A472 /* linear_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CB94C81D0126ED00D8A472 /* linear_view.cpp */; };
 		26CB94CB1D0126F900D8A472 /* tree_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CB94CA1D0126F900D8A472 /* tree_view.cpp */; };
+		26D6C37D1D1E87E2008720E4 /* charset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D6C37C1D1E87E2008720E4 /* charset.cpp */; };
 		26DA34FD1C4B8B1D004DC204 /* audio_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26DA34FC1C4B8B1D004DC204 /* audio_data.cpp */; };
 		26DA34FF1C4B8B2D004DC204 /* video_frame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26DA34FE1C4B8B2D004DC204 /* video_frame.cpp */; };
 		26FD28F61CFCB67D003E95FB /* scroll_bar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FD28F51CFCB67D003E95FB /* scroll_bar.cpp */; };
@@ -182,7 +183,7 @@
 		A2498C781AFA9C3200C76201 /* thirdparty_libopus.c in Sources */ = {isa = PBXBuildFile; fileRef = A2498C711AFA9C3200C76201 /* thirdparty_libopus.c */; settings = {COMPILER_FLAGS = "-O3 -Wno-conversion"; }; };
 		A2498C791AFA9C3200C76201 /* thirdparty_libpng.c in Sources */ = {isa = PBXBuildFile; fileRef = A2498C721AFA9C3200C76201 /* thirdparty_libpng.c */; settings = {COMPILER_FLAGS = "-O3"; }; };
 		A2498C7A1AFA9C3200C76201 /* thirdparty_sqlite3.c in Sources */ = {isa = PBXBuildFile; fileRef = A2498C731AFA9C3200C76201 /* thirdparty_sqlite3.c */; settings = {COMPILER_FLAGS = "-O3 -Wno-conversion"; }; };
-		A2498C7B1AFA9C3200C76201 /* thirdparty_zlib.c in Sources */ = {isa = PBXBuildFile; fileRef = A2498C741AFA9C3200C76201 /* thirdparty_zlib.c */; settings = {COMPILER_FLAGS = "-O3"; }; };
+		A2498C7B1AFA9C3200C76201 /* thirdparty_zlib.c in Sources */ = {isa = PBXBuildFile; fileRef = A2498C741AFA9C3200C76201 /* thirdparty_zlib.c */; settings = {COMPILER_FLAGS = "-O3 -w"; }; };
 		A25F2F371B039EF600854DAF /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F2EC71B039EF600854DAF /* app.cpp */; };
 		A25F2F381B039EF600854DAF /* async.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F2EC81B039EF600854DAF /* async.cpp */; };
 		A25F2F3B1B039EF600854DAF /* async_kqueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F2ECC1B039EF600854DAF /* async_kqueue.cpp */; };
@@ -410,6 +411,7 @@
 		26CA8D701C23A61D0049A658 /* system_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = system_apple.mm; sourceTree = "<group>"; };
 		26CB94C81D0126ED00D8A472 /* linear_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = linear_view.cpp; sourceTree = "<group>"; };
 		26CB94CA1D0126F900D8A472 /* tree_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tree_view.cpp; sourceTree = "<group>"; };
+		26D6C37C1D1E87E2008720E4 /* charset.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = charset.cpp; sourceTree = "<group>"; };
 		26DA34FC1C4B8B1D004DC204 /* audio_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = audio_data.cpp; path = media/audio_data.cpp; sourceTree = "<group>"; };
 		26DA34FE1C4B8B2D004DC204 /* video_frame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = video_frame.cpp; path = media/video_frame.cpp; sourceTree = "<group>"; };
 		26FD28F51CFCB67D003E95FB /* scroll_bar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scroll_bar.cpp; sourceTree = "<group>"; };
@@ -610,6 +612,7 @@
 				A25F2ECF1B039EF600854DAF /* base.cpp */,
 				A25F2ED01B039EF600854DAF /* base64.cpp */,
 				260252011BF18BE200DEFAB1 /* callback.cpp */,
+				26D6C37C1D1E87E2008720E4 /* charset.cpp */,
 				A234D6ED1B3F12F600ADDF4E /* content_type.cpp */,
 				A25F2ED11B039EF600854DAF /* event.cpp */,
 				A2DE1D9B1B383E7800A74698 /* event_unix.cpp */,
@@ -1070,6 +1073,7 @@
 				26B5714D1C9D43ED0099E69B /* object.cpp in Sources */,
 				26C0A3511C128D80005690FE /* sensor.cpp in Sources */,
 				266DD4521C1191F300D47AB0 /* web_view.cpp in Sources */,
+				26D6C37D1D1E87E2008720E4 /* charset.cpp in Sources */,
 				266DD3AA1C117AE300D47AB0 /* pen.cpp in Sources */,
 				26CB94CB1D0126F900D8A472 /* tree_view.cpp in Sources */,
 				2648D5481D096AB000819E09 /* ui_app.cpp in Sources */,

@@ -20,11 +20,13 @@ enum class VariantType
 	Uint64 = 4,
 	Float = 5,
 	Double = 6,
-	Time = 7,
-	Pointer = 8,
-	Boolean = 9,
-	String8 = 10,
-	String16 = 11,
+	Boolean = 7,
+	String8 = 8,
+	String16 = 9,
+	Sz8 = 10,
+	Sz16 = 11,
+	Time = 12,
+	Pointer = 13,
 	Object = 20,
 	Weak = 30
 };
@@ -72,10 +74,6 @@ public:
 
 	Variant(double value);
 	
-	Variant(const Time& value);
-	
-	Variant(const void* ptr);
-	
 	Variant(const sl_bool value);
 	
 	Variant(const String8& value);
@@ -85,7 +83,15 @@ public:
 	Variant(const String16& value);
 	
 	Variant(const SafeString16& value);
+	
+	Variant(const sl_char8* sz8);
+	
+	Variant(const sl_char16* sz16);
 
+	Variant(const Time& value);
+	
+	Variant(const void* ptr);
+	
 	template <class T>
 	Variant(const Ref<T>& ref);
 	
@@ -135,15 +141,21 @@ public:
 	
 	static Variant fromDouble(double value);
 	
+	static Variant fromBoolean(sl_bool value);
+	
+	static Variant fromString(const String& value);
+	
+	static Variant fromString8(const String8& value);
+	
+	static Variant fromString16(const String16& value);
+	
+	static Variant fromSz8(const sl_char8* value);
+	
+	static Variant fromSz16(const sl_char16* value);
+	
 	static Variant fromTime(const Time& value);
 	
 	static Variant fromPointer(const void* value);
-	
-	static Variant fromBoolean(sl_bool value);
-	
-	static Variant fromString(const String8& value);
-	
-	static Variant fromString(const String16& value);
 	
 	template <class T>
 	static Variant fromRef(const Ref<T>& ref);
@@ -195,10 +207,6 @@ public:
 	
 	Variant& operator=(double value);
 	
-	Variant& operator=(const Time& value);
-	
-	Variant& operator=(const void* ptr);
-	
 	Variant& operator=(const sl_bool value);
 	
 	Variant& operator=(const String8& value);
@@ -208,6 +216,14 @@ public:
 	Variant& operator=(const String16& value);
 	
 	Variant& operator=(const SafeString16& value);
+	
+	Variant& operator=(const sl_char8* sz8);
+	
+	Variant& operator=(const sl_char16* sz16);
+	
+	Variant& operator=(const Time& value);
+	
+	Variant& operator=(const void* ptr);
 	
 	template <class T>
 	Variant& operator=(const Ref<T>& ref);
@@ -256,47 +272,53 @@ public:
 	sl_bool isInt32() const;
 
 	sl_int32 getInt32(sl_int32 def = 0) const;
+	
+	void setInt32(sl_int32 value);
 
 	sl_bool isUint32() const;
 
 	sl_uint32 getUint32(sl_uint32 def = 0) const;
+	
+	void setUint32(sl_uint32 value);
 
 	sl_bool isInt64() const;
 
 	sl_int64 getInt64(sl_int64 def = 0) const;
+	
+	void setInt64(sl_int64 value);
 
 	sl_bool isUint64() const;
 
 	sl_uint64 getUint64(sl_uint64 def = 0) const;
+	
+	void setUint64(sl_uint64 value);
 
 	sl_bool isInteger() const;
-
+	
+	sl_bool isSignedInteger() const;
+	
+	sl_bool isUnsignedInteger() const;
+	
 	sl_bool isFloat() const;
 
 	float getFloat(float def = 0) const;
+	
+	void setFloat(float value);
 
 	sl_bool isDouble() const;
 
 	double getDouble(double def = 0) const;
+	
+	void setDouble(double value);
 
 	sl_bool isNumber() const;
 
 	
-	sl_bool isTime() const;
-
-	Time getTime(Time def) const;
-
-	Time getTime() const;
-	
-	
-	sl_bool isPointer() const;
-
-	void* getPointer(const void* def = sl_null) const;
-
-	
 	sl_bool isBoolean() const;
 
-	sl_bool getBoolean(sl_bool def) const;
+	sl_bool getBoolean(sl_bool def = sl_false) const;
+	
+	void setBoolean(sl_bool value);
 
 	
 	sl_bool isString() const;
@@ -304,6 +326,10 @@ public:
 	sl_bool isString8() const;
 
 	sl_bool isString16() const;
+	
+	sl_bool isSz8() const;
+	
+	sl_bool isSz16() const;
 
 	String getString(const String& def) const;
 	
@@ -316,7 +342,39 @@ public:
 	String16 getString16(const String16& def) const;
 
 	String16 getString16() const;
+	
+	const sl_char8* getSz8(const sl_char8* def = sl_null) const;
+	
+	const sl_char16* getSz16(const sl_char16* def = sl_null) const;
+	
+	void setString(const String8& value);
+	
+	void setString(const String16& value);
+	
+	void setString(const SafeString8& value);
+	
+	void setString(const SafeString16& value);
+	
+	void setString(const sl_char8* sz8);
+	
+	void setString(const sl_char16* sz16);
 
+	
+	sl_bool isTime() const;
+	
+	Time getTime(const Time& def) const;
+	
+	Time getTime() const;
+	
+	void setTime(const Time& value);
+	
+	
+	sl_bool isPointer() const;
+	
+	void* getPointer(const void* def = sl_null) const;
+	
+	void setPointer(const void* ptr);
+	
 	
 	sl_bool isObject() const;
 
@@ -324,6 +382,9 @@ public:
 
 	template <class T>
 	Ref<T> getObject(const Ref<T>& def) const;
+
+	template <class T>
+	void setObject(const Ref<T>& ref);
 	
 	sl_bool isObjectNotNull() const;
 	
@@ -334,18 +395,34 @@ public:
 	sl_bool isMemory() const;
 	
 	Memory getMemory() const;
+	
+	void setMemory(const Memory& mem);
+	
+	template <class TYPE, class COMPARE>
+	Array<TYPE, COMPARE> getArray(const Array<TYPE, COMPARE>& def) const;
+	
+	template <class TYPE, class COMPARE>
+	void setArray(const Array<TYPE, COMPARE>& array);
 
 	template <class TYPE, class COMPARE>
 	List<TYPE, COMPARE> getList(const List<TYPE, COMPARE>& def) const;
 	
+	template <class TYPE, class COMPARE>
+	void setList(const List<TYPE, COMPARE>& list);
+	
 	template <class KT, class VT>
 	Map<KT, VT> getMap(const Map<KT, VT>& def) const;
-
+	
+	template <class KT, class VT>
+	void setMap(const Map<KT, VT>& map);
+	
 	sl_bool isWeak() const;
 	
 	template <class T>
 	WeakRef<T> getWeak(const WeakRef<T>& def) const;
 	
+	template <class T>
+	void setWeak(const WeakRef<T>& weak);
 
 	sl_bool isVariantList() const;
 	
@@ -415,10 +492,6 @@ public:
 	
 	SafeVariant(double value);
 	
-	SafeVariant(const Time& value);
-	
-	SafeVariant(const void* ptr);
-	
 	SafeVariant(const sl_bool value);
 	
 	SafeVariant(const String8& value);
@@ -428,6 +501,14 @@ public:
 	SafeVariant(const String16& value);
 	
 	SafeVariant(const SafeString16& value);
+	
+	SafeVariant(const sl_char8* sz8);
+	
+	SafeVariant(const sl_char16* sz16);
+	
+	SafeVariant(const Time& value);
+	
+	SafeVariant(const void* ptr);
 
 	template <class T>
 	SafeVariant(const Ref<T>& ref);
@@ -487,10 +568,6 @@ public:
 	
 	SafeVariant& operator=(double value);
 	
-	SafeVariant& operator=(const Time& value);
-	
-	SafeVariant& operator=(const void* ptr);
-	
 	SafeVariant& operator=(const sl_bool value);
 	
 	SafeVariant& operator=(const String8& value);
@@ -500,6 +577,14 @@ public:
 	SafeVariant& operator=(const String16& value);
 	
 	SafeVariant& operator=(const SafeString16& value);
+
+	SafeVariant& operator=(const sl_char8* sz8);
+	
+	SafeVariant& operator=(const sl_char16* sz16);
+	
+	SafeVariant& operator=(const Time& value);
+	
+	SafeVariant& operator=(const void* ptr);
 	
 	template <class T>
 	SafeVariant& operator=(const Ref<T>& ref);
@@ -549,27 +634,43 @@ public:
 	
 	sl_int32 getInt32(sl_int32 def = 0) const;
 	
+	void setInt32(sl_int32 value);
+	
 	sl_bool isUint32() const;
 	
 	sl_uint32 getUint32(sl_uint32 def = 0) const;
+	
+	void setUint32(sl_uint32 value);
 	
 	sl_bool isInt64() const;
 	
 	sl_int64 getInt64(sl_int64 def = 0) const;
 	
+	void setInt64(sl_int64 value);
+	
 	sl_bool isUint64() const;
 	
 	sl_uint64 getUint64(sl_uint64 def = 0) const;
 	
+	void setUint64(sl_uint64 value);
+	
 	sl_bool isInteger() const;
 	
+	sl_bool isSignedInteger() const;
+	
+	sl_bool isUnsignedInteger() const;
+
 	sl_bool isFloat() const;
 	
 	float getFloat(float def = 0) const;
 	
+	void setFloat(float value);
+	
 	sl_bool isDouble() const;
 	
 	double getDouble(double def = 0) const;
+	
+	void setDouble(double value);
 	
 	sl_bool isNumber() const;
 	
@@ -580,15 +681,21 @@ public:
 	
 	Time getTime() const;
 	
+	void setTime(const Time& time);
+	
 	
 	sl_bool isPointer() const;
 	
 	void* getPointer(const void* def = sl_null) const;
 	
+	void setPointer(const void* ptr);
+	
 	
 	sl_bool isBoolean() const;
 	
-	sl_bool getBoolean(sl_bool def) const;
+	sl_bool getBoolean(sl_bool def = sl_false) const;
+	
+	void setBoolean(sl_bool value);
 	
 	
 	sl_bool isString() const;
@@ -596,6 +703,10 @@ public:
 	sl_bool isString8() const;
 	
 	sl_bool isString16() const;
+	
+	sl_bool isSz8() const;
+	
+	sl_bool isSz16() const;
 	
 	String getString(const String& def) const;
 	
@@ -609,6 +720,22 @@ public:
 	
 	String16 getString16() const;
 	
+	const sl_char8* getSz8(const sl_char8* def = sl_null) const;
+	
+	const sl_char16* getSz16(const sl_char16* def = sl_null) const;
+	
+	void setString(const String8& value);
+	
+	void setString(const SafeString8& value);
+	
+	void setString(const String16& value);
+	
+	void setString(const SafeString16& value);
+	
+	void setString(const sl_char8* sz8);
+	
+	void setString(const sl_char16* sz16);
+
 	
 	sl_bool isObject() const;
 	
@@ -616,6 +743,9 @@ public:
 	
 	template <class T>
 	Ref<T> getObject(const Ref<T>& def) const;
+	
+	template <class T>
+	void setObject(const Ref<T>& object);
 	
 	sl_bool isObjectNotNull() const;
 	
@@ -627,16 +757,33 @@ public:
 	
 	Memory getMemory() const;
 	
+	void setMemory(const Memory& mem);
+	
+	template <class TYPE, class COMPARE>
+	Array<TYPE, COMPARE> getArray(const Array<TYPE, COMPARE>& def) const;
+	
+	template <class TYPE, class COMPARE>
+	void setArray(const Array<TYPE, COMPARE>& array);
+	
 	template <class TYPE, class COMPARE>
 	List<TYPE, COMPARE> getList(const List<TYPE, COMPARE>& def) const;
 	
+	template <class TYPE, class COMPARE>
+	void setList(const List<TYPE, COMPARE>& list);
+	
 	template <class KT, class VT>
 	Map<KT, VT> getMap(const Map<KT, VT>& def) const;
+	
+	template <class KT, class VT>
+	void setMap(const Map<KT, VT>& map);
 
 	sl_bool isWeak() const;
 	
 	template <class T>
 	WeakRef<T> getWeak(const WeakRef<T>& def) const;
+	
+	template <class T>
+	void setWeak(const WeakRef<T>& weak);
 	
 	
 	sl_bool isVariantList() const;
@@ -820,90 +967,70 @@ static Variant fromWeakRef(const WeakRef<T>& weak)
 template <class T>
 Variant& Variant::operator=(const Ref<T>& ref)
 {
-	_free(_type, _value);
-	_type = VariantType::Object;
-	new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+	setObject(ref);
 	return *this;
 }
 
 template <class T>
 Variant& Variant::operator=(const SafeRef<T>& ref)
 {
-	_free(_type, _value);
-	_type = VariantType::Object;
-	new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+	setObject(ref);
 	return *this;
 }
 
 template <class T, class COMPARE>
 Variant& Variant::operator=(const Array<T, COMPARE>& object)
 {
-	_free(_type, _value);
-	_type = VariantType::Object;
-	new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+	setArray(object);
 	return *this;
 }
 
 template <class T, class COMPARE>
 Variant& Variant::operator=(const SafeArray<T, COMPARE>& object)
 {
-	_free(_type, _value);
-	_type = VariantType::Object;
-	new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+	setArray(object);
 	return *this;
 }
 
 template <class T, class COMPARE>
 Variant& Variant::operator=(const List<T, COMPARE>& object)
 {
-	_free(_type, _value);
-	_type = VariantType::Object;
-	new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+	setList(object);
 	return *this;
 }
 
 template <class T, class COMPARE>
 Variant& Variant::operator=(const SafeList<T, COMPARE>& object)
 {
-	_free(_type, _value);
-	_type = VariantType::Object;
-	new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+	setList(object);
 	return *this;
 }
 
 template <class KT, class VT>
 Variant& Variant::operator=(const Map<KT, VT>& object)
 {
-	_free(_type, _value);
-	_type = VariantType::Object;
-	new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+	setMap(object);
 	return *this;
 }
 
 template <class KT, class VT>
 Variant& Variant::operator=(const SafeMap<KT, VT>& object)
 {
-	_free(_type, _value);
-	_type = VariantType::Object;
-	new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+	setMap(object);
 	return *this;
 }
 
 template <class T>
 Variant& Variant::operator=(const WeakRef<T>& weak)
 {
-	_free(_type, _value);
-	_type = VariantType::Weak;
-	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+	setWeak(weak);
 	return *this;
 }
 
 template <class T>
 Variant& Variant::operator=(const SafeWeakRef<T>& weak)
 {
-	_free(_type, _value);
-	_type = VariantType::Weak;
-	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+	setWeak(weak);
 	return *this;
 }
 
@@ -931,6 +1058,32 @@ Ref<T> Variant::getObject(const Ref<T>& def) const
 	return def;
 }
 
+template <class T>
+void Variant::setObject(const Ref<T>& ref)
+{
+	_free(_type, _value);
+	_type = VariantType::Object;
+	new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+}
+
+template <class TYPE, class COMPARE>
+Array<TYPE, COMPARE> Variant::getArray(const Array<TYPE, COMPARE>& def) const
+{
+	if (_type == VariantType::Object) {
+		Referable* ref = *((Referable**)(void*)(&_value));
+		return (CArray<TYPE, COMPARE>*)ref;
+	}
+	return def;
+}
+
+template <class T, class COMPARE>
+void Variant::setArray(const Array<T, COMPARE>& object)
+{
+	_free(_type, _value);
+	_type = VariantType::Object;
+	new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+}
+
 template <class TYPE, class COMPARE>
 List<TYPE, COMPARE> Variant::getList(const List<TYPE, COMPARE>& def) const
 {
@@ -939,6 +1092,14 @@ List<TYPE, COMPARE> Variant::getList(const List<TYPE, COMPARE>& def) const
 		return (CList<TYPE, COMPARE>*)ref;
 	}
 	return def;
+}
+
+template <class T, class COMPARE>
+void Variant::setList(const List<T, COMPARE>& object)
+{
+	_free(_type, _value);
+	_type = VariantType::Object;
+	new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
 }
 
 template <class KT, class VT>
@@ -951,6 +1112,14 @@ Map<KT, VT> Variant::getMap(const Map<KT, VT>& def) const
 	return def;
 }
 
+template <class KT, class VT>
+void Variant::setMap(const Map<KT, VT>& object)
+{
+	_free(_type, _value);
+	_type = VariantType::Object;
+	new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+}
+
 template <class T>
 WeakRef<T> Variant::getWeak(const WeakRef<T>& def) const
 {
@@ -958,6 +1127,14 @@ WeakRef<T> Variant::getWeak(const WeakRef<T>& def) const
 		return *((WeakRef<T>*)(void*)(&_value));
 	}
 	return def;
+}
+
+template <class T>
+void Variant::setWeak(const WeakRef<T>& weak)
+{
+	_free(_type, _value);
+	_type = VariantType::Weak;
+	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
 }
 
 
@@ -1041,63 +1218,73 @@ SLIB_INLINE const SafeVariant& SafeVariant::null()
 }
 
 template <class T>
-SafeVariant& SafeVariant::operator=(const Ref<T>& ref)
+SLIB_INLINE SafeVariant& SafeVariant::operator=(const Ref<T>& ref)
 {
-	return *this = Variant(ref);
+	setObject(ref);
+	return *this;
 }
 
 template <class T>
 SafeVariant& SafeVariant::operator=(const SafeRef<T>& ref)
 {
-	return *this = Variant(ref);
+	setObject(ref);
+	return *this;
 }
 
 template <class T, class COMPARE>
 SafeVariant& SafeVariant::operator=(const Array<T, COMPARE>& object)
 {
-	return *this = Variant(object);
+	setArray(object);
+	return *this;
 }
 
 template <class T, class COMPARE>
 SafeVariant& SafeVariant::operator=(const SafeArray<T, COMPARE>& object)
 {
-	return *this = Variant(object);
+	setArray(object);
+	return *this;
 }
 
 template <class T, class COMPARE>
 SafeVariant& SafeVariant::operator=(const List<T, COMPARE>& object)
 {
-	return *this = Variant(object);
+	setList(object);
+	return *this;
 }
 
 template <class T, class COMPARE>
 SafeVariant& SafeVariant::operator=(const SafeList<T, COMPARE>& object)
 {
-	return *this = Variant(object);
+	setList(object);
+	return *this;
 }
 
 template <class KT, class VT>
 SafeVariant& SafeVariant::operator=(const Map<KT, VT>& object)
 {
-	return *this = Variant(object);
+	setMap(object);
+	return *this;
 }
 
 template <class KT, class VT>
 SafeVariant& SafeVariant::operator=(const SafeMap<KT, VT>& object)
 {
-	return *this = Variant(object);
+	setMap(object);
+	return *this;
 }
 
 template <class T>
 SafeVariant& SafeVariant::operator=(const WeakRef<T>& weak)
 {
-	return *this = Variant(weak);
+	setWeak(weak);
+	return *this;
 }
 
 template <class T>
 SafeVariant& SafeVariant::operator=(const SafeWeakRef<T>& weak)
 {
-	return *this = Variant(weak);
+	setWeak(weak);
+	return *this;
 }
 
 SLIB_INLINE VariantType SafeVariant::getType() const
@@ -1122,11 +1309,42 @@ Ref<T> SafeVariant::getObject(const Ref<T>& def) const
 	return var.getObject(def);
 }
 
+template <class T>
+void SafeVariant::setObject(const Ref<T>& object)
+{
+	sl_int64 v;
+	new ((Ref<T>*)(void*)(&v)) Ref<T>(object);
+	_replace(VariantType::Object, v);
+}
+
+template <class TYPE, class COMPARE>
+Array<TYPE, COMPARE> SafeVariant::getArray(const Array<TYPE, COMPARE>& def) const
+{
+	Variant var(*this);
+	return var.getArray(def);
+}
+
+template <class TYPE, class COMPARE>
+void SafeVariant::setArray(const Array<TYPE, COMPARE>& object)
+{
+	sl_int64 v;
+	new ((Array<TYPE, COMPARE>*)(void*)(&v)) Array<TYPE, COMPARE>(object);
+	_replace(VariantType::Object, v);
+}
+
 template <class TYPE, class COMPARE>
 List<TYPE, COMPARE> SafeVariant::getList(const List<TYPE, COMPARE>& def) const
 {
 	Variant var(*this);
 	return var.getList(def);
+}
+
+template <class TYPE, class COMPARE>
+void SafeVariant::setList(const List<TYPE, COMPARE>& object)
+{
+	sl_int64 v;
+	new ((List<TYPE, COMPARE>*)(void*)(&v)) List<TYPE, COMPARE>(object);
+	_replace(VariantType::Object, v);
 }
 
 template <class KT, class VT>
@@ -1136,11 +1354,27 @@ Map<KT, VT> SafeVariant::getMap(const Map<KT, VT>& def) const
 	return var.getMap(def);
 }
 
+template <class KT, class VT>
+void SafeVariant::setMap(const Map<KT, VT>& object)
+{
+	sl_int64 v;
+	new ((Map<KT, VT>*)(void*)(&v)) Map<KT, VT>(object);
+	_replace(VariantType::Object, v);
+}
+
 template <class T>
 WeakRef<T> SafeVariant::getWeak(const WeakRef<T>& def) const
 {
 	Variant var(*this);
 	return var.getWeak(def);
+}
+
+template <class T>
+void SafeVariant::setWeak(const WeakRef<T>& weak)
+{
+	sl_int64 v;
+	new ((WeakRef<T>*)(void*)(&v)) WeakRef<T>(weak);
+	_replace(VariantType::Weak, v);
 }
 
 SLIB_NAMESPACE_END

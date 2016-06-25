@@ -221,6 +221,11 @@ String Locale::getLanguageCode(Language language)
 	return sz;
 }
 
+sl_bool Locale::isValidLanguageCode(Language language)
+{
+	return getLanguageName(language).isNotNull();
+}
+
 
 #define DEFINE_COUNTRY_CASE(COUNTRY, NAME) \
 	case Country::COUNTRY: \
@@ -537,6 +542,10 @@ String Locale::getCountryCode(Country country)
 	return sz;
 }
 
+sl_bool Locale::isValidCountryCode(Country country)
+{
+	return getCountryName(country).isNotNull();
+}
 
 Locale::Locale() : value(Locale::Unknown)
 {
@@ -583,6 +592,23 @@ String Locale::getLanguageName() const
 Country Locale::getCountry() const
 {
 	return (Country)((((sl_uint32)value) >> 16) & 0xFFFF);
+}
+
+sl_bool Locale::isValid() const
+{
+	Language lang = getLanguage();
+	Country country = getCountry();
+	if (lang != Language::Unknown && isValidLanguageCode(lang)) {
+		if (country == Country::Unknown || isValidCountryCode(country)) {
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
+sl_bool Locale::isInvalid() const
+{
+	return !(isValid());
 }
 
 String Locale::getCountryCode() const

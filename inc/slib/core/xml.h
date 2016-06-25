@@ -81,8 +81,6 @@ public:
 	
 	String toString() const;
 	
-	sl_bool writeToUtf8TextFile(const String& filePath);
-	
 	sl_bool isDocumentNode() const;
 	
 	Ref<XmlDocument> toDocumentNode() const;
@@ -110,12 +108,32 @@ public:
 	Ref<XmlNodeGroup> getParent() const;
 	
 	Ref<XmlElement> getParentElement() const;
-		
+	
+	sl_size getStartPositionInSource();
+	
+	void setStartPositionInSource(sl_size pos);
+	
+	sl_size getEndPositionInSource();
+	
+	void setEndPositionInSource(sl_size pos);
+	
+	sl_size getLineNumberInSource();
+	
+	void setLineNumberInSource(sl_size line);
+	
+	sl_size getColumnNumberInSource();
+	
+	void setColumnNumberInSource(sl_size line);
+
 protected:
 	XmlNodeType m_type;
 	WeakRef<XmlNodeGroup> m_parent;
 	WeakRef<XmlDocument> m_document;
-	
+	sl_size m_positionStartInSource;
+	sl_size m_positionEndInSource;
+	sl_size m_lineInSource;
+	sl_size m_columnInSource;
+
 protected:
 	void _setDocument(const Ref<XmlDocument>& documentNew);
 	
@@ -414,6 +432,8 @@ public:
 	// read & write
 	StringData source;
 	
+	sl_uint32 characterSize;
+	
 	// write only
 	sl_bool flagChangeSource;
 
@@ -470,6 +490,10 @@ public:
 public:
 	String getErrorText();
 	
+	void setCreatingAll();
+	
+	void setCreatingOnlyElements();
+	
 };
 
 class SLIB_EXPORT Xml
@@ -493,9 +517,9 @@ public:
 	static Ref<XmlDocument> parseXml16(const String16& xml);
 	
 	
-	static Ref<XmlDocument> parseXmlFromUtf8TextFile(const String& filePath, XmlParseParam& param);
+	static Ref<XmlDocument> parseXmlFromTextFile(const String& filePath, XmlParseParam& param);
 	
-	static Ref<XmlDocument> parseXmlFromUtf8TextFile(const String& filePath);
+	static Ref<XmlDocument> parseXmlFromTextFile(const String& filePath);
 	
 	
 	static String makeEscapedText(const String& text);

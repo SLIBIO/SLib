@@ -48,6 +48,7 @@
 #include "core/service.h"
 #include "core/content_type.h"
 #include "core/locale.h"
+#include "core/charset.h"
 #include "core/resource.h"
 #include "core/setting.h"
 #include "core/url.h"

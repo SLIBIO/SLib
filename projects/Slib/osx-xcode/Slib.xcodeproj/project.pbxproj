@@ -181,6 +181,7 @@
 		26AFF77B1C34CE2B00AF9470 /* atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26AFF77A1C34CE2B00AF9470 /* atomic.cpp */; };
 		26B0AF851C13E08600CD8673 /* bitmap_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B0AF831C13E08600CD8673 /* bitmap_data.cpp */; };
 		26B0AF861C13E08600CD8673 /* bitmap_format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B0AF841C13E08600CD8673 /* bitmap_format.cpp */; };
+		26B5737F1D1051DF00304424 /* charset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B5737E1D1051DF00304424 /* charset.cpp */; };
 		26C70E9C1CA168EB005B1768 /* datagram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C70E9B1CA168EB005B1768 /* datagram.cpp */; };
 		26C7E37E1D00097000C0A769 /* linear_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C7E37D1D00097000C0A769 /* linear_view.cpp */; };
 		26CA8D791C23B4C90049A658 /* system_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26CA8D781C23B4C90049A658 /* system_apple.mm */; };
@@ -230,7 +231,7 @@
 		A2C8BE361AFA832800D584D1 /* thirdparty_libopus.c in Sources */ = {isa = PBXBuildFile; fileRef = A2C8BE2F1AFA832800D584D1 /* thirdparty_libopus.c */; settings = {COMPILER_FLAGS = "-O3 -Wno-conversion"; }; };
 		A2C8BE371AFA832800D584D1 /* thirdparty_libpng.c in Sources */ = {isa = PBXBuildFile; fileRef = A2C8BE301AFA832800D584D1 /* thirdparty_libpng.c */; settings = {COMPILER_FLAGS = "-O3"; }; };
 		A2C8BE381AFA832800D584D1 /* thirdparty_sqlite3.c in Sources */ = {isa = PBXBuildFile; fileRef = A2C8BE311AFA832800D584D1 /* thirdparty_sqlite3.c */; settings = {COMPILER_FLAGS = "-O3 -Wno-conversion"; }; };
-		A2C8BE391AFA832800D584D1 /* thirdparty_zlib.c in Sources */ = {isa = PBXBuildFile; fileRef = A2C8BE321AFA832800D584D1 /* thirdparty_zlib.c */; settings = {COMPILER_FLAGS = "-O3"; }; };
+		A2C8BE391AFA832800D584D1 /* thirdparty_zlib.c in Sources */ = {isa = PBXBuildFile; fileRef = A2C8BE321AFA832800D584D1 /* thirdparty_zlib.c */; settings = {COMPILER_FLAGS = "-O3 -w"; }; };
 		A2DE1D7F1B383B7900A74698 /* java.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2DE1D7E1B383B7900A74698 /* java.cpp */; };
 		A2DE1D871B383BA600A74698 /* pipe_unix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2DE1D841B383BA600A74698 /* pipe_unix.cpp */; };
 		A2DE1D891B383BA600A74698 /* pipe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2DE1D861B383BA600A74698 /* pipe.cpp */; };
@@ -416,6 +417,7 @@
 		26AFF77A1C34CE2B00AF9470 /* atomic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = atomic.cpp; sourceTree = "<group>"; };
 		26B0AF831C13E08600CD8673 /* bitmap_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_data.cpp; sourceTree = "<group>"; };
 		26B0AF841C13E08600CD8673 /* bitmap_format.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_format.cpp; sourceTree = "<group>"; };
+		26B5737E1D1051DF00304424 /* charset.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = charset.cpp; sourceTree = "<group>"; };
 		26C70E9B1CA168EB005B1768 /* datagram.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = datagram.cpp; sourceTree = "<group>"; };
 		26C7E37D1D00097000C0A769 /* linear_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = linear_view.cpp; sourceTree = "<group>"; };
 		26CA8D781C23B4C90049A658 /* system_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = system_apple.mm; sourceTree = "<group>"; };
@@ -751,6 +753,7 @@
 				A25F2FA41B03A33700854DAF /* base.cpp */,
 				A25F2FA51B03A33700854DAF /* base64.cpp */,
 				26599DBB1BEA5DDF008659BB /* callback.cpp */,
+				26B5737E1D1051DF00304424 /* charset.cpp */,
 				A234D6EA1B3F12A600ADDF4E /* content_type.cpp */,
 				A25F2FA61B03A33700854DAF /* event.cpp */,
 				A2DE1D8E1B383BC100A74698 /* event_unix.cpp */,
@@ -996,6 +999,7 @@
 				26D53C451BDF25090010BDA4 /* math.cpp in Sources */,
 				266DD4901C1193C400D47AB0 /* canvas.cpp in Sources */,
 				266DD5E51C11940A00D47AB0 /* web_view_osx.mm in Sources */,
+				26B5737F1D1051DF00304424 /* charset.cpp in Sources */,
 				26AE7BF41C98FD570026C2D9 /* line3.cpp in Sources */,
 				266DD5981C11940A00D47AB0 /* cursor_osx.mm in Sources */,
 				266DD5691C11940A00D47AB0 /* ip_address.cpp in Sources */,

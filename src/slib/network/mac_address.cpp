@@ -29,9 +29,7 @@ MacAddress::MacAddress(sl_uint8 m0, sl_uint8 m1, sl_uint8 m2, sl_uint8 m3, sl_ui
 
 MacAddress::MacAddress(const String& address)
 {
-	if (!parse(address)) {
-		setZero();
-	}
+	setString(address);
 }
 
 void MacAddress::setZero()
@@ -116,6 +114,16 @@ String MacAddress::toString(sl_char8 sep) const
 	return ret;
 }
 
+sl_bool MacAddress::setString(const String& str)
+{
+	if (parse(str)) {
+		return sl_true;
+	} else {
+		setZero();
+		return sl_false;
+	}
+}
+
 template <class CT>
 SLIB_INLINE sl_reg _MacAddress_parse(MacAddress* obj, const CT* sz, sl_size i, sl_size n, sl_char8 sep)
 {
@@ -175,7 +183,7 @@ SLIB_INLINE sl_reg _MacAddress_parse(MacAddress* obj, const CT* sz, sl_size i, s
 	return i;
 }
 
-sl_reg MacAddress::parse(MacAddress* out, const char* sz, sl_size posBegin, sl_size len, sl_char8 sep)
+sl_reg MacAddress::parse(MacAddress* out, const sl_char8* sz, sl_size posBegin, sl_size len, sl_char8 sep)
 {
 	return _MacAddress_parse(out, sz, posBegin, len, sep);
 }
@@ -198,9 +206,7 @@ MacAddress& MacAddress::operator=(const MacAddress& other) = default;
 
 MacAddress& MacAddress::operator=(const String& address)
 {
-	if (!parse(address)) {
-		setZero();
-	}
+	setString(address);
 	return *this;
 }
 

@@ -150,19 +150,33 @@ public:
 	
 	static Memory readAllBytes(const String& path);
 	
-	static String readUtf8Text(const String& path);
+	static String readAllTextUTF8(const String& path);
 	
+	static String16 readAllTextUTF16(const String& path, sl_bool flagBigEndian = sl_false);
+	
+	static String readAllText(const String& path, Charset* outCharset = sl_null);
+	
+	static String16 readAllText16(const String& path, Charset* outCharset = sl_null);
+
 	static sl_size writeAllBytes(const String& path, const void* buf, sl_size size);
 	
 	static sl_size writeAllBytes(const String& path, const Memory& mem);
 	
-	static sl_bool writeUtf8Text(const String& path, const String& text);
+	static sl_bool writeAllTextUTF8(const String& path, const String& text, sl_bool flagWriteByteOrderMark = sl_false);
+	
+	static sl_bool writeAllTextUTF16LE(const String& path, const String16& text, sl_bool flagWriteByteOrderMark = sl_false);
+	
+	static sl_bool writeAllTextUTF16BE(const String& path, const String16& text, sl_bool flagWriteByteOrderMark = sl_false);
 	
 	static sl_size appendAllBytes(const String& path, const void* buf, sl_size size);
 	
 	static sl_size appendAllBytes(const String& path, const Memory& mem);
 	
-	static sl_bool appendUtf8Text(const String& path, const String& text);
+	static sl_bool appendAllTextUTF8(const String& path, const String& text);
+	
+	static sl_bool appendAllTextUTF16LE(const String& path, const String16& text);
+	
+	static sl_bool appendAllTextUTF16BE(const String& path, const String16& text);
 	
 
 	static String getParentDirectoryPath(const String& path);

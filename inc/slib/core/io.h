@@ -104,12 +104,12 @@ public:
 	Memory readSection(sl_size maxLen = SLIB_SIZE_MAX);
 	
 	// maxLen means the maximum length of utf-8 string
-	sl_bool readString(String* output, sl_size maxLen = SLIB_SIZE_MAX);
+	sl_bool readStringSection(String* output, sl_size maxLen = SLIB_SIZE_MAX);
 	
 	// maxLen means the maximum length of utf-8 string
-	String readString(const String& def, sl_size maxLen = SLIB_SIZE_MAX);
+	String readStringSection(const String& def, sl_size maxLen = SLIB_SIZE_MAX);
 	
-	String readString(sl_size maxLen = SLIB_SIZE_MAX);
+	String readStringSection(sl_size maxLen = SLIB_SIZE_MAX);
 
 	sl_bool readBigInt(BigInt* v, sl_size maxLen = SLIB_SIZE_MAX);
 	
@@ -123,6 +123,14 @@ public:
 	
 	Time readTime(Time def);
 
+	String readTextUTF8(sl_size size);
+	
+	String16 readTextUTF16(sl_size size, sl_bool flagBigEndian = sl_false);
+	
+	String readText(sl_size size, Charset* outCharset = sl_null);
+	
+	String16 readText16(sl_size size, Charset* outCharset = sl_null);
+	
 };
 
 
@@ -176,12 +184,18 @@ public:
 	sl_bool writeSection(const Memory& mem);
 
 	// maxLen means the maximum length of utf-8 string
-	sl_bool writeString(const String& str, sl_size maxLen = SLIB_SIZE_MAX);
+	sl_bool writeStringSection(const String& str, sl_size maxLen = SLIB_SIZE_MAX);
 
 	sl_bool writeBigInt(const BigInt& v, sl_size maxLen = SLIB_SIZE_MAX);
 
 	sl_bool writeTime(const Time& t);
 
+	sl_bool writeTextUTF8(const String& text, sl_bool flagWriteByteOrderMark = sl_false);
+	
+	sl_bool writeTextUTF16LE(const String16& text, sl_bool flagWriteByteOrderMark = sl_false);
+	
+	sl_bool writeTextUTF16BE(const String16& text, sl_bool flagWriteByteOrderMark = sl_false);
+	
 };
 
 class SLIB_EXPORT IStream : public IReader, public IWriter

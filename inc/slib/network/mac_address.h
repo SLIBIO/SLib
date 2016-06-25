@@ -61,7 +61,9 @@ public:
 	// m0-m1-m2-m3-m4-m5, m0:m1:m2:m3:m4:m5
 	String toString(sl_char8 sep = '-') const;
 	
-	static sl_reg parse(MacAddress* out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX, sl_char8 sep = 0);
+	sl_bool setString(const String& address);
+	
+	static sl_reg parse(MacAddress* out, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX, sl_char8 sep = 0);
 	
 	static sl_reg parse(MacAddress* out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX, sl_char8 sep = 0);
 	

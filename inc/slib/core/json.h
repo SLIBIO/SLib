@@ -53,9 +53,9 @@ public:
 	static Variant parseJson16(const String16& json);
 	
 	
-	static Variant parseJsonFromUtf8TextFile(const String& filePath, JsonParseParam& param);
+	static Variant parseJsonFromTextFile(const String& filePath, JsonParseParam& param);
 	
-	static Variant parseJsonFromUtf8TextFile(const String& filePath);
+	static Variant parseJsonFromTextFile(const String& filePath);
 	
 	
 	static String toJson(const Variant& var);

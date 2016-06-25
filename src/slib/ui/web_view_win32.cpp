@@ -129,32 +129,32 @@ public:
 	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, void** ppvObject)
 	{
 		*ppvObject = NULL;
-		if (Base::compareMemory(&iid, &IID_IUnknown, sizeof(IID)) == 0) {
+		if (Base::equalsMemory(&iid, &IID_IUnknown, sizeof(IID))) {
 			*ppvObject = (IUnknown*)(IOleClientSite*)this;
 			AddRef();
 			return S_OK;
 		}
-		if (Base::compareMemory(&iid, &IID_IOleClientSite, sizeof(IID)) == 0) {
+		if (Base::equalsMemory(&iid, &IID_IOleClientSite, sizeof(IID))) {
 			*ppvObject = (IOleClientSite*)this;
 			AddRef();
 			return S_OK;
 		}
-		if (Base::compareMemory(&iid, &IID_IOleInPlaceSite, sizeof(IID)) == 0) {
+		if (Base::equalsMemory(&iid, &IID_IOleInPlaceSite, sizeof(IID))) {
 			*ppvObject = (IOleInPlaceSite*)this;
 			AddRef();
 			return S_OK;
 		}
-		if (Base::compareMemory(&iid, &IID_IDocHostUIHandler, sizeof(IID)) == 0) {
+		if (Base::equalsMemory(&iid, &IID_IDocHostUIHandler, sizeof(IID))) {
 			*ppvObject = (IDocHostUIHandler*)this;
 			AddRef();
 			return S_OK;
 		}
-		if (Base::compareMemory(&iid, &IID_IOleInPlaceFrame, sizeof(IID)) == 0) {
+		if (Base::equalsMemory(&iid, &IID_IOleInPlaceFrame, sizeof(IID))) {
 			*ppvObject = (IOleInPlaceFrame*)this;
 			AddRef();
 			return S_OK;
 		}
-		if (Base::compareMemory(&iid, &IID_IDispatch, sizeof(IID)) == 0) {
+		if (Base::equalsMemory(&iid, &IID_IDispatch, sizeof(IID))) {
 			*ppvObject = (IDispatch*)this;
 			AddRef();
 			return S_OK;
@@ -633,12 +633,12 @@ public:
 	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, void** ppvObject)
 	{
 		*ppvObject = NULL;
-		if (Base::compareMemory(&iid, &IID_IUnknown, sizeof(IID)) == 0) {
+		if (Base::equalsMemory(&iid, &IID_IUnknown, sizeof(IID))) {
 			*ppvObject = (IUnknown*)(IMoniker*)this;
 			AddRef();
 			return S_OK;
 		}
-		if (Base::compareMemory(&iid, &IID_IMoniker, sizeof(IID)) == 0) {
+		if (Base::equalsMemory(&iid, &IID_IMoniker, sizeof(IID))) {
 			*ppvObject = (IMoniker*)this;
 			AddRef();
 			return S_OK;
@@ -697,7 +697,7 @@ public:
 	HRESULT STDMETHODCALLTYPE BindToStorage(IBindCtx *pbc, IMoniker *pmkToLeft, REFIID riid, void **ppvObj)
 	{
 		*ppvObj = NULL;
-		if (Base::compareMemory(&riid, &IID_IStream, sizeof(IID)) == 0) {
+		if (Base::equalsMemory(&riid, &IID_IStream, sizeof(IID))) {
 			*ppvObj = m_stream;
 			m_stream->AddRef();
 		} else {

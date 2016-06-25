@@ -585,6 +585,10 @@ public:
 	
 	Country getCountry() const;
 	
+	sl_bool isValid() const;
+	
+	sl_bool isInvalid() const;
+
 	// ISO 3166-1 alpha-2
 	String getCountryCode() const;
 	
@@ -611,6 +615,8 @@ public:
 	// ISO 639-1
 	static String getLanguageCode(Language language);
 	
+	static sl_bool isValidLanguageCode(Language language);
+	
 	// Countries
 public:
 	static String getCountryName(Country country);
@@ -625,6 +631,8 @@ public:
 	
 	// ISO 3166-1 alpha-2
 	static String getCountryCode(Country country);
+	
+	static sl_bool isValidCountryCode(Country country);
 	
 };
 

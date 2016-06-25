@@ -178,7 +178,7 @@ void Service::runService()
 	}
 
 	String pidFileName = PID_FILE;
-	if (!File::writeUtf8Text(pidFileName, String::fromUint64(System::getProcessId()))) {
+	if (!File::writeAllTextUTF8(pidFileName, String::fromUint64(System::getProcessId()))) {
 		SLIB_LOG_ERROR(TAG, "FAILED to create PID file");
 		return;
 	}

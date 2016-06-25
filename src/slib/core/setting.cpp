@@ -11,7 +11,7 @@ void IniSetting::initialize()
 sl_bool IniSetting::parseFromUtf8TextFile(const String& filePath)
 {
 	if (File::exists(filePath)) {
-		String text = File::readUtf8Text(filePath);
+		String text = File::readAllText(filePath);
 		return parseFromText(text);
 	} else {
 		return sl_false;

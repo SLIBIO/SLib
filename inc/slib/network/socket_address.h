@@ -45,7 +45,9 @@ public:
 	*/
 	String toString() const;
 	
-	static sl_reg parse(SocketAddress* out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+	sl_bool setString(const String& str);
+	
+	static sl_reg parse(SocketAddress* out, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	static sl_reg parse(SocketAddress* out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
@@ -66,6 +68,8 @@ public:
 	
 public:
 	SocketAddress& operator=(const SocketAddress& other) = default;
+	
+	SocketAddress& operator=(const String& str);
 	
 	sl_bool operator==(const SocketAddress& other) const;
 	

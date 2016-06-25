@@ -29,6 +29,7 @@
     <ClInclude Include="..\..\..\inc\slib\core\base.h" />
     <ClInclude Include="..\..\..\inc\slib\core\base64.h" />
     <ClInclude Include="..\..\..\inc\slib\core\callback.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\charset.h" />
     <ClInclude Include="..\..\..\inc\slib\core\content_type.h" />
     <ClInclude Include="..\..\..\inc\slib\core\definition.h" />
     <ClInclude Include="..\..\..\inc\slib\core\endian.h" />
@@ -238,6 +239,7 @@
     <ClCompile Include="..\..\..\src\slib\core\base.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\base64.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\callback.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\charset.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\content_type.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\event.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\event_win32.cpp" />

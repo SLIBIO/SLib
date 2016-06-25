@@ -145,7 +145,7 @@ typedef sl_uint32			sl_char32;
 #endif
 
 SLIB_INLINE void sl_blank_proc(const void*) {}
-#define SLIB_UNUSED(x) sl_blank_proc(&x)
+#define SLIB_UNUSED(x) sl_blank_proc(&x);
 
 #define SLIB_PARSE_ERROR (sl_reg)(-1)
 

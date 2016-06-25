@@ -26,7 +26,8 @@ Ref<MobileGame> MobileGame::getApp()
 
 Ref<MobileGameView> MobileGame::getGameView()
 {
-	if (this) {
+	void* _thiz = this;
+	if (_thiz) {
 		return m_gameView;
 	}
 	return Ref<MobileGameView>::null();

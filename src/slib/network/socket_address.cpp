@@ -37,7 +37,7 @@ SocketAddress::SocketAddress(const IPAddress& _ip, sl_int32 _port) : ip(_ip), po
 
 SocketAddress::SocketAddress(const String& str)
 {
-	parse(str);
+	setString(str);
 }
 
 void SocketAddress::setNone()
@@ -88,7 +88,17 @@ String SocketAddress::toString() const
 	}
 }
 
-template <class CT>
+sl_bool SocketAddress::setString(const String& str)
+{
+	if (parse(str)) {
+		return sl_true;
+	} else {
+		setNone();
+		return sl_false;
+	}
+}
+
+template <class CT, class ST>
 SLIB_INLINE sl_reg _SocketAddress_parse(SocketAddress* obj, const CT* sz, sl_size pos, sl_size len)
 {
 	if (pos >= len) {
@@ -123,7 +133,7 @@ SLIB_INLINE sl_reg _SocketAddress_parse(SocketAddress* obj, const CT* sz, sl_siz
 	}
 	pos++;
 	sl_uint32 port;
-	pos = String::parseUint32(10, &port, sz, pos, len);
+	pos = ST::parseUint32(10, &port, sz, pos, len);
 	if (pos == SLIB_PARSE_ERROR) {
 		return SLIB_PARSE_ERROR;
 	}
@@ -134,14 +144,14 @@ SLIB_INLINE sl_reg _SocketAddress_parse(SocketAddress* obj, const CT* sz, sl_siz
 	return pos;
 }
 
-sl_reg SocketAddress::parse(SocketAddress* out, const char* sz, sl_size posBegin, sl_size len)
+sl_reg SocketAddress::parse(SocketAddress* out, const sl_char8* sz, sl_size posBegin, sl_size len)
 {
-	return _SocketAddress_parse(out, sz, posBegin, len);
+	return _SocketAddress_parse<sl_char8, String8>(out, sz, posBegin, len);
 }
 
 sl_reg SocketAddress::parse(SocketAddress* out, const sl_char16* sz, sl_size posBegin, sl_size len)
 {
-	return _SocketAddress_parse(out, sz, posBegin, len);
+	return _SocketAddress_parse<sl_char16, String16>(out, sz, posBegin, len);
 }
 
 sl_bool SocketAddress::parse(const String& s, SocketAddress* out)
@@ -150,7 +160,7 @@ sl_bool SocketAddress::parse(const String& s, SocketAddress* out)
 	if (n == 0) {
 		return sl_false;
 	}
-	return _SocketAddress_parse(out, s.getData(), 0, n) == n;
+	return _SocketAddress_parse<sl_char8, String8>(out, s.getData(), 0, n) == n;
 }
 
 sl_bool SocketAddress::parse(const String& s)
@@ -159,7 +169,7 @@ sl_bool SocketAddress::parse(const String& s)
 	if (n == 0) {
 		return sl_false;
 	}
-	return _SocketAddress_parse(this, s.getData(), 0, n) == n;
+	return _SocketAddress_parse<sl_char8, String8>(this, s.getData(), 0, n) == n;
 }
 
 sl_uint32 SocketAddress::getSystemSocketAddress(void* addr)
@@ -261,6 +271,12 @@ sl_bool SocketAddress::parseIPv4Range(const String& str, IPv4Address* _from, IPv
 sl_bool SocketAddress::parsePortRange(const String& str, sl_uint32* from, sl_uint32* to)
 {
 	return SettingUtil::parseUint32Range(str, from, to);
+}
+
+SocketAddress& SocketAddress::operator=(const String& str)
+{
+	setString(str);
+	return *this;
 }
 
 sl_bool SocketAddress::operator==(const SocketAddress& other) const

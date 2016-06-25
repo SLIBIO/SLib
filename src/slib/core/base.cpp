@@ -96,33 +96,289 @@ void Base::resetMemory(void* dst, sl_uint8 value, sl_size count)
 	}
 }
 
-void Base::resetMemory2(void* dst, sl_uint16 value, sl_size count)
+void Base::resetMemory2(sl_uint16* dst, sl_uint16 value, sl_size count)
 {
-	sl_uint16* d = (sl_uint16*)dst;
 	for (sl_size i = 0; i < count; i++) {
-		d[i] = value;
+		dst[i] = value;
 	}
 }
 
-void Base::resetMemory4(void* dst, sl_uint32 value, sl_size count)
+void Base::resetMemory2(sl_int16* dst, sl_int16 value, sl_size count)
 {
-	sl_uint32* d = (sl_uint32*)dst;
 	for (sl_size i = 0; i < count; i++) {
-		d[i] = value;
+		dst[i] = value;
 	}
 }
 
-void Base::resetMemory8(void* dst, sl_uint64 value, sl_size count)
+void Base::resetMemory4(sl_uint32* dst, sl_uint32 value, sl_size count)
 {
-	sl_uint64* d = (sl_uint64*)dst;
 	for (sl_size i = 0; i < count; i++) {
-		d[i] = value;
+		dst[i] = value;
 	}
 }
 
-sl_int32 Base::compareZero(const void* mem, sl_size count)
+void Base::resetMemory4(sl_int32* dst, sl_int32 value, sl_size count)
 {
-	sl_uint8* m = (sl_uint8*)mem;
+	for (sl_size i = 0; i < count; i++) {
+		dst[i] = value;
+	}
+}
+
+void Base::resetMemory8(sl_uint64* dst, sl_uint64 value, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		dst[i] = value;
+	}
+}
+
+void Base::resetMemory8(sl_int64* dst, sl_int64 value, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		dst[i] = value;
+	}
+}
+
+sl_bool Base::equalsMemory(const void* _m1, const void* _m2, sl_size count)
+{
+	sl_uint8* m1 = (sl_uint8*)_m1;
+	sl_uint8* m2 = (sl_uint8*)_m2;
+	for (sl_size i = 0; i < count; i++) {
+		if (m1[i] != m2[i]) {
+			return sl_false;
+		}
+	}
+	return sl_true;
+}
+
+sl_bool Base::equalsMemory2(const sl_uint16* m1, const sl_uint16* m2, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m1[i] != m2[i]) {
+			return sl_false;
+		}
+	}
+	return sl_true;
+}
+
+sl_bool Base::equalsMemory2(const sl_int16* m1, const sl_int16* m2, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m1[i] != m2[i]) {
+			return sl_false;
+		}
+	}
+	return sl_true;
+}
+
+sl_bool Base::equalsMemory4(const sl_uint32* m1, const sl_uint32* m2, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m1[i] != m2[i]) {
+			return sl_false;
+		}
+	}
+	return sl_true;
+}
+
+sl_bool Base::equalsMemory4(const sl_int32* m1, const sl_int32* m2, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m1[i] != m2[i]) {
+			return sl_false;
+		}
+	}
+	return sl_true;
+}
+
+sl_bool Base::equalsMemory8(const sl_uint64* m1, const sl_uint64* m2, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m1[i] != m2[i]) {
+			return sl_false;
+		}
+	}
+	return sl_true;
+}
+
+sl_bool Base::equalsMemory8(const sl_int64* m1, const sl_int64* m2, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m1[i] != m2[i]) {
+			return sl_false;
+		}
+	}
+	return sl_true;
+}
+
+sl_int32 Base::compareMemory(const sl_uint8* m1, const sl_uint8* m2, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m1[i] < m2[i]) {
+			return -1;
+		} else if (m1[i] > m2[i]) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+sl_int32 Base::compareMemory(const sl_int8* m1, const sl_int8* m2, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m1[i] < m2[i]) {
+			return -1;
+		} else if (m1[i] > m2[i]) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+sl_int32 Base::compareMemory2(const sl_uint16* m1, const sl_uint16* m2, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m1[i] < m2[i]) {
+			return -1;
+		} else if (m1[i] > m2[i]) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+sl_int32 Base::compareMemory2(const sl_int16* m1, const sl_int16* m2, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m1[i] < m2[i]) {
+			return -1;
+		} else if (m1[i] > m2[i]) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+sl_int32 Base::compareMemory4(const sl_uint32* m1, const sl_uint32* m2, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m1[i] < m2[i]) {
+			return -1;
+		} else if (m1[i] > m2[i]) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+sl_int32 Base::compareMemory4(const sl_int32* m1, const sl_int32* m2, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m1[i] < m2[i]) {
+			return -1;
+		} else if (m1[i] > m2[i]) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+sl_int32 Base::compareMemory8(const sl_uint64* m1, const sl_uint64* m2, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m1[i] < m2[i]) {
+			return -1;
+		} else if (m1[i] > m2[i]) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+sl_int32 Base::compareMemory8(const sl_int64* m1, const sl_int64* m2, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m1[i] < m2[i]) {
+			return -1;
+		} else if (m1[i] > m2[i]) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+sl_bool Base::equalsMemoryZero(const void* _m, sl_size count)
+{
+	sl_uint8* m = (sl_uint8*)_m;
+	for (sl_size i = 0; i < count; i++) {
+		if (m[i]) {
+			return sl_false;
+		}
+	}
+	return sl_true;
+}
+
+sl_bool Base::equalsMemoryZero2(const sl_uint16* m, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m[i]) {
+			return sl_false;
+		}
+	}
+	return sl_true;
+}
+
+sl_bool Base::equalsMemoryZero2(const sl_int16* m, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m[i]) {
+			return sl_false;
+		}
+	}
+	return sl_true;
+}
+
+sl_bool Base::equalsMemoryZero4(const sl_uint32* m, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m[i]) {
+			return sl_false;
+		}
+	}
+	return sl_true;
+}
+
+sl_bool Base::equalsMemoryZero4(const sl_int32* m, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m[i]) {
+			return sl_false;
+		}
+	}
+	return sl_true;
+}
+
+sl_bool Base::equalsMemoryZero8(const sl_uint64* m, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m[i]) {
+			return sl_false;
+		}
+	}
+	return sl_true;
+}
+
+sl_bool Base::equalsMemoryZero8(const sl_int64* m, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m[i]) {
+			return sl_false;
+		}
+	}
+	return sl_true;
+}
+
+sl_int32 Base::compareMemoryZero(const sl_uint8* m, sl_size count)
+{
 	for (sl_size i = 0; i < count; i++) {
 		if (m[i]) {
 			return 1;
@@ -131,63 +387,97 @@ sl_int32 Base::compareZero(const void* mem, sl_size count)
 	return 0;
 }
 
-sl_int32 Base::compareMemory(const void* mem1, const void* mem2, sl_size count)
+sl_int32 Base::compareMemoryZero(const sl_int8* m, sl_size count)
 {
-	sl_uint8* m1 = (sl_uint8*)mem1;
-	sl_uint8* m2 = (sl_uint8*)mem2;
 	for (sl_size i = 0; i < count; i++) {
-		if (m1[i] < m2[i]) {
-			return -1;
-		} else if (m1[i] > m2[i]) {
+		sl_int8 v = m[i];
+		if (v) {
+			if (v < 0) {
+				return -1;
+			} else {
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
+sl_int32 Base::compareMemoryZero2(const sl_uint16* m, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m[i]) {
 			return 1;
 		}
 	}
 	return 0;
 }
 
-sl_int32 Base::compareMemory2(const void* mem1, const void* mem2, sl_size count)
+sl_int32 Base::compareMemoryZero2(const sl_int16* m, sl_size count)
 {
-	sl_uint16* m1 = (sl_uint16*)mem1;
-	sl_uint16* m2 = (sl_uint16*)mem2;
 	for (sl_size i = 0; i < count; i++) {
-		if (m1[i] < m2[i]) {
-			return -1;
-		} else if (m1[i] > m2[i]) {
+		sl_int16 v = m[i];
+		if (v) {
+			if (v < 0) {
+				return -1;
+			} else {
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
+sl_int32 Base::compareMemoryZero4(const sl_uint32* m, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m[i]) {
 			return 1;
 		}
 	}
 	return 0;
 }
 
-sl_int32 Base::compareMemory4(const void* mem1, const void* mem2, sl_size count)
+sl_int32 Base::compareMemoryZero4(const sl_int32* m, sl_size count)
 {
-	sl_uint32* m1 = (sl_uint32*)mem1;
-	sl_uint32* m2 = (sl_uint32*)mem2;
 	for (sl_size i = 0; i < count; i++) {
-		if (m1[i] < m2[i]) {
-			return -1;
-		} else if (m1[i] > m2[i]) {
+		sl_int32 v = m[i];
+		if (v) {
+			if (v < 0) {
+				return -1;
+			} else {
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
+sl_int32 Base::compareMemoryZero8(const sl_uint64* m, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m[i]) {
 			return 1;
 		}
 	}
 	return 0;
 }
 
-sl_int32 Base::compareMemory8(const void* mem1, const void* mem2, sl_size count)
+sl_int32 Base::compareMemoryZero8(const sl_int64* m, sl_size count)
 {
-	sl_uint64* m1 = (sl_uint64*)mem1;
-	sl_uint64* m2 = (sl_uint64*)mem2;
 	for (sl_size i = 0; i < count; i++) {
-		if (m1[i] < m2[i]) {
-			return -1;
-		} else if (m1[i] > m2[i]) {
-			return 1;
+		sl_int64 v = m[i];
+		if (v) {
+			if (v < 0) {
+				return -1;
+			} else {
+				return 1;
+			}
 		}
 	}
 	return 0;
 }
 
-const void* Base::findMemory(const void* mem, sl_uint8 pattern, sl_size count)
+const sl_uint8* Base::findMemory(const void* mem, sl_uint8 pattern, sl_size count)
 {
 	sl_uint8* m = (sl_uint8*)mem;
 	for (sl_size i = 0; i < count; i++) {
@@ -198,7 +488,150 @@ const void* Base::findMemory(const void* mem, sl_uint8 pattern, sl_size count)
 	return sl_null;
 }
 
-const void* Base::findMemoryUntilZero(const void* mem, sl_uint8 pattern, sl_size count)
+const sl_int8* Base::findMemory(const sl_int8* m, sl_int8 pattern, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m[i] == pattern) {
+			return m + i;
+		}
+	}
+	return sl_null;
+}
+
+const sl_uint16* Base::findMemory2(const sl_uint16* m, sl_uint16 pattern, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m[i] == pattern) {
+			return m + i;
+		}
+	}
+	return sl_null;
+}
+
+const sl_int16* Base::findMemory2(const sl_int16* m, sl_int16 pattern, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m[i] == pattern) {
+			return m + i;
+		}
+	}
+	return sl_null;
+}
+
+const sl_uint32* Base::findMemory4(const sl_uint32* m, sl_uint32 pattern, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m[i] == pattern) {
+			return m + i;
+		}
+	}
+	return sl_null;
+}
+
+const sl_int32* Base::findMemory4(const sl_int32* m, sl_int32 pattern, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m[i] == pattern) {
+			return m + i;
+		}
+	}
+	return sl_null;
+}
+
+const sl_uint64* Base::findMemory8(const sl_uint64* m, sl_uint64 pattern, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m[i] == pattern) {
+			return m + i;
+		}
+	}
+	return sl_null;
+}
+
+const sl_int64* Base::findMemory8(const sl_int64* m, sl_int64 pattern, sl_size count)
+{
+	for (sl_size i = 0; i < count; i++) {
+		if (m[i] == pattern) {
+			return m + i;
+		}
+	}
+	return sl_null;
+}
+
+const sl_uint8* Base::findMemoryReverse(const void* mem, sl_uint8 pattern, sl_size count)
+{
+	sl_uint8* m = (sl_uint8*)mem;
+	for (sl_reg i = count - 1; i >= 0; i--) {
+		if (m[i] == pattern) {
+			return m + i;
+		}
+	}
+	return sl_null;
+}
+
+const sl_uint16* Base::findMemoryReverse2(const sl_uint16* m, sl_uint16 pattern, sl_size count)
+{
+	for (sl_reg i = count - 1; i >= 0; i--) {
+		if (m[i] == pattern) {
+			return m + i;
+		}
+	}
+	return sl_null;
+}
+
+const sl_int16* Base::findMemoryReverse2(const sl_int16* m, sl_int16 pattern, sl_size count)
+{
+	for (sl_reg i = count - 1; i >= 0; i--) {
+		if (m[i] == pattern) {
+			return m + i;
+		}
+	}
+	return sl_null;
+}
+
+const sl_uint32* Base::findMemoryReverse4(const sl_uint32* m, sl_uint32 pattern, sl_size count)
+{
+	for (sl_reg i = count - 1; i >= 0; i--) {
+		if (m[i] == pattern) {
+			return m + i;
+		}
+	}
+	return sl_null;
+}
+
+const sl_int32* Base::findMemoryReverse4(const sl_int32* m, sl_int32 pattern, sl_size count)
+{
+	for (sl_reg i = count - 1; i >= 0; i--) {
+		if (m[i] == pattern) {
+			return m + i;
+		}
+	}
+	return sl_null;
+}
+
+const sl_uint64* Base::findMemoryReverse8(const sl_uint64* mem, sl_uint64 pattern, sl_size count)
+{
+	sl_uint64* m = (sl_uint64*)mem;
+	for (sl_reg i = count - 1; i >= 0; i--) {
+		if (m[i] == pattern) {
+			return m + i;
+		}
+	}
+	return sl_null;
+}
+
+const sl_int64* Base::findMemoryReverse8(const sl_int64* mem, sl_int64 pattern, sl_size count)
+{
+	sl_int64* m = (sl_int64*)mem;
+	for (sl_reg i = count - 1; i >= 0; i--) {
+		if (m[i] == pattern) {
+			return m + i;
+		}
+	}
+	return sl_null;
+}
+
+const sl_uint8* Base::findMemoryUntilZero(const void* mem, sl_uint8 pattern, sl_size count)
 {
 	sl_uint8* m = (sl_uint8*)mem;
 	for (sl_size i = 0; i < count; i++) {
@@ -212,204 +645,200 @@ const void* Base::findMemoryUntilZero(const void* mem, sl_uint8 pattern, sl_size
 	return sl_null;
 }
 
-const void* Base::findMemory2(const void* mem, sl_uint16 pattern, sl_size count)
+#define STRING_LENGTH_LIMIT 0x1000000
+
+sl_bool Base::equalsString(const sl_char8 *s1, const sl_char8 *s2, sl_reg count)
 {
-	sl_uint16* m = (sl_uint16*)mem;
-	for (sl_size i = 0; i < count; i++) {
-		if (m[i] == pattern) {
-			return m + i;
+	if (count < 0) {
+		count = STRING_LENGTH_LIMIT;
+	}
+	for (sl_reg i = 0; i < count; i++) {
+		if (s1[i] != s2[i]) {
+			return sl_false;
+		}
+		if (s1[i] == 0) {
+			break;
 		}
 	}
-	return sl_null;
+	return sl_true;
 }
 
-const void* Base::findMemory4(const void* mem, sl_uint32 pattern, sl_size count)
+sl_bool Base::equalsString2(const sl_char16 *s1, const sl_char16 *s2, sl_reg count)
 {
-	sl_uint32* m = (sl_uint32*)mem;
-	for (sl_size i = 0; i < count; i++) {
-		if (m[i] == pattern) {
-			return m + i;
+	if (count < 0) {
+		count = STRING_LENGTH_LIMIT;
+	}
+	for (sl_reg i = 0; i < count; i++) {
+		if (s1[i] != s2[i]) {
+			return sl_false;
+		}
+		if (s1[i] == 0) {
+			break;
 		}
 	}
-	return sl_null;
+	return sl_true;
 }
 
-const void* Base::findMemory8(const void* mem, sl_uint64 pattern, sl_size count)
+sl_bool Base::equalsString4(const sl_char32 *s1, const sl_char32 *s2, sl_reg count)
 {
-	sl_uint64* m = (sl_uint64*)mem;
-	for (sl_size i = 0; i < count; i++) {
-		if (m[i] == pattern) {
-			return m + i;
+	if (count < 0) {
+		count = STRING_LENGTH_LIMIT;
+	}
+	for (sl_reg i = 0; i < count; i++) {
+		if (s1[i] != s2[i]) {
+			return sl_false;
+		}
+		if (s1[i] == 0) {
+			break;
 		}
 	}
-	return sl_null;
+	return sl_true;
 }
 
-const void* Base::findMemoryReverse(const void* mem, sl_uint8 pattern, sl_size count)
-{
-	sl_uint8* m = (sl_uint8*)mem;
-	for (sl_reg i = count - 1; i >= 0; i--) {
-		if (m[i] == pattern) {
-			return m + i;
-		}
-	}
-	return sl_null;
-}
-
-const void* Base::findMemoryReverse2(const void* mem, sl_uint16 pattern, sl_size count)
-{
-	sl_uint16* m = (sl_uint16*)mem;
-	for (sl_reg i = count - 1; i >= 0; i--) {
-		if (m[i] == pattern) {
-			return m + i;
-		}
-	}
-	return sl_null;
-}
-
-const void* Base::findMemoryReverse4(const void* mem, sl_uint32 pattern, sl_size count)
-{
-	sl_uint32* m = (sl_uint32*)mem;
-	for (sl_reg i = count - 1; i >= 0; i--) {
-		if (m[i] == pattern) {
-			return m + i;
-		}
-	}
-	return sl_null;
-}
-
-const void* Base::findMemoryReverse8(const void* mem, sl_uint64 pattern, sl_size count)
-{
-	sl_uint64* m = (sl_uint64*)mem;
-	for (sl_reg i = count - 1; i >= 0; i--) {
-		if (m[i] == pattern) {
-			return m + i;
-		}
-	}
-	return sl_null;
-}
-
-sl_int32 Base::compareString(const void *s1, const void *s2, sl_size limitCount)
+sl_int32 Base::compareString(const sl_char8 *s1, const sl_char8 *s2, sl_reg count)
 {
 	const sl_uint8* m1 = (const sl_uint8*)s1;
 	const sl_uint8* m2 = (const sl_uint8*)s2;
-	for (sl_size i = 0; i < limitCount; i++) {
+	if (count < 0) {
+		count = STRING_LENGTH_LIMIT;
+	}
+	for (sl_reg i = 0; i < count; i++) {
 		if (m1[i] < m2[i]) {
 			return -1;
 		} else if (m1[i] > m2[i]) {
 			return 1;
 		}
 		if (m1[i] == 0) {
-			return 0;
+			break;
 		}
 	}
 	return 0;
 }
 
-sl_int32 Base::compareString2(const void *s1, const void *s2, sl_size limitCount)
+sl_int32 Base::compareString2(const sl_char16 *s1, const sl_char16 *s2, sl_reg count)
 {
-	const sl_uint16* m1 = (const sl_uint16*)s1;
-	const sl_uint16* m2 = (const sl_uint16*)s2;
-	for (sl_size i = 0; i < limitCount; i++) {
-		if (m1[i] < m2[i]) {
+	if (count < 0) {
+		count = STRING_LENGTH_LIMIT;
+	}
+	for (sl_reg i = 0; i < count; i++) {
+		if (s1[i] < s2[i]) {
 			return -1;
-		} else if (m1[i] > m2[i]) {
+		} else if (s1[i] > s2[i]) {
 			return 1;
 		}
-		if (m1[i] == 0) {
-			return 0;
+		if (s1[i] == 0) {
+			break;
 		}
 	}
 	return 0;
 }
 
-sl_int32 Base::compareString4(const void *s1, const void *s2, sl_size limitCount)
+sl_int32 Base::compareString4(const sl_char32 *s1, const sl_char32 *s2, sl_reg count)
 {
-	const sl_uint32* m1 = (const sl_uint32*)s1;
-	const sl_uint32* m2 = (const sl_uint32*)s2;
-	for (sl_size i = 0; i < limitCount; i++) {
-		if (m1[i] < m2[i]) {
+	if (count < 0) {
+		count = STRING_LENGTH_LIMIT;
+	}
+	for (sl_reg i = 0; i < count; i++) {
+		if (s1[i] < s2[i]) {
 			return -1;
-		} else if (m1[i] > m2[i]) {
+		} else if (s1[i] > s2[i]) {
 			return 1;
 		}
-		if (m1[i] == 0) {
-			return 0;
+		if (s1[i] == 0) {
+			break;
 		}
 	}
 	return 0;
 }
 
-sl_size Base::copyString(void* dst, const void* src, sl_size limitCount)
+sl_size Base::copyString(sl_char8* dst, const sl_char8* src, sl_reg count)
 {
-	sl_uint8* d = (sl_uint8*)dst;
-	const sl_uint8* s = (const sl_uint8*)src;
-	for (sl_size i = 0; i < limitCount; i++) {
-		d[i] = s[i];
-		if (d[i] == 0) {
+	if (count < 0) {
+		count = STRING_LENGTH_LIMIT;
+	}
+	for (sl_reg i = 0; i < count; i++) {
+		dst[i] = src[i];
+		if (dst[i] == 0) {
 			return i + 1;
 		}
 	}
-	return limitCount;
+	return count;
 }
 
-sl_size Base::copyString2(void* dst, const void* src, sl_size limitCount)
+sl_size Base::copyString2(sl_char16* dst, const sl_char16* src, sl_reg count)
 {
-	sl_uint16* d = (sl_uint16*)dst;
-	const sl_uint16* s = (const sl_uint16*)src;
-	for (sl_size i = 0; i < limitCount; i++) {
-		d[i] = s[i];
-		if (d[i] == 0) {
+	if (count < 0) {
+		count = STRING_LENGTH_LIMIT;
+	}
+	for (sl_reg i = 0; i < count; i++) {
+		dst[i] = src[i];
+		if (dst[i] == 0) {
 			return i + 1;
 		}
 	}
-	return limitCount;
+	return count;
 }
 
-sl_size Base::copyString4(void* dst, const void* src, sl_size limitCount)
+sl_size Base::copyString4(sl_char32* dst, const sl_char32* src, sl_reg count)
 {
-	sl_uint32* d = (sl_uint32*)dst;
-	const sl_uint32* s = (const sl_uint32*)src;
-	for (sl_size i = 0; i < limitCount; i++) {
-		d[i] = s[i];
-		if (d[i] == 0) {
+	if (count < 0) {
+		count = STRING_LENGTH_LIMIT;
+	}
+	for (sl_reg i = 0; i < count; i++) {
+		dst[i] = src[i];
+		if (dst[i] == 0) {
 			return i + 1;
 		}
 	}
-	return limitCount;
+	return count;
 }
 
-sl_size Base::getStringLength(const void* sz, sl_size limitCount)
+sl_size Base::getStringLength(const sl_char8* sz, sl_reg count)
 {
-	const sl_uint8* s = (const sl_uint8*)sz;
-	for (sl_size i = 0; i < limitCount; i++) {
-		if (s[i] == 0) {
+	if (count == 0) {
+		return 0;
+	}
+	if (count < 0) {
+		count = STRING_LENGTH_LIMIT;
+	}
+	for (sl_reg i = 0; i < count; i++) {
+		if (sz[i] == 0) {
 			return i;
 		}
 	}
-	return 0;
+	return count;
 }
 
-sl_size Base::getStringLength2(const void* sz, sl_size limitCount)
+sl_size Base::getStringLength2(const sl_char16* sz, sl_reg count)
 {
-	const sl_uint16* s = (const sl_uint16*)sz;
-	for (sl_size i = 0; i < limitCount; i++) {
-		if (s[i] == 0) {
+	if (count == 0) {
+		return 0;
+	}
+	if (count < 0) {
+		count = STRING_LENGTH_LIMIT;
+	}
+	for (sl_reg i = 0; i < count; i++) {
+		if (sz[i] == 0) {
 			return i;
 		}
 	}
-	return 0;
+	return count;
 }
 
-sl_size Base::getStringLength4(const void* sz, sl_size limitCount)
+sl_size Base::getStringLength4(const sl_char32* sz, sl_reg count)
 {
-	const sl_uint32* s = (const sl_uint32*)sz;
-	for (sl_size i = 0; i < limitCount; i++) {
-		if (s[i] == 0) {
+	if (count == 0) {
+		return 0;
+	}
+	if (count < 0) {
+		count = STRING_LENGTH_LIMIT;
+	}
+	for (sl_reg i = 0; i < count; i++) {
+		if (sz[i] == 0) {
 			return i;
 		}
 	}
-	return 0;
+	return count;
 }
 
 sl_int32 Base::interlockedIncrement32(sl_int32* pValue)

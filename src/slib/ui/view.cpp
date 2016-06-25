@@ -573,7 +573,6 @@ Rectangle View::getInstanceFrame()
 void View::_setFrame(const Rectangle& _frame, sl_bool flagRedraw, sl_bool flagLayouting)
 {
 	Rectangle frameOld = m_frame;
-	Size sizeOld = frameOld.getSize();
 	Rectangle frame = _frame;
 	if (frame.right < frame.left) {
 		frame.right = frame.left;
@@ -852,10 +851,10 @@ sl_bool View::hitTest(sl_real x, sl_real y)
 	Rectangle rc(0, 0, getWidth(), getHeight());
 	switch (getBoundShape()) {
 		case BoundShape::RoundRect:
-			GraphicsPath::containsPointInRoundRect(Point(x, y), rc, getRoundRectBoundShapeRadius());
-			break;
+			return GraphicsPath::containsPointInRoundRect(Point(x, y), rc, getRoundRectBoundShapeRadius());
 		case BoundShape::Ellipse:
-			GraphicsPath::containsPointInEllipse(Point(x, y), rc);
+			return GraphicsPath::containsPointInEllipse(Point(x, y), rc);
+		default:
 			break;
 	}
 	return rc.containsPoint(x, y);
@@ -5054,7 +5053,6 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 	}
 	sl_real lineX = getWidth() / 20;
 	sl_real lineY = getHeight() / 20;
-	sl_real value = scroll->y;
 	UIAction action = ev->getAction();
 	switch (action) {
 		case UIAction::LeftButtonDown:
@@ -5136,6 +5134,8 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 					ev->stopPropagation();
 				}
 			}
+			break;
+		default:
 			break;
 	}
 }

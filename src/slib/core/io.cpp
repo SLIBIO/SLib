@@ -513,7 +513,7 @@ Memory IReader::readSection(sl_size maxSize)
 	return Memory::null();
 }
 
-sl_bool IReader::readString(String* str, sl_size maxLen)
+sl_bool IReader::readStringSection(String* str, sl_size maxLen)
 {
 	Memory mem;
 	if (readSection(&mem, maxLen)) {
@@ -531,20 +531,20 @@ sl_bool IReader::readString(String* str, sl_size maxLen)
 	return sl_false;
 }
 
-String IReader::readString(const String& def, sl_size maxLen)
+String IReader::readStringSection(const String& def, sl_size maxLen)
 {
 	String ret;
-	if (readString(&ret, maxLen)) {
+	if (readStringSection(&ret, maxLen)) {
 		return ret;
 	} else {
 		return def;
 	}
 }
 
-String IReader::readString(sl_size maxLen)
+String IReader::readStringSection(sl_size maxLen)
 {
 	String ret;
-	if (readString(&ret, maxLen)) {
+	if (readStringSection(&ret, maxLen)) {
 		return ret;
 	} else {
 		return String::null();
@@ -617,6 +617,270 @@ Time IReader::readTime(Time def)
 	} else {
 		return def;
 	}
+}
+
+String IReader::readTextUTF8(sl_size size)
+{
+	if (size == 0) {
+		return String::getEmpty();
+	}
+	sl_char8 sbuf[3];
+	if (size >= 3) {
+		if (read(sbuf, 3) == 3) {
+			if ((sl_uint8)(sbuf[0]) == 0xEF && (sl_uint8)(sbuf[1]) == 0xBB && (sl_uint8)(sbuf[2]) == 0xBF) {
+				size -= 3;
+				if (size == 0) {
+					return String::getEmpty();
+				}
+				String ret = String8::allocate(size);
+				if (ret.isNotNull()) {
+					if (read(ret.getData(), size) == size) {
+						return ret;
+					}
+				}
+			} else {
+				String ret = String8::allocate(size);
+				if (ret.isNotNull()) {
+					sl_char8* buf = ret.getData();
+					Base::copyMemory(buf, sbuf, 3);
+					if (size == 3) {
+						return ret;
+					}
+					size -= 3;
+					if (read(buf+3, size) == size) {
+						return ret;
+					}
+				}
+			}
+		}
+	} else {
+		String ret = String8::allocate(size);
+		if (ret.isNotNull()) {
+			if (read(ret.getData(), size) == size) {
+				return ret;
+			}
+		}
+	}
+	return String::null();
+}
+
+String16 IReader::readTextUTF16(sl_size size, sl_bool flagBigEndian)
+{
+	if (size == 0) {
+		return String16::getEmpty();
+	}
+	sl_size len = (size >> 1) + (size & 1);
+	sl_uint16 first;
+	if (readUint16(&first, flagBigEndian)) {
+		len--;
+		// check BOM(Byte Order Mark = U+FEFF)
+		String16 str;
+		sl_char16* buf;
+		if (first == 0xFEFF) {
+			if (len == 0) {
+				return String16::getEmpty();
+			}
+			str = String16::allocate(len);
+			if (str.isNull()) {
+				return str;
+			}
+			buf = str.getData();
+		} else {
+			str = String16::allocate(len + 1);
+			if (str.isNull()) {
+				return str;
+			}
+			buf = str.getData();
+			*buf = first;
+			buf++;
+		}
+		if (len == 0) {
+			return str;
+		}
+		buf[len - 1] = 0;
+		if (read(buf, size) == size) {
+			if ((flagBigEndian && Endian::isLE()) || (!flagBigEndian && Endian::isBE())) {
+				for (sl_size i = 0; i < len; i++) {
+					sl_uint16 c = (sl_uint16)(buf[i]);
+					buf[i] = (sl_char16)((c >> 8) | (c << 8));
+				}
+			}
+			return str;
+		}
+	}
+	return String16::null();
+}
+
+String IReader::readText(sl_size size, Charset* outCharset)
+{
+	if (size == 0) {
+		if (outCharset) {
+			*outCharset = Charset::UTF8;
+		}
+		return String::getEmpty();
+	}
+	sl_char8 sbuf[3];
+	if (size >= 2) {
+		if (read(sbuf, 2) == 2) {
+			if (size % 2 == 0) {
+				sl_bool flagUTF16LE = sbuf[0] == (sl_char8)0xFF && sbuf[1] == (sl_char8)0xFE;
+				sl_bool flagUTF16BE = sbuf[0] == (sl_char8)0xFE && sbuf[1] == (sl_char8)0xFF;
+				if (flagUTF16LE || flagUTF16BE) {
+					if (outCharset) {
+						if (flagUTF16LE) {
+							*outCharset = Charset::UTF16LE;
+						} else {
+							*outCharset = Charset::UTF16BE;
+						}
+					}
+					size -= 2;
+					sl_size len = size >> 1;
+					SLIB_SCOPED_BUFFER(sl_uint16, 4096, buf, len);
+					if (buf) {
+						if (read(buf, size) == size) {
+							if (flagUTF16LE) {
+								return String8::fromUtf16LE(buf, len);
+							} else {
+								return String8::fromUtf16BE(buf, len);
+							}
+						}
+					}
+					return String::null();
+				}
+			}
+			if (outCharset) {
+				*outCharset = Charset::UTF8;
+			}
+			if (size >= 3) {
+				if (read(sbuf + 2, 1) == 1) {
+					if (sbuf[0] == (sl_char8)0xEF && sbuf[1] == (sl_char8)0xBB && sbuf[2] == (sl_char8)0xBF) {
+						size -= 3;
+						if (size == 0) {
+							return String::getEmpty();
+						}
+						String ret = String8::allocate(size);
+						if (ret.isNotNull()) {
+							if (read(ret.getData(), size) == size) {
+								return ret;
+							}
+						}
+					} else {
+						String ret = String8::allocate(size);
+						if (ret.isNotNull()) {
+							sl_char8* buf = ret.getData();
+							Base::copyMemory(buf, sbuf, 3);
+							if (size == 3) {
+								return ret;
+							}
+							size -= 3;
+							if (read(buf+3, size) == size) {
+								return ret;
+							}
+						}
+					}
+				}
+			} else {
+				return String::fromUtf8(sbuf, 2);
+			}
+			return String8::null();
+		}
+	} else {
+		String ret = String8::allocate(size);
+		if (ret.isNotNull()) {
+			if (read(ret.getData(), size) == size) {
+				if (outCharset) {
+					*outCharset = Charset::UTF8;
+				}
+				return ret;
+			}
+		}
+	}
+	if (outCharset) {
+		*outCharset = Charset::UTF8;
+	}
+	return String8::null();
+}
+
+String16 IReader::readText16(sl_size size, Charset* outCharset)
+{
+	if (size == 0) {
+		if (outCharset) {
+			*outCharset = Charset::UTF8;
+		}
+		return String16::getEmpty();
+	}
+	sl_char8 sbuf[3];
+	if (size >= 2) {
+		if (read(sbuf, 2) == 2) {
+			if (size % 2 == 0) {
+				sl_bool flagUTF16LE = sbuf[0] == (sl_char8)0xFF && sbuf[1] == (sl_char8)0xFE;
+				sl_bool flagUTF16BE = sbuf[0] == (sl_char8)0xFE && sbuf[1] == (sl_char8)0xFF;
+				if (flagUTF16LE || flagUTF16BE) {
+					if (outCharset) {
+						if (flagUTF16LE) {
+							*outCharset = Charset::UTF16LE;
+						} else {
+							*outCharset = Charset::UTF16BE;
+						}
+					}
+					size -= 2;
+					sl_size len = size >> 1;
+					if (len == 0) {
+						return String16::getEmpty();
+					}
+					String16 str = String16::allocate(len);
+					if (str.isNotNull()) {
+						sl_char16* buf = str.getData();
+						size = len << 1;
+						if (read(buf, len) == len) {
+							if ((flagUTF16BE && Endian::isLE()) || (flagUTF16LE && Endian::isBE())) {
+								for (sl_size i = 0; i < len; i++) {
+									sl_uint16 c = (sl_uint16)(buf[i]);
+									buf[i] = (sl_char16)((c >> 8) | (c << 8));
+								}
+							}
+							return str;
+						}
+					}
+					return String16::null();
+				}
+			}
+			SLIB_SCOPED_BUFFER(sl_char8, 4096, tbuf, size);
+			if (tbuf) {
+				if (outCharset) {
+					*outCharset = Charset::UTF8;
+				}
+				tbuf[0] = sbuf[0];
+				tbuf[1] = sbuf[1];
+				sl_char8* buf = tbuf;
+				if (size >= 3) {
+					if (read(tbuf + 2, size - 2) == size - 2) {
+						if (tbuf[0] == (sl_char8)0xEF && tbuf[1] == (sl_char8)0xBB && tbuf[2] == (sl_char8)0xBF) {
+							size -= 3;
+							if (size == 0) {
+								return String16::getEmpty();
+							}
+							buf = tbuf + 3;
+						}
+					} else {
+						return String16::null();
+					}
+				}
+				return String16::fromUtf8(buf, size);
+			}
+		}
+	} else {
+		if (read(sbuf, size) == size) {
+			if (outCharset) {
+				*outCharset = Charset::UTF8;
+			}
+			return String16::fromUtf8(sbuf, size);
+		}
+	}
+	if (outCharset) {
+		*outCharset = Charset::UTF8;
+	}
+	return String16::null();
 }
 
 /***************
@@ -841,7 +1105,7 @@ sl_bool IWriter::writeSection(const Memory& mem)
 	return writeSection(mem.getData(), mem.getSize());
 }
 
-sl_bool IWriter::writeString(const String& str, sl_size maxLen)
+sl_bool IWriter::writeStringSection(const String& str, sl_size maxLen)
 {
 	return writeSection(str.getData(), str.getLength());
 }
@@ -861,6 +1125,109 @@ sl_bool IWriter::writeTime(const Time& t)
 {
 	return writeInt64(t.toInt());
 }
+
+sl_bool IWriter::writeTextUTF8(const String& text, sl_bool flagWriteByteOrderMark)
+{
+	if (flagWriteByteOrderMark) {
+		static sl_char8 sbuf[3] = {(sl_char8)0xEF, (sl_char8)0xBB, (sl_char8)0xBF};
+		if (write(sbuf, 3) != 3) {
+			return sl_false;
+		}
+	}
+	sl_size n = text.getLength();
+	if (n == 0) {
+		return sl_true;
+	}
+	if (write(text.getData(), n) == n) {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+#define UTF16_SWAPPING_BUF_SIZE 0x2000
+
+sl_bool IWriter::writeTextUTF16LE(const String16& text, sl_bool flagWriteByteOrderMark)
+{
+	if (flagWriteByteOrderMark) {
+		static sl_char8 sbuf[2] = {(sl_char8)0xFE, (sl_char8)0xFF};
+		if (write(sbuf, 2) != 2) {
+			return sl_false;
+		}
+	}
+	sl_size n = text.getLength();
+	if (n == 0) {
+		return sl_true;
+	}
+	if (Endian::isLE()) {
+		n <<= 1;
+		if (write(text.getData(), n) == n) {
+			return sl_true;
+		}
+		return sl_false;
+	} else {
+		sl_char16* s = text.getData();
+		sl_char16 buf[UTF16_SWAPPING_BUF_SIZE];
+		while (n > 0) {
+			sl_size m = UTF16_SWAPPING_BUF_SIZE;
+			if (m > n) {
+				m = n;
+			}
+			for (sl_size i = 0; i < m; i++) {
+				sl_uint16 c = (sl_uint16)(s[i]);
+				buf[i] = (sl_char16)((c >> 8) | (c << 8));
+			}
+			sl_size l = m << 1;
+			if (write(buf, l) != l) {
+				return sl_false;
+			}
+			n -= m;
+			s += m;
+		}
+		return sl_true;
+	}
+}
+
+sl_bool IWriter::writeTextUTF16BE(const String16& text, sl_bool flagWriteByteOrderMark)
+{
+	if (flagWriteByteOrderMark) {
+		static sl_char8 sbuf[2] = {(sl_char8)0xFF, (sl_char8)0xFE};
+		if (write(sbuf, 2) != 2) {
+			return sl_false;
+		}
+	}
+	sl_size n = text.getLength();
+	if (n == 0) {
+		return sl_true;
+	}
+	if (Endian::isBE()) {
+		n <<= 1;
+		if (write(text.getData(), n) == n) {
+			return sl_true;
+		}
+		return sl_false;
+	} else {
+		sl_char16* s = text.getData();
+		sl_char16 buf[UTF16_SWAPPING_BUF_SIZE];
+		while (n > 0) {
+			sl_size m = UTF16_SWAPPING_BUF_SIZE;
+			if (m > n) {
+				m = n;
+			}
+			for (sl_size i = 0; i < m; i++) {
+				sl_uint16 c = (sl_uint16)(s[i]);
+				buf[i] = (sl_char16)((c >> 8) | (c << 8));
+			}
+			sl_size l = m << 1;
+			if (write(buf, l) != l) {
+				return sl_false;
+			}
+			n -= m;
+			s += m;
+		}
+		return sl_true;
+	}
+}
+
 
 sl_bool ISeekable::seekToBegin()
 {

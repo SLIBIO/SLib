@@ -11,12 +11,10 @@ const sl_uint8 IPv4Address::_zero[4] = {0, 0, 0, 0};
 
 IPv4Address::IPv4Address(const String& address)
 {
-	if (! parse(address)) {
-		set(0, 0, 0, 0);
-	}
+	setString(address);
 }
 
-void IPv4Address::set(sl_uint8 _a, sl_uint8 _b, sl_uint8 _c, sl_uint8 _d)
+void IPv4Address::setElements(sl_uint8 _a, sl_uint8 _b, sl_uint8 _c, sl_uint8 _d)
 {
 	a = _a;
 	b = _b;
@@ -105,6 +103,16 @@ String IPv4Address::toString() const
 	return ret;
 }
 
+sl_bool IPv4Address::setString(const String& str)
+{
+	if (parse(str)) {
+		return sl_true;
+	} else {
+		setZero();
+		return sl_false;
+	}
+}
+
 template <class CT>
 SLIB_INLINE sl_reg _IPv4Address_parse(IPv4Address* obj, const CT* sz, sl_size i, sl_size n)
 {
@@ -147,7 +155,7 @@ SLIB_INLINE sl_reg _IPv4Address_parse(IPv4Address* obj, const CT* sz, sl_size i,
 	return i;
 }
 
-sl_reg IPv4Address::parse(IPv4Address* out, const char* sz, sl_size posBegin, sl_size n)
+sl_reg IPv4Address::parse(IPv4Address* out, const sl_char8* sz, sl_size posBegin, sl_size n)
 {
 	return _IPv4Address_parse(out, sz, posBegin, n);
 }
@@ -219,12 +227,7 @@ sl_bool IPv4Address::setHostName(const String& hostName)
 
 IPv4Address& IPv4Address::operator=(const String& address)
 {
-	if (! parse(address)) {
-		a = 0;
-		b = 0;
-		c = 0;
-		d = 0;
-	}
+	setString(address);
 	return *this;
 }
 
@@ -323,9 +326,7 @@ IPv6Address::IPv6Address(const sl_uint8* b)
 
 IPv6Address::IPv6Address(const String& address)
 {
-	if (! parse(address)) {
-		Base::resetMemory(m, 0, 16);
-	}
+	setString(address);
 }
 
 IPv6Address::IPv6Address(const IPv4Address& ip)
@@ -396,17 +397,17 @@ void IPv6Address::setZero()
 
 sl_bool IPv6Address::isZero() const
 {
-	return Base::compareZero(m, 16) == 0;
+	return Base::equalsMemoryZero(m, 16);
 }
 
 sl_bool IPv6Address::isNotZero() const
 {
-	return Base::compareZero(m, 16) != 0;
+	return !(Base::equalsMemoryZero(m, 16));
 }
 
 sl_bool IPv6Address::isLoopback() const
 {
-	return Base::compareMemory(_loopback, m, 16) == 0;
+	return Base::equalsMemory(_loopback, m, 16);
 }
 
 IPv4Address IPv6Address::getIPv4Transition() const
@@ -448,6 +449,16 @@ String IPv6Address::toString() const
 		ret += String::fromUint32(getElement(i), 16, 4);
 	}
 	return ret;
+}
+
+sl_bool IPv6Address::setString(const String& str)
+{
+	if (parse(str)) {
+		return sl_true;
+	} else {
+		setZero();
+		return sl_false;
+	}
 }
 
 template <class CT>
@@ -544,7 +555,7 @@ SLIB_INLINE sl_reg _IPv6Address_parse(IPv6Address* obj, const CT* sz, sl_size i,
 	return i;
 }
 
-sl_reg IPv6Address::parse(IPv6Address* out, const char* sz, sl_size posStart, sl_size n)
+sl_reg IPv6Address::parse(IPv6Address* out, const sl_char8* sz, sl_size posStart, sl_size n)
 {
 	return _IPv6Address_parse(out, sz, posStart, n);
 }
@@ -582,9 +593,7 @@ IPv6Address& IPv6Address::operator=(const IPv6Address& other) = default;
 
 IPv6Address& IPv6Address::operator=(const String& address)
 {
-	if (! parse(address)) {
-		Base::resetMemory(m, 0, 16);
-	}
+	setString(address);
 	return *this;
 }
 
@@ -651,6 +660,11 @@ IPAddress::IPAddress(const IPv4Address& other)
 IPAddress::IPAddress(const IPv6Address& other)
 {
 	setIPv6(other);
+}
+
+IPAddress::IPAddress(const String& address)
+{
+	setString(address);
 }
 
 sl_bool IPAddress::isIPv4() const
@@ -729,6 +743,16 @@ String IPAddress::toString() const
 	}
 }
 
+sl_bool IPAddress::setString(const String& str)
+{
+	if (parse(str)) {
+		return sl_true;
+	} else {
+		setNone();
+		return sl_false;
+	}
+}
+
 template <class CT>
 SLIB_INLINE sl_reg _IPAddress_parse(IPAddress* obj, const CT* sz, sl_size posStart, sl_size len)
 {
@@ -755,7 +779,7 @@ SLIB_INLINE sl_reg _IPAddress_parse(IPAddress* obj, const CT* sz, sl_size posSta
 	return SLIB_PARSE_ERROR;
 }
 
-sl_reg IPAddress::parse(IPAddress* out, const char* sz, sl_size posStart, sl_size len)
+sl_reg IPAddress::parse(IPAddress* out, const sl_char8* sz, sl_size posStart, sl_size len)
 {
 	return _IPAddress_parse(out, sz, posStart, len);
 }
@@ -802,6 +826,12 @@ IPAddress& IPAddress::operator=(const IPv6Address& other)
 {
 	type = IPAddressType::IPv6;
 	*((IPv6Address*)(void*)(m)) = other;
+	return *this;
+}
+
+IPAddress& IPAddress::operator=(const String& address)
+{
+	setString(address);
 	return *this;
 }
 

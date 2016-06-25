@@ -50,7 +50,7 @@ void IXmlParseListener::onEndPrefixMapping(XmlParseControl* control, const Strin
 
 SLIB_DEFINE_ROOT_OBJECT(XmlNode)
 
-XmlNode::XmlNode(XmlNodeType type) : m_type(type)
+XmlNode::XmlNode(XmlNodeType type) : m_type(type), m_positionStartInSource(0), m_positionEndInSource(0), m_lineInSource(1), m_columnInSource(1)
 {
 }
 
@@ -75,18 +75,6 @@ String XmlNode::toString() const
 		return buf.merge();
 	}
 	return String::null();
-}
-
-sl_bool XmlNode::writeToUtf8TextFile(const String& filePath)
-{
-	StringBuffer buf;
-	if (buildXml(buf)) {
-		String xml = buf.merge();
-		if (xml.isNotNull()) {
-			return File::writeUtf8Text(filePath, xml);
-		}
-	}
-	return sl_false;
 }
 
 sl_bool XmlNode::isDocumentNode() const
@@ -187,6 +175,46 @@ Ref<XmlElement> XmlNode::getParentElement() const
 {
 	Ref<XmlNodeGroup> parent = m_parent;
 	return parent->toElementNode();
+}
+
+sl_size XmlNode::getStartPositionInSource()
+{
+	return m_positionStartInSource;
+}
+
+void XmlNode::setStartPositionInSource(sl_size pos)
+{
+	m_positionStartInSource = pos;
+}
+
+sl_size XmlNode::getEndPositionInSource()
+{
+	return m_positionEndInSource;
+}
+
+void XmlNode::setEndPositionInSource(sl_size pos)
+{
+	m_positionEndInSource = pos;
+}
+
+sl_size XmlNode::getLineNumberInSource()
+{
+	return m_lineInSource;
+}
+
+void XmlNode::setLineNumberInSource(sl_size line)
+{
+	m_lineInSource = line;
+}
+
+sl_size XmlNode::getColumnNumberInSource()
+{
+	return m_columnInSource;
+}
+
+void XmlNode::setColumnNumberInSource(sl_size line)
+{
+	m_columnInSource = line;
 }
 
 void XmlNode::_setDocument(const Ref<XmlDocument>& documentNew)
@@ -1229,10 +1257,11 @@ void XmlWhiteSpace::setContent(const String& content)
 XmlParseParam::XmlParseParam()
 {
 	flagCreateDocument = sl_true;
-	flagCreateCommentNodes = sl_true;
+	flagCreateCommentNodes = sl_false;
 	flagCreateProcessingInstructionNodes = sl_true;
 	flagCreateTextNodes = sl_true;
-	flagCreateWhiteSpaces = sl_true;
+	flagCreateWhiteSpaces = sl_false;
+	
 	flagProcessNamespaces = sl_true;
 	flagCheckWellFormed = sl_true;
 	
@@ -1250,9 +1279,27 @@ String XmlParseParam::getErrorText()
 	return String::null();
 }
 
+void XmlParseParam::setCreatingAll()
+{
+	flagCreateDocument = sl_true;
+	flagCreateCommentNodes = sl_true;
+	flagCreateProcessingInstructionNodes = sl_true;
+	flagCreateTextNodes = sl_true;
+	flagCreateWhiteSpaces = sl_true;
+}
+
+void XmlParseParam::setCreatingOnlyElements()
+{
+	flagCreateDocument = sl_true;
+	flagCreateCommentNodes = sl_false;
+	flagCreateProcessingInstructionNodes = sl_false;
+	flagCreateTextNodes = sl_false;
+	flagCreateWhiteSpaces = sl_false;
+}
 
 XmlParseControl::XmlParseControl()
 {
+	characterSize = 0;
 	flagChangeSource = sl_false;
 	parsingPosition = 0;
 	flagStopParsing = sl_false;
@@ -1265,6 +1312,9 @@ public:
 	const CT* buf;
 	sl_size len;
 	sl_size pos;
+	sl_size lineNumber;
+	sl_size columnNumber;
+	sl_size posForLineColumn;
 	
 	Ref<XmlDocument> document;
 	Ptr<IXmlParseListener> listener;
@@ -1276,7 +1326,11 @@ public:
 	String errorMessage;
 	
 public:
+	_Xml_Parser();
+	
 	void escapeWhiteSpaces();
+	
+	void calcLineNumber();
 	
 	void createWhiteSpace(XmlNodeGroup* parent, sl_size posStart, sl_size posEnd);
 
@@ -1393,6 +1447,18 @@ SLIB_STATIC_STRING(_g_xml_error_msg_document_not_wellformed, "Document must be w
 	errorMessage = MSG; \
 	return;
 
+
+template <class ST, class CT, class BT>
+_Xml_Parser<ST, CT, BT>::_Xml_Parser()
+{
+	pos = 0;
+	lineNumber = 1;
+	columnNumber = 1;
+	posForLineColumn = 0;
+	
+	flagError = sl_false;
+}
+
 template <class ST, class CT, class BT>
 void _Xml_Parser<ST, CT, BT>::escapeWhiteSpaces()
 {
@@ -1403,6 +1469,29 @@ void _Xml_Parser<ST, CT, BT>::escapeWhiteSpaces()
 		}
 		pos++;
 	}
+}
+
+template <class ST, class CT, class BT>
+void _Xml_Parser<ST, CT, BT>::calcLineNumber()
+{
+	for (sl_size i = posForLineColumn; i < pos; i++) {
+		CT ch = buf[i];
+		if (ch == '\r') {
+			lineNumber++;
+			columnNumber = 1;
+			if (i + 1 < len && buf[i+1] == '\n') {
+				i++;
+			}
+		} else if (ch == '\n') {
+			if (i == 0 || buf[i-1] != '\r') {
+				lineNumber++;
+				columnNumber = 1;
+			}
+		} else {
+			columnNumber++;
+		}
+	}
+	posForLineColumn = pos;
 }
 
 template <class ST, class CT, class BT>
@@ -1421,6 +1510,11 @@ void _Xml_Parser<ST, CT, BT>::createWhiteSpace(XmlNodeGroup* parent, sl_size pos
 			if (node.isNull()) {
 				REPORT_ERROR(_g_xml_error_msg_memory_lack)
 			}
+			calcLineNumber();
+			node->setStartPositionInSource(posStart);
+			node->setEndPositionInSource(posEnd);
+			node->setLineNumberInSource(lineNumber);
+			node->setColumnNumberInSource(columnNumber);
 			if (!(parent->addChild(node))) {
 				REPORT_ERROR(_g_xml_error_msg_memory_lack)
 			}
@@ -1477,9 +1571,9 @@ void _Xml_Parser<ST, CT, BT>::escapeEntity(BT* sb)
 		sl_reg parseRes;
 		if (buf[pos] == 'x') {
 			pos++;
-			parseRes = String::parseUint32(16, &n, buf, pos, len - pos);
+			parseRes = ST::parseUint32(16, &n, buf, pos, len - pos);
 		} else {
-			parseRes = String::parseUint32(10, &n, buf, pos, len - pos);
+			parseRes = ST::parseUint32(10, &n, buf, pos, len - pos);
 		}
 		if (parseRes == SLIB_PARSE_ERROR) {
 			REPORT_ERROR(_g_xml_error_msg_invalid_escape)
@@ -1538,6 +1632,9 @@ void _Xml_Parser<ST, CT, BT>::parseName(String& name)
 template <class ST, class CT, class BT>
 void _Xml_Parser<ST, CT, BT>::parseComment(XmlNodeGroup* parent)
 {
+	calcLineNumber();
+	sl_size startLine = lineNumber;
+	sl_size startColumn = columnNumber;
 	sl_size startComment = pos;
 	sl_bool flagEnded = sl_false;
 	while (pos < len - 2) {
@@ -1553,6 +1650,10 @@ void _Xml_Parser<ST, CT, BT>::parseComment(XmlNodeGroup* parent)
 						if (comment.isNull()) {
 							REPORT_ERROR(_g_xml_error_msg_memory_lack)
 						}
+						comment->setStartPositionInSource(startComment);
+						comment->setEndPositionInSource(pos + 3);
+						comment->setLineNumberInSource(startLine);
+						comment->setColumnNumberInSource(startColumn);
 						if (!(parent->addChild(comment))) {
 							REPORT_ERROR(_g_xml_error_msg_memory_lack)
 						}
@@ -1579,6 +1680,9 @@ void _Xml_Parser<ST, CT, BT>::parseComment(XmlNodeGroup* parent)
 template <class ST, class CT, class BT>
 void _Xml_Parser<ST, CT, BT>::parseCDATA(XmlNodeGroup* parent)
 {
+	calcLineNumber();
+	sl_size startLine = lineNumber;
+	sl_size startColumn = columnNumber;
 	sl_size startCDATA = pos;
 	sl_bool flagEnded = sl_false;
 	while (pos < len - 2) {
@@ -1593,6 +1697,10 @@ void _Xml_Parser<ST, CT, BT>::parseCDATA(XmlNodeGroup* parent)
 					if (text.isNull()) {
 						REPORT_ERROR(_g_xml_error_msg_memory_lack)
 					}
+					text->setStartPositionInSource(startCDATA);
+					text->setEndPositionInSource(pos + 3);
+					text->setLineNumberInSource(startLine);
+					text->setColumnNumberInSource(startColumn);
 					if (!(parent->addChild(text))) {
 						REPORT_ERROR(_g_xml_error_msg_memory_lack)
 					}
@@ -1633,6 +1741,9 @@ void _Xml_Parser<ST, CT, BT>::parsePI(XmlNodeGroup* parent)
 			REPORT_ERROR(_g_xml_error_msg_name_invalid_char)
 		}
 	}
+	calcLineNumber();
+	sl_size startLine = lineNumber;
+	sl_size startColumn = columnNumber;
 	sl_size startPI = pos;
 	sl_bool flagEnded = sl_false;
 	while (pos < len - 1) {
@@ -1647,6 +1758,10 @@ void _Xml_Parser<ST, CT, BT>::parsePI(XmlNodeGroup* parent)
 					if (PI.isNull()) {
 						REPORT_ERROR(_g_xml_error_msg_memory_lack)
 					}
+					PI->setStartPositionInSource(startPI);
+					PI->setEndPositionInSource(pos + 2);
+					PI->setLineNumberInSource(startLine);
+					PI->setColumnNumberInSource(startColumn);
 					if (!(parent->addChild(PI))) {
 						REPORT_ERROR(_g_xml_error_msg_memory_lack)
 					}
@@ -1765,6 +1880,9 @@ void _Xml_Parser<ST, CT, BT>::parseElement(XmlNodeGroup* parent, const String& _
 	String defNamespace = _defNamespace;
 	Map<String, String> namespaces = _namespaces;
 	
+	calcLineNumber();
+	sl_size startLine = lineNumber;
+	sl_size startColumn = columnNumber;
 	sl_size posNameStart = pos;
 	String name;
 	parseName(name);
@@ -1877,6 +1995,10 @@ void _Xml_Parser<ST, CT, BT>::parseElement(XmlNodeGroup* parent, const String& _
 		REPORT_ERROR(_g_xml_error_msg_unknown)
 	}
 	if (parent) {
+		parent->setStartPositionInSource(posNameStart);
+		parent->setEndPositionInSource(pos);
+		parent->setLineNumberInSource(startLine);
+		parent->setColumnNumberInSource(startColumn);
 		if (!(parent->addChild(element))) {
 			REPORT_ERROR(_g_xml_error_msg_memory_lack)
 		}
@@ -1894,7 +2016,7 @@ void _Xml_Parser<ST, CT, BT>::parseElement(XmlNodeGroup* parent, const String& _
 			REPORT_ERROR(_g_xml_error_msg_element_tag_not_matching_end_tag)
 		}
 		pos += 2;
-		if (Base::compareMemory(buf + posNameStart, buf + pos, lenName * sizeof(CT)) != 0) {
+		if (!(Base::equalsMemory(buf + posNameStart, buf + pos, lenName * sizeof(CT)))) {
 			REPORT_ERROR(_g_xml_error_msg_element_tag_not_matching_end_tag)
 		}
 		pos += lenName;
@@ -1915,6 +2037,7 @@ void _Xml_Parser<ST, CT, BT>::parseElement(XmlNodeGroup* parent, const String& _
 		}
 		pos++;
 	}
+	element->setEndPositionInSource(pos);
 	CALL_LISTENER(onEndElement, element.ptr, element.ptr);
 	if (param.flagProcessNamespaces) {
 		ListLocker<String> prefixes(listPrefixMappings);
@@ -1927,6 +2050,9 @@ void _Xml_Parser<ST, CT, BT>::parseElement(XmlNodeGroup* parent, const String& _
 template <class ST, class CT, class BT>
 void _Xml_Parser<ST, CT, BT>::parseText(XmlNodeGroup* parent)
 {
+	calcLineNumber();
+	sl_size startLine = lineNumber;
+	sl_size startColumn = columnNumber;
 	sl_size startWhiteSpace = pos;
 	escapeWhiteSpaces();
 	if (pos > startWhiteSpace) {
@@ -1990,6 +2116,10 @@ void _Xml_Parser<ST, CT, BT>::parseText(XmlNodeGroup* parent)
 				if (node.isNull()) {
 					REPORT_ERROR(_g_xml_error_msg_memory_lack)
 				}
+				node->setStartPositionInSource(startText);
+				node->setEndPositionInSource(pos);
+				node->setLineNumberInSource(startLine);
+				node->setColumnNumberInSource(startColumn);
 				if (!(parent->addChild(node))) {
 					REPORT_ERROR(_g_xml_error_msg_memory_lack)
 				}
@@ -2080,12 +2210,12 @@ Ref<XmlDocument> _Xml_Parser<ST, CT, BT>::parseXml(const CT* buf, sl_size len, X
 	_Xml_Parser<ST, CT, BT> parser;
 	parser.buf = buf;
 	parser.len = len;
-	parser.pos = 0;
-	parser.flagError = sl_false;
 	
 	if (param.flagCreateDocument) {
 		parser.document = XmlDocument::create();
 		if (parser.document.isNull()) {
+			parser.document->setStartPositionInSource(0);
+			parser.document->setEndPositionInSource(len);
 			param.flagError = sl_true;
 			param.errorMessage = _g_xml_error_msg_memory_lack;
 			return Ref<XmlDocument>::null();
@@ -2095,6 +2225,7 @@ Ref<XmlDocument> _Xml_Parser<ST, CT, BT>::parseXml(const CT* buf, sl_size len, X
 	parser.listener = param.listener;
 	parser.control.source.sz8 = (sl_char8*)(buf);
 	parser.control.source.len = len;
+	parser.control.characterSize = sizeof(CT);
 	
 	parser.parseXml();
 	
@@ -2155,16 +2286,16 @@ Ref<XmlDocument> Xml::parseXml16(const String16& xml)
 	return Xml::parseXml16(xml, param);
 }
 
-Ref<XmlDocument> Xml::parseXmlFromUtf8TextFile(const String& filePath, XmlParseParam& param)
+Ref<XmlDocument> Xml::parseXmlFromTextFile(const String& filePath, XmlParseParam& param)
 {
-	String xml = File::readUtf8Text(filePath);
-	return parseXml(xml, param);
+	String16 xml = File::readAllText16(filePath);
+	return parseXml16(xml, param);
 }
 
-Ref<XmlDocument> Xml::parseXmlFromUtf8TextFile(const String& filePath)
+Ref<XmlDocument> Xml::parseXmlFromTextFile(const String& filePath)
 {
 	XmlParseParam param;
-	return parseXmlFromUtf8TextFile(filePath, param);
+	return parseXmlFromTextFile(filePath, param);
 }
 
 /************************************************

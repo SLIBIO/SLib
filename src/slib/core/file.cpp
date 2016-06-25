@@ -1,4 +1,5 @@
 #include "../../../inc/slib/core/file.h"
+#include "../../../inc/slib/core/scoped_pointer.h"
 
 SLIB_NAMESPACE_BEGIN
 
@@ -209,21 +210,21 @@ Memory File::readAllBytes(const String& path)
 		}
 		sl_size size = (sl_size)_size;
 #endif
+		if (size == 0) {
+			return Memory::null();
+		}
 		Memory ret = Memory::create(size);
 		if (ret.isNotNull()) {
 			char* buf = (char*)(ret.getData());
-			sl_reg n = file->read(buf, size);
-			if (n != size) {
-				return Memory::null();
+			if (file->read(buf, size) == size) {
+				return ret;
 			}
 		}
-		return ret;
-	} else {
-		return Memory::null();
 	}
+	return Memory::null();
 }
 
-String File::readUtf8Text(const String& path)
+String File::readAllTextUTF8(const String& path)
 {
 	Ref<File> file = File::openForRead(path);
 	if (file.isNotNull()) {
@@ -236,32 +237,63 @@ String File::readUtf8Text(const String& path)
 		}
 		sl_size size = (sl_size)_size;
 #endif
-		String ret = String8::allocate(size);
-		if (ret.isNotEmpty()) {
-			sl_char8* buf = ret.getData();
-			sl_reg n;
-			if (size >= 3) {
-				n = file->read(buf, 3);
-				if (n != 3) {
-					return String::null();
-				}
-				size -= 3;
-				if ((sl_uint8)(buf[0]) == 0xEF && (sl_uint8)(buf[1]) == 0xBB && (sl_uint8)(buf[2]) == 0xBF) {
-					ret.setLength(size);
-					buf[size] = 0;
-				} else {
-					buf += 3;
-				}
-			}
-			n = file->read(buf, size);
-			if (n != size) {
-				return String::null();
-			}
-		}
-		return ret;
-	} else {
-		return String::null();
+		return file->readTextUTF8(size);
 	}
+	return String::null();
+}
+
+String16 File::readAllTextUTF16(const String& path, sl_bool flagBigEndian)
+{
+	Ref<File> file = File::openForRead(path);
+	if (file.isNotNull()) {
+#if defined(SLIB_ARCH_IS_64BIT)
+		sl_uint64 size = file->getSize();
+#else
+		sl_uint64 _size = file->getSize();
+		if (_size > 0x7fffffff) {
+			return String16::null();
+		}
+		sl_size size = (sl_size)_size;
+#endif
+		return file->readTextUTF16(size, flagBigEndian);
+	}
+	return String16::null();
+}
+
+String File::readAllText(const String& path, Charset* outCharset)
+{
+	Ref<File> file = File::openForRead(path);
+	if (file.isNotNull()) {
+#if defined(SLIB_ARCH_IS_64BIT)
+		sl_uint64 size = file->getSize();
+#else
+		sl_uint64 _size = file->getSize();
+		if (_size > 0x7fffffff) {
+			return String::null();
+		}
+		sl_size size = (sl_size)_size;
+#endif
+		return file->readText(size, outCharset);
+	}
+	return String::null();
+}
+
+String16 File::readAllText16(const String& path, Charset* outCharset)
+{
+	Ref<File> file = File::openForRead(path);
+	if (file.isNotNull()) {
+#if defined(SLIB_ARCH_IS_64BIT)
+		sl_uint64 size = file->getSize();
+#else
+		sl_uint64 _size = file->getSize();
+		if (_size > 0x7fffffff) {
+			return String::null();
+		}
+		sl_size size = (sl_size)_size;
+#endif
+		return file->readText16(size, outCharset);
+	}
+	return String16::null();
 }
 
 sl_size File::writeAllBytes(const String& path, const void* buf, sl_size size)
@@ -281,11 +313,31 @@ sl_size File::writeAllBytes(const String& path, const Memory& mem)
 	return File::writeAllBytes(path, mem.getData(), mem.getSize());
 }
 
-sl_bool File::writeUtf8Text(const String& path, const String& text)
+sl_bool File::writeAllTextUTF8(const String& path, const String& text, sl_bool flagWriteByteOrderMark)
 {
-	sl_size n = text.getLength();
-	sl_size ret = File::writeAllBytes(path, text.getData(), n);
-	return ret == n;
+	Ref<File> file = File::openForWrite(path);
+	if (file.isNotNull()) {
+		return file->writeTextUTF8(text, flagWriteByteOrderMark);
+	}
+	return sl_false;
+}
+
+sl_bool File::writeAllTextUTF16LE(const String& path, const String16& text, sl_bool flagWriteByteOrderMark)
+{
+	Ref<File> file = File::openForWrite(path);
+	if (file.isNotNull()) {
+		return file->writeTextUTF16LE(text, flagWriteByteOrderMark);
+	}
+	return sl_false;
+}
+
+sl_bool File::writeAllTextUTF16BE(const String& path, const String16& text, sl_bool flagWriteByteOrderMark)
+{
+	Ref<File> file = File::openForWrite(path);
+	if (file.isNotNull()) {
+		return file->writeTextUTF16BE(text, flagWriteByteOrderMark);
+	}
+	return sl_false;
 }
 
 sl_size File::appendAllBytes(const String& path, const void* buf, sl_size size)
@@ -305,11 +357,31 @@ sl_size File::appendAllBytes(const String& path, const Memory& mem)
 	return File::appendAllBytes(path, mem.getData(), mem.getSize());
 }
 
-sl_bool File::appendUtf8Text(const String& path, const String& text)
+sl_bool File::appendAllTextUTF8(const String& path, const String& text)
 {
-	sl_size n = text.getLength();
-	sl_size ret = File::appendAllBytes(path, text.getData(), n);
-	return ret == n;
+	Ref<File> file = File::openForAppend(path);
+	if (file.isNotNull()) {
+		return file->writeTextUTF8(text, sl_false);
+	}
+	return sl_false;
+}
+
+sl_bool File::appendAllTextUTF16LE(const String& path, const String16& text)
+{
+	Ref<File> file = File::openForAppend(path);
+	if (file.isNotNull()) {
+		return file->writeTextUTF16LE(text, sl_false);
+	}
+	return sl_false;
+}
+
+sl_bool File::appendAllTextUTF16BE(const String& path, const String16& text)
+{
+	Ref<File> file = File::openForAppend(path);
+	if (file.isNotNull()) {
+		return file->writeTextUTF16BE(text, sl_false);
+	}
+	return sl_false;
 }
 
 List<String> File::getAllDescendantFiles(const String& dirPath)

@@ -107,7 +107,7 @@ void _Json_Parser<ST, CT>::escapeSpaceAndComments()
 				}
 			}
 		}
-		if (!flagEscape && ch != '\r' && ch != '\n' && ch != ' ' && ch != '\t') {
+		if (!flagEscape && !(SLIB_CHAR_IS_WHITE_SPACE(ch))) {
 			break;
 		}
 		pos++;
@@ -414,16 +414,16 @@ Variant Json::parseJson16(const String16& json)
 }
 
 
-Variant Json::parseJsonFromUtf8TextFile(const String& filePath, JsonParseParam& param)
+Variant Json::parseJsonFromTextFile(const String& filePath, JsonParseParam& param)
 {
-	String json = File::readUtf8Text(filePath);
-	return parseJson(json, param);
+	String16 json = File::readAllText16(filePath);
+	return parseJson16(json, param);
 }
 
-Variant Json::parseJsonFromUtf8TextFile(const String& filePath)
+Variant Json::parseJsonFromTextFile(const String& filePath)
 {
 	JsonParseParam param;
-	return parseJsonFromUtf8TextFile(filePath, param);
+	return parseJsonFromTextFile(filePath, param);
 }
 
 

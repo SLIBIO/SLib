@@ -39,7 +39,8 @@ sl_bool MobileApp::isPaused()
 
 void MobileApp::addView(const Ref<View>& view)
 {
-	if (this) {
+	void* _thiz = this;
+	if (_thiz) {
 		Ref<MobileMainWindow> window = getMainWindow();
 		if (window.isNotNull()) {
 			window->addView(view);
@@ -49,7 +50,8 @@ void MobileApp::addView(const Ref<View>& view)
 
 void MobileApp::removeView(const Ref<View>& view)
 {
-	if (this) {
+	void* _thiz = this;
+	if (_thiz) {
 		Ref<MobileMainWindow> window = getMainWindow();
 		if (window.isNotNull()) {
 			window->removeView(view);
