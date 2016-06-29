@@ -432,7 +432,7 @@ List<String> File::getFiles(const String& _filePath)
 	return ret;
 }
 
-sl_bool File::createDirectory(const String& filePath)
+sl_bool File::_createDirectory(const String& filePath)
 {
 	if (filePath.isEmpty()) {
 		return sl_false;
@@ -441,7 +441,7 @@ sl_bool File::createDirectory(const String& filePath)
 }
 
 
-sl_bool File::deleteFile(const String& filePath)
+sl_bool File::_deleteFile(const String& filePath)
 {
 	if (filePath.isEmpty()) {
 		return sl_false;
@@ -449,7 +449,7 @@ sl_bool File::deleteFile(const String& filePath)
 	return 0 == ::remove(filePath.getData());
 }
 
-sl_bool File::deleteDirectoryOnly(const String& filePath)
+sl_bool File::_deleteDirectory(const String& filePath)
 {
 	if (filePath.isEmpty()) {
 		return sl_false;

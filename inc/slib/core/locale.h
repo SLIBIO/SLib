@@ -511,7 +511,7 @@ enum class Country
 
 class Locale
 {
-	SLIB_DECLARE_PRIMITIVE_WRAPPER(sl_uint32, Locale)
+	SLIB_DECLARE_PRIMITIVE_WRAPPER(int, Locale)
 public:
 	enum {
 		Unknown = 0,
@@ -569,11 +569,14 @@ public:
 	
 	Locale(Language language, Country country);
 	
-	// 2 or 5 characters ([ISO 639-1]_[ISO 3166-1 alpha-2])
-	Locale(const char* code);
+	// 2 or 5 characters ([ISO 639-1]-[ISO 3166-1 alpha-2]  or  [ISO 639-1]_[ISO 3166-1 alpha-2])
+	Locale(const sl_char8* name);
 	
-	// 2 or 5 characters ([ISO 639-1]_[ISO 3166-1 alpha-2])
-	Locale(const String& code);
+	// 2 or 5 characters ([ISO 639-1]-[ISO 3166-1 alpha-2]  or  [ISO 639-1]_[ISO 3166-1 alpha-2])
+	Locale(const sl_char16* name);
+	
+	// 2 or 5 characters ([ISO 639-1]-[ISO 3166-1 alpha-2]  or  [ISO 639-1]_[ISO 3166-1 alpha-2])
+	Locale(const String& name);
 	
 public:
 	Language getLanguage() const;
@@ -596,18 +599,21 @@ public:
 	
 	String getCountryLongName() const;
 	
-	String getCode() const;
+	String toString(sl_char8 delimiter='_') const;
 	
-	static Locale getFromCode(const char* code);
+	String8 toString8(sl_char8 delimiter='_') const;
 	
-	static Locale getFromCode(const String& code);
-	
+	String16 toString16(sl_char16 delimiter='_') const;
+		
 	// Languages
 public:
 	static String getLanguageName(Language language);
 	
 	// ISO 639-1
-	static Language getLanguageFromCode(const char* code);
+	static Language getLanguageFromCode(const sl_char8* code);
+
+	// ISO 639-1
+	static Language getLanguageFromCode(const sl_char16* code);
 	
 	// ISO 639-1
 	static Language getLanguageFromCode(const String& code);
@@ -624,7 +630,10 @@ public:
 	static String getCountryLongName(Country country);
 	
 	// ISO 3166-1 alpha-2
-	static Country getCountryFromCode(const char* code);
+	static Country getCountryFromCode(const sl_char8* code);
+	
+	// ISO 3166-1 alpha-2
+	static Country getCountryFromCode(const sl_char16* code);
 	
 	// ISO 3166-1 alpha-2
 	static Country getCountryFromCode(const String& code);

@@ -577,7 +577,12 @@ Time Time::getTimeOnly() const
 	return m_time % TIME_DAY;
 }
 
-String8 Time::toString() const
+String Time::toString() const
+{
+	return toString8();
+}
+
+String8 Time::toString8() const
 {
 	DATE d;
 	getDate(&d);
@@ -630,7 +635,12 @@ String16 Time::toString16() const
 	return sb.merge();
 }
 
-String8 Time::getDateString() const
+String Time::getDateString() const
+{
+	return getDateString8();
+}
+
+String8 Time::getDateString8() const
 {
 	DATE d;
 	getDate(&d);
@@ -662,7 +672,12 @@ String16 Time::getDateString16() const
 	return sb.merge();
 }
 
-String8 Time::getTimeString() const
+String Time::getTimeString() const
+{
+	return getTimeString8();
+}
+
+String8 Time::getTimeString8() const
 {
 	StringBuffer8 sb;
 	sb.add(String8::fromInt32(getHour(), 10, 2));

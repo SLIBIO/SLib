@@ -129,7 +129,11 @@ String File::getParentDirectoryPath(const String& pathName)
 	if (index == -1) {
 		return String::null();
 	} else {
-		return pathName.substring(0, index);
+		if (index == 0 && indexSlash == 0 && pathName.getLength() != 1) {
+			return "/";
+		} else {
+			return pathName.substring(0, index);
+		}
 	}
 }
 
@@ -396,34 +400,70 @@ List<String> File::getAllDescendantFiles(const String& dirPath)
 	sl_size n = listCurrent.getCount();
 	for (sl_size i = 0; i < n; i++) {
 		String& item = p[i];
-		ret.add_NoLock(item);
-		String dir = dirPath + "/" + item;
-		if (File::isDirectory(dir)) {
-			ListItems<String> sub(File::getAllDescendantFiles(dir));
-			for (sl_size j = 0; j < sub.count; j++) {
-				ret.add(item + "/" + sub[j]);
+		if (item != "." && item != "..") {
+			ret.add_NoLock(item);
+			String dir = dirPath + "/" + item;
+			if (File::isDirectory(dir)) {
+				ListItems<String> sub(File::getAllDescendantFiles(dir));
+				for (sl_size j = 0; j < sub.count; j++) {
+					ret.add(item + "/" + sub[j]);
+				}
 			}
 		}
 	}
 	return ret;
 }
 
-sl_bool File::createDirectories(const String& dirPath)
+sl_bool File::createDirectory(const String& dirPath, sl_bool flagErrorOnCreateExistingDirectory)
 {
-	if (File::createDirectory(dirPath)) {
-		return sl_true;
-	} else {
-		String parent = File::getParentDirectoryPath(dirPath);
-		if (File::exists(parent)) {
-			return sl_false;
-		} else {
-			if (File::createDirectories(parent)) {
-				return File::createDirectory(dirPath);
-			} else {
+	FileAttributes attr = File::getAttributes(dirPath);
+	if (attr !=  FileAttributes::NotExist) {
+		if (attr & FileAttributes::Directory) {
+			if (flagErrorOnCreateExistingDirectory) {
 				return sl_false;
+			} else {
+				return sl_true;
 			}
+		} else {
+			return sl_false;
 		}
 	}
+	_createDirectory(dirPath);
+	return File::isDirectory(dirPath);
+}
+
+sl_bool File::createDirectories(const String& dirPath)
+{
+	if (dirPath.isEmpty()) {
+		return sl_false;
+	}
+	String parent = File::getParentDirectoryPath(dirPath);
+	if (parent.isEmpty()) {
+		return File::createDirectory(dirPath);
+	} else {
+		if (File::createDirectories(parent)) {
+			return File::createDirectory(dirPath);
+		}
+		return sl_false;
+	}
+}
+
+sl_bool File::deleteFile(const String& filePath, sl_bool flagErrorOnDeleteNotExistingFile)
+{
+	FileAttributes attr = File::getAttributes(filePath);
+	if (attr ==  FileAttributes::NotExist) {
+		if (flagErrorOnDeleteNotExistingFile) {
+			return sl_false;
+		} else {
+			return sl_true;
+		}
+	}
+	if (attr & FileAttributes::Directory) {
+		_deleteDirectory(filePath);
+	} else {
+		_deleteFile(filePath);
+	}
+	return !(File::exists(filePath));
 }
 
 sl_bool File::deleteDirectoryRecursively(const String& dirPath)
@@ -442,7 +482,7 @@ sl_bool File::deleteDirectoryRecursively(const String& dirPath)
 				}
 			}
 		}
-		ret = ret && File::deleteDirectoryOnly(path);
+		ret = ret && File::deleteFile(path);
 		return ret;
 	} else {
 		return sl_false;

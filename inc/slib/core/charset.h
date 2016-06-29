@@ -24,9 +24,9 @@ public:
 	
 	static sl_size utf32ToUtf8(const sl_char32* utf32, sl_reg lenUtf32, sl_char8* utf8, sl_reg lenUtf8Buffer);
 
-	static void copyUtf32ToUtf16(sl_char16* utf16, const sl_char32* utf32, sl_size count);
+	static sl_size utf16ToUtf32(const sl_char16* utf16, sl_reg lenUtf16, sl_char32* utf32, sl_reg lenUtf32Buffer);
 	
-	static void copyUtf16ToUtf32(sl_char32* utf32, const sl_char16* utf16, sl_size count);
+	static sl_size utf32ToUtf16(const sl_char32* utf32, sl_reg lenUtf32, sl_char16* utf16, sl_reg lenUtf16Buffer);
 	
 };
 

@@ -174,7 +174,9 @@ public: \
 	SLIB_INLINE operator TYPE() const { return value; } \
 	SLIB_INLINE CLASS& operator=(const CLASS& other) { value = other.value; return *this; } \
 	SLIB_INLINE CLASS& operator=(TYPE _value) { value = _value; return *this; } \
+	SLIB_INLINE sl_bool operator==(const CLASS& other) { return value == other.value; } \
 	SLIB_INLINE sl_bool operator==(TYPE _value) { return value == _value; } \
+	SLIB_INLINE sl_bool operator!=(const CLASS& other) { return value != other.value; } \
 	SLIB_INLINE sl_bool operator!=(TYPE _value) { return value != _value; }
 
 #define SLIB_CHECK_FLAG(v, flag) (((v) & (flag)) != 0)

@@ -27,7 +27,7 @@ public:
 	enum {
 		Directory = 1,
 		Hidden = 2,
-		NotExist = 0x80000000
+		NotExist = 0x8000
 	};
 };
 
@@ -127,18 +127,16 @@ public:
 	static sl_bool setHidden(const String& filePath, sl_bool flagHidden = sl_true);
 
 	
-	static sl_bool createDirectory(const String& dirPath);
+	static sl_bool createDirectory(const String& dirPath, sl_bool flagErrorOnCreateExistingDirectory = sl_false);
 	
 	static sl_bool createDirectories(const String& dirPath);
 	
-	static sl_bool deleteFile(const String& filePath);
-	
-	static sl_bool deleteDirectoryOnly(const String& dirPath);
+	static sl_bool deleteFile(const String& filePath, sl_bool flagErrorOnDeleteNotExistingFile = sl_false);
 
 	
 	// Deletes the directory and its sub-directories and files
 	static sl_bool deleteDirectoryRecursively(const String& dirPath);
-
+	
 	// Changes the path of file or directory. Don't replace the existing file.
 	static sl_bool rename(const String& filePathOriginal, const String& filePathNew);
 
@@ -204,7 +202,14 @@ public:
 
 private:
 	static sl_file _open(const String& filePath, FileMode mode);
+	
 	static sl_bool _close(sl_file file);
+	
+	static sl_bool _createDirectory(const String& dirPath);
+	
+	static sl_bool _deleteFile(const String& dirPath);
+	
+	static sl_bool _deleteDirectory(const String& dirPath);
 	
 };
 

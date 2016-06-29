@@ -284,15 +284,21 @@ public:
 	Time getTimeOnly() const;
 	
 	
-	String8 toString() const;
+	String toString() const;
 
+	String8 toString8() const;
+	
 	String16 toString16() const;
 	
-	String8 getDateString() const;
+	String getDateString() const;
+	
+	String8 getDateString8() const;
 	
 	String16 getDateString16() const;
 	
-	String8 getTimeString() const;
+	String getTimeString() const;
+	
+	String8 getTimeString8() const;
 	
 	String16 getTimeString16() const;
 	

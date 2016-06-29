@@ -96,12 +96,28 @@ public:
 	
 	void setLocation(sl_real x, sl_real y);
 	
+	sl_real getX();
+	
+	void setX(sl_real x);
+	
+	sl_real getY();
+	
+	void setY(sl_real y);
+	
 	virtual Size getSize();
 	
 	virtual void setSize(const Size& size);
 	
 	void setSize(sl_real width, sl_real height);
 	
+	sl_real getWidth();
+	
+	void setWidth(sl_real width);
+	
+	sl_real getHeight();
+	
+	void setHeight(sl_real height);
+
 	
 	Rectangle getClientFrame();
 	

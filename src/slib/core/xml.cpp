@@ -566,6 +566,31 @@ String XmlNodeGroup::getFirstDescendantElementText(const String& uri, const Stri
 	return String::null();
 }
 
+Ref<XmlElement> XmlNodeGroup::findChildElementByAttribute(const String& attrName, const String& attrValue) const
+{
+	ListLocker< Ref<XmlNode> > nodes(m_children);
+	for (sl_size i = 0; i < nodes.count; i++) {
+		Ref<XmlElement> e = nodes[i]->toElementNode();
+		if (e.isNotNull()) {
+			String value = e->getAttribute(attrName);
+			if (value == attrValue) {
+				return e;
+			}
+			Ref<XmlElement> found = e->findChildElementByAttribute(attrName, attrValue);
+			if (found.isNotNull()) {
+				return found;
+			}
+		}
+	}
+	return Ref<XmlElement>::null();
+}
+
+Ref<XmlElement> XmlNodeGroup::findChildElementById(const String& _id) const
+{
+	SLIB_STATIC_STRING_BY_ARRAY(name, 'i', 'd');
+	return findChildElementByAttribute(name, _id);
+}
+
 /************************************************
 				XmlElement
 ************************************************/
@@ -927,7 +952,7 @@ sl_bool XmlDocument::checkWellFormed() const
 			return sl_false;
 		}
 	}
-	return sl_true;
+	return flagFoundRoot;
 }
 
 /************************************************
@@ -1297,6 +1322,15 @@ void XmlParseParam::setCreatingOnlyElements()
 	flagCreateWhiteSpaces = sl_false;
 }
 
+void XmlParseParam::setCreatingOnlyElementsAndTexts()
+{
+	flagCreateDocument = sl_true;
+	flagCreateCommentNodes = sl_false;
+	flagCreateProcessingInstructionNodes = sl_false;
+	flagCreateTextNodes = sl_true;
+	flagCreateWhiteSpaces = sl_false;
+}
+
 XmlParseControl::XmlParseControl()
 {
 	characterSize = 0;
@@ -1578,9 +1612,6 @@ void _Xml_Parser<ST, CT, BT>::escapeEntity(BT* sb)
 		if (parseRes == SLIB_PARSE_ERROR) {
 			REPORT_ERROR(_g_xml_error_msg_invalid_escape)
 		}
-		if (n == 0 || n > 65535) {
-			REPORT_ERROR(_g_xml_error_msg_invalid_escape)
-		}
 		pos = parseRes;
 		if (pos >= len) {
 			REPORT_ERROR(_g_xml_error_msg_escape_not_end)
@@ -1588,7 +1619,7 @@ void _Xml_Parser<ST, CT, BT>::escapeEntity(BT* sb)
 		if (buf[pos] != ';') {
 			REPORT_ERROR(_g_xml_error_msg_escape_not_end)
 		}
-		String16 s((sl_char16)n, 1);
+		String16 s(&n, 1);
 		if (s.isNull()) {
 			REPORT_ERROR(_g_xml_error_msg_memory_lack)
 		}
@@ -1989,16 +2020,19 @@ void _Xml_Parser<ST, CT, BT>::parseElement(XmlNodeGroup* parent, const String& _
 	} else {
 		pos++;
 	}
+	
+	element->setStartPositionInSource(posNameStart);
+	element->setLineNumberInSource(startLine);
+	element->setColumnNumberInSource(startColumn);
+	element->setEndPositionInSource(pos);
+
 	String prefix, uri, localName;
 	processPrefix(name, defNamespace, namespaces, prefix, uri, localName);
 	if (!(element->setName(name, uri, localName))) {
 		REPORT_ERROR(_g_xml_error_msg_unknown)
 	}
+
 	if (parent) {
-		parent->setStartPositionInSource(posNameStart);
-		parent->setEndPositionInSource(pos);
-		parent->setLineNumberInSource(startLine);
-		parent->setColumnNumberInSource(startColumn);
 		if (!(parent->addChild(element))) {
 			REPORT_ERROR(_g_xml_error_msg_memory_lack)
 		}

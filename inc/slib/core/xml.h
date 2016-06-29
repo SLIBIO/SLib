@@ -206,6 +206,10 @@ public:
 	
 	String getFirstDescendantElementText(const String& uri, const String& localName) const;
 	
+	Ref<XmlElement> findChildElementByAttribute(const String& name, const String& value) const;
+	
+	Ref<XmlElement> findChildElementById(const String& _id) const;
+
 protected:
 	CList< Ref<XmlNode> > m_children;
 
@@ -493,6 +497,8 @@ public:
 	void setCreatingAll();
 	
 	void setCreatingOnlyElements();
+	
+	void setCreatingOnlyElementsAndTexts();
 	
 };
 

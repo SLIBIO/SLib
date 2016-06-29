@@ -328,10 +328,11 @@ SLIB_INLINE StringContainer16* String16::_create(const sl_char32* utf32, sl_reg 
 		if (lenUtf32 < 0) {
 			lenUtf32 = Base::getStringLength4(utf32);
 		}
-		sl_size len = lenUtf32;
+		sl_size len = Charsets::utf32ToUtf16(utf32, lenUtf32, sl_null, -1);
 		StringContainer16* container = _alloc(len);
 		if (container != _String16_Null.container) {
-			Charsets::copyUtf32ToUtf16(container->sz, utf32, len);
+			Charsets::utf32ToUtf16(utf32, lenUtf32, container->sz, len);
+			container->sz[len] = 0;
 		}
 		return container;
 	}
@@ -489,36 +490,38 @@ SLIB_INLINE StringContainer16* String16::_merge8(const sl_char8* s1_u8, sl_reg l
 	return s;
 }
 
-SLIB_INLINE StringContainer16* String16::_merge32(const sl_char16* s1, sl_reg len1, const sl_char32* s2, sl_reg len2)
+SLIB_INLINE StringContainer16* String16::_merge32(const sl_char16* s1, sl_reg len1, const sl_char32* s2_u32, sl_reg len2_u32)
 {
 	if (len1 < 0) {
 		len1 = Base::getStringLength2(s1);
 	}
-	if (len2 < 0) {
-		len2 = Base::getStringLength4(s2);
+	if (len2_u32 < 0) {
+		len2_u32 = Base::getStringLength4(s2_u32);
 	}
+	sl_size len2 = Charsets::utf32ToUtf16(s2_u32, len2_u32, sl_null, -1);
 	sl_size len = len1 + len2;
 	StringContainer16* s = _alloc(len);
 	if (s != _String16_Null.container) {
 		Base::copyMemory(s->sz, s1, len1*sizeof(sl_char16));
-		Charsets::copyUtf32ToUtf16(s->sz + len1, s2, len2);
+		Charsets::utf32ToUtf16(s2_u32, len2_u32, s->sz + len1, len2);
 		s->sz[len] = 0;
 	}
 	return s;
 }
 
-SLIB_INLINE StringContainer16* String16::_merge32(const sl_char32* s1, sl_reg len1, const sl_char16* s2, sl_reg len2)
+SLIB_INLINE StringContainer16* String16::_merge32(const sl_char32* s1_u32, sl_reg len1_u32, const sl_char16* s2, sl_reg len2)
 {
-	if (len1 < 0) {
-		len1 = Base::getStringLength4(s1);
+	if (len1_u32 < 0) {
+		len1_u32 = Base::getStringLength4(s1_u32);
 	}
 	if (len2 < 0) {
 		len2 = Base::getStringLength2(s2);
 	}
+	sl_size len1 = Charsets::utf32ToUtf16(s1_u32, len1_u32, sl_null, -1);
 	sl_size len = len1 + len2;
 	StringContainer16* s = _alloc(len);
 	if (s != _String16_Null.container) {
-		Charsets::copyUtf32ToUtf16(s->sz, s1, len1);
+		Charsets::utf32ToUtf16(s1_u32, len1_u32, s->sz, len1);
 		Base::copyMemory(s->sz + len1, s2, len2*sizeof(sl_char16));
 		s->sz[len] = 0;
 	}
@@ -4947,13 +4950,18 @@ List<String16> SafeString16::split(const sl_char16* pattern) const
 
 
 template <class ST, class CT>
-static sl_size _String_applyBackslashEscapes(const ST& s, sl_bool flagDoubleQuote, CT* buf)
+static sl_size _String_applyBackslashEscapes(const ST& s, sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii, CT* buf)
 {
 	const CT* ch = s.getData();
 	sl_size len = s.getLength();
-	sl_size d = 1;
-	if (buf) {
-		buf[0] = flagDoubleQuote ? '"' : '\'';
+	sl_size d;
+	if (flagAddQuote) {
+		d = 1;
+		if (buf) {
+			buf[0] = flagDoubleQuote ? '"' : '\'';
+		}
+	} else {
+		d = 0;
 	}
 	for (sl_size i = 0; i < len; i++) {
 		CT c = ch[i];
@@ -5002,53 +5010,85 @@ static sl_size _String_applyBackslashEscapes(const ST& s, sl_bool flagDoubleQuot
 				d += 2;
 			}
 		} else {
-			if (buf) {
-				buf[d++] = c;
+			if (flagEscapeNonAscii && ((sl_uint8)c < 32 || (sl_uint8)c > 126)) {
+				if (sizeof(CT) == 1) {
+					if (buf) {
+						sl_uint8 t = (sl_uint8)c;
+						buf[d++] = '\\';
+						buf[d++] = 'x';
+						buf[d++] = _StringConv_radixPatternLower[(t >> 4) & 15];
+						buf[d++] = _StringConv_radixPatternLower[t & 15];
+					} else {
+						d += 4;
+					}
+				} else {
+					if (buf) {
+						sl_uint16 t = (sl_uint16)c;
+						buf[d++] = '\\';
+						buf[d++] = 'x';
+						buf[d++] = _StringConv_radixPatternLower[(t >> 12) & 15];
+						buf[d++] = _StringConv_radixPatternLower[(t >> 8) & 15];
+						buf[d++] = _StringConv_radixPatternLower[(t >> 4) & 15];
+						buf[d++] = _StringConv_radixPatternLower[t & 15];
+					} else {
+						d += 6;
+					}
+				}
+				
 			} else {
-				d++;
+				if (buf) {
+					buf[d++] = c;
+				} else {
+					d++;
+				}
 			}
 		}
 	}
-	if (buf) {
-		buf[d++] = flagDoubleQuote ? '"' : '\'';
-	} else {
-		d++;
+	if (flagAddQuote) {
+		if (buf) {
+			buf[d++] = flagDoubleQuote ? '"' : '\'';
+		} else {
+			d++;
+		}
 	}
 	return d;
 }
 
-String8 String8::applyBackslashEscapes(sl_bool flagDoubleQuote)
+String8 String8::applyBackslashEscapes(sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii)
 {
-	sl_size n = _String_applyBackslashEscapes<String8, sl_char8>(*this, flagDoubleQuote, sl_null);
+	sl_size n = _String_applyBackslashEscapes<String8, sl_char8>(*this, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, sl_null);
+	if (n == 0) {
+		return String8::getEmpty();
+	}
 	String8 ret = allocate(n);
 	if (ret.isEmpty()) {
 		return String8::null();
 	}
-	_String_applyBackslashEscapes<String8, sl_char8>(*this, flagDoubleQuote, ret.getData());
+	_String_applyBackslashEscapes<String8, sl_char8>(*this, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, ret.getData());
 	return ret;
 }
 
-String16 String16::applyBackslashEscapes(sl_bool flagDoubleQuote)
+String16 String16::applyBackslashEscapes(sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii)
 {
-	sl_size n = _String_applyBackslashEscapes<String16, sl_char16>(*this, flagDoubleQuote, sl_null);
+	sl_size n = _String_applyBackslashEscapes<String16, sl_char16>(*this, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, sl_null);
 	String16 ret = allocate(n);
 	if (ret.isEmpty()) {
 		return String16::null();
 	}
-	_String_applyBackslashEscapes<String16, sl_char16>(*this, flagDoubleQuote, ret.getData());
+	_String_applyBackslashEscapes<String16, sl_char16>(*this, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, ret.getData());
 	return ret;
 }
 
-String8 SafeString8::applyBackslashEscapes(sl_bool flagDoubleQuote)
+String8 SafeString8::applyBackslashEscapes(sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii)
 {
 	String8 s(*this);
-	return s.applyBackslashEscapes(flagDoubleQuote);
+	return s.applyBackslashEscapes(flagDoubleQuote, flagAddQuote, flagEscapeNonAscii);
 }
 
-String16 SafeString16::applyBackslashEscapes(sl_bool flagDoubleQuote)
+String16 SafeString16::applyBackslashEscapes(sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii)
 {
 	String16 s(*this);
-	return s.applyBackslashEscapes(flagDoubleQuote);
+	return s.applyBackslashEscapes(flagDoubleQuote, flagAddQuote, flagEscapeNonAscii);
 }
 
 template <class ST, class CT>
@@ -5092,9 +5132,6 @@ SLIB_INLINE ST _String_parseBackslashEscapes(const CT* sz, sl_size n, sl_size* l
 				if (i < n) {
 					ch = sz[i];
 					switch (ch) {
-						case '0':
-							ch = 0;
-							break;
 						case '\\':
 						case '"':
 						case '\'':
@@ -5117,6 +5154,137 @@ SLIB_INLINE ST _String_parseBackslashEscapes(const CT* sz, sl_size n, sl_size* l
 						case 'a':
 							ch = '\a';
 							break;
+						case '0': case '1': case '2': case '3':
+						case '4': case '5': case '6': case '7':
+						{
+							i++;
+							sl_size nh = 2;
+							sl_uint32 t = ch - '0';
+							while (i < n && nh > 0) {
+								ch = sz[i];
+								if (ch >= '0' && ch < '8') {
+									t = (t << 3) | (ch - '0');
+									i++;
+								} else {
+									break;
+								}
+							}
+							i--;
+							ch = (CT)t;
+							break;
+						}
+						case 'x':
+						{
+							i++;
+							sl_uint32 h = SLIB_CHAR_HEX_TO_INT(sz[i]);
+							if (h < 16) {
+								i++;
+								sl_uint32 t = h;
+								sl_size nh;
+								if (sizeof(CT) == 1) {
+									nh = 1;
+								} else {
+									nh = 3;
+								}
+								while (i < n && nh > 0) {
+									ch = sz[i];
+									h = SLIB_CHAR_HEX_TO_INT(ch);
+									if (h < 16) {
+										t = (t << 4) | h;
+										i++;
+									} else {
+										break;
+									}
+								}
+							} else {
+								flagError = sl_true;
+							}
+							i--;
+							break;
+						}
+						case 'u':
+						{
+							if (i + 4 < n) {
+								i++;
+								sl_uint16 t = 0;
+								for (int k = 0; k < 4; k++) {
+									sl_uint16 h = SLIB_CHAR_HEX_TO_INT(ch);
+									if (h < 16) {
+										t = (t << 4) | h;
+										i++;
+									} else {
+										flagError = sl_true;
+										break;
+									}
+								}
+								if (!flagError) {
+									if (sizeof(CT) == 1) {
+										sl_char8 u[3];
+										sl_size nu = Charsets::utf16ToUtf8(&t, 1, u, 3);
+										if (nu > 0) {
+											for (sl_size iu = 0; iu < nu - 1; iu++) {
+												buf[len++] = (CT)(u[iu]);
+											}
+											ch = (CT)(u[nu - 1]);
+										} else {
+											flagError = sl_true;
+										}
+									} else {
+										ch = (CT)t;
+									}
+								}
+								i--;
+							} else {
+								flagError = sl_true;
+							}
+							break;
+						}
+						case 'U':
+						{
+							if (i + 8 < n) {
+								i++;
+								sl_uint32 t = 0;
+								for (int k = 0; k < 4; k++) {
+									sl_uint32 h = SLIB_CHAR_HEX_TO_INT(ch);
+									if (h < 16) {
+										t = (t << 4) | h;
+										i++;
+									} else {
+										flagError = sl_true;
+										break;
+									}
+								}
+								if (!flagError) {
+									if (sizeof(CT) == 1) {
+										sl_char8 u[6];
+										sl_size nu = Charsets::utf32ToUtf8(&t, 1, u, 6);
+										if (nu > 0) {
+											for (sl_size iu = 0; iu < nu - 1; iu++) {
+												buf[len++] = (CT)(u[iu]);
+											}
+											ch = (CT)(u[nu - 1]);
+										} else {
+											flagError = sl_true;
+										}
+									} else {
+										sl_char16 u[2];
+										sl_size nu = Charsets::utf32ToUtf16(&t, 1, u, 2);
+										if (nu > 0) {
+											for (sl_size iu = 0; iu < nu - 1; iu++) {
+												buf[len++] = (CT)(u[iu]);
+											}
+											ch = (CT)(u[nu - 1]);
+										} else {
+											flagError = sl_true;
+										}
+									}
+								}
+								i--;
+							} else {
+								flagError = sl_true;
+							}
+							break;
+						}
 						default:
 							flagError = sl_true;
 							break;
@@ -7213,62 +7381,62 @@ String16 String16::formatv(const sl_char16* format, const Variant *params, sl_si
 
 String8 String8::argv(const Variant* params, sl_size nParams)
 {
-	return format(*this, params, nParams);
+	return formatv(*this, params, nParams);
 }
 
 String16 String16::argv(const Variant* params, sl_size nParams)
 {
-	return format(*this, params, nParams);
+	return formatv(*this, params, nParams);
 }
 
 String8 SafeString8::argv(const Variant* params, sl_size nParams)
 {
-	return String8::format(*this, params, nParams);
+	return String8::formatv(*this, params, nParams);
 }
 
 String16 SafeString16::argv(const Variant* params, sl_size nParams)
 {
-	return String16::format(*this, params, nParams);
+	return String16::formatv(*this, params, nParams);
 }
 
 String8 String8::format(const String8& szFormat, const Variant& param)
 {
-	return format(szFormat, &param, 1);
+	return formatv(szFormat, &param, 1);
 }
 
 String16 String16::format(const String16& szFormat, const Variant& param)
 {
-	return format(szFormat, &param, 1);
+	return formatv(szFormat, &param, 1);
 }
 
 String8 String8::format(const sl_char8* szFormat, const Variant& param)
 {
-	return format(szFormat, &param, 1);
+	return formatv(szFormat, &param, 1);
 }
 
 String16 String16::format(const sl_char16* szFormat, const Variant& param)
 {
-	return format(szFormat, &param, 1);
+	return formatv(szFormat, &param, 1);
 }
 
 String8 String8::arg(const Variant& param)
 {
-	return format(*this, &param, 1);
+	return formatv(*this, &param, 1);
 }
 
 String16 String16::arg(const Variant& param)
 {
-	return format(*this, &param, 1);
+	return formatv(*this, &param, 1);
 }
 
 String8 SafeString8::arg(const Variant& param)
 {
-	return String8::format(*this, &param, 1);
+	return String8::formatv(*this, &param, 1);
 }
 
 String16 SafeString16::arg(const Variant& param)
 {
-	return String16::format(*this, &param, 1);
+	return String16::formatv(*this, &param, 1);
 }
 
 #define FORMAT_BEGIN_VARS_LIST(n) char _vars[sizeof(Variant)*n]; Variant* vars=(Variant*)((void*)_vars); char* pvar = _vars;

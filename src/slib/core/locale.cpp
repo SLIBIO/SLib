@@ -199,9 +199,14 @@ String Locale::getLanguageName(Language lang)
 	return String::null();
 }
 
-Language Locale::getLanguageFromCode(const char* code)
+Language Locale::getLanguageFromCode(const sl_char8* code)
 {
 	return (Language)(((((sl_uint32)(code[1])) << 8) | ((sl_uint32)(code[0]))));
+}
+
+Language Locale::getLanguageFromCode(const sl_char16* code)
+{
+	return (Language)(((((sl_uint32)(code[1] & 255)) << 8) | ((sl_uint32)(code[0] & 255))));
 }
 
 Language Locale::getLanguageFromCode(const String& code)
@@ -520,9 +525,14 @@ String Locale::getCountryLongName(Country country)
 	return getCountryName(country);
 }
 
-Country Locale::getCountryFromCode(const char* code)
+Country Locale::getCountryFromCode(const sl_char8* code)
 {
 	return (Country)(((((sl_uint32)(code[1])) << 8) | ((sl_uint32)(code[0]))));
+}
+
+Country Locale::getCountryFromCode(const sl_char16* code)
+{
+	return (Country)(((((sl_uint32)(code[1] & 255)) << 8) | ((sl_uint32)(code[0] & 255))));
 }
 
 Country Locale::getCountryFromCode(const String& code)
@@ -556,22 +566,35 @@ Locale::Locale(Language language, Country country)
 {
 }
 
-Locale::Locale(const char* code)
+template <class CT>
+SLIB_INLINE sl_uint32 _Locale_getValueFromName(const CT* name)
 {
-	value = Unknown;
-	if (code[0] != 0 && code[1] != 0) {
-		if (code[2] == 0) {
-			value = (sl_uint32)(getLanguageFromCode(code));
-		} else if (code[2] == '_') {
-			if (code[3] !=0 && code[4] != 0) {
-				value = (sl_uint32)(getLanguageFromCode(code)) | (((sl_uint32)(getCountryFromCode(code+3))) << 16);
+	sl_uint32 value = Locale::Unknown;
+	if (name[0] != 0 && name[1] != 0) {
+		if (name[2] == 0) {
+			value = (sl_uint32)(Locale::getLanguageFromCode(name));
+		} else if (name[2] == '_' || name[2] == '-') {
+			if (name[3] !=0 && name[4] != 0) {
+				value = (sl_uint32)(Locale::getLanguageFromCode(name)) | (((sl_uint32)(Locale::getCountryFromCode(name+3))) << 16);
 			}
 		}
 	}
+	return value;
 }
 
-Locale::Locale(const String& code) : Locale(code.getData())
+Locale::Locale(const sl_char8* name)
 {
+	value = _Locale_getValueFromName(name);
+}
+
+Locale::Locale(const sl_char16* name)
+{
+	value = _Locale_getValueFromName(name);
+}
+
+Locale::Locale(const String& name)
+{
+	value = _Locale_getValueFromName(name.getData());
 }
 
 Language Locale::getLanguage() const
@@ -626,9 +649,14 @@ String Locale::getCountryLongName() const
 	return getCountryLongName(getCountry());
 }
 
-String Locale::getCode() const
+String Locale::toString(sl_char8 delimiter) const
 {
-	char sz[5];
+	return toString8(delimiter);
+}
+
+String8 Locale::toString8(sl_char8 delimiter) const
+{
+	sl_char8 sz[5];
 	Language lang = getLanguage();
 	sz[0] = (char)(((sl_uint32)(lang)));
 	sz[1] = (char)(((sl_uint32)(lang)) >> 8);
@@ -636,21 +664,28 @@ String Locale::getCode() const
 	if (country == Country::Unknown) {
 		sz[2] = 0;
 	} else {
-		sz[2] = '_';
+		sz[2] = delimiter;
 		sz[3] = (char)(((sl_uint32)(country)));
 		sz[4] = (char)(((sl_uint32)(country)) >> 8);
 	}
 	return sz;
 }
 
-Locale Locale::getFromCode(const char *code)
+String16 Locale::toString16(sl_char16 delimiter) const
 {
-	return Locale(code);
-}
-
-Locale Locale::getFromCode(const String& code)
-{
-	return Locale(code);
+	sl_char16 sz[5];
+	Language lang = getLanguage();
+	sz[0] = (char)(((sl_uint32)(lang)));
+	sz[1] = (char)(((sl_uint32)(lang)) >> 8);
+	Country country = getCountry();
+	if (country == Country::Unknown) {
+		sz[2] = 0;
+	} else {
+		sz[2] = delimiter;
+		sz[3] = (char)(((sl_uint32)(country)));
+		sz[4] = (char)(((sl_uint32)(country)) >> 8);
+	}
+	return sz;
 }
 
 SLIB_NAMESPACE_END

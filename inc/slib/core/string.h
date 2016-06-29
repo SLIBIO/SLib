@@ -525,7 +525,7 @@ public:
 	
 	List<String8> split(const sl_char8* pattern) const;
 	
-	String8 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true);
+	String8 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false);
 	
 	static String8 parseBackslashEscapes(const sl_char8* input, sl_size len, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null);
 	
@@ -1169,7 +1169,7 @@ public:
 	
 	List<String16> split(const sl_char16* pattern) const;
 	
-	String16 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true);
+	String16 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false);
 	
 	static String16 parseBackslashEscapes(const sl_char16* input, sl_size len, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null);
 	
@@ -1781,7 +1781,7 @@ public:
 	
 	List<String8> split(const sl_char8* pattern) const;
 	
-	String8 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true);
+	String8 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false);
 	
 	String8 parseBackslashEscapes(sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
 	
@@ -2253,7 +2253,7 @@ public:
 	
 	List<String16> split(const sl_char16* pattern) const;
 	
-	String16 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true);
+	String16 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false);
 	
 	String16 parseBackslashEscapes(sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
 	

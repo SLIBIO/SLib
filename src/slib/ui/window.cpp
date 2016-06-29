@@ -233,6 +233,30 @@ void Window::setLocation(sl_real x, sl_real y)
 	setLocation(Point(x, y));
 }
 
+sl_real Window::getX()
+{
+	return getFrame().left;
+}
+
+void Window::setX(sl_real x)
+{
+	Rectangle frame = getFrame();
+	frame.left = x;
+	setFrame(frame);
+}
+
+sl_real Window::getY()
+{
+	return getFrame().top;
+}
+
+void Window::setY(sl_real y)
+{
+	Rectangle frame = getFrame();
+	frame.top = y;
+	setFrame(frame);
+}
+
 Size Window::getSize()
 {
 	return getFrame().getSize();
@@ -248,6 +272,30 @@ void Window::setSize(const Size& size)
 void Window::setSize(sl_real width, sl_real height)
 {
 	setSize(Size(width, height));
+}
+
+sl_real Window::getWidth()
+{
+	return getFrame().getWidth();
+}
+
+void Window::setWidth(sl_real width)
+{
+	Rectangle frame = getFrame();
+	frame.setWidth(width);
+	setFrame(frame);
+}
+
+sl_real Window::getHeight()
+{
+	return getFrame().getHeight();
+}
+
+void Window::setHeight(sl_real height)
+{
+	Rectangle frame = getFrame();
+	frame.setHeight(height);
+	setFrame(frame);
 }
 
 Rectangle Window::getClientFrame()
