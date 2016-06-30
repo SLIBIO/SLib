@@ -5220,7 +5220,7 @@ SLIB_INLINE ST _String_parseBackslashEscapes(const CT* sz, sl_size n, sl_size* l
 								if (!flagError) {
 									if (sizeof(CT) == 1) {
 										sl_char8 u[3];
-										sl_size nu = Charsets::utf16ToUtf8(&t, 1, u, 3);
+										sl_size nu = Charsets::utf16ToUtf8((sl_char16*)&t, 1, u, 3);
 										if (nu > 0) {
 											for (sl_size iu = 0; iu < nu - 1; iu++) {
 												buf[len++] = (CT)(u[iu]);
