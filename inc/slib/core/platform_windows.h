@@ -48,6 +48,8 @@ public:
 	static void setWindowVerticalScrollParam(HWND hWnd, sl_int32 nMin, sl_int32 nMax, sl_int32 nPage);
 	
 
+	static void setDebugFlags();
+
 	static HMODULE loadLibrary(const String& path);
 	
 	static HMODULE loadLibrary_kernel32();

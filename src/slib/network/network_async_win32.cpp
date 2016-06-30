@@ -156,7 +156,7 @@ public:
 					} else {
 						int err = ::WSAGetLastError();
 						if (err == WSAEINVAL) {
-							// ConnectEx requires the socket to be �initially bound�
+							// ConnectEx requires the socket to be 'initially bound'
 							sockaddr_storage saBind;
 							SocketAddress aBind;
 							aBind.port = 0;

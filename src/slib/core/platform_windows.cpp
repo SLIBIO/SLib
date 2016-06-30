@@ -5,6 +5,8 @@
 #include "../../../inc/slib/core/platform_windows.h"
 #include "../../../inc/slib/core/scoped_pointer.h"
 
+#include <crtdbg.h>
+
 SLIB_NAMESPACE_BEGIN
 
 String Windows::getStringFromGUID(const GUID& guid)
@@ -131,7 +133,7 @@ sl_bool Windows::processWindowScrollEvents(HWND hWnd, UINT uMsg, WPARAM wParam, 
 		Base::zeroMemory(&si, sizeof(si));
 		si.cbSize = sizeof(si);
 		si.fMask = SIF_POS | SIF_PAGE | SIF_RANGE;
-		GetScrollInfo(hWnd, SB_VERT, &si);
+		::GetScrollInfo(hWnd, SB_VERT, &si);
 
 		switch (nSBCode) {
 		case SB_TOP:
@@ -162,7 +164,7 @@ sl_bool Windows::processWindowScrollEvents(HWND hWnd, UINT uMsg, WPARAM wParam, 
 		}
 
 		si.fMask = SIF_POS;
-		SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
+		::SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
 
 		return sl_true;
 
@@ -176,7 +178,7 @@ sl_bool Windows::processWindowScrollEvents(HWND hWnd, UINT uMsg, WPARAM wParam, 
 			Base::zeroMemory(&si, sizeof(si));
 			si.cbSize = sizeof(si);
 			si.fMask = SIF_POS | SIF_PAGE | SIF_RANGE;
-			GetScrollInfo(hWnd, SB_VERT, &si);
+			::GetScrollInfo(hWnd, SB_VERT, &si);
 
 			si.nPos += delta * (int)nWheel / WHEEL_DELTA;
 			if (si.nPos < si.nMin) {
@@ -187,7 +189,7 @@ sl_bool Windows::processWindowScrollEvents(HWND hWnd, UINT uMsg, WPARAM wParam, 
 			}
 
 			si.fMask = SIF_POS;
-			SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
+			::SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
 		}
 		return sl_true;
 
@@ -201,7 +203,7 @@ sl_bool Windows::processWindowScrollEvents(HWND hWnd, UINT uMsg, WPARAM wParam, 
 			Base::zeroMemory(&si, sizeof(si));
 			si.cbSize = sizeof(si);
 			si.fMask = SIF_POS | SIF_PAGE | SIF_RANGE;
-			GetScrollInfo(hWnd, SB_HORZ, &si);
+			::GetScrollInfo(hWnd, SB_HORZ, &si);
 
 			si.nPos += delta * (int)nWheel / WHEEL_DELTA;
 			if (si.nPos < si.nMin) {
@@ -212,7 +214,7 @@ sl_bool Windows::processWindowScrollEvents(HWND hWnd, UINT uMsg, WPARAM wParam, 
 			}
 
 			si.fMask = SIF_POS;
-			SetScrollInfo(hWnd, SB_HORZ, &si, TRUE);
+			::SetScrollInfo(hWnd, SB_HORZ, &si, TRUE);
 		}
 		return sl_true;
 	}
@@ -228,7 +230,7 @@ void Windows::setWindowHorizontalScrollParam(HWND hWnd, sl_int32 nMin, sl_int32 
 	si.nMin = nMin;
 	si.nMax = nMax;
 	si.nPage = nPage;
-	SetScrollInfo(hWnd, SB_HORZ, &si, TRUE);
+	::SetScrollInfo(hWnd, SB_HORZ, &si, TRUE);
 }
 
 void Windows::setWindowVerticalScrollParam(HWND hWnd, sl_int32 nMin, sl_int32 nMax, sl_int32 nPage)
@@ -240,7 +242,18 @@ void Windows::setWindowVerticalScrollParam(HWND hWnd, sl_int32 nMin, sl_int32 nM
 	si.nMin = nMin;
 	si.nMax = nMax;
 	si.nPage = nPage;
-	SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
+	::SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
+}
+
+void Windows::setDebugFlags()
+{
+#ifdef SLIB_DEBUG
+	int flag = ::_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+	// logically OR leak check bit
+	flag |= _CRTDBG_LEAK_CHECK_DF;
+	// set the flags again
+	::_CrtSetDbgFlag(flag);
+#endif
 }
 
 HMODULE Windows::loadLibrary(const String& _path)

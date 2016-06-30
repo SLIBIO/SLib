@@ -1061,6 +1061,7 @@ typename BTree<KT, VT, COMPARE>::NodeData* BTree<KT, VT, COMPARE>::_createNodeDa
 			}
 			New<KT>::free(data->keys, m_order);
 		}
+		delete data;
 	}
 	return sl_null;
 }
@@ -1072,6 +1073,7 @@ void BTree<KT, VT, COMPARE>::_freeNodeData(NodeData* data)
 		New<KT>::free(data->keys, m_order);
 		New<VT>::free(data->values, m_order);
 		New<TreeNode>::free(data->links, m_order);
+		delete data;
 	}
 }
 

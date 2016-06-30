@@ -66,6 +66,34 @@ DEFINE_MODIFIER_FUNCS(Control)
 DEFINE_MODIFIER_FUNCS(Windows)
 DEFINE_MODIFIER_FUNCS(Command)
 
+KeycodeAndModifiers::KeycodeAndModifiers() : value(0)
+{
+}
+
+KeycodeAndModifiers::KeycodeAndModifiers(Keycode keycode, const Modifiers& modifiers) : value((int)keycode | modifiers)
+{
+}
+
+Keycode KeycodeAndModifiers::getKeycode() const
+{
+	return (Keycode)(value & 0xFFFF);
+}
+
+void KeycodeAndModifiers::setKeycode(Keycode keycode)
+{
+	value = (value & Modifiers::Mask) | (int)(keycode);
+}
+
+Modifiers KeycodeAndModifiers::getModifiers() const
+{
+	return value & Modifiers::Mask;
+}
+
+void KeycodeAndModifiers::setModifiers(const Modifiers& modifiers)
+{
+	value = modifiers | (value & 0xFFFF);
+}
+
 String KeycodeAndModifiers::toString() const
 {
 	StringBuffer sb;
@@ -92,6 +120,65 @@ String KeycodeAndModifiers::toString() const
 	sb.add(UI::getKeyName(getKeycode(), sl_true));
 	return sb.merge();
 }
+
+sl_bool KeycodeAndModifiers::parse(const String& str)
+{
+	KeycodeAndModifiers km;
+	ListItems<String> list(str.split("+"));
+	for (sl_size i = 0; i < list.count; i++) {
+		if (km.getKeycode() != Keycode::Unknown) {
+			return sl_false;
+		}
+		String s = list[i].toLower();
+		if (s == "control" || s == "ctrl") {
+			km |= Modifiers::Control;
+		} else if (s == "shift") {
+			km |= Modifiers::Shift;
+		} else if (s == "alt" || s == "option") {
+			km |= Modifiers::Alt;
+		} else if (s == "command" || s == "window" || s == "win") {
+			km |= Modifiers::Alt;
+		} else {
+			Keycode keycode = UI::getKeycodeFromName(s);
+			if (keycode == Keycode::Unknown) {
+				return sl_false;
+			}
+			km.setKeycode(keycode);
+		}
+	}
+	if (km.getKeycode() == Keycode::Unknown) {
+		return sl_false;
+	}
+	*this = km;
+	return sl_true;
+}
+
+KeycodeAndModifiers& KeycodeAndModifiers::operator|=(int modifiers)
+{
+	value |= modifiers;
+	return *this;
+}
+
+KeycodeAndModifiers KeycodeAndModifiers::operator|(int modifiers)
+{
+	return KeycodeAndModifiers(value | modifiers);
+}
+
+KeycodeAndModifiers operator|(int modifiers, const KeycodeAndModifiers& km)
+{
+	return KeycodeAndModifiers(km.value | modifiers);
+}
+
+KeycodeAndModifiers operator|(Keycode keycode, int modifiers)
+{
+	return KeycodeAndModifiers(keycode, modifiers);
+}
+
+KeycodeAndModifiers operator|(int modifiers, Keycode keycode)
+{
+	return KeycodeAndModifiers(keycode, modifiers);
+}
+
 
 enum
 {
@@ -470,6 +557,7 @@ class _UIKeyNameMapper
 private:
 	HashTable<sl_uint32, String> mapLong;
 	HashTable<sl_uint32, String> mapShort;
+	HashTable<String, sl_uint32> mapName;
 	String nameInvalid;
 	
 public:
@@ -479,6 +567,7 @@ public:
 		SLIB_STATIC_STRING(_s, B); \
 		mapLong.put((sl_uint32)(A), _s); \
 		mapShort.put((sl_uint32)(A), _s); \
+		mapName.put(_s.toLower(), (sl_uint32)A); \
 	}
 #define _MAP_KEY2(A, B, C) \
 	{ \
@@ -486,6 +575,8 @@ public:
 		mapLong.put((sl_uint32)(A), _s1); \
 		SLIB_STATIC_STRING(_s2, C); \
 		mapShort.put((sl_uint32)(A), _s2); \
+		mapName.put(_s1.toLower(), (sl_uint32)A); \
+		mapName.put(_s2.toLower(), (sl_uint32)A); \
 	}
 
 	_UIKeyNameMapper()
@@ -550,23 +641,23 @@ public:
 		_MAP_KEY(Keycode::Y, "Y");
 		_MAP_KEY(Keycode::Z, "Z");
 		
-		_MAP_KEY(Keycode::Numpad0, "Numpad0");
-		_MAP_KEY(Keycode::Numpad1, "Numpad1");
-		_MAP_KEY(Keycode::Numpad2, "Numpad2");
-		_MAP_KEY(Keycode::Numpad3, "Numpad3");
-		_MAP_KEY(Keycode::Numpad4, "Numpad4");
-		_MAP_KEY(Keycode::Numpad5, "Numpad5");
-		_MAP_KEY(Keycode::Numpad6, "Numpad6");
-		_MAP_KEY(Keycode::Numpad7, "Numpad7");
-		_MAP_KEY(Keycode::Numpad8, "Numpad8");
-		_MAP_KEY(Keycode::Numpad9, "Numpad9");
+		_MAP_KEY2(Keycode::Numpad0, "Numpad0", "Num0");
+		_MAP_KEY2(Keycode::Numpad1, "Numpad1", "Num1");
+		_MAP_KEY2(Keycode::Numpad2, "Numpad2", "Num2");
+		_MAP_KEY2(Keycode::Numpad3, "Numpad3", "Num3");
+		_MAP_KEY2(Keycode::Numpad4, "Numpad4", "Num4");
+		_MAP_KEY2(Keycode::Numpad5, "Numpad5", "Num5");
+		_MAP_KEY2(Keycode::Numpad6, "Numpad6", "Num6");
+		_MAP_KEY2(Keycode::Numpad7, "Numpad7", "Num7");
+		_MAP_KEY2(Keycode::Numpad8, "Numpad8", "Num8");
+		_MAP_KEY2(Keycode::Numpad9, "Numpad9", "Num9");
 		
-		_MAP_KEY2(Keycode::NumpadDivide, "NumpadDivide", "Numpad /");
-		_MAP_KEY2(Keycode::NumpadMultiply, "NumpadMultiply", "Numpad *");
-		_MAP_KEY2(Keycode::NumpadMinus, "NumpadMinus", "Numpad -");
-		_MAP_KEY2(Keycode::NumpadPlus, "NumpadPlus", "Numpad +");
-		_MAP_KEY(Keycode::NumpadEnter, "NumpadEnter");
-		_MAP_KEY2(Keycode::NumpadDecimal, "NumpadDecimal", "Numpad .");
+		_MAP_KEY2(Keycode::NumpadDivide, "NumpadDivide", "Num/");
+		_MAP_KEY2(Keycode::NumpadMultiply, "NumpadMultiply", "Num*");
+		_MAP_KEY2(Keycode::NumpadMinus, "NumpadMinus", "Num-");
+		_MAP_KEY2(Keycode::NumpadPlus, "NumpadPlus", "Num+");
+		_MAP_KEY2(Keycode::NumpadEnter, "NumpadEnter", "NumEnter");
+		_MAP_KEY2(Keycode::NumpadDecimal, "NumpadDecimal", "Num.");
 		
 		_MAP_KEY(Keycode::F1, "F1");
 		_MAP_KEY(Keycode::F2, "F2");
@@ -581,15 +672,15 @@ public:
 		_MAP_KEY(Keycode::F11, "F11");
 		_MAP_KEY(Keycode::F12, "F12");
 		
-		_MAP_KEY(Keycode::PageUp, "PageUp");
-		_MAP_KEY(Keycode::PageDown, "PageDown");
+		_MAP_KEY2(Keycode::PageUp, "PageUp", "PgUp");
+		_MAP_KEY2(Keycode::PageDown, "PageDown", "PgDn");
 		_MAP_KEY(Keycode::Home, "Home");
 		_MAP_KEY(Keycode::End, "End");
 		_MAP_KEY(Keycode::Left, "Left");
 		_MAP_KEY(Keycode::Up, "Up");
 		_MAP_KEY(Keycode::Right, "Right");
 		_MAP_KEY(Keycode::Down, "Down");
-		_MAP_KEY(Keycode::PrintScreen, "PrintScreen");
+		_MAP_KEY2(Keycode::PrintScreen, "PrintScreen", "PrtSc");
 		_MAP_KEY2(Keycode::Insert, "Insert", "Ins");
 		_MAP_KEY2(Keycode::Delete, "Delete", "Del");
 		_MAP_KEY(Keycode::Sleep, "Sleep");
@@ -609,20 +700,28 @@ public:
 		_MAP_KEY(Keycode::PhoneStar, "Dial*");
 		_MAP_KEY(Keycode::PhonePound, "Dial#");
 
-		_MAP_KEY(Keycode::LeftShift, "LeftShift");
-		_MAP_KEY(Keycode::RightShift, "RightShift");
-		_MAP_KEY2(Keycode::LeftControl, "LeftControl", "LeftCtrl");
-		_MAP_KEY2(Keycode::RightControl, "RightControl", "RightCtrl");
+		_MAP_KEY2(Keycode::LeftShift, "LeftShift", "LShift");
+		_MAP_KEY2(Keycode::RightShift, "RightShift", "RShift");
+		_MAP_KEY2(Keycode::LeftControl, "LeftControl", "LCtrl");
+		_MAP_KEY2(Keycode::RightControl, "RightControl", "RCtrl");
 #if defined(SLIB_PLATFORM_IS_APPLE)
-		_MAP_KEY(Keycode::LeftOption, "LeftOption");
-		_MAP_KEY(Keycode::RightOption, "RightOption");
-		_MAP_KEY(Keycode::LeftCommand, "LeftCommand");
-		_MAP_KEY(Keycode::RightCommand, "RightCommand");
+		_MAP_KEY2(Keycode::LeftAlt, "LeftAlt", "LAlt");
+		_MAP_KEY2(Keycode::RightAlt, "RightAlt", "RAlt");
+		_MAP_KEY2(Keycode::LeftWin, "LeftWin", "LWin");
+		_MAP_KEY2(Keycode::RightWin, "RightWin", "RWin");
+		_MAP_KEY2(Keycode::LeftOption, "LeftOption", "LAlt");
+		_MAP_KEY2(Keycode::RightOption, "RightOption", "RAlt");
+		_MAP_KEY2(Keycode::LeftCommand, "LeftCommand", "LCmd");
+		_MAP_KEY2(Keycode::RightCommand, "RightCommand", "RCmd");
 #else
-		_MAP_KEY(Keycode::LeftAlt, "LeftAlt");
-		_MAP_KEY(Keycode::RightAlt, "RightAlt");
-		_MAP_KEY(Keycode::LeftWin, "LeftWin");
-		_MAP_KEY(Keycode::RightWin, "RightWin");
+		_MAP_KEY2(Keycode::LeftOption, "LeftOption", "LAlt");
+		_MAP_KEY2(Keycode::RightOption, "RightOption", "RAlt");
+		_MAP_KEY2(Keycode::LeftCommand, "LeftCommand", "LCmd");
+		_MAP_KEY2(Keycode::RightCommand, "RightCommand", "RCmd");
+		_MAP_KEY2(Keycode::LeftAlt, "LeftAlt", "LAlt");
+		_MAP_KEY2(Keycode::RightAlt, "RightAlt", "RAlt");
+		_MAP_KEY2(Keycode::LeftWin, "LeftWin", "LWin");
+		_MAP_KEY2(Keycode::RightWin, "RightWin", "RWin");
 #endif
 		_MAP_KEY(Keycode::CapsLock, "CapsLock");
 		_MAP_KEY(Keycode::ScrollLock, "ScrollLock");
@@ -645,12 +744,37 @@ public:
 		}
 		return nameInvalid;
 	}
+	
+	Keycode getCode(const String& keyName)
+	{
+		sl_uint32 keycode;
+		if (mapName.get(keyName.toLower(), &keycode)) {
+			return (Keycode)keycode;
+		}
+		return Keycode::Unknown;
+	}
+	
 };
 
+SLIB_SAFE_STATIC_GETTER(_UIKeyNameMapper, _UI_getKeyNameMapper);
 String UI::getKeyName(Keycode code, sl_bool flagShort)
 {
-	SLIB_SAFE_STATIC(_UIKeyNameMapper, mapper);
-	return mapper.get(code, flagShort);
+	_UIKeyNameMapper& mapper = _UI_getKeyNameMapper();
+	if ((void*)&mapper) {
+		return mapper.get(code, flagShort);
+	} else {
+		return String::null();
+	}
+}
+
+Keycode UI::getKeycodeFromName(const String& keyName)
+{
+	_UIKeyNameMapper& mapper = _UI_getKeyNameMapper();
+	if ((void*)&mapper) {
+		return mapper.getCode(keyName);
+	} else {
+		return Keycode::Unknown;
+	}
 }
 
 void IViewListener::onMouseEvent(View* view, UIEvent* event)

@@ -117,6 +117,7 @@ public:
 	// HID related functions
 	static String getKeyName(Keycode key, sl_bool flagShort = sl_false);
 
+	static Keycode getKeycodeFromName(const String& keyName);
 	
 	// UI Thread
 	static sl_bool isUiThread();

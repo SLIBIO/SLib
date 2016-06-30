@@ -109,9 +109,20 @@ public:
 
 	String toString() const;
 	
+	sl_bool parse(const String& str);
+	
+public:
+	KeycodeAndModifiers& operator|=(int modifiers);
+	
+	KeycodeAndModifiers operator|(int modifiers);
+	
+	friend KeycodeAndModifiers operator|(int modifiers, const KeycodeAndModifiers& km);
+	
 };
 
-KeycodeAndModifiers operator|(Keycode keycode, const Modifiers& modifiers);
+KeycodeAndModifiers operator|(Keycode keycode, int modifiers);
+
+KeycodeAndModifiers operator|(int modifiers, Keycode keycode);
 
 
 class SLIB_EXPORT UIEvent : public Referable
@@ -390,49 +401,6 @@ private:
 	String getModifierText(UIEvent* ev);
 	
 };
-
-SLIB_UI_NAMESPACE_END
-
-
-SLIB_UI_NAMESPACE_BEGIN
-
-SLIB_INLINE KeycodeAndModifiers::KeycodeAndModifiers() : value(0)
-{
-}
-
-SLIB_INLINE KeycodeAndModifiers::KeycodeAndModifiers(Keycode keycode, const Modifiers& modifiers) : value((int)keycode | modifiers)
-{
-}
-
-SLIB_INLINE Keycode KeycodeAndModifiers::getKeycode() const
-{
-	return (Keycode)(value & 0xFFFF);
-}
-
-SLIB_INLINE void KeycodeAndModifiers::setKeycode(Keycode keycode)
-{
-	value = (value & Modifiers::Mask) | (int)(keycode);
-}
-
-SLIB_INLINE Modifiers KeycodeAndModifiers::getModifiers() const
-{
-	return value & Modifiers::Mask;
-}
-
-SLIB_INLINE void KeycodeAndModifiers::setModifiers(const Modifiers& modifiers)
-{
-	value = modifiers | (value & 0xFFFF);
-}
-
-SLIB_INLINE KeycodeAndModifiers operator|(Keycode keycode, int modifiers)
-{
-	return KeycodeAndModifiers(keycode, modifiers);
-}
-
-SLIB_INLINE KeycodeAndModifiers operator|(int modifiers, Keycode keycode)
-{
-	return KeycodeAndModifiers(keycode, modifiers);
-}
 
 SLIB_UI_NAMESPACE_END
 

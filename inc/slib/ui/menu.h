@@ -197,6 +197,12 @@ NAME::NAME() { \
 #define SLIB_DEFINE_MENU_ITEM(PARENT, NAME, ...) \
 	NAME = PARENT##_menu->addMenuItem(__VA_ARGS__);
 
+#define SLIB_DEFINE_MENU_SEPARATOR(PARENT, NAME) \
+	NAME = PARENT##_menu->addSeparator();
+
+#define SLIB_DEFINE_MENU_SEPARATOR_NONAME(PARENT) \
+	PARENT##_menu->addSeparator();
+
 #define SLIB_DEFINE_MENU_END }
 
 SLIB_UI_NAMESPACE_END
