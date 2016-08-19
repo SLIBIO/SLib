@@ -100,7 +100,11 @@ public:
 	
 	void fillRectangle(const Rectangle& rc, const Ref<Brush>& brush);
 	
+	void fillRectangle(const Rectangle& rc, const Color& color);
+	
 	void fillRectangle(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Brush>& brush);
+	
+	void fillRectangle(sl_real x, sl_real y, sl_real width, sl_real height, const Color& color);
 	
 	
 	virtual void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& pen, const Ref<Brush>& brush) = 0;
@@ -113,7 +117,11 @@ public:
 	
 	void fillRoundRect(const Rectangle& rc, const Size& radius, const Ref<Brush>& brush);
 	
+	void fillRoundRect(const Rectangle& rc, const Size& radius, const Color& color);
+	
 	void fillRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real rx, sl_real ry, const Ref<Brush>& brush);
+	
+	void fillRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real rx, sl_real ry, const Color& color);
 	
 	
 	virtual void drawEllipse(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush) = 0;
@@ -126,7 +134,11 @@ public:
 	
 	void fillEllipse(const Rectangle& rc, const Ref<Brush>& brush);
 	
+	void fillEllipse(const Rectangle& rc, const Color& color);
+	
 	void fillEllipse(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Brush>& brush);
+	
+	void fillEllipse(sl_real x, sl_real y, sl_real width, sl_real height, const Color& color);
 	
 	
 	virtual void drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode = FillMode::Alternate) = 0;
@@ -139,7 +151,11 @@ public:
 	
 	void fillPolygon(const Point* points, sl_uint32 countPoints, const Ref<Brush>& brush);
 	
+	void fillPolygon(const Point* points, sl_uint32 countPoints, const Color& color);
+	
 	void fillPolygon(const List<Point>& points, const Ref<Brush>& brush);
+	
+	void fillPolygon(const List<Point>& points, const Color& color);
 	
 	
 	virtual void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Ref<Brush>& brush) = 0;
@@ -152,7 +168,11 @@ public:
 	
 	void fillPie(const Rectangle& rc, sl_real startDegrees, sl_real sweepDegrees, const Ref<Brush>& brush);
 	
+	void fillPie(const Rectangle& rc, sl_real startDegrees, sl_real sweepDegrees, const Color& color);
+	
 	void fillPie(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, const Ref<Brush>& brush);
+	
+	void fillPie(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, const Color& color);
 	
 	
 	virtual void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen, const Ref<Brush>& brush) = 0;
@@ -160,6 +180,8 @@ public:
 	void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen);
 	
 	void fillPath(const Ref<GraphicsPath>& path, const Ref<Brush>& brush);
+	
+	void fillPath(const Ref<GraphicsPath>& path, const Color& color);
 	
 	
 	void draw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc);

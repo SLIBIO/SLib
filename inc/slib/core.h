@@ -49,6 +49,7 @@
 #include "core/content_type.h"
 #include "core/locale.h"
 #include "core/charset.h"
+#include "core/parse.h"
 #include "core/resource.h"
 #include "core/setting.h"
 #include "core/url.h"

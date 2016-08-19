@@ -26,6 +26,10 @@ public:
 	
 	virtual sl_real getDrawableHeight();
 	
+	virtual Ref<Drawable> subDrawable(sl_real x, sl_real y, sl_real width, sl_real height);
+	
+	virtual Ref<Drawable> scaleDrawable(sl_real width, sl_real height);
+	
 	virtual void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc);
 	
 	virtual void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
@@ -41,6 +45,14 @@ public:
 	static Ref<ColorDrawable> createColorDrawable(const Color& color);
 	
 	static Ref<Drawable> createEmptyDrawable();
+	
+	static Ref<Drawable> createSubDrawable(const Ref<Drawable>& src, sl_real x, sl_real y, sl_real width, sl_real height);
+	
+	static Ref<Drawable> createSubDrawable(const Ref<Drawable>& src, const Rectangle& rectSrc);
+	
+	static Ref<Drawable> createScaledDrawable(const Ref<Drawable>& src, sl_real width, sl_real height);
+	
+	static Ref<Drawable> createScaledDrawable(const Ref<Drawable>& src, const Size& size);
 	
 };
 
@@ -98,6 +110,108 @@ public:
 protected:
 	Ref<Pen> m_pen;
 	Ref<Brush> m_brush;
+	
+};
+
+class SLIB_EXPORT SubDrawable : public Drawable
+{
+	SLIB_DECLARE_OBJECT
+	
+public:
+	static Ref<SubDrawable> create(const Ref<Drawable>& src, sl_real x, sl_real y, sl_real width, sl_real height);
+	
+public:
+	// override
+	sl_real getDrawableWidth();
+	
+	// override
+	sl_real getDrawableHeight();
+	
+	// override
+	Ref<Drawable> subDrawable(sl_real x, sl_real y, sl_real width, sl_real height);
+
+	// override
+	Ref<Drawable> scaleDrawable(sl_real width, sl_real height);
+	
+	// override
+	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc);
+	
+	// override
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	
+protected:
+	Ref<Drawable> m_src;
+	sl_real m_x;
+	sl_real m_y;
+	sl_real m_width;
+	sl_real m_height;
+
+};
+
+class SLIB_EXPORT ScaledDrawable : public Drawable
+{
+	SLIB_DECLARE_OBJECT
+	
+public:
+	static Ref<ScaledDrawable> create(const Ref<Drawable>& src, sl_real width, sl_real height);
+	
+public:
+	// override
+	sl_real getDrawableWidth();
+	
+	// override
+	sl_real getDrawableHeight();
+	
+	// override
+	Ref<Drawable> subDrawable(sl_real x, sl_real y, sl_real width, sl_real height);
+	
+	// override
+	Ref<Drawable> scaleDrawable(sl_real width, sl_real height);
+	
+	// override
+	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc);
+	
+	// override
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	
+protected:
+	Ref<Drawable> m_src;
+	sl_real m_width;
+	sl_real m_height;
+	
+};
+
+class SLIB_EXPORT ScaledSubDrawable : public Drawable
+{
+	SLIB_DECLARE_OBJECT
+	
+public:
+	static Ref<ScaledSubDrawable> create(const Ref<Drawable>& src, const Rectangle& rectSrc, sl_real width, sl_real height);
+	
+public:
+	// override
+	sl_real getDrawableWidth();
+	
+	// override
+	sl_real getDrawableHeight();
+	
+	// override
+	Ref<Drawable> subDrawable(sl_real x, sl_real y, sl_real width, sl_real height);
+	
+	// override
+	Ref<Drawable> scaleDrawable(sl_real width, sl_real height);
+	
+	// override
+	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc);
+	
+	// override
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	
+protected:
+	Ref<Drawable> m_src;
+	Rectangle m_rectSrc;
+	sl_real m_width;
+	sl_real m_height;
 	
 };
 

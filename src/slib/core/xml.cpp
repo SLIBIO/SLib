@@ -177,7 +177,17 @@ Ref<XmlElement> XmlNode::getParentElement() const
 	return parent->toElementNode();
 }
 
-sl_size XmlNode::getStartPositionInSource()
+String XmlNode::getSourceFilePath() const
+{
+	return m_sourceFilePath;
+}
+
+void XmlNode::setSourceFilePath(const String& path)
+{
+	m_sourceFilePath = path;
+}
+
+sl_size XmlNode::getStartPositionInSource() const
 {
 	return m_positionStartInSource;
 }
@@ -187,7 +197,7 @@ void XmlNode::setStartPositionInSource(sl_size pos)
 	m_positionStartInSource = pos;
 }
 
-sl_size XmlNode::getEndPositionInSource()
+sl_size XmlNode::getEndPositionInSource() const
 {
 	return m_positionEndInSource;
 }
@@ -197,7 +207,7 @@ void XmlNode::setEndPositionInSource(sl_size pos)
 	m_positionEndInSource = pos;
 }
 
-sl_size XmlNode::getLineNumberInSource()
+sl_size XmlNode::getLineNumberInSource() const
 {
 	return m_lineInSource;
 }
@@ -207,7 +217,7 @@ void XmlNode::setLineNumberInSource(sl_size line)
 	m_lineInSource = line;
 }
 
-sl_size XmlNode::getColumnNumberInSource()
+sl_size XmlNode::getColumnNumberInSource() const
 {
 	return m_columnInSource;
 }
@@ -1343,6 +1353,7 @@ template <class ST, class CT, class BT>
 class _Xml_Parser
 {
 public:
+	String sourceFilePath;
 	const CT* buf;
 	sl_size len;
 	sl_size pos;
@@ -1390,7 +1401,7 @@ public:
 	
 	void parseXml();
 	
-	static Ref<XmlDocument> parseXml(const CT* buf, sl_size len, XmlParseParam& param);
+	static Ref<XmlDocument> parseXml(const String& sourceFilePath, const CT* buf, sl_size len, XmlParseParam& param);
 	
 };
 
@@ -1545,6 +1556,7 @@ void _Xml_Parser<ST, CT, BT>::createWhiteSpace(XmlNodeGroup* parent, sl_size pos
 				REPORT_ERROR(_g_xml_error_msg_memory_lack)
 			}
 			calcLineNumber();
+			node->setSourceFilePath(sourceFilePath);
 			node->setStartPositionInSource(posStart);
 			node->setEndPositionInSource(posEnd);
 			node->setLineNumberInSource(lineNumber);
@@ -1681,6 +1693,7 @@ void _Xml_Parser<ST, CT, BT>::parseComment(XmlNodeGroup* parent)
 						if (comment.isNull()) {
 							REPORT_ERROR(_g_xml_error_msg_memory_lack)
 						}
+						comment->setSourceFilePath(sourceFilePath);
 						comment->setStartPositionInSource(startComment);
 						comment->setEndPositionInSource(pos + 3);
 						comment->setLineNumberInSource(startLine);
@@ -1728,6 +1741,7 @@ void _Xml_Parser<ST, CT, BT>::parseCDATA(XmlNodeGroup* parent)
 					if (text.isNull()) {
 						REPORT_ERROR(_g_xml_error_msg_memory_lack)
 					}
+					text->setSourceFilePath(sourceFilePath);
 					text->setStartPositionInSource(startCDATA);
 					text->setEndPositionInSource(pos + 3);
 					text->setLineNumberInSource(startLine);
@@ -1789,6 +1803,7 @@ void _Xml_Parser<ST, CT, BT>::parsePI(XmlNodeGroup* parent)
 					if (PI.isNull()) {
 						REPORT_ERROR(_g_xml_error_msg_memory_lack)
 					}
+					PI->setSourceFilePath(sourceFilePath);
 					PI->setStartPositionInSource(startPI);
 					PI->setEndPositionInSource(pos + 2);
 					PI->setLineNumberInSource(startLine);
@@ -2021,6 +2036,7 @@ void _Xml_Parser<ST, CT, BT>::parseElement(XmlNodeGroup* parent, const String& _
 		pos++;
 	}
 	
+	element->setSourceFilePath(sourceFilePath);
 	element->setStartPositionInSource(posNameStart);
 	element->setLineNumberInSource(startLine);
 	element->setColumnNumberInSource(startColumn);
@@ -2150,6 +2166,7 @@ void _Xml_Parser<ST, CT, BT>::parseText(XmlNodeGroup* parent)
 				if (node.isNull()) {
 					REPORT_ERROR(_g_xml_error_msg_memory_lack)
 				}
+				node->setSourceFilePath(sourceFilePath);
 				node->setStartPositionInSource(startText);
 				node->setEndPositionInSource(pos);
 				node->setLineNumberInSource(startLine);
@@ -2237,11 +2254,12 @@ void _Xml_Parser<ST, CT, BT>::parseXml()
 }
 
 template <class ST, class CT, class BT>
-Ref<XmlDocument> _Xml_Parser<ST, CT, BT>::parseXml(const CT* buf, sl_size len, XmlParseParam& param)
+Ref<XmlDocument> _Xml_Parser<ST, CT, BT>::parseXml(const String& sourceFilePath, const CT* buf, sl_size len, XmlParseParam& param)
 {
 	param.flagError = sl_false;
 	
 	_Xml_Parser<ST, CT, BT> parser;
+	parser.sourceFilePath = sourceFilePath;
 	parser.buf = buf;
 	parser.len = len;
 	
@@ -2278,7 +2296,7 @@ Ref<XmlDocument> _Xml_Parser<ST, CT, BT>::parseXml(const CT* buf, sl_size len, X
 
 Ref<XmlDocument> Xml::parseXml(const sl_char8* sz, sl_size len, XmlParseParam& param)
 {
-	return _Xml_Parser<String8, sl_char8, StringBuffer8>::parseXml(sz, len, param);
+	return _Xml_Parser<String8, sl_char8, StringBuffer8>::parseXml(String::null(), sz, len, param);
 }
 
 Ref<XmlDocument> Xml::parseXml(const sl_char8* sz, sl_size len)
@@ -2289,7 +2307,7 @@ Ref<XmlDocument> Xml::parseXml(const sl_char8* sz, sl_size len)
 
 Ref<XmlDocument> Xml::parseXml(const String& xml, XmlParseParam& param)
 {
-	return _Xml_Parser<String8, sl_char8, StringBuffer8>::parseXml(xml.getData(), xml.getLength(), param);
+	return _Xml_Parser<String8, sl_char8, StringBuffer8>::parseXml(String::null(), xml.getData(), xml.getLength(), param);
 }
 
 Ref<XmlDocument> Xml::parseXml(const String& xml)
@@ -2300,7 +2318,7 @@ Ref<XmlDocument> Xml::parseXml(const String& xml)
 
 Ref<XmlDocument> Xml::parseXml16(const sl_char16* sz, sl_size len, XmlParseParam& param)
 {
-	return _Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(sz, len, param);
+	return _Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(String::null(), sz, len, param);
 }
 
 Ref<XmlDocument> Xml::parseXml16(const sl_char16* sz, sl_size len)
@@ -2311,7 +2329,7 @@ Ref<XmlDocument> Xml::parseXml16(const sl_char16* sz, sl_size len)
 
 Ref<XmlDocument> Xml::parseXml16(const String16& xml, XmlParseParam& param)
 {
-	return _Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(xml.getData(), xml.getLength(), param);
+	return _Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(String::null(), xml.getData(), xml.getLength(), param);
 }
 
 Ref<XmlDocument> Xml::parseXml16(const String16& xml)
@@ -2323,13 +2341,14 @@ Ref<XmlDocument> Xml::parseXml16(const String16& xml)
 Ref<XmlDocument> Xml::parseXmlFromTextFile(const String& filePath, XmlParseParam& param)
 {
 	String16 xml = File::readAllText16(filePath);
-	return parseXml16(xml, param);
+	return _Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(filePath, xml.getData(), xml.getLength(), param);
 }
 
 Ref<XmlDocument> Xml::parseXmlFromTextFile(const String& filePath)
 {
 	XmlParseParam param;
-	return parseXmlFromTextFile(filePath, param);
+	String16 xml = File::readAllText16(filePath);
+	return _Xml_Parser<String16, sl_char16, StringBuffer16>::parseXml(filePath, xml.getData(), xml.getLength(), param);
 }
 
 /************************************************

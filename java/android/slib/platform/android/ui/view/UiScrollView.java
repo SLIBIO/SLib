@@ -9,12 +9,19 @@ import slib.platform.android.Logger;
 
 public class UiScrollView extends ScrollView {
 	
-	HorizontalScrollView horz;
+	InnerHorizontalView horz;
 	
-	public static UiScrollView _create(Context context) {
+	public static View _create(Context context, boolean flagBothScroll, boolean flagVertical) {
 		try {
-			UiScrollView ret = new UiScrollView(context);
-			return ret;
+			if (flagBothScroll) {
+				return new UiScrollView(context);
+			} else {
+				if (flagVertical) {
+					return new VerticalView(context);
+				} else {
+					return new HorizontalView(context);
+				}
+			}
 		} catch (Exception e) {
 			Logger.exception(e);
 		}
@@ -31,7 +38,7 @@ public class UiScrollView extends ScrollView {
 			sv.scrollTo(0, (int)y);
 			sv.horz.scrollTo((int)x, 0);
 		} else {
-			view.scrollTo(0, (int)y);
+			view.scrollTo((int)x, (int)y);
 		}
 	}
 	
@@ -52,10 +59,18 @@ public class UiScrollView extends ScrollView {
 			return view.getScrollY();
 		}
 	}
-	
+
+	private static native void nativeOnScroll(long instance, float x, float y);
+	public static void onEventScroll(View view, float x, float y) {
+		long instance = UiView.getInstance(view);
+		if (instance != 0) {
+			nativeOnScroll(instance, x, y);
+		}
+	}
+		
 	public UiScrollView(Context context) {
 		super(context);
-		horz = new HorizontalScrollView(context);
+		horz = new InnerHorizontalView(context);
 		FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
 		horz.setLayoutParams(lp);
 		super.addView(horz);
@@ -64,6 +79,57 @@ public class UiScrollView extends ScrollView {
 	public void addView(View view) {
 		horz.removeAllViews();
 		horz.addView(view);
+	}
+
+	protected void onScrollChanged(int l, int t, int oldl, int oldt) {	    
+	    super.onScrollChanged( l, t, oldl, oldt );
+	    onEventScroll(this, horz.getScrollX(), t);
+	}
+	
+	static class HorizontalView extends HorizontalScrollView {
+		
+		public HorizontalView(Context context) {
+			super(context);
+		}
+		
+		public void addView(View view) {
+			removeAllViews();
+			super.addView(view);
+		}
+
+		protected void onScrollChanged(int l, int t, int oldl, int oldt) {	    
+		    super.onScrollChanged( l, t, oldl, oldt );
+		    onEventScroll(this, l, t);
+		}
+	}
+
+	static class VerticalView extends ScrollView {
+		
+		public VerticalView(Context context) {
+			super(context);
+		}
+		
+		public void addView(View view) {
+			removeAllViews();
+			super.addView(view);
+		}
+
+		protected void onScrollChanged(int l, int t, int oldl, int oldt) {	    
+		    super.onScrollChanged( l, t, oldl, oldt );
+		    onEventScroll(this, l, t);
+		}
+	}
+
+	class InnerHorizontalView extends HorizontalScrollView {
+		
+		public InnerHorizontalView(Context context) {
+			super(context);
+		}
+		
+		protected void onScrollChanged(int l, int t, int oldl, int oldt) {	    
+		    super.onScrollChanged( l, t, oldl, oldt );
+		    onEventScroll(UiScrollView.this, l, UiScrollView.this.getScrollY());
+		}
 	}
 	
 }

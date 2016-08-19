@@ -5,6 +5,7 @@
 
 #include "../core/list.h"
 #include "../core/string.h"
+#include "../core/parse.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
@@ -78,20 +79,16 @@ public:
 	
 	sl_bool setString(const String& str);
 
-	static sl_reg parse(IPv4Address* _out, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
-	static sl_reg parse(IPv4Address* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
-	static sl_bool parse(const String& str, IPv4Address* _out);
-	
-	sl_bool parse(const String& str);
-	
 	void makeNetworkMask(sl_uint32 networkPrefixLength);
 	
 	sl_uint32 getNetworkPrefixLengthFromMask() const;
 	
 	sl_bool setHostName(const String& hostName);
 	
+	
+	SLIB_DECLARE_PARSE_FUNCTIONS(IPv4Address)
+	
+
 public:
 	SLIB_INLINE IPv4Address& operator=(const IPv4Address& other) = default;
 	
@@ -223,16 +220,12 @@ public:
 	String toString() const;
 	
 	sl_bool setString(const String& str);
-
-	static sl_reg parse(IPv6Address* _out, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
-	static sl_reg parse(IPv6Address* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
-	static sl_bool parse(const String& str, IPv6Address* _out);
-	
-	sl_bool parse(const String& str);
 	
 	sl_bool setHostName(const String& hostName);
+	
+	
+	SLIB_DECLARE_PARSE_FUNCTIONS(IPv6Address)
+	
 
 public:
 	IPv6Address& operator=(const IPv6Address& other);
@@ -324,16 +317,12 @@ public:
 	String toString() const;
 	
 	sl_bool setString(const String& str);
-
-	static sl_reg parse(IPAddress* _out, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
-	static sl_reg parse(IPAddress* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
-	static sl_bool parse(const String& str, IPAddress* _out);
-	
-	sl_bool parse(const String& str);
 	
 	sl_bool setHostName(const String& hostName);
+	
+	
+	SLIB_DECLARE_PARSE_FUNCTIONS(IPAddress)
+	
 	
 public:
 	IPAddress& operator=(const IPAddress& other);

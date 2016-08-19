@@ -133,9 +133,19 @@ void Canvas::fillRectangle(const Rectangle& rc, const Ref<Brush>& brush)
 	drawRectangle(rc, Ref<Pen>::null(), brush);
 }
 
+void Canvas::fillRectangle(const Rectangle& rc, const Color& color)
+{
+	drawRectangle(rc, Ref<Pen>::null(), Brush::createSolidBrush(color));
+}
+
 void Canvas::fillRectangle(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Brush>& brush)
 {
 	drawRectangle(Rectangle(x, y, x+width, y+height), Ref<Pen>::null(), brush);
+}
+
+void Canvas::fillRectangle(sl_real x, sl_real y, sl_real width, sl_real height, const Color& color)
+{
+	drawRectangle(Rectangle(x, y, x+width, y+height), Ref<Pen>::null(), Brush::createSolidBrush(color));
 }
 
 void Canvas::drawRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real rx, sl_real ry, const Ref<Pen>& pen, const Ref<Brush>& brush)
@@ -158,9 +168,19 @@ void Canvas::fillRoundRect(const Rectangle& rc, const Size& radius, const Ref<Br
 	drawRoundRect(rc, radius, Ref<Pen>::null(), brush);
 }
 
+void Canvas::fillRoundRect(const Rectangle& rc, const Size& radius, const Color& color)
+{
+	drawRoundRect(rc, radius, Ref<Pen>::null(), Brush::createSolidBrush(color));
+}
+
 void Canvas::fillRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real rx, sl_real ry, const Ref<Brush>& brush)
 {
 	drawRoundRect(Rectangle(x, y, x+width, y+height), Size(rx, ry), Ref<Pen>::null(), brush);
+}
+
+void Canvas::fillRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real rx, sl_real ry, const Color& color)
+{
+	drawRoundRect(Rectangle(x, y, x+width, y+height), Size(rx, ry), Ref<Pen>::null(), Brush::createSolidBrush(color));
 }
 
 void Canvas::drawEllipse(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Pen>& pen, const Ref<Brush>& brush)
@@ -183,9 +203,19 @@ void Canvas::fillEllipse(const Rectangle& rc, const Ref<Brush>& brush)
 	drawEllipse(rc, Ref<Pen>::null(), brush);
 }
 
+void Canvas::fillEllipse(const Rectangle& rc, const Color& color)
+{
+	drawEllipse(rc, Ref<Pen>::null(), Brush::createSolidBrush(color));
+}
+
 void Canvas::fillEllipse(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Brush>& brush)
 {
 	drawEllipse(Rectangle(x, y, x+width, y+height), Ref<Pen>::null(), brush);
+}
+
+void Canvas::fillEllipse(sl_real x, sl_real y, sl_real width, sl_real height, const Color& color)
+{
+	drawEllipse(Rectangle(x, y, x+width, y+height), Ref<Pen>::null(), Brush::createSolidBrush(color));
 }
 
 void Canvas::drawPolygon(const List<Point>& _points, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode)
@@ -210,10 +240,21 @@ void Canvas::fillPolygon(const Point* points, sl_uint32 countPoints, const Ref<B
 	drawPolygon(points, countPoints, Ref<Pen>::null(), brush);
 }
 
+void Canvas::fillPolygon(const Point* points, sl_uint32 countPoints, const Color& color)
+{
+	drawPolygon(points, countPoints, Ref<Pen>::null(), Brush::createSolidBrush(color));
+}
+
 void Canvas::fillPolygon(const List<Point>& _points, const Ref<Brush>& brush)
 {
 	ListLocker<Point> points(_points);
 	drawPolygon(points.data, (sl_uint32)(points.count), Ref<Pen>::null(), brush);
+}
+
+void Canvas::fillPolygon(const List<Point>& _points, const Color& color)
+{
+	ListLocker<Point> points(_points);
+	drawPolygon(points.data, (sl_uint32)(points.count), Ref<Pen>::null(), Brush::createSolidBrush(color));
 }
 
 void Canvas::drawPie(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen, const Ref<Brush>& brush)
@@ -236,9 +277,14 @@ void Canvas::fillPie(const Rectangle& rc, sl_real startDegrees, sl_real sweepDeg
 	drawPie(rc, startDegrees, sweepDegrees, Ref<Pen>::null(), brush);
 }
 
-void Canvas::fillPie(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, const Ref<Brush>& brush)
+void Canvas::fillPie(const Rectangle& rc, sl_real startDegrees, sl_real sweepDegrees, const Color& color)
 {
-	drawPie(Rectangle(x, y, x+width, y+height), startDegrees, sweepDegrees, Ref<Pen>::null(), brush);
+	drawPie(rc, startDegrees, sweepDegrees, Ref<Pen>::null(), Brush::createSolidBrush(color));
+}
+
+void Canvas::fillPie(sl_real x, sl_real y, sl_real width, sl_real height, sl_real startDegrees, sl_real sweepDegrees, const Color& color)
+{
+	drawPie(Rectangle(x, y, x+width, y+height), startDegrees, sweepDegrees, Ref<Pen>::null(), Brush::createSolidBrush(color));
 }
 
 void Canvas::drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen)
@@ -249,6 +295,11 @@ void Canvas::drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen)
 void Canvas::fillPath(const Ref<GraphicsPath>& path, const Ref<Brush>& brush)
 {
 	drawPath(path, Ref<Pen>::null(), brush);
+}
+
+void Canvas::fillPath(const Ref<GraphicsPath>& path, const Color& color)
+{
+	drawPath(path, Ref<Pen>::null(), Brush::createSolidBrush(color));
 }
 
 void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc)

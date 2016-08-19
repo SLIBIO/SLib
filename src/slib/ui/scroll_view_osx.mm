@@ -43,6 +43,19 @@ public:
 		}
 		__applyContent(handle);
 	}
+	
+	static void __onScroll(OSX_ViewInstance* instance, NSScrollView* sv)
+	{
+		NSClipView* clip = [sv contentView];
+		if (clip != nil) {
+			NSPoint pt=[clip bounds].origin;
+			Ref<View> _view = instance->getView();
+			if (ScrollView::checkInstance(_view.ptr)) {
+				_ScrollView* view = (_ScrollView*)(_view.ptr);
+				view->_onScroll_NW((sl_real)(pt.x), (sl_real)(pt.y));
+			}
+		}
+	}
 };
 
 Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* _parent)
@@ -50,6 +63,18 @@ Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* _parent)
 	OSX_VIEW_CREATE_INSTANCE_BEGIN
 	_Slib_OSX_ScrollView* handle = [[_Slib_OSX_ScrollView alloc] initWithFrame:frame];
 	if (handle != nil) {
+		if (m_flagBothScroll) {
+			[handle setHasVerticalScroller:YES];
+			[handle setHasHorizontalScroller:YES];
+		} else {
+			if (m_flagVerticalScroll) {
+				[handle setHasHorizontalScroller:NO];
+				[handle setHasVerticalScroller:YES];
+			} else {
+				[handle setHasHorizontalScroller:YES];
+				[handle setHasVerticalScroller:NO];
+			}
+		}
 		((_ScrollView*)this)->__applyProperties(handle);
 	}
 	OSX_VIEW_CREATE_INSTANCE_END
@@ -157,10 +182,23 @@ SLIB_UI_NAMESPACE_END
 {
 	self = [super initWithFrame:frame];
 	if (self != nil) {
-		[self setHasVerticalScroller:TRUE];
-		[self setHasHorizontalScroller:TRUE];
+		NSView *contentView = [self contentView];
+		if (contentView != nil) {
+			[contentView setPostsBoundsChangedNotifications:YES];
+			[[NSNotificationCenter defaultCenter] addObserver:self
+													 selector:@selector(boundDidChange:)
+														 name:NSViewBoundsDidChangeNotification
+													   object:contentView];
+		}
 	}
 	return self;
+}
+
+- (void)boundDidChange:(NSNotification *)notification {
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		slib::_ScrollView::__onScroll(instance.ptr, self);
+	}
 }
 @end
 

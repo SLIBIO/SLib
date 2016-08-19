@@ -92,8 +92,6 @@ public:
 	
 	void fillColor(const Color& color);
 
-	Ref<Image> createSub(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height) const;
-
 	
 	static void draw(ImageDesc& dst, const ImageDesc& src, BlendMode blend = BlendMode::Copy, StretchMode stretch = StretchMode::Halftone);
 	
@@ -109,13 +107,19 @@ public:
 				   const Ref<Image>& src, sl_int32 sx, sl_int32 sy,
 				   BlendMode blend = BlendMode::Copy, StretchMode stretch = StretchMode::Halftone);
 	
+	
+	// override
+	Ref<Drawable> subDrawable(sl_real x, sl_real y, sl_real width, sl_real height);
+	
+	Ref<Image> sub(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height) const;
+	
 	Ref<Image> scale(sl_uint32 width, sl_uint32 height, StretchMode stretch = StretchMode::Halftone) const;
 	
 	
 	static ImageFileType getFileType(const void* mem, sl_size size);
 	
 	static ImageFileType getFileType(Memory mem);
-
+	
 	static Ref<Image> loadFromMemory(const void* mem, sl_size size, sl_uint32 width = 0, sl_uint32 height = 0);
 	
 	static Ref<Image> loadFromMemory(Memory mem, sl_uint32 width = 0, sl_uint32 height = 0);

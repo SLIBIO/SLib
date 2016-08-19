@@ -140,9 +140,9 @@ public:
 	
 	sl_size remove(const KT& key, sl_bool flagRemoveAllMatches = sl_false);
 	
-	sl_size remove_NoLock(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
+	sl_size removeKeyAndValue_NoLock(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
 	
-	sl_size remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
+	sl_size removeKeyAndValue(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
 	
 	// override
 	sl_size removeAll_NoLock();
@@ -213,9 +213,9 @@ public:
 	
 	sl_size remove(const KT& key, sl_bool flagRemoveAllMatches = sl_false);
 	
-	sl_size remove_NoLock(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
+	sl_size removeKeyAndValue_NoLock(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
 	
-	sl_size remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
+	sl_size removeKeyAndValue(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
 
 	// override
 	sl_size removeAll_NoLock();
@@ -288,9 +288,9 @@ public:
 
 	sl_size remove(const KT& key, sl_bool flagRemoveAllMatches = sl_false);
 	
-	sl_size remove_NoLock(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
+	sl_size removeKeyAndValue_NoLock(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
 	
-	sl_size remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
+	sl_size removeKeyAndValue(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
 	
 	// override
 	sl_size removeAll_NoLock();
@@ -1084,7 +1084,7 @@ sl_size ListMap<KT, VT, COMPARE>::remove(const KT& key, sl_bool flagRemoveAllMat
 }
 
 template <class KT, class VT, class COMPARE>
-sl_size ListMap<KT, VT, COMPARE>::remove_NoLock(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
+sl_size ListMap<KT, VT, COMPARE>::removeKeyAndValue_NoLock(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
 {
 	Pair<KT, VT> pair;
 	pair.key = key;
@@ -1093,10 +1093,10 @@ sl_size ListMap<KT, VT, COMPARE>::remove_NoLock(const KT& key, const VT& value, 
 }
 
 template <class KT, class VT, class COMPARE>
-sl_size ListMap<KT, VT, COMPARE>::remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
+sl_size ListMap<KT, VT, COMPARE>::removeKeyAndValue(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
 {
 	ObjectLocker lock(this);
-	return remove_NoLock(key, value, flagRemoveAllMatches);
+	return removeKeyAndValue_NoLock(key, value, flagRemoveAllMatches);
 }
 
 template <class KT, class VT, class COMPARE>
@@ -1279,16 +1279,16 @@ sl_size HashMap<KT, VT, HASH>::remove(const KT& key, sl_bool flagRemoveAllMatche
 }
 
 template <class KT, class VT, class HASH>
-sl_size HashMap<KT, VT, HASH>::remove_NoLock(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
+sl_size HashMap<KT, VT, HASH>::removeKeyAndValue_NoLock(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
 {
-	return table.remove(key, value, flagRemoveAllMatches);
+	return table.removeKeyAndValue(key, value, flagRemoveAllMatches);
 }
 
 template <class KT, class VT, class HASH>
-sl_size HashMap<KT, VT, HASH>::remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
+sl_size HashMap<KT, VT, HASH>::removeKeyAndValue(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
 {
 	ObjectLocker lock(this);
-	return table.remove(key, value, flagRemoveAllMatches);
+	return table.removeKeyAndValue(key, value, flagRemoveAllMatches);
 }
 
 template <class KT, class VT, class HASH>
@@ -1473,16 +1473,16 @@ sl_size TreeMap<KT, VT, COMPARE>::remove(const KT& key, sl_bool flagRemoveAllMat
 }
 
 template <class KT, class VT, class COMPARE>
-sl_size TreeMap<KT, VT, COMPARE>::remove_NoLock(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
+sl_size TreeMap<KT, VT, COMPARE>::removeKeyAndValue_NoLock(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
 {
-	return tree.remove(key, value, flagRemoveAllMatches);
+	return tree.removeKeyAndValue(key, value, flagRemoveAllMatches);
 }
 
 template <class KT, class VT, class COMPARE>
-sl_size TreeMap<KT, VT, COMPARE>::remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
+sl_size TreeMap<KT, VT, COMPARE>::removeKeyAndValue(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
 {
 	ObjectLocker lock(this);
-	return tree.remove(key, value, flagRemoveAllMatches);
+	return tree.removeKeyAndValue(key, value, flagRemoveAllMatches);
 }
 
 template <class KT, class VT, class COMPARE>

@@ -4,6 +4,7 @@
 #include "definition.h"
 
 #include "string.h"
+#include "parse.h"
 
 SLIB_NAMESPACE_BEGIN
 
@@ -64,7 +65,7 @@ public:
 	void add(sl_int64 time);
 	
 	void add(const Time& other);
-	
+
 public:
 	Time& operator=(const Time& other);
 	
@@ -118,18 +119,16 @@ public:
 	Time& operator-=(sl_int64 time);
 	
 	Time& operator-=(const Time& time);
-
-	/* platform functions */
-public:
-	void getDate(DATE* date) const;
 	
+public:
 	void setElements(int year, int month, int date, int hour, int minute, int second);
 	
 	void setNow();
 	
 	void setToSystem();
 	
-public:
+	void getDate(DATE* date) const;
+	
 	void setDate(int year, int month, int day);
 	
 	int getYear() const;
@@ -314,6 +313,19 @@ public:
 	
 	sl_bool setString(const sl_char16* str);
 	
+	String format(const String8& fmt) const;
+	
+	String format(const SafeString8& fmt) const;
+	
+	String format(const String16& fmt) const;
+	
+	String format(const SafeString16& fmt) const;
+	
+	String format(const sl_char8* fmt) const;
+	
+	String format(const sl_char16* fmt) const;
+
+	
 	static sl_reg parseElements(sl_int32* outArrayYMDHMS, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	static sl_reg parseElements(sl_int32* outArrayYMDHMS, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
@@ -330,49 +342,21 @@ public:
 	
 	static sl_bool parseElements(const sl_char16* time, sl_int32* outArrayYMDHMS);
 
-	static sl_reg parse(Time* _out, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+	SLIB_DECLARE_PARSE_FUNCTIONS(Time)
 	
-	static sl_reg parse(Time* _out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
-	static sl_bool parse(const String8& str, Time* _out);
-	
-	static sl_bool parse(const String16& str, Time* _out);
-	
-	static sl_bool parse(const SafeString8& str, Time* _out);
-	
-	static sl_bool parse(const SafeString16& str, Time* _out);
-	
-	static sl_bool parse(const sl_char8* str, Time* _out);
-	
-	static sl_bool parse(const sl_char16* str, Time* _out);
-	
-	sl_bool parse(const String8& str);
-	
-	sl_bool parse(const String16& str);
-	
-	sl_bool parse(const SafeString8& str);
-	
-	sl_bool parse(const SafeString16& str);
-	
-	sl_bool parse(const sl_char8* str);
-	
-	sl_bool parse(const sl_char16* str);
-	
-	String format(const String8& fmt) const;
-	
-	String format(const SafeString8& fmt) const;
-	
-	String format(const String16& fmt) const;
-	
-	String format(const SafeString16& fmt) const;
-	
-	String format(const sl_char8* fmt) const;
-	
-	String format(const sl_char16* fmt) const;
-
-	
-private:
+protected:
 	sl_int64 m_time; // microseconds
+	
+	/* platform functions */
+protected:
+	sl_bool _getDate(DATE* date) const;
+	
+	void _setElements(int year, int month, int date, int hour, int minute, int second);
+	
+	void _setNow();
+	
+	void _setToSystem();
+	
 };
 
 

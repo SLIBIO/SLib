@@ -476,6 +476,7 @@ TreeView::TreeView()
 	SLIB_REFERABLE_CONSTRUCTOR
 	
 	ScrollView::setCreatingNativeWidget(sl_false);
+	ScrollView::setOccurringClick(sl_false);
 	
 	_createRootItem();
 	_createContentView();
@@ -494,7 +495,6 @@ TreeView::TreeView()
 	m_itemIndent = 16;
 	m_textIndent = 4;
 	
-	setOccurringClick(sl_false);
 }
 
 Ref<TreeViewItem> TreeView::getRootItem()

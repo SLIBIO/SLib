@@ -113,76 +113,6 @@ sl_bool IPv4Address::setString(const String& str)
 	}
 }
 
-template <class CT>
-SLIB_INLINE sl_reg _IPv4Address_parse(IPv4Address* obj, const CT* sz, sl_size i, sl_size n)
-{
-	if (i >= n) {
-		return SLIB_PARSE_ERROR;
-	}
-	int v[4];
-	for (int k = 0; k < 4; k++) {
-		int t = 0;
-		int s = 0;
-		for (; i < n; i++) {
-			int h = sz[i];
-			if (h >= '0' && h <= '9') {
-				s = s * 10 + (h - '0');
-				if (s > 255) {
-					return SLIB_PARSE_ERROR;
-				}
-				t++;
-			} else {
-				break;
-			}
-		}
-		if (t == 0) {
-			return SLIB_PARSE_ERROR;
-		}
-		if (k < 3) {
-			if (i >= n || sz[i] != '.') {
-				return SLIB_PARSE_ERROR;
-			}
-			i++;
-		}
-		v[k] = s;
-	}
-	if (obj) {
-		obj->a = (sl_uint8)(v[0]);
-		obj->b = (sl_uint8)(v[1]);
-		obj->c = (sl_uint8)(v[2]);
-		obj->d = (sl_uint8)(v[3]);
-	}
-	return i;
-}
-
-sl_reg IPv4Address::parse(IPv4Address* out, const sl_char8* sz, sl_size posBegin, sl_size n)
-{
-	return _IPv4Address_parse(out, sz, posBegin, n);
-}
-
-sl_reg IPv4Address::parse(IPv4Address* out, const sl_char16* sz, sl_size posBegin, sl_size n)
-{
-	return _IPv4Address_parse(out, sz, posBegin, n);
-}
-
-sl_bool IPv4Address::parse(const String& s, IPv4Address* out)
-{
-	sl_size n = s.getLength();
-	if (n == 0) {
-		return sl_false;
-	}
-	return _IPv4Address_parse(out, s.getData(), 0, n) == n;
-}
-
-sl_bool IPv4Address::parse(const String& s)
-{
-	sl_size n = s.getLength();
-	if (n == 0) {
-		return sl_false;
-	}
-	return _IPv4Address_parse(this, s.getData(), 0, n) == n;
-}
-
 void IPv4Address::makeNetworkMask(sl_uint32 networkPrefixLength)
 {
 	int p = networkPrefixLength;
@@ -224,6 +154,52 @@ sl_bool IPv4Address::setHostName(const String& hostName)
 	*this = Network::getIPv4AddressFromHostName(hostName);
 	return isNotZero();
 }
+
+
+template <class CT, class ST>
+static sl_reg _IPv4Address_parse(IPv4Address* obj, const CT* sz, sl_size i, sl_size n)
+{
+	if (i >= n) {
+		return SLIB_PARSE_ERROR;
+	}
+	int v[4];
+	for (int k = 0; k < 4; k++) {
+		int t = 0;
+		int s = 0;
+		for (; i < n; i++) {
+			int h = sz[i];
+			if (h >= '0' && h <= '9') {
+				s = s * 10 + (h - '0');
+				if (s > 255) {
+					return SLIB_PARSE_ERROR;
+				}
+				t++;
+			} else {
+				break;
+			}
+		}
+		if (t == 0) {
+			return SLIB_PARSE_ERROR;
+		}
+		if (k < 3) {
+			if (i >= n || sz[i] != '.') {
+				return SLIB_PARSE_ERROR;
+			}
+			i++;
+		}
+		v[k] = s;
+	}
+	if (obj) {
+		obj->a = (sl_uint8)(v[0]);
+		obj->b = (sl_uint8)(v[1]);
+		obj->c = (sl_uint8)(v[2]);
+		obj->d = (sl_uint8)(v[3]);
+	}
+	return i;
+}
+
+SLIB_DEFINE_PARSE_FUNCTIONS(IPv4Address, _IPv4Address_parse)
+
 
 IPv4Address& IPv4Address::operator=(const String& address)
 {
@@ -461,8 +437,15 @@ sl_bool IPv6Address::setString(const String& str)
 	}
 }
 
-template <class CT>
-SLIB_INLINE sl_reg _IPv6Address_parse(IPv6Address* obj, const CT* sz, sl_size i, sl_size n)
+sl_bool IPv6Address::setHostName(const String& hostName)
+{
+	*this = Network::getIPv6AddressFromHostName(hostName);
+	return isNotZero();
+}
+
+
+template <class CT, class ST>
+static sl_reg _IPv6Address_parse(IPv6Address* obj, const CT* sz, sl_size i, sl_size n)
 {
 	if (i >= n) {
 		return SLIB_PARSE_ERROR;
@@ -555,39 +538,8 @@ SLIB_INLINE sl_reg _IPv6Address_parse(IPv6Address* obj, const CT* sz, sl_size i,
 	return i;
 }
 
-sl_reg IPv6Address::parse(IPv6Address* out, const sl_char8* sz, sl_size posStart, sl_size n)
-{
-	return _IPv6Address_parse(out, sz, posStart, n);
-}
+SLIB_DEFINE_PARSE_FUNCTIONS(IPv6Address, _IPv6Address_parse)
 
-sl_reg IPv6Address::parse(IPv6Address* out, const sl_char16* sz, sl_size posStart, sl_size n)
-{
-	return _IPv6Address_parse(out, sz, posStart, n);
-}
-
-sl_bool IPv6Address::parse(const String& s, IPv6Address* out)
-{
-	sl_size n = s.getLength();
-	if (n == 0) {
-		return sl_false;
-	}
-	return _IPv6Address_parse(out, s.getData(), 0, n) == n;
-}
-
-sl_bool IPv6Address::parse(const String& s)
-{
-	sl_size n = s.getLength();
-	if (n == 0) {
-		return sl_false;
-	}
-	return _IPv6Address_parse(this, s.getData(), 0, n) == n;
-}
-
-sl_bool IPv6Address::setHostName(const String& hostName)
-{
-	*this = Network::getIPv6AddressFromHostName(hostName);
-	return isNotZero();
-}
 
 IPv6Address& IPv6Address::operator=(const IPv6Address& other) = default;
 
@@ -753,8 +705,15 @@ sl_bool IPAddress::setString(const String& str)
 	}
 }
 
-template <class CT>
-SLIB_INLINE sl_reg _IPAddress_parse(IPAddress* obj, const CT* sz, sl_size posStart, sl_size len)
+sl_bool IPAddress::setHostName(const String& hostName)
+{
+	*this = Network::getIPAddressFromHostName(hostName);
+	return isNotNone();
+}
+
+
+template <class CT, class ST>
+static sl_reg _IPAddress_parse(IPAddress* obj, const CT* sz, sl_size posStart, sl_size len)
 {
 	if (posStart >= len) {
 		return SLIB_PARSE_ERROR;
@@ -779,39 +738,8 @@ SLIB_INLINE sl_reg _IPAddress_parse(IPAddress* obj, const CT* sz, sl_size posSta
 	return SLIB_PARSE_ERROR;
 }
 
-sl_reg IPAddress::parse(IPAddress* out, const sl_char8* sz, sl_size posStart, sl_size len)
-{
-	return _IPAddress_parse(out, sz, posStart, len);
-}
+SLIB_DEFINE_PARSE_FUNCTIONS(IPAddress, _IPAddress_parse)
 
-sl_reg IPAddress::parse(IPAddress* out, const sl_char16* sz, sl_size posStart, sl_size len)
-{
-	return _IPAddress_parse(out, sz, posStart, len);
-}
-
-sl_bool IPAddress::parse(const String& s, IPAddress* out)
-{
-	sl_size n = s.getLength();
-	if (n == 0) {
-		return sl_false;
-	}
-	return _IPAddress_parse(out, s.getData(), 0, n) == n;
-}
-
-sl_bool IPAddress::parse(const String& s)
-{
-	sl_size n = s.getLength();
-	if (n == 0) {
-		return sl_false;
-	}
-	return _IPAddress_parse(this, s.getData(), 0, n) == n;
-}
-
-sl_bool IPAddress::setHostName(const String& hostName)
-{
-	*this = Network::getIPAddressFromHostName(hostName);
-	return isNotNone();
-}
 
 IPAddress& IPAddress::operator=(const IPAddress& other) = default;
 

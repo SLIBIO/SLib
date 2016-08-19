@@ -124,15 +124,9 @@ sl_bool MacAddress::setString(const String& str)
 	}
 }
 
-template <class CT>
-SLIB_INLINE sl_reg _MacAddress_parse(MacAddress* obj, const CT* sz, sl_size i, sl_size n, sl_char8 sep)
+template <class CT, class ST>
+static sl_reg _MacAddress_parse(MacAddress* obj, const CT* sz, sl_size i, sl_size n)
 {
-	sl_char8 sep1 = sep;
-	sl_char8 sep2 = sep;
-	if (sep == 0) {
-		sep1 = '-';
-		sep2 = ':';
-	}
 	int v[6];
 	for (int k = 0; k < 6; k++) {
 		int t = 0;
@@ -162,7 +156,7 @@ SLIB_INLINE sl_reg _MacAddress_parse(MacAddress* obj, const CT* sz, sl_size i, s
 			}
 		}
 		if (k < 5) {
-			if (i >= n || (sz[i] != sep1 && sz[i] != sep2)) {
+			if (i >= n || (sz[i] != '-' && sz[i] != ':')) {
 				return SLIB_PARSE_ERROR;
 			}
 			i++;
@@ -183,24 +177,8 @@ SLIB_INLINE sl_reg _MacAddress_parse(MacAddress* obj, const CT* sz, sl_size i, s
 	return i;
 }
 
-sl_reg MacAddress::parse(MacAddress* out, const sl_char8* sz, sl_size posBegin, sl_size len, sl_char8 sep)
-{
-	return _MacAddress_parse(out, sz, posBegin, len, sep);
-}
+SLIB_DEFINE_PARSE_FUNCTIONS(MacAddress, _MacAddress_parse)
 
-sl_reg MacAddress::parse(MacAddress* out, const sl_char16* sz, sl_size posBegin, sl_size len, sl_char8 sep)
-{
-	return _MacAddress_parse(out, sz, posBegin, len, sep);
-}
-
-sl_bool MacAddress::parse(const String& s, sl_char8 sep)
-{
-	sl_size n = s.getLength();
-	if (n == 0) {
-		return sl_false;
-	}
-	return _MacAddress_parse(this, s.getData(), 0, n, sep) == n;
-}
 
 MacAddress& MacAddress::operator=(const MacAddress& other) = default;
 

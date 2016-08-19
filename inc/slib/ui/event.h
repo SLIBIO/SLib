@@ -63,6 +63,8 @@ public:
 	KeycodeAndModifiers(Keycode keycode, const Modifiers& modifiers);
 
 public:
+	static KeycodeAndModifiers none();
+	
 	Keycode getKeycode() const;
 	
 	void setKeycode(Keycode keycode);

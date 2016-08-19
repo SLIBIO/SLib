@@ -53,6 +53,7 @@
     <ClInclude Include="..\..\..\inc\slib\core\new.h" />
     <ClInclude Include="..\..\..\inc\slib\core\object.h" />
     <ClInclude Include="..\..\..\inc\slib\core\option.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\parse.h" />
     <ClInclude Include="..\..\..\inc\slib\core\pipe.h" />
     <ClInclude Include="..\..\..\inc\slib\core\platform_android.h" />
     <ClInclude Include="..\..\..\inc\slib\core\platform_apple.h" />
@@ -104,6 +105,7 @@
     <ClInclude Include="..\..\..\inc\slib\graphics\image.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\path.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\pen.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics\resource.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\util.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\yuv.h" />
     <ClInclude Include="..\..\..\inc\slib\math.h" />
@@ -184,8 +186,10 @@
     <ClInclude Include="..\..\..\inc\slib\render\opengl.h" />
     <ClInclude Include="..\..\..\inc\slib\render\opengl_entries.h" />
     <ClInclude Include="..\..\..\inc\slib\render\program.h" />
+    <ClInclude Include="..\..\..\inc\slib\render\resource.h" />
     <ClInclude Include="..\..\..\inc\slib\render\texture.h" />
     <ClInclude Include="..\..\..\inc\slib\render\vertex_buffer.h" />
+    <ClInclude Include="..\..\..\inc\slib\resource.h" />
     <ClInclude Include="..\..\..\inc\slib\slib.h" />
     <ClInclude Include="..\..\..\inc\slib\ui.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\app.h" />
@@ -202,13 +206,16 @@
     <ClInclude Include="..\..\..\inc\slib\ui\event.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\image_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\label_view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\linear_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\list_details_view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\list_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\menu.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\mobile_app.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\mobile_game.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\platform.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\radio_button.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\render_view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\resource.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\screen.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\scroll_bar.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\scroll_view.h" />
@@ -306,6 +313,7 @@
     <ClCompile Include="..\..\..\src\slib\graphics\font_freetype.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\graphics_context.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\graphics_path.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_resource.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\graphics_util.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\image.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\image_jpeg.cpp" />
@@ -390,6 +398,7 @@
     <ClCompile Include="..\..\..\src\slib\render\render_base.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\render_engine.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\render_program.cpp" />
+    <ClCompile Include="..\..\..\src\slib\render\render_resource.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\texture.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\vertex_buffer.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\button.cpp" />
@@ -411,8 +420,10 @@
     <ClCompile Include="..\..\..\src\slib\ui\graphics_path_gdiplus.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\label_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\label_view_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\linear_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\list_details_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\list_details_view_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\list_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\mobile_app.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\mobile_game.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\radio_button.cpp" />
@@ -434,6 +445,7 @@
     <ClCompile Include="..\..\..\src\slib\ui\ui_menu.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\ui_menu_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\ui_platform.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_resource.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\video_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\view_win32.cpp" />

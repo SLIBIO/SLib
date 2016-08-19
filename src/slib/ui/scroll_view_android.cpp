@@ -8,14 +8,18 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+void JNICALL _AndroidScrollView_nativeOnScroll(JNIEnv* env, jobject _this, jlong instance, float x, float y);
+
 SLIB_JNI_BEGIN_CLASS(_JAndroidScrollView, "slib/platform/android/ui/view/UiScrollView")
 
-	SLIB_JNI_STATIC_METHOD(create, "_create", "(Landroid/content/Context;)Lslib/platform/android/ui/view/UiScrollView;");
+	SLIB_JNI_STATIC_METHOD(create, "_create", "(Landroid/content/Context;ZZ)Landroid/view/View;");
 
 	SLIB_JNI_STATIC_METHOD(setBackgroundColor, "_setBackgroundColor", "(Landroid/view/View;I)V");
 	SLIB_JNI_STATIC_METHOD(scrollTo, "_scrollTo", "(Landroid/view/View;FF)V");
 	SLIB_JNI_STATIC_METHOD(getScrollX, "_getScrollX", "(Landroid/view/View;)F");
 	SLIB_JNI_STATIC_METHOD(getScrollY, "_getScrollY", "(Landroid/view/View;)F");
+
+	SLIB_JNI_NATIVE(nativeOnScroll, "nativeOnScroll", "(JFF)V", _AndroidScrollView_nativeOnScroll);
 
 SLIB_JNI_END_CLASS
 
@@ -36,14 +40,28 @@ public:
 		_JAndroidScrollView::setBackgroundColor.call(sl_null, handle, getBackgroundColor().getARGB());
 		__applyContent(handle, scrollViewInstance);
 	}
+
+	void __onScroll(sl_real x, sl_real y)
+	{
+		_onScroll_NW(x, y);
+	}
 };
+
+void JNICALL _AndroidScrollView_nativeOnScroll(JNIEnv* env, jobject _this, jlong instance, float x, float y)
+{
+	Ref<View> _view = Android_ViewInstance::getAndroidView(instance);
+	if (ScrollView::checkInstance(_view.ptr)) {
+		_ScrollView* view = (_ScrollView*)(_view.ptr);
+		view->__onScroll(x, y);
+	}
+}
 
 Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* _parent)
 {
 	Ref<Android_ViewInstance> ret;
 	Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 	if (parent) {
-		JniLocal<jobject> handle = _JAndroidScrollView::create.callObject(sl_null, parent->getContext());
+		JniLocal<jobject> handle = _JAndroidScrollView::create.callObject(sl_null, parent->getContext(), m_flagBothScroll, m_flagVerticalScroll);
 		ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 		if (ret.isNotNull()) {
 			jobject handle = ret->getHandle();

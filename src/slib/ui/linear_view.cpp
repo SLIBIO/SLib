@@ -6,8 +6,11 @@ SLIB_DEFINE_OBJECT(LinearView, View)
 
 LinearView::LinearView(LayoutOrientation orientation) : m_orientation(orientation)
 {
-	setOnMakeLayoutEnabled(sl_true);
-	setLayoutEnabled(sl_true);
+	SLIB_REFERABLE_CONSTRUCTOR
+	
+	setCreatingChildInstances(sl_true);
+	setLayoutEnabled(sl_true, sl_false);
+ 	setOnMakeLayoutEnabled(sl_true, sl_false);
 }
 
 LayoutOrientation LinearView::getOrientation()
@@ -58,34 +61,79 @@ void LinearView::onChangeVisibilityOfChild(View* child, Visibility oldVisibility
 
 void LinearView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 {
-	if (m_orientation == LayoutOrientation::Horizontal) {
-		flagVertical = sl_false;
-	} else {
-		flagHorizontal = sl_false;
-	}
 	if (!flagVertical && !flagHorizontal) {
 		return;
 	}
-	sl_real size = 0;
+	
+	sl_real measuredWidth = 0;
+	sl_real measuredHeight = 0;
+	sl_real paddingWidth = getPaddingLeft() + getPaddingRight();
+	sl_real paddingHeight = getPaddingTop() + getPaddingBottom();
+	if (m_orientation == LayoutOrientation::Horizontal) {
+		measuredWidth = paddingWidth;
+	} else {
+		measuredHeight = paddingHeight;
+	}
+
 	ListLocker< Ref<View> > children(_getChildren());
 	for (sl_size i = 0; i < children.count; i++) {
 		Ref<View>& child = children[i];
 		if (child.isNotNull()) {
 			if (child->getVisibility() != Visibility::Gone) {
 				child->measureLayout();
-				if (flagHorizontal) {
-					size += child->getMeasuredWidth();
+				if (m_orientation == LayoutOrientation::Horizontal) {
+					if (flagHorizontal) {
+						if (child->isLayoutLeftFixed() && child->isLayoutRightFixed()) {
+							measuredWidth += child->getMeasuredWidth();
+							if (!(child->isRelativeMarginLeft())) {
+								measuredWidth += child->getMarginLeft();
+							}
+							if (!(child->isRelativeMarginRight())) {
+								measuredWidth += child->getMarginRight();
+							}
+						}
+					}
+					if (flagVertical) {
+						sl_real h = child->getMeasuredOuterBoundHeight();
+						if (!(child->isLayoutTopFixed() && child->isLayoutBottomFixed())) {
+							h += paddingHeight;
+						}
+						if (h > measuredHeight) {
+							measuredHeight = h;
+						}
+					}
 				} else {
-					size += child->getMeasuredHeight();
+					if (flagVertical) {
+						if (child->isLayoutTopFixed() && child->isLayoutBottomFixed()) {
+							measuredHeight += child->getMeasuredHeight();
+							if (!(child->isRelativeMarginTop())) {
+								measuredHeight += child->getMarginTop();
+							}
+							if (!(child->isRelativeMarginBottom())) {
+								measuredHeight += child->getMarginBottom();
+							}
+						}
+					}
+					if (flagHorizontal) {
+						sl_real w = child->getMeasuredOuterBoundWidth();
+						if (!(child->isLayoutLeftFixed() && child->isLayoutRightFixed())) {
+							w += paddingWidth;
+						}
+						if (w > measuredWidth) {
+							measuredWidth = w;
+						}
+					}
 				}
 			}
 		}
 	}
 	if (flagHorizontal) {
-		setMeasuredWidth(size + getPaddingLeft() + getPaddingRight());
-	} else {
-		setMeasuredHeight(size + getPaddingTop() + getPaddingBottom());
+		setMeasuredWidth(measuredWidth);
 	}
+	if (flagVertical) {
+		setMeasuredHeight(measuredHeight);
+	}
+	
 }
 
 void LinearView::onMakeLayout()
@@ -102,19 +150,28 @@ void LinearView::onMakeLayout()
 		Ref<View>& child = children[i];
 		if (child.isNotNull()) {
 			if (child->getVisibility() != Visibility::Gone) {
-				Rectangle frame = child->getLayoutFrame();
 				if (flagHorizontal) {
-					sl_real width = frame.getWidth();
-					frame.left = pos;
-					frame.right = pos + width;
-					child->setLayoutFrame(frame);
-					pos += width;
+					if (child->isLayoutLeftFixed() && child->isLayoutRightFixed()) {
+						Rectangle frame = child->getLayoutFrame();
+						sl_real width = frame.getWidth();
+						pos += child->getMarginLeft();
+						frame.left = pos;
+						frame.right = pos + width;
+						child->setLayoutFrame(frame);
+						pos += width;
+						pos += child->getMarginRight();
+					}
 				} else {
-					sl_real height = frame.getHeight();
-					frame.top = pos;
-					frame.bottom = pos + height;
-					child->setLayoutFrame(frame);
-					pos += height;
+					if (child->isLayoutTopFixed() && child->isLayoutBottomFixed()) {
+						Rectangle frame = child->getLayoutFrame();
+						sl_real height = frame.getHeight();
+						pos += child->getMarginTop();
+						frame.top = pos;
+						frame.bottom = pos + height;
+						child->setLayoutFrame(frame);
+						pos += height;
+						pos += child->getMarginBottom();
+					}
 				}
 			}
 		}

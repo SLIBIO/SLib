@@ -98,80 +98,6 @@ sl_bool SocketAddress::setString(const String& str)
 	}
 }
 
-template <class CT, class ST>
-SLIB_INLINE sl_reg _SocketAddress_parse(SocketAddress* obj, const CT* sz, sl_size pos, sl_size len)
-{
-	if (pos >= len) {
-		return SLIB_PARSE_ERROR;
-	}
-	IPAddress ip;
-	if (sz[0] == '[') {
-		IPv6Address addr;
-		pos++;
-		pos = IPv6Address::parse(&addr, sz, pos, len);
-		if (pos == SLIB_PARSE_ERROR || pos >= len) {
-			return SLIB_PARSE_ERROR;
-		}
-		if (sz[pos] != ']') {
-			return SLIB_PARSE_ERROR;
-		}
-		pos++;
-		ip = addr;
-	} else {
-		IPv4Address addr;
-		pos = IPv4Address::parse(&addr, sz, pos, len);
-		if (pos == SLIB_PARSE_ERROR) {
-			return SLIB_PARSE_ERROR;
-		}
-		ip = addr;
-	}
-	if (pos >= len) {
-		return SLIB_PARSE_ERROR;
-	}
-	if (sz[pos] != ':') {
-		return SLIB_PARSE_ERROR;
-	}
-	pos++;
-	sl_uint32 port;
-	pos = ST::parseUint32(10, &port, sz, pos, len);
-	if (pos == SLIB_PARSE_ERROR) {
-		return SLIB_PARSE_ERROR;
-	}
-	if (obj) {
-		obj->ip = ip;
-		obj->port = port;
-	}
-	return pos;
-}
-
-sl_reg SocketAddress::parse(SocketAddress* out, const sl_char8* sz, sl_size posBegin, sl_size len)
-{
-	return _SocketAddress_parse<sl_char8, String8>(out, sz, posBegin, len);
-}
-
-sl_reg SocketAddress::parse(SocketAddress* out, const sl_char16* sz, sl_size posBegin, sl_size len)
-{
-	return _SocketAddress_parse<sl_char16, String16>(out, sz, posBegin, len);
-}
-
-sl_bool SocketAddress::parse(const String& s, SocketAddress* out)
-{
-	sl_size n = s.getLength();
-	if (n == 0) {
-		return sl_false;
-	}
-	return _SocketAddress_parse<sl_char8, String8>(out, s.getData(), 0, n) == n;
-}
-
-sl_bool SocketAddress::parse(const String& s)
-{
-	sl_size n = s.getLength();
-	if (n == 0) {
-		return sl_false;
-	}
-	return _SocketAddress_parse<sl_char8, String8>(this, s.getData(), 0, n) == n;
-}
-
 sl_uint32 SocketAddress::getSystemSocketAddress(void* addr)
 {
 	if (ip.isIPv4()) {
@@ -233,6 +159,55 @@ sl_bool SocketAddress::setHostAddress(const String& address)
 		return ip.setHostName(address.substring(0, index));
 	}
 }
+
+
+template <class CT, class ST>
+static sl_reg _SocketAddress_parse(SocketAddress* obj, const CT* sz, sl_size pos, sl_size len)
+{
+	if (pos >= len) {
+		return SLIB_PARSE_ERROR;
+	}
+	IPAddress ip;
+	if (sz[0] == '[') {
+		IPv6Address addr;
+		pos++;
+		pos = IPv6Address::parse(&addr, sz, pos, len);
+		if (pos == SLIB_PARSE_ERROR || pos >= len) {
+			return SLIB_PARSE_ERROR;
+		}
+		if (sz[pos] != ']') {
+			return SLIB_PARSE_ERROR;
+		}
+		pos++;
+		ip = addr;
+	} else {
+		IPv4Address addr;
+		pos = IPv4Address::parse(&addr, sz, pos, len);
+		if (pos == SLIB_PARSE_ERROR) {
+			return SLIB_PARSE_ERROR;
+		}
+		ip = addr;
+	}
+	if (pos >= len) {
+		return SLIB_PARSE_ERROR;
+	}
+	if (sz[pos] != ':') {
+		return SLIB_PARSE_ERROR;
+	}
+	pos++;
+	sl_uint32 port;
+	pos = ST::parseUint32(10, &port, sz, pos, len);
+	if (pos == SLIB_PARSE_ERROR) {
+		return SLIB_PARSE_ERROR;
+	}
+	if (obj) {
+		obj->ip = ip;
+		obj->port = port;
+	}
+	return pos;
+}
+
+SLIB_DEFINE_PARSE_FUNCTIONS(SocketAddress, _SocketAddress_parse)
 
 sl_bool SocketAddress::parseIPv4Range(const String& str, IPv4Address* _from, IPv4Address* _to)
 {

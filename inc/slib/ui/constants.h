@@ -240,7 +240,8 @@ enum class SizeMode
 {
 	Fixed = 0,
 	Filling = 1,
-	Wrapping = 2
+	Wrapping = 2,
+	Weight = 3
 };
 
 enum class PositionMode

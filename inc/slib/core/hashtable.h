@@ -77,7 +77,7 @@ public:
 	
 	sl_size remove(const KT& key, sl_bool flagRemoveAllMatches = sl_false);
 	
-	sl_size remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
+	sl_size removeKeyAndValue(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
 	
 	sl_size removeAll();
 	
@@ -541,7 +541,7 @@ sl_size HashTable<KT, VT, HASH>::remove(const KT& key, sl_bool flagRemoveAllMatc
 }
 
 template <class KT, class VT, class HASH>
-sl_size HashTable<KT, VT, HASH>::remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
+sl_size HashTable<KT, VT, HASH>::removeKeyAndValue(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
 {
 	if (m_nCapacity == 0) {
 		return 0;

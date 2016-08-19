@@ -4,7 +4,9 @@
 #include "definition.h"
 
 #include "ip_address.h"
+
 #include "../core/string.h"
+#include "../core/parse.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
@@ -47,20 +49,15 @@ public:
 	
 	sl_bool setString(const String& str);
 	
-	static sl_reg parse(SocketAddress* out, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
-	static sl_reg parse(SocketAddress* out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
-	
-	static sl_bool parse(const String& str, SocketAddress* out);
-
-	sl_bool parse(const String& str);
-	
 	sl_uint32 getSystemSocketAddress(void* addr);
 	
 	sl_bool setSystemSocketAddress(const void* addr, sl_uint32 size = 0);
 
 	// HostName:port
 	sl_bool setHostAddress(const String& address);
+	
+	
+	SLIB_DECLARE_PARSE_FUNCTIONS(SocketAddress)
 
 	static sl_bool parseIPv4Range(const String& str, IPv4Address* from = sl_null, IPv4Address* to = sl_null);
 

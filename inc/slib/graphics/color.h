@@ -6,6 +6,9 @@
 #include "../math/vector3.h"
 #include "../math/vector4.h"
 
+#include "../core/string.h"
+#include "../core/parse.h"
+
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
 typedef Vector3f Color3f;
@@ -252,7 +255,12 @@ public:
 	void convertNPAtoPA();
 
 	void convertPAtoNPA();
-
+	
+	
+	String toString() const;
+	
+	SLIB_DECLARE_PARSE_FUNCTIONS(Color)
+	
 public:
 	SLIB_INLINE Color& operator=(const Color& other) = default;
 	

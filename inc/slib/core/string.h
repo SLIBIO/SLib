@@ -503,6 +503,10 @@ public:
 	
 	void makeLower();
 	
+	static String8 toUpper(const sl_char8* sz, sl_reg len = -1);
+	
+	static String8 toLower(const sl_char8* sz, sl_reg len = -1);
+	
 	String8 toUpper() const;
 	
 	String8 toLower() const;
@@ -1147,10 +1151,14 @@ public:
 	
 	void makeLower();
 	
+	static String16 toUpper(const sl_char16* sz, sl_reg len = -1);
+	
+	static String16 toLower(const sl_char16* sz, sl_reg len = -1);
+	
 	String16 toUpper() const;
 	
 	String16 toLower() const;
-	
+
 	String16 replaceAll(const String16& pattern, const String16& replacement) const;
 	
 	String16 replaceAll(const String16& pattern, const sl_char16* replacement) const;
@@ -2396,14 +2404,18 @@ public:
 	StringBuffer8();
 
 public:
+	sl_size getLength() const;
+	
 	sl_bool add(const String8& str);
 	
 	sl_bool add(const StringData& str);
 	
 	sl_bool addStatic(const sl_char8* buf, sl_size length);
 	
-	sl_size getLength() const;
-
+	void link(StringBuffer8& buf);
+	
+	void clear();
+	
 	String8 merge() const;
 	
 	Memory mergeToMemory() const;
@@ -2420,14 +2432,18 @@ public:
 	StringBuffer16();
 
 public:
+	sl_size getLength() const;
+	
 	sl_bool add(const String16& str);
 	
 	sl_bool add(const StringData& str);
 	
 	sl_bool addStatic(const sl_char16* buf, sl_size length);
 
-	sl_size getLength() const;
+	void link(StringBuffer16& buf);
 	
+	void clear();
+
 	String16 merge() const;
 	
 	Memory mergeToMemory() const;
@@ -2449,10 +2465,13 @@ typedef StringBuffer8 StringBuffer;
 #define SLIB_CHAR_IS_ALNUM(c) (((c) >= '0' && (c) <= '9') || ((c) >= 'A' && (c) <= 'Z') || ((c) >= 'a' && (c) <= 'z'))
 #define SLIB_CHAR_IS_HEX(c) (((c) >= '0' && (c) <= '9') || ((c) >= 'A' && (c) <= 'F') || ((c) >= 'a' && (c) <= 'f'))
 #define SLIB_CHAR_IS_WHITE_SPACE(c) (c == ' ' || c == '\t' || c == '\r' || c == '\n')
+#define SLIB_CHAR_IS_SPACE_TAB(c) (c == ' ' || c == '\t')
 #define SLIB_CHAR_IS_C_NAME(c) (((c) >= '0' && (c) <= '9') || ((c) >= 'A' && (c) <= 'Z') || ((c) >= 'a' && (c) <= 'z') || c == '_')
 
 #define SLIB_CHAR_DIGIT_TO_INT(c) (((c) >= '0' && (c) <= '9') ? ((c) - '0') : 10)
 #define SLIB_CHAR_HEX_TO_INT(c) (((c) >= '0' && (c) <= '9') ? ((c) - '0') : (((c) >= 'A' && (c) <= 'F') ? ((c) -  55) : ((c) >= 'a' && (c) <= 'f') ? ((c) -  87) : 16))
+#define SLIB_CHAR_UPPER_TO_LOWER(c) (((c) >= 'A' && (c) <= 'Z')?((c) + ('a' - 'A')):(c))
+#define SLIB_CHAR_LOWER_TO_UPPER(c) (((c) >= 'a' && (c) <= 'z')?((c) - ('a' - 'A')):(c))
 
 
 #define SLIB_STATIC_STRING8(name, str) \

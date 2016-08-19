@@ -6,6 +6,7 @@
 #include "ip_address.h"
 
 #include "../core/string.h"
+#include "../core/parse.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
@@ -62,12 +63,10 @@ public:
 	String toString(sl_char8 sep = '-') const;
 	
 	sl_bool setString(const String& address);
+
 	
-	static sl_reg parse(MacAddress* out, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX, sl_char8 sep = 0);
+	SLIB_DECLARE_PARSE_FUNCTIONS(MacAddress)
 	
-	static sl_reg parse(MacAddress* out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX, sl_char8 sep = 0);
-	
-	sl_bool parse(const String& str, sl_char8 sep = 0);
 	
 public:
 	MacAddress& operator=(const MacAddress& other);

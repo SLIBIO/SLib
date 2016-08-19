@@ -6,6 +6,7 @@
 #include "../core/reference.h"
 #include "../core/memory.h"
 #include "../core/string.h"
+#include "../core/parse.h"
 
 SLIB_MATH_NAMESPACE_BEGIN
 
@@ -130,12 +131,6 @@ public:
 	
 	static CBigInt* fromUint64(sl_uint64 v);
 	
-	static sl_reg parseString(CBigInt* out, const char* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX, sl_uint32 radix = 10);
-	
-	static sl_reg parseString(CBigInt* out, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX, sl_uint32 radix = 10);
-	
-	sl_bool parseString(const String& str, sl_uint32 radix = 10);
-	
 	static CBigInt* fromString(const String& str, sl_uint32 radix = 10);
 	
 	String toString(sl_uint32 radix = 10) const;
@@ -143,6 +138,8 @@ public:
 	static CBigInt* fromHexString(const String& str);
 	
 	String toHexString() const;
+	
+	SLIB_DECLARE_PARSE_FUNCTIONS_ARG(CBigInt, sl_uint32, radix, 10)
 	
 	
 	// compare returns

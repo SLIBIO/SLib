@@ -392,7 +392,7 @@ NSImage* UIPlatform::getNSImageFromBitmap(const Ref<Bitmap>& bitmap)
 	if (bitmap.isNotNull() && bitmap->isNotEmpty()) {
 		sl_uint32 width = bitmap->getWidth();
 		sl_uint32 height = bitmap->getHeight();
-		NSBitmapImageRep* rep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:width pixelsHigh:height bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:FALSE colorSpaceName:NSDeviceRGBColorSpace bitmapFormat:0 bytesPerRow:0 bitsPerPixel:0];
+		NSBitmapImageRep* rep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:width pixelsHigh:height bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:FALSE colorSpaceName:NSDeviceRGBColorSpace bitmapFormat:0 bytesPerRow:(width*4) bitsPerPixel:32];
 		if (rep != nil) {
 			BitmapData bd;
 			bd.data = rep.bitmapData;

@@ -124,8 +124,6 @@ public:
 	
 	static void dispatchToUiThread(const Ref<Runnable>& callback);
 	
-	static void runOnUiThread(const Ref<Runnable>& callback);
-	
 	
 	// Run Loop
 	static void runLoop();

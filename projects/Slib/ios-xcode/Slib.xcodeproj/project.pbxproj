@@ -125,6 +125,10 @@
 		266DD46C1C11934A00D47AB0 /* compress_zlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD46B1C11934A00D47AB0 /* compress_zlib.cpp */; };
 		266DD5EE1C11CEBB00D47AB0 /* camera_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5ED1C11CEBB00D47AB0 /* camera_ios.mm */; };
 		266DD5F61C11E09B00D47AB0 /* camera_avfoundation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5F51C11E09B00D47AB0 /* camera_avfoundation.mm */; };
+		266F926A1D51CD290040166C /* ui_resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266F92691D51CD290040166C /* ui_resource.cpp */; };
+		266F926C1D51CD450040166C /* list_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266F926B1D51CD450040166C /* list_view.cpp */; };
+		266F926E1D51CD5D0040166C /* render_resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266F926D1D51CD5D0040166C /* render_resource.cpp */; };
+		266F92701D51CD7A0040166C /* graphics_resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266F926F1D51CD7A0040166C /* graphics_resource.cpp */; };
 		2683BFAE1C39710C0068AC42 /* atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2683BFAD1C39710C0068AC42 /* atomic.cpp */; };
 		268916341C182AC8009FD75E /* camera_dshow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268916331C182AC8009FD75E /* camera_dshow.cpp */; };
 		2694620A1CAD1C47001B2130 /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269462091CAD1C47001B2130 /* xml.cpp */; };
@@ -365,6 +369,10 @@
 		266DD46B1C11934A00D47AB0 /* compress_zlib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = compress_zlib.cpp; sourceTree = "<group>"; };
 		266DD5ED1C11CEBB00D47AB0 /* camera_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = camera_ios.mm; path = media/camera_ios.mm; sourceTree = "<group>"; };
 		266DD5F51C11E09B00D47AB0 /* camera_avfoundation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = camera_avfoundation.mm; path = media/camera_avfoundation.mm; sourceTree = "<group>"; };
+		266F92691D51CD290040166C /* ui_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_resource.cpp; sourceTree = "<group>"; };
+		266F926B1D51CD450040166C /* list_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list_view.cpp; sourceTree = "<group>"; };
+		266F926D1D51CD5D0040166C /* render_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_resource.cpp; sourceTree = "<group>"; };
+		266F926F1D51CD7A0040166C /* graphics_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graphics_resource.cpp; sourceTree = "<group>"; };
 		2683BFAD1C39710C0068AC42 /* atomic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = atomic.cpp; sourceTree = "<group>"; };
 		268916331C182AC8009FD75E /* camera_dshow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = camera_dshow.cpp; path = media/camera_dshow.cpp; sourceTree = "<group>"; };
 		269462091CAD1C47001B2130 /* xml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = xml.cpp; sourceTree = "<group>"; };
@@ -531,6 +539,7 @@
 				266DD3921C117AE300D47AB0 /* font.cpp */,
 				266DD3931C117AE300D47AB0 /* graphics_context.cpp */,
 				266DD3941C117AE300D47AB0 /* graphics_path.cpp */,
+				266F926F1D51CD7A0040166C /* graphics_resource.cpp */,
 				266DD3951C117AE300D47AB0 /* graphics_util.cpp */,
 				266DD3961C117AE300D47AB0 /* image_jpeg.cpp */,
 				266DD3971C117AE300D47AB0 /* image_png.cpp */,
@@ -762,6 +771,7 @@
 				266DD3F71C118B9900D47AB0 /* render_base.cpp */,
 				266DD3F81C118B9900D47AB0 /* render_engine.cpp */,
 				266DD3FB1C118B9900D47AB0 /* render_program.cpp */,
+				266F926D1D51CD5D0040166C /* render_resource.cpp */,
 				266DD3FC1C118B9900D47AB0 /* texture.cpp */,
 				266DD3FD1C118B9900D47AB0 /* vertex_buffer.cpp */,
 			);
@@ -790,6 +800,7 @@
 				266DD4411C11910F00D47AB0 /* label_view_ios.mm */,
 				26CB94C81D0126ED00D8A472 /* linear_view.cpp */,
 				266DD4431C11912B00D47AB0 /* list_details_view.cpp */,
+				266F926B1D51CD450040166C /* list_view.cpp */,
 				2648D5491D096AC400819E09 /* mobile_app.cpp */,
 				2648D54A1D096AC400819E09 /* mobile_game.cpp */,
 				266DD4451C11914200D47AB0 /* radio_button.cpp */,
@@ -808,6 +819,7 @@
 				260252251BF18D4300DEFAB1 /* ui_graphics_context.cpp */,
 				2621F7201CCF174B00C4615C /* ui_menu.cpp */,
 				2648D54D1D098AE800819E09 /* ui_platform.cpp */,
+				266F92691D51CD290040166C /* ui_resource.cpp */,
 				26A9B7631C172BDE004C9B0E /* video_view.cpp */,
 				266DD4281C118F6D00D47AB0 /* view.cpp */,
 				266DD42A1C118F7800D47AB0 /* view_ios.h */,
@@ -941,6 +953,7 @@
 				266DD40B1C118CD100D47AB0 /* crypto_secure_stream.cpp in Sources */,
 				266DD36A1C1170BD00D47AB0 /* video_codec.cpp in Sources */,
 				26DA34FF1C4B8B2D004DC204 /* video_frame.cpp in Sources */,
+				266F926C1D51CD450040166C /* list_view.cpp in Sources */,
 				26B571491C9D43D70099E69B /* locale.cpp in Sources */,
 				260252001BF18BCF00DEFAB1 /* thread_pool.cpp in Sources */,
 				266DD3FE1C118B9900D47AB0 /* index_buffer.cpp in Sources */,
@@ -948,6 +961,7 @@
 				266DD46C1C11934A00D47AB0 /* compress_zlib.cpp in Sources */,
 				26B5716C1C9D44720099E69B /* line3.cpp in Sources */,
 				266DD3EB1C1181B500D47AB0 /* socket_event.cpp in Sources */,
+				266F92701D51CD7A0040166C /* graphics_resource.cpp in Sources */,
 				266DD3E81C1181B500D47AB0 /* socket_address.cpp in Sources */,
 				A25F2F4F1B039EF600854DAF /* service.cpp in Sources */,
 				266DD3D81C1181B500D47AB0 /* http_common.cpp in Sources */,
@@ -999,6 +1013,7 @@
 				266DD4361C11901A00D47AB0 /* check_box.cpp in Sources */,
 				260252261BF18D4300DEFAB1 /* ui_graphics_context.cpp in Sources */,
 				266DD4341C118FF700D47AB0 /* button_ios.mm in Sources */,
+				266F926A1D51CD290040166C /* ui_resource.cpp in Sources */,
 				A25F2F3E1B039EF600854DAF /* base.cpp in Sources */,
 				266DD3DE1C1181B500D47AB0 /* nat.cpp in Sources */,
 				266DD4481C11917700D47AB0 /* render_view.cpp in Sources */,
@@ -1019,6 +1034,7 @@
 				26B5717B1C9D44720099E69B /* view_frustum.cpp in Sources */,
 				26B5716E1C9D44720099E69B /* matrix3.cpp in Sources */,
 				266DD4211C118EB000D47AB0 /* drawable_quartz.mm in Sources */,
+				266F926E1D51CD5D0040166C /* render_resource.cpp in Sources */,
 				266DD3A11C117AE300D47AB0 /* font_freetype.cpp in Sources */,
 				26B571431C9D43A70099E69B /* asset.cpp in Sources */,
 				26B571451C9D43AC0099E69B /* array.cpp in Sources */,

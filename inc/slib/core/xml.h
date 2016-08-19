@@ -109,19 +109,23 @@ public:
 	
 	Ref<XmlElement> getParentElement() const;
 	
-	sl_size getStartPositionInSource();
+	String getSourceFilePath() const;
+	
+	void setSourceFilePath(const String& path);
+	
+	sl_size getStartPositionInSource() const;
 	
 	void setStartPositionInSource(sl_size pos);
 	
-	sl_size getEndPositionInSource();
+	sl_size getEndPositionInSource() const;
 	
 	void setEndPositionInSource(sl_size pos);
 	
-	sl_size getLineNumberInSource();
+	sl_size getLineNumberInSource() const;
 	
 	void setLineNumberInSource(sl_size line);
 	
-	sl_size getColumnNumberInSource();
+	sl_size getColumnNumberInSource() const;
 	
 	void setColumnNumberInSource(sl_size line);
 
@@ -129,6 +133,7 @@ protected:
 	XmlNodeType m_type;
 	WeakRef<XmlNodeGroup> m_parent;
 	WeakRef<XmlDocument> m_document;
+	SafeString m_sourceFilePath;
 	sl_size m_positionStartInSource;
 	sl_size m_positionEndInSource;
 	sl_size m_lineInSource;

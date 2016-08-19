@@ -71,6 +71,15 @@ void* Base::reallocMemory(void* ptr, sl_size sizeNew)
 #endif
 }
 
+void* Base::createZeroMemory(sl_size size)
+{
+	void* ret = createMemory(size);
+	if (ret) {
+		zeroMemory(ret, size);
+	}
+	return ret;
+}
+
 void Base::copyMemory(void* dst, const void* src, sl_size count)
 {
 	sl_uint8* d = (sl_uint8*)dst;
@@ -80,10 +89,10 @@ void Base::copyMemory(void* dst, const void* src, sl_size count)
 	}
 }
 
-void Base::zeroMemory(void* dst, sl_size count)
+void Base::zeroMemory(void* dst, sl_size size)
 {
 	sl_uint8* d = (sl_uint8*)dst;
-	for (sl_size i = 0; i < count; i++) {
+	for (sl_size i = 0; i < size; i++) {
 		d[i] = 0;
 	}
 }

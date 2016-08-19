@@ -26,6 +26,8 @@
 #include "ui/tab_view.h"
 
 #include "ui/scroll_bar.h"
+#include "ui/linear_view.h"
+#include "ui/list_view.h"
 #include "ui/tree_view.h"
 #include "ui/video_view.h"
 #include "ui/camera_view.h"

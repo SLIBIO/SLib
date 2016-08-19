@@ -69,6 +69,41 @@ void Time::add(const Time& other)
 	m_time += other.m_time;
 }
 
+void Time::setElements(int year, int month, int day, int hour, int minute, int second)
+{
+	if (year == 0 && month == 0 && day == 0) {
+		m_time = hour * TIME_HOUR + minute * TIME_MINUTE + second * TIME_SECOND;
+		return;
+	}
+	if (month <= 0) {
+		month = 1;
+	}
+	if (day <= 0) {
+		day = 1;
+	}
+	_setElements(year, month, day, hour, minute, second);
+}
+
+void Time::setNow()
+{
+	_setNow();
+}
+
+void Time::setToSystem()
+{
+	_setToSystem();
+}
+
+void Time::getDate(DATE* date) const
+{
+	if (!(_getDate(date))) {
+		date->year = 0;
+		date->month = 0;
+		date->day = 0;
+		date->dayOfWeek = 0;
+	}
+}
+
 void Time::setDate(int year, int month, int day) {
 	Time old(m_time);
 	sl_int64 time = old.m_time % TIME_DAY;
@@ -765,275 +800,6 @@ sl_bool Time::setString(const sl_char16* str)
 	}
 }
 
-template <class CT>
-sl_reg _Time_parse(sl_int32* outArrayYMDHMS, const CT* sz, sl_size i, sl_size n)
-{
-	if (i >= n) {
-		return SLIB_PARSE_ERROR;
-	}
-	if (outArrayYMDHMS) {
-		Base::resetMemory4(outArrayYMDHMS, 0, 6);
-	}
-	sl_size index = 0;
-	sl_size posParsed = i;
-	while (i < n && index < 6) {
-		if (sz[i] == 0) {
-			break;
-		}
-		do {
-			CT ch = sz[i];
-			if (SLIB_CHAR_IS_WHITE_SPACE(ch)) {
-				i++;
-			} else {
-				break;
-			}
-		} while (i < n);
-		if (i >= n) {
-			break;
-		}
-		int value = 0;
-		sl_bool flagNumber = sl_false;
-		do {
-			CT ch = sz[i];
-			if (ch >= '0' && ch <= '9') {
-				value = value * 10 + (ch - '0');
-				flagNumber = sl_true;
-				i++;
-			} else {
-				break;
-			}
-		} while (i < n);
-		if (!flagNumber) {
-			break;
-		}
-		posParsed = i;
-		if (i >= n) {
-			break;
-		}
-		do {
-			CT ch = sz[i];
-			if (SLIB_CHAR_IS_WHITE_SPACE(ch)) {
-				i++;
-			} else {
-				break;
-			}
-		} while (i < n);
-		posParsed = i;
-		if (i < n) {
-			CT ch = sz[i];
-			if (ch != '/' && ch != '-' && ch != ':') {
-				break;
-			}
-			if (ch == ':') {
-				if (index < 3) {
-					index = 3;
-				}
-			}
-			i++;
-		}
-		if (outArrayYMDHMS) {
-			outArrayYMDHMS[index] = value;
-		}
-		index++;
-	}
-	if (index > 0) {
-		return posParsed;
-	}
-	return SLIB_PARSE_ERROR;
-}
-
-sl_reg Time::parseElements(sl_int32* outArrayYMDHMS, const sl_char8* sz, sl_size posBegin, sl_size len)
-{
-	return _Time_parse(outArrayYMDHMS, sz, 0, len);
-}
-
-sl_reg Time::parseElements(sl_int32* outArrayYMDHMS, const sl_char16* sz, sl_size posBegin, sl_size len)
-{
-	return _Time_parse(outArrayYMDHMS, sz, 0, len);
-}
-
-sl_bool Time::parseElements(const String8& time, sl_int32* outArrayYMDHMS)
-{
-	sl_size n = time.getLength();
-	if (n == 0) {
-		return sl_false;
-	}
-	return _Time_parse(outArrayYMDHMS, time.getData(), 0, time.getLength()) == n;
-}
-
-sl_bool Time::parseElements(const String16& time, sl_int32* outArrayYMDHMS)
-{
-	sl_size n = time.getLength();
-	if (n == 0) {
-		return sl_false;
-	}
-	return _Time_parse(outArrayYMDHMS, time.getData(), 0, time.getLength()) == n;
-}
-
-sl_bool Time::parseElements(const SafeString8& _time, sl_int32* outArrayYMDHMS)
-{
-	String8 time = _time;
-	sl_size n = time.getLength();
-	if (n == 0) {
-		return sl_false;
-	}
-	return _Time_parse(outArrayYMDHMS, time.getData(), 0, time.getLength()) == n;
-}
-
-sl_bool Time::parseElements(const SafeString16& _time, sl_int32* outArrayYMDHMS)
-{
-	String time = _time;
-	sl_size n = time.getLength();
-	if (n == 0) {
-		return sl_false;
-	}
-	return _Time_parse(outArrayYMDHMS, time.getData(), 0, time.getLength()) == n;
-}
-
-sl_bool Time::parseElements(const sl_char8* time, sl_int32* outArrayYMDHMS)
-{
-	sl_reg ret = _Time_parse(outArrayYMDHMS, time, 0, SLIB_SIZE_MAX);
-	if (ret != SLIB_PARSE_ERROR && time[ret] == 0) {
-		return sl_true;
-	}
-	return sl_false;
-}
-
-sl_bool Time::parseElements(const sl_char16* time, sl_int32* outArrayYMDHMS)
-{
-	sl_reg ret = _Time_parse(outArrayYMDHMS, time, 0, SLIB_SIZE_MAX);
-	if (ret != SLIB_PARSE_ERROR && time[ret] == 0) {
-		return sl_true;
-	}
-	return sl_false;
-}
-
-sl_reg Time::parse(Time* _out, const sl_char8* sz, sl_size posBegin, sl_size len)
-{
-	sl_int32 t[6];
-	sl_reg ret = parseElements(t, sz, posBegin, len);
-	if (ret != SLIB_PARSE_ERROR) {
-		if (_out) {
-			_out->setElements(t[0], t[1], t[2], t[3], t[4], t[5]);
-		}
-	}
-	return ret;
-}
-
-sl_reg Time::parse(Time* _out, const sl_char16* sz, sl_size posBegin, sl_size len)
-{
-	sl_int32 t[6];
-	sl_reg ret = parseElements(t, sz, posBegin, len);
-	if (ret != SLIB_PARSE_ERROR) {
-		if (_out) {
-			_out->setElements(t[0], t[1], t[2], t[3], t[4], t[5]);
-		}
-	}
-	return ret;
-}
-
-sl_bool Time::parse(const String8& str, Time* _out)
-{
-	sl_int32 t[6];
-	if (parseElements(str, t)) {
-		if (_out) {
-			_out->setElements(t[0], t[1], t[2], t[3], t[4], t[5]);
-		}
-		return sl_true;
-	}
-	return sl_false;
-}
-
-sl_bool Time::parse(const String16& str, Time* _out)
-{
-	sl_int32 t[6];
-	if (parseElements(str, t)) {
-		if (_out) {
-			_out->setElements(t[0], t[1], t[2], t[3], t[4], t[5]);
-		}
-		return sl_true;
-	}
-	return sl_false;
-}
-
-sl_bool Time::parse(const SafeString8& str, Time* _out)
-{
-	sl_int32 t[6];
-	if (parseElements(str, t)) {
-		if (_out) {
-			_out->setElements(t[0], t[1], t[2], t[3], t[4], t[5]);
-		}
-		return sl_true;
-	}
-	return sl_false;
-}
-
-sl_bool Time::parse(const SafeString16& str, Time* _out)
-{
-	sl_int32 t[6];
-	if (parseElements(str, t)) {
-		if (_out) {
-			_out->setElements(t[0], t[1], t[2], t[3], t[4], t[5]);
-		}
-		return sl_true;
-	}
-	return sl_false;
-}
-
-sl_bool Time::parse(const sl_char8* str, Time* _out)
-{
-	sl_int32 t[6];
-	if (parseElements(str, t)) {
-		if (_out) {
-			_out->setElements(t[0], t[1], t[2], t[3], t[4], t[5]);
-		}
-		return sl_true;
-	}
-	return sl_false;
-}
-
-sl_bool Time::parse(const sl_char16* str, Time* _out)
-{
-	sl_int32 t[6];
-	if (parseElements(str, t)) {
-		if (_out) {
-			_out->setElements(t[0], t[1], t[2], t[3], t[4], t[5]);
-		}
-		return sl_true;
-	}
-	return sl_false;
-}
-
-sl_bool Time::parse(const String8& str)
-{
-	return parse(str, this);
-}
-
-sl_bool Time::parse(const String16& str)
-{
-	return parse(str, this);
-}
-
-sl_bool Time::parse(const SafeString8& str)
-{
-	return parse(str, this);
-}
-
-sl_bool Time::parse(const SafeString16& str)
-{
-	return parse(str, this);
-}
-
-sl_bool Time::parse(const sl_char8* str)
-{
-	return parse(str, this);
-}
-
-sl_bool Time::parse(const sl_char16* str)
-{
-	return parse(str, this);
-}
-
 String Time::format(const String8& fmt) const
 {
 	return String8::format(fmt, *this);
@@ -1063,6 +829,171 @@ String Time::format(const sl_char16* fmt) const
 {
 	return String16::format(fmt, *this);
 }
+
+
+template <class CT>
+static sl_reg _Time_parseElements(sl_int32* outYMDHMS, const CT* sz, sl_size i, sl_size n)
+{
+	if (i >= n) {
+		return SLIB_PARSE_ERROR;
+	}
+	sl_int32 YMDHMS[6];
+	Base::resetMemory4(YMDHMS, 0, 6);
+	sl_size index = 0;
+	sl_size posParsed = i;
+	while (i < n && index < 6) {
+		if (sz[i] == 0) {
+			break;
+		}
+		do {
+			CT ch = sz[i];
+			if (SLIB_CHAR_IS_SPACE_TAB(ch)) {
+				i++;
+			} else {
+				break;
+			}
+		} while (i < n);
+		if (i >= n) {
+			break;
+		}
+		int value = 0;
+		sl_bool flagNumber = sl_false;
+		do {
+			CT ch = sz[i];
+			if (SLIB_CHAR_IS_DIGIT(ch)) {
+				value = value * 10 + (ch - '0');
+				flagNumber = sl_true;
+				i++;
+			} else {
+				break;
+			}
+		} while (i < n);
+		if (!flagNumber) {
+			break;
+		}
+		posParsed = i;
+		
+		YMDHMS[index] = value;
+		index++;
+		
+		if (i >= n) {
+			break;
+		}
+		do {
+			CT ch = sz[i];
+			if (SLIB_CHAR_IS_SPACE_TAB(ch)) {
+				i++;
+			} else {
+				break;
+			}
+		} while (i < n);
+		if (i < n) {
+			CT ch = sz[i];
+			if (!SLIB_CHAR_IS_DIGIT(ch)) {
+				if (ch != '/' && ch != '-' && ch != ':') {
+					break;
+				}
+				if (ch == ':') {
+					if (index < 3) {
+						index = 3;
+					}
+				}
+				i++;
+			}
+		} else {
+			break;
+		}
+	}
+	if (index > 0) {
+		if (outYMDHMS) {
+			Base::copyMemory(outYMDHMS, YMDHMS, 24);
+		}
+		return posParsed;
+	}
+	return SLIB_PARSE_ERROR;
+}
+
+sl_reg Time::parseElements(sl_int32* outArrayYMDHMS, const sl_char8* sz, sl_size posBegin, sl_size len)
+{
+	return _Time_parseElements(outArrayYMDHMS, sz, 0, len);
+}
+
+sl_reg Time::parseElements(sl_int32* outArrayYMDHMS, const sl_char16* sz, sl_size posBegin, sl_size len)
+{
+	return _Time_parseElements(outArrayYMDHMS, sz, 0, len);
+}
+
+sl_bool Time::parseElements(const String8& time, sl_int32* outArrayYMDHMS)
+{
+	sl_size n = time.getLength();
+	if (n == 0) {
+		return sl_false;
+	}
+	return _Time_parseElements(outArrayYMDHMS, time.getData(), 0, time.getLength()) == n;
+}
+
+sl_bool Time::parseElements(const String16& time, sl_int32* outArrayYMDHMS)
+{
+	sl_size n = time.getLength();
+	if (n == 0) {
+		return sl_false;
+	}
+	return _Time_parseElements(outArrayYMDHMS, time.getData(), 0, time.getLength()) == n;
+}
+
+sl_bool Time::parseElements(const SafeString8& _time, sl_int32* outArrayYMDHMS)
+{
+	String8 time = _time;
+	sl_size n = time.getLength();
+	if (n == 0) {
+		return sl_false;
+	}
+	return _Time_parseElements(outArrayYMDHMS, time.getData(), 0, time.getLength()) == n;
+}
+
+sl_bool Time::parseElements(const SafeString16& _time, sl_int32* outArrayYMDHMS)
+{
+	String time = _time;
+	sl_size n = time.getLength();
+	if (n == 0) {
+		return sl_false;
+	}
+	return _Time_parseElements(outArrayYMDHMS, time.getData(), 0, time.getLength()) == n;
+}
+
+sl_bool Time::parseElements(const sl_char8* time, sl_int32* outArrayYMDHMS)
+{
+	sl_reg ret = _Time_parseElements(outArrayYMDHMS, time, 0, SLIB_SIZE_MAX);
+	if (ret != SLIB_PARSE_ERROR && time[ret] == 0) {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+sl_bool Time::parseElements(const sl_char16* time, sl_int32* outArrayYMDHMS)
+{
+	sl_reg ret = _Time_parseElements(outArrayYMDHMS, time, 0, SLIB_SIZE_MAX);
+	if (ret != SLIB_PARSE_ERROR && time[ret] == 0) {
+		return sl_true;
+	}
+	return sl_false;
+}
+
+template <class CT, class ST>
+SLIB_INLINE sl_reg _Time_parse(Time* _out, const CT* sz, sl_size i, sl_size n)
+{
+	sl_int32 t[6];
+	sl_reg ret = _Time_parseElements(t, sz, i, n);
+	if (ret != SLIB_PARSE_ERROR) {
+		if (_out) {
+			_out->setElements(t[0], t[1], t[2], t[3], t[4], t[5]);
+		}
+	}
+	return ret;
+}
+
+SLIB_DEFINE_PARSE_FUNCTIONS(Time, _Time_parse)
+
 
 Time& Time::operator=(const String8& time)
 {
@@ -1182,7 +1113,7 @@ SLIB_NAMESPACE_END
 
 SLIB_NAMESPACE_BEGIN
 
-void Time::getDate(DATE* date) const
+sl_bool Time::_getDate(DATE* date) const
 {
 	SYSTEMTIME st;
 	sl_int64 n = (m_time + SLIB_INT64(11644473600000000)) * 10;  // Convert 1970 Based (time_t mode) to 1601 Based (FILETIME mode)
@@ -1191,14 +1122,11 @@ void Time::getDate(DATE* date) const
 	date->month = st.wMonth;
 	date->day = st.wDay;
 	date->dayOfWeek = st.wDayOfWeek;
+	return sl_true;
 }
 
-void Time::setElements(int year, int month, int day, int hour, int minute, int second)
+void Time::_setElements(int year, int month, int day, int hour, int minute, int second)
 {
-	if (year == 0 && month == 0 && day == 0) {
-		m_time = hour * TIME_HOUR + minute * TIME_MINUTE + second * TIME_SECOND;
-		return;
-	}
 	SYSTEMTIME st;
 	st.wYear = (WORD)year;
 	st.wMonth = (WORD)month;
@@ -1213,7 +1141,7 @@ void Time::setElements(int year, int month, int day, int hour, int minute, int s
 	m_time = n / 10 - SLIB_INT64(11644473600000000);  // Convert 1601 Based (FILETIME mode) to 1970 Based (time_t mode)
 }
 
-void Time::setNow()
+void Time::_setNow()
 {
 	SYSTEMTIME st;
 	GetLocalTime(&st);
@@ -1228,7 +1156,7 @@ SLIB_NAMESPACE_END
 
 SLIB_NAMESPACE_BEGIN
 
-void Time::setToSystem()
+void Time::_setToSystem()
 {
 	SYSTEMTIME st;
 	sl_int64 n = m_time * 10;
@@ -1242,7 +1170,7 @@ SLIB_NAMESPACE_END
 
 SLIB_NAMESPACE_BEGIN
 
-void Time::setToSystem()
+void Time::_setToSystem()
 {
 }
 
@@ -1257,7 +1185,7 @@ SLIB_NAMESPACE_END
 
 SLIB_NAMESPACE_BEGIN
 
-void Time::getDate(DATE* date) const
+sl_bool Time::_getDate(DATE* date) const
 {
 	time_t t = (time_t)(m_time / 1000000);
 	tm v;
@@ -1266,20 +1194,13 @@ void Time::getDate(DATE* date) const
 		date->month = v.tm_mon + 1;
 		date->day = v.tm_mday;
 		date->dayOfWeek = v.tm_wday;
-	} else {
-		date->year = 0;
-		date->month = 0;
-		date->day = 0;
-		date->dayOfWeek = 0;
+		return sl_true;
 	}
+	return sl_false;
 }
 
-void Time::setElements(int year, int month, int day, int hour, int minute, int second)
+void Time::_setElements(int year, int month, int day, int hour, int minute, int second)
 {
-	if (year == 0 && month == 0 && day == 0) {
-		m_time = hour * TIME_HOUR + minute * TIME_MINUTE + second * TIME_SECOND;
-		return;
-	}
 	tm v;
 	Base::resetMemory(&v, 0, sizeof(tm));
 	v.tm_year = year - 1900;
@@ -1301,7 +1222,7 @@ void Time::setElements(int year, int month, int day, int hour, int minute, int s
 	}
 }
 
-void Time::setNow()
+void Time::_setNow()
 {
 	sl_uint64 t;
 	timeval tv;
@@ -1323,7 +1244,7 @@ void Time::setNow()
 	m_time = t;
 }
 
-void Time::setToSystem()
+void Time::_setToSystem()
 {
 }
 

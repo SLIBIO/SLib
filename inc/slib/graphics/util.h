@@ -19,7 +19,7 @@ public:
 	static Point calculateAlignPosition(const Rectangle& rectDst, sl_real widthSrc, sl_real heightSrc, Alignment alignment);
 	
 	
-	static Rectangle transformRectangle(const Rectangle& rectSrc, const Rectangle& rectFrom, const Rectangle& rectTo);
+	static Rectangle transformRectangle(const Rectangle& rectTransform, const Rectangle& rectOtherFrom, const Rectangle& rectOtherTo);
 	
 };
 

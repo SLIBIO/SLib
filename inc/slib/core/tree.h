@@ -101,7 +101,7 @@ public:
 	
 	sl_size remove(const KT& key, sl_bool flagRemoveAllMatches = sl_false);
 	
-	sl_size remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
+	sl_size removeKeyAndValue(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
 	
 	sl_bool removeAt(const TreePosition& pos);
 	
@@ -883,7 +883,7 @@ sl_size BTree<KT, VT, COMPARE>::remove(const KT& key, sl_bool flagRemoveAllMatch
 }
 
 template <class KT, class VT, class COMPARE>
-sl_size BTree<KT, VT, COMPARE>::remove(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
+sl_size BTree<KT, VT, COMPARE>::removeKeyAndValue(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
 {
 	TreePosition pos;
 	if (search(key, value, &pos)) {

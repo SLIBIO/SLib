@@ -146,15 +146,15 @@ public:
 	static List<String> getAllDescendantFiles(const String& dirPath);
 
 	
-	static Memory readAllBytes(const String& path);
+	static Memory readAllBytes(const String& path, sl_size maxSize = SLIB_SIZE_MAX);
 	
-	static String readAllTextUTF8(const String& path);
+	static String readAllTextUTF8(const String& path, sl_size maxSize = SLIB_SIZE_MAX);
 	
-	static String16 readAllTextUTF16(const String& path, sl_bool flagBigEndian = sl_false);
+	static String16 readAllTextUTF16(const String& path, sl_bool flagBigEndian = sl_false, sl_size maxSize = SLIB_SIZE_MAX);
 	
-	static String readAllText(const String& path, Charset* outCharset = sl_null);
+	static String readAllText(const String& path, Charset* outCharset = sl_null, sl_size maxSize = SLIB_SIZE_MAX);
 	
-	static String16 readAllText16(const String& path, Charset* outCharset = sl_null);
+	static String16 readAllText16(const String& path, Charset* outCharset = sl_null, sl_size maxSize = SLIB_SIZE_MAX);
 
 	static sl_size writeAllBytes(const String& path, const void* buf, sl_size size);
 	

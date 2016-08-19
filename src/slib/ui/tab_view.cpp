@@ -113,8 +113,9 @@ void TabView::setTabContentView(sl_uint32 index, const Ref<View>& view, sl_bool 
 		TabViewItem* item = m_items.getItemPtr(index);
 		if (item->contentView != view) {
 			removeChild(item->contentView, sl_false);
-			addChild(view, sl_false);
 			view->setFrame(getTabContentRegion(), sl_false);
+			view->setCreatingInstance(sl_true);
+			addChildNotAttach(view, sl_false);
 			item->contentView = view;
 			if (isNativeWidget()) {
 				if (UI::isUiThread()) {

@@ -77,7 +77,7 @@ public:
 			styleEx |= WS_EX_COMPOSITED;
 #endif
 #if defined(_SLIB_UI_WIN32_USE_CLIP_CHILDREN)
-			style |= WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+			style |= WS_CLIPCHILDREN;
 #endif
 			if (param.flagBorderless || param.flagFullScreen) {
 				style |= WS_POPUP;

@@ -201,7 +201,7 @@ String File::normalizeDirectoryPath(const String& _str)
 	return str;
 }
 
-Memory File::readAllBytes(const String& path)
+Memory File::readAllBytes(const String& path, sl_size maxSize)
 {
 	Ref<File> file = File::openForRead(path);
 	if (file.isNotNull()) {
@@ -210,10 +210,13 @@ Memory File::readAllBytes(const String& path)
 #else
 		sl_uint64 _size = file->getSize();
 		if (_size > 0x7fffffff) {
-			return Memory::null();
+			_size = 0x7fffffff;
 		}
 		sl_size size = (sl_size)_size;
 #endif
+		if (size > maxSize) {
+			size = maxSize;
+		}
 		if (size == 0) {
 			return Memory::null();
 		}
@@ -228,7 +231,7 @@ Memory File::readAllBytes(const String& path)
 	return Memory::null();
 }
 
-String File::readAllTextUTF8(const String& path)
+String File::readAllTextUTF8(const String& path, sl_size maxSize)
 {
 	Ref<File> file = File::openForRead(path);
 	if (file.isNotNull()) {
@@ -241,12 +244,15 @@ String File::readAllTextUTF8(const String& path)
 		}
 		sl_size size = (sl_size)_size;
 #endif
+		if (size > maxSize) {
+			size = maxSize;
+		}
 		return file->readTextUTF8(size);
 	}
 	return String::null();
 }
 
-String16 File::readAllTextUTF16(const String& path, sl_bool flagBigEndian)
+String16 File::readAllTextUTF16(const String& path, sl_bool flagBigEndian, sl_size maxSize)
 {
 	Ref<File> file = File::openForRead(path);
 	if (file.isNotNull()) {
@@ -259,12 +265,15 @@ String16 File::readAllTextUTF16(const String& path, sl_bool flagBigEndian)
 		}
 		sl_size size = (sl_size)_size;
 #endif
+		if (size > maxSize) {
+			size = maxSize;
+		}
 		return file->readTextUTF16(size, flagBigEndian);
 	}
 	return String16::null();
 }
 
-String File::readAllText(const String& path, Charset* outCharset)
+String File::readAllText(const String& path, Charset* outCharset, sl_size maxSize)
 {
 	Ref<File> file = File::openForRead(path);
 	if (file.isNotNull()) {
@@ -277,12 +286,15 @@ String File::readAllText(const String& path, Charset* outCharset)
 		}
 		sl_size size = (sl_size)_size;
 #endif
+		if (size > maxSize) {
+			size = maxSize;
+		}
 		return file->readText(size, outCharset);
 	}
 	return String::null();
 }
 
-String16 File::readAllText16(const String& path, Charset* outCharset)
+String16 File::readAllText16(const String& path, Charset* outCharset, sl_size maxSize)
 {
 	Ref<File> file = File::openForRead(path);
 	if (file.isNotNull()) {
@@ -295,6 +307,9 @@ String16 File::readAllText16(const String& path, Charset* outCharset)
 		}
 		sl_size size = (sl_size)_size;
 #endif
+		if (size > maxSize) {
+			size = maxSize;
+		}
 		return file->readText16(size, outCharset);
 	}
 	return String16::null();

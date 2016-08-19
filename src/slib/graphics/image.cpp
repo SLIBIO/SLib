@@ -287,56 +287,9 @@ sl_bool Image::resetPixels(const Color& color)
 	return resetPixels(0, 0, getWidth(), getHeight(), color);
 }
 
-
 Ref<Canvas> Image::getCanvas()
 {
 	return Ref<Canvas>::null();
-}
-
-Ref<Image> Image::createSub(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height) const
-{
-	Ref<Image> ret;
-	if (x >= m_desc.width) {
-		return ret;
-	}
-	if (y >= m_desc.height) {
-		return ret;
-	}
-	if (width > m_desc.width - x) {
-		return ret;
-	}
-	if (height > m_desc.height - y) {
-		return ret;
-	}
-	ret = new Image;
-	if (ret.isNotNull()) {
-		ret->m_desc.colors = getColorsAt(x, y);
-		ret->m_desc.width = width;
-		ret->m_desc.height = height;
-		ret->m_desc.stride = m_desc.stride;
-		ret->m_desc.ref = m_desc.ref;
-	}
-	return ret;
-}
-
-Ref<Image> Image::loadFromFile(const String& filePath, sl_uint32 width, sl_uint32 height)
-{
-	Ref<Image> ret;
-	Memory mem = File::readAllBytes(filePath);
-	if (mem.isNotEmpty()) {
-		ret = loadFromMemory(mem, width, height);
-	}
-	return ret;
-}
-
-Ref<Image> Image::loadFromAsset(const String& path, sl_uint32 width, sl_uint32 height)
-{
-	Ref<Image> ret;
-	Memory mem = Assets::readAllBytes(path);
-	if (mem.isNotEmpty()) {
-		ret = loadFromMemory(mem, width, height);
-	}
-	return ret;
 }
 
 void Image::fillColor(const Color& color)
@@ -350,15 +303,6 @@ void Image::fillColor(const Color& color)
 		}
 		colorsDstLine += m_desc.stride;
 	}
-}
-
-Ref<Image> Image::scale(sl_uint32 width, sl_uint32 height, StretchMode stretch) const
-{
-	Ref<Image> ret = Image::create(width, height);
-	if (ret.isNotNull()) {
-		draw(ret->m_desc, m_desc, BlendMode::Copy, stretch);
-	}
-	return ret;
 }
 
 void Image::draw(ImageDesc& dst, const ImageDesc& src, BlendMode blend, StretchMode stretch)
@@ -486,6 +430,46 @@ void Image::drawImage(sl_int32 dx, sl_int32 dy, sl_int32 dw, sl_int32 dh
 	drawImage(dx, dy, dw, dh, src, sx, sy, dw, dh, blend, stretch);
 }
 
+Ref<Drawable> Image::subDrawable(sl_real x, sl_real y, sl_real width, sl_real height)
+{
+	if (x >= 0 && y >= 0 && width > 0 && height > 0) {
+		sl_real _w = (sl_real)(m_desc.width);
+		sl_real _h = (sl_real)(m_desc.height);
+		if (x + width <= _w && y + height <= _h) {
+			return sub((sl_uint32)x, (sl_uint32)y, (sl_uint32)width, (sl_uint32)height);
+		}
+	}
+	return Drawable::subDrawable(x, y, width, height);
+}
+
+Ref<Image> Image::sub(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height) const
+{
+	if (width > 0 && height > 0) {
+		if (x < m_desc.width && y < m_desc.height) {
+			if (width <= m_desc.width - x && height <= m_desc.height - y) {
+				Ref<Image> ret = new Image;
+				if (ret.isNotNull()) {
+					ret->m_desc.colors = getColorsAt(x, y);
+					ret->m_desc.width = width;
+					ret->m_desc.height = height;
+					ret->m_desc.stride = m_desc.stride;
+					ret->m_desc.ref = m_desc.ref;
+					return ret;
+				}
+			}
+		}
+	}
+	return Ref<Image>::null();
+}
+
+Ref<Image> Image::scale(sl_uint32 width, sl_uint32 height, StretchMode stretch) const
+{
+	Ref<Image> ret = Image::create(width, height);
+	if (ret.isNotNull()) {
+		draw(ret->m_desc, m_desc, BlendMode::Copy, stretch);
+	}
+	return ret;
+}
 
 ImageFileType Image::getFileType(const void* _mem, sl_size size)
 {
@@ -550,6 +534,26 @@ Ref<Image> Image::loadFromMemory(const void* _mem, sl_size size, sl_uint32 width
 Ref<Image> Image::loadFromMemory(Memory mem, sl_uint32 width, sl_uint32 height)
 {
 	return loadFromMemory(mem.getData(), mem.getSize(), width, height);
+}
+
+Ref<Image> Image::loadFromFile(const String& filePath, sl_uint32 width, sl_uint32 height)
+{
+	Ref<Image> ret;
+	Memory mem = File::readAllBytes(filePath);
+	if (mem.isNotEmpty()) {
+		ret = loadFromMemory(mem, width, height);
+	}
+	return ret;
+}
+
+Ref<Image> Image::loadFromAsset(const String& path, sl_uint32 width, sl_uint32 height)
+{
+	Ref<Image> ret;
+	Memory mem = Assets::readAllBytes(path);
+	if (mem.isNotEmpty()) {
+		ret = loadFromMemory(mem, width, height);
+	}
+	return ret;
 }
 
 SLIB_GRAPHICS_NAMESPACE_END

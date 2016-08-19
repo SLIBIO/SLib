@@ -147,8 +147,6 @@ typedef sl_uint32			sl_char32;
 SLIB_INLINE void sl_blank_proc(const void*) {}
 #define SLIB_UNUSED(x) sl_blank_proc(&x);
 
-#define SLIB_PARSE_ERROR (sl_reg)(-1)
-
 #define SLIB_IS_ALIGNED(p, a) (!((unsigned long)(p) & ((a) - 1)))
 #define SLIB_IS_ALIGNED_4(x) (!(((sl_reg)((void*)(x))) & 3))
 #define SLIB_IS_ALIGNED_8(x) (!(((sl_reg)((void*)(x))) & 7))

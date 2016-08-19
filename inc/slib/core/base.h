@@ -15,11 +15,12 @@ public:
 	
 	static void freeMemory(void* ptr);
 
+	static void* createZeroMemory(sl_size size);
 	
 	// Memory Utilities
 	static void copyMemory(void* dst, const void* src, sl_size count);
 	
-	static void zeroMemory(void* dst, sl_size count);
+	static void zeroMemory(void* dst, sl_size size);
 	
 	
 	static void resetMemory(void* dst, sl_uint8 value, sl_size count);

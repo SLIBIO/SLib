@@ -70,8 +70,17 @@ KeycodeAndModifiers::KeycodeAndModifiers() : value(0)
 {
 }
 
+KeycodeAndModifiers::KeycodeAndModifiers(Keycode keycode) : value((int)keycode)
+{
+}
+
 KeycodeAndModifiers::KeycodeAndModifiers(Keycode keycode, const Modifiers& modifiers) : value((int)keycode | modifiers)
 {
+}
+
+KeycodeAndModifiers KeycodeAndModifiers::none()
+{
+	return 0;
 }
 
 Keycode KeycodeAndModifiers::getKeycode() const
@@ -137,7 +146,7 @@ sl_bool KeycodeAndModifiers::parse(const String& str)
 		} else if (s == "alt" || s == "option") {
 			km |= Modifiers::Alt;
 		} else if (s == "command" || s == "window" || s == "win") {
-			km |= Modifiers::Alt;
+			km |= Modifiers::Windows;
 		} else {
 			Keycode keycode = UI::getKeycodeFromName(s);
 			if (keycode == Keycode::Unknown) {
@@ -562,171 +571,171 @@ private:
 	
 public:
 
-#define _MAP_KEY(A, B) \
+#define _MAP_KEY(NAME) \
 	{ \
-		SLIB_STATIC_STRING(_s, B); \
-		mapLong.put((sl_uint32)(A), _s); \
-		mapShort.put((sl_uint32)(A), _s); \
-		mapName.put(_s.toLower(), (sl_uint32)A); \
+		SLIB_STATIC_STRING(_s, #NAME); \
+		mapLong.put((sl_uint32)(Keycode::NAME), _s); \
+		mapShort.put((sl_uint32)(Keycode::NAME), _s); \
+		mapName.put(_s.toLower(), (sl_uint32)(Keycode::NAME)); \
 	}
-#define _MAP_KEY2(A, B, C) \
+#define _MAP_KEY2(NAME, SHORT_NAME) \
 	{ \
-		SLIB_STATIC_STRING(_s1, B); \
-		mapLong.put((sl_uint32)(A), _s1); \
-		SLIB_STATIC_STRING(_s2, C); \
-		mapShort.put((sl_uint32)(A), _s2); \
-		mapName.put(_s1.toLower(), (sl_uint32)A); \
-		mapName.put(_s2.toLower(), (sl_uint32)A); \
+		SLIB_STATIC_STRING(_s1, #NAME); \
+		mapLong.put((sl_uint32)(Keycode::NAME), _s1); \
+		SLIB_STATIC_STRING(_s2, SHORT_NAME); \
+		mapShort.put((sl_uint32)(Keycode::NAME), _s2); \
+		mapName.put(_s1.toLower(), (sl_uint32)(Keycode::NAME)); \
+		mapName.put(_s2.toLower(), (sl_uint32)(Keycode::NAME)); \
 	}
 
 	_UIKeyNameMapper()
 	{
-		SLIB_STATIC_STRING(_invalid, "Invalid");
+		SLIB_STATIC_STRING(_invalid, "Invalid")
 		nameInvalid = _invalid;
-		_MAP_KEY(Keycode::Unknown, "Unknown");
+		_MAP_KEY(Unknown);
 		
-		_MAP_KEY2(Keycode::Backspace, "Backspace", "Back");
-		_MAP_KEY(Keycode::Tab, "Tab");
-		_MAP_KEY(Keycode::Enter, "Enter");
-		_MAP_KEY2(Keycode::Escape, "Escape", "Esc");
+		_MAP_KEY2(Backspace, "Back")
+		_MAP_KEY(Tab)
+		_MAP_KEY(Enter)
+		_MAP_KEY2(Escape, "Esc")
 		
-		_MAP_KEY(Keycode::Space, "Space");
-		_MAP_KEY2(Keycode::Grave, "Grave", "`");
-		_MAP_KEY2(Keycode::Equal, "Equal", "=");
-		_MAP_KEY2(Keycode::Semicolon, "Semicolon", ";");
-		_MAP_KEY2(Keycode::Backslash, "Backslash", "\\");
-		_MAP_KEY2(Keycode::LeftBaracket, "LeftBaracket", "[");
-		_MAP_KEY2(Keycode::RightBaracket, "RightBaracket", "]");
-		_MAP_KEY2(Keycode::Quote, "Quote", "'");
-		_MAP_KEY2(Keycode::Comma, "Comma", ",");
-		_MAP_KEY2(Keycode::Minus, "Minus", "-");
-		_MAP_KEY2(Keycode::Period, "Period", ".");
-		_MAP_KEY2(Keycode::Divide, "Divide", "/");
+		_MAP_KEY(Space)
+		_MAP_KEY2(Grave, "`")
+		_MAP_KEY2(Equal, "=")
+		_MAP_KEY2(Semicolon, ";")
+		_MAP_KEY2(Backslash, "\\")
+		_MAP_KEY2(LeftBaracket, "[")
+		_MAP_KEY2(RightBaracket, "]")
+		_MAP_KEY2(Quote, "'")
+		_MAP_KEY2(Comma, ",")
+		_MAP_KEY2(Minus, "-")
+		_MAP_KEY2(Period, ".")
+		_MAP_KEY2(Divide, "/")
 		
-		_MAP_KEY(Keycode::Num0, "0");
-		_MAP_KEY(Keycode::Num1, "1");
-		_MAP_KEY(Keycode::Num2, "2");
-		_MAP_KEY(Keycode::Num3, "3");
-		_MAP_KEY(Keycode::Num4, "4");
-		_MAP_KEY(Keycode::Num5, "5");
-		_MAP_KEY(Keycode::Num6, "6");
-		_MAP_KEY(Keycode::Num7, "7");
-		_MAP_KEY(Keycode::Num8, "8");
-		_MAP_KEY(Keycode::Num9, "9");
+		_MAP_KEY2(Num0, "0")
+		_MAP_KEY2(Num1, "1")
+		_MAP_KEY2(Num2, "2")
+		_MAP_KEY2(Num3, "3")
+		_MAP_KEY2(Num4, "4")
+		_MAP_KEY2(Num5, "5")
+		_MAP_KEY2(Num6, "6")
+		_MAP_KEY2(Num7, "7")
+		_MAP_KEY2(Num8, "8")
+		_MAP_KEY2(Num9, "9")
 		
-		_MAP_KEY(Keycode::A, "A");
-		_MAP_KEY(Keycode::B, "B");
-		_MAP_KEY(Keycode::C, "C");
-		_MAP_KEY(Keycode::D, "D");
-		_MAP_KEY(Keycode::E, "E");
-		_MAP_KEY(Keycode::F, "F");
-		_MAP_KEY(Keycode::G, "G");
-		_MAP_KEY(Keycode::H, "H");
-		_MAP_KEY(Keycode::I, "I");
-		_MAP_KEY(Keycode::J, "J");
-		_MAP_KEY(Keycode::K, "K");
-		_MAP_KEY(Keycode::L, "L");
-		_MAP_KEY(Keycode::M, "M");
-		_MAP_KEY(Keycode::N, "N");
-		_MAP_KEY(Keycode::O, "O");
-		_MAP_KEY(Keycode::P, "P");
-		_MAP_KEY(Keycode::Q, "Q");
-		_MAP_KEY(Keycode::R, "R");
-		_MAP_KEY(Keycode::S, "S");
-		_MAP_KEY(Keycode::T, "T");
-		_MAP_KEY(Keycode::U, "U");
-		_MAP_KEY(Keycode::V, "V");
-		_MAP_KEY(Keycode::W, "W");
-		_MAP_KEY(Keycode::X, "X");
-		_MAP_KEY(Keycode::Y, "Y");
-		_MAP_KEY(Keycode::Z, "Z");
+		_MAP_KEY(A)
+		_MAP_KEY(B)
+		_MAP_KEY(C)
+		_MAP_KEY(D)
+		_MAP_KEY(E)
+		_MAP_KEY(F)
+		_MAP_KEY(G)
+		_MAP_KEY(H)
+		_MAP_KEY(I)
+		_MAP_KEY(J)
+		_MAP_KEY(K)
+		_MAP_KEY(L)
+		_MAP_KEY(M)
+		_MAP_KEY(N)
+		_MAP_KEY(O)
+		_MAP_KEY(P)
+		_MAP_KEY(Q)
+		_MAP_KEY(R)
+		_MAP_KEY(S)
+		_MAP_KEY(T)
+		_MAP_KEY(U)
+		_MAP_KEY(V)
+		_MAP_KEY(W)
+		_MAP_KEY(X)
+		_MAP_KEY(Y)
+		_MAP_KEY(Z)
 		
-		_MAP_KEY2(Keycode::Numpad0, "Numpad0", "Num0");
-		_MAP_KEY2(Keycode::Numpad1, "Numpad1", "Num1");
-		_MAP_KEY2(Keycode::Numpad2, "Numpad2", "Num2");
-		_MAP_KEY2(Keycode::Numpad3, "Numpad3", "Num3");
-		_MAP_KEY2(Keycode::Numpad4, "Numpad4", "Num4");
-		_MAP_KEY2(Keycode::Numpad5, "Numpad5", "Num5");
-		_MAP_KEY2(Keycode::Numpad6, "Numpad6", "Num6");
-		_MAP_KEY2(Keycode::Numpad7, "Numpad7", "Num7");
-		_MAP_KEY2(Keycode::Numpad8, "Numpad8", "Num8");
-		_MAP_KEY2(Keycode::Numpad9, "Numpad9", "Num9");
+		_MAP_KEY(Numpad0)
+		_MAP_KEY(Numpad1)
+		_MAP_KEY(Numpad2)
+		_MAP_KEY(Numpad3)
+		_MAP_KEY(Numpad4)
+		_MAP_KEY(Numpad5)
+		_MAP_KEY(Numpad6)
+		_MAP_KEY(Numpad7)
+		_MAP_KEY(Numpad8)
+		_MAP_KEY(Numpad9)
 		
-		_MAP_KEY2(Keycode::NumpadDivide, "NumpadDivide", "Num/");
-		_MAP_KEY2(Keycode::NumpadMultiply, "NumpadMultiply", "Num*");
-		_MAP_KEY2(Keycode::NumpadMinus, "NumpadMinus", "Num-");
-		_MAP_KEY2(Keycode::NumpadPlus, "NumpadPlus", "Num+");
-		_MAP_KEY2(Keycode::NumpadEnter, "NumpadEnter", "NumEnter");
-		_MAP_KEY2(Keycode::NumpadDecimal, "NumpadDecimal", "Num.");
+		_MAP_KEY2(NumpadDivide, "Numpad/")
+		_MAP_KEY2(NumpadMultiply, "Numpad*")
+		_MAP_KEY2(NumpadMinus, "Numpad-")
+		_MAP_KEY2(NumpadPlus, "Numpad+")
+		_MAP_KEY2(NumpadEnter, "NumpadEnter")
+		_MAP_KEY2(NumpadDecimal, "Numpad.")
 		
-		_MAP_KEY(Keycode::F1, "F1");
-		_MAP_KEY(Keycode::F2, "F2");
-		_MAP_KEY(Keycode::F3, "F3");
-		_MAP_KEY(Keycode::F4, "F4");
-		_MAP_KEY(Keycode::F5, "F5");
-		_MAP_KEY(Keycode::F6, "F6");
-		_MAP_KEY(Keycode::F7, "F7");
-		_MAP_KEY(Keycode::F8, "F8");
-		_MAP_KEY(Keycode::F9, "F9");
-		_MAP_KEY(Keycode::F10, "F10");
-		_MAP_KEY(Keycode::F11, "F11");
-		_MAP_KEY(Keycode::F12, "F12");
+		_MAP_KEY(F1)
+		_MAP_KEY(F2)
+		_MAP_KEY(F3)
+		_MAP_KEY(F4)
+		_MAP_KEY(F5)
+		_MAP_KEY(F6)
+		_MAP_KEY(F7)
+		_MAP_KEY(F8)
+		_MAP_KEY(F9)
+		_MAP_KEY(F10)
+		_MAP_KEY(F11)
+		_MAP_KEY(F12)
 		
-		_MAP_KEY2(Keycode::PageUp, "PageUp", "PgUp");
-		_MAP_KEY2(Keycode::PageDown, "PageDown", "PgDn");
-		_MAP_KEY(Keycode::Home, "Home");
-		_MAP_KEY(Keycode::End, "End");
-		_MAP_KEY(Keycode::Left, "Left");
-		_MAP_KEY(Keycode::Up, "Up");
-		_MAP_KEY(Keycode::Right, "Right");
-		_MAP_KEY(Keycode::Down, "Down");
-		_MAP_KEY2(Keycode::PrintScreen, "PrintScreen", "PrtSc");
-		_MAP_KEY2(Keycode::Insert, "Insert", "Ins");
-		_MAP_KEY2(Keycode::Delete, "Delete", "Del");
-		_MAP_KEY(Keycode::Sleep, "Sleep");
-		_MAP_KEY(Keycode::Pause, "Pause");
+		_MAP_KEY2(PageUp, "PgUp")
+		_MAP_KEY2(PageDown, "PgDn")
+		_MAP_KEY(Home)
+		_MAP_KEY(End)
+		_MAP_KEY(Left)
+		_MAP_KEY(Up)
+		_MAP_KEY(Right)
+		_MAP_KEY(Down)
+		_MAP_KEY2(PrintScreen, "PrtSc")
+		_MAP_KEY2(Insert, "Ins")
+		_MAP_KEY2(Delete, "Del")
+		_MAP_KEY(Sleep)
+		_MAP_KEY(Pause)
 		
-		_MAP_KEY(Keycode::GoHome, "GoHome");
-		_MAP_KEY(Keycode::GoMenu, "GoMenu");
-		_MAP_KEY(Keycode::GoBack, "GoBack");
-		_MAP_KEY(Keycode::Camera, "Camera");
-		_MAP_KEY(Keycode::VolumeMute, "VolumeMute");
-		_MAP_KEY(Keycode::VolumeDown, "VolumeDown");
-		_MAP_KEY(Keycode::VolumeUp, "VolumeUp");
-		_MAP_KEY(Keycode::MediaPrev, "MediaPrev");
-		_MAP_KEY(Keycode::MediaNext, "MediaNext");
-		_MAP_KEY(Keycode::MediaPause, "MediaPause");
-		_MAP_KEY(Keycode::MediaStop, "MediaStop");
-		_MAP_KEY(Keycode::PhoneStar, "Dial*");
-		_MAP_KEY(Keycode::PhonePound, "Dial#");
+		_MAP_KEY(GoHome)
+		_MAP_KEY(GoMenu)
+		_MAP_KEY(GoBack)
+		_MAP_KEY(Camera)
+		_MAP_KEY(VolumeMute)
+		_MAP_KEY(VolumeDown)
+		_MAP_KEY(VolumeUp)
+		_MAP_KEY(MediaPrev)
+		_MAP_KEY(MediaNext)
+		_MAP_KEY(MediaPause)
+		_MAP_KEY(MediaStop)
+		_MAP_KEY2(PhoneStar, "Dial*")
+		_MAP_KEY2(PhonePound, "Dial#")
 
-		_MAP_KEY2(Keycode::LeftShift, "LeftShift", "LShift");
-		_MAP_KEY2(Keycode::RightShift, "RightShift", "RShift");
-		_MAP_KEY2(Keycode::LeftControl, "LeftControl", "LCtrl");
-		_MAP_KEY2(Keycode::RightControl, "RightControl", "RCtrl");
+		_MAP_KEY2(LeftShift, "LShift")
+		_MAP_KEY2(RightShift, "RShift")
+		_MAP_KEY2(LeftControl, "LCtrl")
+		_MAP_KEY2(RightControl, "RCtrl")
 #if defined(SLIB_PLATFORM_IS_APPLE)
-		_MAP_KEY2(Keycode::LeftAlt, "LeftAlt", "LAlt");
-		_MAP_KEY2(Keycode::RightAlt, "RightAlt", "RAlt");
-		_MAP_KEY2(Keycode::LeftWin, "LeftWin", "LWin");
-		_MAP_KEY2(Keycode::RightWin, "RightWin", "RWin");
-		_MAP_KEY2(Keycode::LeftOption, "LeftOption", "LAlt");
-		_MAP_KEY2(Keycode::RightOption, "RightOption", "RAlt");
-		_MAP_KEY2(Keycode::LeftCommand, "LeftCommand", "LCmd");
-		_MAP_KEY2(Keycode::RightCommand, "RightCommand", "RCmd");
+		_MAP_KEY2(LeftAlt, "LAlt")
+		_MAP_KEY2(RightAlt, "RAlt")
+		_MAP_KEY2(LeftWin, "LWin")
+		_MAP_KEY2(RightWin, "RWin")
+		_MAP_KEY2(LeftOption, "LAlt")
+		_MAP_KEY2(RightOption, "RAlt")
+		_MAP_KEY2(LeftCommand, "LCmd")
+		_MAP_KEY2(RightCommand, "RCmd")
 #else
-		_MAP_KEY2(Keycode::LeftOption, "LeftOption", "LAlt");
-		_MAP_KEY2(Keycode::RightOption, "RightOption", "RAlt");
-		_MAP_KEY2(Keycode::LeftCommand, "LeftCommand", "LCmd");
-		_MAP_KEY2(Keycode::RightCommand, "RightCommand", "RCmd");
-		_MAP_KEY2(Keycode::LeftAlt, "LeftAlt", "LAlt");
-		_MAP_KEY2(Keycode::RightAlt, "RightAlt", "RAlt");
-		_MAP_KEY2(Keycode::LeftWin, "LeftWin", "LWin");
-		_MAP_KEY2(Keycode::RightWin, "RightWin", "RWin");
+		_MAP_KEY2(LeftOption, "LAlt")
+		_MAP_KEY2(RightOption, "RAlt")
+		_MAP_KEY2(LeftCommand, "LCmd")
+		_MAP_KEY2(RightCommand, "RCmd")
+		_MAP_KEY2(LeftAlt, "LAlt")
+		_MAP_KEY2(RightAlt, "RAlt")
+		_MAP_KEY2(LeftWin, "LWin")
+		_MAP_KEY2(RightWin, "RWin")
 #endif
-		_MAP_KEY(Keycode::CapsLock, "CapsLock");
-		_MAP_KEY(Keycode::ScrollLock, "ScrollLock");
-		_MAP_KEY(Keycode::NumLock, "NumLock");
-		_MAP_KEY(Keycode::ContextMenu, "ContextMenu");
+		_MAP_KEY(CapsLock)
+		_MAP_KEY(ScrollLock)
+		_MAP_KEY(NumLock)
+		_MAP_KEY(ContextMenu)
 
 	}
 	

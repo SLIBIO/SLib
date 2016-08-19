@@ -10,3 +10,4 @@ project.xcworkspace/
 xcuserdata/
 Debug/
 Release/
+.vscode

@@ -1,0 +1,12 @@
+#ifndef CHECKHEADER_SLIB_RENDER_RESOURCE
+#define CHECKHEADER_SLIB_RENDER_RESOURCE
+
+#include "definition.h"
+
+#include "../core/resource.h"
+
+SLIB_RENDER_NAMESPACE_BEGIN
+
+SLIB_RENDER_NAMESPACE_END
+
+#endif

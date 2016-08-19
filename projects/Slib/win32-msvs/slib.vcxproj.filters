@@ -700,6 +700,27 @@
     <ClInclude Include="..\..\..\inc\slib\core\charset.h">
       <Filter>inc\core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\resource.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\graphics\resource.h">
+      <Filter>inc\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\render\resource.h">
+      <Filter>inc\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\ui\resource.h">
+      <Filter>inc\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\parse.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\ui\linear_view.h">
+      <Filter>inc\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\ui\list_view.h">
+      <Filter>inc\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">
@@ -1367,6 +1388,21 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\charset.cpp">
       <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_resource.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\render\render_resource.cpp">
+      <Filter>src\slib\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\ui_resource.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\linear_view.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\list_view.cpp">
+      <Filter>src\slib\ui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

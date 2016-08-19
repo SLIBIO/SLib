@@ -51,6 +51,8 @@ public:
 
 	// override
 	void setSubmenu(const Ref<Menu>& menu);
+	
+	static NSImage* _createIcon(const Ref<Bitmap>& iconSrc);
 
 };
 
@@ -181,8 +183,8 @@ Ref<_OSX_MenuItem> _OSX_MenuItem::create(_OSX_Menu* parent, const MenuItemParam&
 		if (handle.submenu != nil) {
 			handle.submenu.title = handle.title;
 		}
-		handle.offStateImage = UIPlatform::getNSImageFromBitmap(param.icon);
-		handle.onStateImage = UIPlatform::getNSImageFromBitmap(param.checkedIcon);
+		handle.offStateImage = _createIcon(param.icon);
+		handle.onStateImage = _createIcon(param.checkedIcon);
 		if (handle.onStateImage == nil) {
 			handle.onStateImage = handle->m_defaultCheckedImage;
 		}
@@ -273,6 +275,24 @@ void _OSX_MenuItem::setSubmenu(const Ref<Menu>& menu)
 	if (m_handle.submenu != nil) {
 		m_handle.submenu.title = m_handle.title;
 	}
+}
+
+NSImage* _OSX_MenuItem::_createIcon(const Ref<Bitmap>& iconSrc)
+{
+	if (iconSrc.isNotNull()) {
+		NSImage* icon = UIPlatform::getNSImageFromBitmap(iconSrc);
+		if (icon != nil) {
+			if (icon.size.width > 0 && icon.size.height > 0) {
+				double w = [[NSFont menuFontOfSize:0] pointSize];
+				NSSize size;
+				size.width = w;
+				size.height = w;
+				icon.size = size;
+				return icon;
+			}
+		}
+	}
+	return nil;
 }
 
 

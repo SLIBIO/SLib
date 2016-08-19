@@ -136,10 +136,15 @@ void Win32_ViewInstance::setFrame(const Rectangle& frame)
 	}
 	HWND hWnd = m_handle;
 	if (hWnd) {
+		UINT uFlags = SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE
+			| SWP_NOCOPYBITS
+			| SWP_ASYNCWINDOWPOS
+			;
 		::SetWindowPos(hWnd, NULL
 			, (int)(frame.left), (int)(frame.top)
 			, (int)(frame.getWidth()), (int)(frame.getHeight())
-			, SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
+			, uFlags
+		);
 	}
 }
 
@@ -151,8 +156,10 @@ void Win32_ViewInstance::setVisible(sl_bool flag)
 		sl_bool f2 = flag ? sl_true : sl_false;
 		if (f1 != f2) {
 			if (f2) {
+				//::ShowWindow(hWnd, SW_SHOW);
 				::ShowWindowAsync(hWnd, SW_SHOW);
 			} else {
+				//::ShowWindow(hWnd, SW_HIDE);
 				::ShowWindowAsync(hWnd, SW_HIDE);
 			}
 		}
@@ -611,7 +618,8 @@ Ref<ViewInstance> View::createGenericInstance(ViewInstance* parent)
 		styleEx |= WS_EX_COMPOSITED;
 #endif
 #if defined(_SLIB_UI_WIN32_USE_CLIP_CHILDREN)
-		style |= (WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
+		//style |= WS_CLIPSIBLINGS;
+		style |= WS_CLIPCHILDREN;
 #endif
 	}
 	Ref<Win32_ViewInstance> ret = Win32_ViewInstance::create<Win32_ViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);

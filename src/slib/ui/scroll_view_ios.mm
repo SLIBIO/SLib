@@ -10,7 +10,12 @@
 	
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
 	
+	@public UIView* m_contentView;
+	
 }
+
+- (void)setContentOffsetFromAPI:(CGPoint)contentOffset;
+
 @end
 
 SLIB_UI_NAMESPACE_BEGIN
@@ -18,8 +23,25 @@ SLIB_UI_NAMESPACE_BEGIN
 class _ScrollView : public ScrollView
 {
 public:
-	void __applyContent(UIScrollView* sv)
+	void __applyContentSize(_Slib_iOS_ScrollView* sv)
 	{
+		Size size = getContentSize();
+		if (!m_flagBothScroll) {
+			if (m_flagVerticalScroll) {
+				size.x = 0;
+			} else {
+				size.y = 0;
+			}
+		}
+		[sv setContentSize:CGSizeMake(size.x, size.y)];
+	}
+	
+	void __applyContent(_Slib_iOS_ScrollView* sv)
+	{
+		if (sv->m_contentView != nil) {
+			[sv->m_contentView removeFromSuperview];
+			sv->m_contentView = nil;
+		}
 		Ref<View> viewContent = m_viewContent;
 		UIView* handle = nil;
 		if (viewContent.isNotNull()) {
@@ -27,13 +49,12 @@ public:
 			if (instance.isNotNull()) {
 				handle = UIPlatform::getViewHandle(instance.ptr);
 			}
-			viewContent->setParent(this);
-			Size sizeContent = viewContent->getSize();
-			[sv setContentSize:CGSizeMake(sizeContent.x, sizeContent.y)];
+			sv->m_contentView = handle;
 			if (handle != nil) {
 				[sv addSubview:handle];
 			}
 		}
+		__applyContentSize(sv);
 	}
 	
 	void __applyProperties(UIScrollView* handle)
@@ -41,6 +62,17 @@ public:
 		handle.backgroundColor = UIPlatform::getUIColorFromColor(getBackgroundColor());
 		__applyContent(handle);
 	}
+	
+	static void __onScroll(iOS_ViewInstance* instance, UIScrollView* sv)
+	{
+		CGPoint pt= sv.contentOffset;
+		Ref<View> _view = instance->getView();
+		if (ScrollView::checkInstance(_view.ptr)) {
+			_ScrollView* view = (_ScrollView*)(_view.ptr);
+			view->_onScroll_NW((sl_real)(pt.x), (sl_real)(pt.y));
+		}
+	}
+
 };
 
 Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* _parent)
@@ -59,11 +91,7 @@ void ScrollView::_refreshContentSize_NW()
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[UIScrollView class]]) {
 		UIScrollView* sv = (UIScrollView*)handle;
-		Ref<View> viewContent = m_viewContent;
-		if (viewContent.isNotNull()) {
-			Size sizeContent = viewContent->getSize();
-			[sv setContentSize:CGSizeMake(sizeContent.x, sizeContent.y)];
-		}
+		((_ScrollView*)this)->__applyContentSize(handle);
 	}
 }
 
@@ -79,9 +107,14 @@ void ScrollView::_setContentView_NW(const Ref<View>& view)
 void ScrollView::_scrollTo_NW(sl_real x, sl_real y)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[UIScrollView class]]) {
-		UIScrollView* sv = (UIScrollView*)handle;
-		[sv setContentOffset:CGPointMake(x, y)];
+	if (handle != nil) {
+		if ([handle isKindOfClass:[_Slib_iOS_ScrollView class]]) {
+			_Slib_iOS_ScrollView* sv = (_Slib_iOS_ScrollView*)handle;
+			[sv setContentOffsetFromAPI:CGPointMake(x, y)];
+		} else if ([handle isKindOfClass:[UIScrollView class]]) {
+			UIScrollView* sv = (UIScrollView*)handle;
+			[sv setContentOffset:CGPointMake(x, y)];
+		}
 	}
 }
 
@@ -136,13 +169,27 @@ void ScrollView::_setBackgroundColor_NW(const Color& color)
 SLIB_UI_NAMESPACE_END
 
 @implementation _Slib_iOS_ScrollView
+
 -(id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];
-	if (self != nil) {
-	}
 	return self;
 }
+
+- (void)setContentOffset:(CGPoint)contentOffset
+{
+	[super setContentOffset:contentOffset];
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		slib::_ScrollView::__onScroll(instance.ptr, self);
+	}
+}
+
+- (void)setContentOffsetFromAPI:(CGPoint)contentOffset
+{
+	[super setContentOffset:contentOffset];
+}
+
 @end
 
 #endif

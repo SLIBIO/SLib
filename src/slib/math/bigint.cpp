@@ -875,114 +875,11 @@ CBigInt* CBigInt::fromUint64(sl_uint64 v)
 	return sl_null;
 }
 
-template <class CT>
-sl_reg _CBigInt_parseString(CBigInt* out, const CT* sz, sl_size posBegin, sl_size len, sl_uint32 radix)
-{
-	if (radix < 2 || radix > 64) {
-		return SLIB_PARSE_ERROR;;
-	}
-	sl_int32 sign;
-	sl_size pos = posBegin;
-	if (pos < len && sz[pos] == '-') {
-		pos++;
-		sign = -1;
-	} else {
-		sign = 1;
-	}
-	for (; pos < len; pos++) {
-		sl_int32 c = (sl_uint32)(sz[pos]);
-		if (c != '\t' && c != ' ') {
-			break;
-		}
-	}
-	sl_size end = pos;
-	const sl_uint8* pattern = radix <= 36 ? _StringConv_radixInversePatternSmall : _StringConv_radixInversePatternBig;
-	for (; end < len; end++) {
-		sl_uint32 c = (sl_uint8)(sz[end]);
-		sl_uint32 v = c < 128 ? pattern[c] : 255;
-		if (v >= radix) {
-			break;
-		}
-	}
-	if (end <= pos) {
-		return SLIB_PARSE_ERROR;
-	}
-	if (!out) {
-		return end;
-	}
-	out->sign = sign;
-	if (radix == 16) {
-		out->setZero();
-		sl_size nh = end - pos;
-		sl_size ne = ((nh << 2) + 31) >> 5;
-		if (!(out->growLength(ne))) {
-			return SLIB_PARSE_ERROR;
-		}
-		sl_uint32* elements = out->elements;
-		sl_size ih = nh - 1;
-		for (; pos < end; pos++) {
-			sl_uint32 c = (sl_uint8)(sz[pos]);
-			sl_uint32 v = c < 128 ? pattern[c] : 255;
-			if (v >= radix) {
-				break;
-			}
-			sl_size ie = ih >> 3;
-			sl_uint32 ib = (sl_uint32)((ih << 2) & 31);
-			elements[ie] |= (v << ib);
-			ih--;
-		}
-		return pos;
-	} else {
-		sl_size nb = (sl_size)(Math::ceil(Math::log2((double)radix) * len));
-		sl_size ne = (nb + 31) >> 5;
-		SLIB_SCOPED_BUFFER(sl_uint32, STACK_BUFFER_SIZE, a, ne);
-		if (!a) {
-			return SLIB_PARSE_ERROR;
-		}
-		sl_size n = 0;
-		for (; pos < end; pos++) {
-			sl_uint32 c = (sl_uint8)(sz[pos]);
-			sl_uint32 v = c < 128 ? pattern[c] : 255;
-			if (v >= radix) {
-				break;
-			}
-			sl_uint32 o = _cbigint_mul_uint32(a, a, n, radix, v);
-			if (o) {
-				a[n] = o;
-				n++;
-			}
-		}
-		if (!(out->setValueFromElements(a, n))) {
-			return SLIB_PARSE_ERROR;
-		}
-		return pos;
-	}
-}
-
-sl_reg CBigInt::parseString(CBigInt* out, const char* sz, sl_size posBegin, sl_size len, sl_uint32 radix)
-{
-	return _CBigInt_parseString(out, sz, posBegin, len, radix);
-}
-
-sl_reg CBigInt::parseString(CBigInt* out, const sl_char16* sz, sl_size posBegin, sl_size len, sl_uint32 radix)
-{
-	return _CBigInt_parseString(out, sz, posBegin, len, radix);
-}
-
-sl_bool CBigInt::parseString(const String& s, sl_uint32 radix)
-{
-	sl_size n = s.getLength();
-	if (n == 0) {
-		return sl_false;
-	}
-	return _CBigInt_parseString(this, s.getData(), 0, n, radix) == n;
-}
-
 CBigInt* CBigInt::fromString(const String& s, sl_uint32 radix)
 {
 	CBigInt* ret = new CBigInt;
 	if (ret) {
-		ret->parseString(s, radix);
+		ret->parse(s, radix);
 	}
 	return ret;
 }
@@ -1070,6 +967,93 @@ String CBigInt::toHexString() const
 {
 	return toString(16);
 }
+
+template <class CT, class ST>
+static sl_reg _CBigInt_parseString(CBigInt* out, const CT* sz, sl_size posBegin, sl_size len, sl_uint32 radix)
+{
+	if (radix < 2 || radix > 64) {
+		return SLIB_PARSE_ERROR;;
+	}
+	sl_int32 sign;
+	sl_size pos = posBegin;
+	if (pos < len && sz[pos] == '-') {
+		pos++;
+		sign = -1;
+	} else {
+		sign = 1;
+	}
+	for (; pos < len; pos++) {
+		sl_int32 c = (sl_uint32)(sz[pos]);
+		if (c != '\t' && c != ' ') {
+			break;
+		}
+	}
+	sl_size end = pos;
+	const sl_uint8* pattern = radix <= 36 ? _StringConv_radixInversePatternSmall : _StringConv_radixInversePatternBig;
+	for (; end < len; end++) {
+		sl_uint32 c = (sl_uint8)(sz[end]);
+		sl_uint32 v = c < 128 ? pattern[c] : 255;
+		if (v >= radix) {
+			break;
+		}
+	}
+	if (end <= pos) {
+		return SLIB_PARSE_ERROR;
+	}
+	if (!out) {
+		return end;
+	}
+	out->sign = sign;
+	if (radix == 16) {
+		out->setZero();
+		sl_size nh = end - pos;
+		sl_size ne = ((nh << 2) + 31) >> 5;
+		if (!(out->growLength(ne))) {
+			return SLIB_PARSE_ERROR;
+		}
+		sl_uint32* elements = out->elements;
+		sl_size ih = nh - 1;
+		for (; pos < end; pos++) {
+			sl_uint32 c = (sl_uint8)(sz[pos]);
+			sl_uint32 v = c < 128 ? pattern[c] : 255;
+			if (v >= radix) {
+				break;
+			}
+			sl_size ie = ih >> 3;
+			sl_uint32 ib = (sl_uint32)((ih << 2) & 31);
+			elements[ie] |= (v << ib);
+			ih--;
+		}
+		return pos;
+	} else {
+		sl_size nb = (sl_size)(Math::ceil(Math::log2((double)radix) * len));
+		sl_size ne = (nb + 31) >> 5;
+		SLIB_SCOPED_BUFFER(sl_uint32, STACK_BUFFER_SIZE, a, ne);
+		if (!a) {
+			return SLIB_PARSE_ERROR;
+		}
+		sl_size n = 0;
+		for (; pos < end; pos++) {
+			sl_uint32 c = (sl_uint8)(sz[pos]);
+			sl_uint32 v = c < 128 ? pattern[c] : 255;
+			if (v >= radix) {
+				break;
+			}
+			sl_uint32 o = _cbigint_mul_uint32(a, a, n, radix, v);
+			if (o) {
+				a[n] = o;
+				n++;
+			}
+		}
+		if (!(out->setValueFromElements(a, n))) {
+			return SLIB_PARSE_ERROR;
+		}
+		return pos;
+	}
+}
+
+SLIB_DEFINE_PARSE_FUNCTIONS_ARG(CBigInt, _CBigInt_parseString, sl_uint32, radix, 10)
+
 
 sl_int32 CBigInt::compareAbs(const CBigInt& other) const
 {

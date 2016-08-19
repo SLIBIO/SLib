@@ -43,7 +43,7 @@ Point GraphicsUtil::calculateAlignPosition(const Rectangle &rcDst, sl_real width
 	return ret;
 }
 
-Rectangle GraphicsUtil::transformRectangle(const Rectangle& rectSrc, const Rectangle& rectFrom, const Rectangle& rectTo)
+Rectangle GraphicsUtil::transformRectangle(const Rectangle& rectTransform, const Rectangle& rectFrom, const Rectangle& rectTo)
 {
 	sl_real w1 = rectFrom.getWidth();
 	sl_real h1 = rectFrom.getHeight();
@@ -55,13 +55,13 @@ Rectangle GraphicsUtil::transformRectangle(const Rectangle& rectSrc, const Recta
 	if (Math::isAlmostZero(w2) || Math::isAlmostZero(h2)) {
 		return Rectangle::zero();
 	}
-	sl_real sw = rectSrc.getWidth();
-	sl_real sh = rectSrc.getHeight();
+	sl_real sw = rectTransform.getWidth();
+	sl_real sh = rectTransform.getHeight();
 	sl_real w = sw * w2 / w1;
 	sl_real h = sh * h2 / h1;
 	Rectangle ret;
-	ret.left = rectSrc.left + (rectTo.left - rectFrom.left) * sw / w1;
-	ret.top = rectSrc.top + (rectTo.top - rectFrom.top) * sh / h1;
+	ret.left = rectTransform.left + (rectTo.left - rectFrom.left) * sw / w1;
+	ret.top = rectTransform.top + (rectTo.top - rectFrom.top) * sh / h1;
 	ret.right = ret.left + w;
 	ret.bottom = ret.top + h;
 	return ret;

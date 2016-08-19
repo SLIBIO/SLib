@@ -87,9 +87,13 @@ public:
 	sl_size getChildrenCount();
 	
 	void addChild(const Ref<View>& view, sl_bool flagRedraw = sl_true);
-	
+
+	void addChildNotAttach(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+
 	void insertChild(sl_size index, const Ref<View>& view, sl_bool flagRedraw = sl_true);
-	
+
+	void insertChildNotAttach(sl_size index, const Ref<View>& view, sl_bool flagRedraw = sl_true);
+
 	void removeChild(sl_size index, sl_bool flagRedraw = sl_true);
 
 	void removeChild(const Ref<View>& view, sl_bool flagRedraw = sl_true);
@@ -255,6 +259,10 @@ public:
 	sl_real getMeasuredHeight();
 	
 	void setMeasuredHeight(sl_real height);
+	
+	sl_real getMeasuredOuterBoundWidth();
+	
+	sl_real getMeasuredOuterBoundHeight();
 
 	void requestLayout(sl_bool flagRedraw = sl_true);
 	
@@ -294,17 +302,13 @@ public:
 	
 	sl_bool isWidthFilling();
 	
-	sl_real getWidthFillingWeight();
-	
-	void setWidthFilling(sl_real weight = 1, sl_bool flagRedraw = sl_true);
+	void setWidthFilling(sl_bool flagRedraw = sl_true);
 	
 	sl_bool isHeightFilling();
 	
-	sl_real getHeightFillingWeight();
+	void setHeightFilling(sl_bool flagRedraw = sl_true);
 	
-	void setHeightFilling(sl_real weight = 1, sl_bool flagRedraw = sl_true);
-	
-	void setSizeFilling(sl_real widthWeight = 1, sl_real heightWeight = 1, sl_bool flagRedraw = sl_true);
+	void setSizeFilling(sl_bool flagRedraw = sl_true);
 	
 	sl_bool isWidthWrapping();
 	
@@ -316,6 +320,20 @@ public:
 	
 	void setSizeWrapping(sl_bool flagRedraw = sl_true);
 	
+	sl_bool isWidthWeight();
+	
+	sl_real getWidthWeight();
+	
+	void setWidthWeight(sl_real weight = 1, sl_bool flagRedraw = sl_true);
+	
+	sl_bool isHeightWeight();
+	
+	sl_real getHeightWeight();
+	
+	void setHeightWeight(sl_real weight = 1, sl_bool flagRedraw = sl_true);
+	
+	void setSizeWeight(sl_real widthWeight = 1, sl_real heightWeight = 1, sl_bool flagRedraw = sl_true);
+
 	sl_bool isLayoutLeftFixed();
 	
 	void setLayoutLeftFixed(sl_bool flagRedraw = sl_true);
@@ -406,26 +424,6 @@ public:
 	
 	void setAlignCenterVertical(const Ref<View>& view, sl_bool flagRedraw = sl_true);
 	
-	sl_real getPaddingLeft();
-	
-	void setPaddingLeft(sl_real padding, sl_bool flagRedraw = sl_true);
-	
-	sl_real getPaddingTop();
-	
-	void setPaddingTop(sl_real padding, sl_bool flagRedraw = sl_true);
-	
-	sl_real getPaddingRight();
-	
-	void setPaddingRight(sl_real padding, sl_bool flagRedraw = sl_true);
-	
-	sl_real getPaddingBottom();
-	
-	void setPaddingBottom(sl_real padding, sl_bool flagRedraw = sl_true);
-	
-	void setPadding(sl_real left, sl_real top, sl_real right, sl_real bottom, sl_bool flagRedraw = sl_true);
-	
-	void setPadding(sl_real padding, sl_bool flagRedraw = sl_true);
-	
 	sl_real getMarginLeft();
 	
 	void setMarginLeft(sl_real margin, sl_bool flagRedraw = sl_true);
@@ -445,6 +443,68 @@ public:
 	void setMargin(sl_real left, sl_real top, sl_real right, sl_real bottom, sl_bool flagRedraw = sl_true);
 	
 	void setMargin(sl_real margin, sl_bool flagRedraw = sl_true);
+	
+	sl_bool isRelativeMarginLeft();
+	
+	sl_real getRelativeMarginLeftWeight();
+	
+	void setRelativeMarginLeft(sl_real weight, sl_bool flagRedraw = sl_true);
+	
+	sl_real getAbsoluteMarginLeft();
+	
+	void setAbsoluteMarginLeft(sl_real margin, sl_bool flagDraw = sl_true);
+
+	sl_bool isRelativeMarginTop();
+	
+	sl_real getRelativeMarginTopWeight();
+	
+	void setRelativeMarginTop(sl_real weight, sl_bool flagRedraw = sl_true);
+	
+	sl_real getAbsoluteMarginTop();
+
+	void setAbsoluteMarginTop(sl_real margin, sl_bool flagDraw = sl_true);
+	
+	sl_bool isRelativeMarginRight();
+
+	sl_real getRelativeMarginRightWeight();
+	
+	void setRelativeMarginRight(sl_real weight, sl_bool flagRedraw = sl_true);
+	
+	sl_real getAbsoluteMarginRight();
+
+	void setAbsoluteMarginRight(sl_real margin, sl_bool flagDraw = sl_true);
+
+	sl_bool isRelativeMarginBottom();
+	
+	sl_real getRelativeMarginBottomWeight();
+	
+	void setRelativeMarginBottom(sl_real weight, sl_bool flagRedraw = sl_true);
+	
+	sl_real getAbsoluteMarginBottom();
+
+	void setAbsoluteMarginBottom(sl_real margin, sl_bool flagDraw = sl_true);
+	
+	void applyRelativeMargins(sl_real parentWidth, sl_real parentHeight);
+	
+	sl_real getPaddingLeft();
+	
+	void setPaddingLeft(sl_real padding, sl_bool flagRedraw = sl_true);
+	
+	sl_real getPaddingTop();
+	
+	void setPaddingTop(sl_real padding, sl_bool flagRedraw = sl_true);
+	
+	sl_real getPaddingRight();
+	
+	void setPaddingRight(sl_real padding, sl_bool flagRedraw = sl_true);
+	
+	sl_real getPaddingBottom();
+	
+	void setPaddingBottom(sl_real padding, sl_bool flagRedraw = sl_true);
+	
+	void setPadding(sl_real left, sl_real top, sl_real right, sl_real bottom, sl_bool flagRedraw = sl_true);
+	
+	void setPadding(sl_real padding, sl_bool flagRedraw = sl_true);
 	
 	
 	sl_bool isTransformEnabled();
@@ -565,8 +625,9 @@ public:
 	
 	virtual void setFont(const Ref<Font>& font, sl_bool flagRedraw = sl_true);
 	
+	void setFontAttributes(sl_real size, sl_bool flagBold = sl_false, sl_bool flagItalic = sl_false, sl_bool flagUnderline = sl_false, sl_bool flagRedraw = sl_true);
 
-
+	
 	Ref<ScrollBar> getHorizontalScrollBar();
 	
 	Ref<ScrollBar> getVerticalScrollBar();
@@ -603,7 +664,7 @@ public:
 	
 	virtual Point getScrollPosition();
 	
-	void scrollTo(sl_real x, sl_real y, sl_bool flagRedraw = sl_true);
+	virtual void scrollTo(sl_real x, sl_real y, sl_bool flagRedraw = sl_true);
 	
 	void scrollTo(const Point& position, sl_bool flagRedraw = sl_true);
 	
@@ -613,7 +674,7 @@ public:
 	
 	Size getContentSize();
 	
-	void setContentSize(sl_real width, sl_real height, sl_bool flagRefresh = sl_true);
+	virtual void setContentSize(sl_real width, sl_real height, sl_bool flagRefresh = sl_true);
 	
 	void setContentSize(const Size& size, sl_bool flagRefresh = sl_true);
 	
@@ -784,7 +845,7 @@ public:
 private:
 	void _processAttachOnUiThread();
 	
-	void _addChild(const Ref<View>& view, sl_bool flagRedraw);
+	void _addChild(const Ref<View>& view, sl_bool flagRedraw, sl_bool flagAttach);
 	
 	void _removeChild(const Ref<View>& view);
 	
@@ -801,6 +862,8 @@ private:
 	void _setFrame(const Rectangle& frame, sl_bool flagRedraw, sl_bool flagLayouting);
 	
 	void _prepareLayout(ViewPrepareLayoutParam& param);
+	
+	void _measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 	
 	void _makeLayout(sl_bool flagApplyLayout);
 	
@@ -891,8 +954,8 @@ private:
 		
 		SizeMode widthMode;
 		SizeMode heightMode;
-		sl_real widthFillingWeight;
-		sl_real heightFillingWeight;
+		sl_real widthWeight;
+		sl_real heightWeight;
 		
 		PositionMode leftMode;
 		PositionMode topMode;
@@ -905,6 +968,8 @@ private:
 		
 		sl_real measuredWidth;
 		sl_real measuredHeight;
+		sl_real measuredBoundWidth;
+		sl_real measuredBoundHeight;
 		Rectangle frame;
 		
 		sl_bool flagOnPrepareLayout;
@@ -919,9 +984,19 @@ private:
 		sl_real marginTop;
 		sl_real marginRight;
 		sl_real marginBottom;
+		sl_bool flagRelativeMarginLeft;
+		sl_real relativeMarginLeftWeight;
+		sl_bool flagRelativeMarginTop;
+		sl_real relativeMarginTopWeight;
+		sl_bool flagRelativeMarginRight;
+		sl_real relativeMarginRightWeight;
+		sl_bool flagRelativeMarginBottom;
+		sl_real relativeMarginBottomWeight;
 		
 		sl_bool flagInvalidMeasure;
 		sl_bool flagInvalidLayout;
+		
+		sl_bool flagRecursiveMakeLayout;
 		
 	};
 	SafeRef<LayoutAttributes> m_layout;
@@ -997,6 +1072,7 @@ private:
 struct ViewPrepareLayoutParam
 {
 	Rectangle parentContentFrame;
+	sl_bool flagUseLayoutFrame;
 };
 
 class SLIB_EXPORT ViewInstance : public Object

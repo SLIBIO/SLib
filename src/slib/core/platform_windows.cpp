@@ -82,17 +82,16 @@ void Windows::setWindowText(HWND hWnd, const String& _str)
 	}
 }
 
-sl_bool Windows::processWindowScrollEvents(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, sl_uint32 nLine, sl_uint32 nWheel)
+sl_bool Windows::processWindowHorizontalScrollEvents(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, sl_uint32 nLine, sl_uint32 nWheel)
 {
 	int nSBCode = LOWORD(wParam);
-	int nPos = HIWORD(wParam);
 
 	if (uMsg == WM_HSCROLL) {
 
 		SCROLLINFO si;
 		Base::zeroMemory(&si, sizeof(si));
 		si.cbSize = sizeof(si);
-		si.fMask = SIF_POS | SIF_PAGE | SIF_RANGE;
+		si.fMask = SIF_POS | SIF_PAGE | SIF_RANGE | SIF_TRACKPOS;
 		::GetScrollInfo(hWnd, SB_HORZ, &si);
 		switch (nSBCode) {
 		case SB_TOP:
@@ -111,7 +110,7 @@ sl_bool Windows::processWindowScrollEvents(HWND hWnd, UINT uMsg, WPARAM wParam, 
 			break;
 		case SB_THUMBPOSITION:
 		case SB_THUMBTRACK:
-			si.nPos = nPos;
+			si.nPos = si.nTrackPos;
 			break;
 		}
 
@@ -127,12 +126,44 @@ sl_bool Windows::processWindowScrollEvents(HWND hWnd, UINT uMsg, WPARAM wParam, 
 
 		return sl_true;
 
-	} else if (uMsg == WM_VSCROLL) {
+	} else if (uMsg == 0x020E) {
+		// WM_MOUSEHWHEEL
+		int delta = (short)((wParam >> 16) & 0xffff);
+
+		if (delta != 0) {
+
+			SCROLLINFO si;
+			Base::zeroMemory(&si, sizeof(si));
+			si.cbSize = sizeof(si);
+			si.fMask = SIF_POS | SIF_PAGE | SIF_RANGE;
+			::GetScrollInfo(hWnd, SB_HORZ, &si);
+
+			si.nPos += delta * (int)nWheel / WHEEL_DELTA;
+			if (si.nPos < si.nMin) {
+				si.nPos = si.nMin;
+			}
+			if (si.nPos >= si.nMax) {
+				si.nPos = si.nMax - 1;
+			}
+
+			si.fMask = SIF_POS;
+			::SetScrollInfo(hWnd, SB_HORZ, &si, TRUE);
+		}
+		return sl_true;
+	}
+	return sl_false;
+}
+
+sl_bool Windows::processWindowVerticalScrollEvents(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, sl_uint32 nLine, sl_uint32 nWheel)
+{
+	int nSBCode = LOWORD(wParam);
+
+	if (uMsg == WM_VSCROLL) {
 
 		SCROLLINFO si;
 		Base::zeroMemory(&si, sizeof(si));
 		si.cbSize = sizeof(si);
-		si.fMask = SIF_POS | SIF_PAGE | SIF_RANGE;
+		si.fMask = SIF_POS | SIF_PAGE | SIF_RANGE | SIF_TRACKPOS;
 		::GetScrollInfo(hWnd, SB_VERT, &si);
 
 		switch (nSBCode) {
@@ -152,7 +183,7 @@ sl_bool Windows::processWindowScrollEvents(HWND hWnd, UINT uMsg, WPARAM wParam, 
 			break;
 		case SB_THUMBPOSITION:
 		case SB_THUMBTRACK:
-			si.nPos = nPos;
+			si.nPos = si.nTrackPos;
 			break;
 		}
 
@@ -162,7 +193,6 @@ sl_bool Windows::processWindowScrollEvents(HWND hWnd, UINT uMsg, WPARAM wParam, 
 		if (si.nPos >= si.nMax) {
 			si.nPos = si.nMax - 1;
 		}
-
 		si.fMask = SIF_POS;
 		::SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
 
@@ -193,30 +223,6 @@ sl_bool Windows::processWindowScrollEvents(HWND hWnd, UINT uMsg, WPARAM wParam, 
 		}
 		return sl_true;
 
-	} else if (uMsg == 0x020E) {
-		// WM_MOUSEHWHEEL
-		int delta = (short)((wParam >> 16) & 0xffff);
-
-		if (delta != 0) {
-
-			SCROLLINFO si;
-			Base::zeroMemory(&si, sizeof(si));
-			si.cbSize = sizeof(si);
-			si.fMask = SIF_POS | SIF_PAGE | SIF_RANGE;
-			::GetScrollInfo(hWnd, SB_HORZ, &si);
-
-			si.nPos += delta * (int)nWheel / WHEEL_DELTA;
-			if (si.nPos < si.nMin) {
-				si.nPos = si.nMin;
-			}
-			if (si.nPos >= si.nMax) {
-				si.nPos = si.nMax - 1;
-			}
-
-			si.fMask = SIF_POS;
-			::SetScrollInfo(hWnd, SB_HORZ, &si, TRUE);
-		}
-		return sl_true;
 	}
 	return sl_false;
 }

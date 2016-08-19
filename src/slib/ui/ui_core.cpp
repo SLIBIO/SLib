@@ -99,15 +99,6 @@ void UI::showAlert(const String& caption, const String& text, const Ref<Runnable
 	AlertDialog::show(caption, text, onOk);
 }
 
-void UI::runOnUiThread(const Ref<Runnable> &callback)
-{
-	if (UI::isUiThread()) {
-		callback->run();
-		return;
-	}
-	UI::dispatchToUiThread(callback);
-}
-
 static sl_int32 _g_ui_run_loop_level = 0;
 static sl_bool _g_ui_flag_quit_app = 0;
 
