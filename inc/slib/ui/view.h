@@ -65,6 +65,11 @@ public:
 	
 	void setWindow(const Ref<Window>& window);
 	
+	Ref<GraphicsContext> getGraphicsContext();
+	
+	void setGraphicsContext(const Ref<GraphicsContext>& context);
+	
+	
 	Ref<View> getParent();
 	
 	void setParent(const Ref<View>& parent);
@@ -77,7 +82,7 @@ public:
 	
 	Ref<ViewInstance> attachToNewInstance(const Ref<ViewInstance>& parent);
 	
-		
+	
 	String getId();
 	
 	void setId(const String& _id);
@@ -625,6 +630,8 @@ public:
 	
 	virtual void setFont(const Ref<Font>& font, sl_bool flagRedraw = sl_true);
 	
+	void setFont(const String& fontFamily, sl_real size, sl_bool flagBold = sl_false, sl_bool flagItalic = sl_false, sl_bool flagUnderline = sl_false, sl_bool flagRedraw = sl_true);
+	
 	void setFontAttributes(sl_real size, sl_bool flagBold = sl_false, sl_bool flagItalic = sl_false, sl_bool flagUnderline = sl_false, sl_bool flagRedraw = sl_true);
 
 	
@@ -909,6 +916,7 @@ protected:
 private:
 	SafeRef<ViewInstance> m_instance;
 	SafeWeakRef<Window> m_window;
+	SafeRef<GraphicsContext> m_graphicsContext;
 	SafeWeakRef<View> m_parent;
 	
 	sl_bool m_flagCreatingInstance;

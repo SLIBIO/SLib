@@ -61,7 +61,7 @@ Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* _parent)
 	Ref<Android_ViewInstance> ret;
 	Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 	if (parent) {
-		JniLocal<jobject> handle = _JAndroidScrollView::create.callObject(sl_null, parent->getContext(), m_flagBothScroll, m_flagVerticalScroll);
+		JniLocal<jobject> handle = _JAndroidScrollView::create.callObject(sl_null, parent->getContext(), m_flagVerticalScroll && m_flagHorizontalScroll, m_flagVerticalScroll);
 		ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 		if (ret.isNotNull()) {
 			jobject handle = ret->getHandle();

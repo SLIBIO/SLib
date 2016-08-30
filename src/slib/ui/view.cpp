@@ -162,6 +162,24 @@ void View::setWindow(const Ref<Window>& window)
 	m_window = window;
 }
 
+Ref<GraphicsContext> View::getGraphicsContext()
+{
+	Ref<GraphicsContext> context = m_graphicsContext;
+	if (context.isNotNull()) {
+		return context;
+	}
+	Ref<View> parent = getParent();
+	if (parent.isNotNull()) {
+		return parent->getGraphicsContext();
+	}
+	return UI::getGraphicsContext();
+}
+
+void View::setGraphicsContext(const Ref<GraphicsContext>& context)
+{
+	m_graphicsContext = context;
+}
+
 Ref<View> View::getParent()
 {
 	return m_parent;
@@ -410,7 +428,7 @@ Ref<View> View::getRootView()
 {
 	Ref<View> parent = getParent();
 	if (parent.isNotNull()) {
-		return parent->getRootView();;
+		return parent->getRootView();
 	}
 	return this;
 }
@@ -3768,11 +3786,16 @@ void View::setFont(const Ref<Font>& _font, sl_bool flagRedraw)
 	}
 }
 
+void View::setFont(const String& fontFamily, sl_real size, sl_bool flagBold, sl_bool flagItalic, sl_bool flagUnderline, sl_bool flagRedraw)
+{
+	setFont(Font::create(fontFamily, size, flagBold, flagItalic, flagUnderline), flagRedraw);
+}
+
 void View::setFontAttributes(sl_real size, sl_bool flagBold, sl_bool flagItalic, sl_bool flagUnderline, sl_bool flagRedraw)
 {
 	Ref<Font> font = getFont();
 	if (font.isNull()) {
-		setFont(Font::create("Arial", size, flagBold, flagItalic, flagUnderline), flagRedraw);
+		setFont(Font::create(UI::getDefaultFontFamily(), size, flagBold, flagItalic, flagUnderline), flagRedraw);
 	} else {
 		setFont(Font::create(font->getFamilyName(), size, flagBold, flagItalic, flagUnderline), flagRedraw);
 	}
@@ -4817,7 +4840,13 @@ void View::onChangePadding()
 
 void View::dispatchDraw(Canvas* canvas)
 {
+	Ref<GraphicsContext> context = canvas->getGraphicsContext();
+	m_graphicsContext = context;
+	
 	if (!(canvas->isBuffer())) {
+		if (context.isNull()) {
+			return;
+		}
 		Ref<DrawAttributes> attr = m_draw;
 		if (attr.isNotNull()) {
 			if (attr->flagDoubleBuffer) {
@@ -4830,7 +4859,6 @@ void View::dispatchDraw(Canvas* canvas)
 				sl_real width = getWidth();
 				sl_real height = getHeight();
 				if (bitmapBuffer.isNull() || canvasBuffer.isNull() || bitmapBuffer->getWidth() < width || bitmapBuffer->getHeight() < height) {
-					Ref<GraphicsContext> context = canvas->getGraphicsContext();
 					bitmapBuffer = context->createBitmap((sl_uint32)(Math::ceil(width / 256)) * 256, (sl_uint32)(Math::ceil(height / 256) * 256));
 					if (bitmapBuffer.isNull()) {
 						return;

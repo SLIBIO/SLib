@@ -274,14 +274,15 @@ void HttpServiceConnection::_processInput(const void* _data, sl_uint32 size)
 			m_contextCurrent.setNull();
 
 			context->m_requestBody = context->m_requestBodyBuffer.merge();
-			if (context->m_requestBody.isNotEmpty()) {
+			if (context->m_requestContentLength > 0 && context->m_requestBody.isEmpty()) {
 				sendResponse_ServerError();
 				return;
 			}
 			context->m_requestBodyBuffer.clear();
 
 			if (context->getMethod() == HttpMethod::POST) {
-				if (context->getRequestContentType() == ContentTypes::WebForm) {
+				String reqContentType = context->getRequestContentTypeNoParams();
+				if (reqContentType == ContentTypes::WebForm) {
 					Memory body = context->getRequestBody();
 					context->applyPostParameters(body.getData(), body.getSize());
 				}
@@ -541,6 +542,9 @@ HttpServiceParam::HttpServiceParam()
 	maxRequestHeadersSize = 0x10000; // 64KB
 	maxRequestBodySize = 0x2000000; // 32MB
 	
+	flagAllowCrossOrigin = sl_false;
+	flagAlwaysRespondAcceptRangesHeader = sl_true;
+	
 	flagLogDebug = sl_false;
 }
 
@@ -673,58 +677,215 @@ void HttpService::processRequest(HttpServiceContext* context)
 			+ " Query=" + context->getQuery()
 			+ " Host=" + context->getHost());
 	}
-	ListLocker< Ptr<IHttpServiceProcessor> > processors(m_processors);
-	for (sl_size i = 0; i < processors.count; i++) {
-		PtrLocker<IHttpServiceProcessor> processor(processors[i]);
-		if (processor.isNotNull()) {
-			if (processor->onHttpRequest(context)) {
-				return;
+	
+	do {
+		
+		ListLocker< Ptr<IHttpServiceProcessor> > processors(m_processors);
+		{
+			sl_size i = 0;
+			for (; i < processors.count; i++) {
+				PtrLocker<IHttpServiceProcessor> processor(processors[i]);
+				if (processor.isNotNull()) {
+					if (processor->onHttpRequest(context)) {
+						break;
+					}
+				}
+			}
+			if (i < processors.count) {
+				break;
 			}
 		}
-	}
-	if (m_param.flagUseAsset) {
-		if (context->getMethod() == HttpMethod::GET) {
-			String path = context->getPath();
-			if (path.startsWith('/')) {
-				path = path.substring(1);
-			}
-			path = m_param.prefixAsset + path;
-			if (processAsset(context, path)) {
-				return;
-			}
-			if (processAsset(context, path + "/index.html")) {
-				return;
+		
+		if (m_param.flagUseAsset) {
+			if (context->getMethod() == HttpMethod::GET) {
+				String path = context->getPath();
+				if (path.startsWith('/')) {
+					path = path.substring(1);
+				}
+				path = m_param.prefixAsset + path;
+				if (processAsset(context, path)) {
+					break;
+				}
+				if (processAsset(context, path + "/index.html")) {
+					break;
+				}
 			}
 		}
-	}
-	context->setResponseCode(HttpStatus::NotFound);
+		
+		context->setResponseCode(HttpStatus::NotFound);
+		onPostProcessRequest(context, sl_false);
+		return;
+	
+	} while (0);
+	
+	onPostProcessRequest(context, sl_true);
+	
 }
 
-sl_bool HttpService::processAsset(HttpServiceContext* context, String path)
+sl_bool HttpService::processAsset(HttpServiceContext* context, const String& path)
 {
+	if (context->getMethod() != HttpMethod::GET) {
+		return sl_false;
+	}
 	FilePathSegments seg;
 	seg.parsePath(path);
 	if (seg.parentLevel == 0) {
 		String ext = File::getFileExtension(path);
-		ContentType contentType = ContentTypes::getFromFileExtension(ext);
-		if (contentType == ContentType::Unknown) {
-			contentType = ContentType::OctetStream;
-		}
-		context->setResponseContentType(contentType);
 		if (Assets::isBasedOnFileSystem()) {
 			String filePath = Assets::getFilePath(path);
-			if (File::getSize(filePath) > 0x100000) {
-				context->copyFromFile(filePath);
+			return processFile(context, filePath);
+		} else {
+			ContentType contentType = ContentTypes::getFromFileExtension(ext);
+			if (contentType == ContentType::Unknown) {
+				contentType = ContentType::OctetStream;
+			}
+			context->setResponseContentType(contentType);
+			Memory mem = Assets::readAllBytes(path);
+			if (mem.isNotEmpty()) {
+				context->write(mem);
 				return sl_true;
 			}
 		}
-		Memory mem = Assets::readAllBytes(path);
-		if (mem.isNotEmpty()) {
-			context->write(mem);
-			return sl_true;
-		}
 	}
 	return sl_false;
+}
+
+sl_bool HttpService::processFile(HttpServiceContext* context, const String& path)
+{
+	if (context->getMethod() != HttpMethod::GET) {
+		return sl_false;
+	}
+
+	if (File::exists(path)) {
+		
+		String ext = File::getFileExtension(path);
+		
+		if (context->getResponseContentType().isEmpty()) {
+			ContentType contentType = ContentTypes::getFromFileExtension(ext);
+			if (contentType == ContentType::Unknown) {
+				contentType = ContentType::OctetStream;
+			}
+			context->setResponseContentType(contentType);
+		}
+
+		context->setResponseAcceptRanges(sl_true);
+
+		sl_uint64 totalSize = File::getSize(path);
+
+		String rangeHeader = context->getRequestRange();
+		
+		if (rangeHeader.isNotEmpty()) {
+			
+			sl_uint64 start;
+			sl_uint64 len;
+			
+			if (processRangeRequest(context, totalSize, rangeHeader, start, len)) {
+
+				Ref<AsyncFile> file = AsyncFile::openForRead(path, getAsyncLoop());
+				if (file.isNotNull()) {
+					file->seek(start);
+					context->copyFrom(file.ptr, len);
+					return sl_true;
+				}
+				
+			} else {
+				return sl_true;
+			}
+			
+		} else {
+			if (totalSize > 100000) {
+				context->copyFromFile(path, getAsyncLoop());
+				return sl_true;
+			} else {
+				Memory mem = File::readAllBytes(path);
+				if (mem.isNotEmpty()) {
+					context->write(mem);
+					return sl_true;
+				}
+			}
+		}
+		
+	}
+	
+	return sl_false;
+	
+}
+
+sl_bool HttpService::processRangeRequest(HttpServiceContext* context, sl_uint64 totalLength, const String& range, sl_uint64& outStart, sl_uint64& outLength)
+{
+	if (range.getLength() < 2 || !(range.startsWith("bytes="))) {
+		context->setResponseCode(HttpStatus::BadRequest);
+		return sl_false;
+	}
+	sl_reg indexSplit = range.indexOf('-');
+	if (indexSplit < 0) {
+		context->setResponseCode(HttpStatus::BadRequest);
+		return sl_false;
+	}
+	String s1 = range.substring(6, indexSplit);
+	String s2 = range.substring(indexSplit+1);
+	sl_uint64 n1 = 0;
+	sl_uint64 n2 = 0;
+	if (s1.isNotEmpty()) {
+		if (!(s1.parseUint64(10, &n1))) {
+			context->setResponseCode(HttpStatus::BadRequest);
+			return sl_false;
+		}
+	}
+	if (s2.isNotEmpty()) {
+		if (!(s2.parseUint64(10, &n2))) {
+			context->setResponseCode(HttpStatus::BadRequest);
+			return sl_false;
+		}
+	}
+	if (indexSplit == 0) {
+		if (n2 == 0) {
+			context->setResponseCode(HttpStatus::NoContent);
+			return sl_false;
+		}
+		if (n2 > totalLength) {
+			context->setResponseCode(HttpStatus::RequestRangeNotSatisfiable);
+			context->setResponseContentRangeUnsatisfied(totalLength);
+			return sl_false;
+		}
+		outStart = totalLength - n2;
+		outLength = totalLength - 1;
+	} else {
+		if (n1 >= totalLength) {
+			context->setResponseCode(HttpStatus::RequestRangeNotSatisfiable);
+			context->setResponseContentRangeUnsatisfied(totalLength);
+			return sl_false;
+		}
+		if (indexSplit == range.getLength() - 1) {
+			outLength = totalLength - n1;
+		} else {
+			if (n2 >= totalLength) {
+				context->setResponseCode(HttpStatus::RequestRangeNotSatisfiable);
+				context->setResponseContentRangeUnsatisfied(totalLength);
+				return sl_false;
+			}
+			outLength = n2 - n1 + 1;
+		}
+		outStart = n1;
+	}
+	context->setResponseContentRange(outStart, outStart + outLength - 1, totalLength);
+	context->setResponseCode(HttpStatus::PartialContent);
+	return sl_true;
+}
+
+void HttpService::onPostProcessRequest(HttpServiceContext* context, sl_bool flagProcessed)
+{
+	if (m_param.flagAlwaysRespondAcceptRangesHeader) {
+		if (context->getMethod() == HttpMethod::GET) {
+			context->setResponseAcceptRangesIfNotDefined(sl_false);
+		}
+	}
+	if (m_param.flagAllowCrossOrigin) {
+		context->setResponseAccessControlAllowOrigin("*");
+		if (!flagProcessed && context->getMethod() == HttpMethod::OPTIONS) {
+			context->setResponseCode(HttpStatus::OK);
+		}
+	}
 }
 
 Ref<HttpServiceConnection> HttpService::addConnection(const Ref<AsyncStream>& stream, const SocketAddress& remoteAddress, const SocketAddress& localAddress)

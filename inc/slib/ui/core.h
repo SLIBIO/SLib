@@ -21,6 +21,14 @@ class Font;
 class SLIB_EXPORT UI
 {
 public:
+	static sl_real getDefaultFontSize();
+	
+	static void setDefaultFontSize(sl_real fontSize);
+	
+	static String getDefaultFontFamily();
+	
+	static void setDefaultFontFamily(const String& fontFamily);
+	
 	static Ref<Font> getDefaultFont();
 
 	static void setDefaultFont(const Ref<Font>& font);

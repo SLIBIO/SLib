@@ -204,7 +204,7 @@ public:
 		}
 		if (pOverlapped == &m_overlappedRead) {
 			if (dwSize == 0) {
-				flagError = sl_true;
+				//flagError = sl_true;
 			}
 			Ref<AsyncStreamRequest> req = m_requestReading;
 			m_requestReading.setNull();

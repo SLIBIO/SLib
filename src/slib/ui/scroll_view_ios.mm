@@ -26,12 +26,11 @@ public:
 	void __applyContentSize(_Slib_iOS_ScrollView* sv)
 	{
 		Size size = getContentSize();
-		if (!m_flagBothScroll) {
-			if (m_flagVerticalScroll) {
-				size.x = 0;
-			} else {
-				size.y = 0;
-			}
+		if (!m_flagHorizontalScroll) {
+			size.x = 0;
+		}
+		if (!m_flagVerticalScroll) {
+			size.y = 0;
 		}
 		[sv setContentSize:CGSizeMake(size.x, size.y)];
 	}

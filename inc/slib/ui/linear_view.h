@@ -12,12 +12,12 @@ class SLIB_EXPORT LinearView : public View
 	SLIB_DECLARE_OBJECT
 	
 public:
-	LinearView(LayoutOrientation orientation = LayoutOrientation::Vertical);
+	LinearView();
 	
 public:
 	LayoutOrientation getOrientation();
 	
-	void setOrientation(LayoutOrientation orientation);
+	void setOrientation(LayoutOrientation orientation, sl_bool flagRedraw = sl_true);
 	
 	sl_bool isHorizontal();
 	

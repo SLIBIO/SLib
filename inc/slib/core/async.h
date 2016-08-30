@@ -796,9 +796,11 @@ public:
 	sl_bool write(const Memory& mem);
 	
 	sl_bool copyFrom(AsyncStream* stream, sl_uint64 size);
+
+	sl_bool copyFromFile(const String& path, const Ref<AsyncLoop>& loop);
 	
 	sl_bool copyFromFile(const String& path);
-
+	
 	sl_uint64 getOutputLength() const;
 
 protected:

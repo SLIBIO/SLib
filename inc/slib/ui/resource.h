@@ -12,6 +12,23 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+class UIResource
+{
+public:
+	static sl_real getScreenWidth();
+	
+	static void setScreenWidth(sl_real width);
+	
+	static sl_real getScreenHeight();
+	
+	static void setScreenHeight(sl_real height);
+	
+	static sl_real getScreenMinimum();
+	
+	static sl_real getScreenMaximum();
+	
+};
+
 #define SLIB_DECLARE_MENU_BEGIN(NAME) \
 class NAME : public slib::Referable { \
 public: \
@@ -57,6 +74,103 @@ NAME::NAME() { \
 	PARENT##_menu->addSeparator();
 
 #define SLIB_DEFINE_MENU_END }
+
+#define SLIB_DECLARE_UILAYOUT_BEGIN(NAME, BASE_CLASS) \
+	class NAME : public BASE_CLASS \
+	{ \
+		SLIB_DECLARE_OBJECT \
+	public: \
+		NAME(sl_real customUnitLength = 1); \
+	protected: \
+		void initialize(); \
+		void layoutViews(sl_real width, sl_real height);
+
+
+#define SLIB_DECLARE_UILAYOUT_END \
+	};
+
+#define SLIB_DEFINE_UILAYOUT(NAME, BASE_CLASS) \
+SLIB_DEFINE_OBJECT(NAME, BASE_CLASS) \
+NAME::NAME(sl_real customUnitLength) \
+: BASE_CLASS(customUnitLength) \
+{ \
+	SLIB_REFERABLE_CONSTRUCTOR \
+	initialize(); \
+	layoutViews(0, 0); \
+}
+
+class UILayoutResource
+{
+public:
+	UILayoutResource(sl_real customUnitLength = 1);
+	
+public:
+	Ref<View> getContentView();
+	
+	sl_real getCustomUnitLength();
+	
+	void setCustomUnitLength(sl_real length);
+	
+protected:
+	virtual void layoutViews(sl_real width, sl_real height) = 0;
+	
+protected:
+	void _layoutViews_safe(sl_real width, sl_real height);
+	
+protected:
+	View* m_contentView;
+	Ref<View> m_contentViewRef;
+
+	sl_real m_customUnit;
+	
+	sl_int32 m_countRecursiveLayout;
+};
+
+#define SLIB_DECLARE_WINDOW_LAYOUT_BEGIN(NAME) \
+	SLIB_DECLARE_UILAYOUT_BEGIN(NAME, slib::WindowLayoutResource)
+
+#define SLIB_DECLARE_WINDOW_LAYOUT_END \
+	SLIB_DECLARE_UILAYOUT_END
+
+#define SLIB_DEFINE_WINDOW_LAYOUT(NAME) \
+	SLIB_DEFINE_UILAYOUT(NAME, slib::WindowLayoutResource)
+
+
+class WindowLayoutResource : public Window, public UILayoutResource
+{
+	SLIB_DECLARE_OBJECT
+public:
+	WindowLayoutResource(sl_real customUnitLength = 1);
+	
+public:
+	// override
+	void dispatchResize(Size& size);
+	
+protected:
+	void _layoutViews_safe();
+
+};
+
+#define SLIB_DECLARE_VIEW_LAYOUT_BEGIN(NAME) \
+	SLIB_DECLARE_UILAYOUT_BEGIN(NAME, slib::ViewLayoutResource)
+
+#define SLIB_DECLARE_VIEW_LAYOUT_END \
+	SLIB_DECLARE_UILAYOUT_END
+
+#define SLIB_DEFINE_VIEW_LAYOUT(NAME) \
+	SLIB_DEFINE_UILAYOUT(NAME, slib::ViewLayoutResource)
+
+class ViewLayoutResource : public ViewGroup, public UILayoutResource
+{
+	SLIB_DECLARE_OBJECT
+public:
+	ViewLayoutResource(sl_real customUnitLength = 1);
+	
+public:
+	// override
+	void dispatchResize(sl_real width, sl_real height);
+	
+};
 
 SLIB_UI_NAMESPACE_END
 

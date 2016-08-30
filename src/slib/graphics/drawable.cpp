@@ -338,4 +338,90 @@ void ScaledSubDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
 	canvas->draw(rectDst, m_src, m_rectSrc);
 }
 
+
+SLIB_DEFINE_OBJECT(NinePatchDrawable, Drawable)
+
+Ref<NinePatchDrawable> NinePatchDrawable::create(sl_real leftWidth, sl_real rightWidth, sl_real topHeight, sl_real bottomHeight,
+									 const Ref<Drawable>& topLeft, const Ref<Drawable>& top, const Ref<Drawable>& topRight,
+									 const Ref<Drawable>& left, const Ref<Drawable>& center, const Ref<Drawable>& right,
+									 const Ref<Drawable>& bottomLeft, const Ref<Drawable>& bottom, const Ref<Drawable>& bottomRight)
+{
+	Ref<NinePatchDrawable> ret = new NinePatchDrawable;
+	if (ret.isNotNull()) {
+		if (leftWidth < 0) {
+			leftWidth = 0;
+		}
+		if (rightWidth < 0) {
+			rightWidth = 0;
+		}
+		if (topHeight < 0) {
+			topHeight = 0;
+		}
+		if (bottomHeight < 0) {
+			bottomHeight = 0;
+		}
+		ret->m_widthLeft = leftWidth;
+		ret->m_widthRight = rightWidth;
+		ret->m_heightTop = topHeight;
+		ret->m_heightBottom = bottomHeight;
+		ret->m_partTopLeft = topLeft;
+		ret->m_partTop = top;
+		ret->m_partTopRight = topRight;
+		ret->m_partLeft = left;
+		ret->m_partCenter = center;
+		ret->m_partRight = right;
+		ret->m_partBottomLeft = bottomLeft;
+		ret->m_partBottom = bottom;
+		ret->m_partTopRight = bottomRight;
+		return ret;
+	}
+	return Ref<NinePatchDrawable>::null();
+}
+
+void NinePatchDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
+{
+	sl_real widthLeft = m_widthLeft;
+	sl_real widthRight = m_widthRight;
+	sl_real heightTop = m_heightTop;
+	sl_real heightBottom = m_heightBottom;
+	sl_real widthDst = rectDst.getWidth();
+	sl_real heightDst = rectDst.getHeight();
+	if (widthDst < widthLeft + widthRight || heightDst < heightTop + heightBottom) {
+		canvas->draw(rectDst, m_partCenter);
+		return;
+	}
+	if (heightTop > 0) {
+		if (widthLeft > 0 && m_partTopLeft.isNotNull()) {
+			canvas->draw(Rectangle(rectDst.left, rectDst.top, rectDst.left + widthLeft, rectDst.top + heightTop), m_partTopLeft);
+		}
+		if (m_partTop.isNotNull()) {
+			canvas->draw(Rectangle(rectDst.left + widthLeft, rectDst.top, rectDst.right - widthRight, rectDst.top + heightTop), m_partTop);
+		}
+		if (widthRight > 0 && m_partTopRight.isNotNull()) {
+			canvas->draw(Rectangle(rectDst.right - widthRight, rectDst.top, rectDst.right, rectDst.top + heightTop), m_partTopRight);
+		}
+	}
+	if (heightBottom > 0) {
+		if (widthLeft > 0 && m_partBottomLeft.isNotNull()) {
+			canvas->draw(Rectangle(rectDst.left, rectDst.bottom - heightBottom, rectDst.left + widthLeft, rectDst.bottom), m_partBottomLeft);
+		}
+		if (m_partBottom.isNotNull()) {
+			canvas->draw(Rectangle(rectDst.left + widthLeft, rectDst.bottom - heightBottom, rectDst.right - widthRight, rectDst.bottom), m_partBottom);
+		}
+		if (widthRight > 0 && m_partBottomRight.isNotNull()) {
+			canvas->draw(Rectangle(rectDst.right - widthRight, rectDst.bottom - heightBottom, rectDst.right, rectDst.bottom), m_partBottomRight);
+		}
+	}
+	if (widthLeft > 0 && m_partLeft.isNotNull()) {
+		canvas->draw(Rectangle(rectDst.left, rectDst.top + heightTop, rectDst.left + widthLeft, rectDst.bottom - heightBottom), m_partLeft);
+	}
+	if (m_partCenter.isNotNull()) {
+		canvas->draw(Rectangle(rectDst.left + widthLeft, rectDst.top + heightTop, rectDst.right - widthRight, rectDst.bottom - heightBottom), m_partCenter);
+	}
+	if (widthRight > 0 && m_partRight.isNotNull()) {
+		canvas->draw(Rectangle(rectDst.right - widthRight, rectDst.top + heightTop, rectDst.right, rectDst.bottom - heightBottom), m_partRight);
+	}
+}
+
+
 SLIB_GRAPHICS_NAMESPACE_END

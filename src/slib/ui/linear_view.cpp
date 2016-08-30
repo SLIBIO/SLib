@@ -4,13 +4,16 @@ SLIB_UI_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(LinearView, View)
 
-LinearView::LinearView(LayoutOrientation orientation) : m_orientation(orientation)
+LinearView::LinearView()
 {
 	SLIB_REFERABLE_CONSTRUCTOR
 	
 	setCreatingChildInstances(sl_true);
 	setLayoutEnabled(sl_true, sl_false);
  	setOnMakeLayoutEnabled(sl_true, sl_false);
+	
+	m_orientation = LayoutOrientation::Vertical;
+	
 }
 
 LayoutOrientation LinearView::getOrientation()
@@ -18,11 +21,16 @@ LayoutOrientation LinearView::getOrientation()
 	return m_orientation;
 }
 
-void LinearView::setOrientation(LayoutOrientation orientation)
+void LinearView::setOrientation(LayoutOrientation orientation, sl_bool flagRedraw)
 {
+	if (m_orientation == orientation) {
+		return;
+	}
 	m_orientation = orientation;
-	requestLayout();
-	invalidate();
+	requestLayout(sl_false);
+	if (flagRedraw) {
+		invalidate();
+	}
 }
 
 sl_bool LinearView::isHorizontal()
@@ -178,12 +186,14 @@ void LinearView::onMakeLayout()
 	}
 }
 
-VerticalLinearView::VerticalLinearView() : LinearView(LayoutOrientation::Vertical)
+VerticalLinearView::VerticalLinearView()
 {
+	setOrientation(LayoutOrientation::Vertical);
 }
 
-HorizontalLinearView::HorizontalLinearView() : LinearView(LayoutOrientation::Horizontal)
+HorizontalLinearView::HorizontalLinearView()
 {
+	setOrientation(LayoutOrientation::Horizontal);
 }
 
 SLIB_UI_NAMESPACE_END

@@ -14,9 +14,17 @@ class SLIB_EXPORT ScrollView : public View
 public:
 	ScrollView();
 	
-	ScrollView(sl_bool flagVertical);
-	
 public:
+	sl_bool isHorizontalScrolling();
+	
+	// must be called before creating instruction or seting content view/size
+	void setHorizontalScrolling(sl_bool flagHorizontal);
+	
+	sl_bool isVerticalScrolling();
+	
+	// must be called before creating instruction or seting content view/size
+	void setVerticalScrolling(sl_bool flagVertical);
+	
 	Ref<View> getContentView();
 	
 	virtual void setContentView(const Ref<View>& view, sl_bool flagRedraw = sl_true);
@@ -55,7 +63,7 @@ protected:
 	void onMakeLayout();
 	
 private:
-	void _init(sl_bool flagBothScroll, sl_bool flagVertical);
+	void _initScrollbars();
 	
 	void _scrollTo(sl_real x, sl_real y, sl_bool flagRedraw);
 	
@@ -82,8 +90,9 @@ protected:
 	
 protected:
 	SafeRef<View> m_viewContent;
-	sl_bool m_flagBothScroll;
+	sl_bool m_flagHorizontalScroll;
 	sl_bool m_flagVerticalScroll;
+	sl_bool m_flagInitedScrollbars;
 	
 };
 

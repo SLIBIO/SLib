@@ -135,6 +135,13 @@ public:
 	static const String& TransferEncoding;
 	static const String& ContentEncoding;
 	
+	static const String& Range;
+	static const String& ContentRange;
+	static const String& AcceptRanges;
+	
+	static const String& Origin;
+	static const String& AccessControlAllowOrigin;
+	
 };
 
 
@@ -166,6 +173,7 @@ public:
 	
 	void setRequestVersion(const String& version);
 
+	
 	const IMap<String, String>& getRequestHeaders() const;
 	
 	String getRequestHeader(String name) const;
@@ -182,12 +190,15 @@ public:
 	
 	void clearRequestHeaders();
 	
+	
 	sl_uint64 getRequestContentLengthHeader() const;
 	
-	void setRequestContentLengthHeader(sl_int64 size);
+	void setRequestContentLengthHeader(sl_uint64 size);
 
 	String getRequestContentType() const;
-	
+
+	String getRequestContentTypeNoParams() const;
+
 	void setRequestContentType(const String& type);
 	
 	void setRequestContentType(ContentType type);
@@ -201,10 +212,25 @@ public:
 	void setRequestTransferEncoding(const String& type);
 
 	sl_bool isChunkedRequest() const;
-
+	
 	String getHost() const;
 	
 	void setHost(const String& type);
+	
+	String getRequestRange() const;
+	
+	void setRequestRange(const String& range);
+	
+	void setRequestRange(sl_uint64 start, sl_uint64 last);
+	
+	void setRequestRangeFrom(sl_uint64 start);
+	
+	void setRequestRangeSuffix(sl_uint64 length);
+	
+	String getRequestOrigin() const;
+	
+	void setRequestOrigin(const String& origin);
+	
 	
 	const IMap<String, String>& getParameters() const;
 	
@@ -283,6 +309,7 @@ public:
 	
 	void setResponseVersion(const String& version);
 
+	
 	const IMap<String, String>& getResponseHeaders() const;
 	
 	String getResponseHeader(String name) const;
@@ -299,9 +326,10 @@ public:
 	
 	void clearResponseHeaders();
 	
+	
 	sl_uint64 getResponseContentLengthHeader() const;
 	
-	void setResponseContentLengthHeader(sl_int64 size);
+	void setResponseContentLengthHeader(sl_uint64 size);
 	
 	String getResponseContentType() const;
 	
@@ -316,8 +344,29 @@ public:
 	String getResponseTransferEncoding() const;
 	
 	void setResponseTransferEncoding(const String& type);
-
+	
 	sl_bool isChunkedResponse() const;
+	
+	String getResponseContentRange() const;
+	
+	void setResponseContentRange(const String& range);
+	
+	void setResponseContentRange(sl_uint64 start, sl_uint64 last, sl_uint64 total);
+	
+	void setResponseContentRangeUnknownTotal(sl_uint64 start, sl_uint64 last);
+	
+	void setResponseContentRangeUnsatisfied(sl_uint64 total);
+	
+	String getResponseAcceptRanges() const;
+	
+	void setResponseAcceptRanges(sl_bool flagAcceptRanges);
+	
+	void setResponseAcceptRangesIfNotDefined(sl_bool flagAcceptRanges);
+	
+	String getResponseAccessControlAllowOrigin() const;
+	
+	void setResponseAccessControlAllowOrigin(const String& origin);
+	
 	
 	Memory makeResponsePacket() const;
 	
@@ -353,8 +402,8 @@ public:
 	void write(const Memory& mem);
 	
 	void copyFrom(AsyncStream* stream, sl_uint64 size);
-
-	void copyFromFile(const String& path);
+	
+	void copyFromFile(const String& path, const Ref<AsyncLoop>& loop);
 
 	sl_uint64 getOutputLength() const;
 

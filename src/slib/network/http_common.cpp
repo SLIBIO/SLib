@@ -132,6 +132,12 @@ DEFINE_HTTP_HEADER(AcceptEncoding, "Accept-Encoding")
 DEFINE_HTTP_HEADER(TransferEncoding, "Transfer-Encoding")
 DEFINE_HTTP_HEADER(ContentEncoding, "Content-Encoding")
 
+DEFINE_HTTP_HEADER(Range, "Range")
+DEFINE_HTTP_HEADER(ContentRange, "Content-Range")
+DEFINE_HTTP_HEADER(AcceptRanges, "Accept-Ranges")
+
+DEFINE_HTTP_HEADER(Origin, "Origin")
+DEFINE_HTTP_HEADER(AccessControlAllowOrigin, "Access-Control-Allow-Origin")
 
 /***********************************************************************
 	HttpRequest
@@ -254,17 +260,24 @@ sl_uint64 HttpRequest::getRequestContentLengthHeader() const
 	return 0;
 }
 
-void HttpRequest::setRequestContentLengthHeader(sl_int64 size)
+void HttpRequest::setRequestContentLengthHeader(sl_uint64 size)
 {
-	if (size < 0) {
-		size = 0;
-	}
 	setRequestHeader(HttpHeaders::ContentLength, String::fromUint64(size));
 }
 
 String HttpRequest::getRequestContentType() const
 {
 	return getRequestHeader(HttpHeaders::ContentType);
+}
+
+String HttpRequest::getRequestContentTypeNoParams() const
+{
+	String type = getRequestHeader(HttpHeaders::ContentType);
+	sl_reg index = type.indexOf(';');
+	if (index >= 0) {
+		type = type.substring(0, index);
+	}
+	return type;
 }
 
 void HttpRequest::setRequestContentType(const String& type)
@@ -314,6 +327,41 @@ String HttpRequest::getHost() const
 void HttpRequest::setHost(const String& type)
 {
 	setRequestHeader(HttpHeaders::Host, type);
+}
+
+String HttpRequest::getRequestRange() const
+{
+	return getRequestHeader(HttpHeaders::Range);
+}
+
+void HttpRequest::setRequestRange(const String& range)
+{
+	setRequestHeader(HttpHeaders::Range, range);
+}
+
+void HttpRequest::setRequestRange(sl_uint64 start, sl_uint64 last)
+{
+	setRequestHeader(HttpHeaders::Range, String::format("bytes=%d-%d", start, last));
+}
+
+void HttpRequest::setRequestRangeFrom(sl_uint64 start)
+{
+	setRequestHeader(HttpHeaders::Range, String::format("bytes=%d-", start));
+}
+
+void HttpRequest::setRequestRangeSuffix(sl_uint64 length)
+{
+	setRequestHeader(HttpHeaders::Range, String::format("bytes=-%d", length));
+}
+
+String HttpRequest::getRequestOrigin() const
+{
+	return getRequestHeader(HttpHeaders::Origin);
+}
+
+void HttpRequest::setRequestOrigin(const String& origin)
+{
+	setRequestHeader(HttpHeaders::Origin, origin);
 }
 
 const IMap<String, String>& HttpRequest::getParameters() const
@@ -689,11 +737,8 @@ sl_uint64 HttpResponse::getResponseContentLengthHeader() const
 	return 0;
 }
 
-void HttpResponse::setResponseContentLengthHeader(sl_int64 size)
+void HttpResponse::setResponseContentLengthHeader(sl_uint64 size)
 {
-	if (size < 0) {
-		size = 0;
-	}
 	setResponseHeader(HttpHeaders::ContentLength, String::fromUint64(size));
 }
 
@@ -730,6 +775,64 @@ String HttpResponse::getResponseTransferEncoding() const
 void HttpResponse::setResponseTransferEncoding(const String& type)
 {
 	setResponseHeader(HttpHeaders::TransferEncoding, type);
+}
+
+String HttpResponse::getResponseContentRange() const
+{
+	return getResponseHeader(HttpHeaders::ContentRange);
+}
+
+void HttpResponse::setResponseContentRange(const String& range)
+{
+	setResponseHeader(HttpHeaders::ContentRange, range);
+}
+
+void HttpResponse::setResponseContentRange(sl_uint64 start, sl_uint64 last, sl_uint64 total)
+{
+	setResponseHeader(HttpHeaders::ContentRange, String::format("bytes %d-%d/%d", start, last, total));
+}
+
+void HttpResponse::setResponseContentRangeUnknownTotal(sl_uint64 start, sl_uint64 last)
+{
+	setResponseHeader(HttpHeaders::ContentRange, String::format("bytes %d-%d/*", start, last));
+}
+
+void HttpResponse::setResponseContentRangeUnsatisfied(sl_uint64 total)
+{
+	setResponseHeader(HttpHeaders::ContentRange, String::format("bytes */%d", total));
+}
+
+String HttpResponse::getResponseAcceptRanges() const
+{
+	return getResponseHeader(HttpHeaders::AcceptRanges);
+}
+
+void HttpResponse::setResponseAcceptRanges(sl_bool flagAcceptRanges)
+{
+	if (flagAcceptRanges) {
+		SLIB_STATIC_STRING(s, "bytes")
+		setResponseHeader(HttpHeaders::AcceptRanges, s);
+	} else {
+		SLIB_STATIC_STRING(s, "none")
+		setResponseHeader(HttpHeaders::AcceptRanges, s);
+	}
+}
+
+void HttpResponse::setResponseAcceptRangesIfNotDefined(sl_bool flagAcceptRanges)
+{
+	if (!(containsResponseHeader(HttpHeaders::AcceptRanges))) {
+		setResponseAcceptRanges(flagAcceptRanges);
+	}
+}
+
+String HttpResponse::getResponseAccessControlAllowOrigin() const
+{
+	return getResponseHeader(HttpHeaders::AccessControlAllowOrigin);
+}
+
+void HttpResponse::setResponseAccessControlAllowOrigin(const String& origin)
+{
+	setResponseHeader(HttpHeaders::AccessControlAllowOrigin, origin);
 }
 
 sl_bool HttpResponse::isChunkedResponse() const
@@ -919,9 +1022,9 @@ void HttpOutputBuffer::copyFrom(AsyncStream* stream, sl_uint64 size)
 	m_bufferOutput.copyFrom(stream, size);
 }
 
-void HttpOutputBuffer::copyFromFile(const String& path)
+void HttpOutputBuffer::copyFromFile(const String& path, const Ref<AsyncLoop>& loop)
 {
-	m_bufferOutput.copyFromFile(path);
+	m_bufferOutput.copyFromFile(path, loop);
 }
 
 sl_uint64 HttpOutputBuffer::getOutputLength() const

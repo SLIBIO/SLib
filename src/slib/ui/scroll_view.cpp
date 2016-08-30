@@ -8,14 +8,36 @@ SLIB_DEFINE_OBJECT(ScrollView, View)
 ScrollView::ScrollView()
 {
 	SLIB_REFERABLE_CONSTRUCTOR
-	_init(sl_true, sl_true);
+
+	setCreatingNativeWidget(sl_true);
+	setCreatingChildInstances(sl_false);
+	setBorder(sl_true, sl_false);
+	
+	m_flagInitedScrollbars = sl_false;
+	m_flagHorizontalScroll = sl_true;
+	m_flagVerticalScroll = sl_true;
 }
 
-ScrollView::ScrollView(sl_bool flagVertical)
+sl_bool ScrollView::isHorizontalScrolling()
 {
-	SLIB_REFERABLE_CONSTRUCTOR
-	_init(sl_false, flagVertical);
+	return m_flagHorizontalScroll;
 }
+
+void ScrollView::setHorizontalScrolling(sl_bool flagHorizontal)
+{
+	m_flagHorizontalScroll = flagHorizontal;
+}
+
+sl_bool ScrollView::isVerticalScrolling()
+{
+	return m_flagVerticalScroll;
+}
+
+void ScrollView::setVerticalScrolling(sl_bool flagVertical)
+{
+	m_flagVerticalScroll = flagVertical;
+}
+
 
 Ref<View> ScrollView::getContentView()
 {
@@ -25,6 +47,7 @@ Ref<View> ScrollView::getContentView()
 void ScrollView::setContentView(const Ref<slib::View>& view, sl_bool flagRedraw)
 {
 	ObjectLocker lock(this);
+	_initScrollbars();
 	if (m_viewContent != view) {
 		Ref<View> viewOld = m_viewContent;
 		removeChild(viewOld);
@@ -55,6 +78,8 @@ void ScrollView::setContentView(const Ref<slib::View>& view, sl_bool flagRedraw)
 
 void ScrollView::setContentSize(sl_real width, sl_real height, sl_bool flagRefresh)
 {
+	ObjectLocker lock(this);
+	_initScrollbars();
 	Ref<View> viewContent = m_viewContent;
 	if (viewContent.isNotNull()) {
 		viewContent->setSize(width, height);
@@ -122,26 +147,23 @@ void ScrollView::onMakeLayout()
 {	
 }
 
-void ScrollView::_init(sl_bool flagBothScroll, sl_bool flagVertical)
+void ScrollView::_initScrollbars()
 {
-	setCreatingNativeWidget(sl_true);
-	setCreatingChildInstances(sl_false);
-	
-	m_flagBothScroll = flagBothScroll;
-	m_flagVerticalScroll = flagVertical;
-	
-	if (flagBothScroll) {
-		createScrollBars(sl_false);
-	} else {
-		if (flagVertical) {
-			createVerticalScrollBar(sl_false);
+	if (m_flagInitedScrollbars) {
+		return;
+	}
+	m_flagInitedScrollbars = sl_true;
+	if (m_flagVerticalScroll) {
+		if (m_flagHorizontalScroll) {
+			createScrollBars(sl_false);
 		} else {
+			createVerticalScrollBar(sl_false);
+		}
+	} else {
+		if (m_flagHorizontalScroll) {
 			createHorizontalScrollBar(sl_false);
 		}
 	}
-	
-	setBorder(sl_true, sl_false);
-
 }
 
 void ScrollView::_scrollTo(sl_real x, sl_real y, sl_bool flagRedraw)
@@ -225,12 +247,16 @@ void ScrollView::_setBackgroundColor_NW(const Color& color)
 #endif
 
 
-HorizontalScrollView::HorizontalScrollView() : ScrollView(sl_false)
+HorizontalScrollView::HorizontalScrollView()
 {
+	setHorizontalScrolling(sl_true);
+	setVerticalScrolling(sl_false);
 }
 
-VerticalScrollView::VerticalScrollView() : ScrollView(sl_true)
+VerticalScrollView::VerticalScrollView()
 {
+	setHorizontalScrolling(sl_false);
+	setVerticalScrolling(sl_true);
 }
 
 SLIB_UI_NAMESPACE_END

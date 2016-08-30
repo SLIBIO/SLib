@@ -814,6 +814,7 @@ SLIB_INLINE void LinkedList<T, COMPARE>::_init()
 {
 	m_begin = sl_null;
 	m_end = sl_null;
+	m_count = 0;
 }
 
 

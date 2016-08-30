@@ -215,6 +215,37 @@ protected:
 	
 };
 
+class SLIB_EXPORT NinePatchDrawable : public Drawable
+{
+	SLIB_DECLARE_OBJECT
+	
+public:
+	static Ref<NinePatchDrawable> create(sl_real leftWidth, sl_real rightWidth, sl_real topHeight, sl_real bottomHeight,
+										 const Ref<Drawable>& topLeft, const Ref<Drawable>& top, const Ref<Drawable>& topRight,
+										 const Ref<Drawable>& left, const Ref<Drawable>& center, const Ref<Drawable>& right,
+										 const Ref<Drawable>& bottomLeft, const Ref<Drawable>& bottom, const Ref<Drawable>& bottomRight);
+	
+public:
+	// override
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	
+protected:
+	sl_real m_widthLeft;
+	sl_real m_widthRight;
+	sl_real m_heightTop;
+	sl_real m_heightBottom;
+	Ref<Drawable> m_partTopLeft;
+	Ref<Drawable> m_partTop;
+	Ref<Drawable> m_partTopRight;
+	Ref<Drawable> m_partLeft;
+	Ref<Drawable> m_partCenter;
+	Ref<Drawable> m_partRight;
+	Ref<Drawable> m_partBottomLeft;
+	Ref<Drawable> m_partBottom;
+	Ref<Drawable> m_partBottomRight;
+	
+};
+
 SLIB_GRAPHICS_NAMESPACE_END
 
 #endif

@@ -53,13 +53,13 @@ public:
 			Ref<View> view = getView();
 			if (ScrollView::checkInstance(view.ptr)) {
 				_ScrollView* sv = (_ScrollView*)(view.ptr);
-				if (sv->m_flagBothScroll || !(sv->m_flagVerticalScroll)) {
+				if (sv->m_flagHorizontalScroll) {
 					if (Windows::processWindowHorizontalScrollEvents(handle, msg, wParam, lParam, _SCROLL_LINE_SIZE, _SCROLL_WHEEL_SIZE)) {
 						__refreshContentPosition((_ScrollView*)(view.ptr), sl_true);
 						return sl_true;
 					}
 				}
-				if (sv->m_flagBothScroll || sv->m_flagVerticalScroll) {
+				if (sv->m_flagVerticalScroll) {
 					if (Windows::processWindowVerticalScrollEvents(handle, msg, wParam, lParam, _SCROLL_LINE_SIZE, _SCROLL_WHEEL_SIZE)) {
 						__refreshContentPosition((_ScrollView*)(view.ptr), sl_true);
 						return sl_true;
@@ -98,10 +98,10 @@ public:
 			Ref<View> viewContent = view->getContentView();
 			Sizei sizeContent = view->getContentSize();
 			Sizei sizeParent = view->getSize();
-			if (view->m_flagBothScroll || !(view->m_flagVerticalScroll)) {
+			if (view->m_flagHorizontalScroll) {
 				Windows::setWindowHorizontalScrollParam(handle, 0, sizeContent.x, sizeParent.x);
 			}
-			if (view->m_flagBothScroll || view->m_flagVerticalScroll) {
+			if (view->m_flagVerticalScroll) {
 				Windows::setWindowVerticalScrollParam(handle, 0, sizeContent.y, sizeParent.y);
 			}
 			__refreshContentPosition(view, sl_false);
@@ -133,15 +133,12 @@ public:
 Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* parent)
 {
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
-	DWORD style;
-	if (m_flagBothScroll) {
-		style = WS_HSCROLL | WS_VSCROLL;
-	} else {
-		if (m_flagVerticalScroll) {
-			style = WS_VSCROLL;
-		} else {
-			style = WS_HSCROLL;
-		}
+	DWORD style = 0;
+	if (m_flagHorizontalScroll) {
+		style = WS_HSCROLL;
+	}
+	if (m_flagVerticalScroll) {
+		style |= WS_VSCROLL;
 	}
 	DWORD styleEx = WS_EX_CONTROLPARENT;
 #if defined(_SLIB_UI_WIN32_USE_COMPOSITE_VIEWS)
@@ -185,11 +182,11 @@ void ScrollView::_scrollTo_NW(sl_real x, sl_real y)
 		Base::zeroMemory(&si, sizeof(si));
 		si.cbSize = sizeof(si);
 		si.fMask = SIF_POS;
-		if (m_flagBothScroll || !m_flagVerticalScroll) {
+		if (m_flagHorizontalScroll) {
 			si.nPos = (int)x;
 			::SetScrollInfo(handle, SB_HORZ, &si, TRUE);
 		}
-		if (m_flagBothScroll || m_flagVerticalScroll) {
+		if (m_flagVerticalScroll) {
 			si.nPos = (int)y;
 			::SetScrollInfo(handle, SB_VERT, &si, TRUE);
 		}

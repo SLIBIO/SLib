@@ -175,6 +175,9 @@ public:
 	sl_uint64 maxRequestHeadersSize;
 	sl_uint64 maxRequestBodySize;
 
+	sl_bool flagAllowCrossOrigin;
+	sl_bool flagAlwaysRespondAcceptRangesHeader;
+	
 	sl_bool flagLogDebug;
 
 public:
@@ -214,11 +217,18 @@ public:
 	// called after inputing body
 	virtual void processRequest(HttpServiceContext* context);
 	
-	virtual sl_bool processAsset(HttpServiceContext* context, String path);
+	virtual sl_bool processAsset(HttpServiceContext* context, const String& path);
+	
+	sl_bool processFile(HttpServiceContext* context, const String& path);
+	
+	sl_bool processRangeRequest(HttpServiceContext* context, sl_uint64 totalLength, const String& range, sl_uint64& outStart, sl_uint64& outLength);
 	
 	virtual Ref<HttpServiceConnection> addConnection(const Ref<AsyncStream>& stream, const SocketAddress& remoteAddress, const SocketAddress& localAddress);
 	
 	virtual void closeConnection(HttpServiceConnection* connection);
+
+protected:
+	virtual void onPostProcessRequest(HttpServiceContext* context, sl_bool flagProcessed);
 
 public:
 	void addProcessor(const Ptr<IHttpServiceProcessor>& processor);

@@ -10,20 +10,72 @@ SLIB_UI_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(Screen, Object)
 
+#if defined(SLIB_PLATFORM_IS_DESKTOP)
+sl_real _g_ui_core_default_font_size = 12;
+#else
+sl_real _g_ui_core_default_font_size = 0;
+#endif
+SLIB_STATIC_SAFE_STRING(_g_ui_core_default_font_family, "Arial");
 SLIB_SAFE_STATIC_REF(SafeRef<Font>, _g_ui_core_default_font)
+
+sl_real UI::getDefaultFontSize()
+{
+#if !defined(SLIB_PLATFORM_IS_DESKTOP)
+	if (_g_ui_core_default_font_size == 0) {
+		_g_ui_core_default_font_family = UI::getScreenSize().y / 80.0f;
+	}
+#endif
+	return _g_ui_core_default_font_size;
+}
+
+void UI::setDefaultFontSize(sl_real fontSize)
+{
+	_g_ui_core_default_font_size = fontSize;
+	Ref<Font> font = _g_ui_core_default_font;
+	if (font.isNull() || font->getSize() != fontSize) {
+		FontDesc desc;
+		font->getDesc(desc);
+		desc.size = fontSize;
+		font = Font::create(desc);
+		_g_ui_core_default_font = font;
+	}
+}
+
+String UI::getDefaultFontFamily()
+{
+	return _g_ui_core_default_font_family;
+}
+
+void UI::setDefaultFontFamily(const String& fontFamily)
+{
+	_g_ui_core_default_font_family = fontFamily;
+	Ref<Font> font = _g_ui_core_default_font;
+	if (font.isNull() || font->getFamilyName() != fontFamily) {
+		FontDesc desc;
+		font->getDesc(desc);
+		desc.familyName = fontFamily;
+		font = Font::create(desc);
+		_g_ui_core_default_font = font;
+	}
+}
 
 Ref<Font> UI::getDefaultFont()
 {
 	Ref<Font> font = _g_ui_core_default_font;
-	if (font.isNotNull()) {
-		return font;
+	if (font.isNull()) {
+		font = Font::create(getDefaultFontFamily(), getDefaultFontSize());
+		_g_ui_core_default_font = font;
 	}
-	return Font::getDefault();
+	return font;
 }
 
 void UI::setDefaultFont(const Ref<Font>& font)
 {
-	_g_ui_core_default_font = font;
+	if (font.isNotNull()) {
+		_g_ui_core_default_font_family = font->getFamilyName();
+		_g_ui_core_default_font_size = font->getSize();
+		_g_ui_core_default_font = font;
+	}
 }
 
 Rectangle UI::getScreenRegion()

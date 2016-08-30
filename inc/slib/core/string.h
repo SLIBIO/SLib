@@ -75,6 +75,106 @@ class SafeString16;
 class StringData;
 class Variant;
 
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS1 const Variant& param1
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS2 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS1, const Variant& param2
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS3 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS2, const Variant& param3
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS4 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS3, const Variant& param4
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS5 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS4, const Variant& param5
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS6 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS5, const Variant& param6
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS7 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS6, const Variant& param7
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS8 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS7, const Variant& param8
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS9 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS8, const Variant& param9
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS10 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS9, const Variant& param10
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS11 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS10, const Variant& param11
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS12 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS11, const Variant& param12
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS13 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS12, const Variant& param13
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS14 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS13, const Variant& param14
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS15 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS14, const Variant& param15
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS16 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS15, const Variant& param16
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS17 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS16, const Variant& param17
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS18 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS17, const Variant& param18
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS19 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS18, const Variant& param19
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS20 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS19, const Variant& param20
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS21 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS20, const Variant& param21
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS22 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS21, const Variant& param22
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS23 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS22, const Variant& param23
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS24 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS23, const Variant& param24
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS25 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS24, const Variant& param25
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS26 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS25, const Variant& param26
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS27 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS26, const Variant& param27
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS28 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS27, const Variant& param28
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS29 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS28, const Variant& param29
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS30 _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS29, const Variant& param30
+
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, n) \
+	static STRING format(const STRING& szFormat, _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS##n); \
+	static STRING format(const CHAR* szFormat, _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS##n); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS##n);
+
+#define _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS(STRING, CHAR) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 1) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 2) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 3) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 4) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 5) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 6) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 7) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 8) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 9) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 10) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 11) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 12) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 13) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 14) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 15) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 16) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 17) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 18) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 19) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 20) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 21) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 22) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 23) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 24) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 25) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 26) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 27) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 28) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 29) \
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_N(STRING, CHAR, 30)
+
+#define _SLIB_SAFE_STRING_DECLARE_FORMAT_FUNCTIONS(STRING, CHAR) \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS1); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS2); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS3); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS4); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS5); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS6); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS7); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS8); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS9); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS10); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS11); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS12); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS13); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS14); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS15); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS16); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS17); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS18); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS19); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS20); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS21); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS22); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS23); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS24); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS25); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS26); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS27); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS28); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS29); \
+	STRING arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS30); \
+
 /** auto-referencing object **/
 class SLIB_EXPORT String8
 {
@@ -627,65 +727,7 @@ public:
 	
 	String8 argv(const Variant* params, sl_size nParams);
 	
-	static String8 format(const String8& szFormat, const Variant& param);
-	
-	static String8 format(const sl_char8* szFormat, const Variant& param);
-	
-	String8 arg(const Variant& param);
-	
-	static String8 format(const String8& szFormat, const Variant& param1, const Variant& param2);
-	
-	static String8 format(const sl_char8* szFormat, const Variant& param1, const Variant& param2);
-	
-	String8 arg(const Variant& param1, const Variant& param2);
-	
-	static String8 format(const String8& szFormat, const Variant& param1, const Variant& param2, const Variant& param3);
-	
-	static String8 format(const sl_char8* szFormat, const Variant& param1, const Variant& param2, const Variant& param3);
-	
-	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3);
-	
-	static String8 format(const String8& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4);
-	
-	static String8 format(const sl_char8* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4);
-	
-	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4);
-	
-	static String8 format(const String8& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5);
-	
-	static String8 format(const sl_char8* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5);
-	
-	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5);
-	
-	static String8 format(const String8& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6);
-	
-	static String8 format(const sl_char8* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6);
-	
-	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6);
-	
-	static String8 format(const String8& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7);
-	
-	static String8 format(const sl_char8* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7);
-	
-	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7);
-	
-	static String8 format(const String8& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8);
-	
-	static String8 format(const sl_char8* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8);
-	
-	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8);
-	
-	static String8 format(const String8& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9);
-	
-	static String8 format(const sl_char8* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9);
-	
-	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9);
-	
-	static String8 format(const String8& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9, const Variant& param10);
-	
-	static String8 format(const sl_char8* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9, const Variant& param10);
-	
-	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9, const Variant& param10);
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS(String8, sl_char8)
 	
 private:
 	// Allocates memory required for a string for the specified length
@@ -1275,65 +1317,7 @@ public:
 	
 	String16 argv(const Variant* params, sl_size nParams);
 	
-	static String16 format(const String16& szFormat, const Variant& param);
-	
-	static String16 format(const sl_char16* szFormat, const Variant& param);
-	
-	String16 arg(const Variant& param);
-	
-	static String16 format(const String16& szFormat, const Variant& param1, const Variant& param2);
-	
-	static String16 format(const sl_char16* szFormat, const Variant& param1, const Variant& param2);
-	
-	String16 arg(const Variant& param1, const Variant& param2);
-	
-	static String16 format(const String16& szFormat, const Variant& param1, const Variant& param2, const Variant& param3);
-	
-	static String16 format(const sl_char16* szFormat, const Variant& param1, const Variant& param2, const Variant& param3);
-	
-	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3);
-	
-	static String16 format(const String16& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4);
-	
-	static String16 format(const sl_char16* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4);
-	
-	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4);
-	
-	static String16 format(const String16& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5);
-	
-	static String16 format(const sl_char16* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5);
-	
-	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5);
-	
-	static String16 format(const String16& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6);
-	
-	static String16 format(const sl_char16* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6);
-	
-	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6);
-	
-	static String16 format(const String16& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7);
-	
-	static String16 format(const sl_char16* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7);
-	
-	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7);
-	
-	static String16 format(const String16& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8);
-	
-	static String16 format(const sl_char16* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8);
-	
-	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8);
-	
-	static String16 format(const String16& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9);
-	
-	static String16 format(const sl_char16* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9);
-	
-	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9);
-	
-	static String16 format(const String16& szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9, const Variant& param10);
-	
-	static String16 format(const sl_char16* szFormat, const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9, const Variant& param10);
-	
-	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9, const Variant& param10);
+	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS(String16, sl_char16)
 	
 private:	
 	// Allocates memory required for a string for the specified length
@@ -1837,25 +1821,7 @@ public:
 	
 	String8 argv(const Variant* params, sl_size nParams);
 	
-	String8 arg(const Variant& param);
-	
-	String8 arg(const Variant& param1, const Variant& param2);
-	
-	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3);
-	
-	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4);
-	
-	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5);
-	
-	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6);
-	
-	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7);
-	
-	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8);
-	
-	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9);
-	
-	String8 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9, const Variant& param10);
+	_SLIB_SAFE_STRING_DECLARE_FORMAT_FUNCTIONS(String8, sl_char8)
 	
 private:
 	StringContainer8* _retainContainer() const;
@@ -2309,25 +2275,7 @@ public:
 	
 	String16 argv(const Variant* params, sl_size nParams);
 	
-	String16 arg(const Variant& param);
-	
-	String16 arg(const Variant& param1, const Variant& param2);
-	
-	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3);
-	
-	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4);
-	
-	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5);
-	
-	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6);
-	
-	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7);
-	
-	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8);
-	
-	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9);
-	
-	String16 arg(const Variant& param1, const Variant& param2, const Variant& param3, const Variant& param4, const Variant& param5, const Variant& param6, const Variant& param7, const Variant& param8, const Variant& param9, const Variant& param10);
+	_SLIB_SAFE_STRING_DECLARE_FORMAT_FUNCTIONS(String16, sl_char16)
 	
 private:
 	StringContainer16* _retainContainer() const;
@@ -2480,12 +2428,23 @@ typedef StringBuffer8 StringBuffer;
 	static slib::StringContainer8* _static_string_##name = &_static_string_container_##name; \
 	static slib::String8& name = *((slib::String8*)((void*)(&_static_string_##name)));
 
+#define SLIB_STATIC_SAFE_STRING8(name, str) \
+	static sl_char8 _static_string_buf_##name[] = str; \
+	static slib::StringContainer8 _static_string_container_##name = {_static_string_buf_##name, sizeof(_static_string_buf_##name)-1, 0, -1}; \
+	static slib::_String8_Const _static_string_##name = {&_static_string_container_##name, 0}; \
+	static slib::SafeString8& name = *((slib::SafeString8*)((void*)(&_static_string_##name)));
+
 #if !defined(SLIB_USE_UNICODE32)
 #define SLIB_STATIC_STRING16(name, str) \
 	static wchar_t _static_string_buf_##name[] = L##str; \
 	static slib::StringContainer16 _static_string_container_##name = {(sl_char16*)_static_string_buf_##name, (sizeof(_static_string_buf_##name)/2)-1, 0, -1}; \
 	static slib::StringContainer16* _static_string_##name = &_static_string_container_##name; \
 	static slib::String16& name = *((slib::String16*)((void*)(&_static_string_##name)));
+#define SLIB_STATIC_SAEF_STRING16(name, str) \
+	static wchar_t _static_string_buf_##name[] = L##str; \
+	static slib::StringContainer16 _static_string_container_##name = {(sl_char16*)_static_string_buf_##name, (sizeof(_static_string_buf_##name)/2)-1, 0, -1}; \
+	static slib::_String16_Const _static_string_##name = {&_static_string_container_##name, 0}; \
+	static slib::SafeString16& name = *((slib::SafeString16*)((void*)(&_static_string_##name)));
 #endif
 
 #define SLIB_STATIC_STRING8_BY_ARRAY(name, ...) \
@@ -2494,23 +2453,46 @@ typedef StringBuffer8 StringBuffer;
 	static slib::StringContainer8* _static_string_##name = &_static_string_container_##name; \
 	static slib::String8& name = *((slib::String8*)((void*)(&_static_string_##name)));
 
+#define SLIB_STATIC_SAFE_STRING8_BY_ARRAY(name, ...) \
+	static sl_char8 _static_string_buf_##name[] = {__VA_ARGS__, 0}; \
+	static slib::StringContainer8 _static_string_container_##name = {_static_string_buf_##name, sizeof(_static_string_buf_##name)-1, 0, -1}; \
+	static slib::_String8_Const _static_string_##name = {&_static_string_container_##name, 0}; \
+	static slib::SafeString8& name = *((slib::SafeString8*)((void*)(&_static_string_##name)));
+
 #define SLIB_STATIC_STRING16_BY_ARRAY(name, ...) \
 	static sl_char16 _static_string_buf_##name[] = {__VA_ARGS__, 0}; \
 	static slib::StringContainer16 _static_string_container_##name = {_static_string_buf_##name, (sizeof(_static_string_buf_##name)/2)-1, 0, -1}; \
 	static slib::StringContainer16* _static_string_##name = &_static_string_container_##name; \
 	static slib::String16& name = *((slib::String16*)((void*)(&_static_string_##name)));
 
+#define SLIB_STATIC_SAFE_STRING16_BY_ARRAY(name, ...) \
+	static sl_char16 _static_string_buf_##name[] = {__VA_ARGS__, 0}; \
+	static slib::StringContainer16 _static_string_container_##name = {_static_string_buf_##name, (sizeof(_static_string_buf_##name)/2)-1, 0, -1}; \
+	static slib::_String16_Const _static_string_##name = {&_static_string_container_##name, 0}; \
+	static slib::SafeString16& name = *((slib::SafeString16*)((void*)(&_static_string_##name)));
+
 #define SLIB_STATIC_STRING8_NULL(name) \
 	static slib::_String8_Const _static_string_null_##name = {slib::_String8_Null.container, 0}; \
 	static slib::String8& name = *((slib::String8*)((void*)(&_static_string_null_##name)));
+
+#define SLIB_STATIC_SAFE_STRING8_NULL(name) \
+	static slib::_String8_Const _static_string_null_##name = {slib::_String8_Null.container, 0}; \
+	static slib::SafeString8& name = *((slib::SafeString8*)((void*)(&_static_string_null_##name)));
 
 #define SLIB_STATIC_STRING16_NULL(name) \
 	static slib::_String16_Const _static_string_null_##name = {slib::_String16_Null.container, 0}; \
 	static slib::String16& name = *((slib::String16*)((void*)(&_static_string_null_##name)));
 
+#define SLIB_STATIC_SAFE_STRING16_NULL(name) \
+	static slib::_String16_Const _static_string_null_##name = {slib::_String16_Null.container, 0}; \
+	static slib::SafeString16& name = *((slib::SafeString16*)((void*)(&_static_string_null_##name)));
+
 #define SLIB_STATIC_STRING SLIB_STATIC_STRING8
 #define SLIB_STATIC_STRING_BY_ARRAY SLIB_STATIC_STRING8_BY_ARRAY
 #define SLIB_STATIC_STRING_NULL SLIB_STATIC_STRING8_NULL
+#define SLIB_STATIC_SAFE_STRING SLIB_STATIC_SAFE_STRING8
+#define SLIB_STATIC_SAFE_STRING_BY_ARRAY SLIB_STATIC_SAFE_STRING8_BY_ARRAY
+#define SLIB_STATIC_SAFE_STRING_NULL SLIB_STATIC_SAFE_STRING8_NULL
 
 
 SLIB_NAMESPACE_END

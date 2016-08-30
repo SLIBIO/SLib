@@ -329,7 +329,7 @@ void AsyncLoop::_runLoop()
 			Queue< Ref<Runnable> > tasks;
 			tasks.merge(&m_queueTasks);
 			Ref<Runnable> task;
-			while (m_queueTasks.pop(&task)) {
+			while (tasks.pop(&task)) {
 				if (task.isNotNull()) {
 					task->run();
 				}
@@ -1905,14 +1905,14 @@ sl_bool AsyncOutputBuffer::copyFrom(AsyncStream* stream, sl_uint64 size)
 	return sl_true;
 }
 
-sl_bool AsyncOutputBuffer::copyFromFile(const String& path)
+sl_bool AsyncOutputBuffer::copyFromFile(const String& path, const Ref<AsyncLoop>& loop)
 {
 	if (!(File::exists(path))) {
 		return sl_false;
 	}
 	sl_uint64 size = File::getSize(path);
 	if (size > 0) {
-		Ref<AsyncFile> file = AsyncFile::openForRead(path);
+		Ref<AsyncFile> file = AsyncFile::openForRead(path, loop);
 		if (file.isNotNull()) {
 			return copyFrom(file.ptr, size);
 		} else {
@@ -1920,6 +1920,11 @@ sl_bool AsyncOutputBuffer::copyFromFile(const String& path)
 		}
 	}
 	return sl_true;
+}
+
+sl_bool AsyncOutputBuffer::copyFromFile(const String& path)
+{
+	return copyFromFile(path, AsyncLoop::getDefault());
 }
 
 sl_uint64 AsyncOutputBuffer::getOutputLength() const
