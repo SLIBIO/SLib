@@ -32,7 +32,7 @@ public:
 #define SLIB_DECLARE_MENU_BEGIN(NAME) \
 class NAME : public slib::Referable { \
 public: \
-	static const NAME& get(); \
+	static const NAME* get(); \
 	NAME(); \
 	slib::Ref<slib::Menu> root; \
 	slib::Ref<slib::Menu> root_menu;
@@ -51,9 +51,12 @@ public: \
 
 
 #define SLIB_DEFINE_MENU_BEGIN(NAME) \
-const NAME& NAME::get() { \
+const NAME* NAME::get() { \
 	SLIB_SAFE_STATIC(NAME, ret); \
-	return ret; \
+	if (SLIB_SAFE_STATIC_CHECK_FREED(ret)) { \
+		return sl_null; \
+	} \
+	return &ret; \
 } \
 NAME::NAME() { \
 	root = root_menu = slib::Menu::create(); \
@@ -145,6 +148,12 @@ public:
 public:
 	// override
 	void dispatchResize(Size& size);
+	
+	// override
+	void dispatchMaximize();
+	
+	// override
+	void dispatchMinimize();
 	
 protected:
 	void _layoutViews_safe();

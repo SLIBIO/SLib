@@ -169,6 +169,11 @@ public:
 
 Ref<ViewInstance> TabView::createNativeWidget(ViewInstance* parent)
 {
+	Win32_UI_Shared* shared = Win32_UI_Shared::get();
+	if (!shared) {
+		return Ref<ViewInstance>::null();
+	}
+
 	DWORD style = 0;
 	DWORD styleEx = WS_EX_CONTROLPARENT;
 #if defined(_SLIB_UI_WIN32_USE_COMPOSITE_VIEWS)

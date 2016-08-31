@@ -52,6 +52,11 @@ public:
 	// set before attaching
 	void setCreatingNativeWidget(sl_bool flag);
 	
+	sl_bool isCreatingInstanceOnParentAttach();
+	
+	// set before attaching
+	void setCreatingInstanceOnParentAttach(sl_bool flag);
+
 	Ref<ViewInstance> createGenericInstance(ViewInstance* parent);
 	
 	virtual Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
@@ -922,6 +927,7 @@ private:
 	sl_bool m_flagCreatingInstance;
 	sl_bool m_flagCreatingChildInstances;
 	sl_bool m_flagCreatingNativeWidget;
+	sl_bool m_flagCreatingInstanceOnParentAttach;
 	
 	Rectangle m_frame;
 	

@@ -190,21 +190,26 @@ public:
 		return @"";
 	}
 	
-	static _UI_OSX_KeyMapper& instance()
-	{
-		SLIB_SAFE_STATIC(_UI_OSX_KeyMapper, mapper);
-		return mapper;
-	}
 };
+
+SLIB_SAFE_STATIC_GETTER(_UI_OSX_KeyMapper, _UI_OSX_getKeyMapper)
 
 sl_uint32 UIEvent::getSystemKeycode(Keycode key)
 {
-	return _UI_OSX_KeyMapper::instance().keyToVk(key);
+	_UI_OSX_KeyMapper* mapper = _UI_OSX_getKeyMapper();
+	if (mapper) {
+		return mapper->keyToVk(key);
+	}
+	return 0;
 }
 
 Keycode UIEvent::getKeycodeFromSystemKeycode(sl_uint32 vkey)
 {
-	return _UI_OSX_KeyMapper::instance().vkToKey(vkey);
+	_UI_OSX_KeyMapper* mapper = _UI_OSX_getKeyMapper();
+	if (mapper) {
+		return mapper->vkToKey(vkey);
+	}
+	return Keycode::Unknown;
 }
 
 sl_bool UI::checkKeyPressed(Keycode key)
@@ -263,10 +268,14 @@ sl_bool UI::checkMiddleButtonPressed()
 
 NSString* UIPlatform::getKeyEquivalent(const KeycodeAndModifiers& km, NSUInteger& mask)
 {
+	_UI_OSX_KeyMapper* mapper = _UI_OSX_getKeyMapper();
+	if (!mapper) {
+		return @"";
+	}
 	mask = 0;
-	NSString* ret = _UI_OSX_KeyMapper::instance().keyToEquivalent(km.getKeycode());
+	NSString* ret = mapper->keyToEquivalent(km.getKeycode());
 	if (ret == nil) {
-		ret = @"";
+		return @"";
 	}
 	if (ret.length > 0) {
 		if (km.isCommandKey()) {

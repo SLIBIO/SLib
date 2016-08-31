@@ -44,7 +44,10 @@ public:
 
 void MySQL_Database::initThread()
 {
-	SLIB_SAFE_STATIC(_MySQL_Database_Lib, lib);
+	SLIB_SAFE_STATIC(_MySQL_Database_Lib, lib)
+	if (SLIB_SAFE_STATIC_CHECK_FREED(lib)) {
+		return;
+	}
 #if !defined(SLIB_PLATFORM_IS_APPLE)
 	static SLIB_THREAD int check = 0;
 	if (check) {

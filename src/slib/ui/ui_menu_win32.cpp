@@ -11,7 +11,7 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class _Win32_Menu;
 typedef HashMap<HMENU, WeakRef<_Win32_Menu> > _UiMenuMap;
-SLIB_SAFE_STATIC_GETTER(_UiMenuMap, _UI_getMenu);
+SLIB_SAFE_STATIC_GETTER(_UiMenuMap, _UI_getMenu)
 
 class _Win32_MenuItem : public MenuItem
 {
@@ -111,7 +111,7 @@ public:
 	{
 		if (m_hMenu) {
 			::DestroyMenu(m_hMenu);
-			_UiMenuMap* map = &(_UI_getMenu());
+			_UiMenuMap* map = _UI_getMenu();
 			if (map) {
 				map->remove(m_hMenu);
 			}
@@ -130,7 +130,10 @@ public:
 				Ref<_Win32_Menu> ret = new _Win32_Menu();
 				if (ret.isNotNull()) {
 					ret->m_hMenu = hMenu;
-					_UI_getMenu().put(hMenu, ret);
+					_UiMenuMap* map = _UI_getMenu();
+					if (map) {
+						map->put(hMenu, ret);
+					}
 					return ret;
 				}
 			}
@@ -211,7 +214,10 @@ public:
 	// override
 	void show(sl_real x, sl_real y)
 	{
-		::TrackPopupMenuEx(m_hMenu, 0, (int)x, (int)y, Win32_UI_Shared::get()->hWndMessage, NULL);
+		Win32_UI_Shared* shared = Win32_UI_Shared::get();
+		if (shared) {
+			::TrackPopupMenuEx(m_hMenu, 0, (int)x, (int)y, shared->hWndMessage, NULL);
+		}
 	}
 
 	friend class _Win32_MenuItem;
@@ -384,20 +390,27 @@ HMENU UIPlatform::getMenuHandle(const Ref<Menu>& menu)
 
 Ref<Menu> UIPlatform::getMenu(HMENU hMenu)
 {
-	return _UI_getMenu().getValue(hMenu, WeakRef<_Win32_Menu>::null());
+	_UiMenuMap* map = _UI_getMenu();
+	if (map) {
+		return map->getValue(hMenu, WeakRef<_Win32_Menu>::null());
+	}
+	return Ref<Menu>::null();
 }
 
 void _Win32_processMenuCommand(WPARAM wParam, LPARAM lParam)
 {
 	HMENU hMenu = (HMENU)(lParam);
 	sl_uint32 index = (sl_uint32)(wParam);
-	Ref<_Win32_Menu> menu(_UI_getMenu().getValue(hMenu, WeakRef<_Win32_Menu>::null()));
-	if (menu.isNotNull()) {
-		Ref<MenuItem> item = menu->getMenuItem(index);
-		if (item.isNotNull()) {
-			Ref<Runnable> action = item->getAction();
-			if (action.isNotNull()) {
-				action->run();
+	_UiMenuMap* map = _UI_getMenu();
+	if (map) {
+		Ref<_Win32_Menu> menu(map->getValue(hMenu, WeakRef<_Win32_Menu>::null()));
+		if (menu.isNotNull()) {
+			Ref<MenuItem> item = menu->getMenuItem(index);
+			if (item.isNotNull()) {
+				Ref<Runnable> action = item->getAction();
+				if (action.isNotNull()) {
+					action->run();
+				}
 			}
 		}
 	}

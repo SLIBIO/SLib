@@ -77,12 +77,13 @@ SLIB_INLINE SafeStaticDestructor<T>::~SafeStaticDestructor()
 
 SLIB_NAMESPACE_END
 
-#define SLIB_SAFE_STATIC_DESTRUCTOR(TYPE, NAME) \
-	static slib::SafeStaticDestructor<TYPE> _static_destructor_instance_##NAME(&NAME);
+#define SLIB_SAFE_STATIC_DESTRUCTOR(TYPE, NAME) static slib::SafeStaticDestructor<TYPE> _static_destructor_instance_##NAME(&NAME);
+#define SLIB_SAFE_STATIC_CHECK_FREED(NAME) _static_destructor_instance_##NAME.flagFreed
 
 #else
 
 #define SLIB_SAFE_STATIC_DESTRUCTOR(TYPE, NAME)
+#define SLIB_SAFE_STATIC_CHECK_FREED(NAME) 0
 
 #endif
 
@@ -101,28 +102,19 @@ SLIB_NAMESPACE_END
 	} \
 	SLIB_SAFE_STATIC_DESTRUCTOR(TYPE, NAME)
 
-#if defined(SLIB_PLATFORM_IS_WIN32)
 #define SLIB_SAFE_STATIC_GETTER(TYPE, FUNC, ...) \
-	static TYPE& FUNC() { \
+	static TYPE* FUNC() { \
 		SLIB_SAFE_STATIC(TYPE, ret, ##__VA_ARGS__) \
-		if (_static_destructor_instance_ret.flagFreed) { \
-			return *((TYPE*)0); \
+		if (SLIB_SAFE_STATIC_CHECK_FREED(ret)) { \
+			return 0; \
 		} \
-		return ret; \
+		return &ret; \
 	}
-#else
-#define SLIB_SAFE_STATIC_GETTER(TYPE, FUNC, ...) \
-	static TYPE& FUNC() { \
-		SLIB_SAFE_STATIC(TYPE, ret, ##__VA_ARGS__) \
-		return ret; \
-	}
-#endif
 
-#define SLIB_SAFE_STATIC_REF(TYPE, NAME) \
-	static _Ref_Const _g_globalref_##NAME = {0, 0}; \
-	TYPE& NAME = *((TYPE*)&_g_globalref_##NAME); \
+#define SLIB_STATIC_ZERO_INITIALIZED(TYPE, NAME) \
+	static char _static_safemem_##NAME[sizeof(TYPE)] = {0}; \
+	TYPE& NAME = *((TYPE*)((void*)(_static_safemem_##NAME))); \
 	SLIB_SAFE_STATIC_DESTRUCTOR(TYPE, NAME)
-
 
 
 #define SLIB_PROPERTY(TYPE, NAME) protected: \

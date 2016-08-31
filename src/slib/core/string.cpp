@@ -6710,12 +6710,10 @@ SLIB_INLINE ST _String_fromFloat(FT value, sl_int32 precision, sl_bool flagZeroP
 	CT buf[MAX_NUMBER_STR_LEN];
 	
 	if (Math::isNaN(value)) {
-		SLIB_SAFE_STATIC(ST, s, "NaN");
-		return s;
+		return "NaN";
 	}
 	if (Math::isInfinite(value)) {
-		SLIB_SAFE_STATIC(ST, s, "Infinity");
-		return s;
+		return "Infinity";
 	}
 
 	if (minWidthIntegral > MAX_PRECISION) {

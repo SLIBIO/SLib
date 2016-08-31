@@ -133,6 +133,10 @@ public:
 Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* parent)
 {
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
+	if (!shared) {
+		return Ref<ViewInstance>::null();
+	}
+
 	DWORD style = 0;
 	if (m_flagHorizontalScroll) {
 		style = WS_HSCROLL;

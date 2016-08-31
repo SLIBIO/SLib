@@ -610,6 +610,10 @@ LRESULT CALLBACK _Win32_ViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 Ref<ViewInstance> View::createGenericInstance(ViewInstance* parent)
 {
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
+	if (!shared) {
+		return Ref<ViewInstance>::null();
+	}
+
 	DWORD styleEx = 0;
 	DWORD style = 0;
 	if (m_flagCreatingChildInstances) {

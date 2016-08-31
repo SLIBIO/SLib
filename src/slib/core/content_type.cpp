@@ -193,7 +193,10 @@ public:
 
 ContentType ContentTypes::getFromFileExtension(const String& fileExt)
 {
-	SLIB_SAFE_STATIC(_ContentType_Mapping, t);
+	SLIB_SAFE_STATIC(_ContentType_Mapping, t)
+	if (SLIB_SAFE_STATIC_CHECK_FREED(t)) {
+		return ContentType::Unknown;
+	}
 	return t.maps.getValue(fileExt.toLower(), ContentType::Unknown);
 }
 

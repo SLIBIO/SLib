@@ -179,21 +179,26 @@ public:
 		}
 	}
 	
-	static _UI_Android_KeyMapper& instance()
-	{
-		SLIB_SAFE_STATIC(_UI_Android_KeyMapper, mapper);
-		return mapper;
-	}
 };
+
+SLIB_SAFE_STATIC_GETTER(_UI_Android_KeyMapper, _UI_Android_getKeyMapper)
 
 sl_uint32 UIEvent::getSystemKeycode(Keycode key)
 {
-	return _UI_Android_KeyMapper::instance().keyToVk(key);
+	_UI_Android_KeyMapper* mapper = _UI_Android_getKeyMapper();
+	if (mapper) {
+		return mapper->keyToVk(key);
+	}
+	return 0;
 }
 
 Keycode UIEvent::getKeycodeFromSystemKeycode(sl_uint32 vkey)
 {
-	return _UI_Android_KeyMapper::instance().vkToKey(vkey);
+	_UI_Android_KeyMapper* mapper = _UI_Android_getKeyMapper();
+	if (mapper) {
+		return mapper->vkToKey(vkey);
+	}
+	return Keycode::Unknown;
 }
 
 sl_bool UI::checkKeyPressed(Keycode key)

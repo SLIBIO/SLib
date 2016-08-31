@@ -126,6 +126,11 @@ public:
 	*/
 	Ref<ViewInstance> __createInstance(ViewInstance* parent, int type)
 	{
+		Win32_UI_Shared* shared = Win32_UI_Shared::get();
+		if (!shared) {
+			return Ref<ViewInstance>::null();
+		}
+
 		int style = WS_TABSTOP;
 		if (isBorder()) {
 			style |= WS_BORDER;

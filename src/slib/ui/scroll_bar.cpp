@@ -39,13 +39,9 @@ public:
 		defaultBar = new _ScrollBar_Bar(Color(0, 0, 0, 110));
 		defaultClickedBar = new _ScrollBar_Bar(Color(0, 0, 0, 160));
 	}
-	
-	static _ScrollBar_Static& get()
-	{
-		SLIB_SAFE_STATIC(_ScrollBar_Static, ret);
-		return ret;
-	}
 };
+
+SLIB_SAFE_STATIC_GETTER(_ScrollBar_Static, _ScrollBar_getStatic)
 
 ScrollBar::ScrollBar(LayoutOrientation orientation)
 {
@@ -59,9 +55,11 @@ ScrollBar::ScrollBar(LayoutOrientation orientation)
 	m_valueDown = 0;
 	m_posDown = 0;
 
-	_ScrollBar_Static& s = _ScrollBar_Static::get();
-	m_bar = s.defaultBar;
-	m_clickedBar = s.defaultClickedBar;
+	_ScrollBar_Static* s = _ScrollBar_getStatic();
+	if (s) {
+		m_bar = s->defaultBar;
+		m_clickedBar = s->defaultClickedBar;
+	}
 	m_bar_len_ratio_min = 2;
 }
 

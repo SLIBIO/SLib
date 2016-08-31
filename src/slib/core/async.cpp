@@ -76,16 +76,11 @@ AsyncLoop::~AsyncLoop()
 
 Ref<AsyncLoop> AsyncLoop::getDefault()
 {
-	SLIB_SAFE_STATIC(Ref<AsyncLoop>, ret, create());
-	return ret;
-}
-
-void AsyncLoop::releaseDefault()
-{
-	Ref<AsyncLoop> loop = getDefault();
-	if (loop.isNotNull()) {
-		loop->release();
+	SLIB_SAFE_STATIC(Ref<AsyncLoop>, ret, create())
+	if (SLIB_SAFE_STATIC_CHECK_FREED(ret)) {
+		return Ref<AsyncLoop>::null();
 	}
+	return ret;
 }
 
 Ref<AsyncLoop> AsyncLoop::create(sl_bool flagAutoStart)
@@ -446,7 +441,10 @@ AsyncIoLoop::~AsyncIoLoop()
 
 Ref<AsyncIoLoop> AsyncIoLoop::getDefault()
 {
-	SLIB_SAFE_STATIC(Ref<AsyncIoLoop>, ret, create());
+	SLIB_SAFE_STATIC(Ref<AsyncIoLoop>, ret, create())
+	if (SLIB_SAFE_STATIC_CHECK_FREED(ret)) {
+		return Ref<AsyncIoLoop>::null();
+	}
 	return ret;
 }
 

@@ -91,9 +91,9 @@ public:
 	}; \
 	SLIB_SAFE_STATIC_GETTER(_ResourceMap, _get_resource_map); \
 	TYPE get(const slib::String& name) { \
-		_ResourceMap& map = _get_resource_map(); \
-		if (&map) { \
-			return map.map.getValue_NoLock(name, TYPE::null()); \
+		_ResourceMap* map = _get_resource_map(); \
+		if (map) { \
+			return map->map.getValue_NoLock(name, TYPE::null()); \
 		} \
 		return TYPE::null(); \
 	}

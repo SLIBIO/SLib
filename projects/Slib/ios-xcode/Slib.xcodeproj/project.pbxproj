@@ -113,7 +113,6 @@
 		266DD43E1C1190AF00D47AB0 /* edit_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD43D1C1190AF00D47AB0 /* edit_view_ios.mm */; };
 		266DD4401C1190E800D47AB0 /* label_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD43F1C1190E800D47AB0 /* label_view.cpp */; };
 		266DD4421C11910F00D47AB0 /* label_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4411C11910F00D47AB0 /* label_view_ios.mm */; };
-		266DD4441C11912B00D47AB0 /* list_details_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4431C11912B00D47AB0 /* list_details_view.cpp */; };
 		266DD4461C11914200D47AB0 /* radio_button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4451C11914200D47AB0 /* radio_button.cpp */; };
 		266DD4481C11917700D47AB0 /* render_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4471C11917700D47AB0 /* render_view.cpp */; };
 		266DD44A1C11918300D47AB0 /* render_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4491C11918300D47AB0 /* render_view_ios.mm */; };
@@ -131,6 +130,7 @@
 		266F92701D51CD7A0040166C /* graphics_resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266F926F1D51CD7A0040166C /* graphics_resource.cpp */; };
 		2683BFAE1C39710C0068AC42 /* atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2683BFAD1C39710C0068AC42 /* atomic.cpp */; };
 		268916341C182AC8009FD75E /* camera_dshow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268916331C182AC8009FD75E /* camera_dshow.cpp */; };
+		269394CC1D7609EB002B9B03 /* list_report_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269394CB1D7609EB002B9B03 /* list_report_view.cpp */; };
 		2694620A1CAD1C47001B2130 /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269462091CAD1C47001B2130 /* xml.cpp */; };
 		26A9B7621C172BCC004C9B0E /* camera_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A9B7611C172BCC004C9B0E /* camera_view.cpp */; };
 		26A9B7641C172BDE004C9B0E /* video_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A9B7631C172BDE004C9B0E /* video_view.cpp */; };
@@ -357,7 +357,6 @@
 		266DD43D1C1190AF00D47AB0 /* edit_view_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = edit_view_ios.mm; sourceTree = "<group>"; };
 		266DD43F1C1190E800D47AB0 /* label_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = label_view.cpp; sourceTree = "<group>"; };
 		266DD4411C11910F00D47AB0 /* label_view_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = label_view_ios.mm; sourceTree = "<group>"; };
-		266DD4431C11912B00D47AB0 /* list_details_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list_details_view.cpp; sourceTree = "<group>"; };
 		266DD4451C11914200D47AB0 /* radio_button.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = radio_button.cpp; sourceTree = "<group>"; };
 		266DD4471C11917700D47AB0 /* render_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_view.cpp; sourceTree = "<group>"; };
 		266DD4491C11918300D47AB0 /* render_view_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = render_view_ios.mm; sourceTree = "<group>"; };
@@ -375,6 +374,7 @@
 		266F926F1D51CD7A0040166C /* graphics_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graphics_resource.cpp; sourceTree = "<group>"; };
 		2683BFAD1C39710C0068AC42 /* atomic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = atomic.cpp; sourceTree = "<group>"; };
 		268916331C182AC8009FD75E /* camera_dshow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = camera_dshow.cpp; path = media/camera_dshow.cpp; sourceTree = "<group>"; };
+		269394CB1D7609EB002B9B03 /* list_report_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list_report_view.cpp; sourceTree = "<group>"; };
 		269462091CAD1C47001B2130 /* xml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = xml.cpp; sourceTree = "<group>"; };
 		26A9B7611C172BCC004C9B0E /* camera_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera_view.cpp; sourceTree = "<group>"; };
 		26A9B7631C172BDE004C9B0E /* video_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_view.cpp; sourceTree = "<group>"; };
@@ -799,7 +799,7 @@
 				266DD43F1C1190E800D47AB0 /* label_view.cpp */,
 				266DD4411C11910F00D47AB0 /* label_view_ios.mm */,
 				26CB94C81D0126ED00D8A472 /* linear_view.cpp */,
-				266DD4431C11912B00D47AB0 /* list_details_view.cpp */,
+				269394CB1D7609EB002B9B03 /* list_report_view.cpp */,
 				266F926B1D51CD450040166C /* list_view.cpp */,
 				2648D5491D096AC400819E09 /* mobile_app.cpp */,
 				2648D54A1D096AC400819E09 /* mobile_game.cpp */,
@@ -919,6 +919,7 @@
 				A25F2F861B039EF600854DAF /* ui_core_ios.mm in Sources */,
 				266DD3E01C1181B500D47AB0 /* net_capture.cpp in Sources */,
 				A25F2F891B039EF600854DAF /* ui_event.cpp in Sources */,
+				269394CC1D7609EB002B9B03 /* list_report_view.cpp in Sources */,
 				A25F2F501B039EF600854DAF /* setting.cpp in Sources */,
 				266DD4251C118EE800D47AB0 /* graphics_path_quartz.mm in Sources */,
 				266DD3741C1171E400D47AB0 /* audio_recorder_dsound.cpp in Sources */,
@@ -1002,7 +1003,6 @@
 				266DD3881C117A3100D47AB0 /* sha2.cpp in Sources */,
 				266DD3A51C117AE300D47AB0 /* graphics_util.cpp in Sources */,
 				266DD3E71C1181B500D47AB0 /* network_secure_stream.cpp in Sources */,
-				266DD4441C11912B00D47AB0 /* list_details_view.cpp in Sources */,
 				A24142E31BA7CA4C00D7AB80 /* algorithm.cpp in Sources */,
 				A25F2F551B039EF600854DAF /* thread.cpp in Sources */,
 				A25F2F381B039EF600854DAF /* async.cpp in Sources */,

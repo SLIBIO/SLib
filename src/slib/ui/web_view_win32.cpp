@@ -899,6 +899,10 @@ public:
 Ref<ViewInstance> WebView::createNativeWidget(ViewInstance* parent)
 {
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
+	if (!shared) {
+		return Ref<ViewInstance>::null();
+	}
+
 	DWORD style = 0;
 	DWORD styleEx = 0;
 	Ref<_Win32_WebViewInstance> ret = Win32_ViewInstance::create<_Win32_WebViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);

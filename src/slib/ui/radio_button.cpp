@@ -74,17 +74,21 @@ public:
 		categories[1].properties[(int)ButtonState::Down].icon = new _RadioButton_Icon(penDown, colorBackDown, colorCheckDown);
 	}
 	
-	static _RadioButton_Categories* get()
+	static ButtonCategory* getCategories()
 	{
-		SLIB_SAFE_STATIC(_RadioButton_Categories, ret);
-		return &ret;
+		SLIB_SAFE_STATIC(_RadioButton_Categories, ret)
+		if (SLIB_SAFE_STATIC_CHECK_FREED(ret)) {
+			return sl_null;
+		}
+		return ret.categories;
 	}
+
 };
 
 
 SLIB_DEFINE_OBJECT(RadioButton, CheckBox)
 
-RadioButton::RadioButton() : CheckBox(2, _RadioButton_Categories::get()->categories)
+RadioButton::RadioButton() : CheckBox(2, _RadioButton_Categories::getCategories())
 {
 	setCreatingNativeWidget(sl_true);
 }

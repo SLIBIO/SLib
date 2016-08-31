@@ -527,9 +527,9 @@ static sl_reg _Color_parse(Color* _out, const CT* sz, sl_size pos, sl_size len)
 					s[i] = SLIB_CHAR_UPPER_TO_LOWER(ch);
 				}
 				
-				_Color_Name_Map& nm = _Color_getNameMap();
-				if ((void*)&nm) {
-					Color color = nm.getColorFromName(String(s, n));
+				_Color_Name_Map* nm = _Color_getNameMap();
+				if (nm) {
+					Color color = nm->getColorFromName(String(s, n));
 					if (color.isNotZero()) {
 						if (_out) {
 							*_out = color;

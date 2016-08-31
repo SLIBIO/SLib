@@ -765,25 +765,24 @@ public:
 	
 };
 
-SLIB_SAFE_STATIC_GETTER(_UIKeyNameMapper, _UI_getKeyNameMapper);
+SLIB_SAFE_STATIC_GETTER(_UIKeyNameMapper, _UI_getKeyNameMapper)
+
 String UI::getKeyName(Keycode code, sl_bool flagShort)
 {
-	_UIKeyNameMapper& mapper = _UI_getKeyNameMapper();
-	if ((void*)&mapper) {
-		return mapper.get(code, flagShort);
-	} else {
-		return String::null();
+	_UIKeyNameMapper* mapper = _UI_getKeyNameMapper();
+	if (mapper) {
+		return mapper->get(code, flagShort);
 	}
+	return String::null();
 }
 
 Keycode UI::getKeycodeFromName(const String& keyName)
 {
-	_UIKeyNameMapper& mapper = _UI_getKeyNameMapper();
-	if ((void*)&mapper) {
-		return mapper.getCode(keyName);
-	} else {
-		return Keycode::Unknown;
+	_UIKeyNameMapper* mapper = _UI_getKeyNameMapper();
+	if (mapper) {
+		return mapper->getCode(keyName);
 	}
+	return Keycode::Unknown;
 }
 
 void IViewListener::onMouseEvent(View* view, UIEvent* event)

@@ -7,7 +7,7 @@ SLIB_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(Application, Object)
 
-SLIB_SAFE_STATIC_REF(SafeWeakRef<Application>, _g_app)
+SLIB_STATIC_ZERO_INITIALIZED(SafeWeakRef<Application>, _g_app)
 
 Ref<Application> Application::getApp()
 {
@@ -29,21 +29,24 @@ void Application::run()
 	run(String::null());
 }
 
-static Map<String, String>& _Application_getEnvList()
-{
-	typedef Map<String, String> _T;
-	SLIB_SAFE_STATIC(_T, ret, _T::createHash());
-	return ret;
-}
+typedef Map<String, String> _Application_EnvList;
+SLIB_SAFE_STATIC_GETTER(_Application_EnvList, _Application_getEnvList, _Application_EnvList::createHash())
 
 void Application::setEnvironmentPath(const String& key, const String& path)
 {
-	_Application_getEnvList().put(key, path);
+	Map<String, String>* envMap = _Application_getEnvList();
+	if (envMap) {
+		envMap->put(key, path);
+	}
 }
 
 String Application::getEnvironmentPath(const String& key)
 {
-	return _Application_getEnvList().getValue(key, String::null());
+	Map<String, String>* envMap = _Application_getEnvList();
+	if (envMap) {
+		return envMap->getValue(key, String::null());
+	}
+	return String::null();
 }
 
 String Application::parseEnvironmentPath(const String& _path)
@@ -65,20 +68,23 @@ String Application::parseEnvironmentPath(const String& _path)
 	return path;
 }
 
-static String& _Application_getAppPath()
-{
-	SLIB_SAFE_STATIC(String, ret, System::getApplicationDirectory());
-	return ret;
-}
+SLIB_SAFE_STATIC_GETTER(String, _Application_getAppPath, System::getApplicationDirectory())
 
 String Application::getAppPath()
 {
-	return _Application_getAppPath();
+	String* s = _Application_getAppPath();
+	if (!s) {
+		return String::null();
+	}
+	return *s;
 }
 
 void Application::setAppPath(const String& path)
 {
-	_Application_getAppPath() = path;
+	String* s = _Application_getAppPath();
+	if (s) {
+		*s = path;
+	}
 }
 
 String Application::findFileAndSetAppPath(const String& filePath, sl_uint32 nDeep)

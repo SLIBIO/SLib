@@ -1337,19 +1337,26 @@ struct _SecureStream_DefaultKey
 	}
 };
 
-static const _SecureStream_DefaultKey& _SecureStream_getDefaultKey()
-{
-	SLIB_SAFE_STATIC(_SecureStream_DefaultKey, ret);
-	return ret;
-}
+SLIB_SAFE_STATIC_GETTER(_SecureStream_DefaultKey, _SecureStream_getDefaultKey)
 
 const RSAPrivateKey& SecureStream::getDefaultPrivateKey()
 {
-	return _SecureStream_getDefaultKey().privateKey;
+	_SecureStream_DefaultKey* keys = _SecureStream_getDefaultKey();
+	if (keys) {
+		return keys->privateKey;
+	}
+	SLIB_STATIC_ZERO_INITIALIZED(RSAPrivateKey, zero);
+	return zero;
 }
 
 const RSAPublicKey& SecureStream::getDefaultPublicKey()
 {
-	return _SecureStream_getDefaultKey().publicKey;
+	_SecureStream_DefaultKey* keys = _SecureStream_getDefaultKey();
+	if (keys) {
+		return keys->publicKey;
+	}
+	SLIB_STATIC_ZERO_INITIALIZED(RSAPublicKey, zero);
+	return zero;
 }
+
 SLIB_CRYPTO_NAMESPACE_END

@@ -29,6 +29,10 @@ public:
 
 Ref<ViewInstance> Button::createNativeWidget(ViewInstance* parent)
 {
+	Win32_UI_Shared* shared = Win32_UI_Shared::get();
+	if (!shared) {
+		return Ref<ViewInstance>::null();
+	}
 	String16 text = m_text;
 	DWORD style = WS_TABSTOP;
 	if (m_flagDefaultButton) {

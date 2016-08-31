@@ -22,7 +22,10 @@ Pen::Pen()
 
 Ref<Pen> Pen::getDefault()
 {
-	SLIB_SAFE_STATIC(Ref<Pen>, defaultPen, create(PenDesc()));
+	SLIB_SAFE_STATIC(Ref<Pen>, defaultPen, create(PenDesc()))
+	if (SLIB_SAFE_STATIC_CHECK_FREED(defaultPen)) {
+		return Ref<Pen>::null();
+	}
 	return defaultPen;
 }
 

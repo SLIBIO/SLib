@@ -22,6 +22,7 @@ View::View()
 	m_flagCreatingInstance = sl_false;
 	m_flagCreatingChildInstances = sl_false;
 	m_flagCreatingNativeWidget = sl_false;
+	m_flagCreatingInstanceOnParentAttach = sl_true;
 	
 	m_frame.left = 0;
 	m_frame.top = 0;
@@ -113,6 +114,16 @@ void View::setCreatingNativeWidget(sl_bool flag)
 	if (flag) {
 		m_flagCreatingInstance = sl_true;
 	}
+}
+
+sl_bool View::isCreatingInstanceOnParentAttach()
+{
+	return m_flagCreatingInstanceOnParentAttach;
+}
+
+void View::setCreatingInstanceOnParentAttach(sl_bool flag)
+{
+	m_flagCreatingInstanceOnParentAttach = flag;
 }
 
 Ref<ViewInstance> View::createNativeWidget(ViewInstance* parent)
@@ -243,7 +254,7 @@ void View::_processAttachOnUiThread()
 			ListLocker< Ref<View> > children(m_children);
 			for (sl_size i = 0; i < children.count; i++) {
 				Ref<View>& child = children[i];
-				if (child.isNotNull()) {
+				if (child.isNotNull() && child->isCreatingInstanceOnParentAttach()) {
 					attachChild(child);
 				}
 			}
@@ -513,6 +524,7 @@ void View::setOnRemoveChildEnabled(sl_bool flagEnabled)
 void View::_addChild(const Ref<View>& view, sl_bool flagRedraw, sl_bool flagAttach)
 {
 	if (view.isNotNull()) {
+		view->setCreatingInstanceOnParentAttach(flagAttach);
 		view->setFocus(sl_false, sl_false);
 		view->setParent(this);
 		if (m_flagOnAddChild) {

@@ -177,21 +177,26 @@ public:
 		}
 	}
 	
-	static _UI_Windows_KeyMapper& instance()
-	{
-		SLIB_SAFE_STATIC(_UI_Windows_KeyMapper, mapper);
-		return mapper;
-	}
 };
+
+SLIB_SAFE_STATIC_GETTER(_UI_Windows_KeyMapper, _UI_Windows_getKeyMapper)
 
 sl_uint32 UIEvent::getSystemKeycode(Keycode key)
 {
-	return _UI_Windows_KeyMapper::instance().keyToVk(key);
+	_UI_Windows_KeyMapper* mapper = _UI_Windows_getKeyMapper();
+	if (mapper) {
+		return mapper->keyToVk(key);
+	}
+	return 0;
 }
 
 Keycode UIEvent::getKeycodeFromSystemKeycode(sl_uint32 vkey)
 {
-	return _UI_Windows_KeyMapper::instance().vkToKey(vkey);
+	_UI_Windows_KeyMapper* mapper = _UI_Windows_getKeyMapper();
+	if (mapper) {
+		return mapper->vkToKey(vkey);
+	}
+	return Keycode::Unknown;
 }
 
 sl_bool UI::checkKeyPressed(Keycode key)

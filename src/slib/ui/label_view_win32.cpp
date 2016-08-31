@@ -98,6 +98,11 @@ SLIB_DEFINE_OBJECT(_Win32_LabelViewInstance, Win32_ViewInstance)
 
 Ref<ViewInstance> LabelView::createNativeWidget(ViewInstance* parent)
 {
+	Win32_UI_Shared* shared = Win32_UI_Shared::get();
+	if (!shared) {
+		return Ref<ViewInstance>::null();
+	}
+
 	int style = SS_NOTIFY;
 	if (isBorder()) {
 		style |= WS_BORDER;

@@ -98,9 +98,17 @@ DialogResult AlertDialog::_run()
 		style |= MB_TASKMODAL;
 	}
 
+	int result;
+
 	String16 text = this->text;
-	::PostMessage(Win32_UI_Shared::get()->hWndMessage, SLIB_UI_MESSAGE_CUSTOM_MSGBOX, 0, (LPARAM)(this));
-	int result = ::MessageBoxW(hWndParent, (LPCWSTR)(text.getData()), L"CustomizedMsgBox", style);
+	Win32_UI_Shared* shared = Win32_UI_Shared::get();
+	if (shared) {
+		::PostMessage(shared->hWndMessage, SLIB_UI_MESSAGE_CUSTOM_MSGBOX, 0, (LPARAM)(this));
+		result = ::MessageBoxW(hWndParent, (LPCWSTR)(text.getData()), L"CustomizedMsgBox", style);
+	} else {
+		String16 caption = this->caption;
+		result = ::MessageBoxW(hWndParent, (LPCWSTR)(text.getData()), (LPCWSTR)(caption.getData()), style);
+	}
 
 	switch (result) {
 	case IDOK:

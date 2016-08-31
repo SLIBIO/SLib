@@ -92,6 +92,11 @@ public:
 
 Ref<ViewInstance> DropDownList::createNativeWidget(ViewInstance* parent)
 {
+	Win32_UI_Shared* shared = Win32_UI_Shared::get();
+	if (!shared) {
+		return Ref<ViewInstance>::null();
+	}
+
 	UINT style = CBS_DROPDOWNLIST | WS_TABSTOP;
 	Ref<_Win32_DropDownListInstance> ret = Win32_ViewInstance::create<_Win32_DropDownListInstance>(this, parent, L"COMBOBOX", L"", style, 0);
 	

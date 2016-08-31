@@ -53,10 +53,14 @@ public:
 };
 
 typedef HashMap<jlong, Ref<_UiAlertResult> > _UiAlertMap;
-SLIB_SAFE_STATIC_GETTER(_UiAlertMap, _AndroidUi_alerts);
+SLIB_SAFE_STATIC_GETTER(_UiAlertMap, _AndroidUi_alerts)
 
 void AlertDialog::_show()
 {
+	_UiAlertMap* alertMap = _AndroidUi_alerts();
+	if (!alertMap) {
+		return;
+	}
 	jobject jactivity = Android::getCurrentActivity();
 	if (jactivity) {
 		Ref<_UiAlertResult> result = new _UiAlertResult();
@@ -76,7 +80,7 @@ void AlertDialog::_show()
 				_JAndroidAlert::titleCancel.set(jalert, titleCancel);
 				_JAndroidAlert::titleYes.set(jalert, titleYes);
 				_JAndroidAlert::titleNo.set(jalert, titleNo);
-				_AndroidUi_alerts().put(lresult, result);
+				alertMap->put(lresult, result);
 				_JAndroidAlert::show.call(jalert, jactivity);
 			}
 		}
@@ -85,10 +89,15 @@ void AlertDialog::_show()
 
 void _AndroidAlert_runShowResult(JNIEnv* env, jobject _this, jlong _alert, int result)
 {
+	_UiAlertMap* alertMap = _AndroidUi_alerts();
+	if (!alertMap) {
+		return;
+	}
+
 	Ref<_UiAlertResult> alert;
-	_AndroidUi_alerts().get(_alert, &alert);
+	alertMap->get(_alert, &alert);
 	if (alert.isNotNull()) {
-		_AndroidUi_alerts().remove(_alert);
+		alertMap->remove(_alert);
 		switch (result) {
 		case 0: // OK
 			if (alert->onOk.isNotNull()) {

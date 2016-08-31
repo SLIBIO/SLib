@@ -88,7 +88,10 @@ public:
 
 Ref<Screen> UI::getPrimaryScreen()
 {
-	SLIB_SAFE_STATIC_REF(SafeRef<Screen>, ret);
+	SLIB_STATIC_ZERO_INITIALIZED(SafeRef<Screen>, ret)
+	if (SLIB_SAFE_STATIC_CHECK_FREED(ret)) {
+		return Ref<Screen>::null();
+	}
 	if (ret.isNull()) {
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
@@ -124,19 +127,23 @@ SLIB_SAFE_STATIC_GETTER(Queue< Ref<Runnable> >, _AndroidUi_getDispatchQueue);
 void UI::dispatchToUiThread(const Ref<Runnable>& callback)
 {
 	if (callback.isNotNull()) {
-		Queue< Ref<Runnable> >& queue = _AndroidUi_getDispatchQueue();
-		queue.push(callback);
-		_AndroidUiThread::dispatch.call(sl_null);
+		Queue< Ref<Runnable> >* queue = _AndroidUi_getDispatchQueue();
+		if (queue) {
+			queue->push(callback);
+			_AndroidUiThread::dispatch.call(sl_null);
+		}
 	}
 }
 
 void _AndroidUiThread_runDispatchCallback(JNIEnv* env, jobject _this)
 {
-	Queue< Ref<Runnable> >& queue = _AndroidUi_getDispatchQueue();
-	Ref<Runnable> callback;
-	while (queue.pop(&callback)) {
-		if (callback.isNotNull()) {
-			callback->run();
+	Queue< Ref<Runnable> >* queue = _AndroidUi_getDispatchQueue();
+	if (queue) {
+		Ref<Runnable> callback;
+		while (queue->pop(&callback)) {
+			if (callback.isNotNull()) {
+				callback->run();
+			}
 		}
 	}
 }

@@ -65,7 +65,11 @@ public:
 
 	static HWND createHandle(const WindowInstanceParam& param)
 	{
-		Win32_UI_Shared* ui = Win32_UI_Shared::get();
+		Win32_UI_Shared* shared = Win32_UI_Shared::get();
+		if (!shared) {
+			return NULL;
+		}
+
 		HINSTANCE hInst = ::GetModuleHandleW(NULL);
 
 		// create handle
@@ -104,7 +108,7 @@ public:
 			String16 title = param.title;
 			hWnd = ::CreateWindowExW(
 				styleEx // ex-style
-				, (LPCWSTR)((LONG_PTR)(ui->wndClassForWindow))
+				, (LPCWSTR)((LONG_PTR)(shared->wndClassForWindow))
 				, (LPCWSTR)(title.getData())
 				, style
 				, (int)(frameWindow.left), (int)(frameWindow.top)
@@ -936,7 +940,10 @@ LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 Ref<WindowInstance> Window::createWindowInstance(const WindowInstanceParam& param)
 {
 	HWND hWnd = _Win32_Window::createHandle(param);
-	return UIPlatform::createWindowInstance(hWnd);
+	if (hWnd) {
+		return UIPlatform::createWindowInstance(hWnd);
+	}
+	return Ref<WindowInstance>::null();
 }
 
 Ref<WindowInstance> UIPlatform::createWindowInstance(HWND hWnd, sl_bool flagDestroyOnRelease)

@@ -35,7 +35,7 @@ public:
 		dispatch_queue = dispatch_queue_create("SLIB_CAMERA", DISPATCH_QUEUE_SERIAL);
 	}
 };
-SLIB_SAFE_STATIC_GETTER(_AVFoundation_Camera_Static, _AVFoundation_Camera_getStatic);
+SLIB_SAFE_STATIC_GETTER(_AVFoundation_Camera_Static, _AVFoundation_Camera_getStatic)
 
 class _AVFoundation_Camera : public Camera
 {
@@ -105,7 +105,7 @@ public:
 		
 		AVCaptureVideoDataOutput* output = [[AVCaptureVideoDataOutput alloc] init];
 		[output setAlwaysDiscardsLateVideoFrames:YES];
-		dispatch_queue_t queue = _AVFoundation_Camera_getStatic().dispatch_queue;
+		dispatch_queue_t queue = _AVFoundation_Camera_getStatic()->dispatch_queue;
 		[output setSampleBufferDelegate:callback queue:queue];
 		
 		NSMutableDictionary *settings = [[NSMutableDictionary alloc] init];

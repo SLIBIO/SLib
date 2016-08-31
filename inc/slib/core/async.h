@@ -62,8 +62,6 @@ private:
 
 public:
 	static Ref<AsyncLoop> getDefault();
-
-	static void releaseDefault();
 	
 	static Ref<AsyncLoop> create(sl_bool flagAutoStart = sl_true);
 	

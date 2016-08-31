@@ -31,6 +31,11 @@ public:
 
 Ref<ViewInstance> RadioButton::createNativeWidget(ViewInstance* parent)
 {
+	Win32_UI_Shared* shared = Win32_UI_Shared::get();
+	if (!shared) {
+		return Ref<ViewInstance>::null();
+	}
+
 	String16 text = getText();
 	UINT style = BS_RADIOBUTTON | WS_TABSTOP;
 	Ref<_Win32_RadioButtonViewInstance> ret = Win32_ViewInstance::create<_Win32_RadioButtonViewInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);

@@ -56,7 +56,7 @@ public:
 		__applyContentSize(sv);
 	}
 	
-	void __applyProperties(UIScrollView* handle)
+	void __applyProperties(_Slib_iOS_ScrollView* handle)
 	{
 		handle.backgroundColor = UIPlatform::getUIColorFromColor(getBackgroundColor());
 		__applyContent(handle);
@@ -88,17 +88,17 @@ Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* _parent)
 void ScrollView::_refreshContentSize_NW()
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[UIScrollView class]]) {
-		UIScrollView* sv = (UIScrollView*)handle;
-		((_ScrollView*)this)->__applyContentSize(handle);
+	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_ScrollView class]]) {
+		_Slib_iOS_ScrollView* sv = (_Slib_iOS_ScrollView*)handle;
+		((_ScrollView*)this)->__applyContentSize(sv);
 	}
 }
 
 void ScrollView::_setContentView_NW(const Ref<View>& view)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[UIScrollView class]]) {
-		UIScrollView* sv = (UIScrollView*)handle;
+	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_ScrollView class]]) {
+		_Slib_iOS_ScrollView* sv = (_Slib_iOS_ScrollView*)handle;
 		((_ScrollView*)this)->__applyContent(sv);
 	}
 }

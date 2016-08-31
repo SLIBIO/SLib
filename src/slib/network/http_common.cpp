@@ -116,7 +116,10 @@ public:
 
 HttpMethod HttpMethods::fromString(const String& method)
 {
-	SLIB_SAFE_STATIC(_HttpMethod_Mapping, t);
+	SLIB_SAFE_STATIC(_HttpMethod_Mapping, t)
+	if (SLIB_SAFE_STATIC_CHECK_FREED(t)) {
+		return HttpMethod::Unknown;
+	}
 	return t.maps.getValue(method, HttpMethod::Unknown);
 }
 

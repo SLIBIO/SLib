@@ -90,13 +90,19 @@ Log::Log(const Ref<Logger>& logger, const Ref<Logger>& errorLogger)
 Ref<Log> Log::global()
 {
 	Ref<Logger> console(getConsoleLogger());
-	SLIB_SAFE_STATIC(Ref<Log>, log, new Log(console, console));
+	SLIB_SAFE_STATIC(Ref<Log>, log, new Log(console, console))
+	if (SLIB_SAFE_STATIC_CHECK_FREED(log)) {
+		return Ref<Log>::null();
+	}
 	return log;
 }
 
 Ref<Logger> Log::getConsoleLogger()
 {
-	SLIB_SAFE_STATIC(Ref<Logger>, logger, new ConsoleLogger);
+	SLIB_SAFE_STATIC(Ref<Logger>, logger, new ConsoleLogger)
+	if (SLIB_SAFE_STATIC_CHECK_FREED(logger)) {
+		return Ref<Logger>::null();
+	}
 	return logger;
 }
 

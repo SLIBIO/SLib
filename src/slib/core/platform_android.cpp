@@ -17,15 +17,21 @@ void Android::initialize(JavaVM* jvm)
 	Jni::initialize(jvm);
 }
 
-SLIB_SAFE_STATIC_REF(JniSafeGlobal<jobject>, _g_android_current_activity);
+SLIB_STATIC_ZERO_INITIALIZED(JniSafeGlobal<jobject>, _g_android_current_activity);
 
 jobject Android::getCurrentActivity()
 {
+	if (SLIB_SAFE_STATIC_CHECK_FREED(_g_android_current_activity)) {
+		return 0;
+	}
 	return _g_android_current_activity.get();
 }
 
 void Android::setCurrentActivity(jobject activity)
 {
+	if (SLIB_SAFE_STATIC_CHECK_FREED(_g_android_current_activity)) {
+		return;
+	}
 	_g_android_current_activity = activity;
 }
 

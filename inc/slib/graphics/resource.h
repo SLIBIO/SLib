@@ -102,8 +102,11 @@ SLIB_GRAPHICS_NAMESPACE_BEGIN
 
 #define SLIB_DEFINE_NINEPATCH_RESOURCE(NAME, LEFT_WIDTH, RIGHT_WIDTH, TOP_HEIGHT, BOTTOM_HEIGHT, TOP_LEFT, TOP, TOP_RIGHT, LEFT, CENTER, RIGHT, BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT) \
 	namespace NAME { \
-		SLIB_SAFE_STATIC_REF(SafeRef<Drawable>, value) \
+		SLIB_STATIC_ZERO_INITIALIZED(SafeRef<Drawable>, value) \
 		slib::Ref<slib::Drawable> get() { \
+			if (SLIB_SAFE_STATIC_CHECK_FREED(value)) { \
+				return slib::Ref<slib::Drawable>::null(); \
+			} \
 			if (value.isNull()) { \
 				value = NinePatchDrawable::create(LEFT_WIDTH, RIGHT_WIDTH, TOP_HEIGHT, BOTTOM_HEIGHT, TOP_LEFT, TOP, TOP_RIGHT, LEFT, CENTER, RIGHT, BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT); \
 			} \

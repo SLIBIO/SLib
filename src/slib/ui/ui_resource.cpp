@@ -81,6 +81,7 @@ void UILayoutResource::_layoutViews_safe(sl_real width, sl_real height)
 	Base::interlockedDecrement32(&m_countRecursiveLayout);
 }
 
+
 SLIB_DEFINE_OBJECT(WindowLayoutResource, Window)
 
 WindowLayoutResource::WindowLayoutResource(sl_real customUnitLength)
@@ -98,11 +99,24 @@ void WindowLayoutResource::dispatchResize(Size& size)
 	UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(WindowLayoutResource, _layoutViews_safe, this));
 }
 
+void WindowLayoutResource::dispatchMaximize()
+{
+	Window::dispatchMaximize();
+	UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(WindowLayoutResource, _layoutViews_safe, this));
+}
+
+void WindowLayoutResource::dispatchMinimize()
+{
+	Window::dispatchMinimize();
+	UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(WindowLayoutResource, _layoutViews_safe, this));
+}
+
 void WindowLayoutResource::_layoutViews_safe()
 {
 	Size size = getClientSize();
 	UILayoutResource::_layoutViews_safe(size.x, size.y);
 }
+
 
 SLIB_DEFINE_OBJECT(ViewLayoutResource, ViewGroup)
 

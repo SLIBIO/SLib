@@ -64,7 +64,10 @@ public:
 
 Ref<GraphicsContext> UI::getGraphicsContext()
 {
-	SLIB_SAFE_STATIC(Ref<GraphicsContext>, ret, new _UI_GraphicsContext);
+	SLIB_SAFE_STATIC(Ref<GraphicsContext>, ret, new _UI_GraphicsContext)
+	if (SLIB_SAFE_STATIC_CHECK_FREED(ret)) {
+		return Ref<GraphicsContext>::null();
+	}
 	return ret;
 }
 

@@ -77,16 +77,19 @@ public:
 	}
 	
 public:
-	static _CheckBox_Categories* get()
+	static ButtonCategory* getCategories()
 	{
-		SLIB_SAFE_STATIC(_CheckBox_Categories, ret);
-		return &ret;
+		SLIB_SAFE_STATIC(_CheckBox_Categories, ret)
+		if (SLIB_SAFE_STATIC_CHECK_FREED(ret)) {
+			return sl_null;
+		}
+		return ret.categories;
 	}
 };
 
 SLIB_DEFINE_OBJECT(CheckBox, Button)
 
-CheckBox::CheckBox() : CheckBox(2, _CheckBox_Categories::get()->categories)
+CheckBox::CheckBox() : CheckBox(2, _CheckBox_Categories::getCategories())
 {
 	setCreatingNativeWidget(sl_true);
 }

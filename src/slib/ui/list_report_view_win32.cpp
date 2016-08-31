@@ -2,7 +2,7 @@
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 
-#include "../../../inc/slib/ui/list_details_view.h"
+#include "../../../inc/slib/ui/list_report_view.h"
 
 #include "view_win32.h"
 
@@ -10,7 +10,7 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
-class _ListDetailsView : public ListDetailsView
+class _ListReportView : public ListReportView
 {
 public:
 	static sl_uint32 getColumnsCountFromListView(HWND hWnd)
@@ -51,9 +51,9 @@ public:
 		LVCOLUMNW lvc;
 		Base::zeroMemory(&lvc, sizeof(lvc));
 		lvc.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_FMT;
-		ListLocker<ListDetailsViewColumn> columns(m_columns);
+		ListLocker<ListReportViewColumn> columns(m_columns);
 		for (sl_size i = 0; i < columns.count; i++) {
-			ListDetailsViewColumn& column = columns[i];
+			ListReportViewColumn& column = columns[i];
 			String16 title = column.title;
 			lvc.pszText = (LPWSTR)(title.getData());
 			int width = (int)(column.width);
@@ -85,7 +85,7 @@ public:
 
 };
 
-class _Win32_ListDetailsViewInstance : public Win32_ViewInstance
+class _Win32_ListReportViewInstance : public Win32_ViewInstance
 {
 public:
     // override
@@ -104,8 +104,8 @@ public:
 	sl_bool processNotify(NMHDR* nmhdr, LRESULT& result)
 	{
 		Ref<View> _view = getView();
-		if (ListDetailsView::checkInstance(_view.ptr)) {
-			ListDetailsView* view = (ListDetailsView*)(_view.ptr);
+		if (ListReportView::checkInstance(_view.ptr)) {
+			ListReportView* view = (ListReportView*)(_view.ptr);
 			NMITEMACTIVATE* nm = (NMITEMACTIVATE*)nmhdr;
 			UINT code = nmhdr->code;
 			if (code == LVN_GETDISPINFOW) {
@@ -154,14 +154,19 @@ public:
 	}
 };
 
-Ref<ViewInstance> ListDetailsView::createNativeWidget(ViewInstance* parent)
+Ref<ViewInstance> ListReportView::createNativeWidget(ViewInstance* parent)
 {
+	Win32_UI_Shared* shared = Win32_UI_Shared::get();
+	if (!shared) {
+		return Ref<ViewInstance>::null();
+	}
+
 	DWORD style = LVS_REPORT | LVS_SINGLESEL | LVS_OWNERDATA | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_BORDER;
 	DWORD styleEx = 0;
 #if defined(_SLIB_UI_WIN32_USE_COMPOSITE_VIEWS)
 	styleEx |= WS_EX_COMPOSITED;
 #endif
-	Ref<_Win32_ListDetailsViewInstance> ret = Win32_ViewInstance::create<_Win32_ListDetailsViewInstance>(this, parent, L"SysListView32", L"", style, styleEx);
+	Ref<_Win32_ListReportViewInstance> ret = Win32_ViewInstance::create<_Win32_ListReportViewInstance>(this, parent, L"SysListView32", L"", style, styleEx);
 	
 	if (ret.isNotNull()) {
 
@@ -179,30 +184,30 @@ Ref<ViewInstance> ListDetailsView::createNativeWidget(ViewInstance* parent)
 		UINT exStyle = LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVS_EX_ONECLICKACTIVATE;
 		::SendMessageW(handle, LVM_SETEXTENDEDLISTVIEWSTYLE, exStyle, exStyle);
 
-		((_ListDetailsView*)this)->__copyColumns(handle);
-		((_ListDetailsView*)this)->__applyRowsCount(handle);
+		((_ListReportView*)this)->__copyColumns(handle);
+		((_ListReportView*)this)->__applyRowsCount(handle);
 	}
 	return ret;
 }
 
-void ListDetailsView::_refreshColumnsCount_NW()
+void ListReportView::_refreshColumnsCount_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		((_ListDetailsView*)this)->__applyColumnsCount(handle);
+		((_ListReportView*)this)->__applyColumnsCount(handle);
 	}
 }
 
-void ListDetailsView::_refreshRowsCount_NW()
+void ListReportView::_refreshRowsCount_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		((_ListDetailsView*)this)->__applyRowsCount(handle);
+		((_ListReportView*)this)->__applyRowsCount(handle);
 		::InvalidateRect(handle, NULL, TRUE);
 	}
 }
 
-void ListDetailsView::_setHeaderText_NW(sl_uint32 iCol, const String& _text)
+void ListReportView::_setHeaderText_NW(sl_uint32 iCol, const String& _text)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -215,7 +220,7 @@ void ListDetailsView::_setHeaderText_NW(sl_uint32 iCol, const String& _text)
 	}
 }
 
-void ListDetailsView::_setColumnWidth_NW(sl_uint32 iCol, sl_real width)
+void ListReportView::_setColumnWidth_NW(sl_uint32 iCol, sl_real width)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -226,23 +231,23 @@ void ListDetailsView::_setColumnWidth_NW(sl_uint32 iCol, sl_real width)
 	}
 }
 
-void ListDetailsView::_setHeaderAlignment_NW(sl_uint32 iCol, Alignment align)
+void ListReportView::_setHeaderAlignment_NW(sl_uint32 iCol, Alignment align)
 {
 }
 
-void ListDetailsView::_setColumnAlignment_NW(sl_uint32 iCol, Alignment align)
+void ListReportView::_setColumnAlignment_NW(sl_uint32 iCol, Alignment align)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		LVCOLUMNW lvc;
 		Base::zeroMemory(&lvc, sizeof(lvc));
 		lvc.mask = LVCF_FMT;
-		lvc.fmt = _ListDetailsView::translateAlignment(align);
+		lvc.fmt = _ListReportView::translateAlignment(align);
 		::SendMessageW(handle, LVM_SETCOLUMNW, (WPARAM)iCol, (LPARAM)(&lvc));
 	}
 }
 
-void ListDetailsView::_getSelectedRow_NW()
+void ListReportView::_getSelectedRow_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -250,7 +255,7 @@ void ListDetailsView::_getSelectedRow_NW()
 	}
 }
 
-void ListDetailsView::_setFont_NW(const Ref<Font>& font)
+void ListReportView::_setFont_NW(const Ref<Font>& font)
 {
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);

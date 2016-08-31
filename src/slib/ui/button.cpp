@@ -36,10 +36,13 @@ public:
 	}
 	
 public:
-	static _Button_Categories* get()
+	static ButtonCategory* getCategories()
 	{
-		SLIB_SAFE_STATIC(_Button_Categories, ret);
-		return &ret;
+		SLIB_SAFE_STATIC(_Button_Categories, ret)
+		if (SLIB_SAFE_STATIC_CHECK_FREED(ret)) {
+			return sl_null;
+		}
+		return ret.categories;
 	}
 };
 
@@ -82,13 +85,18 @@ Button::Button(sl_uint32 nCategories, ButtonCategory* categories)
 	m_nCategories = nCategories;
 	m_categories = New<ButtonCategory>::create(nCategories);
 	if (!categories) {
-		categories = _Button_Categories::get()->categories;
+		categories = _Button_Categories::getCategories();
 		if (nCategories > 2) {
 			nCategories = 2;
 		}
+		if (!categories) {
+			nCategories = 1;
+		}
 	}
-	for (sl_uint32 i = 0; i < nCategories; i++) {
-		m_categories[i] = categories[i];
+	if (categories) {
+		for (sl_uint32 i = 0; i < nCategories; i++) {
+			m_categories[i] = categories[i];
+		}
 	}
 	setOccurringClick(sl_true);
 }

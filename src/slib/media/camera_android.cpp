@@ -28,7 +28,7 @@ SLIB_JNI_END_CLASS
 
 class _Android_Camera;
 typedef HashMap<jlong, WeakRef<_Android_Camera> > _AndroidCameraMap;
-SLIB_SAFE_STATIC_GETTER(_AndroidCameraMap, _AndroidCameras_get);
+SLIB_SAFE_STATIC_GETTER(_AndroidCameraMap, _AndroidCameras_get)
 
 class _Android_Camera : public Camera
 {
@@ -48,10 +48,14 @@ public:
 public:
 	static Ref<_Android_Camera> _create(const CameraParam& param)
 	{
+		_AndroidCameraMap* cameraMap = _AndroidCameras_get();
+		if (!cameraMap) {
+			return Ref<_Android_Camera>::null();
+		}
 		Ref<_Android_Camera> ret = new _Android_Camera();
 		if (ret.isNotNull()) {
 			jlong instance = (jlong)(ret.ptr);
-			_AndroidCameras_get().put(instance, ret);
+			cameraMap->put(instance, ret);
 			JniLocal<jstring> jid = Jni::getJniString(param.deviceId);
 			JniLocal<jobject> jcamera = _JAndroidCamera::create.callObject(sl_null, jid.get(), instance);
 			if (jcamera.isNotNull()) {
@@ -71,21 +75,31 @@ public:
 
 	static Ref<_Android_Camera> get(jlong instance)
 	{
+		_AndroidCameraMap* cameraMap = _AndroidCameras_get();
+		if (!cameraMap) {
+			return Ref<_Android_Camera>::null();
+		}
 		WeakRef<_Android_Camera> camera;
-		_AndroidCameras_get().get(instance, &camera);
+		cameraMap->get(instance, &camera);
 		return camera;
 	}
 
 	void release()
 	{
 		ObjectLocker lock(this);
+
 		jobject jcamera = m_camera.get();
 		if (!jcamera) {
 			return;
 		}
+
 		_JAndroidCamera::release.call(jcamera);
 		m_camera.setNull();
-		_AndroidCameras_get().remove((jlong)this);
+
+		_AndroidCameraMap* cameraMap = _AndroidCameras_get();
+		if (cameraMap) {
+			cameraMap->remove((jlong)this);
+		}
 	}
 
 	sl_bool isOpened()

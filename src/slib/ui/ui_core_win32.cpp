@@ -34,12 +34,9 @@ public:
 
 	_Win32_UI();
 
-	static _Win32_UI* get()
-	{
-		SLIB_SAFE_STATIC(_Win32_UI, ui);
-		return &ui;
-	}
 };
+
+SLIB_SAFE_STATIC_GETTER(_Win32_UI, _Win32_getUI)
 
 class _Win32_Screen : public Screen
 {
@@ -61,7 +58,10 @@ public:
 
 List< Ref<Screen> > UI::getScreens()
 {
-	_Win32_UI* ui = _Win32_UI::get();
+	_Win32_UI* ui = _Win32_getUI();
+	if (!ui) {
+		return List< Ref<Screen> >::null();
+	}
 	List< Ref<Screen> > ret;
 	ret.add(ui->m_screenPrimary);
 	return ret;
@@ -69,13 +69,19 @@ List< Ref<Screen> > UI::getScreens()
 
 Ref<Screen> UI::getPrimaryScreen()
 {
-	_Win32_UI* ui = _Win32_UI::get();
+	_Win32_UI* ui = _Win32_getUI();
+	if (!ui) {
+		return Ref<Screen>::null();
+	}
 	return ui->m_screenPrimary;
 }
 
 Ref<Screen> UI::getFocusedScreen()
 {
-	_Win32_UI* ui = _Win32_UI::get();
+	_Win32_UI* ui = _Win32_getUI();
+	if (!ui) {
+		return Ref<Screen>::null();
+	}
 	return ui->m_screenPrimary;
 }
 
@@ -89,7 +95,7 @@ void UI::dispatchToUiThread(const Ref<Runnable>& callback)
 	if (callback.isNull()) {
 		return;
 	}
-	_Win32_UI* ui = _Win32_UI::get();
+	_Win32_UI* ui = _Win32_getUI();
 	if (!ui) {
 		return;
 	}
@@ -103,7 +109,7 @@ void UI::dispatchToUiThread(const Ref<Runnable>& callback)
 
 void _Win32_processUiDispatchQueue()
 {
-	_Win32_UI* ui = _Win32_UI::get();
+	_Win32_UI* ui = _Win32_getUI();
 	if (!ui) {
 		return;
 	}
@@ -134,7 +140,10 @@ LRESULT CALLBACK _Win32_MessageProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 void UIPlatform::runLoop(sl_uint32 level)
 {
-	_Win32_UI* ui = _Win32_UI::get();
+	_Win32_UI* ui = _Win32_getUI();
+	if (!ui) {
+		return;
+	}
 
 	MSG msg;
 	while (::GetMessageW(&msg, NULL, 0, 0)) {
@@ -287,6 +296,9 @@ Win32_UI_Shared::~Win32_UI_Shared()
 Win32_UI_Shared* Win32_UI_Shared::get()
 {
 	SLIB_SAFE_STATIC(Win32_UI_Shared, ret);
+	if (SLIB_SAFE_STATIC_CHECK_FREED(ret)) {
+		return sl_null;
+	}
 	return &ret;
 }
 

@@ -206,7 +206,10 @@ Size UI::getFontTextSize(const Ref<Font>& font, const String& _text)
 		return ret;
 	}
 
-	SLIB_SAFE_STATIC(_Win32_FontStatic, fs);
+	SLIB_SAFE_STATIC(_Win32_FontStatic, fs)
+	if (SLIB_SAFE_STATIC_CHECK_FREED(fs)) {
+		return ret;
+	}
 	if (fs.graphics) {
 		String16 text = _text;
 		Gdiplus::StringFormat format(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsNoClip);

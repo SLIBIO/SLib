@@ -22,7 +22,7 @@
 #include "ui/render_view.h"
 #include "ui/web_view.h"
 #include "ui/scroll_view.h"
-#include "ui/list_details_view.h"
+#include "ui/list_report_view.h"
 #include "ui/tab_view.h"
 
 #include "ui/scroll_bar.h"
