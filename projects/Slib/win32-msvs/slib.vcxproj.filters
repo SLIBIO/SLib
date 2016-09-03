@@ -1134,12 +1134,6 @@
     <ClCompile Include="..\..\..\src\slib\ui\drawable_gdiplus.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\drop_down_list.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\drop_down_list_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\edit_view.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
@@ -1402,6 +1396,12 @@
       <Filter>src\slib\ui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\list_report_view.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\select_view_win32.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\select_view.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
   </ItemGroup>

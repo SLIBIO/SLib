@@ -40,9 +40,9 @@ public:
 	sl_bool isImage();
 	
 public:
-	static Ref<BrushDrawable> createBrushDrawable(const Ref<Brush>& brush);
+	static Ref<Drawable> createBrushDrawable(const Ref<Brush>& brush);
 	
-	static Ref<ColorDrawable> createColorDrawable(const Color& color);
+	static Ref<Drawable> createColorDrawable(const Color& color);
 	
 	static Ref<Drawable> createEmptyDrawable();
 	
@@ -61,7 +61,7 @@ class SLIB_EXPORT BrushDrawable : public Drawable
 	SLIB_DECLARE_OBJECT
 	
 public:
-	static Ref<BrushDrawable> create(const Ref<Brush>& brush);
+	static Ref<Drawable> create(const Ref<Brush>& brush);
 	
 public:
 	// override
@@ -77,7 +77,7 @@ class SLIB_EXPORT ColorDrawable : public BrushDrawable
 	SLIB_DECLARE_OBJECT
 	
 public:
-	static Ref<ColorDrawable> create(const Color& color);
+	static Ref<Drawable> create(const Color& color);
 	
 };
 
@@ -86,7 +86,7 @@ class SLIB_EXPORT EmptyDrawable : public Drawable
 	SLIB_DECLARE_OBJECT
 
 public:
-	static Ref<EmptyDrawable> create();
+	static Ref<Drawable> create();
 	
 public:
 	// override
@@ -101,7 +101,7 @@ class SLIB_EXPORT RectangleDrawable : public Drawable
 	SLIB_DECLARE_OBJECT
 	
 public:
-	static Ref<RectangleDrawable> create(const Ref<Pen>& pen, const Ref<Brush>& brush);
+	static Ref<Drawable> create(const Ref<Pen>& pen, const Ref<Brush>& brush);
 	
 public:
 	// override
@@ -118,7 +118,7 @@ class SLIB_EXPORT SubDrawable : public Drawable
 	SLIB_DECLARE_OBJECT
 	
 public:
-	static Ref<SubDrawable> create(const Ref<Drawable>& src, sl_real x, sl_real y, sl_real width, sl_real height);
+	static Ref<Drawable> create(const Ref<Drawable>& src, sl_real x, sl_real y, sl_real width, sl_real height);
 	
 public:
 	// override
@@ -153,7 +153,7 @@ class SLIB_EXPORT ScaledDrawable : public Drawable
 	SLIB_DECLARE_OBJECT
 	
 public:
-	static Ref<ScaledDrawable> create(const Ref<Drawable>& src, sl_real width, sl_real height);
+	static Ref<Drawable> create(const Ref<Drawable>& src, sl_real width, sl_real height);
 	
 public:
 	// override
@@ -186,7 +186,7 @@ class SLIB_EXPORT ScaledSubDrawable : public Drawable
 	SLIB_DECLARE_OBJECT
 	
 public:
-	static Ref<ScaledSubDrawable> create(const Ref<Drawable>& src, const Rectangle& rectSrc, sl_real width, sl_real height);
+	static Ref<Drawable> create(const Ref<Drawable>& src, const Rectangle& rectSrc, sl_real width, sl_real height);
 	
 public:
 	// override
@@ -215,12 +215,12 @@ protected:
 	
 };
 
-class SLIB_EXPORT NinePatchDrawable : public Drawable
+class SLIB_EXPORT NinePiecesDrawable : public Drawable
 {
 	SLIB_DECLARE_OBJECT
 	
 public:
-	static Ref<NinePatchDrawable> create(sl_real leftWidth, sl_real rightWidth, sl_real topHeight, sl_real bottomHeight,
+	static Ref<Drawable> create(sl_real leftWidth, sl_real rightWidth, sl_real topHeight, sl_real bottomHeight,
 										 const Ref<Drawable>& topLeft, const Ref<Drawable>& top, const Ref<Drawable>& topRight,
 										 const Ref<Drawable>& left, const Ref<Drawable>& center, const Ref<Drawable>& right,
 										 const Ref<Drawable>& bottomLeft, const Ref<Drawable>& bottom, const Ref<Drawable>& bottomRight);
@@ -243,6 +243,33 @@ protected:
 	Ref<Drawable> m_partBottomLeft;
 	Ref<Drawable> m_partBottom;
 	Ref<Drawable> m_partBottomRight;
+	
+};
+
+class SLIB_EXPORT NinePatchDrawable : public Drawable
+{
+	SLIB_DECLARE_OBJECT
+	
+public:
+	static Ref<Drawable> create(sl_real leftWidthDst, sl_real rightWidthDst, sl_real topHeightDst, sl_real bottomHeightDst,
+			const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc, sl_real topHeightSrc, sl_real bottomHeightSrc);
+	
+	static Ref<Drawable> create(const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc, sl_real topHeightSrc, sl_real bottomHeightSrc);
+	
+public:
+	// override
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	
+protected:
+	sl_real m_widthLeftDst;
+	sl_real m_widthRightDst;
+	sl_real m_heightTopDst;
+	sl_real m_heightBottomDst;
+	Ref<Drawable> m_src;
+	sl_real m_widthLeftSrc;
+	sl_real m_widthRightSrc;
+	sl_real m_heightTopSrc;
+	sl_real m_heightBottomSrc;
 	
 };
 

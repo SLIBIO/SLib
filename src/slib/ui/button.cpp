@@ -53,17 +53,21 @@ Button::Button() : Button(2)
 
 Button::Button(sl_uint32 nCategories, ButtonCategory* categories)
 {
-	m_flagDefaultButton = sl_false;
+	setCreatingNativeWidget(sl_false);
 	
-	View::setBackgroundColor(Color::Transparent, sl_false);
-	View::setBorderPen(Pen::getDefault(), sl_false);
+	setAlwaysOnDrawBackground(sl_true, sl_false);
+	setAlwaysOnDrawBorder(sl_true, sl_false);
+	
+	m_flagDefaultButton = sl_false;
+
+	m_textColorDefault = Color::Black;
 	
 	m_state = ButtonState::Normal;
 	m_category = 0;
 	
 	m_iconSize.x = 0;
 	m_iconSize.y = 0;
-	m_contentAlignment = Alignment::MiddleCenter;
+	m_gravity = Alignment::MiddleCenter;
 	m_iconAlignment = Alignment::MiddleCenter;
 	m_textAlignment = Alignment::MiddleCenter;
 	m_flagTextBeforeIcon = sl_false;
@@ -193,14 +197,34 @@ void Button::setIconSize(sl_real size, sl_bool flagRedraw)
 	setIconSize(Size(size, size),flagRedraw);
 }
 
-Alignment Button::getContentAlignment()
+sl_real Button::getIconWidth()
 {
-	return m_contentAlignment;
+	return m_iconSize.x;
 }
 
-void Button::setContentAlignment(Alignment align, sl_bool flagRedraw)
+void Button::setIconWidth(sl_real width, sl_bool flagRedraw)
 {
-	m_contentAlignment = align;
+	setIconSize(Size(width, m_iconSize.y), flagRedraw);
+}
+
+sl_real Button::getIconHeight()
+{
+	return m_iconSize.y;
+}
+
+void Button::setIconHeight(sl_real height, sl_bool flagRedraw)
+{
+	setIconSize(Size(m_iconSize.x, height), flagRedraw);
+}
+
+Alignment Button::getGravity()
+{
+	return m_gravity;
+}
+
+void Button::setGravity(Alignment align, sl_bool flagRedraw)
+{
+	m_gravity = align;
 	if (flagRedraw) {
 		invalidate();
 	}
@@ -389,6 +413,19 @@ void Button::setTextColor(const Color& color, ButtonState state, sl_uint32 categ
 	}
 }
 
+Color Button::getTextColor()
+{
+	return m_textColorDefault;
+}
+
+void Button::setTextColor(const Color& color, sl_bool flagRedraw)
+{
+	m_textColorDefault = color;
+	if (flagRedraw) {
+		invalidate();
+	}
+}
+
 Color Button::getBackgroundColor(ButtonState state, sl_uint32 category)
 {
 	if (category < m_nCategories) {
@@ -406,6 +443,16 @@ void Button::setBackgroundColor(const Color& color, ButtonState state, sl_uint32
 			invalidate();
 		}
 	}
+}
+
+Color Button::getBackgroundColor()
+{
+	return View::getBackgroundColor();
+}
+
+void Button::setBackgroundColor(const Color& color, sl_bool flagRedraw)
+{
+	View::setBackgroundColor(color, flagRedraw);
 }
 
 Ref<Drawable> Button::getBackground(ButtonState state, sl_uint32 category)
@@ -427,6 +474,16 @@ void Button::setBackground(const Ref<Drawable>& background, ButtonState state, s
 	}
 }
 
+Ref<Drawable> Button::getBackground()
+{
+	return View::getBackground();
+}
+
+void Button::setBackground(const Ref<Drawable>& background, sl_bool flagRedraw)
+{
+	View::setBackground(background ,flagRedraw);
+}
+
 Ref<Drawable> Button::getIcon(ButtonState state, sl_uint32 category)
 {
 	if (category < m_nCategories) {
@@ -443,6 +500,19 @@ void Button::setIcon(const Ref<Drawable>& icon, ButtonState state, sl_uint32 cat
 		if (flagRedraw) {
 			invalidate();
 		}
+	}
+}
+
+Ref<Drawable> Button::getIcon()
+{
+	return m_iconDefault;
+}
+
+void Button::setIcon(const Ref<Drawable>& icon, sl_bool flagRedraw)
+{
+	m_iconDefault = icon;
+	if (flagRedraw) {
+		invalidate();
 	}
 }
 
@@ -465,24 +535,14 @@ void Button::setBorder(const Ref<Pen>& pen, ButtonState state, sl_uint32 categor
 	}
 }
 
-Color Button::getBackgroundColor()
+Ref<Pen> Button::getBorder()
 {
-	return View::getBackgroundColor();
+	return View::getBorder();
 }
 
-void Button::setBackgroundColor(const Color& color, sl_bool flagRedraw)
+void Button::setBorder(const Ref<Pen>& pen, sl_bool flagRedraw)
 {
-	View::setBackgroundColor(color, flagRedraw);
-}
-
-Ref<Drawable> Button::getBackground()
-{
-	return View::getBackground();
-}
-
-void Button::setBackground(const Ref<Drawable>& background, sl_bool flagRedraw)
-{
-	View::setBackground(background, flagRedraw);
+	View::setBorder(pen, flagRedraw);
 }
 
 void Button::setEnabled(sl_bool flagEnabled, sl_bool flagRedraw)
@@ -512,10 +572,10 @@ void Button::onDraw(Canvas* canvas)
 	Color textColor = params.textColor;
 	Ref<Drawable> icon = params.icon;
 	if (textColor.isZero()) {
-		textColor = m_categories[m_category].properties[(int)ButtonState::Normal].textColor;
+		textColor = m_textColorDefault;
 	}
 	if (icon.isNull()) {
-		icon = m_categories[m_category].properties[(int)ButtonState::Normal].icon;
+		icon = m_iconDefault;
 	}
 	drawContent(canvas, icon, m_text, textColor);
 }
@@ -526,18 +586,14 @@ void Button::onDrawBackground(Canvas* canvas)
 	Color color = params.backgroundColor;
 	Ref<Drawable> background = params.background;
 	if (color.isZero()) {
-		color = m_categories[m_category].properties[(int)ButtonState::Normal].backgroundColor;
-		if (color.isZero()) {
-			color = View::getBackgroundColor();
-		}
+		color = View::getBackgroundColor();
 	}
 	if (background.isNull()) {
-		background = m_categories[m_category].properties[(int)ButtonState::Normal].background;
-		if (background.isNull()) {
-			background = View::getBackground();
-		}
+		background = View::getBackground();
 	}
-	drawBackground(canvas, color, background);
+	if (background.isNotNull() || color.a > 0) {
+		drawBackground(canvas, color, background);		
+	}
 }
 
 void Button::onDrawBorder(Canvas* canvas)
@@ -545,12 +601,39 @@ void Button::onDrawBorder(Canvas* canvas)
 	ButtonCategoryProperties& params = m_categories[m_category].properties[(int)m_state];
 	Ref<Pen> pen = params.border;
 	if (pen.isNull()) {
-		pen = m_categories[m_category].properties[(int)ButtonState::Normal].border;
-		if (pen.isNull()) {
-			pen = getBorderPen();
-		}
+		pen = getBorder();
 	}
-	drawBorder(canvas, pen);
+	if (pen.isNotNull()) {
+		drawBorder(canvas, pen);
+	}
+}
+
+void Button::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
+{
+	if (!flagVertical && !flagHorizontal) {
+		return;
+	}
+	
+	Ref<GraphicsContext> gc = getGraphicsContext();
+	if (gc.isNull()) {
+		return;
+	}
+	
+	Size size = measureContentSize(gc.ptr);
+	
+	if (flagHorizontal) {
+		if (size.x < 0) {
+			size.x = 0;
+		}
+		setMeasuredWidth(size.x + getPaddingLeft() + getPaddingRight());
+	}
+	if (flagVertical) {
+		if (size.y < 0) {
+			size.y = 0;
+		}
+		setMeasuredHeight(size.y + getPaddingTop() + getPaddingBottom());
+	}
+	
 }
 
 void Button::_invalidateButtonState()
@@ -706,6 +789,9 @@ Size Button::measureContentSize(GraphicsContext* gc)
 
 void Button::drawContent(Canvas* canvas, const Ref<Drawable>& icon, const String& text, const Color& textColor)
 {
+	if (text.isEmpty() && icon.isNull()) {
+		return;
+	}
 	Ref<GraphicsContext> gc = canvas->getGraphicsContext();
 	if (gc.isNull()) {
 		return;
@@ -717,19 +803,19 @@ void Button::drawContent(Canvas* canvas, const Ref<Drawable>& icon, const String
 	Size sizeContent;
 	Rectangle rcIcon, rcText;
 	layoutIconAndText(gc.ptr, bound.getWidth(), bound.getHeight(), sizeContent, rcIcon, rcText);
-	Point pt = GraphicsUtil::calculateAlignPosition(bound, sizeContent.x, sizeContent.y, m_contentAlignment);
-	rcIcon.left += pt.x;
-	rcIcon.top += pt.y;
-	rcIcon.right += pt.x;
-	rcIcon.bottom += pt.y;
-	rcText.left += pt.x;
-	rcText.top += pt.y;
-	rcText.right += pt.x;
-	rcText.bottom += pt.y;
+	Point pt = GraphicsUtil::calculateAlignPosition(bound, sizeContent.x, sizeContent.y, m_gravity);
 	if (icon.isNotNull()) {
+		rcIcon.left += pt.x;
+		rcIcon.top += pt.y;
+		rcIcon.right += pt.x;
+		rcIcon.bottom += pt.y;
 		canvas->draw(rcIcon, icon);
 	}
 	if (text.isNotEmpty()) {
+		rcText.left += pt.x;
+		rcText.top += pt.y;
+		rcText.right += pt.x;
+		rcText.bottom += pt.y;
 		canvas->drawText(text, rcText.left, rcText.top, getFont(), textColor);
 	}
 }

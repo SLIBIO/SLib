@@ -5,9 +5,9 @@ SLIB_UI_NAMESPACE_BEGIN
 class _CheckBox_Icon : public Drawable
 {
 public:
-	SafeRef<Pen> m_penBorder;
-	SafeRef<Brush> m_brush;
-	SafeRef<Pen> m_penCheck;
+	Ref<Pen> m_penBorder;
+	Ref<Brush> m_brush;
+	Ref<Pen> m_penCheck;
 	
 public:
 	_CheckBox_Icon(const Ref<Pen>& penBorder, const Color& backColor, const Ref<Pen>& penCheck)
@@ -96,11 +96,13 @@ CheckBox::CheckBox() : CheckBox(2, _CheckBox_Categories::getCategories())
 
 CheckBox::CheckBox(sl_uint32 nCategories, ButtonCategory* categories) : Button(nCategories, categories)
 {
+	setCreatingNativeWidget(sl_false);
+	
 	m_flagChecked = sl_false;
 	setIconSize(Font::getDefaultFontSize());
 	setIconMargin(2);
 	setTextMargin(2, 0, 2, 2);
-	setContentAlignment(Alignment::MiddleLeft);
+	setGravity(Alignment::MiddleLeft);
 	setIconAlignment(Alignment::MiddleLeft);
 	setTextAlignment(Alignment::MiddleLeft);
 }

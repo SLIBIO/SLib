@@ -28,9 +28,9 @@ public:
 	
 	virtual void setText(const String& text, sl_bool flagRedraw = sl_true);
 	
-	Alignment getTextAlignment();
+	Alignment getGravity();
 	
-	virtual void setTextAlignment(Alignment align, sl_bool flagRedraw = sl_true);
+	virtual void setGravity(Alignment align, sl_bool flagRedraw = sl_true);
 	
 	String getHintText();
 	
@@ -47,6 +47,10 @@ public:
 	Color getTextColor();
 	
 	virtual void setTextColor(const Color& color, sl_bool flagRedraw = sl_true);
+	
+protected:
+	// override
+	void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 	
 public:
 	SLIB_PTR_PROPERTY(IEditViewListener, Listener)

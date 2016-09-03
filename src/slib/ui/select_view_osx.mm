@@ -2,11 +2,11 @@
 
 #if defined(SLIB_PLATFORM_IS_OSX)
 
-#include "../../../inc/slib/ui/drop_down_list.h"
+#include "../../../inc/slib/ui/select_view.h"
 
 #include "view_osx.h"
 
-@interface _Slib_OSX_DropDownList : NSPopUpButton {
+@interface _Slib_OSX_SelectView : NSPopUpButton {
 	
 	@public slib::WeakRef<slib::OSX_ViewInstance> m_viewInstance;
 
@@ -16,7 +16,7 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
-class _DropDownList : public DropDownList
+class _SelectView : public SelectView
 {
 public:
 	void __applyItemsCount(NSPopUpButton* v)
@@ -85,13 +85,13 @@ public:
 	}
 };
 
-Ref<ViewInstance> DropDownList::createNativeWidget(ViewInstance* _parent)
+Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* _parent)
 {
 	OSX_VIEW_CREATE_INSTANCE_BEGIN
-	_Slib_OSX_DropDownList* handle = [[_Slib_OSX_DropDownList alloc] initWithFrame:frame];
+	_Slib_OSX_SelectView* handle = [[_Slib_OSX_SelectView alloc] initWithFrame:frame];
 	if (handle != nil) {
 		[handle setPullsDown:NO];
-		((_DropDownList*)this)->__copyItems(handle);
+		((_SelectView*)this)->__copyItems(handle);
 		
 		Ref<Font> font = getFont();
 		Ref<FontInstance> fontInstance;
@@ -104,16 +104,16 @@ Ref<ViewInstance> DropDownList::createNativeWidget(ViewInstance* _parent)
 	return ret;
 }
 
-void DropDownList::_getSelectedIndex_NW()
+void SelectView::_getSelectedIndex_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
 		NSPopUpButton* v = (NSPopUpButton*)handle;
-		m_indexSelected = ((_DropDownList*)this)->__getSelectedIndex(v);
+		m_indexSelected = ((_SelectView*)this)->__getSelectedIndex(v);
 	}
 }
 
-void DropDownList::_select_NW(sl_uint32 index)
+void SelectView::_select_NW(sl_uint32 index)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
@@ -122,34 +122,34 @@ void DropDownList::_select_NW(sl_uint32 index)
 	}
 }
 
-void DropDownList::_refreshItemsCount_NW()
+void SelectView::_refreshItemsCount_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
 		NSPopUpButton* v = (NSPopUpButton*)handle;
-		((_DropDownList*)this)->__applyItemsCount(v);
+		((_SelectView*)this)->__applyItemsCount(v);
 	}
 }
 
-void DropDownList::_refreshItemsContent_NW()
+void SelectView::_refreshItemsContent_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
 		NSPopUpButton* v = (NSPopUpButton*)handle;
-		((_DropDownList*)this)->__copyItems(v);
+		((_SelectView*)this)->__copyItems(v);
 	}
 }
 
-void DropDownList::_setItemTitle_NW(sl_uint32 index, const String& title)
+void SelectView::_setItemTitle_NW(sl_uint32 index, const String& title)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
 		NSPopUpButton* v = (NSPopUpButton*)handle;
-		((_DropDownList*)this)->__setItemTitle(v, index, title);
+		((_SelectView*)this)->__setItemTitle(v, index, title);
 	}
 }
 
-void DropDownList::_setFont_NW(const Ref<Font>& font)
+void SelectView::_setFont_NW(const Ref<Font>& font)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
@@ -164,7 +164,7 @@ void DropDownList::_setFont_NW(const Ref<Font>& font)
 
 SLIB_UI_NAMESPACE_END
 
-@implementation _Slib_OSX_DropDownList
+@implementation _Slib_OSX_SelectView
 -(id)initWithFrame:(NSRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -180,8 +180,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::DropDownList::checkInstance(view.ptr)) {
-			((slib::_DropDownList*)(view.ptr))->__onSelectItem(self);
+		if (slib::SelectView::checkInstance(view.ptr)) {
+			((slib::_SelectView*)(view.ptr))->__onSelectItem(self);
 		}
 	}
 }

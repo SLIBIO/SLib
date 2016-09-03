@@ -658,6 +658,8 @@ void View::_setFrame(const Rectangle& _frame, sl_bool flagRedraw, sl_bool flagLa
 			Ref<View> parent = getParent();
 			if (parent.isNotNull()) {
 				parent->requestLayout(sl_false);
+			} else {
+				UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, _makeLayout, this, sl_false));
 			}
 		}
 	}
@@ -1086,12 +1088,18 @@ void View::measureLayout()
 	PositionMode rightMode = layout->rightMode;
 	PositionMode topMode = layout->topMode;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
 	PositionMode bottomMode = layout->bottomMode;
+	
 	if (widthMode == SizeMode::Filling) {
-		if (leftMode == PositionMode::CenterInParent || leftMode == PositionMode::CenterInOther || leftMode == PositionMode::Fixed) {
-			leftMode = PositionMode::ParentEdge;
-		}
-		if (rightMode == PositionMode::Fixed) {
-			rightMode = PositionMode::ParentEdge;
+		if (leftMode == PositionMode::CenterInParent || leftMode == PositionMode::CenterInOther) {
+			widthMode = SizeMode::Weight;
+			rightMode = PositionMode::Fixed;
+		} else {
+			if (leftMode == PositionMode::Fixed) {
+				leftMode = PositionMode::ParentEdge;
+			}
+			if (rightMode == PositionMode::Fixed) {
+				rightMode = PositionMode::ParentEdge;
+			}
 		}
 	} else {
 		if (leftMode != PositionMode::Fixed) {
@@ -1099,11 +1107,16 @@ void View::measureLayout()
 		}
 	}
 	if (heightMode == SizeMode::Filling) {
-		if (topMode == PositionMode::CenterInParent || topMode == PositionMode::CenterInOther || topMode == PositionMode::Fixed) {
-			topMode = PositionMode::ParentEdge;
-		}
-		if (bottomMode == PositionMode::Fixed) {
-			bottomMode = PositionMode::ParentEdge;
+		if (topMode == PositionMode::CenterInParent || topMode == PositionMode::CenterInOther) {
+			heightMode = SizeMode::Weight;
+			bottomMode = PositionMode::Fixed;
+		} else {
+			if (topMode == PositionMode::Fixed) {
+				topMode = PositionMode::ParentEdge;
+			}
+			if (bottomMode == PositionMode::Fixed) {
+				bottomMode = PositionMode::ParentEdge;
+			}
 		}
 	} else {
 		if (topMode != PositionMode::Fixed) {
@@ -1394,11 +1407,16 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 	PositionMode bottomMode = layout->bottomMode;
 	
 	if (widthMode == SizeMode::Filling) {
-		if (leftMode == PositionMode::CenterInParent || leftMode == PositionMode::CenterInOther || leftMode == PositionMode::Fixed) {
-			leftMode = PositionMode::ParentEdge;
-		}
-		if (rightMode == PositionMode::Fixed) {
-			rightMode = PositionMode::ParentEdge;
+		if (leftMode == PositionMode::CenterInParent || leftMode == PositionMode::CenterInOther) {
+			widthMode = SizeMode::Weight;
+			rightMode = PositionMode::Fixed;
+		} else {
+			if (leftMode == PositionMode::Fixed) {
+				leftMode = PositionMode::ParentEdge;
+			}
+			if (rightMode == PositionMode::Fixed) {
+				rightMode = PositionMode::ParentEdge;
+			}
 		}
 	} else {
 		if (leftMode != PositionMode::Fixed) {
@@ -1406,11 +1424,16 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 		}
 	}
 	if (heightMode == SizeMode::Filling) {
-		if (topMode == PositionMode::CenterInParent || topMode == PositionMode::CenterInOther || topMode == PositionMode::Fixed) {
-			topMode = PositionMode::ParentEdge;
-		}
-		if (bottomMode == PositionMode::Fixed) {
-			bottomMode = PositionMode::ParentEdge;
+		if (topMode == PositionMode::CenterInParent || topMode == PositionMode::CenterInOther) {
+			heightMode = SizeMode::Weight;
+			bottomMode = PositionMode::Fixed;
+		} else {
+			if (topMode == PositionMode::Fixed) {
+				topMode = PositionMode::ParentEdge;
+			}
+			if (bottomMode == PositionMode::Fixed) {
+				bottomMode = PositionMode::ParentEdge;
+			}
 		}
 	} else {
 		if (topMode != PositionMode::Fixed) {
@@ -1430,10 +1453,8 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 			}
 			break;
 		case SizeMode::Filling:
-			width = parentWidth;
-			break;
 		case SizeMode::Weight:
-			width = parentWidth * layout->widthWeight;
+			width = parentWidth * Math::abs(layout->widthWeight);
 			break;
 		default:
 			width = frame.getWidth();
@@ -1447,10 +1468,8 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 			}
 			break;
 		case SizeMode::Filling:
-			height = parentHeight;
-			break;
 		case SizeMode::Weight:
-			height = parentHeight * layout->heightWeight;
+			height = parentHeight * Math::abs(layout->heightWeight);
 			break;
 		default:
 			height = frame.getHeight();
@@ -1600,6 +1619,13 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 		if (frame.right < frame.left) {
 			frame.right = frame.left;
 		}
+		if (width > 0 && width < frame.right - frame.left) {
+			if (layout->widthWeight > 0) {
+				frame.right = frame.left + width;
+			} else {
+				frame.left = frame.right - width;
+			}
+		}
 	} else {
 		if (leftMode == PositionMode::Fixed) {
 			if (rightMode != PositionMode::Fixed) {
@@ -1615,6 +1641,13 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 		if (frame.bottom < frame.top) {
 			frame.bottom = frame.top;
 		}
+		if (height > 0 && height < frame.bottom - frame.top) {
+			if (layout->heightWeight > 0) {
+				frame.bottom = frame.top + height;
+			} else {
+				frame.top = frame.bottom - height;
+			}
+		}
 	} else {
 		if (topMode == PositionMode::Fixed) {
 			if (bottomMode != PositionMode::Fixed) {
@@ -1627,6 +1660,7 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 		}
 	}
 	layout->frame = frame;
+	layout->flagUpdatedLayoutFrame = sl_true;
 }
 
 void View::_measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical)
@@ -1686,76 +1720,82 @@ void View::_makeLayout(sl_bool flagApplyLayout)
 			
 			layout->flagRecursiveMakeLayout = sl_true;
 			
-			if (flagApplyLayout) {
-				if (layout->frame.isAlmostEqual(m_frame)) {
-					return;
-				}
-				Size oldSize = m_frame.getSize();
-				_setFrame(layout->frame, sl_false, sl_true);
-				if (layout->frame.getSize().isAlmostEqual(oldSize)) {
-					return;
-				}
-			} else {
-				if (!(layout->flagInvalidLayout)) {
-					return;
-				}
-				if (layout->widthMode == SizeMode::Wrapping || layout->heightMode == SizeMode::Wrapping) {
-					measureLayout();
-					Rectangle frame = layout->frame;
-					if (layout->widthMode == SizeMode::Wrapping) {
-						frame.setWidth(layout->measuredWidth);
+			do {
+				if (flagApplyLayout) {
+					if (layout->frame.isAlmostEqual(m_frame)) {
+						break;
 					}
-					if (layout->heightMode == SizeMode::Wrapping) {
-						frame.setHeight(layout->measuredHeight);
+					Size oldSize = m_frame.getSize();
+					_setFrame(layout->frame, sl_false, sl_true);
+					if (layout->frame.getSize().isAlmostEqual(oldSize)) {
+						break;
 					}
-					_setFrame(frame, sl_false, sl_true);
-				}
-			}
-			
-			ViewPrepareLayoutParam param;
-			param.parentContentFrame.left = layout->paddingLeft;
-			param.parentContentFrame.top = layout->paddingTop;
-			param.parentContentFrame.right = getWidth() - layout->paddingRight;
-			param.parentContentFrame.bottom = getHeight() - layout->paddingBottom;
-			if (param.parentContentFrame.right < param.parentContentFrame.left) {
-				param.parentContentFrame.right = param.parentContentFrame.left;
-			}
-			if (param.parentContentFrame.bottom < param.parentContentFrame.top) {
-				param.parentContentFrame.bottom = param.parentContentFrame.top;
-			}
-			param.flagUseLayoutFrame = sl_false;
-			
-			{
-				ListLocker< Ref<View> > children(m_children);
-				for (sl_size i = 0; i < children.count; i++) {
-					Ref<View>& child = children[i];
-					if (child.isNotNull()) {
-						child->_prepareLayout(param);
+				} else {
+					if (!(layout->flagInvalidLayout)) {
+						break;
 					}
-				}
-			}
-			
-			if (layout->flagOnMakeLayout) {
-				onMakeLayout();
-			}
-			
-			param.flagUseLayoutFrame = sl_true;
-
-			{
-				ListLocker< Ref<View> > children(m_children);
-				for (sl_size i = 0; i < children.count; i++) {
-					Ref<View>& child = children[i];
-					if (child.isNotNull()) {
-						child->_prepareLayout(param);
-						if (child->isOnPrepareLayoutEnabled()) {
-							child->onPrepareLayout(param);
+					if (layout->widthMode == SizeMode::Wrapping || layout->heightMode == SizeMode::Wrapping) {
+						measureLayout();
+						Rectangle frame = layout->frame;
+						if (layout->widthMode == SizeMode::Wrapping) {
+							frame.setWidth(layout->measuredWidth);
 						}
-						child->_makeLayout(sl_true);
+						if (layout->heightMode == SizeMode::Wrapping) {
+							frame.setHeight(layout->measuredHeight);
+						}
+						_setFrame(frame, sl_false, sl_true);
 					}
 				}
-			}
-			
-			layout->flagInvalidLayout = sl_false;
+				
+				ViewPrepareLayoutParam param;
+				param.parentContentFrame.left = layout->paddingLeft;
+				param.parentContentFrame.top = layout->paddingTop;
+				param.parentContentFrame.right = getWidth() - layout->paddingRight;
+				param.parentContentFrame.bottom = getHeight() - layout->paddingBottom;
+				if (param.parentContentFrame.right < param.parentContentFrame.left) {
+					param.parentContentFrame.right = param.parentContentFrame.left;
+				}
+				if (param.parentContentFrame.bottom < param.parentContentFrame.top) {
+					param.parentContentFrame.bottom = param.parentContentFrame.top;
+				}
+				param.flagUseLayoutFrame = sl_false;
+				
+				{
+					ListLocker< Ref<View> > children(m_children);
+					for (sl_size i = 0; i < children.count; i++) {
+						Ref<View>& child = children[i];
+						if (child.isNotNull() && child->isLayoutEnabled()) {
+							child->_prepareLayout(param);
+							child->setLayoutFrameUpdated(sl_false);
+						}
+					}
+				}
+				
+				if (layout->flagOnMakeLayout) {
+					onMakeLayout();
+				}
+				
+				param.flagUseLayoutFrame = sl_true;
+
+				{
+					ListLocker< Ref<View> > children(m_children);
+					for (sl_size i = 0; i < children.count; i++) {
+						Ref<View>& child = children[i];
+						if (child.isNotNull() && child->isLayoutEnabled()) {
+							if (!(child->isLayoutFrameUpdated())) {
+								child->_prepareLayout(param);
+								if (child->isOnPrepareLayoutEnabled()) {
+									child->onPrepareLayout(param);
+								}
+							}
+							child->_makeLayout(sl_true);
+						}
+					}
+				}
+				
+				layout->flagInvalidLayout = sl_false;
+				
+			} while (0);
 
 			layout->flagRecursiveMakeLayout = sl_false;
 			
@@ -1858,12 +1898,29 @@ Rectangle View::getLayoutFrame()
 
 void View::setLayoutFrame(const Rectangle& rect)
 {
-	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull() && layout->flagEnabled) {
 		layout->frame = rect;
+		layout->flagUpdatedLayoutFrame = sl_true;
 	} else {
 		_setFrame(rect, sl_false, sl_true);
+	}
+}
+
+sl_bool View::isLayoutFrameUpdated()
+{
+	Ref<LayoutAttributes> layout = m_layout;
+	if (layout.isNotNull() && layout->flagEnabled) {
+		return layout->flagUpdatedLayoutFrame;
+	}
+	return sl_false;
+}
+
+void View::setLayoutFrameUpdated(sl_bool flag)
+{
+	Ref<LayoutAttributes> layout = m_layout;
+	if (layout.isNotNull() && layout->flagEnabled) {
+		layout->flagUpdatedLayoutFrame = flag;
 	}
 }
 
@@ -1975,6 +2032,24 @@ void View::setSizeFixed(sl_bool flagRedraw)
 	}
 }
 
+sl_real View::getWidthWeight()
+{
+	Ref<LayoutAttributes> layout = m_layout;
+	if (layout.isNotNull()) {
+		return layout->widthWeight;
+	}
+	return 1;
+}
+
+sl_bool View::isHeightWeight()
+{
+	Ref<LayoutAttributes> layout = m_layout;
+	if (layout.isNotNull() && layout->flagEnabled) {
+		return layout->heightMode == SizeMode::Weight;
+	}
+	return sl_false;
+}
+
 sl_bool View::isWidthFilling()
 {
 	Ref<LayoutAttributes> layout = m_layout;
@@ -1984,13 +2059,14 @@ sl_bool View::isWidthFilling()
 	return sl_false;
 }
 
-void View::setWidthFilling(sl_bool flagRedraw)
+void View::setWidthFilling(sl_real weight, sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
 		layout->flagEnabled = sl_true;
 		layout->widthMode = SizeMode::Filling;
+		layout->widthWeight = weight;
 		requestParentAndSelfLayout(flagRedraw);
 	}
 }
@@ -2004,25 +2080,28 @@ sl_bool View::isHeightFilling()
 	return sl_false;
 }
 
-void View::setHeightFilling(sl_bool flagRedraw)
+void View::setHeightFilling(sl_real weight, sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
 		layout->flagEnabled = sl_true;
 		layout->heightMode = SizeMode::Filling;
+		layout->heightWeight = weight;
 		requestParentAndSelfLayout(flagRedraw);
 	}
 }
 
-void View::setSizeFilling(sl_bool flagRedraw)
+void View::setSizeFilling(sl_real widthWeight, sl_real heightWeight, sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
 		layout->flagEnabled = sl_true;
 		layout->widthMode = SizeMode::Filling;
+		layout->widthWeight = widthWeight;
 		layout->heightMode = SizeMode::Filling;
+		layout->heightWeight = heightWeight;
 		requestParentAndSelfLayout(flagRedraw);
 	}
 }
@@ -2088,15 +2167,6 @@ sl_bool View::isWidthWeight()
 	return sl_false;
 }
 
-sl_real View::getWidthWeight()
-{
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->widthWeight;
-	}
-	return 1;
-}
-
 void View::setWidthWeight(sl_real weight, sl_bool flagRedraw)
 {
 	_initializeLayout();
@@ -2104,21 +2174,9 @@ void View::setWidthWeight(sl_real weight, sl_bool flagRedraw)
 	if (layout.isNotNull()) {
 		layout->flagEnabled = sl_true;
 		layout->widthMode = SizeMode::Weight;
-		if (weight < 0) {
-			weight = 1;
-		}
 		layout->widthWeight = weight;
 		requestParentAndSelfLayout(flagRedraw);
 	}
-}
-
-sl_bool View::isHeightWeight()
-{
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->heightMode == SizeMode::Weight;
-	}
-	return sl_false;
 }
 
 sl_real View::getHeightWeight()
@@ -2137,9 +2195,6 @@ void View::setHeightWeight(sl_real weight, sl_bool flagRedraw)
 	if (layout.isNotNull()) {
 		layout->flagEnabled = sl_true;
 		layout->heightMode = SizeMode::Weight;
-		if (weight < 0) {
-			weight = 1;
-		}
 		layout->heightWeight = weight;
 		requestParentAndSelfLayout(flagRedraw);
 	}
@@ -2152,14 +2207,8 @@ void View::setSizeWeight(sl_real widthWeight, sl_real heightWeight, sl_bool flag
 	if (layout.isNotNull()) {
 		layout->flagEnabled = sl_true;
 		layout->widthMode = SizeMode::Weight;
-		if (widthWeight < 0) {
-			widthWeight = 1;
-		}
 		layout->widthWeight = widthWeight;
 		layout->heightMode = SizeMode::Weight;
-		if (heightWeight < 0) {
-			heightWeight = 1;
-		}
 		layout->heightWeight = heightWeight;
 		requestParentAndSelfLayout(flagRedraw);
 	}
@@ -3144,6 +3193,7 @@ void View::_initializeLayout()
 		attr->flagInvalidLayout = sl_true;
 		
 		attr->flagRecursiveMakeLayout = sl_false;
+		attr->flagUpdatedLayoutFrame = sl_false;
 		
 		m_layout = attr;
 	}
@@ -3505,7 +3555,7 @@ void View::setBackgroundColor(const Color& color, sl_bool flagRedraw)
 	}
 }
 
-Ref<Pen> View::getBorderPen()
+Ref<Pen> View::getBorder()
 {
 	Ref<DrawAttributes> draw = m_draw;
 	if (draw.isNotNull()) {
@@ -3514,7 +3564,7 @@ Ref<Pen> View::getBorderPen()
 	return Ref<Pen>::null();
 }
 
-void View::setBorderPen(const Ref<Pen>& pen, sl_bool flagRedraw)
+void View::setBorder(const Ref<Pen>& pen, sl_bool flagRedraw)
 {
 	_initializeDraw();
 	Ref<DrawAttributes> draw = m_draw;
@@ -3547,7 +3597,7 @@ void View::setBorderColor(const Color& color, sl_bool flagRedraw)
 
 sl_bool View::isBorder()
 {
-	return getBorderPen().isNotNull();
+	return getBorder().isNotNull();
 }
 
 void View::setBorder(sl_bool flagBorder, sl_bool flagRedraw)
@@ -3556,10 +3606,10 @@ void View::setBorder(sl_bool flagBorder, sl_bool flagRedraw)
 		if (isBorder()) {
 			return;
 		}
-		setBorderPen(Pen::getDefault(), sl_false);
+		setBorder(Pen::getDefault(), sl_false);
 	} else {
 		if (isBorder()) {
-			setBorderPen(Ref<Pen>::null(), sl_false);
+			setBorder(Ref<Pen>::null(), sl_false);
 		}
 	}
 	if (isNativeWidget()) {
@@ -3763,6 +3813,48 @@ void View::setDoubleBuffering(sl_bool flagEnabled, sl_bool flagRedraw)
 	}
 }
 
+sl_bool View::isAlwaysOnDrawBackground()
+{
+	Ref<DrawAttributes> draw = m_draw;
+	if (draw.isNotNull()) {
+		return draw->flagOnDrawBackgroundAlways;
+	}
+	return sl_false;
+}
+
+void View::setAlwaysOnDrawBackground(sl_bool flagEnabled, sl_bool flagRedraw)
+{
+	_initializeDraw();
+	Ref<DrawAttributes> draw = m_draw;
+	if (draw.isNotNull()) {
+		draw->flagOnDrawBackgroundAlways = flagEnabled;
+		if (flagRedraw) {
+			invalidate();
+		}
+	}
+}
+
+sl_bool View::isAlwaysOnDrawBorder()
+{
+	Ref<DrawAttributes> draw = m_draw;
+	if (draw.isNotNull()) {
+		return draw->flagOnDrawBorderAlways;
+	}
+	return sl_false;
+}
+
+void View::setAlwaysOnDrawBorder(sl_bool flagEnabled, sl_bool flagRedraw)
+{
+	_initializeDraw();
+	Ref<DrawAttributes> draw = m_draw;
+	if (draw.isNotNull()) {
+		draw->flagOnDrawBorderAlways = flagEnabled;
+		if (flagRedraw) {
+			invalidate();
+		}
+	}
+}
+
 Ref<Font> View::getFont()
 {
 	Ref<DrawAttributes> draw = m_draw;
@@ -3848,6 +3940,9 @@ void View::_initializeDraw()
 		attr->flagClippingBounds = sl_true;
 		attr->flagDoubleBuffer = sl_false;
 		
+		attr->flagOnDrawBackgroundAlways = sl_false;
+		attr->flagOnDrawBorderAlways = sl_false;
+		
 		m_draw = attr;
 		
 	}
@@ -3862,7 +3957,7 @@ void View::_refreshBorderPen(sl_bool flagRedraw)
 		if (width > 0) {
 			pen = Pen::create(draw->borderStyle, draw->borderWidth, draw->borderColor);
 		}
-		setBorderPen(pen, flagRedraw);
+		setBorder(pen, flagRedraw);
 	}
 }
 
@@ -4584,7 +4679,7 @@ void View::draw(Canvas *canvas)
 		if (attr->flagPreDrawEnabled) {
 			onPreDraw(canvas);
 		}
-		if (attr->backgroundColor.isNotZero() || attr->background.isNotNull()) {
+		if (attr->flagOnDrawBackgroundAlways || attr->backgroundColor.isNotZero() || attr->background.isNotNull()) {
 			onDrawBackground(canvas);
 		}
 	}
@@ -4658,7 +4753,7 @@ void View::draw(Canvas *canvas)
 	
 	
 	if (attr.isNotNull()) {
-		if (attr->penBorder.isNotNull()) {
+		if (attr->flagOnDrawBorderAlways || attr->penBorder.isNotNull()) {
 			onDrawBorder(canvas);
 		}
 		if (attr->flagPostDrawEnabled) {

@@ -12,12 +12,12 @@ import android.widget.TextView;
 import slib.platform.android.Logger;
 import slib.platform.android.ui.UiFont;
 
-public class UiDropDownList extends Spinner {
+public class UiSelectView extends Spinner {
 	
-	public static UiDropDownList _create(Context context)
+	public static UiSelectView _create(Context context)
 	{
 		try {
-			UiDropDownList view = new UiDropDownList(context);
+			UiSelectView view = new UiSelectView(context);
 			return view;
 		} catch (Exception e) {
 			Logger.exception(e);
@@ -26,16 +26,16 @@ public class UiDropDownList extends Spinner {
 	}
 	
 	public static void _applyList(View _view, String[] items) {
-		if (_view instanceof UiDropDownList) {
-			UiDropDownList view = (UiDropDownList)_view;
+		if (_view instanceof UiSelectView) {
+			UiSelectView view = (UiSelectView)_view;
 			MyAdapter adapter = view.new MyAdapter(items);
 			view.setAdapter(adapter);
 		}
 	}
 	
 	public static int _getSelectedIndex(View _view) {
-		if (_view instanceof UiDropDownList) {
-			UiDropDownList view = (UiDropDownList)_view;
+		if (_view instanceof UiSelectView) {
+			UiSelectView view = (UiSelectView)_view;
 			int n = view.getSelectedItemPosition();
 			if (n < 0) {
 				n = 0;
@@ -46,15 +46,15 @@ public class UiDropDownList extends Spinner {
 	}
 	
 	public static void _select(View _view, int n) {
-		if (_view instanceof UiDropDownList) {
-			UiDropDownList view = (UiDropDownList)_view;
+		if (_view instanceof UiSelectView) {
+			UiSelectView view = (UiSelectView)_view;
 			view.setSelection(n);
 		}
 	}
 
 	public static boolean _setFont(View _view, UiFont font) {
-		if (_view instanceof UiDropDownList) {
-			UiDropDownList view = (UiDropDownList)_view;
+		if (_view instanceof UiSelectView) {
+			UiSelectView view = (UiSelectView)_view;
 			if (font != null) {
 				view.font = font;
 				return true;				
@@ -73,7 +73,7 @@ public class UiDropDownList extends Spinner {
 
 	UiFont font;
 
-	public UiDropDownList(Context context) {
+	public UiSelectView(Context context) {
 		
 		super(context);
 		this.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
@@ -82,7 +82,7 @@ public class UiDropDownList extends Spinner {
 				if (position < 0) {
 					position = 0;
 				}
-				onEventSelect(UiDropDownList.this, position);
+				onEventSelect(UiSelectView.this, position);
 			}
 			
 			@Override
@@ -94,7 +94,7 @@ public class UiDropDownList extends Spinner {
 	class MyAdapter extends ArrayAdapter<String> {
 		
 		MyAdapter(String[] items) {
-			super(UiDropDownList.this.getContext(), R.layout.spinner_default_item, items);
+			super(UiSelectView.this.getContext(), R.layout.spinner_default_item, items);
 			setDropDownViewResource(R.layout.spinner_default_dropdown_item);
 		}
 		

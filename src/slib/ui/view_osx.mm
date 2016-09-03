@@ -143,10 +143,10 @@ void OSX_ViewInstance::setFrame(const Rectangle& frame)
 	NSView* handle = m_handle;
 	if (handle != nil) {
 		NSRect frameNew;
-		frameNew.origin.x = frame.left;
-		frameNew.origin.y = frame.top;
-		frameNew.size.width = frame.getWidth();
-		frameNew.size.height = frame.getHeight();
+		frameNew.origin.x = (int)(frame.left);
+		frameNew.origin.y = (int)(frame.top);
+		frameNew.size.width = (int)(frame.getWidth());
+		frameNew.size.height = (int)(frame.getHeight());
 		[handle setFrame:frameNew];
 		[handle setNeedsDisplay:YES];
 	}

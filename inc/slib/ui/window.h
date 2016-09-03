@@ -463,6 +463,8 @@ public:
 	
 	void onResize(Size& size);
 	
+	void onResized(sl_real width, sl_real height);
+	
 	void onMinimize();
 	
 	void onDeminimize();
@@ -473,7 +475,7 @@ public:
 
 private:
 	SafeWeakRef<Window> m_window;
-
+	
 };
 
 SLIB_UI_NAMESPACE_END

@@ -423,7 +423,7 @@ Ref<_TreeContentView> TreeViewItem::_getContentView()
 class _TreeView_DefaultIdentIcon : public Drawable
 {
 public:
-	SafeRef<Brush> m_brush;
+	Ref<Brush> m_brush;
 	Point m_pts[3];
 	
 public:
@@ -495,6 +495,8 @@ TreeView::TreeView()
 	m_itemIndent = 16;
 	m_textIndent = 4;
 	
+	m_iconCollapsed = new _TreeView_DefaultIdentIcon(sl_true);
+	m_iconExpanded = new _TreeView_DefaultIdentIcon(sl_false);
 }
 
 Ref<TreeViewItem> TreeView::getRootItem()
@@ -666,23 +668,6 @@ Ref<Drawable> TreeView::getExpandedIcon()
 void TreeView::setExpandedIcon(const Ref<Drawable>& icon, sl_bool flagRedraw)
 {
 	m_iconExpanded = icon;
-	_relayoutContent(flagRedraw);
-}
-
-Ref<Drawable> TreeView::getDefaultCollapsedIcon()
-{
-	return new _TreeView_DefaultIdentIcon(sl_true);
-}
-
-Ref<Drawable> TreeView::getDefaultExpandedIcon()
-{
-	return new _TreeView_DefaultIdentIcon(sl_false);
-}
-
-void TreeView::applyDefaultIcons(sl_bool flagRedraw)
-{
-	m_iconCollapsed = getDefaultCollapsedIcon();
-	m_iconExpanded = getDefaultExpandedIcon();
 	_relayoutContent(flagRedraw);
 }
 

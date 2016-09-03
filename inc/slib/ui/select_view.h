@@ -1,5 +1,5 @@
-#ifndef CHECKHEADER_SLIB_UI_DROP_DOWN_LIST
-#define CHECKHEADER_SLIB_UI_DROP_DOWN_LIST
+#ifndef CHECKHEADER_SLIB_UI_SELECT_VIEW
+#define CHECKHEADER_SLIB_UI_SELECT_VIEW
 
 #include "definition.h"
 
@@ -7,21 +7,21 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
-class DropDownList;
+class SelectView;
 
-class SLIB_EXPORT IDropDownListListener
+class SLIB_EXPORT ISelectViewListener
 {
 public:
-	virtual void onSelectItem(DropDownList* view, sl_uint32 index) = 0;
+	virtual void onSelectItem(SelectView* view, sl_uint32 index) = 0;
 	
 };
 
-class SLIB_EXPORT DropDownList : public View
+class SLIB_EXPORT SelectView : public View
 {
 	SLIB_DECLARE_OBJECT
 	
 public:
-	DropDownList();
+	SelectView();
 	
 public:
 	sl_uint32 getItemsCount();
@@ -59,12 +59,59 @@ public:
 	
 	String getSelectedTitle();
 
+	
+	const Size& getIconSize();
+	
+	virtual void setIconSize(const Size& size, sl_bool flagRedraw = sl_true);
+	
+	void setIconSize(sl_real width, sl_real height, sl_bool flagRedraw = sl_true);
+	
+	void setIconSize(sl_real size, sl_bool flagRedraw = sl_true);
+	
+	sl_real getIconWidth();
+	
+	void setIconWidth(sl_real width, sl_bool flagRedraw = sl_true);
+	
+	sl_real getIconHeight();
+	
+	void setIconHeight(sl_real height, sl_bool flagRedraw = sl_true);
+	
+	
+	Ref<Drawable> getLeftIcon();
+	
+	virtual void setLeftIcon(const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
+	
+	Ref<Drawable> getRightIcon();
+	
+	virtual void setRightIcon(const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
+	
+	
+	Color getTextColor();
+	
+	virtual void setTextColor(const Color& color, sl_bool flagRedraw = sl_true);
+	
+	
 public:
-	SLIB_PTR_PROPERTY(IDropDownListListener, Listener)
+	SLIB_PTR_PROPERTY(ISelectViewListener, Listener)
 	
 public:
 	virtual void onSelectItem(sl_uint32 index);
-
+	
+protected:
+	// override
+	void onDraw(Canvas* canvas);
+	
+	// override
+	void onMouseEvent(UIEvent* ev);
+	
+	// override
+	void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
+	
+protected:
+	Rectangle getLeftIconRegion();
+	
+	Rectangle getRightIconRegion();
+	
 public:
 	// override
 	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
@@ -87,6 +134,13 @@ protected:
 	SafeList<String> m_values;
 	SafeList<String> m_titles;
 	sl_uint32 m_indexSelected;
+	
+	Size m_iconSize;
+	SafeRef<Drawable> m_leftIcon;
+	SafeRef<Drawable> m_rightIcon;
+	int m_clickedIconNo;
+	
+	Color m_textColor;
 	
 };
 

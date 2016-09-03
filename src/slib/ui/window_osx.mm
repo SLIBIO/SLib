@@ -859,10 +859,10 @@ private:
 	
 	static void _getNSRect(NSRect& rectOut, const Rectangle& rectIn, sl_real heightScreen)
 	{
-		rectOut.origin.x = rectIn.left;
-		rectOut.origin.y = heightScreen - rectIn.bottom;
-		rectOut.size.width = rectIn.getWidth();
-		rectOut.size.height = rectIn.getHeight();
+		rectOut.origin.x = (int)(rectIn.left);
+		rectOut.origin.y = (int)(heightScreen - rectIn.bottom);
+		rectOut.size.width = (int)(rectIn.getWidth());
+		rectOut.size.height = (int)(rectIn.getHeight());
 		_applyRectLimit(rectOut);
 	}
 	
@@ -957,10 +957,29 @@ SLIB_UI_NAMESPACE_END
 		} else {
 			window->onMaximize();
 		}
+		slib::Size size((sl_real)(newFrame.size.width), (sl_real)(newFrame.size.height));
+		slib::UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(slib::WindowInstance, onResized, window, size.x, size.y));
 	}
 	return TRUE;
 }
-
+- (void)windowDidEnterFullScreen:(NSNotification *)notification
+{
+	slib::Ref<slib::_OSX_Window> window = m_window;
+	if (window.isNotNull()) {
+		window->onMaximize();
+		slib::Size size((sl_real)(self.frame.size.width), (sl_real)(self.frame.size.height));
+		window->onResized(size.x, size.y);
+	}
+}
+- (void)windowDidExitFullScreen:(NSNotification *)notification
+{
+	slib::Ref<slib::_OSX_Window> window = m_window;
+	if (window.isNotNull()) {
+		window->onMinimize();
+		slib::Size size((sl_real)(self.frame.size.width), (sl_real)(self.frame.size.height));
+		window->onResized(size.x, size.y);
+	}
+}
 - (BOOL)acceptsFirstResponder
 {
 	return TRUE;

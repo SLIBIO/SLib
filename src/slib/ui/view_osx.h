@@ -108,10 +108,10 @@ SLIB_UI_NAMESPACE_END
 	NSView* parent = UIPlatform::getViewHandle(_parent); \
 	NSRect frame; \
 	Rectangle _frame = getFrame(); \
-	frame.origin.x = _frame.left; \
-	frame.origin.y = _frame.top; \
-	frame.size.width = _frame.getWidth(); \
-	frame.size.height = _frame.getHeight();
+	frame.origin.x = (int)(_frame.left); \
+	frame.origin.y = (int)(_frame.top); \
+	frame.size.width = (int)(_frame.getWidth()); \
+	frame.size.height = (int)(_frame.getHeight());
 
 #define OSX_VIEW_CREATE_INSTANCE_END \
 	if (handle != nil) { \

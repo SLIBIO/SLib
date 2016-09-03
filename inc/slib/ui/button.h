@@ -66,26 +66,30 @@ public:
 	
 	void setIconSize(sl_real size, sl_bool flagRedraw = sl_true);
 	
+	sl_real getIconWidth();
 	
-	Alignment getContentAlignment();
+	void setIconWidth(sl_real width, sl_bool flagRedraw = sl_true);
 	
-	virtual void setContentAlignment(Alignment align, sl_bool flagRedraw = sl_true);
+	sl_real getIconHeight();
 	
+	void setIconHeight(sl_real height, sl_bool flagRedraw = sl_true);
+	
+	
+	Alignment getGravity();
+	
+	virtual void setGravity(Alignment align, sl_bool flagRedraw = sl_true);
 	
 	Alignment getIconAlignment();
 	
 	virtual void setIconAlignment(Alignment align, sl_bool flagRedraw = sl_true);
 	
-	
 	Alignment getTextAlignment();
 	
 	virtual void setTextAlignment(Alignment align, sl_bool flagRedraw = sl_true);
 	
-	
 	sl_bool isTextBeforeIcon();
 	
 	virtual void setTextBeforeIcon(sl_bool flag, sl_bool flagRedraw = sl_true);
-	
 	
 	LayoutOrientation getLayoutOrientation();
 	
@@ -96,21 +100,17 @@ public:
 	
 	void setIconMargin(sl_real margin, sl_bool flagRedraw = sl_true);
 	
-	
 	sl_real getIconMarginLeft();
 	
 	void setIconMarginLeft(sl_real margin, sl_bool flagRedraw = sl_true);
-	
 	
 	sl_real getIconMarginTop();
 	
 	void setIconMarginTop(sl_real margin, sl_bool flagRedraw = sl_true);
 	
-	
 	sl_real getIconMarginRight();
 	
 	void setIconMarginRight(sl_real margin, sl_bool flagRedraw = sl_true);
-	
 	
 	sl_real getIconMarginBottom();
 	
@@ -121,21 +121,17 @@ public:
 	
 	void setTextMargin(sl_real margin, sl_bool flagRedraw = sl_true);
 	
-	
 	sl_real getTextMarginLeft();
 	
 	void setTextMarginLeft(sl_real margin, sl_bool flagRedraw = sl_true);
-	
 	
 	sl_real getTextMarginTop();
 	
 	void setTextMarginTop(sl_real margin, sl_bool flagRedraw = sl_true);
 	
-	
 	sl_real getTextMarginRight();
 	
 	void setTextMarginRight(sl_real margin, sl_bool flagRedraw = sl_true);
-	
 	
 	sl_real getTextMarginBottom();
 	
@@ -146,34 +142,46 @@ public:
 	
 	virtual void setTextColor(const Color& color, ButtonState state, sl_uint32 category = 0, sl_bool flagRedraw = sl_true);
 	
+	Color getTextColor();
+	
+	virtual void setTextColor(const Color& color, sl_bool flagRedraw = sl_true);
+	
 	
 	Color getBackgroundColor(ButtonState state, sl_uint32 category = 0);
 	
 	virtual void setBackgroundColor(const Color& color, ButtonState state, sl_uint32 category = 0, sl_bool flagRedraw = sl_true);
+
+	Color getBackgroundColor();
+	
+	virtual void setBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
 	
 	
 	Ref<Drawable> getBackground(ButtonState state, sl_uint32 category = 0);
 	
 	virtual void setBackground(const Ref<Drawable>& background, ButtonState state, sl_uint32 category = 0, sl_bool flagRedraw = sl_true);
 	
+	Ref<Drawable> getBackground();
+	
+	virtual void setBackground(const Ref<Drawable>& background, sl_bool flagRedraw = sl_true);
+
 	
 	Ref<Drawable> getIcon(ButtonState state, sl_uint32 category = 0);
 	
 	virtual void setIcon(const Ref<Drawable>& icon, ButtonState state, sl_uint32 category = 0, sl_bool flagRedraw = sl_true);
+
+	Ref<Drawable> getIcon();
+	
+	virtual void setIcon(const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
 	
 	
 	Ref<Pen> getBorder(ButtonState state, sl_uint32 category = 0);
 	
 	virtual void setBorder(const Ref<Pen>& pen, ButtonState state, sl_uint32 category = 0, sl_bool flagRedraw = sl_true);
 	
+	Ref<Pen> getBorder();
 	
-	Color getBackgroundColor();
+	virtual void setBorder(const Ref<Pen>& pen, sl_bool flagRedraw = sl_true);
 	
-	void setBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
-	
-	Ref<Drawable> getBackground();
-	
-	void setBackground(const Ref<Drawable>& background, sl_bool flagRedraw = sl_true);
 	
 public:
 	// override
@@ -201,6 +209,9 @@ protected:
 	// override
 	void onDrawBorder(Canvas* canvas);
 	
+	// override
+	void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
+	
 protected:
 	virtual void layoutIconAndText(GraphicsContext* gc, sl_real widthFrame, sl_real heightFrame, Size& sizeContent, Rectangle& frameIcon, Rectangle& frameText);
 	
@@ -225,7 +236,7 @@ private:
 	sl_uint32 m_category;
 	
 	Size m_iconSize;
-	Alignment m_contentAlignment;
+	Alignment m_gravity;
 	Alignment m_iconAlignment;
 	Alignment m_textAlignment;
 	sl_bool m_flagTextBeforeIcon;
@@ -238,6 +249,9 @@ private:
 	sl_real m_textMarginTop;
 	sl_real m_textMarginRight;
 	sl_real m_textMarginBottom;
+	
+	Color m_textColorDefault;
+	SafeRef<Drawable> m_iconDefault;
 	
 	ButtonCategory* m_categories;
 	sl_uint32 m_nCategories;

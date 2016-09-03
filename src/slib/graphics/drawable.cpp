@@ -49,12 +49,12 @@ sl_bool Drawable::isImage()
 	return Image::checkInstance(this);
 }
 
-Ref<BrushDrawable> Drawable::createBrushDrawable(const Ref<Brush>& brush)
+Ref<Drawable> Drawable::createBrushDrawable(const Ref<Brush>& brush)
 {
 	return BrushDrawable::create(brush);
 }
 
-Ref<ColorDrawable> Drawable::createColorDrawable(const Color& color)
+Ref<Drawable> Drawable::createColorDrawable(const Color& color)
 {
 	return ColorDrawable::create(color);
 }
@@ -99,7 +99,7 @@ Ref<Drawable> Drawable::createScaledDrawable(const Ref<Drawable>& src, const Siz
 
 SLIB_DEFINE_OBJECT(BrushDrawable, Drawable)
 
-Ref<BrushDrawable> BrushDrawable::create(const Ref<Brush>& brush)
+Ref<Drawable> BrushDrawable::create(const Ref<Brush>& brush)
 {
 	if (brush.isNotNull()) {
 		Ref<BrushDrawable> ret = new BrushDrawable;
@@ -108,7 +108,7 @@ Ref<BrushDrawable> BrushDrawable::create(const Ref<Brush>& brush)
 			return ret;
 		}
 	}
-	return Ref<BrushDrawable>::null();
+	return Ref<Drawable>::null();
 }
 
 void BrushDrawable::onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc)
@@ -119,7 +119,7 @@ void BrushDrawable::onDraw(Canvas* canvas, const Rectangle& rectDst, const Recta
 
 SLIB_DEFINE_OBJECT(ColorDrawable, BrushDrawable)
 
-Ref<ColorDrawable> ColorDrawable::create(const Color& color)
+Ref<Drawable> ColorDrawable::create(const Color& color)
 {
 	Ref<ColorDrawable> ret;
 	Ref<Brush> brush = Brush::createSolidBrush(color);
@@ -136,7 +136,7 @@ Ref<ColorDrawable> ColorDrawable::create(const Color& color)
 
 SLIB_DEFINE_OBJECT(EmptyDrawable, Drawable)
 
-Ref<EmptyDrawable> EmptyDrawable::create()
+Ref<Drawable> EmptyDrawable::create()
 {
 	return new EmptyDrawable();
 }
@@ -148,7 +148,7 @@ void EmptyDrawable::onDraw(Canvas* canvas, const Rectangle& rectDst, const Recta
 
 SLIB_DEFINE_OBJECT(RectangleDrawable, Drawable)
 
-Ref<RectangleDrawable> RectangleDrawable::create(const Ref<Pen>& pen, const Ref<Brush>& brush)
+Ref<Drawable> RectangleDrawable::create(const Ref<Pen>& pen, const Ref<Brush>& brush)
 {
 	if (brush.isNotNull()) {
 		Ref<RectangleDrawable> ret = new RectangleDrawable;
@@ -158,7 +158,7 @@ Ref<RectangleDrawable> RectangleDrawable::create(const Ref<Pen>& pen, const Ref<
 			return ret;
 		}
 	}
-	return Ref<RectangleDrawable>::null();
+	return Ref<Drawable>::null();
 }
 
 void RectangleDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
@@ -169,7 +169,7 @@ void RectangleDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
 
 SLIB_DEFINE_OBJECT(SubDrawable, Drawable)
 
-Ref<SubDrawable> SubDrawable::create(const Ref<Drawable>& src, sl_real x, sl_real y, sl_real width, sl_real height)
+Ref<Drawable> SubDrawable::create(const Ref<Drawable>& src, sl_real x, sl_real y, sl_real width, sl_real height)
 {
 	if (src.isNotNull() && width > 0 && height > 0) {
 		Ref<SubDrawable> sub = new SubDrawable;
@@ -182,7 +182,7 @@ Ref<SubDrawable> SubDrawable::create(const Ref<Drawable>& src, sl_real x, sl_rea
 			return sub;
 		}
 	}
-	return Ref<SubDrawable>::null();
+	return Ref<Drawable>::null();
 }
 
 sl_real SubDrawable::getDrawableWidth()
@@ -223,7 +223,7 @@ void SubDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
 
 SLIB_DEFINE_OBJECT(ScaledDrawable, Drawable)
 
-Ref<ScaledDrawable> ScaledDrawable::create(const Ref<Drawable>& src, sl_real width, sl_real height)
+Ref<Drawable> ScaledDrawable::create(const Ref<Drawable>& src, sl_real width, sl_real height)
 {
 	if (src.isNotNull() && width > 0 && height > 0) {
 		Ref<ScaledDrawable> ret = new ScaledDrawable;
@@ -234,7 +234,7 @@ Ref<ScaledDrawable> ScaledDrawable::create(const Ref<Drawable>& src, sl_real wid
 			return ret;
 		}
 	}
-	return Ref<ScaledDrawable>::null();
+	return Ref<Drawable>::null();
 }
 
 sl_real ScaledDrawable::getDrawableWidth()
@@ -279,7 +279,7 @@ void ScaledDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
 
 SLIB_DEFINE_OBJECT(ScaledSubDrawable, Drawable)
 
-Ref<ScaledSubDrawable> ScaledSubDrawable::create(const Ref<Drawable>& src, const Rectangle& rectSrc, sl_real width, sl_real height)
+Ref<Drawable> ScaledSubDrawable::create(const Ref<Drawable>& src, const Rectangle& rectSrc, sl_real width, sl_real height)
 {
 	if (src.isNotNull() && width > 0 && height > 0 && rectSrc.getWidth() > 0 && rectSrc.getHeight() > 0) {
 		Ref<ScaledSubDrawable> ret = new ScaledSubDrawable;
@@ -291,7 +291,7 @@ Ref<ScaledSubDrawable> ScaledSubDrawable::create(const Ref<Drawable>& src, const
 			return ret;
 		}
 	}
-	return Ref<ScaledSubDrawable>::null();
+	return Ref<Drawable>::null();
 }
 
 sl_real ScaledSubDrawable::getDrawableWidth()
@@ -339,14 +339,14 @@ void ScaledSubDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
 }
 
 
-SLIB_DEFINE_OBJECT(NinePatchDrawable, Drawable)
+SLIB_DEFINE_OBJECT(NinePiecesDrawable, Drawable)
 
-Ref<NinePatchDrawable> NinePatchDrawable::create(sl_real leftWidth, sl_real rightWidth, sl_real topHeight, sl_real bottomHeight,
+Ref<Drawable> NinePiecesDrawable::create(sl_real leftWidth, sl_real rightWidth, sl_real topHeight, sl_real bottomHeight,
 									 const Ref<Drawable>& topLeft, const Ref<Drawable>& top, const Ref<Drawable>& topRight,
 									 const Ref<Drawable>& left, const Ref<Drawable>& center, const Ref<Drawable>& right,
 									 const Ref<Drawable>& bottomLeft, const Ref<Drawable>& bottom, const Ref<Drawable>& bottomRight)
 {
-	Ref<NinePatchDrawable> ret = new NinePatchDrawable;
+	Ref<NinePiecesDrawable> ret = new NinePiecesDrawable;
 	if (ret.isNotNull()) {
 		if (leftWidth < 0) {
 			leftWidth = 0;
@@ -375,10 +375,10 @@ Ref<NinePatchDrawable> NinePatchDrawable::create(sl_real leftWidth, sl_real righ
 		ret->m_partTopRight = bottomRight;
 		return ret;
 	}
-	return Ref<NinePatchDrawable>::null();
+	return Ref<Drawable>::null();
 }
 
-void NinePatchDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
+void NinePiecesDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
 {
 	sl_real widthLeft = m_widthLeft;
 	sl_real widthRight = m_widthRight;
@@ -423,5 +423,137 @@ void NinePatchDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
 	}
 }
 
+
+SLIB_DEFINE_OBJECT(NinePatchDrawable, Drawable)
+
+Ref<Drawable> NinePatchDrawable::create(sl_real leftWidthDst, sl_real rightWidthDst, sl_real topHeightDst, sl_real bottomHeightDst,
+				const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc, sl_real topHeightSrc, sl_real bottomHeightSrc)
+{
+	if (src.isNull()) {
+		return Ref<Drawable>::null();
+	}
+	
+	if (leftWidthSrc + rightWidthSrc + SLIB_EPSILON > src->getDrawableWidth()) {
+		return Ref<Drawable>::null();
+	}
+	if (topHeightSrc + bottomHeightSrc + SLIB_EPSILON > src->getDrawableWidth()) {
+		return Ref<Drawable>::null();
+	}
+	
+	Ref<NinePatchDrawable> ret = new NinePatchDrawable;
+	
+	if (ret.isNotNull()) {
+		if (leftWidthDst < 0) {
+			leftWidthDst = 0;
+		}
+		if (rightWidthDst < 0) {
+			rightWidthDst = 0;
+		}
+		if (topHeightDst < 0) {
+			topHeightDst = 0;
+		}
+		if (bottomHeightDst < 0) {
+			bottomHeightDst = 0;
+		}
+		if (leftWidthSrc < 0) {
+			leftWidthSrc = 0;
+		}
+		if (rightWidthSrc < 0) {
+			rightWidthSrc = 0;
+		}
+		if (topHeightSrc < 0) {
+			topHeightSrc = 0;
+		}
+		if (bottomHeightSrc < 0) {
+			bottomHeightSrc = 0;
+		}
+
+		ret->m_widthLeftDst = leftWidthDst;
+		ret->m_widthRightDst = rightWidthDst;
+		ret->m_heightTopDst = topHeightDst;
+		ret->m_heightBottomDst = bottomHeightDst;
+		ret->m_src = src;
+		ret->m_widthLeftSrc = leftWidthSrc;
+		ret->m_widthRightSrc = rightWidthSrc;
+		ret->m_heightTopSrc = topHeightSrc;
+		ret->m_heightBottomSrc = bottomHeightSrc;
+		
+		return ret;
+		
+	}
+	return Ref<Drawable>::null();
+}
+
+Ref<Drawable> NinePatchDrawable::create(const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc, sl_real topHeightSrc, sl_real bottomHeightSrc)
+{
+	return create(leftWidthSrc, rightWidthSrc, topHeightSrc, bottomHeightSrc, src, leftWidthSrc, rightWidthSrc, topHeightSrc, bottomHeightSrc);
+}
+
+void NinePatchDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
+{
+	Ref<Drawable> src = m_src;
+	if (src.isNull()) {
+		return;
+	}
+	sl_real widthDst = rectDst.getWidth();
+	sl_real heightDst = rectDst.getHeight();
+	sl_real widthLeftDst = m_widthLeftDst;
+	sl_real widthRightDst = m_widthRightDst;
+	sl_real heightTopDst = m_heightTopDst;
+	sl_real heightBottomDst = m_heightBottomDst;
+	if (widthDst < widthLeftDst + widthRightDst || heightDst < heightTopDst + heightBottomDst) {
+		canvas->draw(rectDst, src);
+		return;
+	}
+	sl_real widthLeftSrc = m_widthLeftSrc;
+	sl_real widthRightSrc = m_widthRightSrc;
+	sl_real heightTopSrc = m_heightTopSrc;
+	sl_real heightBottomSrc = m_heightBottomSrc;
+	sl_real widthSrc = src->getDrawableWidth();
+	sl_real heightSrc = src->getDrawableHeight();
+	if (widthSrc < widthLeftSrc + widthRightSrc || heightSrc < heightTopSrc + heightBottomSrc) {
+		canvas->draw(rectDst, src);
+		return;
+	}
+	if (heightTopDst > 0 && heightTopSrc > 0) {
+		sl_real topDst = rectDst.top;
+		sl_real bottomDst = rectDst.top + heightTopDst;
+		sl_real topSrc = 0;
+		sl_real bottomSrc = heightTopSrc;
+		if (widthLeftDst > 0 && widthLeftSrc > 0) {
+			canvas->draw(Rectangle(rectDst.left, topDst, rectDst.left + widthLeftDst, bottomDst), src, Rectangle(0, topSrc, widthLeftSrc, bottomSrc));
+		}
+		canvas->draw(Rectangle(rectDst.left + widthLeftDst, topDst, rectDst.right - widthRightDst, bottomDst), src, Rectangle(widthLeftSrc, topSrc, widthSrc - widthRightSrc, bottomSrc));
+		if (widthRightDst > 0 && widthRightSrc > 0) {
+			canvas->draw(Rectangle(rectDst.right - widthRightDst, topDst, rectDst.right, bottomDst), src, Rectangle(widthSrc - widthRightSrc, topSrc, widthSrc, bottomSrc));
+		}
+	}
+	if (heightBottomDst > 0 && heightBottomSrc > 0) {
+		sl_real topDst = rectDst.bottom - heightBottomDst;
+		sl_real bottomDst = rectDst.bottom;
+		sl_real topSrc = heightSrc - heightBottomSrc;
+		sl_real bottomSrc = heightSrc;
+		if (widthLeftDst > 0 && widthLeftSrc > 0) {
+			canvas->draw(Rectangle(rectDst.left, topDst, rectDst.left + widthLeftDst, bottomDst), src, Rectangle(0, topSrc, widthLeftSrc, bottomSrc));
+		}
+		canvas->draw(Rectangle(rectDst.left + widthLeftDst, topDst, rectDst.right - widthRightDst, bottomDst), src, Rectangle(widthLeftSrc, topSrc, widthSrc - widthRightSrc, bottomSrc));
+		if (widthRightDst > 0 && widthRightSrc > 0) {
+			canvas->draw(Rectangle(rectDst.right - widthRightDst, topDst, rectDst.right, bottomDst), src, Rectangle(widthSrc - widthRightSrc, topSrc, widthSrc, bottomSrc));
+		}
+	}
+	{
+		sl_real topDst = rectDst.top + heightTopDst;
+		sl_real bottomDst = rectDst.bottom - heightBottomDst;
+		sl_real topSrc = heightTopSrc;
+		sl_real bottomSrc = heightSrc - heightBottomSrc;
+		if (widthLeftDst > 0 && widthLeftSrc > 0) {
+			canvas->draw(Rectangle(rectDst.left, topDst, rectDst.left + widthLeftDst, bottomDst), src, Rectangle(0, topSrc, widthLeftSrc, bottomSrc));
+		}
+		canvas->draw(Rectangle(rectDst.left + widthLeftDst, topDst, rectDst.right - widthRightDst, bottomDst), src, Rectangle(widthLeftSrc, topSrc, widthSrc - widthRightSrc, bottomSrc));
+		if (widthRightDst > 0 && widthRightSrc > 0) {
+			canvas->draw(Rectangle(rectDst.right - widthRightDst, topDst, rectDst.right, bottomDst), src, Rectangle(widthSrc - widthRightSrc, topSrc, widthSrc, bottomSrc));
+		}
+	}
+}
 
 SLIB_GRAPHICS_NAMESPACE_END

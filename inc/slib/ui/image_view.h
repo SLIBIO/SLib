@@ -25,9 +25,9 @@ public:
 	virtual void setScaleMode(ScaleMode mode, sl_bool flagRedraw = sl_true);
 	
 	
-	Alignment getSourceAlignment();
+	Alignment getGravity();
 	
-	virtual void setSourceAlignment(Alignment align, sl_bool flagRedraw = sl_true);
+	virtual void setGravity(Alignment align, sl_bool flagRedraw = sl_true);
 	
 public:
 	// override
@@ -36,7 +36,7 @@ public:
 protected:
 	SafeRef<Drawable> m_source;
 	ScaleMode m_scaleMode;
-	Alignment m_sourceAlignment;
+	Alignment m_gravity;
 	
 };
 

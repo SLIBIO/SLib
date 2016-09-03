@@ -412,8 +412,6 @@
     <ClCompile Include="..\..\..\src\slib\ui\cursor.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\cursor_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\drawable_gdiplus.cpp" />
-    <ClCompile Include="..\..\..\src\slib\ui\drop_down_list.cpp" />
-    <ClCompile Include="..\..\..\src\slib\ui\drop_down_list_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\edit_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\edit_view_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\font_win32.cpp" />
@@ -433,6 +431,8 @@
     <ClCompile Include="..\..\..\src\slib\ui\scroll_bar.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\scroll_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\scroll_view_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\select_view.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\select_view_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\tab_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\tab_view_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\tree_view.cpp" />

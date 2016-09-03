@@ -2,13 +2,13 @@
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 
-#include "../../../inc/slib/ui/drop_down_list.h"
+#include "../../../inc/slib/ui/select_view.h"
 
 #include "view_win32.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
-class _DropDownList : public DropDownList
+class _SelectView : public SelectView
 {
 public:
 	void __applyItemsCount(HWND hWnd)
@@ -67,7 +67,7 @@ public:
 
 };
 
-class _Win32_DropDownListInstance : public Win32_ViewInstance
+class _Win32_SelectViewInstance : public Win32_ViewInstance
 {
 public:
     // override
@@ -81,8 +81,8 @@ public:
 	{
 		if (code == CBN_SELCHANGE) {
 			Ref<View> view = getView();
-			if (DropDownList::checkInstance(view.ptr)) {
-				((_DropDownList*)(view.ptr))->__onSelectItem(m_handle);
+			if (SelectView::checkInstance(view.ptr)) {
+				((_SelectView*)(view.ptr))->__onSelectItem(m_handle);
 			}
 			return sl_true;
 		}
@@ -90,7 +90,7 @@ public:
 	}
 };
 
-Ref<ViewInstance> DropDownList::createNativeWidget(ViewInstance* parent)
+Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* parent)
 {
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
 	if (!shared) {
@@ -98,7 +98,7 @@ Ref<ViewInstance> DropDownList::createNativeWidget(ViewInstance* parent)
 	}
 
 	UINT style = CBS_DROPDOWNLIST | WS_TABSTOP;
-	Ref<_Win32_DropDownListInstance> ret = Win32_ViewInstance::create<_Win32_DropDownListInstance>(this, parent, L"COMBOBOX", L"", style, 0);
+	Ref<_Win32_SelectViewInstance> ret = Win32_ViewInstance::create<_Win32_SelectViewInstance>(this, parent, L"COMBOBOX", L"", style, 0);
 	
 	if (ret.isNotNull()) {
 
@@ -112,20 +112,20 @@ Ref<ViewInstance> DropDownList::createNativeWidget(ViewInstance* parent)
 		}
 		_setFontInstance(fontInstance);
 
-		((_DropDownList*)this)->__copyItems(handle);
+		((_SelectView*)this)->__copyItems(handle);
 	}
 	return ret;
 }
 
-void DropDownList::_getSelectedIndex_NW()
+void SelectView::_getSelectedIndex_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		m_indexSelected = ((_DropDownList*)this)->__getSelectedIndex(handle);
+		m_indexSelected = ((_SelectView*)this)->__getSelectedIndex(handle);
 	}
 }
 
-void DropDownList::_select_NW(sl_uint32 index)
+void SelectView::_select_NW(sl_uint32 index)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -133,31 +133,31 @@ void DropDownList::_select_NW(sl_uint32 index)
 	}
 }
 
-void DropDownList::_refreshItemsCount_NW()
+void SelectView::_refreshItemsCount_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		((_DropDownList*)this)->__applyItemsCount(handle);
+		((_SelectView*)this)->__applyItemsCount(handle);
 	}
 }
 
-void DropDownList::_refreshItemsContent_NW()
+void SelectView::_refreshItemsContent_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		((_DropDownList*)this)->__copyItems(handle);
+		((_SelectView*)this)->__copyItems(handle);
 	}
 }
 
-void DropDownList::_setItemTitle_NW(sl_uint32 index, const String& title)
+void SelectView::_setItemTitle_NW(sl_uint32 index, const String& title)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		((_DropDownList*)this)->__setItemTitle(handle, index, title);
+		((_SelectView*)this)->__setItemTitle(handle, index, title);
 	}
 }
 
-void DropDownList::_setFont_NW(const Ref<Font>& font)
+void SelectView::_setFont_NW(const Ref<Font>& font)
 {
 	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);

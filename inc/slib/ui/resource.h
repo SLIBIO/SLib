@@ -3,12 +3,30 @@
 
 #include "definition.h"
 
+#include "../core/resource.h"
+
 #include "menu.h"
 #include "event.h"
 #include "view.h"
 #include "window.h"
 
-#include "../core/resource.h"
+#include "button.h"
+#include "label_view.h"
+#include "check_box.h"
+#include "radio_button.h"
+#include "edit_view.h"
+#include "image_view.h"
+#include "select_view.h"
+#include "scroll_view.h"
+#include "linear_view.h"
+#include "list_view.h"
+#include "list_report_view.h"
+#include "render_view.h"
+#include "tab_view.h"
+#include "tree_view.h"
+#include "web_view.h"
+#include "video_view.h"
+#include "camera_view.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 

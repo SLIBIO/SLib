@@ -147,14 +147,148 @@ void LinearView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 void LinearView::onMakeLayout()
 {
 	sl_bool flagHorizontal = m_orientation == LayoutOrientation::Horizontal;
+	
+	sl_real sizeSum = 0;
+	sl_size countFullFill = 0;
+	sl_size countPartFill = 0;
+	
+	ListLocker< Ref<View> > children(_getChildren());
+	sl_size i;
+	for (i = 0; i < children.count; i++) {
+		Ref<View>& child = children[i];
+		if (child.isNotNull()) {
+			if (child->getVisibility() != Visibility::Gone) {
+				if (flagHorizontal) {
+					if (child->isLayoutLeftFixed() && child->isLayoutRightFixed()) {
+						sizeSum += child->getMarginLeft();
+						if (child->getWidthMode() != SizeMode::Filling) {
+							Rectangle frame = child->getLayoutFrame();
+							sizeSum += frame.getWidth();
+						} else {
+							if (Math::isAlmostZero(child->getWidthWeight() - 1)) {
+								countFullFill++;
+							} else {
+								countPartFill++;
+							}
+						}
+						sizeSum += child->getMarginRight();
+					}
+				} else {
+					if (child->isLayoutTopFixed() && child->isLayoutBottomFixed()) {
+						sizeSum += child->getMarginTop();
+						if (child->getHeightMode() != SizeMode::Filling) {
+							Rectangle frame = child->getLayoutFrame();
+							sizeSum += frame.getHeight();
+						} else {
+							if (Math::isAlmostZero(child->getWidthWeight() - 1)) {
+								countFullFill++;
+							} else {
+								countPartFill++;
+							}
+						}
+						sizeSum += child->getMarginBottom();
+					}
+				}
+			}
+		}
+	}
+	
+	if (countPartFill > 0) {
+		sl_real remainedSize;
+		if (flagHorizontal) {
+			remainedSize = getWidth() - sizeSum;
+		} else {
+			remainedSize = getHeight() - sizeSum;
+		}
+		if (remainedSize < 0) {
+			remainedSize = 0;
+		}
+		for (i = 0; i < children.count; i++) {
+			Ref<View>& child = children[i];
+			if (child.isNotNull()) {
+				if (child->getVisibility() != Visibility::Gone) {
+					if (flagHorizontal) {
+						if (child->isLayoutLeftFixed() && child->isLayoutRightFixed()) {
+							if (child->getWidthMode() == SizeMode::Filling) {
+								sl_real weight = child->getWidthWeight();
+								if (!(Math::isAlmostZero(weight - 1))) {
+									sl_real width = remainedSize * weight;
+									sizeSum += width;
+									Rectangle frame = child->getLayoutFrame();
+									frame.setWidth(width);
+									child->setLayoutFrame(frame);
+								}
+							}
+						}
+					} else {
+						if (child->isLayoutTopFixed() && child->isLayoutBottomFixed()) {
+							if (child->getWidthMode() == SizeMode::Filling) {
+								sl_real weight = child->getHeightWeight();
+								if (!(Math::isAlmostZero(weight - 1))) {
+									sl_real height = remainedSize * weight;
+									sizeSum += height;
+									Rectangle frame = child->getLayoutFrame();
+									frame.setHeight(height);
+									child->setLayoutFrame(frame);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	if (countFullFill > 0) {
+		sl_real remainedSize;
+		if (flagHorizontal) {
+			remainedSize = getWidth() - sizeSum;
+		} else {
+			remainedSize = getHeight() - sizeSum;
+		}
+		if (remainedSize < 0) {
+			remainedSize = 0;
+		}
+		sl_real sizeAvg = remainedSize / (sl_real)countFullFill;
+		for (i = 0; i < children.count; i++) {
+			Ref<View>& child = children[i];
+			if (child.isNotNull()) {
+				if (child->getVisibility() != Visibility::Gone) {
+					if (flagHorizontal) {
+						if (child->isLayoutLeftFixed() && child->isLayoutRightFixed()) {
+							if (child->getWidthMode() == SizeMode::Filling) {
+								sl_real weight = child->getWidthWeight();
+								if (Math::isAlmostZero(weight - 1)) {
+									Rectangle frame = child->getLayoutFrame();
+									frame.setWidth(sizeAvg);
+									child->setLayoutFrame(frame);
+								}
+							}
+						}
+					} else {
+						if (child->isLayoutTopFixed() && child->isLayoutBottomFixed()) {
+							if (child->getWidthMode() == SizeMode::Filling) {
+								sl_real weight = child->getHeightWeight();
+								if (Math::isAlmostZero(weight - 1)) {
+									Rectangle frame = child->getLayoutFrame();
+									frame.setHeight(sizeAvg);
+									child->setLayoutFrame(frame);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	sl_real pos;
 	if (flagHorizontal) {
 		pos = getPaddingLeft();
 	} else {
 		pos = getPaddingTop();
 	}
-	ListLocker< Ref<View> > children(_getChildren());
-	for (sl_size i = 0; i < children.count; i++) {
+	for (i = 0; i < children.count; i++) {
 		Ref<View>& child = children[i];
 		if (child.isNotNull()) {
 			if (child->getVisibility() != Visibility::Gone) {
@@ -184,6 +318,7 @@ void LinearView::onMakeLayout()
 			}
 		}
 	}
+
 }
 
 VerticalLinearView::VerticalLinearView()

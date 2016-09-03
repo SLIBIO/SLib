@@ -212,12 +212,6 @@ public:
 	
 	void setExpandedIcon(const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
 	
-	Ref<Drawable> getDefaultCollapsedIcon();
-	
-	Ref<Drawable> getDefaultExpandedIcon();
-	
-	void applyDefaultIcons(sl_bool flagRedraw = sl_true);
-	
 	Color getSelectedItemBackgroundColor();
 	
 	void setSelectedItemBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);

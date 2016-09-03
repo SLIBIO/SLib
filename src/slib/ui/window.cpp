@@ -1097,6 +1097,12 @@ void WindowInstance::onResize(Size& size)
 	}
 }
 
+void WindowInstance::onResized(sl_real width, sl_real height)
+{
+	Size size(width, height);
+	onResize(size);
+}
+
 void WindowInstance::onMinimize()
 {
 	Ref<Window> window = getWindow();

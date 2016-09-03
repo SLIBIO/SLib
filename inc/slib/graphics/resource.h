@@ -95,12 +95,12 @@ SLIB_GRAPHICS_NAMESPACE_BEGIN
 	}
 
 
-#define SLIB_DECLARE_NINEPATCH_RESOURCE(NAME) \
+#define SLIB_DECLARE_NINEPIECES_RESOURCE(NAME) \
 	namespace NAME { \
 		slib::Ref<slib::Drawable> get(); \
 	}
 
-#define SLIB_DEFINE_NINEPATCH_RESOURCE(NAME, LEFT_WIDTH, RIGHT_WIDTH, TOP_HEIGHT, BOTTOM_HEIGHT, TOP_LEFT, TOP, TOP_RIGHT, LEFT, CENTER, RIGHT, BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT) \
+#define SLIB_DEFINE_NINEPIECES_RESOURCE(NAME, LEFT_WIDTH, RIGHT_WIDTH, TOP_HEIGHT, BOTTOM_HEIGHT, TOP_LEFT, TOP, TOP_RIGHT, LEFT, CENTER, RIGHT, BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT) \
 	namespace NAME { \
 		SLIB_STATIC_ZERO_INITIALIZED(SafeRef<Drawable>, value) \
 		slib::Ref<slib::Drawable> get() { \
@@ -108,15 +108,31 @@ SLIB_GRAPHICS_NAMESPACE_BEGIN
 				return slib::Ref<slib::Drawable>::null(); \
 			} \
 			if (value.isNull()) { \
-				value = NinePatchDrawable::create(LEFT_WIDTH, RIGHT_WIDTH, TOP_HEIGHT, BOTTOM_HEIGHT, TOP_LEFT, TOP, TOP_RIGHT, LEFT, CENTER, RIGHT, BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT); \
+				value = NinePiecesDrawable::create(LEFT_WIDTH, RIGHT_WIDTH, TOP_HEIGHT, BOTTOM_HEIGHT, TOP_LEFT, TOP, TOP_RIGHT, LEFT, CENTER, RIGHT, BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT); \
 			} \
 			return value; \
 		} \
 	}
 
-#define SLIB_DEFINE_DRAWABLE_RESOURCES \
-	sl_real getScree
 
+#define SLIB_DECLARE_NINEPATCH_RESOURCE(NAME) \
+	namespace NAME { \
+		slib::Ref<slib::Drawable> get(); \
+	}
+
+#define SLIB_DEFINE_NINEPATCH_RESOURCE(NAME, DST_LEFT_WIDTH, DST_RIGHT_WIDTH, DST_TOP_HEIGHT, DST_BOTTOM_HEIGHT, SRC, SRC_LEFT_WIDTH, SRC_RIGHT_WIDTH, SRC_TOP_HEIGHT, SRC_BOTTOM_HEIGHT) \
+	namespace NAME { \
+		SLIB_STATIC_ZERO_INITIALIZED(SafeRef<Drawable>, value) \
+		slib::Ref<slib::Drawable> get() { \
+			if (SLIB_SAFE_STATIC_CHECK_FREED(value)) { \
+				return slib::Ref<slib::Drawable>::null(); \
+			} \
+			if (value.isNull()) { \
+				value = NinePatchDrawable::create(DST_LEFT_WIDTH, DST_RIGHT_WIDTH, DST_TOP_HEIGHT, DST_BOTTOM_HEIGHT, SRC, SRC_LEFT_WIDTH, SRC_RIGHT_WIDTH, SRC_TOP_HEIGHT, SRC_BOTTOM_HEIGHT); \
+			} \
+			return value; \
+		} \
+	}
 
 #define SLIB_DECLARE_DRAWABLE_RESOURCE_MAP SLIB_DECLARE_RESOURCE_MAP(slib::Ref<slib::Drawable>)
 #define SLIB_DEFINE_DRAWABLE_RESOURCE_MAP_BEGIN SLIB_DEFINE_RESOURCE_MAP_BEGIN(slib::Ref<slib::Drawable>)

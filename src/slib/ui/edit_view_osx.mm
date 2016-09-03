@@ -443,22 +443,22 @@ SLIB_UI_NAMESPACE_END
 		[self setHasVerticalScroller:TRUE];
 		[self setHasHorizontalScroller:TRUE];
 		
-		[textView setDelegate:self];
+		//[textView setDelegate:self];
 	}
 	return self;
 }
-
+/*
 -(void)controlTextDidChange:(NSNotification *)obj
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::_EditView::onChangeTextArea(instance.ptr, self);
 	}
-}
+}*/
 @end
 
 @implementation _Slib_OSX_TextArea_TextView
-
+/*
 - (void)keyUp:(NSEvent*)theEvent
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
@@ -470,7 +470,7 @@ SLIB_UI_NAMESPACE_END
 	}
 	[super keyUp:theEvent];
 }
-
+*/
 @end
 
 #endif

@@ -2,11 +2,11 @@
 
 #if defined(SLIB_PLATFORM_IS_IOS)
 
-#include "../../../inc/slib/ui/drop_down_list.h"
+#include "../../../inc/slib/ui/select_view.h"
 
 #include "view_ios.h"
 
-@interface _Slib_iOS_DropDownList : UITextField<UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate>
+@interface _Slib_iOS_SelectView : UITextField<UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate>
 {
 	@public UIPickerView* m_picker;
 	
@@ -18,7 +18,7 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
-class _DropDownList : public DropDownList
+class _SelectView : public SelectView
 {
 public:
 	sl_uint32 __getItemsCount()
@@ -32,14 +32,14 @@ public:
 		return Apple::getNSStringFromString(s);
 	}
 	
-	void __onSelectItem(_Slib_iOS_DropDownList* v, sl_uint32 row)
+	void __onSelectItem(_Slib_iOS_SelectView* v, sl_uint32 row)
 	{
 		m_indexSelected = row;
 		v.text = __getItemTitle(row);
 		onSelectItem(row);
 	}
 	
-	void __onStartSelection(_Slib_iOS_DropDownList* v)
+	void __onStartSelection(_Slib_iOS_SelectView* v)
 	{
 		sl_uint32 n = m_indexSelected;
 		v->m_selectionBefore = n;
@@ -48,12 +48,12 @@ public:
 		});
 	}
 	
-	void __onCancelSelection(_Slib_iOS_DropDownList* v)
+	void __onCancelSelection(_Slib_iOS_SelectView* v)
 	{
 		__onSelectItem(v, v->m_selectionBefore);
 	}
 	
-	void __selectItem(_Slib_iOS_DropDownList* v, sl_uint32 row)
+	void __selectItem(_Slib_iOS_SelectView* v, sl_uint32 row)
 	{
 		v.text = __getItemTitle(row);
 		dispatch_async(dispatch_get_main_queue(), ^{
@@ -62,12 +62,12 @@ public:
 	}
 };
 
-Ref<ViewInstance> DropDownList::createNativeWidget(ViewInstance* _parent)
+Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* _parent)
 {
 	IOS_VIEW_CREATE_INSTANCE_BEGIN
-	_Slib_iOS_DropDownList* handle = [[_Slib_iOS_DropDownList alloc] initWithFrame:frame];
+	_Slib_iOS_SelectView* handle = [[_Slib_iOS_SelectView alloc] initWithFrame:frame];
 	if (handle != nil) {
-		((_DropDownList*)this)->__selectItem(handle, m_indexSelected);
+		((_SelectView*)this)->__selectItem(handle, m_indexSelected);
 		
 		Ref<Font> font = getFont();
 		Ref<FontInstance> fontInstance;
@@ -80,51 +80,51 @@ Ref<ViewInstance> DropDownList::createNativeWidget(ViewInstance* _parent)
 	return ret;
 }
 
-void DropDownList::_getSelectedIndex_NW()
+void SelectView::_getSelectedIndex_NW()
 {
 }
 
-void DropDownList::_select_NW(sl_uint32 index)
+void SelectView::_select_NW(sl_uint32 index)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_DropDownList class]]) {
-		_Slib_iOS_DropDownList* v = (_Slib_iOS_DropDownList*)handle;
-		((_DropDownList*)this)->__selectItem(v, index);
+	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
+		_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
+		((_SelectView*)this)->__selectItem(v, index);
 	}
 }
 
-void DropDownList::_refreshItemsCount_NW()
+void SelectView::_refreshItemsCount_NW()
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_DropDownList class]]) {
-		_Slib_iOS_DropDownList* v = (_Slib_iOS_DropDownList*)handle;
+	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
+		_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
 		[v->m_picker reloadAllComponents];
 	}
 }
 
-void DropDownList::_refreshItemsContent_NW()
+void SelectView::_refreshItemsContent_NW()
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_DropDownList class]]) {
-		_Slib_iOS_DropDownList* v = (_Slib_iOS_DropDownList*)handle;
+	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
+		_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
 		[v->m_picker reloadAllComponents];
 	}
 }
 
-void DropDownList::_setItemTitle_NW(sl_uint32 index, const String& title)
+void SelectView::_setItemTitle_NW(sl_uint32 index, const String& title)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_DropDownList class]]) {
-		_Slib_iOS_DropDownList* v = (_Slib_iOS_DropDownList*)handle;
+	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
+		_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
 		[v->m_picker reloadComponent:index];
 	}
 }
 
-void DropDownList::_setFont_NW(const Ref<Font>& font)
+void SelectView::_setFont_NW(const Ref<Font>& font)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_DropDownList class]]) {
-		_Slib_iOS_DropDownList* v = (_Slib_iOS_DropDownList*)handle;
+	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
+		_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
 		Ref<FontInstance> fontInstance;
 		UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
 		if (hFont != nil) {
@@ -138,13 +138,13 @@ SLIB_UI_NAMESPACE_END
 #define DROP_ICON_WIDTH 20
 #define DROP_ICON_HEIGHT 12
 
-@interface _Slib_iOS_DropDownList_DropIcon : UIView
+@interface _Slib_iOS_SelectView_DropIcon : UIView
 {
-	@public __weak _Slib_iOS_DropDownList* parent;
+	@public __weak _Slib_iOS_SelectView* parent;
 }
 @end
 
-@implementation _Slib_iOS_DropDownList_DropIcon
+@implementation _Slib_iOS_SelectView_DropIcon
 - (id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -181,7 +181,7 @@ SLIB_UI_NAMESPACE_END
 }
 @end
 
-@implementation _Slib_iOS_DropDownList
+@implementation _Slib_iOS_SelectView
 -(id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -198,7 +198,7 @@ SLIB_UI_NAMESPACE_END
 		[[self valueForKey:@"textInputTraits"] setValue:[UIColor clearColor] forKey:@"insertionPointColor"];
 		
 		// add icon
-		_Slib_iOS_DropDownList_DropIcon* icon = [[_Slib_iOS_DropDownList_DropIcon alloc] initWithFrame:(CGRectMake(0, 0, DROP_ICON_WIDTH, DROP_ICON_HEIGHT))];
+		_Slib_iOS_SelectView_DropIcon* icon = [[_Slib_iOS_SelectView_DropIcon alloc] initWithFrame:(CGRectMake(0, 0, DROP_ICON_WIDTH, DROP_ICON_HEIGHT))];
 		icon->parent = self;
 		self.rightView =  icon;
 		self.rightViewMode = UITextFieldViewModeAlways;
@@ -235,8 +235,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::DropDownList::checkInstance(view.ptr)) {
-			((slib::_DropDownList*)(view.ptr))->__onSelectItem(self, (sl_uint32)row);
+		if (slib::SelectView::checkInstance(view.ptr)) {
+			((slib::_SelectView*)(view.ptr))->__onSelectItem(self, (sl_uint32)row);
 		}
 	}
 }
@@ -246,8 +246,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::DropDownList::checkInstance(view.ptr)) {
-			return (NSInteger)(((slib::_DropDownList*)(view.ptr))->__getItemsCount());
+		if (slib::SelectView::checkInstance(view.ptr)) {
+			return (NSInteger)(((slib::_SelectView*)(view.ptr))->__getItemsCount());
 		}
 	}
 	return 0;
@@ -258,8 +258,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::DropDownList::checkInstance(view.ptr)) {
-			return ((slib::_DropDownList*)(view.ptr))->__getItemTitle((sl_uint32)row);
+		if (slib::SelectView::checkInstance(view.ptr)) {
+			return ((slib::_SelectView*)(view.ptr))->__getItemTitle((sl_uint32)row);
 		}
 	}
 	return @"";
@@ -270,8 +270,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::DropDownList::checkInstance(view.ptr)) {
-			if ((NSInteger)(((slib::_DropDownList*)(view.ptr))->__getItemsCount()) > 0) {
+		if (slib::SelectView::checkInstance(view.ptr)) {
+			if ((NSInteger)(((slib::_SelectView*)(view.ptr))->__getItemsCount()) > 0) {
 				return YES;
 			}
 		}
@@ -285,8 +285,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::DropDownList::checkInstance(view.ptr)) {
-			((slib::_DropDownList*)(view.ptr))->__onStartSelection(self);
+		if (slib::SelectView::checkInstance(view.ptr)) {
+			((slib::_SelectView*)(view.ptr))->__onStartSelection(self);
 		}
 	}
 }
@@ -313,8 +313,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::DropDownList::checkInstance(view.ptr)) {
-			((slib::_DropDownList*)(view.ptr))->__onCancelSelection(self);
+		if (slib::SelectView::checkInstance(view.ptr)) {
+			((slib::_SelectView*)(view.ptr))->__onCancelSelection(self);
 		}
 	}
 }

@@ -128,8 +128,8 @@
 		266DD5971C11940A00D47AB0 /* cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4F51C11940A00D47AB0 /* cursor.cpp */; };
 		266DD5981C11940A00D47AB0 /* cursor_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4F61C11940A00D47AB0 /* cursor_osx.mm */; };
 		266DD59C1C11940A00D47AB0 /* drawable_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4FA1C11940A00D47AB0 /* drawable_quartz.mm */; };
-		266DD59D1C11940A00D47AB0 /* drop_down_list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4FB1C11940A00D47AB0 /* drop_down_list.cpp */; };
-		266DD5A01C11940A00D47AB0 /* drop_down_list_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4FE1C11940A00D47AB0 /* drop_down_list_osx.mm */; };
+		266DD59D1C11940A00D47AB0 /* select_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4FB1C11940A00D47AB0 /* select_view.cpp */; };
+		266DD5A01C11940A00D47AB0 /* select_view_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4FE1C11940A00D47AB0 /* select_view_osx.mm */; };
 		266DD5A21C11940A00D47AB0 /* edit_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5001C11940A00D47AB0 /* edit_view.cpp */; };
 		266DD5A51C11940A00D47AB0 /* edit_view_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5031C11940A00D47AB0 /* edit_view_osx.mm */; };
 		266DD5A81C11940A00D47AB0 /* font_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5061C11940A00D47AB0 /* font_apple.mm */; };
@@ -368,8 +368,8 @@
 		266DD4F51C11940A00D47AB0 /* cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cursor.cpp; sourceTree = "<group>"; };
 		266DD4F61C11940A00D47AB0 /* cursor_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = cursor_osx.mm; sourceTree = "<group>"; };
 		266DD4FA1C11940A00D47AB0 /* drawable_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = drawable_quartz.mm; sourceTree = "<group>"; };
-		266DD4FB1C11940A00D47AB0 /* drop_down_list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = drop_down_list.cpp; sourceTree = "<group>"; };
-		266DD4FE1C11940A00D47AB0 /* drop_down_list_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = drop_down_list_osx.mm; sourceTree = "<group>"; };
+		266DD4FB1C11940A00D47AB0 /* select_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = select_view.cpp; sourceTree = "<group>"; };
+		266DD4FE1C11940A00D47AB0 /* select_view_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = select_view_osx.mm; sourceTree = "<group>"; };
 		266DD5001C11940A00D47AB0 /* edit_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = edit_view.cpp; sourceTree = "<group>"; };
 		266DD5031C11940A00D47AB0 /* edit_view_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = edit_view_osx.mm; sourceTree = "<group>"; };
 		266DD5061C11940A00D47AB0 /* font_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = font_apple.mm; sourceTree = "<group>"; };
@@ -606,8 +606,6 @@
 				266DD4F51C11940A00D47AB0 /* cursor.cpp */,
 				266DD4F61C11940A00D47AB0 /* cursor_osx.mm */,
 				266DD4FA1C11940A00D47AB0 /* drawable_quartz.mm */,
-				266DD4FB1C11940A00D47AB0 /* drop_down_list.cpp */,
-				266DD4FE1C11940A00D47AB0 /* drop_down_list_osx.mm */,
 				266DD5001C11940A00D47AB0 /* edit_view.cpp */,
 				266DD5031C11940A00D47AB0 /* edit_view_osx.mm */,
 				266DD5061C11940A00D47AB0 /* font_apple.mm */,
@@ -628,6 +626,8 @@
 				267C16B81CE779D8000318C2 /* scroll_bar.cpp */,
 				266DD5231C11940A00D47AB0 /* scroll_view.cpp */,
 				266DD5261C11940A00D47AB0 /* scroll_view_osx.mm */,
+				266DD4FB1C11940A00D47AB0 /* select_view.cpp */,
+				266DD4FE1C11940A00D47AB0 /* select_view_osx.mm */,
 				266DD5281C11940A00D47AB0 /* tab_view.cpp */,
 				266DD5291C11940A00D47AB0 /* tab_view_osx.mm */,
 				26A4ECCE1CFE7FB700288A0B /* tree_view.cpp */,
@@ -981,7 +981,7 @@
 				266DD56E1C11940A00D47AB0 /* netfilter.cpp in Sources */,
 				A25F30181B03A33700854DAF /* file_unix.cpp in Sources */,
 				266DD5771C11940A00D47AB0 /* socket_address.cpp in Sources */,
-				266DD59D1C11940A00D47AB0 /* drop_down_list.cpp in Sources */,
+				266DD59D1C11940A00D47AB0 /* select_view.cpp in Sources */,
 				A25F30261B03A33700854DAF /* setting.cpp in Sources */,
 				266DD5C01C11940A00D47AB0 /* image_view.cpp in Sources */,
 				266DD49C1C1193C400D47AB0 /* image.cpp in Sources */,
@@ -1146,7 +1146,7 @@
 				266DD4981C1193C400D47AB0 /* image_jpeg.cpp in Sources */,
 				266DD4651C11930800D47AB0 /* gcm.cpp in Sources */,
 				26AE7BF01C98F8CB0026C2D9 /* line_segment.cpp in Sources */,
-				266DD5A01C11940A00D47AB0 /* drop_down_list_osx.mm in Sources */,
+				266DD5A01C11940A00D47AB0 /* select_view_osx.mm in Sources */,
 				26AE7BFA1C9930E10026C2D9 /* sphere.cpp in Sources */,
 				A2C8BE361AFA832800D584D1 /* thirdparty_libopus.c in Sources */,
 				26694BF71C9AB4330047E67C /* audio_util.cpp in Sources */,

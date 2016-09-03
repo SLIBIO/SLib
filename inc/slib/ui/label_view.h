@@ -23,9 +23,9 @@ public:
 	
 	virtual void setTextColor(const Color& color, sl_bool flagRedraw = sl_true);
 	
-	Alignment getTextAlignment();
+	Alignment getGravity();
 	
-	virtual void setTextAlignment(Alignment align, sl_bool flagRedraw = sl_true);
+	virtual void setGravity(Alignment align, sl_bool flagRedraw = sl_true);
 	
 public:
 	// override
@@ -34,6 +34,9 @@ public:
 protected:
 	// override
 	void onDraw(Canvas* canvas);
+	
+	// override
+	void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 	
 private:
 	void _setText_NW(const String& text);

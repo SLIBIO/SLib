@@ -1,4 +1,5 @@
 #include "../../../inc/slib/ui/label_view.h"
+#include "../../../inc/slib/graphics/context.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -48,12 +49,12 @@ void LabelView::setTextColor(const Color& color, sl_bool flagRedraw)
 	}
 }
 
-Alignment LabelView::getTextAlignment()
+Alignment LabelView::getGravity()
 {
 	return m_textAlignment;
 }
 
-void LabelView::setTextAlignment(Alignment align, sl_bool flagRedraw)
+void LabelView::setGravity(Alignment align, sl_bool flagRedraw)
 {
 	m_textAlignment = align;
 	if (isNativeWidget()) {
@@ -71,6 +72,32 @@ void LabelView::onDraw(Canvas* canvas)
 	canvas->drawText(m_text, bound, getFont(), m_textColor, m_textAlignment);
 }
 
+void LabelView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
+{
+	if (!flagVertical && !flagHorizontal) {
+		return;
+	}
+	
+	Ref<GraphicsContext> gc = getGraphicsContext();
+	if (gc.isNull()) {
+		return;
+	}
+	
+	Size sizeText = gc->getFontTextSize(getFont(), m_text);
+	
+	if (flagHorizontal) {
+		if (sizeText.x < 0) {
+			sizeText.x = 0;
+		}
+		setMeasuredWidth(sizeText.x + getPaddingLeft() + getPaddingRight());
+	}
+	if (flagVertical) {
+		if (sizeText.y < 0) {
+			sizeText.y = 0;
+		}
+		setMeasuredHeight(sizeText.y + getPaddingTop() + getPaddingBottom());
+	}
+}
 
 #if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
 

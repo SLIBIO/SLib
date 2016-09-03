@@ -1,4 +1,5 @@
 #include "../../../inc/slib/ui/edit_view.h"
+#include "../../../inc/slib/graphics/context.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -38,7 +39,7 @@ void EditView::setText(const String& text, sl_bool flagRedraw)
 	}
 }
 
-Alignment EditView::getTextAlignment()
+Alignment EditView::getGravity()
 {
 	if (isNativeWidget()) {
 		_getTextAlignment_NW();
@@ -46,7 +47,7 @@ Alignment EditView::getTextAlignment()
 	return m_textAlignment;
 }
 
-void EditView::setTextAlignment(Alignment align, sl_bool flagRedraw)
+void EditView::setGravity(Alignment align, sl_bool flagRedraw)
 {
 	m_textAlignment = align;
 	if (isNativeWidget()) {
@@ -132,6 +133,33 @@ void EditView::setTextColor(const Color& color, sl_bool flagRedraw)
 		if (flagRedraw) {
 			invalidate();
 		}
+	}
+}
+
+
+void EditView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
+{
+	if (!flagHorizontal && !flagVertical) {
+		return;
+	}
+	
+	Ref<GraphicsContext> gc = getGraphicsContext();
+	if (gc.isNull()) {
+		return;
+	}
+	
+	Size sizeText = gc->getFontTextSize(getFont(), "|");
+	if (flagHorizontal) {
+		if (sizeText.x < 0) {
+			sizeText.x = 0;
+		}
+		setMeasuredWidth(sizeText.x + getPaddingLeft() + getPaddingRight());
+	}
+	if (flagVertical) {
+		if (sizeText.y < 0) {
+			sizeText.y = 0;
+		}
+		setMeasuredHeight(sizeText.y + getPaddingTop() + getPaddingBottom());
 	}
 }
 

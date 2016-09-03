@@ -288,6 +288,10 @@ public:
 	
 	void setLayoutFrame(const Rectangle& rect);
 	
+	sl_bool isLayoutFrameUpdated();
+	
+	void setLayoutFrameUpdated(sl_bool flag);
+	
 	sl_bool isOnPrepareLayoutEnabled();
 	
 	void setOnPrepareLayoutEnabled(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
@@ -310,15 +314,19 @@ public:
 	
 	void setSizeFixed(sl_bool flagRedraw = sl_true);
 	
+	sl_real getWidthWeight();
+	
+	sl_real getHeightWeight();
+	
 	sl_bool isWidthFilling();
 	
-	void setWidthFilling(sl_bool flagRedraw = sl_true);
+	void setWidthFilling(sl_real weight = 1, sl_bool flagRedraw = sl_true);
 	
 	sl_bool isHeightFilling();
 	
-	void setHeightFilling(sl_bool flagRedraw = sl_true);
+	void setHeightFilling(sl_real weight = 1, sl_bool flagRedraw = sl_true);
 	
-	void setSizeFilling(sl_bool flagRedraw = sl_true);
+	void setSizeFilling(sl_real widthWeight = 1, sl_real heightWeight = 1, sl_bool flagRedraw = sl_true);
 	
 	sl_bool isWidthWrapping();
 	
@@ -332,13 +340,9 @@ public:
 	
 	sl_bool isWidthWeight();
 	
-	sl_real getWidthWeight();
-	
 	void setWidthWeight(sl_real weight = 1, sl_bool flagRedraw = sl_true);
 	
 	sl_bool isHeightWeight();
-	
-	sl_real getHeightWeight();
 	
 	void setHeightWeight(sl_real weight = 1, sl_bool flagRedraw = sl_true);
 	
@@ -577,9 +581,9 @@ public:
 	
 	void setBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
 	
-	Ref<Pen> getBorderPen();
+	Ref<Pen> getBorder();
 	
-	void setBorderPen(const Ref<Pen>& pen, sl_bool flagRedraw = sl_true);
+	void setBorder(const Ref<Pen>& pen, sl_bool flagRedraw = sl_true);
 	
 	PenStyle getBorderStyle();
 	
@@ -629,6 +633,14 @@ public:
 	sl_bool isDoubleBuffering();
 	
 	void setDoubleBuffering(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
+	
+	sl_bool isAlwaysOnDrawBackground();
+	
+	void setAlwaysOnDrawBackground(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
+	
+	sl_bool isAlwaysOnDrawBorder();
+	
+	void setAlwaysOnDrawBorder(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
 
 	
 	Ref<Font> getFont();
@@ -1011,6 +1023,7 @@ private:
 		sl_bool flagInvalidLayout;
 		
 		sl_bool flagRecursiveMakeLayout;
+		sl_bool flagUpdatedLayoutFrame;
 		
 	};
 	SafeRef<LayoutAttributes> m_layout;
@@ -1053,6 +1066,9 @@ private:
 		
 		SafeRef<Font> font;
 		SafeRef<FontInstance> fontInstance;
+		
+		sl_bool flagOnDrawBackgroundAlways;
+		sl_bool flagOnDrawBorderAlways;
 	};
 	SafeRef<DrawAttributes> m_draw;
 	
