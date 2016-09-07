@@ -148,18 +148,19 @@ void EditView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 		return;
 	}
 	
-	Size sizeText = gc->getFontTextSize(getFont(), "|");
 	if (flagHorizontal) {
-		if (sizeText.x < 0) {
-			sizeText.x = 0;
-		}
-		setMeasuredWidth(sizeText.x + getPaddingLeft() + getPaddingRight());
+		setMeasuredWidth(0);
 	}
 	if (flagVertical) {
-		if (sizeText.y < 0) {
-			sizeText.y = 0;
+		sl_real height = 0;
+		Ref<Font> font = getFont();
+		if (font.isNotNull()) {
+			height = font->getSize();
 		}
-		setMeasuredHeight(sizeText.y + getPaddingTop() + getPaddingBottom());
+		if (height < 0) {
+			height = 0;
+		}
+		setMeasuredHeight(height + getPaddingTop() + getPaddingBottom());
 	}
 }
 

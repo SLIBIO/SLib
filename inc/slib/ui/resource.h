@@ -126,7 +126,7 @@ public:
 	UILayoutResource(sl_real customUnitLength = 1);
 	
 public:
-	Ref<View> getContentView();
+	Ref<View> getContent();
 	
 	sl_real getCustomUnitLength();
 	

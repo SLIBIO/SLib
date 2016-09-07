@@ -99,6 +99,15 @@ sl_bool Window::isClosed()
 	return sl_true;
 }
 
+sl_bool Window::isOpened()
+{
+	Ref<WindowInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		return !(instance->isClosed());
+	}
+	return sl_false;
+}
+
 Ref<Window> Window::getParent()
 {
 	return m_parent;

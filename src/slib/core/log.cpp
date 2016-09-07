@@ -1,6 +1,7 @@
 #include "../../../inc/slib/core/file.h"
 #include "../../../inc/slib/core/log.h"
 #include "../../../inc/slib/core/system.h"
+#include "../../../inc/slib/core/variant.h"
 
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 #include <android/log.h>
@@ -15,7 +16,7 @@ void Logger::logError(const String& tag, const String& content)
 
 static String _Log_getLineString(const String& tag, const String& content)
 {
-	return Time::now().toString() + " " + tag + " - " + content;
+	return String::format("%s [%s] %s", Time::now(), tag, content);
 }
 
 FileLogger::FileLogger()

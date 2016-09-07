@@ -426,62 +426,16 @@ void Button::setTextColor(const Color& color, sl_bool flagRedraw)
 	}
 }
 
-Color Button::getBackgroundColor(ButtonState state, sl_uint32 category)
+void Button::resetStateTextColors(sl_bool flagRedraw)
 {
-	if (category < m_nCategories) {
-		return m_categories[category].properties[(int)state].backgroundColor;
-	} else {
-		return Color::zero();
-	}
-}
-
-void Button::setBackgroundColor(const Color& color, ButtonState state, sl_uint32 category, sl_bool flagRedraw)
-{
-	if (category < m_nCategories) {
-		m_categories[category].properties[(int)state].backgroundColor = color;
-		if (flagRedraw) {
-			invalidate();
+	for (sl_uint32 i = 0; i < m_nCategories; i++) {
+		for (int k = 0; k < (int)(ButtonState::Count); k++) {
+			m_categories[i].properties[k].textColor = Color::zero();
 		}
 	}
-}
-
-Color Button::getBackgroundColor()
-{
-	return View::getBackgroundColor();
-}
-
-void Button::setBackgroundColor(const Color& color, sl_bool flagRedraw)
-{
-	View::setBackgroundColor(color, flagRedraw);
-}
-
-Ref<Drawable> Button::getBackground(ButtonState state, sl_uint32 category)
-{
-	if (category < m_nCategories) {
-		return m_categories[category].properties[(int)state].background;
-	} else {
-		return Ref<Drawable>::null();
+	if (flagRedraw) {
+		invalidate();
 	}
-}
-
-void Button::setBackground(const Ref<Drawable>& background, ButtonState state, sl_uint32 category, sl_bool flagRedraw)
-{
-	if (category < m_nCategories) {
-		m_categories[category].properties[(int)state].background = background;
-		if (flagRedraw) {
-			invalidate();
-		}
-	}
-}
-
-Ref<Drawable> Button::getBackground()
-{
-	return View::getBackground();
-}
-
-void Button::setBackground(const Ref<Drawable>& background, sl_bool flagRedraw)
-{
-	View::setBackground(background ,flagRedraw);
 }
 
 Ref<Drawable> Button::getIcon(ButtonState state, sl_uint32 category)
@@ -516,6 +470,100 @@ void Button::setIcon(const Ref<Drawable>& icon, sl_bool flagRedraw)
 	}
 }
 
+void Button::resetStateIcons(sl_bool flagRedraw)
+{
+	for (sl_uint32 i = 0; i < m_nCategories; i++) {
+		for (int k = 0; k < (int)(ButtonState::Count); k++) {
+			m_categories[i].properties[k].icon.setNull();
+		}
+	}
+	if (flagRedraw) {
+		invalidate();
+	}
+}
+
+Color Button::getBackgroundColor(ButtonState state, sl_uint32 category)
+{
+	if (category < m_nCategories) {
+		return m_categories[category].properties[(int)state].backgroundColor;
+	} else {
+		return Color::zero();
+	}
+}
+
+void Button::setBackgroundColor(const Color& color, ButtonState state, sl_uint32 category, sl_bool flagRedraw)
+{
+	if (category < m_nCategories) {
+		m_categories[category].properties[(int)state].backgroundColor = color;
+		if (flagRedraw) {
+			invalidate();
+		}
+	}
+}
+
+Color Button::getBackgroundColor()
+{
+	return View::getBackgroundColor();
+}
+
+void Button::setBackgroundColor(const Color& color, sl_bool flagRedraw)
+{
+	View::setBackgroundColor(color, flagRedraw);
+}
+
+void Button::resetStateBackgroundColors(sl_bool flagRedraw)
+{
+	for (sl_uint32 i = 0; i < m_nCategories; i++) {
+		for (int k = 0; k < (int)(ButtonState::Count); k++) {
+			m_categories[i].properties[k].backgroundColor = Color::zero();
+		}
+	}
+	if (flagRedraw) {
+		invalidate();
+	}
+}
+
+Ref<Drawable> Button::getBackground(ButtonState state, sl_uint32 category)
+{
+	if (category < m_nCategories) {
+		return m_categories[category].properties[(int)state].background;
+	} else {
+		return Ref<Drawable>::null();
+	}
+}
+
+void Button::setBackground(const Ref<Drawable>& background, ButtonState state, sl_uint32 category, sl_bool flagRedraw)
+{
+	if (category < m_nCategories) {
+		m_categories[category].properties[(int)state].background = background;
+		if (flagRedraw) {
+			invalidate();
+		}
+	}
+}
+
+Ref<Drawable> Button::getBackground()
+{
+	return View::getBackground();
+}
+
+void Button::setBackground(const Ref<Drawable>& background, sl_bool flagRedraw)
+{
+	View::setBackground(background, flagRedraw);
+}
+
+void Button::resetStateBackgrounds(sl_bool flagRedraw)
+{
+	for (sl_uint32 i = 0; i < m_nCategories; i++) {
+		for (int k = 0; k < (int)(ButtonState::Count); k++) {
+			m_categories[i].properties[k].background.setNull();
+		}
+	}
+	if (flagRedraw) {
+		invalidate();
+	}
+}
+
 Ref<Pen> Button::getBorder(ButtonState state, sl_uint32 category)
 {
 	if (category < m_nCategories) {
@@ -543,6 +591,18 @@ Ref<Pen> Button::getBorder()
 void Button::setBorder(const Ref<Pen>& pen, sl_bool flagRedraw)
 {
 	View::setBorder(pen, flagRedraw);
+}
+
+void Button::resetStateBorders(sl_bool flagRedraw)
+{
+	for (sl_uint32 i = 0; i < m_nCategories; i++) {
+		for (int k = 0; k < (int)(ButtonState::Count); k++) {
+			m_categories[i].properties[k].border.setNull();
+		}
+	}
+	if (flagRedraw) {
+		invalidate();
+	}
 }
 
 void Button::setEnabled(sl_bool flagEnabled, sl_bool flagRedraw)
@@ -658,6 +718,10 @@ void Button::layoutIconAndText(GraphicsContext* gc, sl_real widthFrame, sl_real 
 	
 	Ref<Font> font = getFont();
 	Size sizeText = gc->getFontTextSize(font, m_text);
+	if (font.isNotNull()) {
+		sizeText.y = font->getSize();
+	}
+	
 	sl_real widthText = sizeText.x + m_textMarginLeft + m_textMarginRight;
 	sl_real heightText = sizeText.y + m_textMarginTop + m_textMarginBottom;
 	

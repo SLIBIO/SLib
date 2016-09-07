@@ -416,6 +416,7 @@
     <ClCompile Include="..\..\..\src\slib\ui\edit_view_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\font_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\graphics_path_gdiplus.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\image_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\label_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\label_view_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\linear_view.cpp" />

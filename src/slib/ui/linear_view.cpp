@@ -101,15 +101,6 @@ void LinearView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 							}
 						}
 					}
-					if (flagVertical) {
-						sl_real h = child->getMeasuredOuterBoundHeight();
-						if (!(child->isLayoutTopFixed() && child->isLayoutBottomFixed())) {
-							h += paddingHeight;
-						}
-						if (h > measuredHeight) {
-							measuredHeight = h;
-						}
-					}
 				} else {
 					if (flagVertical) {
 						if (child->isLayoutTopFixed() && child->isLayoutBottomFixed()) {
@@ -122,26 +113,26 @@ void LinearView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 							}
 						}
 					}
-					if (flagHorizontal) {
-						sl_real w = child->getMeasuredOuterBoundWidth();
-						if (!(child->isLayoutLeftFixed() && child->isLayoutRightFixed())) {
-							w += paddingWidth;
-						}
-						if (w > measuredWidth) {
-							measuredWidth = w;
-						}
-					}
 				}
 			}
 		}
 	}
-	if (flagHorizontal) {
-		setMeasuredWidth(measuredWidth);
-	}
-	if (flagVertical) {
-		setMeasuredHeight(measuredHeight);
-	}
 	
+	if (m_orientation == LayoutOrientation::Horizontal) {
+		if (flagHorizontal) {
+			setMeasuredWidth(measuredWidth);
+		}
+		if (flagVertical) {
+			measureRelativeLayout(sl_false, sl_true);
+		}
+	} else {
+		if (flagHorizontal) {
+			measureRelativeLayout(sl_true, sl_false);
+		}
+		if (flagVertical) {
+			setMeasuredHeight(measuredHeight);
+		}
+	}
 }
 
 void LinearView::onMakeLayout()

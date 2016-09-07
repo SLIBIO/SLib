@@ -349,6 +349,10 @@ void Canvas::draw(sl_real xDst, sl_real yDst, const Ref<Drawable>& src)
 
 void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleMode scaleMode, Alignment alignment)
 {
+	if (scaleMode == ScaleMode::Stretch) {
+		draw(rectDst, source);
+		return;
+	}
 	Canvas* canvas = this;
 	if (source.isNotNull()) {
 		sl_real dw = rectDst.getWidth();
@@ -358,13 +362,7 @@ void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleMo
 		if (dw > 0 && dh > 0 && sw > 0 && sh > 0) {
 			Rectangle rectSrc;
 			Rectangle rectDraw;
-			if (scaleMode == ScaleMode::Stretch) {
-				rectSrc.left = 0;
-				rectSrc.top = 0;
-				rectSrc.right = sw;
-				rectSrc.bottom = sh;
-				rectDraw = rectDst;
-			} else if (scaleMode == ScaleMode::Contain) {
+			if (scaleMode == ScaleMode::Contain) {
 				sl_real fw = dw / sw;
 				sl_real fh = dh / sh;
 				sl_real tw, th;
@@ -395,13 +393,16 @@ void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleMo
 					tw = sw;
 					th = dh * fw;
 				}
+				rectSrc.left = 0;
+				rectSrc.top = 0;
+				rectSrc.right = sw;
+				rectSrc.bottom = sh;
 				Point pt = GraphicsUtil::calculateAlignPosition(rectSrc, tw, th, alignment);
 				rectSrc.left = pt.x;
 				rectSrc.top = pt.y;
 				rectSrc.right = rectSrc.left + tw;
 				rectSrc.bottom = rectSrc.top + th;
 				rectDraw = rectDst;
-				rectDraw.bottom = dh;
 			} else {
 				rectSrc.left = 0;
 				rectSrc.top = 0;

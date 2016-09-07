@@ -273,6 +273,54 @@ protected:
 	
 };
 
+class MipmapDrawable : public Drawable
+{
+	SLIB_DECLARE_OBJECT
+public:
+	MipmapDrawable();
+	
+public:
+	// override
+	sl_real getDrawableWidth();
+	
+	void setDrawableWidth(sl_real width);
+	
+	// override
+	sl_real getDrawableHeight();
+	
+	void setDrawableHeight(sl_real height);
+
+	void addSource(const Ref<Drawable>& source, sl_real width, sl_real height);
+	
+	void addSource(const Ref<Drawable>& source);
+	
+	Ref<Drawable> getSource(sl_size index);
+	
+	sl_size getSourcesCount();
+	
+	Ref<Drawable> getMatchingSource(sl_real requiredWidth, sl_real requiredHeight);
+	
+public:
+	// override
+	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc);
+	
+	// override
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	
+protected:
+	struct _Source
+	{
+		sl_real width;
+		sl_real height;
+		Ref<Drawable> drawable;
+	};
+	CList<_Source> m_sources;
+	
+	sl_real m_width;
+	sl_real m_height;
+	
+};
+
 SLIB_GRAPHICS_NAMESPACE_END
 
 #endif

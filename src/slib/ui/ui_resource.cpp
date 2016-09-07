@@ -56,7 +56,7 @@ UILayoutResource::UILayoutResource(sl_real customUnitLength)
 	m_countRecursiveLayout = 0;
 }
 
-Ref<View> UILayoutResource::getContentView()
+Ref<View> UILayoutResource::getContent()
 {
 	return m_contentView;
 }

@@ -269,10 +269,6 @@ public:
 	sl_real getMeasuredHeight();
 	
 	void setMeasuredHeight(sl_real height);
-	
-	sl_real getMeasuredOuterBoundWidth();
-	
-	sl_real getMeasuredOuterBoundHeight();
 
 	void requestLayout(sl_bool flagRedraw = sl_true);
 	
@@ -575,15 +571,23 @@ public:
 	
 	Ref<Drawable> getBackground();
 	
-	void setBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	virtual void setBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
 	
+	ScaleMode getBackgroundScaleMode();
+	
+	virtual void setBackgroundScaleMode(ScaleMode mode, sl_bool flagRedraw = sl_true);
+	
+	Alignment getBackgroundAlignment();
+	
+	virtual void setBackgroundAlignment(Alignment align, sl_bool flagRedraw = sl_true);
+
 	Color getBackgroundColor();
 	
-	void setBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
+	virtual void setBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
 	
 	Ref<Pen> getBorder();
 	
-	void setBorder(const Ref<Pen>& pen, sl_bool flagRedraw = sl_true);
+	virtual void setBorder(const Ref<Pen>& pen, sl_bool flagRedraw = sl_true);
 	
 	PenStyle getBorderStyle();
 	
@@ -887,9 +891,11 @@ private:
 	
 	void _prepareLayout(ViewPrepareLayoutParam& param);
 	
-	void _measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical);
-	
 	void _makeLayout(sl_bool flagApplyLayout);
+	
+	void _measureRelativeBoundWidth();
+	
+	void _measureRelativeBoundHeight();
 	
 	void _requestInvalidateLayout();
 	
@@ -918,6 +924,9 @@ private:
 	void _processEventForStateAndClick(UIEvent* ev);
 	
 	void _processContentScrollingEvents(UIEvent* ev);
+	
+protected:
+	void measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 	
 protected:
 	CList< Ref<View> >& _getChildren();
@@ -994,10 +1003,17 @@ private:
 		
 		sl_real measuredWidth;
 		sl_real measuredHeight;
-		sl_real measuredBoundWidth;
-		sl_real measuredBoundHeight;
 		Rectangle frame;
-		
+		sl_bool flagInvalidMeasure;
+		sl_bool flagInvalidLayout;
+
+		sl_real measuredRelativeBoundWidth;
+		sl_bool flagInvalidRelativeBoundWidth;
+		sl_bool flagBadRelativeBoundWidth;
+		sl_real measuredRelativeBoundHeight;
+		sl_bool flagInvalidRelativeBoundHeight;
+		sl_bool flagBadRelativeBoundHeight;
+
 		sl_bool flagOnPrepareLayout;
 		sl_bool flagOnMakeLayout;
 		
@@ -1018,9 +1034,6 @@ private:
 		sl_real relativeMarginRightWeight;
 		sl_bool flagRelativeMarginBottom;
 		sl_real relativeMarginBottomWeight;
-		
-		sl_bool flagInvalidMeasure;
-		sl_bool flagInvalidLayout;
 		
 		sl_bool flagRecursiveMakeLayout;
 		sl_bool flagUpdatedLayoutFrame;
@@ -1046,6 +1059,8 @@ private:
 	{
 	public:
 		SafeRef<Drawable> background;
+		ScaleMode backgroundScaleMode;
+		Alignment backgroundAlignment;
 		Color backgroundColor;
 		
 		SafeRef<Pen> penBorder;

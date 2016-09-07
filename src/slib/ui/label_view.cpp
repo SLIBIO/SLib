@@ -84,6 +84,10 @@ void LabelView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 	}
 	
 	Size sizeText = gc->getFontTextSize(getFont(), m_text);
+	Ref<Font> font = getFont();
+	if (font.isNotNull()) {
+		sizeText.y = font->getSize();
+	}
 	
 	if (flagHorizontal) {
 		if (sizeText.x < 0) {

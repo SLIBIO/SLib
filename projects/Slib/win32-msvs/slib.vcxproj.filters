@@ -1404,5 +1404,8 @@
     <ClCompile Include="..\..\..\src\slib\ui\select_view.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\image_view.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

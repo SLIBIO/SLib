@@ -64,6 +64,8 @@ public:
 private:
 	static sl_bool m_flagPaused;
 	
+protected:
+	Ref<ViewGroup> m_viewPages;
 	
 };
 
@@ -73,6 +75,27 @@ class SLIB_EXPORT MobileMainWindow : public Window
 	
 public:
 	MobileMainWindow();
+	
+};
+
+class SLIB_EXPORT MobilePage : public ViewGroup
+{
+	SLIB_DECLARE_OBJECT
+	
+public:
+	MobilePage();
+	
+public:
+	void show();
+	
+protected:
+	virtual void on();
+	
+	virtual void onShowPage();
+	
+	virtual void onHidePage();
+	
+	virtual void onClosePage();
 	
 };
 

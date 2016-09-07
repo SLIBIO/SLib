@@ -146,6 +146,19 @@ public:
 	
 	virtual void setTextColor(const Color& color, sl_bool flagRedraw = sl_true);
 	
+	void resetStateTextColors(sl_bool flagRedraw = sl_true);
+	
+	
+	Ref<Drawable> getIcon(ButtonState state, sl_uint32 category = 0);
+	
+	virtual void setIcon(const Ref<Drawable>& icon, ButtonState state, sl_uint32 category = 0, sl_bool flagRedraw = sl_true);
+	
+	Ref<Drawable> getIcon();
+	
+	virtual void setIcon(const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
+	
+	void resetStateIcons(sl_bool flagRedraw = sl_true);
+	
 	
 	Color getBackgroundColor(ButtonState state, sl_uint32 category = 0);
 	
@@ -153,7 +166,10 @@ public:
 
 	Color getBackgroundColor();
 	
-	virtual void setBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
+	// override
+	void setBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
+	
+	void resetStateBackgroundColors(sl_bool flagRedraw = sl_true);
 	
 	
 	Ref<Drawable> getBackground(ButtonState state, sl_uint32 category = 0);
@@ -162,16 +178,10 @@ public:
 	
 	Ref<Drawable> getBackground();
 	
-	virtual void setBackground(const Ref<Drawable>& background, sl_bool flagRedraw = sl_true);
+	// override
+	void setBackground(const Ref<Drawable>& background, sl_bool flagRedraw = sl_true);
 
-	
-	Ref<Drawable> getIcon(ButtonState state, sl_uint32 category = 0);
-	
-	virtual void setIcon(const Ref<Drawable>& icon, ButtonState state, sl_uint32 category = 0, sl_bool flagRedraw = sl_true);
-
-	Ref<Drawable> getIcon();
-	
-	virtual void setIcon(const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
+	void resetStateBackgrounds(sl_bool flagRedraw = sl_true);
 	
 	
 	Ref<Pen> getBorder(ButtonState state, sl_uint32 category = 0);
@@ -180,8 +190,10 @@ public:
 	
 	Ref<Pen> getBorder();
 	
-	virtual void setBorder(const Ref<Pen>& pen, sl_bool flagRedraw = sl_true);
+	// override
+	void setBorder(const Ref<Pen>& pen, sl_bool flagRedraw = sl_true);
 	
+	void resetStateBorders(sl_bool flagRedraw = sl_true);
 	
 public:
 	// override

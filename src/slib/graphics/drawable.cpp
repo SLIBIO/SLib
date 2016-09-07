@@ -495,12 +495,24 @@ void NinePatchDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
 	if (src.isNull()) {
 		return;
 	}
+	sl_real xDst = rectDst.left;
+	sl_real yDst = rectDst.top;
 	sl_real widthDst = rectDst.getWidth();
 	sl_real heightDst = rectDst.getHeight();
 	sl_real widthLeftDst = m_widthLeftDst;
 	sl_real widthRightDst = m_widthRightDst;
 	sl_real heightTopDst = m_heightTopDst;
 	sl_real heightBottomDst = m_heightBottomDst;
+	if (widthLeftDst > 1 && widthRightDst > 1 && heightTopDst > 1 && heightBottomDst > 1) {
+		xDst = (sl_real)(int)(xDst);
+		yDst = (sl_real)(int)(yDst);
+		widthDst = (sl_real)(int)(widthDst);
+		heightDst = (sl_real)(int)(heightDst);
+		widthLeftDst = (sl_real)(int)(widthLeftDst);
+		widthRightDst = (sl_real)(int)widthRightDst;
+		heightTopDst = (sl_real)(int)(heightTopDst);
+		heightBottomDst = (sl_real)(int)(heightBottomDst);
+	}
 	if (widthDst < widthLeftDst + widthRightDst || heightDst < heightTopDst + heightBottomDst) {
 		canvas->draw(rectDst, src);
 		return;
@@ -516,42 +528,185 @@ void NinePatchDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
 		return;
 	}
 	if (heightTopDst > 0 && heightTopSrc > 0) {
-		sl_real topDst = rectDst.top;
-		sl_real bottomDst = rectDst.top + heightTopDst;
+		sl_real topDst = yDst;
+		sl_real bottomDst = yDst + heightTopDst;
 		sl_real topSrc = 0;
 		sl_real bottomSrc = heightTopSrc;
 		if (widthLeftDst > 0 && widthLeftSrc > 0) {
-			canvas->draw(Rectangle(rectDst.left, topDst, rectDst.left + widthLeftDst, bottomDst), src, Rectangle(0, topSrc, widthLeftSrc, bottomSrc));
+			canvas->draw(Rectangle(xDst, topDst, xDst + widthLeftDst, bottomDst), src, Rectangle(0, topSrc, widthLeftSrc, bottomSrc));
 		}
-		canvas->draw(Rectangle(rectDst.left + widthLeftDst, topDst, rectDst.right - widthRightDst, bottomDst), src, Rectangle(widthLeftSrc, topSrc, widthSrc - widthRightSrc, bottomSrc));
+		canvas->draw(Rectangle(xDst + widthLeftDst, topDst, xDst + widthDst - widthRightDst, bottomDst), src, Rectangle(widthLeftSrc, topSrc, widthSrc - widthRightSrc, bottomSrc));
 		if (widthRightDst > 0 && widthRightSrc > 0) {
-			canvas->draw(Rectangle(rectDst.right - widthRightDst, topDst, rectDst.right, bottomDst), src, Rectangle(widthSrc - widthRightSrc, topSrc, widthSrc, bottomSrc));
+			canvas->draw(Rectangle(xDst + widthDst - widthRightDst, topDst, xDst + widthDst, bottomDst), src, Rectangle(widthSrc - widthRightSrc, topSrc, widthSrc, bottomSrc));
 		}
 	}
 	if (heightBottomDst > 0 && heightBottomSrc > 0) {
-		sl_real topDst = rectDst.bottom - heightBottomDst;
-		sl_real bottomDst = rectDst.bottom;
+		sl_real topDst = yDst + heightDst - heightBottomDst;
+		sl_real bottomDst = yDst + heightDst;
 		sl_real topSrc = heightSrc - heightBottomSrc;
 		sl_real bottomSrc = heightSrc;
 		if (widthLeftDst > 0 && widthLeftSrc > 0) {
-			canvas->draw(Rectangle(rectDst.left, topDst, rectDst.left + widthLeftDst, bottomDst), src, Rectangle(0, topSrc, widthLeftSrc, bottomSrc));
+			canvas->draw(Rectangle(xDst, topDst, xDst + widthLeftDst, bottomDst), src, Rectangle(0, topSrc, widthLeftSrc, bottomSrc));
 		}
-		canvas->draw(Rectangle(rectDst.left + widthLeftDst, topDst, rectDst.right - widthRightDst, bottomDst), src, Rectangle(widthLeftSrc, topSrc, widthSrc - widthRightSrc, bottomSrc));
+		canvas->draw(Rectangle(xDst + widthLeftDst, topDst, xDst + widthDst - widthRightDst, bottomDst), src, Rectangle(widthLeftSrc, topSrc, widthSrc - widthRightSrc, bottomSrc));
 		if (widthRightDst > 0 && widthRightSrc > 0) {
-			canvas->draw(Rectangle(rectDst.right - widthRightDst, topDst, rectDst.right, bottomDst), src, Rectangle(widthSrc - widthRightSrc, topSrc, widthSrc, bottomSrc));
+			canvas->draw(Rectangle(xDst + widthDst - widthRightDst, topDst, xDst + widthDst, bottomDst), src, Rectangle(widthSrc - widthRightSrc, topSrc, widthSrc, bottomSrc));
 		}
 	}
 	{
-		sl_real topDst = rectDst.top + heightTopDst;
-		sl_real bottomDst = rectDst.bottom - heightBottomDst;
+		sl_real topDst = yDst + heightTopDst;
+		sl_real bottomDst = yDst + heightDst - heightBottomDst;
 		sl_real topSrc = heightTopSrc;
 		sl_real bottomSrc = heightSrc - heightBottomSrc;
 		if (widthLeftDst > 0 && widthLeftSrc > 0) {
-			canvas->draw(Rectangle(rectDst.left, topDst, rectDst.left + widthLeftDst, bottomDst), src, Rectangle(0, topSrc, widthLeftSrc, bottomSrc));
+			canvas->draw(Rectangle(xDst, topDst, xDst + widthLeftDst, bottomDst), src, Rectangle(0, topSrc, widthLeftSrc, bottomSrc));
 		}
-		canvas->draw(Rectangle(rectDst.left + widthLeftDst, topDst, rectDst.right - widthRightDst, bottomDst), src, Rectangle(widthLeftSrc, topSrc, widthSrc - widthRightSrc, bottomSrc));
+		canvas->draw(Rectangle(xDst + widthLeftDst, topDst, xDst + widthDst - widthRightDst, bottomDst), src, Rectangle(widthLeftSrc, topSrc, widthSrc - widthRightSrc, bottomSrc));
 		if (widthRightDst > 0 && widthRightSrc > 0) {
-			canvas->draw(Rectangle(rectDst.right - widthRightDst, topDst, rectDst.right, bottomDst), src, Rectangle(widthSrc - widthRightSrc, topSrc, widthSrc, bottomSrc));
+			canvas->draw(Rectangle(xDst + widthDst - widthRightDst, topDst, xDst + widthDst, bottomDst), src, Rectangle(widthSrc - widthRightSrc, topSrc, widthSrc, bottomSrc));
+		}
+	}
+}
+
+
+SLIB_DEFINE_OBJECT(MipmapDrawable, Drawable)
+
+MipmapDrawable::MipmapDrawable()
+{
+	m_width = 1;
+	m_height = 1;
+}
+
+sl_real MipmapDrawable::getDrawableWidth()
+{
+	return m_width;
+}
+
+void MipmapDrawable::setDrawableWidth(sl_real width)
+{
+	m_width = width;
+}
+
+sl_real MipmapDrawable::getDrawableHeight()
+{
+	return m_height;
+}
+
+void MipmapDrawable::setDrawableHeight(sl_real height)
+{
+	m_height = height;
+}
+
+void MipmapDrawable::addSource(const Ref<Drawable>& source, sl_real width, sl_real height)
+{
+	if (source.isNotNull()) {
+		_Source src;
+		src.drawable = source;
+		src.width = width;
+		src.height = height;
+		m_sources.add(src);
+	}
+}
+
+void MipmapDrawable::addSource(const Ref<Drawable>& source)
+{
+	if (source.isNotNull()) {
+		_Source src;
+		src.drawable = source;
+		src.width = source->getDrawableWidth();
+		src.height = source->getDrawableHeight();
+		m_sources.add(src);
+	}
+}
+
+Ref<Drawable> MipmapDrawable::getSource(sl_size index)
+{
+	_Source source;
+	if (m_sources.getItem(index, &source)) {
+		return source.drawable;
+	}
+	return Ref<Drawable>::null();
+}
+
+sl_size MipmapDrawable::getSourcesCount()
+{
+	return m_sources.getCount();
+}
+
+Ref<Drawable> MipmapDrawable::getMatchingSource(sl_real requiredWidth, sl_real requiredHeight)
+{
+	if (requiredWidth == 0 && requiredHeight == 0) {
+		return getSource(0);
+	}
+	
+	ListLocker<_Source> sources(m_sources);
+	if (sources.count == 0) {
+		return Ref<Drawable>::null();
+	}
+	if (sources.count == 1) {
+		return sources[0].drawable;
+	}
+	
+	sl_size i;
+	sl_real minSize = 0;
+	Ref<Drawable> minSrc;
+	for (i = 0; i < sources.count; i++) {
+		_Source& s = sources[i];
+		sl_real width = s.width;
+		sl_real height = s.height;
+		if (width >= requiredWidth && height >= requiredHeight) {
+			sl_real size = width * height;
+			if (minSize == 0 || size < minSize) {
+				minSize = size;
+				minSrc = s.drawable;
+			}
+		}
+	}
+	if (minSrc.isNotNull()) {
+		return minSrc;
+	}
+	
+	sl_real maxSize = 0;
+	Ref<Drawable> maxSrc;
+	for (i = 0; i < sources.count; i++) {
+		_Source& s = sources[i];
+		sl_real width = s.width;
+		sl_real height = s.height;
+		if (width < requiredWidth || height < requiredHeight) {
+			sl_real size = width * height;
+			if (maxSize == 0 || size > maxSize) {
+				maxSize = size;
+				maxSrc = s.drawable;
+			}
+		}
+	}
+	if (maxSrc.isNotNull()) {
+		return maxSrc;
+	}
+	return Ref<Drawable>::null();
+}
+
+void MipmapDrawable::onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc)
+{
+	Rectangle rectDstWhole = GraphicsUtil::transformRectangle(rectDst, rectSrc, Rectangle(0, 0, m_width, m_height));
+	sl_real width = rectDstWhole.getWidth();
+	sl_real height = rectDstWhole.getHeight();
+	if (width > 0 && height > 0) {
+		Ref<Drawable> drawable = getMatchingSource(width, height);
+		if (drawable.isNotNull()) {
+			canvas->draw(rectDst, drawable, rectSrc);
+		}
+	}
+}
+
+void MipmapDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
+{
+	sl_real width = rectDst.getWidth();
+	sl_real height = rectDst.getHeight();
+	if (width > 0 && height > 0) {
+		Ref<Drawable> drawable = getMatchingSource(width, height);
+		if (drawable.isNotNull()) {
+			canvas->draw(rectDst, drawable);
 		}
 	}
 }

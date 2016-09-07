@@ -58,6 +58,8 @@ public:
 	
 	sl_bool isClosed();
 	
+	sl_bool isOpened();
+	
 	
 	Ref<Window> getParent();
 	
