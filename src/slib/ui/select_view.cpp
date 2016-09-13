@@ -244,12 +244,12 @@ String SelectView::getSelectedTitle()
 	return m_titles.getItemValue(m_indexSelected, String::null());
 }
 
-const Size& SelectView::getIconSize()
+const UISize& SelectView::getIconSize()
 {
 	return m_iconSize;
 }
 
-void SelectView::setIconSize(const Size& size, sl_bool flagRedraw)
+void SelectView::setIconSize(const UISize& size, sl_bool flagRedraw)
 {
 	m_iconSize = size;
 	if (flagRedraw) {
@@ -257,34 +257,34 @@ void SelectView::setIconSize(const Size& size, sl_bool flagRedraw)
 	}
 }
 
-void SelectView::setIconSize(sl_real width, sl_real height, sl_bool flagRedraw)
+void SelectView::setIconSize(sl_ui_len width, sl_ui_len height, sl_bool flagRedraw)
 {
-	setIconSize(Size(width, height), flagRedraw);
+	setIconSize(UISize(width, height), flagRedraw);
 }
 
-void SelectView::setIconSize(sl_real size, sl_bool flagRedraw)
+void SelectView::setIconSize(sl_ui_len size, sl_bool flagRedraw)
 {
-	setIconSize(Size(size, size),flagRedraw);
+	setIconSize(UISize(size, size),flagRedraw);
 }
 
-sl_real SelectView::getIconWidth()
+sl_ui_len SelectView::getIconWidth()
 {
 	return m_iconSize.x;
 }
 
-void SelectView::setIconWidth(sl_real width, sl_bool flagRedraw)
+void SelectView::setIconWidth(sl_ui_len width, sl_bool flagRedraw)
 {
-	setIconSize(Size(width, m_iconSize.y), flagRedraw);
+	setIconSize(UISize(width, m_iconSize.y), flagRedraw);
 }
 
-sl_real SelectView::getIconHeight()
+sl_ui_len SelectView::getIconHeight()
 {
 	return m_iconSize.y;
 }
 
-void SelectView::setIconHeight(sl_real height, sl_bool flagRedraw)
+void SelectView::setIconHeight(sl_ui_len height, sl_bool flagRedraw)
 {
-	setIconSize(Size(m_iconSize.x, height), flagRedraw);
+	setIconSize(UISize(m_iconSize.x, height), flagRedraw);
 }
 
 Ref<Drawable> SelectView::getLeftIcon()
@@ -344,7 +344,7 @@ void SelectView::onDraw(Canvas* canvas)
 void SelectView::onMouseEvent(UIEvent* ev)
 {
 	UIAction action = ev->getAction();
-	Point pt = ev->getPoint();
+	UIPoint pt = ev->getPoint();
 	if (action == UIAction::LeftButtonDown || action == UIAction::TouchBegin) {
 		if (getLeftIconRegion().containsPoint(pt)) {
 			m_clickedIconNo = ICON_LEFT;
@@ -392,34 +392,41 @@ void SelectView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 		return;
 	}
 	
-	Size sizeText = gc->getFontTextSize(getFont(), "|");
-	
 	if (flagHorizontal) {
-		sizeText.x += m_iconSize.x * 2;
-		if (sizeText.x < 0) {
-			sizeText.x = 0;
+		sl_ui_pos width = m_iconSize.x * 2 + getPaddingLeft() + getPaddingRight();
+		if (width < 0) {
+			width = 0;
 		}
-		setMeasuredWidth(sizeText.x + getPaddingLeft() + getPaddingRight());
+		setMeasuredWidth(width);
 	}
 	if (flagVertical) {
-		if (sizeText.y < m_iconSize.y) {
-			sizeText.y = m_iconSize.y;
+		sl_ui_pos height = 0;
+		Ref<Font> font = getFont();
+		if (font.isNotNull()) {
+			height = (sl_ui_pos)(font->getSize());
+			if (height < 0) {
+				height = 0;
+			}
 		}
-		if (sizeText.y < 0) {
-			sizeText.y = 0;
+		if (height < m_iconSize.y) {
+			height = m_iconSize.y;
 		}
-		setMeasuredHeight(sizeText.y + getPaddingTop() + getPaddingBottom());
+		height += getPaddingTop() + getPaddingBottom();
+		if (height < 0) {
+			height = 0;
+		}
+		setMeasuredHeight(height);
 	}
 }
 
-Rectangle SelectView::getLeftIconRegion()
+UIRect SelectView::getLeftIconRegion()
 {
-	sl_real heightView = getHeight();
-	sl_real h = heightView - getPaddingTop() - getPaddingBottom();
+	sl_ui_pos heightView = getHeight();
+	sl_ui_pos h = heightView - getPaddingTop() - getPaddingBottom();
 	if (h < 0) {
 		h = 0;
 	}
-	Rectangle ret;
+	UIRect ret;
 	ret.left = getPaddingLeft();
 	if (m_iconSize.x > 0) {
 		ret.right = ret.left + m_iconSize.x;
@@ -431,17 +438,18 @@ Rectangle SelectView::getLeftIconRegion()
 	}
 	ret.top = (heightView - h) / 2;
 	ret.bottom = ret.top + h;
+	ret.fixSizeError();
 	return ret;
 }
 
-Rectangle SelectView::getRightIconRegion()
+UIRect SelectView::getRightIconRegion()
 {
-	Size sizeView = getSize();
-	sl_real h = sizeView.y - getPaddingTop() - getPaddingBottom();
+	UISize sizeView = getSize();
+	sl_ui_pos h = sizeView.y - getPaddingTop() - getPaddingBottom();
 	if (h < 0) {
 		h = 0;
 	}
-	Rectangle ret;
+	UIRect ret;
 	ret.right = sizeView.x - getPaddingRight();
 	if (m_iconSize.x > 0) {
 		ret.left = ret.right - m_iconSize.x;
@@ -453,6 +461,7 @@ Rectangle SelectView::getRightIconRegion()
 	}
 	ret.top = (sizeView.y - h) / 2;
 	ret.bottom = ret.top + h;
+	ret.fixSizeError();
 	return ret;
 }
 

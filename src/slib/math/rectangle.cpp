@@ -376,10 +376,25 @@ sl_bool RectangleT<T, FT>::equals(const RectangleT<T, FT>& other) const
 template <class T, class FT>
 sl_bool RectangleT<T, FT>::isAlmostEqual(const RectangleT<T, FT>& other) const
 {
-	return Math::isAlmostZero((FT)(left - other.left)) &&
-		Math::isAlmostZero((FT)(top - other.top)) &&
-		Math::isAlmostZero((FT)(right - other.right)) &&
-		Math::isAlmostZero((FT)(bottom - other.bottom));
+	return Math::isAlmostZero(left - other.left) &&
+		Math::isAlmostZero(top - other.top) &&
+		Math::isAlmostZero(right - other.right) &&
+		Math::isAlmostZero(bottom - other.bottom);
+}
+
+template <class T, class FT>
+sl_bool RectangleT<T, FT>::fixSizeError()
+{
+	sl_bool flagFixed = sl_false;
+	if (right < left) {
+		flagFixed = sl_true;
+		right = left;
+	}
+	if (bottom < top) {
+		flagFixed = sl_true;
+		bottom = top;
+	}
+	return flagFixed;
 }
 
 SLIB_DEFINE_GEOMETRY_TYPE_EX(Rectangle)

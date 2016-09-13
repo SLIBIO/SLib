@@ -12,11 +12,11 @@ class ListView;
 class SLIB_EXPORT IListViewAdapter
 {
 public:
-	virtual sl_size getItemsCount(ListView* lv) = 0;
+	virtual sl_uint64 getItemsCount(ListView* lv) = 0;
 	
-	virtual Ref<View> getView(ListView* lv, sl_size index, View* original) = 0;
+	virtual Ref<View> getView(ListView* lv, sl_uint64 index, View* original) = 0;
 	
-	virtual sl_real getAverageItemHeight(ListView* lv);
+	virtual sl_ui_len getAverageItemHeight(ListView* lv);
 	
 };
 
@@ -39,10 +39,10 @@ public:
 	
 protected:
 	// override
-	void onScroll(sl_real x, sl_real y);
+	void onScroll(sl_scroll_pos x, sl_scroll_pos y);
 	
 	// override
-	void onResize(sl_real x, sl_real y);
+	void onResize(sl_ui_len x, sl_ui_len y);
 
 protected:
 	void _checkUpdateContent(sl_bool fromDraw);
@@ -53,7 +53,7 @@ protected:
 	
 	void _layoutItemViews(sl_bool flagFromDraw, sl_bool flagFromScroll, sl_bool flagRefresh);
 	
-	sl_real _measureItemHeight(const Ref<View>& itemView, sl_real heightList);
+	sl_ui_len _measureItemHeight(const Ref<View>& itemView, sl_ui_len heightList);
 		
 protected:
 	SafePtr<IListViewAdapter> m_adapter;
@@ -62,23 +62,23 @@ protected:
 	sl_bool m_flagResetAdapter;
 	sl_bool m_flagRefreshItems;
 
-	sl_size m_countTotalItems;
-	sl_size m_indexFirstItem;
-	sl_size m_countVisibleItems;
-	sl_real m_yFirstItem;
+	sl_uint64 m_countTotalItems;
+	sl_uint64 m_indexFirstItem;
+	sl_uint32 m_countVisibleItems;
+	sl_ui_pos m_yFirstItem;
 	Ref<View>* m_viewsVisibleItems;
 	Ref<View>* m_viewsGoDownItems;
 	Ref<View>* m_viewsGoUpItems;
 	Ref<View>* m_viewsFreeItems;
-	sl_real* m_heightsVisibleItems;
-	sl_real* m_heightsTopItems;
-	sl_real* m_heightsBottomItems;
-	sl_real* m_heightsGoDownItems;
-	sl_real* m_heightsGoUpItems;
-	sl_real m_averageItemHeight;
+	sl_ui_len* m_heightsVisibleItems;
+	sl_ui_len* m_heightsTopItems;
+	sl_ui_len* m_heightsBottomItems;
+	sl_ui_len* m_heightsGoDownItems;
+	sl_ui_len* m_heightsGoUpItems;
+	sl_ui_len m_averageItemHeight;
 	double m_averageMidItemHeight;
-	sl_real m_heightTotalItems;
-	sl_real m_lastScrollY;
+	sl_ui_len m_heightTotalItems;
+	sl_ui_pos m_lastScrollY;
 		
 	friend class _ListContentView;
 	

@@ -136,7 +136,7 @@ public:
 				Base::zeroMemory(&lvhi, sizeof(lvhi));
 				lvhi.pt.x = (LONG)(nm->ptAction.x);
 				lvhi.pt.y = (LONG)(nm->ptAction.y);
-				Point pt((sl_real)(nm->ptAction.x), (sl_real)(nm->ptAction.y));
+				UIPoint pt((sl_ui_pos)(nm->ptAction.x), (sl_ui_pos)(nm->ptAction.y));
 				sl_int32 n = (sl_int32)(::SendMessageW(getHandle(), LVM_HITTEST, 0, (LPARAM)(&lvhi)));
 				if (n >= 0) {
 					if (code == NM_CLICK) {
@@ -220,7 +220,7 @@ void ListReportView::_setHeaderText_NW(sl_uint32 iCol, const String& _text)
 	}
 }
 
-void ListReportView::_setColumnWidth_NW(sl_uint32 iCol, sl_real width)
+void ListReportView::_setColumnWidth_NW(sl_uint32 iCol, sl_ui_len width)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {

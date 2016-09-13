@@ -52,7 +52,7 @@ public:
 			Ref<View> _view = instance->getView();
 			if (ScrollView::checkInstance(_view.ptr)) {
 				_ScrollView* view = (_ScrollView*)(_view.ptr);
-				view->_onScroll_NW((sl_real)(pt.x), (sl_real)(pt.y));
+				view->_onScroll_NW((sl_ui_pos)(pt.x), (sl_ui_pos)(pt.y));
 			}
 		}
 	}
@@ -84,7 +84,7 @@ void ScrollView::_setContentView_NW(const Ref<View>& view)
 	}
 }
 
-void ScrollView::_scrollTo_NW(sl_real x, sl_real y)
+void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSScrollView class]]) {
@@ -92,15 +92,15 @@ void ScrollView::_scrollTo_NW(sl_real x, sl_real y)
 		NSClipView* clip = [sv contentView];
 		if (clip != nil) {
 			NSPoint pt;
-			pt.x = x;
-			pt.y = y;
+			pt.x = (CGFloat)x;
+			pt.y = (CGFloat)y;
 			[clip scrollToPoint:pt];
 			[sv reflectScrolledClipView:clip];
 		}
 	}
 }
 
-Point ScrollView::_getScrollPosition_NW()
+ScrollPoint ScrollView::_getScrollPosition_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSScrollView class]]) {
@@ -108,16 +108,16 @@ Point ScrollView::_getScrollPosition_NW()
 		NSClipView* clip = [sv contentView];
 		if (clip != nil) {
 			NSPoint pt=[clip bounds].origin;
-			Point ret;
-			ret.x = (sl_real)(pt.x);
-			ret.y = (sl_real)(pt.y);
+			ScrollPoint ret;
+			ret.x = (sl_scroll_pos)(pt.x);
+			ret.y = (sl_scroll_pos)(pt.y);
 			return ret;
 		}
 	}
-	return Point::zero();
+	return ScrollPoint::zero();
 }
 
-Size ScrollView::_getScrollRange_NW()
+ScrollPoint ScrollView::_getScrollRange_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSScrollView class]]) {
@@ -125,11 +125,11 @@ Size ScrollView::_getScrollRange_NW()
 		NSClipView* clip = [sv contentView];
 		NSView* doc = [sv documentView];
 		if (clip != nil && doc != nil) {
-			Size ret;
+			ScrollPoint ret;
 			NSRect rcDoc = [doc frame];
 			NSRect rcClip = [clip bounds];
-			ret.x = (sl_real)(NSMaxX(rcDoc) - NSWidth(rcClip));
-			ret.y = (sl_real)(NSMaxY(rcDoc) - NSHeight(rcClip));
+			ret.x = (sl_scroll_pos)(NSMaxX(rcDoc) - NSWidth(rcClip));
+			ret.y = (sl_scroll_pos)(NSMaxY(rcDoc) - NSHeight(rcClip));
 			if (ret.x < 0) {
 				ret.x = 0;
 			}
@@ -139,7 +139,7 @@ Size ScrollView::_getScrollRange_NW()
 			return ret;
 		}
 	}
-	return Size::zero();
+	return ScrollPoint::zero();
 }
 
 void ScrollView::_setBorder_NW(sl_bool flag)

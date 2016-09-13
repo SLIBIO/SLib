@@ -13,23 +13,27 @@ TabView::TabView()
 	setCreatingNativeWidget(sl_true);
 	setCreatingChildInstances(sl_true);
 	
-	setOpaque(sl_true, sl_false);
-	
 	m_items.setCount(1);
 	m_indexSelected = 0;
 	m_indexHover = -1;
 	
 	setBackgroundColor(Color::White, sl_false);
-	setTabBarBackgroundColor(Color(230, 230, 230));
+	setBarBackgroundColor(Color(230, 230, 230));
 	setSelectedTabBackgroundColor(Color(150, 150, 150));
 	setHoverTabBackgroundColor(Color(210, 210, 210));
-	m_tabLabelColor = Color(50, 50, 50);
-	m_selectedTabLabelColor = Color::Black;
-	m_hoverTabLabelColor = Color(0, 20, 250);
+	m_labelColor = Color(50, 50, 50);
+	m_selectedLabelColor = Color::Black;
+	m_hoverLabelColor = Color(0, 20, 250);
 	
-	m_flagVertical = sl_false;
+	m_orientation = LayoutOrientation::Horizontal;
 	m_tabWidth = 90;
 	m_tabHeight = 24;
+	
+	m_labelAlignment = Alignment::MiddleCenter;
+	m_labelMarginLeft = 0;
+	m_labelMarginTop = 0;
+	m_labelMarginRight = 0;
+	m_labelMarginBottom = 0;
 	
 	setOccurringClick(sl_true);
 	
@@ -116,7 +120,8 @@ void TabView::setTabContentView(sl_uint32 index, const Ref<View>& view, sl_bool 
 			if (view.isNotNull()) {
 				view->setFrame(getTabContentRegion(), sl_false);
 				view->setCreatingInstance(sl_true);
-				addChildNotAttach(view, sl_false);
+				view->setAttachMode(UIAttachMode::NotAttachInNativeWidget);
+				addChild(view, sl_false);
 			}
 			item->contentView = view;
 			if (isNativeWidget()) {
@@ -177,63 +182,112 @@ void TabView::selectTab(sl_uint32 index, sl_bool flagRedraw)
 	}
 }
 
-Size TabView::getContentViewSize()
+UISize TabView::getContentViewSize()
 {
 	if (isNativeWidget()) {
-		return _getContentViewSize_NW();
+		UISize size = _getContentViewSize_NW();
+		if (size.x < 0) {
+			size.x = 0;
+		}
+		if (size.y < 0) {
+			size.y = 0;
+		}
+		return size;
 	}
 	return getTabContentRegion().getSize();
 }
 
-sl_bool TabView::isVerticalTabBar()
+LayoutOrientation TabView::getOrientation()
 {
-	return m_flagVertical;
+	return m_orientation;
 }
 
-void TabView::setVerticalTabBar(sl_bool flag, sl_bool flagRedraw)
+void TabView::setOrientation(LayoutOrientation orientation, sl_bool flagRedraw)
 {
-	m_flagVertical = flag;
-	_relayout(flagRedraw);
+	m_orientation = orientation;
+	if (!(isNativeWidget())) {
+		_relayout(flagRedraw);
+	}
 }
 
-sl_real TabView::getTabWidth()
+sl_ui_len TabView::getTabWidth()
 {
 	return m_tabWidth;
 }
 
-void TabView::setTabWidth(sl_real width, sl_bool flagRedraw)
+void TabView::setTabWidth(sl_ui_len width, sl_bool flagRedraw)
 {
 	m_tabWidth = width;
-	_relayout(flagRedraw);
+	if (!(isNativeWidget())) {
+		_relayout(flagRedraw);
+	}
 }
 
-sl_real TabView::getTabHeight()
+sl_ui_len TabView::getTabHeight()
 {
 	return m_tabHeight;
 }
 
-void TabView::setTabHeight(sl_real height, sl_bool flagRedraw)
+void TabView::setTabHeight(sl_ui_len height, sl_bool flagRedraw)
 {
 	m_tabHeight = height;
-	_relayout(flagRedraw);
+	if (!(isNativeWidget())) {
+		_relayout(flagRedraw);
+	}
 }
 
-Ref<Drawable> TabView::getTabBarBackground()
+Ref<Drawable> TabView::getBarBackground()
 {
-	return m_tabBarBackground;
+	return m_barBackground;
 }
 
-void TabView::setTabBarBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void TabView::setBarBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw)
 {
-	m_tabBarBackground = drawable;
+	m_barBackground = drawable;
 	if (flagRedraw) {
 		_invalidateTabBar();
 	}
 }
 
-void TabView::setTabBarBackgroundColor(const Color& color, sl_bool flagRedraw)
+void TabView::setBarBackgroundColor(const Color& color, sl_bool flagRedraw)
 {
-	setTabBarBackground(Drawable::createColorDrawable(color), flagRedraw);
+	setBarBackground(Drawable::createColorDrawable(color), flagRedraw);
+}
+
+Ref<Drawable> TabView::getContentBackground()
+{
+	return m_contentBackground;
+}
+
+void TabView::setContentBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+{
+	m_contentBackground = drawable;
+	if (flagRedraw) {
+		_invalidateTabBar();
+	}
+}
+
+void TabView::setContentBackgroundColor(const Color& color, sl_bool flagRedraw)
+{
+	setContentBackground(Drawable::createColorDrawable(color));
+}
+
+Ref<Drawable> TabView::getTabBackground()
+{
+	return m_tabBackground;
+}
+
+void TabView::setTabBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+{
+	m_tabBackground = drawable;
+	if (flagRedraw) {
+		_invalidateTabBar();
+	}
+}
+
+void TabView::setTabBackgroundColor(const Color& color, sl_bool flagRedraw)
+{
+	setTabBackground(Drawable::createColorDrawable(color), flagRedraw);
 }
 
 Ref<Drawable> TabView::getSelectedTabBackground()
@@ -272,50 +326,119 @@ void TabView::setHoverTabBackgroundColor(const Color& color, sl_bool flagRedraw)
 	setHoverTabBackground(Drawable::createColorDrawable(color), flagRedraw);
 }
 
-Color TabView::getTabLabelColor()
+Color TabView::getLabelColor()
 {
-	return m_tabLabelColor;
+	return m_labelColor;
 }
 
-void TabView::setTabLabelColor(const Color& color, sl_bool flagRedraw)
+void TabView::setLabelColor(const Color& color, sl_bool flagRedraw)
 {
-	m_tabLabelColor = color;
+	m_labelColor = color;
 	if (flagRedraw) {
 		_invalidateTabBar();
 	}
 }
 
-Color TabView::getSelectedTabLabelColor()
+Color TabView::getSelectedLabelColor()
 {
-	return m_selectedTabLabelColor;
+	return m_selectedLabelColor;
 }
 
-void TabView::setSelectedTabLabelColor(const Color& color, sl_bool flagRedraw)
+void TabView::setSelectedLabelColor(const Color& color, sl_bool flagRedraw)
 {
-	m_selectedTabLabelColor = color;
+	m_selectedLabelColor = color;
 	if (flagRedraw) {
 		_invalidateTabBar();
 	}
 }
 
-Color TabView::getHoverTabLabelColor()
+Color TabView::getHoverLabelColor()
 {
-	return m_hoverTabLabelColor;
+	return m_hoverLabelColor;
 }
 
-void TabView::setHoverTabLabelColor(const Color& color, sl_bool flagRedraw)
+void TabView::setHoverLabelColor(const Color& color, sl_bool flagRedraw)
 {
-	m_hoverTabLabelColor = color;
+	m_hoverLabelColor = color;
 	if (flagRedraw) {
 		_invalidateTabBar();
 	}
 }
 
-Rectangle TabView::getTabBarRegion()
+Alignment TabView::getLabelAlignment()
 {
-	Size size = getSize();
-	Rectangle ret;
-	if (m_flagVertical) {
+	return m_labelAlignment;
+}
+
+void TabView::setLabelAlignment(Alignment align, sl_bool flagRedraw)
+{
+	m_labelAlignment = align;
+	if (flagRedraw) {
+		invalidate();
+	}
+}
+
+void TabView::setLabelMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw)
+{
+	m_labelMarginLeft = left;
+	m_labelMarginTop = top;
+	m_labelMarginRight = right;
+	m_labelMarginBottom = bottom;
+	if (flagRedraw) {
+		invalidate();
+	}
+}
+
+void TabView::setLabelMargin(sl_ui_pos margin, sl_bool flagRedraw)
+{
+	setLabelMargin(margin, margin, margin, margin, flagRedraw);
+}
+
+sl_ui_pos TabView::getLabelMarginLeft()
+{
+	return m_labelMarginLeft;
+}
+
+void TabView::setLabelMarginLeft(sl_ui_pos margin, sl_bool flagRedraw)
+{
+	setLabelMargin(margin, m_labelMarginTop, m_labelMarginRight, m_labelMarginBottom, flagRedraw);
+}
+
+sl_ui_pos TabView::getLabelMarginTop()
+{
+	return m_labelMarginTop;
+}
+
+void TabView::setLabelMarginTop(sl_ui_pos margin, sl_bool flagRedraw)
+{
+	setLabelMargin(m_labelMarginLeft, margin, m_labelMarginRight, m_labelMarginBottom, flagRedraw);
+}
+
+sl_ui_pos TabView::getLabelMarginRight()
+{
+	return m_labelMarginRight;
+}
+
+void TabView::setLabelMarginRight(sl_ui_pos margin, sl_bool flagRedraw)
+{
+	setLabelMargin(m_labelMarginLeft, m_labelMarginTop, margin, m_labelMarginBottom, flagRedraw);
+}
+
+sl_ui_pos TabView::getLabelMarginBottom()
+{
+	return m_labelMarginBottom;
+}
+
+void TabView::setLabelMarginBottom(sl_ui_pos margin, sl_bool flagRedraw)
+{
+	setLabelMargin(m_labelMarginLeft, m_labelMarginTop, m_labelMarginRight, margin, flagRedraw);
+}
+
+UIRect TabView::getTabBarRegion()
+{
+	UISize size = getSize();
+	UIRect ret;
+	if (m_orientation == LayoutOrientation::Vertical) {
 		ret.left = 0;
 		ret.top = 0;
 		ret.right = m_tabWidth;
@@ -326,43 +449,56 @@ Rectangle TabView::getTabBarRegion()
 		ret.right = size.x;
 		ret.bottom = m_tabHeight;
 	}
+	ret.fixSizeError();
 	return ret;
 }
 
-Rectangle TabView::getTabRegion(sl_uint32 index)
+UIRect TabView::getTabRegion(sl_uint32 index)
 {
-	Rectangle ret;
-	sl_real f = (sl_real)index;
-	if (m_flagVertical) {
+	UIRect ret;
+	if (m_orientation == LayoutOrientation::Vertical) {
 		ret.left = 0;
-		ret.top = f * m_tabHeight;
+		ret.top = (sl_ui_len)index * m_tabHeight;
 		ret.right = m_tabWidth;
-		ret.bottom = (f + 1) * m_tabHeight;
+		ret.bottom = (sl_ui_len)(index + 1) * m_tabHeight;
 	} else {
-		ret.left = f * m_tabWidth;
+		ret.left = (sl_ui_len)index * m_tabWidth;
 		ret.top = 0;
-		ret.right = (f + 1) * m_tabWidth;
+		ret.right = (sl_ui_len)(index + 1) * m_tabWidth;
 		ret.bottom = m_tabHeight;
 	}
+	ret.fixSizeError();
 	return ret;
 }
 
-Rectangle TabView::getTabContentRegion()
+UIRect TabView::getWholeContentRegion()
 {
-	Rectangle ret = getBounds();
-	if (m_flagVertical) {
+	UIRect ret = getBounds();
+	if (m_orientation == LayoutOrientation::Vertical) {
+		ret.left += m_tabWidth;
+	} else {
+		ret.top += m_tabHeight;
+	}
+	ret.fixSizeError();
+	return ret;
+}
+
+UIRect TabView::getTabContentRegion()
+{
+	UIRect ret = getBounds();
+	if (m_orientation == LayoutOrientation::Vertical) {
 		ret.left += m_tabWidth + getPaddingLeft();
 		ret.top += getPaddingTop();
 		ret.right -= getPaddingRight();
 		ret.bottom -= getPaddingBottom();
-		return ret;
 	} else {
 		ret.left += getPaddingLeft();
 		ret.top += m_tabHeight + getPaddingTop();
 		ret.right -= getPaddingRight();
 		ret.bottom -= getPaddingBottom();
-		return ret;
 	}
+	ret.fixSizeError();
+	return ret;
 }
 
 void TabView::_invalidateTabBar()
@@ -373,7 +509,7 @@ void TabView::_invalidateTabBar()
 void TabView::_relayout(sl_bool flagRedraw)
 {
 	ObjectLocker lock(this);
-	Rectangle bound = getTabContentRegion();
+	UIRect bound = getTabContentRegion();
 	ListLocker<TabViewItem> items(m_items);
 	for (sl_size i = 0; i < items.count; i++) {
 		Ref<View> view = items[i].contentView;
@@ -399,9 +535,9 @@ void TabView::onSelectTab(sl_uint32 index)
 {
 }
 
-void TabView::onClickView(UIEvent* ev)
+void TabView::onClick(UIEvent* ev)
 {
-	Point pt = ev->getPoint();
+	UIPoint pt = ev->getPoint();
 	ObjectLocker lock(this);
 	ListLocker<TabViewItem> items(m_items);
 	sl_uint32 n = (sl_uint32)(items.count);
@@ -420,7 +556,7 @@ void TabView::onMouseEvent(UIEvent* ev)
 		m_indexHover = -1;
 		_invalidateTabBar();
 	} else if (ev->getAction() == UIAction::MouseMove) {
-		Point pt = ev->getPoint();
+		UIPoint pt = ev->getPoint();
 		ObjectLocker lock(this);
 		ListLocker<TabViewItem> items(m_items);
 		sl_uint32 n = (sl_uint32)(items.count);
@@ -442,7 +578,8 @@ void TabView::onMouseEvent(UIEvent* ev)
 
 void TabView::onDraw(Canvas* canvas)
 {
-	onDrawTabBarBackground(canvas);
+	canvas->draw(getTabBarRegion(), m_barBackground);
+	canvas->draw(getWholeContentRegion(), m_contentBackground);
 	ObjectLocker lock(this);
 	ListLocker<TabViewItem> items(m_items);
 	sl_uint32 n = (sl_uint32)(items.count);
@@ -451,38 +588,41 @@ void TabView::onDraw(Canvas* canvas)
 	}
 }
 
-void TabView::onDrawTabBarBackground(Canvas* canvas)
+void TabView::onDrawTab(Canvas* canvas, const UIRect& rect, sl_uint32 index, const String& label)
 {
-	canvas->draw(getTabBarRegion(), m_tabBarBackground);
-}
-
-void TabView::onDrawTab(Canvas* canvas, const Rectangle& rect, sl_uint32 index, const String& label)
-{
-	Rectangle rc = getTabRegion(index);
+	UIRect rc = getTabRegion(index);
 	Color labelColor;
 	if (m_indexSelected == index) {
 		canvas->draw(rc, m_selectedTabBackground);
-		labelColor = m_selectedTabLabelColor;
+		labelColor = m_selectedLabelColor;
 	} else if (m_indexHover == index) {
 		canvas->draw(rc, m_hoverTabBackground);
-		labelColor = m_hoverTabLabelColor;
+		labelColor = m_hoverLabelColor;
 	} else {
-		labelColor = m_tabLabelColor;
+		canvas->draw(rc, m_tabBackground);
+		labelColor = m_labelColor;
 	}
 	if (label.isNotEmpty()) {
 		Ref<Font> font = getFont();
-		if (m_flagVertical) {
-			canvas->drawText(label, rc, font, labelColor, Alignment::MiddleLeft);
+		rc.left += m_labelMarginLeft;
+		rc.top += m_labelMarginTop;
+		rc.right -= m_labelMarginRight;
+		rc.bottom -= m_labelMarginBottom;
+		rc.fixSizeError();
+		if (m_orientation == LayoutOrientation::Vertical) {
+			canvas->drawText(label, rc, font, labelColor, m_labelAlignment);
 		} else {
-			canvas->drawText(label, rc, font, labelColor, Alignment::MiddleCenter);
+			canvas->drawText(label, rc, font, labelColor, m_labelAlignment);
 		}
 	}
 }
 
-void TabView::onResize(sl_real width, sl_real height)
+void TabView::onResize(sl_ui_len width, sl_ui_len height)
 {
 	if (isNativeWidget()) {
 		_refreshSize_NW();
+	} else {
+		_relayout(sl_true);
 	}
 }
 
@@ -514,9 +654,9 @@ void TabView::_getSelectedTabIndex_NW()
 {
 }
 
-Size TabView::_getContentViewSize_NW()
+UISize TabView::_getContentViewSize_NW()
 {
-	return Size::zero();
+	return UISize::zero();
 }
 
 void TabView::_selectTab_NW(sl_uint32 index)

@@ -52,12 +52,12 @@ public:
 	// set before attaching
 	void setCreatingNativeWidget(sl_bool flag);
 	
-	sl_bool isCreatingInstanceOnParentAttach();
+	UIAttachMode getAttachMode();
 	
 	// set before attaching
-	void setCreatingInstanceOnParentAttach(sl_bool flag);
+	void setAttachMode(UIAttachMode mode);
 
-	Ref<ViewInstance> createGenericInstance(ViewInstance* parent);
+	virtual Ref<ViewInstance> createGenericInstance(ViewInstance* parent);
 	
 	virtual Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
 	
@@ -98,11 +98,7 @@ public:
 	
 	void addChild(const Ref<View>& view, sl_bool flagRedraw = sl_true);
 
-	void addChildNotAttach(const Ref<View>& view, sl_bool flagRedraw = sl_true);
-
 	void insertChild(sl_size index, const Ref<View>& view, sl_bool flagRedraw = sl_true);
-
-	void insertChildNotAttach(sl_size index, const Ref<View>& view, sl_bool flagRedraw = sl_true);
 
 	void removeChild(sl_size index, sl_bool flagRedraw = sl_true);
 
@@ -110,9 +106,9 @@ public:
 	
 	void removeAllChildren(sl_bool flagRedraw = sl_true);
 	
-	Ref<View> getChildAt(sl_real x, sl_real y);
+	Ref<View> getChildAt(sl_ui_pos x, sl_ui_pos y);
 	
-	Ref<View> getChildAt(const Point& point);
+	Ref<View> getChildAt(const UIPoint& point);
 	
 	Ref<View> getChildById(const String& _id);
 	
@@ -140,67 +136,67 @@ public:
 	void invalidate();
 
 	// local coordinate
-	void invalidate(const Rectangle& rect);
+	void invalidate(const UIRect& rect);
 	
 	
 	// parent coordinate
-	const Rectangle& getFrame();
+	const UIRect& getFrame();
 	
 	// parent coordinate
-	Rectangle getInstanceFrame();
+	UIRect getInstanceFrame();
 	
 	// parent coordinate
-	void setFrame(const Rectangle& frame, sl_bool flagRedraw = sl_true);
+	void setFrame(const UIRect& frame, sl_bool flagRedraw = sl_true);
 	
 	// parent coordinate
-	void setFrame(sl_real x, sl_real y, sl_real width, sl_real height, sl_bool flagRedraw = sl_true);
+	void setFrame(sl_ui_pos x, sl_ui_pos y, sl_ui_len width, sl_ui_len height, sl_bool flagRedraw = sl_true);
 	
-	sl_real getWidth();
+	sl_ui_len getWidth();
 	
-	void setWidth(sl_real width, sl_bool flagRedraw = sl_true);
+	void setWidth(sl_ui_len width, sl_bool flagRedraw = sl_true);
 	
-	sl_real getHeight();
+	sl_ui_len getHeight();
 	
-	void setHeight(sl_real height, sl_bool flagRedraw = sl_true);
+	void setHeight(sl_ui_len height, sl_bool flagRedraw = sl_true);
 	
-	Size getSize();
+	UISize getSize();
 	
-	void setSize(const Size& size, sl_bool flagRedraw = sl_true);
+	void setSize(const UISize& size, sl_bool flagRedraw = sl_true);
 	
-	void setSize(sl_real width, sl_real height, sl_bool flagRedraw = sl_true);
-	
-	// parent coordinate
-	sl_real getX();
+	void setSize(sl_ui_len width, sl_ui_len height, sl_bool flagRedraw = sl_true);
 	
 	// parent coordinate
-	sl_real getY();
+	sl_ui_pos getLeft();
 	
 	// parent coordinate
-	void setX(sl_real x, sl_bool flagRedraw = sl_true);
+	sl_ui_pos getTop();
 	
 	// parent coordinate
-	void setY(sl_real y, sl_bool flagRedraw = sl_true);
+	void setLeft(sl_ui_pos x, sl_bool flagRedraw = sl_true);
+	
+	// parent coordinate
+	void setTop(sl_ui_pos y, sl_bool flagRedraw = sl_true);
 
 	// parent coordinate
-	Point getPosition();
+	UIPoint getPosition();
 	
 	// parent coordinate
-	void setPosition(sl_real x, sl_real y, sl_bool flagRedraw = sl_true);
+	void setPosition(sl_ui_pos x, sl_ui_pos y, sl_bool flagRedraw = sl_true);
 	
 	// parent coordinate
-	void setPosition(const Point& point, sl_bool flagRedraw = sl_true);
+	void setPosition(const UIPoint& point, sl_bool flagRedraw = sl_true);
 	
 	// local coordinate
-	Rectangle getBounds();
+	UIRect getBounds();
 	
 	// local coordinate
-	Rectangle getBoundsInnerPadding();
+	UIRect getBoundsInnerPadding();
 	
 	// parent coordinate
-	Rectangle getBoundsInParent();
+	UIRect getBoundsInParent();
 	
 	// parent coordinate
-	Rectangle getBoundsInParent(const Rectangle& boundsLocal);
+	UIRect getBoundsInParent(const UIRect& boundsLocal);
 	
 	
 	Visibility getVisibility();
@@ -225,10 +221,10 @@ public:
 	void setHitTestable(sl_bool flag);
 	
 	// local coordinate
-	virtual sl_bool hitTest(sl_real x, sl_real y);
+	virtual sl_bool hitTest(sl_ui_pos x, sl_ui_pos y);
 	
 	// local coordinate
-	sl_bool hitTest(const Point& point);
+	sl_bool hitTest(const UIPoint& point);
 
 	
 	sl_bool isFocusable();
@@ -262,13 +258,13 @@ public:
 	
 	void measureLayout();
 	
-	sl_real getMeasuredWidth();
+	sl_ui_len getMeasuredWidth();
 	
-	void setMeasuredWidth(sl_real width);
+	void setMeasuredWidth(sl_ui_len width);
 	
-	sl_real getMeasuredHeight();
+	sl_ui_len getMeasuredHeight();
 	
-	void setMeasuredHeight(sl_real height);
+	void setMeasuredHeight(sl_ui_len height);
 
 	void requestLayout(sl_bool flagRedraw = sl_true);
 	
@@ -280,9 +276,9 @@ public:
 	
 	void setLayoutEnabled(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
 	
-	Rectangle getLayoutFrame();
+	UIRect getLayoutFrame();
 	
-	void setLayoutFrame(const Rectangle& rect);
+	void setLayoutFrame(const UIRect& rect);
 	
 	sl_bool isLayoutFrameUpdated();
 	
@@ -434,25 +430,25 @@ public:
 	
 	void setAlignCenterVertical(const Ref<View>& view, sl_bool flagRedraw = sl_true);
 	
-	sl_real getMarginLeft();
+	sl_ui_pos getMarginLeft();
 	
-	void setMarginLeft(sl_real margin, sl_bool flagRedraw = sl_true);
+	void setMarginLeft(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
 	
-	sl_real getMarginTop();
+	sl_ui_pos getMarginTop();
 	
-	void setMarginTop(sl_real margin, sl_bool flagRedraw = sl_true);
+	void setMarginTop(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
 	
-	sl_real getMarginRight();
+	sl_ui_pos getMarginRight();
 	
-	void setMarginRight(sl_real margin, sl_bool flagRedraw = sl_true);
+	void setMarginRight(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
 	
-	sl_real getMarginBottom();
+	sl_ui_pos getMarginBottom();
 	
-	void setMarginBottom(sl_real margin, sl_bool flagRedraw = sl_true);
+	void setMarginBottom(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
 	
-	void setMargin(sl_real left, sl_real top, sl_real right, sl_real bottom, sl_bool flagRedraw = sl_true);
+	void setMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw = sl_true);
 	
-	void setMargin(sl_real margin, sl_bool flagRedraw = sl_true);
+	void setMargin(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
 	
 	sl_bool isRelativeMarginLeft();
 	
@@ -460,9 +456,9 @@ public:
 	
 	void setRelativeMarginLeft(sl_real weight, sl_bool flagRedraw = sl_true);
 	
-	sl_real getAbsoluteMarginLeft();
+	sl_ui_pos getAbsoluteMarginLeft();
 	
-	void setAbsoluteMarginLeft(sl_real margin, sl_bool flagDraw = sl_true);
+	void setAbsoluteMarginLeft(sl_ui_pos margin, sl_bool flagDraw = sl_true);
 
 	sl_bool isRelativeMarginTop();
 	
@@ -470,9 +466,9 @@ public:
 	
 	void setRelativeMarginTop(sl_real weight, sl_bool flagRedraw = sl_true);
 	
-	sl_real getAbsoluteMarginTop();
+	sl_ui_pos getAbsoluteMarginTop();
 
-	void setAbsoluteMarginTop(sl_real margin, sl_bool flagDraw = sl_true);
+	void setAbsoluteMarginTop(sl_ui_pos margin, sl_bool flagDraw = sl_true);
 	
 	sl_bool isRelativeMarginRight();
 
@@ -480,9 +476,9 @@ public:
 	
 	void setRelativeMarginRight(sl_real weight, sl_bool flagRedraw = sl_true);
 	
-	sl_real getAbsoluteMarginRight();
+	sl_ui_pos getAbsoluteMarginRight();
 
-	void setAbsoluteMarginRight(sl_real margin, sl_bool flagDraw = sl_true);
+	void setAbsoluteMarginRight(sl_ui_pos margin, sl_bool flagDraw = sl_true);
 
 	sl_bool isRelativeMarginBottom();
 	
@@ -490,31 +486,31 @@ public:
 	
 	void setRelativeMarginBottom(sl_real weight, sl_bool flagRedraw = sl_true);
 	
-	sl_real getAbsoluteMarginBottom();
+	sl_ui_pos getAbsoluteMarginBottom();
 
-	void setAbsoluteMarginBottom(sl_real margin, sl_bool flagDraw = sl_true);
+	void setAbsoluteMarginBottom(sl_ui_pos margin, sl_bool flagDraw = sl_true);
 	
-	void applyRelativeMargins(sl_real parentWidth, sl_real parentHeight);
+	void applyRelativeMargins(sl_ui_len parentWidth, sl_ui_len parentHeight);
 	
-	sl_real getPaddingLeft();
+	sl_ui_pos getPaddingLeft();
 	
-	void setPaddingLeft(sl_real padding, sl_bool flagRedraw = sl_true);
+	void setPaddingLeft(sl_ui_pos padding, sl_bool flagRedraw = sl_true);
 	
-	sl_real getPaddingTop();
+	sl_ui_pos getPaddingTop();
 	
-	void setPaddingTop(sl_real padding, sl_bool flagRedraw = sl_true);
+	void setPaddingTop(sl_ui_pos padding, sl_bool flagRedraw = sl_true);
 	
-	sl_real getPaddingRight();
+	sl_ui_pos getPaddingRight();
 	
-	void setPaddingRight(sl_real padding, sl_bool flagRedraw = sl_true);
+	void setPaddingRight(sl_ui_pos padding, sl_bool flagRedraw = sl_true);
 	
-	sl_real getPaddingBottom();
+	sl_ui_pos getPaddingBottom();
 	
-	void setPaddingBottom(sl_real padding, sl_bool flagRedraw = sl_true);
+	void setPaddingBottom(sl_ui_pos padding, sl_bool flagRedraw = sl_true);
 	
-	void setPadding(sl_real left, sl_real top, sl_real right, sl_real bottom, sl_bool flagRedraw = sl_true);
+	void setPadding(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw = sl_true);
 	
-	void setPadding(sl_real padding, sl_bool flagRedraw = sl_true);
+	void setPadding(sl_ui_pos padding, sl_bool flagRedraw = sl_true);
 	
 	
 	sl_bool isTransformEnabled();
@@ -560,13 +556,13 @@ public:
 	void setAnchorOffsetY(sl_real y, sl_bool flagSetTransform = sl_true);
 	
 
-	Point convertCoordinateFromScreen(const Point& ptScreen);
+	UIPointf convertCoordinateFromScreen(const UIPointf& ptScreen);
 	
-	Point convertCoordinateToScreen(const Point& ptView);
+	UIPointf convertCoordinateToScreen(const UIPointf& ptView);
 	
-	Point convertCoordinateFromParent(const Point& ptParent);
+	UIPointf convertCoordinateFromParent(const UIPointf& ptParent);
 	
-	Point convertCoordinateToParent(const Point& ptView);
+	UIPointf convertCoordinateToParent(const UIPointf& ptView);
 	
 	
 	Ref<Drawable> getBackground();
@@ -686,35 +682,39 @@ public:
 	
 	void setScrollBarsVisible(sl_bool flagVisible, sl_bool flagRefresh = sl_true);
 	
-	sl_real getScrollX();
+	sl_scroll_pos getScrollX();
 	
-	sl_real getScrollY();
+	sl_scroll_pos getScrollY();
 	
-	virtual Point getScrollPosition();
+	virtual Pointlf getScrollPosition();
 	
-	virtual void scrollTo(sl_real x, sl_real y, sl_bool flagRedraw = sl_true);
+	virtual void scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagRedraw = sl_true);
 	
-	void scrollTo(const Point& position, sl_bool flagRedraw = sl_true);
+	void scrollTo(const Pointlf& position, sl_bool flagRedraw = sl_true);
 	
-	sl_real getContentWidth();
+	void setScrollX(sl_scroll_pos x, sl_bool flagRedraw = sl_true);
 	
-	sl_real getContentHeight();
+	void setScrollY(sl_scroll_pos y, sl_bool flagRedraw = sl_true);
 	
-	Size getContentSize();
+	sl_scroll_pos getContentWidth();
 	
-	virtual void setContentSize(sl_real width, sl_real height, sl_bool flagRefresh = sl_true);
+	sl_scroll_pos getContentHeight();
 	
-	void setContentSize(const Size& size, sl_bool flagRefresh = sl_true);
+	ScrollPoint getContentSize();
 	
-	void setContentWidth(sl_real width, sl_bool flagRefresh = sl_true);
+	virtual void setContentSize(sl_scroll_pos width, sl_scroll_pos height, sl_bool flagRefresh = sl_true);
 	
-	void setContentHeight(sl_real height, sl_bool flagRefresh = sl_true);
+	void setContentSize(const ScrollPoint& size, sl_bool flagRefresh = sl_true);
 	
-	virtual Size getScrollRange();
+	void setContentWidth(sl_scroll_pos width, sl_bool flagRefresh = sl_true);
 	
-	sl_real getScrollBarWidth();
+	void setContentHeight(sl_scroll_pos height, sl_bool flagRefresh = sl_true);
 	
-	void setScrollBarWidth(sl_real width, sl_bool flagRefresh = sl_true);
+	virtual ScrollPoint getScrollRange();
+	
+	sl_ui_len getScrollBarWidth();
+	
+	void setScrollBarWidth(sl_ui_len width, sl_bool flagRefresh = sl_true);
 	
 	
 	sl_bool isContentScrollingByMouse();
@@ -803,17 +803,17 @@ protected:
 	
 	virtual void onSetCursor(UIEvent* ev);
 	
-	virtual void onResize(sl_real width, sl_real height);
+	virtual void onResize(sl_ui_len width, sl_ui_len height);
 	
-	virtual void onResizeChild(View* child, sl_real width, sl_real height);
+	virtual void onResizeChild(View* child, sl_ui_len width, sl_ui_len height);
 	
 	virtual void onChangeVisibility(Visibility oldVisibility, Visibility newVisibility);
 	
 	virtual void onChangeVisibilityOfChild(View* child, Visibility oldVisibility, Visibility newVisibility);
 	
-	virtual void onScroll(sl_real x, sl_real y);
+	virtual void onScroll(sl_scroll_pos x, sl_scroll_pos y);
 	
-	virtual void onResizeContent(sl_real width, sl_real height);
+	virtual void onResizeContent(sl_scroll_pos width, sl_scroll_pos height);
 	
 	virtual void onAttach();
 	
@@ -864,16 +864,16 @@ public:
 	
 	void dispatchSetCursorToChild(UIEvent* ev, View* child, sl_bool flagTransformPoints = sl_true);
 	
-	virtual void dispatchResize(sl_real width, sl_real height);
+	virtual void dispatchResize(sl_ui_len width, sl_ui_len height);
 	
 	virtual void dispatchChangeVisibility(Visibility oldVisibility, Visibility newVisibility);
 	
-	virtual void dispatchScroll(sl_real x, sl_real y);
+	virtual void dispatchScroll(sl_scroll_pos x, sl_scroll_pos y);
 	
 private:
 	void _processAttachOnUiThread();
 	
-	void _addChild(const Ref<View>& view, sl_bool flagRedraw, sl_bool flagAttach);
+	void _addChild(const Ref<View>& view, sl_bool flagRedraw);
 	
 	void _removeChild(const Ref<View>& view);
 	
@@ -887,7 +887,7 @@ private:
 	
 	void _setFocusedChild(View* child, sl_bool flagRedraw);
 	
-	void _setFrame(const Rectangle& frame, sl_bool flagRedraw, sl_bool flagLayouting);
+	void _setFrame(const UIRect& frame, sl_bool flagRedraw, sl_bool flagLayouting);
 	
 	void _prepareLayout(ViewPrepareLayoutParam& param);
 	
@@ -948,9 +948,9 @@ private:
 	sl_bool m_flagCreatingInstance;
 	sl_bool m_flagCreatingChildInstances;
 	sl_bool m_flagCreatingNativeWidget;
-	sl_bool m_flagCreatingInstanceOnParentAttach;
+	UIAttachMode m_attachMode;
 	
-	Rectangle m_frame;
+	UIRect m_frame;
 	
 	Visibility m_visibility;
 	sl_bool m_flagEnabled;
@@ -1001,31 +1001,31 @@ private:
 		SafeWeakRef<View> rightReferingView;
 		SafeWeakRef<View> bottomReferingView;
 		
-		sl_real measuredWidth;
-		sl_real measuredHeight;
-		Rectangle frame;
+		sl_ui_len measuredWidth;
+		sl_ui_len measuredHeight;
+		UIRect frame;
 		sl_bool flagInvalidMeasure;
 		sl_bool flagInvalidLayout;
 
-		sl_real measuredRelativeBoundWidth;
+		sl_ui_len measuredRelativeBoundWidth;
 		sl_bool flagInvalidRelativeBoundWidth;
 		sl_bool flagBadRelativeBoundWidth;
-		sl_real measuredRelativeBoundHeight;
+		sl_ui_len measuredRelativeBoundHeight;
 		sl_bool flagInvalidRelativeBoundHeight;
 		sl_bool flagBadRelativeBoundHeight;
 
 		sl_bool flagOnPrepareLayout;
 		sl_bool flagOnMakeLayout;
 		
-		sl_real paddingLeft;
-		sl_real paddingTop;
-		sl_real paddingRight;
-		sl_real paddingBottom;
+		sl_ui_pos paddingLeft;
+		sl_ui_pos paddingTop;
+		sl_ui_pos paddingRight;
+		sl_ui_pos paddingBottom;
 
-		sl_real marginLeft;
-		sl_real marginTop;
-		sl_real marginRight;
-		sl_real marginBottom;
+		sl_ui_pos marginLeft;
+		sl_ui_pos marginTop;
+		sl_ui_pos marginRight;
+		sl_ui_pos marginBottom;
 		sl_bool flagRelativeMarginLeft;
 		sl_real relativeMarginLeftWeight;
 		sl_bool flagRelativeMarginTop;
@@ -1094,21 +1094,21 @@ private:
 		SafeRef<ScrollBar> vert;
 		sl_bool flagValidHorz;
 		sl_bool flagValidVert;
-		sl_real x;
-		sl_real y;
-		sl_real contentWidth;
-		sl_real contentHeight;
-		sl_real barWidth;
+		sl_scroll_pos x;
+		sl_scroll_pos y;
+		sl_scroll_pos contentWidth;
+		sl_scroll_pos contentHeight;
+		sl_ui_len barWidth;
 		
 		sl_bool flagContentScrollingByMouse;
 		sl_bool flagContentScrollingByTouch;
 		sl_bool flagContentScrollingByMouseWheel;
 		sl_bool flagContentScrollingByKeyboard;
 		sl_bool flagDownContent;
-		sl_real scrollX_DownContent;
-		sl_real scrollY_DownContent;
-		sl_real mouseX_DownContent;
-		sl_real mouseY_DownContent;
+		sl_scroll_pos scrollX_DownContent;
+		sl_scroll_pos scrollY_DownContent;
+		sl_ui_posf mouseX_DownContent;
+		sl_ui_posf mouseY_DownContent;
 	};
 	SafeRef<ScrollAttributes> m_scroll;
 	
@@ -1116,7 +1116,7 @@ private:
 
 struct ViewPrepareLayoutParam
 {
-	Rectangle parentContentFrame;
+	UIRect parentContentFrame;
 	sl_bool flagUseLayoutFrame;
 };
 
@@ -1147,11 +1147,11 @@ public:
 	
 	virtual void invalidate() = 0;
 	
-	virtual void invalidate(const Rectangle& rect) = 0;
+	virtual void invalidate(const UIRect& rect) = 0;
 	
-	virtual Rectangle getFrame() = 0;
+	virtual UIRect getFrame() = 0;
 	
-	virtual void setFrame(const Rectangle& frame) = 0;
+	virtual void setFrame(const UIRect& frame) = 0;
 	
 	virtual void setVisible(sl_bool flag) = 0;
 	
@@ -1159,9 +1159,9 @@ public:
 	
 	virtual void setOpaque(sl_bool flag) = 0;
 	
-	virtual Point convertCoordinateFromScreenToView(const Point& ptScreen) = 0;
+	virtual UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen) = 0;
 	
-	virtual Point convertCoordinateFromViewToScreen(const Point& ptView) = 0;
+	virtual UIPointf convertCoordinateFromViewToScreen(const UIPointf& ptView) = 0;
 	
 	virtual void addChildInstance(const Ref<ViewInstance>& instance) = 0;
 	

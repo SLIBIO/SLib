@@ -16,9 +16,9 @@ public:
 	
 	virtual void onClickRow(ListReportView* view, sl_uint32 row, const Point& pt);
 	
-	virtual void onRightButtonClickRow(ListReportView* view, sl_uint32 row, const Point& pt);
+	virtual void onRightButtonClickRow(ListReportView* view, sl_uint32 row, const UIPoint& pt);
 	
-	virtual void onDoubleClickRow(ListReportView* view, sl_uint32 row, const Point& pt);
+	virtual void onDoubleClickRow(ListReportView* view, sl_uint32 row, const UIPoint& pt);
 
 };
 
@@ -26,7 +26,7 @@ class ListReportViewColumn
 {
 public:
 	SafeString title;
-	sl_real width;
+	sl_ui_len width;
 	Alignment align;
 	Alignment headerAlign;
 
@@ -64,9 +64,9 @@ public:
 	
 	virtual void setHeaderText(sl_uint32 col, const String& text, sl_bool flagRedraw = sl_true);
 	
-	sl_real getColumnWidth(sl_uint32 col);
+	sl_ui_len getColumnWidth(sl_uint32 col);
 	
-	virtual void setColumnWidth(sl_uint32 col, sl_real width, sl_bool flagRedraw = sl_true);
+	virtual void setColumnWidth(sl_uint32 col, sl_ui_len width, sl_bool flagRedraw = sl_true);
 	
 	Alignment getHeaderAlignment(sl_uint32 col);
 	
@@ -92,11 +92,11 @@ public:
 protected:
 	virtual void onSelectRow(sl_uint32 row);
 	
-	virtual void onClickRow(sl_uint32 row, const Point& pt);
+	virtual void onClickRow(sl_uint32 row, const UIPoint& pt);
 	
-	virtual void onRightButtonClickRow(sl_uint32 row, const Point& pt);
+	virtual void onRightButtonClickRow(sl_uint32 row, const UIPoint& pt);
 	
-	virtual void onDoubleClickRow(sl_uint32 row, const Point& pt);
+	virtual void onDoubleClickRow(sl_uint32 row, const UIPoint& pt);
 	
 public:
 	// override
@@ -104,11 +104,11 @@ public:
 	
 	void dispatchSelectRow(sl_uint32 row);
 	
-	void dispatchClickRow(sl_uint32 row, const Point& pt);
+	void dispatchClickRow(sl_uint32 row, const UIPoint& pt);
 	
-	void dispatchRightButtonClickRow(sl_uint32 row, const Point& pt);
+	void dispatchRightButtonClickRow(sl_uint32 row, const UIPoint& pt);
 	
-	void dispatchDoubleClickRow(sl_uint32 row, const Point& pt);
+	void dispatchDoubleClickRow(sl_uint32 row, const UIPoint& pt);
 
 protected:
 	void _refreshColumnsCount_NW();
@@ -117,7 +117,7 @@ protected:
 	
 	void _setHeaderText_NW(sl_uint32 col, const String& text);
 	
-	void _setColumnWidth_NW(sl_uint32 col, sl_real width);
+	void _setColumnWidth_NW(sl_uint32 col, sl_ui_len width);
 	
 	void _setHeaderAlignment_NW(sl_uint32 col, Alignment align);
 	

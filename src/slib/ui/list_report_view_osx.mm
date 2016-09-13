@@ -64,7 +64,7 @@ public:
 			NSTableColumn* tc = tv->m_columns.getItemValue(i, nil);
 			if (tc != nil) {
 				[tc setTitle:(Apple::getNSStringFromString(columns[i].title))];
-				[tc setWidth:columns[i].width];
+				[tc setWidth:(CGFloat)(columns[i].width)];
 				NSTableHeaderCell* headerCell = [tc headerCell];
 				NSCell* dataCell = [tc dataCell];
 				[headerCell setAlignment:translateAlignment(columns[i].headerAlign)];
@@ -172,14 +172,14 @@ void ListReportView::_setHeaderText_NW(sl_uint32 iCol, const String& text)
 	}
 }
 
-void ListReportView::_setColumnWidth_NW(sl_uint32 iCol, sl_real width)
+void ListReportView::_setColumnWidth_NW(sl_uint32 iCol, sl_ui_len width)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListReportView class]]) {
 		_Slib_OSX_ListReportView* tv = (_Slib_OSX_ListReportView*)handle;
 		NSTableColumn* tc = tv->m_columns.getItemValue(iCol, nil);
 		if (tc != nil) {
-			[tc setWidth:width];
+			[tc setWidth:(CGFloat)width];
 		}
 	}
 }
@@ -301,13 +301,13 @@ SLIB_UI_NAMESPACE_END
 					// don't call event callback when it is new selection because it is already called by default
 					((slib::_ListReportView*)(view.ptr))->dispatchSelectRow((sl_uint32)(indexRow));
 				}
-				sl_real x = (sl_real)(ptView.x);
-				sl_real y = (sl_real)(ptView.y);
+				sl_ui_posf x = (sl_ui_posf)(ptView.x);
+				sl_ui_posf y = (sl_ui_posf)(ptView.y);
 				NSInteger clicks = [theEvent clickCount];
 				if (clicks == 1) {
-					((slib::_ListReportView*)(view.ptr))->dispatchClickRow((sl_uint32)(indexRow), slib::Point(x, y));
+					((slib::_ListReportView*)(view.ptr))->dispatchClickRow((sl_uint32)(indexRow), slib::UIPointf(x, y));
 				} else if (clicks == 2) {
-					((slib::_ListReportView*)(view.ptr))->dispatchDoubleClickRow((sl_uint32)(indexRow), slib::Point(x, y));
+					((slib::_ListReportView*)(view.ptr))->dispatchDoubleClickRow((sl_uint32)(indexRow), slib::UIPointf(x, y));
 				}
 			}
 		}
@@ -325,9 +325,9 @@ SLIB_UI_NAMESPACE_END
 		if (instance.isNotNull()) {
 			slib::Ref<slib::View> view = instance->getView();
 			if (slib::ListReportView::checkInstance(view.ptr)) {
-				sl_real x = (sl_real)(ptView.x);
-				sl_real y = (sl_real)(ptView.y);
-				((slib::_ListReportView*)(view.ptr))->dispatchRightButtonClickRow((sl_uint32)(indexRow), slib::Point(x, y));
+				sl_ui_posf x = (sl_ui_posf)(ptView.x);
+				sl_ui_posf y = (sl_ui_posf)(ptView.y);
+				((slib::_ListReportView*)(view.ptr))->dispatchRightButtonClickRow((sl_uint32)(indexRow), slib::UIPointf(x, y));
 			}
 		}
 	}

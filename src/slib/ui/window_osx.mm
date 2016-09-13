@@ -31,7 +31,7 @@ public:
 	NSWindow* m_window;
 	__weak NSWindow* m_parent;
 	
-	sl_real m_heightScreen;
+	sl_ui_len m_heightScreen;
 	
 	SafeRef<ViewInstance> m_viewContent;
 	
@@ -49,11 +49,14 @@ public:
 	static Ref<_OSX_Window> create(NSWindow* window)
 	{
 		if (window != nil) {
-			sl_real heightScreen;
+			sl_ui_pos heightScreen;
 			NSScreen* screen = [window screen];
 			if (screen != nil) {
 				NSRect rc = [screen frame];
-				heightScreen = rc.size.height;
+				heightScreen = (sl_ui_pos)(rc.size.height);
+				if (heightScreen < 0) {
+					heightScreen = 0;
+				}
 			} else {
 				heightScreen = 0;
 			}
@@ -91,7 +94,7 @@ public:
 			}
 		}
 		NSScreen* screen = UIPlatform::getScreenHandle(param.screen.ptr);
-		Rectangle screenFrame;
+		UIRect screenFrame;
 		Ref<Screen> _screen = param.screen;
 		if (_screen.isNotNull()) {
 			screenFrame = _screen->getRegion();
@@ -100,7 +103,7 @@ public:
 			if (_screen.isNotNull()) {
 				screenFrame = _screen->getRegion();
 			} else {
-				screenFrame = Rectangle::zero();
+				screenFrame = UIRect::zero();
 			}
 		}
 		NSRect rect;
@@ -227,22 +230,22 @@ public:
 		}
 	}
 
-	Rectangle getFrame()
+	UIRect getFrame()
 	{
 		NSWindow* window = m_window;
 		if (window != nil) {
 			NSRect rect = [window frame];
-			Rectangle frame;
+			UIRect frame;
 			_getFrame(frame, rect, m_heightScreen);
 			return frame;
 		} else {
-			return Rectangle::zero();
+			return UIRect::zero();
 		}
 	}
 	
-	sl_bool setFrame(const Rectangle& _frame)
+	sl_bool setFrame(const UIRect& _frame)
 	{
-		Rectangle frame = _frame;
+		UIRect frame = _frame;
 		NSWindow* window = m_window;
 		if (window != nil) {
 			dispatch_async(dispatch_get_main_queue(), ^{
@@ -255,43 +258,44 @@ public:
 		return sl_false;
 	}
 	
-	Rectangle getClientFrame()
+	UIRect getClientFrame()
 	{
 		NSWindow* window = m_window;
 		if (window != nil) {
 			NSRect fr = [window frame];
 			NSRect cr = [window contentRectForFrameRect:fr];
-			Rectangle ret;
-			ret.left = (sl_real)(cr.origin.x - fr.origin.x);
-			ret.top = (sl_real)((fr.origin.y + fr.size.height) - (cr.origin.y + cr.size.height));
-			ret.setWidth((sl_real)(cr.size.width));
-			ret.setHeight((sl_real)(cr.size.height));
+			UIRect ret;
+			ret.left = (sl_ui_pos)(cr.origin.x - fr.origin.x);
+			ret.top = (sl_ui_pos)((fr.origin.y + fr.size.height) - (cr.origin.y + cr.size.height));
+			ret.setWidth((sl_ui_pos)(cr.size.width));
+			ret.setHeight((sl_ui_pos)(cr.size.height));
+			ret.fixSizeError();
 			return ret;
 		} else {
-			return Rectangle::zero();
+			return UIRect::zero();
 		}
 	}
 	
-	Size getClientSize()
+	UISize getClientSize()
 	{
 		NSWindow* window = m_window;
 		if (window != nil) {
 			NSRect rect = [window contentRectForFrameRect:[window frame]];
-			return Size((sl_real)(rect.size.width), (sl_real)(rect.size.height));
+			return UISize((sl_ui_pos)(rect.size.width), (sl_ui_pos)(rect.size.height));
 		} else {
-			return Size::zero();
+			return UISize::zero();
 		}
 	}
 	
-	sl_bool setClientSize(const Size& _size)
+	sl_bool setClientSize(const UISize& _size)
 	{
-		Size size = _size;
+		UISize size = _size;
 		NSWindow* window = m_window;
 		if (window != nil) {
 			dispatch_async(dispatch_get_main_queue(), ^{
 				NSSize s;
-				s.width = size.x;
-				s.height = size.y;
+				s.width = (CGFloat)(size.x);
+				s.height = (CGFloat)(size.y);
 				[window setContentSize:s];
 			});
 			return sl_true;
@@ -688,140 +692,152 @@ public:
 	}
 	
 	
-	Point convertCoordinateFromScreenToWindow(const Point& ptScreen)
+	UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen)
 	{
 		NSWindow* window = m_window;
 		if (window != nil) {
 			NSRect rect;
-			rect.origin.x = ptScreen.x;
-			rect.origin.y = m_heightScreen - ptScreen.y;
+			rect.origin.x = (CGFloat)(ptScreen.x);
+			rect.origin.y = (CGFloat)(m_heightScreen - ptScreen.y);
 			rect.size.width = 0;
 			rect.size.height = 0;
 			rect = [window convertRectFromScreen:rect];
 			NSRect frame = [window frame];
-			Point ret;
-			ret.x = (sl_real)(rect.origin.x);
-			ret.y = (sl_real)(frame.size.height - rect.origin.y);
+			UIPointf ret;
+			ret.x = (sl_ui_pos)(rect.origin.x);
+			ret.y = (sl_ui_pos)(frame.size.height - rect.origin.y);
 			return ret;
 		} else {
 			return ptScreen;
 		}
 	}
 	
-	Point convertCoordinateFromWindowToScreen(const Point& ptWindow)
+	UIPointf convertCoordinateFromWindowToScreen(const UIPointf& ptWindow)
 	{
 		NSWindow* window = m_window;
 		if (window != nil) {
 			NSRect frame = [window frame];
 			NSRect rect;
-			rect.origin.x = ptWindow.x;
-			rect.origin.y = frame.size.height - ptWindow.y;
+			rect.origin.x = (CGFloat)(ptWindow.x);
+			rect.origin.y = (CGFloat)(frame.size.height - ptWindow.y);
 			rect.size.width = 0;
 			rect.size.height = 0;
 			rect = [window convertRectToScreen:rect];
-			Point ret;
-			ret.x = (sl_real)(rect.origin.x);
-			ret.y = m_heightScreen - (sl_real)(rect.origin.y);
+			UIPointf ret;
+			ret.x = (sl_ui_posf)(rect.origin.x);
+			ret.y = (sl_ui_posf)(m_heightScreen - rect.origin.y);
 			return ret;
 		} else {
 			return ptWindow;
 		}
 	}
 	
-	Point convertCoordinateFromScreenToClient(const Point& ptScreen)
+	UIPointf convertCoordinateFromScreenToClient(const UIPointf& ptScreen)
 	{
 		NSWindow* window = m_window;
 		if (window != nil) {
 			NSRect rect;
-			rect.origin.x = ptScreen.x;
-			rect.origin.y = m_heightScreen - ptScreen.y;
+			rect.origin.x = (CGFloat)(ptScreen.x);
+			rect.origin.y = (CGFloat)(m_heightScreen - ptScreen.y);
 			rect.size.width = 0;
 			rect.size.height = 0;
 			rect = [window convertRectFromScreen:rect];
 			NSRect client = [window contentRectForFrameRect:[window frame]];
-			Point ret;
-			ret.x = (sl_real)(rect.origin.x);
-			ret.y = (sl_real)(client.size.height - rect.origin.y);
+			UIPointf ret;
+			ret.x = (sl_ui_posf)(rect.origin.x);
+			ret.y = (sl_ui_posf)(client.size.height - rect.origin.y);
 			return ret;
 		} else {
 			return ptScreen;
 		}
 	}
 	
-	Point convertCoordinateFromClientToScreen(const Point& ptClient)
+	UIPointf convertCoordinateFromClientToScreen(const UIPointf& ptClient)
 	{
 		NSWindow* window = m_window;
 		if (window != nil) {
 			NSRect client = [window contentRectForFrameRect:[window frame]];
 			NSRect rect;
-			rect.origin.x = ptClient.x;
-			rect.origin.y = client.size.height - ptClient.y;
+			rect.origin.x = (CGFloat)(ptClient.x);
+			rect.origin.y = (CGFloat)(client.size.height - ptClient.y);
 			rect.size.width = 0;
 			rect.size.height = 0;
 			rect = [window convertRectToScreen:rect];
-			Point ret;
-			ret.x = (sl_real)(rect.origin.x);
-			ret.y = m_heightScreen - (sl_real)(rect.origin.y);
+			UIPointf ret;
+			ret.x = (sl_ui_posf)(rect.origin.x);
+			ret.y = (sl_ui_posf)(m_heightScreen - rect.origin.y);
 			return ret;
 		} else {
 			return ptClient;
 		}
 	}
 	
-	Point convertCoordinateFromWindowToClient(const Point& ptWindow)
+	UIPointf convertCoordinateFromWindowToClient(const UIPointf& ptWindow)
 	{
 		NSWindow* window = m_window;
 		if (window != nil) {
 			NSRect frame = [window frame];
 			NSRect client = [window contentRectForFrameRect:frame];
-			Point ret;
-			ret.x = (sl_real)(ptWindow.x);
-			ret.y = (sl_real)(client.size.height - (frame.size.height - ptWindow.y));
+			UIPointf ret;
+			ret.x = (sl_ui_posf)(ptWindow.x);
+			ret.y = (sl_ui_posf)(client.size.height - (frame.size.height - ptWindow.y));
 			return ret;
 		} else {
 			return ptWindow;
 		}
 	}
 	
-	Point convertCoordinateFromClientToWindow(const Point& ptClient)
+	UIPointf convertCoordinateFromClientToWindow(const UIPointf& ptClient)
 	{
 		NSWindow* window = m_window;
 		if (window != nil) {
 			NSRect frame = [window frame];
 			NSRect client = [window contentRectForFrameRect:frame];
-			Point ret;
-			ret.x = (sl_real)(ptClient.x);
-			ret.y = (sl_real)(frame.size.height - (client.size.height - ptClient.y));
+			UIPointf ret;
+			ret.x = (sl_ui_posf)(ptClient.x);
+			ret.y = (sl_ui_posf)(frame.size.height - (client.size.height - ptClient.y));
 			return ret;
 		} else {
 			return ptClient;
 		}
 	}
 	
-	Size getWindowSizeFromClientSize(const Size& sizeClient)
+	UISize getWindowSizeFromClientSize(const UISize& sizeClient)
 	{
 		NSWindow* window = m_window;
 		if (window != nil) {
 			NSRect frame = [window frame];
 			NSRect client = [window contentRectForFrameRect:frame];
-			Size ret;
-			ret.x = sizeClient.x + (sl_real)(frame.size.width - client.size.width);
-			ret.y = sizeClient.y + (sl_real)(frame.size.height - client.size.height);
+			UISize ret;
+			ret.x = sizeClient.x + (sl_ui_pos)(frame.size.width - client.size.width);
+			ret.y = sizeClient.y + (sl_ui_pos)(frame.size.height - client.size.height);
+			if (ret.x < 0) {
+				ret.x = 0;
+			}
+			if (ret.y < 0) {
+				ret.y = 0;
+			}
 			return ret;
 		} else {
 			return sizeClient;
 		}
 	}
 	
-	Size getClientSizeFromWindowSize(const Size& sizeWindow)
+	UISize getClientSizeFromWindowSize(const UISize& sizeWindow)
 	{
 		NSWindow* window = m_window;
 		if (window != nil) {
 			NSRect frame = [window frame];
 			NSRect client = [window contentRectForFrameRect:frame];
-			Size ret;
-			ret.x = sizeWindow.x - (sl_real)(frame.size.width - client.size.width);
-			ret.y = sizeWindow.y - (sl_real)(frame.size.height - client.size.height);
+			UISize ret;
+			ret.x = sizeWindow.x - (sl_ui_pos)(frame.size.width - client.size.width);
+			ret.y = sizeWindow.y - (sl_ui_pos)(frame.size.height - client.size.height);
+			if (ret.x < 0) {
+				ret.x = 0;
+			}
+			if (ret.y < 0) {
+				ret.y = 0;
+			}
 			return ret;
 		} else {
 			return sizeWindow;
@@ -857,7 +873,7 @@ private:
 		}
 	}
 	
-	static void _getNSRect(NSRect& rectOut, const Rectangle& rectIn, sl_real heightScreen)
+	static void _getNSRect(NSRect& rectOut, const UIRect& rectIn, sl_ui_len heightScreen)
 	{
 		rectOut.origin.x = (int)(rectIn.left);
 		rectOut.origin.y = (int)(heightScreen - rectIn.bottom);
@@ -866,12 +882,13 @@ private:
 		_applyRectLimit(rectOut);
 	}
 	
-	static void _getFrame(Rectangle& rectOut, const NSRect& rectIn, sl_real heightScreen)
+	static void _getFrame(UIRect& rectOut, const NSRect& rectIn, sl_ui_len heightScreen)
 	{
-		rectOut.left = (sl_real)(rectIn.origin.x);
-		rectOut.top = heightScreen - (sl_real)(rectIn.origin.y + rectIn.size.height);
-		rectOut.setWidth((sl_real)(rectIn.size.width));
-		rectOut.setHeight((sl_real)(rectIn.size.height));
+		rectOut.left = (sl_ui_pos)(rectIn.origin.x);
+		rectOut.top = heightScreen - (sl_ui_pos)(rectIn.origin.y + rectIn.size.height);
+		rectOut.setWidth((sl_ui_pos)(rectIn.size.width));
+		rectOut.setHeight((sl_ui_pos)(rectIn.size.height));
+		rectOut.fixSizeError();
 	}
 	
 };
@@ -919,13 +936,20 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::_OSX_Window> window = m_window;
 	if (window.isNotNull()) {
-		slib::Size size(frameSize.width, frameSize.height);
+		slib::UISize size((sl_ui_pos)(frameSize.width), (sl_ui_pos)(frameSize.height));
+		if (size.x < 0) {
+			size.x = 0;
+		}
+		if (size.y < 0) {
+			size.y = 0;
+		}
 		window->onResize(size);
-		frameSize.width = size.x;
-		frameSize.height = size.y;
+		frameSize.width = (CGFloat)(size.x);
+		frameSize.height = (CGFloat)(size.y);
 	}
 	return frameSize;
 }
+
 - (void)windowDidMove:(NSNotification *)notification
 {
 	slib::Ref<slib::_OSX_Window> window = m_window;
@@ -941,6 +965,7 @@ SLIB_UI_NAMESPACE_END
 		window->onMinimize();
 	}
 }
+
 - (void)windowDidDeminiaturize:(NSNotification *)notification
 {
 	slib::Ref<slib::_OSX_Window> window = m_window;
@@ -948,6 +973,7 @@ SLIB_UI_NAMESPACE_END
 		window->onDeminimize();
 	}
 }
+
 - (BOOL)windowShouldZoom:(NSWindow *)w toFrame:(NSRect)newFrame
 {
 	slib::Ref<slib::_OSX_Window> window = m_window;
@@ -957,33 +983,55 @@ SLIB_UI_NAMESPACE_END
 		} else {
 			window->onMaximize();
 		}
-		slib::Size size((sl_real)(newFrame.size.width), (sl_real)(newFrame.size.height));
-		slib::UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(slib::WindowInstance, onResized, window, size.x, size.y));
+		slib::UISize size((sl_ui_pos)(newFrame.size.width), (sl_ui_pos)(newFrame.size.height));
+		if (size.x < 0) {
+			size.x = 0;
+		}
+		if (size.y < 0) {
+			size.y = 0;
+		}
+		slib::UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(slib::WindowInstance, onResized, window, (sl_ui_len)(size.x), (sl_ui_len)(size.y)));
 	}
 	return TRUE;
 }
+
 - (void)windowDidEnterFullScreen:(NSNotification *)notification
 {
 	slib::Ref<slib::_OSX_Window> window = m_window;
 	if (window.isNotNull()) {
 		window->onMaximize();
-		slib::Size size((sl_real)(self.frame.size.width), (sl_real)(self.frame.size.height));
+		slib::UISize size((sl_ui_pos)(self.frame.size.width), (sl_ui_pos)(self.frame.size.height));
+		if (size.x < 0) {
+			size.x = 0;
+		}
+		if (size.y < 0) {
+			size.y = 0;
+		}
 		window->onResized(size.x, size.y);
 	}
 }
+
 - (void)windowDidExitFullScreen:(NSNotification *)notification
 {
 	slib::Ref<slib::_OSX_Window> window = m_window;
 	if (window.isNotNull()) {
 		window->onMinimize();
-		slib::Size size((sl_real)(self.frame.size.width), (sl_real)(self.frame.size.height));
+		slib::UISize size((sl_ui_pos)(self.frame.size.width), (sl_ui_pos)(self.frame.size.height));
+		if (size.x < 0) {
+			size.x = 0;
+		}
+		if (size.y < 0) {
+			size.y = 0;
+		}
 		window->onResized(size.x, size.y);
 	}
 }
+
 - (BOOL)acceptsFirstResponder
 {
 	return TRUE;
 }
+
 @end
 
 SLIB_UI_NAMESPACE_BEGIN

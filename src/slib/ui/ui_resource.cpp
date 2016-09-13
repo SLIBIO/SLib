@@ -3,13 +3,13 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
-sl_real _g_ui_resource_screenWidth = 0;
-sl_real _g_ui_resource_screenHeight = 0;
+sl_ui_len _g_ui_resource_screenWidth = 0;
+sl_ui_len _g_ui_resource_screenHeight = 0;
 
-sl_real UIResource::getScreenWidth()
+sl_ui_len UIResource::getScreenWidth()
 {
 	if (_g_ui_resource_screenWidth == 0) {
-		Size size = UI::getScreenSize();
+		UISize size = UI::getScreenSize();
 		_g_ui_resource_screenWidth = size.x;
 		if (_g_ui_resource_screenHeight == 0) {
 			_g_ui_resource_screenHeight = size.y;
@@ -18,12 +18,12 @@ sl_real UIResource::getScreenWidth()
 	return _g_ui_resource_screenWidth;
 }
 
-void UIResource::setScreenWidth(sl_real width)
+void UIResource::setScreenWidth(sl_ui_len width)
 {
 	_g_ui_resource_screenWidth = width;
 }
 
-sl_real UIResource::getScreenHeight()
+sl_ui_len UIResource::getScreenHeight()
 {
 	if (_g_ui_resource_screenHeight == 0) {
 		Size size = UI::getScreenSize();
@@ -35,17 +35,17 @@ sl_real UIResource::getScreenHeight()
 	return _g_ui_resource_screenHeight;
 }
 
-void UIResource::setScreenHeight(sl_real height)
+void UIResource::setScreenHeight(sl_ui_len height)
 {
 	_g_ui_resource_screenHeight = height;
 }
 
-sl_real UIResource::getScreenMinimum()
+sl_ui_len UIResource::getScreenMinimum()
 {
 	return SLIB_MIN(getScreenWidth(), getScreenHeight());
 }
 
-sl_real UIResource::getScreenMaximum()
+sl_ui_len UIResource::getScreenMaximum()
 {
 	return SLIB_MAX(getScreenWidth(), getScreenHeight());
 }
@@ -72,11 +72,12 @@ void UILayoutResource::setCustomUnitLength(sl_real length)
 }
 
 // avoid recursively layouting
-void UILayoutResource::_layoutViews_safe(sl_real width, sl_real height)
+void UILayoutResource::_layoutViews_safe(sl_ui_len width, sl_ui_len height)
 {
 	sl_int32 n = Base::interlockedIncrement32(&m_countRecursiveLayout);
 	if (n == 1) {
 		layoutViews(width, height);
+		m_contentView->invalidate();
 	}
 	Base::interlockedDecrement32(&m_countRecursiveLayout);
 }
@@ -93,7 +94,7 @@ WindowLayoutResource::WindowLayoutResource(sl_real customUnitLength)
 	m_contentView = view.ptr;
 }
 
-void WindowLayoutResource::dispatchResize(Size& size)
+void WindowLayoutResource::dispatchResize(UISize& size)
 {
 	Window::dispatchResize(size);
 	UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(WindowLayoutResource, _layoutViews_safe, this));
@@ -113,7 +114,7 @@ void WindowLayoutResource::dispatchMinimize()
 
 void WindowLayoutResource::_layoutViews_safe()
 {
-	Size size = getClientSize();
+	UISize size = getClientSize();
 	UILayoutResource::_layoutViews_safe(size.x, size.y);
 }
 
@@ -127,7 +128,7 @@ ViewLayoutResource::ViewLayoutResource(sl_real customUnitLength)
 	m_contentView = this;
 }
 
-void ViewLayoutResource::dispatchResize(sl_real width, sl_real height)
+void ViewLayoutResource::dispatchResize(sl_ui_len width, sl_ui_len height)
 {
 	_layoutViews_safe(width, height);
 	ViewGroup::dispatchResize(width, height);

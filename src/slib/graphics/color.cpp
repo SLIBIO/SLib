@@ -361,15 +361,13 @@ public:
 		_MAP_COLOR(WhiteSmoke)
 		_MAP_COLOR(Yellow)
 		_MAP_COLOR(YellowGreen)
+		_MAP_COLOR(Zero)
+		_MAP_COLOR(None)
 	}
 	
-	Color getColorFromName(const String& nameLower)
+	sl_bool getColorFromName(const String& nameLower, Color& color)
 	{
-		Color ret;
-		if (mapName.get(nameLower, &ret)) {
-			return ret;
-		}
-		return Color::zero();
+		return mapName.get(nameLower, &color);
 	}
 	
 };
@@ -529,8 +527,8 @@ static sl_reg _Color_parse(Color* _out, const CT* sz, sl_size pos, sl_size len)
 				
 				_Color_Name_Map* nm = _Color_getNameMap();
 				if (nm) {
-					Color color = nm->getColorFromName(String(s, n));
-					if (color.isNotZero()) {
+					Color color;
+					if (nm->getColorFromName(String(s, n), color)) {
 						if (_out) {
 							*_out = color;
 						}

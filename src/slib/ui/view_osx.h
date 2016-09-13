@@ -39,13 +39,13 @@ public:
 	void invalidate();
 	
 	// override
-	void invalidate(const Rectangle& rect);
+	void invalidate(const UIRect& rect);
 	
 	// override
-	Rectangle getFrame();
+	UIRect getFrame();
 	
 	// override
-	void setFrame(const Rectangle& frame);
+	void setFrame(const UIRect& frame);
 	
 	// override
 	void setVisible(sl_bool flag);
@@ -57,10 +57,10 @@ public:
 	void setOpaque(sl_bool flag);
 	
 	// override
-	Point convertCoordinateFromScreenToView(const Point& ptScreen);
+	UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen);
 	
 	// override
-	Point convertCoordinateFromViewToScreen(const Point& ptView);
+	UIPointf convertCoordinateFromViewToScreen(const UIPointf& ptView);
 	
 	// override
 	void addChildInstance(const Ref<ViewInstance>& instance);
@@ -107,11 +107,11 @@ SLIB_UI_NAMESPACE_END
 	Ref<OSX_ViewInstance> ret; \
 	NSView* parent = UIPlatform::getViewHandle(_parent); \
 	NSRect frame; \
-	Rectangle _frame = getFrame(); \
-	frame.origin.x = (int)(_frame.left); \
-	frame.origin.y = (int)(_frame.top); \
-	frame.size.width = (int)(_frame.getWidth()); \
-	frame.size.height = (int)(_frame.getHeight());
+	UIRect _frame = getFrame(); \
+	frame.origin.x = (CGFloat)(_frame.left); \
+	frame.origin.y = (CGFloat)(_frame.top); \
+	frame.size.width = (CGFloat)(_frame.getWidth()); \
+	frame.size.height = (CGFloat)(_frame.getHeight());
 
 #define OSX_VIEW_CREATE_INSTANCE_END \
 	if (handle != nil) { \

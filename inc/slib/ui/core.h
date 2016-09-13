@@ -77,17 +77,21 @@ public:
 	
 	static Ref<Screen> getFocusedScreen();
 	
-	static Rectangle getScreenRegion();
+	static UIRect getScreenRegion();
 	
-	static Rectangle getScreenRegion(const Ref<Screen>& screen);
+	static UIRect getScreenRegion(const Ref<Screen>& screen);
 	
-	static Rectangle getScreenBounds();
+	static UIRect getScreenBounds();
 	
-	static Rectangle getScreenBounds(const Ref<Screen>& screen);
+	static UIRect getScreenBounds(const Ref<Screen>& screen);
 	
-	static Size getScreenSize();
+	static UISize getScreenSize();
 	
-	static Size getScreenSize(const Ref<Screen>& screen);
+	static UISize getScreenSize(const Ref<Screen>& screen);
+	
+	static sl_ui_len getScreenWidth();
+	
+	static sl_ui_len getScreenHeight();
 	
 	
 	// Message Box

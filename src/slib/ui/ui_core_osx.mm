@@ -17,7 +17,7 @@ class _OSX_Screen : public Screen
 {
 public:
 	NSScreen* m_screen;
-	Rectangle m_region;
+	UIRect m_region;
 	
 public:
 	static Ref<_OSX_Screen> create(NSScreen* screen, NSScreen* primary)
@@ -27,20 +27,20 @@ public:
 			ret = new _OSX_Screen();
 			if (ret.isNotNull()) {
 				ret->m_screen = screen;
-				Rectangle region;
-				sl_real leftBottom = 0;
+				UIRect region;
+				sl_ui_pos leftBottom = 0;
 				if (primary == nil) {
 					primary = getPrimaryScreen();
 				}
 				if (primary != nil) {
 					NSRect rect = [primary frame];
-					leftBottom = (sl_real)(rect.origin.y + rect.size.height);
+					leftBottom = (sl_ui_pos)(rect.origin.y + rect.size.height);
 				}
 				NSRect rect = [screen frame];
-				region.left = (sl_real)(rect.origin.x);
-				region.top = leftBottom - (sl_real)(rect.origin.y + rect.size.height);
-				region.setWidth((sl_real)(rect.size.width));
-				region.setHeight((sl_real)(rect.size.height));
+				region.left = (sl_ui_pos)(rect.origin.x);
+				region.top = leftBottom - (sl_ui_pos)(rect.origin.y + rect.size.height);
+				region.setWidth((sl_ui_pos)(rect.size.width));
+				region.setHeight((sl_ui_pos)(rect.size.height));
 				ret->m_region = region;
 			}
 		}
@@ -60,7 +60,7 @@ public:
 	
 public:
 	// override
-	Rectangle getRegion()
+	UIRect getRegion()
 	{
 		return m_region;
 	}
@@ -165,6 +165,7 @@ void UIPlatform::runApp()
 	[NSBundle loadNibNamed:@"MainMenu" owner:NSApp];
 	_slib_OSX_AppDelegate * delegate = [[_slib_OSX_AppDelegate alloc] init];
 	[NSApp setDelegate:delegate];
+	
 	[NSApp run];
 }
 

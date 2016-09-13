@@ -38,9 +38,9 @@ sl_bool LinearView::isHorizontal()
 	return m_orientation == LayoutOrientation::Horizontal;
 }
 
-void LinearView::setHorizontal()
+void LinearView::setHorizontal(sl_bool flagRedraw)
 {
-	setOrientation(LayoutOrientation::Horizontal);
+	setOrientation(LayoutOrientation::Horizontal, flagRedraw);
 }
 
 sl_bool LinearView::isVertical()
@@ -48,12 +48,12 @@ sl_bool LinearView::isVertical()
 	return m_orientation == LayoutOrientation::Vertical;
 }
 
-void LinearView::setVertical()
+void LinearView::setVertical(sl_bool flagRedraw)
 {
-	setOrientation(LayoutOrientation::Vertical);
+	setOrientation(LayoutOrientation::Vertical, flagRedraw);
 }
 
-void LinearView::onResizeChild(View* child, sl_real width, sl_real height)
+void LinearView::onResizeChild(View* child, sl_ui_len width, sl_ui_len height)
 {
 	if (!(child->isLayoutEnabled())) {
 		requestLayout();
@@ -73,10 +73,10 @@ void LinearView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 		return;
 	}
 	
-	sl_real measuredWidth = 0;
-	sl_real measuredHeight = 0;
-	sl_real paddingWidth = getPaddingLeft() + getPaddingRight();
-	sl_real paddingHeight = getPaddingTop() + getPaddingBottom();
+	sl_ui_pos measuredWidth = 0;
+	sl_ui_pos measuredHeight = 0;
+	sl_ui_pos paddingWidth = getPaddingLeft() + getPaddingRight();
+	sl_ui_pos paddingHeight = getPaddingTop() + getPaddingBottom();
 	if (m_orientation == LayoutOrientation::Horizontal) {
 		measuredWidth = paddingWidth;
 	} else {
@@ -120,6 +120,9 @@ void LinearView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 	
 	if (m_orientation == LayoutOrientation::Horizontal) {
 		if (flagHorizontal) {
+			if (measuredWidth < 0) {
+				measuredWidth = 0;
+			}
 			setMeasuredWidth(measuredWidth);
 		}
 		if (flagVertical) {
@@ -130,6 +133,9 @@ void LinearView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 			measureRelativeLayout(sl_true, sl_false);
 		}
 		if (flagVertical) {
+			if (measuredHeight < 0) {
+				measuredHeight = 0;
+			}
 			setMeasuredHeight(measuredHeight);
 		}
 	}
@@ -139,9 +145,9 @@ void LinearView::onMakeLayout()
 {
 	sl_bool flagHorizontal = m_orientation == LayoutOrientation::Horizontal;
 	
-	sl_real sizeSum = 0;
-	sl_size countFullFill = 0;
-	sl_size countPartFill = 0;
+	sl_ui_pos sizeSum = 0;
+	sl_uint32 countFullFill = 0;
+	sl_uint32 countPartFill = 0;
 	
 	ListLocker< Ref<View> > children(_getChildren());
 	sl_size i;
@@ -153,7 +159,7 @@ void LinearView::onMakeLayout()
 					if (child->isLayoutLeftFixed() && child->isLayoutRightFixed()) {
 						sizeSum += child->getMarginLeft();
 						if (child->getWidthMode() != SizeMode::Filling) {
-							Rectangle frame = child->getLayoutFrame();
+							UIRect frame = child->getLayoutFrame();
 							sizeSum += frame.getWidth();
 						} else {
 							if (Math::isAlmostZero(child->getWidthWeight() - 1)) {
@@ -168,7 +174,7 @@ void LinearView::onMakeLayout()
 					if (child->isLayoutTopFixed() && child->isLayoutBottomFixed()) {
 						sizeSum += child->getMarginTop();
 						if (child->getHeightMode() != SizeMode::Filling) {
-							Rectangle frame = child->getLayoutFrame();
+							UIRect frame = child->getLayoutFrame();
 							sizeSum += frame.getHeight();
 						} else {
 							if (Math::isAlmostZero(child->getWidthWeight() - 1)) {
@@ -184,12 +190,26 @@ void LinearView::onMakeLayout()
 		}
 	}
 	
+	if (sizeSum < 0) {
+		sizeSum = 0;
+	}
+	
 	if (countPartFill > 0) {
-		sl_real remainedSize;
+		sl_ui_pos remainedSize;
 		if (flagHorizontal) {
-			remainedSize = getWidth() - sizeSum;
+			sl_ui_len n = getWidth();
+			if (n > (sl_ui_len)sizeSum) {
+				remainedSize = n - sizeSum;
+			} else {
+				remainedSize = 0;
+			}
 		} else {
-			remainedSize = getHeight() - sizeSum;
+			sl_ui_len n = getHeight();
+			if (n > (sl_ui_len)sizeSum) {
+				remainedSize = n - sizeSum;
+			} else {
+				remainedSize = 0;
+			}
 		}
 		if (remainedSize < 0) {
 			remainedSize = 0;
@@ -203,9 +223,9 @@ void LinearView::onMakeLayout()
 							if (child->getWidthMode() == SizeMode::Filling) {
 								sl_real weight = child->getWidthWeight();
 								if (!(Math::isAlmostZero(weight - 1))) {
-									sl_real width = remainedSize * weight;
+									sl_ui_pos width = (sl_ui_pos)((sl_real)(remainedSize) * weight);
 									sizeSum += width;
-									Rectangle frame = child->getLayoutFrame();
+									UIRect frame = child->getLayoutFrame();
 									frame.setWidth(width);
 									child->setLayoutFrame(frame);
 								}
@@ -216,9 +236,9 @@ void LinearView::onMakeLayout()
 							if (child->getWidthMode() == SizeMode::Filling) {
 								sl_real weight = child->getHeightWeight();
 								if (!(Math::isAlmostZero(weight - 1))) {
-									sl_real height = remainedSize * weight;
+									sl_ui_pos height = (sl_ui_pos)((sl_real)(remainedSize) * weight);
 									sizeSum += height;
-									Rectangle frame = child->getLayoutFrame();
+									UIRect frame = child->getLayoutFrame();
 									frame.setHeight(height);
 									child->setLayoutFrame(frame);
 								}
@@ -230,17 +250,32 @@ void LinearView::onMakeLayout()
 		}
 	}
 	
+	if (sizeSum < 0) {
+		sizeSum = 0;
+	}
+
 	if (countFullFill > 0) {
-		sl_real remainedSize;
+		sl_ui_pos remainedSize;
 		if (flagHorizontal) {
-			remainedSize = getWidth() - sizeSum;
+			sl_ui_len n = getWidth();
+			if (n > (sl_ui_len)sizeSum) {
+				remainedSize = n - sizeSum;
+			} else {
+				remainedSize = 0;
+			}
 		} else {
-			remainedSize = getHeight() - sizeSum;
+			sl_ui_len n = getHeight();
+			if (n > (sl_ui_len)sizeSum) {
+				remainedSize = n - sizeSum;
+			} else {
+				remainedSize = 0;
+			}
 		}
 		if (remainedSize < 0) {
 			remainedSize = 0;
 		}
-		sl_real sizeAvg = remainedSize / (sl_real)countFullFill;
+
+		sl_ui_pos sizeAvg = remainedSize / countFullFill;
 		for (i = 0; i < children.count; i++) {
 			Ref<View>& child = children[i];
 			if (child.isNotNull()) {
@@ -250,7 +285,7 @@ void LinearView::onMakeLayout()
 							if (child->getWidthMode() == SizeMode::Filling) {
 								sl_real weight = child->getWidthWeight();
 								if (Math::isAlmostZero(weight - 1)) {
-									Rectangle frame = child->getLayoutFrame();
+									UIRect frame = child->getLayoutFrame();
 									frame.setWidth(sizeAvg);
 									child->setLayoutFrame(frame);
 								}
@@ -261,7 +296,7 @@ void LinearView::onMakeLayout()
 							if (child->getWidthMode() == SizeMode::Filling) {
 								sl_real weight = child->getHeightWeight();
 								if (Math::isAlmostZero(weight - 1)) {
-									Rectangle frame = child->getLayoutFrame();
+									UIRect frame = child->getLayoutFrame();
 									frame.setHeight(sizeAvg);
 									child->setLayoutFrame(frame);
 								}
@@ -273,7 +308,7 @@ void LinearView::onMakeLayout()
 		}
 	}
 	
-	sl_real pos;
+	sl_ui_pos pos;
 	if (flagHorizontal) {
 		pos = getPaddingLeft();
 	} else {
@@ -285,19 +320,20 @@ void LinearView::onMakeLayout()
 			if (child->getVisibility() != Visibility::Gone) {
 				if (flagHorizontal) {
 					if (child->isLayoutLeftFixed() && child->isLayoutRightFixed()) {
-						Rectangle frame = child->getLayoutFrame();
-						sl_real width = frame.getWidth();
+						UIRect frame = child->getLayoutFrame();
+						sl_ui_len width = frame.getWidth();
 						pos += child->getMarginLeft();
 						frame.left = pos;
 						frame.right = pos + width;
+						frame.fixSizeError();
 						child->setLayoutFrame(frame);
 						pos += width;
 						pos += child->getMarginRight();
 					}
 				} else {
 					if (child->isLayoutTopFixed() && child->isLayoutBottomFixed()) {
-						Rectangle frame = child->getLayoutFrame();
-						sl_real height = frame.getHeight();
+						UIRect frame = child->getLayoutFrame();
+						sl_ui_len height = frame.getHeight();
 						pos += child->getMarginTop();
 						frame.top = pos;
 						frame.bottom = pos + height;
@@ -314,12 +350,12 @@ void LinearView::onMakeLayout()
 
 VerticalLinearView::VerticalLinearView()
 {
-	setOrientation(LayoutOrientation::Vertical);
+	setOrientation(LayoutOrientation::Vertical, sl_false);
 }
 
 HorizontalLinearView::HorizontalLinearView()
 {
-	setOrientation(LayoutOrientation::Horizontal);
+	setOrientation(LayoutOrientation::Horizontal, sl_false);
 }
 
 SLIB_UI_NAMESPACE_END

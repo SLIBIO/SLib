@@ -23,11 +23,11 @@ public:
 	void dispatchDraw(Canvas* canvas);
 	
 	// override
-	void onResizeChild(View* child, sl_real width, sl_real height);
+	void onResizeChild(View* child, sl_ui_len width, sl_ui_len height);
 	
 };
 
-sl_real IListViewAdapter::getAverageItemHeight(ListView* lv)
+sl_ui_len IListViewAdapter::getAverageItemHeight(ListView* lv)
 {
 	return 0;
 }
@@ -48,7 +48,7 @@ ListView::ListView()
 	m_viewsGoUpItems = m_viewsGoDownItems + MAX_ITEMS_VISIBLE;
 	m_viewsFreeItems = m_viewsGoUpItems + MAX_ITEMS_VISIBLE;
 	
-	m_heightsVisibleItems = (sl_real*)(Base::createMemory(sizeof(sl_real)*MAX_ITEMS_VISIBLE*5));
+	m_heightsVisibleItems = (sl_ui_len*)(Base::createMemory(sizeof(sl_ui_len)*MAX_ITEMS_VISIBLE*5));
 	m_heightsTopItems = m_heightsVisibleItems + MAX_ITEMS_VISIBLE;
 	m_heightsBottomItems = m_heightsTopItems + MAX_ITEMS_VISIBLE;
 	m_heightsGoDownItems = m_heightsBottomItems + MAX_ITEMS_VISIBLE;
@@ -96,15 +96,16 @@ void ListView::refreshItems()
 	UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(ListView, _checkUpdateContent, this, sl_false));
 }
 
-void ListView::onScroll(sl_real x, sl_real y)
+void ListView::onScroll(sl_scroll_pos _x, sl_scroll_pos _y)
 {
+	sl_ui_pos y = (sl_ui_pos)(_y);
 	if (Math::isAlmostZero(y - m_lastScrollY)) {
 		return;
 	}
 	UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(ListView, _layoutItemViews, this, sl_false, sl_true, sl_false));
 }
 
-void ListView::onResize(sl_real x, sl_real y)
+void ListView::onResize(sl_ui_len x, sl_ui_len y)
 {
 	UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(ListView, _layoutItemViews, this, sl_false, sl_false, sl_false));
 }
@@ -155,16 +156,16 @@ void ListView::_resetAdapter()
 	scrollTo(0, 0);
 }
 
-static sl_real _ListView_getTotalHeights(sl_size count, sl_real averageHeight, sl_real* topHeights, sl_real* bottomHeights, double& averageMidHeight)
+static sl_ui_len _ListView_getTotalHeights(sl_uint64 count, sl_ui_len averageHeight, sl_ui_len* topHeights, sl_ui_len* bottomHeights, double& averageMidHeight)
 {
-	averageMidHeight = averageHeight;
-	sl_size i;
-	sl_real s = 0;
+	averageMidHeight = (double)(averageHeight);
+	sl_uint32 i;
+	sl_ui_len s = 0;
 	for (i = 0; i < MAX_ITEMS_VISIBLE; i++) {
 		if (i >= count) {
 			return s;
 		}
-		sl_real h = topHeights[i];
+		sl_ui_len h = topHeights[i];
 		if (h <= 0) {
 			h = averageHeight;
 		}
@@ -178,34 +179,39 @@ static sl_real _ListView_getTotalHeights(sl_size count, sl_real averageHeight, s
 		if (i >= count) {
 			return s;
 		}
-		sl_real h = bottomHeights[i];
+		sl_ui_len h = bottomHeights[i];
 		if (h <= 0) {
 			h = averageHeight;
 		}
 		s += h;
 	}
 	count -= MAX_ITEMS_VISIBLE;
-	if (count == 0) {
+	if (count == 0 || averageHeight == 0) {
 		return s;
 	}
-	sl_real mid = count * averageHeight;
+	double fCount = (double)count;
+	double mid = fCount * (double)(averageHeight);
+	sl_ui_len _mid;
 	if (mid > MAX_MID_HEIGHT) {
-		mid = MAX_MID_HEIGHT;
-		averageMidHeight = (double)mid / (double)count;
+		_mid = MAX_MID_HEIGHT;
+		averageMidHeight = MAX_MID_HEIGHT / fCount;
+	} else {
+		_mid = (sl_ui_len)(count) * averageHeight;
 	}
-	return s + mid;
+	s += _mid;
+	return s;
 }
 
-static sl_real _ListView_getAverageHeight(sl_size count, sl_real* topHeights, sl_real* bottomHeights)
+static sl_ui_len _ListView_getAverageHeight(sl_uint64 count, sl_ui_len* topHeights, sl_ui_len* bottomHeights)
 {
-	sl_size i;
-	sl_real s = 0;
-	sl_size n = 0;
+	sl_uint32 i;
+	sl_ui_len s = 0;
+	sl_uint32 n = 0;
 	for (i = 0; i < MAX_ITEMS_VISIBLE; i++) {
 		if (i >= count) {
 			break;
 		}
-		sl_real h = topHeights[i];
+		sl_ui_len h = topHeights[i];
 		if (h > 0) {
 			s += h;
 			n++;
@@ -218,7 +224,7 @@ static sl_real _ListView_getAverageHeight(sl_size count, sl_real* topHeights, sl
 				if (i >= count) {
 					break;
 				}
-				sl_real h = bottomHeights[i];
+				sl_ui_len h = bottomHeights[i];
 				if (h > 0) {
 					s += h;
 					n++;
@@ -229,18 +235,19 @@ static sl_real _ListView_getAverageHeight(sl_size count, sl_real* topHeights, sl
 	if (n == 0) {
 		return 0;
 	}
-	return s / (sl_real)n;
+	return s / n;
 }
 
-static sl_real _ListView_getYPositionOfItem(sl_size index, sl_size count, sl_real averageHeight, double averageMidHeight, sl_real totalHeight, sl_real* topHeights, sl_real* bottomHeights)
+static sl_ui_pos _ListView_getYPositionOfItem(sl_uint64 index, sl_uint64 count, sl_ui_len averageHeight, double averageMidHeight, sl_ui_len totalHeight, sl_ui_len* topHeights, sl_ui_len* bottomHeights)
 {
 	if (index > count) {
 		index = count;
 	}
 	if (index <= MAX_ITEMS_VISIBLE) {
-		sl_real y = 0;
-		for (sl_size i = 0; i < index; i++) {
-			sl_real h = topHeights[i];
+		sl_ui_len y = 0;
+		sl_uint32 n = (sl_uint32)index;
+		for (sl_uint32 i = 0; i < n; i++) {
+			sl_ui_len h = topHeights[i];
 			if (h <= 0) {
 				h = averageHeight;
 			}
@@ -248,68 +255,76 @@ static sl_real _ListView_getYPositionOfItem(sl_size index, sl_size count, sl_rea
 		}
 		return y;
 	}
-	if (index + MAX_ITEMS_VISIBLE >= count) {
-		sl_real y = 0;
-		sl_size n = count - index;
-		for (sl_size i = 0; i < n; i++) {
-			sl_real h = bottomHeights[i];
+	if (count - index <= MAX_ITEMS_VISIBLE) {
+		sl_ui_len y = 0;
+		sl_uint32 n = (sl_uint32)(count - index);
+		for (sl_uint32 i = 0; i < n; i++) {
+			sl_ui_len h = bottomHeights[i];
 			if (h <= 0) {
 				h = averageHeight;
 			}
 			y += h;
 		}
-		y = totalHeight - y;
-		if (y < 0) {
+		if (totalHeight > y) {
+			y = totalHeight - y;
+		} else {
 			y = 0;
 		}
 		return y;
 	}
-	sl_real y = 0;
-	for (sl_size i = 0; i < MAX_ITEMS_VISIBLE; i++) {
-		sl_real h = topHeights[i];
+	sl_ui_len y = 0;
+	for (sl_uint32 i = 0; i < MAX_ITEMS_VISIBLE; i++) {
+		sl_ui_len h = topHeights[i];
 		if (h <= 0) {
 			h = averageHeight;
 		}
 		y += h;
 	}
-	return y + (sl_real)((double)(index - MAX_ITEMS_VISIBLE) * averageMidHeight);
+	return y + (sl_ui_len)((double)(index - MAX_ITEMS_VISIBLE) * averageMidHeight);
 }
 
-static void _ListView_pushRealArrayLeft(sl_real* arr, sl_size sizeArr, sl_size capacityArr, sl_real value, sl_size count)
+template <class T>
+static void _ListView_pushArrayLeft(T* arr, sl_uint64 sizeArr, sl_uint32 capacityArr, T value, sl_uint64 _count)
 {
-	if (count >= capacityArr) {
-		for (sl_size i = 0; i < capacityArr; i++) {
-			arr[i] = 0;
+	if (_count >= capacityArr) {
+		for (sl_uint32 i = 0; i < capacityArr; i++) {
+			arr[i] = value;
 		}
 	} else {
-		sl_size n = sizeArr + count;
-		if (n > capacityArr) {
-			n = capacityArr;
+		sl_uint32 count = (sl_uint32)_count;
+		sl_uint64 _n = sizeArr + count;
+		if (_n > capacityArr) {
+			_n = capacityArr;
 		}
+		sl_uint32 n = (sl_uint32)_n;
 		n -= count;
-		sl_size p = n - 1;
-		sl_size i;
+		sl_uint32 p = n - 1;
+		sl_uint32 i;
 		for (i = 0; i < n; i++) {
 			arr[p+count] = arr[p];
 			p--;
 		}
 		for (i = 0; i < count; i++) {
-			arr[i] = 0;
+			arr[i] = value;
 		}
 	}
 }
 
-static void _ListView_pushRealArrayRight(sl_real* arr, sl_size sizeArr, sl_size capacityArr, sl_real value, sl_size count)
+template <class T>
+static void _ListView_pushArrayRight(T* arr, sl_uint64 sizeArr, sl_uint32 capacityArr, T value, sl_uint64 _count)
 {
-	if (count >= capacityArr) {
-		for (sl_size i = 0; i < capacityArr; i++) {
-			arr[i] = 0;
+	if (_count >= capacityArr) {
+		for (sl_uint32 i = 0; i < capacityArr; i++) {
+			arr[i] = value;
 		}
 	} else {
-		sl_size i;
-		sl_size n = sizeArr;
-		if (n > capacityArr) {
+		sl_uint32 count = (sl_uint32)_count;
+		sl_uint32 i;
+		sl_uint32 n;
+		if (sizeArr > capacityArr) {
 			n = capacityArr;
+		} else {
+			n = (sl_uint32)sizeArr;
 		}
 		n -= count;
 		for (i = 0; i < n; i++) {
@@ -317,7 +332,7 @@ static void _ListView_pushRealArrayRight(sl_real* arr, sl_size sizeArr, sl_size 
 		}
 		n += count;
 		for (; i < n; i++) {
-			arr[i] = 0;
+			arr[i] = value;
 		}
 	}
 }
@@ -328,10 +343,10 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 		return;
 	}
 	
-	sl_real widthListView = getWidth();
-	sl_real heightListView = getHeight();
+	sl_ui_pos widthListView = getWidth();
+	sl_ui_pos heightListView = getHeight();
 	
-	if (Math::isAlmostZero(widthListView) || Math::isAlmostZero(heightListView)) {
+	if (widthListView <= 0 || heightListView <= 0) {
 		return;
 	}
 	
@@ -339,49 +354,45 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 	
 	if (adapter.isNotNull()) {
 		
-		Rectangle frame;
-		frame.left = 0;
-		frame.right = widthListView;
-		
 		View* contentView = m_contentView.ptr;
 
 		Ref<View>* viewsVisibleItems = m_viewsVisibleItems;
-		sl_real* heightsVisibleItems = m_heightsVisibleItems;
-		sl_real* heightsTopItems = m_heightsTopItems;
-		sl_real* heightsBottomItems = m_heightsBottomItems;
+		sl_ui_len* heightsVisibleItems = m_heightsVisibleItems;
+		sl_ui_len* heightsTopItems = m_heightsTopItems;
+		sl_ui_len* heightsBottomItems = m_heightsBottomItems;
 		Ref<View>* viewsGoDownItems = m_viewsGoDownItems;
-		sl_real* heightsGoDownItems = m_heightsGoDownItems;
+		sl_ui_len* heightsGoDownItems = m_heightsGoDownItems;
 		Ref<View>* viewsGoUpItems = m_viewsGoUpItems;
-		sl_real* heightsGoUpItems = m_heightsGoUpItems;
+		sl_ui_len* heightsGoUpItems = m_heightsGoUpItems;
 		Ref<View>* viewsFreeItems = m_viewsFreeItems;
 		
-		sl_size lastCountTotalItems = m_countTotalItems;
-		sl_real lastHeightTotalItems = m_heightTotalItems;
-		sl_size lastIndexFirstItem = m_indexFirstItem;
-		sl_real lastAverageItemHeight = m_averageItemHeight;
+		sl_uint64 lastCountTotalItems = m_countTotalItems;
+		sl_ui_len lastHeightTotalItems = m_heightTotalItems;
+		sl_uint64 lastIndexFirstItem = m_indexFirstItem;
+		sl_ui_len lastAverageItemHeight = m_averageItemHeight;
 		double lastAverageMidItemHeight = m_averageMidItemHeight;
-		sl_size lastCountVisibleItems = m_countVisibleItems;
+		sl_uint32 lastCountVisibleItems = m_countVisibleItems;
 		
-		sl_size countFreeViews = 0;
-		sl_size countGoDownViews = 0;
-		sl_size countGoUpViews = 0;
+		sl_uint32 countFreeViews = 0;
+		sl_uint32 countGoDownViews = 0;
+		sl_uint32 countGoUpViews = 0;
 		
-		sl_size countTotalItems = lastCountTotalItems;
-		sl_real heightTotalItems = lastHeightTotalItems;
+		sl_uint64 countTotalItems = lastCountTotalItems;
+		sl_ui_len heightTotalItems = lastHeightTotalItems;
 		sl_bool flagClearAll = sl_false;
 		
-		sl_real yGoDown = 0;
-		sl_size indexGoDown = 0;
-		sl_real yGoUp = 0;
-		sl_size indexGoUp = 0;
+		sl_ui_pos yGoDown = 0;
+		sl_uint64 indexGoDown = 0;
+		sl_ui_pos yGoUp = 0;
+		sl_uint64 indexGoUp = 0;
 		
-		sl_real scrollY = getScrollY();
+		sl_ui_pos scrollY = (sl_ui_pos)(getScrollY());
 		if (fromScroll) {
 			if (Math::isAlmostZero(scrollY - m_lastScrollY)) {
 				return;
 			}
 		}
-		sl_real originalScrollY = scrollY;
+		sl_ui_pos originalScrollY = scrollY;
 		
 		if (flagRefresh) {
 			
@@ -392,18 +403,18 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 			// shift bottom heights when count is changed
 			if (lastCountTotalItems != countTotalItems) {
 				if (countTotalItems > lastCountTotalItems) {
-					sl_size off = countTotalItems - lastCountTotalItems;
-					_ListView_pushRealArrayLeft(heightsBottomItems, lastCountTotalItems, MAX_ITEMS_VISIBLE, 0, off);
+					sl_uint64 off = countTotalItems - lastCountTotalItems;
+					_ListView_pushArrayLeft<sl_ui_len>(heightsBottomItems, lastCountTotalItems, MAX_ITEMS_VISIBLE, 0, off);
 				} else {
-					sl_size off = lastCountTotalItems - countTotalItems;
-					_ListView_pushRealArrayRight(heightsBottomItems, lastCountTotalItems, MAX_ITEMS_VISIBLE, 0, off);
+					sl_uint64 off = lastCountTotalItems - countTotalItems;
+					_ListView_pushArrayRight<sl_ui_len>(heightsBottomItems, lastCountTotalItems, MAX_ITEMS_VISIBLE, 0, off);
 				}
 			}
 			
 			heightTotalItems = _ListView_getTotalHeights(countTotalItems, lastAverageItemHeight, heightsTopItems, heightsBottomItems, lastAverageMidItemHeight);
 			
 			// free visible views
-			for (sl_size iItem = 0; iItem < lastCountVisibleItems; iItem++) {
+			for (sl_uint32 iItem = 0; iItem < lastCountVisibleItems; iItem++) {
 				Ref<View> view = viewsVisibleItems[iItem];
 				if (view.isNotNull()) {
 					viewsFreeItems[countFreeViews] = view;
@@ -415,10 +426,10 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 		} else {
 			
 			// removes scrolled-over items
-			sl_real yItem = m_yFirstItem;
-			sl_size iItem;
+			sl_ui_pos yItem = m_yFirstItem;
+			sl_uint32 iItem;
 			for (iItem = 0; iItem < lastCountVisibleItems; iItem++) {
-				sl_real h = heightsVisibleItems[iItem];
+				sl_ui_pos h = heightsVisibleItems[iItem];
 				if (yItem + h > scrollY) {
 					break;
 				}
@@ -433,12 +444,12 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 			
 			yGoUp = yItem;
 			indexGoUp = lastIndexFirstItem + iItem;
-			sl_size iStart = iItem;
+			sl_uint32 iStart = iItem;
 			
 			// reuse visible items
 			for (; iItem < lastCountVisibleItems && yItem < scrollY + heightListView; iItem++) {
 				Ref<View> view = viewsVisibleItems[iItem];
-				sl_real h = _measureItemHeight(view, heightListView);
+				sl_ui_len h = _measureItemHeight(view, heightListView);
 				yItem += h;
 				viewsGoDownItems[countGoDownViews] = view;
 				heightsGoDownItems[countGoDownViews] = h;
@@ -472,22 +483,21 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 		// all of former visible items is scrolled over, so have to find index and y position
 		if (flagClearAll) {
 			
-			sl_real yTop = 0;
-			sl_real yBottom = heightTotalItems;
-			sl_size n = countTotalItems;
+			sl_ui_pos yTop = 0;
+			sl_ui_pos yBottom = heightTotalItems;
 			
-			sl_real y = 0;
-			sl_size index = 0;
+			sl_ui_pos y = 0;
+			sl_uint64 index = 0;
 			sl_bool flagFound = sl_false;
 			
-			if (!(Math::isAlmostZero(scrollY)) && !(Math::isAlmostZero(lastAverageItemHeight))) {
+			if (scrollY != 0 && lastAverageItemHeight > 0) {
 				
-				sl_size i;
+				sl_uint32 i;
 				for (i = 0; i < MAX_ITEMS_VISIBLE; i++) {
-					if (i >= n) {
+					if (i >= countTotalItems) {
 						break;
 					}
-					sl_real h = heightsTopItems[i];
+					sl_ui_pos h = heightsTopItems[i];
 					if (h <= 0) {
 						h = lastAverageItemHeight;
 					}
@@ -516,7 +526,11 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 					if (i < MAX_ITEMS_VISIBLE || Math::isAlmostZero(lastAverageMidItemHeight)) {
 						index = 0;
 					} else {
-						index = MAX_ITEMS_VISIBLE + (sl_size)((double)(y - yTop) / lastAverageMidItemHeight);
+						double no = (double)(y - yTop) / lastAverageMidItemHeight;
+						if (no < 0) {
+							no = 0;
+						}
+						index = MAX_ITEMS_VISIBLE + (sl_uint64)(no);
 						if (index > countTotalItems) {
 							index = countTotalItems;
 						}
@@ -542,7 +556,7 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 					}
 				}
 				Ref<View> view = adapter->getView(this, indexGoUp - 1, viewFree.ptr);
-				sl_real h = _measureItemHeight(view, heightListView);
+				sl_ui_len h = _measureItemHeight(view, heightListView);
 				viewsGoUpItems[countGoUpViews] = view;
 				heightsGoUpItems[countGoUpViews] = h;
 				countGoUpViews++;
@@ -555,8 +569,8 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 			}
 		}
 		
-		sl_size indexStart = indexGoUp;
-		sl_real yStart = yGoUp;
+		sl_uint64 indexStart = indexGoUp;
+		sl_ui_pos yStart = yGoUp;
 
 		// Go Down
 		{
@@ -569,7 +583,7 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 					}
 				}
 				Ref<View> view = adapter->getView(this, indexGoDown, viewFree.ptr);
-				sl_real h = _measureItemHeight(view, heightListView);
+				sl_ui_len h = _measureItemHeight(view, heightListView);
 				viewsGoDownItems[countGoDownViews] = view;
 				heightsGoDownItems[countGoDownViews] = h;
 				countGoDownViews++;
@@ -583,10 +597,10 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 		}
 		
 		// Merge to visible items
-		sl_size countVisibleItems = 0;
+		sl_uint32 countVisibleItems = 0;
 		{
-			sl_size i;
-			sl_size k = countGoUpViews - 1;
+			sl_uint32 i;
+			sl_uint32 k = countGoUpViews - 1;
 			for (i = 0; i < countGoUpViews && countVisibleItems < MAX_ITEMS_VISIBLE; i++) {
 				viewsVisibleItems[countVisibleItems] = viewsGoUpItems[k];
 				heightsVisibleItems[countVisibleItems] = heightsGoUpItems[k];
@@ -604,18 +618,20 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 		
 		// Save top&bottom heights
 		{
-			for (sl_size i = 0; i < countVisibleItems; i++) {
-				sl_size index = indexStart + i;
+			for (sl_uint32 i = 0; i < countVisibleItems; i++) {
+				sl_uint64 index = indexStart + i;
 				if (index < MAX_ITEMS_VISIBLE) {
-					heightsTopItems[index] = heightsVisibleItems[i];
+					heightsTopItems[(sl_uint32)index] = heightsVisibleItems[i];
 				}
-				if (index + MAX_ITEMS_VISIBLE >= countTotalItems && index < countTotalItems) {
-					heightsBottomItems[countTotalItems - 1 - index] = heightsVisibleItems[i];
+				if (index < countTotalItems) {
+					if (countTotalItems - index <= MAX_ITEMS_VISIBLE) {
+						heightsBottomItems[(sl_uint32)(countTotalItems - 1 - index)] = heightsVisibleItems[i];
+					}
 				}
 			}
 		}
-		sl_real averageItemHeight = adapter->getAverageItemHeight(this);
-		if (averageItemHeight == 0) {
+		sl_ui_len averageItemHeight = adapter->getAverageItemHeight(this);
+		if (averageItemHeight <= 0) {
 			averageItemHeight = _ListView_getAverageHeight(countTotalItems, heightsTopItems, heightsBottomItems);
 		}
 		double averageMidItemHeight = averageItemHeight;
@@ -624,8 +640,8 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 		// readjust scroll position
 		if (!flagClearAll) {
 			if (scrollY < heightListView || scrollY + 2 * heightListView >= heightTotalItems) {
-				sl_real scrollOffset = scrollY - yStart;
-				sl_real yStartNew = _ListView_getYPositionOfItem(indexStart, countTotalItems, averageItemHeight, averageMidItemHeight, heightTotalItems, heightsTopItems, heightsBottomItems);
+				sl_ui_pos scrollOffset = scrollY - yStart;
+				sl_ui_pos yStartNew = _ListView_getYPositionOfItem(indexStart, countTotalItems, averageItemHeight, averageMidItemHeight, heightTotalItems, heightsTopItems, heightsBottomItems);
 				if (Math::abs(yStartNew - yStart) > averageItemHeight/10) {
 					yStart = yStartNew;
 					scrollY = yStartNew + scrollOffset;
@@ -643,7 +659,7 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 		
 		// layout views
 		{
-			sl_real y;
+			sl_ui_pos y;
 #if defined(USE_CONTENT_VIEW)
 			y = yStart;
 #else
@@ -651,13 +667,14 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 #endif
 			for (sl_size i = 0; i < countVisibleItems; i++) {
 				Ref<View> view = viewsVisibleItems[i];
-				sl_real b = y + heightsVisibleItems[i];
+				sl_ui_pos b = y + heightsVisibleItems[i];
 				if (view.isNotNull()) {
-					Rectangle rect;
+					UIRect rect;
 					rect.left = 0;
 					rect.right = widthListView;
 					rect.top = y;
 					rect.bottom = b;
+					rect.fixSizeError();
 					if (view->getParent() != contentView) {
 						view->setFrame(rect, sl_false);
 						contentView->addChild(view, !fromDraw);
@@ -678,18 +695,19 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 		m_heightTotalItems = heightTotalItems;
 		m_lastScrollY = scrollY;
 
-		if (!(Math::isAlmostZero(getContentHeight() - heightTotalItems)) || !(Math::isAlmostZero(getContentWidth() - widthListView))) {
-			setContentSize(widthListView, heightTotalItems);
+		if (!(Math::isAlmostZero((sl_ui_pos)(getContentHeight()) - (sl_ui_pos)heightTotalItems)) || !(Math::isAlmostZero((sl_ui_pos)(getContentWidth()) - (sl_ui_pos)widthListView))) {
+			setContentSize((sl_scroll_pos)widthListView, (sl_scroll_pos)heightTotalItems);
 		}
 		if (!(Math::isAlmostZero(scrollY - originalScrollY))) {
-			scrollTo(0, scrollY);
+			scrollTo(0, (sl_scroll_pos)scrollY);
 		}
 		
 #if !defined(USE_CONTENT_VIEW)
 #if defined(SLIB_PLATFORM_IS_IOS)
-		Rectangle rcContent = getBounds();
+		UIRect rcContent = getBounds();
 		rcContent.top += scrollY;
 		rcContent.bottom += scrollY;
+		rcContent.fixSizeError();
 		contentView->setFrame(rcContent, sl_false);
 #else
 		contentView->setFrame(getBounds(), sl_false);
@@ -701,9 +719,9 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 	}
 }
 
-sl_real ListView::_measureItemHeight(const Ref<View>& itemView, sl_real heightList)
+sl_ui_len ListView::_measureItemHeight(const Ref<View>& itemView, sl_ui_len heightList)
 {
-	sl_real ret = 0;
+	sl_ui_len ret = 0;
 	if (itemView.isNotNull()) {
 		SizeMode mode = itemView->getHeightMode();
 		switch (mode) {
@@ -711,7 +729,7 @@ sl_real ListView::_measureItemHeight(const Ref<View>& itemView, sl_real heightLi
 				ret = heightList;
 				break;
 			case SizeMode::Weight:
-				ret = heightList * itemView->getHeightWeight();
+				ret = (sl_ui_len)((sl_real)heightList * itemView->getHeightWeight());
 				break;
 			case SizeMode::Wrapping:
 				itemView->measureLayout();
@@ -722,7 +740,7 @@ sl_real ListView::_measureItemHeight(const Ref<View>& itemView, sl_real heightLi
 				break;
 		}
 	}
-	sl_real minItemHeight = heightList / (MAX_ITEMS_VISIBLE + 1);
+	sl_ui_len minItemHeight = heightList / (MAX_ITEMS_VISIBLE + 1);
 	if (ret < minItemHeight) {
 		ret = minItemHeight;
 	}
@@ -738,7 +756,7 @@ void _ListContentView::dispatchDraw(Canvas* canvas)
 	ViewGroup::dispatchDraw(canvas);
 }
 
-void _ListContentView::onResizeChild(View* child, sl_real width, sl_real height)
+void _ListContentView::onResizeChild(View* child, sl_ui_len width, sl_ui_len height)
 {
 	Ref<ListView> lv = m_lv;
 	if (lv.isNotNull()) {

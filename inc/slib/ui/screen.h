@@ -13,7 +13,7 @@ class SLIB_EXPORT Screen : public Object
 	SLIB_DECLARE_OBJECT
     
 public:
-	virtual Rectangle getRegion() = 0;
+	virtual UIRect getRegion() = 0;
     
 };
 

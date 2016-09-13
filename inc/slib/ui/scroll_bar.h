@@ -12,7 +12,7 @@ class ScrollBar;
 class SLIB_EXPORT IScrollBarListener
 {
 public:
-	virtual void onScroll(ScrollBar* scrollBar, sl_real value) = 0;
+	virtual void onScroll(ScrollBar* scrollBar, sl_scroll_pos value) = 0;
 };
 
 class SLIB_EXPORT ScrollBar : public View
@@ -35,29 +35,31 @@ public:
 	
 	void setHorizontal(sl_bool flagRedraw = sl_true);
 	
-	sl_real getValue();
+	sl_scroll_pos getValue();
 	
-	void setValue(sl_real value, sl_bool flagRedraw = sl_true);
+	void setValue(sl_scroll_pos value, sl_bool flagRedraw = sl_true);
 	
-	void setValueOfOutRange(sl_real value, sl_bool flagRedraw = sl_true);
+	void setValueOfOutRange(sl_scroll_pos value, sl_bool flagRedraw = sl_true);
 	
-	sl_real getPage();
+	sl_scroll_pos getPage();
 	
-	void setPage(sl_real page, sl_bool flagRedraw = sl_true);
+	void setPage(sl_scroll_pos page, sl_bool flagRedraw = sl_true);
 	
-	sl_real getLine();
+	sl_scroll_pos getLine();
 	
-	void setLine(sl_real line, sl_bool flagRedraw = sl_true);
+	void setLine(sl_scroll_pos line, sl_bool flagRedraw = sl_true);
 	
-	sl_real getMinimumValue();
+	sl_scroll_pos getMinimumValue();
 	
-	void setMinimumValue(sl_real value, sl_bool flagRedraw = sl_true);
+	void setMinimumValue(sl_scroll_pos value, sl_bool flagRedraw = sl_true);
 	
-	sl_real getMaximumValue();
+	sl_scroll_pos getMaximumValue();
 	
-	void setMaximumValue(sl_real value, sl_bool flagRedraw = sl_true);
+	void setMaximumValue(sl_scroll_pos value, sl_bool flagRedraw = sl_true);
 	
-	sl_real getRange();
+	sl_scroll_pos getRange();
+	
+	void setRange(sl_scroll_pos range, sl_bool flagRedraw = sl_true);
 
 	
 	Ref<Drawable> getBar();
@@ -72,16 +74,16 @@ public:
 	
 	void setHoverBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
 	
-	sl_real getMinimumBarLengthRatio();
+	sl_scroll_pos getMinimumBarLengthRatio();
 	
-	void setMinimumBarLengthRatio(sl_real ratio);
+	void setMinimumBarLengthRatio(sl_scroll_pos ratio);
 	
 	
-	sl_bool getBarPositionRange(sl_real& begin, sl_real& end);
+	sl_bool getBarPositionRange(sl_ui_pos& begin, sl_ui_pos& end);
 	
-	sl_bool getBarRegion(Rectangle& _out);
+	sl_bool getBarRegion(UIRect& _out);
 	
-	sl_real getValueFromBarPosition(sl_real pos);
+	sl_scroll_pos getValueFromBarPosition(sl_ui_pos pos);
 	
 	sl_bool isValid();
 	
@@ -95,30 +97,30 @@ protected:
 	// override
 	void onMouseWheelEvent(UIEvent* ev);
 	
-	virtual void onScroll(sl_real value);
+	virtual void onScroll(sl_scroll_pos value);
 	
 public:
-	void dispatchScroll(sl_real value);
+	void dispatchScroll(sl_scroll_pos value);
 	
 public:
 	SLIB_PTR_PROPERTY(IScrollBarListener, Listener);
 
 protected:
 	LayoutOrientation m_orientation;
-	sl_real m_value;
-	sl_real m_page;
-	sl_real m_line;
-	sl_real m_value_min;
-	sl_real m_value_max;
+	sl_scroll_pos m_value;
+	sl_scroll_pos m_page;
+	sl_scroll_pos m_line;
+	sl_scroll_pos m_value_min;
+	sl_scroll_pos m_value_max;
 	
 	SafeRef<Drawable> m_bar;
 	SafeRef<Drawable> m_clickedBar;
 	SafeRef<Drawable> m_hoverBackground;
-	sl_real m_bar_len_ratio_min;
+	sl_scroll_pos m_bar_len_ratio_min;
 	
 private:
-	sl_real m_posDown;
-	sl_real m_valueDown;
+	sl_ui_pos m_posDown;
+	sl_scroll_pos m_valueDown;
 	
 };
 

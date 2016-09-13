@@ -123,9 +123,9 @@ public:
 
 	virtual void removeMenuItem(const Ref<MenuItem>& item) = 0;
 
-	virtual void show(sl_real x, sl_real y) = 0;
+	virtual void show(sl_ui_pos x, sl_ui_pos y) = 0;
 
-	void show(const Point& pt);
+	void show(const UIPoint& pt);
 	
 	Ref<MenuItem> addMenuItem(const String& title);
 	

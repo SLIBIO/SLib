@@ -149,7 +149,7 @@ Ref<MenuItem> Menu::getMenuItem(sl_uint32 index) const
 	return m_items.getItemValue(index, Ref<MenuItem>::null());
 }
 
-void Menu::show(const Point& pt)
+void Menu::show(const UIPoint& pt)
 {
 	show(pt.x, pt.y);
 }

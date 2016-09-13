@@ -294,7 +294,6 @@ NSString* UIPlatform::getKeyEquivalent(const KeycodeAndModifiers& km, NSUInteger
 	return ret;
 }
 
-
 SLIB_UI_NAMESPACE_END
 
 #endif

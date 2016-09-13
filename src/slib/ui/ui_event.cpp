@@ -10,23 +10,23 @@ TouchPoint::TouchPoint() = default;
 
 TouchPoint::TouchPoint(const TouchPoint& other) = default;
 
-TouchPoint::TouchPoint(const Point& _point) : point(_point), pressure(0), phase(TouchPhase::Move)
+TouchPoint::TouchPoint(const UIPointf& _point) : point(_point), pressure(0), phase(TouchPhase::Move)
 {
 }
 
-TouchPoint::TouchPoint(const Point& _point, sl_real _pressure, TouchPhase _phase) : point(_point), pressure(_pressure), phase(_phase)
+TouchPoint::TouchPoint(const UIPointf& _point, sl_real _pressure, TouchPhase _phase) : point(_point), pressure(_pressure), phase(_phase)
 {
 }
 
-TouchPoint::TouchPoint(sl_real x, sl_real y) : point(x, y), pressure(0), phase(TouchPhase::Move)
+TouchPoint::TouchPoint(sl_ui_posf x, sl_ui_posf y) : point(x, y), pressure(0), phase(TouchPhase::Move)
 {
 }
 
-TouchPoint::TouchPoint(sl_real x, sl_real y, sl_real _pressure) : point(x, y), pressure(_pressure), phase(TouchPhase::Move)
+TouchPoint::TouchPoint(sl_ui_posf x, sl_ui_posf y, sl_real _pressure) : point(x, y), pressure(_pressure), phase(TouchPhase::Move)
 {
 }
 
-TouchPoint::TouchPoint(sl_real x, sl_real y, sl_real _pressure, TouchPhase _phase) : point(x, y), pressure(_pressure), phase(_phase)
+TouchPoint::TouchPoint(sl_ui_posf x, sl_ui_posf y, sl_real _pressure, TouchPhase _phase) : point(x, y), pressure(_pressure), phase(_phase)
 {
 }
 
@@ -193,7 +193,7 @@ enum
 {
 	flagPreventDefault = 0x1,
 	flagStopPropagation = 0x2,
-	flagPassToNext = 0x4
+	flagPassToNext = 0x4,
 };
 
 UIEvent::UIEvent()
@@ -222,7 +222,7 @@ Ref<UIEvent> UIEvent::createKeyEvent(UIAction action, Keycode keycode, sl_uint32
 	return ret;
 }
 
-Ref<UIEvent> UIEvent::createMouseEvent(UIAction action, sl_real x, sl_real y)
+Ref<UIEvent> UIEvent::createMouseEvent(UIAction action, sl_ui_posf x, sl_ui_posf y)
 {
 	Ref<UIEvent> ret = new UIEvent;
 	if (ret.isNotNull()) {
@@ -233,7 +233,7 @@ Ref<UIEvent> UIEvent::createMouseEvent(UIAction action, sl_real x, sl_real y)
 	return ret;
 }
 
-Ref<UIEvent> UIEvent::createMouseWheelEvent(sl_real mouseX, sl_real mouseY, sl_real deltaX, sl_real deltaY)
+Ref<UIEvent> UIEvent::createMouseWheelEvent(sl_ui_posf mouseX, sl_ui_posf mouseY, sl_real deltaX, sl_real deltaY)
 {
 	Ref<UIEvent> ret = new UIEvent;
 	if (ret.isNotNull()) {
@@ -259,7 +259,7 @@ Ref<UIEvent> UIEvent::createTouchEvent(UIAction action, const Array<TouchPoint>&
 	return ret;
 }
 
-Ref<UIEvent> UIEvent::createSetCursorEvent(sl_real x, sl_real y)
+Ref<UIEvent> UIEvent::createSetCursorEvent(sl_ui_posf x, sl_ui_posf y)
 {
 	Ref<UIEvent> ret = new UIEvent;
 	if (ret.isNotNull()) {
@@ -334,38 +334,38 @@ void UIEvent::setSystemKeycode(sl_uint32 keycode)
 	m_systemKeycode = keycode;
 }
 
-const Point& UIEvent::getPoint() const
+const UIPointf& UIEvent::getPoint() const
 {
 	return m_point.point;
 }
 
-void UIEvent::setPoint(const Point& pt)
+void UIEvent::setPoint(const UIPointf& pt)
 {
 	m_point.point = pt;
 }
 
-void UIEvent::setPoint(sl_real x, sl_real y)
+void UIEvent::setPoint(sl_ui_posf x, sl_ui_posf y)
 {
 	m_point.point.x = x;
 	m_point.point.y = y;
 }
 
-sl_real UIEvent::getX() const
+sl_ui_posf UIEvent::getX() const
 {
 	return m_point.point.x;
 }
 
-void UIEvent::setX(sl_real x)
+void UIEvent::setX(sl_ui_posf x)
 {
 	m_point.point.x = x;
 }
 
-sl_real UIEvent::getY() const
+sl_ui_posf UIEvent::getY() const
 {
 	return m_point.point.y;
 }
 
-void UIEvent::setY(sl_real y)
+void UIEvent::setY(sl_ui_posf y)
 {
 	m_point.point.y = y;
 }
@@ -410,26 +410,26 @@ void UIEvent::setTouchPoint(const TouchPoint& pt)
 	m_point = pt;
 }
 
-void UIEvent::setTouchPoint(const Point& pt)
+void UIEvent::setTouchPoint(const UIPointf& pt)
 {
 	m_point.point = pt;
 	m_point.pressure = 0;
 }
 
-void UIEvent::setTouchPoint(const Point& pt, sl_real pressure)
+void UIEvent::setTouchPoint(const UIPointf& pt, sl_real pressure)
 {
 	m_point.point = pt;
 	m_point.pressure = pressure;
 }
 
-void UIEvent::setTouchPoint(sl_real x, sl_real y)
+void UIEvent::setTouchPoint(sl_ui_posf x, sl_ui_posf y)
 {
 	m_point.point.x = x;
 	m_point.point.y = y;
 	m_point.pressure = 0;
 }
 
-void UIEvent::setTouchPoint(sl_real x, sl_real y, sl_real pressure)
+void UIEvent::setTouchPoint(sl_ui_posf x, sl_ui_posf y, sl_real pressure)
 {
 	m_point.point.x = x;
 	m_point.point.y = y;
@@ -468,7 +468,22 @@ void UIEvent::setTouchPoints(const Array<TouchPoint>& points)
 	m_points = points;
 }
 
-void UIEvent::transformPoints(const Matrix3& mat)
+void UIEvent::transformPoints(const Matrix3f& mat)
+{
+	if (isMouseEvent() || isTouchEvent()) {
+		m_point.point = mat.transformPosition(m_point.point);
+	}
+	if (isTouchEvent()) {
+		Array<TouchPoint> points = m_points;
+		sl_size n = points.getCount();
+		TouchPoint* pts = points.getData();
+		for (sl_size i = 0; i < n; i++) {
+			pts[i].point = mat.transformPosition(pts[i].point);
+		}
+	}
+}
+
+void UIEvent::transformPoints(const Matrix3lf& mat)
 {
 	if (isMouseEvent() || isTouchEvent()) {
 		m_point.point = mat.transformPosition(m_point.point);
@@ -809,7 +824,7 @@ void IViewListener::onSetCursor(View* view, UIEvent* event)
 {
 }
 
-void IViewListener::onResize(View* view, sl_real width, sl_real height)
+void IViewListener::onResize(View* view, sl_ui_len width, sl_ui_len height)
 {
 }
 
@@ -833,7 +848,7 @@ void IWindowListener::onMove(Window* window)
 {
 }
 
-void IWindowListener::onResize(Window* window, Size& size)
+void IWindowListener::onResize(Window* window, UISize& size)
 {
 }
 
@@ -906,7 +921,7 @@ void UIEventLogListener::onMove(Window* window)
 	SLIB_LOG("Window", "onMove");
 }
 
-void UIEventLogListener::onResize(Window* window, Size& size)
+void UIEventLogListener::onResize(Window* window, UISize& size)
 {
 	SLIB_LOG("Window", "onResize (" + String::fromFloat(size.x) + "," + String::fromFloat(size.y) + ")");
 }

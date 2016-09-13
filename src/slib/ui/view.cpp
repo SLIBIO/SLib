@@ -22,7 +22,7 @@ View::View()
 	m_flagCreatingInstance = sl_false;
 	m_flagCreatingChildInstances = sl_false;
 	m_flagCreatingNativeWidget = sl_false;
-	m_flagCreatingInstanceOnParentAttach = sl_true;
+	m_attachMode = UIAttachMode::NotAttachInNativeWidget;
 	
 	m_frame.left = 0;
 	m_frame.top = 0;
@@ -116,14 +116,14 @@ void View::setCreatingNativeWidget(sl_bool flag)
 	}
 }
 
-sl_bool View::isCreatingInstanceOnParentAttach()
+UIAttachMode View::getAttachMode()
 {
-	return m_flagCreatingInstanceOnParentAttach;
+	return m_attachMode;
 }
 
-void View::setCreatingInstanceOnParentAttach(sl_bool flag)
+void View::setAttachMode(UIAttachMode mode)
 {
-	m_flagCreatingInstanceOnParentAttach = flag;
+	m_attachMode = mode;
 }
 
 Ref<ViewInstance> View::createNativeWidget(ViewInstance* parent)
@@ -254,8 +254,15 @@ void View::_processAttachOnUiThread()
 			ListLocker< Ref<View> > children(m_children);
 			for (sl_size i = 0; i < children.count; i++) {
 				Ref<View>& child = children[i];
-				if (child.isNotNull() && child->isCreatingInstanceOnParentAttach()) {
-					attachChild(child);
+				if (child.isNotNull()) {
+					UIAttachMode attachMode = child->getAttachMode();
+					if (attachMode == UIAttachMode::AttachAlways) {
+						attachChild(child);
+					} else if (attachMode == UIAttachMode::NotAttachInNativeWidget) {
+						if (!(isNativeWidget())) {
+							attachChild(child);
+						}
+					}
 				}
 			}
 		}
@@ -294,17 +301,7 @@ void View::addChild(const Ref<View>& view, sl_bool flagRedraw)
 		return;
 	}
 	if (m_children.addIfNotExist(view)) {
-		_addChild(view, flagRedraw, sl_true);
-	}
-}
-
-void View::addChildNotAttach(const Ref<View>& view, sl_bool flagRedraw)
-{
-	if (view.isNull()) {
-		return;
-	}
-	if (m_children.addIfNotExist(view)) {
-		_addChild(view, flagRedraw, sl_false);
+		_addChild(view, flagRedraw);
 	}
 }
 
@@ -314,17 +311,7 @@ void View::insertChild(sl_size index, const Ref<View>& view, sl_bool flagRedraw)
 		return;
 	}
 	if (m_children.insert(index, view)) {
-		_addChild(view, flagRedraw, sl_true);
-	}
-}
-
-void View::insertChildNotAttach(sl_size index, const Ref<View>& view, sl_bool flagRedraw)
-{
-	if (view.isNull()) {
-		return;
-	}
-	if (m_children.insert(index, view)) {
-		_addChild(view, flagRedraw, sl_false);
+		_addChild(view, flagRedraw);
 	}
 }
 
@@ -397,13 +384,13 @@ void View::removeAllChildren(sl_bool flagRedraw)
 	requestLayout(flagRedraw);
 }
 
-Ref<View> View::getChildAt(sl_real x, sl_real y)
+Ref<View> View::getChildAt(sl_ui_pos x, sl_ui_pos y)
 {
 	ListLocker< Ref<View> > children(m_children);
 	for (sl_size i = children.count - 1, ii = 0; ii < children.count; i--, ii++) {
 		Ref<View>& child = children[i];
 		if (child.isNotNull() && child->isVisible() && child->isHitTestable()) {
-			Point pt = child->convertCoordinateFromParent(Point(x, y));
+			UIPoint pt = child->convertCoordinateFromParent(UIPointf(x, y));
 			if (child->hitTest(pt)) {
 				return child;
 			}
@@ -412,7 +399,7 @@ Ref<View> View::getChildAt(sl_real x, sl_real y)
 	return Ref<View>::null();
 }
 
-Ref<View> View::getChildAt(const Point& point)
+Ref<View> View::getChildAt(const UIPoint& point)
 {
 	return getChildAt(point.x, point.y);
 }
@@ -521,18 +508,23 @@ void View::setOnRemoveChildEnabled(sl_bool flagEnabled)
 	m_flagOnRemoveChild = flagEnabled;
 }
 
-void View::_addChild(const Ref<View>& view, sl_bool flagRedraw, sl_bool flagAttach)
+void View::_addChild(const Ref<View>& view, sl_bool flagRedraw)
 {
 	if (view.isNotNull()) {
-		view->setCreatingInstanceOnParentAttach(flagAttach);
 		view->setFocus(sl_false, sl_false);
 		view->setParent(this);
 		if (m_flagOnAddChild) {
 			onAddChild(view.ptr);
 		}
 		requestLayout(sl_false);
-		if (flagAttach) {
+		
+		UIAttachMode attachMode = view->getAttachMode();
+		if (attachMode == UIAttachMode::AttachAlways) {
 			if (isInstance() && isCreatingChildInstances()) {
+				attachChild(view);
+			}
+		} else if (attachMode == UIAttachMode::NotAttachInNativeWidget) {
+			if (isInstance() && isCreatingChildInstances() && !(isNativeWidget())) {
 				attachChild(view);
 			}
 		}
@@ -591,9 +583,9 @@ void View::invalidate()
 	}
 }
 
-void View::invalidate(const Rectangle &rect)
+void View::invalidate(const UIRect &rect)
 {
-	Rectangle rectIntersect;
+	UIRect rectIntersect;
 	if (getBounds().intersectRectangle(rect, &rectIntersect)) {
 		Ref<ViewInstance> instance = m_instance;
 		if (instance.isNotNull()) {
@@ -607,30 +599,25 @@ void View::invalidate(const Rectangle &rect)
 	}
 }
 
-const Rectangle& View::getFrame()
+const UIRect& View::getFrame()
 {
 	return m_frame;
 }
 
-Rectangle View::getInstanceFrame()
+UIRect View::getInstanceFrame()
 {
 	Ref<ViewInstance> instance = m_instance;
 	if (instance.isNotNull()) {
 		return instance->getFrame();
 	}
-	return Rectangle::zero();
+	return UIRect::zero();
 }
 
-void View::_setFrame(const Rectangle& _frame, sl_bool flagRedraw, sl_bool flagLayouting)
+void View::_setFrame(const UIRect& _frame, sl_bool flagRedraw, sl_bool flagLayouting)
 {
-	Rectangle frameOld = m_frame;
-	Rectangle frame = _frame;
-	if (frame.right < frame.left) {
-		frame.right = frame.left;
-	}
-	if (frame.bottom < frame.top) {
-		frame.bottom = frame.top;
-	}
+	UIRect frameOld = m_frame;
+	UIRect frame = _frame;
+	frame.fixSizeError();
 	
 	sl_bool flagNotMoveX = Math::isAlmostZero(frameOld.left - frame.left);
 	sl_bool flagNotMoveY = Math::isAlmostZero(frameOld.top - frame.top);
@@ -672,7 +659,7 @@ void View::_setFrame(const Rectangle& _frame, sl_bool flagRedraw, sl_bool flagLa
 		if (flagRedraw) {
 			Ref<View> parent = getParent();
 			if (parent.isNotNull()) {
-				Rectangle bounds = getBoundsInParent(Rectangle(0, 0, frameOld.getWidth(), frameOld.getHeight()));
+				UIRect bounds = getBoundsInParent(UIRect(0, 0, frameOld.getWidth(), frameOld.getHeight()));
 				bounds.mergeRectangle(getBoundsInParent());
 				parent->invalidate(bounds);
 			}
@@ -681,120 +668,115 @@ void View::_setFrame(const Rectangle& _frame, sl_bool flagRedraw, sl_bool flagLa
 
 }
 
-void View::setFrame(const Rectangle &frame, sl_bool flagRedraw)
+void View::setFrame(const UIRect &frame, sl_bool flagRedraw)
 {
 	_setFrame(frame, flagRedraw, sl_false);
 }
 
-void View::setFrame(sl_real x, sl_real y, sl_real width, sl_real height, sl_bool flagRedraw)
+void View::setFrame(sl_ui_pos x, sl_ui_pos y, sl_ui_len width, sl_ui_len height, sl_bool flagRedraw)
 {
-	_setFrame(Rectangle(x, y, x+width, y+height), flagRedraw, sl_false);
+	_setFrame(UIRect(x, y, x+width, y+height), flagRedraw, sl_false);
 }
 
-sl_real View::getWidth()
+sl_ui_len View::getWidth()
 {
 	return m_frame.getWidth();
 }
 
-void View::setWidth(sl_real width, sl_bool flagRedraw)
+void View::setWidth(sl_ui_len width, sl_bool flagRedraw)
 {
 	setFrame(m_frame.left, m_frame.top, width, m_frame.getHeight(), flagRedraw);
 }
 
-sl_real View::getHeight()
+sl_ui_len View::getHeight()
 {
 	return m_frame.getHeight();
 }
 
-void View::setHeight(sl_real height, sl_bool flagRedraw)
+void View::setHeight(sl_ui_len height, sl_bool flagRedraw)
 {
 	setFrame(m_frame.left, m_frame.top, m_frame.getWidth(), height, flagRedraw);
 }
 
-Size View::getSize()
+UISize View::getSize()
 {
 	return m_frame.getSize();
 }
 
-void View::setSize(const Size& size, sl_bool flagRedraw)
+void View::setSize(const UISize& size, sl_bool flagRedraw)
 {
 	setFrame(m_frame.left, m_frame.top, size.x, size.y, flagRedraw);
 }
 
-void View::setSize(sl_real width, sl_real height, sl_bool flagRedraw)
+void View::setSize(sl_ui_len width, sl_ui_len height, sl_bool flagRedraw)
 {
 	setFrame(m_frame.left, m_frame.top, width, height, flagRedraw);
 }
 
-sl_real View::getX()
+sl_ui_pos View::getLeft()
 {
 	return m_frame.left;
 }
 
-sl_real View::getY()
+sl_ui_pos View::getTop()
 {
 	return m_frame.top;
 }
 
-void View::setX(sl_real x, sl_bool flagRedraw)
+void View::setLeft(sl_ui_pos x, sl_bool flagRedraw)
 {
 	setFrame(x, m_frame.top, m_frame.getWidth(), m_frame.getHeight(), flagRedraw);
 }
 
-void View::setY(sl_real y, sl_bool flagRedraw)
+void View::setTop(sl_ui_pos y, sl_bool flagRedraw)
 {
 	setFrame(m_frame.left, y, m_frame.getWidth(), m_frame.getHeight(), flagRedraw);
 }
 
-Point View::getPosition()
+UIPoint View::getPosition()
 {
 	return m_frame.getLeftTop();
 }
 
-void View::setPosition(sl_real x, sl_real y, sl_bool flagRedraw)
+void View::setPosition(sl_ui_pos x, sl_ui_pos y, sl_bool flagRedraw)
 {
 	setFrame(x, y, m_frame.getWidth(), m_frame.getHeight(), flagRedraw);
 }
 
-void View::setPosition(const Point& point, sl_bool flagRedraw)
+void View::setPosition(const UIPoint& point, sl_bool flagRedraw)
 {
 	setFrame(point.x, point.y, m_frame.getWidth(), m_frame.getHeight(), flagRedraw);
 }
 
-Rectangle View::getBounds()
+UIRect View::getBounds()
 {
-	return Rectangle(0, 0, m_frame.getWidth(), m_frame.getHeight());
+	return UIRect(0, 0, m_frame.getWidth(), m_frame.getHeight());
 }
 
-Rectangle View::getBoundsInnerPadding()
+UIRect View::getBoundsInnerPadding()
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNull()) {
 		return getBounds();
 	}
-	Rectangle ret(layout->paddingLeft, layout->paddingTop, m_frame.getWidth() - layout->paddingRight, m_frame.getHeight() - layout->paddingBottom);
-	if (ret.right < ret.left) {
-		ret.right = ret.left;
-	}
-	if (ret.bottom < ret.top) {
-		ret.bottom = ret.top;
-	}
+	UIRect ret(layout->paddingLeft, layout->paddingTop, m_frame.getWidth() - layout->paddingRight, m_frame.getHeight() - layout->paddingBottom);
+	ret.fixSizeError();
 	return ret;
 }
 
-Rectangle View::getBoundsInParent()
+UIRect View::getBoundsInParent()
 {
 	return getBoundsInParent(getBounds());
 }
 
-Rectangle View::getBoundsInParent(const Rectangle& boundsLocal)
+UIRect View::getBoundsInParent(const UIRect& boundsLocal)
 {
-	Point pts[4];
+	UIPoint pts[4];
 	boundsLocal.getCornerPoints(pts);
 	for (int i = 0; i < 4; i++) {
 		pts[i] = convertCoordinateToParent(pts[i]);
 	}
-	Rectangle rc;
+	UIRect rc;
 	rc.setFromPoints(pts, 4);
 	return rc;
 }
@@ -885,21 +867,21 @@ void View::setHitTestable(sl_bool flag)
 	m_flagHitTestable = flag;
 }
 
-sl_bool View::hitTest(sl_real x, sl_real y)
+sl_bool View::hitTest(sl_ui_pos x, sl_ui_pos y)
 {
-	Rectangle rc(0, 0, getWidth(), getHeight());
+	UIRect rc(0, 0, getWidth(), getHeight());
 	switch (getBoundShape()) {
 		case BoundShape::RoundRect:
-			return GraphicsPath::containsPointInRoundRect(Point(x, y), rc, getRoundRectBoundShapeRadius());
+			return GraphicsPath::containsPointInRoundRect(Point((sl_real)x, (sl_real)y), rc, getRoundRectBoundShapeRadius());
 		case BoundShape::Ellipse:
-			return GraphicsPath::containsPointInEllipse(Point(x, y), rc);
+			return GraphicsPath::containsPointInEllipse(Point((sl_real)x, (sl_real)y), rc);
 		default:
 			break;
 	}
 	return rc.containsPoint(x, y);
 }
 
-sl_bool View::hitTest(const Point& point)
+sl_bool View::hitTest(const UIPoint& point)
 {
 	return hitTest(point.x, point.y);
 }
@@ -1052,8 +1034,8 @@ void View::measureLayout()
 	sl_bool flagHorizontal = sl_false;
 	sl_bool flagVertical = sl_false;
 	
-	sl_real measuredWidth = 0;
-	sl_real measuredHeight = 0;
+	sl_ui_len measuredWidth = 0;
+	sl_ui_len measuredHeight = 0;
 	
 	if (widthMode == SizeMode::Wrapping) {
 		flagHorizontal = sl_true;
@@ -1083,7 +1065,7 @@ void View::measureLayout()
 
 }
 
-sl_real View::getMeasuredWidth()
+sl_ui_len View::getMeasuredWidth()
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
@@ -1100,7 +1082,7 @@ sl_real View::getMeasuredWidth()
 	return getWidth();
 }
 
-void View::setMeasuredWidth(sl_real width)
+void View::setMeasuredWidth(sl_ui_len width)
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
@@ -1110,7 +1092,7 @@ void View::setMeasuredWidth(sl_real width)
 	}
 }
 
-sl_real View::getMeasuredHeight()
+sl_ui_len View::getMeasuredHeight()
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
@@ -1127,7 +1109,7 @@ sl_real View::getMeasuredHeight()
 	return getHeight();
 }
 
-void View::setMeasuredHeight(sl_real height)
+void View::setMeasuredHeight(sl_ui_len height)
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
@@ -1150,7 +1132,7 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 		return;
 	}
 	
-	Rectangle frame;
+	UIRect frame;
 	if (param.flagUseLayoutFrame) {
 		frame = layout->frame;
 	} else {
@@ -1204,20 +1186,17 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 		}
 	}
 	
-	sl_real parentWidth = param.parentContentFrame.getWidth();
-	sl_real parentHeight = param.parentContentFrame.getHeight();
+	sl_ui_pos parentWidth = param.parentContentFrame.getWidth();
+	sl_ui_pos parentHeight = param.parentContentFrame.getHeight();
 	
-	sl_real width, height;
+	sl_ui_pos width, height;
 	switch (widthMode) {
 		case SizeMode::Wrapping:
 			width = layout->measuredWidth;
-			if (width < 0) {
-				width = 0;
-			}
 			break;
 		case SizeMode::Filling:
 		case SizeMode::Weight:
-			width = parentWidth * Math::abs(layout->widthWeight);
+			width = (sl_ui_pos)((sl_real)parentWidth * Math::abs(layout->widthWeight));
 			break;
 		default:
 			width = frame.getWidth();
@@ -1226,29 +1205,33 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 	switch (heightMode) {
 		case SizeMode::Wrapping:
 			height = layout->measuredHeight;
-			if (height < 0) {
-				height = 0;
-			}
 			break;
 		case SizeMode::Filling:
 		case SizeMode::Weight:
-			height = parentHeight * Math::abs(layout->heightWeight);
+			height = (sl_ui_pos)((sl_real)parentHeight * Math::abs(layout->heightWeight));
 			break;
 		default:
 			height = frame.getHeight();
 			break;
 	}
+	if (width < 0) {
+		width = 0;
+	}
+	if (height < 0) {
+		height = 0;
+	}
+	
 	if (layout->flagRelativeMarginLeft) {
-		layout->marginLeft = parentWidth * layout->relativeMarginLeftWeight;
+		layout->marginLeft = (sl_ui_pos)((sl_real)parentWidth * layout->relativeMarginLeftWeight);
 	}
 	if (layout->flagRelativeMarginTop) {
-		layout->marginTop = parentHeight * layout->relativeMarginTopWeight;
+		layout->marginTop = (sl_ui_pos)((sl_real)parentHeight * layout->relativeMarginTopWeight);
 	}
 	if (layout->flagRelativeMarginRight) {
-		layout->marginRight = parentWidth * layout->relativeMarginRightWeight;
+		layout->marginRight = (sl_ui_pos)((sl_real)parentWidth * layout->relativeMarginRightWeight);
 	}
 	if (layout->flagRelativeMarginBottom) {
-		layout->marginBottom = parentHeight * layout->relativeMarginBottomWeight;
+		layout->marginBottom = (sl_ui_pos)((sl_real)parentHeight * layout->relativeMarginBottomWeight);
 	}
 	Ref<View> referView;
 	switch (leftMode) {
@@ -1258,7 +1241,7 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 		case PositionMode::OtherStart:
 			referView = layout->leftReferingView;
 			if (referView.isNotNull()) {
-				Rectangle referFrame = referView->getLayoutFrame();
+				UIRect referFrame = referView->getLayoutFrame();
 				frame.left = referFrame.left + layout->marginLeft;
 			} else {
 				frame.left = param.parentContentFrame.left + layout->marginLeft;
@@ -1267,7 +1250,7 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 		case PositionMode::OtherEnd:
 			referView = layout->leftReferingView;
 			if (referView.isNotNull()) {
-				Rectangle referFrame = referView->getLayoutFrame();
+				UIRect referFrame = referView->getLayoutFrame();
 				frame.left = referFrame.right + referView->getMarginRight() + layout->marginLeft;
 			} else {
 				frame.left = param.parentContentFrame.left + layout->marginLeft;
@@ -1279,7 +1262,7 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 		case PositionMode::CenterInOther:
 			referView = layout->leftReferingView;
 			if (referView.isNotNull()) {
-				Rectangle referFrame = referView->getLayoutFrame();
+				UIRect referFrame = referView->getLayoutFrame();
 				frame.left = (referFrame.left + layout->marginLeft + referFrame.right - layout->marginRight - width) / 2;
 			} else {
 				frame.left = (param.parentContentFrame.left + layout->marginLeft + param.parentContentFrame.right - layout->marginRight - width) / 2;
@@ -1295,7 +1278,7 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 		case PositionMode::OtherStart:
 			referView = layout->rightReferingView;
 			if (referView.isNotNull()) {
-				Rectangle referFrame = referView->getLayoutFrame();
+				UIRect referFrame = referView->getLayoutFrame();
 				frame.right = referFrame.left - referView->getMarginLeft() - layout->marginRight;
 			} else {
 				frame.right = param.parentContentFrame.right - layout->marginRight;
@@ -1304,7 +1287,7 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 		case PositionMode::OtherEnd:
 			referView = layout->rightReferingView;
 			if (referView.isNotNull()) {
-				Rectangle referFrame = referView->getLayoutFrame();
+				UIRect referFrame = referView->getLayoutFrame();
 				frame.right = referFrame.right - layout->marginRight;
 			} else {
 				frame.right = param.parentContentFrame.right - layout->marginRight;
@@ -1321,7 +1304,7 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 		case PositionMode::OtherStart:
 			referView = layout->topReferingView;
 			if (referView.isNotNull()) {
-				Rectangle referFrame = referView->getLayoutFrame();
+				UIRect referFrame = referView->getLayoutFrame();
 				frame.top = referFrame.top + layout->marginTop;
 			} else {
 				frame.top = param.parentContentFrame.top + layout->marginTop;
@@ -1330,7 +1313,7 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 		case PositionMode::OtherEnd:
 			referView = layout->topReferingView;
 			if (referView.isNotNull()) {
-				Rectangle referFrame = referView->getLayoutFrame();
+				UIRect referFrame = referView->getLayoutFrame();
 				frame.top = referFrame.bottom + referView->getMarginBottom() + layout->marginTop;
 			} else {
 				frame.top = param.parentContentFrame.top + layout->marginTop;
@@ -1342,7 +1325,7 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 		case PositionMode::CenterInOther:
 			referView = layout->topReferingView;
 			if (referView.isNotNull()) {
-				Rectangle referFrame = referView->getLayoutFrame();
+				UIRect referFrame = referView->getLayoutFrame();
 				frame.top = (referFrame.top + layout->marginTop + referFrame.bottom - layout->marginBottom - height) / 2;
 			} else {
 				frame.top = (param.parentContentFrame.top + layout->marginTop + param.parentContentFrame.bottom - layout->marginBottom - height) / 2;
@@ -1359,7 +1342,7 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 		case PositionMode::OtherStart:
 			referView = layout->bottomReferingView;
 			if (referView.isNotNull()) {
-				Rectangle referFrame = referView->getLayoutFrame();
+				UIRect referFrame = referView->getLayoutFrame();
 				frame.bottom = referFrame.top - referView->getMarginTop() - layout->marginBottom;
 			} else {
 				frame.bottom = param.parentContentFrame.bottom - layout->marginBottom;
@@ -1368,7 +1351,7 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 		case PositionMode::OtherEnd:
 			referView = layout->bottomReferingView;
 			if (referView.isNotNull()) {
-				Rectangle referFrame = referView->getLayoutFrame();
+				UIRect referFrame = referView->getLayoutFrame();
 				frame.bottom = referFrame.bottom - layout->marginBottom;
 			} else {
 				frame.bottom = param.parentContentFrame.bottom - layout->marginBottom;
@@ -1422,6 +1405,7 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 			frame.bottom = frame.top + height;
 		}
 	}
+	frame.fixSizeError();
 	layout->frame = frame;
 	layout->flagUpdatedLayoutFrame = sl_true;
 }
@@ -1444,7 +1428,7 @@ void View::_makeLayout(sl_bool flagApplyLayout)
 					if (layout->frame.isAlmostEqual(m_frame)) {
 						break;
 					}
-					Size oldSize = m_frame.getSize();
+					UISize oldSize = m_frame.getSize();
 					_setFrame(layout->frame, sl_false, sl_true);
 					if (layout->frame.getSize().isAlmostEqual(oldSize)) {
 						break;
@@ -1455,7 +1439,7 @@ void View::_makeLayout(sl_bool flagApplyLayout)
 					}
 					if (layout->widthMode == SizeMode::Wrapping || layout->heightMode == SizeMode::Wrapping) {
 						measureLayout();
-						Rectangle frame = layout->frame;
+						UIRect frame = layout->frame;
 						if (layout->widthMode == SizeMode::Wrapping) {
 							frame.setWidth(layout->measuredWidth);
 						}
@@ -1471,12 +1455,7 @@ void View::_makeLayout(sl_bool flagApplyLayout)
 				param.parentContentFrame.top = layout->paddingTop;
 				param.parentContentFrame.right = getWidth() - layout->paddingRight;
 				param.parentContentFrame.bottom = getHeight() - layout->paddingBottom;
-				if (param.parentContentFrame.right < param.parentContentFrame.left) {
-					param.parentContentFrame.right = param.parentContentFrame.left;
-				}
-				if (param.parentContentFrame.bottom < param.parentContentFrame.top) {
-					param.parentContentFrame.bottom = param.parentContentFrame.top;
-				}
+				param.parentContentFrame.fixSizeError();
 				param.flagUseLayoutFrame = sl_false;
 				
 				{
@@ -1562,19 +1541,19 @@ void View::_measureRelativeBoundWidth()
 		rightMode = PositionMode::Fixed;
 	}
 	
-	sl_real outerWidth = 0;
+	sl_ui_pos outerWidth = 0;
 	
 	if (leftMode == PositionMode::Fixed && rightMode == PositionMode::Fixed) {
 		
-		outerWidth = getX() + layout->measuredWidth;
+		outerWidth = m_frame.left + layout->measuredWidth;
 		
 	} else {
 		
-		sl_real marginLeft = 0;
+		sl_ui_pos marginLeft = 0;
 		if (!(layout->flagRelativeMarginLeft)) {
 			marginLeft = layout->marginLeft;
 		}
-		sl_real marginRight = 0;
+		sl_ui_pos marginRight = 0;
 		if (!(layout->flagRelativeMarginRight)) {
 			marginRight = layout->marginRight;
 		}
@@ -1602,7 +1581,7 @@ void View::_measureRelativeBoundWidth()
 						return;
 					}
 					if (leftMode == PositionMode::OtherStart) {
-						sl_real w = referLayout->measuredRelativeBoundWidth;
+						sl_ui_pos w = referLayout->measuredRelativeBoundWidth;
 						w -= referView->getMeasuredWidth();
 						w -= referView->getAbsoluteMarginRight();
 						if (w < 0) {
@@ -1610,7 +1589,7 @@ void View::_measureRelativeBoundWidth()
 						}
 						outerWidth += w;
 					} else {
-						sl_real w = referLayout->measuredRelativeBoundWidth;
+						sl_ui_pos w = referLayout->measuredRelativeBoundWidth;
 						w -= referView->getAbsoluteMarginRight();
 						if (w < 0) {
 							w = 0;
@@ -1638,14 +1617,14 @@ void View::_measureRelativeBoundWidth()
 						return;
 					}
 					if (rightMode == PositionMode::OtherStart) {
-						sl_real w = referLayout->measuredRelativeBoundWidth;
+						sl_ui_pos w = referLayout->measuredRelativeBoundWidth;
 						w -= referView->getAbsoluteMarginLeft();
 						if (w < 0) {
 							w = 0;
 						}
 						outerWidth += w;
 					} else {
-						sl_real w = referLayout->measuredRelativeBoundWidth;
+						sl_ui_pos w = referLayout->measuredRelativeBoundWidth;
 						w -= referView->getMeasuredWidth();
 						w -= referView->getAbsoluteMarginLeft();
 						if (w < 0) {
@@ -1705,11 +1684,11 @@ void View::_measureRelativeBoundHeight()
 		bottomMode = PositionMode::Fixed;
 	}
 	
-	sl_real outerHeight = 0;
+	sl_ui_pos outerHeight = 0;
 	
 	if (topMode == PositionMode::Fixed && bottomMode == PositionMode::Fixed) {
 		
-		outerHeight = getY() + layout->measuredHeight;
+		outerHeight = m_frame.top + layout->measuredHeight;
 		
 	} else {
 		
@@ -1745,7 +1724,7 @@ void View::_measureRelativeBoundHeight()
 						return;
 					}
 					if (topMode == PositionMode::OtherStart) {
-						sl_real h = referLayout->measuredRelativeBoundHeight;
+						sl_ui_pos h = referLayout->measuredRelativeBoundHeight;
 						h -= referView->getMeasuredHeight();
 						h -= referView->getAbsoluteMarginBottom();
 						if (h < 0) {
@@ -1753,7 +1732,7 @@ void View::_measureRelativeBoundHeight()
 						}
 						outerHeight += h;
 					} else {
-						sl_real h = referLayout->measuredRelativeBoundHeight;
+						sl_ui_pos h = referLayout->measuredRelativeBoundHeight;
 						h -= referView->getAbsoluteMarginBottom();
 						if (h < 0) {
 							h = 0;
@@ -1782,14 +1761,14 @@ void View::_measureRelativeBoundHeight()
 						return;
 					}
 					if (bottomMode == PositionMode::OtherStart) {
-						sl_real h = referLayout->measuredRelativeBoundHeight;
+						sl_ui_pos h = referLayout->measuredRelativeBoundHeight;
 						h -= referView->getAbsoluteMarginTop();
 						if (h < 0) {
 							h = 0;
 						}
 						outerHeight += h;
 					} else {
-						sl_real h = referLayout->measuredRelativeBoundHeight;
+						sl_ui_pos h = referLayout->measuredRelativeBoundHeight;
 						h -= referView->getMeasuredHeight();
 						h -= referView->getAbsoluteMarginTop();
 						if (h < 0) {
@@ -1816,10 +1795,10 @@ void View::measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 	if (!flagVertical && !flagHorizontal) {
 		return;
 	}
-	sl_real measuredWidth = 0;
-	sl_real measuredHeight = 0;
-	sl_real paddingWidth = getPaddingLeft() + getPaddingRight();
-	sl_real paddingHeight = getPaddingTop() + getPaddingBottom();
+	sl_ui_pos measuredWidth = 0;
+	sl_ui_pos measuredHeight = 0;
+	sl_ui_pos paddingWidth = getPaddingLeft() + getPaddingRight();
+	sl_ui_pos paddingHeight = getPaddingTop() + getPaddingBottom();
 	
 	sl_size i;
 	ListLocker< Ref<View> > children(_getChildren());
@@ -1845,7 +1824,7 @@ void View::measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 						if (flagHorizontal) {
 							child->_measureRelativeBoundWidth();
 							if (!(layout->flagBadRelativeBoundWidth)) {
-								sl_real w = layout->measuredRelativeBoundWidth;
+								sl_ui_pos w = layout->measuredRelativeBoundWidth;
 								if (!(child->isLayoutLeftFixed() && child->isLayoutRightFixed())) {
 									w += paddingWidth;
 								}
@@ -1857,7 +1836,7 @@ void View::measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 						if (flagVertical) {
 							child->_measureRelativeBoundHeight();
 							if (!(layout->flagBadRelativeBoundHeight)) {
-								sl_real h = layout->measuredRelativeBoundHeight;
+								sl_ui_pos h = layout->measuredRelativeBoundHeight;
 								if (!(child->isLayoutTopFixed() && child->isLayoutBottomFixed())) {
 									h += paddingHeight;
 								}
@@ -1868,13 +1847,13 @@ void View::measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 						}
 					} else {
 						if (flagHorizontal) {
-							sl_real w = child->m_frame.right;
+							sl_ui_pos w = child->m_frame.right;
 							if (w > measuredWidth) {
 								measuredWidth = w;
 							}
 						}
 						if (flagVertical) {
-							sl_real h = child->m_frame.bottom;
+							sl_ui_pos h = child->m_frame.bottom;
 							if (h > measuredHeight) {
 								measuredHeight = h;
 							}
@@ -1975,7 +1954,7 @@ void View::setLayoutEnabled(sl_bool flagEnabled, sl_bool flagRedraw)
 	}
 }
 
-Rectangle View::getLayoutFrame()
+UIRect View::getLayoutFrame()
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull() && layout->flagEnabled) {
@@ -1984,7 +1963,7 @@ Rectangle View::getLayoutFrame()
 	return getFrame();
 }
 
-void View::setLayoutFrame(const Rectangle& rect)
+void View::setLayoutFrame(const UIRect& rect)
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull() && layout->flagEnabled) {
@@ -2791,7 +2770,7 @@ void View::setAlignCenterVertical(const Ref<View>& view, sl_bool flagRedraw)
 	}
 }
 
-sl_real View::getMarginLeft()
+sl_ui_pos View::getMarginLeft()
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
@@ -2800,7 +2779,7 @@ sl_real View::getMarginLeft()
 	return 0;
 }
 
-void View::setMarginLeft(sl_real marginLeft, sl_bool flagRedraw)
+void View::setMarginLeft(sl_ui_pos marginLeft, sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> attr = m_layout;
@@ -2810,7 +2789,7 @@ void View::setMarginLeft(sl_real marginLeft, sl_bool flagRedraw)
 	}
 }
 
-sl_real View::getMarginTop()
+sl_ui_pos View::getMarginTop()
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
@@ -2819,7 +2798,7 @@ sl_real View::getMarginTop()
 	return 0;
 }
 
-void View::setMarginTop(sl_real marginTop, sl_bool flagRedraw)
+void View::setMarginTop(sl_ui_pos marginTop, sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> attr = m_layout;
@@ -2829,7 +2808,7 @@ void View::setMarginTop(sl_real marginTop, sl_bool flagRedraw)
 	}
 }
 
-sl_real View::getMarginRight()
+sl_ui_pos View::getMarginRight()
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
@@ -2838,7 +2817,7 @@ sl_real View::getMarginRight()
 	return 0;
 }
 
-void View::setMarginRight(sl_real marginRight, sl_bool flagRedraw)
+void View::setMarginRight(sl_ui_pos marginRight, sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> attr = m_layout;
@@ -2848,7 +2827,7 @@ void View::setMarginRight(sl_real marginRight, sl_bool flagRedraw)
 	}
 }
 
-sl_real View::getMarginBottom()
+sl_ui_pos View::getMarginBottom()
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
@@ -2857,7 +2836,7 @@ sl_real View::getMarginBottom()
 	return 0;
 }
 
-void View::setMarginBottom(sl_real marginBottom, sl_bool flagRedraw)
+void View::setMarginBottom(sl_ui_pos marginBottom, sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> attr = m_layout;
@@ -2867,7 +2846,7 @@ void View::setMarginBottom(sl_real marginBottom, sl_bool flagRedraw)
 	}
 }
 
-void View::setMargin(sl_real left, sl_real top, sl_real right, sl_real bottom, sl_bool flagRedraw)
+void View::setMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> attr = m_layout;
@@ -2880,7 +2859,7 @@ void View::setMargin(sl_real left, sl_real top, sl_real right, sl_real bottom, s
 	}
 }
 
-void View::setMargin(sl_real margin, sl_bool flagRedraw)
+void View::setMargin(sl_ui_pos margin, sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> attr = m_layout;
@@ -2922,7 +2901,7 @@ void View::setRelativeMarginLeft(sl_real weight, sl_bool flagRedraw)
 	}
 }
 
-sl_real View::getAbsoluteMarginLeft()
+sl_ui_pos View::getAbsoluteMarginLeft()
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull() && !(layout->flagRelativeMarginLeft)) {
@@ -2934,7 +2913,7 @@ sl_real View::getAbsoluteMarginLeft()
 	return 0;
 }
 
-void View::setAbsoluteMarginLeft(sl_real margin, sl_bool flagRedraw)
+void View::setAbsoluteMarginLeft(sl_ui_pos margin, sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> attr = m_layout;
@@ -2974,7 +2953,7 @@ void View::setRelativeMarginTop(sl_real weight, sl_bool flagRedraw)
 	}
 }
 
-sl_real View::getAbsoluteMarginTop()
+sl_ui_pos View::getAbsoluteMarginTop()
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull() && !(layout->flagRelativeMarginTop)) {
@@ -2986,7 +2965,7 @@ sl_real View::getAbsoluteMarginTop()
 	return 0;
 }
 
-void View::setAbsoluteMarginTop(sl_real margin, sl_bool flagRedraw)
+void View::setAbsoluteMarginTop(sl_ui_pos margin, sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> attr = m_layout;
@@ -3026,7 +3005,7 @@ void View::setRelativeMarginRight(sl_real weight, sl_bool flagRedraw)
 	}
 }
 
-sl_real View::getAbsoluteMarginRight()
+sl_ui_pos View::getAbsoluteMarginRight()
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull() && !(layout->flagRelativeMarginRight)) {
@@ -3038,7 +3017,7 @@ sl_real View::getAbsoluteMarginRight()
 	return 0;
 }
 
-void View::setAbsoluteMarginRight(sl_real margin, sl_bool flagRedraw)
+void View::setAbsoluteMarginRight(sl_ui_pos margin, sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> attr = m_layout;
@@ -3078,7 +3057,7 @@ void View::setRelativeMarginBottom(sl_real weight, sl_bool flagRedraw)
 	}
 }
 
-sl_real View::getAbsoluteMarginBottom()
+sl_ui_pos View::getAbsoluteMarginBottom()
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull() && !(layout->flagRelativeMarginBottom)) {
@@ -3090,7 +3069,7 @@ sl_real View::getAbsoluteMarginBottom()
 	return 0;
 }
 
-void View::setAbsoluteMarginBottom(sl_real margin, sl_bool flagRedraw)
+void View::setAbsoluteMarginBottom(sl_ui_pos margin, sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> attr = m_layout;
@@ -3101,26 +3080,26 @@ void View::setAbsoluteMarginBottom(sl_real margin, sl_bool flagRedraw)
 	}
 }
 
-void View::applyRelativeMargins(sl_real parentWidth, sl_real parentHeight)
+void View::applyRelativeMargins(sl_ui_len parentWidth, sl_ui_len parentHeight)
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
 		if (layout->flagRelativeMarginLeft) {
-			layout->marginLeft = parentWidth * layout->relativeMarginLeftWeight;
+			layout->marginLeft = (sl_ui_pos)((sl_real)parentWidth * layout->relativeMarginLeftWeight);
 		}
 		if (layout->flagRelativeMarginTop) {
-			layout->marginTop = parentHeight * layout->relativeMarginTopWeight;
+			layout->marginTop = (sl_ui_pos)((sl_real)parentHeight * layout->relativeMarginTopWeight);
 		}
 		if (layout->flagRelativeMarginRight) {
-			layout->marginRight = parentWidth * layout->relativeMarginRightWeight;
+			layout->marginRight = (sl_ui_pos)((sl_real)parentWidth * layout->relativeMarginRightWeight);
 		}
 		if (layout->flagRelativeMarginBottom) {
-			layout->marginBottom = parentHeight * layout->relativeMarginBottomWeight;
+			layout->marginBottom = (sl_ui_pos)((sl_real)parentHeight * layout->relativeMarginBottomWeight);
 		}
 	}
 }
 
-sl_real View::getPaddingLeft()
+sl_ui_pos View::getPaddingLeft()
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
@@ -3129,7 +3108,7 @@ sl_real View::getPaddingLeft()
 	return 0;
 }
 
-void View::setPaddingLeft(sl_real paddingLeft, sl_bool flagRedraw)
+void View::setPaddingLeft(sl_ui_pos paddingLeft, sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> attr = m_layout;
@@ -3140,7 +3119,7 @@ void View::setPaddingLeft(sl_real paddingLeft, sl_bool flagRedraw)
 	}
 }
 
-sl_real View::getPaddingTop()
+sl_ui_pos View::getPaddingTop()
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
@@ -3149,7 +3128,7 @@ sl_real View::getPaddingTop()
 	return 0;
 }
 
-void View::setPaddingTop(sl_real paddingTop, sl_bool flagRedraw)
+void View::setPaddingTop(sl_ui_pos paddingTop, sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> attr = m_layout;
@@ -3160,7 +3139,7 @@ void View::setPaddingTop(sl_real paddingTop, sl_bool flagRedraw)
 	}
 }
 
-sl_real View::getPaddingRight()
+sl_ui_pos View::getPaddingRight()
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
@@ -3169,7 +3148,7 @@ sl_real View::getPaddingRight()
 	return 0;
 }
 
-void View::setPaddingRight(sl_real paddingRight, sl_bool flagRedraw)
+void View::setPaddingRight(sl_ui_pos paddingRight, sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> attr = m_layout;
@@ -3180,7 +3159,7 @@ void View::setPaddingRight(sl_real paddingRight, sl_bool flagRedraw)
 	}
 }
 
-sl_real View::getPaddingBottom()
+sl_ui_pos View::getPaddingBottom()
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull()) {
@@ -3189,7 +3168,7 @@ sl_real View::getPaddingBottom()
 	return 0;
 }
 
-void View::setPaddingBottom(sl_real paddingBottom, sl_bool flagRedraw)
+void View::setPaddingBottom(sl_ui_pos paddingBottom, sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> attr = m_layout;
@@ -3200,7 +3179,7 @@ void View::setPaddingBottom(sl_real paddingBottom, sl_bool flagRedraw)
 	}
 }
 
-void View::setPadding(sl_real left, sl_real top, sl_real right, sl_real bottom, sl_bool flagRedraw)
+void View::setPadding(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> attr = m_layout;
@@ -3214,7 +3193,7 @@ void View::setPadding(sl_real left, sl_real top, sl_real right, sl_real bottom, 
 	}
 }
 
-void View::setPadding(sl_real padding, sl_bool flagRedraw)
+void View::setPadding(sl_ui_pos padding, sl_bool flagRedraw)
 {
 	_initializeLayout();
 	Ref<LayoutAttributes> attr = m_layout;
@@ -3533,7 +3512,7 @@ void View::_applyTransform()
 	}
 }
 
-Point View::convertCoordinateFromScreen(const Point& ptScreen)
+UIPointf View::convertCoordinateFromScreen(const UIPointf& ptScreen)
 {
 	Ref<ViewInstance> instance = m_instance;
 	if (instance.isNotNull()) {
@@ -3543,11 +3522,11 @@ Point View::convertCoordinateFromScreen(const Point& ptScreen)
 	if (parent.isNull()) {
 		return ptScreen;
 	}
-	Point pt = parent->convertCoordinateFromScreen(ptScreen);
+	UIPointf pt = parent->convertCoordinateFromScreen(ptScreen);
 	return convertCoordinateFromParent(pt);
 }
 
-Point View::convertCoordinateToScreen(const Point& ptView)
+UIPointf View::convertCoordinateToScreen(const UIPointf& ptView)
 {
 	Ref<ViewInstance> instance = m_instance;
 	if (instance.isNotNull()) {
@@ -3557,23 +3536,23 @@ Point View::convertCoordinateToScreen(const Point& ptView)
 	if (parent.isNull()) {
 		return ptView;
 	}
-	Point pt = convertCoordinateToParent(ptView);
+	UIPointf pt = convertCoordinateToParent(ptView);
 	return parent->convertCoordinateToScreen(pt);
 }
 
-Point View::convertCoordinateFromParent(const Point& ptParent)
+UIPointf View::convertCoordinateFromParent(const UIPointf& ptParent)
 {
 	if (isInstance()) {
-		return ptParent - getPosition();
+		return UIPointf(ptParent.x - (sl_ui_posf)(m_frame.left), ptParent.y - (sl_ui_posf)(m_frame.top));
 	}
 	Ref<View> parent = m_parent;
 	if (parent.isNull()) {
 		return ptParent;
 	}
 	
-	Point pt = ptParent;
-	pt.x -= getX();
-	pt.y -= getY();
+	UIPointf pt = ptParent;
+	pt.x -= (sl_ui_posf)(m_frame.left);
+	pt.y -= (sl_ui_posf)(m_frame.top);
 	Ref<TransformAttributes> transform = m_transform;
 	if (transform.isNotNull() && transform->flagEnabled) {
 		pt = transform->transformInverse.transformPosition(pt);
@@ -3581,10 +3560,10 @@ Point View::convertCoordinateFromParent(const Point& ptParent)
 	return pt;
 }
 
-Point View::convertCoordinateToParent(const Point& ptView)
+UIPointf View::convertCoordinateToParent(const UIPointf& ptView)
 {
 	if (isInstance()) {
-		return ptView + getPosition();
+		return UIPointf(ptView.x + (sl_ui_pos)(m_frame.left), ptView.y + (sl_ui_pos)(m_frame.top));
 	}
 	Ref<View> parent = m_parent;
 	if (parent.isNull()) {
@@ -3596,8 +3575,8 @@ Point View::convertCoordinateToParent(const Point& ptView)
 	if (transform.isNotNull() && transform->flagEnabled) {
 		pt = transform->transform.transformPosition(pt);
 	}
-	pt.x += getX();
-	pt.y += getY();
+	pt.x += (sl_ui_pos)(m_frame.left);
+	pt.y += (sl_ui_pos)(m_frame.top);
 	return pt;
 }
 
@@ -4235,26 +4214,34 @@ void View::setScrollBarsVisible(sl_bool flagVisible, sl_bool flagRefresh)
 	}
 }
 
-sl_real View::getScrollX()
-{
-	return getScrollPosition().x;
-}
-
-sl_real View::getScrollY()
-{
-	return getScrollPosition().y;
-}
-
-Point View::getScrollPosition()
+sl_scroll_pos View::getScrollX()
 {
 	Ref<ScrollAttributes> scroll = m_scroll;
 	if (scroll.isNotNull()) {
-		return Point(scroll->x, scroll->y);
+		return scroll->x;
 	}
-	return Point::zero();
+	return 0;
 }
 
-void View::scrollTo(sl_real x, sl_real y, sl_bool flagRedraw)
+sl_scroll_pos View::getScrollY()
+{
+	Ref<ScrollAttributes> scroll = m_scroll;
+	if (scroll.isNotNull()) {
+		return scroll->y;
+	}
+	return 0;
+}
+
+ScrollPoint View::getScrollPosition()
+{
+	Ref<ScrollAttributes> scroll = m_scroll;
+	if (scroll.isNotNull()) {
+		return ScrollPoint(scroll->x, scroll->y);
+	}
+	return ScrollPoint::zero();
+}
+
+void View::scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagRedraw)
 {
 	_initializeScroll();
 	
@@ -4262,14 +4249,14 @@ void View::scrollTo(sl_real x, sl_real y, sl_bool flagRedraw)
 	
 	if (scroll.isNotNull()) {
 		
-		sl_real rx = scroll->contentWidth - getWidth();
+		sl_scroll_pos rx = scroll->contentWidth - getWidth();
 		if (x > rx) {
 			x = rx;
 		}
 		if (x < 0) {
 			x = 0;
 		}
-		sl_real ry = scroll->contentHeight - getHeight();
+		sl_scroll_pos ry = scroll->contentHeight - getHeight();
 		if (y > ry) {
 			y = ry;
 		}
@@ -4303,12 +4290,30 @@ void View::scrollTo(sl_real x, sl_real y, sl_bool flagRedraw)
 	}
 }
 
-void View::scrollTo(const Point& position, sl_bool flagRedraw)
+void View::scrollTo(const ScrollPoint& position, sl_bool flagRedraw)
 {
 	scrollTo(position.x, position.y, flagRedraw);
 }
 
-sl_real View::getContentWidth()
+void View::setScrollX(sl_scroll_pos x, sl_bool flagRedraw)
+{
+	_initializeScroll();
+	Ref<ScrollAttributes> scroll = m_scroll;
+	if (scroll.isNotNull()) {
+		scrollTo(x, scroll->y, flagRedraw);
+	}
+}
+
+void View::setScrollY(sl_scroll_pos y, sl_bool flagRedraw)
+{
+	_initializeScroll();
+	Ref<ScrollAttributes> scroll = m_scroll;
+	if (scroll.isNotNull()) {
+		scrollTo(scroll->x, y, flagRedraw);
+	}
+}
+
+sl_scroll_pos View::getContentWidth()
 {
 	Ref<ScrollAttributes> scroll = m_scroll;
 	if (scroll.isNotNull()) {
@@ -4317,7 +4322,7 @@ sl_real View::getContentWidth()
 	return 0;
 }
 
-sl_real View::getContentHeight()
+sl_scroll_pos View::getContentHeight()
 {
 	Ref<ScrollAttributes> scroll = m_scroll;
 	if (scroll.isNotNull()) {
@@ -4326,16 +4331,16 @@ sl_real View::getContentHeight()
 	return 0;
 }
 
-Size View::getContentSize()
+ScrollPoint View::getContentSize()
 {
 	Ref<ScrollAttributes> scroll = m_scroll;
 	if (scroll.isNotNull()) {
-		return Size(scroll->contentWidth, scroll->contentHeight);
+		return ScrollPoint(scroll->contentWidth, scroll->contentHeight);
 	}
-	return Size::zero();
+	return ScrollPoint::zero();
 }
 
-void View::setContentSize(sl_real width, sl_real height, sl_bool flagRefresh)
+void View::setContentSize(sl_scroll_pos width, sl_scroll_pos height, sl_bool flagRefresh)
 {
 	_initializeScroll();
 	
@@ -4356,12 +4361,12 @@ void View::setContentSize(sl_real width, sl_real height, sl_bool flagRefresh)
 	}
 }
 
-void View::setContentSize(const Size& size, sl_bool flagRefresh)
+void View::setContentSize(const ScrollPoint& size, sl_bool flagRefresh)
 {
 	setContentSize(size.x, size.y, flagRefresh);
 }
 
-void View::setContentWidth(sl_real width, sl_bool flagRefresh)
+void View::setContentWidth(sl_scroll_pos width, sl_bool flagRefresh)
 {
 	_initializeScroll();
 	Ref<ScrollAttributes> scroll = m_scroll;
@@ -4370,7 +4375,7 @@ void View::setContentWidth(sl_real width, sl_bool flagRefresh)
 	}
 }
 
-void View::setContentHeight(sl_real height, sl_bool flagRefresh)
+void View::setContentHeight(sl_scroll_pos height, sl_bool flagRefresh)
 {
 	_initializeScroll();
 	Ref<ScrollAttributes> scroll = m_scroll;
@@ -4379,11 +4384,11 @@ void View::setContentHeight(sl_real height, sl_bool flagRefresh)
 	}
 }
 
-Size View::getScrollRange()
+ScrollPoint View::getScrollRange()
 {
 	Ref<ScrollAttributes> scroll = m_scroll;
 	if (scroll.isNotNull()) {
-		Size ret(scroll->contentWidth - getWidth(), scroll->contentHeight - getHeight());
+		ScrollPoint ret(scroll->contentWidth - (sl_scroll_pos)(getWidth()), scroll->contentHeight - (sl_scroll_pos)(getHeight()));
 		if (ret.x < 0) {
 			ret.x = 0;
 		}
@@ -4392,10 +4397,10 @@ Size View::getScrollRange()
 		}
 		return ret;
 	}
-	return Size::zero();
+	return ScrollPoint::zero();
 }
 
-sl_real View::getScrollBarWidth()
+sl_ui_len View::getScrollBarWidth()
 {
 	Ref<ScrollAttributes> scroll = m_scroll;
 	if (scroll.isNotNull()) {
@@ -4404,7 +4409,7 @@ sl_real View::getScrollBarWidth()
 	return 0;
 }
 
-void View::setScrollBarWidth(sl_real width, sl_bool flagRefresh)
+void View::setScrollBarWidth(sl_ui_len width, sl_bool flagRefresh)
 {
 	_initializeScroll();
 	
@@ -4548,14 +4553,14 @@ public:
 	}
 	
 	// override
-	void onScroll(ScrollBar* scrollBar, sl_real value)
+	void onScroll(ScrollBar* scrollBar, sl_scroll_pos value)
 	{
 		Ref<View> view = m_view;
 		if (view.isNull()) {
 			return;
 		}
-		sl_real sx = 0;
-		sl_real sy = 0;
+		sl_scroll_pos sx = 0;
+		sl_scroll_pos sy = 0;
 		Ref<ScrollBar> horz = view->getHorizontalScrollBar();
 		if (horz.isNotNull()) {
 			sx = horz->getValue();
@@ -4572,8 +4577,8 @@ void View::_refreshScroll(sl_bool flagRedraw)
 {
 	Ref<ScrollAttributes> scroll = m_scroll;
 	if (scroll.isNotNull()) {
-		sl_real width = getWidth();
-		sl_real height = getHeight();
+		sl_ui_pos width = getWidth();
+		sl_ui_pos height = getHeight();
 		sl_bool flagVisibleHorz = sl_false;
 		Ref<ScrollBar> barHorz = scroll->horz;
 		if (barHorz.isNotNull()) {
@@ -4582,7 +4587,7 @@ void View::_refreshScroll(sl_bool flagRedraw)
 			barHorz->setMaximumValue(scroll->contentWidth, sl_false);
 			barHorz->setPage(width, sl_false);
 			barHorz->setValueOfOutRange(scroll->x, sl_false);
-			barHorz->setFrame(Rectangle(0, height - scroll->barWidth, width, height), sl_false);
+			barHorz->setFrame(UIRect(0, height - scroll->barWidth, width, height), sl_false);
 			if (barHorz->getListener().isNull()) {
 				barHorz->setListener(Ref<_View_ScrollBarListener>(new _View_ScrollBarListener(this)));
 			}
@@ -4600,7 +4605,7 @@ void View::_refreshScroll(sl_bool flagRedraw)
 			barVert->setMaximumValue(scroll->contentHeight, sl_false);
 			barVert->setPage(height, sl_false);
 			barVert->setValueOfOutRange(scroll->y, sl_false);
-			barVert->setFrame(Rectangle(width - scroll->barWidth, 0, width, height), sl_false);
+			barVert->setFrame(UIRect(width - scroll->barWidth, 0, width, height), sl_false);
 			if (barVert->getListener().isNull()) {
 				barVert->setListener(Ref<_View_ScrollBarListener>(new _View_ScrollBarListener(this)));
 			}
@@ -4612,7 +4617,7 @@ void View::_refreshScroll(sl_bool flagRedraw)
 		if (flagVisibleHorz && flagVisibleVert) {
 			//// avoid overlapping two scrollbars.
 			////		2016/6/8 temporally cancel this function
-			//barHorz->setFrame(Rectangle(0, height - scroll->barWidth, width - scroll->barWidth, height), sl_false);
+			//barHorz->setFrame(UIRect(0, height - scroll->barWidth, width - scroll->barWidth, height), sl_false);
 		}
 		scrollTo(scroll->x, scroll->y, sl_false);
 		if (flagRedraw) {
@@ -4806,6 +4811,15 @@ void View::setPreviousTabStop(const Ref<View>& view)
 
 void View::draw(Canvas *canvas)
 {
+	sl_ui_pos width = m_frame.getWidth();
+	if (width <= 0) {
+		return;
+	}
+	sl_ui_pos height = m_frame.getHeight();
+	if (height <= 0) {
+		return;
+	}
+	
 	Ref<DrawAttributes> attr = m_draw;
 	Ref<ScrollAttributes> scroll = m_scroll;
 	
@@ -4823,17 +4837,19 @@ void View::draw(Canvas *canvas)
 	do {
 		CanvasStatusScope scopeClip;
 		if (attr.isNull() || attr->flagClippingBounds) {
-			Rectangle rcClip(Point::zero(), getSize());
+			Rectangle rcClip(0, 0, (sl_real)width, (sl_real)height);
 			switch (getBoundShape()) {
 				case BoundShape::RoundRect:
 					rcClip.right -= 1;
 					rcClip.bottom -= 1;
+					rcClip.fixSizeError();
 					scopeClip.save(canvas);
 					canvas->clipToRoundRect(rcClip, getRoundRectBoundShapeRadius());
 					break;
 				case BoundShape::Ellipse:
 					rcClip.right -= 1;
 					rcClip.bottom -= 1;
+					rcClip.fixSizeError();
 					scopeClip.save(canvas);
 					canvas->clipToEllipse(rcClip);
 					break;
@@ -4850,6 +4866,7 @@ void View::draw(Canvas *canvas)
 					break;
 			}
 			rcClip = canvas->getClipBounds();
+			rcClip.fixSizeError();
 			if (Math::isAlmostZero(rcClip.getWidth()) || Math::isAlmostZero(rcClip.getHeight())) {
 				break;
 			}
@@ -4872,8 +4889,10 @@ void View::draw(Canvas *canvas)
 		{
 			CanvasStatusScope scopeContent(flagSaveStatus ? canvas : sl_null);
 			if (scroll.isNotNull()) {
-				if(!(Math::isAlmostZero(scroll->x)) || !(Math::isAlmostZero(scroll->y))) {
-					canvas->translate(-(scroll->x), -(scroll->y));
+				sl_real scrollX = (sl_real)(scroll->x);
+				sl_real scrollY = (sl_real)(scroll->y);
+				if(!(Math::isAlmostZero(scrollX)) || !(Math::isAlmostZero(scrollY))) {
+					canvas->translate(-scrollX, -scrollY);
 				}
 			}
 			onDraw(canvas);
@@ -4901,7 +4920,7 @@ void View::draw(Canvas *canvas)
 
 void View::drawBackground(Canvas* canvas, const Color& color, const Ref<Drawable>& background)
 {
-	Rectangle rc(Point::zero(), getSize());
+	Rectangle rc(0, 0, m_frame.getWidth(), m_frame.getHeight());
 	if (color.a > 0) {
 		Ref<Brush> brush = Brush::createSolidBrush(color);
 		canvas->fillRectangle(rc, brush);
@@ -4916,7 +4935,7 @@ void View::drawBackground(Canvas* canvas, const Color& color, const Ref<Drawable
 
 void View::drawBorder(Canvas* canvas, const Ref<Pen>& pen)
 {
-	Rectangle rc(Point::zero(), getSize());
+	Rectangle rc(0, 0, m_frame.getWidth(), m_frame.getHeight());
 	if (pen.isNotNull()) {
 		switch (getBoundShape()) {
 			case BoundShape::RoundRect:
@@ -4924,6 +4943,7 @@ void View::drawBorder(Canvas* canvas, const Ref<Pen>& pen)
 				rc.top += 1;
 				rc.right -= 2;
 				rc.bottom -= 2;
+				rc.fixSizeError();
 				canvas->drawRoundRect(rc, getRoundRectBoundShapeRadius(), pen);
 				break;
 			case BoundShape::Ellipse:
@@ -4931,6 +4951,7 @@ void View::drawBorder(Canvas* canvas, const Ref<Pen>& pen)
 				rc.top += 1;
 				rc.right -= 2;
 				rc.bottom -= 2;
+				rc.fixSizeError();
 				canvas->drawEllipse(rc, pen);
 				break;
 			case BoundShape::Path:
@@ -4940,6 +4961,7 @@ void View::drawBorder(Canvas* canvas, const Ref<Pen>& pen)
 			default:
 				rc.right -= 1;
 				rc.bottom -= 1;
+				rc.fixSizeError();
 				canvas->setAntiAlias(sl_false);
 				canvas->drawRectangle(rc, pen);
 				canvas->setAntiAlias(sl_true);
@@ -4962,7 +4984,7 @@ void View::drawChild(Canvas* canvas, View* child)
 {
 	if (child) {
 		CanvasStatusScope scope(canvas);
-		canvas->translate((sl_real)(int)(child->m_frame.left), (sl_real)(int)(child->m_frame.top));
+		canvas->translate((sl_real)(child->m_frame.left), (sl_real)(child->m_frame.top));
 		if (child->isTransformEnabled()) {
 			canvas->concatMatrix(child->getTransform());
 		}
@@ -5028,11 +5050,11 @@ void View::onSetCursor(UIEvent* ev)
 {
 }
 
-void View::onResize(sl_real width, sl_real height)
+void View::onResize(sl_ui_len width, sl_ui_len height)
 {
 }
 
-void View::onResizeChild(View* child, sl_real width, sl_real height)
+void View::onResizeChild(View* child, sl_ui_len width, sl_ui_len height)
 {
 }
 
@@ -5044,11 +5066,11 @@ void View::onChangeVisibilityOfChild(View* child, Visibility oldVisibility, Visi
 {
 }
 
-void View::onScroll(sl_real x, sl_real y)
+void View::onScroll(sl_scroll_pos x, sl_scroll_pos y)
 {
 }
 
-void View::onResizeContent(sl_real width, sl_real height)
+void View::onResizeContent(sl_scroll_pos width, sl_scroll_pos height)
 {
 }
 
@@ -5083,6 +5105,15 @@ void View::onChangePadding()
 
 void View::dispatchDraw(Canvas* canvas)
 {
+	sl_ui_pos width = getWidth();
+	if (width <= 0) {
+		return;
+	}
+	sl_ui_pos height = getHeight();
+	if (height <= 0) {
+		return;
+	}
+
 	Ref<GraphicsContext> context = canvas->getGraphicsContext();
 	m_graphicsContext = context;
 	
@@ -5093,16 +5124,17 @@ void View::dispatchDraw(Canvas* canvas)
 		Ref<DrawAttributes> attr = m_draw;
 		if (attr.isNotNull()) {
 			if (attr->flagDoubleBuffer) {
-				Rectangle region = canvas->getClipBounds();
-				if (!region.intersectRectangle(getBounds(), &region)) {
+				UIRect region = canvas->getClipBounds();
+				if (!(region.intersectRectangle(getBounds(), &region))) {
 					return;
 				}
 				Ref<Bitmap> bitmapBuffer = attr->bitmapDoubleBuffer;
 				Ref<Canvas> canvasBuffer = attr->canvasDoubleBuffer;
-				sl_real width = getWidth();
-				sl_real height = getHeight();
-				if (bitmapBuffer.isNull() || canvasBuffer.isNull() || bitmapBuffer->getWidth() < width || bitmapBuffer->getHeight() < height) {
-					bitmapBuffer = context->createBitmap((sl_uint32)(Math::ceil(width / 256)) * 256, (sl_uint32)(Math::ceil(height / 256) * 256));
+				sl_uint32 iwidth = (sl_uint32)width;
+				sl_uint32 iheight = (sl_uint32)height;
+				
+				if (bitmapBuffer.isNull() || canvasBuffer.isNull() || bitmapBuffer->getWidth() < iwidth || bitmapBuffer->getHeight() < iheight) {
+					bitmapBuffer = context->createBitmap((iwidth + 255) & 0xFFFFFF00, (iheight + 255) & 0xFFFFFF00);
 					if (bitmapBuffer.isNull()) {
 						return;
 					}
@@ -5239,7 +5271,7 @@ void View::dispatchMouseEvent(UIEvent* ev)
 sl_bool View::dispatchMouseEventToChildren(UIEvent* ev, const Ref<View>* children, sl_size count)
 {
 	UIAction action = ev->getAction();
-	Point ptMouse = ev->getPoint();
+	UIPointf ptMouse = ev->getPoint();
 	
 	Ref<View> oldChild;
 	switch (action) {
@@ -5254,7 +5286,7 @@ sl_bool View::dispatchMouseEventToChildren(UIEvent* ev, const Ref<View>* childre
 			for (sl_size i = 0; i < count; i++) {
 				View* child = children[count - 1 - i].ptr;
 				if (POINT_EVENT_CHECK_CHILD(child)) {
-					Point pt = child->convertCoordinateFromParent(ptMouse);
+					UIPointf pt = child->convertCoordinateFromParent(ptMouse);
 					if (child->hitTest(pt)) {
 						ev->setPoint(pt);
 						dispatchMouseEventToChild(ev, child, sl_false);
@@ -5282,7 +5314,7 @@ sl_bool View::dispatchMouseEventToChildren(UIEvent* ev, const Ref<View>* childre
 			for (sl_size i = 0; i < count; i++) {
 				View* child = children[count - 1 - i].ptr;
 				if (POINT_EVENT_CHECK_CHILD(child)) {
-					Point pt = child->convertCoordinateFromParent(ptMouse);
+					UIPointf pt = child->convertCoordinateFromParent(ptMouse);
 					if (child->hitTest(pt)) {
 						ev->setPoint(pt);
 						dispatchMouseEventToChild(ev, child, sl_false);
@@ -5312,7 +5344,7 @@ sl_bool View::dispatchMouseEventToChildren(UIEvent* ev, const Ref<View>* childre
 			for (sl_size i = 0; i < count; i++) {
 				View* child = children[count - 1 - i].ptr;
 				if (POINT_EVENT_CHECK_CHILD(child)) {
-					Point pt = child->convertCoordinateFromParent(ptMouse);
+					UIPointf pt = child->convertCoordinateFromParent(ptMouse);
 					if (child->hitTest(pt)) {
 						if (oldChild == child) {
 							ev->setAction(UIAction::MouseMove);
@@ -5354,7 +5386,7 @@ void View::dispatchMouseEventToChild(UIEvent* ev, View* child, sl_bool flagTrans
 	if (child) {
 		ev->resetStatus();
 		if (flagTransformPoints) {
-			Point ptMouse = ev->getPoint();
+			UIPointf ptMouse = ev->getPoint();
 			ev->setPoint(child->convertCoordinateFromParent(ptMouse));
 			child->dispatchMouseEvent(ev);
 			ev->setPoint(ptMouse);
@@ -5439,7 +5471,7 @@ void View::dispatchTouchEvent(UIEvent* ev)
 sl_bool View::dispatchTouchEventToChildren(UIEvent *ev, const Ref<View>* children, sl_size count)
 {
 	UIAction action = ev->getAction();
-	Point ptMouse = ev->getPoint();
+	UIPointf ptMouse = ev->getPoint();
 	
 	Ref<View> oldChild;
 	switch (action) {
@@ -5452,7 +5484,7 @@ sl_bool View::dispatchTouchEventToChildren(UIEvent *ev, const Ref<View>* childre
 			for (sl_size i = 0; i < count; i++) {
 				View* child = children[count - 1 - i].ptr;
 				if (POINT_EVENT_CHECK_CHILD(child)) {
-					Point pt = child->convertCoordinateFromParent(ptMouse);
+					UIPointf pt = child->convertCoordinateFromParent(ptMouse);
 					if (child->hitTest(pt)) {
 						dispatchTouchEventToChild(ev, child);
 						if (!(ev->isPassedToNext())) {
@@ -5522,7 +5554,7 @@ void View::dispatchMultiTouchEventToChildren(UIEvent *ev, const Ref<View>* child
 						sl_size nInside = 0;
 						sl_size nOutside = 0;
 						for (k = 0; k < nCheck; k++) {
-							Point pt = child->convertCoordinateFromParent(ptsCheck[k].point);
+							UIPointf pt = child->convertCoordinateFromParent(ptsCheck[k].point);
 							if (child->hitTest(pt)) {
 								ptsInside[nInside] = ptsCheck[k];
 								ptsInside[nInside].point = pt;
@@ -5686,11 +5718,11 @@ sl_bool View::dispatchMouseWheelEventToChildren(UIEvent* ev, const Ref<View>* ch
 	if (action != UIAction::MouseWheel) {
 		return sl_true;
 	}
-	Point ptMouse = ev->getPoint();
+	UIPointf ptMouse = ev->getPoint();
 	for (sl_size i = 0; i < count; i++) {
 		View* child = children[count - 1 - i].ptr;
 		if (POINT_EVENT_CHECK_CHILD(child)) {
-			Point pt = child->convertCoordinateFromParent(ptMouse);
+			UIPointf pt = child->convertCoordinateFromParent(ptMouse);
 			if (child->hitTest(pt)) {
 				ev->setPoint(pt);
 				dispatchMouseWheelEventToChild(ev, child, sl_false);
@@ -5709,7 +5741,7 @@ void View::dispatchMouseWheelEventToChild(UIEvent* ev, View* child, sl_bool flag
 	if (child) {
 		ev->resetStatus();
 		if (flagTransformPoints) {
-			Point ptMouse = ev->getPoint();
+			UIPointf ptMouse = ev->getPoint();
 			ev->setPoint(child->convertCoordinateFromParent(ptMouse));
 			child->dispatchMouseWheelEvent(ev);
 			ev->setPoint(ptMouse);
@@ -5865,11 +5897,11 @@ sl_bool View::dispatchSetCursorToChildren(UIEvent* ev, const Ref<View>* children
 	if (action != UIAction::SetCursor) {
 		return sl_true;
 	}
-	Point ptMouse = ev->getPoint();
+	UIPointf ptMouse = ev->getPoint();
 	for (sl_size i = 0; i < count; i++) {
 		View* child = children[count - 1 - i].ptr;
 		if (POINT_EVENT_CHECK_CHILD(child)) {
-			Point pt = child->convertCoordinateFromParent(ptMouse);
+			UIPointf pt = child->convertCoordinateFromParent(ptMouse);
 			if (child->hitTest(pt)) {
 				ev->setPoint(pt);
 				dispatchSetCursorToChild(ev, child, sl_false);
@@ -5888,7 +5920,7 @@ void View::dispatchSetCursorToChild(UIEvent* ev, View* child, sl_bool flagTransf
 	if (child) {
 		ev->resetStatus();
 		if (flagTransformPoints) {
-			Point ptMouse = ev->getPoint();
+			UIPointf ptMouse = ev->getPoint();
 			ev->setPoint(child->convertCoordinateFromParent(ptMouse));
 			child->dispatchSetCursor(ev);
 			ev->setPoint(ptMouse);
@@ -5898,7 +5930,7 @@ void View::dispatchSetCursorToChild(UIEvent* ev, View* child, sl_bool flagTransf
 	}
 }
 
-void View::dispatchResize(sl_real width, sl_real height)
+void View::dispatchResize(sl_ui_len width, sl_ui_len height)
 {
 	_refreshScroll(sl_false);
 	onResize(width, height);
@@ -5925,7 +5957,7 @@ void View::dispatchChangeVisibility(Visibility oldVisibility, Visibility newVisi
 	}
 }
 
-void View::dispatchScroll(sl_real x, sl_real y)
+void View::dispatchScroll(sl_scroll_pos x, sl_scroll_pos y)
 {
 	onScroll(x, y);
 }
@@ -5962,11 +5994,11 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 	if (scroll.isNull()) {
 		return;
 	}
-	if (scroll->contentWidth < getWidth() && scroll->contentHeight < getHeight()) {
+	if (scroll->contentWidth < (sl_scroll_pos)(getWidth()) && scroll->contentHeight < (sl_scroll_pos)(getHeight())) {
 		return;
 	}
-	sl_real lineX = getWidth() / 20;
-	sl_real lineY = getHeight() / 20;
+	sl_scroll_pos lineX = (sl_scroll_pos)(getWidth() / 20);
+	sl_scroll_pos lineY = (sl_scroll_pos)(getHeight() / 20);
 	UIAction action = ev->getAction();
 	switch (action) {
 		case UIAction::LeftButtonDown:
@@ -5981,8 +6013,8 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 		case UIAction::LeftButtonDrag:
 		case UIAction::TouchMove:
 			if (scroll->flagDownContent) {
-				sl_real sx = scroll->scrollX_DownContent - (ev->getX() - scroll->mouseX_DownContent);
-				sl_real sy = scroll->scrollY_DownContent - (ev->getY() - scroll->mouseY_DownContent);
+				sl_scroll_pos sx = scroll->scrollX_DownContent - (sl_scroll_pos)(ev->getX() - scroll->mouseX_DownContent);
+				sl_scroll_pos sy = scroll->scrollY_DownContent - (sl_scroll_pos)(ev->getY() - scroll->mouseY_DownContent);
 				scrollTo(sx, sy);
 				ev->stopPropagation();
 			}
@@ -5997,8 +6029,8 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 		case UIAction::MouseWheel:
 			{
 				sl_bool flagChange = sl_false;
-				sl_real sx = scroll->x;
-				sl_real sy = scroll->y;
+				sl_scroll_pos sx = scroll->x;
+				sl_scroll_pos sy = scroll->y;
 				
 				sl_real deltaX = ev->getDeltaX();
 				if (deltaX > SLIB_EPSILON) {
@@ -6025,8 +6057,8 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 			break;
 		case UIAction::KeyDown:
 			{
-				sl_real sx = scroll->x;
-				sl_real sy = scroll->y;
+				sl_scroll_pos sx = scroll->x;
+				sl_scroll_pos sy = scroll->y;
 				Keycode key = ev->getKeycode();
 				if (key == Keycode::Left) {
 					scrollTo(sx - lineX, sy);
@@ -6041,10 +6073,10 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 					scrollTo(sx, sy + lineY);
 					ev->stopPropagation();
 				} else if (key == Keycode::PageUp) {
-					scrollTo(sx, sy - getHeight());
+					scrollTo(sx, sy - (sl_scroll_pos)(getHeight()));
 					ev->stopPropagation();
 				} else if (key == Keycode::PageDown) {
-					scrollTo(sx, sy + getHeight());
+					scrollTo(sx, sy + (sl_scroll_pos)(getHeight()));
 					ev->stopPropagation();
 				}
 			}

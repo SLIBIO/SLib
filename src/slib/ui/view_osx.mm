@@ -110,35 +110,36 @@ void OSX_ViewInstance::invalidate()
 	}
 }
 
-void OSX_ViewInstance::invalidate(const Rectangle& rect)
+void OSX_ViewInstance::invalidate(const UIRect& rect)
 {
 	NSView* handle = m_handle;
 	if (handle != nil) {
 		NSRect _rect;
-		_rect.origin.x = rect.left;
-		_rect.origin.y = rect.top;
-		_rect.size.width = rect.getWidth();
-		_rect.size.height = rect.getHeight();
+		_rect.origin.x = (CGFloat)(rect.left);
+		_rect.origin.y = (CGFloat)(rect.top);
+		_rect.size.width = (CGFloat)(rect.getWidth());
+		_rect.size.height = (CGFloat)(rect.getHeight());
 		[handle setNeedsDisplayInRect: _rect];
 	}
 }
 
-Rectangle OSX_ViewInstance::getFrame()
+UIRect OSX_ViewInstance::getFrame()
 {
 	NSView* handle = m_handle;
 	if (handle != nil) {
 		NSRect frame = handle.frame;
-		Rectangle ret;
-		ret.left = frame.origin.x;
-		ret.top = frame.origin.y;
-		ret.right = ret.left + frame.size.width;
-		ret.bottom = ret.top + frame.size.height;
+		UIRect ret;
+		ret.left = (sl_ui_pos)(frame.origin.x);
+		ret.top = (sl_ui_pos)(frame.origin.y);
+		ret.right = ret.left + (sl_ui_pos)(frame.size.width);
+		ret.bottom = ret.top + (sl_ui_pos)(frame.size.height);
+		ret.fixSizeError();
 		return ret;
 	}
-	return Rectangle::zero();
+	return UIRect::zero();
 }
 
-void OSX_ViewInstance::setFrame(const Rectangle& frame)
+void OSX_ViewInstance::setFrame(const UIRect& frame)
 {
 	NSView* handle = m_handle;
 	if (handle != nil) {
@@ -182,7 +183,7 @@ void OSX_ViewInstance::setOpaque(sl_bool flag)
 	}
 }
 
-Point OSX_ViewInstance::convertCoordinateFromScreenToView(const Point& ptScreen)
+UIPointf OSX_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& ptScreen)
 {
 	NSView* handle = m_handle;
 	if (handle != nil) {
@@ -190,8 +191,8 @@ Point OSX_ViewInstance::convertCoordinateFromScreenToView(const Point& ptScreen)
 		if (window != nil) {
 			NSScreen* screen = [window screen];
 			NSRect rect;
-			rect.origin.x = ptScreen.x;
-			rect.origin.y = [screen frame].size.height - 1 - ptScreen.y;
+			rect.origin.x = (CGFloat)(ptScreen.x);
+			rect.origin.y = [screen frame].size.height - 1 - (CGFloat)(ptScreen.y);
 			rect.size.width = 0;
 			rect.size.height = 0;
 			rect = [window convertRectFromScreen:rect];
@@ -199,16 +200,16 @@ Point OSX_ViewInstance::convertCoordinateFromScreenToView(const Point& ptScreen)
 			pw.x = rect.origin.x;
 			pw.y = rect.origin.y;
 			NSPoint pt = [handle convertPoint:pw fromView:nil];
-			Point ret;
-			ret.x = (sl_real)(pt.x);
-			ret.y = (sl_real)(pt.y);
+			UIPointf ret;
+			ret.x = (sl_ui_posf)(pt.x);
+			ret.y = (sl_ui_posf)(pt.y);
 			return ret;
 		}
 	}
 	return ptScreen;
 }
 
-Point OSX_ViewInstance::convertCoordinateFromViewToScreen(const Point& ptView)
+UIPointf OSX_ViewInstance::convertCoordinateFromViewToScreen(const UIPointf& ptView)
 {
 	NSView* handle = m_handle;
 	if (handle != nil) {
@@ -216,8 +217,8 @@ Point OSX_ViewInstance::convertCoordinateFromViewToScreen(const Point& ptView)
 		if (window != nil) {
 			NSScreen* screen = [window screen];
 			NSPoint pt;
-			pt.x = ptView.x;
-			pt.y = ptView.y;
+			pt.x = (CGFloat)(ptView.x);
+			pt.y = (CGFloat)(ptView.y);
 			NSPoint pw = [handle convertPoint:pt toView:nil];
 			NSRect rect;
 			rect.origin.x = pw.x;
@@ -225,9 +226,9 @@ Point OSX_ViewInstance::convertCoordinateFromViewToScreen(const Point& ptView)
 			rect.size.width = 0;
 			rect.size.height = 0;
 			rect = [window convertRectToScreen:rect];
-			Point ret;
-			ret.x = (sl_real)(rect.origin.x);
-			ret.y = (sl_real)([screen frame].size.height - 1 - rect.origin.y);
+			UIPointf ret;
+			ret.x = (sl_ui_posf)(rect.origin.x);
+			ret.y = (sl_ui_posf)([screen frame].size.height - 1 - rect.origin.y);
 			return ret;
 		}
 	}
@@ -266,11 +267,14 @@ void OSX_ViewInstance::onDraw(NSRect _rectDirty)
 	if (handle != nil) {
 		
 		NSRect rectBound = [handle bounds];
+		
+		/*
 		Rectangle rectDirty;
 		rectDirty.left = (sl_real)(_rectDirty.origin.x);
 		rectDirty.top =  (sl_real)(_rectDirty.origin.y);
 		rectDirty.right = (sl_real)(rectDirty.left + _rectDirty.size.width);
 		rectDirty.bottom = (sl_real)(rectDirty.top + _rectDirty.size.height);
+		*/
 		
 		NSGraphicsContext* _graphics = [NSGraphicsContext currentContext];
 		
@@ -311,8 +315,8 @@ sl_bool OSX_ViewInstance::onEventMouse(UIAction action, NSEvent* event)
 		if (window != nil) {
 			NSPoint pw = [event locationInWindow];
 			NSPoint pt = [handle convertPoint:pw fromView:nil];
-			sl_real x = (sl_real)(pt.x);
-			sl_real y = (sl_real)(pt.y);
+			sl_ui_posf x = (sl_ui_posf)(pt.x);
+			sl_ui_posf y = (sl_ui_posf)(pt.y);
 			Ref<UIEvent> ev = UIEvent::createMouseEvent(action, x, y);
 			if (ev.isNotNull()) {
 				applyModifiers(ev.ptr, event);
@@ -335,8 +339,8 @@ sl_bool OSX_ViewInstance::onEventMouseWheel(NSEvent* event)
 		}
 		NSPoint pw = [event locationInWindow];
 		NSPoint pt = [handle convertPoint:pw fromView:nil];
-		sl_real x = (sl_real)(pt.x);
-		sl_real y = (sl_real)(pt.y);
+		sl_ui_posf x = (sl_ui_posf)(pt.x);
+		sl_ui_posf y = (sl_ui_posf)(pt.y);
 		Ref<UIEvent> ev = UIEvent::createMouseWheelEvent(x, y, deltaX, deltaY);
 		if (ev.isNotNull()) {
 			applyModifiers(ev.ptr, event);
@@ -353,8 +357,8 @@ sl_bool OSX_ViewInstance::onEventUpdateCursor(NSEvent* event)
 	if (handle != nil) {
 		NSPoint pw = [event locationInWindow];
 		NSPoint pt = [handle convertPoint:pw fromView:nil];
-		sl_real x = (sl_real)(pt.x);
-		sl_real y = (sl_real)(pt.y);
+		sl_ui_posf x = (sl_ui_posf)(pt.x);
+		sl_ui_posf y = (sl_ui_posf)(pt.y);
 		Ref<UIEvent> ev = UIEvent::createSetCursorEvent(x, y);
 		if (ev.isNotNull()) {
 			onSetCursor(ev.ptr);
@@ -437,11 +441,11 @@ SLIB_UI_NAMESPACE_END
 		[self removeTrackingArea:m_trackingArea];
 	}
 	NSRect rc;
-	m_trackingArea = [[NSTrackingArea alloc] initWithRect:rc options: (NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved | NSTrackingCursorUpdate| NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect) owner:self userInfo:nil];
+	m_trackingArea = [[NSTrackingArea alloc] initWithRect:rc options: (NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved | NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect) owner:self userInfo:nil];
 	if (m_trackingArea != nil) {
 		[self addTrackingArea:m_trackingArea];
 	}
-	[super updateTrackingAreas];
+	//[super updateTrackingAreas];
 }
 
 - (BOOL)acceptsFirstResponder
@@ -603,6 +607,7 @@ SLIB_UI_NAMESPACE_END
 
 - (void)mouseMoved:(NSEvent *)theEvent
 {
+	[[self window] invalidateCursorRectsForView:self];
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		sl_bool flagNoDefault = instance->onEventMouse(slib::UIAction::MouseMove, theEvent);
@@ -660,12 +665,12 @@ SLIB_UI_NAMESPACE_END
 	}
 	[super cursorUpdate: theEvent];
 }
-@end
 
+@end
 
 /******************************************
 				UIPlatform
- ******************************************/
+******************************************/
 SLIB_UI_NAMESPACE_BEGIN
 Ref<ViewInstance> UIPlatform::createViewInstance(NSView* handle, sl_bool flagFreeOnRelease)
 {

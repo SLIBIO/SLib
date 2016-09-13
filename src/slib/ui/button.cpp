@@ -174,12 +174,12 @@ void Button::setCurrentCategory(sl_uint32 n, sl_bool flagRedraw)
 	}
 }
 
-const Size& Button::getIconSize()
+const UISize& Button::getIconSize()
 {
 	return m_iconSize;
 }
 
-void Button::setIconSize(const Size& size, sl_bool flagRedraw)
+void Button::setIconSize(const UISize& size, sl_bool flagRedraw)
 {
 	m_iconSize = size;
 	if (flagRedraw) {
@@ -187,34 +187,34 @@ void Button::setIconSize(const Size& size, sl_bool flagRedraw)
 	}
 }
 
-void Button::setIconSize(sl_real width, sl_real height, sl_bool flagRedraw)
+void Button::setIconSize(sl_ui_len width, sl_ui_len height, sl_bool flagRedraw)
 {
-	setIconSize(Size(width, height), flagRedraw);
+	setIconSize(UISize(width, height), flagRedraw);
 }
 
-void Button::setIconSize(sl_real size, sl_bool flagRedraw)
+void Button::setIconSize(sl_ui_len size, sl_bool flagRedraw)
 {
-	setIconSize(Size(size, size),flagRedraw);
+	setIconSize(UISize(size, size),flagRedraw);
 }
 
-sl_real Button::getIconWidth()
+sl_ui_len Button::getIconWidth()
 {
 	return m_iconSize.x;
 }
 
-void Button::setIconWidth(sl_real width, sl_bool flagRedraw)
+void Button::setIconWidth(sl_ui_len width, sl_bool flagRedraw)
 {
-	setIconSize(Size(width, m_iconSize.y), flagRedraw);
+	setIconSize(UISize(width, m_iconSize.y), flagRedraw);
 }
 
-sl_real Button::getIconHeight()
+sl_ui_len Button::getIconHeight()
 {
 	return m_iconSize.y;
 }
 
-void Button::setIconHeight(sl_real height, sl_bool flagRedraw)
+void Button::setIconHeight(sl_ui_len height, sl_bool flagRedraw)
 {
-	setIconSize(Size(m_iconSize.x, height), flagRedraw);
+	setIconSize(UISize(m_iconSize.x, height), flagRedraw);
 }
 
 Alignment Button::getGravity()
@@ -282,7 +282,7 @@ void Button::setLayoutOrientation(LayoutOrientation orientation, sl_bool flagRed
 	}
 }
 
-void Button::setIconMargin(sl_real left, sl_real top, sl_real right, sl_real bottom, sl_bool flagRedraw)
+void Button::setIconMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw)
 {
 	m_iconMarginLeft = left;
 	m_iconMarginTop = top;
@@ -293,52 +293,52 @@ void Button::setIconMargin(sl_real left, sl_real top, sl_real right, sl_real bot
 	}
 }
 
-void Button::setIconMargin(sl_real margin, sl_bool flagRedraw)
+void Button::setIconMargin(sl_ui_pos margin, sl_bool flagRedraw)
 {
 	setIconMargin(margin, margin, margin, margin, flagRedraw);
 }
 
-sl_real Button::getIconMarginLeft()
+sl_ui_pos Button::getIconMarginLeft()
 {
 	return m_iconMarginLeft;
 }
 
-void Button::setIconMarginLeft(sl_real margin, sl_bool flagRedraw)
+void Button::setIconMarginLeft(sl_ui_pos margin, sl_bool flagRedraw)
 {
 	setIconMargin(margin, m_iconMarginTop, m_iconMarginRight, m_iconMarginBottom, flagRedraw);
 }
 
-sl_real Button::getIconMarginTop()
+sl_ui_pos Button::getIconMarginTop()
 {
 	return m_iconMarginTop;
 }
 
-void Button::setIconMarginTop(sl_real margin, sl_bool flagRedraw)
+void Button::setIconMarginTop(sl_ui_pos margin, sl_bool flagRedraw)
 {
 	setIconMargin(m_iconMarginLeft, margin, m_iconMarginRight, m_iconMarginBottom, flagRedraw);
 }
 
-sl_real Button::getIconMarginRight()
+sl_ui_pos Button::getIconMarginRight()
 {
 	return m_iconMarginRight;
 }
 
-void Button::setIconMarginRight(sl_real margin, sl_bool flagRedraw)
+void Button::setIconMarginRight(sl_ui_pos margin, sl_bool flagRedraw)
 {
 	setIconMargin(m_iconMarginLeft, m_iconMarginTop, margin, m_iconMarginBottom, flagRedraw);
 }
 
-sl_real Button::getIconMarginBottom()
+sl_ui_pos Button::getIconMarginBottom()
 {
 	return m_iconMarginBottom;
 }
 
-void Button::setIconMarginBottom(sl_real margin, sl_bool flagRedraw)
+void Button::setIconMarginBottom(sl_ui_pos margin, sl_bool flagRedraw)
 {
 	setIconMargin(m_iconMarginLeft, m_iconMarginTop, m_iconMarginRight, margin, flagRedraw);
 }
 
-void Button::setTextMargin(sl_real left, sl_real top, sl_real right, sl_real bottom, sl_bool flagRedraw)
+void Button::setTextMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw)
 {
 	m_textMarginLeft = left;
 	m_textMarginTop = top;
@@ -349,47 +349,47 @@ void Button::setTextMargin(sl_real left, sl_real top, sl_real right, sl_real bot
 	}
 }
 
-void Button::setTextMargin(sl_real margin, sl_bool flagRedraw)
+void Button::setTextMargin(sl_ui_pos margin, sl_bool flagRedraw)
 {
 	setTextMargin(margin, margin, margin, margin, flagRedraw);
 }
 
-sl_real Button::getTextMarginLeft()
+sl_ui_pos Button::getTextMarginLeft()
 {
 	return m_textMarginLeft;
 }
 
-void Button::setTextMarginLeft(sl_real margin, sl_bool flagRedraw)
+void Button::setTextMarginLeft(sl_ui_pos margin, sl_bool flagRedraw)
 {
 	setTextMargin(margin, m_textMarginTop, m_textMarginRight, m_textMarginBottom, flagRedraw);
 }
 
-sl_real Button::getTextMarginTop()
+sl_ui_pos Button::getTextMarginTop()
 {
 	return m_textMarginTop;
 }
 
-void Button::setTextMarginTop(sl_real margin, sl_bool flagRedraw)
+void Button::setTextMarginTop(sl_ui_pos margin, sl_bool flagRedraw)
 {
 	setTextMargin(m_textMarginLeft, margin, m_textMarginRight, m_textMarginBottom, flagRedraw);
 }
 
-sl_real Button::getTextMarginRight()
+sl_ui_pos Button::getTextMarginRight()
 {
 	return m_textMarginRight;
 }
 
-void Button::setTextMarginRight(sl_real margin, sl_bool flagRedraw)
+void Button::setTextMarginRight(sl_ui_pos margin, sl_bool flagRedraw)
 {
 	setTextMargin(m_textMarginLeft, m_textMarginTop, margin, m_textMarginBottom, flagRedraw);
 }
 
-sl_real Button::getTextMarginBottom()
+sl_ui_pos Button::getTextMarginBottom()
 {
 	return m_textMarginBottom;
 }
 
-void Button::setTextMarginBottom(sl_real margin, sl_bool flagRedraw)
+void Button::setTextMarginBottom(sl_ui_pos margin, sl_bool flagRedraw)
 {
 	setTextMargin(m_textMarginLeft, m_textMarginTop, m_textMarginRight, margin, flagRedraw);
 }
@@ -679,51 +679,63 @@ void Button::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 		return;
 	}
 	
-	Size size = measureContentSize(gc.ptr);
+	UISize size = measureContentSize(gc.ptr);
 	
 	if (flagHorizontal) {
 		if (size.x < 0) {
 			size.x = 0;
 		}
-		setMeasuredWidth(size.x + getPaddingLeft() + getPaddingRight());
+		sl_ui_pos width = size.x + getPaddingLeft() + getPaddingRight();
+		if (width < 0) {
+			width = 0;
+		}
+		setMeasuredWidth(width);
 	}
 	if (flagVertical) {
 		if (size.y < 0) {
 			size.y = 0;
 		}
-		setMeasuredHeight(size.y + getPaddingTop() + getPaddingBottom());
+		sl_ui_pos height = size.y + getPaddingTop() + getPaddingBottom();
+		if (height < 0) {
+			height = 0;
+		}
+		setMeasuredHeight(height);
 	}
 	
 }
 
-void Button::_invalidateButtonState()
+UISize Button::measureContentSize(GraphicsContext* gc)
 {
-	if (isEnabled()) {
-		if (isDownState()) {
-			m_state = ButtonState::Down;
-		} else if (isHoverState()) {
-			m_state = ButtonState::Hover;
-		} else {
-			m_state = ButtonState::Normal;
-		}
-	} else {
-		m_state = ButtonState::Disabled;
-	}
+	UISize size;
+	UIRect rcIcon, rcText;
+	layoutIconAndText(gc, 0, 0, size, rcIcon, rcText);
+	return size;
 }
 
-void Button::layoutIconAndText(GraphicsContext* gc, sl_real widthFrame, sl_real heightFrame, Size& sizeContent, Rectangle& frameIcon, Rectangle& frameText)
+void Button::layoutIconAndText(GraphicsContext* gc, sl_ui_len widthFrame, sl_ui_len heightFrame, UISize& sizeContent, UIRect& frameIcon, UIRect& frameText)
 {
-	sl_real widthIcon = m_iconSize.x + m_iconMarginLeft + m_iconMarginRight;
-	sl_real heightIcon = m_iconSize.y + m_iconMarginTop + m_iconMarginBottom;
+	sl_ui_pos widthIcon = m_iconSize.x + m_iconMarginLeft + m_iconMarginRight;
+	if (widthIcon < 0) {
+		widthIcon = 0;
+	}
+	sl_ui_pos heightIcon = m_iconSize.y + m_iconMarginTop + m_iconMarginBottom;
+	if (heightIcon < 0) {
+		heightIcon = 0;
+	}
 	
 	Ref<Font> font = getFont();
-	Size sizeText = gc->getFontTextSize(font, m_text);
+	UISize sizeText = gc->getFontTextSize(font, m_text);
 	if (font.isNotNull()) {
-		sizeText.y = font->getSize();
+		sizeText.y = (sl_ui_pos)(font->getSize());
 	}
-	
-	sl_real widthText = sizeText.x + m_textMarginLeft + m_textMarginRight;
-	sl_real heightText = sizeText.y + m_textMarginTop + m_textMarginBottom;
+	sl_ui_pos widthText = sizeText.x + m_textMarginLeft + m_textMarginRight;
+	if (widthText < 0) {
+		widthText = 0;
+	}
+	sl_ui_pos heightText = sizeText.y + m_textMarginTop + m_textMarginBottom;
+	if (heightText < 0) {
+		heightText = 0;
+	}
 	
 	Alignment alignIcon = m_iconAlignment;
 	Alignment horzIcon = alignIcon & Alignment::HorizontalMask;
@@ -733,33 +745,33 @@ void Button::layoutIconAndText(GraphicsContext* gc, sl_real widthFrame, sl_real 
 	Alignment horzText = alignText & Alignment::HorizontalMask;
 	Alignment vertText = alignText & Alignment::VerticalMask;
 	
-	sl_real xIcon = 0;
-	sl_real yIcon = 0;
+	sl_ui_pos xIcon = 0;
+	sl_ui_pos yIcon = 0;
 	
-	sl_real xText = 0;
-	sl_real yText = 0;
+	sl_ui_pos xText = 0;
+	sl_ui_pos yText = 0;
 	
-	sl_real widthContent = 0;
-	sl_real heightContent = 0;
+	sl_ui_pos widthContent = 0;
+	sl_ui_pos heightContent = 0;
 	
 	if (m_layoutOrientation == LayoutOrientation::Horizontal) {
 		
 		if (horzIcon != horzText) {
 			widthContent = widthFrame;
-			if (widthContent >= 0) {
+			if (widthContent > 0) {
 				if (m_flagTextBeforeIcon) {
-					xText = GraphicsUtil::calculateAlignX(0, widthContent, widthText, alignText);
+					xText = (sl_ui_pos)(GraphicsUtil::calculateAlignX(0, (sl_real)widthContent, (sl_real)widthText, alignText));
 					if (horzText == Alignment::Right) {
-						xIcon = GraphicsUtil::calculateAlignX(0, xText, widthIcon, alignIcon);
+						xIcon = (sl_ui_pos)(GraphicsUtil::calculateAlignX(0, (sl_real)xText, (sl_real)widthIcon, alignIcon));
 					} else {
-						xIcon = GraphicsUtil::calculateAlignX(xText + widthText, widthContent, widthIcon, alignIcon);
+						xIcon = (sl_ui_pos)(GraphicsUtil::calculateAlignX((sl_real)(xText + widthText), (sl_real)widthContent, (sl_real)widthIcon, alignIcon));
 					}
 				} else {
-					xIcon = GraphicsUtil::calculateAlignX(0, widthContent, widthIcon, alignIcon);
+					xIcon = (sl_ui_pos)(GraphicsUtil::calculateAlignX(0, (sl_real)widthContent, (sl_real)widthIcon, alignIcon));
 					if (horzIcon == Alignment::Right) {
-						xText = GraphicsUtil::calculateAlignX(0, xIcon, widthText, alignText);
+						xText = (sl_ui_pos)(GraphicsUtil::calculateAlignX(0, (sl_real)xIcon, (sl_real)widthText, alignText));
 					} else {
-						xText = GraphicsUtil::calculateAlignX(xIcon + widthIcon, widthContent, widthText, alignText);
+						xText = (sl_ui_pos)(GraphicsUtil::calculateAlignX((sl_real)(xIcon + widthIcon), (sl_real)widthContent, (sl_real)widthText, alignText));
 					}
 				}
 			}
@@ -780,8 +792,8 @@ void Button::layoutIconAndText(GraphicsContext* gc, sl_real widthFrame, sl_real 
 			heightContent = SLIB_MAX(heightIcon, heightText);
 		}
 		if (heightContent >= 0) {
-			yIcon = GraphicsUtil::calculateAlignY(0, heightContent, heightIcon, alignIcon);
-			yText = GraphicsUtil::calculateAlignY(0, heightContent, heightText, alignText);
+			yIcon = (sl_ui_pos)(GraphicsUtil::calculateAlignY(0, (sl_real)heightContent, (sl_real)heightIcon, alignIcon));
+			yText = (sl_ui_pos)(GraphicsUtil::calculateAlignY(0, (sl_real)heightContent, (sl_real)heightText, alignText));
 		}
 		
 	} else {
@@ -791,26 +803,26 @@ void Button::layoutIconAndText(GraphicsContext* gc, sl_real widthFrame, sl_real 
 			widthContent = SLIB_MAX(widthIcon, widthText);
 		}
 		if (widthContent >= 0) {
-			xIcon = GraphicsUtil::calculateAlignX(0, widthContent, widthIcon, alignIcon);
-			xText = GraphicsUtil::calculateAlignX(0, widthContent, widthText, alignText);
+			xIcon = (sl_ui_pos)(GraphicsUtil::calculateAlignX(0, (sl_real)widthContent, (sl_real)widthIcon, alignIcon));
+			xText = (sl_ui_pos)(GraphicsUtil::calculateAlignX(0, (sl_real)widthContent, (sl_real)widthText, alignText));
 		}
 		
 		if (vertIcon != vertText) {
 			heightContent = heightFrame;
-			if (heightContent >= 0) {
+			if (heightContent > 0) {
 				if (m_flagTextBeforeIcon) {
-					yText = GraphicsUtil::calculateAlignY(0, heightContent, heightText, alignText);
+					yText = (sl_ui_pos)(GraphicsUtil::calculateAlignY(0, (sl_real)heightContent, (sl_real)heightText, alignText));
 					if (vertText == Alignment::Bottom) {
-						yIcon = GraphicsUtil::calculateAlignY(0, yText, heightIcon, alignIcon);
+						yIcon = (sl_ui_pos)(GraphicsUtil::calculateAlignY(0, (sl_real)yText, (sl_real)heightIcon, alignIcon));
 					} else {
-						yIcon = GraphicsUtil::calculateAlignY(yText + heightText, heightContent, heightIcon, alignIcon);
+						yIcon = (sl_ui_pos)(GraphicsUtil::calculateAlignY((sl_real)(yText + heightText), (sl_real)heightContent, (sl_real)heightIcon, alignIcon));
 					}
 				} else {
-					yIcon = GraphicsUtil::calculateAlignY(0, heightContent, heightIcon, alignIcon);
+					yIcon = (sl_ui_pos)(GraphicsUtil::calculateAlignY(0, (sl_real)heightContent, (sl_real)heightIcon, alignIcon));
 					if (vertIcon == Alignment::Bottom) {
-						yText = GraphicsUtil::calculateAlignY(0, yIcon, heightText, alignText);
+						yText = (sl_ui_pos)(GraphicsUtil::calculateAlignY(0, (sl_real)yIcon, (sl_real)heightText, alignText));
 					} else {
-						yText = GraphicsUtil::calculateAlignY(yIcon + heightIcon, heightContent, heightText, alignText);
+						yText = (sl_ui_pos)(GraphicsUtil::calculateAlignY((sl_real)(yIcon + heightIcon), (sl_real)heightContent, (sl_real)heightText, alignText));
 					}
 				}
 			}
@@ -827,28 +839,27 @@ void Button::layoutIconAndText(GraphicsContext* gc, sl_real widthFrame, sl_real 
 		
 	}
 	
+	if (widthContent < 0) {
+		widthContent = 0;
+	}
+	if (heightContent < 0) {
+		heightContent = 0;
+	}
 	sizeContent.x = widthContent;
 	sizeContent.y = heightContent;
 	
-	if (widthContent >= 0 && heightContent >= 0) {
-		frameIcon.left = xIcon + m_iconMarginLeft;
-		frameIcon.top = yIcon + m_iconMarginTop;
-		frameIcon.right = xIcon + widthIcon - m_iconMarginRight;
-		frameIcon.bottom = yIcon + heightIcon - m_iconMarginBottom;
-		
-		frameText.left = xText + m_textMarginLeft;
-		frameText.top = yText + m_textMarginTop;
-		frameText.right = xText + widthText - m_textMarginRight;
-		frameText.bottom = yText + heightText - m_textMarginBottom;
-	}
-}
-
-Size Button::measureContentSize(GraphicsContext* gc)
-{
-	Size size;
-	Rectangle rcIcon, rcText;
-	layoutIconAndText(gc, -1, -1, size, rcIcon, rcText);
-	return size;
+	frameIcon.left = xIcon + m_iconMarginLeft;
+	frameIcon.top = yIcon + m_iconMarginTop;
+	frameIcon.right = xIcon + widthIcon - m_iconMarginRight;
+	frameIcon.bottom = yIcon + heightIcon - m_iconMarginBottom;
+	frameIcon.fixSizeError();
+	
+	frameText.left = xText + m_textMarginLeft;
+	frameText.top = yText + m_textMarginTop;
+	frameText.right = xText + widthText - m_textMarginRight;
+	frameText.bottom = yText + heightText - m_textMarginBottom;
+	frameText.fixSizeError();
+	
 }
 
 void Button::drawContent(Canvas* canvas, const Ref<Drawable>& icon, const String& text, const Color& textColor)
@@ -860,27 +871,45 @@ void Button::drawContent(Canvas* canvas, const Ref<Drawable>& icon, const String
 	if (gc.isNull()) {
 		return;
 	}
-	Rectangle bound = getBoundsInnerPadding();
-	if (bound.getWidth() <= 0 || bound.getHeight() <= 0) {
+	UIRect bound = getBoundsInnerPadding();
+	sl_ui_pos widthFrame = bound.getWidth();
+	sl_ui_pos heightFrame = bound.getHeight();
+	if (widthFrame <= 0 || heightFrame <= 0) {
 		return;
 	}
-	Size sizeContent;
-	Rectangle rcIcon, rcText;
-	layoutIconAndText(gc.ptr, bound.getWidth(), bound.getHeight(), sizeContent, rcIcon, rcText);
-	Point pt = GraphicsUtil::calculateAlignPosition(bound, sizeContent.x, sizeContent.y, m_gravity);
-	if (icon.isNotNull()) {
+	
+	UISize sizeContent;
+	UIRect rcIcon, rcText;
+	layoutIconAndText(gc.ptr, widthFrame, heightFrame, sizeContent, rcIcon, rcText);
+	UIPoint pt = GraphicsUtil::calculateAlignPosition(bound, (sl_real)(sizeContent.x), (sl_real)(sizeContent.y), m_gravity);
+	if (icon.isNotNull() && rcIcon.getWidth() > 0 && rcIcon.getHeight() > 0) {
 		rcIcon.left += pt.x;
 		rcIcon.top += pt.y;
 		rcIcon.right += pt.x;
 		rcIcon.bottom += pt.y;
 		canvas->draw(rcIcon, icon);
 	}
-	if (text.isNotEmpty()) {
+	if (text.isNotEmpty() && rcText.getWidth() > 0 && rcText.getHeight() > 0) {
 		rcText.left += pt.x;
 		rcText.top += pt.y;
 		rcText.right += pt.x;
 		rcText.bottom += pt.y;
-		canvas->drawText(text, rcText.left, rcText.top, getFont(), textColor);
+		canvas->drawText(text, (sl_real)(rcText.left), (sl_real)(rcText.top), getFont(), textColor);
+	}
+}
+
+void Button::_invalidateButtonState()
+{
+	if (isEnabled()) {
+		if (isDownState()) {
+			m_state = ButtonState::Down;
+		} else if (isHoverState()) {
+			m_state = ButtonState::Hover;
+		} else {
+			m_state = ButtonState::Normal;
+		}
+	} else {
+		m_state = ButtonState::Disabled;
 	}
 }
 

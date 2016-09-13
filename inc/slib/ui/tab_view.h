@@ -48,25 +48,37 @@ public:
 	
 	virtual void selectTab(sl_uint32 index, sl_bool flagRedraw = sl_true);
 	
-	Size getContentViewSize();
+	UISize getContentViewSize();
 	
-	sl_bool isVerticalTabBar();
+	LayoutOrientation getOrientation();
 	
-	void setVerticalTabBar(sl_bool flag, sl_bool flagRedraw = sl_true);
+	void setOrientation(LayoutOrientation orientation, sl_bool flagRedraw = sl_true);
 	
-	sl_real getTabWidth();
+	sl_ui_len getTabWidth();
 	
-	virtual void setTabWidth(sl_real width, sl_bool flagRedraw = sl_true);
+	virtual void setTabWidth(sl_ui_len width, sl_bool flagRedraw = sl_true);
 	
-	sl_real getTabHeight();
+	sl_ui_len getTabHeight();
 	
-	virtual void setTabHeight(sl_real height, sl_bool flagRedraw = sl_true);
+	virtual void setTabHeight(sl_ui_len height, sl_bool flagRedraw = sl_true);
 	
-	Ref<Drawable> getTabBarBackground();
+	Ref<Drawable> getBarBackground();
 	
-	void setTabBarBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	void setBarBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
 	
-	void setTabBarBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setBarBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
+	
+	Ref<Drawable> getContentBackground();
+	
+	void setContentBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	
+	void setContentBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
+	
+	Ref<Drawable> getTabBackground();
+	
+	void setTabBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	
+	void setTabBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
 	
 	Ref<Drawable> getSelectedTabBackground();
 	
@@ -80,23 +92,49 @@ public:
 	
 	void setHoverTabBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
 	
-	Color getTabLabelColor();
+	Color getLabelColor();
 	
-	void setTabLabelColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setLabelColor(const Color& color, sl_bool flagRedraw = sl_true);
 	
-	Color getSelectedTabLabelColor();
+	Color getSelectedLabelColor();
 	
-	void setSelectedTabLabelColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setSelectedLabelColor(const Color& color, sl_bool flagRedraw = sl_true);
 	
-	Color getHoverTabLabelColor();
+	Color getHoverLabelColor();
 	
-	void setHoverTabLabelColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setHoverLabelColor(const Color& color, sl_bool flagRedraw = sl_true);
 	
-	virtual Rectangle getTabBarRegion();
+	Alignment getLabelAlignment();
 	
-	virtual Rectangle getTabRegion(sl_uint32 index);
+	virtual void setLabelAlignment(Alignment align, sl_bool flagRedraw = sl_true);
 	
-	virtual Rectangle getTabContentRegion();
+	virtual void setLabelMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw = sl_true);
+	
+	void setLabelMargin(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	
+	sl_ui_pos getLabelMarginLeft();
+	
+	void setLabelMarginLeft(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	
+	sl_ui_pos getLabelMarginTop();
+	
+	void setLabelMarginTop(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	
+	sl_ui_pos getLabelMarginRight();
+	
+	void setLabelMarginRight(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	
+	sl_ui_pos getLabelMarginBottom();
+	
+	void setLabelMarginBottom(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+
+	virtual UIRect getTabBarRegion();
+	
+	virtual UIRect getTabRegion(sl_uint32 index);
+	
+	virtual UIRect getWholeContentRegion();
+
+	virtual UIRect getTabContentRegion();
 	
 public:
 	SLIB_PTR_PROPERTY(ITabViewListener, Listener)
@@ -111,7 +149,7 @@ protected:
 	virtual void onSelectTab(sl_uint32 index);
 	
 	// override
-	void onClickView(UIEvent* ev);
+	void onClick(UIEvent* ev);
 	
 	// override
 	void onMouseEvent(UIEvent* ev);
@@ -120,11 +158,9 @@ protected:
 	void onDraw(Canvas* canvas);
 	
 	// override
-	void onResize(sl_real width, sl_real height);
+	void onResize(sl_ui_len width, sl_ui_len height);
 	
-	virtual void onDrawTabBarBackground(Canvas* canvas);
-	
-	virtual void onDrawTab(Canvas* canvas, const Rectangle& rect, sl_uint32 index, const String& label);
+	virtual void onDrawTab(Canvas* canvas, const UIRect& rect, sl_uint32 index, const String& label);
 	
 protected:
 	void _invalidateTabBar();
@@ -144,7 +180,7 @@ private:
 	
 	void _getSelectedTabIndex_NW();
 	
-	Size _getContentViewSize_NW();
+	UISize _getContentViewSize_NW();
 	
 	void _selectTab_NW(sl_uint32 index);
 	
@@ -156,16 +192,23 @@ protected:
 	sl_uint32 m_indexSelected;
 	sl_int32 m_indexHover;
 	
-	sl_bool m_flagVertical;
-	sl_real m_tabWidth;
-	sl_real m_tabHeight;
+	LayoutOrientation m_orientation;
+	sl_ui_len m_tabWidth;
+	sl_ui_len m_tabHeight;
 	
-	SafeRef<Drawable> m_tabBarBackground;
+	SafeRef<Drawable> m_barBackground;
+	SafeRef<Drawable> m_contentBackground;
+	SafeRef<Drawable> m_tabBackground;
 	SafeRef<Drawable> m_selectedTabBackground;
 	SafeRef<Drawable> m_hoverTabBackground;
-	Color m_tabLabelColor;
-	Color m_selectedTabLabelColor;
-	Color m_hoverTabLabelColor;
+	Color m_labelColor;
+	Color m_selectedLabelColor;
+	Color m_hoverLabelColor;
+	Alignment m_labelAlignment;
+	sl_ui_pos m_labelMarginLeft;
+	sl_ui_pos m_labelMarginTop;
+	sl_ui_pos m_labelMarginRight;
+	sl_ui_pos m_labelMarginBottom;
 	
 };
 

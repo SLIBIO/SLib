@@ -10,11 +10,11 @@ void IListReportViewListener::onClickRow(ListReportView* view, sl_uint32 row, co
 {
 }
 
-void IListReportViewListener::onRightButtonClickRow(ListReportView* view, sl_uint32 row, const Point& pt)
+void IListReportViewListener::onRightButtonClickRow(ListReportView* view, sl_uint32 row, const UIPoint& pt)
 {
 }
 
-void IListReportViewListener::onDoubleClickRow(ListReportView* view, sl_uint32 row, const Point& pt)
+void IListReportViewListener::onDoubleClickRow(ListReportView* view, sl_uint32 row, const UIPoint& pt)
 {
 }
 
@@ -149,7 +149,7 @@ void ListReportView::setHeaderText(sl_uint32 iCol, const String& text, sl_bool f
 	}
 }
 
-sl_real ListReportView::getColumnWidth(sl_uint32 iCol)
+sl_ui_len ListReportView::getColumnWidth(sl_uint32 iCol)
 {
 	MutexLocker lock(m_columns.getLocker());
 	if (iCol < m_columns.getCount()) {
@@ -159,7 +159,7 @@ sl_real ListReportView::getColumnWidth(sl_uint32 iCol)
 	return 0;
 }
 
-void ListReportView::setColumnWidth(sl_uint32 iCol, sl_real width, sl_bool flagRedraw)
+void ListReportView::setColumnWidth(sl_uint32 iCol, sl_ui_len width, sl_bool flagRedraw)
 {
 	MutexLocker lock(m_columns.getLocker());
 	if (iCol < m_columns.getCount()) {
@@ -270,15 +270,15 @@ void ListReportView::onSelectRow(sl_uint32 row)
 {
 }
 
-void ListReportView::onClickRow(sl_uint32 row, const Point& pt)
+void ListReportView::onClickRow(sl_uint32 row, const UIPoint& pt)
 {
 }
 
-void ListReportView::onRightButtonClickRow(sl_uint32 row, const Point& pt)
+void ListReportView::onRightButtonClickRow(sl_uint32 row, const UIPoint& pt)
 {
 }
 
-void ListReportView::onDoubleClickRow(sl_uint32 row, const Point& pt)
+void ListReportView::onDoubleClickRow(sl_uint32 row, const UIPoint& pt)
 {
 }
 
@@ -291,7 +291,7 @@ void ListReportView::dispatchSelectRow(sl_uint32 row)
 	}
 }
 
-void ListReportView::dispatchClickRow(sl_uint32 row, const Point& pt)
+void ListReportView::dispatchClickRow(sl_uint32 row, const UIPoint& pt)
 {
 	Ref<UIEvent> ev = UIEvent::createMouseEvent(UIAction::Unknown, pt.x, pt.y);
 	if (ev.isNotNull()) {
@@ -304,7 +304,7 @@ void ListReportView::dispatchClickRow(sl_uint32 row, const Point& pt)
 	}
 }
 
-void ListReportView::dispatchRightButtonClickRow(sl_uint32 row, const Point& pt)
+void ListReportView::dispatchRightButtonClickRow(sl_uint32 row, const UIPoint& pt)
 {
 	PtrLocker<IListReportViewListener> listener(getListener());
 	if (listener.isNotNull()) {
@@ -312,7 +312,7 @@ void ListReportView::dispatchRightButtonClickRow(sl_uint32 row, const Point& pt)
 	}
 }
 
-void ListReportView::dispatchDoubleClickRow(sl_uint32 row, const Point& pt)
+void ListReportView::dispatchDoubleClickRow(sl_uint32 row, const UIPoint& pt)
 {
 	Ref<UIEvent> ev = UIEvent::createMouseEvent(UIAction::LeftButtonDoubleClick, pt.x, pt.y);
 	if (ev.isNotNull()) {
@@ -345,7 +345,7 @@ void ListReportView::_setHeaderText_NW(sl_uint32 col, const String& text)
 {
 }
 
-void ListReportView::_setColumnWidth_NW(sl_uint32 col, sl_real width)
+void ListReportView::_setColumnWidth_NW(sl_uint32 col, sl_ui_len width)
 {
 }
 

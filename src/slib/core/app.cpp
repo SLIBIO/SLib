@@ -11,6 +11,9 @@ SLIB_STATIC_ZERO_INITIALIZED(SafeWeakRef<Application>, _g_app)
 
 Ref<Application> Application::getApp()
 {
+	if (SLIB_SAFE_STATIC_CHECK_FREED(_g_app)) {
+		return Ref<Application>::null();
+	}
 	return _g_app;
 }
 

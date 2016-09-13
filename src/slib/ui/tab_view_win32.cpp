@@ -90,7 +90,7 @@ public:
 
 	void __applyTabContents(HWND hWnd, ViewInstance* viewInstance)
 	{
-		Rectangle rc = __getClientBounds(hWnd);
+		UIRect rc = __getClientBounds(hWnd);
 		sl_size sel = m_indexSelected;
 		ListLocker<TabViewItem> items(m_items);
 		for (sl_size i = 0; i < items.count; i++) {
@@ -111,7 +111,7 @@ public:
 
 	void __applyClientBounds(HWND hWnd)
 	{
-		Rectangle rc = __getClientBounds(hWnd);
+		UIRect rc = __getClientBounds(hWnd);
 		ListLocker<TabViewItem> items(m_items);
 		for (sl_size i = 0; i < items.count; i++) {
 			Ref<View> view = items[i].contentView;
@@ -121,7 +121,7 @@ public:
 		}
 	}
 
-	Rectangle __getClientBounds(HWND hWnd)
+	UIRect __getClientBounds(HWND hWnd)
 	{
 		RECT rc;
 		rc.left = -2;
@@ -129,7 +129,7 @@ public:
 		rc.right = (int)(getWidth());
 		rc.bottom = (int)(getHeight()) + 1;
 		::SendMessageW(hWnd, TCM_ADJUSTRECT, FALSE, (LPARAM)(&rc));
-		return Rectangle((sl_real)(rc.left), (sl_real)(rc.top), (sl_real)(rc.right), (sl_real)(rc.bottom));
+		return UIRect((sl_ui_pos)(rc.left), (sl_ui_pos)(rc.top), (sl_ui_pos)(rc.right), (sl_ui_pos)(rc.bottom));
 	}
 };
 
@@ -252,13 +252,13 @@ void TabView::_selectTab_NW(sl_uint32 index)
 	}
 }
 
-Size TabView::_getContentViewSize_NW()
+UISize TabView::_getContentViewSize_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		return ((_TabView*)this)->__getClientBounds(handle).getSize();
 	}
-	return Size::zero();
+	return UISize::zero();
 }
 
 void TabView::_setFont_NW(const Ref<Font>& font)

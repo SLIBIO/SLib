@@ -29,8 +29,8 @@ public:
 	sl_bool flagFullScreen;
 	sl_bool flagCenterScreen;
 	sl_bool flagDialog;
-	Point location;
-	Size size;
+	UIPoint location;
+	UISize size;
 
 	String title;
 	sl_bool flagShowTitleBar;
@@ -42,7 +42,7 @@ public:
 	WindowInstanceParam();
 	
 public:
-	Rectangle calculateRegion(const Rectangle& screenFrame) const;
+	UIRect calculateRegion(const UIRect& screenFrame) const;
 	
 };
 
@@ -86,48 +86,48 @@ public:
 	void runModal();
 	
 	
-	Rectangle getFrame();
+	UIRect getFrame();
 	
-	virtual void setFrame(const Rectangle& frame);
+	virtual void setFrame(const UIRect& frame);
 	
-	void setFrame(sl_real left, sl_real top, sl_real width, sl_real height);
+	void setFrame(sl_ui_pos left, sl_ui_pos top, sl_ui_len width, sl_ui_len height);
 	
-	Point getLocation();
+	UIPoint getLocation();
 	
-	virtual void setLocation(const Point& location);
+	virtual void setLocation(const UIPoint& location);
 	
-	void setLocation(sl_real x, sl_real y);
+	void setLocation(sl_ui_pos x, sl_ui_pos y);
 	
-	sl_real getX();
+	sl_ui_pos getLeft();
 	
-	void setX(sl_real x);
+	void setLeft(sl_ui_pos x);
 	
-	sl_real getY();
+	sl_ui_pos getTop();
 	
-	void setY(sl_real y);
+	void setTop(sl_ui_pos y);
 	
-	virtual Size getSize();
+	virtual UISize getSize();
 	
-	virtual void setSize(const Size& size);
+	virtual void setSize(const UISize& size);
 	
-	void setSize(sl_real width, sl_real height);
+	void setSize(sl_ui_len width, sl_ui_len height);
 	
-	sl_real getWidth();
+	sl_ui_len getWidth();
 	
-	void setWidth(sl_real width);
+	void setWidth(sl_ui_len width);
 	
-	sl_real getHeight();
+	sl_ui_len getHeight();
 	
-	void setHeight(sl_real height);
+	void setHeight(sl_ui_len height);
 
 	
-	Rectangle getClientFrame();
+	UIRect getClientFrame();
 	
-	Size getClientSize();
+	UISize getClientSize();
 	
-	virtual void setClientSize(const Size& size);
+	virtual void setClientSize(const UISize& size);
 
-	void setClientSize(sl_real width, sl_real height);
+	void setClientSize(sl_ui_len width, sl_ui_len height);
 
 	
 	String getTitle();
@@ -190,33 +190,33 @@ public:
 	virtual void setTransparent(sl_bool flag);
 
 	
-	virtual Point convertCoordinateFromScreenToWindow(const Point& ptScreen);
+	virtual UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen);
 	
-	Rectangle convertCoordinateFromScreenToWindow(const Rectangle& rect);
+	UIRectf convertCoordinateFromScreenToWindow(const UIRectf& rect);
 	
-	virtual Point convertCoordinateFromWindowToScreen(const Point& ptWindow);
+	virtual UIPointf convertCoordinateFromWindowToScreen(const UIPointf& ptWindow);
 
-	Rectangle convertCoordinateFromWindowToScreen(const Rectangle& rect);
+	UIRectf convertCoordinateFromWindowToScreen(const UIRectf& rect);
 	
-	virtual Point convertCoordinateFromScreenToClient(const Point& ptScreen);
+	virtual UIPointf convertCoordinateFromScreenToClient(const UIPointf& ptScreen);
 	
-	Rectangle convertCoordinateFromScreenToClient(const Rectangle& rect);
+	UIRectf convertCoordinateFromScreenToClient(const UIRectf& rect);
 	
-	virtual Point convertCoordinateFromClientToScreen(const Point& ptClient);
+	virtual UIPointf convertCoordinateFromClientToScreen(const UIPointf& ptClient);
 	
-	Rectangle convertCoordinateFromClientToScreen(const Rectangle& rect);
+	UIRectf convertCoordinateFromClientToScreen(const UIRectf& rect);
 	
-	virtual Point convertCoordinateFromWindowToClient(const Point& ptWindow);
+	virtual UIPointf convertCoordinateFromWindowToClient(const UIPointf& ptWindow);
 	
-	Rectangle convertCoordinateFromWindowToClient(const Rectangle& rect);
+	UIRectf convertCoordinateFromWindowToClient(const UIRectf& rect);
 	
-	virtual Point convertCoordinateFromClientToWindow(const Point& ptClient);
+	virtual UIPointf convertCoordinateFromClientToWindow(const UIPointf& ptClient);
 	
-	Rectangle convertCoordinateFromClientToWindow(const Rectangle& rect);
+	UIRectf convertCoordinateFromClientToWindow(const UIRectf& rect);
 	
-	virtual Size getWindowSizeFromClientSize(const Size& sizeClient);
+	virtual UISize getWindowSizeFromClientSize(const UISize& sizeClient);
 	
-	virtual Size getClientSizeFromWindowSize(const Size& sizeWindow);
+	virtual UISize getClientSizeFromWindowSize(const UISize& sizeWindow);
 
 	
 	sl_bool isModal();
@@ -288,7 +288,7 @@ protected:
 	
 	virtual void onMove();
 	
-	virtual void onResize(Size& size);
+	virtual void onResize(UISize& size);
 
 	virtual void onMinimize();
 	
@@ -311,7 +311,7 @@ public:
 	
 	virtual void dispatchMove();
 	
-	virtual void dispatchResize(Size& size);
+	virtual void dispatchResize(UISize& size);
 	
 	virtual void dispatchMinimize();
 	
@@ -337,7 +337,7 @@ private:
 	SafeRef<View> m_viewContent;
 	SafeRef<Menu> m_menu;
 	
-	Rectangle m_frame;
+	UIRect m_frame;
 	SafeString m_title;
 	Color m_backgroundColor;
 	
@@ -393,15 +393,15 @@ public:
 	virtual void runModal() = 0;
 
 	
-	virtual Rectangle getFrame() = 0;
+	virtual UIRect getFrame() = 0;
 	
-	virtual sl_bool setFrame(const Rectangle& frame) = 0;
+	virtual sl_bool setFrame(const UIRect& frame) = 0;
 	
-	virtual Rectangle getClientFrame() = 0;
+	virtual UIRect getClientFrame() = 0;
 	
-	virtual Size getClientSize() = 0;
+	virtual UISize getClientSize() = 0;
 	
-	virtual sl_bool setClientSize(const Size& size) = 0;
+	virtual sl_bool setClientSize(const UISize& size) = 0;
 	
 
 	virtual sl_bool setTitle(const String& title) = 0;
@@ -436,21 +436,21 @@ public:
 	virtual sl_bool setTransparent(sl_bool flag) = 0;
 
 	
-	virtual Point convertCoordinateFromScreenToWindow(const Point& ptScreen) = 0;
+	virtual UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen) = 0;
 	
-	virtual Point convertCoordinateFromWindowToScreen(const Point& ptWindow) = 0;
+	virtual UIPointf convertCoordinateFromWindowToScreen(const UIPointf& ptWindow) = 0;
 	
-	virtual Point convertCoordinateFromScreenToClient(const Point& ptScreen) = 0;
+	virtual UIPointf convertCoordinateFromScreenToClient(const UIPointf& ptScreen) = 0;
 	
-	virtual Point convertCoordinateFromClientToScreen(const Point& ptClient) = 0;
+	virtual UIPointf convertCoordinateFromClientToScreen(const UIPointf& ptClient) = 0;
 	
-	virtual Point convertCoordinateFromWindowToClient(const Point& ptWindow) = 0;
+	virtual UIPointf convertCoordinateFromWindowToClient(const UIPointf& ptWindow) = 0;
 	
-	virtual Point convertCoordinateFromClientToWindow(const Point& ptClient) = 0;
+	virtual UIPointf convertCoordinateFromClientToWindow(const UIPointf& ptClient) = 0;
 	
-	virtual Size getWindowSizeFromClientSize(const Size& sizeClient) = 0;
+	virtual UISize getWindowSizeFromClientSize(const UISize& sizeClient) = 0;
 	
-	virtual Size getClientSizeFromWindowSize(const Size& sizeWindow) = 0;
+	virtual UISize getClientSizeFromWindowSize(const UISize& sizeWindow) = 0;
 	
 public:
 	void onCreate();
@@ -463,9 +463,9 @@ public:
 	
 	void onMove();
 	
-	void onResize(Size& size);
+	void onResize(UISize& size);
 	
-	void onResized(sl_real width, sl_real height);
+	void onResized(sl_ui_len width, sl_ui_len height);
 	
 	void onMinimize();
 	

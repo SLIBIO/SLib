@@ -221,9 +221,14 @@ class SLIB_EXPORT NinePiecesDrawable : public Drawable
 	
 public:
 	static Ref<Drawable> create(sl_real leftWidth, sl_real rightWidth, sl_real topHeight, sl_real bottomHeight,
-										 const Ref<Drawable>& topLeft, const Ref<Drawable>& top, const Ref<Drawable>& topRight,
-										 const Ref<Drawable>& left, const Ref<Drawable>& center, const Ref<Drawable>& right,
-										 const Ref<Drawable>& bottomLeft, const Ref<Drawable>& bottom, const Ref<Drawable>& bottomRight);
+								const Ref<Drawable>& topLeft, const Ref<Drawable>& top, const Ref<Drawable>& topRight,
+								const Ref<Drawable>& left, const Ref<Drawable>& center, const Ref<Drawable>& right,
+								const Ref<Drawable>& bottomLeft, const Ref<Drawable>& bottom, const Ref<Drawable>& bottomRight);
+	
+	static Ref<Drawable> create(sl_int32 leftWidth, sl_int32 rightWidth, sl_int32 topHeight, sl_int32 bottomHeight,
+								const Ref<Drawable>& topLeft, const Ref<Drawable>& top, const Ref<Drawable>& topRight,
+								const Ref<Drawable>& left, const Ref<Drawable>& center, const Ref<Drawable>& right,
+								const Ref<Drawable>& bottomLeft, const Ref<Drawable>& bottom, const Ref<Drawable>& bottomRight);
 	
 public:
 	// override
@@ -256,6 +261,9 @@ public:
 	
 	static Ref<Drawable> create(const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc, sl_real topHeightSrc, sl_real bottomHeightSrc);
 	
+	static Ref<Drawable> create(sl_int32 leftWidthDst, sl_int32 rightWidthDst, sl_int32 topHeightDst, sl_int32 bottomHeightDst,
+								const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc, sl_real topHeightSrc, sl_real bottomHeightSrc);
+	
 public:
 	// override
 	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
@@ -268,6 +276,58 @@ protected:
 	Ref<Drawable> m_src;
 	sl_real m_widthLeftSrc;
 	sl_real m_widthRightSrc;
+	sl_real m_heightTopSrc;
+	sl_real m_heightBottomSrc;
+	
+};
+
+class SLIB_EXPORT HorizontalThreePatchDrawable : public Drawable
+{
+	SLIB_DECLARE_OBJECT
+	
+public:
+	static Ref<Drawable> create(sl_real leftWidthDst, sl_real rightWidthDst,
+								const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc);
+	
+	static Ref<Drawable> create(const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc);
+	
+	static Ref<Drawable> create(sl_int32 leftWidthDst, sl_int32 rightWidthDst,
+								const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc);
+	
+public:
+	// override
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	
+protected:
+	sl_real m_widthLeftDst;
+	sl_real m_widthRightDst;
+	Ref<Drawable> m_src;
+	sl_real m_widthLeftSrc;
+	sl_real m_widthRightSrc;
+	
+};
+
+class SLIB_EXPORT VerticalThreePatchDrawable : public Drawable
+{
+	SLIB_DECLARE_OBJECT
+	
+public:
+	static Ref<Drawable> create(sl_real topHeightDst, sl_real bottomHeightDst,
+								const Ref<Drawable>& src, sl_real topHeightSrc, sl_real bottomHeightSrc);
+	
+	static Ref<Drawable> create(const Ref<Drawable>& src, sl_real topHeightSrc, sl_real bottomHeightSrc);
+	
+	static Ref<Drawable> create(sl_int32 topHeightDst, sl_int32 bottomHeightDst,
+								const Ref<Drawable>& src, sl_real topHeightSrc, sl_real bottomHeightSrc);
+	
+public:
+	// override
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	
+protected:
+	sl_real m_heightTopDst;
+	sl_real m_heightBottomDst;
+	Ref<Drawable> m_src;
 	sl_real m_heightTopSrc;
 	sl_real m_heightBottomSrc;
 	

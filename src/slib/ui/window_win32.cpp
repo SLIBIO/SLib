@@ -98,13 +98,13 @@ public:
 				}
 			}
 
-			Rectangle frameScreen;
+			UIRect frameScreen;
 			if (param.screen.isNotNull()) {
 				frameScreen = param.screen->getRegion();
 			} else {
 				frameScreen = UI::getScreenRegion();
 			}
-			Rectangle frameWindow = param.calculateRegion(frameScreen);
+			UIRect frameWindow = param.calculateRegion(frameScreen);
 			String16 title = param.title;
 			hWnd = ::CreateWindowExW(
 				styleEx // ex-style
@@ -210,21 +210,21 @@ public:
 		}
 	}
 
-	Rectangle getFrame()
+	UIRect getFrame()
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
 			RECT rect;
 			::GetWindowRect(hWnd, &rect);
-			Rectangle frame((sl_real)(rect.left), (sl_real)(rect.top)
-				, (sl_real)(rect.right), (sl_real)(rect.bottom));
+			UIRect frame((sl_ui_pos)(rect.left), (sl_ui_pos)(rect.top)
+				, (sl_ui_pos)(rect.right), (sl_ui_pos)(rect.bottom));
 			return frame;
 		} else {
-			return Rectangle::zero();
+			return UIRect::zero();
 		}
 	}
 
-	sl_bool setFrame(const Rectangle& frame)
+	sl_bool setFrame(const UIRect& frame)
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
@@ -237,43 +237,43 @@ public:
 		return sl_false;
 	}
 
-	Rectangle getClientFrame()
+	UIRect getClientFrame()
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
-			Rectangle ret;
+			UIRect ret;
 			RECT rect;
 			::GetClientRect(hWnd, &rect);
 			POINT pt;
 			pt.x = 0;
 			pt.y = 0;
 			::ClientToScreen(hWnd, &pt);
-			ret.left = (sl_real)(pt.x);
-			ret.top = (sl_real)(pt.y);
+			ret.left = (sl_ui_pos)(pt.x);
+			ret.top = (sl_ui_pos)(pt.y);
 			pt.x = rect.right;
 			pt.y = rect.bottom;
 			::ClientToScreen(hWnd, &pt);
-			ret.right = (sl_real)(pt.x);
-			ret.bottom = (sl_real)(pt.y);
+			ret.right = (sl_ui_pos)(pt.x);
+			ret.bottom = (sl_ui_pos)(pt.y);
 			return ret;
 		} else {
-			return Rectangle::zero();
+			return UIRect::zero();
 		}
 	}
 
-	Size getClientSize()
+	UISize getClientSize()
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
 			RECT rect;
 			::GetClientRect(hWnd, &rect);
-			return Size((sl_real)(rect.right), (sl_real)(rect.bottom));
+			return UISize((sl_ui_pos)(rect.right), (sl_ui_pos)(rect.bottom));
 		} else {
-			return Size::zero();
+			return UISize::zero();
 		}
 	}
 
-	sl_bool setClientSize(const Size& size)
+	sl_bool setClientSize(const UISize& size)
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
@@ -285,7 +285,7 @@ public:
 			int dy = rectWindow.bottom - rectWindow.top - rectClient.bottom;
 			::SetWindowPos(hWnd, NULL
 				, 0, 0
-				, (int)(dx + size.x), (int)(dy + size.y)
+				, dx + (int)(size.x), dy + (int)(size.y)
 				, SWP_NOMOVE | SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE | SWP_ASYNCWINDOWPOS);
 			return sl_true;
 		}
@@ -665,31 +665,31 @@ public:
 		return sl_false;
 	}
 
-	Point convertCoordinateFromScreenToWindow(const Point& ptScreen)
+	UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen)
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
 			RECT rect;
 			::GetWindowRect(hWnd, &rect);
-			return Point(ptScreen.x - rect.left, ptScreen.y - rect.top);
+			return UIPointf(ptScreen.x - (sl_ui_posf)(rect.left), ptScreen.y - (sl_ui_posf)(rect.top));
 		} else {
 			return ptScreen;
 		}
 	}
 
-	Point convertCoordinateFromWindowToScreen(const Point& ptWindow)
+	UIPointf convertCoordinateFromWindowToScreen(const UIPointf& ptWindow)
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
 			RECT rect;
 			::GetWindowRect(hWnd, &rect);
-			return Point(ptWindow.x + rect.left, ptWindow.y + rect.top);
+			return UIPointf(ptWindow.x + (sl_ui_posf)(rect.left), ptWindow.y + (sl_ui_posf)(rect.top));
 		} else {
 			return ptWindow;
 		}
 	}
 
-	Point convertCoordinateFromScreenToClient(const Point& ptScreen)
+	UIPointf convertCoordinateFromScreenToClient(const UIPointf& ptScreen)
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
@@ -697,13 +697,13 @@ public:
 			pt.x = (int)(ptScreen.x);
 			pt.y = (int)(ptScreen.y);
 			::ScreenToClient(hWnd, &pt);
-			return Point((sl_real)(pt.x), (sl_real)(pt.y));
+			return UIPointf((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y));
 		} else {
 			return ptScreen;
 		}
 	}
 
-	Point convertCoordinateFromClientToScreen(const Point& ptClient)
+	UIPointf convertCoordinateFromClientToScreen(const UIPointf& ptClient)
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
@@ -711,13 +711,13 @@ public:
 			pt.x = (int)(ptClient.x);
 			pt.y = (int)(ptClient.y);
 			::ClientToScreen(hWnd, &pt);
-			return Point((sl_real)(pt.x), (sl_real)(pt.y));
+			return UIPointf((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y));
 		} else {
 			return ptClient;
 		}
 	}
 
-	Point convertCoordinateFromWindowToClient(const Point& ptWindow)
+	UIPointf convertCoordinateFromWindowToClient(const UIPointf& ptWindow)
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
@@ -727,13 +727,13 @@ public:
 			pt.x = (int)(ptWindow.x) + rect.left;
 			pt.y = (int)(ptWindow.y) + rect.top;
 			::ScreenToClient(hWnd, &pt);
-			return Point((sl_real)(pt.x), (sl_real)(pt.y));
+			return UIPointf((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y));
 		} else {
 			return ptWindow;
 		}
 	}
 
-	Point convertCoordinateFromClientToWindow(const Point& ptClient)
+	UIPointf convertCoordinateFromClientToWindow(const UIPointf& ptClient)
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
@@ -743,13 +743,13 @@ public:
 			::ClientToScreen(hWnd, &pt);
 			RECT rect;
 			::GetWindowRect(hWnd, &rect);
-			return Point((sl_real)(pt.x - rect.left), (sl_real)(pt.y - rect.top));
+			return UIPointf((sl_ui_posf)(pt.x - rect.left), (sl_ui_posf)(pt.y - rect.top));
 		} else {
 			return ptClient;
 		}
 	}
 
-	Size getWindowSizeFromClientSize(const Size& size)
+	UISize getWindowSizeFromClientSize(const UISize& size)
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
@@ -757,14 +757,21 @@ public:
 			::GetClientRect(hWnd, &rectClient);
 			RECT rectWindow;
 			::GetWindowRect(hWnd, &rectWindow);
-			return Point((sl_real)(rectWindow.right - rectWindow.left - rectClient.right + size.x)
-				, (sl_real)(rectWindow.bottom - rectWindow.top - rectClient.bottom + size.y));
+			UISize ret((sl_ui_pos)(rectWindow.right - rectWindow.left - rectClient.right + size.x)
+				, (sl_ui_pos)(rectWindow.bottom - rectWindow.top - rectClient.bottom + size.y));
+			if (ret.x < 0) {
+				ret.x = 0;
+			}
+			if (ret.y < 0) {
+				ret.y = 0;
+			}
+			return ret;
 		} else {
 			return size;
 		}
 	}
 
-	Size getClientSizeFromWindowSize(const Size& size)
+	UISize getClientSizeFromWindowSize(const UISize& size)
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
@@ -772,8 +779,15 @@ public:
 			::GetClientRect(hWnd, &rectClient);
 			RECT rectWindow;
 			::GetWindowRect(hWnd, &rectWindow);
-			return Point(size.x - (sl_real)(rectWindow.right - rectWindow.left - rectClient.right)
-				, size.y - (sl_real)(rectWindow.bottom - rectWindow.top - rectClient.bottom));
+			UISize ret(size.x - (sl_ui_pos)(rectWindow.right - rectWindow.left - rectClient.right)
+				, size.y - (sl_ui_pos)(rectWindow.bottom - rectWindow.top - rectClient.bottom));
+			if (ret.x < 0) {
+				ret.x = 0;
+			}
+			if (ret.y < 0) {
+				ret.y = 0;
+			}
+			return ret;
 		} else {
 			return size;
 		}
@@ -821,7 +835,7 @@ LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 				if (height > 60000) {
 					height = 60000;
 				}
-				Size size((sl_real)width, (sl_real)height);
+				UISize size((sl_ui_pos)width, (sl_ui_pos)height);
 				if (wParam == SIZE_MAXIMIZED) {
 					window->m_flagMaximized = sl_true;
 					window->onMaximize();
@@ -846,7 +860,7 @@ LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 		case WM_SIZING:
 			{
 				RECT& rect = *(RECT*)(lParam);
-				Size size((sl_real)(rect.right - rect.left), (sl_real)(rect.bottom - rect.top));
+				UISize size((sl_ui_pos)(rect.right - rect.left), (sl_ui_pos)(rect.bottom - rect.top));
 				size = window->getClientSizeFromWindowSize(size);
 				window->onResize(size);
 				size = window->getWindowSizeFromClientSize(size);

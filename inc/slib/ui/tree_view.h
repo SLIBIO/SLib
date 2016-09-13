@@ -109,9 +109,9 @@ public:
 	
 	void setSelectedTextColor(const Color& color, sl_bool flagRedraw = sl_true);
 	
-	sl_real getHeight();
+	sl_ui_len getHeight();
 	
-	void setHeight(sl_real height, sl_bool flagRedraw = sl_true);
+	void setHeight(sl_ui_len height, sl_bool flagRedraw = sl_true);
 
 public:
 	SLIB_REF_PROPERTY(Runnable, OnSelect)
@@ -146,10 +146,10 @@ private:
 	Color m_textColor;
 	Color m_hoverTextColor;
 	Color m_selectedTextColor;
-	sl_real m_height;
+	sl_ui_len m_height;
 	
-	Rectangle m_frame;
-	sl_real m_bottomChildren;
+	UIRect m_frame;
+	sl_ui_pos m_bottomChildren;
 	SafeRef<Drawable> m_iconDrawing;
 	
 	friend class TreeView;
@@ -228,21 +228,21 @@ public:
 	
 	void setSelectedItemTextColor(const Color& color, sl_bool flagRedraw = sl_true);
 	
-	sl_real getItemHeight();
+	sl_ui_len getItemHeight();
 	
-	void setItemHeight(sl_real height, sl_bool flagRedraw = sl_true);
+	void setItemHeight(sl_ui_len height, sl_bool flagRedraw = sl_true);
 	
-	sl_real getItemPadding();
+	sl_ui_pos getItemPadding();
 	
-	void setItemPadding(sl_real padding, sl_bool flagRedraw = sl_true);
+	void setItemPadding(sl_ui_pos padding, sl_bool flagRedraw = sl_true);
 	
-	sl_real getItemIndent();
+	sl_ui_pos getItemIndent();
 	
-	void setItemIndent(sl_real indent, sl_bool flagRedraw = sl_true);
+	void setItemIndent(sl_ui_pos indent, sl_bool flagRedraw = sl_true);
 	
-	sl_real getTextIndent();
+	sl_ui_pos getTextIndent();
 	
-	void setTextIndent(sl_real indent, sl_bool flagRedraw = sl_true);
+	void setTextIndent(sl_ui_pos indent, sl_bool flagRedraw = sl_true);
 	
 public:
 	SLIB_PTR_PROPERTY(ITreeViewListener, Listener);
@@ -254,7 +254,7 @@ public:
 	virtual void onDraw(Canvas* canvas);
 	
 	// override
-	virtual void onResize(sl_real width, sl_real height);
+	virtual void onResize(sl_ui_len width, sl_ui_len height);
 	
 	// override
 	virtual void onChangePadding();
@@ -275,7 +275,7 @@ private:
 	
 	void _makeLayoutContent();
 	
-	void _makeLayoutItem(TreeViewItem* item, sl_real& top, sl_real left, sl_real right, sl_bool flagRoot);
+	void _makeLayoutItem(TreeViewItem* item, sl_ui_pos& top, sl_ui_pos left, sl_ui_pos right, sl_bool flagRoot);
 	
 	void _calcTextHeight(Canvas* canvas);
 	
@@ -304,18 +304,18 @@ private:
 	Color m_hoverItemTextColor;
 	Color m_selectedItemTextColor;
 	
-	sl_real m_itemHeight;
-	sl_real m_itemPadding;
-	sl_real m_itemIndent;
-	sl_real m_textIndent;
+	sl_ui_len m_itemHeight;
+	sl_ui_pos m_itemPadding;
+	sl_ui_pos m_itemIndent;
+	sl_ui_pos m_textIndent;
 	
-	sl_real m_layoutTextHeight;
+	sl_ui_len m_layoutTextHeight;
 	
 	SafeRef<TreeViewItem> m_itemHover;
 	SafeRef<TreeViewItem> m_itemSelected;
 	
 	sl_bool m_flagBeginTapping;
-	Point m_pointBeginTapping;
+	UIPointf m_pointBeginTapping;
 	
 	friend class TreeViewItem;
 	friend class _TreeContentView;

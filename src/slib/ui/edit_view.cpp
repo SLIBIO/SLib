@@ -149,18 +149,26 @@ void EditView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 	}
 	
 	if (flagHorizontal) {
-		setMeasuredWidth(0);
+		sl_ui_pos width = getPaddingLeft() + getPaddingRight();
+		if (width < 0) {
+			width = 0;
+		}
+		setMeasuredWidth(width);
 	}
 	if (flagVertical) {
-		sl_real height = 0;
+		sl_ui_pos height = 0;
 		Ref<Font> font = getFont();
 		if (font.isNotNull()) {
-			height = font->getSize();
+			height = (sl_ui_pos)(font->getSize());
+			if (height < 0) {
+				height = 0;
+			}
 		}
+		height += getPaddingTop() + getPaddingBottom();
 		if (height < 0) {
 			height = 0;
 		}
-		setMeasuredHeight(height + getPaddingTop() + getPaddingBottom());
+		setMeasuredHeight(height);
 	}
 }
 

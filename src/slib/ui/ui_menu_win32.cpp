@@ -212,7 +212,7 @@ public:
 	}
 
 	// override
-	void show(sl_real x, sl_real y)
+	void show(sl_ui_pos x, sl_ui_pos y)
 	{
 		Win32_UI_Shared* shared = Win32_UI_Shared::get();
 		if (shared) {

@@ -182,10 +182,13 @@
 		26AE7C041C99ABD70026C2D9 /* bezier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26AE7C031C99ABD70026C2D9 /* bezier.cpp */; };
 		26AE7C061C99AF9D0026C2D9 /* transform2d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26AE7C051C99AF9D0026C2D9 /* transform2d.cpp */; };
 		26AE7C081C99B3290026C2D9 /* transform3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26AE7C071C99B3280026C2D9 /* transform3d.cpp */; };
+		26AE7CCC1D8450F80095AACA /* split_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26AE7CCB1D8450F80095AACA /* split_view.cpp */; };
 		26AFF77B1C34CE2B00AF9470 /* atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26AFF77A1C34CE2B00AF9470 /* atomic.cpp */; };
 		26B0AF851C13E08600CD8673 /* bitmap_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B0AF831C13E08600CD8673 /* bitmap_data.cpp */; };
 		26B0AF861C13E08600CD8673 /* bitmap_format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B0AF841C13E08600CD8673 /* bitmap_format.cpp */; };
 		26B5737F1D1051DF00304424 /* charset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B5737E1D1051DF00304424 /* charset.cpp */; };
+		26BB61381D872D0B0049A5C3 /* split_view_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26BB61371D872D0B0049A5C3 /* split_view_osx.mm */; };
+		26BB613A1D872FB10049A5C3 /* progress_bar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BB61391D872FB10049A5C3 /* progress_bar.cpp */; };
 		26C70E9C1CA168EB005B1768 /* datagram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C70E9B1CA168EB005B1768 /* datagram.cpp */; };
 		26C7E37E1D00097000C0A769 /* linear_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C7E37D1D00097000C0A769 /* linear_view.cpp */; };
 		26CA8D791C23B4C90049A658 /* system_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26CA8D781C23B4C90049A658 /* system_apple.mm */; };
@@ -422,10 +425,13 @@
 		26AE7C031C99ABD70026C2D9 /* bezier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bezier.cpp; sourceTree = "<group>"; };
 		26AE7C051C99AF9D0026C2D9 /* transform2d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = transform2d.cpp; sourceTree = "<group>"; };
 		26AE7C071C99B3280026C2D9 /* transform3d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = transform3d.cpp; sourceTree = "<group>"; };
+		26AE7CCB1D8450F80095AACA /* split_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = split_view.cpp; sourceTree = "<group>"; };
 		26AFF77A1C34CE2B00AF9470 /* atomic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = atomic.cpp; sourceTree = "<group>"; };
 		26B0AF831C13E08600CD8673 /* bitmap_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_data.cpp; sourceTree = "<group>"; };
 		26B0AF841C13E08600CD8673 /* bitmap_format.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_format.cpp; sourceTree = "<group>"; };
 		26B5737E1D1051DF00304424 /* charset.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = charset.cpp; sourceTree = "<group>"; };
+		26BB61371D872D0B0049A5C3 /* split_view_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = split_view_osx.mm; sourceTree = "<group>"; };
+		26BB61391D872FB10049A5C3 /* progress_bar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = progress_bar.cpp; sourceTree = "<group>"; };
 		26C70E9B1CA168EB005B1768 /* datagram.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = datagram.cpp; sourceTree = "<group>"; };
 		26C7E37D1D00097000C0A769 /* linear_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = linear_view.cpp; sourceTree = "<group>"; };
 		26CA8D781C23B4C90049A658 /* system_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = system_apple.mm; sourceTree = "<group>"; };
@@ -619,6 +625,7 @@
 				2699DC8F1D43682D0085EE67 /* list_view.cpp */,
 				2648D5431D096A7000819E09 /* mobile_app.cpp */,
 				2648D5411D0965C400819E09 /* mobile_game.cpp */,
+				26BB61391D872FB10049A5C3 /* progress_bar.cpp */,
 				266DD5141C11940A00D47AB0 /* radio_button.cpp */,
 				266DD5151C11940A00D47AB0 /* radio_button_osx.mm */,
 				266DD5171C11940A00D47AB0 /* render_view.cpp */,
@@ -628,6 +635,8 @@
 				266DD5261C11940A00D47AB0 /* scroll_view_osx.mm */,
 				266DD4FB1C11940A00D47AB0 /* select_view.cpp */,
 				266DD4FE1C11940A00D47AB0 /* select_view_osx.mm */,
+				26AE7CCB1D8450F80095AACA /* split_view.cpp */,
+				26BB61371D872D0B0049A5C3 /* split_view_osx.mm */,
 				266DD5281C11940A00D47AB0 /* tab_view.cpp */,
 				266DD5291C11940A00D47AB0 /* tab_view_osx.mm */,
 				26A4ECCE1CFE7FB700288A0B /* tree_view.cpp */,
@@ -975,6 +984,7 @@
 				2620412B1C88A95E00AF48F2 /* object.cpp in Sources */,
 				266DD5A21C11940A00D47AB0 /* edit_view.cpp in Sources */,
 				26AE7BFE1C9934740026C2D9 /* triangle3.cpp in Sources */,
+				26AE7CCC1D8450F80095AACA /* split_view.cpp in Sources */,
 				262041271C8895C900AF48F2 /* array.cpp in Sources */,
 				2648D5421D0965C400819E09 /* mobile_game.cpp in Sources */,
 				266DD56D1C11940A00D47AB0 /* net_capture_pcap.cpp in Sources */,
@@ -990,6 +1000,7 @@
 				266DD5BC1C11940A00D47AB0 /* render_view_osx.mm in Sources */,
 				266DD5C51C11940A00D47AB0 /* scroll_view.cpp in Sources */,
 				AECCC4B21B0F064D002B0284 /* thirdparty_libvpx.c in Sources */,
+				26BB613A1D872FB10049A5C3 /* progress_bar.cpp in Sources */,
 				266DD58B1C11940A00D47AB0 /* vertex_buffer.cpp in Sources */,
 				A2DE1D901B383BC100A74698 /* event_unix.cpp in Sources */,
 				266DD48F1C1193C400D47AB0 /* brush.cpp in Sources */,
@@ -1016,6 +1027,7 @@
 				26AE7BF41C98FD570026C2D9 /* line3.cpp in Sources */,
 				266DD5981C11940A00D47AB0 /* cursor_osx.mm in Sources */,
 				266DD5691C11940A00D47AB0 /* ip_address.cpp in Sources */,
+				26BB61381D872D0B0049A5C3 /* split_view_osx.mm in Sources */,
 				2640BC391CAA65EF004AA780 /* xml.cpp in Sources */,
 				266DD4961C1193C400D47AB0 /* graphics_path.cpp in Sources */,
 				A25F30161B03A33700854DAF /* event.cpp in Sources */,

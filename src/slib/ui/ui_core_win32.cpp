@@ -45,13 +45,13 @@ public:
 	{
 	}
 
-	Rectangle getRegion()
+	UIRect getRegion()
 	{
-		Rectangle ret;
+		UIRect ret;
 		ret.left = 0;
 		ret.top = 0;
-		ret.right = (sl_real)(GetSystemMetrics(SM_CXSCREEN));
-		ret.bottom = (sl_real)(GetSystemMetrics(SM_CYSCREEN));
+		ret.right = (sl_ui_pos)(GetSystemMetrics(SM_CXSCREEN));
+		ret.bottom = (sl_ui_pos)(GetSystemMetrics(SM_CYSCREEN));
 		return ret;
 	}
 };

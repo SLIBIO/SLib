@@ -10,40 +10,22 @@
 #include "view.h"
 #include "window.h"
 
-#include "button.h"
-#include "label_view.h"
-#include "check_box.h"
-#include "radio_button.h"
-#include "edit_view.h"
-#include "image_view.h"
-#include "select_view.h"
-#include "scroll_view.h"
-#include "linear_view.h"
-#include "list_view.h"
-#include "list_report_view.h"
-#include "render_view.h"
-#include "tab_view.h"
-#include "tree_view.h"
-#include "web_view.h"
-#include "video_view.h"
-#include "camera_view.h"
-
 SLIB_UI_NAMESPACE_BEGIN
 
 class UIResource
 {
 public:
-	static sl_real getScreenWidth();
+	static sl_ui_len getScreenWidth();
 	
-	static void setScreenWidth(sl_real width);
+	static void setScreenWidth(sl_ui_len width);
 	
-	static sl_real getScreenHeight();
+	static sl_ui_len getScreenHeight();
 	
-	static void setScreenHeight(sl_real height);
+	static void setScreenHeight(sl_ui_len height);
 	
-	static sl_real getScreenMinimum();
+	static sl_ui_len getScreenMinimum();
 	
-	static sl_real getScreenMaximum();
+	static sl_ui_len getScreenMaximum();
 	
 };
 
@@ -104,7 +86,7 @@ NAME::NAME() { \
 		NAME(sl_real customUnitLength = 1); \
 	protected: \
 		void initialize(); \
-		void layoutViews(sl_real width, sl_real height);
+		void layoutViews(sl_ui_len width, sl_ui_len height);
 
 
 #define SLIB_DECLARE_UILAYOUT_END \
@@ -133,10 +115,10 @@ public:
 	void setCustomUnitLength(sl_real length);
 	
 protected:
-	virtual void layoutViews(sl_real width, sl_real height) = 0;
+	virtual void layoutViews(sl_ui_len width, sl_ui_len height) = 0;
 	
 protected:
-	void _layoutViews_safe(sl_real width, sl_real height);
+	void _layoutViews_safe(sl_ui_len width, sl_ui_len height);
 	
 protected:
 	View* m_contentView;
@@ -165,7 +147,7 @@ public:
 	
 public:
 	// override
-	void dispatchResize(Size& size);
+	void dispatchResize(UISize& size);
 	
 	// override
 	void dispatchMaximize();
@@ -195,9 +177,30 @@ public:
 	
 public:
 	// override
-	void dispatchResize(sl_real width, sl_real height);
+	void dispatchResize(sl_ui_len width, sl_ui_len height);
 	
 };
+
+class Button;
+class LabelView;
+class CheckBox;
+class RadioButton;
+class RadioGroup;
+class EditView;
+class PasswordView;
+class TextArea;
+class ImageView;
+class SelectView;
+class ScrollView;
+class LinearView;
+class ListView;
+class ListReportView;
+class RenderView;
+class TabView;
+class TreeView;
+class WebView;
+class SplitView;
+class ProgressBar;
 
 SLIB_UI_NAMESPACE_END
 

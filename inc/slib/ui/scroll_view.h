@@ -30,20 +30,20 @@ public:
 	virtual void setContentView(const Ref<View>& view, sl_bool flagRedraw = sl_true);
 
 	// override
-	void setContentSize(sl_real width, sl_real height, sl_bool flagRefresh = sl_true);
+	void setContentSize(sl_scroll_pos width, sl_scroll_pos height, sl_bool flagRefresh = sl_true);
 
-	void setContentSize(const Size& size, sl_bool flagRefresh = sl_true);
+	void setContentSize(const ScrollPoint& size, sl_bool flagRefresh = sl_true);
 	
 	// override
-	Point getScrollPosition();
+	ScrollPoint getScrollPosition();
 	
 	// override
-	Size getScrollRange();
+	ScrollPoint getScrollRange();
 	
 	// override
-	void scrollTo(sl_real x, sl_real y, sl_bool flagRedraw = sl_true);
+	void scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagRedraw = sl_true);
 	
-	void scrollTo(const Point& position, sl_bool flagRedraw = sl_true);
+	void scrollTo(const ScrollPoint& position, sl_bool flagRedraw = sl_true);
 
 public:
 	// override
@@ -51,10 +51,10 @@ public:
 
 protected:
 	// override
-	void onResize(sl_real width, sl_real height);
+	void onResize(sl_ui_len width, sl_ui_len height);
 	
 	// override
-	void onResizeChild(View* child, sl_real width, sl_real height);
+	void onResizeChild(View* child, sl_ui_len width, sl_ui_len height);
 	
 	// override
 	void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
@@ -65,7 +65,7 @@ protected:
 private:
 	void _initScrollbars();
 	
-	void _scrollTo(sl_real x, sl_real y, sl_bool flagRedraw);
+	void _scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagRedraw);
 	
 	void _refreshContentSize_NW();
 	
@@ -73,11 +73,11 @@ private:
 	
 	void _setContentView_NW_OnUiThread(const Ref<View> view);
 
-	void _scrollTo_NW(sl_real x, sl_real y);
+	void _scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y);
 	
-	Point _getScrollPosition_NW();
+	ScrollPoint _getScrollPosition_NW();
 	
-	Size _getScrollRange_NW();
+	ScrollPoint _getScrollRange_NW();
 	
 	// override
 	void _setBorder_NW(sl_bool flag);
@@ -86,7 +86,7 @@ private:
 	void _setBackgroundColor_NW(const Color& color);
 	
 protected:
-	void _onScroll_NW(sl_real x, sl_real y);
+	void _onScroll_NW(sl_scroll_pos x, sl_scroll_pos y);
 	
 protected:
 	SafeRef<View> m_viewContent;

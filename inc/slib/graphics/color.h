@@ -165,7 +165,9 @@ public:
 		White = 0xFFFFFFFF,
 		WhiteSmoke = 0xFFF5F5F5,
 		Yellow = 0xFFFFFF00,
-		YellowGreen = 0xFF9ACD32
+		YellowGreen = 0xFF9ACD32,
+		Zero = 0,
+		None = 0
 	};
 
 public:

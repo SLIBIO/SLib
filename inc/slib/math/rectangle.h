@@ -127,6 +127,8 @@ public:
 	
 	sl_bool isAlmostEqual(const RectangleT<T, FT>& other) const;
 	
+	sl_bool fixSizeError();
+	
 public:
 	RectangleT<T, FT>& operator=(const RectangleT<T, FT>& other) = default;
 	

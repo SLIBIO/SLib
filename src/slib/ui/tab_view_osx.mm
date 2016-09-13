@@ -76,7 +76,7 @@ public:
 				handle = UIPlatform::getViewHandle(instance.ptr);
 			}
 			NSRect rc = [tv contentRect];
-			view->setFrame((sl_real)(rc.origin.x), (sl_real)(rc.origin.y), (sl_real)(rc.size.width), (sl_real)(rc.size.height));
+			view->setFrame((sl_ui_pos)(rc.origin.x), (sl_ui_pos)(rc.origin.y), (sl_ui_pos)(rc.size.width), (sl_ui_pos)(rc.size.height));
 			view->setParent(this);
 		}
 		if (handle == nil) {
@@ -94,11 +94,11 @@ public:
 	void __updateContentViewSize(_Slib_OSX_TabView* tv)
 	{
 		NSRect rc = [tv contentRect];
-		Rectangle frame;
-		sl_real w = (sl_real)(rc.size.width);
-		sl_real h = (sl_real)(rc.size.height);
-		frame.left = (sl_real)(rc.origin.x);
-		frame.top = (sl_real)(rc.origin.y);
+		UIRect frame;
+		sl_ui_pos w = (sl_ui_pos)(rc.size.width);
+		sl_ui_pos h = (sl_ui_pos)(rc.size.height);
+		frame.left = (sl_ui_pos)(rc.origin.x);
+		frame.top = (sl_ui_pos)(rc.origin.y);
 		frame.right = frame.left + w;
 		frame.bottom = frame.top + h;
 		ListLocker<TabViewItem> items(m_items);
@@ -181,18 +181,18 @@ void TabView::_selectTab_NW(sl_uint32 index)
 	}
 }
 
-Size TabView::_getContentViewSize_NW()
+UISize TabView::_getContentViewSize_NW()
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTabView class]]) {
 		NSTabView* tv = (NSTabView*)handle;
 		NSRect rc = [tv contentRect];
-		Size ret;
-		ret.x = rc.size.width;
-		ret.y = rc.size.height;
+		UISize ret;
+		ret.x = (sl_ui_pos)(rc.size.width);
+		ret.y = (sl_ui_pos)(rc.size.height);
 		return ret;
 	}
-	return Size::zero();
+	return UISize::zero();
 }
 
 void TabView::_setFont_NW(const Ref<Font>& font)

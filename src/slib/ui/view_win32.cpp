@@ -43,7 +43,7 @@ HWND Win32_ViewInstance::createHandle(
 	HWND hWndParent = UIPlatform::getViewHandle(parent);
 	if (hWndParent) {
 		HINSTANCE hInst = ::GetModuleHandleW(NULL);
-		const Rectangle& frame = view->getFrame();
+		UIRect frame = view->getFrame();
 		style |= WS_CHILD;
 		if (view->isVisible()) {
 			style |= WS_VISIBLE;
@@ -101,7 +101,7 @@ void Win32_ViewInstance::invalidate()
 	}
 }
 
-void Win32_ViewInstance::invalidate(const Rectangle& rect)
+void Win32_ViewInstance::invalidate(const UIRect& rect)
 {
 	HWND hWnd = m_handle;
 	if (hWnd) {
@@ -114,22 +114,22 @@ void Win32_ViewInstance::invalidate(const Rectangle& rect)
 	}
 }
 
-Rectangle Win32_ViewInstance::getFrame()
+UIRect Win32_ViewInstance::getFrame()
 {
 	HWND hWnd = m_handle;
 	if (hWnd) {
 		RECT rc;
 		::GetWindowRect(hWnd, &rc);
-		Rectangle ret;
-		ret.left = (sl_real)rc.left;
-		ret.top = (sl_real)rc.top;
-		ret.right = (sl_real)rc.right;
-		ret.bottom = (sl_real)rc.bottom;
+		UIRect ret;
+		ret.left = (sl_ui_pos)(rc.left);
+		ret.top = (sl_ui_pos)(rc.top);
+		ret.right = (sl_ui_pos)(rc.right);
+		ret.bottom = (sl_ui_pos)(rc.bottom);
 	}
-	return Rectangle::zero();
+	return UIRect::zero();
 }
 
-void Win32_ViewInstance::setFrame(const Rectangle& frame)
+void Win32_ViewInstance::setFrame(const UIRect& frame)
 {
 	if (isWindowContent()) {
 		return;
@@ -182,7 +182,7 @@ void Win32_ViewInstance::setOpaque(sl_bool flag)
 {
 }
 
-Point Win32_ViewInstance::convertCoordinateFromScreenToView(const Point& ptScreen)
+UIPointf Win32_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& ptScreen)
 {
 	HWND hWnd = m_handle;
 	if (hWnd) {
@@ -190,12 +190,12 @@ Point Win32_ViewInstance::convertCoordinateFromScreenToView(const Point& ptScree
 		pt.x = (LONG)(ptScreen.x);
 		pt.y = (LONG)(ptScreen.y);
 		::ScreenToClient(hWnd, &pt);
-		return Point((sl_real)(pt.x), (sl_real)(pt.y));
+		return UIPointf((sl_ui_pos)(pt.x), (sl_ui_pos)(pt.y));
 	}
 	return ptScreen;
 }
 
-Point Win32_ViewInstance::convertCoordinateFromViewToScreen(const Point& ptView)
+UIPointf Win32_ViewInstance::convertCoordinateFromViewToScreen(const UIPointf& ptView)
 {
 	HWND hWnd = m_handle;
 	if (hWnd) {
@@ -203,7 +203,7 @@ Point Win32_ViewInstance::convertCoordinateFromViewToScreen(const Point& ptView)
 		pt.x = (LONG)(ptView.x);
 		pt.y = (LONG)(ptView.y);
 		::ClientToScreen(hWnd, &pt);
-		return Point((sl_real)(pt.x), (sl_real)(pt.y));
+		return UIPointf((sl_ui_pos)(pt.x), (sl_ui_pos)(pt.y));
 	}
 	return ptView;
 }
@@ -270,8 +270,8 @@ sl_bool Win32_ViewInstance::onEventMouse(UIAction action, WPARAM wParam, LPARAM 
 		int _x = (short)(lParam & 0xffff);
 		int _y = (short)((lParam >> 16) & 0xffff);
 
-		sl_real x = (sl_real)(_x);
-		sl_real y = (sl_real)(_y);
+		sl_ui_posf x = (sl_ui_posf)(_x);
+		sl_ui_posf y = (sl_ui_posf)(_y);
 
 		Ref<UIEvent> me = UIEvent::createMouseEvent(action, x, y);
 		if (me.isNotNull()) {
@@ -303,7 +303,7 @@ sl_bool Win32_ViewInstance::onEventMouseWheel(sl_bool flagVertical, WPARAM wPara
 		pt.x = (short)(lParam & 0xffff);
 		pt.y = (short)((lParam >> 16) & 0xffff);
 		::ScreenToClient(hWnd, &pt);
-		Ref<UIEvent> me = UIEvent::createMouseWheelEvent((sl_real)(pt.x), (sl_real)(pt.y), deltaX, deltaY);
+		Ref<UIEvent> me = UIEvent::createMouseWheelEvent((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y), deltaX, deltaY);
 		if (me.isNotNull()) {
 			applyModifiers(me.ptr);
 			onMouseWheelEvent(me.ptr);
@@ -324,7 +324,7 @@ sl_bool Win32_ViewInstance::onEventSetCursor()
 		pt.x = (short)(lParam & 0xffff);
 		pt.y = (short)((lParam >> 16) & 0xffff);
 		::ScreenToClient(hWnd, &pt);
-		Ref<UIEvent> ev = UIEvent::createSetCursorEvent((sl_real)(pt.x), (sl_real)(pt.y));
+		Ref<UIEvent> ev = UIEvent::createSetCursorEvent((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y));
 		if (ev.isNotNull()) {
 			onSetCursor(ev.ptr);
 			if (ev->isPreventedDefault()) {

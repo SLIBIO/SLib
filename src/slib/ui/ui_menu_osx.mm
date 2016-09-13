@@ -146,11 +146,11 @@ public:
 	}
 
 	// override
-	void show(sl_real x, sl_real y)
+	void show(sl_ui_pos x, sl_ui_pos y)
 	{
 		NSPoint pt;
-		pt.x = x;
-		pt.y = UI::getScreenSize().y - y;
+		pt.x = (CGFloat)x;
+		pt.y = (CGFloat)(UI::getScreenSize().y - y);
 		[m_handle popUpMenuPositioningItem:nil atLocation:pt inView:nil];
 	}
 

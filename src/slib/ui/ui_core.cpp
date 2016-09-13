@@ -106,57 +106,67 @@ void UI::setDefaultFont(const Ref<Font>& font)
 	}
 }
 
-Rectangle UI::getScreenRegion()
+UIRect UI::getScreenRegion()
 {
 	return UI::getScreenRegion(Ref<Screen>::null());
 }
 
-Rectangle UI::getScreenRegion(const Ref<Screen>& _screen)
+UIRect UI::getScreenRegion(const Ref<Screen>& _screen)
 {
 	Ref<Screen> screen = _screen;
 	if (screen.isNull()) {
 		screen = getPrimaryScreen();
 		if (screen.isNull()) {
-			return Rectangle::zero();
+			return UIRect::zero();
 		}
 	}
 	return screen->getRegion();
 }
 
-Rectangle UI::getScreenBounds()
+UIRect UI::getScreenBounds()
 {
 	return UI::getScreenBounds(Ref<Screen>::null());
 }
 
-Rectangle UI::getScreenBounds(const Ref<Screen>& _screen)
+UIRect UI::getScreenBounds(const Ref<Screen>& _screen)
 {
 	Ref<Screen> screen = _screen;
 	if (screen.isNull()) {
 		screen = getPrimaryScreen();
 		if (screen.isNull()) {
-			return Rectangle::zero();
+			return UIRect::zero();
 		}
 	}
-	Rectangle region = screen->getRegion();
-	return Rectangle(0, 0, region.getWidth(), region.getHeight());
+	UIRect region = screen->getRegion();
+	return UIRect(0, 0, region.getWidth(), region.getHeight());
 }
 
-Size UI::getScreenSize()
+UISize UI::getScreenSize()
 {
 	return UI::getScreenSize(Ref<Screen>::null());
 }
 
-Size UI::getScreenSize(const Ref<Screen>& _screen)
+UISize UI::getScreenSize(const Ref<Screen>& _screen)
 {
 	Ref<Screen> screen = _screen;
 	if (screen.isNull()) {
 		screen = getPrimaryScreen();
 		if (screen.isNull()) {
-			return Size::zero();
+			return UISize::zero();
 		}
 	}
-	Rectangle region = screen->getRegion();
-	return Size(region.getWidth(), region.getHeight());
+	UIRect region = screen->getRegion();
+	return UISize(region.getWidth(), region.getHeight());
+}
+
+sl_ui_len UI::getScreenWidth()
+{
+	return getScreenSize().x;
+}
+
+sl_ui_len UI::getScreenHeight()
+{
+	return getScreenSize().y;
 }
 
 void UI::alert(const String& text)

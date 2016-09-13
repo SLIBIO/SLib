@@ -58,21 +58,21 @@ public:
 	ButtonState getButtonState();
 	
 	
-	const Size& getIconSize();
+	const UISize& getIconSize();
 	
-	virtual void setIconSize(const Size& size, sl_bool flagRedraw = sl_true);
+	virtual void setIconSize(const UISize& size, sl_bool flagRedraw = sl_true);
 	
-	void setIconSize(sl_real width, sl_real height, sl_bool flagRedraw = sl_true);
+	void setIconSize(sl_ui_len width, sl_ui_len height, sl_bool flagRedraw = sl_true);
 	
-	void setIconSize(sl_real size, sl_bool flagRedraw = sl_true);
+	void setIconSize(sl_ui_len size, sl_bool flagRedraw = sl_true);
 	
-	sl_real getIconWidth();
+	sl_ui_len getIconWidth();
 	
-	void setIconWidth(sl_real width, sl_bool flagRedraw = sl_true);
+	void setIconWidth(sl_ui_len width, sl_bool flagRedraw = sl_true);
 	
-	sl_real getIconHeight();
+	sl_ui_len getIconHeight();
 	
-	void setIconHeight(sl_real height, sl_bool flagRedraw = sl_true);
+	void setIconHeight(sl_ui_len height, sl_bool flagRedraw = sl_true);
 	
 	
 	Alignment getGravity();
@@ -96,46 +96,46 @@ public:
 	virtual void setLayoutOrientation(LayoutOrientation orientation, sl_bool flagRedraw = sl_true);
 	
 	
-	virtual void setIconMargin(sl_real left, sl_real top, sl_real right, sl_real bottom, sl_bool flagRedraw = sl_true);
+	virtual void setIconMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw = sl_true);
 	
-	void setIconMargin(sl_real margin, sl_bool flagRedraw = sl_true);
+	void setIconMargin(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
 	
-	sl_real getIconMarginLeft();
+	sl_ui_pos getIconMarginLeft();
 	
-	void setIconMarginLeft(sl_real margin, sl_bool flagRedraw = sl_true);
+	void setIconMarginLeft(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
 	
-	sl_real getIconMarginTop();
+	sl_ui_pos getIconMarginTop();
 	
-	void setIconMarginTop(sl_real margin, sl_bool flagRedraw = sl_true);
+	void setIconMarginTop(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
 	
-	sl_real getIconMarginRight();
+	sl_ui_pos getIconMarginRight();
 	
-	void setIconMarginRight(sl_real margin, sl_bool flagRedraw = sl_true);
+	void setIconMarginRight(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
 	
-	sl_real getIconMarginBottom();
+	sl_ui_pos getIconMarginBottom();
 	
-	void setIconMarginBottom(sl_real margin, sl_bool flagRedraw = sl_true);
+	void setIconMarginBottom(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
 	
 	
-	virtual void setTextMargin(sl_real left, sl_real top, sl_real right, sl_real bottom, sl_bool flagRedraw = sl_true);
+	virtual void setTextMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw = sl_true);
 	
-	void setTextMargin(sl_real margin, sl_bool flagRedraw = sl_true);
+	void setTextMargin(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
 	
-	sl_real getTextMarginLeft();
+	sl_ui_pos getTextMarginLeft();
 	
-	void setTextMarginLeft(sl_real margin, sl_bool flagRedraw = sl_true);
+	void setTextMarginLeft(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
 	
-	sl_real getTextMarginTop();
+	sl_ui_pos getTextMarginTop();
 	
-	void setTextMarginTop(sl_real margin, sl_bool flagRedraw = sl_true);
+	void setTextMarginTop(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
 	
-	sl_real getTextMarginRight();
+	sl_ui_pos getTextMarginRight();
 	
-	void setTextMarginRight(sl_real margin, sl_bool flagRedraw = sl_true);
+	void setTextMarginRight(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
 	
-	sl_real getTextMarginBottom();
+	sl_ui_pos getTextMarginBottom();
 	
-	void setTextMarginBottom(sl_real margin, sl_bool flagRedraw = sl_true);
+	void setTextMarginBottom(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
 	
 	
 	Color getTextColor(ButtonState state, sl_uint32 category = 0);
@@ -200,9 +200,6 @@ public:
 	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
 	
 	// override
-	Size measureContentSize(GraphicsContext* gc);
-	
-	// override
 	void setEnabled(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
 	
 	// override
@@ -225,7 +222,9 @@ protected:
 	void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 	
 protected:
-	virtual void layoutIconAndText(GraphicsContext* gc, sl_real widthFrame, sl_real heightFrame, Size& sizeContent, Rectangle& frameIcon, Rectangle& frameText);
+	virtual UISize measureContentSize(GraphicsContext* gc);
+
+	virtual void layoutIconAndText(GraphicsContext* gc, sl_ui_len widthFrame, sl_ui_len heightFrame, UISize& sizeContent, UIRect& frameIcon, UIRect& frameText);
 	
 	virtual void drawContent(Canvas* canvas, const Ref<Drawable>& icon, const String& text, const Color& textColor);
 	
@@ -247,20 +246,20 @@ private:
 	ButtonState m_state;
 	sl_uint32 m_category;
 	
-	Size m_iconSize;
+	UISize m_iconSize;
 	Alignment m_gravity;
 	Alignment m_iconAlignment;
 	Alignment m_textAlignment;
 	sl_bool m_flagTextBeforeIcon;
 	LayoutOrientation m_layoutOrientation;
-	sl_real m_iconMarginLeft;
-	sl_real m_iconMarginTop;
-	sl_real m_iconMarginRight;
-	sl_real m_iconMarginBottom;
-	sl_real m_textMarginLeft;
-	sl_real m_textMarginTop;
-	sl_real m_textMarginRight;
-	sl_real m_textMarginBottom;
+	sl_ui_pos m_iconMarginLeft;
+	sl_ui_pos m_iconMarginTop;
+	sl_ui_pos m_iconMarginRight;
+	sl_ui_pos m_iconMarginBottom;
+	sl_ui_pos m_textMarginLeft;
+	sl_ui_pos m_textMarginTop;
+	sl_ui_pos m_textMarginRight;
+	sl_ui_pos m_textMarginBottom;
 	
 	Color m_textColorDefault;
 	SafeRef<Drawable> m_iconDefault;

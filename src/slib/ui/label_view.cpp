@@ -68,8 +68,7 @@ void LabelView::setGravity(Alignment align, sl_bool flagRedraw)
 
 void LabelView::onDraw(Canvas* canvas)
 {
-	Rectangle bound = getBoundsInnerPadding();
-	canvas->drawText(m_text, bound, getFont(), m_textColor, m_textAlignment);
+	canvas->drawText(m_text, getBoundsInnerPadding(), getFont(), m_textColor, m_textAlignment);
 }
 
 void LabelView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
@@ -83,23 +82,31 @@ void LabelView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 		return;
 	}
 	
-	Size sizeText = gc->getFontTextSize(getFont(), m_text);
+	UISize size = gc->getFontTextSize(getFont(), m_text);
 	Ref<Font> font = getFont();
 	if (font.isNotNull()) {
-		sizeText.y = font->getSize();
+		size.y = (sl_ui_pos)(font->getSize());
 	}
 	
 	if (flagHorizontal) {
-		if (sizeText.x < 0) {
-			sizeText.x = 0;
+		if (size.x < 0) {
+			size.x = 0;
 		}
-		setMeasuredWidth(sizeText.x + getPaddingLeft() + getPaddingRight());
+		sl_ui_pos width = size.x + getPaddingLeft() + getPaddingRight();
+		if (width < 0) {
+			width = 0;
+		}
+		setMeasuredWidth(width);
 	}
 	if (flagVertical) {
-		if (sizeText.y < 0) {
-			sizeText.y = 0;
+		if (size.y < 0) {
+			size.y = 0;
 		}
-		setMeasuredHeight(sizeText.y + getPaddingTop() + getPaddingBottom());
+		sl_ui_pos height = size.y + getPaddingTop() + getPaddingBottom();
+		if (height < 0) {
+			height = 0;
+		}
+		setMeasuredHeight(height);
 	}
 }
 

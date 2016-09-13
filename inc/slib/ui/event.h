@@ -18,7 +18,7 @@ class View;
 class SLIB_EXPORT TouchPoint
 {
 public:
-	Point point;
+	UIPointf point;
 	sl_real pressure;
 	TouchPhase phase;
 
@@ -27,17 +27,17 @@ public:
 
 	TouchPoint(const TouchPoint& other);
 	
-	TouchPoint(const Point& point);
+	TouchPoint(const UIPointf& point);
 	
-	TouchPoint(const Point& point, sl_real pressure);
+	TouchPoint(const UIPointf& point, sl_real pressure);
 	
-	TouchPoint(const Point& point, sl_real pressure, TouchPhase phase);
+	TouchPoint(const UIPointf& point, sl_real pressure, TouchPhase phase);
 	
-	TouchPoint(sl_real x, sl_real y);
+	TouchPoint(sl_ui_posf x, sl_ui_posf y);
 	
-	TouchPoint(sl_real x, sl_real y, sl_real pressure);
+	TouchPoint(sl_ui_posf x, sl_ui_posf y, sl_real pressure);
 	
-	TouchPoint(sl_real x, sl_real y, sl_real pressure, TouchPhase phase);
+	TouchPoint(sl_ui_posf x, sl_ui_posf y, sl_real pressure, TouchPhase phase);
 	
 public:
 	TouchPoint& operator=(const TouchPoint& other);
@@ -137,13 +137,13 @@ public:
 	
 	static Ref<UIEvent> createKeyEvent(UIAction action, Keycode keycode, sl_uint32 systemKeycode);
 	
-	static Ref<UIEvent> createMouseEvent(UIAction action, sl_real x, sl_real y);
+	static Ref<UIEvent> createMouseEvent(UIAction action, sl_ui_posf x, sl_ui_posf y);
 	
-	static Ref<UIEvent> createMouseWheelEvent(sl_real mouseX, sl_real mouseY, sl_real deltaX, sl_real deltaY);
+	static Ref<UIEvent> createMouseWheelEvent(sl_ui_posf mouseX, sl_ui_posf mouseY, sl_real deltaX, sl_real deltaY);
 	
 	static Ref<UIEvent> createTouchEvent(UIAction action, const Array<TouchPoint>& points);
 	
-	static Ref<UIEvent> createSetCursorEvent(sl_real x, sl_real y);
+	static Ref<UIEvent> createSetCursorEvent(sl_ui_posf x, sl_ui_posf y);
 	
 public:
 	UIAction getAction() const;
@@ -174,19 +174,19 @@ public:
 	void setSystemKeycode(sl_uint32 keycode);
 	
 	// mouse, touch
-	const Point& getPoint() const;
+	const UIPointf& getPoint() const;
 	
-	void setPoint(const Point& pt);
+	void setPoint(const UIPointf& pt);
 	
-	void setPoint(sl_real x, sl_real y);
+	void setPoint(sl_ui_posf x, sl_ui_posf y);
 	
-	sl_real getX() const;
+	sl_ui_posf getX() const;
 	
-	void setX(sl_real x);
+	void setX(sl_ui_posf x);
 	
-	sl_real getY() const;
+	sl_ui_posf getY() const;
 	
-	void setY(sl_real y);
+	void setY(sl_ui_posf y);
 	
 	// mouse wheel
 	sl_real getDelta() const;
@@ -206,13 +206,13 @@ public:
 	
 	void setTouchPoint(const TouchPoint& pt);
 	
-	void setTouchPoint(const Point& pt);
+	void setTouchPoint(const UIPointf& pt);
 	
-	void setTouchPoint(const Point& pt, sl_real pressure);
+	void setTouchPoint(const UIPointf& pt, sl_real pressure);
 	
-	void setTouchPoint(sl_real x, sl_real y);
+	void setTouchPoint(sl_ui_posf x, sl_ui_posf y);
 	
-	void setTouchPoint(sl_real x, sl_real y, sl_real pressure);
+	void setTouchPoint(sl_ui_posf x, sl_ui_posf y, sl_real pressure);
 	
 	sl_real getPressure() const;
 	
@@ -226,7 +226,9 @@ public:
 	
 	void setTouchPoints(const Array<TouchPoint>& points);
 
-	void transformPoints(const Matrix3& mat);
+	void transformPoints(const Matrix3f& mat);
+	
+	void transformPoints(const Matrix3lf& mat);
 	
 	// modifiers
 	void setShiftKey();
@@ -285,7 +287,7 @@ public:
 	sl_bool isPassedToNext();
 	
 	void setPassedToNext(sl_bool flag);
-	
+			
 	Ref<UIEvent> duplicate();
 	
 	static sl_uint32 getSystemKeycode(Keycode key);
@@ -327,7 +329,7 @@ public:
 	
 	virtual void onSetCursor(View* view, UIEvent* ev);
 
-	virtual void onResize(View* view, sl_real width, sl_real height);
+	virtual void onResize(View* view, sl_ui_len width, sl_ui_len height);
 	
 	virtual void onChangeVisibility(View* view, Visibility oldVisibility, Visibility newVisibility);
 
@@ -344,7 +346,7 @@ public:
 	
 	virtual void onMove(Window* window);
 	
-	virtual void onResize(Window* window, Size& size);
+	virtual void onResize(Window* window, UISize& size);
 	
 	virtual void onMinimize(Window* window);
 	
@@ -381,7 +383,7 @@ public:
 	
 	void onMove(Window* window);
 	
-	void onResize(Window* window, Size& size);
+	void onResize(Window* window, UISize& size);
 	
 	void onMinimize(Window* window);
 	

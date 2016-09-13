@@ -82,13 +82,13 @@ public:
 	void invalidate();
 
 	// override
-	void invalidate(const Rectangle& rect);
+	void invalidate(const UIRect& rect);
 
 	// override
-	Rectangle getFrame();
+	UIRect getFrame();
 
 	// override
-	void setFrame(const Rectangle& frame);
+	void setFrame(const UIRect& frame);
 
 	// override
 	void setVisible(sl_bool flag);
@@ -100,10 +100,10 @@ public:
 	void setOpaque(sl_bool flag);
 
 	// override
-	Point convertCoordinateFromScreenToView(const Point& ptScreen);
+	UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen);
 
 	// override
-	Point convertCoordinateFromViewToScreen(const Point& ptView);
+	UIPointf convertCoordinateFromViewToScreen(const UIPointf& ptView);
 
 	// override
 	void addChildInstance(const Ref<ViewInstance>& instance);

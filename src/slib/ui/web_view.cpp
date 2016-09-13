@@ -114,7 +114,7 @@ void WebView::onMessageFromJavaScript(const String& msg, const String& param)
 {
 }
 
-void WebView::onResize(sl_real width, sl_real height)
+void WebView::onResize(sl_ui_len width, sl_ui_len height)
 {
 	if (isNativeWidget()) {
 		_refreshSize_NW();

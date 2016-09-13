@@ -21,15 +21,15 @@ public:
 	
 	sl_bool isHorizontal();
 	
-	void setHorizontal();
+	void setHorizontal(sl_bool flagRedraw = sl_true);
 	
 	sl_bool isVertical();
 	
-	void setVertical();
+	void setVertical(sl_bool flagRedraw = sl_true);
 	
 protected:
 	// override
-	void onResizeChild(View* child, sl_real width, sl_real height);
+	void onResizeChild(View* child, sl_ui_len width, sl_ui_len height);
 	
 	// override
 	void onChangeVisibilityOfChild(View* child, Visibility oldVisibility, Visibility newVisibility);

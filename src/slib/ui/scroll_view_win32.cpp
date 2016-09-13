@@ -121,10 +121,10 @@ public:
 			int y = si.nPos;
 			Ref<View> viewContent = view->getContentView();
 			if (viewContent.isNotNull()) {
-				viewContent->setPosition(-(sl_real)x, -(sl_real)y);
+				viewContent->setPosition((sl_ui_pos)(-x), (sl_ui_pos)(-y));
 			}
 			if (flagFromEvent) {
-				view->_onScroll_NW((sl_real)x, (sl_real)y);
+				view->_onScroll_NW((sl_scroll_pos)x, (sl_scroll_pos)y);
 			}
 		}
 	}
@@ -178,7 +178,7 @@ void ScrollView::_setContentView_NW(const Ref<View>& view)
 	}
 }
 
-void ScrollView::_scrollTo_NW(sl_real x, sl_real y)
+void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -201,7 +201,7 @@ void ScrollView::_scrollTo_NW(sl_real x, sl_real y)
 	}
 }
 
-Point ScrollView::_getScrollPosition_NW()
+ScrollPoint ScrollView::_getScrollPosition_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -213,12 +213,12 @@ Point ScrollView::_getScrollPosition_NW()
 		int x = si.nPos;
 		::GetScrollInfo(handle, SB_VERT, &si);
 		int y = si.nPos;
-		return Point((sl_real)x, (sl_real)y);
+		return ScrollPoint((sl_scroll_pos)x, (sl_scroll_pos)y);
 	}
-	return Point::zero();
+	return ScrollPoint::zero();
 }
 
-Size ScrollView::_getScrollRange_NW()
+ScrollPoint ScrollView::_getScrollRange_NW()
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
@@ -236,9 +236,9 @@ Size ScrollView::_getScrollRange_NW()
 		if (h < 0) {
 			h = 0;
 		}
-		return Size((sl_real)w, (sl_real)h);
+		return ScrollPoint((sl_scroll_pos)w, (sl_scroll_pos)h);
 	}
-	return Size::zero();
+	return ScrollPoint::zero();
 }
 
 void ScrollView::_setBorder_NW(sl_bool flag)

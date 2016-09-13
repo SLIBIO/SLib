@@ -353,12 +353,12 @@ void TreeViewItem::setSelectedTextColor(const Color& color, sl_bool flagRedraw)
 	}
 }
 
-sl_real TreeViewItem::getHeight()
+sl_ui_len TreeViewItem::getHeight()
 {
 	return m_height;
 }
 
-void TreeViewItem::setHeight(sl_real height, sl_bool flagRedraw)
+void TreeViewItem::setHeight(sl_ui_len height, sl_bool flagRedraw)
 {
 	m_height = height;
 	_relayoutTree(flagRedraw);
@@ -723,45 +723,45 @@ void TreeView::setSelectedItemTextColor(const Color& color, sl_bool flagRedraw)
 	}
 }
 
-sl_real TreeView::getItemHeight()
+sl_ui_len TreeView::getItemHeight()
 {
 	return m_itemHeight;
 }
 
-void TreeView::setItemHeight(sl_real height, sl_bool flagRedraw)
+void TreeView::setItemHeight(sl_ui_len height, sl_bool flagRedraw)
 {
 	m_itemHeight = height;
 	_relayoutContent(flagRedraw);
 }
 
-sl_real TreeView::getItemPadding()
+sl_ui_pos TreeView::getItemPadding()
 {
 	return m_itemPadding;
 }
 
-void TreeView::setItemPadding(sl_real padding, sl_bool flagRedraw)
+void TreeView::setItemPadding(sl_ui_pos padding, sl_bool flagRedraw)
 {
 	m_itemPadding = padding;
 	_relayoutContent(flagRedraw);
 }
 
-sl_real TreeView::getItemIndent()
+sl_ui_pos TreeView::getItemIndent()
 {
 	return m_itemIndent;
 }
 
-void TreeView::setItemIndent(sl_real indent, sl_bool flagRedraw)
+void TreeView::setItemIndent(sl_ui_pos indent, sl_bool flagRedraw)
 {
 	m_itemIndent = indent;
 	_relayoutContent(flagRedraw);
 }
 
-sl_real TreeView::getTextIndent()
+sl_ui_pos TreeView::getTextIndent()
 {
 	return m_textIndent;
 }
 
-void TreeView::setTextIndent(sl_real indent, sl_bool flagRedraw)
+void TreeView::setTextIndent(sl_ui_pos indent, sl_bool flagRedraw)
 {
 	m_textIndent = indent;
 	if (flagRedraw) {
@@ -779,7 +779,7 @@ void TreeView::onDraw(Canvas* canvas)
 	_makeLayoutContent();
 }
 
-void TreeView::onResize(sl_real width, sl_real height)
+void TreeView::onResize(sl_ui_len width, sl_ui_len height)
 {
 	ScrollView::onResize(width, height);
 	Ref<_TreeContentView> content = m_content;
@@ -863,14 +863,17 @@ void TreeView::_makeLayoutContent()
 	
 	Ref<TreeViewItem> root = m_root;
 	if (root.isNotNull()) {
-		sl_real top = getPaddingTop();
-		sl_real left = getPaddingLeft();
-		sl_real right = getWidth() - getPaddingRight();
+		sl_ui_pos top = getPaddingTop();
+		sl_ui_pos left = getPaddingLeft();
+		sl_ui_pos right = getWidth() - getPaddingRight();
 		if (m_iconCollapsed.isNotNull() || m_iconExpanded.isNotNull()) {
 			left += m_itemIndent;
 		}
 		_makeLayoutItem(root.ptr, top, left, right, sl_true);
 		top += getPaddingBottom();
+		if (top < 0) {
+			top = 0;
+		}
 		Ref<_TreeContentView> content = m_content;
 		if (content.isNotNull()) {
 			content->setHeight(top, sl_false);
@@ -879,7 +882,7 @@ void TreeView::_makeLayoutContent()
 	
 }
 
-void TreeView::_makeLayoutItem(TreeViewItem* item, sl_real& top, sl_real left, sl_real right, sl_bool flagRoot)
+void TreeView::_makeLayoutItem(TreeViewItem* item, sl_ui_pos& top, sl_ui_pos left, sl_ui_pos right, sl_bool flagRoot)
 {
 	if (!flagRoot) {
 		Ref<Drawable> iconDraw;
@@ -913,12 +916,12 @@ void TreeView::_makeLayoutItem(TreeViewItem* item, sl_real& top, sl_real left, s
 				}
 			}
 		}
-		sl_real height = item->m_height;
+		sl_ui_pos height = item->m_height;
 		if (height == 0) {
 			height = m_itemHeight;
 			if (height == 0) {
 				if (iconDraw.isNotNull()) {
-					height = iconDraw->getDrawableHeight();
+					height = (sl_ui_pos)(iconDraw->getDrawableHeight());
 				}
 				if (height < m_layoutTextHeight) {
 					height = m_layoutTextHeight;
@@ -954,33 +957,34 @@ void TreeView::_calcTextHeight(Canvas* canvas)
 void TreeView::_drawItem(Canvas* canvas, TreeViewItem* item, sl_bool flagRoot)
 {
 	if (!flagRoot) {
-		sl_real left = item->m_frame.left;
-		sl_real right = item->m_frame.right;
-		sl_real top = item->m_frame.top;
-		sl_real bottom = item->m_frame.bottom;
+		sl_ui_pos left = item->m_frame.left;
+		sl_ui_pos right = item->m_frame.right;
+		sl_ui_pos top = item->m_frame.top;
+		sl_ui_pos bottom = item->m_frame.bottom;
 		if (item == m_itemSelected) {
 			Color backColor = m_selectedItemBackgroundColor;
 			if (backColor.a != 0) {
-				canvas->fillRectangle(Rectangle(0, top, getWidth(), bottom), Brush::createSolidBrush(backColor));
+				canvas->fillRectangle(UIRect(0, top, getWidth(), bottom), Brush::createSolidBrush(backColor));
 			}
 		}
 		if (item->m_children.getCount() > 0) {
 			if (item->m_flagOpened) {
 				Ref<Drawable> icon = m_iconExpanded;
 				if (icon.isNotNull()) {
-					canvas->draw(Rectangle(left - m_itemIndent, top, left, bottom), icon, ScaleMode::None, Alignment::MiddleCenter);
+					canvas->draw(UIRect(left - m_itemIndent, top, left, bottom), icon, ScaleMode::None, Alignment::MiddleCenter);
 				}
 			} else {
 				Ref<Drawable> icon = m_iconCollapsed;
 				if (icon.isNotNull()) {
-					canvas->draw(Rectangle(left - m_itemIndent, top, left, bottom), icon, ScaleMode::None, Alignment::MiddleCenter);
+					canvas->draw(UIRect(left - m_itemIndent, top, left, bottom), icon, ScaleMode::None, Alignment::MiddleCenter);
 				}
 			}
 		}
 		Ref<Drawable> icon = item->m_iconDrawing;
 		if (icon.isNotNull()) {
-			canvas->draw(Rectangle(left, top, left + icon->getDrawableWidth(), bottom), icon, ScaleMode::None, Alignment::MiddleCenter);
-			left += icon->getDrawableWidth();
+			sl_ui_pos iconWidth = (sl_ui_pos)(icon->getDrawableWidth());
+			canvas->draw(UIRect(left, top, left + iconWidth, bottom), icon, ScaleMode::None, Alignment::MiddleCenter);
+			left += iconWidth;
 			left += m_textIndent;
 		}
 		String text = item->m_text;
@@ -1008,7 +1012,7 @@ void TreeView::_drawItem(Canvas* canvas, TreeViewItem* item, sl_bool flagRoot)
 					colorText = m_itemTextColor;
 				}
 			}
-			canvas->drawText(text, Rectangle(left, top, right, bottom), getFont(), colorText, Alignment::MiddleLeft);
+			canvas->drawText(text, UIRect(left, top, right, bottom), getFont(), colorText, Alignment::MiddleLeft);
 		}
 	}
 	if (item->m_flagOpened) {
@@ -1065,7 +1069,7 @@ void TreeView::_processMouseEvent(UIEvent* ev)
 
 void TreeView::_processMouseEventItem(UIEvent* ev, sl_bool flagClick, TreeViewItem* item, sl_bool flagRoot)
 {
-	sl_real y =ev->getY();
+	sl_ui_pos y = (sl_ui_pos)(ev->getY());
 	UIAction action = ev->getAction();
 	if (!flagRoot) {
 		if (item->m_frame.top <= y && y < item->m_frame.bottom) {

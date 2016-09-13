@@ -378,48 +378,58 @@ Ref<Drawable> NinePiecesDrawable::create(sl_real leftWidth, sl_real rightWidth, 
 	return Ref<Drawable>::null();
 }
 
+Ref<Drawable> NinePiecesDrawable::create(sl_int32 leftWidth, sl_int32 rightWidth, sl_int32 topHeight, sl_int32 bottomHeight,
+										 const Ref<Drawable>& topLeft, const Ref<Drawable>& top, const Ref<Drawable>& topRight,
+										 const Ref<Drawable>& left, const Ref<Drawable>& center, const Ref<Drawable>& right,
+										 const Ref<Drawable>& bottomLeft, const Ref<Drawable>& bottom, const Ref<Drawable>& bottomRight)
+{
+	return create((sl_real)leftWidth, (sl_real)(rightWidth), (sl_real)topHeight, (sl_real)bottomHeight, topLeft, top, topRight, left, center, right, bottomLeft, bottom, bottomRight);
+}
+
 void NinePiecesDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
 {
+	sl_real x = rectDst.left;
+	sl_real y = rectDst.top;
 	sl_real widthLeft = m_widthLeft;
 	sl_real widthRight = m_widthRight;
 	sl_real heightTop = m_heightTop;
 	sl_real heightBottom = m_heightBottom;
-	sl_real widthDst = rectDst.getWidth();
-	sl_real heightDst = rectDst.getHeight();
-	if (widthDst < widthLeft + widthRight || heightDst < heightTop + heightBottom) {
+	sl_real width = rectDst.getWidth();
+	sl_real height = rectDst.getHeight();
+	if (width < widthLeft + widthRight || height < heightTop + heightBottom) {
 		canvas->draw(rectDst, m_partCenter);
 		return;
 	}
 	if (heightTop > 0) {
 		if (widthLeft > 0 && m_partTopLeft.isNotNull()) {
-			canvas->draw(Rectangle(rectDst.left, rectDst.top, rectDst.left + widthLeft, rectDst.top + heightTop), m_partTopLeft);
-		}
-		if (m_partTop.isNotNull()) {
-			canvas->draw(Rectangle(rectDst.left + widthLeft, rectDst.top, rectDst.right - widthRight, rectDst.top + heightTop), m_partTop);
+			canvas->draw(Rectangle(x, y, x + widthLeft, y + heightTop), m_partTopLeft);
 		}
 		if (widthRight > 0 && m_partTopRight.isNotNull()) {
-			canvas->draw(Rectangle(rectDst.right - widthRight, rectDst.top, rectDst.right, rectDst.top + heightTop), m_partTopRight);
+			canvas->draw(Rectangle(x + width - widthRight, y, x + width, y + heightTop), m_partTopRight);
+		}
+		if (m_partTop.isNotNull()) {
+			canvas->draw(Rectangle(x + widthLeft, y, x + width - widthRight, y + heightTop), m_partTop);
 		}
 	}
 	if (heightBottom > 0) {
 		if (widthLeft > 0 && m_partBottomLeft.isNotNull()) {
-			canvas->draw(Rectangle(rectDst.left, rectDst.bottom - heightBottom, rectDst.left + widthLeft, rectDst.bottom), m_partBottomLeft);
-		}
-		if (m_partBottom.isNotNull()) {
-			canvas->draw(Rectangle(rectDst.left + widthLeft, rectDst.bottom - heightBottom, rectDst.right - widthRight, rectDst.bottom), m_partBottom);
+			canvas->draw(Rectangle(x, y + height - heightBottom, x + widthLeft, y + height), m_partBottomLeft);
 		}
 		if (widthRight > 0 && m_partBottomRight.isNotNull()) {
-			canvas->draw(Rectangle(rectDst.right - widthRight, rectDst.bottom - heightBottom, rectDst.right, rectDst.bottom), m_partBottomRight);
+			canvas->draw(Rectangle(x + width - widthRight, y + height - heightBottom, x + width, y + height), m_partBottomRight);
+		}
+		if (m_partBottom.isNotNull()) {
+			canvas->draw(Rectangle(x + widthLeft, y + height - heightBottom, x + width - widthRight, y + height), m_partBottom);
 		}
 	}
 	if (widthLeft > 0 && m_partLeft.isNotNull()) {
-		canvas->draw(Rectangle(rectDst.left, rectDst.top + heightTop, rectDst.left + widthLeft, rectDst.bottom - heightBottom), m_partLeft);
-	}
-	if (m_partCenter.isNotNull()) {
-		canvas->draw(Rectangle(rectDst.left + widthLeft, rectDst.top + heightTop, rectDst.right - widthRight, rectDst.bottom - heightBottom), m_partCenter);
+		canvas->draw(Rectangle(x, y + heightTop, x + widthLeft, y + height - heightBottom), m_partLeft);
 	}
 	if (widthRight > 0 && m_partRight.isNotNull()) {
-		canvas->draw(Rectangle(rectDst.right - widthRight, rectDst.top + heightTop, rectDst.right, rectDst.bottom - heightBottom), m_partRight);
+		canvas->draw(Rectangle(x + width - widthRight, y + heightTop, x + width, y + height - heightBottom), m_partRight);
+	}
+	if (m_partCenter.isNotNull()) {
+		canvas->draw(Rectangle(x + widthLeft, y + heightTop, x + width - widthRight, y + height - heightBottom), m_partCenter);
 	}
 }
 
@@ -489,6 +499,12 @@ Ref<Drawable> NinePatchDrawable::create(const Ref<Drawable>& src, sl_real leftWi
 	return create(leftWidthSrc, rightWidthSrc, topHeightSrc, bottomHeightSrc, src, leftWidthSrc, rightWidthSrc, topHeightSrc, bottomHeightSrc);
 }
 
+Ref<Drawable> NinePatchDrawable::create(sl_int32 leftWidthDst, sl_int32 rightWidthDst, sl_int32 topHeightDst, sl_int32 bottomHeightDst,
+										const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc, sl_real topHeightSrc, sl_real bottomHeightSrc)
+{
+	return create((sl_real)leftWidthDst, (sl_real)rightWidthDst, (sl_real)topHeightDst, (sl_real)bottomHeightDst, src, leftWidthSrc, rightWidthSrc, topHeightSrc, bottomHeightSrc);
+}
+
 void NinePatchDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
 {
 	Ref<Drawable> src = m_src;
@@ -503,16 +519,6 @@ void NinePatchDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
 	sl_real widthRightDst = m_widthRightDst;
 	sl_real heightTopDst = m_heightTopDst;
 	sl_real heightBottomDst = m_heightBottomDst;
-	if (widthLeftDst > 1 && widthRightDst > 1 && heightTopDst > 1 && heightBottomDst > 1) {
-		xDst = (sl_real)(int)(xDst);
-		yDst = (sl_real)(int)(yDst);
-		widthDst = (sl_real)(int)(widthDst);
-		heightDst = (sl_real)(int)(heightDst);
-		widthLeftDst = (sl_real)(int)(widthLeftDst);
-		widthRightDst = (sl_real)(int)widthRightDst;
-		heightTopDst = (sl_real)(int)(heightTopDst);
-		heightBottomDst = (sl_real)(int)(heightBottomDst);
-	}
 	if (widthDst < widthLeftDst + widthRightDst || heightDst < heightTopDst + heightBottomDst) {
 		canvas->draw(rectDst, src);
 		return;
@@ -535,10 +541,10 @@ void NinePatchDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
 		if (widthLeftDst > 0 && widthLeftSrc > 0) {
 			canvas->draw(Rectangle(xDst, topDst, xDst + widthLeftDst, bottomDst), src, Rectangle(0, topSrc, widthLeftSrc, bottomSrc));
 		}
-		canvas->draw(Rectangle(xDst + widthLeftDst, topDst, xDst + widthDst - widthRightDst, bottomDst), src, Rectangle(widthLeftSrc, topSrc, widthSrc - widthRightSrc, bottomSrc));
 		if (widthRightDst > 0 && widthRightSrc > 0) {
 			canvas->draw(Rectangle(xDst + widthDst - widthRightDst, topDst, xDst + widthDst, bottomDst), src, Rectangle(widthSrc - widthRightSrc, topSrc, widthSrc, bottomSrc));
 		}
+		canvas->draw(Rectangle(xDst + widthLeftDst, topDst, xDst + widthDst - widthRightDst, bottomDst), src, Rectangle(widthLeftSrc, topSrc, widthSrc - widthRightSrc, bottomSrc));
 	}
 	if (heightBottomDst > 0 && heightBottomSrc > 0) {
 		sl_real topDst = yDst + heightDst - heightBottomDst;
@@ -548,10 +554,10 @@ void NinePatchDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
 		if (widthLeftDst > 0 && widthLeftSrc > 0) {
 			canvas->draw(Rectangle(xDst, topDst, xDst + widthLeftDst, bottomDst), src, Rectangle(0, topSrc, widthLeftSrc, bottomSrc));
 		}
-		canvas->draw(Rectangle(xDst + widthLeftDst, topDst, xDst + widthDst - widthRightDst, bottomDst), src, Rectangle(widthLeftSrc, topSrc, widthSrc - widthRightSrc, bottomSrc));
 		if (widthRightDst > 0 && widthRightSrc > 0) {
 			canvas->draw(Rectangle(xDst + widthDst - widthRightDst, topDst, xDst + widthDst, bottomDst), src, Rectangle(widthSrc - widthRightSrc, topSrc, widthSrc, bottomSrc));
 		}
+		canvas->draw(Rectangle(xDst + widthLeftDst, topDst, xDst + widthDst - widthRightDst, bottomDst), src, Rectangle(widthLeftSrc, topSrc, widthSrc - widthRightSrc, bottomSrc));
 	}
 	{
 		sl_real topDst = yDst + heightTopDst;
@@ -561,11 +567,183 @@ void NinePatchDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
 		if (widthLeftDst > 0 && widthLeftSrc > 0) {
 			canvas->draw(Rectangle(xDst, topDst, xDst + widthLeftDst, bottomDst), src, Rectangle(0, topSrc, widthLeftSrc, bottomSrc));
 		}
-		canvas->draw(Rectangle(xDst + widthLeftDst, topDst, xDst + widthDst - widthRightDst, bottomDst), src, Rectangle(widthLeftSrc, topSrc, widthSrc - widthRightSrc, bottomSrc));
 		if (widthRightDst > 0 && widthRightSrc > 0) {
 			canvas->draw(Rectangle(xDst + widthDst - widthRightDst, topDst, xDst + widthDst, bottomDst), src, Rectangle(widthSrc - widthRightSrc, topSrc, widthSrc, bottomSrc));
 		}
+		canvas->draw(Rectangle(xDst + widthLeftDst, topDst, xDst + widthDst - widthRightDst, bottomDst), src, Rectangle(widthLeftSrc, topSrc, widthSrc - widthRightSrc, bottomSrc));
 	}
+}
+
+
+SLIB_DEFINE_OBJECT(HorizontalThreePatchDrawable, Drawable)
+
+Ref<Drawable> HorizontalThreePatchDrawable::create(sl_real leftWidthDst, sl_real rightWidthDst,
+										const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc)
+{
+	if (src.isNull()) {
+		return Ref<Drawable>::null();
+	}
+	
+	if (leftWidthSrc + rightWidthSrc + SLIB_EPSILON > src->getDrawableWidth()) {
+		return Ref<Drawable>::null();
+	}
+
+	Ref<HorizontalThreePatchDrawable> ret = new HorizontalThreePatchDrawable;
+	
+	if (ret.isNotNull()) {
+		if (leftWidthDst < 0) {
+			leftWidthDst = 0;
+		}
+		if (rightWidthDst < 0) {
+			rightWidthDst = 0;
+		}
+		if (leftWidthSrc < 0) {
+			leftWidthSrc = 0;
+		}
+		if (rightWidthSrc < 0) {
+			rightWidthSrc = 0;
+		}
+		
+		ret->m_widthLeftDst = leftWidthDst;
+		ret->m_widthRightDst = rightWidthDst;
+		ret->m_src = src;
+		ret->m_widthLeftSrc = leftWidthSrc;
+		ret->m_widthRightSrc = rightWidthSrc;
+
+		return ret;
+		
+	}
+	return Ref<Drawable>::null();
+}
+
+Ref<Drawable> HorizontalThreePatchDrawable::create(const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc)
+{
+	return create(leftWidthSrc, rightWidthSrc, src, leftWidthSrc, rightWidthSrc);
+}
+
+Ref<Drawable> HorizontalThreePatchDrawable::create(sl_int32 leftWidthDst, sl_int32 rightWidthDst,
+										const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc)
+{
+	return create((sl_real)leftWidthDst, (sl_real)rightWidthDst, src, leftWidthSrc, rightWidthSrc);
+}
+
+void HorizontalThreePatchDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
+{
+	Ref<Drawable> src = m_src;
+	if (src.isNull()) {
+		return;
+	}
+	sl_real xDst = rectDst.left;
+	sl_real yDst = rectDst.top;
+	sl_real widthDst = rectDst.getWidth();
+	sl_real heightDst = rectDst.getHeight();
+	sl_real widthLeftDst = m_widthLeftDst;
+	sl_real widthRightDst = m_widthRightDst;
+	if (widthDst < widthLeftDst + widthRightDst) {
+		canvas->draw(rectDst, src);
+		return;
+	}
+	sl_real widthLeftSrc = m_widthLeftSrc;
+	sl_real widthRightSrc = m_widthRightSrc;
+	sl_real widthSrc = src->getDrawableWidth();
+	sl_real heightSrc = src->getDrawableHeight();
+	if (widthSrc < widthLeftSrc + widthRightSrc) {
+		canvas->draw(rectDst, src);
+		return;
+	}
+	if (widthLeftDst > 0 && widthLeftSrc > 0) {
+		canvas->draw(Rectangle(xDst, yDst, xDst + widthLeftDst, yDst + heightDst), src, Rectangle(0, 0, widthLeftSrc, heightSrc));
+	}
+	if (widthRightDst > 0 && widthRightSrc > 0) {
+		canvas->draw(Rectangle(xDst + widthDst - widthRightDst, yDst, xDst + widthDst, yDst + heightDst), src, Rectangle(widthSrc - widthRightSrc, 0, widthSrc, heightSrc));
+	}
+	canvas->draw(Rectangle(xDst + widthLeftDst, yDst, xDst + widthDst - widthRightDst, yDst + heightDst), src, Rectangle(widthLeftSrc, 0, widthSrc - widthRightSrc, heightSrc));
+}
+
+
+SLIB_DEFINE_OBJECT(VerticalThreePatchDrawable, Drawable)
+
+Ref<Drawable> VerticalThreePatchDrawable::create(sl_real topHeightDst, sl_real bottomHeightDst,
+										const Ref<Drawable>& src, sl_real topHeightSrc, sl_real bottomHeightSrc)
+{
+	if (src.isNull()) {
+		return Ref<Drawable>::null();
+	}
+	
+	if (topHeightSrc + bottomHeightSrc + SLIB_EPSILON > src->getDrawableWidth()) {
+		return Ref<Drawable>::null();
+	}
+	
+	Ref<VerticalThreePatchDrawable> ret = new VerticalThreePatchDrawable;
+	
+	if (ret.isNotNull()) {
+		if (topHeightDst < 0) {
+			topHeightDst = 0;
+		}
+		if (bottomHeightDst < 0) {
+			bottomHeightDst = 0;
+		}
+		if (topHeightSrc < 0) {
+			topHeightSrc = 0;
+		}
+		if (bottomHeightSrc < 0) {
+			bottomHeightSrc = 0;
+		}
+		
+		ret->m_heightTopDst = topHeightDst;
+		ret->m_heightBottomDst = bottomHeightDst;
+		ret->m_src = src;
+		ret->m_heightTopSrc = topHeightSrc;
+		ret->m_heightBottomSrc = bottomHeightSrc;
+		
+		return ret;
+		
+	}
+	return Ref<Drawable>::null();
+}
+
+Ref<Drawable> VerticalThreePatchDrawable::create(const Ref<Drawable>& src, sl_real topHeightSrc, sl_real bottomHeightSrc)
+{
+	return create(topHeightSrc, bottomHeightSrc, src, topHeightSrc, bottomHeightSrc);
+}
+
+Ref<Drawable> VerticalThreePatchDrawable::create(sl_int32 topHeightDst, sl_int32 bottomHeightDst,
+										const Ref<Drawable>& src, sl_real topHeightSrc, sl_real bottomHeightSrc)
+{
+	return create((sl_real)topHeightDst, (sl_real)bottomHeightDst, src, topHeightSrc, bottomHeightSrc);
+}
+
+void VerticalThreePatchDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
+{
+	Ref<Drawable> src = m_src;
+	if (src.isNull()) {
+		return;
+	}
+	sl_real xDst = rectDst.left;
+	sl_real yDst = rectDst.top;
+	sl_real widthDst = rectDst.getWidth();
+	sl_real heightDst = rectDst.getHeight();
+	sl_real heightTopDst = m_heightTopDst;
+	sl_real heightBottomDst = m_heightBottomDst;
+	if (heightDst < heightTopDst + heightBottomDst) {
+		canvas->draw(rectDst, src);
+		return;
+	}
+	sl_real heightTopSrc = m_heightTopSrc;
+	sl_real heightBottomSrc = m_heightBottomSrc;
+	sl_real widthSrc = src->getDrawableWidth();
+	sl_real heightSrc = src->getDrawableHeight();
+	if (heightSrc < heightTopSrc + heightBottomSrc) {
+		canvas->draw(rectDst, src);
+		return;
+	}
+	if (heightTopDst > 0 && heightTopSrc > 0) {
+		canvas->draw(Rectangle(xDst, yDst, xDst + widthDst, yDst + heightTopDst), src, Rectangle(0, 0, widthSrc, heightTopSrc));
+	}
+	if (heightBottomDst > 0 && heightBottomSrc > 0) {
+		canvas->draw(Rectangle(xDst, yDst + heightDst - heightBottomDst, xDst + widthDst, yDst + heightDst), src, Rectangle(0, heightSrc - heightBottomSrc, widthSrc, heightSrc));
+	}
+	canvas->draw(Rectangle(xDst, yDst + heightTopDst, xDst + widthDst, yDst + heightDst - heightBottomDst), src, Rectangle(0, heightTopSrc, widthSrc, heightSrc - heightBottomSrc));
 }
 
 

@@ -62,7 +62,7 @@ protected:
 	virtual void onMessageFromJavaScript(const String& msg, const String& param);
 
 	// override
-	void onResize(sl_real width, sl_real height);
+	void onResize(sl_ui_len width, sl_ui_len height);
 	
 public:
 	// override

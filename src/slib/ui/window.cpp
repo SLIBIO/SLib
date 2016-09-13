@@ -18,9 +18,9 @@ WindowInstanceParam::WindowInstanceParam()
 #endif
 }
 
-Rectangle WindowInstanceParam::calculateRegion(const Rectangle& screenFrame) const
+UIRect WindowInstanceParam::calculateRegion(const UIRect& screenFrame) const
 {
-	Rectangle frame;
+	UIRect frame;
 	if (flagFullScreen) {
 		frame.setLeftTop(0, 0);
 		frame.setSize(screenFrame.getSize());
@@ -32,6 +32,7 @@ Rectangle WindowInstanceParam::calculateRegion(const Rectangle& screenFrame) con
 		}
 		frame.setSize(size);
 	}
+	frame.fixSizeError();
 	return frame;
 }
 
@@ -198,7 +199,7 @@ void Window::_runModal()
 	}
 }
 
-Rectangle Window::getFrame()
+UIRect Window::getFrame()
 {
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
@@ -207,7 +208,7 @@ Rectangle Window::getFrame()
 	return m_frame;
 }
 
-void Window::setFrame(const Rectangle& frame)
+void Window::setFrame(const UIRect& frame)
 {
 	m_frame = frame;
 	Ref<WindowInstance> instance = m_instance;
@@ -216,116 +217,116 @@ void Window::setFrame(const Rectangle& frame)
 	}
 }
 
-void Window::setFrame(sl_real left, sl_real top, sl_real width, sl_real height)
+void Window::setFrame(sl_ui_pos left, sl_ui_pos top, sl_ui_len width, sl_ui_len height)
 {
-	Rectangle rect;
+	UIRect rect;
 	rect.left = left;
 	rect.top = top;
 	rect.setSize(width, height);
 	setFrame(rect);
 }
 
-Point Window::getLocation()
+UIPoint Window::getLocation()
 {
 	return getFrame().getLocation();
 }
 
-void Window::setLocation(const Point& location)
+void Window::setLocation(const UIPoint& location)
 {
-	Rectangle frame = getFrame();
+	UIRect frame = getFrame();
 	frame.setLocation(location);
 	setFrame(frame);
 }
 
-void Window::setLocation(sl_real x, sl_real y)
+void Window::setLocation(sl_ui_pos x, sl_ui_pos y)
 {
-	setLocation(Point(x, y));
+	setLocation(UIPoint(x, y));
 }
 
-sl_real Window::getX()
+sl_ui_pos Window::getLeft()
 {
 	return getFrame().left;
 }
 
-void Window::setX(sl_real x)
+void Window::setLeft(sl_ui_pos x)
 {
-	Rectangle frame = getFrame();
+	UIRect frame = getFrame();
 	frame.left = x;
 	setFrame(frame);
 }
 
-sl_real Window::getY()
+sl_ui_pos Window::getTop()
 {
 	return getFrame().top;
 }
 
-void Window::setY(sl_real y)
+void Window::setTop(sl_ui_pos y)
 {
-	Rectangle frame = getFrame();
+	UIRect frame = getFrame();
 	frame.top = y;
 	setFrame(frame);
 }
 
-Size Window::getSize()
+UISize Window::getSize()
 {
 	return getFrame().getSize();
 }
 
-void Window::setSize(const Size& size)
+void Window::setSize(const UISize& size)
 {
-	Rectangle frame = getFrame();
+	UIRect frame = getFrame();
 	frame.setSize(size);
 	setFrame(frame);
 }
 
-void Window::setSize(sl_real width, sl_real height)
+void Window::setSize(sl_ui_len width, sl_ui_len height)
 {
 	setSize(Size(width, height));
 }
 
-sl_real Window::getWidth()
+sl_ui_len Window::getWidth()
 {
 	return getFrame().getWidth();
 }
 
-void Window::setWidth(sl_real width)
+void Window::setWidth(sl_ui_len width)
 {
-	Rectangle frame = getFrame();
+	UIRect frame = getFrame();
 	frame.setWidth(width);
 	setFrame(frame);
 }
 
-sl_real Window::getHeight()
+sl_ui_len Window::getHeight()
 {
 	return getFrame().getHeight();
 }
 
-void Window::setHeight(sl_real height)
+void Window::setHeight(sl_ui_len height)
 {
-	Rectangle frame = getFrame();
+	UIRect frame = getFrame();
 	frame.setHeight(height);
 	setFrame(frame);
 }
 
-Rectangle Window::getClientFrame()
+UIRect Window::getClientFrame()
 {
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
 		return instance->getClientFrame();
 	}
-	return Rectangle::zero();
+	return UIRect::zero();
 }
 
-Size Window::getClientSize()
+UISize Window::getClientSize()
 {
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
 		return instance->getClientSize();
 	}
-	return Size::zero();
+	return UISize::zero();
 }
 
-void Window::setClientSize(const Size& size)
+void Window::setClientSize(const UISize& size)
 {
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
@@ -333,9 +334,9 @@ void Window::setClientSize(const Size& size)
 	}
 }
 
-void Window::setClientSize(sl_real width, sl_real height)
+void Window::setClientSize(sl_ui_len width, sl_ui_len height)
 {
-	setClientSize(Size(width, height));
+	setClientSize(UISize(width, height));
 }
 
 String Window::getTitle()
@@ -514,131 +515,131 @@ void Window::setTransparent(sl_bool flag)
 	}
 }
 
-Point Window::convertCoordinateFromScreenToWindow(const Point& ptScreen)
+UIPointf Window::convertCoordinateFromScreenToWindow(const UIPointf& ptScreen)
 {
 	Ref<WindowInstance> instance = m_instance;
 	if (instance.isNotNull()) {
 		return instance->convertCoordinateFromScreenToWindow(ptScreen);
 	} else {
-		return Point::zero();
+		return UIPointf::zero();
 	}
 }
 
-Rectangle Window::convertCoordinateFromScreenToWindow(const Rectangle& rect)
+UIRectf Window::convertCoordinateFromScreenToWindow(const UIRectf& rect)
 {
-	Rectangle ret;
+	UIRectf ret;
 	ret.setLeftTop(convertCoordinateFromScreenToWindow(rect.getLeftTop()));
 	ret.setRightBottom(convertCoordinateFromScreenToWindow(rect.getRightBottom()));
 	return ret;
 }
 
-Point Window::convertCoordinateFromWindowToScreen(const Point& ptWindow)
+UIPointf Window::convertCoordinateFromWindowToScreen(const UIPointf& ptWindow)
 {
 	Ref<WindowInstance> instance = m_instance;
 	if (instance.isNotNull()) {
 		return instance->convertCoordinateFromWindowToScreen(ptWindow);
 	} else {
-		return Point::zero();
+		return UIPointf::zero();
 	}
 }
 
-Rectangle Window::convertCoordinateFromWindowToScreen(const Rectangle& rect)
+UIRectf Window::convertCoordinateFromWindowToScreen(const UIRectf& rect)
 {
-	Rectangle ret;
+	UIRectf ret;
 	ret.setLeftTop(convertCoordinateFromWindowToScreen(rect.getLeftTop()));
 	ret.setRightBottom(convertCoordinateFromWindowToScreen(rect.getRightBottom()));
 	return ret;
 }
 
-Point Window::convertCoordinateFromScreenToClient(const Point& ptScreen)
+UIPointf Window::convertCoordinateFromScreenToClient(const UIPointf& ptScreen)
 {
 	Ref<WindowInstance> instance = m_instance;
 	if (instance.isNotNull()) {
 		return instance->convertCoordinateFromScreenToClient(ptScreen);
 	} else {
-		return Point::zero();
+		return UIPointf::zero();
 	}
 }
 
-Rectangle Window::convertCoordinateFromScreenToClient(const Rectangle& rect)
+UIRectf Window::convertCoordinateFromScreenToClient(const UIRectf& rect)
 {
-	Rectangle ret;
+	UIRectf ret;
 	ret.setLeftTop(convertCoordinateFromScreenToClient(rect.getLeftTop()));
 	ret.setRightBottom(convertCoordinateFromScreenToClient(rect.getRightBottom()));
 	return ret;
 }
 
-Point Window::convertCoordinateFromClientToScreen(const Point& ptClient)
+UIPointf Window::convertCoordinateFromClientToScreen(const UIPointf& ptClient)
 {
 	Ref<WindowInstance> instance = m_instance;
 	if (instance.isNotNull()) {
 		return instance->convertCoordinateFromClientToScreen(ptClient);
 	} else {
-		return Point::zero();
+		return UIPointf::zero();
 	}
 }
 
-Rectangle Window::convertCoordinateFromClientToScreen(const Rectangle& rect)
+UIRectf Window::convertCoordinateFromClientToScreen(const UIRectf& rect)
 {
-	Rectangle ret;
+	UIRectf ret;
 	ret.setLeftTop(convertCoordinateFromClientToScreen(rect.getLeftTop()));
 	ret.setRightBottom(convertCoordinateFromClientToScreen(rect.getRightBottom()));
 	return ret;
 }
 
-Point Window::convertCoordinateFromWindowToClient(const Point& ptWindow)
+UIPointf Window::convertCoordinateFromWindowToClient(const UIPointf& ptWindow)
 {
 	Ref<WindowInstance> instance = m_instance;
 	if (instance.isNotNull()) {
 		return instance->convertCoordinateFromWindowToClient(ptWindow);
 	} else {
-		return Point::zero();
+		return UIPointf::zero();
 	}
 }
 
-Rectangle Window::convertCoordinateFromWindowToClient(const Rectangle& rect)
+UIRectf Window::convertCoordinateFromWindowToClient(const UIRectf& rect)
 {
-	Rectangle ret;
+	UIRectf ret;
 	ret.setLeftTop(convertCoordinateFromWindowToClient(rect.getLeftTop()));
 	ret.setRightBottom(convertCoordinateFromWindowToClient(rect.getRightBottom()));
 	return ret;
 }
 
-Point Window::convertCoordinateFromClientToWindow(const Point& ptClient)
+UIPointf Window::convertCoordinateFromClientToWindow(const UIPointf& ptClient)
 {
 	Ref<WindowInstance> instance = m_instance;
 	if (instance.isNotNull()) {
 		return instance->convertCoordinateFromClientToWindow(ptClient);
 	} else {
-		return Point::zero();
+		return UIPointf::zero();
 	}
 }
 
-Rectangle Window::convertCoordinateFromClientToWindow(const Rectangle& rect)
+UIRectf Window::convertCoordinateFromClientToWindow(const UIRectf& rect)
 {
-	Rectangle ret;
+	UIRectf ret;
 	ret.setLeftTop(convertCoordinateFromClientToWindow(rect.getLeftTop()));
 	ret.setRightBottom(convertCoordinateFromClientToWindow(rect.getRightBottom()));
 	return ret;
 }
 
-Size Window::getWindowSizeFromClientSize(const Size& sizeClient)
+UISize Window::getWindowSizeFromClientSize(const UISize& sizeClient)
 {
 	Ref<WindowInstance> instance = m_instance;
 	if (instance.isNotNull()) {
 		return instance->getWindowSizeFromClientSize(sizeClient);
 	} else {
-		return Point::zero();
+		return UISize::zero();
 	}
 }
 
-Size Window::getClientSizeFromWindowSize(const Size& sizeWindow)
+UISize Window::getClientSizeFromWindowSize(const UISize& sizeWindow)
 {
 	Ref<WindowInstance> instance = m_instance;
 	if (instance.isNotNull()) {
 		return instance->getClientSizeFromWindowSize(sizeWindow);
 	} else {
-		return Point::zero();
+		return UISize::zero();
 	}
 }
 
@@ -729,8 +730,8 @@ void Window::attach(const Ref<WindowInstance>& instance)
 		
 		Ref<ViewInstance> contentViewInstance = instance->getContentView();
 		if (contentViewInstance.isNotNull()) {
-			Rectangle rect;
-			rect.setLeftTop(Point::zero());
+			UIRect rect;
+			rect.setLeftTop(UIPoint::zero());
 			rect.setSize(instance->getClientSize());
 			Ref<View> view = m_viewContent;
 			if (view.isNotNull()) {
@@ -824,9 +825,9 @@ void Window::_create()
 		onCreate();
 		
 #if !defined(SLIB_PLATFORM_IS_OSX)
-		Size sizeOld = getSize();
+		UISize sizeOld = getSize();
 		if (sizeOld.x > 0 && sizeOld.y > 0) {
-			Size size = sizeOld;
+			UISize size = sizeOld;
 			dispatchResize(size);
 			if (size != sizeOld) {
 				setSize(size);
@@ -905,7 +906,7 @@ void Window::onMove()
 {
 }
 
-void Window::onResize(Size& size)
+void Window::onResize(UISize& size)
 {
 }
 
@@ -975,7 +976,7 @@ void Window::dispatchMove()
 	}
 }
 
-void Window::dispatchResize(Size& size)
+void Window::dispatchResize(UISize& size)
 {
 	_refreshSize();
 	onResize(size);
@@ -1027,8 +1028,8 @@ void Window::_refreshSize()
 {
 	Ref<View> view = m_viewContent;
 	if (view.isNotNull()) {
-		Rectangle rect;
-		rect.setLeftTop(Point::zero());
+		UIRect rect;
+		rect.setLeftTop(UIPoint::zero());
 		rect.setSize(getClientSize());
 		view->setFrame(rect);
 	}
@@ -1098,7 +1099,7 @@ void WindowInstance::onMove()
 	}
 }
 
-void WindowInstance::onResize(Size& size)
+void WindowInstance::onResize(UISize& size)
 {
 	Ref<Window> window = getWindow();
 	if (window.isNotNull()) {
@@ -1106,9 +1107,9 @@ void WindowInstance::onResize(Size& size)
 	}
 }
 
-void WindowInstance::onResized(sl_real width, sl_real height)
+void WindowInstance::onResized(sl_ui_len width, sl_ui_len height)
 {
-	Size size(width, height);
+	UISize size(width, height);
 	onResize(size);
 }
 

@@ -60,21 +60,21 @@ public:
 	String getSelectedTitle();
 
 	
-	const Size& getIconSize();
+	const UISize& getIconSize();
 	
-	virtual void setIconSize(const Size& size, sl_bool flagRedraw = sl_true);
+	virtual void setIconSize(const UISize& size, sl_bool flagRedraw = sl_true);
 	
-	void setIconSize(sl_real width, sl_real height, sl_bool flagRedraw = sl_true);
+	void setIconSize(sl_ui_len width, sl_ui_len height, sl_bool flagRedraw = sl_true);
 	
-	void setIconSize(sl_real size, sl_bool flagRedraw = sl_true);
+	void setIconSize(sl_ui_len size, sl_bool flagRedraw = sl_true);
 	
-	sl_real getIconWidth();
+	sl_ui_len getIconWidth();
 	
-	void setIconWidth(sl_real width, sl_bool flagRedraw = sl_true);
+	void setIconWidth(sl_ui_len width, sl_bool flagRedraw = sl_true);
 	
-	sl_real getIconHeight();
+	sl_ui_len getIconHeight();
 	
-	void setIconHeight(sl_real height, sl_bool flagRedraw = sl_true);
+	void setIconHeight(sl_ui_len height, sl_bool flagRedraw = sl_true);
 	
 	
 	Ref<Drawable> getLeftIcon();
@@ -108,9 +108,9 @@ protected:
 	void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 	
 protected:
-	Rectangle getLeftIconRegion();
+	UIRect getLeftIconRegion();
 	
-	Rectangle getRightIconRegion();
+	UIRect getRightIconRegion();
 	
 public:
 	// override
@@ -135,7 +135,7 @@ protected:
 	SafeList<String> m_titles;
 	sl_uint32 m_indexSelected;
 	
-	Size m_iconSize;
+	UISize m_iconSize;
 	SafeRef<Drawable> m_leftIcon;
 	SafeRef<Drawable> m_rightIcon;
 	int m_clickedIconNo;

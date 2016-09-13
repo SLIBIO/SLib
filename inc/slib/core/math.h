@@ -143,6 +143,14 @@ public:
 	static sl_bool isAlmostZero(float f);
 	
 	static sl_bool isAlmostZero(double f);
+	
+	static sl_bool isAlmostZero(sl_int32 f);
+	
+	static sl_bool isAlmostZero(sl_uint32 f);
+	
+	static sl_bool isAlmostZero(sl_int64 f);
+	
+	static sl_bool isAlmostZero(sl_uint64 f);
 
 	static sl_bool isLessThanEpsilon(float f);
 	
@@ -326,6 +334,26 @@ SLIB_INLINE sl_bool Math::isAlmostZero(float f)
 SLIB_INLINE sl_bool Math::isAlmostZero(double f)
 {
 	return f > -SLIB_EPSILON_LONG && f < SLIB_EPSILON_LONG;
+}
+
+SLIB_INLINE sl_bool Math::isAlmostZero(sl_int32 v)
+{
+	return v == 0;
+}
+
+SLIB_INLINE sl_bool Math::isAlmostZero(sl_uint32 v)
+{
+	return v == 0;
+}
+
+SLIB_INLINE sl_bool Math::isAlmostZero(sl_int64 v)
+{
+	return v == 0;
+}
+
+SLIB_INLINE sl_bool Math::isAlmostZero(sl_uint64 v)
+{
+	return v == 0;
 }
 
 SLIB_INLINE sl_bool Math::isLessThanEpsilon(float f)

@@ -268,6 +268,13 @@ public:
 	};
 };
 
+enum class UIAttachMode
+{
+	NotAttach,
+	AttachAlways,
+	NotAttachInNativeWidget
+};
+
 SLIB_UI_NAMESPACE_END
 
 #endif
