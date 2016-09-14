@@ -150,7 +150,7 @@ SLIB_NAMESPACE_BEGIN
 template <class T, class FT>
 template <class O, class FO>
 SLIB_INLINE RectangleT<T, FT>::RectangleT(const RectangleT<O, FO>& other)
-: left((T)(other.left)), top((other.top)), right((T)(other.right)), bottom((T)(other.bottom))
+: left((T)(other.left)), top((T)(other.top)), right((T)(other.right)), bottom((T)(other.bottom))
 {
 }
 

@@ -923,7 +923,7 @@ void UIEventLogListener::onMove(Window* window)
 
 void UIEventLogListener::onResize(Window* window, UISize& size)
 {
-	SLIB_LOG("Window", "onResize (" + String::fromFloat(size.x) + "," + String::fromFloat(size.y) + ")");
+	SLIB_LOG("Window", String::format("onResize (%d, %d)", size.x, size.y));
 }
 
 void UIEventLogListener::onMinimize(Window* window)

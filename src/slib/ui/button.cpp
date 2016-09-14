@@ -725,9 +725,6 @@ void Button::layoutIconAndText(GraphicsContext* gc, sl_ui_len widthFrame, sl_ui_
 	
 	Ref<Font> font = getFont();
 	UISize sizeText = gc->getFontTextSize(font, m_text);
-	if (font.isNotNull()) {
-		sizeText.y = (sl_ui_pos)(font->getSize());
-	}
 	sl_ui_pos widthText = sizeText.x + m_textMarginLeft + m_textMarginRight;
 	if (widthText < 0) {
 		widthText = 0;

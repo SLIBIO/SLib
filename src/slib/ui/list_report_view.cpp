@@ -293,7 +293,7 @@ void ListReportView::dispatchSelectRow(sl_uint32 row)
 
 void ListReportView::dispatchClickRow(sl_uint32 row, const UIPoint& pt)
 {
-	Ref<UIEvent> ev = UIEvent::createMouseEvent(UIAction::Unknown, pt.x, pt.y);
+	Ref<UIEvent> ev = UIEvent::createMouseEvent(UIAction::Unknown, (sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y));
 	if (ev.isNotNull()) {
 		dispatchClick(ev.ptr);
 	}
@@ -314,7 +314,7 @@ void ListReportView::dispatchRightButtonClickRow(sl_uint32 row, const UIPoint& p
 
 void ListReportView::dispatchDoubleClickRow(sl_uint32 row, const UIPoint& pt)
 {
-	Ref<UIEvent> ev = UIEvent::createMouseEvent(UIAction::LeftButtonDoubleClick, pt.x, pt.y);
+	Ref<UIEvent> ev = UIEvent::createMouseEvent(UIAction::LeftButtonDoubleClick, (sl_real)(pt.x), (sl_real)(pt.y));
 	if (ev.isNotNull()) {
 		dispatchMouseEvent(ev.ptr);
 	}

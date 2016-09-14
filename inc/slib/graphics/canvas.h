@@ -35,6 +35,8 @@ public:
 	virtual void restore() = 0;
 
 	
+	virtual sl_bool isAntiAlias() = 0;
+
 	virtual void setAntiAlias(sl_bool flag) = 0;
 	
 	

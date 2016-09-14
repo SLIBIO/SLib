@@ -183,12 +183,11 @@ public:
 				ret->m_flagFreeOnRelease = flagFreeOnRelease;
 				ret->m_ref = ref;
 				ret->m_flagBuffer = flagBuffer;
-				graphics->SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+				graphics->SetSmoothingMode(Gdiplus::SmoothingModeNone);
+				graphics->SetInterpolationMode(Gdiplus::InterpolationModeNearestNeighbor);
 				ret->setMatrix(Matrix3::identity());
 				if (rectClip) {
 					ret->clipToRectangle(*rectClip);
-				} else {
-					ret->clipToRectangle(Rectangle(0, 0, width, height));
 				}
 				return ret;
 			}
@@ -227,6 +226,7 @@ public:
 		}
 	}
 
+	// override
 	sl_bool isAntiAlias()
 	{
 		return m_graphics->GetSmoothingMode() == Gdiplus::SmoothingModeAntiAlias;
@@ -237,8 +237,10 @@ public:
 	{
 		if (flag) {
 			m_graphics->SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+			m_graphics->SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBilinear);
 		} else {
 			m_graphics->SetSmoothingMode(Gdiplus::SmoothingModeNone);
+			m_graphics->SetInterpolationMode(Gdiplus::InterpolationModeNearestNeighbor);
 		}
 	}
 
@@ -250,7 +252,7 @@ public:
 		if (status == Gdiplus::Ok) {
 			return Rectangle(rc.X, rc.Y, rc.X + rc.Width, rc.Y + rc.Height);
 		}
-		return Rectangle::zero();
+		return Rectangle(0, 0, m_width, m_height);
 	}
 
     // override

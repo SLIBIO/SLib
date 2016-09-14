@@ -476,7 +476,7 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 			}
 		}
 		
-		if (scrollY > heightTotalItems) {
+		if (scrollY > (sl_ui_pos)heightTotalItems) {
 			scrollY = heightTotalItems;
 		}
 		
@@ -639,10 +639,10 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 
 		// readjust scroll position
 		if (!flagClearAll) {
-			if (scrollY < heightListView || scrollY + 2 * heightListView >= heightTotalItems) {
+			if (scrollY < heightListView || scrollY + 2 * heightListView >= (sl_ui_pos)heightTotalItems) {
 				sl_ui_pos scrollOffset = scrollY - yStart;
 				sl_ui_pos yStartNew = _ListView_getYPositionOfItem(indexStart, countTotalItems, averageItemHeight, averageMidItemHeight, heightTotalItems, heightsTopItems, heightsBottomItems);
-				if (Math::abs(yStartNew - yStart) > averageItemHeight/10) {
+				if (Math::abs(yStartNew - yStart) >(sl_ui_pos)averageItemHeight/10) {
 					yStart = yStartNew;
 					scrollY = yStartNew + scrollOffset;
 				}

@@ -44,21 +44,26 @@ sl_bool Windows::isWindowVisible(HWND hWnd)
 	if (::IsIconic(hWnd)) {
 		return sl_false;
 	}
-	hWnd = ::GetParent(hWnd);
+	hWnd = Windows::getParentWindow(hWnd);
 	if (hWnd) {
 		return Windows::isWindowVisible(hWnd);
 	}
 	return sl_true;
 }
 
+HWND Windows::getOwnerWindow(HWND hWnd)
+{
+	return ::GetWindow(hWnd, GW_OWNER);
+}
+
+HWND Windows::getParentWindow(HWND hWnd)
+{
+	return ::GetAncestor(hWnd, GA_PARENT);
+}
+
 HWND Windows::getRootWindow(HWND hWnd)
 {
-	HWND hWndParent = ::GetParent(hWnd);
-	if (hWndParent) {
-		return Windows::getRootWindow(hWndParent);
-	} else {
-		return hWndParent;
-	}
+	return ::GetAncestor(hWnd, GA_ROOT);
 }
 
 String Windows::getWindowText(HWND hWnd)

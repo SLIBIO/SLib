@@ -281,7 +281,7 @@ void Window::setSize(const UISize& size)
 
 void Window::setSize(sl_ui_len width, sl_ui_len height)
 {
-	setSize(Size(width, height));
+	setSize(UISize(width, height));
 }
 
 sl_ui_len Window::getWidth()

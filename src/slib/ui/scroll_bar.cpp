@@ -446,7 +446,7 @@ void ScrollBar::onMouseWheelEvent(UIEvent* ev)
 			line = range * 0.05f;
 		}
 	}
-	sl_ui_pos delta;
+	sl_real delta;
 	if (flagVertical) {
 		delta = ev->getDeltaY();
 	} else {

@@ -923,7 +923,7 @@ void TreeView::_makeLayoutItem(TreeViewItem* item, sl_ui_pos& top, sl_ui_pos lef
 				if (iconDraw.isNotNull()) {
 					height = (sl_ui_pos)(iconDraw->getDrawableHeight());
 				}
-				if (height < m_layoutTextHeight) {
+				if (height < (sl_ui_pos)m_layoutTextHeight) {
 					height = m_layoutTextHeight;
 				}
 				height += m_itemPadding;
@@ -951,7 +951,11 @@ void TreeView::_makeLayoutItem(TreeViewItem* item, sl_ui_pos& top, sl_ui_pos lef
 
 void TreeView::_calcTextHeight(Canvas* canvas)
 {
-	m_layoutTextHeight = canvas->getTextSize(getFont(), "j").y;
+	sl_ui_pos height = (sl_ui_pos)(canvas->getTextSize(getFont(), "|").y);
+	if (height < 0) {
+		height = 0;
+	}
+	m_layoutTextHeight = height;
 }
 
 void TreeView::_drawItem(Canvas* canvas, TreeViewItem* item, sl_bool flagRoot)

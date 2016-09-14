@@ -83,20 +83,6 @@ public:
 
 SLIB_DEFINE_OBJECT(_Gdiplus_ImageDrawable, Drawable)
 
-Ref<Drawable> UIPlatform::createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease, const Referable* ref)
-{
-	return _Gdiplus_ImageDrawable::create(image, flagFreeOnRelease, ref);
-}
-
-Gdiplus::Image* UIPlatform::getImageDrawableHandle(Drawable* _drawable)
-{
-	if (_Gdiplus_ImageDrawable::checkInstance(_drawable)) {
-		_Gdiplus_ImageDrawable* drawable = (_Gdiplus_ImageDrawable*)_drawable;
-		return drawable->m_image;
-	}
-	return NULL;
-}
-
 Ref<Drawable> UI::createDrawableFromImage(const ImageDesc& desc)
 {
 	return UI::createBitmapFromImage(desc);
@@ -421,6 +407,33 @@ Ref<Bitmap> UI::loadBitmapFromMemory(const void* mem, sl_size size)
 	return _Gdiplus_Bitmap::loadFromMemory(mem, size);
 }
 
+
+Ref<Drawable> UIPlatform::createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease, const Referable* ref)
+{
+	return _Gdiplus_ImageDrawable::create(image, flagFreeOnRelease, ref);
+}
+
+Gdiplus::Image* UIPlatform::getImageHandle(Drawable* _drawable)
+{
+	if (_Gdiplus_ImageDrawable::checkInstance(_drawable)) {
+		_Gdiplus_ImageDrawable* drawable = (_Gdiplus_ImageDrawable*)_drawable;
+		return drawable->m_image;
+	}
+	if (_Gdiplus_Bitmap::checkInstance(_drawable)) {
+		_Gdiplus_Bitmap* bitmap = (_Gdiplus_Bitmap*)_drawable;
+		return bitmap->m_bitmap;
+	}
+	return NULL;
+}
+
+Gdiplus::Bitmap* UIPlatform::getBitmapHandle(Bitmap* _bitmap)
+{
+	if (_Gdiplus_Bitmap::checkInstance(_bitmap)) {
+		_Gdiplus_Bitmap* bitmap = (_Gdiplus_Bitmap*)_bitmap;
+		return bitmap->m_bitmap;
+	}
+	return NULL;
+}
 
 HBITMAP UIPlatform::createDIBFromBitmap(const Ref<Bitmap>& bitmap)
 {

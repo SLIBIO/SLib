@@ -5,7 +5,10 @@
 #include "view_win32.h"
 
 #include "../../../inc/slib/ui/core.h"
+#include "../../../inc/slib/ui/window.h"
 #include "../../../inc/slib/ui/scroll_view.h"
+
+#define USE_SCREEN_BACK_BUFFER
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -190,7 +193,7 @@ UIPointf Win32_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& p
 		pt.x = (LONG)(ptScreen.x);
 		pt.y = (LONG)(ptScreen.y);
 		::ScreenToClient(hWnd, &pt);
-		return UIPointf((sl_ui_pos)(pt.x), (sl_ui_pos)(pt.y));
+		return UIPointf((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y));
 	}
 	return ptScreen;
 }
@@ -203,7 +206,7 @@ UIPointf Win32_ViewInstance::convertCoordinateFromViewToScreen(const UIPointf& p
 		pt.x = (LONG)(ptView.x);
 		pt.y = (LONG)(ptView.y);
 		::ClientToScreen(hWnd, &pt);
-		return UIPointf((sl_ui_pos)(pt.x), (sl_ui_pos)(pt.y));
+		return UIPointf((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y));
 	}
 	return ptView;
 }
@@ -356,45 +359,182 @@ sl_bool Win32_ViewInstance::preprocessWindowMessage(MSG& msg)
 	return sl_false;
 }
 
+static void _Win32_DrawView(Canvas* canvas, View* view, sl_bool flagErased)
+{
+	Color colorClear = Color::zero();
+	do {
+		if (view->isDoubleBuffering()) {
+			break;
+		}
+		if (view->isOpaque()) {
+			break;
+		}
+		Color color = view->getBackgroundColor();
+		if (color.a == 255) {
+			break;
+		}
+
+		Ref<Window> window = view->getWindow();
+		if (window.isNotNull() && window->getContentView() == view) {
+			colorClear = window->getBackgroundColor();
+			if (colorClear.a < 255) {
+				Color c = UIPlatform::getColorFromColorRef(::GetSysColor(COLOR_MENU));
+				c.blend_PA_NPA(colorClear);
+				colorClear = c;
+			}
+			break;
+		} else {
+			if (!flagErased) {
+				colorClear = UIPlatform::getColorFromColorRef(::GetSysColor(COLOR_MENU));
+			}
+		}
+	} while (0);
+	if (colorClear.isNotZero()) {
+		canvas->fillRectangle(view->getBounds(), colorClear);
+	}
+	view->dispatchDraw(canvas);
+}
+
+class _Win32_Draw_BackBuffer
+{
+public:
+	Mutex mutex;
+	Ref<Bitmap> bitmapBuffer;
+	Ref<Canvas> canvasBuffer;
+	Gdiplus::Bitmap* bitmap;
+	Gdiplus::Graphics* graphics;
+
+public:
+	_Win32_Draw_BackBuffer()
+	{
+		bitmap = sl_null;
+		graphics = sl_null;
+	}
+
+	void allocateBackBuffer(sl_uint32 width, sl_uint32 height)
+	{
+		UISize screenSize = UI::getScreenSize();
+		if ((sl_ui_pos)width > screenSize.x) {
+			width = screenSize.x;
+		}
+		if ((sl_ui_pos)height > screenSize.y) {
+			height = screenSize.y;
+		}
+		if (bitmapBuffer.isNull() || canvasBuffer.isNull() || bitmapBuffer->getWidth() < width || bitmapBuffer->getHeight() < height) {
+			bitmap = sl_null;
+			graphics = sl_null;
+			bitmapBuffer = UI::createBitmap((width + 255) & 0xFFFFFF00, (height + 255) & 0xFFFFFF00);
+			if (bitmapBuffer.isNull()) {
+				return;
+			}
+			canvasBuffer = bitmapBuffer->getCanvas();
+			if (canvasBuffer.isNull()) {
+				return;
+			}
+			bitmap = UIPlatform::getBitmapHandle(bitmapBuffer.ptr);
+			graphics = UIPlatform::getCanvasHandle(canvasBuffer.ptr);
+		}
+	}
+
+};
+
+static void _Win32_DrawViewInBackbuffer(Gdiplus::Graphics* graphics, View* view, RECT& rcPaint)
+{
+	Color backgroundColor = view->getBackgroundColor();
+	sl_bool flagOpaque = sl_false;
+	if (view->isOpaque()) {
+		flagOpaque = sl_true;
+	} else if (view->isDoubleBuffering()) {
+		flagOpaque = sl_true;
+	} else if (backgroundColor.a == 255) {
+		flagOpaque = sl_true;
+	}
+	sl_bool flagDrawParent = sl_false;
+	Ref<View> parent = view->getParent();
+	if (parent.isNotNull()) {
+		if (parent->isInstance() && !(parent->isNativeWidget())) {
+			RECT rcParent;
+			int x = (int)(view->getLeft());
+			int y = (int)(view->getTop());
+			rcParent.left = rcPaint.left + x;
+			if (rcParent.left < 0) {
+				rcParent.left = 0;
+			}
+			rcParent.top = rcPaint.top + y;
+			if (rcParent.top < 0) {
+				rcParent.top = 0;
+			}
+			rcParent.right = rcPaint.right + x;
+			int width = (int)(parent->getWidth());
+			if (rcParent.right > width) {
+				rcParent.right = width;
+			}
+			rcParent.bottom = rcPaint.bottom + y;
+			int height = (int)(parent->getHeight());
+			if (rcParent.bottom > height) {
+				rcParent.bottom = height;
+			}
+			if (rcParent.right > rcParent.left && rcParent.bottom > rcParent.top) {
+				_Win32_DrawViewInBackbuffer(graphics, parent.ptr, rcParent);
+			}
+			flagDrawParent = sl_true;
+		}
+	}
+	sl_uint32 widthRedraw = (sl_uint32)(rcPaint.right - rcPaint.left);
+	sl_uint32 heightRedraw = (sl_uint32)(rcPaint.bottom - rcPaint.top);
+	Ref<Canvas> canvas = UIPlatform::createCanvas(graphics, widthRedraw, heightRedraw, sl_null, sl_false);
+	if (canvas.isNotNull()) {
+		CanvasStatusScope scope(canvas);
+		canvas->clipToRectangle(0, 0, (sl_real)(widthRedraw), (sl_real)(heightRedraw));
+		canvas->translate(-(sl_real)(rcPaint.left), -(sl_real)(rcPaint.top));
+		_Win32_DrawView(canvas.ptr, view, flagDrawParent);
+	}
+}
+
 sl_bool Win32_ViewInstance::processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 {
 	HWND hWnd = m_handle;
 	switch (msg) {
 		case WM_ERASEBKGND:
 			{
-				Ref<View> view = getView();
-				if (view.isNotNull()) {
-					if (view->isDoubleBuffering()) {
-						result = TRUE;
-						return sl_true;
-					}
-					if (view->isOpaque()) {
-						result = TRUE;
-						return sl_true;
-					}
-					Color backgroundColor = view->getBackgroundColor();
-					if (backgroundColor.a == 255) {
-						result = TRUE;
-						return sl_true;
-					}
-				}
+				result = TRUE;
+				return sl_true;
 			}
-			return sl_false;
 
 		case WM_PAINT:
 			{
 				PAINTSTRUCT ps;
 				HDC hDC = ::BeginPaint(hWnd, &ps);
 				if (hDC) {
-					Gdiplus::Graphics* _graphics = new Gdiplus::Graphics(hDC);
-					if (_graphics) {
-						RECT rect;
-						::GetClientRect(hWnd, &rect);
-						Rectangle rcDirty((sl_real)(ps.rcPaint.left), (sl_real)(ps.rcPaint.top), (sl_real)(ps.rcPaint.right), (sl_real)(ps.rcPaint.bottom));
-						Ref<Canvas> graphics = UIPlatform::createCanvas(_graphics, rect.right, rect.bottom, &rcDirty);
-						if (graphics.isNotNull()) {
-							_graphics->SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
-							onDraw(graphics.ptr);
+					if (ps.rcPaint.right > ps.rcPaint.left && ps.rcPaint.bottom > ps.rcPaint.top) {
+						Ref<View> view = getView();
+						if (view.isNotNull()) {
+							Gdiplus::Graphics* _graphics = new Gdiplus::Graphics(hDC);
+							if (_graphics) {
+#if defined(USE_SCREEN_BACK_BUFFER)
+								sl_uint32 widthRedraw = (sl_uint32)(ps.rcPaint.right - ps.rcPaint.left);
+								sl_uint32 heightRedraw = (sl_uint32)(ps.rcPaint.bottom - ps.rcPaint.top);
+								SLIB_SAFE_STATIC(_Win32_Draw_BackBuffer, bb)
+								if (!(SLIB_SAFE_STATIC_CHECK_FREED(bb))) {
+									MutexLocker lock(&(bb.mutex));
+									bb.allocateBackBuffer(widthRedraw, heightRedraw);
+									if (bb.bitmap && bb.graphics) {
+										_Win32_DrawViewInBackbuffer(bb.graphics, view.ptr, ps.rcPaint);
+										_graphics->DrawImage(bb.bitmap, Gdiplus::Rect(ps.rcPaint.left, ps.rcPaint.top, widthRedraw, heightRedraw), 0, 0, widthRedraw, heightRedraw, Gdiplus::UnitPixel);
+									}
+								}
+
+#else
+								RECT rect;
+								::GetClientRect(hWnd, &rect);
+								Rectangle rcDirty((sl_real)(ps.rcPaint.left), (sl_real)(ps.rcPaint.top), (sl_real)(ps.rcPaint.right), (sl_real)(ps.rcPaint.bottom));
+								Ref<Canvas> graphics = UIPlatform::createCanvas(_graphics, rect.right, rect.bottom, &rcDirty);
+								if (graphics.isNotNull()) {
+									_graphics->SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+									_Win32_DrawView(graphics.ptr, view.ptr, sl_false);
+								}
+#endif
+							}
 						}
 					}
 					::EndPaint(hWnd, &ps);
@@ -516,6 +656,7 @@ sl_bool Win32_ViewInstance::processWindowMessage(UINT msg, WPARAM wParam, LPARAM
 		case WM_SETCURSOR:
 			{
 				if (onEventSetCursor()) {
+					result = 1;
 					return sl_true;
 				}
 				break;

@@ -373,9 +373,6 @@
     <ClInclude Include="..\..\..\inc\slib\ui\view.h">
       <Filter>inc\ui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\ui\drop_down_list.h">
-      <Filter>inc\ui</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\core\platform_android.h">
       <Filter>inc\core</Filter>
     </ClInclude>
@@ -719,6 +716,15 @@
       <Filter>inc\ui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\list_report_view.h">
+      <Filter>inc\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\ui\select_view.h">
+      <Filter>inc\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\ui\split_view.h">
+      <Filter>inc\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\ui\progress_bar.h">
       <Filter>inc\ui</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1405,6 +1411,15 @@
       <Filter>src\slib\ui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\image_view.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\split_view.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\progress_bar.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\split_view_win32.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
   </ItemGroup>

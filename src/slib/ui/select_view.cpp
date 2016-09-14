@@ -403,7 +403,7 @@ void SelectView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 		sl_ui_pos height = 0;
 		Ref<Font> font = getFont();
 		if (font.isNotNull()) {
-			height = (sl_ui_pos)(font->getSize());
+			height = (sl_ui_pos)(gc->getFontTextSize(font, "|").y * 1.5f);
 			if (height < 0) {
 				height = 0;
 			}

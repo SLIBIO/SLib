@@ -26,7 +26,7 @@ void UIResource::setScreenWidth(sl_ui_len width)
 sl_ui_len UIResource::getScreenHeight()
 {
 	if (_g_ui_resource_screenHeight == 0) {
-		Size size = UI::getScreenSize();
+		UISize size = UI::getScreenSize();
 		if (_g_ui_resource_screenWidth == 0) {
 			_g_ui_resource_screenWidth = size.x;
 		}

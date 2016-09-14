@@ -1,4 +1,5 @@
 #include "../../../inc/slib/ui/check_box.h"
+#include "../../../inc/slib/ui/core.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -23,9 +24,10 @@ public:
 	// override
 	void onDrawAll(Canvas* canvas, const Rectangle& rectDst)
 	{
+		sl_bool flagAntiAlias = canvas->isAntiAlias();
 		canvas->setAntiAlias(sl_false);
 		canvas->drawRectangle(rectDst, m_penBorder, m_brush);
-		canvas->setAntiAlias(sl_true);
+		canvas->setAntiAlias(flagAntiAlias);
 		
 		if (m_penCheck.isNotNull()) {
 			Point pts[3];
@@ -99,7 +101,7 @@ CheckBox::CheckBox(sl_uint32 nCategories, ButtonCategory* categories) : Button(n
 	setCreatingNativeWidget(sl_false);
 	
 	m_flagChecked = sl_false;
-	setIconSize(Font::getDefaultFontSize());
+	setIconSize((sl_ui_pos)(UI::getDefaultFontSize()));
 	setIconMargin(2);
 	setTextMargin(2, 0, 2, 2);
 	setGravity(Alignment::MiddleLeft);

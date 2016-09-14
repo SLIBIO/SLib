@@ -49,7 +49,9 @@ public:
 	static Gdiplus::Graphics* getCanvasHandle(Canvas* canvas);
 	
 	static Ref<Drawable> createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease = sl_true, const Referable* ref = sl_null);
-	static Gdiplus::Image* getImageDrawableHandle(Drawable* drawable);
+	static Gdiplus::Image* getImageHandle(Drawable* drawable);
+	static Gdiplus::Bitmap* getBitmapHandle(Bitmap* bitmap);
+	static HBITMAP createDIBFromBitmap(const Ref<Bitmap>& bitmap);
 
 	static Ref<ViewInstance> createViewInstance(HWND hWnd, sl_bool flagDestroyOnRelease = sl_true);
 	static void registerViewInstance(HWND hWnd, ViewInstance* instance);
@@ -65,8 +67,7 @@ public:
 	static HWND getWindowHandle(Window* window);
 
 	static COLORREF getColorRef(const Color& color);
-
-	static HBITMAP createDIBFromBitmap(const Ref<Bitmap>& bitmap);
+	static Color getColorFromColorRef(COLORREF cr);
 
 	static Ref<Cursor> createCursor(HCURSOR hCursor, sl_bool flagDestroyOnRelease = sl_true);
 	static HCURSOR getCursorHandle(const Ref<Cursor>& cursor);

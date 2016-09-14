@@ -390,7 +390,7 @@ Ref<View> View::getChildAt(sl_ui_pos x, sl_ui_pos y)
 	for (sl_size i = children.count - 1, ii = 0; ii < children.count; i--, ii++) {
 		Ref<View>& child = children[i];
 		if (child.isNotNull() && child->isVisible() && child->isHitTestable()) {
-			UIPoint pt = child->convertCoordinateFromParent(UIPointf(x, y));
+			UIPoint pt = child->convertCoordinateFromParent(UIPointf((sl_ui_posf)x, (sl_ui_posf)y));
 			if (child->hitTest(pt)) {
 				return child;
 			}
@@ -1692,11 +1692,11 @@ void View::_measureRelativeBoundHeight()
 		
 	} else {
 		
-		sl_real marginTop = 0;
+		sl_ui_pos marginTop = 0;
 		if (!(layout->flagRelativeMarginTop)) {
 			marginTop = layout->marginTop;
 		}
-		sl_real marginBottom = 0;
+		sl_ui_pos marginBottom = 0;
 		if (!(layout->flagRelativeMarginBottom)) {
 			marginBottom = layout->marginBottom;
 		}
@@ -3990,6 +3990,7 @@ void View::setFont(const Ref<Font>& _font, sl_bool flagRedraw)
 	Ref<DrawAttributes> draw = m_draw;
 	if (draw.isNotNull()) {
 		draw->font = _font;
+		requestLayout(sl_false);
 		if (isNativeWidget()) {
 			Ref<Font> font = getFont();
 			if (font.isNotNull()) {
@@ -4920,7 +4921,7 @@ void View::draw(Canvas *canvas)
 
 void View::drawBackground(Canvas* canvas, const Color& color, const Ref<Drawable>& background)
 {
-	Rectangle rc(0, 0, m_frame.getWidth(), m_frame.getHeight());
+	Rectangle rc(0, 0, (sl_real)(m_frame.getWidth()), (sl_real)(m_frame.getHeight()));
 	if (color.a > 0) {
 		Ref<Brush> brush = Brush::createSolidBrush(color);
 		canvas->fillRectangle(rc, brush);
@@ -4935,7 +4936,7 @@ void View::drawBackground(Canvas* canvas, const Color& color, const Ref<Drawable
 
 void View::drawBorder(Canvas* canvas, const Ref<Pen>& pen)
 {
-	Rectangle rc(0, 0, m_frame.getWidth(), m_frame.getHeight());
+	UIRect rc(0, 0, m_frame.getWidth(), m_frame.getHeight());
 	if (pen.isNotNull()) {
 		switch (getBoundShape()) {
 			case BoundShape::RoundRect:
@@ -4962,9 +4963,10 @@ void View::drawBorder(Canvas* canvas, const Ref<Pen>& pen)
 				rc.right -= 1;
 				rc.bottom -= 1;
 				rc.fixSizeError();
+				sl_bool flagAntiAlias = canvas->isAntiAlias();
 				canvas->setAntiAlias(sl_false);
 				canvas->drawRectangle(rc, pen);
-				canvas->setAntiAlias(sl_true);
+				canvas->setAntiAlias(flagAntiAlias);
 				break;
 		}
 	}
@@ -4974,8 +4976,12 @@ void View::drawChildren(Canvas* canvas, const Ref<View>* children, sl_size count
 {
 	for (sl_size i = 0; i < count; i++) {
 		View* child = children[i].ptr;
-		if (child && !(child->isInstance()) && child->isVisible()) {
-			drawChild(canvas, child);
+		if (child) {
+			if (child->isVisible()) {
+				if (!(child->isInstance())) {
+					drawChild(canvas, child);
+				}
+			}
 		}
 	}
 }
@@ -5121,9 +5127,10 @@ void View::dispatchDraw(Canvas* canvas)
 		if (context.isNull()) {
 			return;
 		}
-		Ref<DrawAttributes> attr = m_draw;
-		if (attr.isNotNull()) {
-			if (attr->flagDoubleBuffer) {
+		if (isDoubleBuffering()) {
+			_initializeDraw();
+			Ref<DrawAttributes> attr = m_draw;
+			if (attr.isNotNull() && attr->flagDoubleBuffer) {
 				UIRect region = canvas->getClipBounds();
 				if (!(region.intersectRectangle(getBounds(), &region))) {
 					return;
@@ -5158,7 +5165,11 @@ void View::dispatchDraw(Canvas* canvas)
 						Ref<Window> window = m_window;
 						if (window.isNotNull() && window->getContentView() == this) {
 							colorClear = window->getBackgroundColor();
-							colorClear.a = 255;
+							if (colorClear.a < 255) {
+								Color c = Color::White;
+								c.blend_PA_NPA(colorClear);
+								colorClear = c;
+							}
 							break;
 						}
 						colorClear = Color::White;

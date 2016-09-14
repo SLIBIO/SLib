@@ -123,6 +123,7 @@ void _Win32_processUiDispatchQueue()
 
 void _Win32_processMenuCommand(WPARAM wParam, LPARAM lParam);
 void _Win32_processCustomMsgBox(WPARAM wParam, LPARAM lParam);
+sl_bool _SplitView_preprocessMessage(MSG& msg);
 
 LRESULT CALLBACK _Win32_MessageProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -157,25 +158,27 @@ void UIPlatform::runLoop(sl_uint32 level)
 		} else if (msg.message == WM_MENUCOMMAND) {
 			_Win32_processMenuCommand(msg.wParam, msg.lParam);
 		} else {
-			HWND hWnd = ::GetActiveWindow();
-			sl_bool flagDefaultProcess = sl_true;
-			if (hWnd) {
-				if (::GetWindowLongW(hWnd, GWL_STYLE) & WS_POPUP) {
-					if (::IsDialogMessageW(hWnd, &msg)) {
-						flagDefaultProcess = sl_false;
+			do {
+				HWND hWnd = ::GetActiveWindow();
+				if (hWnd) {
+					if (::GetWindowLongW(hWnd, GWL_STYLE) & WS_POPUP) {
+						if (::IsDialogMessageW(hWnd, &msg)) {
+							break;
+						}
 					}
 				}
-			}
-			Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(msg.hwnd));
-			if (instance.isNotNull()) {
-				if (instance->preprocessWindowMessage(msg)) {
-					flagDefaultProcess = sl_false;
+				if (_SplitView_preprocessMessage(msg)) {
+					break;
 				}
-			}
-			if (flagDefaultProcess) {
+				Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(msg.hwnd));
+				if (instance.isNotNull()) {
+					if (instance->preprocessWindowMessage(msg)) {
+						break;
+					}
+				}
 				::TranslateMessage(&msg);
 				::DispatchMessageW(&msg);
-			}
+			} while (0);
 		}
 	}
 
@@ -228,6 +231,14 @@ COLORREF UIPlatform::getColorRef(const Color& color)
 	return (COLORREF)(color.getBGR());
 }
 
+Color UIPlatform::getColorFromColorRef(COLORREF cr)
+{
+	Color ret;
+	ret.setBGR((sl_uint32)cr);
+	ret.a = 255;
+	return ret;
+}
+
 LRESULT CALLBACK _Win32_ViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -247,7 +258,7 @@ Win32_UI_Shared::Win32_UI_Shared()
 		wc.hInstance = hInstance;
 		wc.hIcon = NULL;
 		wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
+		wc.hbrBackground = (HBRUSH)(COLOR_MENU + 1);
 		wc.lpszMenuName = NULL;
 		wc.lpszClassName = L"SLIBUIVIEW";
 		wc.hIconSm = NULL;
@@ -266,7 +277,7 @@ Win32_UI_Shared::Win32_UI_Shared()
 		wc.hInstance = hInstance;
 		wc.hIcon = ::LoadIcon(hInstance, IDI_APPLICATION);
 		wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
+		wc.hbrBackground = (HBRUSH)(COLOR_MENU + 1);
 		wc.lpszMenuName = NULL;
 		wc.lpszClassName = L"SLIBUIWINDOW";
 		wc.hIconSm = NULL;

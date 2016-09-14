@@ -132,7 +132,7 @@ public:
 		HWND hWnd = m_handle;
 		if (hWnd) {
 			if (m_flagModal) {
-				HWND hWndParent = ::GetParent(hWnd);
+				HWND hWndParent = Windows::getOwnerWindow(hWnd);
 				if (hWndParent) {
 					::EnableWindow(hWndParent, TRUE);
 				}
@@ -155,7 +155,7 @@ public:
 	{
 		HWND hWnd = m_handle;
 		if (hWnd) {
-			HWND hParent = ::GetParent(hWnd);
+			HWND hParent = Windows::getOwnerWindow(hWnd);
 			return UIPlatform::createWindowInstance(hParent, sl_false);
 		}
 		return Ref<WindowInstance>::null();
@@ -203,7 +203,7 @@ public:
 		m_flagModal = sl_true;
 		HWND hWnd = m_handle;
 		if (hWnd) {
-			HWND hWndParent = ::GetParent(hWnd);
+			HWND hWndParent = Windows::getOwnerWindow(hWnd);
 			if (hWndParent) {
 				::EnableWindow(hWndParent, FALSE);
 			}
@@ -918,19 +918,7 @@ LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			{
 				Ref<ViewInstance> contentInst = window->getContentView();
 				if (contentInst.isNotNull()) {
-					Ref<View> content = contentInst->getView();
-					if (content.isNotNull()) {
-						if (content->isDoubleBuffering()) {
-							return TRUE;
-						}
-						if (content->isOpaque()) {
-							return TRUE;
-						}
-						Color color = content->getBackgroundColor();
-						if (color.a == 255) {
-							return TRUE;
-						}
-					}
+					return TRUE;
 				}
 				HDC hDC = (HDC)(wParam);
 				Color color = window->m_backgroundColor;

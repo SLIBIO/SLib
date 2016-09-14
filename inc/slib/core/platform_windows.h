@@ -32,6 +32,10 @@ public:
 
 	
 	static sl_bool isWindowVisible(HWND hWnd);
+
+	static HWND getOwnerWindow(HWND hWnd);
+
+	static HWND getParentWindow(HWND hWnd);
 	
 	static HWND getRootWindow(HWND hWnd);
 

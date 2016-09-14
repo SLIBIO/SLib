@@ -13,6 +13,8 @@ class SLIB_EXPORT SplitView : public View
 	
 public:
 	SplitView();
+
+	~SplitView();
 	
 public:
 	LayoutOrientation getOrientation();

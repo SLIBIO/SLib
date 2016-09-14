@@ -19,10 +19,12 @@ public:
 	CGContextRef m_graphics;
 	sl_real m_width;
 	sl_real m_height;
+	sl_bool m_flagAntiAlias;
 	
 public:
 	_Quartz_Canvas()
 	{
+		m_flagAntiAlias = sl_true;
 	}
 	
 	~_Quartz_Canvas()
@@ -47,6 +49,8 @@ public:
 				} else {
 					CGContextClipToRect(graphics, CGRectMake(0, 0, width, height));
 				}
+				CGContextSetAllowsAntialiasing(graphics, sl_true);
+				CGContextSetShouldAntialias(graphics, sl_true);
 				return ret;
 			}
 			CGContextRelease(graphics);
@@ -79,14 +83,22 @@ public:
 	}
 	
 	// override
+	sl_bool isAntiAlias()
+	{
+		return m_flagAntiAlias;
+	}
+	
+	// override
 	void setAntiAlias(sl_bool flag)
 	{
 		if (flag) {
 			CGContextSetAllowsAntialiasing(m_graphics, sl_true);
 			CGContextSetShouldAntialias(m_graphics, sl_true);
+			m_flagAntiAlias = sl_true;
 		} else {
 			CGContextSetAllowsAntialiasing(m_graphics, sl_false);
 			CGContextSetShouldAntialias(m_graphics, sl_false);
+			m_flagAntiAlias = sl_false;
 		}
 	}
 	
@@ -200,14 +212,16 @@ public:
 						if (attrString) {
 							CTLineRef line = CTLineCreateWithAttributedString(attrString);
 							if (line) {
-								CGRect rect = CTLineGetBoundsWithOptions(line, kCTLineBoundsUseGlyphPathBounds);
+								CGFloat ascend, descend, leading;
+								CTLineGetTypographicBounds(line, &ascend, &descend, &leading);
+								CGRect rect = CTLineGetBoundsWithOptions(line, kCTLineBoundsExcludeTypographicShifts);
 								CGAffineTransform trans;
 								trans.a = 1;
 								trans.b = 0;
 								trans.c = 0;
 								trans.d = -1;
 								trans.tx = x;
-								trans.ty = y + rect.size.height;
+								trans.ty = y + leading + ascend;
 								CGContextSetTextMatrix(m_graphics, trans);
 								CTLineDraw(line, m_graphics);
 								CFRelease(line);

@@ -5,6 +5,10 @@ SLIB_UI_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(SplitView, View)
 
+#if defined(SLIB_PLATFORM_IS_WIN32)
+void _SplitView_unregisterWin32Handle(View* view);
+#endif
+
 SplitView::SplitView()
 {
 	SLIB_REFERABLE_CONSTRUCTOR
@@ -32,6 +36,13 @@ SplitView::SplitView()
 	
 	m_cursor = Cursor::getResizeLeftRight();
 	
+}
+
+SplitView::~SplitView()
+{
+#if defined(SLIB_PLATFORM_IS_WIN32)
+	_SplitView_unregisterWin32Handle(this);
+#endif
 }
 
 SplitView::Item::Item()
@@ -530,9 +541,11 @@ void SplitView::dispatchMouseEvent(UIEvent* ev)
 					m_posDown = pt.y;
 				}
 			}
-			m_indexDividerDown = index;
 			if (index >= 0) {
+				m_indexDividerDown = index;
 				return;
+			} else {
+				m_indexDividerDown = -1;
 			}
 		}
 		if (action == UIAction::LeftButtonDrag || action == UIAction::LeftButtonUp) {
@@ -708,7 +721,7 @@ HorizontalSplitView::HorizontalSplitView()
 }
 
 
-#if !(defined(SLIB_PLATFORM_IS_OSX))
+#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_WIN32))
 
 Ref<ViewInstance> SplitView::createGenericInstance(ViewInstance* parent)
 {
