@@ -12,6 +12,7 @@ TabView::TabView()
 {
 	setCreatingNativeWidget(sl_true);
 	setCreatingChildInstances(sl_true);
+	setUsingFont(sl_true);
 	
 	m_items.setCount(1);
 	m_indexSelected = 0;

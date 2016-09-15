@@ -651,6 +651,10 @@ public:
 	
 	void setFontAttributes(sl_real size, sl_bool flagBold = sl_false, sl_bool flagItalic = sl_false, sl_bool flagUnderline = sl_false, sl_bool flagRedraw = sl_true);
 
+	sl_bool isUsingFont();
+	
+	void setUsingFont(sl_bool flag);
+	
 	
 	Ref<ScrollBar> getHorizontalScrollBar();
 	
@@ -907,6 +911,8 @@ private:
 	
 	void _applyTransform();
 	
+	void _setFontInvalidateChildren();
+	
 	void _initializeDraw();
 	
 	void _refreshBorderPen(sl_bool flagRedraw);
@@ -1081,6 +1087,7 @@ private:
 		
 		SafeRef<Font> font;
 		SafeRef<FontInstance> fontInstance;
+		sl_bool flagUsingFont;
 		
 		sl_bool flagOnDrawBackgroundAlways;
 		sl_bool flagOnDrawBorderAlways;

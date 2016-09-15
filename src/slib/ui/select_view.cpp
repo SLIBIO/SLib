@@ -88,6 +88,7 @@ SLIB_SAFE_STATIC_GETTER(_SelectView_DefaultResources, _SelectView_getDefaultReso
 SelectView::SelectView()
 {
 	setCreatingNativeWidget(sl_true);
+	setUsingFont(sl_true);
 	setBorder(sl_true, sl_false);
 	
 	m_indexSelected = 0;

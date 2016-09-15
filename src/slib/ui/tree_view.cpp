@@ -476,6 +476,7 @@ TreeView::TreeView()
 	SLIB_REFERABLE_CONSTRUCTOR
 	
 	ScrollView::setCreatingNativeWidget(sl_false);
+	setUsingFont(sl_true);
 	ScrollView::setOccurringClick(sl_false);
 	
 	_createRootItem();

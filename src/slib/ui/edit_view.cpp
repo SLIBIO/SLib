@@ -12,6 +12,7 @@ SLIB_DEFINE_OBJECT(EditView, View)
 EditView::EditView()
 {
 	setCreatingNativeWidget(sl_true);
+	setUsingFont(sl_true);
 	m_textAlignment = Alignment::MiddleCenter;
 	m_flagReadOnly = sl_false;
 	m_flagMultiLine = sl_false;

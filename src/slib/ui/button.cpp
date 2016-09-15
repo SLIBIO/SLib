@@ -49,6 +49,7 @@ public:
 Button::Button() : Button(2)
 {
 	setCreatingNativeWidget(sl_true);
+	setUsingFont(sl_true);
 }
 
 Button::Button(sl_uint32 nCategories, ButtonCategory* categories)

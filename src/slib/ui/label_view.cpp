@@ -8,6 +8,7 @@ SLIB_DEFINE_OBJECT(LabelView, View)
 LabelView::LabelView()
 {
 	setCreatingNativeWidget(sl_false);
+	setUsingFont(sl_true);
 	
 	m_textAlignment = Alignment::Left;
 	m_textColor = Color::Black;

@@ -31,6 +31,7 @@ SLIB_DEFINE_OBJECT(ListReportView, View)
 ListReportView::ListReportView()
 {
 	setCreatingNativeWidget(sl_true);
+	setUsingFont(sl_true);
 	
 	m_columns.setCount(1);
 	m_nRows = 0;
