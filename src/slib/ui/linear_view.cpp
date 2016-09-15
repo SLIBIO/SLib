@@ -91,26 +91,22 @@ void LinearView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 				child->measureLayout();
 				if (m_orientation == LayoutOrientation::Horizontal) {
 					if (flagHorizontal) {
-						if (child->isLayoutLeftFixed() && child->isLayoutRightFixed()) {
-							measuredWidth += child->getMeasuredWidth();
-							if (!(child->isRelativeMarginLeft())) {
-								measuredWidth += child->getMarginLeft();
-							}
-							if (!(child->isRelativeMarginRight())) {
-								measuredWidth += child->getMarginRight();
-							}
+						measuredWidth += child->getMeasuredWidth();
+						if (!(child->isRelativeMarginLeft())) {
+							measuredWidth += child->getMarginLeft();
+						}
+						if (!(child->isRelativeMarginRight())) {
+							measuredWidth += child->getMarginRight();
 						}
 					}
 				} else {
 					if (flagVertical) {
-						if (child->isLayoutTopFixed() && child->isLayoutBottomFixed()) {
-							measuredHeight += child->getMeasuredHeight();
-							if (!(child->isRelativeMarginTop())) {
-								measuredHeight += child->getMarginTop();
-							}
-							if (!(child->isRelativeMarginBottom())) {
-								measuredHeight += child->getMarginBottom();
-							}
+						measuredHeight += child->getMeasuredHeight();
+						if (!(child->isRelativeMarginTop())) {
+							measuredHeight += child->getMarginTop();
+						}
+						if (!(child->isRelativeMarginBottom())) {
+							measuredHeight += child->getMarginBottom();
 						}
 					}
 				}
@@ -156,35 +152,31 @@ void LinearView::onMakeLayout()
 		if (child.isNotNull()) {
 			if (child->getVisibility() != Visibility::Gone) {
 				if (flagHorizontal) {
-					if (child->isLayoutLeftFixed() && child->isLayoutRightFixed()) {
-						sizeSum += child->getMarginLeft();
-						if (child->getWidthMode() != SizeMode::Filling) {
-							UIRect frame = child->getLayoutFrame();
-							sizeSum += frame.getWidth();
+					sizeSum += child->getMarginLeft();
+					if (child->getWidthMode() != SizeMode::Filling) {
+						UIRect frame = child->getLayoutFrame();
+						sizeSum += frame.getWidth();
+					} else {
+						if (Math::isAlmostZero(child->getWidthWeight() - 1)) {
+							countFullFill++;
 						} else {
-							if (Math::isAlmostZero(child->getWidthWeight() - 1)) {
-								countFullFill++;
-							} else {
-								countPartFill++;
-							}
+							countPartFill++;
 						}
-						sizeSum += child->getMarginRight();
 					}
+					sizeSum += child->getMarginRight();
 				} else {
-					if (child->isLayoutTopFixed() && child->isLayoutBottomFixed()) {
-						sizeSum += child->getMarginTop();
-						if (child->getHeightMode() != SizeMode::Filling) {
-							UIRect frame = child->getLayoutFrame();
-							sizeSum += frame.getHeight();
+					sizeSum += child->getMarginTop();
+					if (child->getHeightMode() != SizeMode::Filling) {
+						UIRect frame = child->getLayoutFrame();
+						sizeSum += frame.getHeight();
+					} else {
+						if (Math::isAlmostZero(child->getWidthWeight() - 1)) {
+							countFullFill++;
 						} else {
-							if (Math::isAlmostZero(child->getWidthWeight() - 1)) {
-								countFullFill++;
-							} else {
-								countPartFill++;
-							}
+							countPartFill++;
 						}
-						sizeSum += child->getMarginBottom();
 					}
+					sizeSum += child->getMarginBottom();
 				}
 			}
 		}
@@ -219,29 +211,25 @@ void LinearView::onMakeLayout()
 			if (child.isNotNull()) {
 				if (child->getVisibility() != Visibility::Gone) {
 					if (flagHorizontal) {
-						if (child->isLayoutLeftFixed() && child->isLayoutRightFixed()) {
-							if (child->getWidthMode() == SizeMode::Filling) {
-								sl_real weight = child->getWidthWeight();
-								if (!(Math::isAlmostZero(weight - 1))) {
-									sl_ui_pos width = (sl_ui_pos)((sl_real)(remainedSize) * weight);
-									sizeSum += width;
-									UIRect frame = child->getLayoutFrame();
-									frame.setWidth(width);
-									child->setLayoutFrame(frame);
-								}
+						if (child->getWidthMode() == SizeMode::Filling) {
+							sl_real weight = child->getWidthWeight();
+							if (!(Math::isAlmostZero(weight - 1))) {
+								sl_ui_pos width = (sl_ui_pos)((sl_real)(remainedSize) * weight);
+								sizeSum += width;
+								UIRect frame = child->getLayoutFrame();
+								frame.setWidth(width);
+								child->setLayoutFrame(frame);
 							}
 						}
 					} else {
-						if (child->isLayoutTopFixed() && child->isLayoutBottomFixed()) {
-							if (child->getWidthMode() == SizeMode::Filling) {
-								sl_real weight = child->getHeightWeight();
-								if (!(Math::isAlmostZero(weight - 1))) {
-									sl_ui_pos height = (sl_ui_pos)((sl_real)(remainedSize) * weight);
-									sizeSum += height;
-									UIRect frame = child->getLayoutFrame();
-									frame.setHeight(height);
-									child->setLayoutFrame(frame);
-								}
+						if (child->getWidthMode() == SizeMode::Filling) {
+							sl_real weight = child->getHeightWeight();
+							if (!(Math::isAlmostZero(weight - 1))) {
+								sl_ui_pos height = (sl_ui_pos)((sl_real)(remainedSize) * weight);
+								sizeSum += height;
+								UIRect frame = child->getLayoutFrame();
+								frame.setHeight(height);
+								child->setLayoutFrame(frame);
 							}
 						}
 					}
@@ -281,25 +269,21 @@ void LinearView::onMakeLayout()
 			if (child.isNotNull()) {
 				if (child->getVisibility() != Visibility::Gone) {
 					if (flagHorizontal) {
-						if (child->isLayoutLeftFixed() && child->isLayoutRightFixed()) {
-							if (child->getWidthMode() == SizeMode::Filling) {
-								sl_real weight = child->getWidthWeight();
-								if (Math::isAlmostZero(weight - 1)) {
-									UIRect frame = child->getLayoutFrame();
-									frame.setWidth(sizeAvg);
-									child->setLayoutFrame(frame);
-								}
+						if (child->getWidthMode() == SizeMode::Filling) {
+							sl_real weight = child->getWidthWeight();
+							if (Math::isAlmostZero(weight - 1)) {
+								UIRect frame = child->getLayoutFrame();
+								frame.setWidth(sizeAvg);
+								child->setLayoutFrame(frame);
 							}
 						}
 					} else {
-						if (child->isLayoutTopFixed() && child->isLayoutBottomFixed()) {
-							if (child->getWidthMode() == SizeMode::Filling) {
-								sl_real weight = child->getHeightWeight();
-								if (Math::isAlmostZero(weight - 1)) {
-									UIRect frame = child->getLayoutFrame();
-									frame.setHeight(sizeAvg);
-									child->setLayoutFrame(frame);
-								}
+						if (child->getWidthMode() == SizeMode::Filling) {
+							sl_real weight = child->getHeightWeight();
+							if (Math::isAlmostZero(weight - 1)) {
+								UIRect frame = child->getLayoutFrame();
+								frame.setHeight(sizeAvg);
+								child->setLayoutFrame(frame);
 							}
 						}
 					}
@@ -319,28 +303,24 @@ void LinearView::onMakeLayout()
 		if (child.isNotNull()) {
 			if (child->getVisibility() != Visibility::Gone) {
 				if (flagHorizontal) {
-					if (child->isLayoutLeftFixed() && child->isLayoutRightFixed()) {
-						UIRect frame = child->getLayoutFrame();
-						sl_ui_len width = frame.getWidth();
-						pos += child->getMarginLeft();
-						frame.left = pos;
-						frame.right = pos + width;
-						frame.fixSizeError();
-						child->setLayoutFrame(frame);
-						pos += width;
-						pos += child->getMarginRight();
-					}
+					UIRect frame = child->getLayoutFrame();
+					sl_ui_len width = frame.getWidth();
+					pos += child->getMarginLeft();
+					frame.left = pos;
+					frame.right = pos + width;
+					frame.fixSizeError();
+					child->setLayoutFrame(frame);
+					pos += width;
+					pos += child->getMarginRight();
 				} else {
-					if (child->isLayoutTopFixed() && child->isLayoutBottomFixed()) {
-						UIRect frame = child->getLayoutFrame();
-						sl_ui_len height = frame.getHeight();
-						pos += child->getMarginTop();
-						frame.top = pos;
-						frame.bottom = pos + height;
-						child->setLayoutFrame(frame);
-						pos += height;
-						pos += child->getMarginBottom();
-					}
+					UIRect frame = child->getLayoutFrame();
+					sl_ui_len height = frame.getHeight();
+					pos += child->getMarginTop();
+					frame.top = pos;
+					frame.bottom = pos + height;
+					child->setLayoutFrame(frame);
+					pos += height;
+					pos += child->getMarginBottom();
 				}
 			}
 		}

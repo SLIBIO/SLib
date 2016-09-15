@@ -1240,14 +1240,6 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 	}
 	Ref<View> referView;
 	switch (leftMode) {
-		case PositionMode::Fixed:
-			{
-				sl_ui_pos m = param.parentContentFrame.left + layout->marginLeft;
-				if (frame.left < m) {
-					frame.left = m;
-				}
-				break;
-			}
 		case PositionMode::ParentEdge:
 			frame.left = param.parentContentFrame.left + layout->marginLeft;
 			break;
@@ -1280,6 +1272,8 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 			} else {
 				frame.left = (param.parentContentFrame.left + layout->marginLeft + param.parentContentFrame.right - layout->marginRight - width) / 2;
 			}
+		default:
+			break;
 	}
 	switch (rightMode) {
 		case PositionMode::ParentEdge:
@@ -1308,14 +1302,6 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 			break;
 	}
 	switch (topMode) {
-		case PositionMode::Fixed:
-			{
-				sl_ui_pos m = param.parentContentFrame.top + layout->marginTop;
-				if (frame.top < m) {
-					frame.top = m;
-				}
-				break;
-			}
 		case PositionMode::ParentEdge:
 			frame.top = param.parentContentFrame.top + layout->marginTop;
 			break;
@@ -1348,6 +1334,8 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 			} else {
 				frame.top = (param.parentContentFrame.top + layout->marginTop + param.parentContentFrame.bottom - layout->marginBottom - height) / 2;
 			}
+			break;
+		default:
 			break;
 	}
 	switch (bottomMode)
@@ -1574,10 +1562,7 @@ void View::_measureRelativeBoundWidth()
 	}
 
 	if (leftMode == PositionMode::Fixed && rightMode == PositionMode::Fixed) {
-		sl_ui_pos m = m_frame.left - parentPaddingLeft;
-		if (marginLeft < m) {
-			marginLeft = m;
-		}
+		marginLeft = m_frame.left - parentPaddingLeft;
 	}
 	
 	sl_ui_pos outerWidth = layout->measuredWidth + marginLeft + marginRight;
@@ -1720,10 +1705,7 @@ void View::_measureRelativeBoundHeight()
 		parentPaddingTop = parent->getPaddingTop();
 	}
 	if (topMode == PositionMode::Fixed && bottomMode == PositionMode::Fixed) {
-		sl_ui_pos m = m_frame.top - getPaddingBottom();
-		if (marginTop < m) {
-			marginTop = m;
-		}
+		marginTop = m_frame.top - getPaddingBottom();
 	}
 	
 	sl_ui_pos outerHeight = layout->measuredHeight + marginTop + marginBottom;
@@ -2803,6 +2785,9 @@ void View::setMarginLeft(sl_ui_pos marginLeft, sl_bool flagRedraw)
 	if (attr.isNotNull()) {
 		attr->flagEnabled = sl_true;
 		attr->marginLeft = marginLeft;
+		if (attr->leftMode == PositionMode::Fixed && attr->rightMode == PositionMode::Fixed) {
+			attr->leftMode = PositionMode::ParentEdge;
+		}
 		requestParentLayout(flagRedraw);
 	}
 }
@@ -2823,6 +2808,9 @@ void View::setMarginTop(sl_ui_pos marginTop, sl_bool flagRedraw)
 	if (attr.isNotNull()) {
 		attr->flagEnabled = sl_true;
 		attr->marginTop = marginTop;
+		if (attr->topMode == PositionMode::Fixed && attr->bottomMode == PositionMode::Fixed) {
+			attr->topMode = PositionMode::ParentEdge;
+		}
 		requestParentLayout(flagRedraw);
 	}
 }
@@ -2921,6 +2909,9 @@ void View::setRelativeMarginLeft(sl_real weight, sl_bool flagRedraw)
 		attr->flagEnabled = sl_true;
 		attr->flagRelativeMarginLeft = sl_true;
 		attr->relativeMarginLeftWeight = weight;
+		if (attr->leftMode == PositionMode::Fixed && attr->rightMode == PositionMode::Fixed) {
+			attr->leftMode = PositionMode::ParentEdge;
+		}
 		requestParentLayout(flagRedraw);
 	}
 }
@@ -2945,6 +2936,9 @@ void View::setAbsoluteMarginLeft(sl_ui_pos margin, sl_bool flagRedraw)
 		attr->flagEnabled = sl_true;
 		attr->flagRelativeMarginLeft = sl_false;
 		attr->marginLeft = margin;
+		if (attr->leftMode == PositionMode::Fixed && attr->rightMode == PositionMode::Fixed) {
+			attr->leftMode = PositionMode::ParentEdge;
+		}
 		requestParentLayout(flagRedraw);
 	}
 }
@@ -2975,6 +2969,9 @@ void View::setRelativeMarginTop(sl_real weight, sl_bool flagRedraw)
 		attr->flagEnabled = sl_true;
 		attr->flagRelativeMarginTop = sl_true;
 		attr->relativeMarginTopWeight = weight;
+		if (attr->topMode == PositionMode::Fixed && attr->bottomMode == PositionMode::Fixed) {
+			attr->topMode = PositionMode::ParentEdge;
+		}
 		requestParentLayout(flagRedraw);
 	}
 }
@@ -2999,6 +2996,9 @@ void View::setAbsoluteMarginTop(sl_ui_pos margin, sl_bool flagRedraw)
 		attr->flagEnabled = sl_true;
 		attr->flagRelativeMarginTop = sl_false;
 		attr->marginTop = margin;
+		if (attr->topMode == PositionMode::Fixed && attr->bottomMode == PositionMode::Fixed) {
+			attr->topMode = PositionMode::ParentEdge;
+		}
 		requestParentLayout(flagRedraw);
 	}
 }
