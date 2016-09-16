@@ -250,18 +250,28 @@ void View::detach()
 void View::_processAttachOnUiThread()
 {
 	if (isInstance()) {
+		if (getParent().isNull()) {
+			_makeLayout(sl_false);
+		}
 		if (isCreatingChildInstances()) {
 			ListLocker< Ref<View> > children(m_children);
 			for (sl_size i = 0; i < children.count; i++) {
 				Ref<View>& child = children[i];
 				if (child.isNotNull()) {
-					UIAttachMode attachMode = child->getAttachMode();
-					if (attachMode == UIAttachMode::AttachAlways) {
-						attachChild(child);
-					} else if (attachMode == UIAttachMode::NotAttachInNativeWidget) {
-						if (!(isNativeWidget())) {
+					switch(child->getAttachMode()) {
+						case UIAttachMode::NotAttach:
+							break;
+						case UIAttachMode::AttachAlways:
 							attachChild(child);
-						}
+							break;
+						case UIAttachMode::NotAttachInNativeWidget:
+							if (!(isNativeWidget())) {
+								attachChild(child);
+							}
+						case UIAttachMode::AttachInNativeWidget:
+							if (isNativeWidget()) {
+								attachChild(child);
+							}
 					}
 				}
 			}
@@ -518,15 +528,22 @@ void View::_addChild(const Ref<View>& view, sl_bool flagRedraw)
 		}
 		requestLayout(sl_false);
 		
-		UIAttachMode attachMode = view->getAttachMode();
-		if (attachMode == UIAttachMode::AttachAlways) {
-			if (isInstance() && isCreatingChildInstances()) {
-				attachChild(view);
-			}
-		} else if (attachMode == UIAttachMode::NotAttachInNativeWidget) {
-			if (isInstance() && isCreatingChildInstances() && !(isNativeWidget())) {
-				attachChild(view);
-			}
+		switch(view->getAttachMode()) {
+			case UIAttachMode::NotAttach:
+				break;
+			case UIAttachMode::AttachAlways:
+				if (isInstance() && isCreatingChildInstances()) {
+					attachChild(view);
+				}
+				break;
+			case UIAttachMode::NotAttachInNativeWidget:
+				if (isInstance() && isCreatingChildInstances() && !(isNativeWidget())) {
+					attachChild(view);
+				}
+			case UIAttachMode::AttachInNativeWidget:
+				if (isInstance() && isCreatingChildInstances() && isNativeWidget()) {
+					attachChild(view);
+				}
 		}
 		if (flagRedraw) {
 			invalidate();
@@ -646,7 +663,7 @@ void View::_setFrame(const UIRect& _frame, sl_bool flagRedraw, sl_bool flagLayou
 			if (parent.isNotNull()) {
 				parent->requestLayout(sl_false);
 			} else {
-				UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, _makeLayout, this, sl_false));
+				_requestMakeLayout();
 			}
 		}
 	} else {
@@ -800,8 +817,10 @@ void View::setVisibility(Visibility visibility, sl_bool flagRedraw)
 		instance->setVisible(visibility == Visibility::Visible);
 	}
 	if (oldVisibility != visibility) {
-		if (isLayoutEnabled()) {
+		if (visibility == Visibility::Gone) {
 			requestParentLayout(sl_false);
+		} else if (visibility == Visibility::Visible) {
+			requestParentAndSelfLayout(sl_false);
 		}
 		dispatchChangeVisibility(oldVisibility, visibility);
 	}
@@ -1870,13 +1889,31 @@ void View::measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 	}
 }
 
+void View::_requestMakeLayout()
+{
+	Ref<View> view = this;
+	while (view.isNotNull()) {
+		if (view->isVisible()) {
+			if (view->isInstance()) {
+				break;
+			}
+		} else {
+			return;
+		}
+		view = view->getParent();
+	}
+	if (view.isNotNull()) {
+		UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, _makeLayout, this, sl_false));
+	}
+}
+
 void View::_requestInvalidateLayout()
 {
 	Ref<LayoutAttributes> layout = m_layout;
 	if (layout.isNotNull() && layout->flagEnabled) {
 		layout->flagInvalidLayout = sl_true;
 		layout->flagInvalidMeasure = sl_true;
-		UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, _makeLayout, this, sl_false));
+		_requestMakeLayout();
 	}
 }
 
@@ -5291,7 +5328,7 @@ void View::dispatchMouseEvent(UIEvent* ev)
 	}
 	
 	UIAction action = ev->getAction();
-	
+
 	// pass event to children
 	{
 		Ref<View> oldChildMouseMove;

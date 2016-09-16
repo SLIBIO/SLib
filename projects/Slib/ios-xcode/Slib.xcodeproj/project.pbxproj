@@ -12,6 +12,8 @@
 		260252021BF18BE200DEFAB1 /* callback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260252011BF18BE200DEFAB1 /* callback.cpp */; };
 		260252261BF18D4300DEFAB1 /* ui_graphics_context.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260252251BF18D4300DEFAB1 /* ui_graphics_context.cpp */; };
 		2621F7211CCF174B00C4615C /* ui_menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2621F7201CCF174B00C4615C /* ui_menu.cpp */; };
+		2634DCE51D8A82B200E8F19E /* split_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2634DCE41D8A82B200E8F19E /* split_view.cpp */; };
+		2634DCE71D8A82EA00E8F19E /* progress_bar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2634DCE61D8A82EA00E8F19E /* progress_bar.cpp */; };
 		2648D5481D096AB000819E09 /* ui_app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2648D5471D096AB000819E09 /* ui_app.cpp */; };
 		2648D54B1D096AC400819E09 /* mobile_app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2648D5491D096AC400819E09 /* mobile_app.cpp */; };
 		2648D54C1D096AC400819E09 /* mobile_game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2648D54A1D096AC400819E09 /* mobile_game.cpp */; };
@@ -249,6 +251,8 @@
 		260252011BF18BE200DEFAB1 /* callback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = callback.cpp; sourceTree = "<group>"; };
 		260252251BF18D4300DEFAB1 /* ui_graphics_context.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_graphics_context.cpp; sourceTree = "<group>"; };
 		2621F7201CCF174B00C4615C /* ui_menu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_menu.cpp; sourceTree = "<group>"; };
+		2634DCE41D8A82B200E8F19E /* split_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = split_view.cpp; sourceTree = "<group>"; };
+		2634DCE61D8A82EA00E8F19E /* progress_bar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = progress_bar.cpp; sourceTree = "<group>"; };
 		2648D5471D096AB000819E09 /* ui_app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_app.cpp; sourceTree = "<group>"; };
 		2648D5491D096AC400819E09 /* mobile_app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mobile_app.cpp; sourceTree = "<group>"; };
 		2648D54A1D096AC400819E09 /* mobile_game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mobile_game.cpp; sourceTree = "<group>"; };
@@ -801,6 +805,7 @@
 				266F926B1D51CD450040166C /* list_view.cpp */,
 				2648D5491D096AC400819E09 /* mobile_app.cpp */,
 				2648D54A1D096AC400819E09 /* mobile_game.cpp */,
+				2634DCE61D8A82EA00E8F19E /* progress_bar.cpp */,
 				266DD4451C11914200D47AB0 /* radio_button.cpp */,
 				266DD4471C11917700D47AB0 /* render_view.cpp */,
 				266DD4491C11918300D47AB0 /* render_view_ios.mm */,
@@ -809,6 +814,7 @@
 				266DD44D1C1191B900D47AB0 /* scroll_view_ios.mm */,
 				26E49B1E1D79AD0A0052D89F /* select_view.cpp */,
 				26E49B201D79AD440052D89F /* select_view_ios.mm */,
+				2634DCE41D8A82B200E8F19E /* split_view.cpp */,
 				266DD44F1C1191D400D47AB0 /* tab_view.cpp */,
 				26CB94CA1D0126F900D8A472 /* tree_view.cpp */,
 				2648D5471D096AB000819E09 /* ui_app.cpp */,
@@ -906,6 +912,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				26E49B1F1D79AD0A0052D89F /* select_view.cpp in Sources */,
+				2634DCE51D8A82B200E8F19E /* split_view.cpp in Sources */,
 				266DD3841C117A3100D47AB0 /* md5.cpp in Sources */,
 				266DD3691C1170BD00D47AB0 /* video_capture.cpp in Sources */,
 				266DD43E1C1190AF00D47AB0 /* edit_view_ios.mm in Sources */,
@@ -1010,6 +1017,7 @@
 				266DD42C1C118F7800D47AB0 /* view_ios.mm in Sources */,
 				266DD41B1C118E4A00D47AB0 /* cursor.cpp in Sources */,
 				266DD3AE1C117B1200D47AB0 /* bigint.cpp in Sources */,
+				2634DCE71D8A82EA00E8F19E /* progress_bar.cpp in Sources */,
 				266DD4501C1191D400D47AB0 /* tab_view.cpp in Sources */,
 				266DD4361C11901A00D47AB0 /* check_box.cpp in Sources */,
 				260252261BF18D4300DEFAB1 /* ui_graphics_context.cpp in Sources */,

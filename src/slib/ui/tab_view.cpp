@@ -593,17 +593,27 @@ void TabView::onDrawTab(Canvas* canvas, const UIRect& rect, sl_uint32 index, con
 {
 	UIRect rc = getTabRegion(index);
 	Color labelColor;
+	Ref<Drawable> background;
 	if (m_indexSelected == index) {
-		canvas->draw(rc, m_selectedTabBackground);
+		background = m_selectedTabBackground;
 		labelColor = m_selectedLabelColor;
 	} else if (m_indexHover == index) {
-		canvas->draw(rc, m_hoverTabBackground);
+		background = m_hoverTabBackground;
 		labelColor = m_hoverLabelColor;
 	} else {
-		canvas->draw(rc, m_tabBackground);
+		background = m_tabBackground;
 		labelColor = m_labelColor;
 	}
-	if (label.isNotEmpty()) {
+	if (background.isNull()) {
+		background = m_tabBackground;
+	}
+	if (labelColor.isZero()) {
+		labelColor = m_labelColor;
+	}
+	if (background.isNotNull()) {
+		canvas->draw(rc, background);
+	}
+	if (label.isNotEmpty() && labelColor.isNotZero()) {
 		Ref<Font> font = getFont();
 		rc.left += m_labelMarginLeft;
 		rc.top += m_labelMarginTop;

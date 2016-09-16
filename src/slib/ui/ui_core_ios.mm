@@ -19,7 +19,7 @@ class _iOS_Screen : public Screen
 {
 public:
 	UIScreen* m_screen;
-	Rectangle m_region;
+	UIRect m_region;
 	
 public:
 	static Ref<_iOS_Screen> create(UIScreen* screen)
@@ -29,12 +29,13 @@ public:
 			ret = new _iOS_Screen();
 			if (ret.isNotNull()) {
 				ret->m_screen = screen;
-				Rectangle region;
+				UIRect region;
 				CGRect rect = [screen bounds];
-				region.left = (sl_real)(rect.origin.x);
-				region.top = (sl_real)(rect.origin.y);
-				region.setWidth((sl_real)(rect.size.width));
-				region.setHeight((sl_real)(rect.size.height));
+				region.left = (sl_ui_pos)(rect.origin.x);
+				region.top = (sl_ui_pos)(rect.origin.y);
+				region.setWidth((sl_ui_pos)(rect.size.width));
+				region.setHeight((sl_ui_pos)(rect.size.height));
+				region.fixSizeError();
 				ret->m_region = region;
 			}
 		}
@@ -53,7 +54,7 @@ public:
 	}
     
     // override
-    Rectangle getRegion()
+    UIRect getRegion()
 	{
 		return m_region;
 	}	

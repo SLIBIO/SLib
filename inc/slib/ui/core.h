@@ -115,7 +115,7 @@ public:
 	
 	static sl_bool checkNumLockOn();
 	
-	static Point getCursorPos();
+	static UIPoint getCursorPos();
 	
 	static sl_bool checkLeftButtonPressed();
 	

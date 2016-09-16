@@ -8,18 +8,18 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
-void JNICALL _AndroidScrollView_nativeOnScroll(JNIEnv* env, jobject _this, jlong instance, float x, float y);
+void JNICALL _AndroidScrollView_nativeOnScroll(JNIEnv* env, jobject _this, jlong instance, int x, int y);
 
 SLIB_JNI_BEGIN_CLASS(_JAndroidScrollView, "slib/platform/android/ui/view/UiScrollView")
 
 	SLIB_JNI_STATIC_METHOD(create, "_create", "(Landroid/content/Context;ZZ)Landroid/view/View;");
 
 	SLIB_JNI_STATIC_METHOD(setBackgroundColor, "_setBackgroundColor", "(Landroid/view/View;I)V");
-	SLIB_JNI_STATIC_METHOD(scrollTo, "_scrollTo", "(Landroid/view/View;FF)V");
-	SLIB_JNI_STATIC_METHOD(getScrollX, "_getScrollX", "(Landroid/view/View;)F");
-	SLIB_JNI_STATIC_METHOD(getScrollY, "_getScrollY", "(Landroid/view/View;)F");
+	SLIB_JNI_STATIC_METHOD(scrollTo, "_scrollTo", "(Landroid/view/View;II)V");
+	SLIB_JNI_STATIC_METHOD(getScrollX, "_getScrollX", "(Landroid/view/View;)I");
+	SLIB_JNI_STATIC_METHOD(getScrollY, "_getScrollY", "(Landroid/view/View;)I");
 
-	SLIB_JNI_NATIVE(nativeOnScroll, "nativeOnScroll", "(JFF)V", _AndroidScrollView_nativeOnScroll);
+	SLIB_JNI_NATIVE(nativeOnScroll, "nativeOnScroll", "(JII)V", _AndroidScrollView_nativeOnScroll);
 
 SLIB_JNI_END_CLASS
 
@@ -41,13 +41,13 @@ public:
 		__applyContent(handle, scrollViewInstance);
 	}
 
-	void __onScroll(sl_real x, sl_real y)
+	void __onScroll(int x, int y)
 	{
-		_onScroll_NW(x, y);
+		_onScroll_NW((sl_scroll_pos)x, (sl_scroll_pos)y);
 	}
 };
 
-void JNICALL _AndroidScrollView_nativeOnScroll(JNIEnv* env, jobject _this, jlong instance, float x, float y)
+void JNICALL _AndroidScrollView_nativeOnScroll(JNIEnv* env, jobject _this, jlong instance, int x, int y)
 {
 	Ref<View> _view = Android_ViewInstance::getAndroidView(instance);
 	if (ScrollView::checkInstance(_view.ptr)) {
@@ -86,42 +86,42 @@ void ScrollView::_setContentView_NW(const Ref<View>& view)
 	}
 }
 
-void ScrollView::_scrollTo_NW(sl_real x, sl_real y)
+void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		_JAndroidScrollView::scrollTo.call(sl_null, handle, x, y);
+		_JAndroidScrollView::scrollTo.call(sl_null, handle, (int)x, (int)y);
 	}
 }
 
-Point ScrollView::_getScrollPosition_NW()
+ScrollPoint ScrollView::_getScrollPosition_NW()
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		Point ret;
-		ret.x = _JAndroidScrollView::getScrollX.callFloat(sl_null, handle);
-		ret.y = _JAndroidScrollView::getScrollY.callFloat(sl_null, handle);
+		ScrollPoint ret;
+		ret.x = (sl_scroll_pos)(_JAndroidScrollView::getScrollX.callInt(sl_null, handle));
+		ret.y = (sl_scroll_pos)(_JAndroidScrollView::getScrollY.callInt(sl_null, handle));
 		return ret;
 	}
-	return Point::zero();
+	return ScrollPoint::zero();
 }
 
-Size ScrollView::_getScrollRange_NW()
+ScrollPoint ScrollView::_getScrollRange_NW()
 {
 	Ref<View> content = m_viewContent;
 	if (content.isNotNull()) {
-		Size ret;
-		ret.x = content->getWidth() - getWidth();
+		ScrollPoint ret;
+		ret.x = (sl_scroll_pos)(content->getWidth() - getWidth());
 		if (ret.x < 0) {
 			ret.x = 0;
 		}
-		ret.y = content->getHeight() - getHeight();
+		ret.y = (sl_scroll_pos)(content->getHeight() - getHeight());
 		if (ret.y < 0) {
 			ret.y = 0;
 		}
 		return ret;
 	}
-	return Size::zero();
+	return ScrollPoint::zero();
 }
 
 void ScrollView::_setBorder_NW(sl_bool flag)

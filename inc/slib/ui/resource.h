@@ -83,7 +83,7 @@ NAME::NAME() { \
 	{ \
 		SLIB_DECLARE_OBJECT \
 	public: \
-		NAME(sl_real customUnitLength = 1); \
+		NAME(sl_real sp = 1); \
 	protected: \
 		void initialize(); \
 		void layoutViews(sl_ui_len width, sl_ui_len height);
@@ -94,8 +94,8 @@ NAME::NAME() { \
 
 #define SLIB_DEFINE_UILAYOUT(NAME, BASE_CLASS) \
 SLIB_DEFINE_OBJECT(NAME, BASE_CLASS) \
-NAME::NAME(sl_real customUnitLength) \
-: BASE_CLASS(customUnitLength) \
+NAME::NAME(sl_real sp) \
+: BASE_CLASS(sp) \
 { \
 	SLIB_REFERABLE_CONSTRUCTOR \
 	initialize(); \
@@ -105,14 +105,14 @@ NAME::NAME(sl_real customUnitLength) \
 class UILayoutResource
 {
 public:
-	UILayoutResource(sl_real customUnitLength = 1);
+	UILayoutResource(sl_real sp = 1);
 	
 public:
 	Ref<View> getContent();
 	
-	sl_real getCustomUnitLength();
+	sl_real getScaledPixel();
 	
-	void setCustomUnitLength(sl_real length);
+	void setScaledPixel(sl_real sp);
 	
 protected:
 	virtual void layoutViews(sl_ui_len width, sl_ui_len height) = 0;
@@ -124,7 +124,7 @@ protected:
 	View* m_contentView;
 	Ref<View> m_contentViewRef;
 
-	sl_real m_customUnit;
+	sl_real m_sp;
 	
 	sl_int32 m_countRecursiveLayout;
 };
@@ -143,7 +143,7 @@ class WindowLayoutResource : public Window, public UILayoutResource
 {
 	SLIB_DECLARE_OBJECT
 public:
-	WindowLayoutResource(sl_real customUnitLength = 1);
+	WindowLayoutResource(sl_real sp = 1);
 	
 public:
 	// override
@@ -173,7 +173,7 @@ class ViewLayoutResource : public ViewGroup, public UILayoutResource
 {
 	SLIB_DECLARE_OBJECT
 public:
-	ViewLayoutResource(sl_real customUnitLength = 1);
+	ViewLayoutResource(sl_real sp = 1);
 	
 public:
 	// override

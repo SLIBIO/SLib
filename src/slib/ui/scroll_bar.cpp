@@ -21,10 +21,13 @@ public:
 	// override
 	void onDrawAll(Canvas* canvas, const Rectangle& rectDst)
 	{
+		sl_bool flagAntiAlias = canvas->isAntiAlias();
+		canvas->setAntiAlias(sl_true);
 		sl_real r = Math::min(rectDst.getWidth(), rectDst.getHeight()) * 0.5f;
 		sl_real padding = 2;
 		r -= padding;
 		canvas->drawRoundRect(Rectangle(rectDst.left + padding, rectDst.top + padding, rectDst.right - padding, rectDst.bottom - padding), Size(r, r), Ref<Pen>::null(), m_brush);
+		canvas->setAntiAlias(flagAntiAlias);
 	}
 };
 

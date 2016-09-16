@@ -59,9 +59,9 @@ Ref<Drawable> Drawable::createColorDrawable(const Color& color)
 	return ColorDrawable::create(color);
 }
 
-Ref<Drawable> Drawable::createEmptyDrawable()
+Ref<Drawable> Drawable::getEmptyDrawable()
 {
-	return EmptyDrawable::create();
+	return EmptyDrawable::get();
 }
 
 Ref<Drawable> Drawable::createSubDrawable(const Ref<Drawable>& src, sl_real x, sl_real y, sl_real width, sl_real height)
@@ -121,6 +121,9 @@ SLIB_DEFINE_OBJECT(ColorDrawable, BrushDrawable)
 
 Ref<Drawable> ColorDrawable::create(const Color& color)
 {
+	if (color.isZero()) {
+		return EmptyDrawable::get();
+	}
 	Ref<ColorDrawable> ret;
 	Ref<Brush> brush = Brush::createSolidBrush(color);
 	if (brush.isNull()) {
@@ -136,9 +139,13 @@ Ref<Drawable> ColorDrawable::create(const Color& color)
 
 SLIB_DEFINE_OBJECT(EmptyDrawable, Drawable)
 
-Ref<Drawable> EmptyDrawable::create()
+Ref<Drawable> EmptyDrawable::get()
 {
-	return new EmptyDrawable();
+	SLIB_SAFE_STATIC(Ref<Drawable>, ret, new EmptyDrawable)
+	if (SLIB_SAFE_STATIC_CHECK_FREED(ret)) {
+		return new EmptyDrawable;
+	}
+	return ret;
 }
 
 void EmptyDrawable::onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc)

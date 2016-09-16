@@ -52,8 +52,8 @@ class _Android_Screen : public Screen
 {
 public:
 	JniGlobal<jobject> m_display;
-	sl_int32 m_width;
-	sl_int32 m_height;
+	int m_width;
+	int m_height;
 
 public:
 	static Ref<_Android_Screen> create(jobject display)
@@ -75,13 +75,13 @@ public:
 
 public:
     // override
-	Rectangle getRegion()
+	UIRect getRegion()
 	{
-		Rectangle ret;
+		UIRect ret;
 		ret.left = 0;
 		ret.top = 0;
-		ret.right = (sl_real)m_width;
-		ret.bottom = (sl_real)m_height;
+		ret.right = (sl_ui_pos)m_width;
+		ret.bottom = (sl_ui_pos)m_height;
 		return ret;
 	}
 };

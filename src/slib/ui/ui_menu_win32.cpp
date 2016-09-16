@@ -4,6 +4,7 @@
 
 #include "../../../inc/slib/ui/menu.h"
 #include "../../../inc/slib/ui/platform.h"
+#include "../../../inc/slib/ui/window.h"
 
 #include "ui_core_win32.h"
 
@@ -414,6 +415,44 @@ void _Win32_processMenuCommand(WPARAM wParam, LPARAM lParam)
 			}
 		}
 	}
+}
+
+sl_bool _Win32_processMenuShortcutKey(MSG& msg)
+{
+	if (msg.message != WM_KEYDOWN) {
+		return sl_false;
+	}
+	HWND hWnd = Windows::getRootWindow(msg.hwnd);
+	if (hWnd) {
+		Ref<WindowInstance> instance = UIPlatform::getWindowInstance(hWnd);
+		if (instance.isNotNull()) {
+			Ref<Window> window = instance->getWindow();
+			if (window.isNotNull()) {
+				Ref<Menu> menu = window->getMenu();
+				if (menu.isNotNull()) {
+					Keycode keycode = UIEvent::getKeycodeFromSystemKeycode((sl_uint32)(msg.wParam));
+					KeycodeAndModifiers km;
+					km.setKeycode(keycode);
+					if (::GetKeyState(VK_CONTROL) & 0x8000) {
+						km.setControlKey();
+					}
+					if (::GetKeyState(VK_SHIFT) & 0x8000) {
+						km.setShiftKey();
+					}
+					if (::GetKeyState(VK_MENU) & 0x8000) {
+						km.setAltKey();
+					}
+					if ((::GetKeyState(VK_LWIN) & 0x8000) || (::GetKeyState(VK_RWIN) & 0x8000)) {
+						km.setWindowsKey();
+					}
+					if (km != 0) {
+						return menu->processShortcutKey(km);
+					}
+				}
+			}
+		}
+	}
+	return sl_false;
 }
 
 SLIB_UI_NAMESPACE_END

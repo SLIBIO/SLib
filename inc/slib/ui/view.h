@@ -901,6 +901,8 @@ private:
 	
 	void _measureRelativeBoundHeight();
 	
+	void _requestMakeLayout();
+	
 	void _requestInvalidateLayout();
 	
 	void _requestInvalidateMeasure(sl_bool flagWidth, sl_bool flagHeight);
@@ -1119,6 +1121,8 @@ private:
 	};
 	SafeRef<ScrollAttributes> m_scroll;
 	
+	friend class ListView;
+
 };
 
 struct ViewPrepareLayoutParam

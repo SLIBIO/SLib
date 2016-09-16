@@ -383,6 +383,9 @@ sl_size XmlNodeGroup::getChildElementsCount() const
 
 List< Ref<XmlElement> > XmlNodeGroup::getChildElements(const String& tagName) const
 {
+	if (tagName.isEmpty()) {
+		return getChildElements();
+	}
 	List< Ref<XmlElement> > ret;
 	ListLocker< Ref<XmlNode> > nodes(m_children);
 	for (sl_size i = 0; i < nodes.count; i++) {
@@ -425,6 +428,9 @@ Ref<XmlElement> XmlNodeGroup::getFirstChildElement() const
 
 Ref<XmlElement> XmlNodeGroup::getFirstChildElement(const String& tagName) const
 {
+	if (tagName.isEmpty()) {
+		return getFirstChildElement();
+	}
 	ListLocker< Ref<XmlNode> > nodes(m_children);
 	for (sl_size i = 0; i < nodes.count; i++) {
 		Ref<XmlElement> e = nodes[i]->toElementNode();
@@ -462,6 +468,9 @@ String XmlNodeGroup::getFirstChildElementText() const
 
 String XmlNodeGroup::getFirstChildElementText(const String& tagName) const
 {
+	if (tagName.isEmpty()) {
+		return getFirstChildElementText();
+	}
 	Ref<XmlElement> e = getFirstChildElement(tagName);
 	if (e.isNotNull()) {
 		return e->getText();

@@ -224,11 +224,11 @@ sl_bool UI::checkScrollLockOn()
 	return (GetAsyncKeyState(VK_SCROLL) & 1) != 0;
 }
 
-Point UI::getCursorPos()
+UIPoint UI::getCursorPos()
 {
 	POINT pt;
 	::GetCursorPos(&pt);
-	return Point((sl_real)(pt.x), (sl_real)(pt.y));
+	return UIPoint((sl_ui_pos)(pt.x), (sl_ui_pos)(pt.y));
 }
 
 sl_bool UI::checkLeftButtonPressed()

@@ -20,6 +20,29 @@ public:
 	
 };
 
+template <class T>
+class SLIB_EXPORT IListViewAdapterT : public IListViewAdapter
+{
+public:
+	virtual void onBindView(ListView* lv, sl_uint64 index, T* view) = 0;
+	
+public:
+	// override
+	Ref<View> getView(ListView* lv, sl_uint64 index, View* original)
+	{
+		Ref<T> view;
+		if (original) {
+			view = (T*)original;
+		} else {
+			view = new T;
+		}
+		onBindView(lv, index, view.ptr);
+		return view;
+	}
+	
+};
+
+
 
 class _ListContentView;
 
@@ -52,9 +75,11 @@ protected:
 	void _resetAdapter();
 	
 	void _layoutItemViews(sl_bool flagFromDraw, sl_bool flagFromScroll, sl_bool flagRefresh);
-	
+
+	sl_ui_len _measureItemWidth(const Ref<View>& itemView, sl_ui_len heightList);
+
 	sl_ui_len _measureItemHeight(const Ref<View>& itemView, sl_ui_len heightList);
-		
+
 protected:
 	SafePtr<IListViewAdapter> m_adapter;
 	
@@ -79,6 +104,8 @@ protected:
 	double m_averageMidItemHeight;
 	sl_ui_len m_heightTotalItems;
 	sl_ui_pos m_lastScrollY;
+
+	sl_int32 m_lockCountLayouting;
 		
 	friend class _ListContentView;
 	

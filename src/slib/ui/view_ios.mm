@@ -103,43 +103,44 @@ void iOS_ViewInstance::invalidate()
 	}
 }
 
-void iOS_ViewInstance::invalidate(const Rectangle& _rect)
+void iOS_ViewInstance::invalidate(const UIRect& _rect)
 {
 	UIView* handle = m_handle;
 	if (handle != nil) {
 		CGRect rect;
-		rect.origin.x = _rect.left;
-		rect.origin.y = _rect.top;
-		rect.size.width = _rect.getWidth();
-		rect.size.height = _rect.getHeight();
+		rect.origin.x = (CGFloat)(_rect.left);
+		rect.origin.y = (CGFloat)(_rect.top);
+		rect.size.width = (CGFloat)(_rect.getWidth());
+		rect.size.height = (CGFloat)(_rect.getHeight());
 		[handle setNeedsDisplayInRect: rect];
 	}
 }
 
-Rectangle iOS_ViewInstance::getFrame()
+UIRect iOS_ViewInstance::getFrame()
 {
 	UIView* handle = m_handle;
 	if (handle != nil) {
 		CGRect frame = handle.frame;
-		Rectangle ret;
-		ret.left = frame.origin.x;
-		ret.top = frame.origin.y;
-		ret.right = ret.left + frame.size.width;
-		ret.bottom = ret.top + frame.size.height;
+		UIRect ret;
+		ret.left = (sl_ui_pos)(frame.origin.x);
+		ret.top = (sl_ui_pos)(frame.origin.y);
+		ret.right = ret.left + (sl_ui_pos)(frame.size.width);
+		ret.bottom = ret.top + (sl_ui_pos)(frame.size.height);
+		ret.fixSizeError();
 		return ret;
 	}
-	return Rectangle::zero();
+	return UIRect::zero();
 }
 
-void iOS_ViewInstance::setFrame(const Rectangle& frame)
+void iOS_ViewInstance::setFrame(const UIRect& frame)
 {
 	UIView* handle = m_handle;
 	if (handle != nil) {
 		CGRect rect;
-		rect.origin.x = frame.left;
-		rect.origin.y = frame.top;
-		rect.size.width = frame.getWidth();
-		rect.size.height = frame.getHeight();
+		rect.origin.x = (CGFloat)(frame.left);
+		rect.origin.y = (CGFloat)(frame.top);
+		rect.size.width = (CGFloat)(frame.getWidth());
+		rect.size.height = (CGFloat)(frame.getHeight());
 		[handle setFrame:rect];
 		[handle setNeedsDisplay];
 	}
@@ -172,7 +173,7 @@ void iOS_ViewInstance::setOpaque(sl_bool flag)
 	}
 }
 
-Point iOS_ViewInstance::convertCoordinateFromScreenToView(const Point& ptScreen)
+UIPointf iOS_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& ptScreen)
 {
 	UIView* handle = m_handle;
 	if (handle != nil) {
@@ -183,16 +184,16 @@ Point iOS_ViewInstance::convertCoordinateFromScreenToView(const Point& ptScreen)
 			pt.y = ptScreen.y;
 			pt = [window convertPoint:pt fromWindow:nil];
 			pt = [window convertPoint:pt toView:handle];
-			Point ret;
-			ret.x = (sl_real)(pt.x);
-			ret.y = (sl_real)(pt.y);
+			UIPointf ret;
+			ret.x = (sl_ui_posf)(pt.x);
+			ret.y = (sl_ui_posf)(pt.y);
 			return ret;
 		}
 	}
 	return ptScreen;
 }
 
-Point iOS_ViewInstance::convertCoordinateFromViewToScreen(const Point& ptView)
+UIPointf iOS_ViewInstance::convertCoordinateFromViewToScreen(const UIPointf& ptView)
 {
 	UIView* handle = m_handle;
 	if (handle != nil) {
@@ -203,9 +204,9 @@ Point iOS_ViewInstance::convertCoordinateFromViewToScreen(const Point& ptView)
 			pt.y = ptView.y;
 			pt = [window convertPoint:pt fromView:handle];
 			pt = [window convertPoint:pt toWindow:nil];
-			Point ret;
-			ret.x = (sl_real)(pt.x);
-			ret.y = (sl_real)(pt.y);
+			UIPointf ret;
+			ret.x = (sl_ui_posf)(pt.x);
+			ret.y = (sl_ui_posf)(pt.y);
 			return ret;
 		}
 	}
@@ -239,11 +240,6 @@ void iOS_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
 
 void iOS_ViewInstance::onDraw(CGRect _rectDirty)
 {
-	Rectangle rectDirty;
-	rectDirty.left = (sl_real)(_rectDirty.origin.x);
-	rectDirty.top =  (sl_real)(_rectDirty.origin.y);
-	rectDirty.right = (sl_real)(rectDirty.left + _rectDirty.size.width);
-	rectDirty.bottom = (sl_real)(rectDirty.top + _rectDirty.size.height);
 	
 	UIView* handle = m_handle;
 	
@@ -291,7 +287,7 @@ sl_bool iOS_ViewInstance::onEventTouch(UIAction action, NSSet* touches, ::UIEven
 				} else {
 					phase = TouchPhase::Move;
 				}
-				TouchPoint point((sl_real)(pt.x), (sl_real)(pt.y), pressure, phase);
+				TouchPoint point((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y), pressure, phase);
 				pts[i] = point;
 				i++;
 				if (i >= n) {

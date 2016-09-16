@@ -6,6 +6,25 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+SLIB_JNI_BEGIN_CLASS(_JAndroidPoint, "android/graphics/Point")
+	SLIB_JNI_INT_FIELD(x);
+	SLIB_JNI_INT_FIELD(y);
+SLIB_JNI_END_CLASS
+
+SLIB_JNI_BEGIN_CLASS(_JAndroidRect, "android/graphics/Rect")
+	SLIB_JNI_INT_FIELD(left);
+	SLIB_JNI_INT_FIELD(top);
+	SLIB_JNI_INT_FIELD(right);
+	SLIB_JNI_INT_FIELD(bottom);
+SLIB_JNI_END_CLASS
+
+SLIB_JNI_BEGIN_CLASS(_JAndroidTouchPoint, "slib/platform/android/ui/view/UiTouchPoint")
+	SLIB_JNI_FLOAT_FIELD(x);
+	SLIB_JNI_FLOAT_FIELD(y);
+	SLIB_JNI_FLOAT_FIELD(pressure);
+	SLIB_JNI_INT_FIELD(phase);
+SLIB_JNI_END_CLASS
+
 void JNICALL _AndroidView_nativeOnDraw(JNIEnv* env, jobject _this, jlong jinstance, jobject jcanvas)
 {
 	Ref<Android_ViewInstance> instance = Android_ViewInstance::getAndroidInstance(jinstance);
@@ -58,8 +77,8 @@ jboolean JNICALL _AndroidView_nativeOnTouchEvent(JNIEnv* env, jobject _this, jlo
 				for (sl_uint32 i = 0; i < nPts; i++) {
 					JniLocal<jobject> jpt = Jni::getObjectArrayElement(jpoints, i);
 					if (jpt.isNotNull()) {
-						pts[i].point.x = _JAndroidTouchPoint::x.get(jpt);
-						pts[i].point.y = _JAndroidTouchPoint::y.get(jpt);
+						pts[i].point.x = (sl_ui_posf)(_JAndroidTouchPoint::x.get(jpt));
+						pts[i].point.y = (sl_ui_posf)(_JAndroidTouchPoint::y.get(jpt));
 						pts[i].pressure = _JAndroidTouchPoint::pressure.get(jpt);
 						pts[i].phase = (TouchPhase)(_JAndroidTouchPoint::phase.get(jpt));
 					}
@@ -93,15 +112,15 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidView, "slib/platform/android/ui/view/UiView")
 
 	SLIB_JNI_STATIC_METHOD(setFocus, "setFocus", "(Landroid/view/View;)V");
 	SLIB_JNI_STATIC_METHOD(invalidate, "invalidate", "(Landroid/view/View;)V");
-	SLIB_JNI_STATIC_METHOD(invalidateRect, "invalidateRect", "(Landroid/view/View;FFFF)V");
-	SLIB_JNI_STATIC_METHOD(getFrame, "getFrame", "(Landroid/view/View;)Landroid/graphics/RectF;");
-	SLIB_JNI_STATIC_METHOD(setFrame, "setFrame", "(Landroid/view/View;FFFF)Z");
+	SLIB_JNI_STATIC_METHOD(invalidateRect, "invalidateRect", "(Landroid/view/View;IIII)V");
+	SLIB_JNI_STATIC_METHOD(getFrame, "getFrame", "(Landroid/view/View;)Landroid/graphics/Rect;");
+	SLIB_JNI_STATIC_METHOD(setFrame, "setFrame", "(Landroid/view/View;IIII)Z");
 	SLIB_JNI_STATIC_METHOD(isVisible, "isVisible", "(Landroid/view/View;)Z");
 	SLIB_JNI_STATIC_METHOD(setVisible, "setVisible", "(Landroid/view/View;Z)V");
 	SLIB_JNI_STATIC_METHOD(isEnabled, "isEnabled", "(Landroid/view/View;)Z");
 	SLIB_JNI_STATIC_METHOD(setEnabled, "setEnabled", "(Landroid/view/View;Z)V");
-	SLIB_JNI_STATIC_METHOD(convertCoordinateFromScreenToView, "convertCoordinateFromScreenToView", "(Landroid/view/View;FF)Landroid/graphics/PointF;");
-	SLIB_JNI_STATIC_METHOD(convertCoordinateFromViewToScreen, "convertCoordinateFromViewToScreen", "(Landroid/view/View;FF)Landroid/graphics/PointF;");
+	SLIB_JNI_STATIC_METHOD(convertCoordinateFromScreenToView, "convertCoordinateFromScreenToView", "(Landroid/view/View;II)Landroid/graphics/Point;");
+	SLIB_JNI_STATIC_METHOD(convertCoordinateFromViewToScreen, "convertCoordinateFromViewToScreen", "(Landroid/view/View;II)Landroid/graphics/Point;");
 
 	SLIB_JNI_STATIC_METHOD(addChild, "addChild", "(Landroid/view/View;Landroid/view/View;)V");
 	SLIB_JNI_STATIC_METHOD(removeChild, "removeChild", "(Landroid/view/View;Landroid/view/View;)V");
@@ -158,8 +177,8 @@ sl_bool Android_ViewInstance::applyProperties(View* _view, ViewInstance* parent)
 	_View* view = (_View*)_view;
 	jobject jhandle = m_handle.get();
 	if (jhandle) {
-		Rectangle frame = view->getFrame();
-		_JAndroidView::setFrame.callBoolean(sl_null, jhandle, frame.left, frame.top, frame.right, frame.bottom);
+		UIRect frame = view->getFrame();
+		_JAndroidView::setFrame.callBoolean(sl_null, jhandle, (int)(frame.left), (int)(frame.top), (int)(frame.right), (int)(frame.bottom));
 		_JAndroidView::setVisible.call(sl_null, jhandle, view->isVisible());
 		_JAndroidView::setEnabled.call(sl_null, jhandle, view->isEnabled());
         if (parent) {
@@ -218,36 +237,37 @@ void Android_ViewInstance::invalidate()
 	}
 }
 
-void Android_ViewInstance::invalidate(const Rectangle& rect)
+void Android_ViewInstance::invalidate(const UIRect& rect)
 {
 	jobject handle = m_handle.get();
 	if (handle) {
-		_JAndroidView::invalidateRect.call(sl_null, handle, rect.left, rect.top, rect.right, rect.bottom);
+		_JAndroidView::invalidateRect.call(sl_null, handle, (int)(rect.left), (int)(rect.top), (int)(rect.right), (int)(rect.bottom));
 	}
 }
 
-Rectangle Android_ViewInstance::getFrame()
+UIRect Android_ViewInstance::getFrame()
 {
 	jobject handle = m_handle.get();
 	if (handle) {
 		JniLocal<jobject> jrect = _JAndroidView::getFrame.callObject(sl_null, handle);
 		if (jrect.isNotNull()) {
-            Rectangle ret;
-			ret.left = _JAndroidRectF::left.get(jrect);
-			ret.top = _JAndroidRectF::top.get(jrect);
-			ret.right = _JAndroidRectF::right.get(jrect);
-			ret.bottom = _JAndroidRectF::bottom.get(jrect);
+            UIRect ret;
+			ret.left = (sl_ui_pos)(_JAndroidRect::left.get(jrect));
+			ret.top = (sl_ui_pos)(_JAndroidRect::top.get(jrect));
+			ret.right = (sl_ui_pos)(_JAndroidRect::right.get(jrect));
+			ret.bottom = (sl_ui_pos)(_JAndroidRect::bottom.get(jrect));
+			ret.fixSizeError();
             return ret;
 		}
 	}
-	return Rectangle::zero();
+	return UIRect::zero();
 }
 
-void Android_ViewInstance::setFrame(const Rectangle& frame)
+void Android_ViewInstance::setFrame(const UIRect& frame)
 {
 	jobject handle = m_handle.get();
 	if (handle) {
-		_JAndroidView::setFrame.callBoolean(sl_null, handle, frame.left, frame.top, frame.right, frame.bottom);
+		_JAndroidView::setFrame.callBoolean(sl_null, handle, (int)(frame.left), (int)(frame.top), (int)(frame.right), (int)(frame.bottom));
 	}
 }
 
@@ -271,30 +291,30 @@ void Android_ViewInstance::setOpaque(sl_bool flag)
 {
 }
 
-Point Android_ViewInstance::convertCoordinateFromScreenToView(const Point& ptScreen)
+UIPointf Android_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& ptScreen)
 {
 	jobject handle = m_handle.get();
 	if (handle) {
-		JniLocal<jobject> jpt = _JAndroidView::convertCoordinateFromScreenToView.callObject(sl_null, handle, ptScreen.x, ptScreen.y);
+		JniLocal<jobject> jpt = _JAndroidView::convertCoordinateFromScreenToView.callObject(sl_null, handle, 0, 0);
 		if (jpt.isNotNull()) {
-			Point ret;
-			ret.x = _JAndroidPointF::x.get(jpt);
-			ret.y = _JAndroidPointF::y.get(jpt);
+			UIPointf ret;
+			ret.x = ptScreen.x + (sl_ui_pos)(_JAndroidPoint::x.get(jpt));
+			ret.y = ptScreen.y + (sl_ui_pos)(_JAndroidPoint::y.get(jpt));
 			return ret;
 		}
 	}
 	return ptScreen;
 }
 
-Point Android_ViewInstance::convertCoordinateFromViewToScreen(const Point& ptView)
+UIPointf Android_ViewInstance::convertCoordinateFromViewToScreen(const UIPointf& ptView)
 {
 	jobject handle = m_handle.get();
 	if (handle) {
-		JniLocal<jobject> jpt = _JAndroidView::convertCoordinateFromViewToScreen.callObject(sl_null, handle, ptView.x, ptView.y);
+		JniLocal<jobject> jpt = _JAndroidView::convertCoordinateFromViewToScreen.callObject(sl_null, handle, 0, 0);
 		if (jpt.isNotNull()) {
-			Point ret;
-			ret.x = _JAndroidPointF::x.get(jpt);
-			ret.y = _JAndroidPointF::y.get(jpt);
+			UIPointf ret;
+			ret.x = ptView.x + (sl_ui_pos)(_JAndroidPoint::x.get(jpt));
+			ret.y = ptView.y + (sl_ui_pos)(_JAndroidPoint::y.get(jpt));
 			return ret;
 		}
 	}

@@ -122,6 +122,7 @@ void _Win32_processUiDispatchQueue()
 }
 
 void _Win32_processMenuCommand(WPARAM wParam, LPARAM lParam);
+sl_bool _Win32_processMenuShortcutKey(MSG& msg);
 void _Win32_processCustomMsgBox(WPARAM wParam, LPARAM lParam);
 sl_bool _SplitView_preprocessMessage(MSG& msg);
 
@@ -166,6 +167,9 @@ void UIPlatform::runLoop(sl_uint32 level)
 							break;
 						}
 					}
+				}
+				if (_Win32_processMenuShortcutKey(msg)) {
+					break;
 				}
 				if (_SplitView_preprocessMessage(msg)) {
 					break;

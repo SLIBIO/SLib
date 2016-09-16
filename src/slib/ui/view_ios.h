@@ -9,6 +9,7 @@
 #include "../../../inc/slib/ui/platform.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class iOS_ViewInstance : public ViewInstance
 {
 public:
@@ -38,13 +39,13 @@ public:
 	void invalidate();
 	
 	// override
-	void invalidate(const Rectangle& rect);
+	void invalidate(const UIRect& rect);
 	
 	// override
-	Rectangle getFrame();
+	UIRect getFrame();
 	
 	// override
-	void setFrame(const Rectangle& frame);
+	void setFrame(const UIRect& frame);
 	
 	// override
 	void setVisible(sl_bool flag);
@@ -56,10 +57,10 @@ public:
 	void setOpaque(sl_bool flag);
 	
 	// override
-	Point convertCoordinateFromScreenToView(const Point& ptScreen);
+	UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen);
 	
 	// override
-	Point convertCoordinateFromViewToScreen(const Point& ptView);
+	UIPointf convertCoordinateFromViewToScreen(const UIPointf& ptView);
 	
 	// override
 	void addChildInstance(const Ref<ViewInstance>& instance);
@@ -91,11 +92,11 @@ SLIB_UI_NAMESPACE_END
 	Ref<iOS_ViewInstance> ret; \
 	UIView* parent = UIPlatform::getViewHandle(_parent); \
 	CGRect frame; \
-	Rectangle _frame = getFrame(); \
-	frame.origin.x = _frame.left; \
-	frame.origin.y = _frame.top; \
-	frame.size.width = _frame.getWidth(); \
-	frame.size.height = _frame.getHeight(); \
+	UIRect _frame = getFrame(); \
+	frame.origin.x = (CGFloat)(_frame.left); \
+	frame.origin.y = (CGFloat)(_frame.top); \
+	frame.size.width = (CGFloat)(_frame.getWidth()); \
+	frame.size.height = (CGFloat)(_frame.getHeight()); \
 
 #define IOS_VIEW_CREATE_INSTANCE_END \
 	if (handle != nil) { \

@@ -32,17 +32,17 @@ public class UiScrollView extends ScrollView {
 		view.setBackgroundColor(color);
 	}
 	
-	public static void _scrollTo(View view, float x, float y) {
+	public static void _scrollTo(View view, int x, int y) {
 		if (view instanceof UiScrollView) {
 			UiScrollView sv = (UiScrollView)view;
-			sv.scrollTo(0, (int)y);
-			sv.horz.scrollTo((int)x, 0);
+			sv.scrollTo(0, y);
+			sv.horz.scrollTo(x, 0);
 		} else {
-			view.scrollTo((int)x, (int)y);
+			view.scrollTo(x, y);
 		}
 	}
 	
-	public static float _getScrollX(View view) {
+	public static int _getScrollX(View view) {
 		if (view instanceof UiScrollView) {
 			UiScrollView sv = (UiScrollView)view;
 			return sv.horz.getScrollX();
@@ -51,7 +51,7 @@ public class UiScrollView extends ScrollView {
 		}
 	}
 
-	public static float _getScrollY(View view) {
+	public static int _getScrollY(View view) {
 		if (view instanceof UiScrollView) {
 			UiScrollView sv = (UiScrollView)view;
 			return sv.getScrollY();
@@ -60,8 +60,8 @@ public class UiScrollView extends ScrollView {
 		}
 	}
 
-	private static native void nativeOnScroll(long instance, float x, float y);
-	public static void onEventScroll(View view, float x, float y) {
+	private static native void nativeOnScroll(long instance, int x, int y);
+	public static void onEventScroll(View view, int x, int y) {
 		long instance = UiView.getInstance(view);
 		if (instance != 0) {
 			nativeOnScroll(instance, x, y);

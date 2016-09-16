@@ -126,6 +126,24 @@ Ref<MenuItem> MenuItem::createSeparator()
 	return new _MenuItemSeparator;
 }
 
+sl_bool MenuItem::processShortcutKey(const KeycodeAndModifiers& km)
+{
+	if (km != 0) {
+		if (km == m_shortcutKey) {
+			Ref<Runnable> action = m_action;
+			if (action.isNotNull()) {
+				action->run();
+			}
+			return sl_true;
+		}
+		Ref<Menu> submenu = m_submenu;
+		if (submenu.isNotNull()) {
+			return submenu->processShortcutKey(km);
+		}
+	}
+	return sl_false;
+}
+
 
 MenuItemParam::MenuItemParam()
 {
@@ -230,6 +248,22 @@ Ref<MenuItem> Menu::addSubmenu(Ref<Menu>& submenu, const String& title, const Re
 	param.checkedIcon = checkedIcon;
 	param.submenu = submenu;
 	return addMenuItem(param);
+}
+
+sl_bool Menu::processShortcutKey(const KeycodeAndModifiers& km)
+{
+	if (km != 0) {
+		ListLocker< Ref<MenuItem> > items(m_items);
+		for (sl_size i = 0; i < items.count; i++) {
+			Ref<MenuItem>& item = items[i];
+			if (item.isNotNull()) {
+				if (item->processShortcutKey(km)) {
+					return sl_true;
+				}
+			}
+		}
+	}
+	return sl_false;
 }
 
 SLIB_UI_NAMESPACE_END

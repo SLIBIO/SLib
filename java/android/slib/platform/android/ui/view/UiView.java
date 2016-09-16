@@ -8,8 +8,8 @@ import slib.platform.android.ui.UiThread;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.PointF;
-import android.graphics.RectF;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Build;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -80,17 +80,17 @@ public class UiView {
 		}
 	}
 	
-	public static void invalidateRect(View view, float left, float top, float right, float bottom) {
+	public static void invalidateRect(View view, int left, int top, int right, int bottom) {
 		if (UiThread.isUiThread()) {
-			view.invalidate((int)left, (int)top, (int)right, (int)bottom);			
+			view.invalidate(left, top, right, bottom);			
 		} else {
-			view.postInvalidate((int)left, (int)top, (int)right, (int)bottom);			
+			view.postInvalidate(left, top, right, bottom);			
 		}
 	}
 	
-	public static RectF getFrame(View view)
+	public static Rect getFrame(View view)
 	{
-		RectF ret = new RectF();
+		Rect ret = new Rect();
 		ret.left = view.getLeft();
 		ret.top = view.getTop();
 		ret.right = view.getRight();
@@ -98,7 +98,7 @@ public class UiView {
 		return ret;
 	}
 	
-	public static boolean setFrame(View view, float left, float top, float right, float bottom) {
+	public static boolean setFrame(View view, int left, int top, int right, int bottom) {
 		
 		if (right < left) {
 			right = left;
@@ -113,16 +113,16 @@ public class UiView {
 			if (_params != null && _params instanceof FrameLayout.LayoutParams) {
 				params = (FrameLayout.LayoutParams)_params;
 			} else {
-				params = new FrameLayout.LayoutParams((int)(right - left), (int)(bottom - top));
+				params = new FrameLayout.LayoutParams(right - left, bottom - top);
 			}
 			if (view instanceof Button) {
 				top -= 5;
 				bottom += 5;
 			}
-			params.leftMargin = (int)left;
-			params.topMargin = (int)top;
-			params.width = (int)(right - left);
-			params.height = (int)(bottom - top);
+			params.leftMargin = left;
+			params.topMargin = top;
+			params.width = right - left;
+			params.height = bottom - top;
 			view.setLayoutParams(params);
 			view.setMinimumWidth(params.width);
 			view.setMinimumHeight(params.height);
@@ -153,8 +153,8 @@ public class UiView {
 		view.setEnabled(flag);
 	}
 	
-	public static PointF convertCoordinateFromScreenToView(View view, float x, float y) {
-		PointF ret = new PointF();
+	public static Point convertCoordinateFromScreenToView(View view, int x, int y) {
+		Point ret = new Point();
 		int[] location = new int[2];
 		view.getLocationOnScreen(location);
 		ret.x = x - location[0];
@@ -162,8 +162,8 @@ public class UiView {
 		return ret;
 	}
 	
-	public static PointF convertCoordinateFromViewToScreen(View view, float x, float y) {
-		PointF ret = new PointF();
+	public static Point convertCoordinateFromViewToScreen(View view, int x, int y) {
+		Point ret = new Point();
 		int[] location = new int[2];
 		view.getLocationOnScreen(location);
 		ret.x = location[0] + x;

@@ -214,7 +214,6 @@ public:
 							if (line) {
 								CGFloat ascend, descend, leading;
 								CTLineGetTypographicBounds(line, &ascend, &descend, &leading);
-								CGRect rect = CTLineGetBoundsWithOptions(line, kCTLineBoundsExcludeTypographicShifts);
 								CGAffineTransform trans;
 								trans.a = 1;
 								trans.b = 0;

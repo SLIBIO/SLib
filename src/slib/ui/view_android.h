@@ -9,6 +9,7 @@
 #include "../../../inc/slib/ui/platform.h"
 
 SLIB_UI_NAMESPACE_BEGIN
+
 class Android_ViewInstance : public ViewInstance
 {
 public:
@@ -67,13 +68,13 @@ public:
 	void invalidate();
 
 	// override
-	void invalidate(const Rectangle& rect);
+	void invalidate(const UIRect& rect);
 
 	// override
-	Rectangle getFrame();
+	UIRect getFrame();
 
 	// override
-	void setFrame(const Rectangle& frame);
+	void setFrame(const UIRect& frame);
 
 	// override
 	void setVisible(sl_bool flag);
@@ -85,10 +86,10 @@ public:
 	void setOpaque(sl_bool flag);
 
 	// override
-	Point convertCoordinateFromScreenToView(const Point& ptScreen);
+	UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen);
 
 	// override
-	Point convertCoordinateFromViewToScreen(const Point& ptView);
+	UIPointf convertCoordinateFromViewToScreen(const UIPointf& ptView);
 
 	// override
 	void addChildInstance(const Ref<ViewInstance>& instance);
@@ -101,25 +102,6 @@ protected:
 	JniGlobal<jobject> m_context;
 	
 };
-
-SLIB_JNI_BEGIN_CLASS(_JAndroidPointF, "android/graphics/PointF")
-	SLIB_JNI_FLOAT_FIELD(x);
-	SLIB_JNI_FLOAT_FIELD(y);
-SLIB_JNI_END_CLASS
-
-SLIB_JNI_BEGIN_CLASS(_JAndroidRectF, "android/graphics/RectF")
-	SLIB_JNI_FLOAT_FIELD(left);
-	SLIB_JNI_FLOAT_FIELD(top);
-	SLIB_JNI_FLOAT_FIELD(right);
-	SLIB_JNI_FLOAT_FIELD(bottom);
-SLIB_JNI_END_CLASS
-
-SLIB_JNI_BEGIN_CLASS(_JAndroidTouchPoint, "slib/platform/android/ui/view/UiTouchPoint")
-	SLIB_JNI_FLOAT_FIELD(x);
-	SLIB_JNI_FLOAT_FIELD(y);
-	SLIB_JNI_FLOAT_FIELD(pressure);
-	SLIB_JNI_INT_FIELD(phase);
-SLIB_JNI_END_CLASS
 
 SLIB_UI_NAMESPACE_END
 

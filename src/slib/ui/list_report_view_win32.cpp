@@ -181,7 +181,7 @@ Ref<ViewInstance> ListReportView::createNativeWidget(ViewInstance* parent)
 		}
 		_setFontInstance(fontInstance);
 
-		UINT exStyle = LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVS_EX_ONECLICKACTIVATE;
+		UINT exStyle = LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVS_EX_ONECLICKACTIVATE | LVS_EX_DOUBLEBUFFER;
 		::SendMessageW(handle, LVM_SETEXTENDEDLISTVIEWSTYLE, exStyle, exStyle);
 
 		((_ListReportView*)this)->__copyColumns(handle);

@@ -30,24 +30,31 @@ public:
 		HWND handle = getHandle();
 		if (msg == WM_ERASEBKGND) {
 			Ref<View> view = getView();
-			if (view.isNotNull()) {
-				if (view->isOpaque()) {
-					result = TRUE;
-					return sl_true;
+			if (ScrollView::checkInstance(view.ptr)) {
+				_ScrollView* sv = (_ScrollView*)(view.ptr);
+				Ref<View> cv = sv->getContentView();
+				if (cv.isNotNull()) {
+					if (cv->getWidth() >= sv->getWidth() && cv->getHeight() >= sv->getHeight()) {
+						result = TRUE;
+						return sl_true;
+					}
 				}
 			}
 			Color color = m_backgroundColor;
-			if (color.a > 0) {
-				HBRUSH hbr = ::CreateSolidBrush(RGB(color.r, color.g, color.b));
-				if (hbr) {
-					HDC hDC = (HDC)(wParam);
-					RECT rc;
-					::GetClientRect(handle, &rc);
-					::FillRect(hDC, &rc, hbr);
-					::DeleteObject(hbr);
-					result = TRUE;
-					return sl_true;
-				}
+			if (color.a < 255) {
+				Color c = UIPlatform::getColorFromColorRef(::GetSysColor(COLOR_MENU));
+				c.blend_PA_NPA(color);
+				color = c;
+			}
+			HBRUSH hbr = ::CreateSolidBrush(RGB(color.r, color.g, color.b));
+			if (hbr) {
+				HDC hDC = (HDC)(wParam);
+				RECT rc;
+				::GetClientRect(handle, &rc);
+				::FillRect(hDC, &rc, hbr);
+				::DeleteObject(hbr);
+				result = TRUE;
+				return sl_true;
 			}
 		} else {
 			Ref<View> view = getView();

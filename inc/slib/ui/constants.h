@@ -272,7 +272,8 @@ enum class UIAttachMode
 {
 	NotAttach,
 	AttachAlways,
-	NotAttachInNativeWidget
+	NotAttachInNativeWidget,
+	AttachInNativeWidget
 };
 
 SLIB_UI_NAMESPACE_END

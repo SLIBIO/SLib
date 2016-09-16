@@ -240,12 +240,12 @@ sl_bool UI::checkScrollLockOn()
 }
 
 
-Point UI::getCursorPos()
+UIPoint UI::getCursorPos()
 {
 	NSScreen* screen = [NSScreen mainScreen];
 	NSRect rect = [screen frame];
 	NSPoint pt = [NSEvent mouseLocation];
-	return Point(pt.x, rect.size.height - pt.y);
+	return UIPoint((sl_ui_pos)(pt.x), (sl_ui_pos)(rect.size.height - pt.y));
 }
 
 sl_bool UI::checkLeftButtonPressed()

@@ -7,8 +7,8 @@ import slib.platform.android.ui.view.UiGroupView;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.PointF;
-import android.graphics.RectF;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Build.VERSION;
 import android.view.Gravity;
@@ -34,19 +34,19 @@ public class UiWindow extends UiGroupView {
 	
 	static UiWindow create(Activity activity
 			, boolean flagFullScreen, boolean flagCenterScreen
-			, float x, float y, float width, float height) {
+			, int x, int y, int width, int height) {
 		try {
 			UiWindow ret = new UiWindow(activity);
 			FrameLayout.LayoutParams params;
 			if (flagFullScreen) {
 				params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);			
 			} else {
-				params = new FrameLayout.LayoutParams((int)(width), (int)(height));
+				params = new FrameLayout.LayoutParams(width, height);
 				if (flagCenterScreen) {
 					params.gravity = Gravity.CENTER;
 				} else {
-					params.leftMargin = (int)x;
-					params.topMargin = (int)y;
+					params.leftMargin = x;
+					params.topMargin = y;
 				}
 			}
 			activity.addContentView(ret, params);
@@ -85,8 +85,8 @@ public class UiWindow extends UiGroupView {
 		setBackgroundColor(color);
 	}
 	
-	public RectF getFrame() {
-		RectF ret = new RectF();
+	public Rect getFrame() {
+		Rect ret = new Rect();
 		int[] off = new int[2];
 		getLocationOnScreen(off);
 		ret.left = off[0];
@@ -96,11 +96,11 @@ public class UiWindow extends UiGroupView {
 		return ret;
 	}
 	
-	public void setFrame(float left, float top, float right, float bottom) {
+	public void setFrame(int left, int top, int right, int bottom) {
 		try {
-			final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams((int)(right - left), (int)(bottom - top));
-			params.leftMargin = (int)left;
-			params.topMargin = (int)top;
+			final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(right - left, bottom - top);
+			params.leftMargin = left;
+			params.topMargin = top;
 			if (UiThread.isUiThread()) {
 				setLayoutParams(params);
 			} else {
@@ -115,19 +115,19 @@ public class UiWindow extends UiGroupView {
 		}
 	}
 	
-	public PointF getSize() {
-		PointF ret = new PointF();
+	public Point getSize() {
+		Point ret = new Point();
 		ret.x = getWidth();
 		ret.y = getHeight();
 		return ret;
 	}
 	
-	public void setSize(float width, float height) {
+	public void setSize(int width, int height) {
 		try {
 			final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)(getLayoutParams());
 			if (params != null) {
-				params.width = (int)width;
-				params.height = (int)height;
+				params.width = width;
+				params.height = height;
 			}
 			if (UiThread.isUiThread()) {
 				setLayoutParams(params);
@@ -190,8 +190,8 @@ public class UiWindow extends UiGroupView {
 		requestFocus();
 	}
 	
-	public PointF convertCoordinateFromScreenToWindow(float x, float y) {
-		PointF ret = new PointF();
+	public Point convertCoordinateFromScreenToWindow(int x, int y) {
+		Point ret = new Point();
 		int[] location = new int[2];
 		getLocationOnScreen(location);
 		ret.x = x - location[0];
@@ -199,8 +199,8 @@ public class UiWindow extends UiGroupView {
 		return ret;
 	}
 	
-	public PointF convertCoordinateFromWindowToScreen(float x, float y) {
-		PointF ret = new PointF();
+	public Point convertCoordinateFromWindowToScreen(int x, int y) {
+		Point ret = new Point();
 		int[] location = new int[2];
 		getLocationOnScreen(location);
 		ret.x = location[0] + x;
@@ -208,7 +208,7 @@ public class UiWindow extends UiGroupView {
 		return ret;
 	}
 	
-	private static native void nativeOnResize(long instance, float w, float h);
+	private static native void nativeOnResize(long instance, int w, int h);
 	public void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
 		nativeOnResize(instance, w, h);

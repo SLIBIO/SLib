@@ -39,9 +39,9 @@ sl_bool UI::checkScrollLockOn()
 }
 
 
-Point UI::getCursorPos()
+UIPoint UI::getCursorPos()
 {
-	return Point::zero();
+	return UIPoint::zero();
 }
 
 sl_bool UI::checkLeftButtonPressed()

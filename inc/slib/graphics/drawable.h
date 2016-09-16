@@ -44,7 +44,7 @@ public:
 	
 	static Ref<Drawable> createColorDrawable(const Color& color);
 	
-	static Ref<Drawable> createEmptyDrawable();
+	static Ref<Drawable> getEmptyDrawable();
 	
 	static Ref<Drawable> createSubDrawable(const Ref<Drawable>& src, sl_real x, sl_real y, sl_real width, sl_real height);
 	
@@ -86,14 +86,12 @@ class SLIB_EXPORT EmptyDrawable : public Drawable
 	SLIB_DECLARE_OBJECT
 
 public:
-	static Ref<Drawable> create();
+	static Ref<Drawable> get();
 	
 public:
 	// override
 	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc);
 	
-protected:
-	Ref<Brush> m_brush;
 };
 
 class SLIB_EXPORT RectangleDrawable : public Drawable

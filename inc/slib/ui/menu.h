@@ -64,6 +64,8 @@ public:
 
 	static Ref<MenuItem> createSeparator();
 
+	sl_bool processShortcutKey(const KeycodeAndModifiers& km);
+
 protected:
 	WeakRef<Menu> m_parent;
 
@@ -74,7 +76,7 @@ protected:
 	sl_bool m_flagChecked;
 	SafeRef<Bitmap> m_icon;
 	SafeRef<Bitmap> m_checkedIcon;
-	Ref<Menu> m_submenu;
+	SafeRef<Menu> m_submenu;
 	SafeRef<Runnable> m_action;
 
 };
@@ -144,6 +146,8 @@ public:
 	Ref<MenuItem> addSubmenu(Ref<Menu>& submenu, const String& title, const Ref<Bitmap>& icon);
 	
 	Ref<MenuItem> addSubmenu(Ref<Menu>& submenu, const String& title, const Ref<Bitmap>& icon, const Ref<Bitmap>& checkedIcon);
+
+	sl_bool processShortcutKey(const KeycodeAndModifiers& km);
 	
 protected:
 	CList< Ref<MenuItem> > m_items;

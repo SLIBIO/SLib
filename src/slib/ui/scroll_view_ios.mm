@@ -25,14 +25,14 @@ class _ScrollView : public ScrollView
 public:
 	void __applyContentSize(_Slib_iOS_ScrollView* sv)
 	{
-		Size size = getContentSize();
+		ScrollPoint size = getContentSize();
 		if (!m_flagHorizontalScroll) {
 			size.x = 0;
 		}
 		if (!m_flagVerticalScroll) {
 			size.y = 0;
 		}
-		[sv setContentSize:CGSizeMake(size.x, size.y)];
+		[sv setContentSize:CGSizeMake((CGFloat)(size.x), (CGFloat)(size.y))];
 	}
 	
 	void __applyContent(_Slib_iOS_ScrollView* sv)
@@ -68,7 +68,7 @@ public:
 		Ref<View> _view = instance->getView();
 		if (ScrollView::checkInstance(_view.ptr)) {
 			_ScrollView* view = (_ScrollView*)(_view.ptr);
-			view->_onScroll_NW((sl_real)(pt.x), (sl_real)(pt.y));
+			view->_onScroll_NW((sl_scroll_pos)(pt.x), (sl_scroll_pos)(pt.y));
 		}
 	}
 
@@ -103,53 +103,53 @@ void ScrollView::_setContentView_NW(const Ref<View>& view)
 	}
 }
 
-void ScrollView::_scrollTo_NW(sl_real x, sl_real y)
+void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
 		if ([handle isKindOfClass:[_Slib_iOS_ScrollView class]]) {
 			_Slib_iOS_ScrollView* sv = (_Slib_iOS_ScrollView*)handle;
-			[sv setContentOffsetFromAPI:CGPointMake(x, y)];
+			[sv setContentOffsetFromAPI:CGPointMake((CGFloat)x, (CGFloat)y)];
 		} else if ([handle isKindOfClass:[UIScrollView class]]) {
 			UIScrollView* sv = (UIScrollView*)handle;
-			[sv setContentOffset:CGPointMake(x, y)];
+			[sv setContentOffset:CGPointMake((CGFloat)x, (CGFloat)y)];
 		}
 	}
 }
 
-Point ScrollView::_getScrollPosition_NW()
+ScrollPoint ScrollView::_getScrollPosition_NW()
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[UIScrollView class]]) {
 		UIScrollView* sv = (UIScrollView*)handle;
 		Point ret;
 		CGPoint pt = sv.contentOffset;
-		ret.x = (sl_real)(pt.x);
-		ret.y = (sl_real)(pt.y);
+		ret.x = (sl_scroll_pos)(pt.x);
+		ret.y = (sl_scroll_pos)(pt.y);
 		return ret;
 	}
-	return Point::zero();
+	return ScrollPoint::zero();
 }
 
-Size ScrollView::_getScrollRange_NW()
+ScrollPoint ScrollView::_getScrollRange_NW()
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[UIScrollView class]]) {
 		UIScrollView* sv = (UIScrollView*)handle;
 		CGSize sizeContent = sv.contentSize;
 		CGSize sizeFrame = sv.bounds.size;
-		Size ret;
-		ret.x = sizeContent.width - sizeFrame.width;
+		ScrollPoint ret;
+		ret.x = (sl_scroll_pos)(sizeContent.width - sizeFrame.width);
 		if (ret.x < 0) {
 			ret.x = 0;
 		}
-		ret.y = sizeContent.height - sizeFrame.height;
+		ret.y = (sl_scroll_pos)(sizeContent.height - sizeFrame.height);
 		if (ret.y < 0) {
 			ret.y = 0;
 		}
 		return ret;
 	}
-	return Size::zero();
+	return ScrollPoint::zero();
 }
 
 void ScrollView::_setBorder_NW(sl_bool flag)

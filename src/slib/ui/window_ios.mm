@@ -73,7 +73,7 @@ public:
 	
 	static Ref<WindowInstance> create(const WindowInstanceParam& param)
 	{
-		Rectangle screenFrame;
+		UIRect screenFrame;
 		Ref<Screen> _screen = param.screen;
 		if (_screen.isNotNull()) {
 			screenFrame = _screen->getRegion();
@@ -82,15 +82,15 @@ public:
 			if (_screen.isNotNull()) {
 				screenFrame = _screen->getRegion();
 			} else {
-				screenFrame = Rectangle::zero();
+				screenFrame = UIRect::zero();
 			}
 		}
-		Rectangle _rect = param.calculateRegion(screenFrame);
+		UIRect _rect = param.calculateRegion(screenFrame);
 		CGRect rect;
-		rect.origin.x = _rect.left;
-		rect.origin.y = _rect.top;
-		rect.size.width = _rect.getWidth();
-		rect.size.height = _rect.getHeight();
+		rect.origin.x = (CGFloat)(_rect.left);
+		rect.origin.y = (CGFloat)(_rect.top);
+		rect.size.width = (CGFloat)(_rect.getWidth());
+		rect.size.height = (CGFloat)(_rect.getHeight());
 		_slib_iOS_Window* window = [[_slib_iOS_Window alloc] initWithFrame:rect];
 		if (window != nil) {
 			UIScreen* screen = UIPlatform::getScreenHandle(_screen.ptr);
@@ -185,33 +185,33 @@ public:
 	{
 	}
 	
-	Rectangle getFrame()
+	UIRect getFrame()
 	{
 		UIView* window = m_window;
 		if (window != nil) {
 			CGRect rect = [window frame];
-			Rectangle frame;
-			frame.left = (sl_real)(rect.origin.x);
-			frame.top = (sl_real)(rect.origin.y);
-			frame.right = frame.left + (sl_real)(rect.size.width);
-			frame.bottom = frame.top + (sl_real)(rect.size.height);
+			UIRect frame;
+			frame.left = (sl_ui_pos)(rect.origin.x);
+			frame.top = (sl_ui_pos)(rect.origin.y);
+			frame.right = frame.left + (sl_ui_pos)(rect.size.width);
+			frame.bottom = frame.top + (sl_ui_pos)(rect.size.height);
 			return frame;
 		} else {
-			return Rectangle::zero();
+			return UIRect::zero();
 		}
 	}
 	
-	sl_bool setFrame(const Rectangle& _frame)
+	sl_bool setFrame(const UIRect& _frame)
 	{
-		Rectangle frame = _frame;
+		UIRect frame = _frame;
 		UIView* window = m_window;
 		if (window != nil) {
 			dispatch_async(dispatch_get_main_queue(), ^{
 				CGRect rect;
-				rect.origin.x = frame.left;
-				rect.origin.y = frame.top;
-				rect.size.width = frame.getWidth();
-				rect.size.height = frame.getHeight();
+				rect.origin.x = (CGFloat)(frame.left);
+				rect.origin.y = (CGFloat)(frame.top);
+				rect.size.width = (CGFloat)(frame.getWidth());
+				rect.size.height = (CGFloat)(frame.getHeight());
 				[window setFrame:rect];
 			});
 			return sl_true;
@@ -219,34 +219,34 @@ public:
 		return sl_false;
 	}
 	
-	Rectangle getClientFrame()
+	UIRect getClientFrame()
 	{
 		return getFrame();
 	}
 	
-	Size getClientSize()
+	UISize getClientSize()
 	{
 		UIView* window = m_window;
 		if (window != nil) {
 			CGRect rect = [window frame];
-			Size ret;
-			ret.x = (sl_real)(rect.size.width);
-			ret.y = (sl_real)(rect.size.height);
+			UISize ret;
+			ret.x = (sl_ui_pos)(rect.size.width);
+			ret.y = (sl_ui_pos)(rect.size.height);
 			return ret;
 		} else {
-			return Size::zero();
+			return UISize::zero();
 		}
 	}
 	
-	sl_bool setClientSize(const Size& _size)
+	sl_bool setClientSize(const UISize& _size)
 	{
-		Size size = _size;
+		UISize size = _size;
 		UIView* window = m_window;
 		if (window != nil) {
 			dispatch_async(dispatch_get_main_queue(), ^{
 				CGRect frame = [window frame];
-				frame.size.width = size.x;
-				frame.size.height = size.y;
+				frame.size.width = (CGFloat)(size.x);
+				frame.size.height = (CGFloat)(size.y);
 				[window setFrame:frame];
 			});
 			return sl_true;
@@ -450,31 +450,31 @@ public:
 		return sl_false;
 	}
 	
-	Point convertCoordinateFromScreenToWindow(const Point& ptScreen)
+	UIPointf convertCoordinateFromScreenToWindow(const UIPointf& ptScreen)
 	{
 		UIView* view = m_window;
 		if (view != nil) {
 			if ([view isKindOfClass:[UIWindow class]]) {
 				UIWindow* window = (UIWindow*)view;
 				CGPoint pt;
-				pt.x = ptScreen.x;
-				pt.y = ptScreen.y;
+				pt.x = (CGFloat)(ptScreen.x);
+				pt.y = (CGFloat)(ptScreen.y);
 				pt = [window convertPoint:pt fromWindow:nil];
-				Point ret;
-				ret.x = (sl_real)(pt.x);
-				ret.y = (sl_real)(pt.y);
+				UIPointf ret;
+				ret.x = (sl_ui_posf)(pt.x);
+				ret.y = (sl_ui_posf)(pt.y);
 				return ret;
 			} else {
 				UIWindow* window = [view window];
 				if (window != nil) {
 					CGPoint pt;
-					pt.x = ptScreen.x;
-					pt.y = ptScreen.y;
+					pt.x = (CGFloat)(ptScreen.x);
+					pt.y = (CGFloat)(ptScreen.y);
 					pt = [window convertPoint:pt fromWindow:nil];
 					pt = [window convertPoint:pt toView:view];
-					Point ret;
-					ret.x = (sl_real)(pt.x);
-					ret.y = (sl_real)(pt.y);
+					UIPointf ret;
+					ret.x = (sl_ui_posf)(pt.x);
+					ret.y = (sl_ui_posf)(pt.y);
 					return ret;
 				}
 			}
@@ -482,31 +482,31 @@ public:
 		return ptScreen;
 	}
 	
-	Point convertCoordinateFromWindowToScreen(const Point& ptWindow)
+	UIPointf convertCoordinateFromWindowToScreen(const UIPointf& ptWindow)
 	{
 		UIView* view = m_window;
 		if (view != nil) {
 			if ([view isKindOfClass:[UIWindow class]]) {
 				UIWindow* window = (UIWindow*)view;
 				CGPoint pt;
-				pt.x = ptWindow.x;
-				pt.y = ptWindow.y;
+				pt.x = (CGFloat)(ptWindow.x);
+				pt.y = (CGFloat)(ptWindow.y);
 				pt = [window convertPoint:pt toWindow:nil];
-				Point ret;
-				ret.x = (sl_real)(pt.x);
-				ret.y = (sl_real)(pt.y);
+				UIPointf ret;
+				ret.x = (sl_ui_posf)(pt.x);
+				ret.y = (sl_ui_posf)(pt.y);
 				return ret;
 			} else {
 				UIWindow* window = [view window];
 				if (window != nil) {
 					CGPoint pt;
-					pt.x = ptWindow.x;
-					pt.y = ptWindow.y;
+					pt.x = (CGFloat)(ptWindow.x);
+					pt.y = (CGFloat)(ptWindow.y);
 					pt = [window convertPoint:pt fromView:view];
 					pt = [window convertPoint:pt toWindow:nil];
-					Point ret;
-					ret.x = (sl_real)(pt.x);
-					ret.y = (sl_real)(pt.y);
+					UIPointf ret;
+					ret.x = (sl_ui_posf)(pt.x);
+					ret.y = (sl_ui_posf)(pt.y);
 					return ret;
 				}
 			}
@@ -514,32 +514,32 @@ public:
 		return ptWindow;
 	}
 	
-	Point convertCoordinateFromScreenToClient(const Point& ptScreen)
+	UIPointf convertCoordinateFromScreenToClient(const UIPointf& ptScreen)
 	{
 		return convertCoordinateFromScreenToWindow(ptScreen);
 	}
 	
-	Point convertCoordinateFromClientToScreen(const Point& ptClient)
+	UIPointf convertCoordinateFromClientToScreen(const UIPointf& ptClient)
 	{
 		return convertCoordinateFromWindowToScreen(ptClient);
 	}
 	
-	Point convertCoordinateFromWindowToClient(const Point& ptWindow)
+	UIPointf convertCoordinateFromWindowToClient(const UIPointf& ptWindow)
 	{
 		return ptWindow;
 	}
 	
-	Point convertCoordinateFromClientToWindow(const Point& ptClient)
+	UIPointf convertCoordinateFromClientToWindow(const UIPointf& ptClient)
 	{
 		return ptClient;
 	}
 	
-	Size getWindowSizeFromClientSize(const Size& sizeClient)
+	UISize getWindowSizeFromClientSize(const UISize& sizeClient)
 	{
 		return sizeClient;
 	}
 	
-	Size getClientSizeFromWindowSize(const Size& sizeWindow)
+	UISize getClientSizeFromWindowSize(const UISize& sizeWindow)
 	{
 		return sizeWindow;
 	}
@@ -574,9 +574,9 @@ SLIB_UI_NAMESPACE_END
 		_slib_iOS_Window* window = (_slib_iOS_Window*)_window;
 		slib::Ref<slib::_iOS_Window> w = window->m_window;
 		if (w.isNotNull()) {
-			slib::Size size;
-			size.x = (sl_real)(_size.width);
-			size.y = (sl_real)(_size.height);
+			slib::UISize size;
+			size.x = (sl_ui_pos)(_size.width);
+			size.y = (sl_ui_pos)(_size.height);
 			CGRect r = window.frame;
 			r.size = _size;
 			window.frame = r;

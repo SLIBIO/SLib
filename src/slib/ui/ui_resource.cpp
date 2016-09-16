@@ -50,9 +50,9 @@ sl_ui_len UIResource::getScreenMaximum()
 	return SLIB_MAX(getScreenWidth(), getScreenHeight());
 }
 
-UILayoutResource::UILayoutResource(sl_real customUnitLength)
+UILayoutResource::UILayoutResource(sl_real sp)
 {
-	m_customUnit = customUnitLength;
+	m_sp = sp;
 	m_countRecursiveLayout = 0;
 }
 
@@ -61,14 +61,14 @@ Ref<View> UILayoutResource::getContent()
 	return m_contentView;
 }
 
-sl_real UILayoutResource::getCustomUnitLength()
+sl_real UILayoutResource::getScaledPixel()
 {
-	return m_customUnit;
+	return m_sp;
 }
 
-void UILayoutResource::setCustomUnitLength(sl_real length)
+void UILayoutResource::setScaledPixel(sl_real sp)
 {
-	m_customUnit = length;
+	m_sp = sp;
 }
 
 // avoid recursively layouting
@@ -85,8 +85,8 @@ void UILayoutResource::_layoutViews_safe(sl_ui_len width, sl_ui_len height)
 
 SLIB_DEFINE_OBJECT(WindowLayoutResource, Window)
 
-WindowLayoutResource::WindowLayoutResource(sl_real customUnitLength)
-: UILayoutResource(customUnitLength)
+WindowLayoutResource::WindowLayoutResource(sl_real sp)
+: UILayoutResource(sp)
 {
 	SLIB_REFERABLE_CONSTRUCTOR
 	Ref<View> view = Window::getContentView();
@@ -121,8 +121,8 @@ void WindowLayoutResource::_layoutViews_safe()
 
 SLIB_DEFINE_OBJECT(ViewLayoutResource, ViewGroup)
 
-ViewLayoutResource::ViewLayoutResource(sl_real customUnitLength)
-: UILayoutResource(customUnitLength)
+ViewLayoutResource::ViewLayoutResource(sl_real sp)
+: UILayoutResource(sp)
 {
 	SLIB_REFERABLE_CONSTRUCTOR
 	m_contentView = this;
