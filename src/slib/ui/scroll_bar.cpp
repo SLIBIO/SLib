@@ -444,9 +444,9 @@ void ScrollBar::onMouseWheelEvent(UIEvent* ev)
 	sl_scroll_pos line = m_line;
 	if (line < SLIB_EPSILON) {
 		if (page > 0) {
-			line = page * 0.05f;
+			line = page / 20;
 		} else {
-			line = range * 0.05f;
+			line = range / 20;
 		}
 	}
 	sl_real delta;

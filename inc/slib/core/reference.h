@@ -609,16 +609,16 @@ struct _Ref_Const
 
 extern const _Ref_Const _Ref_Null;
 
-class SLIB_EXPORT _ReferableConstructor
+class SLIB_EXPORT _SafeReferenceMemberFunction
 {
 public:
 	Referable* m_object;
-	_ReferableConstructor(Referable* object)
+	_SafeReferenceMemberFunction(Referable* object)
 	{
 		m_object = object;
 		m_object->increaseReference();
 	}
-	~_ReferableConstructor()
+	~_SafeReferenceMemberFunction()
 	{
 		m_object->decreaseReferenceNoFree();
 	}
@@ -626,7 +626,8 @@ public:
 
 SLIB_NAMESPACE_END
 
-#define SLIB_REFERABLE_CONSTRUCTOR slib::_ReferableConstructor _slib_referable_constructor(this);
+#define SLIB_REFERABLE_MEMBER_FUNCTION slib::_SafeReferenceMemberFunction _slib_referable_constructor(this);
+#define SLIB_REFERABLE_CONSTRUCTOR SLIB_REFERABLE_MEMBER_FUNCTION
 
 #define SLIB_NEW_REF(CLASS, NAME, ...) \
 	CLASS* NAME = new CLASS(__VA_ARGS__); \
