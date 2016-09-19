@@ -94,22 +94,6 @@ public:
 	
 };
 
-class SLIB_EXPORT RectangleDrawable : public Drawable
-{
-	SLIB_DECLARE_OBJECT
-	
-public:
-	static Ref<Drawable> create(const Ref<Pen>& pen, const Ref<Brush>& brush);
-	
-public:
-	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
-	
-protected:
-	Ref<Pen> m_pen;
-	Ref<Brush> m_brush;
-	
-};
 
 class SLIB_EXPORT SubDrawable : public Drawable
 {
@@ -378,6 +362,74 @@ protected:
 	sl_real m_height;
 	
 };
+
+
+class SLIB_EXPORT RectangleDrawable : public Drawable
+{
+	SLIB_DECLARE_OBJECT
+	
+public:
+	static Ref<Drawable> create(const Ref<Pen>& pen, const Ref<Brush>& brush);
+	
+public:
+	// override
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	
+protected:
+	Ref<Pen> m_pen;
+	Ref<Brush> m_brush;
+	
+};
+
+class SLIB_EXPORT EllipseDrawable : public Drawable
+{
+	SLIB_DECLARE_OBJECT
+	
+public:
+	static Ref<Drawable> create(const Ref<Pen>& pen, const Ref<Brush>& brush);
+	
+public:
+	// override
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	
+protected:
+	Ref<Pen> m_pen;
+	Ref<Brush> m_brush;
+	
+};
+
+class SLIB_EXPORT HorizontalLineDrawable : public Drawable
+{
+	SLIB_DECLARE_OBJECT
+	
+public:
+	static Ref<Drawable> create(const Ref<Pen>& pen);
+	
+public:
+	// override
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	
+protected:
+	Ref<Pen> m_pen;
+	
+};
+
+class SLIB_EXPORT VerticalLineDrawable : public Drawable
+{
+	SLIB_DECLARE_OBJECT
+	
+public:
+	static Ref<Drawable> create(const Ref<Pen>& pen);
+	
+public:
+	// override
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	
+protected:
+	Ref<Pen> m_pen;
+	
+};
+
 
 SLIB_GRAPHICS_NAMESPACE_END
 

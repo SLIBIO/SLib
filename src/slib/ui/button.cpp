@@ -608,23 +608,29 @@ void Button::resetStateBorders(sl_bool flagRedraw)
 
 void Button::setEnabled(sl_bool flagEnabled, sl_bool flagRedraw)
 {
-	View::setEnabled(flagEnabled, flagRedraw);
+	View::setEnabled(flagEnabled, sl_false);
 	_invalidateButtonState();
-	invalidate();
+	if (flagRedraw) {
+		invalidate();
+	}
 }
 
 void Button::setDownState(sl_bool flagState, sl_bool flagRedraw)
 {
-	View::setDownState(flagState, flagRedraw);
+	View::setDownState(flagState, sl_false);
 	_invalidateButtonState();
-	invalidate();
+	if (flagRedraw) {
+		invalidate();
+	}
 }
 
 void Button::setHoverState(sl_bool flagState, sl_bool flagRedraw)
 {
-	View::setHoverState(flagState, flagRedraw);
+	View::setHoverState(flagState, sl_false);
 	_invalidateButtonState();
-	invalidate();
+	if (flagRedraw) {
+		invalidate();
+	}
 }
 
 void Button::onDraw(Canvas* canvas)

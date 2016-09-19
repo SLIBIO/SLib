@@ -81,12 +81,12 @@ void ProgressBar::setGravity(Alignment gravity, sl_bool flagRedraw)
 	}
 }
 
-sl_progress_bar_pos ProgressBar::getValue()
+sl_progress_bar_value ProgressBar::getValue()
 {
 	return m_value;
 }
 
-void ProgressBar::setValue(sl_progress_bar_pos value, sl_bool flagRedraw)
+void ProgressBar::setValue(sl_progress_bar_value value, sl_bool flagRedraw)
 {
 	if (value > m_value_max) {
 		value = m_value_max;
@@ -104,12 +104,12 @@ void ProgressBar::setValue(sl_progress_bar_pos value, sl_bool flagRedraw)
 	}
 }
 
-sl_progress_bar_pos ProgressBar::getMinimumValue()
+sl_progress_bar_value ProgressBar::getMinimumValue()
 {
 	return m_value_min;
 }
 
-void ProgressBar::setMinimumValue(sl_progress_bar_pos value, sl_bool flagRedraw)
+void ProgressBar::setMinimumValue(sl_progress_bar_value value, sl_bool flagRedraw)
 {
 	m_value_min = value;
 	setValue(m_value, sl_false);
@@ -118,12 +118,12 @@ void ProgressBar::setMinimumValue(sl_progress_bar_pos value, sl_bool flagRedraw)
 	}
 }
 
-sl_progress_bar_pos ProgressBar::getMaximumValue()
+sl_progress_bar_value ProgressBar::getMaximumValue()
 {
 	return m_value_max;
 }
 
-void ProgressBar::setMaximumValue(sl_progress_bar_pos value, sl_bool flagRedraw)
+void ProgressBar::setMaximumValue(sl_progress_bar_value value, sl_bool flagRedraw)
 {
 	m_value_max = value;
 	setValue(m_value, sl_false);
@@ -132,7 +132,7 @@ void ProgressBar::setMaximumValue(sl_progress_bar_pos value, sl_bool flagRedraw)
 	}
 }
 
-sl_progress_bar_pos ProgressBar::getRange()
+sl_progress_bar_value ProgressBar::getRange()
 {
 	sl_scroll_pos range = m_value_max - m_value_min;
 	if (range < 0) {
@@ -141,7 +141,7 @@ sl_progress_bar_pos ProgressBar::getRange()
 	return range;
 }
 
-void ProgressBar::setRange(sl_progress_bar_pos range, sl_bool flagRedraw)
+void ProgressBar::setRange(sl_progress_bar_value range, sl_bool flagRedraw)
 {
 	setMaximumValue(m_value_min + range, flagRedraw);
 }
@@ -172,7 +172,7 @@ UIRect ProgressBar::getBarRegion()
 	LayoutOrientation orientation = m_orientation;
 	if (orientation == LayoutOrientation::Horizontal) {
 		sl_ui_pos barPos, barLen;
-		sl_progress_bar_pos range = m_value_max - m_value_min;
+		sl_progress_bar_value range = m_value_max - m_value_min;
 		if (range > SLIB_EPSILON) {
 			barLen = (sl_ui_pos)(width * (m_value - m_value_min) / range);
 		} else {
@@ -189,7 +189,7 @@ UIRect ProgressBar::getBarRegion()
 		return UIRect(paddingLeft + barPos, paddingTop, paddingLeft + barPos + barLen, paddingTop + height);
 	} else {
 		sl_ui_pos barPos, barLen;
-		sl_progress_bar_pos range = m_value_max - m_value_min;
+		sl_progress_bar_value range = m_value_max - m_value_min;
 		if (range > SLIB_EPSILON) {
 			barLen = (sl_ui_pos)(height * (m_value - m_value_min) / range);
 		} else {
