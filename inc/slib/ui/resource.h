@@ -201,6 +201,7 @@ class TreeView;
 class WebView;
 class SplitView;
 class ProgressBar;
+class SliderBar;
 
 SLIB_UI_NAMESPACE_END
 

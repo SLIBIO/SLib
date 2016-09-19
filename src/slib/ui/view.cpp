@@ -5398,7 +5398,7 @@ sl_bool View::dispatchMouseEventToChildren(UIEvent* ev, const Ref<View>* childre
 {
 	UIAction action = ev->getAction();
 	UIPointf ptMouse = ev->getPoint();
-	
+
 	Ref<View> oldChild;
 	switch (action) {
 		case UIAction::LeftButtonDown:

@@ -153,27 +153,6 @@ void EmptyDrawable::onDraw(Canvas* canvas, const Rectangle& rectDst, const Recta
 }
 
 
-SLIB_DEFINE_OBJECT(RectangleDrawable, Drawable)
-
-Ref<Drawable> RectangleDrawable::create(const Ref<Pen>& pen, const Ref<Brush>& brush)
-{
-	if (brush.isNotNull()) {
-		Ref<RectangleDrawable> ret = new RectangleDrawable;
-		if (ret.isNotNull()) {
-			ret->m_pen = pen;
-			ret->m_brush = brush;
-			return ret;
-		}
-	}
-	return Ref<Drawable>::null();
-}
-
-void RectangleDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
-{
-	canvas->drawRectangle(rectDst, m_pen, m_brush);
-}
-
-
 SLIB_DEFINE_OBJECT(SubDrawable, Drawable)
 
 Ref<Drawable> SubDrawable::create(const Ref<Drawable>& src, sl_real x, sl_real y, sl_real width, sl_real height)
@@ -677,7 +656,7 @@ Ref<Drawable> VerticalThreePatchDrawable::create(sl_real topHeightDst, sl_real b
 		return Ref<Drawable>::null();
 	}
 	
-	if (topHeightSrc + bottomHeightSrc + SLIB_EPSILON > src->getDrawableWidth()) {
+	if (topHeightSrc + bottomHeightSrc + SLIB_EPSILON > src->getDrawableHeight()) {
 		return Ref<Drawable>::null();
 	}
 	
@@ -895,5 +874,93 @@ void MipmapDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
 		}
 	}
 }
+
+
+SLIB_DEFINE_OBJECT(RectangleDrawable, Drawable)
+
+Ref<Drawable> RectangleDrawable::create(const Ref<Pen>& pen, const Ref<Brush>& brush)
+{
+	if (brush.isNotNull() || pen.isNotNull()) {
+		Ref<RectangleDrawable> ret = new RectangleDrawable;
+		if (ret.isNotNull()) {
+			ret->m_pen = pen;
+			ret->m_brush = brush;
+			return ret;
+		}
+	}
+	return Ref<Drawable>::null();
+}
+
+void RectangleDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
+{
+	canvas->drawRectangle(rectDst, m_pen, m_brush);
+}
+
+
+SLIB_DEFINE_OBJECT(EllipseDrawable, Drawable)
+
+Ref<Drawable> EllipseDrawable::create(const Ref<Pen>& pen, const Ref<Brush>& brush)
+{
+	if (brush.isNotNull() || pen.isNotNull()) {
+		Ref<EllipseDrawable> ret = new EllipseDrawable;
+		if (ret.isNotNull()) {
+			ret->m_pen = pen;
+			ret->m_brush = brush;
+			return ret;
+		}
+	}
+	return Ref<Drawable>::null();
+}
+
+void EllipseDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
+{
+	sl_bool flagAntiAlias = canvas->isAntiAlias();
+	canvas->setAntiAlias(sl_true);
+	canvas->fillEllipse(rectDst, m_brush);
+	canvas->setAntiAlias(flagAntiAlias);
+}
+
+
+SLIB_DEFINE_OBJECT(HorizontalLineDrawable, Drawable)
+
+Ref<Drawable> HorizontalLineDrawable::create(const Ref<Pen>& pen)
+{
+	if (pen.isNotNull()) {
+		Ref<HorizontalLineDrawable> ret = new HorizontalLineDrawable;
+		if (ret.isNotNull()) {
+			ret->m_pen = pen;
+			return ret;
+		}
+	}
+	return Ref<Drawable>::null();
+}
+
+void HorizontalLineDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
+{
+	sl_real y = (rectDst.top + rectDst.bottom) / 2;
+	canvas->drawLine(rectDst.left, y, rectDst.right, y, m_pen);
+}
+
+
+SLIB_DEFINE_OBJECT(VerticalLineDrawable, Drawable)
+
+Ref<Drawable> VerticalLineDrawable::create(const Ref<Pen>& pen)
+{
+	if (pen.isNotNull()) {
+		Ref<VerticalLineDrawable> ret = new VerticalLineDrawable;
+		if (ret.isNotNull()) {
+			ret->m_pen = pen;
+			return ret;
+		}
+	}
+	return Ref<Drawable>::null();
+}
+
+void VerticalLineDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst)
+{
+	sl_real x = (rectDst.left + rectDst.right) / 2;
+	canvas->drawLine(x, rectDst.top, x, rectDst.bottom, m_pen);
+}
+
 
 SLIB_GRAPHICS_NAMESPACE_END

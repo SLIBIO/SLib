@@ -5,7 +5,7 @@
 
 #include "view.h"
 
-typedef double sl_progress_bar_pos;
+typedef double sl_progress_bar_value;
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -25,21 +25,21 @@ public:
 	
 	void setGravity(Alignment gravity, sl_bool flagRedraw = sl_true);
 	
-	sl_progress_bar_pos getValue();
+	sl_progress_bar_value getValue();
 	
-	void setValue(sl_progress_bar_pos value, sl_bool flagRedraw = sl_true);
+	void setValue(sl_progress_bar_value value, sl_bool flagRedraw = sl_true);
 	
-	sl_progress_bar_pos getMinimumValue();
+	sl_progress_bar_value getMinimumValue();
 	
-	void setMinimumValue(sl_progress_bar_pos value, sl_bool flagRedraw = sl_true);
+	void setMinimumValue(sl_progress_bar_value value, sl_bool flagRedraw = sl_true);
 	
-	sl_progress_bar_pos getMaximumValue();
+	sl_progress_bar_value getMaximumValue();
 	
-	void setMaximumValue(sl_progress_bar_pos value, sl_bool flagRedraw = sl_true);
+	void setMaximumValue(sl_progress_bar_value value, sl_bool flagRedraw = sl_true);
 	
-	sl_progress_bar_pos getRange();
+	sl_progress_bar_value getRange();
 	
-	void setRange(sl_progress_bar_pos range, sl_bool flagRedraw = sl_true);
+	void setRange(sl_progress_bar_value range, sl_bool flagRedraw = sl_true);
 
 	
 	Ref<Drawable> getBar();

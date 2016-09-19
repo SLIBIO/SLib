@@ -19,6 +19,7 @@
 #include "ui/radio_button.h"
 #include "ui/select_view.h"
 #include "ui/progress_bar.h"
+#include "ui/slider_bar.h"
 
 #include "ui/scroll_bar.h"
 #include "ui/scroll_view.h"
