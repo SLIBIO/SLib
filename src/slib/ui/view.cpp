@@ -40,12 +40,14 @@ View::View()
 	
 	m_flagPressed = sl_false;
 	m_flagHover = sl_false;
-	m_flagOccurringClick = sl_true;
+	m_flagOccurringClick = sl_false;
 	
 	m_actionMouseDown = UIAction::Unknown;
 	m_flagMultiTouchMode = sl_false;
 	m_flagPassEventToChildren = sl_true;
 	m_flagProcessingTabStop = sl_true;
+	
+	m_flagCapturingChildInstanceEvents = sl_false;
 	
 	m_flagOnAddChild = sl_false;
 	m_flagOnRemoveChild = sl_false;
@@ -4686,7 +4688,7 @@ void View::_initializeScroll()
 		scroll->y = 0;
 		scroll->contentWidth = 0;
 		scroll->contentHeight = 0;
-		scroll->barWidth = 12;
+		scroll->barWidth = UI::getDefaultScrollBarWidth();
 		
 		scroll->flagContentScrollingByMouse = sl_true;
 		scroll->flagContentScrollingByTouch = sl_true;
@@ -4983,6 +4985,21 @@ Ref<View> View::getPreviousTabStop()
 void View::setPreviousTabStop(const Ref<View>& view)
 {
 	m_viewPrevTabStop = view;
+}
+
+sl_bool View::isCapturingChildInstanceEvents()
+{
+	return m_flagCapturingChildInstanceEvents;
+}
+
+void View::setCapturingChildInstanceEvents(sl_bool flag)
+{
+	m_flagCapturingChildInstanceEvents = flag;
+}
+
+sl_bool View::hitTestForCapturingChildInstanceEvents(const UIPoint& pt)
+{
+	return sl_true;
 }
 
 void View::draw(Canvas *canvas)
@@ -6163,7 +6180,7 @@ void View::_processEventForStateAndClick(UIEvent* ev)
 	if (action == UIAction::LeftButtonDown || action == UIAction::TouchBegin) {
 		setPressedState(sl_true);
 		if (m_flagOccurringClick) {
-			ev->preventDefault();
+			ev->stopPropagation();
 		}
 	} else if (action == UIAction::LeftButtonUp || action == UIAction::TouchEnd) {
 		if (m_flagOccurringClick) {

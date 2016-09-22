@@ -18,9 +18,9 @@ public:
 
 	_ScrollBar_Static()
 	{
-		defaultThumb = ColorDrawable::create(Color(0, 0, 0, 110));
-		defaultPressedThumb = ColorDrawable::create(Color(0, 0, 0, 160));
-		defaultHoverThumb = ColorDrawable::create(Color(110, 110, 110, 255));
+		defaultThumb = ColorDrawable::create(Color(0, 0, 0, 150));
+		defaultPressedThumb = ColorDrawable::create(Color(0, 0, 0, 200));
+		defaultHoverThumb = ColorDrawable::create(Color(0, 50, 255, 110));
 		
 		defaultHoverTrack = ColorDrawable::create(Color(255, 255, 255, 50));
 		defaultPressedTrack = ColorDrawable::create(Color(255, 255, 255, 100));
@@ -475,7 +475,7 @@ void ScrollBar::onDraw(Canvas* canvas)
 				sl_real r = Math::min(thumbRegion.getWidth(), thumbRegion.getHeight()) * 0.5f;
 				sl_real padding = 2;
 				r -= padding;
-				canvas->drawRoundRect(Rectangle(thumbRegion.left + padding, thumbRegion.top + padding, thumbRegion.right - padding, thumbRegion.bottom - padding), Size(r, r), Ref<Pen>::null(), brush);
+				canvas->drawRoundRect(Rectangle(thumbRegion.left + padding - 1, thumbRegion.top + padding, thumbRegion.right - padding, thumbRegion.bottom - padding), Size(r, r), Ref<Pen>::null(), brush);
 				canvas->setAntiAlias(flagAntiAlias);
 			} else {
 				canvas->draw(thumbRegion, thumb);

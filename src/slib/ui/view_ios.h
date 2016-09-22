@@ -115,8 +115,8 @@ SLIB_UI_NAMESPACE_END
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \
-		sl_bool flagPreventDefault = instance->onEventTouch(slib::UIAction::TouchBegin, touches, theEvent); \
-		if (flagPreventDefault) { \
+		sl_bool flagStopPropagation = instance->onEventTouch(slib::UIAction::TouchBegin, touches, theEvent); \
+		if (flagStopPropagation) { \
 			return; \
 		} \
 	} \
@@ -126,8 +126,8 @@ SLIB_UI_NAMESPACE_END
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \
-		sl_bool flagPreventDefault = instance->onEventTouch(slib::UIAction::TouchMove, touches, theEvent); \
-		if (flagPreventDefault) { \
+		sl_bool flagStopPropagation = instance->onEventTouch(slib::UIAction::TouchMove, touches, theEvent); \
+		if (flagStopPropagation) { \
 			return; \
 		} \
 	} \
@@ -137,8 +137,8 @@ SLIB_UI_NAMESPACE_END
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \
-		sl_bool flagPreventDefault = instance->onEventTouch(slib::UIAction::TouchEnd, touches, theEvent); \
-		if (flagPreventDefault) { \
+		sl_bool flagStopPropagation = instance->onEventTouch(slib::UIAction::TouchEnd, touches, theEvent); \
+		if (flagStopPropagation) { \
 			return; \
 		} \
 	} \
@@ -148,8 +148,8 @@ SLIB_UI_NAMESPACE_END
 { \
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
 	if (instance.isNotNull()) { \
-		sl_bool flagPreventDefault = instance->onEventTouch(slib::UIAction::TouchCancel, touches, theEvent); \
-		if (flagPreventDefault) { \
+		sl_bool flagStopPropagation = instance->onEventTouch(slib::UIAction::TouchCancel, touches, theEvent); \
+		if (flagStopPropagation) { \
 			return; \
 		} \
 	} \

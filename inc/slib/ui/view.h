@@ -780,6 +780,13 @@ public:
 	void setPreviousTabStop(const Ref<View>& view);
 	
 	
+	sl_bool isCapturingChildInstanceEvents();
+	
+	void setCapturingChildInstanceEvents(sl_bool flag);
+	
+	virtual sl_bool hitTestForCapturingChildInstanceEvents(const UIPoint& pt);
+	
+	
 	void draw(Canvas* canvas);
 	
 	void drawBackground(Canvas* canvas, const Color& color, const Ref<Drawable>& background);
@@ -1001,6 +1008,7 @@ private:
 	sl_bool m_flagProcessingTabStop;
 	SafeWeakRef<View> m_viewNextTabStop;
 	SafeWeakRef<View> m_viewPrevTabStop;
+	sl_bool m_flagCapturingChildInstanceEvents;
 	
 	class LayoutAttributes : public Referable
 	{

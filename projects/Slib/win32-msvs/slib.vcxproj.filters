@@ -1425,9 +1425,6 @@
     <ClCompile Include="..\..\..\src\slib\ui\progress_bar.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\split_view_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\view_page.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>

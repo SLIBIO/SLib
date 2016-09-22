@@ -8,7 +8,6 @@ ImageView::ImageView()
 {
 	m_scaleMode = ScaleMode::Stretch;
 	m_gravity = Alignment::MiddleCenter;
-	setOccurringClick(sl_true);
 }
 
 Ref<Drawable> ImageView::getSource()

@@ -745,6 +745,80 @@ LRESULT CALLBACK _Win32_ViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 	return ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
 
+HWND UIPlatform::getViewHandle(View* view)
+{
+	if (view) {
+		Ref<ViewInstance> _instance = view->getViewInstance();
+		Win32_ViewInstance* instance = (Win32_ViewInstance*)(_instance.ptr);
+		if (instance) {
+			return instance->getHandle();
+		}
+	}
+	return 0;
+}
+
+sl_bool _Win32_captureChildInstanceEvents(View* view, UINT uMsg)
+{
+	Ref<View> parent = view->getParent();
+	while (parent.isNotNull()) {
+		if (parent->isCapturingChildInstanceEvents()) {
+			if (_Win32_captureChildInstanceEvents(parent.ptr, uMsg)) {
+				return sl_true;
+			}
+			Ref<ViewInstance> _instance = parent->getViewInstance();
+			if (_instance.isNotNull()) {
+				Win32_ViewInstance* instance = (Win32_ViewInstance*)(_instance.ptr);
+				HWND hWnd = instance->getHandle();
+				if (hWnd) {
+					DWORD lParam = ::GetMessagePos();
+					POINT pt;
+					pt.x = (short)(lParam & 0xffff);
+					pt.y = (short)((lParam >> 16) & 0xffff);
+					::ScreenToClient(hWnd, &pt);
+					if (parent->hitTestForCapturingChildInstanceEvents(UIPoint((sl_ui_pos)(pt.x), (sl_ui_pos)(pt.y)))) {
+						LPARAM lParam = POINTTOPOINTS(pt);
+						LRESULT res;
+						instance->processWindowMessage(uMsg, 0, lParam, res);
+						return sl_true;
+					}
+				}
+			}
+		}
+		parent = parent->getParent();
+	}
+	return sl_false;
+}
+
+sl_bool _Win32_captureChildInstanceEvents(View* view, MSG& msg)
+{
+	UINT uMsg = msg.message;
+	switch (uMsg) {
+	case WM_LBUTTONDOWN:
+	case WM_LBUTTONDBLCLK:
+	case WM_RBUTTONDOWN:
+	case WM_RBUTTONDBLCLK:
+	case WM_MBUTTONDOWN:
+	case WM_MBUTTONDBLCLK:
+	case WM_MOUSEMOVE:
+		break;
+	case WM_NCLBUTTONDOWN:
+		uMsg = WM_LBUTTONDOWN;
+		break;
+	case WM_NCRBUTTONDOWN:
+		uMsg = WM_RBUTTONDOWN;
+		break;
+	case WM_NCMBUTTONDOWN:
+		uMsg = WM_MBUTTONDOWN;
+		break;
+	case WM_NCMOUSEMOVE:
+		uMsg = WM_MOUSEMOVE;
+		break;
+	default:
+		return sl_false;
+	}
+	return _Win32_captureChildInstanceEvents(view, uMsg);
+}
+
 /******************************************
 				View
 ******************************************/
@@ -806,18 +880,6 @@ HWND UIPlatform::getViewHandle(ViewInstance* _instance)
 	} else {
 		return 0;
 	}
-}
-
-HWND UIPlatform::getViewHandle(View* view)
-{
-	if (view) {
-		Ref<ViewInstance> _instance = view->getViewInstance();
-		Win32_ViewInstance* instance = (Win32_ViewInstance*)(_instance.ptr);
-		if (instance) {
-			return instance->getHandle();
-		}
-	}
-	return 0;
 }
 
 SLIB_UI_NAMESPACE_END

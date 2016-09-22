@@ -299,7 +299,7 @@ sl_bool iOS_ViewInstance::onEventTouch(UIAction action, NSSet* touches, ::UIEven
 		Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points);
 		if (ev.isNotNull()) {
 			onTouchEvent(ev.ptr);
-			if (ev->isPreventedDefault()) {
+			if (ev->isStoppedPropagation()) {
 				return sl_true;
 			}
 		}
@@ -330,6 +330,20 @@ SLIB_UI_NAMESPACE_END
 	if (instance.isNotNull()) {
 		instance->onDraw(dirtyRect);
 	}
+}
+
+- (UIView *)hitTest:(CGPoint)aPoint withEvent:(UIEvent *)event
+{
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		slib::Ref<slib::View> view = instance->getView();
+		if (view->isCapturingChildInstanceEvents()) {
+			if (view->hitTestForCapturingChildInstanceEvents(slib::UIPoint((sl_ui_pos)(aPoint.x), (sl_ui_pos)(aPoint.y)))) {
+				return self;
+			}
+		}
+	}
+	return [super hitTest:aPoint withEvent:event];
 }
 
 IOS_VIEW_EVENTS

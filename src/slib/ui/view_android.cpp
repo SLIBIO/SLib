@@ -59,9 +59,12 @@ jboolean JNICALL _AndroidView_nativeOnKeyEvent(JNIEnv* env, jobject _this, jlong
 				ev->setWindowsKey();
 			}
 			instance->onKeyEvent(ev.ptr);
+			if (ev->isStoppedPropagation()) {
+				return 1;
+			}
 		}
 	}
-	return 1;
+	return 0;
 }
 
 jboolean JNICALL _AndroidView_nativeOnTouchEvent(JNIEnv* env, jobject _this, jlong jinstance, int _action, jobjectArray jpoints)
@@ -86,11 +89,14 @@ jboolean JNICALL _AndroidView_nativeOnTouchEvent(JNIEnv* env, jobject _this, jlo
 				Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points);
 				if (ev.isNotNull()) {
 					instance->onTouchEvent(ev.ptr);
+					if (ev->isStoppedPropagation()) {
+						return 1;
+					}
 				}
 			}
 		}
 	}
-	return 1;
+	return 0;
 }
 
 void JNICALL _AndroidView_nativeOnClick(JNIEnv* env, jobject _this, jlong jinstance)
@@ -99,6 +105,20 @@ void JNICALL _AndroidView_nativeOnClick(JNIEnv* env, jobject _this, jlong jinsta
 	if (instance.isNotNull()) {
 		instance->onClick();
 	}
+}
+
+jboolean JNICALL _AndroidView_nativeHitTestTouchEvent(JNIEnv* env, jobject _this, jlong jinstance, int x, int y)
+{
+	Ref<Android_ViewInstance> instance = Android_ViewInstance::getAndroidInstance(jinstance);
+	if (instance.isNotNull()) {
+		Ref<View> view = instance->getView();
+		if (view->isCapturingChildInstanceEvents()) {
+			if (view->hitTestForCapturingChildInstanceEvents(UIPoint((sl_ui_pos)x, (sl_ui_pos)y))) {
+				return 1;
+			}
+		}
+	}
+	return 0;
 }
 
 SLIB_JNI_BEGIN_CLASS(_JAndroidView, "slib/platform/android/ui/view/UiView")
@@ -129,6 +149,7 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidView, "slib/platform/android/ui/view/UiView")
 	SLIB_JNI_NATIVE(nativeOnKeyEvent, "nativeOnKeyEvent", "(JZIZZZZ)Z", _AndroidView_nativeOnKeyEvent);
 	SLIB_JNI_NATIVE(nativeOnTouchEvent, "nativeOnTouchEvent", "(JI[Lslib/platform/android/ui/view/UiTouchPoint;)Z", _AndroidView_nativeOnTouchEvent);
 	SLIB_JNI_NATIVE(nativeOnClick, "nativeOnClick", "(J)V", _AndroidView_nativeOnClick);
+	SLIB_JNI_NATIVE(nativeHitTestTouchEvent, "nativeHitTestTouchEvent", "(JII)Z", _AndroidView_nativeHitTestTouchEvent);
 
 SLIB_JNI_END_CLASS
 

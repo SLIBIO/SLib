@@ -124,7 +124,7 @@ void _Win32_processUiDispatchQueue()
 void _Win32_processMenuCommand(WPARAM wParam, LPARAM lParam);
 sl_bool _Win32_processMenuShortcutKey(MSG& msg);
 void _Win32_processCustomMsgBox(WPARAM wParam, LPARAM lParam);
-sl_bool _SplitView_preprocessMessage(MSG& msg);
+sl_bool _Win32_captureChildInstanceEvents(View* view, MSG& msg);
 
 LRESULT CALLBACK _Win32_MessageProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -139,6 +139,7 @@ LRESULT CALLBACK _Win32_MessageProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 	}
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
+
 
 void UIPlatform::runLoop(sl_uint32 level)
 {
@@ -171,13 +172,16 @@ void UIPlatform::runLoop(sl_uint32 level)
 				if (_Win32_processMenuShortcutKey(msg)) {
 					break;
 				}
-				if (_SplitView_preprocessMessage(msg)) {
-					break;
-				}
 				Ref<Win32_ViewInstance> instance = Ref<Win32_ViewInstance>::from(UIPlatform::getViewInstance(msg.hwnd));
 				if (instance.isNotNull()) {
-					if (instance->preprocessWindowMessage(msg)) {
-						break;
+					Ref<View> view = instance->getView();
+					if (view.isNotNull()) {
+						if (_Win32_captureChildInstanceEvents(view.ptr, msg)) {
+							break;
+						}
+						if (instance->preprocessWindowMessage(msg)) {
+							break;
+						}
 					}
 				}
 				::TranslateMessage(&msg);

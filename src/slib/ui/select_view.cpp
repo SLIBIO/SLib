@@ -349,10 +349,10 @@ void SelectView::onMouseEvent(UIEvent* ev)
 	if (action == UIAction::LeftButtonDown || action == UIAction::TouchBegin) {
 		if (getLeftIconRegion().containsPoint(pt)) {
 			m_clickedIconNo = ICON_LEFT;
-			ev->preventDefault();
+			ev->stopPropagation();
 		} else if (getRightIconRegion().containsPoint(pt)) {
 			m_clickedIconNo = ICON_RIGHT;
-			ev->preventDefault();
+			ev->stopPropagation();
 		}
 	} else if (action == UIAction::MouseLeave || action == UIAction::TouchCancel) {
 		m_clickedIconNo = ICON_NONE;

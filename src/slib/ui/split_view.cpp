@@ -5,16 +5,14 @@ SLIB_UI_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(SplitView, View)
 
-#if defined(SLIB_PLATFORM_IS_WIN32)
-void _SplitView_unregisterWin32Handle(View* view);
-#endif
-
 SplitView::SplitView()
 {
 	SLIB_REFERABLE_CONSTRUCTOR
 	
 	setCreatingChildInstances(sl_true);
 	setCreatingInstance(sl_true);
+	
+	setCapturingChildInstanceEvents(sl_true);
 
 	m_orientation = LayoutOrientation::Horizontal;
 	
@@ -27,7 +25,7 @@ SplitView::SplitView()
 #if defined(SLIB_PLATFORM_IS_DESKTOP)
 	m_cursorMargin = 4;
 #else
-	m_cursorMargin = SLIB_MIN(UI::getScreenWidth(), UI::getScreenHeight()) / 300;
+	m_cursorMargin = SLIB_MIN(UI::getScreenWidth(), UI::getScreenHeight()) / 60;
 #endif
 	
 	m_indexDividerDown = -1;
@@ -40,9 +38,6 @@ SplitView::SplitView()
 
 SplitView::~SplitView()
 {
-#if defined(SLIB_PLATFORM_IS_WIN32)
-	_SplitView_unregisterWin32Handle(this);
-#endif
 }
 
 SplitView::Item::Item()
@@ -584,6 +579,13 @@ void SplitView::dispatchSetCursor(UIEvent* ev)
 	
 }
 
+sl_bool SplitView::hitTestForCapturingChildInstanceEvents(const UIPoint& pt)
+{
+	ObjectLocker lock(this);
+	sl_int32 index = _getDividerIndexAtPoint(pt);
+	return index >= 0;
+}
+
 sl_ui_len SplitView::_getTotalSize()
 {
 	sl_ui_pos total;
@@ -719,15 +721,5 @@ HorizontalSplitView::HorizontalSplitView()
 {
 	setOrientation(LayoutOrientation::Horizontal, sl_false);
 }
-
-
-#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_WIN32))
-
-Ref<ViewInstance> SplitView::createGenericInstance(ViewInstance* parent)
-{
-	return View::createGenericInstance(parent);
-}
-
-#endif
 
 SLIB_UI_NAMESPACE_END

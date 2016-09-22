@@ -106,13 +106,13 @@ protected:
 	
 public:
 	// override
-	Ref<ViewInstance> createGenericInstance(ViewInstance* parent);
-	
-	// override
 	void dispatchMouseEvent(UIEvent* ev);
 	
 	// override
 	void dispatchSetCursor(UIEvent* ev);
+	
+	// override
+	sl_bool hitTestForCapturingChildInstanceEvents(const UIPoint& pt);
 	
 protected:
 	sl_ui_len _getTotalSize();

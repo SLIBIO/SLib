@@ -68,25 +68,19 @@ public class UiGLView extends GLSurfaceView implements GLSurfaceView.Renderer {
 	}
 	
 	public boolean onKeyDown(int keycode, KeyEvent event) {
-		if (UiView.onEventKey(this, true, keycode, event)) {
-			return super.onKeyDown(keycode, event);
-		}
-		return false;
+		UiView.onEventKey(this, true, keycode, event);
+		return true;
 	}
 	
 	public boolean onKeyUp(int keycode, KeyEvent event) {
-		if (UiView.onEventKey(this, false, keycode, event)) {
-			return super.onKeyUp(keycode, event);
-		}
-		return false;
+		UiView.onEventKey(this, false, keycode, event);
+		return true;
 	}
 	
 	@SuppressLint("ClickableViewAccessibility")
 	public boolean onTouchEvent(MotionEvent event) {		
-		if (UiView.onEventTouch(this, event)) {
-			return true;
-		}
-		return false;
+		UiView.onEventTouch(this, event);
+		return true;
 	}
 
 	

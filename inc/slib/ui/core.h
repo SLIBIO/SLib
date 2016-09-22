@@ -33,6 +33,11 @@ public:
 
 	static void setDefaultFont(const Ref<Font>& font);
 
+	static sl_ui_len getDefaultScrollBarWidth();
+	
+	static void setDefaultScrollBarWidth(sl_ui_len width);
+	
+	
 	static Size getFontTextSize(const Ref<Font>& font, const String& text);
 	
 	static Rectangle getPathBounds(const Ref<GraphicsPath>& path);

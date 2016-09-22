@@ -16,14 +16,17 @@ public:
 	sl_real fontSize;
 	SafeString fontFamily;
 	SafeRef<Font> font;
+	sl_ui_len scrollBarWidth;
 
 public:
 	_UI_Core_Default()
 	{
 #if defined(SLIB_PLATFORM_IS_DESKTOP)
+		scrollBarWidth = 12;
 		fontSize = 12;
 #else
-		fontSize = UI::getScreenSize().y / 80.0f;
+		scrollBarWidth = SLIB_MIN(UI::getScreenWidth(), UI::getScreenHeight()) / 40;
+		fontSize = SLIB_MIN(UI::getScreenWidth(), UI::getScreenHeight()) / 40.0f;
 #endif
 		fontFamily = "Arial";
 		font = Font::create(fontFamily, fontSize);
@@ -104,6 +107,24 @@ void UI::setDefaultFont(const Ref<Font>& font)
 		def->fontSize = font->getSize();
 		def->font = font;
 	}
+}
+
+sl_ui_len UI::getDefaultScrollBarWidth()
+{
+	_UI_Core_Default* def = _UI_Core_getDefault();
+	if (!def) {
+		return 0;
+	}
+	return def->scrollBarWidth;
+}
+
+void UI::setDefaultScrollBarWidth(sl_ui_len len)
+{
+	_UI_Core_Default* def = _UI_Core_getDefault();
+	if (!def) {
+		return;
+	}
+	def->scrollBarWidth = len;
 }
 
 UIRect UI::getScreenRegion()

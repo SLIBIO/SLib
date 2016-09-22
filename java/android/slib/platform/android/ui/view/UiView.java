@@ -268,7 +268,7 @@ public class UiView {
 				action = 0x0304;
 				break;
 			default:
-				return true;
+				return false;
 			}
 			int n = event.getPointerCount();
 			if (n > 0) {
@@ -303,7 +303,7 @@ public class UiView {
 				return nativeOnTouchEvent(instance, action, pts);
 			}
 		}
-		return true;
+		return false;
 	}
 	
 	private static native void nativeOnClick(long instance);
@@ -314,4 +314,13 @@ public class UiView {
 		}
 	}
 
+	private static native boolean nativeHitTestTouchEvent(long instance, int x, int y);
+	public static boolean onHitTestTouchEvent(View view, int x, int y) {
+		long instance = getInstance(view);
+		if (instance != 0) {
+			return nativeHitTestTouchEvent(instance, x, y);
+		}
+		return false;
+	}
+	
 }

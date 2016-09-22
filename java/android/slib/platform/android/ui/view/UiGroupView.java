@@ -19,24 +19,26 @@ public class UiGroupView extends FrameLayout {
 	}
 
 	public boolean onKeyDown(int keycode, KeyEvent event) {
-		if (UiView.onEventKey(this, true, keycode, event)) {
-			return super.onKeyDown(keycode, event);
-		}
-		return false;
+		UiView.onEventKey(this, true, keycode, event);
+		return true;
 	}
 	
 	public boolean onKeyUp(int keycode, KeyEvent event) {
-		if (UiView.onEventKey(this, false, keycode, event)) {
-			return super.onKeyUp(keycode, event);
-		}
-		return false;
+		UiView.onEventKey(this, false, keycode, event);
+		return true;
 	}
 	
-	@SuppressLint("ClickableViewAccessibility")
-	public boolean onTouchEvent(MotionEvent event) {		
-		if (UiView.onEventTouch(this, event)) {
+	public boolean onInterceptTouchEvent(MotionEvent event) {
+		if (UiView.onHitTestTouchEvent(this, (int)(event.getX()), (int)(event.getY()))) {
 			return true;
 		}
 		return false;
+	};
+	
+	@SuppressLint("ClickableViewAccessibility")
+	public boolean onTouchEvent(MotionEvent event) {		
+		UiView.onEventTouch(this, event);
+		return true;
 	}
+	
 }
