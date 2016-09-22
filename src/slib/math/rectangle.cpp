@@ -383,6 +383,12 @@ sl_bool RectangleT<T, FT>::isAlmostEqual(const RectangleT<T, FT>& other) const
 }
 
 template <class T, class FT>
+sl_bool RectangleT<T, FT>::isValidSize()
+{
+	return right > left && bottom > top;
+}
+
+template <class T, class FT>
 sl_bool RectangleT<T, FT>::fixSizeError()
 {
 	sl_bool flagFixed = sl_false;

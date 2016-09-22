@@ -79,6 +79,11 @@ class SLIB_EXPORT ColorDrawable : public BrushDrawable
 public:
 	static Ref<Drawable> create(const Color& color);
 	
+	static sl_bool check(const Ref<Drawable>& drawable, Color* outColor = sl_null, Ref<Brush>* outBrush = sl_null);
+	
+protected:
+	Color m_color;
+	
 };
 
 class SLIB_EXPORT EmptyDrawable : public Drawable

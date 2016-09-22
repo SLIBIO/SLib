@@ -5,8 +5,6 @@
 
 #include "view.h"
 
-typedef double sl_progress_bar_value;
-
 SLIB_UI_NAMESPACE_BEGIN
 
 class SLIB_EXPORT ProgressBar : public View
@@ -14,52 +12,103 @@ class SLIB_EXPORT ProgressBar : public View
 	SLIB_DECLARE_OBJECT
 	
 public:
-	ProgressBar();
+	ProgressBar(LayoutOrientation orientation = LayoutOrientation::Horizontal);
 	
 public:
 	LayoutOrientation getOrientation();
 	
 	void setOrientation(LayoutOrientation orientation, sl_bool flagRedraw = sl_true);
 	
-	Alignment getGravity();
+	sl_bool isVertical();
 	
-	void setGravity(Alignment gravity, sl_bool flagRedraw = sl_true);
+	void setVertical(sl_bool flagRedraw = sl_true);
 	
-	sl_progress_bar_value getValue();
+	sl_bool isHorizontal();
 	
-	void setValue(sl_progress_bar_value value, sl_bool flagRedraw = sl_true);
+	void setHorizontal(sl_bool flagRedraw = sl_true);
 	
-	sl_progress_bar_value getMinimumValue();
+	float getMinimumValue();
 	
-	void setMinimumValue(sl_progress_bar_value value, sl_bool flagRedraw = sl_true);
+	void setMinimumValue(float value, sl_bool flagRedraw = sl_true);
 	
-	sl_progress_bar_value getMaximumValue();
+	float getMaximumValue();
 	
-	void setMaximumValue(sl_progress_bar_value value, sl_bool flagRedraw = sl_true);
+	void setMaximumValue(float value, sl_bool flagRedraw = sl_true);
 	
-	sl_progress_bar_value getRange();
+	float getRange();
 	
-	void setRange(sl_progress_bar_value range, sl_bool flagRedraw = sl_true);
+	void setRange(float range, sl_bool flagRedraw = sl_true);
+	
+	float getValue();
+	
+	void setValue(float value, sl_bool flagRedraw = sl_true);
+	
+	float getSecondaryValue();
+	
+	void setSecondaryValue(float value, sl_bool flagRedraw = sl_true);
+	
+	sl_bool isDualValues();
+	
+	void setDualValues(sl_bool flagDualValues, sl_bool flagRedraw = sl_true);
 
+	sl_bool isDiscrete();
 	
-	Ref<Drawable> getBar();
+	void setDiscrete(sl_bool flagDiscrete);
 	
-	void setBar(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	float getStep();
+	
+	void setStep(float step);
+	
+	sl_bool isReversed();
+	
+	void setReversed(sl_bool flagReversed, sl_bool flagRedraw = sl_true);
+	
+	
+	Ref<Drawable> getTrackDrawable();
+	
+	void setTrackDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	
+	void setTrackColor(const Color& color, sl_bool flagRedraw = sl_true);
+	
+	Ref<Drawable> getProgressDrawable();
+	
+	void setProgressDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	
+	void setProgressColor(const Color& color, sl_bool flagRedraw = sl_true);
+	
+	Ref<Drawable> getSecondaryProgressDrawable();
+	
+	void setSecondaryProgressDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	
+	void setSecondaryProgressColor(const Color& color, sl_bool flagRedraw = sl_true);
 
-	UIRect getBarRegion();
-	
 protected:
 	// override
 	void onDraw(Canvas* canvas);
+	
+protected:
+	float _refineValue(float value);
+	
+	float _refineStep();
+	
+	sl_ui_pos _getPositionFromValue(float value);
+	
+	void _getProgressRegions(UIRect& outProgress, UIRect& outSecondaryProgress);
 
 protected:
 	LayoutOrientation m_orientation;
-	Alignment m_gravity;
-	sl_scroll_pos m_value;
-	sl_scroll_pos m_value_min;
-	sl_scroll_pos m_value_max;
+	float m_value_min;
+	float m_value_max;
+	float m_value;
+	float m_value2;
+	sl_bool m_flagDualValues;
+	sl_bool m_flagDiscrete;
+	float m_step;
+	sl_bool m_flagReversed;
 	
-	SafeRef<Drawable> m_bar;
+	SafeRef<Drawable> m_track;
+	SafeRef<Drawable> m_progress;
+	SafeRef<Drawable> m_progress2;
 	
 };
 

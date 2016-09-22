@@ -9,6 +9,9 @@
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
+class Canvas;
+class Drawable;
+
 class SLIB_EXPORT GraphicsUtil
 {
 public:
@@ -20,6 +23,9 @@ public:
 	
 	
 	static Rectangle transformRectangle(const Rectangle& rectTransform, const Rectangle& rectOtherFrom, const Rectangle& rectOtherTo);
+	
+	
+	static void drawRepeat(Canvas* canvas, const Ref<Drawable>& source, sl_real _dx, sl_real _dy, sl_uint32 nRepeatX, sl_uint32 nRepeatY);
 	
 };
 

@@ -134,4 +134,20 @@ void ViewLayoutResource::dispatchResize(sl_ui_len width, sl_ui_len height)
 	ViewGroup::dispatchResize(width, height);
 }
 
+
+SLIB_DEFINE_OBJECT(MobilePageLayoutResource, ViewGroup)
+
+MobilePageLayoutResource::MobilePageLayoutResource(sl_real sp)
+: UILayoutResource(sp)
+{
+	SLIB_REFERABLE_CONSTRUCTOR
+	m_contentView = this;
+}
+
+void MobilePageLayoutResource::dispatchResize(sl_ui_len width, sl_ui_len height)
+{
+	_layoutViews_safe(width, height);
+	MobilePage::dispatchResize(width, height);
+}
+
 SLIB_UI_NAMESPACE_END

@@ -132,10 +132,25 @@ Ref<Drawable> ColorDrawable::create(const Color& color)
 	ret = new ColorDrawable();
 	if (ret.isNotNull()) {
 		ret->m_brush = brush;
+		ret->m_color = color;
 	}
 	return ret;
 }
 
+sl_bool ColorDrawable::check(const Ref<Drawable>& drawable, Color* outColor, Ref<Brush>* outBrush)
+{
+	if (ColorDrawable::checkInstance(drawable.ptr)) {
+		if (outColor) {
+			*outColor = ((ColorDrawable*)(drawable.ptr))->m_color;
+		}
+		if (outBrush) {
+			*outBrush = ((ColorDrawable*)(drawable.ptr))->m_brush;
+		}
+		return sl_true;
+	} else {
+		return sl_false;
+	}
+}
 
 SLIB_DEFINE_OBJECT(EmptyDrawable, Drawable)
 

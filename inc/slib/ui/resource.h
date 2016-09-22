@@ -9,6 +9,7 @@
 #include "event.h"
 #include "view.h"
 #include "window.h"
+#include "mobile_app.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -181,6 +182,29 @@ public:
 	
 };
 
+
+#define SLIB_DECLARE_MOBILE_PAGE_LAYOUT_BEGIN(NAME) \
+	SLIB_DECLARE_UILAYOUT_BEGIN(NAME, slib::MobilePageLayoutResource)
+
+#define SLIB_DECLARE_MOBILE_PAGE_LAYOUT_END \
+	SLIB_DECLARE_UILAYOUT_END
+
+#define SLIB_DEFINE_MOBILE_PAGE_LAYOUT(NAME) \
+	SLIB_DEFINE_UILAYOUT(NAME, slib::MobilePageLayoutResource)
+
+class MobilePageLayoutResource : public MobilePage, public UILayoutResource
+{
+	SLIB_DECLARE_OBJECT
+public:
+	MobilePageLayoutResource(sl_real sp = 1);
+	
+public:
+	// override
+	void dispatchResize(sl_ui_len width, sl_ui_len height);
+	
+};
+
+
 class Button;
 class LabelView;
 class CheckBox;
@@ -201,7 +225,7 @@ class TreeView;
 class WebView;
 class SplitView;
 class ProgressBar;
-class SliderBar;
+class Slider;
 
 SLIB_UI_NAMESPACE_END
 

@@ -23,6 +23,10 @@ void IViewPagerListener::onReadyPage(ViewPager* navigation, View* page)
 }
 
 
+ViewPageMoveParam::ViewPageMoveParam()
+{
+}
+
 ViewPagePushParam::ViewPagePushParam()
 {
 }

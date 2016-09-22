@@ -211,7 +211,7 @@ enum class ButtonState
 {
 	Normal = 0,
 	Hover = 1,
-	Down = 2,
+	Pressed = 2,
 	Disabled = 3,
 	
 	Count = 4

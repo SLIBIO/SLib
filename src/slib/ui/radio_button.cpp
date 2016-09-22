@@ -65,13 +65,13 @@ public:
 		categories[0].properties[(int)ButtonState::Disabled].textColor = Color(90, 90, 90);
 		categories[0].properties[(int)ButtonState::Disabled].icon = new _RadioButton_Icon(penDisabled, colorBackDisabled, Color::zero());
 		categories[0].properties[(int)ButtonState::Hover].icon = new _RadioButton_Icon(penHover, colorBackHover, Color::zero());
-		categories[0].properties[(int)ButtonState::Down].icon = new _RadioButton_Icon(penDown, colorBackDown, Color::zero());
+		categories[0].properties[(int)ButtonState::Pressed].icon = new _RadioButton_Icon(penDown, colorBackDown, Color::zero());
 		
 		categories[1] = categories[0];
 		categories[1].properties[(int)ButtonState::Normal].icon = new _RadioButton_Icon(penNormal, colorBackNormal, colorCheckNormal);
 		categories[1].properties[(int)ButtonState::Disabled].icon = new _RadioButton_Icon(penDisabled, colorBackDisabled, colorCheckDisabled);
 		categories[1].properties[(int)ButtonState::Hover].icon = new _RadioButton_Icon(penHover, colorBackHover, colorCheckHover);
-		categories[1].properties[(int)ButtonState::Down].icon = new _RadioButton_Icon(penDown, colorBackDown, colorCheckDown);
+		categories[1].properties[(int)ButtonState::Pressed].icon = new _RadioButton_Icon(penDown, colorBackDown, colorCheckDown);
 	}
 	
 	static ButtonCategory* getCategories()

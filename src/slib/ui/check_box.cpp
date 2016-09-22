@@ -69,13 +69,13 @@ public:
 		categories[0].properties[(int)ButtonState::Disabled].textColor = Color(90, 90, 90);
 		categories[0].properties[(int)ButtonState::Disabled].icon = new _CheckBox_Icon(penDisabled, colorBackDisabled, Ref<Pen>::null());
 		categories[0].properties[(int)ButtonState::Hover].icon = new _CheckBox_Icon(penHover, colorBackHover, Ref<Pen>::null());
-		categories[0].properties[(int)ButtonState::Down].icon = new _CheckBox_Icon(penDown, colorBackDown, Ref<Pen>::null());
+		categories[0].properties[(int)ButtonState::Pressed].icon = new _CheckBox_Icon(penDown, colorBackDown, Ref<Pen>::null());
 		
 		categories[1] = categories[0];
 		categories[1].properties[(int)ButtonState::Normal].icon = new _CheckBox_Icon(penNormal, colorBackNormal, penCheckNormal);
 		categories[1].properties[(int)ButtonState::Disabled].icon = new _CheckBox_Icon(penDisabled, colorBackDisabled, penCheckDisabled);
 		categories[1].properties[(int)ButtonState::Hover].icon = new _CheckBox_Icon(penHover, colorBackHover, penCheckHover);
-		categories[1].properties[(int)ButtonState::Down].icon = new _CheckBox_Icon(penDown, colorBackDown, penCheckDown);
+		categories[1].properties[(int)ButtonState::Pressed].icon = new _CheckBox_Icon(penDown, colorBackDown, penCheckDown);
 	}
 	
 public:

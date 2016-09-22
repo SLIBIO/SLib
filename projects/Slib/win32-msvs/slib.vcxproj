@@ -220,11 +220,13 @@
     <ClInclude Include="..\..\..\inc\slib\ui\scroll_bar.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\scroll_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\select_view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\slider.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\split_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\tab_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\tree_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\video_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\view.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\view_page.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\web_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\window.h" />
     <ClInclude Include="..\..\..\src\slib\core\async_config.h" />
@@ -437,6 +439,7 @@
     <ClCompile Include="..\..\..\src\slib\ui\scroll_view_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\select_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\select_view_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\slider.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\split_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\split_view_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\tab_view.cpp" />
@@ -454,6 +457,7 @@
     <ClCompile Include="..\..\..\src\slib\ui\ui_resource.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\video_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\view.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\view_page.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\view_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\web_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\web_view_win32.cpp" />

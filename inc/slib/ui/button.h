@@ -11,7 +11,6 @@ class SLIB_EXPORT ButtonCategoryProperties
 {
 public:
 	Color textColor;
-	Color backgroundColor;
 	SafeRef<Drawable> background;
 	SafeRef<Pen> border;
 	SafeRef<Drawable> icon;
@@ -160,21 +159,11 @@ public:
 	void resetStateIcons(sl_bool flagRedraw = sl_true);
 	
 	
-	Color getBackgroundColor(ButtonState state, sl_uint32 category = 0);
-	
-	virtual void setBackgroundColor(const Color& color, ButtonState state, sl_uint32 category = 0, sl_bool flagRedraw = sl_true);
-
-	Color getBackgroundColor();
-	
-	// override
-	void setBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
-	
-	void resetStateBackgroundColors(sl_bool flagRedraw = sl_true);
-	
-	
 	Ref<Drawable> getBackground(ButtonState state, sl_uint32 category = 0);
 	
 	virtual void setBackground(const Ref<Drawable>& background, ButtonState state, sl_uint32 category = 0, sl_bool flagRedraw = sl_true);
+	
+	void setBackground(const Color& backgroundColor, ButtonState state, sl_uint32 category = 0, sl_bool flagRedraw = sl_true);
 	
 	Ref<Drawable> getBackground();
 	
@@ -203,7 +192,7 @@ public:
 	void setEnabled(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
 	
 	// override
-	void setDownState(sl_bool flagState, sl_bool flagRedraw = sl_true);
+	void setPressedState(sl_bool flagState, sl_bool flagRedraw = sl_true);
 	
 	// override
 	void setHoverState(sl_bool flagState, sl_bool flagRedraw = sl_true);

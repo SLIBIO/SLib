@@ -248,7 +248,7 @@
 		AECCC4B01B0F064D002B0284 /* thirdparty_libvpx_dec.c in Sources */ = {isa = PBXBuildFile; fileRef = AECCC4AD1B0F064D002B0284 /* thirdparty_libvpx_dec.c */; settings = {COMPILER_FLAGS = "-O3 -w"; }; };
 		AECCC4B11B0F064D002B0284 /* thirdparty_libvpx_enc.c in Sources */ = {isa = PBXBuildFile; fileRef = AECCC4AE1B0F064D002B0284 /* thirdparty_libvpx_enc.c */; settings = {COMPILER_FLAGS = "-O3 -w"; }; };
 		AECCC4B21B0F064D002B0284 /* thirdparty_libvpx.c in Sources */ = {isa = PBXBuildFile; fileRef = AECCC4AF1B0F064D002B0284 /* thirdparty_libvpx.c */; settings = {COMPILER_FLAGS = "-O3 -w"; }; };
-		E1CC6F931D8FC21000C491E5 /* slider_bar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1CC6F921D8FC21000C491E5 /* slider_bar.cpp */; };
+		E1CC6F931D8FC21000C491E5 /* slider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1CC6F921D8FC21000C491E5 /* slider.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -495,7 +495,7 @@
 		AECCC4AD1B0F064D002B0284 /* thirdparty_libvpx_dec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_libvpx_dec.c; sourceTree = "<group>"; };
 		AECCC4AE1B0F064D002B0284 /* thirdparty_libvpx_enc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_libvpx_enc.c; sourceTree = "<group>"; };
 		AECCC4AF1B0F064D002B0284 /* thirdparty_libvpx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_libvpx.c; sourceTree = "<group>"; };
-		E1CC6F921D8FC21000C491E5 /* slider_bar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = slider_bar.cpp; sourceTree = "<group>"; };
+		E1CC6F921D8FC21000C491E5 /* slider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = slider.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -635,11 +635,11 @@
 				266DD5171C11940A00D47AB0 /* render_view.cpp */,
 				266DD51A1C11940A00D47AB0 /* render_view_osx.mm */,
 				267C16B81CE779D8000318C2 /* scroll_bar.cpp */,
-				E1CC6F921D8FC21000C491E5 /* slider_bar.cpp */,
 				266DD5231C11940A00D47AB0 /* scroll_view.cpp */,
 				266DD5261C11940A00D47AB0 /* scroll_view_osx.mm */,
 				266DD4FB1C11940A00D47AB0 /* select_view.cpp */,
 				266DD4FE1C11940A00D47AB0 /* select_view_osx.mm */,
+				E1CC6F921D8FC21000C491E5 /* slider.cpp */,
 				26AE7CCB1D8450F80095AACA /* split_view.cpp */,
 				26BB61371D872D0B0049A5C3 /* split_view_osx.mm */,
 				266DD5281C11940A00D47AB0 /* tab_view.cpp */,
@@ -962,7 +962,7 @@
 				AECCC4B01B0F064D002B0284 /* thirdparty_libvpx_dec.c in Sources */,
 				2699DC901D43682D0085EE67 /* list_view.cpp in Sources */,
 				266DD5851C11940A00D47AB0 /* render_base.cpp in Sources */,
-				E1CC6F931D8FC21000C491E5 /* slider_bar.cpp in Sources */,
+				E1CC6F931D8FC21000C491E5 /* slider.cpp in Sources */,
 				26AE7BF61C99000A0026C2D9 /* plane.cpp in Sources */,
 				26AE7C021C993BB60026C2D9 /* box.cpp in Sources */,
 				266DD5681C11940A00D47AB0 /* icmp.cpp in Sources */,

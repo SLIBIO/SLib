@@ -11,6 +11,7 @@
 		260252001BF18BCF00DEFAB1 /* thread_pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260251FF1BF18BCF00DEFAB1 /* thread_pool.cpp */; };
 		260252021BF18BE200DEFAB1 /* callback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260252011BF18BE200DEFAB1 /* callback.cpp */; };
 		260252261BF18D4300DEFAB1 /* ui_graphics_context.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260252251BF18D4300DEFAB1 /* ui_graphics_context.cpp */; };
+		260747CC1D9388F60061A3B5 /* slider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260747CB1D9388F60061A3B5 /* slider.cpp */; };
 		2621F7211CCF174B00C4615C /* ui_menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2621F7201CCF174B00C4615C /* ui_menu.cpp */; };
 		2634DCE51D8A82B200E8F19E /* split_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2634DCE41D8A82B200E8F19E /* split_view.cpp */; };
 		2634DCE71D8A82EA00E8F19E /* progress_bar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2634DCE61D8A82EA00E8F19E /* progress_bar.cpp */; };
@@ -167,6 +168,7 @@
 		26B5717D1C9D44930099E69B /* arp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B5717C1C9D44930099E69B /* arp.cpp */; };
 		26B5717F1C9D449E0099E69B /* audio_util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B5717E1C9D449E0099E69B /* audio_util.cpp */; };
 		26B571821C9D45A80099E69B /* yuv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B571811C9D45A80099E69B /* yuv.cpp */; };
+		26BBBECD1D906D4A00735947 /* view_page.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BBBECB1D906D4A00735947 /* view_page.cpp */; };
 		26C0A3511C128D80005690FE /* sensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A34D1C128D80005690FE /* sensor.cpp */; };
 		26C0A3531C128D80005690FE /* vibrator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A34F1C128D80005690FE /* vibrator.cpp */; };
 		26C0A3561C131F8E005690FE /* bitmap_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A3551C131F8E005690FE /* bitmap_data.cpp */; };
@@ -250,6 +252,7 @@
 		260251FF1BF18BCF00DEFAB1 /* thread_pool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_pool.cpp; sourceTree = "<group>"; };
 		260252011BF18BE200DEFAB1 /* callback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = callback.cpp; sourceTree = "<group>"; };
 		260252251BF18D4300DEFAB1 /* ui_graphics_context.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_graphics_context.cpp; sourceTree = "<group>"; };
+		260747CB1D9388F60061A3B5 /* slider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = slider.cpp; sourceTree = "<group>"; };
 		2621F7201CCF174B00C4615C /* ui_menu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_menu.cpp; sourceTree = "<group>"; };
 		2634DCE41D8A82B200E8F19E /* split_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = split_view.cpp; sourceTree = "<group>"; };
 		2634DCE61D8A82EA00E8F19E /* progress_bar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = progress_bar.cpp; sourceTree = "<group>"; };
@@ -413,6 +416,7 @@
 		26B5717C1C9D44930099E69B /* arp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = arp.cpp; sourceTree = "<group>"; };
 		26B5717E1C9D449E0099E69B /* audio_util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = audio_util.cpp; path = media/audio_util.cpp; sourceTree = "<group>"; };
 		26B571811C9D45A80099E69B /* yuv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yuv.cpp; sourceTree = "<group>"; };
+		26BBBECB1D906D4A00735947 /* view_page.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view_page.cpp; sourceTree = "<group>"; };
 		26C0A34D1C128D80005690FE /* sensor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sensor.cpp; sourceTree = "<group>"; };
 		26C0A34F1C128D80005690FE /* vibrator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vibrator.cpp; sourceTree = "<group>"; };
 		26C0A3551C131F8E005690FE /* bitmap_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_data.cpp; sourceTree = "<group>"; };
@@ -814,6 +818,7 @@
 				266DD44D1C1191B900D47AB0 /* scroll_view_ios.mm */,
 				26E49B1E1D79AD0A0052D89F /* select_view.cpp */,
 				26E49B201D79AD440052D89F /* select_view_ios.mm */,
+				260747CB1D9388F60061A3B5 /* slider.cpp */,
 				2634DCE41D8A82B200E8F19E /* split_view.cpp */,
 				266DD44F1C1191D400D47AB0 /* tab_view.cpp */,
 				26CB94CA1D0126F900D8A472 /* tree_view.cpp */,
@@ -830,6 +835,7 @@
 				266DD4281C118F6D00D47AB0 /* view.cpp */,
 				266DD42A1C118F7800D47AB0 /* view_ios.h */,
 				266DD42B1C118F7800D47AB0 /* view_ios.mm */,
+				26BBBECB1D906D4A00735947 /* view_page.cpp */,
 				266DD4511C1191F300D47AB0 /* web_view.cpp */,
 				266DD4531C1191FE00D47AB0 /* web_view_ios.mm */,
 				266DD42D1C118FA500D47AB0 /* window.cpp */,
@@ -981,6 +987,7 @@
 				266DD3A71C117AE300D47AB0 /* image_png.cpp in Sources */,
 				26FD28F61CFCB67D003E95FB /* scroll_bar.cpp in Sources */,
 				266DD5EE1C11CEBB00D47AB0 /* camera_ios.mm in Sources */,
+				26BBBECD1D906D4A00735947 /* view_page.cpp in Sources */,
 				266DD44E1C1191B900D47AB0 /* scroll_view_ios.mm in Sources */,
 				266DD4071C118B9900D47AB0 /* render_program.cpp in Sources */,
 				2621F7211CCF174B00C4615C /* ui_menu.cpp in Sources */,
@@ -1056,6 +1063,7 @@
 				A25F2F511B039EF600854DAF /* spinlock.cpp in Sources */,
 				266DD4541C1191FE00D47AB0 /* web_view_ios.mm in Sources */,
 				266DD36F1C1171B800D47AB0 /* audio_player_ios.mm in Sources */,
+				260747CC1D9388F60061A3B5 /* slider.cpp in Sources */,
 				266DD3E61C1181B500D47AB0 /* network_io.cpp in Sources */,
 				266DD3641C1170BD00D47AB0 /* audio_player.cpp in Sources */,
 				26B571761C9D44720099E69B /* triangle.cpp in Sources */,

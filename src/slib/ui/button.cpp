@@ -10,7 +10,6 @@ SLIB_DEFINE_OBJECT(Button, View)
 ButtonCategoryProperties::ButtonCategoryProperties()
 {
 	textColor = Color::zero();
-	backgroundColor = Color::zero();
 }
 
 class _Button_Categories
@@ -22,14 +21,14 @@ public:
 	_Button_Categories()
 	{
 		categories[0].properties[(int)(ButtonState::Normal)].border = Pen::create(PenStyle::Solid, 1, Color(100, 100, 100));
-		categories[0].properties[(int)(ButtonState::Normal)].backgroundColor = Color(240, 240, 240);
+		categories[0].properties[(int)(ButtonState::Normal)].background = ColorDrawable::create(Color(240, 240, 240));
 		categories[0].properties[(int)(ButtonState::Normal)].textColor = Color::Black;
-		categories[0].properties[(int)(ButtonState::Disabled)].backgroundColor = Color(220, 220, 220);
+		categories[0].properties[(int)(ButtonState::Disabled)].background = ColorDrawable::create(Color(220, 220, 220));
 		categories[0].properties[(int)(ButtonState::Disabled)].textColor = Color(110, 110, 110);
 		categories[0].properties[(int)(ButtonState::Hover)].border = Pen::create(PenStyle::Solid, 1, Color(0, 100, 250));
-		categories[0].properties[(int)(ButtonState::Hover)].backgroundColor = Color(220, 230, 255);
-		categories[0].properties[(int)(ButtonState::Down)].border = categories[0].properties[(int)(ButtonState::Hover)].border;
-		categories[0].properties[(int)(ButtonState::Down)].backgroundColor = Color(180, 210, 255);
+		categories[0].properties[(int)(ButtonState::Hover)].background = ColorDrawable::create(Color(220, 230, 255));
+		categories[0].properties[(int)(ButtonState::Pressed)].border = categories[0].properties[(int)(ButtonState::Hover)].border;
+		categories[0].properties[(int)(ButtonState::Pressed)].background = ColorDrawable::create(Color(180, 210, 255));
 		
 		categories[1] = categories[0];
 		categories[1].properties[(int)(ButtonState::Normal)].border = Pen::create(PenStyle::Solid, 3, Color(0, 100, 250));
@@ -483,47 +482,6 @@ void Button::resetStateIcons(sl_bool flagRedraw)
 	}
 }
 
-Color Button::getBackgroundColor(ButtonState state, sl_uint32 category)
-{
-	if (category < m_nCategories) {
-		return m_categories[category].properties[(int)state].backgroundColor;
-	} else {
-		return Color::zero();
-	}
-}
-
-void Button::setBackgroundColor(const Color& color, ButtonState state, sl_uint32 category, sl_bool flagRedraw)
-{
-	if (category < m_nCategories) {
-		m_categories[category].properties[(int)state].backgroundColor = color;
-		if (flagRedraw) {
-			invalidate();
-		}
-	}
-}
-
-Color Button::getBackgroundColor()
-{
-	return View::getBackgroundColor();
-}
-
-void Button::setBackgroundColor(const Color& color, sl_bool flagRedraw)
-{
-	View::setBackgroundColor(color, flagRedraw);
-}
-
-void Button::resetStateBackgroundColors(sl_bool flagRedraw)
-{
-	for (sl_uint32 i = 0; i < m_nCategories; i++) {
-		for (int k = 0; k < (int)(ButtonState::Count); k++) {
-			m_categories[i].properties[k].backgroundColor = Color::zero();
-		}
-	}
-	if (flagRedraw) {
-		invalidate();
-	}
-}
-
 Ref<Drawable> Button::getBackground(ButtonState state, sl_uint32 category)
 {
 	if (category < m_nCategories) {
@@ -541,6 +499,11 @@ void Button::setBackground(const Ref<Drawable>& background, ButtonState state, s
 			invalidate();
 		}
 	}
+}
+
+void Button::setBackground(const Color& color, ButtonState state, sl_uint32 category, sl_bool flagRedraw)
+{
+	setBackground(Drawable::createColorDrawable(color), state, category, flagRedraw);
 }
 
 Ref<Drawable> Button::getBackground()
@@ -615,9 +578,9 @@ void Button::setEnabled(sl_bool flagEnabled, sl_bool flagRedraw)
 	}
 }
 
-void Button::setDownState(sl_bool flagState, sl_bool flagRedraw)
+void Button::setPressedState(sl_bool flagState, sl_bool flagRedraw)
 {
-	View::setDownState(flagState, sl_false);
+	View::setPressedState(flagState, sl_false);
 	_invalidateButtonState();
 	if (flagRedraw) {
 		invalidate();
@@ -650,16 +613,12 @@ void Button::onDraw(Canvas* canvas)
 void Button::onDrawBackground(Canvas* canvas)
 {
 	ButtonCategoryProperties& params = m_categories[m_category].properties[(int)m_state];
-	Color color = params.backgroundColor;
 	Ref<Drawable> background = params.background;
-	if (color.isZero()) {
-		color = View::getBackgroundColor();
-	}
-	if (background.isNull()) {
-		background = View::getBackground();
-	}
-	if (background.isNotNull() || color.a > 0) {
-		drawBackground(canvas, color, background);		
+	if (background.isNotNull()) {
+		Color color = getBackgroundColor();
+		drawBackground(canvas, color, background);
+	} else {
+		View::onDrawBackground(canvas);
 	}
 }
 
@@ -667,11 +626,10 @@ void Button::onDrawBorder(Canvas* canvas)
 {
 	ButtonCategoryProperties& params = m_categories[m_category].properties[(int)m_state];
 	Ref<Pen> pen = params.border;
-	if (pen.isNull()) {
-		pen = getBorder();
-	}
 	if (pen.isNotNull()) {
 		drawBorder(canvas, pen);
+	} else {
+		View::onDrawBorder(canvas);
 	}
 }
 
@@ -905,8 +863,8 @@ void Button::drawContent(Canvas* canvas, const Ref<Drawable>& icon, const String
 void Button::_invalidateButtonState()
 {
 	if (isEnabled()) {
-		if (isDownState()) {
-			m_state = ButtonState::Down;
+		if (isPressedState()) {
+			m_state = ButtonState::Pressed;
 		} else if (isHoverState()) {
 			m_state = ButtonState::Hover;
 		} else {

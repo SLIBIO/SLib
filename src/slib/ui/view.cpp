@@ -38,7 +38,7 @@ View::View()
 	m_flagFocusable = sl_false;
 	m_flagFocused = sl_false;
 	
-	m_flagDown = sl_false;
+	m_flagPressed = sl_false;
 	m_flagHover = sl_false;
 	m_flagOccurringClick = sl_true;
 	
@@ -989,15 +989,15 @@ void View::_setFocusedChild(View* child, sl_bool flagRedraw)
 	}
 }
 
-sl_bool View::isDownState()
+sl_bool View::isPressedState()
 {
-	return m_flagDown;
+	return m_flagPressed;
 }
 
-void View::setDownState(sl_bool flagState, sl_bool flagRedraw)
+void View::setPressedState(sl_bool flagState, sl_bool flagRedraw)
 {
-	if (m_flagDown != flagState) {
-		m_flagDown = flagState;
+	if (m_flagPressed != flagState) {
+		m_flagPressed = flagState;
 		if (flagRedraw) {
 			invalidate();
 		}
@@ -3690,6 +3690,48 @@ void View::setBackgroundScaleMode(ScaleMode scaleMode, sl_bool flagRedraw)
 	}
 }
 
+Ref<Drawable> View::getPressedBackground()
+{
+	Ref<DrawAttributes> draw = m_draw;
+	if (draw.isNotNull()) {
+		return draw->backgroundPressed;
+	}
+	return Ref<Drawable>::null();
+}
+
+void View::setPressedBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+{
+	_initializeDraw();
+	Ref<DrawAttributes> draw = m_draw;
+	if (draw.isNotNull()) {
+		draw->backgroundPressed = drawable;
+		if (flagRedraw) {
+			invalidate();
+		}
+	}
+}
+
+Ref<Drawable> View::getHoverBackground()
+{
+	Ref<DrawAttributes> draw = m_draw;
+	if (draw.isNotNull()) {
+		return draw->backgroundHover;
+	}
+	return Ref<Drawable>::null();
+}
+
+void View::setHoverBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+{
+	_initializeDraw();
+	Ref<DrawAttributes> draw = m_draw;
+	if (draw.isNotNull()) {
+		draw->backgroundHover = drawable;
+		if (flagRedraw) {
+			invalidate();
+		}
+	}
+}
+
 Alignment View::getBackgroundAlignment()
 {
 	Ref<DrawAttributes> draw = m_draw;
@@ -3885,6 +3927,24 @@ void View::setRoundRectBoundShapeRadius(const Size& radius, sl_bool flagRedraw)
 void View::setRoundRectBoundShapeRadius(sl_real rx, sl_real ry, sl_bool flagRedraw)
 {
 	setRoundRectBoundShapeRadius(Size(rx, ry), flagRedraw);
+}
+
+void View::setRoundRectBoundShapeRadiusX(sl_real rx, sl_bool flagRedraw)
+{
+	_initializeDraw();
+	Ref<DrawAttributes> draw = m_draw;
+	if (draw.isNotNull()) {
+		setRoundRectBoundShapeRadius(Size(rx, draw->roundRectBoundShapeRadius.y), flagRedraw);
+	}
+}
+
+void View::setRoundRectBoundShapeRadiusY(sl_real ry, sl_bool flagRedraw)
+{
+	_initializeDraw();
+	Ref<DrawAttributes> draw = m_draw;
+	if (draw.isNotNull()) {
+		setRoundRectBoundShapeRadius(Size(draw->roundRectBoundShapeRadius.x, ry), flagRedraw);
+	}
 }
 
 void View::setRoundRectBoundShapeRadius(sl_real radius, sl_bool flagRedraw)
@@ -5135,7 +5195,16 @@ void View::onDrawBackground(Canvas* canvas)
 {
 	Ref<DrawAttributes> draw = m_draw;
 	if (draw.isNotNull()) {
-		drawBackground(canvas, draw->backgroundColor, draw->background);
+		Ref<Drawable> background;
+		if (isPressedState()) {
+			background = draw->backgroundPressed;
+		} else if (isHoverState()) {
+			background = draw->backgroundHover;
+		}
+		if (background.isNull()) {
+			background = draw->background;
+		}
+		drawBackground(canvas, draw->backgroundColor, background);
 	}
 }
 
@@ -6092,21 +6161,21 @@ void View::_processEventForStateAndClick(UIEvent* ev)
 {
 	UIAction action = ev->getAction();
 	if (action == UIAction::LeftButtonDown || action == UIAction::TouchBegin) {
-		setDownState(sl_true);
+		setPressedState(sl_true);
 		if (m_flagOccurringClick) {
 			ev->preventDefault();
 		}
 	} else if (action == UIAction::LeftButtonUp || action == UIAction::TouchEnd) {
 		if (m_flagOccurringClick) {
-			if (isDownState()) {
+			if (isPressedState()) {
 				if (getBounds().containsPoint(ev->getPoint())) {
 					dispatchClick(ev);
 				}
 			}
 		}
-		setDownState(sl_false);
+		setPressedState(sl_false);
 	} else if (action == UIAction::TouchCancel) {
-		setDownState(sl_false);
+		setPressedState(sl_false);
 	} else if (action == UIAction::MouseEnter) {
 		setHoverState(sl_true);
 	} else if (action == UIAction::MouseLeave) {

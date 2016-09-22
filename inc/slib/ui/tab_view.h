@@ -66,31 +66,31 @@ public:
 	
 	void setBarBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
 	
-	void setBarBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setBarBackground(const Color& color, sl_bool flagRedraw = sl_true);
 	
 	Ref<Drawable> getContentBackground();
 	
 	void setContentBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
 	
-	void setContentBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setContentBackground(const Color& color, sl_bool flagRedraw = sl_true);
 	
 	Ref<Drawable> getTabBackground();
 	
 	void setTabBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
 	
-	void setTabBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setTabBackground(const Color& color, sl_bool flagRedraw = sl_true);
 	
 	Ref<Drawable> getSelectedTabBackground();
 	
 	void setSelectedTabBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
 	
-	void setSelectedTabBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setSelectedTabBackground(const Color& color, sl_bool flagRedraw = sl_true);
 	
 	Ref<Drawable> getHoverTabBackground();
 	
 	void setHoverTabBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
 	
-	void setHoverTabBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setHoverTabBackground(const Color& color, sl_bool flagRedraw = sl_true);
 	
 	Color getLabelColor();
 	

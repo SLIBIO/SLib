@@ -6,6 +6,7 @@
 #include "app.h"
 #include "event.h"
 #include "window.h"
+#include "view_page.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -73,6 +74,11 @@ class SLIB_EXPORT MobileMainWindow : public Window
 	
 public:
 	MobileMainWindow();
+	
+};
+
+class SLIB_EXPORT MobilePage : public ViewPage
+{
 	
 };
 

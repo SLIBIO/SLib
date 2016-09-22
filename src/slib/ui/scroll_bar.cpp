@@ -6,41 +6,24 @@ SLIB_UI_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(ScrollBar, View)
 
-class _ScrollBar_Bar : public Drawable
-{
-public:
-	Ref<Brush> m_brush;
-	
-public:
-	_ScrollBar_Bar(const Color& color)
-	{
-		m_brush = Brush::createSolidBrush(color);
-	}
-	
-public:
-	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst)
-	{
-		sl_bool flagAntiAlias = canvas->isAntiAlias();
-		canvas->setAntiAlias(sl_true);
-		sl_real r = Math::min(rectDst.getWidth(), rectDst.getHeight()) * 0.5f;
-		sl_real padding = 2;
-		r -= padding;
-		canvas->drawRoundRect(Rectangle(rectDst.left + padding, rectDst.top + padding, rectDst.right - padding, rectDst.bottom - padding), Size(r, r), Ref<Pen>::null(), m_brush);
-		canvas->setAntiAlias(flagAntiAlias);
-	}
-};
-
 class _ScrollBar_Static
 {
 public:
-	Ref<Drawable> defaultBar;
-	Ref<Drawable> defaultClickedBar;
+	Ref<Drawable> defaultThumb;
+	Ref<Drawable> defaultPressedThumb;
+	Ref<Drawable> defaultHoverThumb;
+	
+	Ref<Drawable> defaultHoverTrack;
+	Ref<Drawable> defaultPressedTrack;
 
 	_ScrollBar_Static()
 	{
-		defaultBar = new _ScrollBar_Bar(Color(0, 0, 0, 110));
-		defaultClickedBar = new _ScrollBar_Bar(Color(0, 0, 0, 160));
+		defaultThumb = ColorDrawable::create(Color(0, 0, 0, 110));
+		defaultPressedThumb = ColorDrawable::create(Color(0, 0, 0, 160));
+		defaultHoverThumb = ColorDrawable::create(Color(110, 110, 110, 255));
+		
+		defaultHoverTrack = ColorDrawable::create(Color(255, 255, 255, 50));
+		defaultPressedTrack = ColorDrawable::create(Color(255, 255, 255, 100));
 	}
 };
 
@@ -60,10 +43,18 @@ ScrollBar::ScrollBar(LayoutOrientation orientation)
 
 	_ScrollBar_Static* s = _ScrollBar_getStatic();
 	if (s) {
-		m_bar = s->defaultBar;
-		m_clickedBar = s->defaultClickedBar;
+		m_thumb = s->defaultThumb;
+		m_pressedThumb = s->defaultPressedThumb;
+		m_hoverThumb = s->defaultHoverThumb;
+		
+		m_hoverTrack = s->defaultHoverTrack;
+		m_pressedTrack = s->defaultPressedTrack;
 	}
-	m_bar_len_ratio_min = 2;
+	
+	m_thumb_len_ratio_min = 2;
+	
+	m_flagHoverThumb = sl_false;
+	
 }
 
 LayoutOrientation ScrollBar::getOrientation()
@@ -207,56 +198,125 @@ void ScrollBar::setRange(sl_scroll_pos range, sl_bool flagRedraw)
 	}
 }
 
-Ref<Drawable> ScrollBar::getBar()
+Ref<Drawable> ScrollBar::getThumbDrawable()
 {
-	return m_bar;
+	return m_thumb;
 }
 
-void ScrollBar::setBar(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void ScrollBar::setThumbDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
 {
-	m_bar = drawable;
+	m_thumb = drawable;
 	if (flagRedraw) {
 		invalidate();
 	}
 }
 
-Ref<Drawable> ScrollBar::getClickedBar()
+void ScrollBar::setThumbColor(const Color& color, sl_bool flagRedraw)
 {
-	return m_clickedBar;
+	setThumbDrawable(ColorDrawable::create(color), flagRedraw);
 }
 
-void ScrollBar::setClickedBar(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+Ref<Drawable> ScrollBar::getPressedThumbDrawable()
 {
-	m_clickedBar = drawable;
+	return m_pressedThumb;
+}
+
+void ScrollBar::setPressedThumbDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+{
+	m_pressedThumb = drawable;
 	if (flagRedraw) {
 		invalidate();
 	}
 }
 
-Ref<Drawable> ScrollBar::getHoverBackground()
+void ScrollBar::setPressedThumbColor(const Color& color, sl_bool flagRedraw)
 {
-	return m_hoverBackground;
+	setPressedThumbDrawable(ColorDrawable::create(color), flagRedraw);
 }
 
-void ScrollBar::setHoverBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+Ref<Drawable> ScrollBar::getHoverThumbDrawable()
 {
-	m_hoverBackground = drawable;
+	return m_hoverThumb;
+}
+
+void ScrollBar::setHoverThumbDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+{
+	m_hoverThumb = drawable;
 	if (flagRedraw) {
 		invalidate();
 	}
 }
 
-sl_scroll_pos ScrollBar::getMinimumBarLengthRatio()
+void ScrollBar::setHoverThumbColor(const Color& color, sl_bool flagRedraw)
 {
-	return m_bar_len_ratio_min;
+	setHoverThumbDrawable(ColorDrawable::create(color), flagRedraw);
 }
 
-void ScrollBar::setMinimumBarLengthRatio(sl_scroll_pos ratio)
+Ref<Drawable> ScrollBar::getTrackDrawable()
+{
+	return m_track;
+}
+
+void ScrollBar::setTrackDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+{
+	m_track = drawable;
+	if (flagRedraw) {
+		invalidate();
+	}
+}
+
+void ScrollBar::setTrackColor(const Color& color, sl_bool flagRedraw)
+{
+	setTrackDrawable(ColorDrawable::create(color), flagRedraw);
+}
+
+Ref<Drawable> ScrollBar::getPressedTrackDrawable()
+{
+	return m_pressedTrack;
+}
+
+void ScrollBar::setPressedTrackDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+{
+	m_pressedTrack = drawable;
+	if (flagRedraw) {
+		invalidate();
+	}
+}
+
+void ScrollBar::setPressedTrackColor(const Color& color, sl_bool flagRedraw)
+{
+	setPressedTrackDrawable(ColorDrawable::create(color), flagRedraw);
+}
+
+Ref<Drawable> ScrollBar::getHoverTrackDrawable()
+{
+	return m_hoverTrack;
+}
+
+void ScrollBar::setHoverTrackDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+{
+	m_hoverTrack = drawable;
+	if (flagRedraw) {
+		invalidate();
+	}
+}
+
+void ScrollBar::setHoverTrackColor(const Color& color, sl_bool flagRedraw)
+{
+	setHoverTrackDrawable(ColorDrawable::create(color), flagRedraw);
+}
+
+float ScrollBar::getMinimumThumbLengthRatio()
+{
+	return m_thumb_len_ratio_min;
+}
+
+void ScrollBar::setMinimumThumbLengthRatio(float ratio)
 {
 	if (ratio < 0) {
 		ratio = 0;
 	}
-	m_bar_len_ratio_min = ratio;
+	m_thumb_len_ratio_min = ratio;
 }
 
 #define CHECK_STATUS(...) \
@@ -272,11 +332,11 @@ void ScrollBar::setMinimumBarLengthRatio(sl_scroll_pos ratio)
 		return __VA_ARGS__; \
 	} \
 	sl_bool flagVertical = m_orientation == LayoutOrientation::Vertical; \
-	sl_ui_len width = getWidth(); \
+	sl_ui_pos width = getWidth() - getPaddingLeft() - getPaddingTop(); \
 	if (width < 1) { \
 		return __VA_ARGS__; \
 	} \
-	sl_ui_len height = getHeight(); \
+	sl_ui_pos height = getHeight() - getPaddingTop() - getPaddingBottom(); \
 	if (height < 1) { \
 		return __VA_ARGS__; \
 	} \
@@ -288,63 +348,74 @@ void ScrollBar::setMinimumBarLengthRatio(sl_scroll_pos ratio)
 		depth = height; \
 		length = width; \
 	} \
-	sl_scroll_pos f_min_bar_len = m_bar_len_ratio_min * (sl_scroll_pos)depth; \
-	if (f_min_bar_len >= (sl_scroll_pos)length) { \
+	float f_min_thumb_len = (float)(m_thumb_len_ratio_min * (float)depth); \
+	if (f_min_thumb_len < 0 || f_min_thumb_len >= (float)length) { \
 		return __VA_ARGS__; \
 	} \
-	sl_ui_len min_bar_len = (sl_ui_len)(f_min_bar_len); \
-	sl_scroll_pos f_bar_len = page * (sl_scroll_pos)length / range; \
-	if (f_bar_len < 0 || f_bar_len - (sl_scroll_pos)length > (sl_scroll_pos)SLIB_EPSILON) { \
+	sl_ui_len min_thumb_len = (sl_ui_len)(f_min_thumb_len); \
+	float f_thumb_len = (float)(page * (sl_scroll_pos)length / range); \
+	if (f_thumb_len < 0 || f_thumb_len - (float)length > SLIB_EPSILON) { \
 		return __VA_ARGS__; \
 	} \
-	sl_ui_len bar_len = (sl_ui_len)(f_bar_len); \
-	if (bar_len < min_bar_len) { \
-		bar_len = min_bar_len; \
+	sl_ui_len thumb_len = (sl_ui_len)(f_thumb_len); \
+	if (thumb_len < min_thumb_len) { \
+		thumb_len = min_thumb_len; \
 	} \
-	if (bar_len > length) { \
-		bar_len = length; \
+	if (thumb_len > length) { \
+		thumb_len = length; \
 	} \
 	sl_scroll_pos ratioValuePos; \
-	if (bar_len < length) { \
-		ratioValuePos = (range - page) / (sl_scroll_pos)(length - bar_len); \
+	if (thumb_len < length) { \
+		ratioValuePos = (range - page) / (sl_scroll_pos)(length - thumb_len); \
 	} else { \
 		ratioValuePos = 0; \
 	} \
 	SLIB_UNUSED(ratioValuePos) \
 	SLIB_UNUSED(value)
 
-sl_bool ScrollBar::getBarPositionRange(sl_ui_pos& pos_begin, sl_ui_pos& pos_end)
+sl_bool ScrollBar::getThumbPositionRange(sl_ui_pos& _pos_begin, sl_ui_pos& _pos_end)
 {
 	CHECK_STATUS(sl_false)
-	pos_begin = (sl_ui_pos)((value - range_min) * (sl_scroll_pos)(length - bar_len) / (range - page));
-	pos_end = pos_begin + bar_len;
+	sl_ui_pos pos_begin = (sl_ui_pos)((value - range_min) * (sl_scroll_pos)(length - thumb_len) / (range - page));
+	sl_ui_pos pos_end = pos_begin + thumb_len;
 	if (pos_end > (sl_ui_pos)length) {
 		pos_end = length;
 	}
-	if (pos_begin > pos_end - (sl_ui_pos)min_bar_len) {
-		pos_begin = pos_end - min_bar_len;
+	if (pos_begin > pos_end - (sl_ui_pos)min_thumb_len) {
+		pos_begin = pos_end - min_thumb_len;
 	}
 	if (pos_begin < 0) {
 		pos_begin = 0;
 	}
-	if (pos_end < pos_begin + (sl_ui_pos)min_bar_len) {
-		pos_end = pos_begin + min_bar_len;
+	if (pos_end < pos_begin + (sl_ui_pos)min_thumb_len) {
+		pos_end = pos_begin + min_thumb_len;
 	}
+	if (flagVertical) {
+		sl_ui_pos padding = getPaddingTop();
+		pos_begin += padding;
+		pos_end += padding;
+	} else {
+		sl_ui_pos padding = getPaddingLeft();
+		pos_begin += padding;
+		pos_end += padding;
+	}
+	_pos_begin = pos_begin;
+	_pos_end = pos_end;
 	return sl_true;
 }
 
-sl_bool ScrollBar::getBarRegion(UIRect& region)
+sl_bool ScrollBar::getThumbRegion(UIRect& region)
 {
 	sl_ui_pos pos_begin, pos_end;
-	if (getBarPositionRange(pos_begin, pos_end)) {
+	if (getThumbPositionRange(pos_begin, pos_end)) {
 		if (isVertical()) {
-			region.left = 0;
-			region.right = getWidth();
+			region.left = getPaddingLeft();
+			region.right = getWidth() - getPaddingRight();
 			region.top = pos_begin;
 			region.bottom = pos_end;
 		} else {
-			region.top = 0;
-			region.bottom = getHeight();
+			region.top = getPaddingTop();
+			region.bottom = getHeight() - getPaddingBottom();
 			region.left = pos_begin;
 			region.right = pos_end;
 		}
@@ -354,10 +425,15 @@ sl_bool ScrollBar::getBarRegion(UIRect& region)
 	return sl_false;
 }
 
-sl_scroll_pos ScrollBar::getValueFromBarPosition(sl_ui_pos pos)
+sl_scroll_pos ScrollBar::getValueFromThumbPosition(sl_ui_pos pos)
 {
 	CHECK_STATUS(range_min)
-	return ((sl_scroll_pos)(pos - bar_len / 2) * ratioValuePos) + m_value_min;
+	if (flagVertical) {
+		pos -= getPaddingTop();
+	} else {
+		pos -= getPaddingLeft();
+	}
+	return ((sl_scroll_pos)(pos - thumb_len / 2) * ratioValuePos) + m_value_min;
 }
 
 sl_bool ScrollBar::isValid()
@@ -368,17 +444,42 @@ sl_bool ScrollBar::isValid()
 
 void ScrollBar::onDraw(Canvas* canvas)
 {
-	UIRect barRegion;
-	if (getBarRegion(barRegion)) {
-		if (isHoverState()) {
-			drawBackground(canvas, getBackgroundColor(), m_hoverBackground);
-		} else {
-			drawBackground(canvas, getBackgroundColor(), getBackground());
+	Ref<Drawable> track;
+	if (isPressedState()) {
+		track = m_pressedTrack;
+	} else if (isHoverState()) {
+		track = m_hoverTrack;
+	}
+	if (track.isNull()) {
+		track = m_track;
+	}
+	if (track.isNotNull()) {
+		canvas->draw(getBoundsInnerPadding(), track);
+	}
+	UIRect thumbRegion;
+	if (getThumbRegion(thumbRegion)) {
+		Ref<Drawable> thumb;
+		if (isPressedState()) {
+			thumb = m_pressedThumb;
+		} else if (isHoverState() && m_flagHoverThumb) {
+			thumb = m_hoverThumb;
 		}
-		if (isDownState()) {
-			canvas->draw(barRegion, m_clickedBar);
-		} else {
-			canvas->draw(barRegion, m_bar);
+		if (thumb.isNull()) {
+			thumb = m_thumb;
+		}
+		if (thumb.isNotNull()) {
+			Ref<Brush> brush;
+			if (ColorDrawable::check(thumb, sl_null, &brush)) {
+				sl_bool flagAntiAlias = canvas->isAntiAlias();
+				canvas->setAntiAlias(sl_true);
+				sl_real r = Math::min(thumbRegion.getWidth(), thumbRegion.getHeight()) * 0.5f;
+				sl_real padding = 2;
+				r -= padding;
+				canvas->drawRoundRect(Rectangle(thumbRegion.left + padding, thumbRegion.top + padding, thumbRegion.right - padding, thumbRegion.bottom - padding), Size(r, r), Ref<Pen>::null(), brush);
+				canvas->setAntiAlias(flagAntiAlias);
+			} else {
+				canvas->draw(thumbRegion, thumb);
+			}
 		}
 	}
 }
@@ -389,6 +490,12 @@ void ScrollBar::onMouseEvent(UIEvent* ev)
 	CHECK_STATUS()
 	ev->setPreventedDefault(sl_false);
 	
+	sl_ui_pos pos_begin, pos_end;
+	if (!(getThumbPositionRange(pos_begin, pos_end))) {
+		ev->preventDefault();
+		return;
+	}
+
 	UIAction action = ev->getAction();
 	sl_ui_pos pos;
 	if (isVertical()) {
@@ -397,38 +504,62 @@ void ScrollBar::onMouseEvent(UIEvent* ev)
 		pos = (sl_ui_pos)(ev->getX());
 	}
 	
-	sl_ui_pos pos_begin, pos_end;
-	if (getBarPositionRange(pos_begin, pos_end)) {
-		if (action == UIAction::LeftButtonDown || action == UIAction::TouchBegin) {
-			m_posDown = pos;
-			if (pos < pos_begin) {
-				m_valueDown = getValueFromBarPosition(pos);
-				if (page > 0) {
-					setValue(value - page);
-				} else {
-					setValue(m_valueDown);
+	switch (action) {
+		case UIAction::MouseEnter:
+		case UIAction::MouseMove:
+			{
+				UIRect region;
+				if (getThumbRegion(region)) {
+					if (region.containsPoint(ev->getPoint())) {
+						_setHoverThumb(sl_true);
+						return;
+					}
 				}
-			} else if (pos <= pos_end) {
-				m_valueDown = value;
-			} else {
-				m_valueDown = getValueFromBarPosition(pos);
-				if (page > 0) {
-					setValue(value + page);
-				} else {
-					setValue(m_valueDown);
-				}
+				_setHoverThumb(sl_false);
+				return;
 			}
-		} else if (action == UIAction::LeftButtonDrag || action == UIAction::TouchMove) {
-			if (isDownState()) {
+		case UIAction::MouseLeave:
+			_setHoverThumb(sl_false);
+			return;
+			
+		case UIAction::LeftButtonDown:
+		case UIAction::TouchBegin:
+			{
+				m_posDown = pos;
+				if (pos < pos_begin) {
+					m_valueDown = getValueFromThumbPosition(pos);
+					if (page > 0) {
+						setValue(value - page);
+					} else {
+						setValue(m_valueDown);
+					}
+				} else if (pos <= pos_end) {
+					m_valueDown = value;
+				} else {
+					m_valueDown = getValueFromThumbPosition(pos);
+					if (page > 0) {
+						setValue(value + page);
+					} else {
+						setValue(m_valueDown);
+					}
+				}
+				break;
+			}
+		case UIAction::LeftButtonDrag:
+		case UIAction::TouchMove:
+			if (isPressedState()) {
 				setValue(m_valueDown + (sl_scroll_pos)(pos - m_posDown) * ratioValuePos);
 			}
-		} else if (action == UIAction::LeftButtonUp || action == UIAction::TouchEnd || action == UIAction::TouchCancel) {
-			if (isDownState()) {
+			break;
+		case UIAction::LeftButtonUp:
+		case UIAction::TouchEnd:
+		case UIAction::TouchCancel:
+			if (isPressedState()) {
 				if (m_posDown != pos) {
 					setValue(m_valueDown + (sl_scroll_pos)(pos - m_posDown) * ratioValuePos);
 				}
 			}
-		}
+			break;
 	}
 	
 	ev->stopPropagation();
@@ -474,6 +605,14 @@ void ScrollBar::dispatchScroll(sl_scroll_pos value)
 	PtrLocker<IScrollBarListener> listener(getListener());
 	if (listener.isNotNull()) {
 		listener->onScroll(this, value);
+	}
+}
+
+void ScrollBar::_setHoverThumb(sl_bool flag)
+{
+	if (m_flagHoverThumb != flag) {
+		m_flagHoverThumb = flag;
+		invalidate();
 	}
 }
 

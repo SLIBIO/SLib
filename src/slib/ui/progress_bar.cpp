@@ -6,53 +6,41 @@ SLIB_UI_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(ProgressBar, View)
 
-class _ProgressBar_Bar : public Drawable
-{
-public:
-	Ref<Brush> m_brush;
-	
-public:
-	_ProgressBar_Bar(const Color& color)
-	{
-		m_brush = Brush::createSolidBrush(color);
-	}
-	
-public:
-	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst)
-	{
-		canvas->fillRectangle(rectDst, m_brush);
-	}
-};
-
 class _ProgressBar_Static
 {
 public:
-	Ref<Drawable> defaultBar;
+	Ref<Drawable> defaultTrack;
+	Ref<Drawable> defaultProgress;
+	Ref<Drawable> defaultProgress2;
 	
 	_ProgressBar_Static()
 	{
-		defaultBar = new _ProgressBar_Bar(Color(150, 150, 150));
+		defaultTrack = ColorDrawable::create(Color(220, 220, 220));
+		defaultProgress = ColorDrawable::create(Color(150, 150, 150));
+		defaultProgress2 = ColorDrawable::create(Color(200, 200, 200));
 	}
 };
 
 SLIB_SAFE_STATIC_GETTER(_ProgressBar_Static, _ProgressBar_getStatic)
 
-ProgressBar::ProgressBar()
+ProgressBar::ProgressBar(LayoutOrientation orientation)
 {
-	m_orientation = LayoutOrientation::Horizontal;
-	m_gravity = Alignment::TopLeft;
-	m_value = 0;
+	m_orientation = orientation;
 	m_value_min = 0;
 	m_value_max = 1;
+	m_value = 0;
+	m_value2 = 0;
+	m_flagDualValues = sl_false;
+	m_flagDiscrete = sl_false;
+	m_step = 0;
+	m_flagReversed = sl_false;
 	
 	_ProgressBar_Static* s = _ProgressBar_getStatic();
 	if (s) {
-		m_bar = s->defaultBar;
+		m_track = s->defaultTrack;
+		m_progress = s->defaultProgress;
+		m_progress2 = s->defaultProgress2;
 	}
-
-	setBackgroundColor(Color(220, 220, 220));
-	
 }
 
 LayoutOrientation ProgressBar::getOrientation()
@@ -68,48 +56,32 @@ void ProgressBar::setOrientation(LayoutOrientation orientation, sl_bool flagRedr
 	}
 }
 
-Alignment ProgressBar::getGravity()
+sl_bool ProgressBar::isVertical()
 {
-	return m_gravity;
+	return m_orientation == LayoutOrientation::Vertical;
 }
 
-void ProgressBar::setGravity(Alignment gravity, sl_bool flagRedraw)
+void ProgressBar::setVertical(sl_bool flagRedraw)
 {
-	m_gravity = gravity;
-	if (flagRedraw) {
-		invalidate();
-	}
+	setOrientation(LayoutOrientation::Vertical, flagRedraw);
 }
 
-sl_progress_bar_value ProgressBar::getValue()
+sl_bool ProgressBar::isHorizontal()
 {
-	return m_value;
+	return m_orientation == LayoutOrientation::Horizontal;
 }
 
-void ProgressBar::setValue(sl_progress_bar_value value, sl_bool flagRedraw)
+void ProgressBar::setHorizontal(sl_bool flagRedraw)
 {
-	if (value > m_value_max) {
-		value = m_value_max;
-	}
-	if (value < m_value_min) {
-		value = m_value_min;
-	}
-	if (Math::isAlmostZero(value - m_value)) {
-		m_value = value;
-		return;
-	}
-	m_value = value;
-	if (flagRedraw) {
-		invalidate();
-	}
+	setOrientation(LayoutOrientation::Horizontal, flagRedraw);
 }
 
-sl_progress_bar_value ProgressBar::getMinimumValue()
+float ProgressBar::getMinimumValue()
 {
 	return m_value_min;
 }
 
-void ProgressBar::setMinimumValue(sl_progress_bar_value value, sl_bool flagRedraw)
+void ProgressBar::setMinimumValue(float value, sl_bool flagRedraw)
 {
 	m_value_min = value;
 	setValue(m_value, sl_false);
@@ -118,12 +90,12 @@ void ProgressBar::setMinimumValue(sl_progress_bar_value value, sl_bool flagRedra
 	}
 }
 
-sl_progress_bar_value ProgressBar::getMaximumValue()
+float ProgressBar::getMaximumValue()
 {
 	return m_value_max;
 }
 
-void ProgressBar::setMaximumValue(sl_progress_bar_value value, sl_bool flagRedraw)
+void ProgressBar::setMaximumValue(float value, sl_bool flagRedraw)
 {
 	m_value_max = value;
 	setValue(m_value, sl_false);
@@ -132,85 +104,274 @@ void ProgressBar::setMaximumValue(sl_progress_bar_value value, sl_bool flagRedra
 	}
 }
 
-sl_progress_bar_value ProgressBar::getRange()
+float ProgressBar::getRange()
 {
-	sl_scroll_pos range = m_value_max - m_value_min;
+	float range = m_value_max - m_value_min;
 	if (range < 0) {
 		range = 0;
 	}
 	return range;
 }
 
-void ProgressBar::setRange(sl_progress_bar_value range, sl_bool flagRedraw)
+void ProgressBar::setRange(float range, sl_bool flagRedraw)
 {
 	setMaximumValue(m_value_min + range, flagRedraw);
 }
 
-Ref<Drawable> ProgressBar::getBar()
+float ProgressBar::getValue()
 {
-	return m_bar;
+	return m_value;
 }
 
-void ProgressBar::setBar(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void ProgressBar::setValue(float value, sl_bool flagRedraw)
 {
-	m_bar = drawable;
+	value = _refineValue(value);
+	if (Math::isAlmostZero(value - m_value)) {
+		m_value = value;
+		return;
+	}
+	m_value = value;
+	if (m_flagDualValues && value > m_value2) {
+		m_value2 = value;
+	}
 	if (flagRedraw) {
 		invalidate();
 	}
 }
 
-UIRect ProgressBar::getBarRegion()
+float ProgressBar::getSecondaryValue()
+{
+	return m_value2;
+}
+
+void ProgressBar::setSecondaryValue(float value, sl_bool flagRedraw)
+{
+	value = _refineValue(value);
+	if (Math::isAlmostZero(value - m_value2)) {
+		m_value2 = value;
+		return;
+	}
+	m_value2 = value;
+	if (m_flagDualValues && value < m_value) {
+		m_value = value;
+	}
+	if (flagRedraw) {
+		invalidate();
+	}
+}
+
+sl_bool ProgressBar::isDualValues()
+{
+	return m_flagDualValues;
+}
+
+void ProgressBar::setDualValues(sl_bool flagDualValues, sl_bool flagRedraw)
+{
+	m_flagDualValues = flagDualValues;
+	if (flagDualValues) {
+		if (m_value2 < m_value) {
+			m_value2 = m_value;
+		}
+	}
+	if (flagRedraw) {
+		invalidate();
+	}
+}
+
+sl_bool ProgressBar::isDiscrete()
+{
+	return m_flagDiscrete;
+}
+
+void ProgressBar::setDiscrete(sl_bool flagDiscrete)
+{
+	m_flagDiscrete = flagDiscrete;
+}
+
+float ProgressBar::getStep()
+{
+	return m_step;
+}
+
+void ProgressBar::setStep(float step)
+{
+	m_step = step;
+}
+
+sl_bool ProgressBar::isReversed()
+{
+	return m_flagReversed;
+}
+
+void ProgressBar::setReversed(sl_bool flagReversed, sl_bool flagRedraw)
+{
+	m_flagReversed = flagReversed;
+	if (flagRedraw) {
+		invalidate();
+	}
+}
+
+Ref<Drawable> ProgressBar::getTrackDrawable()
+{
+	return m_track;
+}
+
+void ProgressBar::setTrackDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+{
+	m_track = drawable;
+	if (flagRedraw) {
+		invalidate();
+	}
+}
+
+void ProgressBar::setTrackColor(const Color& color, sl_bool flagRedraw)
+{
+	setTrackDrawable(ColorDrawable::create(color), flagRedraw);
+}
+
+Ref<Drawable> ProgressBar::getProgressDrawable()
+{
+	return m_progress;
+}
+
+void ProgressBar::setProgressDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+{
+	m_progress = drawable;
+	if (flagRedraw) {
+		invalidate();
+	}
+}
+
+void ProgressBar::setProgressColor(const Color &color, sl_bool flagRedraw)
+{
+	setProgressDrawable(ColorDrawable::create(color), flagRedraw);
+}
+
+Ref<Drawable> ProgressBar::getSecondaryProgressDrawable()
+{
+	return m_progress2;
+}
+
+void ProgressBar::setSecondaryProgressDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+{
+	m_progress2 = drawable;
+	if (flagRedraw) {
+		invalidate();
+	}
+}
+
+void ProgressBar::setSecondaryProgressColor(const Color &color, sl_bool flagRedraw)
+{
+	setSecondaryProgressDrawable(ColorDrawable::create(color), flagRedraw);
+}
+
+void ProgressBar::onDraw(Canvas* canvas)
+{
+	Ref<Drawable> track = m_track;
+	if (track.isNotNull()) {
+		canvas->draw(getBoundsInnerPadding(), track);
+	}
+	Ref<Drawable> progress = m_progress;
+	Ref<Drawable> progress2 = m_progress2;
+	if (progress.isNotNull() || progress2.isNotNull()) {
+		UIRect rc, rc2;
+		_getProgressRegions(rc, rc2);
+		if (rc2.isValidSize()) {
+			canvas->draw(rc2, progress2);
+		}
+		if (rc.isValidSize()) {
+			canvas->draw(rc, progress);
+		}
+	}
+}
+
+float ProgressBar::_refineValue(float value)
+{
+	if (m_flagDiscrete) {
+		float step = _refineStep();
+		if (step > SLIB_EPSILON) {
+			value = (float)((int)((value - m_value_min) / step) * step + m_value_min);
+		}
+	}
+	if (value > m_value_max) {
+		value = m_value_max;
+	}
+	if (value < m_value_min) {
+		value = m_value_min;
+	}
+	return value;
+}
+
+float ProgressBar::_refineStep()
+{
+	sl_real step = m_step;
+	if (step > SLIB_EPSILON) {
+		return step;
+	}
+	float range = getRange();
+	if (m_flagDiscrete && range > 1) {
+		return 1;
+	} else {
+		step = getRange() / 20;
+	}
+	return step;
+}
+
+sl_ui_pos ProgressBar::_getPositionFromValue(float value)
 {
 	sl_ui_pos paddingLeft = getPaddingLeft();
 	sl_ui_pos paddingTop = getPaddingTop();
 	sl_ui_pos width = getWidth() - paddingLeft - getPaddingRight();
 	sl_ui_pos height = getHeight() - paddingTop - getPaddingBottom();
 	if (width <= 0 || height <= 0) {
-		return UIRect::zero();
+		return paddingLeft;
 	}
-	Alignment gravity = m_gravity;
-	LayoutOrientation orientation = m_orientation;
-	if (orientation == LayoutOrientation::Horizontal) {
-		sl_ui_pos barPos, barLen;
-		sl_progress_bar_value range = m_value_max - m_value_min;
-		if (range > SLIB_EPSILON) {
-			barLen = (sl_ui_pos)(width * (m_value - m_value_min) / range);
-		} else {
-			barLen = 0;
-		}
-		Alignment align = gravity & Alignment::HorizontalMask;
-		if (align == Alignment::Left) {
-			barPos = 0;
-		} else if (align == Alignment::Right) {
-			barPos = width - barLen;
-		} else {
-			barPos = (width - barLen) / 2;
-		}
-		return UIRect(paddingLeft + barPos, paddingTop, paddingLeft + barPos + barLen, paddingTop + height);
+	float range = m_value_max - m_value_min;
+	if (range < SLIB_EPSILON) {
+		return paddingLeft;
+	}
+	sl_ui_pos len, padding;
+	if (m_orientation == LayoutOrientation::Horizontal) {
+		len = width;
+		padding = paddingLeft;
 	} else {
-		sl_ui_pos barPos, barLen;
-		sl_progress_bar_value range = m_value_max - m_value_min;
-		if (range > SLIB_EPSILON) {
-			barLen = (sl_ui_pos)(height * (m_value - m_value_min) / range);
-		} else {
-			barLen = 0;
-		}
-		Alignment align = gravity & Alignment::VerticalMask;
-		if (align == Alignment::Top) {
-			barPos = 0;
-		} else if (align == Alignment::Bottom) {
-			barPos = height - barLen;
-		} else {
-			barPos = (height - barLen) / 2;
-		}
-		return UIRect(paddingLeft, paddingTop + barPos, paddingLeft + width, paddingTop + barPos + barLen);
+		len = height;
+		padding = paddingTop;
+	}
+	sl_ui_pos pos = (sl_ui_pos)(len * (value - m_value_min) / range);
+	if (m_flagReversed) {
+		return padding + len - pos;
+	} else {
+		return pos + padding;
 	}
 }
 
-void ProgressBar::onDraw(Canvas* canvas)
+void ProgressBar::_getProgressRegions(UIRect& outProgress, UIRect& outSecondaryProgress)
 {
-	drawBackground(canvas, getBackgroundColor(), getBackground());
-	canvas->draw(getBarRegion(), m_bar);
+	sl_ui_pos pos1 = _getPositionFromValue(m_value);
+	sl_ui_pos pos2 = 0;
+	if (m_value2 > m_value) {
+		pos2 = _getPositionFromValue(m_value2);
+	}
+	if (m_orientation == LayoutOrientation::Horizontal) {
+		outProgress.left = getPaddingLeft();
+		outProgress.right = pos1;
+		outProgress.top = getPaddingTop();
+		outProgress.bottom = getHeight() - getPaddingBottom();
+		outSecondaryProgress.left = outProgress.right;
+		outSecondaryProgress.right = pos2;
+		outSecondaryProgress.top = outProgress.top;
+		outSecondaryProgress.bottom = outProgress.bottom;
+	} else {
+		outProgress.top = getPaddingTop();
+		outProgress.bottom = pos1;
+		outProgress.left = getPaddingLeft();
+		outProgress.right = getWidth() - getPaddingRight();
+		outSecondaryProgress.top = outProgress.bottom;
+		outSecondaryProgress.bottom = pos2;
+		outSecondaryProgress.left = outProgress.left;
+		outSecondaryProgress.right = outProgress.right;
+	}
 }
 
 SLIB_UI_NAMESPACE_END

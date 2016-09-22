@@ -1,5 +1,8 @@
 #include "../../../inc/slib/graphics/util.h"
+
 #include "../../../inc/slib/core/math.h"
+#include "../../../inc/slib/graphics/canvas.h"
+#include "../../../inc/slib/graphics/drawable.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
@@ -65,6 +68,52 @@ Rectangle GraphicsUtil::transformRectangle(const Rectangle& rectTransform, const
 	ret.right = ret.left + w;
 	ret.bottom = ret.top + h;
 	return ret;
+}
+
+void GraphicsUtil::drawRepeat(Canvas* canvas, const Ref<Drawable>& source, sl_real _dx, sl_real _dy, sl_uint32 nRepeatX, sl_uint32 nRepeatY)
+{
+	if (source.isNull()) {
+		return;
+	}
+	sl_real sw = source->getDrawableWidth();
+	sl_real sh = source->getDrawableHeight();
+	if (sw < SLIB_EPSILON || sh <= SLIB_EPSILON) {
+		return;
+	}
+	Rectangle rectDraw;
+	Rectangle rectSrc;
+	sl_real dy = _dy;
+	for (sl_uint32 j = 0; j < nRepeatY; j++) {
+		if (j == 0) {
+			rectDraw.top = 0;
+			rectDraw.bottom = sh + dy;
+			rectSrc.top = -dy;
+			rectSrc.bottom = sh;
+		} else {
+			rectDraw.top = dy;
+			rectDraw.bottom = rectDraw.top + sh;
+			rectSrc.top = 0;
+			rectSrc.bottom = sh;
+		}
+		sl_real dx = _dx;
+		for (sl_uint32 i = 0; i < nRepeatX; i++) {
+			if (i == 0) {
+				rectDraw.left = 0;
+				rectDraw.right = sw + dx;
+				rectSrc.left = -dx;
+				rectSrc.right = sw;
+			} else {
+				rectDraw.left = dx;
+				rectDraw.right = rectDraw.left + sw;
+				rectSrc.left = 0;
+				rectSrc.right = sw;
+			}
+			canvas->draw(rectDraw, source, rectSrc);
+			dx += sw;
+		}
+		dy += sh;
+	}
+
 }
 
 SLIB_GRAPHICS_NAMESPACE_END

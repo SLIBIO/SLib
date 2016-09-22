@@ -19,9 +19,9 @@ TabView::TabView()
 	m_indexHover = -1;
 	
 	setBackgroundColor(Color::White, sl_false);
-	setBarBackgroundColor(Color(230, 230, 230));
-	setSelectedTabBackgroundColor(Color(150, 150, 150));
-	setHoverTabBackgroundColor(Color(210, 210, 210));
+	setBarBackground(Color(230, 230, 230));
+	setSelectedTabBackground(Color(150, 150, 150));
+	setHoverTabBackground(Color(210, 210, 210));
 	m_labelColor = Color(50, 50, 50);
 	m_selectedLabelColor = Color::Black;
 	m_hoverLabelColor = Color(0, 20, 250);
@@ -250,7 +250,7 @@ void TabView::setBarBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw
 	}
 }
 
-void TabView::setBarBackgroundColor(const Color& color, sl_bool flagRedraw)
+void TabView::setBarBackground(const Color& color, sl_bool flagRedraw)
 {
 	setBarBackground(Drawable::createColorDrawable(color), flagRedraw);
 }
@@ -268,7 +268,7 @@ void TabView::setContentBackground(const Ref<Drawable>& drawable, sl_bool flagRe
 	}
 }
 
-void TabView::setContentBackgroundColor(const Color& color, sl_bool flagRedraw)
+void TabView::setContentBackground(const Color& color, sl_bool flagRedraw)
 {
 	setContentBackground(Drawable::createColorDrawable(color));
 }
@@ -286,7 +286,7 @@ void TabView::setTabBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw
 	}
 }
 
-void TabView::setTabBackgroundColor(const Color& color, sl_bool flagRedraw)
+void TabView::setTabBackground(const Color& color, sl_bool flagRedraw)
 {
 	setTabBackground(Drawable::createColorDrawable(color), flagRedraw);
 }
@@ -304,7 +304,7 @@ void TabView::setSelectedTabBackground(const Ref<Drawable>& drawable, sl_bool fl
 	}
 }
 
-void TabView::setSelectedTabBackgroundColor(const Color& color, sl_bool flagRedraw)
+void TabView::setSelectedTabBackground(const Color& color, sl_bool flagRedraw)
 {
 	setSelectedTabBackground(Drawable::createColorDrawable(color), flagRedraw);
 }
@@ -322,7 +322,7 @@ void TabView::setHoverTabBackground(const Ref<Drawable>& drawable, sl_bool flagR
 	}
 }
 
-void TabView::setHoverTabBackgroundColor(const Color& color, sl_bool flagRedraw)
+void TabView::setHoverTabBackground(const Color& color, sl_bool flagRedraw)
 {
 	setHoverTabBackground(Drawable::createColorDrawable(color), flagRedraw);
 }

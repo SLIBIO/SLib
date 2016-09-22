@@ -359,60 +359,72 @@ void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleMo
 		sl_real dh = rectDst.getHeight();
 		sl_real sw = source->getDrawableWidth();
 		sl_real sh = source->getDrawableHeight();
-		if (dw > 0 && dh > 0 && sw > 0 && sh > 0) {
+		if (dw > SLIB_EPSILON && dh > SLIB_EPSILON && sw > SLIB_EPSILON && sh > SLIB_EPSILON) {
 			Rectangle rectSrc;
 			Rectangle rectDraw;
-			if (scaleMode == ScaleMode::Contain) {
-				sl_real fw = dw / sw;
-				sl_real fh = dh / sh;
-				sl_real tw, th;
-				if (fw > fh) {
-					th = dh;
-					tw = sw * fh;
-				} else {
-					tw = dw;
-					th = sh * fw;
-				}
-				rectSrc.left = 0;
-				rectSrc.top = 0;
-				rectSrc.right = sw;
-				rectSrc.bottom = sh;
-				Point pt = GraphicsUtil::calculateAlignPosition(rectDst, tw, th, alignment);
-				rectDraw.left = pt.x;
-				rectDraw.top = pt.y;
-				rectDraw.right = rectDraw.left + tw;
-				rectDraw.bottom = rectDraw.top + th;
-			} else if (scaleMode == ScaleMode::Cover) {
-				sl_real fw = sw / dw;
-				sl_real fh = sh / dh;
-				sl_real tw, th;
-				if (fw > fh) {
-					th = sh;
-					tw = dw * fh;
-				} else {
-					tw = sw;
-					th = dh * fw;
-				}
-				rectSrc.left = 0;
-				rectSrc.top = 0;
-				rectSrc.right = sw;
-				rectSrc.bottom = sh;
-				Point pt = GraphicsUtil::calculateAlignPosition(rectSrc, tw, th, alignment);
-				rectSrc.left = pt.x;
-				rectSrc.top = pt.y;
-				rectSrc.right = rectSrc.left + tw;
-				rectSrc.bottom = rectSrc.top + th;
-				rectDraw = rectDst;
-			} else {
-				rectSrc.left = 0;
-				rectSrc.top = 0;
-				rectSrc.right = sw;
-				rectSrc.bottom = sh;
-				Point pt = GraphicsUtil::calculateAlignPosition(rectDst, sw, sh, alignment);
-				rectDraw.left = pt.x;
-				rectDraw.top = pt.y;
-				rectDraw.right = rectDraw.left + sw;
-				rectDraw.bottom = rectDraw.top + sh;
+			switch (scaleMode) {
+				case ScaleMode::None:
+					{
+						rectSrc.left = 0;
+						rectSrc.top = 0;
+						rectSrc.right = sw;
+						rectSrc.bottom = sh;
+						Point pt = GraphicsUtil::calculateAlignPosition(rectDst, sw, sh, alignment);
+						rectDraw.left = pt.x;
+						rectDraw.top = pt.y;
+						rectDraw.right = rectDraw.left + sw;
+						rectDraw.bottom = rectDraw.top + sh;
+						break;
+					}
+				case ScaleMode::Stretch:
+					return;
+				case ScaleMode::Contain:
+					{
+						sl_real fw = dw / sw;
+						sl_real fh = dh / sh;
+						sl_real tw, th;
+						if (fw > fh) {
+							th = dh;
+							tw = sw * fh;
+						} else {
+							tw = dw;
+							th = sh * fw;
+						}
+						rectSrc.left = 0;
+						rectSrc.top = 0;
+						rectSrc.right = sw;
+						rectSrc.bottom = sh;
+						Point pt = GraphicsUtil::calculateAlignPosition(rectDst, tw, th, alignment);
+						rectDraw.left = pt.x;
+						rectDraw.top = pt.y;
+						rectDraw.right = rectDraw.left + tw;
+						rectDraw.bottom = rectDraw.top + th;
+						break;
+					}
+				case ScaleMode::Cover:
+					{
+						sl_real fw = sw / dw;
+						sl_real fh = sh / dh;
+						sl_real tw, th;
+						if (fw > fh) {
+							th = sh;
+							tw = dw * fh;
+						} else {
+							tw = sw;
+							th = dh * fw;
+						}
+						rectSrc.left = 0;
+						rectSrc.top = 0;
+						rectSrc.right = sw;
+						rectSrc.bottom = sh;
+						Point pt = GraphicsUtil::calculateAlignPosition(rectSrc, tw, th, alignment);
+						rectSrc.left = pt.x;
+						rectSrc.top = pt.y;
+						rectSrc.right = rectSrc.left + tw;
+						rectSrc.bottom = rectSrc.top + th;
+						rectDraw = rectDst;
+						break;
+					}
 			}
 			canvas->draw(rectDraw, source, rectSrc);
 		}

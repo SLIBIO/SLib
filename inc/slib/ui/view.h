@@ -238,9 +238,9 @@ public:
 	Ref<View> getFocusedChild();
 	
 	
-	sl_bool isDownState();
+	sl_bool isPressedState();
 	
-	virtual void setDownState(sl_bool flagState, sl_bool flagRedraw = sl_true);
+	virtual void setPressedState(sl_bool flagState, sl_bool flagRedraw = sl_true);
 	
 	sl_bool isHoverState();
 	
@@ -569,6 +569,14 @@ public:
 	
 	virtual void setBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
 	
+	Ref<Drawable> getPressedBackground();
+	
+	virtual void setPressedBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	
+	Ref<Drawable> getHoverBackground();
+	
+	virtual void setHoverBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	
 	ScaleMode getBackgroundScaleMode();
 	
 	virtual void setBackgroundScaleMode(ScaleMode mode, sl_bool flagRedraw = sl_true);
@@ -610,6 +618,10 @@ public:
 	void setRoundRectBoundShapeRadius(const Size& radius, sl_bool flagRedraw = sl_true);
 	
 	void setRoundRectBoundShapeRadius(sl_real rx, sl_real ry, sl_bool flagRedraw = sl_true);
+	
+	void setRoundRectBoundShapeRadiusX(sl_real rx, sl_bool flagRedraw = sl_true);
+	
+	void setRoundRectBoundShapeRadiusY(sl_real ry, sl_bool flagRedraw = sl_true);
 	
 	void setRoundRectBoundShapeRadius(sl_real radius, sl_bool flagRedraw = sl_true);
 	
@@ -967,7 +979,7 @@ private:
 	sl_bool m_flagFocusable;
 
 	sl_bool m_flagFocused;
-	sl_bool m_flagDown;
+	sl_bool m_flagPressed;
 	sl_bool m_flagHover;
 	sl_bool m_flagOccurringClick;
 	
@@ -1067,6 +1079,8 @@ private:
 	{
 	public:
 		SafeRef<Drawable> background;
+		SafeRef<Drawable> backgroundPressed;
+		SafeRef<Drawable> backgroundHover;
 		ScaleMode backgroundScaleMode;
 		Alignment backgroundAlignment;
 		Color backgroundColor;
