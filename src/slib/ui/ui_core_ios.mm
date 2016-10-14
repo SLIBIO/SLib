@@ -19,7 +19,7 @@ class _iOS_Screen : public Screen
 {
 public:
 	UIScreen* m_screen;
-	UIRect m_region;
+	CGRect m_rect;
 	
 public:
 	static Ref<_iOS_Screen> create(UIScreen* screen)
@@ -29,14 +29,7 @@ public:
 			ret = new _iOS_Screen();
 			if (ret.isNotNull()) {
 				ret->m_screen = screen;
-				UIRect region;
-				CGRect rect = [screen bounds];
-				region.left = (sl_ui_pos)(rect.origin.x);
-				region.top = (sl_ui_pos)(rect.origin.y);
-				region.setWidth((sl_ui_pos)(rect.size.width));
-				region.setHeight((sl_ui_pos)(rect.size.height));
-				region.fixSizeError();
-				ret->m_region = region;
+				ret->m_rect = [screen bounds];
 			}
 		}
 		return ret;
@@ -56,7 +49,13 @@ public:
     // override
     UIRect getRegion()
 	{
-		return m_region;
+		CGFloat f = UIPlatform::getGlobalScaleFactor();
+		UIRect region;
+		region.left = (sl_ui_pos)(m_rect.origin.x * f);
+		region.top = (sl_ui_pos)(m_rect.origin.y * f);
+		region.setWidth((sl_ui_pos)(m_rect.size.width * f));
+		region.setHeight((sl_ui_pos)(m_rect.size.height * f));
+		return region;
 	}	
 
 };
@@ -137,21 +136,6 @@ void UIPlatform::quitApp()
 {
 }
 
-UIColor* UIPlatform::getUIColorFromColor(const Color& color)
-{
-	return [UIColor colorWithRed:color.getRedF() green:color.getGreenF() blue:color.getBlueF() alpha:color.getAlphaF()];
-}
-
-Color UIPlatform::getColorFromUIColor(UIColor* color)
-{
-	if (color == nil) {
-		return Color::zero();
-	}
-	CGFloat red, green, blue, alpha;
-	[color getRed:&red green:&green blue:&blue alpha:&alpha];
-	return Color4f((sl_real)red, (sl_real)green, (sl_real)blue, (sl_real)alpha);
-}
-
 __weak UIWindow* _g_slib_ios_keyWindow = nil;
 UIWindow* UIPlatform::getMainWindow()
 {
@@ -182,6 +166,28 @@ UIWindow* UIPlatform::getKeyWindow()
 void UIPlatform::setKeyWindow(UIWindow *window)
 {
 	_g_slib_ios_keyWindow = window;
+}
+
+CGFloat _g_slib_ios_global_scale_factor = 0;
+
+CGFloat UIPlatform::getGlobalScaleFactor()
+{
+	if (_g_slib_ios_global_scale_factor == 0) {
+		UIScreen* screen = _iOS_Screen::getPrimaryScreen();
+		if (screen != nil) {
+			CGFloat f = screen.nativeScale;
+			_g_slib_ios_global_scale_factor = f;
+			return f;
+		} else {
+			return 1;
+		}
+	}
+	return _g_slib_ios_global_scale_factor;
+}
+
+void UIPlatform::setGlobalScaleFactor(CGFloat factor)
+{
+	_g_slib_ios_global_scale_factor = factor;
 }
 
 SLIB_UI_NAMESPACE_END

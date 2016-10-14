@@ -6,14 +6,14 @@ import android.graphics.Region;
 
 public class UiPath {
 	
-	public final static int FILL_ALTERNATE = 0;
-	public final static int FILL_WINDING = 1;
+	public final static int FILL_WINDING = 0;
+	public final static int FILL_ALTERNATE = 1;
 	
 	public static Path.FillType getFillType(int type) {
-		if (type == 0) {
-			return Path.FillType.EVEN_ODD;
-		} else {
+		if (type == FILL_WINDING) {
 			return Path.FillType.WINDING;
+		} else {
+			return Path.FillType.EVEN_ODD;
 		}
 	}
 
@@ -27,7 +27,7 @@ public class UiPath {
 	
 	public UiPath() {
 		path = new android.graphics.Path();
-		path.setFillType(Path.FillType.EVEN_ODD);
+		path.setFillType(Path.FillType.WINDING);
 	}
 	
 	public void setFillMode(int mode) {

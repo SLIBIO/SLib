@@ -54,7 +54,6 @@
 		266DD4921C1193C400D47AB0 /* drawable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4821C1193C400D47AB0 /* drawable.cpp */; };
 		266DD4931C1193C400D47AB0 /* font_freetype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4831C1193C400D47AB0 /* font_freetype.cpp */; };
 		266DD4941C1193C400D47AB0 /* font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4841C1193C400D47AB0 /* font.cpp */; };
-		266DD4951C1193C400D47AB0 /* graphics_context.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4851C1193C400D47AB0 /* graphics_context.cpp */; };
 		266DD4961C1193C400D47AB0 /* graphics_path.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4861C1193C400D47AB0 /* graphics_path.cpp */; };
 		266DD4971C1193C400D47AB0 /* graphics_util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4871C1193C400D47AB0 /* graphics_util.cpp */; };
 		266DD4981C1193C400D47AB0 /* image_jpeg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4881C1193C400D47AB0 /* image_jpeg.cpp */; };
@@ -122,18 +121,14 @@
 		266DD58B1C11940A00D47AB0 /* vertex_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4E81C11940A00D47AB0 /* vertex_buffer.cpp */; };
 		266DD58C1C11940A00D47AB0 /* button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4EA1C11940A00D47AB0 /* button.cpp */; };
 		266DD58F1C11940A00D47AB0 /* button_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4ED1C11940A00D47AB0 /* button_osx.mm */; };
-		266DD5931C11940A00D47AB0 /* canvas_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4F11C11940A00D47AB0 /* canvas_quartz.mm */; };
 		266DD5941C11940A00D47AB0 /* check_box.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4F21C11940A00D47AB0 /* check_box.cpp */; };
 		266DD5951C11940A00D47AB0 /* check_box_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4F31C11940A00D47AB0 /* check_box_osx.mm */; };
 		266DD5971C11940A00D47AB0 /* cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4F51C11940A00D47AB0 /* cursor.cpp */; };
 		266DD5981C11940A00D47AB0 /* cursor_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4F61C11940A00D47AB0 /* cursor_osx.mm */; };
-		266DD59C1C11940A00D47AB0 /* drawable_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4FA1C11940A00D47AB0 /* drawable_quartz.mm */; };
 		266DD59D1C11940A00D47AB0 /* select_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4FB1C11940A00D47AB0 /* select_view.cpp */; };
 		266DD5A01C11940A00D47AB0 /* select_view_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4FE1C11940A00D47AB0 /* select_view_osx.mm */; };
 		266DD5A21C11940A00D47AB0 /* edit_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5001C11940A00D47AB0 /* edit_view.cpp */; };
 		266DD5A51C11940A00D47AB0 /* edit_view_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5031C11940A00D47AB0 /* edit_view_osx.mm */; };
-		266DD5A81C11940A00D47AB0 /* font_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5061C11940A00D47AB0 /* font_apple.mm */; };
-		266DD5AD1C11940A00D47AB0 /* graphics_path_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD50B1C11940A00D47AB0 /* graphics_path_quartz.mm */; };
 		266DD5AE1C11940A00D47AB0 /* label_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD50C1C11940A00D47AB0 /* label_view.cpp */; };
 		266DD5B11C11940A00D47AB0 /* label_view_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD50F1C11940A00D47AB0 /* label_view_osx.mm */; };
 		266DD5B31C11940A00D47AB0 /* list_report_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5111C11940A00D47AB0 /* list_report_view.cpp */; };
@@ -151,7 +146,6 @@
 		266DD5D01C11940A00D47AB0 /* ui_core_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD52E1C11940A00D47AB0 /* ui_core_osx.mm */; };
 		266DD5D21C11940A00D47AB0 /* ui_event.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5301C11940A00D47AB0 /* ui_event.cpp */; };
 		266DD5D51C11940A00D47AB0 /* ui_event_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5331C11940A00D47AB0 /* ui_event_osx.mm */; };
-		266DD5D71C11940A00D47AB0 /* ui_graphics_context.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5351C11940A00D47AB0 /* ui_graphics_context.cpp */; };
 		266DD5D81C11940A00D47AB0 /* view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5361C11940A00D47AB0 /* view.cpp */; };
 		266DD5DE1C11940A00D47AB0 /* view_osx.h in Headers */ = {isa = PBXBuildFile; fileRef = 266DD53C1C11940A00D47AB0 /* view_osx.h */; };
 		266DD5DF1C11940A00D47AB0 /* view_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD53D1C11940A00D47AB0 /* view_osx.mm */; };
@@ -203,7 +197,14 @@
 		26E376DD1C9865EF00B178E6 /* matrix2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E376DC1C9865EF00B178E6 /* matrix2.cpp */; };
 		26E376DF1C98739200B178E6 /* matrix3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E376DE1C98739200B178E6 /* matrix3.cpp */; };
 		26E376E11C987F6200B178E6 /* matrix4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E376E01C987F6200B178E6 /* matrix4.cpp */; };
+		26F900651D994ED0001A6EE9 /* animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F900641D994ED0001A6EE9 /* animation.cpp */; };
 		26FA807C1C98891B0074F76B /* quaternion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FA807B1C98891B0074F76B /* quaternion.cpp */; };
+		26FBDE511DA2B3EC00FF1B55 /* canvas_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26FBDE4E1DA2B3EC00FF1B55 /* canvas_quartz.mm */; };
+		26FBDE571DA2B3F700FF1B55 /* drawable_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26FBDE541DA2B3F700FF1B55 /* drawable_quartz.mm */; };
+		26FBDE5D1DA2B40700FF1B55 /* font_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26FBDE591DA2B40700FF1B55 /* font_apple.mm */; };
+		26FBDE651DA2B41700FF1B55 /* graphics_path_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26FBDE621DA2B41700FF1B55 /* graphics_path_quartz.mm */; };
+		26FBDE671DA2B48800FF1B55 /* bitmap_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26FBDE661DA2B48800FF1B55 /* bitmap_quartz.mm */; };
+		26FBDE691DA2BDE900FF1B55 /* graphics_platform_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26FBDE681DA2BDE900FF1B55 /* graphics_platform_apple.mm */; };
 		A21C166B1BA74E8F006B1FA1 /* algorithm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A21C166A1BA74E8F006B1FA1 /* algorithm.cpp */; };
 		A234D6EB1B3F12A600ADDF4E /* content_type.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A234D6EA1B3F12A600ADDF4E /* content_type.cpp */; };
 		A24142F91BA8603300D7AB80 /* thirdparty_soil2.c in Sources */ = {isa = PBXBuildFile; fileRef = A24142F81BA8603300D7AB80 /* thirdparty_soil2.c */; settings = {COMPILER_FLAGS = "-O3 -Wno-conversion"; }; };
@@ -298,7 +299,6 @@
 		266DD4821C1193C400D47AB0 /* drawable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = drawable.cpp; sourceTree = "<group>"; };
 		266DD4831C1193C400D47AB0 /* font_freetype.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = font_freetype.cpp; sourceTree = "<group>"; };
 		266DD4841C1193C400D47AB0 /* font.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = font.cpp; sourceTree = "<group>"; };
-		266DD4851C1193C400D47AB0 /* graphics_context.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graphics_context.cpp; sourceTree = "<group>"; };
 		266DD4861C1193C400D47AB0 /* graphics_path.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graphics_path.cpp; sourceTree = "<group>"; };
 		266DD4871C1193C400D47AB0 /* graphics_util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graphics_util.cpp; sourceTree = "<group>"; };
 		266DD4881C1193C400D47AB0 /* image_jpeg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = image_jpeg.cpp; sourceTree = "<group>"; };
@@ -366,18 +366,14 @@
 		266DD4E81C11940A00D47AB0 /* vertex_buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vertex_buffer.cpp; sourceTree = "<group>"; };
 		266DD4EA1C11940A00D47AB0 /* button.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = button.cpp; sourceTree = "<group>"; };
 		266DD4ED1C11940A00D47AB0 /* button_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = button_osx.mm; sourceTree = "<group>"; };
-		266DD4F11C11940A00D47AB0 /* canvas_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = canvas_quartz.mm; sourceTree = "<group>"; };
 		266DD4F21C11940A00D47AB0 /* check_box.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = check_box.cpp; sourceTree = "<group>"; };
 		266DD4F31C11940A00D47AB0 /* check_box_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = check_box_osx.mm; sourceTree = "<group>"; };
 		266DD4F51C11940A00D47AB0 /* cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cursor.cpp; sourceTree = "<group>"; };
 		266DD4F61C11940A00D47AB0 /* cursor_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = cursor_osx.mm; sourceTree = "<group>"; };
-		266DD4FA1C11940A00D47AB0 /* drawable_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = drawable_quartz.mm; sourceTree = "<group>"; };
 		266DD4FB1C11940A00D47AB0 /* select_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = select_view.cpp; sourceTree = "<group>"; };
 		266DD4FE1C11940A00D47AB0 /* select_view_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = select_view_osx.mm; sourceTree = "<group>"; };
 		266DD5001C11940A00D47AB0 /* edit_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = edit_view.cpp; sourceTree = "<group>"; };
 		266DD5031C11940A00D47AB0 /* edit_view_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = edit_view_osx.mm; sourceTree = "<group>"; };
-		266DD5061C11940A00D47AB0 /* font_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = font_apple.mm; sourceTree = "<group>"; };
-		266DD50B1C11940A00D47AB0 /* graphics_path_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = graphics_path_quartz.mm; sourceTree = "<group>"; };
 		266DD50C1C11940A00D47AB0 /* label_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = label_view.cpp; sourceTree = "<group>"; };
 		266DD50F1C11940A00D47AB0 /* label_view_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = label_view_osx.mm; sourceTree = "<group>"; };
 		266DD5111C11940A00D47AB0 /* list_report_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list_report_view.cpp; sourceTree = "<group>"; };
@@ -395,7 +391,6 @@
 		266DD52E1C11940A00D47AB0 /* ui_core_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_core_osx.mm; sourceTree = "<group>"; };
 		266DD5301C11940A00D47AB0 /* ui_event.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_event.cpp; sourceTree = "<group>"; };
 		266DD5331C11940A00D47AB0 /* ui_event_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_event_osx.mm; sourceTree = "<group>"; };
-		266DD5351C11940A00D47AB0 /* ui_graphics_context.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_graphics_context.cpp; sourceTree = "<group>"; };
 		266DD5361C11940A00D47AB0 /* view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view.cpp; sourceTree = "<group>"; };
 		266DD53C1C11940A00D47AB0 /* view_osx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = view_osx.h; sourceTree = "<group>"; };
 		266DD53D1C11940A00D47AB0 /* view_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = view_osx.mm; sourceTree = "<group>"; };
@@ -447,7 +442,14 @@
 		26E376DC1C9865EF00B178E6 /* matrix2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix2.cpp; sourceTree = "<group>"; };
 		26E376DE1C98739200B178E6 /* matrix3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix3.cpp; sourceTree = "<group>"; };
 		26E376E01C987F6200B178E6 /* matrix4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix4.cpp; sourceTree = "<group>"; };
+		26F900641D994ED0001A6EE9 /* animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = animation.cpp; sourceTree = "<group>"; };
 		26FA807B1C98891B0074F76B /* quaternion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = quaternion.cpp; sourceTree = "<group>"; };
+		26FBDE4E1DA2B3EC00FF1B55 /* canvas_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = canvas_quartz.mm; sourceTree = "<group>"; };
+		26FBDE541DA2B3F700FF1B55 /* drawable_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = drawable_quartz.mm; sourceTree = "<group>"; };
+		26FBDE591DA2B40700FF1B55 /* font_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = font_apple.mm; sourceTree = "<group>"; };
+		26FBDE621DA2B41700FF1B55 /* graphics_path_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = graphics_path_quartz.mm; sourceTree = "<group>"; };
+		26FBDE661DA2B48800FF1B55 /* bitmap_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = bitmap_quartz.mm; sourceTree = "<group>"; };
+		26FBDE681DA2BDE900FF1B55 /* graphics_platform_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = graphics_platform_apple.mm; sourceTree = "<group>"; };
 		28CE36521A0FEDC600AB513C /* libslib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libslib.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A21C166A1BA74E8F006B1FA1 /* algorithm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = algorithm.cpp; sourceTree = "<group>"; };
 		A234D6EA1B3F12A600ADDF4E /* content_type.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = content_type.cpp; sourceTree = "<group>"; };
@@ -606,18 +608,14 @@
 				266DD4EA1C11940A00D47AB0 /* button.cpp */,
 				266DD4ED1C11940A00D47AB0 /* button_osx.mm */,
 				2688DD861C16FBDF00973672 /* camera_view.cpp */,
-				266DD4F11C11940A00D47AB0 /* canvas_quartz.mm */,
 				266DD4F21C11940A00D47AB0 /* check_box.cpp */,
 				266DD4F31C11940A00D47AB0 /* check_box_osx.mm */,
 				2649C2341CBBCB54003E7561 /* common_dialogs.cpp */,
 				2649C2361CBBCB7E003E7561 /* common_dialogs_osx.mm */,
 				266DD4F51C11940A00D47AB0 /* cursor.cpp */,
 				266DD4F61C11940A00D47AB0 /* cursor_osx.mm */,
-				266DD4FA1C11940A00D47AB0 /* drawable_quartz.mm */,
 				266DD5001C11940A00D47AB0 /* edit_view.cpp */,
 				266DD5031C11940A00D47AB0 /* edit_view_osx.mm */,
-				266DD5061C11940A00D47AB0 /* font_apple.mm */,
-				266DD50B1C11940A00D47AB0 /* graphics_path_quartz.mm */,
 				266DD51E1C11940A00D47AB0 /* image_view.cpp */,
 				266DD50C1C11940A00D47AB0 /* label_view.cpp */,
 				266DD50F1C11940A00D47AB0 /* label_view_osx.mm */,
@@ -647,7 +645,6 @@
 				266DD52E1C11940A00D47AB0 /* ui_core_osx.mm */,
 				266DD5301C11940A00D47AB0 /* ui_event.cpp */,
 				266DD5331C11940A00D47AB0 /* ui_event_osx.mm */,
-				266DD5351C11940A00D47AB0 /* ui_graphics_context.cpp */,
 				264A5D7B1CB6C9BF00FB0B08 /* ui_menu.cpp */,
 				264A5D7D1CB6C9C800FB0B08 /* ui_menu_osx.mm */,
 				2648D57F1D0999F700819E09 /* ui_platform.cpp */,
@@ -671,14 +668,19 @@
 				266DD47E1C1193C400D47AB0 /* bitmap.cpp */,
 				26B0AF831C13E08600CD8673 /* bitmap_data.cpp */,
 				26B0AF841C13E08600CD8673 /* bitmap_format.cpp */,
+				26FBDE661DA2B48800FF1B55 /* bitmap_quartz.mm */,
 				266DD47F1C1193C400D47AB0 /* brush.cpp */,
 				266DD4801C1193C400D47AB0 /* canvas.cpp */,
+				26FBDE4E1DA2B3EC00FF1B55 /* canvas_quartz.mm */,
 				266DD4811C1193C400D47AB0 /* color.cpp */,
 				266DD4821C1193C400D47AB0 /* drawable.cpp */,
+				26FBDE541DA2B3F700FF1B55 /* drawable_quartz.mm */,
 				266DD4841C1193C400D47AB0 /* font.cpp */,
+				26FBDE591DA2B40700FF1B55 /* font_apple.mm */,
 				266DD4831C1193C400D47AB0 /* font_freetype.cpp */,
-				266DD4851C1193C400D47AB0 /* graphics_context.cpp */,
 				266DD4861C1193C400D47AB0 /* graphics_path.cpp */,
+				26FBDE621DA2B41700FF1B55 /* graphics_path_quartz.mm */,
+				26FBDE681DA2BDE900FF1B55 /* graphics_platform_apple.mm */,
 				2666122A1D2A44280081F26E /* graphics_resource.cpp */,
 				266DD4871C1193C400D47AB0 /* graphics_util.cpp */,
 				266DD4881C1193C400D47AB0 /* image_jpeg.cpp */,
@@ -766,6 +768,7 @@
 			isa = PBXGroup;
 			children = (
 				A21C166A1BA74E8F006B1FA1 /* algorithm.cpp */,
+				26F900641D994ED0001A6EE9 /* animation.cpp */,
 				A25F2F9C1B03A33700854DAF /* app.cpp */,
 				262041261C8895C900AF48F2 /* array.cpp */,
 				260272E51C81877F0079E2F2 /* asset.cpp */,
@@ -968,17 +971,16 @@
 				26483B2C1C99D8F3009075BF /* yuv.cpp in Sources */,
 				266DD5781C11940A00D47AB0 /* socket_event.cpp in Sources */,
 				266DD5B41C11940A00D47AB0 /* list_report_view_osx.mm in Sources */,
-				266DD5A81C11940A00D47AB0 /* font_apple.mm in Sources */,
 				266DD5B91C11940A00D47AB0 /* render_view.cpp in Sources */,
 				266DD4581C1192E800D47AB0 /* url.cpp in Sources */,
 				A2DE1D891B383BA600A74698 /* pipe.cpp in Sources */,
 				2648D5461D096A8B00819E09 /* ui_app.cpp in Sources */,
+				26F900651D994ED0001A6EE9 /* animation.cpp in Sources */,
 				266DD5641C11940A00D47AB0 /* http_client.cpp in Sources */,
 				266DD5811C11940A00D47AB0 /* opengl_gles.cpp in Sources */,
 				266DD4A11C1193DB00D47AB0 /* bigint.cpp in Sources */,
 				26AE7C081C99B3290026C2D9 /* transform3d.cpp in Sources */,
 				266DD5861C11940A00D47AB0 /* render_engine.cpp in Sources */,
-				266DD5931C11940A00D47AB0 /* canvas_quartz.mm in Sources */,
 				A234D6EB1B3F12A600ADDF4E /* content_type.cpp in Sources */,
 				26D3A1A41C85894A00FB8DBD /* resource.cpp in Sources */,
 				2649C2351CBBCB54003E7561 /* common_dialogs.cpp in Sources */,
@@ -1042,7 +1044,6 @@
 				266DD4991C1193C400D47AB0 /* image_png.cpp in Sources */,
 				266DD5511C11940A00D47AB0 /* audio_player_osx.mm in Sources */,
 				266DD58F1C11940A00D47AB0 /* button_osx.mm in Sources */,
-				266DD5D71C11940A00D47AB0 /* ui_graphics_context.cpp in Sources */,
 				26CA8D791C23B4C90049A658 /* system_apple.mm in Sources */,
 				2688DD851C16F6E200973672 /* video_view.cpp in Sources */,
 				266DD56F1C11940A00D47AB0 /* network_async.cpp in Sources */,
@@ -1051,6 +1052,7 @@
 				264A5D7C1CB6C9BF00FB0B08 /* ui_menu.cpp in Sources */,
 				A2C8BE391AFA832800D584D1 /* thirdparty_zlib.c in Sources */,
 				A25F30231B03A33700854DAF /* reference.cpp in Sources */,
+				26FBDE651DA2B41700FF1B55 /* graphics_path_quartz.mm in Sources */,
 				266DD57F1C11940A00D47AB0 /* opengl_gl.cpp in Sources */,
 				266DD54A1C11940A00D47AB0 /* audio_codec.cpp in Sources */,
 				260A402E1D2AAAD8009CFCE8 /* render_resource.cpp in Sources */,
@@ -1069,13 +1071,13 @@
 				A25F300C1B03A33700854DAF /* app.cpp in Sources */,
 				26FA807C1C98891B0074F76B /* quaternion.cpp in Sources */,
 				268D4F2E1C89FBF4000D9691 /* queue.cpp in Sources */,
+				26FBDE5D1DA2B40700FF1B55 /* font_apple.mm in Sources */,
 				2666122B1D2A44280081F26E /* graphics_resource.cpp in Sources */,
 				266DD48E1C1193C400D47AB0 /* bitmap.cpp in Sources */,
 				266DD57C1C11940A00D47AB0 /* index_buffer.cpp in Sources */,
 				266DD49A1C1193C400D47AB0 /* image_soil2.cpp in Sources */,
 				266DD5DF1C11940A00D47AB0 /* view_osx.mm in Sources */,
 				A25F301E1B03A33700854DAF /* mutex.cpp in Sources */,
-				266DD4951C1193C400D47AB0 /* graphics_context.cpp in Sources */,
 				266DD5571C11940A00D47AB0 /* audio_recorder_opensl_es.cpp in Sources */,
 				266DD5D81C11940A00D47AB0 /* view.cpp in Sources */,
 				26A4ECCF1CFE7FB700288A0B /* tree_view.cpp in Sources */,
@@ -1088,7 +1090,6 @@
 				26694BF91C9B2CBC0047E67C /* arp.cpp in Sources */,
 				26AE7C001C9939210026C2D9 /* view_frustum.cpp in Sources */,
 				26AE7C061C99AF9D0026C2D9 /* transform2d.cpp in Sources */,
-				266DD5AD1C11940A00D47AB0 /* graphics_path_quartz.mm in Sources */,
 				A2774E0C1B1A005B00538A7B /* pointer.cpp in Sources */,
 				A25F300D1B03A33700854DAF /* async.cpp in Sources */,
 				A25F30141B03A33700854DAF /* base.cpp in Sources */,
@@ -1098,11 +1099,11 @@
 				266DD4911C1193C400D47AB0 /* color.cpp in Sources */,
 				AECCC4B11B0F064D002B0284 /* thirdparty_libvpx_enc.c in Sources */,
 				A25F301C1B03A33700854DAF /* log.cpp in Sources */,
-				266DD59C1C11940A00D47AB0 /* drawable_quartz.mm in Sources */,
 				266DD58C1C11940A00D47AB0 /* button.cpp in Sources */,
 				266DD4971C1193C400D47AB0 /* graphics_util.cpp in Sources */,
 				A25F30271B03A33700854DAF /* spinlock.cpp in Sources */,
 				266DD5D51C11940A00D47AB0 /* ui_event_osx.mm in Sources */,
+				26FBDE671DA2B48800FF1B55 /* bitmap_quartz.mm in Sources */,
 				266DD5B71C11940A00D47AB0 /* radio_button_osx.mm in Sources */,
 				260A40301D2AAAE3009CFCE8 /* ui_resource.cpp in Sources */,
 				A24142F91BA8603300D7AB80 /* thirdparty_soil2.c in Sources */,
@@ -1133,6 +1134,7 @@
 				A2DE1D7F1B383B7900A74698 /* java.cpp in Sources */,
 				A2C8BE381AFA832800D584D1 /* thirdparty_sqlite3.c in Sources */,
 				266DD5601C11940A00D47AB0 /* video_capture.cpp in Sources */,
+				26FBDE691DA2BDE900FF1B55 /* graphics_platform_apple.mm in Sources */,
 				26DA34FA1C4B47CF004DC204 /* video_frame.cpp in Sources */,
 				A25F302A1B03A33700854DAF /* system.cpp in Sources */,
 				26AE7C041C99ABD70026C2D9 /* bezier.cpp in Sources */,
@@ -1140,6 +1142,7 @@
 				266DD5631C11940A00D47AB0 /* ethernet.cpp in Sources */,
 				2649C2371CBBCB7E003E7561 /* common_dialogs_osx.mm in Sources */,
 				26AE7BFC1C99329B0026C2D9 /* triangle.cpp in Sources */,
+				26FBDE571DA2B3F700FF1B55 /* drawable_quartz.mm in Sources */,
 				266DD5661C11940A00D47AB0 /* http_proxy.cpp in Sources */,
 				266DD5CD1C11940A00D47AB0 /* ui_core.cpp in Sources */,
 				266DD4931C1193C400D47AB0 /* font_freetype.cpp in Sources */,
@@ -1161,6 +1164,7 @@
 				266DD5551C11940A00D47AB0 /* audio_recorder_dsound.cpp in Sources */,
 				266DD4981C1193C400D47AB0 /* image_jpeg.cpp in Sources */,
 				266DD4651C11930800D47AB0 /* gcm.cpp in Sources */,
+				26FBDE511DA2B3EC00FF1B55 /* canvas_quartz.mm in Sources */,
 				26AE7BF01C98F8CB0026C2D9 /* line_segment.cpp in Sources */,
 				266DD5A01C11940A00D47AB0 /* select_view_osx.mm in Sources */,
 				26AE7BFA1C9930E10026C2D9 /* sphere.cpp in Sources */,

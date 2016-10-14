@@ -1,5 +1,4 @@
 #include "../../../inc/slib/ui/label_view.h"
-#include "../../../inc/slib/graphics/context.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -78,12 +77,13 @@ void LabelView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 		return;
 	}
 	
-	Ref<GraphicsContext> gc = getGraphicsContext();
-	if (gc.isNull()) {
-		return;
+	UISize size;
+	Ref<Font> font = getFont();
+	if (font.isNotNull()) {
+		size = font->getTextSize(m_text);
+	} else {
+		size = UISize::zero();
 	}
-	
-	UISize size = gc->getFontTextSize(getFont(), m_text);	
 	if (flagHorizontal) {
 		if (size.x < 0) {
 			size.x = 0;

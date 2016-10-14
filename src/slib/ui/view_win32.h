@@ -9,9 +9,6 @@
 
 #include "ui_core_win32.h"
 
-//#define _SLIB_UI_WIN32_USE_COMPOSITE_VIEWS
-#define _SLIB_UI_WIN32_USE_CLIP_CHILDREN
-
 SLIB_UI_NAMESPACE_BEGIN
 class Win32_ViewInstance : public ViewInstance
 {
@@ -91,6 +88,9 @@ public:
 	void setFrame(const UIRect& frame);
 
 	// override
+	void setTransform(const Matrix3& transform);
+
+	// override
 	void setVisible(sl_bool flag);
 
 	// override
@@ -98,6 +98,9 @@ public:
 
 	// override
 	void setOpaque(sl_bool flag);
+
+	// override
+	void setAlpha(sl_real alpha);
 
 	// override
 	UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen);
@@ -110,6 +113,9 @@ public:
 
 	// override
 	void removeChildInstance(const Ref<ViewInstance>& instance);
+
+	// override
+	void bringToFront();
 
 public:
 	sl_bool onEventKey(sl_bool flagDown, WPARAM wParam, LPARAM lParam);

@@ -332,7 +332,7 @@ public:
 			if (color == [NSColor windowBackgroundColor]) {
 				return Color::zero();
 			}
-			return UIPlatform::getColorFromNSColor(color);
+			return GraphicsPlatform::getColorFromNSColor(color);
 		}
 		return Color::Transparent;
 	}
@@ -345,7 +345,7 @@ public:
 			if (_color.isZero()) {
 				color = [NSColor windowBackgroundColor];
 			} else {
-				color = UIPlatform::getNSColorFromColor(_color);
+				color = GraphicsPlatform::getNSColorFromColor(_color);
 			}
 			[window setBackgroundColor:color];
 			return sl_true;

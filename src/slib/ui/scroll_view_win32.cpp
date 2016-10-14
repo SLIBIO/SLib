@@ -42,7 +42,7 @@ public:
 			}
 			Color color = m_backgroundColor;
 			if (color.a < 255) {
-				Color c = UIPlatform::getColorFromColorRef(::GetSysColor(COLOR_MENU));
+				Color c = GraphicsPlatform::getColorFromColorRef(::GetSysColor(COLOR_MENU));
 				c.blend_PA_NPA(color);
 				color = c;
 			}
@@ -144,20 +144,16 @@ Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* parent)
 		return Ref<ViewInstance>::null();
 	}
 
-	DWORD style = 0;
+	DWORD style = WS_CLIPCHILDREN;
 	if (m_flagHorizontalScroll) {
 		style = WS_HSCROLL;
 	}
 	if (m_flagVerticalScroll) {
 		style |= WS_VSCROLL;
 	}
+
 	DWORD styleEx = WS_EX_CONTROLPARENT;
-#if defined(_SLIB_UI_WIN32_USE_COMPOSITE_VIEWS)
-	styleEx |= WS_EX_COMPOSITED;
-#endif
-#if defined(_SLIB_UI_WIN32_USE_CLIP_CHILDREN)
-	style |= WS_CLIPCHILDREN;
-#endif
+
 	if (isBorder()) {
 		style |= WS_BORDER;
 	}

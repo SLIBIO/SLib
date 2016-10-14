@@ -23,7 +23,12 @@ public:
 	static Matrix4T<T> getTranslationMatrix(T x, T y, T z);
 	
 	static Matrix4T<T> getTranslationMatrix(const Vector3T<T>& v);
+	
+	static void translate(Matrix4T<T>& mat, T x, T y, T z);
+	
+	static void translate(Matrix4T<T>& mat, const Vector3T<T>& v);
 
+	
 	static void setScaling(Matrix4T<T>& _out, T sx, T sy, T sz);
 	
 	static void setScaling(Matrix4T<T>& _out, const Vector3T<T>& v);
@@ -31,26 +36,42 @@ public:
 	static Matrix4T<T> getScalingMatrix(T x, T y, T z);
 	
 	static Matrix4T<T> getScalingMatrix(const Vector3T<T>& v);
+	
+	static void scale(Matrix4T<T>& mat, T sx, T sy, T sz);
+	
+	static void scale(Matrix4T<T>& mat, const Vector3T<T>& v);
 
+	
 	static void setRotationX(Matrix4T<T>& _out, T radians);
 	
 	static Matrix4T<T> getRotationXMatrix(T radians);
+	
+	static void rotateX(Matrix4T<T>& mat, T radians);
 	
 	static void setRotationY(Matrix4T<T>& _out, T radians);
 	
 	static Matrix4T<T> getRotationYMatrix(T radians);
 	
+	static void rotateY(Matrix4T<T>& mat, T radians);
+	
 	static void setRotationZ(Matrix4T<T>& _out, T radians);
 	
 	static Matrix4T<T> getRotationZMatrix(T radians);
+	
+	static void rotateZ(Matrix4T<T>& mat, T radians);
 	
 	static void setRotation(Matrix4T<T>& _out, const QuaternionT<T>& q);
 	
 	static Matrix4T<T> getRotationMatrix(const QuaternionT<T>& q);
 	
+	static void rotate(Matrix4T<T>& mat, const QuaternionT<T>& q);
+	
 	static void setRotation(Matrix4T<T>& _out, const Vector3T<T>& vAxis, T fAngle);
 	
 	static Matrix4T<T> getRotationMatrix(const Vector3T<T>& vAxis, T fAngle);
+	
+	static void rotate(Matrix4T<T>& mat, const Vector3T<T>& vAxis, T fAngle);
+	
 	
 	// Slib uses Left-Handed coordinate system
 	static void setPerspectiveProjection(Matrix4T<T>& _out, T sx, T sy, T zNear, T zFar);

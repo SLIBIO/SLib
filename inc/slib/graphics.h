@@ -17,7 +17,6 @@
 #include "graphics/bitmap.h"
 #include "graphics/image.h"
 
-#include "graphics/context.h"
 #include "graphics/canvas.h"
 
 #include "graphics/freetype.h"

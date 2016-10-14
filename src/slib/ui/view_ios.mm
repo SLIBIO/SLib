@@ -3,12 +3,14 @@
 #if defined(SLIB_PLATFORM_IS_IOS)
 
 #include "view_ios.h"
+#include "../../../inc/slib/ui/core.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
 /******************************************
 			iOS_ViewInstance
 ******************************************/
+
 iOS_ViewInstance::iOS_ViewInstance()
 {
 	m_handle = nil;
@@ -56,9 +58,16 @@ Ref<iOS_ViewInstance> iOS_ViewInstance::create(UIView* handle, sl_bool flagFreeO
 Ref<iOS_ViewInstance> iOS_ViewInstance::create(UIView* handle, UIView* parent, View* view)
 {
 	Ref<iOS_ViewInstance> instance;
+	
 	if (handle != nil) {
+		
 		instance = create(handle, sl_true);
+		
 		if (instance.isNotNull()) {
+			
+			[handle setClipsToBounds:YES];
+			[handle setMultipleTouchEnabled:YES];
+
 			[handle setHidden:(view->isVisible() ? NO : YES)];
 			if (!(view->isEnabled())) {
 				if ([handle isKindOfClass:[UIControl class]]) {
@@ -67,8 +76,19 @@ Ref<iOS_ViewInstance> iOS_ViewInstance::create(UIView* handle, UIView* parent, V
 				}
 			}
 			[handle setOpaque:(view->isOpaque() ? YES : NO)];
-			[handle setClipsToBounds:YES];
-			[handle setMultipleTouchEnabled:YES];
+			if (!([handle isKindOfClass:[Slib_iOS_ViewHandle class]])) {
+				sl_real alpha = view->getFinalAlpha();
+				if (alpha < 0.995f) {
+					[handle setAlpha: alpha];
+				}
+			}
+			Matrix3 transform;
+			if (view->getFinalTransform(&transform)) {
+				CGAffineTransform t;
+				GraphicsPlatform::getCGAffineTransform(t, transform, UIPlatform::getGlobalScaleFactor(), 0, 0);
+				[handle setTransform: t];
+			}
+			
 			if (parent != nil) {
 				[parent addSubview:handle];
 			}
@@ -99,7 +119,13 @@ void iOS_ViewInstance::invalidate()
 {
 	UIView* handle = m_handle;
 	if (handle != nil) {
-		[handle setNeedsDisplay];
+		if (UI::isUiThread()) {
+			[handle setNeedsDisplay];
+		} else {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[handle setNeedsDisplay];
+			});
+		}
 	}
 }
 
@@ -108,11 +134,18 @@ void iOS_ViewInstance::invalidate(const UIRect& _rect)
 	UIView* handle = m_handle;
 	if (handle != nil) {
 		CGRect rect;
-		rect.origin.x = (CGFloat)(_rect.left);
-		rect.origin.y = (CGFloat)(_rect.top);
-		rect.size.width = (CGFloat)(_rect.getWidth());
-		rect.size.height = (CGFloat)(_rect.getHeight());
-		[handle setNeedsDisplayInRect: rect];
+		CGFloat f = UIPlatform::getGlobalScaleFactor();
+		rect.origin.x = (CGFloat)(_rect.left) / f;
+		rect.origin.y = (CGFloat)(_rect.top) / f;
+		rect.size.width = (CGFloat)(_rect.getWidth()) / f;
+		rect.size.height = (CGFloat)(_rect.getHeight()) / f;
+		if (UI::isUiThread()) {
+			[handle setNeedsDisplayInRect: rect];
+		} else {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[handle setNeedsDisplayInRect: rect];
+			});
+		}
 	}
 }
 
@@ -120,12 +153,16 @@ UIRect iOS_ViewInstance::getFrame()
 {
 	UIView* handle = m_handle;
 	if (handle != nil) {
-		CGRect frame = handle.frame;
+		CGPoint center = handle.center;
+		CGSize size = handle.bounds.size;
+		size.width /= 2;
+		size.height /= 2;
 		UIRect ret;
-		ret.left = (sl_ui_pos)(frame.origin.x);
-		ret.top = (sl_ui_pos)(frame.origin.y);
-		ret.right = ret.left + (sl_ui_pos)(frame.size.width);
-		ret.bottom = ret.top + (sl_ui_pos)(frame.size.height);
+		CGFloat f = UIPlatform::getGlobalScaleFactor();
+		ret.left = (sl_ui_pos)((center.x - size.width) * f);
+		ret.top = (sl_ui_pos)((center.y - size.height) * f);
+		ret.right = (sl_ui_pos)((center.x + size.width) * f);
+		ret.bottom = (sl_ui_pos)((center.y + size.height) * f);
 		ret.fixSizeError();
 		return ret;
 	}
@@ -136,13 +173,36 @@ void iOS_ViewInstance::setFrame(const UIRect& frame)
 {
 	UIView* handle = m_handle;
 	if (handle != nil) {
+		CGFloat f = UIPlatform::getGlobalScaleFactor();
+		CGPoint center;
+		CGRect bounds;
+		bounds.origin.x = 0;
+		bounds.origin.y = 0;
+		bounds.size.width = (CGFloat)(frame.getWidth()) / f;
+		bounds.size.height = (CGFloat)(frame.getHeight()) / f;
+		[handle setBounds:bounds];
+		center.x = (CGFloat)(frame.left) / f + bounds.size.width / 2;
+		center.y = (CGFloat)(frame.top) / f + bounds.size.height / 2;
+		[handle setCenter:center];
+		/*
 		CGRect rect;
-		rect.origin.x = (CGFloat)(frame.left);
-		rect.origin.y = (CGFloat)(frame.top);
-		rect.size.width = (CGFloat)(frame.getWidth());
-		rect.size.height = (CGFloat)(frame.getHeight());
+		rect.origin.x = (CGFloat)(frame.left) / f;
+		rect.origin.y = (CGFloat)(frame.top) / f;
+		rect.size.width = (CGFloat)(frame.getWidth()) / f;
+		rect.size.height = (CGFloat)(frame.getHeight()) / f;
 		[handle setFrame:rect];
+		*/
 		[handle setNeedsDisplay];
+	}
+}
+
+void iOS_ViewInstance::setTransform(const Matrix3& m)
+{
+	UIView* handle = m_handle;
+	if (handle != nil) {
+		CGAffineTransform t;
+		GraphicsPlatform::getCGAffineTransform(t, m, UIPlatform::getGlobalScaleFactor(), 0, 0);
+		[handle setTransform: t];
 	}
 }
 
@@ -173,6 +233,17 @@ void iOS_ViewInstance::setOpaque(sl_bool flag)
 	}
 }
 
+void iOS_ViewInstance::setAlpha(sl_real alpha)
+{
+	UIView* handle = m_handle;
+	if (handle != nil) {
+		if (!([handle isKindOfClass:[Slib_iOS_ViewHandle class]])) {
+			[handle setAlpha:alpha];
+		}
+		invalidate();
+	}
+}
+
 UIPointf iOS_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& ptScreen)
 {
 	UIView* handle = m_handle;
@@ -180,13 +251,14 @@ UIPointf iOS_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& ptS
 		UIWindow* window = [handle window];
 		if (window != nil) {
 			CGPoint pt;
-			pt.x = ptScreen.x;
-			pt.y = ptScreen.y;
+			CGFloat f = UIPlatform::getGlobalScaleFactor();
+			pt.x = ptScreen.x / f;
+			pt.y = ptScreen.y / f;
 			pt = [window convertPoint:pt fromWindow:nil];
 			pt = [window convertPoint:pt toView:handle];
 			UIPointf ret;
-			ret.x = (sl_ui_posf)(pt.x);
-			ret.y = (sl_ui_posf)(pt.y);
+			ret.x = (sl_ui_posf)(pt.x * f);
+			ret.y = (sl_ui_posf)(pt.y * f);
 			return ret;
 		}
 	}
@@ -200,13 +272,14 @@ UIPointf iOS_ViewInstance::convertCoordinateFromViewToScreen(const UIPointf& ptV
 		UIWindow* window = [handle window];
 		if (window != nil) {
 			CGPoint pt;
-			pt.x = ptView.x;
-			pt.y = ptView.y;
+			CGFloat f = UIPlatform::getGlobalScaleFactor();
+			pt.x = ptView.x / f;
+			pt.y = ptView.y / f;
 			pt = [window convertPoint:pt fromView:handle];
 			pt = [window convertPoint:pt toWindow:nil];
 			UIPointf ret;
-			ret.x = (sl_ui_posf)(pt.x);
-			ret.y = (sl_ui_posf)(pt.y);
+			ret.x = (sl_ui_posf)(pt.x * f);
+			ret.y = (sl_ui_posf)(pt.y * f);
 			return ret;
 		}
 	}
@@ -238,7 +311,18 @@ void iOS_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
 	}
 }
 
-void iOS_ViewInstance::onDraw(CGRect _rectDirty)
+void iOS_ViewInstance::bringToFront()
+{
+	UIView* handle = m_handle;
+	if (handle != nil) {
+		UIView* parent = handle.superview;
+		if (parent != nil) {
+			[parent bringSubviewToFront:handle];
+		}
+	}
+}
+
+void iOS_ViewInstance::onDraw(CGRect rectDirty)
 {
 	
 	UIView* handle = m_handle;
@@ -251,11 +335,13 @@ void iOS_ViewInstance::onDraw(CGRect _rectDirty)
 		
 		if (context != nil) {
 			
-			CGContextTranslateCTM(context, 0.5, -0.5);
+			CGFloat f = UIPlatform::getGlobalScaleFactor();
+			CGContextScaleCTM(context, 1/f, 1/f);
 			
-			Ref<Canvas> canvas = UIPlatform::createCanvas(context, (sl_uint32)(rectBound.size.width), (sl_uint32)(rectBound.size.height));
+			Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, context, (sl_uint32)(rectBound.size.width), (sl_uint32)(rectBound.size.height));
 			
 			if (canvas.isNotNull()) {
+				canvas->setInvalidatedRect(Rectangle((sl_real)(rectDirty.origin.x * f), (sl_real)(rectDirty.origin.y * f), (sl_real)((rectDirty.origin.x + rectDirty.size.width) * f), (sl_real)((rectDirty.origin.y + rectDirty.size.height) * f)));
 				ViewInstance::onDraw(canvas.ptr);
 			}
 		}
@@ -267,6 +353,8 @@ sl_bool iOS_ViewInstance::onEventTouch(UIAction action, NSSet* touches, ::UIEven
 	UIView* handle = m_handle;
 	
 	if (handle != nil) {
+		
+		CGFloat f = UIPlatform::getGlobalScaleFactor();
 		
 		sl_uint32 n = (sl_uint32)([touches count]);
 		Array<TouchPoint> points(n);
@@ -287,7 +375,7 @@ sl_bool iOS_ViewInstance::onEventTouch(UIAction action, NSSet* touches, ::UIEven
 				} else {
 					phase = TouchPhase::Move;
 				}
-				TouchPoint point((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y), pressure, phase);
+				TouchPoint point((sl_ui_posf)(pt.x * f), (sl_ui_posf)(pt.y * f), pressure, phase);
 				pts[i] = point;
 				i++;
 				if (i >= n) {
@@ -338,7 +426,8 @@ SLIB_UI_NAMESPACE_END
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (view->isCapturingChildInstanceEvents()) {
-			if (view->hitTestForCapturingChildInstanceEvents(slib::UIPoint((sl_ui_pos)(aPoint.x), (sl_ui_pos)(aPoint.y)))) {
+			CGFloat f = slib::UIPlatform::getGlobalScaleFactor();
+			if (view->hitTestForCapturingChildInstanceEvents(slib::UIPoint((sl_ui_pos)(aPoint.x * f), (sl_ui_pos)(aPoint.y * f)))) {
 				return self;
 			}
 		}

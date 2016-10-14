@@ -59,7 +59,6 @@ ListView::ListView()
 	_initStatus();
 	
 	m_contentView = new _ListContentView;
-	m_contentView->setLayoutEnabled(sl_false);
 	m_contentView->m_lv = this;
 #ifdef USE_CONTENT_VIEW
 	ScrollView::setContentView(m_contentView);

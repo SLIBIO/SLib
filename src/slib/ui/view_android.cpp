@@ -29,7 +29,7 @@ void JNICALL _AndroidView_nativeOnDraw(JNIEnv* env, jobject _this, jlong jinstan
 {
 	Ref<Android_ViewInstance> instance = Android_ViewInstance::getAndroidInstance(jinstance);
 	if (instance.isNotNull()) {
-		Ref<Canvas> canvas = UIPlatform::createCanvas(jcanvas);
+		Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, jcanvas);
 		if (canvas.isNotNull()) {
 			instance->onDraw(canvas.ptr);
 		}
@@ -135,15 +135,18 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidView, "slib/platform/android/ui/view/UiView")
 	SLIB_JNI_STATIC_METHOD(invalidateRect, "invalidateRect", "(Landroid/view/View;IIII)V");
 	SLIB_JNI_STATIC_METHOD(getFrame, "getFrame", "(Landroid/view/View;)Landroid/graphics/Rect;");
 	SLIB_JNI_STATIC_METHOD(setFrame, "setFrame", "(Landroid/view/View;IIII)Z");
+	SLIB_JNI_STATIC_METHOD(setTransform, "setTransform", "(Landroid/view/View;FFFFFFF)V");
 	SLIB_JNI_STATIC_METHOD(isVisible, "isVisible", "(Landroid/view/View;)Z");
 	SLIB_JNI_STATIC_METHOD(setVisible, "setVisible", "(Landroid/view/View;Z)V");
 	SLIB_JNI_STATIC_METHOD(isEnabled, "isEnabled", "(Landroid/view/View;)Z");
 	SLIB_JNI_STATIC_METHOD(setEnabled, "setEnabled", "(Landroid/view/View;Z)V");
+	SLIB_JNI_STATIC_METHOD(setAlpha, "setAlpha", "(Landroid/view/View;F)V");
 	SLIB_JNI_STATIC_METHOD(convertCoordinateFromScreenToView, "convertCoordinateFromScreenToView", "(Landroid/view/View;II)Landroid/graphics/Point;");
 	SLIB_JNI_STATIC_METHOD(convertCoordinateFromViewToScreen, "convertCoordinateFromViewToScreen", "(Landroid/view/View;II)Landroid/graphics/Point;");
 
 	SLIB_JNI_STATIC_METHOD(addChild, "addChild", "(Landroid/view/View;Landroid/view/View;)V");
 	SLIB_JNI_STATIC_METHOD(removeChild, "removeChild", "(Landroid/view/View;Landroid/view/View;)V");
+	SLIB_JNI_STATIC_METHOD(bringToFront, "bringToFront", "(Landroid/view/View;)V");
 
 	SLIB_JNI_NATIVE(nativeOnDraw, "nativeOnDraw", "(JLslib/platform/android/ui/Graphics;)V", _AndroidView_nativeOnDraw);
 	SLIB_JNI_NATIVE(nativeOnKeyEvent, "nativeOnKeyEvent", "(JZIZZZZ)Z", _AndroidView_nativeOnKeyEvent);
@@ -202,6 +205,18 @@ sl_bool Android_ViewInstance::applyProperties(View* _view, ViewInstance* parent)
 		_JAndroidView::setFrame.callBoolean(sl_null, jhandle, (int)(frame.left), (int)(frame.top), (int)(frame.right), (int)(frame.bottom));
 		_JAndroidView::setVisible.call(sl_null, jhandle, view->isVisible());
 		_JAndroidView::setEnabled.call(sl_null, jhandle, view->isEnabled());
+		sl_real alpha = view->getFinalAlpha();
+		if (alpha < 0.995f) {
+			_JAndroidView::setAlpha.call(sl_null, jhandle, alpha);
+		}
+		Vector2 t;
+		sl_real r;
+		Vector2 s;
+		Vector2 anchor;
+		if (view->getFinalTranslationRotationScale(&t, &r, &s, &anchor)) {
+			_JAndroidView::setTransform.call(sl_null, jhandle, t.x, t.y, r, s.x, s.y, anchor.x, anchor.y);
+		}
+
         if (parent) {
             jobject jparent = UIPlatform::getViewHandle(parent);
             if (jparent) {
@@ -292,6 +307,10 @@ void Android_ViewInstance::setFrame(const UIRect& frame)
 	}
 }
 
+void Android_ViewInstance::setTransform(const Matrix3& transform)
+{
+}
+
 void Android_ViewInstance::setVisible(sl_bool flag)
 {
 	jobject handle = m_handle.get();
@@ -310,6 +329,14 @@ void Android_ViewInstance::setEnabled(sl_bool flag)
 
 void Android_ViewInstance::setOpaque(sl_bool flag)
 {
+}
+
+void Android_ViewInstance::setAlpha(sl_real alpha)
+{
+	jobject handle = m_handle.get();
+	if (handle) {
+		_JAndroidView::setAlpha.call(sl_null, handle, (float)alpha);
+	}
 }
 
 UIPointf Android_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& ptScreen)
@@ -360,6 +387,14 @@ void Android_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
 	}
 }
 
+void Android_ViewInstance::bringToFront()
+{
+	jobject handle = m_handle.get();
+	if (handle) {
+		_JAndroidView::bringToFront.call(sl_null, handle);
+	}
+}
+
 /******************************************
 				View
  ******************************************/
@@ -377,6 +412,20 @@ Ref<ViewInstance> View::createGenericInstance(ViewInstance* _parent)
 		ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 	}
 	return ret;
+}
+
+void View::_setTransform_NI(const Matrix3& matrix)
+{
+	jobject handle = UIPlatform::getViewHandle(this);
+	if (handle) {
+		Vector2 t;
+		sl_real r;
+		Vector2 s;
+		Vector2 anchor;
+		if (getFinalTranslationRotationScale(&t, &r, &s, &anchor)) {
+			_JAndroidView::setTransform.call(sl_null, handle, t.x, t.y, r, s.x, s.y, anchor.x, anchor.y);
+		}
+	}
 }
 
 /******************************************

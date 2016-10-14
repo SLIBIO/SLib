@@ -344,15 +344,15 @@ void Slider::_drawThumb(Canvas* canvas, const Ref<Drawable>& thumb, const Rectan
 	if (thumb.isNull()) {
 		return;
 	}
-	Ref<Brush> brush;
-	if (ColorDrawable::check(thumb.ptr, sl_null, &brush)) {
+	Color color;
+	if (ColorDrawable::check(thumb.ptr, &color)) {
 		sl_bool flagAntiAlias = canvas->isAntiAlias();
 		canvas->setAntiAlias(sl_true);
 		if (Math::isAlmostZero(rectDst.getWidth() - rectDst.getHeight())) {
-			canvas->fillEllipse(rectDst, brush);
+			canvas->fillEllipse(rectDst, color);
 		} else {
 			sl_real r = Math::min(rectDst.getWidth(), rectDst.getHeight()) / 8;
-			canvas->fillRoundRect(rectDst, Size(r, r), brush);
+			canvas->fillRoundRect(rectDst, Size(r, r), color);
 		}
 		canvas->setAntiAlias(flagAntiAlias);
 	} else {

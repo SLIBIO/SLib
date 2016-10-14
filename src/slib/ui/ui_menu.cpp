@@ -266,4 +266,14 @@ sl_bool Menu::processShortcutKey(const KeycodeAndModifiers& km)
 	return sl_false;
 }
 
+
+#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_WIN32))
+
+Ref<Menu> Menu::create()
+{
+	return Ref<Menu>::null();
+}
+
+#endif
+
 SLIB_UI_NAMESPACE_END

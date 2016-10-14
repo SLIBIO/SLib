@@ -176,22 +176,6 @@ void UIPlatform::quitApp()
 	});
 }
 
-NSColor* UIPlatform::getNSColorFromColor(const Color& color)
-{
-	return [NSColor colorWithRed:color.getRedF() green:color.getGreenF() blue:color.getBlueF() alpha:color.getAlphaF()];
-}
-
-Color UIPlatform::getColorFromNSColor(NSColor* color)
-{
-	if (color == nil) {
-		return Color::zero();
-	}
-	color = [color colorUsingColorSpaceName:NSDeviceRGBColorSpace];
-	CGFloat red, green, blue, alpha;
-	[color getRed:&red green:&green blue:&blue alpha:&alpha];
-	return Color4f((sl_real)red, (sl_real)green, (sl_real)blue, (sl_real)alpha);
-}
-
 SLIB_UI_NAMESPACE_END
 
 @implementation _slib_OSX_AppDelegate

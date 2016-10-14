@@ -121,8 +121,7 @@ Ref<ViewInstance> TabView::createNativeWidget(ViewInstance* _parent)
 		((_TabView*)this)->__copyTabs(handle);
 		
 		Ref<Font> font = getFont();
-		Ref<FontInstance> fontInstance;
-		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
+		NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
 		[handle setFont:hFont];
 	}
 	OSX_VIEW_CREATE_INSTANCE_END
@@ -200,8 +199,7 @@ void TabView::_setFont_NW(const Ref<Font>& font)
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTabView class]]) {
 		NSTabView* tv = (NSTabView*)handle;
-		Ref<FontInstance> fontInstance;
-		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
+		NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
 		[tv setFont:hFont];
 	}
 }

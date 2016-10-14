@@ -105,12 +105,10 @@ Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* parent)
 		HWND handle = ret->getHandle();
 
 		Ref<Font> font = getFont();
-		Ref<FontInstance> fontInstance;
-		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
-		_setFontInstance(fontInstance);
 
 		((_SelectView*)this)->__copyItems(handle);
 	}
@@ -159,15 +157,13 @@ void SelectView::_setItemTitle_NW(sl_uint32 index, const String& title)
 
 void SelectView::_setFont_NW(const Ref<Font>& font)
 {
-	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
 	}
-	_setFontInstance(fontInstance);
 }
 
 SLIB_UI_NAMESPACE_END

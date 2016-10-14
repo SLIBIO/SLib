@@ -545,7 +545,7 @@ void RenderEngine::drawDebugText()
 {
 	Ref<Texture> texture = m_textureDebug;
 	if (texture.isNull()) {
-		texture = Texture::create(UI::createBitmap(DEBUG_WIDTH, DEBUG_HEIGHT));
+		texture = Texture::create(Bitmap::create(DEBUG_WIDTH, DEBUG_HEIGHT));
 		if (texture.isNull()) {
 			return;
 		}

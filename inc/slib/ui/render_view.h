@@ -23,6 +23,12 @@ public:
 	
 	void requestRender();
 	
+	// override
+	void invalidate();
+	
+	// override
+	void invalidate(const UIRect& rect);
+	
 public:
 	SLIB_PROPERTY(RenderEngineType, PreferredEngineType)
 

@@ -3,13 +3,9 @@
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 
 #include "../../../inc/slib/graphics/canvas.h"
+#include "../../../inc/slib/graphics/platform.h"
 
-#include "../../../inc/slib/ui/platform.h"
-#include "../../../inc/slib/ui/core.h"
-
-#include "../../../inc/slib/core/endian.h"
-
-SLIB_UI_NAMESPACE_BEGIN
+SLIB_GRAPHICS_NAMESPACE_BEGIN
 
 SLIB_JNI_BEGIN_CLASS(_JAndroidRect, "android/graphics/Rect")
 	SLIB_JNI_INT_FIELD(left);
@@ -17,87 +13,6 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidRect, "android/graphics/Rect")
 	SLIB_JNI_INT_FIELD(right);
 	SLIB_JNI_INT_FIELD(bottom);
 SLIB_JNI_END_CLASS
-
-SLIB_JNI_BEGIN_CLASS(_JAndroidPen, "slib/platform/android/ui/UiPen")
-	SLIB_JNI_NEW(init, "()V");
-	SLIB_JNI_METHOD(setStyle, "setStyle", "(I)V");
-	SLIB_JNI_INT_FIELD(cap);
-	SLIB_JNI_INT_FIELD(join);
-	SLIB_JNI_FLOAT_FIELD(width);
-	SLIB_JNI_INT_FIELD(color);
-	SLIB_JNI_FLOAT_FIELD(miterLimit);
-SLIB_JNI_END_CLASS
-
-
-class _Android_PenInstance : public PenInstance
-{
-	SLIB_DECLARE_OBJECT
-public:
-	JniGlobal<jobject> m_pen;
-
-public:
-    static Ref<_Android_PenInstance> _create(const PenDesc& desc)
-	{
-		Ref<_Android_PenInstance> ret;
-		JniLocal<jobject> jpen = _JAndroidPen::init.newObject(sl_null);
-		if (jpen.isNotNull()) {
-			JniGlobal<jobject> gpen = jpen;
-			if (gpen.isNotNull()) {
-				_JAndroidPen::cap.set(jpen, (int)(desc.cap));
-				_JAndroidPen::join.set(jpen, (int)(desc.join));
-				_JAndroidPen::color.set(jpen, desc.color.getARGB());
-				_JAndroidPen::width.set(jpen, desc.width);
-				_JAndroidPen::miterLimit.set(jpen, desc.miterLimit);
-				_JAndroidPen::setStyle.call(jpen, desc.style);
-				ret = new _Android_PenInstance();
-				if (ret.isNotNull()) {
-					ret->m_pen = gpen;
-					return ret;
-				}
-			}
-		}
-		return ret;
-	}
-};
-
-SLIB_DEFINE_OBJECT(_Android_PenInstance, PenInstance)
-
-
-SLIB_JNI_BEGIN_CLASS(_JAndroidBrush, "slib/platform/android/ui/UiBrush")
-	SLIB_JNI_NEW(init, "()V");
-	SLIB_JNI_INT_FIELD(style);
-	SLIB_JNI_INT_FIELD(color);
-SLIB_JNI_END_CLASS
-
-
-class _Android_BrushInstance : public BrushInstance
-{
-	SLIB_DECLARE_OBJECT
-public:
-	JniGlobal<jobject> m_brush;
-
-public:
-	static Ref<_Android_BrushInstance> _create(const BrushDesc& desc)
-	{
-		Ref<_Android_BrushInstance> ret;
-		JniLocal<jobject> jbrush = _JAndroidBrush::init.newObject(sl_null);
-		if (jbrush.isNotNull()) {
-			JniGlobal<jobject> gbrush = jbrush;
-			if (gbrush.isNotNull()) {
-				_JAndroidBrush::color.set(jbrush, desc.color.getARGB());
-				_JAndroidBrush::style.set(jbrush, (int)(desc.style));
-				ret = new _Android_BrushInstance();
-				if (ret.isNotNull()) {
-					ret->m_brush = gbrush;
-					return ret;
-				}
-			}
-		}
-		return ret;
-	}
-};
-
-SLIB_DEFINE_OBJECT(_Android_BrushInstance, BrushInstance)
 
 SLIB_JNI_BEGIN_CLASS(_JAndroidGraphics, "slib/platform/android/ui/Graphics")
 	SLIB_JNI_BOOLEAN_FIELD(flagAntiAlias);
@@ -126,11 +41,9 @@ class _Android_Canvas : public Canvas
 	SLIB_DECLARE_OBJECT
 public:
 	JniGlobal<jobject> m_canvas;
-	int m_width;
-	int m_height;
 
 public:
-	static Ref<_Android_Canvas> create(jobject jcanvas) {
+	static Ref<_Android_Canvas> create(CanvasType type, jobject jcanvas) {
 		Ref<_Android_Canvas> ret;
 		JniGlobal<jobject> canvas = jcanvas;
 		if (canvas.isNotNull()) {
@@ -138,26 +51,13 @@ public:
 			int height = _JAndroidGraphics::getHeight.callInt(jcanvas);
 			ret = new _Android_Canvas();
 			if (ret.isNotNull()) {
-                ret->m_context = UI::getGraphicsContext();
+				ret->setType(type);
+				ret->setSize(Size((sl_real)width, (sl_real)height));
+
 				ret->m_canvas = canvas;
-				ret->m_width = width;
-				ret->m_height = height;
-				ret->clipToRectangle(Rectangle(0, 0, width, height));
 			}
 		}
 		return ret;
-	}
-
-    // override
-	Size getSize()
-	{
-		return Size((sl_real)(m_width), (sl_real)(m_height));
-	}
-	
-	// override
-	sl_bool isBuffer()
-	{
-		return sl_true;
 	}
 
     // override
@@ -195,7 +95,7 @@ public:
 			ret.bottom = _JAndroidRect::bottom.get(rect);
 			return ret;
 		}
-		return Rectangle(0, 0, m_width, m_height);
+		return Rectangle(Point::zero(), getSize());
 	}
 
     // override
@@ -207,8 +107,7 @@ public:
     // override
 	void clipToPath(const Ref<GraphicsPath>& path)
 	{
-		Ref<GraphicsPathInstance> instance;
-		jobject handle = UIPlatform::getGraphicsPath(path.ptr, instance);
+		jobject handle = GraphicsPlatform::getGraphicsPath(path.ptr);
 		if (handle) {
 			_JAndroidGraphics::clipToPath.call(m_canvas, handle);
 		}
@@ -217,10 +116,10 @@ public:
     // override
 	void concatMatrix(const Matrix3& matrix)
 	{
-		_JAndroidGraphics::concatMatrix.call(m_canvas
-				, (float)(matrix.m00), (float)(matrix.m10), (float)(matrix.m20)
-				, (float)(matrix.m01), (float)(matrix.m11), (float)(matrix.m21)
-				, (float)(matrix.m02), (float)(matrix.m12), (float)(matrix.m22));
+		_JAndroidGraphics::concatMatrix.call(m_canvas,
+				(float)(matrix.m00), (float)(matrix.m10), (float)(matrix.m20),
+				(float)(matrix.m01), (float)(matrix.m11), (float)(matrix.m21),
+				(float)(matrix.m02), (float)(matrix.m12), (float)(matrix.m22));
 	}
 
     // override
@@ -231,8 +130,7 @@ public:
 			if (font.isNull()) {
 				font = Font::getDefault();
 			}
-			Ref<FontInstance> fontInstance;
-			jobject hFont = UIPlatform::getNativeFont(font.ptr, fontInstance);
+			jobject hFont = GraphicsPlatform::getNativeFont(font.ptr);
 			if (hFont) {
 				JniLocal<jstring> jtext = Jni::getJniString(text);
 				_JAndroidGraphics::drawText.call(m_canvas, jtext.value, (float)x, (float)y, hFont, color.getARGB());
@@ -247,8 +145,7 @@ public:
 		if (pen.isNull()) {
 			pen = Pen::getDefault();
 		}
-		Ref<PenInstance> penInstance;
-		jobject hPen = _getPen(pen.ptr, penInstance);
+		jobject hPen = GraphicsPlatform::getPenHandle(pen.ptr);
 		if (hPen) {
 			_JAndroidGraphics::drawLine.call(m_canvas
 					, (float)(pt1.x), (float)(pt1.y), (float)(pt2.x), (float)(pt2.y)
@@ -266,8 +163,7 @@ public:
 		if (pen.isNull()) {
 			pen = Pen::getDefault();
 		}
-		Ref<PenInstance> penInstance;
-		jobject hPen = _getPen(pen.ptr, penInstance);
+		jobject hPen = GraphicsPlatform::getPenHandle(pen.ptr);
 		if (hPen) {
 			JniLocal<jfloatArray> jarr = Jni::newFloatArray(countPoints*2);
 			if (jarr.isNotNull()) {
@@ -284,8 +180,7 @@ public:
 		if (pen.isNull()) {
 			pen = Pen::getDefault();
 		}
-		Ref<PenInstance> penInstance;
-		jobject hPen = _getPen(pen.ptr, penInstance);
+		jobject hPen = GraphicsPlatform::getPenHandle(pen.ptr);
 		if (hPen) {
 			_JAndroidGraphics::drawArc.call(m_canvas
 					, (float)(rect.left), (float)(rect.top), (float)(rect.right), (float)(rect.bottom)
@@ -301,10 +196,8 @@ public:
 		if (brush.isNull() && pen.isNull()) {
 			pen = Pen::getDefault();
 		}
-		Ref<PenInstance> penInstance;
-		jobject hPen = _getPen(pen.ptr, penInstance);
-		Ref<BrushInstance> brushInstance;
-		jobject hBrush = _getBrush(brush.ptr, brushInstance);
+		jobject hPen = GraphicsPlatform::getPenHandle(pen.ptr);
+		jobject hBrush = GraphicsPlatform::getBrushHandle(brush.ptr);
 		if (hPen || hBrush) {
 			_JAndroidGraphics::drawRectangle.call(m_canvas
 					, (float)(rect.left), (float)(rect.top), (float)(rect.right), (float)(rect.bottom)
@@ -319,10 +212,8 @@ public:
 		if (brush.isNull() && pen.isNull()) {
 			pen = Pen::getDefault();
 		}
-		Ref<PenInstance> penInstance;
-		jobject hPen = _getPen(pen.ptr, penInstance);
-		Ref<BrushInstance> brushInstance;
-		jobject hBrush = _getBrush(brush.ptr, brushInstance);
+		jobject hPen = GraphicsPlatform::getPenHandle(pen.ptr);
+		jobject hBrush = GraphicsPlatform::getBrushHandle(brush.ptr);
 		if (hPen || hBrush) {
 			_JAndroidGraphics::drawRoundRectangle.call(m_canvas
 					, (float)(rect.left), (float)(rect.top), (float)(rect.right), (float)(rect.bottom)
@@ -337,10 +228,8 @@ public:
 		if (brush.isNull() && pen.isNull()) {
 			pen = Pen::getDefault();
 		}
-		Ref<PenInstance> penInstance;
-		jobject hPen = _getPen(pen.ptr, penInstance);
-		Ref<BrushInstance> brushInstance;
-		jobject hBrush = _getBrush(brush.ptr, brushInstance);
+		jobject hPen = GraphicsPlatform::getPenHandle(pen.ptr);
+		jobject hBrush = GraphicsPlatform::getBrushHandle(brush.ptr);
 		if (hPen || hBrush) {
 			_JAndroidGraphics::drawEllipse.call(m_canvas
 					, (float)(rect.left), (float)(rect.top), (float)(rect.right), (float)(rect.bottom)
@@ -358,10 +247,8 @@ public:
 		if (brush.isNull() && pen.isNull()) {
 			pen = Pen::getDefault();
 		}
-		Ref<PenInstance> penInstance;
-		jobject hPen = _getPen(pen.ptr, penInstance);
-		Ref<BrushInstance> brushInstance;
-		jobject hBrush = _getBrush(brush.ptr, brushInstance);
+		jobject hPen = GraphicsPlatform::getPenHandle(pen.ptr);
+		jobject hBrush = GraphicsPlatform::getBrushHandle(brush.ptr);
 		if (hPen || hBrush) {
 			JniLocal<jfloatArray> jarr = Jni::newFloatArray(countPoints*2);
 			if (jarr.isNotNull()) {
@@ -378,10 +265,8 @@ public:
 		if (brush.isNull() && pen.isNull()) {
 			pen = Pen::getDefault();
 		}
-		Ref<PenInstance> penInstance;
-		jobject hPen = _getPen(pen.ptr, penInstance);
-		Ref<BrushInstance> brushInstance;
-		jobject hBrush = _getBrush(brush.ptr, brushInstance);
+		jobject hPen = GraphicsPlatform::getPenHandle(pen.ptr);
+		jobject hBrush = GraphicsPlatform::getBrushHandle(brush.ptr);
 		if (hPen || hBrush) {
 			_JAndroidGraphics::drawPie.call(m_canvas
 					, (float)(rect.left), (float)(rect.top), (float)(rect.right), (float)(rect.bottom)
@@ -393,17 +278,14 @@ public:
     // override
 	void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
-		Ref<GraphicsPathInstance> pathInstance;
-		jobject hPath = UIPlatform::getGraphicsPath(path.ptr, pathInstance);
+		jobject hPath = GraphicsPlatform::getGraphicsPath(path.ptr);
 		if (hPath) {
 			Ref<Pen> pen = _pen;
 			if (brush.isNull() && pen.isNull()) {
 				pen = Pen::getDefault();
 			}
-			Ref<PenInstance> penInstance;
-			jobject hPen = _getPen(pen.ptr, penInstance);
-			Ref<BrushInstance> brushInstance;
-			jobject hBrush = _getBrush(brush.ptr, brushInstance);
+			jobject hPen = GraphicsPlatform::getPenHandle(pen.ptr);
+			jobject hBrush = GraphicsPlatform::getBrushHandle(brush.ptr);
 			if (hPen || hBrush) {
 				_JAndroidGraphics::drawPath.call(m_canvas
 						, hPath
@@ -411,67 +293,19 @@ public:
 			}
 		}
 	}
-
-	jobject _getPen(Pen* pen, Ref<PenInstance>& instanceOut)
-	{
-		if (pen) {
-			Ref<PenInstance> _instance = pen->getInstance();
-			Ref<_Android_PenInstance> instance;
-			if (_Android_PenInstance::checkInstance(_instance.ptr)) {
-				instance = Ref<_Android_PenInstance>::from(_instance);
-			}
-			if (instance.isNull()) {
-				PenDesc desc;
-				pen->getDesc(desc);
-				instance = _Android_PenInstance::_create(desc);
-				if (instance.isNotNull()) {
-					pen->setInstance(instance);
-				}
-			}
-			instanceOut = instance;
-			if (instance.isNotNull()) {
-				return instance->m_pen;
-			}
-		}
-		return sl_null;
-	}
-
-	jobject _getBrush(Brush* brush, Ref<BrushInstance>& instanceOut)
-	{
-		if (brush) {
-			Ref<BrushInstance> _instance = brush->getInstance();
-			Ref<_Android_BrushInstance> instance;
-			if (_Android_BrushInstance::checkInstance(_instance.ptr)) {
-				instance = Ref<_Android_BrushInstance>::from(_instance);
-			}
-			if (instance.isNull()) {
-				BrushDesc desc;
-				brush->getDesc(desc);
-				instance = _Android_BrushInstance::_create(desc);
-				if (instance.isNotNull()) {
-					brush->setInstance(instance);
-				}
-			}
-			instanceOut = instance;
-			if (instance.isNotNull()) {
-				return instance->m_brush;
-			}
-		}
-		return sl_null;
-	}
 };
 
 SLIB_DEFINE_OBJECT(_Android_Canvas, Canvas)
 
-Ref<Canvas> UIPlatform::createCanvas(jobject jcanvas)
+Ref<Canvas> GraphicsPlatform::createCanvas(CanvasType type, jobject jcanvas)
 {
 	if (!jcanvas) {
 		return Ref<Canvas>::null();
 	}
-	return _Android_Canvas::create(jcanvas);
+	return _Android_Canvas::create(type, jcanvas);
 }
 
-jobject UIPlatform::getCanvasHandle(Canvas* _canvas)
+jobject GraphicsPlatform::getCanvasHandle(Canvas* _canvas)
 {
 	if (_Android_Canvas::checkInstance(_canvas)) {
 		_Android_Canvas* canvas = (_Android_Canvas*)_canvas;
@@ -481,6 +315,6 @@ jobject UIPlatform::getCanvasHandle(Canvas* _canvas)
 	}
 }
 
-SLIB_UI_NAMESPACE_END
+SLIB_GRAPHICS_NAMESPACE_END
 
 #endif

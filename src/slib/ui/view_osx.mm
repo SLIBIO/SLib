@@ -73,6 +73,17 @@ Ref<OSX_ViewInstance> OSX_ViewInstance::create(NSView* handle, NSView* parent, V
 			if ([handle isKindOfClass:[Slib_OSX_ViewBase class]]) {
 				((Slib_OSX_ViewBase*)handle)->m_flagOpaque = view->isOpaque();
 			}
+			
+			/*****************
+			 Don't use alphaValue because this causes displaying error when used with frameRotation or bounds
+			******************/
+			/*
+			sl_real alpha = view->getFinalAlpha();
+			if (alpha < 1 - SLIB_EPSILON) {
+				handle.alphaValue = alpha;
+			}
+			*/
+			
 			if (parent != nil) {
 				[parent addSubview:handle];				
 			}
@@ -153,6 +164,10 @@ void OSX_ViewInstance::setFrame(const UIRect& frame)
 	}
 }
 
+void OSX_ViewInstance::setTransform(const Matrix3 &transform)
+{
+}
+
 void OSX_ViewInstance::setVisible(sl_bool flag)
 {
 	NSView* handle = m_handle;
@@ -181,6 +196,27 @@ void OSX_ViewInstance::setOpaque(sl_bool flag)
 			control->m_flagOpaque = flag;
 		}
 	}
+}
+
+void OSX_ViewInstance::setAlpha(sl_real alpha)
+{
+	/*********
+		Don't use alphaValue because this causes displaying error when used with frameRotation or bounds
+	*********/
+	
+	/*
+	NSView* handle = m_handle;
+	if (handle != nil) {
+		handle.alphaValue = alpha;
+		[handle setNeedsDisplay:YES];
+	}
+	*/
+	
+	NSView* handle = m_handle;
+	if (handle != nil) {
+		[handle setNeedsDisplay:YES];
+	}
+	
 }
 
 UIPointf OSX_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& ptScreen)
@@ -260,32 +296,73 @@ void OSX_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
 	}
 }
 
-void OSX_ViewInstance::onDraw(NSRect _rectDirty)
+void OSX_ViewInstance::bringToFront()
+{
+	NSView* handle = m_handle;
+	if (handle != nil) {
+		NSView* parent = handle.superview;
+		if (parent != nil) {
+			[handle removeFromSuperviewWithoutNeedingDisplay];
+			[parent addSubview:handle];
+		}
+	}
+}
+
+void OSX_ViewInstance::onDraw(NSRect rcDirty)
 {
 	NSView* handle = m_handle;
 	
 	if (handle != nil) {
 		
-		NSRect rectBound = [handle bounds];
+		NSGraphicsContext* graphics = [NSGraphicsContext currentContext];
 		
-		/*
-		Rectangle rectDirty;
-		rectDirty.left = (sl_real)(_rectDirty.origin.x);
-		rectDirty.top =  (sl_real)(_rectDirty.origin.y);
-		rectDirty.right = (sl_real)(rectDirty.left + _rectDirty.size.width);
-		rectDirty.bottom = (sl_real)(rectDirty.top + _rectDirty.size.height);
-		*/
-		
-		NSGraphicsContext* _graphics = [NSGraphicsContext currentContext];
-		
-		if (_graphics != nil) {
+		if (graphics != nil) {
 			
-			CGContextRef context = (CGContextRef)([_graphics graphicsPort]);
-						
-			Ref<Canvas> canvas = UIPlatform::createCanvas(context, (sl_uint32)(rectBound.size.width), (sl_uint32)(rectBound.size.height));
+			CGContextRef context = (CGContextRef)([graphics graphicsPort]);
+			
+			/******
+				adjust transform when NSView's alphaValue is less than 1 and, bounds scale is not equal to 1 or frame rotation is not equal to 0.
+				This error is found at macOS Sierra, but it seems to be the common problem of all series of macOS system
+				Later, decided to do not use alphaValue!
+			*****/
+			/*
+			BOOL flagAdjustTransform = FALSE;
+			if (handle.alphaValue < 1 - SLIB_EPSILON) {
+				CGFloat w = handle.frame.size.width;
+				if (w < 1) {
+					return;
+				}
+				CGFloat h = handle.frame.size.height;
+				if (h < 1) {
+					return;
+				}
+				CGFloat bw = handle.bounds.size.width;
+				CGFloat bh = handle.bounds.size.height;
+				CGFloat sx = bw / w;
+				CGFloat sy = bh / h;
+				CGFloat r = handle.frameRotation;
+				if (Math::abs(sx - 1) > 0.0000001 || Math::abs(sy - 1) > 0.0000001 || Math::abs(r) > 0.0000001) {
+					flagAdjustTransform = TRUE;
+					CGContextSaveGState(context);
+					CGContextTranslateCTM(context, 0, bh/2);
+					CGContextScaleCTM(context, sx, sy);
+					CGContextTranslateCTM(context, 0, h/2-bh);
+				}
+			}
+			*/
+			
+			NSRect rectBound = [handle bounds];
+			Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, context, (sl_uint32)(rectBound.size.width), (sl_uint32)(rectBound.size.height));
 			if (canvas.isNotNull()) {
+				canvas->setInvalidatedRect(Rectangle((sl_real)(rcDirty.origin.x), (sl_real)(rcDirty.origin.y), (sl_real)(rcDirty.origin.x + rcDirty.size.width), (sl_real)(rcDirty.origin.y + rcDirty.size.height)));
 				ViewInstance::onDraw(canvas.ptr);
 			}
+			
+			/*
+			if (flagAdjustTransform) {
+				CGContextRestoreGState(context);
+			}
+			*/
 		}
 	}
 }
@@ -385,15 +462,118 @@ void OSX_ViewInstance::applyModifiers(UIEvent* ev, NSEvent* event)
 	}
 }
 
+
 /******************************************
 				View
  ******************************************/
+
 Ref<ViewInstance> View::createGenericInstance(ViewInstance* _parent)
 {
 	OSX_VIEW_CREATE_INSTANCE_BEGIN
 	Slib_OSX_ViewHandle* handle = [[Slib_OSX_ViewHandle alloc] initWithFrame:frame];
 	OSX_VIEW_CREATE_INSTANCE_END
 	return ret;
+}
+
+void View::_setFrame_NI(const UIRect& _frame)
+{
+	NSView* handle = UIPlatform::getViewHandle(this);
+	if (handle != nil) {
+		UIRect _frame = getFrame();
+		Vector2 t;
+		sl_real r;
+		Vector2 s;
+		Vector2 anchor;
+		if (getFinalTranslationRotationScale(&t, &r, &s, &anchor)) {
+			NSPoint pt;
+			NSSize size;
+			OSX_transformViewFrame(pt, size, _frame, t.x, t.y, s.x, s.y, r, anchor.x, anchor.y);
+			[handle setFrameOrigin:pt];
+			[handle setFrameSize:size];
+			NSRect bounds;
+			bounds.origin.x = 0;
+			bounds.origin.y = 0;
+			bounds.size.width = (CGFloat)(_frame.getWidth());
+			bounds.size.height = (CGFloat)(_frame.getHeight());
+			handle.bounds = bounds;
+		} else {
+			NSRect frame;
+			frame.origin.x = (CGFloat)(_frame.left);
+			frame.origin.y = (CGFloat)(_frame.top);
+			frame.size.width = (CGFloat)(_frame.getWidth());
+			frame.size.height = (CGFloat)(_frame.getHeight());
+			handle.frame = frame;
+		}
+		[handle setNeedsDisplay:YES];
+	}
+}
+
+void View::_setTransform_NI(const Matrix3& matrix)
+{
+	NSView* handle = UIPlatform::getViewHandle(this);
+	if (handle != nil) {
+		UIRect _frame = getFrame();
+		Vector2 t;
+		sl_real r;
+		Vector2 s;
+		Vector2 anchor;
+		if (getFinalTranslationRotationScale(&t, &r, &s, &anchor)) {
+			NSPoint pt;
+			NSSize size;
+			OSX_transformViewFrame(pt, size, _frame, t.x, t.y, s.x, s.y, r, anchor.x, anchor.y);
+			[handle setFrameOrigin:pt];
+			[handle setFrameSize:size];
+			handle.frameRotation = Math::getDegreesFromRadian(r);
+			NSRect bounds;
+			bounds.origin.x = 0;
+			bounds.origin.y = 0;
+			bounds.size.width = (CGFloat)(_frame.getWidth());
+			bounds.size.height = (CGFloat)(_frame.getHeight());
+			handle.bounds = bounds;
+		} else {
+			NSRect frame;
+			frame.origin.x = (CGFloat)(_frame.left);
+			frame.origin.y = (CGFloat)(_frame.top);
+			frame.size.width = (CGFloat)(_frame.getWidth());
+			frame.size.height = (CGFloat)(_frame.getHeight());
+			handle.frame = frame;
+			[handle setNeedsDisplay:YES];
+		}
+	}
+}
+
+
+void OSX_transformViewFrame(NSPoint& origin, NSSize& size, const UIRect& frame, sl_real tx, sl_real ty, sl_real sx, sl_real sy, sl_real r, sl_real anchorOffsetX, sl_real anchorOffsetY)
+{
+	sl_ui_pos x = frame.left;
+	sl_ui_pos y = frame.top;
+	sl_ui_pos w = frame.getWidth();
+	sl_ui_pos h = frame.getHeight();
+	sl_bool flagScale = !(Math::isAlmostZero(sx - 1) && Math::isAlmostZero(sy - 1));
+	sl_bool flagRotate = !(Math::isAlmostZero(r));
+	if (flagScale || flagRotate) {
+		sl_real ax = (sl_real)(w) / 2 + anchorOffsetX;
+		sl_real ay = (sl_real)(h) / 2 + anchorOffsetY;
+		sl_bool flagAnchor = !(Math::isAlmostZero(ax) && Math::isAlmostZero(ay));
+		if (flagAnchor) {
+			sl_real cr = Math::cos(r);
+			sl_real sr = Math::sin(r);
+			tx += (- ax * cr + ay * sr) * sx + ax;
+			ty += (- ax * sr - ay * cr) * sy + ay;
+		}
+	}
+	if (!(Math::isAlmostZero(tx) && Math::isAlmostZero(ty))) {
+		x += (sl_ui_pos)tx;
+		y += (sl_ui_pos)ty;
+	}
+	if (flagScale) {
+		w = (sl_ui_pos)(w * sx);
+		h = (sl_ui_pos)(h * sy);
+	}
+	origin.x = x;
+	origin.y = y;
+	size.width = w;
+	size.height = h;
 }
 
 SLIB_UI_NAMESPACE_END
@@ -686,6 +866,7 @@ SLIB_UI_NAMESPACE_END
 				UIPlatform
 ******************************************/
 SLIB_UI_NAMESPACE_BEGIN
+
 Ref<ViewInstance> UIPlatform::createViewInstance(NSView* handle, sl_bool flagFreeOnRelease)
 {
 	Ref<ViewInstance> ret = UIPlatform::_getViewInstance((__bridge void*)handle);

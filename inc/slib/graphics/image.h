@@ -43,11 +43,11 @@ public:
 	
 	static Ref<Image> create(const BitmapData& bitmapData);
 
-	static Ref<Image> createFromBitmap(const Ref<Bitmap>& bitmap);
+	static Ref<Image> create(const Ref<Bitmap>& bitmap);
 	
-	static Ref<Image> createFromBitmap(const Ref<Bitmap>& bitmap, sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height);
+	static Ref<Image> create(const Ref<Bitmap>& bitmap, sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height);
 	
-	
+public:
 	sl_uint32 getWidth() const;
 	
 	sl_uint32 getHeight() const;
@@ -151,7 +151,16 @@ public:
 	
 	sl_bool saveToJPEG(String filePath, float quality = 0.5f);
 #endif
+	
+public:
+	Ref<Drawable> getDrawableCache();
 
+	// override
+	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param);
+	
+	// override
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
+	
 protected:
 	ImageDesc m_desc;
 	

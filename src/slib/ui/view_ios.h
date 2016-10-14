@@ -48,6 +48,9 @@ public:
 	void setFrame(const UIRect& frame);
 	
 	// override
+	void setTransform(const Matrix3& transform);
+	
+	// override
 	void setVisible(sl_bool flag);
 	
 	// override
@@ -55,6 +58,9 @@ public:
 	
 	// override
 	void setOpaque(sl_bool flag);
+	
+	// override
+	void setAlpha(sl_real alpha);
 	
 	// override
 	UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen);
@@ -67,6 +73,9 @@ public:
 	
 	// override
 	void removeChildInstance(const Ref<ViewInstance>& instance);
+	
+	// override
+	void bringToFront();
 	
 public:
 	void onDraw(CGRect rectDirty);
@@ -92,11 +101,12 @@ SLIB_UI_NAMESPACE_END
 	Ref<iOS_ViewInstance> ret; \
 	UIView* parent = UIPlatform::getViewHandle(_parent); \
 	CGRect frame; \
+	CGFloat f = UIPlatform::getGlobalScaleFactor();	\
 	UIRect _frame = getFrame(); \
-	frame.origin.x = (CGFloat)(_frame.left); \
-	frame.origin.y = (CGFloat)(_frame.top); \
-	frame.size.width = (CGFloat)(_frame.getWidth()); \
-	frame.size.height = (CGFloat)(_frame.getHeight()); \
+	frame.origin.x = (CGFloat)(_frame.left) / f; \
+	frame.origin.y = (CGFloat)(_frame.top) / f; \
+	frame.size.width = (CGFloat)(_frame.getWidth()) / f; \
+	frame.size.height = (CGFloat)(_frame.getHeight()) / f; \
 
 #define IOS_VIEW_CREATE_INSTANCE_END \
 	if (handle != nil) { \

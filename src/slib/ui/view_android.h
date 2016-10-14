@@ -77,6 +77,9 @@ public:
 	void setFrame(const UIRect& frame);
 
 	// override
+	void setTransform(const Matrix3& transform);
+
+	// override
 	void setVisible(sl_bool flag);
 
 	// override
@@ -85,6 +88,9 @@ public:
 	// override
 	void setOpaque(sl_bool flag);
 
+	// override
+	void setAlpha(sl_real alpha);
+	
 	// override
 	UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen);
 
@@ -96,6 +102,9 @@ public:
 
 	// override
 	void removeChildInstance(const Ref<ViewInstance>& instance);
+
+	// override
+	void bringToFront();
 
 protected:
 	JniGlobal<jobject> m_handle;

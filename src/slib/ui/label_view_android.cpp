@@ -37,8 +37,7 @@ public:
 		_JAndroidEditView::setTextColor.callBoolean(sl_null, handle, m_textColor.getARGB());
 		_JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, getBackgroundColor().getARGB());
 		Ref<Font> font = getFont();
-		Ref<FontInstance> fontInstance;
-		jobject jfont = UIPlatform::getNativeFont(font.ptr, fontInstance);
+		jobject jfont = GraphicsPlatform::getNativeFont(font.ptr);
 		if (jfont) {
 			_JAndroidEditView::setFont.callBoolean(sl_null, handle, jfont);
 		}
@@ -89,8 +88,7 @@ void LabelView::_setFont_NW(const Ref<Font>& font)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		Ref<FontInstance> fontInstance;
-		jobject jfont = UIPlatform::getNativeFont(font.ptr, fontInstance);
+		jobject jfont = GraphicsPlatform::getNativeFont(font.ptr);
 		if (jfont) {
 			_JAndroidEditView::setFont.callBoolean(sl_null, handle, jfont);
 		}

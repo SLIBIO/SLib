@@ -161,11 +161,8 @@ Ref<ViewInstance> ListReportView::createNativeWidget(ViewInstance* parent)
 		return Ref<ViewInstance>::null();
 	}
 
-	DWORD style = LVS_REPORT | LVS_SINGLESEL | LVS_OWNERDATA | WS_TABSTOP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_BORDER;
+	DWORD style = LVS_REPORT | LVS_SINGLESEL | LVS_OWNERDATA | WS_TABSTOP | WS_BORDER;
 	DWORD styleEx = 0;
-#if defined(_SLIB_UI_WIN32_USE_COMPOSITE_VIEWS)
-	styleEx |= WS_EX_COMPOSITED;
-#endif
 	Ref<_Win32_ListReportViewInstance> ret = Win32_ViewInstance::create<_Win32_ListReportViewInstance>(this, parent, L"SysListView32", L"", style, styleEx);
 	
 	if (ret.isNotNull()) {
@@ -173,13 +170,11 @@ Ref<ViewInstance> ListReportView::createNativeWidget(ViewInstance* parent)
 		HWND handle = ret->getHandle();
 
 		Ref<Font> font = getFont();
-		Ref<FontInstance> fontInstance;
-		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
 		if (hFont) {
 			// You should send this message before inserting any items
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
-		_setFontInstance(fontInstance);
 
 		UINT exStyle = LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES | LVS_EX_ONECLICKACTIVATE | LVS_EX_DOUBLEBUFFER;
 		::SendMessageW(handle, LVM_SETEXTENDEDLISTVIEWSTYLE, exStyle, exStyle);
@@ -257,15 +252,13 @@ void ListReportView::_getSelectedRow_NW()
 
 void ListReportView::_setFont_NW(const Ref<Font>& font)
 {
-	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
 	}
-	_setFontInstance(fontInstance);
 }
 
 SLIB_UI_NAMESPACE_END

@@ -45,6 +45,7 @@ DEFINE_CONTENT_TYPE(FontWOFF, "application/font-woff")
 DEFINE_CONTENT_TYPE(FontTTF, "application/x-font-ttf")
 DEFINE_CONTENT_TYPE(Zip, "application/zip")
 DEFINE_CONTENT_TYPE(Gzip, "application/gzip")
+DEFINE_CONTENT_TYPE(Flash, "application/x-shockwave-flash")
 
 DEFINE_CONTENT_TYPE(WebForm, "application/x-www-form-urlencoded")
 DEFINE_CONTENT_TYPE(MultipartFormData, "multipart/form-data")
@@ -124,7 +125,9 @@ String ContentTypes::toString(ContentType type)
 			return _g_szContentType_Zip;
 		case ContentType::Gzip:
 			return _g_szContentType_Gzip;
-			
+		case ContentType::Flash:
+			return _g_szContentType_Flash;
+
 		case ContentType::WebForm:
 			return _g_szContentType_WebForm;
 		case ContentType::MultipartFormData:
@@ -188,6 +191,7 @@ public:
 		maps.put("ttf", ContentType::FontTTF);
 		maps.put("zip", ContentType::Zip);
 		maps.put("gz", ContentType::Gzip);
+		maps.put("swf", ContentType::Flash);
 	}
 };
 

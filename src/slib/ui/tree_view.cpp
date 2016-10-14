@@ -455,7 +455,7 @@ public:
 	}
 	
 	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst)
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
 	{
 		if (m_brush.isNotNull()) {
 			Point pts[3];

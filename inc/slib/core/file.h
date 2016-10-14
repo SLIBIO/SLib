@@ -119,7 +119,9 @@ public:
 	static FileAttributes getAttributes(const String& filePath);
 	
 	static sl_bool exists(const String& filePath);
-	
+
+	static sl_bool isFile(const String& filePath);
+
 	static sl_bool isDirectory(const String& filePath);
 	
 	static sl_bool isHidden(const String& filePath);

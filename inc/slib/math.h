@@ -21,7 +21,6 @@
 #include "math/line_segment.h"
 #include "math/triangle.h"
 #include "math/transform2d.h"
-#include "math/bezier.h"
 
 #include "math/quaternion.h"
 #include "math/line3.h"
@@ -31,6 +30,8 @@
 #include "math/box.h"
 #include "math/view_frustum.h"
 #include "math/transform3d.h"
+
+#include "math/bezier.h"
 
 #include "math/geograph.h"
 

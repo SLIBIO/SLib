@@ -87,10 +87,11 @@ public:
 		}
 		UIRect _rect = param.calculateRegion(screenFrame);
 		CGRect rect;
-		rect.origin.x = (CGFloat)(_rect.left);
-		rect.origin.y = (CGFloat)(_rect.top);
-		rect.size.width = (CGFloat)(_rect.getWidth());
-		rect.size.height = (CGFloat)(_rect.getHeight());
+		CGFloat f = UIPlatform::getGlobalScaleFactor();
+		rect.origin.x = (CGFloat)(_rect.left) / f;
+		rect.origin.y = (CGFloat)(_rect.top) / f;
+		rect.size.width = (CGFloat)(_rect.getWidth()) / f;
+		rect.size.height = (CGFloat)(_rect.getHeight()) / f;
 		_slib_iOS_Window* window = [[_slib_iOS_Window alloc] initWithFrame:rect];
 		if (window != nil) {
 			UIScreen* screen = UIPlatform::getScreenHandle(_screen.ptr);
@@ -190,11 +191,12 @@ public:
 		UIView* window = m_window;
 		if (window != nil) {
 			CGRect rect = [window frame];
+			CGFloat f = UIPlatform::getGlobalScaleFactor();
 			UIRect frame;
-			frame.left = (sl_ui_pos)(rect.origin.x);
-			frame.top = (sl_ui_pos)(rect.origin.y);
-			frame.right = frame.left + (sl_ui_pos)(rect.size.width);
-			frame.bottom = frame.top + (sl_ui_pos)(rect.size.height);
+			frame.left = (sl_ui_pos)(rect.origin.x * f);
+			frame.top = (sl_ui_pos)(rect.origin.y * f);
+			frame.right = (sl_ui_pos)((rect.origin.x + rect.size.width) * f);
+			frame.bottom = (sl_ui_pos)((rect.origin.y + rect.size.height) * f);
 			return frame;
 		} else {
 			return UIRect::zero();
@@ -206,12 +208,13 @@ public:
 		UIRect frame = _frame;
 		UIView* window = m_window;
 		if (window != nil) {
+			CGFloat f = UIPlatform::getGlobalScaleFactor();
 			dispatch_async(dispatch_get_main_queue(), ^{
 				CGRect rect;
-				rect.origin.x = (CGFloat)(frame.left);
-				rect.origin.y = (CGFloat)(frame.top);
-				rect.size.width = (CGFloat)(frame.getWidth());
-				rect.size.height = (CGFloat)(frame.getHeight());
+				rect.origin.x = (CGFloat)(frame.left) / f;
+				rect.origin.y = (CGFloat)(frame.top) / f;
+				rect.size.width = (CGFloat)(frame.getWidth()) / f;
+				rect.size.height = (CGFloat)(frame.getHeight()) / f;
 				[window setFrame:rect];
 			});
 			return sl_true;
@@ -228,10 +231,11 @@ public:
 	{
 		UIView* window = m_window;
 		if (window != nil) {
+			CGFloat f = UIPlatform::getGlobalScaleFactor();
 			CGRect rect = [window frame];
 			UISize ret;
-			ret.x = (sl_ui_pos)(rect.size.width);
-			ret.y = (sl_ui_pos)(rect.size.height);
+			ret.x = (sl_ui_pos)(rect.size.width * f);
+			ret.y = (sl_ui_pos)(rect.size.height * f);
 			return ret;
 		} else {
 			return UISize::zero();
@@ -243,10 +247,11 @@ public:
 		UISize size = _size;
 		UIView* window = m_window;
 		if (window != nil) {
+			CGFloat f = UIPlatform::getGlobalScaleFactor();
 			dispatch_async(dispatch_get_main_queue(), ^{
 				CGRect frame = [window frame];
-				frame.size.width = (CGFloat)(size.x);
-				frame.size.height = (CGFloat)(size.y);
+				frame.size.width = (CGFloat)(size.x) / f;
+				frame.size.height = (CGFloat)(size.y) / f;
 				[window setFrame:frame];
 			});
 			return sl_true;
@@ -272,7 +277,7 @@ public:
 			if (color == nil) {
 				return Color::zero();
 			}
-			return UIPlatform::getColorFromUIColor(color);
+			return GraphicsPlatform::getColorFromUIColor(color);
 		}
 		return Color::Transparent;
 	}
@@ -285,7 +290,7 @@ public:
 			if (_color.isZero()) {
 				color = nil;
 			} else {
-				color = UIPlatform::getUIColorFromColor(_color);
+				color = GraphicsPlatform::getUIColorFromColor(_color);
 			}
 			[window setBackgroundColor:color];
 			return sl_true;
@@ -454,27 +459,28 @@ public:
 	{
 		UIView* view = m_window;
 		if (view != nil) {
+			CGFloat f = UIPlatform::getGlobalScaleFactor();
 			if ([view isKindOfClass:[UIWindow class]]) {
 				UIWindow* window = (UIWindow*)view;
 				CGPoint pt;
-				pt.x = (CGFloat)(ptScreen.x);
-				pt.y = (CGFloat)(ptScreen.y);
+				pt.x = (CGFloat)(ptScreen.x) / f;
+				pt.y = (CGFloat)(ptScreen.y) / f;
 				pt = [window convertPoint:pt fromWindow:nil];
 				UIPointf ret;
-				ret.x = (sl_ui_posf)(pt.x);
-				ret.y = (sl_ui_posf)(pt.y);
+				ret.x = (sl_ui_posf)(pt.x * f);
+				ret.y = (sl_ui_posf)(pt.y * f);
 				return ret;
 			} else {
 				UIWindow* window = [view window];
 				if (window != nil) {
 					CGPoint pt;
-					pt.x = (CGFloat)(ptScreen.x);
-					pt.y = (CGFloat)(ptScreen.y);
+					pt.x = (CGFloat)(ptScreen.x) / f;
+					pt.y = (CGFloat)(ptScreen.y) / f;
 					pt = [window convertPoint:pt fromWindow:nil];
 					pt = [window convertPoint:pt toView:view];
 					UIPointf ret;
-					ret.x = (sl_ui_posf)(pt.x);
-					ret.y = (sl_ui_posf)(pt.y);
+					ret.x = (sl_ui_posf)(pt.x * f);
+					ret.y = (sl_ui_posf)(pt.y * f);
 					return ret;
 				}
 			}
@@ -486,27 +492,28 @@ public:
 	{
 		UIView* view = m_window;
 		if (view != nil) {
+			CGFloat f = UIPlatform::getGlobalScaleFactor();
 			if ([view isKindOfClass:[UIWindow class]]) {
 				UIWindow* window = (UIWindow*)view;
 				CGPoint pt;
-				pt.x = (CGFloat)(ptWindow.x);
-				pt.y = (CGFloat)(ptWindow.y);
+				pt.x = (CGFloat)(ptWindow.x) / f;
+				pt.y = (CGFloat)(ptWindow.y) / f;
 				pt = [window convertPoint:pt toWindow:nil];
 				UIPointf ret;
-				ret.x = (sl_ui_posf)(pt.x);
-				ret.y = (sl_ui_posf)(pt.y);
+				ret.x = (sl_ui_posf)(pt.x * f);
+				ret.y = (sl_ui_posf)(pt.y * f);
 				return ret;
 			} else {
 				UIWindow* window = [view window];
 				if (window != nil) {
 					CGPoint pt;
-					pt.x = (CGFloat)(ptWindow.x);
-					pt.y = (CGFloat)(ptWindow.y);
+					pt.x = (CGFloat)(ptWindow.x) / f;
+					pt.y = (CGFloat)(ptWindow.y) / f;
 					pt = [window convertPoint:pt fromView:view];
 					pt = [window convertPoint:pt toWindow:nil];
 					UIPointf ret;
-					ret.x = (sl_ui_posf)(pt.x);
-					ret.y = (sl_ui_posf)(pt.y);
+					ret.x = (sl_ui_posf)(pt.x * f);
+					ret.y = (sl_ui_posf)(pt.y * f);
 					return ret;
 				}
 			}
@@ -574,9 +581,10 @@ SLIB_UI_NAMESPACE_END
 		_slib_iOS_Window* window = (_slib_iOS_Window*)_window;
 		slib::Ref<slib::_iOS_Window> w = window->m_window;
 		if (w.isNotNull()) {
+			CGFloat f = slib::UIPlatform::getGlobalScaleFactor();
 			slib::UISize size;
-			size.x = (sl_ui_pos)(_size.width);
-			size.y = (sl_ui_pos)(_size.height);
+			size.x = (sl_ui_pos)(_size.width * f);
+			size.y = (sl_ui_pos)(_size.height * f);
 			CGRect r = window.frame;
 			r.size = _size;
 			window.frame = r;

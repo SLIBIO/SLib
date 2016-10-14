@@ -39,7 +39,7 @@ public:
 			handle.drawsBackground = FALSE;
 		} else {
 			handle.drawsBackground = TRUE;
-			handle.backgroundColor = UIPlatform::getNSColorFromColor(backgroundColor);
+			handle.backgroundColor = GraphicsPlatform::getNSColorFromColor(backgroundColor);
 		}
 		__applyContent(handle);
 	}
@@ -160,7 +160,7 @@ void ScrollView::_setBackgroundColor_NW(const Color& color)
 			sv.drawsBackground = FALSE;
 		} else {
 			sv.drawsBackground = TRUE;
-			sv.backgroundColor = UIPlatform::getNSColorFromColor(color);
+			sv.backgroundColor = GraphicsPlatform::getNSColorFromColor(color);
 		}
 	}
 }

@@ -2,12 +2,12 @@
 
 #include "../../../inc/slib/ui/window.h"
 #include "../../../inc/slib/ui/core.h"
-
 #include "../../../inc/slib/ui/scroll_bar.h"
-#include "../../../inc/slib/graphics/bitmap.h"
 
 #include "../../../inc/slib/core/scoped_pointer.h"
 #include "../../../inc/slib/math/transform2d.h"
+#include "../../../inc/slib/graphics/bitmap.h"
+#include "../../../inc/slib/graphics/util.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -19,7 +19,7 @@ SLIB_DEFINE_OBJECT(View, Object)
 
 View::View()
 {
-	m_flagCreatingInstance = sl_false;
+	m_flagCreatingInstance = sl_true;
 	m_flagCreatingChildInstances = sl_false;
 	m_flagCreatingNativeWidget = sl_false;
 	m_attachMode = UIAttachMode::NotAttachInNativeWidget;
@@ -28,20 +28,23 @@ View::View()
 	m_frame.top = 0;
 	m_frame.right = 0;
 	m_frame.bottom = 0;
+	m_boundsInParent.left = 0;
+	m_boundsInParent.top = 0;
+	m_boundsInParent.right = 0;
+	m_boundsInParent.bottom = 0;
 	
 	m_visibility = Visibility::Visible;
-	m_flagEnabled = sl_true;
-	m_flagOpaque = sl_false;
-	
+	m_flagEnabled = sl_true;	
 	m_flagHitTestable = sl_true;
-	
 	m_flagFocusable = sl_false;
-	m_flagFocused = sl_false;
 	
+	m_flagFocused = sl_false;
 	m_flagPressed = sl_false;
 	m_flagHover = sl_false;
 	m_flagOccurringClick = sl_false;
 	
+	m_flagCurrentDrawing = sl_false;
+
 	m_actionMouseDown = UIAction::Unknown;
 	m_flagMultiTouchMode = sl_false;
 	m_flagPassEventToChildren = sl_true;
@@ -51,12 +54,216 @@ View::View()
 	
 	m_flagOnAddChild = sl_false;
 	m_flagOnRemoveChild = sl_false;
-
+	
+	m_paddingLeft = 0;
+	m_paddingTop = 0;
+	m_paddingRight = 0;
+	m_paddingBottom = 0;
+	
 }
 
 View::~View()
 {
 	detach();
+	detachAnimations();
+}
+
+Ref<View::LayoutAttributes> View::_initializeLayoutAttibutes()
+{
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs;
+	}
+	attrs = new LayoutAttributes;
+	if (attrs.isNull()) {
+		return Ref<LayoutAttributes>::null();
+	}
+
+	attrs->widthMode = SizeMode::Fixed;
+	attrs->heightMode = SizeMode::Fixed;
+	attrs->widthWeight = 1;
+	attrs->heightWeight = 1;
+	
+	attrs->leftMode = PositionMode::Fixed;
+	attrs->topMode = PositionMode::Fixed;
+	attrs->rightMode = PositionMode::Fixed;
+	attrs->bottomMode = PositionMode::Fixed;
+	
+	attrs->measuredWidth = 0;
+	attrs->measuredHeight = 0;
+	attrs->frame.left = 0;
+	attrs->frame.top = 0;
+	attrs->frame.right = 0;
+	attrs->frame.bottom = 0;
+	attrs->flagInvalidMeasure = sl_true;
+	attrs->flagInvalidLayout = sl_true;
+	attrs->flagMakeLayout = sl_false;
+	
+	attrs->flagInvalidRelativeBoundWidth = sl_true;
+	attrs->measuredRelativeBoundWidth = 0;
+	attrs->flagBadRelativeBoundWidth = sl_false;
+	attrs->flagInvalidRelativeBoundHeight = sl_true;
+	attrs->measuredRelativeBoundHeight = 0;
+	attrs->flagBadRelativeBoundHeight = sl_false;
+	
+	attrs->flagOnPrepareLayout = sl_false;
+	attrs->flagOnMakeLayout = sl_false;
+	
+	attrs->marginLeft = 0;
+	attrs->marginTop = 0;
+	attrs->marginRight = 0;
+	attrs->marginBottom = 0;
+	attrs->flagRelativeMarginLeft = sl_false;
+	attrs->relativeMarginLeftWeight = 0;
+	attrs->flagRelativeMarginTop = sl_false;
+	attrs->relativeMarginTopWeight = 0;
+	attrs->flagRelativeMarginRight = sl_false;
+	attrs->relativeMarginRightWeight = 0;
+	attrs->flagRelativeMarginBottom = sl_false;
+	attrs->relativeMarginBottomWeight = 0;
+	
+	attrs->flagRecursiveMakeLayout = sl_false;
+	attrs->flagUpdatedLayoutFrame = sl_false;
+		
+	m_layoutAttributes = attrs;
+	
+	return attrs;
+	
+}
+
+Ref<View::TransformAttributes> View::_initializeTransformAttributes()
+{
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull()) {
+		return attrs;
+	}
+	attrs = new TransformAttributes;
+	if (attrs.isNull()) {
+		return Ref<TransformAttributes>::null();
+	}
+
+	attrs->flagTransformFinalInvalid = sl_false;
+	attrs->flagTransformFinal = sl_false;
+	
+	attrs->flagInverseTransformFinalInvalid = sl_false;
+	attrs->flagInverseTransformFinal = sl_false;
+	
+	attrs->flagTransformStatic = sl_false;
+	attrs->flagTransformAnimation = sl_false;
+	
+	attrs->flagTransformCalcInvalid = sl_false;
+	attrs->flagTransformCalc = sl_false;
+	
+	attrs->translationStatic.x = 0;
+	attrs->translationStatic.y = 0;
+	attrs->translationAnimation.x = 0;
+	attrs->translationAnimation.y = 0;
+	
+	attrs->scaleStatic.x = 1;
+	attrs->scaleStatic.y = 1;
+	attrs->scaleAnimation.x = 1;
+	attrs->scaleAnimation.y = 1;
+	
+	attrs->rotationAngleStatic = 0;
+	attrs->rotationAngleAnimation = 0;
+	
+	attrs->anchorOffset.x = 0;
+	attrs->anchorOffset.y = 0;
+
+	m_transformAttributes = attrs;
+	
+	return attrs;
+	
+}
+
+Ref<View::DrawAttributes> View::_initializeDrawAttributes()
+{
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs;
+	}
+	attrs = new DrawAttributes;
+	if (attrs.isNull()) {
+		return Ref<DrawAttributes>::null();
+	}
+	
+	attrs->backgroundScaleMode = ScaleMode::Stretch;
+	attrs->backgroundAlignment = Alignment::MiddleCenter;
+	attrs->backgroundColor = Color::zero();
+	
+	attrs->boundShape = BoundShape::Rectangle;
+	
+	attrs->roundRectBoundShapeRadius.x = 5;
+	attrs->roundRectBoundShapeRadius.y = 5;
+	
+	attrs->borderColor = Color::Black;
+	attrs->borderStyle = PenStyle::Solid;
+	attrs->borderWidth = 0;
+	
+	attrs->flagPreDrawEnabled = sl_false;
+	attrs->flagPostDrawEnabled = sl_false;
+	attrs->flagOnDrawBackgroundAlways = sl_false;
+	attrs->flagOnDrawBorderAlways = sl_false;
+	
+	attrs->flagUsingFont = sl_false;
+	
+	attrs->flagOpaque = sl_false;
+	attrs->alphaStatic = 1;
+	attrs->alphaAnimation = 1;
+	attrs->flagLayer = sl_false;
+	attrs->flagInvalidatedLayer = sl_true;
+	attrs->flagInvalidatedWholeLayer = sl_true;
+
+	m_drawAttributes = attrs;
+	
+	return attrs;
+	
+}
+
+Ref<View::AnimationAttributes> View::_initializeAnimationAttributes()
+{
+	Ref<AnimationAttributes> attrs = m_animationAttributes;
+	if (attrs.isNotNull()) {
+		return attrs;
+	}
+	attrs = new AnimationAttributes;
+	if (attrs.isNull()) {
+		return Ref<AnimationAttributes>::null();
+	}
+	
+	m_animationAttributes = attrs;
+	
+	return attrs;
+}
+
+Ref<View::ScrollAttributes> View::_initializeScrollAttributes()
+{
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs;
+	}
+	attrs = new ScrollAttributes;
+	if (attrs.isNull()) {
+		return Ref<ScrollAttributes>::null();
+	}
+	
+	attrs->flagValidHorz = sl_false;
+	attrs->flagValidVert = sl_false;
+	attrs->x = 0;
+	attrs->y = 0;
+	attrs->contentWidth = 0;
+	attrs->contentHeight = 0;
+	attrs->barWidth = UI::getDefaultScrollBarWidth();
+	
+	attrs->flagContentScrollingByMouse = sl_true;
+	attrs->flagContentScrollingByTouch = sl_true;
+	attrs->flagContentScrollingByMouseWheel = sl_true;
+	attrs->flagContentScrollingByKeyboard = sl_true;
+	attrs->flagDownContent = sl_false;
+	
+	m_scrollAttributes = attrs;
+	
+	return attrs;
 }
 
 Ref<ViewInstance> View::getViewInstance()
@@ -175,24 +382,6 @@ void View::setWindow(const Ref<Window>& window)
 	m_window = window;
 }
 
-Ref<GraphicsContext> View::getGraphicsContext()
-{
-	Ref<GraphicsContext> context = m_graphicsContext;
-	if (context.isNotNull()) {
-		return context;
-	}
-	Ref<View> parent = getParent();
-	if (parent.isNotNull()) {
-		return parent->getGraphicsContext();
-	}
-	return UI::getGraphicsContext();
-}
-
-void View::setGraphicsContext(const Ref<GraphicsContext>& context)
-{
-	m_graphicsContext = context;
-}
-
 Ref<View> View::getParent()
 {
 	return m_parent;
@@ -258,7 +447,11 @@ void View::_processAttachOnUiThread()
 		if (isCreatingChildInstances()) {
 			ListLocker< Ref<View> > children(m_children);
 			for (sl_size i = 0; i < children.count; i++) {
+#if defined(SLIB_PLATFORM_IS_WIN32)
+				Ref<View>& child = children[children.count - 1 - i];
+#else
 				Ref<View>& child = children[i];
+#endif
 				if (child.isNotNull()) {
 					switch(child->getAttachMode()) {
 						case UIAttachMode::NotAttach:
@@ -270,10 +463,12 @@ void View::_processAttachOnUiThread()
 							if (!(isNativeWidget())) {
 								attachChild(child);
 							}
+							break;
 						case UIAttachMode::AttachInNativeWidget:
 							if (isNativeWidget()) {
 								attachChild(child);
 							}
+							break;
 					}
 				}
 			}
@@ -520,6 +715,28 @@ void View::setOnRemoveChildEnabled(sl_bool flagEnabled)
 	m_flagOnRemoveChild = flagEnabled;
 }
 
+void View::bringToFront(sl_bool flagRedraw)
+{
+	Ref<ViewInstance> instance = m_instance;
+	Ref<View> parent = getParent();
+	if (parent.isNotNull()) {
+		ObjectLocker lock(&(parent->m_children));
+		sl_reg index = parent->m_children.indexOf_NoLock(this);
+		if (index >= 0) {
+			parent->m_children.remove_NoLock(index);
+			parent->m_children.add_NoLock(this);
+			if (instance.isNull()) {
+				if (flagRedraw) {
+					invalidateBoundsInParent();
+				}
+			}
+		}
+	}
+	if (instance.isNotNull()) {
+		instance->bringToFront();
+	}
+}
+
 void View::_addChild(const Ref<View>& view, sl_bool flagRedraw)
 {
 	if (view.isNotNull()) {
@@ -542,11 +759,15 @@ void View::_addChild(const Ref<View>& view, sl_bool flagRedraw)
 				if (isInstance() && isCreatingChildInstances() && !(isNativeWidget())) {
 					attachChild(view);
 				}
+				break;
 			case UIAttachMode::AttachInNativeWidget:
 				if (isInstance() && isCreatingChildInstances() && isNativeWidget()) {
 					attachChild(view);
 				}
+				break;
 		}
+		
+		view->updateAndInvalidateBoundsInParent(sl_false);
 		if (flagRedraw) {
 			invalidate();
 		}
@@ -592,30 +813,160 @@ void View::_removeChildInstanceOnUiThread(Ref<ViewInstance> child)
 void View::invalidate()
 {
 	Ref<ViewInstance> instance = m_instance;
-	if (instance.isNotNull()) {
-		instance->invalidate();
-	} else {
-		Ref<View> parent = getParent();
-		if (parent.isNotNull()) {
-			parent->invalidate(getBoundsInParent());
+	if (instance.isNotNull() && instance->isNativeWidget()) {
+		return;
+	}
+	if (m_frame.getWidth() > 0 && m_frame.getHeight() > 0) {
+		if (UI::isUiThread()) {
+			if (m_flagCurrentDrawing) {
+				if (m_rectCurrentDrawing.containsRectangle(getBounds())) {
+					return;
+				}
+			}
 		}
+		invalidateLayer();
+#if defined(SLIB_PLATFORM_IS_WIN32)
+		if (checkSelfInvalidatable()) {
+			Ref<ViewInstance> instance = m_instance;
+			if (instance.isNotNull()) {
+				instance->invalidate();
+			}
+		} else {
+			Ref<View> parent = m_parent;
+			if (parent.isNotNull()) {
+				parent->invalidate(m_boundsInParent);
+			}
+		}
+#else
+		Ref<ViewInstance> instance = m_instance;
+		if (instance.isNotNull()) {
+			instance->invalidate();
+		} else {
+			Ref<View> parent = m_parent;
+			if (parent.isNotNull()) {
+				parent->invalidate(m_boundsInParent);
+			}
+		}
+#endif
 	}
 }
 
 void View::invalidate(const UIRect &rect)
 {
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull() && instance->isNativeWidget()) {
+		return;
+	}
 	UIRect rectIntersect;
 	if (getBounds().intersectRectangle(rect, &rectIntersect)) {
+		if (UI::isUiThread()) {
+			if (m_flagCurrentDrawing) {
+				if (m_rectCurrentDrawing.containsRectangle(rectIntersect)) {
+					return;
+				}
+			}
+		}
+		invalidateLayer(rectIntersect);
+#if defined(SLIB_PLATFORM_IS_WIN32)
+		if (checkSelfInvalidatable()) {
+			Ref<ViewInstance> instance = m_instance;
+			if (instance.isNotNull()) {
+				instance->invalidate(rectIntersect);
+			}
+		} else {
+			Ref<View> parent = m_parent;
+			if (parent.isNotNull()) {
+				parent->invalidate(convertCoordinateToParent(rectIntersect));
+			}
+		}
+#else
 		Ref<ViewInstance> instance = m_instance;
 		if (instance.isNotNull()) {
 			instance->invalidate(rectIntersect);
 		} else {
-			Ref<View> parent = getParent();
+			Ref<View> parent = m_parent;
 			if (parent.isNotNull()) {
-				parent->invalidate(getBoundsInParent(rectIntersect));
+				parent->invalidate(convertCoordinateToParent(rectIntersect));
 			}
 		}
+#endif
 	}
+}
+
+void View::invalidateBoundsInParent()
+{
+	if (checkSelfInvalidatable()) {
+		return;
+	}
+	Ref<View> parent = m_parent;
+	if (parent.isNotNull()) {
+		parent->invalidate(m_boundsInParent);
+	}
+}
+
+void View::updateAndInvalidateBoundsInParent(sl_bool flagInvalidate)
+{
+	Ref<View> parent = m_parent;
+	if (parent.isNotNull()) {
+		if (flagInvalidate && !(checkSelfInvalidatable())) {
+			UIRect bounds = m_boundsInParent;
+			if (bounds.getWidth() > 0 && bounds.getHeight() > 0) {
+				UIRect boundsNew = convertCoordinateToParent(getBounds());
+				boundsNew.left -= 2;
+				boundsNew.top -= 2;
+				boundsNew.right += 2;
+				boundsNew.bottom += 2;
+				m_boundsInParent = boundsNew;
+				if (bounds.intersectRectangle(boundsNew)) {
+					bounds.mergeRectangle(boundsNew);
+					parent->invalidate(bounds);
+				} else {
+					parent->invalidate(bounds);
+					parent->invalidate(boundsNew);
+				}
+			} else {
+				m_boundsInParent = convertCoordinateToParent(getBounds());
+				parent->invalidate(m_boundsInParent);
+			}
+		} else {
+			m_boundsInParent = convertCoordinateToParent(getBounds());
+		}
+	} else {
+		m_boundsInParent.setZero();
+	}
+}
+
+sl_bool View::checkSelfInvalidatable()
+{
+#if defined(SLIB_PLATFORM_IS_WIN32)
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		if (instance->isNativeWidget()) {
+			return sl_true;
+		}
+		if (isOpaque()) {
+			return sl_true;
+		}
+		if (getBackgroundColor().a == 255) {
+			return sl_true;
+		}
+		Ref<View> parent = m_parent;
+		if (parent.isNotNull()) {
+			Ref<ViewInstance> parentInstance = parent->m_instance;
+			if (parentInstance.isNull()) {
+				return sl_true;
+			}
+			if (parentInstance->isNativeWidget()) {
+				return sl_true;
+			}
+			return sl_false;
+		}
+		return sl_true;
+	}
+	return sl_false;
+#else
+	return isInstance();
+#endif
 }
 
 const UIRect& View::getFrame()
@@ -643,22 +994,19 @@ void View::_setFrame(const UIRect& _frame, sl_bool flagRedraw, sl_bool flagLayou
 	sl_bool flagNotResizeWidth = Math::isAlmostZero(frameOld.getWidth() - frame.getWidth());
 	sl_bool flagNotResizeHeight = Math::isAlmostZero(frameOld.getHeight() - frame.getHeight());
 	
-	m_frame = frame;
-
 	if (flagNotMoveX && flagNotMoveY && flagNotResizeWidth && flagNotResizeHeight) {
 		return;
 	}
 
-	Ref<ViewInstance> instance = m_instance;
-	if (instance.isNotNull()) {
-		instance->setFrame(frame);
-	}
+	m_frame = frame;
 	
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		layout->flagInvalidMeasure = sl_true;
+	_setFrame_NI(frame);
+	
+	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+	if (layoutAttrs.isNotNull()) {
+		layoutAttrs->flagInvalidMeasure = sl_true;
 		if (!(flagNotResizeWidth && flagNotResizeHeight)) {
-			layout->flagInvalidLayout = sl_true;
+			layoutAttrs->flagInvalidLayout = sl_true;
 		}
 		if (!flagLayouting) {
 			Ref<View> parent = getParent();
@@ -669,26 +1017,16 @@ void View::_setFrame(const UIRect& _frame, sl_bool flagRedraw, sl_bool flagLayou
 			}
 		}
 	} else {
-		Ref<View> parent = getParent();
-		if (parent.isNotNull()) {
-			parent->requestLayout(sl_false);
-		}
+		requestParentLayout(sl_false);
 	}
 	
 	if (!(flagNotResizeWidth && flagNotResizeHeight)) {
 		dispatchResize(frame.getWidth(), frame.getHeight());
-	}
-	
-	if (instance.isNull()) {
 		if (flagRedraw) {
-			Ref<View> parent = getParent();
-			if (parent.isNotNull()) {
-				UIRect bounds = getBoundsInParent(UIRect(0, 0, frameOld.getWidth(), frameOld.getHeight()));
-				bounds.mergeRectangle(getBoundsInParent());
-				parent->invalidate(bounds);
-			}
+			invalidateLayer();
 		}
 	}
+	updateAndInvalidateBoundsInParent(flagRedraw);
 
 }
 
@@ -779,30 +1117,14 @@ UIRect View::getBounds()
 
 UIRect View::getBoundsInnerPadding()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNull()) {
-		return getBounds();
-	}
-	UIRect ret(layout->paddingLeft, layout->paddingTop, m_frame.getWidth() - layout->paddingRight, m_frame.getHeight() - layout->paddingBottom);
+	UIRect ret(m_paddingLeft, m_paddingTop, m_frame.getWidth() - m_paddingRight, m_frame.getHeight() - m_paddingBottom);
 	ret.fixSizeError();
 	return ret;
 }
 
 UIRect View::getBoundsInParent()
 {
-	return getBoundsInParent(getBounds());
-}
-
-UIRect View::getBoundsInParent(const UIRect& boundsLocal)
-{
-	UIPoint pts[4];
-	boundsLocal.getCornerPoints(pts);
-	for (int i = 0; i < 4; i++) {
-		pts[i] = convertCoordinateToParent(pts[i]);
-	}
-	UIRect rc;
-	rc.setFromPoints(pts, 4);
-	return rc;
+	return m_boundsInParent;
 }
 
 Visibility View::getVisibility()
@@ -828,7 +1150,7 @@ void View::setVisibility(Visibility visibility, sl_bool flagRedraw)
 	}
 	if (instance.isNull()) {
 		if (flagRedraw) {
-			invalidate();
+			invalidateBoundsInParent();
 		}
 	}
 }
@@ -865,24 +1187,6 @@ void View::setEnabled(sl_bool flag, sl_bool flagRedraw)
 	}
 }
 
-sl_bool View::isOpaque()
-{
-	return m_flagOpaque;
-}
-
-void View::setOpaque(sl_bool flag, sl_bool flagRedraw)
-{
-	m_flagOpaque = flag;
-	Ref<ViewInstance> instance = m_instance;
-	if (instance.isNotNull()) {
-		instance->setOpaque(flag);
-	} else {
-		if (flagRedraw) {
-			invalidate();
-		}
-	}
-}
-
 sl_bool View::isHitTestable()
 {
 	return m_flagHitTestable;
@@ -898,9 +1202,9 @@ sl_bool View::hitTest(sl_ui_pos x, sl_ui_pos y)
 	UIRect rc(0, 0, getWidth(), getHeight());
 	switch (getBoundShape()) {
 		case BoundShape::RoundRect:
-			return GraphicsPath::containsPointInRoundRect(Point((sl_real)x, (sl_real)y), rc, getRoundRectBoundShapeRadius());
+			return GraphicsUtil::containsPointInRoundRect(Point((sl_real)x, (sl_real)y), rc, getRoundRectBoundShapeRadius());
 		case BoundShape::Ellipse:
-			return GraphicsPath::containsPointInEllipse(Point((sl_real)x, (sl_real)y), rc);
+			return GraphicsUtil::containsPointInEllipse(Point((sl_real)x, (sl_real)y), rc);
 		default:
 			break;
 	}
@@ -1016,7 +1320,12 @@ void View::setHoverState(sl_bool flagState, sl_bool flagRedraw)
 	if (m_flagHover != flagState) {
 		m_flagHover = flagState;
 		if (flagRedraw) {
-			invalidate();
+			Ref<DrawAttributes> attrs = m_drawAttributes;
+			if (attrs.isNotNull()) {
+				if (attrs->backgroundHover.isNotNull() && attrs->background != attrs->backgroundHover) {
+					invalidate();
+				}
+			}
 		}
 	}
 }
@@ -1043,19 +1352,16 @@ void View::setCursor(const Ref<Cursor> &cursor)
 
 void View::measureLayout()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNull()) {
+	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+	if (layoutAttrs.isNull()) {
 		return;
 	}
-	if (!(layout->flagEnabled)) {
-		return;
-	}
-	if (!(layout->flagInvalidMeasure)) {
+	if (!(layoutAttrs->flagInvalidMeasure)) {
 		return;
 	}
 	
-	SizeMode widthMode = layout->widthMode;
-	SizeMode heightMode = layout->heightMode;
+	SizeMode widthMode = layoutAttrs->widthMode;
+	SizeMode heightMode = layoutAttrs->heightMode;
 	
 	sl_bool flagHorizontal = sl_false;
 	sl_bool flagVertical = sl_false;
@@ -1073,36 +1379,34 @@ void View::measureLayout()
 	} else if (heightMode == SizeMode::Fixed) {
 		measuredHeight = getHeight();
 	}
-	layout->measuredWidth = measuredWidth;
-	layout->measuredHeight = measuredHeight;
+	layoutAttrs->measuredWidth = measuredWidth;
+	layoutAttrs->measuredHeight = measuredHeight;
 	
 	if (flagHorizontal || flagVertical) {
 		onMeasureLayout(flagHorizontal, flagVertical);
 	}
 	
 	if (widthMode == SizeMode::Wrapping) {
-		measuredWidth = layout->measuredWidth;
+		measuredWidth = layoutAttrs->measuredWidth;
 	}
 	if (heightMode == SizeMode::Wrapping) {
-		measuredHeight = layout->measuredHeight;
+		measuredHeight = layoutAttrs->measuredHeight;
 	}
 	
-	layout->flagInvalidMeasure = sl_false;
+	layoutAttrs->flagInvalidMeasure = sl_false;
 
 }
 
 sl_ui_len View::getMeasuredWidth()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		if (layout->flagEnabled) {
-			if (layout->widthMode == SizeMode::Wrapping) {
-				return layout->measuredWidth;
-			} else if (layout->widthMode == SizeMode::Filling) {
-				return 0;
-			} else if (layout->widthMode == SizeMode::Weight) {
-				return 0;
-			}
+	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+	if (layoutAttrs.isNotNull()) {
+		if (layoutAttrs->widthMode == SizeMode::Wrapping) {
+			return layoutAttrs->measuredWidth;
+		} else if (layoutAttrs->widthMode == SizeMode::Filling) {
+			return 0;
+		} else if (layoutAttrs->widthMode == SizeMode::Weight) {
+			return 0;
 		}
 	}
 	return getWidth();
@@ -1110,26 +1414,22 @@ sl_ui_len View::getMeasuredWidth()
 
 void View::setMeasuredWidth(sl_ui_len width)
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		if (layout->flagEnabled) {
-			layout->measuredWidth = width;
-		}
+	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+	if (layoutAttrs.isNotNull()) {
+		layoutAttrs->measuredWidth = width;
 	}
 }
 
 sl_ui_len View::getMeasuredHeight()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		if (layout->flagEnabled) {
-			if (layout->heightMode == SizeMode::Wrapping) {
-				return layout->measuredHeight;
-			} else if (layout->heightMode == SizeMode::Filling) {
-				return 0;
-			} else if (layout->heightMode == SizeMode::Weight) {
-				return 0;
-			}
+	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+	if (layoutAttrs.isNotNull()) {
+		if (layoutAttrs->heightMode == SizeMode::Wrapping) {
+			return layoutAttrs->measuredHeight;
+		} else if (layoutAttrs->heightMode == SizeMode::Filling) {
+			return 0;
+		} else if (layoutAttrs->heightMode == SizeMode::Weight) {
+			return 0;
 		}
 	}
 	return getHeight();
@@ -1137,11 +1437,9 @@ sl_ui_len View::getMeasuredHeight()
 
 void View::setMeasuredHeight(sl_ui_len height)
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		if (layout->flagEnabled) {
-			layout->measuredHeight = height;
-		}
+	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+	if (layoutAttrs.isNotNull()) {
+		layoutAttrs->measuredHeight = height;
 	}
 }
 
@@ -1150,32 +1448,29 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 	if (!(isVisible())) {
 		return;
 	}
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNull()) {
-		return;
-	}
-	if (!(layout->flagEnabled)) {
+	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+	if (layoutAttrs.isNull()) {
 		return;
 	}
 	
 	UIRect frame;
 	if (param.flagUseLayoutFrame) {
-		frame = layout->frame;
+		frame = layoutAttrs->frame;
 	} else {
 		frame = m_frame;
 	}
 	
-	SizeMode widthMode = layout->widthMode;
-	SizeMode heightMode = layout->heightMode;
+	SizeMode widthMode = layoutAttrs->widthMode;
+	SizeMode heightMode = layoutAttrs->heightMode;
 	
 	if (widthMode == SizeMode::Wrapping || heightMode == SizeMode::Wrapping) {
 		measureLayout();
 	}
 	
-	PositionMode leftMode = layout->leftMode;
-	PositionMode topMode = layout->topMode;
-	PositionMode rightMode = layout->rightMode;
-	PositionMode bottomMode = layout->bottomMode;
+	PositionMode leftMode = layoutAttrs->leftMode;
+	PositionMode topMode = layoutAttrs->topMode;
+	PositionMode rightMode = layoutAttrs->rightMode;
+	PositionMode bottomMode = layoutAttrs->bottomMode;
 	
 	if (widthMode == SizeMode::Filling) {
 		if (leftMode == PositionMode::CenterInParent || leftMode == PositionMode::CenterInOther) {
@@ -1218,11 +1513,11 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 	sl_ui_pos width, height;
 	switch (widthMode) {
 		case SizeMode::Wrapping:
-			width = layout->measuredWidth;
+			width = layoutAttrs->measuredWidth;
 			break;
 		case SizeMode::Filling:
 		case SizeMode::Weight:
-			width = (sl_ui_pos)((sl_real)parentWidth * Math::abs(layout->widthWeight));
+			width = (sl_ui_pos)((sl_real)parentWidth * Math::abs(layoutAttrs->widthWeight));
 			break;
 		default:
 			width = frame.getWidth();
@@ -1230,11 +1525,11 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 	}
 	switch (heightMode) {
 		case SizeMode::Wrapping:
-			height = layout->measuredHeight;
+			height = layoutAttrs->measuredHeight;
 			break;
 		case SizeMode::Filling:
 		case SizeMode::Weight:
-			height = (sl_ui_pos)((sl_real)parentHeight * Math::abs(layout->heightWeight));
+			height = (sl_ui_pos)((sl_real)parentHeight * Math::abs(layoutAttrs->heightWeight));
 			break;
 		default:
 			height = frame.getHeight();
@@ -1247,75 +1542,75 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 		height = 0;
 	}
 	
-	if (layout->flagRelativeMarginLeft) {
-		layout->marginLeft = (sl_ui_pos)((sl_real)parentWidth * layout->relativeMarginLeftWeight);
+	if (layoutAttrs->flagRelativeMarginLeft) {
+		layoutAttrs->marginLeft = (sl_ui_pos)((sl_real)parentWidth * layoutAttrs->relativeMarginLeftWeight);
 	}
-	if (layout->flagRelativeMarginTop) {
-		layout->marginTop = (sl_ui_pos)((sl_real)parentHeight * layout->relativeMarginTopWeight);
+	if (layoutAttrs->flagRelativeMarginTop) {
+		layoutAttrs->marginTop = (sl_ui_pos)((sl_real)parentHeight * layoutAttrs->relativeMarginTopWeight);
 	}
-	if (layout->flagRelativeMarginRight) {
-		layout->marginRight = (sl_ui_pos)((sl_real)parentWidth * layout->relativeMarginRightWeight);
+	if (layoutAttrs->flagRelativeMarginRight) {
+		layoutAttrs->marginRight = (sl_ui_pos)((sl_real)parentWidth * layoutAttrs->relativeMarginRightWeight);
 	}
-	if (layout->flagRelativeMarginBottom) {
-		layout->marginBottom = (sl_ui_pos)((sl_real)parentHeight * layout->relativeMarginBottomWeight);
+	if (layoutAttrs->flagRelativeMarginBottom) {
+		layoutAttrs->marginBottom = (sl_ui_pos)((sl_real)parentHeight * layoutAttrs->relativeMarginBottomWeight);
 	}
 	Ref<View> referView;
 	switch (leftMode) {
 		case PositionMode::ParentEdge:
-			frame.left = param.parentContentFrame.left + layout->marginLeft;
+			frame.left = param.parentContentFrame.left + layoutAttrs->marginLeft;
 			break;
 		case PositionMode::OtherStart:
-			referView = layout->leftReferingView;
+			referView = layoutAttrs->leftReferingView;
 			if (referView.isNotNull()) {
 				UIRect referFrame = referView->getLayoutFrame();
-				frame.left = referFrame.left + layout->marginLeft;
+				frame.left = referFrame.left + layoutAttrs->marginLeft;
 			} else {
-				frame.left = param.parentContentFrame.left + layout->marginLeft;
+				frame.left = param.parentContentFrame.left + layoutAttrs->marginLeft;
 			}
 			break;
 		case PositionMode::OtherEnd:
-			referView = layout->leftReferingView;
+			referView = layoutAttrs->leftReferingView;
 			if (referView.isNotNull()) {
 				UIRect referFrame = referView->getLayoutFrame();
-				frame.left = referFrame.right + referView->getMarginRight() + layout->marginLeft;
+				frame.left = referFrame.right + referView->getMarginRight() + layoutAttrs->marginLeft;
 			} else {
-				frame.left = param.parentContentFrame.left + layout->marginLeft;
+				frame.left = param.parentContentFrame.left + layoutAttrs->marginLeft;
 			}
 			break;
 		case PositionMode::CenterInParent:
-			frame.left = (param.parentContentFrame.left + layout->marginLeft + param.parentContentFrame.right - layout->marginRight - width) / 2;
+			frame.left = (param.parentContentFrame.left + layoutAttrs->marginLeft + param.parentContentFrame.right - layoutAttrs->marginRight - width) / 2;
 			break;
 		case PositionMode::CenterInOther:
-			referView = layout->leftReferingView;
+			referView = layoutAttrs->leftReferingView;
 			if (referView.isNotNull()) {
 				UIRect referFrame = referView->getLayoutFrame();
-				frame.left = (referFrame.left + layout->marginLeft + referFrame.right - layout->marginRight - width) / 2;
+				frame.left = (referFrame.left + layoutAttrs->marginLeft + referFrame.right - layoutAttrs->marginRight - width) / 2;
 			} else {
-				frame.left = (param.parentContentFrame.left + layout->marginLeft + param.parentContentFrame.right - layout->marginRight - width) / 2;
+				frame.left = (param.parentContentFrame.left + layoutAttrs->marginLeft + param.parentContentFrame.right - layoutAttrs->marginRight - width) / 2;
 			}
 		default:
 			break;
 	}
 	switch (rightMode) {
 		case PositionMode::ParentEdge:
-			frame.right = param.parentContentFrame.right - layout->marginRight;
+			frame.right = param.parentContentFrame.right - layoutAttrs->marginRight;
 			break;
 		case PositionMode::OtherStart:
-			referView = layout->rightReferingView;
+			referView = layoutAttrs->rightReferingView;
 			if (referView.isNotNull()) {
 				UIRect referFrame = referView->getLayoutFrame();
-				frame.right = referFrame.left - referView->getMarginLeft() - layout->marginRight;
+				frame.right = referFrame.left - referView->getMarginLeft() - layoutAttrs->marginRight;
 			} else {
-				frame.right = param.parentContentFrame.right - layout->marginRight;
+				frame.right = param.parentContentFrame.right - layoutAttrs->marginRight;
 			}
 			break;
 		case PositionMode::OtherEnd:
-			referView = layout->rightReferingView;
+			referView = layoutAttrs->rightReferingView;
 			if (referView.isNotNull()) {
 				UIRect referFrame = referView->getLayoutFrame();
-				frame.right = referFrame.right - layout->marginRight;
+				frame.right = referFrame.right - layoutAttrs->marginRight;
 			} else {
-				frame.right = param.parentContentFrame.right - layout->marginRight;
+				frame.right = param.parentContentFrame.right - layoutAttrs->marginRight;
 			}
 			break;
 		default:
@@ -1324,36 +1619,36 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 	}
 	switch (topMode) {
 		case PositionMode::ParentEdge:
-			frame.top = param.parentContentFrame.top + layout->marginTop;
+			frame.top = param.parentContentFrame.top + layoutAttrs->marginTop;
 			break;
 		case PositionMode::OtherStart:
-			referView = layout->topReferingView;
+			referView = layoutAttrs->topReferingView;
 			if (referView.isNotNull()) {
 				UIRect referFrame = referView->getLayoutFrame();
-				frame.top = referFrame.top + layout->marginTop;
+				frame.top = referFrame.top + layoutAttrs->marginTop;
 			} else {
-				frame.top = param.parentContentFrame.top + layout->marginTop;
+				frame.top = param.parentContentFrame.top + layoutAttrs->marginTop;
 			}
 			break;
 		case PositionMode::OtherEnd:
-			referView = layout->topReferingView;
+			referView = layoutAttrs->topReferingView;
 			if (referView.isNotNull()) {
 				UIRect referFrame = referView->getLayoutFrame();
-				frame.top = referFrame.bottom + referView->getMarginBottom() + layout->marginTop;
+				frame.top = referFrame.bottom + referView->getMarginBottom() + layoutAttrs->marginTop;
 			} else {
-				frame.top = param.parentContentFrame.top + layout->marginTop;
+				frame.top = param.parentContentFrame.top + layoutAttrs->marginTop;
 			}
 			break;
 		case PositionMode::CenterInParent:
-			frame.top = (param.parentContentFrame.top + layout->marginTop + param.parentContentFrame.bottom - layout->marginBottom - height) / 2;
+			frame.top = (param.parentContentFrame.top + layoutAttrs->marginTop + param.parentContentFrame.bottom - layoutAttrs->marginBottom - height) / 2;
 			break;
 		case PositionMode::CenterInOther:
-			referView = layout->topReferingView;
+			referView = layoutAttrs->topReferingView;
 			if (referView.isNotNull()) {
 				UIRect referFrame = referView->getLayoutFrame();
-				frame.top = (referFrame.top + layout->marginTop + referFrame.bottom - layout->marginBottom - height) / 2;
+				frame.top = (referFrame.top + layoutAttrs->marginTop + referFrame.bottom - layoutAttrs->marginBottom - height) / 2;
 			} else {
-				frame.top = (param.parentContentFrame.top + layout->marginTop + param.parentContentFrame.bottom - layout->marginBottom - height) / 2;
+				frame.top = (param.parentContentFrame.top + layoutAttrs->marginTop + param.parentContentFrame.bottom - layoutAttrs->marginBottom - height) / 2;
 			}
 			break;
 		default:
@@ -1362,24 +1657,24 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 	switch (bottomMode)
 	{
 		case PositionMode::ParentEdge:
-			frame.bottom = param.parentContentFrame.bottom - layout->marginBottom;
+			frame.bottom = param.parentContentFrame.bottom - layoutAttrs->marginBottom;
 			break;
 		case PositionMode::OtherStart:
-			referView = layout->bottomReferingView;
+			referView = layoutAttrs->bottomReferingView;
 			if (referView.isNotNull()) {
 				UIRect referFrame = referView->getLayoutFrame();
-				frame.bottom = referFrame.top - referView->getMarginTop() - layout->marginBottom;
+				frame.bottom = referFrame.top - referView->getMarginTop() - layoutAttrs->marginBottom;
 			} else {
-				frame.bottom = param.parentContentFrame.bottom - layout->marginBottom;
+				frame.bottom = param.parentContentFrame.bottom - layoutAttrs->marginBottom;
 			}
 			break;
 		case PositionMode::OtherEnd:
-			referView = layout->bottomReferingView;
+			referView = layoutAttrs->bottomReferingView;
 			if (referView.isNotNull()) {
 				UIRect referFrame = referView->getLayoutFrame();
-				frame.bottom = referFrame.bottom - layout->marginBottom;
+				frame.bottom = referFrame.bottom - layoutAttrs->marginBottom;
 			} else {
-				frame.bottom = param.parentContentFrame.bottom - layout->marginBottom;
+				frame.bottom = param.parentContentFrame.bottom - layoutAttrs->marginBottom;
 			}
 			break;
 		default:
@@ -1391,7 +1686,7 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 			frame.right = frame.left;
 		}
 		if (width > 0 && width < frame.right - frame.left) {
-			if (layout->widthWeight > 0) {
+			if (layoutAttrs->widthWeight > 0) {
 				frame.right = frame.left + width;
 			} else {
 				frame.left = frame.right - width;
@@ -1413,7 +1708,7 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 			frame.bottom = frame.top;
 		}
 		if (height > 0 && height < frame.bottom - frame.top) {
-			if (layout->heightWeight > 0) {
+			if (layoutAttrs->heightWeight > 0) {
 				frame.bottom = frame.top + height;
 			} else {
 				frame.top = frame.bottom - height;
@@ -1431,8 +1726,8 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 		}
 	}
 	frame.fixSizeError();
-	layout->frame = frame;
-	layout->flagUpdatedLayoutFrame = sl_true;
+	layoutAttrs->frame = frame;
+	layoutAttrs->flagUpdatedLayoutFrame = sl_true;
 }
 
 void View::_makeLayout(sl_bool flagApplyLayout)
@@ -1442,85 +1737,88 @@ void View::_makeLayout(sl_bool flagApplyLayout)
 	}
 	if (isVisible()) {
 		
-		Ref<LayoutAttributes> layout = m_layout;
+		Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
 		
-		if (layout.isNotNull() && layout->flagEnabled && !(layout->flagRecursiveMakeLayout)) {
+		if (layoutAttrs.isNotNull() && !(layoutAttrs->flagRecursiveMakeLayout)) {
 			
-			layout->flagRecursiveMakeLayout = sl_true;
+			layoutAttrs->flagRecursiveMakeLayout = sl_true;
 			
 			do {
 				if (flagApplyLayout) {
-					if (layout->frame.isAlmostEqual(m_frame)) {
+					if (layoutAttrs->frame.isAlmostEqual(m_frame)) {
 						break;
 					}
 					UISize oldSize = m_frame.getSize();
-					_setFrame(layout->frame, sl_false, sl_true);
-					if (layout->frame.getSize().isAlmostEqual(oldSize)) {
+					_setFrame(layoutAttrs->frame, sl_false, sl_true);
+					if (layoutAttrs->frame.getSize().isAlmostEqual(oldSize)) {
 						break;
 					}
 				} else {
-					if (!(layout->flagInvalidLayout)) {
+					if (!(layoutAttrs->flagInvalidLayout)) {
 						break;
 					}
-					if (layout->widthMode == SizeMode::Wrapping || layout->heightMode == SizeMode::Wrapping) {
+					if (layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping) {
 						measureLayout();
-						UIRect frame = layout->frame;
-						if (layout->widthMode == SizeMode::Wrapping) {
-							frame.setWidth(layout->measuredWidth);
+						UIRect frame = layoutAttrs->frame;
+						if (layoutAttrs->widthMode == SizeMode::Wrapping) {
+							frame.setWidth(layoutAttrs->measuredWidth);
 						}
-						if (layout->heightMode == SizeMode::Wrapping) {
-							frame.setHeight(layout->measuredHeight);
+						if (layoutAttrs->heightMode == SizeMode::Wrapping) {
+							frame.setHeight(layoutAttrs->measuredHeight);
 						}
 						_setFrame(frame, sl_false, sl_true);
 					}
 				}
 				
-				ViewPrepareLayoutParam param;
-				param.parentContentFrame.left = layout->paddingLeft;
-				param.parentContentFrame.top = layout->paddingTop;
-				param.parentContentFrame.right = getWidth() - layout->paddingRight;
-				param.parentContentFrame.bottom = getHeight() - layout->paddingBottom;
-				param.parentContentFrame.fixSizeError();
-				param.flagUseLayoutFrame = sl_false;
-				
-				{
-					ListLocker< Ref<View> > children(m_children);
-					for (sl_size i = 0; i < children.count; i++) {
-						Ref<View>& child = children[i];
-						if (child.isNotNull() && child->isLayoutEnabled()) {
-							child->_prepareLayout(param);
-							child->setLayoutFrameUpdated(sl_false);
-						}
-					}
-				}
-				
-				if (layout->flagOnMakeLayout) {
-					onMakeLayout();
-				}
-				
-				param.flagUseLayoutFrame = sl_true;
-
-				{
-					ListLocker< Ref<View> > children(m_children);
-					for (sl_size i = 0; i < children.count; i++) {
-						Ref<View>& child = children[i];
-						if (child.isNotNull() && child->isLayoutEnabled()) {
-							if (!(child->isLayoutFrameUpdated())) {
+				if (layoutAttrs->flagMakeLayout) {
+					
+					ViewPrepareLayoutParam param;
+					param.parentContentFrame.left = m_paddingLeft;
+					param.parentContentFrame.top = m_paddingTop;
+					param.parentContentFrame.right = getWidth() - m_paddingRight;
+					param.parentContentFrame.bottom = getHeight() - m_paddingBottom;
+					param.parentContentFrame.fixSizeError();
+					param.flagUseLayoutFrame = sl_false;
+					
+					{
+						ListLocker< Ref<View> > children(m_children);
+						for (sl_size i = 0; i < children.count; i++) {
+							Ref<View>& child = children[i];
+							if (child.isNotNull() && child->isLayouting()) {
 								child->_prepareLayout(param);
-								if (child->isOnPrepareLayoutEnabled()) {
-									child->onPrepareLayout(param);
-								}
+								child->setLayoutFrameUpdated(sl_false);
 							}
-							child->_makeLayout(sl_true);
+						}
+					}
+					
+					if (layoutAttrs->flagOnMakeLayout) {
+						onMakeLayout();
+					}
+					
+					param.flagUseLayoutFrame = sl_true;
+
+					{
+						ListLocker< Ref<View> > children(m_children);
+						for (sl_size i = 0; i < children.count; i++) {
+							Ref<View>& child = children[i];
+							if (child.isNotNull() && child->isLayouting()) {
+								if (!(child->isLayoutFrameUpdated())) {
+									child->_prepareLayout(param);
+									if (child->isOnPrepareLayoutEnabled()) {
+										child->onPrepareLayout(param);
+									}
+								}
+								child->_makeLayout(sl_true);
+							}
 						}
 					}
 				}
 				
-				layout->flagInvalidLayout = sl_false;
+				layoutAttrs->flagInvalidLayout = sl_false;
 				
 			} while (0);
 
-			layout->flagRecursiveMakeLayout = sl_false;
+			layoutAttrs->flagRecursiveMakeLayout = sl_false;
 			
 		}
 	}
@@ -1529,27 +1827,23 @@ void View::_makeLayout(sl_bool flagApplyLayout)
 
 void View::_measureRelativeBoundWidth()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNull()) {
+	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+	if (layoutAttrs.isNull()) {
 		return;
 	}
-	if (!(layout->flagEnabled)) {
+	if (!(layoutAttrs->flagInvalidRelativeBoundWidth)) {
 		return;
 	}
-	
-	if (!(layout->flagInvalidRelativeBoundWidth)) {
-		return;
-	}
-	layout->flagInvalidRelativeBoundWidth = sl_false;
-	layout->measuredRelativeBoundWidth = 0;
-	layout->flagBadRelativeBoundWidth = sl_false;
+	layoutAttrs->flagInvalidRelativeBoundWidth = sl_false;
+	layoutAttrs->measuredRelativeBoundWidth = 0;
+	layoutAttrs->flagBadRelativeBoundWidth = sl_false;
 	
 	measureLayout();
 	
-	PositionMode leftMode = layout->leftMode;
-	PositionMode rightMode = layout->rightMode;
+	PositionMode leftMode = layoutAttrs->leftMode;
+	PositionMode rightMode = layoutAttrs->rightMode;
 	
-	SizeMode widthMode = layout->widthMode;
+	SizeMode widthMode = layoutAttrs->widthMode;
 	if (widthMode == SizeMode::Filling) {
 		if (leftMode == PositionMode::CenterInParent || leftMode == PositionMode::CenterInOther) {
 			rightMode = PositionMode::Fixed;
@@ -1568,12 +1862,12 @@ void View::_measureRelativeBoundWidth()
 	
 	
 	sl_ui_pos marginLeft = 0;
-	if (!(layout->flagRelativeMarginLeft)) {
-		marginLeft = layout->marginLeft;
+	if (!(layoutAttrs->flagRelativeMarginLeft)) {
+		marginLeft = layoutAttrs->marginLeft;
 	}
 	sl_ui_pos marginRight = 0;
-	if (!(layout->flagRelativeMarginRight)) {
-		marginRight = layout->marginRight;
+	if (!(layoutAttrs->flagRelativeMarginRight)) {
+		marginRight = layoutAttrs->marginRight;
 	}
 	
 	sl_ui_pos parentPaddingLeft = 0;
@@ -1586,30 +1880,30 @@ void View::_measureRelativeBoundWidth()
 		marginLeft = m_frame.left - parentPaddingLeft;
 	}
 	
-	sl_ui_pos outerWidth = layout->measuredWidth + marginLeft + marginRight;
+	sl_ui_pos outerWidth = layoutAttrs->measuredWidth + marginLeft + marginRight;
 	
 	if (leftMode == PositionMode::OtherStart || leftMode == PositionMode::OtherEnd) {
-		Ref<View> referView = layout->leftReferingView;
+		Ref<View> referView = layoutAttrs->leftReferingView;
 		if (referView.isNotNull()) {
-			Ref<LayoutAttributes> referLayout = referView->m_layout;
-			if (referLayout.isNull() || !(layout->flagEnabled)) {
+			Ref<LayoutAttributes> referLayoutAttrs = referView->m_layoutAttributes;
+			if (referLayoutAttrs.isNull()) {
 				if (leftMode == PositionMode::OtherStart) {
 					outerWidth += referView->m_frame.left - parentPaddingLeft;
 				} else {
 					outerWidth += referView->m_frame.right - parentPaddingLeft;
 				}
 			} else {
-				if (referLayout->rightMode != PositionMode::Fixed || referLayout->leftMode == PositionMode::CenterInOther || referLayout->leftMode == PositionMode::CenterInParent) {
-					layout->flagBadRelativeBoundWidth = sl_true;
+				if (referLayoutAttrs->rightMode != PositionMode::Fixed || referLayoutAttrs->leftMode == PositionMode::CenterInOther || referLayoutAttrs->leftMode == PositionMode::CenterInParent) {
+					layoutAttrs->flagBadRelativeBoundWidth = sl_true;
 					return;
 				}
 				referView->_measureRelativeBoundWidth();
-				if (referLayout->flagBadRelativeBoundWidth) {
-					layout->flagBadRelativeBoundWidth = sl_true;
+				if (referLayoutAttrs->flagBadRelativeBoundWidth) {
+					layoutAttrs->flagBadRelativeBoundWidth = sl_true;
 					return;
 				}
 				if (leftMode == PositionMode::OtherStart) {
-					sl_ui_pos w = referLayout->measuredRelativeBoundWidth;
+					sl_ui_pos w = referLayoutAttrs->measuredRelativeBoundWidth;
 					w -= referView->getMeasuredWidth();
 					w -= referView->getAbsoluteMarginRight();
 					if (w < 0) {
@@ -1617,7 +1911,7 @@ void View::_measureRelativeBoundWidth()
 					}
 					outerWidth += w;
 				} else {
-					sl_ui_pos w = referLayout->measuredRelativeBoundWidth;
+					sl_ui_pos w = referLayoutAttrs->measuredRelativeBoundWidth;
 					w -= referView->getAbsoluteMarginRight();
 					if (w < 0) {
 						w = 0;
@@ -1628,31 +1922,31 @@ void View::_measureRelativeBoundWidth()
 		}
 	}
 	if (rightMode == PositionMode::OtherStart || rightMode == PositionMode::OtherEnd) {
-		Ref<View> referView = layout->rightReferingView;
+		Ref<View> referView = layoutAttrs->rightReferingView;
 		if (referView.isNotNull()) {
-			Ref<LayoutAttributes> referLayout = referView->m_layout;
-			if (referLayout.isNull() || !(layout->flagEnabled)) {
-				layout->flagBadRelativeBoundWidth = sl_true;
+			Ref<LayoutAttributes> referLayoutAttrs = referView->m_layoutAttributes;
+			if (referLayoutAttrs.isNull()) {
+				layoutAttrs->flagBadRelativeBoundWidth = sl_true;
 				return;
 			} else {
-				if (referLayout->rightMode == PositionMode::Fixed || referLayout->leftMode != PositionMode::Fixed) {
-					layout->flagBadRelativeBoundWidth = sl_true;
+				if (referLayoutAttrs->rightMode == PositionMode::Fixed || referLayoutAttrs->leftMode != PositionMode::Fixed) {
+					layoutAttrs->flagBadRelativeBoundWidth = sl_true;
 					return;
 				}
 				referView->_measureRelativeBoundWidth();
-				if (referLayout->flagBadRelativeBoundWidth) {
-					layout->flagBadRelativeBoundWidth = sl_true;
+				if (referLayoutAttrs->flagBadRelativeBoundWidth) {
+					layoutAttrs->flagBadRelativeBoundWidth = sl_true;
 					return;
 				}
 				if (rightMode == PositionMode::OtherStart) {
-					sl_ui_pos w = referLayout->measuredRelativeBoundWidth;
+					sl_ui_pos w = referLayoutAttrs->measuredRelativeBoundWidth;
 					w -= referView->getAbsoluteMarginLeft();
 					if (w < 0) {
 						w = 0;
 					}
 					outerWidth += w;
 				} else {
-					sl_ui_pos w = referLayout->measuredRelativeBoundWidth;
+					sl_ui_pos w = referLayoutAttrs->measuredRelativeBoundWidth;
 					w -= referView->getMeasuredWidth();
 					w -= referView->getAbsoluteMarginLeft();
 					if (w < 0) {
@@ -1668,33 +1962,30 @@ void View::_measureRelativeBoundWidth()
 		outerWidth = 0;
 	}
 	
-	layout->measuredRelativeBoundWidth = outerWidth;
+	layoutAttrs->measuredRelativeBoundWidth = outerWidth;
 	
 }
 
 void View::_measureRelativeBoundHeight()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNull()) {
-		return;
-	}
-	if (!(layout->flagEnabled)) {
+	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+	if (layoutAttrs.isNull()) {
 		return;
 	}
 	
-	if (!(layout->flagInvalidRelativeBoundHeight)) {
+	if (!(layoutAttrs->flagInvalidRelativeBoundHeight)) {
 		return;
 	}
-	layout->flagInvalidRelativeBoundHeight = sl_false;
-	layout->measuredRelativeBoundHeight = 0;
-	layout->flagBadRelativeBoundHeight = sl_false;
+	layoutAttrs->flagInvalidRelativeBoundHeight = sl_false;
+	layoutAttrs->measuredRelativeBoundHeight = 0;
+	layoutAttrs->flagBadRelativeBoundHeight = sl_false;
 	
 	measureLayout();
 	
-	PositionMode topMode = layout->topMode;
-	PositionMode bottomMode = layout->bottomMode;
+	PositionMode topMode = layoutAttrs->topMode;
+	PositionMode bottomMode = layoutAttrs->bottomMode;
 	
-	SizeMode heightMode = layout->heightMode;
+	SizeMode heightMode = layoutAttrs->heightMode;
 	if (heightMode == SizeMode::Filling) {
 		if (topMode == PositionMode::CenterInParent || topMode == PositionMode::CenterInOther) {
 			bottomMode = PositionMode::Fixed;
@@ -1712,12 +2003,12 @@ void View::_measureRelativeBoundHeight()
 	}
 	
 	sl_ui_pos marginTop = 0;
-	if (!(layout->flagRelativeMarginTop)) {
-		marginTop = layout->marginTop;
+	if (!(layoutAttrs->flagRelativeMarginTop)) {
+		marginTop = layoutAttrs->marginTop;
 	}
 	sl_ui_pos marginBottom = 0;
-	if (!(layout->flagRelativeMarginBottom)) {
-		marginBottom = layout->marginBottom;
+	if (!(layoutAttrs->flagRelativeMarginBottom)) {
+		marginBottom = layoutAttrs->marginBottom;
 	}
 	
 	sl_ui_pos parentPaddingTop = 0;
@@ -1729,30 +2020,30 @@ void View::_measureRelativeBoundHeight()
 		marginTop = m_frame.top - getPaddingBottom();
 	}
 	
-	sl_ui_pos outerHeight = layout->measuredHeight + marginTop + marginBottom;
+	sl_ui_pos outerHeight = layoutAttrs->measuredHeight + marginTop + marginBottom;
 	
 	if (topMode == PositionMode::OtherStart || topMode == PositionMode::OtherEnd) {
-		Ref<View> referView = layout->topReferingView;
+		Ref<View> referView = layoutAttrs->topReferingView;
 		if (referView.isNotNull()) {
-			Ref<LayoutAttributes> referLayout = referView->m_layout;
-			if (referLayout.isNull() || !(layout->flagEnabled)) {
+			Ref<LayoutAttributes> referLayoutAttrs = referView->m_layoutAttributes;
+			if (referLayoutAttrs.isNull()) {
 				if (topMode == PositionMode::OtherStart) {
 					outerHeight += referView->m_frame.top - parentPaddingTop;
 				} else {
 					outerHeight += referView->m_frame.bottom - parentPaddingTop;
 				}
 			} else {
-				if (referLayout->bottomMode != PositionMode::Fixed || referLayout->topMode == PositionMode::CenterInOther || referLayout->topMode == PositionMode::CenterInParent) {
-					layout->flagBadRelativeBoundHeight = sl_true;
+				if (referLayoutAttrs->bottomMode != PositionMode::Fixed || referLayoutAttrs->topMode == PositionMode::CenterInOther || referLayoutAttrs->topMode == PositionMode::CenterInParent) {
+					layoutAttrs->flagBadRelativeBoundHeight = sl_true;
 					return;
 				}
 				referView->_measureRelativeBoundHeight();
-				if (referLayout->flagBadRelativeBoundHeight) {
-					layout->flagBadRelativeBoundHeight = sl_true;
+				if (referLayoutAttrs->flagBadRelativeBoundHeight) {
+					layoutAttrs->flagBadRelativeBoundHeight = sl_true;
 					return;
 				}
 				if (topMode == PositionMode::OtherStart) {
-					sl_ui_pos h = referLayout->measuredRelativeBoundHeight;
+					sl_ui_pos h = referLayoutAttrs->measuredRelativeBoundHeight;
 					h -= referView->getMeasuredHeight();
 					h -= referView->getAbsoluteMarginBottom();
 					if (h < 0) {
@@ -1760,7 +2051,7 @@ void View::_measureRelativeBoundHeight()
 					}
 					outerHeight += h;
 				} else {
-					sl_ui_pos h = referLayout->measuredRelativeBoundHeight;
+					sl_ui_pos h = referLayoutAttrs->measuredRelativeBoundHeight;
 					h -= referView->getAbsoluteMarginBottom();
 					if (h < 0) {
 						h = 0;
@@ -1772,31 +2063,31 @@ void View::_measureRelativeBoundHeight()
 	}
 	
 	if (bottomMode == PositionMode::OtherStart || bottomMode == PositionMode::OtherEnd) {
-		Ref<View> referView = layout->bottomReferingView;
+		Ref<View> referView = layoutAttrs->bottomReferingView;
 		if (referView.isNotNull()) {
-			Ref<LayoutAttributes> referLayout = referView->m_layout;
-			if (referLayout.isNull() || !(layout->flagEnabled)) {
-				layout->flagBadRelativeBoundHeight = sl_true;
+			Ref<LayoutAttributes> referLayoutAttrs = referView->m_layoutAttributes;
+			if (referLayoutAttrs.isNull()) {
+				layoutAttrs->flagBadRelativeBoundHeight = sl_true;
 				return;
 			} else {
-				if (referLayout->bottomMode == PositionMode::Fixed || referLayout->topMode != PositionMode::Fixed) {
-					layout->flagBadRelativeBoundHeight = sl_true;
+				if (referLayoutAttrs->bottomMode == PositionMode::Fixed || referLayoutAttrs->topMode != PositionMode::Fixed) {
+					layoutAttrs->flagBadRelativeBoundHeight = sl_true;
 					return;
 				}
 				referView->_measureRelativeBoundHeight();
-				if (referLayout->flagBadRelativeBoundHeight) {
-					layout->flagBadRelativeBoundHeight = sl_true;
+				if (referLayoutAttrs->flagBadRelativeBoundHeight) {
+					layoutAttrs->flagBadRelativeBoundHeight = sl_true;
 					return;
 				}
 				if (bottomMode == PositionMode::OtherStart) {
-					sl_ui_pos h = referLayout->measuredRelativeBoundHeight;
+					sl_ui_pos h = referLayoutAttrs->measuredRelativeBoundHeight;
 					h -= referView->getAbsoluteMarginTop();
 					if (h < 0) {
 						h = 0;
 					}
 					outerHeight += h;
 				} else {
-					sl_ui_pos h = referLayout->measuredRelativeBoundHeight;
+					sl_ui_pos h = referLayoutAttrs->measuredRelativeBoundHeight;
 					h -= referView->getMeasuredHeight();
 					h -= referView->getAbsoluteMarginTop();
 					if (h < 0) {
@@ -1812,7 +2103,7 @@ void View::_measureRelativeBoundHeight()
 		outerHeight = 0;
 	}
 	
-	layout->measuredRelativeBoundHeight = outerHeight;
+	layoutAttrs->measuredRelativeBoundHeight = outerHeight;
 	
 }
 
@@ -1832,10 +2123,10 @@ void View::measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 		Ref<View>& child = children[i];
 		if (child.isNotNull()) {
 			if (child->getVisibility() != Visibility::Gone) {
-				Ref<LayoutAttributes> layout = child->m_layout;
-				if (layout.isNotNull() && layout->flagEnabled) {
-					layout->flagInvalidRelativeBoundWidth = sl_true;
-					layout->flagInvalidRelativeBoundHeight = sl_true;
+				Ref<LayoutAttributes> layoutAttrs = child->m_layoutAttributes;
+				if (layoutAttrs.isNotNull()) {
+					layoutAttrs->flagInvalidRelativeBoundWidth = sl_true;
+					layoutAttrs->flagInvalidRelativeBoundHeight = sl_true;
 				}
 			}
 		}
@@ -1845,12 +2136,12 @@ void View::measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 		if (child.isNotNull()) {
 			if (child->getVisibility() != Visibility::Gone) {
 				if (child->getVisibility() != Visibility::Gone) {
-					Ref<LayoutAttributes> layout = child->m_layout;
-					if (layout.isNotNull() && layout->flagEnabled) {
+					Ref<LayoutAttributes> layoutAttrs = child->m_layoutAttributes;
+					if (layoutAttrs.isNotNull()) {
 						if (flagHorizontal) {
 							child->_measureRelativeBoundWidth();
-							if (!(layout->flagBadRelativeBoundWidth)) {
-								sl_ui_pos w = layout->measuredRelativeBoundWidth + paddingWidth;
+							if (!(layoutAttrs->flagBadRelativeBoundWidth)) {
+								sl_ui_pos w = layoutAttrs->measuredRelativeBoundWidth + paddingWidth;
 								if (w > measuredWidth) {
 									measuredWidth = w;
 								}
@@ -1858,8 +2149,8 @@ void View::measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 						}
 						if (flagVertical) {
 							child->_measureRelativeBoundHeight();
-							if (!(layout->flagBadRelativeBoundHeight)) {
-								sl_ui_pos h = layout->measuredRelativeBoundHeight + paddingHeight;
+							if (!(layoutAttrs->flagBadRelativeBoundHeight)) {
+								sl_ui_pos h = layoutAttrs->measuredRelativeBoundHeight + paddingHeight;
 								if (h > measuredHeight) {
 									measuredHeight = h;
 								}
@@ -1911,21 +2202,21 @@ void View::_requestMakeLayout()
 
 void View::_requestInvalidateLayout()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		layout->flagInvalidLayout = sl_true;
-		layout->flagInvalidMeasure = sl_true;
+	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+	if (layoutAttrs.isNotNull()) {
+		layoutAttrs->flagInvalidLayout = sl_true;
+		layoutAttrs->flagInvalidMeasure = sl_true;
 		_requestMakeLayout();
 	}
 }
 
 void View::_requestInvalidateMeasure(sl_bool flagWidth, sl_bool flagHeight)
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		layout->flagInvalidLayout = sl_true;
-		flagWidth = flagWidth && layout->widthMode == SizeMode::Wrapping;
-		flagHeight = flagHeight && layout->heightMode == SizeMode::Wrapping;
+	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+	if (layoutAttrs.isNotNull()) {
+		layoutAttrs->flagInvalidLayout = sl_true;
+		flagWidth = flagWidth && layoutAttrs->widthMode == SizeMode::Wrapping;
+		flagHeight = flagHeight && layoutAttrs->heightMode == SizeMode::Wrapping;
 		if (flagWidth || flagHeight) {
 			Ref<View> parent = m_parent;
 			if (parent.isNotNull()) {
@@ -1954,12 +2245,12 @@ void View::requestParentLayout(sl_bool flagRedraw)
 
 void View::requestParentAndSelfLayout(sl_bool flagRedraw)
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		layout->flagInvalidLayout = sl_true;
-		layout->flagInvalidMeasure = sl_true;
+	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+	if (layoutAttrs.isNotNull()) {
+		layoutAttrs->flagInvalidLayout = sl_true;
+		layoutAttrs->flagInvalidMeasure = sl_true;
 		Ref<View> parent = m_parent;
-		if (parent.isNotNull() && parent->isLayoutEnabled()) {
+		if (parent.isNotNull() && parent->isLayouting()) {
 			parent->requestLayout(flagRedraw);
 			_requestInvalidateLayout();
 		} else {
@@ -1971,42 +2262,50 @@ void View::requestParentAndSelfLayout(sl_bool flagRedraw)
 	}
 }
 
-sl_bool View::isLayoutEnabled()
+sl_bool View::isLayouting()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->flagEnabled;
+	return m_layoutAttributes.isNotNull();
+}
+
+void View::resetLayout(sl_bool flagRedraw)
+{
+	m_layoutAttributes.setNull();
+	requestParentLayout(flagRedraw);
+}
+
+sl_bool View::isMakingLayout()
+{
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagMakeLayout;
 	}
 	return sl_false;
 }
 
-void View::setLayoutEnabled(sl_bool flagEnabled, sl_bool flagRedraw)
+void View::setMakingLayout(sl_bool flagMakeLayout, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = flagEnabled;
-		if (flagRedraw) {
-			invalidate();
-		}
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->flagMakeLayout = flagMakeLayout;
+		requestLayout(flagRedraw);
 	}
 }
 
 UIRect View::getLayoutFrame()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->frame;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->frame;
 	}
 	return getFrame();
 }
 
 void View::setLayoutFrame(const UIRect& rect)
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		layout->frame = rect;
-		layout->flagUpdatedLayoutFrame = sl_true;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		attrs->frame = rect;
+		attrs->flagUpdatedLayoutFrame = sl_true;
 	} else {
 		_setFrame(rect, sl_false, sl_true);
 	}
@@ -2014,356 +2313,326 @@ void View::setLayoutFrame(const UIRect& rect)
 
 sl_bool View::isLayoutFrameUpdated()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->flagUpdatedLayoutFrame;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagUpdatedLayoutFrame;
 	}
 	return sl_false;
 }
 
 void View::setLayoutFrameUpdated(sl_bool flag)
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		layout->flagUpdatedLayoutFrame = flag;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		attrs->flagUpdatedLayoutFrame = flag;
 	}
 }
 
 sl_bool View::isOnPrepareLayoutEnabled()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->flagOnPrepareLayout;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagOnPrepareLayout;
 	}
 	return sl_false;
 }
 
 void View::setOnPrepareLayoutEnabled(sl_bool flagEnabled, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagOnPrepareLayout = flagEnabled;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->flagOnPrepareLayout = flagEnabled;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isOnMakeLayoutEnabled()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->flagOnMakeLayout;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagOnMakeLayout;
 	}
 	return sl_false;
 }
 
 void View::setOnMakeLayoutEnabled(sl_bool flagEnabled, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagOnMakeLayout = flagEnabled;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->flagOnMakeLayout = flagEnabled;
 		requestLayout(flagRedraw);
 	}
 }
 
 SizeMode View::getWidthMode()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->widthMode;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->widthMode;
 	}
 	return SizeMode::Fixed;
 }
 
 SizeMode View::getHeightMode()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->heightMode;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->heightMode;
 	}
 	return SizeMode::Fixed;
 }
 
 sl_bool View::isWidthFixed()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->widthMode == SizeMode::Fixed;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->widthMode == SizeMode::Fixed;
 	}
 	return sl_true;
 }
 
 void View::setWidthFixed(sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->widthMode = SizeMode::Fixed;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->widthMode = SizeMode::Fixed;
 		requestParentAndSelfLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isHeightFixed()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->heightMode == SizeMode::Fixed;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->heightMode == SizeMode::Fixed;
 	}
 	return sl_true;
 }
 
 void View::setHeightFixed(sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->heightMode = SizeMode::Fixed;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->heightMode = SizeMode::Fixed;
 		requestParentAndSelfLayout(flagRedraw);
 	}
 }
 
 void View::setSizeFixed(sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->widthMode = SizeMode::Fixed;
-		layout->heightMode = SizeMode::Fixed;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->widthMode = SizeMode::Fixed;
+		attrs->heightMode = SizeMode::Fixed;
 		requestParentAndSelfLayout(flagRedraw);
 	}
 }
 
 sl_real View::getWidthWeight()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->widthWeight;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->widthWeight;
 	}
 	return 1;
 }
 
 sl_bool View::isHeightWeight()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->heightMode == SizeMode::Weight;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->heightMode == SizeMode::Weight;
 	}
 	return sl_false;
 }
 
 sl_bool View::isWidthFilling()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->widthMode == SizeMode::Filling;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->widthMode == SizeMode::Filling;
 	}
 	return sl_false;
 }
 
 void View::setWidthFilling(sl_real weight, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->widthMode = SizeMode::Filling;
-		layout->widthWeight = weight;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->widthMode = SizeMode::Filling;
+		attrs->widthWeight = weight;
 		requestParentAndSelfLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isHeightFilling()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->heightMode == SizeMode::Filling;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->heightMode == SizeMode::Filling;
 	}
 	return sl_false;
 }
 
 void View::setHeightFilling(sl_real weight, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->heightMode = SizeMode::Filling;
-		layout->heightWeight = weight;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->heightMode = SizeMode::Filling;
+		attrs->heightWeight = weight;
 		requestParentAndSelfLayout(flagRedraw);
 	}
 }
 
 void View::setSizeFilling(sl_real widthWeight, sl_real heightWeight, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->widthMode = SizeMode::Filling;
-		layout->widthWeight = widthWeight;
-		layout->heightMode = SizeMode::Filling;
-		layout->heightWeight = heightWeight;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->widthMode = SizeMode::Filling;
+		attrs->widthWeight = widthWeight;
+		attrs->heightMode = SizeMode::Filling;
+		attrs->heightWeight = heightWeight;
 		requestParentAndSelfLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isWidthWrapping()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->widthMode == SizeMode::Wrapping;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->widthMode == SizeMode::Wrapping;
 	}
 	return sl_false;
 }
 
 void View::setWidthWrapping(sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->widthMode = SizeMode::Wrapping;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->widthMode = SizeMode::Wrapping;
 		requestParentAndSelfLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isHeightWrapping()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->heightMode == SizeMode::Wrapping;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->heightMode == SizeMode::Wrapping;
 	}
 	return sl_false;
 }
 
 void View::setHeightWrapping(sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->heightMode = SizeMode::Wrapping;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->heightMode = SizeMode::Wrapping;
 		requestParentAndSelfLayout(flagRedraw);
 	}
 }
 
 void View::setSizeWrapping(sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->widthMode = SizeMode::Wrapping;
-		layout->heightMode = SizeMode::Wrapping;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->widthMode = SizeMode::Wrapping;
+		attrs->heightMode = SizeMode::Wrapping;
 		requestParentAndSelfLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isWidthWeight()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->widthMode == SizeMode::Weight;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->widthMode == SizeMode::Weight;
 	}
 	return sl_false;
 }
 
 void View::setWidthWeight(sl_real weight, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->widthMode = SizeMode::Weight;
-		layout->widthWeight = weight;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->widthMode = SizeMode::Weight;
+		attrs->widthWeight = weight;
 		requestParentAndSelfLayout(flagRedraw);
 	}
 }
 
 sl_real View::getHeightWeight()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->heightWeight;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->heightWeight;
 	}
 	return 1;
 }
 
 void View::setHeightWeight(sl_real weight, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->heightMode = SizeMode::Weight;
-		layout->heightWeight = weight;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->heightMode = SizeMode::Weight;
+		attrs->heightWeight = weight;
 		requestParentAndSelfLayout(flagRedraw);
 	}
 }
 
 void View::setSizeWeight(sl_real widthWeight, sl_real heightWeight, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->widthMode = SizeMode::Weight;
-		layout->widthWeight = widthWeight;
-		layout->heightMode = SizeMode::Weight;
-		layout->heightWeight = heightWeight;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->widthMode = SizeMode::Weight;
+		attrs->widthWeight = widthWeight;
+		attrs->heightMode = SizeMode::Weight;
+		attrs->heightWeight = heightWeight;
 		requestParentAndSelfLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isLayoutLeftFixed()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->leftMode == PositionMode::Fixed;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->leftMode == PositionMode::Fixed;
 	}
 	return sl_true;
 }
 
 void View::setLayoutLeftFixed(sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->leftMode = PositionMode::Fixed;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->leftMode = PositionMode::Fixed;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isAlignParentLeft()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->leftMode == PositionMode::ParentEdge;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->leftMode == PositionMode::ParentEdge;
 	}
 	return sl_false;
 }
 
 void View::setAlignParentLeft(sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->leftMode = PositionMode::ParentEdge;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->leftMode = PositionMode::ParentEdge;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isAlignLeft()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->leftMode == PositionMode::OtherStart;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->leftMode == PositionMode::OtherStart;
 	}
 	return sl_false;
 }
@@ -2373,21 +2642,19 @@ void View::setAlignLeft(const Ref<View>& view, sl_bool flagRedraw)
 	if (view.isNull()) {
 		return;
 	}
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->leftMode = PositionMode::OtherStart;
-		layout->leftReferingView = view;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->leftMode = PositionMode::OtherStart;
+		attrs->leftReferingView = view;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isRightOf()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->leftMode == PositionMode::OtherEnd;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->leftMode == PositionMode::OtherEnd;
 	}
 	return sl_false;
 }
@@ -2397,70 +2664,64 @@ void View::setRightOf(const Ref<View>& view, sl_bool flagRedraw)
 	if (view.isNull()) {
 		return;
 	}
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->leftMode = PositionMode::OtherEnd;
-		layout->leftReferingView = view;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->leftMode = PositionMode::OtherEnd;
+		attrs->leftReferingView = view;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 Ref<View> View::getLayoutLeftReferingView()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->leftReferingView;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->leftReferingView;
 	}
 	return Ref<View>::null();
 }
 
 sl_bool View::isLayoutRightFixed()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->rightMode == PositionMode::Fixed;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->rightMode == PositionMode::Fixed;
 	}
 	return sl_true;
 }
 
 void View::setLayoutRightFixed(sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->rightMode = PositionMode::Fixed;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->rightMode = PositionMode::Fixed;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isAlignParentRight()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->rightMode == PositionMode::ParentEdge;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->rightMode == PositionMode::ParentEdge;
 	}
 	return sl_false;
 }
 
 void View::setAlignParentRight(sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->rightMode = PositionMode::ParentEdge;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->rightMode = PositionMode::ParentEdge;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isAlignRight()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->rightMode == PositionMode::OtherEnd;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->rightMode == PositionMode::OtherEnd;
 	}
 	return sl_false;
 }
@@ -2470,21 +2731,19 @@ void View::setAlignRight(const Ref<View>& view, sl_bool flagRedraw)
 	if (view.isNull()) {
 		return;
 	}
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->rightMode = PositionMode::OtherEnd;
-		layout->rightReferingView = view;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->rightMode = PositionMode::OtherEnd;
+		attrs->rightReferingView = view;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isLeftOf()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->rightMode == PositionMode::OtherStart;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->rightMode == PositionMode::OtherStart;
 	}
 	return sl_false;
 }
@@ -2494,41 +2753,37 @@ void View::setLeftOf(const Ref<View>& view, sl_bool flagRedraw)
 	if (view.isNull()) {
 		return;
 	}
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->rightMode = PositionMode::OtherStart;
-		layout->rightReferingView = view;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->rightMode = PositionMode::OtherStart;
+		attrs->rightReferingView = view;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 Ref<View> View::getLayoutRightReferingView()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->rightReferingView;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->rightReferingView;
 	}
 	return Ref<View>::null();
 }
 
 sl_bool View::isLayoutTopFixed()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->topMode == PositionMode::Fixed;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->topMode == PositionMode::Fixed;
 	}
 	return sl_true;
 }
 
 void View::setLayoutTopFixed(sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->topMode = PositionMode::Fixed;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->topMode = PositionMode::Fixed;
 		requestParentLayout(flagRedraw);
 	}
 
@@ -2536,29 +2791,27 @@ void View::setLayoutTopFixed(sl_bool flagRedraw)
 
 sl_bool View::isAlignParentTop()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->topMode == PositionMode::ParentEdge;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->topMode == PositionMode::ParentEdge;
 	}
 	return sl_false;
 }
 
 void View::setAlignParentTop(sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->topMode = PositionMode::ParentEdge;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->topMode = PositionMode::ParentEdge;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isAlignTop()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->topMode == PositionMode::OtherStart;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->topMode == PositionMode::OtherStart;
 	}
 	return sl_false;
 }
@@ -2568,21 +2821,19 @@ void View::setAlignTop(const Ref<View>& view, sl_bool flagRedraw)
 	if (view.isNull()) {
 		return;
 	}
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->topMode = PositionMode::OtherStart;
-		layout->topReferingView = view;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->topMode = PositionMode::OtherStart;
+		attrs->topReferingView = view;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isBelow()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->topMode == PositionMode::OtherEnd;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->topMode == PositionMode::OtherEnd;
 	}
 	return sl_false;
 }
@@ -2592,70 +2843,64 @@ void View::setBelow(const Ref<View>& view, sl_bool flagRedraw)
 	if (view.isNull()) {
 		return;
 	}
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->topMode = PositionMode::OtherEnd;
-		layout->topReferingView = view;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->topMode = PositionMode::OtherEnd;
+		attrs->topReferingView = view;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 Ref<View> View::getLayoutTopReferingView()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->topReferingView;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->topReferingView;
 	}
 	return Ref<View>::null();
 }
 
 sl_bool View::isLayoutBottomFixed()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->bottomMode == PositionMode::Fixed;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->bottomMode == PositionMode::Fixed;
 	}
 	return sl_true;
 }
 
 void View::setLayoutBottomFixed(sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->bottomMode = PositionMode::Fixed;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->bottomMode = PositionMode::Fixed;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isAlignParentBottom()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->bottomMode == PositionMode::ParentEdge;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->bottomMode == PositionMode::ParentEdge;
 	}
 	return sl_false;
 }
 
 void View::setAlignParentBottom(sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->bottomMode = PositionMode::ParentEdge;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->bottomMode = PositionMode::ParentEdge;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isAlignBottom()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->bottomMode == PositionMode::OtherEnd;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->bottomMode == PositionMode::OtherEnd;
 	}
 	return sl_false;
 }
@@ -2665,21 +2910,19 @@ void View::setAlignBottom(const Ref<View>& view, sl_bool flagRedraw)
 	if (view.isNotNull()) {
 		return;
 	}
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->bottomMode = PositionMode::OtherEnd;
-		layout->bottomReferingView = view;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->bottomMode = PositionMode::OtherEnd;
+		attrs->bottomReferingView = view;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isAbove()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->bottomMode == PositionMode::OtherStart;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->bottomMode == PositionMode::OtherStart;
 	}
 	return sl_false;
 }
@@ -2689,82 +2932,74 @@ void View::setAbove(const Ref<View>& view, sl_bool flagRedraw)
 	if (view.isNotNull()) {
 		return;
 	}
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->bottomMode = PositionMode::OtherStart;
-		layout->bottomReferingView = view;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->bottomMode = PositionMode::OtherStart;
+		attrs->bottomReferingView = view;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 Ref<View> View::getLayoutBottomReferingView()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->bottomReferingView;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->bottomReferingView;
 	}
 	return Ref<View>::null();
 }
 
 sl_bool View::isCenterHorizontal()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->leftMode == PositionMode::CenterInParent;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->leftMode == PositionMode::CenterInParent;
 	}
 	return sl_false;
 }
 
 void View::setCenterHorizontal(sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->leftMode = PositionMode::CenterInParent;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->leftMode = PositionMode::CenterInParent;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isCenterVertical()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->topMode == PositionMode::CenterInParent;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->topMode == PositionMode::CenterInParent;
 	}
 	return sl_false;
 }
 
 void View::setCenterVertical(sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->topMode = PositionMode::CenterInParent;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->topMode = PositionMode::CenterInParent;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 void View::setCenterInParent(sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->leftMode = PositionMode::CenterInParent;
-		layout->topMode = PositionMode::CenterInParent;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->leftMode = PositionMode::CenterInParent;
+		attrs->topMode = PositionMode::CenterInParent;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isAlignCenterHorizontal()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->leftMode == PositionMode::CenterInOther;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->leftMode == PositionMode::CenterInOther;
 	}
 	return sl_false;
 }
@@ -2774,21 +3009,19 @@ void View::setAlignCenterHorizontal(const Ref<View>& view, sl_bool flagRedraw)
 	if (view.isNotNull()) {
 		return;
 	}
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->leftMode = PositionMode::CenterInOther;
-		layout->leftReferingView = view;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->leftMode = PositionMode::CenterInOther;
+		attrs->leftReferingView = view;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isAlignCenterVertical()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && layout->flagEnabled) {
-		return layout->topMode == PositionMode::CenterInOther;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->topMode == PositionMode::CenterInOther;
 	}
 	return sl_false;
 }
@@ -2798,34 +3031,30 @@ void View::setAlignCenterVertical(const Ref<View>& view, sl_bool flagRedraw)
 	if (view.isNotNull()) {
 		return;
 	}
-	_initializeLayout();
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		layout->flagEnabled = sl_true;
-		layout->topMode = PositionMode::CenterInOther;
-		layout->topReferingView = view;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->topMode = PositionMode::CenterInOther;
+		attrs->topReferingView = view;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_ui_pos View::getMarginLeft()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->marginLeft;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->marginLeft;
 	}
 	return 0;
 }
 
 void View::setMarginLeft(sl_ui_pos marginLeft, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->flagEnabled = sl_true;
-		attr->marginLeft = marginLeft;
-		if (attr->leftMode == PositionMode::Fixed && attr->rightMode == PositionMode::Fixed) {
-			attr->leftMode = PositionMode::ParentEdge;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->marginLeft = marginLeft;
+		if (attrs->leftMode == PositionMode::Fixed && attrs->rightMode == PositionMode::Fixed) {
+			attrs->leftMode = PositionMode::ParentEdge;
 		}
 		requestParentLayout(flagRedraw);
 	}
@@ -2833,22 +3062,20 @@ void View::setMarginLeft(sl_ui_pos marginLeft, sl_bool flagRedraw)
 
 sl_ui_pos View::getMarginTop()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->marginTop;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->marginTop;
 	}
 	return 0;
 }
 
 void View::setMarginTop(sl_ui_pos marginTop, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->flagEnabled = sl_true;
-		attr->marginTop = marginTop;
-		if (attr->topMode == PositionMode::Fixed && attr->bottomMode == PositionMode::Fixed) {
-			attr->topMode = PositionMode::ParentEdge;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->marginTop = marginTop;
+		if (attrs->topMode == PositionMode::Fixed && attrs->bottomMode == PositionMode::Fixed) {
+			attrs->topMode = PositionMode::ParentEdge;
 		}
 		requestParentLayout(flagRedraw);
 	}
@@ -2856,100 +3083,90 @@ void View::setMarginTop(sl_ui_pos marginTop, sl_bool flagRedraw)
 
 sl_ui_pos View::getMarginRight()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->marginRight;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->marginRight;
 	}
 	return 0;
 }
 
 void View::setMarginRight(sl_ui_pos marginRight, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->flagEnabled = sl_true;
-		attr->marginRight = marginRight;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->marginRight = marginRight;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_ui_pos View::getMarginBottom()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->marginBottom;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->marginBottom;
 	}
 	return 0;
 }
 
 void View::setMarginBottom(sl_ui_pos marginBottom, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->flagEnabled = sl_true;
-		attr->marginBottom = marginBottom;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->marginBottom = marginBottom;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 void View::setMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->flagEnabled = sl_true;
-		attr->marginLeft = left;
-		attr->marginTop = top;
-		attr->marginRight = right;
-		attr->marginBottom = bottom;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->marginLeft = left;
+		attrs->marginTop = top;
+		attrs->marginRight = right;
+		attrs->marginBottom = bottom;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 void View::setMargin(sl_ui_pos margin, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->flagEnabled = sl_true;
-		attr->marginLeft = margin;
-		attr->marginTop = margin;
-		attr->marginRight = margin;
-		attr->marginBottom = margin;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->marginLeft = margin;
+		attrs->marginTop = margin;
+		attrs->marginRight = margin;
+		attrs->marginBottom = margin;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isRelativeMarginLeft()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->flagRelativeMarginLeft;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagRelativeMarginLeft;
 	}
 	return sl_false;
 }
 
 sl_real View::getRelativeMarginLeftWeight()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->relativeMarginLeftWeight;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->relativeMarginLeftWeight;
 	}
 	return 0;
 }
 
 void View::setRelativeMarginLeft(sl_real weight, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->flagEnabled = sl_true;
-		attr->flagRelativeMarginLeft = sl_true;
-		attr->relativeMarginLeftWeight = weight;
-		if (attr->leftMode == PositionMode::Fixed && attr->rightMode == PositionMode::Fixed) {
-			attr->leftMode = PositionMode::ParentEdge;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->flagRelativeMarginLeft = sl_true;
+		attrs->relativeMarginLeftWeight = weight;
+		if (attrs->leftMode == PositionMode::Fixed && attrs->rightMode == PositionMode::Fixed) {
+			attrs->leftMode = PositionMode::ParentEdge;
 		}
 		requestParentLayout(flagRedraw);
 	}
@@ -2957,26 +3174,24 @@ void View::setRelativeMarginLeft(sl_real weight, sl_bool flagRedraw)
 
 sl_ui_pos View::getAbsoluteMarginLeft()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && !(layout->flagRelativeMarginLeft)) {
-		if (layout->leftMode == PositionMode::Fixed && layout->rightMode == PositionMode::Fixed) {
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull() && !(attrs->flagRelativeMarginLeft)) {
+		if (attrs->leftMode == PositionMode::Fixed && attrs->rightMode == PositionMode::Fixed) {
 			return 0;
 		}
-		return layout->marginLeft;
+		return attrs->marginLeft;
 	}
 	return 0;
 }
 
 void View::setAbsoluteMarginLeft(sl_ui_pos margin, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->flagEnabled = sl_true;
-		attr->flagRelativeMarginLeft = sl_false;
-		attr->marginLeft = margin;
-		if (attr->leftMode == PositionMode::Fixed && attr->rightMode == PositionMode::Fixed) {
-			attr->leftMode = PositionMode::ParentEdge;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->flagRelativeMarginLeft = sl_false;
+		attrs->marginLeft = margin;
+		if (attrs->leftMode == PositionMode::Fixed && attrs->rightMode == PositionMode::Fixed) {
+			attrs->leftMode = PositionMode::ParentEdge;
 		}
 		requestParentLayout(flagRedraw);
 	}
@@ -2984,32 +3199,30 @@ void View::setAbsoluteMarginLeft(sl_ui_pos margin, sl_bool flagRedraw)
 
 sl_bool View::isRelativeMarginTop()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->flagRelativeMarginTop;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagRelativeMarginTop;
 	}
 	return sl_false;
 }
 
 sl_real View::getRelativeMarginTopWeight()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->relativeMarginTopWeight;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->relativeMarginTopWeight;
 	}
 	return 0;
 }
 
 void View::setRelativeMarginTop(sl_real weight, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->flagEnabled = sl_true;
-		attr->flagRelativeMarginTop = sl_true;
-		attr->relativeMarginTopWeight = weight;
-		if (attr->topMode == PositionMode::Fixed && attr->bottomMode == PositionMode::Fixed) {
-			attr->topMode = PositionMode::ParentEdge;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->flagRelativeMarginTop = sl_true;
+		attrs->relativeMarginTopWeight = weight;
+		if (attrs->topMode == PositionMode::Fixed && attrs->bottomMode == PositionMode::Fixed) {
+			attrs->topMode = PositionMode::ParentEdge;
 		}
 		requestParentLayout(flagRedraw);
 	}
@@ -3017,26 +3230,24 @@ void View::setRelativeMarginTop(sl_real weight, sl_bool flagRedraw)
 
 sl_ui_pos View::getAbsoluteMarginTop()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && !(layout->flagRelativeMarginTop)) {
-		if (layout->topMode == PositionMode::Fixed && layout->bottomMode == PositionMode::Fixed) {
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull() && !(attrs->flagRelativeMarginTop)) {
+		if (attrs->topMode == PositionMode::Fixed && attrs->bottomMode == PositionMode::Fixed) {
 			return 0;
 		}
-		return layout->marginTop;
+		return attrs->marginTop;
 	}
 	return 0;
 }
 
 void View::setAbsoluteMarginTop(sl_ui_pos margin, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->flagEnabled = sl_true;
-		attr->flagRelativeMarginTop = sl_false;
-		attr->marginTop = margin;
-		if (attr->topMode == PositionMode::Fixed && attr->bottomMode == PositionMode::Fixed) {
-			attr->topMode = PositionMode::ParentEdge;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->flagRelativeMarginTop = sl_false;
+		attrs->marginTop = margin;
+		if (attrs->topMode == PositionMode::Fixed && attrs->bottomMode == PositionMode::Fixed) {
+			attrs->topMode = PositionMode::ParentEdge;
 		}
 		requestParentLayout(flagRedraw);
 	}
@@ -3044,553 +3255,699 @@ void View::setAbsoluteMarginTop(sl_ui_pos margin, sl_bool flagRedraw)
 
 sl_bool View::isRelativeMarginRight()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->flagRelativeMarginRight;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagRelativeMarginRight;
 	}
 	return sl_false;
 }
 
 sl_real View::getRelativeMarginRightWeight()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->relativeMarginRightWeight;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->relativeMarginRightWeight;
 	}
 	return 0;
 }
 
 void View::setRelativeMarginRight(sl_real weight, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->flagEnabled = sl_true;
-		attr->flagRelativeMarginRight = sl_true;
-		attr->relativeMarginRightWeight = weight;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->flagRelativeMarginRight = sl_true;
+		attrs->relativeMarginRightWeight = weight;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_ui_pos View::getAbsoluteMarginRight()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && !(layout->flagRelativeMarginRight)) {
-		if (layout->leftMode == PositionMode::Fixed && layout->rightMode == PositionMode::Fixed) {
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull() && !(attrs->flagRelativeMarginRight)) {
+		if (attrs->leftMode == PositionMode::Fixed && attrs->rightMode == PositionMode::Fixed) {
 			return 0;
 		}
-		return layout->marginRight;
+		return attrs->marginRight;
 	}
 	return 0;
 }
 
 void View::setAbsoluteMarginRight(sl_ui_pos margin, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->flagEnabled = sl_true;
-		attr->flagRelativeMarginRight = sl_false;
-		attr->marginRight = margin;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->flagRelativeMarginRight = sl_false;
+		attrs->marginRight = margin;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_bool View::isRelativeMarginBottom()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->flagRelativeMarginBottom;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagRelativeMarginBottom;
 	}
 	return sl_false;
 }
 
 sl_real View::getRelativeMarginBottomWeight()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->relativeMarginBottomWeight;
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->relativeMarginBottomWeight;
 	}
 	return 0;
 }
 
 void View::setRelativeMarginBottom(sl_real weight, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->flagEnabled = sl_true;
-		attr->flagRelativeMarginBottom = sl_true;
-		attr->relativeMarginBottomWeight = weight;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->flagRelativeMarginBottom = sl_true;
+		attrs->relativeMarginBottomWeight = weight;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 sl_ui_pos View::getAbsoluteMarginBottom()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull() && !(layout->flagRelativeMarginBottom)) {
-		if (layout->topMode == PositionMode::Fixed && layout->bottomMode == PositionMode::Fixed) {
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull() && !(attrs->flagRelativeMarginBottom)) {
+		if (attrs->topMode == PositionMode::Fixed && attrs->bottomMode == PositionMode::Fixed) {
 			return 0;
 		}
-		return layout->marginBottom;
+		return attrs->marginBottom;
 	}
 	return 0;
 }
 
 void View::setAbsoluteMarginBottom(sl_ui_pos margin, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->flagEnabled = sl_true;
-		attr->flagRelativeMarginBottom = sl_false;
-		attr->marginBottom = margin;
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->flagRelativeMarginBottom = sl_false;
+		attrs->marginBottom = margin;
 		requestParentLayout(flagRedraw);
 	}
 }
 
 void View::applyRelativeMargins(sl_ui_len parentWidth, sl_ui_len parentHeight)
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		if (layout->flagRelativeMarginLeft) {
-			layout->marginLeft = (sl_ui_pos)((sl_real)parentWidth * layout->relativeMarginLeftWeight);
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		if (attrs->flagRelativeMarginLeft) {
+			attrs->marginLeft = (sl_ui_pos)((sl_real)parentWidth * attrs->relativeMarginLeftWeight);
 		}
-		if (layout->flagRelativeMarginTop) {
-			layout->marginTop = (sl_ui_pos)((sl_real)parentHeight * layout->relativeMarginTopWeight);
+		if (attrs->flagRelativeMarginTop) {
+			attrs->marginTop = (sl_ui_pos)((sl_real)parentHeight * attrs->relativeMarginTopWeight);
 		}
-		if (layout->flagRelativeMarginRight) {
-			layout->marginRight = (sl_ui_pos)((sl_real)parentWidth * layout->relativeMarginRightWeight);
+		if (attrs->flagRelativeMarginRight) {
+			attrs->marginRight = (sl_ui_pos)((sl_real)parentWidth * attrs->relativeMarginRightWeight);
 		}
-		if (layout->flagRelativeMarginBottom) {
-			layout->marginBottom = (sl_ui_pos)((sl_real)parentHeight * layout->relativeMarginBottomWeight);
+		if (attrs->flagRelativeMarginBottom) {
+			attrs->marginBottom = (sl_ui_pos)((sl_real)parentHeight * attrs->relativeMarginBottomWeight);
 		}
 	}
 }
 
 sl_ui_pos View::getPaddingLeft()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->paddingLeft;
-	}
-	return 0;
+	return m_paddingLeft;
 }
 
 void View::setPaddingLeft(sl_ui_pos paddingLeft, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->paddingLeft = paddingLeft;
-		requestLayout(flagRedraw);
-		onChangePadding();
-	}
+	m_paddingLeft = paddingLeft;
+	requestLayout(flagRedraw);
+	onChangePadding();
 }
 
 sl_ui_pos View::getPaddingTop()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->paddingTop;
-	}
-	return 0;
+	return m_paddingTop;
 }
 
 void View::setPaddingTop(sl_ui_pos paddingTop, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->paddingTop = paddingTop;
-		requestLayout(flagRedraw);
-		onChangePadding();
-	}
+	m_paddingTop = paddingTop;
+	requestLayout(flagRedraw);
+	onChangePadding();
 }
 
 sl_ui_pos View::getPaddingRight()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->paddingRight;
-	}
-	return 0;
+	return m_paddingRight;
 }
 
 void View::setPaddingRight(sl_ui_pos paddingRight, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->paddingRight = paddingRight;
-		requestLayout(flagRedraw);
-		onChangePadding();
-	}
+	m_paddingRight = paddingRight;
+	requestLayout(flagRedraw);
+	onChangePadding();
 }
 
 sl_ui_pos View::getPaddingBottom()
 {
-	Ref<LayoutAttributes> layout = m_layout;
-	if (layout.isNotNull()) {
-		return layout->paddingBottom;
-	}
-	return 0;
+	return m_paddingBottom;
 }
 
 void View::setPaddingBottom(sl_ui_pos paddingBottom, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->paddingBottom = paddingBottom;
-		requestLayout(flagRedraw);
-		onChangePadding();
-	}
+	m_paddingBottom = paddingBottom;
+	requestLayout(flagRedraw);
+	onChangePadding();
 }
 
 void View::setPadding(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->paddingLeft = left;
-		attr->paddingTop = top;
-		attr->paddingRight = right;
-		attr->paddingBottom = bottom;
-		requestLayout(flagRedraw);
-		onChangePadding();
-	}
+	m_paddingLeft = left;
+	m_paddingTop = top;
+	m_paddingRight = right;
+	m_paddingBottom = bottom;
+	requestLayout(flagRedraw);
+	onChangePadding();
 }
 
 void View::setPadding(sl_ui_pos padding, sl_bool flagRedraw)
 {
-	_initializeLayout();
-	Ref<LayoutAttributes> attr = m_layout;
-	if (attr.isNotNull()) {
-		attr->paddingLeft = padding;
-		attr->paddingTop = padding;
-		attr->paddingRight = padding;
-		attr->paddingBottom = padding;
-		requestLayout(flagRedraw);
-		onChangePadding();
-	}
+	m_paddingLeft = padding;
+	m_paddingTop = padding;
+	m_paddingRight = padding;
+	m_paddingBottom = padding;
+	requestLayout(flagRedraw);
+	onChangePadding();
 }
 
-void View::_initializeLayout()
+sl_bool View::getFinalTransform(Matrix3* _out)
 {
-	if (m_layout.isNotNull()) {
-		return;
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNull()) {
+		return sl_false;
 	}
-	Ref<LayoutAttributes> attr = new LayoutAttributes;
-	if (attr.isNotNull()) {
-		attr->flagEnabled = sl_false;
-		
-		attr->widthMode = SizeMode::Fixed;
-		attr->heightMode = SizeMode::Fixed;
-		attr->widthWeight = 1;
-		attr->heightWeight = 1;
-		
-		attr->leftMode = PositionMode::Fixed;
-		attr->topMode = PositionMode::Fixed;
-		attr->rightMode = PositionMode::Fixed;
-		attr->bottomMode = PositionMode::Fixed;
-		
-		attr->measuredWidth = 0;
-		attr->measuredHeight = 0;
-		attr->frame.left = 0;
-		attr->frame.top = 0;
-		attr->frame.right = 0;
-		attr->frame.bottom = 0;
-		attr->flagInvalidMeasure = sl_true;
-		attr->flagInvalidLayout = sl_true;
-		
-		attr->flagInvalidRelativeBoundWidth = sl_true;
-		attr->measuredRelativeBoundWidth = 0;
-		attr->flagBadRelativeBoundWidth = sl_false;
-		attr->flagInvalidRelativeBoundHeight = sl_true;
-		attr->measuredRelativeBoundHeight = 0;
-		attr->flagBadRelativeBoundHeight = sl_false;
-		
-		attr->flagOnPrepareLayout = sl_false;
-		attr->flagOnMakeLayout = sl_false;
-		
-		attr->paddingLeft = 0;
-		attr->paddingTop = 0;
-		attr->paddingRight = 0;
-		attr->paddingBottom = 0;
-		
-		attr->marginLeft = 0;
-		attr->marginTop = 0;
-		attr->marginRight = 0;
-		attr->marginBottom = 0;
-		attr->flagRelativeMarginLeft = sl_false;
-		attr->relativeMarginLeftWeight = 0;
-		attr->flagRelativeMarginTop = sl_false;
-		attr->relativeMarginTopWeight = 0;
-		attr->flagRelativeMarginRight = sl_false;
-		attr->relativeMarginRightWeight = 0;
-		attr->flagRelativeMarginBottom = sl_false;
-		attr->relativeMarginBottomWeight = 0;
-		
-		attr->flagRecursiveMakeLayout = sl_false;
-		attr->flagUpdatedLayoutFrame = sl_false;
-		
-		m_layout = attr;
+	
+	if (attrs->flagTransformFinalInvalid) {
+		attrs->flagTransformFinalInvalid = sl_false;
+		attrs->flagInverseTransformFinalInvalid = sl_true;
+		if (attrs->flagTransformStatic) {
+			attrs->flagTransformFinal = sl_true;
+			if (attrs->flagTransformAnimation) {
+				attrs->transformFinal = attrs->transformStatic * attrs->transformAnimation;
+			} else {
+				attrs->transformFinal = attrs->transformStatic;
+			}
+		} else {
+			if (attrs->flagTransformCalcInvalid) {
+				attrs->flagTransformCalcInvalid = sl_false;
+				Matrix3 mat;
+				sl_bool flagInited = sl_false;
+				sl_real tx = attrs->translationStatic.x + attrs->translationAnimation.x;
+				sl_real ty = attrs->translationStatic.y + attrs->translationAnimation.y;
+				sl_bool flagTranslate = !(Math::isAlmostZero(tx) && Math::isAlmostZero(ty));
+				sl_real sx = attrs->scaleStatic.x * attrs->scaleAnimation.x;
+				sl_real sy = attrs->scaleStatic.y * attrs->scaleAnimation.y;
+				sl_bool flagScale = !(Math::isAlmostZero(sx - 1) && Math::isAlmostZero(sy - 1));
+				sl_real r = attrs->rotationAngleStatic + attrs->rotationAngleAnimation;
+				sl_bool flagRotate = !(Math::isAlmostZero(r));
+				if (flagScale || flagRotate) {
+					sl_real ax = attrs->anchorOffset.x;
+					sl_real ay = attrs->anchorOffset.y;
+					sl_bool flagAnchor = !(Math::isAlmostZero(ax) && Math::isAlmostZero(ay));
+					if (flagAnchor) {
+						if (flagInited) {
+							Transform2::translate(mat, -ax, -ay);
+						} else {
+							mat = Transform2::getTranslationMatrix(-ax, -ay);
+							flagInited = sl_true;
+						}
+					}
+					if (flagRotate) {
+						if (flagInited) {
+							Transform2::rotate(mat, r);
+						} else {
+							mat = Transform2::getRotationMatrix(r);
+							flagInited = sl_true;
+						}
+					}
+					if (flagScale) {
+						if (flagInited) {
+							Transform2::scale(mat, sx, sy);
+						} else {
+							mat = Transform2::getScalingMatrix(sx, sy);
+							flagInited = sl_true;
+						}
+					}
+					if (flagAnchor) {
+						Transform2::translate(mat, ax, ay);
+					}
+				}
+				if (flagTranslate) {
+					if (flagInited) {
+						Transform2::translate(mat, tx, ty);
+					} else {
+						mat = Transform2::getTranslationMatrix(tx, ty);
+						flagInited = sl_true;
+					}
+				}
+				if (flagInited) {
+					attrs->flagTransformCalc = sl_true;
+					attrs->transformCalc = mat;
+				} else {
+					attrs->flagTransformCalc = sl_false;
+				}
+			}
+
+			if (attrs->flagTransformCalc) {
+				attrs->flagTransformFinal = sl_true;
+				if (attrs->flagTransformAnimation) {
+					attrs->transformFinal = attrs->transformCalc * attrs->transformAnimation;
+				} else {
+					attrs->transformFinal = attrs->transformCalc;
+				}
+			} else {
+				if (attrs->flagTransformAnimation) {
+					attrs->flagTransformFinal = sl_true;
+					attrs->transformFinal = attrs->transformAnimation;
+				} else {
+					attrs->flagTransformFinal = sl_false;
+				}
+			}
+			
+		}
 	}
+	
+	if (attrs->flagTransformFinal) {
+		if (_out) {
+			*_out = attrs->transformFinal;
+		}
+		return sl_true;
+	}
+	
+	return sl_false;
+	
 }
 
-sl_bool View::isTransformEnabled()
+sl_bool View::getFinalInverseTransform(Matrix3* _out)
 {
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull()) {
-		return transform->flagEnabled;
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNull()) {
+		return sl_false;
+	}
+	if (attrs->flagTransformFinalInvalid) {
+		getFinalTransform(sl_null);
+	}
+	if (attrs->flagInverseTransformFinalInvalid) {
+		attrs->flagInverseTransformFinalInvalid = sl_false;
+		if (attrs->flagTransformFinal) {
+			attrs->flagInverseTransformFinal = sl_true;
+			attrs->inverseTransformFinal = attrs->transformFinal.inverse();
+		} else {
+			attrs->flagInverseTransformFinal = sl_false;
+		}
+	}
+	if (attrs->flagInverseTransformFinal) {
+		if (_out) {
+			*_out = attrs->inverseTransformFinal;
+		}
+		return sl_true;
 	}
 	return sl_false;
 }
 
-void View::setTransformEnabled(sl_bool flag, sl_bool flagRedraw)
-{
-	_initializeTransform();
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull()) {
-		transform->flagEnabled = flag;
-		if (flagRedraw) {
-			invalidate();
-		}
-	}
-}
-
 const Matrix3& View::getTransform()
 {
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull()) {
-		return transform->transform;
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull() && attrs->flagTransformStatic) {
+		return attrs->transformStatic;
 	}
 	return Matrix3::identity();
 }
 
 void View::setTransform(const Matrix3& matrix, sl_bool flagRedraw)
 {
-	_initializeTransform();
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull()) {
-		transform->transform = matrix;
-		transform->transformInverse = matrix.inverse();
-		if (transform->flagEnabled) {
-			if (flagRedraw) {
-				invalidate();
-			}
-		}
+	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+	if (attrs.isNotNull()) {
+		attrs->flagTransformStatic = sl_true;
+		attrs->transformStatic = matrix;
+		_applyFinalTransform(flagRedraw);
+	}
+}
+
+void View::resetTransform(sl_bool flagRedraw)
+{
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull() && attrs->flagTransformStatic) {
+		attrs->flagTransformStatic = sl_false;
+		_applyFinalTransform(flagRedraw);
+	}
+}
+
+void View::setTransformFromAnimation(const Matrix3& matrix, sl_bool flagRedraw)
+{
+	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+	if (attrs.isNotNull()) {
+		attrs->flagTransformAnimation = sl_true;
+		attrs->transformAnimation = matrix;
+		_applyFinalTransform(flagRedraw);
+	}
+}
+
+void View::resetTransformFromAnimation(sl_bool flagRedraw)
+{
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull() && attrs->flagTransformAnimation) {
+		attrs->flagTransformAnimation = sl_false;
+		_applyFinalTransform(flagRedraw);
+	}
+}
+
+sl_bool View::getFinalTranslationRotationScale(Vector2* translation, sl_real* rotation, Vector2* scale, Vector2* anchor)
+{
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNull()) {
+		return sl_false;
+	}
+	if (translation) {
+		translation->x = attrs->translationStatic.x + attrs->translationAnimation.x;
+		translation->y = attrs->translationStatic.y + attrs->translationAnimation.y;
+	}
+	if (scale) {
+		scale->x = attrs->scaleStatic.x * attrs->scaleAnimation.x;
+		scale->y = attrs->scaleStatic.y * attrs->scaleAnimation.y;
+	}
+	if (rotation) {
+		*rotation = attrs->rotationAngleStatic + attrs->rotationAngleAnimation;
+	}
+	if (anchor) {
+		anchor->x = attrs->anchorOffset.x;
+		anchor->y = attrs->anchorOffset.y;
+	}
+	return sl_true;
+}
+
+sl_real View::getTranslationX()
+{
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->translationStatic.x;
+	}
+	return 0;
+}
+
+sl_real View::getTranslationY()
+{
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->translationStatic.y;
+	}
+	return 0;
+}
+
+const Vector2& View::getTranslation()
+{
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->translationStatic;
+	}
+	return Vector2::zero();
+}
+
+void View::setTranslationX(sl_real tx, sl_bool flagRedraw)
+{
+	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+	if (attrs.isNotNull()) {
+		attrs->translationStatic.x = tx;
+		_applyCalcTransform(flagRedraw);
+	}
+}
+
+void View::setTranslationY(sl_real ty, sl_bool flagRedraw)
+{
+	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+	if (attrs.isNotNull()) {
+		attrs->translationStatic.y = ty;
+		_applyCalcTransform(flagRedraw);
+	}
+}
+
+void View::setTranslation(sl_real tx, sl_real ty, sl_bool flagRedraw)
+{
+	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+	if (attrs.isNotNull()) {
+		attrs->translationStatic.x = tx;
+		attrs->translationStatic.y = ty;
+		_applyCalcTransform(flagRedraw);
+	}
+}
+
+void View::setTranslation(const Vector2& t, sl_bool flagRedraw)
+{
+	setTranslation(t.x, t.y, flagRedraw);
+}
+
+void View::setTranslationFromAnimation(const Vector2& t, sl_bool flagRedraw)
+{
+	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+	if (attrs.isNotNull()) {
+		attrs->translationAnimation = t;
+		_applyCalcTransform(flagRedraw);
+	}
+}
+
+void View::resetTranslationFromAnimation(sl_bool flagRedraw)
+{
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull()) {
+		attrs->translationAnimation.x = 0;
+		attrs->translationAnimation.y = 0;
+		_applyCalcTransform(flagRedraw);
 	}
 }
 
 sl_real View::getScaleX()
 {
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull()) {
-		return transform->scaleX;
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->scaleStatic.x;
 	}
 	return 1;
 }
 
 sl_real View::getScaleY()
 {
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull()) {
-		return transform->scaleY;
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->scaleStatic.y;
 	}
 	return 1;
 }
 
-Vector2 View::getScale()
+const Vector2& View::getScale()
 {
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull()) {
-		return Vector2(transform->scaleX, transform->scaleY);
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->scaleStatic;
 	}
-	return Vector2(1, 1);
+	static const sl_real t[2] = {1, 1};
+	return Vector2::fromArray(t);
 }
 
-void View::setScaleX(sl_real sx, sl_bool flagSetTransform)
+void View::setScaleX(sl_real sx, sl_bool flagRedraw)
 {
-	_initializeTransform();
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull()) {
-		transform->scaleX = sx;
-		if (flagSetTransform) {
-			_applyTransform();
-		}
+	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+	if (attrs.isNotNull()) {
+		attrs->scaleStatic.x = sx;
+		_applyCalcTransform(flagRedraw);
 	}
 }
 
-void View::setScaleY(sl_real sy, sl_bool flagSetTransform)
+void View::setScaleY(sl_real sy, sl_bool flagRedraw)
 {
-	_initializeTransform();
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull()) {
-		transform->scaleY = sy;
-		if (flagSetTransform) {
-			_applyTransform();
-		}
+	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+	if (attrs.isNotNull()) {
+		attrs->scaleStatic.y = sy;
+		_applyCalcTransform(flagRedraw);
 	}
 }
 
-void View::setScale(sl_real sx, sl_real sy, sl_bool flagSetTransform)
+void View::setScale(sl_real sx, sl_real sy, sl_bool flagRedraw)
 {
-	_initializeTransform();
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull()) {
-		transform->scaleX = sx;
-		transform->scaleY = sy;
-		if (flagSetTransform) {
-			_applyTransform();
-		}
+	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+	if (attrs.isNotNull()) {
+		attrs->scaleStatic.x = sx;
+		attrs->scaleStatic.y = sy;
+		_applyCalcTransform(flagRedraw);
 	}
 }
 
-void View::setScale(const Vector2& factor, sl_bool flagSetTransform)
+void View::setScale(sl_real factor, sl_bool flagRedraw)
 {
-	setScale(factor.x, factor.y, flagSetTransform);
+	setScale(factor, factor, flagRedraw);
 }
 
-void View::setScale(sl_real factor, sl_bool flagSetTransform)
+void View::setScale(const Vector2& factor, sl_bool flagRedraw)
 {
-	setScale(factor, factor, flagSetTransform);
+	setScale(factor.x, factor.y, flagRedraw);
+}
+
+void View::setScaleFromAnimation(const Vector2& factor, sl_bool flagRedraw)
+{
+	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+	if (attrs.isNotNull()) {
+		attrs->scaleAnimation = factor;
+		_applyCalcTransform(flagRedraw);
+	}
+}
+
+void View::resetScaleFromAnimation(sl_bool flagRedraw)
+{
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull()) {
+		attrs->scaleAnimation.x = 1;
+		attrs->scaleAnimation.y = 1;
+		_applyCalcTransform(flagRedraw);
+	}
 }
 
 sl_real View::getRotation()
 {
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull()) {
-		return transform->rotationAngle;
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->rotationAngleStatic;
 	}
 	return 0;
 }
 
-void View::setRatation(sl_real radian, sl_bool flagSetTransform)
+void View::setRotation(sl_real radian, sl_bool flagRedraw)
 {
-	_initializeTransform();
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull()) {
-		transform->rotationAngle = radian;
-		if (flagSetTransform) {
-			_applyTransform();
-		}
+	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+	if (attrs.isNotNull()) {
+		attrs->rotationAngleStatic = radian;
+		_applyCalcTransform(flagRedraw);
 	}
 }
 
-Point View::getAnchorOffset()
+void View::setRotationFromAnimation(sl_real radian, sl_bool flagRedraw)
 {
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull()) {
-		return Point(transform->anchorOffsetX, transform->anchorOffsetY);
-	}
-	return Point::zero();
-}
-
-void View::setAnchorOffset(sl_real x, sl_real y, sl_bool flagSetTransform)
-{
-	_initializeTransform();
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull()) {
-		transform->anchorOffsetX = x;
-		transform->anchorOffsetY = y;
-		if (flagSetTransform) {
-			_applyTransform();
-		}
+	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+	if (attrs.isNotNull()) {
+		attrs->rotationAngleAnimation = radian;
+		_applyCalcTransform(flagRedraw);
 	}
 }
 
-void View::setAnchorOffset(const Point& pt, sl_bool flagSetTransform)
+void View::resetRotationFromAnimation(sl_bool flagRedraw)
 {
-	setAnchorOffset(pt.x, pt.y, flagSetTransform);
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull()) {
+		attrs->rotationAngleAnimation = 0;
+		_applyCalcTransform(flagRedraw);
+	}
 }
 
 sl_real View::getAnchorOffsetX()
 {
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull()) {
-		return transform->anchorOffsetX;
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->anchorOffset.x;
 	}
 	return 0;
-}
-
-void View::setAnchorOffsetX(sl_real x, sl_bool flagSetTransform)
-{
-	_initializeTransform();
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull()) {
-		transform->anchorOffsetX = x;
-		if (flagSetTransform) {
-			_applyTransform();
-		}
-	}
 }
 
 sl_real View::getAnchorOffsetY()
 {
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull()) {
-		return transform->anchorOffsetY;
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->anchorOffset.y;
 	}
 	return 0;
 }
 
-void View::setAnchorOffsetY(sl_real y, sl_bool flagSetTransform)
+const Vector2& View::getAnchorOffset()
 {
-	_initializeTransform();
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull()) {
-		transform->anchorOffsetY = y;
-		if (flagSetTransform) {
-			_applyTransform();
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->anchorOffset;
+	}
+	return Vector2::zero();
+}
+
+void View::setAnchorOffsetX(sl_real x, sl_bool flagRedraw)
+{
+	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+	if (attrs.isNotNull()) {
+		attrs->anchorOffset.x = x;
+		_applyCalcTransform(flagRedraw);
+	}
+}
+
+void View::setAnchorOffsetY(sl_real y, sl_bool flagRedraw)
+{
+	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+	if (attrs.isNotNull()) {
+		attrs->anchorOffset.y = y;
+		_applyCalcTransform(flagRedraw);
+	}
+}
+
+void View::setAnchorOffset(sl_real x, sl_real y, sl_bool flagRedraw)
+{
+	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
+	if (attrs.isNotNull()) {
+		attrs->anchorOffset.x = x;
+		attrs->anchorOffset.y = y;
+		_applyCalcTransform(flagRedraw);
+	}
+}
+
+void View::setAnchorOffset(const Vector2& pt, sl_bool flagRedraw)
+{
+	setAnchorOffset(pt.x, pt.y, flagRedraw);
+}
+
+void View::_applyCalcTransform(sl_bool flagRedraw)
+{
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull()) {
+		attrs->flagTransformCalcInvalid = sl_true;
+		if (!(attrs->flagTransformStatic)) {
+			_applyFinalTransform(flagRedraw);
 		}
 	}
 }
 
-void View::_initializeTransform()
+void View::_applyFinalTransform(sl_bool flagRedraw)
 {
-	if (m_transform.isNotNull()) {
-		return;
-	}
-	Ref<TransformAttributes> attr = new TransformAttributes;
-	if (attr.isNotNull()) {
-		attr->flagEnabled = sl_false;
-		attr->transform = Matrix3::identity();
-		attr->transformInverse = Matrix3::identity();
-		attr->scaleX = 1;
-		attr->scaleY = 1;
-		attr->rotationAngle = 0;
-		attr->anchorOffsetX = 0;
-		attr->anchorOffsetY = 0;
-		m_transform = attr;
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull()) {
+		attrs->flagTransformFinalInvalid = sl_true;
+		if (isInstance()) {
+			UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, _invalidateInstanceTransform, this));
+		}
+		updateAndInvalidateBoundsInParent(flagRedraw);
 	}
 }
 
-void View::_applyTransform()
+void View::_invalidateInstanceTransform()
 {
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull()) {
-		sl_real tx = 0.5f + transform->anchorOffsetX;
-		sl_real ty = 0.5f + transform->anchorOffsetY;
-		Matrix3 mat = Transform2::getTranslationMatrix(-tx, -ty);
-		mat *= Transform2::getRotationMatrix(transform->rotationAngle);
-		mat *= Transform2::getScalingMatrix(transform->scaleX, transform->scaleY);
-		mat *= Transform2::getTranslationMatrix(tx, tx);
-		setTransform(mat);
+	Matrix3 mat;
+	if (getFinalTransform(&mat)) {
+		_setTransform_NI(mat);
+	} else {
+		_setTransform_NI(Matrix3::identity());
 	}
 }
 
 UIPointf View::convertCoordinateFromScreen(const UIPointf& ptScreen)
 {
-	Ref<ViewInstance> instance = m_instance;
-	if (instance.isNotNull()) {
-		return instance->convertCoordinateFromScreenToView(ptScreen);
-	}
 	Ref<View> parent = getParent();
 	if (parent.isNull()) {
 		return ptScreen;
+	}
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		return instance->convertCoordinateFromScreenToView(ptScreen);
 	}
 	UIPointf pt = parent->convertCoordinateFromScreen(ptScreen);
 	return convertCoordinateFromParent(pt);
@@ -3598,13 +3955,13 @@ UIPointf View::convertCoordinateFromScreen(const UIPointf& ptScreen)
 
 UIPointf View::convertCoordinateToScreen(const UIPointf& ptView)
 {
-	Ref<ViewInstance> instance = m_instance;
-	if (instance.isNotNull()) {
-		return instance->convertCoordinateFromViewToScreen(ptView);
-	}
 	Ref<View> parent = getParent();
 	if (parent.isNull()) {
 		return ptView;
+	}
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		return instance->convertCoordinateFromViewToScreen(ptView);
 	}
 	UIPointf pt = convertCoordinateToParent(ptView);
 	return parent->convertCoordinateToScreen(pt);
@@ -3612,80 +3969,172 @@ UIPointf View::convertCoordinateToScreen(const UIPointf& ptView)
 
 UIPointf View::convertCoordinateFromParent(const UIPointf& ptParent)
 {
-	if (isInstance()) {
-		return UIPointf(ptParent.x - (sl_ui_posf)(m_frame.left), ptParent.y - (sl_ui_posf)(m_frame.top));
-	}
 	Ref<View> parent = m_parent;
 	if (parent.isNull()) {
 		return ptParent;
 	}
 	
-	UIPointf pt = ptParent;
-	pt.x -= (sl_ui_posf)(m_frame.left);
-	pt.y -= (sl_ui_posf)(m_frame.top);
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull() && transform->flagEnabled) {
-		pt = transform->transformInverse.transformPosition(pt);
+	sl_ui_posf offx = (sl_ui_posf)(m_frame.left);
+	sl_ui_posf offy = (sl_ui_posf)(m_frame.top);
+	
+#if defined(SLIB_PLATFORM_IS_WIN32)
+	if (isInstance()) {
+		Vector2 t;
+		if (getFinalTranslationRotationScale(&t, sl_null, sl_null, sl_null)) {
+			offx += (sl_ui_pos)(t.x);
+			offy += (sl_ui_pos)(t.y);
+		}
+		return UIPointf(ptParent.x - offx, ptParent.y - offy);
 	}
+#endif
+	
+	UIPointf pt = ptParent;
+	pt.x -= offx;
+	pt.y -= offy;
+	
+	Matrix3 mat;
+	if (getFinalInverseTransform(&mat)) {
+		sl_real ax = (sl_real)(m_frame.getWidth()) / 2;
+		sl_real ay = (sl_real)(m_frame.getHeight()) / 2;
+		pt = mat.transformPosition(pt.x - ax, pt.y - ay);
+		pt.x += (sl_ui_posf)(ax);
+		pt.y += (sl_ui_posf)(ay);
+	}
+	
 	return pt;
+}
+
+UIRectf View::convertCoordinateFromParent(const UIRectf& rcParent)
+{
+	Ref<View> parent = m_parent;
+	if (parent.isNull()) {
+		return rcParent;
+	}
+	
+	sl_ui_posf offx = (sl_ui_posf)(m_frame.left);
+	sl_ui_posf offy = (sl_ui_posf)(m_frame.top);
+	
+#if defined(SLIB_PLATFORM_IS_WIN32)
+	if (isInstance()) {
+		Vector2 t;
+		if (getFinalTranslationRotationScale(&t, sl_null, sl_null, sl_null)) {
+			offx += (sl_ui_pos)(t.x);
+			offy += (sl_ui_pos)(t.y);
+		}
+		return UIRectf(rcParent.left - offx, rcParent.top - offy, rcParent.right - offx, rcParent.bottom - offy);
+	}
+#endif
+	
+	Matrix3 mat;
+	if (getFinalInverseTransform(&mat)) {
+		UIPointf pts[4];
+		rcParent.getCornerPoints(pts);
+		for (int i = 0; i < 4; i++) {
+			sl_real ax = (sl_real)(m_frame.getWidth()) / 2;
+			sl_real ay = (sl_real)(m_frame.getHeight()) / 2;
+			pts[i] = mat.transformPosition(pts[i].x - (sl_real)offx - ax, pts[i].y - (sl_real)offy - ay);
+			pts[i].x += (sl_ui_posf)(ax);
+			pts[i].y += (sl_ui_posf)(ay);
+		}
+		UIRectf rc;
+		rc.setFromPoints(pts, 4);
+		return rc;
+	} else {
+		return UIRectf(rcParent.left - offx, rcParent.top - offy, rcParent.right - offx, rcParent.bottom - offy);
+	}
 }
 
 UIPointf View::convertCoordinateToParent(const UIPointf& ptView)
 {
-	if (isInstance()) {
-		return UIPointf(ptView.x + (sl_ui_pos)(m_frame.left), ptView.y + (sl_ui_pos)(m_frame.top));
-	}
 	Ref<View> parent = m_parent;
 	if (parent.isNull()) {
 		return ptView;
 	}
 	
-	Point pt = ptView;
-	Ref<TransformAttributes> transform = m_transform;
-	if (transform.isNotNull() && transform->flagEnabled) {
-		pt = transform->transform.transformPosition(pt);
+	sl_ui_posf offx = (sl_ui_posf)(m_frame.left);
+	sl_ui_posf offy = (sl_ui_posf)(m_frame.top);
+
+#if defined(SLIB_PLATFORM_IS_WIN32)
+	if (isInstance()) {
+		Vector2 t;
+		if (getFinalTranslationRotationScale(&t, sl_null, sl_null, sl_null)) {
+			offx += (sl_ui_pos)(t.x);
+			offy += (sl_ui_pos)(t.y);
+		}
+		return UIPointf(ptView.x + offx, ptView.y + offy);
 	}
-	pt.x += (sl_ui_pos)(m_frame.left);
-	pt.y += (sl_ui_pos)(m_frame.top);
+#endif
+	
+	UIPointf pt = ptView;
+	Matrix3 mat;
+	if (getFinalTransform(&mat)) {
+		sl_real ax = (sl_real)(m_frame.getWidth()) / 2;
+		sl_real ay = (sl_real)(m_frame.getHeight()) / 2;
+		pt = mat.transformPosition(pt.x - ax, pt.y - ay);
+		pt.x += (sl_ui_posf)(ax);
+		pt.y += (sl_ui_posf)(ay);
+	}
+	
+	pt.x += offx;
+	pt.y += offy;
+	
 	return pt;
+}
+
+UIRectf View::convertCoordinateToParent(const UIRectf& rcView)
+{
+	Ref<View> parent = m_parent;
+	if (parent.isNull()) {
+		return rcView;
+	}
+	
+	sl_ui_posf offx = (sl_ui_posf)(m_frame.left);
+	sl_ui_posf offy = (sl_ui_posf)(m_frame.top);
+
+#if defined(SLIB_PLATFORM_IS_WIN32)
+	if (isInstance()) {
+		Vector2 t;
+		if (getFinalTranslationRotationScale(&t, sl_null, sl_null, sl_null)) {
+			offx += (sl_ui_pos)(t.x);
+			offy += (sl_ui_pos)(t.y);
+		}
+		return UIRectf(rcView.left + offx, rcView.top + offy, rcView.right + offx, rcView.bottom + offy);
+	}
+#endif
+	
+	Matrix3 mat;
+	if (getFinalTransform(&mat)) {
+		UIPointf pts[4];
+		rcView.getCornerPoints(pts);
+		for (int i = 0; i < 4; i++) {
+			sl_real ax = (sl_real)(m_frame.getWidth()) / 2;
+			sl_real ay = (sl_real)(m_frame.getHeight()) / 2;
+			pts[i] = mat.transformPosition(pts[i].x - ax, pts[i].y - ay);
+			pts[i].x += (sl_ui_posf)(ax) + offx;
+			pts[i].y += (sl_ui_posf)(ay) + offy;
+		}
+		UIRectf rc;
+		rc.setFromPoints(pts, 4);
+		return rc;
+	} else {
+		return UIRectf(rcView.left + offx, rcView.top + offy, rcView.right + offx, rcView.bottom + offy);
+	}
 }
 
 Ref<Drawable> View::getBackground()
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->background;
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->background;
 	}
 	return Ref<Drawable>::null();
 }
 
 void View::setBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->background = drawable;
-		if (flagRedraw) {
-			invalidate();
-		}
-	}
-}
-
-ScaleMode View::getBackgroundScaleMode()
-{
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->backgroundScaleMode;
-	}
-	return ScaleMode::Stretch;
-}
-
-void View::setBackgroundScaleMode(ScaleMode scaleMode, sl_bool flagRedraw)
-{
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->backgroundScaleMode = scaleMode;
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->background = drawable;
 		if (flagRedraw) {
 			invalidate();
 		}
@@ -3694,19 +4143,18 @@ void View::setBackgroundScaleMode(ScaleMode scaleMode, sl_bool flagRedraw)
 
 Ref<Drawable> View::getPressedBackground()
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->backgroundPressed;
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->backgroundPressed;
 	}
 	return Ref<Drawable>::null();
 }
 
 void View::setPressedBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->backgroundPressed = drawable;
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->backgroundPressed = drawable;
 		if (flagRedraw) {
 			invalidate();
 		}
@@ -3715,19 +4163,38 @@ void View::setPressedBackground(const Ref<Drawable>& drawable, sl_bool flagRedra
 
 Ref<Drawable> View::getHoverBackground()
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->backgroundHover;
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->backgroundHover;
 	}
 	return Ref<Drawable>::null();
 }
 
 void View::setHoverBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->backgroundHover = drawable;
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->backgroundHover = drawable;
+		if (flagRedraw) {
+			invalidate();
+		}
+	}
+}
+
+ScaleMode View::getBackgroundScaleMode()
+{
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->backgroundScaleMode;
+	}
+	return ScaleMode::Stretch;
+}
+
+void View::setBackgroundScaleMode(ScaleMode scaleMode, sl_bool flagRedraw)
+{
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->backgroundScaleMode = scaleMode;
 		if (flagRedraw) {
 			invalidate();
 		}
@@ -3736,17 +4203,16 @@ void View::setHoverBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw)
 
 Alignment View::getBackgroundAlignment()
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->backgroundAlignment;
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->backgroundAlignment;
 	}
 	return Alignment::MiddleCenter;
 }
 
 void View::setBackgroundAlignment(Alignment align, sl_bool flagRedraw)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
+	Ref<DrawAttributes> draw = _initializeDrawAttributes();
 	if (draw.isNotNull()) {
 		draw->backgroundAlignment = align;
 		if (flagRedraw) {
@@ -3757,19 +4223,18 @@ void View::setBackgroundAlignment(Alignment align, sl_bool flagRedraw)
 
 Color View::getBackgroundColor()
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->backgroundColor;
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->backgroundColor;
 	}
 	return Color::zero();
 }
 
 void View::setBackgroundColor(const Color& color, sl_bool flagRedraw)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->backgroundColor = color;
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->backgroundColor = color;
 		if (isNativeWidget()) {
 			_setBackgroundColor_NW(color);
 		} else {
@@ -3782,19 +4247,18 @@ void View::setBackgroundColor(const Color& color, sl_bool flagRedraw)
 
 Ref<Pen> View::getBorder()
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->penBorder;
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->penBorder;
 	}
 	return Ref<Pen>::null();
 }
 
 void View::setBorder(const Ref<Pen>& pen, sl_bool flagRedraw)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->penBorder = pen;
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->penBorder = pen;
 		if (flagRedraw) {
 			invalidate();
 		}
@@ -3803,19 +4267,18 @@ void View::setBorder(const Ref<Pen>& pen, sl_bool flagRedraw)
 
 Color View::getBorderColor()
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->borderColor;
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->borderColor;
 	}
 	return Color::Black;
 }
 
 void View::setBorderColor(const Color& color, sl_bool flagRedraw)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->borderColor = color;
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->borderColor = color;
 		_refreshBorderPen(flagRedraw);
 	}
 }
@@ -3848,57 +4311,67 @@ void View::setBorder(sl_bool flagBorder, sl_bool flagRedraw)
 
 PenStyle View::getBorderStyle()
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->borderStyle;
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->borderStyle;
 	}
 	return PenStyle::Solid;
 }
 
 void View::setBorderStyle(PenStyle style, sl_bool flagRedraw)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->borderStyle = style;
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->borderStyle = style;
 		_refreshBorderPen(flagRedraw);
 	}
 }
 
 sl_real View::getBorderWidth()
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->borderWidth;
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->borderWidth;
 	}
 	return 0;
 }
 
 void View::setBorderWidth(sl_real width, sl_bool flagRedraw)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->borderWidth = width;
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->borderWidth = width;
 		_refreshBorderPen(flagRedraw);
+	}
+}
+
+void View::_refreshBorderPen(sl_bool flagRedraw)
+{
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		sl_real width = attrs->borderWidth;
+		Ref<Pen> pen;
+		if (width > 0) {
+			pen = Pen::create(attrs->borderStyle, attrs->borderWidth, attrs->borderColor);
+		}
+		setBorder(pen, flagRedraw);
 	}
 }
 
 BoundShape View::getBoundShape()
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->boundShape;
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->boundShape;
 	}
 	return BoundShape::Rectangle;
 }
 
 void View::setBoundShape(BoundShape shape, sl_bool flagRedraw)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->boundShape = shape;
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->boundShape = shape;
 		if (flagRedraw) {
 			invalidate();
 		}
@@ -3907,19 +4380,18 @@ void View::setBoundShape(BoundShape shape, sl_bool flagRedraw)
 
 const Size& View::getRoundRectBoundShapeRadius()
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->roundRectBoundShapeRadius;
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->roundRectBoundShapeRadius;
 	}
 	return Size::zero();
 }
 
 void View::setRoundRectBoundShapeRadius(const Size& radius, sl_bool flagRedraw)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->roundRectBoundShapeRadius = radius;
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->roundRectBoundShapeRadius = radius;
 		if (flagRedraw) {
 			invalidate();
 		}
@@ -3933,19 +4405,23 @@ void View::setRoundRectBoundShapeRadius(sl_real rx, sl_real ry, sl_bool flagRedr
 
 void View::setRoundRectBoundShapeRadiusX(sl_real rx, sl_bool flagRedraw)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		setRoundRectBoundShapeRadius(Size(rx, draw->roundRectBoundShapeRadius.y), flagRedraw);
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->roundRectBoundShapeRadius.x = rx;
+		if (flagRedraw) {
+			invalidate();
+		}
 	}
 }
 
 void View::setRoundRectBoundShapeRadiusY(sl_real ry, sl_bool flagRedraw)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		setRoundRectBoundShapeRadius(Size(draw->roundRectBoundShapeRadius.x, ry), flagRedraw);
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->roundRectBoundShapeRadius.y = ry;
+		if (flagRedraw) {
+			invalidate();
+		}
 	}
 }
 
@@ -3956,19 +4432,18 @@ void View::setRoundRectBoundShapeRadius(sl_real radius, sl_bool flagRedraw)
 
 Ref<GraphicsPath> View::getBoundShapePath()
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->boundShapePath;
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->boundShapePath;
 	}
 	return Ref<GraphicsPath>::null();
 }
 
 void View::setBoundShapePath(const Ref<GraphicsPath>& path, sl_bool flagRedraw)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->boundShapePath = path;
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->boundShapePath = path;
 		if (flagRedraw) {
 			invalidate();
 		}
@@ -3977,19 +4452,18 @@ void View::setBoundShapePath(const Ref<GraphicsPath>& path, sl_bool flagRedraw)
 
 sl_bool View::isPreDrawEnabled()
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->flagPreDrawEnabled;
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagPreDrawEnabled;
 	}
 	return sl_false;
 }
 
 void View::setPreDrawEnabled(sl_bool flagEnabled, sl_bool flagRedraw)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->flagPreDrawEnabled = flagEnabled;
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->flagPreDrawEnabled = flagEnabled;
 		if (flagRedraw) {
 			invalidate();
 		}
@@ -3998,58 +4472,18 @@ void View::setPreDrawEnabled(sl_bool flagEnabled, sl_bool flagRedraw)
 
 sl_bool View::isPostDrawEnabled()
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->flagPostDrawEnabled;
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagPostDrawEnabled;
 	}
 	return sl_false;
 }
 
 void View::setPostDrawEnabled(sl_bool flagEnabled, sl_bool flagRedraw)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->flagPostDrawEnabled = flagEnabled;
-		if (flagRedraw) {
-			invalidate();
-		}
-	}
-}
-
-sl_bool View::isClippingBounds()
-{
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->flagClippingBounds;
-	}
-	return sl_true;
-}
-
-void View::setClippingBounds(sl_bool flag)
-{
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->flagClippingBounds = flag;
-	}
-}
-
-sl_bool View::isDoubleBuffering()
-{
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->flagDoubleBuffer;
-	}
-	return sl_false;
-}
-
-void View::setDoubleBuffering(sl_bool flagEnabled, sl_bool flagRedraw)
-{
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->flagDoubleBuffer = flagEnabled;
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->flagPostDrawEnabled = flagEnabled;
 		if (flagRedraw) {
 			invalidate();
 		}
@@ -4058,19 +4492,18 @@ void View::setDoubleBuffering(sl_bool flagEnabled, sl_bool flagRedraw)
 
 sl_bool View::isAlwaysOnDrawBackground()
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->flagOnDrawBackgroundAlways;
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagOnDrawBackgroundAlways;
 	}
 	return sl_false;
 }
 
 void View::setAlwaysOnDrawBackground(sl_bool flagEnabled, sl_bool flagRedraw)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->flagOnDrawBackgroundAlways = flagEnabled;
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->flagOnDrawBackgroundAlways = flagEnabled;
 		if (flagRedraw) {
 			invalidate();
 		}
@@ -4079,19 +4512,18 @@ void View::setAlwaysOnDrawBackground(sl_bool flagEnabled, sl_bool flagRedraw)
 
 sl_bool View::isAlwaysOnDrawBorder()
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->flagOnDrawBorderAlways;
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagOnDrawBorderAlways;
 	}
 	return sl_false;
 }
 
 void View::setAlwaysOnDrawBorder(sl_bool flagEnabled, sl_bool flagRedraw)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->flagOnDrawBorderAlways = flagEnabled;
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->flagOnDrawBorderAlways = flagEnabled;
 		if (flagRedraw) {
 			invalidate();
 		}
@@ -4100,9 +4532,9 @@ void View::setAlwaysOnDrawBorder(sl_bool flagEnabled, sl_bool flagRedraw)
 
 Ref<Font> View::getFont()
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		Ref<Font> font = draw->font;
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		Ref<Font> font = attrs->font;
 		if (font.isNotNull()) {
 			return font;
 		}
@@ -4138,19 +4570,26 @@ void View::_setFontInvalidateChildren()
 	}
 }
 
-void View::setFont(const Ref<Font>& _font, sl_bool flagRedraw)
+void View::setFont(const Ref<Font>& font, sl_bool flagRedraw)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->font = _font;
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
 		_setFontInvalidateChildren();
 		if (isNativeWidget()) {
-			Ref<Font> font = getFont();
-			if (font.isNotNull()) {
-				_setFont_NW(font);
+			Ref<Font> _font = font;
+			if (_font.isNull()) {
+				Ref<View> parent = getParent();
+				if (parent.isNotNull()) {
+					_font = parent->getFont();
+				}
+				_font = UI::getDefaultFont();
 			}
+			if (_font.isNotNull()) {
+				_setFont_NW(_font);
+			}
+			attrs->font = font;
 		} else {
+			attrs->font = font;
 			if (isUsingFont()) {
 				requestLayout(sl_false);
 				if (flagRedraw) {
@@ -4158,6 +4597,7 @@ void View::setFont(const Ref<Font>& _font, sl_bool flagRedraw)
 				}
 			}
 		}
+		
 	}
 }
 
@@ -4178,107 +4618,644 @@ void View::setFontAttributes(sl_real size, sl_bool flagBold, sl_bool flagItalic,
 
 sl_bool View::isUsingFont()
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		return draw->flagUsingFont;
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagUsingFont;
 	}
 	return sl_false;
 }
 
 void View::setUsingFont(sl_bool flag)
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->flagUsingFont = flag;
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->flagUsingFont = flag;
 	}
 }
 
-void View::_setFontInstance(const Ref<FontInstance>& instance)
+sl_bool View::isOpaque()
 {
-	_initializeDraw();
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		draw->fontInstance = instance;
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagOpaque;
 	}
+	return sl_false;
 }
 
-void View::_initializeDraw()
+void View::setOpaque(sl_bool flag, sl_bool flagRedraw)
 {
-	if (m_draw.isNotNull()) {
-		return;
-	}
-	
-	Ref<DrawAttributes> attr = new DrawAttributes;
-	
-	if (attr.isNotNull()) {
-		
-		attr->backgroundScaleMode = ScaleMode::Stretch;
-		attr->backgroundAlignment = Alignment::MiddleCenter;
-		attr->backgroundColor = Color::zero();
-		
-		attr->boundShape = BoundShape::Rectangle;
-		
-		attr->roundRectBoundShapeRadius.x = 5;
-		attr->roundRectBoundShapeRadius.y = 5;
-		
-		attr->borderColor = Color::Black;
-		attr->borderStyle = PenStyle::Solid;
-		attr->borderWidth = 0;
-		
-		attr->flagPreDrawEnabled = sl_false;
-		attr->flagPostDrawEnabled = sl_false;
-		attr->flagClippingBounds = sl_true;
-		attr->flagDoubleBuffer = sl_false;
-		
-		attr->flagUsingFont = sl_false;
-		
-		attr->flagOnDrawBackgroundAlways = sl_false;
-		attr->flagOnDrawBorderAlways = sl_false;
-		
-		m_draw = attr;
-		
-	}
-}
-
-void View::_refreshBorderPen(sl_bool flagRedraw)
-{
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		sl_real width = draw->borderWidth;
-		Ref<Pen> pen;
-		if (width > 0) {
-			pen = Pen::create(draw->borderStyle, draw->borderWidth, draw->borderColor);
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->flagOpaque = flag;
+		Ref<ViewInstance> instance = m_instance;
+		if (instance.isNotNull()) {
+			instance->setOpaque(flag);
+		} else {
+			if (flagRedraw) {
+				invalidateBoundsInParent();
+			}
 		}
-		setBorder(pen, flagRedraw);
+	}
+}
+
+sl_real View::getFinalAlpha()
+{
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->alphaStatic * attrs->alphaAnimation;
+	}
+	return 1;
+}
+
+sl_real View::getAlpha()
+{
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->alphaStatic;
+	}
+	return 1;
+}
+
+void View::setAlpha(sl_real alpha, sl_bool flagRedraw)
+{
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->alphaStatic = alpha;
+		_applyFinalAlpha(flagRedraw);
+	}
+}
+
+void View::setAlphaFromAnimation(sl_real alpha, sl_bool flagRedraw)
+{
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->alphaAnimation = alpha;
+		_applyFinalAlpha(flagRedraw);
+	}
+}
+
+void View::resetAlphaFromAnimation(sl_bool flagRedraw)
+{
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		attrs->alphaAnimation = 1;
+		_applyFinalAlpha(flagRedraw);
+	}
+}
+
+void View::_applyFinalAlpha(sl_bool flagRedraw)
+{
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		instance->setAlpha(getFinalAlpha());
+	} else {
+		if (flagRedraw) {
+			invalidateBoundsInParent();
+		}
+	}
+}
+
+sl_bool View::isLayer()
+{
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagLayer;
+	}
+	return sl_false;
+}
+
+void View::setLayer(sl_bool flagLayer, sl_bool flagRedraw)
+{
+	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
+	if (attrs.isNotNull()) {
+		attrs->flagLayer = flagLayer;
+		if (flagRedraw) {
+			invalidate();
+		}
+	}
+}
+
+void View::invalidateLayer()
+{
+	Ref<DrawAttributes> draw = m_drawAttributes;
+	if (draw.isNotNull()) {
+		draw->flagInvalidatedLayer = sl_true;
+		draw->flagInvalidatedWholeLayer = sl_true;
+	}
+}
+
+void View::invalidateLayer(const UIRect& rect)
+{
+	Ref<DrawAttributes> draw = m_drawAttributes;
+	if (draw.isNotNull()) {
+		if (draw->flagInvalidatedLayer) {
+			if (!(draw->flagInvalidatedWholeLayer)) {
+				UIRect r = draw->rectInvalidatedLayer;
+				r.mergeRectangle(rect);
+				draw->rectInvalidatedLayer = r;
+			}
+		} else {
+			draw->rectInvalidatedLayer = rect;
+			draw->flagInvalidatedWholeLayer = sl_false;
+			draw->flagInvalidatedLayer = sl_true;
+		}
+	}
+}
+
+void View::detachAnimations()
+{
+	Ref<AnimationAttributes> attrs = m_animationAttributes;
+	if (attrs.isNotNull()) {
+		if (attrs->animationTransform.isNotNull()) {
+			Ref<Animation> animation = attrs->animationTransform;
+			Ref< AnimationTargetT<Matrix3> > target = attrs->targetTransform;
+			if (animation.isNotNull() && target.isNotNull()) {
+				animation->removeTarget(target);
+			}
+		}
+		if (attrs->animationTranslation.isNotNull()) {
+			Ref<Animation> animation = attrs->animationTranslation;
+			Ref< AnimationTargetT<Vector2> > target = attrs->targetTranslation;
+			if (animation.isNotNull() && target.isNotNull()) {
+				animation->removeTarget(target);
+			}
+		}
+		if (attrs->animationScale.isNotNull()) {
+			Ref<Animation> animation = attrs->animationScale;
+			Ref< AnimationTargetT<Vector2> > target = attrs->targetScale;
+			if (animation.isNotNull() && target.isNotNull()) {
+				animation->removeTarget(target);
+			}
+		}
+		if (attrs->animationRotation.isNotNull()) {
+			Ref<Animation> animation = attrs->animationRotation;
+			Ref< AnimationTargetT<sl_real> > target = attrs->targetRotation;
+			if (animation.isNotNull() && target.isNotNull()) {
+				animation->removeTarget(target);
+			}
+		}
+		if (attrs->animationAlpha.isNotNull()) {
+			Ref<Animation> animation = attrs->animationAlpha;
+			Ref< AnimationTargetT<sl_real> > target = attrs->targetAlpha;
+			if (animation.isNotNull() && target.isNotNull()) {
+				animation->removeTarget(target);
+			}
+		}
+		if (attrs->animationBackgroundColor.isNotNull()) {
+			Ref<Animation> animation = attrs->animationBackgroundColor;
+			Ref< AnimationTargetT<Color4f> > target = attrs->targetBackgroundColor;
+			if (animation.isNotNull() && target.isNotNull()) {
+				animation->removeTarget(target);
+			}
+		}
+		m_animationAttributes.setNull();
+	}
+}
+
+void View::resetAnimations(sl_bool flagRedraw)
+{
+	detachAnimations();
+	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull()) {
+		attrs->flagTransformAnimation = sl_false;
+		attrs->translationAnimation.x = 0;
+		attrs->translationAnimation.y = 0;
+		attrs->scaleAnimation.x = 0;
+		attrs->scaleAnimation.y = 0;
+		attrs->rotationAngleAnimation = 0;
+		attrs->flagTransformCalcInvalid = sl_true;
+		_applyFinalTransform(sl_false);
+	}
+	resetAlphaFromAnimation(sl_false);
+	if (flagRedraw) {
+		invalidateBoundsInParent();
+	}
+}
+
+class _ViewTransformAnimationTarget : public AnimationTargetT<Matrix3>
+{
+public:
+	WeakRef<View> m_view;
+	
+	_ViewTransformAnimationTarget(const Ref<View>& view, const AnimationFrames<Matrix3>& frames) : AnimationTargetT<Matrix3>(frames), m_view(view)
+	{
+	}
+	
+	// override
+	void update(float fraction, const Matrix3& value)
+	{
+		Ref<View> view(m_view);
+		if (view.isNotNull()) {
+			view->setTransformFromAnimation(value);
+		}
+	}
+	
+};
+
+Ref<Animation> View::getTransformAnimation()
+{
+	Ref<AnimationAttributes> attrs = m_animationAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->animationTransform;
+	}
+	return Ref<Animation>::null();
+}
+
+void View::setTransformAnimation(const Ref<Animation>& animation, const AnimationFrames<Matrix3>& frames, sl_bool flagRedraw)
+{
+	if (animation.isNotNull()) {
+		resetTransformAnimation(flagRedraw);
+		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
+		if (attrs.isNotNull()) {
+			Ref<_ViewTransformAnimationTarget> target = new _ViewTransformAnimationTarget(this, frames);
+			if (target.isNotNull()) {
+				attrs->animationTransform = animation;
+				attrs->targetTransform = target;
+			}
+		}
+	}
+}
+
+void View::setTransformAnimation(const Ref<Animation>& animation, const Matrix3& startValue, const Matrix3& endValue, sl_bool flagRedraw)
+{
+	AnimationFrames<Matrix3> frames(startValue, endValue);
+	setTransformAnimation(animation, frames, flagRedraw);
+}
+
+void View::resetTransformAnimation(sl_bool flagRedraw)
+{
+	Ref<AnimationAttributes> attrs = m_animationAttributes;
+	if (attrs.isNotNull()) {
+		Ref<Animation> animation = attrs->animationTransform;
+		Ref< AnimationTargetT<Matrix3> > target = attrs->targetTransform;
+		if (animation.isNotNull() && target.isNotNull()) {
+			animation->removeTarget(target);
+		}
+		attrs->animationTransform.setNull();
+		attrs->targetTransform.setNull();
+		resetTransformFromAnimation(flagRedraw);
+	}
+}
+
+class _ViewTranslateAnimationTarget : public AnimationTargetT<Vector2>
+{
+public:
+	WeakRef<View> m_view;
+	
+	_ViewTranslateAnimationTarget(const Ref<View>& view, const AnimationFrames<Vector2>& frames) : AnimationTargetT<Vector2>(frames), m_view(view)
+	{
+	}
+	
+	// override
+	void update(float fraction, const Vector2& value)
+	{
+		Ref<View> view(m_view);
+		if (view.isNotNull()) {
+			view->setTranslationFromAnimation(value);
+		}
+	}
+	
+};
+
+Ref<Animation> View::getTranslateAnimation()
+{
+	Ref<AnimationAttributes> attrs = m_animationAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->animationTranslation;
+	}
+	return Ref<Animation>::null();
+}
+
+void View::setTranslateAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, sl_bool flagRedraw)
+{
+	if (animation.isNotNull()) {
+		resetTranslateAnimation(flagRedraw);
+		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
+		if (attrs.isNotNull()) {
+			Ref<_ViewTranslateAnimationTarget> target = new _ViewTranslateAnimationTarget(this, frames);
+			if (target.isNotNull()) {
+				attrs->animationTranslation = animation;
+				attrs->targetTranslation = target;
+				animation->addTarget(target);
+			}
+		}
+	}
+}
+
+void View::setTranslateAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue, sl_bool flagRedraw)
+{
+	AnimationFrames<Vector2> frames(startValue, endValue);
+	setTranslateAnimation(animation, frames, flagRedraw);
+}
+
+void View::resetTranslateAnimation(sl_bool flagRedraw)
+{
+	Ref<AnimationAttributes> attrs = m_animationAttributes;
+	if (attrs.isNotNull()) {
+		Ref<Animation> animation = attrs->animationTranslation;
+		Ref< AnimationTargetT<Vector2> > target = attrs->targetTranslation;
+		if (animation.isNotNull() && target.isNotNull()) {
+			animation->removeTarget(target);
+		}
+		attrs->animationTranslation.setNull();
+		attrs->targetTranslation.setNull();
+		resetTranslationFromAnimation(flagRedraw);
+	}
+}
+
+class _ViewScaleAnimationTarget : public AnimationTargetT<Vector2>
+{
+public:
+	WeakRef<View> m_view;
+	
+	_ViewScaleAnimationTarget(const Ref<View>& view, const AnimationFrames<Vector2>& frames) : AnimationTargetT<Vector2>(frames), m_view(view)
+	{
+	}
+	
+	// override
+	void update(float fraction, const Vector2& value)
+	{
+		Ref<View> view(m_view);
+		if (view.isNotNull()) {
+			view->setScaleFromAnimation(value);
+		}
+	}
+	
+};
+
+Ref<Animation> View::getScaleAnimation()
+{
+	Ref<AnimationAttributes> attrs = m_animationAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->animationScale;
+	}
+	return Ref<Animation>::null();
+}
+
+void View::setScaleAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, sl_bool flagRedraw)
+{
+	if (animation.isNotNull()) {
+		resetScaleAnimation(flagRedraw);
+		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
+		if (attrs.isNotNull()) {
+			Ref<_ViewScaleAnimationTarget> target = new _ViewScaleAnimationTarget(this, frames);
+			if (target.isNotNull()) {
+				attrs->animationScale = animation;
+				attrs->targetScale = target;
+				animation->addTarget(target);
+			}
+		}
+	}
+}
+
+void View::setScaleAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue, sl_bool flagRedraw)
+{
+	AnimationFrames<Vector2> frames(startValue, endValue);
+	setScaleAnimation(animation, frames, flagRedraw);
+}
+
+void View::setScaleAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, sl_bool flagRedraw)
+{
+	AnimationFrames<Vector2> frames(Vector2(startValue, startValue), Vector2(endValue, endValue));
+	setScaleAnimation(animation, frames, flagRedraw);
+}
+
+void View::resetScaleAnimation(sl_bool flagRedraw)
+{
+	Ref<AnimationAttributes> attrs = m_animationAttributes;
+	if (attrs.isNotNull()) {
+		Ref<Animation> animation = attrs->animationScale;
+		Ref< AnimationTargetT<Vector2> > target = attrs->targetScale;
+		if (animation.isNotNull() && target.isNotNull()) {
+			animation->removeTarget(target);
+		}
+		attrs->animationScale.setNull();
+		attrs->targetScale.setNull();
+		resetScaleFromAnimation(flagRedraw);
+	}
+}
+
+class _ViewRotateAnimationTarget : public AnimationTargetT<sl_real>
+{
+public:
+	WeakRef<View> m_view;
+	
+	_ViewRotateAnimationTarget(const Ref<View>& view, const AnimationFrames<sl_real>& frames) : AnimationTargetT<sl_real>(frames), m_view(view)
+	{
+	}
+	
+	// override
+	void update(float fraction, const sl_real& value)
+	{
+		Ref<View> view(m_view);
+		if (view.isNotNull()) {
+			view->setRotationFromAnimation(value);
+		}
+	}
+	
+};
+
+Ref<Animation> View::getRotateAnimation()
+{
+	Ref<AnimationAttributes> attrs = m_animationAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->animationRotation;
+	}
+	return Ref<Animation>::null();
+}
+
+void View::setRotateAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, sl_bool flagRedraw)
+{
+	if (animation.isNotNull()) {
+		resetRotateAnimation(flagRedraw);
+		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
+		if (attrs.isNotNull()) {
+			Ref<_ViewRotateAnimationTarget> target = new _ViewRotateAnimationTarget(this, frames);
+			if (target.isNotNull()) {
+				attrs->animationRotation = animation;
+				attrs->targetRotation = target;
+				animation->addTarget(target);
+			}
+		}
+	}
+}
+
+void View::setRotateAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, sl_bool flagRedraw)
+{
+	AnimationFrames<sl_real> frames(startValue, endValue);
+	setRotateAnimation(animation, frames, flagRedraw);
+}
+
+void View::resetRotateAnimation(sl_bool flagRedraw)
+{
+	Ref<AnimationAttributes> attrs = m_animationAttributes;
+	if (attrs.isNotNull()) {
+		Ref<Animation> animation = attrs->animationRotation;
+		Ref< AnimationTargetT<sl_real> > target = attrs->targetRotation;
+		if (animation.isNotNull() && target.isNotNull()) {
+			animation->removeTarget(target);
+		}
+		attrs->animationRotation.setNull();
+		attrs->targetRotation.setNull();
+		resetRotationFromAnimation(flagRedraw);
+	}
+}
+
+class _ViewAlphaAnimationTarget : public AnimationTargetT<sl_real>
+{
+public:
+	WeakRef<View> m_view;
+	
+	_ViewAlphaAnimationTarget(const Ref<View>& view, const AnimationFrames<sl_real>& frames) : AnimationTargetT<sl_real>(frames), m_view(view)
+	{
+	}
+	
+	// override
+	void update(float fraction, const sl_real& value)
+	{
+		Ref<View> view(m_view);
+		if (view.isNotNull()) {
+			view->setAlphaFromAnimation(value);
+		}
+	}
+	
+};
+
+Ref<Animation> View::getAlphaAnimation()
+{
+	Ref<AnimationAttributes> attrs = m_animationAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->animationAlpha;
+	}
+	return Ref<Animation>::null();
+}
+
+void View::setAlphaAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, sl_bool flagRedraw)
+{
+	if (animation.isNotNull()) {
+		resetAlphaAnimation(flagRedraw);
+		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
+		if (attrs.isNotNull()) {
+			Ref<_ViewAlphaAnimationTarget> target = new _ViewAlphaAnimationTarget(this, frames);
+			if (target.isNotNull()) {
+				attrs->animationAlpha = animation;
+				attrs->targetAlpha = target;
+				animation->addTarget(target);
+			}
+		}
+	}
+}
+
+void View::setAlphaAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, sl_bool flagRedraw)
+{
+	AnimationFrames<sl_real> frames(startValue, endValue);
+	setAlphaAnimation(animation, frames, flagRedraw);
+}
+
+void View::resetAlphaAnimation(sl_bool flagRedraw)
+{
+	Ref<AnimationAttributes> attrs = m_animationAttributes;
+	if (attrs.isNotNull()) {
+		Ref<Animation> animation = attrs->animationAlpha;
+		Ref< AnimationTargetT<sl_real> > target = attrs->targetAlpha;
+		if (animation.isNotNull() && target.isNotNull()) {
+			animation->removeTarget(target);
+		}
+		attrs->animationAlpha.setNull();
+		attrs->targetAlpha.setNull();
+		resetAlphaFromAnimation(flagRedraw);
+	}
+}
+
+class _ViewBackgroundColorAnimationTarget : public AnimationTargetT<Color4f>
+{
+public:
+	WeakRef<View> m_view;
+	
+	_ViewBackgroundColorAnimationTarget(const Ref<View>& view, const AnimationFrames<Color4f>& frames) : AnimationTargetT<Color4f>(frames), m_view(view)
+	{
+	}
+	
+	// override
+	void update(float fraction, const Color4f& value)
+	{
+		Ref<View> view(m_view);
+		if (view.isNotNull()) {
+			view->setBackgroundColor(value);
+		}
+	}
+	
+};
+
+Ref<Animation> View::getBackgroundColorAnimation()
+{
+	Ref<AnimationAttributes> attrs = m_animationAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->animationBackgroundColor;
+	}
+	return Ref<Animation>::null();
+}
+
+void View::setBackgroundColorAnimation(const Ref<Animation>& animation, const AnimationFrames<Color4f>& frames, sl_bool flagRedraw)
+{
+	if (animation.isNotNull()) {
+		resetBackgroundColorAnimation(flagRedraw);
+		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
+		if (attrs.isNotNull()) {
+			Ref<_ViewBackgroundColorAnimationTarget> target = new _ViewBackgroundColorAnimationTarget(this, frames);
+			if (target.isNotNull()) {
+				attrs->animationBackgroundColor = animation;
+				attrs->targetBackgroundColor = target;
+				animation->addTarget(target);
+			}
+		}
+	}
+}
+
+void View::setBackgroundColorAnimation(const Ref<Animation>& animation, const Color4f& startValue, const Color4f& endValue, sl_bool flagRedraw)
+{
+	AnimationFrames<Color4f> frames(startValue, endValue);
+	setBackgroundColorAnimation(animation, frames, flagRedraw);
+}
+
+void View::resetBackgroundColorAnimation(sl_bool flagRedraw)
+{
+	Ref<AnimationAttributes> attrs = m_animationAttributes;
+	if (attrs.isNotNull()) {
+		Ref<Animation> animation = attrs->animationBackgroundColor;
+		Ref< AnimationTargetT<Color4f> > target = attrs->targetBackgroundColor;
+		if (animation.isNotNull() && target.isNotNull()) {
+			animation->removeTarget(target);
+		}
+		attrs->animationBackgroundColor.setNull();
+		attrs->targetBackgroundColor.setNull();
 	}
 }
 
 Ref<ScrollBar> View::getHorizontalScrollBar()
 {
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		return scroll->horz;
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->horz;
 	}
 	return Ref<ScrollBar>::null();
 }
 
 Ref<ScrollBar> View::getVerticalScrollBar()
 {
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		return scroll->vert;
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->vert;
 	}
 	return Ref<ScrollBar>::null();
 }
 
 void View::setHorizontalScrollBar(const Ref<ScrollBar>& bar, sl_bool flagRefresh)
 {
-	_initializeScroll();
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		removeChild(scroll->horz, sl_false);
-		scroll->horz = bar;
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	if (attrs.isNotNull()) {
+		removeChild(attrs->horz, sl_false);
+		attrs->horz = bar;
 		if (flagRefresh) {
 			_refreshScroll(sl_true);
 		}
@@ -4287,11 +5264,10 @@ void View::setHorizontalScrollBar(const Ref<ScrollBar>& bar, sl_bool flagRefresh
 
 void View::setVerticalScrollBar(const Ref<ScrollBar>& bar, sl_bool flagRefresh)
 {
-	_initializeScroll();
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		removeChild(scroll->vert, sl_false);
-		scroll->vert = bar;
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	if (attrs.isNotNull()) {
+		removeChild(attrs->vert, sl_false);
+		attrs->vert = bar;
 		if (flagRefresh) {
 			_refreshScroll(sl_true);
 		}
@@ -4394,47 +5370,45 @@ void View::setScrollBarsVisible(sl_bool flagVisible, sl_bool flagRefresh)
 
 sl_scroll_pos View::getScrollX()
 {
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		return scroll->x;
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->x;
 	}
 	return 0;
 }
 
 sl_scroll_pos View::getScrollY()
 {
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		return scroll->y;
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->y;
 	}
 	return 0;
 }
 
 ScrollPoint View::getScrollPosition()
 {
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		return ScrollPoint(scroll->x, scroll->y);
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return ScrollPoint(attrs->x, attrs->y);
 	}
 	return ScrollPoint::zero();
 }
 
 void View::scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagRedraw)
 {
-	_initializeScroll();
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
 	
-	Ref<ScrollAttributes> scroll = m_scroll;
-	
-	if (scroll.isNotNull()) {
+	if (attrs.isNotNull()) {
 		
-		sl_scroll_pos rx = scroll->contentWidth - getWidth();
+		sl_scroll_pos rx = attrs->contentWidth - getWidth();
 		if (x > rx) {
 			x = rx;
 		}
 		if (x < 0) {
 			x = 0;
 		}
-		sl_scroll_pos ry = scroll->contentHeight - getHeight();
+		sl_scroll_pos ry = attrs->contentHeight - getHeight();
 		if (y > ry) {
 			y = ry;
 		}
@@ -4442,22 +5416,22 @@ void View::scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagRedraw)
 			y = 0;
 		}
 		
-		if (Math::isAlmostZero(scroll->x - x) && Math::isAlmostZero(scroll->y - y)) {
-			scroll->x = x;
-			scroll->y = y;
+		if (Math::isAlmostZero(attrs->x - x) && Math::isAlmostZero(attrs->y - y)) {
+			attrs->x = x;
+			attrs->y = y;
 			return;
 		}
 		
-		scroll->x = x;
-		scroll->y = y;
+		attrs->x = x;
+		attrs->y = y;
 		
 		dispatchScroll(x, y);
 		
-		Ref<ScrollBar> bar = scroll->horz;
+		Ref<ScrollBar> bar = attrs->horz;
 		if (bar.isNotNull()) {
 			bar->setValueOfOutRange(x, sl_false);
 		}
-		bar = scroll->vert;
+		bar = attrs->vert;
 		if (bar.isNotNull()) {
 			bar->setValueOfOutRange(y, sl_false);
 		}
@@ -4475,63 +5449,58 @@ void View::scrollTo(const ScrollPoint& position, sl_bool flagRedraw)
 
 void View::setScrollX(sl_scroll_pos x, sl_bool flagRedraw)
 {
-	_initializeScroll();
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		scrollTo(x, scroll->y, flagRedraw);
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	if (attrs.isNotNull()) {
+		scrollTo(x, attrs->y, flagRedraw);
 	}
 }
 
 void View::setScrollY(sl_scroll_pos y, sl_bool flagRedraw)
 {
-	_initializeScroll();
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		scrollTo(scroll->x, y, flagRedraw);
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	if (attrs.isNotNull()) {
+		scrollTo(attrs->x, y, flagRedraw);
 	}
 }
 
 sl_scroll_pos View::getContentWidth()
 {
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		return scroll->contentWidth;
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->contentWidth;
 	}
 	return 0;
 }
 
 sl_scroll_pos View::getContentHeight()
 {
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		return scroll->contentHeight;
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->contentHeight;
 	}
 	return 0;
 }
 
 ScrollPoint View::getContentSize()
 {
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		return ScrollPoint(scroll->contentWidth, scroll->contentHeight);
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return ScrollPoint(attrs->contentWidth, attrs->contentHeight);
 	}
 	return ScrollPoint::zero();
 }
 
 void View::setContentSize(sl_scroll_pos width, sl_scroll_pos height, sl_bool flagRefresh)
 {
-	_initializeScroll();
-	
-	Ref<ScrollAttributes> scroll = m_scroll;
-	
-	if (scroll.isNotNull()) {
-		if (Math::isAlmostZero(width - scroll->contentWidth) && Math::isAlmostZero(height - scroll->contentHeight)) {
-			scroll->contentWidth = width;
-			scroll->contentHeight = height;
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	if (attrs.isNotNull()) {
+		if (Math::isAlmostZero(width - attrs->contentWidth) && Math::isAlmostZero(height - attrs->contentHeight)) {
+			attrs->contentWidth = width;
+			attrs->contentHeight = height;
 			return;
 		}
-		scroll->contentWidth = width;
-		scroll->contentHeight = height;
+		attrs->contentWidth = width;
+		attrs->contentHeight = height;
 		onResizeContent(width, height);
 		if (flagRefresh) {
 			_refreshScroll(sl_true);
@@ -4546,27 +5515,25 @@ void View::setContentSize(const ScrollPoint& size, sl_bool flagRefresh)
 
 void View::setContentWidth(sl_scroll_pos width, sl_bool flagRefresh)
 {
-	_initializeScroll();
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		setContentSize(width, scroll->contentHeight, flagRefresh);
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	if (attrs.isNotNull()) {
+		setContentSize(width, attrs->contentHeight, flagRefresh);
 	}
 }
 
 void View::setContentHeight(sl_scroll_pos height, sl_bool flagRefresh)
 {
-	_initializeScroll();
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		setContentSize(scroll->contentWidth, height, flagRefresh);
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	if (attrs.isNotNull()) {
+		setContentSize(attrs->contentWidth, height, flagRefresh);
 	}
 }
 
 ScrollPoint View::getScrollRange()
 {
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		ScrollPoint ret(scroll->contentWidth - (sl_scroll_pos)(getWidth()), scroll->contentHeight - (sl_scroll_pos)(getHeight()));
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		ScrollPoint ret(attrs->contentWidth - (sl_scroll_pos)(getWidth()), attrs->contentHeight - (sl_scroll_pos)(getHeight()));
 		if (ret.x < 0) {
 			ret.x = 0;
 		}
@@ -4580,21 +5547,18 @@ ScrollPoint View::getScrollRange()
 
 sl_ui_len View::getScrollBarWidth()
 {
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		return scroll->barWidth;
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->barWidth;
 	}
 	return 0;
 }
 
 void View::setScrollBarWidth(sl_ui_len width, sl_bool flagRefresh)
 {
-	_initializeScroll();
-	
-	Ref<ScrollAttributes> scroll = m_scroll;
-	
-	if (scroll.isNotNull()) {
-		scroll->barWidth = width;
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	if (attrs.isNotNull()) {
+		attrs->barWidth = width;
 		if (flagRefresh) {
 			_refreshScroll(sl_true);
 		}
@@ -4603,102 +5567,70 @@ void View::setScrollBarWidth(sl_ui_len width, sl_bool flagRefresh)
 
 sl_bool View::isContentScrollingByMouse()
 {
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		return scroll->flagContentScrollingByMouse;
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagContentScrollingByMouse;
 	}
 	return sl_true;
 }
 
 void View::setContentScrollingByMouse(sl_bool flag)
 {
-	_initializeScroll();
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		scroll->flagContentScrollingByMouse = flag;
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	if (attrs.isNotNull()) {
+		attrs->flagContentScrollingByMouse = flag;
 	}
 }
 
 sl_bool View::isContentScrollingByTouch()
 {
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		return scroll->flagContentScrollingByTouch;
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagContentScrollingByTouch;
 	}
 	return sl_true;
 }
 
 void View::setContentScrollingByTouch(sl_bool flag)
 {
-	_initializeScroll();
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		scroll->flagContentScrollingByTouch = flag;
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	if (attrs.isNotNull()) {
+		attrs->flagContentScrollingByTouch = flag;
 	}
 }
 
 sl_bool View::isContentScrollingByMouseWheel()
 {
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		return scroll->flagContentScrollingByMouseWheel;
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagContentScrollingByMouseWheel;
 	}
 	return sl_true;
 }
 
 void View::setContentScrollingByMouseWheel(sl_bool flag)
 {
-	_initializeScroll();
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		scroll->flagContentScrollingByMouseWheel = flag;
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	if (attrs.isNotNull()) {
+		attrs->flagContentScrollingByMouseWheel = flag;
 	}
 }
 
 sl_bool View::isContentScrollingByKeyboard()
 {
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		return scroll->flagContentScrollingByKeyboard;
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagContentScrollingByKeyboard;
 	}
 	return sl_true;
 }
 
 void View::setContentScrollingByKeyboard(sl_bool flag)
 {
-	_initializeScroll();
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		scroll->flagContentScrollingByKeyboard = flag;
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	if (attrs.isNotNull()) {
+		attrs->flagContentScrollingByKeyboard = flag;
 	}
-}
-
-void View::_initializeScroll()
-{
-	if (m_scroll.isNotNull()) {
-		return;
-	}
-	
-	Ref<ScrollAttributes> scroll = new ScrollAttributes;
-	
-	if (scroll.isNotNull()) {
-		scroll->flagValidHorz = sl_false;
-		scroll->flagValidVert = sl_false;
-		scroll->x = 0;
-		scroll->y = 0;
-		scroll->contentWidth = 0;
-		scroll->contentHeight = 0;
-		scroll->barWidth = UI::getDefaultScrollBarWidth();
-		
-		scroll->flagContentScrollingByMouse = sl_true;
-		scroll->flagContentScrollingByTouch = sl_true;
-		scroll->flagContentScrollingByMouseWheel = sl_true;
-		scroll->flagContentScrollingByKeyboard = sl_true;
-		scroll->flagDownContent = sl_false;
-		
-		m_scroll = scroll;
-	}
-
 }
 
 Ref<ScrollBar> View::_createHorizontalScrollBar()
@@ -4753,42 +5685,42 @@ public:
 
 void View::_refreshScroll(sl_bool flagRedraw)
 {
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
 		sl_ui_pos width = getWidth();
 		sl_ui_pos height = getHeight();
 		sl_bool flagVisibleHorz = sl_false;
-		Ref<ScrollBar> barHorz = scroll->horz;
+		Ref<ScrollBar> barHorz = attrs->horz;
 		if (barHorz.isNotNull()) {
 			barHorz->setParent(this);
 			barHorz->setMinimumValue(0, sl_false);
-			barHorz->setMaximumValue(scroll->contentWidth, sl_false);
+			barHorz->setMaximumValue(attrs->contentWidth, sl_false);
 			barHorz->setPage(width, sl_false);
-			barHorz->setValueOfOutRange(scroll->x, sl_false);
-			barHorz->setFrame(UIRect(0, height - scroll->barWidth, width, height), sl_false);
+			barHorz->setValueOfOutRange(attrs->x, sl_false);
+			barHorz->setFrame(UIRect(0, height - attrs->barWidth, width, height), sl_false);
 			if (barHorz->getListener().isNull()) {
 				barHorz->setListener(Ref<_View_ScrollBarListener>(new _View_ScrollBarListener(this)));
 			}
-			scroll->flagValidHorz = barHorz->isValid();
-			if (barHorz->isVisible() && scroll->flagValidHorz) {
+			attrs->flagValidHorz = barHorz->isValid();
+			if (barHorz->isVisible() && attrs->flagValidHorz) {
 				flagVisibleHorz = sl_true;
 			}
 		}
 		sl_bool flagVisibleVert = sl_false;
-		Ref<ScrollBar> barVert = scroll->vert;
+		Ref<ScrollBar> barVert = attrs->vert;
 		if (barVert.isNotNull()) {
 			barVert->setParent(this);
 			barVert->setVertical(sl_true);
 			barVert->setMinimumValue(0, sl_false);
-			barVert->setMaximumValue(scroll->contentHeight, sl_false);
+			barVert->setMaximumValue(attrs->contentHeight, sl_false);
 			barVert->setPage(height, sl_false);
-			barVert->setValueOfOutRange(scroll->y, sl_false);
-			barVert->setFrame(UIRect(width - scroll->barWidth, 0, width, height), sl_false);
+			barVert->setValueOfOutRange(attrs->y, sl_false);
+			barVert->setFrame(UIRect(width - attrs->barWidth, 0, width, height), sl_false);
 			if (barVert->getListener().isNull()) {
 				barVert->setListener(Ref<_View_ScrollBarListener>(new _View_ScrollBarListener(this)));
 			}
-			scroll->flagValidVert = barVert->isValid();
-			if (barVert->isVisible() && scroll->flagValidVert) {
+			attrs->flagValidVert = barVert->isValid();
+			if (barVert->isVisible() && attrs->flagValidVert) {
 				flagVisibleVert = sl_true;
 			}
 		}
@@ -4797,7 +5729,7 @@ void View::_refreshScroll(sl_bool flagRedraw)
 			////		2016/6/8 temporally cancel this function
 			//barHorz->setFrame(UIRect(0, height - scroll->barWidth, width - scroll->barWidth, height), sl_false);
 		}
-		scrollTo(scroll->x, scroll->y, sl_false);
+		scrollTo(attrs->x, attrs->y, sl_false);
 		if (flagRedraw) {
 			invalidate();
 		}
@@ -4806,18 +5738,18 @@ void View::_refreshScroll(sl_bool flagRedraw)
 
 void View::_getScrollBars(Ref<View> views[2])
 {
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNotNull()) {
-		if (scroll->flagValidHorz) {
-			Ref<ScrollBar> bar = scroll->horz;
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		if (attrs->flagValidHorz) {
+			Ref<ScrollBar> bar = attrs->horz;
 			if (bar.isNotNull()) {
 				if (bar->isVisible()) {
 					views[0] = bar;
 				}
 			}
 		}
-		if (scroll->flagValidVert) {
-			Ref<ScrollBar> bar = scroll->vert;
+		if (attrs->flagValidVert) {
+			Ref<ScrollBar> bar = attrs->vert;
 			if (bar.isNotNull()) {
 				if (bar->isVisible()) {
 					views[1] = bar;
@@ -5002,115 +5934,6 @@ sl_bool View::hitTestForCapturingChildInstanceEvents(const UIPoint& pt)
 	return sl_true;
 }
 
-void View::draw(Canvas *canvas)
-{
-	sl_ui_pos width = m_frame.getWidth();
-	if (width <= 0) {
-		return;
-	}
-	sl_ui_pos height = m_frame.getHeight();
-	if (height <= 0) {
-		return;
-	}
-	
-	Ref<DrawAttributes> attr = m_draw;
-	Ref<ScrollAttributes> scroll = m_scroll;
-	
-	_makeLayout(sl_false);
-
-	if (attr.isNotNull()) {
-		if (attr->flagPreDrawEnabled) {
-			onPreDraw(canvas);
-		}
-		if (attr->flagOnDrawBackgroundAlways || attr->backgroundColor.isNotZero() || attr->background.isNotNull()) {
-			onDrawBackground(canvas);
-		}
-	}
-	
-	do {
-		CanvasStatusScope scopeClip;
-		if (attr.isNull() || attr->flagClippingBounds) {
-			Rectangle rcClip(0, 0, (sl_real)width, (sl_real)height);
-			switch (getBoundShape()) {
-				case BoundShape::RoundRect:
-					rcClip.right -= 1;
-					rcClip.bottom -= 1;
-					rcClip.fixSizeError();
-					scopeClip.save(canvas);
-					canvas->clipToRoundRect(rcClip, getRoundRectBoundShapeRadius());
-					break;
-				case BoundShape::Ellipse:
-					rcClip.right -= 1;
-					rcClip.bottom -= 1;
-					rcClip.fixSizeError();
-					scopeClip.save(canvas);
-					canvas->clipToEllipse(rcClip);
-					break;
-				case BoundShape::Path:
-					scopeClip.save(canvas);
-					canvas->clipToPath(getBoundShapePath());
-					break;
-				case BoundShape::Rectangle:
-				default:
-					if (!(isInstance())) {
-						scopeClip.save(canvas);
-						canvas->clipToRectangle(rcClip);
-					}
-					break;
-			}
-			rcClip = canvas->getClipBounds();
-			rcClip.fixSizeError();
-			if (Math::isAlmostZero(rcClip.getWidth()) || Math::isAlmostZero(rcClip.getHeight())) {
-				break;
-			}
-		}
-		
-		Ref<View> scrollBars[2];
-		if (scroll.isNotNull()) {
-			_getScrollBars(scrollBars);
-		}
-
-		sl_bool flagSaveStatus = sl_false;
-		if (m_children.getCount() > 0) {
-			flagSaveStatus = sl_true;
-		} else if (scrollBars[0].isNotNull() || scrollBars[1].isNotNull()) {
-			flagSaveStatus = sl_true;
-		} else if (attr.isNotNull() && attr->penBorder.isNotNull() && scopeClip.getCanvas().isNull()) {
-			flagSaveStatus = sl_true;
-		}
-		
-		{
-			CanvasStatusScope scopeContent(flagSaveStatus ? canvas : sl_null);
-			if (scroll.isNotNull()) {
-				sl_real scrollX = (sl_real)(scroll->x);
-				sl_real scrollY = (sl_real)(scroll->y);
-				if(!(Math::isAlmostZero(scrollX)) || !(Math::isAlmostZero(scrollY))) {
-					canvas->translate(-scrollX, -scrollY);
-				}
-			}
-			onDraw(canvas);
-		}
-		if (m_children.getCount() > 0) {
-			onDrawChildren(canvas);
-		}
-		if (scrollBars[0].isNotNull() || scrollBars[1].isNotNull()) {
-			drawChildren(canvas, scrollBars, 2);
-		}
-		
-	} while (0);
-	
-	
-	if (attr.isNotNull()) {
-		if (attr->flagOnDrawBorderAlways || attr->penBorder.isNotNull()) {
-			onDrawBorder(canvas);
-		}
-		if (attr->flagPostDrawEnabled) {
-			onPostDraw(canvas);
-		}
-	}
-
-}
-
 void View::drawBackground(Canvas* canvas, const Color& color, const Ref<Drawable>& background)
 {
 	Rectangle rc(0, 0, (sl_real)(m_frame.getWidth()), (sl_real)(m_frame.getHeight()));
@@ -5119,9 +5942,6 @@ void View::drawBackground(Canvas* canvas, const Color& color, const Ref<Drawable
 		canvas->fillRectangle(rc, brush);
 	}
 	if (background.isNotNull()) {
-		sl_real width = background->getDrawableWidth();
-		sl_real height = background->getDrawableHeight();
-		Rectangle rcSrc(0, 0, width, height);
 		canvas->draw(rc, background, getBackgroundScaleMode(), getBackgroundAlignment());
 	}
 }
@@ -5166,28 +5986,293 @@ void View::drawBorder(Canvas* canvas, const Ref<Pen>& pen)
 
 void View::drawChildren(Canvas* canvas, const Ref<View>* children, sl_size count)
 {
+	if (count == 0) {
+		return;
+	}
+	UIRect rcInvalidatedParent = canvas->getInvalidatedRect();
 	for (sl_size i = 0; i < count; i++) {
 		View* child = children[i].ptr;
 		if (child) {
 			if (child->isVisible()) {
-				if (!(child->isInstance())) {
-					drawChild(canvas, child);
+				if (child->isInstance()) {
+#if defined(SLIB_PLATFORM_IS_WIN32)
+					if (!(child->checkSelfInvalidatable())) {
+						CanvasStatusScope scope(canvas);
+						sl_ui_pos offx = child->m_frame.left;
+						sl_ui_pos offy = child->m_frame.top;
+						Vector2 t;
+						if (child->getFinalTranslationRotationScale(&t, sl_null, sl_null, sl_null)) {
+							offx += (sl_ui_pos)(t.x);
+							offy += (sl_ui_pos)(t.y);
+						}
+						UIRect rcInvalidated(rcInvalidatedParent.left - offx, rcInvalidatedParent.top - offy, rcInvalidatedParent.right - offx, rcInvalidatedParent.bottom - offy);
+						if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated)) {
+							canvas->setInvalidatedRect(rcInvalidated);
+							canvas->translate((sl_real)(offx), (sl_real)(offy));
+							child->dispatchDraw(canvas);
+						}
+					}
+#endif
+				} else {
+					CanvasStatusScope scope(canvas);
+					sl_ui_pos offx = child->m_frame.left;
+					sl_ui_pos offy = child->m_frame.top;
+					Matrix3 mat;
+					if (child->getFinalTransform(&mat)) {
+						UIRect rcInvalidated = child->convertCoordinateFromParent(rcInvalidatedParent);
+						rcInvalidated.left -= 1;
+						rcInvalidated.top -= 1;
+						rcInvalidated.right += 1;
+						rcInvalidated.bottom += 1;
+						if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated)) {
+							canvas->clipToRectangle(rcInvalidatedParent);
+							canvas->setInvalidatedRect(rcInvalidated);
+							sl_real ax = (sl_real)(child->getWidth()) / 2;
+							sl_real ay = (sl_real)(child->getHeight()) / 2;
+							mat.m20 = -ax * mat.m00 - ay * mat.m10 + mat.m20 + ax + (sl_real)(offx);
+							mat.m21 = -ax * mat.m01 - ay * mat.m11 + mat.m21 + ay + (sl_real)(offy);
+							canvas->concatMatrix(mat);
+							child->dispatchDraw(canvas);
+						}
+					} else {
+						UIRect rcInvalidated(rcInvalidatedParent.left - offx, rcInvalidatedParent.top - offy, rcInvalidatedParent.right - offx, rcInvalidatedParent.bottom - offy);
+						if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated)) {
+							canvas->setInvalidatedRect(rcInvalidated);
+							canvas->translate((sl_real)(offx), (sl_real)(offy));
+							child->dispatchDraw(canvas);
+						}
+					}
 				}
 			}
 		}
 	}
+	canvas->setInvalidatedRect(rcInvalidatedParent);
 }
 
-void View::drawChild(Canvas* canvas, View* child)
+void View::drawContent(Canvas *canvas)
 {
-	if (child) {
-		CanvasStatusScope scope(canvas);
-		canvas->translate((sl_real)(child->m_frame.left), (sl_real)(child->m_frame.top));
-		if (child->isTransformEnabled()) {
-			canvas->concatMatrix(child->getTransform());
+	sl_uint32 width = getWidth();
+	sl_uint32 height = getHeight();
+	
+	Ref<DrawAttributes> drawAttrs = m_drawAttributes;
+
+	if (drawAttrs.isNotNull()) {
+		Rectangle rcClip(0, 0, (sl_real)width, (sl_real)height);
+		switch (getBoundShape()) {
+			case BoundShape::RoundRect:
+				rcClip.right -= 1;
+				rcClip.bottom -= 1;
+				rcClip.fixSizeError();
+				canvas->clipToRoundRect(rcClip, getRoundRectBoundShapeRadius());
+				break;
+			case BoundShape::Ellipse:
+				rcClip.right -= 1;
+				rcClip.bottom -= 1;
+				rcClip.fixSizeError();
+				canvas->clipToEllipse(rcClip);
+				break;
+			case BoundShape::Path:
+				canvas->clipToPath(getBoundShapePath());
+				break;
+			default:
+				break;
 		}
-		child->dispatchDraw(canvas);
 	}
+	
+	do {
+		{
+			CanvasStatusScope scope(canvas);
+			canvas->clipToRectangle(canvas->getInvalidatedRect());
+			if (drawAttrs.isNotNull()) {
+				if (drawAttrs->flagOnDrawBackgroundAlways || drawAttrs->backgroundColor.isNotZero() || drawAttrs->background.isNotNull()) {
+					onDrawBackground(canvas);
+				}
+			}
+			Ref<ScrollAttributes> scrollAttrs = m_scrollAttributes;
+			if (scrollAttrs.isNotNull()) {
+				sl_real scrollX = (sl_real)(scrollAttrs->x);
+				sl_real scrollY = (sl_real)(scrollAttrs->y);
+				if(!(Math::isAlmostZero(scrollX)) || !(Math::isAlmostZero(scrollY))) {
+					canvas->translate(-scrollX, -scrollY);
+				}
+			}
+			onDraw(canvas);
+		}
+		
+		if (m_children.getCount() > 0) {
+			onDrawChildren(canvas);
+		}
+
+	} while (0);
+	
+}
+
+#define MAX_LAYER_SIZE 8192
+
+Ref<Bitmap> View::drawLayer()
+{
+	Ref<DrawAttributes> drawAttrs = _initializeDrawAttributes();
+	if (drawAttrs.isNull()) {
+		return Ref<Bitmap>::null();
+	}
+	
+	sl_uint32 width = getWidth();
+	sl_uint32 height = getHeight();
+	
+	if (width == 0 || height == 0 || width > MAX_LAYER_SIZE || height > MAX_LAYER_SIZE) {
+		return Ref<Bitmap>::null();
+	}
+
+	sl_bool flagInvalidate = drawAttrs->flagInvalidatedLayer;
+	sl_bool flagInvalidateWhole = drawAttrs->flagInvalidatedWholeLayer;
+	
+	Ref<Bitmap> bitmap = drawAttrs->bitmapLayer;
+	Ref<Canvas> canvas = drawAttrs->canvasLayer;
+	
+	if (bitmap.isNull() || bitmap->getWidth() < width || bitmap->getHeight() < height) {
+		bitmap = Bitmap::create((width + 255) & 0xFFFFFF00, (height + 255) & 0xFFFFFF00);
+		if (bitmap.isNull()) {
+			return Ref<Bitmap>::null();
+		}
+		canvas = bitmap->getCanvas();
+		if (canvas.isNull()) {
+			return Ref<Bitmap>::null();
+		}
+		drawAttrs->bitmapLayer = bitmap;
+		drawAttrs->canvasLayer = canvas;
+		flagInvalidate = sl_true;
+		flagInvalidateWhole = sl_true;
+	}
+	
+	if (!flagInvalidate) {
+		return bitmap;
+	}
+	
+	drawAttrs->flagInvalidatedLayer = sl_false;
+	
+	UIRect rc;
+	if (flagInvalidateWhole) {
+		flagInvalidateWhole = sl_false;
+		rc.left = 0;
+		rc.top = 0;
+		rc.right = width;
+		rc.bottom = height;
+		canvas->setInvalidatedRect(Rectangle(0, 0, (sl_real)width, (sl_real)height));
+	} else {
+		rc = drawAttrs->rectInvalidatedLayer;
+		canvas->setInvalidatedRect(rc);
+	}
+	
+	do {
+		if (isOpaque()) {
+			break;
+		}
+		if (drawAttrs->backgroundColor.a == 255) {
+			break;
+		}
+		bitmap->resetPixels((sl_uint32)(rc.left), (sl_uint32)(rc.top), (sl_uint32)(rc.getWidth()), (sl_uint32)(rc.getHeight()), Color::zero());
+	} while (0);
+
+	CanvasStatusScope scope(canvas);
+	drawContent(canvas.ptr);
+
+	return bitmap;
+	
+}
+
+void View::draw(Canvas* canvas)
+{
+	sl_ui_pos width = m_frame.getWidth();
+	if (width <= 0) {
+		return;
+	}
+	sl_ui_pos height = m_frame.getHeight();
+	if (height <= 0) {
+		return;
+	}
+	
+	do {
+		sl_real alpha = getFinalAlpha();
+		if (alpha < 0.005f) {
+			break;
+		}
+		
+		sl_bool flagRequireLayer = sl_false;
+		do {
+#if defined(SLIB_PLATFORM_IS_ANDROID)
+			if (isInstance() && canvas->getType() != CanvasType::Render) {
+				break;
+			}
+#endif
+			if (alpha < 0.995f) {
+				flagRequireLayer = sl_true;
+				break;
+			}
+			flagRequireLayer = isLayer();
+		} while (0);
+		
+		if (flagRequireLayer) {
+			Ref<Bitmap> bitmap = drawLayer();
+			if (bitmap.isNotNull()) {
+				DrawParam dp;
+				dp.useAlpha = sl_true;
+				dp.alpha = alpha;
+				Rectangle rcInvalidated = canvas->getInvalidatedRect();
+				canvas->draw(rcInvalidated, bitmap, rcInvalidated, dp);
+				break;
+			}
+		}
+		
+		CanvasStatusScope scope(canvas);
+		drawContent(canvas);
+		
+	} while (0);
+	
+}
+
+void View::dispatchDraw(Canvas* canvas)
+{
+	m_flagCurrentDrawing = sl_true;
+	{
+		Rectangle rcInvalidated = canvas->getInvalidatedRect();
+		if (rcInvalidated.right < rcInvalidated.left + SLIB_EPSILON) {
+			return;
+		}
+		if (rcInvalidated.bottom < rcInvalidated.top + SLIB_EPSILON) {
+			return;
+		}
+		m_rectCurrentDrawing.left = (sl_ui_pos)(rcInvalidated.left - SLIB_EPSILON);
+		m_rectCurrentDrawing.top = (sl_ui_pos)(rcInvalidated.top - SLIB_EPSILON);
+		m_rectCurrentDrawing.right = (sl_ui_pos)(rcInvalidated.right + SLIB_EPSILON);
+		m_rectCurrentDrawing.bottom = (sl_ui_pos)(rcInvalidated.bottom + SLIB_EPSILON);
+	}
+	
+	_makeLayout(sl_false);
+	
+	Ref<DrawAttributes> drawAttrs = m_drawAttributes;
+	if (drawAttrs.isNotNull() && drawAttrs->flagPreDrawEnabled) {
+		onPreDraw(canvas);
+	}
+	
+	draw(canvas);
+	
+	Ref<View> scrollBars[2];
+	_getScrollBars(scrollBars);
+	if (scrollBars[0].isNotNull() || scrollBars[1].isNotNull()) {
+		drawChildren(canvas, scrollBars, 2);
+	}
+
+	if (drawAttrs.isNotNull()) {
+		if (drawAttrs->flagOnDrawBorderAlways || drawAttrs->penBorder.isNotNull()) {
+			onDrawBorder(canvas);
+		}
+		if (drawAttrs->flagPostDrawEnabled) {
+			onPostDraw(canvas);
+		}
+	}
+
+	m_flagCurrentDrawing = sl_false;
+	
 }
 
 void View::onDraw(Canvas* canvas)
@@ -5210,26 +6295,26 @@ void View::onDrawChildren(Canvas* canvas)
 
 void View::onDrawBackground(Canvas* canvas)
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
 		Ref<Drawable> background;
 		if (isPressedState()) {
-			background = draw->backgroundPressed;
+			background = attrs->backgroundPressed;
 		} else if (isHoverState()) {
-			background = draw->backgroundHover;
+			background = attrs->backgroundHover;
 		}
 		if (background.isNull()) {
-			background = draw->background;
+			background = attrs->background;
 		}
-		drawBackground(canvas, draw->backgroundColor, background);
+		drawBackground(canvas, attrs->backgroundColor, background);
 	}
 }
 
 void View::onDrawBorder(Canvas* canvas)
 {
-	Ref<DrawAttributes> draw = m_draw;
-	if (draw.isNotNull()) {
-		drawBorder(canvas, draw->penBorder);
+	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		drawBorder(canvas, attrs->penBorder);
 	}
 }
 
@@ -5310,86 +6395,6 @@ void View::onChangePadding()
 {
 }
 
-void View::dispatchDraw(Canvas* canvas)
-{
-	sl_ui_pos width = getWidth();
-	if (width <= 0) {
-		return;
-	}
-	sl_ui_pos height = getHeight();
-	if (height <= 0) {
-		return;
-	}
-
-	Ref<GraphicsContext> context = canvas->getGraphicsContext();
-	m_graphicsContext = context;
-	
-	if (!(canvas->isBuffer())) {
-		if (context.isNull()) {
-			return;
-		}
-		if (isDoubleBuffering()) {
-			_initializeDraw();
-			Ref<DrawAttributes> attr = m_draw;
-			if (attr.isNotNull() && attr->flagDoubleBuffer) {
-				UIRect region = canvas->getClipBounds();
-				if (!(region.intersectRectangle(getBounds(), &region))) {
-					return;
-				}
-				Ref<Bitmap> bitmapBuffer = attr->bitmapDoubleBuffer;
-				Ref<Canvas> canvasBuffer = attr->canvasDoubleBuffer;
-				sl_uint32 iwidth = (sl_uint32)width;
-				sl_uint32 iheight = (sl_uint32)height;
-				
-				if (bitmapBuffer.isNull() || canvasBuffer.isNull() || bitmapBuffer->getWidth() < iwidth || bitmapBuffer->getHeight() < iheight) {
-					bitmapBuffer = context->createBitmap((iwidth + 255) & 0xFFFFFF00, (iheight + 255) & 0xFFFFFF00);
-					if (bitmapBuffer.isNull()) {
-						return;
-					}
-					canvasBuffer = bitmapBuffer->getCanvas();
-					if (canvasBuffer.isNull()) {
-						return;
-					}
-					attr->bitmapDoubleBuffer = bitmapBuffer;
-					attr->canvasDoubleBuffer = canvasBuffer;
-				}
-				{
-					Color colorClear = Color::zero();
-					do {
-						if (m_flagOpaque) {
-							break;
-						}
-						Color color = attr->backgroundColor;
-						if (color.a == 255) {
-							break;
-						}
-						Ref<Window> window = m_window;
-						if (window.isNotNull() && window->getContentView() == this) {
-							colorClear = window->getBackgroundColor();
-							if (colorClear.a < 255) {
-								Color c = Color::White;
-								c.blend_PA_NPA(colorClear);
-								colorClear = c;
-							}
-							break;
-						}
-						colorClear = Color::White;
-					} while (0);
-					if (colorClear.isNotZero()) {
-						bitmapBuffer->resetPixels((sl_uint32)(region.left), (sl_uint32)(region.top), (sl_uint32)(region.getWidth()), (sl_uint32)(region.getHeight()), colorClear);
-					}
-					CanvasStatusScope scope(canvasBuffer);
-					canvasBuffer->clipToRectangle(region);
-					draw(canvasBuffer.ptr);
-				}
-				canvas->draw(region, bitmapBuffer, region);
-				return;
-			}
-		}
-	}
-	draw(canvas);
-}
-
 static UIAction _SView_getActionUp(UIAction actionDown)
 {
 	if (actionDown == UIAction::LeftButtonDown) {
@@ -5443,6 +6448,7 @@ void View::dispatchMouseEvent(UIEvent* ev)
 				dispatchMouseEventToChild(ev, oldChildMouseMove.ptr);
 				ev->setAction(action);
 				ev->setStoppedPropagation(flagSP);
+				m_childMouseMove.setNull();
 			}
 		}
 	}
@@ -6177,36 +7183,44 @@ void View::dispatchScroll(sl_scroll_pos x, sl_scroll_pos y)
 void View::_processEventForStateAndClick(UIEvent* ev)
 {
 	UIAction action = ev->getAction();
-	if (action == UIAction::LeftButtonDown || action == UIAction::TouchBegin) {
-		setPressedState(sl_true);
-		if (m_flagOccurringClick) {
-			ev->stopPropagation();
-		}
-	} else if (action == UIAction::LeftButtonUp || action == UIAction::TouchEnd) {
-		if (m_flagOccurringClick) {
-			if (isPressedState()) {
-				if (getBounds().containsPoint(ev->getPoint())) {
-					dispatchClick(ev);
+	switch (action) {
+		case UIAction::LeftButtonDown:
+		case UIAction::TouchBegin:
+			setPressedState(sl_true);
+			if (m_flagOccurringClick) {
+				ev->stopPropagation();
+			}
+			break;
+		case UIAction::LeftButtonUp:
+		case UIAction::TouchEnd:
+			if (m_flagOccurringClick) {
+				if (isPressedState()) {
+					if (getBounds().containsPoint(ev->getPoint())) {
+						dispatchClick(ev);
+					}
 				}
 			}
-		}
-		setPressedState(sl_false);
-	} else if (action == UIAction::TouchCancel) {
-		setPressedState(sl_false);
-	} else if (action == UIAction::MouseEnter) {
-		setHoverState(sl_true);
-	} else if (action == UIAction::MouseLeave) {
-		setHoverState(sl_false);
+			setPressedState(sl_false);
+			break;
+		case UIAction::TouchCancel:
+			setPressedState(sl_false);
+			break;
+		case UIAction::MouseEnter:
+			setHoverState(sl_true);
+			break;
+		case UIAction::MouseLeave:
+			setHoverState(sl_false);
+			break;
 	}
 }
 
 void View::_processContentScrollingEvents(UIEvent* ev)
 {
-	Ref<ScrollAttributes> scroll = m_scroll;
-	if (scroll.isNull()) {
+	Ref<ScrollAttributes> scrollAttrs = m_scrollAttributes;
+	if (scrollAttrs.isNull()) {
 		return;
 	}
-	if (scroll->contentWidth < (sl_scroll_pos)(getWidth()) && scroll->contentHeight < (sl_scroll_pos)(getHeight())) {
+	if (scrollAttrs->contentWidth < (sl_scroll_pos)(getWidth()) && scrollAttrs->contentHeight < (sl_scroll_pos)(getHeight())) {
 		return;
 	}
 	sl_scroll_pos lineX = (sl_scroll_pos)(getWidth() / 20);
@@ -6215,34 +7229,34 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 	switch (action) {
 		case UIAction::LeftButtonDown:
 		case UIAction::TouchBegin:
-			scroll->flagDownContent = sl_true;
-			scroll->scrollX_DownContent = scroll->x;
-			scroll->scrollY_DownContent = scroll->y;
-			scroll->mouseX_DownContent = ev->getX();
-			scroll->mouseY_DownContent = ev->getY();
+			scrollAttrs->flagDownContent = sl_true;
+			scrollAttrs->scrollX_DownContent = scrollAttrs->x;
+			scrollAttrs->scrollY_DownContent = scrollAttrs->y;
+			scrollAttrs->mouseX_DownContent = ev->getX();
+			scrollAttrs->mouseY_DownContent = ev->getY();
 			ev->stopPropagation();
 			break;
 		case UIAction::LeftButtonDrag:
 		case UIAction::TouchMove:
-			if (scroll->flagDownContent) {
-				sl_scroll_pos sx = scroll->scrollX_DownContent - (sl_scroll_pos)(ev->getX() - scroll->mouseX_DownContent);
-				sl_scroll_pos sy = scroll->scrollY_DownContent - (sl_scroll_pos)(ev->getY() - scroll->mouseY_DownContent);
+			if (scrollAttrs->flagDownContent) {
+				sl_scroll_pos sx = scrollAttrs->scrollX_DownContent - (sl_scroll_pos)(ev->getX() - scrollAttrs->mouseX_DownContent);
+				sl_scroll_pos sy = scrollAttrs->scrollY_DownContent - (sl_scroll_pos)(ev->getY() - scrollAttrs->mouseY_DownContent);
 				scrollTo(sx, sy);
 				ev->stopPropagation();
 			}
 			break;
 		case UIAction::LeftButtonUp:
 		case UIAction::TouchEnd:
-			if (scroll->flagDownContent) {
-				scroll->flagDownContent = sl_false;
+			if (scrollAttrs->flagDownContent) {
+				scrollAttrs->flagDownContent = sl_false;
 				ev->stopPropagation();
 			}
 			break;
 		case UIAction::MouseWheel:
 			{
 				sl_bool flagChange = sl_false;
-				sl_scroll_pos sx = scroll->x;
-				sl_scroll_pos sy = scroll->y;
+				sl_scroll_pos sx = scrollAttrs->x;
+				sl_scroll_pos sy = scrollAttrs->y;
 				
 				sl_real deltaX = ev->getDeltaX();
 				if (deltaX > SLIB_EPSILON) {
@@ -6269,8 +7283,8 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 			break;
 		case UIAction::KeyDown:
 			{
-				sl_scroll_pos sx = scroll->x;
-				sl_scroll_pos sy = scroll->y;
+				sl_scroll_pos sx = scrollAttrs->x;
+				sl_scroll_pos sy = scrollAttrs->y;
 				Keycode key = ev->getKeycode();
 				if (key == Keycode::Left) {
 					scrollTo(sx - lineX, sy);
@@ -6297,6 +7311,34 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 			break;
 	}
 }
+
+
+#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
+Ref<ViewInstance> View::createGenericInstance(ViewInstance* parent)
+{
+	return Ref<ViewInstance>::null();
+}
+#endif
+
+#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_WIN32))
+void View::_setFrame_NI(const UIRect& frame)
+{
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		instance->setFrame(frame);
+	}
+}
+#endif
+
+#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
+void View::_setTransform_NI(const Matrix3& matrix)
+{
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		instance->setTransform(matrix);
+	}
+}
+#endif
 
 void View::_setBorder_NW(sl_bool flag)
 {
@@ -6412,15 +7454,10 @@ SLIB_DEFINE_OBJECT(ViewGroup, View)
 
 ViewGroup::ViewGroup(sl_bool flagCreatingChildInstances)
 {
+	SLIB_REFERABLE_CONSTRUCTOR
+	
 	setCreatingChildInstances(flagCreatingChildInstances);
-	setLayoutEnabled(sl_true, sl_false);
+	setMakingLayout(sl_true, sl_false);
 }
-
-#if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
-Ref<ViewInstance> View::createGenericInstance(ViewInstance* parent)
-{
-	return Ref<ViewInstance>::null();
-}
-#endif
 
 SLIB_UI_NAMESPACE_END

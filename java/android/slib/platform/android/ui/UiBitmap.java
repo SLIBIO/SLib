@@ -5,9 +5,13 @@ import java.util.Vector;
 import slib.platform.android.Logger;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Shader;
 
 public class UiBitmap {
 	
@@ -98,30 +102,130 @@ public class UiBitmap {
 		}
 	}
 	
-	public void draw(Graphics graphics, float dx1, float dy1, float dx2, float dy2
-			, int sx1, int sy1, int sx2, int sy2) {
+	void draw(Graphics graphics,
+			float dx1, float dy1, float dx2, float dy2,
+			int sx1, int sy1, int sx2, int sy2, 
+			float _alpha, float blur, int tileMode,
+			float[] cm) 
+	{
 		try {
+			int alpha = (int)(_alpha * 255);
+			if (alpha <= 0) {
+				return;
+			}			
 			RectF rd = new RectF(dx1, dy1, dx2, dy2);
 			Rect rs = new Rect(sx1, sy1, sx2, sy2);
-			graphics.canvas.drawBitmap(bitmap, rs, rd, null);
+			if (alpha < 255 || blur > 0.5f || tileMode != 0) {
+				Paint paint = new Paint();
+				if (alpha < 255) {
+					paint.setAlpha(alpha);				
+				}
+				if (cm != null) {
+					ColorMatrixColorFilter cf = new ColorMatrixColorFilter(cm);
+					paint.setColorFilter(cf);
+				}
+				if (tileMode != 0) {
+					BitmapShader bs = new BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+					paint.setShader(bs);
+					graphics.canvas.drawRect(rd, paint);
+				} else {
+					graphics.canvas.drawBitmap(bitmap, rs, rd, paint);
+				}
+			} else {
+				graphics.canvas.drawBitmap(bitmap, rs, rd, null);
+			}
 		} catch (Throwable e) {
 			Logger.exception(e);
 		}
 	}
 	
-	public static void drawPixels(Graphics graphics, float dx1, float dy1, float dx2, float dy2
-			, int[] pixels, int stride, int sw, int sh) {
+	public void draw(Graphics graphics,
+			float dx1, float dy1, float dx2, float dy2,
+			int sx1, int sy1, int sx2, int sy2,
+			float alpha, float blur, int tileMode)
+	{
+		draw(graphics, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, alpha, blur, tileMode, null);
+	}
+
+	public void draw(Graphics graphics,
+			float dx1, float dy1, float dx2, float dy2,
+			int sx1, int sy1, int sx2, int sy2,
+			float alpha, float blur, int tileMode,
+			float crx, float cry, float crz, float crw,
+			float cgx, float cgy, float cgz, float cgw,
+			float cbx, float cby, float cbz, float cbw,
+			float cax, float cay, float caz, float caw,
+			float ccx, float ccy, float ccz, float ccw)
+	{
+		float[] f = new float[] {
+			crx, cry, crz, crw, ccx * 255,
+			cgx, cgy, cgz, cgw, ccy * 255,
+			cbx, cby, cbz, cbw, ccz * 255,
+			cax, cay, caz, caw, ccw * 255,
+		};
+		draw(graphics, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, alpha, blur, tileMode, f);
+	}
+	
+	static void drawPixels(Graphics graphics,
+			float dx1, float dy1, float dx2, float dy2,
+			int[] pixels, int stride, int sw, int sh,
+			float _alpha, float blur, int tileMode,
+			float[] cm) 
+	{
 		try {
 			if (sw == 0 || sh == 0) {
 				return;
 			}
+			int alpha = (int)(_alpha * 255);
+			if (alpha <= 0) {
+				return;
+			}			
 			graphics.canvas.save();
 			graphics.canvas.scale((dx2 - dx1) / sw, (dy2 - dy1) / sh, dx1, dy1);
-			graphics.canvas.drawBitmap(pixels, 0, stride, dx1, dy1, sw, sh, true, null);
+			if (alpha < 255 || cm != null) {
+				Paint paint = new Paint();
+				if (alpha < 255) {
+					paint.setAlpha(alpha);			
+				}
+				if (cm != null) {
+					ColorMatrixColorFilter cf = new ColorMatrixColorFilter(cm);
+					paint.setColorFilter(cf);
+				}
+				graphics.canvas.drawBitmap(pixels, 0, stride, dx1, dy1, sw, sh, true, paint);
+			} else {
+				graphics.canvas.drawBitmap(pixels, 0, stride, dx1, dy1, sw, sh, true, null);
+			}
 			graphics.canvas.restore();
 		} catch (Throwable e) {
 			Logger.exception(e);
 		}
+	}
+	
+	public static void drawPixels(Graphics graphics,
+			float dx1, float dy1, float dx2, float dy2,
+			int[] pixels, int stride, int sw, int sh,
+			float alpha, float blur, int tileMode) 
+	{
+		drawPixels(graphics, dx1, dy1, dx2, dy2, pixels, stride, sw, sh, alpha, blur, tileMode, null);
+	}
+	
+	public static void drawPixels(Graphics graphics,
+			float dx1, float dy1, float dx2, float dy2,
+			int[] pixels, int stride, int sw, int sh,
+			float alpha, float blur, int tileMode,
+			float crx, float cry, float crz, float crw,
+			float cgx, float cgy, float cgz, float cgw,
+			float cbx, float cby, float cbz, float cbw,
+			float cax, float cay, float caz, float caw,
+			float ccx, float ccy, float ccz, float ccw)
+	{
+		float[] f = new float[] {
+			crx, cry, crz, crw, ccx * 255,
+			cgx, cgy, cgz, cgw, ccy * 255,
+			cbx, cby, cbz, cbw, ccz * 255,
+			cax, cay, caz, caw, ccw * 255,
+		};
+		drawPixels(graphics, dx1, dy1, dx2, dy2, pixels, stride, sw, sh, alpha, blur, tileMode, f);
 	}
 	
 	static int[] arrayBufferForUi;

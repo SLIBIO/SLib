@@ -22,11 +22,7 @@ public:
 	FontDesc();
 };
 
-class GraphicsContext;
-
-class FontInstance;
-
-class SLIB_EXPORT Font : public Object
+class SLIB_EXPORT Font : public Referable
 {
 	SLIB_DECLARE_OBJECT
 	
@@ -57,19 +53,16 @@ public:
 	
 	sl_bool isUnderline();
 	
-	Size getTextSize(const Ref<GraphicsContext>& context, const String& text);
-
-public:
-	SLIB_REF_PROPERTY(FontInstance, Instance)
+	Ref<Referable> getPlatformObject();
+	
+	Size getTextSize(const String& text);
 	
 protected:
 	FontDesc m_desc;
 	
-};
-
-class SLIB_EXPORT FontInstance : public Object
-{
-	SLIB_DECLARE_OBJECT
+	Ref<Referable> m_platformObject;
+	SpinLock m_lock;
+	
 };
 
 SLIB_GRAPHICS_NAMESPACE_END

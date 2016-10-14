@@ -145,8 +145,6 @@ public:
 	
 	virtual void setTextColor(const Color& color, sl_bool flagRedraw = sl_true);
 	
-	void resetStateTextColors(sl_bool flagRedraw = sl_true);
-	
 	
 	Ref<Drawable> getIcon(ButtonState state, sl_uint32 category = 0);
 	
@@ -155,8 +153,6 @@ public:
 	Ref<Drawable> getIcon();
 	
 	virtual void setIcon(const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
-	
-	void resetStateIcons(sl_bool flagRedraw = sl_true);
 	
 	
 	Ref<Drawable> getBackground(ButtonState state, sl_uint32 category = 0);
@@ -170,8 +166,6 @@ public:
 	// override
 	void setBackground(const Ref<Drawable>& background, sl_bool flagRedraw = sl_true);
 
-	void resetStateBackgrounds(sl_bool flagRedraw = sl_true);
-	
 	
 	Ref<Pen> getBorder(ButtonState state, sl_uint32 category = 0);
 	
@@ -181,8 +175,13 @@ public:
 	
 	// override
 	void setBorder(const Ref<Pen>& pen, sl_bool flagRedraw = sl_true);
+
+	void setBorder(sl_bool flagBorder, sl_bool flagRedraw = sl_true);
 	
-	void resetStateBorders(sl_bool flagRedraw = sl_true);
+	
+	sl_bool isUsingDefaultColorFilter();
+	
+	void setUsingDefaultColorFilter(sl_bool flag, sl_bool flagRedraw = sl_true);
 	
 public:
 	// override
@@ -211,11 +210,11 @@ protected:
 	void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 	
 protected:
-	virtual UISize measureContentSize(GraphicsContext* gc);
+	virtual UISize measureContentSize();
 
-	virtual void layoutIconAndText(GraphicsContext* gc, sl_ui_len widthFrame, sl_ui_len heightFrame, UISize& sizeContent, UIRect& frameIcon, UIRect& frameText);
+	virtual void layoutIconAndText(sl_ui_len widthFrame, sl_ui_len heightFrame, UISize& sizeContent, UIRect& frameIcon, UIRect& frameText);
 	
-	virtual void drawContent(Canvas* canvas, const Ref<Drawable>& icon, const String& text, const Color& textColor);
+	virtual void drawButtonContent(Canvas* canvas, const Ref<Drawable>& icon, const String& text, const Color& textColor);
 	
 private:
 	void _invalidateButtonState();
@@ -252,9 +251,11 @@ private:
 	
 	Color m_textColorDefault;
 	SafeRef<Drawable> m_iconDefault;
-	
+	sl_bool m_flagUseDefaultColorFilter;
+
 	ButtonCategory* m_categories;
 	sl_uint32 m_nCategories;
+	
 	
 };
 

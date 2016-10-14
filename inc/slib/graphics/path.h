@@ -11,10 +11,6 @@
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
-class GraphicsContext;
-
-class GraphicsPathInstance;
-
 struct SLIB_EXPORT GraphicsPathPoint
 {
 	Point pt;
@@ -81,44 +77,37 @@ public:
 	
 	void setFillMode(FillMode mode);
 	
-	Rectangle getBounds(const Ref<GraphicsContext>& context);
 	
-	sl_bool containsPoint(const Ref<GraphicsContext>& context, sl_real x, sl_real y);
+	Rectangle getBounds();
 	
-	sl_bool containsPoint(const Ref<GraphicsContext>& context, const Point& pt);
+	sl_bool containsPoint(sl_real x, sl_real y);
 	
-	void invalidate();
-	
-public:
-	static sl_bool containsPointInRoundRect(const Point& pt, const Rectangle& rect, const Size& radius);
-	
-	static sl_bool containsPointInEllipse(const Point& pt, const Rectangle& rect);
-
-public:
-	CList<GraphicsPathPoint> points;
+	sl_bool containsPoint(const Point& pt);
 	
 protected:
+	void _initialize_PO();
+	
+	void _moveTo_PO(sl_real x, sl_real y);
+	
+	void _lineTo_PO(sl_real x, sl_real y);
+	
+	void _cubicTo_PO(sl_real xc1, sl_real yc1, sl_real xc2, sl_real yc2, sl_real xe, sl_real ye);
+	
+	void _closeSubpath_PO();
+	
+	void _setFillMode_PO(FillMode mode);
+
+	Rectangle _getBounds_PO();
+
+	sl_bool _containsPoint_PO(sl_real x, sl_real y);
+
+protected:
+	CList<GraphicsPathPoint> points;
 	sl_bool m_flagBegan;
 	Point m_pointBegin;
 	FillMode m_fillMode;
 	
-	sl_bool m_flagInvalidated;
-	
-	SLIB_REF_PROPERTY(GraphicsPathInstance, Instance)
-};
-
-class SLIB_EXPORT GraphicsPathInstance : public Object
-{
-	SLIB_DECLARE_OBJECT
-
-public:
-	virtual void moveTo(const Point& pt) = 0;
-	virtual void lineTo(const Point& pt) = 0;
-	virtual void cubicTo(const Point& ptControl1, const Point& ptControl2, const Point& ptEnd) = 0;
-	virtual void closeSubpath() = 0;
-
-public:
-	void buildFrom(const Ref<GraphicsPath>& path);
+	Ref<Referable> m_platformObject;
 	
 };
 

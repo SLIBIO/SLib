@@ -31,12 +31,11 @@ public:
 		[handle setTextAlignment:translateAlignment(m_textAlignment)];
 		[handle setBorderStyle:(isBorder()?UITextBorderStyleBezel:UITextBorderStyleNone)];
 		[handle setPlaceholder:(Apple::getNSStringFromString(m_hintText))];
-		[handle setTextColor:(UIPlatform::getUIColorFromColor(m_textColor))];
-		[handle setBackgroundColor:(UIPlatform::getUIColorFromColor(getBackgroundColor()))];
+		[handle setTextColor:(GraphicsPlatform::getUIColorFromColor(m_textColor))];
+		[handle setBackgroundColor:(GraphicsPlatform::getUIColorFromColor(getBackgroundColor()))];
 		[handle setEnabled:(m_flagReadOnly ? NO : YES)];
-		Ref<FontInstance> fontInstance;
 		Ref<Font> font = getFont();
-		UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
+		UIFont* hFont = GraphicsPlatform::getUIFont(font.ptr, UIPlatform::getGlobalScaleFactor());
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
@@ -52,13 +51,12 @@ public:
 		} else {
 			[handle.layer setBorderWidth:0];
 		}
-		[handle setTextColor:(UIPlatform::getUIColorFromColor(m_textColor))];
-		[handle setBackgroundColor:(UIPlatform::getUIColorFromColor(getBackgroundColor()))];
+		[handle setTextColor:(GraphicsPlatform::getUIColorFromColor(m_textColor))];
+		[handle setBackgroundColor:(GraphicsPlatform::getUIColorFromColor(getBackgroundColor()))];
 		[handle setEditable:(m_flagReadOnly?FALSE:TRUE)];
 		[handle setSelectable:TRUE];
-		Ref<FontInstance> fontInstance;
 		Ref<Font> font = getFont();
-		UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
+		UIFont* hFont = GraphicsPlatform::getUIFont(font.ptr, UIPlatform::getGlobalScaleFactor());
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
@@ -291,10 +289,10 @@ void EditView::_setTextColor_NW(const Color& color)
 	if (handle != nil) {
 		if ([handle isKindOfClass:[UITextField class]]) {
 			UITextField* tv = (UITextField*)handle;
-			[tv setTextColor:(UIPlatform::getUIColorFromColor(color))];
+			[tv setTextColor:(GraphicsPlatform::getUIColorFromColor(color))];
 		} else if ([handle isKindOfClass:[UITextView class]]) {
 			UITextView* tv = (UITextView*)handle;
-			[tv setTextColor:(UIPlatform::getUIColorFromColor(color))];
+			[tv setTextColor:(GraphicsPlatform::getUIColorFromColor(color))];
 		}
 	}
 }
@@ -305,10 +303,10 @@ void EditView::_setBackgroundColor_NW(const Color& color)
 	if (handle != nil) {
 		if ([handle isKindOfClass:[UITextField class]]) {
 			UITextField* tv = (UITextField*)handle;
-			[tv setBackgroundColor:(UIPlatform::getUIColorFromColor(color))];
+			[tv setBackgroundColor:(GraphicsPlatform::getUIColorFromColor(color))];
 		} else if ([handle isKindOfClass:[UITextView class]]) {
 			UITextView* tv = (UITextView*)handle;
-			[tv setBackgroundColor:(UIPlatform::getUIColorFromColor(color))];
+			[tv setBackgroundColor:(GraphicsPlatform::getUIColorFromColor(color))];
 		}
 	}
 }
@@ -319,15 +317,13 @@ void EditView::_setFont_NW(const Ref<Font>& font)
 	if (handle != nil) {
 		if ([handle isKindOfClass:[UITextField class]]) {
 			UITextField* tv = (UITextField*)handle;
-			Ref<FontInstance> fontInstance;
-			UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
+			UIFont* hFont = GraphicsPlatform::getUIFont(font.ptr, UIPlatform::getGlobalScaleFactor());
 			if (hFont != nil) {
 				[tv setFont:hFont];
 			}
 		} else if ([handle isKindOfClass:[UITextView class]]) {
 			UITextView* tv = (UITextView*)handle;
-			Ref<FontInstance> fontInstance;
-			UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
+			UIFont* hFont = GraphicsPlatform::getUIFont(font.ptr, UIPlatform::getGlobalScaleFactor());
 			if (hFont != nil) {
 				[tv setFont:hFont];
 			}

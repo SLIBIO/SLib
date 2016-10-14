@@ -23,7 +23,7 @@ public:
 	
 public:
 	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst)
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
 	{
 		canvas->drawEllipse(rectDst, m_penBorder, m_brushBack);
 		if (m_brushCheck.isNotNull()) {
@@ -60,9 +60,7 @@ public:
 		Color colorCheckDisabled = Color(90, 90, 90);
 		Color colorCheckHover = Color(0, 80, 200);
 		Color colorCheckDown = colorCheckHover;
-		categories[0].properties[(int)ButtonState::Normal].textColor = Color::Black;
 		categories[0].properties[(int)ButtonState::Normal].icon = new _RadioButton_Icon(penNormal, colorBackNormal, Color::zero());
-		categories[0].properties[(int)ButtonState::Disabled].textColor = Color(90, 90, 90);
 		categories[0].properties[(int)ButtonState::Disabled].icon = new _RadioButton_Icon(penDisabled, colorBackDisabled, Color::zero());
 		categories[0].properties[(int)ButtonState::Hover].icon = new _RadioButton_Icon(penHover, colorBackHover, Color::zero());
 		categories[0].properties[(int)ButtonState::Pressed].icon = new _RadioButton_Icon(penDown, colorBackDown, Color::zero());

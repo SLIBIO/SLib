@@ -41,6 +41,22 @@ Matrix4T<T> Transform3T<T>::getTranslationMatrix(const Vector3T<T>& v)
 }
 
 template <class T>
+void Transform3T<T>::translate(Matrix4T<T>& mat, T x, T y, T z)
+{
+	mat.m30 += x;
+	mat.m31 += y;
+	mat.m32 += z;
+}
+
+template <class T>
+void Transform3T<T>::translate(Matrix4T<T>& mat, const Vector3T<T>& v)
+{
+	mat.m30 += v.x;
+	mat.m31 += v.y;
+	mat.m32 += v.z;
+}
+
+template <class T>
 void Transform3T<T>::setScaling(Matrix4T<T>& _out, T sx, T sy, T sz)
 {
 	_out.m00 = sx; _out.m01 = 0; _out.m02 = 0; _out.m03 = 0;
@@ -77,6 +93,29 @@ Matrix4T<T> Transform3T<T>::getScalingMatrix(const Vector3T<T>& v)
 }
 
 template <class T>
+void Transform3T<T>::scale(Matrix4T<T>& mat, T sx, T sy, T sz)
+{
+	mat.m00 *= sx;
+	mat.m10 *= sx;
+	mat.m20 *= sx;
+	mat.m30 *= sx;
+	mat.m01 *= sy;
+	mat.m11 *= sy;
+	mat.m21 *= sy;
+	mat.m31 *= sy;
+	mat.m02 *= sz;
+	mat.m12 *= sz;
+	mat.m22 *= sz;
+	mat.m32 *= sz;
+}
+
+template <class T>
+void Transform3T<T>::scale(Matrix4T<T>& mat, const Vector3T<T>& v)
+{
+	scale(mat, v.x, v.y, v.z);
+}
+
+template <class T>
 void Transform3T<T>::setRotationX(Matrix4T<T>& _out, T radians)
 {
 	T c = Math::cos(radians);
@@ -96,6 +135,26 @@ Matrix4T<T> Transform3T<T>::getRotationXMatrix(T radians)
 			0, c, s, 0,
 			0, -s, c, 0,
 			0, 0, 0, 1};
+}
+
+template <class T>
+void Transform3T<T>::rotateX(Matrix4T<T>& mat, T radians)
+{
+	T c = Math::cos(radians);
+	T s = Math::sin(radians);
+	T v1, v2;
+	v1 = mat.m01 * c - mat.m02 * s;
+	v2 = mat.m01 * s + mat.m02 * c;
+	mat.m01 = v1; mat.m02 = v2;
+	v1 = mat.m11 * c - mat.m12 * s;
+	v2 = mat.m11 * s + mat.m12 * c;
+	mat.m11 = v1; mat.m12 = v2;
+	v1 = mat.m21 * c - mat.m22 * s;
+	v2 = mat.m21 * s + mat.m22 * c;
+	mat.m21 = v1; mat.m22 = v2;
+	v1 = mat.m31 * c - mat.m32 * s;
+	v2 = mat.m31 * s + mat.m32 * c;
+	mat.m31 = v1; mat.m32 = v2;
 }
 
 template <class T>
@@ -121,6 +180,26 @@ Matrix4T<T> Transform3T<T>::getRotationYMatrix(T radians)
 }
 
 template <class T>
+void Transform3T<T>::rotateY(Matrix4T<T>& mat, T radians)
+{
+	T c = Math::cos(radians);
+	T s = Math::sin(radians);
+	T v0, v2;
+	v0 = mat.m00 * c + mat.m02 * s;
+	v2 = - mat.m00 * s + mat.m02 * c;
+	mat.m00 = v0; mat.m02 = v2;
+	v0 = mat.m10 * c + mat.m12 * s;
+	v2 = - mat.m10 * s + mat.m12 * c;
+	mat.m10 = v0; mat.m12 = v2;
+	v0 = mat.m20 * c + mat.m22 * s;
+	v2 = - mat.m20 * s + mat.m22 * c;
+	mat.m20 = v0; mat.m22 = v2;
+	v0 = mat.m30 * c + mat.m32 * s;
+	v2 = - mat.m30 * s + mat.m32 * c;
+	mat.m30 = v0; mat.m32 = v2;
+}
+
+template <class T>
 void Transform3T<T>::setRotationZ(Matrix4T<T>& _out, T radians)
 {
 	T c = Math::cos(radians);
@@ -140,6 +219,26 @@ Matrix4T<T> Transform3T<T>::getRotationZMatrix(T radians)
 			-s, c, 0, 0,
 			0, 0, 1, 0,
 			0, 0, 0, 1};
+}
+
+template <class T>
+void Transform3T<T>::rotateZ(Matrix4T<T>& mat, T radians)
+{
+	T c = Math::cos(radians);
+	T s = Math::sin(radians);
+	T v0, v1;
+	v0 = mat.m00 * c - mat.m01 * s;
+	v1 = mat.m00 * s + mat.m01 * c;
+	mat.m00 = v0; mat.m01 = v1;
+	v0 = mat.m10 * c - mat.m11 * s;
+	v1 = mat.m10 * s + mat.m11 * c;
+	mat.m10 = v0; mat.m11 = v1;
+	v0 = mat.m20 * c - mat.m21 * s;
+	v1 = mat.m20 * s + mat.m21 * c;
+	mat.m20 = v0; mat.m21 = v1;
+	v0 = mat.m30 * c - mat.m31 * s;
+	v1 = mat.m30 * s + mat.m31 * c;
+	mat.m30 = v0; mat.m31 = v1;
 }
 
 template <class T>
@@ -187,6 +286,45 @@ Matrix4T<T> Transform3T<T>::getRotationMatrix(const QuaternionT<T>& q)
 }
 
 template <class T>
+void Transform3T<T>::rotate(Matrix4T<T>& mat, const QuaternionT<T>& q)
+{
+	T d = q.getLength2p();
+	T s = 2 / d;
+	T x = q.x * s, y = q.y * s, z = q.z * s;
+	T wx = q.w * x, wy = q.w * y, wz = q.w * z;
+	T xx = q.x * x, xy = q.x * y, xz = q.x * z;
+	T yy = q.y * y, yz = q.y * z, zz = q.z * z;
+	
+	T o00 = 1 - (yy + zz);
+	T o01 = xy - wz;
+	T o02 = xz + wy;
+	T o10 = xy + wz;
+	T o11 = 1 - (xx + zz);
+	T o12 = yz - wx;
+	T o20 = xz - wy;
+	T o21 = yz + wx;
+	T o22 = 1 - (xx + yy);
+	
+	T v0, v1, v2;
+	v0 = mat.m00 * o00 + mat.m01 * o10 + mat.m02 * o20;
+	v1 = mat.m00 * o01 + mat.m01 * o11 + mat.m02 * o21;
+	v2 = mat.m00 * o02 + mat.m01 * o12 + mat.m02 * o22;
+	mat.m00 = v0; mat.m01 = v1; mat.m02 = v2;
+	v0 = mat.m10 * o00 + mat.m11 * o10 + mat.m12 * o20;
+	v1 = mat.m10 * o01 + mat.m11 * o11 + mat.m12 * o21;
+	v2 = mat.m10 * o02 + mat.m11 * o12 + mat.m12 * o22;
+	mat.m10 = v0; mat.m11 = v1; mat.m12 = v2;
+	v0 = mat.m20 * o00 + mat.m21 * o10 + mat.m22 * o20;
+	v1 = mat.m20 * o01 + mat.m21 * o11 + mat.m22 * o21;
+	v2 = mat.m20 * o02 + mat.m21 * o12 + mat.m22 * o22;
+	mat.m20 = v0; mat.m21 = v1; mat.m22 = v2;
+	v0 = mat.m30 * o00 + mat.m31 * o10 + mat.m32 * o20;
+	v1 = mat.m30 * o01 + mat.m31 * o11 + mat.m32 * o21;
+	v2 = mat.m30 * o02 + mat.m31 * o12 + mat.m32 * o22;
+	mat.m30 = v0; mat.m31 = v1; mat.m32 = v2;
+}
+
+template <class T>
 void Transform3T<T>::setRotation(Matrix4T<T>& _out, const Vector3T<T>& vAxis, T fAngle)
 {
 	QuaternionT<T> q;
@@ -200,6 +338,14 @@ Matrix4T<T> Transform3T<T>::getRotationMatrix(const Vector3T<T>& vAxis, T fAngle
 	Matrix4T<T> ret;
 	setRotation(ret, vAxis, fAngle);
 	return ret;
+}
+
+template <class T>
+void Transform3T<T>::rotate(Matrix4T<T>& mat, const Vector3T<T>& vAxis, T fAngle)
+{
+	QuaternionT<T> q;
+	q.setRotation(vAxis, fAngle);
+	rotate(mat, q);
 }
 
 template <class T>

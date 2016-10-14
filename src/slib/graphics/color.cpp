@@ -562,5 +562,27 @@ Color::operator Color4f() const
 	return {_r / 255, _g / 255, _b / 255, _a / 255};
 }
 
+
+Color4f ColorMatrix::transformColor(const Color4f& src) const
+{
+	Color4f ret;
+	ret.x = src.dot(red);
+	ret.y = src.dot(green);
+	ret.z = src.dot(blue);
+	ret.w = src.dot(alpha);
+	ret += bias;
+	return ret;
+}
+
+Color4f ColorMatrix::transformColor(const Color& src) const
+{
+	return transformColor((Color4f)src);
+}
+
+Color4f ColorMatrix::transformColor(const Color3f& src) const
+{
+	return transformColor(Color4f(src.x, src.y, src.z, 1));
+}
+
 SLIB_GRAPHICS_NAMESPACE_END
 

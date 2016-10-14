@@ -1,7 +1,8 @@
 #include "../../../inc/slib/graphics/bitmap.h"
-
-#include "../../../inc/slib/graphics/context.h"
 #include "../../../inc/slib/graphics/image.h"
+
+#include "../../../inc/slib/core/file.h"
+#include "../../../inc/slib/core/asset.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
@@ -9,6 +10,52 @@ SLIB_DEFINE_OBJECT(Bitmap, Drawable)
 
 Bitmap::Bitmap()
 {
+}
+
+Ref<Bitmap> Bitmap::create(const ImageDesc& desc)
+{
+	Ref<Bitmap> ret = Bitmap::create(desc.width, desc.height);
+	if (ret.isNotNull()) {
+		ret->writePixels(0, 0, desc.width, desc.height, desc.colors, desc.stride);
+		return ret;
+	}
+	return Ref<Bitmap>::null();
+}
+
+Ref<Bitmap> Bitmap::create(const Ref<Image>& image)
+{
+	if (image.isNotNull()) {
+		ImageDesc desc;
+		image->getDesc(desc);
+		return Bitmap::create(desc);
+	}
+	return Ref<Bitmap>::null();
+}
+
+Ref<Bitmap> Bitmap::loadFromMemory(const Memory& mem)
+{
+	if (mem.isNotEmpty()) {
+		return Bitmap::loadFromMemory(mem.getData(), mem.getSize());
+	}
+	return Ref<Bitmap>::null();
+}
+
+Ref<Bitmap> Bitmap::loadFromFile(const String& filePath)
+{
+	Memory mem = File::readAllBytes(filePath);
+	if (mem.isNotEmpty()) {
+		return Bitmap::loadFromMemory(mem);
+	}
+	return Ref<Bitmap>::null();
+}
+
+Ref<Bitmap> Bitmap::loadFromAsset(const String& path)
+{
+	Memory mem = Assets::readAllBytes(path);
+	if (mem.isNotEmpty()) {
+		return Bitmap::loadFromMemory(mem);
+	}
+	return Ref<Bitmap>::null();
 }
 
 sl_real Bitmap::getDrawableWidth()
@@ -41,33 +88,8 @@ sl_bool Bitmap::isNotEmpty()
 	return getBitmapWidth() != 0 && getBitmapHeight() != 0;
 }
 
-void Bitmap::onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc)
-{
-	Ref<GraphicsContext> context = canvas->getGraphicsContext();
-	if (context.isNull()) {
-		return;
-	}
-	Ref<GraphicsContext> contextCached = m_contextCached;
-	Ref<Drawable> drawableCached = m_drawableCached;
-	if (contextCached == context && drawableCached.isNotNull()) {
-		drawableCached->onDraw(canvas, rectDst, rectSrc);
-	} else {
-		if (Image::checkInstance(this)) {
-			drawableCached = context->createDrawableFromImage((Image*)this);
-		} else {
-			drawableCached = context->createDrawableFromBitmap(this);
-		}
-		if (drawableCached.isNotNull()) {
-			drawableCached->onDraw(canvas, rectDst, rectSrc);
-			m_drawableCached = drawableCached;
-			m_contextCached = context;
-		}
-	}
-}
-
 void Bitmap::update()
 {
-	m_contextCached.setNull();
 	m_drawableCached.setNull();
 }
 

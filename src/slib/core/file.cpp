@@ -93,6 +93,12 @@ sl_bool File::exists(const String& filePath)
 	return (getAttributes(filePath) & FileAttributes::NotExist) == 0;
 }
 
+sl_bool File::isFile(const String& filePath)
+{
+	FileAttributes attrs = getAttributes(filePath);
+	return (attrs & (FileAttributes::NotExist | FileAttributes::Directory)) == 0;
+}
+
 sl_bool File::isDirectory(const String& filePath)
 {
 	return (getAttributes(filePath) & FileAttributes::Directory) != 0;

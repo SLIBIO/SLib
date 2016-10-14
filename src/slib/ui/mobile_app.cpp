@@ -1,6 +1,8 @@
 #include "../../../inc/slib/ui/mobile_app.h"
 #include "../../../inc/slib/ui/view.h"
 
+#include "../../../inc/slib/core/animation.h"
+
 SLIB_UI_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(MobileApp, UIApp)
@@ -86,6 +88,7 @@ void MobileApp::dispatchPause()
 
 void MobileApp::dispatchPauseToApp()
 {
+	Animation::pauseAnimationCenter();
 	m_flagPaused = sl_true;
 	Ref<MobileApp> app = getApp();
 	if (app.isNotNull()) {
@@ -100,6 +103,7 @@ void MobileApp::dispatchResume()
 
 void MobileApp::dispatchResumeToApp()
 {
+	Animation::resumeAnimationCenter();
 	m_flagPaused = sl_false;
 	Ref<MobileApp> app = getApp();
 	if (app.isNotNull()) {

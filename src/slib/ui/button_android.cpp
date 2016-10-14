@@ -30,8 +30,7 @@ Ref<ViewInstance> Button::createNativeWidget(ViewInstance* _parent)
 			JniLocal<jstring> jtext = Jni::getJniString(m_text);
 			_JAndroidButton::setText.callBoolean(sl_null, handle, jtext.get());
 			Ref<Font> font = getFont();
-			Ref<FontInstance> fontInstance;
-			jobject jfont = UIPlatform::getNativeFont(font.ptr, fontInstance);
+			jobject jfont = GraphicsPlatform::getNativeFont(font.ptr);
 			if (jfont) {
 				_JAndroidButton::setFont.callBoolean(sl_null, handle, jfont);
 			}
@@ -57,8 +56,7 @@ void Button::_setFont_NW(const Ref<Font>& font)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		Ref<FontInstance> fontInstance;
-		jobject jfont = UIPlatform::getNativeFont(font.ptr, fontInstance);
+		jobject jfont = GraphicsPlatform::getNativeFont(font.ptr);
 		if (jfont) {
 			_JAndroidButton::setFont.callBoolean(sl_null, handle, jfont);
 		}

@@ -41,12 +41,10 @@ Ref<ViewInstance> Button::createNativeWidget(ViewInstance* parent)
 	Ref<_Win32_ButtonViewInstance> ret = Win32_ViewInstance::create<_Win32_ButtonViewInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
 	if (ret.isNotNull()) {
 		Ref<Font> font = getFont();
-		Ref<FontInstance> fontInstance;
-		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
 		if (hFont) {
 			::SendMessageW(ret->getHandle(), WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
-		_setFontInstance(fontInstance);
 	}
 	return ret;
 }
@@ -76,15 +74,13 @@ void Button::_setDefaultButton_NW(sl_bool flag)
 
 void Button::_setFont_NW(const Ref<Font>& font)
 {
-	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
 	}
-	_setFontInstance(fontInstance);
 }
 
 SLIB_UI_NAMESPACE_END

@@ -47,12 +47,10 @@ Ref<ViewInstance> RadioButton::createNativeWidget(ViewInstance* parent)
 			::SendMessageW(handle, BM_SETCHECK, BST_UNCHECKED, 0);
 		}
 		Ref<Font> font = getFont();
-		Ref<FontInstance> fontInstance;
-		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
-		_setFontInstance(fontInstance);
 	}
 	return ret;
 }

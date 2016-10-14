@@ -70,8 +70,7 @@ Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* _parent)
 		((_SelectView*)this)->__selectItem(handle, m_indexSelected);
 		
 		Ref<Font> font = getFont();
-		Ref<FontInstance> fontInstance;
-		UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
+		UIFont* hFont = GraphicsPlatform::getUIFont(font.ptr, UIPlatform::getGlobalScaleFactor());
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
@@ -125,8 +124,7 @@ void SelectView::_setFont_NW(const Ref<Font>& font)
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
 		_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
-		Ref<FontInstance> fontInstance;
-		UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
+		UIFont* hFont = GraphicsPlatform::getUIFont(font.ptr, UIPlatform::getGlobalScaleFactor());
 		if (hFont != nil) {
 			[v setFont:hFont];
 		}

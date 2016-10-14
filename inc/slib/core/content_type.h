@@ -83,7 +83,9 @@ enum class ContentType
 	Zip,
 	// application/gzip
 	Gzip,
-	
+	// application/x-shockwave-flash
+	Flash,
+
 	// application/x-www-form-urlencoded
 	WebForm,
 	// multipart/form-data
@@ -172,7 +174,9 @@ public:
 	static const String& Zip;
 	// application/gzip
 	static const String& Gzip;
-	
+	// application/x-shockwave-flash
+	static const String& Flash;
+
 	// application/x-www-form-urlencoded
 	static const String& WebForm;
 	// multipart/form-data

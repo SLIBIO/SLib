@@ -279,6 +279,29 @@ private:
 	
 };
 
+class SLIB_EXPORT ColorMatrix
+{
+public:
+	Color4f red;
+	Color4f green;
+	Color4f blue;
+	Color4f alpha;
+	Color4f bias;
+	
+public:
+	/*
+	 d.r = dot(s, red)
+	 d.g = dot(s, green)
+	 d.b = dot(s, blue)
+	 d.a = dot(s, alpha)
+	 d = d + bias
+	 */
+	Color4f transformColor(const Color4f& s) const;
+	Color4f transformColor(const Color& s) const;	
+	Color4f transformColor(const Color3f& s) const;
+	
+};
+
 SLIB_GRAPHICS_NAMESPACE_END
 
 

@@ -48,6 +48,9 @@ public:
 	void setFrame(const UIRect& frame);
 	
 	// override
+	void setTransform(const Matrix3& transform);
+
+	// override
 	void setVisible(sl_bool flag);
 	
 	// override
@@ -56,6 +59,9 @@ public:
 	// override
 	void setOpaque(sl_bool flag);
 	
+	// override
+	void setAlpha(sl_real alpha);
+
 	// override
 	UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen);
 	
@@ -67,6 +73,9 @@ public:
 	
 	// override
 	void removeChildInstance(const Ref<ViewInstance>& instance);
+	
+	// override
+	void bringToFront();
 	
 public:
 	void onDraw(NSRect rectDirty);
@@ -87,6 +96,8 @@ protected:
 	
 };
 
+void OSX_transformViewFrame(NSPoint& origin, NSSize& size, const UIRect& frame, sl_real translationX, sl_real translationY, sl_real scaleX, sl_real scaleY, sl_real rotationRadian, sl_real anchorOffsetX, sl_real anchorOffsetY);
+
 SLIB_UI_NAMESPACE_END
 
 @interface Slib_OSX_ViewBase : NSView {
@@ -106,8 +117,8 @@ SLIB_UI_NAMESPACE_END
 #define OSX_VIEW_CREATE_INSTANCE_BEGIN \
 	Ref<OSX_ViewInstance> ret; \
 	NSView* parent = UIPlatform::getViewHandle(_parent); \
-	NSRect frame; \
 	UIRect _frame = getFrame(); \
+	NSRect frame; \
 	frame.origin.x = (CGFloat)(_frame.left); \
 	frame.origin.y = (CGFloat)(_frame.top); \
 	frame.size.width = (CGFloat)(_frame.getWidth()); \
@@ -115,6 +126,18 @@ SLIB_UI_NAMESPACE_END
 
 #define OSX_VIEW_CREATE_INSTANCE_END \
 	if (handle != nil) { \
+		Vector2 t; \
+		sl_real r; \
+		Vector2 s; \
+		Vector2 anchor; \
+		if (getFinalTranslationRotationScale(&t, &r, &s, &anchor)) { \
+			NSPoint pt; \
+			NSSize size; \
+			OSX_transformViewFrame(pt, size, _frame, t.x, t.y, s.x, s.y, r, anchor.x, anchor.y); \
+			[handle setFrameOrigin:pt]; \
+			[handle setFrameSize:size]; \
+			handle.frameRotation = Math::getDegreesFromRadian(r); \
+		} \
 		ret = OSX_ViewInstance::create(handle, parent, this); \
 		if (ret.isNotNull()) { \
 			handle->m_viewInstance = ret; \

@@ -36,6 +36,10 @@ public:
 
 	static const Matrix2T<T>& identity();
 	
+	static const Matrix2T<T>& fromArray(const T arr[4]);
+	
+	static Matrix2T<T>& fromArray(T arr[4]);
+
 	
 	Vector2T<T> getRow0() const;
 	
@@ -183,6 +187,18 @@ template <class T>
 SLIB_INLINE const Matrix2T<T>& Matrix2T<T>::identity()
 {
 	return *((Matrix2T<T>*)((void*)(_identity)));
+}
+
+template <class T>
+SLIB_INLINE const Matrix2T<T>& Matrix2T<T>::fromArray(const T* arr)
+{
+	return *((Matrix2T<T>*)((void*)(arr)));
+}
+
+template <class T>
+SLIB_INLINE Matrix2T<T>& Matrix2T<T>::fromArray(T* arr)
+{
+	return *((Matrix2T<T>*)((void*)(arr)));
 }
 
 template <class T>

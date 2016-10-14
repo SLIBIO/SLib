@@ -39,10 +39,14 @@ public:
 	sl_bool processWindowMessage(UINT msg, WPARAM wParam, LPARAM lParam, LRESULT& result)
 	{
 		if (msg == WM_PAINT) {
+			PAINTSTRUCT ps;
+			::BeginPaint(m_handle, &ps);
+			::EndPaint(m_handle, &ps);
 			Ref<Renderer> renderer = m_renderer;
 			if (renderer.isNotNull()) {
 				renderer->requestRender();
 			}
+			return sl_true;
 		} else if (msg == WM_ERASEBKGND) {
 			result = TRUE;
 			return sl_true;

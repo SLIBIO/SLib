@@ -251,8 +251,8 @@ Ref<_Win32_MenuItem> _Win32_MenuItem::create(_Win32_Menu* parent, sl_uint32 inde
 			mii.fMask |= MIIM_SUBMENU;
 		}
 	}
-	mii.hbmpUnchecked = UIPlatform::createDIBFromBitmap(param.icon);
-	mii.hbmpChecked = UIPlatform::createDIBFromBitmap(param.checkedIcon);
+	mii.hbmpUnchecked = GraphicsPlatform::createDIBFromBitmap(param.icon);
+	mii.hbmpChecked = GraphicsPlatform::createDIBFromBitmap(param.checkedIcon);
 	if (mii.hbmpUnchecked || mii.hbmpChecked) {
 		mii.fMask |= MIIM_CHECKMARKS;
 	}
@@ -350,7 +350,7 @@ void _Win32_MenuItem::setIcon(const Ref<Bitmap>& icon)
 	if (m_hbmUnchecked) {
 		::DeleteObject(m_hbmUnchecked);
 	}
-	m_hbmUnchecked = UIPlatform::createDIBFromBitmap(icon);
+	m_hbmUnchecked = GraphicsPlatform::createDIBFromBitmap(icon);
 	mii.fMask = MIIM_CHECKMARKS;
 	mii.hbmpUnchecked = m_hbmUnchecked;
 	mii.hbmpChecked = m_hbmChecked;
@@ -364,7 +364,7 @@ void _Win32_MenuItem::setCheckedIcon(const Ref<Bitmap>& icon)
 	if (m_hbmChecked) {
 		::DeleteObject(m_hbmChecked);
 	}
-	m_hbmChecked = UIPlatform::createDIBFromBitmap(icon);
+	m_hbmChecked = GraphicsPlatform::createDIBFromBitmap(icon);
 	mii.fMask = MIIM_CHECKMARKS;
 	mii.hbmpUnchecked = m_hbmUnchecked;
 	mii.hbmpChecked = m_hbmChecked;

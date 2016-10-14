@@ -66,42 +66,6 @@ String Apple::getFilePathFromNSURL(NSURL* url)
 	return String::null();
 }
 
-#if defined(SLIB_PLATFORM_IS_OSX)
-NSImage* Apple::loadImage(const void* buf, sl_size size)
-{
-	NSData* data = [NSData dataWithBytesNoCopy:(void*)buf length:size freeWhenDone:FALSE];
-	return [[NSImage alloc] initWithData:data];
-}
-#elif defined(SLIB_PLATFORM_IS_IOS)
-UIImage* Apple::loadImage(const void* buf, sl_size size)
-{
-	NSData* data = [NSData dataWithBytesNoCopy:(void*)buf length:size freeWhenDone:FALSE];
-	return [UIImage imageWithData:data];
-}
-#endif
-
-CGImageRef Apple::loadCGImage(const void* buf, sl_size size)
-{
-	CGImageRef ret;
-#if defined(SLIB_PLATFORM_IS_OSX)
-	NSImage* image = loadImage(buf, size);
-	if (image == nil) {
-		return NULL;
-	}
-	ret = [image CGImageForProposedRect:NULL context:NULL hints:NULL];
-	CGImageRetain(ret);
-	return ret;
-#elif defined(SLIB_PLATFORM_IS_IOS)
-	UIImage* image = loadImage(buf, size);
-	if (image == nil) {
-		return NULL;
-	}
-	ret = image.CGImage;
-	CGImageRetain(ret);
-	return ret;
-#endif
-}
-
 String Apple::getAssetFilePath(const String &path)
 {
 	String fileExt = File::getFileExtension(path);

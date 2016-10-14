@@ -31,6 +31,10 @@ public:
 public:
 	static const Vector4T<T, FT>& zero();
 	
+	static const Vector4T<T, FT>& fromArray(const T arr[4]);
+
+	static Vector4T<T, FT>& fromArray(T arr[4]);
+	
 	const Vector3T<T, FT>& xyz() const;
 	
 	Vector3T<T, FT>& xyz();
@@ -147,6 +151,18 @@ template <class T, class FT>
 SLIB_INLINE const Vector4T<T, FT>& Vector4T<T, FT>::zero()
 {
 	return *((Vector4T<T, FT>*)((void*)(_zero)));
+}
+
+template <class T, class FT>
+SLIB_INLINE const Vector4T<T, FT>& Vector4T<T, FT>::fromArray(const T* arr)
+{
+	return *((Vector4T<T, FT>*)((void*)(arr)));
+}
+
+template <class T, class FT>
+SLIB_INLINE Vector4T<T, FT>& Vector4T<T, FT>::fromArray(T* arr)
+{
+	return *((Vector4T<T, FT>*)((void*)(arr)));
 }
 
 template <class T, class FT>

@@ -22,9 +22,8 @@ Ref<ViewInstance> Button::createNativeWidget(ViewInstance* _parent)
 	_Slib_iOS_Button* handle = [[_Slib_iOS_Button alloc] initWithFrame:frame];
 	if (handle != nil) {
 		[handle setTitle:(Apple::getNSStringFromString(m_text)) forState:UIControlStateNormal];
-		Ref<FontInstance> fontInstance;
 		Ref<Font> font = getFont();
-		UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
+		UIFont* hFont = GraphicsPlatform::getUIFont(font.ptr, UIPlatform::getGlobalScaleFactor());
 		if (hFont != nil) {
 			handle.titleLabel.font = hFont;
 		}
@@ -54,8 +53,7 @@ void Button::_setFont_NW(const Ref<Font>& font)
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[UIButton class]]) {
 		UIButton* v = (UIButton*)handle;
-		Ref<FontInstance> fontInstance;
-		UIFont* hFont = UIPlatform::getUIFont(font.ptr, fontInstance);
+		UIFont* hFont = GraphicsPlatform::getUIFont(font.ptr, UIPlatform::getGlobalScaleFactor());
 		if (hFont != nil) {
 			v.titleLabel.font = hFont;
 		}

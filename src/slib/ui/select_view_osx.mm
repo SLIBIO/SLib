@@ -94,8 +94,7 @@ Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* _parent)
 		((_SelectView*)this)->__copyItems(handle);
 		
 		Ref<Font> font = getFont();
-		Ref<FontInstance> fontInstance;
-		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
+		NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
@@ -154,8 +153,7 @@ void SelectView::_setFont_NW(const Ref<Font>& font)
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
 		NSPopUpButton* v = (NSPopUpButton*)handle;
-		Ref<FontInstance> fontInstance;
-		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
+		NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
 		if (hFont != nil) {
 			[v setFont:hFont];
 		}

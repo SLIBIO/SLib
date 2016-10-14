@@ -31,6 +31,7 @@
 #include "core/math.h"
 #include "core/time.h"
 #include "core/variant.h"
+#include "core/animation.h"
 
 #include "core/system.h"
 #include "core/event.h"

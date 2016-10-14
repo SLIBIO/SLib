@@ -118,8 +118,7 @@ Ref<ViewInstance> ListReportView::createNativeWidget(ViewInstance* _parent)
 			[table setDataSource:handle];
 			
 			Ref<Font> font = getFont();
-			Ref<FontInstance> fontInstance;
-			NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
+			NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
 			handle->m_font = hFont;
 			((_ListReportView*)this)->__copyColumns(handle);
 			[table setRowSizeStyle:NSTableViewRowSizeStyleCustom];
@@ -222,8 +221,7 @@ void ListReportView::_setFont_NW(const Ref<Font>& font)
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_OSX_ListReportView class]]) {
 		_Slib_OSX_ListReportView* tv = (_Slib_OSX_ListReportView*)handle;
-		Ref<FontInstance> fontInstance;
-		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
+		NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
 		tv->m_font = hFont;
 		((_ListReportView*)this)->__applyFont(tv);
 		[tv->table reloadData];

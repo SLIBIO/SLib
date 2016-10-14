@@ -7,7 +7,7 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
-class SLIB_EXPORT LinearView : public View
+class SLIB_EXPORT LinearView : public ViewGroup
 {
 	SLIB_DECLARE_OBJECT
 	

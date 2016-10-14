@@ -468,14 +468,14 @@ void ScrollBar::onDraw(Canvas* canvas)
 			thumb = m_thumb;
 		}
 		if (thumb.isNotNull()) {
-			Ref<Brush> brush;
-			if (ColorDrawable::check(thumb, sl_null, &brush)) {
+			Color color;
+			if (ColorDrawable::check(thumb, &color)) {
 				sl_bool flagAntiAlias = canvas->isAntiAlias();
 				canvas->setAntiAlias(sl_true);
 				sl_real r = Math::min(thumbRegion.getWidth(), thumbRegion.getHeight()) * 0.5f;
 				sl_real padding = 2;
 				r -= padding;
-				canvas->drawRoundRect(Rectangle(thumbRegion.left + padding - 1, thumbRegion.top + padding, thumbRegion.right - padding, thumbRegion.bottom - padding), Size(r, r), Ref<Pen>::null(), brush);
+				canvas->fillRoundRect(Rectangle(thumbRegion.left + padding - 1, thumbRegion.top + padding, thumbRegion.right - padding, thumbRegion.bottom - padding), Size(r, r), color);
 				canvas->setAntiAlias(flagAntiAlias);
 			} else {
 				canvas->draw(thumbRegion, thumb);
@@ -560,6 +560,8 @@ void ScrollBar::onMouseEvent(UIEvent* ev)
 				}
 			}
 			break;
+		default:
+			return;
 	}
 	
 	ev->stopPropagation();

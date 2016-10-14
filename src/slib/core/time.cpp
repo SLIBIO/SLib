@@ -1031,80 +1031,6 @@ Time& Time::operator=(const sl_char16* time)
 	return *this;
 }
 
-sl_bool Time::operator==(const Time& other) const
-{
-	return m_time == other.m_time;
-}
-
-sl_bool Time::operator<=(const Time& other) const
-{
-	return m_time <= other.m_time;
-}
-
-sl_bool Time::operator>=(const Time& other) const
-{
-	return m_time >= other.m_time;
-}
-
-sl_bool Time::operator!=(const Time& other) const
-{
-	return m_time != other.m_time;
-}
-
-sl_bool Time::operator<(const Time& other) const
-{
-	return m_time < other.m_time;
-}
-
-sl_bool Time::operator>(const Time& other) const
-{
-	return m_time > other.m_time;
-}
-
-Time Time::operator+(sl_int64 time) const
-{
-	return m_time + time;
-}
-
-Time Time::operator+(const Time& time) const
-{
-	return m_time + time.m_time;
-}
-
-Time& Time::operator+=(sl_int64 time)
-{
-	m_time += time;
-	return *this;
-}
-
-Time& Time::operator+=(const Time& time)
-{
-	m_time += time.m_time;
-	return *this;
-}
-
-Time Time::operator-(sl_int64 time) const
-{
-	return m_time - time;
-}
-
-Time Time::operator-(const Time& time) const
-{
-	return m_time - time.m_time;
-}
-
-Time& Time::operator-=(sl_int64 time)
-{
-	m_time -= time;
-	return *this;
-}
-
-Time& Time::operator-=(const Time& time)
-{
-	m_time -= time.m_time;
-	return *this;
-}
-
 SLIB_NAMESPACE_END
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -1259,36 +1185,226 @@ TimeCounter::TimeCounter()
 	reset();
 }
 
-void TimeCounter::reset()
+Time TimeCounter::getTime() const
 {
-	m_timeStart = Time::now();
-	m_relStart = 0;
+	return getTime(Time::now());
 }
 
-void TimeCounter::update()
+Time TimeCounter::getTime(const Time& current) const
 {
-	Time orig = m_timeStart;
-	Time time = Time::now();
-	if (time > orig) {
-		m_relStart += (time - orig).toInt();
-	}
-	m_timeStart = time;
-}
-
-Time TimeCounter::getRelative() const
-{
-	Time orig = m_timeStart;
-	Time time = Time::now();
-	if (time > orig) {
-		return m_relStart + (time - orig).toInt();
+	Time last = m_timeLast;
+	if (current > last) {
+		return current - last + m_timeEllapsed;
 	} else {
-		return m_relStart;
+		return m_timeEllapsed;
 	}
 }
 
 sl_uint64 TimeCounter::getEllapsedMilliseconds() const
 {
-	return getRelative().getMillisecondsCount();
+	return getTime().getMillisecondsCount();
 }
+
+sl_uint64 TimeCounter::getEllapsedMilliseconds(const Time& current) const
+{
+	return getTime(current).getMillisecondsCount();
+}
+
+void TimeCounter::reset()
+{
+	reset(Time::now());
+}
+
+void TimeCounter::reset(const Time& current)
+{
+	m_timeLast = current;
+	m_timeEllapsed.setZero();
+}
+
+void TimeCounter::update()
+{
+	update(Time::now());
+}
+
+void TimeCounter::update(const Time& current)
+{
+	Time last = m_timeLast;
+	if (current > last) {
+		m_timeEllapsed += (current - last);
+	}
+	m_timeLast = current;
+}
+
+
+TimeKeeper::TimeKeeper()
+: m_flagStarted(sl_false), m_flagRunning(sl_false), m_timeLast(0), m_timeEllapsed(0)
+{
+}
+
+void TimeKeeper::start()
+{
+	startAndSetTime(Time::zero(), Time::now());
+}
+
+void TimeKeeper::start(const Time& current)
+{
+	startAndSetTime(Time::zero(), current);
+}
+
+void TimeKeeper::startAndSetTime(const Time& init)
+{
+	startAndSetTime(init, Time::now());
+}
+
+void TimeKeeper::startAndSetTime(const Time& init, const Time& current)
+{
+	SpinLocker lock(&m_lock);
+	if (m_flagStarted) {
+		return;
+	}
+	m_timeLast = current;
+	m_timeEllapsed = init;
+	m_flagStarted = sl_true;
+	m_flagRunning = sl_true;
+}
+
+void TimeKeeper::restart()
+{
+	restartAndSetTime(Time::zero(), Time::now());
+}
+
+void TimeKeeper::restart(const Time& current)
+{
+	restartAndSetTime(Time::zero(), current);
+}
+
+void TimeKeeper::restartAndSetTime(const Time& init)
+{
+	restartAndSetTime(init, Time::now());
+}
+
+void TimeKeeper::restartAndSetTime(const Time& init, const Time& current)
+{
+	SpinLocker lock(&m_lock);
+	m_timeLast = current;
+	m_timeEllapsed = init;
+	m_flagStarted = sl_true;
+	m_flagRunning = sl_true;
+}
+
+void TimeKeeper::stop()
+{
+	m_flagStarted = sl_false;
+}
+
+void TimeKeeper::resume()
+{
+	resume(Time::now());
+}
+
+void TimeKeeper::resume(const Time& current)
+{
+	SpinLocker lock(&m_lock);
+	if (m_flagStarted) {
+		if (!m_flagRunning) {
+			m_timeLast = current;
+			m_flagRunning = sl_true;
+		}
+	}
+}
+
+void TimeKeeper::pause()
+{
+	pause(Time::now());
+}
+
+void TimeKeeper::pause(const Time& current)
+{
+	SpinLocker lock(&m_lock);
+	if (m_flagStarted) {
+		if (m_flagRunning) {
+			if (current > m_timeLast) {
+				m_timeEllapsed += (current - m_timeLast);
+			}
+			m_flagRunning = sl_false;
+		}
+	}
+}
+
+Time TimeKeeper::getTime() const
+{
+	return getTime(Time::now());
+}
+
+Time TimeKeeper::getTime(const Time& current) const
+{
+	SpinLocker lock(&m_lock);
+	if (!m_flagStarted) {
+		return Time::zero();
+	}
+	if (!m_flagRunning) {
+		return m_timeEllapsed;
+	}
+	return m_timeEllapsed + (current - m_timeLast);
+}
+
+void TimeKeeper::setTime(const Time& time)
+{
+	setTime(time, Time::now());
+}
+
+void TimeKeeper::setTime(const Time& time, const Time& current)
+{
+	SpinLocker lock(&m_lock);
+	if (m_flagStarted) {
+		m_timeEllapsed = time;
+		m_timeLast = current;
+	}
+}
+
+void TimeKeeper::update()
+{
+	update(Time::now());
+}
+
+void TimeKeeper::update(const Time& current)
+{
+	SpinLocker lock(&m_lock);
+	if (m_flagStarted) {
+		if (m_flagRunning) {
+			sl_int64 add = (current - m_timeLast).toInt();
+			if (add > 0) {
+				m_timeEllapsed += add;
+			}
+			m_timeLast = current;
+		}
+	}
+}
+
+sl_bool TimeKeeper::isStarted() const
+{
+	return m_flagStarted;
+}
+
+sl_bool TimeKeeper::isStopped() const
+{
+	return !m_flagStarted;
+}
+
+sl_bool TimeKeeper::isRunning() const
+{
+	return m_flagStarted && m_flagRunning;
+}
+
+sl_bool TimeKeeper::isNotRunning() const
+{
+	return m_flagStarted && m_flagRunning;
+}
+
+sl_bool TimeKeeper::isPaused() const
+{
+	return m_flagStarted && !m_flagRunning;
+}
+
 
 SLIB_NAMESPACE_END

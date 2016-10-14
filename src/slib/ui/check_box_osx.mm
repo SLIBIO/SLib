@@ -26,8 +26,7 @@ Ref<ViewInstance> CheckBox::createNativeWidget(ViewInstance* _parent)
 		[handle setState: (m_flagChecked ? NSOnState : NSOffState)];
 		
 		Ref<Font> font = getFont();
-		Ref<FontInstance> fontInstance;
-		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
+		NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}

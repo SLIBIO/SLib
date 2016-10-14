@@ -113,8 +113,9 @@ void _iOS_GLCallback(_Slib_iOS_GLView* handle)
 			
 			handle.context = desc.m_context;
 			
-			sl_uint32 width = (sl_uint32)(handle.frame.size.width) * (handle.contentScaleFactor);
-			sl_uint32 height = (sl_uint32)(handle.frame.size.height) * (handle.contentScaleFactor);
+			sl_uint32 width = (sl_uint32)(handle.frame.size.width * handle.contentScaleFactor);
+			sl_uint32 height = (sl_uint32)(handle.frame.size.height * handle.contentScaleFactor);
+			
 			if (width > 0 && height > 0) {
 				
 				sl_bool flagUpdate = sl_false;
@@ -151,9 +152,11 @@ void _iOS_GLCallback(_Slib_iOS_GLView* handle)
 		if (Thread::isNotStoppingCurrent()) {
 			sl_uint64 t = timer.getEllapsedMilliseconds();
 			if (t < 20) {
-				Thread::sleep((sl_uint32)(20-t));
+				Thread::sleep(20 - (sl_uint32)(t));
 			}
 			timer.reset();
+		} else {
+			break;
 		}
 	}
 }

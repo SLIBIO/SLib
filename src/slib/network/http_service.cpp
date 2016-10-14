@@ -287,7 +287,6 @@ void HttpServiceConnection::_processInput(const void* _data, sl_uint32 size)
 					context->applyPostParameters(body.getData(), body.getSize());
 				}
 			}
-			context->setResponseContentType(ContentTypes::TextHtml_Utf8);
 			
 			if (context->isProcessingByThread()) {
 				Ref<ThreadPool> threadPool = service->getThreadPool();
@@ -343,6 +342,10 @@ void HttpServiceConnection::_processContext(Ref<HttpServiceContext> context)
 	} else {
 		service->processRequest(context.ptr);
 		context->setResponseHeader(HttpHeaders::ContentLength, String::fromUint64(context->getResponseContentLength()));
+		String oldResponseContentType = context->getResponseContentType();
+		if (oldResponseContentType.isEmpty()) {
+			context->setResponseContentType(ContentTypes::TextHtml_Utf8);
+		}
 	}
 	Memory header = context->makeResponsePacket();
 	if (header.isEmpty()) {
@@ -735,13 +738,16 @@ sl_bool HttpService::processAsset(HttpServiceContext* context, const String& pat
 			String filePath = Assets::getFilePath(path);
 			return processFile(context, filePath);
 		} else {
-			ContentType contentType = ContentTypes::getFromFileExtension(ext);
-			if (contentType == ContentType::Unknown) {
-				contentType = ContentType::OctetStream;
-			}
-			context->setResponseContentType(contentType);
 			Memory mem = Assets::readAllBytes(path);
 			if (mem.isNotEmpty()) {
+				String oldResponseContentType = context->getResponseContentType();
+				if (oldResponseContentType.isEmpty()) {
+					ContentType contentType = ContentTypes::getFromFileExtension(ext);
+					if (contentType == ContentType::Unknown) {
+						contentType = ContentType::OctetStream;
+					}
+					context->setResponseContentType(contentType);
+				}
 				context->write(mem);
 				return sl_true;
 			}
@@ -756,11 +762,14 @@ sl_bool HttpService::processFile(HttpServiceContext* context, const String& path
 		return sl_false;
 	}
 
-	if (File::exists(path)) {
-		
+	if (File::exists(path) && !(File::isDirectory(path))) {
+
+		sl_uint64 totalSize = File::getSize(path);
+
 		String ext = File::getFileExtension(path);
 		
-		if (context->getResponseContentType().isEmpty()) {
+		String oldResponseContentType = context->getResponseContentType();
+		if (oldResponseContentType.isEmpty()) {
 			ContentType contentType = ContentTypes::getFromFileExtension(ext);
 			if (contentType == ContentType::Unknown) {
 				contentType = ContentType::OctetStream;
@@ -769,8 +778,6 @@ sl_bool HttpService::processFile(HttpServiceContext* context, const String& path
 		}
 
 		context->setResponseAcceptRanges(sl_true);
-
-		sl_uint64 totalSize = File::getSize(path);
 
 		String rangeHeader = context->getRequestRange();
 		

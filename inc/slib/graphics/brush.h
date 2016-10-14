@@ -20,9 +20,7 @@ public:
 	BrushDesc();
 };
 
-class BrushInstance;
-
-class SLIB_EXPORT Brush : public Object
+class SLIB_EXPORT Brush : public Referable
 {
 	SLIB_DECLARE_OBJECT
 	
@@ -43,17 +41,12 @@ public:
 	
 	Color getColor();
 	
-public:
-	SLIB_REF_PROPERTY(BrushInstance, Instance)
-	
 protected:
 	BrushDesc m_desc;
 	
-};
-
-class SLIB_EXPORT BrushInstance : public Object
-{
-	SLIB_DECLARE_OBJECT
+	Ref<Referable> m_platformObject;
+	SpinLock m_lock;
+	
 };
 
 SLIB_GRAPHICS_NAMESPACE_END

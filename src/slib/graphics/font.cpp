@@ -1,5 +1,4 @@
 #include "../../../inc/slib/graphics/font.h"
-#include "../../../inc/slib/graphics/context.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
@@ -13,7 +12,7 @@ FontDesc::FontDesc()
 
 sl_real _g_graphics_font_default_size = 12;
 
-SLIB_DEFINE_OBJECT(Font, Object)
+SLIB_DEFINE_ROOT_OBJECT(Font)
 
 Font::Font()
 {
@@ -88,16 +87,19 @@ sl_bool Font::isUnderline()
 	return m_desc.flagUnderline;
 }
 
-Size Font::getTextSize(const Ref<GraphicsContext>& context, const String& text)
+Ref<Referable> Font::getPlatformObject()
 {
-	if (context.isNotNull()) {
-		return context->getFontTextSize(this, text);
-	}
+	return m_platformObject;
+}
+
+#if !(defined(SLIB_PLATFORM_IS_APPLE)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
+
+Size Font::getTextSize(const String& text)
+{
 	return Size::zero();
 }
 
-
-SLIB_DEFINE_OBJECT(FontInstance, Object)
+#endif
 
 SLIB_GRAPHICS_NAMESPACE_END
 

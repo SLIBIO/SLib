@@ -48,7 +48,7 @@ public:
 			m_hBrushBackground = NULL;
 		}
 		if (color.a != 0) {
-			m_hBrushBackground = ::CreateSolidBrush(UIPlatform::getColorRef(color));
+			m_hBrushBackground = ::CreateSolidBrush(GraphicsPlatform::getColorRef(color));
 		}
 		::InvalidateRect(handle, NULL, TRUE);
 	}
@@ -99,7 +99,7 @@ public:
 		HBRUSH hbr = m_hBrushBackground;
 		if (hbr) {
 			::SetBkMode(hDC, OPAQUE);
-			::SetBkColor(hDC, UIPlatform::getColorRef(m_colorBackground));
+			::SetBkColor(hDC, GraphicsPlatform::getColorRef(m_colorBackground));
 			result = hbr;
 			return sl_true;
 		} else {
@@ -111,7 +111,7 @@ public:
 	void processPostControlColor(UINT msg, HDC hDC, HBRUSH& result)
 	{
 		Color c = m_colorText;
-		::SetTextColor(hDC, UIPlatform::getColorRef(c));
+		::SetTextColor(hDC, GraphicsPlatform::getColorRef(c));
 	}
 };
 
@@ -161,12 +161,10 @@ public:
 			HWND handle = ret->getHandle();
 			
 			Ref<Font> font = getFont();
-			Ref<FontInstance> fontInstance;
-			HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
+			HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
 			if (hFont) {
 				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 			}
-			_setFontInstance(fontInstance);
 
 			String16 hintText = m_hintText;
 			::SendMessageW(handle, 0x1501 /*EM_SETCUEBANNER*/, FALSE, (LPARAM)(LPCWSTR)(hintText.getData()));
@@ -314,15 +312,13 @@ void EditView::_setTextColor_NW(const Color& color)
 
 void EditView::_setFont_NW(const Ref<Font>& font)
 {
-	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
 	}
-	_setFontInstance(fontInstance);
 }
 
 void EditView::_setBorder_NW(sl_bool flag)

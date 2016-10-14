@@ -24,12 +24,11 @@ public:
 		[handle setAlignment:translateAlignment(m_textAlignment)];
 		[handle setBordered: (isBorder() ? TRUE : FALSE)];
 		[handle setBezeled: (isBorder() ? TRUE : FALSE)];
-		[handle setTextColor:(UIPlatform::getNSColorFromColor(m_textColor))];
-		[handle setBackgroundColor:(UIPlatform::getNSColorFromColor(getBackgroundColor()))];
+		[handle setTextColor:(GraphicsPlatform::getNSColorFromColor(m_textColor))];
+		[handle setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(getBackgroundColor()))];
 		
 		Ref<Font> font = getFont();
-		Ref<FontInstance> fontInstance;
-		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
+		NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
@@ -93,7 +92,7 @@ void LabelView::_setTextColor_NW(const Color& color)
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
 		NSTextField* tv = (NSTextField*)handle;
-		[tv setTextColor:(UIPlatform::getNSColorFromColor(color))];
+		[tv setTextColor:(GraphicsPlatform::getNSColorFromColor(color))];
 	}
 }
 
@@ -102,9 +101,7 @@ void LabelView::_setFont_NW(const Ref<Font>& font)
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
 		NSTextField* tv = (NSTextField*)handle;
-		
-		Ref<FontInstance> fontInstance;
-		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
+		NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
 		if (hFont != nil) {
 			[tv setFont:hFont];
 		}
@@ -125,7 +122,7 @@ void LabelView::_setBackgroundColor_NW(const Color& color)
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
 		NSTextField* tv = (NSTextField*)handle;
-		[tv setBackgroundColor:(UIPlatform::getNSColorFromColor(color))];
+		[tv setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(color))];
 	}
 }
 

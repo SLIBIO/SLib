@@ -132,7 +132,7 @@ public:
 	}
 	
 	// override
-	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc)
+	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param)
 	{
 		Rectangle rectDstWhole = GraphicsUtil::transformRectangle(rectDst, rectSrc, Rectangle(0, 0, getDrawableWidth(), getDrawableHeight()));
 		sl_int32 width = (sl_int32)(rectDstWhole.getWidth());
@@ -140,20 +140,20 @@ public:
 		if (width > 0 && height > 0) {
 			Ref<Image> image = _ImageResource_getImage(m_entries, width, height);
 			if (image.isNotNull()) {
-				canvas->draw(rectDst, image, rectSrc);
+				canvas->draw(rectDst, image, rectSrc, param);
 			}
 		}
 	}
 
 	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst)
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
 	{
 		sl_int32 width = (sl_int32)(rectDst.getWidth());
 		sl_int32 height = (sl_int32)(rectDst.getHeight());
 		if (width > 0 && height > 0) {
 			Ref<Image> image = _ImageResource_getImage(m_entries, width, height);
 			if (image.isNotNull()) {
-				canvas->draw(rectDst, image);
+				canvas->draw(rectDst, image, param);
 			}
 		}
 	}

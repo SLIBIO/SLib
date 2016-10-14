@@ -90,8 +90,6 @@ sl_real Pen::getMiterLimit()
 	return m_desc.miterLimit;
 }
 
-SLIB_DEFINE_OBJECT(PenInstance, Object)
-
 SLIB_GRAPHICS_NAMESPACE_END
 
 

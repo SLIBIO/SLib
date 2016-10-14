@@ -3,9 +3,9 @@
 #if defined(SLIB_PLATFORM_IS_OSX)
 
 #include "../../../inc/slib/ui/menu.h"
-#include "../../../inc/slib/ui/platform.h"
 #include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/app.h"
+#include "../../../inc/slib/ui/platform.h"
 
 @interface _OSX_MenuItemHandle : NSMenuItem
 {
@@ -256,13 +256,13 @@ void _OSX_MenuItem::setChecked(sl_bool flag)
 void _OSX_MenuItem::setIcon(const Ref<Bitmap>& icon)
 {
 	MenuItem::setIcon(icon);
-	m_handle.offStateImage = UIPlatform::getNSImageFromBitmap(icon);
+	m_handle.offStateImage = GraphicsPlatform::createNSImageFromBitmap(icon);
 }
 
 void _OSX_MenuItem::setCheckedIcon(const Ref<Bitmap>& icon)
 {
 	MenuItem::setCheckedIcon(icon);
-	m_handle.onStateImage = UIPlatform::getNSImageFromBitmap(icon);
+	m_handle.onStateImage = GraphicsPlatform::createNSImageFromBitmap(icon);
 	if (m_handle.onStateImage == nil) {
 		m_handle.onStateImage = m_handle->m_defaultCheckedImage;
 	}
@@ -280,7 +280,7 @@ void _OSX_MenuItem::setSubmenu(const Ref<Menu>& menu)
 NSImage* _OSX_MenuItem::_createIcon(const Ref<Bitmap>& iconSrc)
 {
 	if (iconSrc.isNotNull()) {
-		NSImage* icon = UIPlatform::getNSImageFromBitmap(iconSrc);
+		NSImage* icon = GraphicsPlatform::createNSImageFromBitmap(iconSrc);
 		if (icon != nil) {
 			if (icon.size.width > 0 && icon.size.height > 0) {
 				double w = [[NSFont menuFontOfSize:0] pointSize];

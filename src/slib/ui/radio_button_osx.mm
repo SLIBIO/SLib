@@ -24,8 +24,7 @@ Ref<ViewInstance> RadioButton::createNativeWidget(ViewInstance* _parent)
 		[handle setState: (isChecked() ? NSOnState : NSOffState)];
 		
 		Ref<Font> font = getFont();
-		Ref<FontInstance> fontInstance;
-		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
+		NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}

@@ -50,14 +50,13 @@ public:
 		[handle setBordered: (isBorder() ? TRUE : FALSE)];
 		[handle setBezeled: (isBorder() ? TRUE : FALSE)];
 		[[handle cell] setPlaceholderString:(Apple::getNSStringFromString(m_hintText))];
-		[handle setTextColor:(UIPlatform::getNSColorFromColor(m_textColor))];
-		[handle setBackgroundColor:(UIPlatform::getNSColorFromColor(getBackgroundColor()))];
+		[handle setTextColor:(GraphicsPlatform::getNSColorFromColor(m_textColor))];
+		[handle setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(getBackgroundColor()))];
 		[handle setEditable:(m_flagReadOnly?FALSE:TRUE)];
 		[handle setSelectable:TRUE];
 		
 		Ref<Font> font = getFont();
-		Ref<FontInstance> fontInstance;
-		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
+		NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
@@ -69,14 +68,13 @@ public:
 		[tv setString:(Apple::getNSStringFromString(m_text))];
 		[tv setAlignment:translateAlignment(m_textAlignment)];
 		[handle setBorderType:(isBorder() ? NSBezelBorder : NSNoBorder)];
-		[tv setTextColor:(UIPlatform::getNSColorFromColor(m_textColor))];
-		[tv setBackgroundColor:(UIPlatform::getNSColorFromColor(getBackgroundColor()))];
+		[tv setTextColor:(GraphicsPlatform::getNSColorFromColor(m_textColor))];
+		[tv setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(getBackgroundColor()))];
 		[tv setEditable:(m_flagReadOnly?FALSE:TRUE)];
 		[tv setSelectable:TRUE];
 		
 		Ref<Font> font = getFont();
-		Ref<FontInstance> fontInstance;
-		NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
+		NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
 		if (hFont != nil) {
 			[tv setFont:hFont];
 		}
@@ -316,10 +314,10 @@ void EditView::_setTextColor_NW(const Color& color)
 	if (handle != nil) {
 		if ([handle isKindOfClass:[NSTextField class]]) {
 			NSTextField* tv = (NSTextField*)handle;
-			[tv setTextColor:(UIPlatform::getNSColorFromColor(color))];
+			[tv setTextColor:(GraphicsPlatform::getNSColorFromColor(color))];
 		} else if ([handle isKindOfClass:[_Slib_OSX_TextArea class]]) {
 			_Slib_OSX_TextArea* tv = (_Slib_OSX_TextArea*)handle;
-			[tv->textView setTextColor:(UIPlatform::getNSColorFromColor(color))];
+			[tv->textView setTextColor:(GraphicsPlatform::getNSColorFromColor(color))];
 		}
 	}
 }
@@ -330,10 +328,10 @@ void EditView::_setBackgroundColor_NW(const Color& color)
 	if (handle != nil) {
 		if ([handle isKindOfClass:[NSTextField class]]) {
 			NSTextField* tv = (NSTextField*)handle;
-			[tv setBackgroundColor:(UIPlatform::getNSColorFromColor(color))];
+			[tv setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(color))];
 		} else if ([handle isKindOfClass:[_Slib_OSX_TextArea class]]) {
 			_Slib_OSX_TextArea* tv = (_Slib_OSX_TextArea*)handle;
-			[tv->textView setBackgroundColor:(UIPlatform::getNSColorFromColor(color))];
+			[tv->textView setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(color))];
 		}
 	}
 }
@@ -344,15 +342,13 @@ void EditView::_setFont_NW(const Ref<Font>& font)
 	if (handle != nil) {
 		if ([handle isKindOfClass:[NSTextField class]]) {
 			NSTextField* tv = (NSTextField*)handle;
-			Ref<FontInstance> fontInstance;
-			NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
+			NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
 			if (hFont != nil) {
 				[tv setFont:hFont];
 			}
 		} else if ([handle isKindOfClass:[_Slib_OSX_TextArea class]]) {
 			_Slib_OSX_TextArea* tv = (_Slib_OSX_TextArea*)handle;
-			Ref<FontInstance> fontInstance;
-			NSFont* hFont = UIPlatform::getNSFont(font.ptr, fontInstance);
+			NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
 			if (hFont != nil) {
 				[tv->textView setFont:hFont];
 			}

@@ -37,6 +37,20 @@ Matrix3T<T> Transform2T<T>::getTranslationMatrix(const Vector2T<T>& v)
 }
 
 template <class T>
+void Transform2T<T>::translate(Matrix3T<T>& mat, T x, T y)
+{
+	mat.m20 += x;
+	mat.m21 += y;
+}
+
+template <class T>
+void Transform2T<T>::translate(Matrix3T<T>& mat, const Vector2T<T>& v)
+{
+	mat.m20 += v.x;
+	mat.m21 += v.y;
+}
+
+template <class T>
 void Transform2T<T>::setScaling(Matrix3T<T>& _out, T sx, T sy)
 {
 	_out.m00 = sx; _out.m01 = 0; _out.m02 = 0;
@@ -69,6 +83,23 @@ Matrix3T<T> Transform2T<T>::getScalingMatrix(const Vector2T<T>& v)
 }
 
 template <class T>
+void Transform2T<T>::scale(Matrix3T<T>& mat, T sx, T sy)
+{
+	mat.m00 *= sx;
+	mat.m10 *= sx;
+	mat.m20 *= sx;
+	mat.m01 *= sy;
+	mat.m11 *= sy;
+	mat.m21 *= sy;
+}
+
+template <class T>
+void Transform2T<T>::scale(Matrix3T<T>& mat, const Vector2T<T>& v)
+{
+	scale(mat, v.x, v.y);
+}
+
+template <class T>
 void Transform2T<T>::setRotation(Matrix3T<T>& _out, T radians)
 {
 	T c = Math::cos(radians);
@@ -81,12 +112,9 @@ void Transform2T<T>::setRotation(Matrix3T<T>& _out, T radians)
 template <class T>
 void Transform2T<T>::setRotation(Matrix3T<T>& _out, T cx, T cy, T radians)
 {
-	Matrix3T<T> m;
 	setTranslation(_out, -cx, -cy);
-	setRotation(m, radians);
-	_out.multiply(m);
-	setTranslation(m, cx, cy);
-	_out.multiply(m);
+	rotate(_out, radians);
+	translate(_out, cx, cy);
 }
 
 template <class T>
@@ -119,6 +147,39 @@ Matrix3T<T> Transform2T<T>::getRotationMatrix(const Vector2T<T>& pt, T radians)
 	Matrix3T<T> ret;
 	setRotation(ret, pt, radians);
 	return ret;
+}
+
+template <class T>
+void Transform2T<T>::rotate(Matrix3T<T>& mat, T radians)
+{
+	T c = Math::cos(radians);
+	T s = Math::sin(radians);
+	T _m00 = mat.m00 * c - mat.m01 * s;
+	T _m01 = mat.m00 * s + mat.m01 * c;
+	T _m10 = mat.m10 * c - mat.m11 * s;
+	T _m11 = mat.m10 * s + mat.m11 * c;
+	T _m20 = mat.m20 * c - mat.m21 * s;
+	T _m21 = mat.m20 * s + mat.m21 * c;
+	mat.m00 = _m00;
+	mat.m01 = _m01;
+	mat.m10 = _m10;
+	mat.m11 = _m11;
+	mat.m20 = _m20;
+	mat.m21 = _m21;
+}
+
+template <class T>
+void Transform2T<T>::rotate(Matrix3T<T>& mat, T cx, T cy, T radians)
+{
+	translate(mat, -cx, -cy);
+	rotate(mat, radians);
+	translate(mat, cx, cy);
+}
+
+template <class T>
+void Transform2T<T>::rotate(Matrix3T<T>& mat, const Vector2T<T>& pt, T radians)
+{
+	rotate(mat, pt.x, pt.y, radians);
 }
 
 template <class T>

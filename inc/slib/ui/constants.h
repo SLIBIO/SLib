@@ -270,10 +270,35 @@ public:
 
 enum class UIAttachMode
 {
-	NotAttach,
-	AttachAlways,
-	NotAttachInNativeWidget,
-	AttachInNativeWidget
+	NotAttach = 0,
+	AttachAlways = 1,
+	NotAttachInNativeWidget = 2,
+	AttachInNativeWidget = 3
+};
+
+enum class TransitionType
+{
+	None = 0,
+	Push = 1,
+	Slide = 2,
+	Cover = 3,
+	Zoom = 4,
+	Fade = 5
+};
+
+enum class TransitionDirection
+{
+	Left = 0,
+	Top = 1,
+	Right = 2,
+	Bottom = 3
+};
+
+enum class TransitionDuration
+{
+	Normal = 0,
+	Short = 1,
+	Long = 2
 };
 
 SLIB_UI_NAMESPACE_END

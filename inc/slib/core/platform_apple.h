@@ -7,7 +7,6 @@
 
 #include "string.h"
 
-#include <CoreGraphics/CoreGraphics.h>
 #ifdef __OBJC__
 #import <Foundation/Foundation.h>
 #ifdef SLIB_PLATFORM_IS_OSX
@@ -35,13 +34,6 @@ public:
 	
 	static String getFilePathFromNSURL(NSURL* url);
 	
-#if defined(SLIB_PLATFORM_IS_OSX)
-	static NSImage* loadImage(const void* buf, sl_size size);
-#elif defined(SLIB_PLATFORM_IS_IOS)
-	static UIImage* loadImage(const void* buf, sl_size size);
-#endif
-	
-	static CGImageRef loadCGImage(const void* buf, sl_size size);
 #endif
 	
 	static String getAssetFilePath(const String& path);

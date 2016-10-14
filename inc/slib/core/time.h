@@ -366,17 +366,89 @@ public:
 	TimeCounter();
 
 public:
-	void reset();
-
-	void update();
+	Time getTime() const;
+	
+	Time getTime(const Time& current) const;
 
 	sl_uint64 getEllapsedMilliseconds() const;
+	
+	sl_uint64 getEllapsedMilliseconds(const Time& current) const;
 
-	Time getRelative() const;
+	void reset();
+	
+	void reset(const Time& current);
+	
+	void update();
+	
+	void update(const Time& current);
+	
+protected:
+	Time m_timeLast;
+	Time m_timeEllapsed;
+	
+};
+
+
+class SLIB_EXPORT TimeKeeper
+{
+public:
+	TimeKeeper();
+	
+public:
+	void start();
+	
+	void start(const Time& current);
+	
+	void startAndSetTime(const Time& initialTimeValue);
+	
+	void startAndSetTime(const Time& initialTimeValue, const Time& current);
+	
+	void restart();
+	
+	void restart(const Time& current);
+	
+	void restartAndSetTime(const Time& initialTimeValue);
+	
+	void restartAndSetTime(const Time& initialTimeValue, const Time& current);
+
+	void stop();
+	
+	void resume();
+	
+	void resume(const Time& current);
+	
+	void pause();
+	
+	void pause(const Time& current);
+
+	Time getTime() const;
+	
+	Time getTime(const Time& current) const;
+	
+	void setTime(const Time& time);
+	
+	void setTime(const Time& time, const Time& current);
+	
+	void update();
+	
+	void update(const Time& current);
+	
+	sl_bool isStarted() const;
+	
+	sl_bool isStopped() const;
+	
+	sl_bool isRunning() const;
+	
+	sl_bool isNotRunning() const;
+
+	sl_bool isPaused() const;
 
 protected:
-	Time m_timeStart;
-	sl_uint64 m_relStart;
+	sl_bool m_flagStarted;
+	sl_bool m_flagRunning;
+	Time m_timeLast;
+	Time m_timeEllapsed;
+	SpinLock m_lock;
 	
 };
 
@@ -473,6 +545,80 @@ SLIB_INLINE Time& Time::operator=(sl_int64 time)
 SLIB_INLINE Time& Time::operator=(sl_uint64 time)
 {
 	m_time = time;
+	return *this;
+}
+
+SLIB_INLINE sl_bool Time::operator==(const Time& other) const
+{
+	return m_time == other.m_time;
+}
+
+SLIB_INLINE sl_bool Time::operator<=(const Time& other) const
+{
+	return m_time <= other.m_time;
+}
+
+SLIB_INLINE sl_bool Time::operator>=(const Time& other) const
+{
+	return m_time >= other.m_time;
+}
+
+SLIB_INLINE sl_bool Time::operator!=(const Time& other) const
+{
+	return m_time != other.m_time;
+}
+
+SLIB_INLINE sl_bool Time::operator<(const Time& other) const
+{
+	return m_time < other.m_time;
+}
+
+SLIB_INLINE sl_bool Time::operator>(const Time& other) const
+{
+	return m_time > other.m_time;
+}
+
+SLIB_INLINE Time Time::operator+(sl_int64 time) const
+{
+	return m_time + time;
+}
+
+SLIB_INLINE Time Time::operator+(const Time& time) const
+{
+	return m_time + time.m_time;
+}
+
+SLIB_INLINE Time& Time::operator+=(sl_int64 time)
+{
+	m_time += time;
+	return *this;
+}
+
+SLIB_INLINE Time& Time::operator+=(const Time& time)
+{
+	m_time += time.m_time;
+	return *this;
+}
+
+SLIB_INLINE Time Time::operator-(sl_int64 time) const
+{
+	return m_time - time;
+}
+
+SLIB_INLINE Time Time::operator-(const Time& time) const
+{
+	return m_time - time.m_time;
+}
+
+SLIB_INLINE Time& Time::operator-=(sl_int64 time)
+{
+	m_time -= time;
+	return *this;
+}
+
+SLIB_INLINE Time& Time::operator-=(const Time& time)
+{
+	m_time -= time.m_time;
 	return *this;
 }
 

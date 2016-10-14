@@ -1,6 +1,5 @@
 #include "../../../inc/slib/graphics/canvas.h"
 
-#include "../../../inc/slib/graphics/context.h"
 #include "../../../inc/slib/graphics/util.h"
 #include "../../../inc/slib/math/transform2d.h"
 
@@ -8,9 +7,53 @@ SLIB_GRAPHICS_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(Canvas, Object)
 
-Ref<GraphicsContext> Canvas::getGraphicsContext()
+Canvas::Canvas()
 {
-	return m_context;
+	m_time = Time::now();
+}
+
+CanvasType Canvas::getType()
+{
+	return m_type;
+}
+
+void Canvas::setType(CanvasType type)
+{
+	m_type = type;
+}
+
+Time Canvas::getTime()
+{
+	return m_time;
+}
+
+void Canvas::setTime(const Time& time)
+{
+	m_time = time;
+}
+
+Size Canvas::getSize()
+{
+	return m_size;
+}
+
+void Canvas::setSize(const Size& size)
+{
+	m_size = size;
+	m_invalidatedRect.left = 0;
+	m_invalidatedRect.top = 0;
+	m_invalidatedRect.right = size.x;
+	m_invalidatedRect.bottom = size.y;
+}
+
+const Rectangle& Canvas::getInvalidatedRect()
+{
+	return m_invalidatedRect;
+}
+
+void Canvas::setInvalidatedRect(const Rectangle& rect)
+{
+	m_invalidatedRect = rect;
 }
 
 void Canvas::clipToRectangle(sl_real x, sl_real y, sl_real width, sl_real height)
@@ -76,9 +119,8 @@ void Canvas::scale(sl_real sx, sl_real sy)
 
 Size Canvas::getTextSize(const Ref<Font>& font, const String &text)
 {
-	Ref<GraphicsContext> context = m_context;
-	if (context.isNotNull()) {
-		return context->getFontTextSize(font, text);
+	if (font.isNotNull()) {
+		return font->getTextSize(text);
 	}
 	return Size::zero();
 }
@@ -302,133 +344,338 @@ void Canvas::fillPath(const Ref<GraphicsPath>& path, const Color& color)
 	drawPath(path, Ref<Pen>::null(), Brush::createSolidBrush(color));
 }
 
+
+const char _g_globalDefaultDrawParamBuf[sizeof(DrawParam)] = {0};
+const DrawParam& _g_globalDefaultDrawParam = *((const DrawParam*)((void*)_g_globalDefaultDrawParamBuf));
+
+void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param)
+{
+	if (src.isNull()) {
+		return;
+	}
+	if (param.isTransparent()) {
+		return;
+	}
+	if (rectDst.getWidth() < SLIB_EPSILON) {
+		return;
+	}
+	if (rectDst.getHeight() < SLIB_EPSILON) {
+		return;
+	}
+	if (rectSrc.getWidth() < SLIB_EPSILON) {
+		return;
+	}
+	if (rectSrc.getHeight() < SLIB_EPSILON) {
+		return;
+	}
+	onDraw(rectDst, src, rectSrc, param);
+}
+
 void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc)
 {
-	if (src.isNotNull()) {
-		src->onDraw(this, rectDst, rectSrc);
+	if (src.isNull()) {
+		return;
 	}
+	if (rectDst.getWidth() < SLIB_EPSILON) {
+		return;
+	}
+	if (rectDst.getHeight() < SLIB_EPSILON) {
+		return;
+	}
+	if (rectSrc.getWidth() < SLIB_EPSILON) {
+		return;
+	}
+	if (rectSrc.getHeight() < SLIB_EPSILON) {
+		return;
+	}
+	onDraw(rectDst, src, rectSrc, _g_globalDefaultDrawParam);
+}
+
+void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& src, const DrawParam& param)
+{
+	if (src.isNull()) {
+		return;
+	}
+	if (param.isTransparent()) {
+		return;
+	}
+	if (rectDst.getWidth() < SLIB_EPSILON) {
+		return;
+	}
+	if (rectDst.getHeight() < SLIB_EPSILON) {
+		return;
+	}
+	sl_real sw = src->getDrawableWidth();
+	if (sw < SLIB_EPSILON) {
+		return;
+	}
+	sl_real sh = src->getDrawableHeight();
+	if (sh < SLIB_EPSILON) {
+		return;
+	}
+	onDrawAll(rectDst, src, param);
 }
 
 void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& src)
 {
-	if (src.isNotNull()) {
-		Rectangle rectSrc(0, 0, src->getDrawableWidth(), src->getDrawableHeight());
-		src->onDraw(this, rectDst, rectSrc);
+	if (src.isNull()) {
+		return;
 	}
+	if (rectDst.getWidth() < SLIB_EPSILON) {
+		return;
+	}
+	if (rectDst.getHeight() < SLIB_EPSILON) {
+		return;
+	}
+	sl_real sw = src->getDrawableWidth();
+	if (sw < SLIB_EPSILON) {
+		return;
+	}
+	sl_real sh = src->getDrawableHeight();
+	if (sh < SLIB_EPSILON) {
+		return;
+	}
+	onDrawAll(rectDst, src, _g_globalDefaultDrawParam);
 }
 
-void Canvas::draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst
-					  , const Ref<Drawable>& src, sl_real xSrc, sl_real ySrc, sl_real widthSrc, sl_real heightSrc)
+void Canvas::draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst, const Ref<Drawable>& src, sl_real xSrc, sl_real ySrc, sl_real widthSrc, sl_real heightSrc, const DrawParam& param)
 {
-	if (src.isNotNull()) {
-		Rectangle rectDst(xDst, yDst, xDst + widthDst, yDst + heightDst);
-		Rectangle rectSrc(xSrc, ySrc, xSrc + widthSrc, ySrc + heightSrc);
-		src->onDraw(this, rectDst, rectSrc);
+	if (src.isNull()) {
+		return;
 	}
+	if (param.isTransparent()) {
+		return;
+	}
+	if (widthDst < SLIB_EPSILON) {
+		return;
+	}
+	if (heightDst < SLIB_EPSILON) {
+		return;
+	}
+	if (widthSrc < SLIB_EPSILON) {
+		return;
+	}
+	if (widthSrc < SLIB_EPSILON) {
+		return;
+	}
+	Rectangle rectDst(xDst, yDst, xDst + widthDst, yDst + heightDst);
+	Rectangle rectSrc(xSrc, ySrc, xSrc + widthSrc, ySrc + heightSrc);
+	onDraw(rectDst, src, rectSrc, param);
+}
+
+void Canvas::draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst, const Ref<Drawable>& src, sl_real xSrc, sl_real ySrc, sl_real widthSrc, sl_real heightSrc)
+{
+	if (src.isNull()) {
+		return;
+	}
+	if (widthDst < SLIB_EPSILON) {
+		return;
+	}
+	if (heightDst < SLIB_EPSILON) {
+		return;
+	}
+	if (widthSrc < SLIB_EPSILON) {
+		return;
+	}
+	if (widthSrc < SLIB_EPSILON) {
+		return;
+	}
+	Rectangle rectDst(xDst, yDst, xDst + widthDst, yDst + heightDst);
+	Rectangle rectSrc(xSrc, ySrc, xSrc + widthSrc, ySrc + heightSrc);
+	onDraw(rectDst, src, rectSrc, _g_globalDefaultDrawParam);
+}
+
+void Canvas::draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst, const Ref<Drawable>& src, const DrawParam& param)
+{
+	if (src.isNull()) {
+		return;
+	}
+	if (param.isTransparent()) {
+		return;
+	}
+	if (widthDst < SLIB_EPSILON) {
+		return;
+	}
+	if (heightDst < SLIB_EPSILON) {
+		return;
+	}
+	sl_real sw = src->getDrawableWidth();
+	if (sw < SLIB_EPSILON) {
+		return;
+	}
+	sl_real sh = src->getDrawableHeight();
+	if (sh < SLIB_EPSILON) {
+		return;
+	}
+	Rectangle rectDst(xDst, yDst, xDst + widthDst, yDst + heightDst);
+	onDrawAll(rectDst, src, param);
 }
 
 void Canvas::draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst, const Ref<Drawable>& src)
 {
-	if (src.isNotNull()) {
-		Rectangle rectDst(xDst, yDst, xDst + widthDst, yDst + heightDst);
-		Rectangle rectSrc(0, 0, src->getDrawableWidth(), src->getDrawableHeight());
-		src->onDraw(this, rectDst, rectSrc);
+	if (src.isNull()) {
+		return;
 	}
+	if (widthDst < SLIB_EPSILON) {
+		return;
+	}
+	if (heightDst < SLIB_EPSILON) {
+		return;
+	}
+	sl_real sw = src->getDrawableWidth();
+	if (sw < SLIB_EPSILON) {
+		return;
+	}
+	sl_real sh = src->getDrawableHeight();
+	if (sh < SLIB_EPSILON) {
+		return;
+	}
+	Rectangle rectDst(xDst, yDst, xDst + widthDst, yDst + heightDst);
+	onDrawAll(rectDst, src, _g_globalDefaultDrawParam);
+}
+
+void Canvas::draw(sl_real xDst, sl_real yDst, const Ref<Drawable>& src, const DrawParam& param)
+{
+	if (src.isNull()) {
+		return;
+	}
+	if (param.isTransparent()) {
+		return;
+	}
+	sl_real sw = src->getDrawableWidth();
+	if (sw < SLIB_EPSILON) {
+		return;
+	}
+	sl_real sh = src->getDrawableHeight();
+	if (sh < SLIB_EPSILON) {
+		return;
+	}
+	Rectangle rectDst(xDst, yDst, xDst + sw, yDst + sh);
+	onDrawAll(rectDst, src, param);
 }
 
 void Canvas::draw(sl_real xDst, sl_real yDst, const Ref<Drawable>& src)
 {
-	if (src.isNotNull()) {
-		sl_real w = src->getDrawableWidth();
-		sl_real h = src->getDrawableHeight();
-		Rectangle rectDst(xDst, yDst, xDst + w, yDst + h);
-		Rectangle rectSrc(0, 0, w, h);
-		src->onDraw(this, rectDst, rectSrc);
+	if (src.isNull()) {
+		return;
 	}
+	sl_real sw = src->getDrawableWidth();
+	if (sw < SLIB_EPSILON) {
+		return;
+	}
+	sl_real sh = src->getDrawableHeight();
+	if (sh < SLIB_EPSILON) {
+		return;
+	}
+	Rectangle rectDst(xDst, yDst, xDst + sw, yDst + sh);
+	onDrawAll(rectDst, src, _g_globalDefaultDrawParam);
+}
+
+void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleMode scaleMode, Alignment alignment, const DrawParam& param)
+{
+	if (source.isNull()) {
+		return;
+	}
+	if (param.isTransparent()) {
+		return;
+	}
+	sl_real dw = rectDst.getWidth();
+	if (dw < SLIB_EPSILON) {
+		return;
+	}
+	sl_real dh = rectDst.getHeight();
+	if (dh < SLIB_EPSILON) {
+		return;
+	}
+	sl_real sw = source->getDrawableWidth();
+	if (sw < SLIB_EPSILON) {
+		return;
+	}
+	sl_real sh = source->getDrawableHeight();
+	if (sh < SLIB_EPSILON) {
+		return;
+	}
+	
+	switch (scaleMode) {
+		case ScaleMode::None:
+			{
+				Point pt = GraphicsUtil::calculateAlignPosition(rectDst, sw, sh, alignment);
+				Rectangle rectDraw;
+				rectDraw.left = pt.x;
+				rectDraw.top = pt.y;
+				rectDraw.right = rectDraw.left + sw;
+				rectDraw.bottom = rectDraw.top + sh;
+				onDrawAll(rectDraw, source, param);
+				break;
+			}
+		case ScaleMode::Stretch:
+			{
+				onDrawAll(rectDst, source, param);
+				break;
+			}
+		case ScaleMode::Contain:
+			{
+				sl_real fw = dw / sw;
+				sl_real fh = dh / sh;
+				sl_real tw, th;
+				if (fw > fh) {
+					th = dh;
+					tw = sw * fh;
+				} else {
+					tw = dw;
+					th = sh * fw;
+				}
+				Point pt = GraphicsUtil::calculateAlignPosition(rectDst, tw, th, alignment);
+				Rectangle rectDraw;
+				rectDraw.left = pt.x;
+				rectDraw.top = pt.y;
+				rectDraw.right = rectDraw.left + tw;
+				rectDraw.bottom = rectDraw.top + th;
+				onDrawAll(rectDraw, source, param);
+				break;
+			}
+		case ScaleMode::Cover:
+			{
+				sl_real fw = sw / dw;
+				sl_real fh = sh / dh;
+				sl_real tw, th;
+				if (fw > fh) {
+					th = sh;
+					tw = dw * fh;
+				} else {
+					tw = sw;
+					th = dh * fw;
+				}
+				Rectangle rectSrc;
+				rectSrc.left = 0;
+				rectSrc.top = 0;
+				rectSrc.right = sw;
+				rectSrc.bottom = sh;
+				Point pt = GraphicsUtil::calculateAlignPosition(rectSrc, tw, th, alignment);
+				rectSrc.left = pt.x;
+				rectSrc.top = pt.y;
+				rectSrc.right = rectSrc.left + tw;
+				rectSrc.bottom = rectSrc.top + th;
+				onDraw(rectDst, source, rectSrc, param);
+				break;
+			}
+	}
+
 }
 
 void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& source, ScaleMode scaleMode, Alignment alignment)
 {
-	if (scaleMode == ScaleMode::Stretch) {
-		draw(rectDst, source);
-		return;
-	}
-	Canvas* canvas = this;
-	if (source.isNotNull()) {
-		sl_real dw = rectDst.getWidth();
-		sl_real dh = rectDst.getHeight();
-		sl_real sw = source->getDrawableWidth();
-		sl_real sh = source->getDrawableHeight();
-		if (dw > SLIB_EPSILON && dh > SLIB_EPSILON && sw > SLIB_EPSILON && sh > SLIB_EPSILON) {
-			Rectangle rectSrc;
-			Rectangle rectDraw;
-			switch (scaleMode) {
-				case ScaleMode::None:
-					{
-						rectSrc.left = 0;
-						rectSrc.top = 0;
-						rectSrc.right = sw;
-						rectSrc.bottom = sh;
-						Point pt = GraphicsUtil::calculateAlignPosition(rectDst, sw, sh, alignment);
-						rectDraw.left = pt.x;
-						rectDraw.top = pt.y;
-						rectDraw.right = rectDraw.left + sw;
-						rectDraw.bottom = rectDraw.top + sh;
-						break;
-					}
-				case ScaleMode::Stretch:
-					return;
-				case ScaleMode::Contain:
-					{
-						sl_real fw = dw / sw;
-						sl_real fh = dh / sh;
-						sl_real tw, th;
-						if (fw > fh) {
-							th = dh;
-							tw = sw * fh;
-						} else {
-							tw = dw;
-							th = sh * fw;
-						}
-						rectSrc.left = 0;
-						rectSrc.top = 0;
-						rectSrc.right = sw;
-						rectSrc.bottom = sh;
-						Point pt = GraphicsUtil::calculateAlignPosition(rectDst, tw, th, alignment);
-						rectDraw.left = pt.x;
-						rectDraw.top = pt.y;
-						rectDraw.right = rectDraw.left + tw;
-						rectDraw.bottom = rectDraw.top + th;
-						break;
-					}
-				case ScaleMode::Cover:
-					{
-						sl_real fw = sw / dw;
-						sl_real fh = sh / dh;
-						sl_real tw, th;
-						if (fw > fh) {
-							th = sh;
-							tw = dw * fh;
-						} else {
-							tw = sw;
-							th = dh * fw;
-						}
-						rectSrc.left = 0;
-						rectSrc.top = 0;
-						rectSrc.right = sw;
-						rectSrc.bottom = sh;
-						Point pt = GraphicsUtil::calculateAlignPosition(rectSrc, tw, th, alignment);
-						rectSrc.left = pt.x;
-						rectSrc.top = pt.y;
-						rectSrc.right = rectSrc.left + tw;
-						rectSrc.bottom = rectSrc.top + th;
-						rectDraw = rectDst;
-						break;
-					}
-			}
-			canvas->draw(rectDraw, source, rectSrc);
-		}
-	}
+	draw(rectDst, source, scaleMode, alignment, _g_globalDefaultDrawParam);
+}
+
+void Canvas::onDraw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param)
+{
+	src->onDraw(this, rectDst, rectSrc, param);
+}
+
+void Canvas::onDrawAll(const Rectangle& rectDst, const Ref<Drawable>& src, const DrawParam& param)
+{
+	src->onDrawAll(this, rectDst, param);
 }
 
 CanvasStatusScope::CanvasStatusScope()

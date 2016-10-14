@@ -29,9 +29,17 @@ void RenderView::requestRender()
 {
 	if (isNativeWidget()) {
 		_requestRender_NW();
-	} else {
-		invalidate();
 	}
+}
+
+void RenderView::invalidate()
+{
+	requestRender();
+}
+
+void RenderView::invalidate(const UIRect& rect)
+{
+	requestRender();
 }
 
 void RenderView::onFrame(RenderEngine* engine)

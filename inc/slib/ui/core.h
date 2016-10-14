@@ -7,7 +7,6 @@
 
 #include "../core/string.h"
 #include "../core/thread.h"
-#include "../graphics/context.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -37,44 +36,6 @@ public:
 	
 	static void setDefaultScrollBarWidth(sl_ui_len width);
 	
-	
-	static Size getFontTextSize(const Ref<Font>& font, const String& text);
-	
-	static Rectangle getPathBounds(const Ref<GraphicsPath>& path);
-	
-	static sl_bool checkPointInPath(const Ref<GraphicsPath>& path, const Point& pt);
-	
-	static Ref<Drawable> createDrawableFromImage(const ImageDesc& desc);
-	
-	static Ref<Drawable> loadDrawableFromMemory(const void* mem, sl_size size);
-	
-	static Ref<Bitmap> createBitmap(sl_uint32 width, sl_uint32 height);
-	
-	static Ref<Drawable> createDrawableFromBitmap(const Ref<Bitmap>& bitmap);
-	
-	static Ref<Bitmap> loadBitmapFromMemory(const void* mem, sl_size size);
-
-	static Ref<GraphicsContext> getGraphicsContext();
-	
-	static Ref<Drawable> createDrawableFromImage(const Ref<Image>& image);
-	
-	static Ref<Drawable> loadDrawableFromMemory(const Memory& mem);
-	
-	static Ref<Drawable> loadDrawableFromFile(const String& filePath);
-	
-	static Ref<Drawable> loadDrawableFromAsset(const String& path);
-	
-	static Ref<Bitmap> createBitmapFromImage(const ImageDesc& desc);
-	
-	static Ref<Bitmap> createBitmapFromImage(const Ref<Image>& image);
-	
-	static Ref<Bitmap> loadBitmapFromMemory(const Memory& mem);
-	
-	static Ref<Bitmap> loadBitmapFromFile(const String& filePath);
-	
-	static Ref<Bitmap> loadBitmapFromAsset(const String& path);
-
-
 	// Screens
 	static List< Ref<Screen> > getScreens();
 	

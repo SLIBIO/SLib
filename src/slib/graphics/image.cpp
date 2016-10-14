@@ -101,7 +101,7 @@ Ref<Image> Image::create(const BitmapData& bitmapData)
 	return ret;
 }
 
-Ref<Image> Image::createFromBitmap(const Ref<Bitmap>& bitmap, sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
+Ref<Image> Image::create(const Ref<Bitmap>& bitmap, sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
 {
 	Ref<Image> ret;
 	if (bitmap.isNull()) {
@@ -137,7 +137,7 @@ Ref<Image> Image::createFromBitmap(const Ref<Bitmap>& bitmap, sl_uint32 x, sl_ui
 	return ret;
 }
 
-Ref<Image> Image::createFromBitmap(const Ref<Bitmap>& bitmap)
+Ref<Image> Image::create(const Ref<Bitmap>& bitmap)
 {
 	Ref<Image> ret;
 	if (bitmap.isNull()) {
@@ -556,5 +556,33 @@ Ref<Image> Image::loadFromAsset(const String& path, sl_uint32 width, sl_uint32 h
 	return ret;
 }
 
-SLIB_GRAPHICS_NAMESPACE_END
+Ref<Drawable> Image::getDrawableCache()
+{
+	Ref<Drawable> drawableCached = m_drawableCached;
+	if (drawableCached.isNotNull()) {
+		return drawableCached;
+	}
+	drawableCached = PlatformDrawable::create(this);
+	if (drawableCached.isNotNull()) {
+		m_drawableCached = drawableCached;
+	}
+	return drawableCached;
+}
 
+void Image::onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param)
+{
+	Ref<Drawable> drawableCached = getDrawableCache();
+	if (drawableCached.isNotNull()) {
+		drawableCached->onDraw(canvas, rectDst, rectSrc, param);
+	}
+}
+
+void Image::onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
+{
+	Ref<Drawable> drawableCached = getDrawableCache();
+	if (drawableCached.isNotNull()) {
+		drawableCached->onDrawAll(canvas, rectDst, param);
+	}
+}
+
+SLIB_GRAPHICS_NAMESPACE_END

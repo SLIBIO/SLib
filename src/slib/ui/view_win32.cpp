@@ -14,6 +14,12 @@ SLIB_UI_NAMESPACE_BEGIN
 
 class _View : public View
 {
+public:
+	SLIB_INLINE CList< Ref<View> >& _getChildren()
+	{
+		return View::_getChildren();
+	}
+
 	friend class Win32_ViewInstance;
 };
 
@@ -51,6 +57,13 @@ HWND Win32_ViewInstance::createHandle(
 		if (view->isVisible()) {
 			style |= WS_VISIBLE;
 		}
+
+		Vector2 t;
+		if (view->getFinalTranslationRotationScale(&t, NULL, NULL, NULL)) {
+			frame.left += (sl_ui_pos)(t.x);
+			frame.top += (sl_ui_pos)(t.y);
+		}
+
 		HWND hWnd = ::CreateWindowExW(
 			styleEx // ex-style
 			, wndClass
@@ -151,6 +164,10 @@ void Win32_ViewInstance::setFrame(const UIRect& frame)
 	}
 }
 
+void Win32_ViewInstance::setTransform(const Matrix3 &transform)
+{
+}
+
 void Win32_ViewInstance::setVisible(sl_bool flag)
 {
 	HWND hWnd = m_handle;
@@ -183,6 +200,11 @@ void Win32_ViewInstance::setEnabled(sl_bool flag)
 
 void Win32_ViewInstance::setOpaque(sl_bool flag)
 {
+}
+
+void Win32_ViewInstance::setAlpha(sl_real alpha)
+{
+	::InvalidateRect(m_handle, NULL, TRUE);
 }
 
 UIPointf Win32_ViewInstance::convertCoordinateFromScreenToView(const UIPointf& ptScreen)
@@ -231,6 +253,14 @@ void Win32_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
 	HWND hWnd = child->getHandle();
 	if (hWnd) {
 		::SetParent(hWnd, HWND_MESSAGE);
+	}
+}
+
+void Win32_ViewInstance::bringToFront()
+{
+	HWND hWnd = m_handle;
+	if (hWnd) {
+		::BringWindowToTop(hWnd);
 	}
 }
 
@@ -359,42 +389,6 @@ sl_bool Win32_ViewInstance::preprocessWindowMessage(MSG& msg)
 	return sl_false;
 }
 
-static void _Win32_DrawView(Canvas* canvas, View* view, sl_bool flagErased)
-{
-	Color colorClear = Color::zero();
-	do {
-		if (view->isDoubleBuffering()) {
-			break;
-		}
-		if (view->isOpaque()) {
-			break;
-		}
-		Color color = view->getBackgroundColor();
-		if (color.a == 255) {
-			break;
-		}
-
-		Ref<Window> window = view->getWindow();
-		if (window.isNotNull() && window->getContentView() == view) {
-			colorClear = window->getBackgroundColor();
-			if (colorClear.a < 255) {
-				Color c = UIPlatform::getColorFromColorRef(::GetSysColor(COLOR_MENU));
-				c.blend_PA_NPA(colorClear);
-				colorClear = c;
-			}
-			break;
-		} else {
-			if (!flagErased) {
-				colorClear = UIPlatform::getColorFromColorRef(::GetSysColor(COLOR_MENU));
-			}
-		}
-	} while (0);
-	if (colorClear.isNotZero()) {
-		canvas->fillRectangle(view->getBounds(), colorClear);
-	}
-	view->dispatchDraw(canvas);
-}
-
 class _Win32_Draw_BackBuffer
 {
 public:
@@ -423,7 +417,7 @@ public:
 		if (bitmapBuffer.isNull() || canvasBuffer.isNull() || bitmapBuffer->getWidth() < width || bitmapBuffer->getHeight() < height) {
 			bitmap = sl_null;
 			graphics = sl_null;
-			bitmapBuffer = UI::createBitmap((width + 255) & 0xFFFFFF00, (height + 255) & 0xFFFFFF00);
+			bitmapBuffer = Bitmap::create((width + 255) & 0xFFFFFF00, (height + 255) & 0xFFFFFF00);
 			if (bitmapBuffer.isNull()) {
 				return;
 			}
@@ -431,63 +425,100 @@ public:
 			if (canvasBuffer.isNull()) {
 				return;
 			}
-			bitmap = UIPlatform::getBitmapHandle(bitmapBuffer.ptr);
-			graphics = UIPlatform::getCanvasHandle(canvasBuffer.ptr);
+			bitmap = GraphicsPlatform::getBitmapHandle(bitmapBuffer.ptr);
+			graphics = GraphicsPlatform::getCanvasHandle(canvasBuffer.ptr);
 		}
 	}
 
 };
 
-static void _Win32_DrawViewInBackbuffer(Gdiplus::Graphics* graphics, View* view, RECT& rcPaint)
+static sl_size _Win32_getSelfInvalidatableRects(View* view, UIRect bounds, UIRect* outRects, sl_size countRectsBuf)
 {
-	Color backgroundColor = view->getBackgroundColor();
-	sl_bool flagOpaque = sl_false;
-	if (view->isOpaque()) {
-		flagOpaque = sl_true;
-	} else if (view->isDoubleBuffering()) {
-		flagOpaque = sl_true;
-	} else if (backgroundColor.a == 255) {
-		flagOpaque = sl_true;
+	if (!countRectsBuf) {
+		return 0;
 	}
-	sl_bool flagDrawParent = sl_false;
-	Ref<View> parent = view->getParent();
-	if (parent.isNotNull()) {
-		if (parent->isInstance() && !(parent->isNativeWidget())) {
-			RECT rcParent;
-			int x = (int)(view->getLeft());
-			int y = (int)(view->getTop());
-			rcParent.left = rcPaint.left + x;
-			if (rcParent.left < 0) {
-				rcParent.left = 0;
+	sl_size count = 0;
+	ListLocker< Ref<View> > children(((_View*)view)->_getChildren());
+	for (sl_size i = 0; i < children.count; i++) {
+		Ref<View>& child = children[i];
+		if (child.isNotNull()) {
+			if (child->isVisible() && child->getWidth() > 0 && child->getHeight() > 0) {
+				if (child->checkSelfInvalidatable()) {
+					UIRect rect = child->getFrame();
+					if (rect.intersectRectangle(bounds, &rect)) {
+						*outRects = rect;
+						outRects++;
+						count++;
+						countRectsBuf--;
+						if (!countRectsBuf) {
+							return count;
+						}
+					}
+				} else {
+					sl_ui_pos x = child->getLeft();
+					sl_ui_pos y = child->getTop();
+					sl_size n = _Win32_getSelfInvalidatableRects(child.ptr, child->getBounds(), outRects, countRectsBuf);
+					sl_size m = 0;
+					for (sl_size k = 0; k < n; k++) {
+						outRects[k].left += x;
+						outRects[k].top += y;
+						outRects[k].right += x;
+						outRects[k].bottom += y;
+						if (outRects[k].intersectRectangle(bounds, &outRects[m])) {
+							m++;
+						}
+					}
+					count += m;
+					outRects += m;
+					countRectsBuf -= m;
+				}
 			}
-			rcParent.top = rcPaint.top + y;
-			if (rcParent.top < 0) {
-				rcParent.top = 0;
-			}
-			rcParent.right = rcPaint.right + x;
-			int width = (int)(parent->getWidth());
-			if (rcParent.right > width) {
-				rcParent.right = width;
-			}
-			rcParent.bottom = rcPaint.bottom + y;
-			int height = (int)(parent->getHeight());
-			if (rcParent.bottom > height) {
-				rcParent.bottom = height;
-			}
-			if (rcParent.right > rcParent.left && rcParent.bottom > rcParent.top) {
-				_Win32_DrawViewInBackbuffer(graphics, parent.ptr, rcParent);
-			}
-			flagDrawParent = sl_true;
 		}
 	}
+	return count;
+}
+
+static void _Win32_DrawView(Canvas* canvas, View* view)
+{
+	Color colorClear = Color::zero();
+	do {
+		if (view->isOpaque()) {
+			break;
+		}
+		Color color = view->getBackgroundColor();
+		if (color.a == 255) {
+			break;
+		}
+
+		Ref<Window> window = view->getWindow();
+		if (window.isNotNull() && window->getContentView() == view) {
+			colorClear = window->getBackgroundColor();
+			if (colorClear.a < 255) {
+				Color c = GraphicsPlatform::getColorFromColorRef(::GetSysColor(COLOR_MENU));
+				c.blend_PA_NPA(colorClear);
+				colorClear = c;
+			}
+			break;
+		} else {
+			colorClear = GraphicsPlatform::getColorFromColorRef(::GetSysColor(COLOR_MENU));
+		}
+	} while (0);
+	if (colorClear.isNotZero()) {
+		canvas->fillRectangle(view->getBounds(), colorClear);
+	}
+	view->dispatchDraw(canvas);
+}
+
+static void _Win32_DrawViewRegion(Gdiplus::Graphics* graphics, View* view, RECT& rcPaint)
+{
 	sl_uint32 widthRedraw = (sl_uint32)(rcPaint.right - rcPaint.left);
 	sl_uint32 heightRedraw = (sl_uint32)(rcPaint.bottom - rcPaint.top);
-	Ref<Canvas> canvas = UIPlatform::createCanvas(graphics, widthRedraw, heightRedraw, sl_null, sl_false);
+	Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::Bitmap, graphics, widthRedraw, heightRedraw, sl_false);
 	if (canvas.isNotNull()) {
 		CanvasStatusScope scope(canvas);
-		canvas->clipToRectangle(0, 0, (sl_real)(widthRedraw), (sl_real)(heightRedraw));
 		canvas->translate(-(sl_real)(rcPaint.left), -(sl_real)(rcPaint.top));
-		_Win32_DrawView(canvas.ptr, view, flagDrawParent);
+		canvas->setInvalidatedRect(Rectangle((sl_real)(rcPaint.left), (sl_real)(rcPaint.top), (sl_real)(rcPaint.right), (sl_real)(rcPaint.bottom)));
+		_Win32_DrawView(canvas.ptr, view);
 	}
 }
 
@@ -508,33 +539,39 @@ sl_bool Win32_ViewInstance::processWindowMessage(UINT msg, WPARAM wParam, LPARAM
 				if (hDC) {
 					if (ps.rcPaint.right > ps.rcPaint.left && ps.rcPaint.bottom > ps.rcPaint.top) {
 						Ref<View> view = getView();
-						if (view.isNotNull()) {
-							Gdiplus::Graphics* _graphics = new Gdiplus::Graphics(hDC);
-							if (_graphics) {
+						if (view.isNotNull() && view->checkSelfInvalidatable()) {
+							Gdiplus::Graphics graphics(hDC);
 #if defined(USE_SCREEN_BACK_BUFFER)
-								sl_uint32 widthRedraw = (sl_uint32)(ps.rcPaint.right - ps.rcPaint.left);
-								sl_uint32 heightRedraw = (sl_uint32)(ps.rcPaint.bottom - ps.rcPaint.top);
-								SLIB_SAFE_STATIC(_Win32_Draw_BackBuffer, bb)
-								if (!(SLIB_SAFE_STATIC_CHECK_FREED(bb))) {
-									MutexLocker lock(&(bb.mutex));
-									bb.allocateBackBuffer(widthRedraw, heightRedraw);
-									if (bb.bitmap && bb.graphics) {
-										_Win32_DrawViewInBackbuffer(bb.graphics, view.ptr, ps.rcPaint);
-										_graphics->DrawImage(bb.bitmap, Gdiplus::Rect(ps.rcPaint.left, ps.rcPaint.top, widthRedraw, heightRedraw), 0, 0, widthRedraw, heightRedraw, Gdiplus::UnitPixel);
+							sl_uint32 widthRedraw = (sl_uint32)(ps.rcPaint.right - ps.rcPaint.left);
+							sl_uint32 heightRedraw = (sl_uint32)(ps.rcPaint.bottom - ps.rcPaint.top);
+							SLIB_SAFE_STATIC(_Win32_Draw_BackBuffer, bb)
+							if (!(SLIB_SAFE_STATIC_CHECK_FREED(bb))) {
+								MutexLocker lock(&(bb.mutex));
+								bb.allocateBackBuffer(widthRedraw, heightRedraw);
+								if (bb.bitmap && bb.graphics) {
+									_Win32_DrawViewRegion(bb.graphics, view.ptr, ps.rcPaint);
+									Gdiplus::Rect rcPaint(ps.rcPaint.left, ps.rcPaint.top, widthRedraw, heightRedraw);
+									Gdiplus::Region region(rcPaint);
+									static UIRect rectsExclude[128];
+									sl_size n = _Win32_getSelfInvalidatableRects(view.ptr, UIRect(ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right, ps.rcPaint.bottom), rectsExclude, 128);
+									if (n > 0) {
+										for (sl_size i = 0; i < n; i++) {
+											region.Exclude(Gdiplus::Rect(rectsExclude[i].left, rectsExclude[i].top, rectsExclude[i].getWidth(), rectsExclude[i].getHeight()));
+										}
+										graphics.IntersectClip(&region);
 									}
+									graphics.DrawImage(bb.bitmap, rcPaint, 0, 0, widthRedraw, heightRedraw, Gdiplus::UnitPixel);
 								}
-
-#else
-								RECT rect;
-								::GetClientRect(hWnd, &rect);
-								Rectangle rcDirty((sl_real)(ps.rcPaint.left), (sl_real)(ps.rcPaint.top), (sl_real)(ps.rcPaint.right), (sl_real)(ps.rcPaint.bottom));
-								Ref<Canvas> graphics = UIPlatform::createCanvas(_graphics, rect.right, rect.bottom, &rcDirty);
-								if (graphics.isNotNull()) {
-									_graphics->SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
-									_Win32_DrawView(graphics.ptr, view.ptr, sl_false);
-								}
-#endif
 							}
+#else
+							RECT rect;
+							::GetClientRect(hWnd, &rect);
+							Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, &graphics, rect.right, rect.bottom, sl_false);
+							if (canvas.isNotNull()) {
+								canvas->setInvalidatedRect(Rectangle((sl_real)(ps.rcPaint.left), (sl_real)(ps.rcPaint.top), (sl_real)(ps.rcPaint.right), (sl_real)(ps.rcPaint.bottom)));
+								_Win32_DrawView(canvas.ptr, view.ptr);
+							}
+#endif
 						}
 					}
 					::EndPaint(hWnd, &ps);
@@ -833,16 +870,67 @@ Ref<ViewInstance> View::createGenericInstance(ViewInstance* parent)
 	DWORD style = 0;
 	if (m_flagCreatingChildInstances) {
 		styleEx = WS_EX_CONTROLPARENT;
-#if defined(_SLIB_UI_WIN32_USE_COMPOSITE_VIEWS)
-		styleEx |= WS_EX_COMPOSITED;
-#endif
-#if defined(_SLIB_UI_WIN32_USE_CLIP_CHILDREN)
-		//style |= WS_CLIPSIBLINGS;
-		style |= WS_CLIPCHILDREN;
-#endif
 	}
 	Ref<Win32_ViewInstance> ret = Win32_ViewInstance::create<Win32_ViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
 	return ret;
+}
+
+void View::_setFrame_NI(const UIRect& frame)
+{
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		if (instance->isWindowContent()) {
+			return;
+		}
+		HWND hWnd = UIPlatform::getViewHandle(instance.ptr);
+		if (hWnd) {
+			UINT uFlags = SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE
+				| SWP_NOCOPYBITS
+				| SWP_ASYNCWINDOWPOS
+				;
+			int x = frame.left;
+			int y = frame.top;
+			Vector2 t;
+			if (getFinalTranslationRotationScale(&t, NULL, NULL, NULL)) {
+				x += (int)(t.x);
+				y += (int)(t.y);
+			}
+			::SetWindowPos(hWnd, NULL
+				, x, y
+				, (int)(frame.getWidth()), (int)(frame.getHeight())
+				, uFlags
+			);
+		}
+	}
+}
+
+void View::_setTransform_NI(const Matrix3& matrix)
+{
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		if (instance->isWindowContent()) {
+			return;
+		}
+		HWND hWnd = UIPlatform::getViewHandle(instance.ptr);
+		if (hWnd) {
+			UINT uFlags = SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOSIZE
+				| SWP_NOCOPYBITS
+				| SWP_ASYNCWINDOWPOS
+				;
+			int x = (int)(m_frame.left);
+			int y = (int)(m_frame.top);
+			Vector2 t;
+			if (getFinalTranslationRotationScale(&t, NULL, NULL, NULL)) {
+				x += (int)(t.x);
+				y += (int)(t.y);
+			}
+			::SetWindowPos(hWnd, NULL
+				, x, y
+				, 0, 0
+				, uFlags
+			);
+		}
+	}
 }
 
 /******************************************

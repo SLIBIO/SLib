@@ -24,7 +24,7 @@ public:
 	
 };
 
-class SLIB_EXPORT TabView : public View
+class SLIB_EXPORT TabView : public ViewGroup
 {
 	SLIB_DECLARE_OBJECT
 	

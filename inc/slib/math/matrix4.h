@@ -41,6 +41,11 @@ public:
 
 	static const Matrix4T<T>& identity();
 	
+	static const Matrix4T<T>& fromArray(const T arr[16]);
+	
+	static Matrix4T<T>& fromArray(T arr[16]);
+
+	
 	Vector4T<T> getRow0() const;
 	
 	void setRow0(const Vector4T<T>& v);
@@ -203,6 +208,18 @@ template <class T>
 SLIB_INLINE const Matrix4T<T>& Matrix4T<T>::identity()
 {
 	return *((Matrix4T<T>*)((void*)(_identity)));
+}
+
+template <class T>
+SLIB_INLINE const Matrix4T<T>& Matrix4T<T>::fromArray(const T *arr)
+{
+	return *((Matrix4T<T>*)((void*)(arr)));
+}
+
+template <class T>
+SLIB_INLINE Matrix4T<T>& Matrix4T<T>::fromArray(T *arr)
+{
+	return *((Matrix4T<T>*)((void*)(arr)));
 }
 
 template <class T>

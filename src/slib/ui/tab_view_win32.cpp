@@ -174,14 +174,8 @@ Ref<ViewInstance> TabView::createNativeWidget(ViewInstance* parent)
 		return Ref<ViewInstance>::null();
 	}
 
-	DWORD style = 0;
+	DWORD style = WS_CLIPCHILDREN;
 	DWORD styleEx = WS_EX_CONTROLPARENT;
-#if defined(_SLIB_UI_WIN32_USE_COMPOSITE_VIEWS)
-	styleEx |= WS_EX_COMPOSITED;
-#endif
-#if defined(_SLIB_UI_WIN32_USE_CLIP_CHILDREN)
-	style |= WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-#endif
 
 	Ref<_Win32_TabViewInstance> ret = Win32_ViewInstance::create<_Win32_TabViewInstance>(this, parent, L"SysTabControl32", L"", style, styleEx);
 	
@@ -190,12 +184,10 @@ Ref<ViewInstance> TabView::createNativeWidget(ViewInstance* parent)
 		HWND handle = ret->getHandle();
 
 		Ref<Font> font = getFont();
-		Ref<FontInstance> fontInstance;
-		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
-		_setFontInstance(fontInstance);
 
 		((_TabView*)this)->__copyTabs(handle, ret.ptr);
 	}
@@ -263,15 +255,13 @@ UISize TabView::_getContentViewSize_NW()
 
 void TabView::_setFont_NW(const Ref<Font>& font)
 {
-	Ref<FontInstance> fontInstance;
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		HFONT hFont = UIPlatform::getGdiFont(font.ptr, fontInstance);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
 	}
-	_setFontInstance(fontInstance);
 }
 
 SLIB_UI_NAMESPACE_END

@@ -8,8 +8,7 @@ BrushDesc::BrushDesc()
     color = Color::White;
 }
 
-
-SLIB_DEFINE_OBJECT(Brush, Object)
+SLIB_DEFINE_ROOT_OBJECT(Brush)
 
 Brush::Brush()
 {
@@ -54,8 +53,5 @@ Color Brush::getColor()
 {
 	return m_desc.color;
 }
-
-
-SLIB_DEFINE_OBJECT(BrushInstance, Object)
 
 SLIB_GRAPHICS_NAMESPACE_END

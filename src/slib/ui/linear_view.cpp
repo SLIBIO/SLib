@@ -2,14 +2,12 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
-SLIB_DEFINE_OBJECT(LinearView, View)
+SLIB_DEFINE_OBJECT(LinearView, ViewGroup)
 
 LinearView::LinearView()
 {
 	SLIB_REFERABLE_CONSTRUCTOR
 	
-	setCreatingChildInstances(sl_true);
-	setLayoutEnabled(sl_true, sl_false);
  	setOnMakeLayoutEnabled(sl_true, sl_false);
 	
 	m_orientation = LayoutOrientation::Vertical;
@@ -55,14 +53,14 @@ void LinearView::setVertical(sl_bool flagRedraw)
 
 void LinearView::onResizeChild(View* child, sl_ui_len width, sl_ui_len height)
 {
-	if (!(child->isLayoutEnabled())) {
+	if (!(child->isLayouting())) {
 		requestLayout();
 	}
 }
 
 void LinearView::onChangeVisibilityOfChild(View* child, Visibility oldVisibility, Visibility newVisibility)
 {
-	if (!(child->isLayoutEnabled())) {
+	if (!(child->isLayouting())) {
 		requestLayout();
 	}
 }

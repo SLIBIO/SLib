@@ -77,12 +77,6 @@ public:
 		{
 			DWORD style = 0;
 			DWORD styleEx = WS_EX_CONTROLPARENT;
-#if defined(_SLIB_UI_WIN32_USE_COMPOSITE_VIEWS)
-			styleEx |= WS_EX_COMPOSITED;
-#endif
-#if defined(_SLIB_UI_WIN32_USE_CLIP_CHILDREN)
-			style |= WS_CLIPCHILDREN;
-#endif
 			if (param.flagBorderless || param.flagFullScreen) {
 				style |= WS_POPUP;
 			} else {
@@ -923,7 +917,7 @@ LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 				HDC hDC = (HDC)(wParam);
 				Color color = window->m_backgroundColor;
 				if (color.a != 0) {
-					HBRUSH hBrush = ::CreateSolidBrush(UIPlatform::getColorRef(color));
+					HBRUSH hBrush = ::CreateSolidBrush(GraphicsPlatform::getColorRef(color));
 					if (hBrush) {
 						RECT rect;
 						::GetClientRect(hWnd, &rect);

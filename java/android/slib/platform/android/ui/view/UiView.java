@@ -132,7 +132,21 @@ public class UiView {
 		}
 		return false;
 	}
-
+	
+	public static void setTransform(View view, float tx, float ty, float rotate, float sx, float sy, float ax, float ay) {
+		view.setRotation((float)(rotate * 180 / Math.PI));
+		view.setScaleX(sx);
+		view.setScaleY(sy);
+		if (Math.abs(ax) > 0.000001f || Math.abs(ay) > 0.000001f) {
+			double cr = Math.cos(rotate);
+			double sr = Math.sin(rotate);
+			tx = (float)((- ax * cr + ay * sr) * sx + tx + ax);
+			ty = (float)((- ax * sr - ay * cr) * sy + ty + ay);
+		}
+		view.setTranslationX(tx);
+		view.setTranslationY(ty);
+	}
+	
 	public static boolean isVisible(View view) {
 		return view.getVisibility() == View.VISIBLE;
 	}
@@ -151,6 +165,10 @@ public class UiView {
 	
 	public static void setEnabled(View view, boolean flag) {
 		view.setEnabled(flag);
+	}
+
+	public static void setAlpha(View view, float alpha) {
+		view.setAlpha(alpha);
 	}
 	
 	public static Point convertCoordinateFromScreenToView(View view, int x, int y) {
@@ -202,6 +220,16 @@ public class UiView {
 					group.removeView(view);
 				}
 			}
+		} catch (Throwable e) {
+			Logger.exception(e);
+		}
+	}
+	
+	public static void bringToFront(View view) {
+		try {
+			ViewParent parent = view.getParent();
+			parent.bringChildToFront(view);
+			view.invalidate();
 		} catch (Throwable e) {
 			Logger.exception(e);
 		}

@@ -102,7 +102,7 @@ enum class FlipMode
 	None = 0,
 	Horizontal = 1,
 	Vertical = 2,
-	HorizontalAndVertical = 3
+	Both = 3
 };
 
 enum class ScaleMode

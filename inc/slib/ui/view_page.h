@@ -86,7 +86,6 @@ public:
 	
 	void moveTo(sl_size index);
 	
-	
 protected:
 	virtual void onPushPage(View* pageIn);
 	

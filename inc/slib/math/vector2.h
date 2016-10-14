@@ -25,6 +25,10 @@ public:
 public:
 	static const Vector2T<T, FT>& zero();
 	
+	static const Vector2T& fromArray(const T arr[2]);
+	
+	static Vector2T& fromArray(T arr[2]);
+	
 	T dot(const Vector2T<T, FT>& other) const;
 	
 	T cross(const Vector2T<T, FT>& other) const;
@@ -122,6 +126,18 @@ template <class T, class FT>
 SLIB_INLINE const Vector2T<T, FT>& Vector2T<T, FT>::zero()
 {
 	return *((Vector2T<T, FT>*)((void*)(_zero)));
+}
+
+template <class T, class FT>
+SLIB_INLINE const Vector2T<T, FT>& Vector2T<T, FT>::fromArray(const T* arr)
+{
+	return *((Vector2T<T, FT>*)((void*)(arr)));
+}
+
+template <class T, class FT>
+SLIB_INLINE Vector2T<T, FT>& Vector2T<T, FT>::fromArray(T* arr)
+{
+	return *((Vector2T<T, FT>*)((void*)(arr)));
 }
 
 template <class T, class FT>

@@ -4,8 +4,7 @@
 #include "definition.h"
 
 #include "../core/reference.h"
-#include "../graphics/color.h"
-#include "../graphics/context.h"
+#include "../graphics/platform.h"
 
 #if defined(SLIB_PLATFORM_IS_WIN32)
 #include "../core/platform_windows.h"
@@ -40,19 +39,6 @@ public:
 	
 #if defined(SLIB_PLATFORM_IS_WIN32)
 	
-	static Gdiplus::GraphicsPath* getGraphicsPath(GraphicsPath* path, Ref<GraphicsPathInstance>& instance);
-
-	static Gdiplus::Font* getGdiplusFont(Font* font, Ref<FontInstance>& instance);
-	static HFONT getGdiFont(Font* font, Ref<FontInstance>& instance);
-	
-	static Ref<Canvas> createCanvas(Gdiplus::Graphics* graphics, sl_uint32 width, sl_uint32 height, const Rectangle* rectClip = sl_null, sl_bool flagFreeOnRelease = sl_true, const Referable* ref = sl_null, sl_bool flagBuffer = sl_false);
-	static Gdiplus::Graphics* getCanvasHandle(Canvas* canvas);
-	
-	static Ref<Drawable> createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease = sl_true, const Referable* ref = sl_null);
-	static Gdiplus::Image* getImageHandle(Drawable* drawable);
-	static Gdiplus::Bitmap* getBitmapHandle(Bitmap* bitmap);
-	static HBITMAP createDIBFromBitmap(const Ref<Bitmap>& bitmap);
-
 	static Ref<ViewInstance> createViewInstance(HWND hWnd, sl_bool flagDestroyOnRelease = sl_true);
 	static void registerViewInstance(HWND hWnd, ViewInstance* instance);
 	static Ref<ViewInstance> getViewInstance(HWND hWnd);
@@ -66,9 +52,6 @@ public:
 	static HWND getWindowHandle(WindowInstance* instance);
 	static HWND getWindowHandle(Window* window);
 
-	static COLORREF getColorRef(const Color& color);
-	static Color getColorFromColorRef(COLORREF cr);
-
 	static Ref<Cursor> createCursor(HCURSOR hCursor, sl_bool flagDestroyOnRelease = sl_true);
 	static HCURSOR getCursorHandle(const Ref<Cursor>& cursor);
 
@@ -76,16 +59,7 @@ public:
 	static Ref<Menu> getMenu(HMENU hMenu);
 
 #elif defined(SLIB_PLATFORM_IS_ANDROID)
-
-    static jobject getGraphicsPath(GraphicsPath* path, Ref<GraphicsPathInstance>& instance);
-	static jobject getNativeFont(Font* font, Ref<FontInstance>& instance);
 	
-	static Ref<Canvas> createCanvas(jobject canvas);
-	static jobject getCanvasHandle(Canvas* canvas);
-	
-	static Ref<Drawable> createImageDrawable(jobject bitmap, sl_bool flagRecycleOnRelease = sl_true, const Referable* ref = sl_null);
-	static jobject getImageDrawableHandle(Drawable* drawable);
-
 	static Ref<ViewInstance> createViewInstance(jobject jhandle);
 	static void registerViewInstance(jobject jhandle, ViewInstance* instance);
 	static Ref<ViewInstance> getViewInstance(jobject jhandle);
@@ -100,19 +74,8 @@ public:
 
 #elif defined(SLIB_PLATFORM_IS_APPLE)
 	
-	static CGPathRef getGraphicsPath(GraphicsPath* path, Ref<GraphicsPathInstance>& instance);
-	static CTFontRef getCoreTextFont(Font* font, Ref<FontInstance>& instance);
-	
-	static Ref<Canvas> createCanvas(CGContextRef graphics, sl_uint32 width, sl_uint32 height, const Rectangle* rectClip = sl_null);
-	static CGContextRef getCanvasHandle(Canvas* canvas);
-	
-	static Ref<Drawable> createImageDrawable(CGImageRef image, sl_bool flagFlipped = sl_false);
-	static CGImageRef getImageDrawableHandle(Drawable* drawable);
-
 #	if defined(__OBJC__)
 #		if defined(SLIB_PLATFORM_IS_OSX)
-	
-	static NSFont* getNSFont(Font* font, Ref<FontInstance>& instance);
 	
 	static Ref<ViewInstance> createViewInstance(NSView* handle, sl_bool flagFreeOnRelease = sl_true);
 	static void registerViewInstance(NSView* handle, ViewInstance* instance);
@@ -131,22 +94,15 @@ public:
 	static NSScreen* getScreenHandle(Screen* screen);
 	static float getDpiForScreen(NSScreen* handle);
 	
-	static NSColor* getNSColorFromColor(const Color& color);
-	static Color getColorFromNSColor(NSColor* color);
-	
-	static NSImage* getNSImageFromBitmap(const Ref<Bitmap>& bitmap);
-	
-	static NSString* getKeyEquivalent(const KeycodeAndModifiers& km, NSUInteger& outMask);
-	
 	static Ref<Cursor> createCursor(NSCursor* handle);
 	static NSCursor* getCursorHandle(const Ref<Cursor>& cursor);
 	
 	static NSMenu* getMenuHandle(const Ref<Menu>& menu);
 	static NSMenuItem* getMenuItemHandle(const Ref<MenuItem>& menu);
 
-#		elif defined(SLIB_PLATFORM_IS_IOS)
+	static NSString* getKeyEquivalent(const KeycodeAndModifiers& km, NSUInteger& outMask);
 	
-	static UIFont* getUIFont(Font* font, Ref<FontInstance>& instance);
+#		elif defined(SLIB_PLATFORM_IS_IOS)
 	
 	static Ref<ViewInstance> createViewInstance(UIView* handle, sl_bool flagFreeOnRelease = sl_true);
 	static void registerViewInstance(UIView* handle, ViewInstance* instance);
@@ -163,12 +119,12 @@ public:
 	static Ref<Screen> createScreen(UIScreen* handle);
 	static UIScreen* getScreenHandle(Screen* screen);
 	
-	static UIColor* getUIColorFromColor(const Color& color);
-	static Color getColorFromUIColor(UIColor* color);
-	
 	static UIWindow* getMainWindow();
 	static UIWindow* getKeyWindow();
 	static void setKeyWindow(UIWindow* window);
+	
+	static CGFloat getGlobalScaleFactor();
+	static void setGlobalScaleFactor(CGFloat factor);
 	
 #		endif
 #	endif

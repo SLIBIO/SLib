@@ -234,19 +234,6 @@ _Win32_UI::_Win32_UI()
 	m_screenPrimary = new _Win32_Screen();
 }
 
-COLORREF UIPlatform::getColorRef(const Color& color)
-{
-	return (COLORREF)(color.getBGR());
-}
-
-Color UIPlatform::getColorFromColorRef(COLORREF cr)
-{
-	Color ret;
-	ret.setBGR((sl_uint32)cr);
-	ret.a = 255;
-	return ret;
-}
-
 LRESULT CALLBACK _Win32_ViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 

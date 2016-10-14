@@ -3,13 +3,12 @@
 #if defined(SLIB_PLATFORM_IS_APPLE)
 
 #include "../../../inc/slib/graphics/canvas.h"
-
-#include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/ui/platform.h"
+#include "../../../inc/slib/graphics/platform.h"
 
 #include <CoreText/CoreText.h>
+#include <CoreImage/CoreImage.h>
 
-SLIB_UI_NAMESPACE_BEGIN
+SLIB_GRAPHICS_NAMESPACE_BEGIN
 
 class _Quartz_Canvas : public Canvas
 {
@@ -17,8 +16,6 @@ class _Quartz_Canvas : public Canvas
 	
 public:
 	CGContextRef m_graphics;
-	sl_real m_width;
-	sl_real m_height;
 	sl_bool m_flagAntiAlias;
 	
 public:
@@ -33,41 +30,27 @@ public:
 	}
 	
 public:
-	static Ref<_Quartz_Canvas> _create(CGContextRef graphics, sl_real width, sl_real height, const Rectangle* rectClip)
+	static Ref<_Quartz_Canvas> _create(CanvasType type, CGContextRef graphics, sl_real width, sl_real height)
 	{
 		Ref<_Quartz_Canvas> ret;
 		if (graphics) {
 			CGContextRetain(graphics);
 			ret = new _Quartz_Canvas();
 			if (ret.isNotNull()) {
-				ret->m_context = UI::getGraphicsContext();
+				ret->setType(type);
+				ret->setSize(Size(width, height));
+				
 				ret->m_graphics = graphics;
-				ret->m_width = width;
-				ret->m_height = height;
-				if (rectClip) {
-					CGContextClipToRect(graphics, CGRectMake(rectClip->left, rectClip->top, rectClip->getWidth(), rectClip->getHeight()));
-				} else {
-					CGContextClipToRect(graphics, CGRectMake(0, 0, width, height));
-				}
-				CGContextSetAllowsAntialiasing(graphics, sl_true);
-				CGContextSetShouldAntialias(graphics, sl_true);
+				
+				CGContextSetAllowsAntialiasing(graphics, YES);
+				CGContextSetShouldAntialias(graphics, YES);
+				CGContextSetInterpolationQuality(graphics, kCGInterpolationMedium);
+				
 				return ret;
 			}
 			CGContextRelease(graphics);
 		}
 		return ret;
-	}
-	
-	// override
-	Size getSize()
-	{
-		return Size(m_width, m_height);
-	}
-	
-	// override
-	sl_bool isBuffer()
-	{
-		return sl_true;
 	}
 	
 	// override
@@ -92,12 +75,14 @@ public:
 	void setAntiAlias(sl_bool flag)
 	{
 		if (flag) {
-			CGContextSetAllowsAntialiasing(m_graphics, sl_true);
-			CGContextSetShouldAntialias(m_graphics, sl_true);
+			CGContextSetAllowsAntialiasing(m_graphics, YES);
+			CGContextSetShouldAntialias(m_graphics, YES);
+			CGContextSetInterpolationQuality(m_graphics, kCGInterpolationMedium);
 			m_flagAntiAlias = sl_true;
 		} else {
-			CGContextSetAllowsAntialiasing(m_graphics, sl_false);
-			CGContextSetShouldAntialias(m_graphics, sl_false);
+			CGContextSetAllowsAntialiasing(m_graphics, NO);
+			CGContextSetShouldAntialias(m_graphics, NO);
+			CGContextSetInterpolationQuality(m_graphics, kCGInterpolationNone);
 			m_flagAntiAlias = sl_false;
 		}
 	}
@@ -124,8 +109,7 @@ public:
 	void clipToPath(const Ref<GraphicsPath>& path)
 	{
 		if (path.isNotNull()) {
-			Ref<GraphicsPathInstance> instance;
-			CGPathRef handle = UIPlatform::getGraphicsPath(path.ptr, instance);
+			CGPathRef handle = GraphicsPlatform::getGraphicsPath(path.ptr);
 			if (handle) {
 				_clipToPath(handle, path->getFillMode());				
 			}
@@ -147,15 +131,7 @@ public:
 	{
 		Matrix3 ret;
 		CGAffineTransform t = CGContextGetCTM(m_graphics);
-		ret.m00 = (sl_real)(t.a);
-		ret.m01 = (sl_real)(t.b);
-		ret.m02 = 0;
-		ret.m10 = (sl_real)(t.c);
-		ret.m11 = (sl_real)(t.d);
-		ret.m12 = 0;
-		ret.m20 = (sl_real)(t.tx);
-		ret.m21 = (sl_real)(t.ty);
-		ret.m22 = 1;
+		GraphicsPlatform::getMatrix3FromCGAffineTransform(ret, t);
 		return ret;
 	}
 	
@@ -163,12 +139,7 @@ public:
 	void concatMatrix(const Matrix3& other)
 	{
 		CGAffineTransform t;
-		t.a = other.m00;
-		t.b = other.m01;
-		t.c = other.m10;
-		t.d = other.m11;
-		t.tx = other.m20;
-		t.ty = other.m21;
+		GraphicsPlatform::getCGAffineTransform(t, other);
 		CGContextConcatCTM(m_graphics, t);
 	}
 	
@@ -183,8 +154,7 @@ public:
 			}
 			if (_font.isNotNull()) {
 				
-				Ref<FontInstance> fontInstance;
-				CTFontRef font = UIPlatform::getCoreTextFont(_font.ptr, fontInstance);
+				CTFontRef font = GraphicsPlatform::getCoreTextFont(_font.ptr);
 				
 				if (font) {
 					
@@ -372,8 +342,7 @@ public:
 	void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		if (path.isNotNull()) {
-			Ref<GraphicsPathInstance> instance;
-			CGPathRef handle = UIPlatform::getGraphicsPath(path.ptr, instance);
+			CGPathRef handle = GraphicsPlatform::getGraphicsPath(path.ptr);
 			if (handle) {
 				_drawPath(handle, _pen, brush, path->getFillMode());
 			}
@@ -416,7 +385,7 @@ public:
 		CGLineCap _cap;
 		CGLineJoin _join;
 		CGFloat _miterLimit;
-		CGFloat* _dash;
+		CGFloat _dash[6];
 		sl_uint32 _dashLen;
 		
 		_width = pen->getWidth();
@@ -450,31 +419,35 @@ public:
 		
 		_miterLimit = pen->getMiterLimit();
 		
-#define W _width
-		CGFloat dashStyleDot[] = {W, 2*W};
-		CGFloat dashStyleDash[] = {3*W, 3*W};
-		CGFloat dashStyleDashDot[] = {3*W, 2*W, W, 2*W};
-		CGFloat dashStyleDashDotDot[] = {3*W, 2*W, W, 2*W, W, 2*W};
 		switch (pen->getStyle()) {
 			case PenStyle::Dot:
-				_dash = dashStyleDot;
-				_dashLen = sizeof(dashStyleDot) / sizeof(CGFloat);
+				_dash[0] = _width;
+				_dash[1] = 2 * _width;
+				_dashLen = 2;
 				break;
 			case PenStyle::Dash:
-				_dash = dashStyleDash;
-				_dashLen = sizeof(dashStyleDash) / sizeof(CGFloat);
+				_dash[0] = 3 * _width;
+				_dash[1] = _dash[0];
+				_dashLen = 2;
 				break;
 			case PenStyle::DashDot:
-				_dash = dashStyleDashDot;
-				_dashLen = sizeof(dashStyleDashDot) / sizeof(CGFloat);
+				_dash[0] = 3 * _width;
+				_dash[1] = 2 * _width;
+				_dash[2] = _width;
+				_dash[3] = _dash[1];
+				_dashLen = 4;
 				break;
 			case PenStyle::DashDotDot:
-				_dash = dashStyleDashDotDot;
-				_dashLen = sizeof(dashStyleDashDotDot) / sizeof(CGFloat);
+				_dash[0] = 3 * _width;
+				_dash[1] = 2 * _width;
+				_dash[2] = _width;
+				_dash[3] = _dash[1];
+				_dash[4] = _width;
+				_dash[5] = _dash[1];
+				_dashLen = 6;
 				break;
 			case PenStyle::Solid:
 			default:
-				_dash = 0;
 				_dashLen = 0;
 				break;
 		}
@@ -499,15 +472,15 @@ public:
 
 SLIB_DEFINE_OBJECT(_Quartz_Canvas, Canvas)
 
-Ref<Canvas> UIPlatform::createCanvas(CGContextRef graphics, sl_uint32 width, sl_uint32 height, const Rectangle* rectClip)
+Ref<Canvas> GraphicsPlatform::createCanvas(CanvasType type, CGContextRef graphics, sl_uint32 width, sl_uint32 height)
 {
 	if (!graphics) {
 		return Ref<Canvas>::null();
 	}
-	return _Quartz_Canvas::_create(graphics, (sl_real)width, (sl_real)height, rectClip);
+	return _Quartz_Canvas::_create(type, graphics, (sl_real)width, (sl_real)height);
 }
 
-CGContextRef UIPlatform::getCanvasHandle(Canvas* _canvas)
+CGContextRef GraphicsPlatform::getCanvasHandle(Canvas* _canvas)
 {
 	if (_Quartz_Canvas::checkInstance(_canvas)) {
 		_Quartz_Canvas* canvas = (_Quartz_Canvas*)_canvas;
@@ -516,6 +489,157 @@ CGContextRef UIPlatform::getCanvasHandle(Canvas* _canvas)
 	return NULL;
 }
 
-SLIB_UI_NAMESPACE_END
+SLIB_INLINE static CIVector* _getCIVector(const Vector4& v)
+{
+	return [CIVector vectorWithX:(v.x) Y:(v.y) Z:(v.z) W:(v.w)];
+}
+
+void GraphicsPlatform::drawCGImage(Canvas* canvas, const Rectangle& _rectDst, CGImageRef image, sl_bool flagFlipY, const DrawParam& param)
+{
+	if (!image) {
+		return;
+	}
+	
+	CGContextRef graphics = GraphicsPlatform::getCanvasHandle(canvas);
+	if (!graphics) {
+		return;
+	}
+	
+	sl_bool flagBlur = param.isBlur();
+	sl_bool flagOpaque = param.isOpaque();
+	sl_bool flagTiled = param.tiled;
+	
+	CIImage* ciImage = nil;
+	sl_bool flagFreeImage = sl_false;
+	
+	if (param.useColorMatrix || param.useBlur) {
+		ciImage = [CIImage imageWithCGImage:image];
+		if (ciImage != nil) {
+			if (param.useColorMatrix) {
+				CIFilter* filter = [CIFilter filterWithName:@"CIColorMatrix"];
+				[filter setValue:ciImage forKey:kCIInputImageKey];
+				[filter setValue:_getCIVector(param.colorMatrix.red) forKey:@"inputRVector"];
+				[filter setValue:_getCIVector(param.colorMatrix.green) forKey:@"inputGVector"];
+				[filter setValue:_getCIVector(param.colorMatrix.blue) forKey:@"inputBVector"];
+				[filter setValue:_getCIVector(param.colorMatrix.alpha) forKey:@"inputAVector"];
+				[filter setValue:_getCIVector(param.colorMatrix.bias) forKey:@"inputBiasVector"];
+				ciImage = [filter outputImage];
+			}
+			if (flagBlur) {
+				CIFilter* filter = [CIFilter filterWithName:@"CIBoxBlur"];
+				[filter setValue:ciImage forKey:kCIInputImageKey];
+				[filter setValue:[NSNumber numberWithFloat:param.blurRadius] forKey:@"inputRadius"];
+				ciImage = [filter outputImage];
+			}
+			if (ciImage != nil) {
+				if (flagTiled) {
+					CIContext *ciContext = [CIContext contextWithOptions:nil];
+					CGImageRef t = [ciContext createCGImage:ciImage fromRect:[ciImage extent]];
+					if (t) {
+						image = t;
+						flagFreeImage = sl_true;
+						ciImage = nil;
+					}
+				}
+			}
+		}
+	}
+	
+	if (ciImage != nil) {
+#if defined(SLIB_PLATFORM_IS_OSX)
+		NSGraphicsContext* oldContext = [NSGraphicsContext currentContext];
+		NSGraphicsContext* context = [NSGraphicsContext graphicsContextWithGraphicsPort:graphics flipped:NO];
+		[NSGraphicsContext setCurrentContext:context];
+#else
+		UIGraphicsPushContext(graphics);
+#endif
+		
+#if defined(SLIB_PLATFORM_IS_OSX)
+		NSRect rectDst;
+#else
+		CGRect rectDst;
+#endif
+		
+		rectDst.origin.x = _rectDst.left;
+		rectDst.origin.y = _rectDst.top;
+		rectDst.size.width = _rectDst.getWidth();
+		rectDst.size.height = _rectDst.getHeight();
+				
+#if defined(SLIB_PLATFORM_IS_OSX)
+		if (!flagFlipY) {
+			CGContextSaveGState(graphics);
+			CGContextTranslateCTM(graphics, 0, rectDst.origin.y + rectDst.size.height);
+			CGContextScaleCTM(graphics, 1, -1);
+			CGContextTranslateCTM(graphics, 0, -rectDst.origin.y);
+		}
+		
+		NSRect rectSrc;
+		rectSrc.origin.x = 0;
+		rectSrc.origin.y = 0;
+		rectSrc.size.width = CGImageGetWidth(image);
+		rectSrc.size.height = CGImageGetHeight(image);
+		[ciImage drawInRect:rectDst fromRect:rectSrc operation:NSCompositeSourceOver fraction:(flagOpaque?1:param.alpha)];
+
+		if (!flagFlipY) {
+			CGContextRestoreGState(graphics);
+		}
+		
+#else
+		if (flagFlipY) {
+			CGContextSaveGState(graphics);
+			CGContextTranslateCTM(graphics, 0, rectDst.origin.y + rectDst.size.height);
+			CGContextScaleCTM(graphics, 1, -1);
+			CGContextTranslateCTM(graphics, 0, -rectDst.origin.y);
+		} else {
+			flagFlipY = flagFlipY;
+		}
+
+		[[UIImage imageWithCIImage:ciImage] drawInRect:rectDst blendMode:kCGBlendModeNormal alpha:(flagOpaque?1:param.alpha)];
+
+		if (flagFlipY) {
+			CGContextRestoreGState(graphics);
+		}
+#endif
+		
+
+#if defined(SLIB_PLATFORM_IS_OSX)
+		[NSGraphicsContext setCurrentContext:oldContext];
+#else
+		UIGraphicsPopContext();
+#endif
+	} else {
+		sl_bool flagSaveState = (!flagOpaque) || (!flagFlipY);
+		if (flagSaveState) {
+			CGContextSaveGState(graphics);
+		}
+		if (!flagOpaque) {
+			CGContextSetAlpha(graphics, param.alpha);
+		}
+		
+		CGRect rectDst;
+		rectDst.origin.x = _rectDst.left;
+		rectDst.origin.y = _rectDst.top;
+		rectDst.size.width = _rectDst.getWidth();
+		rectDst.size.height = _rectDst.getHeight();
+		if (!flagFlipY) {
+			CGContextTranslateCTM(graphics, 0, rectDst.origin.y + rectDst.size.height);
+			CGContextScaleCTM(graphics, 1, -1);
+			CGContextTranslateCTM(graphics, 0, -rectDst.origin.y);
+		}
+		if (flagTiled) {
+			CGContextDrawTiledImage(graphics, rectDst, image);
+		} else {
+			CGContextDrawImage(graphics, rectDst, image);
+		}
+		if (flagSaveState) {
+			CGContextRestoreGState(graphics);
+		}
+	}
+	if (flagFreeImage) {
+		CGImageRelease(image);
+	}
+}
+
+SLIB_GRAPHICS_NAMESPACE_END
 
 #endif

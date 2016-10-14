@@ -1,11 +1,37 @@
 #include "../../../inc/slib/ui/button.h"
 
-#include "../../../inc/slib/graphics/context.h"
 #include "../../../inc/slib/graphics/util.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(Button, View)
+
+const sl_real _g_button_colorMatrix_hover_buf[20] = {
+	0.5f, 0, 0, 0,
+	0, 0.5f, 0, 0,
+	0, 0, 0.5f, 0,
+	0, 0, 0, 1,
+	0, 0, 0.5f, 0
+};
+const ColorMatrix& _g_button_colorMatrix_hover = *((const ColorMatrix*)((void*)_g_button_colorMatrix_hover_buf));
+
+const sl_real _g_button_colorMatrix_pressed_buf[20] = {
+	0.6f, 0, 0, 0,
+	0, 0.6f, 0, 0,
+	0, 0, 0.6f, 0,
+	0, 0, 0, 1,
+	0, 0, 0, 0
+};
+const ColorMatrix& _g_button_colorMatrix_pressed = *((const ColorMatrix*)((void*)_g_button_colorMatrix_pressed_buf));
+
+const sl_real _g_button_colorMatrix_disabled_buf[20] = {
+	0.2f, 0.2f, 0.2f, 0,
+	0.2f, 0.2f, 0.2f, 0,
+	0.2f, 0.2f, 0.2f, 0,
+	0, 0, 0, 1,
+	0, 0, 0, 0
+};
+const ColorMatrix& _g_button_colorMatrix_disabled = *((const ColorMatrix*)((void*)_g_button_colorMatrix_disabled_buf));
 
 ButtonCategoryProperties::ButtonCategoryProperties()
 {
@@ -20,17 +46,6 @@ public:
 public:
 	_Button_Categories()
 	{
-		categories[0].properties[(int)(ButtonState::Normal)].border = Pen::create(PenStyle::Solid, 1, Color(100, 100, 100));
-		categories[0].properties[(int)(ButtonState::Normal)].background = ColorDrawable::create(Color(240, 240, 240));
-		categories[0].properties[(int)(ButtonState::Normal)].textColor = Color::Black;
-		categories[0].properties[(int)(ButtonState::Disabled)].background = ColorDrawable::create(Color(220, 220, 220));
-		categories[0].properties[(int)(ButtonState::Disabled)].textColor = Color(110, 110, 110);
-		categories[0].properties[(int)(ButtonState::Hover)].border = Pen::create(PenStyle::Solid, 1, Color(0, 100, 250));
-		categories[0].properties[(int)(ButtonState::Hover)].background = ColorDrawable::create(Color(220, 230, 255));
-		categories[0].properties[(int)(ButtonState::Pressed)].border = categories[0].properties[(int)(ButtonState::Hover)].border;
-		categories[0].properties[(int)(ButtonState::Pressed)].background = ColorDrawable::create(Color(180, 210, 255));
-		
-		categories[1] = categories[0];
 		categories[1].properties[(int)(ButtonState::Normal)].border = Pen::create(PenStyle::Solid, 3, Color(0, 100, 250));
 	}
 	
@@ -48,7 +63,6 @@ public:
 Button::Button() : Button(2)
 {
 	setCreatingNativeWidget(sl_true);
-	setUsingFont(sl_true);
 }
 
 Button::Button(sl_uint32 nCategories, ButtonCategory* categories)
@@ -59,8 +73,6 @@ Button::Button(sl_uint32 nCategories, ButtonCategory* categories)
 	setAlwaysOnDrawBorder(sl_true, sl_false);
 	
 	m_flagDefaultButton = sl_false;
-
-	m_textColorDefault = Color::Black;
 	
 	m_state = ButtonState::Normal;
 	m_category = 0;
@@ -83,6 +95,8 @@ Button::Button(sl_uint32 nCategories, ButtonCategory* categories)
 	m_textMarginRight = 2;
 	m_textMarginBottom = 2;
 	
+	m_flagUseDefaultColorFilter = sl_true;
+
 	if (nCategories == 0) {
 		nCategories = 1;
 	}
@@ -102,7 +116,14 @@ Button::Button(sl_uint32 nCategories, ButtonCategory* categories)
 			m_categories[i] = categories[i];
 		}
 	}
+	
 	setOccurringClick(sl_true);
+	setUsingFont(sl_true);
+	
+	setBorder(Pen::create(PenStyle::Solid, 1, Color(100, 100, 100)), sl_false);
+	setBackground(ColorDrawable::create(Color(240, 240, 240)), sl_false);
+	m_textColorDefault = Color::Black;
+
 }
 
 Button::~Button()
@@ -426,18 +447,6 @@ void Button::setTextColor(const Color& color, sl_bool flagRedraw)
 	}
 }
 
-void Button::resetStateTextColors(sl_bool flagRedraw)
-{
-	for (sl_uint32 i = 0; i < m_nCategories; i++) {
-		for (int k = 0; k < (int)(ButtonState::Count); k++) {
-			m_categories[i].properties[k].textColor = Color::zero();
-		}
-	}
-	if (flagRedraw) {
-		invalidate();
-	}
-}
-
 Ref<Drawable> Button::getIcon(ButtonState state, sl_uint32 category)
 {
 	if (category < m_nCategories) {
@@ -465,18 +474,6 @@ Ref<Drawable> Button::getIcon()
 void Button::setIcon(const Ref<Drawable>& icon, sl_bool flagRedraw)
 {
 	m_iconDefault = icon;
-	if (flagRedraw) {
-		invalidate();
-	}
-}
-
-void Button::resetStateIcons(sl_bool flagRedraw)
-{
-	for (sl_uint32 i = 0; i < m_nCategories; i++) {
-		for (int k = 0; k < (int)(ButtonState::Count); k++) {
-			m_categories[i].properties[k].icon.setNull();
-		}
-	}
 	if (flagRedraw) {
 		invalidate();
 	}
@@ -516,18 +513,6 @@ void Button::setBackground(const Ref<Drawable>& background, sl_bool flagRedraw)
 	View::setBackground(background, flagRedraw);
 }
 
-void Button::resetStateBackgrounds(sl_bool flagRedraw)
-{
-	for (sl_uint32 i = 0; i < m_nCategories; i++) {
-		for (int k = 0; k < (int)(ButtonState::Count); k++) {
-			m_categories[i].properties[k].background.setNull();
-		}
-	}
-	if (flagRedraw) {
-		invalidate();
-	}
-}
-
 Ref<Pen> Button::getBorder(ButtonState state, sl_uint32 category)
 {
 	if (category < m_nCategories) {
@@ -557,13 +542,19 @@ void Button::setBorder(const Ref<Pen>& pen, sl_bool flagRedraw)
 	View::setBorder(pen, flagRedraw);
 }
 
-void Button::resetStateBorders(sl_bool flagRedraw)
+void Button::setBorder(sl_bool flagBorder, sl_bool flagRedraw)
 {
-	for (sl_uint32 i = 0; i < m_nCategories; i++) {
-		for (int k = 0; k < (int)(ButtonState::Count); k++) {
-			m_categories[i].properties[k].border.setNull();
-		}
-	}
+	View::setBorder(flagBorder, flagRedraw);
+}
+
+sl_bool Button::isUsingDefaultColorFilter()
+{
+	return m_flagUseDefaultColorFilter;
+}
+
+void Button::setUsingDefaultColorFilter(sl_bool flag, sl_bool flagRedraw)
+{
+	m_flagUseDefaultColorFilter = flag;
 	if (flagRedraw) {
 		invalidate();
 	}
@@ -571,28 +562,34 @@ void Button::resetStateBorders(sl_bool flagRedraw)
 
 void Button::setEnabled(sl_bool flagEnabled, sl_bool flagRedraw)
 {
-	View::setEnabled(flagEnabled, sl_false);
-	_invalidateButtonState();
-	if (flagRedraw) {
-		invalidate();
+	if (isEnabled() != flagEnabled) {
+		View::setEnabled(flagEnabled, sl_false);
+		_invalidateButtonState();
+		if (flagRedraw) {
+			invalidate();
+		}
 	}
 }
 
 void Button::setPressedState(sl_bool flagState, sl_bool flagRedraw)
 {
-	View::setPressedState(flagState, sl_false);
-	_invalidateButtonState();
-	if (flagRedraw) {
-		invalidate();
+	if (isPressedState() != flagState) {
+		View::setPressedState(flagState, sl_false);
+		_invalidateButtonState();
+		if (flagRedraw) {
+			invalidate();
+		}
 	}
 }
 
 void Button::setHoverState(sl_bool flagState, sl_bool flagRedraw)
 {
-	View::setHoverState(flagState, sl_false);
-	_invalidateButtonState();
-	if (flagRedraw) {
-		invalidate();
+	if (isHoverState() != flagState) {
+		View::setHoverState(flagState, sl_false);
+		_invalidateButtonState();
+		if (flagRedraw) {
+			invalidate();
+		}
 	}
 }
 
@@ -601,13 +598,39 @@ void Button::onDraw(Canvas* canvas)
 	ButtonCategoryProperties& params = m_categories[m_category].properties[(int)m_state];
 	Color textColor = params.textColor;
 	Ref<Drawable> icon = params.icon;
-	if (textColor.isZero()) {
-		textColor = m_textColorDefault;
+	if (textColor.isZero() || icon.isNull()) {
+		const ColorMatrix* cm = sl_null;
+		if (m_flagUseDefaultColorFilter) {
+			switch (m_state) {
+				case ButtonState::Hover:
+					cm = &_g_button_colorMatrix_hover;
+					break;
+				case ButtonState::Pressed:
+					cm = &_g_button_colorMatrix_pressed;
+					break;
+				case ButtonState::Disabled:
+					cm = &_g_button_colorMatrix_disabled;
+					break;
+				default:
+					break;
+			}
+		}
+		if (textColor.isZero()) {
+			textColor = m_textColorDefault;
+			if (cm) {
+				textColor = cm->transformColor(textColor);
+			}
+		}
+		if (icon.isNull()) {
+			icon = m_iconDefault;
+			if (icon.isNotNull()) {
+				if (cm) {
+					icon = icon->filter(*cm);
+				}
+			}
+		}
 	}
-	if (icon.isNull()) {
-		icon = m_iconDefault;
-	}
-	drawContent(canvas, icon, m_text, textColor);
+	drawButtonContent(canvas, icon, m_text, textColor);
 }
 
 void Button::onDrawBackground(Canvas* canvas)
@@ -615,10 +638,47 @@ void Button::onDrawBackground(Canvas* canvas)
 	ButtonCategoryProperties& params = m_categories[m_category].properties[(int)m_state];
 	Ref<Drawable> background = params.background;
 	if (background.isNotNull()) {
-		Color color = getBackgroundColor();
-		drawBackground(canvas, color, background);
+		drawBackground(canvas, getBackgroundColor(), background);
 	} else {
-		View::onDrawBackground(canvas);
+		Ref<DrawAttributes> attrs = m_drawAttributes;
+		if (attrs.isNotNull()) {
+			Ref<Drawable> background;
+			switch (m_state) {
+				case ButtonState::Hover:
+					background = attrs->backgroundHover;
+					break;
+				case ButtonState::Pressed:
+					background = attrs->backgroundPressed;
+					break;
+				default:
+					break;
+			}
+			if (background.isNull()) {
+				background = attrs->background;
+				if (background.isNotNull()) {
+					if (m_flagUseDefaultColorFilter) {
+						const ColorMatrix* cm = sl_null;
+						switch (m_state) {
+							case ButtonState::Hover:
+								cm = &_g_button_colorMatrix_hover;
+								break;
+							case ButtonState::Pressed:
+								cm = &_g_button_colorMatrix_pressed;
+								break;
+							case ButtonState::Disabled:
+								cm = &_g_button_colorMatrix_disabled;
+								break;
+							default:
+								break;
+						}
+						if (cm) {
+							background = background->filter(*cm);
+						}
+					}
+				}
+			}
+			drawBackground(canvas, attrs->backgroundColor, background);
+		}
 	}
 }
 
@@ -639,12 +699,7 @@ void Button::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 		return;
 	}
 	
-	Ref<GraphicsContext> gc = getGraphicsContext();
-	if (gc.isNull()) {
-		return;
-	}
-	
-	UISize size = measureContentSize(gc.ptr);
+	UISize size = measureContentSize();
 	
 	if (flagHorizontal) {
 		if (size.x < 0) {
@@ -669,15 +724,15 @@ void Button::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 	
 }
 
-UISize Button::measureContentSize(GraphicsContext* gc)
+UISize Button::measureContentSize()
 {
 	UISize size;
 	UIRect rcIcon, rcText;
-	layoutIconAndText(gc, 0, 0, size, rcIcon, rcText);
+	layoutIconAndText(0, 0, size, rcIcon, rcText);
 	return size;
 }
 
-void Button::layoutIconAndText(GraphicsContext* gc, sl_ui_len widthFrame, sl_ui_len heightFrame, UISize& sizeContent, UIRect& frameIcon, UIRect& frameText)
+void Button::layoutIconAndText(sl_ui_len widthFrame, sl_ui_len heightFrame, UISize& sizeContent, UIRect& frameIcon, UIRect& frameText)
 {
 	sl_ui_pos widthIcon = m_iconSize.x + m_iconMarginLeft + m_iconMarginRight;
 	if (widthIcon < 0) {
@@ -689,7 +744,12 @@ void Button::layoutIconAndText(GraphicsContext* gc, sl_ui_len widthFrame, sl_ui_
 	}
 	
 	Ref<Font> font = getFont();
-	UISize sizeText = gc->getFontTextSize(font, m_text);
+	UISize sizeText;
+	if (font.isNotNull()) {
+		sizeText = font->getTextSize(m_text);
+	} else {
+		sizeText = UISize::zero();
+	}
 	sl_ui_pos widthText = sizeText.x + m_textMarginLeft + m_textMarginRight;
 	if (widthText < 0) {
 		widthText = 0;
@@ -824,15 +884,12 @@ void Button::layoutIconAndText(GraphicsContext* gc, sl_ui_len widthFrame, sl_ui_
 	
 }
 
-void Button::drawContent(Canvas* canvas, const Ref<Drawable>& icon, const String& text, const Color& textColor)
+void Button::drawButtonContent(Canvas* canvas, const Ref<Drawable>& icon, const String& text, const Color& textColor)
 {
 	if (text.isEmpty() && icon.isNull()) {
 		return;
 	}
-	Ref<GraphicsContext> gc = canvas->getGraphicsContext();
-	if (gc.isNull()) {
-		return;
-	}
+
 	UIRect bound = getBoundsInnerPadding();
 	sl_ui_pos widthFrame = bound.getWidth();
 	sl_ui_pos heightFrame = bound.getHeight();
@@ -842,7 +899,7 @@ void Button::drawContent(Canvas* canvas, const Ref<Drawable>& icon, const String
 	
 	UISize sizeContent;
 	UIRect rcIcon, rcText;
-	layoutIconAndText(gc.ptr, widthFrame, heightFrame, sizeContent, rcIcon, rcText);
+	layoutIconAndText(widthFrame, heightFrame, sizeContent, rcIcon, rcText);
 	UIPoint pt = GraphicsUtil::calculateAlignPosition(bound, (sl_real)(sizeContent.x), (sl_real)(sizeContent.y), m_gravity);
 	if (icon.isNotNull() && rcIcon.getWidth() > 0 && rcIcon.getHeight() > 0) {
 		rcIcon.left += pt.x;

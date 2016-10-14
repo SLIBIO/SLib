@@ -11,7 +11,8 @@
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
-class GraphicsContext;
+struct ImageDesc;
+class Image;
 
 class SLIB_EXPORT Bitmap : public Drawable
 {
@@ -19,6 +20,21 @@ class SLIB_EXPORT Bitmap : public Drawable
 
 protected:
 	Bitmap();
+	
+public:
+	static Ref<Bitmap> create(sl_uint32 width, sl_uint32 height);
+	
+	static Ref<Bitmap> create(const ImageDesc& desc);
+	
+	static Ref<Bitmap> create(const Ref<Image>& image);
+	
+	static Ref<Bitmap> loadFromMemory(const void* mem, sl_size size);
+	
+	static Ref<Bitmap> loadFromMemory(const Memory& mem);
+	
+	static Ref<Bitmap> loadFromFile(const String& filePath);
+	
+	static Ref<Bitmap> loadFromAsset(const String& path);
 
 public:
 	virtual sl_uint32 getBitmapWidth() = 0;
@@ -42,9 +58,6 @@ public:
 	// override
 	sl_real getDrawableHeight();
 	
-	// override
-	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc);
-	
 public:
 	sl_uint32 getWidth();
 	
@@ -65,7 +78,6 @@ public:
 	
 protected:
 	SafeRef<Drawable> m_drawableCached;
-	SafeWeakRef<GraphicsContext> m_contextCached;
 	
 };
 

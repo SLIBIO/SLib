@@ -28,6 +28,10 @@ public:
 public:
 	static const Vector3T<T, FT>& zero();
 	
+	static const Vector3T<T, FT>& fromArray(const T arr[3]);
+	
+	static Vector3T<T, FT>& fromArray(T arr[3]);
+	
 	static Vector3T<T, FT> fromLocation(const Vector2T<T>& v);
 	
 	static Vector3T<T, FT> fromDirection(const Vector2T<T>& v);
@@ -136,6 +140,18 @@ template <class T, class FT>
 SLIB_INLINE const Vector3T<T, FT>& Vector3T<T, FT>::zero()
 {
 	return *((Vector3T<T, FT>*)((void*)(_zero)));
+}
+
+template <class T, class FT>
+SLIB_INLINE const Vector3T<T, FT>& Vector3T<T, FT>::fromArray(const T* arr)
+{
+	return *((Vector3T<T, FT>*)((void*)(arr)));
+}
+
+template <class T, class FT>
+SLIB_INLINE Vector3T<T, FT>& Vector3T<T, FT>::fromArray(T* arr)
+{
+	return *((Vector3T<T, FT>*)((void*)(arr)));
 }
 
 template <class T, class FT>

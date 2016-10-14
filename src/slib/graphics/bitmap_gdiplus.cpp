@@ -3,104 +3,15 @@
 #if defined(SLIB_PLATFORM_IS_WIN32)
 
 #include "../../../inc/slib/graphics/bitmap.h"
-#include "../../../inc/slib/graphics/image.h"
+#include "../../../inc/slib/graphics/platform.h"
 
-#include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/ui/platform.h"
 #include "../../../inc/slib/core/scoped_pointer.h"
 
 #include <Shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
 #pragma comment(lib, "gdiplus.lib")
 
-SLIB_UI_NAMESPACE_BEGIN
-
-class _Gdiplus_ImageDrawable : public Drawable
-{
-	SLIB_DECLARE_OBJECT
-public:
-	Gdiplus::Image* m_image;
-	sl_bool m_flagFreeOnRelease;
-	Ref<Referable> m_ref;
-	
-public:
-	_Gdiplus_ImageDrawable()
-	{
-	}
-	
-	~_Gdiplus_ImageDrawable()
-	{
-		if (m_flagFreeOnRelease) {
-			delete m_image;
-		}
-	}
-	
-public:
-	static Ref<_Gdiplus_ImageDrawable> create(Gdiplus::Image* image, sl_bool flagFreeOnRelease, const Referable* ref)
-	{
-		Ref<_Gdiplus_ImageDrawable> ret;
-		if (image) {
-			ret = new _Gdiplus_ImageDrawable();
-			if (ret.isNotNull()) {
-				ret->m_image = image;
-				ret->m_flagFreeOnRelease = flagFreeOnRelease;
-				ret->m_ref = ref;
-				return ret;
-			}
-			if (flagFreeOnRelease) {
-				delete image;
-			}
-		}
-		return ret;
-	}
-	
-    // override
-	void onDraw(Canvas* _canvas, const Rectangle& rectDst, const Rectangle& rectSrc)
-	{
-		Gdiplus::Graphics* graphics = UIPlatform::getCanvasHandle(_canvas);
-		if (!graphics) {
-			return;
-		}
-		Gdiplus::RectF rcDst(rectDst.left, rectDst.top, rectDst.getWidth(), rectDst.getHeight());
-		graphics->DrawImage(m_image, rcDst
-			, rectSrc.left, rectSrc.top, rectSrc.getWidth(), rectSrc.getHeight()
-			, Gdiplus::UnitPixel);
-	}
-	
-    // override
-	sl_real getDrawableWidth()
-	{
-		return (sl_real)(m_image->GetWidth());
-	}
-	
-    // override
-	sl_real getDrawableHeight()
-	{
-		return (sl_real)(m_image->GetHeight());
-	}
-    
-};
-
-SLIB_DEFINE_OBJECT(_Gdiplus_ImageDrawable, Drawable)
-
-Ref<Drawable> UI::createDrawableFromImage(const ImageDesc& desc)
-{
-	return UI::createBitmapFromImage(desc);
-}
-
-Ref<Drawable> UI::loadDrawableFromMemory(const void* buf, sl_size size)
-{
-	Ref<Drawable> ret;
-	IStream* stream = ::SHCreateMemStream((BYTE*)buf, (sl_uint32)size);
-	if (stream) {
-		Gdiplus::Image* image = new Gdiplus::Image(stream);
-		stream->Release();
-		if (image && image->GetWidth() > 0 && image->GetHeight() > 0) {
-			ret = UIPlatform::createImageDrawable(image, sl_true);
-		}
-	}
-	return ret;
-}
+SLIB_GRAPHICS_NAMESPACE_BEGIN
 
 class _Gdiplus_Bitmap : public Bitmap
 {
@@ -121,12 +32,11 @@ public:
 public:
 	static Ref<_Gdiplus_Bitmap> create(sl_uint32 width, sl_uint32 height)
 	{
-		Ref<_Gdiplus_Bitmap> ret;
 		if (width > 0 && height > 0) {
 			Gdiplus::Bitmap* bitmap = new Gdiplus::Bitmap(width, height, PixelFormat32bppARGB);
 			if (bitmap) {
 				if (bitmap->GetWidth() == width && bitmap->GetHeight() == height) {
-					ret = new _Gdiplus_Bitmap();
+					Ref<_Gdiplus_Bitmap> ret = new _Gdiplus_Bitmap();
 					if (ret.isNotNull()) {
 						ret->m_bitmap = bitmap;
 						return ret;
@@ -135,18 +45,17 @@ public:
 				delete bitmap;
 			}
 		}
-		return ret;
+		return Ref<_Gdiplus_Bitmap>::null();
 	}
 	
 	static Ref<_Gdiplus_Bitmap> loadFromMemory(const void* mem, sl_size size)
 	{
-		Ref<_Gdiplus_Bitmap> ret;
 		IStream* stream = ::SHCreateMemStream((BYTE*)mem, (sl_uint32)size);
 		if (stream) {
 			Gdiplus::Bitmap* bitmap = new Gdiplus::Bitmap(stream);
 			stream->Release();
 			if (bitmap && bitmap->GetWidth() > 0 && bitmap->GetHeight() > 0) {
-				ret = new _Gdiplus_Bitmap();
+				Ref<_Gdiplus_Bitmap> ret = new _Gdiplus_Bitmap();
 				if (ret.isNotNull()) {
 					ret->m_bitmap = bitmap;
 					return ret;
@@ -154,7 +63,7 @@ public:
 				delete bitmap;
 			}
 		}
-		return ret;
+		return Ref<_Gdiplus_Bitmap>::null();
 	}
 	
     // override
@@ -366,67 +275,35 @@ public:
     // override
 	Ref<Canvas> getCanvas()
 	{
-		Ref<Canvas> ret;
 		Gdiplus::Graphics* g = new Gdiplus::Graphics(m_bitmap);
 		if (g) {
 			sl_uint32 w = getBitmapWidth();
 			sl_uint32 h = getBitmapHeight();
-			ret = UIPlatform::createCanvas(g, w, h, sl_null, sl_true, this, sl_true);
+			return GraphicsPlatform::createCanvas(CanvasType::Bitmap, g, w, h, sl_true, this);
 		}
-		return ret;
+		return Ref<Canvas>::null();
 	}
 	
     // override
-	void onDraw(Canvas* _canvas, const Rectangle& rectDst, const Rectangle& rectSrc)
+	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param)
 	{
-		Gdiplus::Graphics* graphics = UIPlatform::getCanvasHandle(_canvas);
-		if (!graphics) {
-			return;
-		}
-		Gdiplus::RectF rcDst(rectDst.left, rectDst.top, rectDst.getWidth(), rectDst.getHeight());
-		graphics->DrawImage(m_bitmap, rcDst
-			, rectSrc.left, rectSrc.top, rectSrc.getWidth(), rectSrc.getHeight()
-			, Gdiplus::UnitPixel);
+		GraphicsPlatform::drawImage(canvas, rectDst, m_bitmap, rectSrc, param);
 	}
 };
 
 SLIB_DEFINE_OBJECT(_Gdiplus_Bitmap, Bitmap)
 
-Ref<Bitmap> UI::createBitmap(sl_uint32 width, sl_uint32 height)
+Ref<Bitmap> Bitmap::create(sl_uint32 width, sl_uint32 height)
 {
 	return _Gdiplus_Bitmap::create(width, height);
 }
 
-Ref<Drawable> UI::createDrawableFromBitmap(const Ref<Bitmap>& bitmap)
-{
-	return Ref<Drawable>::null();
-}
-
-Ref<Bitmap> UI::loadBitmapFromMemory(const void* mem, sl_size size)
+Ref<Bitmap> Bitmap::loadFromMemory(const void* mem, sl_size size)
 {
 	return _Gdiplus_Bitmap::loadFromMemory(mem, size);
 }
 
-
-Ref<Drawable> UIPlatform::createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease, const Referable* ref)
-{
-	return _Gdiplus_ImageDrawable::create(image, flagFreeOnRelease, ref);
-}
-
-Gdiplus::Image* UIPlatform::getImageHandle(Drawable* _drawable)
-{
-	if (_Gdiplus_ImageDrawable::checkInstance(_drawable)) {
-		_Gdiplus_ImageDrawable* drawable = (_Gdiplus_ImageDrawable*)_drawable;
-		return drawable->m_image;
-	}
-	if (_Gdiplus_Bitmap::checkInstance(_drawable)) {
-		_Gdiplus_Bitmap* bitmap = (_Gdiplus_Bitmap*)_drawable;
-		return bitmap->m_bitmap;
-	}
-	return NULL;
-}
-
-Gdiplus::Bitmap* UIPlatform::getBitmapHandle(Bitmap* _bitmap)
+Gdiplus::Bitmap* GraphicsPlatform::getBitmapHandle(Bitmap* _bitmap)
 {
 	if (_Gdiplus_Bitmap::checkInstance(_bitmap)) {
 		_Gdiplus_Bitmap* bitmap = (_Gdiplus_Bitmap*)_bitmap;
@@ -435,7 +312,7 @@ Gdiplus::Bitmap* UIPlatform::getBitmapHandle(Bitmap* _bitmap)
 	return NULL;
 }
 
-HBITMAP UIPlatform::createDIBFromBitmap(const Ref<Bitmap>& bitmap)
+HBITMAP GraphicsPlatform::createDIBFromBitmap(const Ref<Bitmap>& bitmap)
 {
 	if (bitmap.isNotNull() && bitmap->isNotEmpty()) {
 
@@ -471,6 +348,6 @@ HBITMAP UIPlatform::createDIBFromBitmap(const Ref<Bitmap>& bitmap)
 	return NULL;
 }
 
-SLIB_UI_NAMESPACE_END
+SLIB_GRAPHICS_NAMESPACE_END
 
 #endif

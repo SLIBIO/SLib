@@ -10,6 +10,7 @@
 #include "../core/object.h"
 #include "../core/pointer.h"
 #include "../core/callback.h"
+#include "../core/animation.h"
 #include "../graphics/canvas.h"
 #include "../graphics/bitmap.h"
 
@@ -70,10 +71,6 @@ public:
 	
 	void setWindow(const Ref<Window>& window);
 	
-	Ref<GraphicsContext> getGraphicsContext();
-	
-	void setGraphicsContext(const Ref<GraphicsContext>& context);
-	
 	
 	Ref<View> getParent();
 	
@@ -131,12 +128,20 @@ public:
 	sl_bool isOnRemoveChildEnabled();
 	
 	void setOnRemoveChildEnabled(sl_bool flagEnabled);
+	
+	void bringToFront(sl_bool flagRedraw = sl_true);
 
 	
-	void invalidate();
+	virtual void invalidate();
 
 	// local coordinate
-	void invalidate(const UIRect& rect);
+	virtual void invalidate(const UIRect& rect);
+	
+	void invalidateBoundsInParent();
+	
+	void updateAndInvalidateBoundsInParent(sl_bool flagInvalidate = sl_true);
+
+	sl_bool checkSelfInvalidatable();
 	
 	
 	// parent coordinate
@@ -195,9 +200,6 @@ public:
 	// parent coordinate
 	UIRect getBoundsInParent();
 	
-	// parent coordinate
-	UIRect getBoundsInParent(const UIRect& boundsLocal);
-	
 	
 	Visibility getVisibility();
 	
@@ -209,11 +211,7 @@ public:
 	
 	sl_bool isEnabled();
 	
-	void setEnabled(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
-	
-	sl_bool isOpaque();
-	
-	void setOpaque(sl_bool flagOpaque, sl_bool flagRedraw = sl_true);
+	virtual void setEnabled(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
 	
 	
 	sl_bool isHitTestable();
@@ -271,10 +269,15 @@ public:
 	void requestParentLayout(sl_bool flagRedraw = sl_true);
 	
 	void requestParentAndSelfLayout(sl_bool flagRedraw = sl_true);
+
 	
-	sl_bool isLayoutEnabled();
+	sl_bool isLayouting();
 	
-	void setLayoutEnabled(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
+	void resetLayout(sl_bool flagRedraw = sl_true);
+	
+	sl_bool isMakingLayout();
+	
+	void setMakingLayout(sl_bool flag, sl_bool flagRedraw = sl_true);
 	
 	UIRect getLayoutFrame();
 	
@@ -492,6 +495,7 @@ public:
 	
 	void applyRelativeMargins(sl_ui_len parentWidth, sl_ui_len parentHeight);
 	
+	
 	sl_ui_pos getPaddingLeft();
 	
 	void setPaddingLeft(sl_ui_pos padding, sl_bool flagRedraw = sl_true);
@@ -513,47 +517,81 @@ public:
 	void setPadding(sl_ui_pos padding, sl_bool flagRedraw = sl_true);
 	
 	
-	sl_bool isTransformEnabled();
+	sl_bool getFinalTransform(Matrix3* _out);
 	
-	void setTransformEnabled(sl_bool flag, sl_bool flagRedraw = sl_true);
+	sl_bool getFinalInverseTransform(Matrix3* _out);
 	
 	const Matrix3& getTransform();
 	
 	void setTransform(const Matrix3& matrix, sl_bool flagRedraw = sl_true);
 	
+	void resetTransform(sl_bool flagRedraw = sl_true);
+
+	void setTransformFromAnimation(const Matrix3& matrix, sl_bool flagRedraw = sl_true);
+	
+	void resetTransformFromAnimation(sl_bool flagRedraw = sl_true);
+	
+	sl_bool getFinalTranslationRotationScale(Vector2* translation = sl_null, sl_real* rotation = sl_null, Vector2* scale = sl_null, Vector2* anchor = sl_null);
+	
+	sl_real getTranslationX();
+	
+	sl_real getTranslationY();
+	
+	const Vector2& getTranslation();
+	
+	void setTranslationX(sl_real x, sl_bool flagRedraw = sl_true);
+	
+	void setTranslationY(sl_real y, sl_bool flagRedraw = sl_true);
+	
+	void setTranslation(sl_real x, sl_real y, sl_bool flagRedraw = sl_true);
+	
+	void setTranslation(const Vector2& t, sl_bool flagRedraw = sl_true);
+	
+	void setTranslationFromAnimation(const Vector2& t, sl_bool flagRedraw = sl_true);
+	
+	void resetTranslationFromAnimation(sl_bool flagRedraw = sl_true);
+	
 	sl_real getScaleX();
 	
 	sl_real getScaleY();
 	
-	Vector2 getScale();
+	const Vector2& getScale();
 	
-	void setScaleX(sl_real sx, sl_bool flagSetTransform = sl_true);
+	void setScaleX(sl_real sx, sl_bool flagRedraw = sl_true);
 	
-	void setScaleY(sl_real sy, sl_bool flagSetTransform = sl_true);
+	void setScaleY(sl_real sy, sl_bool flagRedraw = sl_true);
 	
-	void setScale(sl_real x, sl_real y, sl_bool flagSetTransform = sl_true);
+	void setScale(sl_real x, sl_real y, sl_bool flagRedraw = sl_true);
 	
-	void setScale(const Vector2& factor, sl_bool flagSetTransform = sl_true);
+	void setScale(sl_real factor, sl_bool flagRedraw = sl_true);
 	
-	void setScale(sl_real factor, sl_bool flagSetTransform = sl_true);
+	void setScale(const Vector2& factor, sl_bool flagRedraw = sl_true);
+	
+	void setScaleFromAnimation(const Vector2& factor, sl_bool flagRedraw = sl_true);
+	
+	void resetScaleFromAnimation(sl_bool flagRedraw = sl_true);
 	
 	sl_real getRotation();
 	
-	void setRatation(sl_real radian, sl_bool flagSetTransform = sl_true);
+	void setRotation(sl_real radian, sl_bool flagRedraw = sl_true);
 	
-	Point getAnchorOffset();
+	void setRotationFromAnimation(sl_real radian, sl_bool flagRedraw = sl_true);
 	
-	void setAnchorOffset(sl_real x, sl_real y, sl_bool flagSetTransform = sl_true);
-	
-	void setAnchorOffset(const Point& pt, sl_bool flagSetTransform = sl_true);
+	void resetRotationFromAnimation(sl_bool flagRedraw = sl_true);
 	
 	sl_real getAnchorOffsetX();
 	
-	void setAnchorOffsetX(sl_real x, sl_bool flagSetTransform = sl_true);
-	
 	sl_real getAnchorOffsetY();
+
+	const Vector2& getAnchorOffset();
 	
-	void setAnchorOffsetY(sl_real y, sl_bool flagSetTransform = sl_true);
+	void setAnchorOffsetX(sl_real x, sl_bool flagRedraw = sl_true);
+	
+	void setAnchorOffsetY(sl_real y, sl_bool flagRedraw = sl_true);
+	
+	void setAnchorOffset(sl_real x, sl_real y, sl_bool flagRedraw = sl_true);
+	
+	void setAnchorOffset(const Vector2& pt, sl_bool flagRedraw = sl_true);
 	
 
 	UIPointf convertCoordinateFromScreen(const UIPointf& ptScreen);
@@ -562,8 +600,12 @@ public:
 	
 	UIPointf convertCoordinateFromParent(const UIPointf& ptParent);
 	
-	UIPointf convertCoordinateToParent(const UIPointf& ptView);
+	UIRectf convertCoordinateFromParent(const UIRectf& rectParent);
 	
+	UIPointf convertCoordinateToParent(const UIPointf& ptView);
+
+	UIRectf convertCoordinateToParent(const UIRectf& rectView);
+
 	
 	Ref<Drawable> getBackground();
 	
@@ -638,14 +680,6 @@ public:
 	
 	void setPostDrawEnabled(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
 	
-	sl_bool isClippingBounds();
-	
-	void setClippingBounds(sl_bool flag);
-	
-	sl_bool isDoubleBuffering();
-	
-	void setDoubleBuffering(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
-	
 	sl_bool isAlwaysOnDrawBackground();
 	
 	void setAlwaysOnDrawBackground(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
@@ -666,6 +700,84 @@ public:
 	sl_bool isUsingFont();
 	
 	void setUsingFont(sl_bool flag);
+	
+	
+	sl_bool isOpaque();
+	
+	void setOpaque(sl_bool flagOpaque, sl_bool flagRedraw = sl_true);
+	
+	sl_real getFinalAlpha();
+	
+	sl_real getAlpha();
+	
+	void setAlpha(sl_real alpha, sl_bool flagRedraw = sl_true);
+	
+	void setAlphaFromAnimation(sl_real alpha, sl_bool flagRedraw = sl_true);
+	
+	void resetAlphaFromAnimation(sl_bool flagRedraw = sl_true);
+
+	sl_bool isLayer();
+	
+	void setLayer(sl_bool flagLayer, sl_bool flagRedraw = sl_true);
+	
+	void invalidateLayer();
+	
+	void invalidateLayer(const UIRect& rect);
+	
+	
+	void detachAnimations();
+
+	void resetAnimations(sl_bool flagRedraw = sl_true);
+	
+	Ref<Animation> getTransformAnimation();
+	
+	void setTransformAnimation(const Ref<Animation>& animation, const AnimationFrames<Matrix3>& frames, sl_bool flagRedraw = sl_true);
+	
+	void setTransformAnimation(const Ref<Animation>& animation, const Matrix3& startValue, const Matrix3& endValue, sl_bool flagRedraw = sl_true);
+	
+	void resetTransformAnimation(sl_bool flagRedraw = sl_true);
+	
+	Ref<Animation> getTranslateAnimation();
+	
+	void setTranslateAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, sl_bool flagRedraw = sl_true);
+	
+	void setTranslateAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue, sl_bool flagRedraw = sl_true);
+	
+	void resetTranslateAnimation(sl_bool flagRedraw = sl_true);
+	
+	Ref<Animation> getScaleAnimation();
+	
+	void setScaleAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, sl_bool flagRedraw = sl_true);
+	
+	void setScaleAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue, sl_bool flagRedraw = sl_true);
+	
+	void setScaleAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, sl_bool flagRedraw = sl_true);
+	
+	void resetScaleAnimation(sl_bool flagRedraw = sl_true);
+	
+	Ref<Animation> getRotateAnimation();
+	
+	void setRotateAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, sl_bool flagRedraw = sl_true);
+	
+	void setRotateAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, sl_bool flagRedraw = sl_true);
+	
+	void resetRotateAnimation(sl_bool flagRedraw = sl_true);
+	
+	Ref<Animation> getAlphaAnimation();
+	
+	void setAlphaAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, sl_bool flagRedraw = sl_true);
+	
+	void setAlphaAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, sl_bool flagRedraw = sl_true);
+	
+	void resetAlphaAnimation(sl_bool flagRedraw = sl_true);
+	
+	Ref<Animation> getBackgroundColorAnimation();
+	
+	void setBackgroundColorAnimation(const Ref<Animation>& animation, const AnimationFrames<Color4f>& frames, sl_bool flagRedraw = sl_true);
+	
+	void setBackgroundColorAnimation(const Ref<Animation>& animation, const Color4f& startValue, const Color4f& endValue, sl_bool flagRedraw = sl_true);
+	
+	void resetBackgroundColorAnimation(sl_bool flagRedraw = sl_true);
 	
 	
 	Ref<ScrollBar> getHorizontalScrollBar();
@@ -787,15 +899,17 @@ public:
 	virtual sl_bool hitTestForCapturingChildInstanceEvents(const UIPoint& pt);
 	
 	
-	void draw(Canvas* canvas);
-	
 	void drawBackground(Canvas* canvas, const Color& color, const Ref<Drawable>& background);
 	
 	void drawBorder(Canvas* canvas, const Ref<Pen>& pen);
 	
 	void drawChildren(Canvas* canvas, const Ref<View>* children, sl_size count);
 	
-	void drawChild(Canvas* canvas, View* view);
+	void drawContent(Canvas* canvas);
+	
+	Ref<Bitmap> drawLayer();
+	
+	void draw(Canvas* canvas);
 
 public:
 	SLIB_PTR_PROPERTY(IViewListener, EventListener)
@@ -925,20 +1039,18 @@ private:
 	void _requestInvalidateLayout();
 	
 	void _requestInvalidateMeasure(sl_bool flagWidth, sl_bool flagHeight);
-
-	void _initializeLayout();
 	
-	void _initializeTransform();
+	void _applyCalcTransform(sl_bool flagRedraw);
 	
-	void _applyTransform();
+	void _applyFinalTransform(sl_bool flagRedraw);
 	
-	void _setFontInvalidateChildren();
-	
-	void _initializeDraw();
+	void _invalidateInstanceTransform();
 	
 	void _refreshBorderPen(sl_bool flagRedraw);
 	
-	void _initializeScroll();
+	void _setFontInvalidateChildren();
+
+	void _applyFinalAlpha(sl_bool flagRedraw);
 	
 	Ref<ScrollBar> _createHorizontalScrollBar();
 	
@@ -955,11 +1067,13 @@ private:
 protected:
 	void measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 	
-protected:
 	CList< Ref<View> >& _getChildren();
 
-	void _setFontInstance(const Ref<FontInstance>& instance);
-
+public:
+	void _setFrame_NI(const UIRect& frame);
+	
+	void _setTransform_NI(const Matrix3& transform);
+	
 	virtual void _setBorder_NW(sl_bool flag);
 
 	virtual void _setBackgroundColor_NW(const Color& color);
@@ -969,7 +1083,6 @@ protected:
 private:
 	SafeRef<ViewInstance> m_instance;
 	SafeWeakRef<Window> m_window;
-	SafeRef<GraphicsContext> m_graphicsContext;
 	SafeWeakRef<View> m_parent;
 	
 	sl_bool m_flagCreatingInstance;
@@ -978,10 +1091,10 @@ private:
 	UIAttachMode m_attachMode;
 	
 	UIRect m_frame;
+	UIRect m_boundsInParent;
 	
 	Visibility m_visibility;
 	sl_bool m_flagEnabled;
-	sl_bool m_flagOpaque;
 	sl_bool m_flagHitTestable;
 	sl_bool m_flagFocusable;
 
@@ -989,6 +1102,9 @@ private:
 	sl_bool m_flagPressed;
 	sl_bool m_flagHover;
 	sl_bool m_flagOccurringClick;
+	
+	sl_bool m_flagCurrentDrawing;
+	UIRect m_rectCurrentDrawing;
 	
 	SafeRef<Cursor> m_cursor;
 	
@@ -1010,11 +1126,15 @@ private:
 	SafeWeakRef<View> m_viewPrevTabStop;
 	sl_bool m_flagCapturingChildInstanceEvents;
 	
+	sl_ui_pos m_paddingLeft;
+	sl_ui_pos m_paddingTop;
+	sl_ui_pos m_paddingRight;
+	sl_ui_pos m_paddingBottom;
+	
+protected:
 	class LayoutAttributes : public Referable
 	{
 	public:
-		sl_bool flagEnabled;
-		
 		SizeMode widthMode;
 		SizeMode heightMode;
 		sl_real widthWeight;
@@ -1034,6 +1154,7 @@ private:
 		UIRect frame;
 		sl_bool flagInvalidMeasure;
 		sl_bool flagInvalidLayout;
+		sl_bool flagMakeLayout;
 
 		sl_ui_len measuredRelativeBoundWidth;
 		sl_bool flagInvalidRelativeBoundWidth;
@@ -1045,11 +1166,6 @@ private:
 		sl_bool flagOnPrepareLayout;
 		sl_bool flagOnMakeLayout;
 		
-		sl_ui_pos paddingLeft;
-		sl_ui_pos paddingTop;
-		sl_ui_pos paddingRight;
-		sl_ui_pos paddingBottom;
-
 		sl_ui_pos marginLeft;
 		sl_ui_pos marginTop;
 		sl_ui_pos marginRight;
@@ -1067,21 +1183,45 @@ private:
 		sl_bool flagUpdatedLayoutFrame;
 		
 	};
-	SafeRef<LayoutAttributes> m_layout;
+	SafeRef<LayoutAttributes> m_layoutAttributes;
 	
+	Ref<LayoutAttributes> _initializeLayoutAttibutes();
+
 	class TransformAttributes : public Referable
 	{
 	public:
-		sl_bool flagEnabled;
-		Matrix3 transform;
-		Matrix3 transformInverse;
-		sl_real scaleX;
-		sl_real scaleY;
-		sl_real rotationAngle;
-		sl_real anchorOffsetX;
-		sl_real anchorOffsetY;
+		sl_bool flagTransformFinalInvalid;
+		sl_bool flagTransformFinal;
+		Matrix3 transformFinal;
+		
+		sl_bool flagInverseTransformFinalInvalid;
+		sl_bool flagInverseTransformFinal;
+		Matrix3 inverseTransformFinal;
+		
+		sl_bool flagTransformStatic;
+		Matrix3 transformStatic;
+		sl_bool flagTransformAnimation;
+		Matrix3 transformAnimation;
+		
+		sl_bool flagTransformCalcInvalid;
+		sl_bool flagTransformCalc;
+		Matrix3 transformCalc;
+		
+		Vector2 translationStatic;
+		Vector2 translationAnimation;
+		
+		Vector2 scaleStatic;
+		Vector2 scaleAnimation;
+		
+		sl_real rotationAngleStatic;
+		sl_real rotationAngleAnimation;
+		
+		Vector2 anchorOffset;
+		
 	};
-	SafeRef<TransformAttributes> m_transform;
+	SafeRef<TransformAttributes> m_transformAttributes;
+	
+	Ref<TransformAttributes> _initializeTransformAttributes();
 	
 	class DrawAttributes : public Referable
 	{
@@ -1104,19 +1244,53 @@ private:
 		
 		sl_bool flagPreDrawEnabled;
 		sl_bool flagPostDrawEnabled;
-		sl_bool flagDoubleBuffer;
-		sl_bool flagClippingBounds;
-		SafeRef<Bitmap> bitmapDoubleBuffer;
-		SafeRef<Canvas> canvasDoubleBuffer;
-		
-		SafeRef<Font> font;
-		SafeRef<FontInstance> fontInstance;
-		sl_bool flagUsingFont;
-		
 		sl_bool flagOnDrawBackgroundAlways;
 		sl_bool flagOnDrawBorderAlways;
+		
+		SafeRef<Font> font;
+		sl_bool flagUsingFont;
+		
+		sl_bool flagOpaque;
+		sl_real alphaStatic;
+		sl_real alphaAnimation;
+		
+		sl_bool flagLayer;
+		SafeRef<Bitmap> bitmapLayer;
+		SafeRef<Canvas> canvasLayer;
+		sl_bool flagInvalidatedLayer;
+		sl_bool flagInvalidatedWholeLayer;
+		UIRect rectInvalidatedLayer;
+		
 	};
-	SafeRef<DrawAttributes> m_draw;
+	SafeRef<DrawAttributes> m_drawAttributes;
+	
+	Ref<DrawAttributes> _initializeDrawAttributes();
+
+	class AnimationAttributes : public Referable
+	{
+	public:
+		SafeRef<Animation> animationTransform;
+		SafeRef< AnimationTargetT<Matrix3> > targetTransform;
+		
+		SafeRef<Animation> animationTranslation;
+		SafeRef< AnimationTargetT<Vector2> > targetTranslation;
+		
+		SafeRef<Animation> animationScale;
+		SafeRef< AnimationTargetT<Vector2> > targetScale;
+		
+		SafeRef<Animation> animationRotation;
+		SafeRef< AnimationTargetT<sl_real> > targetRotation;
+		
+		SafeRef<Animation> animationAlpha;
+		SafeRef< AnimationTargetT<sl_real> > targetAlpha;
+		
+		SafeRef<Animation> animationBackgroundColor;
+		SafeRef< AnimationTargetT<Color4f> > targetBackgroundColor;
+		
+	};
+	SafeRef<AnimationAttributes> m_animationAttributes;
+	
+	Ref<AnimationAttributes> _initializeAnimationAttributes();
 	
 	class ScrollAttributes : public Referable
 	{
@@ -1141,8 +1315,10 @@ private:
 		sl_ui_posf mouseX_DownContent;
 		sl_ui_posf mouseY_DownContent;
 	};
-	SafeRef<ScrollAttributes> m_scroll;
+	SafeRef<ScrollAttributes> m_scrollAttributes;
 	
+	Ref<ScrollAttributes> _initializeScrollAttributes();
+
 	friend class ListView;
 
 };
@@ -1179,18 +1355,22 @@ public:
 	virtual void setFocus() = 0;
 	
 	virtual void invalidate() = 0;
-	
+
 	virtual void invalidate(const UIRect& rect) = 0;
 	
 	virtual UIRect getFrame() = 0;
 	
 	virtual void setFrame(const UIRect& frame) = 0;
 	
+	virtual void setTransform(const Matrix3& transform) = 0;
+	
 	virtual void setVisible(sl_bool flag) = 0;
 	
 	virtual void setEnabled(sl_bool flag) = 0;
 	
 	virtual void setOpaque(sl_bool flag) = 0;
+	
+	virtual void setAlpha(sl_real alpha) = 0;
 	
 	virtual UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen) = 0;
 	
@@ -1199,6 +1379,8 @@ public:
 	virtual void addChildInstance(const Ref<ViewInstance>& instance) = 0;
 	
 	virtual void removeChildInstance(const Ref<ViewInstance>& instance) = 0;
+	
+	virtual void bringToFront() = 0;
 	
 public:
 	void onDraw(Canvas* canvas);
@@ -1217,7 +1399,6 @@ public:
 	
 protected:
 	SafeWeakRef<View> m_view;
-	SafeWeakRef<GraphicsContext> m_graphicsContext;
 	sl_bool m_flagNativeWidget;
 	sl_bool m_flagWindowContent;
 

@@ -11,25 +11,44 @@
 #include "drawable.h"
 
 #include "../core/object.h"
+#include "../core/time.h"
 #include "../math/matrix3.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
-class GraphicsContext;
+enum class CanvasType
+{
+	View = 0,
+	Bitmap = 1,
+	Image = 2,
+	Render = 3
+};
 
 class SLIB_EXPORT Canvas : public Object
 {
 	SLIB_DECLARE_OBJECT
 
 public:
-	Ref<GraphicsContext> getGraphicsContext();
+	Canvas();
 	
 public:
-	virtual Size getSize() = 0;
+	CanvasType getType();
 	
-	virtual sl_bool isBuffer() = 0;
+	void setType(CanvasType type);
 	
+	Time getTime();
 	
+	void setTime(const Time& time);
+
+	Size getSize();
+	
+	void setSize(const Size& size);
+	
+	const Rectangle& getInvalidatedRect();
+	
+	void setInvalidatedRect(const Rectangle& rect);
+
+public:
 	virtual void save() = 0;
 	
 	virtual void restore() = 0;
@@ -70,7 +89,7 @@ public:
 	virtual void scale(sl_real sx, sl_real sy);
 	
 
-	Size getTextSize(const Ref<Font>& font, const String& text);
+	virtual Size getTextSize(const Ref<Font>& font, const String& text);
 
 	virtual void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color) = 0;
 	
@@ -186,21 +205,42 @@ public:
 	void fillPath(const Ref<GraphicsPath>& path, const Color& color);
 	
 	
+	void draw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param);
+	
 	void draw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc);
+	
+	void draw(const Rectangle& rectDst, const Ref<Drawable>& src, const DrawParam& param);
 	
 	void draw(const Rectangle& rectDst, const Ref<Drawable>& src);
 	
 	void draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst
-			, const Ref<Drawable>& src, sl_real xSrc, sl_real ySrc, sl_real widthSrc, sl_real heightSrc);
+			, const Ref<Drawable>& src, sl_real xSrc, sl_real ySrc, sl_real widthSrc, sl_real heightSrc, const DrawParam& param);
+	
+	void draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst
+			  , const Ref<Drawable>& src, sl_real xSrc, sl_real ySrc, sl_real widthSrc, sl_real heightSrc);
 
+	void draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst, const Ref<Drawable>& drawable, const DrawParam& param);
+	
 	void draw(sl_real xDst, sl_real yDst, sl_real widthDst, sl_real heightDst, const Ref<Drawable>& drawable);
 
+	void draw(sl_real xDst, sl_real yDst, const Ref<Drawable>& drawable, const DrawParam& param);
+	
 	void draw(sl_real xDst, sl_real yDst, const Ref<Drawable>& drawable);
+	
+	void draw(const Rectangle& rectDst, const Ref<Drawable>& src, ScaleMode scaleMode, Alignment alignment, const DrawParam& param);
 	
 	void draw(const Rectangle& rectDst, const Ref<Drawable>& src, ScaleMode scaleMode, Alignment alignment);
 	
 protected:
-	SafeWeakRef<GraphicsContext> m_context;
+	virtual void onDraw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param);
+	
+	virtual void onDrawAll(const Rectangle& rectDst, const Ref<Drawable>& src, const DrawParam& param);
+	
+private:
+	CanvasType m_type;
+	Time m_time;
+	Size m_size;
+	Rectangle m_invalidatedRect;
 	
 };
 

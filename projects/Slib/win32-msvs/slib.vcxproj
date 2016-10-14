@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\inc\slib\core.h" />
     <ClInclude Include="..\..\..\inc\slib\core\algorithm.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\animation.h" />
     <ClInclude Include="..\..\..\inc\slib\core\app.h" />
     <ClInclude Include="..\..\..\inc\slib\core\array.h" />
     <ClInclude Include="..\..\..\inc\slib\core\array2d.h" />
@@ -105,6 +106,7 @@
     <ClInclude Include="..\..\..\inc\slib\graphics\image.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\path.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\pen.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics\platform.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\resource.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\util.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\yuv.h" />
@@ -241,6 +243,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\algorithm.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\animation.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\app.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\array.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\async.cpp" />
@@ -309,14 +312,20 @@
     <ClCompile Include="..\..\..\src\slib\graphics\bitmap.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\bitmap_data.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\bitmap_format.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\bitmap_gdiplus.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\brush.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\brush_gdiplus.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\canvas.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\canvas_gdiplus.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\color.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\drawable.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\drawable_gdiplus.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\font.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\font_freetype.cpp" />
-    <ClCompile Include="..\..\..\src\slib\graphics\graphics_context.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\font_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\graphics_path.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_path_gdiplus.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_platform_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\graphics_resource.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\graphics_util.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\image.cpp" />
@@ -324,6 +333,7 @@
     <ClCompile Include="..\..\..\src\slib\graphics\image_png.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\image_soil2.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\pen.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\pen_gdiplus.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\yuv.cpp" />
     <ClCompile Include="..\..\..\src\slib\math\bezier.cpp" />
     <ClCompile Include="..\..\..\src\slib\math\bigint.cpp" />
@@ -408,18 +418,14 @@
     <ClCompile Include="..\..\..\src\slib\ui\button.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\button_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\camera_view.cpp" />
-    <ClCompile Include="..\..\..\src\slib\ui\canvas_gdiplus.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\check_box.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\check_box_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\common_dialogs.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\common_dialogs_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\cursor.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\cursor_win32.cpp" />
-    <ClCompile Include="..\..\..\src\slib\ui\drawable_gdiplus.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\edit_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\edit_view_win32.cpp" />
-    <ClCompile Include="..\..\..\src\slib\ui\font_win32.cpp" />
-    <ClCompile Include="..\..\..\src\slib\ui\graphics_path_gdiplus.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\image_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\label_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\label_view_win32.cpp" />
@@ -449,7 +455,6 @@
     <ClCompile Include="..\..\..\src\slib\ui\ui_core_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\ui_event.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\ui_event_win32.cpp" />
-    <ClCompile Include="..\..\..\src\slib\ui\ui_graphics_context.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\ui_menu.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\ui_menu_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\ui_platform.cpp" />

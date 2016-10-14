@@ -39,6 +39,11 @@ public:
 
 	static const Matrix3T<T>& identity();
 	
+	static const Matrix3T<T>& fromArray(const T arr[9]);
+	
+	static Matrix3T<T>& fromArray(T arr[9]);
+
+	
 	Vector3T<T> getRow0() const;
 	
 	void setRow0(const Vector3T<T>& v);
@@ -191,6 +196,18 @@ template <class T>
 SLIB_INLINE const Matrix3T<T>& Matrix3T<T>::identity()
 {
 	return *((Matrix3T<T>*)((void*)(_identity)));
+}
+
+template <class T>
+SLIB_INLINE const Matrix3T<T>& Matrix3T<T>::fromArray(const T* arr)
+{
+	return *((Matrix3T<T>*)((void*)(arr)));
+}
+
+template <class T>
+SLIB_INLINE Matrix3T<T>& Matrix3T<T>::fromArray(T* arr)
+{
+	return *((Matrix3T<T>*)((void*)(arr)));
 }
 
 template <class T>

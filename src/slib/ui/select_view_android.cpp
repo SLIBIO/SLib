@@ -77,8 +77,7 @@ Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* _parent)
 			((_SelectView*)this)->__copyItems(handle);
 
 			Ref<Font> font = getFont();
-			Ref<FontInstance> fontInstance;
-			jobject jfont = UIPlatform::getNativeFont(font.ptr, fontInstance);
+			jobject jfont = GraphicsPlatform::getNativeFont(font.ptr);
 			if (jfont) {
 				_JAndroidSelectView::setFont.callBoolean(sl_null, handle, jfont);
 			}
@@ -131,8 +130,7 @@ void SelectView::_setFont_NW(const Ref<Font>& font)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		Ref<FontInstance> fontInstance;
-		jobject jfont = UIPlatform::getNativeFont(font.ptr, fontInstance);
+		jobject jfont = GraphicsPlatform::getNativeFont(font.ptr);
 		if (jfont) {
 			_JAndroidSelectView::setFont.callBoolean(sl_null, handle, jfont);
 		}

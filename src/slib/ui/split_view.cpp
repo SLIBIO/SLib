@@ -10,7 +10,6 @@ SplitView::SplitView()
 	SLIB_REFERABLE_CONSTRUCTOR
 	
 	setCreatingChildInstances(sl_true);
-	setCreatingInstance(sl_true);
 	
 	setCapturingChildInstanceEvents(sl_true);
 

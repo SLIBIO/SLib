@@ -22,9 +22,8 @@ public:
 	
 public:
 	PenDesc();
+	
 };
-
-class PenInstance;
 
 class SLIB_EXPORT Pen : public Object
 {
@@ -57,17 +56,12 @@ public:
 
 	sl_real getMiterLimit();
 
-public:
-	SLIB_REF_PROPERTY(PenInstance, Instance)
-
 protected:
 	PenDesc m_desc;
 	
-};
-
-class SLIB_EXPORT PenInstance : public Object
-{
-	SLIB_DECLARE_OBJECT
+	Ref<Referable> m_platformObject;
+	SpinLock m_lock;
+	
 };
 
 SLIB_GRAPHICS_NAMESPACE_END

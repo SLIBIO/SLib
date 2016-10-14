@@ -22,7 +22,7 @@ public:
 	
 public:
 	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst)
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
 	{
 		sl_bool flagAntiAlias = canvas->isAntiAlias();
 		canvas->setAntiAlias(sl_false);
@@ -64,9 +64,7 @@ public:
 		Ref<Pen> penCheckHover = Pen::createSolidPen(2, Color(0, 80, 200));
 		Ref<Pen> penCheckDown = penCheckHover;
 		Ref<Pen> penCheckDisabled = Pen::createSolidPen(2, Color(90, 90, 90));
-		categories[0].properties[(int)ButtonState::Normal].textColor = Color::Black;
 		categories[0].properties[(int)ButtonState::Normal].icon = new _CheckBox_Icon(penNormal, colorBackNormal, Ref<Pen>::null());
-		categories[0].properties[(int)ButtonState::Disabled].textColor = Color(90, 90, 90);
 		categories[0].properties[(int)ButtonState::Disabled].icon = new _CheckBox_Icon(penDisabled, colorBackDisabled, Ref<Pen>::null());
 		categories[0].properties[(int)ButtonState::Hover].icon = new _CheckBox_Icon(penHover, colorBackHover, Ref<Pen>::null());
 		categories[0].properties[(int)ButtonState::Pressed].icon = new _CheckBox_Icon(penDown, colorBackDown, Ref<Pen>::null());
@@ -107,6 +105,10 @@ CheckBox::CheckBox(sl_uint32 nCategories, ButtonCategory* categories) : Button(n
 	setGravity(Alignment::MiddleLeft);
 	setIconAlignment(Alignment::MiddleLeft);
 	setTextAlignment(Alignment::MiddleLeft);
+	
+	setBorder(sl_false, sl_false);
+	setBackground(Ref<Drawable>::null(), sl_false);
+	
 }
 
 sl_bool CheckBox::isChecked()

@@ -32,7 +32,8 @@ public:
 		if (!m_flagVerticalScroll) {
 			size.y = 0;
 		}
-		[sv setContentSize:CGSizeMake((CGFloat)(size.x), (CGFloat)(size.y))];
+		CGFloat f = UIPlatform::getGlobalScaleFactor();
+		[sv setContentSize:CGSizeMake((CGFloat)(size.x) / f, (CGFloat)(size.y) / f)];
 	}
 	
 	void __applyContent(_Slib_iOS_ScrollView* sv)
@@ -58,7 +59,7 @@ public:
 	
 	void __applyProperties(_Slib_iOS_ScrollView* handle)
 	{
-		handle.backgroundColor = UIPlatform::getUIColorFromColor(getBackgroundColor());
+		handle.backgroundColor = GraphicsPlatform::getUIColorFromColor(getBackgroundColor());
 		__applyContent(handle);
 	}
 	
@@ -68,7 +69,8 @@ public:
 		Ref<View> _view = instance->getView();
 		if (ScrollView::checkInstance(_view.ptr)) {
 			_ScrollView* view = (_ScrollView*)(_view.ptr);
-			view->_onScroll_NW((sl_scroll_pos)(pt.x), (sl_scroll_pos)(pt.y));
+			CGFloat f = UIPlatform::getGlobalScaleFactor();
+			view->_onScroll_NW((sl_scroll_pos)(pt.x * f), (sl_scroll_pos)(pt.y * f));
 		}
 	}
 
@@ -107,12 +109,13 @@ void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
+		CGFloat f = UIPlatform::getGlobalScaleFactor();
 		if ([handle isKindOfClass:[_Slib_iOS_ScrollView class]]) {
 			_Slib_iOS_ScrollView* sv = (_Slib_iOS_ScrollView*)handle;
-			[sv setContentOffsetFromAPI:CGPointMake((CGFloat)x, (CGFloat)y)];
+			[sv setContentOffsetFromAPI:CGPointMake((CGFloat)(x) / f, (CGFloat)(y) / f)];
 		} else if ([handle isKindOfClass:[UIScrollView class]]) {
 			UIScrollView* sv = (UIScrollView*)handle;
-			[sv setContentOffset:CGPointMake((CGFloat)x, (CGFloat)y)];
+			[sv setContentOffset:CGPointMake((CGFloat)(x) / f, (CGFloat)(y) / f)];
 		}
 	}
 }
@@ -123,9 +126,10 @@ ScrollPoint ScrollView::_getScrollPosition_NW()
 	if (handle != nil && [handle isKindOfClass:[UIScrollView class]]) {
 		UIScrollView* sv = (UIScrollView*)handle;
 		Point ret;
+		CGFloat f = UIPlatform::getGlobalScaleFactor();
 		CGPoint pt = sv.contentOffset;
-		ret.x = (sl_scroll_pos)(pt.x);
-		ret.y = (sl_scroll_pos)(pt.y);
+		ret.x = (sl_scroll_pos)(pt.x * f);
+		ret.y = (sl_scroll_pos)(pt.y * f);
 		return ret;
 	}
 	return ScrollPoint::zero();
@@ -138,12 +142,13 @@ ScrollPoint ScrollView::_getScrollRange_NW()
 		UIScrollView* sv = (UIScrollView*)handle;
 		CGSize sizeContent = sv.contentSize;
 		CGSize sizeFrame = sv.bounds.size;
+		CGFloat f = UIPlatform::getGlobalScaleFactor();
 		ScrollPoint ret;
-		ret.x = (sl_scroll_pos)(sizeContent.width - sizeFrame.width);
+		ret.x = (sl_scroll_pos)((sizeContent.width - sizeFrame.width) * f);
 		if (ret.x < 0) {
 			ret.x = 0;
 		}
-		ret.y = (sl_scroll_pos)(sizeContent.height - sizeFrame.height);
+		ret.y = (sl_scroll_pos)((sizeContent.height - sizeFrame.height) * f);
 		if (ret.y < 0) {
 			ret.y = 0;
 		}
@@ -161,7 +166,7 @@ void ScrollView::_setBackgroundColor_NW(const Color& color)
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[UIScrollView class]]) {
 		UIScrollView* sv = (UIScrollView*)handle;
-		sv.backgroundColor = UIPlatform::getUIColorFromColor(color);
+		sv.backgroundColor = GraphicsPlatform::getUIColorFromColor(color);
 	}
 }
 

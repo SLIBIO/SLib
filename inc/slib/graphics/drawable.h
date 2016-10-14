@@ -12,10 +12,41 @@
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
-class Canvas;
+class SLIB_EXPORT DrawParam
+{
+public:
+	sl_bool useAlpha;
+	sl_real alpha;
+	
+	sl_bool tiled;
+	
+	sl_bool useColorMatrix;
+	ColorMatrix colorMatrix;
+	
+	sl_bool useBlur;
+	sl_real blurRadius;
+	
+public:
+	DrawParam();
+	
+	DrawParam(const DrawParam& other);
+	
+	DrawParam& operator=(const DrawParam& other);
+	
+public:
+	sl_bool isTransparent() const;
+	
+	sl_bool isOpaque() const;
+	
+	sl_bool isBlur() const;
+	
+	Color transformColor(const Color& src) const;
+	
+};
 
-class BrushDrawable;
-class ColorDrawable;
+struct ImageDesc;
+class Image;
+class Canvas;
 
 class SLIB_EXPORT Drawable : public Object
 {
@@ -30,9 +61,9 @@ public:
 	
 	virtual Ref<Drawable> scaleDrawable(sl_real width, sl_real height);
 	
-	virtual void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc);
+	virtual void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param);
 	
-	virtual void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	virtual void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
 	
 public:
 	sl_bool isBitmap();
@@ -40,8 +71,11 @@ public:
 	sl_bool isImage();
 	
 public:
-	static Ref<Drawable> createBrushDrawable(const Ref<Brush>& brush);
+	Ref<Drawable> filter(const ColorMatrix& colorMatrix, sl_real alpha = 1, sl_real blurRadius = 0);
 	
+	Ref<Drawable> filter(sl_real alpha, sl_real blurRadius = 0);
+	
+public:
 	static Ref<Drawable> createColorDrawable(const Color& color);
 	
 	static Ref<Drawable> getEmptyDrawable();
@@ -54,32 +88,44 @@ public:
 	
 	static Ref<Drawable> createScaledDrawable(const Ref<Drawable>& src, const Size& size);
 	
+	static Ref<Drawable> filter(const Ref<Drawable>& src, const ColorMatrix& colorMatrix, sl_real alpha = 1, sl_real blurRadius = 0);
+	
+	static Ref<Drawable> filter(const Ref<Drawable>& src, sl_real alpha, sl_real blurRadius = 0);
+	
 };
 
-class SLIB_EXPORT BrushDrawable : public Drawable
+class SLIB_EXPORT PlatformDrawable
 {
-	SLIB_DECLARE_OBJECT
-	
 public:
-	static Ref<Drawable> create(const Ref<Brush>& brush);
+	static Ref<Drawable> create(const ImageDesc& desc);
 	
-public:
-	// override
-	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc);
-
-protected:
-	Ref<Brush> m_brush;
+	static Ref<Drawable> create(const Ref<Image>& image);
+	
+	static Ref<Drawable> loadFromMemory(const void* mem, sl_size size);
+	
+	static Ref<Drawable> loadFromMemory(const Memory& mem);
+	
+	static Ref<Drawable> loadFromFile(const String& filePath);
+	
+	static Ref<Drawable> loadFromAsset(const String& path);
 	
 };
 
-class SLIB_EXPORT ColorDrawable : public BrushDrawable
+class SLIB_EXPORT ColorDrawable : public Drawable
 {
 	SLIB_DECLARE_OBJECT
 	
 public:
 	static Ref<Drawable> create(const Color& color);
 	
-	static sl_bool check(const Ref<Drawable>& drawable, Color* outColor = sl_null, Ref<Brush>* outBrush = sl_null);
+	static sl_bool check(const Ref<Drawable>& drawable, Color* outColor = sl_null);
+	
+public:
+	// override
+	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param);
+	
+	// override
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
 	
 protected:
 	Color m_color;
@@ -95,8 +141,11 @@ public:
 	
 public:
 	// override
-	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc);
+	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param);
 	
+	// override
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
+
 };
 
 
@@ -121,10 +170,10 @@ public:
 	Ref<Drawable> scaleDrawable(sl_real width, sl_real height);
 	
 	// override
-	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc);
+	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param);
 	
 	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
 	
 protected:
 	Ref<Drawable> m_src;
@@ -156,10 +205,10 @@ public:
 	Ref<Drawable> scaleDrawable(sl_real width, sl_real height);
 	
 	// override
-	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc);
+	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param);
 	
 	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
 	
 protected:
 	Ref<Drawable> m_src;
@@ -189,16 +238,50 @@ public:
 	Ref<Drawable> scaleDrawable(sl_real width, sl_real height);
 	
 	// override
-	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc);
+	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param);
 	
 	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
 	
 protected:
 	Ref<Drawable> m_src;
 	Rectangle m_rectSrc;
 	sl_real m_width;
 	sl_real m_height;
+	
+};
+
+class SLIB_EXPORT FilterDrawable : public Drawable
+{
+	SLIB_DECLARE_OBJECT
+	
+public:
+	static Ref<Drawable> create(const Ref<Drawable>& src, const ColorMatrix& colorMatrix, sl_real alpha = 1, sl_real blurRadius = 0);
+	
+	static Ref<Drawable> create(const Ref<Drawable>& src, sl_real alpha, sl_real blurRadius = 0);
+	
+public:
+	// override
+	sl_real getDrawableWidth();
+	
+	// override
+	sl_real getDrawableHeight();
+	
+	// override
+	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param);
+	
+	// override
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
+	
+protected:
+	void _prepareParam(DrawParam& dst, const DrawParam& src);
+	
+protected:
+	Ref<Drawable> m_src;
+	sl_bool m_flagUseColorMatrix;
+	ColorMatrix m_colorMatrix;
+	sl_real m_alpha;
+	sl_real m_blurRadius;
 	
 };
 
@@ -219,7 +302,7 @@ public:
 	
 public:
 	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
 	
 protected:
 	sl_real m_widthLeft;
@@ -253,7 +336,7 @@ public:
 	
 public:
 	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
 	
 protected:
 	sl_real m_widthLeftDst;
@@ -283,7 +366,7 @@ public:
 	
 public:
 	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
 	
 protected:
 	sl_real m_widthLeftDst;
@@ -309,7 +392,7 @@ public:
 	
 public:
 	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
 	
 protected:
 	sl_real m_heightTopDst;
@@ -349,10 +432,10 @@ public:
 	
 public:
 	// override
-	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc);
+	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param);
 	
 	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param);
 	
 protected:
 	struct _Source
@@ -367,74 +450,6 @@ protected:
 	sl_real m_height;
 	
 };
-
-
-class SLIB_EXPORT RectangleDrawable : public Drawable
-{
-	SLIB_DECLARE_OBJECT
-	
-public:
-	static Ref<Drawable> create(const Ref<Pen>& pen, const Ref<Brush>& brush);
-	
-public:
-	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
-	
-protected:
-	Ref<Pen> m_pen;
-	Ref<Brush> m_brush;
-	
-};
-
-class SLIB_EXPORT EllipseDrawable : public Drawable
-{
-	SLIB_DECLARE_OBJECT
-	
-public:
-	static Ref<Drawable> create(const Ref<Pen>& pen, const Ref<Brush>& brush);
-	
-public:
-	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
-	
-protected:
-	Ref<Pen> m_pen;
-	Ref<Brush> m_brush;
-	
-};
-
-class SLIB_EXPORT HorizontalLineDrawable : public Drawable
-{
-	SLIB_DECLARE_OBJECT
-	
-public:
-	static Ref<Drawable> create(const Ref<Pen>& pen);
-	
-public:
-	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
-	
-protected:
-	Ref<Pen> m_pen;
-	
-};
-
-class SLIB_EXPORT VerticalLineDrawable : public Drawable
-{
-	SLIB_DECLARE_OBJECT
-	
-public:
-	static Ref<Drawable> create(const Ref<Pen>& pen);
-	
-public:
-	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst);
-	
-protected:
-	Ref<Pen> m_pen;
-	
-};
-
 
 SLIB_GRAPHICS_NAMESPACE_END
 

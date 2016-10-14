@@ -545,6 +545,8 @@ sl_int32 Variant::getInt32(sl_int32 def) const
 			return REF_VAR(String8, _value).parseInt32(10, def);
 		case VariantType::String16:
 			return REF_VAR(String16, _value).parseInt32(10, def);
+		case VariantType::Pointer:
+			return (sl_int32)(REF_VAR(sl_size, _value));
 		case VariantType::Sz8:
 		{
 			sl_int32 ret;
@@ -602,6 +604,8 @@ sl_uint32 Variant::getUint32(sl_uint32 def) const
 			return REF_VAR(String8, _value).parseUint32(10, def);
 		case VariantType::String16:
 			return REF_VAR(String16, _value).parseUint32(10, def);
+		case VariantType::Pointer:
+			return (sl_uint32)(REF_VAR(sl_size, _value));
 		case VariantType::Sz8:
 		{
 			sl_uint32 ret;
@@ -659,6 +663,8 @@ sl_int64 Variant::getInt64(sl_int64 def) const
 			return (REF_VAR(String8, _value)).parseInt64(10, def);
 		case VariantType::String16:
 			return (REF_VAR(String16, _value)).parseInt64(10, def);
+		case VariantType::Pointer:
+			return (sl_int64)(REF_VAR(sl_size, _value));
 		case VariantType::Sz8:
 		{
 			sl_int64 ret;
@@ -716,6 +722,8 @@ sl_uint64 Variant::getUint64(sl_uint64 def) const
 			return (REF_VAR(String8, _value)).parseUint64(10, def);
 		case VariantType::String16:
 			return (REF_VAR(String16, _value)).parseUint64(10, def);
+		case VariantType::Pointer:
+			return (sl_uint64)(REF_VAR(sl_size, _value));
 		case VariantType::Sz8:
 		{
 			sl_uint64 ret;
@@ -1034,6 +1042,8 @@ String8 Variant::getString8(const String8& def) const
 			return REF_VAR(const sl_char8*, _value);
 		case VariantType::Sz16:
 			return REF_VAR(const sl_char16*, _value);
+		case VariantType::Pointer:
+			return "#" + String8::fromPointerValue(REF_VAR(const void*, _value));
 		default:
 			break;
 	}
@@ -1078,6 +1088,8 @@ String16 Variant::getString16(const String16& def) const
 			return REF_VAR(const sl_char8*, _value);
 		case VariantType::Sz16:
 			return REF_VAR(const sl_char16*, _value);
+		case VariantType::Pointer:
+			return "#" + String16::fromPointerValue(REF_VAR(const void*, _value));
 		default:
 			break;
 	}

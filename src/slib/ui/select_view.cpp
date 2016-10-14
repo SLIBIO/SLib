@@ -1,5 +1,4 @@
 #include "../../../inc/slib/ui/select_view.h"
-#include "../../../inc/slib/graphics/context.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -52,7 +51,7 @@ public:
 	}
 	
 	// override
-	void onDrawAll(Canvas* canvas, const Rectangle& rectDst)
+	void onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawParam& param)
 	{
 		if (m_brush.isNotNull()) {
 			Point pts[3];
@@ -388,11 +387,6 @@ void SelectView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 		return;
 	}
 	
-	Ref<GraphicsContext> gc = getGraphicsContext();
-	if (gc.isNull()) {
-		return;
-	}
-	
 	if (flagHorizontal) {
 		sl_ui_pos width = m_iconSize.x * 2 + getPaddingLeft() + getPaddingRight();
 		if (width < 0) {
@@ -404,7 +398,7 @@ void SelectView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 		sl_ui_pos height = 0;
 		Ref<Font> font = getFont();
 		if (font.isNotNull()) {
-			height = (sl_ui_pos)(gc->getFontTextSize(font, "|").y * 1.5f);
+			height = (sl_ui_pos)(font->getTextSize("|").y * 1.5f);
 			if (height < 0) {
 				height = 0;
 			}

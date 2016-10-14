@@ -733,6 +733,12 @@
     <ClInclude Include="..\..\..\inc\slib\ui\slider.h">
       <Filter>inc\ui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\animation.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\graphics\platform.h">
+      <Filter>inc\graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">
@@ -957,9 +963,6 @@
     <ClCompile Include="..\..\..\src\slib\graphics\font_freetype.cpp">
       <Filter>src\slib\graphics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\graphics\graphics_context.cpp">
-      <Filter>src\slib\graphics</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\slib\graphics\graphics_path.cpp">
       <Filter>src\slib\graphics</Filter>
     </ClCompile>
@@ -1128,9 +1131,6 @@
     <ClCompile Include="..\..\..\src\slib\ui\button_win32.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\canvas_gdiplus.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\check_box.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
@@ -1143,19 +1143,10 @@
     <ClCompile Include="..\..\..\src\slib\ui\cursor_win32.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\drawable_gdiplus.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\edit_view.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\edit_view_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\font_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\graphics_path_gdiplus.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\label_view.cpp">
@@ -1198,9 +1189,6 @@
       <Filter>src\slib\ui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\ui_event_win32.cpp">
-      <Filter>src\slib\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\ui\ui_graphics_context.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\view.cpp">
@@ -1430,6 +1418,33 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\slider.cpp">
       <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\animation.cpp">
+      <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\bitmap_gdiplus.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\brush_gdiplus.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\pen_gdiplus.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\canvas_gdiplus.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\font_win32.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_path_gdiplus.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\drawable_gdiplus.cpp">
+      <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_platform_win32.cpp">
+      <Filter>src\slib\graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
