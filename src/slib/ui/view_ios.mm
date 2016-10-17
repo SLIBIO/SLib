@@ -192,7 +192,7 @@ void iOS_ViewInstance::setFrame(const UIRect& frame)
 		rect.size.height = (CGFloat)(frame.getHeight()) / f;
 		[handle setFrame:rect];
 		*/
-		[handle setNeedsDisplay];
+		invalidate();
 	}
 }
 
@@ -203,6 +203,7 @@ void iOS_ViewInstance::setTransform(const Matrix3& m)
 		CGAffineTransform t;
 		GraphicsPlatform::getCGAffineTransform(t, m, UIPlatform::getGlobalScaleFactor(), 0, 0);
 		[handle setTransform: t];
+		invalidate();
 	}
 }
 
@@ -211,6 +212,7 @@ void iOS_ViewInstance::setVisible(sl_bool flag)
 	UIView* handle = m_handle;
 	if (handle != nil) {
 		[handle setHidden:(flag ? NO : YES)];
+		invalidate();
 	}
 }
 
@@ -318,6 +320,7 @@ void iOS_ViewInstance::bringToFront()
 		UIView* parent = handle.superview;
 		if (parent != nil) {
 			[parent bringSubviewToFront:handle];
+			invalidate();
 		}
 	}
 }
@@ -425,10 +428,12 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (view->isCapturingChildInstanceEvents()) {
-			CGFloat f = slib::UIPlatform::getGlobalScaleFactor();
-			if (view->hitTestForCapturingChildInstanceEvents(slib::UIPoint((sl_ui_pos)(aPoint.x * f), (sl_ui_pos)(aPoint.y * f)))) {
-				return self;
+		if (view.isNotNull()) {
+			if (view->isCapturingChildInstanceEvents()) {
+				CGFloat f = slib::UIPlatform::getGlobalScaleFactor();
+				if (view->hitTestForCapturingChildInstanceEvents(slib::UIPoint((sl_ui_pos)(aPoint.x * f), (sl_ui_pos)(aPoint.y * f)))) {
+					return self;
+				}
 			}
 		}
 	}
@@ -443,7 +448,9 @@ IOS_VIEW_EVENTS
 /******************************************
 			UIPlatform
 ******************************************/
+
 SLIB_UI_NAMESPACE_BEGIN
+
 Ref<ViewInstance> UIPlatform::createViewInstance(UIView* handle, sl_bool flagFreeOnRelease)
 {
 	Ref<ViewInstance> ret = UIPlatform::_getViewInstance((__bridge void*)handle);
@@ -489,6 +496,7 @@ UIView* UIPlatform::getViewHandle(View* view)
 	}
 	return nil;
 }
+
 SLIB_UI_NAMESPACE_END
 
 #endif

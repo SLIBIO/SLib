@@ -582,13 +582,10 @@ SLIB_UI_NAMESPACE_END
 		slib::Ref<slib::_iOS_Window> w = window->m_window;
 		if (w.isNotNull()) {
 			CGFloat f = slib::UIPlatform::getGlobalScaleFactor();
-			slib::UISize size;
-			size.x = (sl_ui_pos)(_size.width * f);
-			size.y = (sl_ui_pos)(_size.height * f);
 			CGRect r = window.frame;
 			r.size = _size;
 			window.frame = r;
-			w->onResize(size);
+			w->onResize((sl_ui_pos)(_size.width * f), (sl_ui_pos)(_size.height * f));
 		}
 	}
 }

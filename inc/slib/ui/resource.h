@@ -148,14 +148,8 @@ public:
 	
 public:
 	// override
-	void dispatchResize(UISize& size);
-	
-	// override
-	void dispatchMaximize();
-	
-	// override
-	void dispatchMinimize();
-	
+	void dispatchResize(sl_ui_len width, sl_ui_len height);
+		
 protected:
 	void _layoutViews_safe();
 

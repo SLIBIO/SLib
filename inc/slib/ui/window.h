@@ -128,6 +128,8 @@ public:
 	virtual void setClientSize(const UISize& size);
 
 	void setClientSize(sl_ui_len width, sl_ui_len height);
+	
+	UIRect getClientBounds();
 
 	
 	String getTitle();
@@ -288,7 +290,9 @@ protected:
 	
 	virtual void onMove();
 	
-	virtual void onResize(UISize& size);
+	virtual void onResizing(UISize& size);
+	
+	virtual void onResize(sl_ui_len width, sl_ui_len height);
 
 	virtual void onMinimize();
 	
@@ -311,7 +315,9 @@ public:
 	
 	virtual void dispatchMove();
 	
-	virtual void dispatchResize(UISize& size);
+	virtual void dispatchResizing(UISize& size);
+	
+	virtual void dispatchResize(sl_ui_len width, sl_ui_len height);
 	
 	virtual void dispatchMinimize();
 	
@@ -463,9 +469,9 @@ public:
 	
 	void onMove();
 	
-	void onResize(UISize& size);
+	void onResizing(UISize& size);
 	
-	void onResized(sl_ui_len width, sl_ui_len height);
+	void onResize(sl_ui_len width, sl_ui_len height);
 	
 	void onMinimize();
 	

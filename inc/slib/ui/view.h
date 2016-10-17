@@ -735,6 +735,10 @@ public:
 	
 	void setTransformAnimation(const Ref<Animation>& animation, const Matrix3& startValue, const Matrix3& endValue, sl_bool flagRedraw = sl_true);
 	
+	Ref<Animation> startTransformAnimation(const AnimationFrames<Matrix3>& frames, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
+	
+	Ref<Animation> startTransformAnimation(const Matrix3& startValue, const Matrix3& endValue, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
+	
 	void resetTransformAnimation(sl_bool flagRedraw = sl_true);
 	
 	Ref<Animation> getTranslateAnimation();
@@ -742,6 +746,10 @@ public:
 	void setTranslateAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, sl_bool flagRedraw = sl_true);
 	
 	void setTranslateAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue, sl_bool flagRedraw = sl_true);
+	
+	Ref<Animation> startTranslateAnimation(const AnimationFrames<Vector2>& frames, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
+	
+	Ref<Animation> startTranslateAnimation(const Vector2& startValue, const Vector2& endValue, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
 	
 	void resetTranslateAnimation(sl_bool flagRedraw = sl_true);
 	
@@ -753,6 +761,12 @@ public:
 	
 	void setScaleAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, sl_bool flagRedraw = sl_true);
 	
+	Ref<Animation> startScaleAnimation(const AnimationFrames<Vector2>& frames, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
+	
+	Ref<Animation> startScaleAnimation(const Vector2& startValue, const Vector2& endValue, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
+	
+	Ref<Animation> startScaleAnimation(sl_real startValue, sl_real endValue, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
+
 	void resetScaleAnimation(sl_bool flagRedraw = sl_true);
 	
 	Ref<Animation> getRotateAnimation();
@@ -761,6 +775,10 @@ public:
 	
 	void setRotateAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, sl_bool flagRedraw = sl_true);
 	
+	Ref<Animation> startRotateAnimation(const AnimationFrames<sl_real>& frames, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
+	
+	Ref<Animation> startRotateAnimation(sl_real startValue, sl_real endValue, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
+
 	void resetRotateAnimation(sl_bool flagRedraw = sl_true);
 	
 	Ref<Animation> getAlphaAnimation();
@@ -769,6 +787,10 @@ public:
 	
 	void setAlphaAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, sl_bool flagRedraw = sl_true);
 	
+	Ref<Animation> startAlphaAnimation(const AnimationFrames<sl_real>& frames, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
+	
+	Ref<Animation> startAlphaAnimation(sl_real startValue, sl_real endValue, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
+
 	void resetAlphaAnimation(sl_bool flagRedraw = sl_true);
 	
 	Ref<Animation> getBackgroundColorAnimation();
@@ -777,6 +799,10 @@ public:
 	
 	void setBackgroundColorAnimation(const Ref<Animation>& animation, const Color4f& startValue, const Color4f& endValue, sl_bool flagRedraw = sl_true);
 	
+	Ref<Animation> startBackgroundColorAnimation(const AnimationFrames<Color4f>& frames, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
+	
+	Ref<Animation> startBackgroundColorAnimation(const Color4f& startValue, const Color4f& endValue, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
+
 	void resetBackgroundColorAnimation(sl_bool flagRedraw = sl_true);
 	
 	
@@ -1051,6 +1077,20 @@ private:
 	void _setFontInvalidateChildren();
 
 	void _applyFinalAlpha(sl_bool flagRedraw);
+	
+
+	void _resetTransformAnimation();
+	
+	void _resetTranslateAnimation();
+	
+	void _resetScaleAnimation();
+	
+	void _resetRotateAnimation();
+	
+	void _resetAlphaAnimation();
+	
+	void _resetBackgroundColorAnimation();
+
 	
 	Ref<ScrollBar> _createHorizontalScrollBar();
 	
@@ -1408,7 +1448,7 @@ class ViewGroup : public View
 {
 	SLIB_DECLARE_OBJECT
 public:
-	ViewGroup(sl_bool flagCreatingChildInstances = sl_true);
+	ViewGroup();
 	
 };
 

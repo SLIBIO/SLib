@@ -276,29 +276,12 @@ enum class UIAttachMode
 	AttachInNativeWidget = 3
 };
 
-enum class TransitionType
+enum class UIPageAction
 {
-	None = 0,
-	Push = 1,
-	Slide = 2,
-	Cover = 3,
-	Zoom = 4,
-	Fade = 5
-};
-
-enum class TransitionDirection
-{
-	Left = 0,
-	Top = 1,
-	Right = 2,
-	Bottom = 3
-};
-
-enum class TransitionDuration
-{
-	Normal = 0,
-	Short = 1,
-	Long = 2
+	Push = 0,
+	Pop = 1,
+	Resume = 2,
+	Pause = 3
 };
 
 SLIB_UI_NAMESPACE_END

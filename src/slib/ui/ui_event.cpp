@@ -848,7 +848,11 @@ void IWindowListener::onMove(Window* window)
 {
 }
 
-void IWindowListener::onResize(Window* window, UISize& size)
+void IWindowListener::onResizing(Window* window, UISize& size)
+{
+}
+
+void IWindowListener::onResize(Window* window, sl_ui_len width, sl_ui_len height)
 {
 }
 
@@ -921,9 +925,9 @@ void UIEventLogListener::onMove(Window* window)
 	SLIB_LOG("Window", "onMove");
 }
 
-void UIEventLogListener::onResize(Window* window, UISize& size)
+void UIEventLogListener::onResize(Window* window, sl_ui_len width, sl_ui_len height)
 {
-	SLIB_LOG("Window", String::format("onResize (%d, %d)", size.x, size.y));
+	SLIB_LOG("Window", String::format("onResize (%d, %d)", width, height));
 }
 
 void UIEventLogListener::onMinimize(Window* window)

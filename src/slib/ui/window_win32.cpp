@@ -829,11 +829,10 @@ LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 				if (height > 60000) {
 					height = 60000;
 				}
-				UISize size((sl_ui_pos)width, (sl_ui_pos)height);
 				if (wParam == SIZE_MAXIMIZED) {
 					window->m_flagMaximized = sl_true;
 					window->onMaximize();
-					window->onResize(size);
+					window->onResize((sl_ui_pos)width, (sl_ui_pos)height);
 				} else if (wParam == SIZE_MINIMIZED) {
 					window->m_flagMinimized = sl_true;
 					window->onMinimize();
@@ -844,9 +843,9 @@ LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 					} else if (window->m_flagMaximized) {
 						window->m_flagMaximized = sl_false;
 						window->onDemaximize();
-						window->onResize(size);
+						window->onResize((sl_ui_pos)width, (sl_ui_pos)height);
 					} else {
-						window->onResize(size);
+						window->onResize((sl_ui_pos)width, (sl_ui_pos)height);
 					}
 				}
 				break;
@@ -855,9 +854,7 @@ LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 			{
 				RECT& rect = *(RECT*)(lParam);
 				UISize size((sl_ui_pos)(rect.right - rect.left), (sl_ui_pos)(rect.bottom - rect.top));
-				size = window->getClientSizeFromWindowSize(size);
-				window->onResize(size);
-				size = window->getWindowSizeFromClientSize(size);
+				window->onResizing(size);
 				if (size.x < 0) {
 					size.x = 0;
 				}

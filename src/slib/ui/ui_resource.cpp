@@ -94,22 +94,10 @@ WindowLayoutResource::WindowLayoutResource(sl_real sp)
 	m_contentView = view.ptr;
 }
 
-void WindowLayoutResource::dispatchResize(UISize& size)
+void WindowLayoutResource::dispatchResize(sl_ui_len width, sl_ui_len height)
 {
-	Window::dispatchResize(size);
-	UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(WindowLayoutResource, _layoutViews_safe, this));
-}
-
-void WindowLayoutResource::dispatchMaximize()
-{
-	Window::dispatchMaximize();
-	UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(WindowLayoutResource, _layoutViews_safe, this));
-}
-
-void WindowLayoutResource::dispatchMinimize()
-{
-	Window::dispatchMinimize();
-	UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(WindowLayoutResource, _layoutViews_safe, this));
+	Window::dispatchResize(width, height);
+	_layoutViews_safe();
 }
 
 void WindowLayoutResource::_layoutViews_safe()
@@ -135,7 +123,7 @@ void ViewLayoutResource::dispatchResize(sl_ui_len width, sl_ui_len height)
 }
 
 
-SLIB_DEFINE_OBJECT(MobilePageLayoutResource, ViewGroup)
+SLIB_DEFINE_OBJECT(MobilePageLayoutResource, MobilePage)
 
 MobilePageLayoutResource::MobilePageLayoutResource(sl_real sp)
 : UILayoutResource(sp)

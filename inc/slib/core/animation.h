@@ -4,6 +4,7 @@
 #include "definition.h"
 
 #include "object.h"
+#include "callback.h"
 #include "pointer.h"
 #include "list.h"
 #include "time.h"
@@ -40,7 +41,8 @@ enum class AnimationCurve
 	Bounce = 5,			// bounces at the end
 	Anticipate = 6,		// starts backward then flings forward
 	Overshoot = 7,		// flings forward and overshoots the last value then comes back
-	Custom = 100
+	Custom = 50,
+	Default = 100
 };
 
 typedef float (*CustomAnimationCurve)(float fraction, Referable* param);
@@ -188,6 +190,7 @@ public:
 	
 public:
 	SLIB_PTR_PROPERTY(IAnimationListener, Listener)
+	SLIB_REF_PROPERTY(Runnable, OnStop)
 	
 protected:
 	virtual void onAnimationFrame(float seconds);

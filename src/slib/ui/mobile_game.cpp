@@ -10,8 +10,7 @@ MobileGame::MobileGame()
 	
 	m_gameView = new MobileGameView;
 	if (m_gameView.isNotNull()) {
-		m_gameView->setSizeFilling();
-		addView(m_gameView);
+		//addView(m_gameView);
 	}
 }
 
@@ -40,6 +39,12 @@ void MobileGame::onGameFrame(RenderEngine* engine)
 void MobileGame::dispatchGameFrame(RenderEngine* engine)
 {
 	onGameFrame(engine);
+}
+
+void MobileGame::dispatchResize(sl_ui_len width, sl_ui_len height)
+{
+	m_gameView->setFrame(0, 0, width, height);
+	MobileApp::dispatchResize(width, height);
 }
 
 SLIB_DEFINE_OBJECT(MobileGameView, RenderView)

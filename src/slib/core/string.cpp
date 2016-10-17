@@ -5049,6 +5049,7 @@ static sl_size _String_applyBackslashEscapes(const ST& s, sl_bool flagDoubleQuot
 	} else {
 		d = 0;
 	}
+	sl_bool flagPrevEscaped = sl_false;
 	for (sl_size i = 0; i < len; i++) {
 		CT c = ch[i];
 		CT r = 0;
@@ -5120,13 +5121,25 @@ static sl_size _String_applyBackslashEscapes(const ST& s, sl_bool flagDoubleQuot
 						d += 6;
 					}
 				}
-				
+				flagPrevEscaped = sl_true;
 			} else {
+				if (flagPrevEscaped) {
+					if (SLIB_CHAR_IS_HEX(c)) {
+						if (buf) {
+							CT t = flagDoubleQuote ? '"' : '\'';
+							buf[d++] = t;
+							buf[d++] = t;
+						} else {
+							d += 2;
+						}
+					}
+				}
 				if (buf) {
 					buf[d++] = c;
 				} else {
 					d++;
 				}
+				flagPrevEscaped = sl_false;
 			}
 		}
 	}

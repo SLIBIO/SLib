@@ -626,6 +626,10 @@ void Animation::dispatchEndAnimation(sl_int32 nRemainingRepeatCount)
 void Animation::dispatchStopAnimation()
 {
 	onStopAnimation();
+	Ref<Runnable> onStop(getOnStop());
+	if (onStop.isNotNull()) {
+		onStop->run();
+	}
 	PtrLocker<IAnimationListener> listener(getListener());
 	if (listener.isNotNull()) {
 		listener->onStopAnimation(this);
@@ -713,6 +717,7 @@ SLIB_INLINE static float _Animation_bounce(float f)
 float Animation::_applyCurve(float f)
 {
 	switch (m_curve) {
+		case AnimationCurve::Default:
 		case AnimationCurve::Linear:
 			return f;
 		case AnimationCurve::EaseInOut:

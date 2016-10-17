@@ -66,6 +66,21 @@ HWND Windows::getRootWindow(HWND hWnd)
 	return ::GetAncestor(hWnd, GA_ROOT);
 }
 
+void Windows::getWindowFrame(HWND hWnd, RECT& rc)
+{
+	::GetWindowRect(hWnd, &rc);
+	HWND hWndParent = Windows::getParentWindow(hWnd);
+	if (hWndParent) {
+		::ScreenToClient(hWnd, (POINT*)(&rc));
+		::ScreenToClient(hWnd, (POINT*)(&rc) + 1);
+	} else {
+		rc.right -= rc.left;
+		rc.bottom -= rc.top;
+		rc.left = 0;
+		rc.top = 0;
+	}
+}
+
 String Windows::getWindowText(HWND hWnd)
 {
 	sl_int32 len = ::GetWindowTextLengthW(hWnd);

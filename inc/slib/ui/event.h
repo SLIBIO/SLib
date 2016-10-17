@@ -346,7 +346,9 @@ public:
 	
 	virtual void onMove(Window* window);
 	
-	virtual void onResize(Window* window, UISize& size);
+	virtual void onResizing(Window* window, UISize& size);
+	
+	virtual void onResize(Window* window, sl_ui_len width, sl_ui_len height);
 	
 	virtual void onMinimize(Window* window);
 	
@@ -383,7 +385,7 @@ public:
 	
 	void onMove(Window* window);
 	
-	void onResize(Window* window, UISize& size);
+	void onResize(Window* window, sl_ui_len width, sl_ui_len height);
 	
 	void onMinimize(Window* window);
 	

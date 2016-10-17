@@ -117,6 +117,21 @@ SLIB_NAMESPACE_END
 	SLIB_SAFE_STATIC_DESTRUCTOR(TYPE, NAME)
 
 
+#define SLIB_DECLARE_SINGLETON(TYPE) \
+public: \
+	static slib::Ref<TYPE> getInstance();
+
+#define SLIB_DEFINE_SINGLETON(TYPE) \
+	slib::Ref<TYPE> TYPE::getInstance() \
+	{ \
+		SLIB_SAFE_STATIC(slib::Ref<TYPE>, instance, new TYPE); \
+		if (SLIB_SAFE_STATIC_CHECK_FREED(instance)) { \
+			return slib::Ref<TYPE>::null(); \
+		} \
+		return instance; \
+	}
+
+
 #define SLIB_PROPERTY(TYPE, NAME) protected: \
 	TYPE _m_property_##NAME; \
 public: \

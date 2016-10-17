@@ -39,6 +39,8 @@ public:
 	
 	static HWND getRootWindow(HWND hWnd);
 
+	static void getWindowFrame(HWND hWnd, RECT& rc);
+
 	
 	static String getWindowText(HWND hWnd);
 	

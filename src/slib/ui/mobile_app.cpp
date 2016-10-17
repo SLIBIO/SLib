@@ -11,7 +11,12 @@ MobileApp::MobileApp()
 {
 	SLIB_REFERABLE_CONSTRUCTOR
 	
-	setMainWindow(new MobileMainWindow);
+	Ref<MobileMainWindow> window = new MobileMainWindow;
+	setMainWindow(window);
+	
+	m_pageStack = new ViewStack;
+	window->addView(m_pageStack);
+	
 }
 
 Ref<MobileApp> MobileApp::getApp()
@@ -61,6 +66,51 @@ void MobileApp::removeView(const Ref<View>& view)
 	}
 }
 
+Ref<ViewStack> MobileApp::getPageStack()
+{
+	return m_pageStack;
+}
+
+void MobileApp::openPage(const Ref<View>& page, const Transition& transition)
+{
+	m_pageStack->push(page, transition);
+}
+
+void MobileApp::openPage(const Ref<View>& page)
+{
+	m_pageStack->push(page);
+}
+
+void MobileApp::openHomePage(const Ref<View>& page, const Transition& transition)
+{
+	m_pageStack->push(page, transition, sl_true);
+}
+
+void MobileApp::openHomePage(const Ref<View>& page)
+{
+	m_pageStack->push(page, sl_true);
+}
+
+void MobileApp::closePage(const Ref<View>& page, const Transition& transition)
+{
+	m_pageStack->pop(page, transition);
+}
+
+void MobileApp::closePage(const Ref<View>& page)
+{
+	m_pageStack->pop(page);
+}
+
+void MobileApp::closePage(const Transition& transition)
+{
+	m_pageStack->pop(transition);
+}
+
+void MobileApp::closePage()
+{
+	m_pageStack->pop();
+}
+
 void MobileApp::onPause()
 {
 }
@@ -78,6 +128,10 @@ void MobileApp::onCreateActivity()
 }
 
 void MobileApp::onDestroyActivity()
+{
+}
+
+void MobileApp::onResize(sl_ui_len width, sl_ui_len height)
 {
 }
 
@@ -162,14 +216,249 @@ void MobileApp::dispatchDestroyActivityToApp()
 	}
 }
 
+void MobileApp::dispatchResize(sl_ui_len width, sl_ui_len height)
+{
+	m_pageStack->setFrame(0, 0, width, height);
+	onResize(width, height);
+}
+
+void MobileApp::dispatchResizeToApp(sl_ui_len width, sl_ui_len height)
+{
+	Ref<MobileApp> app = getApp();
+	if (app.isNotNull()) {
+		app->dispatchResize(width, height);
+	}
+}
+
 
 SLIB_DEFINE_OBJECT(MobileMainWindow, Window)
 
 MobileMainWindow::MobileMainWindow()
 {
-	SLIB_REFERABLE_CONSTRUCTOR
-	
+	SLIB_REFERABLE_CONSTRUCTOR;
 }
+
+void MobileMainWindow::onResize(sl_ui_len width, sl_ui_len height)
+{
+	MobileApp::dispatchResizeToApp(width, height);
+}
+
+
+SLIB_DEFINE_OBJECT(MobilePage, ViewPage)
+
+MobilePage::MobilePage()
+{
+	SLIB_REFERABLE_CONSTRUCTOR
+}
+
+void MobilePage::openPage(const Transition& transition)
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		app->openPage(this, transition);
+	}
+}
+
+void MobilePage::openPage()
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		app->openPage(this);
+	}
+}
+
+void MobilePage::openHomePage(const Transition& transition)
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		app->openHomePage(this, transition);
+	}
+}
+
+void MobilePage::openHomePage()
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		app->openHomePage(this);
+	}
+}
+
+void MobilePage::closePage(const Transition& transition)
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		app->closePage(this, transition);
+	}
+}
+
+void MobilePage::closePage()
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		app->closePage(this);
+	}
+}
+
+TransitionType MobilePage::getGlobalOpeningTransitionType()
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		Ref<ViewStack> stack = app->getPageStack();
+		if (stack.isNotNull()) {
+			return stack->getPushTransitionType();
+		}
+	}
+	return TransitionType::Default;
+}
+
+void MobilePage::setGlobalOpeningTransitionType(TransitionType type)
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		Ref<ViewStack> stack = app->getPageStack();
+		if (stack.isNotNull()) {
+			stack->setPushTransitionType(type);
+		}
+	}
+}
+
+TransitionDirection MobilePage::getGlobalOpeningTransitionDirection()
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		Ref<ViewStack> stack = app->getPageStack();
+		if (stack.isNotNull()) {
+			return stack->getPushTransitionDirection();
+		}
+	}
+	return TransitionDirection::Default;
+}
+
+void MobilePage::setGlobalOpeningTransitionDirection(TransitionDirection direction)
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		Ref<ViewStack> stack = app->getPageStack();
+		if (stack.isNotNull()) {
+			stack->setPushTransitionDirection(direction);
+		}
+	}
+}
+
+TransitionType MobilePage::getGlobalClosingTransitionType()
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		Ref<ViewStack> stack = app->getPageStack();
+		if (stack.isNotNull()) {
+			return stack->getPopTransitionType();
+		}
+	}
+	return TransitionType::Default;
+}
+
+void MobilePage::setGlobalClosingTransitionType(TransitionType type)
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		Ref<ViewStack> stack = app->getPageStack();
+		if (stack.isNotNull()) {
+			stack->setPopTransitionType(type);
+		}
+	}
+}
+
+TransitionDirection MobilePage::getGlobalClosingTransitionDirection()
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		Ref<ViewStack> stack = app->getPageStack();
+		if (stack.isNotNull()) {
+			return stack->getPopTransitionDirection();
+		}
+	}
+	return TransitionDirection::Default;
+}
+
+void MobilePage::setGlobalClosingTransitionDirection(TransitionDirection direction)
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		Ref<ViewStack> stack = app->getPageStack();
+		if (stack.isNotNull()) {
+			stack->setPopTransitionDirection(direction);
+		}
+	}
+}
+
+void MobilePage::setGlobalTransitionType(TransitionType type)
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		Ref<ViewStack> stack = app->getPageStack();
+		if (stack.isNotNull()) {
+			stack->setTransitionType(type);
+		}
+	}
+}
+
+void MobilePage::setGlobalTransitionDirection(TransitionDirection direction)
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		Ref<ViewStack> stack = app->getPageStack();
+		if (stack.isNotNull()) {
+			stack->setTransitionDirection(direction);
+		}
+	}
+}
+
+float MobilePage::getGlobalTransitionDuration()
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		Ref<ViewStack> stack = app->getPageStack();
+		if (stack.isNotNull()) {
+			return stack->getTransitionDuration();
+		}
+	}
+	return 0;
+}
+
+void MobilePage::setGlobalTransitionDuration(float duration)
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		Ref<ViewStack> stack = app->getPageStack();
+		if (stack.isNotNull()) {
+			stack->setTransitionDuration(duration);
+		}
+	}
+}
+
+AnimationCurve MobilePage::getGlobalTransitionCurve()
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		Ref<ViewStack> stack = app->getPageStack();
+		if (stack.isNotNull()) {
+			return stack->getTransitionCurve();
+		}
+	}
+	return AnimationCurve::Default;
+}
+
+void MobilePage::setGlobalTransitionCurve(AnimationCurve curve)
+{
+	Ref<MobileApp> app = MobileApp::getApp();
+	if (app.isNotNull()) {
+		Ref<ViewStack> stack = app->getPageStack();
+		if (stack.isNotNull()) {
+			stack->setTransitionCurve(curve);
+		}
+	}
+}
+
 
 SLIB_UI_NAMESPACE_END
 

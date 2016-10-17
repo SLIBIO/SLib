@@ -339,6 +339,11 @@ void Window::setClientSize(sl_ui_len width, sl_ui_len height)
 	setClientSize(UISize(width, height));
 }
 
+UIRect Window::getClientBounds()
+{
+	return UIRect(UIPoint::zero(), getClientSize());
+}
+
 String Window::getTitle()
 {
 	return m_title;
@@ -824,17 +829,9 @@ void Window::_create()
 		
 		onCreate();
 		
-#if !defined(SLIB_PLATFORM_IS_OSX)
-		UISize sizeOld = getSize();
-		if (sizeOld.x > 0 && sizeOld.y > 0) {
-			UISize size = sizeOld;
-			dispatchResize(size);
-			if (size != sizeOld) {
-				setSize(size);
-			}
-		}
-#endif
-		
+		UIRect frame = window->getFrame();
+		dispatchResize(frame.getWidth(), frame.getHeight());
+
 		if (m_flagModal) {
 			_runModal();
 		}
@@ -906,7 +903,11 @@ void Window::onMove()
 {
 }
 
-void Window::onResize(UISize& size)
+void Window::onResizing(UISize& size)
+{
+}
+
+void Window::onResize(sl_ui_len width, sl_ui_len height)
 {
 }
 
@@ -976,13 +977,22 @@ void Window::dispatchMove()
 	}
 }
 
-void Window::dispatchResize(UISize& size)
+void Window::dispatchResizing(UISize& size)
 {
-	_refreshSize();
-	onResize(size);
+	onResizing(size);
 	PtrLocker<IWindowListener> listener(getEventListener());
 	if (listener.isNotNull()) {
-		listener->onResize(this, size);
+		listener->onResizing(this, size);
+	}
+}
+
+void Window::dispatchResize(sl_ui_len width, sl_ui_len height)
+{
+	_refreshSize();
+	onResize(width, height);
+	PtrLocker<IWindowListener> listener(getEventListener());
+	if (listener.isNotNull()) {
+		listener->onResize(this, width, height);
 	}
 }
 
@@ -1099,18 +1109,20 @@ void WindowInstance::onMove()
 	}
 }
 
-void WindowInstance::onResize(UISize& size)
+void WindowInstance::onResizing(UISize& size)
 {
 	Ref<Window> window = getWindow();
 	if (window.isNotNull()) {
-		window->dispatchResize(size);
+		window->dispatchResizing(size);
 	}
 }
 
-void WindowInstance::onResized(sl_ui_len width, sl_ui_len height)
+void WindowInstance::onResize(sl_ui_len width, sl_ui_len height)
 {
-	UISize size(width, height);
-	onResize(size);
+	Ref<Window> window = getWindow();
+	if (window.isNotNull()) {
+		window->dispatchResize(width, height);
+	}
 }
 
 void WindowInstance::onMinimize()

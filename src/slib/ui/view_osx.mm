@@ -851,9 +851,11 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (view->isCapturingChildInstanceEvents()) {
-			if (view->hitTestForCapturingChildInstanceEvents(slib::UIPoint((sl_ui_pos)(aPoint.x), (sl_ui_pos)(aPoint.y)))) {
-				return self;
+		if (view.isNotNull()) {
+			if (view->isCapturingChildInstanceEvents()) {
+				if (view->hitTestForCapturingChildInstanceEvents(slib::UIPoint((sl_ui_pos)(aPoint.x), (sl_ui_pos)(aPoint.y)))) {
+					return self;
+				}
 			}
 		}
 	}

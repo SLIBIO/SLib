@@ -444,7 +444,7 @@ void View::_processAttachOnUiThread()
 		if (getParent().isNull()) {
 			_makeLayout(sl_false);
 		}
-		if (isCreatingChildInstances()) {
+		if (m_flagCreatingChildInstances) {
 			ListLocker< Ref<View> > children(m_children);
 			for (sl_size i = 0; i < children.count; i++) {
 #if defined(SLIB_PLATFORM_IS_WIN32)
@@ -452,7 +452,7 @@ void View::_processAttachOnUiThread()
 #else
 				Ref<View>& child = children[i];
 #endif
-				if (child.isNotNull()) {
+				if (child.isNotNull() && child->m_flagCreatingInstance) {
 					switch(child->getAttachMode()) {
 						case UIAttachMode::NotAttach:
 							break;
@@ -654,7 +654,7 @@ void View::removeFromParent()
 void View::attachChild(const Ref<View>& child)
 {
 	if (m_flagCreatingChildInstances) {
-		if (child.isNotNull()) {
+		if (child.isNotNull() && child->m_flagCreatingInstance) {
 			if (!(UI::isUiThread())) {
 				UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, _attachChildOnUiThread, this, child));
 				return;
@@ -737,37 +737,36 @@ void View::bringToFront(sl_bool flagRedraw)
 	}
 }
 
-void View::_addChild(const Ref<View>& view, sl_bool flagRedraw)
+void View::_addChild(const Ref<View>& child, sl_bool flagRedraw)
 {
-	if (view.isNotNull()) {
-		view->setFocus(sl_false, sl_false);
-		view->setParent(this);
+	if (child.isNotNull()) {
+		child->setFocus(sl_false, sl_false);
+		child->setParent(this);
 		if (m_flagOnAddChild) {
-			onAddChild(view.ptr);
+			onAddChild(child.ptr);
 		}
 		requestLayout(sl_false);
-		
-		switch(view->getAttachMode()) {
-			case UIAttachMode::NotAttach:
-				break;
-			case UIAttachMode::AttachAlways:
-				if (isInstance() && isCreatingChildInstances()) {
-					attachChild(view);
-				}
-				break;
-			case UIAttachMode::NotAttachInNativeWidget:
-				if (isInstance() && isCreatingChildInstances() && !(isNativeWidget())) {
-					attachChild(view);
-				}
-				break;
-			case UIAttachMode::AttachInNativeWidget:
-				if (isInstance() && isCreatingChildInstances() && isNativeWidget()) {
-					attachChild(view);
-				}
-				break;
+		if (isInstance() && m_flagCreatingChildInstances && child->m_flagCreatingInstance) {
+			switch(child->getAttachMode()) {
+				case UIAttachMode::NotAttach:
+					break;
+				case UIAttachMode::AttachAlways:
+					attachChild(child);
+					break;
+				case UIAttachMode::NotAttachInNativeWidget:
+					if (!(isNativeWidget())) {
+						attachChild(child);
+					}
+					break;
+				case UIAttachMode::AttachInNativeWidget:
+					if (isNativeWidget()) {
+						attachChild(child);
+					}
+					break;
+			}
 		}
 		
-		view->updateAndInvalidateBoundsInParent(sl_false);
+		child->updateAndInvalidateBoundsInParent(sl_false);
 		if (flagRedraw) {
 			invalidate();
 		}
@@ -945,9 +944,6 @@ sl_bool View::checkSelfInvalidatable()
 			return sl_true;
 		}
 		if (isOpaque()) {
-			return sl_true;
-		}
-		if (getBackgroundColor().a == 255) {
 			return sl_true;
 		}
 		Ref<View> parent = m_parent;
@@ -1141,10 +1137,16 @@ void View::setVisibility(Visibility visibility, sl_bool flagRedraw)
 		instance->setVisible(visibility == Visibility::Visible);
 	}
 	if (oldVisibility != visibility) {
-		if (visibility == Visibility::Gone) {
-			requestParentLayout(sl_false);
-		} else if (visibility == Visibility::Visible) {
-			requestParentAndSelfLayout(sl_false);
+		switch (visibility) {
+			case Visibility::Visible:
+			case Visibility::Hidden:
+				if (oldVisibility == Visibility::Gone) {
+					requestParentAndSelfLayout(sl_false);
+				}
+				break;
+			case Visibility::Gone:
+				requestParentLayout(sl_false);
+				break;
 		}
 		dispatchChangeVisibility(oldVisibility, visibility);
 	}
@@ -3923,7 +3925,7 @@ void View::_applyFinalTransform(sl_bool flagRedraw)
 	if (attrs.isNotNull()) {
 		attrs->flagTransformFinalInvalid = sl_true;
 		if (isInstance()) {
-			UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, _invalidateInstanceTransform, this));
+			_invalidateInstanceTransform();
 		}
 		updateAndInvalidateBoundsInParent(flagRedraw);
 	}
@@ -4820,8 +4822,8 @@ void View::resetAnimations(sl_bool flagRedraw)
 		attrs->flagTransformAnimation = sl_false;
 		attrs->translationAnimation.x = 0;
 		attrs->translationAnimation.y = 0;
-		attrs->scaleAnimation.x = 0;
-		attrs->scaleAnimation.y = 0;
+		attrs->scaleAnimation.x = 1;
+		attrs->scaleAnimation.y = 1;
 		attrs->rotationAngleAnimation = 0;
 		attrs->flagTransformCalcInvalid = sl_true;
 		_applyFinalTransform(sl_false);
@@ -4863,8 +4865,9 @@ Ref<Animation> View::getTransformAnimation()
 
 void View::setTransformAnimation(const Ref<Animation>& animation, const AnimationFrames<Matrix3>& frames, sl_bool flagRedraw)
 {
+	_resetTransformAnimation();
+	setTransformFromAnimation(frames.startValue, flagRedraw);
 	if (animation.isNotNull()) {
-		resetTransformAnimation(flagRedraw);
 		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
 		if (attrs.isNotNull()) {
 			Ref<_ViewTransformAnimationTarget> target = new _ViewTransformAnimationTarget(this, frames);
@@ -4882,7 +4885,31 @@ void View::setTransformAnimation(const Ref<Animation>& animation, const Matrix3&
 	setTransformAnimation(animation, frames, flagRedraw);
 }
 
+Ref<Animation> View::startTransformAnimation(const AnimationFrames<Matrix3>& frames, sl_real duration, AnimationCurve curve)
+{
+	Ref<Animation> animation = Animation::create(duration);
+	if (animation.isNotNull()) {
+		setTransformAnimation(animation, frames);
+		animation->setAnimationCurve(curve);
+		animation->start();
+		return animation;
+	}
+	return Ref<Animation>::null();
+}
+
+Ref<Animation> View::startTransformAnimation(const Matrix3& startValue, const Matrix3& endValue, sl_real duration, AnimationCurve curve)
+{
+	AnimationFrames<Matrix3> frames(startValue, endValue);
+	return startTransformAnimation(frames, duration, curve);
+}
+
 void View::resetTransformAnimation(sl_bool flagRedraw)
+{
+	_resetTransformAnimation();
+	resetTransformFromAnimation(flagRedraw);
+}
+
+void View::_resetTransformAnimation()
 {
 	Ref<AnimationAttributes> attrs = m_animationAttributes;
 	if (attrs.isNotNull()) {
@@ -4893,7 +4920,6 @@ void View::resetTransformAnimation(sl_bool flagRedraw)
 		}
 		attrs->animationTransform.setNull();
 		attrs->targetTransform.setNull();
-		resetTransformFromAnimation(flagRedraw);
 	}
 }
 
@@ -4928,8 +4954,9 @@ Ref<Animation> View::getTranslateAnimation()
 
 void View::setTranslateAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, sl_bool flagRedraw)
 {
+	_resetTranslateAnimation();
+	setTranslationFromAnimation(frames.startValue, flagRedraw);
 	if (animation.isNotNull()) {
-		resetTranslateAnimation(flagRedraw);
 		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
 		if (attrs.isNotNull()) {
 			Ref<_ViewTranslateAnimationTarget> target = new _ViewTranslateAnimationTarget(this, frames);
@@ -4948,7 +4975,31 @@ void View::setTranslateAnimation(const Ref<Animation>& animation, const Vector2&
 	setTranslateAnimation(animation, frames, flagRedraw);
 }
 
+Ref<Animation> View::startTranslateAnimation(const AnimationFrames<Vector2>& frames, sl_real duration, AnimationCurve curve)
+{
+	Ref<Animation> animation = Animation::create(duration);
+	if (animation.isNotNull()) {
+		setTranslateAnimation(animation, frames);
+		animation->setAnimationCurve(curve);
+		animation->start();
+		return animation;
+	}
+	return Ref<Animation>::null();
+}
+
+Ref<Animation> View::startTranslateAnimation(const Vector2& startValue, const Vector2& endValue, sl_real duration, AnimationCurve curve)
+{
+	AnimationFrames<Vector2> frames(startValue, endValue);
+	return startTranslateAnimation(frames, duration, curve);
+}
+
 void View::resetTranslateAnimation(sl_bool flagRedraw)
+{
+	_resetTranslateAnimation();
+	resetTranslationFromAnimation(flagRedraw);
+}
+
+void View::_resetTranslateAnimation()
 {
 	Ref<AnimationAttributes> attrs = m_animationAttributes;
 	if (attrs.isNotNull()) {
@@ -4959,7 +5010,6 @@ void View::resetTranslateAnimation(sl_bool flagRedraw)
 		}
 		attrs->animationTranslation.setNull();
 		attrs->targetTranslation.setNull();
-		resetTranslationFromAnimation(flagRedraw);
 	}
 }
 
@@ -4994,8 +5044,9 @@ Ref<Animation> View::getScaleAnimation()
 
 void View::setScaleAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, sl_bool flagRedraw)
 {
+	_resetScaleAnimation();
+	setScaleFromAnimation(frames.startValue, flagRedraw);
 	if (animation.isNotNull()) {
-		resetScaleAnimation(flagRedraw);
 		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
 		if (attrs.isNotNull()) {
 			Ref<_ViewScaleAnimationTarget> target = new _ViewScaleAnimationTarget(this, frames);
@@ -5020,7 +5071,37 @@ void View::setScaleAnimation(const Ref<Animation>& animation, sl_real startValue
 	setScaleAnimation(animation, frames, flagRedraw);
 }
 
+Ref<Animation> View::startScaleAnimation(const AnimationFrames<Vector2>& frames, sl_real duration, AnimationCurve curve)
+{
+	Ref<Animation> animation = Animation::create(duration);
+	if (animation.isNotNull()) {
+		setScaleAnimation(animation, frames);
+		animation->setAnimationCurve(curve);
+		animation->start();
+		return animation;
+	}
+	return Ref<Animation>::null();
+}
+
+Ref<Animation> View::startScaleAnimation(const Vector2& startValue, const Vector2& endValue, sl_real duration, AnimationCurve curve)
+{
+	AnimationFrames<Vector2> frames(startValue, endValue);
+	return startScaleAnimation(frames, duration, curve);
+}
+
+Ref<Animation> View::startScaleAnimation(sl_real startValue, sl_real endValue, sl_real duration, AnimationCurve curve)
+{
+	AnimationFrames<Vector2> frames(Vector2(startValue, startValue), Vector2(endValue, endValue));
+	return startScaleAnimation(frames, duration, curve);
+}
+
 void View::resetScaleAnimation(sl_bool flagRedraw)
+{
+	_resetScaleAnimation();
+	resetScaleFromAnimation(flagRedraw);
+}
+
+void View::_resetScaleAnimation()
 {
 	Ref<AnimationAttributes> attrs = m_animationAttributes;
 	if (attrs.isNotNull()) {
@@ -5031,7 +5112,6 @@ void View::resetScaleAnimation(sl_bool flagRedraw)
 		}
 		attrs->animationScale.setNull();
 		attrs->targetScale.setNull();
-		resetScaleFromAnimation(flagRedraw);
 	}
 }
 
@@ -5066,8 +5146,9 @@ Ref<Animation> View::getRotateAnimation()
 
 void View::setRotateAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, sl_bool flagRedraw)
 {
+	_resetRotateAnimation();
+	setRotationFromAnimation(frames.startValue, flagRedraw);
 	if (animation.isNotNull()) {
-		resetRotateAnimation(flagRedraw);
 		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
 		if (attrs.isNotNull()) {
 			Ref<_ViewRotateAnimationTarget> target = new _ViewRotateAnimationTarget(this, frames);
@@ -5086,7 +5167,31 @@ void View::setRotateAnimation(const Ref<Animation>& animation, sl_real startValu
 	setRotateAnimation(animation, frames, flagRedraw);
 }
 
+Ref<Animation> View::startRotateAnimation(const AnimationFrames<sl_real>& frames, sl_real duration, AnimationCurve curve)
+{
+	Ref<Animation> animation = Animation::create(duration);
+	if (animation.isNotNull()) {
+		setRotateAnimation(animation, frames);
+		animation->setAnimationCurve(curve);
+		animation->start();
+		return animation;
+	}
+	return Ref<Animation>::null();
+}
+
+Ref<Animation> View::startRotateAnimation(sl_real startValue, sl_real endValue, sl_real duration, AnimationCurve curve)
+{
+	AnimationFrames<sl_real> frames(startValue, endValue);
+	return startRotateAnimation(frames, duration, curve);
+}
+
 void View::resetRotateAnimation(sl_bool flagRedraw)
+{
+	_resetRotateAnimation();
+	resetRotationFromAnimation(flagRedraw);
+}
+
+void View::_resetRotateAnimation()
 {
 	Ref<AnimationAttributes> attrs = m_animationAttributes;
 	if (attrs.isNotNull()) {
@@ -5097,7 +5202,6 @@ void View::resetRotateAnimation(sl_bool flagRedraw)
 		}
 		attrs->animationRotation.setNull();
 		attrs->targetRotation.setNull();
-		resetRotationFromAnimation(flagRedraw);
 	}
 }
 
@@ -5132,8 +5236,9 @@ Ref<Animation> View::getAlphaAnimation()
 
 void View::setAlphaAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, sl_bool flagRedraw)
 {
+	_resetAlphaAnimation();
+	setAlphaFromAnimation(frames.startValue, flagRedraw);
 	if (animation.isNotNull()) {
-		resetAlphaAnimation(flagRedraw);
 		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
 		if (attrs.isNotNull()) {
 			Ref<_ViewAlphaAnimationTarget> target = new _ViewAlphaAnimationTarget(this, frames);
@@ -5152,7 +5257,31 @@ void View::setAlphaAnimation(const Ref<Animation>& animation, sl_real startValue
 	setAlphaAnimation(animation, frames, flagRedraw);
 }
 
+Ref<Animation> View::startAlphaAnimation(const AnimationFrames<sl_real>& frames, sl_real duration, AnimationCurve curve)
+{
+	Ref<Animation> animation = Animation::create(duration);
+	if (animation.isNotNull()) {
+		setAlphaAnimation(animation, frames);
+		animation->setAnimationCurve(curve);
+		animation->start();
+		return animation;
+	}
+	return Ref<Animation>::null();
+}
+
+Ref<Animation> View::startAlphaAnimation(sl_real startValue, sl_real endValue, sl_real duration, AnimationCurve curve)
+{
+	AnimationFrames<sl_real> frames(startValue, endValue);
+	return startAlphaAnimation(frames, duration, curve);
+}
+
 void View::resetAlphaAnimation(sl_bool flagRedraw)
+{
+	_resetAlphaAnimation();
+	resetAlphaFromAnimation(flagRedraw);
+}
+
+void View::_resetAlphaAnimation()
 {
 	Ref<AnimationAttributes> attrs = m_animationAttributes;
 	if (attrs.isNotNull()) {
@@ -5163,7 +5292,6 @@ void View::resetAlphaAnimation(sl_bool flagRedraw)
 		}
 		attrs->animationAlpha.setNull();
 		attrs->targetAlpha.setNull();
-		resetAlphaFromAnimation(flagRedraw);
 	}
 }
 
@@ -5198,8 +5326,9 @@ Ref<Animation> View::getBackgroundColorAnimation()
 
 void View::setBackgroundColorAnimation(const Ref<Animation>& animation, const AnimationFrames<Color4f>& frames, sl_bool flagRedraw)
 {
+	_resetBackgroundColorAnimation();
+	setBackgroundColor(frames.startValue, flagRedraw);
 	if (animation.isNotNull()) {
-		resetBackgroundColorAnimation(flagRedraw);
 		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
 		if (attrs.isNotNull()) {
 			Ref<_ViewBackgroundColorAnimationTarget> target = new _ViewBackgroundColorAnimationTarget(this, frames);
@@ -5218,7 +5347,30 @@ void View::setBackgroundColorAnimation(const Ref<Animation>& animation, const Co
 	setBackgroundColorAnimation(animation, frames, flagRedraw);
 }
 
+Ref<Animation> View::startBackgroundColorAnimation(const AnimationFrames<Color4f>& frames, sl_real duration, AnimationCurve curve)
+{
+	Ref<Animation> animation = Animation::create(duration);
+	if (animation.isNotNull()) {
+		setBackgroundColorAnimation(animation, frames);
+		animation->setAnimationCurve(curve);
+		animation->start();
+		return animation;
+	}
+	return Ref<Animation>::null();
+}
+
+Ref<Animation> View::startBackgroundColorAnimation(const Color4f& startValue, const Color4f& endValue, sl_real duration, AnimationCurve curve)
+{
+	AnimationFrames<Color4f> frames(startValue, endValue);
+	return startBackgroundColorAnimation(frames, duration, curve);
+}
+
 void View::resetBackgroundColorAnimation(sl_bool flagRedraw)
+{
+	_resetBackgroundColorAnimation();
+}
+
+void View::_resetBackgroundColorAnimation()
 {
 	Ref<AnimationAttributes> attrs = m_animationAttributes;
 	if (attrs.isNotNull()) {
@@ -7452,11 +7604,11 @@ void ViewInstance::onSetCursor(UIEvent* ev)
 
 SLIB_DEFINE_OBJECT(ViewGroup, View)
 
-ViewGroup::ViewGroup(sl_bool flagCreatingChildInstances)
+ViewGroup::ViewGroup()
 {
 	SLIB_REFERABLE_CONSTRUCTOR
 	
-	setCreatingChildInstances(flagCreatingChildInstances);
+	setCreatingChildInstances(sl_true);
 	setMakingLayout(sl_true, sl_false);
 }
 

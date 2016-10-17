@@ -459,8 +459,7 @@ void JNICALL _AndroidWindow_nativeOnResize(JNIEnv* env, jobject _this, jlong ins
 {
 	Ref<_Android_Window> window = _AndroidUi_getWindow(instance);
 	if (window.isNotNull()) {
-		UISize size((sl_ui_pos)w, (sl_ui_pos)h);
-		window->onResize(size);
+		window->onResize((sl_ui_pos)w, (sl_ui_pos)h);
 	}
 }
 

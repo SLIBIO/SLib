@@ -3,7 +3,8 @@
 
 #include "definition.h"
 
-#include "../ui/view.h"
+#include "view.h"
+#include "transition.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -13,48 +14,13 @@ class ViewPager;
 class SLIB_EXPORT IViewPagerListener
 {
 public:
-	virtual void onPushPage(ViewPager* pager, View* pageIn);
+	virtual void onPageAction(ViewPager* pager, View* page, UIPageAction action);
 	
-	virtual void onPopPage(ViewPager* pager, View* pageOut);
-	
-	virtual void onResumePage(ViewPager* pager, View* page);
-	
-	virtual void onPausePage(ViewPager* pager, View* page);
-	
-	virtual void onReadyPage(ViewPager* pager, View* page);
+	virtual void onFinishPageAnimation(ViewPager* pager, View* page, UIPageAction action);
 	
 };
 
-class SLIB_EXPORT ViewPageMoveParam
-{
-public:
-	
-	
-public:
-	ViewPageMoveParam();
-};
-
-class SLIB_EXPORT ViewPagePushParam : public ViewPageMoveParam
-{
-public:
-	
-	
-public:
-	ViewPagePushParam();
-	
-};
-
-class SLIB_EXPORT ViewPagePopParam : public ViewPageMoveParam
-{
-public:
-	
-	
-public:
-	ViewPagePopParam();
-	
-};
-
-class SLIB_EXPORT ViewPager : public ViewGroup
+class SLIB_EXPORT ViewPager : public View
 {
 	SLIB_DECLARE_OBJECT
 	
@@ -64,56 +30,88 @@ public:
 public:
 	sl_size getPagesCount();
 	
-	sl_size getCurrentPageIndex();
-	
-	Ref<View> getCurrentPage();
-	
-	void push(const Ref<View>& page, const ViewPagePushParam& param);
-	
-	void push(const Ref<View>& page);
-	
-	void pop(const ViewPagePopParam& param);
-	
-	void pop();
-	
-	void moveNext(const ViewPageMoveParam& param);
-	
-	void moveNext();
-	
-	void movePrevious(const ViewPageMoveParam& param);
-	
-	void movePrevious();
-	
-	void moveTo(sl_size index);
-	
 protected:
-	virtual void onPushPage(View* pageIn);
-	
-	virtual void onPopPage(View* pageOut);
-	
-	virtual void onResumePage(View* page);
-	
-	virtual void onPausePage(View* page);
-	
-	virtual void onReadyPage(View* page);
+	virtual void onPageAction(View* page, UIPageAction action);
+
+	virtual void onFinishPageAnimation(View* page, UIPageAction action);
 	
 public:
-	virtual void dispatchPushPage(View* pageIn);
+	virtual void dispatchPageAction(View* page, UIPageAction action);
 	
-	virtual void dispatchPopPage(View* pageOut);
-	
-	virtual void dispatchResumePage(View* page);
-	
-	virtual void dispatchPausePage(View* page);
-	
-	virtual void dispatchReadyPage(View* page);
+	virtual void dispatchFinishPageAnimation(View* page, UIPageAction action);
+
+public:
+	// override
+	void onResize(sl_ui_len width, sl_ui_len height);
 
 public:
 	SLIB_PTR_PROPERTY(IViewPagerListener, Listener)
 	
-private:
+protected:
 	CList< Ref<View> > m_pages;
-	sl_size m_indexCurrent;
+	
+};
+
+class SLIB_EXPORT ViewStack : public ViewPager
+{
+	SLIB_DECLARE_OBJECT
+	
+public:
+	ViewStack();
+	
+public:
+	void push(const Ref<View>& page, const Transition& transition, sl_bool flagRemoveAllBackPages = sl_false);
+
+	void push(const Ref<View>& page, sl_bool flagRemoveAllBackPages = sl_false);
+	
+	void pop(const Ref<View>& page, const Transition& transition);
+	
+	void pop(const Ref<View>& page);
+	
+	void pop(const Transition& transition);
+	
+	void pop();
+
+	TransitionType getPushTransitionType();
+	
+	void setPushTransitionType(TransitionType type);
+	
+	TransitionDirection getPushTransitionDirection();
+	
+	void setPushTransitionDirection(TransitionDirection direction);
+	
+	TransitionType getPopTransitionType();
+	
+	void setPopTransitionType(TransitionType type);
+	
+	TransitionDirection getPopTransitionDirection();
+	
+	void setPopTransitionDirection(TransitionDirection direction);
+	
+	void setTransitionType(TransitionType type);
+	
+	void setTransitionDirection(TransitionDirection direction);
+
+	float getTransitionDuration();
+	
+	void setTransitionDuration(float duration);
+	
+	AnimationCurve getTransitionCurve();
+	
+	void setTransitionCurve(AnimationCurve curve);
+	
+protected:
+	void _applyDefaultPushTransition(Transition& transition);
+	
+	void _applyDefaultPopTransition(Transition& transition);
+	
+protected:
+	TransitionType m_pushTransitionType;
+	TransitionDirection m_pushTransitionDirection;
+	TransitionType m_popTransitionType;
+	TransitionDirection m_popTransitionDirection;
+	float m_transitionDuration; // seconds
+	AnimationCurve m_transitionCurve; // curve
 	
 };
 
@@ -125,27 +123,22 @@ public:
 	ViewPage();
 	
 protected:
-	virtual void onPush(ViewPager* pager);
+	virtual void onOpen();
 	
-	virtual void onPop(ViewPager* pager);
+	virtual void onClose();
 	
-	virtual void onResume(ViewPager* pager);
+	virtual void onResume();
 	
-	virtual void onPause(ViewPager* pager);
+	virtual void onPause();
 	
-	virtual void onReady(ViewPager* pager);
+	virtual void onPageAction(UIPageAction action);
+	
+	virtual void onFinishPageAnimation(UIPageAction action);
 	
 public:
-	virtual void dispatchPush(ViewPager* pager);
+	virtual void dispatchPageAction(ViewPager* pager, UIPageAction action);
 	
-	virtual void dispatchPop(ViewPager* pager);
-	
-	virtual void dispatchResume(ViewPager* pager);
-	
-	virtual void dispatchPause(ViewPager* pager);
-	
-	virtual void dispatchReady(ViewPager* pager);
-	
+	virtual void dispatchFinishPageAnimation(ViewPager* pager, UIPageAction action);
 	
 };
 

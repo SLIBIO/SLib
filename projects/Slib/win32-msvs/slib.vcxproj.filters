@@ -739,6 +739,9 @@
     <ClInclude Include="..\..\..\inc\slib\graphics\platform.h">
       <Filter>inc\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\ui\transition.h">
+      <Filter>inc\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">
@@ -1445,6 +1448,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\graphics\graphics_platform_win32.cpp">
       <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\transition.cpp">
+      <Filter>src\slib\ui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

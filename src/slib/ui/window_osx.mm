@@ -943,11 +943,20 @@ SLIB_UI_NAMESPACE_END
 		if (size.y < 0) {
 			size.y = 0;
 		}
-		window->onResize(size);
+		window->onResizing(size);
 		frameSize.width = (CGFloat)(size.x);
 		frameSize.height = (CGFloat)(size.y);
 	}
 	return frameSize;
+}
+
+- (void)windowDidResize:(NSNotification *)notification
+{
+	slib::Ref<slib::_OSX_Window> window = m_window;
+	if (window.isNotNull()) {
+		NSSize size = self.frame.size;
+		window->onResize((sl_ui_len)(size.width), (sl_ui_len)(size.height));
+	}
 }
 
 - (void)windowDidMove:(NSNotification *)notification
@@ -974,40 +983,11 @@ SLIB_UI_NAMESPACE_END
 	}
 }
 
-- (BOOL)windowShouldZoom:(NSWindow *)w toFrame:(NSRect)newFrame
-{
-	slib::Ref<slib::_OSX_Window> window = m_window;
-	if (window.isNotNull()) {
-		if ([self isZoomed]) {
-			window->onDemaximize();
-		} else {
-			window->onMaximize();
-		}
-		slib::UISize size((sl_ui_pos)(newFrame.size.width), (sl_ui_pos)(newFrame.size.height));
-		if (size.x < 0) {
-			size.x = 0;
-		}
-		if (size.y < 0) {
-			size.y = 0;
-		}
-		slib::UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(slib::WindowInstance, onResized, window, (sl_ui_len)(size.x), (sl_ui_len)(size.y)));
-	}
-	return TRUE;
-}
-
 - (void)windowDidEnterFullScreen:(NSNotification *)notification
 {
 	slib::Ref<slib::_OSX_Window> window = m_window;
 	if (window.isNotNull()) {
 		window->onMaximize();
-		slib::UISize size((sl_ui_pos)(self.frame.size.width), (sl_ui_pos)(self.frame.size.height));
-		if (size.x < 0) {
-			size.x = 0;
-		}
-		if (size.y < 0) {
-			size.y = 0;
-		}
-		window->onResized(size.x, size.y);
 	}
 }
 
@@ -1015,15 +995,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::_OSX_Window> window = m_window;
 	if (window.isNotNull()) {
-		window->onMinimize();
-		slib::UISize size((sl_ui_pos)(self.frame.size.width), (sl_ui_pos)(self.frame.size.height));
-		if (size.x < 0) {
-			size.x = 0;
-		}
-		if (size.y < 0) {
-			size.y = 0;
-		}
-		window->onResized(size.x, size.y);
+		window->onDemaximize();
 	}
 }
 

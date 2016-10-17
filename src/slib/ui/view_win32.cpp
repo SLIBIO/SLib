@@ -6,7 +6,7 @@
 
 #include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/window.h"
-#include "../../../inc/slib/ui/scroll_view.h"
+#include "../../../inc/slib/ui/select_view.h"
 
 #define USE_SCREEN_BACK_BUFFER
 
@@ -135,12 +135,13 @@ UIRect Win32_ViewInstance::getFrame()
 	HWND hWnd = m_handle;
 	if (hWnd) {
 		RECT rc;
-		::GetWindowRect(hWnd, &rc);
+		Windows::getWindowFrame(hWnd, rc);
 		UIRect ret;
 		ret.left = (sl_ui_pos)(rc.left);
 		ret.top = (sl_ui_pos)(rc.top);
 		ret.right = (sl_ui_pos)(rc.right);
 		ret.bottom = (sl_ui_pos)(rc.bottom);
+		return ret;
 	}
 	return UIRect::zero();
 }
@@ -261,6 +262,10 @@ void Win32_ViewInstance::bringToFront()
 	HWND hWnd = m_handle;
 	if (hWnd) {
 		::BringWindowToTop(hWnd);
+		Ref<View> view = getView();
+		if (view.isNotNull()) {
+			view->invalidateBoundsInParent();
+		}
 	}
 }
 
@@ -444,7 +449,10 @@ static sl_size _Win32_getSelfInvalidatableRects(View* view, UIRect bounds, UIRec
 		if (child.isNotNull()) {
 			if (child->isVisible() && child->getWidth() > 0 && child->getHeight() > 0) {
 				if (child->checkSelfInvalidatable()) {
-					UIRect rect = child->getFrame();
+					UIRect rect = child->getBoundsInParent();
+					if (child->isNativeWidget() && SelectView::checkInstance(child.ptr)) {
+						rect.setSize(child->getInstanceFrame().getSize());
+					}
 					if (rect.intersectRectangle(bounds, &rect)) {
 						*outRects = rect;
 						outRects++;
