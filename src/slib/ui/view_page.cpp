@@ -394,6 +394,219 @@ ViewPage::ViewPage()
 	SLIB_REFERABLE_CONSTRUCTOR
 }
 
+Ref<ViewPager> ViewPage::getPager()
+{
+	return m_pager;
+}
+
+void ViewPage::setPager(const Ref<ViewPager>& pager)
+{
+	m_pager = pager;
+}
+
+Ref<ViewStack> ViewPage::getPageStack()
+{
+	Ref<ViewPager> pager(m_pager);
+	if (ViewStack::checkInstance(pager.ptr)) {
+		return Ref<ViewStack>::from(pager);
+	}
+	return Ref<ViewStack>::null();
+}
+
+void ViewPage::open(const Ref<ViewStack>& stack, const Transition& transition)
+{
+	if (stack.isNotNull()) {
+		stack->push(this, transition);
+	}
+}
+
+void ViewPage::open(const Ref<ViewStack>& stack)
+{
+	if (stack.isNotNull()) {
+		stack->push(this);
+	}
+}
+
+void ViewPage::openHome(const Ref<ViewStack>& stack, const Transition& transition)
+{
+	if (stack.isNotNull()) {
+		stack->push(stack, transition, sl_true);
+	}
+}
+
+void ViewPage::openHome(const Ref<ViewStack>& stack)
+{
+	if (stack.isNotNull()) {
+		stack->push(stack, sl_true);
+	}
+}
+
+void ViewPage::close(const Transition& transition)
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->pop(this, transition);
+	}
+}
+
+void ViewPage::close()
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->pop(this);
+	}
+}
+
+void ViewPage::openPage(const Ref<View>& page, const Transition& transition)
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->push(page, transition);
+	}
+}
+
+void ViewPage::openPage(const Ref<View>& page)
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->push(page);
+	}
+}
+
+void ViewPage::openHomePage(const Ref<View>& page, const Transition& transition)
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->push(page, transition, sl_true);
+	}
+}
+
+void ViewPage::openHomePage(const Ref<View>& page)
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->push(page, sl_true);
+	}
+}
+
+TransitionType ViewPage::getGlobalOpeningTransitionType()
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->getPushTransitionType();
+	}
+	return TransitionType::Default;
+}
+
+void ViewPage::setGlobalOpeningTransitionType(TransitionType type)
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->setPushTransitionType(type);
+	}
+}
+
+TransitionDirection ViewPage::getGlobalOpeningTransitionDirection()
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->getPushTransitionDirection();
+	}
+	return TransitionDirection::Default;
+}
+
+void ViewPage::setGlobalOpeningTransitionDirection(TransitionDirection direction)
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->setPushTransitionDirection(direction);
+	}
+}
+
+TransitionType ViewPage::getGlobalClosingTransitionType()
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->getPopTransitionType();
+	}
+	return TransitionType::Default;
+}
+
+void ViewPage::setGlobalClosingTransitionType(TransitionType type)
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->setPopTransitionType(type);
+	}
+}
+
+TransitionDirection ViewPage::getGlobalClosingTransitionDirection()
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->getPopTransitionDirection();
+	}
+	return TransitionDirection::Default;
+}
+
+void ViewPage::setGlobalClosingTransitionDirection(TransitionDirection direction)
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->setPopTransitionDirection(direction);
+	}
+}
+
+void ViewPage::setGlobalTransitionType(TransitionType type)
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->setTransitionType(type);
+	}
+}
+
+void ViewPage::setGlobalTransitionDirection(TransitionDirection direction)
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->setTransitionDirection(direction);
+	}
+}
+
+float ViewPage::getGlobalTransitionDuration()
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->getTransitionDuration();
+	}
+	return 0;
+}
+
+void ViewPage::setGlobalTransitionDuration(float duration)
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->setTransitionDuration(duration);
+	}
+}
+
+AnimationCurve ViewPage::getGlobalTransitionCurve()
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->getTransitionCurve();
+	}
+	return AnimationCurve::Default;
+}
+
+void ViewPage::setGlobalTransitionCurve(AnimationCurve curve)
+{
+	Ref<ViewStack> stack = getPageStack();
+	if (stack.isNotNull()) {
+		stack->setTransitionCurve(curve);
+	}
+}
+
 void ViewPage::onOpen()
 {
 }
@@ -420,6 +633,7 @@ void ViewPage::onFinishPageAnimation(UIPageAction action)
 
 void ViewPage::dispatchPageAction(ViewPager* pager, UIPageAction action)
 {
+	m_pager = pager;
 	onPageAction(action);
 	switch (action) {
 		case UIPageAction::Push:
@@ -441,6 +655,7 @@ void ViewPage::dispatchPageAction(ViewPager* pager, UIPageAction action)
 
 void ViewPage::dispatchFinishPageAnimation(ViewPager* pager, UIPageAction action)
 {
+	m_pager = pager;
 	onFinishPageAnimation(action);
 }
 

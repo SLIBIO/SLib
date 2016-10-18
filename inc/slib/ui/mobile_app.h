@@ -109,58 +109,6 @@ protected:
 	
 };
 
-class SLIB_EXPORT MobilePage : public ViewPage
-{
-	SLIB_DECLARE_OBJECT
-	
-public:
-	MobilePage();
-	
-public:
-	void openPage(const Transition& transition);
-	
-	void openPage();
-	
-	void openHomePage(const Transition& transition);
-	
-	void openHomePage();
-	
-	void closePage(const Transition& transition);
-	
-	void closePage();
-
-public:
-	static TransitionType getGlobalOpeningTransitionType();
-	
-	static void setGlobalOpeningTransitionType(TransitionType type);
-	
-	static TransitionDirection getGlobalOpeningTransitionDirection();
-	
-	static void setGlobalOpeningTransitionDirection(TransitionDirection direction);
-	
-	static TransitionType getGlobalClosingTransitionType();
-	
-	static void setGlobalClosingTransitionType(TransitionType type);
-	
-	static TransitionDirection getGlobalClosingTransitionDirection();
-	
-	static void setGlobalClosingTransitionDirection(TransitionDirection direction);
-	
-	static void setGlobalTransitionType(TransitionType type);
-	
-	static void setGlobalTransitionDirection(TransitionDirection direction);
-	
-	static float getGlobalTransitionDuration();
-	
-	static void setGlobalTransitionDuration(float duration);
-	
-	static AnimationCurve getGlobalTransitionCurve();
-	
-	static void setGlobalTransitionCurve(AnimationCurve curve);
-
-	
-};
-
 SLIB_UI_NAMESPACE_END
 
 #endif

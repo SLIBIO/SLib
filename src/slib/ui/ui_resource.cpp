@@ -54,6 +54,7 @@ UILayoutResource::UILayoutResource(sl_real sp)
 {
 	m_sp = sp;
 	m_countRecursiveLayout = 0;
+	m_flagInitialized = sl_false;
 }
 
 Ref<View> UILayoutResource::getContent()
@@ -74,6 +75,9 @@ void UILayoutResource::setScaledPixel(sl_real sp)
 // avoid recursively layouting
 void UILayoutResource::_layoutViews_safe(sl_ui_len width, sl_ui_len height)
 {
+	if (!m_flagInitialized) {
+		return;
+	}
 	sl_int32 n = Base::interlockedIncrement32(&m_countRecursiveLayout);
 	if (n == 1) {
 		layoutViews(width, height);
@@ -82,6 +86,10 @@ void UILayoutResource::_layoutViews_safe(sl_ui_len width, sl_ui_len height)
 	Base::interlockedDecrement32(&m_countRecursiveLayout);
 }
 
+void UILayoutResource::setInitialized()
+{
+	m_flagInitialized = sl_true;
+}
 
 SLIB_DEFINE_OBJECT(WindowLayoutResource, Window)
 
@@ -123,19 +131,19 @@ void ViewLayoutResource::dispatchResize(sl_ui_len width, sl_ui_len height)
 }
 
 
-SLIB_DEFINE_OBJECT(MobilePageLayoutResource, MobilePage)
+SLIB_DEFINE_OBJECT(PageLayoutResource, ViewPage)
 
-MobilePageLayoutResource::MobilePageLayoutResource(sl_real sp)
+PageLayoutResource::PageLayoutResource(sl_real sp)
 : UILayoutResource(sp)
 {
 	SLIB_REFERABLE_CONSTRUCTOR
 	m_contentView = this;
 }
 
-void MobilePageLayoutResource::dispatchResize(sl_ui_len width, sl_ui_len height)
+void PageLayoutResource::dispatchResize(sl_ui_len width, sl_ui_len height)
 {
 	_layoutViews_safe(width, height);
-	MobilePage::dispatchResize(width, height);
+	ViewPage::dispatchResize(width, height);
 }
 
 SLIB_UI_NAMESPACE_END

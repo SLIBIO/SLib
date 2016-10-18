@@ -100,6 +100,7 @@ NAME::NAME(sl_real sp) \
 { \
 	SLIB_REFERABLE_CONSTRUCTOR \
 	initialize(); \
+	setInitialized(); \
 	layoutViews(0, 0); \
 }
 
@@ -121,6 +122,8 @@ protected:
 protected:
 	void _layoutViews_safe(sl_ui_len width, sl_ui_len height);
 	
+	void setInitialized();
+	
 protected:
 	View* m_contentView;
 	Ref<View> m_contentViewRef;
@@ -128,6 +131,8 @@ protected:
 	sl_real m_sp;
 	
 	sl_int32 m_countRecursiveLayout;
+	sl_bool m_flagInitialized;
+	
 };
 
 #define SLIB_DECLARE_WINDOW_LAYOUT_BEGIN(NAME) \
@@ -177,20 +182,20 @@ public:
 };
 
 
-#define SLIB_DECLARE_MOBILE_PAGE_LAYOUT_BEGIN(NAME) \
-	SLIB_DECLARE_UILAYOUT_BEGIN(NAME, slib::MobilePageLayoutResource)
+#define SLIB_DECLARE_PAGE_LAYOUT_BEGIN(NAME) \
+	SLIB_DECLARE_UILAYOUT_BEGIN(NAME, slib::PageLayoutResource)
 
-#define SLIB_DECLARE_MOBILE_PAGE_LAYOUT_END \
+#define SLIB_DECLARE_PAGE_LAYOUT_END \
 	SLIB_DECLARE_UILAYOUT_END
 
-#define SLIB_DEFINE_MOBILE_PAGE_LAYOUT(NAME) \
-	SLIB_DEFINE_UILAYOUT(NAME, slib::MobilePageLayoutResource)
+#define SLIB_DEFINE_PAGE_LAYOUT(NAME) \
+	SLIB_DEFINE_UILAYOUT(NAME, slib::PageLayoutResource)
 
-class MobilePageLayoutResource : public MobilePage, public UILayoutResource
+class PageLayoutResource : public ViewPage, public UILayoutResource
 {
 	SLIB_DECLARE_OBJECT
 public:
-	MobilePageLayoutResource(sl_real sp = 1);
+	PageLayoutResource(sl_real sp = 1);
 	
 public:
 	// override

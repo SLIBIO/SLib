@@ -126,6 +126,73 @@ class SLIB_EXPORT ViewPage : public ViewGroup
 public:
 	ViewPage();
 	
+public:
+	Ref<ViewPager> getPager();
+	
+	void setPager(const Ref<ViewPager>& pager);
+	
+	Ref<ViewStack> getPageStack();
+	
+	
+	void open(const Ref<ViewStack>& stack, const Transition& transition);
+	
+	void open(const Ref<ViewStack>& stack);
+	
+	void openHome(const Ref<ViewStack>& stack, const Transition& transition);
+	
+	void openHome(const Ref<ViewStack>& stack);
+	
+	void close(const Transition& transition);
+	
+	void close();
+	
+	void openPage(const Ref<View>& pageOther, const Transition& transition);
+	
+	void openPage(const Ref<View>& pageOther);
+	
+	void openHomePage(const Ref<View>& pageOther, const Transition& transition);
+	
+	void openHomePage(const Ref<View>& pageOther);
+	
+	
+	void popup(const Ref<View>& parent, const Transition& transition);
+	
+	void popup(const Ref<View>& parent);
+	
+	void popupPage(const Ref<ViewPage>& pageOther, const Transition& transition);
+	
+	void popupPage(const Ref<ViewPage>& pageOther);
+	
+	
+	TransitionType getGlobalOpeningTransitionType();
+	
+	void setGlobalOpeningTransitionType(TransitionType type);
+	
+	TransitionDirection getGlobalOpeningTransitionDirection();
+	
+	void setGlobalOpeningTransitionDirection(TransitionDirection direction);
+	
+	TransitionType getGlobalClosingTransitionType();
+	
+	void setGlobalClosingTransitionType(TransitionType type);
+	
+	TransitionDirection getGlobalClosingTransitionDirection();
+	
+	void setGlobalClosingTransitionDirection(TransitionDirection direction);
+	
+	void setGlobalTransitionType(TransitionType type);
+	
+	void setGlobalTransitionDirection(TransitionDirection direction);
+	
+	float getGlobalTransitionDuration();
+	
+	void setGlobalTransitionDuration(float duration);
+	
+	AnimationCurve getGlobalTransitionCurve();
+	
+	void setGlobalTransitionCurve(AnimationCurve curve);
+	
+	
 protected:
 	virtual void onOpen();
 	
@@ -143,6 +210,9 @@ public:
 	virtual void dispatchPageAction(ViewPager* pager, UIPageAction action);
 	
 	virtual void dispatchFinishPageAnimation(ViewPager* pager, UIPageAction action);
+	
+protected:
+	SafeWeakRef<ViewPager> m_pager;
 	
 };
 
