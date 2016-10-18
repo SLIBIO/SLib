@@ -139,7 +139,7 @@ void UIPlatform::quitApp()
 __weak UIWindow* _g_slib_ios_keyWindow = nil;
 UIWindow* UIPlatform::getMainWindow()
 {
-	_slib_iOS_AppDelegate* app = [[UIApplication sharedApplication] delegate];
+	_slib_iOS_AppDelegate* app = (_slib_iOS_AppDelegate*)([[UIApplication sharedApplication] delegate]);
 	if (app != nil) {
 		return app.window;
 	}

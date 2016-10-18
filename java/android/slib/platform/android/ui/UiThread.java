@@ -88,7 +88,11 @@ public class UiThread {
 				if (msg.getCallback() == callbackQuitLoop) {
 					break;
 				}
-				msg.getTarget().dispatchMessage(msg);
+				try {
+					msg.getTarget().dispatchMessage(msg);
+				} catch (Exception e) {
+					Logger.exception(e);
+				}
 				final long newIdent = Binder.clearCallingIdentity();
 				if (ident != newIdent) {
 					Logger.info("Thread identity changed from 0x" + Long.toHexString(ident) + " to 0x"

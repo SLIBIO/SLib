@@ -17,6 +17,8 @@ MobileApp::MobileApp()
 	m_pageStack = new ViewStack;
 	window->addView(m_pageStack);
 	
+	m_flagStartedPage = sl_false;
+	
 }
 
 Ref<MobileApp> MobileApp::getApp()
@@ -135,14 +137,18 @@ void MobileApp::onResize(sl_ui_len width, sl_ui_len height)
 {
 }
 
+void MobileApp::onStartPage()
+{
+}
+
 void MobileApp::dispatchPause()
 {
+	Animation::pauseAnimationCenter();
 	onPause();
 }
 
 void MobileApp::dispatchPauseToApp()
 {
-	Animation::pauseAnimationCenter();
 	m_flagPaused = sl_true;
 	Ref<MobileApp> app = getApp();
 	if (app.isNotNull()) {
@@ -152,12 +158,12 @@ void MobileApp::dispatchPauseToApp()
 
 void MobileApp::dispatchResume()
 {
+	Animation::resumeAnimationCenter();
 	onResume();
 }
 
 void MobileApp::dispatchResumeToApp()
 {
-	Animation::resumeAnimationCenter();
 	m_flagPaused = sl_false;
 	Ref<MobileApp> app = getApp();
 	if (app.isNotNull()) {
@@ -168,6 +174,13 @@ void MobileApp::dispatchResumeToApp()
 void MobileApp::dispatchBack(UIEvent* ev)
 {
 	onBack(ev);
+	if (ev->isPreventedDefault()) {
+		return;
+	}
+	if (m_pageStack->getPagesCount() > 1) {
+		m_pageStack->pop();
+		ev->preventDefault();
+	}
 }
 
 sl_bool MobileApp::dispatchBackToApp()
@@ -189,9 +202,8 @@ void MobileApp::dispatchCreateActivity()
 {
 	Ref<MobileMainWindow> window = getMainWindow();
 	if (window.isNotNull()) {
-		window->create();
+		window->forceCreate();
 	}
-	
 	onCreateActivity();
 }
 
@@ -219,6 +231,10 @@ void MobileApp::dispatchDestroyActivityToApp()
 void MobileApp::dispatchResize(sl_ui_len width, sl_ui_len height)
 {
 	m_pageStack->setFrame(0, 0, width, height);
+	if (!m_flagStartedPage) {
+		m_flagStartedPage = sl_true;
+		onStartPage();
+	}
 	onResize(width, height);
 }
 

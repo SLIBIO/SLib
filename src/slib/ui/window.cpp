@@ -779,6 +779,12 @@ void Window::create()
 	}
 }
 
+void Window::forceCreate()
+{
+	detach();
+	create();
+}
+
 void Window::_create()
 {
 	if (m_instance.isNotNull()) {
@@ -827,18 +833,20 @@ void Window::_create()
 		
 		attach(window);
 		
-		onCreate();
+		dispatchCreate();
 		
+#if defined(SLIB_PLATFORM_IS_OSX) || defined(SLIB_PLATFORM_IS_IOS)
 		UIRect frame = window->getFrame();
 		dispatchResize(frame.getWidth(), frame.getHeight());
+#endif
 
 		if (m_flagModal) {
 			_runModal();
 		}
-		
-	}
 	
-	dispatchCreateFailed();
+	} else {
+		dispatchCreateFailed();
+	}
 	
 }
 
@@ -1060,14 +1068,6 @@ void WindowInstance::setWindow(const Ref<Window>& window)
 
 void WindowInstance::setMenu(const Ref<Menu>& menu)
 {
-}
-
-void WindowInstance::onCreate()
-{
-	Ref<Window> window = getWindow();
-	if (window.isNotNull()) {
-		window->dispatchCreate();
-	}
 }
 
 sl_bool WindowInstance::onClose()

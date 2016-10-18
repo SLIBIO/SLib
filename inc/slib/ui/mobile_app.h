@@ -61,6 +61,8 @@ protected:
 	
 	virtual void onResize(sl_ui_len width, sl_ui_len height);
 	
+	virtual void onStartPage();
+	
 public:
 	virtual void dispatchPause();
 	
@@ -90,6 +92,7 @@ private:
 	static sl_bool m_flagPaused;
 	
 	Ref<ViewStack> m_pageStack;
+	sl_bool m_flagStartedPage;
 	
 };
 

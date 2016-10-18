@@ -265,6 +265,8 @@ public:
 
 	void create();
 	
+	void forceCreate();
+
 	
 	void addView(const Ref<View>& view);
 
@@ -459,8 +461,6 @@ public:
 	virtual UISize getClientSizeFromWindowSize(const UISize& sizeWindow) = 0;
 	
 public:
-	void onCreate();
-	
 	sl_bool onClose();
 	
 	void onActivate();

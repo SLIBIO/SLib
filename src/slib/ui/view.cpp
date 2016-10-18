@@ -7363,6 +7363,8 @@ void View::_processEventForStateAndClick(UIEvent* ev)
 		case UIAction::MouseLeave:
 			setHoverState(sl_false);
 			break;
+		default:
+			break;
 	}
 }
 

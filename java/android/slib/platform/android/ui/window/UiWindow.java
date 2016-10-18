@@ -36,11 +36,13 @@ public class UiWindow extends UiGroupView {
 			, boolean flagFullScreen, boolean flagCenterScreen
 			, int x, int y, int width, int height) {
 		try {
-			UiWindow ret = new UiWindow(activity);
+			final UiWindow ret = new UiWindow(activity);
 			FrameLayout.LayoutParams params;
 			if (flagFullScreen) {
+				Logger.info("FullScreen Window Created");
 				params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);			
 			} else {
+				Logger.info("Window Created (" + x + ", " + y + ") - Size(" + width + "," + height + ")");
 				params = new FrameLayout.LayoutParams(width, height);
 				if (flagCenterScreen) {
 					params.gravity = Gravity.CENTER;
@@ -51,7 +53,9 @@ public class UiWindow extends UiGroupView {
 			}
 			activity.addContentView(ret, params);
 			ret.activity = activity;
-			return ret;			
+			
+			return ret;
+			
 		} catch (Exception e) {
 			Logger.exception(e);
 			return null;

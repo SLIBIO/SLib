@@ -114,9 +114,9 @@ Ref<Animation> Transition::createAnimation(const Ref<View>& view, const Transiti
 				break;
 			case TransitionType::Fade:
 				if (pageAction == UIPageAction::Push) {
-					view->setAlphaAnimation(animation, 0.0f, 1.0f, sl_false);
+					view->setAlphaAnimation(animation, 0.01f, 1.0f, sl_false);
 				} else if (pageAction == UIPageAction::Pop){
-					view->setAlphaAnimation(animation, 1.0f, 0.0f, sl_false);
+					view->setAlphaAnimation(animation, 1.0f, 0.01f, sl_false);
 				}
 				break;
 		}

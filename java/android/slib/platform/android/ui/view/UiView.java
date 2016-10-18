@@ -133,29 +133,51 @@ public class UiView {
 		return false;
 	}
 	
-	public static void setTransform(View view, float tx, float ty, float rotate, float sx, float sy, float ax, float ay) {
-		view.setRotation((float)(rotate * 180 / Math.PI));
-		view.setScaleX(sx);
-		view.setScaleY(sy);
-		if (Math.abs(ax) > 0.000001f || Math.abs(ay) > 0.000001f) {
-			double cr = Math.cos(rotate);
-			double sr = Math.sin(rotate);
-			tx = (float)((- ax * cr + ay * sr) * sx + tx + ax);
-			ty = (float)((- ax * sr - ay * cr) * sy + ty + ay);
+	public static void setTransform(final View view, final float _tx, final float _ty, final float rotate, final float sx, final float sy, final float ax, final float ay) {
+		if (UiThread.isUiThread()) {
+			view.setRotation((float)(rotate * 180 / Math.PI));
+			view.setScaleX(sx);
+			view.setScaleY(sy);
+			float tx = _tx;
+			float ty = _ty;
+			if (Math.abs(ax) > 0.000001f || Math.abs(ay) > 0.000001f) {
+				double cr = Math.cos(rotate);
+				double sr = Math.sin(rotate);
+				tx = (float)((- ax * cr + ay * sr) * sx + tx + ax);
+				ty = (float)((- ax * sr - ay * cr) * sy + ty + ay);
+			}
+			view.setTranslationX(tx);
+			view.setTranslationY(ty);			
+		} else {
+			view.post(new Runnable() {
+				public void run() {
+					setTransform(view, _tx, _ty, rotate, sx, sy, ax, ay);
+				}
+			});
 		}
-		view.setTranslationX(tx);
-		view.setTranslationY(ty);
 	}
 	
 	public static boolean isVisible(View view) {
 		return view.getVisibility() == View.VISIBLE;
 	}
 	
-	public static void setVisible(View view, boolean flag) {
-		if (flag) {
-			view.setVisibility(View.VISIBLE);
+	public static void setVisible(final View view, final boolean flag) {
+		if (UiThread.isUiThread()) {
+			if (flag) {
+				view.setVisibility(View.VISIBLE);
+			} else {
+				view.setVisibility(View.INVISIBLE);
+			}
 		} else {
-			view.setVisibility(View.INVISIBLE);
+			view.post(new Runnable() {
+				public void run() {
+					if (flag) {
+						view.setVisibility(View.VISIBLE);
+					} else {
+						view.setVisibility(View.INVISIBLE);
+					}
+				}
+			});
 		}
 	}
 	
@@ -167,8 +189,16 @@ public class UiView {
 		view.setEnabled(flag);
 	}
 
-	public static void setAlpha(View view, float alpha) {
-		view.setAlpha(alpha);
+	public static void setAlpha(final View view, final float alpha) {
+		if (UiThread.isUiThread()) {
+			view.setAlpha(alpha);
+		} else {
+			view.post(new Runnable() {
+				public void run() {
+					view.setAlpha(alpha);
+				}
+			});
+		}
 	}
 	
 	public static Point convertCoordinateFromScreenToView(View view, int x, int y) {
