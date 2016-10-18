@@ -180,18 +180,19 @@ void iOS_ViewInstance::setFrame(const UIRect& frame)
 		bounds.origin.y = 0;
 		bounds.size.width = (CGFloat)(frame.getWidth()) / f;
 		bounds.size.height = (CGFloat)(frame.getHeight()) / f;
-		[handle setBounds:bounds];
 		center.x = (CGFloat)(frame.left) / f + bounds.size.width / 2;
 		center.y = (CGFloat)(frame.top) / f + bounds.size.height / 2;
-		[handle setCenter:center];
-		/*
-		CGRect rect;
-		rect.origin.x = (CGFloat)(frame.left) / f;
-		rect.origin.y = (CGFloat)(frame.top) / f;
-		rect.size.width = (CGFloat)(frame.getWidth()) / f;
-		rect.size.height = (CGFloat)(frame.getHeight()) / f;
-		[handle setFrame:rect];
-		*/
+		if (UI::isUiThread()) {
+			[handle setBounds:bounds];
+			[handle setCenter:center];
+			[handle setNeedsDisplay];
+		} else {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[handle setBounds:bounds];
+				[handle setCenter:center];
+				[handle setNeedsDisplay];
+			});
+		}
 		invalidate();
 	}
 }
@@ -202,8 +203,13 @@ void iOS_ViewInstance::setTransform(const Matrix3& m)
 	if (handle != nil) {
 		CGAffineTransform t;
 		GraphicsPlatform::getCGAffineTransform(t, m, UIPlatform::getGlobalScaleFactor(), 0, 0);
-		[handle setTransform: t];
-		invalidate();
+		if (UI::isUiThread()) {
+			[handle setTransform: t];
+		} else {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[handle setTransform: t];
+			});
+		}
 	}
 }
 
@@ -211,8 +217,13 @@ void iOS_ViewInstance::setVisible(sl_bool flag)
 {
 	UIView* handle = m_handle;
 	if (handle != nil) {
-		[handle setHidden:(flag ? NO : YES)];
-		invalidate();
+		if (UI::isUiThread()) {
+			[handle setHidden:(flag ? NO : YES)];
+		} else {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[handle setHidden:(flag ? NO : YES)];
+			});
+		}
 	}
 }
 
@@ -222,7 +233,13 @@ void iOS_ViewInstance::setEnabled(sl_bool flag)
 	if (handle != nil) {
 		if ([handle isKindOfClass:[UIControl class]]) {
 			UIControl* control = (UIControl*)handle;
-			[control setEnabled:(flag ? YES : NO)];
+			if (UI::isUiThread()) {
+				[control setEnabled:(flag ? YES : NO)];
+			} else {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[control setEnabled:(flag ? YES : NO)];
+				});
+			}
 		}
 	}
 }
@@ -239,10 +256,19 @@ void iOS_ViewInstance::setAlpha(sl_real alpha)
 {
 	UIView* handle = m_handle;
 	if (handle != nil) {
+		if (UI::isUiThread()) {
+			[handle setAlpha:alpha];
+		} else {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[handle setAlpha:alpha];
+			});
+		}
+		/*
 		if (!([handle isKindOfClass:[Slib_iOS_ViewHandle class]])) {
 			[handle setAlpha:alpha];
 		}
 		invalidate();
+		*/
 	}
 }
 

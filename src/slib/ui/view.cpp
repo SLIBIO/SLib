@@ -6351,7 +6351,7 @@ void View::draw(Canvas* canvas)
 		
 		sl_bool flagRequireLayer = sl_false;
 		do {
-#if defined(SLIB_PLATFORM_IS_ANDROID)
+#if defined(SLIB_PLATFORM_IS_ANDROID) || defined(SLIB_PLATFORM_IS_IOS)
 			if (isInstance() && canvas->getType() != CanvasType::Render) {
 				break;
 			}

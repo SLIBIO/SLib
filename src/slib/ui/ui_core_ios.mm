@@ -19,7 +19,6 @@ class _iOS_Screen : public Screen
 {
 public:
 	UIScreen* m_screen;
-	CGRect m_rect;
 	
 public:
 	static Ref<_iOS_Screen> create(UIScreen* screen)
@@ -29,7 +28,6 @@ public:
 			ret = new _iOS_Screen();
 			if (ret.isNotNull()) {
 				ret->m_screen = screen;
-				ret->m_rect = [screen bounds];
 			}
 		}
 		return ret;
@@ -49,14 +47,15 @@ public:
     // override
     UIRect getRegion()
 	{
+		CGRect rect = [m_screen bounds];
 		CGFloat f = UIPlatform::getGlobalScaleFactor();
 		UIRect region;
-		region.left = (sl_ui_pos)(m_rect.origin.x * f);
-		region.top = (sl_ui_pos)(m_rect.origin.y * f);
-		region.setWidth((sl_ui_pos)(m_rect.size.width * f));
-		region.setHeight((sl_ui_pos)(m_rect.size.height * f));
+		region.left = (sl_ui_pos)(rect.origin.x * f);
+		region.top = (sl_ui_pos)(rect.origin.y * f);
+		region.setWidth((sl_ui_pos)(rect.size.width * f));
+		region.setHeight((sl_ui_pos)(rect.size.height * f));
 		return region;
-	}	
+	}
 
 };
 
