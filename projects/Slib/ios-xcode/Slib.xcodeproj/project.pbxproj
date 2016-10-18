@@ -618,6 +618,7 @@
 				260252031BF18CB800DEFAB1 /* graphics */,
 				A25F2EFB1B039EF600854DAF /* math */,
 				266DD3581C11705C00D47AB0 /* media */,
+				A25F2F041B039EF600854DAF /* network */,
 				A25F2F131B039EF600854DAF /* render */,
 				A25F2F231B039EF600854DAF /* ui */,
 			);
@@ -773,8 +774,7 @@
 				266DD3D31C1181B500D47AB0 /* socket.cpp */,
 				266DD3D41C1181B500D47AB0 /* tcpip.cpp */,
 			);
-			name = network;
-			path = ../network;
+			path = network;
 			sourceTree = "<group>";
 		};
 		A25F2F131B039EF600854DAF /* render */ = {
@@ -801,7 +801,6 @@
 		A25F2F231B039EF600854DAF /* ui */ = {
 			isa = PBXGroup;
 			children = (
-				A25F2F041B039EF600854DAF /* network */,
 				266DD4311C118FF200D47AB0 /* button.cpp */,
 				266DD4331C118FF700D47AB0 /* button_ios.mm */,
 				26A9B7611C172BCC004C9B0E /* camera_view.cpp */,
