@@ -3,21 +3,21 @@
 SLIB_MATH_NAMESPACE_BEGIN
 
 template <class T>
-T Matrix4T<T>::_zero[16] = {
+SLIB_ALIGN(8) T Matrix4T<T>::_zero[16] = {
 	0, 0, 0, 0
 	, 0, 0, 0, 0
 	, 0, 0, 0, 0
 	, 0, 0, 0, 0 };
 
 template <class T>
-T Matrix4T<T>::_one[16] = {
+SLIB_ALIGN(8) T Matrix4T<T>::_one[16] = {
 	1, 1, 1, 1
 	, 1, 1, 1, 1
 	, 1, 1, 1, 1
 	, 1, 1, 1, 1 };
 
 template <class T>
-T Matrix4T<T>::_identity[16] = {
+SLIB_ALIGN(8) T Matrix4T<T>::_identity[16] = {
 	1, 0, 0, 0
 	, 0, 1, 0, 0
 	, 0, 0, 1, 0

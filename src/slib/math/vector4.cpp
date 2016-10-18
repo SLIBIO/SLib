@@ -5,7 +5,7 @@
 SLIB_MATH_NAMESPACE_BEGIN
 
 template <class T, class FT>
-T Vector4T<T, FT>::_zero[4] = {0, 0, 0, 0};
+SLIB_ALIGN(8) T Vector4T<T, FT>::_zero[4] = {0, 0, 0, 0};
 
 template <class T, class FT>
 Vector4T<T, FT> Vector4T<T, FT>::fromLocation(const Vector3T<T, FT>& v)

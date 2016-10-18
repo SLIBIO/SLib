@@ -3,19 +3,19 @@
 SLIB_MATH_NAMESPACE_BEGIN
 
 template <class T>
-T Matrix3T<T>::_zero[9] = {
+SLIB_ALIGN(8) T Matrix3T<T>::_zero[9] = {
 	0, 0, 0
 	, 0, 0, 0
 	, 0, 0, 0 };
 
 template <class T>
-T Matrix3T<T>::_one[9] = {
+SLIB_ALIGN(8) T Matrix3T<T>::_one[9] = {
 	1, 1, 1
 	, 1, 1, 1
 	, 1, 1, 1 };
 
 template <class T>
-T Matrix3T<T>::_identity[9] = {
+SLIB_ALIGN(8) T Matrix3T<T>::_identity[9] = {
 	1, 0, 0
 	, 0, 1, 0
 	, 0, 0, 1 };

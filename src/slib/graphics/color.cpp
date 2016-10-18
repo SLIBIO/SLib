@@ -5,7 +5,7 @@
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
-sl_uint8 Color::_zero[4] = {0, 0, 0, 0};
+SLIB_ALIGN(8) sl_uint8 Color::_zero[4] = {0, 0, 0, 0};
 
 Color::Color(const Color3f& v)
 {

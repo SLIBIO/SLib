@@ -25,7 +25,8 @@ typedef __int64				sl_int64;
 typedef unsigned __int64	sl_uint64;
 typedef size_t sl_size_t;
 
-#define SLIB_ALIGN(var, n) __declspec(align(n)) var
+#define SLIB_ALIGN(n) __declspec(align(n))
+
 #define SLIB_EXPORT
 #define SLIB_VISIBLE_LOCAL
 
@@ -44,7 +45,8 @@ typedef long long			sl_int64;
 typedef unsigned long long	sl_uint64;
 typedef __SIZE_TYPE__ sl_size_t;
 
-#define SLIB_ALIGN(var, n) var __attribute__((aligned(n)))
+#define SLIB_ALIGN(n) __attribute__((aligned(n)))
+
 #if __GNUC__ >= 4
 #define SLIB_EXPORT __attribute__((visibility("default")))
 #define SLIB_VISIBLE_LOCAL __attribute__((visibility("hidden")))

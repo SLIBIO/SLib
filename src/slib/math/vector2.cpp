@@ -5,7 +5,7 @@
 SLIB_MATH_NAMESPACE_BEGIN
 
 template <class T, class FT>
-T Vector2T<T, FT>::_zero[2] = {0, 0};
+SLIB_ALIGN(8) T Vector2T<T, FT>::_zero[2] = {0, 0};
 
 template <class T, class FT>
 T Vector2T<T, FT>::dot(const Vector2T<T, FT>& other) const

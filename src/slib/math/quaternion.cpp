@@ -5,7 +5,7 @@
 SLIB_MATH_NAMESPACE_BEGIN
 
 template <class T>
-T QuaternionT<T>::_identity[4] = { 0, 0, 0, 1 };
+SLIB_ALIGN(8) T QuaternionT<T>::_identity[4] = { 0, 0, 0, 1 };
 
 template <class T>
 T QuaternionT<T>::getLength2p() const

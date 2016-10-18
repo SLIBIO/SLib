@@ -3,7 +3,7 @@
 SLIB_MATH_NAMESPACE_BEGIN
 
 template <class T>
-T BoxT<T>::_zero[6] = {0, 0, 0, 0, 0, 0};
+SLIB_ALIGN(8) T BoxT<T>::_zero[6] = {0, 0, 0, 0, 0, 0};
 
 template <class T>
 BoxT<T>::BoxT(T _x1, T _y1, T _z1,

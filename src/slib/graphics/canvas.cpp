@@ -345,7 +345,7 @@ void Canvas::fillPath(const Ref<GraphicsPath>& path, const Color& color)
 }
 
 
-const char _g_globalDefaultDrawParamBuf[sizeof(DrawParam)] = {0};
+SLIB_ALIGN(8) const char _g_globalDefaultDrawParamBuf[sizeof(DrawParam)] = {0};
 const DrawParam& _g_globalDefaultDrawParam = *((const DrawParam*)((void*)_g_globalDefaultDrawParamBuf));
 
 void Canvas::draw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param)

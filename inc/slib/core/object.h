@@ -88,7 +88,7 @@ SLIB_NAMESPACE_END
 #endif
 
 #define SLIB_SAFE_STATIC(TYPE, NAME, ...) \
-	static sl_uint8 _static_safemem_##NAME[sizeof(TYPE)]; \
+	SLIB_ALIGN(8) static sl_uint8 _static_safemem_##NAME[sizeof(TYPE)]; \
 	static sl_int32 _static_safeflag_##NAME = 0; \
 	TYPE& NAME = *((TYPE*)((void*)(_static_safemem_##NAME))); \
 	SLIB_STATIC_SPINLOCK(_static_safelock_##NAME); \
@@ -112,7 +112,7 @@ SLIB_NAMESPACE_END
 	}
 
 #define SLIB_STATIC_ZERO_INITIALIZED(TYPE, NAME) \
-	static char _static_safemem_##NAME[sizeof(TYPE)] = {0}; \
+	SLIB_ALIGN(8) static char _static_safemem_##NAME[sizeof(TYPE)] = {0}; \
 	TYPE& NAME = *((TYPE*)((void*)(_static_safemem_##NAME))); \
 	SLIB_SAFE_STATIC_DESTRUCTOR(TYPE, NAME)
 

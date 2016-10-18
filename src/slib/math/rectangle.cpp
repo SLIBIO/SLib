@@ -4,7 +4,7 @@
 SLIB_MATH_NAMESPACE_BEGIN
 
 template <class T, class FT>
-T RectangleT<T, FT>::_zero[4] = {0, 0, 0, 0};
+SLIB_ALIGN(8) T RectangleT<T, FT>::_zero[4] = {0, 0, 0, 0};
 
 template <class T, class FT>
 void RectangleT<T, FT>::setWidth(T width)
