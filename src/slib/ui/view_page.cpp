@@ -1,4 +1,5 @@
 #include "../../../inc/slib/ui/view_page.h"
+#include "../../../inc/slib/ui/core.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -99,7 +100,7 @@ void _ViewStack_FinishAnimation(Ref<ViewStack> stack, Ref<View> view, UIPageActi
 	}
 }
 
-void ViewStack::push(const Ref<View>& viewIn, const Transition& _transition, sl_bool flagRemoveAllBackPages)
+void ViewStack::_push(Ref<View> viewIn, Transition transition, sl_bool flagRemoveAllBackPages)
 {
 	if (viewIn.isNull()) {
 		return;
@@ -128,7 +129,6 @@ void ViewStack::push(const Ref<View>& viewIn, const Transition& _transition, sl_
 	
 	viewIn->setFrame(getBounds(), sl_false);
 	
-	Transition transition = _transition;
 	_applyDefaultPushTransition(transition);
 	Ref<Animation> animationPause = Transition::createAnimation(viewBack, transition, UIPageAction::Pause, SLIB_CALLBACK(_ViewStack_FinishAnimation, Ref<ViewStack>(this), viewBack, UIPageAction::Pause));
 	
@@ -168,42 +168,40 @@ void ViewStack::push(const Ref<View>& viewIn, const Transition& _transition, sl_
 	
 }
 
-void ViewStack::push(const Ref<View> &page, sl_bool flagRemoveAllBackPages)
+void ViewStack::push(const Ref<View>& viewIn, const Transition& transition, sl_bool flagRemoveAllBackPages)
 {
-	Transition transition;
-	push(page, transition, flagRemoveAllBackPages);
+	if (UI::isUiThread()) {
+		_push(viewIn, transition, flagRemoveAllBackPages);
+	} else {
+		UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(ViewStack, _push, this, viewIn, transition, flagRemoveAllBackPages));
+	}
 }
 
-void ViewStack::pop(const Ref<View>& viewOut, const Transition& transition)
+void ViewStack::push(const Ref<View>& viewIn, sl_bool flagRemoveAllBackPages)
+{
+	if (UI::isUiThread()) {
+		_push(viewIn, Transition(), flagRemoveAllBackPages);
+	} else {
+		UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(ViewStack, _push, this, viewIn, Transition(), flagRemoveAllBackPages));
+	}
+}
+
+void ViewStack::_pop(Ref<View> _viewOut, Transition transition)
 {
 	ObjectLocker lock(this);
+	
 	sl_size n = m_pages.getCount();
+	
 	if (n == 0) {
 		return;
 	}
-	if (viewOut == *(m_pages.getItemPtr(n-1))) {
-		pop(transition);
-	}
-}
-
-void ViewStack::pop(const Ref<View>& viewOut)
-{
-	Transition transition;
-	pop(viewOut, transition);
-}
-
-void ViewStack::pop(const Transition& _transition)
-{
-	ObjectLocker lock(this);
 	
-	sl_size n = m_pages.getCount();
-	
-	if (n == 0) {
+	Ref<View> viewOut = *(m_pages.getItemPtr(n-1));
+	if (_viewOut.isNotNull() && _viewOut != viewOut) {
 		return;
 	}
 	
 	if (n == 1) {
-		Ref<View> viewOut = *(m_pages.getItemPtr(0));
 		dispatchPageAction(viewOut.ptr, UIPageAction::Pop);
 		dispatchFinishPageAnimation(viewOut.ptr, UIPageAction::Pop);
 		removeChild(viewOut);
@@ -213,9 +211,7 @@ void ViewStack::pop(const Transition& _transition)
 	}
 	
 	Ref<View> viewBack = *(m_pages.getItemPtr(n-2));
-	Ref<View> viewOut = *(m_pages.getItemPtr(n-1));
 	
-	Transition transition = _transition;
 	_applyDefaultPopTransition(transition);
 	Ref<Animation> animationPop = Transition::createAnimation(viewOut, transition, UIPageAction::Pop, SLIB_CALLBACK(_ViewStack_FinishAnimation, Ref<ViewStack>(this), viewOut, UIPageAction::Pop));
 	
@@ -250,10 +246,40 @@ void ViewStack::pop(const Transition& _transition)
 
 }
 
+void ViewStack::pop(const Ref<View>& viewOut, const Transition& transition)
+{
+	if (UI::isUiThread()) {
+		_pop(viewOut, transition);
+	} else {
+		UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(ViewStack, _pop, this, viewOut, transition));
+	}
+}
+
+void ViewStack::pop(const Ref<View>& viewOut)
+{
+	if (UI::isUiThread()) {
+		_pop(viewOut, Transition());
+	} else {
+		UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(ViewStack, _pop, this, viewOut, Transition()));
+	}
+}
+
+void ViewStack::pop(const Transition& transition)
+{
+	if (UI::isUiThread()) {
+		_pop(Ref<View>::null(), transition);
+	} else {
+		UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(ViewStack, _pop, this, Ref<View>::null(), transition));
+	}
+}
+
 void ViewStack::pop()
 {
-	Transition transition;
-	pop(transition);
+	if (UI::isUiThread()) {
+		_pop(Ref<View>::null(), Transition());
+	} else {
+		UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(ViewStack, _pop, this, Ref<View>::null(), Transition()));
+	}
 }
 
 TransitionType ViewStack::getPushTransitionType()

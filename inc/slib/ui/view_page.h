@@ -101,6 +101,10 @@ public:
 	void setTransitionCurve(AnimationCurve curve);
 	
 protected:
+	void _push(Ref<View> page, Transition transition, sl_bool flagRemoveAllBackPages);
+	
+	void _pop(Ref<View> page, Transition transition);
+	
 	void _applyDefaultPushTransition(Transition& transition);
 	
 	void _applyDefaultPopTransition(Transition& transition);

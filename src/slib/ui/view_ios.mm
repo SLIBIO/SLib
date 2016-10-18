@@ -193,7 +193,6 @@ void iOS_ViewInstance::setFrame(const UIRect& frame)
 				[handle setNeedsDisplay];
 			});
 		}
-		invalidate();
 	}
 }
 
