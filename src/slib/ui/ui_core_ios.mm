@@ -174,7 +174,7 @@ CGFloat UIPlatform::getGlobalScaleFactor()
 	if (_g_slib_ios_global_scale_factor == 0) {
 		UIScreen* screen = _iOS_Screen::getPrimaryScreen();
 		if (screen != nil) {
-			CGFloat f = screen.nativeScale;
+			CGFloat f = screen.scale;
 			_g_slib_ios_global_scale_factor = f;
 			return f;
 		} else {
