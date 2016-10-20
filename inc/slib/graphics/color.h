@@ -279,6 +279,10 @@ private:
 	
 };
 
+#define SLIB_STATIC_COLOR(name, R, G, B, A) \
+	SLIB_ALIGN(8) static sl_uint8 _static_color_buf_##name[] = {R, G, B, A}; \
+	Color& name = *((Color*)((void*)_static_color_buf_##name));
+
 class SLIB_EXPORT ColorMatrix
 {
 public:

@@ -5,15 +5,16 @@ SLIB_UI_NAMESPACE_BEGIN
 
 sl_ui_len _g_ui_resource_screenWidth = 0;
 sl_ui_len _g_ui_resource_screenHeight = 0;
+sl_ui_len _g_ui_resource_defaultScreenWidth = 0;
+sl_ui_len _g_ui_resource_defaultScreenHeight = 0;
 
 sl_ui_len UIResource::getScreenWidth()
 {
 	if (_g_ui_resource_screenWidth == 0) {
-		UISize size = UI::getScreenSize();
-		_g_ui_resource_screenWidth = size.x;
-		if (_g_ui_resource_screenHeight == 0) {
-			_g_ui_resource_screenHeight = size.y;
+		if (_g_ui_resource_defaultScreenWidth == 0) {
+			updateDefaultScreenSize();
 		}
+		return _g_ui_resource_defaultScreenWidth;
 	}
 	return _g_ui_resource_screenWidth;
 }
@@ -26,11 +27,10 @@ void UIResource::setScreenWidth(sl_ui_len width)
 sl_ui_len UIResource::getScreenHeight()
 {
 	if (_g_ui_resource_screenHeight == 0) {
-		UISize size = UI::getScreenSize();
-		if (_g_ui_resource_screenWidth == 0) {
-			_g_ui_resource_screenWidth = size.x;
+		if (_g_ui_resource_defaultScreenHeight == 0) {
+			updateDefaultScreenSize();
 		}
-		_g_ui_resource_screenHeight = size.y;
+		return _g_ui_resource_defaultScreenHeight;
 	}
 	return _g_ui_resource_screenHeight;
 }
@@ -48,6 +48,13 @@ sl_ui_len UIResource::getScreenMinimum()
 sl_ui_len UIResource::getScreenMaximum()
 {
 	return SLIB_MAX(getScreenWidth(), getScreenHeight());
+}
+
+void UIResource::updateDefaultScreenSize()
+{
+	UISize size = UI::getScreenSize();
+	_g_ui_resource_defaultScreenWidth = size.x;
+	_g_ui_resource_defaultScreenHeight = size.y;
 }
 
 UILayoutResource::UILayoutResource(sl_real sp)

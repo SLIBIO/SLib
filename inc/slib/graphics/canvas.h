@@ -47,17 +47,20 @@ public:
 	const Rectangle& getInvalidatedRect();
 	
 	void setInvalidatedRect(const Rectangle& rect);
-
+	
+	sl_real getAlpha();
+	
+	void setAlpha(sl_real alpha);
+	
+	sl_bool isAntiAlias();
+	
+	void setAntiAlias(sl_bool flag);
+	
 public:
 	virtual void save() = 0;
 	
 	virtual void restore() = 0;
 
-	
-	virtual sl_bool isAntiAlias() = 0;
-
-	virtual void setAntiAlias(sl_bool flag) = 0;
-	
 	
 	virtual Rectangle getClipBounds() = 0;
 	
@@ -236,11 +239,18 @@ protected:
 	
 	virtual void onDrawAll(const Rectangle& rectDst, const Ref<Drawable>& src, const DrawParam& param);
 	
+protected:
+	virtual void _setAlpha(sl_real alpha);
+	
+	virtual void _setAntiAlias(sl_bool flag);
+	
 private:
 	CanvasType m_type;
 	Time m_time;
 	Size m_size;
 	Rectangle m_invalidatedRect;
+	sl_real m_alpha;
+	sl_bool m_flagAntiAlias;
 	
 };
 

@@ -9,9 +9,12 @@ MobileGame::MobileGame()
 	SLIB_REFERABLE_CONSTRUCTOR
 	
 	m_gameView = new MobileGameView;
-	if (m_gameView.isNotNull()) {
-		//addView(m_gameView);
-	}
+	/*
+	m_contentView->removeAllChildren(sl_false);
+	m_contentView->addChild(m_gameView, sl_false);
+	m_contentView = m_gameView;
+	m_gameView->addChild(m_pageStack, sl_false);
+	*/
 }
 
 Ref<MobileGame> MobileGame::getApp()
@@ -25,11 +28,7 @@ Ref<MobileGame> MobileGame::getApp()
 
 Ref<MobileGameView> MobileGame::getGameView()
 {
-	void* _thiz = this;
-	if (_thiz) {
-		return m_gameView;
-	}
-	return Ref<MobileGameView>::null();
+	return m_gameView;
 }
 
 void MobileGame::onGameFrame(RenderEngine* engine)

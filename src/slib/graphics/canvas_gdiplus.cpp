@@ -21,6 +21,87 @@
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
+static void _Gdiplus_applyAlphaToColor(Gdiplus::Color& color, sl_real alpha)
+{
+	BYTE a = color.GetA();
+	BYTE r = color.GetR();
+	BYTE g = color.GetG();
+	BYTE b = color.GetB();
+	int t = color.GetA();
+	t = (int)(t * alpha);
+	if (t < 0) {
+		t = 0;
+	}
+	if (t > 255) {
+		t = 255;
+	}
+	color.SetValue(Gdiplus::Color::MakeARGB((BYTE)t, r, g, b));
+}
+
+
+#define DRAW_PEN_BEGIN \
+	Gdiplus::Graphics* graphics = m_graphics; \
+	sl_real alpha = getAlpha(); \
+	Ref<Pen> pen = _pen; \
+	if (pen.isNull()) { \
+		pen = Pen::getDefault(); \
+	} \
+	Gdiplus::Pen* hPen = GraphicsPlatform::getPenHandle(pen.ptr); \
+	Gdiplus::Pen* hPenClone = NULL; \
+	if (alpha < 0.995f) { \
+		if (hPen) { \
+			hPenClone = hPen->Clone(); \
+			Gdiplus::Color color; \
+			hPenClone->GetColor(&color); \
+			_Gdiplus_applyAlphaToColor(color, alpha); \
+			hPenClone->SetColor(color); \
+			hPen = hPenClone; \
+		} \
+	}
+
+#define DRAW_PEN_END \
+	if (hPenClone) { \
+		delete hPenClone; \
+	}
+
+#define DRAW_PEN_BRUSH_BEGIN \
+	Gdiplus::Graphics* graphics = m_graphics; \
+	sl_real alpha = getAlpha(); \
+	Gdiplus::Brush* hBrush = GraphicsPlatform::getBrushHandle(brush.ptr); \
+	Ref<Pen> pen = _pen; \
+	if (brush.isNull() && pen.isNull()) { \
+		pen = Pen::getDefault(); \
+	} \
+	Gdiplus::Pen* hPen = GraphicsPlatform::getPenHandle(pen.ptr); \
+	Gdiplus::Brush* hBrushClone = NULL; \
+	Gdiplus::Pen* hPenClone = NULL; \
+	if (alpha < 0.995f) { \
+		if (hBrush && hBrush->GetType() == Gdiplus::BrushTypeSolidColor) { \
+			hBrushClone = hBrush->Clone(); \
+			Gdiplus::Color color; \
+			((Gdiplus::SolidBrush*)hBrushClone)->GetColor(&color); \
+			_Gdiplus_applyAlphaToColor(color, alpha); \
+			((Gdiplus::SolidBrush*)hBrushClone)->SetColor(color); \
+			hBrush = hBrushClone; \
+		} \
+		if (hPen) { \
+			hPenClone = hPen->Clone(); \
+			Gdiplus::Color color; \
+			hPenClone->GetColor(&color); \
+			_Gdiplus_applyAlphaToColor(color, alpha); \
+			hPenClone->SetColor(color); \
+			hPen = hPenClone; \
+		} \
+	}
+
+#define DRAW_PEN_BRUSH_END \
+	if (hBrushClone) { \
+		delete hBrushClone; \
+	} \
+	if (hPenClone) { \
+		delete hPenClone; \
+	}
+
 class _Gdiplus_Canvas : public Canvas
 {
 	SLIB_DECLARE_OBJECT
@@ -44,26 +125,25 @@ public:
 
 public:
 	static Ref<_Gdiplus_Canvas> create(CanvasType type, Gdiplus::Graphics* graphics, sl_real width, sl_real height, sl_bool flagFreeOnRelease, const Referable* ref)
-	{
-		Ref<_Gdiplus_Canvas> ret;
+	{		
 		if (graphics) {
-			ret = new _Gdiplus_Canvas();
+			Ref<_Gdiplus_Canvas> ret = new _Gdiplus_Canvas();
 			if (ret.isNotNull()) {
-				ret->setType(type);
-				ret->setSize(Size(width, height));
-
 				ret->m_graphics = graphics;
 				ret->m_flagFreeOnRelease = flagFreeOnRelease;
 				ret->m_ref = ref;
-				ret->setAntiAlias(sl_true);
-				ret->setMatrix(Matrix3::identity());
+
+				ret->setType(type);
+				ret->setSize(Size(width, height));
+
+				ret->_setAntiAlias(sl_true);
 				return ret;
 			}
 			if (flagFreeOnRelease) {
 				delete graphics;
 			}
 		}
-		return ret;
+		return Ref<_Gdiplus_Canvas>::null();
 	}
 
     // override
@@ -79,24 +159,6 @@ public:
 		Gdiplus::GraphicsState state;
 		if (m_stackState.pop(&state)) {
 			m_graphics->Restore(state);
-		}
-	}
-
-	// override
-	sl_bool isAntiAlias()
-	{
-		return m_graphics->GetSmoothingMode() == Gdiplus::SmoothingModeAntiAlias;
-	}
-
-    // override
-	void setAntiAlias(sl_bool flag)
-	{
-		if (flag) {
-			m_graphics->SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
-			m_graphics->SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBilinear);
-		} else {
-			m_graphics->SetSmoothingMode(Gdiplus::SmoothingModeNone);
-			m_graphics->SetInterpolationMode(Gdiplus::InterpolationModeNearestNeighbor);
 		}
 	}
 
@@ -176,7 +238,18 @@ public:
 				Gdiplus::Font* pf = GraphicsPlatform::getGdiplusFont(font.ptr);
 				if (pf) {
 					Gdiplus::StringFormat format(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsNoClip);
-					Gdiplus::SolidBrush brush(Gdiplus::Color(color.a, color.r, color.g, color.b));
+					int a = color.a;
+					sl_real alpha = getAlpha();
+					if (alpha < 0.995f) {
+						a = (int)(a * alpha);
+						if (a < 0) {
+							a = 0;
+						}
+						if (a > 255) {
+							a = 255;
+						}
+					}
+					Gdiplus::SolidBrush brush(Gdiplus::Color((BYTE)a, color.r, color.g, color.b));
 					graphics->DrawString((const WCHAR*)(text.getData()), (INT)(text.getLength())
 						, pf
 						, Gdiplus::PointF(x, y + 1)
@@ -190,14 +263,11 @@ public:
     // override
 	void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& _pen)
 	{
-		Ref<Pen> pen = _pen;
-		if (pen.isNull()) {
-			pen = Pen::getDefault();
-		}
-		Gdiplus::Pen* hPen = GraphicsPlatform::getPenHandle(pen.ptr);
+		DRAW_PEN_BEGIN
 		if (hPen) {
 			m_graphics->DrawLine(hPen, Gdiplus::PointF(pt1.x, pt1.y), Gdiplus::PointF(pt2.x, pt2.y));
 		}
+		DRAW_PEN_END
 	}
 
     // override
@@ -206,49 +276,39 @@ public:
 		if (countPoints < 2) {
 			return;
 		}
-		Ref<Pen> pen = _pen;
-		if (pen.isNull()) {
-			pen = Pen::getDefault();
-		}
-		Gdiplus::Pen* hPen = GraphicsPlatform::getPenHandle(pen.ptr);
+		DRAW_PEN_BEGIN
 		if (hPen) {
 			Gdiplus::PointF* pts = (Gdiplus::PointF*)points;
 			m_graphics->DrawLines(hPen, pts, countPoints);
 		}
+		DRAW_PEN_END
 	}
 
     // override
 	void drawArc(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& _pen)
 	{
-		Ref<Pen> pen = _pen;
-		if (pen.isNull()) {
-			pen = Pen::getDefault();
-		}
-		Gdiplus::Pen* hPen = GraphicsPlatform::getPenHandle(pen.ptr);
+		DRAW_PEN_BEGIN
 		if (hPen) {
 			m_graphics->DrawArc(hPen, rect.left, rect.top, rect.getWidth(), rect.getHeight()
 				, startDegrees, sweepDegrees);
 		}
+		DRAW_PEN_END
 	}
 
     // override
 	void drawRectangle(const Rectangle& rect, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
-		Gdiplus::Graphics* graphics = m_graphics;
-		Gdiplus::Brush* hBrush = GraphicsPlatform::getBrushHandle(brush.ptr);
 		sl_real width = rect.getWidth();
 		sl_real height = rect.getHeight();
+
+		DRAW_PEN_BRUSH_BEGIN
 		if (hBrush) {
 			graphics->FillRectangle(hBrush, rect.left, rect.top, width, height);
 		}
-		Ref<Pen> pen = _pen;
-		if (brush.isNull() && pen.isNull()) {
-			pen = Pen::getDefault();
-		}
-		Gdiplus::Pen* hPen = GraphicsPlatform::getPenHandle(pen.ptr);
 		if (hPen) {
 			graphics->DrawRectangle(hPen, rect.left, rect.top, width, height);
 		}
+		DRAW_PEN_BRUSH_END
 	}
 
     // override
@@ -268,19 +328,15 @@ public:
 	{
 		sl_real width = rect.getWidth();
 		sl_real height = rect.getHeight();
-		Gdiplus::Graphics* graphics = m_graphics;
-		Gdiplus::Brush* hBrush = GraphicsPlatform::getBrushHandle(brush.ptr);
+		
+		DRAW_PEN_BRUSH_BEGIN
 		if (hBrush) {
 			graphics->FillEllipse(hBrush, rect.left, rect.top, width, height);
 		}
-		Ref<Pen> pen = _pen;
-		if (brush.isNull() && pen.isNull()) {
-			pen = Pen::getDefault();
-		}
-		Gdiplus::Pen* hPen = GraphicsPlatform::getPenHandle(pen.ptr);
 		if (hPen) {
 			graphics->DrawEllipse(hPen, rect.left, rect.top, width, height);
 		}
+		DRAW_PEN_BRUSH_END
 	}
 
     // override
@@ -289,8 +345,8 @@ public:
 		if (countPoints <= 2) {
 			return;
 		}
-		Gdiplus::Graphics* graphics = m_graphics;
-		Gdiplus::Brush* hBrush = GraphicsPlatform::getBrushHandle(brush.ptr);
+
+		DRAW_PEN_BRUSH_BEGIN
 		if (hBrush) {
 			Gdiplus::FillMode mode;
 			switch (fillMode) {
@@ -305,58 +361,57 @@ public:
 			Gdiplus::PointF* pts = (Gdiplus::PointF*)points;
 			graphics->FillPolygon(hBrush, pts, countPoints, mode);
 		}
-		Ref<Pen> pen = _pen;
-		if (brush.isNull() && pen.isNull()) {
-			pen = Pen::getDefault();
-		}
-		Gdiplus::Pen* hPen = GraphicsPlatform::getPenHandle(pen.ptr);
 		if (hPen) {
 			Gdiplus::PointF* pts = (Gdiplus::PointF*)points;
 			graphics->DrawPolygon(hPen, pts, countPoints);
 		}
+		DRAW_PEN_BRUSH_END
+
 	}
 
     // override
 	void drawPie(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
-		Gdiplus::Graphics* graphics = m_graphics;
-		Gdiplus::Brush* hBrush = GraphicsPlatform::getBrushHandle(brush.ptr);
+		DRAW_PEN_BRUSH_BEGIN
 		if (hBrush) {
 			graphics->FillPie(hBrush, rect.left, rect.top, rect.getWidth(), rect.getHeight()
 				, startDegrees, sweepDegrees);
 		}
-		Ref<Pen> pen = _pen;
-		if (brush.isNull() && pen.isNull()) {
-			pen = Pen::getDefault();
-		}
-		Gdiplus::Pen* hPen = GraphicsPlatform::getPenHandle(pen.ptr);
 		if (hPen) {
 			graphics->DrawPie(hPen, rect.left, rect.top, rect.getWidth(), rect.getHeight()
 				, startDegrees, sweepDegrees);
 		}
+		DRAW_PEN_BRUSH_END
 	}
 
     // override
 	void drawPath(const Ref<GraphicsPath>& _path, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
-		Gdiplus::Graphics* graphics = m_graphics;
 		Ref<GraphicsPath> path = _path;
 		if (path.isNotNull()) {
 			Gdiplus::GraphicsPath* pPath = GraphicsPlatform::getGraphicsPath(path.ptr);
 			if (pPath) {
-				Gdiplus::Brush* hBrush = GraphicsPlatform::getBrushHandle(brush.ptr);
+				DRAW_PEN_BRUSH_BEGIN
 				if (hBrush) {
 					graphics->FillPath(hBrush, pPath);
 				}
-				Ref<Pen> pen = _pen;
-				if (brush.isNull() && pen.isNull()) {
-					pen = Pen::getDefault();
-				}
-				Gdiplus::Pen* hPen = GraphicsPlatform::getPenHandle(pen.ptr);
 				if (hPen) {
 					graphics->DrawPath(hPen, pPath);
 				}
+				DRAW_PEN_BRUSH_END
 			}
+		}
+	}
+
+	// override
+	void _setAntiAlias(sl_bool flag)
+	{
+		if (flag) {
+			m_graphics->SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+			m_graphics->SetInterpolationMode(Gdiplus::InterpolationModeHighQualityBilinear);
+		} else {
+			m_graphics->SetSmoothingMode(Gdiplus::SmoothingModeNone);
+			m_graphics->SetInterpolationMode(Gdiplus::InterpolationModeNearestNeighbor);
 		}
 	}
 
@@ -400,12 +455,13 @@ void GraphicsPlatform::drawImage(Canvas* canvas, const Rectangle& rectDst, Gdipl
 	int sy = (int)(rectSrc.top);
 
 	Gdiplus::ImageAttributes* pia = NULL;
-	if (param.useAlpha || param.useColorMatrix) {
+	sl_real canvasAlpha = canvas->getAlpha();
+	if (param.useAlpha || param.useColorMatrix || canvasAlpha < 0.995f) {
 		Gdiplus::REAL alpha;
 		if (param.useAlpha) {
-			alpha = (Gdiplus::REAL)(param.alpha);
+			alpha = (Gdiplus::REAL)(param.alpha * canvasAlpha);
 		} else {
-			alpha = 1;
+			alpha = (Gdiplus::REAL)(canvasAlpha);
 		}
 		Gdiplus::ColorMatrix cm;
 		if (param.useColorMatrix) {

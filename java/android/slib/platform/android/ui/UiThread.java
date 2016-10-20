@@ -91,8 +91,7 @@ public class UiThread {
 				try {
 					msg.getTarget().dispatchMessage(msg);
 				} catch (Exception e) {
-					Logger.exception(e);
-				}
+				}				
 				final long newIdent = Binder.clearCallingIdentity();
 				if (ident != newIdent) {
 					Logger.info("Thread identity changed from 0x" + Long.toHexString(ident) + " to 0x"
@@ -117,6 +116,13 @@ public class UiThread {
 			return;
 		}
 		handlerUi.post(callbackQuitLoop);
+	}
+	
+	public static void post(Runnable runnable) {
+		if (!(initStatics())) {
+			return;
+		}
+		handlerUi.post(runnable);
 	}
 	
 }

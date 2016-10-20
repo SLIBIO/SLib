@@ -28,6 +28,8 @@ public:
 	
 	static sl_ui_len getScreenMaximum();
 	
+	static void updateDefaultScreenSize();
+	
 };
 
 #define SLIB_DECLARE_MENU_BEGIN(NAME) \
@@ -87,8 +89,8 @@ NAME::NAME() { \
 		NAME(sl_real sp = 1); \
 	protected: \
 		void initialize(); \
-		void layoutViews(sl_ui_len width, sl_ui_len height);
-
+		void layoutViews(sl_ui_len width, sl_ui_len height); \
+	public:
 
 #define SLIB_DECLARE_UILAYOUT_END \
 	};

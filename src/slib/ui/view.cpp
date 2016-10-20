@@ -4707,6 +4707,9 @@ void View::resetAlphaFromAnimation(sl_bool flagRedraw)
 
 void View::_applyFinalAlpha(sl_bool flagRedraw)
 {
+#if defined(SLIB_PLATFORM_IS_WIN32)
+	invalidateBoundsInParent();
+#else
 	Ref<ViewInstance> instance = m_instance;
 	if (instance.isNotNull()) {
 		instance->setAlpha(getFinalAlpha());
@@ -4715,6 +4718,7 @@ void View::_applyFinalAlpha(sl_bool flagRedraw)
 			invalidateBoundsInParent();
 		}
 	}
+#endif
 }
 
 sl_bool View::isLayer()
@@ -6141,7 +6145,10 @@ void View::drawChildren(Canvas* canvas, const Ref<View>* children, sl_size count
 	if (count == 0) {
 		return;
 	}
+	
+	sl_real alphaParent = canvas->getAlpha();
 	UIRect rcInvalidatedParent = canvas->getInvalidatedRect();
+	
 	for (sl_size i = 0; i < count; i++) {
 		View* child = children[i].ptr;
 		if (child) {
@@ -6161,6 +6168,7 @@ void View::drawChildren(Canvas* canvas, const Ref<View>* children, sl_size count
 						if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated)) {
 							canvas->setInvalidatedRect(rcInvalidated);
 							canvas->translate((sl_real)(offx), (sl_real)(offy));
+							canvas->setAlpha(alphaParent * child->getFinalAlpha());
 							child->dispatchDraw(canvas);
 						}
 					}
@@ -6184,6 +6192,7 @@ void View::drawChildren(Canvas* canvas, const Ref<View>* children, sl_size count
 							mat.m20 = -ax * mat.m00 - ay * mat.m10 + mat.m20 + ax + (sl_real)(offx);
 							mat.m21 = -ax * mat.m01 - ay * mat.m11 + mat.m21 + ay + (sl_real)(offy);
 							canvas->concatMatrix(mat);
+							canvas->setAlpha(alphaParent * child->getFinalAlpha());
 							child->dispatchDraw(canvas);
 						}
 					} else {
@@ -6191,6 +6200,7 @@ void View::drawChildren(Canvas* canvas, const Ref<View>* children, sl_size count
 						if (rcInvalidated.intersectRectangle(child->getBounds(), &rcInvalidated)) {
 							canvas->setInvalidatedRect(rcInvalidated);
 							canvas->translate((sl_real)(offx), (sl_real)(offy));
+							canvas->setAlpha(alphaParent * child->getFinalAlpha());
 							child->dispatchDraw(canvas);
 						}
 					}
@@ -6198,6 +6208,7 @@ void View::drawChildren(Canvas* canvas, const Ref<View>* children, sl_size count
 			}
 		}
 	}
+	canvas->setAlpha(alphaParent);
 	canvas->setInvalidatedRect(rcInvalidatedParent);
 }
 
@@ -6334,51 +6345,18 @@ Ref<Bitmap> View::drawLayer()
 
 void View::draw(Canvas* canvas)
 {
-	sl_ui_pos width = m_frame.getWidth();
-	if (width <= 0) {
-		return;
-	}
-	sl_ui_pos height = m_frame.getHeight();
-	if (height <= 0) {
-		return;
+
+	if (isLayer()) {
+		Ref<Bitmap> bitmap = drawLayer();
+		if (bitmap.isNotNull()) {
+			Rectangle rcInvalidated = canvas->getInvalidatedRect();
+			canvas->draw(rcInvalidated, bitmap, rcInvalidated);
+			return;
+		}
 	}
 	
-	do {
-		sl_real alpha = getFinalAlpha();
-		if (alpha < 0.005f) {
-			break;
-		}
-		
-		sl_bool flagRequireLayer = sl_false;
-		do {
-#if defined(SLIB_PLATFORM_IS_ANDROID) || defined(SLIB_PLATFORM_IS_IOS)
-			if (isInstance() && canvas->getType() != CanvasType::Render) {
-				break;
-			}
-#endif
-			if (alpha < 0.995f) {
-				flagRequireLayer = sl_true;
-				break;
-			}
-			flagRequireLayer = isLayer();
-		} while (0);
-		
-		if (flagRequireLayer) {
-			Ref<Bitmap> bitmap = drawLayer();
-			if (bitmap.isNotNull()) {
-				DrawParam dp;
-				dp.useAlpha = sl_true;
-				dp.alpha = alpha;
-				Rectangle rcInvalidated = canvas->getInvalidatedRect();
-				canvas->draw(rcInvalidated, bitmap, rcInvalidated, dp);
-				break;
-			}
-		}
-		
-		CanvasStatusScope scope(canvas);
-		drawContent(canvas);
-		
-	} while (0);
+	CanvasStatusScope scope(canvas);
+	drawContent(canvas);
 	
 }
 
@@ -7552,6 +7530,20 @@ void ViewInstance::onDraw(Canvas* canvas)
 {
 	Ref<View> view = getView();
 	if (view.isNotNull()) {
+#if defined(SLIB_PLATFORM_IS_OSX)
+		sl_real alpha = view->getFinalAlpha();
+		Ref<View> parent = view->getParent();
+		while (parent.isNotNull()) {
+			alpha *= parent->getFinalAlpha();
+			parent = parent->getParent();
+		}
+		if (alpha < 0.005f) {
+			return;
+		}
+		if (alpha < 0.995f) {
+			canvas->setAlpha(alpha);
+		}
+#endif
 		view->dispatchDraw(canvas);
 	}
 }

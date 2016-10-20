@@ -3,9 +3,12 @@ package slib.platform.android;
 import java.util.Vector;
 
 import slib.platform.android.camera.SCamera;
+import slib.platform.android.ui.UiThread;
 import slib.platform.android.ui.window.UiWindow;
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 
 public class SlibActivity extends Activity {
 
@@ -57,6 +60,11 @@ public class SlibActivity extends Activity {
 		}
 	}
 	
+	@Override
+	public void finish() {
+		super.finish();
+	}
+	
 	public boolean isVisible() {
 		return flagVisible;
 	}
@@ -72,4 +80,35 @@ public class SlibActivity extends Activity {
 			finish();
 		}
 	}
+	
+	@Override
+	public boolean dispatchTouchEvent(final MotionEvent ev) {
+		// avoid crash on using UI::runLoop
+		UiThread.post(new Runnable() {
+			public void run() {
+				dispatchTouchEventToSuper(ev);
+			}
+		});
+		return true;
+	}
+	
+	void dispatchTouchEventToSuper(final MotionEvent ev) {
+		super.dispatchTouchEvent(ev);
+	}
+	
+	@Override
+	public boolean dispatchKeyEvent(final KeyEvent ev) {
+		// avoid crash on using UI::runLoop
+		UiThread.post(new Runnable() {
+			public void run() {
+				dispatchKeyEventToSuper(ev);
+			}
+		});
+		return true;
+	}
+	
+	public void dispatchKeyEventToSuper(final KeyEvent ev) {
+		super.dispatchKeyEvent(ev);
+	}
+	
 }

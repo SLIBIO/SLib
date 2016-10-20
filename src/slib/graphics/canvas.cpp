@@ -10,6 +10,8 @@ SLIB_DEFINE_OBJECT(Canvas, Object)
 Canvas::Canvas()
 {
 	m_time = Time::now();
+	m_alpha = 1;
+	m_flagAntiAlias = sl_true;
 }
 
 CanvasType Canvas::getType()
@@ -54,6 +56,34 @@ const Rectangle& Canvas::getInvalidatedRect()
 void Canvas::setInvalidatedRect(const Rectangle& rect)
 {
 	m_invalidatedRect = rect;
+}
+
+sl_real Canvas::getAlpha()
+{
+	return m_alpha;
+}
+
+void Canvas::setAlpha(sl_real alpha)
+{
+	if (Math::isAlmostZero(m_alpha - alpha)) {
+		m_alpha = alpha;
+	} else {
+		m_alpha = alpha;
+		_setAlpha(alpha);
+	}
+}
+
+sl_bool Canvas::isAntiAlias()
+{
+	return m_flagAntiAlias;
+}
+
+void Canvas::setAntiAlias(sl_bool flag)
+{
+	if (m_flagAntiAlias != flag) {
+		m_flagAntiAlias = flag;
+		_setAntiAlias(flag);
+	}
 }
 
 void Canvas::clipToRectangle(sl_real x, sl_real y, sl_real width, sl_real height)
@@ -676,6 +706,14 @@ void Canvas::onDraw(const Rectangle& rectDst, const Ref<Drawable>& src, const Re
 void Canvas::onDrawAll(const Rectangle& rectDst, const Ref<Drawable>& src, const DrawParam& param)
 {
 	src->onDrawAll(this, rectDst, param);
+}
+
+void Canvas::_setAlpha(sl_real alpha)
+{
+}
+
+void Canvas::_setAntiAlias(sl_bool flag)
+{
 }
 
 CanvasStatusScope::CanvasStatusScope()

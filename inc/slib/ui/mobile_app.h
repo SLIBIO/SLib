@@ -26,11 +26,19 @@ public:
 	
 	static sl_bool isPaused();
 	
-	void addView(const Ref<View>& view);
-	
-	void removeView(const Ref<View>& view);
+	Ref<View> getRootView();
+
+	Ref<View> getContentView();
 	
 	Ref<ViewStack> getPageStack();
+	
+	Ref<View> getStartupPage();
+	
+	void setStartupPage(const Ref<View>& page);
+	
+	void addViewToRoot(const Ref<View>& view);
+	
+	void addViewToContent(const Ref<View>& view);
 	
 	void openPage(const Ref<View>& page, const Transition& transition);
 	
@@ -48,6 +56,22 @@ public:
 	
 	void closePage();
 	
+	void popupPage(const Ref<ViewPage>& page, const Transition& transition, sl_bool flagFillParentBackground = sl_true);
+	
+	void popupPage(const Ref<ViewPage>& page, sl_bool flagFillParentBackground = sl_true);
+	
+	void closePopup(const Ref<ViewPage>& page, const Transition& transition);
+	
+	void closePopup(const Ref<ViewPage>& page);
+	
+	void closePopup(const Transition& transition);
+	
+	void closePopup();
+	
+	void modalPage(const Ref<ViewPage>& page, const Transition& transition, sl_bool flagFillParentBackground = sl_true);
+	
+	void modalPage(const Ref<ViewPage>& page, sl_bool flagFillParentBackground = sl_true);
+	
 protected:
 	virtual void onPause();
 	
@@ -60,9 +84,7 @@ protected:
 	virtual void onDestroyActivity();
 	
 	virtual void onResize(sl_ui_len width, sl_ui_len height);
-	
-	virtual void onStartPage();
-	
+		
 public:
 	virtual void dispatchPause();
 	
@@ -88,11 +110,16 @@ public:
 	
 	static void dispatchResizeToApp(sl_ui_len width, sl_ui_len height);
 	
-private:
+protected:
 	static sl_bool m_flagPaused;
 	
+	Ref<View> m_contentView;
 	Ref<ViewStack> m_pageStack;
+	Ref<View> m_startupPage;
 	sl_bool m_flagStartedPage;
+	CList< Ref<ViewPage> > m_popupPages;
+	
+	friend class ViewPage;
 	
 };
 

@@ -15,7 +15,6 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidRect, "android/graphics/Rect")
 SLIB_JNI_END_CLASS
 
 SLIB_JNI_BEGIN_CLASS(_JAndroidGraphics, "slib/platform/android/ui/Graphics")
-	SLIB_JNI_BOOLEAN_FIELD(flagAntiAlias);
 	SLIB_JNI_METHOD(getWidth, "getWidth", "()I");
 	SLIB_JNI_METHOD(getHeight, "getHeight", "()I");
 	SLIB_JNI_METHOD(save, "save", "()V");
@@ -34,6 +33,8 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidGraphics, "slib/platform/android/ui/Graphics")
 	SLIB_JNI_METHOD(drawPolygon, "drawPolygon", "([FLslib/platform/android/ui/UiPen;Lslib/platform/android/ui/UiBrush;I)V");
 	SLIB_JNI_METHOD(drawPie, "drawPie", "(FFFFFFLslib/platform/android/ui/UiPen;Lslib/platform/android/ui/UiBrush;)V");
 	SLIB_JNI_METHOD(drawPath, "drawPath", "(Lslib/platform/android/ui/UiPath;Lslib/platform/android/ui/UiPen;Lslib/platform/android/ui/UiBrush;)V");
+	SLIB_JNI_METHOD(setAlpha, "setAlpha", "(F)V");
+	SLIB_JNI_METHOD(setAntiAlias, "setAntiAlias", "(Z)V");
 SLIB_JNI_END_CLASS
 
 class _Android_Canvas : public Canvas
@@ -44,20 +45,19 @@ public:
 
 public:
 	static Ref<_Android_Canvas> create(CanvasType type, jobject jcanvas) {
-		Ref<_Android_Canvas> ret;
 		JniGlobal<jobject> canvas = jcanvas;
 		if (canvas.isNotNull()) {
 			int width = _JAndroidGraphics::getWidth.callInt(jcanvas);
 			int height = _JAndroidGraphics::getHeight.callInt(jcanvas);
-			ret = new _Android_Canvas();
+			Ref<_Android_Canvas> ret = new _Android_Canvas();
 			if (ret.isNotNull()) {
+				ret->m_canvas = canvas;
 				ret->setType(type);
 				ret->setSize(Size((sl_real)width, (sl_real)height));
-
-				ret->m_canvas = canvas;
+				return ret;
 			}
 		}
-		return ret;
+		return Ref<_Android_Canvas>::null();
 	}
 
     // override
@@ -70,17 +70,6 @@ public:
 	void restore()
 	{
 		_JAndroidGraphics::restore.call(m_canvas);
-	}
-
-	sl_bool isAntiAlias()
-	{
-		return _JAndroidGraphics::flagAntiAlias.get(m_canvas);
-	}
-
-    // override
-	void setAntiAlias(sl_bool flag)
-	{
-		_JAndroidGraphics::flagAntiAlias.set(m_canvas, flag);
 	}
 
     // override
@@ -293,6 +282,19 @@ public:
 			}
 		}
 	}
+
+	// override
+	void _setAlpha(sl_real alpha)
+	{
+		_JAndroidGraphics::setAlpha.call(m_canvas, (float)alpha);
+	}
+
+    // override
+	void _setAntiAlias(sl_bool flag)
+	{
+		_JAndroidGraphics::setAntiAlias.call(m_canvas, flag);
+	}
+
 };
 
 SLIB_DEFINE_OBJECT(_Android_Canvas, Canvas)

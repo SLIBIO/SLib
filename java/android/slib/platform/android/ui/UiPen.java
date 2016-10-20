@@ -54,7 +54,7 @@ public class UiPen {
 		}
 	}
 	
-	public void applyPaint(Paint paint) {
+	public void applyPaint(Paint paint, int alpha) {
 		
 		paint.setPathEffect(pathEffect);
 		
@@ -84,7 +84,7 @@ public class UiPen {
 		}
 		
 		paint.setStrokeWidth(width);
-		paint.setColor(color);
+		paint.setColor(Graphics.applyAlphaToColor(color, alpha));
 		paint.setStyle(Style.STROKE);
 	
 	}

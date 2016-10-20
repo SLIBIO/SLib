@@ -1,5 +1,7 @@
 #include "../../../inc/slib/ui/transition.h"
 
+#include "../../../inc/slib/ui/core.h"
+
 SLIB_UI_NAMESPACE_BEGIN
 
 Transition::Transition()
@@ -115,7 +117,107 @@ Ref<Animation> Transition::createAnimation(const Ref<View>& view, const Transiti
 			case TransitionType::Fade:
 				if (pageAction == UIPageAction::Push) {
 					view->setAlphaAnimation(animation, 0.01f, 1.0f, sl_false);
-				} else if (pageAction == UIPageAction::Pop){
+				} else if (pageAction == UIPageAction::Pop) {
+					view->setAlphaAnimation(animation, 1.0f, 0.01f, sl_false);
+				}
+				break;
+		}
+		animation->setAnimationCurve(curve);
+		animation->setOnStop(onStop);
+		return animation;
+	}
+	
+	return Ref<Animation>::null();
+}
+
+Ref<Animation> Transition::startPopup(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Ref<Runnable>& onStop)
+{
+	if (view.isNull()) {
+		return Ref<Animation>::null();
+	}
+	Ref<Animation> animation = createPopupAnimation(view, transition, pageAction, onStop);
+	if (animation.isNotNull()) {
+		animation->start();
+		return animation;
+	} else {
+		if (onStop.isNotNull()) {
+			onStop->run();
+		}
+		return Ref<Animation>::null();
+	}
+}
+
+Ref<Animation> Transition::createPopupAnimation(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Ref<Runnable>& onStop)
+{
+	if (view.isNull()) {
+		return Ref<Animation>::null();
+	}
+	
+	TransitionType type = transition.type;
+	if (type == TransitionType::Default || type == TransitionType::None) {
+		return Ref<Animation>::null();
+	}
+	
+	float duration = transition.duration;
+	if (duration < SLIB_EPSILON) {
+		return Ref<Animation>::null();
+	}
+	
+	if (pageAction != UIPageAction::Push && pageAction != UIPageAction::Pop) {
+		return Ref<Animation>::null();
+	}
+
+	TransitionDirection direction = transition.direction;
+	AnimationCurve curve = transition.curve;
+	
+	Ref<Animation> animation = Animation::create(duration);
+	if (animation.isNotNull()) {
+		switch (type) {
+			case TransitionType::None:
+			case TransitionType::Default:
+				break;
+			case TransitionType::Push:
+			case TransitionType::Slide:
+			case TransitionType::Cover:
+				{
+					sl_real startFactor;
+					sl_real endFactor;
+					if (pageAction == UIPageAction::Push) {
+						startFactor = 1;
+						endFactor = 0;
+					} else {
+						startFactor = 0;
+						endFactor = -1;
+					}
+					if (direction == TransitionDirection::FromLeftToRight) {
+						direction = TransitionDirection::FromRightToLeft;
+						startFactor = -startFactor;
+						endFactor = -endFactor;
+					} else if (direction == TransitionDirection::FromTopToBottom) {
+						direction = TransitionDirection::FromBottomToTop;
+						startFactor = -startFactor;
+						endFactor = -endFactor;
+					}
+					if (direction == TransitionDirection::FromRightToLeft) {
+						sl_real width = (sl_real)(UI::getScreenWidth());
+						view->setTranslateAnimation(animation, Vector2(width * startFactor, 0), Vector2(width * endFactor, 0), sl_false);
+					} else {
+						sl_real height = (sl_real)(UI::getScreenHeight());
+						view->setTranslateAnimation(animation, Vector2(0, height * startFactor), Vector2(0, height * endFactor), sl_false);
+					}
+				}
+				break;
+			case TransitionType::Zoom:
+				if (pageAction == UIPageAction::Push) {
+					view->setScaleAnimation(animation, 0.5f, 1.0f, sl_false);
+				} else {
+					view->setScaleAnimation(animation, 1.0f, 0.5f, sl_false);
+				}
+				break;
+			case TransitionType::Fade:
+				if (pageAction == UIPageAction::Push) {
+					view->setAlphaAnimation(animation, 0.01f, 1.0f, sl_false);
+				} else {
 					view->setAlphaAnimation(animation, 1.0f, 0.01f, sl_false);
 				}
 				break;

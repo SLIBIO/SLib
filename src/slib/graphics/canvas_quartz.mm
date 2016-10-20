@@ -32,25 +32,24 @@ public:
 public:
 	static Ref<_Quartz_Canvas> _create(CanvasType type, CGContextRef graphics, sl_real width, sl_real height)
 	{
-		Ref<_Quartz_Canvas> ret;
 		if (graphics) {
-			CGContextRetain(graphics);
-			ret = new _Quartz_Canvas();
+			
+			Ref<_Quartz_Canvas> ret = new _Quartz_Canvas();
+			
 			if (ret.isNotNull()) {
+				
+				ret->m_graphics = graphics;
+				CGContextRetain(graphics);
+				
 				ret->setType(type);
 				ret->setSize(Size(width, height));
 				
-				ret->m_graphics = graphics;
-				
-				CGContextSetAllowsAntialiasing(graphics, YES);
-				CGContextSetShouldAntialias(graphics, YES);
-				CGContextSetInterpolationQuality(graphics, kCGInterpolationMedium);
+				ret->_setAntiAlias(sl_true);
 				
 				return ret;
 			}
-			CGContextRelease(graphics);
 		}
-		return ret;
+		return Ref<_Quartz_Canvas>::null();
 	}
 	
 	// override
@@ -63,28 +62,6 @@ public:
 	void restore()
 	{
 		CGContextRestoreGState(m_graphics);
-	}
-	
-	// override
-	sl_bool isAntiAlias()
-	{
-		return m_flagAntiAlias;
-	}
-	
-	// override
-	void setAntiAlias(sl_bool flag)
-	{
-		if (flag) {
-			CGContextSetAllowsAntialiasing(m_graphics, YES);
-			CGContextSetShouldAntialias(m_graphics, YES);
-			CGContextSetInterpolationQuality(m_graphics, kCGInterpolationMedium);
-			m_flagAntiAlias = sl_true;
-		} else {
-			CGContextSetAllowsAntialiasing(m_graphics, NO);
-			CGContextSetShouldAntialias(m_graphics, NO);
-			CGContextSetInterpolationQuality(m_graphics, kCGInterpolationNone);
-			m_flagAntiAlias = sl_false;
-		}
 	}
 	
 	// override
@@ -468,6 +445,29 @@ public:
 		Color _color = brush->getColor();
 		CGContextSetRGBFillColor(graphics, _color.getRedF(), _color.getGreenF(), _color.getBlueF(), _color.getAlphaF());
 	}
+	
+	// override
+	void _setAlpha(sl_real alpha)
+	{
+		CGContextSetAlpha(m_graphics, (CGFloat)alpha);
+	}
+	
+	// override
+	void _setAntiAlias(sl_bool flag)
+	{
+		if (flag) {
+			CGContextSetAllowsAntialiasing(m_graphics, YES);
+			CGContextSetShouldAntialias(m_graphics, YES);
+			CGContextSetInterpolationQuality(m_graphics, kCGInterpolationMedium);
+			m_flagAntiAlias = sl_true;
+		} else {
+			CGContextSetAllowsAntialiasing(m_graphics, NO);
+			CGContextSetShouldAntialias(m_graphics, NO);
+			CGContextSetInterpolationQuality(m_graphics, kCGInterpolationNone);
+			m_flagAntiAlias = sl_false;
+		}
+	}
+	
 };
 
 SLIB_DEFINE_OBJECT(_Quartz_Canvas, Canvas)
@@ -578,7 +578,7 @@ void GraphicsPlatform::drawCGImage(Canvas* canvas, const Rectangle& _rectDst, CG
 		rectSrc.origin.y = 0;
 		rectSrc.size.width = CGImageGetWidth(image);
 		rectSrc.size.height = CGImageGetHeight(image);
-		[ciImage drawInRect:rectDst fromRect:rectSrc operation:NSCompositeSourceOver fraction:(flagOpaque?1:param.alpha)];
+		[ciImage drawInRect:rectDst fromRect:rectSrc operation:NSCompositeSourceOver fraction:((flagOpaque?1:param.alpha) * canvas->getAlpha())];
 
 		if (!flagFlipY) {
 			CGContextRestoreGState(graphics);
@@ -594,7 +594,7 @@ void GraphicsPlatform::drawCGImage(Canvas* canvas, const Rectangle& _rectDst, CG
 			flagFlipY = flagFlipY;
 		}
 
-		[[UIImage imageWithCIImage:ciImage] drawInRect:rectDst blendMode:kCGBlendModeNormal alpha:(flagOpaque?1:param.alpha)];
+		[[UIImage imageWithCIImage:ciImage] drawInRect:rectDst blendMode:kCGBlendModeNormal alpha:((flagOpaque?1:param.alpha) * canvas->getAlpha())];
 
 		if (flagFlipY) {
 			CGContextRestoreGState(graphics);
@@ -613,7 +613,7 @@ void GraphicsPlatform::drawCGImage(Canvas* canvas, const Rectangle& _rectDst, CG
 			CGContextSaveGState(graphics);
 		}
 		if (!flagOpaque) {
-			CGContextSetAlpha(graphics, param.alpha);
+			CGContextSetAlpha(graphics, canvas->getAlpha() * param.alpha);
 		}
 		
 		CGRect rectDst;

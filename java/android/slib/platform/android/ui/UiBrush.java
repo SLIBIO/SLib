@@ -10,8 +10,8 @@ public class UiBrush {
 	
 	public int color;
 	
-	public void applyPaint(Paint paint) {
-		paint.setColor(color);
+	public void applyPaint(Paint paint, int alpha) {
+		paint.setColor(Graphics.applyAlphaToColor(color, alpha));
 		paint.setStyle(Style.FILL);
 	}
 }

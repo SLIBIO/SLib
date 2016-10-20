@@ -45,6 +45,10 @@ public:
 
 	static Ref<Animation> createAnimation(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Ref<Runnable>& onStop);
 	
+	static Ref<Animation> startPopup(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Ref<Runnable>& onStop);
+	
+	static Ref<Animation> createPopupAnimation(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Ref<Runnable>& onStop);
+	
 };
 
 SLIB_UI_NAMESPACE_END

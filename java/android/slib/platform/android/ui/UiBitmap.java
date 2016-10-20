@@ -109,10 +109,11 @@ public class UiBitmap {
 			float[] cm) 
 	{
 		try {
-			int alpha = (int)(_alpha * 255);
+			int alpha = (int)(_alpha * graphics.getAlpha());
 			if (alpha <= 0) {
 				return;
-			}			
+			}
+			Canvas canvas = graphics.getCanvas();
 			RectF rd = new RectF(dx1, dy1, dx2, dy2);
 			Rect rs = new Rect(sx1, sy1, sx2, sy2);
 			if (alpha < 255 || blur > 0.5f || tileMode != 0) {
@@ -127,12 +128,12 @@ public class UiBitmap {
 				if (tileMode != 0) {
 					BitmapShader bs = new BitmapShader(bitmap, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
 					paint.setShader(bs);
-					graphics.canvas.drawRect(rd, paint);
+					canvas.drawRect(rd, paint);
 				} else {
-					graphics.canvas.drawBitmap(bitmap, rs, rd, paint);
+					canvas.drawBitmap(bitmap, rs, rd, paint);
 				}
 			} else {
-				graphics.canvas.drawBitmap(bitmap, rs, rd, null);
+				canvas.drawBitmap(bitmap, rs, rd, null);
 			}
 		} catch (Throwable e) {
 			Logger.exception(e);
@@ -176,12 +177,13 @@ public class UiBitmap {
 			if (sw == 0 || sh == 0) {
 				return;
 			}
-			int alpha = (int)(_alpha * 255);
+			int alpha = (int)(_alpha * graphics.getAlpha());
 			if (alpha <= 0) {
 				return;
-			}			
-			graphics.canvas.save();
-			graphics.canvas.scale((dx2 - dx1) / sw, (dy2 - dy1) / sh, dx1, dy1);
+			}
+			Canvas canvas = graphics.getCanvas();
+			canvas.save();
+			canvas.scale((dx2 - dx1) / sw, (dy2 - dy1) / sh, dx1, dy1);
 			if (alpha < 255 || cm != null) {
 				Paint paint = new Paint();
 				if (alpha < 255) {
@@ -191,11 +193,11 @@ public class UiBitmap {
 					ColorMatrixColorFilter cf = new ColorMatrixColorFilter(cm);
 					paint.setColorFilter(cf);
 				}
-				graphics.canvas.drawBitmap(pixels, 0, stride, dx1, dy1, sw, sh, true, paint);
+				canvas.drawBitmap(pixels, 0, stride, dx1, dy1, sw, sh, true, paint);
 			} else {
-				graphics.canvas.drawBitmap(pixels, 0, stride, dx1, dy1, sw, sh, true, null);
+				canvas.drawBitmap(pixels, 0, stride, dx1, dy1, sw, sh, true, null);
 			}
-			graphics.canvas.restore();
+			canvas.restore();
 		} catch (Throwable e) {
 			Logger.exception(e);
 		}
