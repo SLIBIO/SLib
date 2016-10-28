@@ -102,6 +102,7 @@
     <ClInclude Include="..\..\..\inc\slib\graphics\definition.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\drawable.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\font.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics\font_atlas.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\freetype.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\image.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\path.h" />
@@ -182,6 +183,7 @@
     <ClInclude Include="..\..\..\inc\slib\network\tcpip.h" />
     <ClInclude Include="..\..\..\inc\slib\render.h" />
     <ClInclude Include="..\..\..\inc\slib\render\base.h" />
+    <ClInclude Include="..\..\..\inc\slib\render\canvas.h" />
     <ClInclude Include="..\..\..\inc\slib\render\definition.h" />
     <ClInclude Include="..\..\..\inc\slib\render\engine.h" />
     <ClInclude Include="..\..\..\inc\slib\render\index_buffer.h" />
@@ -233,7 +235,7 @@
     <ClInclude Include="..\..\..\inc\slib\ui\web_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\window.h" />
     <ClInclude Include="..\..\..\src\slib\core\async_config.h" />
-    <ClInclude Include="..\..\..\src\slib\graphics\image_soil2.h" />
+    <ClInclude Include="..\..\..\src\slib\graphics\image_stb.h" />
     <ClInclude Include="..\..\..\src\slib\network\network_async_config.h" />
     <ClInclude Include="..\..\..\src\slib\render\opengl_egl.h" />
     <ClInclude Include="..\..\..\src\slib\render\opengl_gl.h" />
@@ -322,6 +324,7 @@
     <ClCompile Include="..\..\..\src\slib\graphics\drawable.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\drawable_gdiplus.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\font.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\font_atlas.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\font_freetype.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\font_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\graphics_path.cpp" />
@@ -332,7 +335,7 @@
     <ClCompile Include="..\..\..\src\slib\graphics\image.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\image_jpeg.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\image_png.cpp" />
-    <ClCompile Include="..\..\..\src\slib\graphics\image_soil2.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\image_stb.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\pen.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\pen_gdiplus.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\yuv.cpp" />
@@ -411,6 +414,7 @@
     <ClCompile Include="..\..\..\src\slib\render\opengl_gles.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\opengl_wgl.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\render_base.cpp" />
+    <ClCompile Include="..\..\..\src\slib\render\render_canvas.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\render_engine.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\render_program.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\render_resource.cpp" />
@@ -569,7 +573,6 @@
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ProgramDatabase</DebugInformationFormat>
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ProgramDatabase</DebugInformationFormat>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\thirdparty\thirdparty_soil2.c" />
     <ClCompile Include="..\..\..\src\thirdparty\thirdparty_sqlite3.c">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>

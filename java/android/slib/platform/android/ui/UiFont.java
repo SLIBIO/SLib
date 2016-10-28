@@ -4,8 +4,8 @@ import java.util.HashMap;
 
 import slib.platform.android.Logger;
 import android.graphics.Paint;
+import android.graphics.Paint.FontMetrics;
 import android.graphics.PointF;
-import android.graphics.Rect;
 import android.graphics.Typeface;
 
 public class UiFont {
@@ -85,9 +85,15 @@ public class UiFont {
 	
 	public PointF getTextSize(String text) {
 		if (text != null && text.length() != 0) {
-			Rect bounds = new Rect();
-			paint.getTextBounds(text, 0, text.length(), bounds);
-			return new PointF(bounds.width(), bounds.height());
+			float width = paint.measureText(text);
+			FontMetrics fm = paint.getFontMetrics();
+			float height;
+			if (fm != null) {
+				height = - fm.ascent + fm.descent;
+			} else {
+				height = this.height;
+			}
+			return new PointF(width, height);
 		}
 		return new PointF(0, height);
 	}

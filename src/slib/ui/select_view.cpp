@@ -88,7 +88,7 @@ SelectView::SelectView()
 {
 	setCreatingNativeWidget(sl_true);
 	setUsingFont(sl_true);
-	setBorder(sl_true, sl_false);
+	setBorder(sl_true, UIUpdateMode::NoRedraw);
 	
 	m_indexSelected = 0;
 	
@@ -112,28 +112,28 @@ sl_uint32 SelectView::getItemsCount()
 	return (sl_uint32)(m_titles.getCount());
 }
 
-void SelectView::setItemsCount(sl_uint32 n, sl_bool flagRedraw)
+void SelectView::setItemsCount(sl_uint32 n, UIUpdateMode mode)
 {
 	m_values.setCount(n);
 	m_titles.setCount(n);
 	if (isNativeWidget()) {
 		_refreshItemsCount_NW();
 		if (m_indexSelected >= n) {
-			selectIndex(0, sl_false);
+			selectIndex(0, UIUpdateMode::NoRedraw);
 		}
 	} else {
 		if (m_indexSelected >= n) {
-			selectIndex(0, sl_false);
+			selectIndex(0, UIUpdateMode::NoRedraw);
 		}
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
 }
 
-void SelectView::removeAllItems(sl_bool flagRedraw)
+void SelectView::removeAllItems(UIUpdateMode mode)
 {
-	setItemsCount(0, flagRedraw);
+	setItemsCount(0, mode);
 }
 
 String SelectView::getItemValue(sl_uint32 index)
@@ -161,14 +161,14 @@ String SelectView::getItemTitle(sl_uint32 index)
 	return m_titles.getItemValue(index, String::null());
 }
 
-void SelectView::setItemTitle(sl_uint32 index, const String& title, sl_bool flagRedraw)
+void SelectView::setItemTitle(sl_uint32 index, const String& title, UIUpdateMode mode)
 {
 	if (index < m_titles.getCount()) {
 		m_titles.setItem(index, title);
 		if (isNativeWidget()) {
 			_setItemTitle_NW(index, title);
 		} else {
-			if (flagRedraw) {
+			if (mode == UIUpdateMode::Redraw) {
 				invalidate();
 			}
 		}
@@ -180,34 +180,34 @@ List<String> SelectView::getTitles()
 	return m_titles;
 }
 
-void SelectView::setTitles(const List<String>& list, sl_bool flagRedraw)
+void SelectView::setTitles(const List<String>& list, UIUpdateMode mode)
 {
 	m_titles = list;
 	if (isNativeWidget()) {
 		_refreshItemsContent_NW();
 		sl_uint32 n = (sl_uint32)(m_titles.getCount());
 		if (m_indexSelected >= n) {
-			selectIndex(0, sl_false);
+			selectIndex(0, UIUpdateMode::NoRedraw);
 		}
 	} else {
 		sl_uint32 n = (sl_uint32)(m_titles.getCount());
 		if (m_indexSelected >= n) {
-			selectIndex(0, sl_false);
+			selectIndex(0, UIUpdateMode::NoRedraw);
 		}
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
 }
 
-void SelectView::selectIndex(sl_uint32 index, sl_bool flagRedraw)
+void SelectView::selectIndex(sl_uint32 index, UIUpdateMode mode)
 {
 	if (index < m_titles.getCount()) {
 		m_indexSelected = index;
 		if (isNativeWidget()) {
 			_select_NW(index);
 		} else {
-			if (flagRedraw) {
+			if (mode == UIUpdateMode::Redraw) {
 				invalidate();
 			}
 		}
@@ -218,11 +218,11 @@ void SelectView::selectIndex(sl_uint32 index, sl_bool flagRedraw)
 	}
 }
 
-void SelectView::selectValue(const String& value, sl_bool flagRedraw)
+void SelectView::selectValue(const String& value, UIUpdateMode mode)
 {
 	sl_int32 m = (sl_int32)(m_values.indexOf(value));
 	if (m > 0) {
-		selectIndex(m, flagRedraw);
+		selectIndex(m, mode);
 	}
 }
 
@@ -249,22 +249,22 @@ const UISize& SelectView::getIconSize()
 	return m_iconSize;
 }
 
-void SelectView::setIconSize(const UISize& size, sl_bool flagRedraw)
+void SelectView::setIconSize(const UISize& size, UIUpdateMode mode)
 {
 	m_iconSize = size;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void SelectView::setIconSize(sl_ui_len width, sl_ui_len height, sl_bool flagRedraw)
+void SelectView::setIconSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode)
 {
-	setIconSize(UISize(width, height), flagRedraw);
+	setIconSize(UISize(width, height), mode);
 }
 
-void SelectView::setIconSize(sl_ui_len size, sl_bool flagRedraw)
+void SelectView::setIconSize(sl_ui_len size, UIUpdateMode mode)
 {
-	setIconSize(UISize(size, size),flagRedraw);
+	setIconSize(UISize(size, size),mode);
 }
 
 sl_ui_len SelectView::getIconWidth()
@@ -272,9 +272,9 @@ sl_ui_len SelectView::getIconWidth()
 	return m_iconSize.x;
 }
 
-void SelectView::setIconWidth(sl_ui_len width, sl_bool flagRedraw)
+void SelectView::setIconWidth(sl_ui_len width, UIUpdateMode mode)
 {
-	setIconSize(UISize(width, m_iconSize.y), flagRedraw);
+	setIconSize(UISize(width, m_iconSize.y), mode);
 }
 
 sl_ui_len SelectView::getIconHeight()
@@ -282,9 +282,9 @@ sl_ui_len SelectView::getIconHeight()
 	return m_iconSize.y;
 }
 
-void SelectView::setIconHeight(sl_ui_len height, sl_bool flagRedraw)
+void SelectView::setIconHeight(sl_ui_len height, UIUpdateMode mode)
 {
-	setIconSize(UISize(m_iconSize.x, height), flagRedraw);
+	setIconSize(UISize(m_iconSize.x, height), mode);
 }
 
 Ref<Drawable> SelectView::getLeftIcon()
@@ -292,10 +292,10 @@ Ref<Drawable> SelectView::getLeftIcon()
 	return m_leftIcon;
 }
 
-void SelectView::setLeftIcon(const Ref<Drawable>& icon, sl_bool flagRedraw)
+void SelectView::setLeftIcon(const Ref<Drawable>& icon, UIUpdateMode mode)
 {
 	m_leftIcon = icon;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -305,10 +305,10 @@ Ref<Drawable> SelectView::getRightIcon()
 	return m_rightIcon;
 }
 
-void SelectView::setRightIcon(const Ref<Drawable>& icon, sl_bool flagRedraw)
+void SelectView::setRightIcon(const Ref<Drawable>& icon, UIUpdateMode mode)
 {
 	m_rightIcon = icon;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -318,10 +318,10 @@ Color SelectView::getTextColor()
 	return m_textColor;
 }
 
-void SelectView::setTextColor(const Color& color, sl_bool flagRedraw)
+void SelectView::setTextColor(const Color& color, UIUpdateMode mode)
 {
 	m_textColor = color;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }

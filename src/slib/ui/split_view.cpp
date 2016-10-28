@@ -58,15 +58,15 @@ LayoutOrientation SplitView::getOrientation()
 	return m_orientation;
 }
 
-void SplitView::setOrientation(LayoutOrientation orientation, sl_bool flagRelayout)
+void SplitView::setOrientation(LayoutOrientation orientation, UIUpdateMode mode)
 {
 	if (m_orientation == orientation) {
 		return;
 	}
 	m_orientation = orientation;
-	ObjectLocker lock(this);
-	if (flagRelayout) {
-		_refreshItemFrames(sl_true);
+	if (mode != UIUpdateMode::Init) {
+		ObjectLocker lock(this);
+		_refreshItemFrames(mode);
 	}
 }
 
@@ -75,9 +75,9 @@ sl_bool SplitView::isHorizontal()
 	return m_orientation == LayoutOrientation::Horizontal;
 }
 
-void SplitView::setHorizontal(sl_bool flagRelayout)
+void SplitView::setHorizontal(UIUpdateMode mode)
 {
-	setOrientation(LayoutOrientation::Horizontal, flagRelayout);
+	setOrientation(LayoutOrientation::Horizontal, mode);
 }
 
 sl_bool SplitView::isVertical()
@@ -85,9 +85,9 @@ sl_bool SplitView::isVertical()
 	return m_orientation == LayoutOrientation::Vertical;
 }
 
-void SplitView::setVertical(sl_bool flagRelayout)
+void SplitView::setVertical(UIUpdateMode mode)
 {
-	setOrientation(LayoutOrientation::Vertical, flagRelayout);
+	setOrientation(LayoutOrientation::Vertical, mode);
 }
 
 sl_size SplitView::getItemsCount()
@@ -95,16 +95,14 @@ sl_size SplitView::getItemsCount()
 	return m_items.getCount();
 }
 
-void SplitView::setItemsCount(sl_size count, sl_bool flagRelayout)
+void SplitView::setItemsCount(sl_size count, UIUpdateMode mode)
 {
 	if (count < 2) {
 		return;
 	}
 	ObjectLocker lock(this);
 	m_items.setCount_NoLock(count);
-	if (flagRelayout) {
-		_refreshItemFrames(sl_true);
-	}
+	_refreshItemFrames(mode);
 }
 
 Ref<View> SplitView::getItemView(sl_size index)
@@ -117,7 +115,7 @@ Ref<View> SplitView::getItemView(sl_size index)
 	return Ref<View>::null();
 }
 
-void SplitView::setItemView(sl_size index, const Ref<View>& view, sl_bool flagRelayout)
+void SplitView::setItemView(sl_size index, const Ref<View>& view, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	Item* item = m_items.getItemPtr(index);
@@ -127,9 +125,7 @@ void SplitView::setItemView(sl_size index, const Ref<View>& view, sl_bool flagRe
 		}
 		addChild(view);
 		item->view = view;
-		if (flagRelayout) {
-			_refreshItemFrames(sl_true);
-		}
+		_refreshItemFrames(mode);
 	}
 }
 
@@ -143,14 +139,14 @@ sl_ui_len SplitView::getItemSize(sl_size index)
 	return 0;
 }
 
-void SplitView::setItemSize(sl_size index, sl_ui_len size, sl_bool flagRelayout)
+void SplitView::setItemSize(sl_size index, sl_ui_len size, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	sl_ui_len total = _getTotalSize();
 	if (total <= 0 || Math::isAlmostZero(total)) {
 		return;
 	}
-	setItemWeight(index, (sl_real)size / (sl_real)total, flagRelayout);
+	setItemWeight(index, (sl_real)size / (sl_real)total, mode);
 }
 
 sl_real SplitView::getItemWeight(sl_size index)
@@ -163,7 +159,7 @@ sl_real SplitView::getItemWeight(sl_size index)
 	return 0;
 }
 
-void SplitView::setItemWeight(sl_size index, sl_real weight, sl_bool flagRelayout)
+void SplitView::setItemWeight(sl_size index, sl_real weight, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	Item* item = m_items.getItemPtr(index);
@@ -227,9 +223,7 @@ void SplitView::setItemWeight(sl_size index, sl_real weight, sl_bool flagRelayou
 		}
 		item->weight = weight;
 		itemNext->weight = weightTotal - weight;
-		if (flagRelayout) {
-			_refreshItemFrames(sl_true);
-		}
+		_refreshItemFrames(mode);
 	}
 }
 
@@ -243,7 +237,7 @@ sl_real SplitView::getItemMinimumWeight(sl_size index)
 	return 0;
 }
 
-void SplitView::setItemMinimumWeight(sl_size index, sl_real weight, sl_bool flagRelayout)
+void SplitView::setItemMinimumWeight(sl_size index, sl_real weight, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	Item* item = m_items.getItemPtr(index);
@@ -256,9 +250,9 @@ void SplitView::setItemMinimumWeight(sl_size index, sl_real weight, sl_bool flag
 		}
 		item->minWeight = weight;
 		if (index > 0) {
-			setItemWeight(index - 1, getItemWeight(index - 1), sl_false);
+			setItemWeight(index - 1, getItemWeight(index - 1), UIUpdateMode::Init);
 		}
-		setItemWeight(index, item->weight, flagRelayout);
+		setItemWeight(index, item->weight, mode);
 	}
 }
 
@@ -272,7 +266,7 @@ sl_real SplitView::getItemMaximumWeight(sl_size index)
 	return 0;
 }
 
-void SplitView::setItemMaximumWeight(sl_size index, sl_real weight, sl_bool flagRelayout)
+void SplitView::setItemMaximumWeight(sl_size index, sl_real weight, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	Item* item = m_items.getItemPtr(index);
@@ -285,9 +279,9 @@ void SplitView::setItemMaximumWeight(sl_size index, sl_real weight, sl_bool flag
 		}
 		item->maxWeight = weight;
 		if (index > 0) {
-			setItemWeight(index - 1, getItemWeight(index - 1), sl_false);
+			setItemWeight(index - 1, getItemWeight(index - 1), UIUpdateMode::Init);
 		}
-		setItemWeight(index, item->weight, flagRelayout);
+		setItemWeight(index, item->weight, mode);
 	}
 }
 
@@ -301,16 +295,16 @@ sl_ui_len SplitView::getItemMinimumSize(sl_size index)
 	return 0;
 }
 
-void SplitView::setItemMinimumSize(sl_size index, sl_ui_len size, sl_bool flagRelayout)
+void SplitView::setItemMinimumSize(sl_size index, sl_ui_len size, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	Item* item = m_items.getItemPtr(index);
 	if (item) {
 		item->minSize = size;
 		if (index > 0) {
-			setItemWeight(index - 1, getItemWeight(index - 1), sl_false);
+			setItemWeight(index - 1, getItemWeight(index - 1), UIUpdateMode::Init);
 		}
-		setItemWeight(index, item->weight, flagRelayout);
+		setItemWeight(index, item->weight, mode);
 	}
 }
 
@@ -324,16 +318,16 @@ sl_ui_len SplitView::getItemMaximumSize(sl_size index)
 	return 0;
 }
 
-void SplitView::setItemMaximumSize(sl_size index, sl_ui_len size, sl_bool flagRelayout)
+void SplitView::setItemMaximumSize(sl_size index, sl_ui_len size, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	Item* item = m_items.getItemPtr(index);
 	if (item) {
 		item->maxSize = size;
 		if (index > 0) {
-			setItemWeight(index - 1, getItemWeight(index - 1), sl_false);
+			setItemWeight(index - 1, getItemWeight(index - 1), UIUpdateMode::Init);
 		}
-		setItemWeight(index, item->weight, flagRelayout);
+		setItemWeight(index, item->weight, mode);
 	}
 }
 
@@ -347,13 +341,13 @@ sl_ui_len SplitView::getItemDividerWidth(sl_size index)
 	return 0;
 }
 
-void SplitView::setItemDividerWidth(sl_size index, sl_ui_len width, sl_bool flagRelayout)
+void SplitView::setItemDividerWidth(sl_size index, sl_ui_len width, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	Item* item = m_items.getItemPtr(index);
 	if (item) {
 		item->dividerWidth = width;
-		_resetWeights(flagRelayout);
+		_resetWeights(mode);
 	}
 }
 
@@ -367,13 +361,13 @@ Ref<Drawable> SplitView::getItemDividerBackground(sl_size index)
 	return 0;
 }
 
-void SplitView::setItemDividerBackground(sl_size index, const Ref<Drawable>& background, sl_bool flagRedraw)
+void SplitView::setItemDividerBackground(sl_size index, const Ref<Drawable>& background, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	Item* item = m_items.getItemPtr(index);
 	if (item) {
 		item->dividerBackground = background;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -389,13 +383,13 @@ Color SplitView::getItemDividerColor(sl_size index)
 	return 0;
 }
 
-void SplitView::setItemDividerColor(sl_size index, const Color& color, sl_bool flagRedraw)
+void SplitView::setItemDividerColor(sl_size index, const Color& color, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	Item* item = m_items.getItemPtr(index);
 	if (item) {
 		item->dividerColor = color;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -406,11 +400,11 @@ sl_ui_len SplitView::getDividerWidth()
 	return m_dividerWidth;
 }
 
-void SplitView::setDividerWidth(sl_ui_len width, sl_bool flagRelayout)
+void SplitView::setDividerWidth(sl_ui_len width, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	m_dividerWidth = width;
-	_resetWeights(flagRelayout);
+	_resetWeights(mode);
 }
 
 Ref<Drawable> SplitView::getDividerBackground()
@@ -418,10 +412,10 @@ Ref<Drawable> SplitView::getDividerBackground()
 	return m_dividerBackground;
 }
 
-void SplitView::setDividerBackground(const Ref<Drawable>& background, sl_bool flagRedraw)
+void SplitView::setDividerBackground(const Ref<Drawable>& background, UIUpdateMode mode)
 {
 	m_dividerBackground = background;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -431,10 +425,10 @@ Color SplitView::getDividerColor()
 	return m_dividerColor;
 }
 
-void SplitView::setDividerColor(const Color& color, sl_bool flagRedraw)
+void SplitView::setDividerColor(const Color& color, UIUpdateMode mode)
 {
 	m_dividerColor = color;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -449,16 +443,16 @@ void SplitView::setCursorMargin(sl_ui_len margin)
 	m_cursorMargin = margin;
 }
 
-void SplitView::relayout(sl_bool flagRedraw)
+void SplitView::relayout(UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
-	_refreshItemFrames(flagRedraw);
+	_refreshItemFrames(mode);
 }
 
 void SplitView::onResize(sl_ui_len width, sl_ui_len height)
 {
 	ObjectLocker lock(this);
-	_resetWeights(sl_true);
+	_resetWeights(UIUpdateMode::Redraw);
 }
 
 void SplitView::onDraw(Canvas* canvas)
@@ -611,8 +605,12 @@ sl_ui_len SplitView::_getTotalSize()
 	return total;
 }
 
-void SplitView::_refreshItemFrames(sl_bool flagRedraw)
+void SplitView::_refreshItemFrames(UIUpdateMode mode)
 {
+	if (mode == UIUpdateMode::Init) {
+		return;
+	}
+	
 	LayoutOrientation orientation = m_orientation;
 	sl_ui_pos total = _getTotalSize();
 	sl_ui_pos pos = 0;
@@ -632,9 +630,9 @@ void SplitView::_refreshItemFrames(sl_bool flagRedraw)
 		}
 		if (item.view.isNotNull()) {
 			if (orientation == LayoutOrientation::Horizontal) {
-				item.view->setFrame(UIRect(pos, 0, pos + width, height), sl_false);
+				item.view->setFrame(UIRect(pos, 0, pos + width, height), UIUpdateMode::NoRedraw);
 			} else {
-				item.view->setFrame(UIRect(0, pos, height, pos + width), sl_false);
+				item.view->setFrame(UIRect(0, pos, height, pos + width), UIUpdateMode::NoRedraw);
 			}
 		}
 		
@@ -652,20 +650,18 @@ void SplitView::_refreshItemFrames(sl_bool flagRedraw)
 		pos += dw;
 	}
 
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void SplitView::_resetWeights(sl_bool flagRelayout)
+void SplitView::_resetWeights(UIUpdateMode mode)
 {
 	ListItems<Item> items(m_items);
 	for (sl_size i = 0; i + 1 < items.count; i++) {
-		setItemWeight(i, items[i].weight, sl_false);
+		setItemWeight(i, items[i].weight, UIUpdateMode::Init);
 	}
-	if (flagRelayout) {
-		_refreshItemFrames(sl_true);
-	}
+	_refreshItemFrames(mode);
 }
 
 sl_int32 SplitView::_getDividerIndexAtPoint(const UIPoint& pt)
@@ -713,12 +709,12 @@ sl_int32 SplitView::_getDividerIndexAtPoint(const UIPoint& pt)
 
 VerticalSplitView::VerticalSplitView()
 {
-	setOrientation(LayoutOrientation::Vertical, sl_false);
+	setOrientation(LayoutOrientation::Vertical, UIUpdateMode::Init);
 }
 
 HorizontalSplitView::HorizontalSplitView()
 {
-	setOrientation(LayoutOrientation::Horizontal, sl_false);
+	setOrientation(LayoutOrientation::Horizontal, UIUpdateMode::Init);
 }
 
 SLIB_UI_NAMESPACE_END

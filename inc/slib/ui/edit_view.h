@@ -26,27 +26,27 @@ public:
 public:
 	String getText();
 	
-	virtual void setText(const String& text, sl_bool flagRedraw = sl_true);
+	virtual void setText(const String& text, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Alignment getGravity();
 	
-	virtual void setGravity(Alignment align, sl_bool flagRedraw = sl_true);
+	virtual void setGravity(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	String getHintText();
 	
-	virtual void setHintText(const String& str, sl_bool flagRedraw = sl_true);
+	virtual void setHintText(const String& str, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isReadOnly();
 	
-	virtual void setReadOnly(sl_bool flag, sl_bool flagRedraw = sl_true);
+	virtual void setReadOnly(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	virtual sl_bool isMultiLine();
 
-	virtual void setMultiLine(sl_bool flag, sl_bool flagRedraw = sl_true);
+	virtual void setMultiLine(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Color getTextColor();
 	
-	virtual void setTextColor(const Color& color, sl_bool flagRedraw = sl_true);
+	virtual void setTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 protected:
 	// override
@@ -127,7 +127,7 @@ public:
 	sl_bool isMultiLine();
 	
 	// override
-	virtual void setMultiLine(sl_bool flag, sl_bool flagRedraw = sl_true);
+	virtual void setMultiLine(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 public:
 	// override
@@ -147,7 +147,7 @@ public:
 	sl_bool isMultiLine();
 	
 	// override
-	void setMultiLine(sl_bool flag, sl_bool flagRedraw = sl_true);
+	void setMultiLine(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 public:
 	// override

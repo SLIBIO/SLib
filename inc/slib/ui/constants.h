@@ -217,6 +217,13 @@ enum class ButtonState
 	Count = 4
 };
 
+enum class UIUpdateMode
+{
+	Init = 0,
+	Redraw = 1,
+	NoRedraw = 2
+};
+
 enum class RedrawMode
 {
 	Continuously = 0,

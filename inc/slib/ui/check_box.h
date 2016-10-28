@@ -19,7 +19,7 @@ public:
 public:
 	sl_bool isChecked();
 	
-	virtual void setChecked(sl_bool flag, sl_bool flagRedraw = sl_true);
+	virtual void setChecked(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 public:
 	// override

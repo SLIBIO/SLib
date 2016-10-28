@@ -17,15 +17,15 @@ public:
 public:
 	LayoutOrientation getOrientation();
 	
-	void setOrientation(LayoutOrientation orientation, sl_bool flagRedraw = sl_true);
+	void setOrientation(LayoutOrientation orientation, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isHorizontal();
 	
-	void setHorizontal(sl_bool flagRedraw = sl_true);
+	void setHorizontal(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isVertical();
 	
-	void setVertical(sl_bool flagRedraw = sl_true);
+	void setVertical(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 protected:
 	// override

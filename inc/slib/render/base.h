@@ -4,26 +4,43 @@
 #include "definition.h"
 
 #include "../core/object.h"
+#include "../core/list.h"
 
 SLIB_RENDER_NAMESPACE_BEGIN
 
 class RenderEngine;
 class RenderBaseObject;
 
+#define SLIB_MAX_RENDER_ENGINE_COUNT_PER_OBJECT 4
+
 class SLIB_EXPORT RenderBaseObjectInstance : public Object
 {
 	SLIB_DECLARE_OBJECT
+	
+protected:
+	RenderBaseObjectInstance();
 
 public:
-	void linkObject(RenderEngine* engine, RenderBaseObject* object);
+	void link(const Ref<RenderEngine>& engine, const Ref<RenderBaseObject>& object);
 
 	Ref<RenderBaseObject> getObject();
 	
 	Ref<RenderEngine> getEngine();
+	
+protected:
+	virtual void onUpdate(RenderBaseObject* object);
 
+public:
+	// should be called by only engine internally
+	void _update(RenderBaseObject* object);
+	
 protected:
 	SafeWeakRef<RenderBaseObject> m_object;
 	SafeWeakRef<RenderEngine> m_engine;
+	
+	sl_bool m_flagUpdated;
+	
+	friend class RenderBaseObject;
 
 };
 
@@ -31,23 +48,17 @@ class SLIB_EXPORT RenderBaseObject : public Object
 {
 	SLIB_DECLARE_OBJECT
 	
-protected:
-	RenderBaseObject();
-	
-	~RenderBaseObject();
-
 public:
-	void linkEngine(const Ref<RenderEngine>& engine, const Ref<RenderBaseObjectInstance>& instance);
+	void addInstance(const Ref<RenderBaseObjectInstance>& instance);
 	
-	void unlinkEngine();
-
-	Ref<RenderEngine> getEngine();
+	void removeInstance(const Ref<RenderBaseObjectInstance>& instance);
 	
-	Ref<RenderBaseObjectInstance> getInstance();
+	void removeAllInstances();
 
+	Ref<RenderBaseObjectInstance> getInstance(RenderEngine* engine);
+	
 protected:
-	SafeWeakRef<RenderEngine> m_engine;
-	SafeRef<RenderBaseObjectInstance> m_instance;
+	SafeRef<RenderBaseObjectInstance> m_instances[SLIB_MAX_RENDER_ENGINE_COUNT_PER_OBJECT];
 	
 };
 

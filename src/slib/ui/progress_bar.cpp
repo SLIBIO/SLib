@@ -48,10 +48,10 @@ LayoutOrientation ProgressBar::getOrientation()
 	return m_orientation;
 }
 
-void ProgressBar::setOrientation(LayoutOrientation orientation, sl_bool flagRedraw)
+void ProgressBar::setOrientation(LayoutOrientation orientation, UIUpdateMode mode)
 {
 	m_orientation = orientation;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -61,9 +61,9 @@ sl_bool ProgressBar::isVertical()
 	return m_orientation == LayoutOrientation::Vertical;
 }
 
-void ProgressBar::setVertical(sl_bool flagRedraw)
+void ProgressBar::setVertical(UIUpdateMode mode)
 {
-	setOrientation(LayoutOrientation::Vertical, flagRedraw);
+	setOrientation(LayoutOrientation::Vertical, mode);
 }
 
 sl_bool ProgressBar::isHorizontal()
@@ -71,9 +71,9 @@ sl_bool ProgressBar::isHorizontal()
 	return m_orientation == LayoutOrientation::Horizontal;
 }
 
-void ProgressBar::setHorizontal(sl_bool flagRedraw)
+void ProgressBar::setHorizontal(UIUpdateMode mode)
 {
-	setOrientation(LayoutOrientation::Horizontal, flagRedraw);
+	setOrientation(LayoutOrientation::Horizontal, mode);
 }
 
 float ProgressBar::getMinimumValue()
@@ -81,11 +81,11 @@ float ProgressBar::getMinimumValue()
 	return m_value_min;
 }
 
-void ProgressBar::setMinimumValue(float value, sl_bool flagRedraw)
+void ProgressBar::setMinimumValue(float value, UIUpdateMode mode)
 {
 	m_value_min = value;
-	setValue(m_value, sl_false);
-	if (flagRedraw) {
+	setValue(m_value, UIUpdateMode::NoRedraw);
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -95,11 +95,11 @@ float ProgressBar::getMaximumValue()
 	return m_value_max;
 }
 
-void ProgressBar::setMaximumValue(float value, sl_bool flagRedraw)
+void ProgressBar::setMaximumValue(float value, UIUpdateMode mode)
 {
 	m_value_max = value;
-	setValue(m_value, sl_false);
-	if (flagRedraw) {
+	setValue(m_value, UIUpdateMode::NoRedraw);
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -113,9 +113,9 @@ float ProgressBar::getRange()
 	return range;
 }
 
-void ProgressBar::setRange(float range, sl_bool flagRedraw)
+void ProgressBar::setRange(float range, UIUpdateMode mode)
 {
-	setMaximumValue(m_value_min + range, flagRedraw);
+	setMaximumValue(m_value_min + range, mode);
 }
 
 float ProgressBar::getValue()
@@ -123,7 +123,7 @@ float ProgressBar::getValue()
 	return m_value;
 }
 
-void ProgressBar::setValue(float value, sl_bool flagRedraw)
+void ProgressBar::setValue(float value, UIUpdateMode mode)
 {
 	value = _refineValue(value);
 	if (Math::isAlmostZero(value - m_value)) {
@@ -134,7 +134,7 @@ void ProgressBar::setValue(float value, sl_bool flagRedraw)
 	if (m_flagDualValues && value > m_value2) {
 		m_value2 = value;
 	}
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -144,7 +144,7 @@ float ProgressBar::getSecondaryValue()
 	return m_value2;
 }
 
-void ProgressBar::setSecondaryValue(float value, sl_bool flagRedraw)
+void ProgressBar::setSecondaryValue(float value, UIUpdateMode mode)
 {
 	value = _refineValue(value);
 	if (Math::isAlmostZero(value - m_value2)) {
@@ -155,7 +155,7 @@ void ProgressBar::setSecondaryValue(float value, sl_bool flagRedraw)
 	if (m_flagDualValues && value < m_value) {
 		m_value = value;
 	}
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -165,7 +165,7 @@ sl_bool ProgressBar::isDualValues()
 	return m_flagDualValues;
 }
 
-void ProgressBar::setDualValues(sl_bool flagDualValues, sl_bool flagRedraw)
+void ProgressBar::setDualValues(sl_bool flagDualValues, UIUpdateMode mode)
 {
 	m_flagDualValues = flagDualValues;
 	if (flagDualValues) {
@@ -173,7 +173,7 @@ void ProgressBar::setDualValues(sl_bool flagDualValues, sl_bool flagRedraw)
 			m_value2 = m_value;
 		}
 	}
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -203,10 +203,10 @@ sl_bool ProgressBar::isReversed()
 	return m_flagReversed;
 }
 
-void ProgressBar::setReversed(sl_bool flagReversed, sl_bool flagRedraw)
+void ProgressBar::setReversed(sl_bool flagReversed, UIUpdateMode mode)
 {
 	m_flagReversed = flagReversed;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -216,17 +216,17 @@ Ref<Drawable> ProgressBar::getTrackDrawable()
 	return m_track;
 }
 
-void ProgressBar::setTrackDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void ProgressBar::setTrackDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	m_track = drawable;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void ProgressBar::setTrackColor(const Color& color, sl_bool flagRedraw)
+void ProgressBar::setTrackColor(const Color& color, UIUpdateMode mode)
 {
-	setTrackDrawable(ColorDrawable::create(color), flagRedraw);
+	setTrackDrawable(ColorDrawable::create(color), mode);
 }
 
 Ref<Drawable> ProgressBar::getProgressDrawable()
@@ -234,17 +234,17 @@ Ref<Drawable> ProgressBar::getProgressDrawable()
 	return m_progress;
 }
 
-void ProgressBar::setProgressDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void ProgressBar::setProgressDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	m_progress = drawable;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void ProgressBar::setProgressColor(const Color &color, sl_bool flagRedraw)
+void ProgressBar::setProgressColor(const Color &color, UIUpdateMode mode)
 {
-	setProgressDrawable(ColorDrawable::create(color), flagRedraw);
+	setProgressDrawable(ColorDrawable::create(color), mode);
 }
 
 Ref<Drawable> ProgressBar::getSecondaryProgressDrawable()
@@ -252,17 +252,17 @@ Ref<Drawable> ProgressBar::getSecondaryProgressDrawable()
 	return m_progress2;
 }
 
-void ProgressBar::setSecondaryProgressDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void ProgressBar::setSecondaryProgressDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	m_progress2 = drawable;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void ProgressBar::setSecondaryProgressColor(const Color &color, sl_bool flagRedraw)
+void ProgressBar::setSecondaryProgressColor(const Color &color, UIUpdateMode mode)
 {
-	setSecondaryProgressDrawable(ColorDrawable::create(color), flagRedraw);
+	setSecondaryProgressDrawable(ColorDrawable::create(color), mode);
 }
 
 void ProgressBar::onDraw(Canvas* canvas)

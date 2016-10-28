@@ -9,4 +9,6 @@
 #include "render/texture.h"
 #include "render/program.h"
 
+#include "render/canvas.h"
+
 #endif

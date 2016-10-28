@@ -34,99 +34,99 @@ public:
 public:
 	sl_uint32 getTabsCount();
 	
-	virtual void setTabsCount(sl_uint32 count, sl_bool flagRedraw = sl_true);
+	virtual void setTabsCount(sl_uint32 count, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	String getTabLabel(sl_uint32 index);
 	
-	virtual void setTabLabel(sl_uint32 index, const String& text, sl_bool flagRedraw = sl_true);
+	virtual void setTabLabel(sl_uint32 index, const String& text, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<View> getTabContentView(sl_uint32 index);
 	
-	virtual void setTabContentView(sl_uint32 index, const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	virtual void setTabContentView(sl_uint32 index, const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_uint32 getSelectedTabIndex();
 	
-	virtual void selectTab(sl_uint32 index, sl_bool flagRedraw = sl_true);
+	virtual void selectTab(sl_uint32 index, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	UISize getContentViewSize();
 	
 	LayoutOrientation getOrientation();
 	
-	void setOrientation(LayoutOrientation orientation, sl_bool flagRedraw = sl_true);
+	void setOrientation(LayoutOrientation orientation, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_len getTabWidth();
 	
-	virtual void setTabWidth(sl_ui_len width, sl_bool flagRedraw = sl_true);
+	virtual void setTabWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_len getTabHeight();
 	
-	virtual void setTabHeight(sl_ui_len height, sl_bool flagRedraw = sl_true);
+	virtual void setTabHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getBarBackground();
 	
-	void setBarBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	void setBarBackground(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setBarBackground(const Color& color, sl_bool flagRedraw = sl_true);
+	void setBarBackground(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getContentBackground();
 	
-	void setContentBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	void setContentBackground(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setContentBackground(const Color& color, sl_bool flagRedraw = sl_true);
+	void setContentBackground(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getTabBackground();
 	
-	void setTabBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	void setTabBackground(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setTabBackground(const Color& color, sl_bool flagRedraw = sl_true);
+	void setTabBackground(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getSelectedTabBackground();
 	
-	void setSelectedTabBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	void setSelectedTabBackground(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setSelectedTabBackground(const Color& color, sl_bool flagRedraw = sl_true);
+	void setSelectedTabBackground(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getHoverTabBackground();
 	
-	void setHoverTabBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	void setHoverTabBackground(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setHoverTabBackground(const Color& color, sl_bool flagRedraw = sl_true);
+	void setHoverTabBackground(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Color getLabelColor();
 	
-	void setLabelColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setLabelColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Color getSelectedLabelColor();
 	
-	void setSelectedLabelColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setSelectedLabelColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Color getHoverLabelColor();
 	
-	void setHoverLabelColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setHoverLabelColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Alignment getLabelAlignment();
 	
-	virtual void setLabelAlignment(Alignment align, sl_bool flagRedraw = sl_true);
+	virtual void setLabelAlignment(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	virtual void setLabelMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw = sl_true);
+	virtual void setLabelMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setLabelMargin(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setLabelMargin(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getLabelMarginLeft();
 	
-	void setLabelMarginLeft(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setLabelMarginLeft(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getLabelMarginTop();
 	
-	void setLabelMarginTop(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setLabelMarginTop(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getLabelMarginRight();
 	
-	void setLabelMarginRight(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setLabelMarginRight(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getLabelMarginBottom();
 	
-	void setLabelMarginBottom(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setLabelMarginBottom(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	virtual UIRect getTabBarRegion();
 	
@@ -165,7 +165,7 @@ protected:
 protected:
 	void _invalidateTabBar();
 	
-	void _relayout(sl_bool flagRedraw);
+	void _relayout(UIUpdateMode mode);
 	
 private:
 	void _refreshTabsCount_NW();

@@ -20,13 +20,13 @@ String LabelView::getText()
 	return m_text;
 }
 
-void LabelView::setText(const String& text, sl_bool flagRedraw)
+void LabelView::setText(const String& text, UIUpdateMode mode)
 {
 	m_text = text;
 	if (isNativeWidget()) {
 		_setText_NW(text);
 	} else {
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -37,13 +37,13 @@ Color LabelView::getTextColor()
 	return m_textColor;
 }
 
-void LabelView::setTextColor(const Color& color, sl_bool flagRedraw)
+void LabelView::setTextColor(const Color& color, UIUpdateMode mode)
 {
 	m_textColor = color;
 	if (isNativeWidget()) {
 		_setTextColor_NW(color);
 	} else {
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -54,13 +54,13 @@ Alignment LabelView::getGravity()
 	return m_textAlignment;
 }
 
-void LabelView::setGravity(Alignment align, sl_bool flagRedraw)
+void LabelView::setGravity(Alignment align, UIUpdateMode mode)
 {
 	m_textAlignment = align;
 	if (isNativeWidget()) {
 		_setTextAlignment_NW(align);
 	} else {
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}

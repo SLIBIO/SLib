@@ -14,6 +14,13 @@ SLIB_GRAPHICS_NAMESPACE_BEGIN
 struct ImageDesc;
 class Image;
 
+class BitmapCache : public Object
+{
+public:
+	virtual void update(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height) = 0;
+	
+};
+
 class SLIB_EXPORT Bitmap : public Drawable
 {
 	SLIB_DECLARE_OBJECT
@@ -67,6 +74,8 @@ public:
 
 	sl_bool isNotEmpty();
 	
+	void update(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height);
+	
 	void update();
 	
 public:
@@ -78,6 +87,7 @@ public:
 	
 protected:
 	SafeRef<Drawable> m_drawableCached;
+	SafeRef<BitmapCache> m_renderingTextureCached;
 	
 };
 

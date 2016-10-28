@@ -225,9 +225,8 @@ public:
 	}
 
     // override
-	void drawText(const String& _text, sl_real x, sl_real y, const Ref<Font>& _font, const Color& color)
+	void drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& _font, const Color& color)
 	{
-		String16 text = _text;
 		if (text.isNotEmpty()) {
 			Gdiplus::Graphics* graphics = m_graphics;
 			Ref<Font> font = _font;

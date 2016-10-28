@@ -17,15 +17,15 @@ public:
 public:
 	String getText();
 	
-	virtual void setText(const String& text, sl_bool flagRedraw = sl_true);
+	virtual void setText(const String& text, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Color getTextColor();
 	
-	virtual void setTextColor(const Color& color, sl_bool flagRedraw = sl_true);
+	virtual void setTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Alignment getGravity();
 	
-	virtual void setGravity(Alignment align, sl_bool flagRedraw = sl_true);
+	virtual void setGravity(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 public:
 	// override

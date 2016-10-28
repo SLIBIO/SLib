@@ -25,38 +25,38 @@ public:
 public:
 	Ref<Drawable> getThumbDrawable();
 	
-	void setThumbDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	void setThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setThumbColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setThumbColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getPressedThumbDrawable();
 	
-	void setPressedThumbDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	void setPressedThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setPressedThumbColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setPressedThumbColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getHoverThumbDrawable();
 	
-	void setHoverThumbDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	void setHoverThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setHoverThumbColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setHoverThumbColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 
 	const UISize& getThumbSize();
 	
-	virtual void setThumbSize(const UISize& size, sl_bool flagRedraw = sl_true);
+	virtual void setThumbSize(const UISize& size, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setThumbSize(sl_ui_len width, sl_ui_len height, sl_bool flagRedraw = sl_true);
+	void setThumbSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setThumbSize(sl_ui_len size, sl_bool flagRedraw = sl_true);
+	void setThumbSize(sl_ui_len size, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_len getThumbWidth();
 	
-	void setThumbWidth(sl_ui_len width, sl_bool flagRedraw = sl_true);
+	void setThumbWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_len getThumbHeight();
 	
-	void setThumbHeight(sl_ui_len height, sl_bool flagRedraw = sl_true);
+	void setThumbHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
 		
 protected:
 	// override

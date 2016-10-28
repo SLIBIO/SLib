@@ -50,41 +50,41 @@ public:
 public:
 	sl_uint32 getColumnsCount();
 	
-	virtual void setColumnsCount(sl_uint32 nCount, sl_bool flagRedraw = sl_true);
+	virtual void setColumnsCount(sl_uint32 nCount, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	sl_uint32 getRowsCount();
 	
-	virtual void setRowsCount(sl_uint32 nCount, sl_bool flagRedraw = sl_true);
+	virtual void setRowsCount(sl_uint32 nCount, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	virtual String getItemText(sl_uint32 row, sl_uint32 col);
 	
-	virtual void setItemText(sl_uint32 row, sl_uint32 col, const String& text, sl_bool flagRedraw = sl_true);
+	virtual void setItemText(sl_uint32 row, sl_uint32 col, const String& text, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	String getHeaderText(sl_uint32 col);
 	
-	virtual void setHeaderText(sl_uint32 col, const String& text, sl_bool flagRedraw = sl_true);
+	virtual void setHeaderText(sl_uint32 col, const String& text, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_len getColumnWidth(sl_uint32 col);
 	
-	virtual void setColumnWidth(sl_uint32 col, sl_ui_len width, sl_bool flagRedraw = sl_true);
+	virtual void setColumnWidth(sl_uint32 col, sl_ui_len width, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Alignment getHeaderAlignment(sl_uint32 col);
 	
-	virtual void setHeaderAlignment(sl_uint32 col, Alignment align, sl_bool flagRedraw = sl_true);
+	virtual void setHeaderAlignment(sl_uint32 col, Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Alignment getColumnAlignment(sl_uint32 col);
 	
-	virtual void setColumnAlignment(sl_uint32 col, Alignment align, sl_bool flagRedraw = sl_true);
+	virtual void setColumnAlignment(sl_uint32 col, Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_int32 getSelectedRow();
 	
-	virtual void addRow(sl_bool flagRedraw = sl_true);
+	virtual void addRow(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	virtual void insertRow(sl_uint32 row, sl_bool flagRedraw = sl_true);
+	virtual void insertRow(sl_uint32 row, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	virtual void removeRow(sl_uint32 row, sl_bool flagRedraw = sl_true);
+	virtual void removeRow(sl_uint32 row, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	virtual void removeAllRows(sl_bool flagRedraw = sl_true);
+	virtual void removeAllRows(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 public:
 	SLIB_PTR_PROPERTY(IListReportViewListener, Listener)

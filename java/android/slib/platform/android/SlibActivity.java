@@ -4,6 +4,7 @@ import java.util.Vector;
 
 import slib.platform.android.camera.SCamera;
 import slib.platform.android.ui.UiThread;
+import slib.platform.android.ui.view.UiGLView;
 import slib.platform.android.ui.window.UiWindow;
 import android.app.Activity;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ public class SlibActivity extends Activity {
 		super.onPause();
 		Android.onPauseActivity(this);
 		SCamera.onPauseActivity(this);
+		UiGLView.onPauseViews();
 		flagVisible = false;
 	}
 	
@@ -33,6 +35,7 @@ public class SlibActivity extends Activity {
 		super.onResume();
 		Android.onResumeActivity(this);
 		SCamera.onResumeActivity(this);
+		UiGLView.onResumeViews();
 		flagVisible = true;
 	}
 

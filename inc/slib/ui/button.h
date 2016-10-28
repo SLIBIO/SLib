@@ -40,18 +40,18 @@ public:
 public:
 	String getText();
 	
-	virtual void setText(const String& text, sl_bool flagRedraw = sl_true);
+	virtual void setText(const String& text, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isDefaultButton();
 	
-	virtual void setDefaultButton(sl_bool flag, sl_bool flagRedraw = sl_true);
+	virtual void setDefaultButton(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
 	sl_uint32 getCategoriesCount();
 	
 	sl_uint32 getCurrentCategory();
 	
-	void setCurrentCategory(sl_uint32 n, sl_bool flagRedraw = sl_true);
+	void setCurrentCategory(sl_uint32 n, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
 	ButtonState getButtonState();
@@ -59,142 +59,142 @@ public:
 	
 	const UISize& getIconSize();
 	
-	virtual void setIconSize(const UISize& size, sl_bool flagRedraw = sl_true);
+	virtual void setIconSize(const UISize& size, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setIconSize(sl_ui_len width, sl_ui_len height, sl_bool flagRedraw = sl_true);
+	void setIconSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setIconSize(sl_ui_len size, sl_bool flagRedraw = sl_true);
+	void setIconSize(sl_ui_len size, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_len getIconWidth();
 	
-	void setIconWidth(sl_ui_len width, sl_bool flagRedraw = sl_true);
+	void setIconWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_len getIconHeight();
 	
-	void setIconHeight(sl_ui_len height, sl_bool flagRedraw = sl_true);
+	void setIconHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
 	Alignment getGravity();
 	
-	virtual void setGravity(Alignment align, sl_bool flagRedraw = sl_true);
+	virtual void setGravity(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Alignment getIconAlignment();
 	
-	virtual void setIconAlignment(Alignment align, sl_bool flagRedraw = sl_true);
+	virtual void setIconAlignment(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Alignment getTextAlignment();
 	
-	virtual void setTextAlignment(Alignment align, sl_bool flagRedraw = sl_true);
+	virtual void setTextAlignment(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isTextBeforeIcon();
 	
-	virtual void setTextBeforeIcon(sl_bool flag, sl_bool flagRedraw = sl_true);
+	virtual void setTextBeforeIcon(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	LayoutOrientation getLayoutOrientation();
 	
-	virtual void setLayoutOrientation(LayoutOrientation orientation, sl_bool flagRedraw = sl_true);
+	virtual void setLayoutOrientation(LayoutOrientation orientation, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
-	virtual void setIconMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw = sl_true);
+	virtual void setIconMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setIconMargin(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setIconMargin(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getIconMarginLeft();
 	
-	void setIconMarginLeft(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setIconMarginLeft(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getIconMarginTop();
 	
-	void setIconMarginTop(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setIconMarginTop(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getIconMarginRight();
 	
-	void setIconMarginRight(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setIconMarginRight(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getIconMarginBottom();
 	
-	void setIconMarginBottom(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setIconMarginBottom(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
-	virtual void setTextMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw = sl_true);
+	virtual void setTextMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setTextMargin(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setTextMargin(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getTextMarginLeft();
 	
-	void setTextMarginLeft(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setTextMarginLeft(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getTextMarginTop();
 	
-	void setTextMarginTop(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setTextMarginTop(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getTextMarginRight();
 	
-	void setTextMarginRight(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setTextMarginRight(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getTextMarginBottom();
 	
-	void setTextMarginBottom(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setTextMarginBottom(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
 	Color getTextColor(ButtonState state, sl_uint32 category = 0);
 	
-	virtual void setTextColor(const Color& color, ButtonState state, sl_uint32 category = 0, sl_bool flagRedraw = sl_true);
+	virtual void setTextColor(const Color& color, ButtonState state, sl_uint32 category = 0, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Color getTextColor();
 	
-	virtual void setTextColor(const Color& color, sl_bool flagRedraw = sl_true);
+	virtual void setTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
 	Ref<Drawable> getIcon(ButtonState state, sl_uint32 category = 0);
 	
-	virtual void setIcon(const Ref<Drawable>& icon, ButtonState state, sl_uint32 category = 0, sl_bool flagRedraw = sl_true);
+	virtual void setIcon(const Ref<Drawable>& icon, ButtonState state, sl_uint32 category = 0, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getIcon();
 	
-	virtual void setIcon(const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
+	virtual void setIcon(const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
 	Ref<Drawable> getBackground(ButtonState state, sl_uint32 category = 0);
 	
-	virtual void setBackground(const Ref<Drawable>& background, ButtonState state, sl_uint32 category = 0, sl_bool flagRedraw = sl_true);
+	virtual void setBackground(const Ref<Drawable>& background, ButtonState state, sl_uint32 category = 0, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setBackground(const Color& backgroundColor, ButtonState state, sl_uint32 category = 0, sl_bool flagRedraw = sl_true);
+	void setBackground(const Color& backgroundColor, ButtonState state, sl_uint32 category = 0, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getBackground();
 	
 	// override
-	void setBackground(const Ref<Drawable>& background, sl_bool flagRedraw = sl_true);
+	void setBackground(const Ref<Drawable>& background, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	
 	Ref<Pen> getBorder(ButtonState state, sl_uint32 category = 0);
 	
-	virtual void setBorder(const Ref<Pen>& pen, ButtonState state, sl_uint32 category = 0, sl_bool flagRedraw = sl_true);
+	virtual void setBorder(const Ref<Pen>& pen, ButtonState state, sl_uint32 category = 0, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Pen> getBorder();
 	
 	// override
-	void setBorder(const Ref<Pen>& pen, sl_bool flagRedraw = sl_true);
+	void setBorder(const Ref<Pen>& pen, UIUpdateMode mode = UIUpdateMode::Redraw);
 
-	void setBorder(sl_bool flagBorder, sl_bool flagRedraw = sl_true);
+	void setBorder(sl_bool flagBorder, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
 	sl_bool isUsingDefaultColorFilter();
 	
-	void setUsingDefaultColorFilter(sl_bool flag, sl_bool flagRedraw = sl_true);
+	void setUsingDefaultColorFilter(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 public:
 	// override
 	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
 	
 	// override
-	void setEnabled(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
+	void setEnabled(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	// override
-	void setPressedState(sl_bool flagState, sl_bool flagRedraw = sl_true);
+	void setPressedState(sl_bool flagState, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	// override
-	void setHoverState(sl_bool flagState, sl_bool flagRedraw = sl_true);
+	void setHoverState(sl_bool flagState, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 protected:
 	// override

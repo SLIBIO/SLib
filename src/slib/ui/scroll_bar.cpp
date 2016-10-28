@@ -62,10 +62,10 @@ LayoutOrientation ScrollBar::getOrientation()
 	return m_orientation;
 }
 
-void ScrollBar::setOrientation(LayoutOrientation orientation, sl_bool flagRedraw)
+void ScrollBar::setOrientation(LayoutOrientation orientation, UIUpdateMode mode)
 {
 	m_orientation = orientation;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -75,9 +75,9 @@ sl_bool ScrollBar::isVertical()
 	return m_orientation == LayoutOrientation::Vertical;
 }
 
-void ScrollBar::setVertical(sl_bool flagRedraw)
+void ScrollBar::setVertical(UIUpdateMode mode)
 {
-	setOrientation(LayoutOrientation::Vertical, flagRedraw);
+	setOrientation(LayoutOrientation::Vertical, mode);
 }
 
 sl_bool ScrollBar::isHorizontal()
@@ -85,9 +85,9 @@ sl_bool ScrollBar::isHorizontal()
 	return m_orientation == LayoutOrientation::Horizontal;
 }
 
-void ScrollBar::setHorizontal(sl_bool flagRedraw)
+void ScrollBar::setHorizontal(UIUpdateMode mode)
 {
-	setOrientation(LayoutOrientation::Horizontal, flagRedraw);
+	setOrientation(LayoutOrientation::Horizontal, mode);
 }
 
 sl_scroll_pos ScrollBar::getValue()
@@ -95,7 +95,7 @@ sl_scroll_pos ScrollBar::getValue()
 	return m_value;
 }
 
-void ScrollBar::setValue(sl_scroll_pos value, sl_bool flagRedraw)
+void ScrollBar::setValue(sl_scroll_pos value, UIUpdateMode mode)
 {
 	sl_scroll_pos _max = m_value_max - m_page;
 	if (value > _max) {
@@ -110,15 +110,15 @@ void ScrollBar::setValue(sl_scroll_pos value, sl_bool flagRedraw)
 	}
 	m_value = value;
 	dispatchScroll(value);
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void ScrollBar::setValueOfOutRange(sl_scroll_pos value, sl_bool flagRedraw)
+void ScrollBar::setValueOfOutRange(sl_scroll_pos value, UIUpdateMode mode)
 {
 	m_value = value;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -128,10 +128,10 @@ sl_scroll_pos ScrollBar::getPage()
 	return m_page;
 }
 
-void ScrollBar::setPage(sl_scroll_pos page, sl_bool flagRedraw)
+void ScrollBar::setPage(sl_scroll_pos page, UIUpdateMode mode)
 {
 	m_page = page;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -141,10 +141,10 @@ sl_scroll_pos ScrollBar::getLine()
 	return m_line;
 }
 
-void ScrollBar::setLine(sl_scroll_pos line, sl_bool flagRedraw)
+void ScrollBar::setLine(sl_scroll_pos line, UIUpdateMode mode)
 {
 	m_line = line;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -154,11 +154,11 @@ sl_scroll_pos ScrollBar::getMinimumValue()
 	return m_value_min;
 }
 
-void ScrollBar::setMinimumValue(sl_scroll_pos value, sl_bool flagRedraw)
+void ScrollBar::setMinimumValue(sl_scroll_pos value, UIUpdateMode mode)
 {
 	m_value_min = value;
-	setValue(m_value, sl_false);
-	if (flagRedraw) {
+	setValue(m_value, UIUpdateMode::NoRedraw);
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -168,11 +168,11 @@ sl_scroll_pos ScrollBar::getMaximumValue()
 	return m_value_max;
 }
 
-void ScrollBar::setMaximumValue(sl_scroll_pos value, sl_bool flagRedraw)
+void ScrollBar::setMaximumValue(sl_scroll_pos value, UIUpdateMode mode)
 {
 	m_value_max = value;
-	setValue(m_value, sl_false);
-	if (flagRedraw) {
+	setValue(m_value, UIUpdateMode::NoRedraw);
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -186,14 +186,14 @@ sl_scroll_pos ScrollBar::getRange()
 	return range;
 }
 
-void ScrollBar::setRange(sl_scroll_pos range, sl_bool flagRedraw)
+void ScrollBar::setRange(sl_scroll_pos range, UIUpdateMode mode)
 {
 	if (range < 0) {
 		range = 0;
 	}
 	m_value_max = m_value_min + range;
-	setValue(m_value, sl_false);
-	if (flagRedraw) {
+	setValue(m_value, UIUpdateMode::NoRedraw);
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -203,17 +203,17 @@ Ref<Drawable> ScrollBar::getThumbDrawable()
 	return m_thumb;
 }
 
-void ScrollBar::setThumbDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void ScrollBar::setThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	m_thumb = drawable;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void ScrollBar::setThumbColor(const Color& color, sl_bool flagRedraw)
+void ScrollBar::setThumbColor(const Color& color, UIUpdateMode mode)
 {
-	setThumbDrawable(ColorDrawable::create(color), flagRedraw);
+	setThumbDrawable(ColorDrawable::create(color), mode);
 }
 
 Ref<Drawable> ScrollBar::getPressedThumbDrawable()
@@ -221,17 +221,17 @@ Ref<Drawable> ScrollBar::getPressedThumbDrawable()
 	return m_pressedThumb;
 }
 
-void ScrollBar::setPressedThumbDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void ScrollBar::setPressedThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	m_pressedThumb = drawable;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void ScrollBar::setPressedThumbColor(const Color& color, sl_bool flagRedraw)
+void ScrollBar::setPressedThumbColor(const Color& color, UIUpdateMode mode)
 {
-	setPressedThumbDrawable(ColorDrawable::create(color), flagRedraw);
+	setPressedThumbDrawable(ColorDrawable::create(color), mode);
 }
 
 Ref<Drawable> ScrollBar::getHoverThumbDrawable()
@@ -239,17 +239,17 @@ Ref<Drawable> ScrollBar::getHoverThumbDrawable()
 	return m_hoverThumb;
 }
 
-void ScrollBar::setHoverThumbDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void ScrollBar::setHoverThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	m_hoverThumb = drawable;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void ScrollBar::setHoverThumbColor(const Color& color, sl_bool flagRedraw)
+void ScrollBar::setHoverThumbColor(const Color& color, UIUpdateMode mode)
 {
-	setHoverThumbDrawable(ColorDrawable::create(color), flagRedraw);
+	setHoverThumbDrawable(ColorDrawable::create(color), mode);
 }
 
 Ref<Drawable> ScrollBar::getTrackDrawable()
@@ -257,17 +257,17 @@ Ref<Drawable> ScrollBar::getTrackDrawable()
 	return m_track;
 }
 
-void ScrollBar::setTrackDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void ScrollBar::setTrackDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	m_track = drawable;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void ScrollBar::setTrackColor(const Color& color, sl_bool flagRedraw)
+void ScrollBar::setTrackColor(const Color& color, UIUpdateMode mode)
 {
-	setTrackDrawable(ColorDrawable::create(color), flagRedraw);
+	setTrackDrawable(ColorDrawable::create(color), mode);
 }
 
 Ref<Drawable> ScrollBar::getPressedTrackDrawable()
@@ -275,17 +275,17 @@ Ref<Drawable> ScrollBar::getPressedTrackDrawable()
 	return m_pressedTrack;
 }
 
-void ScrollBar::setPressedTrackDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void ScrollBar::setPressedTrackDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	m_pressedTrack = drawable;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void ScrollBar::setPressedTrackColor(const Color& color, sl_bool flagRedraw)
+void ScrollBar::setPressedTrackColor(const Color& color, UIUpdateMode mode)
 {
-	setPressedTrackDrawable(ColorDrawable::create(color), flagRedraw);
+	setPressedTrackDrawable(ColorDrawable::create(color), mode);
 }
 
 Ref<Drawable> ScrollBar::getHoverTrackDrawable()
@@ -293,17 +293,17 @@ Ref<Drawable> ScrollBar::getHoverTrackDrawable()
 	return m_hoverTrack;
 }
 
-void ScrollBar::setHoverTrackDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void ScrollBar::setHoverTrackDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	m_hoverTrack = drawable;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void ScrollBar::setHoverTrackColor(const Color& color, sl_bool flagRedraw)
+void ScrollBar::setHoverTrackColor(const Color& color, UIUpdateMode mode)
 {
-	setHoverTrackDrawable(ColorDrawable::create(color), flagRedraw);
+	setHoverTrackDrawable(ColorDrawable::create(color), mode);
 }
 
 float ScrollBar::getMinimumThumbLengthRatio()

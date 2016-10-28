@@ -50,10 +50,10 @@ public:
 	
 	sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 	
-	void put(IMap<KT, VT>* other, MapPutMode mode = MapPutMode::Default);
+	void putAll(IMap<KT, VT>* other, MapPutMode mode = MapPutMode::Default);
 	
 	template <class _KT, class _VT>
-	void put(IMap<_KT, _VT>* other, MapPutMode mode = MapPutMode::Default);
+	void putAll(IMap<_KT, _VT>* other, MapPutMode mode = MapPutMode::Default);
 	
 	virtual sl_size remove_NoLock(const KT& key, sl_bool flagRemoveAllMatches = sl_false) = 0;
 	
@@ -401,15 +401,15 @@ public:
 	
 	sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 	
-	void put(const Map<KT, VT>& other, MapPutMode mode = MapPutMode::Default);
+	void putAll(const Map<KT, VT>& other, MapPutMode mode = MapPutMode::Default);
 	
 	template <class _KT, class _VT>
-	void put(const Map<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
+	void putAll(const Map<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
 	
-	void put(const SafeMap<KT, VT>& other, MapPutMode mode = MapPutMode::Default);
+	void putAll(const SafeMap<KT, VT>& other, MapPutMode mode = MapPutMode::Default);
 	
 	template <class _KT, class _VT>
-	void put(const SafeMap<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
+	void putAll(const SafeMap<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
 	
 	sl_size remove_NoLock(const KT& key, sl_bool flagRemoveAllMatches = sl_false) const;
 	
@@ -489,15 +489,15 @@ public:
 	
 	sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 	
-	void put(const Map<KT, VT>& other, MapPutMode mode = MapPutMode::Default);
+	void putAll(const Map<KT, VT>& other, MapPutMode mode = MapPutMode::Default);
 	
 	template <class _KT, class _VT>
-	void put(const Map<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
+	void putAll(const Map<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
 	
-	void put(const SafeMap<KT, VT>& other, MapPutMode mode = MapPutMode::Default);
+	void putAll(const SafeMap<KT, VT>& other, MapPutMode mode = MapPutMode::Default);
 	
 	template <class _KT, class _VT>
-	void put(const SafeMap<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
+	void putAll(const SafeMap<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
 	
 	sl_size remove(const KT& key, sl_bool flagRemoveAllMatches = sl_false) const;
 	
@@ -851,7 +851,7 @@ sl_bool IMap<KT, VT>::put(const KT& key, const VT& value, MapPutMode mode, sl_bo
 }
 
 template <class KT, class VT>
-void IMap<KT, VT>::put(IMap<KT, VT>* other, MapPutMode mode)
+void IMap<KT, VT>::putAll(IMap<KT, VT>* other, MapPutMode mode)
 {
 	if (!other) {
 		return;
@@ -869,7 +869,7 @@ void IMap<KT, VT>::put(IMap<KT, VT>* other, MapPutMode mode)
 
 template <class KT, class VT>
 template <class _KT, class _VT>
-void IMap<KT, VT>::put(IMap<_KT, _VT>* other, MapPutMode mode)
+void IMap<KT, VT>::putAll(IMap<_KT, _VT>* other, MapPutMode mode)
 {
 	if (!other) {
 		return;
@@ -1847,17 +1847,17 @@ sl_bool Map<KT, VT>::put(const KT& key, const VT& value, MapPutMode mode, sl_boo
 }
 
 template <class KT, class VT>
-void Map<KT, VT>::put(const Map<KT, VT>& other, MapPutMode mode)
+void Map<KT, VT>::putAll(const Map<KT, VT>& other, MapPutMode mode)
 {
 	IMap<KT, VT>* obj = ref.ptr;
 	if (obj) {
-		obj->put(other.ref.ptr, mode);
+		obj->putAll(other.ref.ptr, mode);
 	} else {
 		if (mode != MapPutMode::ReplaceExisting) {
 			obj = IMap<KT, VT>::createDefault();
 			if (obj) {
 				ref = obj;
-				obj->put(other.ref.ptr, mode);
+				obj->putAll(other.ref.ptr, mode);
 			}
 		}
 	}
@@ -1865,33 +1865,33 @@ void Map<KT, VT>::put(const Map<KT, VT>& other, MapPutMode mode)
 
 template <class KT, class VT>
 template <class _KT, class _VT>
-void Map<KT, VT>::put(const Map<_KT, _VT>& other, MapPutMode mode)
+void Map<KT, VT>::putAll(const Map<_KT, _VT>& other, MapPutMode mode)
 {
 	IMap<KT, VT>* obj = ref.ptr;
 	if (obj) {
-		obj->put(other.ref.ptr, mode);
+		obj->putAll(other.ref.ptr, mode);
 	} else {
 		if (mode != MapPutMode::ReplaceExisting) {
 			obj = IMap<KT, VT>::createDefault();
 			if (obj) {
 				ref = obj;
-				obj->put(other.ref.ptr, mode);
+				obj->putAll(other.ref.ptr, mode);
 			}
 		}
 	}
 }
 
 template <class KT, class VT>
-void Map<KT, VT>::put(const SafeMap<KT, VT>& other, MapPutMode mode)
+void Map<KT, VT>::putAll(const SafeMap<KT, VT>& other, MapPutMode mode)
 {
-	put(Map<KT, VT>(other), mode);
+	putAll(Map<KT, VT>(other), mode);
 }
 
 template <class KT, class VT>
 template <class _KT, class _VT>
-void Map<KT, VT>::put(const SafeMap<_KT, _VT>& other, MapPutMode mode)
+void Map<KT, VT>::putAll(const SafeMap<_KT, _VT>& other, MapPutMode mode)
 {
-	put(Map<_KT, _VT>(other), mode);
+	putAll(Map<_KT, _VT>(other), mode);
 }
 
 template <class KT, class VT>
@@ -2202,24 +2202,24 @@ sl_bool SafeMap<KT, VT>::put(const KT& key, const VT& value, MapPutMode mode, sl
 }
 
 template <class KT, class VT>
-void SafeMap<KT, VT>::put(const Map<KT, VT>& other, MapPutMode mode)
+void SafeMap<KT, VT>::putAll(const Map<KT, VT>& other, MapPutMode mode)
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
-		obj->put(other.ref.ptr, mode);
+		obj->putAll(other.ref.ptr, mode);
 	} else {
 		if (mode != MapPutMode::ReplaceExisting) {
 			SpinLocker lock(SpinLockPoolForMap::get(this));
 			obj = ref;
 			if (obj.isNotNull()) {
 				lock.unlock();
-				obj->put(other.ref.ptr, mode);
+				obj->putAll(other.ref.ptr, mode);
 			}
 			obj = IMap<KT, VT>::createDefault();
 			if (obj.isNotNull()) {
 				ref = obj;
 				lock.unlock();
-				obj->put(other.ref.ptr, mode);
+				obj->putAll(other.ref.ptr, mode);
 			}
 		}
 	}
@@ -2227,40 +2227,40 @@ void SafeMap<KT, VT>::put(const Map<KT, VT>& other, MapPutMode mode)
 
 template <class KT, class VT>
 template <class _KT, class _VT>
-void SafeMap<KT, VT>::put(const Map<_KT, _VT>& other, MapPutMode mode)
+void SafeMap<KT, VT>::putAll(const Map<_KT, _VT>& other, MapPutMode mode)
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
-		obj->put(other.ref.ptr, mode);
+		obj->putAll(other.ref.ptr, mode);
 	} else {
 		if (mode != MapPutMode::ReplaceExisting) {
 			SpinLocker lock(SpinLockPoolForMap::get(this));
 			obj = ref;
 			if (obj.isNotNull()) {
 				lock.unlock();
-				obj->put(other.ref.ptr, mode);
+				obj->putAll(other.ref.ptr, mode);
 			}
 			obj = IMap<KT, VT>::createDefault();
 			if (obj.isNotNull()) {
 				ref = obj;
 				lock.unlock();
-				obj->put(other.ref.ptr, mode);
+				obj->putAll(other.ref.ptr, mode);
 			}
 		}
 	}
 }
 
 template <class KT, class VT>
-void SafeMap<KT, VT>::put(const SafeMap<KT, VT>& other, MapPutMode mode)
+void SafeMap<KT, VT>::putAll(const SafeMap<KT, VT>& other, MapPutMode mode)
 {
-	put(Map<KT, VT>(other), mode);
+	putAll(Map<KT, VT>(other), mode);
 }
 
 template <class KT, class VT>
 template <class _KT, class _VT>
-void SafeMap<KT, VT>::put(const SafeMap<_KT, _VT>& other, MapPutMode mode)
+void SafeMap<KT, VT>::putAll(const SafeMap<_KT, _VT>& other, MapPutMode mode)
 {
-	put(Map<_KT, _VT>(other), mode);
+	putAll(Map<_KT, _VT>(other), mode);
 }
 
 template <class KT, class VT>

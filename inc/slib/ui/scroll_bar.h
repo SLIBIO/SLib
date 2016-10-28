@@ -25,79 +25,79 @@ public:
 public:
 	LayoutOrientation getOrientation();
 	
-	void setOrientation(LayoutOrientation orientation, sl_bool flagRedraw = sl_true);
+	void setOrientation(LayoutOrientation orientation, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isVertical();
 	
-	void setVertical(sl_bool flagRedraw = sl_true);
+	void setVertical(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isHorizontal();
 	
-	void setHorizontal(sl_bool flagRedraw = sl_true);
+	void setHorizontal(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_scroll_pos getValue();
 	
-	void setValue(sl_scroll_pos value, sl_bool flagRedraw = sl_true);
+	void setValue(sl_scroll_pos value, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setValueOfOutRange(sl_scroll_pos value, sl_bool flagRedraw = sl_true);
+	void setValueOfOutRange(sl_scroll_pos value, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_scroll_pos getPage();
 	
-	void setPage(sl_scroll_pos page, sl_bool flagRedraw = sl_true);
+	void setPage(sl_scroll_pos page, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_scroll_pos getLine();
 	
-	void setLine(sl_scroll_pos line, sl_bool flagRedraw = sl_true);
+	void setLine(sl_scroll_pos line, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_scroll_pos getMinimumValue();
 	
-	void setMinimumValue(sl_scroll_pos value, sl_bool flagRedraw = sl_true);
+	void setMinimumValue(sl_scroll_pos value, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_scroll_pos getMaximumValue();
 	
-	void setMaximumValue(sl_scroll_pos value, sl_bool flagRedraw = sl_true);
+	void setMaximumValue(sl_scroll_pos value, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_scroll_pos getRange();
 	
-	void setRange(sl_scroll_pos range, sl_bool flagRedraw = sl_true);
+	void setRange(sl_scroll_pos range, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	
 	Ref<Drawable> getThumbDrawable();
 	
-	void setThumbDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	void setThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setThumbColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setThumbColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	Ref<Drawable> getPressedThumbDrawable();
 	
-	void setPressedThumbDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	void setPressedThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setPressedThumbColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setPressedThumbColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getHoverThumbDrawable();
 	
-	void setHoverThumbDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	void setHoverThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setHoverThumbColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setHoverThumbColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	
 	Ref<Drawable> getTrackDrawable();
 	
-	void setTrackDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	void setTrackDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setTrackColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setTrackColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	Ref<Drawable> getPressedTrackDrawable();
 	
-	void setPressedTrackDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	void setPressedTrackDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setPressedTrackColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setPressedTrackColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getHoverTrackDrawable();
 	
-	void setHoverTrackDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	void setHoverTrackDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setHoverTrackColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setHoverTrackColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	
 	float getMinimumThumbLengthRatio();

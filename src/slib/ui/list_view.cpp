@@ -64,7 +64,7 @@ ListView::ListView()
 	ScrollView::setContentView(m_contentView);
 #else
 	m_contentView->setAttachMode(UIAttachMode::AttachInNativeWidget);
-	addChild(m_contentView, sl_false);
+	addChild(m_contentView, UIUpdateMode::NoRedraw);
 	setCreatingChildInstances(sl_true);
 #endif
 
@@ -688,10 +688,10 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 						rect.bottom = b;
 						rect.fixSizeError();
 						if (view->getParent() != contentView) {
-							view->_setFrame(rect, sl_false, sl_true);
-							contentView->addChild(view, sl_false);
+							view->_setFrame(rect, UIUpdateMode::NoRedraw, sl_true);
+							contentView->addChild(view, UIUpdateMode::NoRedraw);
 						} else {
-							view->_setFrame(rect, sl_false, sl_true);
+							view->_setFrame(rect, UIUpdateMode::NoRedraw, sl_true);
 						}
 					}
 					y = b;
@@ -721,12 +721,12 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 				rcContent.top += scrollY;
 				rcContent.bottom += scrollY;
 				rcContent.fixSizeError();
-				contentView->setFrame(rcContent, sl_false);
+				contentView->setFrame(rcContent, UIUpdateMode::NoRedraw);
 			} else {
-				contentView->setFrame(getBounds(), sl_false);
+				contentView->setFrame(getBounds(), UIUpdateMode::NoRedraw);
 			}
 #else
-			contentView->setFrame(getBounds(), sl_false);
+			contentView->setFrame(getBounds(), UIUpdateMode::NoRedraw);
 #endif
 #endif
 			if (!fromDraw) {

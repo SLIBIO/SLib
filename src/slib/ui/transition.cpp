@@ -100,25 +100,25 @@ Ref<Animation> Transition::createAnimation(const Ref<View>& view, const Transiti
 					}
 					if (direction == TransitionDirection::FromRightToLeft) {
 						sl_real width = (sl_real)(view->getWidth());
-						view->setTranslateAnimation(animation, Vector2(width * startFactor, 0), Vector2(width * endFactor, 0), sl_false);
+						view->setTranslateAnimation(animation, Vector2(width * startFactor, 0), Vector2(width * endFactor, 0), UIUpdateMode::NoRedraw);
 					} else {
 						sl_real height = (sl_real)(view->getHeight());
-						view->setTranslateAnimation(animation, Vector2(0, height * startFactor), Vector2(0, height * endFactor), sl_false);
+						view->setTranslateAnimation(animation, Vector2(0, height * startFactor), Vector2(0, height * endFactor), UIUpdateMode::NoRedraw);
 					}
 				}
 				break;
 			case TransitionType::Zoom:
 				if (pageAction == UIPageAction::Push || pageAction == UIPageAction::Resume) {
-					view->setScaleAnimation(animation, 0.5f, 1.0f, sl_false);
+					view->setScaleAnimation(animation, 0.5f, 1.0f, UIUpdateMode::NoRedraw);
 				} else {
-					view->setScaleAnimation(animation, 1.0f, 0.5f, sl_false);
+					view->setScaleAnimation(animation, 1.0f, 0.5f, UIUpdateMode::NoRedraw);
 				}
 				break;
 			case TransitionType::Fade:
 				if (pageAction == UIPageAction::Push) {
-					view->setAlphaAnimation(animation, 0.01f, 1.0f, sl_false);
+					view->setAlphaAnimation(animation, 0.01f, 1.0f, UIUpdateMode::NoRedraw);
 				} else if (pageAction == UIPageAction::Pop) {
-					view->setAlphaAnimation(animation, 1.0f, 0.01f, sl_false);
+					view->setAlphaAnimation(animation, 1.0f, 0.01f, UIUpdateMode::NoRedraw);
 				}
 				break;
 		}
@@ -200,25 +200,25 @@ Ref<Animation> Transition::createPopupAnimation(const Ref<View>& view, const Tra
 					}
 					if (direction == TransitionDirection::FromRightToLeft) {
 						sl_real width = (sl_real)(UI::getScreenWidth());
-						view->setTranslateAnimation(animation, Vector2(width * startFactor, 0), Vector2(width * endFactor, 0), sl_false);
+						view->setTranslateAnimation(animation, Vector2(width * startFactor, 0), Vector2(width * endFactor, 0), UIUpdateMode::NoRedraw);
 					} else {
 						sl_real height = (sl_real)(UI::getScreenHeight());
-						view->setTranslateAnimation(animation, Vector2(0, height * startFactor), Vector2(0, height * endFactor), sl_false);
+						view->setTranslateAnimation(animation, Vector2(0, height * startFactor), Vector2(0, height * endFactor), UIUpdateMode::NoRedraw);
 					}
 				}
 				break;
 			case TransitionType::Zoom:
 				if (pageAction == UIPageAction::Push) {
-					view->setScaleAnimation(animation, 0.5f, 1.0f, sl_false);
+					view->setScaleAnimation(animation, 0.5f, 1.0f, UIUpdateMode::NoRedraw);
 				} else {
-					view->setScaleAnimation(animation, 1.0f, 0.5f, sl_false);
+					view->setScaleAnimation(animation, 1.0f, 0.5f, UIUpdateMode::NoRedraw);
 				}
 				break;
 			case TransitionType::Fade:
 				if (pageAction == UIPageAction::Push) {
-					view->setAlphaAnimation(animation, 0.01f, 1.0f, sl_false);
+					view->setAlphaAnimation(animation, 0.01f, 1.0f, UIUpdateMode::NoRedraw);
 				} else {
-					view->setAlphaAnimation(animation, 1.0f, 0.01f, sl_false);
+					view->setAlphaAnimation(animation, 1.0f, 0.01f, UIUpdateMode::NoRedraw);
 				}
 				break;
 		}

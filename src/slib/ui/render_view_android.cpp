@@ -12,17 +12,13 @@ SLIB_UI_NAMESPACE_BEGIN
 class _RenderViewInstance : public Android_ViewInstance
 {
 public:
-	SafeRef<RenderEngine> m_renderEngine;
+	Ref<RenderEngine> m_renderEngine;
 };
 
 void JNICALL _AndroidGLView_nativeOnCreate(JNIEnv* env, jobject _this, jlong jinstance)
 {
 	Ref<_RenderViewInstance> instance = Ref<_RenderViewInstance>::from(Android_ViewInstance::getAndroidInstance(jinstance));
 	if (instance.isNotNull()) {
-		Ref<RenderEngine> engine = instance->m_renderEngine;
-		if (engine.isNotNull()) {
-			engine->release();
-		}
 		instance->m_renderEngine.setNull();
 	}
 }

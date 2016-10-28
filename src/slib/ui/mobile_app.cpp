@@ -18,7 +18,7 @@ MobileApp::MobileApp()
 	m_contentView = window->getContentView();
 	
 	m_pageStack = new ViewStack;
-	m_contentView->addChild(m_pageStack, sl_false);
+	m_contentView->addChild(m_pageStack, UIUpdateMode::Init);
 	
 	m_flagStartedPage = sl_false;
 	

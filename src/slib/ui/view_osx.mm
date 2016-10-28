@@ -852,6 +852,9 @@ SLIB_UI_NAMESPACE_END
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (view.isNotNull()) {
+			if (!(view->isEnabled())) {
+				return nil;
+			}
 			if (view->isCapturingChildInstanceEvents()) {
 				if (view->hitTestForCapturingChildInstanceEvents(slib::UIPoint((sl_ui_pos)(aPoint.x), (sl_ui_pos)(aPoint.y)))) {
 					return self;

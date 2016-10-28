@@ -454,6 +454,9 @@ SLIB_UI_NAMESPACE_END
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
 		if (view.isNotNull()) {
+			if (!(view->isEnabled())) {
+				return nil;
+			}
 			if (view->isCapturingChildInstanceEvents()) {
 				CGFloat f = slib::UIPlatform::getGlobalScaleFactor();
 				if (view->hitTestForCapturingChildInstanceEvents(slib::UIPoint((sl_ui_pos)(aPoint.x * f), (sl_ui_pos)(aPoint.y * f)))) {

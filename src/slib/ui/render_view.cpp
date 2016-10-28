@@ -1,12 +1,18 @@
 #include "../../../inc/slib/ui/render_view.h"
 
+#include "../../../inc/slib/render/canvas.h"
+
 SLIB_UI_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(RenderView, View)
 
 RenderView::RenderView()
 {
+	SLIB_REFERABLE_CONSTRUCTOR
+	
 	setCreatingNativeWidget(sl_true);
+	setCreatingChildInstances(sl_false);
+	setMakingLayout(sl_true, UIUpdateMode::Init);
 	
 	setPreferredEngineType(RenderEngineType::OpenGL_ES);
 	m_redrawMode = RedrawMode::Continuously;
@@ -42,8 +48,19 @@ void RenderView::invalidate(const UIRect& rect)
 	requestRender();
 }
 
+void RenderView::renderViewContent(RenderEngine* engine)
+{
+	engine->setDepthTest(sl_false);
+	engine->setBlending(sl_true);
+	Ref<RenderCanvas> canvas = RenderCanvas::create(engine, (sl_real)(getWidth()), (sl_real)(getHeight()));
+	if (canvas.isNotNull()) {
+		dispatchDraw(canvas.ptr);
+	}
+}
+
 void RenderView::onFrame(RenderEngine* engine)
 {
+	renderViewContent(engine);
 }
 
 void RenderView::onAttach()

@@ -43,14 +43,14 @@ sl_uint32 ListReportView::getColumnsCount()
 	return (sl_uint32)(m_columns.getCount());
 }
 
-void ListReportView::setColumnsCount(sl_uint32 nCount, sl_bool flagRedraw)
+void ListReportView::setColumnsCount(sl_uint32 nCount, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	m_columns.setCount(nCount);
 	if (isNativeWidget()) {
 		_refreshColumnsCount_NW();
 	} else {
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -61,7 +61,7 @@ sl_uint32 ListReportView::getRowsCount()
 	return m_nRows;
 }
 
-void ListReportView::setRowsCount(sl_uint32 nCount, sl_bool flagRedraw)
+void ListReportView::setRowsCount(sl_uint32 nCount, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	if (nCount < m_cells.getCount()) {
@@ -71,7 +71,7 @@ void ListReportView::setRowsCount(sl_uint32 nCount, sl_bool flagRedraw)
 	if (isNativeWidget()) {
 		_refreshRowsCount_NW();
 	} else {
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -90,7 +90,7 @@ String ListReportView::getItemText(sl_uint32 iRow, sl_uint32 iCol)
 	return String::null();
 }
 
-void ListReportView::setItemText(sl_uint32 iRow, sl_uint32 iCol, const String& text, sl_bool flagRedraw)
+void ListReportView::setItemText(sl_uint32 iRow, sl_uint32 iCol, const String& text, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	if (iRow < m_nRows) {
@@ -114,7 +114,7 @@ void ListReportView::setItemText(sl_uint32 iRow, sl_uint32 iCol, const String& t
 			ListReportViewCell* cell = row.getItemPtr(iCol);
 			cell->text = text;
 		}
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			if (isNativeWidget()) {
 				_refreshRowsCount_NW();
 			} else {
@@ -134,7 +134,7 @@ String ListReportView::getHeaderText(sl_uint32 iCol)
 	return String::null();
 }
 
-void ListReportView::setHeaderText(sl_uint32 iCol, const String& text, sl_bool flagRedraw)
+void ListReportView::setHeaderText(sl_uint32 iCol, const String& text, UIUpdateMode mode)
 {
 	MutexLocker lock(m_columns.getLocker());
 	if (iCol < m_columns.getCount()) {
@@ -143,7 +143,7 @@ void ListReportView::setHeaderText(sl_uint32 iCol, const String& text, sl_bool f
 		if (isNativeWidget()) {
 			_setHeaderText_NW(iCol, text);
 		} else {
-			if (flagRedraw) {
+			if (mode == UIUpdateMode::Redraw) {
 				invalidate();
 			}
 		}
@@ -160,7 +160,7 @@ sl_ui_len ListReportView::getColumnWidth(sl_uint32 iCol)
 	return 0;
 }
 
-void ListReportView::setColumnWidth(sl_uint32 iCol, sl_ui_len width, sl_bool flagRedraw)
+void ListReportView::setColumnWidth(sl_uint32 iCol, sl_ui_len width, UIUpdateMode mode)
 {
 	MutexLocker lock(m_columns.getLocker());
 	if (iCol < m_columns.getCount()) {
@@ -169,7 +169,7 @@ void ListReportView::setColumnWidth(sl_uint32 iCol, sl_ui_len width, sl_bool fla
 		if (isNativeWidget()) {
 			_setColumnWidth_NW(iCol, width);
 		} else {
-			if (flagRedraw) {
+			if (mode == UIUpdateMode::Redraw) {
 				invalidate();
 			}
 		}
@@ -186,7 +186,7 @@ Alignment ListReportView::getHeaderAlignment(sl_uint32 iCol)
 	return Alignment::Center;
 }
 
-void ListReportView::setHeaderAlignment(sl_uint32 iCol, Alignment align, sl_bool flagRedraw)
+void ListReportView::setHeaderAlignment(sl_uint32 iCol, Alignment align, UIUpdateMode mode)
 {
 	MutexLocker lock(m_columns.getLocker());
 	if (iCol < m_columns.getCount()) {
@@ -195,7 +195,7 @@ void ListReportView::setHeaderAlignment(sl_uint32 iCol, Alignment align, sl_bool
 		if (isNativeWidget()) {
 			_setHeaderAlignment_NW(iCol, align);
 		} else {
-			if (flagRedraw) {
+			if (mode == UIUpdateMode::Redraw) {
 				invalidate();
 			}
 		}
@@ -212,7 +212,7 @@ Alignment ListReportView::getColumnAlignment(sl_uint32 iCol)
 	return Alignment::Center;
 }
 
-void ListReportView::setColumnAlignment(sl_uint32 iCol, Alignment align, sl_bool flagRedraw)
+void ListReportView::setColumnAlignment(sl_uint32 iCol, Alignment align, UIUpdateMode mode)
 {
 	MutexLocker lock(m_columns.getLocker());
 	if (iCol < m_columns.getCount()) {
@@ -221,7 +221,7 @@ void ListReportView::setColumnAlignment(sl_uint32 iCol, Alignment align, sl_bool
 		if (isNativeWidget()) {
 			_setColumnAlignment_NW(iCol, align);
 		} else {
-			if (flagRedraw) {
+			if (mode == UIUpdateMode::Redraw) {
 				invalidate();
 			}
 		}
@@ -236,35 +236,35 @@ sl_int32 ListReportView::getSelectedRow()
 	return m_selectedRow;
 }
 
-void ListReportView::addRow(sl_bool flagRedraw)
+void ListReportView::addRow(UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
-	setRowsCount(m_nRows+1, flagRedraw);
+	setRowsCount(m_nRows+1, mode);
 }
 
-void ListReportView::insertRow(sl_uint32 iRow, sl_bool flagRedraw)
+void ListReportView::insertRow(sl_uint32 iRow, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	if (iRow < m_cells.getCount()) {
 		m_cells.insert(iRow, List<ListReportViewCell>::null());
 	}
-	setRowsCount(m_nRows+1, flagRedraw);
+	setRowsCount(m_nRows+1, mode);
 }
 
-void ListReportView::removeRow(sl_uint32 iRow, sl_bool flagRedraw)
+void ListReportView::removeRow(sl_uint32 iRow, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	if (iRow < m_nRows) {
 		if (iRow < m_cells.getCount()) {
 			m_cells.remove(iRow);
 		}
-		setRowsCount(m_nRows - 1, flagRedraw);
+		setRowsCount(m_nRows - 1, mode);
 	}
 }
 
-void ListReportView::removeAllRows(sl_bool flagRedraw)
+void ListReportView::removeAllRows(UIUpdateMode mode)
 {
-	setRowsCount(0, flagRedraw);
+	setRowsCount(0, mode);
 }
 
 void ListReportView::onSelectRow(sl_uint32 row)

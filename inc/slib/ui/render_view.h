@@ -29,6 +29,8 @@ public:
 	// override
 	void invalidate(const UIRect& rect);
 	
+	void renderViewContent(RenderEngine* engine);
+	
 public:
 	SLIB_PROPERTY(RenderEngineType, PreferredEngineType)
 

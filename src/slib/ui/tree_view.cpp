@@ -108,61 +108,61 @@ Ref<TreeViewItem> TreeViewItem::getChild(sl_size index)
 	return m_children.getItemValue(index, Ref<TreeViewItem>::null());
 }
 
-void TreeViewItem::addChild(const Ref<TreeViewItem>& item, sl_bool flagRedraw)
+void TreeViewItem::addChild(const Ref<TreeViewItem>& item, UIUpdateMode mode)
 {
 	if (item.isNull()) {
 		return;
 	}
 	if (m_children.add(item)) {
-		_addChild(item.ptr, flagRedraw);
+		_addChild(item.ptr, mode);
 	}
 }
 
-Ref<TreeViewItem> TreeViewItem::addChild(const String& text, const Ref<Drawable>& icon, sl_bool flagRedraw)
+Ref<TreeViewItem> TreeViewItem::addChild(const String& text, const Ref<Drawable>& icon, UIUpdateMode mode)
 {
 	Ref<TreeViewItem> item = new TreeViewItem;
 	if (item.isNotNull()) {
 		item->setText(text);
 		item->setIcon(icon);
-		addChild(item, flagRedraw);
+		addChild(item, mode);
 		return item;
 	}
 	return Ref<TreeViewItem>::null();
 }
 
-Ref<TreeViewItem> TreeViewItem::addChild(const String& text, sl_bool flagRedraw)
+Ref<TreeViewItem> TreeViewItem::addChild(const String& text, UIUpdateMode mode)
 {
-	return addChild(text, Ref<Drawable>::null(), flagRedraw);
+	return addChild(text, Ref<Drawable>::null(), mode);
 }
 
-void TreeViewItem::insertChild(sl_size index, const Ref<TreeViewItem>& item, sl_bool flagRedraw)
+void TreeViewItem::insertChild(sl_size index, const Ref<TreeViewItem>& item, UIUpdateMode mode)
 {
 	if (item.isNull()) {
 		return;
 	}
 	if (m_children.insert(index, item)) {
-		_addChild(item.ptr, flagRedraw);
+		_addChild(item.ptr, mode);
 	}
 }
 
-Ref<TreeViewItem> TreeViewItem::insertChild(sl_size index, const String& text, const Ref<Drawable>& icon, sl_bool flagRedraw)
+Ref<TreeViewItem> TreeViewItem::insertChild(sl_size index, const String& text, const Ref<Drawable>& icon, UIUpdateMode mode)
 {
 	Ref<TreeViewItem> item = new TreeViewItem;
 	if (item.isNotNull()) {
 		item->setText(text);
 		item->setIcon(icon);
-		insertChild(index, item, flagRedraw);
+		insertChild(index, item, mode);
 		return item;
 	}
 	return Ref<TreeViewItem>::null();
 }
 
-Ref<TreeViewItem> TreeViewItem::insertChild(sl_size index, const String& text, sl_bool flagRedraw)
+Ref<TreeViewItem> TreeViewItem::insertChild(sl_size index, const String& text, UIUpdateMode mode)
 {
-	return insertChild(index, text, Ref<Drawable>::null(), flagRedraw);
+	return insertChild(index, text, Ref<Drawable>::null(), mode);
 }
 
-void TreeViewItem::removeChild(sl_size index, sl_bool flagRedraw)
+void TreeViewItem::removeChild(sl_size index, UIUpdateMode mode)
 {
 	Ref<TreeViewItem> item = m_children.getItemValue(index, Ref<TreeViewItem>::null());
 	if (item.isNull()) {
@@ -171,11 +171,11 @@ void TreeViewItem::removeChild(sl_size index, sl_bool flagRedraw)
 	_removeChild(item.ptr);
 	m_children.remove(index);
 	if (isVisible()) {
-		_relayoutTree(flagRedraw);
+		_relayoutTree(mode);
 	}
 }
 
-void TreeViewItem::removeChild(const Ref<TreeViewItem>& item, sl_bool flagRedraw)
+void TreeViewItem::removeChild(const Ref<TreeViewItem>& item, UIUpdateMode mode)
 {
 	if (item.isNull()) {
 		return;
@@ -183,11 +183,11 @@ void TreeViewItem::removeChild(const Ref<TreeViewItem>& item, sl_bool flagRedraw
 	_removeChild(item.ptr);
 	m_children.removeValue(item);
 	if (isVisible()) {
-		_relayoutTree(flagRedraw);
+		_relayoutTree(mode);
 	}
 }
 
-void TreeViewItem::removeAllChildren(sl_bool flagRedraw)
+void TreeViewItem::removeAllChildren(UIUpdateMode mode)
 {
 	ListLocker< Ref<TreeViewItem> > children(m_children);
 	for (sl_size i = 0; i < children.count; i++) {
@@ -195,7 +195,7 @@ void TreeViewItem::removeAllChildren(sl_bool flagRedraw)
 	}
 	m_children.removeAll();
 	if (isVisible()) {
-		_relayoutTree(flagRedraw);
+		_relayoutTree(mode);
 	}
 }
 
@@ -231,19 +231,19 @@ sl_bool TreeViewItem::isVisible()
 	}
 }
 
-void TreeViewItem::open(sl_bool flagRedraw)
+void TreeViewItem::open(UIUpdateMode mode)
 {
 	m_flagOpened = sl_true;
 	if (m_children.getCount() != 0) {
-		_relayoutTree(flagRedraw);
+		_relayoutTree(mode);
 	}
 }
 
-void TreeViewItem::close(sl_bool flagRedraw)
+void TreeViewItem::close(UIUpdateMode mode)
 {
 	m_flagOpened = sl_false;
 	if (m_children.getCount() != 0) {
-		_relayoutTree(flagRedraw);
+		_relayoutTree(mode);
 	}
 }
 
@@ -252,10 +252,10 @@ String TreeViewItem::getText()
 	return m_text;
 }
 
-void TreeViewItem::setText(const String& text, sl_bool flagRedraw)
+void TreeViewItem::setText(const String& text, UIUpdateMode mode)
 {
 	m_text = text;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		_redrawTree();
 	}
 }
@@ -265,10 +265,10 @@ Ref<Drawable> TreeViewItem::getIcon()
 	return m_icon;
 }
 
-void TreeViewItem::setIcon(const Ref<Drawable>& icon, sl_bool flagRedraw)
+void TreeViewItem::setIcon(const Ref<Drawable>& icon, UIUpdateMode mode)
 {
 	m_icon = icon;
-	_relayoutTree(flagRedraw);
+	_relayoutTree(mode);
 }
 
 Ref<Drawable> TreeViewItem::getOpenedIcon()
@@ -276,10 +276,10 @@ Ref<Drawable> TreeViewItem::getOpenedIcon()
 	return m_iconOpened;
 }
 
-void TreeViewItem::setOpenedIcon(const Ref<Drawable>& icon, sl_bool flagRedraw)
+void TreeViewItem::setOpenedIcon(const Ref<Drawable>& icon, UIUpdateMode mode)
 {
 	m_iconOpened = icon;
-	_relayoutTree(flagRedraw);
+	_relayoutTree(mode);
 }
 
 Ref<Drawable> TreeViewItem::getClosedIcon()
@@ -287,10 +287,10 @@ Ref<Drawable> TreeViewItem::getClosedIcon()
 	return m_iconClosed;
 }
 
-void TreeViewItem::setClosedIcon(const Ref<Drawable>& icon, sl_bool flagRedraw)
+void TreeViewItem::setClosedIcon(const Ref<Drawable>& icon, UIUpdateMode mode)
 {
 	m_iconClosed = icon;
-	_relayoutTree(flagRedraw);
+	_relayoutTree(mode);
 }
 
 Ref<View> TreeViewItem::getCustomView()
@@ -298,7 +298,7 @@ Ref<View> TreeViewItem::getCustomView()
 	return m_customView;
 }
 
-void TreeViewItem::setCustomView(const Ref<View>& view, sl_bool flagRedraw)
+void TreeViewItem::setCustomView(const Ref<View>& view, UIUpdateMode mode)
 {
 	Ref<View> old = m_customView;
 	m_customView = view;
@@ -311,7 +311,7 @@ void TreeViewItem::setCustomView(const Ref<View>& view, sl_bool flagRedraw)
 			view->setParent(content);
 		}
 	}
-	_relayoutTree(flagRedraw);
+	_relayoutTree(mode);
 }
 
 Color TreeViewItem::getTextColor()
@@ -319,10 +319,10 @@ Color TreeViewItem::getTextColor()
 	return m_textColor;
 }
 
-void TreeViewItem::setTextColor(const Color& color, sl_bool flagRedraw)
+void TreeViewItem::setTextColor(const Color& color, UIUpdateMode mode)
 {
 	m_textColor = color;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		_redrawTree();
 	}
 }
@@ -332,10 +332,10 @@ Color TreeViewItem::getHoverTextColor()
 	return m_hoverTextColor;
 }
 
-void TreeViewItem::setHoverTextColor(const Color& color, sl_bool flagRedraw)
+void TreeViewItem::setHoverTextColor(const Color& color, UIUpdateMode mode)
 {
 	m_hoverTextColor = color;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		_redrawTree();
 	}
 }
@@ -345,10 +345,10 @@ Color TreeViewItem::getSelectedTextColor()
 	return m_selectedTextColor;
 }
 
-void TreeViewItem::setSelectedTextColor(const Color& color, sl_bool flagRedraw)
+void TreeViewItem::setSelectedTextColor(const Color& color, UIUpdateMode mode)
 {
 	m_selectedTextColor = color;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		_redrawTree();
 	}
 }
@@ -358,13 +358,13 @@ sl_ui_len TreeViewItem::getHeight()
 	return m_height;
 }
 
-void TreeViewItem::setHeight(sl_ui_len height, sl_bool flagRedraw)
+void TreeViewItem::setHeight(sl_ui_len height, UIUpdateMode mode)
 {
 	m_height = height;
-	_relayoutTree(flagRedraw);
+	_relayoutTree(mode);
 }
 
-void TreeViewItem::_addChild(TreeViewItem* item, sl_bool flagRedraw)
+void TreeViewItem::_addChild(TreeViewItem* item, UIUpdateMode mode)
 {
 	item->m_parent = this;
 	Ref<TreeView> tree = m_tree;
@@ -372,7 +372,7 @@ void TreeViewItem::_addChild(TreeViewItem* item, sl_bool flagRedraw)
 		item->_setTreeViewHierarchy(tree.ptr, m_level + 1);
 	}
 	if (isVisible()) {
-		_relayoutTree(flagRedraw);
+		_relayoutTree(mode);
 	}
 }
 
@@ -395,11 +395,11 @@ void TreeViewItem::_setTreeViewHierarchy(TreeView* view, sl_uint32 level)
 	}
 }
 
-void TreeViewItem::_relayoutTree(sl_bool flagRedraw)
+void TreeViewItem::_relayoutTree(UIUpdateMode mode)
 {
 	Ref<TreeView> tree = m_tree;
 	if (tree.isNotNull()) {
-		tree->_relayoutContent(flagRedraw);
+		tree->_relayoutContent(mode);
 	}
 }
 
@@ -491,7 +491,7 @@ TreeView::TreeView()
 	
 	m_itemHeight = 0;
 	
-	ScrollView::setPadding(6, 6, 6, 6, sl_false);
+	ScrollView::setPadding(6, 6, 6, 6, UIUpdateMode::Init);
 	m_itemPadding = 8;
 	m_itemIndent = 16;
 	m_textIndent = 4;
@@ -541,79 +541,79 @@ Ref<TreeViewItem> TreeView::getItem(sl_size index)
 	return Ref<TreeViewItem>::null();
 }
 
-void TreeView::addItem(const Ref<TreeViewItem>& item, sl_bool flagRedraw)
+void TreeView::addItem(const Ref<TreeViewItem>& item, UIUpdateMode mode)
 {
 	Ref<TreeViewItem> root = m_root;
 	if (root.isNotNull()) {
-		root->addChild(item, flagRedraw);
+		root->addChild(item, mode);
 	}
 }
 
-Ref<TreeViewItem> TreeView::addItem(const String& text, const Ref<Drawable>& icon, sl_bool flagRedraw)
+Ref<TreeViewItem> TreeView::addItem(const String& text, const Ref<Drawable>& icon, UIUpdateMode mode)
 {
 	Ref<TreeViewItem> root = m_root;
 	if (root.isNotNull()) {
-		return root->addChild(text, icon, flagRedraw);
-	}
-	return Ref<TreeViewItem>::null();
-}
-
-Ref<TreeViewItem> TreeView::addItem(const String& text, sl_bool flagRedraw)
-{
-	Ref<TreeViewItem> root = m_root;
-	if (root.isNotNull()) {
-		return root->addChild(text, flagRedraw);
+		return root->addChild(text, icon, mode);
 	}
 	return Ref<TreeViewItem>::null();
 }
 
-void TreeView::insertItem(sl_size index, const Ref<TreeViewItem>& item, sl_bool flagRedraw)
+Ref<TreeViewItem> TreeView::addItem(const String& text, UIUpdateMode mode)
 {
 	Ref<TreeViewItem> root = m_root;
 	if (root.isNotNull()) {
-		root->insertChild(index, item, flagRedraw);
-	}
-}
-
-Ref<TreeViewItem> TreeView::insertItem(sl_size index, const String& text, const Ref<Drawable>& icon, sl_bool flagRedraw)
-{
-	Ref<TreeViewItem> root = m_root;
-	if (root.isNotNull()) {
-		return root->insertChild(index, text, icon, flagRedraw);
+		return root->addChild(text, mode);
 	}
 	return Ref<TreeViewItem>::null();
 }
 
-Ref<TreeViewItem> TreeView::insertItem(sl_size index, const String& text, sl_bool flagRedraw)
+void TreeView::insertItem(sl_size index, const Ref<TreeViewItem>& item, UIUpdateMode mode)
 {
 	Ref<TreeViewItem> root = m_root;
 	if (root.isNotNull()) {
-		return root->insertChild(index, text, flagRedraw);
+		root->insertChild(index, item, mode);
+	}
+}
+
+Ref<TreeViewItem> TreeView::insertItem(sl_size index, const String& text, const Ref<Drawable>& icon, UIUpdateMode mode)
+{
+	Ref<TreeViewItem> root = m_root;
+	if (root.isNotNull()) {
+		return root->insertChild(index, text, icon, mode);
 	}
 	return Ref<TreeViewItem>::null();
 }
 
-void TreeView::removeItem(sl_size index, sl_bool flagRedraw)
+Ref<TreeViewItem> TreeView::insertItem(sl_size index, const String& text, UIUpdateMode mode)
 {
 	Ref<TreeViewItem> root = m_root;
 	if (root.isNotNull()) {
-		root->removeChild(index, flagRedraw);
+		return root->insertChild(index, text, mode);
+	}
+	return Ref<TreeViewItem>::null();
+}
+
+void TreeView::removeItem(sl_size index, UIUpdateMode mode)
+{
+	Ref<TreeViewItem> root = m_root;
+	if (root.isNotNull()) {
+		root->removeChild(index, mode);
 	}
 }
 
-void TreeView::removeItem(const Ref<TreeViewItem>& item, sl_bool flagRedraw)
+void TreeView::removeItem(const Ref<TreeViewItem>& item, UIUpdateMode mode)
 {
 	Ref<TreeViewItem> root = m_root;
 	if (root.isNotNull()) {
-		root->removeChild(item, flagRedraw);
+		root->removeChild(item, mode);
 	}
 }
 
-void TreeView::removeAllItems(sl_bool flagRedraw)
+void TreeView::removeAllItems(UIUpdateMode mode)
 {
 	Ref<TreeViewItem> root = m_root;
 	if (root.isNotNull()) {
-		root->removeAllChildren(flagRedraw);
+		root->removeAllChildren(mode);
 	}
 }
 
@@ -622,10 +622,10 @@ Ref<Drawable> TreeView::getItemIcon()
 	return m_itemIcon;
 }
 
-void TreeView::setItemIcon(const Ref<Drawable>& icon, sl_bool flagRedraw)
+void TreeView::setItemIcon(const Ref<Drawable>& icon, UIUpdateMode mode)
 {
 	m_itemIcon = icon;
-	_relayoutContent(flagRedraw);
+	_relayoutContent(mode);
 }
 
 Ref<Drawable> TreeView::getOpenedItemIcon()
@@ -633,10 +633,10 @@ Ref<Drawable> TreeView::getOpenedItemIcon()
 	return m_itemIconOpened;
 }
 
-void TreeView::setOpenedItemIcon(const Ref<Drawable>& icon, sl_bool flagRedraw)
+void TreeView::setOpenedItemIcon(const Ref<Drawable>& icon, UIUpdateMode mode)
 {
 	m_itemIconOpened = icon;
-	_relayoutContent(flagRedraw);
+	_relayoutContent(mode);
 }
 
 Ref<Drawable> TreeView::getClosedItemIcon()
@@ -644,10 +644,10 @@ Ref<Drawable> TreeView::getClosedItemIcon()
 	return m_itemIconClosed;
 }
 
-void TreeView::setClosedItemIcon(const Ref<Drawable>& icon, sl_bool flagRedraw)
+void TreeView::setClosedItemIcon(const Ref<Drawable>& icon, UIUpdateMode mode)
 {
 	m_itemIconClosed = icon;
-	_relayoutContent(flagRedraw);
+	_relayoutContent(mode);
 }
 
 Ref<Drawable> TreeView::getCollapsedIcon()
@@ -655,10 +655,10 @@ Ref<Drawable> TreeView::getCollapsedIcon()
 	return m_iconCollapsed;
 }
 
-void TreeView::setCollapsedIcon(const Ref<Drawable>& icon, sl_bool flagRedraw)
+void TreeView::setCollapsedIcon(const Ref<Drawable>& icon, UIUpdateMode mode)
 {
 	m_iconCollapsed = icon;
-	_relayoutContent(flagRedraw);
+	_relayoutContent(mode);
 }
 
 Ref<Drawable> TreeView::getExpandedIcon()
@@ -666,10 +666,10 @@ Ref<Drawable> TreeView::getExpandedIcon()
 	return m_iconExpanded;
 }
 
-void TreeView::setExpandedIcon(const Ref<Drawable>& icon, sl_bool flagRedraw)
+void TreeView::setExpandedIcon(const Ref<Drawable>& icon, UIUpdateMode mode)
 {
 	m_iconExpanded = icon;
-	_relayoutContent(flagRedraw);
+	_relayoutContent(mode);
 }
 
 Color TreeView::getSelectedItemBackgroundColor()
@@ -677,10 +677,10 @@ Color TreeView::getSelectedItemBackgroundColor()
 	return m_selectedItemBackgroundColor;
 }
 
-void TreeView::setSelectedItemBackgroundColor(const Color& color, sl_bool flagRedraw)
+void TreeView::setSelectedItemBackgroundColor(const Color& color, UIUpdateMode mode)
 {
 	m_selectedItemBackgroundColor = color;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		_redrawContent();
 	}
 }
@@ -690,10 +690,10 @@ Color TreeView::getItemTextColor()
 	return m_itemTextColor;
 }
 
-void TreeView::setItemTextColor(const Color& color, sl_bool flagRedraw)
+void TreeView::setItemTextColor(const Color& color, UIUpdateMode mode)
 {
 	m_itemTextColor = color;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		_redrawContent();
 	}
 }
@@ -703,10 +703,10 @@ Color TreeView::getHoverItemTextColor()
 	return m_hoverItemTextColor;
 }
 
-void TreeView::setHoverItemTextColor(const Color& color, sl_bool flagRedraw)
+void TreeView::setHoverItemTextColor(const Color& color, UIUpdateMode mode)
 {
 	m_hoverItemTextColor = color;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		_redrawContent();
 	}
 }
@@ -716,10 +716,10 @@ Color TreeView::getSelectedItemTextColor()
 	return m_selectedItemTextColor;
 }
 
-void TreeView::setSelectedItemTextColor(const Color& color, sl_bool flagRedraw)
+void TreeView::setSelectedItemTextColor(const Color& color, UIUpdateMode mode)
 {
 	m_selectedItemTextColor = color;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		_redrawContent();
 	}
 }
@@ -729,10 +729,10 @@ sl_ui_len TreeView::getItemHeight()
 	return m_itemHeight;
 }
 
-void TreeView::setItemHeight(sl_ui_len height, sl_bool flagRedraw)
+void TreeView::setItemHeight(sl_ui_len height, UIUpdateMode mode)
 {
 	m_itemHeight = height;
-	_relayoutContent(flagRedraw);
+	_relayoutContent(mode);
 }
 
 sl_ui_pos TreeView::getItemPadding()
@@ -740,10 +740,10 @@ sl_ui_pos TreeView::getItemPadding()
 	return m_itemPadding;
 }
 
-void TreeView::setItemPadding(sl_ui_pos padding, sl_bool flagRedraw)
+void TreeView::setItemPadding(sl_ui_pos padding, UIUpdateMode mode)
 {
 	m_itemPadding = padding;
-	_relayoutContent(flagRedraw);
+	_relayoutContent(mode);
 }
 
 sl_ui_pos TreeView::getItemIndent()
@@ -751,10 +751,10 @@ sl_ui_pos TreeView::getItemIndent()
 	return m_itemIndent;
 }
 
-void TreeView::setItemIndent(sl_ui_pos indent, sl_bool flagRedraw)
+void TreeView::setItemIndent(sl_ui_pos indent, UIUpdateMode mode)
 {
 	m_itemIndent = indent;
-	_relayoutContent(flagRedraw);
+	_relayoutContent(mode);
 }
 
 sl_ui_pos TreeView::getTextIndent()
@@ -762,10 +762,10 @@ sl_ui_pos TreeView::getTextIndent()
 	return m_textIndent;
 }
 
-void TreeView::setTextIndent(sl_ui_pos indent, sl_bool flagRedraw)
+void TreeView::setTextIndent(sl_ui_pos indent, UIUpdateMode mode)
 {
 	m_textIndent = indent;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		_redrawContent();
 	}
 }
@@ -785,14 +785,14 @@ void TreeView::onResize(sl_ui_len width, sl_ui_len height)
 	ScrollView::onResize(width, height);
 	Ref<_TreeContentView> content = m_content;
 	if (content.isNotNull()) {
-		content->setWidth(width, sl_false);
-		_relayoutContent(sl_false);
+		content->setWidth(width, UIUpdateMode::NoRedraw);
+		_relayoutContent(UIUpdateMode::NoRedraw);
 	}
 }
 
 void TreeView::onChangePadding()
 {
-	_relayoutContent(sl_false);
+	_relayoutContent(UIUpdateMode::NoRedraw);
 }
 
 void TreeView::dispatchSelectItem(TreeViewItem* item)
@@ -828,12 +828,12 @@ void TreeView::_createContentView()
 	}
 }
 
-void TreeView::_relayoutContent(sl_bool flagRedraw)
+void TreeView::_relayoutContent(UIUpdateMode mode)
 {
 	Ref<_TreeContentView> content = m_content;
 	if (content.isNotNull()) {
 		m_flagInvalidLayout = sl_true;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			content->invalidate();
 		}
 	}
@@ -877,7 +877,7 @@ void TreeView::_makeLayoutContent()
 		}
 		Ref<_TreeContentView> content = m_content;
 		if (content.isNotNull()) {
-			content->setHeight(top, sl_false);
+			content->setHeight(top, UIUpdateMode::NoRedraw);
 		}
 	}
 	

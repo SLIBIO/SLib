@@ -430,8 +430,8 @@ sl_bool HttpRequest::containsPostParameter(String name) const
 void HttpRequest::applyPostParameters(const void* data, sl_size size)
 {
 	Map<String, String> params = parseParameters(data, size);
-	m_postParameters.put(params.ref.ptr);
-	m_parameters.put(params.ref.ptr);
+	m_postParameters.putAll(params.ref.ptr);
+	m_parameters.putAll(params.ref.ptr);
 }
 
 void HttpRequest::applyPostParameters(const String& str)
@@ -442,8 +442,8 @@ void HttpRequest::applyPostParameters(const String& str)
 void HttpRequest::applyQueryToParameters()
 {
 	Map<String, String> params = parseParameters(m_query);
-	m_queryParameters.put(params.ref.ptr);
-	m_parameters.put(params.ref.ptr);
+	m_queryParameters.putAll(params.ref.ptr);
+	m_parameters.putAll(params.ref.ptr);
 }
 
 Map<String, String> HttpRequest::parseParameters(const String& str)

@@ -19,77 +19,77 @@ public:
 public:
 	LayoutOrientation getOrientation();
 	
-	void setOrientation(LayoutOrientation orientation, sl_bool flagRelayout = sl_true);
+	void setOrientation(LayoutOrientation orientation, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isHorizontal();
 	
-	void setHorizontal(sl_bool flagRelayout = sl_true);
+	void setHorizontal(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isVertical();
 	
-	void setVertical(sl_bool flagRelayout = sl_true);
+	void setVertical(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_size getItemsCount();
 	
-	void setItemsCount(sl_size count, sl_bool flagRelayout = sl_true);
+	void setItemsCount(sl_size count, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<View> getItemView(sl_size index);
 	
-	void setItemView(sl_size index, const Ref<View>& view, sl_bool flagRelayout = sl_true);
+	void setItemView(sl_size index, const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_len getItemSize(sl_size index);
 	
-	void setItemSize(sl_size index, sl_ui_len size, sl_bool flagRelayout = sl_true);
+	void setItemSize(sl_size index, sl_ui_len size, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_real getItemWeight(sl_size index);
 	
-	void setItemWeight(sl_size index, sl_real weight, sl_bool flagRelayout = sl_true);
+	void setItemWeight(sl_size index, sl_real weight, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_real getItemMinimumWeight(sl_size index);
 	
-	void setItemMinimumWeight(sl_size index, sl_real weight, sl_bool flagRelayout = sl_true);
+	void setItemMinimumWeight(sl_size index, sl_real weight, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_real getItemMaximumWeight(sl_size index);
 	
-	void setItemMaximumWeight(sl_size index, sl_real weight, sl_bool flagRelayout = sl_true);
+	void setItemMaximumWeight(sl_size index, sl_real weight, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_len getItemMinimumSize(sl_size index);
 	
-	void setItemMinimumSize(sl_size index, sl_ui_len size, sl_bool flagRelayout = sl_true);
+	void setItemMinimumSize(sl_size index, sl_ui_len size, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_len getItemMaximumSize(sl_size index);
 	
-	void setItemMaximumSize(sl_size index, sl_ui_len size, sl_bool flagRelayout = sl_true);
+	void setItemMaximumSize(sl_size index, sl_ui_len size, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_len getItemDividerWidth(sl_size index);
 	
-	void setItemDividerWidth(sl_size index, sl_ui_len width, sl_bool flagRelayout = sl_true);
+	void setItemDividerWidth(sl_size index, sl_ui_len width, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getItemDividerBackground(sl_size index);
 	
-	void setItemDividerBackground(sl_size index, const Ref<Drawable>& background, sl_bool flagRedraw = sl_true);
+	void setItemDividerBackground(sl_size index, const Ref<Drawable>& background, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Color getItemDividerColor(sl_size index);
 	
-	void setItemDividerColor(sl_size index, const Color& color, sl_bool flagRedraw = sl_true);
+	void setItemDividerColor(sl_size index, const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	sl_ui_len getDividerWidth();
 	
-	void setDividerWidth(sl_ui_len width, sl_bool flagRelayout = sl_true);
+	void setDividerWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getDividerBackground();
 	
-	void setDividerBackground(const Ref<Drawable>& background, sl_bool flagRedraw = sl_true);
+	void setDividerBackground(const Ref<Drawable>& background, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Color getDividerColor();
 	
-	void setDividerColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setDividerColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_len getCursorMargin();
 	
 	void setCursorMargin(sl_ui_len margin);
 
-	void relayout(sl_bool flagRedraw = sl_true);
+	void relayout(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 protected:
 	// override
@@ -117,9 +117,9 @@ public:
 protected:
 	sl_ui_len _getTotalSize();
 
-	void _refreshItemFrames(sl_bool flagRedraw);
+	void _refreshItemFrames(UIUpdateMode mode);
 	
-	void _resetWeights(sl_bool flagRelayout);
+	void _resetWeights(UIUpdateMode mode);
 	
 	sl_int32 _getDividerIndexAtPoint(const UIPoint& pt);
 	

@@ -93,15 +93,15 @@ public:
 	
 	sl_size getChildrenCount();
 	
-	void addChild(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	void addChild(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 
-	void insertChild(sl_size index, const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	void insertChild(sl_size index, const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 
-	void removeChild(sl_size index, sl_bool flagRedraw = sl_true);
+	void removeChild(sl_size index, UIUpdateMode mode = UIUpdateMode::Redraw);
 
-	void removeChild(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	void removeChild(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void removeAllChildren(sl_bool flagRedraw = sl_true);
+	void removeAllChildren(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<View> getChildAt(sl_ui_pos x, sl_ui_pos y);
 	
@@ -129,7 +129,7 @@ public:
 	
 	void setOnRemoveChildEnabled(sl_bool flagEnabled);
 	
-	void bringToFront(sl_bool flagRedraw = sl_true);
+	void bringToFront(UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	
 	virtual void invalidate();
@@ -139,7 +139,7 @@ public:
 	
 	void invalidateBoundsInParent();
 	
-	void updateAndInvalidateBoundsInParent(sl_bool flagInvalidate = sl_true);
+	void updateAndInvalidateBoundsInParent(UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	sl_bool checkSelfInvalidatable();
 	
@@ -151,24 +151,24 @@ public:
 	UIRect getInstanceFrame();
 	
 	// parent coordinate
-	void setFrame(const UIRect& frame, sl_bool flagRedraw = sl_true);
+	void setFrame(const UIRect& frame, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	// parent coordinate
-	void setFrame(sl_ui_pos x, sl_ui_pos y, sl_ui_len width, sl_ui_len height, sl_bool flagRedraw = sl_true);
+	void setFrame(sl_ui_pos x, sl_ui_pos y, sl_ui_len width, sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_len getWidth();
 	
-	void setWidth(sl_ui_len width, sl_bool flagRedraw = sl_true);
+	void setWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_len getHeight();
 	
-	void setHeight(sl_ui_len height, sl_bool flagRedraw = sl_true);
+	void setHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	UISize getSize();
 	
-	void setSize(const UISize& size, sl_bool flagRedraw = sl_true);
+	void setSize(const UISize& size, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setSize(sl_ui_len width, sl_ui_len height, sl_bool flagRedraw = sl_true);
+	void setSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	// parent coordinate
 	sl_ui_pos getLeft();
@@ -177,19 +177,19 @@ public:
 	sl_ui_pos getTop();
 	
 	// parent coordinate
-	void setLeft(sl_ui_pos x, sl_bool flagRedraw = sl_true);
+	void setLeft(sl_ui_pos x, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	// parent coordinate
-	void setTop(sl_ui_pos y, sl_bool flagRedraw = sl_true);
+	void setTop(sl_ui_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	// parent coordinate
 	UIPoint getPosition();
 	
 	// parent coordinate
-	void setPosition(sl_ui_pos x, sl_ui_pos y, sl_bool flagRedraw = sl_true);
+	void setPosition(sl_ui_pos x, sl_ui_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	// parent coordinate
-	void setPosition(const UIPoint& point, sl_bool flagRedraw = sl_true);
+	void setPosition(const UIPoint& point, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	// local coordinate
 	UIRect getBounds();
@@ -203,15 +203,15 @@ public:
 	
 	Visibility getVisibility();
 	
-	void setVisibility(Visibility visibility, sl_bool flagRedraw = sl_true);
+	void setVisibility(Visibility visibility, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isVisible();
 	
-	void setVisible(sl_bool flagVisible, sl_bool flagRedraw = sl_true);
+	void setVisible(sl_bool flagVisible, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isEnabled();
 	
-	virtual void setEnabled(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
+	virtual void setEnabled(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
 	sl_bool isHitTestable();
@@ -231,18 +231,18 @@ public:
 	
 	sl_bool isFocused();
 	
-	void setFocus(sl_bool flagFocused = sl_true, sl_bool flagRedraw = sl_true);
+	void setFocus(sl_bool flagFocused = sl_true, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<View> getFocusedChild();
 	
 	
 	sl_bool isPressedState();
 	
-	virtual void setPressedState(sl_bool flagState, sl_bool flagRedraw = sl_true);
+	virtual void setPressedState(sl_bool flagState, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isHoverState();
 	
-	virtual void setHoverState(sl_bool flagState, sl_bool flagRedraw = sl_true);
+	virtual void setHoverState(sl_bool flagState, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isOccurringClick();
 	
@@ -264,20 +264,20 @@ public:
 	
 	void setMeasuredHeight(sl_ui_len height);
 
-	void requestLayout(sl_bool flagRedraw = sl_true);
+	void requestLayout(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void requestParentLayout(sl_bool flagRedraw = sl_true);
+	void requestParentLayout(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void requestParentAndSelfLayout(sl_bool flagRedraw = sl_true);
+	void requestParentAndSelfLayout(UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	
 	sl_bool isLayouting();
 	
-	void resetLayout(sl_bool flagRedraw = sl_true);
+	void resetLayout(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isMakingLayout();
 	
-	void setMakingLayout(sl_bool flag, sl_bool flagRedraw = sl_true);
+	void setMakingLayout(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	UIRect getLayoutFrame();
 	
@@ -289,11 +289,11 @@ public:
 	
 	sl_bool isOnPrepareLayoutEnabled();
 	
-	void setOnPrepareLayoutEnabled(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
+	void setOnPrepareLayoutEnabled(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isOnMakeLayoutEnabled();
 	
-	void setOnMakeLayoutEnabled(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
+	void setOnMakeLayoutEnabled(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	SizeMode getWidthMode();
 	
@@ -301,13 +301,13 @@ public:
 	
 	sl_bool isWidthFixed();
 	
-	void setWidthFixed(sl_bool flagRedraw = sl_true);
+	void setWidthFixed(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isHeightFixed();
 	
-	void setHeightFixed(sl_bool flagRedraw = sl_true);
+	void setHeightFixed(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setSizeFixed(sl_bool flagRedraw = sl_true);
+	void setSizeFixed(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_real getWidthWeight();
 	
@@ -315,206 +315,206 @@ public:
 	
 	sl_bool isWidthFilling();
 	
-	void setWidthFilling(sl_real weight = 1, sl_bool flagRedraw = sl_true);
+	void setWidthFilling(sl_real weight = 1, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isHeightFilling();
 	
-	void setHeightFilling(sl_real weight = 1, sl_bool flagRedraw = sl_true);
+	void setHeightFilling(sl_real weight = 1, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setSizeFilling(sl_real widthWeight = 1, sl_real heightWeight = 1, sl_bool flagRedraw = sl_true);
+	void setSizeFilling(sl_real widthWeight = 1, sl_real heightWeight = 1, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isWidthWrapping();
 	
-	void setWidthWrapping(sl_bool flagRedraw = sl_true);
+	void setWidthWrapping(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isHeightWrapping();
 	
-	void setHeightWrapping(sl_bool flagRedraw = sl_true);
+	void setHeightWrapping(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setSizeWrapping(sl_bool flagRedraw = sl_true);
+	void setSizeWrapping(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isWidthWeight();
 	
-	void setWidthWeight(sl_real weight = 1, sl_bool flagRedraw = sl_true);
+	void setWidthWeight(sl_real weight = 1, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isHeightWeight();
 	
-	void setHeightWeight(sl_real weight = 1, sl_bool flagRedraw = sl_true);
+	void setHeightWeight(sl_real weight = 1, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setSizeWeight(sl_real widthWeight = 1, sl_real heightWeight = 1, sl_bool flagRedraw = sl_true);
+	void setSizeWeight(sl_real widthWeight = 1, sl_real heightWeight = 1, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	sl_bool isLayoutLeftFixed();
 	
-	void setLayoutLeftFixed(sl_bool flagRedraw = sl_true);
+	void setLayoutLeftFixed(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isAlignParentLeft();
 	
-	void setAlignParentLeft(sl_bool flagRedraw = sl_true);
+	void setAlignParentLeft(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isAlignLeft();
 	
-	void setAlignLeft(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	void setAlignLeft(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isRightOf();
 	
-	void setRightOf(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	void setRightOf(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<View> getLayoutLeftReferingView();
 	
 	sl_bool isLayoutRightFixed();
 	
-	void setLayoutRightFixed(sl_bool flagRedraw = sl_true);
+	void setLayoutRightFixed(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isAlignParentRight();
 	
-	void setAlignParentRight(sl_bool flagRedraw = sl_true);
+	void setAlignParentRight(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isAlignRight();
 	
-	void setAlignRight(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	void setAlignRight(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isLeftOf();
 	
-	void setLeftOf(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	void setLeftOf(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<View> getLayoutRightReferingView();
 
 	sl_bool isLayoutTopFixed();
 	
-	void setLayoutTopFixed(sl_bool flagRedraw = sl_true);
+	void setLayoutTopFixed(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isAlignParentTop();
 	
-	void setAlignParentTop(sl_bool flagRedraw = sl_true);
+	void setAlignParentTop(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isAlignTop();
 	
-	void setAlignTop(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	void setAlignTop(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isBelow();
 	
-	void setBelow(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	void setBelow(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<View> getLayoutTopReferingView();
 	
 	sl_bool isLayoutBottomFixed();
 	
-	void setLayoutBottomFixed(sl_bool flagRedraw = sl_true);
+	void setLayoutBottomFixed(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isAlignParentBottom();
 	
-	void setAlignParentBottom(sl_bool flagRedraw = sl_true);
+	void setAlignParentBottom(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isAlignBottom();
 	
-	void setAlignBottom(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	void setAlignBottom(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isAbove();
 	
-	void setAbove(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	void setAbove(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	Ref<View> getLayoutBottomReferingView();
 	
 	sl_bool isCenterHorizontal();
 	
-	void setCenterHorizontal(sl_bool flagRedraw = sl_true);
+	void setCenterHorizontal(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isCenterVertical();
 	
-	void setCenterVertical(sl_bool flagRedraw = sl_true);
+	void setCenterVertical(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setCenterInParent(sl_bool flagRedraw = sl_true);
+	void setCenterInParent(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isAlignCenterHorizontal();
 	
-	void setAlignCenterHorizontal(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	void setAlignCenterHorizontal(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isAlignCenterVertical();
 	
-	void setAlignCenterVertical(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	void setAlignCenterVertical(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getMarginLeft();
 	
-	void setMarginLeft(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setMarginLeft(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getMarginTop();
 	
-	void setMarginTop(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setMarginTop(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getMarginRight();
 	
-	void setMarginRight(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setMarginRight(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getMarginBottom();
 	
-	void setMarginBottom(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setMarginBottom(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw = sl_true);
+	void setMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setMargin(sl_ui_pos margin, sl_bool flagRedraw = sl_true);
+	void setMargin(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isRelativeMarginLeft();
 	
 	sl_real getRelativeMarginLeftWeight();
 	
-	void setRelativeMarginLeft(sl_real weight, sl_bool flagRedraw = sl_true);
+	void setRelativeMarginLeft(sl_real weight, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getAbsoluteMarginLeft();
 	
-	void setAbsoluteMarginLeft(sl_ui_pos margin, sl_bool flagDraw = sl_true);
+	void setAbsoluteMarginLeft(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	sl_bool isRelativeMarginTop();
 	
 	sl_real getRelativeMarginTopWeight();
 	
-	void setRelativeMarginTop(sl_real weight, sl_bool flagRedraw = sl_true);
+	void setRelativeMarginTop(sl_real weight, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getAbsoluteMarginTop();
 
-	void setAbsoluteMarginTop(sl_ui_pos margin, sl_bool flagDraw = sl_true);
+	void setAbsoluteMarginTop(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isRelativeMarginRight();
 
 	sl_real getRelativeMarginRightWeight();
 	
-	void setRelativeMarginRight(sl_real weight, sl_bool flagRedraw = sl_true);
+	void setRelativeMarginRight(sl_real weight, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getAbsoluteMarginRight();
 
-	void setAbsoluteMarginRight(sl_ui_pos margin, sl_bool flagDraw = sl_true);
+	void setAbsoluteMarginRight(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	sl_bool isRelativeMarginBottom();
 	
 	sl_real getRelativeMarginBottomWeight();
 	
-	void setRelativeMarginBottom(sl_real weight, sl_bool flagRedraw = sl_true);
+	void setRelativeMarginBottom(sl_real weight, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getAbsoluteMarginBottom();
 
-	void setAbsoluteMarginBottom(sl_ui_pos margin, sl_bool flagDraw = sl_true);
+	void setAbsoluteMarginBottom(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	void applyRelativeMargins(sl_ui_len parentWidth, sl_ui_len parentHeight);
 	
 	
 	sl_ui_pos getPaddingLeft();
 	
-	void setPaddingLeft(sl_ui_pos padding, sl_bool flagRedraw = sl_true);
+	void setPaddingLeft(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getPaddingTop();
 	
-	void setPaddingTop(sl_ui_pos padding, sl_bool flagRedraw = sl_true);
+	void setPaddingTop(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getPaddingRight();
 	
-	void setPaddingRight(sl_ui_pos padding, sl_bool flagRedraw = sl_true);
+	void setPaddingRight(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getPaddingBottom();
 	
-	void setPaddingBottom(sl_ui_pos padding, sl_bool flagRedraw = sl_true);
+	void setPaddingBottom(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setPadding(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw = sl_true);
+	void setPadding(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setPadding(sl_ui_pos padding, sl_bool flagRedraw = sl_true);
+	void setPadding(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
 	sl_bool getFinalTransform(Matrix3* _out);
@@ -523,13 +523,13 @@ public:
 	
 	const Matrix3& getTransform();
 	
-	void setTransform(const Matrix3& matrix, sl_bool flagRedraw = sl_true);
+	void setTransform(const Matrix3& matrix, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void resetTransform(sl_bool flagRedraw = sl_true);
+	void resetTransform(UIUpdateMode mode = UIUpdateMode::Redraw);
 
-	void setTransformFromAnimation(const Matrix3& matrix, sl_bool flagRedraw = sl_true);
+	void setTransformFromAnimation(const Matrix3& matrix, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void resetTransformFromAnimation(sl_bool flagRedraw = sl_true);
+	void resetTransformFromAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool getFinalTranslationRotationScale(Vector2* translation = sl_null, sl_real* rotation = sl_null, Vector2* scale = sl_null, Vector2* anchor = sl_null);
 	
@@ -539,17 +539,17 @@ public:
 	
 	const Vector2& getTranslation();
 	
-	void setTranslationX(sl_real x, sl_bool flagRedraw = sl_true);
+	void setTranslationX(sl_real x, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setTranslationY(sl_real y, sl_bool flagRedraw = sl_true);
+	void setTranslationY(sl_real y, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setTranslation(sl_real x, sl_real y, sl_bool flagRedraw = sl_true);
+	void setTranslation(sl_real x, sl_real y, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setTranslation(const Vector2& t, sl_bool flagRedraw = sl_true);
+	void setTranslation(const Vector2& t, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setTranslationFromAnimation(const Vector2& t, sl_bool flagRedraw = sl_true);
+	void setTranslationFromAnimation(const Vector2& t, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void resetTranslationFromAnimation(sl_bool flagRedraw = sl_true);
+	void resetTranslationFromAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_real getScaleX();
 	
@@ -557,27 +557,27 @@ public:
 	
 	const Vector2& getScale();
 	
-	void setScaleX(sl_real sx, sl_bool flagRedraw = sl_true);
+	void setScaleX(sl_real sx, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setScaleY(sl_real sy, sl_bool flagRedraw = sl_true);
+	void setScaleY(sl_real sy, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setScale(sl_real x, sl_real y, sl_bool flagRedraw = sl_true);
+	void setScale(sl_real x, sl_real y, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setScale(sl_real factor, sl_bool flagRedraw = sl_true);
+	void setScale(sl_real factor, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setScale(const Vector2& factor, sl_bool flagRedraw = sl_true);
+	void setScale(const Vector2& factor, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setScaleFromAnimation(const Vector2& factor, sl_bool flagRedraw = sl_true);
+	void setScaleFromAnimation(const Vector2& factor, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void resetScaleFromAnimation(sl_bool flagRedraw = sl_true);
+	void resetScaleFromAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_real getRotation();
 	
-	void setRotation(sl_real radian, sl_bool flagRedraw = sl_true);
+	void setRotation(sl_real radian, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setRotationFromAnimation(sl_real radian, sl_bool flagRedraw = sl_true);
+	void setRotationFromAnimation(sl_real radian, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void resetRotationFromAnimation(sl_bool flagRedraw = sl_true);
+	void resetRotationFromAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_real getAnchorOffsetX();
 	
@@ -585,13 +585,13 @@ public:
 
 	const Vector2& getAnchorOffset();
 	
-	void setAnchorOffsetX(sl_real x, sl_bool flagRedraw = sl_true);
+	void setAnchorOffsetX(sl_real x, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setAnchorOffsetY(sl_real y, sl_bool flagRedraw = sl_true);
+	void setAnchorOffsetY(sl_real y, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setAnchorOffset(sl_real x, sl_real y, sl_bool flagRedraw = sl_true);
+	void setAnchorOffset(sl_real x, sl_real y, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setAnchorOffset(const Vector2& pt, sl_bool flagRedraw = sl_true);
+	void setAnchorOffset(const Vector2& pt, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 
 	UIPointf convertCoordinateFromScreen(const UIPointf& ptScreen);
@@ -609,93 +609,93 @@ public:
 	
 	Ref<Drawable> getBackground();
 	
-	virtual void setBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	virtual void setBackground(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getPressedBackground();
 	
-	virtual void setPressedBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	virtual void setPressedBackground(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getHoverBackground();
 	
-	virtual void setHoverBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	virtual void setHoverBackground(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	ScaleMode getBackgroundScaleMode();
 	
-	virtual void setBackgroundScaleMode(ScaleMode mode, sl_bool flagRedraw = sl_true);
+	virtual void setBackgroundScaleMode(ScaleMode scaleMode, UIUpdateMode updateMode = UIUpdateMode::Redraw);
 	
 	Alignment getBackgroundAlignment();
 	
-	virtual void setBackgroundAlignment(Alignment align, sl_bool flagRedraw = sl_true);
+	virtual void setBackgroundAlignment(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	Color getBackgroundColor();
 	
-	virtual void setBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
+	virtual void setBackgroundColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Pen> getBorder();
 	
-	virtual void setBorder(const Ref<Pen>& pen, sl_bool flagRedraw = sl_true);
+	virtual void setBorder(const Ref<Pen>& pen, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	PenStyle getBorderStyle();
 	
-	void setBorderStyle(PenStyle style, sl_bool flagRedraw = sl_true);
+	void setBorderStyle(PenStyle style, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_real getBorderWidth();
 	
-	void setBorderWidth(sl_real width, sl_bool flagRedraw = sl_true);
+	void setBorderWidth(sl_real width, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Color getBorderColor();
 	
-	void setBorderColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setBorderColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isBorder();
 	
-	void setBorder(sl_bool flagBorder, sl_bool flagRedraw = sl_true);
+	void setBorder(sl_bool flagBorder, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	BoundShape getBoundShape();
 	
-	void setBoundShape(BoundShape shape, sl_bool flagRedraw = sl_true);
+	void setBoundShape(BoundShape shape, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	const Size& getRoundRectBoundShapeRadius();
 	
-	void setRoundRectBoundShapeRadius(const Size& radius, sl_bool flagRedraw = sl_true);
+	void setRoundRectBoundShapeRadius(const Size& radius, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setRoundRectBoundShapeRadius(sl_real rx, sl_real ry, sl_bool flagRedraw = sl_true);
+	void setRoundRectBoundShapeRadius(sl_real rx, sl_real ry, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setRoundRectBoundShapeRadiusX(sl_real rx, sl_bool flagRedraw = sl_true);
+	void setRoundRectBoundShapeRadiusX(sl_real rx, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setRoundRectBoundShapeRadiusY(sl_real ry, sl_bool flagRedraw = sl_true);
+	void setRoundRectBoundShapeRadiusY(sl_real ry, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setRoundRectBoundShapeRadius(sl_real radius, sl_bool flagRedraw = sl_true);
+	void setRoundRectBoundShapeRadius(sl_real radius, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<GraphicsPath> getBoundShapePath();
 	
-	void setBoundShapePath(const Ref<GraphicsPath>& path, sl_bool flagRedraw = sl_true);
+	void setBoundShapePath(const Ref<GraphicsPath>& path, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	
 	sl_bool isPreDrawEnabled();
 	
-	void setPreDrawEnabled(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
+	void setPreDrawEnabled(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isPostDrawEnabled();
 	
-	void setPostDrawEnabled(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
+	void setPostDrawEnabled(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isAlwaysOnDrawBackground();
 	
-	void setAlwaysOnDrawBackground(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
+	void setAlwaysOnDrawBackground(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isAlwaysOnDrawBorder();
 	
-	void setAlwaysOnDrawBorder(sl_bool flagEnabled, sl_bool flagRedraw = sl_true);
+	void setAlwaysOnDrawBorder(sl_bool flagEnabled, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	
 	Ref<Font> getFont();
 	
-	virtual void setFont(const Ref<Font>& font, sl_bool flagRedraw = sl_true);
+	virtual void setFont(const Ref<Font>& font, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setFont(const String& fontFamily, sl_real size, sl_bool flagBold = sl_false, sl_bool flagItalic = sl_false, sl_bool flagUnderline = sl_false, sl_bool flagRedraw = sl_true);
+	void setFont(const String& fontFamily, sl_real size, sl_bool flagBold = sl_false, sl_bool flagItalic = sl_false, sl_bool flagUnderline = sl_false, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setFontAttributes(sl_real size, sl_bool flagBold = sl_false, sl_bool flagItalic = sl_false, sl_bool flagUnderline = sl_false, sl_bool flagRedraw = sl_true);
+	void setFontAttributes(sl_real size, sl_bool flagBold = sl_false, sl_bool flagItalic = sl_false, sl_bool flagUnderline = sl_false, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	sl_bool isUsingFont();
 	
@@ -704,21 +704,21 @@ public:
 	
 	sl_bool isOpaque();
 	
-	void setOpaque(sl_bool flagOpaque, sl_bool flagRedraw = sl_true);
+	void setOpaque(sl_bool flagOpaque, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_real getFinalAlpha();
 	
 	sl_real getAlpha();
 	
-	void setAlpha(sl_real alpha, sl_bool flagRedraw = sl_true);
+	void setAlpha(sl_real alpha, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setAlphaFromAnimation(sl_real alpha, sl_bool flagRedraw = sl_true);
+	void setAlphaFromAnimation(sl_real alpha, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void resetAlphaFromAnimation(sl_bool flagRedraw = sl_true);
+	void resetAlphaFromAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	sl_bool isLayer();
 	
-	void setLayer(sl_bool flagLayer, sl_bool flagRedraw = sl_true);
+	void setLayer(sl_bool flagLayer, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	void invalidateLayer();
 	
@@ -727,39 +727,39 @@ public:
 	
 	void detachAnimations();
 
-	void resetAnimations(sl_bool flagRedraw = sl_true);
+	void resetAnimations(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Animation> getTransformAnimation();
 	
-	void setTransformAnimation(const Ref<Animation>& animation, const AnimationFrames<Matrix3>& frames, sl_bool flagRedraw = sl_true);
+	void setTransformAnimation(const Ref<Animation>& animation, const AnimationFrames<Matrix3>& frames, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setTransformAnimation(const Ref<Animation>& animation, const Matrix3& startValue, const Matrix3& endValue, sl_bool flagRedraw = sl_true);
+	void setTransformAnimation(const Ref<Animation>& animation, const Matrix3& startValue, const Matrix3& endValue, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Animation> startTransformAnimation(const AnimationFrames<Matrix3>& frames, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
 	
 	Ref<Animation> startTransformAnimation(const Matrix3& startValue, const Matrix3& endValue, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
 	
-	void resetTransformAnimation(sl_bool flagRedraw = sl_true);
+	void resetTransformAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Animation> getTranslateAnimation();
 	
-	void setTranslateAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, sl_bool flagRedraw = sl_true);
+	void setTranslateAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setTranslateAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue, sl_bool flagRedraw = sl_true);
+	void setTranslateAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Animation> startTranslateAnimation(const AnimationFrames<Vector2>& frames, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
 	
 	Ref<Animation> startTranslateAnimation(const Vector2& startValue, const Vector2& endValue, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
 	
-	void resetTranslateAnimation(sl_bool flagRedraw = sl_true);
+	void resetTranslateAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Animation> getScaleAnimation();
 	
-	void setScaleAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, sl_bool flagRedraw = sl_true);
+	void setScaleAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setScaleAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue, sl_bool flagRedraw = sl_true);
+	void setScaleAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setScaleAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, sl_bool flagRedraw = sl_true);
+	void setScaleAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Animation> startScaleAnimation(const AnimationFrames<Vector2>& frames, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
 	
@@ -767,74 +767,74 @@ public:
 	
 	Ref<Animation> startScaleAnimation(sl_real startValue, sl_real endValue, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
 
-	void resetScaleAnimation(sl_bool flagRedraw = sl_true);
+	void resetScaleAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Animation> getRotateAnimation();
 	
-	void setRotateAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, sl_bool flagRedraw = sl_true);
+	void setRotateAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setRotateAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, sl_bool flagRedraw = sl_true);
+	void setRotateAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Animation> startRotateAnimation(const AnimationFrames<sl_real>& frames, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
 	
 	Ref<Animation> startRotateAnimation(sl_real startValue, sl_real endValue, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
 
-	void resetRotateAnimation(sl_bool flagRedraw = sl_true);
+	void resetRotateAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Animation> getAlphaAnimation();
 	
-	void setAlphaAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, sl_bool flagRedraw = sl_true);
+	void setAlphaAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setAlphaAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, sl_bool flagRedraw = sl_true);
+	void setAlphaAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Animation> startAlphaAnimation(const AnimationFrames<sl_real>& frames, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
 	
 	Ref<Animation> startAlphaAnimation(sl_real startValue, sl_real endValue, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
 
-	void resetAlphaAnimation(sl_bool flagRedraw = sl_true);
+	void resetAlphaAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Animation> getBackgroundColorAnimation();
 	
-	void setBackgroundColorAnimation(const Ref<Animation>& animation, const AnimationFrames<Color4f>& frames, sl_bool flagRedraw = sl_true);
+	void setBackgroundColorAnimation(const Ref<Animation>& animation, const AnimationFrames<Color4f>& frames, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setBackgroundColorAnimation(const Ref<Animation>& animation, const Color4f& startValue, const Color4f& endValue, sl_bool flagRedraw = sl_true);
+	void setBackgroundColorAnimation(const Ref<Animation>& animation, const Color4f& startValue, const Color4f& endValue, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Animation> startBackgroundColorAnimation(const AnimationFrames<Color4f>& frames, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
 	
 	Ref<Animation> startBackgroundColorAnimation(const Color4f& startValue, const Color4f& endValue, sl_real duration, AnimationCurve curve = AnimationCurve::Default);
 
-	void resetBackgroundColorAnimation(sl_bool flagRedraw = sl_true);
+	void resetBackgroundColorAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
 	Ref<ScrollBar> getHorizontalScrollBar();
 	
 	Ref<ScrollBar> getVerticalScrollBar();
 	
-	void setHorizontalScrollBar(const Ref<ScrollBar>& bar, sl_bool flagRefresh = sl_true);
+	void setHorizontalScrollBar(const Ref<ScrollBar>& bar, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setVerticalScrollBar(const Ref<ScrollBar>& bar, sl_bool flagRefresh = sl_true);
+	void setVerticalScrollBar(const Ref<ScrollBar>& bar, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void createHorizontalScrollBar(sl_bool flagRefresh = sl_true);
+	void createHorizontalScrollBar(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void createVerticalScrollBar(sl_bool flagRefresh = sl_true);
+	void createVerticalScrollBar(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void removeHorizontalScrollBar(sl_bool flagRefresh = sl_true);
+	void removeHorizontalScrollBar(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void removeVerticalScrollBar(sl_bool flagRefresh = sl_true);
+	void removeVerticalScrollBar(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void createScrollBars(sl_bool flagRefresh = sl_true);
+	void createScrollBars(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void removeScrollBars(sl_bool flagRefresh = sl_true);
+	void removeScrollBars(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isHorizontalScrollBarVisible();
 	
 	sl_bool isVerticalScrollBarVisible();
 	
-	void setHorizontalScrollBarVisible(sl_bool flagVisible, sl_bool flagRefresh = sl_true);
+	void setHorizontalScrollBarVisible(sl_bool flagVisible, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setVerticalScrollBarVisible(sl_bool flagVisible, sl_bool flagRefresh = sl_true);
+	void setVerticalScrollBarVisible(sl_bool flagVisible, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setScrollBarsVisible(sl_bool flagVisible, sl_bool flagRefresh = sl_true);
+	void setScrollBarsVisible(sl_bool flagVisible, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_scroll_pos getScrollX();
 	
@@ -842,13 +842,13 @@ public:
 	
 	virtual Pointlf getScrollPosition();
 	
-	virtual void scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagRedraw = sl_true);
+	virtual void scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void scrollTo(const Pointlf& position, sl_bool flagRedraw = sl_true);
+	void scrollTo(const Pointlf& position, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setScrollX(sl_scroll_pos x, sl_bool flagRedraw = sl_true);
+	void setScrollX(sl_scroll_pos x, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setScrollY(sl_scroll_pos y, sl_bool flagRedraw = sl_true);
+	void setScrollY(sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_scroll_pos getContentWidth();
 	
@@ -856,19 +856,21 @@ public:
 	
 	ScrollPoint getContentSize();
 	
-	virtual void setContentSize(sl_scroll_pos width, sl_scroll_pos height, sl_bool flagRefresh = sl_true);
+	virtual void setContentSize(sl_scroll_pos width, sl_scroll_pos height, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setContentSize(const ScrollPoint& size, sl_bool flagRefresh = sl_true);
+	void setContentSize(const ScrollPoint& size, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setContentWidth(sl_scroll_pos width, sl_bool flagRefresh = sl_true);
+	void setContentWidth(sl_scroll_pos width, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setContentHeight(sl_scroll_pos height, sl_bool flagRefresh = sl_true);
+	void setContentHeight(sl_scroll_pos height, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	virtual ScrollPoint getScrollRange();
 	
 	sl_ui_len getScrollBarWidth();
 	
-	void setScrollBarWidth(sl_ui_len width, sl_bool flagRefresh = sl_true);
+	void setScrollBarWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::Redraw);
+	
+	void refreshScroll(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
 	sl_bool isContentScrollingByMouse();
@@ -1036,7 +1038,7 @@ public:
 private:
 	void _processAttachOnUiThread();
 	
-	void _addChild(const Ref<View>& view, sl_bool flagRedraw);
+	void _addChild(const Ref<View>& view, UIUpdateMode mode);
 	
 	void _removeChild(const Ref<View>& view);
 	
@@ -1048,9 +1050,9 @@ private:
 	
 	void _killFocusFromParent();
 	
-	void _setFocusedChild(View* child, sl_bool flagRedraw);
+	void _setFocusedChild(View* child, UIUpdateMode mode);
 	
-	void _setFrame(const UIRect& frame, sl_bool flagRedraw, sl_bool flagLayouting);
+	void _setFrame(const UIRect& frame, UIUpdateMode mode, sl_bool flagLayouting);
 	
 	void _prepareLayout(ViewPrepareLayoutParam& param);
 	
@@ -1062,21 +1064,21 @@ private:
 	
 	void _requestMakeLayout();
 	
-	void _requestInvalidateLayout();
+	void _requestInvalidateLayout(UIUpdateMode mode);
 	
-	void _requestInvalidateMeasure(sl_bool flagWidth, sl_bool flagHeight);
+	void _requestInvalidateMeasure(sl_bool flagWidth, sl_bool flagHeight, UIUpdateMode mode);
 	
-	void _applyCalcTransform(sl_bool flagRedraw);
+	void _applyCalcTransform(UIUpdateMode mode);
 	
-	void _applyFinalTransform(sl_bool flagRedraw);
+	void _applyFinalTransform(UIUpdateMode mode);
 	
 	void _invalidateInstanceTransform();
 	
-	void _refreshBorderPen(sl_bool flagRedraw);
+	void _refreshBorderPen(UIUpdateMode mode);
 	
-	void _setFontInvalidateChildren();
+	void _setFontInvalidateChildInstances();
 
-	void _applyFinalAlpha(sl_bool flagRedraw);
+	void _applyFinalAlpha(UIUpdateMode mode);
 	
 
 	void _resetTransformAnimation();
@@ -1095,8 +1097,6 @@ private:
 	Ref<ScrollBar> _createHorizontalScrollBar();
 	
 	Ref<ScrollBar> _createVerticalScrollBar();
-	
-	void _refreshScroll(sl_bool flagRedraw);
 	
 	void _getScrollBars(Ref<View> views[2]);
 	

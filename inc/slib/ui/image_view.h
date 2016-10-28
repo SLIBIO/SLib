@@ -17,17 +17,17 @@ public:
 public:
 	Ref<Drawable> getSource();
 	
-	virtual void setSource(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	virtual void setSource(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
 	ScaleMode getScaleMode();
 	
-	virtual void setScaleMode(ScaleMode mode, sl_bool flagRedraw = sl_true);
+	virtual void setScaleMode(ScaleMode scaleMode, UIUpdateMode updateMode = UIUpdateMode::Redraw);
 	
 	
 	Alignment getGravity();
 	
-	virtual void setGravity(Alignment align, sl_bool flagRedraw = sl_true);
+	virtual void setGravity(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 public:
 	// override

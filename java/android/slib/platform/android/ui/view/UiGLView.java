@@ -1,9 +1,12 @@
 package slib.platform.android.ui.view;
 
+import java.util.Vector;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import slib.platform.android.Logger;
+import slib.platform.android.ui.UiThread;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
@@ -12,6 +15,9 @@ import android.view.MotionEvent;
 import android.view.View;
 
 public class UiGLView extends GLSurfaceView implements GLSurfaceView.Renderer {
+	
+	static Object sync = new Object();
+	static Vector<UiGLView> glViewList = new Vector<UiGLView>();
 	
 	public static UiGLView _create(Context context) {
 		try {
@@ -40,6 +46,7 @@ public class UiGLView extends GLSurfaceView implements GLSurfaceView.Renderer {
 			((UiGLView)view).requestRender();				
 		}
 	}
+	
 
 	private static native void nativeOnCreate(long instance);
 	public static void onEventCreate(UiGLView view) {
@@ -87,6 +94,11 @@ public class UiGLView extends GLSurfaceView implements GLSurfaceView.Renderer {
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		onEventCreate(this);
+		synchronized (sync) {
+			if (!(glViewList.contains(this))) {
+				glViewList.add(this);			
+			}
+		}
 	}
 
 	@Override
@@ -99,6 +111,53 @@ public class UiGLView extends GLSurfaceView implements GLSurfaceView.Renderer {
 	int heightViewport = 0;
 	@Override
 	public void onDrawFrame(GL10 gl) {
+		if (UiThread.isUiThread()) {
+			Logger.info("GL UI");			
+		} else {
+			Logger.info("GL Render");
+		}
 		onEventFrame(this, widthViewport, heightViewport);
 	}
+	
+	
+	public static void removeView(View view) {
+		if (view instanceof UiGLView) {
+			synchronized (sync) {
+				glViewList.remove((UiGLView)view);
+			}
+		}
+	}
+	
+	public static void onPauseViews() {
+		synchronized (sync) {
+			try {
+				for (UiGLView view : glViewList) {
+					try {
+						view.onPause();
+					} catch (Exception e) {
+						Logger.exception(e);
+					}
+				}
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
+		}
+	}
+
+	public static void onResumeViews() {
+		synchronized (sync) {
+			try {
+				for (UiGLView view : glViewList) {
+					try {
+						view.onResume();
+					} catch (Exception e) {
+						Logger.exception(e);
+					}
+				}
+			} catch (Exception e) {
+				Logger.exception(e);
+			}
+		}
+	}
+	
 }

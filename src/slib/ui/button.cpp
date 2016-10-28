@@ -69,8 +69,8 @@ Button::Button(sl_uint32 nCategories, ButtonCategory* categories)
 {
 	setCreatingNativeWidget(sl_false);
 	
-	setAlwaysOnDrawBackground(sl_true, sl_false);
-	setAlwaysOnDrawBorder(sl_true, sl_false);
+	setAlwaysOnDrawBackground(sl_true, UIUpdateMode::Init);
+	setAlwaysOnDrawBorder(sl_true, UIUpdateMode::Init);
 	
 	m_flagDefaultButton = sl_false;
 	
@@ -120,8 +120,8 @@ Button::Button(sl_uint32 nCategories, ButtonCategory* categories)
 	setOccurringClick(sl_true);
 	setUsingFont(sl_true);
 	
-	setBorder(Pen::create(PenStyle::Solid, 1, Color(100, 100, 100)), sl_false);
-	setBackground(ColorDrawable::create(Color(240, 240, 240)), sl_false);
+	setBorder(Pen::create(PenStyle::Solid, 1, Color(100, 100, 100)), UIUpdateMode::Init);
+	setBackground(ColorDrawable::create(Color(240, 240, 240)), UIUpdateMode::Init);
 	m_textColorDefault = Color::Black;
 
 }
@@ -136,13 +136,13 @@ String Button::getText()
 	return m_text;
 }
 
-void Button::setText(const String& text, sl_bool flagRedraw)
+void Button::setText(const String& text, UIUpdateMode mode)
 {
 	m_text = text;
 	if (isNativeWidget()) {
 		_setText_NW(text);
 	} else {
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -153,18 +153,18 @@ sl_bool Button::isDefaultButton()
 	return m_flagDefaultButton;
 }
 
-void Button::setDefaultButton(sl_bool flag, sl_bool flagRedraw)
+void Button::setDefaultButton(sl_bool flag, UIUpdateMode mode)
 {
 	m_flagDefaultButton = flag;
 	if (flag) {
-		setCurrentCategory(1);
+		setCurrentCategory(1, UIUpdateMode::NoRedraw);
 	} else {
-		setCurrentCategory(0);
+		setCurrentCategory(0, UIUpdateMode::NoRedraw);
 	}
 	if (isNativeWidget()) {
 		_setDefaultButton_NW(flag);
 	} else {
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}		
 	}
@@ -185,11 +185,11 @@ sl_uint32 Button::getCurrentCategory()
 	return m_category;
 }
 
-void Button::setCurrentCategory(sl_uint32 n, sl_bool flagRedraw)
+void Button::setCurrentCategory(sl_uint32 n, UIUpdateMode mode)
 {
 	if (n < m_nCategories) {
 		m_category = n;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -200,22 +200,22 @@ const UISize& Button::getIconSize()
 	return m_iconSize;
 }
 
-void Button::setIconSize(const UISize& size, sl_bool flagRedraw)
+void Button::setIconSize(const UISize& size, UIUpdateMode mode)
 {
 	m_iconSize = size;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void Button::setIconSize(sl_ui_len width, sl_ui_len height, sl_bool flagRedraw)
+void Button::setIconSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode)
 {
-	setIconSize(UISize(width, height), flagRedraw);
+	setIconSize(UISize(width, height), mode);
 }
 
-void Button::setIconSize(sl_ui_len size, sl_bool flagRedraw)
+void Button::setIconSize(sl_ui_len size, UIUpdateMode mode)
 {
-	setIconSize(UISize(size, size),flagRedraw);
+	setIconSize(UISize(size, size), mode);
 }
 
 sl_ui_len Button::getIconWidth()
@@ -223,9 +223,9 @@ sl_ui_len Button::getIconWidth()
 	return m_iconSize.x;
 }
 
-void Button::setIconWidth(sl_ui_len width, sl_bool flagRedraw)
+void Button::setIconWidth(sl_ui_len width, UIUpdateMode mode)
 {
-	setIconSize(UISize(width, m_iconSize.y), flagRedraw);
+	setIconSize(UISize(width, m_iconSize.y), mode);
 }
 
 sl_ui_len Button::getIconHeight()
@@ -233,9 +233,9 @@ sl_ui_len Button::getIconHeight()
 	return m_iconSize.y;
 }
 
-void Button::setIconHeight(sl_ui_len height, sl_bool flagRedraw)
+void Button::setIconHeight(sl_ui_len height, UIUpdateMode mode)
 {
-	setIconSize(UISize(m_iconSize.x, height), flagRedraw);
+	setIconSize(UISize(m_iconSize.x, height), mode);
 }
 
 Alignment Button::getGravity()
@@ -243,10 +243,10 @@ Alignment Button::getGravity()
 	return m_gravity;
 }
 
-void Button::setGravity(Alignment align, sl_bool flagRedraw)
+void Button::setGravity(Alignment align, UIUpdateMode mode)
 {
 	m_gravity = align;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -256,10 +256,10 @@ Alignment Button::getIconAlignment()
 	return m_iconAlignment;
 }
 
-void Button::setIconAlignment(Alignment align, sl_bool flagRedraw)
+void Button::setIconAlignment(Alignment align, UIUpdateMode mode)
 {
 	m_iconAlignment = align;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -269,10 +269,10 @@ Alignment Button::getTextAlignment()
 	return m_textAlignment;
 }
 
-void Button::setTextAlignment(Alignment align, sl_bool flagRedraw)
+void Button::setTextAlignment(Alignment align, UIUpdateMode mode)
 {
 	m_textAlignment = align;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -282,10 +282,10 @@ sl_bool Button::isTextBeforeIcon()
 	return m_flagTextBeforeIcon;
 }
 
-void Button::setTextBeforeIcon(sl_bool flag, sl_bool flagRedraw)
+void Button::setTextBeforeIcon(sl_bool flag, UIUpdateMode mode)
 {
 	m_flagTextBeforeIcon = flag;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -295,28 +295,28 @@ LayoutOrientation Button::getLayoutOrientation()
 	return m_layoutOrientation;
 }
 
-void Button::setLayoutOrientation(LayoutOrientation orientation, sl_bool flagRedraw)
+void Button::setLayoutOrientation(LayoutOrientation orientation, UIUpdateMode mode)
 {
 	m_layoutOrientation = orientation;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void Button::setIconMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw)
+void Button::setIconMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode)
 {
 	m_iconMarginLeft = left;
 	m_iconMarginTop = top;
 	m_iconMarginRight = right;
 	m_iconMarginBottom = bottom;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void Button::setIconMargin(sl_ui_pos margin, sl_bool flagRedraw)
+void Button::setIconMargin(sl_ui_pos margin, UIUpdateMode mode)
 {
-	setIconMargin(margin, margin, margin, margin, flagRedraw);
+	setIconMargin(margin, margin, margin, margin, mode);
 }
 
 sl_ui_pos Button::getIconMarginLeft()
@@ -324,9 +324,9 @@ sl_ui_pos Button::getIconMarginLeft()
 	return m_iconMarginLeft;
 }
 
-void Button::setIconMarginLeft(sl_ui_pos margin, sl_bool flagRedraw)
+void Button::setIconMarginLeft(sl_ui_pos margin, UIUpdateMode mode)
 {
-	setIconMargin(margin, m_iconMarginTop, m_iconMarginRight, m_iconMarginBottom, flagRedraw);
+	setIconMargin(margin, m_iconMarginTop, m_iconMarginRight, m_iconMarginBottom, mode);
 }
 
 sl_ui_pos Button::getIconMarginTop()
@@ -334,9 +334,9 @@ sl_ui_pos Button::getIconMarginTop()
 	return m_iconMarginTop;
 }
 
-void Button::setIconMarginTop(sl_ui_pos margin, sl_bool flagRedraw)
+void Button::setIconMarginTop(sl_ui_pos margin, UIUpdateMode mode)
 {
-	setIconMargin(m_iconMarginLeft, margin, m_iconMarginRight, m_iconMarginBottom, flagRedraw);
+	setIconMargin(m_iconMarginLeft, margin, m_iconMarginRight, m_iconMarginBottom, mode);
 }
 
 sl_ui_pos Button::getIconMarginRight()
@@ -344,9 +344,9 @@ sl_ui_pos Button::getIconMarginRight()
 	return m_iconMarginRight;
 }
 
-void Button::setIconMarginRight(sl_ui_pos margin, sl_bool flagRedraw)
+void Button::setIconMarginRight(sl_ui_pos margin, UIUpdateMode mode)
 {
-	setIconMargin(m_iconMarginLeft, m_iconMarginTop, margin, m_iconMarginBottom, flagRedraw);
+	setIconMargin(m_iconMarginLeft, m_iconMarginTop, margin, m_iconMarginBottom, mode);
 }
 
 sl_ui_pos Button::getIconMarginBottom()
@@ -354,25 +354,25 @@ sl_ui_pos Button::getIconMarginBottom()
 	return m_iconMarginBottom;
 }
 
-void Button::setIconMarginBottom(sl_ui_pos margin, sl_bool flagRedraw)
+void Button::setIconMarginBottom(sl_ui_pos margin, UIUpdateMode mode)
 {
-	setIconMargin(m_iconMarginLeft, m_iconMarginTop, m_iconMarginRight, margin, flagRedraw);
+	setIconMargin(m_iconMarginLeft, m_iconMarginTop, m_iconMarginRight, margin, mode);
 }
 
-void Button::setTextMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw)
+void Button::setTextMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode)
 {
 	m_textMarginLeft = left;
 	m_textMarginTop = top;
 	m_textMarginRight = right;
 	m_textMarginBottom = bottom;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void Button::setTextMargin(sl_ui_pos margin, sl_bool flagRedraw)
+void Button::setTextMargin(sl_ui_pos margin, UIUpdateMode mode)
 {
-	setTextMargin(margin, margin, margin, margin, flagRedraw);
+	setTextMargin(margin, margin, margin, margin, mode);
 }
 
 sl_ui_pos Button::getTextMarginLeft()
@@ -380,9 +380,9 @@ sl_ui_pos Button::getTextMarginLeft()
 	return m_textMarginLeft;
 }
 
-void Button::setTextMarginLeft(sl_ui_pos margin, sl_bool flagRedraw)
+void Button::setTextMarginLeft(sl_ui_pos margin, UIUpdateMode mode)
 {
-	setTextMargin(margin, m_textMarginTop, m_textMarginRight, m_textMarginBottom, flagRedraw);
+	setTextMargin(margin, m_textMarginTop, m_textMarginRight, m_textMarginBottom, mode);
 }
 
 sl_ui_pos Button::getTextMarginTop()
@@ -390,9 +390,9 @@ sl_ui_pos Button::getTextMarginTop()
 	return m_textMarginTop;
 }
 
-void Button::setTextMarginTop(sl_ui_pos margin, sl_bool flagRedraw)
+void Button::setTextMarginTop(sl_ui_pos margin, UIUpdateMode mode)
 {
-	setTextMargin(m_textMarginLeft, margin, m_textMarginRight, m_textMarginBottom, flagRedraw);
+	setTextMargin(m_textMarginLeft, margin, m_textMarginRight, m_textMarginBottom, mode);
 }
 
 sl_ui_pos Button::getTextMarginRight()
@@ -400,9 +400,9 @@ sl_ui_pos Button::getTextMarginRight()
 	return m_textMarginRight;
 }
 
-void Button::setTextMarginRight(sl_ui_pos margin, sl_bool flagRedraw)
+void Button::setTextMarginRight(sl_ui_pos margin, UIUpdateMode mode)
 {
-	setTextMargin(m_textMarginLeft, m_textMarginTop, margin, m_textMarginBottom, flagRedraw);
+	setTextMargin(m_textMarginLeft, m_textMarginTop, margin, m_textMarginBottom, mode);
 }
 
 sl_ui_pos Button::getTextMarginBottom()
@@ -410,9 +410,9 @@ sl_ui_pos Button::getTextMarginBottom()
 	return m_textMarginBottom;
 }
 
-void Button::setTextMarginBottom(sl_ui_pos margin, sl_bool flagRedraw)
+void Button::setTextMarginBottom(sl_ui_pos margin, UIUpdateMode mode)
 {
-	setTextMargin(m_textMarginLeft, m_textMarginTop, m_textMarginRight, margin, flagRedraw);
+	setTextMargin(m_textMarginLeft, m_textMarginTop, m_textMarginRight, margin, mode);
 }
 
 Color Button::getTextColor(ButtonState state, sl_uint32 category)
@@ -424,11 +424,11 @@ Color Button::getTextColor(ButtonState state, sl_uint32 category)
 	}
 }
 
-void Button::setTextColor(const Color& color, ButtonState state, sl_uint32 category, sl_bool flagRedraw)
+void Button::setTextColor(const Color& color, ButtonState state, sl_uint32 category, UIUpdateMode mode)
 {
 	if (category < m_nCategories) {
 		m_categories[category].properties[(int)state].textColor = color;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -439,10 +439,10 @@ Color Button::getTextColor()
 	return m_textColorDefault;
 }
 
-void Button::setTextColor(const Color& color, sl_bool flagRedraw)
+void Button::setTextColor(const Color& color, UIUpdateMode mode)
 {
 	m_textColorDefault = color;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -456,11 +456,11 @@ Ref<Drawable> Button::getIcon(ButtonState state, sl_uint32 category)
 	}
 }
 
-void Button::setIcon(const Ref<Drawable>& icon, ButtonState state, sl_uint32 category, sl_bool flagRedraw)
+void Button::setIcon(const Ref<Drawable>& icon, ButtonState state, sl_uint32 category, UIUpdateMode mode)
 {
 	if (category < m_nCategories) {
 		m_categories[category].properties[(int)state].icon = icon;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -471,10 +471,10 @@ Ref<Drawable> Button::getIcon()
 	return m_iconDefault;
 }
 
-void Button::setIcon(const Ref<Drawable>& icon, sl_bool flagRedraw)
+void Button::setIcon(const Ref<Drawable>& icon, UIUpdateMode mode)
 {
 	m_iconDefault = icon;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -488,19 +488,19 @@ Ref<Drawable> Button::getBackground(ButtonState state, sl_uint32 category)
 	}
 }
 
-void Button::setBackground(const Ref<Drawable>& background, ButtonState state, sl_uint32 category, sl_bool flagRedraw)
+void Button::setBackground(const Ref<Drawable>& background, ButtonState state, sl_uint32 category, UIUpdateMode mode)
 {
 	if (category < m_nCategories) {
 		m_categories[category].properties[(int)state].background = background;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
 }
 
-void Button::setBackground(const Color& color, ButtonState state, sl_uint32 category, sl_bool flagRedraw)
+void Button::setBackground(const Color& color, ButtonState state, sl_uint32 category, UIUpdateMode mode)
 {
-	setBackground(Drawable::createColorDrawable(color), state, category, flagRedraw);
+	setBackground(Drawable::createColorDrawable(color), state, category, mode);
 }
 
 Ref<Drawable> Button::getBackground()
@@ -508,9 +508,9 @@ Ref<Drawable> Button::getBackground()
 	return View::getBackground();
 }
 
-void Button::setBackground(const Ref<Drawable>& background, sl_bool flagRedraw)
+void Button::setBackground(const Ref<Drawable>& background, UIUpdateMode mode)
 {
-	View::setBackground(background, flagRedraw);
+	View::setBackground(background, mode);
 }
 
 Ref<Pen> Button::getBorder(ButtonState state, sl_uint32 category)
@@ -522,11 +522,11 @@ Ref<Pen> Button::getBorder(ButtonState state, sl_uint32 category)
 	}
 }
 
-void Button::setBorder(const Ref<Pen>& pen, ButtonState state, sl_uint32 category, sl_bool flagRedraw)
+void Button::setBorder(const Ref<Pen>& pen, ButtonState state, sl_uint32 category, UIUpdateMode mode)
 {
 	if (category < m_nCategories) {
 		m_categories[category].properties[(int)state].border = pen;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -537,14 +537,14 @@ Ref<Pen> Button::getBorder()
 	return View::getBorder();
 }
 
-void Button::setBorder(const Ref<Pen>& pen, sl_bool flagRedraw)
+void Button::setBorder(const Ref<Pen>& pen, UIUpdateMode mode)
 {
-	View::setBorder(pen, flagRedraw);
+	View::setBorder(pen, mode);
 }
 
-void Button::setBorder(sl_bool flagBorder, sl_bool flagRedraw)
+void Button::setBorder(sl_bool flagBorder, UIUpdateMode mode)
 {
-	View::setBorder(flagBorder, flagRedraw);
+	View::setBorder(flagBorder, mode);
 }
 
 sl_bool Button::isUsingDefaultColorFilter()
@@ -552,42 +552,42 @@ sl_bool Button::isUsingDefaultColorFilter()
 	return m_flagUseDefaultColorFilter;
 }
 
-void Button::setUsingDefaultColorFilter(sl_bool flag, sl_bool flagRedraw)
+void Button::setUsingDefaultColorFilter(sl_bool flag, UIUpdateMode mode)
 {
 	m_flagUseDefaultColorFilter = flag;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void Button::setEnabled(sl_bool flagEnabled, sl_bool flagRedraw)
+void Button::setEnabled(sl_bool flagEnabled, UIUpdateMode mode)
 {
 	if (isEnabled() != flagEnabled) {
-		View::setEnabled(flagEnabled, sl_false);
+		View::setEnabled(flagEnabled, UIUpdateMode::NoRedraw);
 		_invalidateButtonState();
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
 }
 
-void Button::setPressedState(sl_bool flagState, sl_bool flagRedraw)
+void Button::setPressedState(sl_bool flagState, UIUpdateMode mode)
 {
 	if (isPressedState() != flagState) {
-		View::setPressedState(flagState, sl_false);
+		View::setPressedState(flagState, UIUpdateMode::NoRedraw);
 		_invalidateButtonState();
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
 }
 
-void Button::setHoverState(sl_bool flagState, sl_bool flagRedraw)
+void Button::setHoverState(sl_bool flagState, UIUpdateMode mode)
 {
 	if (isHoverState() != flagState) {
-		View::setHoverState(flagState, sl_false);
+		View::setHoverState(flagState, UIUpdateMode::NoRedraw);
 		_invalidateButtonState();
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}

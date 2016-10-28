@@ -98,6 +98,7 @@ void _ViewStack_FinishAnimation(Ref<ViewStack> stack, Ref<View> view, UIPageActi
 				stack->removeChild(view);
 				break;
 			default:
+				view->setEnabled(sl_true);
 				break;
 		}
 		view->resetAnimations();
@@ -116,11 +117,11 @@ void ViewStack::_push(Ref<View> viewIn, Transition transition, sl_bool flagRemov
 	
 	if (n == 0) {
 		m_pages.add_NoLock(viewIn);
-		viewIn->setFrame(getBounds(), sl_false);
-		addChild(viewIn, sl_false);
+		viewIn->setFrame(getBounds(), UIUpdateMode::NoRedraw);
+		addChild(viewIn, UIUpdateMode::NoRedraw);
 		dispatchPageAction(viewIn.ptr, UIPageAction::Push);
 		dispatchFinishPageAnimation(viewIn.ptr, UIPageAction::Push);
-		viewIn->setVisibility(Visibility::Visible, sl_false);
+		viewIn->setVisibility(Visibility::Visible, UIUpdateMode::NoRedraw);
 		viewIn->bringToFront();
 		return;
 	}
@@ -131,14 +132,17 @@ void ViewStack::_push(Ref<View> viewIn, Transition transition, sl_bool flagRemov
 		return;
 	}
 	
-	viewIn->setFrame(getBounds(), sl_false);
+	viewIn->setFrame(getBounds(), UIUpdateMode::NoRedraw);
+	
+	viewBack->setEnabled(sl_false, UIUpdateMode::NoRedraw);
+	viewIn->setEnabled(sl_false, UIUpdateMode::NoRedraw);
 	
 	_applyDefaultPushTransition(transition);
 	Ref<Animation> animationPause = Transition::createAnimation(viewBack, transition, UIPageAction::Pause, SLIB_CALLBACK(_ViewStack_FinishAnimation, Ref<ViewStack>(this), viewBack, UIPageAction::Pause));
 	
 	Ref<Animation> animationPush = Transition::createAnimation(viewIn, transition, UIPageAction::Push, SLIB_CALLBACK(_ViewStack_FinishAnimation, Ref<ViewStack>(this), viewIn, UIPageAction::Push));
 	
-	addChild(viewIn, sl_false);
+	addChild(viewIn, UIUpdateMode::NoRedraw);
 	
 	dispatchPageAction(viewBack.ptr, UIPageAction::Pause);
 	
@@ -160,7 +164,7 @@ void ViewStack::_push(Ref<View> viewIn, Transition transition, sl_bool flagRemov
 		animationPush->start(now);
 	}
 
-	viewIn->bringToFront(sl_false);
+	viewIn->bringToFront(UIUpdateMode::NoRedraw);
 	viewIn->setVisibility(Visibility::Visible);
 	
 	if (animationPause.isNull()) {
@@ -209,19 +213,22 @@ void ViewStack::_pop(Ref<View> _viewOut, Transition transition)
 		dispatchPageAction(viewOut.ptr, UIPageAction::Pop);
 		dispatchFinishPageAnimation(viewOut.ptr, UIPageAction::Pop);
 		removeChild(viewOut);
-		viewOut->setVisibility(Visibility::Hidden, sl_false);
+		viewOut->setVisibility(Visibility::Hidden, UIUpdateMode::NoRedraw);
 		m_pages.removeAll_NoLock();
 		return;
 	}
 	
 	Ref<View> viewBack = *(m_pages.getItemPtr(n-2));
 	
+	viewBack->setEnabled(sl_false, UIUpdateMode::NoRedraw);
+	viewOut->setEnabled(sl_false, UIUpdateMode::NoRedraw);
+	
 	_applyDefaultPopTransition(transition);
 	Ref<Animation> animationPop = Transition::createAnimation(viewOut, transition, UIPageAction::Pop, SLIB_CALLBACK(_ViewStack_FinishAnimation, Ref<ViewStack>(this), viewOut, UIPageAction::Pop));
 	
 	Ref<Animation> animationResume = Transition::createAnimation(viewBack, transition, UIPageAction::Resume, SLIB_CALLBACK(_ViewStack_FinishAnimation, Ref<ViewStack>(this), viewBack, UIPageAction::Resume));
 	
-	addChild(viewBack, sl_false);
+	addChild(viewBack, UIUpdateMode::NoRedraw);
 
 	dispatchPageAction(viewOut.ptr, UIPageAction::Pop);
 	dispatchPageAction(viewBack.ptr, UIPageAction::Resume);
@@ -234,8 +241,8 @@ void ViewStack::_pop(Ref<View> _viewOut, Transition transition)
 		animationResume->start(now);
 	}
 	
-	viewBack->bringToFront(sl_false);
-	viewOut->bringToFront(sl_false);
+	viewBack->bringToFront(UIUpdateMode::NoRedraw);
+	viewOut->bringToFront(UIUpdateMode::NoRedraw);
 	
 	viewBack->setVisibility(Visibility::Visible);
 	
@@ -504,6 +511,7 @@ void ViewPage::close(const Transition& transition)
 		if (m_flagClosingPopup) {
 			return;
 		}
+		m_flagClosingPopup = sl_true;
 		if (UI::isUiThread()) {
 			_closePopup(transition);
 		} else {
@@ -742,9 +750,9 @@ void ViewPage::_openPopup(Ref<View> parent, Transition transition, sl_bool flagF
 			color = getGlobalPopupBackgroundColor();
 		}
 		back->setBackgroundColor(Color(0, 0, 0, 100));
-		back->setWidthFilling(1, sl_false);
-		back->setHeightFilling(1, sl_false);
-		back->addChild(this);
+		back->setWidthFilling(1, UIUpdateMode::Init);
+		back->setHeightFilling(1, UIUpdateMode::Init);
+		back->addChild(this, UIUpdateMode::Init);
 		viewAdd = back;
 	} else {
 		viewAdd = this;
@@ -752,9 +760,11 @@ void ViewPage::_openPopup(Ref<View> parent, Transition transition, sl_bool flagF
 	
 	_applyDefaultOpeningPopupTransition(transition);
 	
+	setEnabled(sl_false, UIUpdateMode::NoRedraw);
+	
 	Ref<Animation> animation = Transition::createPopupAnimation(this, transition, UIPageAction::Push, SLIB_CALLBACK_WEAKREF(ViewPage, _finishPopupAnimation, this, UIPageAction::Push));
 	
-	parent->addChild(viewAdd, sl_false);
+	parent->addChild(viewAdd, UIUpdateMode::NoRedraw);
 	
 	dispatchOpen();
 	
@@ -775,6 +785,8 @@ void ViewPage::_closePopup(Transition transition)
 	ObjectLocker lock(this);
 	
 	_applyDefaultClosingPopupTransition(transition);
+	
+	setEnabled(sl_false, UIUpdateMode::NoRedraw);
 	
 	Ref<Animation> animation = Transition::createPopupAnimation(this, transition, UIPageAction::Pop, SLIB_CALLBACK_REF(ViewPage, _finishPopupAnimation, this, UIPageAction::Pop));
 	
@@ -798,13 +810,15 @@ void ViewPage::_finishPopupAnimation(UIPageAction action)
 	if (action == UIPageAction::Pop) {
 		
 		Ref<View> parent = getParent();
-		if (_ViewPagePopupBackground::checkInstance(parent.ptr)) {
-			Ref<View> parent2 = parent->getParent();
-			if (parent2.isNotNull()) {
-				parent2->removeChild(parent);
+		if (parent.isNotNull()) {
+			if (_ViewPagePopupBackground::checkInstance(parent.ptr)) {
+				Ref<View> parent2 = parent->getParent();
+				if (parent2.isNotNull()) {
+					parent2->removeChild(parent);
+				}
+			} else {
+				parent->removeChild(this);
 			}
-		} else {
-			parent->removeChild(this);
 		}
 		
 		Ref<MobileApp> mobile = MobileApp::getApp();
@@ -830,6 +844,8 @@ void ViewPage::_finishPopupAnimation(UIPageAction action)
 		
 		m_flagDidPopup = sl_false;
 		
+	} else {
+		setEnabled(sl_true, UIUpdateMode::NoRedraw);
 	}
 	resetAnimations();
 }

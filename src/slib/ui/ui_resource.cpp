@@ -82,15 +82,17 @@ void UILayoutResource::setScaledPixel(sl_real sp)
 // avoid recursively layouting
 void UILayoutResource::_layoutViews_safe(sl_ui_len width, sl_ui_len height)
 {
-	if (!m_flagInitialized) {
-		return;
+	if (width > 0 && height > 0) {
+		if (!m_flagInitialized) {
+			return;
+		}
+		sl_int32 n = Base::interlockedIncrement32(&m_countRecursiveLayout);
+		if (n == 1) {
+			layoutViews(width, height);
+			m_contentView->invalidate();
+		}
+		Base::interlockedDecrement32(&m_countRecursiveLayout);
 	}
-	sl_int32 n = Base::interlockedIncrement32(&m_countRecursiveLayout);
-	if (n == 1) {
-		layoutViews(width, height);
-		m_contentView->invalidate();
-	}
-	Base::interlockedDecrement32(&m_countRecursiveLayout);
 }
 
 void UILayoutResource::setInitialized()
@@ -107,6 +109,11 @@ WindowLayoutResource::WindowLayoutResource(sl_real sp)
 	Ref<View> view = Window::getContentView();
 	m_contentViewRef = view;
 	m_contentView = view.ptr;
+}
+
+UISize WindowLayoutResource::getContentSize()
+{
+	return getClientSize();
 }
 
 void WindowLayoutResource::dispatchResize(sl_ui_len width, sl_ui_len height)
@@ -131,6 +138,11 @@ ViewLayoutResource::ViewLayoutResource(sl_real sp)
 	m_contentView = this;
 }
 
+UISize ViewLayoutResource::getContentSize()
+{
+	return getSize();
+}
+
 void ViewLayoutResource::dispatchResize(sl_ui_len width, sl_ui_len height)
 {
 	_layoutViews_safe(width, height);
@@ -145,6 +157,11 @@ PageLayoutResource::PageLayoutResource(sl_real sp)
 {
 	SLIB_REFERABLE_CONSTRUCTOR
 	m_contentView = this;
+}
+
+UISize PageLayoutResource::getContentSize()
+{
+	return getSize();
 }
 
 void PageLayoutResource::dispatchResize(sl_ui_len width, sl_ui_len height)

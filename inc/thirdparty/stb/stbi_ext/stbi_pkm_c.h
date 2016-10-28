@@ -53,7 +53,7 @@ int      stbi__pkm_test_filename        		(char const *filename)
 int      stbi__pkm_test_file        (FILE *f)
 {
    stbi__context s;
-   int r,n = ftell(f);
+   int r,n = (int)(ftell(f));
    stbi__start_file(&s,f);
    r = stbi__pkm_test(&s);
    fseek(f,n,SEEK_SET);

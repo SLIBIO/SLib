@@ -26,6 +26,8 @@ class SLIB_EXPORT GLRenderEngine : public RenderEngine
 public:
 	virtual sl_int32 getAttributeLocation(sl_uint32 program, const char* name) = 0;
 	
+	sl_int32 getAttributeLocation(sl_uint32 program, const String& name);
+	
 	virtual void setVertexFloatArrayAttributePtr(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes = 0, sl_bool flagDoNormalize = sl_false) = 0;
 	
 	virtual void setVertexFloatArrayAttribute(sl_int32 attributeLocation, sl_size offsetValuesOnBuffer, sl_uint32 countComponents, sl_uint32 strideBytes = 0, sl_bool flagDoNormalize = sl_false) = 0;
@@ -50,6 +52,8 @@ public:
 
 	
 	virtual sl_int32 getUniformLocation(sl_uint32 program, const char* name) = 0;
+	
+	sl_int32 getUniformLocation(sl_uint32 program, const String& name);
 	
 	virtual void setUniformFloatValue(sl_int32 uniformLocation, float value) = 0;
 	

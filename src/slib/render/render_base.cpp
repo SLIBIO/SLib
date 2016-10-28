@@ -6,11 +6,16 @@ SLIB_RENDER_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(RenderBaseObjectInstance, Object)
 
-void RenderBaseObjectInstance::linkObject(RenderEngine* engine, RenderBaseObject* object)
+RenderBaseObjectInstance::RenderBaseObjectInstance()
 {
-	object->linkEngine(engine, this);
+	m_flagUpdated = sl_false;
+}
+
+void RenderBaseObjectInstance::link(const Ref<RenderEngine>& engine, const Ref<RenderBaseObject>& object)
+{
 	m_object = object;
 	m_engine = engine;
+	object->addInstance(this);
 }
 
 Ref<RenderBaseObject> RenderBaseObjectInstance::getObject()
@@ -23,49 +28,98 @@ Ref<RenderEngine> RenderBaseObjectInstance::getEngine()
 	return m_engine;
 }
 
+void RenderBaseObjectInstance::onUpdate(RenderBaseObject* object)
+{
+}
+
+void RenderBaseObjectInstance::_update(RenderBaseObject* object)
+{
+	if (m_flagUpdated) {
+		m_flagUpdated = sl_false;
+		onUpdate(object);
+	}
+}
 
 SLIB_DEFINE_OBJECT(RenderBaseObject, Object)
 
-RenderBaseObject::RenderBaseObject()
+void RenderBaseObject::addInstance(const Ref<RenderBaseObjectInstance>& instanceNew)
 {
+	if (instanceNew.isNull()) {
+		return;
+	}
+	Ref<RenderEngine> engineNew(instanceNew->m_engine);
+	if (engineNew.isNull()) {
+		return;
+	}
+	int indexEmpty = -1;
+	int i;
+	for (i = 0; i < SLIB_MAX_RENDER_ENGINE_COUNT_PER_OBJECT; i++) {
+		Ref<RenderBaseObjectInstance> instance = m_instances[i];
+		if (instance.isNotNull()) {
+			if (instance == instanceNew) {
+				return;
+			}
+			Ref<RenderEngine> engine(instance->m_engine);
+			if (engine.isNotNull()) {
+				if (engine.ptr == engineNew.ptr) {
+					return;
+				}
+			} else {
+				indexEmpty = i;
+				m_instances[i].setNull();
+			}
+		} else {
+			indexEmpty = i;
+		}
+	}
+	if (indexEmpty >= 0) {
+		m_instances[indexEmpty] = instanceNew;
+	} else {
+		for (i = 0; i < SLIB_MAX_RENDER_ENGINE_COUNT_PER_OBJECT - 1; i++) {
+			m_instances[i] = m_instances[i+1];
+		}
+		m_instances[i] = instanceNew;
+	}
 }
 
-RenderBaseObject::~RenderBaseObject()
+void RenderBaseObject::removeInstance(const Ref<RenderBaseObjectInstance>& instanceRemove)
 {
-	unlinkEngine();
-}
-
-void RenderBaseObject::linkEngine(const Ref<RenderEngine>& engine, const Ref<RenderBaseObjectInstance>& instance)
-{
-	Ref<RenderEngine> engineOld(m_engine);
-	if (engine != engineOld) {
-		unlinkEngine();
-		if (engine.isNotNull() && instance.isNotNull()) {
-			m_engine = engine;
-			m_instance = instance;
+	if (instanceRemove.isNull()) {
+		return;
+	}
+	for (int i = 0; i < SLIB_MAX_RENDER_ENGINE_COUNT_PER_OBJECT; i++) {
+		if (m_instances[i] == instanceRemove) {
+			m_instances[i].setNull();
+			break;
 		}
 	}
 }
 
-void RenderBaseObject::unlinkEngine()
+void RenderBaseObject::removeAllInstances()
 {
-	Ref<RenderEngine> engine(m_engine);
-	Ref<RenderBaseObjectInstance> instance(m_instance);
-	if (engine.isNotNull() && instance.isNotNull()) {
-		engine->_onFreeInstance(instance.ptr);
+	for (int i = 0; i < SLIB_MAX_RENDER_ENGINE_COUNT_PER_OBJECT; i++) {
+		m_instances[i].setNull();
 	}
-	m_engine.setNull();
-	m_instance.setNull();
 }
 
-Ref<RenderEngine> RenderBaseObject::getEngine()
+Ref<RenderBaseObjectInstance> RenderBaseObject::getInstance(RenderEngine* engine)
 {
-	return m_engine;
-}
-
-Ref<RenderBaseObjectInstance> RenderBaseObject::getInstance()
-{
-	return m_instance;
+	if (engine) {
+		for (int i = 0; i < SLIB_MAX_RENDER_ENGINE_COUNT_PER_OBJECT; i++) {
+			Ref<RenderBaseObjectInstance> instance = m_instances[i];
+			if (instance.isNotNull()) {
+				Ref<RenderEngine> instanceEngine(instance->m_engine);
+				if (instanceEngine.isNotNull()) {
+					if (instanceEngine.ptr == engine) {
+						return instance;
+					}
+				} else {
+					m_instances[i].setNull();
+				}
+			}
+		}
+	}
+	return Ref<RenderBaseObjectInstance>::null();
 }
 
 SLIB_RENDER_NAMESPACE_END

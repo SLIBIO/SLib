@@ -15,10 +15,10 @@ Ref<Drawable> ImageView::getSource()
 	return m_source;
 }
 
-void ImageView::setSource(const Ref<Drawable>& source, sl_bool flagRedraw)
+void ImageView::setSource(const Ref<Drawable>& source, UIUpdateMode mode)
 {
 	m_source = source;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -28,10 +28,10 @@ ScaleMode ImageView::getScaleMode()
 	return m_scaleMode;
 }
 
-void ImageView::setScaleMode(ScaleMode mode, sl_bool flagRedraw)
+void ImageView::setScaleMode(ScaleMode scaleMode, UIUpdateMode updateMode)
 {
-	m_scaleMode = mode;
-	if (flagRedraw) {
+	m_scaleMode = scaleMode;
+	if (updateMode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -41,10 +41,10 @@ Alignment ImageView::getGravity()
 	return m_gravity;
 }
 
-void ImageView::setGravity(Alignment align, sl_bool flagRedraw)
+void ImageView::setGravity(Alignment align, UIUpdateMode mode)
 {
 	m_gravity = align;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }

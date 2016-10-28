@@ -47,23 +47,23 @@ public:
 	
 	Ref<TreeViewItem> getChild(sl_size index);
 	
-	void addChild(const Ref<TreeViewItem>& item, sl_bool flagRedraw = sl_true);
+	void addChild(const Ref<TreeViewItem>& item, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	Ref<TreeViewItem> addChild(const String& text, const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
+	Ref<TreeViewItem> addChild(const String& text, const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	Ref<TreeViewItem> addChild(const String& text, sl_bool flagRedraw = sl_true);
+	Ref<TreeViewItem> addChild(const String& text, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void insertChild(sl_size index, const Ref<TreeViewItem>& item, sl_bool flagRedraw = sl_true);
+	void insertChild(sl_size index, const Ref<TreeViewItem>& item, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	Ref<TreeViewItem> insertChild(sl_size index, const String& text, const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
+	Ref<TreeViewItem> insertChild(sl_size index, const String& text, const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	Ref<TreeViewItem> insertChild(sl_size index, const String& text, sl_bool flagRedraw = sl_true);
+	Ref<TreeViewItem> insertChild(sl_size index, const String& text, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void removeChild(sl_size index, sl_bool flagRedraw = sl_true);
+	void removeChild(sl_size index, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void removeChild(const Ref<TreeViewItem>& item, sl_bool flagRedraw = sl_true);
+	void removeChild(const Ref<TreeViewItem>& item, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void removeAllChildren(sl_bool flagRedraw = sl_true);
+	void removeAllChildren(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isRoot();
 	
@@ -73,45 +73,45 @@ public:
 	
 	sl_bool isVisible();
 	
-	void open(sl_bool flagRedraw = sl_true);
+	void open(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void close(sl_bool flagRedraw = sl_true);
+	void close(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	String getText();
 	
-	void setText(const String& text, sl_bool flagRedraw = sl_true);
+	void setText(const String& text, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getIcon();
 	
-	void setIcon(const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
+	void setIcon(const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getOpenedIcon();
 	
-	void setOpenedIcon(const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
+	void setOpenedIcon(const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getClosedIcon();
 	
-	void setClosedIcon(const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
+	void setClosedIcon(const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<View> getCustomView();
 	
-	void setCustomView(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	void setCustomView(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Color getTextColor();
 	
-	void setTextColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Color getHoverTextColor();
 	
-	void setHoverTextColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setHoverTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Color getSelectedTextColor();
 	
-	void setSelectedTextColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setSelectedTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_len getHeight();
 	
-	void setHeight(sl_ui_len height, sl_bool flagRedraw = sl_true);
+	void setHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 public:
 	SLIB_REF_PROPERTY(Runnable, OnSelect)
@@ -119,13 +119,13 @@ public:
 	SLIB_VARIANT_PROPERTY(UserData)
 	
 private:
-	void _addChild(TreeViewItem* item, sl_bool flagRedraw);
+	void _addChild(TreeViewItem* item, UIUpdateMode mode);
 	
 	void _removeChild(TreeViewItem* item);
 
 	void _setTreeViewHierarchy(TreeView* view, sl_uint32 level);
 	
-	void _relayoutTree(sl_bool flagRedraw);
+	void _relayoutTree(UIUpdateMode mode);
 	
 	void _redrawTree();
 	
@@ -174,75 +174,75 @@ public:
 	
 	Ref<TreeViewItem> getItem(sl_size index);
 	
-	void addItem(const Ref<TreeViewItem>& item, sl_bool flagRedraw = sl_true);
+	void addItem(const Ref<TreeViewItem>& item, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	Ref<TreeViewItem> addItem(const String& text, const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
+	Ref<TreeViewItem> addItem(const String& text, const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	Ref<TreeViewItem> addItem(const String& text, sl_bool flagRedraw = sl_true);
+	Ref<TreeViewItem> addItem(const String& text, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void insertItem(sl_size index, const Ref<TreeViewItem>& item, sl_bool flagRedraw = sl_true);
+	void insertItem(sl_size index, const Ref<TreeViewItem>& item, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	Ref<TreeViewItem> insertItem(sl_size index, const String& text, const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
+	Ref<TreeViewItem> insertItem(sl_size index, const String& text, const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	Ref<TreeViewItem> insertItem(sl_size index, const String& text, sl_bool flagRedraw = sl_true);
+	Ref<TreeViewItem> insertItem(sl_size index, const String& text, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void removeItem(sl_size index, sl_bool flagRedraw = sl_true);
+	void removeItem(sl_size index, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void removeItem(const Ref<TreeViewItem>& item, sl_bool flagRedraw = sl_true);
+	void removeItem(const Ref<TreeViewItem>& item, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void removeAllItems(sl_bool flagRedraw = sl_true);
+	void removeAllItems(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getItemIcon();
 	
-	void setItemIcon(const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
+	void setItemIcon(const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getOpenedItemIcon();
 	
-	void setOpenedItemIcon(const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
+	void setOpenedItemIcon(const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getClosedItemIcon();
 	
-	void setClosedItemIcon(const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
+	void setClosedItemIcon(const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getCollapsedIcon();
 	
-	void setCollapsedIcon(const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
+	void setCollapsedIcon(const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	Ref<Drawable> getExpandedIcon();
 	
-	void setExpandedIcon(const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
+	void setExpandedIcon(const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Color getSelectedItemBackgroundColor();
 	
-	void setSelectedItemBackgroundColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setSelectedItemBackgroundColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Color getItemTextColor();
 	
-	void setItemTextColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setItemTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Color getHoverItemTextColor();
 	
-	void setHoverItemTextColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setHoverItemTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Color getSelectedItemTextColor();
 	
-	void setSelectedItemTextColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setSelectedItemTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_len getItemHeight();
 	
-	void setItemHeight(sl_ui_len height, sl_bool flagRedraw = sl_true);
+	void setItemHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getItemPadding();
 	
-	void setItemPadding(sl_ui_pos padding, sl_bool flagRedraw = sl_true);
+	void setItemPadding(sl_ui_pos padding, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getItemIndent();
 	
-	void setItemIndent(sl_ui_pos indent, sl_bool flagRedraw = sl_true);
+	void setItemIndent(sl_ui_pos indent, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_pos getTextIndent();
 	
-	void setTextIndent(sl_ui_pos indent, sl_bool flagRedraw = sl_true);
+	void setTextIndent(sl_ui_pos indent, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 public:
 	SLIB_PTR_PROPERTY(ITreeViewListener, Listener);
@@ -267,7 +267,7 @@ private:
 	
 	void _createContentView();
 	
-	void _relayoutContent(sl_bool flagRedraw);
+	void _relayoutContent(UIUpdateMode mode);
 	
 	void _redrawContent();
 	

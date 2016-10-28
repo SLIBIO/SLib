@@ -9,12 +9,12 @@ MobileGame::MobileGame()
 	SLIB_REFERABLE_CONSTRUCTOR
 	
 	m_gameView = new MobileGameView;
-	/*
-	m_contentView->removeAllChildren(sl_false);
-	m_contentView->addChild(m_gameView, sl_false);
+	
+	m_contentView->removeAllChildren(UIUpdateMode::Init);
+	m_contentView->addChild(m_gameView, UIUpdateMode::Init);
 	m_contentView = m_gameView;
-	m_gameView->addChild(m_pageStack, sl_false);
-	*/
+	m_gameView->addChild(m_pageStack, UIUpdateMode::Init);
+
 }
 
 Ref<MobileGame> MobileGame::getApp()
@@ -31,15 +31,6 @@ Ref<MobileGameView> MobileGame::getGameView()
 	return m_gameView;
 }
 
-void MobileGame::onGameFrame(RenderEngine* engine)
-{
-}
-
-void MobileGame::dispatchGameFrame(RenderEngine* engine)
-{
-	onGameFrame(engine);
-}
-
 void MobileGame::dispatchResize(sl_ui_len width, sl_ui_len height)
 {
 	m_gameView->setFrame(0, 0, width, height);
@@ -52,15 +43,7 @@ MobileGameView::MobileGameView()
 {
 	SLIB_REFERABLE_CONSTRUCTOR
 	
-	setRedrawMode(RedrawMode::Continuously);
-}
-
-void MobileGameView::onFrame(RenderEngine* engine)
-{
-	Ref<MobileGame> app = MobileGame::getApp();
-	if (app.isNotNull()) {
-		app->dispatchGameFrame(engine);
-	}
+	setRedrawMode(RedrawMode::WhenDirty);
 }
 
 SLIB_UI_NAMESPACE_END

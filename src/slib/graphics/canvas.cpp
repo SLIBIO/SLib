@@ -155,6 +155,16 @@ Size Canvas::getTextSize(const Ref<Font>& font, const String &text)
 	return Size::zero();
 }
 
+void Canvas::drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color)
+{
+	drawText16(text, x, y, font, color);
+}
+
+void Canvas::drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color)
+{
+	drawText(text, x, y, font, color);
+}
+
 void Canvas::drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& _font, const Color& color, Alignment align)
 {
 	Ref<Font> font = _font;
@@ -167,6 +177,20 @@ void Canvas::drawText(const String& text, const Rectangle& rcDst, const Ref<Font
 	Size size = getTextSize(font, text);
 	Point pt = GraphicsUtil::calculateAlignPosition(rcDst, size.x, size.y, align);
 	drawText(text, pt.x, pt.y, font, color);
+}
+
+void Canvas::drawText16(const String16& text, const Rectangle& rcDst, const Ref<Font>& _font, const Color& color, Alignment align)
+{
+	Ref<Font> font = _font;
+	if (font.isNull()) {
+		font = Font::getDefault();
+		if (font.isNull()) {
+			return;
+		}
+	}
+	Size size = getTextSize(font, text);
+	Point pt = GraphicsUtil::calculateAlignPosition(rcDst, size.x, size.y, align);
+	drawText16(text, pt.x, pt.y, font, color);
 }
 
 void Canvas::drawLine(sl_real x1, sl_real y1, sl_real x2, sl_real y2, const Ref<Pen>& pen)

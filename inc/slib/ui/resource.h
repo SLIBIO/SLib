@@ -103,7 +103,10 @@ NAME::NAME(sl_real sp) \
 	SLIB_REFERABLE_CONSTRUCTOR \
 	initialize(); \
 	setInitialized(); \
-	layoutViews(0, 0); \
+	slib::UISize size = getContentSize(); \
+	if (size.x > 0 && size.y > 0) { \
+		layoutViews(size.x, size.y); \
+	} \
 }
 
 class UILayoutResource
@@ -154,6 +157,9 @@ public:
 	WindowLayoutResource(sl_real sp = 1);
 	
 public:
+	UISize getContentSize();
+	
+public:
 	// override
 	void dispatchResize(sl_ui_len width, sl_ui_len height);
 		
@@ -178,6 +184,9 @@ public:
 	ViewLayoutResource(sl_real sp = 1);
 	
 public:
+	UISize getContentSize();
+	
+public:
 	// override
 	void dispatchResize(sl_ui_len width, sl_ui_len height);
 	
@@ -198,6 +207,9 @@ class PageLayoutResource : public ViewPage, public UILayoutResource
 	SLIB_DECLARE_OBJECT
 public:
 	PageLayoutResource(sl_real sp = 1);
+	
+public:
+	UISize getContentSize();
 	
 public:
 	// override

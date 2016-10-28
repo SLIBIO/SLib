@@ -15,7 +15,6 @@ class _WGLRendererImpl : public Renderer
 {
 public:
 	sl_bool m_flagRequestRender;
-	SafeRef<RenderEngine> m_renderEngine;
 
 	HGLRC m_context;
 
@@ -103,12 +102,6 @@ public:
 			m_threadRender.setNull();
 		}
 
-		Ref<RenderEngine> engine = m_renderEngine;
-		if (engine.isNotNull()) {
-			engine->release();
-			m_renderEngine.setNull();
-		}
-
 		if (m_context) {
 			wglDeleteContext(m_context);
 			::ReleaseDC(m_hWindow, m_hDC);
@@ -122,16 +115,13 @@ public:
 
 		GL::loadEntries();
 
+		Ref<RenderEngine> engine = GL::createEngine();
+		if (engine.isNull()) {
+			return;
+		}
+
 		TimeCounter timer;
 		while (Thread::isNotStoppingCurrent()) {
-			Ref<RenderEngine> engine = m_renderEngine;
-			if (engine.isNull()) {
-				engine = GL::createEngine();
-				if (engine.isNull()) {
-					break;
-				}
-				m_renderEngine = engine;
-			}
 			runStep(engine.ptr);
 			if (Thread::isNotStoppingCurrent()) {
 				sl_uint64 t = timer.getEllapsedMilliseconds();

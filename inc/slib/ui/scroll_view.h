@@ -27,12 +27,12 @@ public:
 	
 	Ref<View> getContentView();
 	
-	virtual void setContentView(const Ref<View>& view, sl_bool flagRedraw = sl_true);
+	virtual void setContentView(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	// override
-	void setContentSize(sl_scroll_pos width, sl_scroll_pos height, sl_bool flagRefresh = sl_true);
+	void setContentSize(sl_scroll_pos width, sl_scroll_pos height, UIUpdateMode mode = UIUpdateMode::Redraw);
 
-	void setContentSize(const ScrollPoint& size, sl_bool flagRefresh = sl_true);
+	void setContentSize(const ScrollPoint& size, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	// override
 	ScrollPoint getScrollPosition();
@@ -41,9 +41,9 @@ public:
 	ScrollPoint getScrollRange();
 	
 	// override
-	void scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagRedraw = sl_true);
+	void scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void scrollTo(const ScrollPoint& position, sl_bool flagRedraw = sl_true);
+	void scrollTo(const ScrollPoint& position, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 public:
 	// override
@@ -65,7 +65,7 @@ protected:
 private:
 	void _initScrollbars();
 	
-	void _scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagRedraw);
+	void _scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode);
 	
 	void _refreshContentSize_NW();
 	

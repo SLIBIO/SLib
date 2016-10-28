@@ -67,6 +67,11 @@ public:
 	
 	Link<T>* pushBack(const T& value, sl_size countLimit = 0);
 	
+	void pushBackAll(const LinkedList<T, COMPARE>* other);
+	
+	template <class _T, class _COMPARE>
+	void pushBackAll(const LinkedList<_T, _COMPARE>* other);
+	
 	sl_bool popBack_NoLock(T* _out = sl_null);
 	
 	sl_bool popBack(T* _out = sl_null);
@@ -75,6 +80,11 @@ public:
 	
 	Link<T>* pushFront(const T& value, sl_size countLimit = 0);
 	
+	void pushFrontAll(const LinkedList<T, COMPARE>* other);
+	
+	template <class _T, class _COMPARE>
+	void pushFrontAll(const LinkedList<_T, _COMPARE>* other);
+
 	sl_bool popFront_NoLock(T* _out = sl_null);
 	
 	sl_bool popFront(T* _out = sl_null);
@@ -104,6 +114,10 @@ public:
 	
 	List<T> toList() const;
 	
+	LinkedList<T, COMPARE>* duplicate_NoLock() const;
+	
+	LinkedList<T, COMPARE>* duplicate() const;
+	
 	Link<T>* findValue_NoLock(const T& value) const;
 	
 	Link<T>* findValue(const T& value) const;
@@ -112,6 +126,15 @@ public:
 	
 	sl_bool removeValue(const T& value, sl_bool flagAllValues = sl_false);
 	
+	Link<T>* push_NoLock(const T& value, sl_size countLimit = 0);
+	
+	Link<T>* push(const T& value, sl_size countLimit = 0);
+	
+	void pushAll(const LinkedList<T, COMPARE>* other);
+	
+	template <class _T, class _COMPARE>
+	void pushAll(const LinkedList<_T, _COMPARE>* other);
+
 protected:
 	static Link<T>* _createItem(const T& value);
 	
@@ -139,27 +162,19 @@ template <class T, class COMPARE = Compare<T> >
 class SLIB_EXPORT Queue : public LinkedList<T, COMPARE>
 {
 public:
-	Link<T>* push(const T& value, sl_size countLimit = 0);
-
-	Link<T>* push_NoLock(const T& value, sl_size countLimit = 0);
+	sl_bool pop_NoLock(T* _out = sl_null);
 	
 	sl_bool pop(T* _out = sl_null);
 	
-	sl_bool pop_NoLock(T* _out = sl_null);
-
 };
 
 template <class T, class COMPARE = Compare<T> >
 class SLIB_EXPORT Stack : public LinkedList<T, COMPARE>
 {
 public:
-	Link<T>* push(const T& value, sl_size countLimit = 0);
-	
-	Link<T>* push_NoLock(const T& value, sl_size countLimit = 0);
+	sl_bool pop_NoLock(T* _out = sl_null);
 	
 	sl_bool pop(T* _out = sl_null);
-	
-	sl_bool pop_NoLock(T* _out = sl_null);
 	
 };
 
@@ -333,6 +348,33 @@ Link<T>* LinkedList<T, COMPARE>::pushBack(const T& value, sl_size countLimit)
 }
 
 template <class T, class COMPARE>
+void LinkedList<T, COMPARE>::pushBackAll(const LinkedList<T, COMPARE>* other)
+{
+	ObjectLocker lock(this, other);
+	Link<T>* link = other->getBegin();
+	while (link) {
+		if (!(pushBack_NoLock(link->value))) {
+			return;
+		}
+		link = link->next;
+	}
+}
+
+template <class T, class COMPARE>
+template <class _T, class _COMPARE>
+void LinkedList<T, COMPARE>::pushBackAll(const LinkedList<_T, _COMPARE>* other)
+{
+	ObjectLocker lock(this, other);
+	Link<_T>* link = other->getBegin();
+	while (link) {
+		if (!(pushBack_NoLock(link->value))) {
+			return;
+		}
+		link = link->next;
+	}
+}
+
+template <class T, class COMPARE>
 sl_bool LinkedList<T, COMPARE>::popBack_NoLock(T* _out)
 {
 	Link<T>* old = _popBackItem();
@@ -396,6 +438,33 @@ Link<T>* LinkedList<T, COMPARE>::pushFront(const T& value, sl_size countLimit)
 		_freeItem(old);
 	}
 	return item;
+}
+
+template <class T, class COMPARE>
+void LinkedList<T, COMPARE>::pushFrontAll(const LinkedList<T, COMPARE>* other)
+{
+	ObjectLocker lock(this, other);
+	Link<T>* link = other->getEnd();
+	while (link) {
+		if (!(pushFront_NoLock(link->value))) {
+			return;
+		}
+		link = link->before;
+	}
+}
+
+template <class T, class COMPARE>
+template <class _T, class _COMPARE>
+void LinkedList<T, COMPARE>::pushFrontAll(const LinkedList<_T, _COMPARE>* other)
+{
+	ObjectLocker lock(this, other);
+	Link<_T>* link = other->getEnd();
+	while (link) {
+		if (!(pushFront_NoLock(link->value))) {
+			return;
+		}
+		link = link->before;
+	}
 }
 
 template <class T, class COMPARE>
@@ -617,6 +686,31 @@ List<T> LinkedList<T, COMPARE>::toList() const
 }
 
 template <class T, class COMPARE>
+LinkedList<T, COMPARE>* LinkedList<T, COMPARE>::duplicate_NoLock() const
+{
+	LinkedList<T, COMPARE>* ret = new LinkedList<T, COMPARE>;
+	if (ret) {
+		Link<T>* now = m_begin;
+		while (now) {
+			if (!(ret->pushBack_NoLock(now->value))) {
+				delete ret;
+				return sl_null;
+			}
+			now = now->next;
+		}
+		return ret;
+	}
+	return sl_null;
+}
+
+template <class T, class COMPARE>
+LinkedList<T, COMPARE>* LinkedList<T, COMPARE>::duplicate() const
+{
+	ObjectLocker lock(this);
+	return duplicate_NoLock();
+}
+
+template <class T, class COMPARE>
 Link<T>* LinkedList<T, COMPARE>::findValue_NoLock(const T& value) const
 {
 	Link<T>* now = m_begin;
@@ -817,56 +911,56 @@ SLIB_INLINE void LinkedList<T, COMPARE>::_init()
 	m_count = 0;
 }
 
-
 template <class T, class COMPARE>
-Link<T>* Queue<T, COMPARE>::push(const T& value, sl_size countLimit)
+SLIB_INLINE Link<T>* LinkedList<T, COMPARE>::push_NoLock(const T& value, sl_size countLimit)
 {
-	return this->pushBack(value, countLimit);
+	return pushBack_NoLock(value, countLimit);
 }
 
 template <class T, class COMPARE>
-Link<T>* Queue<T, COMPARE>::push_NoLock(const T& value, sl_size countLimit)
+SLIB_INLINE Link<T>* LinkedList<T, COMPARE>::push(const T& value, sl_size countLimit)
 {
-	return this->pushBack_NoLock(value, countLimit);
+	return pushBack(value, countLimit);
 }
 
 template <class T, class COMPARE>
-sl_bool Queue<T, COMPARE>::pop(T* _out)
+SLIB_INLINE void LinkedList<T, COMPARE>::pushAll(const LinkedList<T, COMPARE>* other)
 {
-	return this->popFront(_out);
+	pushBackAll(other);
 }
 
 template <class T, class COMPARE>
-sl_bool Queue<T, COMPARE>::pop_NoLock(T* _out)
+template <class _T, class _COMPARE>
+SLIB_INLINE void LinkedList<T, COMPARE>::pushAll(const LinkedList<_T, _COMPARE>* other)
+{
+	pushBackAll(other);
+}
+
+
+template <class T, class COMPARE>
+SLIB_INLINE sl_bool Queue<T, COMPARE>::pop_NoLock(T* _out)
 {
 	return this->popFront_NoLock(_out);
 }
 
-
 template <class T, class COMPARE>
-Link<T>* Stack<T, COMPARE>::push(const T& value, sl_size countLimit)
+SLIB_INLINE sl_bool Queue<T, COMPARE>::pop(T* _out)
 {
-	return this->pushBack(value, countLimit);
+	return this->popFront(_out);
 }
 
-template <class T, class COMPARE>
-Link<T>* Stack<T, COMPARE>::push_NoLock(const T& value, sl_size countLimit)
-{
-	return this->pushBack_NoLock(value, countLimit);
-}
 
 template <class T, class COMPARE>
-sl_bool Stack<T, COMPARE>::pop(T* _out)
-{
-	return this->popBack(_out);
-}
-
-template <class T, class COMPARE>
-sl_bool Stack<T, COMPARE>::pop_NoLock(T* _out)
+SLIB_INLINE sl_bool Stack<T, COMPARE>::pop_NoLock(T* _out)
 {
 	return this->popBack_NoLock(_out);
 }
 
+template <class T, class COMPARE>
+SLIB_INLINE sl_bool Stack<T, COMPARE>::pop(T* _out)
+{
+	return this->popBack(_out);
+}
 
 SLIB_NAMESPACE_END
 

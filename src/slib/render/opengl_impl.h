@@ -183,7 +183,7 @@ void GL_BASE::setBlending(sl_bool flagEnableBlending)
 	setBlending(flagEnableBlending, param);
 }
 
-static sl_uint32 _GLES_createShader(GLenum type, const String& source)
+static sl_uint32 _GL_createShader(GLenum type, const String& source)
 {
 	GLuint shader = GL_ENTRY(glCreateShader)(type);
 	if (shader) {
@@ -201,7 +201,11 @@ static sl_uint32 _GLES_createShader(GLenum type, const String& source)
 				GLsizei lenLog = 0;
 				GL_ENTRY(glGetShaderInfoLog)(shader, 1024, &lenLog, log);
 				log[lenLog] = 0;
-				SLIB_LOG("OpenGL Compile Shader", String(log));
+				if (type == GL_VERTEX_SHADER) {
+					SLIB_LOG("OpenGL Compile Vertex Shader", String(log));
+				} else if (type == GL_FRAGMENT_SHADER) {
+					SLIB_LOG("OpenGL Compile Fragment Shader", String(log));
+				}
 			}
 		}
 		GL_ENTRY(glDeleteShader)(shader);
@@ -211,12 +215,12 @@ static sl_uint32 _GLES_createShader(GLenum type, const String& source)
 
 sl_uint32 GL_BASE::createVertexShader(const String& source)
 {
-	return _GLES_createShader(GL_VERTEX_SHADER, source);
+	return _GL_createShader(GL_VERTEX_SHADER, source);
 }
 
 sl_uint32 GL_BASE::createFragmentShader(const String& source)
 {
-	return _GLES_createShader(GL_FRAGMENT_SHADER, source);
+	return _GL_createShader(GL_FRAGMENT_SHADER, source);
 }
 
 void GL_BASE::deleteShader(sl_uint32 shader)
@@ -280,7 +284,7 @@ void GL_BASE::deleteProgram(sl_uint32 program)
 	}
 }
 
-static sl_uint32 _GLES_createBuffer(GLenum target, sl_bool flagStatic, sl_size size, const void* data)
+static sl_uint32 _GL_createBuffer(GLenum target, const void* data, sl_size size, sl_bool flagStatic)
 {
 	GLuint buffer = 0;
 	GL_ENTRY(glGenBuffers)(1, &buffer);
@@ -292,7 +296,7 @@ static sl_uint32 _GLES_createBuffer(GLenum target, sl_bool flagStatic, sl_size s
 	return 0;
 }
 
-static void _GLES_updateBuffer(GLenum target, sl_uint32 buffer, sl_size offset, const void* data, sl_size size)
+static void _GL_updateBuffer(GLenum target, sl_uint32 buffer, sl_size offset, const void* data, sl_size size)
 {
 	if (buffer) {
 		GL_ENTRY(glBindBuffer)(target, buffer);
@@ -300,14 +304,19 @@ static void _GLES_updateBuffer(GLenum target, sl_uint32 buffer, sl_size offset, 
 	}
 }
 
-sl_uint32 GL_BASE::createVertexBuffer(sl_bool flagStatic, sl_size size, const void* data)
+sl_uint32 GL_BASE::createVertexBuffer(const void* data, sl_size size, sl_bool flagStatic)
 {
-	return _GLES_createBuffer(GL_ARRAY_BUFFER, flagStatic, size, data);
+	return _GL_createBuffer(GL_ARRAY_BUFFER, data, size, flagStatic);
+}
+
+sl_uint32 GL_BASE::createVertexBuffer(sl_size size, sl_bool flagStatic)
+{
+	return _GL_createBuffer(GL_ARRAY_BUFFER, sl_null, size, flagStatic);
 }
 
 void GL_BASE::updateVertexBuffer(sl_uint32 buffer, sl_size offset, const void* data, sl_size size)
 {
-	_GLES_updateBuffer(GL_ARRAY_BUFFER, buffer, offset, data, size);
+	_GL_updateBuffer(GL_ARRAY_BUFFER, buffer, offset, data, size);
 }
 
 void GL_BASE::bindVertexBuffer(sl_uint32 buffer)
@@ -320,14 +329,19 @@ void GL_BASE::unbindVertexBuffer()
 	GL_ENTRY(glBindBuffer)(GL_ARRAY_BUFFER, 0);
 }
 
-sl_uint32 GL_BASE::createIndexBuffer(sl_bool flagStatic, sl_size size, const void* data)
+sl_uint32 GL_BASE::createIndexBuffer(const void* data, sl_size size, sl_bool flagStatic)
 {
-	return _GLES_createBuffer(GL_ELEMENT_ARRAY_BUFFER, flagStatic, size, data);
+	return _GL_createBuffer(GL_ELEMENT_ARRAY_BUFFER, data, size, flagStatic);
+}
+
+sl_uint32 GL_BASE::createIndexBuffer(sl_size size, sl_bool flagStatic)
+{
+	return _GL_createBuffer(GL_ELEMENT_ARRAY_BUFFER, sl_null, size, flagStatic);
 }
 
 void GL_BASE::updateIndexBuffer(sl_uint32 buffer, sl_size offset, const void* data, sl_size size)
 {
-	_GLES_updateBuffer(GL_ARRAY_BUFFER, buffer, offset, data, size);
+	_GL_updateBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer, offset, data, size);
 }
 
 void GL_BASE::deleteBuffer(sl_uint32 buffer)
@@ -347,7 +361,7 @@ sl_int32 GL_BASE::getAttributeLocation(sl_uint32 program, const char* name)
 	return -1;
 }
 
-static void _GLES_setVertexArrayAttribute(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
+static void _GL_setVertexArrayAttribute(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
 {
 	if (attributeLocation != -1) {
 		GL_ENTRY(glEnableVertexAttribArray)(attributeLocation);
@@ -358,11 +372,11 @@ static void _GLES_setVertexArrayAttribute(sl_int32 attributeLocation, const void
 #define _SL_SETVERTEXARRAY(t) \
 	void GL_BASE::setVertex##t##ArrayAttributePtr(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize) \
 	{ \
-		_GLES_setVertexArrayAttribute(attributeLocation, data, countComponents, strideBytes, flagDoNormalize); \
+		_GL_setVertexArrayAttribute(attributeLocation, data, countComponents, strideBytes, flagDoNormalize); \
 	} \
 	void GL_BASE::setVertex##t##ArrayAttribute(sl_int32 attributeLocation, sl_size offsetValuesOnBuffer, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize) \
 	{ \
-		_GLES_setVertexArrayAttribute(attributeLocation, (void*)offsetValuesOnBuffer, countComponents, strideBytes, flagDoNormalize); \
+		_GL_setVertexArrayAttribute(attributeLocation, (void*)offsetValuesOnBuffer, countComponents, strideBytes, flagDoNormalize); \
 	}
 
 _SL_SETVERTEXARRAY(Float)
@@ -645,16 +659,16 @@ void GL_BASE::setUniformTextureSampler(sl_int32 uniformLocation, sl_uint32 textu
 	}
 }
 
-SLIB_INLINE static void _GLES_drawVertices(GLenum mode, sl_uint32 countVertices, sl_uint32 startIndex)
+SLIB_INLINE static void _GL_drawVertices(GLenum mode, sl_uint32 countVertices, sl_uint32 startIndex)
 {
 	GL_ENTRY(glDrawArrays)(mode, startIndex, countVertices);
 }
-SLIB_INLINE static void _GLES_drawIndices(GLenum mode, sl_uint32 countIndices, const sl_uint16* indices)
+SLIB_INLINE static void _GL_drawIndices(GLenum mode, sl_uint32 countIndices, const sl_uint16* indices)
 {
 	GL_ENTRY(glBindBuffer)(GL_ELEMENT_ARRAY_BUFFER, 0);
 	GL_ENTRY(glDrawElements)(mode, countIndices, GL_UNSIGNED_SHORT, indices);
 }
-SLIB_INLINE static void _GLES_drawIndices(GLenum mode, sl_uint32 countIndices, sl_uint32 indexBuffer, sl_size offsetBytes)
+SLIB_INLINE static void _GL_drawIndices(GLenum mode, sl_uint32 countIndices, sl_uint32 indexBuffer, sl_size offsetBytes)
 {
 	GL_ENTRY(glBindBuffer)(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 	GL_ENTRY(glDrawElements)(mode, countIndices, GL_UNSIGNED_SHORT, (void*)offsetBytes);
@@ -664,15 +678,15 @@ SLIB_INLINE static void _GLES_drawIndices(GLenum mode, sl_uint32 countIndices, s
 #define _SL_DRAW(t1, t2) \
 	void GL_BASE::draw##t1(sl_uint32 countVertices, sl_uint32 startIndex) \
 	{ \
-		_GLES_drawVertices(t2, countVertices, startIndex); \
+		_GL_drawVertices(t2, countVertices, startIndex); \
 	} \
 	void GL_BASE::draw##t1(sl_uint32 countIndices, const sl_uint16* indices)  \
 	{ \
-		_GLES_drawIndices(t2, countIndices, indices); \
+		_GL_drawIndices(t2, countIndices, indices); \
 	} \
 	void GL_BASE::draw##t1(sl_uint32 countIndices, sl_uint32 indexBuffer, sl_size offsetBytes) \
 	{ \
-		_GLES_drawIndices(t2, countIndices, indexBuffer, offsetBytes); \
+		_GL_drawIndices(t2, countIndices, indexBuffer, offsetBytes); \
 	}
 
 _SL_DRAW(Triangles, GL_TRIANGLES)
@@ -902,7 +916,7 @@ void GL_BASE::unbindTexture2D()
 	GL_ENTRY(glBindTexture)(GL_TEXTURE_2D, 0);
 }
 
-static GLenum _GLES_getFilter(TextureFilterMode filter)
+static GLenum _GL_getFilter(TextureFilterMode filter)
 {
 	switch (filter) {
 		case TextureFilterMode::Linear:
@@ -915,17 +929,17 @@ static GLenum _GLES_getFilter(TextureFilterMode filter)
 void GL_BASE::setTexture2DFilterMode(TextureFilterMode minFilter, TextureFilterMode magFilter)
 {
 	GLenum f;
-	f = _GLES_getFilter(minFilter);
+	f = _GL_getFilter(minFilter);
 	if (f != GL_NONE) {
 		GL_ENTRY(glTexParameteri)(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, f);
 	}
-	f = _GLES_getFilter(magFilter);
+	f = _GL_getFilter(magFilter);
 	if (f != GL_NONE) {
 		GL_ENTRY(glTexParameteri)(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, f);
 	}
 }
 
-static GLenum _GLES_getWrap(TextureWrapMode wrap)
+static GLenum _GL_getWrap(TextureWrapMode wrap)
 {
 	switch (wrap) {
 		case TextureWrapMode::Repeat:
@@ -940,11 +954,11 @@ static GLenum _GLES_getWrap(TextureWrapMode wrap)
 void GL_BASE::setTexture2DWrapMode(TextureWrapMode wrapX, TextureWrapMode wrapY)
 {
 	GLenum f;
-	f = _GLES_getWrap(wrapX);
+	f = _GL_getWrap(wrapX);
 	if (f != GL_NONE) {
 		GL_ENTRY(glTexParameteri)(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, f);
 	}
-	f = _GLES_getWrap(wrapY);
+	f = _GL_getWrap(wrapY);
 	if (f != GL_NONE) {
 		GL_ENTRY(glTexParameteri)(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, f);
 	}
@@ -962,17 +976,24 @@ void GL_BASE::deleteTexture(sl_uint32 texture)
 /*****************************************
 	OpenGL Engine
 ******************************************/
+
 class GL_ENGINE : public GLRenderEngine
 {
 public:
 	sl_uint64 m_threadUniqueId;
 	
-	class _BaseInstance;
-	Queue< Ref<_BaseInstance> > m_listDirtyInstances;
-	Queue< Ref<RenderBaseObject> > m_listUsedObjects;
+	CList<sl_uint32> m_listDirtyBufferHandles;
+	CList<sl_uint32> m_listDirtyTextureHandles;
+	struct _ProgramHandle {
+		sl_uint32 program;
+		sl_uint32 vertexShader;
+		sl_uint32 fragmentShader;
+	};
+	CList<_ProgramHandle> m_listDirtyProgramHandles;
 	
 	class _RenderProgramInstance;
-	SafeRef<_RenderProgramInstance> m_currentProgram;
+	Ref<RenderProgram> m_currentProgram;
+	Ref<_RenderProgramInstance> m_currentProgramInstance;
 
 public:
 	GL_ENGINE()
@@ -982,25 +1003,42 @@ public:
 
 	~GL_ENGINE()
 	{
-		_release();
 	}
 
 public:
-	void _release()
-	{
-		clearDirtyInstances();
-	}
-
-	sl_bool isCurrentEngine()
+	SLIB_INLINE sl_bool isCurrentEngine()
 	{
 		return m_threadUniqueId == Thread::getCurrentThreadUniqueId();
 	}
-
-	sl_bool _isValid()
+	
+	void freeDirtyHandles()
 	{
-		return sl_true;
+		{
+			ListLocker<sl_uint32> list(m_listDirtyBufferHandles);
+			for (sl_size i = 0; i < list.count; i++) {
+				GL_BASE::deleteBuffer(list[i]);
+			}
+			m_listDirtyBufferHandles.removeAll_NoLock();
+		}
+		{
+			ListLocker<sl_uint32> list(m_listDirtyTextureHandles);
+			for (sl_size i = 0; i < list.count; i++) {
+				GL_BASE::deleteTexture(list[i]);
+			}
+			m_listDirtyTextureHandles.removeAll_NoLock();
+		}
+		{
+			ListLocker<_ProgramHandle> list(m_listDirtyProgramHandles);
+			for (sl_size i = 0; i < list.count; i++) {
+				GL_BASE::deleteProgram(list[i].program);
+				GL_BASE::deleteShader(list[i].vertexShader);
+				GL_BASE::deleteShader(list[i].fragmentShader);
+			}
+			m_listDirtyProgramHandles.removeAll_NoLock();
+		}
 	}
-
+	
+	// override
 	RenderEngineType getEngineType()
 	{
 #if defined(_OPENGL_ES_IMPL)
@@ -1010,216 +1048,36 @@ public:
 #endif
 	}
 
-	class _BaseInstance : public RenderBaseObjectInstance
-	{
-	public:
-		sl_bool m_flagCleared;
-		sl_bool m_flagUpdated;
-
-	public:
-		SLIB_INLINE _BaseInstance()
-		{
-			m_flagCleared = sl_false;
-			m_flagUpdated = sl_false;
-		}
-		
-	public:
-		virtual void _update(RenderBaseObject* object) = 0;
-		
-		virtual void _free() = 0;
-
-	public:
-		void update(RenderBaseObject* object)
-		{
-			if (m_flagUpdated) {
-				m_flagUpdated = sl_false;
-				_update(object);
-			}
-		}
-		void update()
-		{
-			if (m_flagUpdated) {
-				m_flagUpdated = sl_false;
-				Ref<RenderBaseObject> object = getObject();
-				if (object.isNotNull()) {
-					_update(object.ptr);
-				}
-			}
-		}
-
-		void clear()
-		{
-			m_flagCleared = sl_true;
-		}
-
-		void free()
-		{
-			if (m_flagCleared) {
-				return;
-			}
-			m_flagCleared = sl_true;
-			Ref<GL_ENGINE> engine = Ref<GL_ENGINE>::from(getEngine());
-			if (engine.isNotNull() && engine->isCurrentEngine()) {
-				_free();
-			}
-		}
-
-	};
-
-	void _onFreeInstance(RenderBaseObjectInstance* _instance)
-	{
-		_BaseInstance* instance = (_BaseInstance*)_instance;
-		if (instance) {
-			if (!isCurrentEngine()) {
-				m_listDirtyInstances.push(instance);
-			}
-		}
-	}
-
-	Ref<_BaseInstance> getValidInstance(RenderBaseObject* object)
-	{
-		Ref<GL_ENGINE> engine = Ref<GL_ENGINE>::from(object->getEngine());
-		if (engine.ptr == this) {
-			Ref<_BaseInstance> instance = Ref<_BaseInstance>::from(object->getInstance());
-			if (instance.isNotNull() && !(instance->m_flagCleared)) {
-				instance->update(object);
-				return instance;
-			}
-		}
-		return Ref<_BaseInstance>::null();
-	}
-
-	void freeDirtyInstances()
-	{
-		m_listDirtyInstances.removeAll();
-	}
-
-	void clearDirtyInstances()
-	{
-		Ref<_BaseInstance> instance;
-		while (m_listDirtyInstances.pop(&instance)) {
-			instance->clear();
-		}
-		m_listDirtyInstances.removeAll();
-	}
-
-	void useObject(RenderBaseObject* object)
-	{
-		//m_listUsedObjects.push(object);
-	}
-
-	sl_bool _beginScene()
-	{
-		m_listUsedObjects.removeAll();
-		freeDirtyInstances();
-		return sl_true;
-	}
-
-	void _endScene()
-	{
-	}
-
-	void _clear(const RenderClearParam& param)
-	{
-		if (!isCurrentEngine()) {
-			return;
-		}
-		GL_BASE::clear(param);
-	}
-
-	void _setViewport(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
-	{
-		if (!isCurrentEngine()) {
-			return;
-		}
-		GL_BASE::setViewport(x, y, width, height);
-	}
-
-	void _setDepthTest(sl_bool flag)
-	{
-		if (!isCurrentEngine()) {
-			return;
-		}
-		GL_BASE::setDepthTest(flag);
-	}
-
-	void _setDepthWriteEnabled(sl_bool flagEnableDepthWrite)
-	{
-		if (!isCurrentEngine()) {
-			return;
-		}
-		GL_BASE::setDepthWriteEnabled(flagEnableDepthWrite);
-	}
-
-	void _setCullFace(sl_bool flagEnableCull, sl_bool flagCullCCW = sl_true)
-	{
-		if (!isCurrentEngine()) {
-			return;
-		}
-		GL_BASE::setCullFace(flagEnableCull, flagCullCCW);
-	}
-
-	void _setBlending(sl_bool flagEnableBlending, const RenderBlendingParam& param)
-	{
-		if (!isCurrentEngine()) {
-			return;
-		}
-		GL_BASE::setBlending(flagEnableBlending, param);
-	}
-
-	class _RenderProgramInstance : public _BaseInstance
+	class _RenderProgramInstance : public RenderProgramInstance
 	{
 	public:
 		sl_uint32 vertexShader;
 		sl_uint32 fragmentShader;
 		sl_uint32 program;
-		Ref<RenderProgramInfo> info;
-
+		Ref<RenderProgramState> state;
+		
 	public:
-		SLIB_INLINE _RenderProgramInstance()
+		_RenderProgramInstance()
 		{
 		}
 		
 		~_RenderProgramInstance()
 		{
-			free();
+			Ref<RenderEngine> engine = getEngine();
+			if (engine.isNotNull()) {
+				_ProgramHandle handle;
+				handle.program = program;
+				handle.vertexShader = vertexShader;
+				handle.fragmentShader = fragmentShader;
+				((GL_ENGINE*)(engine.ptr))->m_listDirtyProgramHandles.add(handle);
+			}
 		}
-
+		
 	public:
-		SLIB_INLINE Ref<RenderProgram> getProgram()
+		static Ref<_RenderProgramInstance> create(GL_ENGINE* engine, RenderProgram* program)
 		{
-			return Ref<RenderProgram>::from(getObject());
-		}
-
-		void _update(RenderBaseObject* object)
-		{
-		}
-
-		void _free()
-		{
-			GL_BASE::deleteProgram(program);
-			GL_BASE::deleteShader(vertexShader);
-			GL_BASE::deleteShader(fragmentShader);
-		}
-	};
-	
-	String _convertShader(String glsl)
-	{
-#if defined(_OPENGL_IMPL)
-#else
-		if (! (glsl.startsWith("precision"))) {
-			glsl = "precision highp float;" + glsl;
-		}
-#endif
-		return glsl;
-	}
-
-	Ref<_RenderProgramInstance> _getProgram(RenderProgram* program)
-	{
-		Ref<_RenderProgramInstance> ret = Ref<_RenderProgramInstance>::from(getValidInstance(program));
-		if (ret.isNull()) {
-			String vsSource = _convertShader(program->getGLSLVertexShader(this));
-			String fsSource = _convertShader(program->getGLSLFragmentShader(this));
+			String vsSource = convertShader(program->getGLSLVertexShader(engine));
+			String fsSource = convertShader(program->getGLSLFragmentShader(engine));
 			if (vsSource.isNotEmpty() && fsSource.isNotEmpty()) {
 				sl_uint32 vs = GL_BASE::createVertexShader(vsSource);
 				if (vs) {
@@ -1227,17 +1085,17 @@ public:
 					if (fs) {
 						sl_uint32 ph = GL_BASE::createProgram(vs, fs);
 						if (ph) {
-							Ref<RenderProgramInfo> info = program->create(this);
-							if (info.isNotNull()) {
-								info->program_GL = ph;
-								if (program->onInit(this, info.ptr)) {
-									ret = new _RenderProgramInstance();
+							Ref<RenderProgramState> state = program->onCreate(engine);
+							if (state.isNotNull()) {
+								state->gl_program = ph;
+								if (program->onInit(engine, state.ptr)) {
+									Ref<_RenderProgramInstance> ret = new _RenderProgramInstance();
 									if (ret.isNotNull()) {
 										ret->program = ph;
 										ret->vertexShader = vs;
 										ret->fragmentShader = fs;
-										ret->info = info;
-										ret->linkObject(this, program);
+										ret->state = state;
+										ret->link(engine, program);
 										return ret;
 									}
 								}
@@ -1249,409 +1107,342 @@ public:
 					GL_BASE::deleteShader(vs);
 				}
 			}
+			return Ref<_RenderProgramInstance>::null();
 		}
-		return ret;
+		
+		static String convertShader(String glsl)
+		{
+#if defined(_OPENGL_IMPL)
+#else
+			if (! (glsl.startsWith("precision"))) {
+				glsl = "precision highp float;" + glsl;
+			}
+#endif
+			return glsl;
+		}
+		
+		Ref<RenderProgram> getProgram()
+		{
+			return Ref<RenderProgram>::from(getObject());
+		}
+		
+	};
+	
+	// override
+	Ref<RenderProgramInstance> _createProgramInstance(RenderProgram* program)
+	{
+		if (!isCurrentEngine()) {
+			return Ref<RenderProgramInstance>::null();
+		}
+		return _RenderProgramInstance::create(this, program);
 	}
-
-	class _VertexBufferInstance : public _BaseInstance
+	
+	class _VertexBufferInstance : public VertexBufferInstance
 	{
 	public:
-		sl_uint32 buffer;
+		sl_uint32 handle;
 		
-		sl_size offsetUpdateStart;
-		sl_size offsetUpdateEnd;
-
 	public:
-		SLIB_INLINE _VertexBufferInstance()
+		_VertexBufferInstance()
 		{
 		}
 		
 		~_VertexBufferInstance()
 		{
-			free();
-		}
-
-	public:
-		SLIB_INLINE Ref<VertexBuffer> getVertexBuffer()
-		{
-			return Ref<VertexBuffer>::from(getObject());
-		}
-
-		void _update(RenderBaseObject* _object)
-		{
-			VertexBuffer* object = (VertexBuffer*)_object;
-			if (offsetUpdateEnd > offsetUpdateStart && offsetUpdateEnd <= object->getSize())
-			{
-				GL_BASE::updateVertexBuffer(buffer, offsetUpdateStart, (object->getBuffer()) + offsetUpdateStart, offsetUpdateEnd - offsetUpdateStart);
+			Ref<RenderEngine> engine = getEngine();
+			if (engine.isNotNull()) {
+				((GL_ENGINE*)(engine.ptr))->m_listDirtyBufferHandles.add(handle);
 			}
 		}
-
-		void _free()
+		
+	public:
+		static Ref<_VertexBufferInstance> create(GL_ENGINE* engine, VertexBuffer* buffer)
 		{
-			GL_BASE::deleteBuffer(buffer);
+			sl_uint32 handle = GL_BASE::createVertexBuffer(buffer->getBuffer(), buffer->getSize(), buffer->isStatic());
+			if (handle) {
+				Ref<_VertexBufferInstance> ret = new _VertexBufferInstance();
+				if (ret.isNotNull()) {
+					ret->handle = handle;
+					ret->link(engine, buffer);
+					return ret;
+				}
+				GL_BASE::deleteBuffer(handle);
+			}
+			return Ref<_VertexBufferInstance>::null();
+		}
+		
+		// override
+		void onUpdate(RenderBaseObject* object)
+		{
+			VertexBuffer* buffer = (VertexBuffer*)object;
+			GL_BASE::updateVertexBuffer(handle, m_updatedOffset, buffer->getBuffer() + m_updatedOffset, m_updatedSize);
 		}
 		
 	};
 	
-	Ref<_VertexBufferInstance> _getVertexBuffer(VertexBuffer* buffer)
+	// override
+	Ref<VertexBufferInstance> _createVertexBufferInstance(VertexBuffer* buffer)
 	{
-		Ref<_VertexBufferInstance> ret = Ref<_VertexBufferInstance>::from(getValidInstance(buffer));
-		if (ret.isNull()) {
-			sl_uint32 obj = GL_BASE::createVertexBuffer(buffer->getStatic(), buffer->getSize(), buffer->getBuffer());
-			if (obj) {
-				ret = new _VertexBufferInstance();
-				if (ret.isNotNull()) {
-					ret->buffer = obj;
-					ret->linkObject(this, buffer);
-					return ret;
-				}
-				GL_BASE::deleteBuffer(obj);
-			}
+		if (!isCurrentEngine()) {
+			return Ref<VertexBufferInstance>::null();
 		}
-		return ret;
+		return _VertexBufferInstance::create(this, buffer);
 	}
-
-	void _onUpdateVertexBuffer(VertexBuffer* buffer, sl_size offset, sl_size size)
-	{
-		Ref<_VertexBufferInstance> _instance = Ref<_VertexBufferInstance>::from(buffer->getInstance());
-		_VertexBufferInstance* instance = _instance.ptr;
-		if (instance) {
-			sl_size offsetEnd = offset + size;
-			if (instance->m_flagUpdated) {
-				if (instance->offsetUpdateStart > offset) {
-					instance->offsetUpdateStart = offset;
-				}
-				if (instance->offsetUpdateEnd < offsetEnd) {
-					instance->offsetUpdateEnd = offsetEnd;
-				}
-			} else {
-				instance->offsetUpdateStart = offset;
-				instance->offsetUpdateEnd = offsetEnd;
-			}
-			instance->m_flagUpdated = sl_true;
-		}
-	}
-
-	sl_bool _linkVertexBuffer(VertexBuffer* buffer)
-	{
-		if (buffer) {
-			if (isCurrentEngine()) {
-				Ref<_VertexBufferInstance> t = _getVertexBuffer((VertexBuffer*)buffer);
-				if (t.isNotNull()) {
-					return sl_true;
-				}
-			}
-		}
-		return sl_false;
-	}
-
-	class _IndexBufferInstance : public _BaseInstance
+	
+	class _IndexBufferInstance : public IndexBufferInstance
 	{
 	public:
-		sl_uint32 buffer;
-		
-		sl_size offsetUpdateStart;
-		sl_size offsetUpdateEnd;
+		sl_uint32 handle;
 		
 	public:
-		SLIB_INLINE _IndexBufferInstance()
+		_IndexBufferInstance()
 		{
 		}
 		
 		~_IndexBufferInstance()
 		{
-			free();
-		}
-
-	public:
-		SLIB_INLINE Ref<IndexBuffer> getIndexBuffer()
-		{
-			return Ref<IndexBuffer>::from(getObject());
-		}
-		
-		void _update(RenderBaseObject* _object)
-		{
-			IndexBuffer* object = (IndexBuffer*)_object;
-			if (offsetUpdateEnd > offsetUpdateStart && offsetUpdateEnd <= object->getSize())
-			{
-				GL_BASE::updateIndexBuffer(buffer, offsetUpdateStart, (object->getBuffer()) + offsetUpdateStart, offsetUpdateEnd - offsetUpdateStart);
+			Ref<RenderEngine> engine = getEngine();
+			if (engine.isNotNull()) {
+				((GL_ENGINE*)(engine.ptr))->m_listDirtyBufferHandles.add(handle);
 			}
 		}
-
-		void _free()
+		
+	public:
+		static Ref<_IndexBufferInstance> create(GL_ENGINE* engine, IndexBuffer* buffer)
 		{
-			GL_BASE::deleteBuffer(buffer);
-		}
-
-	};
-	
-	Ref<_IndexBufferInstance> _getIndexBuffer(IndexBuffer* buffer)
-	{
-		Ref<_IndexBufferInstance> ret = Ref<_IndexBufferInstance>::from(getValidInstance(buffer));
-		if (ret.isNull()) {
-			sl_uint32 obj = GL_BASE::createIndexBuffer(buffer->getStatic(), buffer->getSize(), buffer->getBuffer());
-			if (obj) {
-				ret = new _IndexBufferInstance();
+			sl_uint32 handle = GL_BASE::createIndexBuffer(buffer->getBuffer(), buffer->getSize(), buffer->isStatic());
+			if (handle) {
+				Ref<_IndexBufferInstance> ret = new _IndexBufferInstance();
 				if (ret.isNotNull()) {
-					ret->buffer = obj;
-					ret->linkObject(this, buffer);
+					ret->handle = handle;
+					ret->link(engine, buffer);
 					return ret;
 				}
-				GL_BASE::deleteBuffer(obj);
+				GL_BASE::deleteBuffer(handle);
 			}
+			return Ref<_IndexBufferInstance>::null();
 		}
-		return ret;
-	}
-
-	void _onUpdateIndexBuffer(IndexBuffer* buffer, sl_size offset, sl_size size)
-	{
-		Ref<_IndexBufferInstance> _instance = Ref<_IndexBufferInstance>::from(buffer->getInstance());
-		_IndexBufferInstance* instance = _instance.ptr;
-		if (instance) {
-			sl_size offsetEnd = offset + size;
-			if (instance->m_flagUpdated) {
-				if (instance->offsetUpdateStart > offset) {
-					instance->offsetUpdateStart = offset;
-				}
-				if (instance->offsetUpdateEnd < offsetEnd) {
-					instance->offsetUpdateEnd = offsetEnd;
-				}
-			} else {
-				instance->offsetUpdateStart = offset;
-				instance->offsetUpdateEnd = offsetEnd;
-			}
-			instance->m_flagUpdated = sl_true;
-		}
-	}
-
-	sl_bool _linkIndexBuffer(IndexBuffer* buffer)
-	{
-		if (buffer) {
-			if (isCurrentEngine()) {
-				Ref<_IndexBufferInstance> t = _getIndexBuffer((IndexBuffer*)buffer);
-				if (t.isNotNull()) {
-					return sl_true;
-				}
-			}
-		}
-		return sl_false;
-	}
-
-	class _TextureInstance : public _BaseInstance
-	{
-	public:
-		sl_uint32 texture;
 		
-		Rectanglei rectUpdate;
+		// override
+		void onUpdate(RenderBaseObject* object)
+		{
+			IndexBuffer* buffer = (IndexBuffer*)object;
+			GL_BASE::updateIndexBuffer(handle, m_updatedOffset, buffer->getBuffer() + m_updatedOffset, m_updatedSize);
+		}
+		
+	};
+	
+	// override
+	Ref<IndexBufferInstance> _createIndexBufferInstance(IndexBuffer* buffer)
+	{
+		if (!isCurrentEngine()) {
+			return Ref<IndexBufferInstance>::null();
+		}
+		return _IndexBufferInstance::create(this, buffer);
+	}
 
+	class _TextureInstance : public TextureInstance
+	{
 	public:
-		SLIB_INLINE _TextureInstance()
+		sl_uint32 handle;
+		
+	public:
+		_TextureInstance()
 		{
 		}
 		
 		~_TextureInstance()
 		{
-			free();
-		}
-
-	public:
-		SLIB_INLINE Ref<_TextureInstance> getTexture()
-		{
-			return Ref<_TextureInstance>::from(getObject());
-		}
-
-		void _update(RenderBaseObject* _object)
-		{
-			GL_BASE::bindTexture2D(texture);
-			Texture* object = (Texture*)_object;
-			GL_BASE::updateTexture2D(
-				rectUpdate.left, rectUpdate.top, rectUpdate.getWidth(), rectUpdate.getHeight()
-				, object->getSource(), rectUpdate.left, rectUpdate.top);
-			if (object->isFreeSourceOnUpdate()) {
-				object->freeSource();
+			Ref<RenderEngine> engine = getEngine();
+			if (engine.isNotNull()) {
+				((GL_ENGINE*)(engine.ptr))->m_listDirtyTextureHandles.add(handle);
 			}
 		}
-
-		void _free()
+		
+	public:
+		static Ref<_TextureInstance> create(GL_ENGINE* engine, Texture* texture)
 		{
-			GL_BASE::deleteTexture(texture);
+			sl_uint32 handle = GL_BASE::createTexture2D(texture->getSource());;
+			if (texture->isFreeSourceOnUpdate()) {
+				texture->freeSource();
+			}
+			if (handle) {
+				Ref<_TextureInstance> ret = new _TextureInstance();
+				if (ret.isNotNull()) {
+					ret->handle = handle;
+					ret->link(engine, texture);
+					return ret;
+				}
+				GL_BASE::deleteTexture(handle);
+			}
+			return Ref<_TextureInstance>::null();
+		}
+		
+		// override
+		void onUpdate(RenderBaseObject* object)
+		{
+			Texture* texture = (Texture*)object;
+			GL_BASE::bindTexture2D(handle);
+			GL_BASE::updateTexture2D(m_updatedRegion.left, m_updatedRegion.top, m_updatedRegion.getWidth(), m_updatedRegion.getHeight(), texture->getSource(), m_updatedRegion.left, m_updatedRegion.top);
+			if (texture->isFreeSourceOnUpdate()) {
+				texture->freeSource();
+			}
 		}
 		
 	};
 	
-	Ref<_TextureInstance> _getTexture(Texture* texture)
+	// override
+	Ref<TextureInstance> _createTextureInstance(Texture* texture)
 	{
-		Ref<_TextureInstance> ret = Ref<_TextureInstance>::from(getValidInstance(texture));
-		if (ret.isNull()) {
-			sl_uint32 obj = GL_BASE::createTexture2D(texture->getSource());;
-			if (texture->isFreeSourceOnUpdate()) {
-				texture->freeSource();
-			}
-			if (obj) {
-				ret = new _TextureInstance();
-				if (ret.isNotNull()) {
-					ret->texture = obj;
-					ret->linkObject(this, texture);
-					return ret;
-				}
-				GL_BASE::deleteTexture(obj);
-			}
+		if (!isCurrentEngine()) {
+			return Ref<TextureInstance>::null();
 		}
-		return ret;
+		return _TextureInstance::create(this, texture);
 	}
 
-	void _onUpdateTexture(Texture* texture, sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
+	// override
+	sl_bool _beginScene()
 	{
-		if (width == 0 || height == 0) {
-			return;
+		if (!isCurrentEngine()) {
+			return sl_false;
 		}
-		Ref<_TextureInstance> _instance = Ref<_TextureInstance>::from(texture->getInstance());
-		_TextureInstance* instance = _instance.ptr;
-		if (instance) {
-			if (instance->m_flagUpdated) {
-				instance->rectUpdate.mergeRectangle(Rectanglei(x, y, x + width, y + height));
-			} else {
-				instance->rectUpdate = Rectanglei(x, y, x + width, y + height);
-			}
-			instance->m_flagUpdated = sl_true;
-		}
+		freeDirtyHandles();
+		return sl_true;
 	}
 
-	void _applyTexture(const void* _samplerNo, Texture* texture)
+	// override
+	void _endScene()
 	{
-		sl_uint32 samplerNo = (sl_uint32)(sl_reg)(_samplerNo);
-		if (!texture) {
-			return;
-		}
+	}
+
+	// override
+	void _setViewport(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
+	{
 		if (!isCurrentEngine()) {
 			return;
 		}
-		GL_BASE::setActiveSampler(samplerNo);
-		Ref<_TextureInstance> t = _getTexture(texture);
-		if (t.isNotNull()) {
-			useObject(texture);
-			GL_BASE::bindTexture2D(t->texture);
-			GL_BASE::setTexture2DFilterMode(texture->getMinFilter(), texture->getMagFilter());
-			GL_BASE::setTexture2DWrapMode(texture->getWrapX(), texture->getWrapY());
-		}
-	}
-
-	sl_bool _linkTexture(Texture* texture)
-	{
-		if (texture) {
-			if (isCurrentEngine()) {
-				Ref<_TextureInstance> t = _getTexture((Texture*)texture);
-				if (t.isNotNull()) {
-					return sl_true;
-				}
-			}
-		}
-		return sl_false;
+		GL_BASE::setViewport(x, y, width, height);
 	}
 	
-	sl_bool _beginProgram(RenderProgram* program)
+	// override
+	void _clear(const RenderClearParam& param)
 	{
-		if (!program) {
-			return sl_false;
+		if (!isCurrentEngine()) {
+			return;
 		}
+		GL_BASE::clear(param);
+	}
+
+	// override
+	void _setDepthTest(sl_bool flag)
+	{
+		if (!isCurrentEngine()) {
+			return;
+		}
+		GL_BASE::setDepthTest(flag);
+	}
+
+	// override
+	void _setDepthWriteEnabled(sl_bool flagEnableDepthWrite)
+	{
+		if (!isCurrentEngine()) {
+			return;
+		}
+		GL_BASE::setDepthWriteEnabled(flagEnableDepthWrite);
+	}
+
+	// override
+	void _setCullFace(sl_bool flagEnableCull, sl_bool flagCullCCW = sl_true)
+	{
+		if (!isCurrentEngine()) {
+			return;
+		}
+		GL_BASE::setCullFace(flagEnableCull, flagCullCCW);
+	}
+
+	// override
+	void _setBlending(sl_bool flagEnableBlending, const RenderBlendingParam& param)
+	{
+		if (!isCurrentEngine()) {
+			return;
+		}
+		GL_BASE::setBlending(flagEnableBlending, param);
+	}
+	
+	// override
+	sl_bool _beginProgram(RenderProgram* program, RenderProgramInstance* _instance, RenderProgramState** ppState)
+	{
 		if (!isCurrentEngine()) {
 			return sl_false;
 		}
-		Ref<_RenderProgramInstance> engineProgram = _getProgram(program);
-		if (engineProgram.isNull()) {
-			return sl_false;
+		_RenderProgramInstance* instance = (_RenderProgramInstance*)_instance;
+		GL_BASE::useProgram(instance->program);
+		m_currentProgram = program;
+		m_currentProgramInstance = instance;
+		if (ppState) {
+			*ppState = instance->state.ptr;
 		}
-		useObject(program);
-		GL_BASE::useProgram(engineProgram->program);
-		m_currentProgram = engineProgram;
-		if (program->onBeginProgram(this, engineProgram->info.ptr)) {
-			return sl_true;
-		}
-		return sl_false;
+		return sl_true;
 	}
 
+	// override
 	void _endProgram()
 	{
 		if (!isCurrentEngine()) {
 			return;
 		}
-		Ref<_RenderProgramInstance> engineProgram = m_currentProgram;
-		if (engineProgram.isNull()) {
-			return;
-		}
-		Ref<RenderProgram> p = engineProgram->getProgram();
-		if (p.isNotNull()) {
-			p->onEndProgram(this, engineProgram->info.ptr);
-		}
 		GL_BASE::useProgram(0);
 		m_currentProgram.setNull();
+		m_currentProgramInstance.setNull();
 	}
 
-	void _drawPrimitive(Primitive* primitive)
+	// override
+	void _drawPrimitive(EnginePrimitive* primitive)
 	{
 		if (!isCurrentEngine()) {
 			return;
 		}
-		if (!primitive) {
+		if (m_currentProgram.isNull()) {
 			return;
 		}
-		if (primitive->countElements == 0) {
+		if (m_currentProgramInstance.isNull()) {
 			return;
 		}
-
-		if (primitive->vertexBuffer.isNull()) {
-			return;
-		}
-
-		Ref<_VertexBufferInstance> vb = _getVertexBuffer(primitive->vertexBuffer.ptr);
-		if (vb.isNull() || vb->buffer == 0) {
-			return;
-		}
-		useObject(primitive->vertexBuffer.ptr);
-
-		Ref<_RenderProgramInstance> engineProgram = m_currentProgram;
-		if (engineProgram.isNull()) {
-			return;
-		}
-		Ref<RenderProgram> program = engineProgram->getProgram();
-		if (program.isNull()) {
-			return;
-		}
+		_VertexBufferInstance* vb = (_VertexBufferInstance*)(primitive->vertexBufferInstance.ptr);
+		vb->_update(primitive->vertexBuffer.ptr);
 		if (primitive->indexBuffer.isNotNull()) {
-			Ref<_IndexBufferInstance> ib = _getIndexBuffer(primitive->indexBuffer.ptr);
-			if (ib.isNull() || ib->buffer == 0) {
-				return;
-			}
-			useObject(primitive->indexBuffer.ptr);
-
-			GL_BASE::bindVertexBuffer(vb->buffer);
-			if (program->onPreRender(this, engineProgram->info.ptr, primitive)) {
+			_IndexBufferInstance* ib = (_IndexBufferInstance*)(primitive->indexBufferInstance.ptr);
+			ib->_update(primitive->indexBuffer.ptr);
+			GL_BASE::bindVertexBuffer(vb->handle);
+			m_currentProgram->onUpdate(this, m_currentProgramInstance->state.ptr);
+			if (m_currentProgram->onPreRender(this, m_currentProgramInstance->state.ptr, primitive)) {
 				switch (primitive->type) {
 				case PrimitiveType::Triangles:
-					GL_BASE::drawTriangles(primitive->countElements, ib->buffer, 0);
+					GL_BASE::drawTriangles(primitive->countElements, ib->handle, 0);
 					break;
 				case PrimitiveType::TriangleStrip:
-					GL_BASE::drawTriangleStrip(primitive->countElements, ib->buffer, 0);
+					GL_BASE::drawTriangleStrip(primitive->countElements, ib->handle, 0);
 					break;
 				case PrimitiveType::TriangleFan:
-					GL_BASE::drawTriangleFan(primitive->countElements, ib->buffer, 0);
+					GL_BASE::drawTriangleFan(primitive->countElements, ib->handle, 0);
 					break;
 				case PrimitiveType::Lines:
-					GL_BASE::drawLines(primitive->countElements, ib->buffer, 0);
+					GL_BASE::drawLines(primitive->countElements, ib->handle, 0);
 					break;
 				case PrimitiveType::LineStrip:
-					GL_BASE::drawLineStrip(primitive->countElements, ib->buffer, 0);
+					GL_BASE::drawLineStrip(primitive->countElements, ib->handle, 0);
 					break;
 				case PrimitiveType::Points:
-					GL_BASE::drawPoints(primitive->countElements, ib->buffer, 0);
+					GL_BASE::drawPoints(primitive->countElements, ib->handle, 0);
 					break;
 				}
-				program->onPostRender(this, engineProgram->info.ptr, primitive);
+				m_currentProgram->onPostRender(this, m_currentProgramInstance->state.ptr, primitive);
 			}
 			//GL_BASE::unbindVertexBuffer();
 		} else {
-			GL_BASE::bindVertexBuffer(vb->buffer);
-			if (program->onPreRender(this, engineProgram->info.ptr, primitive)) {
+			GL_BASE::bindVertexBuffer(vb->handle);
+			m_currentProgram->onUpdate(this, m_currentProgramInstance->state.ptr);
+			if (m_currentProgram->onPreRender(this, m_currentProgramInstance->state.ptr, primitive)) {
 				switch (primitive->type) {
 				case PrimitiveType::Triangles:
 					GL_BASE::drawTriangles(primitive->countElements);
@@ -1672,20 +1463,39 @@ public:
 					GL_BASE::drawPoints(primitive->countElements);
 					break;
 				}
-				program->onPostRender(this, engineProgram->info.ptr, primitive);
+				m_currentProgram->onPostRender(this, m_currentProgramInstance->state.ptr, primitive);
 			}
 			//GL_BASE::unbindVertexBuffer();
 		}
 	}
-
-	void _setLineWidth(sl_real width)
+	
+	// override
+	void _applyTexture(sl_reg _samplerNo, Texture* texture, TextureInstance* _instance)
 	{
-		GL_BASE::setLineWidth(width);
+		if (!isCurrentEngine()) {
+			return;
+		}
+		sl_uint32 samplerNo = (sl_uint32)(_samplerNo);
+		GL_BASE::setActiveSampler(samplerNo);
+		_TextureInstance* instance = (_TextureInstance*)_instance;
+		instance->_update(texture);
+		GL_BASE::bindTexture2D(instance->handle);
+		GL_BASE::setTexture2DFilterMode(texture->getMinFilter(), texture->getMagFilter());
+		GL_BASE::setTexture2DWrapMode(texture->getWrapX(), texture->getWrapY());
 	}
 
+	// override
+	void _setLineWidth(sl_real width)
+	{
+		if (!isCurrentEngine()) {
+			return;
+		}
+		GL_BASE::setLineWidth(width);
+	}
+		
 	/*************************************************
 		OpenGL entry points
-		**************************************************/
+	**************************************************/
 	sl_int32 getAttributeLocation(sl_uint32 program, const char* name)
 	{
 		return GL_BASE::getAttributeLocation(program, name);

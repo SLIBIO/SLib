@@ -16,7 +16,7 @@ EditView::EditView()
 	m_flagReadOnly = sl_false;
 	m_flagMultiLine = sl_false;
 	m_textColor = Color::Black;
-	setBorder(sl_true, sl_false);
+	setBorder(sl_true, UIUpdateMode::Init);
 }
 
 String EditView::getText()
@@ -27,13 +27,13 @@ String EditView::getText()
 	return m_text;
 }
 
-void EditView::setText(const String& text, sl_bool flagRedraw)
+void EditView::setText(const String& text, UIUpdateMode mode)
 {
 	m_text = text;
 	if (isNativeWidget()) {
 		_setText_NW(text);
 	} else {
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -47,13 +47,13 @@ Alignment EditView::getGravity()
 	return m_textAlignment;
 }
 
-void EditView::setGravity(Alignment align, sl_bool flagRedraw)
+void EditView::setGravity(Alignment align, UIUpdateMode mode)
 {
 	m_textAlignment = align;
 	if (isNativeWidget()) {
 		_setTextAlignment_NW(align);
 	} else {
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -67,13 +67,13 @@ String EditView::getHintText()
 	return m_hintText;
 }
 
-void EditView::setHintText(const String& str, sl_bool flagRedraw)
+void EditView::setHintText(const String& str, UIUpdateMode mode)
 {
 	m_hintText = str;
 	if (isNativeWidget()) {
 		_setHintText_NW(str);
 	} else {
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -87,13 +87,13 @@ sl_bool EditView::isReadOnly()
 	return m_flagReadOnly;
 }
 
-void EditView::setReadOnly(sl_bool flag, sl_bool flagRedraw)
+void EditView::setReadOnly(sl_bool flag, UIUpdateMode mode)
 {
 	m_flagReadOnly = flag;
 	if (isNativeWidget()) {
 		_setReadOnly_NW(flag);
 	} else {
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -107,13 +107,13 @@ sl_bool EditView::isMultiLine()
 	return m_flagMultiLine;
 }
 
-void EditView::setMultiLine(sl_bool flag, sl_bool flagRedraw)
+void EditView::setMultiLine(sl_bool flag, UIUpdateMode mode)
 {
 	m_flagMultiLine = flag;
 	if (isNativeWidget()) {
 		_setMultiLine_NW(flag);
 	} else {
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -124,13 +124,13 @@ Color EditView::getTextColor()
 	return m_textColor;
 }
 
-void EditView::setTextColor(const Color& color, sl_bool flagRedraw)
+void EditView::setTextColor(const Color& color, UIUpdateMode mode)
 {
 	m_textColor = color;
 	if (isNativeWidget()) {
 		_setTextColor_NW(color);
 	} else {
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -222,7 +222,7 @@ sl_bool PasswordView::isMultiLine()
 	return sl_false;
 }
 
-void PasswordView::setMultiLine(sl_bool flag, sl_bool flagRedraw)
+void PasswordView::setMultiLine(sl_bool flag, UIUpdateMode mode)
 {
 }
 
@@ -242,7 +242,7 @@ sl_bool TextArea::isMultiLine()
 	return sl_true;
 }
 
-void TextArea::setMultiLine(sl_bool flag, sl_bool flagRedraw)
+void TextArea::setMultiLine(sl_bool flag, UIUpdateMode mode)
 {
 }
 

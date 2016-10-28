@@ -49,7 +49,6 @@ LOCAL_SRC_FILES += $(SLIB_DB_FILES:$(LOCAL_PATH)/%=%)
 LOCAL_SRC_FILES += \
 	$(SLIB_THIRDPARTY)/thirdparty_libjpeg.c \
 	$(SLIB_THIRDPARTY)/thirdparty_libpng.c \
-	$(SLIB_THIRDPARTY)/thirdparty_soil2.c \
 	$(SLIB_THIRDPARTY)/thirdparty_zlib.c \
 	$(SLIB_THIRDPARTY)/thirdparty_freetype.c \
 	$(SLIB_THIRDPARTY)/thirdparty_sqlite3.c

@@ -94,9 +94,13 @@ public:
 
 	virtual Size getTextSize(const Ref<Font>& font, const String& text);
 
-	virtual void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color) = 0;
+	virtual void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color);
+	
+	virtual void drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color);
 	
 	void drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment);
+	
+	void drawText16(const String16& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment);
 	
 	
 	virtual void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& pen) = 0;

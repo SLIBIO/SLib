@@ -5,6 +5,7 @@
 
 #include "point.h"
 #include "size.h"
+#include "matrix3.h"
 
 #include "../core/list.h"
 
@@ -122,6 +123,8 @@ public:
 	
 	// 4 points
 	void getCornerPoints(PointT<T, FT>* _out) const;
+	
+	void transform(const Matrix3T<FT>& mat);
 	
 	sl_bool equals(const RectangleT<T, FT>& other) const;
 	

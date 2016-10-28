@@ -3,7 +3,7 @@
 #include "../../../inc/slib/core/file.h"
 #include "../../../inc/slib/core/asset.h"
 
-#include "image_soil2.h"
+#include "image_stb.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
@@ -512,8 +512,8 @@ Ref<Image> Image::loadFromMemory(const void* _mem, sl_size size, sl_uint32 width
 			break;
 		}
 #endif
-#ifdef SLIB_GRAPHICS_IMAGE_USE_SOIL2
-		ret = Image_SOIL2::loadImage(mem, size);
+#ifdef SLIB_GRAPHICS_IMAGE_USE_STB
+		ret = Image_STB::loadImage(mem, size);
 		if (ret.isNotNull()) {
 			break;
 		}

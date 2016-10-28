@@ -18,10 +18,10 @@ TabView::TabView()
 	m_indexSelected = 0;
 	m_indexHover = -1;
 	
-	setBackgroundColor(Color::White, sl_false);
-	setBarBackground(Color(230, 230, 230));
-	setSelectedTabBackground(Color(150, 150, 150));
-	setHoverTabBackground(Color(210, 210, 210));
+	setBackgroundColor(Color::White, UIUpdateMode::Init);
+	setBarBackground(Color(230, 230, 230), UIUpdateMode::Init);
+	setSelectedTabBackground(Color(150, 150, 150), UIUpdateMode::Init);
+	setHoverTabBackground(Color(210, 210, 210), UIUpdateMode::Init);
 	m_labelColor = Color(50, 50, 50);
 	m_selectedLabelColor = Color::Black;
 	m_hoverLabelColor = Color(0, 20, 250);
@@ -45,7 +45,7 @@ sl_uint32 TabView::getTabsCount()
 	return (sl_uint32)(m_items.getCount());
 }
 
-void TabView::setTabsCount(sl_uint32 nNew, sl_bool flagRedraw)
+void TabView::setTabsCount(sl_uint32 nNew, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	ListLocker<TabViewItem> items(m_items);
@@ -62,15 +62,15 @@ void TabView::setTabsCount(sl_uint32 nNew, sl_bool flagRedraw)
 	if (nOrig > nNew) {
 		for (sl_uint32 i = nOrig; i > nNew; i--) {
 			TabViewItem& item = items[i-1];
-			removeChild(item.contentView, sl_false);
+			removeChild(item.contentView, UIUpdateMode::NoRedraw);
 		}
 	}
 	m_items.setCount(nNew);
 	if (isNativeWidget()) {
 		_refreshTabsCount_NW();
 	}
-	selectTab(m_indexSelected, sl_false);
-	if (flagRedraw) {
+	selectTab(m_indexSelected, UIUpdateMode::NoRedraw);
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -85,7 +85,7 @@ String TabView::getTabLabel(sl_uint32 index)
 	return String::null();
 }
 
-void TabView::setTabLabel(sl_uint32 index, const String& text, sl_bool flagRedraw)
+void TabView::setTabLabel(sl_uint32 index, const String& text, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	if (index < m_items.getCount()) {
@@ -94,7 +94,7 @@ void TabView::setTabLabel(sl_uint32 index, const String& text, sl_bool flagRedra
 		if (isNativeWidget()) {
 			_setTabLabel_NW(index, text);
 		} else {
-			if (flagRedraw) {
+			if (mode == UIUpdateMode::Redraw) {
 				_invalidateTabBar();
 			}
 		}
@@ -111,18 +111,23 @@ Ref<View> TabView::getTabContentView(sl_uint32 index)
 	return Ref<View>::null();
 }
 
-void TabView::setTabContentView(sl_uint32 index, const Ref<View>& view, sl_bool flagRedraw)
+void TabView::setTabContentView(sl_uint32 index, const Ref<View>& view, UIUpdateMode mode)
 {
 	MutexLocker lock(m_items.getLocker());
 	if (index < m_items.getCount()) {
 		TabViewItem* item = m_items.getItemPtr(index);
 		if (item->contentView != view) {
-			removeChild(item->contentView, sl_false);
+			removeChild(item->contentView, UIUpdateMode::NoRedraw);
 			if (view.isNotNull()) {
-				view->setFrame(getTabContentRegion(), sl_false);
 				view->setCreatingInstance(sl_true);
 				view->setAttachMode(UIAttachMode::NotAttachInNativeWidget);
-				addChild(view, sl_false);
+				if (mode == UIUpdateMode::Init) {
+					view->setFrame(getTabContentRegion(), UIUpdateMode::Init);
+					addChild(view, UIUpdateMode::Init);
+				} else {
+					view->setFrame(getTabContentRegion(), UIUpdateMode::NoRedraw);
+					addChild(view, UIUpdateMode::NoRedraw);
+				}
 			}
 			item->contentView = view;
 			if (isNativeWidget()) {
@@ -132,8 +137,8 @@ void TabView::setTabContentView(sl_uint32 index, const Ref<View>& view, sl_bool 
 					UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(TabView, _setTabContentView_NW_OnUiThread, this, index, view));
 				}
 			} else {
-				selectTab(m_indexSelected, sl_false);
-				if (flagRedraw) {
+				selectTab(m_indexSelected, UIUpdateMode::NoRedraw);
+				if (mode == UIUpdateMode::Redraw) {
 					invalidate();
 				}
 			}
@@ -154,7 +159,7 @@ sl_uint32 TabView::getSelectedTabIndex()
 	return m_indexSelected;
 }
 
-void TabView::selectTab(sl_uint32 index, sl_bool flagRedraw)
+void TabView::selectTab(sl_uint32 index, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	ListLocker<TabViewItem> items(m_items);
@@ -171,13 +176,13 @@ void TabView::selectTab(sl_uint32 index, sl_bool flagRedraw)
 			Ref<View> view = items[i].contentView;
 			if (view.isNotNull()) {
 				if (i == index) {
-					view->setVisible(sl_true, sl_false);
+					view->setVisible(sl_true, UIUpdateMode::NoRedraw);
 				} else {
-					view->setVisible(sl_false, sl_false);
+					view->setVisible(sl_false, UIUpdateMode::NoRedraw);
 				}
 			}
 		}
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -203,11 +208,11 @@ LayoutOrientation TabView::getOrientation()
 	return m_orientation;
 }
 
-void TabView::setOrientation(LayoutOrientation orientation, sl_bool flagRedraw)
+void TabView::setOrientation(LayoutOrientation orientation, UIUpdateMode mode)
 {
 	m_orientation = orientation;
 	if (!(isNativeWidget())) {
-		_relayout(flagRedraw);
+		_relayout(mode);
 	}
 }
 
@@ -216,11 +221,11 @@ sl_ui_len TabView::getTabWidth()
 	return m_tabWidth;
 }
 
-void TabView::setTabWidth(sl_ui_len width, sl_bool flagRedraw)
+void TabView::setTabWidth(sl_ui_len width, UIUpdateMode mode)
 {
 	m_tabWidth = width;
 	if (!(isNativeWidget())) {
-		_relayout(flagRedraw);
+		_relayout(mode);
 	}
 }
 
@@ -229,11 +234,11 @@ sl_ui_len TabView::getTabHeight()
 	return m_tabHeight;
 }
 
-void TabView::setTabHeight(sl_ui_len height, sl_bool flagRedraw)
+void TabView::setTabHeight(sl_ui_len height, UIUpdateMode mode)
 {
 	m_tabHeight = height;
 	if (!(isNativeWidget())) {
-		_relayout(flagRedraw);
+		_relayout(mode);
 	}
 }
 
@@ -242,17 +247,17 @@ Ref<Drawable> TabView::getBarBackground()
 	return m_barBackground;
 }
 
-void TabView::setBarBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void TabView::setBarBackground(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	m_barBackground = drawable;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		_invalidateTabBar();
 	}
 }
 
-void TabView::setBarBackground(const Color& color, sl_bool flagRedraw)
+void TabView::setBarBackground(const Color& color, UIUpdateMode mode)
 {
-	setBarBackground(Drawable::createColorDrawable(color), flagRedraw);
+	setBarBackground(Drawable::createColorDrawable(color), mode);
 }
 
 Ref<Drawable> TabView::getContentBackground()
@@ -260,17 +265,17 @@ Ref<Drawable> TabView::getContentBackground()
 	return m_contentBackground;
 }
 
-void TabView::setContentBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void TabView::setContentBackground(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	m_contentBackground = drawable;
-	if (flagRedraw) {
-		_invalidateTabBar();
+	if (mode == UIUpdateMode::Redraw) {
+		invalidate();
 	}
 }
 
-void TabView::setContentBackground(const Color& color, sl_bool flagRedraw)
+void TabView::setContentBackground(const Color& color, UIUpdateMode mode)
 {
-	setContentBackground(Drawable::createColorDrawable(color));
+	setContentBackground(Drawable::createColorDrawable(color), mode);
 }
 
 Ref<Drawable> TabView::getTabBackground()
@@ -278,17 +283,17 @@ Ref<Drawable> TabView::getTabBackground()
 	return m_tabBackground;
 }
 
-void TabView::setTabBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void TabView::setTabBackground(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	m_tabBackground = drawable;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		_invalidateTabBar();
 	}
 }
 
-void TabView::setTabBackground(const Color& color, sl_bool flagRedraw)
+void TabView::setTabBackground(const Color& color, UIUpdateMode mode)
 {
-	setTabBackground(Drawable::createColorDrawable(color), flagRedraw);
+	setTabBackground(Drawable::createColorDrawable(color), mode);
 }
 
 Ref<Drawable> TabView::getSelectedTabBackground()
@@ -296,17 +301,17 @@ Ref<Drawable> TabView::getSelectedTabBackground()
 	return m_selectedTabBackground;
 }
 
-void TabView::setSelectedTabBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void TabView::setSelectedTabBackground(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	m_selectedTabBackground = drawable;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		_invalidateTabBar();
 	}
 }
 
-void TabView::setSelectedTabBackground(const Color& color, sl_bool flagRedraw)
+void TabView::setSelectedTabBackground(const Color& color, UIUpdateMode mode)
 {
-	setSelectedTabBackground(Drawable::createColorDrawable(color), flagRedraw);
+	setSelectedTabBackground(Drawable::createColorDrawable(color), mode);
 }
 
 Ref<Drawable> TabView::getHoverTabBackground()
@@ -314,17 +319,17 @@ Ref<Drawable> TabView::getHoverTabBackground()
 	return m_hoverTabBackground;
 }
 
-void TabView::setHoverTabBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void TabView::setHoverTabBackground(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	m_hoverTabBackground = drawable;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		_invalidateTabBar();
 	}
 }
 
-void TabView::setHoverTabBackground(const Color& color, sl_bool flagRedraw)
+void TabView::setHoverTabBackground(const Color& color, UIUpdateMode mode)
 {
-	setHoverTabBackground(Drawable::createColorDrawable(color), flagRedraw);
+	setHoverTabBackground(Drawable::createColorDrawable(color), mode);
 }
 
 Color TabView::getLabelColor()
@@ -332,10 +337,10 @@ Color TabView::getLabelColor()
 	return m_labelColor;
 }
 
-void TabView::setLabelColor(const Color& color, sl_bool flagRedraw)
+void TabView::setLabelColor(const Color& color, UIUpdateMode mode)
 {
 	m_labelColor = color;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		_invalidateTabBar();
 	}
 }
@@ -345,10 +350,10 @@ Color TabView::getSelectedLabelColor()
 	return m_selectedLabelColor;
 }
 
-void TabView::setSelectedLabelColor(const Color& color, sl_bool flagRedraw)
+void TabView::setSelectedLabelColor(const Color& color, UIUpdateMode mode)
 {
 	m_selectedLabelColor = color;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		_invalidateTabBar();
 	}
 }
@@ -358,10 +363,10 @@ Color TabView::getHoverLabelColor()
 	return m_hoverLabelColor;
 }
 
-void TabView::setHoverLabelColor(const Color& color, sl_bool flagRedraw)
+void TabView::setHoverLabelColor(const Color& color, UIUpdateMode mode)
 {
 	m_hoverLabelColor = color;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		_invalidateTabBar();
 	}
 }
@@ -371,28 +376,28 @@ Alignment TabView::getLabelAlignment()
 	return m_labelAlignment;
 }
 
-void TabView::setLabelAlignment(Alignment align, sl_bool flagRedraw)
+void TabView::setLabelAlignment(Alignment align, UIUpdateMode mode)
 {
 	m_labelAlignment = align;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void TabView::setLabelMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw)
+void TabView::setLabelMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode)
 {
 	m_labelMarginLeft = left;
 	m_labelMarginTop = top;
 	m_labelMarginRight = right;
 	m_labelMarginBottom = bottom;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void TabView::setLabelMargin(sl_ui_pos margin, sl_bool flagRedraw)
+void TabView::setLabelMargin(sl_ui_pos margin, UIUpdateMode mode)
 {
-	setLabelMargin(margin, margin, margin, margin, flagRedraw);
+	setLabelMargin(margin, margin, margin, margin, mode);
 }
 
 sl_ui_pos TabView::getLabelMarginLeft()
@@ -400,9 +405,9 @@ sl_ui_pos TabView::getLabelMarginLeft()
 	return m_labelMarginLeft;
 }
 
-void TabView::setLabelMarginLeft(sl_ui_pos margin, sl_bool flagRedraw)
+void TabView::setLabelMarginLeft(sl_ui_pos margin, UIUpdateMode mode)
 {
-	setLabelMargin(margin, m_labelMarginTop, m_labelMarginRight, m_labelMarginBottom, flagRedraw);
+	setLabelMargin(margin, m_labelMarginTop, m_labelMarginRight, m_labelMarginBottom, mode);
 }
 
 sl_ui_pos TabView::getLabelMarginTop()
@@ -410,9 +415,9 @@ sl_ui_pos TabView::getLabelMarginTop()
 	return m_labelMarginTop;
 }
 
-void TabView::setLabelMarginTop(sl_ui_pos margin, sl_bool flagRedraw)
+void TabView::setLabelMarginTop(sl_ui_pos margin, UIUpdateMode mode)
 {
-	setLabelMargin(m_labelMarginLeft, margin, m_labelMarginRight, m_labelMarginBottom, flagRedraw);
+	setLabelMargin(m_labelMarginLeft, margin, m_labelMarginRight, m_labelMarginBottom, mode);
 }
 
 sl_ui_pos TabView::getLabelMarginRight()
@@ -420,9 +425,9 @@ sl_ui_pos TabView::getLabelMarginRight()
 	return m_labelMarginRight;
 }
 
-void TabView::setLabelMarginRight(sl_ui_pos margin, sl_bool flagRedraw)
+void TabView::setLabelMarginRight(sl_ui_pos margin, UIUpdateMode mode)
 {
-	setLabelMargin(m_labelMarginLeft, m_labelMarginTop, margin, m_labelMarginBottom, flagRedraw);
+	setLabelMargin(m_labelMarginLeft, m_labelMarginTop, margin, m_labelMarginBottom, mode);
 }
 
 sl_ui_pos TabView::getLabelMarginBottom()
@@ -430,9 +435,9 @@ sl_ui_pos TabView::getLabelMarginBottom()
 	return m_labelMarginBottom;
 }
 
-void TabView::setLabelMarginBottom(sl_ui_pos margin, sl_bool flagRedraw)
+void TabView::setLabelMarginBottom(sl_ui_pos margin, UIUpdateMode mode)
 {
-	setLabelMargin(m_labelMarginLeft, m_labelMarginTop, m_labelMarginRight, margin, flagRedraw);
+	setLabelMargin(m_labelMarginLeft, m_labelMarginTop, m_labelMarginRight, margin, mode);
 }
 
 UIRect TabView::getTabBarRegion()
@@ -507,7 +512,7 @@ void TabView::_invalidateTabBar()
 	invalidate(getTabBarRegion());
 }
 
-void TabView::_relayout(sl_bool flagRedraw)
+void TabView::_relayout(UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	UIRect bound = getTabContentRegion();
@@ -515,10 +520,14 @@ void TabView::_relayout(sl_bool flagRedraw)
 	for (sl_size i = 0; i < items.count; i++) {
 		Ref<View> view = items[i].contentView;
 		if (view.isNotNull()) {
-			view->setFrame(bound, flagRedraw);
+			if (mode == UIUpdateMode::Init) {
+				view->setFrame(bound, UIUpdateMode::Init);
+			} else {
+				view->setFrame(bound, UIUpdateMode::NoRedraw);
+			}
 		}
 	}
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -633,7 +642,7 @@ void TabView::onResize(sl_ui_len width, sl_ui_len height)
 	if (isNativeWidget()) {
 		_refreshSize_NW();
 	} else {
-		_relayout(sl_true);
+		_relayout(UIUpdateMode::Redraw);
 	}
 }
 

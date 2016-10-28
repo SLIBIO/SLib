@@ -368,6 +368,17 @@ void RectangleT<T, FT>::getCornerPoints(PointT<T, FT>* _out) const
 }
 
 template <class T, class FT>
+void RectangleT<T, FT>::transform(const Matrix3T<FT>& mat)
+{
+	Vector2T<T, FT> pts[4];
+	getCornerPoints(pts);
+	for (int i = 0; i < 4; i++) {
+		pts[i] = mat.transformPosition(pts[i]);
+	}
+	setFromPoints(pts, 4);
+}
+
+template <class T, class FT>
 sl_bool RectangleT<T, FT>::equals(const RectangleT<T, FT>& other) const
 {
 	return left == other.left && top == other.top && right == other.right && bottom == other.bottom;

@@ -11,7 +11,7 @@ ScrollView::ScrollView()
 
 	setCreatingNativeWidget(sl_true);
 	setCreatingChildInstances(sl_false);
-	setBorder(sl_true, sl_false);
+	setBorder(sl_true, UIUpdateMode::Init);
 	
 	m_flagInitedScrollbars = sl_false;
 	m_flagHorizontalScroll = sl_true;
@@ -44,40 +44,46 @@ Ref<View> ScrollView::getContentView()
 	return m_viewContent;
 }
 
-void ScrollView::setContentView(const Ref<slib::View>& view, sl_bool flagRedraw)
+void ScrollView::setContentView(const Ref<slib::View>& view, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	_initScrollbars();
 	if (m_viewContent != view) {
 		Ref<View> viewOld = m_viewContent;
-		removeChild(viewOld);
+		removeChild(viewOld, UIUpdateMode::NoRedraw);
 		m_viewContent = view;
 		if (view.isNotNull()) {
 			view->setParent(this);
 			view->setCreatingInstance(sl_true);
 			view->setAttachMode(UIAttachMode::NotAttach);
-			addChild(view, sl_false);
-			View::setContentSize(view->getWidth(), view->getHeight());
-		} else {
-			View::setContentSize(0, 0);
-		}
-		if (isNativeWidget()) {
-			if (UI::isUiThread()) {
-				_setContentView_NW_OnUiThread(view);
+			if (mode == UIUpdateMode::Init) {
+				addChild(view, UIUpdateMode::Init);
 			} else {
-				UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(ScrollView, _setContentView_NW_OnUiThread, this, view));
+				addChild(view, UIUpdateMode::NoRedraw);
 			}
+			View::setContentSize(view->getWidth(), view->getHeight(), UIUpdateMode::NoRedraw);
 		} else {
-			UIPoint pt = View::getScrollPosition();
-			_scrollTo(pt.x, pt.y, sl_false);
-			if (flagRedraw) {
-				invalidate();
+			View::setContentSize(0, 0, UIUpdateMode::NoRedraw);
+		}
+		if (mode != UIUpdateMode::Init) {
+			if (isNativeWidget()) {
+				if (UI::isUiThread()) {
+					_setContentView_NW_OnUiThread(view);
+				} else {
+					UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(ScrollView, _setContentView_NW_OnUiThread, this, view));
+				}
+			} else {
+				UIPoint pt = View::getScrollPosition();
+				_scrollTo(pt.x, pt.y, UIUpdateMode::NoRedraw);
+				if (mode == UIUpdateMode::Redraw) {
+					invalidate();
+				}
 			}
 		}
 	}
 }
 
-void ScrollView::setContentSize(sl_scroll_pos _width, sl_scroll_pos _height, sl_bool flagRefresh)
+void ScrollView::setContentSize(sl_scroll_pos _width, sl_scroll_pos _height, UIUpdateMode mode)
 {
 	sl_ui_pos width = (sl_ui_pos)(_width);
 	if (width < 0) {
@@ -91,17 +97,21 @@ void ScrollView::setContentSize(sl_scroll_pos _width, sl_scroll_pos _height, sl_
 	_initScrollbars();
 	Ref<View> viewContent = m_viewContent;
 	if (viewContent.isNotNull()) {
-		viewContent->setSize(width, height);
+		if (mode == UIUpdateMode::Init) {
+			viewContent->setSize(width, height, UIUpdateMode::Init);
+		} else {
+			viewContent->setSize(width, height, UIUpdateMode::NoRedraw);
+		}
 	}
-	View::setContentSize(_width, _height, flagRefresh);
+	View::setContentSize(_width, _height, mode);
 	if (isNativeWidget()) {
 		_refreshContentSize_NW();
 	}
 }
 
-void ScrollView::setContentSize(const ScrollPoint& size, sl_bool flagRefresh)
+void ScrollView::setContentSize(const ScrollPoint& size, UIUpdateMode mode)
 {
-	setContentSize(size.x, size.y, flagRefresh);
+	setContentSize(size.x, size.y, mode);
 }
 
 ScrollPoint ScrollView::getScrollPosition()
@@ -120,15 +130,15 @@ ScrollPoint ScrollView::getScrollRange()
 	return View::getScrollRange();
 }
 
-void ScrollView::scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagRedraw)
+void ScrollView::scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode)
 {
-	_scrollTo(x, y, sl_false);
-	View::scrollTo(x, y, flagRedraw);
+	_scrollTo(x, y, UIUpdateMode::NoRedraw);
+	View::scrollTo(x, y, mode);
 }
 
-void ScrollView::scrollTo(const ScrollPoint& position, sl_bool flagRedraw)
+void ScrollView::scrollTo(const ScrollPoint& position, UIUpdateMode mode)
 {
-	scrollTo(position.x, position.y, flagRedraw);
+	scrollTo(position.x, position.y, mode);
 }
 
 void ScrollView::onResize(sl_ui_len width, sl_ui_len height)
@@ -164,18 +174,18 @@ void ScrollView::_initScrollbars()
 	m_flagInitedScrollbars = sl_true;
 	if (m_flagVerticalScroll) {
 		if (m_flagHorizontalScroll) {
-			createScrollBars(sl_false);
+			createScrollBars(UIUpdateMode::NoRedraw);
 		} else {
-			createVerticalScrollBar(sl_false);
+			createVerticalScrollBar(UIUpdateMode::NoRedraw);
 		}
 	} else {
 		if (m_flagHorizontalScroll) {
-			createHorizontalScrollBar(sl_false);
+			createHorizontalScrollBar(UIUpdateMode::NoRedraw);
 		}
 	}
 }
 
-void ScrollView::_scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagRedraw)
+void ScrollView::_scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode)
 {
 	Ref<View> view = m_viewContent;
 	if (view.isNotNull()) {
@@ -208,7 +218,7 @@ void ScrollView::_scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagRedraw)
 			} else {
 				y = 0;
 			}
-			view->setPosition((sl_ui_pos)-x, (sl_ui_pos)-y, flagRedraw);
+			view->setPosition((sl_ui_pos)-x, (sl_ui_pos)-y, mode);
 		}
 	}
 }
@@ -224,7 +234,7 @@ void ScrollView::_setContentView_NW_OnUiThread(const Ref<View> view)
 
 void ScrollView::_onScroll_NW(sl_scroll_pos x, sl_scroll_pos y)
 {
-	View::scrollTo(x, y, sl_false);
+	View::scrollTo(x, y, UIUpdateMode::NoRedraw);
 }
 
 

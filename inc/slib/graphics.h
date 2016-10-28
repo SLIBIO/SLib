@@ -20,6 +20,7 @@
 #include "graphics/canvas.h"
 
 #include "graphics/freetype.h"
+#include "graphics/font_atlas.h"
 
 #include "graphics/util.h"
 

@@ -88,9 +88,26 @@ sl_bool Bitmap::isNotEmpty()
 	return getBitmapWidth() != 0 && getBitmapHeight() != 0;
 }
 
+void Bitmap::update(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
+{
+	m_drawableCached.setNull();
+	{
+		Ref<BitmapCache> cache = m_renderingTextureCached;
+		if (cache.isNotNull()) {
+			cache->update(x, y, width, height);
+		}
+	}
+}
+
 void Bitmap::update()
 {
 	m_drawableCached.setNull();
+	{
+		Ref<BitmapCache> cache = m_renderingTextureCached;
+		if (cache.isNotNull()) {
+			cache->update(0, 0, getBitmapWidth(), getBitmapHeight());
+		}		
+	}
 }
 
 sl_bool Bitmap::readPixels(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, Color* colors, sl_int32 stride)

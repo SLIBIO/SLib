@@ -56,17 +56,17 @@ Ref<Drawable> Slider::getThumbDrawable()
 	return m_thumb;
 }
 
-void Slider::setThumbDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void Slider::setThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	m_thumb = drawable;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void Slider::setThumbColor(const Color& color, sl_bool flagRedraw)
+void Slider::setThumbColor(const Color& color, UIUpdateMode mode)
 {
-	setThumbDrawable(ColorDrawable::create(color), flagRedraw);
+	setThumbDrawable(ColorDrawable::create(color), mode);
 }
 
 Ref<Drawable> Slider::getPressedThumbDrawable()
@@ -74,17 +74,17 @@ Ref<Drawable> Slider::getPressedThumbDrawable()
 	return m_pressedThumb;
 }
 
-void Slider::setPressedThumbDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void Slider::setPressedThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	m_pressedThumb = drawable;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void Slider::setPressedThumbColor(const Color& color, sl_bool flagRedraw)
+void Slider::setPressedThumbColor(const Color& color, UIUpdateMode mode)
 {
-	setPressedThumbDrawable(ColorDrawable::create(color), flagRedraw);
+	setPressedThumbDrawable(ColorDrawable::create(color), mode);
 }
 
 Ref<Drawable> Slider::getHoverThumbDrawable()
@@ -92,17 +92,17 @@ Ref<Drawable> Slider::getHoverThumbDrawable()
 	return m_hoverThumb;
 }
 
-void Slider::setHoverThumbDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void Slider::setHoverThumbDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	m_hoverThumb = drawable;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void Slider::setHoverThumbColor(const Color& color, sl_bool flagRedraw)
+void Slider::setHoverThumbColor(const Color& color, UIUpdateMode mode)
 {
-	setHoverThumbDrawable(ColorDrawable::create(color), flagRedraw);
+	setHoverThumbDrawable(ColorDrawable::create(color), mode);
 }
 
 const UISize& Slider::getThumbSize()
@@ -110,22 +110,22 @@ const UISize& Slider::getThumbSize()
 	return m_thumbSize;
 }
 
-void Slider::setThumbSize(const UISize& size, sl_bool flagRedraw)
+void Slider::setThumbSize(const UISize& size, UIUpdateMode mode)
 {
 	m_thumbSize = size;
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void Slider::setThumbSize(sl_ui_len width, sl_ui_len height, sl_bool flagRedraw)
+void Slider::setThumbSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode)
 {
-	setThumbSize(UISize(width, height), flagRedraw);
+	setThumbSize(UISize(width, height), mode);
 }
 
-void Slider::setThumbSize(sl_ui_len size, sl_bool flagRedraw)
+void Slider::setThumbSize(sl_ui_len size, UIUpdateMode mode)
 {
-	setThumbSize(UISize(size, size),flagRedraw);
+	setThumbSize(UISize(size, size), mode);
 }
 
 sl_ui_len Slider::getThumbWidth()
@@ -133,9 +133,9 @@ sl_ui_len Slider::getThumbWidth()
 	return m_thumbSize.x;
 }
 
-void Slider::setThumbWidth(sl_ui_len width, sl_bool flagRedraw)
+void Slider::setThumbWidth(sl_ui_len width, UIUpdateMode mode)
 {
-	setThumbSize(UISize(width, m_thumbSize.y), flagRedraw);
+	setThumbSize(UISize(width, m_thumbSize.y), mode);
 }
 
 sl_ui_len Slider::getThumbHeight()
@@ -143,9 +143,9 @@ sl_ui_len Slider::getThumbHeight()
 	return m_thumbSize.y;
 }
 
-void Slider::setThumbHeight(sl_ui_len height, sl_bool flagRedraw)
+void Slider::setThumbHeight(sl_ui_len height, UIUpdateMode mode)
 {
-	setThumbSize(UISize(m_thumbSize.x, height), flagRedraw);
+	setThumbSize(UISize(m_thumbSize.x, height), mode);
 }
 
 void Slider::onDraw(Canvas* canvas)

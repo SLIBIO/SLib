@@ -26,9 +26,9 @@ public:
 public:
 	sl_uint32 getItemsCount();
 	
-	virtual void setItemsCount(sl_uint32 n, sl_bool flagRedraw = sl_true);
+	virtual void setItemsCount(sl_uint32 n, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void removeAllItems(sl_bool flagRedraw = sl_true);
+	void removeAllItems(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
 	String getItemValue(sl_uint32 index);
@@ -42,16 +42,16 @@ public:
 	
 	String getItemTitle(sl_uint32 index);
 	
-	virtual void setItemTitle(sl_uint32 index, const String& title, sl_bool flagRedraw = sl_true);
+	virtual void setItemTitle(sl_uint32 index, const String& title, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	List<String> getTitles();
 	
-	virtual void setTitles(const List<String>& values, sl_bool flagRedraw = sl_true);
+	virtual void setTitles(const List<String>& values, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
-	virtual void selectIndex(sl_uint32 index, sl_bool flagRedraw = sl_true);
+	virtual void selectIndex(sl_uint32 index, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	virtual void selectValue(const String& value, sl_bool flagRedraw = sl_true);
+	virtual void selectValue(const String& value, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_uint32 getSelectedIndex();
 	
@@ -62,33 +62,33 @@ public:
 	
 	const UISize& getIconSize();
 	
-	virtual void setIconSize(const UISize& size, sl_bool flagRedraw = sl_true);
+	virtual void setIconSize(const UISize& size, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setIconSize(sl_ui_len width, sl_ui_len height, sl_bool flagRedraw = sl_true);
+	void setIconSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setIconSize(sl_ui_len size, sl_bool flagRedraw = sl_true);
+	void setIconSize(sl_ui_len size, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_len getIconWidth();
 	
-	void setIconWidth(sl_ui_len width, sl_bool flagRedraw = sl_true);
+	void setIconWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_ui_len getIconHeight();
 	
-	void setIconHeight(sl_ui_len height, sl_bool flagRedraw = sl_true);
+	void setIconHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
 	Ref<Drawable> getLeftIcon();
 	
-	virtual void setLeftIcon(const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
+	virtual void setLeftIcon(const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getRightIcon();
 	
-	virtual void setRightIcon(const Ref<Drawable>& icon, sl_bool flagRedraw = sl_true);
+	virtual void setRightIcon(const Ref<Drawable>& icon, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
 	Color getTextColor();
 	
-	virtual void setTextColor(const Color& color, sl_bool flagRedraw = sl_true);
+	virtual void setTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
 public:

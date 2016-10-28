@@ -46,6 +46,9 @@ public class UiView {
 	
 	public static void freeView(View view) {
 		mInstances.remove(view);
+		if (view instanceof UiGLView) {
+			UiGLView.removeView(view);
+		}
 	}
 
 	public static View createGeneric(Context context) {
@@ -185,8 +188,16 @@ public class UiView {
 		return view.isEnabled();
 	}
 	
-	public static void setEnabled(View view, boolean flag) {
-		view.setEnabled(flag);
+	public static void setEnabled(final View view, final boolean flag) {
+		if (UiThread.isUiThread()) {
+			view.setEnabled(flag);
+		} else {
+			view.post(new Runnable() {
+				public void run() {
+					view.setEnabled(flag);
+				}
+			});
+		}		
 	}
 
 	public static void setAlpha(final View view, final float alpha) {

@@ -17,39 +17,39 @@ public:
 public:
 	LayoutOrientation getOrientation();
 	
-	void setOrientation(LayoutOrientation orientation, sl_bool flagRedraw = sl_true);
+	void setOrientation(LayoutOrientation orientation, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isVertical();
 	
-	void setVertical(sl_bool flagRedraw = sl_true);
+	void setVertical(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isHorizontal();
 	
-	void setHorizontal(sl_bool flagRedraw = sl_true);
+	void setHorizontal(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	float getMinimumValue();
 	
-	void setMinimumValue(float value, sl_bool flagRedraw = sl_true);
+	void setMinimumValue(float value, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	float getMaximumValue();
 	
-	void setMaximumValue(float value, sl_bool flagRedraw = sl_true);
+	void setMaximumValue(float value, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	float getRange();
 	
-	void setRange(float range, sl_bool flagRedraw = sl_true);
+	void setRange(float range, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	float getValue();
 	
-	void setValue(float value, sl_bool flagRedraw = sl_true);
+	void setValue(float value, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	float getSecondaryValue();
 	
-	void setSecondaryValue(float value, sl_bool flagRedraw = sl_true);
+	void setSecondaryValue(float value, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isDualValues();
 	
-	void setDualValues(sl_bool flagDualValues, sl_bool flagRedraw = sl_true);
+	void setDualValues(sl_bool flagDualValues, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	sl_bool isDiscrete();
 	
@@ -61,26 +61,26 @@ public:
 	
 	sl_bool isReversed();
 	
-	void setReversed(sl_bool flagReversed, sl_bool flagRedraw = sl_true);
+	void setReversed(sl_bool flagReversed, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
 	Ref<Drawable> getTrackDrawable();
 	
-	void setTrackDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	void setTrackDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setTrackColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setTrackColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getProgressDrawable();
 	
-	void setProgressDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	void setProgressDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setProgressColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setProgressColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Drawable> getSecondaryProgressDrawable();
 	
-	void setSecondaryProgressDrawable(const Ref<Drawable>& drawable, sl_bool flagRedraw = sl_true);
+	void setSecondaryProgressDrawable(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setSecondaryProgressColor(const Color& color, sl_bool flagRedraw = sl_true);
+	void setSecondaryProgressColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 protected:
 	// override

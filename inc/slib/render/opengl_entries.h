@@ -143,7 +143,9 @@ public:
 	static void deleteProgram(sl_uint32 program);
 
 	// buffers
-	static sl_uint32 createVertexBuffer(sl_bool flagStatic, sl_size size, const void* data = sl_null);
+	static sl_uint32 createVertexBuffer(const void* data, sl_size size, sl_bool flagStatic = sl_true);
+	
+	static sl_uint32 createVertexBuffer(sl_size size, sl_bool flagStatic = sl_true);
 	
 	static void updateVertexBuffer(sl_uint32 buffer, sl_size offset, const void* data, sl_size size);
 	
@@ -151,7 +153,9 @@ public:
 	
 	static void unbindVertexBuffer();
 	
-	static sl_uint32 createIndexBuffer(sl_bool flagStatic, sl_size size, const void* data = sl_null);
+	static sl_uint32 createIndexBuffer(const void* data, sl_size size, sl_bool flagStatic = sl_true);
+	
+	static sl_uint32 createIndexBuffer(sl_size size, sl_bool flagStatic = sl_true);
 	
 	static void updateIndexBuffer(sl_uint32 buffer, sl_size offset, const void* data, sl_size size);
 	

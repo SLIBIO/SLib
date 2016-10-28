@@ -9,6 +9,19 @@
 
 SLIB_RENDER_NAMESPACE_BEGIN
 
+class SLIB_EXPORT IndexBufferInstance : public RenderBaseObjectInstance
+{
+	SLIB_DECLARE_OBJECT
+	
+public:
+	virtual void notifyUpdated(sl_size offset, sl_size size);
+	
+protected:
+	sl_size m_updatedOffset;
+	sl_size m_updatedSize;
+	
+};
+
 class SLIB_EXPORT IndexBuffer : public RenderBaseObject
 {
 	SLIB_DECLARE_OBJECT
@@ -22,19 +35,23 @@ public:
 	static Ref<IndexBuffer> create(const void* buf, sl_size size);
 
 public:
-	sl_size getSize() const;
+	sl_size getSize();
 	
-	sl_uint8* getBuffer() const;
+	sl_uint8* getBuffer();
+	
+	sl_bool isStatic();
+	
+	void setStatic(sl_bool flag);
 
 	void update(sl_size offset, sl_size size);
 	
 	void update();
-
-public:
-	SLIB_PROPERTY(sl_bool, Static)
+	
+	Ref<IndexBufferInstance> getInstance(RenderEngine* engine);
 
 protected:
 	Memory m_mem;
+	sl_bool m_flagStatic;
 
 };
 

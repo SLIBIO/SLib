@@ -63,6 +63,8 @@ protected:
 	Ref<Referable> m_platformObject;
 	SpinLock m_lock;
 	
+	SafeRef<Referable> m_renderingCache;
+	
 };
 
 SLIB_GRAPHICS_NAMESPACE_END

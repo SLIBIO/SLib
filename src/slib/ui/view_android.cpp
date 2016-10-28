@@ -113,6 +113,9 @@ jboolean JNICALL _AndroidView_nativeHitTestTouchEvent(JNIEnv* env, jobject _this
 	if (instance.isNotNull()) {
 		Ref<View> view = instance->getView();
 		if (view.isNotNull()) {
+			if (!(view->isEnabled())) {
+				return 1;
+			}
 			if (view->isCapturingChildInstanceEvents()) {
 				if (view->hitTestForCapturingChildInstanceEvents(UIPoint((sl_ui_pos)x, (sl_ui_pos)y))) {
 					return 1;

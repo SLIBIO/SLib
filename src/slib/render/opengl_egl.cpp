@@ -15,7 +15,6 @@ class _EGLRendererImpl : public Renderer
 {
 public:
 	sl_bool m_flagRequestRender;
-	SafeRef<RenderEngine> m_renderEngine;
 
 	EGLDisplay m_display;
 	EGLSurface m_surface;
@@ -218,12 +217,6 @@ public:
 			m_threadRender.setNull();
 		}
 
-		Ref<RenderEngine> engine = m_renderEngine;
-		if (engine.isNotNull()) {
-			engine->release();
-			m_renderEngine.setNull();
-		}
-
 		if (m_context) {
 			_EGL_ENTRY(eglDestroyContext)(m_display, m_context);
 			_EGL_ENTRY(eglDestroySurface)(m_display, m_surface);
@@ -238,16 +231,14 @@ public:
 	void run()
 	{
 		_EGL_ENTRY(eglMakeCurrent)(m_display, m_surface, m_surface, m_context);
+
+		Ref<RenderEngine> engine = GLES::createEngine();
+		if (engine.isNull()) {
+			return;
+		}
+
 		TimeCounter timer;
 		while (Thread::isNotStoppingCurrent()) {
-			Ref<RenderEngine> engine = m_renderEngine;
-			if (engine.isNull()) {
-				engine = GLES::createEngine();
-				if (engine.isNull()) {
-					break;
-				}
-				m_renderEngine = engine;
-			}
 			runStep(engine.ptr);
 			if (Thread::isNotStoppingCurrent()) {
 				sl_uint64 t = timer.getEllapsedMilliseconds();
@@ -301,6 +292,7 @@ Ref<Renderer> EGL::createRenderer(void* windowHandle, const RendererParam& param
 {
 	return _EGLRendererImpl::create(windowHandle, param);
 }
+
 SLIB_RENDER_NAMESPACE_END
 
 #if defined (SLIB_PLATFORM_IS_WIN32)

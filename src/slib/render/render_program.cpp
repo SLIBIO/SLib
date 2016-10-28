@@ -10,28 +10,26 @@ SLIB_RENDER_NAMESPACE_BEGIN
 	RenderProgram
 *******************************/
 
+SLIB_DEFINE_OBJECT(RenderProgramInstance, RenderBaseObjectInstance)
+
 SLIB_DEFINE_OBJECT(RenderProgram, RenderBaseObject)
 
-sl_bool RenderProgram::onInit(RenderEngine* engine, RenderProgramInfo* info)
+sl_bool RenderProgram::onInit(RenderEngine* engine, RenderProgramState* state)
 {
 	return sl_true;
 }
 
-sl_bool RenderProgram::onBeginProgram(RenderEngine* engine, RenderProgramInfo* info)
+sl_bool RenderProgram::onUpdate(RenderEngine* engine, RenderProgramState* state)
 {
 	return sl_true;
 }
 
-void RenderProgram::onEndProgram(RenderEngine* engine, RenderProgramInfo* info)
-{
-}
-
-sl_bool RenderProgram::onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive)
+sl_bool RenderProgram::onPreRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive)
 {
 	return sl_true;
 }
 
-void RenderProgram::onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive)
+void RenderProgram::onPostRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive)
 {
 }
 
@@ -45,125 +43,72 @@ String RenderProgram::getGLSLFragmentShader(RenderEngine* engine)
 	return String::null();
 }
 
+Ref<RenderProgramInstance> RenderProgram::getInstance(RenderEngine* engine)
+{
+	return Ref<RenderProgramInstance>::from(RenderBaseObject::getInstance(engine));
+}
+
 /*******************************
 	RenderProgram2D
 *******************************/
+
+RenderProgramState2D::RenderProgramState2D()
+: transform(Matrix3::identity()), textureTransform(Matrix3::identity()), color(1, 1, 1), alpha(1)
+{
+}
+
 RenderProgram2D::RenderProgram2D()
 {
-	setTransform(Matrix3::identity());
-	setTextureTransform(Matrix3::identity());
-
-	setColor(Color::White);
-	setAlpha(1.0f);
 }
 
-Ref<RenderProgramInfo> RenderProgram2D::create(RenderEngine* engine)
-{
-	Ref<RenderProgramInfo> ret;
-	RenderEngineType type = engine->getEngineType();
-	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
-		ret = new Info_GL;
-	}
-	return ret;
-}
-
-sl_bool RenderProgram2D::onInit(RenderEngine* _engine, RenderProgramInfo* _info)
+sl_bool RenderProgram2D::onInit(RenderEngine* _engine, RenderProgramState* _state)
 {
 	RenderEngineType type = _engine->getEngineType();
 	
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
+		RenderProgramState2D* state = (RenderProgramState2D*)_state;
 		
-		sl_uint32 program = info->program_GL;
-		info->attrPosition = engine->getAttributeLocation(program, "a_Position");
-		info->attrColor = engine->getAttributeLocation(program, "a_Color");
-		info->attrTexCoord = engine->getAttributeLocation(program, "a_TexCoord");
+		sl_uint32 program = state->gl_program;
+		state->gl_attrPosition = engine->getAttributeLocation(program, "a_Position");
+		state->gl_attrColor = engine->getAttributeLocation(program, "a_Color");
+		state->gl_attrTexCoord = engine->getAttributeLocation(program, "a_TexCoord");
 		
-		info->uniformTransform = engine->getUniformLocation(program, "u_Transform");
-		
-		info->uniformTextures[0] = engine->getUniformLocation(program, "u_Texture");
-		info->uniformTextures[1] = engine->getUniformLocation(program, "u_Texture1");
-		info->uniformTextures[2] = engine->getUniformLocation(program, "u_Texture2");
-		info->uniformTextures[3] = engine->getUniformLocation(program, "u_Texture3");
-		info->uniformTextures[4] = engine->getUniformLocation(program, "u_Texture4");
-		info->uniformTextures[5] = engine->getUniformLocation(program, "u_Texture5");
-		info->uniformTextures[6] = engine->getUniformLocation(program, "u_Texture6");
-		info->uniformTextures[7] = engine->getUniformLocation(program, "u_Texture7");
-		info->uniformTextures[8] = engine->getUniformLocation(program, "u_Texture8");
-		info->uniformTextures[9] = engine->getUniformLocation(program, "u_Texture9");
-		info->uniformTextures[10] = engine->getUniformLocation(program, "u_Texture10");
-		info->uniformTextures[11] = engine->getUniformLocation(program, "u_Texture11");
-		info->uniformTextures[12] = engine->getUniformLocation(program, "u_Texture12");
-		info->uniformTextures[13] = engine->getUniformLocation(program, "u_Texture13");
-		info->uniformTextures[14] = engine->getUniformLocation(program, "u_Texture14");
-		info->uniformTextures[15] = engine->getUniformLocation(program, "u_Texture15");
-		
-		info->uniformTransformTexture = engine->getUniformLocation(program, "u_TransformTexture");
-		
-		info->uniformColor = engine->getUniformLocation(program, "u_Color");
-		info->uniformAlpha = engine->getUniformLocation(program, "u_Alpha");
+		state->gl_uniformTransform = engine->getUniformLocation(program, "u_Transform");
+		state->gl_uniformTexture = engine->getUniformLocation(program, "u_Texture");
+		state->gl_uniformTextureTransform = engine->getUniformLocation(program, "u_TextureTransform");
+		state->gl_uniformColor = engine->getUniformLocation(program, "u_Color");
+		state->gl_uniformAlpha = engine->getUniformLocation(program, "u_Alpha");
 		
 		return sl_true;
+		
 	}
+	
 	return sl_false;
+	
 }
 
-sl_bool RenderProgram2D::onBeginProgram(RenderEngine* _engine, RenderProgramInfo* _info)
+sl_bool RenderProgram2D::onUpdate(RenderEngine* _engine, RenderProgramState* _state)
 {
 	RenderEngineType type = _engine->getEngineType();
 	
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
+		RenderProgramState2D* state = (RenderProgramState2D*)_state;
 		
-		sl_uint32 i;
-		
-		engine->setUniformMatrix3Value(info->uniformTransform, getTransform());
-		
-		for (i = 0; i < SLIB_RENDER_MAX_TEXTURE_SAMPLERS; i++) {
-			if (info->uniformTextures[i] != -1) {
-				engine->setUniformTextureSampler(info->uniformTextures[i], i);
-				engine->applyTexture(i, m_textures[i]);
-			}
-		}
-		engine->setUniformMatrix3Value(info->uniformTransformTexture, getTextureTransform());
-		
-		engine->setUniformFloat3Value(info->uniformColor, getColor());
-		engine->setUniformFloatValue(info->uniformAlpha, getAlpha());
+		engine->setUniformMatrix3Value(state->gl_uniformTransform, state->transform);
+		engine->setUniformTextureSampler(state->gl_uniformTexture, 0);
+		engine->applyTexture(0, state->texture);
+		engine->setUniformMatrix3Value(state->gl_uniformTextureTransform, state->textureTransform);
+		engine->setUniformFloat3Value(state->gl_uniformColor, state->color);
+		engine->setUniformFloatValue(state->gl_uniformAlpha, state->alpha);
 		
 		return sl_true;
 	}
 	
 	return sl_false;
-}
-
-Ref<Texture> RenderProgram2D::getTexture(sl_uint32 no)
-{
-	if (no < SLIB_RENDER_MAX_TEXTURE_SAMPLERS) {
-		return m_textures[no];
-	} else {
-		return Ref<Texture>::null();
-	}
-}
-
-Ref<Texture> RenderProgram2D::getTexture()
-{
-	return m_textures[0];
-}
-
-void RenderProgram2D::setTexture(sl_uint32 no, const Ref<Texture>& texture)
-{
-	if (no < SLIB_RENDER_MAX_TEXTURE_SAMPLERS) {
-		m_textures[no] = texture;
-	}
-}
-
-void RenderProgram2D::setTexture(const Ref<Texture>& texture)
-{
-	m_textures[0] = texture;
 }
 
 /*******************************
@@ -174,14 +119,14 @@ String RenderProgram2D_PositionTexture::getGLSLVertexShader(RenderEngine* engine
 	String source;
 	source = SLIB_STRINGIFY(
 		uniform mat3 u_Transform;
-		uniform mat3 u_TransformTexture;
+		uniform mat3 u_TextureTransform;
 		attribute vec2 a_Position;
 		attribute vec2 a_TexCoord;
 		varying vec2 v_TexCoord;
 		void main() {
 			vec3 P = vec3(a_Position.x, a_Position.y, 1.0) * u_Transform;
 			gl_Position = vec4(P.x, P.y, 0.0, 1.0);
-			vec3 t = vec3(a_TexCoord, 1.0) * u_TransformTexture;
+			vec3 t = vec3(a_TexCoord, 1.0) * u_TextureTransform;
 			v_TexCoord = t.xy;
 		}
 	);
@@ -204,27 +149,27 @@ String RenderProgram2D_PositionTexture::getGLSLFragmentShader(RenderEngine* engi
 	return source;
 }
 
-sl_bool RenderProgram2D_PositionTexture::onPreRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
+sl_bool RenderProgram2D_PositionTexture::onPreRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
 {
 	RenderEngineType type = _engine->getEngineType();
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
-		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrPosition, VertexData, position);
-		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrTexCoord, VertexData, texCoord);
+		RenderProgramState2D* state = (RenderProgramState2D*)_state;
+		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, state->gl_attrPosition, VertexData, position);
+		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, state->gl_attrTexCoord, VertexData, texCoord);
 		return sl_true;
 	}
 	return sl_false;
 }
 
-void RenderProgram2D_PositionTexture::onPostRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
+void RenderProgram2D_PositionTexture::onPostRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
 {
 	RenderEngineType type = _engine->getEngineType();
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
-		engine->disableVertexArrayAttribute(info->attrPosition);
-		engine->disableVertexArrayAttribute(info->attrTexCoord);
+		RenderProgramState2D* state = (RenderProgramState2D*)_state;
+		engine->disableVertexArrayAttribute(state->gl_attrPosition);
+		engine->disableVertexArrayAttribute(state->gl_attrTexCoord);
 	}
 }
 
@@ -283,27 +228,27 @@ String RenderProgram2D_PositionColor::getGLSLFragmentShader(RenderEngine* engine
 	return source;
 }
 
-sl_bool RenderProgram2D_PositionColor::onPreRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
+sl_bool RenderProgram2D_PositionColor::onPreRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
 {
 	RenderEngineType type = _engine->getEngineType();
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
-		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrPosition, VertexData, position);
-		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrColor, VertexData, color);
+		RenderProgramState2D* state = (RenderProgramState2D*)_state;
+		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, state->gl_attrPosition, VertexData, position);
+		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, state->gl_attrColor, VertexData, color);
 		return sl_true;
 	}
 	return sl_false;
 }
 
-void RenderProgram2D_PositionColor::onPostRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
+void RenderProgram2D_PositionColor::onPostRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
 {
 	RenderEngineType type = _engine->getEngineType();
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
-		engine->disableVertexArrayAttribute(info->attrPosition);
-		engine->disableVertexArrayAttribute(info->attrColor);
+		RenderProgramState2D* state = (RenderProgramState2D*)_state;
+		engine->disableVertexArrayAttribute(state->gl_attrPosition);
+		engine->disableVertexArrayAttribute(state->gl_attrColor);
 	}
 }
 
@@ -335,315 +280,97 @@ String RenderProgram2D_Position::getGLSLFragmentShader(RenderEngine* engine)
 	return source;
 }
 
-sl_bool RenderProgram2D_Position::onPreRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
+sl_bool RenderProgram2D_Position::onPreRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
 {
 	RenderEngineType type = _engine->getEngineType();
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
-		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrPosition, VertexData, position);
+		RenderProgramState2D* state = (RenderProgramState2D*)_state;
+		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, state->gl_attrPosition, VertexData, position);
 		return sl_true;
 	}
 	return sl_false;
 }
 
-void RenderProgram2D_Position::onPostRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
+void RenderProgram2D_Position::onPostRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
 {
 	RenderEngineType type = _engine->getEngineType();
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
-		engine->disableVertexArrayAttribute(info->attrPosition);
+		RenderProgramState2D* state = (RenderProgramState2D*)_state;
+		engine->disableVertexArrayAttribute(state->gl_attrPosition);
 	}
 }
 
 /*******************************
 	RenderProgram3D
 *******************************/
+
+RenderProgramState3D::RenderProgramState3D()
+: transform(Matrix4::identity()), matrixModelViewIT(Matrix4::identity()),
+directionalLight(Vector3(0.0f, -1.0f, 1.0f)), diffuseColor(1, 1, 1), ambientColor(0, 0, 0), alpha(1)
+{
+}
+
 RenderProgram3D::RenderProgram3D()
 {
-	setDirectionalLight(Vector3(0.0f, -1.0f, 1.0f));
-	setDiffuseColor(Color::White);
-	setAmbientColor(Color::Black);
-	setAlpha(1.0f);
-
-	setTextureTransform(Matrix3::identity());	
-
-	m_matrixModel = Matrix4::identity();
-	m_matrixView = Matrix4::identity();
-	m_matrixProjection = Matrix4::identity();
-	m_matrixTransform = Matrix4::identity();
-	m_flagValidMatrixTransform = sl_true;
-	m_flagValidMatrixModelView = sl_false;
-	m_flagValidMatrixModelViewIT = sl_false;
-	m_flagValidMatrixViewProjection = sl_false;
 }
 
-Ref<RenderProgramInfo> RenderProgram3D::create(RenderEngine* engine)
-{
-	Ref<RenderProgramInfo> ret;
-	RenderEngineType type = engine->getEngineType();
-	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
-		ret = new Info_GL;
-	}
-	return ret;
-}
-
-sl_bool RenderProgram3D::onInit(RenderEngine* _engine, RenderProgramInfo* _info)
+sl_bool RenderProgram3D::onInit(RenderEngine* _engine, RenderProgramState* _state)
 {
 	RenderEngineType type = _engine->getEngineType();
 	
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
+		RenderProgramState3D* state = (RenderProgramState3D*)_state;
 		
-		sl_uint32 program = info->program_GL;
+		sl_uint32 program = state->gl_program;
 		
-		info->attrPosition = engine->getAttributeLocation(program, "a_Position");
-		info->attrNormal = engine->getAttributeLocation(program, "a_Normal");
-		info->attrColor = engine->getAttributeLocation(program, "a_Color");
-		info->attrTexCoord = engine->getAttributeLocation(program, "a_TexCoord");
+		state->gl_attrPosition = engine->getAttributeLocation(program, "a_Position");
+		state->gl_attrNormal = engine->getAttributeLocation(program, "a_Normal");
+		state->gl_attrColor = engine->getAttributeLocation(program, "a_Color");
+		state->gl_attrTexCoord = engine->getAttributeLocation(program, "a_TexCoord");
 		
-		info->uniformMatrixModel = engine->getUniformLocation(program, "u_MatrixModel");
-		info->uniformMatrixView = engine->getUniformLocation(program, "u_MatrixView");
-		info->uniformMatrixProjection = engine->getUniformLocation(program, "u_MatrixProjection");
-		info->uniformTransform = engine->getUniformLocation(program, "u_Transform");
-		info->uniformMatrixModelView = engine->getUniformLocation(program, "u_MatrixModelView");
-		info->uniformMatrixModelViewIT = engine->getUniformLocation(program, "u_MatrixModelViewIT");
-		info->uniformMatrixViewProjection = engine->getUniformLocation(program, "u_MatrixViewProjection");
+		state->gl_uniformTransform = engine->getUniformLocation(program, "u_Transform");
+		state->gl_uniformMatrixModelViewIT = engine->getUniformLocation(program, "u_MatrixModelViewIT");
+		state->gl_uniformTexture = engine->getUniformLocation(program, "u_Texture");
+		state->gl_uniformDirectionalLight = engine->getUniformLocation(program, "u_DirectionalLight");
+		state->gl_uniformDiffuseColor = engine->getUniformLocation(program, "u_DiffuseColor");
+		state->gl_uniformAmbientColor = engine->getUniformLocation(program, "u_AmbientColor");
+		state->gl_uniformAlpha = engine->getUniformLocation(program, "u_Alpha");
 		
-		info->uniformTextures[0] = engine->getUniformLocation(program, "u_Texture");
-		info->uniformTextures[1] = engine->getUniformLocation(program, "u_Texture1");
-		info->uniformTextures[2] = engine->getUniformLocation(program, "u_Texture2");
-		info->uniformTextures[3] = engine->getUniformLocation(program, "u_Texture3");
-		info->uniformTextures[4] = engine->getUniformLocation(program, "u_Texture4");
-		info->uniformTextures[5] = engine->getUniformLocation(program, "u_Texture5");
-		info->uniformTextures[6] = engine->getUniformLocation(program, "u_Texture6");
-		info->uniformTextures[7] = engine->getUniformLocation(program, "u_Texture7");
-		info->uniformTextures[8] = engine->getUniformLocation(program, "u_Texture8");
-		info->uniformTextures[9] = engine->getUniformLocation(program, "u_Texture9");
-		info->uniformTextures[10] = engine->getUniformLocation(program, "u_Texture10");
-		info->uniformTextures[11] = engine->getUniformLocation(program, "u_Texture11");
-		info->uniformTextures[12] = engine->getUniformLocation(program, "u_Texture12");
-		info->uniformTextures[13] = engine->getUniformLocation(program, "u_Texture13");
-		info->uniformTextures[14] = engine->getUniformLocation(program, "u_Texture14");
-		info->uniformTextures[15] = engine->getUniformLocation(program, "u_Texture15");
-		
-		info->uniformTextureAlphas[0] = engine->getUniformLocation(program, "u_TextureAlpha0");
-		info->uniformTextureAlphas[1] = engine->getUniformLocation(program, "u_TextureAlpha1");
-		info->uniformTextureAlphas[2] = engine->getUniformLocation(program, "u_TextureAlpha2");
-		info->uniformTextureAlphas[3] = engine->getUniformLocation(program, "u_TextureAlpha3");
-		info->uniformTextureAlphas[4] = engine->getUniformLocation(program, "u_TextureAlpha4");
-		info->uniformTextureAlphas[5] = engine->getUniformLocation(program, "u_TextureAlpha5");
-		info->uniformTextureAlphas[6] = engine->getUniformLocation(program, "u_TextureAlpha6");
-		info->uniformTextureAlphas[7] = engine->getUniformLocation(program, "u_TextureAlpha7");
-		info->uniformTextureAlphas[8] = engine->getUniformLocation(program, "u_TextureAlpha8");
-		info->uniformTextureAlphas[9] = engine->getUniformLocation(program, "u_TextureAlpha9");
-		info->uniformTextureAlphas[10] = engine->getUniformLocation(program, "u_TextureAlpha10");
-		info->uniformTextureAlphas[11] = engine->getUniformLocation(program, "u_TextureAlpha11");
-		info->uniformTextureAlphas[12] = engine->getUniformLocation(program, "u_TextureAlpha12");
-		info->uniformTextureAlphas[13] = engine->getUniformLocation(program, "u_TextureAlpha13");
-		info->uniformTextureAlphas[14] = engine->getUniformLocation(program, "u_TextureAlpha14");
-		info->uniformTextureAlphas[15] = engine->getUniformLocation(program, "u_TextureAlpha15");
-		
-		info->uniformTransformTexture = engine->getUniformLocation(program, "u_TransformTexture");
-		
-		info->uniformDirectionalLight = engine->getUniformLocation(program, "u_DirectionalLight");
-		info->uniformDiffuseColor = engine->getUniformLocation(program, "u_DiffuseColor");
-		info->uniformAmbientColor = engine->getUniformLocation(program, "u_AmbientColor");
-		info->uniformAlpha = engine->getUniformLocation(program, "u_Alpha");
 		return sl_true;
+		
 	}
+	
 	return sl_false;
+	
 }
 
-sl_bool RenderProgram3D::onBeginProgram(RenderEngine* _engine, RenderProgramInfo* _info)
+sl_bool RenderProgram3D::onUpdate(RenderEngine* _engine, RenderProgramState* _state)
 {
 	RenderEngineType type = _engine->getEngineType();
 	
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
+		RenderProgramState3D* state = (RenderProgramState3D*)_state;
 		
-		sl_uint32 i;
+		engine->setUniformMatrix4Value(state->gl_uniformTransform, state->transform);
+		engine->setUniformMatrix4Value(state->gl_uniformMatrixModelViewIT, state->matrixModelViewIT);
+		engine->setUniformTextureSampler(state->gl_uniformTexture, 0);
+		engine->applyTexture(0, state->texture);
+		engine->setUniformFloat3Value(state->gl_uniformDirectionalLight, state->directionalLight);
+		engine->setUniformFloat3Value(state->gl_uniformDiffuseColor, state->diffuseColor);
+		engine->setUniformFloat3Value(state->gl_uniformAmbientColor, state->ambientColor);
+		engine->setUniformFloatValue(state->gl_uniformAlpha, state->alpha);
 		
-		engine->setUniformMatrix4Value(info->uniformMatrixModel, getModelMatrix());
-		engine->setUniformMatrix4Value(info->uniformMatrixView, getViewMatrix());
-		engine->setUniformMatrix4Value(info->uniformMatrixProjection, getProjectionMatrix());
-		engine->setUniformMatrix4Value(info->uniformTransform, getTransform());
-		engine->setUniformMatrix4Value(info->uniformMatrixModelView, getModelViewMatrix());
-		engine->setUniformMatrix4Value(info->uniformMatrixModelViewIT, getModelViewMatrixInverseTranspose());
-		engine->setUniformMatrix4Value(info->uniformMatrixViewProjection, getViewProjectionMatrix());
-		
-		for (i = 0; i < SLIB_RENDER_MAX_TEXTURE_SAMPLERS; i++) {
-			if (info->uniformTextures[i] != -1) {
-				engine->setUniformTextureSampler(info->uniformTextures[i], i);
-				engine->applyTexture(i, m_textures[i]);
-				engine->setUniformFloatValue(info->uniformTextureAlphas[i], m_textureAlphas[i]);
-			}
-		}
-		engine->setUniformMatrix3Value(info->uniformTransformTexture, getTextureTransform());
-		
-		engine->setUniformFloat3Value(info->uniformDirectionalLight, getDirectionalLight());
-		engine->setUniformFloat3Value(info->uniformDiffuseColor, getDiffuseColor());
-		engine->setUniformFloat3Value(info->uniformAmbientColor, getAmbientColor());
-		engine->setUniformFloatValue(info->uniformAlpha, getAlpha());
 		return sl_true;
 	}
+	
 	return sl_false;
-}
-
-const Matrix4& RenderProgram3D::getModelMatrix()
-{
-	return m_matrixModel;
-}
-
-void RenderProgram3D::setModelMatrix(const Matrix4& t)
-{
-	m_matrixModel = t;
-	m_flagValidMatrixTransform = sl_false;
-	m_flagValidMatrixModelView = sl_false;
-	m_flagValidMatrixModelViewIT = sl_false;
-}
-
-const Matrix4& RenderProgram3D::getViewMatrix()
-{
-	return m_matrixView;
-}
-
-void RenderProgram3D::setViewMatrix(const Matrix4& t)
-{
-	m_matrixView = t;
-	m_flagValidMatrixTransform = sl_false;
-	m_flagValidMatrixModelView = sl_false;
-	m_flagValidMatrixModelViewIT = sl_false;
-	m_flagValidMatrixViewProjection = sl_false;
-}
-
-const Matrix4& RenderProgram3D::getProjectionMatrix()
-{
-	return m_matrixProjection;
-}
-
-void RenderProgram3D::setProjectionMatrix(const Matrix4& t, sl_bool flagUpdateTransform)
-{
-	m_matrixProjection = t;
-	m_flagValidMatrixTransform = sl_false;
-	m_flagValidMatrixViewProjection = sl_false;
-}
-
-const Matrix4& RenderProgram3D::getTransform()
-{
-	if (!m_flagValidMatrixTransform) {
-		Matrix4 t = m_matrixModel;
-		t.multiply(m_matrixView);
-		t.multiply(m_matrixProjection);
-		m_matrixTransform = t;
-		m_flagValidMatrixTransform = sl_true;
-	}
-	return m_matrixTransform;
-}
-
-void RenderProgram3D::setTransform(const Matrix4& t)
-{
-	m_flagValidMatrixTransform = sl_true;
-	m_matrixTransform = t;
-}
-
-const Matrix4& RenderProgram3D::getModelViewMatrix()
-{
-	if (!m_flagValidMatrixModelView) {
-		Matrix4 t = m_matrixModel;
-		t.multiply(m_matrixView);
-		m_matrixModelView = t;
-		m_flagValidMatrixModelView = sl_true;
-	}
-	return m_matrixModelView;
-}
-
-void RenderProgram3D::setModelViewMatrix(const Matrix4& t)
-{
-	m_flagValidMatrixModelView = sl_true;
-	m_matrixModelView = t;
-}
-
-const Matrix4& RenderProgram3D::getModelViewMatrixInverseTranspose()
-{
-	if (!m_flagValidMatrixModelViewIT) {
-		Matrix4 t = getModelViewMatrix();
-		t.makeInverseTranspose();
-		m_matrixModelViewIT = t;
-		m_flagValidMatrixModelViewIT = sl_true;
-	}
-	return m_matrixModelViewIT;
-}
-
-void RenderProgram3D::setModelViewMatrixInverseTranspose(const Matrix4& t)
-{
-	m_flagValidMatrixModelViewIT = sl_true;
-	m_matrixModelViewIT = t;
-}
-
-const Matrix4& RenderProgram3D::getViewProjectionMatrix()
-{
-	if (!m_flagValidMatrixViewProjection) {
-		Matrix4 t = m_matrixView;
-		t.multiply(m_matrixProjection);
-		m_matrixViewProjection = t;
-		m_flagValidMatrixViewProjection = sl_true;
-	}
-	return m_matrixViewProjection;
-}
-
-void RenderProgram3D::setViewProjectionMatrix(const Matrix4& t)
-{
-	m_flagValidMatrixViewProjection = sl_true;
-	m_matrixViewProjection = t;
-}
-
-
-Ref<Texture> RenderProgram3D::getTexture(sl_uint32 no)
-{
-	if (no < SLIB_RENDER_MAX_TEXTURE_SAMPLERS) {
-		return m_textures[no];
-	} else {
-		return Ref<Texture>::null();
-	}
-}
-
-Ref<Texture> RenderProgram3D::getTexture()
-{
-	return m_textures[0];
-}
-
-void RenderProgram3D::setTexture(sl_uint32 no, const Ref<Texture>& texture)
-{
-	if (no < SLIB_RENDER_MAX_TEXTURE_SAMPLERS) {
-		m_textures[no] = texture;
-	}
-}
-
-void RenderProgram3D::setTexture(const Ref<Texture>& texture)
-{
-	m_textures[0] = texture;
-}
-
-float RenderProgram3D::getTextureAlpha(sl_uint32 no)
-{
-	if (no < SLIB_RENDER_MAX_TEXTURE_SAMPLERS) {
-		return m_textureAlphas[no];
-	} else {
-		return 0;
-	}
-}
-
-void RenderProgram3D::setTextureAlpha(sl_uint32 no, float alpha)
-{
-	if (no < SLIB_RENDER_MAX_TEXTURE_SAMPLERS) {
-		m_textureAlphas[no] = alpha;
-	}
+	
 }
 
 /*******************************
@@ -685,29 +412,29 @@ String RenderProgram3D_PositionNormalColor_Diffuse::getGLSLFragmentShader(Render
 	return source;
 }
 
-sl_bool RenderProgram3D_PositionNormalColor_Diffuse::onPreRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
+sl_bool RenderProgram3D_PositionNormalColor_Diffuse::onPreRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
 {
 	RenderEngineType type = _engine->getEngineType();
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
-		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrPosition, VertexData, position);
-		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrNormal, VertexData, normal);
-		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrColor, VertexData, color);
+		RenderProgramState3D* state = (RenderProgramState3D*)_state;
+		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, state->gl_attrPosition, VertexData, position);
+		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, state->gl_attrNormal, VertexData, normal);
+		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, state->gl_attrColor, VertexData, color);
 		return sl_true;
 	}
 	return sl_false;
 }
 
-void RenderProgram3D_PositionNormalColor_Diffuse::onPostRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
+void RenderProgram3D_PositionNormalColor_Diffuse::onPostRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
 {
 	RenderEngineType type = _engine->getEngineType();
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
-		engine->disableVertexArrayAttribute(info->attrPosition);
-		engine->disableVertexArrayAttribute(info->attrNormal);
-		engine->disableVertexArrayAttribute(info->attrColor);
+		RenderProgramState3D* state = (RenderProgramState3D*)_state;
+		engine->disableVertexArrayAttribute(state->gl_attrPosition);
+		engine->disableVertexArrayAttribute(state->gl_attrNormal);
+		engine->disableVertexArrayAttribute(state->gl_attrColor);
 	}
 }
 
@@ -744,27 +471,27 @@ String RenderProgram3D_PositionColor::getGLSLFragmentShader(RenderEngine* engine
 	return source;
 }
 
-sl_bool RenderProgram3D_PositionColor::onPreRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
+sl_bool RenderProgram3D_PositionColor::onPreRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
 {
 	RenderEngineType type = _engine->getEngineType();
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
-		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrPosition, VertexData, position);
-		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrColor, VertexData, color);
+		RenderProgramState3D* state = (RenderProgramState3D*)_state;
+		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, state->gl_attrPosition, VertexData, position);
+		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, state->gl_attrColor, VertexData, color);
 		return sl_true;
 	}
 	return sl_false;
 }
 
-void RenderProgram3D_PositionColor::onPostRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
+void RenderProgram3D_PositionColor::onPostRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
 {
 	RenderEngineType type = _engine->getEngineType();
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
-		engine->disableVertexArrayAttribute(info->attrPosition);
-		engine->disableVertexArrayAttribute(info->attrColor);
+		RenderProgramState3D* state = (RenderProgramState3D*)_state;
+		engine->disableVertexArrayAttribute(state->gl_attrPosition);
+		engine->disableVertexArrayAttribute(state->gl_attrColor);
 	}
 }
 
@@ -813,29 +540,29 @@ String RenderProgram3D_PositionNormalTexture_Diffuse::getGLSLFragmentShader(Rend
 	return source;
 }
 
-sl_bool RenderProgram3D_PositionNormalTexture_Diffuse::onPreRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
+sl_bool RenderProgram3D_PositionNormalTexture_Diffuse::onPreRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
 {
 	RenderEngineType type = _engine->getEngineType();
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
-		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrPosition, VertexData, position);
-		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrNormal, VertexData, normal);
-		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrTexCoord, VertexData, texCoord);
+		RenderProgramState3D* state = (RenderProgramState3D*)_state;
+		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, state->gl_attrPosition, VertexData, position);
+		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, state->gl_attrNormal, VertexData, normal);
+		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, state->gl_attrTexCoord, VertexData, texCoord);
 		return sl_true;
 	}
 	return sl_false;
 }
 
-void RenderProgram3D_PositionNormalTexture_Diffuse::onPostRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
+void RenderProgram3D_PositionNormalTexture_Diffuse::onPostRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
 {
 	RenderEngineType type = _engine->getEngineType();
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
-		engine->disableVertexArrayAttribute(info->attrPosition);
-		engine->disableVertexArrayAttribute(info->attrNormal);
-		engine->disableVertexArrayAttribute(info->attrTexCoord);
+		RenderProgramState3D* state = (RenderProgramState3D*)_state;
+		engine->disableVertexArrayAttribute(state->gl_attrPosition);
+		engine->disableVertexArrayAttribute(state->gl_attrNormal);
+		engine->disableVertexArrayAttribute(state->gl_attrTexCoord);
 	}
 }
 
@@ -874,27 +601,27 @@ String RenderProgram3D_PositionTexture::getGLSLFragmentShader(RenderEngine* engi
 	return source;
 }
 
-sl_bool RenderProgram3D_PositionTexture::onPreRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
+sl_bool RenderProgram3D_PositionTexture::onPreRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
 {
 	RenderEngineType type = _engine->getEngineType();
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
-		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrPosition, VertexData, position);
-		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrTexCoord, VertexData, texCoord);
+		RenderProgramState3D* state = (RenderProgramState3D*)_state;
+		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, state->gl_attrPosition, VertexData, position);
+		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, state->gl_attrTexCoord, VertexData, texCoord);
 		return sl_true;
 	}
 	return sl_false;
 }
 
-void RenderProgram3D_PositionTexture::onPostRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
+void RenderProgram3D_PositionTexture::onPostRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
 {
 	RenderEngineType type = _engine->getEngineType();
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
-		engine->disableVertexArrayAttribute(info->attrPosition);
-		engine->disableVertexArrayAttribute(info->attrTexCoord);
+		RenderProgramState3D* state = (RenderProgramState3D*)_state;
+		engine->disableVertexArrayAttribute(state->gl_attrPosition);
+		engine->disableVertexArrayAttribute(state->gl_attrTexCoord);
 	}
 }
 
@@ -937,27 +664,27 @@ String RenderProgram3D_PositionNormal_Diffuse::getGLSLFragmentShader(RenderEngin
 	return source;
 }
 
-sl_bool RenderProgram3D_PositionNormal_Diffuse::onPreRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
+sl_bool RenderProgram3D_PositionNormal_Diffuse::onPreRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
 {
 	RenderEngineType type = _engine->getEngineType();
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
-		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrPosition, VertexData, position);
-		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrNormal, VertexData, normal);
+		RenderProgramState3D* state = (RenderProgramState3D*)_state;
+		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, state->gl_attrPosition, VertexData, position);
+		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, state->gl_attrNormal, VertexData, normal);
 		return sl_true;
 	}
 	return sl_false;
 }
 
-void RenderProgram3D_PositionNormal_Diffuse::onPostRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
+void RenderProgram3D_PositionNormal_Diffuse::onPostRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
 {
 	RenderEngineType type = _engine->getEngineType();
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
-		engine->disableVertexArrayAttribute(info->attrPosition);
-		engine->disableVertexArrayAttribute(info->attrNormal);
+		RenderProgramState3D* state = (RenderProgramState3D*)_state;
+		engine->disableVertexArrayAttribute(state->gl_attrPosition);
+		engine->disableVertexArrayAttribute(state->gl_attrNormal);
 	}
 }
 
@@ -990,25 +717,25 @@ String RenderProgram3D_Position::getGLSLFragmentShader(RenderEngine* engine)
 	return source;
 }
 
-sl_bool RenderProgram3D_Position::onPreRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
+sl_bool RenderProgram3D_Position::onPreRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
 {
 	RenderEngineType type = _engine->getEngineType();
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
-		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, info->attrPosition, VertexData, position);
+		RenderProgramState3D* state = (RenderProgramState3D*)_state;
+		SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, state->gl_attrPosition, VertexData, position);
 		return sl_true;
 	}
 	return sl_false;
 }
 
-void RenderProgram3D_Position::onPostRender(RenderEngine* _engine, RenderProgramInfo* _info, Primitive* primitive)
+void RenderProgram3D_Position::onPostRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
 {
 	RenderEngineType type = _engine->getEngineType();
 	if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
 		GLRenderEngine* engine = (GLRenderEngine*)_engine;
-		Info_GL* info = (Info_GL*)_info;
-		engine->disableVertexArrayAttribute(info->attrPosition);
+		RenderProgramState3D* state = (RenderProgramState3D*)_state;
+		engine->disableVertexArrayAttribute(state->gl_attrPosition);
 	}
 }
 

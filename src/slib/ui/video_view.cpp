@@ -50,9 +50,9 @@ void VideoView::onFrame(RenderEngine* engine)
 {
 	engine->clearColor(Color::Black);
 	if (m_flagYUV) {
-		engine->drawTexture2D(-1, -1, 2, 2, m_textureFrame, m_programYUV);
+		engine->drawTexture2D(m_programYUV, Rectangle(-1, -1, 2, 2), m_textureFrame);
 	} else {
-		engine->drawTexture2D(-1, -1, 2, 2, m_textureFrame, m_programRGB);
+		engine->drawTexture2D(m_programRGB, Rectangle(-1, -1, 2, 2), m_textureFrame);
 	}
 }
 

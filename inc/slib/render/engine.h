@@ -13,6 +13,7 @@
 #include "../core/pointer.h"
 #include "../graphics/color.h"
 #include "../graphics/font.h"
+#include "../math/line_segment.h"
 #include "../math/line3.h"
 
 SLIB_RENDER_NAMESPACE_BEGIN
@@ -37,6 +38,17 @@ public:
 
 public:
 	Primitive();
+	
+};
+
+class SLIB_EXPORT EnginePrimitive : public Primitive
+{
+public:
+	EnginePrimitive(const Primitive& primitive);
+	
+public:
+	Ref<VertexBufferInstance> vertexBufferInstance;
+	Ref<IndexBufferInstance> indexBufferInstance;
 	
 };
 
@@ -104,7 +116,8 @@ public:
 	virtual void onFrame(RenderEngine* engine) = 0;
 };
 
-class SLIB_EXPORT RendererParam {
+class SLIB_EXPORT RendererParam
+{
 public:
 	sl_int32 nRedBits;
 	sl_int32 nGreenBits;
@@ -167,10 +180,6 @@ public:
 	
 	sl_bool isD3D();
 
-	void release();
-
-	sl_bool isValid();
-
 	sl_bool beginScene();
 	
 	void endScene();
@@ -195,91 +204,83 @@ public:
 	
 	void setBlending(sl_bool flagEnableBlending);
 	
-	sl_bool beginProgram(const Ref<RenderProgram>& program);
+	sl_bool beginProgram(const Ref<RenderProgram>& program, RenderProgramState** ppState = sl_null /* RenderProgramState** */);
 	
 	void endProgram();
 	
 	void drawPrimitive(Primitive* primitive);
-
-	void applyTexture(const void* sampler, const Ref<Texture>& texture);
 	
+	void drawPrimitives(Primitive* primitives, sl_uint32 count);
+	
+	void drawPrimitive(sl_uint32 countElements, const Ref<VertexBuffer>& vb, const Ref<IndexBuffer>& ib, PrimitiveType type = PrimitiveType::Triangles);
+	
+	void drawPrimitive(sl_uint32 countElements, const Ref<VertexBuffer>& vb, PrimitiveType type = PrimitiveType::Triangles);
+
 	void applyTexture(sl_reg sampler, const Ref<Texture>& texture);
 
-	sl_bool linkTexture(const Ref<Texture>& texture);
+	Ref<TextureInstance> linkTexture(const Ref<Texture>& texture);
 
-	sl_bool linkVertexBuffer(const Ref<VertexBuffer>& vb);
+	Ref<VertexBufferInstance> linkVertexBuffer(const Ref<VertexBuffer>& vb);
 	
-	sl_bool linkIndexBuffer(const Ref<IndexBuffer>& ib);
+	Ref<IndexBufferInstance> linkIndexBuffer(const Ref<IndexBuffer>& ib);
+	
+	Ref<RenderProgramInstance> linkProgram(const Ref<RenderProgram>& program);
 
 	void setLineWidth(sl_real width);
 
-	void draw(const Ref<RenderProgram>& program, Primitive* primitives, sl_uint32 count = 1);
-
-	void draw(const Ref<RenderProgram>& program, sl_uint32 countElements, const Ref<VertexBuffer>& vb, const Ref<IndexBuffer>& ib, PrimitiveType type = PrimitiveType::Triangles);
-
-	void draw(const Ref<RenderProgram>& program, sl_uint32 countElements, const Ref<VertexBuffer>& vb, PrimitiveType type = PrimitiveType::Triangles);
-
 	// Position(0, 0, 1, 1)
-	void drawRectangle2D(const Ref<RenderProgram>& program);
+	void drawRectangle2D();
 	
-	void drawRectangle2D(const Matrix3& transform, const Ref<RenderProgram2D>& program);
-
-	void drawRectangle2D(const Rectangle& rectDst, const Ref<RenderProgram2D>& program);
-
-	void drawRectangle2D(sl_real dx, sl_real dy, sl_real dw, sl_real dh, const Ref<RenderProgram2D>& program);
-
+	void drawRectangle2D(const Ref<RenderProgram2D>& program, const Matrix3& transform, const Color4f& color);
+	
 	void drawRectangle2D(const Matrix3& transform, const Color4f& color);
 	
-	void drawRectangle2D(const Rectangle& rectDst, const Color4f& color);
+	void drawRectangle2D(const Ref<RenderProgram2D>& program, const Rectangle& rectDst, const Color4f& color);
 	
-	void drawRectangle2D(sl_real dx, sl_real dy, sl_real dw, sl_real dh, const Color4f& color);
+	void drawRectangle2D(const Rectangle& rectDst, const Color4f& color);
 
 	// Position(0, 0, 1, 1) TexCoord(0, 0, 1, 1)
-	void drawTexture2D(const Ref<RenderProgram>& program);
-
-	void drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, const Ref<RenderProgram2D>& program);
-
-	void drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, sl_real sx, sl_real sy, sl_real sw, sl_real sh, const Ref<RenderProgram2D>& program);
-
-	void drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, const Ref<RenderProgram2D>& program);
-
-	void drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& texture, const Rectangle& rectSrc, const Ref<RenderProgram2D>& program);
-
-	void drawTexture2D(sl_real dx, sl_real dy, sl_real dw, sl_real dh, const Ref<Texture>& texture, sl_real sx, sl_real sy, sl_real sw, sl_real sh, const Ref<RenderProgram2D>& program);
-
-	void drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& texture, const Ref<RenderProgram2D>& program);
-
-	void drawTexture2D(sl_real dx, sl_real dy, sl_real dw, sl_real dh, const Ref<Texture>& texture, const Ref<RenderProgram2D>& program);
-
-	void drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, sl_real alpha = 1);
+	void drawTexture2D();
 	
-	void drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, sl_real sx, sl_real sy, sl_real sw, sl_real sh, sl_real alpha = 1);
-	
-	void drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, sl_real alpha = 1);
-	
-	void drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& texture, const Rectangle& rectSrc, sl_real alpha = 1);
-	
-	void drawTexture2D(sl_real dx, sl_real dy, sl_real dw, sl_real dh, const Ref<Texture>& texture, sl_real sx, sl_real sy, sl_real sw, sl_real sh, sl_real alpha = 1);
-	
-	void drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& texture, sl_real alpha = 1);
-	
-	void drawTexture2D(sl_real dx, sl_real dy, sl_real dw, sl_real dh, const Ref<Texture>& texture, sl_real alpha = 1);
+	void drawTexture2D(const Ref<RenderProgram2D>& program, const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, const Color4f& color);
 
 	void drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, const Color4f& color);
 	
-	void drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, sl_real sx, sl_real sy, sl_real sw, sl_real sh, const Color& color);
+	void drawTexture2D(const Ref<RenderProgram2D>& program, const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, sl_real alpha = 1);
+	
+	void drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, sl_real alpha = 1);
+	
+	void drawTexture2D(const Ref<RenderProgram2D>& program, const Matrix3& transform, const Ref<Texture>& texture, const Color4f& color);
 	
 	void drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, const Color4f& color);
 	
+	void drawTexture2D(const Ref<RenderProgram2D>& program, const Matrix3& transform, const Ref<Texture>& texture, sl_real alpha = 1);
+
+	void drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, sl_real alpha = 1);
+	
+	void drawTexture2D(const Ref<RenderProgram2D>& program, const Rectangle& rectDst, const Ref<Texture>& texture, const Rectangle& rectSrc, const Color4f& color);
+	
 	void drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& texture, const Rectangle& rectSrc, const Color4f& color);
 	
-	void drawTexture2D(sl_real dx, sl_real dy, sl_real dw, sl_real dh, const Ref<Texture>& texture, sl_real sx, sl_real sy, sl_real sw, sl_real sh, const Color& color);
+	void drawTexture2D(const Ref<RenderProgram2D>& program, const Rectangle& rectDst, const Ref<Texture>& texture, const Rectangle& rectSrc, sl_real alpha = 1);
+
+	void drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& texture, const Rectangle& rectSrc, sl_real alpha = 1);
+	
+	void drawTexture2D(const Ref<RenderProgram2D>& program, const Rectangle& rectDst, const Ref<Texture>& texture, const Color4f& color);
 	
 	void drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& texture, const Color4f& color);
 	
-	void drawTexture2D(sl_real dx, sl_real dy, sl_real dw, sl_real dh, const Ref<Texture>& texture, const Color4f& color);
+	void drawTexture2D(const Ref<RenderProgram2D>& program, const Rectangle& rectDst, const Ref<Texture>& texture, sl_real alpha = 1);
 	
-	void drawLines(const Ref<RenderProgram>& program, Line3* lines, sl_uint32 n = 1);
+	void drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& texture, sl_real alpha = 1);
+	
+	void drawLines(const Ref<RenderProgram2D>& program, LineSegment* lines, sl_uint32 n, const Color4f& color);
+	
+	void drawLines(LineSegment* lines, sl_uint32 n, const Color4f& color);
+	
+	void drawLines(const Ref<RenderProgram3D>& program, Line3* lines, sl_uint32 n, const Color4f& color);
+	
+	void drawLines(Line3* lines, sl_uint32 n, const Color4f& color);
 	
 	void drawDebugText();
 
@@ -307,10 +308,26 @@ public:
 
 	sl_uint32 getCountOfDrawnPrimitivesOnLastScene();
 	
-protected:
-	virtual void _release() = 0;
+	Ref<VertexBuffer> getDefaultVertexBufferForDrawRectangle2D();
 	
-	virtual sl_bool _isValid() = 0;
+	Ref<RenderProgram2D> getDefaultRenderProgramForDrawRectangle2D();
+	
+	Ref<VertexBuffer> getDefaultVertexBufferForDrawTexture2D();
+	
+	Ref<RenderProgram2D> getDefaultRenderProgramForDrawTexture2D();
+	
+	Ref<RenderProgram2D> getDefaultRenderProgramForDrawLine2D();
+	
+	Ref<RenderProgram3D> getDefaultRenderProgramForDrawLine3D();
+	
+protected:
+	virtual Ref<RenderProgramInstance> _createProgramInstance(RenderProgram* program) = 0;
+	
+	virtual Ref<VertexBufferInstance> _createVertexBufferInstance(VertexBuffer* buffer) = 0;
+	
+	virtual Ref<IndexBufferInstance> _createIndexBufferInstance(IndexBuffer* buffer) = 0;
+	
+	virtual Ref<TextureInstance> _createTextureInstance(Texture* texture) = 0;
 	
 	virtual sl_bool _beginScene() = 0;
 	
@@ -328,39 +345,15 @@ protected:
 	
 	virtual void _setBlending(sl_bool flagEnableBlending, const RenderBlendingParam& param) = 0;
 	
-	virtual sl_bool _beginProgram(RenderProgram* program) = 0;
+	virtual sl_bool _beginProgram(RenderProgram* program, RenderProgramInstance* instance, RenderProgramState** ppState) = 0;
 	
 	virtual void _endProgram() = 0;
 	
-	virtual void _drawPrimitive(Primitive* primitive) = 0;
+	virtual void _drawPrimitive(EnginePrimitive* primitive) = 0;
 	
-	virtual void _applyTexture(const void* sampler, Texture* texture) = 0;
-	
-	virtual sl_bool _linkTexture(Texture* texture) = 0;
-	
-	virtual sl_bool _linkVertexBuffer(VertexBuffer* buffer) = 0;
-	
-	virtual sl_bool _linkIndexBuffer(IndexBuffer* buffer) = 0;
+	virtual void _applyTexture(sl_reg sampler, Texture* texture, TextureInstance* instance) = 0;
 	
 	virtual void _setLineWidth(sl_real width) = 0;
-	
-public:
-	virtual void _onFreeInstance(RenderBaseObjectInstance* instace) = 0;
-	
-	virtual void _onUpdateVertexBuffer(VertexBuffer* vertexBuffer, sl_size offset, sl_size size) = 0;
-	
-	virtual void _onUpdateIndexBuffer(IndexBuffer* vertexBuffer, sl_size offset, sl_size size) = 0;
-	
-	virtual void _onUpdateTexture(Texture* texture, sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height) = 0;
-	
-private:
-	Ref<VertexBuffer> _getDefaultVertexBufferForDrawRectangle2D();
-	
-	Ref<RenderProgram2D> _getDefaultRenderProgramForDrawRectangle2D();
-	
-	Ref<VertexBuffer> _getDefaultVertexBufferForDrawTexture2D();
-	
-	Ref<RenderProgram2D> _getDefaultRenderProgramForDrawTexture2D();
 	
 protected:
 	sl_uint32 m_viewportWidth;
@@ -380,7 +373,53 @@ protected:
 	SafeRef<VertexBuffer> m_defaultVertexBufferForDrawTexture2D;
 	SafeRef<RenderProgram2D> m_defaultRenderProgramForDrawTexture2D;
 	
+	SafeRef<RenderProgram2D> m_defaultRenderProgramForDrawLine2D;
+	SafeRef<RenderProgram3D> m_defaultRenderProgramForDrawLine3D;
 
+};
+
+template <class StateType>
+class SLIB_EXPORT RenderProgramScope
+{
+public:
+	SLIB_INLINE RenderProgramScope() : m_engine(sl_null), m_program(sl_null), m_state(sl_null) {};
+	
+	SLIB_INLINE ~RenderProgramScope()
+	{
+		end();
+	}
+	
+public:
+	SLIB_INLINE sl_bool begin(RenderEngine* engine, const Ref<RenderProgram>& program)
+	{
+		if (program.isNotNull()) {
+			if (engine->beginProgram(program, (RenderProgramState**)(&m_state))) {
+				m_engine = engine;
+				m_program = program;
+				return sl_true;
+			}
+		}
+		return sl_false;
+	}
+	
+	SLIB_INLINE void end()
+	{
+		if (m_engine) {
+			m_engine->endProgram();
+			m_engine = sl_null;
+		}
+	}
+	
+	SLIB_INLINE StateType* operator->()
+	{
+		return m_state;
+	}
+	
+public:
+	RenderEngine* m_engine;
+	Ref<RenderProgram> m_program;
+	StateType* m_state;
+	
 };
 
 SLIB_RENDER_NAMESPACE_END

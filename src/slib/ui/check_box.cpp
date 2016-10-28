@@ -106,8 +106,8 @@ CheckBox::CheckBox(sl_uint32 nCategories, ButtonCategory* categories) : Button(n
 	setIconAlignment(Alignment::MiddleLeft);
 	setTextAlignment(Alignment::MiddleLeft);
 	
-	setBorder(sl_false, sl_false);
-	setBackground(Ref<Drawable>::null(), sl_false);
+	setBorder(sl_false, UIUpdateMode::Init);
+	setBackground(Ref<Drawable>::null(), UIUpdateMode::Init);
 	
 }
 
@@ -119,14 +119,14 @@ sl_bool CheckBox::isChecked()
 	return m_flagChecked;
 }
 
-void CheckBox::setChecked(sl_bool flag, sl_bool flagRedraw)
+void CheckBox::setChecked(sl_bool flag, UIUpdateMode mode)
 {
 	m_flagChecked = flag;
 	if (isNativeWidget()) {
-		setCurrentCategory(flag ? 1 : 0, sl_false);
+		setCurrentCategory(flag ? 1 : 0, UIUpdateMode::NoRedraw);
 		_setChecked_NW(flag);
 	} else {
-		setCurrentCategory(flag ? 1 : 0, flagRedraw);
+		setCurrentCategory(flag ? 1 : 0, mode);
 	}
 }
 

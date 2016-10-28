@@ -9,18 +9,21 @@
 #include "../math/matrix4.h"
 #include "../graphics/color.h"
 
-#define SLIB_RENDER_MAX_TEXTURE_SAMPLERS 16
-
 SLIB_RENDER_NAMESPACE_BEGIN
 
 class Primitive;
 class RenderEngine;
 
-class SLIB_EXPORT RenderProgramInfo : public Referable
+class SLIB_EXPORT RenderProgramState : public Referable
 {
 public:
-	sl_uint32 program_GL;
-	void* effect_D3D9;
+	sl_uint32 gl_program;
+
+};
+
+class SLIB_EXPORT RenderProgramInstance : public RenderBaseObjectInstance
+{
+	SLIB_DECLARE_OBJECT
 };
 
 class SLIB_EXPORT RenderProgram : public RenderBaseObject
@@ -28,81 +31,77 @@ class SLIB_EXPORT RenderProgram : public RenderBaseObject
 	SLIB_DECLARE_OBJECT
 
 public:
-	virtual Ref<RenderProgramInfo> create(RenderEngine* engine) = 0;
+	virtual Ref<RenderProgramState> onCreate(RenderEngine* engine) = 0;
 	
-	virtual sl_bool onInit(RenderEngine* engine, RenderProgramInfo* info);
+	virtual sl_bool onInit(RenderEngine* engine, RenderProgramState* state);
 
-	virtual sl_bool onBeginProgram(RenderEngine* engine, RenderProgramInfo* info);
+	virtual sl_bool onUpdate(RenderEngine* engine, RenderProgramState* state);
 	
-	virtual void onEndProgram(RenderEngine* engine, RenderProgramInfo* info);
+	virtual sl_bool onPreRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
 	
-	virtual sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
-	
-	virtual void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	virtual void onPostRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
 
 	virtual String getGLSLVertexShader(RenderEngine* engine);
 	
 	virtual String getGLSLFragmentShader(RenderEngine* engine);
 
+	
+	Ref<RenderProgramInstance> getInstance(RenderEngine* engine);
+	
+};
+
+template <class BaseProgram, class StateType>
+class SLIB_EXPORT RenderProgramT : public BaseProgram
+{
+	// override
+	Ref<RenderProgramState> onCreate(RenderEngine* engine)
+	{
+		return new StateType;
+	}
+	
 };
 
 
 #define SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, location, VertexData, member) \
 	engine->setVertexFloatArrayAttribute(location, (sl_uint32)(sl_size)(&(((VertexData*)0)->member)), sizeof(((VertexData*)0)->member) / sizeof(float), sizeof(VertexData));
 
+
+class RenderProgramState2D : public RenderProgramState
+{
+public:
+	Matrix3 transform;
+	Ref<Texture> texture;
+	Matrix3 textureTransform;
+	Color3f color;
+	float alpha;
+	
+	sl_int32 gl_uniformTransform;			// Matrix3
+	sl_int32 gl_uniformTexture;				// sampler
+	sl_int32 gl_uniformTextureTransform;	// sampler
+	sl_int32 gl_uniformColor;				// Vector3
+	sl_int32 gl_uniformAlpha;				// float
+	
+	sl_int32 gl_attrPosition;		// Vector2
+	sl_int32 gl_attrColor;			// Vector4
+	sl_int32 gl_attrTexCoord;		// Vector2
+	
+public:
+	RenderProgramState2D();
+	
+};
+
 // Base class for 2D RenderPrograms
-class SLIB_EXPORT RenderProgram2D : public RenderProgram
+class SLIB_EXPORT RenderProgram2D : public RenderProgramT<RenderProgram, RenderProgramState2D>
 {
 public:
 	RenderProgram2D();
 	
 public:
 	// override
-	Ref<RenderProgramInfo> create(RenderEngine* engine);
+	sl_bool onInit(RenderEngine* engine, RenderProgramState* state);
 	
 	// override
-	sl_bool onInit(RenderEngine* engine, RenderProgramInfo* info);
-	
-	// override
-	sl_bool onBeginProgram(RenderEngine* engine, RenderProgramInfo* info);
-	
-public:
-	Ref<Texture> getTexture(sl_uint32 no);
-	
-	Ref<Texture> getTexture();
-	
-	void setTexture(sl_uint32 no, const Ref<Texture>& texture);
-	
-	void setTexture(const Ref<Texture>& texture);
-	
-public:
-	SLIB_PROPERTY(Matrix3, Transform)
-	
-	SLIB_PROPERTY(Matrix3, TextureTransform)
-
-	SLIB_PROPERTY(Color, Color)
-	
-	SLIB_PROPERTY(float, Alpha)
-
-public:
-	class Info_GL : public RenderProgramInfo
-	{
-	public:
-		sl_int32 uniformTransform;	// Matrix3
-
-		sl_int32 uniformTextures[SLIB_RENDER_MAX_TEXTURE_SAMPLERS];	// samplers
-		sl_int32 uniformTransformTexture; // Matrix3
-		
-		sl_int32 uniformColor;		// Vector3
-		sl_int32 uniformAlpha;		// float
-
-		sl_int32 attrPosition;		// Vector2
-		sl_int32 attrColor;			// Vector4
-		sl_int32 attrTexCoord;		// Vector2
-	};
-
-protected:
-	SafeRef<Texture> m_textures[SLIB_RENDER_MAX_TEXTURE_SAMPLERS];
+	sl_bool onUpdate(RenderEngine* engine, RenderProgramState* state);
 	
 };
 
@@ -124,10 +123,10 @@ public:
 	String getGLSLFragmentShader(RenderEngine* engine);
 	
 	// override
-	sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	sl_bool onPreRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
 	
 	// override
-	void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	void onPostRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
 	
 };
 
@@ -158,10 +157,10 @@ public:
 	String getGLSLFragmentShader(RenderEngine* engine);
 	
 	// override
-	sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	sl_bool onPreRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
 	
 	// override
-	void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	void onPostRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
 	
 };
 
@@ -182,133 +181,56 @@ public:
 	String getGLSLFragmentShader(RenderEngine* engine);
 	
 	// override
-	sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	sl_bool onPreRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
 	
 	// override
-	void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	void onPostRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
+	
+};
+
+
+class RenderProgramState3D : public RenderProgramState
+{
+public:
+	Matrix4 transform;
+	Matrix4 matrixModelViewIT;
+	Ref<Texture> texture;
+	Vector3 directionalLight;
+	Color3f diffuseColor;
+	Color3f ambientColor;
+	float alpha;
+	
+	sl_int32 gl_uniformTransform;				// Matrix4
+	sl_int32 gl_uniformMatrixModelViewIT;		// Matrix4
+	sl_int32 gl_uniformTexture;					// sampler
+	sl_int32 gl_uniformDirectionalLight;		// Vector3
+	sl_int32 gl_uniformDiffuseColor;			// Vector3
+	sl_int32 gl_uniformAmbientColor;			// Vector3
+	sl_int32 gl_uniformAlpha;					// float
+	
+	sl_int32 gl_attrPosition;	// Vector3
+	sl_int32 gl_attrNormal;		// Vector3
+	sl_int32 gl_attrColor;		// Vector3
+	sl_int32 gl_attrTexCoord;	// Vector2
+	
+public:
+	RenderProgramState3D();
 	
 };
 
 // Base class for 3D RenderPrograms
-class SLIB_EXPORT RenderProgram3D : public RenderProgram
+class SLIB_EXPORT RenderProgram3D : public RenderProgramT<RenderProgram, RenderProgramState3D>
 {
 public:
 	RenderProgram3D();
 
 public:
 	// override
-	Ref<RenderProgramInfo> create(RenderEngine* engine);
+	sl_bool onInit(RenderEngine* engine, RenderProgramState* state);
 	
 	// override
-	sl_bool onInit(RenderEngine* engine, RenderProgramInfo* info);
-	
-	// override
-	sl_bool onBeginProgram(RenderEngine* engine, RenderProgramInfo* info);
+	sl_bool onUpdate(RenderEngine* engine, RenderProgramState* state);
 
-public:
-	const Matrix4& getModelMatrix();
-	
-	void setModelMatrix(const Matrix4& t);
-	
-	
-	const Matrix4& getViewMatrix();
-	
-	void setViewMatrix(const Matrix4& t);
-	
-	
-	const Matrix4& getProjectionMatrix();
-	
-	void setProjectionMatrix(const Matrix4& t, sl_bool flagUpdateTransform = sl_true);
-	
-	
-	const Matrix4& getTransform();
-	
-	void setTransform(const Matrix4& t);
-	
-	
-	const Matrix4& getModelViewMatrix();
-	
-	void setModelViewMatrix(const Matrix4& t);
-	
-	
-	const Matrix4& getModelViewMatrixInverseTranspose();
-	
-	void setModelViewMatrixInverseTranspose(const Matrix4& t);
-	
-	
-	const Matrix4& getViewProjectionMatrix();
-	
-	void setViewProjectionMatrix(const Matrix4& t);
-	
-	
-	Ref<Texture> getTexture(sl_uint32 no);
-	
-	Ref<Texture> getTexture();
-	
-	void setTexture(sl_uint32 no, const Ref<Texture>& texture);
-	
-	void setTexture(const Ref<Texture>& texture);
-	
-	float getTextureAlpha(sl_uint32 no);
-	
-	void setTextureAlpha(sl_uint32 no, float alpha);
-	
-public:
-	SLIB_PROPERTY(Vector3, DirectionalLight)
-	
-	SLIB_PROPERTY(Color, DiffuseColor)
-	
-	SLIB_PROPERTY(Color, AmbientColor)
-	
-	SLIB_PROPERTY(float, Alpha)
-	
-	SLIB_PROPERTY(Matrix3, TextureTransform)
-
-public:
-	class Info_GL : public RenderProgramInfo
-	{
-	public:
-		sl_int32 uniformTransform;				// Matrix4
-		sl_int32 uniformMatrixModel;			// Matrix4
-		sl_int32 uniformMatrixView;				// Matrix4
-		sl_int32 uniformMatrixProjection;		// Matrix4
-		sl_int32 uniformMatrixModelView;		// Matrix4
-		sl_int32 uniformMatrixModelViewIT;		// Matrix4
-		sl_int32 uniformMatrixViewProjection;	// Matrix4
-
-		sl_int32 uniformTextures[SLIB_RENDER_MAX_TEXTURE_SAMPLERS];	// samplers
-		sl_int32 uniformTextureAlphas[SLIB_RENDER_MAX_TEXTURE_SAMPLERS];	// samplers
-		sl_int32 uniformTransformTexture;		// Matrix3
-
-		sl_int32 uniformDirectionalLight;		// Vector3
-		sl_int32 uniformDiffuseColor;			// Vector3
-		sl_int32 uniformAmbientColor;			// Vector3
-		sl_int32 uniformAlpha;					// float
-
-		sl_int32 attrPosition;	// Vector3
-		sl_int32 attrNormal;	// Vector3
-		sl_int32 attrColor;		// Vector3
-		sl_int32 attrTexCoord;	// Vector2
-
-	};
-
-protected:
-	Matrix4 m_matrixModel;
-	Matrix4 m_matrixView;
-	Matrix4 m_matrixProjection;
-
-	sl_bool m_flagValidMatrixTransform;
-	Matrix4 m_matrixTransform;
-	sl_bool m_flagValidMatrixModelView;
-	Matrix4 m_matrixModelView;
-	sl_bool m_flagValidMatrixModelViewIT;
-	Matrix4 m_matrixModelViewIT;
-	sl_bool m_flagValidMatrixViewProjection;
-	Matrix4 m_matrixViewProjection;
-
-protected:
-	SafeRef<Texture> m_textures[SLIB_RENDER_MAX_TEXTURE_SAMPLERS];
-	float m_textureAlphas[SLIB_RENDER_MAX_TEXTURE_SAMPLERS];
 };
 
 // Position(3), Normal(3), Color(4)
@@ -330,10 +252,10 @@ public:
 	String getGLSLFragmentShader(RenderEngine* engine);
 	
 	// override
-	sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	sl_bool onPreRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
 	
 	// override
-	void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	void onPostRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
 	
 };
 
@@ -355,10 +277,10 @@ public:
 	String getGLSLFragmentShader(RenderEngine* engine);
 	
 	// override
-	sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	sl_bool onPreRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
 	
 	// override
-	void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	void onPostRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
 	
 };
 
@@ -381,10 +303,10 @@ public:
 	String getGLSLFragmentShader(RenderEngine* engine);
 	
 	// override
-	sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	sl_bool onPreRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
 	
 	// override
-	void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	void onPostRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
 	
 };
 
@@ -406,10 +328,10 @@ public:
 	String getGLSLFragmentShader(RenderEngine* engine);
 	
 	// override
-	sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	sl_bool onPreRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
 	
 	// override
-	void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	void onPostRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
 	
 };
 
@@ -431,10 +353,10 @@ public:
 	String getGLSLFragmentShader(RenderEngine* engine);
 	
 	// override
-	sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	sl_bool onPreRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
 	
 	// override
-	void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	void onPostRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
 	
 };
 
@@ -455,10 +377,10 @@ public:
 	String getGLSLFragmentShader(RenderEngine* engine);
 	
 	// override
-	sl_bool onPreRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	sl_bool onPreRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
 	
 	// override
-	void onPostRender(RenderEngine* engine, RenderProgramInfo* info, Primitive* primitive);
+	void onPostRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
 	
 };
 

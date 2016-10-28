@@ -3,6 +3,7 @@
 #include "../../../inc/slib/ui/window.h"
 #include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/scroll_bar.h"
+#include "../../../inc/slib/ui/render_view.h"
 
 #include "../../../inc/slib/core/scoped_pointer.h"
 #include "../../../inc/slib/math/transform2d.h"
@@ -91,10 +92,7 @@ Ref<View::LayoutAttributes> View::_initializeLayoutAttibutes()
 	
 	attrs->measuredWidth = 0;
 	attrs->measuredHeight = 0;
-	attrs->frame.left = 0;
-	attrs->frame.top = 0;
-	attrs->frame.right = 0;
-	attrs->frame.bottom = 0;
+	attrs->frame = m_frame;
 	attrs->flagInvalidMeasure = sl_true;
 	attrs->flagInvalidLayout = sl_true;
 	attrs->flagMakeLayout = sl_false;
@@ -441,7 +439,7 @@ void View::detach()
 void View::_processAttachOnUiThread()
 {
 	if (isInstance()) {
-		if (getParent().isNull()) {
+		if (getParent().isNull() && !(RenderView::checkInstance(this))) {
 			_makeLayout(sl_false);
 		}
 		if (m_flagCreatingChildInstances) {
@@ -502,27 +500,27 @@ sl_size View::getChildrenCount()
 	return m_children.getCount();
 }
 
-void View::addChild(const Ref<View>& view, sl_bool flagRedraw)
+void View::addChild(const Ref<View>& view, UIUpdateMode mode)
 {
 	if (view.isNull()) {
 		return;
 	}
 	if (m_children.addIfNotExist(view)) {
-		_addChild(view, flagRedraw);
+		_addChild(view, mode);
 	}
 }
 
-void View::insertChild(sl_size index, const Ref<View>& view, sl_bool flagRedraw)
+void View::insertChild(sl_size index, const Ref<View>& view, UIUpdateMode mode)
 {
 	if (view.isNull()) {
 		return;
 	}
 	if (m_children.insert(index, view)) {
-		_addChild(view, flagRedraw);
+		_addChild(view, mode);
 	}
 }
 
-void View::removeChild(sl_size index, sl_bool flagRedraw)
+void View::removeChild(sl_size index, UIUpdateMode mode)
 {
 	Ref<View> view = m_children.getItemValue(index, Ref<View>::null());
 	if (view.isNull()) {
@@ -537,13 +535,13 @@ void View::removeChild(sl_size index, sl_bool flagRedraw)
 		m_childMouseMove.setNull();
 	}
 	if (view == m_childFocused) {
-		_setFocusedChild(sl_null, sl_false);
+		_setFocusedChild(sl_null, UIUpdateMode::NoRedraw);
 	}
 	m_childrenMultiTouch.removeValue(view);
-	requestLayout(flagRedraw);
+	requestLayout(mode);
 }
 
-void View::removeChild(const Ref<View>& view, sl_bool flagRedraw)
+void View::removeChild(const Ref<View>& view, UIUpdateMode mode)
 {
 	if (view.isNull()) {
 		return;
@@ -557,17 +555,17 @@ void View::removeChild(const Ref<View>& view, sl_bool flagRedraw)
 		m_childMouseMove.setNull();
 	}
 	if (view == m_childFocused) {
-		_setFocusedChild(sl_null, sl_false);
+		_setFocusedChild(sl_null, UIUpdateMode::NoRedraw);
 	}
 	m_childrenMultiTouch.removeValue(view);
-	requestLayout(flagRedraw);
+	requestLayout(mode);
 }
 
-void View::removeAllChildren(sl_bool flagRedraw)
+void View::removeAllChildren(UIUpdateMode mode)
 {
 	if (isInstance()) {
 		if (!(UI::isUiThread())) {
-			UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, removeAllChildren, this, flagRedraw));
+			UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, removeAllChildren, this, mode));
 			return;
 		}
 		ListLocker< Ref<View> > children(m_children);
@@ -585,10 +583,10 @@ void View::removeAllChildren(sl_bool flagRedraw)
 	}
 	m_childMouseDown.setNull();
 	m_childMouseMove.setNull();
-	_setFocusedChild(sl_null, sl_false);
+	_setFocusedChild(sl_null, UIUpdateMode::NoRedraw);
 	m_childrenMultiTouch.setNull();
 	m_children.removeAll();
-	requestLayout(flagRedraw);
+	requestLayout(mode);
 }
 
 Ref<View> View::getChildAt(sl_ui_pos x, sl_ui_pos y)
@@ -715,7 +713,7 @@ void View::setOnRemoveChildEnabled(sl_bool flagEnabled)
 	m_flagOnRemoveChild = flagEnabled;
 }
 
-void View::bringToFront(sl_bool flagRedraw)
+void View::bringToFront(UIUpdateMode mode)
 {
 	Ref<ViewInstance> instance = m_instance;
 	Ref<View> parent = getParent();
@@ -726,7 +724,7 @@ void View::bringToFront(sl_bool flagRedraw)
 			parent->m_children.remove_NoLock(index);
 			parent->m_children.add_NoLock(this);
 			if (instance.isNull()) {
-				if (flagRedraw) {
+				if (mode == UIUpdateMode::Redraw) {
 					invalidateBoundsInParent();
 				}
 			}
@@ -737,37 +735,40 @@ void View::bringToFront(sl_bool flagRedraw)
 	}
 }
 
-void View::_addChild(const Ref<View>& child, sl_bool flagRedraw)
+void View::_addChild(const Ref<View>& child, UIUpdateMode mode)
 {
 	if (child.isNotNull()) {
-		child->setFocus(sl_false, sl_false);
+		if (mode != UIUpdateMode::Init) {
+			child->setFocus(sl_false, UIUpdateMode::NoRedraw);
+		}
 		child->setParent(this);
 		if (m_flagOnAddChild) {
 			onAddChild(child.ptr);
 		}
-		requestLayout(sl_false);
-		if (isInstance() && m_flagCreatingChildInstances && child->m_flagCreatingInstance) {
-			switch(child->getAttachMode()) {
-				case UIAttachMode::NotAttach:
-					break;
-				case UIAttachMode::AttachAlways:
-					attachChild(child);
-					break;
-				case UIAttachMode::NotAttachInNativeWidget:
-					if (!(isNativeWidget())) {
+		if (mode != UIUpdateMode::Init) {
+			requestLayout(UIUpdateMode::NoRedraw);
+			if (isInstance() && m_flagCreatingChildInstances && child->m_flagCreatingInstance) {
+				switch(child->getAttachMode()) {
+					case UIAttachMode::NotAttach:
+						break;
+					case UIAttachMode::AttachAlways:
 						attachChild(child);
-					}
-					break;
-				case UIAttachMode::AttachInNativeWidget:
-					if (isNativeWidget()) {
-						attachChild(child);
-					}
-					break;
+						break;
+					case UIAttachMode::NotAttachInNativeWidget:
+						if (!(isNativeWidget())) {
+							attachChild(child);
+						}
+						break;
+					case UIAttachMode::AttachInNativeWidget:
+						if (isNativeWidget()) {
+							attachChild(child);
+						}
+						break;
+				}
 			}
+			child->updateAndInvalidateBoundsInParent(UIUpdateMode::NoRedraw);
 		}
-		
-		child->updateAndInvalidateBoundsInParent(sl_false);
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -903,11 +904,14 @@ void View::invalidateBoundsInParent()
 	}
 }
 
-void View::updateAndInvalidateBoundsInParent(sl_bool flagInvalidate)
+void View::updateAndInvalidateBoundsInParent(UIUpdateMode mode)
 {
+	if (mode == UIUpdateMode::Init) {
+		return;
+	}
 	Ref<View> parent = m_parent;
 	if (parent.isNotNull()) {
-		if (flagInvalidate && !(checkSelfInvalidatable())) {
+		if (mode == UIUpdateMode::Redraw && !(checkSelfInvalidatable())) {
 			UIRect bounds = m_boundsInParent;
 			if (bounds.getWidth() > 0 && bounds.getHeight() > 0) {
 				UIRect boundsNew = convertCoordinateToParent(getBounds());
@@ -979,11 +983,12 @@ UIRect View::getInstanceFrame()
 	return UIRect::zero();
 }
 
-void View::_setFrame(const UIRect& _frame, sl_bool flagRedraw, sl_bool flagLayouting)
+void View::_setFrame(const UIRect& _frame, UIUpdateMode mode, sl_bool flagLayouting)
 {
-	UIRect frameOld = m_frame;
+	
 	UIRect frame = _frame;
 	frame.fixSizeError();
+	UIRect frameOld = m_frame;
 	
 	sl_bool flagNotMoveX = Math::isAlmostZero(frameOld.left - frame.left);
 	sl_bool flagNotMoveY = Math::isAlmostZero(frameOld.top - frame.top);
@@ -1000,40 +1005,46 @@ void View::_setFrame(const UIRect& _frame, sl_bool flagRedraw, sl_bool flagLayou
 	
 	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
 	if (layoutAttrs.isNotNull()) {
+		layoutAttrs->frame = frame;
 		layoutAttrs->flagInvalidMeasure = sl_true;
 		if (!(flagNotResizeWidth && flagNotResizeHeight)) {
 			layoutAttrs->flagInvalidLayout = sl_true;
 		}
-		if (!flagLayouting) {
-			Ref<View> parent = getParent();
-			if (parent.isNotNull()) {
-				parent->requestLayout(sl_false);
-			} else {
-				_requestMakeLayout();
+		if (mode != UIUpdateMode::Init) {
+			if (!flagLayouting) {
+				Ref<View> parent = getParent();
+				if (parent.isNotNull()) {
+					parent->requestLayout(UIUpdateMode::NoRedraw);
+				} else {
+					_requestMakeLayout();
+				}
 			}
 		}
 	} else {
-		requestParentLayout(sl_false);
+		if (mode != UIUpdateMode::Init) {
+			requestParentLayout(UIUpdateMode::NoRedraw);
+		}
 	}
 	
 	if (!(flagNotResizeWidth && flagNotResizeHeight)) {
 		dispatchResize(frame.getWidth(), frame.getHeight());
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidateLayer();
 		}
 	}
-	updateAndInvalidateBoundsInParent(flagRedraw);
+	
+	updateAndInvalidateBoundsInParent(mode);
 
 }
 
-void View::setFrame(const UIRect &frame, sl_bool flagRedraw)
+void View::setFrame(const UIRect &frame, UIUpdateMode mode)
 {
-	_setFrame(frame, flagRedraw, sl_false);
+	_setFrame(frame, mode, sl_false);
 }
 
-void View::setFrame(sl_ui_pos x, sl_ui_pos y, sl_ui_len width, sl_ui_len height, sl_bool flagRedraw)
+void View::setFrame(sl_ui_pos x, sl_ui_pos y, sl_ui_len width, sl_ui_len height, UIUpdateMode mode)
 {
-	_setFrame(UIRect(x, y, x+width, y+height), flagRedraw, sl_false);
+	_setFrame(UIRect(x, y, x+width, y+height), mode, sl_false);
 }
 
 sl_ui_len View::getWidth()
@@ -1041,9 +1052,9 @@ sl_ui_len View::getWidth()
 	return m_frame.getWidth();
 }
 
-void View::setWidth(sl_ui_len width, sl_bool flagRedraw)
+void View::setWidth(sl_ui_len width, UIUpdateMode mode)
 {
-	setFrame(m_frame.left, m_frame.top, width, m_frame.getHeight(), flagRedraw);
+	setFrame(m_frame.left, m_frame.top, width, m_frame.getHeight(), mode);
 }
 
 sl_ui_len View::getHeight()
@@ -1051,9 +1062,9 @@ sl_ui_len View::getHeight()
 	return m_frame.getHeight();
 }
 
-void View::setHeight(sl_ui_len height, sl_bool flagRedraw)
+void View::setHeight(sl_ui_len height, UIUpdateMode mode)
 {
-	setFrame(m_frame.left, m_frame.top, m_frame.getWidth(), height, flagRedraw);
+	setFrame(m_frame.left, m_frame.top, m_frame.getWidth(), height, mode);
 }
 
 UISize View::getSize()
@@ -1061,14 +1072,14 @@ UISize View::getSize()
 	return m_frame.getSize();
 }
 
-void View::setSize(const UISize& size, sl_bool flagRedraw)
+void View::setSize(const UISize& size, UIUpdateMode mode)
 {
-	setFrame(m_frame.left, m_frame.top, size.x, size.y, flagRedraw);
+	setFrame(m_frame.left, m_frame.top, size.x, size.y, mode);
 }
 
-void View::setSize(sl_ui_len width, sl_ui_len height, sl_bool flagRedraw)
+void View::setSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode)
 {
-	setFrame(m_frame.left, m_frame.top, width, height, flagRedraw);
+	setFrame(m_frame.left, m_frame.top, width, height, mode);
 }
 
 sl_ui_pos View::getLeft()
@@ -1081,14 +1092,14 @@ sl_ui_pos View::getTop()
 	return m_frame.top;
 }
 
-void View::setLeft(sl_ui_pos x, sl_bool flagRedraw)
+void View::setLeft(sl_ui_pos x, UIUpdateMode mode)
 {
-	setFrame(x, m_frame.top, m_frame.getWidth(), m_frame.getHeight(), flagRedraw);
+	setFrame(x, m_frame.top, m_frame.getWidth(), m_frame.getHeight(), mode);
 }
 
-void View::setTop(sl_ui_pos y, sl_bool flagRedraw)
+void View::setTop(sl_ui_pos y, UIUpdateMode mode)
 {
-	setFrame(m_frame.left, y, m_frame.getWidth(), m_frame.getHeight(), flagRedraw);
+	setFrame(m_frame.left, y, m_frame.getWidth(), m_frame.getHeight(), mode);
 }
 
 UIPoint View::getPosition()
@@ -1096,14 +1107,14 @@ UIPoint View::getPosition()
 	return m_frame.getLeftTop();
 }
 
-void View::setPosition(sl_ui_pos x, sl_ui_pos y, sl_bool flagRedraw)
+void View::setPosition(sl_ui_pos x, sl_ui_pos y, UIUpdateMode mode)
 {
-	setFrame(x, y, m_frame.getWidth(), m_frame.getHeight(), flagRedraw);
+	setFrame(x, y, m_frame.getWidth(), m_frame.getHeight(), mode);
 }
 
-void View::setPosition(const UIPoint& point, sl_bool flagRedraw)
+void View::setPosition(const UIPoint& point, UIUpdateMode mode)
 {
-	setFrame(point.x, point.y, m_frame.getWidth(), m_frame.getHeight(), flagRedraw);
+	setFrame(point.x, point.y, m_frame.getWidth(), m_frame.getHeight(), mode);
 }
 
 UIRect View::getBounds()
@@ -1128,30 +1139,32 @@ Visibility View::getVisibility()
 	return m_visibility;
 }
 
-void View::setVisibility(Visibility visibility, sl_bool flagRedraw)
+void View::setVisibility(Visibility visibility, UIUpdateMode mode)
 {
 	Visibility oldVisibility = m_visibility;
 	m_visibility = visibility;
 	Ref<ViewInstance> instance = m_instance;
-	if (instance.isNotNull()) {
-		instance->setVisible(visibility == Visibility::Visible);
-	}
 	if (oldVisibility != visibility) {
-		switch (visibility) {
-			case Visibility::Visible:
-			case Visibility::Hidden:
-				if (oldVisibility == Visibility::Gone) {
-					requestParentAndSelfLayout(sl_false);
-				}
-				break;
-			case Visibility::Gone:
-				requestParentLayout(sl_false);
-				break;
+		if (instance.isNotNull()) {
+			instance->setVisible(visibility == Visibility::Visible);
+		}
+		if (mode != UIUpdateMode::Init) {
+			switch (visibility) {
+				case Visibility::Visible:
+				case Visibility::Hidden:
+					if (oldVisibility == Visibility::Gone) {
+						requestParentAndSelfLayout(UIUpdateMode::NoRedraw);
+					}
+					break;
+				case Visibility::Gone:
+					requestParentLayout(UIUpdateMode::NoRedraw);
+					break;
+			}
 		}
 		dispatchChangeVisibility(oldVisibility, visibility);
 	}
 	if (instance.isNull()) {
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidateBoundsInParent();
 		}
 	}
@@ -1162,12 +1175,12 @@ sl_bool View::isVisible()
 	return m_visibility == Visibility::Visible;
 }
 
-void View::setVisible(sl_bool flag, sl_bool flagRedraw)
+void View::setVisible(sl_bool flag, UIUpdateMode mode)
 {
 	if (flag) {
-		setVisibility(Visibility::Visible, flagRedraw);
+		setVisibility(Visibility::Visible, mode);
 	} else {
-		setVisibility(Visibility::Gone, flagRedraw);
+		setVisibility(Visibility::Gone, mode);
 	}
 }
 
@@ -1176,14 +1189,14 @@ sl_bool View::isEnabled()
 	return m_flagEnabled;
 }
 
-void View::setEnabled(sl_bool flag, sl_bool flagRedraw)
+void View::setEnabled(sl_bool flag, UIUpdateMode mode)
 {
 	m_flagEnabled = flag;
 	Ref<ViewInstance> instance = m_instance;
 	if (instance.isNotNull()) {
 		instance->setEnabled(flag);
 	} else {
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -1233,7 +1246,7 @@ sl_bool View::isFocused()
 	return m_flagFocused;
 }
 
-void View::setFocus(sl_bool flagFocused, sl_bool flagRedraw)
+void View::setFocus(sl_bool flagFocused, UIUpdateMode mode)
 {
 	m_flagFocused = flagFocused;
 	if (flagFocused) {
@@ -1247,7 +1260,7 @@ void View::setFocus(sl_bool flagFocused, sl_bool flagRedraw)
 	Ref<View> parent = getParent();
 	if (parent.isNotNull()) {
 		if (flagFocused) {
-			parent->_setFocusedChild(this, flagRedraw);
+			parent->_setFocusedChild(this, mode);
 			return;
 		} else {
 			if (m_childFocused == this) {
@@ -1255,7 +1268,7 @@ void View::setFocus(sl_bool flagFocused, sl_bool flagRedraw)
 			}
 		}
 	}
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -1275,7 +1288,7 @@ Ref<View> View::getFocusedChild()
 	return m_childFocused;
 }
 
-void View::_setFocusedChild(View* child, sl_bool flagRedraw)
+void View::_setFocusedChild(View* child, UIUpdateMode mode)
 {
 	Ref<View> old = m_childFocused;
 	if (old != child) {
@@ -1288,11 +1301,11 @@ void View::_setFocusedChild(View* child, sl_bool flagRedraw)
 		m_flagFocused = sl_true;
 		Ref<View> parent = getParent();
 		if (parent.isNotNull()) {
-			parent->_setFocusedChild(this, flagRedraw);
+			parent->_setFocusedChild(this, mode);
 			return;
 		}
 	}
-	if (flagRedraw) {
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
@@ -1302,11 +1315,11 @@ sl_bool View::isPressedState()
 	return m_flagPressed;
 }
 
-void View::setPressedState(sl_bool flagState, sl_bool flagRedraw)
+void View::setPressedState(sl_bool flagState, UIUpdateMode mode)
 {
 	if (m_flagPressed != flagState) {
 		m_flagPressed = flagState;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -1317,11 +1330,11 @@ sl_bool View::isHoverState()
 	return m_flagHover;
 }
 
-void View::setHoverState(sl_bool flagState, sl_bool flagRedraw)
+void View::setHoverState(sl_bool flagState, UIUpdateMode mode)
 {
 	if (m_flagHover != flagState) {
 		m_flagHover = flagState;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			Ref<DrawAttributes> attrs = m_drawAttributes;
 			if (attrs.isNotNull()) {
 				if (attrs->backgroundHover.isNotNull() && attrs->background != attrs->backgroundHover) {
@@ -1734,9 +1747,6 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 
 void View::_makeLayout(sl_bool flagApplyLayout)
 {
-	if (!(UI::isUiThread())) {
-		return;
-	}
 	if (isVisible()) {
 		
 		Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
@@ -1748,12 +1758,11 @@ void View::_makeLayout(sl_bool flagApplyLayout)
 			do {
 				if (flagApplyLayout) {
 					if (layoutAttrs->frame.isAlmostEqual(m_frame)) {
-						break;
-					}
-					UISize oldSize = m_frame.getSize();
-					_setFrame(layoutAttrs->frame, sl_false, sl_true);
-					if (layoutAttrs->frame.getSize().isAlmostEqual(oldSize)) {
-						break;
+						if (!(layoutAttrs->flagInvalidLayout)) {
+							break;
+						}
+					} else {
+						_setFrame(layoutAttrs->frame, UIUpdateMode::NoRedraw, sl_true);
 					}
 				} else {
 					if (!(layoutAttrs->flagInvalidLayout)) {
@@ -1768,7 +1777,7 @@ void View::_makeLayout(sl_bool flagApplyLayout)
 						if (layoutAttrs->heightMode == SizeMode::Wrapping) {
 							frame.setHeight(layoutAttrs->measuredHeight);
 						}
-						_setFrame(frame, sl_false, sl_true);
+						_setFrame(frame, UIUpdateMode::NoRedraw, sl_true);
 					}
 				}
 				
@@ -1810,7 +1819,12 @@ void View::_makeLayout(sl_bool flagApplyLayout)
 										child->onPrepareLayout(param);
 									}
 								}
-								child->_makeLayout(sl_true);
+								if (child->isInstance() && RenderView::checkInstance(child.ptr)) {
+									child->_setFrame(child->getLayoutFrame(), UIUpdateMode::NoRedraw, sl_true);
+									child->_requestMakeLayout();
+								} else {
+									child->_makeLayout(sl_true);
+								}
 							}
 						}
 					}
@@ -2186,33 +2200,37 @@ void View::measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 
 void View::_requestMakeLayout()
 {
+	sl_bool flagRenderView = sl_false;
 	Ref<View> view = this;
 	while (view.isNotNull()) {
-		if (view->isVisible()) {
-			if (view->isInstance()) {
+		if (view->isInstance()) {
+			if (RenderView::checkInstance(view.ptr)) {
+				flagRenderView = sl_true;
 				break;
 			}
-		} else {
-			return;
 		}
 		view = view->getParent();
 	}
-	if (view.isNotNull()) {
+	if (flagRenderView) {
+		((RenderView*)(view.ptr))->requestRender();
+	} else {
 		UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, _makeLayout, this, sl_false));
 	}
 }
 
-void View::_requestInvalidateLayout()
+void View::_requestInvalidateLayout(UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
 	if (layoutAttrs.isNotNull()) {
 		layoutAttrs->flagInvalidLayout = sl_true;
 		layoutAttrs->flagInvalidMeasure = sl_true;
-		_requestMakeLayout();
+		if (mode != UIUpdateMode::Init) {
+			_requestMakeLayout();
+		}
 	}
 }
 
-void View::_requestInvalidateMeasure(sl_bool flagWidth, sl_bool flagHeight)
+void View::_requestInvalidateMeasure(sl_bool flagWidth, sl_bool flagHeight, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
 	if (layoutAttrs.isNotNull()) {
@@ -2222,30 +2240,30 @@ void View::_requestInvalidateMeasure(sl_bool flagWidth, sl_bool flagHeight)
 		if (flagWidth || flagHeight) {
 			Ref<View> parent = m_parent;
 			if (parent.isNotNull()) {
-				parent->_requestInvalidateMeasure(flagWidth, flagHeight);
+				parent->_requestInvalidateMeasure(flagWidth, flagHeight, mode);
 			}
 		}
-		_requestInvalidateLayout();
+		_requestInvalidateLayout(mode);
 	}
 }
 
-void View::requestLayout(sl_bool flagRedraw)
+void View::requestLayout(UIUpdateMode mode)
 {
-	_requestInvalidateMeasure(sl_true, sl_true);
-	if (flagRedraw) {
+	_requestInvalidateMeasure(sl_true, sl_true, mode);
+	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void View::requestParentLayout(sl_bool flagRedraw)
+void View::requestParentLayout(UIUpdateMode mode)
 {
 	Ref<View> parent = m_parent;
 	if (parent.isNotNull()) {
-		parent->requestLayout(flagRedraw);
+		parent->requestLayout(mode);
 	}
 }
 
-void View::requestParentAndSelfLayout(sl_bool flagRedraw)
+void View::requestParentAndSelfLayout(UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
 	if (layoutAttrs.isNotNull()) {
@@ -2253,11 +2271,11 @@ void View::requestParentAndSelfLayout(sl_bool flagRedraw)
 		layoutAttrs->flagInvalidMeasure = sl_true;
 		Ref<View> parent = m_parent;
 		if (parent.isNotNull() && parent->isLayouting()) {
-			parent->requestLayout(flagRedraw);
-			_requestInvalidateLayout();
+			parent->requestLayout(mode);
+			_requestInvalidateLayout(mode);
 		} else {
-			_requestInvalidateLayout();
-			if (flagRedraw) {
+			_requestInvalidateLayout(mode);
+			if (mode == UIUpdateMode::Redraw) {
 				invalidate();
 			}
 		}
@@ -2269,10 +2287,10 @@ sl_bool View::isLayouting()
 	return m_layoutAttributes.isNotNull();
 }
 
-void View::resetLayout(sl_bool flagRedraw)
+void View::resetLayout(UIUpdateMode mode)
 {
 	m_layoutAttributes.setNull();
-	requestParentLayout(flagRedraw);
+	requestParentLayout(mode);
 }
 
 sl_bool View::isMakingLayout()
@@ -2284,12 +2302,12 @@ sl_bool View::isMakingLayout()
 	return sl_false;
 }
 
-void View::setMakingLayout(sl_bool flagMakeLayout, sl_bool flagRedraw)
+void View::setMakingLayout(sl_bool flagMakeLayout, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->flagMakeLayout = flagMakeLayout;
-		requestLayout(flagRedraw);
+		requestLayout(mode);
 	}
 }
 
@@ -2309,7 +2327,7 @@ void View::setLayoutFrame(const UIRect& rect)
 		attrs->frame = rect;
 		attrs->flagUpdatedLayoutFrame = sl_true;
 	} else {
-		_setFrame(rect, sl_false, sl_true);
+		_setFrame(rect, UIUpdateMode::NoRedraw, sl_true);
 	}
 }
 
@@ -2339,12 +2357,12 @@ sl_bool View::isOnPrepareLayoutEnabled()
 	return sl_false;
 }
 
-void View::setOnPrepareLayoutEnabled(sl_bool flagEnabled, sl_bool flagRedraw)
+void View::setOnPrepareLayoutEnabled(sl_bool flagEnabled, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->flagOnPrepareLayout = flagEnabled;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -2357,12 +2375,12 @@ sl_bool View::isOnMakeLayoutEnabled()
 	return sl_false;
 }
 
-void View::setOnMakeLayoutEnabled(sl_bool flagEnabled, sl_bool flagRedraw)
+void View::setOnMakeLayoutEnabled(sl_bool flagEnabled, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->flagOnMakeLayout = flagEnabled;
-		requestLayout(flagRedraw);
+		requestLayout(mode);
 	}
 }
 
@@ -2393,12 +2411,12 @@ sl_bool View::isWidthFixed()
 	return sl_true;
 }
 
-void View::setWidthFixed(sl_bool flagRedraw)
+void View::setWidthFixed(UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->widthMode = SizeMode::Fixed;
-		requestParentAndSelfLayout(flagRedraw);
+		requestParentAndSelfLayout(mode);
 	}
 }
 
@@ -2411,22 +2429,22 @@ sl_bool View::isHeightFixed()
 	return sl_true;
 }
 
-void View::setHeightFixed(sl_bool flagRedraw)
+void View::setHeightFixed(UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->heightMode = SizeMode::Fixed;
-		requestParentAndSelfLayout(flagRedraw);
+		requestParentAndSelfLayout(mode);
 	}
 }
 
-void View::setSizeFixed(sl_bool flagRedraw)
+void View::setSizeFixed(UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->widthMode = SizeMode::Fixed;
 		attrs->heightMode = SizeMode::Fixed;
-		requestParentAndSelfLayout(flagRedraw);
+		requestParentAndSelfLayout(mode);
 	}
 }
 
@@ -2457,13 +2475,13 @@ sl_bool View::isWidthFilling()
 	return sl_false;
 }
 
-void View::setWidthFilling(sl_real weight, sl_bool flagRedraw)
+void View::setWidthFilling(sl_real weight, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->widthMode = SizeMode::Filling;
 		attrs->widthWeight = weight;
-		requestParentAndSelfLayout(flagRedraw);
+		requestParentAndSelfLayout(mode);
 	}
 }
 
@@ -2476,17 +2494,17 @@ sl_bool View::isHeightFilling()
 	return sl_false;
 }
 
-void View::setHeightFilling(sl_real weight, sl_bool flagRedraw)
+void View::setHeightFilling(sl_real weight, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->heightMode = SizeMode::Filling;
 		attrs->heightWeight = weight;
-		requestParentAndSelfLayout(flagRedraw);
+		requestParentAndSelfLayout(mode);
 	}
 }
 
-void View::setSizeFilling(sl_real widthWeight, sl_real heightWeight, sl_bool flagRedraw)
+void View::setSizeFilling(sl_real widthWeight, sl_real heightWeight, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
@@ -2494,7 +2512,7 @@ void View::setSizeFilling(sl_real widthWeight, sl_real heightWeight, sl_bool fla
 		attrs->widthWeight = widthWeight;
 		attrs->heightMode = SizeMode::Filling;
 		attrs->heightWeight = heightWeight;
-		requestParentAndSelfLayout(flagRedraw);
+		requestParentAndSelfLayout(mode);
 	}
 }
 
@@ -2507,12 +2525,12 @@ sl_bool View::isWidthWrapping()
 	return sl_false;
 }
 
-void View::setWidthWrapping(sl_bool flagRedraw)
+void View::setWidthWrapping(UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->widthMode = SizeMode::Wrapping;
-		requestParentAndSelfLayout(flagRedraw);
+		requestParentAndSelfLayout(mode);
 	}
 }
 
@@ -2525,22 +2543,22 @@ sl_bool View::isHeightWrapping()
 	return sl_false;
 }
 
-void View::setHeightWrapping(sl_bool flagRedraw)
+void View::setHeightWrapping(UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->heightMode = SizeMode::Wrapping;
-		requestParentAndSelfLayout(flagRedraw);
+		requestParentAndSelfLayout(mode);
 	}
 }
 
-void View::setSizeWrapping(sl_bool flagRedraw)
+void View::setSizeWrapping(UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->widthMode = SizeMode::Wrapping;
 		attrs->heightMode = SizeMode::Wrapping;
-		requestParentAndSelfLayout(flagRedraw);
+		requestParentAndSelfLayout(mode);
 	}
 }
 
@@ -2553,13 +2571,13 @@ sl_bool View::isWidthWeight()
 	return sl_false;
 }
 
-void View::setWidthWeight(sl_real weight, sl_bool flagRedraw)
+void View::setWidthWeight(sl_real weight, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->widthMode = SizeMode::Weight;
 		attrs->widthWeight = weight;
-		requestParentAndSelfLayout(flagRedraw);
+		requestParentAndSelfLayout(mode);
 	}
 }
 
@@ -2572,17 +2590,17 @@ sl_real View::getHeightWeight()
 	return 1;
 }
 
-void View::setHeightWeight(sl_real weight, sl_bool flagRedraw)
+void View::setHeightWeight(sl_real weight, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->heightMode = SizeMode::Weight;
 		attrs->heightWeight = weight;
-		requestParentAndSelfLayout(flagRedraw);
+		requestParentAndSelfLayout(mode);
 	}
 }
 
-void View::setSizeWeight(sl_real widthWeight, sl_real heightWeight, sl_bool flagRedraw)
+void View::setSizeWeight(sl_real widthWeight, sl_real heightWeight, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
@@ -2590,7 +2608,7 @@ void View::setSizeWeight(sl_real widthWeight, sl_real heightWeight, sl_bool flag
 		attrs->widthWeight = widthWeight;
 		attrs->heightMode = SizeMode::Weight;
 		attrs->heightWeight = heightWeight;
-		requestParentAndSelfLayout(flagRedraw);
+		requestParentAndSelfLayout(mode);
 	}
 }
 
@@ -2603,12 +2621,12 @@ sl_bool View::isLayoutLeftFixed()
 	return sl_true;
 }
 
-void View::setLayoutLeftFixed(sl_bool flagRedraw)
+void View::setLayoutLeftFixed(UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->leftMode = PositionMode::Fixed;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -2621,12 +2639,12 @@ sl_bool View::isAlignParentLeft()
 	return sl_false;
 }
 
-void View::setAlignParentLeft(sl_bool flagRedraw)
+void View::setAlignParentLeft(UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->leftMode = PositionMode::ParentEdge;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -2639,7 +2657,7 @@ sl_bool View::isAlignLeft()
 	return sl_false;
 }
 
-void View::setAlignLeft(const Ref<View>& view, sl_bool flagRedraw)
+void View::setAlignLeft(const Ref<View>& view, UIUpdateMode mode)
 {
 	if (view.isNull()) {
 		return;
@@ -2648,7 +2666,7 @@ void View::setAlignLeft(const Ref<View>& view, sl_bool flagRedraw)
 	if (attrs.isNotNull()) {
 		attrs->leftMode = PositionMode::OtherStart;
 		attrs->leftReferingView = view;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -2661,7 +2679,7 @@ sl_bool View::isRightOf()
 	return sl_false;
 }
 
-void View::setRightOf(const Ref<View>& view, sl_bool flagRedraw)
+void View::setRightOf(const Ref<View>& view, UIUpdateMode mode)
 {
 	if (view.isNull()) {
 		return;
@@ -2670,7 +2688,7 @@ void View::setRightOf(const Ref<View>& view, sl_bool flagRedraw)
 	if (attrs.isNotNull()) {
 		attrs->leftMode = PositionMode::OtherEnd;
 		attrs->leftReferingView = view;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -2692,12 +2710,12 @@ sl_bool View::isLayoutRightFixed()
 	return sl_true;
 }
 
-void View::setLayoutRightFixed(sl_bool flagRedraw)
+void View::setLayoutRightFixed(UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->rightMode = PositionMode::Fixed;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -2710,12 +2728,12 @@ sl_bool View::isAlignParentRight()
 	return sl_false;
 }
 
-void View::setAlignParentRight(sl_bool flagRedraw)
+void View::setAlignParentRight(UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->rightMode = PositionMode::ParentEdge;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -2728,7 +2746,7 @@ sl_bool View::isAlignRight()
 	return sl_false;
 }
 
-void View::setAlignRight(const Ref<View>& view, sl_bool flagRedraw)
+void View::setAlignRight(const Ref<View>& view, UIUpdateMode mode)
 {
 	if (view.isNull()) {
 		return;
@@ -2737,7 +2755,7 @@ void View::setAlignRight(const Ref<View>& view, sl_bool flagRedraw)
 	if (attrs.isNotNull()) {
 		attrs->rightMode = PositionMode::OtherEnd;
 		attrs->rightReferingView = view;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -2750,7 +2768,7 @@ sl_bool View::isLeftOf()
 	return sl_false;
 }
 
-void View::setLeftOf(const Ref<View>& view, sl_bool flagRedraw)
+void View::setLeftOf(const Ref<View>& view, UIUpdateMode mode)
 {
 	if (view.isNull()) {
 		return;
@@ -2759,7 +2777,7 @@ void View::setLeftOf(const Ref<View>& view, sl_bool flagRedraw)
 	if (attrs.isNotNull()) {
 		attrs->rightMode = PositionMode::OtherStart;
 		attrs->rightReferingView = view;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -2781,12 +2799,12 @@ sl_bool View::isLayoutTopFixed()
 	return sl_true;
 }
 
-void View::setLayoutTopFixed(sl_bool flagRedraw)
+void View::setLayoutTopFixed(UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->topMode = PositionMode::Fixed;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 
 }
@@ -2800,12 +2818,12 @@ sl_bool View::isAlignParentTop()
 	return sl_false;
 }
 
-void View::setAlignParentTop(sl_bool flagRedraw)
+void View::setAlignParentTop(UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->topMode = PositionMode::ParentEdge;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -2818,7 +2836,7 @@ sl_bool View::isAlignTop()
 	return sl_false;
 }
 
-void View::setAlignTop(const Ref<View>& view, sl_bool flagRedraw)
+void View::setAlignTop(const Ref<View>& view, UIUpdateMode mode)
 {
 	if (view.isNull()) {
 		return;
@@ -2827,7 +2845,7 @@ void View::setAlignTop(const Ref<View>& view, sl_bool flagRedraw)
 	if (attrs.isNotNull()) {
 		attrs->topMode = PositionMode::OtherStart;
 		attrs->topReferingView = view;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -2840,7 +2858,7 @@ sl_bool View::isBelow()
 	return sl_false;
 }
 
-void View::setBelow(const Ref<View>& view, sl_bool flagRedraw)
+void View::setBelow(const Ref<View>& view, UIUpdateMode mode)
 {
 	if (view.isNull()) {
 		return;
@@ -2849,7 +2867,7 @@ void View::setBelow(const Ref<View>& view, sl_bool flagRedraw)
 	if (attrs.isNotNull()) {
 		attrs->topMode = PositionMode::OtherEnd;
 		attrs->topReferingView = view;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -2871,12 +2889,12 @@ sl_bool View::isLayoutBottomFixed()
 	return sl_true;
 }
 
-void View::setLayoutBottomFixed(sl_bool flagRedraw)
+void View::setLayoutBottomFixed(UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->bottomMode = PositionMode::Fixed;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -2889,12 +2907,12 @@ sl_bool View::isAlignParentBottom()
 	return sl_false;
 }
 
-void View::setAlignParentBottom(sl_bool flagRedraw)
+void View::setAlignParentBottom(UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->bottomMode = PositionMode::ParentEdge;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -2907,7 +2925,7 @@ sl_bool View::isAlignBottom()
 	return sl_false;
 }
 
-void View::setAlignBottom(const Ref<View>& view, sl_bool flagRedraw)
+void View::setAlignBottom(const Ref<View>& view, UIUpdateMode mode)
 {
 	if (view.isNotNull()) {
 		return;
@@ -2916,7 +2934,7 @@ void View::setAlignBottom(const Ref<View>& view, sl_bool flagRedraw)
 	if (attrs.isNotNull()) {
 		attrs->bottomMode = PositionMode::OtherEnd;
 		attrs->bottomReferingView = view;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -2929,7 +2947,7 @@ sl_bool View::isAbove()
 	return sl_false;
 }
 
-void View::setAbove(const Ref<View>& view, sl_bool flagRedraw)
+void View::setAbove(const Ref<View>& view, UIUpdateMode mode)
 {
 	if (view.isNotNull()) {
 		return;
@@ -2938,7 +2956,7 @@ void View::setAbove(const Ref<View>& view, sl_bool flagRedraw)
 	if (attrs.isNotNull()) {
 		attrs->bottomMode = PositionMode::OtherStart;
 		attrs->bottomReferingView = view;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -2960,12 +2978,12 @@ sl_bool View::isCenterHorizontal()
 	return sl_false;
 }
 
-void View::setCenterHorizontal(sl_bool flagRedraw)
+void View::setCenterHorizontal(UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->leftMode = PositionMode::CenterInParent;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -2978,22 +2996,22 @@ sl_bool View::isCenterVertical()
 	return sl_false;
 }
 
-void View::setCenterVertical(sl_bool flagRedraw)
+void View::setCenterVertical(UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->topMode = PositionMode::CenterInParent;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
-void View::setCenterInParent(sl_bool flagRedraw)
+void View::setCenterInParent(UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->leftMode = PositionMode::CenterInParent;
 		attrs->topMode = PositionMode::CenterInParent;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -3006,7 +3024,7 @@ sl_bool View::isAlignCenterHorizontal()
 	return sl_false;
 }
 
-void View::setAlignCenterHorizontal(const Ref<View>& view, sl_bool flagRedraw)
+void View::setAlignCenterHorizontal(const Ref<View>& view, UIUpdateMode mode)
 {
 	if (view.isNotNull()) {
 		return;
@@ -3015,7 +3033,7 @@ void View::setAlignCenterHorizontal(const Ref<View>& view, sl_bool flagRedraw)
 	if (attrs.isNotNull()) {
 		attrs->leftMode = PositionMode::CenterInOther;
 		attrs->leftReferingView = view;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -3028,7 +3046,7 @@ sl_bool View::isAlignCenterVertical()
 	return sl_false;
 }
 
-void View::setAlignCenterVertical(const Ref<View>& view, sl_bool flagRedraw)
+void View::setAlignCenterVertical(const Ref<View>& view, UIUpdateMode mode)
 {
 	if (view.isNotNull()) {
 		return;
@@ -3037,7 +3055,7 @@ void View::setAlignCenterVertical(const Ref<View>& view, sl_bool flagRedraw)
 	if (attrs.isNotNull()) {
 		attrs->topMode = PositionMode::CenterInOther;
 		attrs->topReferingView = view;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -3050,7 +3068,7 @@ sl_ui_pos View::getMarginLeft()
 	return 0;
 }
 
-void View::setMarginLeft(sl_ui_pos marginLeft, sl_bool flagRedraw)
+void View::setMarginLeft(sl_ui_pos marginLeft, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
@@ -3058,7 +3076,7 @@ void View::setMarginLeft(sl_ui_pos marginLeft, sl_bool flagRedraw)
 		if (attrs->leftMode == PositionMode::Fixed && attrs->rightMode == PositionMode::Fixed) {
 			attrs->leftMode = PositionMode::ParentEdge;
 		}
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -3071,7 +3089,7 @@ sl_ui_pos View::getMarginTop()
 	return 0;
 }
 
-void View::setMarginTop(sl_ui_pos marginTop, sl_bool flagRedraw)
+void View::setMarginTop(sl_ui_pos marginTop, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
@@ -3079,7 +3097,7 @@ void View::setMarginTop(sl_ui_pos marginTop, sl_bool flagRedraw)
 		if (attrs->topMode == PositionMode::Fixed && attrs->bottomMode == PositionMode::Fixed) {
 			attrs->topMode = PositionMode::ParentEdge;
 		}
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -3092,12 +3110,12 @@ sl_ui_pos View::getMarginRight()
 	return 0;
 }
 
-void View::setMarginRight(sl_ui_pos marginRight, sl_bool flagRedraw)
+void View::setMarginRight(sl_ui_pos marginRight, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->marginRight = marginRight;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -3110,16 +3128,16 @@ sl_ui_pos View::getMarginBottom()
 	return 0;
 }
 
-void View::setMarginBottom(sl_ui_pos marginBottom, sl_bool flagRedraw)
+void View::setMarginBottom(sl_ui_pos marginBottom, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->marginBottom = marginBottom;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
-void View::setMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw)
+void View::setMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
@@ -3127,11 +3145,11 @@ void View::setMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos b
 		attrs->marginTop = top;
 		attrs->marginRight = right;
 		attrs->marginBottom = bottom;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
-void View::setMargin(sl_ui_pos margin, sl_bool flagRedraw)
+void View::setMargin(sl_ui_pos margin, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
@@ -3139,7 +3157,7 @@ void View::setMargin(sl_ui_pos margin, sl_bool flagRedraw)
 		attrs->marginTop = margin;
 		attrs->marginRight = margin;
 		attrs->marginBottom = margin;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -3161,7 +3179,7 @@ sl_real View::getRelativeMarginLeftWeight()
 	return 0;
 }
 
-void View::setRelativeMarginLeft(sl_real weight, sl_bool flagRedraw)
+void View::setRelativeMarginLeft(sl_real weight, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
@@ -3170,7 +3188,7 @@ void View::setRelativeMarginLeft(sl_real weight, sl_bool flagRedraw)
 		if (attrs->leftMode == PositionMode::Fixed && attrs->rightMode == PositionMode::Fixed) {
 			attrs->leftMode = PositionMode::ParentEdge;
 		}
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -3186,7 +3204,7 @@ sl_ui_pos View::getAbsoluteMarginLeft()
 	return 0;
 }
 
-void View::setAbsoluteMarginLeft(sl_ui_pos margin, sl_bool flagRedraw)
+void View::setAbsoluteMarginLeft(sl_ui_pos margin, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
@@ -3195,7 +3213,7 @@ void View::setAbsoluteMarginLeft(sl_ui_pos margin, sl_bool flagRedraw)
 		if (attrs->leftMode == PositionMode::Fixed && attrs->rightMode == PositionMode::Fixed) {
 			attrs->leftMode = PositionMode::ParentEdge;
 		}
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -3217,7 +3235,7 @@ sl_real View::getRelativeMarginTopWeight()
 	return 0;
 }
 
-void View::setRelativeMarginTop(sl_real weight, sl_bool flagRedraw)
+void View::setRelativeMarginTop(sl_real weight, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
@@ -3226,7 +3244,7 @@ void View::setRelativeMarginTop(sl_real weight, sl_bool flagRedraw)
 		if (attrs->topMode == PositionMode::Fixed && attrs->bottomMode == PositionMode::Fixed) {
 			attrs->topMode = PositionMode::ParentEdge;
 		}
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -3242,7 +3260,7 @@ sl_ui_pos View::getAbsoluteMarginTop()
 	return 0;
 }
 
-void View::setAbsoluteMarginTop(sl_ui_pos margin, sl_bool flagRedraw)
+void View::setAbsoluteMarginTop(sl_ui_pos margin, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
@@ -3251,7 +3269,7 @@ void View::setAbsoluteMarginTop(sl_ui_pos margin, sl_bool flagRedraw)
 		if (attrs->topMode == PositionMode::Fixed && attrs->bottomMode == PositionMode::Fixed) {
 			attrs->topMode = PositionMode::ParentEdge;
 		}
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -3273,13 +3291,13 @@ sl_real View::getRelativeMarginRightWeight()
 	return 0;
 }
 
-void View::setRelativeMarginRight(sl_real weight, sl_bool flagRedraw)
+void View::setRelativeMarginRight(sl_real weight, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->flagRelativeMarginRight = sl_true;
 		attrs->relativeMarginRightWeight = weight;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -3295,13 +3313,13 @@ sl_ui_pos View::getAbsoluteMarginRight()
 	return 0;
 }
 
-void View::setAbsoluteMarginRight(sl_ui_pos margin, sl_bool flagRedraw)
+void View::setAbsoluteMarginRight(sl_ui_pos margin, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->flagRelativeMarginRight = sl_false;
 		attrs->marginRight = margin;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -3323,13 +3341,13 @@ sl_real View::getRelativeMarginBottomWeight()
 	return 0;
 }
 
-void View::setRelativeMarginBottom(sl_real weight, sl_bool flagRedraw)
+void View::setRelativeMarginBottom(sl_real weight, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->flagRelativeMarginBottom = sl_true;
 		attrs->relativeMarginBottomWeight = weight;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -3345,13 +3363,13 @@ sl_ui_pos View::getAbsoluteMarginBottom()
 	return 0;
 }
 
-void View::setAbsoluteMarginBottom(sl_ui_pos margin, sl_bool flagRedraw)
+void View::setAbsoluteMarginBottom(sl_ui_pos margin, UIUpdateMode mode)
 {
 	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
 	if (attrs.isNotNull()) {
 		attrs->flagRelativeMarginBottom = sl_false;
 		attrs->marginBottom = margin;
-		requestParentLayout(flagRedraw);
+		requestParentLayout(mode);
 	}
 }
 
@@ -3379,10 +3397,10 @@ sl_ui_pos View::getPaddingLeft()
 	return m_paddingLeft;
 }
 
-void View::setPaddingLeft(sl_ui_pos paddingLeft, sl_bool flagRedraw)
+void View::setPaddingLeft(sl_ui_pos paddingLeft, UIUpdateMode mode)
 {
 	m_paddingLeft = paddingLeft;
-	requestLayout(flagRedraw);
+	requestLayout(mode);
 	onChangePadding();
 }
 
@@ -3391,10 +3409,10 @@ sl_ui_pos View::getPaddingTop()
 	return m_paddingTop;
 }
 
-void View::setPaddingTop(sl_ui_pos paddingTop, sl_bool flagRedraw)
+void View::setPaddingTop(sl_ui_pos paddingTop, UIUpdateMode mode)
 {
 	m_paddingTop = paddingTop;
-	requestLayout(flagRedraw);
+	requestLayout(mode);
 	onChangePadding();
 }
 
@@ -3403,10 +3421,10 @@ sl_ui_pos View::getPaddingRight()
 	return m_paddingRight;
 }
 
-void View::setPaddingRight(sl_ui_pos paddingRight, sl_bool flagRedraw)
+void View::setPaddingRight(sl_ui_pos paddingRight, UIUpdateMode mode)
 {
 	m_paddingRight = paddingRight;
-	requestLayout(flagRedraw);
+	requestLayout(mode);
 	onChangePadding();
 }
 
@@ -3415,30 +3433,30 @@ sl_ui_pos View::getPaddingBottom()
 	return m_paddingBottom;
 }
 
-void View::setPaddingBottom(sl_ui_pos paddingBottom, sl_bool flagRedraw)
+void View::setPaddingBottom(sl_ui_pos paddingBottom, UIUpdateMode mode)
 {
 	m_paddingBottom = paddingBottom;
-	requestLayout(flagRedraw);
+	requestLayout(mode);
 	onChangePadding();
 }
 
-void View::setPadding(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, sl_bool flagRedraw)
+void View::setPadding(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode)
 {
 	m_paddingLeft = left;
 	m_paddingTop = top;
 	m_paddingRight = right;
 	m_paddingBottom = bottom;
-	requestLayout(flagRedraw);
+	requestLayout(mode);
 	onChangePadding();
 }
 
-void View::setPadding(sl_ui_pos padding, sl_bool flagRedraw)
+void View::setPadding(sl_ui_pos padding, UIUpdateMode mode)
 {
 	m_paddingLeft = padding;
 	m_paddingTop = padding;
 	m_paddingRight = padding;
 	m_paddingBottom = padding;
-	requestLayout(flagRedraw);
+	requestLayout(mode);
 	onChangePadding();
 }
 
@@ -3586,41 +3604,41 @@ const Matrix3& View::getTransform()
 	return Matrix3::identity();
 }
 
-void View::setTransform(const Matrix3& matrix, sl_bool flagRedraw)
+void View::setTransform(const Matrix3& matrix, UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
 	if (attrs.isNotNull()) {
 		attrs->flagTransformStatic = sl_true;
 		attrs->transformStatic = matrix;
-		_applyFinalTransform(flagRedraw);
+		_applyFinalTransform(mode);
 	}
 }
 
-void View::resetTransform(sl_bool flagRedraw)
+void View::resetTransform(UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = m_transformAttributes;
 	if (attrs.isNotNull() && attrs->flagTransformStatic) {
 		attrs->flagTransformStatic = sl_false;
-		_applyFinalTransform(flagRedraw);
+		_applyFinalTransform(mode);
 	}
 }
 
-void View::setTransformFromAnimation(const Matrix3& matrix, sl_bool flagRedraw)
+void View::setTransformFromAnimation(const Matrix3& matrix, UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
 	if (attrs.isNotNull()) {
 		attrs->flagTransformAnimation = sl_true;
 		attrs->transformAnimation = matrix;
-		_applyFinalTransform(flagRedraw);
+		_applyFinalTransform(mode);
 	}
 }
 
-void View::resetTransformFromAnimation(sl_bool flagRedraw)
+void View::resetTransformFromAnimation(UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = m_transformAttributes;
 	if (attrs.isNotNull() && attrs->flagTransformAnimation) {
 		attrs->flagTransformAnimation = sl_false;
-		_applyFinalTransform(flagRedraw);
+		_applyFinalTransform(mode);
 	}
 }
 
@@ -3675,55 +3693,55 @@ const Vector2& View::getTranslation()
 	return Vector2::zero();
 }
 
-void View::setTranslationX(sl_real tx, sl_bool flagRedraw)
+void View::setTranslationX(sl_real tx, UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
 	if (attrs.isNotNull()) {
 		attrs->translationStatic.x = tx;
-		_applyCalcTransform(flagRedraw);
+		_applyCalcTransform(mode);
 	}
 }
 
-void View::setTranslationY(sl_real ty, sl_bool flagRedraw)
+void View::setTranslationY(sl_real ty, UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
 	if (attrs.isNotNull()) {
 		attrs->translationStatic.y = ty;
-		_applyCalcTransform(flagRedraw);
+		_applyCalcTransform(mode);
 	}
 }
 
-void View::setTranslation(sl_real tx, sl_real ty, sl_bool flagRedraw)
+void View::setTranslation(sl_real tx, sl_real ty, UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
 	if (attrs.isNotNull()) {
 		attrs->translationStatic.x = tx;
 		attrs->translationStatic.y = ty;
-		_applyCalcTransform(flagRedraw);
+		_applyCalcTransform(mode);
 	}
 }
 
-void View::setTranslation(const Vector2& t, sl_bool flagRedraw)
+void View::setTranslation(const Vector2& t, UIUpdateMode mode)
 {
-	setTranslation(t.x, t.y, flagRedraw);
+	setTranslation(t.x, t.y, mode);
 }
 
-void View::setTranslationFromAnimation(const Vector2& t, sl_bool flagRedraw)
+void View::setTranslationFromAnimation(const Vector2& t, UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
 	if (attrs.isNotNull()) {
 		attrs->translationAnimation = t;
-		_applyCalcTransform(flagRedraw);
+		_applyCalcTransform(mode);
 	}
 }
 
-void View::resetTranslationFromAnimation(sl_bool flagRedraw)
+void View::resetTranslationFromAnimation(UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = m_transformAttributes;
 	if (attrs.isNotNull()) {
 		attrs->translationAnimation.x = 0;
 		attrs->translationAnimation.y = 0;
-		_applyCalcTransform(flagRedraw);
+		_applyCalcTransform(mode);
 	}
 }
 
@@ -3755,60 +3773,60 @@ const Vector2& View::getScale()
 	return Vector2::fromArray(t);
 }
 
-void View::setScaleX(sl_real sx, sl_bool flagRedraw)
+void View::setScaleX(sl_real sx, UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
 	if (attrs.isNotNull()) {
 		attrs->scaleStatic.x = sx;
-		_applyCalcTransform(flagRedraw);
+		_applyCalcTransform(mode);
 	}
 }
 
-void View::setScaleY(sl_real sy, sl_bool flagRedraw)
+void View::setScaleY(sl_real sy, UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
 	if (attrs.isNotNull()) {
 		attrs->scaleStatic.y = sy;
-		_applyCalcTransform(flagRedraw);
+		_applyCalcTransform(mode);
 	}
 }
 
-void View::setScale(sl_real sx, sl_real sy, sl_bool flagRedraw)
+void View::setScale(sl_real sx, sl_real sy, UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
 	if (attrs.isNotNull()) {
 		attrs->scaleStatic.x = sx;
 		attrs->scaleStatic.y = sy;
-		_applyCalcTransform(flagRedraw);
+		_applyCalcTransform(mode);
 	}
 }
 
-void View::setScale(sl_real factor, sl_bool flagRedraw)
+void View::setScale(sl_real factor, UIUpdateMode mode)
 {
-	setScale(factor, factor, flagRedraw);
+	setScale(factor, factor, mode);
 }
 
-void View::setScale(const Vector2& factor, sl_bool flagRedraw)
+void View::setScale(const Vector2& factor, UIUpdateMode mode)
 {
-	setScale(factor.x, factor.y, flagRedraw);
+	setScale(factor.x, factor.y, mode);
 }
 
-void View::setScaleFromAnimation(const Vector2& factor, sl_bool flagRedraw)
+void View::setScaleFromAnimation(const Vector2& factor, UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
 	if (attrs.isNotNull()) {
 		attrs->scaleAnimation = factor;
-		_applyCalcTransform(flagRedraw);
+		_applyCalcTransform(mode);
 	}
 }
 
-void View::resetScaleFromAnimation(sl_bool flagRedraw)
+void View::resetScaleFromAnimation(UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = m_transformAttributes;
 	if (attrs.isNotNull()) {
 		attrs->scaleAnimation.x = 1;
 		attrs->scaleAnimation.y = 1;
-		_applyCalcTransform(flagRedraw);
+		_applyCalcTransform(mode);
 	}
 }
 
@@ -3821,30 +3839,30 @@ sl_real View::getRotation()
 	return 0;
 }
 
-void View::setRotation(sl_real radian, sl_bool flagRedraw)
+void View::setRotation(sl_real radian, UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
 	if (attrs.isNotNull()) {
 		attrs->rotationAngleStatic = radian;
-		_applyCalcTransform(flagRedraw);
+		_applyCalcTransform(mode);
 	}
 }
 
-void View::setRotationFromAnimation(sl_real radian, sl_bool flagRedraw)
+void View::setRotationFromAnimation(sl_real radian, UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
 	if (attrs.isNotNull()) {
 		attrs->rotationAngleAnimation = radian;
-		_applyCalcTransform(flagRedraw);
+		_applyCalcTransform(mode);
 	}
 }
 
-void View::resetRotationFromAnimation(sl_bool flagRedraw)
+void View::resetRotationFromAnimation(UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = m_transformAttributes;
 	if (attrs.isNotNull()) {
 		attrs->rotationAngleAnimation = 0;
-		_applyCalcTransform(flagRedraw);
+		_applyCalcTransform(mode);
 	}
 }
 
@@ -3875,59 +3893,61 @@ const Vector2& View::getAnchorOffset()
 	return Vector2::zero();
 }
 
-void View::setAnchorOffsetX(sl_real x, sl_bool flagRedraw)
+void View::setAnchorOffsetX(sl_real x, UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
 	if (attrs.isNotNull()) {
 		attrs->anchorOffset.x = x;
-		_applyCalcTransform(flagRedraw);
+		_applyCalcTransform(mode);
 	}
 }
 
-void View::setAnchorOffsetY(sl_real y, sl_bool flagRedraw)
+void View::setAnchorOffsetY(sl_real y, UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
 	if (attrs.isNotNull()) {
 		attrs->anchorOffset.y = y;
-		_applyCalcTransform(flagRedraw);
+		_applyCalcTransform(mode);
 	}
 }
 
-void View::setAnchorOffset(sl_real x, sl_real y, sl_bool flagRedraw)
+void View::setAnchorOffset(sl_real x, sl_real y, UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = _initializeTransformAttributes();
 	if (attrs.isNotNull()) {
 		attrs->anchorOffset.x = x;
 		attrs->anchorOffset.y = y;
-		_applyCalcTransform(flagRedraw);
+		_applyCalcTransform(mode);
 	}
 }
 
-void View::setAnchorOffset(const Vector2& pt, sl_bool flagRedraw)
+void View::setAnchorOffset(const Vector2& pt, UIUpdateMode mode)
 {
-	setAnchorOffset(pt.x, pt.y, flagRedraw);
+	setAnchorOffset(pt.x, pt.y, mode);
 }
 
-void View::_applyCalcTransform(sl_bool flagRedraw)
+void View::_applyCalcTransform(UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = m_transformAttributes;
 	if (attrs.isNotNull()) {
 		attrs->flagTransformCalcInvalid = sl_true;
 		if (!(attrs->flagTransformStatic)) {
-			_applyFinalTransform(flagRedraw);
+			_applyFinalTransform(mode);
 		}
 	}
 }
 
-void View::_applyFinalTransform(sl_bool flagRedraw)
+void View::_applyFinalTransform(UIUpdateMode mode)
 {
 	Ref<TransformAttributes> attrs = m_transformAttributes;
 	if (attrs.isNotNull()) {
 		attrs->flagTransformFinalInvalid = sl_true;
-		if (isInstance()) {
-			_invalidateInstanceTransform();
+		if (mode != UIUpdateMode::Init) {
+			if (isInstance()) {
+				_invalidateInstanceTransform();
+			}
+			updateAndInvalidateBoundsInParent(mode);
 		}
-		updateAndInvalidateBoundsInParent(flagRedraw);
 	}
 }
 
@@ -4132,12 +4152,12 @@ Ref<Drawable> View::getBackground()
 	return Ref<Drawable>::null();
 }
 
-void View::setBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void View::setBackground(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->background = drawable;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -4152,12 +4172,12 @@ Ref<Drawable> View::getPressedBackground()
 	return Ref<Drawable>::null();
 }
 
-void View::setPressedBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void View::setPressedBackground(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->backgroundPressed = drawable;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -4172,12 +4192,12 @@ Ref<Drawable> View::getHoverBackground()
 	return Ref<Drawable>::null();
 }
 
-void View::setHoverBackground(const Ref<Drawable>& drawable, sl_bool flagRedraw)
+void View::setHoverBackground(const Ref<Drawable>& drawable, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->backgroundHover = drawable;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -4192,12 +4212,12 @@ ScaleMode View::getBackgroundScaleMode()
 	return ScaleMode::Stretch;
 }
 
-void View::setBackgroundScaleMode(ScaleMode scaleMode, sl_bool flagRedraw)
+void View::setBackgroundScaleMode(ScaleMode scaleMode, UIUpdateMode updateMode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->backgroundScaleMode = scaleMode;
-		if (flagRedraw) {
+		if (updateMode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -4212,12 +4232,12 @@ Alignment View::getBackgroundAlignment()
 	return Alignment::MiddleCenter;
 }
 
-void View::setBackgroundAlignment(Alignment align, sl_bool flagRedraw)
+void View::setBackgroundAlignment(Alignment align, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> draw = _initializeDrawAttributes();
 	if (draw.isNotNull()) {
 		draw->backgroundAlignment = align;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -4232,7 +4252,7 @@ Color View::getBackgroundColor()
 	return Color::zero();
 }
 
-void View::setBackgroundColor(const Color& color, sl_bool flagRedraw)
+void View::setBackgroundColor(const Color& color, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
@@ -4240,7 +4260,7 @@ void View::setBackgroundColor(const Color& color, sl_bool flagRedraw)
 		if (isNativeWidget()) {
 			_setBackgroundColor_NW(color);
 		} else {
-			if (flagRedraw) {
+			if (mode == UIUpdateMode::Redraw) {
 				invalidate();
 			}
 		}
@@ -4256,12 +4276,12 @@ Ref<Pen> View::getBorder()
 	return Ref<Pen>::null();
 }
 
-void View::setBorder(const Ref<Pen>& pen, sl_bool flagRedraw)
+void View::setBorder(const Ref<Pen>& pen, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->penBorder = pen;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -4276,12 +4296,12 @@ Color View::getBorderColor()
 	return Color::Black;
 }
 
-void View::setBorderColor(const Color& color, sl_bool flagRedraw)
+void View::setBorderColor(const Color& color, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->borderColor = color;
-		_refreshBorderPen(flagRedraw);
+		_refreshBorderPen(mode);
 	}
 }
 
@@ -4290,22 +4310,22 @@ sl_bool View::isBorder()
 	return getBorder().isNotNull();
 }
 
-void View::setBorder(sl_bool flagBorder, sl_bool flagRedraw)
+void View::setBorder(sl_bool flagBorder, UIUpdateMode mode)
 {
 	if (flagBorder) {
 		if (isBorder()) {
 			return;
 		}
-		setBorder(Pen::getDefault(), sl_false);
+		setBorder(Pen::getDefault(), UIUpdateMode::NoRedraw);
 	} else {
 		if (isBorder()) {
-			setBorder(Ref<Pen>::null(), sl_false);
+			setBorder(Ref<Pen>::null(), UIUpdateMode::NoRedraw);
 		}
 	}
 	if (isNativeWidget()) {
 		_setBorder_NW(flagBorder);
 	} else {
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -4320,12 +4340,12 @@ PenStyle View::getBorderStyle()
 	return PenStyle::Solid;
 }
 
-void View::setBorderStyle(PenStyle style, sl_bool flagRedraw)
+void View::setBorderStyle(PenStyle style, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->borderStyle = style;
-		_refreshBorderPen(flagRedraw);
+		_refreshBorderPen(mode);
 	}
 }
 
@@ -4338,16 +4358,16 @@ sl_real View::getBorderWidth()
 	return 0;
 }
 
-void View::setBorderWidth(sl_real width, sl_bool flagRedraw)
+void View::setBorderWidth(sl_real width, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->borderWidth = width;
-		_refreshBorderPen(flagRedraw);
+		_refreshBorderPen(mode);
 	}
 }
 
-void View::_refreshBorderPen(sl_bool flagRedraw)
+void View::_refreshBorderPen(UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = m_drawAttributes;
 	if (attrs.isNotNull()) {
@@ -4356,7 +4376,7 @@ void View::_refreshBorderPen(sl_bool flagRedraw)
 		if (width > 0) {
 			pen = Pen::create(attrs->borderStyle, attrs->borderWidth, attrs->borderColor);
 		}
-		setBorder(pen, flagRedraw);
+		setBorder(pen, mode);
 	}
 }
 
@@ -4369,12 +4389,12 @@ BoundShape View::getBoundShape()
 	return BoundShape::Rectangle;
 }
 
-void View::setBoundShape(BoundShape shape, sl_bool flagRedraw)
+void View::setBoundShape(BoundShape shape, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->boundShape = shape;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -4389,47 +4409,47 @@ const Size& View::getRoundRectBoundShapeRadius()
 	return Size::zero();
 }
 
-void View::setRoundRectBoundShapeRadius(const Size& radius, sl_bool flagRedraw)
+void View::setRoundRectBoundShapeRadius(const Size& radius, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->roundRectBoundShapeRadius = radius;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
 }
 
-void View::setRoundRectBoundShapeRadius(sl_real rx, sl_real ry, sl_bool flagRedraw)
+void View::setRoundRectBoundShapeRadius(sl_real rx, sl_real ry, UIUpdateMode mode)
 {
-	setRoundRectBoundShapeRadius(Size(rx, ry), flagRedraw);
+	setRoundRectBoundShapeRadius(Size(rx, ry), mode);
 }
 
-void View::setRoundRectBoundShapeRadiusX(sl_real rx, sl_bool flagRedraw)
+void View::setRoundRectBoundShapeRadiusX(sl_real rx, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->roundRectBoundShapeRadius.x = rx;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
 }
 
-void View::setRoundRectBoundShapeRadiusY(sl_real ry, sl_bool flagRedraw)
+void View::setRoundRectBoundShapeRadiusY(sl_real ry, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->roundRectBoundShapeRadius.y = ry;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
 }
 
-void View::setRoundRectBoundShapeRadius(sl_real radius, sl_bool flagRedraw)
+void View::setRoundRectBoundShapeRadius(sl_real radius, UIUpdateMode mode)
 {
-	setRoundRectBoundShapeRadius(Size(radius, radius), flagRedraw);
+	setRoundRectBoundShapeRadius(Size(radius, radius), mode);
 }
 
 Ref<GraphicsPath> View::getBoundShapePath()
@@ -4441,12 +4461,12 @@ Ref<GraphicsPath> View::getBoundShapePath()
 	return Ref<GraphicsPath>::null();
 }
 
-void View::setBoundShapePath(const Ref<GraphicsPath>& path, sl_bool flagRedraw)
+void View::setBoundShapePath(const Ref<GraphicsPath>& path, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->boundShapePath = path;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -4461,12 +4481,12 @@ sl_bool View::isPreDrawEnabled()
 	return sl_false;
 }
 
-void View::setPreDrawEnabled(sl_bool flagEnabled, sl_bool flagRedraw)
+void View::setPreDrawEnabled(sl_bool flagEnabled, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->flagPreDrawEnabled = flagEnabled;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -4481,12 +4501,12 @@ sl_bool View::isPostDrawEnabled()
 	return sl_false;
 }
 
-void View::setPostDrawEnabled(sl_bool flagEnabled, sl_bool flagRedraw)
+void View::setPostDrawEnabled(sl_bool flagEnabled, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->flagPostDrawEnabled = flagEnabled;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -4501,12 +4521,12 @@ sl_bool View::isAlwaysOnDrawBackground()
 	return sl_false;
 }
 
-void View::setAlwaysOnDrawBackground(sl_bool flagEnabled, sl_bool flagRedraw)
+void View::setAlwaysOnDrawBackground(sl_bool flagEnabled, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->flagOnDrawBackgroundAlways = flagEnabled;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -4521,12 +4541,12 @@ sl_bool View::isAlwaysOnDrawBorder()
 	return sl_false;
 }
 
-void View::setAlwaysOnDrawBorder(sl_bool flagEnabled, sl_bool flagRedraw)
+void View::setAlwaysOnDrawBorder(sl_bool flagEnabled, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->flagOnDrawBorderAlways = flagEnabled;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -4548,15 +4568,15 @@ Ref<Font> View::getFont()
 	return UI::getDefaultFont();
 }
 
-void View::_setFontInvalidateChildren()
+void View::_setFontInvalidateChildInstances()
 {
 	ListLocker< Ref<View> > children(m_children);
 	for (sl_size i = 0; i < children.count; i++) {
 		Ref<View>& child = children[i];
 		if (child.isNotNull()) {
-			child->_setFontInvalidateChildren();
+			child->_setFontInvalidateChildInstances();
 			if (child->isUsingFont()) {
-				child->requestLayout(sl_false);
+				child->requestLayout(UIUpdateMode::NoRedraw);
 				if (child->isInstance()) {
 					if (child->isNativeWidget()) {
 						Ref<Font> font = child->getFont();
@@ -4572,11 +4592,13 @@ void View::_setFontInvalidateChildren()
 	}
 }
 
-void View::setFont(const Ref<Font>& font, sl_bool flagRedraw)
+void View::setFont(const Ref<Font>& font, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
-		_setFontInvalidateChildren();
+		if (mode != UIUpdateMode::Init) {
+			_setFontInvalidateChildInstances();
+		}
 		if (isNativeWidget()) {
 			Ref<Font> _font = font;
 			if (_font.isNull()) {
@@ -4593,8 +4615,8 @@ void View::setFont(const Ref<Font>& font, sl_bool flagRedraw)
 		} else {
 			attrs->font = font;
 			if (isUsingFont()) {
-				requestLayout(sl_false);
-				if (flagRedraw) {
+				requestLayout(mode);
+				if (mode == UIUpdateMode::Redraw) {
 					invalidate();
 				}
 			}
@@ -4603,18 +4625,18 @@ void View::setFont(const Ref<Font>& font, sl_bool flagRedraw)
 	}
 }
 
-void View::setFont(const String& fontFamily, sl_real size, sl_bool flagBold, sl_bool flagItalic, sl_bool flagUnderline, sl_bool flagRedraw)
+void View::setFont(const String& fontFamily, sl_real size, sl_bool flagBold, sl_bool flagItalic, sl_bool flagUnderline, UIUpdateMode mode)
 {
-	setFont(Font::create(fontFamily, size, flagBold, flagItalic, flagUnderline), flagRedraw);
+	setFont(Font::create(fontFamily, size, flagBold, flagItalic, flagUnderline), mode);
 }
 
-void View::setFontAttributes(sl_real size, sl_bool flagBold, sl_bool flagItalic, sl_bool flagUnderline, sl_bool flagRedraw)
+void View::setFontAttributes(sl_real size, sl_bool flagBold, sl_bool flagItalic, sl_bool flagUnderline, UIUpdateMode mode)
 {
 	Ref<Font> font = getFont();
 	if (font.isNull()) {
-		setFont(Font::create(UI::getDefaultFontFamily(), size, flagBold, flagItalic, flagUnderline), flagRedraw);
+		setFont(Font::create(UI::getDefaultFontFamily(), size, flagBold, flagItalic, flagUnderline), mode);
 	} else {
-		setFont(Font::create(font->getFamilyName(), size, flagBold, flagItalic, flagUnderline), flagRedraw);
+		setFont(Font::create(font->getFamilyName(), size, flagBold, flagItalic, flagUnderline), mode);
 	}
 }
 
@@ -4644,7 +4666,7 @@ sl_bool View::isOpaque()
 	return sl_false;
 }
 
-void View::setOpaque(sl_bool flag, sl_bool flagRedraw)
+void View::setOpaque(sl_bool flag, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
@@ -4653,7 +4675,7 @@ void View::setOpaque(sl_bool flag, sl_bool flagRedraw)
 		if (instance.isNotNull()) {
 			instance->setOpaque(flag);
 		} else {
-			if (flagRedraw) {
+			if (mode == UIUpdateMode::Redraw) {
 				invalidateBoundsInParent();
 			}
 		}
@@ -4678,34 +4700,34 @@ sl_real View::getAlpha()
 	return 1;
 }
 
-void View::setAlpha(sl_real alpha, sl_bool flagRedraw)
+void View::setAlpha(sl_real alpha, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->alphaStatic = alpha;
-		_applyFinalAlpha(flagRedraw);
+		_applyFinalAlpha(mode);
 	}
 }
 
-void View::setAlphaFromAnimation(sl_real alpha, sl_bool flagRedraw)
+void View::setAlphaFromAnimation(sl_real alpha, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->alphaAnimation = alpha;
-		_applyFinalAlpha(flagRedraw);
+		_applyFinalAlpha(mode);
 	}
 }
 
-void View::resetAlphaFromAnimation(sl_bool flagRedraw)
+void View::resetAlphaFromAnimation(UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = m_drawAttributes;
 	if (attrs.isNotNull()) {
 		attrs->alphaAnimation = 1;
-		_applyFinalAlpha(flagRedraw);
+		_applyFinalAlpha(mode);
 	}
 }
 
-void View::_applyFinalAlpha(sl_bool flagRedraw)
+void View::_applyFinalAlpha(UIUpdateMode mode)
 {
 #if defined(SLIB_PLATFORM_IS_WIN32)
 	invalidateBoundsInParent();
@@ -4714,7 +4736,7 @@ void View::_applyFinalAlpha(sl_bool flagRedraw)
 	if (instance.isNotNull()) {
 		instance->setAlpha(getFinalAlpha());
 	} else {
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidateBoundsInParent();
 		}
 	}
@@ -4730,12 +4752,12 @@ sl_bool View::isLayer()
 	return sl_false;
 }
 
-void View::setLayer(sl_bool flagLayer, sl_bool flagRedraw)
+void View::setLayer(sl_bool flagLayer, UIUpdateMode mode)
 {
 	Ref<DrawAttributes> attrs = _initializeDrawAttributes();
 	if (attrs.isNotNull()) {
 		attrs->flagLayer = flagLayer;
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
@@ -4818,7 +4840,7 @@ void View::detachAnimations()
 	}
 }
 
-void View::resetAnimations(sl_bool flagRedraw)
+void View::resetAnimations(UIUpdateMode mode)
 {
 	detachAnimations();
 	Ref<TransformAttributes> attrs = m_transformAttributes;
@@ -4830,10 +4852,10 @@ void View::resetAnimations(sl_bool flagRedraw)
 		attrs->scaleAnimation.y = 1;
 		attrs->rotationAngleAnimation = 0;
 		attrs->flagTransformCalcInvalid = sl_true;
-		_applyFinalTransform(sl_false);
+		_applyFinalTransform(mode);
 	}
-	resetAlphaFromAnimation(sl_false);
-	if (flagRedraw) {
+	resetAlphaFromAnimation(mode);
+	if (mode == UIUpdateMode::Redraw) {
 		invalidateBoundsInParent();
 	}
 }
@@ -4867,10 +4889,10 @@ Ref<Animation> View::getTransformAnimation()
 	return Ref<Animation>::null();
 }
 
-void View::setTransformAnimation(const Ref<Animation>& animation, const AnimationFrames<Matrix3>& frames, sl_bool flagRedraw)
+void View::setTransformAnimation(const Ref<Animation>& animation, const AnimationFrames<Matrix3>& frames, UIUpdateMode mode)
 {
 	_resetTransformAnimation();
-	setTransformFromAnimation(frames.startValue, flagRedraw);
+	setTransformFromAnimation(frames.startValue, mode);
 	if (animation.isNotNull()) {
 		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
 		if (attrs.isNotNull()) {
@@ -4883,10 +4905,10 @@ void View::setTransformAnimation(const Ref<Animation>& animation, const Animatio
 	}
 }
 
-void View::setTransformAnimation(const Ref<Animation>& animation, const Matrix3& startValue, const Matrix3& endValue, sl_bool flagRedraw)
+void View::setTransformAnimation(const Ref<Animation>& animation, const Matrix3& startValue, const Matrix3& endValue, UIUpdateMode mode)
 {
 	AnimationFrames<Matrix3> frames(startValue, endValue);
-	setTransformAnimation(animation, frames, flagRedraw);
+	setTransformAnimation(animation, frames, mode);
 }
 
 Ref<Animation> View::startTransformAnimation(const AnimationFrames<Matrix3>& frames, sl_real duration, AnimationCurve curve)
@@ -4907,10 +4929,10 @@ Ref<Animation> View::startTransformAnimation(const Matrix3& startValue, const Ma
 	return startTransformAnimation(frames, duration, curve);
 }
 
-void View::resetTransformAnimation(sl_bool flagRedraw)
+void View::resetTransformAnimation(UIUpdateMode mode)
 {
 	_resetTransformAnimation();
-	resetTransformFromAnimation(flagRedraw);
+	resetTransformFromAnimation(mode);
 }
 
 void View::_resetTransformAnimation()
@@ -4956,10 +4978,10 @@ Ref<Animation> View::getTranslateAnimation()
 	return Ref<Animation>::null();
 }
 
-void View::setTranslateAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, sl_bool flagRedraw)
+void View::setTranslateAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, UIUpdateMode mode)
 {
 	_resetTranslateAnimation();
-	setTranslationFromAnimation(frames.startValue, flagRedraw);
+	setTranslationFromAnimation(frames.startValue, mode);
 	if (animation.isNotNull()) {
 		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
 		if (attrs.isNotNull()) {
@@ -4973,10 +4995,10 @@ void View::setTranslateAnimation(const Ref<Animation>& animation, const Animatio
 	}
 }
 
-void View::setTranslateAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue, sl_bool flagRedraw)
+void View::setTranslateAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue, UIUpdateMode mode)
 {
 	AnimationFrames<Vector2> frames(startValue, endValue);
-	setTranslateAnimation(animation, frames, flagRedraw);
+	setTranslateAnimation(animation, frames, mode);
 }
 
 Ref<Animation> View::startTranslateAnimation(const AnimationFrames<Vector2>& frames, sl_real duration, AnimationCurve curve)
@@ -4997,10 +5019,10 @@ Ref<Animation> View::startTranslateAnimation(const Vector2& startValue, const Ve
 	return startTranslateAnimation(frames, duration, curve);
 }
 
-void View::resetTranslateAnimation(sl_bool flagRedraw)
+void View::resetTranslateAnimation(UIUpdateMode mode)
 {
 	_resetTranslateAnimation();
-	resetTranslationFromAnimation(flagRedraw);
+	resetTranslationFromAnimation(mode);
 }
 
 void View::_resetTranslateAnimation()
@@ -5046,10 +5068,10 @@ Ref<Animation> View::getScaleAnimation()
 	return Ref<Animation>::null();
 }
 
-void View::setScaleAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, sl_bool flagRedraw)
+void View::setScaleAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, UIUpdateMode mode)
 {
 	_resetScaleAnimation();
-	setScaleFromAnimation(frames.startValue, flagRedraw);
+	setScaleFromAnimation(frames.startValue, mode);
 	if (animation.isNotNull()) {
 		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
 		if (attrs.isNotNull()) {
@@ -5063,16 +5085,16 @@ void View::setScaleAnimation(const Ref<Animation>& animation, const AnimationFra
 	}
 }
 
-void View::setScaleAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue, sl_bool flagRedraw)
+void View::setScaleAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue, UIUpdateMode mode)
 {
 	AnimationFrames<Vector2> frames(startValue, endValue);
-	setScaleAnimation(animation, frames, flagRedraw);
+	setScaleAnimation(animation, frames, mode);
 }
 
-void View::setScaleAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, sl_bool flagRedraw)
+void View::setScaleAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, UIUpdateMode mode)
 {
 	AnimationFrames<Vector2> frames(Vector2(startValue, startValue), Vector2(endValue, endValue));
-	setScaleAnimation(animation, frames, flagRedraw);
+	setScaleAnimation(animation, frames, mode);
 }
 
 Ref<Animation> View::startScaleAnimation(const AnimationFrames<Vector2>& frames, sl_real duration, AnimationCurve curve)
@@ -5099,10 +5121,10 @@ Ref<Animation> View::startScaleAnimation(sl_real startValue, sl_real endValue, s
 	return startScaleAnimation(frames, duration, curve);
 }
 
-void View::resetScaleAnimation(sl_bool flagRedraw)
+void View::resetScaleAnimation(UIUpdateMode mode)
 {
 	_resetScaleAnimation();
-	resetScaleFromAnimation(flagRedraw);
+	resetScaleFromAnimation(mode);
 }
 
 void View::_resetScaleAnimation()
@@ -5148,10 +5170,10 @@ Ref<Animation> View::getRotateAnimation()
 	return Ref<Animation>::null();
 }
 
-void View::setRotateAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, sl_bool flagRedraw)
+void View::setRotateAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, UIUpdateMode mode)
 {
 	_resetRotateAnimation();
-	setRotationFromAnimation(frames.startValue, flagRedraw);
+	setRotationFromAnimation(frames.startValue, mode);
 	if (animation.isNotNull()) {
 		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
 		if (attrs.isNotNull()) {
@@ -5165,10 +5187,10 @@ void View::setRotateAnimation(const Ref<Animation>& animation, const AnimationFr
 	}
 }
 
-void View::setRotateAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, sl_bool flagRedraw)
+void View::setRotateAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, UIUpdateMode mode)
 {
 	AnimationFrames<sl_real> frames(startValue, endValue);
-	setRotateAnimation(animation, frames, flagRedraw);
+	setRotateAnimation(animation, frames, mode);
 }
 
 Ref<Animation> View::startRotateAnimation(const AnimationFrames<sl_real>& frames, sl_real duration, AnimationCurve curve)
@@ -5189,10 +5211,10 @@ Ref<Animation> View::startRotateAnimation(sl_real startValue, sl_real endValue, 
 	return startRotateAnimation(frames, duration, curve);
 }
 
-void View::resetRotateAnimation(sl_bool flagRedraw)
+void View::resetRotateAnimation(UIUpdateMode mode)
 {
 	_resetRotateAnimation();
-	resetRotationFromAnimation(flagRedraw);
+	resetRotationFromAnimation(mode);
 }
 
 void View::_resetRotateAnimation()
@@ -5238,10 +5260,10 @@ Ref<Animation> View::getAlphaAnimation()
 	return Ref<Animation>::null();
 }
 
-void View::setAlphaAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, sl_bool flagRedraw)
+void View::setAlphaAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, UIUpdateMode mode)
 {
 	_resetAlphaAnimation();
-	setAlphaFromAnimation(frames.startValue, flagRedraw);
+	setAlphaFromAnimation(frames.startValue, mode);
 	if (animation.isNotNull()) {
 		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
 		if (attrs.isNotNull()) {
@@ -5255,10 +5277,10 @@ void View::setAlphaAnimation(const Ref<Animation>& animation, const AnimationFra
 	}
 }
 
-void View::setAlphaAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, sl_bool flagRedraw)
+void View::setAlphaAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, UIUpdateMode mode)
 {
 	AnimationFrames<sl_real> frames(startValue, endValue);
-	setAlphaAnimation(animation, frames, flagRedraw);
+	setAlphaAnimation(animation, frames, mode);
 }
 
 Ref<Animation> View::startAlphaAnimation(const AnimationFrames<sl_real>& frames, sl_real duration, AnimationCurve curve)
@@ -5279,10 +5301,10 @@ Ref<Animation> View::startAlphaAnimation(sl_real startValue, sl_real endValue, s
 	return startAlphaAnimation(frames, duration, curve);
 }
 
-void View::resetAlphaAnimation(sl_bool flagRedraw)
+void View::resetAlphaAnimation(UIUpdateMode mode)
 {
 	_resetAlphaAnimation();
-	resetAlphaFromAnimation(flagRedraw);
+	resetAlphaFromAnimation(mode);
 }
 
 void View::_resetAlphaAnimation()
@@ -5328,10 +5350,10 @@ Ref<Animation> View::getBackgroundColorAnimation()
 	return Ref<Animation>::null();
 }
 
-void View::setBackgroundColorAnimation(const Ref<Animation>& animation, const AnimationFrames<Color4f>& frames, sl_bool flagRedraw)
+void View::setBackgroundColorAnimation(const Ref<Animation>& animation, const AnimationFrames<Color4f>& frames, UIUpdateMode mode)
 {
 	_resetBackgroundColorAnimation();
-	setBackgroundColor(frames.startValue, flagRedraw);
+	setBackgroundColor(frames.startValue, mode);
 	if (animation.isNotNull()) {
 		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
 		if (attrs.isNotNull()) {
@@ -5345,10 +5367,10 @@ void View::setBackgroundColorAnimation(const Ref<Animation>& animation, const An
 	}
 }
 
-void View::setBackgroundColorAnimation(const Ref<Animation>& animation, const Color4f& startValue, const Color4f& endValue, sl_bool flagRedraw)
+void View::setBackgroundColorAnimation(const Ref<Animation>& animation, const Color4f& startValue, const Color4f& endValue, UIUpdateMode mode)
 {
 	AnimationFrames<Color4f> frames(startValue, endValue);
-	setBackgroundColorAnimation(animation, frames, flagRedraw);
+	setBackgroundColorAnimation(animation, frames, mode);
 }
 
 Ref<Animation> View::startBackgroundColorAnimation(const AnimationFrames<Color4f>& frames, sl_real duration, AnimationCurve curve)
@@ -5369,7 +5391,7 @@ Ref<Animation> View::startBackgroundColorAnimation(const Color4f& startValue, co
 	return startBackgroundColorAnimation(frames, duration, curve);
 }
 
-void View::resetBackgroundColorAnimation(sl_bool flagRedraw)
+void View::resetBackgroundColorAnimation(UIUpdateMode mode)
 {
 	_resetBackgroundColorAnimation();
 }
@@ -5406,66 +5428,58 @@ Ref<ScrollBar> View::getVerticalScrollBar()
 	return Ref<ScrollBar>::null();
 }
 
-void View::setHorizontalScrollBar(const Ref<ScrollBar>& bar, sl_bool flagRefresh)
+void View::setHorizontalScrollBar(const Ref<ScrollBar>& bar, UIUpdateMode mode)
 {
 	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
 	if (attrs.isNotNull()) {
-		removeChild(attrs->horz, sl_false);
+		removeChild(attrs->horz, UIUpdateMode::NoRedraw);
 		attrs->horz = bar;
-		if (flagRefresh) {
-			_refreshScroll(sl_true);
-		}
+		refreshScroll(mode);
 	}
 }
 
-void View::setVerticalScrollBar(const Ref<ScrollBar>& bar, sl_bool flagRefresh)
+void View::setVerticalScrollBar(const Ref<ScrollBar>& bar, UIUpdateMode mode)
 {
 	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
 	if (attrs.isNotNull()) {
-		removeChild(attrs->vert, sl_false);
+		removeChild(attrs->vert, UIUpdateMode::NoRedraw);
 		attrs->vert = bar;
-		if (flagRefresh) {
-			_refreshScroll(sl_true);
-		}
+		refreshScroll(mode);
 	}
 }
 
-void View::createHorizontalScrollBar(sl_bool flagRefresh)
+void View::createHorizontalScrollBar(UIUpdateMode mode)
 {
-	setHorizontalScrollBar(_createHorizontalScrollBar(), flagRefresh);
+	setHorizontalScrollBar(_createHorizontalScrollBar(), mode);
 }
 
-void View::createVerticalScrollBar(sl_bool flagRefresh)
+void View::createVerticalScrollBar(UIUpdateMode mode)
 {
-	setVerticalScrollBar(_createVerticalScrollBar(), flagRefresh);
+	setVerticalScrollBar(_createVerticalScrollBar(), mode);
 }
 
-void View::removeHorizontalScrollBar(sl_bool flagRefresh)
+void View::removeHorizontalScrollBar(UIUpdateMode mode)
 {
-	setHorizontalScrollBar(Ref<ScrollBar>::null(), flagRefresh);
+	setHorizontalScrollBar(Ref<ScrollBar>::null(), mode);
 }
 
-void View::removeVerticalScrollBar(sl_bool flagRefresh)
+void View::removeVerticalScrollBar(UIUpdateMode mode)
 {
-	setVerticalScrollBar(Ref<ScrollBar>::null(), flagRefresh);
+	setVerticalScrollBar(Ref<ScrollBar>::null(), mode);
 }
 
-void View::createScrollBars(sl_bool flagRefresh)
+void View::createScrollBars(UIUpdateMode mode)
 {
-	setHorizontalScrollBar(_createHorizontalScrollBar(), sl_false);
-	setVerticalScrollBar(_createVerticalScrollBar(), sl_false);
-	if (flagRefresh) {
-		_refreshScroll(sl_true);
-	}
+	setHorizontalScrollBar(_createHorizontalScrollBar(), UIUpdateMode::Init);
+	setVerticalScrollBar(_createVerticalScrollBar(), UIUpdateMode::Init);
+	refreshScroll(mode);
 }
 
-void View::removeScrollBars(sl_bool flagRefresh)
+void View::removeScrollBars(UIUpdateMode mode)
 {
-	setHorizontalScrollBar(Ref<ScrollBar>::null(), sl_false);
-	setVerticalScrollBar(Ref<ScrollBar>::null(), sl_false);
-	if (flagRefresh) {
-		_refreshScroll(sl_true);
-	}
+	setHorizontalScrollBar(Ref<ScrollBar>::null(), UIUpdateMode::Init);
+	setVerticalScrollBar(Ref<ScrollBar>::null(), UIUpdateMode::Init);
+	refreshScroll(mode);
 }
 
 sl_bool View::isHorizontalScrollBarVisible()
@@ -5486,42 +5500,36 @@ sl_bool View::isVerticalScrollBarVisible()
 	return sl_false;
 }
 
-void View::setHorizontalScrollBarVisible(sl_bool flagVisible, sl_bool flagRefresh)
+void View::setHorizontalScrollBarVisible(sl_bool flagVisible, UIUpdateMode mode)
 {
 	Ref<ScrollBar> bar = getVerticalScrollBar();
 	if (bar.isNotNull()) {
-		bar->setVisible(flagVisible, sl_false);
+		bar->setVisible(flagVisible, UIUpdateMode::NoRedraw);
 	}
-	if (flagRefresh) {
-		_refreshScroll(sl_true);
-	}
+	refreshScroll(mode);
 }
 
-void View::setVerticalScrollBarVisible(sl_bool flagVisible, sl_bool flagRefresh)
+void View::setVerticalScrollBarVisible(sl_bool flagVisible, UIUpdateMode mode)
 {
 	Ref<ScrollBar> bar = getVerticalScrollBar();
 	if (bar.isNotNull()) {
-		bar->setVisible(flagVisible, sl_false);
+		bar->setVisible(flagVisible, UIUpdateMode::NoRedraw);
 	}
-	if (flagRefresh) {
-		_refreshScroll(sl_true);
-	}
+	refreshScroll(mode);
 }
 
-void View::setScrollBarsVisible(sl_bool flagVisible, sl_bool flagRefresh)
+void View::setScrollBarsVisible(sl_bool flagVisible, UIUpdateMode mode)
 {
 	Ref<ScrollBar> bar;
 	bar = getHorizontalScrollBar();
 	if (bar.isNotNull()) {
-		bar->setVisible(flagVisible, sl_false);
+		bar->setVisible(flagVisible, UIUpdateMode::NoRedraw);
 	}
 	bar = getVerticalScrollBar();
 	if (bar.isNotNull()) {
-		bar->setVisible(flagVisible, sl_false);
+		bar->setVisible(flagVisible, UIUpdateMode::NoRedraw);
 	}
-	if (flagRefresh) {
-		_refreshScroll(sl_true);
-	}
+	refreshScroll(mode);
 }
 
 sl_scroll_pos View::getScrollX()
@@ -5551,7 +5559,7 @@ ScrollPoint View::getScrollPosition()
 	return ScrollPoint::zero();
 }
 
-void View::scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagRedraw)
+void View::scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode)
 {
 	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
 	
@@ -5585,37 +5593,37 @@ void View::scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagRedraw)
 		
 		Ref<ScrollBar> bar = attrs->horz;
 		if (bar.isNotNull()) {
-			bar->setValueOfOutRange(x, sl_false);
+			bar->setValueOfOutRange(x, UIUpdateMode::NoRedraw);
 		}
 		bar = attrs->vert;
 		if (bar.isNotNull()) {
-			bar->setValueOfOutRange(y, sl_false);
+			bar->setValueOfOutRange(y, UIUpdateMode::NoRedraw);
 		}
 		
-		if (flagRedraw) {
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
 }
 
-void View::scrollTo(const ScrollPoint& position, sl_bool flagRedraw)
+void View::scrollTo(const ScrollPoint& position, UIUpdateMode mode)
 {
-	scrollTo(position.x, position.y, flagRedraw);
+	scrollTo(position.x, position.y, mode);
 }
 
-void View::setScrollX(sl_scroll_pos x, sl_bool flagRedraw)
+void View::setScrollX(sl_scroll_pos x, UIUpdateMode mode)
 {
 	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
 	if (attrs.isNotNull()) {
-		scrollTo(x, attrs->y, flagRedraw);
+		scrollTo(x, attrs->y, mode);
 	}
 }
 
-void View::setScrollY(sl_scroll_pos y, sl_bool flagRedraw)
+void View::setScrollY(sl_scroll_pos y, UIUpdateMode mode)
 {
 	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
 	if (attrs.isNotNull()) {
-		scrollTo(attrs->x, y, flagRedraw);
+		scrollTo(attrs->x, y, mode);
 	}
 }
 
@@ -5646,7 +5654,7 @@ ScrollPoint View::getContentSize()
 	return ScrollPoint::zero();
 }
 
-void View::setContentSize(sl_scroll_pos width, sl_scroll_pos height, sl_bool flagRefresh)
+void View::setContentSize(sl_scroll_pos width, sl_scroll_pos height, UIUpdateMode mode)
 {
 	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
 	if (attrs.isNotNull()) {
@@ -5658,30 +5666,28 @@ void View::setContentSize(sl_scroll_pos width, sl_scroll_pos height, sl_bool fla
 		attrs->contentWidth = width;
 		attrs->contentHeight = height;
 		onResizeContent(width, height);
-		if (flagRefresh) {
-			_refreshScroll(sl_true);
-		}
+		refreshScroll(mode);
 	}
 }
 
-void View::setContentSize(const ScrollPoint& size, sl_bool flagRefresh)
+void View::setContentSize(const ScrollPoint& size, UIUpdateMode mode)
 {
-	setContentSize(size.x, size.y, flagRefresh);
+	setContentSize(size.x, size.y, mode);
 }
 
-void View::setContentWidth(sl_scroll_pos width, sl_bool flagRefresh)
+void View::setContentWidth(sl_scroll_pos width, UIUpdateMode mode)
 {
 	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
 	if (attrs.isNotNull()) {
-		setContentSize(width, attrs->contentHeight, flagRefresh);
+		setContentSize(width, attrs->contentHeight, mode);
 	}
 }
 
-void View::setContentHeight(sl_scroll_pos height, sl_bool flagRefresh)
+void View::setContentHeight(sl_scroll_pos height, UIUpdateMode mode)
 {
 	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
 	if (attrs.isNotNull()) {
-		setContentSize(attrs->contentWidth, height, flagRefresh);
+		setContentSize(attrs->contentWidth, height, mode);
 	}
 }
 
@@ -5710,14 +5716,12 @@ sl_ui_len View::getScrollBarWidth()
 	return 0;
 }
 
-void View::setScrollBarWidth(sl_ui_len width, sl_bool flagRefresh)
+void View::setScrollBarWidth(sl_ui_len width, UIUpdateMode mode)
 {
 	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
 	if (attrs.isNotNull()) {
 		attrs->barWidth = width;
-		if (flagRefresh) {
-			_refreshScroll(sl_true);
-		}
+		refreshScroll(mode);
 	}
 }
 
@@ -5789,24 +5793,6 @@ void View::setContentScrollingByKeyboard(sl_bool flag)
 	}
 }
 
-Ref<ScrollBar> View::_createHorizontalScrollBar()
-{
-	Ref<ScrollBar> ret = new ScrollBar;
-	if (ret.isNotNull()) {
-		return ret;
-	}
-	return Ref<ScrollBar>::null();
-}
-
-Ref<ScrollBar> View::_createVerticalScrollBar()
-{
-	Ref<ScrollBar> ret = new ScrollBar;
-	if (ret.isNotNull()) {
-		return ret;
-	}
-	return Ref<ScrollBar>::null();
-}
-
 class _View_ScrollBarListener : public Referable, public IScrollBarListener
 {
 public:
@@ -5839,8 +5825,11 @@ public:
 	}
 };
 
-void View::_refreshScroll(sl_bool flagRedraw)
+void View::refreshScroll(UIUpdateMode mode)
 {
+	if (mode == UIUpdateMode::Init) {
+		return;
+	}
 	Ref<ScrollAttributes> attrs = m_scrollAttributes;
 	if (attrs.isNotNull()) {
 		sl_ui_pos width = getWidth();
@@ -5849,11 +5838,11 @@ void View::_refreshScroll(sl_bool flagRedraw)
 		Ref<ScrollBar> barHorz = attrs->horz;
 		if (barHorz.isNotNull()) {
 			barHorz->setParent(this);
-			barHorz->setMinimumValue(0, sl_false);
-			barHorz->setMaximumValue(attrs->contentWidth, sl_false);
-			barHorz->setPage(width, sl_false);
-			barHorz->setValueOfOutRange(attrs->x, sl_false);
-			barHorz->setFrame(UIRect(0, height - attrs->barWidth, width, height), sl_false);
+			barHorz->setMinimumValue(0, UIUpdateMode::NoRedraw);
+			barHorz->setMaximumValue(attrs->contentWidth, UIUpdateMode::NoRedraw);
+			barHorz->setPage(width, UIUpdateMode::NoRedraw);
+			barHorz->setValueOfOutRange(attrs->x, UIUpdateMode::NoRedraw);
+			barHorz->setFrame(UIRect(0, height - attrs->barWidth, width, height), UIUpdateMode::NoRedraw);
 			if (barHorz->getListener().isNull()) {
 				barHorz->setListener(Ref<_View_ScrollBarListener>(new _View_ScrollBarListener(this)));
 			}
@@ -5866,12 +5855,12 @@ void View::_refreshScroll(sl_bool flagRedraw)
 		Ref<ScrollBar> barVert = attrs->vert;
 		if (barVert.isNotNull()) {
 			barVert->setParent(this);
-			barVert->setVertical(sl_true);
-			barVert->setMinimumValue(0, sl_false);
-			barVert->setMaximumValue(attrs->contentHeight, sl_false);
-			barVert->setPage(height, sl_false);
-			barVert->setValueOfOutRange(attrs->y, sl_false);
-			barVert->setFrame(UIRect(width - attrs->barWidth, 0, width, height), sl_false);
+			barVert->setVertical(UIUpdateMode::NoRedraw);
+			barVert->setMinimumValue(0, UIUpdateMode::NoRedraw);
+			barVert->setMaximumValue(attrs->contentHeight, UIUpdateMode::NoRedraw);
+			barVert->setPage(height, UIUpdateMode::NoRedraw);
+			barVert->setValueOfOutRange(attrs->y, UIUpdateMode::NoRedraw);
+			barVert->setFrame(UIRect(width - attrs->barWidth, 0, width, height), UIUpdateMode::NoRedraw);
 			if (barVert->getListener().isNull()) {
 				barVert->setListener(Ref<_View_ScrollBarListener>(new _View_ScrollBarListener(this)));
 			}
@@ -5885,12 +5874,31 @@ void View::_refreshScroll(sl_bool flagRedraw)
 			////		2016/6/8 temporally cancel this function
 			//barHorz->setFrame(UIRect(0, height - scroll->barWidth, width - scroll->barWidth, height), sl_false);
 		}
-		scrollTo(attrs->x, attrs->y, sl_false);
-		if (flagRedraw) {
+		scrollTo(attrs->x, attrs->y, UIUpdateMode::NoRedraw);
+		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
 		}
 	}
 }
+
+Ref<ScrollBar> View::_createHorizontalScrollBar()
+{
+	Ref<ScrollBar> ret = new ScrollBar;
+	if (ret.isNotNull()) {
+		return ret;
+	}
+	return Ref<ScrollBar>::null();
+}
+
+Ref<ScrollBar> View::_createVerticalScrollBar()
+{
+	Ref<ScrollBar> ret = new ScrollBar;
+	if (ret.isNotNull()) {
+		return ret;
+	}
+	return Ref<ScrollBar>::null();
+}
+
 
 void View::_getScrollBars(Ref<View> views[2])
 {
@@ -6243,6 +6251,7 @@ void View::drawContent(Canvas *canvas)
 	}
 	
 	do {
+		
 		{
 			CanvasStatusScope scope(canvas);
 			canvas->clipToRectangle(canvas->getInvalidatedRect());
@@ -6626,11 +6635,6 @@ sl_bool View::dispatchMouseEventToChildren(UIEvent* ev, const Ref<View>* childre
 		case UIAction::LeftButtonDown:
 		case UIAction::RightButtonDown:
 		case UIAction::MiddleButtonDown:
-			oldChild = m_childMouseDown;
-			if (oldChild.isNotNull()) {
-				dispatchMouseEventToChild(ev, oldChild.ptr);
-				return sl_true;
-			}
 			for (sl_size i = 0; i < count; i++) {
 				View* child = children[count - 1 - i].ptr;
 				if (POINT_EVENT_CHECK_CHILD(child)) {
@@ -6824,11 +6828,6 @@ sl_bool View::dispatchTouchEventToChildren(UIEvent *ev, const Ref<View>* childre
 	Ref<View> oldChild;
 	switch (action) {
 		case UIAction::TouchBegin:
-			oldChild = m_childMouseDown;
-			if (oldChild.isNotNull()) {
-				dispatchTouchEventToChild(ev, oldChild.ptr);
-				return sl_true;
-			}
 			for (sl_size i = 0; i < count; i++) {
 				View* child = children[count - 1 - i].ptr;
 				if (POINT_EVENT_CHECK_CHILD(child)) {
@@ -7280,7 +7279,7 @@ void View::dispatchSetCursorToChild(UIEvent* ev, View* child, sl_bool flagTransf
 
 void View::dispatchResize(sl_ui_len width, sl_ui_len height)
 {
-	_refreshScroll(sl_false);
+	refreshScroll(UIUpdateMode::NoRedraw);
 	onResize(width, height);
 	PtrLocker<IViewListener> listener(getEventListener());
 	if (listener.isNotNull()) {
@@ -7323,14 +7322,14 @@ void View::_processEventForStateAndClick(UIEvent* ev)
 			break;
 		case UIAction::LeftButtonUp:
 		case UIAction::TouchEnd:
-			if (m_flagOccurringClick) {
-				if (isPressedState()) {
+			if (isPressedState()) {
+				setPressedState(sl_false);
+				if (m_flagOccurringClick) {
 					if (getBounds().containsPoint(ev->getPoint())) {
 						dispatchClick(ev);
 					}
 				}
 			}
-			setPressedState(sl_false);
 			break;
 		case UIAction::TouchCancel:
 			setPressedState(sl_false);
@@ -7603,7 +7602,8 @@ ViewGroup::ViewGroup()
 	SLIB_REFERABLE_CONSTRUCTOR
 	
 	setCreatingChildInstances(sl_true);
-	setMakingLayout(sl_true, sl_false);
+	setMakingLayout(sl_true, UIUpdateMode::Init);
+	
 }
 
 SLIB_UI_NAMESPACE_END

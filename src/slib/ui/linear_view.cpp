@@ -8,7 +8,7 @@ LinearView::LinearView()
 {
 	SLIB_REFERABLE_CONSTRUCTOR
 	
- 	setOnMakeLayoutEnabled(sl_true, sl_false);
+	setOnMakeLayoutEnabled(sl_true, UIUpdateMode::Init);
 	
 	m_orientation = LayoutOrientation::Vertical;
 	
@@ -19,16 +19,13 @@ LayoutOrientation LinearView::getOrientation()
 	return m_orientation;
 }
 
-void LinearView::setOrientation(LayoutOrientation orientation, sl_bool flagRedraw)
+void LinearView::setOrientation(LayoutOrientation orientation, UIUpdateMode mode)
 {
 	if (m_orientation == orientation) {
 		return;
 	}
 	m_orientation = orientation;
-	requestLayout(sl_false);
-	if (flagRedraw) {
-		invalidate();
-	}
+	requestLayout(mode);
 }
 
 sl_bool LinearView::isHorizontal()
@@ -36,9 +33,9 @@ sl_bool LinearView::isHorizontal()
 	return m_orientation == LayoutOrientation::Horizontal;
 }
 
-void LinearView::setHorizontal(sl_bool flagRedraw)
+void LinearView::setHorizontal(UIUpdateMode mode)
 {
-	setOrientation(LayoutOrientation::Horizontal, flagRedraw);
+	setOrientation(LayoutOrientation::Horizontal, mode);
 }
 
 sl_bool LinearView::isVertical()
@@ -46,9 +43,9 @@ sl_bool LinearView::isVertical()
 	return m_orientation == LayoutOrientation::Vertical;
 }
 
-void LinearView::setVertical(sl_bool flagRedraw)
+void LinearView::setVertical(UIUpdateMode mode)
 {
-	setOrientation(LayoutOrientation::Vertical, flagRedraw);
+	setOrientation(LayoutOrientation::Vertical, mode);
 }
 
 void LinearView::onResizeChild(View* child, sl_ui_len width, sl_ui_len height)
@@ -328,12 +325,12 @@ void LinearView::onMakeLayout()
 
 VerticalLinearView::VerticalLinearView()
 {
-	setOrientation(LayoutOrientation::Vertical, sl_false);
+	setOrientation(LayoutOrientation::Vertical, UIUpdateMode::Init);
 }
 
 HorizontalLinearView::HorizontalLinearView()
 {
-	setOrientation(LayoutOrientation::Horizontal, sl_false);
+	setOrientation(LayoutOrientation::Horizontal, UIUpdateMode::Init);
 }
 
 SLIB_UI_NAMESPACE_END

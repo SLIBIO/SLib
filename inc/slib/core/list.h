@@ -97,10 +97,10 @@ public:
 	template <class _T>
 	sl_bool insert(sl_size index, const _T* values, sl_size count);
 	
-	sl_bool insert(sl_size index, const CList<T, COMPARE>* other);
+	sl_bool insertAll(sl_size index, const CList<T, COMPARE>* other);
 	
 	template <class _T, class _COMPARE>
-	sl_bool insert(sl_size index, const CList<_T, _COMPARE>* other);
+	sl_bool insertAll(sl_size index, const CList<_T, _COMPARE>* other);
 	
 	sl_bool insert_NoLock(sl_size index, const T& value);
 	
@@ -116,10 +116,10 @@ public:
 	template <class _T>
 	sl_bool add(const _T* values, sl_size count);
 	
-	sl_bool add(const CList<T, COMPARE>* other);
+	sl_bool addAll(const CList<T, COMPARE>* other);
 	
 	template <class _T, class _COMPARE>
-	sl_bool add(const CList<_T, _COMPARE>* other);
+	sl_bool addAll(const CList<_T, _COMPARE>* other);
 	
 	sl_bool add_NoLock(const T& value);
 	
@@ -319,10 +319,15 @@ public:
 	template <class _T>
 	sl_bool insert(sl_size index, const _T* values, sl_size count) const;
 	
-	sl_bool insert(sl_size index, const List<T, COMPARE>& other) const;
+	sl_bool insertAll(sl_size index, const List<T, COMPARE>& other) const;
 	
 	template <class _T, class _COMPARE>
-	sl_bool insert(sl_size index, const List<_T, _COMPARE>& other) const;
+	sl_bool insertAll(sl_size index, const List<_T, _COMPARE>& other) const;
+	
+	sl_bool insertAll(sl_size index, const SafeList<T, COMPARE>& other) const;
+	
+	template <class _T, class _COMPARE>
+	sl_bool insertAll(sl_size index, const SafeList<_T, _COMPARE>& other) const;
 	
 	sl_bool insert_NoLock(sl_size index, const T& value) const;
 	
@@ -338,15 +343,15 @@ public:
 	template <class _T>
 	sl_bool add(const _T* values, sl_size count);
 	
-	sl_bool add(const List<T, COMPARE>& _other);
+	sl_bool addAll(const List<T, COMPARE>& _other);
 	
 	template <class _T, class _COMPARE>
-	sl_bool add(const List<_T, _COMPARE>& _other);
+	sl_bool addAll(const List<_T, _COMPARE>& _other);
 	
-	sl_bool add(const SafeList<T, COMPARE>& other);
+	sl_bool addAll(const SafeList<T, COMPARE>& _other);
 	
 	template <class _T, class _COMPARE>
-	sl_bool add(const SafeList<_T, _COMPARE>& other);
+	sl_bool addAll(const SafeList<_T, _COMPARE>& _other);
 	
 	sl_bool add_NoLock(const T& value);
 	
@@ -503,10 +508,15 @@ public:
 	template <class _T>
 	sl_bool insert(sl_size index, const _T* values, sl_size count) const;
 	
-	sl_bool insert(sl_size index, const List<T, COMPARE>& other) const;
+	sl_bool insertAll(sl_size index, const List<T, COMPARE>& other) const;
 	
 	template <class _T, class _COMPARE>
-	sl_bool insert(sl_size index, const List<_T, _COMPARE>& other) const;
+	sl_bool insertAll(sl_size index, const List<_T, _COMPARE>& other) const;
+	
+	sl_bool insertAll(sl_size index, const SafeList<T, COMPARE>& other) const;
+	
+	template <class _T, class _COMPARE>
+	sl_bool insertAll(sl_size index, const SafeList<_T, _COMPARE>& other) const;
 	
 	sl_bool insert(sl_size index, const T& value) const;
 	
@@ -515,15 +525,15 @@ public:
 	template <class _T>
 	sl_bool add(const _T* values, sl_size count);
 	
-	sl_bool add(const List<T, COMPARE>& _other);
+	sl_bool addAll(const List<T, COMPARE>& _other);
 	
 	template <class _T, class _COMPARE>
-	sl_bool add(const List<_T, _COMPARE>& _other);
+	sl_bool addAll(const List<_T, _COMPARE>& _other);
 	
-	sl_bool add(const SafeList<T, COMPARE>& other);
+	sl_bool addAll(const SafeList<T, COMPARE>& _other);
 	
 	template <class _T, class _COMPARE>
-	sl_bool add(const SafeList<_T, _COMPARE>& other);
+	sl_bool addAll(const SafeList<_T, _COMPARE>& _other);
 	
 	sl_bool add(const T& value);
 	
@@ -1100,7 +1110,7 @@ sl_bool CList<T, COMPARE>::insert(sl_size index, const _T* values, sl_size count
 }
 
 template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::insert(sl_size index, const CList<T, COMPARE>* other)
+sl_bool CList<T, COMPARE>::insertAll(sl_size index, const CList<T, COMPARE>* other)
 {
 	if (!other) {
 		return sl_true;
@@ -1144,7 +1154,7 @@ sl_bool CList<T, COMPARE>::insert(sl_size index, const CList<T, COMPARE>* other)
 
 template <class T, class COMPARE>
 template <class _T, class _COMPARE>
-sl_bool CList<T, COMPARE>::insert(sl_size index, const CList<_T, _COMPARE>* other)
+sl_bool CList<T, COMPARE>::insertAll(sl_size index, const CList<_T, _COMPARE>* other)
 {
 	if (!other) {
 		return sl_true;
@@ -1261,7 +1271,7 @@ sl_bool CList<T, COMPARE>::add(const _T* values, sl_size count)
 }
 
 template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::add(const CList<T, COMPARE>* other)
+sl_bool CList<T, COMPARE>::addAll(const CList<T, COMPARE>* other)
 {
 	if (!other) {
 		return sl_true;
@@ -1288,7 +1298,7 @@ sl_bool CList<T, COMPARE>::add(const CList<T, COMPARE>* other)
 
 template <class T, class COMPARE>
 template <class _T, class _COMPARE>
-sl_bool CList<T, COMPARE>::add(const CList<_T, _COMPARE>* other)
+sl_bool CList<T, COMPARE>::addAll(const CList<_T, _COMPARE>* other)
 {
 	if (!other) {
 		return sl_true;
@@ -2080,24 +2090,37 @@ sl_bool List<T, COMPARE>::insert(sl_size index, const _T* values, sl_size count)
 }
 
 template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::insert(sl_size index, const List<T, COMPARE>& other) const
+sl_bool List<T, COMPARE>::insertAll(sl_size index, const List<T, COMPARE>& other) const
 {
 	CList<T, COMPARE>* obj = ref.ptr;
 	if (obj) {
-		return obj->insert(index, other.ref.ptr);
+		return obj->insertAll(index, other.ref.ptr);
 	}
 	return sl_false;
 }
 
 template <class T, class COMPARE>
 template <class _T, class _COMPARE>
-sl_bool List<T, COMPARE>::insert(sl_size index, const List<_T, _COMPARE>& other) const
+sl_bool List<T, COMPARE>::insertAll(sl_size index, const List<_T, _COMPARE>& other) const
 {
 	CList<T, COMPARE>* obj = ref.ptr;
 	if (obj) {
-		return obj->insert(index, other.ref.ptr);
+		return obj->insertAll(index, other.ref.ptr);
 	}
 	return sl_false;
+}
+
+template <class T, class COMPARE>
+sl_bool List<T, COMPARE>::insertAll(sl_size index, const SafeList<T, COMPARE>& other) const
+{
+	return insertAll(index, List<T, COMPARE>(other));
+}
+
+template <class T, class COMPARE>
+template <class _T, class _COMPARE>
+sl_bool List<T, COMPARE>::insertAll(sl_size index, const SafeList<_T, _COMPARE>& other) const
+{
+	return insertAll(index, List<_T, _COMPARE>(other));
 }
 
 template <class T, class COMPARE>
@@ -2199,7 +2222,7 @@ sl_bool List<T, COMPARE>::add(const _T* values, sl_size count)
 }
 
 template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::add(const List<T, COMPARE>& _other)
+sl_bool List<T, COMPARE>::addAll(const List<T, COMPARE>& _other)
 {
 	CList<T, COMPARE>* other = _other.ref.ptr;
 	if (!other) {
@@ -2207,12 +2230,12 @@ sl_bool List<T, COMPARE>::add(const List<T, COMPARE>& _other)
 	}
 	CList<T, COMPARE>* obj = ref.ptr;
 	if (obj) {
-		return obj->add(other);
+		return obj->addAll(other);
 	} else {
 		obj = CList<T, COMPARE>::create();
 		if (obj) {
 			ref = obj;
-			return obj->add(other);
+			return obj->addAll(other);
 		}
 	}
 	return sl_false;
@@ -2220,7 +2243,7 @@ sl_bool List<T, COMPARE>::add(const List<T, COMPARE>& _other)
 
 template <class T, class COMPARE>
 template <class _T, class _COMPARE>
-sl_bool List<T, COMPARE>::add(const List<_T, _COMPARE>& _other)
+sl_bool List<T, COMPARE>::addAll(const List<_T, _COMPARE>& _other)
 {
 	CList<_T, _COMPARE>* other = _other.ref.ptr;
 	if (!other) {
@@ -2233,23 +2256,23 @@ sl_bool List<T, COMPARE>::add(const List<_T, _COMPARE>& _other)
 		obj = CList<T, COMPARE>::create();
 		if (obj) {
 			ref = obj;
-			return obj->add(other);
+			return obj->addAll(other);
 		}
 	}
 	return sl_false;
 }
 
 template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::add(const SafeList<T, COMPARE>& other)
+sl_bool List<T, COMPARE>::addAll(const SafeList<T, COMPARE>& other)
 {
-	return add(List<T, COMPARE>(other));
+	return addAll(List<T, COMPARE>(other));
 }
 
 template <class T, class COMPARE>
 template <class _T, class _COMPARE>
-sl_bool List<T, COMPARE>::add(const SafeList<_T, _COMPARE>& other)
+sl_bool List<T, COMPARE>::addAll(const SafeList<_T, _COMPARE>& other)
 {
-	return add(List<_T, _COMPARE>(other));
+	return addAll(List<_T, _COMPARE>(other));
 }
 
 template <class T, class COMPARE>
@@ -2946,24 +2969,37 @@ sl_bool SafeList<T, COMPARE>::insert(sl_size index, const _T* values, sl_size co
 }
 
 template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::insert(sl_size index, const List<T, COMPARE>& other) const
+sl_bool SafeList<T, COMPARE>::insertAll(sl_size index, const List<T, COMPARE>& other) const
 {
 	Ref< CList<T, COMPARE> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->insert(index, other.ref.ptr);
+		return obj->insertAll(index, other.ref.ptr);
 	}
 	return sl_false;
 }
 
 template <class T, class COMPARE>
 template <class _T, class _COMPARE>
-sl_bool SafeList<T, COMPARE>::insert(sl_size index, const List<_T, _COMPARE>& other) const
+sl_bool SafeList<T, COMPARE>::insertAll(sl_size index, const List<_T, _COMPARE>& other) const
 {
 	Ref< CList<T, COMPARE> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->insert(index, other.ref.ptr);
+		return obj->insertAll(index, other.ref.ptr);
 	}
 	return sl_false;
+}
+
+template <class T, class COMPARE>
+sl_bool SafeList<T, COMPARE>::insertAll(sl_size index, const SafeList<T, COMPARE>& other) const
+{
+	return insertAll(index, List<T, COMPARE>(other));
+}
+
+template <class T, class COMPARE>
+template <class _T, class _COMPARE>
+sl_bool SafeList<T, COMPARE>::insertAll(sl_size index, const SafeList<_T, _COMPARE>& other) const
+{
+	return insertAll(index, List<_T, _COMPARE>(other));
 }
 
 template <class T, class COMPARE>
@@ -3030,7 +3066,7 @@ sl_bool SafeList<T, COMPARE>::add(const _T* values, sl_size count)
 }
 
 template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::add(const List<T, COMPARE>& _other)
+sl_bool SafeList<T, COMPARE>::addAll(const List<T, COMPARE>& _other)
 {
 	CList<T, COMPARE>* other = _other.ref.ptr;
 	if (!other) {
@@ -3038,19 +3074,19 @@ sl_bool SafeList<T, COMPARE>::add(const List<T, COMPARE>& _other)
 	}
 	Ref< CList<T, COMPARE> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->add(other);
+		return obj->addAll(other);
 	} else {
 		SpinLocker lock(SpinLockPoolForList::get(this));
 		obj = ref;
 		if (obj.isNotNull()) {
 			lock.unlock();
-			return obj->add(other);
+			return obj->addAll(other);
 		}
 		obj = CList<T, COMPARE>::create();
 		if (obj.isNotNull()) {
 			ref = obj;
 			lock.unlock();
-			return obj->add(other);
+			return obj->addAll(other);
 		}
 	}
 	return sl_false;
@@ -3058,7 +3094,7 @@ sl_bool SafeList<T, COMPARE>::add(const List<T, COMPARE>& _other)
 
 template <class T, class COMPARE>
 template <class _T, class _COMPARE>
-sl_bool SafeList<T, COMPARE>::add(const List<_T, _COMPARE>& _other)
+sl_bool SafeList<T, COMPARE>::addAll(const List<_T, _COMPARE>& _other)
 {
 	CList<_T, _COMPARE>* other = _other.object;
 	if (!other) {
@@ -3066,35 +3102,35 @@ sl_bool SafeList<T, COMPARE>::add(const List<_T, _COMPARE>& _other)
 	}
 	Ref< CList<T, COMPARE> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->add(other);
+		return obj->addAll(other);
 	} else {
 		SpinLocker lock(SpinLockPoolForList::get(this));
 		obj = ref;
 		if (obj.isNotNull()) {
 			lock.unlock();
-			return obj->add(other);
+			return obj->addAll(other);
 		}
 		obj = CList<T, COMPARE>::create();
 		if (obj.isNotNull()) {
 			ref = obj;
 			lock.unlock();
-			return obj->add(other);
+			return obj->addAll(other);
 		}
 	}
 	return sl_false;
 }
 
 template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::add(const SafeList<T, COMPARE>& other)
+sl_bool SafeList<T, COMPARE>::addAll(const SafeList<T, COMPARE>& other)
 {
-	return add(List<T, COMPARE>(other));
+	return addAll(List<T, COMPARE>(other));
 }
 
 template <class T, class COMPARE>
 template <class _T, class _COMPARE>
-sl_bool SafeList<T, COMPARE>::add(const SafeList<_T, _COMPARE>& other)
+sl_bool SafeList<T, COMPARE>::addAll(const SafeList<_T, _COMPARE>& other)
 {
-	return add(List<_T, _COMPARE>(other));
+	return addAll(List<_T, _COMPARE>(other));
 }
 
 template <class T, class COMPARE>

@@ -22,12 +22,7 @@ public:
 	
 	Ref<MobileGameView> getGameView();
 	
-protected:
-	virtual void onGameFrame(RenderEngine* engine);
-	
 public:
-	virtual void dispatchGameFrame(RenderEngine* engine);
-	
 	// override
 	virtual void dispatchResize(sl_ui_len width, sl_ui_len height);
 
@@ -42,10 +37,6 @@ class SLIB_EXPORT MobileGameView : public RenderView
 	
 public:
 	MobileGameView();
-	
-protected:
-	// override
-	void onFrame(RenderEngine* engine);
 	
 };
 
