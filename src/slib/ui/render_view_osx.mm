@@ -56,7 +56,7 @@ void RenderView::_requestRender_NW()
 	}
 }
 
-void _Ui_OSX_GLView_thread(_Slib_OSX_GLView* handle)
+void _Ui_OSX_GLView_thread(__weak _Slib_OSX_GLView* _handle)
 {
 	Ref<RenderEngine> engine = GL::createEngine();
 	if (engine.isNull()) {
@@ -79,66 +79,91 @@ void _Ui_OSX_GLView_thread(_Slib_OSX_GLView* handle)
 		return;
 	}
 	
-	while (Thread::isNotStoppingCurrent()) {
-		do {
-			MutexLocker lock(&(handle->m_lockRender));
-			if ([handle isHidden] || handle.visibleRect.size.width < 1 || handle.visibleRect.size.height < 1 || handle.window == nil) {
-				if (context != nil) {
-					[context clearDrawable];
-					context = nil;
-					handle->m_flagUpdate = sl_true;
-				}
-				break;
+	while (1) {
+		
+		sl_bool flagWorking = sl_false;
+		
+		if (Thread::isNotStoppingCurrent()) {
+			
+			_Slib_OSX_GLView* handle = _handle;
+			if (handle == nil) {
+				return;
 			}
-			if (context == nil) {
-				context = [[NSOpenGLContext alloc] initWithFormat:pf shareContext:nil];
+			Ref<OSX_ViewInstance> instance = handle->m_viewInstance;
+			if (instance.isNull()) {
+				return;
+			}
+			
+			do {
+				MutexLocker lock(&(handle->m_lockRender));
+				if ([handle isHidden] || handle.visibleRect.size.width < 1 || handle.visibleRect.size.height < 1 || handle.window == nil) {
+					if (context != nil) {
+						[context clearDrawable];
+						context = nil;
+						handle->m_flagUpdate = sl_true;
+					}
+					break;
+				}
 				if (context == nil) {
-					return;
-				}
-				[context setView: handle];
-			}
-			if (handle->m_flagUpdate) {
-				[context update];
-				handle->m_flagUpdate = sl_false;
-			}
-			sl_bool flagUpdate = sl_false;
-			if (handle->m_flagRenderingContinuously) {
-				flagUpdate = sl_true;
-			} else {
-				if (handle->m_flagRequestRender) {
-					flagUpdate = sl_true;
-				}
-			}
-			lock.unlock();
-			handle->m_flagRequestRender = sl_false;
-			if (flagUpdate) {
-				NSRect rect = [handle bounds];
-				if (rect.size.width != 0 && rect.size.height != 0) {
-				
-					[context makeCurrentContext];
-					engine->setViewport(0, 0, (sl_uint32)(rect.size.width), (sl_uint32)(rect.size.height));
-					
-					Ref<OSX_ViewInstance> instance = handle->m_viewInstance;
-					if (instance.isNotNull()) {
-						Ref<View> _view = instance->getView();
-						if (RenderView::checkInstance(_view.ptr)) {
-							RenderView* view = (RenderView*)(_view.ptr);
-							view->dispatchFrame(engine.ptr);
-						}
-					} else {
+					context = [[NSOpenGLContext alloc] initWithFormat:pf shareContext:nil];
+					if (context == nil) {
 						return;
 					}
-			
-					GL::flush();
-					[context flushBuffer];
-			
+					[context setView: handle];
 				}
-			}
-		} while(0);
+				if (handle->m_flagUpdate) {
+					[context update];
+					handle->m_flagUpdate = sl_false;
+				}
+				sl_bool flagUpdate = sl_false;
+				if (handle->m_flagRenderingContinuously) {
+					flagUpdate = sl_true;
+				} else {
+					if (handle->m_flagRequestRender) {
+						flagUpdate = sl_true;
+					}
+				}
+				lock.unlock();
+				handle->m_flagRequestRender = sl_false;
+				
+				flagWorking = sl_true;
+				if (flagUpdate) {
+					NSRect rect = [handle bounds];
+					if (rect.size.width != 0 && rect.size.height != 0) {
+					
+						[context makeCurrentContext];
+						engine->setViewport(0, 0, (sl_uint32)(rect.size.width), (sl_uint32)(rect.size.height));
+						
+						Ref<OSX_ViewInstance> instance = handle->m_viewInstance;
+						if (instance.isNotNull()) {
+							Ref<View> _view = instance->getView();
+							if (RenderView::checkInstance(_view.ptr)) {
+								RenderView* view = (RenderView*)(_view.ptr);
+								view->dispatchFrame(engine.ptr);
+							}
+						} else {
+							return;
+						}
+				
+						GL::flush();
+						[context flushBuffer];
+				
+					}
+				}
+			} while(0);
+			
+		} else {
+			break;
+		}
+		
 		if (Thread::isNotStoppingCurrent()) {
-			sl_uint64 t = timer.getEllapsedMilliseconds();
-			if (t < 20) {
-				Thread::sleep(20 - (sl_uint32)(t));
+			if (flagWorking) {
+				sl_uint64 t = timer.getEllapsedMilliseconds();
+				if (t < 20) {
+					Thread::sleep(20 - (sl_uint32)(t));
+				}
+			} else {
+				Thread::sleep(1000);
 			}
 			timer.reset();
 		} else {
@@ -187,6 +212,10 @@ SLIB_UI_NAMESPACE_END
 	[super setFrame: frame];
 	[self updateTrackingAreas];
 	m_flagUpdate = sl_true;
+	slib::Ref<slib::Thread> thread = m_thread;
+	if (thread.isNotNull()) {
+		thread->wake();
+	}
 }
 
 - (void)updateTrackingAreas

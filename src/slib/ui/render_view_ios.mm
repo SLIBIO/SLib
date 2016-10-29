@@ -84,71 +84,90 @@ struct _iOS_GLDesc
 	}
 };
 
-void _iOS_GLCallback(_Slib_iOS_GLView* handle)
+void _iOS_GLCallback(__weak _Slib_iOS_GLView* _handle)
 {
 	TimeCounter timer;
 	
 	_iOS_GLDesc desc;
 	
-	while (Thread::isNotStoppingCurrent()) {
+	while (1) {
 		
-		Ref<iOS_ViewInstance> instance = handle->m_viewInstance;
-		if (instance.isNull()) {
-			return;
-		}
+		sl_bool flagWorking = sl_false;
 		
-		if (handle.superview != nil && handle.hidden == NO && !(MobileApp::isPaused())) {
-			
-			if (desc.m_context == nil) {
-				if (!(desc.create())) {
-					return;
-				}
-				handle.context = desc.m_context;
-			}
-			
-			sl_uint32 width = (sl_uint32)(handle.frame.size.width * handle.contentScaleFactor);
-			sl_uint32 height = (sl_uint32)(handle.frame.size.height * handle.contentScaleFactor);
-			
-			if (width > 0 && height > 0) {
-				
-				sl_bool flagUpdate = sl_false;
-				if (handle->m_flagRenderingContinuously) {
-					flagUpdate = sl_true;
-				} else {
-					if (handle->m_flagRequestRender) {
-						flagUpdate = sl_true;
-					}
-				}
-				handle->m_flagRequestRender = sl_false;
-				
-				if (flagUpdate) {
-					
-					[EAGLContext setCurrentContext:desc.m_context];
-					
-					desc.m_engine->setViewport(0, 0, width, height);
-					
-					Ref<View> _view = instance->getView();
-					if (RenderView::checkInstance(_view.ptr)) {
-						RenderView* view = (RenderView*)(_view.ptr);
-						view->dispatchFrame(desc.m_engine.ptr);
-					}
-					
-					[handle display];
-
-				}
-			}
-		}
-		
-		instance.setNull();
 		if (Thread::isNotStoppingCurrent()) {
-			sl_uint64 t = timer.getEllapsedMilliseconds();
-			if (t < 20) {
-				Thread::sleep(20 - (sl_uint32)(t));
+			
+			_Slib_iOS_GLView* handle = _handle;
+			if (handle == nil) {
+				return;
+			}
+			
+			Ref<iOS_ViewInstance> instance = handle->m_viewInstance;
+			if (instance.isNull()) {
+				return;
+			}
+			
+			if (handle.superview != nil && handle.hidden == NO && !(MobileApp::isPaused())) {
+				
+				if (desc.m_context == nil) {
+					if (!(desc.create())) {
+						return;
+					}
+					handle.context = desc.m_context;
+				}
+				
+				sl_uint32 width = (sl_uint32)(handle.frame.size.width * handle.contentScaleFactor);
+				sl_uint32 height = (sl_uint32)(handle.frame.size.height * handle.contentScaleFactor);
+				
+				if (width > 0 && height > 0) {
+					
+					flagWorking = sl_true;
+					
+					sl_bool flagUpdate = sl_false;
+					if (handle->m_flagRenderingContinuously) {
+						flagUpdate = sl_true;
+					} else {
+						if (handle->m_flagRequestRender) {
+							flagUpdate = sl_true;
+						}
+					}
+					handle->m_flagRequestRender = sl_false;
+					
+					if (flagUpdate) {
+						
+						[EAGLContext setCurrentContext:desc.m_context];
+						
+						desc.m_engine->setViewport(0, 0, width, height);
+						
+						Ref<View> _view = instance->getView();
+						if (RenderView::checkInstance(_view.ptr)) {
+							RenderView* view = (RenderView*)(_view.ptr);
+							view->dispatchFrame(desc.m_engine.ptr);
+						}
+						
+						[handle display];
+
+					}
+				}
+			}
+			
+		} else {
+			break;
+		}
+		
+		if (Thread::isNotStoppingCurrent()) {
+			if (flagWorking) {
+				sl_uint64 t = timer.getEllapsedMilliseconds();
+				if (t < 20) {
+					Thread::sleep(20 - (sl_uint32)(t));
+				}
+			} else {
+				Thread::sleep(1000);
 			}
 			timer.reset();
 		} else {
 			break;
 		}
+		
 	}
 }
 
