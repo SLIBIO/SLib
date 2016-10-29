@@ -87,16 +87,21 @@ public class SlibActivity extends Activity {
 	@Override
 	public boolean dispatchTouchEvent(final MotionEvent ev) {
 		// avoid crash on using UI::runLoop
+		final MotionEvent evNew = MotionEvent.obtain(ev);
 		UiThread.post(new Runnable() {
 			public void run() {
-				dispatchTouchEventToSuper(ev);
+				dispatchTouchEventToSuper(evNew);
 			}
 		});
 		return true;
 	}
 	
 	void dispatchTouchEventToSuper(final MotionEvent ev) {
-		super.dispatchTouchEvent(ev);
+		try {
+			super.dispatchTouchEvent(ev);
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
 	}
 	
 	@Override
@@ -111,7 +116,11 @@ public class SlibActivity extends Activity {
 	}
 	
 	public void dispatchKeyEventToSuper(final KeyEvent ev) {
-		super.dispatchKeyEvent(ev);
+		try {
+			super.dispatchKeyEvent(ev);
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
 	}
 	
 }

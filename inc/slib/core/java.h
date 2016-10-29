@@ -16,7 +16,7 @@
 #include "map.h"
 
 #if defined(SLIB_PLATFORM_IS_ANDROID)
-#include "../../thirdparty/jni/android/jni.h"
+#include <jni.h>
 #elif defined(SLIB_PLATFORM_IS_WIN32)
 #include "../../thirdparty/jni/win32/jni.h"
 #endif

@@ -882,7 +882,7 @@ sl_int32 Base::interlockedAdd32(sl_int32* pDst, sl_int32 value)
 #elif defined(SLIB_PLATFORM_IS_APPLE)
 	return OSAtomicAdd32Barrier((int32_t)value, (int32_t*)pDst);
 #elif defined(SLIB_PLATFORM_IS_UNIX)
-	__sync_fetch_and_add(pDst, value) + value;
+	return __sync_fetch_and_add(pDst, value) + value;
 #endif
 }
 
