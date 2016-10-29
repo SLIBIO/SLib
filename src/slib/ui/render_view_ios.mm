@@ -82,12 +82,6 @@ struct _iOS_GLDesc
 		}
 		return sl_false;
 	}
-	
-	void clear()
-	{
-		m_context = nil;
-		m_engine.setNull();
-	}
 };
 
 void _iOS_GLCallback(_Slib_iOS_GLView* handle)
@@ -109,9 +103,8 @@ void _iOS_GLCallback(_Slib_iOS_GLView* handle)
 				if (!(desc.create())) {
 					return;
 				}
+				handle.context = desc.m_context;
 			}
-			
-			handle.context = desc.m_context;
 			
 			sl_uint32 width = (sl_uint32)(handle.frame.size.width * handle.contentScaleFactor);
 			sl_uint32 height = (sl_uint32)(handle.frame.size.height * handle.contentScaleFactor);
@@ -144,8 +137,6 @@ void _iOS_GLCallback(_Slib_iOS_GLView* handle)
 
 				}
 			}
-		} else {
-			desc.clear();
 		}
 		
 		instance.setNull();
