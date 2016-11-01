@@ -258,14 +258,14 @@ private:
 	
 };
 
-class SLIB_EXPORT CanvasStatusScope
+class SLIB_EXPORT CanvasStateScope
 {
 public:
-	CanvasStatusScope();
+	CanvasStateScope();
 	
-	CanvasStatusScope(const Ref<Canvas>& canvas);
+	CanvasStateScope(const Ref<Canvas>& canvas);
 	
-	~CanvasStatusScope();
+	~CanvasStateScope();
 	
 public:
 	void save(const Ref<Canvas>& canvas);

@@ -22,6 +22,13 @@ public:
 	FontDesc();
 };
 
+struct SLIB_EXPORT FontMetrics
+{
+	sl_real ascent;
+	sl_real descent;
+	sl_real leading;
+};
+
 class SLIB_EXPORT Font : public Referable
 {
 	SLIB_DECLARE_OBJECT
@@ -53,9 +60,17 @@ public:
 	
 	sl_bool isUnderline();
 	
+	sl_real getFontHeight();
+	
+	sl_real getFontAscent();
+	
+	sl_real getFontDescent();
+	
 	Ref<Referable> getPlatformObject();
 	
 	Size getTextSize(const String& text);
+	
+	sl_bool getFontMetrics(FontMetrics& _out);
 	
 protected:
 	FontDesc m_desc;

@@ -64,6 +64,23 @@ Size Font::getTextSize(const String& _text)
 
 }
 
+sl_bool Font::getFontMetrics(FontMetrics& _out)
+{
+	Gdiplus::Font* handle = GraphicsPlatform::getGdiplusFont(this);
+	if (handle) {
+		Gdiplus::FontFamily family;
+		if (handle->GetFamily(&family) == Gdiplus::Ok) {
+			int style = handle->GetStyle();
+			sl_real ratio = (sl_real)(handle->GetSize()) / (sl_real)(family.GetEmHeight(style));
+			_out.ascent = (sl_real)(family.GetCellAscent(style)) * ratio;
+			_out.descent = (sl_real)(family.GetCellDescent(style)) * ratio;
+			_out.leading = (sl_real)(family.GetLineSpacing(style)) * ratio - _out.ascent - _out.descent;
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
 class _Win32_FontObject : public Referable
 {
 public:

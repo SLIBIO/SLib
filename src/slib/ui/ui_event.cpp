@@ -498,7 +498,7 @@ void UIEvent::transformPoints(const Matrix3lf& mat)
 	}
 }
 
-void UIEvent::resetStatus()
+void UIEvent::resetStates()
 {
 	m_flags = 0;
 }
@@ -1073,7 +1073,7 @@ void UIEventLogListener::processMouseWheel(String name, UIEvent* event)
 	SLIB_LOG(name, str);
 }
 
-String UI::getStatusDescription()
+String UI::getStatesDescription()
 {
 	String str;
 	if (UI::checkKeyPressed(Keycode::LeftShift)) {

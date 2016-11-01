@@ -20,16 +20,17 @@
 #include "ui/select_view.h"
 #include "ui/progress_bar.h"
 #include "ui/slider.h"
+#include "ui/text_view.h"
 
 #include "ui/scroll_bar.h"
 #include "ui/scroll_view.h"
 #include "ui/linear_view.h"
 #include "ui/list_view.h"
 #include "ui/list_report_view.h"
-#include "ui/view_page.h"
 #include "ui/split_view.h"
 #include "ui/tab_view.h"
 #include "ui/tree_view.h"
+#include "ui/view_page.h"
 
 #include "ui/render_view.h"
 #include "ui/web_view.h"

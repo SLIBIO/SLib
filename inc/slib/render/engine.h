@@ -415,6 +415,11 @@ public:
 		return m_state;
 	}
 	
+	SLIB_INLINE StateType* getState()
+	{
+		return m_state;
+	}
+	
 public:
 	RenderEngine* m_engine;
 	Ref<RenderProgram> m_program;

@@ -11,6 +11,7 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags "-std=c++11 -frtti"
+                arguments "-DANDROID_ARM_MODE=arm", "-DANDROID_ARM_NEON=TRUE"
             }
         }
         ndk {

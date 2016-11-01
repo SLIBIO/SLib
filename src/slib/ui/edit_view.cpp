@@ -154,7 +154,7 @@ void EditView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 		sl_ui_pos height = 0;
 		Ref<Font> font = getFont();
 		if (font.isNotNull()) {
-			height = (sl_ui_pos)(font->getTextSize("|").y * 1.5f);
+			height = (sl_ui_pos)(font->getFontHeight() * 1.5f);
 			if (height < 0) {
 				height = 0;
 			}

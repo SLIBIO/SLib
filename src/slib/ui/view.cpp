@@ -264,6 +264,22 @@ Ref<View::ScrollAttributes> View::_initializeScrollAttributes()
 	return attrs;
 }
 
+Ref<View::TextInputAttributes> View::_initializeTextInputAttributes()
+{
+	Ref<TextInputAttributes> attrs = m_textInputAttributes;
+	if (attrs.isNotNull()) {
+		return attrs;
+	}
+	attrs = new TextInputAttributes;
+	if (attrs.isNull()) {
+		return Ref<TextInputAttributes>::null();
+	}
+	
+	attrs->flagTextInput = sl_false;
+	
+	return attrs;
+}
+
 Ref<ViewInstance> View::getViewInstance()
 {
 	return m_instance;
@@ -1286,6 +1302,19 @@ void View::_killFocusFromParent()
 Ref<View> View::getFocusedChild()
 {
 	return m_childFocused;
+}
+
+Ref<View> View::getFocusedDescendant()
+{
+	Ref<View> focused = m_childFocused;
+	if (focused.isNotNull()) {
+		Ref<View> descendant = focused->getFocusedDescendant();
+		if (descendant.isNotNull()) {
+			return descendant;
+		}
+		return focused;
+	}
+	return Ref<View>::null();
 }
 
 void View::_setFocusedChild(View* child, UIUpdateMode mode)
@@ -6098,6 +6127,23 @@ sl_bool View::hitTestForCapturingChildInstanceEvents(const UIPoint& pt)
 	return sl_true;
 }
 
+sl_bool View::isTextInput()
+{
+	Ref<TextInputAttributes> attrs = m_textInputAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagTextInput;
+	}
+	return sl_false;
+}
+
+void View::setTextInput(sl_bool flagTextInput)
+{
+	Ref<TextInputAttributes> attrs = _initializeTextInputAttributes();
+	if (attrs.isNotNull()) {
+		attrs->flagTextInput = sl_true;
+	}
+}
+
 void View::drawBackground(Canvas* canvas, const Color& color, const Ref<Drawable>& background)
 {
 	Rectangle rc(0, 0, (sl_real)(m_frame.getWidth()), (sl_real)(m_frame.getHeight()));
@@ -6164,7 +6210,7 @@ void View::drawChildren(Canvas* canvas, const Ref<View>* children, sl_size count
 				if (child->isInstance()) {
 #if defined(SLIB_PLATFORM_IS_WIN32)
 					if (!(child->checkSelfInvalidatable())) {
-						CanvasStatusScope scope(canvas);
+						CanvasStateScope scope(canvas);
 						sl_ui_pos offx = child->m_frame.left;
 						sl_ui_pos offy = child->m_frame.top;
 						Vector2 t;
@@ -6182,7 +6228,7 @@ void View::drawChildren(Canvas* canvas, const Ref<View>* children, sl_size count
 					}
 #endif
 				} else {
-					CanvasStatusScope scope(canvas);
+					CanvasStateScope scope(canvas);
 					sl_ui_pos offx = child->m_frame.left;
 					sl_ui_pos offy = child->m_frame.top;
 					Matrix3 mat;
@@ -6253,7 +6299,7 @@ void View::drawContent(Canvas *canvas)
 	do {
 		
 		{
-			CanvasStatusScope scope(canvas);
+			CanvasStateScope scope(canvas);
 			canvas->clipToRectangle(canvas->getInvalidatedRect());
 			if (drawAttrs.isNotNull()) {
 				if (drawAttrs->flagOnDrawBackgroundAlways || drawAttrs->backgroundColor.isNotZero() || drawAttrs->background.isNotNull()) {
@@ -6345,7 +6391,7 @@ Ref<Bitmap> View::drawLayer()
 		bitmap->resetPixels((sl_uint32)(rc.left), (sl_uint32)(rc.top), (sl_uint32)(rc.getWidth()), (sl_uint32)(rc.getHeight()), Color::zero());
 	} while (0);
 
-	CanvasStatusScope scope(canvas);
+	CanvasStateScope scope(canvas);
 	drawContent(canvas.ptr);
 
 	return bitmap;
@@ -6364,7 +6410,7 @@ void View::draw(Canvas* canvas)
 		}
 	}
 	
-	CanvasStatusScope scope(canvas);
+	CanvasStateScope scope(canvas);
 	drawContent(canvas);
 	
 }
@@ -6602,7 +6648,7 @@ void View::dispatchMouseEvent(UIEvent* ev)
 		}
 	}
 	
-	ev->resetStatus();
+	ev->resetStates();
 	
 	onMouseEvent(ev);
 	if (ev->isPreventedDefault()) {
@@ -6736,7 +6782,7 @@ sl_bool View::dispatchMouseEventToChildren(UIEvent* ev, const Ref<View>* childre
 void View::dispatchMouseEventToChild(UIEvent* ev, View* child, sl_bool flagTransformPoints)
 {
 	if (child) {
-		ev->resetStatus();
+		ev->resetStates();
 		if (flagTransformPoints) {
 			UIPointf ptMouse = ev->getPoint();
 			ev->setPoint(child->convertCoordinateFromParent(ptMouse));
@@ -6787,7 +6833,7 @@ void View::dispatchTouchEvent(UIEvent* ev)
 		}
 	}
 	
-	ev->resetStatus();
+	ev->resetStates();
 	
 	onTouchEvent(ev);
 	if (ev->isPreventedDefault()) {
@@ -6975,7 +7021,7 @@ void View::dispatchTouchEventToChild(UIEvent* ev, View* child, sl_bool flagTranf
 {
 	if (child) {
 		
-		ev->resetStatus();
+		ev->resetStates();
 		
 		if (flagTranformPoints) {
 			
@@ -7038,7 +7084,7 @@ void View::dispatchMouseWheelEvent(UIEvent* ev)
 		return;
 	}
 	
-	ev->resetStatus();
+	ev->resetStates();
 	
 	onMouseWheelEvent(ev);
 	if (ev->isPreventedDefault()) {
@@ -7086,7 +7132,7 @@ sl_bool View::dispatchMouseWheelEventToChildren(UIEvent* ev, const Ref<View>* ch
 void View::dispatchMouseWheelEventToChild(UIEvent* ev, View* child, sl_bool flagTransformPoints)
 {
 	if (child) {
-		ev->resetStatus();
+		ev->resetStates();
 		if (flagTransformPoints) {
 			UIPointf ptMouse = ev->getPoint();
 			ev->setPoint(child->convertCoordinateFromParent(ptMouse));
@@ -7116,7 +7162,7 @@ void View::dispatchKeyEvent(UIEvent* ev)
 		return;
 	}
 	
-	ev->resetStatus();
+	ev->resetStates();
 	
 	onKeyEvent(ev);
 	if (ev->isPreventedDefault()) {
@@ -7215,7 +7261,7 @@ void View::dispatchSetCursor(UIEvent* ev)
 		return;
 	}
 	
-	ev->resetStatus();
+	ev->resetStates();
 	
 	onSetCursor(ev);
 	if (ev->isPreventedDefault()) {
@@ -7265,7 +7311,7 @@ sl_bool View::dispatchSetCursorToChildren(UIEvent* ev, const Ref<View>* children
 void View::dispatchSetCursorToChild(UIEvent* ev, View* child, sl_bool flagTransformPoints)
 {
 	if (child) {
-		ev->resetStatus();
+		ev->resetStates();
 		if (flagTransformPoints) {
 			UIPointf ptMouse = ev->getPoint();
 			ev->setPoint(child->convertCoordinateFromParent(ptMouse));

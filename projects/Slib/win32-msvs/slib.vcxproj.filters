@@ -1461,5 +1461,8 @@
     <ClCompile Include="..\..\..\src\slib\graphics\font_atlas.cpp">
       <Filter>src\slib\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\text_view.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

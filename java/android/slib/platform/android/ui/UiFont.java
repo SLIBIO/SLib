@@ -84,17 +84,27 @@ public class UiFont {
 	}
 	
 	public PointF getTextSize(String text) {
-		if (text != null && text.length() != 0) {
-			float width = paint.measureText(text);
-			FontMetrics fm = paint.getFontMetrics();
-			float height;
-			if (fm != null) {
-				height = - fm.ascent + fm.descent;
-			} else {
-				height = this.height;
+		float width = 0;
+		float height = this.height;
+		try {
+			if (text != null && text.length() != 0) {
+				width = paint.measureText(text);
 			}
-			return new PointF(width, height);
+			FontMetrics fm = paint.getFontMetrics();
+			height = -fm.ascent + fm.descent;
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
-		return new PointF(0, height);
+		return new PointF(width, height);
 	}
+
+	public FontMetrics getFontMetrics() {
+		try {
+			return paint.getFontMetrics();
+		} catch (Exception e) {
+			Logger.exception(e);
+			return null;
+		}
+	}
+
 }

@@ -268,7 +268,7 @@ public:
 	sl_bool isCommandKey() const;
 	
 	// event management
-	void resetStatus();
+	void resetStates();
 	
 	void preventDefault();
 	

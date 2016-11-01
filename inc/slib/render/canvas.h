@@ -11,7 +11,7 @@
 
 SLIB_RENDER_NAMESPACE_BEGIN
 
-class RenderCanvasStatus;
+class RenderCanvasState;
 class RenderCanvasProgram;
 class RenderCanvasProgramParam;
 
@@ -81,6 +81,18 @@ public:
 	void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& pen, const Ref<Brush>& brush);
 	
 	
+	void drawTexture(const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, const DrawParam& param, const Color4f& color);
+	
+	void drawTexture(const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, const DrawParam& param);
+	
+	void drawTexture(const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, sl_real alpha = 1);
+	
+	void drawTexture(const Matrix3& transform, const Ref<Texture>& texture, const DrawParam& param, const Color4f& color);
+	
+	void drawTexture(const Matrix3& transform, const Ref<Texture>& texture, const DrawParam& param);
+	
+	void drawTexture(const Matrix3& transform, const Ref<Texture>& texture, sl_real alpha = 1);
+	
 	void drawTexture(const Rectangle& rectDst, const Ref<Texture>& texture, const Rectangle& rectSrc, const DrawParam& param, const Color4f& color);
 
 	void drawTexture(const Rectangle& rectDst, const Ref<Texture>& texture, const Rectangle& rectSrc, const DrawParam& param);
@@ -114,8 +126,8 @@ protected:
 	sl_real m_width;
 	sl_real m_height;
 	Matrix3 m_matViewport;
-	Ref<RenderCanvasStatus> m_status;
-	Stack< Ref<RenderCanvasStatus> > m_stackStatus;
+	Ref<RenderCanvasState> m_state;
+	Stack< Ref<RenderCanvasState> > m_stackStates;
 	
 };
 

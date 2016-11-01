@@ -736,6 +736,7 @@ class _ViewPagePopupBackground : public ViewGroup
 {
 	SLIB_DECLARE_OBJECT
 };
+
 SLIB_DEFINE_OBJECT(_ViewPagePopupBackground, ViewGroup)
 
 void ViewPage::_openPopup(Ref<View> parent, Transition transition, sl_bool flagFillParentBackground)
@@ -749,7 +750,7 @@ void ViewPage::_openPopup(Ref<View> parent, Transition transition, sl_bool flagF
 		if (color.isZero()) {
 			color = getGlobalPopupBackgroundColor();
 		}
-		back->setBackgroundColor(Color(0, 0, 0, 100));
+		back->setBackgroundColor(color);
 		back->setWidthFilling(1, UIUpdateMode::Init);
 		back->setHeightFilling(1, UIUpdateMode::Init);
 		back->addChild(this, UIUpdateMode::Init);
@@ -920,7 +921,7 @@ TransitionType _g_viewPage_globalClosingPopupTransitionType = TransitionType::Fa
 TransitionDirection _g_viewPage_globalClosingPopupTransitionDirection = TransitionDirection::FromTopToBottom;
 float _g_viewPage_globalClosingPopupTransitionDuration = 0.3f;
 AnimationCurve _g_viewPage_globalClosingPopupTransitionCurve = AnimationCurve::Linear;
-SLIB_STATIC_COLOR(_g_viewPage_globalPopupBackgroundColor, 0, 0, 0, 80)
+SLIB_STATIC_COLOR(_g_viewPage_globalPopupBackgroundColor, 0, 0, 0, 120)
 
 TransitionType ViewPage::getGlobalOpeningPopupTransitionType()
 {

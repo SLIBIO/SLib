@@ -952,8 +952,14 @@ void TreeView::_makeLayoutItem(TreeViewItem* item, sl_ui_pos& top, sl_ui_pos lef
 
 void TreeView::_calcTextHeight(Canvas* canvas)
 {
-	sl_ui_pos height = (sl_ui_pos)(canvas->getTextSize(getFont(), "|").y);
-	if (height < 0) {
+	Ref<Font> font = getFont();
+	sl_ui_pos height;
+	if (font.isNotNull()) {
+		height = (sl_ui_pos)(font->getFontHeight());
+		if (height < 0) {
+			height = 0;
+		}
+	} else {
 		height = 0;
 	}
 	m_layoutTextHeight = height;

@@ -89,7 +89,7 @@ public:
 	
 	static sl_bool checkMiddleButtonPressed();
 	
-	static String getStatusDescription();
+	static String getStatesDescription();
 	
 	
 	// HID related functions

@@ -167,7 +167,7 @@ public:
 								trans.c = 0;
 								trans.d = -1;
 								trans.tx = x;
-								trans.ty = y + leading + ascend;
+								trans.ty = y + ascend;
 								CGContextSetTextMatrix(m_graphics, trans);
 								CTLineDraw(line, m_graphics);
 								CFRelease(line);

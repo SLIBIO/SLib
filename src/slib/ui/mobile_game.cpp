@@ -9,7 +9,7 @@ MobileGame::MobileGame()
 	SLIB_REFERABLE_CONSTRUCTOR
 	
 	m_gameView = new MobileGameView;
-	
+
 	m_contentView->removeAllChildren(UIUpdateMode::Init);
 	m_contentView->addChild(m_gameView, UIUpdateMode::Init);
 	m_contentView = m_gameView;

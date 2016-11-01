@@ -523,7 +523,7 @@ static void _Win32_DrawViewRegion(Gdiplus::Graphics* graphics, View* view, RECT&
 	sl_uint32 heightRedraw = (sl_uint32)(rcPaint.bottom - rcPaint.top);
 	Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::Bitmap, graphics, widthRedraw, heightRedraw, sl_false);
 	if (canvas.isNotNull()) {
-		CanvasStatusScope scope(canvas);
+		CanvasStateScope scope(canvas);
 		canvas->translate(-(sl_real)(rcPaint.left), -(sl_real)(rcPaint.top));
 		canvas->setInvalidatedRect(Rectangle((sl_real)(rcPaint.left), (sl_real)(rcPaint.top), (sl_real)(rcPaint.right), (sl_real)(rcPaint.bottom)));
 		_Win32_DrawView(canvas.ptr, view);

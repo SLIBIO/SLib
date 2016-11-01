@@ -740,21 +740,21 @@ void Canvas::_setAntiAlias(sl_bool flag)
 {
 }
 
-CanvasStatusScope::CanvasStatusScope()
+CanvasStateScope::CanvasStateScope()
 {
 }
 
-CanvasStatusScope::CanvasStatusScope(const Ref<Canvas>& canvas)
+CanvasStateScope::CanvasStateScope(const Ref<Canvas>& canvas)
 {
 	save(canvas);
 }
 
-CanvasStatusScope::~CanvasStatusScope()
+CanvasStateScope::~CanvasStateScope()
 {
 	restore();
 }
 
-void CanvasStatusScope::save(const Ref<Canvas>& canvas)
+void CanvasStateScope::save(const Ref<Canvas>& canvas)
 {
 	restore();
 	if (canvas.isNotNull()) {
@@ -763,7 +763,7 @@ void CanvasStatusScope::save(const Ref<Canvas>& canvas)
 	m_canvas = canvas;
 }
 
-void CanvasStatusScope::restore()
+void CanvasStateScope::restore()
 {
 	Ref<Canvas> canvas = m_canvas;
 	if (canvas.isNotNull()) {
@@ -772,7 +772,7 @@ void CanvasStatusScope::restore()
 	}
 }
 
-Ref<Canvas> CanvasStatusScope::getCanvas()
+Ref<Canvas> CanvasStateScope::getCanvas()
 {
 	return m_canvas;
 }

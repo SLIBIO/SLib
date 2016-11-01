@@ -87,6 +87,33 @@ sl_bool Font::isUnderline()
 	return m_desc.flagUnderline;
 }
 
+sl_real Font::getFontHeight()
+{
+	FontMetrics fm;
+	if (getFontMetrics(fm)) {
+		return fm.ascent + fm.descent;
+	}
+	return 0;
+}
+
+sl_real Font::getFontAscent()
+{
+	FontMetrics fm;
+	if (getFontMetrics(fm)) {
+		return fm.ascent;
+	}
+	return 0;
+}
+
+sl_real Font::getFontDescent()
+{
+	FontMetrics fm;
+	if (getFontMetrics(fm)) {
+		return fm.descent;
+	}
+	return 0;
+}
+
 Ref<Referable> Font::getPlatformObject()
 {
 	return m_platformObject;

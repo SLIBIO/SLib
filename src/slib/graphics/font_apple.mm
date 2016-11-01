@@ -49,6 +49,17 @@ Size Font::getTextSize(const String& text)
 	return ret;
 }
 
+sl_bool Font::getFontMetrics(FontMetrics& _out)
+{
+	CTFontRef handle = GraphicsPlatform::getCoreTextFont(this);
+	if (!handle) {
+		return sl_false;
+	}
+	_out.ascent = CTFontGetAscent(handle);
+	_out.descent = CTFontGetDescent(handle);
+	_out.leading = CTFontGetLeading(handle);
+	return sl_true;
+}
 
 class _Apple_FontObject : public Referable
 {

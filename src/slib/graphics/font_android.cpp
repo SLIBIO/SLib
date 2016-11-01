@@ -12,9 +12,16 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidPointF, "android/graphics/PointF")
 	SLIB_JNI_FLOAT_FIELD(y);
 SLIB_JNI_END_CLASS
 
+SLIB_JNI_BEGIN_CLASS(_JAndroidFontMetrics, "android/graphics/Paint$FontMetrics")
+	SLIB_JNI_FLOAT_FIELD(ascent);
+	SLIB_JNI_FLOAT_FIELD(descent);
+	SLIB_JNI_FLOAT_FIELD(leading);
+SLIB_JNI_END_CLASS
+
 SLIB_JNI_BEGIN_CLASS(_JAndroidFont, "slib/platform/android/ui/UiFont")
 	SLIB_JNI_STATIC_METHOD(create, "create", "(Ljava/lang/String;FI)Lslib/platform/android/ui/UiFont;");
 	SLIB_JNI_METHOD(getTextSize, "getTextSize", "(Ljava/lang/String;)Landroid/graphics/PointF;");
+	SLIB_JNI_METHOD(getFontMetrics, "getFontMetrics", "()Landroid/graphics/Paint$FontMetrics;");
 SLIB_JNI_END_CLASS
 
 
@@ -30,6 +37,21 @@ Size Font::getTextSize(const String& text)
 		return ret;
 	}
 	return Size::zero();
+}
+
+sl_bool Font::getFontMetrics(FontMetrics& _out)
+{
+	jobject font = GraphicsPlatform::getNativeFont(this);
+	if (font) {
+		JniLocal<jobject> fm = _JAndroidFont::getFontMetrics.callObject(font);
+		if (fm.isNotNull()) {
+			_out.ascent = -(_JAndroidFontMetrics::ascent.get(fm.get()));
+			_out.descent = _JAndroidFontMetrics::descent.get(fm.get());
+			_out.leading = _JAndroidFontMetrics::leading.get(fm.get());
+			return sl_true;
+		}
+	}
+	return sl_false;
 }
 
 class _Android_FontObject : public Referable
