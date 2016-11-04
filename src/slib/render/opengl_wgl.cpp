@@ -1,8 +1,9 @@
-#include "../../../inc/slib/render/opengl.h"
+#include "../../../inc/slib/render/opengl_wgl.h"
 
 #if defined(SLIB_RENDER_SUPPORT_OPENGL_WGL) && defined(SLIB_PLATFORM_IS_WIN32)
 
 #include "../../../inc/slib/render/engine.h"
+#include "../../../inc/slib/render/opengl.h"
 #include "../../../inc/slib/core/log.h"
 #include "../../../inc/slib/core/thread.h"
 #include "../../../inc/slib/core/platform_windows.h"

@@ -96,7 +96,6 @@
 		266DD3EC1C1181B500D47AB0 /* socket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3D31C1181B500D47AB0 /* socket.cpp */; };
 		266DD3ED1C1181B500D47AB0 /* tcpip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3D41C1181B500D47AB0 /* tcpip.cpp */; };
 		266DD3FE1C118B9900D47AB0 /* index_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3EE1C118B9900D47AB0 /* index_buffer.cpp */; };
-		266DD3FF1C118B9900D47AB0 /* opengl_egl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3EF1C118B9900D47AB0 /* opengl_egl.cpp */; };
 		266DD4001C118B9900D47AB0 /* opengl_gl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3F11C118B9900D47AB0 /* opengl_gl.cpp */; };
 		266DD4011C118B9900D47AB0 /* opengl_gles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3F31C118B9900D47AB0 /* opengl_gles.cpp */; };
 		266DD4031C118B9900D47AB0 /* render_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3F71C118B9900D47AB0 /* render_base.cpp */; };
@@ -343,8 +342,6 @@
 		266DD3D31C1181B500D47AB0 /* socket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = socket.cpp; sourceTree = "<group>"; };
 		266DD3D41C1181B500D47AB0 /* tcpip.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tcpip.cpp; sourceTree = "<group>"; };
 		266DD3EE1C118B9900D47AB0 /* index_buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = index_buffer.cpp; sourceTree = "<group>"; };
-		266DD3EF1C118B9900D47AB0 /* opengl_egl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = opengl_egl.cpp; sourceTree = "<group>"; };
-		266DD3F01C118B9900D47AB0 /* opengl_egl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opengl_egl.h; sourceTree = "<group>"; };
 		266DD3F11C118B9900D47AB0 /* opengl_gl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = opengl_gl.cpp; sourceTree = "<group>"; };
 		266DD3F21C118B9900D47AB0 /* opengl_gl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opengl_gl.h; sourceTree = "<group>"; };
 		266DD3F31C118B9900D47AB0 /* opengl_gles.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = opengl_gles.cpp; sourceTree = "<group>"; };
@@ -785,8 +782,6 @@
 			isa = PBXGroup;
 			children = (
 				266DD3EE1C118B9900D47AB0 /* index_buffer.cpp */,
-				266DD3EF1C118B9900D47AB0 /* opengl_egl.cpp */,
-				266DD3F01C118B9900D47AB0 /* opengl_egl.h */,
 				266DD3F11C118B9900D47AB0 /* opengl_gl.cpp */,
 				266DD3F21C118B9900D47AB0 /* opengl_gl.h */,
 				266DD3F31C118B9900D47AB0 /* opengl_gles.cpp */,
@@ -1076,7 +1071,6 @@
 				266DD4041C118B9900D47AB0 /* render_engine.cpp in Sources */,
 				A25F2F461B039EF600854DAF /* log.cpp in Sources */,
 				266DD3E91C1181B500D47AB0 /* socket_event_unix.cpp in Sources */,
-				266DD3FF1C118B9900D47AB0 /* opengl_egl.cpp in Sources */,
 				26B571821C9D45A80099E69B /* yuv.cpp in Sources */,
 				A25F2F511B039EF600854DAF /* spinlock.cpp in Sources */,
 				266DD4541C1191FE00D47AB0 /* web_view_ios.mm in Sources */,

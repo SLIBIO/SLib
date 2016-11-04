@@ -87,6 +87,7 @@ protected:
 	sl_bool m_flagFreeOnRelease;
 	
 };
+
 SLIB_UI_NAMESPACE_END
 
 @interface Slib_iOS_ViewHandle : UIView {
@@ -119,7 +120,7 @@ SLIB_UI_NAMESPACE_END
 #define IOS_VIEW_EVENTS \
 - (BOOL)canBecomeFirstResponder \
 { \
-	return TRUE; \
+	return NO; \
 } \
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)theEvent \
 { \

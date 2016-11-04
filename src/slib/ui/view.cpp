@@ -645,7 +645,7 @@ Ref<View> View::getChildById(const String& _id)
 
 Ref<View> View::getRootView()
 {
-	Ref<View> parent = getParent();
+	Ref<View> parent = m_parent;
 	if (parent.isNotNull()) {
 		return parent->getRootView();
 	}
@@ -655,6 +655,32 @@ Ref<View> View::getRootView()
 sl_bool View::isRootView()
 {
 	return m_parent.isNull();
+}
+
+Ref<View> View::getInstanceView()
+{
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		return this;
+	}
+	Ref<View> parent = m_parent;
+	if (parent.isNotNull()) {
+		return parent->getInstanceView();
+	}
+	return Ref<View>::null();
+}
+
+Ref<ViewInstance> View::getInstanceViewInstance()
+{
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		return instance;
+	}
+	Ref<View> parent = m_parent;
+	if (parent.isNotNull()) {
+		return parent->getInstanceViewInstance();
+	}
+	return Ref<ViewInstance>::null();
 }
 
 void View::removeFromParent()
@@ -1266,7 +1292,7 @@ void View::setFocus(sl_bool flagFocused, UIUpdateMode mode)
 {
 	m_flagFocused = flagFocused;
 	if (flagFocused) {
-		Ref<ViewInstance> instance = m_instance;
+		Ref<ViewInstance> instance = getInstanceViewInstance();
 		if (instance.isNotNull()) {
 			instance->setFocus();
 		}

@@ -3,6 +3,8 @@ This file is only for internal use in the engine.
 Don't include this file directly from your own source
 */
 
+#include "opengl_engine.h"
+
 SLIB_RENDER_NAMESPACE_BEGIN
 
 class GLRenderEngine;

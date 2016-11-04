@@ -1,10 +1,11 @@
-#include "../../../inc/slib/render/opengl.h"
+#include "../../../inc/slib/render/opengl_egl.h"
 
 #if defined(SLIB_RENDER_SUPPORT_OPENGL_EGL)
 
-#include "opengl_egl.h"
+#include "opengl_egl_entries.h"
 
 #include "../../../inc/slib/render/engine.h"
+#include "../../../inc/slib/render/opengl.h"
 #include "../../../inc/slib/core/thread.h"
 #include "../../../inc/slib/core/platform_windows.h"
 #include "../../../inc/slib/core/log.h"

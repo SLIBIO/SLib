@@ -113,6 +113,10 @@ public:
 	
 	sl_bool isRootView();
 	
+	Ref<View> getInstanceView();
+	
+	Ref<ViewInstance> getInstanceViewInstance();
+	
 	void removeFromParent();
 	
 	void attachChild(const Ref<View>& child);

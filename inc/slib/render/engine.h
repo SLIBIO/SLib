@@ -231,54 +231,54 @@ public:
 	// Position(0, 0, 1, 1)
 	void drawRectangle2D();
 	
-	void drawRectangle2D(const Ref<RenderProgram2D>& program, const Matrix3& transform, const Color4f& color);
+	void drawRectangle2D(const Ref<RenderProgram2D_Position>& program, const Matrix3& transform, const Color4f& color);
 	
 	void drawRectangle2D(const Matrix3& transform, const Color4f& color);
 	
-	void drawRectangle2D(const Ref<RenderProgram2D>& program, const Rectangle& rectDst, const Color4f& color);
+	void drawRectangle2D(const Ref<RenderProgram2D_Position>& program, const Rectangle& rectDst, const Color4f& color);
 	
 	void drawRectangle2D(const Rectangle& rectDst, const Color4f& color);
 
 	// Position(0, 0, 1, 1) TexCoord(0, 0, 1, 1)
 	void drawTexture2D();
 	
-	void drawTexture2D(const Ref<RenderProgram2D>& program, const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, const Color4f& color);
+	void drawTexture2D(const Ref<RenderProgram2D_PositionTexture>& program, const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, const Color4f& color);
 
 	void drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, const Color4f& color);
 	
-	void drawTexture2D(const Ref<RenderProgram2D>& program, const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, sl_real alpha = 1);
+	void drawTexture2D(const Ref<RenderProgram2D_PositionTexture>& program, const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, sl_real alpha = 1);
 	
 	void drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, sl_real alpha = 1);
 	
-	void drawTexture2D(const Ref<RenderProgram2D>& program, const Matrix3& transform, const Ref<Texture>& texture, const Color4f& color);
+	void drawTexture2D(const Ref<RenderProgram2D_PositionTexture>& program, const Matrix3& transform, const Ref<Texture>& texture, const Color4f& color);
 	
 	void drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, const Color4f& color);
 	
-	void drawTexture2D(const Ref<RenderProgram2D>& program, const Matrix3& transform, const Ref<Texture>& texture, sl_real alpha = 1);
+	void drawTexture2D(const Ref<RenderProgram2D_PositionTexture>& program, const Matrix3& transform, const Ref<Texture>& texture, sl_real alpha = 1);
 
 	void drawTexture2D(const Matrix3& transform, const Ref<Texture>& texture, sl_real alpha = 1);
 	
-	void drawTexture2D(const Ref<RenderProgram2D>& program, const Rectangle& rectDst, const Ref<Texture>& texture, const Rectangle& rectSrc, const Color4f& color);
+	void drawTexture2D(const Ref<RenderProgram2D_PositionTexture>& program, const Rectangle& rectDst, const Ref<Texture>& texture, const Rectangle& rectSrc, const Color4f& color);
 	
 	void drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& texture, const Rectangle& rectSrc, const Color4f& color);
 	
-	void drawTexture2D(const Ref<RenderProgram2D>& program, const Rectangle& rectDst, const Ref<Texture>& texture, const Rectangle& rectSrc, sl_real alpha = 1);
+	void drawTexture2D(const Ref<RenderProgram2D_PositionTexture>& program, const Rectangle& rectDst, const Ref<Texture>& texture, const Rectangle& rectSrc, sl_real alpha = 1);
 
 	void drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& texture, const Rectangle& rectSrc, sl_real alpha = 1);
 	
-	void drawTexture2D(const Ref<RenderProgram2D>& program, const Rectangle& rectDst, const Ref<Texture>& texture, const Color4f& color);
+	void drawTexture2D(const Ref<RenderProgram2D_PositionTexture>& program, const Rectangle& rectDst, const Ref<Texture>& texture, const Color4f& color);
 	
 	void drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& texture, const Color4f& color);
 	
-	void drawTexture2D(const Ref<RenderProgram2D>& program, const Rectangle& rectDst, const Ref<Texture>& texture, sl_real alpha = 1);
+	void drawTexture2D(const Ref<RenderProgram2D_PositionTexture>& program, const Rectangle& rectDst, const Ref<Texture>& texture, sl_real alpha = 1);
 	
 	void drawTexture2D(const Rectangle& rectDst, const Ref<Texture>& texture, sl_real alpha = 1);
 	
-	void drawLines(const Ref<RenderProgram2D>& program, LineSegment* lines, sl_uint32 n, const Color4f& color);
+	void drawLines(const Ref<RenderProgram2D_Position>& program, LineSegment* lines, sl_uint32 n, const Color4f& color);
 	
 	void drawLines(LineSegment* lines, sl_uint32 n, const Color4f& color);
 	
-	void drawLines(const Ref<RenderProgram3D>& program, Line3* lines, sl_uint32 n, const Color4f& color);
+	void drawLines(const Ref<RenderProgram3D_Position>& program, Line3* lines, sl_uint32 n, const Color4f& color);
 	
 	void drawLines(Line3* lines, sl_uint32 n, const Color4f& color);
 	
@@ -310,15 +310,15 @@ public:
 	
 	Ref<VertexBuffer> getDefaultVertexBufferForDrawRectangle2D();
 	
-	Ref<RenderProgram2D> getDefaultRenderProgramForDrawRectangle2D();
+	Ref<RenderProgram2D_Position> getDefaultRenderProgramForDrawRectangle2D();
 	
 	Ref<VertexBuffer> getDefaultVertexBufferForDrawTexture2D();
 	
-	Ref<RenderProgram2D> getDefaultRenderProgramForDrawTexture2D();
+	Ref<RenderProgram2D_PositionTexture> getDefaultRenderProgramForDrawTexture2D();
 	
-	Ref<RenderProgram2D> getDefaultRenderProgramForDrawLine2D();
+	Ref<RenderProgram2D_Position> getDefaultRenderProgramForDrawLine2D();
 	
-	Ref<RenderProgram3D> getDefaultRenderProgramForDrawLine3D();
+	Ref<RenderProgram3D_Position> getDefaultRenderProgramForDrawLine3D();
 	
 protected:
 	virtual Ref<RenderProgramInstance> _createProgramInstance(RenderProgram* program) = 0;
@@ -368,13 +368,13 @@ protected:
 	Ref<Font> m_fontDebug;
 
 	SafeRef<VertexBuffer> m_defaultVertexBufferForDrawRectangle2D;
-	SafeRef<RenderProgram2D> m_defaultRenderProgramForDrawRectangle2D;
+	SafeRef<RenderProgram2D_Position> m_defaultRenderProgramForDrawRectangle2D;
 	
 	SafeRef<VertexBuffer> m_defaultVertexBufferForDrawTexture2D;
-	SafeRef<RenderProgram2D> m_defaultRenderProgramForDrawTexture2D;
+	SafeRef<RenderProgram2D_PositionTexture> m_defaultRenderProgramForDrawTexture2D;
 	
-	SafeRef<RenderProgram2D> m_defaultRenderProgramForDrawLine2D;
-	SafeRef<RenderProgram3D> m_defaultRenderProgramForDrawLine3D;
+	SafeRef<RenderProgram2D_Position> m_defaultRenderProgramForDrawLine2D;
+	SafeRef<RenderProgram3D_Position> m_defaultRenderProgramForDrawLine3D;
 
 };
 

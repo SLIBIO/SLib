@@ -107,8 +107,6 @@
 		266DD5791C11940A00D47AB0 /* socket_event_unix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4D51C11940A00D47AB0 /* socket_event_unix.cpp */; };
 		266DD57B1C11940A00D47AB0 /* tcpip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4D71C11940A00D47AB0 /* tcpip.cpp */; };
 		266DD57C1C11940A00D47AB0 /* index_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4D91C11940A00D47AB0 /* index_buffer.cpp */; };
-		266DD57D1C11940A00D47AB0 /* opengl_egl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4DA1C11940A00D47AB0 /* opengl_egl.cpp */; };
-		266DD57E1C11940A00D47AB0 /* opengl_egl.h in Headers */ = {isa = PBXBuildFile; fileRef = 266DD4DB1C11940A00D47AB0 /* opengl_egl.h */; };
 		266DD57F1C11940A00D47AB0 /* opengl_gl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4DC1C11940A00D47AB0 /* opengl_gl.cpp */; };
 		266DD5801C11940A00D47AB0 /* opengl_gl.h in Headers */ = {isa = PBXBuildFile; fileRef = 266DD4DD1C11940A00D47AB0 /* opengl_gl.h */; };
 		266DD5811C11940A00D47AB0 /* opengl_gles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4DE1C11940A00D47AB0 /* opengl_gles.cpp */; };
@@ -355,8 +353,6 @@
 		266DD4D51C11940A00D47AB0 /* socket_event_unix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = socket_event_unix.cpp; sourceTree = "<group>"; };
 		266DD4D71C11940A00D47AB0 /* tcpip.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tcpip.cpp; sourceTree = "<group>"; };
 		266DD4D91C11940A00D47AB0 /* index_buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = index_buffer.cpp; sourceTree = "<group>"; };
-		266DD4DA1C11940A00D47AB0 /* opengl_egl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = opengl_egl.cpp; sourceTree = "<group>"; };
-		266DD4DB1C11940A00D47AB0 /* opengl_egl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opengl_egl.h; sourceTree = "<group>"; };
 		266DD4DC1C11940A00D47AB0 /* opengl_gl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = opengl_gl.cpp; sourceTree = "<group>"; };
 		266DD4DD1C11940A00D47AB0 /* opengl_gl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opengl_gl.h; sourceTree = "<group>"; };
 		266DD4DE1C11940A00D47AB0 /* opengl_gles.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = opengl_gles.cpp; sourceTree = "<group>"; };
@@ -591,8 +587,6 @@
 			isa = PBXGroup;
 			children = (
 				266DD4D91C11940A00D47AB0 /* index_buffer.cpp */,
-				266DD4DA1C11940A00D47AB0 /* opengl_egl.cpp */,
-				266DD4DB1C11940A00D47AB0 /* opengl_egl.h */,
 				266DD4DC1C11940A00D47AB0 /* opengl_gl.cpp */,
 				266DD4DD1C11940A00D47AB0 /* opengl_gl.h */,
 				266DD4DE1C11940A00D47AB0 /* opengl_gles.cpp */,
@@ -900,7 +894,6 @@
 				266DD5701C11940A00D47AB0 /* network_async_config.h in Headers */,
 				266DD5DE1C11940A00D47AB0 /* view_osx.h in Headers */,
 				266DD5831C11940A00D47AB0 /* opengl_impl.h in Headers */,
-				266DD57E1C11940A00D47AB0 /* opengl_egl.h in Headers */,
 				266DD55E1C11940A00D47AB0 /* media_platform_osx.h in Headers */,
 				A25F300E1B03A33700854DAF /* async_config.h in Headers */,
 				266DD5801C11940A00D47AB0 /* opengl_gl.h in Headers */,
@@ -1023,7 +1016,6 @@
 				266DD5D21C11940A00D47AB0 /* ui_event.cpp in Sources */,
 				266DD4641C11930800D47AB0 /* crypto_secure_stream.cpp in Sources */,
 				267C16B91CE779D8000318C2 /* scroll_bar.cpp in Sources */,
-				266DD57D1C11940A00D47AB0 /* opengl_egl.cpp in Sources */,
 				26B0AF851C13E08600CD8673 /* bitmap_data.cpp in Sources */,
 				26599DBC1BEA5DDF008659BB /* callback.cpp in Sources */,
 				266DD55D1C11940A00D47AB0 /* codec_vp8.cpp in Sources */,

@@ -391,9 +391,6 @@
     <ClInclude Include="..\..\..\src\slib\network\network_async_config.h">
       <Filter>src\slib\network</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\slib\render\opengl_egl.h">
-      <Filter>src\slib\render</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\slib\render\opengl_gl.h">
       <Filter>src\slib\render</Filter>
     </ClInclude>
@@ -747,6 +744,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\graphics\font_atlas.h">
       <Filter>inc\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\render\opengl_egl.h">
+      <Filter>inc\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\render\opengl_engine.h">
+      <Filter>inc\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\render\opengl_wgl.h">
+      <Filter>inc\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\slib\render\opengl_egl_entries.h">
+      <Filter>src\slib\render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

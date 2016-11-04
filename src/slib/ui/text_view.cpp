@@ -7,6 +7,7 @@ SLIB_DEFINE_OBJECT(TextView, View)
 TextView::TextView()
 {
 	m_flagEditable = sl_false;
+	setFocusable(sl_true);
 }
 
 sl_bool TextView::isEditable()
@@ -22,6 +23,7 @@ void TextView::setEditable(sl_bool flagEditable)
 
 void TextView::onDraw(Canvas* canvas)
 {
+	canvas->fillRectangle(getBounds(), Color::White);
 }
 
 void TextView::onMouseEvent(UIEvent* ev)

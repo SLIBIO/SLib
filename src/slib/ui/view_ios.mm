@@ -109,10 +109,6 @@ sl_bool iOS_ViewInstance::isValid()
 
 void iOS_ViewInstance::setFocus()
 {
-	UIView* handle = m_handle;
-	if (handle != nil) {
-		[handle becomeFirstResponder];
-	}
 }
 
 void iOS_ViewInstance::invalidate()
@@ -247,7 +243,13 @@ void iOS_ViewInstance::setOpaque(sl_bool flag)
 {
 	UIView* handle = m_handle;
 	if (handle != nil) {
-		[handle setOpaque:(flag?YES:NO)];
+		if (UI::isUiThread()) {
+			[handle setOpaque:(flag?YES:NO)];
+		} else {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[handle setOpaque:(flag ? YES : NO)];
+			});
+		}
 	}
 }
 
@@ -262,12 +264,6 @@ void iOS_ViewInstance::setAlpha(sl_real alpha)
 				[handle setAlpha:alpha];
 			});
 		}
-		/*
-		if (!([handle isKindOfClass:[Slib_iOS_ViewHandle class]])) {
-			[handle setAlpha:alpha];
-		}
-		invalidate();
-		*/
 	}
 }
 
@@ -344,8 +340,15 @@ void iOS_ViewInstance::bringToFront()
 	if (handle != nil) {
 		UIView* parent = handle.superview;
 		if (parent != nil) {
-			[parent bringSubviewToFront:handle];
-			invalidate();
+			if (UI::isUiThread()) {
+				[parent bringSubviewToFront:handle];
+				[handle setNeedsDisplay];
+			} else {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[parent bringSubviewToFront:handle];
+					[handle setNeedsDisplay];
+				});
+			}
 		}
 	}
 }
@@ -471,7 +474,6 @@ SLIB_UI_NAMESPACE_END
 IOS_VIEW_EVENTS
 
 @end
-
 
 /******************************************
 			UIPlatform

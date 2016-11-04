@@ -59,42 +59,22 @@ public:
 	
 };
 
-class RenderCanvasProgramState : public RenderProgramState
-{
-public:
-	Matrix3 transform;
-	Color4f color;
-	SafeRef<Texture> texture;
-	Vector4 colorFilterR;
-	Vector4 colorFilterG;
-	Vector4 colorFilterB;
-	Vector4 colorFilterA;
-	Vector4 colorFilterC;
-	Rectangle rectSrc;
-	Matrix3 clipTransforms[MAX_SHADER_CLIP];
-	Vector4 clipRects[MAX_SHADER_CLIP];
-	
-	sl_int32 gl_uniformTransform;		// Matrix3
-	sl_int32 gl_uniformColor;			// Vector4
-	sl_int32 gl_uniformTexture;			// samplers
-	sl_int32 gl_uniformColorFilterR;	// Vector4
-	sl_int32 gl_uniformColorFilterG;	// Vector4
-	sl_int32 gl_uniformColorFilterB;	// Vector4
-	sl_int32 gl_uniformColorFilterA;	// Vector4
-	sl_int32 gl_uniformColorFilterC;	// Vector4
-	sl_int32 gl_uniformRectSrc;			// Vector4
-	sl_int32 gl_uniformClipTransforms[MAX_SHADER_CLIP];	// Matrix3
-	sl_int32 gl_uniformClipRects[MAX_SHADER_CLIP];		// Vector4
-	
-	sl_int32 gl_attrPosition;		// Vector2
-	
-public:
-	RenderCanvasProgramState()
-	: transform(Matrix3::identity()), color(1, 1, 1, 1)
-	{
-	}
-	
-};
+
+SLIB_RENDER_PROGRAM_STATE_BEGIN(RenderCanvasProgramState, RenderVertex2D_Position)
+	SLIB_RENDER_PROGRAM_STATE_UNIFORM_MATRIX3(Transform, u_Transform)
+	SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(Color, u_Color)
+	SLIB_RENDER_PROGRAM_STATE_UNIFORM_TEXTURE(Texture, u_Texture)
+	SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(ColorFilterR, u_ColorFilterR)
+	SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(ColorFilterG, u_ColorFilterG)
+	SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(ColorFilterB, u_ColorFilterB)
+	SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(ColorFilterA, u_ColorFilterA)
+	SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(ColorFilterC, u_ColorFilterC)
+	SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(RectSrc, u_RectSrc)
+	SLIB_RENDER_PROGRAM_STATE_UNIFORM_MATRIX3_ARRAY(ClipTransform, u_ClipTransform)
+	SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4_ARRAY(ClipRect, u_ClipRect)
+
+	SLIB_RENDER_PROGRAM_STATE_ATTRIBUTE_FLOAT(position, a_Position)
+SLIB_RENDER_PROGRAM_STATE_END
 
 class RenderCanvasProgramParam
 {
@@ -136,11 +116,11 @@ public:
 	{
 		for (sl_uint32 i = 0; i < countClips; i++) {
 			Rectangle& r = clips[i]->region;
-			state->clipRects[i] = Vector4(r.left, r.top, r.right, r.bottom);
+			state->setClipRect(i, Vector4(r.left, r.top, r.right, r.bottom));
 			if (clips[i]->flagTransform) {
-				state->clipTransforms[i] = transform * clips[i]->transform;
+				state->setClipTransform(i, transform * clips[i]->transform);
 			} else {
-				state->clipTransforms[i] = transform;
+				state->setClipTransform(i, transform);
 			}
 		}
 	}
@@ -150,128 +130,13 @@ private:
 	
 };
 
-class RenderCanvasProgram : public RenderProgramT<RenderProgram, RenderCanvasProgramState>
+class RenderCanvasProgram : public RenderProgramT<RenderCanvasProgramState>
 {
 public:
-	struct VertexData
-	{
-		Vector2 position;
-	};
-	
-public:
-	sl_bool m_flagUseTexture;
-	sl_bool m_flagUseRectClip;
-	sl_bool m_flagUseColorFilter;
-	sl_uint32 m_countClips;
-	
 	String m_vertexShader;
 	String m_fragmentShader;
 	
 public:
-	RenderCanvasProgram()
-	{
-		m_flagUseTexture = sl_false;
-		m_flagUseRectClip = sl_false;
-		m_flagUseColorFilter = sl_false;
-		m_countClips = 0;
-	}
-	
-public:
-	// override
-	sl_bool onInit(RenderEngine* _engine, RenderProgramState* _state)
-	{
-		RenderEngineType type = _engine->getEngineType();
-		
-		if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
-			
-			GLRenderEngine* engine = (GLRenderEngine*)_engine;
-			RenderCanvasProgramState* state = (RenderCanvasProgramState*)_state;
-			
-			sl_uint32 program = state->gl_program;
-			state->gl_attrPosition = engine->getAttributeLocation(program, "a_Position");
-			
-			state->gl_uniformTransform = engine->getUniformLocation(program, "u_Transform");
-			state->gl_uniformColor = engine->getUniformLocation(program, "u_Color");
-			if (m_flagUseTexture) {
-				state->gl_uniformRectSrc = engine->getUniformLocation(program, "u_RectSrc");
-				state->gl_uniformTexture = engine->getUniformLocation(program, "u_Texture");
-			}
-			if (m_flagUseColorFilter) {
-				state->gl_uniformColorFilterR = engine->getUniformLocation(program, "u_ColorFilterR");
-				state->gl_uniformColorFilterG = engine->getUniformLocation(program, "u_ColorFilterG");
-				state->gl_uniformColorFilterB = engine->getUniformLocation(program, "u_ColorFilterB");
-				state->gl_uniformColorFilterA = engine->getUniformLocation(program, "u_ColorFilterA");
-				state->gl_uniformColorFilterC = engine->getUniformLocation(program, "u_ColorFilterC");
-			}
-			for (sl_uint32 i = 0; i < m_countClips; i++) {
-				state->gl_uniformClipRects[i] = engine->getUniformLocation(program, String::format("u_ClipRect%d", i));
-				state->gl_uniformClipTransforms[i] = engine->getUniformLocation(program, String::format("u_ClipTransform%d", i));
-			}
-			
-			return sl_true;
-		}
-		return sl_false;
-	}
-	
-	// override
-	sl_bool onUpdate(RenderEngine* _engine, RenderProgramState* _state)
-	{
-		RenderEngineType type = _engine->getEngineType();
-		
-		if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
-			
-			GLRenderEngine* engine = (GLRenderEngine*)_engine;
-			RenderCanvasProgramState* state = (RenderCanvasProgramState*)_state;
-
-			engine->setUniformMatrix3Value(state->gl_uniformTransform, state->transform);
-			engine->setUniformFloat4Value(state->gl_uniformColor, state->color);
-			if (m_flagUseTexture) {
-				engine->setUniformFloat4Value(state->gl_uniformRectSrc, Vector4(state->rectSrc.left, state->rectSrc.top, state->rectSrc.getWidth(), state->rectSrc.getHeight()));
-				engine->setUniformTextureSampler(state->gl_uniformTexture, 0);
-				engine->applyTexture(0, state->texture);
-			}
-			if (m_flagUseColorFilter) {
-				engine->setUniformFloat4Value(state->gl_uniformColorFilterR, state->colorFilterR);
-				engine->setUniformFloat4Value(state->gl_uniformColorFilterG, state->colorFilterG);
-				engine->setUniformFloat4Value(state->gl_uniformColorFilterB, state->colorFilterB);
-				engine->setUniformFloat4Value(state->gl_uniformColorFilterA, state->colorFilterA);
-				engine->setUniformFloat4Value(state->gl_uniformColorFilterC, state->colorFilterC);
-			}
-			for (sl_uint32 i = 0; i < m_countClips; i++) {
-				engine->setUniformFloat4Value(state->gl_uniformClipRects[i], state->clipRects[i]);
-				engine->setUniformMatrix3Value(state->gl_uniformClipTransforms[i], state->clipTransforms[i]);
-			}
-			
-			return sl_true;
-		}
-		
-		return sl_false;
-	}
-	
-	// override
-	sl_bool onPreRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
-	{
-		RenderEngineType type = _engine->getEngineType();
-		if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
-			GLRenderEngine* engine = (GLRenderEngine*)_engine;
-			RenderCanvasProgramState* state = (RenderCanvasProgramState*)_state;
-			SLIB_RENDER_GL_SET_VERTEX_FLOAT_ARRAY_ATTRIBUTE(engine, state->gl_attrPosition, VertexData, position);
-			return sl_true;
-		}
-		return sl_false;
-	}
-	
-	// override
-	void onPostRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
-	{
-		RenderEngineType type = _engine->getEngineType();
-		if (type == RenderEngineType::OpenGL_ES || type == RenderEngineType::OpenGL) {
-			GLRenderEngine* engine = (GLRenderEngine*)_engine;
-			RenderCanvasProgramState* state = (RenderCanvasProgramState*)_state;
-			engine->disableVertexArrayAttribute(state->gl_attrPosition);
-		}
-	}
-
 	// override
 	String getGLSLVertexShader(RenderEngine* engine)
 	{
@@ -311,30 +176,33 @@ public:
 			bufFBContent.add("void main() {");
 		}
 		
-		for (sl_uint32 i = 0; i < param.countClips; i++) {
-			if (signatures) {
-				SLIB_STATIC_STRING(s, "C");
-				signatures->add(s);
-			}
+		if (param.countClips > 0) {
 			if (bufVertexShader) {
-				RenderCanvasClip& clip = *(param.clips[i]);
 				bufVBHeader.add(String::format(SLIB_STRINGIFY(
-					varying vec2 v_ClipPos%d;
-					uniform mat3 u_ClipTransform%d;
-				), i));
-				bufVBContent.add(String::format(SLIB_STRINGIFY(
-					v_ClipPos%d = (vec3(a_Position, 1.0) * u_ClipTransform%d).xy;
-				), i));
+					varying vec2 v_ClipPos[%d];
+					uniform mat3 u_ClipTransform[%d];
+				), param.countClips));
 				bufFBHeader.add(String::format(SLIB_STRINGIFY(
-					varying vec2 v_ClipPos%d;
-					uniform vec4 u_ClipRect%d;
-				), i));
-				bufFBContent.add(String::format(SLIB_STRINGIFY(
-					float fClip%d = step(u_ClipRect%d.x, v_ClipPos%d.x) * step(u_ClipRect%d.y, v_ClipPos%d.y) * step(v_ClipPos%d.x, u_ClipRect%d.z) * step(v_ClipPos%d.y, u_ClipRect%d.w);
-					if (fClip%d < 0.5) {
-						discard;
-					}
-				), i));
+					varying vec2 v_ClipPos[%d];
+					uniform vec4 u_ClipRect[%d];
+				), param.countClips));
+			}
+			for (sl_uint32 i = 0; i < param.countClips; i++) {
+				if (signatures) {
+					SLIB_STATIC_STRING(s, "C");
+					signatures->add(s);
+				}
+				if (bufVertexShader) {
+					bufVBContent.add(String::format(SLIB_STRINGIFY(
+						v_ClipPos[%d] = (vec3(a_Position, 1.0) * u_ClipTransform[%d]).xy;
+					), i));
+					bufFBContent.add(String::format(SLIB_STRINGIFY(
+						float fClip%d = step(u_ClipRect[%d].x, v_ClipPos[%d].x) * step(u_ClipRect[%d].y, v_ClipPos[%d].y) * step(v_ClipPos[%d].x, u_ClipRect[%d].z) * step(v_ClipPos[%d].y, u_ClipRect[%d].w);
+						if (fClip%d < 0.5) {
+							discard;
+						}
+					), i));
+				}
 			}
 		}
 		
@@ -418,9 +286,6 @@ public:
 			if (ret.isNotNull()) {
 				ret->m_vertexShader = vertexShader;
 				ret->m_fragmentShader = fragmentShader;
-				ret->m_countClips = param.countClips;
-				ret->m_flagUseTexture = param.flagUseTexture;
-				ret->m_flagUseColorFilter = param.flagUseColorFilter;
 				return ret;
 			}
 		}
@@ -438,7 +303,7 @@ public:
 public:
 	_RenderCanvas_Shared()
 	{
-		static RenderProgram2D_Position::VertexData v[] = {
+		static RenderVertex2D_Position v[] = {
 			{ { 0, 0 } }
 			, { { 1, 0 } }
 			, { { 0, 1 } }
@@ -730,15 +595,17 @@ void RenderCanvas::drawRectangle(const Rectangle& _rect, const Ref<Pen>& pen, co
 		
 		RenderProgramScope<RenderCanvasProgramState> scope;
 		if (scope.begin(m_engine.ptr, shared->getProgram(pp))) {
-			Matrix3& mat = scope->transform;
+			Matrix3 mat;
 			mat.m00 = rect.getWidth(); mat.m10 = 0; mat.m20 = rect.left;
-			mat.m10 = 0; mat.m11 = rect.getHeight(); mat.m21 = rect.top;
-			mat.m20 = 0; mat.m21 = 0; mat.m22 = 1;
+			mat.m01 = 0; mat.m11 = rect.getHeight(); mat.m21 = rect.top;
+			mat.m02 = 0; mat.m12 = 0; mat.m22 = 1;
 			pp.applyToProgramState(scope.getState(), mat);
 			mat *= state->matrix;
 			mat *= m_matViewport;
-			scope->color = brush->getColor();
-			scope->color.w *= getAlpha();
+			scope->setTransform(mat);
+			Color4f color = brush->getColor();
+			color.w *= getAlpha();
+			scope->setColor(color);
 			m_engine->drawPrimitive(4, shared->vbRectangle, PrimitiveType::TriangleStrip);
 		}
 	}
@@ -795,20 +662,20 @@ void RenderCanvas::drawTexture(const Matrix3& transform, const Ref<Texture>& tex
 	RenderProgramScope<RenderCanvasProgramState> scope;
 	if (scope.begin(m_engine.ptr, shared->getProgram(pp))) {
 		pp.applyToProgramState(scope.getState(), transform);
-		scope->texture = texture;
-		scope->transform = transform * state->matrix * m_matViewport;
-		scope->rectSrc = rectSrc;
+		scope->setTexture(texture);
+		scope->setTransform(transform * state->matrix * m_matViewport);
+		scope->setRectSrc(Vector4(rectSrc.left, rectSrc.top, rectSrc.getWidth(), rectSrc.getHeight()));
 		if (param.useColorMatrix) {
-			scope->colorFilterR = param.colorMatrix.red;
-			scope->colorFilterG = param.colorMatrix.green;
-			scope->colorFilterB = param.colorMatrix.blue;
-			scope->colorFilterA = param.colorMatrix.alpha;
-			scope->colorFilterC = param.colorMatrix.bias;
+			scope->setColorFilterR(param.colorMatrix.red);
+			scope->setColorFilterG(param.colorMatrix.green);
+			scope->setColorFilterB(param.colorMatrix.blue);
+			scope->setColorFilterA(param.colorMatrix.alpha);
+			scope->setColorFilterC(param.colorMatrix.bias);
 		}
 		if (param.useAlpha) {
-			scope->color = Color4f(color.x, color.y, color.z, color.w * param.alpha * getAlpha());
+			scope->setColor(Color4f(color.x, color.y, color.z, color.w * param.alpha * getAlpha()));
 		} else {
-			scope->color = Color4f(color.x, color.y, color.z, color.w * getAlpha());
+			scope->setColor(Color4f(color.x, color.y, color.z, color.w * getAlpha()));
 		}
 		m_engine->drawPrimitive(4, shared->vbRectangle, PrimitiveType::TriangleStrip);
 	}
@@ -881,26 +748,27 @@ void RenderCanvas::drawTexture(const Rectangle& _rectDst, const Ref<Texture>& te
 	
 	RenderProgramScope<RenderCanvasProgramState> scope;
 	if (scope.begin(m_engine.ptr, shared->getProgram(pp))) {
-		scope->texture = texture;
-		Matrix3& mat = scope->transform;
+		scope->setTexture(texture);
+		Matrix3 mat;
 		mat.m00 = rectDst.getWidth(); mat.m10 = 0; mat.m20 = rectDst.left;
 		mat.m01 = 0; mat.m11 = rectDst.getHeight(); mat.m21 = rectDst.top;
 		mat.m02 = 0; mat.m12 = 0; mat.m22 = 1;
 		pp.applyToProgramState(scope.getState(), mat);
 		mat *= state->matrix;
 		mat *= m_matViewport;
-		scope->rectSrc = rectSrc;
+		scope->setTransform(mat);
+		scope->setRectSrc(Vector4(rectSrc.left, rectSrc.top, rectSrc.getWidth(), rectSrc.getHeight()));
 		if (param.useColorMatrix) {
-			scope->colorFilterR = param.colorMatrix.red;
-			scope->colorFilterG = param.colorMatrix.green;
-			scope->colorFilterB = param.colorMatrix.blue;
-			scope->colorFilterA = param.colorMatrix.alpha;
-			scope->colorFilterC = param.colorMatrix.bias;
+			scope->setColorFilterR(param.colorMatrix.red);
+			scope->setColorFilterG(param.colorMatrix.green);
+			scope->setColorFilterB(param.colorMatrix.blue);
+			scope->setColorFilterA(param.colorMatrix.alpha);
+			scope->setColorFilterC(param.colorMatrix.bias);
 		}
 		if (param.useAlpha) {
-			scope->color = Color4f(color.x, color.y, color.z, color.w * param.alpha * getAlpha());
+			scope->setColor(Color4f(color.x, color.y, color.z, color.w * param.alpha * getAlpha()));
 		} else {
-			scope->color = Color4f(color.x, color.y, color.z, color.w * getAlpha());
+			scope->setColor(Color4f(color.x, color.y, color.z, color.w * getAlpha()));
 		}
 		m_engine->drawPrimitive(4, shared->vbRectangle, PrimitiveType::TriangleStrip);
 	}

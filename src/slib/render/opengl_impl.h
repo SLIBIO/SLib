@@ -1088,6 +1088,7 @@ public:
 							Ref<RenderProgramState> state = program->onCreate(engine);
 							if (state.isNotNull()) {
 								state->gl_program = ph;
+								state->gl_engine = engine;
 								if (program->onInit(engine, state.ptr)) {
 									Ref<_RenderProgramInstance> ret = new _RenderProgramInstance();
 									if (ret.isNotNull()) {
@@ -1414,7 +1415,6 @@ public:
 			_IndexBufferInstance* ib = (_IndexBufferInstance*)(primitive->indexBufferInstance.ptr);
 			ib->_update(primitive->indexBuffer.ptr);
 			GL_BASE::bindVertexBuffer(vb->handle);
-			m_currentProgram->onUpdate(this, m_currentProgramInstance->state.ptr);
 			if (m_currentProgram->onPreRender(this, m_currentProgramInstance->state.ptr, primitive)) {
 				switch (primitive->type) {
 				case PrimitiveType::Triangles:
@@ -1441,7 +1441,6 @@ public:
 			//GL_BASE::unbindVertexBuffer();
 		} else {
 			GL_BASE::bindVertexBuffer(vb->handle);
-			m_currentProgram->onUpdate(this, m_currentProgramInstance->state.ptr);
 			if (m_currentProgram->onPreRender(this, m_currentProgramInstance->state.ptr, primitive)) {
 				switch (primitive->type) {
 				case PrimitiveType::Triangles:

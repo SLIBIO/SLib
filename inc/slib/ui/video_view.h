@@ -27,8 +27,8 @@ protected:
 	SafeRef<Texture> m_textureFrame;
 	sl_bool m_flagYUV;
 	
-	Ref<RenderProgram2D> m_programRGB;
-	Ref<RenderProgram2D> m_programYUV;
+	Ref<RenderProgram2D_PositionTexture> m_programRGB;
+	Ref<RenderProgram2D_PositionTextureYUV> m_programYUV;
 	
 };
 
