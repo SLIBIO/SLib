@@ -59,7 +59,7 @@ void Application::run(const String& commandLine)
 void Application::run(int argc, const char* argv[])
 {
 	List<String> list;
-	for (int i = 0; i < argc; i++) {
+	for (int i = 1; i < argc; i++) {
 		list.add(argv[i]);
 	}
 	m_arguments = list;
@@ -79,11 +79,7 @@ void _app_crash_handler(int n)
 		List<String> args = app->getArguments();
 		String* s = args.getData();
 		sl_uint32 n = (sl_uint32)(args.getCount());
-		if (n > 0) {
-			System::exec(app->getExecutablePath(), s + 1, n - 1);
-		} else {
-			System::exec(app->getExecutablePath(), sl_null, 0);
-		}
+		System::exec(app->getExecutablePath(), s, n);
 	}
 }
 

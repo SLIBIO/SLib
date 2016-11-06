@@ -30,7 +30,7 @@ public:
 	
 	List<String> getArguments();
 
-	String getCommand(sl_uint32 index = 1);
+	String getCommand(sl_uint32 index = 0);
 	
 	void run(const String& commandLine);
 	
