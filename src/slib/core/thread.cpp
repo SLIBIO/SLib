@@ -230,7 +230,7 @@ sl_bool Thread::isNotStoppingCurrent()
 	if (thread.isNotNull()) {
 		return thread->isNotStopping();
 	}
-	return sl_false;
+	return sl_true;
 }
 
 sl_uint64 Thread::getCurrentThreadUniqueId()

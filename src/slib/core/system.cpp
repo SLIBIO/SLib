@@ -5,15 +5,6 @@
 
 SLIB_NAMESPACE_BEGIN
 
-sl_bool System::isMobilePlatform()
-{
-#if defined(SLIB_PLATFORM_IS_MOBILE)
-	return sl_true;
-#else
-	return sl_false;
-#endif
-}
-
 String System::getApplicationDirectory()
 {
 	String path = getApplicationPath();
@@ -82,12 +73,33 @@ void System::freeGlobalUniqueInstance(void* instance)
 #endif
 
 #if defined(SLIB_PLATFORM_IS_MOBILE)
-sl_bool System::createProcess(const String& pathExecutable, const String* commandLines, sl_uint32 nCommandLines)
+sl_bool System::createProcess(const String& pathExecutable, const String* cmds, sl_uint32 nCmds)
 {
 	SLIB_STATIC_STRING(n, "System::createProcess");
 	SLIB_STATIC_STRING(v, "Not supported");
 	SLIB_LOG_ERROR(n, v);
 	return sl_false;
+}
+
+void System::exec(const String& pathExecutable, const String* cmds, sl_uint32 nCmds)
+{
+	SLIB_STATIC_STRING(n, "System::exec");
+	SLIB_STATIC_STRING(v, "Not supported");
+	SLIB_LOG_ERROR(n, v);
+}
+
+void System::exit(int code)
+{
+	SLIB_STATIC_STRING(n, "System::exit");
+	SLIB_STATIC_STRING(v, "Not supported");
+	SLIB_LOG_ERROR(n, v);
+}
+
+void System::setCrashHandler(SIGNAL_HANDLER handler)
+{
+	SLIB_STATIC_STRING(n, "System::setCrashHandler");
+	SLIB_STATIC_STRING(v, "Not supported");
+	SLIB_LOG_ERROR(n, v);
 }
 #endif
 

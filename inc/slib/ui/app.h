@@ -21,11 +21,6 @@ public:
 	// override
 	AppType getAppType();
 	
-	// override
-	void run(const String& param);
-	
-	void run();
-	
 	static void quit();
 	
 	Ref<Window> getMainWindow();
@@ -42,6 +37,9 @@ protected:
 	virtual void onStart();
 	
 	virtual void onExit();
+	
+	// override
+	void onRunApp();
 
 public:
 	virtual void dispatchStart();

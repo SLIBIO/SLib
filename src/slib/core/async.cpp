@@ -83,6 +83,14 @@ Ref<AsyncLoop> AsyncLoop::getDefault()
 	return ret;
 }
 
+void AsyncLoop::releaseDefault()
+{
+	Ref<AsyncLoop> loop = getDefault();
+	if (loop.isNotNull()) {
+		loop->release();
+	}
+}
+
 Ref<AsyncLoop> AsyncLoop::create(sl_bool flagAutoStart)
 {
 	Ref<AsyncLoop> ret = new AsyncLoop;
@@ -109,6 +117,7 @@ void AsyncLoop::release()
 
 	if (m_flagRunning) {
 		m_flagRunning = sl_false;
+		lock.unlock();
 		m_thread->finishAndWait();
 	}
 
@@ -127,8 +136,9 @@ void AsyncLoop::start()
 	if (m_flagRunning) {
 		return;
 	}
-	if (m_thread->start()) {
-		m_flagRunning = sl_true;
+	m_flagRunning = sl_true;
+	if (!(m_thread->start())) {
+		m_flagRunning = sl_false;
 	}
 }
 
@@ -489,6 +499,7 @@ void AsyncIoLoop::release()
 		m_flagRunning = sl_false;
 		m_thread->finish();
 		__wake();
+		lock.unlock();
 		m_thread->finishAndWait();
 	}
 	
@@ -509,8 +520,9 @@ void AsyncIoLoop::start()
 	if (m_flagRunning) {
 		return;
 	}
-	if (m_thread->start()) {
-		m_flagRunning = sl_true;
+	m_flagRunning = sl_true;
+	if (!(m_thread->start())) {
+		m_flagRunning = sl_false;
 	}
 }
 

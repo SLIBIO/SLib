@@ -171,6 +171,10 @@ void UIPlatform::runApp()
 
 void UIPlatform::quitApp()
 {
+	Ref<Application> app = Application::getApp();
+	if (app.isNotNull()) {
+		app->dispatchQuitApp();
+	}
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[NSApp terminate:nil];
 	});

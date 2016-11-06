@@ -24,7 +24,7 @@ String Assets::getFilePath(const String& path)
 {
 	String s = File::makeSafeFilePath(path);
 	if (s.isNotEmpty()) {
-		return Application::getAppPath() + "/" + s;
+		return Application::getApplicationDirectory() + "/" + s;
 	}
 	return String::null();
 }

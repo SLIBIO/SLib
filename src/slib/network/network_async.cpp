@@ -420,10 +420,12 @@ Ref<AsyncTcpServer> AsyncTcpServer::create(const AsyncTcpServerParam& param)
 	}
 	if (socket.isNotNull()) {
 		
+#if defined(SLIB_PLATFORM_IS_UNIX)
 		// Sometimes, the previously bound port is remaining used state even after exit on Unix system.
 		// So, we set ReuseAddress flag on Server sockets to avoid this issue
 		socket->setOption_ReuseAddress(sl_true);
-		
+#endif
+
 		if (socket->bind(param.bindAddress)) {
 			if (socket->listen()) {
 				return create(socket, param.listener, param.ioLoop, param.flagAutoStart);

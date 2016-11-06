@@ -7,13 +7,11 @@
 
 SLIB_NAMESPACE_BEGIN
 
+typedef void (*SIGNAL_HANDLER)(int signal);
+
 class SLIB_EXPORT System
 {
 public:
-	// Generic Information
-	static sl_bool isMobilePlatform();
-
-	
 	// System & Application Information
 	static String getApplicationPath();
 	
@@ -41,7 +39,11 @@ public:
 	
 	static sl_uint32 getThreadId();
 	
-	static sl_bool createProcess(const String& pathExecutable, const String* commandLines, sl_uint32 nCommandLines);
+	static sl_bool createProcess(const String& pathExecutable, const String* command, sl_uint32 nCommands);
+	
+	static void exec(const String& pathExecutable, const String* command, sl_uint32 nCommands);
+	
+	static void exit(int code);
 	
 	static void sleep(sl_uint32 millis);
 	
@@ -51,6 +53,8 @@ public:
 
 	
 	static void abort(const String& msg, const String& file, sl_uint32 line);
+	
+	static void setCrashHandler(SIGNAL_HANDLER handler);
 	
 };
 

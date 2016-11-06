@@ -19,17 +19,6 @@ AppType UIApp::getAppType()
 	return AppType::UI;
 }
 
-void UIApp::run(const String& param)
-{
-	Application::run(param);
-	UI::runApp();
-}
-
-void UIApp::run()
-{
-	run(String::null());
-}
-
 void UIApp::quit()
 {
 	UI::quitApp();
@@ -68,6 +57,11 @@ void UIApp::onStart()
 
 void UIApp::onExit()
 {
+}
+
+void UIApp::onRunApp()
+{
+	UI::runApp();
 }
 
 void UIApp::dispatchStart()

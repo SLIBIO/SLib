@@ -19,11 +19,43 @@ class SLIB_EXPORT Application : public Object
 	SLIB_DECLARE_OBJECT
 	
 public:
-	virtual AppType getAppType() = 0;
-
-	virtual void run(const String& param);
+	Application();
 	
+public:
+	virtual AppType getAppType() = 0;
+	
+	String getExecutablePath();
+
+	String getCommandLine();
+	
+	List<String> getArguments();
+
+	String getCommand(sl_uint32 index = 1);
+	
+	void run(const String& commandLine);
+	
+	void run(int argc, const char * argv[]);
+
 	void run();
+
+	void dispatchQuitApp();
+	
+	sl_bool isUniqueInstanceRunning();
+	
+	virtual String getUniqueInstanceId();
+	
+	void setUniqueInstanceId(const String& _id);
+	
+	virtual sl_bool isCrashRecoverySupport();
+	
+	void setCrashRecoverySupport(sl_bool flagSupport);
+
+protected:
+	virtual void doRun();
+
+	virtual void onRunApp() = 0;
+	
+	virtual void onQuitApp();
 
 public:
 	static Ref<Application> getApp();
@@ -38,33 +70,68 @@ public:
 	static String parseEnvironmentPath(const String& path);
 
 	
-	static String getAppPath();
+	static String getApplicationPath();
 	
-	static void setAppPath(const String& path);
+	static String getApplicationDirectory();
+	
+	static void setApplicationDirectory(const String& path);
 	
 	static String findFileAndSetAppPath(const String& filePath, sl_uint32 nDeep = SLIB_UINT32_MAX);
 	
+	
+	static List<String> breakCommandLine(const String& commandLine);
+	
+	static String buildCommandLine(const String* argv, sl_size argc);
+	
+protected:
+	String m_executablePath;
+	String m_commandLine;
+	List<String> m_arguments;
+	
+	SafeString m_uniqueInstanceId;
+	void* m_uniqueInstanceHandle;
+	
+	sl_bool m_flagCrashRecoverySupport;
+	
 };
+
 SLIB_NAMESPACE_END
 
 #define SLIB_DECLARE_APPLICATION(CLASS) \
 	SLIB_DECLARE_OBJECT \
 public: \
-	static void main(const slib::String& param); \
+	static void main(const slib::String& commandLine); \
+	static void main(int argc, const char * argv[]); \
+	static void main(int argc, char** argv); \
 	static void main(); \
 	static slib::Ref<CLASS> getApp();
 
 
 #define SLIB_DEFINE_APPLICATION(CLASS, BASE) \
 	SLIB_DEFINE_OBJECT(CLASS, BASE) \
-	void CLASS::main(const slib::String& param) { \
+	void CLASS::main(const slib::String& commandLine) { \
 		slib::Ref<CLASS> app = new CLASS; \
 		if (app.isNotNull()) { \
-			app->run(param); \
+			app->run(commandLine); \
+		} \
+	} \
+	void CLASS::main(int argc, const char * argv[]) { \
+		slib::Ref<CLASS> app = new CLASS; \
+		if (app.isNotNull()) { \
+			app->run(argc, argv); \
+		} \
+	} \
+	void CLASS::main(int argc, char** argv) { \
+		slib::Ref<CLASS> app = new CLASS; \
+		if (app.isNotNull()) { \
+			app->run(argc, (const char**)argv); \
 		} \
 	} \
 	void CLASS::main() { \
-		CLASS::main(slib::String::null()); \
+		slib::Ref<CLASS> app = new CLASS; \
+		if (app.isNotNull()) { \
+			app->run(); \
+		} \
 	} \
 	slib::Ref<CLASS> CLASS::getApp() { \
 		slib::Ref<slib::Application> app(slib::Application::getApp()); \

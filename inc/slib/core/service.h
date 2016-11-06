@@ -21,21 +21,22 @@ public:
 public:
 	// override
 	AppType getAppType();
-	
-	// override
-	void run(const String& command);
-	
-	void run();
-	
 
 protected:
 	virtual String getServiceName() = 0;
 	
-	virtual void onRunService() = 0;
-
-	virtual sl_bool onStartService();
+	virtual sl_bool onStartService() = 0;
 	
-	virtual void onStopService();
+	virtual void onStopService() = 0;
+	
+	// override
+	void doRun();
+
+	// override
+	void onRunApp();
+	
+	// override
+	String getUniqueInstanceId();
 	
 public:
 	void startService();
@@ -46,17 +47,8 @@ public:
 	
 	void runService();
 
-	
-	Ref<Thread> getThread();
-	
 	static Ref<Service> getApp();
 
-private:
-	void _release();
-
-private:
-	SafeRef<Thread> m_threadRun;
-	
 };
 
 SLIB_NAMESPACE_END

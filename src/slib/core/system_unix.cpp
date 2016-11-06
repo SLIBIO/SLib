@@ -202,22 +202,47 @@ sl_bool System::createProcess(const String& pathExecutable, const String* cmds, 
 
 			signal(SIGHUP, SIG_IGN);
 
-			char* exe = strdup(pathExecutable.getData());
-			char** args = (char**)(Base::createMemory((nCmds + 2) * sizeof(char*)));
+			char* exe = pathExecutable.getData();
+			char* args[1024];
 			args[0] = exe;
+			if (nCmds > 1020) {
+				nCmds = 1020;
+			}
 			for (sl_size i = 0; i < nCmds; i++) {
-				String8 param = cmds[i];
-				args[i+1] = strdup(param.getData());
+				args[i+1] = cmds[i].getData();
 			}
 			args[nCmds+1] = 0;
 
-			execvp(exe, args);
-			exit(0);
+			::execvp(exe, args);
+			::exit(1);
+			return sl_false;
 		} else {
 			// parent process
 			return sl_true;
 		}
 	}
+}
+
+void System::exec(const String& pathExecutable, const String* cmds, sl_uint32 nCmds)
+{
+	char* exe = pathExecutable.getData();
+	char* args[1024];
+	args[0] = exe;
+	if (nCmds > 1020) {
+		nCmds = 1020;
+	}
+	for (sl_size i = 0; i < nCmds; i++) {
+		args[i+1] = cmds[i].getData();
+	}
+	args[nCmds+1] = 0;
+	
+	::execvp(exe, args);
+	::exit(1);
+}
+
+void System::exit(int code)
+{
+	::exit(code);
 }
 #endif
 
@@ -246,6 +271,27 @@ void System::abort(const String& msg, const String& file, sl_uint32 line)
 #endif
 #endif
 }
+
+#if !defined(SLIB_PLATFORM_IS_MOBILE)
+volatile double __signal_fpe_dummy = 0.0f;
+void System::setCrashHandler(SIGNAL_HANDLER handler)
+{
+	struct sigaction sa;
+	sa.sa_flags = SA_NODEFER;
+	sa.sa_handler = handler;
+	sigemptyset(&(sa.sa_mask));
+	sigaction(SIGFPE, &sa, NULL);
+	sigaction(SIGSEGV, &sa, NULL);
+	sigaction(SIGBUS, &sa, NULL);
+	sigaction(SIGILL, &sa, NULL);
+	sigaction(SIGABRT, &sa, NULL);
+	sigaction(SIGIOT, &sa, NULL);
+#if defined(SLIB_PLATFORM_IS_MACOS)
+	sigaction(SIGEMT, &sa, NULL);
+#endif
+	sigaction(SIGSYS, &sa, NULL);
+}
+#endif
 
 void Console::print(const String& s)
 {
