@@ -6,7 +6,7 @@ SLIB_NAMESPACE_BEGIN
 /*************************************
 	Async
 *************************************/
-sl_bool Async::runTask(const Ref<Runnable>& task, const Ref<AsyncLoop>& loop)
+sl_bool Async::runTask(const Callback& task, const Ref<AsyncLoop>& loop)
 {
 	if (loop.isNotNull()) {
 		return loop->addTask(task);
@@ -14,12 +14,12 @@ sl_bool Async::runTask(const Ref<Runnable>& task, const Ref<AsyncLoop>& loop)
 	return sl_false;
 }
 
-sl_bool Async::runTask(const Ref<Runnable>& task)
+sl_bool Async::runTask(const Callback& task)
 {
 	return Async::runTask(task, AsyncLoop::getDefault());
 }
 
-sl_bool Async::setTimeout(const Ref<Runnable>& task, sl_uint64 delay_ms, const Ref<AsyncLoop>& loop)
+sl_bool Async::setTimeout(const Callback& task, sl_uint64 delay_ms, const Ref<AsyncLoop>& loop)
 {
 	if (loop.isNotNull()) {
 		return loop->setTimeout(task, delay_ms);
@@ -27,12 +27,12 @@ sl_bool Async::setTimeout(const Ref<Runnable>& task, sl_uint64 delay_ms, const R
 	return sl_false;
 }
 
-sl_bool Async::setTimeout(const Ref<Runnable>& task, sl_uint64 delay_ms)
+sl_bool Async::setTimeout(const Callback& task, sl_uint64 delay_ms)
 {
 	return Async::setTimeout(task, delay_ms, AsyncLoop::getDefault());
 }
 
-Ref<AsyncTimer> Async::addTimer(const Ref<Runnable>& task, sl_uint64 interval_ms, const Ref<AsyncLoop>& loop)
+Ref<AsyncTimer> Async::addTimer(const Callback& task, sl_uint64 interval_ms, const Ref<AsyncLoop>& loop)
 {
 	if (loop.isNotNull()) {
 		return loop->addTimer(task, interval_ms);
@@ -40,7 +40,7 @@ Ref<AsyncTimer> Async::addTimer(const Ref<Runnable>& task, sl_uint64 interval_ms
 	return Ref<AsyncTimer>::null();
 }
 
-Ref<AsyncTimer> Async::addTimer(const Ref<Runnable>& task, sl_uint64 interval_ms)
+Ref<AsyncTimer> Async::addTimer(const Callback& task, sl_uint64 interval_ms)
 {
 	return Async::addTimer(task, interval_ms, AsyncLoop::getDefault());
 }
@@ -61,7 +61,7 @@ void Async::removeTimer(const Ref<AsyncTimer>& timer)
 	AsyncLoop
 *************************************/
 
-SLIB_DEFINE_OBJECT(AsyncLoop, Object)
+SLIB_DEFINE_OBJECT(AsyncLoop, Dispatcher)
 
 AsyncLoop::AsyncLoop()
 {
@@ -175,7 +175,7 @@ sl_int32 AsyncLoop::_getTimeout()
 	}
 }
 
-sl_bool AsyncLoop::addTask(const Ref<Runnable>& task)
+sl_bool AsyncLoop::addTask(const Callback& task)
 {
 	if (task.isNull()) {
 		return sl_false;
@@ -185,6 +185,11 @@ sl_bool AsyncLoop::addTask(const Ref<Runnable>& task)
 		return sl_true;
 	}
 	return sl_false;
+}
+
+sl_bool AsyncLoop::dispatch(const Callback &callback)
+{
+	return addTask(callback);
 }
 
 sl_int32 AsyncLoop::_getTimeout_TimeTasks()
@@ -197,7 +202,7 @@ sl_int32 AsyncLoop::_getTimeout_TimeTasks()
 	sl_int32 timeout = -1;
 	TreePosition pos;
 	TimeTask timeTask;
-	Queue< Ref<Runnable> > tasks;
+	Queue<Callback> tasks;
 	sl_uint64 t;
 	while (m_timeTasks.getFirstPosition(pos, &t, &timeTask)) {
 		if (rel >= t) {
@@ -211,16 +216,14 @@ sl_int32 AsyncLoop::_getTimeout_TimeTasks()
 	}
 	lock.unlock();
 
-	Ref<Runnable> task;
+	Callback task;
 	while (tasks.pop(&task)) {
-		if (task.isNotNull()) {
-			task->run();
-		}
+		task();
 	}
 	return timeout;
 }
 
-sl_bool AsyncLoop::setTimeout(const Ref<Runnable>& task, sl_uint64 ms)
+sl_bool AsyncLoop::setTimeout(const Callback& task, sl_uint64 ms)
 {
 	if (task.isNull()) {
 		return sl_false;
@@ -244,7 +247,7 @@ sl_int32 AsyncLoop::_getTimeout_Timer()
 	Queue< Ref<AsyncTimer> > tasks;
 
 	sl_uint64 rel = getEllapsedMilliseconds();
-	Link<Timer>* link = m_queueTimers.getBegin();
+	Link<Timer>* link = m_queueTimers.getFront();
 	while (link) {
 		Ref<AsyncTimer> timer(link->value.timer);
 		if (timer.isNotNull()) {
@@ -309,7 +312,7 @@ void AsyncLoop::removeTimer(const Ref<AsyncTimer>& timer)
 	m_queueTimers.removeValue(t);
 }
 
-Ref<AsyncTimer> AsyncLoop::addTimer(const Ref<Runnable>& task, sl_uint64 interval_ms)
+Ref<AsyncTimer> AsyncLoop::addTimer(const Callback& task, sl_uint64 interval_ms)
 {
 	Ref<AsyncTimer> timer = AsyncTimer::create(task, interval_ms);
 	if (timer.isNotNull()) {
@@ -331,13 +334,11 @@ void AsyncLoop::_runLoop()
 
 		// Async Tasks
 		{
-			Queue< Ref<Runnable> > tasks;
+			Queue<Callback> tasks;
 			tasks.merge(&m_queueTasks);
-			Ref<Runnable> task;
+			Callback task;
 			while (tasks.pop(&task)) {
-				if (task.isNotNull()) {
-					task->run();
-				}
+				task();
 			}
 		}
 		
@@ -367,7 +368,7 @@ AsyncTimer::AsyncTimer()
 	setMaxConcurrentThread(1);
 }
 
-Ref<AsyncTimer> AsyncTimer::create(const Ref<Runnable>& task, sl_uint64 interval_ms, sl_bool flagStart)
+Ref<AsyncTimer> AsyncTimer::create(const Callback& task, sl_uint64 interval_ms, sl_bool flagStart)
 {
 	Ref<AsyncTimer> ret;
 	if (task.isNull()) {
@@ -397,7 +398,7 @@ sl_bool AsyncTimer::isStarted()
 	return m_flagStarted;
 }
 
-Ref<Runnable> AsyncTimer::getTask()
+Callback AsyncTimer::getTask()
 {
 	return m_task;
 }
@@ -414,7 +415,7 @@ void AsyncTimer::run()
 		sl_int32 n = Base::interlockedIncrement32(&m_nCountRun);
 		if (n <= (sl_int32)(getMaxConcurrentThread())) {
 			lock.unlock();
-			m_task->run();
+			m_task();
 		}
 		Base::interlockedDecrement32(&m_nCountRun);
 	}
@@ -435,7 +436,7 @@ void AsyncTimer::stopAndWait()
 	AsyncLoop
  *************************************/
 
-SLIB_DEFINE_OBJECT(AsyncIoLoop, Object)
+SLIB_DEFINE_OBJECT(AsyncIoLoop, Dispatcher)
 
 AsyncIoLoop::AsyncIoLoop()
 {
@@ -531,7 +532,7 @@ sl_bool AsyncIoLoop::isRunning()
 	return m_flagRunning;
 }
 
-sl_bool AsyncIoLoop::addTask(const Ref<Runnable>& task)
+sl_bool AsyncIoLoop::addTask(const Callback& task)
 {
 	if (task.isNull()) {
 		return sl_false;
@@ -541,6 +542,11 @@ sl_bool AsyncIoLoop::addTask(const Ref<Runnable>& task)
 		return sl_true;
 	}
 	return sl_false;
+}
+
+sl_bool AsyncIoLoop::dispatch(const Callback& callback)
+{
+	return addTask(callback);
 }
 
 void AsyncIoLoop::wake()
@@ -590,13 +596,11 @@ void AsyncIoLoop::_stepBegin()
 {
 	// Async Tasks
 	{
-		Queue< Ref<Runnable> > tasks;
+		Queue<Callback> tasks;
 		tasks.merge(&m_queueTasks);
-		Ref<Runnable> task;
+		Callback task;
 		while (m_queueTasks.pop(&task)) {
-			if (task.isNotNull()) {
-				task->run();
-			}
+			task();
 		}
 	}
 	
@@ -1104,7 +1108,7 @@ sl_uint64 AsyncStreamBase::getSize()
 	return sl_false;
 }
 
-sl_bool AsyncStreamBase::addTask(const Ref<Runnable>& callback)
+sl_bool AsyncStreamBase::addTask(const Callback& callback)
 {
 	Ref<AsyncIoLoop> loop = getIoLoop();
 	if (loop.isNotNull()) {
@@ -1123,14 +1127,17 @@ sl_size AsyncStreamBase::getWaitingSizeForWrite()
 }
 
 /*************************************
-	AsyncStreamBaseIO
+	AsyncStreamSimulator
 **************************************/
-AsyncStreamBaseIO::AsyncStreamBaseIO()
+
+SLIB_DEFINE_OBJECT(AsyncStreamSimulator, AsyncStream)
+
+AsyncStreamSimulator::AsyncStreamSimulator()
 {
 	m_flagProcessRequest = sl_false;
 }
 
-sl_bool AsyncStreamBaseIO::read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* refData)
+sl_bool AsyncStreamSimulator::read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* refData)
 {
 	if (data && size > 0) {
 		if (isOpened()) {
@@ -1143,7 +1150,7 @@ sl_bool AsyncStreamBaseIO::read(void* data, sl_uint32 size, const Ptr<IAsyncStre
 	return sl_false;
 }
 
-sl_bool AsyncStreamBaseIO::write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* refData)
+sl_bool AsyncStreamSimulator::write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* refData)
 {
 	if (data && size > 0) {
 		if (isOpened()) {
@@ -1156,39 +1163,54 @@ sl_bool AsyncStreamBaseIO::write(void* data, sl_uint32 size, const Ptr<IAsyncStr
 	return sl_false;
 }
 
-sl_bool AsyncStreamBaseIO::addTask(const Ref<Runnable>& callback)
+sl_bool AsyncStreamSimulator::addTask(const Callback& callback)
 {
-	Ref<AsyncLoop> loop = getLoop();
-	if (loop.isNotNull()) {
-		return loop->addTask(callback);
+	Ref<Dispatcher> dispatcher(m_dispatcher);
+	if (dispatcher.isNotNull()) {
+		return dispatcher->dispatch(callback);
 	}
 	return sl_false;
 }
 
-sl_bool AsyncStreamBaseIO::_addRequest(AsyncStreamRequest* req)
+void AsyncStreamSimulator::init()
 {
-	Ref<AsyncLoop> loop = getLoop();
-	if (loop.isNotNull()) {
+	m_loop = AsyncLoop::create();
+	m_dispatcher = m_loop;
+}
+
+void AsyncStreamSimulator::initWithDispatcher(const Ref<Dispatcher>& dispatcher)
+{
+	if (dispatcher.isNotNull()) {
+		m_dispatcher = dispatcher;
+	} else {
+		init();
+	}
+}
+
+sl_bool AsyncStreamSimulator::_addRequest(AsyncStreamRequest* req)
+{
+	Ref<Dispatcher> dispatcher(m_dispatcher);
+	if (dispatcher.isNotNull()) {
 		ObjectLocker lock(this);
-		m_requests.push(req);
+		m_requests.push_NoLock(req);
 		if (!m_flagProcessRequest) {
 			m_flagProcessRequest = sl_true;
 			lock.unlock();
-			loop->addTask(SLIB_CALLBACK_WEAKREF(AsyncStreamBaseIO, _runProcessor, this));
+			dispatcher->dispatch(SLIB_CALLBACK_WEAKREF(AsyncStreamSimulator, _runProcessor, this));
 		}
 		return sl_true;
 	}
 	return sl_false;
 }
 
-void AsyncStreamBaseIO::_runProcessor()
+void AsyncStreamSimulator::_runProcessor()
 {
 	if (isOpened()) {
 		while (Thread::isNotStoppingCurrent()) {
 			Ref<AsyncStreamRequest> req;
 			{
 				ObjectLocker lock(this);
-				if (!(m_requests.pop(&req))) {
+				if (!(m_requests.pop_NoLock(&req))) {
 					m_flagProcessRequest = sl_false;
 					break;
 				}
@@ -1200,20 +1222,6 @@ void AsyncStreamBaseIO::_runProcessor()
 	}
 }
 
-Ref<AsyncLoop> AsyncStreamBaseIO::getLoop()
-{
-	Ref<AsyncLoop> loop = m_loop;
-	if (loop.isNull()) {
-		loop = AsyncLoop::getDefault();
-	}
-	return loop;
-}
-
-void AsyncStreamBaseIO::setLoop(const Ref<AsyncLoop>& loop)
-{
-	m_loop = loop;
-}
-
 
 /*************************************
 	AsyncReader
@@ -1223,22 +1231,30 @@ AsyncReader::AsyncReader()
 {
 }
 
-Ref<AsyncReader> AsyncReader::create(const Ptr<IReader>& reader, const Ref<AsyncLoop>& loop)
-{
-	Ref<AsyncReader> ret;
-	if (reader.isNotNull()) {
-		ret = new AsyncReader;
-		if (ret.isNotNull()) {
-			ret->m_reader = reader;
-			ret->setLoop(loop);
-		}
-	}
-	return ret;
-}
-
 Ref<AsyncReader> AsyncReader::create(const Ptr<IReader>& reader)
 {
-	return AsyncReader::create(reader, AsyncLoop::getDefault());
+	if (reader.isNotNull()) {
+		Ref<AsyncReader> ret = new AsyncReader;
+		if (ret.isNotNull()) {
+			ret->m_reader = reader;
+			ret->init();
+			return ret;
+		}
+	}
+	return Ref<AsyncReader>::null();
+}
+
+Ref<AsyncReader> AsyncReader::create(const Ptr<IReader>& reader, const Ref<Dispatcher>& dispatcher)
+{
+	if (reader.isNotNull()) {
+		Ref<AsyncReader> ret = new AsyncReader;
+		if (ret.isNotNull()) {
+			ret->m_reader = reader;
+			ret->initWithDispatcher(dispatcher);
+			return ret;
+		}
+	}
+	return Ref<AsyncReader>::null();
 }
 
 sl_bool AsyncReader::isOpened()
@@ -1287,22 +1303,30 @@ AsyncWriter::AsyncWriter()
 {
 }
 
-Ref<AsyncWriter> AsyncWriter::create(const Ptr<IWriter>& writer, const Ref<AsyncLoop>& loop)
-{
-	Ref<AsyncWriter> ret;
-	if (writer.isNotNull()) {
-		ret = new AsyncWriter;
-		if (ret.isNotNull()) {
-			ret->m_writer = writer;
-			ret->setLoop(loop);
-		}
-	}
-	return ret;
-}
-
 Ref<AsyncWriter> AsyncWriter::create(const Ptr<IWriter>& writer)
 {
-	return AsyncWriter::create(writer, AsyncLoop::getDefault());
+	if (writer.isNotNull()) {
+		Ref<AsyncWriter> ret = new AsyncWriter;
+		if (ret.isNotNull()) {
+			ret->m_writer = writer;
+			ret->init();
+			return ret;
+		}
+	}
+	return Ref<AsyncWriter>::null();
+}
+
+Ref<AsyncWriter> AsyncWriter::create(const Ptr<IWriter>& writer, const Ref<Dispatcher>& dispatcher)
+{
+	if (writer.isNotNull()) {
+		Ref<AsyncWriter> ret = new AsyncWriter;
+		if (ret.isNotNull()) {
+			ret->m_writer = writer;
+			ret->initWithDispatcher(dispatcher);
+			return ret;
+		}
+	}
+	return Ref<AsyncWriter>::null();
 }
 
 sl_bool AsyncWriter::isOpened()
@@ -1346,6 +1370,9 @@ void AsyncWriter::processRequest(AsyncStreamRequest* request)
 /*************************************
 	AsyncFile
 **************************************/
+
+SLIB_DEFINE_OBJECT(AsyncFile, AsyncStreamSimulator)
+
 AsyncFile::AsyncFile()
 {
 }
@@ -1355,66 +1382,78 @@ AsyncFile::~AsyncFile()
 	close();
 }
 
-Ref<AsyncFile> AsyncFile::create(const Ref<File>& file, const Ref<AsyncLoop>& loop)
-{
-	Ref<AsyncFile> ret;
-	if (file.isNotNull()) {
-		ret = new AsyncFile;
-		if (ret.isNotNull()) {
-			ret->m_file = file;
-			ret->setLoop(loop);
-		}
-	}
-	return ret;
-}
-
 Ref<AsyncFile> AsyncFile::create(const Ref<File>& file)
 {
-	return AsyncFile::create(file, AsyncLoop::getDefault());
+	if (file.isNotNull()) {
+		Ref<AsyncFile> ret = new AsyncFile;
+		if (ret.isNotNull()) {
+			ret->m_file = file;
+			ret->init();
+			return ret;
+		}
+	}
+	return Ref<AsyncFile>::null();
 }
 
-Ref<AsyncFile> AsyncFile::open(const String& path, FileMode mode, const Ref<AsyncLoop>& loop)
+Ref<AsyncFile> AsyncFile::create(const Ref<File>& file, const Ref<Dispatcher>& dispatcher)
 {
-	Ref<File> file = File::open(path, mode);
 	if (file.isNotNull()) {
-		return AsyncFile::create(file, loop);
+		Ref<AsyncFile> ret = new AsyncFile;
+		if (ret.isNotNull()) {
+			ret->m_file = file;
+			ret->initWithDispatcher(dispatcher);
+			return ret;
+		}
 	}
 	return Ref<AsyncFile>::null();
 }
 
 Ref<AsyncFile> AsyncFile::open(const String& path, FileMode mode)
 {
-	return AsyncFile::open(path, mode, AsyncLoop::getDefault());
+	Ref<File> file = File::open(path, mode);
+	if (file.isNotNull()) {
+		return AsyncFile::create(file);
+	}
+	return Ref<AsyncFile>::null();
 }
 
-Ref<AsyncFile> AsyncFile::openForRead(const String& path, const Ref<AsyncLoop>& loop)
+Ref<AsyncFile> AsyncFile::open(const String& path, FileMode mode, const Ref<Dispatcher>& dispatcher)
 {
-	return AsyncFile::open(path, FileMode::Read, loop);
+	Ref<File> file = File::open(path, mode);
+	if (file.isNotNull()) {
+		return AsyncFile::create(file, dispatcher);
+	}
+	return Ref<AsyncFile>::null();
 }
 
 Ref<AsyncFile> AsyncFile::openForRead(const String& path)
 {
-	return AsyncFile::openForRead(path, AsyncLoop::getDefault());
+	return AsyncFile::open(path, FileMode::Read);
 }
 
-Ref<AsyncFile> AsyncFile::openForWrite(const String& path, const Ref<AsyncLoop>& loop)
+Ref<AsyncFile> AsyncFile::openForRead(const String& path, const Ref<Dispatcher>& dispatcher)
 {
-	return AsyncFile::open(path, FileMode::Write, loop);
+	return AsyncFile::open(path, FileMode::Read, dispatcher);
 }
 
 Ref<AsyncFile> AsyncFile::openForWrite(const String& path)
 {
-	return AsyncFile::openForWrite(path, AsyncLoop::getDefault());
+	return AsyncFile::open(path, FileMode::Write);
 }
 
-Ref<AsyncFile> AsyncFile::openForAppend(const String& path, const Ref<AsyncLoop>& loop)
+Ref<AsyncFile> AsyncFile::openForWrite(const String& path, const Ref<Dispatcher>& dispatcher)
 {
-	return AsyncFile::open(path, FileMode::Append, loop);
+	return AsyncFile::open(path, FileMode::Write, dispatcher);
 }
 
 Ref<AsyncFile> AsyncFile::openForAppend(const String& path)
 {
-	return AsyncFile::openForAppend(path, AsyncLoop::getDefault());
+	return AsyncFile::open(path, FileMode::Append);
+}
+
+Ref<AsyncFile> AsyncFile::openForAppend(const String& path, const Ref<Dispatcher>& dispatcher)
+{
+	return AsyncFile::open(path, FileMode::Append, dispatcher);
 }
 
 Ref<File> AsyncFile::getFile()
@@ -1506,6 +1545,7 @@ AsyncCopy::AsyncCopy()
 	m_flagWriteError = sl_false;
 	m_flagRunning = sl_true;
 	m_flagStarted = sl_false;
+	m_flagEnqueue = sl_false;
 }
 
 AsyncCopy::~AsyncCopy()
@@ -1659,6 +1699,7 @@ void AsyncCopy::onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, cons
 	if (!m_flagRunning) {
 		return;
 	}
+
 	if (flagError) {
 		m_flagReadError = sl_true;
 	}
@@ -1687,6 +1728,7 @@ void AsyncCopy::onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, cons
 	}
 
 	enqueue();
+
 }
 
 void AsyncCopy::onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, const Referable* ref, sl_bool flagError)
@@ -1720,6 +1762,12 @@ void AsyncCopy::enqueue()
 	if (!m_flagRunning) {
 		return;
 	}
+
+	if (m_flagEnqueue) {
+		return;
+	}
+	m_flagEnqueue = sl_true;
+
 	// read
 	do {
 		if (m_flagReadError) {
@@ -1740,19 +1788,20 @@ void AsyncCopy::enqueue()
 			}
 			buffer->memRead = buffer->mem.sub(0, size);
 			sl_bool bRet = sl_false;
+			m_bufferReading = buffer;
 			if (buffer->memRead.isNotEmpty()) {
 				Ref<AsyncStream> source = m_source;
 				if (source.isNotNull()) {
 					bRet = source->readToMemory(buffer->memRead, (WeakRef<AsyncCopy>)this);
 				}
 			}
-			if (bRet) {
-				m_bufferReading = buffer;
-			} else {
+			if (!bRet) {
+				m_bufferReading.setNull();
 				m_flagReadError = sl_true;
 			}
 		}
 	} while (0);
+
 	// write
 	do {
 		if (m_flagWriteError) {
@@ -1763,21 +1812,25 @@ void AsyncCopy::enqueue()
 		}
 		Ref<Buffer> buffer;
 		if (m_buffersWrite.popFront(&buffer)) {
+			m_bufferWriting = buffer;
 			sl_bool bRet = sl_false;
 			Ref<AsyncStream> target = m_target;
 			if (target.isNotNull()) {
 				bRet = target->writeFromMemory(buffer->memWrite, (WeakRef<AsyncCopy>)this);
 			}
-			if (bRet) {
-				m_bufferWriting = buffer;
-			} else {
+			if (!bRet) {
+				m_bufferWriting.setNull();
 				m_flagWriteError = sl_true;
 			}
 		}
 	} while (0);
+
 	if (m_bufferReading.isNull() && m_bufferWriting.isNull()) {
 		close();
 	}
+
+	m_flagEnqueue = sl_false;
+
 }
 
 
@@ -1868,9 +1921,9 @@ sl_bool AsyncOutputBuffer::write(const Memory& mem)
 		return sl_false;
 	}
 	ObjectLocker lock(this);
-	Link< Ref<AsyncOutputBufferElement> >* end = m_queueOutput.getEnd();
-	if (end && end->value->isEmptyBody()) {
-		if (end->value->addHeader(mem)) {
+	Link< Ref<AsyncOutputBufferElement> >* link = m_queueOutput.getBack();
+	if (link && link->value->isEmptyBody()) {
+		if (link->value->addHeader(mem)) {
 			m_lengthOutput += mem.getSize();
 		} else {
 			return sl_false;
@@ -1896,9 +1949,9 @@ sl_bool AsyncOutputBuffer::copyFrom(AsyncStream* stream, sl_uint64 size)
 		return sl_false;
 	}
 	ObjectLocker lock(this);
-	Link< Ref<AsyncOutputBufferElement> >* end = m_queueOutput.getEnd();
-	if (end && end->value->isEmptyBody()) {
-		end->value->setBody(stream, size);
+	Link< Ref<AsyncOutputBufferElement> >* link = m_queueOutput.getBack();
+	if (link && link->value->isEmptyBody()) {
+		link->value->setBody(stream, size);
 		m_lengthOutput += size;
 	} else {
 		Ref<AsyncOutputBufferElement> data = new AsyncOutputBufferElement(stream, size);
@@ -1915,14 +1968,19 @@ sl_bool AsyncOutputBuffer::copyFrom(AsyncStream* stream, sl_uint64 size)
 	return sl_true;
 }
 
-sl_bool AsyncOutputBuffer::copyFromFile(const String& path, const Ref<AsyncLoop>& loop)
+sl_bool AsyncOutputBuffer::copyFromFile(const String& path)
+{
+	return copyFromFile(path, Ref<Dispatcher>::null());
+}
+
+sl_bool AsyncOutputBuffer::copyFromFile(const String& path, const Ref<Dispatcher>& dispatcher)
 {
 	if (!(File::exists(path))) {
 		return sl_false;
 	}
 	sl_uint64 size = File::getSize(path);
 	if (size > 0) {
-		Ref<AsyncFile> file = AsyncFile::openForRead(path, loop);
+		Ref<AsyncFile> file = AsyncFile::openForRead(path, dispatcher);
 		if (file.isNotNull()) {
 			return copyFrom(file.ptr, size);
 		} else {
@@ -1930,11 +1988,6 @@ sl_bool AsyncOutputBuffer::copyFromFile(const String& path, const Ref<AsyncLoop>
 		}
 	}
 	return sl_true;
-}
-
-sl_bool AsyncOutputBuffer::copyFromFile(const String& path)
-{
-	return copyFromFile(path, AsyncLoop::getDefault());
 }
 
 sl_uint64 AsyncOutputBuffer::getOutputLength() const
@@ -2163,7 +2216,7 @@ sl_bool AsyncStreamFilter::read(void* data, sl_uint32 size, const Ptr<IAsyncStre
 		}
 		if (m_requestsRead.push(request)) {
 			if (m_bufReadConverted.getSize() > 0) {
-				if (!(addTask(SLIB_CALLBACK_WEAKREF(AsyncStreamFilter, _processRead, this)))) {
+				if (!(addTask(SLIB_CALLBACK_WEAKREF(AsyncStreamFilter, _processReadEmpty, this)))) {
 					return sl_false;
 				}
 			}
@@ -2291,7 +2344,7 @@ void AsyncStreamFilter::_processRead(void* data, sl_uint32 size, const Referable
 	}
 }
 
-void AsyncStreamFilter::_processRead()
+void AsyncStreamFilter::_processReadEmpty()
 {
 	_processRead(sl_null, 0, sl_null, sl_false);
 }
@@ -2365,7 +2418,7 @@ void AsyncStreamFilter::_processZeroWrite(void* data, sl_uint32 size, Ptr<IAsync
 	}
 }
 
-sl_bool AsyncStreamFilter::addTask(const Ref<Runnable>& callback)
+sl_bool AsyncStreamFilter::addTask(const Callback& callback)
 {
 	Ref<AsyncStream> stream = m_stream;
 	if (stream.isNotNull()) {

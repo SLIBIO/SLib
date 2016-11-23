@@ -159,17 +159,21 @@ public:
 						if (attrString) {
 							CTLineRef line = CTLineCreateWithAttributedString(attrString);
 							if (line) {
-								CGFloat ascend, descend, leading;
-								CTLineGetTypographicBounds(line, &ascend, &descend, &leading);
+								CGFloat ascent, descent, leading;
+								CTLineGetTypographicBounds(line, &ascent, &descent, &leading);
 								CGAffineTransform trans;
 								trans.a = 1;
 								trans.b = 0;
 								trans.c = 0;
 								trans.d = -1;
 								trans.tx = x;
-								trans.ty = y + ascend;
+								trans.ty = y + ascent + leading;
+								
+								CGContextSaveGState(m_graphics);
 								CGContextSetTextMatrix(m_graphics, trans);
+								
 								CTLineDraw(line, m_graphics);
+								CGContextRestoreGState(m_graphics);
 								CFRelease(line);
 							}
 							CFRelease(attrString);

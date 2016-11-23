@@ -13,6 +13,9 @@
 
 SLIB_NAMESPACE_BEGIN
 
+template < class T, class COMPARE >
+class List;
+
 template < class T, class COMPARE=Compare<T> >
 class SLIB_EXPORT CList : public Object
 {
@@ -145,19 +148,33 @@ public:
 	template <class _T>
 	sl_bool add(const Iterator<_T>& iterator);
 	
+	sl_bool removeAt_NoLock(sl_size index, T* outValue = sl_null);
+	
+	sl_bool removeAt(sl_size index, T* outValue = sl_null);
+
 	sl_size remove_NoLock(sl_size index, sl_size count = 1);
 	
 	sl_size remove(sl_size index, sl_size count = 1);
 	
 	template <class _T, class _COMPARE>
-	sl_size removeValueT_NoLock(const _T& value, sl_bool flagAllValues = sl_false);
+	sl_bool removeValueT_NoLock(const _T& value, T* outValue = sl_null);
 	
 	template <class _T, class _COMPARE>
-	sl_size removeValueT(const _T& value, sl_bool flagAllValues = sl_false);
-
-	sl_size removeValue_NoLock(const T& value, sl_bool flagAllValues = sl_false);
+	sl_bool removeValueT(const _T& value, T* outValue = sl_null);
 	
-	sl_size removeValue(const T& value, sl_bool flagAllValues = sl_false);
+	template <class _T, class _COMPARE>
+	sl_size removeValuesT_NoLock(const _T& value, List<T,COMPARE>* outValues = sl_null);
+	
+	template <class _T, class _COMPARE>
+	sl_size removeValuesT(const _T& value, List<T,COMPARE>* outValues = sl_null);
+
+	sl_bool removeValue_NoLock(const T& value);
+	
+	sl_bool removeValue(const T& value);
+	
+	sl_size removeValues_NoLock(const T& value);
+	
+	sl_size removeValues(const T& value);
 	
 	sl_size removeAll_NoLock();
 	
@@ -229,8 +246,43 @@ public:
 	
 	Iterator<T> iterator() const;
 	
+	// range-based for loop
+	T* begin();
+	
+	T const* begin() const;
+	
+	T* end();
+	
+	T const* end() const;
+	
 protected:
 	sl_bool _setCountInner(sl_size count);
+	
+};
+
+template <class T, class COMPARE>
+class SLIB_EXPORT ListPosition
+{
+public:
+	ListPosition();
+	
+	ListPosition(const Ref< CList<T, COMPARE> >& list);
+	
+	ListPosition(const ListPosition<T, COMPARE>& other);
+	
+	ListPosition(ListPosition<T, COMPARE>&& other);
+	
+public:
+	T& operator*();
+	
+	sl_bool operator!=(const ListPosition<T, COMPARE>& other);
+	
+	ListPosition<T, COMPARE>& operator++();
+	
+private:
+	Ref< CList<T, COMPARE> > ref;
+	T* data;
+	sl_size count;
 	
 };
 
@@ -377,19 +429,33 @@ public:
 	template <class _T>
 	sl_bool add(const Iterator<_T>& iterator);
 	
+	sl_bool removeAt_NoLock(sl_size index, T* outValue = sl_null) const;
+	
+	sl_bool removeAt(sl_size index, T* outValue = sl_null) const;
+	
 	sl_size remove_NoLock(sl_size index, sl_size count = 1) const;
 	
 	sl_size remove(sl_size index, sl_size count = 1) const;
 	
 	template <class _T, class _COMPARE>
-	sl_size removeValueT_NoLock(const _T& value, sl_bool flagAllValues = sl_false) const;
+	sl_bool removeValueT_NoLock(const _T& value, T* outValue = sl_null) const;
 	
 	template <class _T, class _COMPARE>
-	sl_size removeValueT(const _T& value, sl_bool flagAllValues = sl_false) const;
+	sl_bool removeValueT(const _T& value, T* outValue = sl_null) const;
 	
-	sl_size removeValue_NoLock(const T& value, sl_bool flagAllValues = sl_false) const;
+	template <class _T, class _COMPARE>
+	sl_size removeValuesT_NoLock(const _T& value, List<T,COMPARE>* outValues = sl_null) const;
 	
-	sl_size removeValue(const T& value, sl_bool flagAllValues = sl_false) const;
+	template <class _T, class _COMPARE>
+	sl_size removeValuesT(const _T& value, List<T,COMPARE>* outValues = sl_null) const;
+	
+	sl_bool removeValue_NoLock(const T& value) const;
+	
+	sl_bool removeValue(const T& value) const;
+	
+	sl_size removeValues_NoLock(const T& value) const;
+	
+	sl_size removeValues(const T& value) const;
 	
 	sl_size removeAll_NoLock() const;
 	
@@ -462,6 +528,11 @@ public:
 	Iterator<T> iterator() const;
 	
 	const Mutex* getLocker() const;
+	
+	// range-based for loop
+	T* begin() const;
+	
+	T* end() const;
 	
 };
 
@@ -547,12 +618,19 @@ public:
 	template <class _T>
 	sl_bool add(const Iterator<_T>& iterator);
 	
+	sl_bool removeAt(sl_size index, T* outValue = sl_null) const;
+	
 	sl_size remove(sl_size index, sl_size count = 1) const;
 	
 	template <class _T, class _COMPARE>
-	sl_size removeValueT(const _T& value, sl_bool flagAllValues = sl_false) const;
+	sl_bool removeValueT(const _T& value, T* outValue = sl_null) const;
 	
-	sl_size removeValue(const T& value, sl_bool flagAllValues = sl_false) const;
+	template <class _T, class _COMPARE>
+	sl_size removeValuesT(const _T& value, List<T,COMPARE>* outValues = sl_null) const;
+	
+	sl_bool removeValue(const T& value) const;
+	
+	sl_size removeValues(const T& value) const;
 	
 	sl_size removeAll() const;
 	
@@ -587,6 +665,11 @@ public:
 	void sortBy(sl_bool flagAscending = sl_true) const;
 	
 	void sort(sl_bool flagAscending = sl_true) const;
+
+	// range-based for loop
+	ListPosition<T, COMPARE> begin() const;
+	
+	ListPosition<T, COMPARE> end() const;
 	
 };
 
@@ -622,6 +705,11 @@ public:
 public:
 	T& operator[](sl_reg index);
 	
+	// range-based for loop
+	T* begin();
+	
+	T* end();
+	
 };
 
 
@@ -653,6 +741,11 @@ public:
 	
 public:
 	T& operator[](sl_reg index);
+	
+	// range-based for loop
+	T* begin();
+	
+	T* end();
 	
 };
 
@@ -1421,6 +1514,33 @@ sl_bool CList<T, COMPARE>::add(const Iterator<_T>& iterator)
 }
 
 template <class T, class COMPARE>
+sl_bool CList<T, COMPARE>::removeAt_NoLock(sl_size index, T* outValue)
+{
+	if (index < m_count) {
+		T* m = m_data + index;
+		if (outValue) {
+			*outValue = *m;
+		}
+		sl_size n = m_count - index - 1;
+		while (n) {
+			*(m) = *(m+1);
+			n--;
+			m++;
+		}
+		_setCountInner(m_count - 1);
+		return sl_true;
+	}
+	return sl_false;
+}
+
+template <class T, class COMPARE>
+sl_bool CList<T, COMPARE>::removeAt(sl_size index, T* outValue)
+{
+	ObjectLocker lock(this);
+	return removeAt_NoLock(index, outValue);
+}
+
+template <class T, class COMPARE>
 sl_size CList<T, COMPARE>::remove_NoLock(sl_size index, sl_size count)
 {
 	if (index < m_count && count > 0) {
@@ -1449,19 +1569,51 @@ sl_size CList<T, COMPARE>::remove(sl_size index, sl_size count)
 
 template <class T, class COMPARE>
 template <class _T, class _COMPARE>
-sl_size CList<T, COMPARE>::removeValueT_NoLock(const _T& value, sl_bool flagAllValues)
+sl_bool CList<T, COMPARE>::removeValueT_NoLock(const _T& value, T* outValue)
 {
 	if (m_data) {
 		sl_size n = m_count;
 		for (sl_size i = 0; i < n;) {
 			if (_COMPARE::equals(m_data[i], value)) {
+				if (outValue) {
+					*outValue = m_data[i];
+				}
+				for (sl_size j = i + 1; j < n; j++) {
+					m_data[j - 1] = m_data[j];
+				}
+				_setCountInner(n - 1);
+				return sl_true;
+			} else {
+				i++;
+			}
+		}
+	}
+	return sl_false;
+}
+
+template <class T, class COMPARE>
+template <class _T, class _COMPARE>
+sl_bool CList<T, COMPARE>::removeValueT(const _T& value, T* outValue)
+{
+	ObjectLocker lock(this);
+	return removeValueT_NoLock<_T, _COMPARE>(value, outValue);
+}
+
+template <class T, class COMPARE>
+template <class _T, class _COMPARE>
+sl_size CList<T, COMPARE>::removeValuesT_NoLock(const _T& value, List<T, COMPARE>* outValues)
+{
+	if (m_data) {
+		sl_size n = m_count;
+		for (sl_size i = 0; i < n;) {
+			if (_COMPARE::equals(m_data[i], value)) {
+				if (outValues) {
+					outValues->add_NoLock(m_data[i]);
+				}
 				for (sl_size j = i + 1; j < n; j++) {
 					m_data[j - 1] = m_data[j];
 				}
 				n--;
-				if (!flagAllValues) {
-					break;
-				}
 			} else {
 				i++;
 			}
@@ -1476,23 +1628,36 @@ sl_size CList<T, COMPARE>::removeValueT_NoLock(const _T& value, sl_bool flagAllV
 
 template <class T, class COMPARE>
 template <class _T, class _COMPARE>
-sl_size CList<T, COMPARE>::removeValueT(const _T& value, sl_bool flagAllValues)
+sl_size CList<T, COMPARE>::removeValuesT(const _T& value, List<T, COMPARE>* outValues)
 {
 	ObjectLocker lock(this);
-	return removeValueT_NoLock<_T, _COMPARE>(value, flagAllValues);
+	return removeValuesT_NoLock<_T, _COMPARE>(value, outValues);
 }
 
 template <class T, class COMPARE>
-sl_size CList<T, COMPARE>::removeValue_NoLock(const T& value, sl_bool flagAllValues)
+sl_bool CList<T, COMPARE>::removeValue_NoLock(const T& value)
 {
-	return removeValueT<T, COMPARE>(value, flagAllValues);
+	return removeValueT_NoLock<T, COMPARE>(value);
 }
 
 template <class T, class COMPARE>
-sl_size CList<T, COMPARE>::removeValue(const T& value, sl_bool flagAllValues)
+sl_bool CList<T, COMPARE>::removeValue(const T& value)
 {
 	ObjectLocker lock(this);
-	return removeValueT_NoLock<T, COMPARE>(value, flagAllValues);
+	return removeValueT_NoLock<T, COMPARE>(value);
+}
+
+template <class T, class COMPARE>
+sl_size CList<T, COMPARE>::removeValues_NoLock(const T& value)
+{
+	return removeValuesT_NoLock<T, COMPARE>(value);
+}
+
+template <class T, class COMPARE>
+sl_size CList<T, COMPARE>::removeValues(const T& value)
+{
+	ObjectLocker lock(this);
+	return removeValuesT_NoLock<T, COMPARE>(value);
 }
 
 template <class T, class COMPARE>
@@ -1774,6 +1939,30 @@ SLIB_INLINE Iterator<T> CList<T, COMPARE>::iterator() const
 }
 
 template <class T, class COMPARE>
+SLIB_INLINE T* CList<T, COMPARE>::begin()
+{
+	return m_data;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE T const* CList<T, COMPARE>::begin() const
+{
+	return m_data;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE T* CList<T, COMPARE>::end()
+{
+	return m_data + m_count;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE T const* CList<T, COMPARE>::end() const
+{
+	return m_data + m_count;
+}
+
+template <class T, class COMPARE>
 sl_bool CList<T, COMPARE>::_setCountInner(sl_size count)
 {
 	sl_size oldCount = m_count;
@@ -1828,6 +2017,48 @@ sl_bool CList<T, COMPARE>::_setCountInner(sl_size count)
 		m_count = count;
 	}
 	return sl_true;
+}
+
+
+template <class T, class COMPARE>
+SLIB_INLINE ListPosition<T, COMPARE>::ListPosition() {};
+
+template <class T, class COMPARE>
+SLIB_INLINE ListPosition<T, COMPARE>::ListPosition(const Ref< CList<T, COMPARE> >& list) : ref(list)
+{
+	if (list.isNotNull()) {
+		data = list->getData();
+		count = list->getCount();
+	} else {
+		data = sl_null;
+		count = 0;
+	}
+}
+
+template <class T, class COMPARE>
+ListPosition<T, COMPARE>::ListPosition(const ListPosition<T, COMPARE>& other) = default;
+
+template <class T, class COMPARE>
+ListPosition<T, COMPARE>::ListPosition(ListPosition<T, COMPARE>&& other) = default;
+
+template <class T, class COMPARE>
+SLIB_INLINE T& ListPosition<T, COMPARE>::operator*()
+{
+	return *data;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE sl_bool ListPosition<T, COMPARE>::operator!=(const ListPosition<T, COMPARE>& other)
+{
+	return count > 0;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE ListPosition<T, COMPARE>& ListPosition<T, COMPARE>::operator++()
+{
+	data++;
+	count--;
+	return *this;
 }
 
 
@@ -2452,6 +2683,26 @@ sl_bool List<T, COMPARE>::add(const Iterator<_T>& iterator)
 }
 
 template <class T, class COMPARE>
+sl_bool List<T, COMPARE>::removeAt_NoLock(sl_size index, T* outValue) const
+{
+	CList<T, COMPARE>* obj = ref.ptr;
+	if (obj) {
+		return obj->removeAt_NoLock(index, outValue);
+	}
+	return sl_false;
+}
+
+template <class T, class COMPARE>
+sl_bool List<T, COMPARE>::removeAt(sl_size index, T* outValue) const
+{
+	CList<T, COMPARE>* obj = ref.ptr;
+	if (obj) {
+		return obj->removeAt(index, outValue);
+	}
+	return 0;
+}
+
+template <class T, class COMPARE>
 sl_size List<T, COMPARE>::remove_NoLock(sl_size index, sl_size count) const
 {
 	CList<T, COMPARE>* obj = ref.ptr;
@@ -2473,42 +2724,84 @@ sl_size List<T, COMPARE>::remove(sl_size index, sl_size count) const
 
 template <class T, class COMPARE>
 template <class _T, class _COMPARE>
-sl_size List<T, COMPARE>::removeValueT_NoLock(const _T& value, sl_bool flagAllValues) const
+sl_bool List<T, COMPARE>::removeValueT_NoLock(const _T& value, T* outValue) const
 {
 	CList<T, COMPARE>* obj = ref.ptr;
 	if (obj) {
-		return obj->template removeValueT_NoLock<_T, _COMPARE>(value, flagAllValues);
+		return obj->template removeValueT_NoLock<_T, _COMPARE>(value, outValue);
+	}
+	return sl_false;
+}
+
+template <class T, class COMPARE>
+template <class _T, class _COMPARE>
+sl_bool List<T, COMPARE>::removeValueT(const _T& value, T* outValue) const
+{
+	CList<T, COMPARE>* obj = ref.ptr;
+	if (obj) {
+		return obj->template removeValueT<_T, _COMPARE>(value, outValue);
+	}
+	return sl_false;
+}
+
+template <class T, class COMPARE>
+template <class _T, class _COMPARE>
+sl_size List<T, COMPARE>::removeValuesT_NoLock(const _T& value, List<T, COMPARE>* outValues) const
+{
+	CList<T, COMPARE>* obj = ref.ptr;
+	if (obj) {
+		return obj->template removeValuesT_NoLock<_T, _COMPARE>(value, outValues);
 	}
 	return 0;
 }
 
 template <class T, class COMPARE>
 template <class _T, class _COMPARE>
-sl_size List<T, COMPARE>::removeValueT(const _T& value, sl_bool flagAllValues) const
+sl_size List<T, COMPARE>::removeValuesT(const _T& value, List<T, COMPARE>* outValues) const
 {
 	CList<T, COMPARE>* obj = ref.ptr;
 	if (obj) {
-		return obj->template removeValueT<_T, _COMPARE>(value, flagAllValues);
+		return obj->template removeValuesT<_T, _COMPARE>(value, outValues);
 	}
 	return 0;
 }
 
 template <class T, class COMPARE>
-sl_size List<T, COMPARE>::removeValue_NoLock(const T& value, sl_bool flagAllValues) const
+sl_bool List<T, COMPARE>::removeValue_NoLock(const T& value) const
 {
 	CList<T, COMPARE>* obj = ref.ptr;
 	if (obj) {
-		return obj->removeValue_NoLock(value, flagAllValues);
+		return obj->removeValue_NoLock(value);
+	}
+	return sl_false;
+}
+
+template <class T, class COMPARE>
+sl_bool List<T, COMPARE>::removeValue(const T& value) const
+{
+	CList<T, COMPARE>* obj = ref.ptr;
+	if (obj) {
+		return obj->removeValue(value);
+	}
+	return sl_false;
+}
+
+template <class T, class COMPARE>
+sl_size List<T, COMPARE>::removeValues_NoLock(const T& value) const
+{
+	CList<T, COMPARE>* obj = ref.ptr;
+	if (obj) {
+		return obj->removeValues_NoLock(value);
 	}
 	return 0;
 }
 
 template <class T, class COMPARE>
-sl_size List<T, COMPARE>::removeValue(const T& value, sl_bool flagAllValues) const
+sl_size List<T, COMPARE>::removeValues(const T& value) const
 {
 	CList<T, COMPARE>* obj = ref.ptr;
 	if (obj) {
-		return obj->removeValue(value, flagAllValues);
+		return obj->removeValues(value);
 	}
 	return 0;
 }
@@ -2825,6 +3118,26 @@ Iterator<T> List<T, COMPARE>::iterator() const
 		return new ListIterator<T, COMPARE>(obj, obj);
 	}
 	return Iterator<T>::null();
+}
+
+template <class T, class COMPARE>
+T* List<T, COMPARE>::begin() const
+{
+	CList<T, COMPARE>* obj = ref.ptr;
+	if (obj) {
+		return obj->begin();
+	}
+	return sl_null;
+}
+
+template <class T, class COMPARE>
+T* List<T, COMPARE>::end() const
+{
+	CList<T, COMPARE>* obj = ref.ptr;
+	if (obj) {
+		return obj->end();
+	}
+	return sl_null;
 }
 
 template <class T, class COMPARE>
@@ -3257,6 +3570,16 @@ sl_bool SafeList<T, COMPARE>::add(const Iterator<_T>& iterator)
 }
 
 template <class T, class COMPARE>
+sl_bool SafeList<T, COMPARE>::removeAt(sl_size index, T* outValue) const
+{
+	Ref< CList<T, COMPARE> > obj(ref);
+	if (obj.isNotNull()) {
+		return obj->removeAt(index, outValue);
+	}
+	return sl_false;
+}
+
+template <class T, class COMPARE>
 sl_size SafeList<T, COMPARE>::remove(sl_size index, sl_size count) const
 {
 	Ref< CList<T, COMPARE> > obj(ref);
@@ -3268,21 +3591,42 @@ sl_size SafeList<T, COMPARE>::remove(sl_size index, sl_size count) const
 
 template <class T, class COMPARE>
 template <class _T, class _COMPARE>
-sl_size SafeList<T, COMPARE>::removeValueT(const _T& value, sl_bool flagAllValues) const
+sl_bool SafeList<T, COMPARE>::removeValueT(const _T& value, T* outValue) const
 {
 	Ref< CList<T, COMPARE> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->template removeValueT<_T, _COMPARE>(value, flagAllValues);
+		return obj->template removeValueT<_T, _COMPARE>(value, outValue);
+	}
+	return sl_false;
+}
+
+template <class T, class COMPARE>
+template <class _T, class _COMPARE>
+sl_size SafeList<T, COMPARE>::removeValuesT(const _T& value, List<T, COMPARE>* outValues) const
+{
+	Ref< CList<T, COMPARE> > obj(ref);
+	if (obj.isNotNull()) {
+		return obj->template removeValuesT<_T, _COMPARE>(value, outValues);
 	}
 	return 0;
 }
 
 template <class T, class COMPARE>
-sl_size SafeList<T, COMPARE>::removeValue(const T& value, sl_bool flagAllValues) const
+sl_bool SafeList<T, COMPARE>::removeValue(const T& value) const
 {
 	Ref< CList<T, COMPARE> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->removeValue(value, flagAllValues);
+		return obj->removeValue(value);
+	}
+	return sl_false;
+}
+
+template <class T, class COMPARE>
+sl_size SafeList<T, COMPARE>::removeValues(const T& value) const
+{
+	Ref< CList<T, COMPARE> > obj(ref);
+	if (obj.isNotNull()) {
+		return obj->removeValues(value);
 	}
 	return 0;
 }
@@ -3439,6 +3783,18 @@ void SafeList<T, COMPARE>::sort(sl_bool flagAscending) const
 	}
 }
 
+template <class T, class COMPARE>
+SLIB_INLINE ListPosition<T, COMPARE> SafeList<T, COMPARE>::begin() const
+{
+	return ListPosition<T, COMPARE>(ref);
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE ListPosition<T, COMPARE> SafeList<T, COMPARE>::end() const
+{
+	return ListPosition<T, COMPARE>();
+}
+
 
 template <class T>
 ListLocker<T>::ListLocker(const List<T>& list) : ObjectLocker(list.ref.ptr)
@@ -3495,6 +3851,17 @@ SLIB_INLINE T& ListLocker<T>::operator[](sl_reg index)
 	return data[index];
 }
 
+template <class T>
+SLIB_INLINE T* ListLocker<T>::begin()
+{
+	return data;
+}
+
+template <class T>
+SLIB_INLINE T* ListLocker<T>::end()
+{
+	return data + count;
+}
 
 template <class T>
 ListItems<T>::ListItems(const List<T>& list)
@@ -3543,6 +3910,18 @@ template <class T>
 SLIB_INLINE T& ListItems<T>::operator[](sl_reg index)
 {
 	return data[index];
+}
+
+template <class T>
+SLIB_INLINE T* ListItems<T>::begin()
+{
+	return data;
+}
+
+template <class T>
+SLIB_INLINE T* ListItems<T>::end()
+{
+	return data + count;
 }
 
 

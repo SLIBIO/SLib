@@ -101,7 +101,7 @@ public:
 			clips[0] = &storageRectClip;
 			countClips++;
 		}
-		Link<RenderCanvasClip>* clip = state->clips.getEnd();
+		Link<RenderCanvasClip>* clip = state->clips.getBack();
 		while (clip) {
 			clips[countClips] = &(clip->value);
 			countClips++;
@@ -401,7 +401,7 @@ Rectangle RenderCanvas::getClipBounds()
 	} else {
 		rect = Rectangle(0, 0, m_width, m_height);
 	}
-	Link<RenderCanvasClip>* link = state->clips.getBegin();
+	Link<RenderCanvasClip>* link = state->clips.getFront();
 	while (link) {
 		Rectangle r = link->value.region;
 		if (link->value.flagTransform) {
@@ -463,7 +463,7 @@ void RenderCanvas::concatMatrix(const Matrix3& matrix)
 			state->clipRect.right -= tx;
 			state->clipRect.bottom -= ty;
 		}
-		Link<RenderCanvasClip>* link = state->clips.getBegin();
+		Link<RenderCanvasClip>* link = state->clips.getFront();
 		while (link) {
 			RenderCanvasClip& clip = link->value;
 			if (clip.flagTransform) {
@@ -477,7 +477,7 @@ void RenderCanvas::concatMatrix(const Matrix3& matrix)
 			link = link->next;
 		}
 	} else {
-		Link<RenderCanvasClip>* link = state->clips.getBegin();
+		Link<RenderCanvasClip>* link = state->clips.getFront();
 		while (link) {
 			RenderCanvasClip& clip = link->value;
 			if (clip.flagTransform) {
@@ -541,8 +541,8 @@ void RenderCanvas::drawText16(const String16& text, sl_real x, sl_real y, const 
 		if (fa->getChar(ch, fac)) {
 			Ref<Texture> texture = Texture::getBitmapRenderingCache(fac.bitmap);
 			if (texture.isNotNull()) {
-				sl_real fw = (sl_real)(fac.fontWidth);
-				sl_real fh = (sl_real)(fac.fontHeight);
+				sl_real fw = fac.fontWidth;
+				sl_real fh = fac.fontHeight;
 				sl_real fxn = fx + fw;
 				sl_real fy = y + (fontHeight - fh) / 2;
 				if (fontItalic) {

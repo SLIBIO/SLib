@@ -1,6 +1,6 @@
 #include "../../../inc/slib/network/http_common.h"
 
-#include "../../../inc/slib/core/url.h"
+#include "../../../inc/slib/network/url.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
@@ -11,6 +11,8 @@ SLIB_NETWORK_NAMESPACE_BEGIN
 String HttpStatuses::toString(HttpStatus status)
 {
 	switch (status) {
+		
+		HTTP_STATUS_CASE(Unknown, "Unknown");
 		
 		HTTP_STATUS_CASE(Continue, "Continue");
 		HTTP_STATUS_CASE(SwitchingProtocols, "Switching Protocols");
@@ -142,6 +144,68 @@ DEFINE_HTTP_HEADER(AcceptRanges, "Accept-Ranges")
 DEFINE_HTTP_HEADER(Origin, "Origin")
 DEFINE_HTTP_HEADER(AccessControlAllowOrigin, "Access-Control-Allow-Origin")
 
+sl_reg HttpHeaders::parseHeaders(IMap<String, String>* map, const void* _data, sl_size size)
+{
+	const sl_char8* data = (const sl_char8*)_data;
+	sl_size posCurrent = 0;
+
+	// headers
+	for (;;) {
+		sl_size posStart = posCurrent;
+		sl_size indexSplit = 0;
+		while (posCurrent < size) {
+			sl_char8 ch = data[posCurrent];
+			if (ch == '\r') {
+				break;
+			}
+			if (indexSplit == 0) {
+				if (ch == ':') {
+					indexSplit = posCurrent;
+				}
+			}
+			posCurrent++;
+		}
+		if (posCurrent >= size - 1) {
+			return 0;
+		}
+		if (data[posCurrent + 1] != '\n') {
+			return -1;
+		}
+
+		if (posCurrent == posStart) {
+			posCurrent += 2;
+			break;
+		}
+
+		String name;
+		String value;
+		if (indexSplit != 0) {
+			name = String::fromUtf8(data + posStart, indexSplit - posStart);
+			sl_size startValue = indexSplit + 1;
+			sl_size endValue = posCurrent;
+			while (startValue < endValue) {
+				if (data[startValue] != ' ' && data[startValue] != '\t') {
+					break;
+				}
+				startValue++;
+			}
+			while (startValue < endValue) {
+				if (data[endValue - 1] != ' ' && data[endValue - 1] != '\t') {
+					break;
+				}
+				endValue--;
+			}
+			value = Url::decodeUriComponentByUTF8(String::fromUtf8(data + startValue, endValue - startValue));
+		} else {
+			name = String::fromUtf8(data + posStart, posCurrent - posStart);
+		}
+		map->put_NoLock(name, value, MapPutMode::AddAlways);
+		posCurrent += 2;
+	}
+	return posCurrent;
+}
+
+
 /***********************************************************************
 	HttpRequest
 ***********************************************************************/
@@ -246,7 +310,7 @@ sl_bool HttpRequest::containsRequestHeader(String name) const
 
 void HttpRequest::removeRequestHeader(String name)
 {
-	m_requestHeaders.remove(name, sl_true);
+	m_requestHeaders.removeItems(name);
 }
 
 void HttpRequest::clearRequestHeaders()
@@ -590,60 +654,13 @@ sl_reg HttpRequest::parseRequestPacket(const void* packet, sl_size size)
 	setRequestVersion(String::fromUtf8(data + posStart, posCurrent - posStart));
 	posCurrent += 2;
 
-	// headers
-	for (;;) {
-		posStart = posCurrent;
-		sl_size indexSplit = 0;
-		while (posCurrent < size) {
-			sl_char8 ch = data[posCurrent];
-			if (ch == '\r') {
-				break;
-			}
-			if (indexSplit == 0) {
-				if (ch == ':') {
-					indexSplit = posCurrent;
-				}
-			}
-			posCurrent++;
-		}
-		if (posCurrent >= size - 1) {
-			return 0;
-		}
-		if (data[posCurrent + 1] != '\n') {
-			return -1;
-		}
-
-		if (posCurrent == posStart) {
-			posCurrent += 2;
-			break;
-		}
-
-		String name;
-		String value;
-		if (indexSplit != 0) {
-			name = String::fromUtf8(data + posStart, indexSplit - posStart);
-			sl_size startValue = indexSplit + 1;
-			sl_size endValue = posCurrent;
-			while (startValue < endValue) {
-				if (data[startValue] != ' ' && data[startValue] != '\t') {
-					break;
-				}
-				startValue++;
-			}
-			while (startValue < endValue) {
-				if (data[endValue - 1] != ' ' && data[endValue - 1] != '\t') {
-					break;
-				}
-				endValue--;
-			}
-			value = Url::decodeUriComponentByUTF8(String::fromUtf8(data + startValue, endValue - startValue));
-		} else {
-			name = String::fromUtf8(data + posStart, posCurrent - posStart);
-		}
-		m_requestHeaders.put(name, value, MapPutMode::AddAlways);
-		posCurrent += 2;
+	ObjectLocker lock(&m_requestHeaders);
+	sl_reg iRet = HttpHeaders::parseHeaders(&m_requestHeaders, data + posCurrent, size - posCurrent);
+	if (iRet > 0) {
+		return posCurrent + iRet;
+	} else {
+		return iRet;
 	}
-	return posCurrent;
 }
 
 
@@ -658,6 +675,8 @@ HttpResponse::HttpResponse()
 	m_responseCode = HttpStatus::OK;
 	SLIB_STATIC_STRING(s2, "OK");
 	m_responseMessage = s2;
+
+	m_responseHeaders.initHashBy<HashIgnoreCaseString, CompareIgnoreCaseString>();
 }
 
 HttpStatus HttpResponse::getResponseCode() const
@@ -691,7 +710,7 @@ void HttpResponse::setResponseVersion(const String& version)
 	m_responseVersion = version;
 }
 
-const IMap<String, String>& HttpResponse::getResponseHeaders() const
+const Map<String, String>& HttpResponse::getResponseHeaders() const
 {
 	return m_responseHeaders;
 }
@@ -723,7 +742,7 @@ sl_bool HttpResponse::containsResponseHeader(String name) const
 
 void HttpResponse::removeResponseHeader(String name)
 {
-	m_responseHeaders.remove(name, sl_true);
+	m_responseHeaders.removeItems(name);
 }
 
 void HttpResponse::clearResponseHeaders()
@@ -937,60 +956,13 @@ sl_reg HttpResponse::parseResponsePacket(const void* packet, sl_size size)
 	setResponseMessage(String::fromUtf8(data + posStart, posCurrent - posStart));
 	posCurrent += 2;
 
-	// headers
-	for (;;) {
-		posStart = posCurrent;
-		sl_size indexSplit = 0;
-		while (posCurrent < size) {
-			sl_char8 ch = data[posCurrent];
-			if (ch == '\r') {
-				break;
-			}
-			if (indexSplit == 0) {
-				if (ch == ':') {
-					indexSplit = posCurrent;
-				}
-			}
-			posCurrent++;
-		}
-		if (posCurrent >= size - 1) {
-			return 0;
-		}
-		if (data[posCurrent + 1] != '\n') {
-			return -1;
-		}
-
-		if (posCurrent == posStart) {
-			posCurrent += 2;
-			break;
-		}
-
-		String name;
-		String value;
-		if (indexSplit != 0) {
-			name = String::fromUtf8(data + posStart, indexSplit - posStart);
-			sl_size startValue = indexSplit + 1;
-			sl_size endValue = posCurrent;
-			while (startValue < endValue) {
-				if (data[startValue] != ' ' && data[startValue] != '\t') {
-					break;
-				}
-				startValue++;
-			}
-			while (startValue < endValue) {
-				if (data[endValue - 1] != ' ' && data[endValue - 1] != '\t') {
-					break;
-				}
-				endValue--;
-			}
-			value = Url::decodeUriComponentByUTF8(String::fromUtf8(data + startValue, endValue - startValue));
-		} else {
-			name = String::fromUtf8(data + posStart, posCurrent - posStart);
-		}
-		m_responseHeaders.put(name, value, MapPutMode::AddAlways);
-		posCurrent += 2;
+	ObjectLocker lock(m_responseHeaders.ref.ptr);
+	sl_reg iRet = HttpHeaders::parseHeaders(m_responseHeaders.ref.ptr, data + posCurrent, size - posCurrent);
+	if (iRet > 0) {
+		return posCurrent + iRet;
+	} else {
+		return iRet;
 	}
-	return posCurrent;
 }
 
 /***********************************************************************
@@ -1025,9 +997,14 @@ void HttpOutputBuffer::copyFrom(AsyncStream* stream, sl_uint64 size)
 	m_bufferOutput.copyFrom(stream, size);
 }
 
-void HttpOutputBuffer::copyFromFile(const String& path, const Ref<AsyncLoop>& loop)
+void HttpOutputBuffer::copyFromFile(const String& path)
 {
-	m_bufferOutput.copyFromFile(path, loop);
+	m_bufferOutput.copyFromFile(path);
+}
+
+void HttpOutputBuffer::copyFromFile(const String& path, const Ref<Dispatcher>& dispatcher)
+{
+	m_bufferOutput.copyFromFile(path, dispatcher);
 }
 
 sl_uint64 HttpOutputBuffer::getOutputLength() const

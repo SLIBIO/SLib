@@ -403,9 +403,6 @@
     <ClInclude Include="..\..\..\src\slib\ui\view_win32.h">
       <Filter>src\slib\ui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\url.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\media\audio_codec.h">
       <Filter>inc\media</Filter>
     </ClInclude>
@@ -757,6 +754,18 @@
     <ClInclude Include="..\..\..\src\slib\render\opengl_egl_entries.h">
       <Filter>src\slib\render</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\linked_object.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\url.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\network\url_request.h">
+      <Filter>inc\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\tuple.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">
@@ -965,9 +974,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\crypto\sha2.cpp">
       <Filter>src\slib\crypto</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\core\url.cpp">
-      <Filter>src\slib\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\graphics\drawable.cpp">
       <Filter>src\slib\graphics</Filter>
@@ -1472,6 +1478,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\ui\text_view.cpp">
       <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\url.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\url_request.cpp">
+      <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\network\url_request_win32.cpp">
+      <Filter>src\slib\network</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

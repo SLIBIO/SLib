@@ -8,7 +8,7 @@
 
 SLIB_NAMESPACE_BEGIN
 
-class SLIB_EXPORT ThreadPool : public Object
+class SLIB_EXPORT ThreadPool : public Dispatcher
 {
 	SLIB_DECLARE_OBJECT
 	
@@ -27,7 +27,10 @@ public:
 	
 	sl_uint32 getThreadsCount();
 
-	sl_bool addTask(const Ref<Runnable>& task);
+	sl_bool addTask(const Callback& task);
+	
+	// override
+	sl_bool dispatch(const Callback& callback);
 
 public:
 	SLIB_PROPERTY(sl_uint32, MinimumThreadsCount)
@@ -39,7 +42,7 @@ protected:
 
 protected:
 	CList< Ref<Thread> > m_threadWorkers;
-	Queue< Ref<Runnable> > m_tasks;
+	Queue<Callback> m_tasks;
 
 	sl_bool m_flagRunning;
 	

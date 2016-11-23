@@ -79,7 +79,7 @@ public:
 			} else {
 				logError("Can not create dsound capture device");
 			}
-			return sl_false;
+			return Ref<_DirectSound_AudioRecorder>::null();
 		}
 		
 		WAVEFORMATEX wf;

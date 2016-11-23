@@ -42,6 +42,7 @@
     <ClInclude Include="..\..\..\inc\slib\core\iterator.h" />
     <ClInclude Include="..\..\..\inc\slib\core\java.h" />
     <ClInclude Include="..\..\..\inc\slib\core\json.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\linked_object.h" />
     <ClInclude Include="..\..\..\inc\slib\core\list.h" />
     <ClInclude Include="..\..\..\inc\slib\core\locale.h" />
     <ClInclude Include="..\..\..\inc\slib\core\log.h" />
@@ -75,7 +76,7 @@
     <ClInclude Include="..\..\..\inc\slib\core\thread_pool.h" />
     <ClInclude Include="..\..\..\inc\slib\core\time.h" />
     <ClInclude Include="..\..\..\inc\slib\core\tree.h" />
-    <ClInclude Include="..\..\..\inc\slib\core\url.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\tuple.h" />
     <ClInclude Include="..\..\..\inc\slib\core\variant.h" />
     <ClInclude Include="..\..\..\inc\slib\core\win32_com.h" />
     <ClInclude Include="..\..\..\inc\slib\core\xml.h" />
@@ -181,6 +182,8 @@
     <ClInclude Include="..\..\..\inc\slib\network\socket.h" />
     <ClInclude Include="..\..\..\inc\slib\network\socket_address.h" />
     <ClInclude Include="..\..\..\inc\slib\network\tcpip.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\url.h" />
+    <ClInclude Include="..\..\..\inc\slib\network\url_request.h" />
     <ClInclude Include="..\..\..\inc\slib\render.h" />
     <ClInclude Include="..\..\..\inc\slib\render\base.h" />
     <ClInclude Include="..\..\..\inc\slib\render\canvas.h" />
@@ -294,7 +297,6 @@
     <ClCompile Include="..\..\..\src\slib\core\thread_pool.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\thread_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\time.cpp" />
-    <ClCompile Include="..\..\..\src\slib\core\url.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\variant.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\win32_com.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\xml.cpp" />
@@ -411,6 +413,9 @@
     <ClCompile Include="..\..\..\src\slib\network\socket_event.cpp" />
     <ClCompile Include="..\..\..\src\slib\network\socket_event_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\network\tcpip.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\url.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\url_request.cpp" />
+    <ClCompile Include="..\..\..\src\slib\network\url_request_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\index_buffer.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\opengl_egl.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\opengl_gl.cpp" />

@@ -10,7 +10,7 @@
 #include "../math/point.h"
 
 typedef sl_int32 sl_ui_pos;
-typedef sl_uint32 sl_ui_len;
+typedef sl_int32 sl_ui_len;
 typedef float sl_ui_posf;
 typedef double sl_scroll_pos;
 

@@ -4,12 +4,12 @@
 	Uniform Resource Identifier (URI): Generic Syntax
 */
 
-#ifndef CHECKHEADER_SLIB_CORE_URL
-#define CHECKHEADER_SLIB_CORE_URL
+#ifndef CHECKHEADER_SLIB_NETWORK_URL
+#define CHECKHEADER_SLIB_NETWORK_URL
 
 #include "definition.h"
 
-#include "string.h"
+#include "../core/string.h"
 
 SLIB_NAMESPACE_BEGIN
 

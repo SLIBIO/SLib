@@ -933,11 +933,6 @@ public:
 	virtual sl_bool hitTestForCapturingChildInstanceEvents(const UIPoint& pt);
 	
 	
-	sl_bool isTextInput();
-	
-	void setTextInput(sl_bool flagTextInput);
-	
-	
 	void drawBackground(Canvas* canvas, const Color& color, const Ref<Drawable>& background);
 	
 	void drawBorder(Canvas* canvas, const Ref<Pen>& pen);
@@ -952,7 +947,7 @@ public:
 
 public:
 	SLIB_PTR_PROPERTY(IViewListener, EventListener)
-	SLIB_REF_PROPERTY(Runnable, OnClick)
+	SLIB_CALLBACK_PROPERTY(OnClick)
 	
 protected:
 	virtual void onDraw(Canvas* canvas);
@@ -1369,17 +1364,6 @@ protected:
 	SafeRef<ScrollAttributes> m_scrollAttributes;
 	
 	Ref<ScrollAttributes> _initializeScrollAttributes();
-	
-	class TextInputAttributes : public Referable
-	{
-	public:
-		sl_bool flagTextInput;
-		
-	};
-	
-	SafeRef<TextInputAttributes> m_textInputAttributes;
-	
-	Ref<TextInputAttributes> _initializeTextInputAttributes();
 
 	friend class ListView;
 

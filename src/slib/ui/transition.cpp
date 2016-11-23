@@ -16,7 +16,7 @@ Transition::Transition(const Transition& other) = default;
 
 Transition& Transition::operator=(const Transition& other) = default;
 
-Ref<Animation> Transition::start(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Ref<Runnable>& onStop)
+Ref<Animation> Transition::start(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Callback& onStop)
 {
 	if (view.isNull()) {
 		return Ref<Animation>::null();
@@ -26,14 +26,12 @@ Ref<Animation> Transition::start(const Ref<View>& view, const Transition& transi
 		animation->start();
 		return animation;
 	} else {
-		if (onStop.isNotNull()) {
-			onStop->run();
-		}
+		onStop();
 		return Ref<Animation>::null();
 	}
 }
 
-Ref<Animation> Transition::createAnimation(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Ref<Runnable>& onStop)
+Ref<Animation> Transition::createAnimation(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Callback& onStop)
 {
 	if (view.isNull()) {
 		return Ref<Animation>::null();
@@ -130,7 +128,7 @@ Ref<Animation> Transition::createAnimation(const Ref<View>& view, const Transiti
 	return Ref<Animation>::null();
 }
 
-Ref<Animation> Transition::startPopup(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Ref<Runnable>& onStop)
+Ref<Animation> Transition::startPopup(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Callback& onStop)
 {
 	if (view.isNull()) {
 		return Ref<Animation>::null();
@@ -140,14 +138,12 @@ Ref<Animation> Transition::startPopup(const Ref<View>& view, const Transition& t
 		animation->start();
 		return animation;
 	} else {
-		if (onStop.isNotNull()) {
-			onStop->run();
-		}
+		onStop();
 		return Ref<Animation>::null();
 	}
 }
 
-Ref<Animation> Transition::createPopupAnimation(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Ref<Runnable>& onStop)
+Ref<Animation> Transition::createPopupAnimation(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Callback& onStop)
 {
 	if (view.isNull()) {
 		return Ref<Animation>::null();

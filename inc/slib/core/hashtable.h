@@ -1,5 +1,5 @@
-#ifndef CHECKHEADER_SLIB_HASHTABLE
-#define CHECKHEADER_SLIB_HASHTABLE
+#ifndef CHECKHEADER_SLIB_CORE_HASHTABLE
+#define CHECKHEADER_SLIB_CORE_HASHTABLE
 
 #include "definition.h"
 
@@ -42,7 +42,7 @@ public:
 	
 };
 
-template <class KT, class VT, class HASH = Hash<KT> >
+template <class KT, class VT, class HASH = Hash<KT>, class COMPARE = Compare<KT> >
 class SLIB_EXPORT HashTable
 {
 public:
@@ -65,7 +65,7 @@ public:
 	
 	sl_bool getAt(const HashPosition& position, KT* outKey = sl_null, VT* outValue = sl_null) const;
 	
-	sl_bool get(const KT& key, VT* value = sl_null) const;
+	sl_bool get(const KT& key, VT* outValue = sl_null) const;
 	
 	VT* getItemPtr(const KT& key) const;
 	
@@ -75,13 +75,17 @@ public:
 	
 	sl_bool addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist = sl_null);
 	
-	sl_size remove(const KT& key, sl_bool flagRemoveAllMatches = sl_false);
+	sl_bool remove(const KT& key, VT* outValue = sl_null);
 	
-	sl_size removeKeyAndValue(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
+	sl_size removeItems(const KT& key, List<VT>* outValues = sl_null);
+	
+	sl_bool removeValue(const KT& key, const VT& value);
+	
+	sl_size removeValues(const KT& key, const VT& value);
 	
 	sl_size removeAll();
 	
-	sl_bool copyFrom(const HashTable<KT, VT, HASH>* other);
+	sl_bool copyFrom(const HashTable<KT, VT, HASH, COMPARE>* other);
 	
 private:
 	struct HashEntry
@@ -109,6 +113,8 @@ private:
 	sl_bool _createTable(sl_uint32 capacity);
 	
 	sl_bool _addEntry(sl_uint32 index, sl_uint32 hash, HashEntry* first, const KT& key, const VT& value);
+	
+	void _compact();
 	
 };
 
@@ -162,8 +168,8 @@ SLIB_INLINE void HashPosition::setNull()
 }
 
 
-template <class KT, class VT, class HASH>
-HashTable<KT, VT, HASH>::HashTable(sl_uint32 capacity)
+template <class KT, class VT, class HASH, class COMPARE>
+HashTable<KT, VT, HASH, COMPARE>::HashTable(sl_uint32 capacity)
 {
 	if (capacity < _SLIB_HASHTABLE_MIN_CAPACITY) {
 		capacity = _SLIB_HASHTABLE_MIN_CAPACITY;
@@ -176,26 +182,26 @@ HashTable<KT, VT, HASH>::HashTable(sl_uint32 capacity)
 	_init();
 }
 
-template <class KT, class VT, class HASH>
-HashTable<KT, VT, HASH>::~HashTable()
+template <class KT, class VT, class HASH, class COMPARE>
+HashTable<KT, VT, HASH, COMPARE>::~HashTable()
 {
 	_free();
 }
 
-template <class KT, class VT, class HASH>
-SLIB_INLINE sl_size HashTable<KT, VT, HASH>::getCount() const
+template <class KT, class VT, class HASH, class COMPARE>
+SLIB_INLINE sl_size HashTable<KT, VT, HASH, COMPARE>::getCount() const
 {
 	return m_nSize;
 }
 
-template <class KT, class VT, class HASH>
-SLIB_INLINE sl_size HashTable<KT, VT, HASH>::getCapacity() const
+template <class KT, class VT, class HASH, class COMPARE>
+SLIB_INLINE sl_size HashTable<KT, VT, HASH, COMPARE>::getCapacity() const
 {
 	return m_nCapacity;
 }
 
-template <class KT, class VT, class HASH>
-sl_bool HashTable<KT, VT, HASH>::search(const KT& key, HashPosition* position) const
+template <class KT, class VT, class HASH, class COMPARE>
+sl_bool HashTable<KT, VT, HASH, COMPARE>::search(const KT& key, HashPosition* position) const
 {
 	if (m_nCapacity == 0) {
 		return sl_false;
@@ -204,7 +210,7 @@ sl_bool HashTable<KT, VT, HASH>::search(const KT& key, HashPosition* position) c
 	sl_uint32 index = hash & (m_nCapacity - 1);
 	HashEntry* entry = m_table[index];
 	while (entry) {
-		if (entry->hash == hash && entry->key == key) {
+		if (entry->hash == hash && COMPARE::equals(entry->key, key)) {
 			if (position) {
 				position->node = entry;
 				position->index = index;
@@ -216,8 +222,8 @@ sl_bool HashTable<KT, VT, HASH>::search(const KT& key, HashPosition* position) c
 	return sl_false;
 }
 
-template <class KT, class VT, class HASH>
-sl_bool HashTable<KT, VT, HASH>::search(const KT& key, const VT& value, HashPosition* position) const
+template <class KT, class VT, class HASH, class COMPARE>
+sl_bool HashTable<KT, VT, HASH, COMPARE>::search(const KT& key, const VT& value, HashPosition* position) const
 {
 	if (m_nCapacity == 0) {
 		return sl_false;
@@ -226,7 +232,7 @@ sl_bool HashTable<KT, VT, HASH>::search(const KT& key, const VT& value, HashPosi
 	sl_uint32 index = hash & (m_nCapacity - 1);
 	HashEntry* entry = m_table[index];
 	while (entry) {
-		if (entry->hash == hash && entry->key == key && entry->value == value) {
+		if (entry->hash == hash && COMPARE::equals(entry->key, key) && entry->value == value) {
 			if (position) {
 				position->node = entry;
 				position->index = index;
@@ -238,8 +244,8 @@ sl_bool HashTable<KT, VT, HASH>::search(const KT& key, const VT& value, HashPosi
 	return sl_false;
 }
 
-template <class KT, class VT, class HASH>
-sl_bool HashTable<KT, VT, HASH>::getFirstPosition(HashPosition& position, KT* outKey, VT* outValue) const
+template <class KT, class VT, class HASH, class COMPARE>
+sl_bool HashTable<KT, VT, HASH, COMPARE>::getFirstPosition(HashPosition& position, KT* outKey, VT* outValue) const
 {
 	if (m_nCapacity == 0) {
 		return sl_false;
@@ -263,8 +269,8 @@ sl_bool HashTable<KT, VT, HASH>::getFirstPosition(HashPosition& position, KT* ou
 	return sl_false;
 }
 
-template <class KT, class VT, class HASH>
-sl_bool HashTable<KT, VT, HASH>::getNextPosition(HashPosition& position, KT* outKey, VT* outValue) const
+template <class KT, class VT, class HASH, class COMPARE>
+sl_bool HashTable<KT, VT, HASH, COMPARE>::getNextPosition(HashPosition& position, KT* outKey, VT* outValue) const
 {
 	if (m_nCapacity == 0) {
 		return sl_false;
@@ -300,8 +306,8 @@ sl_bool HashTable<KT, VT, HASH>::getNextPosition(HashPosition& position, KT* out
 	return sl_false;
 }
 
-template <class KT, class VT, class HASH>
-sl_bool HashTable<KT, VT, HASH>::getAt(const HashPosition& position, KT* outKey, VT* outValue) const
+template <class KT, class VT, class HASH, class COMPARE>
+sl_bool HashTable<KT, VT, HASH, COMPARE>::getAt(const HashPosition& position, KT* outKey, VT* outValue) const
 {
 	if (m_nCapacity == 0) {
 		return sl_false;
@@ -319,8 +325,8 @@ sl_bool HashTable<KT, VT, HASH>::getAt(const HashPosition& position, KT* outKey,
 	return sl_true;
 }
 
-template <class KT, class VT, class HASH>
-sl_bool HashTable<KT, VT, HASH>::get(const KT& key, VT* value) const
+template <class KT, class VT, class HASH, class COMPARE>
+sl_bool HashTable<KT, VT, HASH, COMPARE>::get(const KT& key, VT* value) const
 {
 	HashPosition pos;
 	if (search(key, &pos)) {
@@ -334,8 +340,8 @@ sl_bool HashTable<KT, VT, HASH>::get(const KT& key, VT* value) const
 	}
 }
 
-template <class KT, class VT, class HASH>
-VT* HashTable<KT, VT, HASH>::getItemPtr(const KT& key) const
+template <class KT, class VT, class HASH, class COMPARE>
+VT* HashTable<KT, VT, HASH, COMPARE>::getItemPtr(const KT& key) const
 {
 	HashPosition pos;
 	if (search(key, &pos)) {
@@ -346,8 +352,8 @@ VT* HashTable<KT, VT, HASH>::getItemPtr(const KT& key) const
 	}
 }
 
-template <class KT, class VT, class HASH>
-List<VT> HashTable<KT, VT, HASH>::getValues(const KT& key) const
+template <class KT, class VT, class HASH, class COMPARE>
+List<VT> HashTable<KT, VT, HASH, COMPARE>::getValues(const KT& key) const
 {
 	List<VT> ret;
 	if (m_nCapacity == 0) {
@@ -357,7 +363,7 @@ List<VT> HashTable<KT, VT, HASH>::getValues(const KT& key) const
 	sl_uint32 index = hash & (m_nCapacity - 1);
 	HashEntry* entry = m_table[index];
 	while (entry) {
-		if (entry->hash == hash && entry->key == key) {
+		if (entry->hash == hash && COMPARE::equals(entry->key, key)) {
 			ret.add_NoLock(entry->value);
 		}
 		entry = entry->next;
@@ -365,8 +371,8 @@ List<VT> HashTable<KT, VT, HASH>::getValues(const KT& key) const
 	return ret;
 }
 
-template <class KT, class VT, class HASH>
-sl_bool HashTable<KT, VT, HASH>::_addEntry(sl_uint32 index, sl_uint32 hash, HashEntry* first, const KT& key, const VT& value)
+template <class KT, class VT, class HASH, class COMPARE>
+sl_bool HashTable<KT, VT, HASH, COMPARE>::_addEntry(sl_uint32 index, sl_uint32 hash, HashEntry* first, const KT& key, const VT& value)
 {
 	HashEntry* entry = new HashEntry;
 	if (!entry) {
@@ -418,8 +424,8 @@ sl_bool HashTable<KT, VT, HASH>::_addEntry(sl_uint32 index, sl_uint32 hash, Hash
 	return sl_true;
 }
 
-template <class KT, class VT, class HASH>
-sl_bool HashTable<KT, VT, HASH>::put(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
+template <class KT, class VT, class HASH, class COMPARE>
+sl_bool HashTable<KT, VT, HASH, COMPARE>::put(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
 {
 	if (pFlagExist) {
 		*pFlagExist = sl_false;
@@ -435,7 +441,7 @@ sl_bool HashTable<KT, VT, HASH>::put(const KT& key, const VT& value, MapPutMode 
 	if (mode != MapPutMode::AddAlways) {
 		HashEntry* entry = first;
 		while (entry) {
-			if (entry->hash == hash && entry->key == key) {
+			if (entry->hash == hash && COMPARE::equals(entry->key, key)) {
 				if (pFlagExist) {
 					*pFlagExist = sl_true;
 				}
@@ -456,8 +462,8 @@ sl_bool HashTable<KT, VT, HASH>::put(const KT& key, const VT& value, MapPutMode 
 	
 }
 
-template <class KT, class VT, class HASH>
-sl_bool HashTable<KT, VT, HASH>::addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist)
+template <class KT, class VT, class HASH, class COMPARE>
+sl_bool HashTable<KT, VT, HASH, COMPARE>::addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist)
 {
 	if (pFlagExist) {
 		*pFlagExist = sl_false;
@@ -472,7 +478,7 @@ sl_bool HashTable<KT, VT, HASH>::addIfNewKeyAndValue(const KT& key, const VT& va
 
 	HashEntry* entry = first;
 	while (entry) {
-		if (entry->hash == hash && entry->key == key && entry->value == value) {
+		if (entry->hash == hash && COMPARE::equals(entry->key, key) && entry->value == value) {
 			if (pFlagExist) {
 				*pFlagExist = sl_true;
 			}
@@ -484,37 +490,11 @@ sl_bool HashTable<KT, VT, HASH>::addIfNewKeyAndValue(const KT& key, const VT& va
 	return _addEntry(index, hash, first, key, value);
 }
 
-
-template <class KT, class VT, class HASH>
-sl_size HashTable<KT, VT, HASH>::remove(const KT& key, sl_bool flagRemoveAllMatches)
+template <class KT, class VT, class HASH, class COMPARE>
+void HashTable<KT, VT, HASH, COMPARE>::_compact()
 {
-	if (m_nCapacity == 0) {
-		return 0;
-	}
-	sl_uint32 hash = HASH::hash(key);
-	sl_uint32 index = hash & (m_nCapacity - 1);
 	HashEntry* entry;
-	HashEntry** link = m_table + index;
-	HashEntry* entryDelete = sl_null;
-	HashEntry** linkDelete = &entryDelete;
-	sl_size oldSize = m_nSize;
-	while ((entry = *link)) {
-		if (entry->hash == hash && entry->key == key) {
-			*link = entry->next;
-			m_nSize--;
-			*linkDelete = entry;
-			entry->next = sl_null;
-			linkDelete = &(entry->next);
-			if (!flagRemoveAllMatches) {
-				break;
-			}
-		} else {
-			link = &(entry->next);
-		}
-	}
-	if (!entryDelete) {
-		return 0;
-	}
+	HashEntry** link;
 	if (m_nSize <= m_nThresholdDown) {
 		// half capacity
 		HashEntry** tableOld = m_table;
@@ -532,16 +512,37 @@ sl_size HashTable<KT, VT, HASH>::remove(const KT& key, sl_bool flagRemoveAllMatc
 			Base::freeMemory(tableOld);
 		}
 	}
-	while (entryDelete) {
-		entry = entryDelete;
-		entryDelete = entryDelete->next;
-		delete entry;
-	}
-	return oldSize - m_nSize;
 }
 
-template <class KT, class VT, class HASH>
-sl_size HashTable<KT, VT, HASH>::removeKeyAndValue(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
+template <class KT, class VT, class HASH, class COMPARE>
+sl_bool HashTable<KT, VT, HASH, COMPARE>::remove(const KT& key, VT* outValue)
+{
+	if (m_nCapacity == 0) {
+		return 0;
+	}
+	sl_uint32 hash = HASH::hash(key);
+	sl_uint32 index = hash & (m_nCapacity - 1);
+	HashEntry* entry;
+	HashEntry** link = m_table + index;
+	while ((entry = *link)) {
+		if (entry->hash == hash && COMPARE::equals(entry->key, key)) {
+			*link = entry->next;
+			m_nSize--;
+			if (outValue) {
+				*outValue = entry->value;
+			}
+			delete entry;
+			_compact();
+			return sl_true;
+		} else {
+			link = &(entry->next);
+		}
+	}
+	return sl_false;
+}
+
+template <class KT, class VT, class HASH, class COMPARE>
+sl_size HashTable<KT, VT, HASH, COMPARE>::removeItems(const KT& key, List<VT>* outValues)
 {
 	if (m_nCapacity == 0) {
 		return 0;
@@ -554,15 +555,15 @@ sl_size HashTable<KT, VT, HASH>::removeKeyAndValue(const KT& key, const VT& valu
 	HashEntry** linkDelete = &entryDelete;
 	sl_size oldSize = m_nSize;
 	while ((entry = *link)) {
-		if (entry->hash == hash && entry->key == key && entry->value == value) {
+		if (entry->hash == hash && COMPARE::equals(entry->key, key)) {
 			*link = entry->next;
 			m_nSize--;
+			if (outValues) {
+				outValues->add_NoLock(entry->value);
+			}
 			*linkDelete = entry;
 			entry->next = sl_null;
 			linkDelete = &(entry->next);
-			if (!flagRemoveAllMatches) {
-				break;
-			}
 		} else {
 			link = &(entry->next);
 		}
@@ -570,23 +571,7 @@ sl_size HashTable<KT, VT, HASH>::removeKeyAndValue(const KT& key, const VT& valu
 	if (!entryDelete) {
 		return 0;
 	}
-	if (m_nSize <= m_nThresholdDown) {
-		// half capacity
-		HashEntry** tableOld = m_table;
-		sl_uint32 n = m_nCapacity >> 1;
-		if (_createTable(n)) {
-			HashEntry** table = m_table;
-			for (sl_uint32 i = 0; i < n; i++) {
-				table[i] = tableOld[i];
-				link = table + i;
-				while ((entry = *link)) {
-					link = &(entry->next);
-				}
-				*link = tableOld[i | n];
-			}
-			Base::freeMemory(tableOld);
-		}
-	}
+	_compact();
 	while (entryDelete) {
 		entry = entryDelete;
 		entryDelete = entryDelete->next;
@@ -595,8 +580,68 @@ sl_size HashTable<KT, VT, HASH>::removeKeyAndValue(const KT& key, const VT& valu
 	return oldSize - m_nSize;
 }
 
-template <class KT, class VT, class HASH>
-sl_size HashTable<KT, VT, HASH>::removeAll()
+template <class KT, class VT, class HASH, class COMPARE>
+sl_bool HashTable<KT, VT, HASH, COMPARE>::removeValue(const KT& key, const VT& value)
+{
+	if (m_nCapacity == 0) {
+		return 0;
+	}
+	sl_uint32 hash = HASH::hash(key);
+	sl_uint32 index = hash & (m_nCapacity - 1);
+	HashEntry* entry;
+	HashEntry** link = m_table + index;
+	while ((entry = *link)) {
+		if (entry->hash == hash && COMPARE::equals(entry->key, key) && entry->value == value) {
+			*link = entry->next;
+			m_nSize--;
+			delete entry;
+			_compact();
+			return sl_true;
+		} else {
+			link = &(entry->next);
+		}
+	}
+	return sl_false;
+}
+
+template <class KT, class VT, class HASH, class COMPARE>
+sl_size HashTable<KT, VT, HASH, COMPARE>::removeValues(const KT& key, const VT& value)
+{
+	if (m_nCapacity == 0) {
+		return 0;
+	}
+	sl_uint32 hash = HASH::hash(key);
+	sl_uint32 index = hash & (m_nCapacity - 1);
+	HashEntry* entry;
+	HashEntry** link = m_table + index;
+	HashEntry* entryDelete = sl_null;
+	HashEntry** linkDelete = &entryDelete;
+	sl_size oldSize = m_nSize;
+	while ((entry = *link)) {
+		if (entry->hash == hash && COMPARE::equals(entry->key, key) && entry->value == value) {
+			*link = entry->next;
+			m_nSize--;
+			*linkDelete = entry;
+			entry->next = sl_null;
+			linkDelete = &(entry->next);
+		} else {
+			link = &(entry->next);
+		}
+	}
+	if (!entryDelete) {
+		return 0;
+	}
+	_compact();
+	while (entryDelete) {
+		entry = entryDelete;
+		entryDelete = entryDelete->next;
+		delete entry;
+	}
+	return oldSize - m_nSize;
+}
+
+template <class KT, class VT, class HASH, class COMPARE>
+sl_size HashTable<KT, VT, HASH, COMPARE>::removeAll()
 {
 	if (m_nCapacity == 0) {
 		return 0;
@@ -607,8 +652,8 @@ sl_size HashTable<KT, VT, HASH>::removeAll()
 	return oldSize;
 }
 
-template <class KT, class VT, class HASH>
-sl_bool HashTable<KT, VT, HASH>::copyFrom(const HashTable<KT, VT, HASH>* other)
+template <class KT, class VT, class HASH, class COMPARE>
+sl_bool HashTable<KT, VT, HASH, COMPARE>::copyFrom(const HashTable<KT, VT, HASH, COMPARE>* other)
 {
 	_free();
 	m_nCapacityMin = other->m_nCapacityMin;
@@ -640,8 +685,8 @@ sl_bool HashTable<KT, VT, HASH>::copyFrom(const HashTable<KT, VT, HASH>* other)
 	return sl_true;
 }
 
-template <class KT, class VT, class HASH>
-void HashTable<KT, VT, HASH>::_init()
+template <class KT, class VT, class HASH, class COMPARE>
+void HashTable<KT, VT, HASH, COMPARE>::_init()
 {
 	m_nSize = 0;
 	sl_uint32 capacity = m_nCapacityMin;
@@ -657,8 +702,8 @@ void HashTable<KT, VT, HASH>::_init()
 	}
 }
 
-template <class KT, class VT, class HASH>
-void HashTable<KT, VT, HASH>::_free()
+template <class KT, class VT, class HASH, class COMPARE>
+void HashTable<KT, VT, HASH, COMPARE>::_free()
 {
 	HashEntry** table = m_table;
 	sl_uint32 nCapacity = m_nCapacity;
@@ -677,8 +722,8 @@ void HashTable<KT, VT, HASH>::_free()
 	}
 }
 
-template <class KT, class VT, class HASH>
-sl_bool HashTable<KT, VT, HASH>::_createTable(sl_uint32 capacity)
+template <class KT, class VT, class HASH, class COMPARE>
+sl_bool HashTable<KT, VT, HASH, COMPARE>::_createTable(sl_uint32 capacity)
 {
 	if (capacity > _SLIB_HASHTABLE_MAX_CAPACITY || capacity < m_nCapacityMin) {
 		return sl_false;

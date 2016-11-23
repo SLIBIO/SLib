@@ -1,6 +1,6 @@
 #include "../../../inc/slib/network/http_client.h"
 
-#include "../../../inc/slib/core/url.h"
+#include "../../../inc/slib/network/url.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 

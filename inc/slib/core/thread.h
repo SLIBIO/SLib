@@ -32,9 +32,9 @@ protected:
 	~Thread();
 
 public:
-	static Ref<Thread> create(const Ref<Runnable>& runnable);
+	static Ref<Thread> create(const Callback& callback);
 	
-	static Ref<Thread> start(const Ref<Runnable>& runnable, sl_uint32 stackSize = SLIB_THREAD_DEFAULT_STACK_SIZE);
+	static Ref<Thread> start(const Callback& callback, sl_uint32 stackSize = SLIB_THREAD_DEFAULT_STACK_SIZE);
 	
 public:
 	sl_bool start(sl_uint32 stackSize = SLIB_THREAD_DEFAULT_STACK_SIZE);
@@ -69,7 +69,7 @@ public:
 	
 	sl_bool isNotWaiting();
 	
-	const Ref<Runnable>& getRunnable();
+	const Callback& getCallback();
 	
 	static sl_bool sleep(sl_uint32 ms);
 	
@@ -103,7 +103,7 @@ private:
 
 	sl_bool m_flagRequestStop;
 	sl_bool m_flagRunning;
-	Ref<Runnable> m_runnable;
+	Callback m_callback;
 
 	Ref<Event> m_eventWake;
 	Ref<Event> m_eventExit;

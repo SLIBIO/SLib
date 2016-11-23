@@ -55,7 +55,7 @@ protected:
 public:
 	SLIB_PTR_PROPERTY(IEditViewListener, Listener)
 	
-	SLIB_REF_PROPERTY(Runnable, EnterAction)
+	SLIB_CALLBACK_PROPERTY(EnterAction)
 	
 protected:
 	virtual String onChange(const String& newValue);

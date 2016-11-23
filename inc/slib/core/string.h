@@ -281,6 +281,8 @@ public:
 	sl_uint32 getHashCode() const;
 	
 	void setHashCode(sl_uint32 hash);
+	
+	sl_uint32 getHashCodeIgnoreCase() const;
 
 	sl_char8 getAt(sl_reg index) const;
 	
@@ -415,6 +417,10 @@ public:
 	
 	sl_int32 compare(const String8& other, sl_size len) const;
 	
+	
+	sl_bool equalsIgnoreCase(const String8& other) const;
+	
+	sl_int32 compareIgnoreCase(const String8& other) const;
 
 public:
 	sl_bool operator==(const String8& other) const;
@@ -546,6 +552,8 @@ public:
 	String8 duplicate() const;
 
 	Memory toMemory() const;
+	
+	Memory toStaticMemory() const;
 
 	sl_size getUtf16(sl_char16* utf16, sl_size len) const;
 
@@ -880,6 +888,8 @@ public:
 	
 	void setHashCode(sl_uint32 hash);
 	
+	sl_uint32 getHashCodeIgnoreCase() const;
+	
 	sl_char16 getAt(sl_reg index) const;
 	
 	sl_bool setAt(sl_reg index, sl_char16 ch);
@@ -1012,7 +1022,12 @@ public:
 	sl_int32 compare(const sl_char32* utf32) const;
 	
 	sl_int32 compare(const String16& other, sl_size len) const;
+
 	
+	sl_bool equalsIgnoreCase(const String16& other) const;
+	
+	sl_int32 compareIgnoreCase(const String16& other) const;
+
 public:
 	sl_bool operator==(const String8& other) const;
 	
@@ -1144,6 +1159,8 @@ public:
 
 	Memory toMemory() const;
 
+	Memory toStaticMemory() const;
+	
 	sl_size getUtf8(sl_char8* utf8, sl_size len) const;
 
 	sl_bool getUtf8(StringData& output) const;
@@ -1434,6 +1451,8 @@ public:
 	
 	sl_uint32 getHashCode() const;
 	
+	sl_uint32 getHashCodeIgnoreCase() const;
+	
 public:
 	SafeString8& operator=(SafeString8&& other);
 	
@@ -1563,7 +1582,11 @@ public:
 	
 	sl_int32 compare(const String8& other, sl_size len) const;
 	
-
+	
+	sl_bool equalsIgnoreCase(const String8& other) const;
+	
+	sl_int32 compareIgnoreCase(const String8& other) const;
+	
 public:
 	sl_bool operator==(const String8& other) const;
 	
@@ -1896,6 +1919,8 @@ public:
 	
 	sl_uint32 getHashCode() const;
 
+	sl_uint32 getHashCodeIgnoreCase() const;
+	
 public:
 	SafeString16& operator=(SafeString16&& other);
 	
@@ -2025,6 +2050,11 @@ public:
 	
 	sl_int32 compare(const String16& other, sl_size len) const;
 
+	
+	sl_bool equalsIgnoreCase(const String16& other) const;
+	
+	sl_int32 compareIgnoreCase(const String16& other) const;
+	
 public:
 	sl_bool operator==(const String8& other) const;
 	
@@ -2323,6 +2353,44 @@ sl_uint32 Hash<SafeString8>::hash(const SafeString8& v);
 
 template <>
 sl_uint32 Hash<SafeString16>::hash(const SafeString16& v);
+
+
+class CompareIgnoreCaseString8
+{
+public:
+	static int compare(const String8& a, const String8& b);
+	
+	static sl_bool equals(const String8& a, const String8& b);
+	
+};
+
+class CompareIgnoreCaseString16
+{
+public:
+	static int compare(const String16& a, const String16& b);
+	
+	static sl_bool equals(const String16& a, const String16& b);
+	
+};
+
+typedef CompareIgnoreCaseString8 CompareIgnoreCaseString;
+
+class HashIgnoreCaseString8
+{
+public:
+	static sl_uint32 hash(const String8& v);
+	
+};
+
+class HashIgnoreCaseString16
+{
+public:
+	static sl_uint32 hash(const String16& v);
+	
+};
+
+typedef HashIgnoreCaseString8 HashIgnoreCaseString;
+
 
 typedef String8 String;
 typedef SafeString8 SafeString;

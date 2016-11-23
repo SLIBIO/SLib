@@ -138,9 +138,9 @@ void ViewStack::_push(Ref<View> viewIn, Transition transition, sl_bool flagRemov
 	viewIn->setEnabled(sl_false, UIUpdateMode::NoRedraw);
 	
 	_applyDefaultPushTransition(transition);
-	Ref<Animation> animationPause = Transition::createAnimation(viewBack, transition, UIPageAction::Pause, SLIB_CALLBACK(_ViewStack_FinishAnimation, Ref<ViewStack>(this), viewBack, UIPageAction::Pause));
+	Ref<Animation> animationPause = Transition::createAnimation(viewBack, transition, UIPageAction::Pause, SLIB_CALLBACK(&_ViewStack_FinishAnimation, Ref<ViewStack>(this), viewBack, UIPageAction::Pause));
 	
-	Ref<Animation> animationPush = Transition::createAnimation(viewIn, transition, UIPageAction::Push, SLIB_CALLBACK(_ViewStack_FinishAnimation, Ref<ViewStack>(this), viewIn, UIPageAction::Push));
+	Ref<Animation> animationPush = Transition::createAnimation(viewIn, transition, UIPageAction::Push, SLIB_CALLBACK(&_ViewStack_FinishAnimation, Ref<ViewStack>(this), viewIn, UIPageAction::Push));
 	
 	addChild(viewIn, UIUpdateMode::NoRedraw);
 	
@@ -224,9 +224,9 @@ void ViewStack::_pop(Ref<View> _viewOut, Transition transition)
 	viewOut->setEnabled(sl_false, UIUpdateMode::NoRedraw);
 	
 	_applyDefaultPopTransition(transition);
-	Ref<Animation> animationPop = Transition::createAnimation(viewOut, transition, UIPageAction::Pop, SLIB_CALLBACK(_ViewStack_FinishAnimation, Ref<ViewStack>(this), viewOut, UIPageAction::Pop));
+	Ref<Animation> animationPop = Transition::createAnimation(viewOut, transition, UIPageAction::Pop, SLIB_CALLBACK(&_ViewStack_FinishAnimation, Ref<ViewStack>(this), viewOut, UIPageAction::Pop));
 	
-	Ref<Animation> animationResume = Transition::createAnimation(viewBack, transition, UIPageAction::Resume, SLIB_CALLBACK(_ViewStack_FinishAnimation, Ref<ViewStack>(this), viewBack, UIPageAction::Resume));
+	Ref<Animation> animationResume = Transition::createAnimation(viewBack, transition, UIPageAction::Resume, SLIB_CALLBACK(&_ViewStack_FinishAnimation, Ref<ViewStack>(this), viewBack, UIPageAction::Resume));
 	
 	addChild(viewBack, UIUpdateMode::NoRedraw);
 
@@ -789,6 +789,13 @@ void ViewPage::_closePopup(Transition transition)
 	
 	setEnabled(sl_false, UIUpdateMode::NoRedraw);
 	
+	Ref<View> parent = getParent();
+	if (parent.isNotNull()) {
+		if (_ViewPagePopupBackground::checkInstance(parent.ptr)) {
+			parent->setBackgroundColor(Color::zero());
+		}
+	}
+	
 	Ref<Animation> animation = Transition::createPopupAnimation(this, transition, UIPageAction::Pop, SLIB_CALLBACK_REF(ViewPage, _finishPopupAnimation, this, UIPageAction::Pop));
 	
 	dispatchClose();
@@ -1187,10 +1194,7 @@ void ViewPage::dispatchClose()
 {
 	dispatchPause();
 	onClose();
-	Ref<Runnable> callback = getOnClose();
-	if (callback.isNotNull()) {
-		callback->run();
-	}
+	(getOnClose())();
 }
 
 void ViewPage::dispatchResume()

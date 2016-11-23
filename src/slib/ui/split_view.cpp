@@ -358,7 +358,7 @@ Ref<Drawable> SplitView::getItemDividerBackground(sl_size index)
 	if (item) {
 		return item->dividerBackground;
 	}
-	return 0;
+	return Ref<Drawable>::null();
 }
 
 void SplitView::setItemDividerBackground(sl_size index, const Ref<Drawable>& background, UIUpdateMode mode)

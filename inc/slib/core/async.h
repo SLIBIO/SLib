@@ -31,19 +31,19 @@ class AsyncStreamRequest;
 class SLIB_EXPORT Async
 {
 public:
-	static sl_bool runTask(const Ref<Runnable>& task, const Ref<AsyncLoop>& loop);
+	static sl_bool runTask(const Callback& task, const Ref<AsyncLoop>& loop);
 	
-	static sl_bool runTask(const Ref<Runnable>& task);
-	
-	
-	static sl_bool setTimeout(const Ref<Runnable>& task, sl_uint64 delay_ms, const Ref<AsyncLoop>& loop);
-	
-	static sl_bool setTimeout(const Ref<Runnable>& task, sl_uint64 delay_ms);
+	static sl_bool runTask(const Callback& task);
 	
 	
-	static Ref<AsyncTimer> addTimer(const Ref<Runnable>& task, sl_uint64 interval_ms, const Ref<AsyncLoop>& loop);
+	static sl_bool setTimeout(const Callback& task, sl_uint64 delay_ms, const Ref<AsyncLoop>& loop);
 	
-	static Ref<AsyncTimer> addTimer(const Ref<Runnable>& task, sl_uint64 interval_ms);
+	static sl_bool setTimeout(const Callback& task, sl_uint64 delay_ms);
+	
+	
+	static Ref<AsyncTimer> addTimer(const Callback& task, sl_uint64 interval_ms, const Ref<AsyncLoop>& loop);
+	
+	static Ref<AsyncTimer> addTimer(const Callback& task, sl_uint64 interval_ms);
 	
 	static void removeTimer(const Ref<AsyncTimer>& timer, const Ref<AsyncLoop>& loop);
 	
@@ -51,7 +51,7 @@ public:
 	
 };
 
-class SLIB_EXPORT AsyncLoop : public Object
+class SLIB_EXPORT AsyncLoop : public Dispatcher
 {
 	SLIB_DECLARE_OBJECT
 	
@@ -74,17 +74,20 @@ public:
 	
 	sl_bool isRunning();
 	
-	sl_bool addTask(const Ref<Runnable>& task);
+	sl_bool addTask(const Callback& task);
 
-	sl_bool setTimeout(const Ref<Runnable>& task, sl_uint64 delay_ms);
+	sl_bool setTimeout(const Callback& task, sl_uint64 delay_ms);
 
-	Ref<AsyncTimer> addTimer(const Ref<Runnable>& task, sl_uint64 interval_ms);
+	Ref<AsyncTimer> addTimer(const Callback& task, sl_uint64 interval_ms);
 	
 	sl_bool addTimer(const Ref<AsyncTimer>& timer);
 	
 	void removeTimer(const Ref<AsyncTimer>& timer);
 
 	sl_uint64 getEllapsedMilliseconds();
+	
+	// override
+	sl_bool dispatch(const Callback& callback);
 
 protected:
 	sl_bool m_flagInit;
@@ -93,12 +96,12 @@ protected:
 
 	TimeCounter m_timeCounter;
 
-	Queue< Ref<Runnable> > m_queueTasks;
+	Queue<Callback> m_queueTasks;
 
 	struct TimeTask
 	{
 		sl_uint64 time;
-		Ref<Runnable> task;
+		Callback task;
 	};
 	BTree<sl_uint64, TimeTask> m_timeTasks;
 	Mutex m_lockTimeTasks;
@@ -132,7 +135,7 @@ protected:
 	AsyncTimer();
 	
 public:
-	static Ref<AsyncTimer> create(const Ref<Runnable>& task, sl_uint64 interval_ms, sl_bool flagStart = sl_true);
+	static Ref<AsyncTimer> create(const Callback& task, sl_uint64 interval_ms, sl_bool flagStart = sl_true);
 	
 public:
 	void start();
@@ -141,7 +144,7 @@ public:
 	
 	sl_bool isStarted();
 	
-	Ref<Runnable> getTask();
+	Callback getTask();
 	
 	sl_uint64 getInterval();
 	
@@ -156,14 +159,14 @@ public:
 	
 protected:
 	sl_bool m_flagStarted;
-	Ref<Runnable> m_task;
+	Callback m_task;
 	sl_uint64 m_interval;
 	sl_int32 m_nCountRun;
 	
 };
 
 
-class SLIB_EXPORT AsyncIoLoop : public Object
+class SLIB_EXPORT AsyncIoLoop : public Dispatcher
 {
 	SLIB_DECLARE_OBJECT
 	
@@ -187,7 +190,7 @@ public:
 	sl_bool isRunning();
 	
 	
-	sl_bool addTask(const Ref<Runnable>& task);
+	sl_bool addTask(const Callback& task);
 
 	void wake();
 	
@@ -198,6 +201,9 @@ public:
 	
 	void requestOrder(AsyncIoInstance* instance);
 	
+	// override
+	sl_bool dispatch(const Callback& callback);
+	
 protected:
 	sl_bool m_flagInit;
 	sl_bool m_flagRunning;
@@ -205,7 +211,7 @@ protected:
 	
 	Ref<Thread> m_thread;
 	
-	Queue< Ref<Runnable> > m_queueTasks;
+	Queue<Callback> m_queueTasks;
 
 	Queue< Ref<AsyncIoInstance> > m_queueInstancesOrder;
 	Queue< Ref<AsyncIoInstance> > m_queueInstancesClosing;
@@ -450,7 +456,7 @@ public:
 
 	sl_bool writeFromMemory(const Memory& mem, const Ptr<IAsyncStreamListener>& listener);
 	
-	virtual sl_bool addTask(const Ref<Runnable>& callback) = 0;
+	virtual sl_bool addTask(const Callback& callback) = 0;
 	
 };
 
@@ -479,7 +485,7 @@ public:
 	sl_uint64 getSize();
 	
 	// override
-	sl_bool addTask(const Ref<Runnable>& callback);
+	sl_bool addTask(const Callback& callback);
 	
 	sl_size getWaitingSizeForWrite();
 
@@ -489,16 +495,16 @@ protected:
 	sl_bool _initialize(AsyncStreamInstance* instance, AsyncIoMode mode, const Ref<AsyncIoLoop>& loop);
 
 	friend class AsyncStream;
+	
 };
 
-class SLIB_EXPORT AsyncStreamBaseIO : public AsyncStream
+class SLIB_EXPORT AsyncStreamSimulator : public AsyncStream
 {
-protected:
-	AsyncStreamBaseIO();
-
-public:
-	Ref<AsyncLoop> getLoop();
+	SLIB_DECLARE_OBJECT
 	
+protected:
+	AsyncStreamSimulator();
+
 public:
 	// override
 	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref = sl_null);
@@ -507,13 +513,15 @@ public:
 	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref = sl_null);
 	
 	// override
-	sl_bool addTask(const Ref<Runnable>& callback);
+	sl_bool addTask(const Callback& callback);
 	
 protected:
 	virtual void processRequest(AsyncStreamRequest* request) = 0;
 
 protected:
-	void setLoop(const Ref<AsyncLoop>& loop);
+	void init();
+	
+	void initWithDispatcher(const Ref<Dispatcher>& dispatcher);
 	
 protected:
 	sl_bool _addRequest(AsyncStreamRequest* request);
@@ -524,19 +532,20 @@ private:
 	Queue< Ref<AsyncStreamRequest> > m_requests;
 	sl_bool m_flagProcessRequest;
 	
-	SafeWeakRef<AsyncLoop> m_loop;
+	Ref<AsyncLoop> m_loop;
+	WeakRef<Dispatcher> m_dispatcher;
 
 };
 
-class SLIB_EXPORT AsyncReader : public AsyncStreamBaseIO
+class SLIB_EXPORT AsyncReader : public AsyncStreamSimulator
 {
 protected:
 	AsyncReader();
 	
 public:
-	static Ref<AsyncReader> create(const Ptr<IReader>& reader, const Ref<AsyncLoop>& loop);
-	
 	static Ref<AsyncReader> create(const Ptr<IReader>& reader);
+	
+	static Ref<AsyncReader> create(const Ptr<IReader>& reader, const Ref<Dispatcher>& dispatcher);
 	
 public:
 	// override
@@ -557,17 +566,18 @@ protected:
 
 private:
 	SafePtr<IReader> m_reader;
+	
 };
 
-class SLIB_EXPORT AsyncWriter : public AsyncStreamBaseIO
+class SLIB_EXPORT AsyncWriter : public AsyncStreamSimulator
 {
 protected:
 	AsyncWriter();
 	
 public:
-	static Ref<AsyncWriter> create(const Ptr<IWriter>& writer, const Ref<AsyncLoop>& loop);
-	
 	static Ref<AsyncWriter> create(const Ptr<IWriter>& writer);
+	
+	static Ref<AsyncWriter> create(const Ptr<IWriter>& writer, const Ref<Dispatcher>& dispatcher);
 	
 
 public:
@@ -591,37 +601,39 @@ protected:
 	SafePtr<IWriter> m_writer;
 };
 
-class SLIB_EXPORT AsyncFile : public AsyncStreamBaseIO
+class SLIB_EXPORT AsyncFile : public AsyncStreamSimulator
 {
-private:
+	SLIB_DECLARE_OBJECT
+	
+protected:
 	AsyncFile();
 	
 	~AsyncFile();
 	
 public:
-	static Ref<AsyncFile> create(const Ref<File>& file, const Ref<AsyncLoop>& loop);
-	
 	static Ref<AsyncFile> create(const Ref<File>& file);
 	
+	static Ref<AsyncFile> create(const Ref<File>& file, const Ref<Dispatcher>& dispatcher);
 	
-	static Ref<AsyncFile> open(const String& path, FileMode mode, const Ref<AsyncLoop>& loop);
 	
 	static Ref<AsyncFile> open(const String& path, FileMode mode);
+
+	static Ref<AsyncFile> open(const String& path, FileMode mode, const Ref<Dispatcher>& dispatcher);
 	
-	
-	static Ref<AsyncFile> openForRead(const String& path, const Ref<AsyncLoop>& loop);
 	
 	static Ref<AsyncFile> openForRead(const String& path);
 	
+	static Ref<AsyncFile> openForRead(const String& path, const Ref<Dispatcher>& dispatcher);
 	
-	static Ref<AsyncFile> openForWrite(const String& path, const Ref<AsyncLoop>& loop);
 	
 	static Ref<AsyncFile> openForWrite(const String& path);
 	
+	static Ref<AsyncFile> openForWrite(const String& path, const Ref<Dispatcher>& dispatcher);
 	
-	static Ref<AsyncFile> openForAppend(const String& path, const Ref<AsyncLoop>& loop);
 	
 	static Ref<AsyncFile> openForAppend(const String& path);
+	
+	static Ref<AsyncFile> openForAppend(const String& path, const Ref<Dispatcher>& dispatcher);
 	
 	
 #if defined(SLIB_PLATFORM_IS_WIN32)
@@ -737,6 +749,7 @@ protected:
 	sl_bool m_flagWriteError;
 	sl_bool m_flagStarted;
 	sl_bool m_flagRunning;
+	sl_bool m_flagEnqueue;
 
 	class Buffer : public Referable
 	{
@@ -797,9 +810,9 @@ public:
 	
 	sl_bool copyFrom(AsyncStream* stream, sl_uint64 size);
 
-	sl_bool copyFromFile(const String& path, const Ref<AsyncLoop>& loop);
-	
 	sl_bool copyFromFile(const String& path);
+	
+	sl_bool copyFromFile(const String& path, const Ref<Dispatcher>& dispatcher);
 	
 	sl_uint64 getOutputLength() const;
 
@@ -893,7 +906,7 @@ public:
 	virtual sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref = sl_null);
 
 	// override
-	sl_bool addTask(const Ref<Runnable>& callback);
+	sl_bool addTask(const Callback& callback);
 	
 	
 	void addReadData(void* data, sl_uint32 size, const Referable* refData);
@@ -948,7 +961,7 @@ protected:
 protected:
 	void _read();
 	void _processRead(void* data, sl_uint32 size, const Referable* refData, sl_bool flagError);
-	void _processRead();
+	void _processReadEmpty();
 
 	void _processZeroWrite(void* data, sl_uint32 size, Ptr<IAsyncStreamListener> listener, Ref<Referable> ref);
 	void _closeAllReadRequests();

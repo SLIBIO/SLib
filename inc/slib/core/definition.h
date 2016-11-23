@@ -82,6 +82,7 @@ typedef void*				sl_ptr;
 typedef const void*			sl_cptr;
 
 #define sl_null				nullptr
+typedef decltype(nullptr)	sl_null_t;
 
 typedef bool sl_bool;
 #define sl_true true

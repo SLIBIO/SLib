@@ -182,6 +182,26 @@ public: \
 		_m_property_##NAME = v; \
 	}
 
+#define SLIB_CALLBACK_PROPERTY(NAME) protected: \
+	slib::SafeCallback _m_property_##NAME; \
+public: \
+	SLIB_INLINE slib::Callback get##NAME() const { \
+		return _m_property_##NAME; \
+	} \
+	SLIB_INLINE void set##NAME(const slib::Callback& v) { \
+		_m_property_##NAME = v; \
+	}
+
+#define SLIB_FUNCTION_PROPERTY(TYPE, NAME) protected: \
+	slib::SafeFunction<TYPE> _m_property_##NAME; \
+public: \
+	SLIB_INLINE slib::Function<TYPE> get##NAME() const { \
+		return _m_property_##NAME; \
+	} \
+	SLIB_INLINE void set##NAME(const slib::Function<TYPE>& v) { \
+		_m_property_##NAME = v; \
+	}
+
 #define SLIB_STRING_PROPERTY(NAME) protected: \
 	slib::SafeString _m_property_##NAME; \
 public: \

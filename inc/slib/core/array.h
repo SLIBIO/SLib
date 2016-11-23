@@ -111,8 +111,42 @@ public:
 	
 	CArray<T, COMPARE>* duplicate() const;
 	
+	// range-based for loop
+	T* begin();
+	
+	T const* begin() const;
+	
+	T* end();
+	
+	T const* end() const;
+
 };
 
+template <class T, class COMPARE>
+class SLIB_EXPORT ArrayPosition
+{
+public:
+	ArrayPosition();
+	
+	ArrayPosition(const Ref< CArray<T, COMPARE> >& array);
+	
+	ArrayPosition(const ArrayPosition<T, COMPARE>& other);
+	
+	ArrayPosition(ArrayPosition<T, COMPARE>&& other);
+	
+public:
+	T& operator*();
+	
+	sl_bool operator!=(const ArrayPosition<T, COMPARE>& other);
+	
+	ArrayPosition<T, COMPARE>& operator++();
+	
+private:
+	Ref< CArray<T, COMPARE> > ref;
+	T* data;
+	sl_size count;
+	
+};
 
 #define SLIB_TEMPLATE_PARAMS_CArray T, COMPARE
 #define SLIB_TEMPLATE_DEF_PARAMS_CArray class T, class COMPARE
@@ -208,6 +242,11 @@ public:
 	
 	sl_bool getData(ArrayData<T>& data) const;
 	
+	// range-based for loop
+	T* begin() const;
+	
+	T* end() const;
+	
 };
 
 
@@ -281,6 +320,11 @@ public:
 	
 	sl_bool getData(ArrayData<T>& data) const;
 	
+	// range-based for loop
+	ArrayPosition<T, COMPARE> begin() const;
+	
+	ArrayPosition<T, COMPARE> end() const;
+	
 };
 
 
@@ -350,7 +394,7 @@ CArray<T, COMPARE>::CArray(sl_size count)
 			return;
 		}
 	}
-	m_flagStatic = sl_false;
+	m_flagStatic = sl_true;
 	m_data = sl_null;
 	m_count = 0;
 }
@@ -367,7 +411,7 @@ CArray<T, COMPARE>::CArray(const T* data, sl_size count)
 			return;
 		}
 	}
-	m_flagStatic = sl_false;
+	m_flagStatic = sl_true;
 	m_data = sl_null;
 	m_count = 0;
 }
@@ -385,7 +429,7 @@ CArray<T, COMPARE>::CArray(const _T* data, sl_size count)
 			return;
 		}
 	}
-	m_flagStatic = sl_false;
+	m_flagStatic = sl_true;
 	m_data = sl_null;
 	m_count = 0;
 }
@@ -398,11 +442,11 @@ CArray<T, COMPARE>::CArray(const T* data, sl_size count, const Referable* refer)
 		m_data = (T*)data;
 		m_count = count;
 		m_refer = refer;
-		return;
+	} else {
+		m_flagStatic = sl_true;
+		m_data = sl_null;
+		m_count = 0;
 	}
-	m_flagStatic = sl_false;
-	m_data = sl_null;
-	m_count = 0;
 }
 
 template <class T, class COMPARE>
@@ -750,6 +794,72 @@ CArray<T, COMPARE>* CArray<T, COMPARE>::duplicate() const
 	return create(m_data, m_count);
 }
 
+template <class T, class COMPARE>
+SLIB_INLINE T* CArray<T, COMPARE>::begin()
+{
+	return m_data;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE T const* CArray<T, COMPARE>::begin() const
+{
+	return m_data;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE T* CArray<T, COMPARE>::end()
+{
+	return m_data + m_count;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE T const* CArray<T, COMPARE>::end() const
+{
+	return m_data + m_count;
+}
+
+
+template <class T, class COMPARE>
+SLIB_INLINE ArrayPosition<T, COMPARE>::ArrayPosition() {};
+
+template <class T, class COMPARE>
+SLIB_INLINE ArrayPosition<T, COMPARE>::ArrayPosition(const Ref< CArray<T, COMPARE> >& array) : ref(array)
+{
+	if (array.isNotNull()) {
+		data = array->getData();
+		count = array->getCount();
+	} else {
+		data = sl_null;
+		count = 0;
+	}
+}
+
+template <class T, class COMPARE>
+ArrayPosition<T, COMPARE>::ArrayPosition(const ArrayPosition<T, COMPARE>& other) = default;
+
+template <class T, class COMPARE>
+ArrayPosition<T, COMPARE>::ArrayPosition(ArrayPosition<T, COMPARE>&& other) = default;
+
+template <class T, class COMPARE>
+SLIB_INLINE T& ArrayPosition<T, COMPARE>::operator*()
+{
+	return *data;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE sl_bool ArrayPosition<T, COMPARE>::operator!=(const ArrayPosition<T, COMPARE>& other)
+{
+	return count > 0;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE ArrayPosition<T, COMPARE>& ArrayPosition<T, COMPARE>::operator++()
+{
+	data++;
+	count--;
+	return *this;
+}
+
 
 SLIB_DEFINE_TEMPLATE_REF_WRAPPER(Array, SafeArray, CArray, ref)
 
@@ -1037,6 +1147,25 @@ sl_bool Array<T, COMPARE>::getData(ArrayData<T>& data) const
 	}
 }
 
+template <class T, class COMPARE>
+T* Array<T, COMPARE>::begin() const
+{
+	CArray<T, COMPARE>* obj = ref.ptr;
+	if (obj) {
+		return obj->getData();
+	}
+	return sl_null;
+}
+
+template <class T, class COMPARE>
+T* Array<T, COMPARE>::end() const
+{
+	CArray<T, COMPARE>* obj = ref.ptr;
+	if (obj) {
+		return obj->getData() + obj->getCount();
+	}
+	return sl_null;
+}
 
 SLIB_DEFINE_TEMPLATE_REF_WRAPPER(SafeArray, Array, CArray, ref)
 
@@ -1255,6 +1384,18 @@ sl_bool SafeArray<T, COMPARE>::getData(ArrayData<T>& data) const
 {
 	Array<T, COMPARE> obj(*this);
 	return obj.getData(data);
+}
+
+template <class T, class COMPARE>
+ArrayPosition<T, COMPARE> SafeArray<T, COMPARE>::begin() const
+{
+	return ArrayPosition<T, COMPARE>(ref);
+}
+
+template <class T, class COMPARE>
+ArrayPosition<T, COMPARE> SafeArray<T, COMPARE>::end() const
+{
+	return ArrayPosition<T, COMPARE>();
 }
 
 

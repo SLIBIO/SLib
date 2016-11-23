@@ -40,6 +40,8 @@ public:
 	template <class O>
 	Ptr(const SafePtr<O>& other);
 	
+	Ptr(sl_null_t);
+	
 	Ptr(const T* pointer);
 	
 	Ptr(const Ref<T>& reference);
@@ -157,6 +159,8 @@ public:
 	template <class O>
 	Ptr<T>& operator=(const SafePtr<O>& other);
 	
+	Ptr<T>& operator=(sl_null_t);
+	
 	Ptr<T>& operator=(const T* pointer);
 
 	Ptr<T>& operator=(const Ref<T>& reference);
@@ -249,6 +253,8 @@ public:
 	template <class O>
 	SafePtr(const Ptr<O>& other);
 	
+	SafePtr(sl_null_t);
+	
 	SafePtr(const T* pointer);
 	
 	SafePtr(const Ref<T>& reference);
@@ -340,6 +346,8 @@ public:
 
 	template <class O>
 	SafePtr<T>& operator=(const Ptr<O>& other);
+	
+	SafePtr<T>& operator=(sl_null_t);
 	
 	SafePtr<T>& operator=(const T* pointer);
 	
@@ -493,6 +501,11 @@ template <class O>
 Ptr<T>::Ptr(const SafePtr<O>& other)
 {
 	ptr = other._retain(ref);
+}
+
+template <class T>
+SLIB_INLINE Ptr<T>::Ptr(sl_null_t) : ptr(sl_null)
+{
 }
 
 template <class T>
@@ -869,6 +882,14 @@ Ptr<T>& Ptr<T>::operator=(const SafePtr<O>& other)
 }
 
 template <class T>
+SLIB_INLINE Ptr<T>& Ptr<T>::operator=(sl_null_t)
+{
+	ptr = sl_null;
+	ref.setNull();
+	return *this;
+}
+
+template <class T>
 SLIB_INLINE Ptr<T>& Ptr<T>::operator=(const T* pointer)
 {
 	ptr = (T*)pointer;
@@ -1120,6 +1141,11 @@ SLIB_INLINE SafePtr<T>::SafePtr(Ptr<O>&& other)
 template <class T>
 template <class O>
 SLIB_INLINE SafePtr<T>::SafePtr(const Ptr<O>& other) : _ptr(other.ptr), _ref(other.ref)
+{
+}
+
+template <class T>
+SLIB_INLINE SafePtr<T>::SafePtr(sl_null_t) : _ptr(sl_null)
 {
 }
 
@@ -1409,6 +1435,13 @@ template <class O>
 SafePtr<T>& SafePtr<T>::operator=(const Ptr<O>& other)
 {
 	_replace(other.ptr, other.ref);
+	return *this;
+}
+
+template <class T>
+SafePtr<T>& SafePtr<T>::operator=(sl_null_t)
+{
+	_replace(sl_null, Ref<Referable>::null());
 	return *this;
 }
 

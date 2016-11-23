@@ -54,4 +54,20 @@ void ImageView::onDraw(Canvas* canvas)
 	canvas->draw(getBoundsInnerPadding(), m_source, m_scaleMode, m_gravity);
 }
 
+void ImageView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
+{
+	if (!flagVertical && !flagHorizontal) {
+		return;
+	}
+	Ref<Drawable> source = m_source;
+	if (source.isNotNull()) {
+		if (flagHorizontal) {
+			setMeasuredWidth((sl_ui_len)(source->getDrawableWidth()));
+		}
+		if (flagVertical) {
+			setMeasuredHeight((sl_ui_len)(source->getDrawableHeight()));
+		}
+	}
+}
+
 SLIB_UI_NAMESPACE_END

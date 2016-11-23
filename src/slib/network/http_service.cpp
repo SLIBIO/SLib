@@ -1,6 +1,6 @@
 #include "../../../inc/slib/network/http_service.h"
 
-#include "../../../inc/slib/core/url.h"
+#include "../../../inc/slib/network/url.h"
 #include "../../../inc/slib/core/asset.h"
 #include "../../../inc/slib/core/file.h"
 #include "../../../inc/slib/core/log.h"
@@ -77,15 +77,6 @@ Ref<AsyncStream> HttpServiceContext::getIO()
 		return connection->getIO();
 	}
 	return Ref<AsyncStream>::null();
-}
-
-Ref<AsyncLoop> HttpServiceContext::getAsyncLoop()
-{
-	Ref<HttpService> service = getService();
-	if (service.isNotNull()) {
-		return service->getAsyncLoop();
-	}
-	return Ref<AsyncLoop>::null();
 }
 
 Ref<AsyncIoLoop> HttpServiceContext::getAsyncIoLoop()
@@ -566,29 +557,24 @@ HttpService::~HttpService()
 
 sl_bool HttpService::_init(const HttpServiceParam& param)
 {
-	Ref<AsyncLoop> loop = AsyncLoop::create(sl_false);
-	if (loop.isNotNull()) {
-		Ref<AsyncIoLoop> ioLoop = AsyncIoLoop::create(sl_false);
-		if (ioLoop.isNotNull()) {
-			Ref<ThreadPool> threadPool = ThreadPool::create();
-			if (threadPool.isNotNull()) {
-				threadPool->setMaximumThreadsCount(param.maxThreadsCount);
-				
-				m_loop = loop;
-				m_ioLoop = ioLoop;
-				m_threadPool = threadPool;
-				m_param = param;
-				if (param.port) {
-					if (! (addHttpService(param.addressBind, param.port))) {
-						return sl_false;
-					}
+	Ref<AsyncIoLoop> ioLoop = AsyncIoLoop::create(sl_false);
+	if (ioLoop.isNotNull()) {
+		Ref<ThreadPool> threadPool = ThreadPool::create();
+		if (threadPool.isNotNull()) {
+			threadPool->setMaximumThreadsCount(param.maxThreadsCount);
+			
+			m_ioLoop = ioLoop;
+			m_threadPool = threadPool;
+			m_param = param;
+			if (param.port) {
+				if (! (addHttpService(param.addressBind, param.port))) {
+					return sl_false;
 				}
-				
-				loop->start();
-				ioLoop->start();
-
-				return sl_true;
 			}
+			
+			ioLoop->start();
+
+			return sl_true;
 		}
 	}
 	return sl_false;
@@ -618,11 +604,6 @@ void HttpService::release()
 	}
 	m_connectionProviders.removeAll();
 	
-	Ref<AsyncLoop> loop = m_loop;
-	if (loop.isNotNull()) {
-		loop->release();
-		m_loop.setNull();
-	}
 	Ref<AsyncIoLoop> ioLoop = m_ioLoop;
 	if (ioLoop.isNotNull()) {
 		ioLoop->release();
@@ -640,11 +621,6 @@ void HttpService::release()
 sl_bool HttpService::isRunning()
 {
 	return m_flagRunning;
-}
-
-Ref<AsyncLoop> HttpService::getAsyncLoop()
-{
-	return m_loop;
 }
 
 Ref<AsyncIoLoop> HttpService::getAsyncIoLoop()
@@ -788,7 +764,7 @@ sl_bool HttpService::processFile(HttpServiceContext* context, const String& path
 			
 			if (processRangeRequest(context, totalSize, rangeHeader, start, len)) {
 
-				Ref<AsyncFile> file = AsyncFile::openForRead(path, getAsyncLoop());
+				Ref<AsyncFile> file = AsyncFile::openForRead(path, m_threadPool);
 				if (file.isNotNull()) {
 					file->seek(start);
 					context->copyFrom(file.ptr, len);
@@ -801,7 +777,7 @@ sl_bool HttpService::processFile(HttpServiceContext* context, const String& path
 			
 		} else {
 			if (totalSize > 100000) {
-				context->copyFromFile(path, getAsyncLoop());
+				context->copyFromFile(path, m_threadPool);
 				return sl_true;
 			} else {
 				Memory mem = File::readAllBytes(path);

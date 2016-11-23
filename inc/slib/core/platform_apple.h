@@ -34,6 +34,8 @@ public:
 	
 	static String getFilePathFromNSURL(NSURL* url);
 	
+	static Memory getMemoryFromNSData(NSData* data);
+	
 #endif
 	
 	static String getAssetFilePath(const String& path);

@@ -324,7 +324,7 @@ protected:
 	void _applyDefaultClosingPopupTransition(Transition& transition);
 	
 public:
-	SLIB_REF_PROPERTY(Runnable, OnClose);
+	SLIB_CALLBACK_PROPERTY(OnClose);
 	
 protected:
 	SafeWeakRef<ViewPager> m_pager;

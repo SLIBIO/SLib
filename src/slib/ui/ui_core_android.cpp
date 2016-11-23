@@ -122,12 +122,12 @@ sl_bool UI::isUiThread()
 	return _AndroidUiThread::isUiThread.callBoolean(sl_null) != 0;
 }
 
-SLIB_SAFE_STATIC_GETTER(Queue< Ref<Runnable> >, _AndroidUi_getDispatchQueue);
+SLIB_SAFE_STATIC_GETTER(Queue<Callback>, _AndroidUi_getDispatchQueue);
 
-void UI::dispatchToUiThread(const Ref<Runnable>& callback)
+void UI::dispatchToUiThread(const Callback& callback)
 {
 	if (callback.isNotNull()) {
-		Queue< Ref<Runnable> >* queue = _AndroidUi_getDispatchQueue();
+		Queue<Callback>* queue = _AndroidUi_getDispatchQueue();
 		if (queue) {
 			queue->push(callback);
 			_AndroidUiThread::dispatch.call(sl_null);
@@ -137,13 +137,11 @@ void UI::dispatchToUiThread(const Ref<Runnable>& callback)
 
 void _AndroidUiThread_runDispatchCallback(JNIEnv* env, jobject _this)
 {
-	Queue< Ref<Runnable> >* queue = _AndroidUi_getDispatchQueue();
+	Queue<Callback>* queue = _AndroidUi_getDispatchQueue();
 	if (queue) {
-		Ref<Runnable> callback;
+		Callback callback;
 		while (queue->pop(&callback)) {
-			if (callback.isNotNull()) {
-				callback->run();
-			}
+			callback();
 		}
 	}
 }

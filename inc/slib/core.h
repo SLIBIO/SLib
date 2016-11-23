@@ -16,6 +16,7 @@
 #include "core/object.h"
 #include "core/memory.h"
 #include "core/callback.h"
+#include "core/tuple.h"
 
 #include "core/algorithm.h"
 #include "core/array.h"
@@ -26,6 +27,7 @@
 #include "core/queue.h"
 #include "core/loop_queue.h"
 #include "core/queue_channel.h"
+#include "core/linked_object.h"
 #include "core/expire.h"
 
 #include "core/math.h"
@@ -53,7 +55,6 @@
 #include "core/parse.h"
 #include "core/resource.h"
 #include "core/setting.h"
-#include "core/url.h"
 
 #include "core/json.h"
 #include "core/xml.h"

@@ -2,7 +2,7 @@
 
 SLIB_NAMESPACE_BEGIN
 
-SLIB_DEFINE_OBJECT(ThreadPool, Object)
+SLIB_DEFINE_OBJECT(ThreadPool, Dispatcher)
 
 ThreadPool::ThreadPool()
 {
@@ -53,7 +53,7 @@ sl_uint32 ThreadPool::getThreadsCount()
 	return (sl_uint32)(m_threadWorkers.getCount());
 }
 
-sl_bool ThreadPool::addTask(const Ref<Runnable>& task)
+sl_bool ThreadPool::addTask(const Callback& task)
 {
 	if (task.isNull()) {
 		return sl_false;
@@ -91,12 +91,17 @@ sl_bool ThreadPool::addTask(const Ref<Runnable>& task)
 	return sl_true;
 }
 
+sl_bool ThreadPool::dispatch(const Callback& callback)
+{
+	return addTask(callback);
+}
+
 void ThreadPool::onRunWorker()
 {
 	while (m_flagRunning && Thread::isNotStoppingCurrent()) {
-		Ref<Runnable> task;
+		Callback task;
 		if (m_tasks.pop(&task)) {
-			task->run();
+			task();
 		} else {
 			ObjectLocker lock(this);
 			sl_size nThreads = m_threadWorkers.getCount();

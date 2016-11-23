@@ -264,22 +264,6 @@ Ref<View::ScrollAttributes> View::_initializeScrollAttributes()
 	return attrs;
 }
 
-Ref<View::TextInputAttributes> View::_initializeTextInputAttributes()
-{
-	Ref<TextInputAttributes> attrs = m_textInputAttributes;
-	if (attrs.isNotNull()) {
-		return attrs;
-	}
-	attrs = new TextInputAttributes;
-	if (attrs.isNull()) {
-		return Ref<TextInputAttributes>::null();
-	}
-	
-	attrs->flagTextInput = sl_false;
-	
-	return attrs;
-}
-
 Ref<ViewInstance> View::getViewInstance()
 {
 	return m_instance;
@@ -6153,23 +6137,6 @@ sl_bool View::hitTestForCapturingChildInstanceEvents(const UIPoint& pt)
 	return sl_true;
 }
 
-sl_bool View::isTextInput()
-{
-	Ref<TextInputAttributes> attrs = m_textInputAttributes;
-	if (attrs.isNotNull()) {
-		return attrs->flagTextInput;
-	}
-	return sl_false;
-}
-
-void View::setTextInput(sl_bool flagTextInput)
-{
-	Ref<TextInputAttributes> attrs = _initializeTextInputAttributes();
-	if (attrs.isNotNull()) {
-		attrs->flagTextInput = sl_true;
-	}
-}
-
 void View::drawBackground(Canvas* canvas, const Color& color, const Ref<Drawable>& background)
 {
 	Rectangle rc(0, 0, (sl_real)(m_frame.getWidth()), (sl_real)(m_frame.getHeight()));
@@ -7243,10 +7210,7 @@ void View::dispatchClick(UIEvent* ev)
 	if (listener.isNotNull()) {
 		listener->onClick(this, ev);
 	}
-	Ref<Runnable> onClick = getOnClick();
-	if (onClick.isNotNull()) {
-		onClick->run();
-	}
+	(getOnClick())();
 }
 
 void View::dispatchClickWithNoEvent()

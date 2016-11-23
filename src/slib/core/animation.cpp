@@ -137,7 +137,7 @@ void IAnimationListener::onAnimationFrame(Animation* animation, float time)
 {
 }
 
-void IAnimationListener::onEndAnimation(Animation* animation, sl_int32 nRemainingRepeatCount)
+void IAnimationListener::onRepeatAnimation(Animation* animation, sl_int32 nRemainingRepeatCount)
 {
 }
 
@@ -568,18 +568,17 @@ void Animation::update(const Time& current)
 	dispatchAnimationFrame(time);
 	
 	if (flagStop) {
-		dispatchEndAnimation(0);
 		stop();
 	} else {
 		if (repeat != 0 && lastRepeat < iRepeat) {
 			if (repeat < 0) {
-				dispatchEndAnimation(-1);
+				dispatchRepeatAnimation(-1);
 			} else {
 				sl_int32 remainRepeat = repeat - iRepeat;
 				if (remainRepeat < 0) {
 					remainRepeat = 0;
 				}
-				dispatchEndAnimation(remainRepeat);
+				dispatchRepeatAnimation(remainRepeat);
 			}
 		}
 	}
@@ -589,7 +588,7 @@ void Animation::onAnimationFrame(float time)
 {
 }
 
-void Animation::onEndAnimation(sl_int32 nRemainingRepeatCount)
+void Animation::onRepeatAnimation(sl_int32 nRemainingRepeatCount)
 {
 }
 
@@ -614,21 +613,21 @@ void Animation::dispatchAnimationFrame(float time)
 	}
 }
 
-void Animation::dispatchEndAnimation(sl_int32 nRemainingRepeatCount)
+void Animation::dispatchRepeatAnimation(sl_int32 nRemainingRepeatCount)
 {
-	onEndAnimation(nRemainingRepeatCount);
+	onRepeatAnimation(nRemainingRepeatCount);
 	PtrLocker<IAnimationListener> listener(getListener());
 	if (listener.isNotNull()) {
-		listener->onEndAnimation(this, nRemainingRepeatCount);
+		listener->onRepeatAnimation(this, nRemainingRepeatCount);
 	}
 }
 
 void Animation::dispatchStopAnimation()
 {
 	onStopAnimation();
-	Ref<Runnable> onStop(getOnStop());
+	Callback onStop(getOnStop());
 	if (onStop.isNotNull()) {
-		onStop->run();
+		onStop();
 	}
 	PtrLocker<IAnimationListener> listener(getListener());
 	if (listener.isNotNull()) {

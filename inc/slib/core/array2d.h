@@ -294,7 +294,7 @@ CArray2D<T>::CArray2D(sl_size width, sl_size height)
 			return;
 		}
 	}
-	m_flagStatic = sl_false;
+	m_flagStatic = sl_true;
 	m_data = sl_null;
 	m_width = 0;
 	m_height = 0;
@@ -332,7 +332,7 @@ CArray2D<T>::CArray2D(sl_size width, sl_size height, const T* data, sl_size stri
 			return;
 		}
 	}
-	m_flagStatic = sl_false;
+	m_flagStatic = sl_true;
 	m_data = sl_null;
 	m_width = 0;
 	m_height = 0;
@@ -371,7 +371,7 @@ CArray2D<T>::CArray2D(sl_size width, sl_size height, const _T* data, sl_size str
 			return;
 		}
 	}
-	m_flagStatic = sl_false;
+	m_flagStatic = sl_true;
 	m_data = sl_null;
 	m_width = 0;
 	m_height = 0;
@@ -392,7 +392,7 @@ CArray2D<T>::CArray2D(const T* data, sl_size width, sl_size height, sl_size stri
 		m_stride = stride;
 		m_refer = refer;
 	}
-	m_flagStatic = sl_false;
+	m_flagStatic = sl_true;
 	m_data = sl_null;
 	m_width = 0;
 	m_height = 0;

@@ -25,7 +25,7 @@ class IAnimationListener
 public:
 	virtual void onAnimationFrame(Animation* animation, float seconds);
 	
-	virtual void onEndAnimation(Animation* animation, sl_int32 nRemainingRepeatCount);
+	virtual void onRepeatAnimation(Animation* animation, sl_int32 nRemainingRepeatCount);
 	
 	virtual void onStopAnimation(Animation* animation);
 	
@@ -190,19 +190,19 @@ public:
 	
 public:
 	SLIB_PTR_PROPERTY(IAnimationListener, Listener)
-	SLIB_REF_PROPERTY(Runnable, OnStop)
+	SLIB_CALLBACK_PROPERTY(OnStop)
 	
 protected:
 	virtual void onAnimationFrame(float seconds);
 	
-	virtual void onEndAnimation(sl_int32 nRemainingRepeatCount);
+	virtual void onRepeatAnimation(sl_int32 nRemainingRepeatCount);
 	
 	virtual void onStopAnimation();
 	
 public:
 	void dispatchAnimationFrame(float seconds);
 	
-	void dispatchEndAnimation(sl_int32 nRemainingRepeatCount);
+	void dispatchRepeatAnimation(sl_int32 nRemainingRepeatCount);
 	
 	void dispatchStopAnimation();
 	

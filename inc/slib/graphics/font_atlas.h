@@ -27,8 +27,8 @@ struct FontAtlasChar
 {
 	Ref<Bitmap> bitmap;
 	Rectanglei region;
-	sl_uint32 fontWidth;
-	sl_uint32 fontHeight;
+	sl_real fontWidth;
+	sl_real fontHeight;
 };
 
 class SLIB_EXPORT FontAtlas : public Object

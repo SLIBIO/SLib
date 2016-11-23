@@ -47,9 +47,9 @@ SLIB_JNI_END_CLASS
 class _UiAlertResult : public Referable
 {
 public:
-	Ref<Runnable> onOk;
-	Ref<Runnable> onCancel;
-	Ref<Runnable> onNo;
+	Callback onOk;
+	Callback onCancel;
+	Callback onNo;
 };
 
 typedef HashMap<jlong, Ref<_UiAlertResult> > _UiAlertMap;
@@ -100,24 +100,16 @@ void _AndroidAlert_runShowResult(JNIEnv* env, jobject _this, jlong _alert, int r
 		alertMap->remove(_alert);
 		switch (result) {
 		case 0: // OK
-			if (alert->onOk.isNotNull()) {
-				alert->onOk->run();
-			}
+			alert->onOk();
 			break;
 		case 2: // Yes
-			if (alert->onOk.isNotNull()) {
-				alert->onOk->run();
-			}
+			alert->onOk();
 			break;
 		case 3: // No
-			if (alert->onNo.isNotNull()) {
-				alert->onNo->run();
-			}
+			alert->onNo();
 			break;
 		default: // Cancel
-			if (alert->onCancel.isNotNull()) {
-				alert->onCancel->run();
-			}
+			alert->onCancel();
 			break;
 		}
 	}

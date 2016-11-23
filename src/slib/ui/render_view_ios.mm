@@ -178,7 +178,7 @@ SLIB_UI_NAMESPACE_END
 {
 	m_flagRenderingContinuously = sl_false;
 	m_flagRequestRender = sl_true;
-	m_thread = slib::Thread::start(SLIB_CALLBACK(slib::_iOS_GLCallback, self));
+	m_thread = slib::Thread::start(SLIB_CALLBACK(&(slib::_iOS_GLCallback), self));
 }
 
 -(void)dealloc

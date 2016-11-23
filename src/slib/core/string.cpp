@@ -1549,6 +1549,52 @@ void String16::setHashCode(sl_uint32 hash)
 }
 
 
+template <class CT>
+SLIB_INLINE sl_uint32 _String_calcHashIgnoreCase(const CT* buf, sl_size len)
+{
+	sl_uint32 hash = 0;
+	for (sl_size i = 0; i < len; i++) {
+		sl_uint32 ch = buf[i];
+		ch = SLIB_CHAR_LOWER_TO_UPPER(ch);
+		hash = hash * 31 + ch;
+	}
+	hash = sl_rehash(hash);
+	return hash;
+}
+
+sl_uint32 String8::getHashCodeIgnoreCase() const
+{
+	sl_size n = m_container->len;
+	if (n == 0) {
+		return 0;
+	}
+	sl_uint32 hash = _String_calcHashIgnoreCase(m_container->sz, n);
+	return hash;
+}
+
+sl_uint32 String16::getHashCodeIgnoreCase() const
+{
+	sl_size n = m_container->len;
+	if (n == 0) {
+		return 0;
+	}
+	sl_uint32 hash = _String_calcHashIgnoreCase(m_container->sz, n);
+	return hash;
+}
+
+sl_uint32 SafeString8::getHashCodeIgnoreCase() const
+{
+	String8 s(*this);
+	return s.getHashCodeIgnoreCase();
+}
+
+sl_uint32 SafeString16::getHashCodeIgnoreCase() const
+{
+	String16 s(*this);
+	return s.getHashCodeIgnoreCase();
+}
+
+
 sl_char8 String8::getAt(sl_reg index) const
 {
 	if (index >= 0 && index < (sl_reg)(m_container->len)) {
@@ -3060,12 +3106,21 @@ sl_bool String8::equals(const String8& other) const
 	if (s1 == s2) {
 		return sl_true;
 	}
-	sl_size l1 = getLength();
-	sl_size l2 = other.getLength();
-	if (l1 != l2) {
+	sl_size len = getLength();
+	if (len != other.getLength()) {
 		return sl_false;
 	}
-	return _equals8(s1, l1, s2, l2);
+	if (getHashCode() != other.getHashCode()) {
+		return sl_false;
+	}
+	for (sl_size i = 0; i < len; i++) {
+		sl_char8 c1 = s1[i];
+		sl_char8 c2 = s2[i];
+		if (c1 != c2) {
+			return sl_false;
+		}
+	}
+	return sl_true;
 }
 
 sl_bool String16::equals(const String16& other) const
@@ -3075,12 +3130,21 @@ sl_bool String16::equals(const String16& other) const
 	if (s1 == s2) {
 		return sl_true;
 	}
-	sl_size l1 = getLength();
-	sl_size l2 = other.getLength();
-	if (l1 != l2) {
+	sl_size len = getLength();
+	if (len != other.getLength()) {
 		return sl_false;
 	}
-	return _equals16(s1, l1, s2, l2);
+	if (getHashCode() != other.getHashCode()) {
+		return sl_false;
+	}
+	for (sl_size i = 0; i < len; i++) {
+		sl_char16 c1 = s1[i];
+		sl_char16 c2 = s2[i];
+		if (c1 != c2) {
+			return sl_false;
+		}
+	}
+	return sl_true;
 }
 
 sl_bool SafeString8::equals(const String8& other) const
@@ -3281,7 +3345,37 @@ sl_int32 String8::compare(const String8& other) const
 	if (s1 == s2) {
 		return 0;
 	}
-	return _compare8(s1, getLength(), s2, other.getLength());
+	sl_size len1 = getLength();
+	sl_size len2 = other.getLength();
+	sl_size len = SLIB_MIN(len1, len2);
+	for (sl_size i = 0; i < len; i++) {
+		sl_uint8 c1 = s1[i];
+		sl_uint8 c2 = s2[i];
+		if (c1 < c2) {
+			return -1;
+		}
+		if (c1 > c2) {
+			return 1;
+		}
+		if (c1 == 0) {
+			return 0;
+		}
+	}
+	if (len1 < len2) {
+		if (s2[len1] == 0) {
+			return 0;
+		} else {
+			return -1;
+		}
+	}
+	if (len1 > len2) {
+		if (s1[len2] == 0) {
+			return 0;
+		} else {
+			return 1;
+		}
+	}
+	return 0;
 }
 
 sl_int32 String16::compare(const String16& other) const
@@ -3291,7 +3385,37 @@ sl_int32 String16::compare(const String16& other) const
 	if (s1 == s2) {
 		return 0;
 	}
-	return _compare16(s1, getLength(), s2, other.getLength());
+	sl_size len1 = getLength();
+	sl_size len2 = other.getLength();
+	sl_size len = SLIB_MIN(len1, len2);
+	for (sl_size i = 0; i < len; i++) {
+		sl_uint16 c1 = s1[i];
+		sl_uint16 c2 = s2[i];
+		if (c1 < c2) {
+			return -1;
+		}
+		if (c1 > c2) {
+			return 1;
+		}
+		if (c1 == 0) {
+			return 0;
+		}
+	}
+	if (len1 < len2) {
+		if (s2[len1] == 0) {
+			return 0;
+		} else {
+			return -1;
+		}
+	}
+	if (len1 > len2) {
+		if (s1[len2] == 0) {
+			return 0;
+		} else {
+			return 1;
+		}
+	}
+	return 0;
 }
 
 sl_int32 SafeString8::compare(const String8& other) const
@@ -3512,6 +3636,162 @@ sl_int32 SafeString16::compare(const String16& other, sl_size len) const
 }
 
 
+sl_bool String8::equalsIgnoreCase(const String8& other) const
+{
+	sl_char8* s1 = getData();
+	sl_char8* s2 = other.getData();
+	if (s1 == s2) {
+		return sl_true;
+	}
+	sl_size len = getLength();
+	if (len != other.getLength()) {
+		return sl_false;
+	}
+	for (sl_size i = 0; i < len; i++) {
+		sl_uint8 c1 = s1[i];
+		sl_uint8 c2 = s2[i];
+		c1 = SLIB_CHAR_LOWER_TO_UPPER(c1);
+		c2 = SLIB_CHAR_LOWER_TO_UPPER(c2);
+		if (c1 != c2) {
+			return sl_false;
+		}
+	}
+	return sl_true;
+}
+
+sl_bool String16::equalsIgnoreCase(const String16& other) const
+{
+	sl_char16* s1 = getData();
+	sl_char16* s2 = other.getData();
+	if (s1 == s2) {
+		return sl_true;
+	}
+	sl_size len = getLength();
+	if (len != other.getLength()) {
+		return sl_false;
+	}
+	for (sl_size i = 0; i < len; i++) {
+		sl_uint16 c1 = s1[i];
+		sl_uint16 c2 = s2[i];
+		c1 = SLIB_CHAR_LOWER_TO_UPPER(c1);
+		c2 = SLIB_CHAR_LOWER_TO_UPPER(c2);
+		if (c1 != c2) {
+			return sl_false;
+		}
+	}
+	return sl_true;
+}
+
+sl_bool SafeString8::equalsIgnoreCase(const String8& other) const
+{
+	String8 s(*this);
+	return s.equalsIgnoreCase(other);
+}
+
+sl_bool SafeString16::equalsIgnoreCase(const String16& other) const
+{
+	String16 s(*this);
+	return s.equalsIgnoreCase(other);
+}
+
+
+sl_int32 String8::compareIgnoreCase(const String8& other) const
+{
+	sl_char8* s1 = getData();
+	sl_char8* s2 = other.getData();
+	if (s1 == s2) {
+		return 0;
+	}
+	sl_size len1 = getLength();
+	sl_size len2 = other.getLength();
+	sl_size len = SLIB_MIN(len1, len2);
+	for (sl_size i = 0; i < len; i++) {
+		sl_uint8 c1 = s1[i];
+		sl_uint8 c2 = s2[i];
+		c1 = SLIB_CHAR_LOWER_TO_UPPER(c1);
+		c2 = SLIB_CHAR_LOWER_TO_UPPER(c2);
+		if (c1 < c2) {
+			return -1;
+		}
+		if (c1 > c2) {
+			return 1;
+		}
+		if (c1 == 0) {
+			return 0;
+		}
+	}
+	if (len1 < len2) {
+		if (s2[len1] == 0) {
+			return 0;
+		} else {
+			return -1;
+		}
+	}
+	if (len1 > len2) {
+		if (s1[len2] == 0) {
+			return 0;
+		} else {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+sl_int32 String16::compareIgnoreCase(const String16& other) const
+{
+	sl_char16* s1 = getData();
+	sl_char16* s2 = other.getData();
+	if (s1 == s2) {
+		return 0;
+	}
+	sl_size len1 = getLength();
+	sl_size len2 = other.getLength();
+	sl_size len = SLIB_MIN(len1, len2);
+	for (sl_size i = 0; i < len; i++) {
+		sl_uint16 c1 = s1[i];
+		sl_uint16 c2 = s2[i];
+		c1 = SLIB_CHAR_LOWER_TO_UPPER(c1);
+		c2 = SLIB_CHAR_LOWER_TO_UPPER(c2);
+		if (c1 < c2) {
+			return -1;
+		}
+		if (c1 > c2) {
+			return 1;
+		}
+		if (c1 == 0) {
+			return 0;
+		}
+	}
+	if (len1 < len2) {
+		if (s2[len1] == 0) {
+			return 0;
+		} else {
+			return -1;
+		}
+	}
+	if (len1 > len2) {
+		if (s1[len2] == 0) {
+			return 0;
+		} else {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+sl_int32 SafeString8::compareIgnoreCase(const String8& other) const
+{
+	String8 s(*this);
+	return s.compareIgnoreCase(other);
+}
+
+sl_int32 SafeString16::compareIgnoreCase(const String16& other) const
+{
+	String16 s(*this);
+	return s.compareIgnoreCase(other);
+}
+
+
 #define _DEFINE_STRING_COMPARE_FUNCS(CLASS, OP, BODY, BODY_FRIEND) \
 sl_bool CLASS::OP(const String8& other) const \
 { \
@@ -3610,9 +3890,19 @@ Memory String8::toMemory() const
 	return Memory::create(getData(), getLength()*sizeof(sl_char8));
 }
 
+Memory String8::toStaticMemory() const
+{
+	return Memory::createStatic(getData(), getLength()*sizeof(sl_char8));
+}
+
 Memory String16::toMemory() const
 {
 	return Memory::create(getData(), getLength()*sizeof(sl_char16));
+}
+
+Memory String16::toStaticMemory() const
+{
+	return Memory::createStatic(getData(), getLength()*sizeof(sl_char16));
 }
 
 Memory SafeString8::toMemory() const
@@ -7748,6 +8038,39 @@ sl_uint32 Hash<SafeString16>::hash(const SafeString16& v)
 }
 
 
+int CompareIgnoreCaseString8::compare(const String8& a, const String8& b)
+{
+	return a.compareIgnoreCase(b);
+}
+
+sl_bool CompareIgnoreCaseString8::equals(const String8& a, const String8& b)
+{
+	return a.equalsIgnoreCase(b);
+}
+
+
+int CompareIgnoreCaseString16::compare(const String16& a, const String16& b)
+{
+	return a.compareIgnoreCase(b);
+}
+
+sl_bool CompareIgnoreCaseString16::equals(const String16& a, const String16& b)
+{
+	return a.equalsIgnoreCase(b);
+}
+
+
+sl_uint32 HashIgnoreCaseString8::hash(const String8& v)
+{
+	return v.getHashCodeIgnoreCase();
+}
+
+sl_uint32 HashIgnoreCaseString16::hash(const String16& v)
+{
+	return v.getHashCodeIgnoreCase();
+}
+
+
 /**********************************************************
  String Buffer
  **********************************************************/
@@ -7892,13 +8215,13 @@ String8 StringBuffer8::merge() const
 	if (m_queue.getCount() == 0) {
 		return String8::getEmpty();
 	}
-	Link<StringData>* begin = m_queue.getBegin();
+	Link<StringData>* front = m_queue.getFront();
 	sl_size total = m_len;
 	String8 ret = String8::allocate(total);
 	if (ret.isNotEmpty()) {
 		sl_char8* buf = (sl_char8*)(ret.getData());
 		sl_size offset = 0;
-		Link<StringData>* item = begin;
+		Link<StringData>* item = front;
 		while (item) {
 			StringData& s = item->value;
 			sl_size t = s.len;
@@ -7920,13 +8243,13 @@ String16 StringBuffer16::merge() const
 	if (m_queue.getCount() == 0) {
 		return String16::getEmpty();
 	}
-	Link<StringData>* begin = m_queue.getBegin();
+	Link<StringData>* front = m_queue.getFront();
 	sl_size total = m_len;
 	String16 ret = String16::allocate(total);
 	if (ret.isNotEmpty()) {
 		sl_char16* buf = (sl_char16*)(ret.getData());
 		sl_size offset = 0;
-		Link<StringData>* item = begin;
+		Link<StringData>* item = front;
 		while (item) {
 			StringData& s = item->value;
 			sl_size t = s.len;
@@ -7948,13 +8271,13 @@ Memory StringBuffer8::mergeToMemory() const
 	if (m_queue.getCount() == 0) {
 		return Memory::null();
 	}
-	Link<StringData>* begin = m_queue.getBegin();
+	Link<StringData>* front = m_queue.getFront();
 	sl_size total = m_len;
 	Memory ret = Memory::create(total);
 	if (ret.isNotEmpty()) {
 		sl_char8* buf = (sl_char8*)(ret.getData());
 		sl_size offset = 0;
-		Link<StringData>* item = begin;
+		Link<StringData>* item = front;
 		while (item) {
 			StringData& s = item->value;
 			sl_size t = s.len;
@@ -7972,13 +8295,13 @@ Memory StringBuffer16::mergeToMemory() const
 	if (m_queue.getCount() == 0) {
 		return Memory::null();
 	}
-	Link<StringData>* begin = m_queue.getBegin();
+	Link<StringData>* front = m_queue.getFront();
 	sl_size total = m_len;
 	Memory ret = Memory::create(total * 2);
 	if (ret.isNotEmpty()) {
 		sl_char16* buf = (sl_char16*)(ret.getData());
 		sl_size offset = 0;
-		Link<StringData>* item = begin;
+		Link<StringData>* item = front;
 		while (item) {
 			StringData& s = item->value;
 			sl_size t = s.len;

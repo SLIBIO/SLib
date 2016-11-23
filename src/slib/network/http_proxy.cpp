@@ -54,9 +54,9 @@ sl_bool HttpProxy::preprocessRequest(HttpServiceContext* context)
 			if (m_param.flagLogDebug) {
 				SLIB_LOG(SERVICE_TAG, "[" + String::fromPointerValue(connection.ptr) + "] PROXY CONNECT - Host: " + context->getPath());
 			}
-			Ref<AsyncLoop> loop = getAsyncLoop();
-			if (loop.isNotNull()) {
-				loop->addTask(SLIB_CALLBACK_WEAKREF(HttpProxy, _processConnect, this, Ref<HttpServiceContext>(context)));
+			Ref<ThreadPool> pool = getThreadPool();
+			if (pool.isNotNull()) {
+				pool->addTask(SLIB_CALLBACK_WEAKREF(HttpProxy, _processConnect, this, Ref<HttpServiceContext>(context)));
 			}
 			return sl_true;
 		}
@@ -75,9 +75,9 @@ sl_bool HttpProxy::preprocessRequest(HttpServiceContext* context)
 			if (m_param.flagLogDebug) {
 				SLIB_LOG(SERVICE_TAG, "[" + String::fromPointerValue(connection.ptr) + "] PROXY " + context->getMethodText() + " - Host: " + host);
 			}
-			Ref<AsyncLoop> loop = getAsyncLoop();
-			if (loop.isNotNull()) {
-				loop->addTask(SLIB_CALLBACK_WEAKREF(HttpProxy, _processProxy, this, Ref<HttpServiceContext>(context), host, portProxy));
+			Ref<ThreadPool> pool = getThreadPool();
+			if (pool.isNotNull()) {
+				pool->addTask(SLIB_CALLBACK_WEAKREF(HttpProxy, _processProxy, this, Ref<HttpServiceContext>(context), host, portProxy));
 			}
 			return sl_true;
 		}

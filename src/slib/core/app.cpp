@@ -90,7 +90,6 @@ void Application::doRun()
 	m_executablePath = Application::getApplicationPath();
 	
 #if !defined(SLIB_PLATFORM_IS_MOBILE)
-	void* instance = sl_null;
 	String instanceId = getUniqueInstanceId();
 	if (instanceId.isNotEmpty()) {
 		for (int i = 0; i < 30; i++) {

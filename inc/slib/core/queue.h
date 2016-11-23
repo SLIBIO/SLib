@@ -17,17 +17,63 @@ struct SLIB_EXPORT Link
 	T value;
 };
 
+template <class T>
+class LinkPosition
+{
+public:
+	LinkPosition(Link<T>* link);
+	
+	LinkPosition(const LinkPosition<T>& other);
+	
+public:
+	T& operator*();
+	
+	sl_bool operator!=(const LinkPosition<T>& p);
+	
+	LinkPosition<T>& operator++();
+	
+private:
+	Link<T>* link;
+	
+};
+
+template <class T>
+class LinkReversePosition
+{
+public:
+	LinkReversePosition(Link<T>* link);
+	
+	LinkReversePosition(const LinkReversePosition<T>& other);
+	
+public:
+	T& operator*();
+	
+	sl_bool operator!=(const LinkReversePosition<T>& p);
+	
+	LinkReversePosition<T>& operator++();
+	
+private:
+	Link<T>* link;
+	
+};
+
 class SLIB_EXPORT LinkedListBase : public Object
 {
 	SLIB_DECLARE_OBJECT
 };
 
+template <class T, class COMPARE>
+class Queue;
+
+template <class T, class COMPARE>
+class Stack;
+
 template <class T, class COMPARE = Compare<T> >
 class SLIB_EXPORT LinkedList : public LinkedListBase
 {
 protected:
-	Link<T>* m_begin;
-	Link<T>* m_end;
+	Link<T>* m_front;
+	Link<T>* m_back;
 	sl_size m_count;
 	
 public:
@@ -36,11 +82,11 @@ public:
 	~LinkedList();
 	
 public:
-	void init(Link<T>* begin, Link<T>* end, sl_size count);
+	void init(Link<T>* front, Link<T>* back, sl_size count);
 	
-	Link<T>* getBegin() const;
+	Link<T>* getFront() const;
 
-	Link<T>* getEnd() const;
+	Link<T>* getBack() const;
 
 	sl_size getCount() const;
 	
@@ -134,7 +180,15 @@ public:
 	
 	template <class _T, class _COMPARE>
 	void pushAll(const LinkedList<_T, _COMPARE>* other);
-
+	
+	Queue<T, COMPARE>* toQueue();
+	
+	const Queue<T, COMPARE>* toQueue() const;
+	
+	Stack<T, COMPARE>* toStack();
+	
+	const Stack<T, COMPARE>* toStack() const;
+	
 protected:
 	static Link<T>* _createItem(const T& value);
 	
@@ -166,6 +220,11 @@ public:
 	
 	sl_bool pop(T* _out = sl_null);
 	
+	// range-based for loop
+	LinkPosition<T> begin() const;
+	
+	LinkPosition<T> end() const;
+
 };
 
 template <class T, class COMPARE = Compare<T> >
@@ -176,6 +235,11 @@ public:
 	
 	sl_bool pop(T* _out = sl_null);
 	
+	// range-based for loop
+	LinkReversePosition<T> begin() const;
+	
+	LinkReversePosition<T> end() const;
+
 };
 
 
@@ -198,35 +262,35 @@ SLIB_NAMESPACE_BEGIN
 template <class T, class COMPARE>
 SLIB_INLINE LinkedList<T, COMPARE>::LinkedList()
 {
-	m_begin = sl_null;
-	m_end = sl_null;
+	m_front = sl_null;
+	m_back = sl_null;
 	m_count = 0;
 }
 
 template <class T, class COMPARE>
 SLIB_INLINE LinkedList<T, COMPARE>::~LinkedList()
 {
-	removeAll();
+	removeAll_NoLock();
 }
 
 template <class T, class COMPARE>
-SLIB_INLINE void LinkedList<T, COMPARE>::init(Link<T>* begin, Link<T>* end, sl_size count)
+SLIB_INLINE void LinkedList<T, COMPARE>::init(Link<T>* front, Link<T>* back, sl_size count)
 {
-	m_begin = begin;
-	m_end = end;
+	m_front = front;
+	m_back = back;
 	m_count = count;
 }
 
 template <class T, class COMPARE>
-SLIB_INLINE Link<T>* LinkedList<T, COMPARE>::getBegin() const
+SLIB_INLINE Link<T>* LinkedList<T, COMPARE>::getFront() const
 {
-	return m_begin;
+	return m_front;
 }
 
 template <class T, class COMPARE>
-SLIB_INLINE Link<T>* LinkedList<T, COMPARE>::getEnd() const
+SLIB_INLINE Link<T>* LinkedList<T, COMPARE>::getBack() const
 {
-	return m_end;
+	return m_back;
 }
 
 template <class T, class COMPARE>
@@ -238,13 +302,13 @@ SLIB_INLINE sl_size LinkedList<T, COMPARE>::getCount() const
 template <class T, class COMPARE>
 SLIB_INLINE sl_bool LinkedList<T, COMPARE>::isEmpty() const
 {
-	return m_begin == sl_null;
+	return m_front == sl_null;
 }
 
 template <class T, class COMPARE>
 SLIB_INLINE sl_bool LinkedList<T, COMPARE>::isNotEmpty() const
 {
-	return m_begin != sl_null;
+	return m_front != sl_null;
 }
 
 template <class T, class COMPARE>
@@ -260,7 +324,7 @@ void LinkedList<T, COMPARE>::freeLink(Link<T>* link)
 template <class T, class COMPARE>
 void LinkedList<T, COMPARE>::removeAll_NoLock()
 {
-	Link<T>* now = m_begin;
+	Link<T>* now = m_front;
 	_init();
 	freeLink(now);
 }
@@ -271,7 +335,7 @@ void LinkedList<T, COMPARE>::removeAll()
 	Link<T>* now;
 	{
 		ObjectLocker lock(this);
-		now = m_begin;
+		now = m_front;
 		_init();
 	}
 	freeLink(now);
@@ -280,9 +344,9 @@ void LinkedList<T, COMPARE>::removeAll()
 template <class T, class COMPARE>
 sl_bool LinkedList<T, COMPARE>::getFirstElement_NoLock(T* _out) const
 {
-	if (m_begin) {
+	if (m_front) {
 		if (_out) {
-			*_out = m_begin->value;
+			*_out = m_front->value;
 		}
 		return sl_true;
 	}
@@ -299,9 +363,9 @@ sl_bool LinkedList<T, COMPARE>::getFirstElement(T* _out) const
 template <class T, class COMPARE>
 sl_bool LinkedList<T, COMPARE>::getLastElement_NoLock(T* _out) const
 {
-	if (m_end) {
+	if (m_back) {
 		if (_out) {
-			*_out = m_end->value;
+			*_out = m_back->value;
 		}
 		return sl_true;
 	}
@@ -351,7 +415,7 @@ template <class T, class COMPARE>
 void LinkedList<T, COMPARE>::pushBackAll(const LinkedList<T, COMPARE>* other)
 {
 	ObjectLocker lock(this, other);
-	Link<T>* link = other->getBegin();
+	Link<T>* link = other->getFront();
 	while (link) {
 		if (!(pushBack_NoLock(link->value))) {
 			return;
@@ -365,7 +429,7 @@ template <class _T, class _COMPARE>
 void LinkedList<T, COMPARE>::pushBackAll(const LinkedList<_T, _COMPARE>* other)
 {
 	ObjectLocker lock(this, other);
-	Link<_T>* link = other->getBegin();
+	Link<_T>* link = other->getFront();
 	while (link) {
 		if (!(pushBack_NoLock(link->value))) {
 			return;
@@ -444,7 +508,7 @@ template <class T, class COMPARE>
 void LinkedList<T, COMPARE>::pushFrontAll(const LinkedList<T, COMPARE>* other)
 {
 	ObjectLocker lock(this, other);
-	Link<T>* link = other->getEnd();
+	Link<T>* link = other->getBack();
 	while (link) {
 		if (!(pushFront_NoLock(link->value))) {
 			return;
@@ -458,7 +522,7 @@ template <class _T, class _COMPARE>
 void LinkedList<T, COMPARE>::pushFrontAll(const LinkedList<_T, _COMPARE>* other)
 {
 	ObjectLocker lock(this, other);
-	Link<_T>* link = other->getEnd();
+	Link<_T>* link = other->getBack();
 	while (link) {
 		if (!(pushFront_NoLock(link->value))) {
 			return;
@@ -591,17 +655,17 @@ void LinkedList<T, COMPARE>::merge(LinkedList<T, COMPARE>* other)
 		return;
 	}
 	ObjectLocker lock(this, other);
-	Link<T>* _begin = other->getBegin();
-	Link<T>* _end = other->getEnd();
-	if (_begin) {
+	Link<T>* _front = other->getFront();
+	Link<T>* _back = other->getBack();
+	if (_front) {
 		sl_size countNew = m_count + other->getCount();
-		if (m_end) {
-			m_end->next = _begin;
-			_begin->before = m_end;
+		if (m_back) {
+			m_back->next = _front;
+			_front->before = m_back;
 		} else {
-			m_begin = _begin;
+			m_front = _front;
 		}
-		m_end = _end;
+		m_back = _back;
 		((LinkedList<T, COMPARE>*)((void*)other))->_init();
 		m_count = countNew;
 	}
@@ -615,17 +679,17 @@ void LinkedList<T, COMPARE>::merge(LinkedList<T, _COMPARE>* other)
 		return;
 	}
 	ObjectLocker lock(this, other);
-	Link<T>* _begin = other->getBegin();
-	Link<T>* _end = other->getEnd();
-	if (_begin) {
+	Link<T>* _front = other->getFront();
+	Link<T>* _back = other->getBack();
+	if (_front) {
 		sl_size countNew = m_count + other->getCount();
-		if (m_end) {
-			m_end->next = _begin;
-			_begin->before = m_end;
+		if (m_back) {
+			m_back->next = _front;
+			_front->before = m_back;
 		} else {
-			m_begin = _begin;
+			m_front = _front;
 		}
-		m_end = _end;
+		m_back = _back;
 		((LinkedList<T, COMPARE>*)((void*)other))->_init();
 		m_count = countNew;
 	}
@@ -640,7 +704,7 @@ Array<T> LinkedList<T, COMPARE>::toArray_NoLock() const
 		if (ret.isNotNull()) {
 			T* buf = ret.getData();
 			sl_size index = 0;
-			Link<T>* now = m_begin;
+			Link<T>* now = m_front;
 			while (now) {
 				buf[index] = now->value;
 				now = now->next;
@@ -667,7 +731,7 @@ List<T> LinkedList<T, COMPARE>::toList_NoLock() const
 		if (ret.isNotNull()) {
 			ListItems<T> list(ret);
 			sl_size index = 0;
-			Link<T>* now = m_begin;
+			Link<T>* now = m_front;
 			while (now) {
 				list[index] = now->value;
 				now = now->next;
@@ -690,7 +754,7 @@ LinkedList<T, COMPARE>* LinkedList<T, COMPARE>::duplicate_NoLock() const
 {
 	LinkedList<T, COMPARE>* ret = new LinkedList<T, COMPARE>;
 	if (ret) {
-		Link<T>* now = m_begin;
+		Link<T>* now = m_front;
 		while (now) {
 			if (!(ret->pushBack_NoLock(now->value))) {
 				delete ret;
@@ -713,7 +777,7 @@ LinkedList<T, COMPARE>* LinkedList<T, COMPARE>::duplicate() const
 template <class T, class COMPARE>
 Link<T>* LinkedList<T, COMPARE>::findValue_NoLock(const T& value) const
 {
-	Link<T>* now = m_begin;
+	Link<T>* now = m_front;
 	while (now) {
 		if (COMPARE::equals(value, now->value)) {
 			return now;
@@ -733,7 +797,7 @@ Link<T>* LinkedList<T, COMPARE>::findValue(const T& value) const
 template <class T, class COMPARE>
 sl_bool LinkedList<T, COMPARE>::removeValue_NoLock(const T& value, sl_bool flagAllValues)
 {
-	Link<T>* now = m_begin;
+	Link<T>* now = m_front;
 	sl_bool bRet = sl_false;
 	while (now) {
 		Link<T>* next = now->next;
@@ -754,6 +818,30 @@ sl_bool LinkedList<T, COMPARE>::removeValue(const T& value, sl_bool flagAllValue
 {
 	ObjectLocker lock(this);
 	return removeValue_NoLock(value, flagAllValues);
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE Queue<T, COMPARE>* LinkedList<T, COMPARE>::toQueue()
+{
+	return (Queue<T, COMPARE>*)this;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE const Queue<T, COMPARE>* LinkedList<T, COMPARE>::toQueue() const
+{
+	return (const Queue<T, COMPARE>*)this;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE Stack<T, COMPARE>* LinkedList<T, COMPARE>::toStack()
+{
+	return (Stack<T, COMPARE>*)this;
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE const Stack<T, COMPARE>* LinkedList<T, COMPARE>::toStack() const
+{
+	return (const Stack<T, COMPARE>*)this;
 }
 
 template <class T, class COMPARE>
@@ -786,13 +874,13 @@ Link<T>* LinkedList<T, COMPARE>::_pushBackItem(Link<T>* item, sl_size countLimit
 	} else {
 		old = sl_null;
 	}
-	if (m_end) {
-		m_end->next = item;
-		item->before = m_end;
-		m_end = item;
+	if (m_back) {
+		m_back->next = item;
+		item->before = m_back;
+		m_back = item;
 	} else {
-		m_begin = item;
-		m_end = item;
+		m_front = item;
+		m_back = item;
 	}
 	m_count++;
 	return old;
@@ -801,19 +889,19 @@ Link<T>* LinkedList<T, COMPARE>::_pushBackItem(Link<T>* item, sl_size countLimit
 template <class T, class COMPARE>
 Link<T>* LinkedList<T, COMPARE>::_popBackItem()
 {
-	Link<T>* end = m_end;
-	if (end) {
+	Link<T>* back = m_back;
+	if (back) {
 		m_count--;
-		Link<T>* before = end->before;
+		Link<T>* before = back->before;
 		if (before) {
 			before->next = sl_null;
-			m_end = before;
+			m_back = before;
 		} else {
-			m_begin = sl_null;
-			m_end = sl_null;
+			m_front = sl_null;
+			m_back = sl_null;
 		}
 	}
-	return end;
+	return back;
 }
 
 template <class T, class COMPARE>
@@ -825,13 +913,13 @@ Link<T>* LinkedList<T, COMPARE>::_pushFrontItem(Link<T>* item, sl_size countLimi
 	} else {
 		old = sl_null;
 	}
-	if (m_begin) {
-		item->next = m_begin;
-		m_begin->before = item;
-		m_begin = item;
+	if (m_front) {
+		item->next = m_front;
+		m_front->before = item;
+		m_front = item;
 	} else {
-		m_begin = item;
-		m_end = item;
+		m_front = item;
+		m_back = item;
 	}
 	m_count++;
 	return old;
@@ -840,19 +928,19 @@ Link<T>* LinkedList<T, COMPARE>::_pushFrontItem(Link<T>* item, sl_size countLimi
 template <class T, class COMPARE>
 Link<T>* LinkedList<T, COMPARE>::_popFrontItem()
 {
-	Link<T>* begin = m_begin;
-	if (begin) {
+	Link<T>* front = m_front;
+	if (front) {
 		m_count--;
-		Link<T>* next = begin->next;
+		Link<T>* next = front->next;
 		if (next) {
 			next->before = sl_null;
-			m_begin = next;
+			m_front = next;
 		} else {
-			m_begin = sl_null;
-			m_end = sl_null;
+			m_front = sl_null;
+			m_back = sl_null;
 		}
 	}
-	return begin;
+	return front;
 }
 
 template <class T, class COMPARE>
@@ -864,12 +952,12 @@ void LinkedList<T, COMPARE>::_removeItem(Link<T>* item)
 	if (before) {
 		before->next = next;
 	} else {
-		m_begin = next;
+		m_front = next;
 	}
 	if (next) {
 		next->before = before;
 	} else {
-		m_end = before;
+		m_back = before;
 	}
 }
 
@@ -883,7 +971,7 @@ void LinkedList<T, COMPARE>::_insertBefore(Link<T>* itemWhere, Link<T>* itemNew)
 	if (before) {
 		before->next = itemNew;
 	} else {
-		m_begin = itemNew;
+		m_front = itemNew;
 	}
 	m_count++;
 }
@@ -898,7 +986,7 @@ void LinkedList<T, COMPARE>::_insertAfter(Link<T>* itemWhere, Link<T>* itemNew)
 	if (next) {
 		next->before = itemNew;
 	} else {
-		m_end = itemNew;
+		m_back = itemNew;
 	}
 	m_count++;
 }
@@ -906,8 +994,8 @@ void LinkedList<T, COMPARE>::_insertAfter(Link<T>* itemWhere, Link<T>* itemNew)
 template <class T, class COMPARE>
 SLIB_INLINE void LinkedList<T, COMPARE>::_init()
 {
-	m_begin = sl_null;
-	m_end = sl_null;
+	m_front = sl_null;
+	m_back = sl_null;
 	m_count = 0;
 }
 
@@ -949,6 +1037,18 @@ SLIB_INLINE sl_bool Queue<T, COMPARE>::pop(T* _out)
 	return this->popFront(_out);
 }
 
+template <class T, class COMPARE>
+SLIB_INLINE LinkPosition<T> Queue<T, COMPARE>::begin() const
+{
+	return LinkPosition<T>(this->m_front);
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE LinkPosition<T> Queue<T, COMPARE>::end() const
+{
+	return LinkPosition<T>(sl_null);
+}
+
 
 template <class T, class COMPARE>
 SLIB_INLINE sl_bool Stack<T, COMPARE>::pop_NoLock(T* _out)
@@ -960,6 +1060,69 @@ template <class T, class COMPARE>
 SLIB_INLINE sl_bool Stack<T, COMPARE>::pop(T* _out)
 {
 	return this->popBack(_out);
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE LinkReversePosition<T> Stack<T, COMPARE>::begin() const
+{
+	return LinkReversePosition<T>(this->m_back);
+}
+
+template <class T, class COMPARE>
+SLIB_INLINE LinkReversePosition<T> Stack<T, COMPARE>::end() const
+{
+	return LinkReversePosition<T>(sl_null);
+}
+
+template <class T>
+SLIB_INLINE LinkPosition<T>::LinkPosition(Link<T>* _link) : link(_link) {}
+
+template <class T>
+SLIB_INLINE LinkPosition<T>::LinkPosition(const LinkPosition<T>& other) : link(other.link) {};
+
+template <class T>
+SLIB_INLINE T& LinkPosition<T>::operator*()
+{
+	return link->value;
+}
+
+template <class T>
+SLIB_INLINE sl_bool LinkPosition<T>::operator!=(const LinkPosition<T>& p)
+{
+	return link != p.link;
+}
+
+template <class T>
+SLIB_INLINE LinkPosition<T>& LinkPosition<T>::operator++()
+{
+	link = link->next;
+	return *this;
+}
+
+
+template <class T>
+SLIB_INLINE LinkReversePosition<T>::LinkReversePosition(Link<T>* _link) : link(_link) {}
+
+template <class T>
+SLIB_INLINE LinkReversePosition<T>::LinkReversePosition(const LinkReversePosition<T>& other) : link(other.link) {};
+
+template <class T>
+SLIB_INLINE T& LinkReversePosition<T>::operator*()
+{
+	return link->value;
+}
+
+template <class T>
+SLIB_INLINE sl_bool LinkReversePosition<T>::operator!=(const LinkReversePosition<T>& p)
+{
+	return link != p.link;
+}
+
+template <class T>
+SLIB_INLINE LinkReversePosition<T>& LinkReversePosition<T>::operator++()
+{
+	link = link->before;
+	return *this;
 }
 
 SLIB_NAMESPACE_END

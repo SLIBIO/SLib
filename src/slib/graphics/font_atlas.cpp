@@ -86,16 +86,16 @@ Ref<FontAtlas> FontAtlas::getShared(const Ref<Font>& font)
 		_FontAtlasMap* map = _FontAtlas_getShared();
 		if (map) {
 			String fontFamily = font->getFamilyName();
-			int fontSize = (int)(font->getSize());
+			int fontSize10 = (int)(font->getSize() * 10);
 			sl_bool fontBold = font->isBold();
-			String sig = String::format("%s_%d_%s", fontFamily, fontSize, fontBold?"B":"");
+			String sig = String::format("%s_%d_%s", fontFamily, fontSize10, fontBold?"B":"");
 			WeakRef<FontAtlas> weakFA;
 			map->get(sig, &weakFA);
 			Ref<FontAtlas> ret = weakFA;
 			if (ret.isNotNull()) {
 				return ret;
 			}
-			Ref<Font> fontSource = Font::create(fontFamily, (sl_real)fontSize, fontBold);
+			Ref<Font> fontSource = Font::create(fontFamily, ((sl_real)fontSize10) / 10, fontBold);
 			if (fontSource.isNotNull()) {
 				FontAtlasParam fap;
 				fap.font = fontSource;
@@ -118,7 +118,7 @@ sl_bool FontAtlas::getChar(sl_char16 ch, FontAtlasChar& _out)
 	}
 	String s(&ch, 1);
 	Sizei sizeDraw = m_fontDraw->getTextSize(s);
-	Sizei sizeFont = m_fontSource->getTextSize(s);
+	Size sizeFont = m_fontSource->getTextSize(s);
 	sl_uint32 widthChar = sizeDraw.x;
 	sl_uint32 heightChar = sizeDraw.y;
 	if (sizeDraw.x <= 0 || sizeDraw.y <= 0 || widthChar > m_planeWidth || heightChar > m_planeHeight || sizeFont.x <= 0 || sizeFont.y <= 0) {

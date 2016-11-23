@@ -12,19 +12,45 @@ class IIteratorBase : public Referable
 	SLIB_DECLARE_OBJECT
 };
 
-template <class TYPE>
+template <class T>
 class SLIB_EXPORT IIterator : public IIteratorBase
 {
 public:
 	virtual sl_bool hasNext() = 0;
 	
-	virtual sl_bool next(TYPE* _out = sl_null) = 0;
+	virtual sl_bool next(T* _out = sl_null) = 0;
 	
 	virtual sl_reg getIndex() = 0;
 	
 };
 
-template <class TYPE>
+template <class T>
+class SLIB_EXPORT IteratorPosition
+{
+public:
+	IteratorPosition();
+	
+	IteratorPosition(const Ref< IIterator<T> >& iterator);
+	
+	IteratorPosition(const IteratorPosition<T>& other);
+	
+	IteratorPosition(IteratorPosition<T>&& other);
+	
+public:
+	T& operator*();
+	
+	sl_bool operator!=(const IteratorPosition<T>& p);
+	
+	IteratorPosition<T>& operator++();
+	
+private:
+	Ref< IIterator<T> > ref;
+	T value;
+	sl_bool flagValid;
+	
+};
+
+template <class T>
 class SafeIterator;
 
 #define SLIB_TEMPLATE_PARAMS_IIterator T
@@ -45,6 +71,11 @@ public:
 
 	sl_bool next(T* _out) const;
 	
+	// range-based for loop
+	IteratorPosition<T> begin() const;
+	
+	IteratorPosition<T> end() const;
+	
 };
 
 /** auto-referencing object **/
@@ -61,12 +92,58 @@ public:
 	
 	sl_bool next(T* _out) const;
 	
+	// range-based for loop
+	IteratorPosition<T> begin() const;
+	
+	IteratorPosition<T> end() const;
+	
 };
 
 SLIB_NAMESPACE_END
 
 
 SLIB_NAMESPACE_BEGIN
+
+template <class T>
+SLIB_INLINE IteratorPosition<T>::IteratorPosition()
+{
+}
+
+template <class T>
+SLIB_INLINE IteratorPosition<T>::IteratorPosition(const Ref< IIterator<T> >& iterator) : ref(iterator)
+{
+	if (iterator.isNotNull()) {
+		flagValid = iterator->next(&value);
+	} else {
+		flagValid = sl_false;
+	}
+}
+
+template <class T>
+IteratorPosition<T>::IteratorPosition(const IteratorPosition<T>& other) = default;
+
+template <class T>
+IteratorPosition<T>::IteratorPosition(IteratorPosition<T>&& other) = default;
+
+template <class T>
+SLIB_INLINE T& IteratorPosition<T>::operator*()
+{
+	return value;
+}
+
+template <class T>
+SLIB_INLINE sl_bool IteratorPosition<T>::operator!=(const IteratorPosition<T>& p)
+{
+	return flagValid;
+}
+
+template <class T>
+SLIB_INLINE IteratorPosition<T>& IteratorPosition<T>::operator++()
+{
+	flagValid = ref->next(&value);
+	return *this;
+}
+
 
 SLIB_DEFINE_TEMPLATE_REF_WRAPPER(Iterator, SafeIterator, IIterator, ref)
 
@@ -100,6 +177,17 @@ SLIB_INLINE sl_bool Iterator<T>::next(T* _out) const
 	return sl_false;
 };
 
+template <class T>
+SLIB_INLINE IteratorPosition<T> Iterator<T>::begin() const
+{
+	return IteratorPosition<T>(ref);
+}
+
+template <class T>
+SLIB_INLINE IteratorPosition<T> Iterator<T>::end() const
+{
+	return IteratorPosition<T>();
+}
 
 SLIB_DEFINE_TEMPLATE_REF_WRAPPER(SafeIterator, Iterator, IIterator, ref)
 
@@ -132,6 +220,18 @@ SLIB_INLINE sl_bool SafeIterator<T>::next(T* _out) const
 	}
 	return sl_false;
 };
+
+template <class T>
+SLIB_INLINE IteratorPosition<T> SafeIterator<T>::begin() const
+{
+	return IteratorPosition<T>(ref);
+}
+
+template <class T>
+SLIB_INLINE IteratorPosition<T> SafeIterator<T>::end() const
+{
+	return IteratorPosition<T>();
+}
 
 SLIB_NAMESPACE_END
 

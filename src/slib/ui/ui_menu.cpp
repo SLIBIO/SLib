@@ -95,12 +95,12 @@ void MenuItem::setSubmenu(const Ref<Menu>& menu)
 	m_submenu = menu;
 }
 
-Ref<Runnable> MenuItem::getAction() const
+Callback MenuItem::getAction() const
 {
 	return m_action;
 }
 
-void MenuItem::setAction(const Ref<Runnable>& action)
+void MenuItem::setAction(const Callback& action)
 {
 	m_action = action;
 }
@@ -130,10 +130,7 @@ sl_bool MenuItem::processShortcutKey(const KeycodeAndModifiers& km)
 {
 	if (km != 0) {
 		if (km == m_shortcutKey) {
-			Ref<Runnable> action = m_action;
-			if (action.isNotNull()) {
-				action->run();
-			}
+			m_action();
 			return sl_true;
 		}
 		Ref<Menu> submenu = m_submenu;

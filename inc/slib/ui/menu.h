@@ -56,9 +56,9 @@ public:
 
 	virtual void setSubmenu(const Ref<Menu>& menu);
 
-	Ref<Runnable> getAction() const;
+	Callback getAction() const;
 
-	virtual void setAction(const Ref<Runnable>& action);
+	virtual void setAction(const Callback& action);
 
 	virtual sl_bool isSeparator() const;
 
@@ -77,7 +77,7 @@ protected:
 	SafeRef<Bitmap> m_icon;
 	SafeRef<Bitmap> m_checkedIcon;
 	SafeRef<Menu> m_submenu;
-	SafeRef<Runnable> m_action;
+	SafeCallback m_action;
 
 };
 
@@ -92,7 +92,7 @@ public:
 	Ref<Bitmap> icon;
 	Ref<Bitmap> checkedIcon;
 	Ref<Menu> submenu;
-	Ref<Runnable> action;
+	Callback action;
 
 public:
 	MenuItemParam();

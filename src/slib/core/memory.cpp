@@ -436,16 +436,16 @@ Memory MemoryBuffer::merge() const
 	if (m_queue.getCount() == 0) {
 		return Memory::null();
 	}
-	Link<MemoryData>* begin = m_queue.getBegin();
+	Link<MemoryData>* front = m_queue.getFront();
 	if (m_queue.getCount() == 1) {
-		return begin->value.getMemory();
+		return front->value.getMemory();
 	}
 	sl_size total = m_size;
 	Memory ret = Memory::create(total);
 	if (ret.isNotNull()) {
 		char* buf = (char*)(ret.getData());
 		sl_size offset = 0;
-		Link<MemoryData>* item = begin;
+		Link<MemoryData>* item = front;
 		while (item) {
 			MemoryData& m = item->value;
 			sl_size t = m.size;
@@ -537,9 +537,9 @@ Memory MemoryQueue::merge() const
 	if (m_queue.getCount() == 0) {
 		return m_memCurrent.sub(m_posCurrent);
 	}
-	Link<MemoryData>* begin = m_queue.getBegin();
+	Link<MemoryData>* front = m_queue.getFront();
 	if (m_queue.getCount() == 1 && m_memCurrent.size == 0) {
-		return begin->value.getMemory();
+		return front->value.getMemory();
 	}
 	sl_size total = m_size;
 	Memory ret = Memory::create(total);
@@ -555,7 +555,7 @@ Memory MemoryQueue::merge() const
 				offset = s;
 			}
 		}
-		Link<MemoryData>* item = begin;
+		Link<MemoryData>* item = front;
 		while (item) {
 			MemoryData& m = item->value;
 			sl_size t = m.size;

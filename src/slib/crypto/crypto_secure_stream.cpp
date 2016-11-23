@@ -607,7 +607,7 @@ public:
 		return m_streamBase.isNotNull();
 	}
 
-	sl_bool addTask(const Ref<Runnable>& callback)
+	sl_bool addTask(const Callback& callback)
 	{
 		Ref<AsyncStream> stream = m_streamBase;
 		if (stream.isNotNull()) {
@@ -1211,7 +1211,7 @@ public:
 		return m_streamBase.isNotNull();
 	}
 	
-	sl_bool addTask(const Ref<Runnable>& callback)
+	sl_bool addTask(const Callback& callback)
 	{
 		Ref<AsyncStream> stream = m_streamBase;
 		if (stream.isNotNull()) {

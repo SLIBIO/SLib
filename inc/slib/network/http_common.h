@@ -38,6 +38,8 @@ SLIB_NETWORK_NAMESPACE_BEGIN
 
 enum class HttpStatus
 {
+	Unknown = 0,
+	
 	// Informational
 	Continue = 100,
 	SwitchingProtocols = 101,
@@ -142,6 +144,16 @@ public:
 	static const String& Origin;
 	static const String& AccessControlAllowOrigin;
 	
+public:
+
+	/*
+	Returns
+		<0: error
+		=0: incomplete packet
+		>0: size of the headers (ending with [CR][LF][CR][LF])
+	*/
+	static sl_reg parseHeaders(IMap<String, String>* map, const void* headers, sl_size size);
+
 };
 
 
@@ -284,7 +296,7 @@ protected:
 	SafeString m_query;
 	SafeString m_requestVersion;
 	
-	HashMap<String, String> m_requestHeaders;
+	HashMap<String, String, HashIgnoreCaseString, CompareIgnoreCaseString> m_requestHeaders;
 	HashMap<String, String> m_parameters;
 	HashMap<String, String> m_queryParameters;
 	HashMap<String, String> m_postParameters;
@@ -310,7 +322,7 @@ public:
 	void setResponseVersion(const String& version);
 
 	
-	const IMap<String, String>& getResponseHeaders() const;
+	const Map<String, String>& getResponseHeaders() const;
 	
 	String getResponseHeader(String name) const;
 	
@@ -383,7 +395,7 @@ protected:
 	SafeString m_responseMessage;
 	SafeString m_responseVersion;
 	
-	HashMap<String, String> m_responseHeaders;
+	Map<String, String> m_responseHeaders;
 
 };
 
@@ -403,7 +415,9 @@ public:
 	
 	void copyFrom(AsyncStream* stream, sl_uint64 size);
 	
-	void copyFromFile(const String& path, const Ref<AsyncLoop>& loop);
+	void copyFromFile(const String& path);
+	
+	void copyFromFile(const String& path, const Ref<Dispatcher>& dispatcher);
 
 	sl_uint64 getOutputLength() const;
 

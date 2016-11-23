@@ -114,7 +114,7 @@ public:
 	void setHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 public:
-	SLIB_REF_PROPERTY(Runnable, OnSelect)
+	SLIB_CALLBACK_PROPERTY(OnSelect)
 	SLIB_REF_PROPERTY(Referable, UserObject)
 	SLIB_VARIANT_PROPERTY(UserData)
 	

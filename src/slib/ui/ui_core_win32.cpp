@@ -30,7 +30,7 @@ class _Win32_UI
 {
 public:
 	Ref<Screen> m_screenPrimary;
-	Queue< Ref<Runnable> > m_queueDispatch;
+	Queue<Callback> m_queueDispatch;
 
 	_Win32_UI();
 
@@ -90,7 +90,7 @@ sl_bool UI::isUiThread()
 	return (_g_thread_ui == ::GetCurrentThreadId());
 }
 
-void UI::dispatchToUiThread(const Ref<Runnable>& callback)
+void UI::dispatchToUiThread(const Callback& callback)
 {
 	if (callback.isNull()) {
 		return;
@@ -113,11 +113,9 @@ void _Win32_processUiDispatchQueue()
 	if (!ui) {
 		return;
 	}
-	Ref<Runnable> callback;
+	Callback callback;
 	while (ui->m_queueDispatch.pop(&callback)) {
-		if (callback.isNotNull()) {
-			callback->run();
-		}
+		callback();
 	}
 }
 

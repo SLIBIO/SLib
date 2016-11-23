@@ -180,6 +180,7 @@ public:
 public:
 	static Ref<HttpClient> create(const HttpClientParam& param);
 };
+
 SLIB_NETWORK_NAMESPACE_END
 
 #endif

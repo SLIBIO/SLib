@@ -183,7 +183,7 @@ SLIB_UI_NAMESPACE_END
 		m_flagRequestRender = sl_true;
 		m_flagUpdate = sl_true;
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_surfaceNeedsUpdate:) name:NSViewGlobalFrameDidChangeNotification object:self];
-		m_thread = slib::Thread::start(SLIB_CALLBACK(slib::_Ui_OSX_GLView_thread, self));
+		m_thread = slib::Thread::start(SLIB_CALLBACK(&(slib::_Ui_OSX_GLView_thread), self));
 	}
 	return self;
 }

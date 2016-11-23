@@ -22,21 +22,21 @@ Thread::~Thread()
 {
 }
 
-Ref<Thread> Thread::create(const Ref<Runnable>& runnable)
+Ref<Thread> Thread::create(const Callback& callback)
 {
-	if (runnable.isNull()) {
+	if (callback.isNull()) {
 		return Ref<Thread>::null();
 	}
 	Ref<Thread> ret = new Thread();
 	if (ret.isNotNull()) {
-		ret->m_runnable = runnable;
+		ret->m_callback = callback;
 	}
 	return ret;
 }
 
-Ref<Thread> Thread::start(const Ref<Runnable>& runnable, sl_uint32 stackSize)
+Ref<Thread> Thread::start(const Callback& callback, sl_uint32 stackSize)
 {
-	Ref<Thread> ret = create(runnable);
+	Ref<Thread> ret = create(callback);
 	if (ret.isNotNull()) {
 		if (ret->start(stackSize)) {
 			return ret;
@@ -189,9 +189,9 @@ sl_bool Thread::isNotWaiting()
 	return m_eventWaiting.isNull();
 }
 
-const Ref<Runnable>& Thread::getRunnable()
+const Callback& Thread::getCallback()
 {
-	return m_runnable;
+	return m_callback;
 }
 
 sl_bool Thread::sleep(sl_uint32 ms)
@@ -282,10 +282,8 @@ void Thread::_run()
 #endif
 
 	Thread::_nativeSetCurrentThread(this);
-	if (m_runnable.isNotNull()) {
-		m_runnable->run();
-	}
-	m_runnable.setNull();
+	m_callback();
+	m_callback.setNull();
 
 	m_attachedObjects.removeAll();
 

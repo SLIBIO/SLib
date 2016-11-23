@@ -7,6 +7,7 @@
 
 #include "../core/string.h"
 #include "../core/thread.h"
+#include "../core/callback.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -67,9 +68,9 @@ public:
 	// Run on UI thread
 	static void alert(const String& caption, const String& text);
 	
-	static void showAlert(const String& text, const Ref<Runnable>& onOk);
+	static void showAlert(const String& text, const Callback& onOk);
 	
-	static void showAlert(const String& caption, const String& text, const Ref<Runnable>& onOk);
+	static void showAlert(const String& caption, const String& text, const Callback& onOk);
 	
 	
 	// HID related functions (Platform Specific, only for desktop apps)
@@ -100,8 +101,13 @@ public:
 	// UI Thread
 	static sl_bool isUiThread();
 	
-	static void dispatchToUiThread(const Ref<Runnable>& callback);
+	static void dispatchToUiThread(const Callback& callback);
 	
+	static void runOnUiThread(const Callback& callback);
+	
+	static Callback getCallbackOnUiThread(const Callback& callback);
+
+	static Ref<Dispatcher> getDispatcher();
 	
 	// Run Loop
 	static void runLoop();
@@ -113,6 +119,11 @@ public:
 	static void quitApp();
 
 };
+
+#define SLIB_UI_CALLBACK(...) slib::UI::getCallbackOnUiThread(SLIB_CALLBACK(__VA_ARGS__))
+#define SLIB_UI_CALLBACK_CLASS(...) slib::UI::getCallbackOnUiThread(SLIB_CALLBACK_CLASS(__VA_ARGS__))
+#define SLIB_UI_CALLBACK_REF(...) slib::UI::getCallbackOnUiThread(SLIB_CALLBACK_REF(__VA_ARGS__))
+#define SLIB_UI_CALLBACK_WEAKREF(...) slib::UI::getCallbackOnUiThread(SLIB_CALLBACK_WEAKREF(__VA_ARGS__))
 
 SLIB_UI_NAMESPACE_END
 

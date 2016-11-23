@@ -69,15 +69,15 @@ public:
 
 	List<VT> getValues(const KT& key) const;
 	
-	sl_bool search(const KT& key, TreePosition* pos = sl_null) const;
+	sl_bool search(const KT& key, TreePosition* pos = sl_null, VT* outValue = sl_null) const;
 	
 	sl_bool search(const KT& key, const VT& value, TreePosition* pos = sl_null) const;
 
 	sl_bool search(const KT& key, TreePosition* pPosBegin, TreePosition* pPosEnd) const;
 	
-	sl_bool searchInNode(const KT& key, const TreeNode& node, TreePosition* pos = sl_null) const;
+	sl_bool searchInNode(const KT& key, const TreeNode& node, TreePosition* pos = sl_null, VT* outValue = sl_null) const;
 	
-	sl_bool searchItemInNode(const KT& key, const TreeNode& node, sl_uint32& pos, TreeNode& link) const;
+	sl_bool searchItemInNode(const KT& key, const TreeNode& node, sl_uint32& pos, TreeNode& link, VT* outValue = sl_null) const;
 	
 	sl_bool getAt(const TreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
 	
@@ -99,9 +99,13 @@ public:
 	
 	sl_bool addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist = sl_null);
 	
-	sl_size remove(const KT& key, sl_bool flagRemoveAllMatches = sl_false);
+	sl_bool remove(const KT& key, VT* outValue = sl_null);
 	
-	sl_size removeKeyAndValue(const KT& key, const VT& value, sl_bool flagRemoveAllMatches = sl_false);
+	sl_size removeItems(const KT& key, List<VT>* outValues = sl_null);
+	
+	sl_bool removeValue(const KT& key, const VT& value);
+	
+	sl_size removeValues(const KT& key, const VT& value);
 	
 	sl_bool removeAt(const TreePosition& pos);
 	
@@ -337,9 +341,9 @@ List<VT> BTree<KT, VT, COMPARE>::getValues(const KT& key) const
 }
 
 template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::search(const KT& key, TreePosition* pos) const
+sl_bool BTree<KT, VT, COMPARE>::search(const KT& key, TreePosition* pos, VT* outValue) const
 {
-	return searchInNode(key, getRootNode(), pos);
+	return searchInNode(key, getRootNode(), pos, outValue);
 }
 
 template <class KT, class VT, class COMPARE>
@@ -434,11 +438,11 @@ sl_bool BTree<KT, VT, COMPARE>::search(const KT& key, TreePosition* pPosBegin, T
 }
 
 template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::searchInNode(const KT& key, const TreeNode& node, TreePosition* pos) const
+sl_bool BTree<KT, VT, COMPARE>::searchInNode(const KT& key, const TreeNode& node, TreePosition* pos, VT* outValue) const
 {
 	TreeNode link;
 	sl_uint32 item;
-	if (searchItemInNode(key, node, item, link)) {
+	if (searchItemInNode(key, node, item, link, outValue)) {
 		if (pos) {
 			pos->node = node;
 			pos->item = item;
@@ -446,7 +450,7 @@ sl_bool BTree<KT, VT, COMPARE>::searchInNode(const KT& key, const TreeNode& node
 		return sl_true;
 	} else {
 		if (link.isNotNull()) {
-			return searchInNode(key, link, pos);
+			return searchInNode(key, link, pos, outValue);
 		} else {
 			if (pos) {
 				pos->node = node;
@@ -458,7 +462,7 @@ sl_bool BTree<KT, VT, COMPARE>::searchInNode(const KT& key, const TreeNode& node
 }
 
 template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::searchItemInNode(const KT& key, const TreeNode& node, sl_uint32& pos, TreeNode& link) const
+sl_bool BTree<KT, VT, COMPARE>::searchItemInNode(const KT& key, const TreeNode& node, sl_uint32& pos, TreeNode& link, VT* outValue) const
 {
 	NodeDataScope data(this, node);
 	if (data.isNull()) {
@@ -474,6 +478,9 @@ sl_bool BTree<KT, VT, COMPARE>::searchItemInNode(const KT& key, const TreeNode& 
 	sl_size _pos = 0;
 	if (BinarySearch<KT, KT, COMPARE>::search(data->keys, n, key, &_pos)) {
 		pos = (sl_uint32)_pos;
+		if (outValue) {
+			*outValue = data->values[pos];
+		}
 		link.setNull();
 		return sl_true;
 	} else {
@@ -861,13 +868,42 @@ sl_bool BTree<KT, VT, COMPARE>::addIfNewKeyAndValue(const KT& key, const VT& val
 }
 
 template <class KT, class VT, class COMPARE>
-sl_size BTree<KT, VT, COMPARE>::remove(const KT& key, sl_bool flagRemoveAllMatches)
+sl_bool BTree<KT, VT, COMPARE>::remove(const KT& key, VT* outValue)
 {
 	TreePosition pos;
-	if (search(key, &pos)) {
+	if (search(key, &pos, outValue)) {
 		if (removeAt(pos)) {
-			sl_size n = 1;
-			if (flagRemoveAllMatches) {
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
+template <class KT, class VT, class COMPARE>
+sl_size BTree<KT, VT, COMPARE>::removeItems(const KT& key, List<VT>* outValues)
+{
+	TreePosition pos;
+	if (outValues) {
+		VT v;
+		if (search(key, &pos, &v)) {
+			outValues->add_NoLock(v);
+			if (removeAt(pos)) {
+				sl_size n = 1;
+				while (search(key, &pos, &v)) {
+					outValues->add_NoLock(v);
+					if (removeAt(pos)) {
+						n++;
+					} else {
+						break;
+					}
+				}
+				return n;
+			}
+		}
+	} else {
+		if (search(key, &pos)) {
+			if (removeAt(pos)) {
+				sl_size n = 1;
 				while (search(key, &pos)) {
 					if (removeAt(pos)) {
 						n++;
@@ -875,27 +911,37 @@ sl_size BTree<KT, VT, COMPARE>::remove(const KT& key, sl_bool flagRemoveAllMatch
 						break;
 					}
 				}
+				return n;
 			}
-			return n;
 		}
 	}
 	return 0;
 }
 
 template <class KT, class VT, class COMPARE>
-sl_size BTree<KT, VT, COMPARE>::removeKeyAndValue(const KT& key, const VT& value, sl_bool flagRemoveAllMatches)
+sl_bool BTree<KT, VT, COMPARE>::removeValue(const KT& key, const VT& value)
+{
+	TreePosition pos;
+	if (search(key, value, &pos)) {
+		if (removeAt(pos)) {
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
+template <class KT, class VT, class COMPARE>
+sl_size BTree<KT, VT, COMPARE>::removeValues(const KT& key, const VT& value)
 {
 	TreePosition pos;
 	if (search(key, value, &pos)) {
 		if (removeAt(pos)) {
 			sl_size n = 1;
-			if (flagRemoveAllMatches) {
-				while (search(key, value, &pos)) {
-					if (removeAt(pos)) {
-						n++;
-					} else {
-						break;
-					}
+			while (search(key, value, &pos)) {
+				if (removeAt(pos)) {
+					n++;
+				} else {
+					break;
 				}
 			}
 			return n;

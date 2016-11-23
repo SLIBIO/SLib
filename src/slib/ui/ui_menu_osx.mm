@@ -337,10 +337,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::MenuItem> item(m_item);
 	if (item.isNotNull()) {
-		slib::Ref<slib::Runnable> action = item->getAction();
-		if (action.isNotNull()) {
-			action->run();
-		}
+		(item->getAction())();
 	}
 }
 

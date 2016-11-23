@@ -66,6 +66,24 @@ String Apple::getFilePathFromNSURL(NSURL* url)
 	return String::null();
 }
 
+Memory Apple::getMemoryFromNSData(NSData* data)
+{
+	if (data != nil) {
+		sl_size n = (sl_size)([data length]);
+		if (n > 0) {
+			Memory mem = Memory::create(n);
+			if (mem.isNotNull()) {
+				char* p = (char*)(mem.getData());
+				[data enumerateByteRangesUsingBlock:^(const void* bytes, NSRange byteRange, BOOL* stop) {
+					Base::copyMemory(p + byteRange.location, bytes, byteRange.length);
+				}];
+				return mem;
+			}
+		}
+	}
+	return Memory::null();
+}
+
 String Apple::getAssetFilePath(const String &path)
 {
 	String fileExt = File::getFileExtension(path);

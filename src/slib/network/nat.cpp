@@ -181,7 +181,7 @@ sl_uint16 NatTable::getMappedIcmpEchoSequenceNumber(const IcmpEchoAddress& addre
 	}
 	sl_uint16 sn = ++ m_icmpEchoSequenceCurrent;
 	if (m_mapIcmpEchoIncoming.get(sn, &element)) {
-		m_mapIcmpEchoOutgoing.remove(element.addressSource, sl_true);
+		m_mapIcmpEchoOutgoing.removeItems(element.addressSource);
 	}
 	element.addressSource = address;
 	element.sequenceNumberTarget = sn;

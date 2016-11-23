@@ -200,10 +200,7 @@ String EditView::dispatchChange(const String& newValue)
 
 void EditView::dispatchEnterAction()
 {
-	Ref<Runnable> action = getEnterAction();
-	if (action.isNotNull()) {
-		action->run();
-	}
+	(getEnterAction())();
 	onEnterAction();
 }
 

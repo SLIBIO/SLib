@@ -408,10 +408,7 @@ void _Win32_processMenuCommand(WPARAM wParam, LPARAM lParam)
 		if (menu.isNotNull()) {
 			Ref<MenuItem> item = menu->getMenuItem(index);
 			if (item.isNotNull()) {
-				Ref<Runnable> action = item->getAction();
-				if (action.isNotNull()) {
-					action->run();
-				}
+				(item->getAction())();
 			}
 		}
 	}

@@ -94,6 +94,8 @@ public:
 public:
 	Ref();
 	
+	Ref(sl_null_t);
+	
 	Ref(const T* _other);
 	
 	Ref(Ref<T>&& other);
@@ -143,6 +145,8 @@ public:
 	const Ref<Referable>& getReference() const;
 	
 public:
+	Ref<T>& operator=(sl_null_t);
+	
 	Ref<T>& operator=(const T* other);
 
 	Ref<T>& operator=(Ref<T>&& other);
@@ -176,6 +180,8 @@ public:
 	Ref<T>& operator=(const SafeWeakRef<_T>& other);
 
 public:
+	sl_bool operator==(sl_null_t) const;
+	
 	sl_bool operator==(const T* other) const;
 	
 	sl_bool operator==(const Ref<T>& other) const;
@@ -187,6 +193,8 @@ public:
 	
 	template <class _T>
 	sl_bool operator==(const SafeRef<_T>& other) const;
+	
+	sl_bool operator!=(sl_null_t) const;
 
 	sl_bool operator!=(const T* other) const;
 	
@@ -229,6 +237,8 @@ private:
 
 public:
 	SafeRef();
+	
+	SafeRef(sl_null_t);
 	
 	SafeRef(const T* other);
 	
@@ -277,6 +287,8 @@ public:
 	static const SafeRef<T>& from(const SafeRef<_T>& other);
 	
 public:
+	SafeRef<T>& operator=(sl_null_t);
+	
 	SafeRef<T>& operator=(const T* other);
 	
 	SafeRef<T>& operator=(SafeRef<T>&& other);
@@ -310,6 +322,8 @@ public:
 	SafeRef<T>& operator=(const SafeWeakRef<_T>& other);
 
 public:
+	sl_bool operator==(sl_null_t) const;
+	
 	sl_bool operator==(const T* other) const;
 	
 	sl_bool operator==(const SafeRef<T>& other) const;
@@ -321,6 +335,8 @@ public:
 	
 	template <class _T>
 	sl_bool operator==(const Ref<_T>& other) const;
+	
+	sl_bool operator!=(sl_null_t) const;
 	
 	sl_bool operator!=(const T* other) const;
 	
@@ -358,6 +374,8 @@ public:
 
 public:
 	WeakRef();
+	
+	WeakRef(sl_null_t);
 	
 	WeakRef(const T* other);
 
@@ -408,6 +426,8 @@ public:
 	static const WeakRef<T>& from(const WeakRef<_T>& other);
 	
 public:
+	WeakRef<T>& operator=(sl_null_t);
+	
 	WeakRef<T>& operator=(const T* other);
 
 	WeakRef<T>& operator=(WeakRef<T>&& other);
@@ -476,6 +496,8 @@ public:
 public:
 	SafeWeakRef();
 	
+	SafeWeakRef(sl_null_t);
+	
 	SafeWeakRef(const T* other);
 
 	SafeWeakRef(SafeWeakRef<T>&& other);
@@ -523,6 +545,8 @@ public:
 	static const SafeWeakRef<T>& from(const SafeWeakRef<_T>& other);
 	
 public:
+	SafeWeakRef<T>& operator=(sl_null_t);
+	
 	SafeWeakRef<T>& operator=(const T* other);
 
 	SafeWeakRef<T>& operator=(SafeWeakRef<T>&& other);
@@ -734,6 +758,7 @@ SLIB_NAMESPACE_END
 #define SLIB_DECLARE_REF_WRAPPER_NO_OP(TYPE, OTHER_TYPE, OBJ) \
 public: \
 	TYPE(); \
+	TYPE(sl_null_t); \
 	TYPE(const OBJ* object); \
 	TYPE(const TYPE& other); \
 	TYPE(TYPE&& other); \
@@ -743,6 +768,7 @@ public: \
 	sl_bool isNull() const; \
 	sl_bool isNotNull() const; \
 	void setNull(); \
+	TYPE& operator=(sl_null_t); \
 	TYPE& operator=(const OBJ* object); \
 	TYPE& operator=(const TYPE& other); \
 	TYPE& operator=(TYPE&& other); \
@@ -760,19 +786,14 @@ public: \
 
 #define SLIB_DEFINE_REF_WRAPPER_NO_OP(TYPE, OTHER_TYPE, OBJ, NAME) \
 	TYPE::TYPE() {} \
-	TYPE::TYPE(const OBJ* other) : NAME(other) \
-	{ \
-	} \
-	TYPE::TYPE(const TYPE& other) : NAME(other.NAME) \
-	{ \
-	} \
+	TYPE::TYPE(sl_null_t) : NAME(sl_null) {} \
+	TYPE::TYPE(const OBJ* other) : NAME(other) {} \
+	TYPE::TYPE(const TYPE& other) : NAME(other.NAME) {} \
 	TYPE::TYPE(TYPE&& other) \
 	{ \
 		NAME._move_init(&other); \
 	} \
-	TYPE::TYPE(const OTHER_TYPE& other) : NAME(other.NAME) \
-	{ \
-	} \
+	TYPE::TYPE(const OTHER_TYPE& other) : NAME(other.NAME) {} \
 	TYPE::TYPE(OTHER_TYPE&& other) \
 	{ \
 		NAME._move_init(&other); \
@@ -792,6 +813,11 @@ public: \
 	void TYPE::setNull() \
 	{ \
 		NAME.setNull(); \
+	} \
+	TYPE& TYPE::operator=(sl_null_t) \
+	{ \
+		NAME = sl_null; \
+		return *this; \
 	} \
 	TYPE& TYPE::operator=(const OBJ* other) \
 	{ \
@@ -844,6 +870,7 @@ public: \
 #define SLIB_DECLARE_TEMPLATE_REF_WRAPPER_NO_OP(TYPE, OTHER_TYPE, OBJ) \
 public: \
 	TYPE(); \
+	TYPE(sl_null_t); \
 	TYPE(const OBJ<SLIB_TEMPLATE_PARAMS_##OBJ>* object); \
 	TYPE(const TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>& other); \
 	TYPE(TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>&& other); \
@@ -853,6 +880,7 @@ public: \
 	sl_bool isNull() const; \
 	sl_bool isNotNull() const; \
 	void setNull(); \
+	TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>& operator=(sl_null_t); \
 	TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>& operator=(const OBJ<SLIB_TEMPLATE_PARAMS_##OBJ>* object); \
 	TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>& operator=(const TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>& other); \
 	TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>& operator=(TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>&& other); \
@@ -870,26 +898,20 @@ SLIB_DECLARE_TEMPLATE_REF_WRAPPER_NO_OP(TYPE, OTHER_TYPE, OBJ) \
 
 #define SLIB_DEFINE_TEMPLATE_REF_WRAPPER_NO_OP(TYPE, OTHER_TYPE, OBJ, NAME) \
 	template <SLIB_TEMPLATE_DEF_PARAMS_##OBJ> \
-	TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>::TYPE() \
-	{ \
-	} \
+	TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>::TYPE() {} \
 	template <SLIB_TEMPLATE_DEF_PARAMS_##OBJ> \
-	TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>::TYPE(const OBJ<SLIB_TEMPLATE_PARAMS_##OBJ>* other) : NAME(other) \
-	{ \
-	} \
+	TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>::TYPE(sl_null_t) : NAME(sl_null) {} \
 	template <SLIB_TEMPLATE_DEF_PARAMS_##OBJ> \
-	TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>::TYPE(const TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>& other) : NAME(other.NAME) \
-	{ \
-	} \
+	TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>::TYPE(const OBJ<SLIB_TEMPLATE_PARAMS_##OBJ>* other) : NAME(other) {} \
+	template <SLIB_TEMPLATE_DEF_PARAMS_##OBJ> \
+	TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>::TYPE(const TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>& other) : NAME(other.NAME) {} \
 	template <SLIB_TEMPLATE_DEF_PARAMS_##OBJ> \
 	TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>::TYPE(TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>&& other) \
 	{ \
 		NAME._move_init(&other); \
 	} \
 	template <SLIB_TEMPLATE_DEF_PARAMS_##OBJ> \
-	TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>::TYPE(const OTHER_TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>& other) : NAME(other.NAME) \
-	{ \
-	} \
+	TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>::TYPE(const OTHER_TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>& other) : NAME(other.NAME) {} \
 	template <SLIB_TEMPLATE_DEF_PARAMS_##OBJ> \
 	TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>::TYPE(OTHER_TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>&& other) \
 	{ \
@@ -914,6 +936,12 @@ SLIB_DECLARE_TEMPLATE_REF_WRAPPER_NO_OP(TYPE, OTHER_TYPE, OBJ) \
 	void TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>::setNull() \
 	{ \
 		NAME.setNull(); \
+	} \
+	template <SLIB_TEMPLATE_DEF_PARAMS_##OBJ> \
+	TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>& TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>::operator=(sl_null_t) \
+	{ \
+		NAME = sl_null; \
+		return *this; \
 	} \
 	template <SLIB_TEMPLATE_DEF_PARAMS_##OBJ> \
 	TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>& TYPE<SLIB_TEMPLATE_PARAMS_##OBJ>::operator=(const OBJ<SLIB_TEMPLATE_PARAMS_##OBJ>* other) \
@@ -985,6 +1013,11 @@ SLIB_NAMESPACE_BEGIN
 
 template <class T>
 SLIB_INLINE Ref<T>::Ref() : ptr(sl_null)
+{
+}
+
+template <class T>
+SLIB_INLINE Ref<T>::Ref(sl_null_t) : ptr(sl_null)
 {
 }
 
@@ -1152,6 +1185,13 @@ SLIB_INLINE const Ref<Referable>& Ref<T>::getReference() const
 }
 
 template <class T>
+SLIB_INLINE Ref<T>& Ref<T>::operator=(sl_null_t)
+{
+	_replaceObject(sl_null);
+	return *this;
+}
+
+template <class T>
 SLIB_INLINE Ref<T>& Ref<T>::operator=(const T* other)
 {
 	T* o = (T*)other;
@@ -1290,9 +1330,21 @@ Ref<T>& Ref<T>::operator=(const SafeWeakRef<_T>& _other)
 }
 
 template <class T>
+SLIB_INLINE sl_bool Ref<T>::operator==(sl_null_t) const
+{
+	return ptr == sl_null;
+}
+
+template <class T>
 SLIB_INLINE sl_bool Ref<T>::operator==(const T* other) const
 {
 	return ptr == other;
+}
+
+template <class T>
+SLIB_INLINE sl_bool operator==(sl_null_t, const Ref<T>& b)
+{
+	return sl_null == b.ptr;
 }
 
 template <class T>
@@ -1328,9 +1380,21 @@ SLIB_INLINE sl_bool Ref<T>::operator==(const SafeRef<_T>& other) const
 }
 
 template <class T>
+SLIB_INLINE sl_bool Ref<T>::operator!=(sl_null_t) const
+{
+	return ptr != sl_null;
+}
+
+template <class T>
 SLIB_INLINE sl_bool Ref<T>::operator!=(const T* other) const
 {
 	return ptr != other;
+}
+
+template <class T>
+SLIB_INLINE sl_bool operator!=(sl_null_t, const Ref<T>& b)
+{
+	return sl_null != b.ptr;
 }
 
 template <class T>
@@ -1425,6 +1489,11 @@ SLIB_INLINE void Ref<T>::_move_assign(void* _other, T* dummy)
 
 template <class T>
 SLIB_INLINE SafeRef<T>::SafeRef() : _ptr(sl_null)
+{
+}
+
+template <class T>
+SLIB_INLINE SafeRef<T>::SafeRef(sl_null_t) : _ptr(sl_null)
 {
 }
 
@@ -1586,6 +1655,13 @@ SLIB_INLINE const SafeRef<T>& SafeRef<T>::from(const SafeRef<_T>& other)
 }
 
 template <class T>
+SafeRef<T>& SafeRef<T>::operator=(sl_null_t)
+{
+	_replaceObject(sl_null);
+	return *this;
+}
+
+template <class T>
 SafeRef<T>& SafeRef<T>::operator=(const T* other)
 {
 	T* o = (T*)other;
@@ -1727,9 +1803,21 @@ SafeRef<T>& SafeRef<T>::operator=(const SafeWeakRef<_T>& _other)
 }
 
 template <class T>
+SLIB_INLINE sl_bool SafeRef<T>::operator==(sl_null_t) const
+{
+	return _ptr == sl_null;
+}
+
+template <class T>
 SLIB_INLINE sl_bool SafeRef<T>::operator==(const T* other) const
 {
 	return _ptr == other;
+}
+
+template <class T>
+SLIB_INLINE sl_bool operator==(sl_null_t, const SafeRef<T>& b)
+{
+	return sl_null == b._ptr;
 }
 
 template <class T>
@@ -1765,9 +1853,21 @@ SLIB_INLINE sl_bool SafeRef<T>::operator==(const Ref<_T>& other) const
 }
 
 template <class T>
+SLIB_INLINE sl_bool SafeRef<T>::operator!=(sl_null_t) const
+{
+	return _ptr != sl_null;
+}
+
+template <class T>
 SLIB_INLINE sl_bool SafeRef<T>::operator!=(const T* other) const
 {
 	return _ptr != other;
+}
+
+template <class T>
+SLIB_INLINE sl_bool operator!=(sl_null_t, const SafeRef<T>& b)
+{
+	return sl_null != b._ptr;
 }
 
 template <class T>
@@ -1869,6 +1969,11 @@ SLIB_INLINE void SafeRef<T>::_move_assign(void* _other, T* dummy)
 
 template <class T>
 SLIB_INLINE WeakRef<T>::WeakRef()
+{
+}
+
+template <class T>
+SLIB_INLINE WeakRef<T>::WeakRef(sl_null_t)
 {
 }
 
@@ -2010,6 +2115,13 @@ template <class _T>
 SLIB_INLINE const WeakRef<T>& WeakRef<T>::from(const WeakRef<_T>& other)
 {
 	return *((WeakRef<T>*)((void*)&other));
+}
+
+template <class T>
+WeakRef<T>& WeakRef<T>::operator=(sl_null_t)
+{
+	_weak.setNull();
+	return *this;
 }
 
 template <class T>
@@ -2187,6 +2299,11 @@ SLIB_INLINE SafeWeakRef<T>::SafeWeakRef()
 }
 
 template <class T>
+SafeWeakRef<T>::SafeWeakRef(sl_null_t)
+{
+}
+
+template <class T>
 SafeWeakRef<T>::SafeWeakRef(const T* _other)
 {
 	Ref<T> other(_other);
@@ -2308,6 +2425,13 @@ template <class _T>
 SLIB_INLINE const SafeWeakRef<T>& SafeWeakRef<T>::from(const SafeWeakRef<_T>& other)
 {
 	return *((SafeWeakRef<T>*)((void*)&other));
+}
+
+template <class T>
+SafeWeakRef<T>& SafeWeakRef<T>::operator=(sl_null_t)
+{
+	_weak.setNull();
+	return *this;
 }
 
 template <class T>

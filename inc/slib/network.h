@@ -22,6 +22,8 @@
 #include "network/ethernet.h"
 #include "network/arp.h"
 
+#include "network/url.h"
+#include "network/url_request.h"
 #include "network/http.h"
 #include "network/secure_stream.h"
 #include "network/datagram.h"

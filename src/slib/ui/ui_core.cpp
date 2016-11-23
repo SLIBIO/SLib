@@ -200,14 +200,72 @@ void UI::alert(const String& caption, const String& text)
 	AlertDialog::run(caption, text);
 }
 
-void UI::showAlert(const String& text, const Ref<Runnable>& onOk)
+void UI::showAlert(const String& text, const Callback& onOk)
 {
 	AlertDialog::show(text, onOk);
 }
 
-void UI::showAlert(const String& caption, const String& text, const Ref<Runnable>& onOk)
+void UI::showAlert(const String& caption, const String& text, const Callback& onOk)
 {
 	AlertDialog::show(caption, text, onOk);
+}
+
+void UI::runOnUiThread(const Callback& callback)
+{
+	if (callback.isNotNull()) {
+		if (isUiThread()) {
+			callback();
+		} else {
+			dispatchToUiThread(callback);
+		}
+	}
+}
+
+class _UiCallback : public Runnable
+{
+public:
+	Callback m_callback;
+
+public:
+	SLIB_INLINE _UiCallback(const Callback& callback) : m_callback(callback)
+	{
+	}
+
+public:
+	// override
+	void run()
+	{
+		if (UI::isUiThread()) {
+			m_callback();
+		} else {
+			UI::dispatchToUiThread(m_callback);
+		}
+	}
+
+};
+
+Callback UI::getCallbackOnUiThread(const Callback& callback)
+{
+	if (callback.isNotNull()) {
+		return (Runnable*)(new _UiCallback(callback));
+	}
+	return Callback::null();
+}
+
+class _UiDispatcher : public Dispatcher
+{
+public:
+	// override
+	sl_bool dispatch(const Callback& callback)
+	{
+		UI::dispatchToUiThread(callback);
+		return sl_true;
+	}
+};
+
+Ref<Dispatcher> getDispatcher()
+{
+	return new _UiDispatcher();
 }
 
 static sl_int32 _g_ui_run_loop_level = 0;
@@ -233,7 +291,7 @@ void UI::runLoop()
 void UI::quitLoop()
 {
 	if (!(UI::isUiThread())) {
-		UI::dispatchToUiThread(SLIB_CALLBACK(UI::quitLoop));
+		UI::dispatchToUiThread(&(UI::quitLoop));
 		return;
 	}
 	if (_g_ui_run_loop_level > 0) {
@@ -254,7 +312,7 @@ void UI::quitApp()
 		return;
 	}
 	if (!(UI::isUiThread())) {
-		UI::dispatchToUiThread(SLIB_CALLBACK(UI::quitApp));
+		UI::dispatchToUiThread(&(UI::quitApp));
 		return;
 	}
 	_g_ui_flag_quit_app = sl_true;

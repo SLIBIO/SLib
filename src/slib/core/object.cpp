@@ -1,4 +1,5 @@
 #include "../../../inc/slib/core/object.h"
+#include "../../../inc/slib/core/linked_object.h"
 
 SLIB_NAMESPACE_BEGIN
 
@@ -58,5 +59,8 @@ void ObjectLocker::lock(const Object* object1, const Object* object2)
 		}
 	}
 }
+
+
+SLIB_DEFINE_OBJECT(LinkedObjectListBase, Object)
 
 SLIB_NAMESPACE_END

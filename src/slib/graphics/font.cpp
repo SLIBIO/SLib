@@ -91,7 +91,7 @@ sl_real Font::getFontHeight()
 {
 	FontMetrics fm;
 	if (getFontMetrics(fm)) {
-		return fm.ascent + fm.descent;
+		return fm.leading + fm.ascent + fm.descent;
 	}
 	return 0;
 }

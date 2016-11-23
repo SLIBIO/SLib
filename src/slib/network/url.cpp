@@ -1,7 +1,8 @@
-#include "../../../inc/slib/core/url.h"
+#include "../../../inc/slib/network/url.h"
+
 #include "../../../inc/slib/core/scoped_pointer.h"
 
-SLIB_NAMESPACE_BEGIN
+SLIB_NETWORK_NAMESPACE_BEGIN
 
 /*
 		Uniform Resource Identifier (URI): Generic Syntax
@@ -276,4 +277,4 @@ String Url::decodeUriByUTF8(const String& value)
 	return decodePercentByUTF8(value);
 }
 
-SLIB_NAMESPACE_END
+SLIB_NETWORK_NAMESPACE_END

@@ -28,45 +28,45 @@ public:
 	
 	static void run(const String& caption, const String& text);
 	
-	static void show(const String& text, const Ref<Runnable>& onOk);
+	static void show(const String& text, const Callback& onOk);
 	
-	static void show(const String& caption, const String& text, const Ref<Runnable>& onOk);
+	static void show(const String& caption, const String& text, const Callback& onOk);
 
 	static DialogResult runOkCancel(const String& text);
 	
 	static DialogResult runOkCancel(const String& caption, const String& text);
 	
-	static void showOkCancel(const String& text, const Ref<Runnable>& onOk, const Ref<Runnable>& onCancel);
+	static void showOkCancel(const String& text, const Callback& onOk, const Callback& onCancel);
 	
-	static void showOkCancel(const String& caption, const String& text, const Ref<Runnable>& onOk, const Ref<Runnable>& onCancel);
+	static void showOkCancel(const String& caption, const String& text, const Callback& onOk, const Callback& onCancel);
 	
-	static void showOkCancel(const String& text, const Ref<Runnable>& onOk);
+	static void showOkCancel(const String& text, const Callback& onOk);
 	
-	static void showOkCancel(const String& caption, const String& text, const Ref<Runnable>& onOk);
+	static void showOkCancel(const String& caption, const String& text, const Callback& onOk);
 	
 	static DialogResult runYesNo(const String& text);
 	
 	static DialogResult runYesNo(const String& caption, const String& text);
 	
-	static void showYesNo(const String& text, const Ref<Runnable>& onYes, const Ref<Runnable>& onNo);
+	static void showYesNo(const String& text, const Callback& onYes, const Callback& onNo);
 	
-	static void showYesNo(const String& caption, const String& text, const Ref<Runnable>& onYes, const Ref<Runnable>& onNo);
+	static void showYesNo(const String& caption, const String& text, const Callback& onYes, const Callback& onNo);
 	
-	static void showYesNo(const String& text, const Ref<Runnable>& onYes);
+	static void showYesNo(const String& text, const Callback& onYes);
 	
-	static void showYesNo(const String& caption, const String& text, const Ref<Runnable>& onYes);
+	static void showYesNo(const String& caption, const String& text, const Callback& onYes);
 	
 	static DialogResult runYesNoCancel(const String& text);
 	
 	static DialogResult runYesNoCancel(const String& caption, const String& text);
 	
-	static void showYesNoCancel(const String& text, const Ref<Runnable>& onYes, const Ref<Runnable>& onNo, const Ref<Runnable>& onCancel);
+	static void showYesNoCancel(const String& text, const Callback& onYes, const Callback& onNo, const Callback& onCancel);
 	
-	static void showYesNoCancel(const String& caption, const String& text, const Ref<Runnable>& onYes, const Ref<Runnable>& onNo, const Ref<Runnable>& onCancel);
+	static void showYesNoCancel(const String& caption, const String& text, const Callback& onYes, const Callback& onNo, const Callback& onCancel);
 	
-	static void showYesNoCancel(const String& text, const Ref<Runnable>& onYes, const Ref<Runnable>& onNo);
+	static void showYesNoCancel(const String& text, const Callback& onYes, const Callback& onNo);
 	
-	static void showYesNoCancel(const String& caption, const String& text, const Ref<Runnable>& onYes, const Ref<Runnable>& onNo);
+	static void showYesNoCancel(const String& caption, const String& text, const Callback& onYes, const Callback& onNo);
 	
 public:
 	AlertDialog();
@@ -89,9 +89,9 @@ public:
 	String titleYes;
 	String titleNo;
 	
-	Ref<Runnable> onOk;
-	Ref<Runnable> onCancel;
-	Ref<Runnable> onNo;
+	Callback onOk;
+	Callback onCancel;
+	Callback onNo;
 	
 public:
 	DialogResult _run();

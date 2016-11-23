@@ -37,8 +37,6 @@ public:
 	
 	Ref<AsyncStream> getIO();
 	
-	Ref<AsyncLoop> getAsyncLoop();
-
 	Ref<AsyncIoLoop> getAsyncIoLoop();
 	
 	const SocketAddress& getLocalAddress();
@@ -202,8 +200,6 @@ public:
 	
 	sl_bool isRunning();
 	
-	Ref<AsyncLoop> getAsyncLoop();
-	
 	Ref<AsyncIoLoop> getAsyncIoLoop();
 	
 	Ref<ThreadPool> getThreadPool();
@@ -254,7 +250,6 @@ protected:
 	sl_bool _init(const HttpServiceParam& param);
 	
 protected:
-	SafeRef<AsyncLoop> m_loop;
 	SafeRef<AsyncIoLoop> m_ioLoop;
 	SafeRef<ThreadPool> m_threadPool;
 	sl_bool m_flagRunning;
@@ -265,6 +260,7 @@ protected:
 	CList< Ref<HttpServiceConnectionProvider> > m_connectionProviders;
 
 	HttpServiceParam m_param;
+	
 };
 
 SLIB_NETWORK_NAMESPACE_END

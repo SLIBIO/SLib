@@ -104,12 +104,12 @@ sl_bool UI::isUiThread()
 	return [NSThread isMainThread];
 }
 
-void UI::dispatchToUiThread(const Ref<Runnable>& _callback)
+void UI::dispatchToUiThread(const Callback& _callback)
 {
-    Ref<Runnable> callback = _callback;
+    Callback callback = _callback;
 	if (callback.isNotNull()) {
 		dispatch_async(dispatch_get_main_queue(), ^{
-			callback->run();
+			callback();
 		});
 	}
 }
