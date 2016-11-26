@@ -33,6 +33,4 @@
 
 #include "math/bezier.h"
 
-#include "math/geograph.h"
-
 #endif

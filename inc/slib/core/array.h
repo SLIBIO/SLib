@@ -4,7 +4,7 @@
 #include "definition.h"
 
 #include "new.h"
-#include "algorithm.h"
+#include "compare.h"
 #include "reference.h"
 #include "iterator.h"
 

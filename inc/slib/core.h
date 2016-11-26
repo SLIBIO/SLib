@@ -2,6 +2,7 @@
 #define CHECKHEADER_SLIB_CORE_HEADER
 
 #include "core/definition.h"
+#include "core/constants.h"
 #include "core/base.h"
 #include "core/endian.h"
 #include "core/mio.h"
@@ -18,7 +19,12 @@
 #include "core/callback.h"
 #include "core/tuple.h"
 
-#include "core/algorithm.h"
+#include "core/compare.h"
+#include "core/hash.h"
+#include "core/search.h"
+#include "core/sort.h"
+#include "core/hashtable.h"
+#include "core/tree.h"
 #include "core/array.h"
 #include "core/array2d.h"
 #include "core/iterator.h"
@@ -30,6 +36,7 @@
 #include "core/linked_object.h"
 #include "core/expire.h"
 
+#include "core/interpolation.h"
 #include "core/math.h"
 #include "core/time.h"
 #include "core/variant.h"

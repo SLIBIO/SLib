@@ -680,7 +680,7 @@ void View::attachChild(const Ref<View>& child)
 	if (m_flagCreatingChildInstances) {
 		if (child.isNotNull() && child->m_flagCreatingInstance) {
 			if (!(UI::isUiThread())) {
-				UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, _attachChildOnUiThread, this, child));
+				UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, attachChild, this, child));
 				return;
 			}
 			Ref<ViewInstance> parentInstance = getViewInstance();
@@ -699,7 +699,7 @@ void View::addChildInstance(const Ref<ViewInstance>& child)
 			if (UI::isUiThread()) {
 				instance->addChildInstance(child);
 			} else {
-				UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, _addChildInstanceOnUiThread, this, child));
+				UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, addChildInstance, this, child));
 			}
 		}
 	}
@@ -713,7 +713,7 @@ void View::removeChildInstance(const Ref<ViewInstance>& child)
 			if (UI::isUiThread()) {
 				instance->removeChildInstance(child);
 			} else {
-				UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, _removeChildInstanceOnUiThread, this, child));
+				UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, removeChildInstance, this, child));
 			}
 		}
 	}
@@ -812,27 +812,6 @@ void View::_removeChild(const Ref<View>& view)
 			view->detach();
 		}
 		view->removeParent(this);
-	}
-}
-
-void View::_attachChildOnUiThread(Ref<slib::View> view)
-{
-	attachChild(view);
-}
-
-void View::_addChildInstanceOnUiThread(Ref<ViewInstance> child)
-{
-	Ref<ViewInstance> instance = m_instance;
-	if (instance.isNotNull()) {
-		instance->addChildInstance(child);
-	}
-}
-
-void View::_removeChildInstanceOnUiThread(Ref<ViewInstance> child)
-{
-	Ref<ViewInstance> instance = m_instance;
-	if (instance.isNotNull()) {
-		instance->removeChildInstance(child);
 	}
 }
 
@@ -4950,7 +4929,7 @@ void View::setTransformAnimation(const Ref<Animation>& animation, const Matrix3&
 	setTransformAnimation(animation, frames, mode);
 }
 
-Ref<Animation> View::startTransformAnimation(const AnimationFrames<Matrix3>& frames, sl_real duration, AnimationCurve curve)
+Ref<Animation> View::startTransformAnimation(const AnimationFrames<Matrix3>& frames, float duration, AnimationCurve curve)
 {
 	Ref<Animation> animation = Animation::create(duration);
 	if (animation.isNotNull()) {
@@ -4962,7 +4941,7 @@ Ref<Animation> View::startTransformAnimation(const AnimationFrames<Matrix3>& fra
 	return Ref<Animation>::null();
 }
 
-Ref<Animation> View::startTransformAnimation(const Matrix3& startValue, const Matrix3& endValue, sl_real duration, AnimationCurve curve)
+Ref<Animation> View::startTransformAnimation(const Matrix3& startValue, const Matrix3& endValue, float duration, AnimationCurve curve)
 {
 	AnimationFrames<Matrix3> frames(startValue, endValue);
 	return startTransformAnimation(frames, duration, curve);
@@ -5040,7 +5019,7 @@ void View::setTranslateAnimation(const Ref<Animation>& animation, const Vector2&
 	setTranslateAnimation(animation, frames, mode);
 }
 
-Ref<Animation> View::startTranslateAnimation(const AnimationFrames<Vector2>& frames, sl_real duration, AnimationCurve curve)
+Ref<Animation> View::startTranslateAnimation(const AnimationFrames<Vector2>& frames, float duration, AnimationCurve curve)
 {
 	Ref<Animation> animation = Animation::create(duration);
 	if (animation.isNotNull()) {
@@ -5052,7 +5031,7 @@ Ref<Animation> View::startTranslateAnimation(const AnimationFrames<Vector2>& fra
 	return Ref<Animation>::null();
 }
 
-Ref<Animation> View::startTranslateAnimation(const Vector2& startValue, const Vector2& endValue, sl_real duration, AnimationCurve curve)
+Ref<Animation> View::startTranslateAnimation(const Vector2& startValue, const Vector2& endValue, float duration, AnimationCurve curve)
 {
 	AnimationFrames<Vector2> frames(startValue, endValue);
 	return startTranslateAnimation(frames, duration, curve);
@@ -5136,7 +5115,7 @@ void View::setScaleAnimation(const Ref<Animation>& animation, sl_real startValue
 	setScaleAnimation(animation, frames, mode);
 }
 
-Ref<Animation> View::startScaleAnimation(const AnimationFrames<Vector2>& frames, sl_real duration, AnimationCurve curve)
+Ref<Animation> View::startScaleAnimation(const AnimationFrames<Vector2>& frames, float duration, AnimationCurve curve)
 {
 	Ref<Animation> animation = Animation::create(duration);
 	if (animation.isNotNull()) {
@@ -5148,13 +5127,13 @@ Ref<Animation> View::startScaleAnimation(const AnimationFrames<Vector2>& frames,
 	return Ref<Animation>::null();
 }
 
-Ref<Animation> View::startScaleAnimation(const Vector2& startValue, const Vector2& endValue, sl_real duration, AnimationCurve curve)
+Ref<Animation> View::startScaleAnimation(const Vector2& startValue, const Vector2& endValue, float duration, AnimationCurve curve)
 {
 	AnimationFrames<Vector2> frames(startValue, endValue);
 	return startScaleAnimation(frames, duration, curve);
 }
 
-Ref<Animation> View::startScaleAnimation(sl_real startValue, sl_real endValue, sl_real duration, AnimationCurve curve)
+Ref<Animation> View::startScaleAnimation(sl_real startValue, sl_real endValue, float duration, AnimationCurve curve)
 {
 	AnimationFrames<Vector2> frames(Vector2(startValue, startValue), Vector2(endValue, endValue));
 	return startScaleAnimation(frames, duration, curve);
@@ -5232,7 +5211,7 @@ void View::setRotateAnimation(const Ref<Animation>& animation, sl_real startValu
 	setRotateAnimation(animation, frames, mode);
 }
 
-Ref<Animation> View::startRotateAnimation(const AnimationFrames<sl_real>& frames, sl_real duration, AnimationCurve curve)
+Ref<Animation> View::startRotateAnimation(const AnimationFrames<sl_real>& frames, float duration, AnimationCurve curve)
 {
 	Ref<Animation> animation = Animation::create(duration);
 	if (animation.isNotNull()) {
@@ -5244,7 +5223,7 @@ Ref<Animation> View::startRotateAnimation(const AnimationFrames<sl_real>& frames
 	return Ref<Animation>::null();
 }
 
-Ref<Animation> View::startRotateAnimation(sl_real startValue, sl_real endValue, sl_real duration, AnimationCurve curve)
+Ref<Animation> View::startRotateAnimation(sl_real startValue, sl_real endValue, float duration, AnimationCurve curve)
 {
 	AnimationFrames<sl_real> frames(startValue, endValue);
 	return startRotateAnimation(frames, duration, curve);
@@ -5322,7 +5301,7 @@ void View::setAlphaAnimation(const Ref<Animation>& animation, sl_real startValue
 	setAlphaAnimation(animation, frames, mode);
 }
 
-Ref<Animation> View::startAlphaAnimation(const AnimationFrames<sl_real>& frames, sl_real duration, AnimationCurve curve)
+Ref<Animation> View::startAlphaAnimation(const AnimationFrames<sl_real>& frames, float duration, AnimationCurve curve)
 {
 	Ref<Animation> animation = Animation::create(duration);
 	if (animation.isNotNull()) {
@@ -5334,7 +5313,7 @@ Ref<Animation> View::startAlphaAnimation(const AnimationFrames<sl_real>& frames,
 	return Ref<Animation>::null();
 }
 
-Ref<Animation> View::startAlphaAnimation(sl_real startValue, sl_real endValue, sl_real duration, AnimationCurve curve)
+Ref<Animation> View::startAlphaAnimation(sl_real startValue, sl_real endValue, float duration, AnimationCurve curve)
 {
 	AnimationFrames<sl_real> frames(startValue, endValue);
 	return startAlphaAnimation(frames, duration, curve);
@@ -5412,7 +5391,7 @@ void View::setBackgroundColorAnimation(const Ref<Animation>& animation, const Co
 	setBackgroundColorAnimation(animation, frames, mode);
 }
 
-Ref<Animation> View::startBackgroundColorAnimation(const AnimationFrames<Color4f>& frames, sl_real duration, AnimationCurve curve)
+Ref<Animation> View::startBackgroundColorAnimation(const AnimationFrames<Color4f>& frames, float duration, AnimationCurve curve)
 {
 	Ref<Animation> animation = Animation::create(duration);
 	if (animation.isNotNull()) {
@@ -5424,7 +5403,7 @@ Ref<Animation> View::startBackgroundColorAnimation(const AnimationFrames<Color4f
 	return Ref<Animation>::null();
 }
 
-Ref<Animation> View::startBackgroundColorAnimation(const Color4f& startValue, const Color4f& endValue, sl_real duration, AnimationCurve curve)
+Ref<Animation> View::startBackgroundColorAnimation(const Color4f& startValue, const Color4f& endValue, float duration, AnimationCurve curve)
 {
 	AnimationFrames<Color4f> frames(startValue, endValue);
 	return startBackgroundColorAnimation(frames, duration, curve);

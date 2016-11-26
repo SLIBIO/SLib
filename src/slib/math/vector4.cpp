@@ -110,6 +110,12 @@ sl_bool Vector4T<T, FT>::isAlmostEqual(const Vector4T<T, FT>& other) const
 }
 
 template <class T, class FT>
+Vector4T<T, FT> Vector4T<T, FT>::lerp(const Vector4T<T, FT>& target, float factor) const
+{
+	return {(T)SLIB_LERP(x, target.x, factor), (T)SLIB_LERP(y, target.y, factor), (T)SLIB_LERP(z, target.z, factor), (T)SLIB_LERP(w, target.w, factor)};
+}
+
+template <class T, class FT>
 Vector4T<T, FT> Vector4T<T, FT>::operator+(const Vector4T<T, FT>& other) const
 {
 	return {x + other.x, y + other.y, z + other.z, w + other.w};

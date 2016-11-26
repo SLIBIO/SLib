@@ -5,7 +5,7 @@
 
 #include "../core/object.h"
 #include "../core/pointer.h"
-#include "../math/geograph.h"
+#include "../map/geo_location.h"
 
 SLIB_DEVICE_NAMESPACE_BEGIN
 

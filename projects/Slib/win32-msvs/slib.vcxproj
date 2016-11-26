@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\inc\slib\core.h" />
-    <ClInclude Include="..\..\..\inc\slib\core\algorithm.h" />
     <ClInclude Include="..\..\..\inc\slib\core\animation.h" />
     <ClInclude Include="..\..\..\inc\slib\core\app.h" />
     <ClInclude Include="..\..\..\inc\slib\core\array.h" />
@@ -31,13 +30,17 @@
     <ClInclude Include="..\..\..\inc\slib\core\base64.h" />
     <ClInclude Include="..\..\..\inc\slib\core\callback.h" />
     <ClInclude Include="..\..\..\inc\slib\core\charset.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\compare.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\constants.h" />
     <ClInclude Include="..\..\..\inc\slib\core\content_type.h" />
     <ClInclude Include="..\..\..\inc\slib\core\definition.h" />
     <ClInclude Include="..\..\..\inc\slib\core\endian.h" />
     <ClInclude Include="..\..\..\inc\slib\core\event.h" />
     <ClInclude Include="..\..\..\inc\slib\core\expire.h" />
     <ClInclude Include="..\..\..\inc\slib\core\file.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\hash.h" />
     <ClInclude Include="..\..\..\inc\slib\core\hashtable.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\interpolation.h" />
     <ClInclude Include="..\..\..\inc\slib\core\io.h" />
     <ClInclude Include="..\..\..\inc\slib\core\iterator.h" />
     <ClInclude Include="..\..\..\inc\slib\core\java.h" />
@@ -67,8 +70,10 @@
     <ClInclude Include="..\..\..\inc\slib\core\asset.h" />
     <ClInclude Include="..\..\..\inc\slib\core\resource.h" />
     <ClInclude Include="..\..\..\inc\slib\core\scoped_pointer.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\search.h" />
     <ClInclude Include="..\..\..\inc\slib\core\service.h" />
     <ClInclude Include="..\..\..\inc\slib\core\setting.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\sort.h" />
     <ClInclude Include="..\..\..\inc\slib\core\spinlock.h" />
     <ClInclude Include="..\..\..\inc\slib\core\string.h" />
     <ClInclude Include="..\..\..\inc\slib\core\system.h" />
@@ -112,12 +117,19 @@
     <ClInclude Include="..\..\..\inc\slib\graphics\resource.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\util.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\yuv.h" />
+    <ClInclude Include="..\..\..\inc\slib\map.h" />
+    <ClInclude Include="..\..\..\inc\slib\map\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\map\earth.h" />
+    <ClInclude Include="..\..\..\inc\slib\map\geo_line.h" />
+    <ClInclude Include="..\..\..\inc\slib\map\geo_location.h" />
+    <ClInclude Include="..\..\..\inc\slib\map\geo_rectangle.h" />
+    <ClInclude Include="..\..\..\inc\slib\map\globe.h" />
+    <ClInclude Include="..\..\..\inc\slib\map\latlon.h" />
     <ClInclude Include="..\..\..\inc\slib\math.h" />
     <ClInclude Include="..\..\..\inc\slib\math\bezier.h" />
     <ClInclude Include="..\..\..\inc\slib\math\bigint.h" />
     <ClInclude Include="..\..\..\inc\slib\math\box.h" />
     <ClInclude Include="..\..\..\inc\slib\math\definition.h" />
-    <ClInclude Include="..\..\..\inc\slib\math\geograph.h" />
     <ClInclude Include="..\..\..\inc\slib\math\int128.h" />
     <ClInclude Include="..\..\..\inc\slib\math\line.h" />
     <ClInclude Include="..\..\..\inc\slib\math\line3.h" />
@@ -251,7 +263,6 @@
     <ClInclude Include="..\..\..\src\slib\ui\view_win32.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\slib\core\algorithm.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\animation.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\app.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\array.cpp" />
@@ -268,6 +279,7 @@
     <ClCompile Include="..\..\..\src\slib\core\event_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\file.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\file_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\hash.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\io.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\json.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\list.cpp" />
@@ -344,10 +356,15 @@
     <ClCompile Include="..\..\..\src\slib\graphics\pen.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\pen_gdiplus.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\yuv.cpp" />
+    <ClCompile Include="..\..\..\src\slib\map\earth.cpp" />
+    <ClCompile Include="..\..\..\src\slib\map\geo_line.cpp" />
+    <ClCompile Include="..\..\..\src\slib\map\geo_location.cpp" />
+    <ClCompile Include="..\..\..\src\slib\map\geo_rectangle.cpp" />
+    <ClCompile Include="..\..\..\src\slib\map\globe.cpp" />
+    <ClCompile Include="..\..\..\src\slib\map\latlon.cpp" />
     <ClCompile Include="..\..\..\src\slib\math\bezier.cpp" />
     <ClCompile Include="..\..\..\src\slib\math\bigint.cpp" />
     <ClCompile Include="..\..\..\src\slib\math\box.cpp" />
-    <ClCompile Include="..\..\..\src\slib\math\geograph.cpp" />
     <ClCompile Include="..\..\..\src\slib\math\int128.cpp" />
     <ClCompile Include="..\..\..\src\slib\math\line.cpp" />
     <ClCompile Include="..\..\..\src\slib\math\line3.cpp" />

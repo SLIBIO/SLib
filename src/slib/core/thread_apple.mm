@@ -14,7 +14,9 @@
 {
 	long long _thread = [[parameter objectForKey:@"thread_object"] longLongValue];
 	slib::Thread* pThread = (slib::Thread*)_thread;
-	pThread->_run();
+	@autoreleasepool {
+		pThread->_run();
+	}
 	pThread->decreaseReference();
 }
 @end

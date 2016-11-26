@@ -7,7 +7,8 @@
 #include "object.h"
 #include "iterator.h"
 #include "array.h"
-#include "algorithm.h"
+#include "compare.h"
+#include "sort.h"
 
 #define SLIB_LIST_CAPACITY_MIN 5
 

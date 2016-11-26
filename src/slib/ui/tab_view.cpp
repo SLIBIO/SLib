@@ -132,9 +132,9 @@ void TabView::setTabContentView(sl_uint32 index, const Ref<View>& view, UIUpdate
 			item->contentView = view;
 			if (isNativeWidget()) {
 				if (UI::isUiThread()) {
-					_setTabContentView_NW_OnUiThread(index, view);
+					_setTabContentView_NW(index, view);
 				} else {
-					UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(TabView, _setTabContentView_NW_OnUiThread, this, index, view));
+					UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(TabView, _setTabContentView_NW, this, index, view));
 				}
 			} else {
 				selectTab(m_indexSelected, UIUpdateMode::NoRedraw);
@@ -144,11 +144,6 @@ void TabView::setTabContentView(sl_uint32 index, const Ref<View>& view, UIUpdate
 			}
 		}
 	}
-}
-
-void TabView::_setTabContentView_NW_OnUiThread(sl_uint32 index, Ref<View> view)
-{
-	_setTabContentView_NW(index, view);
 }
 
 sl_uint32 TabView::getSelectedTabIndex()

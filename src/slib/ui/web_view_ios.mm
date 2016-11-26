@@ -228,12 +228,18 @@ SLIB_UI_NAMESPACE_END
 - (void)webView:(WKWebView *)webView runJavaScriptTextInputPanelWithPrompt:(NSString *)prompt defaultText:(nullable NSString *)defaultText initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(NSString * __nullable result))completionHandler
 {
 	UIAlertController *alertController = [UIAlertController alertControllerWithTitle:prompt message:@"" preferredStyle:UIAlertControllerStyleAlert];
+	__weak UIAlertController* _alertController = alertController;
 	[alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
 		textField.text = defaultText;
 	}];
 	[alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-		NSString *input = ((UITextField *)alertController.textFields.firstObject).text;
-		completionHandler(input);
+		UIAlertController* c = _alertController;
+		if (c != nil) {
+			NSString *input = ((UITextField *)c.textFields.firstObject).text;
+			completionHandler(input);
+		} else {
+			completionHandler(@"");
+		}
 	}]];
 	[alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
 		completionHandler(nil);

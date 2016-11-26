@@ -3,7 +3,9 @@
 
 #include "definition.h"
 
-#include "algorithm.h"
+#include "constants.h"
+#include "hash.h"
+#include "compare.h"
 #include "list.h"
 #include "math.h"
 
@@ -42,7 +44,7 @@ public:
 	
 };
 
-template <class KT, class VT, class HASH = Hash<KT>, class COMPARE = Compare<KT> >
+template < class KT, class VT, class HASH = Hash<KT>, class COMPARE = Compare<KT> >
 class SLIB_EXPORT HashTable
 {
 public:

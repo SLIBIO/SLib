@@ -175,9 +175,7 @@ private:
 	void _setTabLabel_NW(sl_uint32 index, const String& text);
 	
 	void _setTabContentView_NW(sl_uint32 index, const Ref<View>& view);
-	
-	void _setTabContentView_NW_OnUiThread(sl_uint32 index, Ref<View> view);
-	
+		
 	void _getSelectedTabIndex_NW();
 	
 	UISize _getContentViewSize_NW();

@@ -1,4 +1,4 @@
-#include "../../../inc/slib/core/algorithm.h"
+#include "../../../inc/slib/core/hash.h"
 
 SLIB_NAMESPACE_BEGIN
 

@@ -1,247 +1,16 @@
-#include "../../../inc/slib/math/geograph.h"
+#include "../../../inc/slib/map/globe.h"
 
 #include "../../../inc/slib/core/math.h"
 
-SLIB_MATH_NAMESPACE_BEGIN
-
-/*****************************************
-				LatLon
-******************************************/
-
-LatLon::LatLon(double _latitude, double _longitude) : latitude(_latitude), longitude(_longitude)
-{
-}
-
-LatLon LatLon::getCenter(const LatLon* list, sl_size count)
-{
-	LatLon ret;
-	ret.latitude = 0;
-	ret.longitude = 0;
-
-	double signedArea = 0;
-	double lat0 = 0;
-	double lon0 = 0;
-	double lat1 = 0;
-	double lon1 = 0;
-	double a = 0;
-
-	sl_size i;
-	for (i = 0; i < count - 1; i++) {
-		lat0 = list[i].latitude;
-		lon0 = list[i].longitude;
-		lat1 = list[i + 1].latitude;
-		lon1 = list[i + 1].longitude;
-		a = lat0 * lon1 - lat1 * lon0;
-		signedArea += a;
-		ret.latitude += (lat0 + lat1) * a;
-		ret.longitude += (lon0 + lon1) * a;
-	}
-
-	lat0 = list[i].latitude;
-	lon0 = list[i].longitude;
-	lat1 = list[0].latitude;
-	lon1 = list[0].longitude;
-	a = lat0 * lon1 - lat1 * lon0;
-	signedArea += a;
-	if (signedArea == 0 || (ret.latitude == 0 && ret.longitude == 0)) {
-		ret.latitude = lat1;
-		ret.longitude = lon1;
-	}
-	else{
-		ret.latitude += (lat0 + lat1) * a;
-		ret.longitude += (lon0 + lon1) * a;
-
-		signedArea /= 2;
-		ret.latitude /= (6 * signedArea);
-		ret.longitude /= (6 * signedArea);
-	}
-	
-
-	return ret;
-}
-
-LatLon LatLon::getCenter(const List<LatLon>& _list)
-{
-	ListLocker<LatLon> list(_list);
-	return getCenter(list.data, list.count);
-}
-
-sl_bool LatLon::checkIntersectionLineToLine(
-	LatLon& pointIntersect,
-	const LatLon& line1Start, const LatLon& line1End,
-	const LatLon& line2Start, const LatLon& line2End)
-{
-	double p0_x, p0_y, p1_x, p1_y, p2_x, p2_y, p3_x, p3_y;
-	p0_x = line1Start.longitude;
-	p0_y = line1Start.latitude;
-	p1_x = line1End.longitude;
-	p1_y = line1End.latitude;
-	p2_x = line2Start.longitude;
-	p2_y = line2Start.latitude;
-	p3_x = line2End.longitude;
-	p3_y = line2End.latitude;
-
-	double s1_x, s1_y, s2_x, s2_y;
-	s1_x = p1_x - p0_x;
-	s1_y = p1_y - p0_y;
-	s2_x = p3_x - p2_x;
-	s2_y = p3_y - p2_y;
-
-	double s, t;
-	s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
-	t = (s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
-
-	if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
-		pointIntersect.longitude = p0_x + (t * s1_x);
-		pointIntersect.latitude = p0_y + (t * s1_y);
-		return sl_true;
-	}
-	return sl_false;
-}
-
-double LatLon::normalizeLatitude(double latitude)
-{
-	if (latitude < -90) {
-		latitude = -90;
-	}
-	if (latitude > 90) {
-		latitude = 90;
-	}
-	return latitude;
-}
-
-double LatLon::normalizeLongitude(double longitude)
-{
-	longitude = Math::normalizeDegree(longitude + 180) - 180;
-	return longitude;
-}
-
-void LatLon::normalize()
-{
-	latitude = normalizeLatitude(latitude);
-	longitude = normalizeLongitude(longitude);
-}
-
-LatLon LatLon::lerp(const LatLon& target, sl_real factor) const
-{
-	double tlon = target.longitude;
-	double dlon = tlon - longitude;
-	if (dlon > 180) {
-		tlon -= 360;
-	} else if (dlon < -180) {
-		tlon += 360;
-	}
-	LatLon r;
-	r.longitude = (tlon - longitude) * factor + longitude;
-	r.latitude = (target.latitude - latitude) * factor + latitude;
-	return r;
-}
-
-sl_bool LatLon::operator==(const LatLon& other) const
-{
-	return latitude == other.latitude && longitude == other.longitude;
-}
-
-sl_bool LatLon::operator!=(const LatLon& other) const
-{
-	return !(*this == other);
-}
-
-
-/**************************************************
-					GeoLocation
-***************************************************/
-
-GeoLocation::GeoLocation(double _latitude, double _longitude, double _altitude)
-: latitude(_latitude), longitude(_longitude), altitude(_altitude)
-{
-}
-
-GeoLocation::GeoLocation(const LatLon& latlon, double _altitude)
-: latitude(latlon.latitude), longitude(latlon.longitude), altitude(_altitude)
-{
-}
-
-LatLon GeoLocation::getLatLon() const
-{
-	return {latitude, longitude};
-}
-
-void GeoLocation::setLatLon(const LatLon& v)
-{
-	latitude = v.latitude;
-	longitude = v.longitude;
-}
-
-void GeoLocation::setLatLon(double _latitude, double _longitude)
-{
-	latitude = _latitude;
-	longitude = _longitude;
-}
-
-void GeoLocation::normalize()
-{
-	latitude = LatLon::normalizeLatitude(latitude);
-	longitude = LatLon::normalizeLongitude(longitude);
-}
-
-GeoLocation GeoLocation::lerp(const GeoLocation& target, sl_real factor) const
-{
-	LatLon l(latitude, longitude);
-	double a = (target.altitude - altitude) * factor + altitude;
-	GeoLocation r(l.lerp(LatLon(target.latitude, target.longitude), factor), a);
-	return r;
-}
-
-GeoLocation& GeoLocation::operator=(const LatLon& other)
-{
-	latitude = other.latitude;
-	longitude = other.longitude;
-	altitude = 0;
-	return *this;
-}
-
-sl_bool GeoLocation::operator==(const GeoLocation& other) const
-{
-	return latitude == other.latitude && longitude == other.longitude && altitude == other.altitude;
-}
-
-sl_bool GeoLocation::operator!=(const GeoLocation& other) const
-{
-	return latitude != other.latitude || longitude != other.longitude || altitude != other.altitude;
-}
-
-
-/**************************************************
-				GeoRectangle
-***************************************************/
-
-GeoRectangle::GeoRectangle(const LatLon& pt1, const LatLon& pt2)
-{
-	bottomLeft.latitude = SLIB_MIN(pt1.latitude, pt2.latitude);
-	bottomLeft.longitude = SLIB_MIN(pt1.longitude, pt2.longitude);
-	topRight.latitude = SLIB_MAX(pt1.latitude, pt2.latitude);
-	topRight.longitude = SLIB_MAX(pt1.longitude, pt2.longitude);
-}
-
-sl_bool GeoRectangle::contains(LatLon& pt) const
-{
-	return (bottomLeft.latitude <= pt.latitude && bottomLeft.longitude <= pt.longitude
-			&& pt.latitude <= topRight.latitude && pt.longitude <= topRight.longitude);
-}
-
-sl_bool GeoRectangle::isValid() const
-{
-	if (bottomLeft.longitude > topRight.longitude || bottomLeft.latitude > topRight.latitude) {
-		return sl_false;
-	}
-	return sl_true;
-}
-
+SLIB_MAP_NAMESPACE_BEGIN
 
 /**************************************************
 					Globe
 ***************************************************/
+
+Globe::Globe() = default;
+
+Globe::Globe(const Globe& other) = default;
 
 void Globe::_initializeParameters()
 {
@@ -265,6 +34,8 @@ Globe::Globe(double _radiusEquatorial, double _radiusPolar, double _inverseFlatt
 	inverseFlattening = _inverseFlattening;
 	eccentricitySquared = _eccentricitySquared;
 }
+
+Globe& Globe::operator=(const Globe& other) = default;
 
 double Globe::getEquatorialRadius() const
 {
@@ -468,14 +239,14 @@ GeoLocation Globe::getGeoLocation(double x, double y, double z) const
 	double lambda;
 	double s2 = 1.4142135623730950488016887242097; // Math::sqrt(2.0);
 	if ((s2 - 1) * Y < sqrtXXpYY + X) {
-		// case 1 - -135deg < lambda < 135deg
+		// case 1: -135deg < lambda < 135deg
 		lambda = 2 * Math::arctan2(Y, sqrtXXpYY + X);
 	} else if (sqrtXXpYY + Y < (s2 + 1) * X) {
-		// case 2 - -225deg < lambda < 45deg
+		// case 2: -225deg(135deg) < lambda < 45deg
 		lambda = -SLIB_PI_LONG * 0.5 + 2 * Math::arctan2(X, sqrtXXpYY - Y);
 	} else {
-		// if (sqrtXXpYY-Y<(s2=1)*X) {  // is the test, if needed, but it's not
-		// case 3: - -45deg < lambda < 225deg
+		// if (sqrtXXpYY-Y<(s2=1)*X)  // is the test, if needed, but it's not
+		// case 3: 45deg < lambda < 225deg(-135deg)
 		lambda = SLIB_PI_LONG * 0.5 - 2 * Math::arctan2(X, sqrtXXpYY + Y);
 	}
 	
@@ -492,9 +263,15 @@ GeoLocation Globe::getGeoLocation(const Vector3lf& position) const
 				SphericalGlobe
 ***************************************************/
 
+SphericalGlobe::SphericalGlobe() = default;
+
+SphericalGlobe::SphericalGlobe(const SphericalGlobe& other) = default;
+
 SphericalGlobe::SphericalGlobe(double _radius) : radius(_radius)
 {
 }
+
+SphericalGlobe& SphericalGlobe::operator=(const SphericalGlobe& other) = default;
 
 double SphericalGlobe::getRadius() const
 {
@@ -603,114 +380,4 @@ GeoLocation SphericalGlobe::getGeoLocation(const Vector3lf& position) const
 	return getGeoLocation(position.x, position.y, position.z);
 }
 
-
-/**************************************************
-					Earth
-***************************************************/
-
-double Earth::getAverageRadius()
-{
-	return SLIB_GEO_EARTH_AVERAGE_RADIUS;
-}
-
-double Earth::getEquatorialRadius()
-{
-	return SLIB_GEO_EARTH_RADIUS_EQUATORIAL_WGS84;
-}
-
-double Earth::getPolarRadius()
-{
-	return SLIB_GEO_EARTH_RADIUS_POLAR_WGS84;
-}
-
-void Earth::getGlobe(Globe* out)
-{
-	out->radiusEquatorial = getEquatorialRadius();
-	out->radiusPolar = getPolarRadius();
-	out->inverseFlattening = SLIB_GEO_EARTH_INVERSE_FLATTENING_WGS84;
-	out->eccentricitySquared = SLIB_GEO_EARTH_ECCENTRICITY_SQUARED_WGS84;
-}
-
-Globe Earth::getGlobe()
-{
-	Globe ret;
-	getGlobe(&ret);
-	return ret;
-}
-
-Vector3lf Earth::getSurfaceNormal(double latitude, double longitude)
-{
-	Globe globe;
-	getGlobe(&globe);
-	return globe.getSurfaceNormal(latitude, longitude);
-}
-
-Vector3lf Earth::getSurfaceNormal(const LatLon& latlon)
-{
-	return getSurfaceNormal(latlon.latitude, latlon.longitude);
-}
-
-Vector3lf Earth::getSurfaceNormal(const GeoLocation& location)
-{
-	return getSurfaceNormal(location.latitude, location.longitude);
-}
-
-Vector3lf Earth::getNorthPointingTangent(double latitude, double longitude)
-{
-	Globe globe;
-	getGlobe(&globe);
-	return globe.getNorthPointingTangent(latitude, longitude);
-}
-
-Vector3lf Earth::getNorthPointingTangent(const LatLon& latlon)
-{
-	return getNorthPointingTangent(latlon.latitude, latlon.longitude);
-}
-
-Vector3lf Earth::getNorthPointingTangent(const GeoLocation& location)
-{
-	return getNorthPointingTangent(location.latitude, location.longitude);
-}
-
-Vector3lf Earth::getSurfaceNormalAtCartesianPosition(double x, double y, double z)
-{
-	Globe globe;
-	getGlobe(&globe);
-	return globe.getSurfaceNormalAtCartesianPosition(x, y, z);
-}
-
-Vector3lf Earth::getSurfaceNormalAtCartesianPosition(const Vector3lf& position)
-{
-	return getSurfaceNormalAtCartesianPosition(position.x, position.y, position.z);
-}
-
-Vector3lf Earth::getCartesianPosition(double latitude, double longitude, double altitude)
-{
-	Globe globe;
-	getGlobe(&globe);
-	return globe.getCartesianPosition(latitude, longitude, altitude);
-}
-
-Vector3lf Earth::getCartesianPosition(const LatLon& latlon)
-{
-	return getCartesianPosition(latlon.latitude, latlon.longitude, 0);
-}
-
-Vector3lf Earth::getCartesianPosition(const GeoLocation& location)
-{
-	return getCartesianPosition(location.latitude, location.longitude, location.altitude);
-}
-
-GeoLocation Earth::getGeoLocation(double x, double y, double z)
-{
-	Globe globe;
-	getGlobe(&globe);
-	return globe.getGeoLocation(x, y, z);
-}
-
-GeoLocation Earth::getGeoLocation(const Vector3lf& position)
-{
-	return getGeoLocation(position.x, position.y, position.z);
-}
-
-SLIB_MATH_NAMESPACE_END
+SLIB_MAP_NAMESPACE_END

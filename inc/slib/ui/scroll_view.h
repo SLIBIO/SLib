@@ -71,8 +71,6 @@ private:
 	
 	void _setContentView_NW(const Ref<View>& view);
 	
-	void _setContentView_NW_OnUiThread(const Ref<View> view);
-
 	void _scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y);
 	
 	ScrollPoint _getScrollPosition_NW();

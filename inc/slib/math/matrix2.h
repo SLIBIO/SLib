@@ -5,6 +5,8 @@
 
 #include "vector2.h"
 
+#include "../core/interpolation.h"
+
 SLIB_MATH_NAMESPACE_BEGIN
 
 #define SLIB_MATH_MATRIX_DETERMINANT2(m00,m01,m10,m11) ((m00)*(m11)-(m01)*(m10))
@@ -97,6 +99,8 @@ public:
 	void makeInverseTranspose();
 	
 	Matrix2T<T> inverseTranspose() const;
+
+	Matrix2T<T> lerp(const Matrix2T<T>& target, float factor) const;
 	
 public:
 	Matrix2T<T>& operator=(const Matrix2T<T>& other) = default;
@@ -148,6 +152,12 @@ Matrix2T<T> operator*(T value, const Matrix2T<T>& m);
 template <class T>
 Vector2T<T> operator*(const Vector2T<T>& v, const Matrix2T<T>& m);
 
+template <class T>
+class Interpolation< Matrix2T<T> >
+{
+public:
+	static Matrix2T<T> interpolate(const Matrix2T<T>& a, const Matrix2T<T>& b, float factor);
+};
 
 SLIB_MATH_NAMESPACE_END
 
@@ -222,6 +232,13 @@ template <class T>
 Vector2T<T> operator*(const Vector2T<T>& v, const Matrix2T<T>& m)
 {
 	return m.multiplyLeft(v);
+}
+
+
+template <class T>
+SLIB_INLINE Matrix2T<T> Interpolation< Matrix2T<T> >::interpolate(const Matrix2T<T>& a, const Matrix2T<T>& b, float factor)
+{
+	return a.lerp(b, factor);
 }
 
 SLIB_MATH_NAMESPACE_END

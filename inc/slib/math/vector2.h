@@ -3,6 +3,8 @@
 
 #include "definition.h"
 
+#include "../core/interpolation.h"
+
 SLIB_MATH_NAMESPACE_BEGIN
 
 template <class T, class FT = T>
@@ -54,6 +56,8 @@ public:
 	sl_bool equals(const Vector2T<T, FT>& other) const;
 	
 	sl_bool isAlmostEqual(const Vector2T<T, FT>& other) const;
+	
+	Vector2T<T, FT> lerp(const Vector2T<T, FT>& target, float factor) const;
 
 public:
 	Vector2T<T, FT>& operator=(const Vector2T<T, FT>& other) = default;
@@ -105,6 +109,12 @@ Vector2T<T, FT> operator*(T f, const Vector2T<T, FT>& v);
 template <class T, class FT>
 Vector2T<T, FT> operator/(T f, const Vector2T<T, FT>& v);
 
+template <class T, class FT>
+class Interpolation< Vector2T<T, FT> >
+{
+public:
+	static Vector2T<T, FT> interpolate(const Vector2T<T, FT>& a, const Vector2T<T, FT>& b, float factor);
+};
 
 SLIB_MATH_NAMESPACE_END
 
@@ -159,6 +169,13 @@ template <class T, class FT>
 Vector2T<T, FT> operator/(T f, const Vector2T<T, FT>& v)
 {
 	return {f / v.x, f / v.y};
+}
+
+
+template <class T, class FT>
+SLIB_INLINE Vector2T<T, FT> Interpolation< Vector2T<T, FT> >::interpolate(const Vector2T<T, FT>& a, const Vector2T<T, FT>& b, float factor)
+{
+	return a.lerp(b, factor);
 }
 
 SLIB_MATH_NAMESPACE_END

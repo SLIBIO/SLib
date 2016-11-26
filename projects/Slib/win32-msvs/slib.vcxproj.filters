@@ -74,6 +74,12 @@
     <Filter Include="inc\device">
       <UniqueIdentifier>{86efe254-d678-404e-90ac-886093584d15}</UniqueIdentifier>
     </Filter>
+    <Filter Include="inc\map">
+      <UniqueIdentifier>{8f0f75b9-b24a-46f7-8563-2ade030b0264}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\slib\map">
+      <UniqueIdentifier>{6ebc5a2a-3ac1-497e-88f6-b4fb4c33e97a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\slib\core\async_config.h">
@@ -218,9 +224,6 @@
       <Filter>inc\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\core\variant.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\algorithm.h">
       <Filter>inc\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\core\app.h">
@@ -550,9 +553,6 @@
     <ClInclude Include="..\..\..\inc\slib\math\definition.h">
       <Filter>inc\math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\math\geograph.h">
-      <Filter>inc\math</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\math\int128.h">
       <Filter>inc\math</Filter>
     </ClInclude>
@@ -766,6 +766,48 @@
     <ClInclude Include="..\..\..\inc\slib\core\tuple.h">
       <Filter>inc\core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\compare.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\constants.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\hash.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\interpolation.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\search.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\sort.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\map.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\map\geo_rectangle.h">
+      <Filter>inc\map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\map\globe.h">
+      <Filter>inc\map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\map\latlon.h">
+      <Filter>inc\map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\map\definition.h">
+      <Filter>inc\map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\map\earth.h">
+      <Filter>inc\map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\map\geo_line.h">
+      <Filter>inc\map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\map\geo_location.h">
+      <Filter>inc\map</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">
@@ -880,9 +922,6 @@
       <Filter>src\slib\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\content_type.cpp">
-      <Filter>src\slib\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\core\algorithm.cpp">
       <Filter>src\slib\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\callback.cpp">
@@ -1015,9 +1054,6 @@
       <Filter>src\slib\graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\math\bigint.cpp">
-      <Filter>src\slib\math</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\math\geograph.cpp">
       <Filter>src\slib\math</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\math\int128.cpp">
@@ -1487,6 +1523,27 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\network\url_request_win32.cpp">
       <Filter>src\slib\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\hash.cpp">
+      <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\map\geo_rectangle.cpp">
+      <Filter>src\slib\map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\map\globe.cpp">
+      <Filter>src\slib\map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\map\latlon.cpp">
+      <Filter>src\slib\map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\map\earth.cpp">
+      <Filter>src\slib\map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\map\geo_line.cpp">
+      <Filter>src\slib\map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\map\geo_location.cpp">
+      <Filter>src\slib\map</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

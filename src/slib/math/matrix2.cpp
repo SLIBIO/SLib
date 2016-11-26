@@ -225,6 +225,14 @@ Matrix2T<T> Matrix2T<T>::inverseTranspose() const
 }
 
 template <class T>
+Matrix2T<T> Matrix2T<T>::lerp(const Matrix2T<T>& target, float factor) const
+{
+	return {
+		SLIB_LERP(m00, target.m00, factor), SLIB_LERP(m01, target.m01, factor),
+		SLIB_LERP(m10, target.m10, factor), SLIB_LERP(m11, target.m11, factor)};
+}
+
+template <class T>
 Matrix2T<T> Matrix2T<T>::operator+(const Matrix2T<T>& other) const
 {
 	Matrix2T<T> ret(*this);

@@ -6,6 +6,8 @@
 #include "matrix3.h"
 #include "vector4.h"
 
+#include "../core/interpolation.h"
+
 SLIB_MATH_NAMESPACE_BEGIN
 
 #define SLIB_MATH_MATRIX_DETERMINANT4(m00,m01,m02,m03,m10,m11,m12,m13,m20,m21,m22,m23,m30,m31,m32,m33) ((m00)*SLIB_MATH_MATRIX_DETERMINANT3(m11,m12,m13,m21,m22,m23,m31,m32,m33)-(m01)*SLIB_MATH_MATRIX_DETERMINANT3(m10,m12,m13,m20,m22,m23,m30,m32,m33)+(m02)*SLIB_MATH_MATRIX_DETERMINANT3(m10,m11,m13,m20,m21,m23,m30,m31,m33)-(m03)*SLIB_MATH_MATRIX_DETERMINANT3(m10,m11,m12,m20,m21,m22,m30,m31,m32))
@@ -127,6 +129,8 @@ public:
 	
 	Matrix4T<T> inverseTranspose() const;
 	
+	Matrix4T<T> lerp(const Matrix4T<T>& target, float factor) const;
+
 public:
 	Matrix4T<T>& operator=(const Matrix4T<T>& other) = default;
 	
@@ -174,6 +178,12 @@ Matrix4T<T> operator*(T value, const Matrix4T<T>& m);
 template <class T>
 Vector4T<T> operator*(const Vector4T<T>& v, const Matrix4T<T>& m);
 
+template <class T>
+class Interpolation< Matrix4T<T> >
+{
+public:
+	static Matrix4T<T> interpolate(const Matrix4T<T>& a, const Matrix4T<T>& b, float factor);
+};
 
 SLIB_DECLARE_GEOMETRY_TYPE(Matrix4)
 
@@ -247,6 +257,12 @@ Vector4T<T> operator*(const Vector4T<T>& v, const Matrix4T<T>& m)
 	return m.multiplyLeft(v);
 }
 
+
+template <class T>
+SLIB_INLINE Matrix4T<T> Interpolation< Matrix4T<T> >::interpolate(const Matrix4T<T>& a, const Matrix4T<T>& b, float factor)
+{
+	return a.lerp(b, factor);
+}
 
 SLIB_MATH_NAMESPACE_END
 

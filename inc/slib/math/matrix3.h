@@ -6,6 +6,8 @@
 #include "matrix2.h"
 #include "vector3.h"
 
+#include "../core/interpolation.h"
+
 SLIB_MATH_NAMESPACE_BEGIN
 
 #define SLIB_MATH_MATRIX_DETERMINANT3(m00,m01,m02,m10,m11,m12,m20,m21,m22) ((m00)*SLIB_MATH_MATRIX_DETERMINANT2(m11,m12,m21,m22)-(m01)*SLIB_MATH_MATRIX_DETERMINANT2(m10,m12,m20,m22)+(m02)*SLIB_MATH_MATRIX_DETERMINANT2(m10,m11,m20,m21))
@@ -117,6 +119,8 @@ public:
 	
 	Matrix3T<T> inverseTranspose() const;
 
+	Matrix3T<T> lerp(const Matrix3T<T>& target, float factor) const;
+
 public:
 	Matrix3T<T>& operator=(const Matrix3T<T>& other) = default;
 	
@@ -165,6 +169,13 @@ Matrix3T<T> operator*(T value, const Matrix3T<T>& m);
 
 template <class T>
 Vector3T<T> operator*(const Vector3T<T>& v, const Matrix3T<T>& m);
+
+template <class T>
+class Interpolation< Matrix3T<T> >
+{
+public:
+	static Matrix3T<T> interpolate(const Matrix3T<T>& a, const Matrix3T<T>& b, float factor);
+};
 
 SLIB_MATH_NAMESPACE_END
 
@@ -233,6 +244,13 @@ template <class T>
 Vector3T<T> operator*(const Vector3T<T>& v, const Matrix3T<T>& m)
 {
 	return m.multiplyLeft(v);
+}
+
+
+template <class T>
+SLIB_INLINE Matrix3T<T> Interpolation< Matrix3T<T> >::interpolate(const Matrix3T<T>& a, const Matrix3T<T>& b, float factor)
+{
+	return a.lerp(b, factor);
 }
 
 SLIB_MATH_NAMESPACE_END

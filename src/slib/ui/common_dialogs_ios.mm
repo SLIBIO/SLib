@@ -53,12 +53,10 @@ void AlertDialog::_show()
 	if (type == AlertDialogType::OkCancel) {
 		UIAlertAction* actionOK = [UIAlertAction actionWithTitle:titleOk style:UIAlertActionStyleDefault handler:
 								   ^(UIAlertAction *) {
-									   [alert dismissViewControllerAnimated:YES completion:nil];
 									   onOk();
 								   }];
 		UIAlertAction* actionCancel = [UIAlertAction actionWithTitle:titleCancel style:UIAlertActionStyleCancel handler:
 									   ^(UIAlertAction *) {
-										   [alert dismissViewControllerAnimated:YES completion:nil];
 										   onCancel();
 									   }];
 		[alert addAction:actionOK];
@@ -66,12 +64,10 @@ void AlertDialog::_show()
 	} else if (type == AlertDialogType::YesNo) {
 		UIAlertAction* actionYes = [UIAlertAction actionWithTitle:titleYes style:UIAlertActionStyleDefault handler:
 									^(UIAlertAction *) {
-										[alert dismissViewControllerAnimated:YES completion:nil];
 										onOk();
 									}];
 		UIAlertAction* actionNo = [UIAlertAction actionWithTitle:titleNo style:UIAlertActionStyleDestructive handler:
 								   ^(UIAlertAction *) {
-									   [alert dismissViewControllerAnimated:YES completion:nil];
 									   onNo();
 								   }];
 		[alert addAction:actionYes];
@@ -79,17 +75,14 @@ void AlertDialog::_show()
 	} else if (type == AlertDialogType::YesNoCancel) {
 		UIAlertAction* actionYes = [UIAlertAction actionWithTitle:titleYes style:UIAlertActionStyleDefault handler:
 									^(UIAlertAction *) {
-										[alert dismissViewControllerAnimated:YES completion:nil];
 										onOk();
 									}];
 		UIAlertAction* actionNo = [UIAlertAction actionWithTitle:titleNo style:UIAlertActionStyleDestructive handler:
 								   ^(UIAlertAction *) {
-									   [alert dismissViewControllerAnimated:YES completion:nil];
 									   onNo();
 								   }];
 		UIAlertAction* actionCancel = [UIAlertAction actionWithTitle:titleCancel style:UIAlertActionStyleCancel handler:
 									   ^(UIAlertAction *) {
-										   [alert dismissViewControllerAnimated:YES completion:nil];
 										   onCancel();
 									   }];
 		[alert addAction:actionYes];
@@ -98,7 +91,6 @@ void AlertDialog::_show()
 	} else {
 		UIAlertAction* actionOK = [UIAlertAction actionWithTitle:titleOk style:UIAlertActionStyleCancel handler:
 								   ^(UIAlertAction *) {
-									   [alert dismissViewControllerAnimated:YES completion:nil];
 										onOk();
 								   }];
 		[alert addAction:actionOK];

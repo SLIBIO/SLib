@@ -13,6 +13,8 @@
 #include "device.h"
 #include "db.h"
 
+#include "map.h"
+
 #include "resource.h"
 
 #endif

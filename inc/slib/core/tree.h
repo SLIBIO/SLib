@@ -3,7 +3,9 @@
 
 #include "definition.h"
 
-#include "algorithm.h"
+#include "constants.h"
+#include "compare.h"
+#include "search.h"
 #include "list.h"
 #include "new.h"
 

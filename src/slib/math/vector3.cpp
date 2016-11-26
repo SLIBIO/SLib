@@ -115,6 +115,12 @@ sl_bool Vector3T<T, FT>::isAlmostEqual(const Vector3T<T, FT>& other) const
 }
 
 template <class T, class FT>
+Vector3T<T, FT> Vector3T<T, FT>::lerp(const Vector3T<T, FT>& target, float factor) const
+{
+	return {(T)SLIB_LERP(x, target.x, factor), (T)SLIB_LERP(y, target.y, factor), (T)SLIB_LERP(z, target.z, factor)};
+}
+
+template <class T, class FT>
 Vector3T<T, FT> Vector3T<T, FT>::operator+(const Vector3T<T, FT>& other) const
 {
 	return {x + other.x, y + other.y, z + other.z};

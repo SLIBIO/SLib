@@ -5,7 +5,6 @@
 
 #include "charset.h"
 #include "memory.h"
-#include "algorithm.h"
 #include "list.h"
 #include "map.h"
 #include "queue.h"

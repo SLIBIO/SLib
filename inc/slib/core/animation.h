@@ -9,6 +9,7 @@
 #include "list.h"
 #include "time.h"
 #include "math.h"
+#include "interpolation.h"
 
 /*
 	Basic functions for Graphics/Rendering/UI animations
@@ -239,7 +240,7 @@ protected:
 
 };
 
-template <class T>
+template < class T, class INTERPOLATION = Interpolation<T> >
 class AnimationFrame
 {
 public:
@@ -255,7 +256,7 @@ public:
 	
 };
 
-template <class T>
+template < class T, class INTERPOLATION = Interpolation<T> >
 class AnimationFrames
 {
 public:
@@ -278,11 +279,11 @@ public:
 };
 
 
-template <class T>
+template < class T, class INTERPOLATION = Interpolation<T> >
 class AnimationFramesSeeker : public Object
 {
 public:
-	AnimationFramesSeeker(const AnimationFrames<T>& frames);
+	AnimationFramesSeeker(const AnimationFrames<T, INTERPOLATION>& frames);
 	
 public:
 	T seek(float fraction);
@@ -292,8 +293,8 @@ public:
 	T endValue;
 
 protected:
-	Array< AnimationFrame<T> > m_arrFrames;
-	AnimationFrame<T>* m_frames;
+	Array< AnimationFrame<T, INTERPOLATION> > m_arrFrames;
+	AnimationFrame<T, INTERPOLATION>* m_frames;
 	sl_size m_countFrames;
 	
 	sl_size m_currentIndex;
@@ -354,14 +355,14 @@ protected:
 	    AnimationFrames Implementations
 **************************************************/
 
-template <class T>
-void AnimationFrames<T>::addFrame(float fraction, const T& value)
+template <class T, class INTERPOLATION>
+void AnimationFrames<T, INTERPOLATION>::addFrame(float fraction, const T& value)
 {
 	frames.add(AnimationFrame<T>(fraction, value));
 }
 
-template <class T>
-T AnimationFrames<T>::getValue(float fraction)
+template <class T, class INTERPOLATION>
+T AnimationFrames<T, INTERPOLATION>::getValue(float fraction)
 {
 	T* sv = &startValue;
 	float st = 0;
@@ -385,7 +386,7 @@ T AnimationFrames<T>::getValue(float fraction)
 			}
 			if (fraction <= et) {
 				float w = (fraction - st) / (et - st);
-				return (1 - w) * (*sv) + w * (*ev);
+				return INTERPOLATION::interpolate(*sv, *ev, w);
 			}
 			sv = ev;
 			st = et;
@@ -399,8 +400,8 @@ T AnimationFrames<T>::getValue(float fraction)
 	AnimationFramesSeeker Implementations
 **************************************************/
 
-template <class T>
-AnimationFramesSeeker<T>::AnimationFramesSeeker(const AnimationFrames<T>& frames)
+template <class T, class INTERPOLATION>
+AnimationFramesSeeker<T, INTERPOLATION>::AnimationFramesSeeker(const AnimationFrames<T, INTERPOLATION>& frames)
 {
 	startValue = frames.startValue;
 	endValue = frames.endValue;
@@ -422,11 +423,11 @@ AnimationFramesSeeker<T>::AnimationFramesSeeker(const AnimationFrames<T>& frames
 	}
 }
 
-template <class T>
-T AnimationFramesSeeker<T>::seek(float fraction)
+template <class T, class INTERPOLATION>
+T AnimationFramesSeeker<T, INTERPOLATION>::seek(float fraction)
 {
 	if (m_countFrames == 0) {
-		return (1 - fraction) * startValue + fraction * endValue;
+		return INTERPOLATION::interpolate(startValue, endValue, fraction);
 	}
 	if (Math::isAlmostZero(fraction - m_currentStartFraction)) {
 		return *m_currentStartValue;
@@ -475,7 +476,7 @@ T AnimationFramesSeeker<T>::seek(float fraction)
 		return *m_currentEndValue;
 	}
 	w /= t;
-	return (1 - w) * (*m_currentStartValue) + w * (*m_currentEndValue);
+	return INTERPOLATION::interpolate(*m_currentStartValue, *m_currentEndValue, fraction);
 }
 
 SLIB_NAMESPACE_END

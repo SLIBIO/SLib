@@ -135,13 +135,15 @@ void UI::dispatchToUiThread(const Callback& _callback)
 void UIPlatform::runLoop(sl_uint32 level)
 {
 	while (1) {
-		NSEvent* ev = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:nil inMode:NSDefaultRunLoopMode dequeue:YES];
-		if ([ev type] == NSApplicationDefined) {
-			if ([ev subtype] == NSPowerOffEventType) {
-				break;
+		@autoreleasepool {
+			NSEvent* ev = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:nil inMode:NSDefaultRunLoopMode dequeue:YES];
+			if ([ev type] == NSApplicationDefined) {
+				if ([ev subtype] == NSPowerOffEventType) {
+					break;
+				}
 			}
+			[NSApp sendEvent:ev];
 		}
-		[NSApp sendEvent:ev];
 	}
 }
 
@@ -166,7 +168,9 @@ void UIPlatform::runApp()
 	_slib_OSX_AppDelegate * delegate = [[_slib_OSX_AppDelegate alloc] init];
 	[NSApp setDelegate:delegate];
 	
-	[NSApp run];
+	@autoreleasepool {
+		[NSApp run];
+	}
 }
 
 void UIPlatform::quitApp()

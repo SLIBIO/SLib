@@ -116,7 +116,9 @@ void UI::dispatchToUiThread(const Callback& _callback)
 
 void UIPlatform::runLoop(sl_uint32 level)
 {
-	CFRunLoopRun();
+	@autoreleasepool {
+		CFRunLoopRun();
+	}
 }
 
 void UIPlatform::quitLoop()

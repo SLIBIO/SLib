@@ -3,7 +3,8 @@
 
 #include "definition.h"
 
-#include "../core/algorithm.h"
+#include "../core/compare.h"
+#include "../core/hash.h"
 #include "../core/string.h"
 #include "../core/parse.h"
 
@@ -16,9 +17,9 @@ public:
 	sl_uint64 low;
 
 public:
-	SLIB_INLINE Uint128() = default;
+	Uint128();
 
-	SLIB_INLINE Uint128(const Uint128& num) = default;;
+	Uint128(const Uint128& num);
 
 	Uint128(sl_uint64 num);
 
@@ -55,7 +56,7 @@ public:
 	void makeBitwiseNot();
 
 public:
-	SLIB_INLINE Uint128& operator=(const Uint128& other) = default;
+	Uint128& operator=(const Uint128& other);
 	
 	Uint128& operator=(sl_uint64 num);
 
@@ -251,9 +252,15 @@ SLIB_MATH_NAMESPACE_END
 
 SLIB_MATH_NAMESPACE_BEGIN
 
+SLIB_INLINE Uint128::Uint128() = default;
+
+SLIB_INLINE Uint128::Uint128(const Uint128& num) = default;;
+
 SLIB_INLINE Uint128::Uint128(sl_uint64 num) : high(0), low(num)
 {
 }
+
+SLIB_INLINE Uint128& Uint128::operator=(const Uint128& other) = default;
 
 SLIB_INLINE const Uint128& Uint128::zero()
 {

@@ -5,6 +5,8 @@
 
 #include "vector3.h"
 
+#include "../core/interpolation.h"
+
 SLIB_MATH_NAMESPACE_BEGIN
 
 template <class T, class FT = T>
@@ -64,6 +66,8 @@ public:
 	sl_bool equals(const Vector4T<T, FT>& other) const;
 
 	sl_bool isAlmostEqual(const Vector4T<T, FT>& other) const;
+	
+	Vector4T<T, FT> lerp(const Vector4T<T, FT>& target, float factor) const;
 
 public:
 	Vector4T<T, FT>& operator=(const Vector4T<T, FT>& other) = default;
@@ -114,6 +118,12 @@ Vector4T<T, FT> operator*(T f, const Vector4T<T, FT>& v);
 template <class T, class FT>
 Vector4T<T, FT> operator/(T f, const Vector4T<T, FT>& v);
 
+template <class T, class FT>
+class Interpolation< Vector4T<T, FT> >
+{
+public:
+	static Vector4T<T, FT> interpolate(const Vector4T<T, FT>& a, const Vector4T<T, FT>& b, float factor);
+};
 
 SLIB_MATH_NAMESPACE_END
 
@@ -187,6 +197,13 @@ template <class T, class FT>
 Vector4T<T, FT> operator/(T f, const Vector4T<T, FT>& v)
 {
 	return {f / v.x, f / v.y, f / v.z, f / v.w};
+}
+
+
+template <class T, class FT>
+SLIB_INLINE Vector4T<T, FT> Interpolation< Vector4T<T, FT> >::interpolate(const Vector4T<T, FT>& a, const Vector4T<T, FT>& b, float factor)
+{
+	return a.lerp(b, factor);
 }
 
 SLIB_MATH_NAMESPACE_END
