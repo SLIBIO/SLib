@@ -59,19 +59,33 @@ String WebController::_getHandlerSignature(HttpMethod method, const String& path
 }
 
 
+WebModule::WebModule(const String& path)
+: m_path(path)
+{
+}
+
 void WebModule::registerToController()
 {
 	Ref<WebService> app = WebService::getApp();
 	if (app.isNotNull()) {
-		app->getController()->m_handlers.putAll(&m_handlers);
+		Ref<WebController> controller = app->getController();
+		if (controller.isNotNull()) {
+			ListLocker<_Handler> list(m_handlers);
+			for (sl_size i = 0; i < list.count; i++) {
+				controller->registerHandler(list[i].method, m_path + list[i].path, list[i].handler);
+			}
+		}
 	}
 }
 
 void WebModule::addHandler(HttpMethod method, const String& path, const WebHandler& handler)
 {
 	if (handler.isNotNull()) {
-		String sig = WebController::_getHandlerSignature(method, path);
-		m_handlers.put(sig, handler);
+		_Handler h;
+		h.method = method;
+		h.path = path;
+		h.handler = handler;
+		m_handlers.add_NoLock(h);
 	}
 }
 

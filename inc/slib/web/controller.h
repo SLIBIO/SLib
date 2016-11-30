@@ -47,18 +47,28 @@ protected:
 class WebModule
 {
 public:
+	WebModule(const String& path);
+	
+public:
 	void registerToController();
 	
 	void addHandler(HttpMethod method, const String& path, const WebHandler& handler);
 	
 protected:
-	TreeMap<String, WebHandler> m_handlers;
+	String m_path;
+	struct _Handler
+	{
+		HttpMethod method;
+		String path;
+		WebHandler handler;
+	};
+	CList<_Handler> m_handlers;
 	
 };
 
-#define SWEB_BEGIN_MODULE(NAME) \
+#define SWEB_BEGIN_MODULE(NAME, PATH) \
 namespace SWEB_MODULE_##NAME { \
-	SLIB_SAFE_STATIC_GETTER(slib::WebModule, getModule) \
+	SLIB_SAFE_STATIC_GETTER(slib::WebModule, getModule, PATH) \
 	void registerModule() { getModule()->registerToController(); }
 
 #define SWEB_END_MODULE }
