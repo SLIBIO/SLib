@@ -4918,6 +4918,7 @@ void View::setTransformAnimation(const Ref<Animation>& animation, const Animatio
 			if (target.isNotNull()) {
 				attrs->animationTransform = animation;
 				attrs->targetTransform = target;
+				animation->addTarget(target);
 			}
 		}
 	}
