@@ -98,6 +98,12 @@ public:
 	template <class T>
 	Variant(const SafeRef<T>& ref);
 	
+	template <class T>
+	Variant(const WeakRef<T>& weak);
+	
+	template <class T>
+	Variant(const SafeWeakRef<T>& weak);
+
 	Variant(const Memory& mem);
 	
 	Variant(const SafeMemory& mem);
@@ -119,12 +125,6 @@ public:
 	
 	template <class KT, class VT>
 	Variant(const SafeMap<KT, VT>& object);
-	
-	template <class T>
-	Variant(const WeakRef<T>& weak);
-	
-	template <class T>
-	Variant(const SafeWeakRef<T>& weak);
 
 public:
 	static const Variant& null();
@@ -231,6 +231,12 @@ public:
 	template <class T>
 	Variant& operator=(const SafeRef<T>& ref);
 	
+	template <class T>
+	Variant& operator=(const WeakRef<T>& weak);
+	
+	template <class T>
+	Variant& operator=(const SafeWeakRef<T>& weak);
+
 	Variant& operator=(const Memory& mem);
 	
 	Variant& operator=(const SafeMemory& mem);
@@ -252,12 +258,6 @@ public:
 	
 	template <class KT, class VT>
 	Variant& operator=(const SafeMap<KT, VT>& object);
-	
-	template <class T>
-	Variant& operator=(const WeakRef<T>& weak);
-	
-	template <class T>
-	Variant& operator=(const SafeWeakRef<T>& weak);
 	
 public:
 	VariantType getType() const;
@@ -377,6 +377,8 @@ public:
 	
 	
 	sl_bool isObject() const;
+	
+	sl_bool isWeak() const;
 
 	Ref<Referable> getObject() const;
 
@@ -385,6 +387,9 @@ public:
 
 	template <class T>
 	void setObject(const Ref<T>& ref);
+	
+	template <class T>
+	void setWeak(const WeakRef<T>& weak);
 	
 	sl_bool isObjectNotNull() const;
 	
@@ -415,14 +420,6 @@ public:
 	
 	template <class KT, class VT>
 	void setMap(const Map<KT, VT>& map);
-	
-	sl_bool isWeak() const;
-	
-	template <class T>
-	WeakRef<T> getWeak(const WeakRef<T>& def) const;
-	
-	template <class T>
-	void setWeak(const WeakRef<T>& weak);
 
 	sl_bool isVariantList() const;
 	
@@ -432,6 +429,10 @@ public:
 	
 	Map<String, Variant> getVariantMap() const;
 	
+	sl_bool isVariantMapList() const;
+	
+	List< Map<String, Variant> > getVariantMapList() const;
+
 	sl_size getListItemsCount() const;
 	
 	Variant getListItem(sl_size index) const;
@@ -447,8 +448,7 @@ public:
 	
 	String toString() const;
 
-	String toJson() const;
-
+	String toJsonString() const;
 	
 private:
 	static void _free(VariantType type, sl_uint64 value);
@@ -516,6 +516,12 @@ public:
 	template <class T>
 	SafeVariant(const SafeRef<T>& ref);
 	
+	template <class T>
+	SafeVariant(const WeakRef<T>& weak);
+	
+	template <class T>
+	SafeVariant(const SafeWeakRef<T>& weak);
+
 	SafeVariant(const Memory& mem);
 	
 	SafeVariant(const SafeMemory& mem);
@@ -537,12 +543,6 @@ public:
 	
 	template <class KT, class VT>
 	SafeVariant(const SafeMap<KT, VT>& object);
-	
-	template <class T>
-	SafeVariant(const WeakRef<T>& weak);
-	
-	template <class T>
-	SafeVariant(const SafeWeakRef<T>& weak);
 	
 public:
 	static const SafeVariant& null();
@@ -592,6 +592,12 @@ public:
 	template <class T>
 	SafeVariant& operator=(const SafeRef<T>& ref);
 	
+	template <class T>
+	SafeVariant& operator=(const WeakRef<T>& weak);
+	
+	template <class T>
+	SafeVariant& operator=(const SafeWeakRef<T>& weak);
+
 	SafeVariant& operator=(const Memory& mem);
 	
 	SafeVariant& operator=(const SafeMemory& mem);
@@ -613,12 +619,6 @@ public:
 	
 	template <class KT, class VT>
 	SafeVariant& operator=(const SafeMap<KT, VT>& object);
-	
-	template <class T>
-	SafeVariant& operator=(const WeakRef<T>& weak);
-	
-	template <class T>
-	SafeVariant& operator=(const SafeWeakRef<T>& weak);
 	
 public:
 	VariantType getType() const;
@@ -739,14 +739,19 @@ public:
 	
 	sl_bool isObject() const;
 	
-	Ref<Referable> getObject() const;
+	sl_bool isWeak() const;
 	
+	Ref<Referable> getObject() const;
+
 	template <class T>
 	Ref<T> getObject(const Ref<T>& def) const;
 	
 	template <class T>
 	void setObject(const Ref<T>& object);
-	
+
+	template <class T>
+	void setWeak(const WeakRef<T>& weak);
+
 	sl_bool isObjectNotNull() const;
 	
 	sl_bool isObjectNull() const;
@@ -776,14 +781,6 @@ public:
 	
 	template <class KT, class VT>
 	void setMap(const Map<KT, VT>& map);
-
-	sl_bool isWeak() const;
-	
-	template <class T>
-	WeakRef<T> getWeak(const WeakRef<T>& def) const;
-	
-	template <class T>
-	void setWeak(const WeakRef<T>& weak);
 	
 	
 	sl_bool isVariantList() const;
@@ -793,6 +790,10 @@ public:
 	sl_bool isVariantMap() const;
 	
 	Map<String, Variant> getVariantMap() const;
+	
+	sl_bool isVariantMapList() const;
+	
+	List< Map<String, Variant> > getVariantMapList() const;
 	
 	sl_size getListItemsCount() const;
 	
@@ -809,7 +810,7 @@ public:
 	
 	String toString() const;
 	
-	String toJson() const;
+	String toJsonString() const;
 	
 private:
 	void _retain(VariantType& type, sl_uint64& value) const;
@@ -837,6 +838,7 @@ sl_class_type IMap<String, Variant>::getClassType() const;
 template <>
 sl_bool IMap<String, Variant>::checkClassType(sl_class_type type) const;
 
+
 template <>
 sl_class_type CList<Variant>::ClassType();
 
@@ -845,6 +847,17 @@ sl_class_type CList<Variant>::getClassType() const;
 
 template <>
 sl_bool CList<Variant>::checkClassType(sl_class_type type) const;
+
+
+template <>
+sl_class_type CList< Map<String, Variant> >::ClassType();
+
+template <>
+sl_class_type CList< Map<String, Variant> >::getClassType() const;
+
+template <>
+sl_bool CList< Map<String, Variant> >::checkClassType(sl_class_type type) const;
+
 
 SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_LIST(Variant)
 SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_MAP(String, Variant)
@@ -871,6 +884,20 @@ Variant::Variant(const SafeRef<T>& ref)
 {
 	_type = VariantType::Object;
 	new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+}
+
+template <class T>
+Variant::Variant(const WeakRef<T>& weak)
+{
+	_type = VariantType::Weak;
+	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+}
+
+template <class T>
+Variant::Variant(const SafeWeakRef<T>& weak)
+{
+	_type = VariantType::Weak;
+	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
 }
 
 template <class T, class COMPARE>
@@ -913,20 +940,6 @@ Variant::Variant(const SafeMap<KT, VT>& object)
 {
 	_type = VariantType::Object;
 	new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
-}
-
-template <class T>
-Variant::Variant(const WeakRef<T>& weak)
-{
-	_type = VariantType::Weak;
-	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
-}
-
-template <class T>
-Variant::Variant(const SafeWeakRef<T>& weak)
-{
-	_type = VariantType::Weak;
-	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
 }
 
 SLIB_INLINE const Variant& Variant::null()
@@ -978,6 +991,20 @@ Variant& Variant::operator=(const SafeRef<T>& ref)
 	return *this;
 }
 
+template <class T>
+Variant& Variant::operator=(const WeakRef<T>& weak)
+{
+	setWeak(weak);
+	return *this;
+}
+
+template <class T>
+Variant& Variant::operator=(const SafeWeakRef<T>& weak)
+{
+	setWeak(weak);
+	return *this;
+}
+
 template <class T, class COMPARE>
 Variant& Variant::operator=(const Array<T, COMPARE>& object)
 {
@@ -1020,20 +1047,6 @@ Variant& Variant::operator=(const SafeMap<KT, VT>& object)
 	return *this;
 }
 
-template <class T>
-Variant& Variant::operator=(const WeakRef<T>& weak)
-{
-	setWeak(weak);
-	return *this;
-}
-
-template <class T>
-Variant& Variant::operator=(const SafeWeakRef<T>& weak)
-{
-	setWeak(weak);
-	return *this;
-}
-
 SLIB_INLINE VariantType Variant::getType() const
 {
 	return _type;
@@ -1052,10 +1065,12 @@ SLIB_INLINE sl_bool Variant::isNotNull() const
 template <class T>
 Ref<T> Variant::getObject(const Ref<T>& def) const
 {
-	if (_type == VariantType::Object) {
-		return *((Ref<T>*)(void*)(&_value));
+	Ref<Referable> obj(getObject());
+	if (T::checkInstance(obj.ptr)) {
+		return Ref<T>::from(obj);
+	} else {
+		return def;
 	}
-	return def;
 }
 
 template <class T>
@@ -1066,12 +1081,20 @@ void Variant::setObject(const Ref<T>& ref)
 	new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
 }
 
+template <class T>
+void Variant::setWeak(const WeakRef<T>& weak)
+{
+	_free(_type, _value);
+	_type = VariantType::Weak;
+	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+}
+
 template <class TYPE, class COMPARE>
 Array<TYPE, COMPARE> Variant::getArray(const Array<TYPE, COMPARE>& def) const
 {
-	if (_type == VariantType::Object) {
-		Referable* ref = *((Referable**)(void*)(&_value));
-		return (CArray<TYPE, COMPARE>*)ref;
+	Ref<Referable> obj(getObject());
+	if (CArray<TYPE, COMPARE>::checkInstance(obj.ptr)) {
+		return (CArray<TYPE, COMPARE>*)(obj.ptr);
 	}
 	return def;
 }
@@ -1087,9 +1110,9 @@ void Variant::setArray(const Array<T, COMPARE>& object)
 template <class TYPE, class COMPARE>
 List<TYPE, COMPARE> Variant::getList(const List<TYPE, COMPARE>& def) const
 {
-	if (_type == VariantType::Object) {
-		Referable* ref = *((Referable**)(void*)(&_value));
-		return (CList<TYPE, COMPARE>*)ref;
+	Ref<Referable> obj(getObject());
+	if (CList<TYPE, COMPARE>::checkInstance(obj.ptr)) {
+		return (CList<TYPE, COMPARE>*)(obj.ptr);
 	}
 	return def;
 }
@@ -1105,9 +1128,9 @@ void Variant::setList(const List<T, COMPARE>& object)
 template <class KT, class VT>
 Map<KT, VT> Variant::getMap(const Map<KT, VT>& def) const
 {
-	if (_type == VariantType::Object) {
-		Referable* ref = *((Referable**)(void*)(&_value));
-		return (IMap<KT, VT>*)ref;
+	Ref<Referable> obj(getObject());
+	if (IMap<KT, VT>::checkInstance(obj.ptr)) {
+		return (IMap<KT, VT>*)(obj.ptr);
 	}
 	return def;
 }
@@ -1118,23 +1141,6 @@ void Variant::setMap(const Map<KT, VT>& object)
 	_free(_type, _value);
 	_type = VariantType::Object;
 	new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
-}
-
-template <class T>
-WeakRef<T> Variant::getWeak(const WeakRef<T>& def) const
-{
-	if (_type == VariantType::Weak) {
-		return *((WeakRef<T>*)(void*)(&_value));
-	}
-	return def;
-}
-
-template <class T>
-void Variant::setWeak(const WeakRef<T>& weak)
-{
-	_free(_type, _value);
-	_type = VariantType::Weak;
-	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
 }
 
 
@@ -1154,6 +1160,20 @@ SafeVariant::SafeVariant(const SafeRef<T>& ref)
 {
 	_type = VariantType::Object;
 	new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+}
+
+template <class T>
+SafeVariant::SafeVariant(const WeakRef<T>& weak)
+{
+	_type = VariantType::Weak;
+	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+}
+
+template <class T>
+SafeVariant::SafeVariant(const SafeWeakRef<T>& weak)
+{
+	_type = VariantType::Weak;
+	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
 }
 
 template <class T, class COMPARE>
@@ -1198,20 +1218,6 @@ SafeVariant::SafeVariant(const SafeMap<KT, VT>& object)
 	new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
 }
 
-template <class T>
-SafeVariant::SafeVariant(const WeakRef<T>& weak)
-{
-	_type = VariantType::Weak;
-	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
-}
-
-template <class T>
-SafeVariant::SafeVariant(const SafeWeakRef<T>& weak)
-{
-	_type = VariantType::Weak;
-	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
-}
-
 SLIB_INLINE const SafeVariant& SafeVariant::null()
 {
 	return *((SafeVariant*)((void*)(&_Variant_Null)));
@@ -1228,6 +1234,20 @@ template <class T>
 SafeVariant& SafeVariant::operator=(const SafeRef<T>& ref)
 {
 	setObject(ref);
+	return *this;
+}
+
+template <class T>
+SafeVariant& SafeVariant::operator=(const WeakRef<T>& weak)
+{
+	setWeak(weak);
+	return *this;
+}
+
+template <class T>
+SafeVariant& SafeVariant::operator=(const SafeWeakRef<T>& weak)
+{
+	setWeak(weak);
 	return *this;
 }
 
@@ -1273,20 +1293,6 @@ SafeVariant& SafeVariant::operator=(const SafeMap<KT, VT>& object)
 	return *this;
 }
 
-template <class T>
-SafeVariant& SafeVariant::operator=(const WeakRef<T>& weak)
-{
-	setWeak(weak);
-	return *this;
-}
-
-template <class T>
-SafeVariant& SafeVariant::operator=(const SafeWeakRef<T>& weak)
-{
-	setWeak(weak);
-	return *this;
-}
-
 SLIB_INLINE VariantType SafeVariant::getType() const
 {
 	return _type;
@@ -1315,6 +1321,14 @@ void SafeVariant::setObject(const Ref<T>& object)
 	sl_int64 v;
 	new ((Ref<T>*)(void*)(&v)) Ref<T>(object);
 	_replace(VariantType::Object, v);
+}
+
+template <class T>
+void SafeVariant::setWeak(const WeakRef<T>& weak)
+{
+	sl_int64 v;
+	new ((WeakRef<T>*)(void*)(&v)) WeakRef<T>(weak);
+	_replace(VariantType::Weak, v);
 }
 
 template <class TYPE, class COMPARE>
@@ -1360,21 +1374,6 @@ void SafeVariant::setMap(const Map<KT, VT>& object)
 	sl_int64 v;
 	new ((Map<KT, VT>*)(void*)(&v)) Map<KT, VT>(object);
 	_replace(VariantType::Object, v);
-}
-
-template <class T>
-WeakRef<T> SafeVariant::getWeak(const WeakRef<T>& def) const
-{
-	Variant var(*this);
-	return var.getWeak(def);
-}
-
-template <class T>
-void SafeVariant::setWeak(const WeakRef<T>& weak)
-{
-	sl_int64 v;
-	new ((WeakRef<T>*)(void*)(&v)) WeakRef<T>(weak);
-	_replace(VariantType::Weak, v);
 }
 
 SLIB_NAMESPACE_END

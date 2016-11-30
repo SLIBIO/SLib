@@ -14,6 +14,7 @@ class SLIB_EXPORT Runnable : public Object
 	
 public:
 	virtual void run() = 0;
+	
 };
 
 class SafeCallback;
@@ -102,6 +103,7 @@ class SLIB_EXPORT Functional<RET_TYPE(ARGS...)> : public Referable
 {
 public:
 	virtual RET_TYPE invoke(ARGS... params) = 0;
+	
 };
 
 #define SLIB_TEMPLATE_PARAMS_Functional RET_TYPE(ARGS...)

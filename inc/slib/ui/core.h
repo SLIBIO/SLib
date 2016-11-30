@@ -68,6 +68,8 @@ public:
 	// Run on UI thread
 	static void alert(const String& caption, const String& text);
 	
+	static void showAlert(const String& text);
+	
 	static void showAlert(const String& text, const Callback& onOk);
 	
 	static void showAlert(const String& caption, const String& text, const Callback& onOk);

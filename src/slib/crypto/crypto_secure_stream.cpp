@@ -528,7 +528,7 @@ public:
 		}
 	}
 
-	void processReadDone(Ref<AsyncStreamRequest> req)
+	void processReadDone(const Ref<AsyncStreamRequest>& req)
 	{
 		if (req.isNotNull()) {
 			PtrLocker<IAsyncStreamListener> listener(req->listener);
@@ -1134,7 +1134,7 @@ public:
 		}
 	}
 
-	void processReadDone(Ref<AsyncStreamRequest> req)
+	void processReadDone(const Ref<AsyncStreamRequest>& req)
 	{
 		if (req.isNotNull()) {
 			PtrLocker<IAsyncStreamListener> listener(req->listener);

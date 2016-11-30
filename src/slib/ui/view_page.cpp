@@ -87,7 +87,7 @@ ViewStack::ViewStack()
 	m_popTransitionDuration = 0.5f;
 }
 
-void _ViewStack_FinishAnimation(Ref<ViewStack> stack, Ref<View> view, UIPageAction action)
+void _ViewStack_FinishAnimation(const Ref<ViewStack>& stack, const Ref<View>& view, UIPageAction action)
 {
 	if (stack.isNotNull() && view.isNotNull()) {
 		stack->dispatchFinishPageAnimation(view.ptr, action);
@@ -105,7 +105,7 @@ void _ViewStack_FinishAnimation(Ref<ViewStack> stack, Ref<View> view, UIPageActi
 	}
 }
 
-void ViewStack::_push(Ref<View> viewIn, Transition transition, sl_bool flagRemoveAllBackPages)
+void ViewStack::_push(const Ref<View>& viewIn, Transition transition, sl_bool flagRemoveAllBackPages)
 {
 	if (viewIn.isNull()) {
 		return;
@@ -194,7 +194,7 @@ void ViewStack::push(const Ref<View>& viewIn, sl_bool flagRemoveAllBackPages)
 	}
 }
 
-void ViewStack::_pop(Ref<View> _viewOut, Transition transition)
+void ViewStack::_pop(const Ref<View>& _viewOut, Transition transition)
 {
 	ObjectLocker lock(this);
 	
@@ -739,7 +739,7 @@ class _ViewPagePopupBackground : public ViewGroup
 
 SLIB_DEFINE_OBJECT(_ViewPagePopupBackground, ViewGroup)
 
-void ViewPage::_openPopup(Ref<View> parent, Transition transition, sl_bool flagFillParentBackground)
+void ViewPage::_openPopup(const Ref<View>& parent, Transition transition, sl_bool flagFillParentBackground)
 {
 	ObjectLocker lock(this);
 	

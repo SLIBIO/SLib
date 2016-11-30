@@ -200,6 +200,11 @@ void UI::alert(const String& caption, const String& text)
 	AlertDialog::run(caption, text);
 }
 
+void UI::showAlert(const String& text)
+{
+	AlertDialog::show(text);
+}
+
 void UI::showAlert(const String& text, const Callback& onOk)
 {
 	AlertDialog::show(text, onOk);

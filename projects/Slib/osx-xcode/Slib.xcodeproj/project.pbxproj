@@ -157,6 +157,7 @@
 		2688DD871C16FBDF00973672 /* camera_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2688DD861C16FBDF00973672 /* camera_view.cpp */; };
 		268916361C182ADA009FD75E /* camera_dshow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268916351C182ADA009FD75E /* camera_dshow.cpp */; };
 		268D4F2E1C89FBF4000D9691 /* queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268D4F2D1C89FBF4000D9691 /* queue.cpp */; };
+		26912BC31DEA81D5008C5FFD /* web_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26912BC21DEA81D5008C5FFD /* web_service.cpp */; };
 		2699DC901D43682D0085EE67 /* list_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2699DC8F1D43682D0085EE67 /* list_view.cpp */; };
 		26A4ECCF1CFE7FB700288A0B /* tree_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A4ECCE1CFE7FB700288A0B /* tree_view.cpp */; };
 		26AE7BF01C98F8CB0026C2D9 /* line_segment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26AE7BEF1C98F8CB0026C2D9 /* line_segment.cpp */; };
@@ -195,6 +196,7 @@
 		26CBB02D1DE5EC4F00F5A6F9 /* latlon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CBB0281DE5EC4F00F5A6F9 /* latlon.cpp */; };
 		26CBB02F1DE5EF6C00F5A6F9 /* geo_line.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CBB02E1DE5EF6C00F5A6F9 /* geo_line.cpp */; };
 		26CBB0311DE61DAC00F5A6F9 /* map_camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CBB0301DE61DAC00F5A6F9 /* map_camera.cpp */; };
+		26CBDF011DED5EC700B1B13B /* web_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CBDF001DED5EC700B1B13B /* web_controller.cpp */; };
 		26CF1D101DBA6B1700B6B65B /* render_canvas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CF1D0F1DBA6B1700B6B65B /* render_canvas.cpp */; };
 		26D028651C48847E0083F1F3 /* audio_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D028641C48847E0083F1F3 /* audio_data.cpp */; };
 		26D3A1A41C85894A00FB8DBD /* resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D3A1A31C85894A00FB8DBD /* resource.cpp */; };
@@ -411,6 +413,7 @@
 		2688DD861C16FBDF00973672 /* camera_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera_view.cpp; sourceTree = "<group>"; };
 		268916351C182ADA009FD75E /* camera_dshow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera_dshow.cpp; sourceTree = "<group>"; };
 		268D4F2D1C89FBF4000D9691 /* queue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = queue.cpp; sourceTree = "<group>"; };
+		26912BC21DEA81D5008C5FFD /* web_service.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = web_service.cpp; sourceTree = "<group>"; };
 		2699DC8F1D43682D0085EE67 /* list_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list_view.cpp; sourceTree = "<group>"; };
 		26A4ECCE1CFE7FB700288A0B /* tree_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tree_view.cpp; sourceTree = "<group>"; };
 		26AE7BEF1C98F8CB0026C2D9 /* line_segment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = line_segment.cpp; sourceTree = "<group>"; };
@@ -449,6 +452,7 @@
 		26CBB0281DE5EC4F00F5A6F9 /* latlon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = latlon.cpp; path = map/latlon.cpp; sourceTree = "<group>"; };
 		26CBB02E1DE5EF6C00F5A6F9 /* geo_line.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = geo_line.cpp; path = map/geo_line.cpp; sourceTree = "<group>"; };
 		26CBB0301DE61DAC00F5A6F9 /* map_camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = map_camera.cpp; path = map/map_camera.cpp; sourceTree = "<group>"; };
+		26CBDF001DED5EC700B1B13B /* web_controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = web_controller.cpp; sourceTree = "<group>"; };
 		26CF1D0F1DBA6B1700B6B65B /* render_canvas.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_canvas.cpp; sourceTree = "<group>"; };
 		26D028641C48847E0083F1F3 /* audio_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_data.cpp; sourceTree = "<group>"; };
 		26D3A1A31C85894A00FB8DBD /* resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = resource.cpp; sourceTree = "<group>"; };
@@ -684,6 +688,15 @@
 			path = ui;
 			sourceTree = "<group>";
 		};
+		26912BC11DEA81D5008C5FFD /* web */ = {
+			isa = PBXGroup;
+			children = (
+				26CBDF001DED5EC700B1B13B /* web_controller.cpp */,
+				26912BC21DEA81D5008C5FFD /* web_service.cpp */,
+			);
+			path = web;
+			sourceTree = "<group>";
+		};
 		26CBB0231DE5E90700F5A6F9 /* map */ = {
 			isa = PBXGroup;
 			children = (
@@ -797,6 +810,7 @@
 				266DD4BD1C11940A00D47AB0 /* network */,
 				266DD4D81C11940A00D47AB0 /* render */,
 				266DD4E91C11940A00D47AB0 /* ui */,
+				26912BC11DEA81D5008C5FFD /* web */,
 			);
 			path = slib;
 			sourceTree = "<group>";
@@ -1171,6 +1185,7 @@
 				266DD49D1C1193C400D47AB0 /* pen.cpp in Sources */,
 				A2DE1D7F1B383B7900A74698 /* java.cpp in Sources */,
 				A2C8BE381AFA832800D584D1 /* thirdparty_sqlite3.c in Sources */,
+				26CBDF011DED5EC700B1B13B /* web_controller.cpp in Sources */,
 				266DD5601C11940A00D47AB0 /* video_capture.cpp in Sources */,
 				26FBDE691DA2BDE900FF1B55 /* graphics_platform_apple.mm in Sources */,
 				26DA34FA1C4B47CF004DC204 /* video_frame.cpp in Sources */,
@@ -1180,6 +1195,7 @@
 				266DD5631C11940A00D47AB0 /* ethernet.cpp in Sources */,
 				2649C2371CBBCB7E003E7561 /* common_dialogs_osx.mm in Sources */,
 				26AE7BFC1C99329B0026C2D9 /* triangle.cpp in Sources */,
+				26912BC31DEA81D5008C5FFD /* web_service.cpp in Sources */,
 				26FBDE571DA2B3F700FF1B55 /* drawable_quartz.mm in Sources */,
 				26C13E431DDA30FD00612945 /* url.cpp in Sources */,
 				266DD5661C11940A00D47AB0 /* http_proxy.cpp in Sources */,

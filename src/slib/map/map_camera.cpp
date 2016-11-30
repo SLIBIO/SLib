@@ -151,7 +151,7 @@ void MapCamera::setTilt(float degree)
 	_invalidateViewMatrix();
 }
 
-const Matrix4& MapCamera::getViewMatrix()
+const Matrix4lf& MapCamera::getViewMatrix()
 {
 	if (m_flagInvalidatedViewMatrix) {
 		m_flagInvalidatedViewMatrix = sl_false;
@@ -208,7 +208,6 @@ public:
 		Ref<MapCamera> _camera(m_camera);
 		_MapCamera* camera = (_MapCamera*)(_camera.ptr);
 		if (camera) {
-			double minAlt = camera->m_minimumAltitudeForAnimation;
 			camera->m_position.bearing = value;
 			camera->_invalidateViewMatrix();
 		}
@@ -231,7 +230,6 @@ public:
 		Ref<MapCamera> _camera(m_camera);
 		_MapCamera* camera = (_MapCamera*)(_camera.ptr);
 		if (camera) {
-			double minAlt = camera->m_minimumAltitudeForAnimation;
 			camera->m_position.tilt = value;
 			camera->_invalidateViewMatrix();
 		}

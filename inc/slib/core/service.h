@@ -38,6 +38,11 @@ protected:
 	// override
 	String getUniqueInstanceId();
 	
+protected:
+	virtual sl_bool dispatchStartService();
+	
+	virtual void dispatchStopService();
+	
 public:
 	void startService();
 	

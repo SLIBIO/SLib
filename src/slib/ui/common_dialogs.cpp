@@ -172,6 +172,13 @@ void AlertDialog::run(const String& caption, const String& text)
 	alert.run();
 }
 
+void AlertDialog::show(const String& text)
+{
+	AlertDialog alert;
+	alert.text = text;
+	alert.show();
+}
+
 void AlertDialog::show(const String& text, const Callback& onOk)
 {
 	AlertDialog alert;

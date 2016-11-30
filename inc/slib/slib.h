@@ -14,6 +14,7 @@
 #include "db.h"
 
 #include "map.h"
+#include "web.h"
 
 #include "resource.h"
 

@@ -12,6 +12,9 @@ add_library(slib-network ${SLIB_NETWORK_FILES})
 file (GLOB SLIB_DB_FILES ${CMAKE_CURRENT_LIST_DIR}/../../../inc/slib/db/*.h ${CMAKE_CURRENT_LIST_DIR}/../../../src/slib/db/*.cpp)
 add_library(slib-db ${SLIB_DB_FILES})
 
+file (GLOB SLIB_WEB_FILES ${CMAKE_CURRENT_LIST_DIR}/../../../inc/slib/web/*.h ${CMAKE_CURRENT_LIST_DIR}/../../../src/slib/web/*.cpp)
+add_library(slib-web ${SLIB_WEB_FILES})
+
 add_library(slib-zlib ${CMAKE_CURRENT_LIST_DIR}/../../../src/thirdparty/thirdparty_zlib.c)
 
-target_link_libraries(slib-network slib-core pthread slib-zlib)
+target_link_libraries(slib-web slib-db slib-network slib-core pthread slib-zlib)

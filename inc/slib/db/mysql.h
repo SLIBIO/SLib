@@ -15,10 +15,10 @@ class SLIB_EXPORT MySQL_Param
 {
 public:
 	String host;
+	sl_uint32 port;
 	String user;
 	String password;
 	String db;
-	sl_uint32 port;
 
 	sl_bool flagAutoReconnect;
 	sl_bool flagMultipleStatements;

@@ -22,6 +22,10 @@ public:
 	static String getCachesDirectory();
 	
 	static String getTempDirectory();
+	
+	static String getCurrentDirectory();
+	
+	static sl_bool setCurrentDirectory(const String& dir);
 
 	
 	// Tick count

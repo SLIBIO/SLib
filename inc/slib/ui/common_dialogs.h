@@ -28,6 +28,8 @@ public:
 	
 	static void run(const String& caption, const String& text);
 	
+	static void show(const String& text);
+
 	static void show(const String& text, const Callback& onOk);
 	
 	static void show(const String& caption, const String& text, const Callback& onOk);

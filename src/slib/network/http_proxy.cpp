@@ -45,7 +45,7 @@ void HttpProxy::release()
 }
 
 
-sl_bool HttpProxy::preprocessRequest(HttpServiceContext* context)
+sl_bool HttpProxy::preprocessRequest(const Ref<HttpServiceContext>& context)
 {
 	Ref<HttpServiceConnection> connection = context->getConnection();
 	if (connection.isNotNull()) {
@@ -149,7 +149,7 @@ public:
 	}
 };
 
-void HttpProxy::_processConnect(Ref<HttpServiceContext> context)
+void HttpProxy::_processConnect(const Ref<HttpServiceContext>& context)
 {
 	Ref<HttpServiceConnection> connection = context->getConnection();
 	if (connection.isNull()) {
@@ -178,7 +178,7 @@ public:
 	sl_uint64 m_sizeResponse;
 
 public:
-	_HttpProxy_ProxyContext(HttpServiceConnection* connection, HttpServiceContext* context)
+	_HttpProxy_ProxyContext(HttpServiceConnection* connection, const Ref<HttpServiceContext>& context)
 	{
 		m_connection = connection;
 		m_context = context;
@@ -254,7 +254,7 @@ public:
 	}
 };
 
-void HttpProxy::_processProxy(Ref<HttpServiceContext> context, String host, sl_uint32 port)
+void HttpProxy::_processProxy(const Ref<HttpServiceContext>& context, String host, sl_uint32 port)
 {
 	Ref<HttpServiceConnection> connection = context->getConnection();
 	if (connection.isNull()) {
@@ -264,7 +264,7 @@ void HttpProxy::_processProxy(Ref<HttpServiceContext> context, String host, sl_u
 		host += ":";
 		host += port;
 	}
-	Ref<_HttpProxy_ProxyContext> proxyContext = new _HttpProxy_ProxyContext(connection.ptr, context.ptr);
+	Ref<_HttpProxy_ProxyContext> proxyContext = new _HttpProxy_ProxyContext(connection.ptr, context);
 	if (proxyContext.isNotNull()) {
 		if (connectTo(connection.ptr, host, WeakRef<_HttpProxy_ProxyContext>(proxyContext))) {
 			connection->setProxyObject(proxyContext.ptr);

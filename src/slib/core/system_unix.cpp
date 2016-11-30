@@ -32,36 +32,28 @@
 #include <bb/cascades/Application>
 #endif
 
+#define _PATH_MAX 1024
+
 SLIB_NAMESPACE_BEGIN
+
 #if !defined(SLIB_PLATFORM_IS_APPLE)
 String System::getApplicationPath()
 {
+	char path[_PATH_MAX] = {0};
 #if defined(SLIB_PLATFORM_IS_ANDROID)
-	sl_uint32 size = 2048;
-	char* path = (char*)(Base::createMemory(size+1));
-	if (!path) {
-		return String::null();
-	}
-	Base::zeroMemory(path, size+1);
 	char a[50];
-	sprintf(a, "/proc/%d/cmdline", getpid());
+	::sprintf(a, "/proc/%d/cmdline", getpid());
 	FILE* fp = fopen(a, "rb");
-	int n = fread(path, 1, size, fp);
+	int n = fread(path, 1, _PATH_MAX - 1, fp);
 	fclose(fp);
 
 	String ret;
 	if (n > 0) {
 		ret = String::fromUtf8(path);
 	}
-	Base::freeMemory(path);
 	return "/data/data/" + ret;
 #else
-	sl_uint32 size = 2048;
-	char* path = (char*)(Base::createMemory(size+1));
-	if (!path) {
-		return String::null();
-	}
-	int n = readlink("/proc/self/exe", path, size);
+	int n = readlink("/proc/self/exe", path, _PATH_MAX-1);
 	/*
 	-- another solution --
 
@@ -73,7 +65,6 @@ String System::getApplicationPath()
 	if (n > 0) {
 		ret = String::fromUtf8(path, n);
 	}
-	Base::freeMemory(path);
 	return ret;
 #endif
 }
@@ -89,6 +80,25 @@ String System::getTempDirectory()
 #endif
 }
 #endif
+
+String System::getCurrentDirectory()
+{
+	char path[_PATH_MAX] = {0};
+	char* r = ::getcwd(path, _PATH_MAX-1);
+	if (r) {
+		return path;
+	}
+	return String::null();
+}
+
+sl_bool System::setCurrentDirectory(const String& dir)
+{
+	int iRet = ::chdir(dir.getData());
+	if (iRet == 0) {
+		return sl_true;
+	}
+	return sl_false;
+}
 
 sl_uint32 System::getTickCount()
 {

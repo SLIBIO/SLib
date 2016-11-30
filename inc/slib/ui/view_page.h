@@ -117,9 +117,9 @@ public:
 	void setTransitionCurve(AnimationCurve curve);
 	
 protected:
-	void _push(Ref<View> page, Transition transition, sl_bool flagRemoveAllBackPages);
+	void _push(const Ref<View>& page, Transition transition, sl_bool flagRemoveAllBackPages);
 	
-	void _pop(Ref<View> page, Transition transition);
+	void _pop(const Ref<View>& page, Transition transition);
 	
 	void _applyDefaultPushTransition(Transition& transition);
 	
@@ -313,7 +313,7 @@ public:
 	virtual void dispatchBackPressed(UIEvent* ev);
 	
 protected:
-	void _openPopup(Ref<View> parent, Transition transition, sl_bool flagFillParentBackground);
+	void _openPopup(const Ref<View>& parent, Transition transition, sl_bool flagFillParentBackground);
 	
 	void _closePopup(Transition transition);
 	

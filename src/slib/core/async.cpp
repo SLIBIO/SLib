@@ -2410,7 +2410,7 @@ void AsyncStreamFilter::onWrite(AsyncStream* stream, void* data, sl_uint32 sizeW
 	}
 }
 
-void AsyncStreamFilter::_processZeroWrite(void* data, sl_uint32 size, Ptr<IAsyncStreamListener> _listener, Ref<Referable> ref)
+void AsyncStreamFilter::_processZeroWrite(void* data, sl_uint32 size, Ptr<IAsyncStreamListener> _listener, const Ref<Referable>& ref)
 {
 	PtrLocker<IAsyncStreamListener> listener(_listener);
 	if (listener.isNotNull()) {

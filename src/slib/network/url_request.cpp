@@ -74,6 +74,42 @@ Ref<UrlRequest> UrlRequest::downloadToFile(const String& filePath, const String&
 	return Ref<UrlRequest>::null();
 }
 
+Ref<UrlRequest> UrlRequest::sendGet(const String& url, const Function<void(UrlRequest*)>& onComplete)
+{
+	UrlRequestParam rp;
+	rp.method = HttpMethod::GET;
+	rp.onComplete = onComplete;
+	return send(url, rp);
+}
+
+Ref<UrlRequest> UrlRequest::sendGet(const String& url, const Function<void(UrlRequest*)>& onComplete, const Function<void(UrlRequest*)>& onError)
+{
+	UrlRequestParam rp;
+	rp.method = HttpMethod::GET;
+	rp.onComplete = onComplete;
+	rp.onError = onError;
+	return send(url, rp);
+}
+
+Ref<UrlRequest> UrlRequest::sendPost(const String& url, const String& body, const Function<void(UrlRequest*)>& onComplete)
+{
+	UrlRequestParam rp;
+	rp.method = HttpMethod::POST;
+	rp.requestBody = body.toMemory();
+	rp.onComplete = onComplete;
+	return send(url, rp);
+}
+
+Ref<UrlRequest> UrlRequest::sendPost(const String& url, const String& body, const Function<void(UrlRequest*)>& onComplete, const Function<void(UrlRequest*)>& onError)
+{
+	UrlRequestParam rp;
+	rp.method = HttpMethod::POST;
+	rp.requestBody = body.toMemory();
+	rp.onComplete = onComplete;
+	rp.onError = onError;
+	return send(url, rp);
+}
+
 const String& UrlRequest::getUrl()
 {
 	return m_url;

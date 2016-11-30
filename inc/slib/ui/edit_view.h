@@ -69,9 +69,9 @@ public:
 	// override
 	void dispatchKeyEvent(UIEvent* ev);
 	
-	String dispatchChange(const String& newValue);
+	virtual String dispatchChange(const String& newValue);
 	
-	void dispatchEnterAction();
+	virtual void dispatchEnterAction();
 	
 private:
 	void _getText_NW();

@@ -427,9 +427,396 @@ Variant Json::parseJsonFromTextFile(const String& filePath)
 }
 
 
-String Json::toJson(const Variant& var)
+String Json::toString(const Variant& var)
 {
-	return var.toJson();
+	return var.toJsonString();
+}
+
+Variant Json::createList()
+{
+	return Variant::createVariantList();
+}
+
+Variant Json::createMap()
+{
+	return Variant::createVariantListMap();
+}
+
+template <> void Json::fromJson(const Variant& v, Variant& _out)
+{
+	_out = v;
+}
+
+template <> void Json::fromJson(const Variant& v, Variant& _out, const Variant& def)
+{
+	if (v.isNotNull()) {
+		_out = v;
+	} else {
+		_out = def;
+	}
+}
+
+template <> Variant Json::toJson(const Variant& _in)
+{
+	return _in;
+}
+
+template <> void Json::fromJson(const Variant& v, SafeVariant& _out)
+{
+	_out = v;
+}
+
+template <> void Json::fromJson(const Variant& v, SafeVariant& _out, const SafeVariant& def)
+{
+	if (v.isNotNull()) {
+		_out = v;
+	} else {
+		_out = def;
+	}
+}
+
+template <> Variant Json::toJson(const SafeVariant& _in)
+{
+	return _in;
+}
+
+template <> void Json::fromJson(const Variant& v, sl_int32& _out)
+{
+	_out = v.getInt32();
+}
+
+template <> void Json::fromJson(const Variant& v, sl_int32& _out, const sl_int32& def)
+{
+	_out = v.getInt32(def);
+}
+
+template <> Variant Json::toJson(const sl_int32& _in)
+{
+	return Variant(_in);
+}
+
+template <> void Json::fromJson(const Variant& v, sl_uint32& _out)
+{
+	_out = v.getUint32();
+}
+
+template <> void Json::fromJson(const Variant& v, sl_uint32& _out, const sl_uint32& def)
+{
+	_out = v.getUint32(def);
+}
+
+template <> Variant Json::toJson(const sl_uint32& _in)
+{
+	return Variant(_in);
+}
+
+template <> void Json::fromJson(const Variant& v, sl_int64& _out)
+{
+	_out = v.getInt64();
+}
+
+template <> void Json::fromJson(const Variant& v, sl_int64& _out, const sl_int64& def)
+{
+	_out = v.getInt64(def);
+}
+
+template <> Variant Json::toJson(const sl_int64& _in)
+{
+	return Variant(_in);
+}
+
+template <> void Json::fromJson(const Variant& v, sl_uint64& _out)
+{
+	_out = v.getUint64();
+}
+
+template <> void Json::fromJson(const Variant& v, sl_uint64& _out, const sl_uint64& def)
+{
+	_out = v.getUint64(def);
+}
+
+template <> Variant Json::toJson(const sl_uint64& _in)
+{
+	return Variant(_in);
+}
+
+template <> void Json::fromJson(const Variant& v, sl_int8& _out)
+{
+	_out = (sl_int8)(v.getInt32());
+}
+
+template <> void Json::fromJson(const Variant& v, sl_int8& _out, const sl_int8& def)
+{
+	_out = (sl_int8)(v.getInt32(def));
+}
+
+template <> Variant Json::toJson(const sl_int8& _in)
+{
+	return Variant((sl_int32)_in);
+}
+
+template <> void Json::fromJson(const Variant& v, sl_uint8& _out)
+{
+	_out = (sl_uint8)(v.getUint32());
+}
+
+template <> void Json::fromJson(const Variant& v, sl_uint8& _out, const sl_uint8& def)
+{
+	_out = (sl_uint8)(v.getUint32(def));
+}
+
+template <> Variant Json::toJson(const sl_uint8& _in)
+{
+	return Variant((sl_uint32)_in);
+}
+
+template <> void Json::fromJson(const Variant& v, sl_int16& _out)
+{
+	_out = (sl_int16)(v.getInt32());
+}
+
+template <> void Json::fromJson(const Variant& v, sl_int16& _out, const sl_int16& def)
+{
+	_out = (sl_int16)(v.getInt32(def));
+}
+
+template <> Variant Json::toJson(const sl_int16& _in)
+{
+	return Variant((sl_int32)_in);
+}
+
+template <> void Json::fromJson(const Variant& v, sl_uint16& _out)
+{
+	_out = (sl_uint16)(v.getUint32());
+}
+
+template <> void Json::fromJson(const Variant& v, sl_uint16& _out, const sl_uint16& def)
+{
+	_out = (sl_uint16)(v.getUint32(def));
+}
+
+template <> Variant Json::toJson(const sl_uint16& _in)
+{
+	return Variant((sl_uint32)_in);
+}
+
+template <> void Json::fromJson(const Variant& v, float& _out)
+{
+	_out = v.getFloat();
+}
+
+template <> void Json::fromJson(const Variant& v, float& _out, const float& def)
+{
+	_out = v.getFloat(def);
+}
+
+template <> Variant Json::toJson(const float& _in)
+{
+	return Variant(_in);
+}
+
+template <> void Json::fromJson(const Variant& v, double& _out)
+{
+	_out = v.getDouble();
+}
+
+template <> void Json::fromJson(const Variant& v, double& _out, const double& def)
+{
+	_out = v.getDouble(def);
+}
+
+template <> Variant Json::toJson(const double& _in)
+{
+	return Variant(_in);
+}
+
+template <> void Json::fromJson(const Variant& v, bool& _out)
+{
+	_out = v.getBoolean();
+}
+
+template <> void Json::fromJson(const Variant& v, bool& _out, const bool& def)
+{
+	_out = v.getBoolean(def);
+}
+
+template <> Variant Json::toJson(const bool& _in)
+{
+	return Variant((sl_bool)_in);
+}
+
+template <> void Json::fromJson(const Variant& v, String8& _out)
+{
+	_out = v.getString8();
+}
+
+template <> void Json::fromJson(const Variant& v, String8& _out, const String8& def)
+{
+	_out = v.getString8(def);
+}
+
+template <> Variant Json::toJson(const String8& _in)
+{
+	return Variant(_in);
+}
+
+template <> void Json::fromJson(const Variant& v, SafeString8& _out)
+{
+	_out = v.getString8();
+}
+
+template <> void Json::fromJson(const Variant& v, SafeString8& _out, const SafeString8& def)
+{
+	_out = v.getString8(def);
+}
+
+template <> Variant Json::toJson(const SafeString8& _in)
+{
+	return Variant(_in);
+}
+
+template <> void Json::fromJson(const Variant& v, String16& _out)
+{
+	_out = v.getString16();
+}
+
+template <> void Json::fromJson(const Variant& v, String16& _out, const String16& def)
+{
+	_out = v.getString16(def);
+}
+
+template <> Variant Json::toJson(const String16& _in)
+{
+	return Variant(_in);
+}
+
+template <> void Json::fromJson(const Variant& v, SafeString16& _out)
+{
+	_out = v.getString16();
+}
+
+template <> void Json::fromJson(const Variant& v, SafeString16& _out, const SafeString16& def)
+{
+	_out = v.getString16(def);
+}
+
+template <> Variant Json::toJson(const SafeString16& _in)
+{
+	return Variant(_in);
+}
+
+template <> void Json::fromJson(const Variant& v, List<Variant>& _out)
+{
+	_out = v.getVariantList();
+}
+
+template <> void Json::fromJson(const Variant& v, List<Variant>& _out, const List<Variant>& def)
+{
+	if (v.isNotNull()) {
+		_out = v.getVariantList();
+	} else {
+		_out = def;
+	}
+}
+
+template <> Variant Json::toJson(const List<Variant>& _in)
+{
+	return _in;
+}
+
+template <> void Json::fromJson(const Variant& v, SafeList<Variant>& _out)
+{
+	_out = v.getVariantList();
+}
+
+template <> void Json::fromJson(const Variant& v, SafeList<Variant>& _out, const SafeList<Variant>& def)
+{
+	if (v.isNotNull()) {
+		_out = v.getVariantList();
+	} else {
+		_out = def;
+	}
+}
+
+template <> Variant Json::toJson(const SafeList<Variant>& _in)
+{
+	return _in;
+}
+
+template <> void Json::fromJson(const Variant& v, Map<String, Variant>& _out)
+{
+	_out = v.getVariantMap();
+}
+
+template <> void Json::fromJson(const Variant& v, Map<String, Variant>& _out, const Map<String, Variant>& def)
+{
+	if (v.isNotNull()) {
+		_out = v.getVariantMap();
+	} else {
+		_out = def;
+	}
+}
+
+template <> Variant Json::toJson(const Map<String, Variant>& _in)
+{
+	return _in;
+}
+
+template <> void Json::fromJson(const Variant& v, SafeMap<String, Variant>& _out)
+{
+	_out = v.getVariantMap();
+}
+
+template <> void Json::fromJson(const Variant& v, SafeMap<String, Variant>& _out, const SafeMap<String, Variant>& def)
+{
+	if (v.isNotNull()) {
+		_out = v.getVariantMap();
+	} else {
+		_out = def;
+	}
+}
+
+template <> Variant Json::toJson(const SafeMap<String, Variant>& _in)
+{
+	return _in;
+}
+
+template <> void Json::fromJson(const Variant& v, List< Map<String, Variant> >& _out)
+{
+	_out = v.getVariantMapList();
+}
+
+template <> void Json::fromJson(const Variant& v, List< Map<String, Variant> >& _out, const List< Map<String, Variant> >& def)
+{
+	if (v.isNotNull()) {
+		_out = v.getVariantMapList();
+	} else {
+		_out = def;
+	}
+}
+
+template <> Variant Json::toJson(const List< Map<String, Variant> >& _in)
+{
+	return _in;
+}
+
+template <> void Json::fromJson(const Variant& v, SafeList< Map<String, Variant> >& _out)
+{
+	_out = v.getVariantMapList();
+}
+
+template <> void Json::fromJson(const Variant& v, SafeList< Map<String, Variant> >& _out, const SafeList< Map<String, Variant> >& def)
+{
+	if (v.isNotNull()) {
+		_out = v.getVariantMapList();
+	} else {
+		_out = def;
+	}
+}
+
+template <> Variant Json::toJson(const SafeList< Map<String, Variant> >& _in)
+{
+	return _in;
 }
 
 SLIB_NAMESPACE_END

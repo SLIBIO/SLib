@@ -31,7 +31,7 @@ public:
 
 public:
 	// override
-	sl_bool preprocessRequest(HttpServiceContext* context);
+	sl_bool preprocessRequest(const Ref<HttpServiceContext>& context);
 	
 public:
 	virtual sl_bool connectTo(HttpServiceConnection* connection, const String& hostAddress, const Ptr<IHttpProxyConnectListener>& listener);
@@ -39,9 +39,9 @@ public:
 protected:
 	sl_bool _init(const HttpProxyParam& param);
 	
-	void _processConnect(Ref<HttpServiceContext> context);
+	void _processConnect(const Ref<HttpServiceContext>& context);
 	
-	void _processProxy(Ref<HttpServiceContext> context, String host, sl_uint32 port);
+	void _processProxy(const Ref<HttpServiceContext>& context, String host, sl_uint32 port);
 
 };
 

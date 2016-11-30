@@ -11,6 +11,8 @@ file (GLOB SLIB_FILES
     ${CMAKE_CURRENT_LIST_DIR}/../../../../src/slib/media/*.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../../../../src/slib/device/*.cpp
     ${CMAKE_CURRENT_LIST_DIR}/../../../../src/slib/db/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../../../src/slib/map/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/../../../../src/slib/web/*.cpp
 )
 
 set(THIRDPARTY_FILES

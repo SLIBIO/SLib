@@ -19,6 +19,7 @@ SLIB_DEFINE_OBJECT(HttpServiceContext, Object)
 HttpServiceContext::HttpServiceContext()
 {
 	m_requestContentLength = 0;
+	m_flagAsynchronousResponse = sl_false;
 
 	setClosingConnection(sl_false);
 	setProcessingByThread(sl_true);
@@ -108,6 +109,25 @@ const SocketAddress& HttpServiceContext::getRemoteAddress()
 	}
 }
 
+sl_bool HttpServiceContext::isAsynchronousResponse()
+{
+	return m_flagAsynchronousResponse;
+}
+
+void HttpServiceContext::setAsynchronousResponse(sl_bool flagAsync)
+{
+	m_flagAsynchronousResponse = flagAsync;
+}
+
+void HttpServiceContext::completeResponse()
+{
+	Ref<HttpServiceConnection> connection = m_connection;
+	if (connection.isNotNull()) {
+		connection->_completeResponse(this);
+		connection.setNull();
+	}
+}
+
 /******************************************************
 	HttpServiceConnection
 ******************************************************/
@@ -186,6 +206,22 @@ Ref<HttpService> HttpServiceConnection::getService()
 Ref<HttpServiceContext> HttpServiceConnection::getCurrentContext()
 {
 	return m_contextCurrent;
+}
+
+void HttpServiceConnection::_read()
+{
+	ObjectLocker lock(this);
+	if (m_flagClosed) {
+		return;
+	}
+	if (m_flagReading) {
+		return;
+	}
+	m_flagReading = sl_true;
+	if (!(m_io->readToMemory(m_bufRead, (WeakRef<HttpServiceConnection>)this))) {
+		m_flagReading = sl_false;
+		close();
+	}
 }
 
 void HttpServiceConnection::_processInput(const void* _data, sl_uint32 size)
@@ -295,33 +331,7 @@ void HttpServiceConnection::_processInput(const void* _data, sl_uint32 size)
 	_read();
 }
 
-void HttpServiceConnection::_read()
-{
-	ObjectLocker lock(this);
-	if (m_flagClosed) {
-		return;
-	}
-	if (m_flagReading) {
-		return;
-	}
-	m_flagReading = sl_true;
-	if (!(m_io->readToMemory(m_bufRead, (WeakRef<HttpServiceConnection>)this))) {
-		m_flagReading = sl_false;
-		close();
-	}
-}
-
-void HttpServiceConnection::onRead(AsyncStream* stream, void* data, sl_uint32 size, const Referable* ref, sl_bool flagError)
-{
-	m_flagReading = sl_false;
-	if (flagError) {
-		close();
-	} else {
-		_processInput(data, size);
-	}
-}
-
-void HttpServiceConnection::_processContext(Ref<HttpServiceContext> context)
+void HttpServiceConnection::_processContext(const Ref<HttpServiceContext>& context)
 {
 	Ref<HttpService> service = getService();
 	if (service.isNull()) {
@@ -330,13 +340,19 @@ void HttpServiceConnection::_processContext(Ref<HttpServiceContext> context)
 	if (context->getMethod() == HttpMethod::CONNECT) {
 		sendConnectResponse_Failed();
 		return;
-	} else {
-		service->processRequest(context.ptr);
-		context->setResponseHeader(HttpHeaders::ContentLength, String::fromUint64(context->getResponseContentLength()));
-		String oldResponseContentType = context->getResponseContentType();
-		if (oldResponseContentType.isEmpty()) {
-			context->setResponseContentType(ContentTypes::TextHtml_Utf8);
-		}
+	}
+	service->processRequest(context.ptr);
+	if (!(context->isAsynchronousResponse())) {
+		context->completeResponse();
+	}
+}
+
+void HttpServiceConnection::_completeResponse(HttpServiceContext* context)
+{
+	context->setResponseHeader(HttpHeaders::ContentLength, String::fromUint64(context->getResponseContentLength()));
+	String oldResponseContentType = context->getResponseContentType();
+	if (oldResponseContentType.isEmpty()) {
+		context->setResponseContentType(ContentTypes::TextHtml_Utf8);
 	}
 	Memory header = context->makeResponsePacket();
 	if (header.isEmpty()) {
@@ -350,6 +366,16 @@ void HttpServiceConnection::_processContext(Ref<HttpServiceContext> context)
 	m_output->mergeBuffer(&(context->m_bufferOutput));
 	m_output->startWriting();
 	start();
+}
+
+void HttpServiceConnection::onRead(AsyncStream* stream, void* data, sl_uint32 size, const Referable* ref, sl_bool flagError)
+{
+	m_flagReading = sl_false;
+	if (flagError) {
+		close();
+	} else {
+		_processInput(data, size);
+	}
 }
 
 void HttpServiceConnection::onAsyncOutputComplete(AsyncOutput* output)
@@ -547,7 +573,7 @@ SLIB_DEFINE_OBJECT(HttpService, Object)
 
 HttpService::HttpService()
 {
-	m_flagRunning = sl_false;
+	m_flagRunning = sl_true;
 }
 
 HttpService::~HttpService()
@@ -595,7 +621,12 @@ void HttpService::release()
 {
 	ObjectLocker lock(this);
 	
+	if (!m_flagRunning) {
+		return;
+	}
+	
 	m_flagRunning = sl_false;
+	
 	{
 		ListLocker< Ref<HttpServiceConnectionProvider> > cp(m_connectionProviders);
 		for (sl_size i = 0; i < cp.count; i++) {
@@ -638,12 +669,12 @@ const HttpServiceParam& HttpService::getParam()
 	return m_param;
 }
 
-sl_bool HttpService::preprocessRequest(HttpServiceContext* context)
+sl_bool HttpService::preprocessRequest(const Ref<HttpServiceContext>& context)
 {
 	return sl_false;
 }
 
-void HttpService::processRequest(HttpServiceContext* context)
+void HttpService::processRequest(const Ref<HttpServiceContext>& context)
 {
 	Ref<HttpServiceConnection> connection = context->getConnection();
 	if (connection.isNull()) {
@@ -701,7 +732,7 @@ void HttpService::processRequest(HttpServiceContext* context)
 	
 }
 
-sl_bool HttpService::processAsset(HttpServiceContext* context, const String& path)
+sl_bool HttpService::processAsset(const Ref<HttpServiceContext>& context, const String& path)
 {
 	if (context->getMethod() != HttpMethod::GET) {
 		return sl_false;
@@ -732,7 +763,7 @@ sl_bool HttpService::processAsset(HttpServiceContext* context, const String& pat
 	return sl_false;
 }
 
-sl_bool HttpService::processFile(HttpServiceContext* context, const String& path)
+sl_bool HttpService::processFile(const Ref<HttpServiceContext>& context, const String& path)
 {
 	if (context->getMethod() != HttpMethod::GET) {
 		return sl_false;
@@ -794,7 +825,7 @@ sl_bool HttpService::processFile(HttpServiceContext* context, const String& path
 	
 }
 
-sl_bool HttpService::processRangeRequest(HttpServiceContext* context, sl_uint64 totalLength, const String& range, sl_uint64& outStart, sl_uint64& outLength)
+sl_bool HttpService::processRangeRequest(const Ref<HttpServiceContext>& context, sl_uint64 totalLength, const String& range, sl_uint64& outStart, sl_uint64& outLength)
 {
 	if (range.getLength() < 2 || !(range.startsWith("bytes="))) {
 		context->setResponseCode(HttpStatus::BadRequest);
@@ -856,7 +887,7 @@ sl_bool HttpService::processRangeRequest(HttpServiceContext* context, sl_uint64 
 	return sl_true;
 }
 
-void HttpService::onPostProcessRequest(HttpServiceContext* context, sl_bool flagProcessed)
+void HttpService::onPostProcessRequest(const Ref<HttpServiceContext>& context, sl_bool flagProcessed)
 {
 	if (m_param.flagAlwaysRespondAcceptRangesHeader) {
 		if (context->getMethod() == HttpMethod::GET) {

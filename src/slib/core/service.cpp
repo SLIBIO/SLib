@@ -34,6 +34,16 @@ Ref<Service> Service::getApp()
 	return Ref<Service>::null();
 }
 
+sl_bool Service::dispatchStartService()
+{
+	return onStartService();
+}
+
+void Service::dispatchStopService()
+{
+	onStopService();
+}
+
 #define PID_FILE (System::getTempDirectory() + "/" + appName + ".pid")
 
 void Service::startService()
@@ -157,13 +167,15 @@ void Service::onRunApp()
 {
 	String appName = getServiceName();
 
-	if (!(onStartService())) {
+	if (!(dispatchStartService())) {
+		dispatchStopService();
 		return;
 	}
 	
 	String pidFileName = PID_FILE;
 	if (!File::writeAllTextUTF8(pidFileName, String::fromUint64(System::getProcessId()))) {
 		SLIB_LOG_ERROR(TAG, "FAILED to create PID file");
+		dispatchStopService();
 		return;
 	}
 
@@ -175,7 +187,7 @@ void Service::onRunApp()
 		}
 	}
 	
-	onStopService();
+	dispatchStopService();
 	
 	File::deleteFile(pidFileName);
 	

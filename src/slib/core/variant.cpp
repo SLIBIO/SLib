@@ -57,6 +57,30 @@ sl_bool CList<Variant>::checkClassType(sl_class_type type) const
 	return _checkClassType(type);
 }
 
+const char _VariantMapList_ClassID[] = "VariantMapList";
+
+template <>
+sl_class_type CList< Map<String, Variant> >::ClassType()
+{
+	return _VariantMapList_ClassID;
+}
+
+template <>
+sl_class_type CList< Map<String, Variant> >::getClassType() const
+{
+	return _VariantMapList_ClassID;
+}
+
+template <>
+sl_bool CList< Map<String, Variant> >::checkClassType(sl_class_type type) const
+{
+	if (type == _VariantMapList_ClassID) {
+		return sl_true;
+	}
+	return _checkClassType(type);
+}
+
+
 SLIB_DEFINE_EXPLICIT_INSTANTIATIONS_FOR_LIST(Variant)
 SLIB_DEFINE_EXPLICIT_INSTANTIATIONS_FOR_MAP(String, Variant)
 SLIB_DEFINE_EXPLICIT_INSTANTIATIONS_FOR_MAP(sl_uint64, Variant)
@@ -541,6 +565,8 @@ sl_int32 Variant::getInt32(sl_int32 def) const
 			return (sl_int32)(REF_VAR(float, _value));
 		case VariantType::Double:
 			return (sl_int32)(REF_VAR(double, _value));
+		case VariantType::Boolean:
+			return (REF_VAR(sl_bool, _value)) ? 1 : 0;
 		case VariantType::String8:
 			return REF_VAR(String8, _value).parseInt32(10, def);
 		case VariantType::String16:
@@ -600,6 +626,8 @@ sl_uint32 Variant::getUint32(sl_uint32 def) const
 			return (sl_uint32)(REF_VAR(float, _value));
 		case VariantType::Double:
 			return (sl_uint32)(REF_VAR(double, _value));
+		case VariantType::Boolean:
+			return (REF_VAR(sl_bool, _value)) ? 1 : 0;
 		case VariantType::String8:
 			return REF_VAR(String8, _value).parseUint32(10, def);
 		case VariantType::String16:
@@ -659,6 +687,8 @@ sl_int64 Variant::getInt64(sl_int64 def) const
 			return (sl_int64)(REF_VAR(float, _value));
 		case VariantType::Double:
 			return (sl_int64)(REF_VAR(double, _value));
+		case VariantType::Boolean:
+			return (REF_VAR(sl_bool, _value)) ? 1 : 0;
 		case VariantType::String8:
 			return (REF_VAR(String8, _value)).parseInt64(10, def);
 		case VariantType::String16:
@@ -718,6 +748,8 @@ sl_uint64 Variant::getUint64(sl_uint64 def) const
 			return (sl_uint64)(REF_VAR(float, _value));
 		case VariantType::Double:
 			return (sl_uint64)(REF_VAR(double, _value));
+		case VariantType::Boolean:
+			return (REF_VAR(sl_bool, _value)) ? 1 : 0;
 		case VariantType::String8:
 			return (REF_VAR(String8, _value)).parseUint64(10, def);
 		case VariantType::String16:
@@ -1241,28 +1273,36 @@ void Variant::setPointer(const void *ptr)
 
 sl_bool Variant::isObject() const
 {
-	return _type == VariantType::Object;
+	return _type == VariantType::Object || _type == VariantType::Weak;
+}
+
+sl_bool Variant::isWeak() const
+{
+	return _type == VariantType::Weak;
 }
 
 Ref<Referable> Variant::getObject() const
 {
 	if (_type == VariantType::Object) {
 		return REF_VAR(Ref<Referable>, _value);
+	} else if (_type == VariantType::Weak) {
+		return REF_VAR(WeakRef<Referable>, _value);
 	}
 	return Ref<Referable>::null();
 }
 
 sl_class_type Variant::getObjectClassType() const
 {
-	if (_type == VariantType::Object) {
-		return REF_VAR(Referable*, _value)->getClassType();
+	Ref<Referable> obj(getObject());
+	if (obj.isNotNull()) {
+		return obj->getClassType();
 	}
 	return 0;
 }
 
 sl_bool Variant::isObjectNotNull() const
 {
-	if (_type == VariantType::Object) {
+	if (_type == VariantType::Object || _type == VariantType::Weak) {
 		return REF_VAR(Ref<Referable>, _value).isNotNull();
 	}
 	return sl_false;
@@ -1270,7 +1310,7 @@ sl_bool Variant::isObjectNotNull() const
 
 sl_bool Variant::isObjectNull() const
 {
-	if (_type == VariantType::Object) {
+	if (_type == VariantType::Object || _type == VariantType::Weak) {
 		return REF_VAR(Ref<Referable>, _value).isNull();
 	}
 	return sl_true;
@@ -1278,19 +1318,15 @@ sl_bool Variant::isObjectNull() const
 
 sl_bool Variant::isMemory() const
 {
-	if (_type == VariantType::Object) {
-		return Memory::checkInstance(REF_VAR(Referable*, _value));
-	}
-	return sl_false;
+	Ref<Referable> obj(getObject());
+	return Memory::checkInstance(obj.ptr);
 }
 
 Memory Variant::getMemory() const
 {
-	if (_type == VariantType::Object) {
-		Referable* ref = REF_VAR(Referable*, _value);
-		if (Memory::checkInstance(ref)) {
-			return (CMemory*)ref;
-		}
+	Ref<Referable> obj(getObject());
+	if (Memory::checkInstance(obj.ptr)) {
+		return (CMemory*)(obj.ptr);
 	}
 	return Memory::null();
 }
@@ -1303,112 +1339,105 @@ void Variant::setMemory(const Memory& mem)
 
 }
 
-sl_bool Variant::isWeak() const
-{
-	return _type == VariantType::Weak;
-}
-
 sl_bool Variant::isVariantList() const
 {
-	if (_type == VariantType::Object) {
-		return List<Variant>::checkInstance(REF_VAR(Referable*, _value));
-	}
-	return sl_false;
+	Ref<Referable> obj(getObject());
+	return CList<Variant>::checkInstance(obj.ptr);
 }
 
 List<Variant> Variant::getVariantList() const
 {
-	if (_type == VariantType::Object) {
-		Referable* ref = REF_VAR(Referable*, _value);
-		if (List<Variant>::checkInstance(ref)) {
-			return (CList<Variant>*)ref;
-		}
+	Ref<Referable> obj(getObject());
+	if (CList<Variant>::checkInstance(obj.ptr)) {
+		return (CList<Variant>*)(obj.ptr);
 	}
 	return List<Variant>::null();
 }
 
 sl_bool Variant::isVariantMap() const
 {
-	if (_type == VariantType::Object) {
-		return Map<String, Variant>::checkInstance(REF_VAR(Referable*, _value));
-	}
-	return sl_false;
+	Ref<Referable> obj(getObject());
+	return IMap<String, Variant>::checkInstance(obj.ptr);
 }
 
 Map<String, Variant> Variant::getVariantMap() const
 {
-	if (_type == VariantType::Object) {
-		Referable* ref = REF_VAR(Referable*, _value);
-		if (Map<String, Variant>::checkInstance(ref)) {
-			return (IMap<String, Variant>*)ref;
-		}
+	Ref<Referable> obj(getObject());
+	if (IMap<String, Variant>::checkInstance(obj.ptr)) {
+		return (IMap<String, Variant>*)(obj.ptr);
 	}
 	return Map<String, Variant>::null();
 }
 
+sl_bool Variant::isVariantMapList() const
+{
+	Ref<Referable> obj(getObject());
+	return CList< Map<String, Variant> >::checkInstance(obj.ptr);
+}
+
+List< Map<String, Variant> > Variant::getVariantMapList() const
+{
+	Ref<Referable> obj(getObject());
+	if (CList< Map<String, Variant> >::checkInstance(obj.ptr)) {
+		return (CList< Map<String, Variant> >*)(obj.ptr);
+	}
+	return List< Map<String, Variant> >::null();
+}
+
 sl_size Variant::getListItemsCount() const
 {
-	if (_type == VariantType::Object) {
-		Referable* ref = REF_VAR(Referable*, _value);
-		if (List<Variant>::checkInstance(ref)) {
-			return ((CList<Variant>*)ref)->getCount();
-		}
+	Ref<Referable> obj(getObject());
+	if (CList<Variant>::checkInstance(obj.ptr)) {
+		return ((CList<Variant>*)(obj.ptr))->getCount();
+	} else if (CList< Map<String, Variant> >::checkInstance(obj.ptr)) {
+		return ((CList< Map<String, Variant> >*)(obj.ptr))->getCount();
 	}
 	return 0;
-	
 }
 
 Variant Variant::getListItem(sl_size index) const
 {
-	if (_type == VariantType::Object) {
-		Referable* ref = REF_VAR(Referable*, _value);
-		if (List<Variant>::checkInstance(ref)) {
-			return ((CList<Variant>*)ref)->getItemValue(index, Variant::null());
-		}
+	Ref<Referable> obj(getObject());
+	if (CList<Variant>::checkInstance(obj.ptr)) {
+		return ((CList<Variant>*)(obj.ptr))->getItemValue(index, Variant::null());
+	} else if (CList< Map<String, Variant> >::checkInstance(obj.ptr)) {
+		return ((CList< Map<String, Variant> >*)(obj.ptr))->getItemValue(index, Map<String, Variant>::null());
 	}
 	return Variant::null();
 }
 
 sl_bool Variant::setListItem(sl_size index, const Variant& value)
 {
-	if (_type == VariantType::Object) {
-		Referable* ref = REF_VAR(Referable*, _value);
-		if (List<Variant>::checkInstance(ref)) {
-			return ((CList<Variant>*)ref)->setItem(index, value);
-		}
+	Ref<Referable> obj(getObject());
+	if (CList<Variant>::checkInstance(obj.ptr)) {
+		return ((CList<Variant>*)(obj.ptr))->setItem(index, value);
 	}
 	return sl_false;
 }
 
 sl_bool Variant::addListItem(const Variant& value)
 {
-	if (_type == VariantType::Object) {
-		Referable* ref = REF_VAR(Referable*, _value);
-		if (List<Variant>::checkInstance(ref)) {
-			return ((CList<Variant>*)ref)->add(value);
-		}
+	Ref<Referable> obj(getObject());
+	if (CList<Variant>::checkInstance(obj.ptr)) {
+		return ((CList<Variant>*)(obj.ptr))->add(value);
 	}
 	return sl_false;
 }
 
 Variant Variant::getField(const String& key) const
 {
-	if (_type == VariantType::Object) {
-		Referable* ref = REF_VAR(Referable*, _value);
-		if (Map<String, Variant>::checkInstance(ref)) {
-			return ((IMap<String, Variant>*)ref)->getValue(key, Variant::null());
-		}
+	Ref<Referable> obj(getObject());
+	if (Map<String, Variant>::checkInstance(obj.ptr)) {
+		return ((IMap<String, Variant>*)(obj.ptr))->getValue(key, Variant::null());
 	}
 	return Variant::null();
 }
 
 sl_bool Variant::putField(const String& key, const Variant& value)
 {
-	if (_type == VariantType::Object) {
-		Referable* ref = REF_VAR(Referable*, _value);
-		if (Map<String, Variant>::checkInstance(ref)) {
-			return ((IMap<String, Variant>*)ref)->put(key, value);
-		}
+	Ref<Referable> obj(getObject());
+	if (Map<String, Variant>::checkInstance(obj.ptr)) {
+		return ((IMap<String, Variant>*)(obj.ptr))->put(key, value);
 	}
 	return sl_false;
 }
@@ -1416,6 +1445,7 @@ sl_bool Variant::putField(const String& key, const Variant& value)
 
 #define _MAX_VAR_STRING_LEN 20000
 static sl_bool _Variant_getVariantMapJsonString(StringBuffer& ret, const Map<String, Variant>& map, sl_bool flagJSON);
+static sl_bool _Variant_getVariantMapListJsonString(StringBuffer& ret, const List< Map<String, Variant> >& list, sl_bool flagJSON);
 static sl_bool _Variant_getVariantListJsonString(StringBuffer& ret, const List<Variant>& list, sl_bool flagJSON)
 {
 	ListLocker<Variant> l(list);
@@ -1425,13 +1455,34 @@ static sl_bool _Variant_getVariantListJsonString(StringBuffer& ret, const List<V
 	if (!(ret.addStatic("[", 1))) {
 		return sl_false;
 	}
-	for (sl_size i = 0; i < n; i++)
-	{
-		String valueText;
+	for (sl_size i = 0; i < n; i++) {
 		Variant& v = lb[i];
-		if (!v.isVariantList() && !v.isVariantMap()) {
+		if (i) {
+			if (!(ret.addStatic(", ", 2))) {
+				return sl_false;
+			}
+		}
+		if (v.isObject()) {
+			Ref<Referable> obj(v.getObject());
+			if (obj.isNotNull()) {
+				if (CList<Variant>::checkInstance(obj.ptr)) {
+					if (!_Variant_getVariantListJsonString(ret, (CList<Variant>*)(obj.ptr), flagJSON)) {
+						return sl_false;
+					}
+				} else if (IMap<String, Variant>::checkInstance(obj.ptr)) {
+					if (!_Variant_getVariantMapJsonString(ret, (IMap<String, Variant>*)(obj.ptr), flagJSON)) {
+						return sl_false;
+					}
+				} else if (CList< Map<String, Variant> >::checkInstance(obj.ptr)) {
+					if (!_Variant_getVariantMapListJsonString(ret, (CList< Map<String, Variant> >*)(obj.ptr), flagJSON)) {
+						return sl_false;
+					}
+				}
+			}
+		} else {
+			String valueText;
 			if (flagJSON) {
-				valueText = v.toJson();
+				valueText = v.toJsonString();
 				if (valueText.isEmpty()) {
 					SLIB_STATIC_STRING(_null, "null");
 					valueText = _null;
@@ -1439,24 +1490,40 @@ static sl_bool _Variant_getVariantListJsonString(StringBuffer& ret, const List<V
 			} else {
 				valueText = v.toString();
 			}
+			if (!(ret.add(valueText))) {
+				return sl_false;
+			}
 		}
+		if (!flagJSON) {
+			if (ret.getLength() > _MAX_VAR_STRING_LEN) {
+				return sl_false;
+			}
+		}
+	}
+	if (!(ret.addStatic("]", 1))) {
+		return sl_false;
+	}
+	return sl_true;
+}
+
+static sl_bool _Variant_getVariantMapListJsonString(StringBuffer& ret, const List< Map<String, Variant> >& list, sl_bool flagJSON)
+{
+	ListLocker< Map<String, Variant> > l(list);
+	sl_size n = l.count;
+	Map<String, Variant>* lb = l.data;
+	
+	if (!(ret.addStatic("[", 1))) {
+		return sl_false;
+	}
+	for (sl_size i = 0; i < n; i++) {
+		Map<String, Variant>& v = lb[i];
 		if (i) {
 			if (!(ret.addStatic(", ", 2))) {
 				return sl_false;
 			}
 		}
-		if (v.isVariantList()) {
-			if (!_Variant_getVariantListJsonString(ret, v.getVariantList(), flagJSON)) {
-				return sl_false;
-			}
-		} else if (v.isVariantMap()) {
-			if (!_Variant_getVariantMapJsonString(ret, v.getVariantMap(), flagJSON)) {
-				return sl_false;
-			}
-		} else {
-			if (!(ret.add(valueText))) {
-				return sl_false;
-			}
+		if (!_Variant_getVariantMapJsonString(ret, v, flagJSON)) {
+			return sl_false;
 		}
 		if (!flagJSON) {
 			if (ret.getLength() > _MAX_VAR_STRING_LEN) {
@@ -1479,19 +1546,7 @@ static sl_bool _Variant_getVariantMapJsonString(StringBuffer& ret, const Map<Str
 	sl_bool flagFirst = sl_true;
 	Pair<String, Variant> pair;
 	while (iterator.next(&pair)) {
-		String valueText;
 		Variant& v = pair.value;
-		if (!v.isVariantList() && !v.isVariantMap()) {
-			if (flagJSON) {
-				valueText = v.toJson();
-				if (valueText.isEmpty()) {
-					SLIB_STATIC_STRING(_null, "null");
-					valueText = _null;
-				}
-			} else {
-				valueText = v.toString();
-			}
-		}
 		if (!flagFirst) {
 			if (!(ret.addStatic(", ", 2))) {
 				return sl_false;
@@ -1509,15 +1564,36 @@ static sl_bool _Variant_getVariantMapJsonString(StringBuffer& ret, const Map<Str
 		if (!(ret.addStatic(": ", 2))) {
 			return sl_false;
 		}
-		if (v.isVariantList()) {
-			if (!_Variant_getVariantListJsonString(ret, v.getVariantList(), flagJSON)) {
-				return sl_false;
-			}
-		} else if (v.isVariantMap()) {
-			if (!_Variant_getVariantMapJsonString(ret, v.getVariantMap(), flagJSON)) {
-				return sl_false;
+		if (v.isObject()) {
+			Ref<Referable> obj(v.getObject());
+			if (obj.isNotNull()) {
+				if (CList<Variant>::checkInstance(obj.ptr)) {
+					if (!_Variant_getVariantListJsonString(ret, (CList<Variant>*)(obj.ptr), flagJSON)) {
+						return sl_false;
+					}
+				} else if (IMap<String, Variant>::checkInstance(obj.ptr)) {
+					if (!_Variant_getVariantMapJsonString(ret, (IMap<String, Variant>*)(obj.ptr), flagJSON)) {
+						return sl_false;
+					}
+				} else if (CList< Map<String, Variant> >::checkInstance(obj.ptr)) {
+					if (!_Variant_getVariantMapListJsonString(ret, (CList< Map<String, Variant> >*)(obj.ptr), flagJSON)) {
+						return sl_false;
+					}
+				}
 			}
 		} else {
+			String valueText;
+			if (!v.isVariantList() && !v.isVariantMap()) {
+				if (flagJSON) {
+					valueText = v.toJsonString();
+					if (valueText.isEmpty()) {
+						SLIB_STATIC_STRING(_null, "null");
+						valueText = _null;
+					}
+				} else {
+					valueText = v.toString();
+				}
+			}
 			if (!(ret.add(valueText))) {
 				return sl_false;
 			}
@@ -1564,29 +1640,41 @@ String Variant::toString() const
 		case VariantType::Pointer:
 			return "#" + String::fromPointerValue(REF_VAR(const void*, _value));
 		case VariantType::Object:
-			if (isVariantList()) {
-				StringBuffer ret;
-				if (!_Variant_getVariantListJsonString(ret, getVariantList(), sl_false)) {
-					ret.addStatic(" ...", 4);
-				}
-				return ret.merge();
-			} else if (isVariantMap()) {
-				StringBuffer ret;
-				if (!_Variant_getVariantMapJsonString(ret, getVariantMap(), sl_false)) {
-					ret.addStatic(" ...", 4);
-				}
-				return ret.merge();
-			} else {
-				return "<object:" + String::fromUtf8(getObjectClassType()) + ">";
-			}
 		case VariantType::Weak:
-			return "<weak-ref>";
+			{
+				Ref<Referable> obj(getObject());
+				if (obj.isNotNull()) {
+					if (CList<Variant>::checkInstance(obj.ptr)) {
+						StringBuffer ret;
+						if (!_Variant_getVariantListJsonString(ret, (CList<Variant>*)(obj.ptr), sl_false)) {
+							ret.addStatic(" ...", 4);
+						}
+						return ret.merge();
+					} else if (IMap<String, Variant>::checkInstance(obj.ptr)) {
+						StringBuffer ret;
+						if (!_Variant_getVariantMapJsonString(ret, (IMap<String, Variant>*)(obj.ptr), sl_false)) {
+							ret.addStatic(" ...", 4);
+						}
+						return ret.merge();
+					} else if (CList< Map<String, Variant> >::checkInstance(obj.ptr)) {
+						StringBuffer ret;
+						if (!_Variant_getVariantMapListJsonString(ret, (CList< Map<String, Variant> >*)(obj.ptr), sl_false)) {
+							ret.addStatic(" ...", 4);
+						}
+						return ret.merge();
+					} else {
+						return "<object:" + String::fromUtf8(obj->getClassType()) + ">";
+					}
+				} else {
+					return "<object:null>";
+				}
+			}
 		default:
 			return "<error-type>";
 	}
 }
 
-String Variant::toJson() const
+String Variant::toJsonString() const
 {
 	switch (_type) {
 		case VariantType::Null:
@@ -1607,20 +1695,36 @@ String Variant::toJson() const
 		case VariantType::Sz16:
 			return getString16(String16::null()).applyBackslashEscapes();
 		case VariantType::Object:
-			if (isVariantList())
+		case VariantType::Weak:
 			{
-				StringBuffer ret;
-				if (!_Variant_getVariantListJsonString(ret, getVariantList(), sl_true)) {
+				Ref<Referable> obj(getObject());
+				if (obj.isNotNull()) {
+					if (CList<Variant>::checkInstance(obj.ptr)) {
+						StringBuffer ret;
+						if (!_Variant_getVariantListJsonString(ret, (CList<Variant>*)(obj.ptr), sl_true)) {
+							return String::null();
+						}
+						return ret.merge();
+					} else if (IMap<String, Variant>::checkInstance(obj.ptr)) {
+						StringBuffer ret;
+						if (!_Variant_getVariantMapJsonString(ret, (IMap<String, Variant>*)(obj.ptr), sl_true)) {
+							return String::null();
+						}
+						return ret.merge();
+					} else if (CList< Map<String, Variant> >::checkInstance(obj.ptr)) {
+						StringBuffer ret;
+						if (!_Variant_getVariantMapListJsonString(ret, (CList< Map<String, Variant> >*)(obj.ptr), sl_false)) {
+							return String::null();
+						}
+						return ret.merge();
+					} else {
+						return String::null();
+					}
+				} else {
 					return String::null();
 				}
-				return ret.merge();
-			} else if (isVariantMap()) {
-				StringBuffer ret;
-				if (!_Variant_getVariantMapJsonString(ret, getVariantMap(), sl_true)) {
-					return String::null();
-				}
-				return ret.merge();
 			}
+			return String::null();
 		default:
 			return String::null();
 	}
@@ -2210,6 +2314,11 @@ sl_bool SafeVariant::isObject() const
 	return _type == VariantType::Object;
 }
 
+sl_bool SafeVariant::isWeak() const
+{
+	return _type == VariantType::Weak;
+}
+
 Ref<Referable> SafeVariant::getObject() const
 {
 	Variant var(*this);
@@ -2253,11 +2362,6 @@ void SafeVariant::setMemory(const Memory& mem)
 	_replace(VariantType::Object, v);
 }
 
-sl_bool SafeVariant::isWeak() const
-{
-	return _type == VariantType::Weak;
-}
-
 sl_bool SafeVariant::isVariantList() const
 {
 	Variant var(*this);
@@ -2280,6 +2384,18 @@ Map<String, Variant> SafeVariant::getVariantMap() const
 {
 	Variant var(*this);
 	return var.getVariantMap();
+}
+
+sl_bool SafeVariant::isVariantMapList() const
+{
+	Variant var(*this);
+	return var.isVariantMap();
+}
+
+List< Map<String, Variant> > SafeVariant::getVariantMapList() const
+{
+	Variant var(*this);
+	return var.getVariantMapList();
 }
 
 sl_size SafeVariant::getListItemsCount() const
@@ -2324,10 +2440,10 @@ String SafeVariant::toString() const
 	return var.toString();
 }
 
-String SafeVariant::toJson() const
+String SafeVariant::toJsonString() const
 {
 	Variant var(*this);
-	return var.toJson();
+	return var.toJsonString();
 }
 
 sl_bool operator==(const Variant& v1, const Variant& v2)

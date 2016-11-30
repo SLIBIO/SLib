@@ -66,7 +66,7 @@ public:
 	
 	void setTilt(float degree);
 
-	const Matrix4& getViewMatrix();
+	const Matrix4lf& getViewMatrix();
 
 	Ref<Animation> getNavigationAnimation();
 	

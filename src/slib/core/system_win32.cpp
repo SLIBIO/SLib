@@ -22,33 +22,48 @@ using namespace Platform;
 
 SLIB_NAMESPACE_BEGIN
 
+#define _PATH_MAX 1024
+
 String System::getApplicationPath()
 {
 #if defined(SLIB_PLATFORM_IS_WIN32)
-	sl_char16 bufAppPath[1024];
-	::GetModuleFileNameW(GetModuleHandle(NULL), (WCHAR*)bufAppPath, 1024);
-	return String::fromUtf16(bufAppPath);
+	sl_char16 bufAppPath[_PATH_MAX] = {0};
+	::GetModuleFileNameW(GetModuleHandle(NULL), (WCHAR*)bufAppPath, _PATH_MAX - 1);
+	return String(bufAppPath);
 #endif
 #if defined(SLIB_PLATFORM_IS_WP8)
-	String ret;
-	ret = String::fromUtf16(ApplicationData::Current->LocalFolder->Path->Data());
-	return ret;
+	return String::fromUtf16(ApplicationData::Current->LocalFolder->Path->Data());
 #endif
 }
 
 String System::getTempDirectory()
 {
 #if defined(SLIB_PLATFORM_IS_WIN32)
-	sl_char16 sz[1024];
-	sl_int32 n = ::GetTempPathW(1024, (LPWSTR)sz);
-	String ret(sz, n);
-	return ret;
+	sl_char16 sz[_PATH_MAX] = {0};
+	sl_int32 n = ::GetTempPathW(_PATH_MAX - 1, (LPWSTR)sz);
+	return String(sz, n);
 #else
 	SLIB_STATIC_STRING(temp, "/temp");
 	String dir = System::getApplicationDirectory() + temp;
 	File::createDirectory(dir);
 	return dir;
 #endif
+}
+
+String System::getCurrentDirectory()
+{
+	sl_char16 path[_PATH_MAX] = { 0 };
+	::GetCurrentDirectoryW(_PATH_MAX - 1, path);
+	return String(path);
+}
+
+sl_bool System::setCurrentDirectory(const String& _dir)
+{
+	String16 dir = _dir;
+	if (::SetCurrentDirectoryW(dir.getData())) {
+		return sl_true;
+	}
+	return sl_false;
 }
 
 sl_uint32 System::getTickCount()

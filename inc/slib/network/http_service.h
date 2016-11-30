@@ -43,6 +43,12 @@ public:
 	
 	const SocketAddress& getRemoteAddress();
 	
+	sl_bool isAsynchronousResponse();
+	
+	void setAsynchronousResponse(sl_bool flagAsync);
+	
+	void completeResponse();
+	
 public:
 	SLIB_BOOLEAN_PROPERTY(ClosingConnection);
 	SLIB_BOOLEAN_PROPERTY(ProcessingByThread);
@@ -53,6 +59,7 @@ protected:
 	sl_uint64 m_requestContentLength;
 	MemoryBuffer m_requestBodyBuffer;
 	SafeMemory m_requestBody;
+	sl_bool m_flagAsynchronousResponse;
 
 private:
 	WeakRef<HttpServiceConnection> m_connection;
@@ -121,7 +128,9 @@ protected:
 	
 	void _processInput(const void* data, sl_uint32 size);
 	
-	void _processContext(Ref<HttpServiceContext> context);
+	void _processContext(const Ref<HttpServiceContext>& context);
+	
+	void _completeResponse(HttpServiceContext* context);
 
 protected:
 	// override
@@ -132,6 +141,8 @@ protected:
 	
 	// override
 	void onAsyncOutputError(AsyncOutput* output);
+	
+	friend class HttpServiceContext;
 	
 };
 
@@ -155,7 +166,7 @@ private:
 class SLIB_EXPORT IHttpServiceProcessor
 {
 public:
-	virtual sl_bool onHttpRequest(HttpServiceContext* context) = 0;
+	virtual sl_bool onHttpRequest(const Ref<HttpServiceContext>& context) = 0;
 };
 
 class SLIB_EXPORT HttpServiceParam
@@ -208,23 +219,23 @@ public:
 
 public:
 	// called before processing body, returns true if the service is trying to process the connection itself.
-	virtual sl_bool preprocessRequest(HttpServiceContext* context);
+	virtual sl_bool preprocessRequest(const Ref<HttpServiceContext>& context);
 	
 	// called after inputing body
-	virtual void processRequest(HttpServiceContext* context);
+	virtual void processRequest(const Ref<HttpServiceContext>& context);
 	
-	virtual sl_bool processAsset(HttpServiceContext* context, const String& path);
+	virtual sl_bool processAsset(const Ref<HttpServiceContext>& context, const String& path);
 	
-	sl_bool processFile(HttpServiceContext* context, const String& path);
+	sl_bool processFile(const Ref<HttpServiceContext>& context, const String& path);
 	
-	sl_bool processRangeRequest(HttpServiceContext* context, sl_uint64 totalLength, const String& range, sl_uint64& outStart, sl_uint64& outLength);
+	sl_bool processRangeRequest(const Ref<HttpServiceContext>& context, sl_uint64 totalLength, const String& range, sl_uint64& outStart, sl_uint64& outLength);
 	
 	virtual Ref<HttpServiceConnection> addConnection(const Ref<AsyncStream>& stream, const SocketAddress& remoteAddress, const SocketAddress& localAddress);
 	
 	virtual void closeConnection(HttpServiceConnection* connection);
 
 protected:
-	virtual void onPostProcessRequest(HttpServiceContext* context, sl_bool flagProcessed);
+	virtual void onPostProcessRequest(const Ref<HttpServiceContext>& context, sl_bool flagProcessed);
 
 public:
 	void addProcessor(const Ptr<IHttpServiceProcessor>& processor);

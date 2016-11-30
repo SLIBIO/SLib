@@ -960,10 +960,13 @@ protected:
 
 protected:
 	void _read();
+	
 	void _processRead(void* data, sl_uint32 size, const Referable* refData, sl_bool flagError);
+	
 	void _processReadEmpty();
 
-	void _processZeroWrite(void* data, sl_uint32 size, Ptr<IAsyncStreamListener> listener, Ref<Referable> ref);
+	void _processZeroWrite(void* data, sl_uint32 size, Ptr<IAsyncStreamListener> listener, const Ref<Referable>& ref);
+	
 	void _closeAllReadRequests();
 
 protected:

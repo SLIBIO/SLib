@@ -39,8 +39,8 @@ public:
 	Memory requestBody;
 	
 	Ptr<IUrlRequestListener> listener;
-	Function<void(UrlRequest*)> onError;
 	Function<void(UrlRequest*)> onComplete;
+	Function<void(UrlRequest*)> onError;
 	Function<void(UrlRequest*, const void*, sl_size)> onReceiveContent;
 	Ref<Dispatcher> dispatcher;
 	
@@ -64,6 +64,14 @@ public:
 	static Ref<UrlRequest> send(const String& url, const UrlRequestParam& param);
 	
 	static Ref<UrlRequest> downloadToFile(const String& filePath, const String& url, const UrlRequestParam& param);
+	
+	static Ref<UrlRequest> sendGet(const String& url, const Function<void(UrlRequest*)>& onComplete);
+	
+	static Ref<UrlRequest> sendGet(const String& url, const Function<void(UrlRequest*)>& onComplete, const Function<void(UrlRequest*)>& onError);
+	
+	static Ref<UrlRequest> sendPost(const String& url, const String& body, const Function<void(UrlRequest*)>& onComplete);
+	
+	static Ref<UrlRequest> sendPost(const String& url, const String& body, const Function<void(UrlRequest*)>& onComplete, const Function<void(UrlRequest*)>& onError);
 	
 public:
 	const String& getUrl();
