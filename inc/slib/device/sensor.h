@@ -5,6 +5,7 @@
 
 #include "../core/object.h"
 #include "../core/pointer.h"
+#include "../core/callback.h"
 #include "../map/geo_location.h"
 
 SLIB_DEVICE_NAMESPACE_BEGIN
@@ -17,9 +18,9 @@ public:
 	virtual void onLocationChanged(Sensor* sensor, const GeoLocation& location);
 
 	// degree, 0 - North, 180 - South, 90 - East, 270 - West
-	virtual void onCompassChanged(Sensor* sensor, sl_real declination);
+	virtual void onCompassChanged(Sensor* sensor, float declination);
 	
-	virtual void onAccelerometerChanged(Sensor* sensor, sl_real xAccel, sl_real yAccel, sl_real zAccel);
+	virtual void onAccelerometerChanged(Sensor* sensor, float xAccel, float yAccel, float zAccel);
 	
 };
 
@@ -43,6 +44,9 @@ public:
 	sl_bool flagAutoStart;
 	
 	Ptr<ISensorListener> listener;
+    Function<void(const GeoLocation& location)> onLocationChanged;
+	Function<void(float declination)> onCompassChanged;
+	Function<void(float xAccel, float yAccel, float zAccel)> onAccelerometerChanged;
 	
 public:
 	SensorParam();
@@ -56,27 +60,73 @@ class SLIB_EXPORT Sensor : public Object
 
 public:
 	static Ref<Sensor> create(const SensorParam& param);
-
+	
+	static sl_bool isAvailableLocation();
+	
+	static sl_bool isAvailableCompass();
+	
+	static sl_bool isAvailableAccelerometer();
+	
+protected:
+	Sensor();
+	
 public:
-	virtual sl_bool start() = 0;
+	sl_bool start();
 	
-	virtual void stop() = 0;
+	void stop();
 	
-	virtual sl_bool isRunning() = 0;
+	sl_bool isRunning();
 
-	virtual sl_bool getLastLocation(GeoLocation& location) = 0;
+	sl_bool isRunningLocation();
 	
-	virtual sl_bool getLastCompassDeclination(sl_real& declination) = 0;
+	sl_bool isRunningCompass();
 	
-	virtual sl_bool getLastAccelerometer(sl_real& xAccel, sl_real& yAccel, sl_real& zAccel) = 0;
+	sl_bool isRunningAccelerometer();
+	
+	sl_bool getLastLocation(GeoLocation& location);
+	
+	sl_bool getLastCompassDeclination(float& declination);
+	
+	sl_bool getLastAccelerometer(float& xAccel, float& yAccel, float& zAccel);
 	
 protected:
+	void _init(const SensorParam& param);
+	
+	virtual sl_bool _start() = 0;
+	
+	virtual void _stop() = 0;
+	
 	void _onLocationChanged(const GeoLocation& location);
-	void _onCompassChanged(sl_real declination);
-	void _onAccelerometerChanged(sl_real xAccel, sl_real yAccel, sl_real zAccel);
+	
+	void _onCompassChanged(float declination);
+	
+	void _onAccelerometerChanged(float xAccel, float yAccel, float zAccel);
 	
 protected:
+	sl_bool m_flagRunning;
+	
+	sl_bool m_flagRunningLocation;
+	sl_bool m_flagRunningCompass;
+	sl_bool m_flagRunningAccelerometer;
+
+	GeoLocation m_lastLocation;
+	sl_bool m_flagValidLocation;
+	
+	float m_lastCompassDeclination;
+	sl_bool m_flagValidCompassDeclination;
+	
+	struct Accelerometer {
+		float xAccel;
+		float yAccel;
+		float zAccel;
+	} m_lastAccelerometer;
+	sl_bool m_flagValidAccerometer;
+	
 	Ptr<ISensorListener> m_listener;
+    Function<void(const GeoLocation& location)> m_onLocationChanged;
+	Function<void(float declination)> m_onCompassChanged;
+	Function<void(float xAccel, float yAccel, float zAccel)> m_onAccelerometerChanged;
+	    
 };
 
 class SLIB_EXPORT SensorLogListener : public Referable, public ISensorListener
@@ -86,10 +136,10 @@ public:
 	void onLocationChanged(Sensor* sensor, const GeoLocation& location);
 
 	// override
-	void onCompassChanged(Sensor* sensor, sl_real declination);
+	void onCompassChanged(Sensor* sensor, float declination);
 	
 	// override
-	void onAccelerometerChanged(Sensor* sensor, sl_real xAccel, sl_real yAccel, sl_real zAccel);
+	void onAccelerometerChanged(Sensor* sensor, float xAccel, float yAccel, float zAccel);
 };
 
 SLIB_DEVICE_NAMESPACE_END

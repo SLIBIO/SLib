@@ -238,6 +238,8 @@
 		AE75B9B21B0F2600004A70EE /* thirdparty_libvpx_dec.c in Sources */ = {isa = PBXBuildFile; fileRef = AE75B9AF1B0F2600004A70EE /* thirdparty_libvpx_dec.c */; settings = {COMPILER_FLAGS = "-O3 -w"; }; };
 		AE75B9B31B0F2600004A70EE /* thirdparty_libvpx_enc.c in Sources */ = {isa = PBXBuildFile; fileRef = AE75B9B01B0F2600004A70EE /* thirdparty_libvpx_enc.c */; settings = {COMPILER_FLAGS = "-O3 -w"; }; };
 		AE75B9B41B0F2600004A70EE /* thirdparty_libvpx.c in Sources */ = {isa = PBXBuildFile; fileRef = AE75B9B11B0F2600004A70EE /* thirdparty_libvpx.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		E1B9F8F31DEC887700BAA9F0 /* vibrator_ios.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1B9F8F21DEC887700BAA9F0 /* vibrator_ios.cpp */; };
+		E1D264BA1DE9B1C800F1D44C /* sensor_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E1D264B91DE9B1C800F1D44C /* sensor_ios.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -493,6 +495,8 @@
 		AE75B9AF1B0F2600004A70EE /* thirdparty_libvpx_dec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_libvpx_dec.c; sourceTree = "<group>"; };
 		AE75B9B01B0F2600004A70EE /* thirdparty_libvpx_enc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_libvpx_enc.c; sourceTree = "<group>"; };
 		AE75B9B11B0F2600004A70EE /* thirdparty_libvpx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_libvpx.c; sourceTree = "<group>"; };
+		E1B9F8F21DEC887700BAA9F0 /* vibrator_ios.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vibrator_ios.cpp; sourceTree = "<group>"; };
+		E1D264B91DE9B1C800F1D44C /* sensor_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = sensor_ios.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -606,7 +610,9 @@
 			isa = PBXGroup;
 			children = (
 				26C0A34D1C128D80005690FE /* sensor.cpp */,
+				E1D264B91DE9B1C800F1D44C /* sensor_ios.mm */,
 				26C0A34F1C128D80005690FE /* vibrator.cpp */,
+				E1B9F8F21DEC887700BAA9F0 /* vibrator_ios.cpp */,
 			);
 			path = device;
 			sourceTree = "<group>";
@@ -947,6 +953,7 @@
 				A25F2F861B039EF600854DAF /* ui_core_ios.mm in Sources */,
 				266DD3E01C1181B500D47AB0 /* net_capture.cpp in Sources */,
 				A25F2F891B039EF600854DAF /* ui_event.cpp in Sources */,
+				E1D264BA1DE9B1C800F1D44C /* sensor_ios.mm in Sources */,
 				269394CC1D7609EB002B9B03 /* list_report_view.cpp in Sources */,
 				A25F2F501B039EF600854DAF /* setting.cpp in Sources */,
 				266DD3741C1171E400D47AB0 /* audio_recorder_dsound.cpp in Sources */,
@@ -969,6 +976,7 @@
 				2631B7821DDB14F200729A87 /* url_request_apple.mm in Sources */,
 				26C0A3581C133969005690FE /* bitmap_format.cpp in Sources */,
 				269222311DC12F600055095F /* image_stb.cpp in Sources */,
+				E1B9F8F31DEC887700BAA9F0 /* vibrator_ios.cpp in Sources */,
 				A25F2F581B039EF600854DAF /* time.cpp in Sources */,
 				A2498C761AFA9C3200C76201 /* thirdparty_freetype.c in Sources */,
 				266DD3A01C117AE300D47AB0 /* drawable.cpp in Sources */,

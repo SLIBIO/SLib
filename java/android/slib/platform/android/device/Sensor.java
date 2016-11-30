@@ -39,12 +39,36 @@ public class Sensor {
 		
 		mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
 		mLocationManager = (LocationManager) context.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-		
+
 		locationTracker = new LocationTracker();
 		compass = new Compass();
 		acceleromter = new Accelerometer();
 	}
-	
+
+	public static boolean isAvailableLocation(Activity context) {
+		LocationManager locationManager = (LocationManager) context.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+		if (locationManager != null || locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean isAvailableCompass(Activity context) {
+		SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+		if (sensorManager.getDefaultSensor(android.hardware.Sensor.TYPE_ACCELEROMETER) != null) {
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean isAvailableAccelerometer(Activity context) {
+		SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+		if (sensorManager.getDefaultSensor(android.hardware.Sensor.TYPE_MAGNETIC_FIELD) != null) {
+			return true;
+		}
+		return false;
+	}
+
 	public static Sensor create(Activity context, boolean flagUseLocation, int locationProviderType, boolean flagUseCompass, boolean flagUseAccelerometer) {
 		try {
 			Logger.info("Sensor Info");
@@ -114,7 +138,7 @@ public class Sensor {
 		return output + ALPHA * (input - output);
 	}
 
-	private static native void nativeOnChangeLocation(long instance, float latitude, float longitude, float altitude);
+	private static native void nativeOnChangeLocation(long instance, double latitude, double longitude, double altitude);
 	private static native void nativeOnChangeCompass(long instance, float declination);
 	private static native void nativeOnChangeAccelerometer(long instance, float xAccel, float yAccel, float zAccel);
 
@@ -211,9 +235,9 @@ public class Sensor {
 						if (curTime - lastLocationCommit > 10 * 1000) {
 							nativeOnChangeLocation(
 									mInstance
-									, (float)(location.getLatitude())
-									, (float)(location.getLongitude())
-									, (float)(location.getAltitude()));
+									, (double)(location.getLatitude())
+									, (double)(location.getLongitude())
+									, (double)(location.getAltitude()));
 							lastLocationCommit = curTime;
 						}
 					} catch (Throwable e) {
@@ -237,20 +261,20 @@ public class Sensor {
 			if (!isLocationEnabled()) {
 				//openSettings(mContext);
 				return false;
-			}
+		}
 			lastLocation = mLocationManager.getLastKnownLocation(providerName);
 
 			if (lastLocation != null) {
 				nativeOnChangeLocation(
 						mInstance
-						, (float)(lastLocation.getLatitude())
-						, (float)(lastLocation.getLongitude())
-						, (float)(lastLocation.getAltitude()));
+						, (lastLocation.getLatitude())
+						, (lastLocation.getLongitude())
+						, (lastLocation.getAltitude()));
 			}
 			mContext.runOnUiThread(new Runnable() {
 				public void run() {
 					try {
-						mLocationManager.requestLocationUpdates(providerName, LOCATION_REFRESH_INTERVAL, 0, listener);					
+						mLocationManager.requestLocationUpdates(providerName, LOCATION_REFRESH_INTERVAL, 0, listener);
 					} catch (Exception e) {
 						Logger.exception(e);
 					}
