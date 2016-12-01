@@ -18,8 +18,6 @@ class SLIB_EXPORT IUrlRequestListener
 public:
 	virtual void onComplete(UrlRequest* request);
 	
-	virtual void onError(UrlRequest* request);
-	
 	virtual void onResponse(UrlRequest* request, HttpStatus status);
 	
 	virtual void onReceiveContent(UrlRequest* request, const void* data, sl_size len);
@@ -40,7 +38,6 @@ public:
 	
 	Ptr<IUrlRequestListener> listener;
 	Function<void(UrlRequest*)> onComplete;
-	Function<void(UrlRequest*)> onError;
 	Function<void(UrlRequest*, const void*, sl_size)> onReceiveContent;
 	Ref<Dispatcher> dispatcher;
 	
@@ -67,11 +64,7 @@ public:
 	
 	static Ref<UrlRequest> sendGet(const String& url, const Function<void(UrlRequest*)>& onComplete);
 	
-	static Ref<UrlRequest> sendGet(const String& url, const Function<void(UrlRequest*)>& onComplete, const Function<void(UrlRequest*)>& onError);
-	
-	static Ref<UrlRequest> sendPost(const String& url, const String& body, const Function<void(UrlRequest*)>& onComplete);
-	
-	static Ref<UrlRequest> sendPost(const String& url, const String& body, const Function<void(UrlRequest*)>& onComplete, const Function<void(UrlRequest*)>& onError);
+	static Ref<UrlRequest> sendPost(const String& url, const Variant& body, const Function<void(UrlRequest*)>& onComplete);
 	
 public:
 	const String& getUrl();
@@ -112,8 +105,6 @@ public:
 	
 	const Function<void(UrlRequest*)>& getOnComplete();
 	
-	const Function<void(UrlRequest*)>& getOnError();
-
 	const Function<void(UrlRequest*, const void*, sl_size)>& getOnReceiveContent();
 	
 	const Ref<Dispatcher>& getDispatcher();
@@ -175,7 +166,6 @@ protected:
 	
 	Ptr<IUrlRequestListener> m_listener;
 	Function<void(UrlRequest*)> m_onComplete;
-	Function<void(UrlRequest*)> m_onError;
 	Function<void(UrlRequest*, const void*, sl_size)> m_onReceiveContent;
 	Ref<Dispatcher> m_dispatcher;
 	sl_bool m_flagUseBackgroundSession;

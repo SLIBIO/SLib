@@ -188,6 +188,11 @@ Variant::~Variant()
 	_Variant_free(_type, _value);
 }
 
+Variant::Variant(sl_null_t)
+: _type(VariantType::Null)
+{
+}
+
 Variant::Variant(sl_int32 value)
 {
 	_type = VariantType::Int32;
@@ -1759,6 +1764,11 @@ SafeVariant::SafeVariant(const Variant& other)
 SafeVariant::~SafeVariant()
 {
 	_Variant_free(_type, _value);
+}
+
+SafeVariant::SafeVariant(sl_null_t)
+: _type(VariantType::Null)
+{
 }
 
 SafeVariant::SafeVariant(sl_int32 value)

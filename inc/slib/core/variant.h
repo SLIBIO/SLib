@@ -62,6 +62,8 @@ public:
 	~Variant();
 	
 public:
+	Variant(sl_null_t);
+	
 	Variant(sl_int32 value);
 	
 	Variant(sl_uint32 value);
@@ -480,6 +482,8 @@ public:
 	~SafeVariant();
 	
 public:
+	SafeVariant(sl_null_t);
+	
 	SafeVariant(sl_int32 value);
 	
 	SafeVariant(sl_uint32 value);

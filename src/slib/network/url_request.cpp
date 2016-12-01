@@ -8,10 +8,6 @@ void IUrlRequestListener::onComplete(UrlRequest *request)
 {
 }
 
-void IUrlRequestListener::onError(UrlRequest* request)
-{
-}
-
 void IUrlRequestListener::onResponse(UrlRequest* request, HttpStatus status)
 {
 }
@@ -83,31 +79,29 @@ Ref<UrlRequest> UrlRequest::sendGet(const String& url, const Function<void(UrlRe
 	return send(url, rp);
 }
 
-Ref<UrlRequest> UrlRequest::sendGet(const String& url, const Function<void(UrlRequest*)>& onComplete, const Function<void(UrlRequest*)>& onError)
+Ref<UrlRequest> UrlRequest::sendPost(const String& url, const Variant& varBody, const Function<void(UrlRequest*)>& onComplete)
 {
-	UrlRequestParam rp;
-	rp.method = HttpMethod::GET;
-	rp.onComplete = onComplete;
-	rp.onError = onError;
-	return send(url, rp);
-}
-
-Ref<UrlRequest> UrlRequest::sendPost(const String& url, const String& body, const Function<void(UrlRequest*)>& onComplete)
-{
+	Memory body;
+	if (varBody.isNotNull()) {
+		if (varBody.isObject()) {
+			Ref<Referable> obj = varBody.getObject();
+			if (obj.isNotNull()) {
+				if (IMap<String, Variant>::checkInstance(obj.ptr)) {
+					body = varBody.toJsonString().toMemory();
+				} else if (XmlDocument::checkInstance(obj.ptr)) {
+					body = ((XmlDocument*)(obj.ptr))->toString().toMemory();
+				} else if (CMemory::checkInstance(obj.ptr)) {
+					body = (CMemory*)(obj.ptr);
+				}
+			}
+		} else {
+			body = varBody.getString().toMemory();
+		}
+	}
 	UrlRequestParam rp;
 	rp.method = HttpMethod::POST;
-	rp.requestBody = body.toMemory();
+	rp.requestBody = body;
 	rp.onComplete = onComplete;
-	return send(url, rp);
-}
-
-Ref<UrlRequest> UrlRequest::sendPost(const String& url, const String& body, const Function<void(UrlRequest*)>& onComplete, const Function<void(UrlRequest*)>& onError)
-{
-	UrlRequestParam rp;
-	rp.method = HttpMethod::POST;
-	rp.requestBody = body.toMemory();
-	rp.onComplete = onComplete;
-	rp.onError = onError;
 	return send(url, rp);
 }
 
@@ -200,11 +194,6 @@ const Function<void(UrlRequest*)>& UrlRequest::getOnComplete()
 	return m_onComplete;
 }
 
-const Function<void(UrlRequest*)>& UrlRequest::getOnError()
-{
-	return m_onError;
-}
-
 const Function<void(UrlRequest*, const void*, sl_size)>& UrlRequest::getOnReceiveContent()
 {
 	return m_onReceiveContent;
@@ -279,11 +268,6 @@ void UrlRequest::_init(const UrlRequestParam& param, const String& url, const St
 	
 	m_listener = param.listener;
 	m_onComplete = param.onComplete;
-	if (param.onError.isNotNull()) {
-		m_onError = param.onError;
-	} else {
-		m_onError = param.onComplete;
-	}
 	m_onReceiveContent = param.onReceiveContent;
 	m_dispatcher = param.dispatcher;
 	m_flagUseBackgroundSession = param.flagUseBackgroundSession;
@@ -332,22 +316,7 @@ void UrlRequest::onComplete()
 void UrlRequest::onError()
 {
 	m_flagError = sl_true;
-	if (m_flagClosed) {
-		return;
-	}
-	m_flagClosed = sl_true;
-	PtrLocker<IUrlRequestListener> listener(m_listener);
-	if (listener.isNotNull()) {
-		listener->onError(this);
-	}
-	if (m_onError.isNotNull()) {
-		if (m_dispatcher.isNotNull()) {
-			m_dispatcher->dispatch(SLIB_CALLBACK_REF(UrlRequest, _runCallback, this, m_onError));
-		} else {
-			m_onError(this);
-		}
-	}
-	_removeFromMap();
+	onComplete();
 }
 
 void UrlRequest::onResponse()
