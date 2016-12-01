@@ -32,6 +32,7 @@ class SLIB_EXPORT UrlRequestParam
 {
 public:
 	HttpMethod method;
+	Map<String, Variant> parameters;
 	Map<String, String> requestHeaders;
 	Map<String, String> additionalRequestHeaders;
 	Memory requestBody;
@@ -64,7 +65,11 @@ public:
 	
 	static Ref<UrlRequest> sendGet(const String& url, const Function<void(UrlRequest*)>& onComplete);
 	
+	static Ref<UrlRequest> sendGet(const String& url, const Map<String, Variant>& params, const Function<void(UrlRequest*)>& onComplete);
+	
 	static Ref<UrlRequest> sendPost(const String& url, const Variant& body, const Function<void(UrlRequest*)>& onComplete);
+	
+	static Ref<UrlRequest> sendPost(const String& url, const Map<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete);
 	
 public:
 	const String& getUrl();
@@ -128,13 +133,15 @@ public:
 	sl_bool isError();
 	
 protected:
+	static Ref<UrlRequest> _send(const UrlRequestParam& param, const String& url, const String& downloadFilePath);
+	
 	static Ref<UrlRequest> _create(const UrlRequestParam& param, const String& url, const String& downloadFilePath);
 	
 	void _init(const UrlRequestParam& param, const String& url, const String& downloadFilePath);
 	
 	void _removeFromMap();
 	
-	virtual void _cancel() = 0;
+	virtual void _cancel();
 	
 	void onComplete();
 	
@@ -149,6 +156,12 @@ protected:
 	void onUploadBody(sl_uint64 size);
 
 	void _runCallback(const Function<void(UrlRequest*)>& callback);
+	
+	static void _onCreateError(const UrlRequestParam& param, const String& url, const String& downloadFilePath);
+	
+	static String _buildParameters(const Map<String, Variant>& params);
+	
+	static Memory _buildRequestBody(const Variant& varBody);
 	
 protected:
 	String m_url;

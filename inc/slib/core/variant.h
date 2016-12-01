@@ -80,9 +80,9 @@ public:
 	
 	Variant(const String8& value);
 	
-	Variant(const SafeString8& value);
-	
 	Variant(const String16& value);
+	
+	Variant(const SafeString8& value);
 	
 	Variant(const SafeString16& value);
 	
@@ -196,6 +196,8 @@ public:
 	Variant& operator=(SafeVariant&& other);
 	
 	Variant& operator=(const SafeVariant& other);
+	
+	Variant& operator=(sl_null_t);
 	
 	Variant& operator=(sl_int32 value);
 	
@@ -499,10 +501,10 @@ public:
 	SafeVariant(const sl_bool value);
 	
 	SafeVariant(const String8& value);
-	
-	SafeVariant(const SafeString8& value);
 
 	SafeVariant(const String16& value);
+	
+	SafeVariant(const SafeString8& value);
 	
 	SafeVariant(const SafeString16& value);
 	
@@ -559,6 +561,8 @@ public:
 	SafeVariant& operator=(Variant&& other);
 	
 	SafeVariant& operator=(const Variant& other);
+	
+	SafeVariant& operator=(sl_null_t);
 	
 	SafeVariant& operator=(sl_int32 value);
 	
@@ -885,71 +889,116 @@ SLIB_INLINE Variant::Variant() : _type(VariantType::Null)
 template <class T>
 Variant::Variant(const Ref<T>& ref)
 {
-	_type = VariantType::Object;
-	new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+	if (ref.isNotNull()) {
+		_type = VariantType::Object;
+		new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class T>
-Variant::Variant(const SafeRef<T>& ref)
+Variant::Variant(const SafeRef<T>& _ref)
 {
-	_type = VariantType::Object;
-	new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+	Ref<T> ref(_ref);
+	if (ref.isNotNull()) {
+		_type = VariantType::Object;
+		new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class T>
 Variant::Variant(const WeakRef<T>& weak)
 {
-	_type = VariantType::Weak;
-	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+	if (weak.isNotNull()) {
+		_type = VariantType::Weak;
+		new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class T>
-Variant::Variant(const SafeWeakRef<T>& weak)
+Variant::Variant(const SafeWeakRef<T>& _weak)
 {
-	_type = VariantType::Weak;
-	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+	Ref<T> weak(_weak);
+	if (weak.isNotNull()) {
+		_type = VariantType::Weak;
+		new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class T, class COMPARE>
 Variant::Variant(const Array<T, COMPARE>& object)
 {
-	_type = VariantType::Object;
-	new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+	if (object.isNotNull()) {
+		_type = VariantType::Object;
+		new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class T, class COMPARE>
-Variant::Variant(const SafeArray<T, COMPARE>& object)
+Variant::Variant(const SafeArray<T, COMPARE>& _object)
 {
-	_type = VariantType::Object;
-	new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+	Array<T, COMPARE> object(_object);
+	if (object.isNotNull()) {
+		_type = VariantType::Object;
+		new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class T, class COMPARE>
 Variant::Variant(const List<T, COMPARE>& object)
 {
-	_type = VariantType::Object;
-	new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+	if (object.isNotNull()) {
+		_type = VariantType::Object;
+		new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class T, class COMPARE>
-Variant::Variant(const SafeList<T, COMPARE>& object)
+Variant::Variant(const SafeList<T, COMPARE>& _object)
 {
-	_type = VariantType::Object;
-	new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+	List<T, COMPARE> object(_object);
+	if (object.isNotNull()) {
+		_type = VariantType::Object;
+		new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class KT, class VT>
 Variant::Variant(const Map<KT, VT>& object)
 {
-	_type = VariantType::Object;
-	new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+	if (object.isNotNull()) {
+		_type = VariantType::Object;
+		new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class KT, class VT>
-Variant::Variant(const SafeMap<KT, VT>& object)
+Variant::Variant(const SafeMap<KT, VT>& _object)
 {
-	_type = VariantType::Object;
-	new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+	Map<KT, VT> object(_object);
+	if (object.isNotNull()) {
+		_type = VariantType::Object;
+		new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 SLIB_INLINE const Variant& Variant::null()
@@ -1087,16 +1136,24 @@ template <class T>
 void Variant::setObject(const Ref<T>& ref)
 {
 	_free(_type, _value);
-	_type = VariantType::Object;
-	new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+	if (ref.isNotNull()) {
+		_type = VariantType::Object;
+		new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class T>
 void Variant::setWeak(const WeakRef<T>& weak)
 {
 	_free(_type, _value);
-	_type = VariantType::Weak;
-	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+	if (weak.isNotNull()) {
+		_type = VariantType::Weak;
+		new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class TYPE, class COMPARE>
@@ -1113,8 +1170,12 @@ template <class T, class COMPARE>
 void Variant::setArray(const Array<T, COMPARE>& object)
 {
 	_free(_type, _value);
-	_type = VariantType::Object;
-	new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+	if (object.isNotNull()) {
+		_type = VariantType::Object;
+		new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class TYPE, class COMPARE>
@@ -1131,8 +1192,12 @@ template <class T, class COMPARE>
 void Variant::setList(const List<T, COMPARE>& object)
 {
 	_free(_type, _value);
-	_type = VariantType::Object;
-	new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+	if (object.isNotNull()) {
+		_type = VariantType::Object;
+		new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class KT, class VT>
@@ -1149,8 +1214,12 @@ template <class KT, class VT>
 void Variant::setMap(const Map<KT, VT>& object)
 {
 	_free(_type, _value);
-	_type = VariantType::Object;
-	new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+	if (object.isNotNull()) {
+		_type = VariantType::Object;
+		new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 
@@ -1161,71 +1230,116 @@ SLIB_INLINE SafeVariant::SafeVariant() : _type(VariantType::Null)
 template <class T>
 SafeVariant::SafeVariant(const Ref<T>& ref)
 {
-	_type = VariantType::Object;
-	new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+	if (ref.isNotNull()) {
+		_type = VariantType::Object;
+		new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class T>
-SafeVariant::SafeVariant(const SafeRef<T>& ref)
+SafeVariant::SafeVariant(const SafeRef<T>& _ref)
 {
-	_type = VariantType::Object;
-	new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+	Ref<T> ref(_ref);
+	if (ref.isNotNull()) {
+		_type = VariantType::Object;
+		new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class T>
 SafeVariant::SafeVariant(const WeakRef<T>& weak)
 {
-	_type = VariantType::Weak;
-	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+	if (weak.isNotNull()) {
+		_type = VariantType::Weak;
+		new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class T>
-SafeVariant::SafeVariant(const SafeWeakRef<T>& weak)
+SafeVariant::SafeVariant(const SafeWeakRef<T>& _weak)
 {
-	_type = VariantType::Weak;
-	new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+	WeakRef<T> weak(_weak);
+	if (weak.isNotNull()) {
+		_type = VariantType::Weak;
+		new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class T, class COMPARE>
 SafeVariant::SafeVariant(const Array<T, COMPARE>& object)
 {
-	_type = VariantType::Object;
-	new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+	if (object.isNotNull()) {
+		_type = VariantType::Object;
+		new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class T, class COMPARE>
-SafeVariant::SafeVariant(const SafeArray<T, COMPARE>& object)
+SafeVariant::SafeVariant(const SafeArray<T, COMPARE>& _object)
 {
-	_type = VariantType::Object;
-	new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+	Array<T, COMPARE> object(_object);
+	if (object.isNotNull()) {
+		_type = VariantType::Object;
+		new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class T, class COMPARE>
 SafeVariant::SafeVariant(const List<T, COMPARE>& object)
 {
-	_type = VariantType::Object;
-	new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+	if (object.isNotNull()) {
+		_type = VariantType::Object;
+		new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class T, class COMPARE>
-SafeVariant::SafeVariant(const SafeList<T, COMPARE>& object)
+SafeVariant::SafeVariant(const SafeList<T, COMPARE>& _object)
 {
-	_type = VariantType::Object;
-	new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+	List<T, COMPARE> object(_object);
+	if (object.isNotNull()) {
+		_type = VariantType::Object;
+		new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class KT, class VT>
 SafeVariant::SafeVariant(const Map<KT, VT>& object)
 {
-	_type = VariantType::Object;
-	new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+	if (object.isNotNull()) {
+		_type = VariantType::Object;
+		new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 template <class KT, class VT>
-SafeVariant::SafeVariant(const SafeMap<KT, VT>& object)
+SafeVariant::SafeVariant(const SafeMap<KT, VT>& _object)
 {
-	_type = VariantType::Object;
-	new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+	Map<KT, VT> object(_object);
+	if (object.isNotNull()) {
+		_type = VariantType::Object;
+		new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 SLIB_INLINE const SafeVariant& SafeVariant::null()
@@ -1328,17 +1442,25 @@ Ref<T> SafeVariant::getObject(const Ref<T>& def) const
 template <class T>
 void SafeVariant::setObject(const Ref<T>& object)
 {
-	sl_int64 v;
-	new ((Ref<T>*)(void*)(&v)) Ref<T>(object);
-	_replace(VariantType::Object, v);
+	if (object.isNotNull()) {
+		sl_int64 v;
+		new ((Ref<T>*)(void*)(&v)) Ref<T>(object);
+		_replace(VariantType::Object, v);
+	} else {
+		_replace(VariantType::Null, 0);
+	}
 }
 
 template <class T>
 void SafeVariant::setWeak(const WeakRef<T>& weak)
 {
-	sl_int64 v;
-	new ((WeakRef<T>*)(void*)(&v)) WeakRef<T>(weak);
-	_replace(VariantType::Weak, v);
+	if (weak.isNotNull()) {
+		sl_int64 v;
+		new ((WeakRef<T>*)(void*)(&v)) WeakRef<T>(weak);
+		_replace(VariantType::Weak, v);
+	} else {
+		_replace(VariantType::Null, 0);
+	}
 }
 
 template <class TYPE, class COMPARE>
@@ -1351,9 +1473,13 @@ Array<TYPE, COMPARE> SafeVariant::getArray(const Array<TYPE, COMPARE>& def) cons
 template <class TYPE, class COMPARE>
 void SafeVariant::setArray(const Array<TYPE, COMPARE>& object)
 {
-	sl_int64 v;
-	new ((Array<TYPE, COMPARE>*)(void*)(&v)) Array<TYPE, COMPARE>(object);
-	_replace(VariantType::Object, v);
+	if (object.isNotNull()) {
+		sl_int64 v;
+		new ((Array<TYPE, COMPARE>*)(void*)(&v)) Array<TYPE, COMPARE>(object);
+		_replace(VariantType::Object, v);
+	} else {
+		_replace(VariantType::Null, 0);
+	}
 }
 
 template <class TYPE, class COMPARE>
@@ -1366,9 +1492,13 @@ List<TYPE, COMPARE> SafeVariant::getList(const List<TYPE, COMPARE>& def) const
 template <class TYPE, class COMPARE>
 void SafeVariant::setList(const List<TYPE, COMPARE>& object)
 {
-	sl_int64 v;
-	new ((List<TYPE, COMPARE>*)(void*)(&v)) List<TYPE, COMPARE>(object);
-	_replace(VariantType::Object, v);
+	if (object.isNotNull()) {
+		sl_int64 v;
+		new ((List<TYPE, COMPARE>*)(void*)(&v)) List<TYPE, COMPARE>(object);
+		_replace(VariantType::Object, v);
+	} else {
+		_replace(VariantType::Null, 0);
+	}
 }
 
 template <class KT, class VT>
@@ -1381,9 +1511,13 @@ Map<KT, VT> SafeVariant::getMap(const Map<KT, VT>& def) const
 template <class KT, class VT>
 void SafeVariant::setMap(const Map<KT, VT>& object)
 {
-	sl_int64 v;
-	new ((Map<KT, VT>*)(void*)(&v)) Map<KT, VT>(object);
-	_replace(VariantType::Object, v);
+	if (object.isNotNull()) {
+		sl_int64 v;
+		new ((Map<KT, VT>*)(void*)(&v)) Map<KT, VT>(object);
+		_replace(VariantType::Object, v);
+	} else {
+		_replace(VariantType::Null, 0);
+	}
 }
 
 SLIB_NAMESPACE_END

@@ -1,6 +1,8 @@
 #include "../../../inc/slib/network/url_request.h"
 
+#include "../../../inc/slib/network/url.h"
 #include "../../../inc/slib/core/json.h"
+#include "../../../inc/slib/core/log.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
@@ -51,24 +53,12 @@ UrlRequest::UrlRequest()
 
 Ref<UrlRequest> UrlRequest::send(const String& url, const UrlRequestParam& param)
 {
-	if (url.isNotEmpty()) {
-		Ref<UrlRequest> request = _create(param, url, String::null());
-		if (request.isNotNull()) {
-			return request;
-		}
-	}
-	return Ref<UrlRequest>::null();
+	return _send(param, url, String::null());
 }
 
 Ref<UrlRequest> UrlRequest::downloadToFile(const String& filePath, const String& url, const UrlRequestParam& param)
 {
-	if (url.isNotEmpty()) {
-		Ref<UrlRequest> request = _create(param, url, filePath);
-		if (request.isNotNull()) {
-			return request;
-		}
-	}
-	return Ref<UrlRequest>::null();
+	return _send(param, url, filePath);
 }
 
 Ref<UrlRequest> UrlRequest::sendGet(const String& url, const Function<void(UrlRequest*)>& onComplete)
@@ -79,28 +69,30 @@ Ref<UrlRequest> UrlRequest::sendGet(const String& url, const Function<void(UrlRe
 	return send(url, rp);
 }
 
-Ref<UrlRequest> UrlRequest::sendPost(const String& url, const Variant& varBody, const Function<void(UrlRequest*)>& onComplete)
+Ref<UrlRequest> UrlRequest::sendGet(const String& url, const Map<String, Variant>& params, const Function<void(UrlRequest*)>& onComplete)
 {
-	Memory body;
-	if (varBody.isNotNull()) {
-		if (varBody.isObject()) {
-			Ref<Referable> obj = varBody.getObject();
-			if (obj.isNotNull()) {
-				if (IMap<String, Variant>::checkInstance(obj.ptr)) {
-					body = varBody.toJsonString().toMemory();
-				} else if (XmlDocument::checkInstance(obj.ptr)) {
-					body = ((XmlDocument*)(obj.ptr))->toString().toMemory();
-				} else if (CMemory::checkInstance(obj.ptr)) {
-					body = (CMemory*)(obj.ptr);
-				}
-			}
-		} else {
-			body = varBody.getString().toMemory();
-		}
-	}
+	UrlRequestParam rp;
+	rp.method = HttpMethod::GET;
+	rp.parameters = params;
+	rp.onComplete = onComplete;
+	return send(url, rp);
+}
+
+Ref<UrlRequest> UrlRequest::sendPost(const String& url, const Variant& body, const Function<void(UrlRequest*)>& onComplete)
+{
 	UrlRequestParam rp;
 	rp.method = HttpMethod::POST;
-	rp.requestBody = body;
+	rp.requestBody = _buildRequestBody(body);
+	rp.onComplete = onComplete;
+	return send(url, rp);
+}
+
+Ref<UrlRequest> UrlRequest::sendPost(const String& url, const Map<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete)
+{
+	UrlRequestParam rp;
+	rp.method = HttpMethod::POST;
+	rp.parameters = params;
+	rp.requestBody = _buildRequestBody(body);
 	rp.onComplete = onComplete;
 	return send(url, rp);
 }
@@ -256,6 +248,22 @@ sl_bool UrlRequest::isError()
 	return m_flagError;
 }
 
+Ref<UrlRequest> UrlRequest::_send(const UrlRequestParam& param, const String& _url, const String& downloadFilePath)
+{
+	String url = _url;
+	if (url.isNotEmpty()) {
+		if (param.parameters.isNotEmpty()) {
+			url += _buildParameters(param.parameters);
+		}
+		Ref<UrlRequest> request = _create(param, url, String::null());
+		if (request.isNotNull()) {
+			return request;
+		}
+	}
+	_onCreateError(param, url, String::null());
+	return Ref<UrlRequest>::null();
+}
+
 void UrlRequest::_init(const UrlRequestParam& param, const String& url, const String& downloadFilePath)
 {
 	m_url = url;
@@ -291,6 +299,10 @@ void UrlRequest::_removeFromMap()
 			map->remove(this);
 		}
 	}
+}
+
+void UrlRequest::_cancel()
+{
 }
 
 void UrlRequest::onComplete()
@@ -381,5 +393,56 @@ void UrlRequest::_runCallback(const Function<void(UrlRequest*)>& callback)
 {
 	callback(this);
 }
+
+void UrlRequest::_onCreateError(const UrlRequestParam& param, const String& url, const String& downloadFilePath)
+{
+	Ref<UrlRequest> req = new UrlRequest;
+	if (req.isNotNull()) {
+		SLIB_LOG_ERROR("UrlRequest", String::format("Failed to create request on %s", url));
+		req->_init(param, url, downloadFilePath);
+		req->onError();
+	}
+}
+
+
+String UrlRequest::_buildParameters(const Map<String, Variant>& params)
+{
+	StringBuffer sb;
+	sb.addStatic("?", 1);
+	sl_bool flagFirst = sl_true;
+	for (auto pair : params) {
+		if (!flagFirst) {
+			sb.addStatic("&", 1);
+		}
+		flagFirst = sl_false;
+		sb.add(pair.key);
+		sb.addStatic("=", 1);
+		sb.add(Url::encodeUriComponentByUTF8(pair.value.getString()));
+	}
+	return sb.merge();
+}
+
+Memory UrlRequest::_buildRequestBody(const Variant& varBody)
+{
+	Memory body;
+	if (varBody.isNotNull()) {
+		if (varBody.isObject()) {
+			Ref<Referable> obj = varBody.getObject();
+			if (obj.isNotNull()) {
+				if (IMap<String, Variant>::checkInstance(obj.ptr)) {
+					body = _buildParameters((IMap<String, Variant>*)(obj.ptr)).toMemory();
+				} else if (XmlDocument::checkInstance(obj.ptr)) {
+					body = ((XmlDocument*)(obj.ptr))->toString().toMemory();
+				} else if (CMemory::checkInstance(obj.ptr)) {
+					body = (CMemory*)(obj.ptr);
+				}
+			}
+		} else {
+			body = varBody.getString().toMemory();
+		}
+	}
+	return body;
+}
+
 
 SLIB_NETWORK_NAMESPACE_END

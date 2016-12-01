@@ -3,5 +3,6 @@
 
 #include "device/sensor.h"
 #include "device/vibrator.h"
+#include "device/information.h"
 
 #endif

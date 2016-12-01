@@ -237,38 +237,64 @@ Variant::Variant(const sl_bool value)
 
 Variant::Variant(const String8& value)
 {
-	_type = VariantType::String8;
-	new PTR_VAR(String8, _value) String8(value);
-}
-
-Variant::Variant(const SafeString8& value)
-{
-	_type = VariantType::String8;
-	new PTR_VAR(String8, _value) String8(value);
+	if (value.isNotNull()) {
+		_type = VariantType::String8;
+		new PTR_VAR(String8, _value) String8(value);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 Variant::Variant(const String16& value)
 {
-	_type = VariantType::String16;
-	new PTR_VAR(String16, _value) String16(value);
+	if (value.isNotNull()) {
+		_type = VariantType::String16;
+		new PTR_VAR(String16, _value) String16(value);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
-Variant::Variant(const SafeString16& value)
+Variant::Variant(const SafeString8& s)
 {
-	_type = VariantType::String16;
-	new PTR_VAR(String16, _value) String16(value);
+	String8 value(s);
+	if (value.isNotNull()) {
+		_type = VariantType::String8;
+		new PTR_VAR(String8, _value) String8(value);
+	} else {
+		_type = VariantType::Null;
+	}
+}
+
+Variant::Variant(const SafeString16& s)
+{
+	String16 value(s);
+	if (value.isNotNull()) {
+		_type = VariantType::String16;
+		new PTR_VAR(String16, _value) String16(value);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 Variant::Variant(const sl_char8* sz8)
 {
-	_type = VariantType::Sz8;
-	REF_VAR(const sl_char8*, _value) = sz8;
+	if (sz8) {
+		_type = VariantType::Sz8;
+		REF_VAR(const sl_char8*, _value) = sz8;
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 Variant::Variant(const sl_char16* sz16)
 {
-	_type = VariantType::Sz16;
-	REF_VAR(const sl_char16*, _value) = sz16;
+	if (sz16) {
+		_type = VariantType::Sz16;
+		REF_VAR(const sl_char16*, _value) = sz16;
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 Variant::Variant(const Time& value)
@@ -279,20 +305,33 @@ Variant::Variant(const Time& value)
 
 Variant::Variant(const void* ptr)
 {
-	_type = VariantType::Pointer;
-	REF_VAR(const void*, _value) = ptr;
+	if (ptr) {
+		_type = VariantType::Pointer;
+		REF_VAR(const void*, _value) = ptr;
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 Variant::Variant(const Memory& mem)
 {
-	_type = VariantType::Object;
-	new PTR_VAR(Memory, _value) Memory(mem);
+	if (mem.isNotNull()) {
+		_type = VariantType::Object;
+		new PTR_VAR(Memory, _value) Memory(mem);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
-Variant::Variant(const SafeMemory& mem)
+Variant::Variant(const SafeMemory& _mem)
 {
-	_type = VariantType::Object;
-	new PTR_VAR(Memory, _value) Memory(mem);
+	Memory mem(_mem);
+	if (mem.isNotNull()) {
+		_type = VariantType::Object;
+		new PTR_VAR(Memory, _value) Memory(mem);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 Variant Variant::fromInt32(sl_int32 value)
@@ -437,6 +476,12 @@ Variant& Variant::operator=(const SafeVariant& other)
 {
 	_Variant_free(_type, _value);
 	other._retain(_type, _value);
+	return *this;
+}
+
+Variant& Variant::operator=(sl_null_t)
+{
+	setNull();
 	return *this;
 }
 
@@ -1181,43 +1226,69 @@ const sl_char16* Variant::getSz16(const sl_char16* def) const
 void Variant::setString(const String8& value)
 {
 	_Variant_free(_type, _value);
-	_type = VariantType::String8;
-	new PTR_VAR(String8, _value) String8(value);
+	if (value.isNotNull()) {
+		_type = VariantType::String8;
+		new PTR_VAR(String8, _value) String8(value);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 void Variant::setString(const String16& value)
 {
 	_Variant_free(_type, _value);
-	_type = VariantType::String16;
-	new PTR_VAR(String16, _value) String16(value);
+	if (value.isNotNull()) {
+		_type = VariantType::String16;
+		new PTR_VAR(String16, _value) String16(value);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
-void Variant::setString(const SafeString8& value)
+void Variant::setString(const SafeString8& s)
 {
 	_Variant_free(_type, _value);
-	_type = VariantType::String8;
-	new PTR_VAR(String8, _value) String8(value);
+	String8 value(s);
+	if (value.isNotNull()) {
+		_type = VariantType::String8;
+		new PTR_VAR(String8, _value) String8(value);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
-void Variant::setString(const SafeString16& value)
+void Variant::setString(const SafeString16& s)
 {
 	_Variant_free(_type, _value);
-	_type = VariantType::String16;
-	new PTR_VAR(String16, _value) String16(value);
+	String8 value(s);
+	if (value.isNotNull()) {
+		_type = VariantType::String16;
+		new PTR_VAR(String16, _value) String16(value);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 void Variant::setString(const sl_char8* value)
 {
 	_Variant_free(_type, _value);
-	_type = VariantType::Sz8;
-	REF_VAR(const sl_char8*, _value) = value;
+	if (value) {
+		_type = VariantType::Sz8;
+		REF_VAR(const sl_char8*, _value) = value;
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 void Variant::setString(const sl_char16* value)
 {
 	_Variant_free(_type, _value);
-	_type = VariantType::Sz16;
-	REF_VAR(const sl_char16*, _value) = value;
+	if (value) {
+		_type = VariantType::Sz16;
+		REF_VAR(const sl_char16*, _value) = value;
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 sl_bool Variant::isTime() const
@@ -1272,8 +1343,12 @@ void* Variant::getPointer(const void* def) const
 void Variant::setPointer(const void *ptr)
 {
 	_Variant_free(_type, _value);
-	_type = VariantType::Pointer;
-	REF_VAR(const void*, _value) = ptr;
+	if (ptr) {
+		_type = VariantType::Pointer;
+		REF_VAR(const void*, _value) = ptr;
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 sl_bool Variant::isObject() const
@@ -1339,9 +1414,12 @@ Memory Variant::getMemory() const
 void Variant::setMemory(const Memory& mem)
 {
 	_Variant_free(_type, _value);
-	_type = VariantType::Object;
-	new PTR_VAR(Memory, _value) Memory(mem);
-
+	if (mem.isNotNull()) {
+		_type = VariantType::Object;
+		new PTR_VAR(Memory, _value) Memory(mem);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 sl_bool Variant::isVariantList() const
@@ -1815,38 +1893,64 @@ SafeVariant::SafeVariant(const sl_bool value)
 
 SafeVariant::SafeVariant(const String8& value)
 {
-	_type = VariantType::String8;
-	new PTR_VAR(String8, _value) String8(value);
+	if (value.isNotNull()) {
+		_type = VariantType::String8;
+		new PTR_VAR(String8, _value) String8(value);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 SafeVariant::SafeVariant(const String16& value)
 {
-	_type = VariantType::String16;
-	new PTR_VAR(String16, _value) String16(value);
+	if (value.isNotNull()) {
+		_type = VariantType::String16;
+		new PTR_VAR(String16, _value) String16(value);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
-SafeVariant::SafeVariant(const SafeString8& value)
+SafeVariant::SafeVariant(const SafeString8& s)
 {
-	_type = VariantType::String8;
-	new PTR_VAR(String8, _value) String8(value);
+	String8 value(s);
+	if (value.isNotNull()) {
+		_type = VariantType::String8;
+		new PTR_VAR(String8, _value) String8(value);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
-SafeVariant::SafeVariant(const SafeString16& value)
+SafeVariant::SafeVariant(const SafeString16& s)
 {
-	_type = VariantType::String16;
-	new PTR_VAR(String16, _value) String16(value);
+	String16 value(s);
+	if (value.isNotNull()) {
+		_type = VariantType::String16;
+		new PTR_VAR(String16, _value) String16(value);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 SafeVariant::SafeVariant(const sl_char8* value)
 {
-	_type = VariantType::Sz8;
-	REF_VAR(const sl_char8*, _value) = value;
+	if (value) {
+		_type = VariantType::Sz8;
+		REF_VAR(const sl_char8*, _value) = value;
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 SafeVariant::SafeVariant(const sl_char16* value)
 {
-	_type = VariantType::Sz16;
-	REF_VAR(const sl_char16*, _value) = value;
+	if (value) {
+		_type = VariantType::Sz16;
+		REF_VAR(const sl_char16*, _value) = value;
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 SafeVariant::SafeVariant(const Time& value)
@@ -1857,20 +1961,33 @@ SafeVariant::SafeVariant(const Time& value)
 
 SafeVariant::SafeVariant(const void* ptr)
 {
-	_type = VariantType::Pointer;
-	REF_VAR(const void*, _value) = ptr;
+	if (ptr) {
+		_type = VariantType::Pointer;
+		REF_VAR(const void*, _value) = ptr;
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 SafeVariant::SafeVariant(const Memory& mem)
 {
-	_type = VariantType::Object;
-	new PTR_VAR(Memory, _value) Memory(mem);
+	if (mem.isNotNull()) {
+		_type = VariantType::Object;
+		new PTR_VAR(Memory, _value) Memory(mem);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
-SafeVariant::SafeVariant(const SafeMemory& mem)
+SafeVariant::SafeVariant(const SafeMemory& _mem)
 {
-	_type = VariantType::Object;
-	new PTR_VAR(Memory, _value) Memory(mem);
+	Memory mem(_mem);
+	if (mem.isNotNull()) {
+		_type = VariantType::Object;
+		new PTR_VAR(Memory, _value) Memory(mem);
+	} else {
+		_type = VariantType::Null;
+	}
 }
 
 SafeVariant& SafeVariant::operator=(SafeVariant&& other)
@@ -1908,6 +2025,12 @@ SafeVariant& SafeVariant::operator=(const Variant& other)
 	sl_uint64 value;
 	_Variant_copy(type, other._value, value);
 	_replace(type, value);
+	return *this;
+}
+
+SafeVariant& SafeVariant::operator=(sl_null_t)
+{
+	setNull();
 	return *this;
 }
 
@@ -2237,44 +2360,70 @@ const sl_char16* SafeVariant::getSz16(const sl_char16* def) const
 
 void SafeVariant::setString(const String8& value)
 {
-	sl_int64 v;
-	new PTR_VAR(String8, v) String8(value);
-	_replace(VariantType::String8, v);
+	if (value.isNotNull()) {
+		sl_int64 v;
+		new PTR_VAR(String8, v) String8(value);
+		_replace(VariantType::String8, v);
+	} else {
+		_replace(VariantType::Null, 0);
+	}
 }
 
 void SafeVariant::setString(const String16& value)
 {
-	sl_int64 v;
-	new PTR_VAR(String16, v) String16(value);
-	_replace(VariantType::String16, v);
+	if (value.isNotNull()) {
+		sl_int64 v;
+		new PTR_VAR(String16, v) String16(value);
+		_replace(VariantType::String16, v);
+	} else {
+		_replace(VariantType::Null, 0);
+	}
 }
 
-void SafeVariant::setString(const SafeString8& value)
+void SafeVariant::setString(const SafeString8& s)
 {
-	sl_int64 v;
-	new PTR_VAR(String8, v) String8(value);
-	_replace(VariantType::String8, v);
+	String8 value(s);
+	if (value.isNotNull()) {
+		sl_int64 v;
+		new PTR_VAR(String8, v) String8(value);
+		_replace(VariantType::String8, v);
+	} else {
+		_replace(VariantType::Null, 0);
+	}
 }
 
-void SafeVariant::setString(const SafeString16& value)
+void SafeVariant::setString(const SafeString16& s)
 {
-	sl_int64 v;
-	new PTR_VAR(String16*, v) String16(value);
-	_replace(VariantType::String16, v);
+	String16 value(s);
+	if (value.isNotNull()) {
+		sl_int64 v;
+		new PTR_VAR(String16*, v) String16(value);
+		_replace(VariantType::String16, v);
+	} else {
+		_replace(VariantType::Null, 0);
+	}
 }
 
 void SafeVariant::setString(const sl_char8* value)
 {
-	sl_int64 v;
-	REF_VAR(const sl_char8*, v) = value;
-	_replace(VariantType::Sz8, v);
+	if (value) {
+		sl_int64 v;
+		REF_VAR(const sl_char8*, v) = value;
+		_replace(VariantType::Sz8, v);
+	} else {
+		_replace(VariantType::Null, 0);
+	}
 }
 
 void SafeVariant::setString(const sl_char16* value)
 {
-	sl_int64 v;
-	REF_VAR(const sl_char16*, v) = value;
-	_replace(VariantType::Sz16, v);
+	if (value) {
+		sl_int64 v;
+		REF_VAR(const sl_char16*, v) = value;
+		_replace(VariantType::Sz16, v);
+	} else {
+		_replace(VariantType::Null, 0);
+	}
 }
 
 sl_bool SafeVariant::isTime() const
@@ -2314,9 +2463,13 @@ void* SafeVariant::getPointer(const void* def) const
 
 void SafeVariant::setPointer(const void *ptr)
 {
-	sl_int64 v;
-	REF_VAR(const void*, v) = ptr;
-	_replace(VariantType::Pointer, v);
+	if (ptr) {
+		sl_int64 v;
+		REF_VAR(const void*, v) = ptr;
+		_replace(VariantType::Pointer, v);
+	} else {
+		_replace(VariantType::Null, 0);
+	}
 }
 
 sl_bool SafeVariant::isObject() const
@@ -2367,9 +2520,13 @@ Memory SafeVariant::getMemory() const
 
 void SafeVariant::setMemory(const Memory& mem)
 {
-	sl_int64 v;
-	new PTR_VAR(Memory, v) Memory(mem);
-	_replace(VariantType::Object, v);
+	if (mem.isNotNull()) {
+		sl_int64 v;
+		new PTR_VAR(Memory, v) Memory(mem);
+		_replace(VariantType::Object, v);
+	} else {
+		_replace(VariantType::Null, 0);
+	}
 }
 
 sl_bool SafeVariant::isVariantList() const
