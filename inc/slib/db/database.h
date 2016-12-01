@@ -91,6 +91,17 @@ protected:
 	
 };
 
+#define _SLIB_DB_DECLARE_RUN_BY_PARAMS(RET, NAME) \
+	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX const Variant&); \
+	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX const Variant&, const Variant&); \
+	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX const Variant&, const Variant&, const Variant&); \
+	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX const Variant&, const Variant&, const Variant&, const Variant&); \
+	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX const Variant&, const Variant&, const Variant&, const Variant&, const Variant&); \
+	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX const Variant&, const Variant&, const Variant&, const Variant&, const Variant&, const Variant&); \
+	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX const Variant&, const Variant&, const Variant&, const Variant&, const Variant&, const Variant&, const Variant&); \
+	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX const Variant&, const Variant&, const Variant&, const Variant&, const Variant&, const Variant&, const Variant&, const Variant&); \
+	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX const Variant&, const Variant&, const Variant&, const Variant&, const Variant&, const Variant&, const Variant&, const Variant&, const Variant&);
+
 class SLIB_EXPORT DatabaseStatement : public Object
 {
 	SLIB_DECLARE_OBJECT
@@ -99,7 +110,7 @@ public:
 	Ref<Database> getDatabase();
 	
 	
-	virtual sl_bool execute(const Variant* params = sl_null, sl_uint32 nParams = 0, sl_uint64* pOutAffectedRowsCount = sl_null) = 0;
+	virtual sl_int64 execute(const Variant* params = sl_null, sl_uint32 nParams = 0) = 0;
 	
 	virtual Ref<DatabaseCursor> query(const Variant* params = sl_null, sl_uint32 nParams = 0) = 0;
 
@@ -109,6 +120,15 @@ public:
 	virtual Map<String, Variant> getRecordForQueryResult(const Variant* params = sl_null, sl_uint32 nParams = 0);
 	
 	virtual Variant getValueForQueryResult(const Variant* params = sl_null, sl_uint32 nParams = 0);
+
+	
+#define _SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX
+	_SLIB_DB_DECLARE_RUN_BY_PARAMS(sl_int64, execute)
+	_SLIB_DB_DECLARE_RUN_BY_PARAMS(Ref<DatabaseCursor>, query)
+	_SLIB_DB_DECLARE_RUN_BY_PARAMS(VariantMapList, getListForQueryResult)
+	_SLIB_DB_DECLARE_RUN_BY_PARAMS(VariantMap, getRecordForQueryResult)
+	_SLIB_DB_DECLARE_RUN_BY_PARAMS(Variant, getValueForQueryResult)
+#undef _SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX
 
 protected:
 	Ref<Database> m_db;
@@ -122,7 +142,7 @@ class SLIB_EXPORT Database : public Object
 public:
 	virtual Ref<DatabaseStatement> prepareStatement(const String& sql) = 0;
 
-	virtual sl_bool execute(const String& sql, sl_uint64* pOutAffectedRowsCount = sl_null);
+	virtual sl_int64 execute(const String& sql);
 	
 	virtual Ref<DatabaseCursor> query(const String& sql);	
 
@@ -134,7 +154,7 @@ public:
 	virtual Variant getValueForQueryResult(const String& sql);
 	
 	
-	virtual sl_bool execute(const String& sql, const Variant* params, sl_uint32 nParams, sl_uint64* pOutAffectedRowsCount = sl_null);
+	virtual sl_int64 execute(const String& sql, const Variant* params, sl_uint32 nParams);
 	
 	virtual Ref<DatabaseCursor> query(const String& sql, const Variant* params, sl_uint32 nParams);
 
@@ -146,6 +166,15 @@ public:
 	virtual Variant getValueForQueryResult(const String& sql, const Variant* params, sl_uint32 nParams);
 
 	virtual String getErrorMessage() = 0;
+	
+	
+#define _SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX const String& sql,
+	_SLIB_DB_DECLARE_RUN_BY_PARAMS(sl_int64, execute)
+	_SLIB_DB_DECLARE_RUN_BY_PARAMS(Ref<DatabaseCursor>, query)
+	_SLIB_DB_DECLARE_RUN_BY_PARAMS(VariantMapList, getListForQueryResult)
+	_SLIB_DB_DECLARE_RUN_BY_PARAMS(VariantMap, getRecordForQueryResult)
+	_SLIB_DB_DECLARE_RUN_BY_PARAMS(Variant, getValueForQueryResult)
+#undef _SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX
 
 };
 

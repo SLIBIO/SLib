@@ -131,6 +131,7 @@ public:
 		return ret;
 	}
 
+	// override
 	sl_bool ping()
 	{
 		initThread();
@@ -141,17 +142,15 @@ public:
 		return sl_false;
 	}
 
-	sl_bool execute(const String& sql, sl_uint64* pOutAffectedRowsCount)
+	// override
+	sl_int64 execute(const String& sql)
 	{
 		initThread();
 		ObjectLocker lock(this);
 		if (0 == ::mysql_real_query(m_mysql, sql.getData(), (sl_uint32)(sql.getLength()))) {
-			if (pOutAffectedRowsCount) {
-				*pOutAffectedRowsCount = ::mysql_affected_rows(m_mysql);
-			}
-			return sl_true;
+			return ::mysql_affected_rows(m_mysql);
 		}
-		return sl_false;
+		return -1;
 	}
 
 	class _DatabaseCursor : public DatabaseCursor
@@ -194,11 +193,13 @@ public:
 			m_db->unlock();
 		}
 
+		// override
 		sl_uint32 getColumnsCount()
 		{
 			return m_nColumnNames;
 		}
 
+		// override
 		String getColumnName(sl_uint32 index)
 		{
 			if (index < m_nColumnNames) {
@@ -207,11 +208,13 @@ public:
 			return String::null();
 		}
 
+		// override
 		sl_int32 getColumnIndex(const String& name)
 		{
 			return m_mapColumnIndexes.getValue_NoLock(name, -1);
 		}
 
+		// override
 		Map<String, Variant> getRow()
 		{
 			Map<String, Variant> ret;
@@ -233,6 +236,7 @@ public:
 			}
 		}
 
+		// override
 		Variant getValue(sl_uint32 index)
 		{
 			if (m_row) {
@@ -243,6 +247,7 @@ public:
 			return Variant::null();
 		}
 
+		// override
 		String getString(sl_uint32 index)
 		{
 			if (m_row) {
@@ -253,6 +258,7 @@ public:
 			return String::null();
 		}
 
+		// override
 		Memory getBlob(sl_uint32 index)
 		{
 			if (m_row) {
@@ -265,6 +271,7 @@ public:
 			return Memory::null();
 		}
 
+		// override
 		sl_bool moveNext()
 		{
 			m_row = ::mysql_fetch_row(m_result);
@@ -276,6 +283,7 @@ public:
 		}
 	};
 
+	// override
 	Ref<DatabaseCursor> query(const String& sql)
 	{
 		initThread();
@@ -387,11 +395,13 @@ public:
 			m_db->unlock();
 		}
 
+		// override
 		sl_uint32 getColumnsCount()
 		{
 			return m_nColumnNames;
 		}
 
+		// override
 		String getColumnName(sl_uint32 index)
 		{
 			if (index < m_nColumnNames) {
@@ -400,11 +410,13 @@ public:
 			return String::null();
 		}
 
+		// override
 		sl_int32 getColumnIndex(const String& name)
 		{
 			return m_mapColumnIndexes.getValue_NoLock(name, -1);
 		}
 
+		// override
 		Map<String, Variant> getRow()
 		{
 			Map<String, Variant> ret;
@@ -489,6 +501,7 @@ public:
 			return Variant::null();
 		}
 
+		// override
 		Variant getValue(sl_uint32 index)
 		{
 			if (index < m_nColumnNames) {
@@ -497,6 +510,7 @@ public:
 			return Variant::null();
 		}
 
+		// override
 		String getString(sl_uint32 index)
 		{
 			if (index < m_nColumnNames) {
@@ -539,6 +553,7 @@ public:
 			return String::null();
 		}
 
+		// override
 		sl_int64 getInt64(sl_uint32 index, sl_int64 defaultValue)
 		{
 			enum_field_types type = m_bind[index].buffer_type;
@@ -579,6 +594,7 @@ public:
 			return defaultValue;
 		}
 
+		// override
 		sl_uint64 getUint64(sl_uint32 index, sl_uint64 defaultValue)
 		{
 			if (index < m_nColumnNames) {
@@ -621,6 +637,7 @@ public:
 			return defaultValue;
 		}
 
+		// override
 		sl_int32 getInt32(sl_uint32 index, sl_int32 defaultValue)
 		{
 			if (index < m_nColumnNames) {
@@ -661,6 +678,7 @@ public:
 			return defaultValue;
 		}
 
+		// override
 		sl_uint32 getUint32(sl_uint32 index, sl_uint32 defaultValue)
 		{
 			if (index < m_nColumnNames) {
@@ -701,6 +719,7 @@ public:
 			return defaultValue;
 		}
 
+		// override
 		float getFloat(sl_uint32 index, float defaultValue)
 		{
 			if (index < m_nColumnNames) {
@@ -741,6 +760,7 @@ public:
 			return defaultValue;
 		}
 
+		// override
 		double getDouble(sl_uint32 index, double defaultValue)
 		{
 			if (index < m_nColumnNames) {
@@ -781,6 +801,7 @@ public:
 			return defaultValue;
 		}
 
+		// override
 		Time getTime(sl_uint32 index, const Time& defaultValue)
 		{
 			if (index < m_nColumnNames) {
@@ -805,6 +826,7 @@ public:
 			return defaultValue;
 		}
 
+		// override
 		Memory getBlob(sl_uint32 index)
 		{
 			if (index < m_nColumnNames) {
@@ -828,6 +850,7 @@ public:
 			return Memory::null();
 		}
 
+		// override
 		sl_bool moveNext()
 		{
 			int iRet = ::mysql_stmt_fetch(m_statement);
@@ -836,6 +859,7 @@ public:
 			}
 			return sl_false;
 		}
+		
 	};
 
 	class _DatabaseStatement : public DatabaseStatement
@@ -1000,19 +1024,18 @@ public:
 			return sl_false;
 		}
 
-		sl_bool execute(const Variant* params, sl_uint32 nParams, sl_uint64* pOutAffectedRowsCount)
+		// override
+		sl_int64 execute(const Variant* params, sl_uint32 nParams)
 		{
 			initThread();
 			ObjectLocker lock(m_db.ptr);
 			if (_execute(params, nParams)) {
-				if (pOutAffectedRowsCount) {
-					*pOutAffectedRowsCount = ::mysql_stmt_affected_rows(m_statement);
-				}
-				return sl_true;
+				return ::mysql_stmt_affected_rows(m_statement);
 			}
-			return sl_false;
+			return -1;
 		}
 
+		// override
 		Ref<DatabaseCursor> query(const Variant* params, sl_uint32 nParams)
 		{
 			initThread();
@@ -1116,6 +1139,7 @@ public:
 
 	};
 
+	// override
 	Ref<DatabaseStatement> prepareStatement(const String& sql)
 	{
 		initThread();
@@ -1129,6 +1153,7 @@ public:
 		return Ref<DatabaseStatement>::null();
 	}
 
+	// override
 	String getErrorMessage()
 	{
 		return ::mysql_error(m_mysql);

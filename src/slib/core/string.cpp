@@ -7850,7 +7850,7 @@ String16 SafeString16::arg(const Variant& param)
 	return String16::formatv(*this, &param, 1);
 }
 
-#define FORMAT_BEGIN_VARS_LIST(n) char _vars[sizeof(Variant)*n]; Variant* vars=(Variant*)((void*)_vars); char* pvar = _vars;
+#define FORMAT_BEGIN_VARS_LIST(n) SLIB_ALIGN(16) char _vars[sizeof(Variant)*n]; Variant* vars=(Variant*)((void*)_vars); char* pvar = _vars;
 #define FORMAT_ADD_VAR_TO_LIST(s) { char* sv = (char*)((void*)&s); for (int iv = 0; iv < sizeof(Variant); iv++) { *(pvar++) = *(sv++); } }
 
 #define FORMAT_DEFINE_FUNCTIONS(nParams) \

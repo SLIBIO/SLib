@@ -40,19 +40,17 @@ public:
 		return ret;
 	}
 
-	sl_bool execute(const String& sql, sl_uint64* pOutAffectedRowsCount)
+	// override
+	sl_int64 execute(const String& sql)
 	{
 		ObjectLocker lock(this);
 		char* zErrMsg = 0;
 		if (SQLITE_OK == ::sqlite3_exec(m_db, sql.getData(), 0, 0, &zErrMsg)) {
-			if (pOutAffectedRowsCount) {
-				*pOutAffectedRowsCount = ::sqlite3_changes(m_db);
-			}
-			return sl_true;
+			return ::sqlite3_changes(m_db);
 		} else {
 			::sqlite3_free(zErrMsg);
 		}
-		return sl_false;
+		return -1;
 	}
 
 	static Map<String, Variant> _getRow(sqlite3_stmt* stmt, String* columns, sl_uint32 nColumns)
@@ -102,11 +100,13 @@ public:
 			m_db->unlock();
 		}
 
+		// override
 		sl_uint32 getColumnsCount()
 		{
 			return m_nColumnNames;
 		}
 
+		// override
 		String getColumnName(sl_uint32 index)
 		{
 			if (index < m_nColumnNames) {
@@ -115,11 +115,13 @@ public:
 			return String::null();
 		}
 
+		// override
 		sl_int32 getColumnIndex(const String& name)
 		{
 			return m_mapColumnIndexes.getValue_NoLock(name, -1);
 		}
 
+		// override
 		Map<String, Variant> getRow()
 		{
 			Map<String, Variant> ret;
@@ -177,6 +179,7 @@ public:
 			return Variant::null();
 		}
 
+		// override
 		Variant getValue(sl_uint32 index)
 		{
 			if (index < m_nColumnNames) {
@@ -185,6 +188,7 @@ public:
 			return Variant::null();
 		}
 
+		// override
 		String getString(sl_uint32 index)
 		{
 			if (index < m_nColumnNames) {
@@ -201,6 +205,7 @@ public:
 			return String::null();
 		}
 
+		// override
 		sl_int64 getInt64(sl_uint32 index, sl_int64 defaultValue)
 		{
 			if (index < m_nColumnNames) {
@@ -217,6 +222,7 @@ public:
 			return defaultValue;
 		}
 
+		// override
 		sl_uint64 getUint64(sl_uint32 index, sl_uint64 defaultValue)
 		{
 			if (index < m_nColumnNames) {
@@ -233,6 +239,7 @@ public:
 			return defaultValue;
 		}
 
+		// override
 		sl_int32 getInt32(sl_uint32 index, sl_int32 defaultValue)
 		{
 			if (index < m_nColumnNames) {
@@ -249,6 +256,7 @@ public:
 			return defaultValue;
 		}
 
+		// override
 		sl_uint32 getUint32(sl_uint32 index, sl_uint32 defaultValue)
 		{
 			if (index < m_nColumnNames) {
@@ -265,6 +273,7 @@ public:
 			return defaultValue;
 		}
 
+		// override
 		float getFloat(sl_uint32 index, float defaultValue)
 		{
 			if (index < m_nColumnNames) {
@@ -281,6 +290,7 @@ public:
 			return defaultValue;
 		}
 
+		// override
 		double getDouble(sl_uint32 index, double defaultValue)
 		{
 			if (index < m_nColumnNames) {
@@ -297,6 +307,7 @@ public:
 			return defaultValue;
 		}
 
+		// override
 		Memory getBlob(sl_uint32 index)
 		{
 			if (index < m_nColumnNames) {
@@ -310,6 +321,7 @@ public:
 			return Memory::null();
 		}
 
+		// override
 		sl_bool moveNext()
 		{
 			sl_int32 nRet = ::sqlite3_step(m_statement);
@@ -403,22 +415,21 @@ public:
 			return sl_false;
 		}
 
-		sl_bool execute(const Variant* params, sl_uint32 nParams, sl_uint64* pOutAffectedRowsCount)
+		// override
+		sl_int64 execute(const Variant* params, sl_uint32 nParams)
 		{
 			ObjectLocker lock(m_db.ptr);
 			if (_execute(params, nParams)) {
 				if (::sqlite3_step(m_statement) == SQLITE_DONE) {
 					::sqlite3_reset(m_statement);
 					::sqlite3_clear_bindings(m_statement);
-					if (pOutAffectedRowsCount) {
-						*pOutAffectedRowsCount = ::sqlite3_changes(m_sqlite);
-					}
-					return sl_true;
+					return ::sqlite3_changes(m_sqlite);
 				}
 			}
-			return sl_false;
+			return -1;
 		}
 
+		// override
 		Ref<DatabaseCursor> query(const Variant* params, sl_uint32 nParams)
 		{
 			ObjectLocker lock(m_db.ptr);
@@ -435,6 +446,7 @@ public:
 		}
 	};
 
+	// override
 	Ref<DatabaseStatement> prepareStatement(const String& sql)
 	{
 		ObjectLocker lock(this);
@@ -450,6 +462,7 @@ public:
 		return ret;
 	}
 
+	// override
 	String getErrorMessage()
 	{
 		return ::sqlite3_errmsg(m_db);
