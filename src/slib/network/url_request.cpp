@@ -47,6 +47,7 @@ UrlRequest::UrlRequest()
 	m_sizeContentTotal = 0;
 	m_sizeContentReceived = 0;
 	m_flagClosed = sl_false;
+	m_flagError = sl_false;
 	
 	m_responseStatus = HttpStatus::Unknown;
 	
@@ -258,6 +259,14 @@ void UrlRequest::cancel()
 	_cancel();
 }
 
+sl_bool UrlRequest::isError()
+{
+	if (m_responseStatus >= HttpStatus::BadRequest) {
+		return sl_true;
+	}
+	return m_flagError;
+}
+
 void UrlRequest::_init(const UrlRequestParam& param, const String& url, const String& downloadFilePath)
 {
 	m_url = url;
@@ -270,7 +279,11 @@ void UrlRequest::_init(const UrlRequestParam& param, const String& url, const St
 	
 	m_listener = param.listener;
 	m_onComplete = param.onComplete;
-	m_onError = param.onError;
+	if (param.onError.isNotNull()) {
+		m_onError = param.onError;
+	} else {
+		m_onError = param.onComplete;
+	}
 	m_onReceiveContent = param.onReceiveContent;
 	m_dispatcher = param.dispatcher;
 	m_flagUseBackgroundSession = param.flagUseBackgroundSession;
@@ -318,6 +331,7 @@ void UrlRequest::onComplete()
 
 void UrlRequest::onError()
 {
+	m_flagError = sl_true;
 	if (m_flagClosed) {
 		return;
 	}

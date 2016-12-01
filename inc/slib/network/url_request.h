@@ -134,6 +134,8 @@ public:
 	
 	void cancel();
 	
+	sl_bool isError();
+	
 protected:
 	static Ref<UrlRequest> _create(const UrlRequestParam& param, const String& url, const String& downloadFilePath);
 	
@@ -185,6 +187,7 @@ protected:
 	sl_uint64 m_sizeContentReceived;
 	
 	sl_bool m_flagClosed;
+	sl_bool m_flagError;
 	
 };
 
