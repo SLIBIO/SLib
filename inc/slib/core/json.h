@@ -135,6 +135,12 @@ public:
 	template <class T>
 	static Variant toJson(const SafeWeakRef<T>& _in);
 
+	static Variant toJson(const sl_char8* _in);
+	
+	static Variant toJson(const sl_char16* _in);
+	
+	static Variant toJson(const sl_char32* _in);
+	
 	template <class T>
 	static void fromJson(const Variant& v, T& _out);
 	

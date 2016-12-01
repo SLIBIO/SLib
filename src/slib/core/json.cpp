@@ -442,6 +442,21 @@ Variant Json::createMap()
 	return Variant::createVariantListMap();
 }
 
+Variant Json::toJson(const sl_char8* _in)
+{
+	return Variant(_in);
+}
+
+Variant Json::toJson(const sl_char16* _in)
+{
+	return Variant(_in);
+}
+
+Variant Json::toJson(const sl_char32* _in)
+{
+	return Variant(_in);
+}
+
 template <> void Json::fromJson(const Variant& v, Variant& _out)
 {
 	_out = v;

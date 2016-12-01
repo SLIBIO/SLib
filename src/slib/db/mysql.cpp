@@ -7,8 +7,11 @@
 
 #include "../../../inc/slib/core/thread.h"
 #include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/log.h"
 
 SLIB_DB_NAMESPACE_BEGIN
+
+#define TAG "MySQL"
 
 MySQL_Param::MySQL_Param()
 {
@@ -125,6 +128,7 @@ public:
 
 			} else {
 				outErrorMessage = ::mysql_error(mysql);
+				SLIB_LOG_ERROR(TAG, outErrorMessage);
 			}
 			::mysql_close(mysql);
 		}
@@ -150,6 +154,7 @@ public:
 		if (0 == ::mysql_real_query(m_mysql, sql.getData(), (sl_uint32)(sql.getLength()))) {
 			return ::mysql_affected_rows(m_mysql);
 		}
+		SLIB_LOG_ERROR(TAG, ::mysql_error(m_mysql));
 		return -1;
 	}
 
@@ -298,6 +303,8 @@ public:
 				}
 				::mysql_free_result(res);
 			}
+		} else {
+			SLIB_LOG_ERROR(TAG, ::mysql_error(m_mysql));
 		}
 		return ret;
 	}
@@ -893,6 +900,7 @@ public:
 					m_statement = statement;
 					return sl_true;
 				}
+				SLIB_LOG_ERROR(TAG, ::mysql_stmt_error(statement));
 				::mysql_stmt_close(statement);
 			}
 			return sl_false;
@@ -1017,9 +1025,14 @@ public:
 									return sl_true;
 								}
 							}
+							SLIB_LOG_ERROR(TAG, ::mysql_stmt_error(m_statement));
 						}
+					} else {
+						SLIB_LOG_ERROR(TAG, ::mysql_stmt_error(m_statement));
 					}
 				}
+			} else {
+				SLIB_LOG_ERROR(TAG, ::mysql_stmt_error(m_statement));
 			}
 			return sl_false;
 		}
