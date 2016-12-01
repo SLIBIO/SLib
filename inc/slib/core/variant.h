@@ -863,6 +863,12 @@ SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_LIST(Variant)
 SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_MAP(String, Variant)
 SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_MAP(sl_uint64, Variant)
 
+
+typedef List<Variant> VariantList;
+typedef Map<String, Variant> VariantMap;
+typedef List< Map<String, Variant> > VariantMapList;
+
+
 SLIB_NAMESPACE_END
 
 
