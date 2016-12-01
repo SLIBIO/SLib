@@ -8,7 +8,7 @@
 
 SLIB_DEVICE_NAMESPACE_BEGIN
 
-SLIB_JNI_BEGIN_CLASS(_JAndroidVibrator, "slib/platform/android/device/DeviceInformation")
+SLIB_JNI_BEGIN_CLASS(_JAndroidDeviceInformation, "slib/platform/android/device/DeviceInformation")
 	SLIB_JNI_STATIC_METHOD(getDeviceId, "getDeviceId", "(Landroid/app/Activity;)Ljava/lang/String;");
 	SLIB_JNI_STATIC_METHOD(getDeviceOSVersion, "getDeviceOSVersion", "()Ljava/lang/String;");
 	SLIB_JNI_STATIC_METHOD(getDeviceName, "getDeviceName", "()Ljava/lang/String;");
@@ -18,7 +18,7 @@ String DeviceInformation::getDeviceId()
 {
 	jobject jactivity = Android::getCurrentActivity();
 	if (jactivity) {
-		return _JAndroidVibrator::getDeviceId.callString(sl_null, jactivity);
+		return _JAndroidDeviceInformation::getDeviceId.callString(sl_null, jactivity);
 	}
 	return String::null();
 }
@@ -27,7 +27,7 @@ String DeviceInformation::getDeviceName()
 {
 	jobject jactivity = Android::getCurrentActivity();
 	if (jactivity) {
-		return _JAndroidVibrator::getDeviceName.callString(sl_null);
+		return _JAndroidDeviceInformation::getDeviceName.callString(sl_null);
 	}
 	return String::null();
 }
@@ -36,7 +36,7 @@ String DeviceInformation::getSystemVersion()
 {
 	jobject jactivity = Android::getCurrentActivity();
 	if (jactivity) {
-		return _JAndroidVibrator::getDeviceOSVersion.callString(sl_null);
+		return _JAndroidDeviceInformation::getDeviceOSVersion.callString(sl_null);
 	}
 	return String::null();
 }
