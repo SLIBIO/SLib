@@ -174,7 +174,7 @@ public:
 	// override
 	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param)
 	{
-		Rectangle rectDstWhole = GraphicsUtil::transformRectangle(rectDst, rectSrc, Rectangle(0, 0, m_width, m_height));
+		Rectangle rectDstWhole = GraphicsUtil::transformRectangle(rectDst, rectSrc, Rectangle(0, 0, (float)m_width, (float)m_height));
 		sl_int32 width = (sl_int32)(rectDstWhole.getWidth());
 		sl_int32 height = (sl_int32)(rectDstWhole.getHeight());
 		if (width > 0 && height > 0) {
@@ -243,7 +243,7 @@ public:
 	// override
 	void onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param)
 	{
-		Rectangle rectDstWhole = GraphicsUtil::transformRectangle(rectDst, rectSrc, Rectangle(0, 0, m_width, m_height));
+		Rectangle rectDstWhole = GraphicsUtil::transformRectangle(rectDst, rectSrc, Rectangle(0, 0, (float)m_width, (float)m_height));
 		sl_int32 width = (sl_int32)(rectDstWhole.getWidth());
 		sl_int32 height = (sl_int32)(rectDstWhole.getHeight());
 		if (width > 0 && height > 0) {

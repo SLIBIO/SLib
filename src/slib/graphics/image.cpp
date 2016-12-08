@@ -638,6 +638,7 @@ public:
 		_ImageStretch_Smooth_Prepare(sw, dw, sx_step, sx_start, dx_start, dx_end, px);
 		
 		sl_int32 dx, dy;
+		sl_int32 dh = dst.height;
 		float sx;
 		
 		Color* colorsDst;
@@ -648,7 +649,7 @@ public:
 			// left
 			colorsDst = dst.colors;
 			colorsSrc = src.colors;
-			for (dy = 0; dy < dst.height; dy++) {
+			for (dy = 0; dy < dh; dy++) {
 				BLEND_OP::blend(*colorsDst, *colorsSrc);
 				colorsDst += dst.stride;
 				colorsSrc += src.stride;
@@ -656,7 +657,7 @@ public:
 			// right
 			colorsDst = dst.colors + (dw - 1);
 			colorsSrc = src.colors + (sw - 1);
-			for (dy = 0; dy < dst.height; dy++) {
+			for (dy = 0; dy < dh; dy++) {
 				BLEND_OP::blend(*colorsDst, *colorsSrc);
 				colorsDst += dst.stride;
 				colorsSrc += src.stride;
@@ -665,7 +666,7 @@ public:
 		
 		colorsDst = dst.colors;
 		colorsSrc = src.colors;
-		for (dy = 0; dy < dst.height; dy++) {
+		for (dy = 0; dy < dh; dy++) {
 			sx = sx_start;
 			for (dx = dx_start; dx < dx_end; dx++) {
 				isx = (sl_int32)sx;
@@ -689,6 +690,7 @@ public:
 		_ImageStretch_Smooth_Prepare(sh, dh, sy_step, sy_start, dy_start, dy_end, py);
 		
 		sl_int32 dx, dy;
+		sl_int32 dw = dst.width;
 		float sy;
 		
 		Color* colorsDst;
@@ -699,13 +701,13 @@ public:
 			// top
 			colorsDst = dst.colors;
 			colorsSrc = src.colors;
-			for (dx = 0; dx < dst.width; dx++) {
+			for (dx = 0; dx < dw; dx++) {
 				BLEND_OP::blend(colorsDst[dx], colorsSrc[dx]);
 			}
 			// bottom
-			colorsDst = dst.colors + (dh - 1) * dst.stride;
-			colorsSrc = src.colors + (sh - 1) * src.stride;
-			for (dx = 0; dx < dst.width; dx++) {
+			colorsDst = dst.colors + (sl_uint32)(dh - 1) * dst.stride;
+			colorsSrc = src.colors + (sl_uint32)(sh - 1) * src.stride;
+			for (dx = 0; dx < dw; dx++) {
 				BLEND_OP::blend(colorsDst[dx], colorsSrc[dx]);
 			}
 		}
@@ -716,8 +718,8 @@ public:
 		for (dy = dy_start; dy < dy_end; dy++) {
 			isy = (sl_int32)sy;
 			float fsy = sy - (float)isy;
-			const Color* lineSrc = colorsSrc + isy * src.stride;
-			for (dx = 0; dx < dst.width; dx++) {
+			const Color* lineSrc = colorsSrc + (sl_uint32)isy * src.stride;
+			for (dx = 0; dx < dw; dx++) {
 				FILTER::getColorAtY(color, lineSrc + dx, fsy, src.stride, py);
 				BLEND_OP::blend(colorsDst[dx], color);
 			}
@@ -737,6 +739,7 @@ public:
 		_ImageStretch_Smooth_Prepare(sw, dw, sx_step, sx_start, dx_start, dx_end, px);
 		
 		sl_int32 dx, dy;
+		sl_int32 dh = dst.height;
 		float sx;
 		
 		Color* colorsDst;
@@ -746,14 +749,14 @@ public:
 			// left
 			colorsDst = dst.colors;
 			color = *(src.colors);
-			for (dy = 0; dy < dst.height; dy++) {
+			for (dy = 0; dy < dh; dy++) {
 				BLEND_OP::blend(*colorsDst, color);
 				colorsDst += dst.stride;
 			}
 			// right
 			colorsDst = dst.colors + (dw - 1);
 			color = *(src.colors + (sw - 1));
-			for (dy = 0; dy < dst.height; dy++) {
+			for (dy = 0; dy < dh; dy++) {
 				BLEND_OP::blend(*colorsDst, color);
 				colorsDst += dst.stride;
 			}
@@ -764,7 +767,7 @@ public:
 			isx = (sl_int32)sx;
 			FILTER::getColorAtX(color, src.colors + isx, sx - (float)isx, px);
 			colorsDst = dst.colors + dx;
-			for (dy = 0; dy < dst.height; dy++) {
+			for (dy = 0; dy < dh; dy++) {
 				BLEND_OP::blend(*(colorsDst), color);
 				colorsDst += dst.stride;
 			}
@@ -783,6 +786,7 @@ public:
 		_ImageStretch_Smooth_Prepare(sh, dh, sy_step, sy_start, dy_start, dy_end, py);
 		
 		sl_int32 dx, dy;
+		sl_int32 dw = dst.width;
 		float sy;
 		
 		Color* colorsDst;
@@ -792,13 +796,13 @@ public:
 			// top
 			colorsDst = dst.colors;
 			color = *(src.colors);
-			for (dx = 0; dx < dst.width; dx++) {
+			for (dx = 0; dx < dw; dx++) {
 				BLEND_OP::blend(colorsDst[dx], color);
 			}
 			// bottom
 			colorsDst = dst.colors + (dh - 1) * dst.stride;
 			color = *(src.colors + (sh - 1) * src.stride);
-			for (dx = 0; dx < dst.width; dx++) {
+			for (dx = 0; dx < dw; dx++) {
 				BLEND_OP::blend(colorsDst[dx], color);
 			}
 		}
@@ -809,7 +813,7 @@ public:
 			isy = (sl_int32)sy;
 			float fsy = sy - (float)isy;
 			FILTER::getColorAtY(color, src.colors + isy * src.stride, fsy, src.stride, py);
-			for (dx = 0; dx < dst.width; dx++) {
+			for (dx = 0; dx < dw; dx++) {
 				BLEND_OP::blend(colorsDst[dx], color);
 			}
 			colorsDst += dst.stride;
