@@ -292,6 +292,10 @@ template <> void Json::fromJson(const Variant& v, SafeString16& _out);
 template <> void Json::fromJson(const Variant& v, SafeString16& _out, const SafeString16& def);
 template <> Variant Json::toJson(const SafeString16& _in);
 
+template <> void Json::fromJson(const Variant& v, Time& _out);
+template <> void Json::fromJson(const Variant& v, Time& _out, const Time& def);
+template <> Variant Json::toJson(const Time& _in);
+
 template <> void Json::fromJson(const Variant& v, List<Variant>& _out);
 template <> void Json::fromJson(const Variant& v, List<Variant>& _out, const List<Variant>& def);
 template <> Variant Json::toJson(const List<Variant>& _in);

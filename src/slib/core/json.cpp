@@ -720,6 +720,21 @@ template <> Variant Json::toJson(const SafeString16& _in)
 	return Variant(_in);
 }
 
+template <> void Json::fromJson(const Variant& v, Time& _out)
+{
+	_out = v.getTime();
+}
+
+template <> void Json::fromJson(const Variant& v, Time& _out, const Time& def)
+{
+	_out = v.getTime(def);
+}
+
+template <> Variant Json::toJson(const Time& _in)
+{
+	return Variant(_in);
+}
+
 template <> void Json::fromJson(const Variant& v, List<Variant>& _out)
 {
 	_out = v.getVariantList();
