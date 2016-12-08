@@ -156,13 +156,8 @@ void ViewStack::_push(const Ref<View>& viewIn, Transition transition, sl_bool fl
 	m_pages.add_NoLock(viewIn);
 	dispatchPageAction(viewIn.ptr, UIPageAction::Push);
 	
-	Time now = Time::now();
-	if (animationPause.isNotNull()) {
-		animationPause->start(now);
-	}
-	if (animationPush.isNotNull()) {
-		animationPush->start(now);
-	}
+	animationPause->dispatchAnimationFrame(0);
+	animationPush->dispatchAnimationFrame(0);
 
 	viewIn->bringToFront(UIUpdateMode::NoRedraw);
 	viewIn->setVisibility(Visibility::Visible);
@@ -174,6 +169,16 @@ void ViewStack::_push(const Ref<View>& viewIn, Transition transition, sl_bool fl
 		_ViewStack_FinishAnimation(this, viewIn, UIPageAction::Push);
 	}
 	
+	viewIn->post([animationPause, animationPush] () {
+		Time now = Time::now();
+		if (animationPause.isNotNull()) {
+			animationPause->start(now);
+		}
+		if (animationPush.isNotNull()) {
+			animationPush->start(now);
+		}
+	});
+
 }
 
 void ViewStack::push(const Ref<View>& viewIn, const Transition& transition, sl_bool flagRemoveAllBackPages)
@@ -769,16 +774,18 @@ void ViewPage::_openPopup(const Ref<View>& parent, Transition transition, sl_boo
 	
 	dispatchOpen();
 	
-	if (animation.isNotNull()) {
-		animation->start();
-	}
+	animation->dispatchAnimationFrame(0);
 	
 	setVisibility(Visibility::Visible);
 	
 	if (animation.isNull()) {
 		_finishPopupAnimation(UIPageAction::Push);
+	} else {
+		post([animation] () {
+			animation->start();
+		});
 	}
-
+	
 }
 
 void ViewPage::_closePopup(Transition transition)

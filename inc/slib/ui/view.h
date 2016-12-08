@@ -10,6 +10,7 @@
 #include "../core/object.h"
 #include "../core/pointer.h"
 #include "../core/callback.h"
+#include "../core/queue.h"
 #include "../core/animation.h"
 #include "../graphics/canvas.h"
 #include "../graphics/bitmap.h"
@@ -944,6 +945,8 @@ public:
 	Ref<Bitmap> drawLayer();
 	
 	void draw(Canvas* canvas);
+	
+	void post(const Function<void()>& callback, sl_bool flagInvalidate = sl_true);
 
 public:
 	SLIB_PTR_PROPERTY(IViewListener, EventListener)
@@ -1358,6 +1361,8 @@ protected:
 	SafeRef<ScrollAttributes> m_scrollAttributes;
 	
 	Ref<ScrollAttributes> _initializeScrollAttributes();
+	
+	Queue< Function<void()> > m_postCallbacks;
 
 	friend class ListView;
 

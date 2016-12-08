@@ -18,14 +18,15 @@
 
 #	define SLIB_STDCALL		__stdcall
 #	define SLIB_INLINE		__forceinline
-#	define SLIB_THREAD		__declspec(thread)
+#	define SLIB_THREAD_OLD	__declspec(thread)
+#	define SLIB_THREAD		thread_local
 #	define SLIB_INT64(v)	(v##i64)
 #	define SLIB_UINT64(v)	(v##ui64)
 typedef __int64				sl_int64;
 typedef unsigned __int64	sl_uint64;
-typedef size_t sl_size_t;
+typedef size_t				sl_size_t;
 
-#define SLIB_ALIGN(n) __declspec(align(n))
+#define SLIB_ALIGN(n)		__declspec(align(n))
 
 #define SLIB_EXPORT
 #define SLIB_VISIBLE_LOCAL
@@ -40,16 +41,17 @@ typedef size_t sl_size_t;
 #	define SLIB_INLINE		inline __attribute__((always_inline))
 #	define SLIB_INT64(v)	(v##LL)
 #	define SLIB_UINT64(v)	(v##ULL)
-#	define SLIB_THREAD		__thread
+#	define SLIB_THREAD_OLD	__thread
+#	define SLIB_THREAD		thread_local
 typedef long long			sl_int64;
 typedef unsigned long long	sl_uint64;
-typedef __SIZE_TYPE__ sl_size_t;
+typedef __SIZE_TYPE__		sl_size_t;
 
-#define SLIB_ALIGN(n) __attribute__((aligned(n)))
+#define SLIB_ALIGN(n)		__attribute__((aligned(n)))
 
 #if __GNUC__ >= 4
-#define SLIB_EXPORT __attribute__((visibility("default")))
-#define SLIB_VISIBLE_LOCAL __attribute__((visibility("hidden")))
+#define SLIB_EXPORT			__attribute__((visibility("default")))
+#define SLIB_VISIBLE_LOCAL	__attribute__((visibility("hidden")))
 #else
 #define SLIB_EXPORT
 #define SLIB_VISIBLE_LOCAL
@@ -84,9 +86,9 @@ typedef const void*			sl_cptr;
 #define sl_null				nullptr
 typedef decltype(nullptr)	sl_null_t;
 
-typedef bool sl_bool;
-#define sl_true true
-#define sl_false false
+typedef bool				sl_bool;
+#define sl_true				true
+#define sl_false			false
 
 #define SLIB_UINT8_MAX		(sl_uint8)(0xFF)
 #define SLIB_INT8_MAX		(sl_int8)(0x7F)
@@ -126,11 +128,11 @@ typedef sl_uint32			sl_char32;
 // Unicode String Constant Definition
 #if defined(SLIB_COMPILER_IS_VC)
 
-#	define SLIB_UNICODE(quote)		(const sl_char16*)(L##quote)
+#	define SLIB_UNICODE(quote)			(const sl_char16*)(L##quote)
 #	define SLIB_USE_UNICODE16
 
 #define SLIB_STRINGIFY(...) (#__VA_ARGS__)
-#define SLIB_STRINGIFY_UNICODE(...) SLIB_UNICODE(#__VA_ARGS__)
+#define SLIB_STRINGIFY_UNICODE(...)		SLIB_UNICODE(#__VA_ARGS__)
 
 #elif defined(SLIB_COMPILER_IS_GCC)
 
@@ -142,20 +144,20 @@ typedef sl_uint32			sl_char32;
 #		define SLIB_USE_UNICODE32
 #	endif
 
-#define SLIB_STRINGIFY(x...) (#x)
-#define SLIB_STRINGIFY_UNICODE(x...) SLIB_UNICODE(#x)
+#define SLIB_STRINGIFY(x...)			(#x)
+#define SLIB_STRINGIFY_UNICODE(x...)	SLIB_UNICODE(#x)
 
 #endif
 
 SLIB_INLINE void sl_blank_proc(const void*) {}
-#define SLIB_UNUSED(x) sl_blank_proc(&x);
+#define SLIB_UNUSED(x)				sl_blank_proc(&x);
 
-#define SLIB_IS_ALIGNED(p, a) (!((unsigned long)(p) & ((a) - 1)))
-#define SLIB_IS_ALIGNED_4(x) (!(((sl_reg)((void*)(x))) & 3))
-#define SLIB_IS_ALIGNED_8(x) (!(((sl_reg)((void*)(x))) & 7))
+#define SLIB_IS_ALIGNED(p, a)		(!((unsigned long)(p) & ((a) - 1)))
+#define SLIB_IS_ALIGNED_4(x)		(!(((sl_reg)((void*)(x))) & 3))
+#define SLIB_IS_ALIGNED_8(x)		(!(((sl_reg)((void*)(x))) & 7))
 
-#define SLIB_MAX(a, b) ((a)>(b)?(a):(b))
-#define SLIB_MIN(a, b) ((a)<(b)?(a):(b))
+#define SLIB_MAX(a, b)				((a)>(b)?(a):(b))
+#define SLIB_MIN(a, b)				((a)<(b)?(a):(b))
 
 template <class T>
 SLIB_INLINE void sl_swap(T& a, T& b)

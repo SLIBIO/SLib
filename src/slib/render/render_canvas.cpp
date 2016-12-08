@@ -374,6 +374,11 @@ Ref<RenderCanvas> RenderCanvas::create(const Ref<RenderEngine>& engine, sl_real 
 	return Ref<RenderCanvas>::null();
 }
 
+Ref<RenderEngine> RenderCanvas::getEngine()
+{
+	return m_engine;
+}
+
 void RenderCanvas::save()
 {
 	RenderCanvasState* stateOld = m_state.ptr;

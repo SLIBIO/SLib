@@ -1,6 +1,7 @@
 #include "../../../inc/slib/core/animation.h"
 
 #include "../../../inc/slib/core/thread.h"
+#include "../../../inc/slib/core/scoped_pointer.h"
 
 SLIB_NAMESPACE_BEGIN
 
@@ -390,10 +391,6 @@ void Animation::startAndSetTime(float initialTime, const Time& current)
 	}
 	m_flagStarted = sl_true;
 	
-	if (initialTime < SLIB_EPSILON) {
-		dispatchAnimationFrame(0);
-	}
-
 	Time t;
 	t.setSecondsCountf(initialTime);
 	m_timer.startAndSetTime(t, current);
@@ -401,6 +398,12 @@ void Animation::startAndSetTime(float initialTime, const Time& current)
 	if (center) {
 		center->addAnimation(this);
 	}
+	
+	if (initialTime < SLIB_EPSILON) {
+		lock.unlock();
+		dispatchAnimationFrame(0);
+	}
+	
 }
 
 void Animation::restart()
@@ -433,15 +436,25 @@ void Animation::restartAndSetTime(float initialTime, const Time& current)
 void Animation::stop()
 {
 	ObjectLocker lock(this);
+	sl_bool flagStarted = _stop();
+	if (flagStarted) {
+		lock.unlock();
+		dispatchStopAnimation();
+	}
+}
+
+sl_bool Animation::_stop()
+{
 	sl_bool flagStarted = m_timer.isStarted();
 	m_timer.stop();
 	if (flagStarted) {
-		dispatchStopAnimation();
 		_AnimationCenter* center = _AnimationCenter_get();
 		if (center) {
 			center->removeAnimation(this);
 		}
+		return sl_true;
 	}
+	return sl_false;
 }
 
 void Animation::resume()
@@ -565,11 +578,12 @@ void Animation::update(const Time& current)
 	float time = _getTime(current, iRepeat, flagStop);
 	m_lastRepeatedCount = iRepeat;
 	
-	dispatchAnimationFrame(time);
-	
+	sl_bool flagStopped = sl_false;
 	if (flagStop) {
-		stop();
+		flagStopped = _stop();
+		lock.unlock();
 	} else {
+		lock.unlock();
 		if (repeat != 0 && lastRepeat < iRepeat) {
 			if (repeat < 0) {
 				dispatchRepeatAnimation(-1);
@@ -581,6 +595,11 @@ void Animation::update(const Time& current)
 				dispatchRepeatAnimation(remainRepeat);
 			}
 		}
+	}
+	
+	dispatchAnimationFrame(time);
+	if (flagStopped) {
+		dispatchStopAnimation();
 	}
 }
 
@@ -604,8 +623,15 @@ void Animation::dispatchAnimationFrame(float time)
 		listener->onAnimationFrame(this, time);
 	}
 	float fraction = _getFraction(time);
-	ListLocker< Ref<AnimationTarget> > targets(m_targets);
-	for (sl_size i = 0; i < targets.count; i++) {
+	ListLocker< Ref<AnimationTarget> > _targets(m_targets);
+	sl_size n = _targets.count;
+	SLIB_SCOPED_BUFFER(Ref<AnimationTarget>, 8, targets, n)
+	sl_size i;
+	for (i = 0; i < n; i++) {
+		targets[i] = _targets[i];
+	}
+	_targets.unlock();
+	for (i = 0; i < n; i++) {
 		Ref<AnimationTarget>& target = targets[i];
 		if (target.isNotNull()) {
 			target->update(fraction);

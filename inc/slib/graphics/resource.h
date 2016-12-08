@@ -75,10 +75,10 @@ SLIB_GRAPHICS_NAMESPACE_BEGIN
 		static slib::_ImageResourceEntry entries[2] = { {sl_true, WIDTH, HEIGHT, BYTES, (sl_uint32)(SIZE), 0, 0, sl_false}, {sl_false, 0, 0, 0, 0, 0, 0, sl_false} }; \
 		static slib::_ImageResourceFreeStatic free_entries(entries); \
 		slib::Ref<slib::Image> getImage(const slib::Locale& locale, sl_uint32 requiredWidth, sl_uint32 requiredHeight) { \
-			return slib::_ImageResource_getImage(entries, 0, 0); \
+			return slib::_ImageResource_getImage(entries, requiredWidth, requiredHeight); \
 		} \
 		slib::Ref<slib::Image> getImage(sl_uint32 requiredWidth, sl_uint32 requiredHeight) { \
-			return slib::_ImageResource_getImage(entries, 0, 0); \
+			return slib::_ImageResource_getImage(entries, requiredWidth, requiredHeight); \
 		} \
 		slib::List< slib::Ref<slib::Image> > getImages(const slib::Locale& locale) { \
 			return slib::_ImageResource_getImages(entries); \
@@ -87,10 +87,10 @@ SLIB_GRAPHICS_NAMESPACE_BEGIN
 			return slib::_ImageResource_getImages(entries); \
 		} \
 		slib::Ref<slib::Drawable> get(const slib::Locale& locale) { \
-			return slib::_ImageResource_getImage(entries, 0, 0); \
+			return slib::_ImageResource_get(entries, WIDTH, HEIGHT); \
 		} \
 		slib::Ref<slib::Drawable> get() { \
-			return slib::_ImageResource_getImage(entries, 0, 0); \
+			return slib::_ImageResource_get(entries, WIDTH, HEIGHT); \
 		} \
 	}
 
@@ -154,6 +154,7 @@ struct _ImageResourceEntry
 	sl_bool flag_load;
 	
 	Ref<Image> getImage();
+	Ref<Image> getMatchingImage(sl_uint32 width, sl_uint32 height);
 	
 };
 

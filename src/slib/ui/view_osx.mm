@@ -159,8 +159,15 @@ void OSX_ViewInstance::setFrame(const UIRect& frame)
 		frameNew.origin.y = (int)(frame.top);
 		frameNew.size.width = (int)(frame.getWidth());
 		frameNew.size.height = (int)(frame.getHeight());
-		[handle setFrame:frameNew];
-		[handle setNeedsDisplay:YES];
+		if (UI::isUiThread()) {
+			[handle setFrame:frameNew];
+			[handle setNeedsDisplay:YES];
+		} else {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[handle setFrame:frameNew];
+				[handle setNeedsDisplay:YES];
+			});
+		}
 	}
 }
 
@@ -172,7 +179,13 @@ void OSX_ViewInstance::setVisible(sl_bool flag)
 {
 	NSView* handle = m_handle;
 	if (handle != nil) {
-		[handle setHidden:(flag ? NO : YES)];
+		if (UI::isUiThread()) {
+			[handle setHidden:(flag ? NO : YES)];
+		} else {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[handle setHidden:(flag ? NO : YES)];
+			});
+		}
 	}
 }
 
@@ -182,7 +195,13 @@ void OSX_ViewInstance::setEnabled(sl_bool flag)
 	if (handle != nil) {
 		if ([handle isKindOfClass:[NSControl class]]) {
 			NSControl* control = (NSControl*)handle;
-			[control setEnabled:(flag ? YES : NO)];
+			if (UI::isUiThread()) {
+				[control setEnabled:(flag ? YES : NO)];
+			} else {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[control setEnabled:(flag ? YES : NO)];
+				});
+			}
 		}
 	}
 }
@@ -302,8 +321,15 @@ void OSX_ViewInstance::bringToFront()
 	if (handle != nil) {
 		NSView* parent = handle.superview;
 		if (parent != nil) {
-			[handle removeFromSuperviewWithoutNeedingDisplay];
-			[parent addSubview:handle];
+			if (UI::isUiThread()) {
+				[handle removeFromSuperviewWithoutNeedingDisplay];
+				[parent addSubview:handle];
+			} else {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[handle removeFromSuperviewWithoutNeedingDisplay];
+					[parent addSubview:handle];
+				});
+			}
 		}
 	}
 }
@@ -488,23 +514,38 @@ void View::_setFrame_NI(const UIRect& _frame)
 			NSPoint pt;
 			NSSize size;
 			OSX_transformViewFrame(pt, size, _frame, t.x, t.y, s.x, s.y, r, anchor.x, anchor.y);
-			[handle setFrameOrigin:pt];
-			[handle setFrameSize:size];
 			NSRect bounds;
 			bounds.origin.x = 0;
 			bounds.origin.y = 0;
 			bounds.size.width = (CGFloat)(_frame.getWidth());
 			bounds.size.height = (CGFloat)(_frame.getHeight());
-			handle.bounds = bounds;
+			if (UI::isUiThread()) {
+				[handle setFrameOrigin:pt];
+				[handle setFrameSize:size];
+				handle.bounds = bounds;
+			} else {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[handle setFrameOrigin:pt];
+					[handle setFrameSize:size];
+					handle.bounds = bounds;
+				});
+			}
 		} else {
 			NSRect frame;
 			frame.origin.x = (CGFloat)(_frame.left);
 			frame.origin.y = (CGFloat)(_frame.top);
 			frame.size.width = (CGFloat)(_frame.getWidth());
 			frame.size.height = (CGFloat)(_frame.getHeight());
-			handle.frame = frame;
+			if (UI::isUiThread()) {
+				handle.frame = frame;
+				[handle setNeedsDisplay:YES];
+			} else {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					handle.frame = frame;
+					[handle setNeedsDisplay:YES];
+				});
+			}
 		}
-		[handle setNeedsDisplay:YES];
 	}
 }
 
@@ -521,23 +562,39 @@ void View::_setTransform_NI(const Matrix3& matrix)
 			NSPoint pt;
 			NSSize size;
 			OSX_transformViewFrame(pt, size, _frame, t.x, t.y, s.x, s.y, r, anchor.x, anchor.y);
-			[handle setFrameOrigin:pt];
-			[handle setFrameSize:size];
-			handle.frameRotation = Math::getDegreesFromRadian(r);
 			NSRect bounds;
 			bounds.origin.x = 0;
 			bounds.origin.y = 0;
 			bounds.size.width = (CGFloat)(_frame.getWidth());
 			bounds.size.height = (CGFloat)(_frame.getHeight());
-			handle.bounds = bounds;
+			if (UI::isUiThread()) {
+				handle.frameRotation = Math::getDegreesFromRadian(r);
+				[handle setFrameOrigin:pt];
+				[handle setFrameSize:size];
+				handle.bounds = bounds;
+			} else {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					handle.frameRotation = Math::getDegreesFromRadian(r);
+					[handle setFrameOrigin:pt];
+					[handle setFrameSize:size];
+					handle.bounds = bounds;
+				});
+			}
 		} else {
 			NSRect frame;
 			frame.origin.x = (CGFloat)(_frame.left);
 			frame.origin.y = (CGFloat)(_frame.top);
 			frame.size.width = (CGFloat)(_frame.getWidth());
 			frame.size.height = (CGFloat)(_frame.getHeight());
-			handle.frame = frame;
-			[handle setNeedsDisplay:YES];
+			if (UI::isUiThread()) {
+				handle.frame = frame;
+				[handle setNeedsDisplay:YES];
+			} else {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					handle.frame = frame;
+					[handle setNeedsDisplay:YES];
+				});
+			}
 		}
 	}
 }

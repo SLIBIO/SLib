@@ -214,6 +214,8 @@ protected:
 	
 	float _applyCurve(float fraction);
 	
+	sl_bool _stop();
+	
 protected:
 	TimeKeeper m_timer;
 	float m_duration; // seconds

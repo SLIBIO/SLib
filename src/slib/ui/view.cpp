@@ -6388,6 +6388,16 @@ void View::draw(Canvas* canvas)
 	
 }
 
+void View::post(const Function<void()>& callback, sl_bool flagInvalidate)
+{
+	if (callback.isNotNull()) {
+		m_postCallbacks.push(callback);
+		if (flagInvalidate) {
+			invalidate();
+		}
+	}
+}
+
 void View::dispatchDraw(Canvas* canvas)
 {
 	m_flagCurrentDrawing = sl_true;
@@ -6430,6 +6440,11 @@ void View::dispatchDraw(Canvas* canvas)
 	}
 
 	m_flagCurrentDrawing = sl_false;
+	
+	Function<void()> callback;
+	while (m_postCallbacks.pop(&callback)) {
+		callback();
+	}
 	
 }
 

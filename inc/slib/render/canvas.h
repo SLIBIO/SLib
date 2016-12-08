@@ -26,6 +26,8 @@ public:
 	static Ref<RenderCanvas> create(const Ref<RenderEngine>& engine, sl_real width, sl_real height);
 	
 public:
+	Ref<RenderEngine> getEngine();
+	
 	// override
 	void save();
 	

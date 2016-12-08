@@ -1099,7 +1099,14 @@ void MipmapDrawable::onDraw(Canvas* canvas, const Rectangle& rectDst, const Rect
 	if (width > 0 && height > 0) {
 		Ref<Drawable> drawable = getMatchingSource(width, height);
 		if (drawable.isNotNull()) {
-			canvas->draw(rectDst, drawable, rectSrc, param);
+			float fx = drawable->getDrawableWidth() / m_width;
+			float fy = drawable->getDrawableHeight() / m_height;
+			Rectangle r;
+			r.left = rectSrc.left * fx;
+			r.top = rectSrc.top * fy;
+			r.right = rectSrc.right * fx;
+			r.bottom = rectSrc.bottom * fy;
+			canvas->draw(rectDst, drawable, r, param);
 		}
 	}
 }

@@ -93,19 +93,19 @@ public:
 	void fillColor(const Color& color);
 
 	
-	static void draw(ImageDesc& dst, const ImageDesc& src, BlendMode blend = BlendMode::Copy, StretchMode stretch = StretchMode::Halftone);
+	static void draw(ImageDesc& dst, const ImageDesc& src, BlendMode blend = BlendMode::Copy, StretchMode stretch = StretchMode::Default);
 	
 	void drawImage(sl_int32 dx, sl_int32 dy, sl_int32 dw, sl_int32 dh,
 				   const Ref<Image>& src, sl_int32 sx, sl_int32 sy, sl_int32 sw, sl_int32 sh,
-				   BlendMode blend = BlendMode::Copy, StretchMode stretch = StretchMode::Halftone);
+				   BlendMode blend = BlendMode::Copy, StretchMode stretch = StretchMode::Default);
 	
 	void drawImage(const Rectanglei& rectDst,
 				   const Ref<Image>& src, const Rectanglei& rectSrc,
-				   BlendMode blend = BlendMode::Copy, StretchMode stretch = StretchMode::Halftone);
+				   BlendMode blend = BlendMode::Copy, StretchMode stretch = StretchMode::Default);
 	
 	void drawImage(sl_int32 dx, sl_int32 dy, sl_int32 dw, sl_int32 dh,
 				   const Ref<Image>& src, sl_int32 sx, sl_int32 sy,
-				   BlendMode blend = BlendMode::Copy, StretchMode stretch = StretchMode::Halftone);
+				   BlendMode blend = BlendMode::Copy, StretchMode stretch = StretchMode::Default);
 	
 	
 	// override
@@ -113,7 +113,7 @@ public:
 	
 	Ref<Image> sub(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height) const;
 	
-	Ref<Image> scale(sl_uint32 width, sl_uint32 height, StretchMode stretch = StretchMode::Halftone) const;
+	Ref<Image> scale(sl_uint32 width, sl_uint32 height, StretchMode stretch = StretchMode::Default) const;
 	
 	
 	static ImageFileType getFileType(const void* mem, sl_size size);

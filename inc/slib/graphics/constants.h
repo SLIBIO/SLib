@@ -79,8 +79,11 @@ enum class ImageFileType
 
 enum class StretchMode
 {
-	Fast = 0,
-	Halftone = 1
+	Nearest = 0,
+	Linear = 1,
+	Box = 2,
+	
+	Default = Box
 };
 
 enum class BlendMode
