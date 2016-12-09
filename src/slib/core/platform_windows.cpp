@@ -3,7 +3,7 @@
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 
 #include "../../../inc/slib/core/platform_windows.h"
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
 
 #include <crtdbg.h>
 

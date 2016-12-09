@@ -5,6 +5,7 @@
 #include "../../../inc/slib/media/camera.h"
 
 #include "../../../inc/slib/core/platform_android.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 SLIB_MEDIA_NAMESPACE_BEGIN
 

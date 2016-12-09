@@ -1,7 +1,9 @@
-#include "../../../inc/slib/core/file.h"
 #include "../../../inc/slib/core/log.h"
+
 #include "../../../inc/slib/core/system.h"
+#include "../../../inc/slib/core/file.h"
 #include "../../../inc/slib/core/variant.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 #include <android/log.h>
@@ -176,15 +178,15 @@ void Log::logGlobalError(const String& tag, const String& content)
 	}
 }
 
+void _log(const char* tag, const char* msg)
+{
+	SLIB_LOG(tag, msg);
+}
+
+void _log_error(const char* tag, const char* msg)
+{
+	SLIB_LOG_ERROR(tag, msg);
+}
+
 SLIB_NAMESPACE_END
-
-void sl_log(const char* tag, const char* msg)
-{
-    SLIB_LOG(tag, msg);
-}
-
-void sl_log_error(const char* tag, const char* msg)
-{
-    SLIB_LOG_ERROR(tag, msg);
-}
 

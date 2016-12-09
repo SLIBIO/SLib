@@ -10,7 +10,7 @@
 #include "program.h"
 
 #include "../core/time.h"
-#include "../core/pointer.h"
+#include "../core/ptr.h"
 #include "../graphics/color.h"
 #include "../graphics/font.h"
 #include "../math/line_segment.h"

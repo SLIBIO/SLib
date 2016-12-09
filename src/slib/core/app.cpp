@@ -1,8 +1,10 @@
 #include "../../../inc/slib/core/app.h"
+
 #include "../../../inc/slib/core/map.h"
 #include "../../../inc/slib/core/system.h"
 #include "../../../inc/slib/core/file.h"
 #include "../../../inc/slib/core/log.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 SLIB_NAMESPACE_BEGIN
 

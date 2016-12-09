@@ -3,6 +3,7 @@
 #if defined(SLIB_PLATFORM_IS_IOS)
 
 #include "../../../inc/slib/device/sensor.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>

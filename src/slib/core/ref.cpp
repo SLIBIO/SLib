@@ -1,4 +1,4 @@
-#include "../../../inc/slib/core/reference.h"
+#include "../../../inc/slib/core/ref.h"
 #include "../../../inc/slib/core/object.h"
 
 SLIB_NAMESPACE_BEGIN

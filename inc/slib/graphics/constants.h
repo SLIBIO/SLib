@@ -3,6 +3,8 @@
 
 #include "definition.h"
 
+#include "../core/macro.h"
+
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
 enum class PenStyle

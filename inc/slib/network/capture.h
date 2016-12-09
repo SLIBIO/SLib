@@ -16,7 +16,7 @@
 #include "ip_address.h"
 
 #include "../core/object.h"
-#include "../core/pointer.h"
+#include "../core/ptr.h"
 #include "../core/time.h"
 #include "../core/string.h"
 

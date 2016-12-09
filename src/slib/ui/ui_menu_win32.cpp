@@ -3,8 +3,10 @@
 #if defined(SLIB_PLATFORM_IS_WIN32)
 
 #include "../../../inc/slib/ui/menu.h"
+
 #include "../../../inc/slib/ui/platform.h"
 #include "../../../inc/slib/ui/window.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 #include "ui_core_win32.h"
 

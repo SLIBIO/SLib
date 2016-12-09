@@ -8,6 +8,7 @@
 #include "../../../inc/slib/core/platform_apple.h"
 #include "../../../inc/slib/core/endian.h"
 #include "../../../inc/slib/core/log.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 #import <AVFoundation/AVFoundation.h>
 #import <CoreMedia/CoreMedia.h>

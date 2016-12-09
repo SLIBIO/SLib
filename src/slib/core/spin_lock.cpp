@@ -1,4 +1,5 @@
-#include "../../../inc/slib/core/spinlock.h"
+#include "../../../inc/slib/core/spin_lock.h"
+
 #include "../../../inc/slib/core/base.h"
 #include "../../../inc/slib/core/system.h"
 
@@ -75,6 +76,5 @@ void SpinLocker::unlock()
 template class SpinLockPool<-20>;
 
 template class SpinLockPool<-21>;
-
 
 SLIB_NAMESPACE_END

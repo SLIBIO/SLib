@@ -131,7 +131,7 @@ typedef sl_uint32			sl_char32;
 #	define SLIB_UNICODE(quote)			(const sl_char16*)(L##quote)
 #	define SLIB_USE_UNICODE16
 
-#define SLIB_STRINGIFY(...) (#__VA_ARGS__)
+#define SLIB_STRINGIFY(...)				(#__VA_ARGS__)
 #define SLIB_STRINGIFY_UNICODE(...)		SLIB_UNICODE(#__VA_ARGS__)
 
 #elif defined(SLIB_COMPILER_IS_GCC)
@@ -149,8 +149,8 @@ typedef sl_uint32			sl_char32;
 
 #endif
 
-SLIB_INLINE void sl_blank_proc(const void*) {}
-#define SLIB_UNUSED(x)				sl_blank_proc(&x);
+#define SLIB_CONSTEXPR				constexpr
+
 
 #define SLIB_IS_ALIGNED(p, a)		(!((unsigned long)(p) & ((a) - 1)))
 #define SLIB_IS_ALIGNED_4(x)		(!(((sl_reg)((void*)(x))) & 3))
@@ -159,64 +159,65 @@ SLIB_INLINE void sl_blank_proc(const void*) {}
 #define SLIB_MAX(a, b)				((a)>(b)?(a):(b))
 #define SLIB_MIN(a, b)				((a)<(b)?(a):(b))
 
-template <class T>
-SLIB_INLINE void sl_swap(T& a, T& b)
-{
-	T o = b;
-	b = a;
-	a = o;
-}
-#define SLIB_SWAP(a, b) sl_swap(a, b);
+#define SLIB_CHECK_FLAG(v, flag)	(((v) & (flag)) != 0)
+#define SLIB_SET_FLAG(v, flag)		v |= (flag);
+#define SLIB_RESET_FLAG(v, flag)	v &= (~(flag));
 
-#define SLIB_DECLARE_PRIMITIVE_WRAPPER(TYPE, CLASS) \
-public: \
-	TYPE value; \
-public: \
-	SLIB_INLINE CLASS(const CLASS& other) : value(other.value) {} \
-	SLIB_INLINE CLASS(TYPE _value) : value(_value) {} \
-	SLIB_INLINE operator TYPE() const { return value; } \
-	SLIB_INLINE CLASS& operator=(const CLASS& other) { value = other.value; return *this; } \
-	SLIB_INLINE CLASS& operator=(TYPE _value) { value = _value; return *this; } \
-	SLIB_INLINE sl_bool operator==(const CLASS& other) { return value == other.value; } \
-	SLIB_INLINE sl_bool operator==(TYPE _value) { return value == _value; } \
-	SLIB_INLINE sl_bool operator!=(const CLASS& other) { return value != other.value; } \
-	SLIB_INLINE sl_bool operator!=(TYPE _value) { return value != _value; }
+#define SLIB_GET_BYTE(A,n)			((sl_uint8)((A) >> (n << 3)))
+#define SLIB_GET_BYTE0(A)			((sl_uint8)(A))
+#define SLIB_GET_BYTE1(A)			((sl_uint8)((A) >> 8))
+#define SLIB_GET_BYTE2(A)			((sl_uint8)((A) >> 16))
+#define SLIB_GET_BYTE3(A)			((sl_uint8)((A) >> 24))
+#define SLIB_GET_BYTE4(A)			((sl_uint8)((A) >> 32))
+#define SLIB_GET_BYTE5(A)			((sl_uint8)((A) >> 40))
+#define SLIB_GET_BYTE6(A)			((sl_uint8)((A) >> 48))
+#define SLIB_GET_BYTE7(A)			((sl_uint8)((A) >> 56))
+#define SLIB_GET_WORD(A,n)			((sl_uint16)((A) >> (n << 4)))
+#define SLIB_GET_WORD0(A)			((sl_uint16)(A))
+#define SLIB_GET_WORD1(A)			((sl_uint16)((A) >> 16))
+#define SLIB_GET_WORD2(A)			((sl_uint16)((A) >> 32))
+#define SLIB_GET_WORD3(A)			((sl_uint16)((A) >> 48))
+#define SLIB_GET_DWORD(A,n)			((sl_uint32)((A) >> (n << 5)))
+#define SLIB_GET_DWORD0(A)			((sl_uint32)(A))
+#define SLIB_GET_DWORD1(A)			((sl_uint32)((A) >> 32))
 
-#define SLIB_CHECK_FLAG(v, flag) (((v) & (flag)) != 0)
-#define SLIB_SET_FLAG(v, flag) v |= (flag);
-#define SLIB_RESET_FLAG(v, flag) v &= (~(flag));
-
-#define SLIB_DECLARE_FLAGS(CLASS) \
-	SLIB_DECLARE_PRIMITIVE_WRAPPER(int, CLASS) \
-	SLIB_INLINE CLASS() = default; \
-	SLIB_INLINE CLASS& operator|=(int _value) { value |= _value; return *this; } \
-	SLIB_INLINE CLASS& operator&=(int _value) { value &= _value; return *this; }
+#define SLIB_MAKE_WORD(A,B)					((((sl_uint32)(A))<<8) | ((sl_uint32)(B)))
+#define SLIB_MAKE_DWORD(A,B,C,D)			((((sl_uint32)(A))<<24) | (((sl_uint32)(B))<<16) | (((sl_uint32)(C))<<8) | ((sl_uint32)(D)))
+#define SLIB_MAKE_DWORD2(A,B)				((((sl_uint32)(A))<<16) | ((sl_uint32)(B)))
+#define SLIB_MAKE_QWORD(A,B,C,D,E,F,G,H)	(((sl_uint64)(SLIB_MAKE_DWORD(A,B,C,D)) << 32) | SLIB_MAKE_DWORD(E,F,G,H))
+#define SLIB_MAKE_QWORD2(A,B,C,D)			(((sl_uint64)(SLIB_MAKE_DWORD2(A,B)) << 32) | SLIB_MAKE_DWORD2(C,D))
+#define SLIB_MAKE_QWORD4(A,B)				((((sl_uint64)(A)) << 32) | (B))
 
 
-#define SLIB_GET_BYTE(A,n) ((sl_uint8)((A) >> (n << 3)))
-#define SLIB_GET_BYTE0(A) ((sl_uint8)(A))
-#define SLIB_GET_BYTE1(A) ((sl_uint8)((A) >> 8))
-#define SLIB_GET_BYTE2(A) ((sl_uint8)((A) >> 16))
-#define SLIB_GET_BYTE3(A) ((sl_uint8)((A) >> 24))
-#define SLIB_GET_BYTE4(A) ((sl_uint8)((A) >> 32))
-#define SLIB_GET_BYTE5(A) ((sl_uint8)((A) >> 40))
-#define SLIB_GET_BYTE6(A) ((sl_uint8)((A) >> 48))
-#define SLIB_GET_BYTE7(A) ((sl_uint8)((A) >> 56))
-#define SLIB_GET_WORD(A,n) ((sl_uint16)((A) >> (n << 4)))
-#define SLIB_GET_WORD0(A) ((sl_uint16)(A))
-#define SLIB_GET_WORD1(A) ((sl_uint16)((A) >> 16))
-#define SLIB_GET_WORD2(A) ((sl_uint16)((A) >> 32))
-#define SLIB_GET_WORD3(A) ((sl_uint16)((A) >> 48))
-#define SLIB_GET_DWORD(A,n) ((sl_uint32)((A) >> (n << 5)))
-#define SLIB_GET_DWORD0(A) ((sl_uint32)(A))
-#define SLIB_GET_DWORD1(A) ((sl_uint32)((A) >> 32))
+SLIB_NAMESPACE_BEGIN
+	SLIB_INLINE void _blank_proc(const void*) {}
+	void _abort(const char* msg, const char* file, sl_uint32 line);
+SLIB_NAMESPACE_END
 
-#define SLIB_MAKE_WORD(A,B) ((((sl_uint32)(A))<<8) | ((sl_uint32)(B)))
-#define SLIB_MAKE_DWORD(A,B,C,D) ((((sl_uint32)(A))<<24) | (((sl_uint32)(B))<<16) | (((sl_uint32)(C))<<8) | ((sl_uint32)(D)))
-#define SLIB_MAKE_DWORD2(A,B) ((((sl_uint32)(A))<<16) | ((sl_uint32)(B)))
-#define SLIB_MAKE_QWORD(A,B,C,D,E,F,G,H) (((sl_uint64)(SLIB_MAKE_DWORD(A,B,C,D)) << 32) | SLIB_MAKE_DWORD(E,F,G,H))
-#define SLIB_MAKE_QWORD2(A,B,C,D) (((sl_uint64)(SLIB_MAKE_DWORD2(A,B)) << 32) | SLIB_MAKE_DWORD2(C,D))
-#define SLIB_MAKE_QWORD4(A, B) ((((sl_uint64)(A)) << 32) | (B))
+#define SLIB_UNUSED(x)					slib::_blank_proc(&x);
+
+#if defined(SLIB_DEBUG)
+#	define SLIB_ASSERT(_Expression)		( (!!(_Expression)) || (slib::_abort(#_Expression, __FILE__, __LINE__), 0) )
+#	define SLIB_ABORT(MESSAGE)			(slib::_abort(MESSAGE, __FILE__, __LINE__))
+#else
+#	define SLIB_ASSERT(_Expression)
+#	define SLIB_ABORT(MESSAGE)
+#endif
+
+
+#if !defined(_LIBCPP_NEW) && !defined(_NEW_) && !defined(_NEW)
+#	ifndef __PLACEMENT_NEW_INLINE
+#		define __PLACEMENT_NEW_INLINE
+		SLIB_INLINE void* (operator new)(sl_size_t in_size, void* in_pWhere) { return in_pWhere; }
+		SLIB_INLINE void(operator delete)(void* in_pVoid, void* in_pWhere) {}
+#	endif
+#	ifndef __PLACEMENT_VEC_NEW_INLINE
+#		define __PLACEMENT_VEC_NEW_INLINE
+		SLIB_INLINE void* (operator new[])(sl_size_t in_size, void* in_pWhere) { return in_pWhere; }
+		SLIB_INLINE void(operator delete[])(void* in_pVoid, void* in_pWhere) {}
+#	endif
+#endif
+
 
 /************************************************************************/
 /* Operating System Related Difinitions                                 */
@@ -225,18 +226,6 @@ public: \
 #	ifndef _WIN32_WINNT
 #		define _WIN32_WINNT 0x0501
 #	endif
-#endif
-
-void sl_abort(const char* msg, const char* file, sl_uint32 line);
-void sl_log(const char* tag, const char* msg);
-void sl_log_error(const char* tag, const char* msg);
-
-#if defined(SLIB_DEBUG)
-#define SLIB_ASSERT(_Expression) ( (!!(_Expression)) || (sl_abort(#_Expression, __FILE__, __LINE__), 0) )
-#define SLIB_ABORT(MESSAGE) (sl_abort(MESSAGE, __FILE__, __LINE__))
-#else
-#define SLIB_ASSERT(_Expression)
-#define SLIB_ABORT(MESSAGE)
 #endif
 
 #endif

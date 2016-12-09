@@ -3,7 +3,7 @@
 
 #include "definition.h"
 
-#include "../core/reference.h"
+#include "../core/ref.h"
 #include "../core/memory.h"
 #include "../core/string.h"
 #include "../core/parse.h"

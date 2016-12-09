@@ -1,5 +1,7 @@
 #include "../../../inc/slib/core/content_type.h"
+
 #include "../../../inc/slib/core/map.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 SLIB_NAMESPACE_BEGIN
 

@@ -112,135 +112,6 @@
     <ClInclude Include="..\..\..\inc\slib\ui.h">
       <Filter>inc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\base64.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\callback.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\content_type.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\definition.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\endian.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\event.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\expire.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\file.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\hashtable.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\io.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\iterator.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\java.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\json.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\list.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\log.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\map.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\math.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\memory.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\mio.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\mutex.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\object.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\option.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\pipe.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\pointer.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\queue.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\queue_channel.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\reference.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\scoped_pointer.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\service.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\setting.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\spinlock.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\string.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\system.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\thread.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\thread_pool.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\time.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\tree.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\variant.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\app.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\array.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\array2d.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\async.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\base.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\db\definition.h">
       <Filter>inc\db</Filter>
     </ClInclude>
@@ -375,18 +246,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\view.h">
       <Filter>inc\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\platform_android.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\platform_apple.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\platform_windows.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\win32_com.h">
-      <Filter>inc\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\camera_view.h">
       <Filter>inc\ui</Filter>
@@ -628,32 +487,14 @@
     <ClInclude Include="..\..\..\inc\slib\db\database.h">
       <Filter>inc\db</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\atomic.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\media\audio_data.h">
       <Filter>inc\media</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\media\video_frame.h">
       <Filter>inc\media</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\asset.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\resource.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\locale.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\loop_queue.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\network\datagram.h">
       <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\xml.h">
-      <Filter>inc\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\menu.h">
       <Filter>inc\ui</Filter>
@@ -663,9 +504,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\common_dialogs.h">
       <Filter>inc\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\new.h">
-      <Filter>inc\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\scroll_bar.h">
       <Filter>inc\ui</Filter>
@@ -682,9 +520,6 @@
     <ClInclude Include="..\..\..\inc\slib\ui\mobile_game.h">
       <Filter>inc\ui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\charset.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\resource.h">
       <Filter>inc</Filter>
     </ClInclude>
@@ -696,9 +531,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\resource.h">
       <Filter>inc\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\parse.h">
-      <Filter>inc\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\linear_view.h">
       <Filter>inc\ui</Filter>
@@ -723,9 +555,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\slider.h">
       <Filter>inc\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\animation.h">
-      <Filter>inc\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\graphics\platform.h">
       <Filter>inc\graphics</Filter>
@@ -754,35 +583,11 @@
     <ClInclude Include="..\..\..\src\slib\render\opengl_egl_entries.h">
       <Filter>src\slib\render</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\linked_object.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\network\url.h">
       <Filter>inc\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\network\url_request.h">
       <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\tuple.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\compare.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\constants.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\hash.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\interpolation.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\search.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\sort.h">
-      <Filter>inc\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\map.h">
       <Filter>inc</Filter>
@@ -808,6 +613,211 @@
     <ClInclude Include="..\..\..\inc\slib\map\geo_location.h">
       <Filter>inc\map</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\spin_lock.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\string.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\system.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\thread.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\thread_pool.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\time.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\tree.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\tuple.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\variant.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\win32_com.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\xml.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\animation.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\app.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\array.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\array2d.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\asset.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\async.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\atomic.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\base.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\base64.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\charset.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\compare.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\constants.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\content_type.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\cpp.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\definition.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\endian.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\event.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\expire.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\file.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\function.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\hash.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\hashtable.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\interpolation.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\io.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\iterator.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\java.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\json.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\linked_object.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\list.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\locale.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\log.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\loop_queue.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\macro.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\map.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\math.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\memory.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\mio.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\mutex.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\new.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\object.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\option.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\parse.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\pipe.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\platform_android.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\platform_apple.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\platform_windows.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\queue.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\queue_channel.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\resource.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\safe_static.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\search.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\service.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\setting.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\sort.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\ref.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\scoped.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\ptr.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">
@@ -825,16 +835,10 @@
     <ClCompile Include="..\..\..\src\slib\core\mutex.cpp">
       <Filter>src\slib\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\core\reference.cpp">
-      <Filter>src\slib\core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\service.cpp">
       <Filter>src\slib\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\setting.cpp">
-      <Filter>src\slib\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\core\spinlock.cpp">
       <Filter>src\slib\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\string.cpp">
@@ -906,9 +910,6 @@
     <ClCompile Include="..\..\..\src\thirdparty\thirdparty_libvpx_enc.c">
       <Filter>src\thirdparty</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\core\pointer.cpp">
-      <Filter>src\slib\core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\pipe.cpp">
       <Filter>src\slib\core</Filter>
     </ClCompile>
@@ -922,9 +923,6 @@
       <Filter>src\slib\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\content_type.cpp">
-      <Filter>src\slib\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\core\callback.cpp">
       <Filter>src\slib\core</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\math.cpp">
@@ -1545,5 +1543,22 @@
     <ClCompile Include="..\..\..\src\slib\map\geo_location.cpp">
       <Filter>src\slib\map</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\spin_lock.cpp">
+      <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\function.cpp">
+      <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\ref.cpp">
+      <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\ptr.cpp">
+      <Filter>src\slib\core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="slib.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

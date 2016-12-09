@@ -5,9 +5,9 @@
 #include "../../../inc/slib/network/url_request.h"
 
 #include "../../../inc/slib/network/url.h"
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
 #include "../../../inc/slib/core/log.h"
-
+#include "../../../inc/slib/core/safe_static.h"
 #include "../../../inc/slib/core/platform_windows.h"
 
 #include <wininet.h>

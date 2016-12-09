@@ -3,9 +3,11 @@
 #if defined(SLIB_PLATFORM_IS_OSX)
 
 #include "../../../inc/slib/ui/event.h"
+
 #include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/platform.h"
 #include "../../../inc/slib/core/hashtable.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 #import <Carbon/Carbon.h>
 

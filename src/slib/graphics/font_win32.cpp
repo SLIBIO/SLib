@@ -4,6 +4,7 @@
 
 #include "../../../inc/slib/graphics/font.h"
 #include "../../../inc/slib/graphics/platform.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 #pragma comment (lib, "gdiplus.lib")
 

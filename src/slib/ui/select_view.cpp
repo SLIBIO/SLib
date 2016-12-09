@@ -1,5 +1,7 @@
 #include "../../../inc/slib/ui/select_view.h"
 
+#include "../../../inc/slib/core/safe_static.h"
+
 SLIB_UI_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(SelectView, View)

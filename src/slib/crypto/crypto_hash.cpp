@@ -4,7 +4,7 @@
 #include "../../../inc/slib/crypto/sha1.h"
 #include "../../../inc/slib/crypto/sha2.h"
 
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
 #include "../../../inc/slib/core/mio.h"
 
 SLIB_CRYPTO_NAMESPACE_BEGIN

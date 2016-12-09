@@ -3,9 +3,10 @@
 #include "../../../inc/slib/render/engine.h"
 #include "../../../inc/slib/render/opengl.h"
 #include "../../../inc/slib/math/transform2d.h"
-#include "../../../inc/slib/core/variant.h"
 #include "../../../inc/slib/graphics/util.h"
 #include "../../../inc/slib/graphics/font_atlas.h"
+#include "../../../inc/slib/core/variant.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 #define MAX_PROGRAM_COUNT 256
 #define MAX_SHADER_CLIP 8

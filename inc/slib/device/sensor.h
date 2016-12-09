@@ -4,8 +4,8 @@
 #include "definition.h"
 
 #include "../core/object.h"
-#include "../core/pointer.h"
-#include "../core/callback.h"
+#include "../core/ptr.h"
+#include "../core/function.h"
 #include "../map/geo_location.h"
 
 SLIB_DEVICE_NAMESPACE_BEGIN

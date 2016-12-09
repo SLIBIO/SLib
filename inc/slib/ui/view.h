@@ -8,8 +8,8 @@
 #include "cursor.h"
 
 #include "../core/object.h"
-#include "../core/pointer.h"
-#include "../core/callback.h"
+#include "../core/ptr.h"
+#include "../core/function.h"
 #include "../core/queue.h"
 #include "../core/animation.h"
 #include "../graphics/canvas.h"

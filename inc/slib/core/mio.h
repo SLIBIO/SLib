@@ -8,6 +8,7 @@
 SLIB_NAMESPACE_BEGIN
 
 // MIO allows reading/writing from unaligned addresses
+
 class SLIB_EXPORT MIO
 {
 public:

@@ -5,6 +5,7 @@
 #include "../../../inc/slib/device/sensor.h"
 
 #include "../../../inc/slib/core/platform_android.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 SLIB_DEVICE_NAMESPACE_BEGIN
 

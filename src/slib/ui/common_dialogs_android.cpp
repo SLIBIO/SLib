@@ -3,9 +3,10 @@
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 
 #include "../../../inc/slib/ui/common_dialogs.h"
-#include "../../../inc/slib/ui/core.h"
 
+#include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/platform.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 

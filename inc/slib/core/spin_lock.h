@@ -1,5 +1,5 @@
-#ifndef CHECKHEADER_SLIB_CORE_SPINLOCK
-#define CHECKHEADER_SLIB_CORE_SPINLOCK
+#ifndef CHECKHEADER_SLIB_CORE_SPIN_LOCK
+#define CHECKHEADER_SLIB_CORE_SPIN_LOCK
 
 #include "definition.h"
 
@@ -23,7 +23,7 @@ public:
 	SpinLock& operator=(const SpinLock& other);
 
 private:
-	sl_int32 m_flagLock;
+	volatile mutable sl_int32 m_flagLock;
 	
 };
 

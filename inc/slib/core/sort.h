@@ -3,6 +3,8 @@
 
 #include "definition.h"
 
+#include "cpp.h"
+
 SLIB_NAMESPACE_BEGIN
 
 template < class TYPE, class COMPARE = Compare<TYPE> >
@@ -64,7 +66,7 @@ void SelectionSort<TYPE, COMPARE>::sortAsc(TYPE* list, sl_size size)
 			}
 		}
 		if (sel != i) {
-			SLIB_SWAP(list[sel], list[i]);
+			swap(list[sel], list[i]);
 		}
 	}
 }
@@ -85,7 +87,7 @@ void SelectionSort<TYPE, COMPARE>::sortDesc(TYPE* list, sl_size size)
 			}
 		}
 		if (sel != i) {
-			SLIB_SWAP(list[sel], list[i]);
+			swap(list[sel], list[i]);
 		}
 	}
 }
@@ -234,7 +236,7 @@ void QuickSort<TYPE, COMPARE>::sortAsc(TYPE* list, sl_size size)
 			InsertionSort<TYPE, COMPARE>::sortAsc(list + start, n);
 		} else {
 			sl_size mid = start + (n / 2);
-			SLIB_SWAP(list[mid], list[start]);
+			Swap(list[mid], list[start]);
 			sl_size border2 = start;
 			sl_size border1 = end + 1;
 			for (;;) {
@@ -261,10 +263,10 @@ void QuickSort<TYPE, COMPARE>::sortAsc(TYPE* list, sl_size size)
 				if (border1 < border2) {
 					break;
 				}
-				SLIB_SWAP(list[border1], list[border2]);
+				Swap(list[border1], list[border2]);
 			}
 			if (border1 != start) {
-				SLIB_SWAP(list[border1], list[start]);
+				Swap(list[border1], list[start]);
 			}
 			if (border1 - start < end + 1 - border2) {
 				if (border2 < end) {
@@ -315,7 +317,7 @@ void QuickSort<TYPE, COMPARE>::sortDesc(TYPE* list, sl_size size)
 			InsertionSort<TYPE, COMPARE>::sortDesc(list + start, n);
 		} else {
 			sl_size mid = start + (n / 2);
-			SLIB_SWAP(list[mid], list[start]);
+			Swap(list[mid], list[start]);
 			sl_size border2 = start;
 			sl_size border1 = end + 1;
 			for (;;) {
@@ -342,10 +344,10 @@ void QuickSort<TYPE, COMPARE>::sortDesc(TYPE* list, sl_size size)
 				if (border1 < border2) {
 					break;
 				}
-				SLIB_SWAP(list[border1], list[border2]);
+				Swap(list[border1], list[border2]);
 			}
 			if (border1 != start) {
-				SLIB_SWAP(list[border1], list[start]);
+				Swap(list[border1], list[start]);
 			}
 			if (border1 - start < end + 1 - border2) {
 				if (border2 < end) {

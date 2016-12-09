@@ -2,7 +2,7 @@
 #include "../../../inc/slib/core/base.h"
 #include "../../../inc/slib/core/mio.h"
 #include "../../../inc/slib/core/endian.h"
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
 #include "../../../inc/slib/core/math.h"
 #include "../../../inc/slib/core/variant.h"
 #include "../../../inc/slib/core/parse.h"
@@ -7808,6 +7808,16 @@ String8 SafeString8::argv(const Variant* params, sl_size nParams)
 String16 SafeString16::argv(const Variant* params, sl_size nParams)
 {
 	return String16::formatv(*this, params, nParams);
+}
+
+String8 String8::format(const String8& str)
+{
+	return str;
+}
+
+String16 String16::format(const String16& str)
+{
+	return str;
 }
 
 String8 String8::format(const String8& szFormat, const Variant& param)

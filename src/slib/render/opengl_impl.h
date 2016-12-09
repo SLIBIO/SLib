@@ -7,7 +7,7 @@
 #include "../../../inc/slib/core/log.h"
 #include "../../../inc/slib/core/thread.h"
 #include "../../../inc/slib/core/system.h"
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
 #include "../../../inc/slib/graphics/image.h"
 
 #define STACK_BUFFER_COUNT 128

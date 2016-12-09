@@ -7,6 +7,7 @@
 #include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/window.h"
 #include "../../../inc/slib/ui/select_view.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 #define USE_SCREEN_BACK_BUFFER
 

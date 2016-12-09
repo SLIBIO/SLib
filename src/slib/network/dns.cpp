@@ -1,7 +1,7 @@
 #include "../../../inc/slib/network/dns.h"
 
 #include "../../../inc/slib/network/event.h"
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
 #include "../../../inc/slib/core/mio.h"
 #include "../../../inc/slib/core/log.h"
 

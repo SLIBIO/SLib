@@ -1,6 +1,8 @@
 #include "../../../inc/slib/crypto/secure_stream.h"
+
 #include "../../../inc/slib/crypto/aes.h"
 #include "../../../inc/slib/core/mio.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 #define RSA_MIN_LEN 256
 #define RSA_MAX_LEN 1024

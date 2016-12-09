@@ -1,5 +1,5 @@
 #include "../../../inc/slib/core/file.h"
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
 
 SLIB_NAMESPACE_BEGIN
 

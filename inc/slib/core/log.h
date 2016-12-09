@@ -80,7 +80,7 @@ private:
 
 SLIB_NAMESPACE_END
 
-#define SLIB_LOG(tag, content) slib::Log::logGlobal((tag), (content));
-#define SLIB_LOG_ERROR(tag, content) slib::Log::logGlobalError((tag), (content));
+#define SLIB_LOG(tag, content, ...) slib::Log::logGlobal((tag), slib::String::format(content, ##__VA_ARGS__));
+#define SLIB_LOG_ERROR(tag, content, ...) slib::Log::logGlobalError((tag), slib::String::format(content, ##__VA_ARGS__));
 
 #endif

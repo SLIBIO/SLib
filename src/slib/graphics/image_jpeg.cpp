@@ -3,7 +3,7 @@
 #ifdef SLIB_GRAPHICS_IMAGE_SUPPORT_JPEG
 
 #include "../../../inc/slib/core/file.h"
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
 
 #include <stdio.h>
 #include <setjmp.h>

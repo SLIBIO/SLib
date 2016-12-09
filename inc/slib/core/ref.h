@@ -1,10 +1,10 @@
-#ifndef CHECKHEADER_SLIB_CORE_REFERENCE
-#define CHECKHEADER_SLIB_CORE_REFERENCE
+#ifndef CHECKHEADER_SLIB_CORE_REF
+#define CHECKHEADER_SLIB_CORE_REF
 
 #include "definition.h"
 
 #include "base.h"
-#include "spinlock.h"
+#include "spin_lock.h"
 
 #ifdef SLIB_DEBUG
 #define SLIB_DEBUG_REFERENCE

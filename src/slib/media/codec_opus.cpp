@@ -2,7 +2,7 @@
 
 #include "../../../inc/slib/core/log.h"
 #include "../../../inc/slib/core/time.h"
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
 
 #include "../../../inc/thirdparty/opus/opus.h"
 

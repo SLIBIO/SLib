@@ -1,4 +1,4 @@
-#include "../../../inc/slib/core/callback.h"
+#include "../../../inc/slib/core/function.h"
 
 SLIB_NAMESPACE_BEGIN
 

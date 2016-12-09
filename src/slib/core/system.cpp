@@ -1,7 +1,9 @@
 #include "../../../inc/slib/core/system.h"
+
 #include "../../../inc/slib/core/file.h"
 #include "../../../inc/slib/core/log.h"
 #include "../../../inc/slib/core/list.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 SLIB_NAMESPACE_BEGIN
 

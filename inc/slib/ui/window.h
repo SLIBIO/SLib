@@ -8,8 +8,8 @@
 
 #include "../core/string.h"
 #include "../core/object.h"
-#include "../core/callback.h"
-#include "../core/pointer.h"
+#include "../core/function.h"
+#include "../core/ptr.h"
 #include "../graphics/color.h"
 #include "../math/rectangle.h"
 

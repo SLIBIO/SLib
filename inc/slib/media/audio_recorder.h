@@ -9,7 +9,7 @@
 #include "../core/event.h"
 #include "../core/loop_queue.h"
 #include "../core/string.h"
-#include "../core/pointer.h"
+#include "../core/ptr.h"
 
 SLIB_MEDIA_NAMESPACE_BEGIN
 

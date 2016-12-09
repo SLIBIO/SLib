@@ -2,7 +2,7 @@
 
 #if defined(SLIB_PLATFORM_IS_OSX)
 
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
 #include "../../../inc/slib/core/platform_apple.h"
 
 SLIB_MEDIA_NAMESPACE_BEGIN

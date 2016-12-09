@@ -7,6 +7,7 @@
 #include "map.h"
 #include "string.h"
 #include "memory.h"
+#include "safe_static.h"
 
 SLIB_NAMESPACE_BEGIN
 

@@ -1,5 +1,7 @@
 #include "../../../inc/slib/ui/radio_button.h"
 
+#include "../../../inc/slib/core/safe_static.h"
+
 SLIB_UI_NAMESPACE_BEGIN
 
 class _RadioButton_Icon : public Drawable

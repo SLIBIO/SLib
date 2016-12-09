@@ -3,6 +3,8 @@
 
 #include "definition.h"
 
+#include "cpp.h"
+
 SLIB_NAMESPACE_BEGIN
 
 class SLIB_EXPORT Base
@@ -207,34 +209,6 @@ public:
 };
 
 SLIB_NAMESPACE_END
-
-#if !defined(_LIBCPP_NEW) && !defined(_NEW_) && !defined(_NEW)
-
-#	ifndef __PLACEMENT_NEW_INLINE
-#		define __PLACEMENT_NEW_INLINE
-SLIB_INLINE void* (operator new)(sl_size_t in_size, void* in_pWhere)
-{
-	return in_pWhere;
-}
-
-SLIB_INLINE void(operator delete)(void* in_pVoid, void* in_pWhere)
-{
-}
-#	endif
-
-#	ifndef __PLACEMENT_VEC_NEW_INLINE
-#		define __PLACEMENT_VEC_NEW_INLINE
-SLIB_INLINE void* (operator new[])(sl_size_t in_size, void* in_pWhere)
-{
-    return in_pWhere;
-}
-
-SLIB_INLINE void(operator delete[])(void* in_pVoid, void* in_pWhere)
-{
-}
-#	endif
-
-#endif
 
 #endif
 

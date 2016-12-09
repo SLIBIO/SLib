@@ -4,6 +4,7 @@
 
 #include "../../../inc/slib/network/url_request.h"
 
+#include "../../../inc/slib/core/safe_static.h"
 #include "../../../inc/slib/core/platform_apple.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN

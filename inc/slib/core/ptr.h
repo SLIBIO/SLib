@@ -1,9 +1,9 @@
-#ifndef CHECKHEADER_SLIB_CORE_POINTER
-#define CHECKHEADER_SLIB_CORE_POINTER
+#ifndef CHECKHEADER_SLIB_CORE_PTR
+#define CHECKHEADER_SLIB_CORE_PTR
 
 #include "definition.h"
 
-#include "reference.h"
+#include "ref.h"
 
 SLIB_NAMESPACE_BEGIN
 

@@ -5,7 +5,7 @@
 #include "../../../inc/slib/network/event.h"
 #include "../../../inc/slib/core/pipe.h"
 #include "../../../inc/slib/core/thread.h"
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
 
 #include <unistd.h>
 #include <poll.h>

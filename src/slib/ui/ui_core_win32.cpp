@@ -8,6 +8,7 @@
 #include "../../../inc/slib/ui/screen.h"
 #include "../../../inc/slib/ui/app.h"
 #include "../../../inc/slib/core/queue.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 #include <commctrl.h>
 

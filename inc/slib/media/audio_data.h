@@ -5,7 +5,7 @@
 
 #include "audio_format.h"
 
-#include "../core/reference.h"
+#include "../core/ref.h"
 
 SLIB_MEDIA_NAMESPACE_BEGIN
 

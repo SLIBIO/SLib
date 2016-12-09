@@ -4,6 +4,7 @@
 
 #include "../../../inc/slib/core/java.h"
 #include "../../../inc/slib/core/log.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 #define JNIVERSION JNI_VERSION_1_4
 

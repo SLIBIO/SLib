@@ -1,4 +1,5 @@
 #include "../../../inc/slib/graphics/drawable.h"
+
 #include "../../../inc/slib/graphics/canvas.h"
 #include "../../../inc/slib/graphics/bitmap.h"
 #include "../../../inc/slib/graphics/image.h"
@@ -6,6 +7,7 @@
 
 #include "../../../inc/slib/core/file.h"
 #include "../../../inc/slib/core/asset.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 

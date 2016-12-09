@@ -3,6 +3,7 @@
 #include "../../../inc/slib/network/url.h"
 #include "../../../inc/slib/core/json.h"
 #include "../../../inc/slib/core/log.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 

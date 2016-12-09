@@ -6,6 +6,7 @@
 #include "../../../inc/slib/core/file.h"
 #include "../../../inc/slib/core/log.h"
 #include "../../../inc/slib/core/list.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -332,9 +333,7 @@ String Console::readLine()
 }
 #endif
 
-SLIB_NAMESPACE_END
-
-void sl_abort(const char* msg, const char* file, sl_uint32 line)
+void _abort(const char* msg, const char* file, sl_uint32 line)
 {
 #if defined(SLIB_DEBUG)
 #if defined(SLIB_PLATFORM_IS_ANDROID)
@@ -346,5 +345,7 @@ void sl_abort(const char* msg, const char* file, sl_uint32 line)
 #endif
 #endif
 }
+
+SLIB_NAMESPACE_END
 
 #endif

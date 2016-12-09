@@ -5,7 +5,7 @@
 #include "../../../inc/slib/graphics/path.h"
 #include "../../../inc/slib/graphics/platform.h"
 
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
 
 #pragma comment(lib, "gdiplus.lib")
 

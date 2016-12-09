@@ -6,7 +6,7 @@
 #include "mac_address.h"
 
 #include "../core/object.h"
-#include "../core/pointer.h"
+#include "../core/ptr.h"
 
 /*******************************************************
 	NetFilter based on Linux netfilter_queue

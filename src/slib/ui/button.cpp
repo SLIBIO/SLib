@@ -1,6 +1,7 @@
 #include "../../../inc/slib/ui/button.h"
 
 #include "../../../inc/slib/graphics/util.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 

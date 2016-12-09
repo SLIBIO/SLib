@@ -734,6 +734,8 @@ public:
 	
 	String8 argv(const Variant* params, sl_size nParams);
 	
+	static String8 format(const String8& str);
+	
 	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS(String8, sl_char8)
 	
 private:
@@ -1332,6 +1334,8 @@ public:
 	static String16 formatv(const String16& strFormat, const Variant* params, sl_size nParams);
 	
 	String16 argv(const Variant* params, sl_size nParams);
+	
+	static String16 format(const String16& str);
 	
 	_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS(String16, sl_char16)
 	

@@ -5,7 +5,7 @@
 #include "../../../inc/slib/ui/scroll_bar.h"
 #include "../../../inc/slib/ui/render_view.h"
 
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
 #include "../../../inc/slib/math/transform2d.h"
 #include "../../../inc/slib/graphics/bitmap.h"
 #include "../../../inc/slib/graphics/util.h"

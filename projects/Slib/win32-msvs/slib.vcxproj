@@ -24,20 +24,22 @@
     <ClInclude Include="..\..\..\inc\slib\core\app.h" />
     <ClInclude Include="..\..\..\inc\slib\core\array.h" />
     <ClInclude Include="..\..\..\inc\slib\core\array2d.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\asset.h" />
     <ClInclude Include="..\..\..\inc\slib\core\async.h" />
     <ClInclude Include="..\..\..\inc\slib\core\atomic.h" />
     <ClInclude Include="..\..\..\inc\slib\core\base.h" />
     <ClInclude Include="..\..\..\inc\slib\core\base64.h" />
-    <ClInclude Include="..\..\..\inc\slib\core\callback.h" />
     <ClInclude Include="..\..\..\inc\slib\core\charset.h" />
     <ClInclude Include="..\..\..\inc\slib\core\compare.h" />
     <ClInclude Include="..\..\..\inc\slib\core\constants.h" />
     <ClInclude Include="..\..\..\inc\slib\core\content_type.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\cpp.h" />
     <ClInclude Include="..\..\..\inc\slib\core\definition.h" />
     <ClInclude Include="..\..\..\inc\slib\core\endian.h" />
     <ClInclude Include="..\..\..\inc\slib\core\event.h" />
     <ClInclude Include="..\..\..\inc\slib\core\expire.h" />
     <ClInclude Include="..\..\..\inc\slib\core\file.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\function.h" />
     <ClInclude Include="..\..\..\inc\slib\core\hash.h" />
     <ClInclude Include="..\..\..\inc\slib\core\hashtable.h" />
     <ClInclude Include="..\..\..\inc\slib\core\interpolation.h" />
@@ -50,6 +52,7 @@
     <ClInclude Include="..\..\..\inc\slib\core\locale.h" />
     <ClInclude Include="..\..\..\inc\slib\core\log.h" />
     <ClInclude Include="..\..\..\inc\slib\core\loop_queue.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\macro.h" />
     <ClInclude Include="..\..\..\inc\slib\core\map.h" />
     <ClInclude Include="..\..\..\inc\slib\core\math.h" />
     <ClInclude Include="..\..\..\inc\slib\core\memory.h" />
@@ -63,18 +66,18 @@
     <ClInclude Include="..\..\..\inc\slib\core\platform_android.h" />
     <ClInclude Include="..\..\..\inc\slib\core\platform_apple.h" />
     <ClInclude Include="..\..\..\inc\slib\core\platform_windows.h" />
-    <ClInclude Include="..\..\..\inc\slib\core\pointer.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\ptr.h" />
     <ClInclude Include="..\..\..\inc\slib\core\queue.h" />
     <ClInclude Include="..\..\..\inc\slib\core\queue_channel.h" />
-    <ClInclude Include="..\..\..\inc\slib\core\reference.h" />
-    <ClInclude Include="..\..\..\inc\slib\core\asset.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\ref.h" />
     <ClInclude Include="..\..\..\inc\slib\core\resource.h" />
-    <ClInclude Include="..\..\..\inc\slib\core\scoped_pointer.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\safe_static.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\scoped.h" />
     <ClInclude Include="..\..\..\inc\slib\core\search.h" />
     <ClInclude Include="..\..\..\inc\slib\core\service.h" />
     <ClInclude Include="..\..\..\inc\slib\core\setting.h" />
     <ClInclude Include="..\..\..\inc\slib\core\sort.h" />
-    <ClInclude Include="..\..\..\inc\slib\core\spinlock.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\spin_lock.h" />
     <ClInclude Include="..\..\..\inc\slib\core\string.h" />
     <ClInclude Include="..\..\..\inc\slib\core\system.h" />
     <ClInclude Include="..\..\..\inc\slib\core\thread.h" />
@@ -261,6 +264,7 @@
     <ClInclude Include="..\..\..\src\slib\render\opengl_impl.h" />
     <ClInclude Include="..\..\..\src\slib\ui\ui_core_win32.h" />
     <ClInclude Include="..\..\..\src\slib\ui\view_win32.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\animation.cpp" />
@@ -272,13 +276,13 @@
     <ClCompile Include="..\..\..\src\slib\core\atomic.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\base.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\base64.cpp" />
-    <ClCompile Include="..\..\..\src\slib\core\callback.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\charset.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\content_type.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\event.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\event_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\file.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\file_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\function.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\hash.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\io.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\json.cpp" />
@@ -294,14 +298,14 @@
     <ClCompile Include="..\..\..\src\slib\core\pipe_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\java.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\platform_windows.cpp" />
-    <ClCompile Include="..\..\..\src\slib\core\pointer.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\ptr.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\queue.cpp" />
-    <ClCompile Include="..\..\..\src\slib\core\reference.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\asset.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\ref.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\resource.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\service.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\setting.cpp" />
-    <ClCompile Include="..\..\..\src\slib\core\spinlock.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\spin_lock.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\string.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\system.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\system_win32.cpp" />
@@ -631,6 +635,9 @@
       <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="slib.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9F3CDC01-7C8E-4C06-82F8-6EF4C068F4B3}</ProjectGuid>

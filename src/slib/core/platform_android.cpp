@@ -4,6 +4,7 @@
 
 #include "../../../inc/slib/core/platform_android.h"
 #include "../../../inc/slib/core/io.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 SLIB_NAMESPACE_BEGIN
 

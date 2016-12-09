@@ -5,7 +5,7 @@
 
 #include "../core/object.h"
 #include "../core/string.h"
-#include "../core/callback.h"
+#include "../core/function.h"
 #include "../graphics/bitmap.h"
 
 #include "event.h"

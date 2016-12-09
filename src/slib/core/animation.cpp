@@ -1,7 +1,8 @@
 #include "../../../inc/slib/core/animation.h"
 
 #include "../../../inc/slib/core/thread.h"
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 SLIB_NAMESPACE_BEGIN
 

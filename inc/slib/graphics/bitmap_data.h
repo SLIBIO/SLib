@@ -6,7 +6,7 @@
 #include "bitmap_format.h"
 #include "color.h"
 
-#include "../core/reference.h"
+#include "../core/ref.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 

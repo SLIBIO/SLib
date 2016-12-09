@@ -2,6 +2,7 @@
 
 #include "../../../inc/slib/core/math.h"
 #include "../../../inc/slib/core/variant.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 

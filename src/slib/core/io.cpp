@@ -1,7 +1,7 @@
 #include "../../../inc/slib/core/io.h"
 #include "../../../inc/slib/core/mio.h"
 #include "../../../inc/slib/core/thread.h"
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
 
 SLIB_NAMESPACE_BEGIN
 

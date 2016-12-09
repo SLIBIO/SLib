@@ -1,6 +1,7 @@
 #include "../../../inc/slib/network/http_common.h"
 
 #include "../../../inc/slib/network/url.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 

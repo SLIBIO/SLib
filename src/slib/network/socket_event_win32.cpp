@@ -6,7 +6,7 @@
 #pragma comment(lib, "ws2_32.lib")
 
 #include "../../../inc/slib/network/event.h"
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 

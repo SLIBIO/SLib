@@ -5,7 +5,7 @@
 
 #include "new.h"
 #include "compare.h"
-#include "reference.h"
+#include "ref.h"
 #include "iterator.h"
 
 SLIB_NAMESPACE_BEGIN

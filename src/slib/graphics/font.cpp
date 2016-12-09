@@ -1,5 +1,7 @@
 #include "../../../inc/slib/graphics/font.h"
 
+#include "../../../inc/slib/core/safe_static.h"
+
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
 FontDesc::FontDesc()

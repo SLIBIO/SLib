@@ -25,7 +25,7 @@ public:
 	Mutex& operator=(const Mutex& other);
 
 private:
-	void* m_pObject;
+	mutable void* m_pObject;
 	
 private:
 	void _init();

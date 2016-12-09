@@ -7,7 +7,7 @@
 #include "event.h"
 #include "object.h"
 #include "variant.h"
-#include "callback.h"
+#include "function.h"
 
 #define SLIB_THREAD_DEFAULT_STACK_SIZE 1048576 // 1MB
 

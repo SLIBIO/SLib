@@ -5,7 +5,7 @@
 #include "../../../inc/slib/network/url_request.h"
 
 #include "../../../inc/slib/core/thread_pool.h"
-
+#include "../../../inc/slib/core/safe_static.h"
 #include "../../../inc/slib/core/platform_android.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN

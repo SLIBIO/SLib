@@ -4,8 +4,8 @@
 #include "definition.h"
 
 #include "object.h"
-#include "callback.h"
-#include "pointer.h"
+#include "function.h"
+#include "ptr.h"
 #include "list.h"
 #include "time.h"
 #include "math.h"

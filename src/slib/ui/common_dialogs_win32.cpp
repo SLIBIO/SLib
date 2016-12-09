@@ -4,7 +4,7 @@
 
 #include "../../../inc/slib/ui/common_dialogs.h"
 #include "../../../inc/slib/ui/window.h"
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
 #include "../../../inc/slib/core/file.h"
 
 #include "../../../inc/slib/ui/platform.h"

@@ -3,13 +3,14 @@
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 
 #include "../../../inc/slib/ui/core.h"
+
 #include "../../../inc/slib/ui/screen.h"
 #include "../../../inc/slib/ui/platform.h"
 #include "../../../inc/slib/ui/mobile_app.h"
-
 #include "../../../inc/slib/core/map.h"
 #include "../../../inc/slib/core/io.h"
 #include "../../../inc/slib/core/log.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 

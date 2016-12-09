@@ -3,7 +3,7 @@
 
 #include "../../../inc/slib/core/math.h"
 #include "../../../inc/slib/core/io.h"
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
 

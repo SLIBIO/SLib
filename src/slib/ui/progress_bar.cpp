@@ -1,6 +1,7 @@
 #include "../../../inc/slib/ui/progress_bar.h"
 
 #include "../../../inc/slib/core/math.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 

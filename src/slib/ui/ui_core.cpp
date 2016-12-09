@@ -1,10 +1,10 @@
 #include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/ui/platform.h"
 
+#include "../../../inc/slib/ui/platform.h"
 #include "../../../inc/slib/ui/screen.h"
 #include "../../../inc/slib/ui/common_dialogs.h"
-
 #include "../../../inc/slib/graphics/font.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 

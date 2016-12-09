@@ -2,7 +2,7 @@
 
 #include "../../../inc/slib/core/file.h"
 #include "../../../inc/slib/core/asset.h"
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
 
 #include "image_stb.h"
 

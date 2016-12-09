@@ -269,13 +269,13 @@ String Console::readLine()
 }
 #endif
 
-SLIB_NAMESPACE_END
-
-void sl_abort(const char* msg, const char* file, sl_uint32 line)
+void _abort(const char* msg, const char* file, sl_uint32 line)
 {
 #if defined(SLIB_DEBUG)
 	slib::System::abort(msg, file, line);
 #endif
 }
+
+SLIB_NAMESPACE_END
 
 #endif

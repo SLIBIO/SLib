@@ -3,7 +3,7 @@
 #ifdef SLIB_AUDIO_SUPPORT_OPENSL_ES
 
 #include "../../../inc/slib/core/log.h"
-#include "../../../inc/slib/core/pointer.h"
+#include "../../../inc/slib/core/ptr.h"
 
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 #include <SLES/OpenSLES.h>

@@ -1,7 +1,7 @@
 #include "../../../inc/slib/graphics/resource.h"
 
 #include "../../../inc/slib/graphics/util.h"
-#include "../../../inc/slib/core/scoped_pointer.h"
+#include "../../../inc/slib/core/scoped.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 

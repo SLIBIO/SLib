@@ -2,8 +2,8 @@
 #define CHECKHEADER_SLIB_CORE_VARIANT
 
 #include "definition.h"
-#include "reference.h"
-#include "pointer.h"
+#include "ref.h"
+#include "ptr.h"
 #include "time.h"
 #include "string.h"
 #include "list.h"

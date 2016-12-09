@@ -7,7 +7,7 @@
 
 #include "../core/string.h"
 #include "../core/thread.h"
-#include "../core/callback.h"
+#include "../core/function.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 

@@ -5,7 +5,7 @@
 #include "../../../inc/slib/media/audio_recorder.h"
 
 #include "../../../inc/slib/core/log.h"
-#include "../../../inc/slib/core/pointer.h"
+#include "../../../inc/slib/core/ptr.h"
 #include "../../../inc/slib/core/platform_apple.h"
 
 #import <Foundation/Foundation.h>

@@ -2,11 +2,12 @@
 
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 
-#include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/event.h"
+
+#include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/platform.h"
 #include "../../../inc/slib/core/hashtable.h"
-
+#include "../../../inc/slib/core/safe_static.h"
 #include "../../../inc/slib/core/platform_android.h"
 
 SLIB_UI_NAMESPACE_BEGIN
