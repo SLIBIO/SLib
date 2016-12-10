@@ -998,11 +998,17 @@ public:
 						}
 						if (0 == ::mysql_stmt_bind_param(m_statement, bind)) {
 							return sl_true;
+						} else {
+							SLIB_LOG_ERROR(TAG, ::mysql_stmt_error(m_statement));
 						}
+					} else {
+						SLIB_LOG_ERROR(TAG, "Can't create memory for parameter binding");
 					}
 				} else {
 					return sl_true;
 				}
+			} else {
+				SLIB_LOG_ERROR(TAG, "Bind error: requires %d params but only %d params provided", n, nParams);
 			}
 			return sl_false;
 		}
@@ -1024,16 +1030,15 @@ public:
 							if (_bind(params, nParams)) {
 								if (0 == ::mysql_stmt_execute(m_statement)) {
 									return sl_true;
+								} else {
+									SLIB_LOG_ERROR(TAG, ::mysql_stmt_error(m_statement));
 								}
 							}
-							SLIB_LOG_ERROR(TAG, ::mysql_stmt_error(m_statement));
 						}
 					} else {
 						SLIB_LOG_ERROR(TAG, ::mysql_stmt_error(m_statement));
 					}
 				}
-			} else {
-				SLIB_LOG_ERROR(TAG, ::mysql_stmt_error(m_statement));
 			}
 			return sl_false;
 		}

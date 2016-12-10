@@ -4,6 +4,7 @@
 #include "../../../inc/slib/core/asset.h"
 #include "../../../inc/slib/core/file.h"
 #include "../../../inc/slib/core/log.h"
+#include "../../../inc/slib/core/json.h"
 #include "../../../inc/slib/core/content_type.h"
 
 #define SERVICE_TAG "HTTP SERVICE"
@@ -50,6 +51,11 @@ sl_uint64 HttpServiceContext::getRequestContentLength() const
 Memory HttpServiceContext::getRequestBody() const
 {
 	return m_requestBody;
+}
+
+Variant HttpServiceContext::getRequestBodyAsJson() const
+{
+	return Json::parseJson16Utf8(m_requestBody);
 }
 
 sl_uint64 HttpServiceContext::getResponseContentLength() const

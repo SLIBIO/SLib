@@ -12,6 +12,8 @@ class SLIB_EXPORT JsonParseParam
 public:
 	// in
 	sl_bool flagSupportComments;
+	// in
+	sl_bool flagLogError;
 	
 	// out
 	sl_bool flagError;
@@ -55,6 +57,14 @@ public:
 	
 	static Variant parseJsonFromTextFile(const String& filePath);
 	
+	static Variant parseJsonUtf8(const Memory& mem, JsonParseParam& param);
+	
+	static Variant parseJsonUtf8(const Memory& mem);
+	
+	static Variant parseJson16Utf8(const Memory& mem, JsonParseParam& param);
+	
+	static Variant parseJson16Utf8(const Memory& mem);
+
 	static String toString(const Variant& var);
 	
 	

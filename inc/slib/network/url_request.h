@@ -63,13 +63,23 @@ public:
 	
 	static Ref<UrlRequest> downloadToFile(const String& filePath, const String& url, const UrlRequestParam& param);
 	
-	static Ref<UrlRequest> sendGet(const String& url, const Function<void(UrlRequest*)>& onComplete);
+	static Ref<UrlRequest> send(const String& url, const Function<void(UrlRequest*)>& onComplete);
 	
-	static Ref<UrlRequest> sendGet(const String& url, const Map<String, Variant>& params, const Function<void(UrlRequest*)>& onComplete);
+	static Ref<UrlRequest> send(const String& url, const Map<String, Variant>& params, const Function<void(UrlRequest*)>& onComplete);
 	
-	static Ref<UrlRequest> sendPost(const String& url, const Variant& body, const Function<void(UrlRequest*)>& onComplete);
+	static Ref<UrlRequest> send(HttpMethod method, const String& url, const Function<void(UrlRequest*)>& onComplete);
 	
-	static Ref<UrlRequest> sendPost(const String& url, const Map<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete);
+	static Ref<UrlRequest> send(HttpMethod method, const String& url, const Map<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete);
+	
+	static Ref<UrlRequest> sendJson(HttpMethod method, const String& url, const Map<String, Variant>& params, const Variant& json, const Function<void(UrlRequest*)>& onComplete);
+	
+	static Ref<UrlRequest> post(const String& url, const Variant& body, const Function<void(UrlRequest*)>& onComplete);
+	
+	static Ref<UrlRequest> post(const String& url, const Map<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete);
+	
+	static Ref<UrlRequest> postJson(const String& url, const Variant& json, const Function<void(UrlRequest*)>& onComplete);
+	
+	static Ref<UrlRequest> postJson(const String& url, const Map<String, Variant>& params, const Variant& json, const Function<void(UrlRequest*)>& onComplete);
 	
 public:
 	const String& getUrl();

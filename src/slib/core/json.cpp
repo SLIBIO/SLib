@@ -1,10 +1,13 @@
 #include "../../../inc/slib/core/json.h"
+
 #include "../../../inc/slib/core/file.h"
+#include "../../../inc/slib/core/log.h"
 
 SLIB_NAMESPACE_BEGIN
 
 JsonParseParam::JsonParseParam()
 {
+	flagLogError = sl_true;
 	flagSupportComments = sl_true;
 	
 	flagError = sl_false;
@@ -141,33 +144,40 @@ Variant _Json_Parser<ST, CT>::parseJson()
 	// array
 	if (first == '[') {
 		pos++;
+		escapeSpaceAndComments();
 		if (pos == len) {
 			flagError = sl_true;
 			errorMessage = "Array: Missing character ] ";
 			return Variant::null();
 		}
+		if (buf[pos] == ']') {
+			pos++;
+			return Variant::createVariantList();
+		}
 		Variant list = Variant::createVariantList();
-		sl_bool flagFirst = sl_true;
 		while (pos < len) {
-			escapeSpaceAndComments();
+			CT ch = buf[pos];
+			if (ch == ']' || ch == ',') {
+				list.addListItem(Variant::null());
+			} else {
+				Variant item = parseJson();
+				if (flagError) {
+					return Variant::null();
+				}
+				list.addListItem(item);
+			}
 			if (pos == len) {
 				flagError = sl_true;
 				errorMessage = "Array: Missing character ] ";
 				return Variant::null();
 			}
-			CT ch = buf[pos];
+			ch = buf[pos];
 			if (ch == ']') {
 				pos++;
 				return list;
 			}
-			if (! flagFirst) {
-				if (ch == ',') {
-					pos++;
-				} else {
-					flagError = sl_true;
-					errorMessage = "Array: Missing character , ";
-					return Variant::null();
-				}
+			if (ch == ',') {
+				pos++;
 			}
 			escapeSpaceAndComments();
 			if (pos == len) {
@@ -175,16 +185,6 @@ Variant _Json_Parser<ST, CT>::parseJson()
 				errorMessage = "Array: Missing character ] ";
 				return Variant::null();
 			}
-			if (buf[pos] == ']') {
-				pos++;
-				return list;
-			}
-			Variant item = parseJson();
-			if (flagError) {
-				return Variant::null();
-			}
-			list.addListItem(item);
-			flagFirst = sl_false;
 		}
 		flagError = sl_true;
 		errorMessage = "Array: Missing character ] ";
@@ -279,11 +279,15 @@ Variant _Json_Parser<ST, CT>::parseJson()
 				errorMessage = "Object: Missing Item value";
 				return Variant::null();
 			}
-			Variant item = parseJson();
-			if (flagError) {
-				return Variant::null();
+			if (buf[pos] == '}' || buf[pos] == ',') {
+				map.putField(key, Variant::null());
+			} else {
+				Variant item = parseJson();
+				if (flagError) {
+					return Variant::null();
+				}
+				map.putField(key, item);
 			}
-			map.putField(key, item);
 			flagFirst = sl_false;
 		}
 		flagError = sl_true;
@@ -363,6 +367,10 @@ Variant _Json_Parser<ST, CT>::parseJson(const CT* buf, sl_size len, JsonParsePar
 	param.errorMessage = parser.errorMessage;
 	param.errorLine = ST::countLineNumber(buf, parser.pos, &(param.errorColumn));
 	
+	if (param.flagLogError) {
+		SLIB_LOG_ERROR("Json", param.getErrorText());
+	}
+	
 	return Variant::null();
 	
 }
@@ -424,6 +432,26 @@ Variant Json::parseJsonFromTextFile(const String& filePath)
 {
 	JsonParseParam param;
 	return parseJsonFromTextFile(filePath, param);
+}
+
+Variant Json::parseJsonUtf8(const Memory& mem, JsonParseParam& param)
+{
+	return parseJson((sl_char8*)(mem.getData()), mem.getSize(), param);
+}
+
+Variant Json::parseJsonUtf8(const Memory& mem)
+{
+	return parseJson((sl_char8*)(mem.getData()), mem.getSize());
+}
+
+Variant Json::parseJson16Utf8(const Memory& mem, JsonParseParam& param)
+{
+	return parseJson(String16((sl_char8*)(mem.getData()), mem.getSize()), param);
+}
+
+Variant Json::parseJson16Utf8(const Memory& mem)
+{
+	return parseJson(String16((sl_char8*)(mem.getData()), mem.getSize()));
 }
 
 

@@ -29,6 +29,8 @@ public:
 
 	Memory getRequestBody() const;
 	
+	Variant getRequestBodyAsJson() const;
+	
 	sl_uint64 getResponseContentLength() const;
 	
 	Ref<HttpService> getService();

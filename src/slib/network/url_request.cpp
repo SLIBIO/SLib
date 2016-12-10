@@ -62,7 +62,7 @@ Ref<UrlRequest> UrlRequest::downloadToFile(const String& filePath, const String&
 	return _send(param, url, filePath);
 }
 
-Ref<UrlRequest> UrlRequest::sendGet(const String& url, const Function<void(UrlRequest*)>& onComplete)
+Ref<UrlRequest> UrlRequest::send(const String& url, const Function<void(UrlRequest*)>& onComplete)
 {
 	UrlRequestParam rp;
 	rp.method = HttpMethod::GET;
@@ -70,7 +70,7 @@ Ref<UrlRequest> UrlRequest::sendGet(const String& url, const Function<void(UrlRe
 	return send(url, rp);
 }
 
-Ref<UrlRequest> UrlRequest::sendGet(const String& url, const Map<String, Variant>& params, const Function<void(UrlRequest*)>& onComplete)
+Ref<UrlRequest> UrlRequest::send(const String& url, const Map<String, Variant>& params, const Function<void(UrlRequest*)>& onComplete)
 {
 	UrlRequestParam rp;
 	rp.method = HttpMethod::GET;
@@ -79,7 +79,35 @@ Ref<UrlRequest> UrlRequest::sendGet(const String& url, const Map<String, Variant
 	return send(url, rp);
 }
 
-Ref<UrlRequest> UrlRequest::sendPost(const String& url, const Variant& body, const Function<void(UrlRequest*)>& onComplete)
+Ref<UrlRequest> UrlRequest::send(HttpMethod method, const String& url, const Function<void(UrlRequest*)>& onComplete)
+{
+	UrlRequestParam rp;
+	rp.method = method;
+	rp.onComplete = onComplete;
+	return send(url, rp);
+}
+
+Ref<UrlRequest> UrlRequest::send(HttpMethod method, const String& url, const Map<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete)
+{
+	UrlRequestParam rp;
+	rp.method = method;
+	rp.parameters = params;
+	rp.requestBody = _buildRequestBody(body);
+	rp.onComplete = onComplete;
+	return send(url, rp);
+}
+
+Ref<UrlRequest> UrlRequest::sendJson(HttpMethod method, const String& url, const Map<String, Variant>& params, const Variant& json, const Function<void(UrlRequest*)>& onComplete)
+{
+	UrlRequestParam rp;
+	rp.method = method;
+	rp.parameters = params;
+	rp.requestBody = json.toJsonString().toMemory();
+	rp.onComplete = onComplete;
+	return send(url, rp);
+}
+
+Ref<UrlRequest> UrlRequest::post(const String& url, const Variant& body, const Function<void(UrlRequest*)>& onComplete)
 {
 	UrlRequestParam rp;
 	rp.method = HttpMethod::POST;
@@ -88,12 +116,31 @@ Ref<UrlRequest> UrlRequest::sendPost(const String& url, const Variant& body, con
 	return send(url, rp);
 }
 
-Ref<UrlRequest> UrlRequest::sendPost(const String& url, const Map<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete)
+Ref<UrlRequest> UrlRequest::post(const String& url, const Map<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete)
 {
 	UrlRequestParam rp;
 	rp.method = HttpMethod::POST;
 	rp.parameters = params;
 	rp.requestBody = _buildRequestBody(body);
+	rp.onComplete = onComplete;
+	return send(url, rp);
+}
+
+Ref<UrlRequest> UrlRequest::postJson(const String& url, const Variant& json, const Function<void(UrlRequest*)>& onComplete)
+{
+	UrlRequestParam rp;
+	rp.method = HttpMethod::POST;
+	rp.requestBody = json.toJsonString().toMemory();
+	rp.onComplete = onComplete;
+	return send(url, rp);
+}
+
+Ref<UrlRequest> UrlRequest::postJson(const String& url, const Map<String, Variant>& params, const Variant& json, const Function<void(UrlRequest*)>& onComplete)
+{
+	UrlRequestParam rp;
+	rp.method = HttpMethod::POST;
+	rp.parameters = params;
+	rp.requestBody = json.toJsonString().toMemory();
 	rp.onComplete = onComplete;
 	return send(url, rp);
 }

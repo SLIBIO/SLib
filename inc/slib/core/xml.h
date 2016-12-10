@@ -482,6 +482,9 @@ public:
 	// in
 	Ptr<IXmlParseListener> listener;
 	
+	// in
+	sl_bool flagLogError;
+	
 	// out
 	sl_bool flagError;
 	// out

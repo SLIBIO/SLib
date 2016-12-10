@@ -1,5 +1,7 @@
 #include "../../../inc/slib/core/xml.h"
+
 #include "../../../inc/slib/core/file.h"
+#include "../../../inc/slib/core/log.h"
 
 SLIB_NAMESPACE_BEGIN
 
@@ -1309,6 +1311,8 @@ XmlParseParam::XmlParseParam()
 	flagProcessNamespaces = sl_true;
 	flagCheckWellFormed = sl_true;
 	
+	flagLogError = sl_true;
+	
 	flagError = sl_false;
 	errorLine = 0;
 	errorColumn = 0;
@@ -2298,6 +2302,10 @@ Ref<XmlDocument> _Xml_Parser<ST, CT, BT>::parseXml(const String& sourceFilePath,
 	param.errorPosition = parser.pos;
 	param.errorMessage = parser.errorMessage;
 	param.errorLine = ST::countLineNumber(buf, parser.pos, &(param.errorColumn));
+	
+	if (param.flagLogError) {
+		SLIB_LOG_ERROR("Xml", param.getErrorText());
+	}
 	
 	return Ref<XmlDocument>::null();
 	
