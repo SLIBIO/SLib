@@ -170,6 +170,11 @@ sl_size UrlRequest::getRequestBodySize()
 	return m_requestBody.getSize();
 }
 
+Map<String, Variant> UrlRequest::getParameters()
+{
+	return m_parameters;
+}
+
 Map<String, String> UrlRequest::getRequestHeaders()
 {
 	return m_requestHeaders;
@@ -319,6 +324,7 @@ void UrlRequest::_init(const UrlRequestParam& param, const String& url, const St
 	
 	m_method = param.method;
 	m_requestBody = param.requestBody;
+	m_parameters = param.parameters;
 	m_requestHeaders = param.requestHeaders;
 	m_additionalRequestHeaders = param.additionalRequestHeaders;
 	

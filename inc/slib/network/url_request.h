@@ -93,6 +93,8 @@ public:
 
 	sl_size getRequestBodySize();
 	
+	Map<String, Variant> getParameters();
+	
 	Map<String, String> getRequestHeaders();
 	
 	Map<String, String> getAdditionalRequestHeaders();
@@ -179,6 +181,7 @@ protected:
 	
 	HttpMethod m_method;
 	Memory m_requestBody;
+	Map<String, Variant> m_parameters;
 	Map<String, String> m_requestHeaders;
 	Map<String, String> m_additionalRequestHeaders;
 

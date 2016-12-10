@@ -587,6 +587,16 @@ Variant& Variant::operator=(const SafeMemory& mem)
 	return *this;
 }
 
+Variant Variant::operator[](sl_size indexForVariantList) const
+{
+	return getListItem(indexForVariantList);
+}
+
+Variant Variant::operator[](const String& keyForVariantMap) const
+{
+	return getField(keyForVariantMap);
+}
+
 void Variant::setNull()
 {
 	if (_type != VariantType::Null) {
@@ -2134,6 +2144,16 @@ SafeVariant& SafeVariant::operator=(const SafeMemory& mem)
 {
 	setMemory(mem);
 	return *this;
+}
+
+Variant SafeVariant::operator[](sl_size indexForVariantList) const
+{
+	return getListItem(indexForVariantList);
+}
+
+Variant SafeVariant::operator[](const String& keyForVariantMap) const
+{
+	return getField(keyForVariantMap);
 }
 
 void SafeVariant::setNull()

@@ -263,6 +263,10 @@ public:
 	template <class KT, class VT>
 	Variant& operator=(const SafeMap<KT, VT>& object);
 	
+	Variant operator[](sl_size indexForVariantList) const;
+	
+	Variant operator[](const String& keyForVariantMap) const;
+	
 public:
 	VariantType getType() const;
 	
@@ -628,6 +632,10 @@ public:
 	template <class KT, class VT>
 	SafeVariant& operator=(const SafeMap<KT, VT>& object);
 	
+	Variant operator[](sl_size indexForVariantList) const;
+	
+	Variant operator[](const String& keyForVariantMap) const;
+
 public:
 	VariantType getType() const;
 	
