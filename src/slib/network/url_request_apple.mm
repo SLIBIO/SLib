@@ -82,7 +82,7 @@ public:
 				NSMutableURLRequest* req = [[NSMutableURLRequest alloc] initWithURL:url];
 				if (req != nil) {
 					req.HTTPMethod = Apple::getNSStringFromString(HttpMethods::toString(param.method));
-					req.HTTPBody = [NSData dataWithBytesNoCopy:param.requestBody.getData() length:param.requestBody.getSize()];
+					req.HTTPBody = [NSData dataWithBytes:param.requestBody.getData() length:param.requestBody.getSize()];
 					{
 						Pair<String, String> pair;
 						Iterator< Pair<String, String> > iterator = param.requestHeaders.iterator();
