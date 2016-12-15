@@ -1006,8 +1006,6 @@ void View::_setFrame(const UIRect& _frame, UIUpdateMode mode, sl_bool flagLayout
 
 	m_frame = frame;
 	
-	_setFrame_NI(frame);
-	
 	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
 	if (layoutAttrs.isNotNull()) {
 		layoutAttrs->frame = frame;
@@ -1016,7 +1014,9 @@ void View::_setFrame(const UIRect& _frame, UIUpdateMode mode, sl_bool flagLayout
 			layoutAttrs->flagInvalidLayout = sl_true;
 		}
 		if (mode != UIUpdateMode::Init) {
-			if (!flagLayouting) {
+			if (flagLayouting) {
+				_setFrame_NI(frame);
+			} else {
 				Ref<View> parent = getParent();
 				if (parent.isNotNull()) {
 					parent->requestLayout(UIUpdateMode::NoRedraw);
@@ -1024,8 +1024,11 @@ void View::_setFrame(const UIRect& _frame, UIUpdateMode mode, sl_bool flagLayout
 					_requestMakeLayout();
 				}
 			}
+		} else {
+			_setFrame_NI(frame);
 		}
 	} else {
+		_setFrame_NI(frame);
 		if (mode != UIUpdateMode::Init) {
 			requestParentLayout(UIUpdateMode::NoRedraw);
 		}
