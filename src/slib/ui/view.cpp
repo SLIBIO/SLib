@@ -93,6 +93,7 @@ Ref<View::LayoutAttributes> View::_initializeLayoutAttibutes()
 	attrs->measuredWidth = 0;
 	attrs->measuredHeight = 0;
 	attrs->frame = m_frame;
+	attrs->requestedFrame = m_frame;
 	attrs->flagInvalidMeasure = sl_true;
 	attrs->flagInvalidLayout = sl_true;
 	attrs->flagMakeLayout = sl_false;
@@ -1006,29 +1007,29 @@ void View::_setFrame(const UIRect& _frame, UIUpdateMode mode, sl_bool flagLayout
 
 	m_frame = frame;
 	
+	if (mode != UIUpdateMode::Init) {
+		_setFrame_NI(frame);
+	}
+	
 	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
 	if (layoutAttrs.isNotNull()) {
 		layoutAttrs->frame = frame;
+		layoutAttrs->requestedFrame = frame;
 		layoutAttrs->flagInvalidMeasure = sl_true;
 		if (!(flagNotResizeWidth && flagNotResizeHeight)) {
 			layoutAttrs->flagInvalidLayout = sl_true;
 		}
 		if (mode != UIUpdateMode::Init) {
-			if (flagLayouting) {
-				_setFrame_NI(frame);
-			} else {
+			if (!flagLayouting) {
 				Ref<View> parent = getParent();
-				if (parent.isNotNull()) {
+				if (parent.isNotNull() && parent->isLayouting()) {
 					parent->requestLayout(UIUpdateMode::NoRedraw);
 				} else {
 					_requestMakeLayout();
 				}
 			}
-		} else {
-			_setFrame_NI(frame);
 		}
 	} else {
-		_setFrame_NI(frame);
 		if (mode != UIUpdateMode::Init) {
 			requestParentLayout(UIUpdateMode::NoRedraw);
 		}
@@ -1140,6 +1141,28 @@ UIRect View::getBoundsInnerPadding()
 UIRect View::getBoundsInParent()
 {
 	return m_boundsInParent;
+}
+
+void View::requestFrame(const UIRect& _frame, UIUpdateMode mode)
+{
+	UIRect frame = _frame;
+	frame.fixSizeError();
+
+	if (mode != UIUpdateMode::Init) {
+	
+		Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+		if (layoutAttrs.isNotNull()) {
+			Ref<View> parent = getParent();
+			if (parent.isNotNull() && parent->isLayouting()) {
+				layoutAttrs->flagInvalidMeasure = sl_true;
+				layoutAttrs->requestedFrame = frame;
+				parent->requestLayout(UIUpdateMode::NoRedraw);
+				return;
+			}
+		}
+	}
+	
+	_setFrame(frame, mode, sl_false);
 }
 
 Visibility View::getVisibility()
@@ -1493,7 +1516,7 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 	if (param.flagUseLayoutFrame) {
 		frame = layoutAttrs->frame;
 	} else {
-		frame = m_frame;
+		frame = layoutAttrs->requestedFrame;
 	}
 	
 	SizeMode widthMode = layoutAttrs->widthMode;
@@ -5267,7 +5290,7 @@ public:
 	{
 		Ref<View> view(m_view);
 		if (view.isNotNull()) {
-			view->setFrame(value);
+			view->requestFrame(value);
 		}
 	}
 	

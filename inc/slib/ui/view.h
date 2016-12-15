@@ -174,7 +174,7 @@ public:
 	void setSize(const UISize& size, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	void setSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
-	
+
 	// parent coordinate
 	sl_ui_pos getLeft();
 	
@@ -205,6 +205,9 @@ public:
 	// parent coordinate
 	UIRect getBoundsInParent();
 	
+	// parent coordinate
+	void requestFrame(const UIRect& frame, UIUpdateMode mode = UIUpdateMode::Redraw);
+
 	
 	Visibility getVisibility();
 	
@@ -1209,6 +1212,7 @@ protected:
 		sl_ui_len measuredWidth;
 		sl_ui_len measuredHeight;
 		UIRect frame;
+		UIRect requestedFrame;
 		sl_bool flagInvalidMeasure;
 		sl_bool flagInvalidLayout;
 		sl_bool flagMakeLayout;

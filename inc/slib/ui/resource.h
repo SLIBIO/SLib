@@ -127,6 +127,8 @@ protected:
 protected:
 	void _layoutViews_safe(sl_ui_len width, sl_ui_len height);
 	
+	sl_bool isInitialized();
+	
 	void setInitialized();
 	
 protected:
