@@ -5250,6 +5250,95 @@ void View::_resetRotateAnimation()
 	}
 }
 
+class _ViewFrameAnimationTarget : public AnimationTargetT<Rectangle>
+{
+public:
+	WeakRef<View> m_view;
+	
+	_ViewFrameAnimationTarget(const Ref<View>& view, const AnimationFrames<Rectangle>& frames) : AnimationTargetT<Rectangle>(frames), m_view(view)
+	{
+	}
+	
+	// override
+	void update(float fraction, const Rectangle& value)
+	{
+		Ref<View> view(m_view);
+		if (view.isNotNull()) {
+			view->setFrame(value);
+		}
+	}
+	
+};
+
+Ref<Animation> View::getFrameAnimation()
+{
+	Ref<AnimationAttributes> attrs = m_animationAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->animationFrame;
+	}
+	return Ref<Animation>::null();
+}
+
+void View::setFrameAnimation(const Ref<Animation>& animation, const AnimationFrames<Rectangle>& frames, UIUpdateMode mode)
+{
+	_resetFrameAnimation();
+	setFrame(frames.startValue, mode);
+	if (animation.isNotNull()) {
+		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
+		if (attrs.isNotNull()) {
+			Ref<_ViewFrameAnimationTarget> target = new _ViewFrameAnimationTarget(this, frames);
+			if (target.isNotNull()) {
+				attrs->animationFrame = animation;
+				attrs->targetFrame = target;
+				animation->addTarget(target);
+			}
+		}
+	}
+}
+
+void View::setFrameAnimation(const Ref<Animation>& animation, const Rectangle& startValue, const Rectangle& endValue, UIUpdateMode mode)
+{
+	AnimationFrames<Rectangle> frames(startValue, endValue);
+	setFrameAnimation(animation, frames, mode);
+}
+
+Ref<Animation> View::startFrameAnimation(const AnimationFrames<Rectangle>& frames, float duration, AnimationCurve curve)
+{
+	Ref<Animation> animation = Animation::create(duration);
+	if (animation.isNotNull()) {
+		setFrameAnimation(animation, frames);
+		animation->setAnimationCurve(curve);
+		animation->start();
+		return animation;
+	}
+	return Ref<Animation>::null();
+}
+
+Ref<Animation> View::startFrameAnimation(const Rectangle& startValue, const Rectangle& endValue, float duration, AnimationCurve curve)
+{
+	AnimationFrames<Rectangle> frames(startValue, endValue);
+	return startFrameAnimation(frames, duration, curve);
+}
+
+void View::resetFrameAnimation(UIUpdateMode mode)
+{
+	_resetFrameAnimation();
+}
+
+void View::_resetFrameAnimation()
+{
+	Ref<AnimationAttributes> attrs = m_animationAttributes;
+	if (attrs.isNotNull()) {
+		Ref<Animation> animation = attrs->animationFrame;
+		Ref< AnimationTargetT<Rectangle> > target = attrs->targetFrame;
+		if (animation.isNotNull() && target.isNotNull()) {
+			animation->removeTarget(target);
+		}
+		attrs->animationFrame.setNull();
+		attrs->targetFrame.setNull();
+	}
+}
+
 class _ViewAlphaAnimationTarget : public AnimationTargetT<sl_real>
 {
 public:

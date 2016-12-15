@@ -1,8 +1,6 @@
-#include "../../../inc/slib/core/definition.h"
-
 #include "../../../inc/slib/ui/cursor.h"
 
-SLIB_NAMESPACE_BEGIN
+SLIB_UI_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(Cursor, Object)
 

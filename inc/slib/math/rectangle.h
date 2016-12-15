@@ -134,6 +134,8 @@ public:
 	
 	sl_bool fixSizeError();
 	
+	RectangleT<T, FT> lerp(const RectangleT<T, FT>& target, float factor) const;
+
 public:
 	RectangleT<T, FT>& operator=(const RectangleT<T, FT>& other) = default;
 	
@@ -146,6 +148,13 @@ private:
 };
 
 SLIB_DECLARE_GEOMETRY_TYPE_EX(Rectangle)
+
+template <class T, class FT>
+class Interpolation< RectangleT<T, FT> >
+{
+public:
+	static RectangleT<T, FT> interpolate(const RectangleT<T, FT>& a, const RectangleT<T, FT>& b, float factor);
+};
 
 SLIB_MATH_NAMESPACE_END
 
@@ -204,6 +213,13 @@ SLIB_INLINE RectangleT<T, FT>& RectangleT<T, FT>::operator=(const RectangleT<O, 
 	right = (T)(other.right);
 	bottom = (T)(other.bottom);
 	return *this;
+}
+
+
+template <class T, class FT>
+SLIB_INLINE RectangleT<T, FT> Interpolation< RectangleT<T, FT> >::interpolate(const RectangleT<T, FT>& a, const RectangleT<T, FT>& b, float factor)
+{
+	return a.lerp(b, factor);
 }
 
 SLIB_NAMESPACE_END

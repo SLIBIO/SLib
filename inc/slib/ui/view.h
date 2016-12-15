@@ -788,6 +788,18 @@ public:
 
 	void resetRotateAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
+	Ref<Animation> getFrameAnimation();
+	
+	void setFrameAnimation(const Ref<Animation>& animation, const AnimationFrames<Rectangle>& frames, UIUpdateMode mode = UIUpdateMode::Redraw);
+	
+	void setFrameAnimation(const Ref<Animation>& animation, const Rectangle& startValue, const Rectangle& endValue, UIUpdateMode mode = UIUpdateMode::Redraw);
+	
+	Ref<Animation> startFrameAnimation(const AnimationFrames<Rectangle>& frames, float duration, AnimationCurve curve = AnimationCurve::Default);
+	
+	Ref<Animation> startFrameAnimation(const Rectangle& startValue, const Rectangle& endValue, float duration, AnimationCurve curve = AnimationCurve::Default);
+	
+	void resetFrameAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
+
 	Ref<Animation> getAlphaAnimation();
 	
 	void setAlphaAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, UIUpdateMode mode = UIUpdateMode::Redraw);
@@ -1092,6 +1104,8 @@ private:
 	
 	void _resetRotateAnimation();
 	
+	void _resetFrameAnimation();
+	
 	void _resetAlphaAnimation();
 	
 	void _resetBackgroundColorAnimation();
@@ -1323,6 +1337,9 @@ protected:
 		
 		SafeRef<Animation> animationRotation;
 		SafeRef< AnimationTargetT<sl_real> > targetRotation;
+		
+		SafeRef<Animation> animationFrame;
+		SafeRef< AnimationTargetT<Rectangle> > targetFrame;
 		
 		SafeRef<Animation> animationAlpha;
 		SafeRef< AnimationTargetT<sl_real> > targetAlpha;

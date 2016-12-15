@@ -414,6 +414,12 @@ sl_bool RectangleT<T, FT>::fixSizeError()
 	return flagFixed;
 }
 
+template <class T, class FT>
+RectangleT<T, FT> RectangleT<T, FT>::lerp(const RectangleT<T, FT>& target, float factor) const
+{
+	return {(T)SLIB_LERP(left, target.left, factor), (T)SLIB_LERP(top, target.top, factor), (T)SLIB_LERP(right, target.right, factor), (T)SLIB_LERP(bottom, target.bottom, factor)};
+}
+
 SLIB_DEFINE_GEOMETRY_TYPE_EX(Rectangle)
 
 SLIB_MATH_NAMESPACE_END
