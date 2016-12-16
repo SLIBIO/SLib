@@ -565,6 +565,19 @@ SLIB_UI_NAMESPACE_END
 
 @end
 
+UIView* _iOS_Window_findFirstResponder(UIView* root)
+{
+	if (root.isFirstResponder) {
+		return root;
+	}
+	for (UIView* subView in root.subviews) {
+		UIView* v = _iOS_Window_findFirstResponder(subView);
+		if (v != nil) {
+			return v;
+		}
+	}
+	return nil;
+}
 
 @implementation _slib_iOS_Window_RootViewController
 
@@ -593,6 +606,72 @@ SLIB_UI_NAMESPACE_END
 - (BOOL)shouldAutorotate
 {
 	return YES;
+}
+
+-(UIView*)findFirstResponderText
+{
+	UIView* view = _iOS_Window_findFirstResponder(self.view);
+	if (view != nil) {
+		if ([view isKindOfClass:[UITextField class]] || [view isKindOfClass:[UITextView class]]) {
+			return view;
+		}
+	}
+	return nil;
+}
+
+-(void)keyboardWillShow : (NSNotification*)aNotification
+{
+	UIView* view = [self findFirstResponderText];
+	if (view == nil) {
+		return;
+	}
+	NSDictionary* info = [aNotification userInfo];
+	CGSize kbSize = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+	CGRect rcText = [self.view convertRect:[view frame] fromView:view];
+	CGRect rcScreen = [[UIScreen mainScreen] bounds];
+	CGFloat yText = rcText.origin.y + rcScreen.size.height / 100;
+	if (yText > rcScreen.size.height - kbSize.height) {
+		CGFloat offset = rcScreen.size.height - kbSize.height - yText;
+		CGAffineTransform transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, offset);
+		[UIView animateWithDuration:0.3 animations:^(void) {
+			self.view.transform = transform;
+		}];
+	}
+}
+
+-(void)keyboardWillHide {
+	[UIView animateWithDuration:0.3 animations:^(void) {
+		self.view.transform = CGAffineTransformIdentity;
+	}];
+}
+
+
+- (void)viewWillAppear:(BOOL)animated
+{
+	[super viewWillAppear:animated];
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(keyboardWillShow:)
+												 name:UIKeyboardWillShowNotification
+											   object:nil];
+	
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(keyboardWillHide)
+												 name:UIKeyboardWillHideNotification
+											   object:nil];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+	[super viewWillDisappear:animated];
+	
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+													name:UIKeyboardWillShowNotification
+												  object:nil];
+	
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+													name:UIKeyboardWillHideNotification
+												  object:nil];
 }
 
 @end

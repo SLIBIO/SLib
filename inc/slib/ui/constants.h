@@ -291,6 +291,40 @@ enum class UIPageAction
 	Pause = 3
 };
 
+enum class UIReturnKeyType
+{
+	Default = 0,
+	Return = 1,
+	Done = 2,
+	Search = 3,
+	Next = 4,
+	Continue = 5,
+	Go = 6,
+	Send = 7,
+	Join = 8,
+	Route = 9,
+	EmergencyCall = 10,
+	Google = 11,
+	Yahoo = 12
+};
+
+enum class UIKeyboardType
+{
+	Default = 0,
+	Numpad = 1,
+	Phone = 2,
+	Email = 3,
+	Decimal = 4,
+	Alphabet = 5,
+	Url = 6,
+	WebSearch = 7,
+	Twitter = 8,
+	NumbersAndPunctation = 9,
+	NamePhone = 10,
+	Ascii = 11,
+	AsciiNumpad = 12
+};
+
 SLIB_UI_NAMESPACE_END
 
 #endif

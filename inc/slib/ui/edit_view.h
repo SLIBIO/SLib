@@ -48,6 +48,18 @@ public:
 	
 	virtual void setTextColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
+	UIReturnKeyType getReturnKeyType();
+	
+	void setReturnKeyType(UIReturnKeyType type);
+	
+	UIKeyboardType getKeyboardType();
+	
+	void setKeyboardType(UIKeyboardType type);
+	
+	sl_bool isAutoDismissKeyboard();
+	
+	void setAutoDismissKeyboard(sl_bool flag);
+	
 protected:
 	// override
 	void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
@@ -95,6 +107,10 @@ private:
 	void _setMultiLine_NW(sl_bool flag);
 	
 	void _setTextColor_NW(const Color& color);
+	
+	void _setReturnKeyType_NW(UIReturnKeyType type);
+	
+	void _setKeyboardType_NW(UIKeyboardType type);
 
 	// override
 	void _setFont_NW(const Ref<Font>& font);
@@ -112,7 +128,9 @@ protected:
 	sl_bool m_flagReadOnly;
 	sl_bool m_flagMultiLine;
 	Color m_textColor;
-
+	UIReturnKeyType m_returnKeyType;
+	UIKeyboardType m_keyboardType;
+	sl_bool m_flagAutoDismissKeyboard;
 };
 
 class PasswordView : public EditView

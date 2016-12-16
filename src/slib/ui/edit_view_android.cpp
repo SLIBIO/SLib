@@ -230,6 +230,14 @@ void EditView::_setFont_NW(const Ref<Font>& font)
 	}
 }
 
+void EditView::_setReturnKeyType_NW(UIReturnKeyType type)
+{
+}
+
+void EditView::_setKeyboardType_NW(UIKeyboardType type)
+{
+}
+
 SLIB_UI_NAMESPACE_END
 
 #endif

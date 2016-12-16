@@ -25,6 +25,69 @@ SLIB_UI_NAMESPACE_BEGIN
 class _EditView : public EditView
 {
 public:
+	static ::UIReturnKeyType convertReturnKeyType(UIReturnKeyType type)
+	{
+		switch (type) {
+			case UIReturnKeyType::Search:
+				return UIReturnKeySearch;
+			case UIReturnKeyType::Next:
+				return UIReturnKeyNext;
+			case UIReturnKeyType::Continue:
+				return UIReturnKeyContinue;
+			case UIReturnKeyType::Go:
+				return UIReturnKeyGo;
+			case UIReturnKeyType::Send:
+				return UIReturnKeySend;
+			case UIReturnKeyType::Join:
+				return UIReturnKeyJoin;
+			case UIReturnKeyType::Route:
+				return UIReturnKeyRoute;
+			case UIReturnKeyType::EmergencyCall:
+				return UIReturnKeyEmergencyCall;
+			case UIReturnKeyType::Google:
+				return UIReturnKeyGoogle;
+			case UIReturnKeyType::Yahoo:
+				return UIReturnKeyYahoo;
+			case UIReturnKeyType::Return:
+				return UIReturnKeyDefault;
+			case UIReturnKeyType::Default:
+			case UIReturnKeyType::Done:
+			default:
+				return UIReturnKeyDone;
+		}
+	}
+	
+	static ::UIKeyboardType convertKeyboardType(UIKeyboardType type)
+	{
+		switch (type) {
+			case UIKeyboardType::Numpad:
+				return UIKeyboardTypeNumberPad;
+			case UIKeyboardType::Phone:
+				return UIKeyboardTypePhonePad;
+			case UIKeyboardType::Email:
+				return UIKeyboardTypeEmailAddress;
+			case UIKeyboardType::Alphabet:
+				return UIKeyboardTypeAlphabet;
+			case UIKeyboardType::Url:
+				return UIKeyboardTypeURL;
+			case UIKeyboardType::WebSearch:
+				return UIKeyboardTypeWebSearch;
+			case UIKeyboardType::Twitter:
+				return UIKeyboardTypeTwitter;
+			case UIKeyboardType::NumbersAndPunctation:
+				return UIKeyboardTypeNumbersAndPunctuation;
+			case UIKeyboardType::NamePhone:
+				return UIKeyboardTypeNamePhonePad;
+			case UIKeyboardType::Ascii:
+				return UIKeyboardTypeASCIICapable;
+			case UIKeyboardType::AsciiNumpad:
+				return UIKeyboardTypeASCIICapableNumberPad;
+			case UIKeyboardType::Default:
+			default:
+				return UIKeyboardTypeDefault;
+		}
+	}
+	
 	void applyProperties(UITextField* handle)
 	{
 		[handle setText:(Apple::getNSStringFromString(m_text))];
@@ -39,6 +102,8 @@ public:
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
+		[handle setReturnKeyType:convertReturnKeyType(m_returnKeyType)];
+		[handle setKeyboardType:convertKeyboardType(m_keyboardType)];
 	}
 	
 	void applyProperties(UITextView* handle)
@@ -60,6 +125,8 @@ public:
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
+		[handle setReturnKeyType:convertReturnKeyType(m_returnKeyType)];
+		[handle setKeyboardType:convertKeyboardType(m_keyboardType)];
 	}
 	
 	static NSTextAlignment translateAlignment(Alignment _align)
@@ -83,30 +150,43 @@ public:
 		return Alignment::Left;
 	}
 	
-	static void onChangeTextField(iOS_ViewInstance* instance, UITextField* control)
+	static void onChangeText(iOS_ViewInstance* instance, UITextField* field, UITextView* area)
 	{
 		Ref<View> _view = instance->getView();
 		if (EditView::checkInstance(_view.ptr)) {
 			_EditView* view = (_EditView*)(_view.ptr);
-			String text = Apple::getStringFromNSString([control text]);
+			String text;
+			if (field != nil) {
+				text = Apple::getStringFromNSString([field text]);
+			} else if (area != nil) {
+				text = Apple::getStringFromNSString([area text]);
+			}
 			String textNew = view->dispatchChange(text);
 			if (text != textNew) {
 				NSString* str = Apple::getNSStringFromString(textNew);
-				[control setText:str];
+				if (field != nil) {
+					[field setText:str];
+				}
+				if (area != nil) {
+					[area setText:str];
+				}
 			}
 		}
 	}
 	
-	static void onChangeTextArea(iOS_ViewInstance* instance, UITextView* control)
+	static void onEnterAction(iOS_ViewInstance* instance, UITextField* field, UITextView* area)
 	{
 		Ref<View> _view = instance->getView();
 		if (EditView::checkInstance(_view.ptr)) {
 			_EditView* view = (_EditView*)(_view.ptr);
-			String text = Apple::getStringFromNSString([control text]);
-			String textNew = view->dispatchChange(text);
-			if (text != textNew) {
-				NSString* str = Apple::getNSStringFromString(textNew);
-				[control setText:str];
+			view->dispatchEnterAction();
+			if (view->isAutoDismissKeyboard()) {
+				if (field != nil) {
+					[field resignFirstResponder];
+				}
+				if (area != nil) {
+					[area resignFirstResponder];
+				}
 			}
 		}
 	}
@@ -331,6 +411,34 @@ void EditView::_setFont_NW(const Ref<Font>& font)
 	}
 }
 
+void EditView::_setReturnKeyType_NW(UIReturnKeyType type)
+{
+	UIView* handle = UIPlatform::getViewHandle(this);
+	if (handle != nil) {
+		if ([handle isKindOfClass:[UITextField class]]) {
+			UITextField* tv = (UITextField*)handle;
+			[tv setReturnKeyType:_EditView::convertReturnKeyType(type)];
+		} else if ([handle isKindOfClass:[UITextView class]]) {
+			UITextView* tv = (UITextView*)handle;
+			[tv setReturnKeyType:_EditView::convertReturnKeyType(type)];
+		}
+	}
+}
+
+void EditView::_setKeyboardType_NW(UIKeyboardType type)
+{
+	UIView* handle = UIPlatform::getViewHandle(this);
+	if (handle != nil) {
+		if ([handle isKindOfClass:[UITextField class]]) {
+			UITextField* tv = (UITextField*)handle;
+			[tv setKeyboardType:_EditView::convertKeyboardType(type)];
+		} else if ([handle isKindOfClass:[UITextView class]]) {
+			UITextView* tv = (UITextView*)handle;
+			[tv setKeyboardType:_EditView::convertKeyboardType(type)];
+		}
+	}
+}
+
 SLIB_UI_NAMESPACE_END
 
 @implementation _Slib_iOS_TextField
@@ -339,6 +447,7 @@ SLIB_UI_NAMESPACE_END
 	self = [super initWithFrame:frame];
 	if (self != nil) {
 		[self addTarget:self action:@selector(textFieldDidChange) forControlEvents:UIControlEventEditingChanged];
+		[self setDelegate:self];
 	}
 	return self;
 }
@@ -347,7 +456,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_EditView::onChangeTextField(instance.ptr, self);
+		slib::_EditView::onChangeText(instance.ptr, self, nil);
 	}
 }
 
@@ -356,10 +465,13 @@ SLIB_UI_NAMESPACE_END
 }
 
 -(BOOL) textFieldShouldReturn:(UITextField *)textField{
-	
-	[textField resignFirstResponder];
-	return YES;
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		slib::_EditView::onEnterAction(instance.ptr, self, nil);
+	}
+	return NO;
 }
+
 @end
 
 @implementation _Slib_iOS_TextArea
@@ -372,12 +484,14 @@ SLIB_UI_NAMESPACE_END
 	}
 	return self;
 }
-
+-(void)keyboardWillShow {
+	
+}
 -(void)textViewDidChange:(UITextView *)textView
 {
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_EditView::onChangeTextArea(instance.ptr, self);
+		slib::_EditView::onChangeText(instance.ptr, nil, self);
 	}
 }
 @end

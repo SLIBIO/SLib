@@ -17,6 +17,9 @@ EditView::EditView()
 	m_flagMultiLine = sl_false;
 	m_textColor = Color::Black;
 	setBorder(sl_true, UIUpdateMode::Init);
+	m_returnKeyType = UIReturnKeyType::Default;
+	m_keyboardType = UIKeyboardType::Default;
+	m_flagAutoDismissKeyboard = sl_true;
 }
 
 String EditView::getText()
@@ -136,6 +139,41 @@ void EditView::setTextColor(const Color& color, UIUpdateMode mode)
 	}
 }
 
+UIReturnKeyType EditView::getReturnKeyType()
+{
+	return m_returnKeyType;
+}
+
+void EditView::setReturnKeyType(UIReturnKeyType type)
+{
+	m_returnKeyType = type;
+	if (isNativeWidget()) {
+		_setReturnKeyType_NW(type);
+	}
+}
+
+UIKeyboardType EditView::getKeyboardType()
+{
+	return m_keyboardType;
+}
+
+void EditView::setKeyboardType(UIKeyboardType type)
+{
+	m_keyboardType = type;
+	if (isNativeWidget()) {
+		_setKeyboardType_NW(type);
+	}
+}
+
+sl_bool EditView::isAutoDismissKeyboard()
+{
+	return m_flagAutoDismissKeyboard;
+}
+
+void EditView::setAutoDismissKeyboard(sl_bool flag)
+{
+	m_flagAutoDismissKeyboard = flag;
+}
 
 void EditView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 {
@@ -232,6 +270,7 @@ SLIB_DEFINE_OBJECT(TextArea, EditView)
 TextArea::TextArea()
 {
 	m_flagMultiLine = sl_true;
+	setReturnKeyType(UIReturnKeyType::Return);
 }
 
 sl_bool TextArea::isMultiLine()
@@ -315,6 +354,19 @@ Ref<ViewInstance> PasswordView::createNativeWidget(ViewInstance* parent)
 Ref<ViewInstance> TextArea::createNativeWidget(ViewInstance* parent)
 {
 	return Ref<ViewInstance>::null();
+}
+
+#endif
+
+
+#if !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
+
+void EditView::_setReturnKeyType_NW(UIReturnKeyType type)
+{
+}
+
+void EditView::_setKeyboardType_NW(UIKeyboardType type)
+{
 }
 
 #endif
