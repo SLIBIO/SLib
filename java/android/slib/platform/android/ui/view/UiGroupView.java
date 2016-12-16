@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.FrameLayout;
 
 public class UiGroupView extends FrameLayout {
@@ -12,6 +13,7 @@ public class UiGroupView extends FrameLayout {
 	public UiGroupView(Context context) {
 		super(context);
 		setWillNotDraw(false);
+//		setLayerType(View.LAYER_TYPE_HARDWARE, null);
 	}
 	
 	public void onDraw(Canvas canvas) {

@@ -28,7 +28,10 @@ public:
 	static jobject openAssetFile(const String& path);
 	
 	static Memory readAllBytesFromAsset(const String& path);
-	
+
+
+	static void dismissKeyboard();
+
 };
 
 SLIB_NAMESPACE_END

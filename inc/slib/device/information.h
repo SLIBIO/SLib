@@ -4,6 +4,7 @@
 #include "definition.h"
 
 #include "../core/string.h"
+#include "../math/size.h"
 
 SLIB_DEVICE_NAMESPACE_BEGIN
 
@@ -17,6 +18,14 @@ public:
 	static String getSystemVersion();
 	
 	static String getSystemName();
+
+	static sl_uint32 getDevicePPI();
+	
+	static Size getScreenSize();
+	
+	static sl_uint32 getScreenWidth();
+	
+	static sl_uint32 getScreenHeight();
 	
 };
 

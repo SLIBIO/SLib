@@ -1,10 +1,13 @@
 package slib.platform.android.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Point;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.inputmethod.InputMethodManager;
+
 import slib.platform.android.SlibActivity;
 
 public class Util {
@@ -80,5 +83,10 @@ public class Util {
 			ret |= 8;
 		}
 		return ret;
+	}
+
+	public static void dismissKeyboard(Activity activity) {
+		InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
 	}
 }

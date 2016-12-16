@@ -53,7 +53,6 @@ public class UiWindow extends UiGroupView {
 			}
 			activity.addContentView(ret, params);
 			ret.activity = activity;
-			
 			return ret;
 			
 		} catch (Exception e) {

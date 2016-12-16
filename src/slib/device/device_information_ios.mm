@@ -38,6 +38,21 @@ String DeviceInformation::getSystemName()
 	return String::format("iOS %s", osVersion);
 }
 
+Size DeviceInformation::getScreenSize()
+{
+	CGRect screenRect = [[UIScreen mainScreen] bounds];
+	Size ret;
+	CGFloat scale = [[UIScreen mainScreen] scale];
+	ret.x = (sl_real)(screenRect.size.width * scale);
+	ret.y = (sl_real)(screenRect.size.height * scale);
+	return ret;
+}
+
+sl_uint32 DeviceInformation::getDevicePPI()
+{
+	return (sl_uint32) ([[UIScreen mainScreen] scale] * 160);
+}
+
 SLIB_DEVICE_NAMESPACE_END
 
 #endif

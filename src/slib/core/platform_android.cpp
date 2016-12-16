@@ -13,6 +13,10 @@ SLIB_JNI_BEGIN_CLASS(_Android, "slib/platform/android/Android")
 	SLIB_JNI_STATIC_METHOD(openAsset, "openAsset", "(Landroid/app/Activity;Ljava/lang/String;)Ljava/io/InputStream;")
 SLIB_JNI_END_CLASS
 
+SLIB_JNI_BEGIN_CLASS(_Util, "slib/platform/android/ui/Util")
+	SLIB_JNI_STATIC_METHOD(dismissKeyboard, "dismissKeyboard", "(Landroid/app/Activity;)V")
+SLIB_JNI_END_CLASS
+
 void Android::initialize(JavaVM* jvm)
 {
 	Jni::initialize(jvm);
@@ -81,6 +85,14 @@ Memory Android::readAllBytesFromAsset(const String& path)
 		}
 	}
 	return Memory::null();
+}
+
+void Android::dismissKeyboard()
+{
+	jobject jactivity = Android::getCurrentActivity();
+	if (jactivity) {
+		_Util::dismissKeyboard.call(sl_null, jactivity);
+	}
 }
 
 SLIB_NAMESPACE_END

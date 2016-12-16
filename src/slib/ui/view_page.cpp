@@ -3,6 +3,10 @@
 #include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/mobile_app.h"
 
+#if defined(SLIB_PLATFORM_IS_ANDROID)
+#	include "../../../inc/slib/core/platform_android.h"
+#endif
+
 SLIB_UI_NAMESPACE_BEGIN
 
 void IViewPagerListener::onPageAction(ViewPager* navigation, View* page, UIPageAction action)
@@ -202,7 +206,11 @@ void ViewStack::push(const Ref<View>& viewIn, sl_bool flagRemoveAllBackPages)
 void ViewStack::_pop(const Ref<View>& _viewOut, Transition transition)
 {
 	ObjectLocker lock(this);
-	
+
+#if defined(SLIB_PLATFORM_IS_ANDROID)
+	Android::dismissKeyboard();
+#endif
+
 	sl_size n = m_pages.getCount();
 	
 	if (n == 0) {
@@ -260,6 +268,7 @@ void ViewStack::_pop(const Ref<View>& _viewOut, Transition transition)
 		_ViewStack_FinishAnimation(this, viewBack, UIPageAction::Resume);
 	}
 
+	
 }
 
 void ViewStack::pop(const Ref<View>& viewOut, const Transition& transition)
@@ -792,6 +801,10 @@ void ViewPage::_closePopup(Transition transition)
 {
 	ObjectLocker lock(this);
 	
+#if defined(SLIB_PLATFORM_IS_ANDROID)
+	Android::dismissKeyboard();
+#endif
+	
 	_applyDefaultClosingPopupTransition(transition);
 	
 	setEnabled(sl_false, UIUpdateMode::NoRedraw);
@@ -814,6 +827,7 @@ void ViewPage::_closePopup(Transition transition)
 	if (animation.isNull()) {
 		_finishPopupAnimation(UIPageAction::Pop);
 	}
+	
 }
 
 void ViewPage::_finishPopupAnimation(UIPageAction action)

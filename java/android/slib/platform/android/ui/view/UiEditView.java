@@ -8,6 +8,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -196,6 +197,109 @@ public class UiEditView extends EditText {
 				tv.setTypeface(font.getTypeface());
 				tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, font.getSize());
 				return true;				
+			}
+		}
+		return false;
+	}
+
+	public static  boolean _setReturnKeyType(View view, int type) {
+		if (view instanceof  TextView) {
+			TextView tv = (TextView)view;
+			switch (type) {
+				case 0:
+					tv.setImeOptions(EditorInfo.IME_ACTION_DONE);
+					break;
+				case 1:
+					tv.setImeActionLabel("Return", KeyEvent.KEYCODE_ENTER);
+					break;
+				case 2:
+					tv.setImeOptions(EditorInfo.IME_ACTION_DONE);
+					break;
+				case 3:
+					tv.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+					break;
+				case 4:
+					tv.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+					break;
+				case 5:
+					tv.setImeActionLabel("Continue", KeyEvent.KEYCODE_ENTER);
+					break;
+				case 6:
+					tv.setImeOptions(EditorInfo.IME_ACTION_GO);
+					break;
+				case 7:
+					tv.setImeOptions(EditorInfo.IME_ACTION_SEND);
+					break;
+				case 8:
+					tv.setImeActionLabel("Join", KeyEvent.KEYCODE_ENTER);
+					break;
+				case 9:
+					tv.setImeActionLabel("Route", KeyEvent.KEYCODE_ENTER);
+					break;
+				case 10:
+					tv.setImeActionLabel("EmergencyCall", KeyEvent.KEYCODE_ENTER);
+					break;
+				case 11:
+					tv.setImeActionLabel("Google", KeyEvent.KEYCODE_ENTER);
+					break;
+				case 12:
+					tv.setImeActionLabel("Yahoo", KeyEvent.KEYCODE_ENTER);
+					break;
+				default:
+					tv.setImeOptions(EditorInfo.IME_ACTION_NONE);
+					break;
+			}
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean _setKeyboardType(View view, int type) {
+		if (view instanceof  TextView) {
+			TextView tv = (TextView)view;
+			switch (type) {
+				case 0:
+					tv.setInputType(InputType.TYPE_CLASS_TEXT);
+					break;
+				case 1:
+					tv.setInputType(InputType.TYPE_CLASS_NUMBER);
+					break;
+				case 2:
+					tv.setInputType(InputType.TYPE_CLASS_PHONE);
+					break;
+				case 3:
+					tv.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+					break;
+				case 4:
+					tv.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
+					break;
+				case 5:
+					tv.setInputType(InputType.TYPE_CLASS_TEXT);
+					break;
+				case 6:
+					tv.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
+					break;
+				case 7:
+					tv.setInputType(InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT);
+					break;
+				case 8:
+					tv.setInputType(InputType.TYPE_CLASS_TEXT);
+					break;
+				case  9:
+					tv.setInputType(InputType.TYPE_CLASS_TEXT);
+					break;
+				case 10:
+					tv.setInputType(InputType.TYPE_CLASS_TEXT);
+					break;
+				case 11:
+					tv.setInputType(InputType.TYPE_CLASS_TEXT);
+					break;
+				case 12:
+					tv.setInputType(InputType.TYPE_CLASS_TEXT);
+					break;
+				default:
+					tv.setInputType(InputType.TYPE_CLASS_TEXT);
+					break;
 			}
 		}
 		return false;

@@ -3,9 +3,11 @@ package slib.platform.android.device;
 import slib.platform.android.Logger;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Point;
 import android.os.Build;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
+import android.util.DisplayMetrics;
 
 public class DeviceInformation {
 	/*
@@ -33,5 +35,18 @@ public class DeviceInformation {
 		} else {
 			return manufacturer + " " + model;
 		}
+	}
+
+	public static Point getScreenSize(Activity context) {
+		DisplayMetrics dm = new DisplayMetrics();
+		context.getWindowManager().getDefaultDisplay().getMetrics(dm);
+		Point ret = new Point(dm.widthPixels, dm.heightPixels);
+		return ret;
+	}
+
+	public static int getDevicePPI(Activity context) {
+		DisplayMetrics dm = new DisplayMetrics();
+		context.getWindowManager().getDefaultDisplay().getMetrics(dm);
+		return dm.densityDpi;
 	}
 }
