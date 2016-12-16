@@ -3,6 +3,7 @@
 #if defined(SLIB_PLATFORM_IS_IOS)
 
 #include "view_ios.h"
+
 #include "../../../inc/slib/ui/core.h"
 
 SLIB_UI_NAMESPACE_BEGIN
