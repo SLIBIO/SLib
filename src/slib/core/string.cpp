@@ -264,7 +264,7 @@ SLIB_INLINE StringContainer16* String16::_create(const sl_char8* utf8, sl_reg le
 		}
 		sl_size len = Charsets::utf8ToUtf16(utf8, lenUtf8, sl_null, -1);
 		StringContainer16* container = _alloc(len);
-		if (container != _String16_Null.container) {
+		if (container != _String16_Null.container && container != _String16_Empty.container) {
 			Charsets::utf8ToUtf16(utf8, lenUtf8, container->sz, len);
 			container->sz[len] = 0;
 		}
@@ -281,7 +281,7 @@ SLIB_INLINE StringContainer8* String8::_create(const sl_char16* utf16, sl_reg le
 		}
 		sl_size len = Charsets::utf16ToUtf8(utf16, lenUtf16, sl_null, -1);
 		StringContainer8* container = _alloc(len);
-		if (container != _String8_Null.container) {
+		if (container != _String8_Null.container && container != _String8_Empty.container) {
 			Charsets::utf16ToUtf8(utf16, lenUtf16, container->sz, len);
 			container->sz[len] = 0;
 		}
