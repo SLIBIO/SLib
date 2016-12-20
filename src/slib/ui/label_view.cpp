@@ -183,6 +183,7 @@ void LabelView::makeMultilineList()
 			lineIndex++;
 			m_textLines.add(strLine);
 			strLine = "";
+			index++;
 			continue;
 		}
 		
