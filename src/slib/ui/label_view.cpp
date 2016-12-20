@@ -42,6 +42,8 @@ String LabelView::getText()
 
 void LabelView::setText(const String& text, UIUpdateMode mode)
 {
+	m_currentSize.x = 0; m_currentSize.y = 0;
+	
 	m_text = text;
 	if (isNativeWidget()) {
 		_setText_NW(text);

@@ -6,6 +6,14 @@
 
 #include "view_ios.h"
 
+#define ADD_TOOL_BAR(handle) UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 0, 44)];\
+toolbar.barTintColor = [UIColor colorWithRed:181.0/255 green:187.0/255 blue:193.0/255 alpha:1];\
+UIBarButtonItem *flex = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:handle action:nil];\
+UIBarButtonItem* barButtonDone;\
+barButtonDone = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:handle action:@selector(resignFirstResponder)];\
+toolbar.items = [NSArray arrayWithObjects:flex, flex, barButtonDone, nil];\
+handle.inputAccessoryView = toolbar;
+
 @interface _Slib_iOS_TextField : UITextField<UITextFieldDelegate> {
 	
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
@@ -90,6 +98,8 @@ public:
 	
 	void applyProperties(UITextField* handle)
 	{
+		ADD_TOOL_BAR(handle)
+		
 		[handle setText:(Apple::getNSStringFromString(m_text))];
 		[handle setTextAlignment:translateAlignment(m_textAlignment)];
 		[handle setBorderStyle:(isBorder()?UITextBorderStyleBezel:UITextBorderStyleNone)];
@@ -108,6 +118,8 @@ public:
 	
 	void applyProperties(UITextView* handle)
 	{
+		ADD_TOOL_BAR(handle)
+		
 		[handle setText:(Apple::getNSStringFromString(m_text))];
 		[handle setTextAlignment:translateAlignment(m_textAlignment)];
 		if (isBorder()) {
@@ -196,6 +208,7 @@ Ref<ViewInstance> EditView::createNativeWidget(ViewInstance* _parent)
 {
 	IOS_VIEW_CREATE_INSTANCE_BEGIN
 	_Slib_iOS_TextField* handle = [[_Slib_iOS_TextField alloc] initWithFrame:frame];
+
 	if (handle != nil) {
 		((_EditView*)this)->applyProperties(handle);
 	}
@@ -207,6 +220,7 @@ Ref<ViewInstance> PasswordView::createNativeWidget(ViewInstance* _parent)
 {
 	IOS_VIEW_CREATE_INSTANCE_BEGIN
 	_Slib_iOS_TextField* handle = [[_Slib_iOS_TextField alloc] initWithFrame:frame];
+	
 	if (handle != nil) {
 		handle.secureTextEntry = TRUE;
 		((_EditView*)this)->applyProperties(handle);
