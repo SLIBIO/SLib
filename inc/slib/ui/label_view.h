@@ -39,9 +39,7 @@ protected:
 	void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 	
 private:
-	void makeMultilineList();
-	
-	sl_uint32 getFirstWordLen(const String16& text, sl_uint32 index);
+	void _makeMultilineList();
 	
 	void _setText_NW(const String& text);
 	
@@ -64,7 +62,9 @@ protected:
 	Alignment m_textAlignment;
 	
 	SafeList<String16> m_textLines;
-	Size m_currentSize;
+	sl_ui_len m_currentTextBoundWidth;
+	SafeRef<Font> m_currentTextFont;
+	
 };
 
 SLIB_UI_NAMESPACE_END

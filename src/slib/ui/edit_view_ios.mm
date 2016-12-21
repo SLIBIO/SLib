@@ -6,14 +6,6 @@
 
 #include "view_ios.h"
 
-#define ADD_TOOL_BAR(handle) UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 0, 44)];\
-toolbar.barTintColor = [UIColor colorWithRed:181.0/255 green:187.0/255 blue:193.0/255 alpha:1];\
-UIBarButtonItem *flex = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:handle action:nil];\
-UIBarButtonItem* barButtonDone;\
-barButtonDone = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:handle action:@selector(resignFirstResponder)];\
-toolbar.items = [NSArray arrayWithObjects:flex, flex, barButtonDone, nil];\
-handle.inputAccessoryView = toolbar;
-
 @interface _Slib_iOS_TextField : UITextField<UITextFieldDelegate> {
 	
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
@@ -96,6 +88,14 @@ public:
 		}
 	}
 	
+#define ADD_TOOL_BAR(handle) UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 0, 44)];\
+	toolbar.barTintColor = [UIColor colorWithRed:181.0/255 green:187.0/255 blue:193.0/255 alpha:1];\
+	UIBarButtonItem *flex = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:handle action:nil];\
+	UIBarButtonItem* barButtonDone;\
+	barButtonDone = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:handle action:@selector(resignFirstResponder)];\
+	toolbar.items = [NSArray arrayWithObjects:flex, flex, barButtonDone, nil];\
+	handle.inputAccessoryView = toolbar;
+
 	void applyProperties(UITextField* handle)
 	{
 		ADD_TOOL_BAR(handle)
