@@ -259,6 +259,7 @@
 		AECCC4B01B0F064D002B0284 /* thirdparty_libvpx_dec.c in Sources */ = {isa = PBXBuildFile; fileRef = AECCC4AD1B0F064D002B0284 /* thirdparty_libvpx_dec.c */; settings = {COMPILER_FLAGS = "-O3 -w"; }; };
 		AECCC4B11B0F064D002B0284 /* thirdparty_libvpx_enc.c in Sources */ = {isa = PBXBuildFile; fileRef = AECCC4AE1B0F064D002B0284 /* thirdparty_libvpx_enc.c */; settings = {COMPILER_FLAGS = "-O3 -w"; }; };
 		AECCC4B21B0F064D002B0284 /* thirdparty_libvpx.c in Sources */ = {isa = PBXBuildFile; fileRef = AECCC4AF1B0F064D002B0284 /* thirdparty_libvpx.c */; settings = {COMPILER_FLAGS = "-O3 -w"; }; };
+		E1B34E9F1E0A90C0006217F4 /* picker_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1B34E9E1E0A90C0006217F4 /* picker_view.cpp */; };
 		E1CC6F931D8FC21000C491E5 /* slider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1CC6F921D8FC21000C491E5 /* slider.cpp */; };
 /* End PBXBuildFile section */
 
@@ -517,6 +518,7 @@
 		AECCC4AD1B0F064D002B0284 /* thirdparty_libvpx_dec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_libvpx_dec.c; sourceTree = "<group>"; };
 		AECCC4AE1B0F064D002B0284 /* thirdparty_libvpx_enc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_libvpx_enc.c; sourceTree = "<group>"; };
 		AECCC4AF1B0F064D002B0284 /* thirdparty_libvpx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_libvpx.c; sourceTree = "<group>"; };
+		E1B34E9E1E0A90C0006217F4 /* picker_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = picker_view.cpp; sourceTree = "<group>"; };
 		E1CC6F921D8FC21000C491E5 /* slider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = slider.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -649,6 +651,7 @@
 				2699DC8F1D43682D0085EE67 /* list_view.cpp */,
 				2648D5431D096A7000819E09 /* mobile_app.cpp */,
 				2648D5411D0965C400819E09 /* mobile_game.cpp */,
+				E1B34E9E1E0A90C0006217F4 /* picker_view.cpp */,
 				26BB61391D872FB10049A5C3 /* progress_bar.cpp */,
 				266DD5141C11940A00D47AB0 /* radio_button.cpp */,
 				266DD5151C11940A00D47AB0 /* radio_button_osx.mm */,
@@ -1124,6 +1127,7 @@
 				2666122B1D2A44280081F26E /* graphics_resource.cpp in Sources */,
 				266DD48E1C1193C400D47AB0 /* bitmap.cpp in Sources */,
 				266DD57C1C11940A00D47AB0 /* index_buffer.cpp in Sources */,
+				E1B34E9F1E0A90C0006217F4 /* picker_view.cpp in Sources */,
 				266DD49A1C1193C400D47AB0 /* image_stb.cpp in Sources */,
 				266DD5DF1C11940A00D47AB0 /* view_osx.mm in Sources */,
 				A25F301E1B03A33700854DAF /* mutex.cpp in Sources */,

@@ -20,6 +20,7 @@
 #include "ui/select_view.h"
 #include "ui/progress_bar.h"
 #include "ui/slider.h"
+#include "ui/picker_view.h"
 #include "ui/text_view.h"
 
 #include "ui/scroll_bar.h"

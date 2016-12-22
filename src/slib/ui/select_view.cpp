@@ -90,7 +90,7 @@ SelectView::SelectView()
 {
 	setCreatingNativeWidget(sl_true);
 	setUsingFont(sl_true);
-	setBorder(sl_true, UIUpdateMode::NoRedraw);
+	setBorder(sl_true, UIUpdateMode::Init);
 	
 	m_indexSelected = 0;
 	

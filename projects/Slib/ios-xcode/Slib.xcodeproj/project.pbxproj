@@ -238,6 +238,8 @@
 		AE75B9B21B0F2600004A70EE /* thirdparty_libvpx_dec.c in Sources */ = {isa = PBXBuildFile; fileRef = AE75B9AF1B0F2600004A70EE /* thirdparty_libvpx_dec.c */; settings = {COMPILER_FLAGS = "-O3 -w"; }; };
 		AE75B9B31B0F2600004A70EE /* thirdparty_libvpx_enc.c in Sources */ = {isa = PBXBuildFile; fileRef = AE75B9B01B0F2600004A70EE /* thirdparty_libvpx_enc.c */; settings = {COMPILER_FLAGS = "-O3 -w"; }; };
 		AE75B9B41B0F2600004A70EE /* thirdparty_libvpx.c in Sources */ = {isa = PBXBuildFile; fileRef = AE75B9B11B0F2600004A70EE /* thirdparty_libvpx.c */; settings = {COMPILER_FLAGS = "-w"; }; };
+		E1034AB41E0B492400989BB1 /* picker_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E1034AB31E0B492400989BB1 /* picker_view_ios.mm */; };
+		E1B34E9D1E0A909A006217F4 /* picker_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1B34E9C1E0A909A006217F4 /* picker_view.cpp */; };
 		E1B9F8F31DEC887700BAA9F0 /* vibrator_ios.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1B9F8F21DEC887700BAA9F0 /* vibrator_ios.cpp */; };
 		E1D264BA1DE9B1C800F1D44C /* sensor_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E1D264B91DE9B1C800F1D44C /* sensor_ios.mm */; };
 		E1E4EDB01DF08924002221C5 /* device_information_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E1E4EDAF1DF08924002221C5 /* device_information_ios.mm */; };
@@ -497,6 +499,8 @@
 		AE75B9AF1B0F2600004A70EE /* thirdparty_libvpx_dec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_libvpx_dec.c; sourceTree = "<group>"; };
 		AE75B9B01B0F2600004A70EE /* thirdparty_libvpx_enc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_libvpx_enc.c; sourceTree = "<group>"; };
 		AE75B9B11B0F2600004A70EE /* thirdparty_libvpx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_libvpx.c; sourceTree = "<group>"; };
+		E1034AB31E0B492400989BB1 /* picker_view_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = picker_view_ios.mm; sourceTree = "<group>"; };
+		E1B34E9C1E0A909A006217F4 /* picker_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = picker_view.cpp; sourceTree = "<group>"; };
 		E1B9F8F21DEC887700BAA9F0 /* vibrator_ios.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vibrator_ios.cpp; sourceTree = "<group>"; };
 		E1D264B91DE9B1C800F1D44C /* sensor_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = sensor_ios.mm; sourceTree = "<group>"; };
 		E1E4EDAF1DF08924002221C5 /* device_information_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = device_information_ios.mm; sourceTree = "<group>"; };
@@ -833,6 +837,8 @@
 				266F926B1D51CD450040166C /* list_view.cpp */,
 				2648D5491D096AC400819E09 /* mobile_app.cpp */,
 				2648D54A1D096AC400819E09 /* mobile_game.cpp */,
+				E1B34E9C1E0A909A006217F4 /* picker_view.cpp */,
+				E1034AB31E0B492400989BB1 /* picker_view_ios.mm */,
 				2634DCE61D8A82EA00E8F19E /* progress_bar.cpp */,
 				266DD4451C11914200D47AB0 /* radio_button.cpp */,
 				266DD4471C11917700D47AB0 /* render_view.cpp */,
@@ -987,6 +993,7 @@
 				A25F2F581B039EF600854DAF /* time.cpp in Sources */,
 				A2498C761AFA9C3200C76201 /* thirdparty_freetype.c in Sources */,
 				266DD3A01C117AE300D47AB0 /* drawable.cpp in Sources */,
+				E1B34E9D1E0A909A006217F4 /* picker_view.cpp in Sources */,
 				2601078E1DACE8D900C40723 /* font_apple.mm in Sources */,
 				26B1C99F1DC76BF50092C84F /* text_view.cpp in Sources */,
 				A2498C781AFA9C3200C76201 /* thirdparty_libopus.c in Sources */,
@@ -1106,6 +1113,7 @@
 				266DD4091C118B9900D47AB0 /* vertex_buffer.cpp in Sources */,
 				266DD3811C117A3100D47AB0 /* aes.cpp in Sources */,
 				266DD3ED1C1181B500D47AB0 /* tcpip.cpp in Sources */,
+				E1034AB41E0B492400989BB1 /* picker_view_ios.mm in Sources */,
 				266DD4001C118B9900D47AB0 /* opengl_gl.cpp in Sources */,
 				266DD42E1C118FA500D47AB0 /* window.cpp in Sources */,
 				A25F2F561B039EF600854DAF /* thread_apple.mm in Sources */,
