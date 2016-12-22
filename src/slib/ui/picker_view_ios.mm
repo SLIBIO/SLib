@@ -182,9 +182,12 @@ SLIB_UI_NAMESPACE_END
 	UIFont* font = m_font;
 	if (font != nil) {
 		CGFloat h = font.lineHeight;
+		if (h < 20) {
+			h = 20;
+		}
 		return h;
 	} else {
-		return 12;
+		return 20;
 	}
 }
 
