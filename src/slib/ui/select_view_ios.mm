@@ -115,7 +115,7 @@ void SelectView::_setItemTitle_NW(sl_uint32 index, const String& title)
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
 		_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
-		[v->m_picker reloadComponent:index];
+		[v->m_picker reloadAllComponents];
 	}
 }
 

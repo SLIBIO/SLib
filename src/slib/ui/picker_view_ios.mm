@@ -105,7 +105,7 @@ void PickerView::_setItemTitle_NW(sl_uint32 index, const String& title)
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
 		_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
-		[v reloadComponent:index];
+		[v reloadAllComponents];
 	}
 }
 
