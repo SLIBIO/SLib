@@ -170,7 +170,6 @@ void LabelView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 				maxWidth = size.x;
 			}
 			height += size.y;
-			m_textLines.add(line);
 		}
 		setMeasuredWidth(maxWidth);
 		if (flagVertical) {
