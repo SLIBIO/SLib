@@ -440,6 +440,10 @@ void View::detach()
 void View::_processAttachOnUiThread()
 {
 	if (isInstance()) {
+		Ref<GestureDetector> gesture = m_gestureDetector;
+		if (gesture.isNotNull()) {
+			gesture->enableNative();
+		}
 		if (getParent().isNull() && !(RenderView::checkInstance(this))) {
 			_makeLayout(sl_false);
 		}
@@ -6232,6 +6236,21 @@ sl_bool View::hitTestForCapturingChildInstanceEvents(const UIPoint& pt)
 	return sl_true;
 }
 
+Ref<GestureDetector> View::createGestureDetector()
+{
+	Ref<GestureDetector> gesture = m_gestureDetector;
+	if (gesture.isNull()) {
+		gesture = new GestureDetector(this);
+		m_gestureDetector = gesture;
+	}
+	return gesture;
+}
+
+Ref<GestureDetector> View::getGestureDetector()
+{
+	return m_gestureDetector;
+}
+
 void View::drawBackground(Canvas* canvas, const Color& color, const Ref<Drawable>& background)
 {
 	Rectangle rc(0, 0, (sl_real)(m_frame.getWidth()), (sl_real)(m_frame.getHeight()));
@@ -6516,44 +6535,47 @@ void View::post(const Function<void()>& callback, sl_bool flagInvalidate)
 void View::dispatchDraw(Canvas* canvas)
 {
 	m_flagCurrentDrawing = sl_true;
-	{
+	
+	do {
+		
 		Rectangle rcInvalidated = canvas->getInvalidatedRect();
 		if (rcInvalidated.right < rcInvalidated.left + SLIB_EPSILON) {
-			return;
+			break;
 		}
 		if (rcInvalidated.bottom < rcInvalidated.top + SLIB_EPSILON) {
-			return;
+			break;
 		}
 		m_rectCurrentDrawing.left = (sl_ui_pos)(rcInvalidated.left - SLIB_EPSILON);
 		m_rectCurrentDrawing.top = (sl_ui_pos)(rcInvalidated.top - SLIB_EPSILON);
 		m_rectCurrentDrawing.right = (sl_ui_pos)(rcInvalidated.right + SLIB_EPSILON);
 		m_rectCurrentDrawing.bottom = (sl_ui_pos)(rcInvalidated.bottom + SLIB_EPSILON);
-	}
-	
-	_makeLayout(sl_false);
-	
-	Ref<DrawAttributes> drawAttrs = m_drawAttributes;
-	if (drawAttrs.isNotNull() && drawAttrs->flagPreDrawEnabled) {
-		onPreDraw(canvas);
-	}
-	
-	draw(canvas);
-	
-	Ref<View> scrollBars[2];
-	_getScrollBars(scrollBars);
-	if (scrollBars[0].isNotNull() || scrollBars[1].isNotNull()) {
-		drawChildren(canvas, scrollBars, 2);
-	}
-
-	if (drawAttrs.isNotNull()) {
-		if (drawAttrs->flagOnDrawBorderAlways || drawAttrs->penBorder.isNotNull()) {
-			onDrawBorder(canvas);
+		
+		_makeLayout(sl_false);
+		
+		Ref<DrawAttributes> drawAttrs = m_drawAttributes;
+		if (drawAttrs.isNotNull() && drawAttrs->flagPreDrawEnabled) {
+			onPreDraw(canvas);
 		}
-		if (drawAttrs->flagPostDrawEnabled) {
-			onPostDraw(canvas);
+		
+		draw(canvas);
+		
+		Ref<View> scrollBars[2];
+		_getScrollBars(scrollBars);
+		if (scrollBars[0].isNotNull() || scrollBars[1].isNotNull()) {
+			drawChildren(canvas, scrollBars, 2);
 		}
-	}
-
+		
+		if (drawAttrs.isNotNull()) {
+			if (drawAttrs->flagOnDrawBorderAlways || drawAttrs->penBorder.isNotNull()) {
+				onDrawBorder(canvas);
+			}
+			if (drawAttrs->flagPostDrawEnabled) {
+				onPostDraw(canvas);
+			}
+		}
+		
+	} while (0);
+	
 	m_flagCurrentDrawing = sl_false;
 	
 	Function<void()> callback;
@@ -6683,7 +6705,11 @@ void View::onChangePadding()
 {
 }
 
-static UIAction _SView_getActionUp(UIAction actionDown)
+void View::onSwipe(GestureType type)
+{
+}
+
+static UIAction _View_getActionUp(UIAction actionDown)
 {
 	if (actionDown == UIAction::LeftButtonDown) {
 		return UIAction::LeftButtonUp;
@@ -6704,6 +6730,11 @@ void View::dispatchMouseEvent(UIEvent* ev)
 	}
 	if (! m_flagEnabled) {
 		return;
+	}
+	
+	Ref<GestureDetector> gesture = m_gestureDetector;
+	if (gesture.isNotNull()) {
+		gesture->processEvent(ev);
 	}
 	
 	UIAction action = ev->getAction();
@@ -6833,7 +6864,7 @@ sl_bool View::dispatchMouseEventToChildren(UIEvent* ev, const Ref<View>* childre
 			oldChild = m_childMouseDown;
 			if (oldChild.isNotNull()) {
 				dispatchMouseEventToChild(ev, oldChild.ptr);
-				if (action == _SView_getActionUp(m_actionMouseDown)) {
+				if (action == _View_getActionUp(m_actionMouseDown)) {
 					m_childMouseDown.setNull();
 					m_actionMouseDown = UIAction::Unknown;
 				}
@@ -6904,6 +6935,11 @@ void View::dispatchTouchEvent(UIEvent* ev)
 	}
 	if (! m_flagEnabled) {
 		return;
+	}
+	
+	Ref<GestureDetector> gesture = m_gestureDetector;
+	if (gesture.isNotNull()) {
+		gesture->processEvent(ev);
 	}
 	
 	UIAction action = ev->getAction();
@@ -7325,7 +7361,7 @@ void View::dispatchClick(UIEvent* ev)
 
 void View::dispatchClickWithNoEvent()
 {
-	Ref<UIEvent> ev = UIEvent::createMouseEvent(UIAction::Unknown, 0, 0);
+	Ref<UIEvent> ev = UIEvent::createMouseEvent(UIAction::Unknown, 0, 0, Time::zero());
 	if (ev.isNotNull()) {
 		dispatchClick(ev.ptr);		
 	}
@@ -7738,6 +7774,16 @@ void ViewInstance::onSetCursor(UIEvent* ev)
 	Ref<View> view = getView();
 	if (view.isNotNull()) {
 		view->dispatchSetCursor(ev);
+	}
+}
+
+void ViewInstance::onSwipe(GestureType type)
+{
+	Ref<View> view = getView();
+	if (view.isNotNull()) {
+		if (view->isEnabled()) {
+			view->onSwipe(type);
+		}
 	}
 }
 

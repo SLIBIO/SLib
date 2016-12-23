@@ -13,7 +13,7 @@ MobileGame::MobileGame()
 	m_contentView->removeAllChildren(UIUpdateMode::Init);
 	m_contentView->addChild(m_gameView, UIUpdateMode::Init);
 	m_contentView = m_gameView;
-	m_gameView->addChild(m_pageStack, UIUpdateMode::Init);
+	m_gameView->addChild(m_pager, UIUpdateMode::Init);
 
 }
 

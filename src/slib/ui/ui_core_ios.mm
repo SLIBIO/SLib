@@ -203,6 +203,9 @@ SLIB_UI_NAMESPACE_END
 	
 	slib::MobileApp::dispatchCreateActivityToApp();
 	
+	UIUserNotificationSettings* notificationSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge categories:nil];
+	[application registerUserNotificationSettings:notificationSettings];
+	
 	return YES;
 }
 
@@ -249,6 +252,17 @@ SLIB_UI_NAMESPACE_END
 	slib::UIApp::dispatchExitToApp();
 }
 
+- (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings {
+	
+}
+
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+	
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
+	
+}
 @end
 
 

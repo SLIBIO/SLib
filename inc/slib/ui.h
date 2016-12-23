@@ -39,6 +39,9 @@
 #include "ui/camera_view.h"
 
 #include "ui/transition.h"
+#include "ui/motion_tracker.h"
+#include "ui/gesture.h"
+
 #include "ui/app.h"
 #include "ui/mobile_app.h"
 #include "ui/mobile_game.h"

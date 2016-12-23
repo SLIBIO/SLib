@@ -32,36 +32,28 @@ public:
 public:
 	sl_size getPagesCount();
 	
-protected:
-	virtual void onPageAction(View* page, UIPageAction action);
-
-	virtual void onFinishPageAnimation(View* page, UIPageAction action);
+	sl_size getCurrentPageIndex();
 	
-public:
-	virtual void dispatchPageAction(View* page, UIPageAction action);
+	Ref<View> getCurrentPage();
 	
-	virtual void dispatchFinishPageAnimation(View* page, UIPageAction action);
-
-public:
-	// override
-	void onResize(sl_ui_len width, sl_ui_len height);
-
-public:
-	SLIB_PTR_PROPERTY(IViewPagerListener, Listener)
+	void addPage(const Ref<View>& page, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-protected:
-	CList< Ref<View> > m_pages;
+	void removePageAt(sl_size index, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-};
-
-class SLIB_EXPORT ViewStack : public ViewPager
-{
-	SLIB_DECLARE_OBJECT
+	void selectPage(sl_size index, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-public:
-	ViewStack();
+	void goToPageAt(sl_size index, const Transition& transition);
 	
-public:
+	void goToPageAt(sl_size index);
+	
+	void goPrev(const Transition& transition);
+	
+	void goPrev();
+	
+	void goNext(const Transition& transition);
+	
+	void goNext();
+	
 	void push(const Ref<View>& page, const Transition& transition, sl_bool flagRemoveAllBackPages = sl_false);
 
 	void push(const Ref<View>& page, sl_bool flagRemoveAllBackPages = sl_false);
@@ -74,8 +66,8 @@ public:
 	
 	void pop();
 	
-	Ref<View> getCurrentPage();
-
+	void setSwipeNavigation(sl_bool flag);
+	
 	TransitionType getPushTransitionType();
 	
 	void setPushTransitionType(TransitionType type);
@@ -117,15 +109,46 @@ public:
 	void setTransitionCurve(AnimationCurve curve);
 	
 protected:
-	void _push(const Ref<View>& page, Transition transition, sl_bool flagRemoveAllBackPages);
+	void _goTo(sl_size index, const Transition& transition);
 	
-	void _pop(const Ref<View>& page, Transition transition);
+	void _push(const Ref<View>& page, const Transition& transition, sl_bool flagRemoveAllBackPages);
+	
+	void _pop(const Ref<View>& page, const Transition& transition);
 	
 	void _applyDefaultPushTransition(Transition& transition);
 	
 	void _applyDefaultPopTransition(Transition& transition);
 	
+	
 protected:
+	virtual void onPageAction(View* page, UIPageAction action);
+	
+	virtual void onFinishPageAnimation(View* page, UIPageAction action);
+	
+public:
+	virtual void dispatchPageAction(View* page, UIPageAction action);
+	
+	virtual void dispatchFinishPageAnimation(View* page, UIPageAction action);
+	
+public:
+	// override
+	void onResize(sl_ui_len width, sl_ui_len height);
+	
+	// override
+	void onChangePadding();
+	
+	// override
+	void onSwipe(GestureType type);
+	
+public:
+	SLIB_PTR_PROPERTY(IViewPagerListener, Listener)
+	
+protected:
+	CList< Ref<View> > m_pages;
+	sl_size m_indexCurrent;
+
+	sl_bool m_flagSwipeNavigation;
+
 	TransitionType m_pushTransitionType;
 	TransitionType m_popTransitionType;
 	TransitionDirection m_pushTransitionDirection;
@@ -149,16 +172,14 @@ public:
 	
 	void setPager(const Ref<ViewPager>& pager);
 	
-	Ref<ViewStack> getPageStack();
 	
+	void open(const Ref<ViewPager>& pager, const Transition& transition);
 	
-	void open(const Ref<ViewStack>& stack, const Transition& transition);
+	void open(const Ref<ViewPager>& pager);
 	
-	void open(const Ref<ViewStack>& stack);
+	void openHome(const Ref<ViewPager>& pager, const Transition& transition);
 	
-	void openHome(const Ref<ViewStack>& stack, const Transition& transition);
-	
-	void openHome(const Ref<ViewStack>& stack);
+	void openHome(const Ref<ViewPager>& pager);
 	
 	void close(const Transition& transition);
 	

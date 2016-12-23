@@ -239,6 +239,8 @@
 		AE75B9B31B0F2600004A70EE /* thirdparty_libvpx_enc.c in Sources */ = {isa = PBXBuildFile; fileRef = AE75B9B01B0F2600004A70EE /* thirdparty_libvpx_enc.c */; settings = {COMPILER_FLAGS = "-O3 -w"; }; };
 		AE75B9B41B0F2600004A70EE /* thirdparty_libvpx.c in Sources */ = {isa = PBXBuildFile; fileRef = AE75B9B11B0F2600004A70EE /* thirdparty_libvpx.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		E1034AB41E0B492400989BB1 /* picker_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E1034AB31E0B492400989BB1 /* picker_view_ios.mm */; };
+		E1034AB81E0B633E00989BB1 /* motion_tracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1034AB71E0B633E00989BB1 /* motion_tracker.cpp */; };
+		E17DADEB1E0C9060006161F6 /* gesture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E17DADEA1E0C9060006161F6 /* gesture.cpp */; };
 		E1B34E9D1E0A909A006217F4 /* picker_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1B34E9C1E0A909A006217F4 /* picker_view.cpp */; };
 		E1B9F8F31DEC887700BAA9F0 /* vibrator_ios.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1B9F8F21DEC887700BAA9F0 /* vibrator_ios.cpp */; };
 		E1D264BA1DE9B1C800F1D44C /* sensor_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E1D264B91DE9B1C800F1D44C /* sensor_ios.mm */; };
@@ -500,6 +502,8 @@
 		AE75B9B01B0F2600004A70EE /* thirdparty_libvpx_enc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_libvpx_enc.c; sourceTree = "<group>"; };
 		AE75B9B11B0F2600004A70EE /* thirdparty_libvpx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_libvpx.c; sourceTree = "<group>"; };
 		E1034AB31E0B492400989BB1 /* picker_view_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = picker_view_ios.mm; sourceTree = "<group>"; };
+		E1034AB71E0B633E00989BB1 /* motion_tracker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = motion_tracker.cpp; sourceTree = "<group>"; };
+		E17DADEA1E0C9060006161F6 /* gesture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gesture.cpp; sourceTree = "<group>"; };
 		E1B34E9C1E0A909A006217F4 /* picker_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = picker_view.cpp; sourceTree = "<group>"; };
 		E1B9F8F21DEC887700BAA9F0 /* vibrator_ios.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vibrator_ios.cpp; sourceTree = "<group>"; };
 		E1D264B91DE9B1C800F1D44C /* sensor_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = sensor_ios.mm; sourceTree = "<group>"; };
@@ -829,6 +833,7 @@
 				266DD41A1C118E4A00D47AB0 /* cursor.cpp */,
 				266DD43B1C1190A600D47AB0 /* edit_view.cpp */,
 				266DD43D1C1190AF00D47AB0 /* edit_view_ios.mm */,
+				E17DADEA1E0C9060006161F6 /* gesture.cpp */,
 				260107B11DAD3E5400C40723 /* image_view.cpp */,
 				266DD43F1C1190E800D47AB0 /* label_view.cpp */,
 				266DD4411C11910F00D47AB0 /* label_view_ios.mm */,
@@ -837,6 +842,7 @@
 				266F926B1D51CD450040166C /* list_view.cpp */,
 				2648D5491D096AC400819E09 /* mobile_app.cpp */,
 				2648D54A1D096AC400819E09 /* mobile_game.cpp */,
+				E1034AB71E0B633E00989BB1 /* motion_tracker.cpp */,
 				E1B34E9C1E0A909A006217F4 /* picker_view.cpp */,
 				E1034AB31E0B492400989BB1 /* picker_view_ios.mm */,
 				2634DCE61D8A82EA00E8F19E /* progress_bar.cpp */,
@@ -1041,6 +1047,7 @@
 				266DD3751C1171E400D47AB0 /* audio_recorder_ios.mm in Sources */,
 				A25F2F481B039EF600854DAF /* mutex.cpp in Sources */,
 				A2774E2A1B1CBBFD00538A7B /* ui_core.cpp in Sources */,
+				E1034AB81E0B633E00989BB1 /* motion_tracker.cpp in Sources */,
 				2694620A1CAD1C47001B2130 /* xml.cpp in Sources */,
 				26FBC2711DF9FB0200D76774 /* spin_lock.cpp in Sources */,
 				26A9B7621C172BCC004C9B0E /* camera_view.cpp in Sources */,
@@ -1107,6 +1114,7 @@
 				266DD3641C1170BD00D47AB0 /* audio_player.cpp in Sources */,
 				26B571761C9D44720099E69B /* triangle.cpp in Sources */,
 				266DD3821C117A3100D47AB0 /* crypto_hash.cpp in Sources */,
+				E17DADEB1E0C9060006161F6 /* gesture.cpp in Sources */,
 				A25F2F591B039EF600854DAF /* variant.cpp in Sources */,
 				266DD4461C11914200D47AB0 /* radio_button.cpp in Sources */,
 				26B571771C9D44720099E69B /* triangle3.cpp in Sources */,

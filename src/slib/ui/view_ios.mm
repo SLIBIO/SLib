@@ -416,7 +416,9 @@ sl_bool iOS_ViewInstance::onEventTouch(UIAction action, NSSet* touches, ::UIEven
 			}
 		}
 		
-		Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points);
+		Time t;
+		t.setSecondsCountf(event.timestamp);
+		Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, t);
 		if (ev.isNotNull()) {
 			onTouchEvent(ev.ptr);
 			if (ev->isStoppedPropagation()) {
@@ -506,11 +508,11 @@ void UIPlatform::removeViewInstance(UIView* handle)
 	UIPlatform::_removeViewInstance((__bridge void*)handle);
 }
 
-UIView* UIPlatform::getViewHandle(ViewInstance* instance)
+UIView* UIPlatform::getViewHandle(ViewInstance* _instance)
 {
-	iOS_ViewInstance* view = (iOS_ViewInstance*)instance;
-	if (view) {
-		return view->getHandle();
+	iOS_ViewInstance* instance = static_cast<iOS_ViewInstance*>(_instance);
+	if (instance) {
+		return instance->getHandle();
 	} else {
 		return nil;
 	}
@@ -519,13 +521,56 @@ UIView* UIPlatform::getViewHandle(ViewInstance* instance)
 UIView* UIPlatform::getViewHandle(View* view)
 {
 	if (view) {
-		Ref<ViewInstance> instance = view->getViewInstance();
-		if (instance.isNotNull()) {
-			iOS_ViewInstance* osx_instance = (iOS_ViewInstance*)(instance.ptr);
-			return osx_instance->getHandle();
+		Ref<ViewInstance> _instance = view->getViewInstance();
+		if (_instance.isNotNull()) {
+			iOS_ViewInstance* instance = static_cast<iOS_ViewInstance*>(_instance.ptr);
+			return instance->getHandle();
 		}
 	}
 	return nil;
+}
+
+sl_bool GestureDetector::_enableNative(const Ref<View>& view, GestureType type)
+{
+	Ref<ViewInstance> _instance = view->getViewInstance();
+	iOS_ViewInstance* instance = static_cast<iOS_ViewInstance*>(_instance.ptr);
+	if (instance) {
+		switch (type) {
+			case GestureType::SwipeLeft:
+				if (instance->m_gestureSwipeLeft == nil) {
+					UISwipeGestureRecognizer* gesture = [[UISwipeGestureRecognizer alloc] initWithTarget:instance->m_handle action:NSSelectorFromString(@"onSwipeLeft")];
+					gesture.direction = UISwipeGestureRecognizerDirectionLeft;
+					[instance->m_handle addGestureRecognizer:gesture];
+					instance->m_gestureSwipeLeft = gesture;
+				}
+				return sl_true;
+			case GestureType::SwipeRight:
+				if (instance->m_gestureSwipeRight == nil) {
+					UISwipeGestureRecognizer* gesture = [[UISwipeGestureRecognizer alloc] initWithTarget:instance->m_handle action:NSSelectorFromString(@"onSwipeRight")];
+					gesture.direction = UISwipeGestureRecognizerDirectionRight;
+					[instance->m_handle addGestureRecognizer:gesture];
+					instance->m_gestureSwipeRight = gesture;
+				}
+				return sl_true;
+			case GestureType::SwipeUp:
+				if (instance->m_gestureSwipeUp == nil) {
+					UISwipeGestureRecognizer* gesture = [[UISwipeGestureRecognizer alloc] initWithTarget:instance->m_handle action:NSSelectorFromString(@"onSwipeUp")];
+					gesture.direction = UISwipeGestureRecognizerDirectionUp;
+					[instance->m_handle addGestureRecognizer:gesture];
+					instance->m_gestureSwipeUp = gesture;
+				}
+				return sl_true;
+			case GestureType::SwipeDown:
+				if (instance->m_gestureSwipeDown == nil) {
+					UISwipeGestureRecognizer* gesture = [[UISwipeGestureRecognizer alloc] initWithTarget:instance->m_handle action:NSSelectorFromString(@"onSwipeDown")];
+					gesture.direction = UISwipeGestureRecognizerDirectionDown;
+					[instance->m_handle addGestureRecognizer:gesture];
+					instance->m_gestureSwipeDown = gesture;
+				}
+				return sl_true;
+		}
+	}
+	return sl_false;
 }
 
 SLIB_UI_NAMESPACE_END

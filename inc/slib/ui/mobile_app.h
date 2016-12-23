@@ -30,7 +30,7 @@ public:
 
 	Ref<View> getContentView();
 	
-	Ref<ViewStack> getPageStack();
+	Ref<ViewPager> getPager();
 	
 	Ref<View> getStartupPage();
 	
@@ -114,7 +114,7 @@ protected:
 	static sl_bool m_flagPaused;
 	
 	Ref<View> m_contentView;
-	Ref<ViewStack> m_pageStack;
+	Ref<ViewPager> m_pager;
 	Ref<View> m_startupPage;
 	sl_bool m_flagStartedPage;
 	CList< Ref<ViewPage> > m_popupPages;

@@ -6,6 +6,7 @@
 #include "constants.h"
 #include "event.h"
 #include "cursor.h"
+#include "gesture.h"
 
 #include "../core/object.h"
 #include "../core/ptr.h"
@@ -949,6 +950,11 @@ public:
 	virtual sl_bool hitTestForCapturingChildInstanceEvents(const UIPoint& pt);
 	
 	
+	Ref<GestureDetector> createGestureDetector();
+	
+	Ref<GestureDetector> getGestureDetector();
+	
+	
 	void drawBackground(Canvas* canvas, const Color& color, const Ref<Drawable>& background);
 	
 	void drawBorder(Canvas* canvas, const Ref<Pen>& pen);
@@ -1017,6 +1023,9 @@ protected:
 	virtual void onMakeLayout();
 	
 	virtual void onChangePadding();
+	
+public:
+	virtual void onSwipe(GestureType type);
 	
 public:
 	virtual void dispatchDraw(Canvas* canvas);
@@ -1185,6 +1194,8 @@ private:
 	SafeWeakRef<View> m_viewNextTabStop;
 	SafeWeakRef<View> m_viewPrevTabStop;
 	sl_bool m_flagCapturingChildInstanceEvents;
+	
+	SafeRef<GestureDetector> m_gestureDetector;
 	
 	sl_ui_pos m_paddingLeft;
 	sl_ui_pos m_paddingTop;
@@ -1462,6 +1473,8 @@ public:
 	void onMouseWheelEvent(UIEvent* event);
 	
 	void onSetCursor(UIEvent* event);
+	
+	void onSwipe(GestureType type);
 	
 protected:
 	SafeWeakRef<View> m_view;

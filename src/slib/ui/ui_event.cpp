@@ -197,10 +197,8 @@ enum
 	flagPassToNext = 0x4,
 };
 
-UIEvent::UIEvent()
+UIEvent::UIEvent() : m_flags(0), m_action(UIAction::Unknown), m_time(0)
 {
-	m_flags = 0;
-	m_action = UIAction::Unknown;
 }
 
 Ref<UIEvent> UIEvent::create(UIAction action)
@@ -212,29 +210,31 @@ Ref<UIEvent> UIEvent::create(UIAction action)
 	return ret;
 }
 
-Ref<UIEvent> UIEvent::createKeyEvent(UIAction action, Keycode keycode, sl_uint32 systemKeycode)
+Ref<UIEvent> UIEvent::createKeyEvent(UIAction action, Keycode keycode, sl_uint32 systemKeycode, const Time& time)
 {
 	Ref<UIEvent> ret = new UIEvent;
 	if (ret.isNotNull()) {
 		ret->setAction(action);
 		ret->setKeycode(keycode);
 		ret->setSystemKeycode(systemKeycode);
+		ret->setTime(time);
 	}
 	return ret;
 }
 
-Ref<UIEvent> UIEvent::createMouseEvent(UIAction action, sl_ui_posf x, sl_ui_posf y)
+Ref<UIEvent> UIEvent::createMouseEvent(UIAction action, sl_ui_posf x, sl_ui_posf y, const Time& time)
 {
 	Ref<UIEvent> ret = new UIEvent;
 	if (ret.isNotNull()) {
 		ret->setAction(action);
 		ret->setX(x);
 		ret->setY(y);
+		ret->setTime(time);
 	}
 	return ret;
 }
 
-Ref<UIEvent> UIEvent::createMouseWheelEvent(sl_ui_posf mouseX, sl_ui_posf mouseY, sl_real deltaX, sl_real deltaY)
+Ref<UIEvent> UIEvent::createMouseWheelEvent(sl_ui_posf mouseX, sl_ui_posf mouseY, sl_real deltaX, sl_real deltaY, const Time& time)
 {
 	Ref<UIEvent> ret = new UIEvent;
 	if (ret.isNotNull()) {
@@ -243,11 +243,12 @@ Ref<UIEvent> UIEvent::createMouseWheelEvent(sl_ui_posf mouseX, sl_ui_posf mouseY
 		ret->setY(mouseY);
 		ret->setDeltaX(deltaX);
 		ret->setDeltaY(deltaY);
+		ret->setTime(time);
 	}
 	return ret;
 }
 
-Ref<UIEvent> UIEvent::createTouchEvent(UIAction action, const Array<TouchPoint>& points)
+Ref<UIEvent> UIEvent::createTouchEvent(UIAction action, const Array<TouchPoint>& points, const Time& time)
 {
 	Ref<UIEvent> ret = new UIEvent;
 	if (ret.isNotNull()) {
@@ -256,16 +257,18 @@ Ref<UIEvent> UIEvent::createTouchEvent(UIAction action, const Array<TouchPoint>&
 		if (points.getCount() > 0) {
 			ret->setTouchPoint((points.getData())[0]);
 		}
+		ret->setTime(time);
 	}
 	return ret;
 }
 
-Ref<UIEvent> UIEvent::createSetCursorEvent(sl_ui_posf x, sl_ui_posf y)
+Ref<UIEvent> UIEvent::createSetCursorEvent(sl_ui_posf x, sl_ui_posf y, const Time& time)
 {
 	Ref<UIEvent> ret = new UIEvent;
 	if (ret.isNotNull()) {
 		ret->setAction(UIAction::SetCursor);
 		ret->setPoint(x, y);
+		ret->setTime(time);
 	}
 	return ret;
 }
@@ -280,19 +283,29 @@ void UIEvent::setAction(UIAction action)
 	m_action = action;
 }
 
-sl_bool UIEvent::isKeyEvent()
+sl_bool UIEvent::isKeyEvent() const
 {
 	return ((sl_uint32)m_action & 0xff00) == 0x0100;
 }
 
-sl_bool UIEvent::isMouseEvent()
+sl_bool UIEvent::isMouseEvent() const
 {
 	return ((sl_uint32)m_action & 0xff00) == 0x0200;
 }
 
-sl_bool UIEvent::isTouchEvent()
+sl_bool UIEvent::isTouchEvent() const
 {
 	return ((sl_uint32)m_action & 0xff00) == 0x0300;
+}
+
+Time UIEvent::getTime() const
+{
+	return m_time;
+}
+
+void UIEvent::setTime(const Time& time)
+{
+	m_time = time;
 }
 
 const KeycodeAndModifiers& UIEvent::getKeycodeAndModifiers() const

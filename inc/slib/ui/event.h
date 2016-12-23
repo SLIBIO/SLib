@@ -6,6 +6,7 @@
 #include "constants.h"
 
 #include "../core/string.h"
+#include "../core/time.h"
 #include "../math/point.h"
 #include "../math/size.h"
 #include "../math/matrix3.h"
@@ -135,26 +136,32 @@ protected:
 public:
 	static Ref<UIEvent> create(UIAction action);
 	
-	static Ref<UIEvent> createKeyEvent(UIAction action, Keycode keycode, sl_uint32 systemKeycode);
+	static Ref<UIEvent> createKeyEvent(UIAction action, Keycode keycode, sl_uint32 systemKeycode, const Time& time);
 	
-	static Ref<UIEvent> createMouseEvent(UIAction action, sl_ui_posf x, sl_ui_posf y);
+	static Ref<UIEvent> createMouseEvent(UIAction action, sl_ui_posf x, sl_ui_posf y, const Time& time);
 	
-	static Ref<UIEvent> createMouseWheelEvent(sl_ui_posf mouseX, sl_ui_posf mouseY, sl_real deltaX, sl_real deltaY);
+	static Ref<UIEvent> createMouseWheelEvent(sl_ui_posf mouseX, sl_ui_posf mouseY, sl_real deltaX, sl_real deltaY, const Time& time);
 	
-	static Ref<UIEvent> createTouchEvent(UIAction action, const Array<TouchPoint>& points);
+	static Ref<UIEvent> createTouchEvent(UIAction action, const Array<TouchPoint>& points, const Time& time);
 	
-	static Ref<UIEvent> createSetCursorEvent(sl_ui_posf x, sl_ui_posf y);
+	static Ref<UIEvent> createSetCursorEvent(sl_ui_posf x, sl_ui_posf y, const Time& time);
 	
 public:
 	UIAction getAction() const;
 	
 	void setAction(UIAction action);
 	
-	sl_bool isKeyEvent();
+	sl_bool isKeyEvent() const;
 	
-	sl_bool isMouseEvent();
+	sl_bool isMouseEvent() const;
 	
-	sl_bool isTouchEvent();
+	sl_bool isTouchEvent() const;
+	
+	// Relative to a absolute time or to the system startup
+	Time getTime() const;
+	
+	// Relative to a absolute time or to the system startup
+	void setTime(const Time& time);
 	
 	// key
 	const KeycodeAndModifiers& getKeycodeAndModifiers() const;
@@ -297,6 +304,7 @@ public:
 protected:
 	sl_uint32 m_flags;
 	UIAction m_action;
+	Time m_time;
 	
 	// keyboard
 	KeycodeAndModifiers m_keycodeAndModifiers;

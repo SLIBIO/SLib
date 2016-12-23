@@ -108,7 +108,13 @@ void OSX_ViewInstance::setFocus()
 	if (handle != nil) {
 		NSWindow* window = [handle window];
 		if (window != nil) {
-			[window makeFirstResponder:handle];
+			if (UI::isUiThread()) {
+				[window makeFirstResponder:handle];
+			} else {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[window makeFirstResponder:handle];
+				});
+			}
 		}
 	}
 }
@@ -117,7 +123,13 @@ void OSX_ViewInstance::invalidate()
 {
 	NSView* handle = m_handle;
 	if (handle != nil) {
-		[handle setNeedsDisplay: TRUE];
+		if (UI::isUiThread()) {
+			[handle setNeedsDisplay: TRUE];
+		} else {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[handle setNeedsDisplay: TRUE];
+			});
+		}
 	}
 }
 
@@ -130,7 +142,13 @@ void OSX_ViewInstance::invalidate(const UIRect& rect)
 		_rect.origin.y = (CGFloat)(rect.top);
 		_rect.size.width = (CGFloat)(rect.getWidth());
 		_rect.size.height = (CGFloat)(rect.getHeight());
-		[handle setNeedsDisplayInRect: _rect];
+		if (UI::isUiThread()) {
+			[handle setNeedsDisplayInRect: _rect];
+		} else {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[handle setNeedsDisplayInRect: _rect];
+			});
+		}
 	}
 }
 
@@ -233,7 +251,13 @@ void OSX_ViewInstance::setAlpha(sl_real alpha)
 	
 	NSView* handle = m_handle;
 	if (handle != nil) {
-		[handle setNeedsDisplay:YES];
+		if (UI::isUiThread()) {
+			[handle setNeedsDisplay: TRUE];
+		} else {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[handle setNeedsDisplay: TRUE];
+			});
+		}
 	}
 	
 }
@@ -400,7 +424,9 @@ sl_bool OSX_ViewInstance::onEventKey(sl_bool flagDown, NSEvent* event)
 		UIAction action = flagDown ? UIAction::KeyDown : UIAction::KeyUp;
 		sl_uint32 vkey = [event keyCode];
 		Keycode key = UIEvent::getKeycodeFromSystemKeycode(vkey);
-		Ref<UIEvent> ev = UIEvent::createKeyEvent(action, key, vkey);
+		Time t;
+		t.setSecondsCountf([event timestamp]);
+		Ref<UIEvent> ev = UIEvent::createKeyEvent(action, key, vkey, t);
 		if (ev.isNotNull()) {
 			applyModifiers(ev.ptr, event);
 			onKeyEvent(ev.ptr);
@@ -420,7 +446,9 @@ sl_bool OSX_ViewInstance::onEventMouse(UIAction action, NSEvent* event)
 			NSPoint pt = [handle convertPoint:pw fromView:nil];
 			sl_ui_posf x = (sl_ui_posf)(pt.x);
 			sl_ui_posf y = (sl_ui_posf)(pt.y);
-			Ref<UIEvent> ev = UIEvent::createMouseEvent(action, x, y);
+			Time t;
+			t.setSecondsCountf([event timestamp]);
+			Ref<UIEvent> ev = UIEvent::createMouseEvent(action, x, y, t);
 			if (ev.isNotNull()) {
 				applyModifiers(ev.ptr, event);
 				onMouseEvent(ev.ptr);
@@ -444,7 +472,9 @@ sl_bool OSX_ViewInstance::onEventMouseWheel(NSEvent* event)
 		NSPoint pt = [handle convertPoint:pw fromView:nil];
 		sl_ui_posf x = (sl_ui_posf)(pt.x);
 		sl_ui_posf y = (sl_ui_posf)(pt.y);
-		Ref<UIEvent> ev = UIEvent::createMouseWheelEvent(x, y, deltaX, deltaY);
+		Time t;
+		t.setSecondsCountf([event timestamp]);
+		Ref<UIEvent> ev = UIEvent::createMouseWheelEvent(x, y, deltaX, deltaY, t);
 		if (ev.isNotNull()) {
 			applyModifiers(ev.ptr, event);
 			onMouseWheelEvent(ev.ptr);
@@ -462,7 +492,9 @@ sl_bool OSX_ViewInstance::onEventUpdateCursor(NSEvent* event)
 		NSPoint pt = [handle convertPoint:pw fromView:nil];
 		sl_ui_posf x = (sl_ui_posf)(pt.x);
 		sl_ui_posf y = (sl_ui_posf)(pt.y);
-		Ref<UIEvent> ev = UIEvent::createSetCursorEvent(x, y);
+		Time t;
+		t.setSecondsCountf([event timestamp]);
+		Ref<UIEvent> ev = UIEvent::createSetCursorEvent(x, y, t);
 		if (ev.isNotNull()) {
 			onSetCursor(ev.ptr);
 			return ev->isPreventedDefault();

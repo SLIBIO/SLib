@@ -86,6 +86,12 @@ protected:
 	UIView* m_handle;
 	sl_bool m_flagFreeOnRelease;
 	
+	UISwipeGestureRecognizer* m_gestureSwipeLeft;
+	UISwipeGestureRecognizer* m_gestureSwipeRight;
+	UISwipeGestureRecognizer* m_gestureSwipeUp;
+	UISwipeGestureRecognizer* m_gestureSwipeDown;
+	
+	friend GestureDetector;
 };
 
 SLIB_UI_NAMESPACE_END
@@ -165,6 +171,34 @@ SLIB_UI_NAMESPACE_END
 		} \
 	} \
 	[super touchesCancelled:touches withEvent:theEvent];\
+} \
+- (void)onSwipeLeft \
+{ \
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
+	if (instance.isNotNull()) { \
+		instance->onSwipe(slib::GestureType::SwipeLeft); \
+	} \
+} \
+- (void)onSwipeRight \
+{ \
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
+	if (instance.isNotNull()) { \
+		instance->onSwipe(slib::GestureType::SwipeRight); \
+	} \
+} \
+- (void)onSwipeUp \
+{ \
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
+	if (instance.isNotNull()) { \
+		instance->onSwipe(slib::GestureType::SwipeUp); \
+	} \
+} \
+- (void)onSwipeDown \
+{ \
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance; \
+	if (instance.isNotNull()) { \
+		instance->onSwipe(slib::GestureType::SwipeDown); \
+	} \
 }
 
 #endif

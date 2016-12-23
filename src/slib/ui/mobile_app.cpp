@@ -17,8 +17,8 @@ MobileApp::MobileApp()
 	
 	m_contentView = window->getContentView();
 	
-	m_pageStack = new ViewStack;
-	m_contentView->addChild(m_pageStack, UIUpdateMode::Init);
+	m_pager = new ViewPager;
+	m_contentView->addChild(m_pager, UIUpdateMode::Init);
 	
 	m_flagStartedPage = sl_false;
 	
@@ -63,9 +63,9 @@ Ref<View> MobileApp::getContentView()
 	return m_contentView;
 }
 
-Ref<ViewStack> MobileApp::getPageStack()
+Ref<ViewPager> MobileApp::getPager()
 {
-	return m_pageStack;
+	return m_pager;
 }
 
 Ref<View> MobileApp::getStartupPage()
@@ -96,42 +96,42 @@ void MobileApp::addViewToContent(const Ref<View>& view)
 
 void MobileApp::openPage(const Ref<View>& page, const Transition& transition)
 {
-	m_pageStack->push(page, transition);
+	m_pager->push(page, transition);
 }
 
 void MobileApp::openPage(const Ref<View>& page)
 {
-	m_pageStack->push(page);
+	m_pager->push(page);
 }
 
 void MobileApp::openHomePage(const Ref<View>& page, const Transition& transition)
 {
-	m_pageStack->push(page, transition, sl_true);
+	m_pager->push(page, transition, sl_true);
 }
 
 void MobileApp::openHomePage(const Ref<View>& page)
 {
-	m_pageStack->push(page, sl_true);
+	m_pager->push(page, sl_true);
 }
 
 void MobileApp::closePage(const Ref<View>& page, const Transition& transition)
 {
-	m_pageStack->pop(page, transition);
+	m_pager->pop(page, transition);
 }
 
 void MobileApp::closePage(const Ref<View>& page)
 {
-	m_pageStack->pop(page);
+	m_pager->pop(page);
 }
 
 void MobileApp::closePage(const Transition& transition)
 {
-	m_pageStack->pop(transition);
+	m_pager->pop(transition);
 }
 
 void MobileApp::closePage()
 {
-	m_pageStack->pop();
+	m_pager->pop();
 }
 
 void MobileApp::popupPage(const Ref<ViewPage>& page, const Transition& transition, sl_bool flagFillParentBackground)
@@ -228,9 +228,9 @@ void MobileApp::dispatchPause()
 {
 	Animation::pauseAnimationCenter();
 	onPause();
-	Ref<ViewStack> stack = m_pageStack;
-	if (stack.isNotNull()) {
-		Ref<View> page = stack->getCurrentPage();
+	Ref<ViewPager> pager = m_pager;
+	if (pager.isNotNull()) {
+		Ref<View> page = pager->getCurrentPage();
 		if (ViewPage::checkInstance(page.ptr)) {
 			((ViewPage*)(page.ptr))->dispatchPause();
 		}
@@ -257,9 +257,9 @@ void MobileApp::dispatchResume()
 {
 	Animation::resumeAnimationCenter();
 	onResume();
-	Ref<ViewStack> stack = m_pageStack;
-	if (stack.isNotNull()) {
-		Ref<View> page = stack->getCurrentPage();
+	Ref<ViewPager> pager = m_pager;
+	if (pager.isNotNull()) {
+		Ref<View> page = pager->getCurrentPage();
 		if (ViewPage::checkInstance(page.ptr)) {
 			((ViewPage*)(page.ptr))->dispatchPause();
 		}
@@ -303,15 +303,15 @@ void MobileApp::dispatchBack(UIEvent* ev)
 			return;
 		}
 	}
-	if (m_pageStack->getPagesCount() > 1) {
-		Ref<View> page = m_pageStack->getCurrentPage();
+	if (m_pager->getPagesCount() > 1) {
+		Ref<View> page = m_pager->getCurrentPage();
 		if (ViewPage::checkInstance(page.ptr)) {
 			((ViewPage*)(page.ptr))->dispatchBackPressed(ev);
 			if (ev->isPreventedDefault()) {
 				return;
 			}
 		}
-		m_pageStack->pop();
+		m_pager->pop();
 		ev->preventDefault();
 		return;
 	}
@@ -365,7 +365,7 @@ void MobileApp::dispatchDestroyActivityToApp()
 void MobileApp::dispatchResize(sl_ui_len width, sl_ui_len height)
 {
 	UIResource::updateDefaultScreenSize();
-	m_pageStack->setFrame(0, 0, width, height);
+	m_pager->setFrame(0, 0, width, height);
 	if (!m_flagStartedPage) {
 		Ref<View> page = m_startupPage;
 		if (page.isNotNull()) {
