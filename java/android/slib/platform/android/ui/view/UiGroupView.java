@@ -9,7 +9,9 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 public class UiGroupView extends FrameLayout {
-	
+
+	UiGestureDetector gestureDetector;
+
 	public UiGroupView(Context context) {
 		super(context);
 		setWillNotDraw(false);
@@ -42,5 +44,15 @@ public class UiGroupView extends FrameLayout {
 		UiView.onEventTouch(this, event);
 		return true;
 	}
-	
+
+	public boolean dispatchTouchEvent(MotionEvent event) {
+		if (gestureDetector != null) {
+			gestureDetector.onTouchEvent(event);
+			super.dispatchTouchEvent(event);
+			return true;
+		} else {
+			return super.dispatchTouchEvent(event);
+		}
+	}
+
 }

@@ -8,6 +8,8 @@ import android.view.MotionEvent;
 import android.view.View;
 
 public class UiGenericView extends View {
+
+	UiGestureDetector gestureDetector;
 	
 	public UiGenericView(Context context) {
 		super(context);
@@ -28,9 +30,19 @@ public class UiGenericView extends View {
 	}
 	
 	@SuppressLint("ClickableViewAccessibility")
-	public boolean onTouchEvent(MotionEvent event) {		
+	public boolean onTouchEvent(MotionEvent event) {
 		UiView.onEventTouch(this, event);
 		return true;
 	}
-	
+
+	public boolean dispatchTouchEvent(MotionEvent event) {
+		if (gestureDetector != null) {
+			gestureDetector.onTouchEvent(event);
+			super.dispatchTouchEvent(event);
+			return true;
+		} else {
+			return super.dispatchTouchEvent(event);
+		}
+	}
+
 }

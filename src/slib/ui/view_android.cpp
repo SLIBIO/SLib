@@ -37,14 +37,16 @@ void JNICALL _AndroidView_nativeOnDraw(JNIEnv* env, jobject _this, jlong jinstan
 }
 
 jboolean JNICALL _AndroidView_nativeOnKeyEvent(JNIEnv* env, jobject _this, jlong jinstance, jboolean flagDown, int keycode
-	, jboolean flagControl, jboolean flagShift, jboolean flagAlt, jboolean flagWin)
+	, jboolean flagControl, jboolean flagShift, jboolean flagAlt, jboolean flagWin, jlong time)
 {
 	Ref<Android_ViewInstance> instance = Android_ViewInstance::getAndroidInstance(jinstance);
 	if (instance.isNotNull()) {
 		UIAction action = flagDown ? UIAction::KeyDown : UIAction::KeyUp;
 		sl_uint32 vkey = keycode;
 		Keycode key = UIEvent::getKeycodeFromSystemKeycode(keycode);
-		Ref<UIEvent> ev = UIEvent::createKeyEvent(action, key, vkey);
+		Time t;
+		t.setMillisecondsCount(time);
+		Ref<UIEvent> ev = UIEvent::createKeyEvent(action, key, vkey, t);
 		if (ev.isNotNull()) {
 			if (flagControl) {
 				ev->setControlKey();
@@ -67,7 +69,7 @@ jboolean JNICALL _AndroidView_nativeOnKeyEvent(JNIEnv* env, jobject _this, jlong
 	return 0;
 }
 
-jboolean JNICALL _AndroidView_nativeOnTouchEvent(JNIEnv* env, jobject _this, jlong jinstance, int _action, jobjectArray jpoints)
+jboolean JNICALL _AndroidView_nativeOnTouchEvent(JNIEnv* env, jobject _this, jlong jinstance, int _action, jobjectArray jpoints, jlong time)
 {
 	Ref<Android_ViewInstance> instance = Android_ViewInstance::getAndroidInstance(jinstance);
 	if (instance.isNotNull()) {
@@ -86,7 +88,9 @@ jboolean JNICALL _AndroidView_nativeOnTouchEvent(JNIEnv* env, jobject _this, jlo
 						pts[i].phase = (TouchPhase)(_JAndroidTouchPoint::phase.get(jpt));
 					}
 				}
-				Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points);
+				Time t;
+				t.setMillisecondsCount(time);
+				Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, t);
 				if (ev.isNotNull()) {
 					instance->onTouchEvent(ev.ptr);
 					if (ev->isStoppedPropagation()) {
@@ -126,6 +130,14 @@ jboolean JNICALL _AndroidView_nativeHitTestTouchEvent(JNIEnv* env, jobject _this
 	return 0;
 }
 
+void JNICALL _AndroidView_nativeOnSwipe(JNIEnv* env, jobject _this, jlong jinstance, int type)
+{
+	Ref<Android_ViewInstance> instance = Android_ViewInstance::getAndroidInstance(jinstance);
+	if (instance.isNotNull()) {
+		instance->onSwipe((GestureType)type);
+	}
+}
+
 SLIB_JNI_BEGIN_CLASS(_JAndroidView, "slib/platform/android/ui/view/UiView")
 
 	SLIB_JNI_STATIC_METHOD(getContext, "getContext", "(Landroid/view/View;)Landroid/content/Context;");
@@ -152,12 +164,14 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidView, "slib/platform/android/ui/view/UiView")
 	SLIB_JNI_STATIC_METHOD(addChild, "addChild", "(Landroid/view/View;Landroid/view/View;)V");
 	SLIB_JNI_STATIC_METHOD(removeChild, "removeChild", "(Landroid/view/View;Landroid/view/View;)V");
 	SLIB_JNI_STATIC_METHOD(bringToFront, "bringToFront", "(Landroid/view/View;)V");
+	SLIB_JNI_STATIC_METHOD(enableGesture, "enableGesture", "(Landroid/view/View;)V");
 
 	SLIB_JNI_NATIVE(nativeOnDraw, "nativeOnDraw", "(JLslib/platform/android/ui/Graphics;)V", _AndroidView_nativeOnDraw);
-	SLIB_JNI_NATIVE(nativeOnKeyEvent, "nativeOnKeyEvent", "(JZIZZZZ)Z", _AndroidView_nativeOnKeyEvent);
-	SLIB_JNI_NATIVE(nativeOnTouchEvent, "nativeOnTouchEvent", "(JI[Lslib/platform/android/ui/view/UiTouchPoint;)Z", _AndroidView_nativeOnTouchEvent);
+	SLIB_JNI_NATIVE(nativeOnKeyEvent, "nativeOnKeyEvent", "(JZIZZZZJ)Z", _AndroidView_nativeOnKeyEvent);
+	SLIB_JNI_NATIVE(nativeOnTouchEvent, "nativeOnTouchEvent", "(JI[Lslib/platform/android/ui/view/UiTouchPoint;J)Z", _AndroidView_nativeOnTouchEvent);
 	SLIB_JNI_NATIVE(nativeOnClick, "nativeOnClick", "(J)V", _AndroidView_nativeOnClick);
 	SLIB_JNI_NATIVE(nativeHitTestTouchEvent, "nativeHitTestTouchEvent", "(JII)Z", _AndroidView_nativeHitTestTouchEvent);
+	SLIB_JNI_NATIVE(nativeOnSwipe, "nativeOnSwipe", "(JI)V", _AndroidView_nativeOnSwipe);
 
 SLIB_JNI_END_CLASS
 
@@ -478,6 +492,26 @@ jobject UIPlatform::getViewHandle(View* view)
 		}
 	}
 	return 0;
+}
+
+sl_bool GestureDetector::_enableNative(const Ref<View>& view, GestureType type)
+{
+	Ref<ViewInstance> _instance = view->getViewInstance();
+	Android_ViewInstance* instance = static_cast<Android_ViewInstance*>(_instance.ptr);
+	if (instance) {
+		jobject handle = instance->getHandle();
+		if (handle) {
+			switch (type) {
+				case GestureType::SwipeLeft:
+				case GestureType::SwipeRight:
+				case GestureType::SwipeUp:
+				case GestureType::SwipeDown:
+					_JAndroidView::enableGesture.call(sl_null, handle);
+					return sl_true;
+			}
+		}
+	}
+	return sl_false;
 }
 
 SLIB_UI_NAMESPACE_END

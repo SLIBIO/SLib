@@ -275,6 +275,38 @@ public class UiView {
 			Logger.exception(e);
 		}
 	}
+
+	static class ViewGestureListener implements UiGestureDetector.GestureListener {
+
+		View view;
+
+		ViewGestureListener(View view) {
+			this.view = view;
+		}
+
+		public void onSwipe(int direction, float posBegin) {
+			UiView.onSwipe(view, direction);
+		}
+
+		public void onDoubleTap() {
+		}
+	}
+
+	public static void enableGesture(View view) {
+		if (view instanceof UiGenericView) {
+			if (((UiGenericView)view).gestureDetector == null) {
+				((UiGenericView)view).gestureDetector = new UiGestureDetector(view.getContext(), new ViewGestureListener(view));
+			}
+		} else if (view instanceof UiGLView) {
+			if (((UiGLView)view).gestureDetector == null) {
+				((UiGLView)view).gestureDetector = new UiGestureDetector(view.getContext(), new ViewGestureListener(view));
+			}
+		} else if (view instanceof UiGroupView) {
+			if (((UiGroupView)view).gestureDetector == null) {
+				((UiGroupView)view).gestureDetector = new UiGestureDetector(view.getContext(), new ViewGestureListener(view));
+			}
+		}
+	}
 	
 	// events
 	private static native void nativeOnDraw(long instance, Graphics graphics);
@@ -287,35 +319,38 @@ public class UiView {
 	}
 	
 	private static native boolean nativeOnKeyEvent(long instance, boolean flagDown, int vkey
-			, boolean flagControl, boolean flagShift, boolean flagAlt, boolean flagWin);
+			, boolean flagControl, boolean flagShift, boolean flagAlt, boolean flagWin, long time);
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public static boolean onEventKey(View view, boolean flagDown, int keycode, KeyEvent event) {
 		long instance = getInstance(view);
 		if (instance != 0) {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 				return nativeOnKeyEvent(
-						instance
-						, flagDown, keycode
-						, event.isCtrlPressed()
-						, event.isShiftPressed()
-						, event.isAltPressed()
-						, event.isMetaPressed()
-						);
+						instance,
+						flagDown, keycode,
+						event.isCtrlPressed(),
+						event.isShiftPressed(),
+						event.isAltPressed(),
+						event.isMetaPressed(),
+						event.getEventTime()
+				);
 			} else {
 				return nativeOnKeyEvent(
-						instance
-						, flagDown, keycode
-						, false
-						, event.isShiftPressed()
-						, event.isAltPressed()
-						, false
-						);
+						instance,
+						flagDown,
+						keycode,
+						false,
+						event.isShiftPressed(),
+						event.isAltPressed(),
+						false,
+						event.getEventTime()
+				);
 			}
 		}
 		return true;
 	}
 	
-	private static native boolean nativeOnTouchEvent(long instance, int action, UiTouchPoint[] pts);
+	private static native boolean nativeOnTouchEvent(long instance, int action, UiTouchPoint[] pts, long time);
 	public static boolean onEventTouch(View view, MotionEvent event) {
 		long instance = getInstance(view);
 		if (instance != 0) {
@@ -369,7 +404,7 @@ public class UiView {
 					}
 					pts[i] = pt;
 				}
-				return nativeOnTouchEvent(instance, action, pts);
+				return nativeOnTouchEvent(instance, action, pts, event.getEventTime());
 			}
 		}
 		return false;
@@ -391,5 +426,13 @@ public class UiView {
 		}
 		return false;
 	}
-	
+
+	private static native void nativeOnSwipe(long instance, int type);
+	public static void onSwipe(View view, int type) {
+		long instance = getInstance(view);
+		if (instance != 0) {
+			nativeOnSwipe(instance, type);
+		}
+	}
+
 }

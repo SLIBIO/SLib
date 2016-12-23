@@ -15,7 +15,9 @@ import android.view.MotionEvent;
 import android.view.View;
 
 public class UiGLView extends GLSurfaceView implements GLSurfaceView.Renderer {
-	
+
+	UiGestureDetector gestureDetector;
+
 	static Object sync = new Object();
 	static Vector<UiGLView> glViewList = new Vector<UiGLView>();
 	
@@ -90,6 +92,15 @@ public class UiGLView extends GLSurfaceView implements GLSurfaceView.Renderer {
 		return true;
 	}
 
+	public boolean dispatchTouchEvent(MotionEvent event) {
+		if (gestureDetector != null) {
+			gestureDetector.onTouchEvent(event);
+			super.dispatchTouchEvent(event);
+			return true;
+		} else {
+			return super.dispatchTouchEvent(event);
+		}
+	}
 	
 	@Override
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
