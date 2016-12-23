@@ -151,7 +151,6 @@ void GestureDetector::processEvent(UIEvent* ev)
 			if (!(flagNative[i])) {
 				flagProcess = sl_true;
 			}
-			break;
 		}
 	}
 	if (!flagProcess) {
