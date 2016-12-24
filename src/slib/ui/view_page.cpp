@@ -335,7 +335,7 @@ void ViewPager::_push(const Ref<View>& viewIn, const Transition& _transition, sl
 	}
 	
 	m_indexCurrent = n;
-	
+
 	viewIn->setFrame(getBoundsInnerPadding(), UIUpdateMode::NoRedraw);
 	
 	setEnabled(sl_false);
@@ -356,6 +356,7 @@ void ViewPager::_push(const Ref<View>& viewIn, const Transition& _transition, sl
 			dispatchPageAction(pages[i].ptr, UIPageAction::Pop);
 		}
 		m_pages.removeAll_NoLock();
+		m_indexCurrent = 0;
 	}
 	
 	m_pages.add_NoLock(viewIn);

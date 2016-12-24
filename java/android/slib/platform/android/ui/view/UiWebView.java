@@ -187,7 +187,7 @@ public class UiWebView extends WebView implements IView {
 				}
 			});
 			return;
-		}k
+		}
 		if (script != null && script.length() > 0) {
 			if (view instanceof WebView) {
 				final WebView wv = (WebView)view;
@@ -203,14 +203,14 @@ public class UiWebView extends WebView implements IView {
 			}				
 		}
 	}
-	
+
 	private static native void nativeOnStartLoad(long instance, String url);
 	public static void onStartLoad(IView view, String url) {
 		long instance = view.getInstance();
 		if (instance != 0) {
 			nativeOnStartLoad(instance, url);
 		}
-	} 
+	}
 	
 	private static native void nativeOnFinishLoad(long instance, String url);
 	public static void onFinishLoad(IView view, String url) {
