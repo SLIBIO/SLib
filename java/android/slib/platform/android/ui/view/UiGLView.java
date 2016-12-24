@@ -39,7 +39,7 @@ public class UiGLView extends GLSurfaceView implements IView, GLSurfaceView.Rend
 		return null;
 	}
 	
-	public static boolean _setRenderMode(View view, int mode) {
+	public static boolean _setRenderMode(final View view, final int mode) {
 		if (view instanceof GLSurfaceView) {
 			if (mode == 0) {
 				((GLSurfaceView)view).setRenderMode(UiGLView.RENDERMODE_CONTINUOUSLY);				
@@ -51,7 +51,7 @@ public class UiGLView extends GLSurfaceView implements IView, GLSurfaceView.Rend
 		return false;
 	}
 
-	public static void _requestRender(View view) {
+	public static void _requestRender(final View view) {
 		if (view instanceof UiGLView) {			
 			((UiGLView)view).requestRender();				
 		}
@@ -139,7 +139,15 @@ public class UiGLView extends GLSurfaceView implements IView, GLSurfaceView.Rend
 	}
 	
 	
-	public static void removeView(View view) {
+	public static void removeView(final View view) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					removeView(view);
+				}
+			});
+			return;
+		}
 		if (view instanceof UiGLView) {
 			synchronized (sync) {
 				glViewList.remove((UiGLView)view);

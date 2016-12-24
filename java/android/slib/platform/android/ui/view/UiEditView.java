@@ -2,6 +2,7 @@ package slib.platform.android.ui.view;
 
 import slib.platform.android.Logger;
 import slib.platform.android.ui.UiFont;
+import slib.platform.android.ui.UiThread;
 import slib.platform.android.ui.Util;
 import android.content.Context;
 import android.graphics.Rect;
@@ -71,7 +72,16 @@ public class UiEditView extends EditText implements IView {
 		return "";
 	}
 	
-	public static boolean _setText(View view, String text) {
+	public static boolean _setText(final View view, String text) {
+		if (!(UiThread.isUiThread())) {
+			final String t = text;
+			view.post(new Runnable() {
+				public void run() {
+					_setText(view, t);
+				}
+			});
+			return true;
+		}
 		if (view instanceof TextView) {
 			if (text == null) {
 				text = "";
@@ -106,7 +116,15 @@ public class UiEditView extends EditText implements IView {
 		return 0;
 	}
 	
-	public static boolean _setAlignment(View view, int align) {
+	public static boolean _setAlignment(final View view, final int align) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_setAlignment(view, align);
+				}
+			});
+			return true;
+		}
 		if (view instanceof TextView) {
 			TextView tv = (TextView)view;
 			tv.setGravity(Util.getAndroidAlignment(align));
@@ -130,7 +148,16 @@ public class UiEditView extends EditText implements IView {
 		return "";
 	}
 	
-	public static boolean _setHintText(View view, String text) {
+	public static boolean _setHintText(final View view, String text) {
+		if (!(UiThread.isUiThread())) {
+			final String t = text;
+			view.post(new Runnable() {
+				public void run() {
+					_setHintText(view, t);
+				}
+			});
+			return true;
+		}
 		if (view instanceof TextView) {
 			if (text == null) {
 				text = "";
@@ -148,7 +175,15 @@ public class UiEditView extends EditText implements IView {
 		return false;
 	}
 	
-	public static boolean _setReadOnly(View view, boolean flag) {
+	public static boolean _setReadOnly(final View view, final boolean flag) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_setReadOnly(view, flag);
+				}
+			});
+			return true;
+		}
 		if (view instanceof TextView) {
 			((TextView)view).setEnabled(!flag);
 			return true;
@@ -162,7 +197,15 @@ public class UiEditView extends EditText implements IView {
 		}
 		return false;
 	}
-	public static boolean _setMultiLine(View view, boolean flag) {
+	public static boolean _setMultiLine(final View view, final boolean flag) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_setMultiLine(view, flag);
+				}
+			});
+			return true;
+		}
 		if (view instanceof TextView) {
 			TextView tv = (TextView)view;
 			int type = tv.getInputType();
@@ -177,7 +220,15 @@ public class UiEditView extends EditText implements IView {
 		return false;
 	}
 
-	public static boolean _setTextColor(View view, int color) {
+	public static boolean _setTextColor(final View view, final int color) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_setTextColor(view, color);
+				}
+			});
+			return true;
+		}
 		if (view instanceof TextView) {
 			TextView tv = (TextView)view;
 			tv.setTextColor(color);				
@@ -186,7 +237,15 @@ public class UiEditView extends EditText implements IView {
 		return false;
 	}
 
-	public static boolean _setBackgroundColor(View view, int color) {
+	public static boolean _setBackgroundColor(final View view, final int color) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_setBackgroundColor(view, color);
+				}
+			});
+			return true;
+		}
 		if (view instanceof TextView) {
 			TextView tv = (TextView)view;
 			tv.setBackgroundColor(color);				
@@ -195,7 +254,15 @@ public class UiEditView extends EditText implements IView {
 		return false;
 	}
 	
-	public static boolean _setFont(View view, UiFont font) {
+	public static boolean _setFont(final View view, final UiFont font) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_setFont(view, font);
+				}
+			});
+			return true;
+		}
 		if (view instanceof TextView) {
 			if (font != null) {
 				TextView tv = (TextView)view;
@@ -207,7 +274,15 @@ public class UiEditView extends EditText implements IView {
 		return false;
 	}
 
-	public static  boolean _setReturnKeyType(View view, int type) {
+	public static  boolean _setReturnKeyType(final View view, final int type) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_setReturnKeyType(view, type);
+				}
+			});
+			return true;
+		}
 		if (view instanceof  TextView) {
 			TextView tv = (TextView)view;
 			switch (type) {
@@ -259,7 +334,15 @@ public class UiEditView extends EditText implements IView {
 		return false;
 	}
 
-	public static boolean _setKeyboardType(View view, int type) {
+	public static boolean _setKeyboardType(final View view, final int type) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_setKeyboardType(view, type);
+				}
+			});
+			return true;
+		}
 		if (view instanceof UiEditView && ((UiEditView)view).flagPassword) {
 			return true;
 		}

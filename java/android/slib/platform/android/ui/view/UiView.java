@@ -282,7 +282,15 @@ public class UiView {
 		}
 	}
 	
-	public static void bringToFront(View view) {
+	public static void bringToFront(final View view) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					bringToFront(view);
+				}
+			});
+			return;
+		}
 		try {
 			ViewParent parent = view.getParent();
 			parent.bringChildToFront(view);

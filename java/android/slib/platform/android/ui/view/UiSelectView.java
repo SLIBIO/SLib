@@ -12,6 +12,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import slib.platform.android.Logger;
 import slib.platform.android.ui.UiFont;
+import slib.platform.android.ui.UiThread;
 
 public class UiSelectView extends Spinner implements IView {
 
@@ -33,7 +34,15 @@ public class UiSelectView extends Spinner implements IView {
 		return null;
 	}
 	
-	public static void _applyList(View _view, String[] items) {
+	public static void _applyList(final View _view, final String[] items) {
+		if (!(UiThread.isUiThread())) {
+			_view.post(new Runnable() {
+				public void run() {
+					_applyList(_view, items);
+				}
+			});
+			return;
+		}
 		if (_view instanceof UiSelectView) {
 			UiSelectView view = (UiSelectView)_view;
 			MyAdapter adapter = view.new MyAdapter(items);
@@ -53,14 +62,30 @@ public class UiSelectView extends Spinner implements IView {
 		return 0;
 	}
 	
-	public static void _select(View _view, int n) {
+	public static void _select(final View _view, final int n) {
+		if (!(UiThread.isUiThread())) {
+			_view.post(new Runnable() {
+				public void run() {
+					_select(_view, n);
+				}
+			});
+			return;
+		}
 		if (_view instanceof UiSelectView) {
 			UiSelectView view = (UiSelectView)_view;
 			view.setSelection(n);
 		}
 	}
 
-	public static boolean _setFont(View _view, UiFont font) {
+	public static boolean _setFont(final View _view, final UiFont font) {
+		if (!(UiThread.isUiThread())) {
+			_view.post(new Runnable() {
+				public void run() {
+					_setFont(_view, font);
+				}
+			});
+			return true;
+		}
 		if (_view instanceof UiSelectView) {
 			UiSelectView view = (UiSelectView)_view;
 			if (font != null) {

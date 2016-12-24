@@ -12,6 +12,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import slib.platform.android.Logger;
+import slib.platform.android.ui.UiThread;
 
 public class UiWebView extends WebView implements IView {
 
@@ -32,7 +33,15 @@ public class UiWebView extends WebView implements IView {
 		return null;
 	}
 	
-	public static void _load(View view, final String url) {
+	public static void _load(final View view, final String url) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_load(view, url);
+				}
+			});
+			return;
+		}
 		if (url == null || url.length() == 0) {
 			return;
 		}
@@ -50,7 +59,15 @@ public class UiWebView extends WebView implements IView {
 		}
 	}
 	
-	public static void _loadHTML(View view, final String html, final String url) {
+	public static void _loadHTML(final View view, final String html, final String url) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_loadHTML(view, html, url);
+				}
+			});
+			return;
+		}
 		if (view instanceof WebView) {
 			final WebView wv = (WebView)view;
 			wv.post(new Runnable() {
@@ -93,7 +110,15 @@ public class UiWebView extends WebView implements IView {
 		return null;
 	}
 	
-	public static void _goBack(View view) {
+	public static void _goBack(final View view) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_goBack(view);
+				}
+			});
+			return;
+		}
 		if (view instanceof WebView) {
 			final WebView wv = (WebView)view;
 			wv.post(new Runnable() {
@@ -108,7 +133,15 @@ public class UiWebView extends WebView implements IView {
 		}
 	}
 
-	public static void _goForward(View view) {
+	public static void _goForward(final View view) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_goForward(view);
+				}
+			});
+			return;
+		}
 		if (view instanceof WebView) {
 			final WebView wv = (WebView)view;
 			wv.post(new Runnable() {
@@ -123,7 +156,15 @@ public class UiWebView extends WebView implements IView {
 		}
 	}
 
-	public static void _reload(View view) {
+	public static void _reload(final View view) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_reload(view);
+				}
+			});
+			return;
+		}
 		if (view instanceof WebView) {
 			final WebView wv = (WebView)view;
 			wv.post(new Runnable() {
@@ -138,7 +179,15 @@ public class UiWebView extends WebView implements IView {
 		}
 	}
 
-	public static void _runJavaScript(View view, final String script) {
+	public static void _runJavaScript(final View view, final String script) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_runJavaScript(view, script);
+				}
+			});
+			return;
+		}k
 		if (script != null && script.length() > 0) {
 			if (view instanceof WebView) {
 				final WebView wv = (WebView)view;
@@ -161,7 +210,7 @@ public class UiWebView extends WebView implements IView {
 		if (instance != 0) {
 			nativeOnStartLoad(instance, url);
 		}
-	}
+	} 
 	
 	private static native void nativeOnFinishLoad(long instance, String url);
 	public static void onFinishLoad(IView view, String url) {

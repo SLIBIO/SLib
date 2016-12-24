@@ -2,6 +2,8 @@ package slib.platform.android.ui.view;
 
 import slib.platform.android.Logger;
 import slib.platform.android.ui.UiFont;
+import slib.platform.android.ui.UiThread;
+
 import android.content.Context;
 import android.graphics.Rect;
 import android.util.TypedValue;
@@ -43,7 +45,16 @@ public class UiButton extends Button implements IView, Button.OnClickListener {
 		return "";
 	}
 	
-	public static boolean _setText(View view, String text) {
+	public static boolean _setText(final View view, String text) {
+		if (!(UiThread.isUiThread())) {
+			final String t = text;
+			view.post(new Runnable() {
+				public void run() {
+					_setText(view, t);
+				}
+			});
+			return true;
+		}
 		if (view instanceof Button) {
 			if (text == null) {
 				text = "";
@@ -54,7 +65,16 @@ public class UiButton extends Button implements IView, Button.OnClickListener {
 		return false;
 	}
 
-	public static boolean _setFont(View view, UiFont font) {
+	public static boolean _setFont(final View view, UiFont font) {
+		if (!(UiThread.isUiThread())) {
+			final UiFont f = font;
+			view.post(new Runnable() {
+				public void run() {
+					_setFont(view, f);
+				}
+			});
+			return true;
+		}
 		if (view instanceof Button) {
 			if (font != null) {
 				Button v = (Button)view;

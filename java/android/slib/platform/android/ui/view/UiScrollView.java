@@ -7,6 +7,7 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ScrollView;
 import slib.platform.android.Logger;
+import slib.platform.android.ui.UiThread;
 
 public class UiScrollView extends ScrollView implements IView {
 
@@ -36,11 +37,25 @@ public class UiScrollView extends ScrollView implements IView {
 		return null;
 	}
 
-	public static void _setBackgroundColor(View view, int color) {
+	public static void _setBackgroundColor(final View view, final int color) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_setBackgroundColor(view, color);
+				}
+			});
+		}
 		view.setBackgroundColor(color);
 	}
 	
-	public static void _scrollTo(View view, int x, int y) {
+	public static void _scrollTo(final View view, final int x, final int y) {
+		if (!(UiThread.isUiThread())) {
+			view.post(new Runnable() {
+				public void run() {
+					_scrollTo(view, x, y);
+				}
+			});
+		}
 		if (view instanceof UiScrollView) {
 			UiScrollView sv = (UiScrollView)view;
 			sv.scrollTo(0, y);
