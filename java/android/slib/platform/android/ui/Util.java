@@ -6,6 +6,7 @@ import android.graphics.Point;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import slib.platform.android.SlibActivity;
@@ -87,6 +88,11 @@ public class Util {
 
 	public static void dismissKeyboard(Activity activity) {
 		InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+		if (imm != null) {
+			View view = activity.getCurrentFocus();
+			if (view != null) {
+				imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+			}
+		}
 	}
 }

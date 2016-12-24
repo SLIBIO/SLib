@@ -2,6 +2,7 @@ package slib.platform.android.ui.view;
 
 import com.slib.R;
 import android.content.Context;
+import android.graphics.Rect;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +13,15 @@ import android.widget.TextView;
 import slib.platform.android.Logger;
 import slib.platform.android.ui.UiFont;
 
-public class UiSelectView extends Spinner {
-	
+public class UiSelectView extends Spinner implements IView {
+
+	private long mInstance = 0;
+	public long getInstance() { return mInstance; }
+	public void setInstance(long instance) { this.mInstance = instance; }
+	private int mLeft, mTop, mRight, mBottom;
+	public Rect getUIFrame() { return new Rect(mLeft, mTop, mRight, mBottom); }
+	public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
+
 	public static UiSelectView _create(Context context)
 	{
 		try {
@@ -64,8 +72,8 @@ public class UiSelectView extends Spinner {
 	}
 	
 	private static native void nativeOnSelect(long instance, int n);
-	public static void onEventSelect(View view, int n) {
-		long instance = UiView.getInstance(view);
+	public static void onEventSelect(IView view, int n) {
+		long instance = view.getInstance();
 		if (instance != 0) {
 			nativeOnSelect(instance, n);
 		}

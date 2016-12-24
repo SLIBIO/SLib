@@ -1,14 +1,22 @@
 package slib.platform.android.ui.view;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ScrollView;
 import slib.platform.android.Logger;
 
-public class UiScrollView extends ScrollView {
-	
+public class UiScrollView extends ScrollView implements IView {
+
+	private long mInstance = 0;
+	public long getInstance() { return mInstance; }
+	public void setInstance(long instance) { this.mInstance = instance; }
+	private int mLeft, mTop, mRight, mBottom;
+	public Rect getUIFrame() { return new Rect(mLeft, mTop, mRight, mBottom); }
+	public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
+
 	InnerHorizontalView horz;
 	
 	public static View _create(Context context, boolean flagBothScroll, boolean flagVertical) {
@@ -61,8 +69,8 @@ public class UiScrollView extends ScrollView {
 	}
 
 	private static native void nativeOnScroll(long instance, int x, int y);
-	public static void onEventScroll(View view, int x, int y) {
-		long instance = UiView.getInstance(view);
+	public static void onEventScroll(IView view, int x, int y) {
+		long instance = view.getInstance();
 		if (instance != 0) {
 			nativeOnScroll(instance, x, y);
 		}
@@ -86,7 +94,14 @@ public class UiScrollView extends ScrollView {
 	    onEventScroll(this, horz.getScrollX(), t);
 	}
 	
-	static class HorizontalView extends HorizontalScrollView {
+	static class HorizontalView extends HorizontalScrollView implements IView {
+
+		private long mInstance = 0;
+		public long getInstance() { return mInstance; }
+		public void setInstance(long instance) { this.mInstance = instance; }
+		private int mLeft, mTop, mRight, mBottom;
+		public Rect getUIFrame() { return new Rect(mLeft, mTop, mRight, mBottom); }
+		public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
 		
 		public HorizontalView(Context context) {
 			super(context);
@@ -103,7 +118,14 @@ public class UiScrollView extends ScrollView {
 		}
 	}
 
-	static class VerticalView extends ScrollView {
+	static class VerticalView extends ScrollView implements IView {
+
+		private long mInstance = 0;
+		public long getInstance() { return mInstance; }
+		public void setInstance(long instance) { this.mInstance = instance; }
+		private int mLeft, mTop, mRight, mBottom;
+		public Rect getUIFrame() { return new Rect(mLeft, mTop, mRight, mBottom); }
+		public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
 		
 		public VerticalView(Context context) {
 			super(context);

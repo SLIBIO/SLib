@@ -3,12 +3,20 @@ package slib.platform.android.ui.view;
 import slib.platform.android.Logger;
 import slib.platform.android.ui.UiFont;
 import android.content.Context;
+import android.graphics.Rect;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 
-public class UiButton extends Button implements Button.OnClickListener {
-	
+public class UiButton extends Button implements IView, Button.OnClickListener {
+
+	private long mInstance = 0;
+	public long getInstance() { return mInstance; }
+	public void setInstance(long instance) { this.mInstance = instance; }
+	private int mLeft, mTop, mRight, mBottom;
+	public Rect getUIFrame() { return new Rect(mLeft, mTop, mRight, mBottom); }
+	public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
+
 	public static UiButton _create(Context context)
 	{
 		try {
@@ -67,7 +75,7 @@ public class UiButton extends Button implements Button.OnClickListener {
 
 	@Override
 	public void onClick(View v) {
-		UiView.onEventClick(v);
+		UiView.onEventClick(this);
 	}
 	
 }

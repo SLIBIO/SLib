@@ -2,6 +2,7 @@
 
 #include "../../../inc/slib/core/safe_static.h"
 #include "../../../inc/slib/core/math.h"
+#include "../../../inc/slib/ui/resource.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -409,12 +410,13 @@ void PickerView::_timerCallback()
 		m_timeCallbackBefore = time;
 		return;
 	}
-	if (Math::abs(m_speedFlow) <= 0.1f) {
-		if (Math::abs(m_yOffset) >= 2) {
+	float T = UIResource::getScreenMinimum() / 2000.0f;
+	if (Math::abs(m_speedFlow) <= T) {
+		if (Math::abs(m_yOffset) >= 4 * T) {
 			if (m_yOffset > 0) {
-				m_speedFlow = -0.1f;
+				m_speedFlow = -T;
 			} else {
-				m_speedFlow = 0.1f;
+				m_speedFlow = T;
 			}
 		} else {
 			_stopFlow();

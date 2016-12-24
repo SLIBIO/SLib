@@ -67,6 +67,7 @@ public class UiWindow extends UiGroupView {
 	
 	public void close() {
 		try {
+			instance = 0;
 			ViewParent parent = getParent();
 			if (parent != null && parent instanceof ViewGroup) {
 				((ViewGroup)parent).removeView(this);
@@ -214,13 +215,17 @@ public class UiWindow extends UiGroupView {
 	private static native void nativeOnResize(long instance, int w, int h);
 	public void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
-		nativeOnResize(instance, w, h);
+		if (instance != 0) {
+			nativeOnResize(instance, w, h);
+		}
     }
 	
 	private static native boolean nativeOnClose(long instance);
 	public void onClose() {
-		if (nativeOnClose(instance)) {
-			close();
+		if (instance != 0) {
+			if (nativeOnClose(instance)) {
+				close();
+			}
 		}
 	}
 }

@@ -2,6 +2,7 @@ package slib.platform.android.ui.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
@@ -12,8 +13,15 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import slib.platform.android.Logger;
 
-public class UiWebView extends WebView {
-	
+public class UiWebView extends WebView implements IView {
+
+	private long mInstance = 0;
+	public long getInstance() { return mInstance; }
+	public void setInstance(long instance) { this.mInstance = instance; }
+	private int mLeft, mTop, mRight, mBottom;
+	public Rect getUIFrame() { return new Rect(mLeft, mTop, mRight, mBottom); }
+	public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
+
 	public static UiWebView _create(Context context) {
 		try {
 			UiWebView ret = new UiWebView(context);
@@ -148,32 +156,32 @@ public class UiWebView extends WebView {
 	}
 	
 	private static native void nativeOnStartLoad(long instance, String url);
-	public static void onStartLoad(View view, String url) {
-		long instance = UiView.getInstance(view);
+	public static void onStartLoad(IView view, String url) {
+		long instance = view.getInstance();
 		if (instance != 0) {
 			nativeOnStartLoad(instance, url);
 		}
 	}
 	
 	private static native void nativeOnFinishLoad(long instance, String url);
-	public static void onFinishLoad(View view, String url) {
-		long instance = UiView.getInstance(view);
+	public static void onFinishLoad(IView view, String url) {
+		long instance = view.getInstance();
 		if (instance != 0) {
 			nativeOnFinishLoad(instance, url);
 		}
 	}
 
 	private static native void nativeOnErrorLoad(long instance, String url, String error);
-	public static void onErrorLoad(View view, String url, String error) {
-		long instance = UiView.getInstance(view);
+	public static void onErrorLoad(IView view, String url, String error) {
+		long instance = view.getInstance();
 		if (instance != 0) {
 			nativeOnErrorLoad(instance, url, error);
 		}
 	}
 
 	private static native void nativeOnMessage(long instance, String msg, String param);
-	public static void onMessage(View view, String msg, String param) {
-		long instance = UiView.getInstance(view);
+	public static void onMessage(IView view, String msg, String param) {
+		long instance = view.getInstance();
 		if (instance != 0) {
 			nativeOnMessage(instance, msg, param);
 		}

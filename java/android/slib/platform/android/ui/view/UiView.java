@@ -1,7 +1,5 @@
 package slib.platform.android.ui.view;
 
-import java.util.HashMap;
-
 import slib.platform.android.Logger;
 import slib.platform.android.ui.Graphics;
 import slib.platform.android.ui.UiThread;
@@ -16,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.widget.AbsoluteLayout;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
@@ -28,24 +27,15 @@ public class UiView {
 	{
 		return view.getContext();
 	}
-
-	static HashMap<View, Long> mInstances = new HashMap<View, Long>();
-
-	public static long getInstance(View view) {
-		Long instance = mInstances.get(view);
-		if (instance != null) {
-			return (long)instance;
-		} else {
-			return 0;
+	
+	public static void setInstance(View view, long instance) {
+		if (view instanceof IView) {
+			((IView)view).setInstance(instance);
 		}
 	}
 	
-	public static void setInstance(View view, long instance) {
-		mInstances.put(view, instance);
-	}
-	
 	public static void freeView(View view) {
-		mInstances.remove(view);
+		setInstance(view, 0);
 		if (view instanceof UiGLView) {
 			UiGLView.removeView(view);
 		}
@@ -100,35 +90,65 @@ public class UiView {
 		ret.bottom = view.getBottom();
 		return ret;
 	}
-	
-	public static boolean setFrame(View view, int left, int top, int right, int bottom) {
-		
+
+	public static boolean setFrame(final View view, int left, int top, int right, int bottom) {
+
+		if (!(UiThread.isUiThread())) {
+			final int l = left;
+			final int r = right;
+			final int t = top;
+			final int b = bottom;
+			view.post(new Runnable() {
+				public void run() {
+					setFrame(view, l, t, r, b);
+				}
+			});
+			return true;
+		}
+
 		if (right < left) {
 			right = left;
 		}
 		if (bottom < top) {
 			bottom = top;
 		}
-		
+		if (view instanceof Button) {
+			top -= 5;
+			bottom += 5;
+		}
+		int width = right - left;
+		int height = bottom - top;
+
 		try {
+			if (view instanceof IView) {
+				((IView)view).setUIFrame(left, top, right, bottom);
+			}
 			ViewGroup.LayoutParams _params = view.getLayoutParams();
-			FrameLayout.LayoutParams params;
-			if (_params != null && _params instanceof FrameLayout.LayoutParams) {
-				params = (FrameLayout.LayoutParams)_params;
+			if (_params != null) {
+				if (_params instanceof FrameLayout.LayoutParams) {
+					FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)_params;
+					params.leftMargin = left;
+					params.topMargin = top;
+					params.width = width;
+					params.height = height;
+					view.setLayoutParams(params);
+					view.setMinimumWidth(width);
+					view.setMinimumHeight(height);
+				} else if (_params instanceof AbsoluteLayout.LayoutParams) {
+					AbsoluteLayout.LayoutParams params = (AbsoluteLayout.LayoutParams)_params;
+					params.x = left;
+					params.y = top;
+					params.width = width;
+					params.height = height;
+					view.setLayoutParams(params);
+				}
 			} else {
-				params = new FrameLayout.LayoutParams(right - left, bottom - top);
+				AbsoluteLayout.LayoutParams params = new AbsoluteLayout.LayoutParams(width, height, left, top);
+				view.setLayoutParams(params);
 			}
-			if (view instanceof Button) {
-				top -= 5;
-				bottom += 5;
+			if (UiThread.isUiThread()) {
+				view.layout(left, top, right, bottom);
 			}
-			params.leftMargin = left;
-			params.topMargin = top;
-			params.width = right - left;
-			params.height = bottom - top;
-			view.setLayoutParams(params);
-			view.setMinimumWidth(params.width);
-			view.setMinimumHeight(params.height);
 			return true;
 		} catch (Exception e) {
 			Logger.exception(e);
@@ -174,11 +194,7 @@ public class UiView {
 		} else {
 			view.post(new Runnable() {
 				public void run() {
-					if (flag) {
-						view.setVisibility(View.VISIBLE);
-					} else {
-						view.setVisibility(View.INVISIBLE);
-					}
+					setVisible(view, flag);
 				}
 			});
 		}
@@ -278,9 +294,9 @@ public class UiView {
 
 	static class ViewGestureListener implements UiGestureDetector.GestureListener {
 
-		View view;
+		IView view;
 
-		ViewGestureListener(View view) {
+		ViewGestureListener(IView view) {
 			this.view = view;
 		}
 
@@ -293,25 +309,27 @@ public class UiView {
 	}
 
 	public static void enableGesture(View view) {
-		if (view instanceof UiGenericView) {
-			if (((UiGenericView)view).gestureDetector == null) {
-				((UiGenericView)view).gestureDetector = new UiGestureDetector(view.getContext(), new ViewGestureListener(view));
-			}
-		} else if (view instanceof UiGLView) {
-			if (((UiGLView)view).gestureDetector == null) {
-				((UiGLView)view).gestureDetector = new UiGestureDetector(view.getContext(), new ViewGestureListener(view));
-			}
-		} else if (view instanceof UiGroupView) {
-			if (((UiGroupView)view).gestureDetector == null) {
-				((UiGroupView)view).gestureDetector = new UiGestureDetector(view.getContext(), new ViewGestureListener(view));
+		if (view instanceof IView) {
+			if (view instanceof UiGenericView) {
+				if (((UiGenericView)view).gestureDetector == null) {
+					((UiGenericView)view).gestureDetector = new UiGestureDetector(view.getContext(), new ViewGestureListener((IView)view));
+				}
+			} else if (view instanceof UiGLView) {
+				if (((UiGLView)view).gestureDetector == null) {
+					((UiGLView)view).gestureDetector = new UiGestureDetector(view.getContext(), new ViewGestureListener((IView)view));
+				}
+			} else if (view instanceof UiGroupView) {
+				if (((UiGroupView)view).gestureDetector == null) {
+					((UiGroupView)view).gestureDetector = new UiGestureDetector(view.getContext(), new ViewGestureListener((IView)view));
+				}
 			}
 		}
 	}
 	
 	// events
 	private static native void nativeOnDraw(long instance, Graphics graphics);
-	public static void onEventDraw(View view, Canvas canvas) {
-		long instance = getInstance(view);
+	public static void onEventDraw(IView view, Canvas canvas) {
+		long instance = view.getInstance();
 		if (instance != 0) {
 			Graphics graphics = new Graphics(canvas);
 			nativeOnDraw(instance, graphics);
@@ -321,8 +339,8 @@ public class UiView {
 	private static native boolean nativeOnKeyEvent(long instance, boolean flagDown, int vkey
 			, boolean flagControl, boolean flagShift, boolean flagAlt, boolean flagWin, long time);
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public static boolean onEventKey(View view, boolean flagDown, int keycode, KeyEvent event) {
-		long instance = getInstance(view);
+	public static boolean onEventKey(IView view, boolean flagDown, int keycode, KeyEvent event) {
+		long instance = view.getInstance();
 		if (instance != 0) {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 				return nativeOnKeyEvent(
@@ -351,8 +369,8 @@ public class UiView {
 	}
 	
 	private static native boolean nativeOnTouchEvent(long instance, int action, UiTouchPoint[] pts, long time);
-	public static boolean onEventTouch(View view, MotionEvent event) {
-		long instance = getInstance(view);
+	public static boolean onEventTouch(IView view, MotionEvent event) {
+		long instance = view.getInstance();
 		if (instance != 0) {
 			int action = 0;
 			int _action = event.getActionMasked();
@@ -411,16 +429,16 @@ public class UiView {
 	}
 	
 	private static native void nativeOnClick(long instance);
-	public static void onEventClick(View view) {
-		long instance = getInstance(view);
+	public static void onEventClick(IView view) {
+		long instance = view.getInstance();
 		if (instance != 0) {
 			nativeOnClick(instance);
 		}
 	}
 
 	private static native boolean nativeHitTestTouchEvent(long instance, int x, int y);
-	public static boolean onHitTestTouchEvent(View view, int x, int y) {
-		long instance = getInstance(view);
+	public static boolean onHitTestTouchEvent(IView view, int x, int y) {
+		long instance = view.getInstance();
 		if (instance != 0) {
 			return nativeHitTestTouchEvent(instance, x, y);
 		}
@@ -428,8 +446,8 @@ public class UiView {
 	}
 
 	private static native void nativeOnSwipe(long instance, int type);
-	public static void onSwipe(View view, int type) {
-		long instance = getInstance(view);
+	public static void onSwipe(IView view, int type) {
+		long instance = view.getInstance();
 		if (instance != 0) {
 			nativeOnSwipe(instance, type);
 		}

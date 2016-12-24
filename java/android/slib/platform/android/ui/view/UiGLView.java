@@ -9,12 +9,20 @@ import slib.platform.android.Logger;
 import slib.platform.android.ui.UiThread;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Rect;
 import android.opengl.GLSurfaceView;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class UiGLView extends GLSurfaceView implements GLSurfaceView.Renderer {
+public class UiGLView extends GLSurfaceView implements IView, GLSurfaceView.Renderer {
+
+	private long mInstance = 0;
+	public long getInstance() { return mInstance; }
+	public void setInstance(long instance) { this.mInstance = instance; }
+	private int mLeft, mTop, mRight, mBottom;
+	public Rect getUIFrame() { return new Rect(mLeft, mTop, mRight, mBottom); }
+	public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
 
 	UiGestureDetector gestureDetector;
 
@@ -51,16 +59,16 @@ public class UiGLView extends GLSurfaceView implements GLSurfaceView.Renderer {
 	
 
 	private static native void nativeOnCreate(long instance);
-	public static void onEventCreate(UiGLView view) {
-		long instance = UiView.getInstance(view);
+	public static void onEventCreate(IView view) {
+		long instance = view.getInstance();
 		if (instance != 0) {
 			nativeOnCreate(instance);
 		}
 	}
 	
 	private static native void nativeOnFrame(long instance, int width, int height);
-	public static void onEventFrame(UiGLView view, int width, int height) {
-		long instance = UiView.getInstance(view);
+	public static void onEventFrame(IView view, int width, int height) {
+		long instance = view.getInstance();
 		if (instance != 0) {
 			nativeOnFrame(instance, width, height);
 		}
