@@ -119,11 +119,11 @@ List< Ref<Screen> > UI::getScreens()
 	return ret;
 }
 
-void UI::openURL(String url) {
+void UI::openURL(const String& _url) {
 	jobject jactivity = Android::getCurrentActivity();
 	if (jactivity) {
 		JniLocal<jstring> jurl = Jni::getJniString(url);
-		_AndroidUtil::openURL(jactivity, jurl);
+		_AndroidUtil::openURL.call(sl_null, jactivity, jurl.get());
 	}
 
 }
