@@ -119,6 +119,9 @@ public:
 	static void runApp();
 	
 	static void quitApp();
+	
+	
+	static void openURL(const String& url);
 
 };
 

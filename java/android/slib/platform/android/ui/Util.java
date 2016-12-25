@@ -2,7 +2,9 @@ package slib.platform.android.ui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
+import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
@@ -94,5 +96,15 @@ public class Util {
 				imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 			}
 		}
+	}
+
+	public static void openURL(final Activity activity, final String url) {
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+				activity.startActivity(intent);
+			}
+		});
 	}
 }

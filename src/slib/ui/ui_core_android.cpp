@@ -22,6 +22,7 @@ SLIB_JNI_END_CLASS
 SLIB_JNI_BEGIN_CLASS(_AndroidUtil, "slib/platform/android/ui/Util")
 	SLIB_JNI_STATIC_METHOD(getDefaultDisplay, "getDefaultDisplay", "(Lslib/platform/android/SlibActivity;)Landroid/view/Display;");
 	SLIB_JNI_STATIC_METHOD(getDisplaySize, "getDisplaySize", "(Landroid/view/Display;)Landroid/graphics/Point;");
+	SLIB_JNI_STATIC_METHOD(openURL, "openURL", "(Lslib/platform/android/SlibActivity;Landroid/view/View;[Ljava/lang/String;)V");
 SLIB_JNI_END_CLASS
 
 void _AndroidUiThread_runDispatchCallback(JNIEnv* env, jobject _this);
@@ -43,8 +44,8 @@ jboolean _Android_onBack(JNIEnv* env, jobject _this, jobject activity);
 
 SLIB_JNI_BEGIN_CLASS(_Android, "slib/platform/android/Android")
 	SLIB_JNI_NATIVE(onCreateActivity, "nativeOnCreateActivity", "(Landroid/app/Activity;)V", _Android_onCreateActivity);
-	SLIB_JNI_NATIVE(onDestroyActivity, "nativeOnDestroyActivity", "(Landroid/app/Activity;)V", _Android_onDestroyActivity);
-	SLIB_JNI_NATIVE(onResumeActivity, "nativeOnResumeActivity", "(Landroid/app/Activity;)V", _Android_onResumeActivity);
+	SLIB_JNI_NATIVE(onDestroyActivity, "nativeOnDestnativeOnResumeActivityroyActivity", "(Landroid/app/Activity;)V", _Android_onDestroyActivity);
+	SLIB_JNI_NATIVE(onResumeActivity, "", "(Landroid/app/Activity;)V", _Android_onResumeActivity);
 	SLIB_JNI_NATIVE(onPauseActivity, "nativeOnPauseActivity", "(Landroid/app/Activity;)V", _Android_onPauseActivity);
 	SLIB_JNI_NATIVE(onBack, "nativeOnBack", "(Landroid/app/Activity;)Z", _Android_onBack);
 SLIB_JNI_END_CLASS
@@ -116,6 +117,15 @@ List< Ref<Screen> > UI::getScreens()
 		ret.add(screen);
 	}
 	return ret;
+}
+
+void UI::openURL(String url) {
+	jobject jactivity = Android::getCurrentActivity();
+	if (jactivity) {
+		JniLocal<jstring> jurl = Jni::getJniString(url);
+		_AndroidUtil::openURL(jactivity, jurl);
+	}
+
 }
 
 sl_bool UI::isUiThread()

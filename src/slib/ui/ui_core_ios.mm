@@ -114,6 +114,15 @@ void UI::dispatchToUiThread(const Callback& _callback)
 	}
 }
 
+void UI::openURL(const String& _url)
+{
+	if (_url.isNotEmpty()) {
+		NSString* s = Apple::getNSStringFromString(_url);
+		NSURL* url = [NSURL URLWithString:s];
+		[[UIApplication sharedApplication] openURL:url];
+	}
+}
+
 void UIPlatform::runLoop(sl_uint32 level)
 {
 	@autoreleasepool {
