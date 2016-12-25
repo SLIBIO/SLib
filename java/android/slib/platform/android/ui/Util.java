@@ -11,6 +11,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
 
 public class Util {
@@ -98,12 +99,16 @@ public class Util {
 		}
 	}
 
-	public static void openURL(final Activity activity, final String url) {
+	public static void openURL(final SlibActivity activity, final String url) {
 		activity.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-				activity.startActivity(intent);
+				try {
+					Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+					activity.startActivity(intent);
+				} catch (Exception e) {
+					Logger.exception(e);
+				}
 			}
 		});
 	}

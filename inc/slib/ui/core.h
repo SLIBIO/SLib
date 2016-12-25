@@ -121,7 +121,7 @@ public:
 	static void quitApp();
 	
 	
-	static void openURL(const String& url);
+	static void openUrl(const String& url);
 
 };
 

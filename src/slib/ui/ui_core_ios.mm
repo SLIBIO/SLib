@@ -114,7 +114,7 @@ void UI::dispatchToUiThread(const Callback& _callback)
 	}
 }
 
-void UI::openURL(const String& _url)
+void UI::openUrl(const String& _url)
 {
 	if (_url.isNotEmpty()) {
 		NSString* s = Apple::getNSStringFromString(_url);

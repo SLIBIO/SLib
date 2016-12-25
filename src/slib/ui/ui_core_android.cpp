@@ -44,8 +44,8 @@ jboolean _Android_onBack(JNIEnv* env, jobject _this, jobject activity);
 
 SLIB_JNI_BEGIN_CLASS(_Android, "slib/platform/android/Android")
 	SLIB_JNI_NATIVE(onCreateActivity, "nativeOnCreateActivity", "(Landroid/app/Activity;)V", _Android_onCreateActivity);
-	SLIB_JNI_NATIVE(onDestroyActivity, "nativeOnDestnativeOnResumeActivityroyActivity", "(Landroid/app/Activity;)V", _Android_onDestroyActivity);
-	SLIB_JNI_NATIVE(onResumeActivity, "", "(Landroid/app/Activity;)V", _Android_onResumeActivity);
+	SLIB_JNI_NATIVE(onDestroyActivity, "nativeOnDestroyActivity", "(Landroid/app/Activity;)V", _Android_onDestroyActivity);
+	SLIB_JNI_NATIVE(onResumeActivity, "nativeOnResumeActivity", "(Landroid/app/Activity;)V", _Android_onResumeActivity);
 	SLIB_JNI_NATIVE(onPauseActivity, "nativeOnPauseActivity", "(Landroid/app/Activity;)V", _Android_onPauseActivity);
 	SLIB_JNI_NATIVE(onBack, "nativeOnBack", "(Landroid/app/Activity;)Z", _Android_onBack);
 SLIB_JNI_END_CLASS
@@ -119,17 +119,18 @@ List< Ref<Screen> > UI::getScreens()
 	return ret;
 }
 
-void UI::openURL(const String& _url) {
+sl_bool UI::isUiThread()
+{
+	return _AndroidUiThread::isUiThread.callBoolean(sl_null) != 0;
+}
+
+
+void UI::openUrl(const String& _url) {
 	jobject jactivity = Android::getCurrentActivity();
 	if (jactivity) {
 		JniLocal<jstring> jurl = Jni::getJniString(_url);
 		_AndroidUtil::openURL.call(sl_null, jactivity, jurl.get());
 	}
-}
-
-sl_bool UI::isUiThread()
-{
-	return _AndroidUiThread::isUiThread.callBoolean(sl_null) != 0;
 }
 
 SLIB_SAFE_STATIC_GETTER(Queue<Callback>, _AndroidUi_getDispatchQueue);
