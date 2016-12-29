@@ -244,6 +244,8 @@
 		E1B34E9D1E0A909A006217F4 /* picker_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1B34E9C1E0A909A006217F4 /* picker_view.cpp */; };
 		E1B9F8F31DEC887700BAA9F0 /* vibrator_ios.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1B9F8F21DEC887700BAA9F0 /* vibrator_ios.cpp */; };
 		E1D264BA1DE9B1C800F1D44C /* sensor_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E1D264B91DE9B1C800F1D44C /* sensor_ios.mm */; };
+		E1D3A4291E14A2FC00007A98 /* preference.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1D3A4281E14A2FC00007A98 /* preference.cpp */; };
+		E1D3A42B1E14A38C00007A98 /* preference_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E1D3A42A1E14A38C00007A98 /* preference_ios.mm */; };
 		E1E4EDB01DF08924002221C5 /* device_information_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E1E4EDAF1DF08924002221C5 /* device_information_ios.mm */; };
 		E1E4EDB21DF08931002221C5 /* device_information.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1E4EDB11DF08931002221C5 /* device_information.cpp */; };
 /* End PBXBuildFile section */
@@ -507,6 +509,8 @@
 		E1B34E9C1E0A909A006217F4 /* picker_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = picker_view.cpp; sourceTree = "<group>"; };
 		E1B9F8F21DEC887700BAA9F0 /* vibrator_ios.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vibrator_ios.cpp; sourceTree = "<group>"; };
 		E1D264B91DE9B1C800F1D44C /* sensor_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = sensor_ios.mm; sourceTree = "<group>"; };
+		E1D3A4281E14A2FC00007A98 /* preference.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = preference.cpp; sourceTree = "<group>"; };
+		E1D3A42A1E14A38C00007A98 /* preference_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = preference_ios.mm; sourceTree = "<group>"; };
 		E1E4EDAF1DF08924002221C5 /* device_information_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = device_information_ios.mm; sourceTree = "<group>"; };
 		E1E4EDB11DF08931002221C5 /* device_information.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = device_information.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -686,6 +690,8 @@
 				A25F2EDA1B039EF600854DAF /* platform_android.cpp */,
 				A25F2EDB1B039EF600854DAF /* platform_apple.mm */,
 				A25F2EDD1B039EF600854DAF /* platform_windows.cpp */,
+				E1D3A4281E14A2FC00007A98 /* preference.cpp */,
+				E1D3A42A1E14A38C00007A98 /* preference_ios.mm */,
 				2629F8751DFAF4B8005CF43D /* ptr.cpp */,
 				26B5714E1C9D43FF0099E69B /* queue.cpp */,
 				2629F8731DFAF4AE005CF43D /* ref.cpp */,
@@ -1064,6 +1070,7 @@
 				26CE672B1DE8271500C1371F /* hash.cpp in Sources */,
 				26C0A3531C128D80005690FE /* vibrator.cpp in Sources */,
 				266DD3881C117A3100D47AB0 /* sha2.cpp in Sources */,
+				E1D3A4291E14A2FC00007A98 /* preference.cpp in Sources */,
 				266DD3A51C117AE300D47AB0 /* graphics_util.cpp in Sources */,
 				266DD3E71C1181B500D47AB0 /* network_secure_stream.cpp in Sources */,
 				A25F2F551B039EF600854DAF /* thread.cpp in Sources */,
@@ -1143,6 +1150,7 @@
 				266DD3DA1C1181B500D47AB0 /* http_service.cpp in Sources */,
 				A25F2F441B039EF600854DAF /* io.cpp in Sources */,
 				A25F2F491B039EF600854DAF /* platform_android.cpp in Sources */,
+				E1D3A42B1E14A38C00007A98 /* preference_ios.mm in Sources */,
 				2649C23D1CBBD7D4003E7561 /* common_dialogs_ios.mm in Sources */,
 				2683BFAE1C39710C0068AC42 /* atomic.cpp in Sources */,
 				260252021BF18BE200DEFAB1 /* function.cpp in Sources */,
