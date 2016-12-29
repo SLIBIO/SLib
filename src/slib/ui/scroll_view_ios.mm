@@ -25,6 +25,13 @@ class _ScrollView : public ScrollView
 public:
 	void __applyContentSize(_Slib_iOS_ScrollView* sv)
 	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				__applyContentSize(sv);
+			});
+			return;
+		}
+		
 		ScrollPoint size = getContentSize();
 		if (!m_flagHorizontalScroll) {
 			size.x = 0;
@@ -38,6 +45,13 @@ public:
 	
 	void __applyContent(_Slib_iOS_ScrollView* sv)
 	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				__applyContent(sv);
+			});
+			return;
+		}
+		
 		if (sv->m_contentView != nil) {
 			[sv->m_contentView removeFromSuperview];
 			sv->m_contentView = nil;
@@ -59,6 +73,13 @@ public:
 	
 	void __applyProperties(_Slib_iOS_ScrollView* handle)
 	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				__applyProperties(handle);
+			});
+			return;
+		}
+		
 		handle.backgroundColor = GraphicsPlatform::getUIColorFromColor(getBackgroundColor());
 		__applyContent(handle);
 	}
@@ -89,6 +110,13 @@ Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* _parent)
 
 void ScrollView::_refreshContentSize_NW()
 {
+	if (![NSThread isMainThread]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_refreshContentSize_NW();
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_ScrollView class]]) {
 		_Slib_iOS_ScrollView* sv = (_Slib_iOS_ScrollView*)handle;
@@ -98,6 +126,14 @@ void ScrollView::_refreshContentSize_NW()
 
 void ScrollView::_setContentView_NW(const Ref<View>& view)
 {
+	if (![NSThread isMainThread]) {
+		Ref<View> _view = view;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setContentView_NW(_view);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_ScrollView class]]) {
 		_Slib_iOS_ScrollView* sv = (_Slib_iOS_ScrollView*)handle;
@@ -107,6 +143,13 @@ void ScrollView::_setContentView_NW(const Ref<View>& view)
 
 void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y)
 {
+	if (![NSThread isMainThread]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_scrollTo_NW(x, y);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
 		CGFloat f = UIPlatform::getGlobalScaleFactor();
@@ -163,6 +206,14 @@ void ScrollView::_setBorder_NW(sl_bool flag)
 
 void ScrollView::_setBackgroundColor_NW(const Color& color)
 {
+	if (![NSThread isMainThread]) {
+		Color _color = color;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setBackgroundColor_NW(_color);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[UIScrollView class]]) {
 		UIScrollView* sv = (UIScrollView*)handle;

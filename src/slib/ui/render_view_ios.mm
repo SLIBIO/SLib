@@ -45,6 +45,13 @@ Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* _parent)
 
 void RenderView::_setRedrawMode_NW(RedrawMode mode)
 {
+	if (![NSThread isMainThread]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setRedrawMode_NW(mode);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_GLView class]]) {
 		_Slib_iOS_GLView* v = (_Slib_iOS_GLView*)handle;
@@ -54,6 +61,13 @@ void RenderView::_setRedrawMode_NW(RedrawMode mode)
 
 void RenderView::_requestRender_NW()
 {
+	if (![NSThread isMainThread]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_requestRender_NW();
+		});
+		return;
+	}
+	
 	UIView* view = UIPlatform::getViewHandle(this);
 	if (view != nil && [view isKindOfClass:[_Slib_iOS_GLView class]]) {
 		_Slib_iOS_GLView* v = (_Slib_iOS_GLView*)view;

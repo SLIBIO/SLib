@@ -8,7 +8,7 @@ SLIB_NAMESPACE_BEGIN
 
 SLIB_JNI_BEGIN_CLASS(_AndroidPreference, "slib/platform/android/Preference")
 	SLIB_JNI_STATIC_METHOD(setValue, "setValue", "(Lslib/platform/android/SlibActivity;Ljava/lang/String;Ljava/lang/String;)V");
-	SLIB_JNI_STATIC_METHOD(getValue, "getValue", "(Lslib/platform/android/SlibActivity;Ljava/lang/String;)V");
+	SLIB_JNI_STATIC_METHOD(getValue, "getValue", "(Lslib/platform/android/SlibActivity;Ljava/lang/String;)Ljava/lang/String;");
 SLIB_JNI_END_CLASS
 
 void Preference::setValue(const String &key, const slib::Variant &value)

@@ -19,6 +19,13 @@ class _LabelView : public LabelView
 public:
 	void applyProperties(UILabel* handle)
 	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				applyProperties(handle);
+			});
+			return;
+		}
+		
 		[handle setText:(Apple::getNSStringFromString(m_text))];
 		[handle setTextAlignment:translateAlignment(m_textAlignment)];
 		if (isBorder()) {
@@ -71,6 +78,14 @@ Ref<ViewInstance> LabelView::createNativeWidget(ViewInstance* _parent)
 
 void LabelView::_setText_NW(const String& value)
 {
+	if (![NSThread isMainThread]) {
+		String _value = value;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setText_NW(_value);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[UILabel class]]) {
 		UILabel* tv = (UILabel*)handle;
@@ -80,6 +95,13 @@ void LabelView::_setText_NW(const String& value)
 
 void LabelView::_setTextAlignment_NW(Alignment align)
 {
+	if (![NSThread isMainThread]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setTextAlignment_NW(align);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[UILabel class]]) {
 		UILabel* tv = (UILabel*)handle;
@@ -89,6 +111,14 @@ void LabelView::_setTextAlignment_NW(Alignment align)
 
 void LabelView::_setTextColor_NW(const Color& color)
 {
+	if (![NSThread isMainThread]) {
+		Color _color = color;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setTextColor_NW(color);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[UILabel class]]) {
 		UILabel* tv = (UILabel*)handle;
@@ -98,6 +128,14 @@ void LabelView::_setTextColor_NW(const Color& color)
 
 void LabelView::_setFont_NW(const Ref<Font>& font)
 {
+	if (![NSThread isMainThread]) {
+		Ref<Font> _font = font;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setFont_NW(_font);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[UILabel class]]) {
 		UILabel* tv = (UILabel*)handle;
@@ -110,6 +148,13 @@ void LabelView::_setFont_NW(const Ref<Font>& font)
 
 void LabelView::_setBorder_NW(sl_bool flag)
 {
+	if (![NSThread isMainThread]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setBorder_NW(flag);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[UILabel class]]) {
 		UILabel* tv = (UILabel*)handle;
@@ -124,6 +169,14 @@ void LabelView::_setBorder_NW(sl_bool flag)
 
 void LabelView::_setBackgroundColor_NW(const Color& color)
 {
+	if (![NSThread isMainThread]) {
+		Color _color = color;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setBackgroundColor_NW(_color);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[UILabel class]]) {
 		UILabel* tv = (UILabel*)handle;

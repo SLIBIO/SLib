@@ -42,9 +42,7 @@ public:
 	
 	void __selectItem(_Slib_iOS_PickerView* v, sl_uint32 row)
 	{
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[v selectRow:row inComponent:0 animated:NO];
-		});
+		[v selectRow:row inComponent:0 animated:NO];
 	}
 };
 
@@ -73,6 +71,13 @@ void PickerView::_getSelectedIndex_NW()
 
 void PickerView::_select_NW(sl_uint32 index)
 {
+	if (![NSThread isMainThread]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_select_NW(index);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
 		_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
@@ -82,6 +87,13 @@ void PickerView::_select_NW(sl_uint32 index)
 
 void PickerView::_refreshItemsCount_NW()
 {
+	if (![NSThread isMainThread]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_refreshItemsCount_NW();
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
 		_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
@@ -92,6 +104,13 @@ void PickerView::_refreshItemsCount_NW()
 
 void PickerView::_refreshItemsContent_NW()
 {
+	if (![NSThread isMainThread]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_refreshItemsContent_NW();
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
 		_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
@@ -102,6 +121,14 @@ void PickerView::_refreshItemsContent_NW()
 
 void PickerView::_setItemTitle_NW(sl_uint32 index, const String& title)
 {
+	if (![NSThread isMainThread]) {
+		String _title = title;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setItemTitle_NW(index, _title);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
 		_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
@@ -111,6 +138,14 @@ void PickerView::_setItemTitle_NW(sl_uint32 index, const String& title)
 
 void PickerView::_setFont_NW(const Ref<Font>& font)
 {
+	if (![NSThread isMainThread]) {
+		Ref<Font> _font = font;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setFont_NW(_font);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
 		_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;

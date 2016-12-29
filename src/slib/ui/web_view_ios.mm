@@ -43,6 +43,13 @@ public:
 	
 	void __applyProperties(OSWebView* handle)
 	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				__applyProperties(handle);
+			});
+			return;
+		}
+		
 		__load(handle);
 	}
 	
@@ -111,6 +118,13 @@ void WebView::_refreshSize_NW()
 
 void WebView::_load_NW()
 {
+	if (![NSThread isMainThread]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_load_NW();
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
 		OSWebView* wv = (OSWebView*)handle;
@@ -143,6 +157,13 @@ String WebView::_getPageTitle_NW()
 
 void WebView::_goBack_NW()
 {
+	if (![NSThread isMainThread]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_goBack_NW();
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
 		OSWebView* wv = (OSWebView*)handle;
@@ -152,6 +173,13 @@ void WebView::_goBack_NW()
 
 void WebView::_goForward_NW()
 {
+	if (![NSThread isMainThread]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_goForward_NW();
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
 		OSWebView* wv = (OSWebView*)handle;
@@ -161,6 +189,13 @@ void WebView::_goForward_NW()
 
 void WebView::_reload_NW()
 {
+	if (![NSThread isMainThread]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_reload_NW();
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
 		OSWebView* wv = (OSWebView*)handle;
@@ -170,6 +205,14 @@ void WebView::_reload_NW()
 
 void WebView::_runJavaScript_NW(const String& script)
 {
+	if (![NSThread isMainThread]) {
+		String _script = script;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_runJavaScript_NW(_script);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
 		OSWebView* wv = (OSWebView*)handle;

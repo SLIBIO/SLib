@@ -116,6 +116,14 @@ void UI::dispatchToUiThread(const Callback& _callback)
 
 void UI::openUrl(const String& _url)
 {
+	if (![NSThread isMainThread]) {
+		String __url = _url;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			openUrl(__url);
+		});
+		return;
+	}
+	
 	if (_url.isNotEmpty()) {
 		NSString* s = Apple::getNSStringFromString(_url);
 		NSURL* url = [NSURL URLWithString:s];

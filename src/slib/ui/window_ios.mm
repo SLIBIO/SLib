@@ -170,13 +170,15 @@ public:
 	{
 		UIView* view = m_window;
 		if (view != nil) {
-			if ([view isKindOfClass:[UIWindow class]]) {
-				UIWindow* window = (UIWindow*)view;
-				[window makeKeyAndVisible];
-				UIPlatform::setKeyWindow(window);
-			} else {
-				[view becomeFirstResponder];
-			}
+			dispatch_async(dispatch_get_main_queue(), ^{
+				if ([view isKindOfClass:[UIWindow class]]) {
+					UIWindow* window = (UIWindow*)view;
+					[window makeKeyAndVisible];
+					UIPlatform::setKeyWindow(window);
+				} else {
+					[view becomeFirstResponder];
+				}
+			});
 			return sl_true;
 		}
 		return sl_false;
@@ -286,13 +288,15 @@ public:
 	{
 		UIView* window = m_window;
 		if (window != nil) {
-			UIColor* color;
-			if (_color.isZero()) {
-				color = nil;
-			} else {
-				color = GraphicsPlatform::getUIColorFromColor(_color);
-			}
-			[window setBackgroundColor:color];
+			dispatch_async(dispatch_get_main_queue(), ^{
+				UIColor* color;
+				if (_color.isZero()) {
+					color = nil;
+				} else {
+					color = GraphicsPlatform::getUIColorFromColor(_color);
+				}
+				[window setBackgroundColor:color];
+			});
 			return sl_true;
 		}
 		return sl_false;
@@ -337,7 +341,9 @@ public:
 	{
 		UIView* window = m_window;
 		if (window != nil) {
-			[window setHidden:(flag?NO:YES)];
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[window setHidden:(flag?NO:YES)];
+			});
 			return sl_true;
 		} else {
 			return sl_false;
@@ -365,12 +371,14 @@ public:
 		UIView* view = m_window;
 		if (view != nil) {
 			if ([view isKindOfClass:[UIWindow class]]) {
-				UIWindow* window = (UIWindow*)view;
-				if (flag) {
-					window.windowLevel = UIWindowLevelAlert + 1;
-				} else {
-					window.windowLevel = UIWindowLevelNormal + 1;
-				}
+				dispatch_async(dispatch_get_main_queue(), ^{
+					UIWindow* window = (UIWindow*)view;
+					if (flag) {
+						window.windowLevel = UIWindowLevelAlert + 1;
+					} else {
+						window.windowLevel = UIWindowLevelNormal + 1;
+					}
+				});
 				return sl_true;
 			}
 		}
@@ -431,14 +439,16 @@ public:
 	{
 		UIView* window = m_window;
 		if (window != nil) {
-			sl_real alpha = _alpha;
-			if (alpha < 0) {
-				alpha = 0;
-			}
-			if (alpha > 1) {
-				alpha = 1;
-			}
-			window.alpha = alpha;
+			dispatch_async(dispatch_get_main_queue(), ^{
+				sl_real alpha = _alpha;
+				if (alpha < 0) {
+					alpha = 0;
+				}
+				if (alpha > 1) {
+					alpha = 1;
+				}
+				window.alpha = alpha;
+			});
 			return sl_true;
 		} else {
 			return sl_false;

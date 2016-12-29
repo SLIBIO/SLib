@@ -98,6 +98,13 @@ public:
 
 	void applyProperties(UITextField* handle)
 	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				applyProperties(handle);
+			});
+			return;
+		}
+		
 		ADD_TOOL_BAR(handle)
 		
 		[handle setText:(Apple::getNSStringFromString(m_text))];
@@ -118,6 +125,13 @@ public:
 	
 	void applyProperties(UITextView* handle)
 	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				applyProperties(handle);
+			});
+			return;
+		}
+		
 		ADD_TOOL_BAR(handle)
 		
 		[handle setText:(Apple::getNSStringFromString(m_text))];
@@ -259,6 +273,14 @@ void EditView::_getText_NW()
 
 void EditView::_setText_NW(const String& value)
 {
+	if (![NSThread isMainThread]) {
+		String _value = value;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setText_NW(_value);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
 		if ([handle isKindOfClass:[UITextField class]]) {
@@ -273,6 +295,13 @@ void EditView::_setText_NW(const String& value)
 
 void EditView::_setBorder_NW(sl_bool flag)
 {
+	if (![NSThread isMainThread]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setBorder_NW(flag);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (flag) {
 		if ([handle isKindOfClass:[UITextField class]]) {
@@ -306,6 +335,13 @@ void EditView::_getTextAlignment_NW()
 
 void EditView::_setTextAlignment_NW(Alignment align)
 {
+	if (![NSThread isMainThread]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setTextAlignment_NW(align);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
 		if ([handle isKindOfClass:[UITextField class]]) {
@@ -331,6 +367,14 @@ void EditView::_getHintText_NW()
 
 void EditView::_setHintText_NW(const String& value)
 {
+	if (![NSThread isMainThread]) {
+		String _value = value;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setHintText_NW(_value);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
 		if ([handle isKindOfClass:[UITextField class]]) {
@@ -357,6 +401,13 @@ void EditView::_isReadOnly_NW()
 
 void EditView::_setReadOnly_NW(sl_bool flag)
 {
+	if (![NSThread isMainThread]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setReadOnly_NW(flag);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
 		if ([handle isKindOfClass:[UITextField class]]) {
@@ -379,6 +430,14 @@ void EditView::_setMultiLine_NW(sl_bool flag)
 
 void EditView::_setTextColor_NW(const Color& color)
 {
+	if (![NSThread isMainThread]) {
+		Color _color = color;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setTextColor_NW(_color);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
 		if ([handle isKindOfClass:[UITextField class]]) {
@@ -393,6 +452,14 @@ void EditView::_setTextColor_NW(const Color& color)
 
 void EditView::_setBackgroundColor_NW(const Color& color)
 {
+	if (![NSThread isMainThread]) {
+		Color _color = color;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setBackgroundColor_NW(_color);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
 		if ([handle isKindOfClass:[UITextField class]]) {
@@ -407,6 +474,14 @@ void EditView::_setBackgroundColor_NW(const Color& color)
 
 void EditView::_setFont_NW(const Ref<Font>& font)
 {
+	if (![NSThread isMainThread]) {
+		Ref<Font> _font = font;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setFont_NW(_font);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
 		if ([handle isKindOfClass:[UITextField class]]) {
@@ -427,6 +502,13 @@ void EditView::_setFont_NW(const Ref<Font>& font)
 
 void EditView::_setReturnKeyType_NW(UIReturnKeyType type)
 {
+	if (![NSThread isMainThread]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setReturnKeyType_NW(type);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
 		if ([handle isKindOfClass:[UITextField class]]) {
@@ -441,6 +523,13 @@ void EditView::_setReturnKeyType_NW(UIReturnKeyType type)
 
 void EditView::_setKeyboardType_NW(UIKeyboardType type)
 {
+	if (![NSThread isMainThread]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setKeyboardType_NW(type);
+		});
+		return;
+	}
+	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
 		if ([handle isKindOfClass:[UITextField class]]) {
