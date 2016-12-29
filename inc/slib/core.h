@@ -73,5 +73,7 @@
 #include "core/xml.h"
 #include "core/base64.h"
 
+#include "core/preference.h"
+
 #endif
 
