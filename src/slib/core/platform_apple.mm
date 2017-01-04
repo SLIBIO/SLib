@@ -84,6 +84,15 @@ Memory Apple::getMemoryFromNSData(NSData* data)
 	return Memory::null();
 }
 
+NSData* Apple::getNSDataFromMemory(const Memory& memory)
+{
+	if(memory.isNotNull()) {
+		return [NSData dataWithBytes:memory.getData() length:memory.getSize()];
+	}
+	
+	return nil;
+}
+
 String Apple::getAssetFilePath(const String &path)
 {
 	String fileExt = File::getFileExtension(path);

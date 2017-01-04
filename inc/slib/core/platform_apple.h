@@ -36,6 +36,8 @@ public:
 	
 	static Memory getMemoryFromNSData(NSData* data);
 	
+	static NSData* getNSDataFromMemory(const Memory& memory);
+	
 #endif
 	
 	static String getAssetFilePath(const String& path);

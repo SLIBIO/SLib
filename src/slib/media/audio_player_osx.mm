@@ -169,7 +169,7 @@ public:
 		}
 	}
 	
-    void stop()
+    void pause()
     {
 		ObjectLocker lock(this);
 		if (!m_flagOpened) {
@@ -183,6 +183,11 @@ public:
 			logError("Failed to stop play device");
 		}
     }
+	
+	void stop()
+	{
+		pause();
+	}
     
     sl_bool isRunning()
     {
@@ -281,6 +286,11 @@ public:
         }
         return Ref<AudioPlayerBuffer>::null();
     }
+	
+	Ref<AudioPlayerControl> _openNative(const AudioPlayerOpenParam& param)
+	{
+		return sl_null;
+	}
 };
 
 Ref<AudioPlayer> AudioPlayer::create(const AudioPlayerParam& param)

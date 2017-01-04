@@ -13,7 +13,207 @@
 #import <AudioToolbox/AudioToolbox.h>
 #import <AVFoundation/AVFoundation.h>
 
+
+@interface _iOS_AVPlayer_Observer : NSObject
+{
+	AVPlayerStatus mStatus;
+	sl_bool mIsPlaying;
+	AVPlayer* mAudioPlayer;
+	AVPlayerItem* mAudioItem;
+	slib::Mutex mLock;
+	slib::WeakRef<slib::AudioPlayerControl> mControl;
+}
+
+-(id) initWithURL:(NSString* ) url;
+-(void) setStatus:(AVPlayerStatus) status;
+-(AVPlayerStatus) getStatus;
+-(sl_bool) isPlaying;
+-(void) pause;
+-(void) play;
+-(void) stop;
+- (void)playerItemDidReachEnd:(NSNotification *)notification;
+
+@end
+
+@implementation _iOS_AVPlayer_Observer
+-(id) initWithURL:(NSString *)url control:(slib::AudioPlayerControl*) control
+{
+	self = [super init];
+	mStatus = AVPlayerStatusUnknown;
+	mIsPlaying = sl_false;
+	
+	NSURL* _url = [NSURL URLWithString:url];
+	mAudioItem = [AVPlayerItem playerItemWithURL:_url];
+	mAudioPlayer = [AVPlayer playerWithPlayerItem:mAudioItem];
+	
+	if (mAudioPlayer != nil) {
+		[mAudioPlayer addObserver:self forKeyPath:@"status" options:0 context:nil];
+		[[NSNotificationCenter defaultCenter] addObserver:self
+												 selector:@selector(playerItemDidReachEnd:)
+													 name:AVPlayerItemDidPlayToEndTimeNotification
+												   object:mAudioItem];
+	}
+	
+	mControl = control;
+	
+	return self;
+}
+
+-(void) dealloc
+{
+	[mAudioPlayer removeObserver:self forKeyPath:@"status"];
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:mAudioItem];
+}
+
+-(void) setStatus:(AVPlayerStatus)status
+{
+	mStatus = status;
+}
+
+-(AVPlayerStatus) getStatus
+{
+	return mStatus;
+}
+
+-(sl_bool) isPlaying
+{
+	return mIsPlaying;
+}
+
+-(void) play
+{
+	slib::MutexLocker lock(&mLock);
+	if (mStatus == AVPlayerStatusFailed) {
+		return;
+	}
+	if (mStatus == AVPlayerStatusReadyToPlay) {
+		[mAudioPlayer play];
+	}
+	mIsPlaying = sl_true;
+}
+
+-(void) pause
+{
+	slib::MutexLocker lock(&mLock);
+	if (mStatus == AVPlayerStatusFailed) {
+		return;		
+	}
+	if (mStatus == AVPlayerStatusReadyToPlay) {
+		[mAudioPlayer pause];
+	}
+	mIsPlaying = sl_false;
+}
+
+-(void) stop
+{
+	slib::MutexLocker lock(&mLock);
+	[mAudioItem cancelPendingSeeks];
+	[mAudioItem.asset cancelLoading];
+	[self processStopped];
+}
+
+- (void)playerItemDidReachEnd:(NSNotification *)notification {
+	slib::MutexLocker lock(&mLock);
+	[self processStopped];
+}
+
+-(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)contex
+{
+	slib::MutexLocker lock(&mLock);
+	if (mAudioPlayer != object) {
+		return;
+	}
+	if ([keyPath isEqualToString:@"status"]) {
+		[self setStatus:mAudioPlayer.status];
+		
+		if (mStatus == AVPlayerStatusFailed) {
+			[self processStopped];
+		} else if (mStatus == AVPlayerStatusReadyToPlay) {
+			if (mIsPlaying) {
+				[mAudioPlayer play];
+			}
+		} else if (mStatus == AVPlayerStatusUnknown) {
+			mIsPlaying = false;
+		}
+	}
+}
+
+-(void)processStopped
+{
+	mIsPlaying = sl_false;
+	slib::Ref<slib::AudioPlayerControl> control = mControl;
+	if (control.isNotNull()) {
+		control->_removeFromMap();
+	}
+}
+
+@end
+
 SLIB_MEDIA_NAMESPACE_BEGIN
+
+class _iOS_AudioPlayerControl : public AudioPlayerControl
+{
+public:
+	_iOS_AudioPlayerControl()
+	{
+	}
+	
+	_iOS_AudioPlayerControl(const String& url)
+	{
+		SLIB_REFERABLE_CONSTRUCTOR
+		mAVObserver = [[_iOS_AVPlayer_Observer alloc] initWithURL:Apple::getNSStringFromString(url) control:this];
+	}
+	
+	_iOS_AudioPlayerControl(const Memory& data)
+	{
+	}
+	
+	~_iOS_AudioPlayerControl()
+	{
+		NSLog(@"completed");
+	}
+	
+public:
+	void start()
+	{
+		ObjectLocker lock(this);
+		if (mAVObserver != nil) {
+			[mAVObserver play];
+		}
+	}
+	
+	void pause()
+	{
+		ObjectLocker lock(this);
+		if (mAVObserver != nil) {
+			[mAVObserver pause];
+		}
+	}
+	
+	void stop()
+	{
+		ObjectLocker lock(this);
+		if (mAVObserver != nil) {
+			[mAVObserver stop];
+			mAVObserver = nil;
+			_removeFromMap();
+		}
+	}
+	
+	sl_bool isRunning()
+	{
+		ObjectLocker lock(this);
+		if (mAVObserver != nil) {
+			return [mAVObserver isPlaying];
+		}
+		return sl_false;
+	}
+	
+private:
+	_iOS_AVPlayer_Observer* mAVObserver;
+};
+
+
 class _iOS_AudioPlayerBuffer : public AudioPlayerBuffer
 {
 public:
@@ -208,7 +408,7 @@ public:
 		m_flagRunning = sl_true;
 	}
 	
-	void stop()
+	void pause()
 	{
 		ObjectLocker lock(this);
 		if (!m_flagOpened) {
@@ -221,6 +421,11 @@ public:
 		if (AudioOutputUnitStop(m_audioUnitOutput) != noErr) {
 			logError("Failed to stop audio unit");
 		}
+	}
+	
+	void stop()
+	{
+		pause();
 	}
 	
 	sl_bool isRunning()
@@ -310,6 +515,11 @@ public:
 	{
 		return _iOS_AudioPlayerBuffer::create(param);
 	}
+	
+	Ref<AudioPlayerControl> _openNative(const AudioPlayerOpenParam& param);
+	Ref<AudioPlayerControl> playUrl(const String& url);
+	
+	Ref<AudioPlayerControl> playSound(const Memory& data);
 };
 
 Ref<AudioPlayer> AudioPlayer::create(const AudioPlayerParam& param)
@@ -323,6 +533,25 @@ List<AudioPlayerInfo> AudioPlayer::getPlayersList()
 	SLIB_STATIC_STRING(s, "Internal Speaker");
 	ret.name = s;
 	return List<AudioPlayerInfo>::createFromElement(ret);
+}
+
+Ref<AudioPlayerControl> _iOS_AudioPlayer::_openNative(const AudioPlayerOpenParam& param)
+{
+	if (param.data.isNotNull() && param.data.getSize() > 0) {
+		Ref<AudioPlayerControl> ret = new _iOS_AudioPlayerControl(param.data);
+		if (param.flagAutoStart) {
+			ret->start();
+		}
+		return ret;
+	} else if (param.url.isNotNull() && param.url.getLength() > 0) {
+		Ref<AudioPlayerControl> ret = new _iOS_AudioPlayerControl(param.url);
+		if (param.flagAutoStart) {
+			ret->start();
+		}
+		return ret;
+	} else {
+		return sl_null;
+	}
 }
 
 SLIB_MEDIA_NAMESPACE_END

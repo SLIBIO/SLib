@@ -1,7 +1,11 @@
 #include "../../../inc/slib/media/audio_player.h"
 #include "../../../inc/slib/media/audio_format.h"
+#include "../../../inc/slib/core/safe_static.h"
 
 SLIB_MEDIA_NAMESPACE_BEGIN
+
+typedef HashMap< AudioPlayerControl*, Ref<AudioPlayerControl> > _AudioPlayerControlsMap;
+SLIB_SAFE_STATIC_GETTER(_AudioPlayerControlsMap, _getAudioPlayerControlsMap)
 
 AudioPlayerInfo::AudioPlayerInfo()
 {
@@ -17,12 +21,28 @@ AudioPlayerBufferParam::AudioPlayerBufferParam()
 	flagAutoStart = sl_true;
 }
 
+AudioPlayerOpenParam::AudioPlayerOpenParam()
+{
+	flagAutoStart = sl_true;
+	flagKeepReference = sl_true;
+}
+
 AudioPlayerParam::AudioPlayerParam()
 {
 }
 
 
-SLIB_DEFINE_OBJECT(AudioPlayerBuffer, Object)
+SLIB_DEFINE_OBJECT(AudioPlayerControl, Object)
+
+void AudioPlayerControl::_removeFromMap()
+{
+	_AudioPlayerControlsMap* map = _getAudioPlayerControlsMap();
+	if (map) {
+		map->remove(this);
+	}
+}
+
+SLIB_DEFINE_OBJECT(AudioPlayerBuffer, AudioPlayerControl)
 
 AudioPlayerBuffer::AudioPlayerBuffer()
 {
@@ -88,8 +108,49 @@ void AudioPlayerBuffer::_processFrame(sl_int16* s, sl_size count)
 	m_lastSample = s[count - 1];
 }
 
-
 SLIB_DEFINE_OBJECT(AudioPlayer, Object)
+
+Ref<AudioPlayer> AudioPlayer::create()
+{
+	AudioPlayerParam param;
+	return create(param);
+}
+
+Ref<AudioPlayerControl> AudioPlayer::open(const slib::AudioPlayerOpenParam &param)
+{
+	Ref<AudioPlayerControl> control = _openNative(param);
+	
+	if (param.flagKeepReference) {
+		_AudioPlayerControlsMap* map = _getAudioPlayerControlsMap();
+		if (map) {
+			map->put(control.ptr, control);
+		}
+	}
+	
+	return control;
+}
+
+Ref<AudioPlayerControl> AudioPlayer::playSound(const Memory& data)
+{
+	Ref<AudioPlayer> player = create();
+	if (player.isNotNull()) {
+		AudioPlayerOpenParam param;
+		param.data = data;
+		return player->open(param);
+	}
+	return sl_null;
+}
+
+Ref<AudioPlayerControl> AudioPlayer::playUrl(const String &url)
+{
+	Ref<AudioPlayer> player = create();
+	if (player.isNotNull()) {
+		AudioPlayerOpenParam param;
+		param.url = url;
+		return player->open(param);
+	}
+	return sl_null;
+}
 
 SLIB_MEDIA_NAMESPACE_END
 

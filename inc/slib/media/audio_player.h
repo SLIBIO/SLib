@@ -10,6 +10,7 @@
 #include "../core/array.h"
 #include "../core/loop_queue.h"
 #include "../core/string.h"
+#include "../core/memory.h"
 #include "../core/ptr.h"
 
 SLIB_MEDIA_NAMESPACE_BEGIN
@@ -52,6 +53,20 @@ public:
 	
 };
 
+class SLIB_EXPORT AudioPlayerOpenParam
+{
+public:
+	Memory data;
+	String url;
+	
+	sl_bool flagAutoStart;
+	sl_bool flagKeepReference;
+	
+public:
+	AudioPlayerOpenParam();
+	
+};
+
 class SLIB_EXPORT AudioPlayerParam
 {
 public:
@@ -62,7 +77,27 @@ public:
 	
 };
 
-class SLIB_EXPORT AudioPlayerBuffer : public Object
+class SLIB_EXPORT AudioPlayerControl : public Object
+{
+	SLIB_DECLARE_OBJECT
+	
+protected:
+	AudioPlayerControl(){};
+	
+public:
+	virtual void start() = 0;
+	
+	virtual void pause() = 0;
+	
+	virtual void stop() = 0;
+	
+	virtual sl_bool isRunning() = 0;
+
+public:
+	void _removeFromMap();
+};
+
+class SLIB_EXPORT AudioPlayerBuffer : public AudioPlayerControl
 {
 	SLIB_DECLARE_OBJECT
 
@@ -73,12 +108,6 @@ public:
 	virtual void release() = 0;
 	
 	virtual sl_bool isOpened() = 0;
-	
-	virtual void start() = 0;
-	
-	virtual void stop() = 0;
-	
-	virtual sl_bool isRunning() = 0;
 	
 public:
 	void write(const AudioData& audioPlay);
@@ -106,11 +135,21 @@ class SLIB_EXPORT AudioPlayer : public Object
 public:
 	static Ref<AudioPlayer> create(const AudioPlayerParam& param);
 	
+	static Ref<AudioPlayer> create();
+	
 	static List<AudioPlayerInfo> getPlayersList();
 	
 public:
 	virtual Ref<AudioPlayerBuffer> createBuffer(const AudioPlayerBufferParam& param) = 0;
 	
+	Ref<AudioPlayerControl> open(const AudioPlayerOpenParam& param);
+	
+	static Ref<AudioPlayerControl> playSound(const Memory& data);
+	
+	static Ref<AudioPlayerControl> playUrl(const String &url);
+	
+protected:
+	virtual Ref<AudioPlayerControl> _openNative(const AudioPlayerOpenParam& param) = 0;
 };
 
 SLIB_MEDIA_NAMESPACE_END
