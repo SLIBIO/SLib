@@ -41,7 +41,7 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidEditView, "slib/platform/android/ui/view/UiEditVie
 	SLIB_JNI_STATIC_METHOD(setBackgroundColor, "_setBackgroundColor", "(Landroid/view/View;I)Z");
 	SLIB_JNI_STATIC_METHOD(setFont, "_setFont", "(Landroid/view/View;Lslib/platform/android/ui/UiFont;)Z");
 	SLIB_JNI_STATIC_METHOD(setReturnKeyType, "_setReturnKeyType", "(Landroid/view/View;I)Z");
-	SLIB_JNI_STATIC_METHOD(setKeyboardType, "_setKeyboardType", "(Landroid/view/View;I)Z");
+	SLIB_JNI_STATIC_METHOD(setInputType, "_setInputType", "(Landroid/view/View;II)Z");
 
 	SLIB_JNI_NATIVE(nativeOnChange, "nativeOnChange", "(J)V", _AndroidEditView_nativeOnChange);
 
@@ -68,7 +68,7 @@ public:
 			_JAndroidEditView::setFont.callBoolean(sl_null, handle, jfont);
 		}
 		_JAndroidEditView::setReturnKeyType.callBoolean(sl_null, handle, (int)m_returnKeyType);
-		_JAndroidEditView::setKeyboardType.callBoolean(sl_null, handle, (int)m_keyboardType);
+		_JAndroidEditView::setInputType.callBoolean(sl_null, handle, (int)m_keyboardType, (int)m_autoCapitalizationType);
 	}
 };
 
@@ -214,7 +214,15 @@ void EditView::_setKeyboardType_NW(UIKeyboardType type)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		_JAndroidEditView::setKeyboardType.callBoolean(sl_null, handle, (int)type);
+		_JAndroidEditView::setInputType.callBoolean(sl_null, handle, (int)type, (int)m_autoCapitalizationType);
+	}
+}
+
+void EditView::_setAutoCapitalizationType_NW(UIAutoCapitalizationType type)
+{
+	jobject handle = UIPlatform::getViewHandle(this);
+	if (handle) {
+		_JAndroidEditView::setInputType.callBoolean(sl_null, handle, m_keyboardType, (int)type);
 	}
 }
 

@@ -325,6 +325,14 @@ enum class UIKeyboardType
 	AsciiNumpad = 12
 };
 
+enum class UIAutoCapitalizationType
+{
+	None = 0,
+	Words = 1,
+	Sentences = 2,
+	AllCharacters = 3
+};
+
 SLIB_UI_NAMESPACE_END
 
 #endif

@@ -19,6 +19,7 @@ EditView::EditView()
 	setBorder(sl_true, UIUpdateMode::Init);
 	m_returnKeyType = UIReturnKeyType::Default;
 	m_keyboardType = UIKeyboardType::Default;
+	m_autoCapitalizationType = UIAutoCapitalizationType::None;
 	m_flagAutoDismissKeyboard = sl_true;
 }
 
@@ -150,6 +151,14 @@ void EditView::setKeyboardType(UIKeyboardType type)
 	m_keyboardType = type;
 	if (isNativeWidget()) {
 		_setKeyboardType_NW(type);
+	}
+}
+
+void EditView::setAutoCapitalizationType(UIAutoCapitalizationType type)
+{
+	m_autoCapitalizationType = type;
+	if (isNativeWidget()) {
+		_setAutoCapitalizationType_NW(type);
 	}
 }
 
@@ -354,6 +363,10 @@ void EditView::_setReturnKeyType_NW(UIReturnKeyType type)
 }
 
 void EditView::_setKeyboardType_NW(UIKeyboardType type)
+{
+}
+
+void EditView::_setAutoCapitalizationType_NW(UIAutoCapitalizationType type)
 {
 }
 

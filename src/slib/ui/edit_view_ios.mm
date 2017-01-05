@@ -95,6 +95,22 @@ public:
 		}
 	}
 	
+	static ::UITextAutocapitalizationType convertAutoCapitalizationType(UIAutoCapitalizationType type)
+	{
+		switch (type) {
+			case UIAutoCapitalizationType::None :
+				return UITextAutocapitalizationTypeNone;
+			case UIAutoCapitalizationType::Words:
+				return UITextAutocapitalizationTypeWords;
+			case UIAutoCapitalizationType::Sentences:
+				return UITextAutocapitalizationTypeSentences;
+			case UIAutoCapitalizationType::AllCharacters:
+				return UITextAutocapitalizationTypeAllCharacters;
+			default:
+				return UITextAutocapitalizationTypeSentences;
+		}
+	}
+	
 #define ADD_TOOL_BAR(handle) UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 0, 44)];\
 	toolbar.barTintColor = [UIColor colorWithRed:181.0/255 green:187.0/255 blue:193.0/255 alpha:1];\
 	UIBarButtonItem *flex = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:handle action:nil];\
@@ -507,6 +523,27 @@ void EditView::_setKeyboardType_NW(UIKeyboardType type)
 		} else if ([handle isKindOfClass:[UITextView class]]) {
 			UITextView* tv = (UITextView*)handle;
 			[tv setKeyboardType:_EditView::convertKeyboardType(type)];
+		}
+	}
+}
+
+void EditView::_setAutoCapitalizationType_NW(UIAutoCapitalizationType type)
+{
+	if (![NSThread isMainThread]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			_setAutoCapitalizationType_NW(type);
+		});
+		return;
+	}
+	
+	UIView* handle = UIPlatform::getViewHandle(this);
+	if (handle != nil) {
+		if ([handle isKindOfClass:[UITextField class]]) {
+			UITextField* tv = (UITextField*)handle;
+			[tv setAutocapitalizationType:_EditView::convertAutoCapitalizationType(type)];
+		} else if ([handle isKindOfClass:[UITextView class]]) {
+			UITextView* tv = (UITextView*)handle;
+			[tv setAutocapitalizationType:_EditView::convertAutoCapitalizationType(type)];
 		}
 	}
 }

@@ -337,69 +337,86 @@ public class UiEditView extends EditText implements IView {
 		return false;
 	}
 
-	public static boolean _setKeyboardType(final View view, final int type) {
-		if (view instanceof UiTextArea) {
-			return false;
+	public static boolean _setInputType(final View view, final int keyboardType, final int autoCapType) {
+
+		if (view instanceof UiEditView && ((UiEditView)view).flagPassword) {
+			return true;
 		}
 
 		if (!(UiThread.isUiThread())) {
 			view.post(new Runnable() {
 				public void run() {
-					_setKeyboardType(view, type);
+					_setInputType(view, keyboardType, autoCapType);
 				}
 			});
 			return true;
 		}
 
-		if (view instanceof UiEditView && ((UiEditView)view).flagPassword) {
-			return true;
-		}
 		if (view instanceof  TextView) {
 			TextView tv = (TextView)view;
-			switch (type) {
-				case 0:
-					tv.setInputType(InputType.TYPE_CLASS_TEXT);
-					break;
-				case 1:
-					tv.setInputType(InputType.TYPE_CLASS_NUMBER);
-					break;
-				case 2:
-					tv.setInputType(InputType.TYPE_CLASS_PHONE);
-					break;
-				case 3:
-					tv.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-					break;
-				case 4:
-					tv.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL);
-					break;
-				case 5:
-					tv.setInputType(InputType.TYPE_CLASS_TEXT);
-					break;
-				case 6:
-					tv.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
-					break;
-				case 7:
-					tv.setInputType(InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT);
-					break;
-				case 8:
-					tv.setInputType(InputType.TYPE_CLASS_TEXT);
-					break;
-				case  9:
-					tv.setInputType(InputType.TYPE_CLASS_TEXT);
-					break;
-				case 10:
-					tv.setInputType(InputType.TYPE_CLASS_TEXT);
-					break;
-				case 11:
-					tv.setInputType(InputType.TYPE_CLASS_TEXT);
-					break;
-				case 12:
-					tv.setInputType(InputType.TYPE_CLASS_TEXT);
-					break;
-				default:
-					tv.setInputType(InputType.TYPE_CLASS_TEXT);
-					break;
+			int type = InputType.TYPE_CLASS_TEXT;
+			if (!(view instanceof UiTextArea)) {
+				switch (keyboardType) {
+					case 0:
+						type = InputType.TYPE_CLASS_TEXT;
+						break;
+					case 1:
+						type = InputType.TYPE_CLASS_NUMBER;
+						break;
+					case 2:
+						type = InputType.TYPE_CLASS_PHONE;
+						break;
+					case 3:
+						type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
+						break;
+					case 4:
+						type = InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL;
+						break;
+					case 5:
+						type = InputType.TYPE_CLASS_TEXT;
+						break;
+					case 6:
+						type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI;
+						break;
+					case 7:
+						type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT;
+						break;
+					case 8:
+						type = InputType.TYPE_CLASS_TEXT;
+						break;
+					case  9:
+						type = InputType.TYPE_CLASS_TEXT;
+						break;
+					case 10:
+						type = InputType.TYPE_CLASS_TEXT;
+						break;
+					case 11:
+						type = InputType.TYPE_CLASS_TEXT;
+						break;
+					case 12:
+						type = InputType.TYPE_CLASS_TEXT;
+						break;
+					default:
+						type = InputType.TYPE_CLASS_TEXT;
+						break;
+				}
 			}
+			if ((type & InputType.TYPE_MASK_CLASS) == InputType.TYPE_CLASS_TEXT) {
+				switch (autoCapType) {
+					case 1:
+						type = type | InputType.TYPE_TEXT_FLAG_CAP_WORDS;
+						break;
+					case 2:
+						type = type | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES;
+						break;
+					case 3:
+						type = type | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS;
+						break;
+					default:
+						break;
+				}
+			}
+			tv.setInputType(type);
 		}
 		return false;
 	}

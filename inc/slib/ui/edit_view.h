@@ -56,6 +56,10 @@ public:
 	
 	void setKeyboardType(UIKeyboardType type);
 	
+	void setAutoCapitalizationType(UIAutoCapitalizationType type);
+	
+	UIAutoCapitalizationType getAutoCaptializationType();
+	
 	sl_bool isAutoDismissKeyboard();
 	
 	void setAutoDismissKeyboard(sl_bool flag);
@@ -103,6 +107,8 @@ private:
 	void _setReturnKeyType_NW(UIReturnKeyType type);
 	
 	void _setKeyboardType_NW(UIKeyboardType type);
+	
+	void _setAutoCapitalizationType_NW(UIAutoCapitalizationType type);
 
 	// override
 	void _setFont_NW(const Ref<Font>& font);
@@ -122,6 +128,7 @@ protected:
 	Color m_textColor;
 	UIReturnKeyType m_returnKeyType;
 	UIKeyboardType m_keyboardType;
+	UIAutoCapitalizationType m_autoCapitalizationType;
 	sl_bool m_flagAutoDismissKeyboard;
 };
 
