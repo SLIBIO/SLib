@@ -142,27 +142,11 @@ void EditView::_setBorder_NW(sl_bool flag)
 	}
 }
 
-void EditView::_getTextAlignment_NW()
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		m_textAlignment = _JAndroidEditView::getAlignment.callInt(sl_null, handle);
-	}
-}
-
 void EditView::_setTextAlignment_NW(Alignment align)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		_JAndroidEditView::setAlignment.callBoolean(sl_null, handle, align.value);
-	}
-}
-
-void EditView::_getHintText_NW()
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		m_hintText = _JAndroidEditView::getHintText.callString(sl_null, handle);
 	}
 }
 
@@ -175,27 +159,11 @@ void EditView::_setHintText_NW(const String& text)
 	}
 }
 
-void EditView::_isReadOnly_NW()
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		m_flagReadOnly = _JAndroidEditView::isReadOnly.callBoolean(sl_null, handle) != 0;
-	}
-}
-
 void EditView::_setReadOnly_NW(sl_bool flag)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		_JAndroidEditView::setReadOnly.callBoolean(sl_null, handle, flag);
-	}
-}
-
-void EditView::_isMultiLine_NW()
-{
-	jobject handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		m_flagMultiLine = _JAndroidEditView::isMultiLine.callBoolean(sl_null, handle) != 0;
 	}
 }
 

@@ -274,7 +274,10 @@ public class UiEditView extends EditText implements IView {
 		return false;
 	}
 
-	public static  boolean _setReturnKeyType(final View view, final int type) {
+	public static boolean _setReturnKeyType(final View view, final int type) {
+		if (view instanceof UiTextArea) {
+			return false;
+		}
 		if (!(UiThread.isUiThread())) {
 			view.post(new Runnable() {
 				public void run() {
@@ -283,7 +286,7 @@ public class UiEditView extends EditText implements IView {
 			});
 			return true;
 		}
-		if (view instanceof  TextView) {
+		if (view instanceof TextView) {
 			TextView tv = (TextView)view;
 			switch (type) {
 				case 0:
@@ -335,6 +338,10 @@ public class UiEditView extends EditText implements IView {
 	}
 
 	public static boolean _setKeyboardType(final View view, final int type) {
+		if (view instanceof UiTextArea) {
+			return false;
+		}
+
 		if (!(UiThread.isUiThread())) {
 			view.post(new Runnable() {
 				public void run() {
@@ -343,6 +350,7 @@ public class UiEditView extends EditText implements IView {
 			});
 			return true;
 		}
+
 		if (view instanceof UiEditView && ((UiEditView)view).flagPassword) {
 			return true;
 		}
