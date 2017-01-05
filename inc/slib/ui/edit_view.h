@@ -90,19 +90,11 @@ private:
 	
 	void _setText_NW(const String& text);
 	
-	void _getTextAlignment_NW();
-	
 	void _setTextAlignment_NW(Alignment align);
-	
-	void _getHintText_NW();
 	
 	void _setHintText_NW(const String& str);
 	
-	void _isReadOnly_NW();
-	
 	void _setReadOnly_NW(sl_bool flag);
-	
-	void _isMultiLine_NW();
 	
 	void _setMultiLine_NW(sl_bool flag);
 	

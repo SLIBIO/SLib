@@ -240,20 +240,6 @@ void EditView::_setBorder_NW(sl_bool flag)
 	}
 }
 
-void EditView::_getTextAlignment_NW()
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil) {
-		if ([handle isKindOfClass:[NSTextField class]]) {
-			NSTextField* tv = (NSTextField*)handle;
-			m_textAlignment = _EditView::translateAlignmentReverse(tv.alignment);
-		} else if ([handle isKindOfClass:[_Slib_OSX_TextArea class]]) {
-			_Slib_OSX_TextArea* tv = (_Slib_OSX_TextArea*)handle;
-			m_textAlignment = _EditView::translateAlignmentReverse(tv->textView.alignment);
-		}
-	}
-}
-
 void EditView::_setTextAlignment_NW(Alignment align)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
@@ -280,16 +266,6 @@ void EditView::_setTextAlignment_NW(Alignment align)
 	}
 }
 
-void EditView::_getHintText_NW()
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
-		NSTextField* tv = (NSTextField*)handle;
-		NSTextFieldCell* cell = [tv cell];
-		m_hintText = Apple::getStringFromNSString(cell.placeholderString);
-	}
-}
-
 void EditView::_setHintText_NW(const String& value)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
@@ -306,19 +282,6 @@ void EditView::_setHintText_NW(const String& value)
 	}
 }
 
-void EditView::_isReadOnly_NW()
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil) {
-		if ([handle isKindOfClass:[NSTextField class]]) {
-			NSTextField* tv = (NSTextField*)handle;
-			m_flagReadOnly = tv.editable ? sl_false : sl_true;
-		} else if ([handle isKindOfClass:[_Slib_OSX_TextArea class]]) {
-			_Slib_OSX_TextArea* tv = (_Slib_OSX_TextArea*)handle;
-			m_flagReadOnly = tv->textView.editable ? sl_false : sl_true;
-		}
-	}
-}
 
 void EditView::_setReadOnly_NW(sl_bool flag)
 {
@@ -343,15 +306,6 @@ void EditView::_setReadOnly_NW(sl_bool flag)
 				});
 			}
 		}
-	}
-}
-
-void EditView::_isMultiLine_NW()
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[_Slib_OSX_TextField class]]) {
-		_Slib_OSX_TextField* tv = (_Slib_OSX_TextField*)handle;
-		m_flagMultiLine = tv->m_flagMultiLine;
 	}
 }
 

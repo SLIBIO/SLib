@@ -44,9 +44,6 @@ void EditView::setText(const String& text, UIUpdateMode mode)
 
 Alignment EditView::getGravity()
 {
-	if (isNativeWidget()) {
-		_getTextAlignment_NW();
-	}
 	return m_textAlignment;
 }
 
@@ -64,9 +61,6 @@ void EditView::setGravity(Alignment align, UIUpdateMode mode)
 
 String EditView::getHintText()
 {
-	if (isNativeWidget()) {
-		_getHintText_NW();
-	}
 	return m_hintText;
 }
 
@@ -84,9 +78,6 @@ void EditView::setHintText(const String& str, UIUpdateMode mode)
 
 sl_bool EditView::isReadOnly()
 {
-	if (isNativeWidget()) {
-		_isReadOnly_NW();
-	}
 	return m_flagReadOnly;
 }
 
@@ -104,9 +95,6 @@ void EditView::setReadOnly(sl_bool flag, UIUpdateMode mode)
 
 sl_bool EditView::isMultiLine()
 {
-	if (isNativeWidget()) {
-		_isMultiLine_NW();
-	}
 	return m_flagMultiLine;
 }
 
