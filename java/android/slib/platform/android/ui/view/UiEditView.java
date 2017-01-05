@@ -354,8 +354,10 @@ public class UiEditView extends EditText implements IView {
 
 		if (view instanceof  TextView) {
 			TextView tv = (TextView)view;
-			int type = InputType.TYPE_CLASS_TEXT;
-			if (!(view instanceof UiTextArea)) {
+			int type;
+			if (view instanceof UiTextArea) {
+				type = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+			} else {
 				switch (keyboardType) {
 					case 0:
 						type = InputType.TYPE_CLASS_TEXT;
