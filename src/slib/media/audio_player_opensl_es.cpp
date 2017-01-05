@@ -81,6 +81,11 @@ public:
 	}
 
 	Ref<AudioPlayerBuffer> createBuffer(const AudioPlayerBufferParam& param);
+
+	Ref<AudioPlayerControl> _openNative(const AudioPlayerOpenParam& param)
+	{
+		return sl_null;
+	}
 };
 
 class _OpenSLES_AudioPlayerBufferImpl : public AudioPlayerBuffer
@@ -240,7 +245,7 @@ public:
 		m_flagRunning = sl_true;
 	}
 
-	void stop()
+	void pause()
 	{
 		ObjectLocker lock(this);
 		if (!m_flagOpened) {
@@ -255,6 +260,11 @@ public:
 			return;
 		}
 		(*m_playerInterface)->SetPlayState(m_playerInterface, SL_PLAYSTATE_STOPPED);
+	}
+
+	void stop()
+	{
+		pause();
 	}
 
 	sl_bool isRunning()

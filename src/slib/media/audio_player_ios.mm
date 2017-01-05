@@ -195,8 +195,6 @@ public:
 		ObjectLocker lock(this);
 		if (mAVObserver != nil) {
 			[mAVObserver stop];
-			mAVObserver = nil;
-			_removeFromMap();
 		}
 	}
 	
@@ -517,9 +515,6 @@ public:
 	}
 	
 	Ref<AudioPlayerControl> _openNative(const AudioPlayerOpenParam& param);
-	Ref<AudioPlayerControl> playUrl(const String& url);
-	
-	Ref<AudioPlayerControl> playSound(const Memory& data);
 };
 
 Ref<AudioPlayer> AudioPlayer::create(const AudioPlayerParam& param)
