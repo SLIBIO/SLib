@@ -1,4 +1,5 @@
 #include "../../../inc/slib/core/definition.h"
+#include "../../../inc/slib/core/platform_apple.h"
 
 #if defined(SLIB_PLATFORM_IS_IOS)
 
@@ -6,8 +7,11 @@
 #include "../../../inc/slib/ui/screen.h"
 #include "../../../inc/slib/ui/platform.h"
 #include "../../../inc/slib/ui/mobile_app.h"
+#include "../../../inc/slib/ui/notification.h"
 
 #include "../../../inc/slib/core/log.h"
+#include "../../../inc/slib/core/json.h"
+#include "../../../inc/slib/core/variant.h"
 
 @interface _slib_iOS_AppDelegate : UIResponder <UIApplicationDelegate>
 @property (strong, nonatomic) UIWindow *window;
@@ -215,13 +219,10 @@ SLIB_UI_NAMESPACE_END
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	
 	SLIB_LOG("App", "Finished Launching");
-
+	
 	slib::UIApp::dispatchStartToApp();
 	
 	slib::MobileApp::dispatchCreateActivityToApp();
-	
-	UIUserNotificationSettings* notificationSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge categories:nil];
-	[application registerUserNotificationSettings:notificationSettings];
 	
 	return YES;
 }
@@ -239,7 +240,6 @@ SLIB_UI_NAMESPACE_END
 - (void)applicationDidEnterBackground:(UIApplication *)application {
 	// Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
 	// If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-	
 	SLIB_LOG("App", "Enter Background");
 
 }
@@ -269,17 +269,35 @@ SLIB_UI_NAMESPACE_END
 	slib::UIApp::dispatchExitToApp();
 }
 
-- (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings {
-	
-}
-
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-	
+	slib::Function<void (const slib::String&)> callback = slib::Notification::getTokenRefreshCallback();
+	slib::String token = slib::Apple::getStringFromNSString([deviceToken base64Encoding]);
+	if (callback.isNotNull()) {
+		callback(token);
+	}
 }
 
-- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
-	
+- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
+{
+	slib::Function<void (const slib::String&)> callback = slib::Notification::getTokenRefreshCallback();
+	if (callback.isNotNull()) {
+		callback(slib::String::null());
+	}
 }
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler {
+	NSError *err;
+	NSData* jsonData = [NSJSONSerialization dataWithJSONObject:userInfo options:0 error:&err];
+	NSString* jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+	if (jsonString) {
+		slib::Variant _userInfo = slib::Json::parseJson(slib::Apple::getStringFromNSString(jsonString));
+		slib::Function<void (const slib::Map<slib::String, slib::Variant>&)> callback = slib::Notification::getNotificationReceivedCallback();
+		if (callback.isNotNull()) {
+			callback(_userInfo.getVariantMap());
+		}
+	}
+}
+
 @end
 
 

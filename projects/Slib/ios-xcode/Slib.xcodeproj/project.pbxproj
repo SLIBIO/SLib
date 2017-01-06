@@ -236,6 +236,8 @@
 		AE75B9B41B0F2600004A70EE /* thirdparty_libvpx.c in Sources */ = {isa = PBXBuildFile; fileRef = AE75B9B11B0F2600004A70EE /* thirdparty_libvpx.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 		E1034AB41E0B492400989BB1 /* picker_view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E1034AB31E0B492400989BB1 /* picker_view_ios.mm */; };
 		E1034AB81E0B633E00989BB1 /* motion_tracker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1034AB71E0B633E00989BB1 /* motion_tracker.cpp */; };
+		E105A6A41E1F2EC000ACB371 /* notification.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E105A6A31E1F2EC000ACB371 /* notification.cpp */; };
+		E15AC4FB1E1F66A60083D3E2 /* notification_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = E15AC4FA1E1F66A60083D3E2 /* notification_ios.mm */; };
 		E17DADEB1E0C9060006161F6 /* gesture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E17DADEA1E0C9060006161F6 /* gesture.cpp */; };
 		E1B34E9D1E0A909A006217F4 /* picker_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1B34E9C1E0A909A006217F4 /* picker_view.cpp */; };
 		E1B9F8F31DEC887700BAA9F0 /* vibrator_ios.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E1B9F8F21DEC887700BAA9F0 /* vibrator_ios.cpp */; };
@@ -497,6 +499,8 @@
 		AE75B9B11B0F2600004A70EE /* thirdparty_libvpx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = thirdparty_libvpx.c; sourceTree = "<group>"; };
 		E1034AB31E0B492400989BB1 /* picker_view_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = picker_view_ios.mm; sourceTree = "<group>"; };
 		E1034AB71E0B633E00989BB1 /* motion_tracker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = motion_tracker.cpp; sourceTree = "<group>"; };
+		E105A6A31E1F2EC000ACB371 /* notification.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = notification.cpp; sourceTree = "<group>"; };
+		E15AC4FA1E1F66A60083D3E2 /* notification_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = notification_ios.mm; sourceTree = "<group>"; };
 		E17DADEA1E0C9060006161F6 /* gesture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gesture.cpp; sourceTree = "<group>"; };
 		E1B34E9C1E0A909A006217F4 /* picker_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = picker_view.cpp; sourceTree = "<group>"; };
 		E1B9F8F21DEC887700BAA9F0 /* vibrator_ios.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vibrator_ios.cpp; sourceTree = "<group>"; };
@@ -837,6 +841,8 @@
 				2648D5491D096AC400819E09 /* mobile_app.cpp */,
 				2648D54A1D096AC400819E09 /* mobile_game.cpp */,
 				E1034AB71E0B633E00989BB1 /* motion_tracker.cpp */,
+				E105A6A31E1F2EC000ACB371 /* notification.cpp */,
+				E15AC4FA1E1F66A60083D3E2 /* notification_ios.mm */,
 				E1B34E9C1E0A909A006217F4 /* picker_view.cpp */,
 				E1034AB31E0B492400989BB1 /* picker_view_ios.mm */,
 				2634DCE61D8A82EA00E8F19E /* progress_bar.cpp */,
@@ -949,6 +955,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				26E49B1F1D79AD0A0052D89F /* select_view.cpp in Sources */,
+				E15AC4FB1E1F66A60083D3E2 /* notification_ios.mm in Sources */,
 				2634DCE51D8A82B200E8F19E /* split_view.cpp in Sources */,
 				266DD3841C117A3100D47AB0 /* md5.cpp in Sources */,
 				266DD3691C1170BD00D47AB0 /* video_capture.cpp in Sources */,
@@ -982,6 +989,7 @@
 				266DD39C1C117AE300D47AB0 /* bitmap.cpp in Sources */,
 				26B5716F1C9D44720099E69B /* matrix4.cpp in Sources */,
 				266DD4401C1190E800D47AB0 /* label_view.cpp in Sources */,
+				E105A6A41E1F2EC000ACB371 /* notification.cpp in Sources */,
 				266DD43C1C1190A600D47AB0 /* edit_view.cpp in Sources */,
 				26B5714F1C9D43FF0099E69B /* queue.cpp in Sources */,
 				2631B7821DDB14F200729A87 /* url_request_apple.mm in Sources */,
