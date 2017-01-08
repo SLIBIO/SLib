@@ -224,6 +224,8 @@ SLIB_UI_NAMESPACE_END
 	
 	slib::MobileApp::dispatchCreateActivityToApp();
 	
+	[application registerForRemoteNotifications];
+	
 	return YES;
 }
 
@@ -270,10 +272,15 @@ SLIB_UI_NAMESPACE_END
 }
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+	const sl_uint8* bytes = (const sl_uint8* )[deviceToken bytes];
+	slib::String tokenString = "";
+	for (sl_uint32 i = 0; i < [deviceToken length]; i++) {
+		tokenString += slib::String::format("%02x", bytes[i]);
+	}
+	
 	slib::Function<void (const slib::String&)> callback = slib::Notification::getTokenRefreshCallback();
-	slib::String token = slib::Apple::getStringFromNSString([deviceToken base64Encoding]);
 	if (callback.isNotNull()) {
-		callback(token);
+		callback(tokenString);
 	}
 }
 

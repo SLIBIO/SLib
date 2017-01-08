@@ -80,6 +80,7 @@ public:
 
 	void pause()
 	{
+		_removeFromMap();
 		ObjectLocker lock(this);
 		JniGlobal<jobject> player = m_player;
 		jobject jactivity = Android::getCurrentActivity();

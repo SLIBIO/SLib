@@ -306,6 +306,11 @@ Ref<UrlRequest> UrlRequest::_send(const UrlRequestParam& param, const String& _u
 	String url = _url;
 	if (url.isNotEmpty()) {
 		if (param.parameters.isNotEmpty()) {
+			if (url.contains('?')) {
+				url += "&";
+			} else {
+				url += "?";
+			}
 			url += _buildParameters(param.parameters);
 		}
 		Ref<UrlRequest> request = _create(param, url, String::null());
@@ -335,7 +340,7 @@ void UrlRequest::_init(const UrlRequestParam& param, const String& url, const St
 	m_flagUseBackgroundSession = param.flagUseBackgroundSession;
 	m_flagKeepReference = param.flagKeepReference;
 	m_flagStoreResponseContent = param.flagStoreResponseContent;
-
+	
 	if (param.flagKeepReference) {
 		_UrlRequestMap* map = _getUrlRequestMap();
 		if (map) {
@@ -369,7 +374,7 @@ void UrlRequest::onComplete()
 	if (listener.isNotNull()) {
 		listener->onComplete(this);
 	}
-	if (m_onComplete.isNotNull()) {		
+	if (m_onComplete.isNotNull()) {
 		if (m_dispatcher.isNotNull()) {
 			m_dispatcher->dispatch(SLIB_CALLBACK_REF(UrlRequest, _runCallback, this, m_onComplete));
 		} else {
@@ -462,7 +467,6 @@ void UrlRequest::_onCreateError(const UrlRequestParam& param, const String& url,
 String UrlRequest::_buildParameters(const Map<String, Variant>& params)
 {
 	StringBuffer sb;
-	sb.addStatic("?", 1);
 	sl_bool flagFirst = sl_true;
 	for (auto pair : params) {
 		if (!flagFirst) {

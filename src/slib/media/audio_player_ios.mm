@@ -184,6 +184,7 @@ public:
 	
 	void pause()
 	{
+		_removeFromMap();
 		ObjectLocker lock(this);
 		if (mAVObserver != nil) {
 			[mAVObserver pause];
