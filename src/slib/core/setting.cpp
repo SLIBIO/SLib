@@ -59,7 +59,7 @@ Variant IniSetting::getValue(const String& name)
 {
 	String ret = m_mapValues.getValue(name, String::null());
 	if (ret.isEmpty()) {
-		return Variant::null();
+		return sl_null;
 	} else {
 		return Variant::fromString(ret);
 	}

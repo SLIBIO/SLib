@@ -22,14 +22,20 @@ public:
 	T d;
 	
 public:
-	PlaneT() = default;
+	SLIB_INLINE PlaneT() = default;
 	
-	PlaneT(const PlaneT<T>& other) = default;
+	SLIB_CONSTEXPR PlaneT(const PlaneT<T>& other):
+	 a(other.a), b(other.b), c(other.c), d(other.d)
+	{}
 	
 	template <class O>
-	PlaneT(const PlaneT<O>& other);
+	SLIB_CONSTEXPR PlaneT(const PlaneT<O>& other):
+	 a((T)(other.a)), b((T)(other.b)), c((T)(other.c)), d((T)(other.d))
+	{}
 	
-	PlaneT(T a, T b, T c, T d);
+	SLIB_CONSTEXPR PlaneT(T _a, T _b, T _c, T _d):
+	 a(_a), b(_b), c(_c), d(_d)
+	{}
 	
 	PlaneT(const Vector3T<T>& point, const Vector3T<T>& normal);
 	
@@ -78,13 +84,6 @@ SLIB_MATH_NAMESPACE_END
 
 
 SLIB_MATH_NAMESPACE_BEGIN
-
-template <class T>
-template <class O>
-SLIB_INLINE PlaneT<T>::PlaneT(const PlaneT<O>& other)
-: a((T)(other.a)), b((T)(other.b)), c((T)(other.c)), d((T)(other.d))
-{
-}
 
 template <class T>
 template <class O>

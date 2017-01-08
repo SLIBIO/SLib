@@ -41,7 +41,7 @@ class _UrlRequestSession
 {
 public:
 	HINTERNET hInternet;
-	Queue< Ref<_UrlRequestConnection> > connectionPool;
+	LinkedQueue< Ref<_UrlRequestConnection> > connectionPool;
 	sl_int32 lastConnectionId;
 	HashMap< sl_int32, WeakRef<_UrlRequestConnection> > connections;
 	sl_int32 lastTaskId;
@@ -113,7 +113,7 @@ public:
 				}
 			}
 		}
-		return Ref<_UrlRequestConnection>::null();
+		return sl_null;
 	}
 
 };
@@ -124,7 +124,7 @@ class _UrlRequestDownloadStream : public AsyncStream, public IAsyncCopyListener
 {
 public:
 	WeakRef<_UrlRequest> m_request;
-	Queue< Ref<AsyncStreamRequest> > m_queueBuffers;
+	LinkedQueue< Ref<AsyncStreamRequest> > m_queueBuffers;
 	Ref<AsyncStreamRequest> m_currentBuffer;
 	DWORD m_currentReadSize;
 	sl_bool m_flagCompleteRead;
@@ -140,16 +140,16 @@ public:
 	sl_bool isOpened();
 
 	// override
-	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref);
+	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref);
 
 	// override
-	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref)
+	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref)
 	{
 		return sl_false;
 	}
 
 	// override
-	sl_bool addTask(const Callback& callback)
+	sl_bool addTask(const Function<void()>& callback)
 	{
 		return sl_false;
 	}
@@ -174,9 +174,9 @@ public:
 	Memory m_bufPacket;
 	DWORD m_sizeReadPacket;
 
-	SafeRef<AsyncFile> m_downloadFile;
-	SafeRef<_UrlRequestDownloadStream> m_downloadStream;
-	SafeRef<AsyncCopy> m_downloadCopy;
+	AtomicRef<AsyncFile> m_downloadFile;
+	AtomicRef<_UrlRequestDownloadStream> m_downloadStream;
+	AtomicRef<AsyncCopy> m_downloadCopy;
 
 	enum {
 		STEP_CONNECT, STEP_SEND_REQUEST, STEP_RECEIVE_DATA, STEP_COMPLETE, STEP_ERROR
@@ -210,7 +210,7 @@ public:
 		if (session) {
 			Memory bufPacket = Memory::create(READ_BUFFER_SIZE);
 			if (bufPacket.isNull()) {
-				return Ref<_UrlRequest>::null();
+				return sl_null;
 			}
 			LPCWSTR path;
 			Ref<_UrlRequestConnection> connection = session->getConnection(url, path);
@@ -221,11 +221,11 @@ public:
 					if (downloadFilePath.isNotEmpty()) {
 						Ref<File> file = File::openForWrite(downloadFilePath);
 						if (file.isNull()) {
-							return Ref<_UrlRequest>::null();
+							return sl_null;
 						}
 						fileDownload = AsyncFile::create(file);
 						if (fileDownload.isNull()) {
-							return Ref<_UrlRequest>::null();
+							return sl_null;
 						}
 					}
 					sl_int32 taskId = Base::interlockedIncrement32(&(session->lastTaskId)) & 0x7FFFFFFF;
@@ -250,7 +250,7 @@ public:
 				}
 			}
 		}
-		return Ref<_UrlRequest>::null();
+		return sl_null;
 	}
 
 	// override
@@ -315,7 +315,7 @@ public:
 			case STEP_CONNECT:
 				{
 					{
-						Iterator< Pair<String, String> > iterator = m_requestHeaders.iterator();
+						Iterator< Pair<String, String> > iterator = m_requestHeaders.toIterator();
 						Pair<String, String> pair;
 						if (iterator.next(&pair)) {
 							String line = String16::format("%s: %s\r\n", pair.key, pair.value);
@@ -324,7 +324,7 @@ public:
 					}
 					StringBuffer sb;
 					{
-						Iterator< Pair<String, String> > iterator = m_additionalRequestHeaders.iterator();
+						Iterator< Pair<String, String> > iterator = m_additionalRequestHeaders.toIterator();
 						Pair<String, String> pair;
 						while (iterator.next(&pair)) {
 							String str = pair.key;
@@ -418,7 +418,7 @@ public:
 				WCHAR buf[512];
 				DWORD len = 512;
 				if (::InternetGetLastResponseInfoW(&err, buf, &len)) {
-					SLIB_LOG_ERROR("UrlRequest", String(buf, len));
+					LogError("UrlRequest", String(buf, len));
 				}
 			}
 			processError();
@@ -491,7 +491,7 @@ sl_bool _UrlRequestDownloadStream::isOpened()
 	return m_request.isNotNull();
 }
 
-sl_bool _UrlRequestDownloadStream::read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref)
+sl_bool _UrlRequestDownloadStream::read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref)
 {
 	Ref<_UrlRequest> request(m_request);
 	if (request.isNotNull()) {
@@ -503,7 +503,7 @@ sl_bool _UrlRequestDownloadStream::read(void* data, sl_uint32 size, const Ptr<IA
 					return sl_true;
 				}
 			} else {
-				return readBuffer(request.ptr, request->m_hRequest, buf.ptr);
+				return readBuffer(request.get(), request->m_hRequest, buf.get());
 			}
 		}
 	}
@@ -519,17 +519,17 @@ void _UrlRequestDownloadStream::onReadBuffer(_UrlRequest* request, HINTERNET hRe
 	if (m_currentBuffer.isNotNull()) {
 		PtrLocker<IAsyncStreamListener> listener(m_currentBuffer->listener);
 		if (listener.isNotNull()) {
-			listener->onRead(this, m_currentBuffer->data, m_currentReadSize, m_currentBuffer->refData.ptr, sl_false);
+			listener->onRead(this, m_currentBuffer->data, m_currentReadSize, m_currentBuffer->refData.get(), sl_false);
 		}
 		m_currentBuffer.setNull();
 	}
 	while (m_currentBuffer.isNull()) {
 		Ref<AsyncStreamRequest> buf;
 		if (m_queueBuffers.pop(&buf)) {
-			if (!(readBuffer(request, hRequest, buf.ptr))) {
+			if (!(readBuffer(request, hRequest, buf.get()))) {
 				PtrLocker<IAsyncStreamListener> listener(buf->listener);
 				if (listener.isNotNull()) {
-					listener->onRead(this, buf->data, 0, buf->refData.ptr, sl_true);
+					listener->onRead(this, buf->data, 0, buf->refData.get(), sl_true);
 				}
 				close();
 				return;
@@ -548,7 +548,7 @@ sl_bool _UrlRequestDownloadStream::readBuffer(_UrlRequest* request, HINTERNET hR
 			request->onDownloadContent(m_currentReadSize);
 			PtrLocker<IAsyncStreamListener> listener(buffer->listener);
 			if (listener.isNotNull()) {
-				listener->onRead(this, buffer->data, m_currentReadSize, buffer->refData.ptr, sl_false);
+				listener->onRead(this, buffer->data, m_currentReadSize, buffer->refData.get(), sl_false);
 			}
 			return sl_true;
 		} else {

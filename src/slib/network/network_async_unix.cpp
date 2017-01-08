@@ -3,15 +3,14 @@
 #if defined(SLIB_PLATFORM_IS_UNIX)
 
 #include "../../../inc/slib/network/async.h"
-#include "../../../inc/slib/core/log.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
 class _Unix_AsyncTcpSocketInstance : public AsyncTcpSocketInstance
 {
 public:
-	SafeRef<AsyncStreamRequest> m_requestReading;
-	SafeRef<AsyncStreamRequest> m_requestWriting;
+	AtomicRef<AsyncStreamRequest> m_requestReading;
+	AtomicRef<AsyncStreamRequest> m_requestWriting;
 	sl_uint32 m_sizeWritten;
 	
 	sl_bool m_flagConnecting;
@@ -77,13 +76,13 @@ public:
 			}
 			sl_int32 n = socket->receive((char*)(request->data), request->size);
 			if (n > 0) {
-				_onReceive(request.ptr, n, flagError);
+				_onReceive(request.get(), n, flagError);
 			} else if (n < 0) {
-				_onReceive(request.ptr, 0, sl_true);
+				_onReceive(request.get(), 0, sl_true);
 				return;
 			} else {
 				if (flagError) {
-					_onReceive(request.ptr, 0, sl_true);
+					_onReceive(request.get(), 0, sl_true);
 				} else {
 					m_requestReading = request;
 				}
@@ -121,16 +120,16 @@ public:
 			if (n > 0) {
 				m_sizeWritten += n;
 				if (m_sizeWritten >= request->size) {
-					_onSend(request.ptr, request->size, flagError);
+					_onSend(request.get(), request->size, flagError);
 				} else {
 					m_requestWriting = request;
 				}
 			} else if (n < 0) {
-				_onSend(request.ptr, m_sizeWritten, sl_true);
+				_onSend(request.get(), m_sizeWritten, sl_true);
 				return;
 			} else {
 				if (flagError) {
-					_onSend(request.ptr, m_sizeWritten, sl_true);
+					_onSend(request.get(), m_sizeWritten, sl_true);
 				} else {
 					m_requestWriting = request;
 				}
@@ -200,7 +199,7 @@ public:
 Ref<AsyncTcpSocket> AsyncTcpSocket::create(const Ref<Socket>& socket, const Ref<AsyncIoLoop>& loop)
 {
 	Ref<_Unix_AsyncTcpSocketInstance> ret = _Unix_AsyncTcpSocketInstance::create(socket);
-	return AsyncTcpSocket::create(ret.ptr, loop);
+	return AsyncTcpSocket::create(ret.get(), loop);
 }
 
 class _Unix_AsyncTcpServerInstance : public AsyncTcpServerInstance
@@ -282,7 +281,7 @@ public:
 Ref<AsyncTcpServer> AsyncTcpServer::create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
 {
 	Ref<_Unix_AsyncTcpServerInstance> ret = _Unix_AsyncTcpServerInstance::create(socket, listener);
-	return AsyncTcpServer::create(ret.ptr, loop, flagAutoStart);
+	return AsyncTcpServer::create(ret.get(), loop, flagAutoStart);
 }
 
 class _Unix_AsyncUdpSocketInstance : public AsyncUdpSocketInstance
@@ -387,9 +386,9 @@ Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ref<Socket>& socket, const Ptr<
 	Memory buffer = Memory::create(packetSize);
 	if (buffer.isNotEmpty()) {
 		Ref<_Unix_AsyncUdpSocketInstance> ret = _Unix_AsyncUdpSocketInstance::create(socket, listener, buffer);
-		return AsyncUdpSocket::create(ret.ptr, loop, flagAutoStart);
+		return AsyncUdpSocket::create(ret.get(), loop, flagAutoStart);
 	}
-	return Ref<AsyncUdpSocket>::null();
+	return sl_null;
 }
 
 SLIB_NETWORK_NAMESPACE_END

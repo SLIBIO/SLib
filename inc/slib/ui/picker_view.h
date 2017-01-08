@@ -69,7 +69,7 @@ public:
 	
 	
 public:
-	SLIB_PTR_PROPERTY(IPickerViewListener, Listener)
+	SLIB_PROPERTY(AtomicPtr<IPickerViewListener>, Listener)
 	
 public:
 	virtual void onSelectItem(sl_uint32 index);
@@ -115,8 +115,8 @@ private:
 	void _setFont_NW(const Ref<Font>& font);
 
 protected:
-	SafeList<String> m_values;
-	SafeList<String> m_titles;
+	AtomicList<String> m_values;
+	AtomicList<String> m_titles;
 	sl_uint32 m_indexSelected;
 	Color m_textColor;
 	

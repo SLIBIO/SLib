@@ -142,7 +142,7 @@ public:
 			}
 			::DestroyMenu(hMenu);
 		}
-		return Ref<_Win32_Menu>::null();
+		return sl_null;
 	}
 
 	// override
@@ -164,7 +164,7 @@ public:
 			m_items.insert(index, item);
 			return item;
 		}
-		return Ref<MenuItem>::null();
+		return sl_null;
 	}
 
 	Ref<MenuItem> addSeparator()
@@ -190,7 +190,7 @@ public:
 				return item;
 			}
 		}
-		return Ref<MenuItem>::null();
+		return sl_null;
 	}
 
 	// override
@@ -199,7 +199,7 @@ public:
 		ObjectLocker lock(this);
 		if (index < m_items.getCount()) {
 			::RemoveMenu(m_hMenu, index, MF_BYPOSITION);
-			m_items.remove(index);
+			m_items.removeAt(index);
 		}
 	}
 
@@ -210,7 +210,7 @@ public:
 		sl_reg index = m_items.indexOf(item);
 		if (index >= 0) {
 			::RemoveMenu(m_hMenu, (sl_uint32)index, MF_BYPOSITION);
-			m_items.remove(index);
+			m_items.removeAt(index);
 		}
 	}
 
@@ -284,7 +284,7 @@ Ref<_Win32_MenuItem> _Win32_MenuItem::create(_Win32_Menu* parent, sl_uint32 inde
 	if (mii.hbmpUnchecked) {
 		::DeleteObject(mii.hbmpUnchecked);
 	}
-	return Ref<_Win32_MenuItem>::null();
+	return sl_null;
 }
 
 String _Win32_MenuItem::makeText(const String& title, const KeycodeAndModifiers& shortcutKey, const KeycodeAndModifiers& secondShortcutKey)
@@ -311,7 +311,7 @@ String _Win32_MenuItem::makeText(const String& title, const KeycodeAndModifiers&
 	if (parent.isNull()) { \
 		return; \
 	} \
-	ObjectLocker lock(parent.ptr); \
+	ObjectLocker lock(parent.get()); \
 	sl_reg _index = parent->m_items.indexOf(this); \
 	if (_index < 0) { \
 		return; \
@@ -385,8 +385,8 @@ void _Win32_MenuItem::setSubmenu(const Ref<Menu>& menu)
 
 HMENU UIPlatform::getMenuHandle(const Ref<Menu>& menu)
 {
-	if (_Win32_Menu::checkInstance(menu.ptr)) {
-		return ((_Win32_Menu*)(menu.ptr))->m_hMenu;
+	if (_Win32_Menu* _menu = CastInstance<_Win32_Menu>(menu.get())) {
+		return _menu->m_hMenu;
 	}
 	return NULL;
 }
@@ -397,7 +397,7 @@ Ref<Menu> UIPlatform::getMenu(HMENU hMenu)
 	if (map) {
 		return map->getValue(hMenu, WeakRef<_Win32_Menu>::null());
 	}
-	return Ref<Menu>::null();
+	return sl_null;
 }
 
 void _Win32_processMenuCommand(WPARAM wParam, LPARAM lParam)

@@ -147,7 +147,7 @@ void CheckBox::dispatchClick(UIEvent* ev)
 
 Ref<ViewInstance> CheckBox::createNativeWidget(ViewInstance* parent)
 {
-	return Ref<ViewInstance>::null();
+	return sl_null;
 }
 
 void CheckBox::_getChecked_NW()

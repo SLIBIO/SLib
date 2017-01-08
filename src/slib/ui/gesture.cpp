@@ -116,6 +116,8 @@ void GestureDetector::enable(GestureType type)
 		case GestureType::SwipeDown:
 			recognizer = new SwipeGestureRecognizer(this, type);
 			break;
+		default:
+			break;
 	}
 	m_recognizers[(int)type] = recognizer;
 }
@@ -169,6 +171,8 @@ void GestureDetector::processEvent(UIEvent* ev)
 		case UIAction::TouchEnd:
 		case UIAction::TouchCancel:
 			m_tracker.addMovement(ev);
+			break;
+		default:
 			break;
 	}
 	for (i = 0; i < nRecognizers; i++) {

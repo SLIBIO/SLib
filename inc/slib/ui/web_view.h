@@ -52,7 +52,7 @@ public:
 	String getErrorMessage();
 	
 public:
-	SLIB_PTR_PROPERTY(IWebViewListener, Listener)
+	SLIB_PROPERTY(AtomicPtr<IWebViewListener>, Listener)
 	
 protected:
 	virtual void onStartLoad(const String& url);
@@ -92,10 +92,10 @@ private:
 	void _runJavaScript_NW(const String& script);
 	
 protected:
-	SafeString m_urlOrigin;
-	SafeString m_offlineContentHTML;
+	AtomicString m_urlOrigin;
+	AtomicString m_offlineContentHTML;
 	sl_bool m_flagOfflineContent;
-	SafeString m_lastErrorMessage;
+	AtomicString m_lastErrorMessage;
 	
 };
 

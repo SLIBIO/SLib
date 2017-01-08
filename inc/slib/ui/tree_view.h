@@ -114,9 +114,9 @@ public:
 	void setHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 public:
-	SLIB_CALLBACK_PROPERTY(OnSelect)
-	SLIB_REF_PROPERTY(Referable, UserObject)
-	SLIB_VARIANT_PROPERTY(UserData)
+	SLIB_PROPERTY(AtomicFunction<void()>, OnSelect)
+	SLIB_PROPERTY(AtomicRef<Referable>, UserObject)
+	SLIB_PROPERTY(AtomicVariant, UserData)
 	
 private:
 	void _addChild(TreeViewItem* item, UIUpdateMode mode);
@@ -132,17 +132,17 @@ private:
 	Ref<_TreeContentView> _getContentView();
 	
 private:
-	SafeString m_id;
-	SafeWeakRef<TreeView> m_tree;
-	SafeWeakRef<TreeViewItem> m_parent;
+	AtomicString m_id;
+	AtomicWeakRef<TreeView> m_tree;
+	AtomicWeakRef<TreeViewItem> m_parent;
 	sl_uint32 m_level;
 	CList< Ref<TreeViewItem> > m_children;
 	sl_bool m_flagOpened;
-	SafeRef<Drawable> m_icon;
-	SafeRef<Drawable> m_iconOpened;
-	SafeRef<Drawable> m_iconClosed;
-	SafeString m_text;
-	SafeRef<View> m_customView;
+	AtomicRef<Drawable> m_icon;
+	AtomicRef<Drawable> m_iconOpened;
+	AtomicRef<Drawable> m_iconClosed;
+	AtomicString m_text;
+	AtomicRef<View> m_customView;
 	Color m_textColor;
 	Color m_hoverTextColor;
 	Color m_selectedTextColor;
@@ -150,7 +150,7 @@ private:
 	
 	UIRect m_frame;
 	sl_ui_pos m_bottomChildren;
-	SafeRef<Drawable> m_iconDrawing;
+	AtomicRef<Drawable> m_iconDrawing;
 	
 	friend class TreeView;
 };
@@ -245,7 +245,7 @@ public:
 	void setTextIndent(sl_ui_pos indent, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 public:
-	SLIB_PTR_PROPERTY(ITreeViewListener, Listener);
+	SLIB_PROPERTY(AtomicPtr<ITreeViewListener>, Listener);
 	
 public:
 	virtual void onSelectItem(TreeViewItem* item);
@@ -293,11 +293,11 @@ private:
 	
 	Ref<TreeViewItem> m_root;
 	
-	SafeRef<Drawable> m_itemIcon;
-	SafeRef<Drawable> m_itemIconOpened;
-	SafeRef<Drawable> m_itemIconClosed;
-	SafeRef<Drawable> m_iconCollapsed;
-	SafeRef<Drawable> m_iconExpanded;
+	AtomicRef<Drawable> m_itemIcon;
+	AtomicRef<Drawable> m_itemIconOpened;
+	AtomicRef<Drawable> m_itemIconClosed;
+	AtomicRef<Drawable> m_iconCollapsed;
+	AtomicRef<Drawable> m_iconExpanded;
 	
 	Color m_selectedItemBackgroundColor;
 	Color m_itemTextColor;
@@ -311,8 +311,8 @@ private:
 	
 	sl_ui_len m_layoutTextHeight;
 	
-	SafeRef<TreeViewItem> m_itemHover;
-	SafeRef<TreeViewItem> m_itemSelected;
+	AtomicRef<TreeViewItem> m_itemHover;
+	AtomicRef<TreeViewItem> m_itemSelected;
 	
 	sl_bool m_flagBeginTapping;
 	UIPointf m_pointBeginTapping;

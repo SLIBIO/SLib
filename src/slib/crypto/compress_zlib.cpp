@@ -350,7 +350,7 @@ Memory Zlib::compress(const void* data, sl_size size, sl_int32 level)
 	if (zlib.start(level)) {
 		return zlib.compress(data, size, sl_true);
 	}
-	return Memory::null();
+	return sl_null;
 }
 
 Memory Zlib::compressRaw(const void* data, sl_size size, sl_int32 level)
@@ -359,7 +359,7 @@ Memory Zlib::compressRaw(const void* data, sl_size size, sl_int32 level)
 	if (zlib.startRaw(level)) {
 		return zlib.compress(data, size, sl_true);
 	}
-	return Memory::null();
+	return sl_null;
 }
 
 Memory Zlib::compressGzip(const GzipParam& param, const void* data, sl_size size, sl_int32 level)
@@ -368,7 +368,7 @@ Memory Zlib::compressGzip(const GzipParam& param, const void* data, sl_size size
 	if (zlib.startGzip(param, level)) {
 		return zlib.compress(data, size, sl_true);
 	}
-	return Memory::null();
+	return sl_null;
 }
 
 Memory Zlib::compressGzip(const void* data, sl_size size, sl_int32 level)
@@ -383,7 +383,7 @@ Memory Zlib::decompress(const void* data, sl_size size)
 	if (zlib.start()) {
 		return zlib.decompress(data, size);
 	}
-	return Memory::null();
+	return sl_null;
 }
 
 Memory Zlib::decompressRaw(const void* data, sl_size size)
@@ -392,7 +392,7 @@ Memory Zlib::decompressRaw(const void* data, sl_size size)
 	if (zlib.startRaw()) {
 		return zlib.decompress(data, size);
 	}
-	return Memory::null();
+	return sl_null;
 }
 
 SLIB_CRYPTO_NAMESPACE_END

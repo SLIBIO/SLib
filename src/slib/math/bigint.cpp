@@ -887,7 +887,7 @@ CBigInt* CBigInt::fromString(const String& s, sl_uint32 radix)
 String CBigInt::toString(sl_uint32 radix) const
 {
 	if (radix < 2 || radix > 64) {
-		return String::null();
+		return sl_null;
 	}
 	sl_size nb = getMostSignificantBits();
 	if (nb == 0) {
@@ -928,11 +928,11 @@ String CBigInt::toString(sl_uint32 radix) const
 		sl_size n = (sl_size)(Math::ceil((nb + 1) / Math::log2((double)radix))) + 1;
 		SLIB_SCOPED_BUFFER(sl_uint32, STACK_BUFFER_SIZE, a, ne);
 		if (!a) {
-			return String::null();
+			return sl_null;
 		}
 		SLIB_SCOPED_BUFFER(sl_char8, STACK_BUFFER_SIZE, s, n + 2);
 		if (!s) {
-			return String::null();
+			return sl_null;
 		}
 		s = s + n;
 		s[1] = 0;
@@ -968,8 +968,8 @@ String CBigInt::toHexString() const
 	return toString(16);
 }
 
-template <class CT, class ST>
-static sl_reg _CBigInt_parseString(CBigInt* out, const CT* sz, sl_size posBegin, sl_size len, sl_uint32 radix)
+template <class CT>
+static sl_reg _CBigInt_parseString(CBigInt* _out, const CT* sz, sl_size posBegin, sl_size len, sl_uint32 radix)
 {
 	if (radix < 2 || radix > 64) {
 		return SLIB_PARSE_ERROR;;
@@ -1000,18 +1000,18 @@ static sl_reg _CBigInt_parseString(CBigInt* out, const CT* sz, sl_size posBegin,
 	if (end <= pos) {
 		return SLIB_PARSE_ERROR;
 	}
-	if (!out) {
+	if (!_out) {
 		return end;
 	}
-	out->sign = sign;
+	_out->sign = sign;
 	if (radix == 16) {
-		out->setZero();
+		_out->setZero();
 		sl_size nh = end - pos;
 		sl_size ne = ((nh << 2) + 31) >> 5;
-		if (!(out->growLength(ne))) {
+		if (!(_out->growLength(ne))) {
 			return SLIB_PARSE_ERROR;
 		}
-		sl_uint32* elements = out->elements;
+		sl_uint32* elements = _out->elements;
 		sl_size ih = nh - 1;
 		for (; pos < end; pos++) {
 			sl_uint32 c = (sl_uint8)(sz[pos]);
@@ -1045,15 +1045,24 @@ static sl_reg _CBigInt_parseString(CBigInt* out, const CT* sz, sl_size posBegin,
 				n++;
 			}
 		}
-		if (!(out->setValueFromElements(a, n))) {
+		if (!(_out->setValueFromElements(a, n))) {
 			return SLIB_PARSE_ERROR;
 		}
 		return pos;
 	}
 }
 
-SLIB_DEFINE_PARSE_FUNCTIONS_ARG(CBigInt, _CBigInt_parseString, sl_uint32, radix, 10)
+template <>
+sl_reg IntParser<CBigInt, sl_char8>::parse(CBigInt* _out, sl_uint32 radix, const sl_char8 *sz, sl_size posBegin, sl_size len)
+{
+	return _CBigInt_parseString(_out, sz, posBegin, len, radix);
+}
 
+template <>
+sl_reg IntParser<CBigInt, sl_char16>::parse(CBigInt* _out, sl_uint32 radix, const sl_char16 *sz, sl_size posBegin, sl_size len)
+{
+	return _CBigInt_parseString(_out, sz, posBegin, len, radix);
+}
 
 sl_int32 CBigInt::compareAbs(const CBigInt& other) const
 {
@@ -2347,8 +2356,6 @@ sl_bool CBigInt::gcd(const CBigInt& B)
 	BigInt
 */
 
-SLIB_DEFINE_REF_WRAPPER_NO_OP(BigInt, SafeBigInt, CBigInt, ref)
-
 BigInt::BigInt(sl_int32 n) : ref(CBigInt::fromInt32(n))
 {
 }
@@ -2422,25 +2429,25 @@ CBigInt& BigInt::instance() const
 
 BigInt BigInt::duplicate() const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		return o->duplicate();
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 BigInt BigInt::compact() const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		return o->duplicateCompact();
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_size BigInt::getElementsCount() const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		return o->length;
 	}
@@ -2449,7 +2456,7 @@ sl_size BigInt::getElementsCount() const
 
 sl_uint32* BigInt::getElements() const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		return o->elements;
 	}
@@ -2458,7 +2465,7 @@ sl_uint32* BigInt::getElements() const
 
 sl_int32 BigInt::getSign() const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		return o->sign;
 	}
@@ -2467,7 +2474,7 @@ sl_int32 BigInt::getSign() const
 
 sl_bool BigInt::getBit(sl_uint32 pos) const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		return o->getBit(pos);
 	}
@@ -2476,7 +2483,7 @@ sl_bool BigInt::getBit(sl_uint32 pos) const
 
 sl_size BigInt::getMostSignificantElements() const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		return o->getMostSignificantElements();
 	}
@@ -2485,7 +2492,7 @@ sl_size BigInt::getMostSignificantElements() const
 
 sl_size BigInt::getLeastSignificantElements() const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		return o->getLeastSignificantElements();
 	}
@@ -2494,7 +2501,7 @@ sl_size BigInt::getLeastSignificantElements() const
 
 sl_size BigInt::getMostSignificantBytes() const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		return o->getMostSignificantBytes();
 	}
@@ -2503,7 +2510,7 @@ sl_size BigInt::getMostSignificantBytes() const
 
 sl_size BigInt::getLeastSignificantBytes() const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		return o->getLeastSignificantBytes();
 	}
@@ -2512,7 +2519,7 @@ sl_size BigInt::getLeastSignificantBytes() const
 
 sl_size BigInt::getMostSignificantBits() const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		return o->getMostSignificantBits();
 	}
@@ -2521,7 +2528,7 @@ sl_size BigInt::getMostSignificantBits() const
 
 sl_size BigInt::getLeastSignificantBits() const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		return o->getLeastSignificantBits();
 	}
@@ -2530,7 +2537,7 @@ sl_size BigInt::getLeastSignificantBits() const
 
 sl_bool BigInt::isZero() const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		return o->isZero();
 	}
@@ -2539,7 +2546,7 @@ sl_bool BigInt::isZero() const
 
 sl_bool BigInt::isNotZero() const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		return o->isNotZero();
 	}
@@ -2548,7 +2555,7 @@ sl_bool BigInt::isNotZero() const
 
 sl_bool BigInt::getBytesLE(void* buf, sl_size n) const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		return o->getBytesLE(buf, n);
 	}
@@ -2557,16 +2564,16 @@ sl_bool BigInt::getBytesLE(void* buf, sl_size n) const
 
 Memory BigInt::getBytesLE() const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		return o->getBytesLE();
 	}
-	return Memory::null();
+	return sl_null;
 }
 
 sl_bool BigInt::getBytesBE(void* buf, sl_size n) const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		return o->getBytesBE(buf, n);
 	}
@@ -2575,16 +2582,16 @@ sl_bool BigInt::getBytesBE(void* buf, sl_size n) const
 
 Memory BigInt::getBytesBE() const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		return o->getBytesBE();
 	}
-	return Memory::null();
+	return sl_null;
 }
 
 String BigInt::toString(sl_uint32 radix) const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		return o->toString(radix);
 	} else {
@@ -2600,8 +2607,8 @@ String BigInt::toHexString() const
 
 sl_int32 BigInt::compare(const BigInt& other) const
 {
-	CBigInt* a = ref.ptr;
-	CBigInt* b = other.ref.ptr;
+	CBigInt* a = ref._ptr;
+	CBigInt* b = other.ref._ptr;
 	if (a) {
 		if (b) {
 			return a->compare(*b);
@@ -2619,7 +2626,7 @@ sl_int32 BigInt::compare(const BigInt& other) const
 
 sl_int32 BigInt::compare(sl_int32 v) const
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (a) {
 		return a->compare(v);
 	} else {
@@ -2635,7 +2642,7 @@ sl_int32 BigInt::compare(sl_int32 v) const
 
 sl_int32 BigInt::compare(sl_uint32 v) const
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (a) {
 		return a->compare(v);
 	} else {
@@ -2645,7 +2652,7 @@ sl_int32 BigInt::compare(sl_uint32 v) const
 
 sl_int32 BigInt::compare(sl_int64 v) const
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (a) {
 		return a->compare(v);
 	} else {
@@ -2661,7 +2668,7 @@ sl_int32 BigInt::compare(sl_int64 v) const
 
 sl_int32 BigInt::compare(sl_uint64 v) const
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (a) {
 		return a->compare(v);
 	} else {
@@ -2671,8 +2678,8 @@ sl_int32 BigInt::compare(sl_uint64 v) const
 
 BigInt BigInt::add(const BigInt& A, const BigInt& B)
 {
-	CBigInt* a = A.ref.ptr;
-	CBigInt* b = B.ref.ptr;
+	CBigInt* a = A.ref._ptr;
+	CBigInt* b = B.ref._ptr;
 	if (b) {
 		if (a) {
 			CBigInt* r = new CBigInt;
@@ -2688,13 +2695,13 @@ BigInt BigInt::add(const BigInt& A, const BigInt& B)
 	} else {
 		return a;
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::add(const BigInt& other)
 {
-	CBigInt* a = ref.ptr;
-	CBigInt* b = other.ref.ptr;
+	CBigInt* a = ref._ptr;
+	CBigInt* b = other.ref._ptr;
 	if (b) {
 		if (a) {
 			return a->add(*a, *b);
@@ -2713,7 +2720,7 @@ sl_bool BigInt::add(const BigInt& other)
 
 BigInt BigInt::add(const BigInt& A, sl_int32 v)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (v) {
 		if (a) {
 			CBigInt* r = new CBigInt;
@@ -2729,12 +2736,12 @@ BigInt BigInt::add(const BigInt& A, sl_int32 v)
 	} else {
 		return a;
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::add(sl_int32 v)
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (v) {
 		if (a) {
 			return a->add(*a, v);
@@ -2753,7 +2760,7 @@ sl_bool BigInt::add(sl_int32 v)
 
 BigInt BigInt::add(const BigInt& A, sl_uint32 v)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (v) {
 		if (a) {
 			CBigInt* r = new CBigInt;
@@ -2769,12 +2776,12 @@ BigInt BigInt::add(const BigInt& A, sl_uint32 v)
 	} else {
 		return a;
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::add(sl_uint32 v)
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (v) {
 		if (a) {
 			return a->add(*a, v);
@@ -2793,7 +2800,7 @@ sl_bool BigInt::add(sl_uint32 v)
 
 BigInt BigInt::add(const BigInt& A, sl_int64 v)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (v) {
 		if (a) {
 			CBigInt* r = new CBigInt;
@@ -2809,12 +2816,12 @@ BigInt BigInt::add(const BigInt& A, sl_int64 v)
 	} else {
 		return a;
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::add(sl_int64 v)
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (v) {
 		if (a) {
 			return a->add(*a, v);
@@ -2833,7 +2840,7 @@ sl_bool BigInt::add(sl_int64 v)
 
 BigInt BigInt::add(const BigInt& A, sl_uint64 v)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (v) {
 		if (a) {
 			CBigInt* r = new CBigInt;
@@ -2849,12 +2856,12 @@ BigInt BigInt::add(const BigInt& A, sl_uint64 v)
 	} else {
 		return a;
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::add(sl_uint64 v)
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (v) {
 		if (a) {
 			return a->add(*a, v);
@@ -2878,8 +2885,8 @@ sl_bool BigInt::increase()
 
 BigInt BigInt::sub(const BigInt& A, const BigInt& B)
 {
-	CBigInt* a = A.ref.ptr;
-	CBigInt* b = B.ref.ptr;
+	CBigInt* a = A.ref._ptr;
+	CBigInt* b = B.ref._ptr;
 	if (b) {
 		if (a) {
 			CBigInt* r = new CBigInt;
@@ -2899,13 +2906,13 @@ BigInt BigInt::sub(const BigInt& A, const BigInt& B)
 	} else {
 		return a;
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::sub(const BigInt& other)
 {
-	CBigInt* a = ref.ptr;
-	CBigInt* b = other.ref.ptr;
+	CBigInt* a = ref._ptr;
+	CBigInt* b = other.ref._ptr;
 	if (b) {
 		if (a) {
 			return a->sub(*a, *b);
@@ -2925,7 +2932,7 @@ sl_bool BigInt::sub(const BigInt& other)
 
 BigInt BigInt::sub(const BigInt& A, sl_int32 v)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (v) {
 		if (a) {
 			CBigInt* r = new CBigInt;
@@ -2941,12 +2948,12 @@ BigInt BigInt::sub(const BigInt& A, sl_int32 v)
 	} else {
 		return a;
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::sub(sl_int32 v)
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (v) {
 		if (a) {
 			return a->sub(*a, v);
@@ -2965,7 +2972,7 @@ sl_bool BigInt::sub(sl_int32 v)
 
 BigInt BigInt::sub(const BigInt& A, sl_uint32 v)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (v) {
 		if (a) {
 			CBigInt* r = new CBigInt;
@@ -2981,12 +2988,12 @@ BigInt BigInt::sub(const BigInt& A, sl_uint32 v)
 	} else {
 		return a;
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::sub(sl_uint32 v)
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (v) {
 		if (a) {
 			return a->sub(*a, v);
@@ -3006,7 +3013,7 @@ sl_bool BigInt::sub(sl_uint32 v)
 
 BigInt BigInt::sub(const BigInt& A, sl_int64 v)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (v) {
 		if (a) {
 			CBigInt* r = new CBigInt;
@@ -3022,12 +3029,12 @@ BigInt BigInt::sub(const BigInt& A, sl_int64 v)
 	} else {
 		return a;
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::sub(sl_int64 v)
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (v) {
 		if (a) {
 			return a->sub(*a, v);
@@ -3046,7 +3053,7 @@ sl_bool BigInt::sub(sl_int64 v)
 
 BigInt BigInt::sub(const BigInt& A, sl_uint64 v)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (v) {
 		if (a) {
 			CBigInt* r = new CBigInt;
@@ -3066,12 +3073,12 @@ BigInt BigInt::sub(const BigInt& A, sl_uint64 v)
 	} else {
 		return a;
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::sub(sl_uint64 v)
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (v) {
 		if (a) {
 			return a->sub(*a, v);
@@ -3096,7 +3103,7 @@ sl_bool BigInt::decrease()
 
 void BigInt::makeNegative() const
 {
-	CBigInt* o = ref.ptr;
+	CBigInt* o = ref._ptr;
 	if (o) {
 		o->makeNagative();
 	}
@@ -3111,9 +3118,9 @@ BigInt BigInt::negative() const
 
 BigInt BigInt::mul(const BigInt& A, const BigInt& B)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (a) {
-		CBigInt* b = B.ref.ptr;
+		CBigInt* b = B.ref._ptr;
 		if (b) {
 			CBigInt* r = new CBigInt;
 			if (r) {
@@ -3124,13 +3131,13 @@ BigInt BigInt::mul(const BigInt& A, const BigInt& B)
 			}
 		}
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::mul(const BigInt& other)
 {
-	CBigInt* a = ref.ptr;
-	CBigInt* b = other.ref.ptr;
+	CBigInt* a = ref._ptr;
+	CBigInt* b = other.ref._ptr;
 	if (a) {
 		if (b) {
 			return a->mul(*a, *b);
@@ -3146,7 +3153,7 @@ sl_bool BigInt::mul(const BigInt& other)
 
 BigInt BigInt::mul(const BigInt& A, sl_int32 v)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (a) {
 		if (v) {
 			CBigInt* r = new CBigInt;
@@ -3158,12 +3165,12 @@ BigInt BigInt::mul(const BigInt& A, sl_int32 v)
 			}
 		}
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::mul(sl_int32 v)
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (a) {
 		if (v) {
 			return a->mul(*a, v);
@@ -3179,7 +3186,7 @@ sl_bool BigInt::mul(sl_int32 v)
 
 BigInt BigInt::mul(const BigInt& A, sl_uint32 v)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (a) {
 		if (v) {
 			CBigInt* r = new CBigInt;
@@ -3191,12 +3198,12 @@ BigInt BigInt::mul(const BigInt& A, sl_uint32 v)
 			}
 		}
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::mul(sl_uint32 v)
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (a) {
 		if (v) {
 			return a->mul(*a, v);
@@ -3212,7 +3219,7 @@ sl_bool BigInt::mul(sl_uint32 v)
 
 BigInt BigInt::mul(const BigInt& A, sl_int64 v)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (a) {
 		if (v) {
 			CBigInt* r = new CBigInt;
@@ -3224,12 +3231,12 @@ BigInt BigInt::mul(const BigInt& A, sl_int64 v)
 			}
 		}
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::mul(sl_int64 v)
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (a) {
 		if (v) {
 			return a->mul(*a, v);
@@ -3245,7 +3252,7 @@ sl_bool BigInt::mul(sl_int64 v)
 
 BigInt BigInt::mul(const BigInt& A, sl_uint64 v)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (a) {
 		if (v) {
 			CBigInt* r = new CBigInt;
@@ -3257,12 +3264,12 @@ BigInt BigInt::mul(const BigInt& A, sl_uint64 v)
 			}
 		}
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::mul(sl_uint64 v)
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (a) {
 		if (v) {
 			return a->mul(*a, v);
@@ -3278,8 +3285,8 @@ sl_bool BigInt::mul(sl_uint64 v)
 
 BigInt BigInt::div(const BigInt& A, const BigInt& B, BigInt* remainder)
 {
-	CBigInt* a = A.ref.ptr;
-	CBigInt* b = B.ref.ptr;
+	CBigInt* a = A.ref._ptr;
+	CBigInt* b = B.ref._ptr;
 	if (b) {
 		if (a) {
 			CBigInt* q = new CBigInt;
@@ -3303,15 +3310,15 @@ BigInt BigInt::div(const BigInt& A, const BigInt& B, BigInt* remainder)
 		}
 	}
 	if (remainder) {
-		*remainder = BigInt::null();
+		remainder->setNull();
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::div(const BigInt& other, BigInt* remainder)
 {
-	CBigInt* a = ref.ptr;
-	CBigInt* b = other.ref.ptr;
+	CBigInt* a = ref._ptr;
+	CBigInt* b = other.ref._ptr;
 	if (b) {
 		if (a) {
 			if (remainder) {
@@ -3330,7 +3337,7 @@ sl_bool BigInt::div(const BigInt& other, BigInt* remainder)
 			}
 		} else {
 			if (remainder) {
-				*remainder = BigInt::null();
+				remainder->setNull();
 			}
 			return sl_true;
 		}
@@ -3340,7 +3347,7 @@ sl_bool BigInt::div(const BigInt& other, BigInt* remainder)
 
 BigInt BigInt::div(const BigInt& A, sl_int32 v, sl_uint32* remainder)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (v) {
 		if (a) {
 			CBigInt* q = new CBigInt;
@@ -3355,12 +3362,12 @@ BigInt BigInt::div(const BigInt& A, sl_int32 v, sl_uint32* remainder)
 	if (remainder) {
 		*remainder = 0;
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::div(sl_int32 v, sl_uint32* remainder)
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (v) {
 		if (a) {
 			if (CBigInt::div(*a, v, a, remainder)) {
@@ -3378,7 +3385,7 @@ sl_bool BigInt::div(sl_int32 v, sl_uint32* remainder)
 
 BigInt BigInt::div(const BigInt& A, sl_uint32 v, sl_uint32* remainder)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (v) {
 		if (a) {
 			CBigInt* q = new CBigInt;
@@ -3393,12 +3400,12 @@ BigInt BigInt::div(const BigInt& A, sl_uint32 v, sl_uint32* remainder)
 	if (remainder) {
 		*remainder = 0;
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::div(sl_uint32 v, sl_uint32* remainder)
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (v) {
 		if (a) {
 			if (CBigInt::div(*a, v, a, remainder)) {
@@ -3416,7 +3423,7 @@ sl_bool BigInt::div(sl_uint32 v, sl_uint32* remainder)
 
 BigInt BigInt::div(const BigInt& A, sl_int64 v, sl_uint64* remainder)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (v) {
 		if (a) {
 			CBigInt* q = new CBigInt;
@@ -3431,12 +3438,12 @@ BigInt BigInt::div(const BigInt& A, sl_int64 v, sl_uint64* remainder)
 	if (remainder) {
 		*remainder = 0;
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::div(sl_int64 v, sl_uint64* remainder)
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (v) {
 		if (a) {
 			if (CBigInt::div(*a, v, a, remainder)) {
@@ -3454,7 +3461,7 @@ sl_bool BigInt::div(sl_int64 v, sl_uint64* remainder)
 
 BigInt BigInt::div(const BigInt& A, sl_uint64 v, sl_uint64* remainder)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (v) {
 		if (a) {
 			CBigInt* q = new CBigInt;
@@ -3469,12 +3476,12 @@ BigInt BigInt::div(const BigInt& A, sl_uint64 v, sl_uint64* remainder)
 	if (remainder) {
 		*remainder = 0;
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::div(sl_uint64 v, sl_uint64* remainder)
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (v) {
 		if (a) {
 			if (CBigInt::div(*a, v, a, remainder)) {
@@ -3492,8 +3499,8 @@ sl_bool BigInt::div(sl_uint64 v, sl_uint64* remainder)
 
 BigInt BigInt::mod(const BigInt& A, const BigInt& B)
 {
-	CBigInt* a = A.ref.ptr;
-	CBigInt* b = B.ref.ptr;
+	CBigInt* a = A.ref._ptr;
+	CBigInt* b = B.ref._ptr;
 	if (b) {
 		if (a) {
 			CBigInt* r = new CBigInt;
@@ -3505,13 +3512,13 @@ BigInt BigInt::mod(const BigInt& A, const BigInt& B)
 			}
 		}
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::mod(const BigInt& other)
 {
-	CBigInt* a = ref.ptr;
-	CBigInt* b = other.ref.ptr;
+	CBigInt* a = ref._ptr;
+	CBigInt* b = other.ref._ptr;
 	if (b) {
 		if (a) {
 			return CBigInt::div(*a, *b, sl_null, a);
@@ -3524,7 +3531,7 @@ sl_bool BigInt::mod(const BigInt& other)
 
 sl_uint32 BigInt::mod(const BigInt& A, sl_int32 v)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (a) {
 		sl_uint32 r;
 		if (CBigInt::div(*a, v, sl_null, &r)) {
@@ -3536,7 +3543,7 @@ sl_uint32 BigInt::mod(const BigInt& A, sl_int32 v)
 
 sl_uint32 BigInt::mod(const BigInt& A, sl_uint32 v)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (a) {
 		sl_uint32 r;
 		if (CBigInt::div(*a, v, sl_null, &r)) {
@@ -3548,7 +3555,7 @@ sl_uint32 BigInt::mod(const BigInt& A, sl_uint32 v)
 
 sl_uint64 BigInt::mod(const BigInt& A, sl_int64 v)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (a) {
 		sl_uint64 r;
 		if (CBigInt::div(*a, v, sl_null, &r)) {
@@ -3560,7 +3567,7 @@ sl_uint64 BigInt::mod(const BigInt& A, sl_int64 v)
 
 sl_uint64 BigInt::mod(const BigInt& A, sl_uint64 v)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (a) {
 		sl_uint64 r;
 		if (CBigInt::div(*a, v, sl_null, &r)) {
@@ -3572,7 +3579,7 @@ sl_uint64 BigInt::mod(const BigInt& A, sl_uint64 v)
 
 BigInt BigInt::shiftLeft(const BigInt& A, sl_size n)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (n) {
 		if (a) {
 			CBigInt* r = new CBigInt;
@@ -3586,12 +3593,12 @@ BigInt BigInt::shiftLeft(const BigInt& A, sl_size n)
 	} else {
 		return a;
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::shiftLeft(sl_size n)
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (n) {
 		if (a) {
 			return a->shiftLeft(*a, n);
@@ -3606,7 +3613,7 @@ sl_bool BigInt::shiftLeft(sl_size n)
 
 BigInt BigInt::shiftRight(const BigInt& A, sl_size n)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (n) {
 		if (a) {
 			CBigInt* r = new CBigInt;
@@ -3620,12 +3627,12 @@ BigInt BigInt::shiftRight(const BigInt& A, sl_size n)
 	} else {
 		return a;
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::shiftRight(sl_size n)
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (n) {
 		if (a) {
 			return a->shiftRight(*a, n);
@@ -3640,8 +3647,8 @@ sl_bool BigInt::shiftRight(sl_size n)
 
 BigInt BigInt::pow(const BigInt& A, const BigInt& E, const BigInt* pM)
 {
-	CBigInt* a = A.ref.ptr;
-	CBigInt* e = E.ref.ptr;
+	CBigInt* a = A.ref._ptr;
+	CBigInt* e = E.ref._ptr;
 	if (!e || e->isZero()) {
 		return fromInt32(1);
 	}
@@ -3649,7 +3656,7 @@ BigInt BigInt::pow(const BigInt& A, const BigInt& E, const BigInt* pM)
 		CBigInt* r = new CBigInt;
 		if (r) {
 			if (pM) {
-				if (r->pow(*a, *e, pM->ref.ptr)) {
+				if (r->pow(*a, *e, pM->ref._ptr)) {
 					return r;
 				}
 			} else {
@@ -3660,13 +3667,13 @@ BigInt BigInt::pow(const BigInt& A, const BigInt& E, const BigInt* pM)
 			delete r;
 		}
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::pow(const BigInt& E, const BigInt* pM)
 {
-	CBigInt* a = ref.ptr;
-	CBigInt* e = E.ref.ptr;
+	CBigInt* a = ref._ptr;
+	CBigInt* e = E.ref._ptr;
 	if (!e || e->isZero()) {
 		if (a) {
 			if (a->setValue(1)) {
@@ -3682,7 +3689,7 @@ sl_bool BigInt::pow(const BigInt& E, const BigInt* pM)
 	} else {
 		if (a) {
 			if (pM) {
-				return a->pow(*a, *e, pM->ref.ptr);
+				return a->pow(*a, *e, pM->ref._ptr);
 			} else {
 				return a->pow(*a, *e, sl_null);
 			}
@@ -3695,7 +3702,7 @@ sl_bool BigInt::pow(const BigInt& E, const BigInt* pM)
 
 BigInt BigInt::pow(const BigInt& A, sl_uint32 E, const BigInt* pM)
 {
-	CBigInt* a = A.ref.ptr;
+	CBigInt* a = A.ref._ptr;
 	if (E) {
 		if (E == 1) {
 			return a;
@@ -3704,7 +3711,7 @@ BigInt BigInt::pow(const BigInt& A, sl_uint32 E, const BigInt* pM)
 			CBigInt* r = new CBigInt;
 			if (r) {
 				if (pM) {
-					if (r->pow(*a, E, pM->ref.ptr)) {
+					if (r->pow(*a, E, pM->ref._ptr)) {
 						return r;
 					}
 				} else {
@@ -3718,7 +3725,7 @@ BigInt BigInt::pow(const BigInt& A, sl_uint32 E, const BigInt* pM)
 	} else {
 		return fromInt32(1);
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 BigInt BigInt::pow_mod(const BigInt& A, const BigInt& E, const BigInt& M)
@@ -3733,14 +3740,14 @@ sl_bool BigInt::pow_mod(const BigInt& E, const BigInt& M)
 
 sl_bool BigInt::pow(sl_uint32 E, const BigInt* pM)
 {
-	CBigInt* a = ref.ptr;
+	CBigInt* a = ref._ptr;
 	if (E) {
 		if (E == 1) {
 			sl_true;
 		}
 		if (a) {
 			if (pM) {
-				return a->pow(*a, E, pM->ref.ptr);
+				return a->pow(*a, E, pM->ref._ptr);
 			} else {
 				return a->pow(*a, E, sl_null);
 			}
@@ -3773,9 +3780,9 @@ sl_bool BigInt::pow_mod(sl_uint32 E, const BigInt& M)
 
 BigInt BigInt::pow_montgomery(const BigInt& A, const BigInt& E, const BigInt& M)
 {
-	CBigInt* a = A.ref.ptr;
-	CBigInt* e = E.ref.ptr;
-	CBigInt* m = M.ref.ptr;
+	CBigInt* a = A.ref._ptr;
+	CBigInt* e = E.ref._ptr;
+	CBigInt* m = M.ref._ptr;
 	if (!e || e->isZero()) {
 		return fromInt32(1);
 	} else {
@@ -3791,14 +3798,14 @@ BigInt BigInt::pow_montgomery(const BigInt& A, const BigInt& E, const BigInt& M)
 			}
 		}
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 sl_bool BigInt::pow_montgomery(const BigInt& E, const BigInt& M)
 {
-	CBigInt* a = ref.ptr;
-	CBigInt* e = E.ref.ptr;
-	CBigInt* m = M.ref.ptr;
+	CBigInt* a = ref._ptr;
+	CBigInt* e = E.ref._ptr;
+	CBigInt* m = M.ref._ptr;
 	if (!e || e->isZero()) {
 		if (a) {
 			if (a->setValue(1)) {
@@ -3825,8 +3832,8 @@ sl_bool BigInt::pow_montgomery(const BigInt& E, const BigInt& M)
 
 BigInt BigInt::gcd(const BigInt& A, const BigInt& B)
 {
-	CBigInt* a = A.ref.ptr;
-	CBigInt* b = B.ref.ptr;
+	CBigInt* a = A.ref._ptr;
+	CBigInt* b = B.ref._ptr;
 	if (a) {
 		if (b) {
 			CBigInt* r = new CBigInt;
@@ -3838,13 +3845,13 @@ BigInt BigInt::gcd(const BigInt& A, const BigInt& B)
 			}
 		}
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 BigInt BigInt::inverseMod(const BigInt& A, const BigInt& M)
 {
-	CBigInt* a = A.ref.ptr;
-	CBigInt* m = M.ref.ptr;
+	CBigInt* a = A.ref._ptr;
+	CBigInt* m = M.ref._ptr;
 	if (a) {
 		if (m) {
 			CBigInt* r = new CBigInt;
@@ -3856,7 +3863,7 @@ BigInt BigInt::inverseMod(const BigInt& A, const BigInt& M)
 			}
 		}
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
 BigInt& BigInt::operator=(sl_int32 n)
@@ -4072,43 +4079,41 @@ BigInt& BigInt::operator>>=(sl_uint32 n)
 }
 
 
-SLIB_DEFINE_REF_WRAPPER_NO_OP(SafeBigInt, BigInt, CBigInt, ref)
-
-SafeBigInt::SafeBigInt(sl_int32 n) : ref(CBigInt::fromInt32(n))
+Atomic<BigInt>::Atomic(sl_int32 n) : ref(CBigInt::fromInt32(n))
 {
 }
 
-SafeBigInt::SafeBigInt(sl_uint32 n) : ref(CBigInt::fromUint32(n))
+Atomic<BigInt>::Atomic(sl_uint32 n) : ref(CBigInt::fromUint32(n))
 {
 }
 
-SafeBigInt::SafeBigInt(sl_int64 n) : ref(CBigInt::fromInt64(n))
+Atomic<BigInt>::Atomic(sl_int64 n) : ref(CBigInt::fromInt64(n))
 {
 }
 
-SafeBigInt::SafeBigInt(sl_uint64 n) : ref(CBigInt::fromUint64(n))
+Atomic<BigInt>::Atomic(sl_uint64 n) : ref(CBigInt::fromUint64(n))
 {
 }
 
-BigInt SafeBigInt::duplicate() const
+BigInt Atomic<BigInt>::duplicate() const
 {
 	Ref<CBigInt> o(ref);
 	if (o.isNotNull()) {
 		return o->duplicate();
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
-BigInt SafeBigInt::compact() const
+BigInt Atomic<BigInt>::compact() const
 {
 	Ref<CBigInt> o(ref);
 	if (o.isNotNull()) {
 		return o->duplicateCompact();
 	}
-	return BigInt::null();
+	return sl_null;
 }
 
-sl_bool SafeBigInt::isZero() const
+sl_bool Atomic<BigInt>::isZero() const
 {
 	Ref<CBigInt> o(ref);
 	if (o.isNotNull()) {
@@ -4117,7 +4122,7 @@ sl_bool SafeBigInt::isZero() const
 	return sl_true;
 }
 
-sl_bool SafeBigInt::isNotZero() const
+sl_bool Atomic<BigInt>::isNotZero() const
 {
 	Ref<CBigInt> o(ref);
 	if (o.isNotNull()) {
@@ -4126,7 +4131,7 @@ sl_bool SafeBigInt::isNotZero() const
 	return sl_false;
 }
 
-sl_bool SafeBigInt::getBytesLE(void* buf, sl_size n) const
+sl_bool Atomic<BigInt>::getBytesLE(void* buf, sl_size n) const
 {
 	Ref<CBigInt> o(ref);
 	if (o.isNotNull()) {
@@ -4135,16 +4140,16 @@ sl_bool SafeBigInt::getBytesLE(void* buf, sl_size n) const
 	return sl_false;
 }
 
-Memory SafeBigInt::getBytesLE() const
+Memory Atomic<BigInt>::getBytesLE() const
 {
 	Ref<CBigInt> o(ref);
 	if (o.isNotNull()) {
 		return o->getBytesLE();
 	}
-	return Memory::null();
+	return sl_null;
 }
 
-sl_bool SafeBigInt::getBytesBE(void* buf, sl_size n) const
+sl_bool Atomic<BigInt>::getBytesBE(void* buf, sl_size n) const
 {
 	Ref<CBigInt> o(ref);
 	if (o.isNotNull()) {
@@ -4153,70 +4158,70 @@ sl_bool SafeBigInt::getBytesBE(void* buf, sl_size n) const
 	return sl_false;
 }
 
-Memory SafeBigInt::getBytesBE() const
+Memory Atomic<BigInt>::getBytesBE() const
 {
 	Ref<CBigInt> o(ref);
 	if (o.isNotNull()) {
 		return o->getBytesBE();
 	}
-	return Memory::null();
+	return sl_null;
 }
 
-sl_int32 SafeBigInt::compare(const BigInt& other) const
+sl_int32 Atomic<BigInt>::compare(const BigInt& other) const
 {
 	BigInt o(*this);
 	return o.compare(other);
 }
 
-sl_int32 SafeBigInt::compare(sl_int32 v) const
+sl_int32 Atomic<BigInt>::compare(sl_int32 v) const
 {
 	BigInt o(*this);
 	return o.compare(v);
 }
 
-sl_int32 SafeBigInt::compare(sl_uint32 v) const
+sl_int32 Atomic<BigInt>::compare(sl_uint32 v) const
 {
 	BigInt o(*this);
 	return o.compare(v);
 }
 
-sl_int32 SafeBigInt::compare(sl_int64 v) const
+sl_int32 Atomic<BigInt>::compare(sl_int64 v) const
 {
 	BigInt o(*this);
 	return o.compare(v);
 }
 
-sl_int32 SafeBigInt::compare(sl_uint64 v) const
+sl_int32 Atomic<BigInt>::compare(sl_uint64 v) const
 {
 	BigInt o(*this);
 	return o.compare(v);
 }
 
-BigInt SafeBigInt::negative() const
+BigInt Atomic<BigInt>::negative() const
 {
 	BigInt o(*this);
 	return o.negative();
 }
 
-SafeBigInt& SafeBigInt::operator=(sl_int32 n)
+AtomicBigInt& Atomic<BigInt>::operator=(sl_int32 n)
 {
 	ref = CBigInt::fromInt32(n);
 	return *this;
 }
 
-SafeBigInt& SafeBigInt::operator=(sl_uint32 n)
+AtomicBigInt& Atomic<BigInt>::operator=(sl_uint32 n)
 {
 	ref = CBigInt::fromUint32(n);
 	return *this;
 }
 
-SafeBigInt& SafeBigInt::operator=(sl_int64 n)
+AtomicBigInt& Atomic<BigInt>::operator=(sl_int64 n)
 {
 	ref = CBigInt::fromInt64(n);
 	return *this;
 }
 
-SafeBigInt& SafeBigInt::operator=(sl_uint64 n)
+AtomicBigInt& Atomic<BigInt>::operator=(sl_uint64 n)
 {
 	ref = CBigInt::fromUint64(n);
 	return *this;

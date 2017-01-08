@@ -19,17 +19,26 @@ public:
 	T m10; T m11;
 
 public:
-	Matrix2T() = default;
+	SLIB_INLINE Matrix2T() = default;
 	
-	Matrix2T(const Matrix2T<T>& other) = default;
+	SLIB_CONSTEXPR Matrix2T(const Matrix2T<T>& other):
+	 m00(other.m00), m01(other.m01),
+	 m10(other.m10), m11(other.m11)
+	{}
 
 	template <class O>
-	Matrix2T(const Matrix2T<O>& other);
+	SLIB_CONSTEXPR Matrix2T(const Matrix2T<O>& other):
+	 m00((T)(other.m00)), m01((T)(other.m01)),
+	 m10((T)(other.m10)), m11((T)(other.m11))
+	{}
 
-	Matrix2T(
-		T m00, T m01,
-		T m10, T m11
-	);
+	SLIB_CONSTEXPR Matrix2T(
+		T _m00, T _m01,
+		T _m10, T _m11
+	):
+	 m00(_m00), m01(_m01),
+	 m10(_m10), m11(_m11)
+	{}
 	
 public:
 	static const Matrix2T<T>& zero();
@@ -42,7 +51,6 @@ public:
 	
 	static Matrix2T<T>& fromArray(T arr[4]);
 
-	
 	Vector2T<T> getRow0() const;
 	
 	void setRow0(const Vector2T<T>& v);
@@ -135,7 +143,7 @@ public:
 	sl_bool operator==(const Matrix2T<T>& other) const;
 	
 	sl_bool operator!=(const Matrix2T<T>& other) const;
-
+	
 private:
 	static T _zero[4];
 	static T _one[4];
@@ -165,50 +173,33 @@ SLIB_MATH_NAMESPACE_END
 SLIB_MATH_NAMESPACE_BEGIN
 
 template <class T>
-template <class O>
-SLIB_INLINE Matrix2T<T>::Matrix2T(const Matrix2T<O>& other)
-: m00((T)(other.m00)), m01((T)(other.m01))
-, m10((T)(other.m10)), m11((T)(other.m11))
-{
-}
-
-template <class T>
-SLIB_INLINE Matrix2T<T>::Matrix2T(
-		 T _m00, T _m01,
-		 T _m10, T _m11)
-: m00(_m00), m01(_m01)
-, m10(_m10), m11(_m11)
-{
-}
-
-template <class T>
 SLIB_INLINE const Matrix2T<T>& Matrix2T<T>::zero()
 {
-	return *((Matrix2T<T>*)((void*)(_zero)));
+	return *(reinterpret_cast<Matrix2T<T> const*>(&_zero));
 }
 
 template <class T>
 SLIB_INLINE const Matrix2T<T>& Matrix2T<T>::one()
 {
-	return *((Matrix2T<T>*)((void*)(_one)));
+	return *(reinterpret_cast<Matrix2T<T> const*>(&_one));
 }
 
 template <class T>
 SLIB_INLINE const Matrix2T<T>& Matrix2T<T>::identity()
 {
-	return *((Matrix2T<T>*)((void*)(_identity)));
+	return *(reinterpret_cast<Matrix2T<T> const*>(&_identity));
 }
 
 template <class T>
-SLIB_INLINE const Matrix2T<T>& Matrix2T<T>::fromArray(const T* arr)
+SLIB_INLINE const Matrix2T<T>& Matrix2T<T>::fromArray(const T arr[4])
 {
-	return *((Matrix2T<T>*)((void*)(arr)));
+	return *(reinterpret_cast<Matrix2T<T> const*>(arr));
 }
 
 template <class T>
-SLIB_INLINE Matrix2T<T>& Matrix2T<T>::fromArray(T* arr)
+SLIB_INLINE Matrix2T<T>& Matrix2T<T>::fromArray(T arr[4])
 {
-	return *((Matrix2T<T>*)((void*)(arr)));
+	return *(reinterpret_cast<Matrix2T<T>*>(arr));
 }
 
 template <class T>

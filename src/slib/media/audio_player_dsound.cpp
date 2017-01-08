@@ -53,13 +53,13 @@ public:
 public:
 	static void logError(String text)
 	{
-		SLIB_LOG_ERROR("AudioPlayer", text);
+		LogError("AudioPlayer", text);
 	}
 
 	static Ref<_DirectSound_AudioPlayerBuffer> create(const AudioPlayerBufferParam& param, const GUID& deviceID)
 	{
         if (param.channelsCount != 1 && param.channelsCount != 2) {
-            return Ref<_DirectSound_AudioPlayerBuffer>::null();
+            return sl_null;
         }
         
 		::CoInitializeEx(NULL, COINIT_MULTITHREADED);
@@ -160,9 +160,10 @@ public:
 				logError("Can not create direct sound playback device");
 			}
 		}
-		return Ref<_DirectSound_AudioPlayerBuffer>::null();
+		return sl_null;
 	}
 
+	// override
 	void release()
 	{
 		ObjectLocker lock(this);
@@ -185,6 +186,13 @@ public:
 		}
 	}
 
+	// override
+	sl_bool isOpened()
+	{
+		return m_flagOpened;
+	}
+
+	// override
 	void start()
 	{
 		ObjectLocker lock(this);
@@ -194,12 +202,13 @@ public:
 		if (m_flagRunning) {
 			return;
 		}
-		m_thread = Thread::start(SLIB_CALLBACK_CLASS(_DirectSound_AudioPlayerBuffer, run, this));
+		m_thread = Thread::start(SLIB_FUNCTION_CLASS(_DirectSound_AudioPlayerBuffer, run, this));
 		if (m_thread.isNotNull()) {
 			m_flagRunning = sl_true;
 		}
 	}
 
+	// override
 	void stop()
 	{
 		ObjectLocker lock(this);
@@ -214,6 +223,12 @@ public:
 		::SetEvent(m_hNotificationEvents[1]);
 		m_thread->finishAndWait();
 		m_thread.setNull();
+	}
+
+	// override
+	sl_bool isRunning()
+	{
+		return m_flagRunning;
 	}
 
 	void run()
@@ -247,15 +262,6 @@ public:
 		}
 	}
 
-	sl_bool isOpened()
-	{
-		return m_flagOpened;
-	}
-
-	sl_bool isRunning()
-	{
-		return m_flagRunning;
-	}
 };
 
 class _DirectSound_AudioPlayer : public AudioPlayer
@@ -275,7 +281,7 @@ public:
 public:
 	static void logError(String text)
 	{
-		SLIB_LOG_ERROR("AudioPlayer", text);
+		LogError("AudioPlayer", text);
 	}
 
 	static Ref<_DirectSound_AudioPlayer> create(const AudioPlayerParam& param)
@@ -302,9 +308,16 @@ public:
 		return ret;
 	}
 
+	// override
 	Ref<AudioPlayerBuffer> createBuffer(const AudioPlayerBufferParam& param)
 	{
 		return _DirectSound_AudioPlayerBuffer::create(param, m_deviceID);
+	}
+
+	// override
+	Ref<AudioPlayerControl> _openNative(const AudioPlayerOpenParam& param)
+	{
+		return sl_null;
 	}
 
 	struct DeviceProperty {
@@ -347,7 +360,7 @@ Ref<AudioPlayer> DirectSound::createPlayer(const AudioPlayerParam& param)
 List<AudioPlayerInfo> DirectSound::getPlayersList()
 {
 	List<AudioPlayerInfo> ret;
-	ListItems<_DirectSound_AudioPlayer::DeviceProperty> props(_DirectSound_AudioPlayer::queryDeviceInfos());
+	ListElements<_DirectSound_AudioPlayer::DeviceProperty> props(_DirectSound_AudioPlayer::queryDeviceInfos());
 	for (sl_size i = 0; i < props.count; i++) {
 		_DirectSound_AudioPlayer::DeviceProperty& prop = props[i];
 		AudioPlayerInfo info;
@@ -367,12 +380,12 @@ SLIB_MEDIA_NAMESPACE_BEGIN
 
 Ref<AudioPlayer> DirectSound::createPlayer(const AudioPlayerParam& param)
 {
-	return Ref<AudioPlayer>::null();
+	return sl_null;
 }
 
 List<AudioPlayerInfo> DirectSound::getPlayersList()
 {
-	return List<AudioPlayerInfo>::null();
+	return sl_null;
 }
 
 SLIB_MEDIA_NAMESPACE_END

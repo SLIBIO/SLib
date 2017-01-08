@@ -71,7 +71,7 @@ void GL::loadEntries(const String& _pathDll, sl_bool flagReload)
 	} else {
 		hDll = ::LoadLibraryW((LPCWSTR)(pathDll.getData()));
 		if (!hDll) {
-			//SLIB_LOG_ERROR("GLES", "Failed to load OpenGL dll - " + pathDll);
+			//LogError("GLES", "Failed to load OpenGL dll - %s", pathDll);
 			return;
 		}
 	}
@@ -124,7 +124,7 @@ SLIB_RENDER_NAMESPACE_BEGIN
 
 Ref<GLRenderEngine> GL::createEngine()
 {
-	return Ref<GLRenderEngine>::null();
+	return sl_null;
 }
 
 void GL::loadEntries(const String& pathDll, sl_bool flagReload)

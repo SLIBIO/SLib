@@ -70,9 +70,9 @@ public:
 	
 	static void showAlert(const String& text);
 	
-	static void showAlert(const String& text, const Callback& onOk);
+	static void showAlert(const String& text, const Function<void()>& onOk);
 	
-	static void showAlert(const String& caption, const String& text, const Callback& onOk);
+	static void showAlert(const String& caption, const String& text, const Function<void()>& onOk);
 	
 	
 	// HID related functions (Platform Specific, only for desktop apps)
@@ -103,11 +103,11 @@ public:
 	// UI Thread
 	static sl_bool isUiThread();
 	
-	static void dispatchToUiThread(const Callback& callback);
+	static void dispatchToUiThread(const Function<void()>& callback);
 	
-	static void runOnUiThread(const Callback& callback);
+	static void runOnUiThread(const Function<void()>& callback);
 	
-	static Callback getCallbackOnUiThread(const Callback& callback);
+	static Function<void()> getCallbackOnUiThread(const Function<void()>& callback);
 
 	static Ref<Dispatcher> getDispatcher();
 	
@@ -125,10 +125,10 @@ public:
 
 };
 
-#define SLIB_UI_CALLBACK(...) slib::UI::getCallbackOnUiThread(SLIB_CALLBACK(__VA_ARGS__))
-#define SLIB_UI_CALLBACK_CLASS(...) slib::UI::getCallbackOnUiThread(SLIB_CALLBACK_CLASS(__VA_ARGS__))
-#define SLIB_UI_CALLBACK_REF(...) slib::UI::getCallbackOnUiThread(SLIB_CALLBACK_REF(__VA_ARGS__))
-#define SLIB_UI_CALLBACK_WEAKREF(...) slib::UI::getCallbackOnUiThread(SLIB_CALLBACK_WEAKREF(__VA_ARGS__))
+#define SLIB_UI_CALLBACK(...) slib::UI::getCallbackOnUiThread(SLIB_BIND(void(), __VA_ARGS__))
+#define SLIB_UI_CALLBACK_CLASS(...) slib::UI::getCallbackOnUiThread(SLIB_BIND_CLASS(void(), __VA_ARGS__))
+#define SLIB_UI_CALLBACK_REF(...) slib::UI::getCallbackOnUiThread(SLIB_BIND_REF(void(), __VA_ARGS__))
+#define SLIB_UI_CALLBACK_WEAKREF(...) slib::UI::getCallbackOnUiThread(SLIB_BIND_WEAKREF(void(), __VA_ARGS__))
 
 SLIB_UI_NAMESPACE_END
 

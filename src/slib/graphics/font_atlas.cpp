@@ -75,7 +75,7 @@ Ref<FontAtlas> FontAtlas::create(const FontAtlasParam& param)
 			}
 		}
 	}
-	return Ref<FontAtlas>::null();
+	return sl_null;
 }
 
 typedef HashMap< String, WeakRef<FontAtlas> > _FontAtlasMap;
@@ -108,7 +108,7 @@ Ref<FontAtlas> FontAtlas::getShared(const Ref<Font>& font)
 			}
 		}
 	}
-	return Ref<FontAtlas>::null();
+	return sl_null;
 }
 
 sl_bool FontAtlas::getChar(sl_char16 ch, FontAtlasChar& _out)

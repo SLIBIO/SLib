@@ -138,7 +138,7 @@ String ContentTypes::toString(ContentType type)
 		default:
 			break;
 	}
-	return String::null();
+	return sl_null;
 }
 
 class _ContentType_Mapping

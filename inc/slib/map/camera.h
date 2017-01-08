@@ -109,9 +109,9 @@ protected:
 	sl_bool m_flagInvalidatedViewMatrix;
 	Matrix4lf m_viewMatrix;
 	
-	SafeRef<Animation> m_animationNavigation;
-	SafeRef<Animation> m_animationBearing;
-	SafeRef<Animation> m_animationTilt;
+	AtomicRef<Animation> m_animationNavigation;
+	AtomicRef<Animation> m_animationBearing;
+	AtomicRef<Animation> m_animationTilt;
 	
 	double m_minimumAltitudeForAnimation;
 	

@@ -91,38 +91,6 @@ protected:
 	
 };
 
-#define _SLIB_DB_DECLARE_RUN_BY_PARAMS(RET, NAME) \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS1); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS2); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS3); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS4); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS5); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS6); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS7); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS8); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS9); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS10); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS11); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS12); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS13); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS14); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS15); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS16); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS17); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS18); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS19); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS20); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS21); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS22); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS23); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS24); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS25); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS26); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS27); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS28); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS29); \
-	RET NAME##By(_SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS30);
-
 class SLIB_EXPORT DatabaseStatement : public Object
 {
 	SLIB_DECLARE_OBJECT
@@ -131,26 +99,76 @@ public:
 	Ref<Database> getDatabase();
 	
 	
-	virtual sl_int64 execute(const Variant* params = sl_null, sl_uint32 nParams = 0) = 0;
+	virtual sl_int64 executeBy(const Variant* params = sl_null, sl_uint32 nParams = 0) = 0;
 	
-	virtual Ref<DatabaseCursor> query(const Variant* params = sl_null, sl_uint32 nParams = 0) = 0;
+	SLIB_INLINE sl_int64 execute()
+	{
+		return executeBy();
+	}
+	
+	template <class... ARGS>
+	SLIB_INLINE sl_int64 execute(ARGS&&... args)
+	{
+		Variant params[] = {Forward<ARGS>(args)...};
+		return executeBy(params, sizeof...(args));
+	}
+	
+	virtual Ref<DatabaseCursor> queryBy(const Variant* params = sl_null, sl_uint32 nParams = 0) = 0;
 
+	SLIB_INLINE Ref<DatabaseCursor> query()
+	{
+		return queryBy();
+	}
 	
-	virtual List< Map<String, Variant> > getListForQueryResult(const Variant* params = sl_null, sl_uint32 nParams = 0);
-	
-	virtual Map<String, Variant> getRecordForQueryResult(const Variant* params = sl_null, sl_uint32 nParams = 0);
-	
-	virtual Variant getValueForQueryResult(const Variant* params = sl_null, sl_uint32 nParams = 0);
+	template <class... ARGS>
+	SLIB_INLINE Ref<DatabaseCursor> query(ARGS&&... args)
+	{
+		Variant params[] = {Forward<ARGS>(args)...};
+		return queryBy(params, sizeof...(args));
+	}
 
+	virtual List< Map<String, Variant> > getListForQueryResultBy(const Variant* params = sl_null, sl_uint32 nParams = 0);
 	
-#define _SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX
-	_SLIB_DB_DECLARE_RUN_BY_PARAMS(sl_int64, execute)
-	_SLIB_DB_DECLARE_RUN_BY_PARAMS(Ref<DatabaseCursor>, query)
-	_SLIB_DB_DECLARE_RUN_BY_PARAMS(VariantMapList, getListForQueryResult)
-	_SLIB_DB_DECLARE_RUN_BY_PARAMS(VariantMap, getRecordForQueryResult)
-	_SLIB_DB_DECLARE_RUN_BY_PARAMS(Variant, getValueForQueryResult)
-#undef _SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX
-
+	SLIB_INLINE List< Map<String, Variant> > getListForQueryResult()
+	{
+		return getListForQueryResultBy();
+	}
+	
+	template <class... ARGS>
+	SLIB_INLINE List< Map<String, Variant> > getListForQueryResult(ARGS&&... args)
+	{
+		Variant params[] = {Forward<ARGS>(args)...};
+		return getListForQueryResultBy(params, sizeof...(args));
+	}
+	
+	virtual Map<String, Variant> getRecordForQueryResultBy(const Variant* params = sl_null, sl_uint32 nParams = 0);
+	
+	SLIB_INLINE Map<String, Variant> getRecordForQueryResult()
+	{
+		return getRecordForQueryResultBy();
+	}
+	
+	template <class... ARGS>
+	SLIB_INLINE Map<String, Variant> getRecordForQueryResult(ARGS&&... args)
+	{
+		Variant params[] = {Forward<ARGS>(args)...};
+		return getRecordForQueryResultBy(params, sizeof...(args));
+	}
+	
+	virtual Variant getValueForQueryResultBy(const Variant* params = sl_null, sl_uint32 nParams = 0);
+	
+	SLIB_INLINE Variant getValueForQueryResult()
+	{
+		return getValueForQueryResultBy();
+	}
+	
+	template <class... ARGS>
+	SLIB_INLINE Variant getValueForQueryResult(ARGS&&... args)
+	{
+		Variant params[] = {Forward<ARGS>(args)...};
+		return getValueForQueryResultBy(params, sizeof...(args));
+	}
+	
 protected:
 	Ref<Database> m_db;
 	
@@ -175,27 +193,53 @@ public:
 	virtual Variant getValueForQueryResult(const String& sql);
 	
 	
-	virtual sl_int64 execute(const String& sql, const Variant* params, sl_uint32 nParams);
+	virtual sl_int64 executeBy(const String& sql, const Variant* params, sl_uint32 nParams);
 	
-	virtual Ref<DatabaseCursor> query(const String& sql, const Variant* params, sl_uint32 nParams);
+	template <class... ARGS>
+	SLIB_INLINE sl_int64 execute(const String& sql, ARGS&&... args)
+	{
+		Variant params[] = {Forward<ARGS>(args)...};
+		return executeBy(sql, params, sizeof...(args));
+	}
+	
+	virtual Ref<DatabaseCursor> queryBy(const String& sql, const Variant* params, sl_uint32 nParams);
 
+	template <class... ARGS>
+	SLIB_INLINE Ref<DatabaseCursor> query(const String& sql, ARGS&&... args)
+	{
+		Variant params[] = {Forward<ARGS>(args)...};
+		return queryBy(sql, params, sizeof...(args));
+	}
+
+	virtual List< Map<String, Variant> > getListForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams);
 	
-	virtual List< Map<String, Variant> > getListForQueryResult(const String& sql, const Variant* params, sl_uint32 nParams);
+	template <class... ARGS>
+	SLIB_INLINE List< Map<String, Variant> > getListForQueryResult(const String& sql, ARGS&&... args)
+	{
+		Variant params[] = {Forward<ARGS>(args)...};
+		return getListForQueryResultBy(sql, params, sizeof...(args));
+	}
+
+	virtual Map<String, Variant> getRecordForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams);
 	
-	virtual Map<String, Variant> getRecordForQueryResult(const String& sql, const Variant* params, sl_uint32 nParams);
+	template <class... ARGS>
+	SLIB_INLINE Map<String, Variant> getRecordForQueryResult(const String& sql, ARGS&&... args)
+	{
+		Variant params[] = {Forward<ARGS>(args)...};
+		return getRecordForQueryResultBy(sql, params, sizeof...(args));
+	}
 	
-	virtual Variant getValueForQueryResult(const String& sql, const Variant* params, sl_uint32 nParams);
+	virtual Variant getValueForQueryResultBy(const String& sql, const Variant* params, sl_uint32 nParams);
+
+	template <class... ARGS>
+	SLIB_INLINE Variant getValueForQueryResult(const String& sql, ARGS&&... args)
+	{
+		Variant params[] = {Forward<ARGS>(args)...};
+		return getValueForQueryResultBy(sql, params, sizeof...(args));
+	}
 
 	virtual String getErrorMessage() = 0;
 	
-	
-#define _SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX const String& sql,
-	_SLIB_DB_DECLARE_RUN_BY_PARAMS(sl_int64, execute)
-	_SLIB_DB_DECLARE_RUN_BY_PARAMS(Ref<DatabaseCursor>, query)
-	_SLIB_DB_DECLARE_RUN_BY_PARAMS(VariantMapList, getListForQueryResult)
-	_SLIB_DB_DECLARE_RUN_BY_PARAMS(VariantMap, getRecordForQueryResult)
-	_SLIB_DB_DECLARE_RUN_BY_PARAMS(Variant, getValueForQueryResult)
-#undef _SLIB_DB_DECLARE_RUN_BY_PARAMS_PREFIX
 
 };
 

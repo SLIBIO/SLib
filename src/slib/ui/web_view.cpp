@@ -58,7 +58,7 @@ String WebView::getURL()
 	if (isNativeWidget()) {
 		return _getURL_NW();
 	}
-	return String::null();
+	return sl_null;
 }
 
 String WebView::getPageTitle()
@@ -66,7 +66,7 @@ String WebView::getPageTitle()
 	if (isNativeWidget()) {
 		return _getPageTitle_NW();
 	}
-	return String::null();
+	return sl_null;
 }
 
 void WebView::goBack()
@@ -153,7 +153,7 @@ void WebView::dispatchMessageFromJavaScript(const String& msg, const String& par
 
 Ref<ViewInstance> WebView::createNativeWidget(ViewInstance* parent)
 {
-	return Ref<ViewInstance>::null();
+	return sl_null;
 }
 
 void WebView::_refreshSize_NW()
@@ -166,12 +166,12 @@ void WebView::_load_NW()
 
 String WebView::_getURL_NW()
 {
-	return String::null();
+	return sl_null;
 }
 
 String WebView::_getPageTitle_NW()
 {
-	return String::null();
+	return sl_null;
 }
 
 void WebView::_goBack_NW()

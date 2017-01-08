@@ -970,8 +970,8 @@ public:
 	void post(const Function<void()>& callback, sl_bool flagInvalidate = sl_true);
 
 public:
-	SLIB_PTR_PROPERTY(IViewListener, EventListener)
-	SLIB_CALLBACK_PROPERTY(OnClick)
+	SLIB_PROPERTY(AtomicPtr<IViewListener>, EventListener)
+	SLIB_PROPERTY(AtomicFunction<void()>, OnClick)
 	
 protected:
 	virtual void onDraw(Canvas* canvas);
@@ -1150,9 +1150,9 @@ public:
 	virtual void _setFont_NW(const Ref<Font>& font);
 
 private:
-	SafeRef<ViewInstance> m_instance;
-	SafeWeakRef<Window> m_window;
-	SafeWeakRef<View> m_parent;
+	AtomicRef<ViewInstance> m_instance;
+	AtomicWeakRef<Window> m_window;
+	AtomicWeakRef<View> m_parent;
 	
 	sl_bool m_flagCreatingInstance;
 	sl_bool m_flagCreatingChildInstances;
@@ -1175,27 +1175,27 @@ private:
 	sl_bool m_flagCurrentDrawing;
 	UIRect m_rectCurrentDrawing;
 	
-	SafeRef<Cursor> m_cursor;
+	AtomicRef<Cursor> m_cursor;
 	
-	SafeString m_id;
+	AtomicString m_id;
 	CList< Ref<View> > m_children;
-	SafeList< Ref<View> > m_childrenMultiTouch;
-	SafeRef<View> m_childMouseMove;
-	SafeRef<View> m_childMouseDown;
+	AtomicList< Ref<View> > m_childrenMultiTouch;
+	AtomicRef<View> m_childMouseMove;
+	AtomicRef<View> m_childMouseDown;
 	UIAction m_actionMouseDown;
 	sl_bool m_flagMultiTouchMode;
 	sl_bool m_flagPassEventToChildren;
-	SafeRef<View> m_childFocused;
+	AtomicRef<View> m_childFocused;
 	
 	sl_bool m_flagOnAddChild;
 	sl_bool m_flagOnRemoveChild;
 	
 	sl_bool m_flagProcessingTabStop;
-	SafeWeakRef<View> m_viewNextTabStop;
-	SafeWeakRef<View> m_viewPrevTabStop;
+	AtomicWeakRef<View> m_viewNextTabStop;
+	AtomicWeakRef<View> m_viewPrevTabStop;
 	sl_bool m_flagCapturingChildInstanceEvents;
 	
-	SafeRef<GestureDetector> m_gestureDetector;
+	AtomicRef<GestureDetector> m_gestureDetector;
 	
 	sl_ui_pos m_paddingLeft;
 	sl_ui_pos m_paddingTop;
@@ -1215,10 +1215,10 @@ protected:
 		PositionMode topMode;
 		PositionMode rightMode;
 		PositionMode bottomMode;
-		SafeWeakRef<View> leftReferingView;
-		SafeWeakRef<View> topReferingView;
-		SafeWeakRef<View> rightReferingView;
-		SafeWeakRef<View> bottomReferingView;
+		AtomicWeakRef<View> leftReferingView;
+		AtomicWeakRef<View> topReferingView;
+		AtomicWeakRef<View> rightReferingView;
+		AtomicWeakRef<View> bottomReferingView;
 		
 		sl_ui_len measuredWidth;
 		sl_ui_len measuredHeight;
@@ -1255,7 +1255,7 @@ protected:
 		sl_bool flagUpdatedLayoutFrame;
 		
 	};
-	SafeRef<LayoutAttributes> m_layoutAttributes;
+	AtomicRef<LayoutAttributes> m_layoutAttributes;
 	
 	Ref<LayoutAttributes> _initializeLayoutAttibutes();
 
@@ -1291,35 +1291,35 @@ protected:
 		Vector2 anchorOffset;
 		
 	};
-	SafeRef<TransformAttributes> m_transformAttributes;
+	AtomicRef<TransformAttributes> m_transformAttributes;
 	
 	Ref<TransformAttributes> _initializeTransformAttributes();
 	
 	class DrawAttributes : public Referable
 	{
 	public:
-		SafeRef<Drawable> background;
-		SafeRef<Drawable> backgroundPressed;
-		SafeRef<Drawable> backgroundHover;
+		AtomicRef<Drawable> background;
+		AtomicRef<Drawable> backgroundPressed;
+		AtomicRef<Drawable> backgroundHover;
 		ScaleMode backgroundScaleMode;
 		Alignment backgroundAlignment;
 		Color backgroundColor;
 		
-		SafeRef<Pen> penBorder;
+		AtomicRef<Pen> penBorder;
 		PenStyle borderStyle;
 		sl_real borderWidth;
 		Color borderColor;
 		
 		BoundShape boundShape;
 		Size roundRectBoundShapeRadius;
-		SafeRef<GraphicsPath> boundShapePath;
+		AtomicRef<GraphicsPath> boundShapePath;
 		
 		sl_bool flagPreDrawEnabled;
 		sl_bool flagPostDrawEnabled;
 		sl_bool flagOnDrawBackgroundAlways;
 		sl_bool flagOnDrawBorderAlways;
 		
-		SafeRef<Font> font;
+		AtomicRef<Font> font;
 		sl_bool flagUsingFont;
 		
 		sl_bool flagOpaque;
@@ -1327,51 +1327,51 @@ protected:
 		sl_real alphaAnimation;
 		
 		sl_bool flagLayer;
-		SafeRef<Bitmap> bitmapLayer;
-		SafeRef<Canvas> canvasLayer;
+		AtomicRef<Bitmap> bitmapLayer;
+		AtomicRef<Canvas> canvasLayer;
 		sl_bool flagInvalidatedLayer;
 		sl_bool flagInvalidatedWholeLayer;
 		UIRect rectInvalidatedLayer;
 		
 	};
-	SafeRef<DrawAttributes> m_drawAttributes;
+	AtomicRef<DrawAttributes> m_drawAttributes;
 	
 	Ref<DrawAttributes> _initializeDrawAttributes();
 
 	class AnimationAttributes : public Referable
 	{
 	public:
-		SafeRef<Animation> animationTransform;
-		SafeRef< AnimationTargetT<Matrix3> > targetTransform;
+		AtomicRef<Animation> animationTransform;
+		AtomicRef< AnimationTargetT<Matrix3> > targetTransform;
 		
-		SafeRef<Animation> animationTranslation;
-		SafeRef< AnimationTargetT<Vector2> > targetTranslation;
+		AtomicRef<Animation> animationTranslation;
+		AtomicRef< AnimationTargetT<Vector2> > targetTranslation;
 		
-		SafeRef<Animation> animationScale;
-		SafeRef< AnimationTargetT<Vector2> > targetScale;
+		AtomicRef<Animation> animationScale;
+		AtomicRef< AnimationTargetT<Vector2> > targetScale;
 		
-		SafeRef<Animation> animationRotation;
-		SafeRef< AnimationTargetT<sl_real> > targetRotation;
+		AtomicRef<Animation> animationRotation;
+		AtomicRef< AnimationTargetT<sl_real> > targetRotation;
 		
-		SafeRef<Animation> animationFrame;
-		SafeRef< AnimationTargetT<Rectangle> > targetFrame;
+		AtomicRef<Animation> animationFrame;
+		AtomicRef< AnimationTargetT<Rectangle> > targetFrame;
 		
-		SafeRef<Animation> animationAlpha;
-		SafeRef< AnimationTargetT<sl_real> > targetAlpha;
+		AtomicRef<Animation> animationAlpha;
+		AtomicRef< AnimationTargetT<sl_real> > targetAlpha;
 		
-		SafeRef<Animation> animationBackgroundColor;
-		SafeRef< AnimationTargetT<Color4f> > targetBackgroundColor;
+		AtomicRef<Animation> animationBackgroundColor;
+		AtomicRef< AnimationTargetT<Color4f> > targetBackgroundColor;
 		
 	};
-	SafeRef<AnimationAttributes> m_animationAttributes;
+	AtomicRef<AnimationAttributes> m_animationAttributes;
 	
 	Ref<AnimationAttributes> _initializeAnimationAttributes();
 	
 	class ScrollAttributes : public Referable
 	{
 	public:
-		SafeRef<ScrollBar> horz;
-		SafeRef<ScrollBar> vert;
+		AtomicRef<ScrollBar> horz;
+		AtomicRef<ScrollBar> vert;
 		sl_bool flagValidHorz;
 		sl_bool flagValidVert;
 		sl_scroll_pos x;
@@ -1390,11 +1390,11 @@ protected:
 		sl_ui_posf mouseX_DownContent;
 		sl_ui_posf mouseY_DownContent;
 	};
-	SafeRef<ScrollAttributes> m_scrollAttributes;
+	AtomicRef<ScrollAttributes> m_scrollAttributes;
 	
 	Ref<ScrollAttributes> _initializeScrollAttributes();
 	
-	Queue< Function<void()> > m_postCallbacks;
+	LinkedQueue< Function<void()> > m_postCallbacks;
 
 	friend class ListView;
 
@@ -1477,7 +1477,7 @@ public:
 	void onSwipe(GestureType type);
 	
 protected:
-	SafeWeakRef<View> m_view;
+	AtomicWeakRef<View> m_view;
 	sl_bool m_flagNativeWidget;
 	sl_bool m_flagWindowContent;
 

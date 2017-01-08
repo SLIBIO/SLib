@@ -1,6 +1,7 @@
 #include "../../../inc/slib/ui/common_dialogs.h"
 
 #include "../../../inc/slib/ui/core.h"
+#include "../../../inc/slib/ui/window.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -40,7 +41,7 @@ DialogResult AlertDialog::_runOnUiThread()
 		_AlertDialog_RunOnUIThread m;
 		m.alert = this;
 		m.event = ev;
-		UI::dispatchToUiThread(SLIB_CALLBACK_CLASS(_AlertDialog_RunOnUIThread, run, &m));
+		UI::dispatchToUiThread(SLIB_FUNCTION_CLASS(_AlertDialog_RunOnUIThread, run, &m));
 		ev->wait();
 		return m.result;
 	}
@@ -103,9 +104,9 @@ DialogResult AlertDialog::_runByShow()
 	AlertDialog alert(*this);
 	if (UI::isUiThread()) {
 		_AlertDialog_CallbackRunByShow_UIThread m;
-		alert.onOk = SLIB_CALLBACK_CLASS(_AlertDialog_CallbackRunByShow_UIThread, onOk, &m);
-		alert.onCancel = SLIB_CALLBACK_CLASS(_AlertDialog_CallbackRunByShow_UIThread, onCancel, &m);
-		alert.onNo = SLIB_CALLBACK_CLASS(_AlertDialog_CallbackRunByShow_UIThread, onNo, &m);
+		alert.onOk = SLIB_FUNCTION_CLASS(_AlertDialog_CallbackRunByShow_UIThread, onOk, &m);
+		alert.onCancel = SLIB_FUNCTION_CLASS(_AlertDialog_CallbackRunByShow_UIThread, onCancel, &m);
+		alert.onNo = SLIB_FUNCTION_CLASS(_AlertDialog_CallbackRunByShow_UIThread, onNo, &m);
 		alert._show();
 		UI::runLoop();
 		return m.result;
@@ -114,10 +115,10 @@ DialogResult AlertDialog::_runByShow()
 		if (ev.isNotNull()) {
 			_AlertDialog_CallbackRunByShow_NonUIThread m;
 			m.event = ev;
-			alert.onOk = SLIB_CALLBACK_CLASS(_AlertDialog_CallbackRunByShow_NonUIThread, onOk, &m);
-			alert.onCancel = SLIB_CALLBACK_CLASS(_AlertDialog_CallbackRunByShow_NonUIThread, onCancel, &m);
-			alert.onNo = SLIB_CALLBACK_CLASS(_AlertDialog_CallbackRunByShow_NonUIThread, onNo, &m);
-			UI::dispatchToUiThread(SLIB_CALLBACK_CLASS(AlertDialog, _show, &alert));
+			alert.onOk = SLIB_FUNCTION_CLASS(_AlertDialog_CallbackRunByShow_NonUIThread, onOk, &m);
+			alert.onCancel = SLIB_FUNCTION_CLASS(_AlertDialog_CallbackRunByShow_NonUIThread, onCancel, &m);
+			alert.onNo = SLIB_FUNCTION_CLASS(_AlertDialog_CallbackRunByShow_NonUIThread, onNo, &m);
+			UI::dispatchToUiThread(SLIB_FUNCTION_CLASS(AlertDialog, _show, &alert));
 			ev->wait();
 			return m.result;
 		}
@@ -133,7 +134,7 @@ void AlertDialog::_showOnUiThread()
 	}
 	Ref<AlertDialog> alert = new AlertDialog(*this);
 	if (alert.isNotNull()) {
-		UI::dispatchToUiThread(SLIB_CALLBACK_REF(AlertDialog, _show, alert));
+		UI::dispatchToUiThread(SLIB_FUNCTION_REF(AlertDialog, _show, alert));
 	}
 }
 
@@ -153,7 +154,7 @@ void AlertDialog::_showByRun()
 {
 	Ref<AlertDialog> alert = new AlertDialog(*this);
 	if (alert.isNotNull()) {
-		UI::dispatchToUiThread(SLIB_CALLBACK(&_AlertDialog_showByRun, alert));
+		UI::dispatchToUiThread(Function<void()>::bind(&_AlertDialog_showByRun, alert));
 	}
 }
 
@@ -179,7 +180,7 @@ void AlertDialog::show(const String& text)
 	alert.show();
 }
 
-void AlertDialog::show(const String& text, const Callback& onOk)
+void AlertDialog::show(const String& text, const Function<void()>& onOk)
 {
 	AlertDialog alert;
 	alert.text = text;
@@ -187,7 +188,7 @@ void AlertDialog::show(const String& text, const Callback& onOk)
 	alert.show();
 }
 
-void AlertDialog::show(const String& caption, const String& text, const Callback& onOk)
+void AlertDialog::show(const String& caption, const String& text, const Function<void()>& onOk)
 {
 	AlertDialog alert;
 	alert.caption = caption;
@@ -213,7 +214,7 @@ DialogResult AlertDialog::runOkCancel(const String& caption, const String& text)
 	return alert.run();
 }
 
-void AlertDialog::showOkCancel(const String& text, const Callback& onOk, const Callback& onCancel)
+void AlertDialog::showOkCancel(const String& text, const Function<void()>& onOk, const Function<void()>& onCancel)
 {
 	AlertDialog alert;
 	alert.type = AlertDialogType::OkCancel;
@@ -223,7 +224,7 @@ void AlertDialog::showOkCancel(const String& text, const Callback& onOk, const C
 	alert.show();
 }
 
-void AlertDialog::showOkCancel(const String& caption, const String& text, const Callback& onOk, const Callback& onCancel)
+void AlertDialog::showOkCancel(const String& caption, const String& text, const Function<void()>& onOk, const Function<void()>& onCancel)
 {
 	AlertDialog alert;
 	alert.type = AlertDialogType::OkCancel;
@@ -234,7 +235,7 @@ void AlertDialog::showOkCancel(const String& caption, const String& text, const 
 	alert.show();
 }
 
-void AlertDialog::showOkCancel(const String& text, const Callback& onOk)
+void AlertDialog::showOkCancel(const String& text, const Function<void()>& onOk)
 {
 	AlertDialog alert;
 	alert.type = AlertDialogType::OkCancel;
@@ -244,7 +245,7 @@ void AlertDialog::showOkCancel(const String& text, const Callback& onOk)
 	alert.show();
 }
 
-void AlertDialog::showOkCancel(const String& caption, const String& text, const Callback& onOk)
+void AlertDialog::showOkCancel(const String& caption, const String& text, const Function<void()>& onOk)
 {
 	AlertDialog alert;
 	alert.type = AlertDialogType::OkCancel;
@@ -271,7 +272,7 @@ DialogResult AlertDialog::runYesNo(const String& caption, const String& text)
 	return alert.run();
 }
 
-void AlertDialog::showYesNo(const String& text, const Callback& onYes, const Callback& onNo)
+void AlertDialog::showYesNo(const String& text, const Function<void()>& onYes, const Function<void()>& onNo)
 {
 	AlertDialog alert;
 	alert.type = AlertDialogType::YesNo;
@@ -281,7 +282,7 @@ void AlertDialog::showYesNo(const String& text, const Callback& onYes, const Cal
 	alert.show();
 }
 
-void AlertDialog::showYesNo(const String& caption, const String& text, const Callback& onYes, const Callback& onNo)
+void AlertDialog::showYesNo(const String& caption, const String& text, const Function<void()>& onYes, const Function<void()>& onNo)
 {
 	AlertDialog alert;
 	alert.type = AlertDialogType::YesNo;
@@ -292,7 +293,7 @@ void AlertDialog::showYesNo(const String& caption, const String& text, const Cal
 	alert.show();
 }
 
-void AlertDialog::showYesNo(const String& text, const Callback& onYes)
+void AlertDialog::showYesNo(const String& text, const Function<void()>& onYes)
 {
 	AlertDialog alert;
 	alert.type = AlertDialogType::YesNo;
@@ -302,7 +303,7 @@ void AlertDialog::showYesNo(const String& text, const Callback& onYes)
 	alert.show();
 }
 
-void AlertDialog::showYesNo(const String& caption, const String& text, const Callback& onYes)
+void AlertDialog::showYesNo(const String& caption, const String& text, const Function<void()>& onYes)
 {
 	AlertDialog alert;
 	alert.type = AlertDialogType::YesNo;
@@ -329,7 +330,7 @@ DialogResult AlertDialog::runYesNoCancel(const String& caption, const String& te
 	return alert.run();
 }
 
-void AlertDialog::showYesNoCancel(const String& text, const Callback& onYes, const Callback& onNo, const Callback& onCancel)
+void AlertDialog::showYesNoCancel(const String& text, const Function<void()>& onYes, const Function<void()>& onNo, const Function<void()>& onCancel)
 {
 	AlertDialog alert;
 	alert.type = AlertDialogType::YesNoCancel;
@@ -340,7 +341,7 @@ void AlertDialog::showYesNoCancel(const String& text, const Callback& onYes, con
 	alert.show();
 }
 
-void AlertDialog::showYesNoCancel(const String& caption, const String& text, const Callback& onYes, const Callback& onNo, const Callback& onCancel)
+void AlertDialog::showYesNoCancel(const String& caption, const String& text, const Function<void()>& onYes, const Function<void()>& onNo, const Function<void()>& onCancel)
 {
 	AlertDialog alert;
 	alert.type = AlertDialogType::YesNoCancel;
@@ -352,7 +353,7 @@ void AlertDialog::showYesNoCancel(const String& caption, const String& text, con
 	alert.show();
 }
 
-void AlertDialog::showYesNoCancel(const String& text, const Callback& onYes, const Callback& onNo)
+void AlertDialog::showYesNoCancel(const String& text, const Function<void()>& onYes, const Function<void()>& onNo)
 {
 	AlertDialog alert;
 	alert.type = AlertDialogType::YesNoCancel;
@@ -362,7 +363,7 @@ void AlertDialog::showYesNoCancel(const String& text, const Callback& onYes, con
 	alert.show();
 }
 
-void AlertDialog::showYesNoCancel(const String& caption, const String& text, const Callback& onYes, const Callback& onNo)
+void AlertDialog::showYesNoCancel(const String& caption, const String& text, const Function<void()>& onYes, const Function<void()>& onNo)
 {
 	AlertDialog alert;
 	alert.type = AlertDialogType::YesNoCancel;
@@ -419,7 +420,7 @@ sl_bool FileDialog::_runOnUiThread()
 		_FileDialog_RunOnUIThread m;
 		m.dlg = this;
 		m.event = ev;
-		UI::dispatchToUiThread(SLIB_CALLBACK_CLASS(_FileDialog_RunOnUIThread, run, &m));
+		UI::dispatchToUiThread(SLIB_FUNCTION_CLASS(_FileDialog_RunOnUIThread, run, &m));
 		ev->wait();
 		return m.result;
 	}
@@ -434,7 +435,7 @@ List<String> FileDialog::openFiles(const Ref<Window>& parent)
 	if (dlg.run()) {
 		return dlg.selectedPaths;
 	}
-	return List<String>::null();
+	return sl_null;
 }
 
 String FileDialog::openFile(const Ref<Window>& parent)
@@ -445,7 +446,7 @@ String FileDialog::openFile(const Ref<Window>& parent)
 	if (dlg.run()) {
 		return dlg.selectedPath;
 	}
-	return String::null();
+	return sl_null;
 }
 
 String FileDialog::saveFile(const Ref<Window>& parent)
@@ -456,7 +457,7 @@ String FileDialog::saveFile(const Ref<Window>& parent)
 	if (dlg.run()) {
 		return dlg.selectedPath;
 	}
-	return String::null();
+	return sl_null;
 }
 
 String FileDialog::selectDirectory(const Ref<Window>& parent)
@@ -467,7 +468,7 @@ String FileDialog::selectDirectory(const Ref<Window>& parent)
 	if (dlg.run()) {
 		return dlg.selectedPath;
 	}
-	return String::null();
+	return sl_null;
 }
 
 SLIB_UI_NAMESPACE_END

@@ -42,6 +42,8 @@ public:
 public:
 	WindowInstanceParam();
 	
+	~WindowInstanceParam();
+	
 public:
 	UIRect calculateRegion(const UIRect& screenFrame) const;
 	
@@ -53,6 +55,8 @@ class SLIB_EXPORT Window : public Object
 	
 public:
 	Window();
+	
+	~Window();
 	
 public:
 	virtual void close();
@@ -278,7 +282,7 @@ public:
 	void removeAllViews();
 
 public:
-	SLIB_PTR_PROPERTY(IWindowListener, EventListener)
+	SLIB_PROPERTY(AtomicPtr<IWindowListener>, EventListener)
 	
 protected:
 	virtual void onCreate();
@@ -340,14 +344,14 @@ private:
 	void _refreshSize();
 	
 private:
-	SafeRef<WindowInstance> m_instance;
-	SafeWeakRef<Window> m_parent;
-	SafeRef<Screen> m_screen;
-	SafeRef<View> m_viewContent;
-	SafeRef<Menu> m_menu;
+	AtomicRef<WindowInstance> m_instance;
+	AtomicWeakRef<Window> m_parent;
+	AtomicRef<Screen> m_screen;
+	AtomicRef<View> m_viewContent;
+	AtomicRef<Menu> m_menu;
 	
 	UIRect m_frame;
-	SafeString m_title;
+	AtomicString m_title;
 	Color m_backgroundColor;
 	
 	sl_bool m_flagVisible;
@@ -483,7 +487,7 @@ public:
 	void onDemaximize();
 
 private:
-	SafeWeakRef<Window> m_window;
+	AtomicWeakRef<Window> m_window;
 	
 };
 

@@ -58,7 +58,7 @@ void GraphicsPath::_initialize_PO()
 
 void GraphicsPath::_moveTo_PO(sl_real x, sl_real y)
 {
-	_Android_GraphicsPathObject* po = (_Android_GraphicsPathObject*)(m_platformObject.ptr);
+	_Android_GraphicsPathObject* po = (_Android_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		_JAndroidPath::moveTo.call(po->path, (float)(x), (float)(y));
 	}
@@ -66,7 +66,7 @@ void GraphicsPath::_moveTo_PO(sl_real x, sl_real y)
 
 void GraphicsPath::_lineTo_PO(sl_real x, sl_real y)
 {
-	_Android_GraphicsPathObject* po = (_Android_GraphicsPathObject*)(m_platformObject.ptr);
+	_Android_GraphicsPathObject* po = (_Android_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		_JAndroidPath::lineTo.call(po->path, (float)(x), (float)(y));
 	}
@@ -74,7 +74,7 @@ void GraphicsPath::_lineTo_PO(sl_real x, sl_real y)
 
 void GraphicsPath::_cubicTo_PO(sl_real xc1, sl_real yc1, sl_real xc2, sl_real yc2, sl_real xe, sl_real ye)
 {
-	_Android_GraphicsPathObject* po = (_Android_GraphicsPathObject*)(m_platformObject.ptr);
+	_Android_GraphicsPathObject* po = (_Android_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		_JAndroidPath::cubicTo.call(po->path, (float)(xc1), (float)(yc1) , (float)(xc2), (float)(yc2) , (float)(xe), (float)(ye));
 	}
@@ -82,7 +82,7 @@ void GraphicsPath::_cubicTo_PO(sl_real xc1, sl_real yc1, sl_real xc2, sl_real yc
 
 void GraphicsPath::_closeSubpath_PO()
 {
-	_Android_GraphicsPathObject* po = (_Android_GraphicsPathObject*)(m_platformObject.ptr);
+	_Android_GraphicsPathObject* po = (_Android_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		_JAndroidPath::closeSubpath.call(po->path);
 	}
@@ -90,7 +90,7 @@ void GraphicsPath::_closeSubpath_PO()
 
 void GraphicsPath::_setFillMode_PO(FillMode mode)
 {
-	_Android_GraphicsPathObject* po = (_Android_GraphicsPathObject*)(m_platformObject.ptr);
+	_Android_GraphicsPathObject* po = (_Android_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		_JAndroidPath::setFillMode.call(po->path, (int)mode);
 	}
@@ -98,7 +98,7 @@ void GraphicsPath::_setFillMode_PO(FillMode mode)
 
 Rectangle GraphicsPath::_getBounds_PO()
 {
-	_Android_GraphicsPathObject* po = (_Android_GraphicsPathObject*)(m_platformObject.ptr);
+	_Android_GraphicsPathObject* po = (_Android_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		JniLocal<jobject> jrect = _JAndroidPath::getBounds.callObject(po->path);
 		if (jrect.isNotNull()) {
@@ -115,7 +115,7 @@ Rectangle GraphicsPath::_getBounds_PO()
 
 sl_bool GraphicsPath::_containsPoint_PO(sl_real x, sl_real y)
 {
-	_Android_GraphicsPathObject* po = (_Android_GraphicsPathObject*)(m_platformObject.ptr);
+	_Android_GraphicsPathObject* po = (_Android_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		return (_JAndroidPath::containsPoint.callBoolean(po->path, x, y)) != 0;
 	}
@@ -127,7 +127,7 @@ class _GraphicsPath : public GraphicsPath
 public:
 	jobject getPlatformPath()
 	{
-		_Android_GraphicsPathObject* po = (_Android_GraphicsPathObject*)(m_platformObject.ptr);
+		_Android_GraphicsPathObject* po = (_Android_GraphicsPathObject*)(m_platformObject.get());
 		if (po) {
 			return po->path;
 		}

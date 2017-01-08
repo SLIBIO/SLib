@@ -16,21 +16,30 @@ struct SLIB_EXPORT DATE
 	int dayOfWeek;
 };
 
+/*******************************************************
+ Time contains an integral value holding the number of
+ microseconds since 00:00, Jan 1 1970 UTC, corresponding
+ to POSIX time (seconds).
+*******************************************************/
+
 class SLIB_EXPORT Time
 {
+protected:
+	sl_int64 m_time; // microseconds
+	
 public:
-	Time();
-
-	Time(const Time& other);
+	SLIB_CONSTEXPR Time() : m_time(0) {}
 	
-	Time(sl_int32 time);
+	SLIB_CONSTEXPR Time(const Time& other) : m_time(other.m_time) {}
 	
-	Time(sl_uint32 time);
+	SLIB_CONSTEXPR Time(sl_int32 time) : m_time(time) {}
 	
-	Time(sl_int64 time);
+	SLIB_CONSTEXPR Time(sl_uint32 time) : m_time(time) {}
 	
-	Time(sl_uint64 time);
-
+	SLIB_CONSTEXPR Time(sl_int64 time) : m_time(time) {}
+	
+	SLIB_CONSTEXPR Time(sl_uint64 time) : m_time(time) {}
+	
 	Time(int year, int month, int date);
 	
 	Time(int year, int month, int date, int hour, int minute, int second);
@@ -39,9 +48,9 @@ public:
 	
 	Time(const String16& str);
 	
-	Time(const SafeString8& str);
+	Time(const AtomicString8& str);
 	
-	Time(const SafeString16& str);
+	Time(const AtomicString16& str);
 	
 	Time(const sl_char8* str);
 	
@@ -50,13 +59,22 @@ public:
 public:
 	static Time now();
 	
-	static Time zero();
+	SLIB_CONSTEXPR static Time zero()
+	{
+		return 0;
+	}
 	
 	void setZero();
 	
-	sl_bool isZero() const;
+	SLIB_CONSTEXPR sl_bool isZero() const
+	{
+		return m_time == 0;
+	}
 	
-	sl_bool isNotZero() const;
+	SLIB_CONSTEXPR sl_bool isNotZero() const
+	{
+		return m_time != 0;
+	}
 	
 	sl_int64 toInt() const;
 
@@ -81,9 +99,9 @@ public:
 	
 	Time& operator=(const String16& str);
 	
-	Time& operator=(const SafeString8& str);
+	Time& operator=(const AtomicString8& str);
 	
-	Time& operator=(const SafeString16& str);
+	Time& operator=(const AtomicString16& str);
 	
 	Time& operator=(const sl_char8* str);
 	
@@ -305,9 +323,9 @@ public:
 	
 	sl_bool setString(const String16& str);
 	
-	sl_bool setString(const SafeString8& str);
+	sl_bool setString(const AtomicString8& str);
 	
-	sl_bool setString(const SafeString16& str);
+	sl_bool setString(const AtomicString16& str);
 	
 	sl_bool setString(const sl_char8* str);
 	
@@ -315,37 +333,44 @@ public:
 	
 	String format(const String8& fmt) const;
 	
-	String format(const SafeString8& fmt) const;
+	String format(const AtomicString8& fmt) const;
 	
 	String format(const String16& fmt) const;
 	
-	String format(const SafeString16& fmt) const;
+	String format(const AtomicString16& fmt) const;
 	
 	String format(const sl_char8* fmt) const;
 	
 	String format(const sl_char16* fmt) const;
 
 	
-	static sl_reg parseElements(sl_int32* outArrayYMDHMS, const sl_char8* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+	static sl_reg parseElements(sl_int32* outArrayYMDHMS, const sl_char8* sz, sl_size posStart = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_reg parseElements(sl_int32* outArrayYMDHMS, const sl_char16* sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
+	static sl_reg parseElements(sl_int32* outArrayYMDHMS, const sl_char16* sz, sl_size posStart = 0, sl_size len = SLIB_SIZE_MAX);
 	
 	static sl_bool parseElements(const String8& time, sl_int32* outArrayYMDHMS);
 	
 	static sl_bool parseElements(const String16& time, sl_int32* outArrayYMDHMS);
 	
-	static sl_bool parseElements(const SafeString8& time, sl_int32* outArrayYMDHMS);
+	static sl_bool parseElements(const AtomicString8& time, sl_int32* outArrayYMDHMS);
 	
-	static sl_bool parseElements(const SafeString16& time, sl_int32* outArrayYMDHMS);
+	static sl_bool parseElements(const AtomicString16& time, sl_int32* outArrayYMDHMS);
 	
 	static sl_bool parseElements(const sl_char8* time, sl_int32* outArrayYMDHMS);
 	
 	static sl_bool parseElements(const sl_char16* time, sl_int32* outArrayYMDHMS);
-
-	SLIB_DECLARE_PARSE_FUNCTIONS(Time)
 	
-protected:
-	sl_int64 m_time; // microseconds
+	template <class ST>
+	static sl_bool parse(const ST& str, Time* _out)
+	{
+		return Parse(str, _out);
+	}
+	
+	template <class ST>
+	sl_bool parse(const ST& str)
+	{
+		return Parse(str, this);
+	}
 	
 	/* platform functions */
 protected:
@@ -359,6 +384,11 @@ protected:
 	
 };
 
+template <>
+sl_reg Parser<Time, sl_char8>::parse(Time* _out, const sl_char8 *sz, sl_size posBegin, sl_size len);
+
+template <>
+sl_reg Parser<Time, sl_char16>::parse(Time* _out, const sl_char16 *sz, sl_size posBegin, sl_size len);
 
 class SLIB_EXPORT TimeCounter
 {
@@ -457,60 +487,9 @@ SLIB_NAMESPACE_END
 
 SLIB_NAMESPACE_BEGIN
 
-SLIB_INLINE Time::Time()
-{
-}
-
-SLIB_INLINE Time::Time(const Time& other)
-{
-	m_time = other.m_time;
-}
-
-SLIB_INLINE Time::Time(sl_int32 time)
-{
-	m_time = time;
-}
-
-SLIB_INLINE Time::Time(sl_uint32 time)
-{
-	m_time = time;
-}
-
-SLIB_INLINE Time::Time(sl_int64 time)
-{
-	m_time = time;
-}
-
-SLIB_INLINE Time::Time(sl_uint64 time)
-{
-	m_time = time;
-}
-
-SLIB_INLINE Time Time::now()
-{
-	Time ret;
-	ret.setNow();
-	return ret;
-}
-
-SLIB_INLINE Time Time::zero()
-{
-	return 0;
-}
-
 SLIB_INLINE void Time::setZero()
 {
 	m_time = 0;
-}
-
-SLIB_INLINE sl_bool Time::isZero() const
-{
-	return m_time == 0;
-}
-
-SLIB_INLINE sl_bool Time::isNotZero() const
-{
-	return m_time != 0;
 }
 
 SLIB_INLINE sl_int64 Time::toInt() const

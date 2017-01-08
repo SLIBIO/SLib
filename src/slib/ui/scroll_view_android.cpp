@@ -50,8 +50,7 @@ public:
 void JNICALL _AndroidScrollView_nativeOnScroll(JNIEnv* env, jobject _this, jlong instance, int x, int y)
 {
 	Ref<View> _view = Android_ViewInstance::getAndroidView(instance);
-	if (ScrollView::checkInstance(_view.ptr)) {
-		_ScrollView* view = (_ScrollView*)(_view.ptr);
+	if (_ScrollView* view = CastInstance<_ScrollView>(_view.get())) {
 		view->__onScroll(x, y);
 	}
 }
@@ -65,7 +64,7 @@ Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* _parent)
 		ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 		if (ret.isNotNull()) {
 			jobject handle = ret->getHandle();
-			((_ScrollView*)this)->__applyProperties(handle, ret.ptr);
+			((_ScrollView*)this)->__applyProperties(handle, ret.get());
 		}
 	}
 	return ret;
@@ -79,9 +78,9 @@ void ScrollView::_setContentView_NW(const Ref<View>& view)
 {
 	Ref<ViewInstance> instance = getViewInstance();
 	if (instance.isNotNull()) {
-		jobject handle = UIPlatform::getViewHandle(instance.ptr);
+		jobject handle = UIPlatform::getViewHandle(instance.get());
 		if (handle) {
-			((_ScrollView*)this)->__applyContent(handle, instance.ptr);
+			((_ScrollView*)this)->__applyContent(handle, instance.get());
 		}
 	}
 }

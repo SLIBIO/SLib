@@ -108,9 +108,9 @@ sl_bool UI::isUiThread()
 	return [NSThread isMainThread];
 }
 
-void UI::dispatchToUiThread(const Callback& _callback)
+void UI::dispatchToUiThread(const Function<void()>& _callback)
 {
-    Callback callback = _callback;
+    const Function<void()> callback = _callback;
 	if (callback.isNotNull()) {
 		dispatch_async(dispatch_get_main_queue(), ^{
 			callback();
@@ -218,7 +218,7 @@ SLIB_UI_NAMESPACE_END
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 	
-	SLIB_LOG("App", "Finished Launching");
+	slib::Log("App", "Finished Launching");
 	
 	slib::UIApp::dispatchStartToApp();
 	
@@ -233,7 +233,7 @@ SLIB_UI_NAMESPACE_END
 	// Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
 	// Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
 	
-	SLIB_LOG("App", "Resign Active");
+	slib::Log("App", "Resign Active");
 
 	slib::MobileApp::dispatchPauseToApp();
 
@@ -242,21 +242,21 @@ SLIB_UI_NAMESPACE_END
 - (void)applicationDidEnterBackground:(UIApplication *)application {
 	// Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
 	// If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-	SLIB_LOG("App", "Enter Background");
+	slib::Log("App", "Enter Background");
 
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
 	// Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
 	
-	SLIB_LOG("App", "Enter Foreground");
+	slib::Log("App", "Enter Foreground");
 
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
 	// Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
 
-	SLIB_LOG("App", "Become Active");
+	slib::Log("App", "Become Active");
 
 	slib::MobileApp::dispatchResumeToApp();
 }
@@ -264,7 +264,7 @@ SLIB_UI_NAMESPACE_END
 - (void)applicationWillTerminate:(UIApplication *)application {
 	// Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 
-	SLIB_LOG("App", "Terminate");
+	slib::Log("App", "Terminate");
 	
 	slib::MobileApp::dispatchDestroyActivityToApp();
 

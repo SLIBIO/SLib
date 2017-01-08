@@ -70,7 +70,7 @@ void ScrollView::setContentView(const Ref<slib::View>& view, UIUpdateMode mode)
 				if (UI::isUiThread()) {
 					_setContentView_NW(view);
 				} else {
-					UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(ScrollView, _setContentView_NW, this, view));
+					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ScrollView, _setContentView_NW, this, view));
 				}
 			} else {
 				UIPoint pt = View::getScrollPosition();
@@ -233,7 +233,7 @@ void ScrollView::_onScroll_NW(sl_scroll_pos x, sl_scroll_pos y)
 
 Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* parent)
 {
-	return Ref<ViewInstance>::null();
+	return sl_null;
 }
 
 void ScrollView::_refreshContentSize_NW()

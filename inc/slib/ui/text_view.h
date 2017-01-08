@@ -44,7 +44,7 @@ protected:
 	
 protected:
 	SDM_ItemType m_type;
-	SafeWeakRef<SDM_Frame> m_frame;
+	AtomicWeakRef<SDM_Frame> m_frame;
 	sl_bool m_flagNewLine;
 	
 	friend class SDM_Frame;
@@ -77,8 +77,8 @@ public:
 	void setBackgroundColor(const Color& color, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 public:
-	SafeString m_text;
-	SafeRef<Font> m_font;
+	AtomicString m_text;
+	AtomicRef<Font> m_font;
 	Color m_textColor;
 	Color m_backgroundColor;
 	
@@ -126,7 +126,7 @@ public:
 	void setHeightFilling(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 public:
-	SafeRef<Drawable> m_source;
+	AtomicRef<Drawable> m_source;
 	ScaleMode m_scaleMode;
 	Alignment m_gravity;
 	SizeMode mode;
@@ -149,7 +149,7 @@ public:
 	void setView(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 protected:
-	SafeRef<View> m_view;
+	AtomicRef<View> m_view;
 	
 };
 
@@ -232,7 +232,7 @@ protected:
 protected:
 	LinkedObjectList<SDM_Item> m_items;
 
-	SafeRef<Drawable> m_background;
+	AtomicRef<Drawable> m_background;
 	ScaleMode m_backgroundScaleMode;
 	Alignment m_backgroundAlignment;
 	
@@ -272,8 +272,8 @@ public:
 	void setView(const Ref<View>& view);
 	
 protected:
-	SafeRef<SDM_Frame> m_body;
-	SafeRef<View> m_view;
+	AtomicRef<SDM_Frame> m_body;
+	AtomicRef<View> m_view;
 	
 	friend class SDM_Frame;
 	

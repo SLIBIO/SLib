@@ -5,7 +5,6 @@ SLIB_NAMESPACE_BEGIN
 SLIB_DEFINE_OBJECT(CMemory, CArray<sl_uint8>)
 
 SLIB_DEFINE_EXPLICIT_INSTANTIATIONS_FOR_LIST(Memory)
-SLIB_DEFINE_EXPLICIT_INSTANTIATIONS_FOR_QUEUE(Memory)
 
 CMemory::CMemory()
 {
@@ -15,11 +14,11 @@ CMemory::CMemory(sl_size count) : CArray(count)
 {
 }
 
-CMemory::CMemory(const sl_uint8* data, sl_size count) : CArray(data, count)
+CMemory::CMemory(const void* data, sl_size count) : CArray((sl_uint8 const*)data, count)
 {
 }
 
-CMemory::CMemory(const sl_uint8* data, sl_size count, const Referable* refer) : CArray(data, count, refer)
+CMemory::CMemory(const void* data, sl_size count, Referable* refer) : CArray((sl_uint8 const*)data, count, refer)
 {
 }
 
@@ -38,7 +37,7 @@ CMemory* CMemory::create(sl_size count)
 }
 
 
-CMemory* CMemory::create(const sl_uint8* data, sl_size count)
+CMemory* CMemory::create(const void* data, sl_size count)
 {
 	if (count > 0) {
 		CMemory* ret = new CMemory(data, count);
@@ -52,7 +51,7 @@ CMemory* CMemory::create(const sl_uint8* data, sl_size count)
 	return sl_null;
 }
 
-CMemory* CMemory::createStatic(const sl_uint8* data, sl_size count, const Referable* refer)
+CMemory* CMemory::createStatic(const void* data, sl_size count, Referable* refer)
 {
 	if (data && count > 0) {
 		return new CMemory(data, count, refer);
@@ -60,7 +59,7 @@ CMemory* CMemory::createStatic(const sl_uint8* data, sl_size count, const Refera
 	return sl_null;
 }
 
-CMemory* CMemory::sub(sl_size start, sl_size count) const
+CMemory* CMemory::sub(sl_size start, sl_size count)
 {
 	sl_size countParent = m_count;
 	if (start < countParent) {
@@ -72,7 +71,7 @@ CMemory* CMemory::sub(sl_size start, sl_size count) const
 				return (CMemory*)this;
 			}
 			if (m_flagStatic) {
-				return createStatic(m_data + start, count, m_refer.ptr);
+				return createStatic(m_data + start, count, m_refer._ptr);
 			} else {
 				return createStatic(m_data + start, count, this);
 			}
@@ -86,43 +85,30 @@ CMemory* CMemory::duplicate() const
 	return create(m_data, m_count);
 }
 
-SLIB_DEFINE_REF_WRAPPER(Memory, SafeMemory, CMemory, ref)
-
-Memory::Memory(sl_size size) : ref(CMemory::create(size))
-{
-}
-
-Memory::Memory(const void* buf, sl_size size) : ref(CMemory::create((sl_uint8*)buf, size))
-{
-}
-
-Memory::Memory(const void* buf, sl_size size, const Referable* refer) : ref(CMemory::createStatic((const sl_uint8*)buf, size, refer))
-{
-}
 
 Memory Memory::create(sl_size count)
 {
-	return Memory(count);
+	return CMemory::create(count);
 }
 
 Memory Memory::create(const void* buf, sl_size count)
 {
-	return Memory(buf, count);
+	return CMemory::create(buf, count);
 }
 
 Memory Memory::createStatic(const void* buf, sl_size count)
 {
-	return Memory(buf, count, sl_null);
+	return CMemory::createStatic(buf, count, sl_null);
 }
 
-Memory Memory::createStatic(const void* buf, sl_size count, const Referable* refer)
+Memory Memory::createStatic(const void* buf, sl_size count, Referable* refer)
 {
-	return Memory(buf, count, refer);
+	return CMemory::createStatic(buf, count, refer);
 }
 
 void* Memory::getData() const
 {
-	CMemory* obj = ref.ptr;
+	CMemory* obj = ref._ptr;
 	if (obj) {
 		return obj->getData();
 	}
@@ -131,7 +117,7 @@ void* Memory::getData() const
 
 sl_size Memory::getSize() const
 {
-	CMemory* obj = ref.ptr;
+	CMemory* obj = ref._ptr;
 	if (obj) {
 		return obj->getCount();
 	}
@@ -140,26 +126,26 @@ sl_size Memory::getSize() const
 
 sl_bool Memory::isEmpty() const
 {
-	return isNull();
+	return ref.isNull();
 }
 
 sl_bool Memory::isNotEmpty() const
 {
-	return isNotNull();
+	return ref.isNotNull();
 }
 
 Memory Memory::sub(sl_size start, sl_size size) const
 {
-	CMemory* obj = ref.ptr;
+	CMemory* obj = ref._ptr;
 	if (obj) {
 		return obj->sub(start, size);
 	}
-	return Memory::null();
+	return sl_null;
 }
 
 sl_size Memory::read(sl_size startSource, sl_size len, void* bufDst) const
 {
-	CMemory* obj = ref.ptr;
+	CMemory* obj = ref._ptr;
 	if (obj) {
 		return obj->read(startSource, len, (sl_uint8*)bufDst);
 	}
@@ -168,7 +154,7 @@ sl_size Memory::read(sl_size startSource, sl_size len, void* bufDst) const
 
 sl_size Memory::write(sl_size startTarget, sl_size len, const void* bufSrc) const
 {
-	CMemory* obj = ref.ptr;
+	CMemory* obj = ref._ptr;
 	if (obj) {
 		return obj->write(startTarget, len, (const sl_uint8*)bufSrc);
 	}
@@ -177,9 +163,9 @@ sl_size Memory::write(sl_size startTarget, sl_size len, const void* bufSrc) cons
 
 sl_size Memory::copy(sl_size startTarget, const Memory& source, sl_size startSource, sl_size len) const
 {
-	CMemory* obj = ref.ptr;
+	CMemory* obj = ref._ptr;
 	if (obj) {
-		return obj->copy(startTarget, source.ref.ptr, startSource, len);
+		return obj->copy(startTarget, source.ref._ptr, startSource, len);
 	}
 	return 0;
 }
@@ -191,30 +177,16 @@ sl_size Memory::copy(const Memory& source, sl_size start, sl_size len) const
 
 Memory Memory::duplicate() const
 {
-	CMemory* obj = ref.ptr;
+	CMemory* obj = ref._ptr;
 	if (obj) {
 		return obj->duplicate();
 	}
-	return Memory::null();
-}
-
-template <>
-int Compare<Memory>::compare(const Memory& a, const Memory& b)
-{
-	void* p1 = a.ref.ptr;
-	void* p2 = b.ref.ptr;
-	return (p1 < p2) ? -1 : (p1 > p2);
-}
-
-template <>
-sl_bool Compare<Memory>::equals(const Memory& a, const Memory& b)
-{
-	return a.ref.ptr == b.ref.ptr;
+	return sl_null;
 }
 
 sl_bool Memory::getData(MemoryData& data) const
 {
-	CMemory* obj = ref.ptr;
+	CMemory* obj = ref._ptr;
 	if (obj) {
 		data.data = obj->getData();
 		data.size = obj->getCount();
@@ -232,21 +204,8 @@ sl_bool Memory::getData(MemoryData& data) const
 	}
 }
 
-SLIB_DEFINE_REF_WRAPPER(SafeMemory, Memory, CMemory, ref)
 
-SafeMemory::SafeMemory(sl_size size) : ref(CMemory::create(size))
-{
-}
-
-SafeMemory::SafeMemory(const void* buf, sl_size size) : ref(CMemory::create((const sl_uint8*)buf, size))
-{
-}
-
-SafeMemory::SafeMemory(const void* buf, sl_size size, const Referable* refer) : ref(CMemory::createStatic((const sl_uint8*)buf, size, refer))
-{
-}
-
-sl_size SafeMemory::getSize() const
+sl_size Atomic<Memory>::getSize() const
 {
 	Ref<CMemory> obj(ref);
 	if (obj.isNotNull()) {
@@ -255,7 +214,7 @@ sl_size SafeMemory::getSize() const
 	return 0;
 }
 
-sl_bool SafeMemory::isEmpty() const
+sl_bool Atomic<Memory>::isEmpty() const
 {
 	Ref<CMemory> obj(ref);
 	if (obj.isNotNull()) {
@@ -264,7 +223,7 @@ sl_bool SafeMemory::isEmpty() const
 	return sl_true;
 }
 
-sl_bool SafeMemory::isNotEmpty() const
+sl_bool Atomic<Memory>::isNotEmpty() const
 {
 	Ref<CMemory> obj(ref);
 	if (obj.isNotNull()) {
@@ -273,16 +232,16 @@ sl_bool SafeMemory::isNotEmpty() const
 	return sl_false;
 }
 
-Memory SafeMemory::sub(sl_size start, sl_size count) const
+Memory Atomic<Memory>::sub(sl_size start, sl_size count) const
 {
 	Ref<CMemory> obj(ref);
 	if (obj.isNotNull()) {
 		return obj->sub(start, count);
 	}
-	return Memory::null();
+	return sl_null;
 }
 
-sl_size SafeMemory::read(sl_size startSource, sl_size len, void* bufDst) const
+sl_size Atomic<Memory>::read(sl_size startSource, sl_size len, void* bufDst) const
 {
 	Ref<CMemory> obj(ref);
 	if (obj.isNotNull()) {
@@ -291,7 +250,7 @@ sl_size SafeMemory::read(sl_size startSource, sl_size len, void* bufDst) const
 	return 0;
 }
 
-sl_size SafeMemory::write(sl_size startTarget, sl_size len, const void* bufSrc) const
+sl_size Atomic<Memory>::write(sl_size startTarget, sl_size len, const void* bufSrc) const
 {
 	Ref<CMemory> obj(ref);
 	if (obj.isNotNull()) {
@@ -300,36 +259,36 @@ sl_size SafeMemory::write(sl_size startTarget, sl_size len, const void* bufSrc) 
 	return 0;
 }
 
-sl_size SafeMemory::copy(sl_size startTarget, const Memory& source, sl_size startSource, sl_size len) const
+sl_size Atomic<Memory>::copy(sl_size startTarget, const Memory& source, sl_size startSource, sl_size len) const
 {
 	Ref<CMemory> obj(ref);
 	if (obj.isNotNull()) {
-		return obj->copy(startTarget, source.ref.ptr, startSource, len);
+		return obj->copy(startTarget, source.ref._ptr, startSource, len);
 	}
 	return 0;
 }
 
-sl_size SafeMemory::copy(const Memory& source, sl_size startSource, sl_size len) const
+sl_size Atomic<Memory>::copy(const Memory& source, sl_size startSource, sl_size len) const
 {
 	Ref<CMemory> obj(ref);
 	if (obj.isNotNull()) {
-		return obj->copy(0, source.ref.ptr, startSource, len);
+		return obj->copy(0, source.ref._ptr, startSource, len);
 	}
 	return 0;
 }
 
-Memory SafeMemory::duplicate() const
+Memory Atomic<Memory>::duplicate() const
 {
 	Ref<CMemory> obj(ref);
 	if (obj.isNotNull()) {
 		return obj->duplicate();
 	}
-	return Memory::null();
+	return sl_null;
 }
 
-sl_bool SafeMemory::getData(MemoryData& data) const
+sl_bool Atomic<Memory>::getData(MemoryData& data) const
 {
-	Memory mem = *this;
+	Memory mem(*this);
 	return mem.getData(data);
 }
 
@@ -340,19 +299,18 @@ sl_bool SafeMemory::getData(MemoryData& data) const
 
 Memory MemoryData::getMemory() const
 {
-	if (CMemory::checkInstance(refer.ptr)) {
-		CMemory* mem = (CMemory*)(refer.ptr);
+	if (CMemory* mem = CastInstance<CMemory>(refer._ptr)) {
 		if (mem->getData() == data && mem->getCount() == size) {
 			return mem;
 		}
 	}
-	return Memory::createStatic(data, size, refer.ptr);
+	return Memory::createStatic(data, size, refer._ptr);
 }
 
 Memory MemoryData::sub(sl_size start, sl_size sizeSub) const
 {
 	if (start >= size) {
-		return Memory::null();
+		return sl_null;
 	}
 	if (sizeSub > size - start) {
 		sizeSub = size - start;
@@ -360,7 +318,7 @@ Memory MemoryData::sub(sl_size start, sl_size sizeSub) const
 	if (start == 0 && sizeSub == size) {
 		return getMemory();
 	}
-	return Memory::createStatic((sl_uint8*)data + start, sizeSub, refer.ptr);
+	return Memory::createStatic((sl_uint8*)data + start, sizeSub, refer._ptr);
 }
 
 /*******************************************
@@ -434,7 +392,7 @@ Memory MemoryBuffer::merge() const
 {
 	ObjectLocker lock(this);
 	if (m_queue.getCount() == 0) {
-		return Memory::null();
+		return sl_null;
 	}
 	Link<MemoryData>* front = m_queue.getFront();
 	if (m_queue.getCount() == 1) {

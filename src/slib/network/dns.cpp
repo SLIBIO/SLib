@@ -418,7 +418,7 @@ String DnsResponseRecord::parseData_CNAME() const
 			return str;
 		}
 	}
-	return String::null();
+	return sl_null;
 }
 
 sl_uint32 DnsResponseRecord::buildRecord_CNAME(void* buf, sl_uint32 offset, sl_uint32 size, const String& cname)
@@ -436,7 +436,7 @@ String DnsResponseRecord::parseData_NS() const
 			return str;
 		}
 	}
-	return String::null();
+	return sl_null;
 }
 
 sl_uint32 DnsResponseRecord::buildRecord_NS(void* buf, sl_uint32 offset, sl_uint32 size, const String& ns)
@@ -468,7 +468,7 @@ String DnsResponseRecord::parseData_PTR() const
 			return str;
 		}
 	}
-	return String::null();
+	return sl_null;
 }
 
 sl_uint32 DnsResponseRecord::buildRecord_PTR(void* buf, sl_uint32 offset, sl_uint32 size, const String& dname)
@@ -606,7 +606,7 @@ Memory DnsPacket::buildQuestionPacket(sl_uint16 id, const String& host)
 	if (size > 0) {
 		return Memory::create(buf, size);
 	}
-	return Memory::null();
+	return sl_null;
 }
 
 Memory DnsPacket::buildHostAddressAnswerPacket(sl_uint16 id, const String& hostName, const IPv4Address& hostAddress)
@@ -664,7 +664,7 @@ Memory DnsPacket::buildHostAddressAnswerPacket(sl_uint16 id, const String& hostN
 		}
 	}
 	
-	return Memory::null();
+	return sl_null;
 	
 }
 
@@ -785,13 +785,13 @@ Ref<DnsServer> DnsServer::create(const DnsServerParam& param, const Ref<AsyncIoL
 
 		Ref<AsyncUdpSocket> socketDns = AsyncUdpSocket::create(param.portDns, (WeakRef<DnsServer>)(ret), 4096, loop, sl_false);
 		if (socketDns.isNull()) {
-			SLIB_LOG_ERROR(TAG_SERVER, "Failed to bind to port " + String::fromUint32(param.portDns));
-			return Ref<DnsServer>::null();
+			LogError(TAG_SERVER, "Failed to bind to port %d", param.portDns);
+			return sl_null;
 		}
 		Ref<AsyncUdpSocket> socketEncrypt = AsyncUdpSocket::create(param.portEncryption, (WeakRef<DnsServer>)(ret), 4096, loop, sl_false);
 		if (socketEncrypt.isNull()) {
-			SLIB_LOG_ERROR(TAG_SERVER, "Failed to bind to port " + String::fromUint32(param.portEncryption));
-			return Ref<DnsServer>::null();
+			LogError(TAG_SERVER, "Failed to bind to port %d", param.portEncryption);
+			return sl_null;
 		}
 
 		if (socketDns.isNotNull() || socketEncrypt.isNotNull()) {
@@ -817,7 +817,7 @@ Ref<DnsServer> DnsServer::create(const DnsServerParam& param, const Ref<AsyncIoL
 		}
 		
 	}
-	return Ref<DnsServer>::null();
+	return sl_null;
 }
 
 Ref<DnsServer> DnsServer::create(const DnsServerParam& param)
@@ -925,7 +925,7 @@ void DnsServer::_processReceivedDnsAnswer(const DnsPacket& packet)
 		HashMap<String, IPv6Address> aliasAddresses6;
 		// address
 		{
-			ListItems<DnsPacket::Address> addresses(packet.addresses);
+			ListElements<DnsPacket::Address> addresses(packet.addresses);
 			sl_size n = addresses.count;
 			for (sl_size i = 0; i < n; i++) {
 				DnsPacket::Address& address = addresses[n - 1 - i];
@@ -952,7 +952,7 @@ void DnsServer::_processReceivedDnsAnswer(const DnsPacket& packet)
 			while (flagProcess) {
 				flagProcess = sl_false;
 				List<DnsPacket::Alias> aliasesNoProcess;
-				ListItems<DnsPacket::Alias> aliases(aliasesProcess);
+				ListElements<DnsPacket::Alias> aliases(aliasesProcess);
 				sl_size n = aliases.count;
 				for (sl_size i = 0; i < n; i++) {
 					DnsPacket::Alias& alias = aliases[n - 1 - i];

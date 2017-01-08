@@ -284,7 +284,7 @@ void TextArea::setMultiLine(sl_bool flag, UIUpdateMode mode)
 
 Ref<ViewInstance> EditView::createNativeWidget(ViewInstance* parent)
 {
-	return Ref<ViewInstance>::null();
+	return sl_null;
 }
 
 void EditView::_getText_NW()
@@ -345,12 +345,12 @@ void EditView::_setBackgroundColor_NW(const Color& color)
 
 Ref<ViewInstance> PasswordView::createNativeWidget(ViewInstance* parent)
 {
-	return Ref<ViewInstance>::null();
+	return sl_null;
 }
 
 Ref<ViewInstance> TextArea::createNativeWidget(ViewInstance* parent)
 {
-	return Ref<ViewInstance>::null();
+	return sl_null;
 }
 
 #endif

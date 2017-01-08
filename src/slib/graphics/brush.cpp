@@ -20,7 +20,7 @@ Ref<Brush> Brush::getDefault()
 {
 	SLIB_SAFE_STATIC(Ref<Brush>, defaultBrush, create(BrushDesc()))
 	if (SLIB_SAFE_STATIC_CHECK_FREED(defaultBrush)) {
-		return Ref<Brush>::null();
+		return sl_null;
 	}
 	return defaultBrush;
 }

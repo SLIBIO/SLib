@@ -11,9 +11,42 @@
 
 SLIB_RENDER_NAMESPACE_BEGIN
 
-class RenderCanvasState;
-class RenderCanvasProgram;
-class RenderCanvasProgramParam;
+enum class RenderCanvasClipType
+{
+	Rectangle,
+	Ellipse,
+	RoundRect
+};
+
+class RenderCanvasClip
+{
+public:
+	RenderCanvasClipType type;
+	Rectangle region;
+	sl_real rx;
+	sl_real ry;
+	sl_bool flagTransform;
+	Matrix3 transform;
+	
+public:
+	RenderCanvasClip();
+	
+};
+
+class RenderCanvasState : public Referable
+{
+public:
+	Matrix3 matrix;
+	sl_bool flagClipRect;
+	Rectangle clipRect;
+	LinkedQueue<RenderCanvasClip> clips;
+	
+public:
+	RenderCanvasState();
+	
+	RenderCanvasState(RenderCanvasState* other);
+	
+};
 
 class SLIB_EXPORT RenderCanvas : public Canvas
 {
@@ -21,6 +54,8 @@ class SLIB_EXPORT RenderCanvas : public Canvas
 	
 protected:
 	RenderCanvas();
+
+	~RenderCanvas();
 	
 public:
 	static Ref<RenderCanvas> create(const Ref<RenderEngine>& engine, sl_real width, sl_real height);
@@ -129,7 +164,7 @@ protected:
 	sl_real m_height;
 	Matrix3 m_matViewport;
 	Ref<RenderCanvasState> m_state;
-	Stack< Ref<RenderCanvasState> > m_stackStates;
+	LinkedStack< Ref<RenderCanvasState> > m_stackStates;
 	
 };
 

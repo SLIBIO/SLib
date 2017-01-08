@@ -15,6 +15,9 @@ class SLIB_EXPORT UIApp : public Application
 	SLIB_DECLARE_OBJECT
 	
 public:
+	UIApp();
+	
+public:
 	static Ref<UIApp> getApp();
 	
 public:
@@ -51,8 +54,8 @@ public:
 	static void dispatchExitToApp();
 	
 private:
-	SafeRef<Window> m_mainWindow;
-	SafeRef<Menu> m_mainMenu;
+	AtomicRef<Window> m_mainWindow;
+	AtomicRef<Menu> m_mainMenu;
 	
 };
 

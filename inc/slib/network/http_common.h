@@ -290,11 +290,11 @@ public:
 
 protected:
 	HttpMethod m_method;
-	SafeString m_methodText;
-	SafeString m_methodTextUpper;
-	SafeString m_path;
-	SafeString m_query;
-	SafeString m_requestVersion;
+	AtomicString m_methodText;
+	AtomicString m_methodTextUpper;
+	AtomicString m_path;
+	AtomicString m_query;
+	AtomicString m_requestVersion;
 	
 	HashMap<String, String, HashIgnoreCaseString, CompareIgnoreCaseString> m_requestHeaders;
 	HashMap<String, String> m_parameters;
@@ -392,8 +392,8 @@ public:
 
 protected:
 	HttpStatus m_responseCode;
-	SafeString m_responseMessage;
-	SafeString m_responseVersion;
+	AtomicString m_responseMessage;
+	AtomicString m_responseVersion;
 	
 	Map<String, String> m_responseHeaders;
 
@@ -480,10 +480,10 @@ public:
 
 protected:
 	// override
-	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref);
+	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref);
 	
 	// override
-	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError);
+	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError);
 	
 protected:
 	void setError();
@@ -492,7 +492,7 @@ protected:
 	
 	sl_bool setDecompressing();
 	
-	Memory decompressData(void* data, sl_uint32 size, const Referable* refData);
+	Memory decompressData(void* data, sl_uint32 size, Referable* refData);
 
 protected:
 	sl_bool m_flagDecompressing;

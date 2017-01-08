@@ -239,7 +239,7 @@ void Win32_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
 {
 	HWND hWnd = m_handle;
 	if (hWnd) {
-		Win32_ViewInstance* child = (Win32_ViewInstance*)(_child.ptr);
+		Win32_ViewInstance* child = (Win32_ViewInstance*)(_child.get());
 		if (child) {
 			HWND hWndChild = child->getHandle();
 			if (hWndChild) {
@@ -251,7 +251,7 @@ void Win32_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
 
 void Win32_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
 {
-	Win32_ViewInstance* child = (Win32_ViewInstance*)(_child.ptr);
+	Win32_ViewInstance* child = (Win32_ViewInstance*)(_child.get());
 	HWND hWnd = child->getHandle();
 	if (hWnd) {
 		::SetParent(hWnd, HWND_MESSAGE);
@@ -290,10 +290,12 @@ sl_bool Win32_ViewInstance::onEventKey(sl_bool flagDown, WPARAM wParam, LPARAM l
 			break;
 		}
 		Keycode key = UIEvent::getKeycodeFromSystemKeycode(vkey);
-		Ref<UIEvent> ke = UIEvent::createKeyEvent(action, key, vkey);
+		Time t;
+		t.setMillisecondsCount(::GetMessageTime());
+		Ref<UIEvent> ke = UIEvent::createKeyEvent(action, key, vkey, t);
 		if (ke.isNotNull()) {
-			applyModifiers(ke.ptr);
-			onKeyEvent(ke.ptr);
+			applyModifiers(ke.get());
+			onKeyEvent(ke.get());
 			if (ke->isPreventedDefault()) {
 				return sl_true;
 			}
@@ -312,10 +314,12 @@ sl_bool Win32_ViewInstance::onEventMouse(UIAction action, WPARAM wParam, LPARAM 
 		sl_ui_posf x = (sl_ui_posf)(_x);
 		sl_ui_posf y = (sl_ui_posf)(_y);
 
-		Ref<UIEvent> me = UIEvent::createMouseEvent(action, x, y);
+		Time t;
+		t.setMillisecondsCount(::GetMessageTime());
+		Ref<UIEvent> me = UIEvent::createMouseEvent(action, x, y, t);
 		if (me.isNotNull()) {
-			applyModifiers(me.ptr);
-			onMouseEvent(me.ptr);
+			applyModifiers(me.get());
+			onMouseEvent(me.get());
 			if (me->isPreventedDefault()) {
 				return sl_true;
 			}
@@ -342,10 +346,12 @@ sl_bool Win32_ViewInstance::onEventMouseWheel(sl_bool flagVertical, WPARAM wPara
 		pt.x = (short)(lParam & 0xffff);
 		pt.y = (short)((lParam >> 16) & 0xffff);
 		::ScreenToClient(hWnd, &pt);
-		Ref<UIEvent> me = UIEvent::createMouseWheelEvent((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y), deltaX, deltaY);
+		Time t;
+		t.setMillisecondsCount(::GetMessageTime());
+		Ref<UIEvent> me = UIEvent::createMouseWheelEvent((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y), deltaX, deltaY, t);
 		if (me.isNotNull()) {
-			applyModifiers(me.ptr);
-			onMouseWheelEvent(me.ptr);
+			applyModifiers(me.get());
+			onMouseWheelEvent(me.get());
 			if (me->isPreventedDefault()) {
 				return sl_true;
 			}
@@ -363,9 +369,11 @@ sl_bool Win32_ViewInstance::onEventSetCursor()
 		pt.x = (short)(lParam & 0xffff);
 		pt.y = (short)((lParam >> 16) & 0xffff);
 		::ScreenToClient(hWnd, &pt);
-		Ref<UIEvent> ev = UIEvent::createSetCursorEvent((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y));
+		Time t;
+		t.setMillisecondsCount(::GetMessageTime());
+		Ref<UIEvent> ev = UIEvent::createSetCursorEvent((sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y), t);
 		if (ev.isNotNull()) {
-			onSetCursor(ev.ptr);
+			onSetCursor(ev.get());
 			if (ev->isPreventedDefault()) {
 				return sl_true;
 			}
@@ -431,8 +439,8 @@ public:
 			if (canvasBuffer.isNull()) {
 				return;
 			}
-			bitmap = GraphicsPlatform::getBitmapHandle(bitmapBuffer.ptr);
-			graphics = GraphicsPlatform::getCanvasHandle(canvasBuffer.ptr);
+			bitmap = GraphicsPlatform::getBitmapHandle(bitmapBuffer.get());
+			graphics = GraphicsPlatform::getCanvasHandle(canvasBuffer.get());
 		}
 	}
 
@@ -451,7 +459,7 @@ static sl_size _Win32_getSelfInvalidatableRects(View* view, UIRect bounds, UIRec
 			if (child->isVisible() && child->getWidth() > 0 && child->getHeight() > 0) {
 				if (child->checkSelfInvalidatable()) {
 					UIRect rect = child->getBoundsInParent();
-					if (child->isNativeWidget() && SelectView::checkInstance(child.ptr)) {
+					if (child->isNativeWidget() && IsInstanceOf<SelectView>(child)) {
 						rect.setSize(child->getInstanceFrame().getSize());
 					}
 					if (rect.intersectRectangle(bounds, &rect)) {
@@ -466,7 +474,7 @@ static sl_size _Win32_getSelfInvalidatableRects(View* view, UIRect bounds, UIRec
 				} else {
 					sl_ui_pos x = child->getLeft();
 					sl_ui_pos y = child->getTop();
-					sl_size n = _Win32_getSelfInvalidatableRects(child.ptr, child->getBounds(), outRects, countRectsBuf);
+					sl_size n = _Win32_getSelfInvalidatableRects(child.get(), child->getBounds(), outRects, countRectsBuf);
 					sl_size m = 0;
 					for (sl_size k = 0; k < n; k++) {
 						outRects[k].left += x;
@@ -527,7 +535,7 @@ static void _Win32_DrawViewRegion(Gdiplus::Graphics* graphics, View* view, RECT&
 		CanvasStateScope scope(canvas);
 		canvas->translate(-(sl_real)(rcPaint.left), -(sl_real)(rcPaint.top));
 		canvas->setInvalidatedRect(Rectangle((sl_real)(rcPaint.left), (sl_real)(rcPaint.top), (sl_real)(rcPaint.right), (sl_real)(rcPaint.bottom)));
-		_Win32_DrawView(canvas.ptr, view);
+		_Win32_DrawView(canvas.get(), view);
 	}
 }
 
@@ -558,11 +566,11 @@ sl_bool Win32_ViewInstance::processWindowMessage(UINT msg, WPARAM wParam, LPARAM
 								MutexLocker lock(&(bb.mutex));
 								bb.allocateBackBuffer(widthRedraw, heightRedraw);
 								if (bb.bitmap && bb.graphics) {
-									_Win32_DrawViewRegion(bb.graphics, view.ptr, ps.rcPaint);
+									_Win32_DrawViewRegion(bb.graphics, view.get(), ps.rcPaint);
 									Gdiplus::Rect rcPaint(ps.rcPaint.left, ps.rcPaint.top, widthRedraw, heightRedraw);
 									Gdiplus::Region region(rcPaint);
 									static UIRect rectsExclude[128];
-									sl_size n = _Win32_getSelfInvalidatableRects(view.ptr, UIRect(ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right, ps.rcPaint.bottom), rectsExclude, 128);
+									sl_size n = _Win32_getSelfInvalidatableRects(view.get(), UIRect(ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right, ps.rcPaint.bottom), rectsExclude, 128);
 									if (n > 0) {
 										for (sl_size i = 0; i < n; i++) {
 											region.Exclude(Gdiplus::Rect(rectsExclude[i].left, rectsExclude[i].top, rectsExclude[i].getWidth(), rectsExclude[i].getHeight()));
@@ -578,7 +586,7 @@ sl_bool Win32_ViewInstance::processWindowMessage(UINT msg, WPARAM wParam, LPARAM
 							Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, &graphics, rect.right, rect.bottom, sl_false);
 							if (canvas.isNotNull()) {
 								canvas->setInvalidatedRect(Rectangle((sl_real)(ps.rcPaint.left), (sl_real)(ps.rcPaint.top), (sl_real)(ps.rcPaint.right), (sl_real)(ps.rcPaint.bottom)));
-								_Win32_DrawView(canvas.ptr, view.ptr);
+								_Win32_DrawView(canvas.get(), view.get());
 							}
 #endif
 						}
@@ -795,7 +803,7 @@ HWND UIPlatform::getViewHandle(View* view)
 {
 	if (view) {
 		Ref<ViewInstance> _instance = view->getViewInstance();
-		Win32_ViewInstance* instance = (Win32_ViewInstance*)(_instance.ptr);
+		Win32_ViewInstance* instance = (Win32_ViewInstance*)(_instance.get());
 		if (instance) {
 			return instance->getHandle();
 		}
@@ -808,12 +816,12 @@ sl_bool _Win32_captureChildInstanceEvents(View* view, UINT uMsg)
 	Ref<View> parent = view->getParent();
 	while (parent.isNotNull()) {
 		if (parent->isCapturingChildInstanceEvents()) {
-			if (_Win32_captureChildInstanceEvents(parent.ptr, uMsg)) {
+			if (_Win32_captureChildInstanceEvents(parent.get(), uMsg)) {
 				return sl_true;
 			}
 			Ref<ViewInstance> _instance = parent->getViewInstance();
 			if (_instance.isNotNull()) {
-				Win32_ViewInstance* instance = (Win32_ViewInstance*)(_instance.ptr);
+				Win32_ViewInstance* instance = (Win32_ViewInstance*)(_instance.get());
 				HWND hWnd = instance->getHandle();
 				if (hWnd) {
 					DWORD lParam = ::GetMessagePos();
@@ -872,7 +880,7 @@ Ref<ViewInstance> View::createGenericInstance(ViewInstance* parent)
 {
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
 	if (!shared) {
-		return Ref<ViewInstance>::null();
+		return sl_null;
 	}
 
 	DWORD styleEx = 0;
@@ -891,7 +899,7 @@ void View::_setFrame_NI(const UIRect& frame)
 		if (instance->isWindowContent()) {
 			return;
 		}
-		HWND hWnd = UIPlatform::getViewHandle(instance.ptr);
+		HWND hWnd = UIPlatform::getViewHandle(instance.get());
 		if (hWnd) {
 			UINT uFlags = SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE
 				| SWP_NOCOPYBITS
@@ -920,7 +928,7 @@ void View::_setTransform_NI(const Matrix3& matrix)
 		if (instance->isWindowContent()) {
 			return;
 		}
-		HWND hWnd = UIPlatform::getViewHandle(instance.ptr);
+		HWND hWnd = UIPlatform::getViewHandle(instance.get());
 		if (hWnd) {
 			UINT uFlags = SWP_NOREPOSITION | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOSIZE
 				| SWP_NOCOPYBITS

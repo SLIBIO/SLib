@@ -185,7 +185,10 @@ enum class Keycode
 
 class Modifiers
 {
-	SLIB_DECLARE_FLAGS(Modifiers)
+public:
+	int value;
+	SLIB_MEMBERS_OF_FLAGS(Modifiers, value)
+	
 public:
 	enum {
 		Mask = 0xFFFF0000,
@@ -263,7 +266,10 @@ enum class PositionMode
 
 class DialogResult
 {
-	SLIB_DECLARE_PRIMITIVE_WRAPPER(int, DialogResult)
+public:
+	int value;
+	SLIB_MEMBERS_OF_PRIMITIVE_WRAPPER(DialogResult, int, value)
+	
 public:
 	SLIB_INLINE DialogResult() = default;
 	

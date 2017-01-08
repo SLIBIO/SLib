@@ -8,42 +8,10 @@ SLIB_GRAPHICS_NAMESPACE_BEGIN
 
 SLIB_ALIGN(8) sl_uint8 Color::_zero[4] = {0, 0, 0, 0};
 
-Color::Color(const Color3f& v)
-{
-	sl_int32 _r = Math::clamp0_255((sl_int32)(v.x * 255));
-	sl_int32 _g = Math::clamp0_255((sl_int32)(v.y * 255));
-	sl_int32 _b = Math::clamp0_255((sl_int32)(v.z * 255));
-	r = (sl_uint8)(_r);
-	g = (sl_uint8)(_g);
-	b = (sl_uint8)(_b);
-}
-
-Color::Color(const Color4f& v)
-{
-	sl_int32 _r = Math::clamp0_255((sl_int32)(v.x * 255));
-	sl_int32 _g = Math::clamp0_255((sl_int32)(v.y * 255));
-	sl_int32 _b = Math::clamp0_255((sl_int32)(v.z * 255));
-	sl_int32 _a = Math::clamp0_255((sl_int32)(v.w * 255));
-	a = (sl_uint8)(_a);
-	r = (sl_uint8)(_r);
-	g = (sl_uint8)(_g);
-	b = (sl_uint8)(_b);
-}
-
-float Color::getBlueF() const
-{
-	return (float)(b) / 255.0f;
-}
-
 void Color::setBlueF(float v)
 {
 	sl_int32 n = (sl_int32)(v * 255.0f);
 	b = (sl_uint8)(Math::clamp0_255(n));
-}
-
-float Color::getGreenF() const
-{
-	return (float)(g) / 255.0f;
 }
 
 void Color::setGreenF(float v)
@@ -52,20 +20,10 @@ void Color::setGreenF(float v)
 	g = (sl_uint8)(Math::clamp0_255(n));
 }
 
-float Color::getRedF() const
-{
-	return (float)(r) / 255.0f;
-}
-
 void Color::setRedF(float v)
 {
 	sl_int32 n = (sl_int32)(v * 255.0f);
 	r = (sl_uint8)(Math::clamp0_255(n));
-}
-
-float Color::getAlphaF() const
-{
-	return (float)(a) / 255.0f;
 }
 
 void Color::setAlphaF(float v)
@@ -375,7 +333,7 @@ public:
 
 SLIB_SAFE_STATIC_GETTER(_Color_Name_Map, _Color_getNameMap)
 
-template <class CT, class ST>
+template <class CT>
 static sl_reg _Color_parse(Color* _out, const CT* sz, sl_size pos, sl_size len)
 {
 	if (pos >= len) {
@@ -468,7 +426,7 @@ static sl_reg _Color_parse(Color* _out, const CT* sz, sl_size pos, sl_size len)
 						return SLIB_PARSE_ERROR;
 					}
 					if (i == 3) {
-						iRet = ST::parseFloat(&a, sz, pos, len);
+						iRet = StringTypeFromCharType<CT>::Type::parseFloat(&a, sz, pos, len);
 						if (iRet == SLIB_PARSE_ERROR) {
 							return SLIB_PARSE_ERROR;
 						}
@@ -479,7 +437,7 @@ static sl_reg _Color_parse(Color* _out, const CT* sz, sl_size pos, sl_size len)
 							return SLIB_PARSE_ERROR;
 						}
 					} else {
-						iRet = ST::parseUint32(10, comp + i, sz, pos, len);
+						iRet = StringTypeFromCharType<CT>::Type::parseUint32(10, comp + i, sz, pos, len);
 						if (iRet == SLIB_PARSE_ERROR) {
 							return SLIB_PARSE_ERROR;
 						}
@@ -543,24 +501,16 @@ static sl_reg _Color_parse(Color* _out, const CT* sz, sl_size pos, sl_size len)
 	return SLIB_PARSE_ERROR;
 }
 
-SLIB_DEFINE_PARSE_FUNCTIONS(Color, _Color_parse)
-
-
-Color::operator Color3f() const
+template <>
+sl_reg Parser<Color, sl_char8>::parse(Color* _out, const sl_char8 *sz, sl_size posBegin, sl_size len)
 {
-	sl_real _r = r;
-	sl_real _g = g;
-	sl_real _b = b;
-	return {_r / 255, _g / 255, _b / 255};
+	return _Color_parse(_out, sz, posBegin, len);
 }
 
-Color::operator Color4f() const
+template <>
+sl_reg Parser<Color, sl_char16>::parse(Color* _out, const sl_char16 *sz, sl_size posBegin, sl_size len)
 {
-	sl_real _r = r;
-	sl_real _g = g;
-	sl_real _b = b;
-	sl_real _a = a;
-	return {_r / 255, _g / 255, _b / 255, _a / 255};
+	return _Color_parse(_out, sz, posBegin, len);
 }
 
 

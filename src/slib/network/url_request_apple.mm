@@ -85,14 +85,14 @@ public:
 					req.HTTPBody = [NSData dataWithBytes:param.requestBody.getData() length:param.requestBody.getSize()];
 					{
 						Pair<String, String> pair;
-						Iterator< Pair<String, String> > iterator = param.requestHeaders.iterator();
+						Iterator< Pair<String, String> > iterator = param.requestHeaders.toIterator();
 						while (iterator.next(&pair)) {
 							[req setValue:(Apple::getNSStringFromString(pair.key)) forHTTPHeaderField:(Apple::getNSStringFromString(pair.value))];
 						}
 					}
 					{
 						Pair<String, String> pair;
-						Iterator< Pair<String, String> > iterator = param.additionalRequestHeaders.iterator();
+						Iterator< Pair<String, String> > iterator = param.additionalRequestHeaders.toIterator();
 						while (iterator.next(&pair)) {
 							[req addValue:(Apple::getNSStringFromString(pair.key)) forHTTPHeaderField:(Apple::getNSStringFromString(pair.value))];
 						}
@@ -124,7 +124,7 @@ public:
 				}
 			}
 		}
-		return Ref<_UrlRequest>::null();
+		return sl_null;
 	}
 	
 	// override
@@ -152,7 +152,7 @@ public:
 			NSUInteger taskId = [task taskIdentifier];
 			return shared->requests.getValue(taskId, WeakRef<_UrlRequest>::null());
 		}
-		return Ref<_UrlRequest>::null();
+		return sl_null;
 	}
 	
 	void dispatchUploadBody(sl_uint64 bytesSent, sl_uint64 totalBytesSent)
@@ -170,9 +170,9 @@ public:
 			NSDictionary* dict = http.allHeaderFields;
 			if (dict != nil && [dict count] > 0) {
 				Map<String, String> map;
-				map.initHashBy<HashIgnoreCaseString, CompareIgnoreCaseString>();
+				map.initHash(0, HashIgnoreCaseString(), CompareIgnoreCaseString());
 				if (map.isNotNull()) {
-					IMap<String, String>* pmap = map.ref.ptr;
+					IMap<String, String>* pmap = map.ref.get();
 					[dict enumerateKeysAndObjectsUsingBlock:^(id key, id value, BOOL *stop) {
 						pmap->put_NoLock(Apple::getStringFromNSString((NSString*)key), Apple::getStringFromNSString((NSString*)value), MapPutMode::AddAlways);
 					}];

@@ -73,7 +73,7 @@ public:
 		if (view.isNotNull()) {
 			Ref<ViewInstance> instance = view->attachToNewInstance(Ref<ViewInstance>::null());
 			if (instance.isNotNull()) {
-				handle = UIPlatform::getViewHandle(instance.ptr);
+				handle = UIPlatform::getViewHandle(instance.get());
 			}
 			NSRect rc = [tv contentRect];
 			view->setFrame((sl_ui_pos)(rc.origin.x), (sl_ui_pos)(rc.origin.y), (sl_ui_pos)(rc.size.width), (sl_ui_pos)(rc.size.height));
@@ -121,7 +121,7 @@ Ref<ViewInstance> TabView::createNativeWidget(ViewInstance* _parent)
 		((_TabView*)this)->__copyTabs(handle);
 		
 		Ref<Font> font = getFont();
-		NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
+		NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
 		[handle setFont:hFont];
 	}
 	OSX_VIEW_CREATE_INSTANCE_END
@@ -199,7 +199,7 @@ void TabView::_setFont_NW(const Ref<Font>& font)
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTabView class]]) {
 		NSTabView* tv = (NSTabView*)handle;
-		NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
+		NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
 		[tv setFont:hFont];
 	}
 }
@@ -221,8 +221,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::TabView::checkInstance(view.ptr)) {
-			((slib::_TabView*)(view.ptr))->__updateContentViewSize(self);
+		if (slib::_TabView* _view = slib::CastInstance<slib::_TabView>(view.get())) {
+			_view->__updateContentViewSize(self);
 		}
 	}
 }
@@ -232,8 +232,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::TabView::checkInstance(view.ptr)) {
-			((slib::_TabView*)(view.ptr))->__onSelectTab(self);
+		if (slib::_TabView* _view = slib::CastInstance<slib::_TabView>(view.get())) {
+			_view->__onSelectTab(self);
 		}
 	}
 }

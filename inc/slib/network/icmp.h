@@ -235,13 +235,28 @@ public:
 };
 
 template <>
-int Compare<IcmpEchoAddress>::compare(const IcmpEchoAddress& a, const IcmpEchoAddress& b);
+class Compare<IcmpEchoAddress>
+{
+public:
+	int operator()(const IcmpEchoAddress& a, const IcmpEchoAddress& b) const;
+	
+};
 
 template <>
-sl_bool Compare<IcmpEchoAddress>::equals(const IcmpEchoAddress& a, const IcmpEchoAddress& b);
+class Equals<IcmpEchoAddress>
+{
+public:
+	sl_bool operator()(const IcmpEchoAddress& a, const IcmpEchoAddress& b) const;
+	
+};
 
 template <>
-sl_uint32 Hash<IcmpEchoAddress>::hash(const IcmpEchoAddress& a);
+class Hash<IcmpEchoAddress>
+{
+public:
+	sl_uint32 operator()(const IcmpEchoAddress& a) const;
+	
+};
 
 SLIB_NETWORK_NAMESPACE_END
 

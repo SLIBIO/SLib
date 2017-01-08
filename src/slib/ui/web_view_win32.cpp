@@ -89,8 +89,7 @@ public:
 	void __onBeforeNavigate2(BSTR szURL, VARIANT_BOOL* pFlagCancel)
 	{
 		Ref<View> _view = getView();
-		if (WebView::checkInstance(_view.ptr)) {
-			WebView* view = (WebView*)(_view.ptr);
+		if (WebView* view = CastInstance<WebView>(_view.get())) {
 			view->dispatchStartLoad(szURL);
 			*pFlagCancel = 0;
 		}
@@ -99,8 +98,7 @@ public:
 	void __onNavigateComplete(BSTR szURL)
 	{
 		Ref<View> _view = getView();
-		if (WebView::checkInstance(_view.ptr)) {
-			WebView* view = (WebView*)(_view.ptr);
+		if (WebView* view = CastInstance<WebView>(_view.get())) {
 			__installExternal();
 		}
 	}
@@ -108,8 +106,7 @@ public:
 	void __onDocumentComplete(BSTR szURL)
 	{
 		Ref<View> _view = getView();
-		if (WebView::checkInstance(_view.ptr)) {
-			WebView* view = (WebView*)(_view.ptr);
+		if (WebView* view = CastInstance<WebView>(_view.get())) {
 			view->dispatchFinishLoad(szURL, sl_false);
 		}
 	}
@@ -454,8 +451,7 @@ public:
 			{
 				sl_uint32 n = (sl_uint32)(pDispParams->cArgs);
 				Ref<View> _view = m_viewInstance->getView();
-				if (WebView::checkInstance(_view.ptr)) {
-					WebView* view = (WebView*)(_view.ptr);
+				if (WebView* view = CastInstance<WebView>(_view.get())) {
 					List<String> params;
 					for (sl_uint32 i = 0; i < n; i++) {
 						VARIANT& var = pDispParams->rgvarg[n - 1 - i];
@@ -473,9 +469,9 @@ public:
 						}
 						params.add(s);
 					}
-					String msg = params.getItemValue(0, String::null());
+					String msg = params.getValueAt(0);
 					if (msg.isNotEmpty()) {
-						String param = params.getItemValue(1, String::null());
+						String param = params.getValueAt(1);
 						view->dispatchMessageFromJavaScript(msg, param);
 					}
 					/*
@@ -900,7 +896,7 @@ Ref<ViewInstance> WebView::createNativeWidget(ViewInstance* parent)
 {
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
 	if (!shared) {
-		return Ref<ViewInstance>::null();
+		return sl_null;
 	}
 
 	DWORD style = 0;
@@ -908,8 +904,8 @@ Ref<ViewInstance> WebView::createNativeWidget(ViewInstance* parent)
 	Ref<_Win32_WebViewInstance> ret = Win32_ViewInstance::create<_Win32_WebViewInstance>(this, parent, (LPCWSTR)((LONG_PTR)(shared->wndClassForView)), L"", style, styleEx);
 	if (ret.isNotNull()) {
 		ret->_initialize();
-		((_WebView*)this)->__init(ret.ptr);
-		((_WebView*)this)->__load(ret.ptr);
+		((_WebView*)this)->__init(ret.get());
+		((_WebView*)this)->__load(ret.get());
 	}
 	return ret;
 }
@@ -917,8 +913,7 @@ Ref<ViewInstance> WebView::createNativeWidget(ViewInstance* parent)
 void WebView::_refreshSize_NW()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
-		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.ptr);
+	if (_Win32_WebViewInstance* instance = CastInstance<_Win32_WebViewInstance>(_instance.get())) {
 		instance->_resize();
 	}
 }
@@ -926,8 +921,7 @@ void WebView::_refreshSize_NW()
 void WebView::_load_NW()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
-		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.ptr);
+	if (_Win32_WebViewInstance* instance = CastInstance<_Win32_WebViewInstance>(_instance.get())) {
 		((_WebView*)this)->__load(instance);
 	}
 }
@@ -935,8 +929,7 @@ void WebView::_load_NW()
 String WebView::_getURL_NW()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
-		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.ptr);
+	if (_Win32_WebViewInstance* instance = CastInstance<_Win32_WebViewInstance>(_instance.get())) {
 		IHTMLDocument2* doc2 = instance->getDoc();
 		if (doc2) {
 			String ret;
@@ -958,8 +951,7 @@ String WebView::_getURL_NW()
 String WebView::_getPageTitle_NW()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
-		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.ptr);
+	if (_Win32_WebViewInstance* instance = CastInstance<_Win32_WebViewInstance>(_instance.get())) {
 		IHTMLDocument2* doc2 = instance->getDoc();
 		if (doc2) {
 			String ret;
@@ -975,14 +967,13 @@ String WebView::_getPageTitle_NW()
 			return ret;
 		}
 	}
-	return String::null();
+	return sl_null;
 }
 
 void WebView::_goBack_NW()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
-		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.ptr);
+	if (_Win32_WebViewInstance* instance = CastInstance<_Win32_WebViewInstance>(_instance.get())) {
 		IWebBrowser2* browser = instance->m_browser;
 		if (browser) {
 			browser->GoBack();
@@ -993,8 +984,7 @@ void WebView::_goBack_NW()
 void WebView::_goForward_NW()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
-		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.ptr);
+	if (_Win32_WebViewInstance* instance = CastInstance<_Win32_WebViewInstance>(_instance.get())) {
 		IWebBrowser2* browser = instance->m_browser;
 		if (browser) {
 			browser->GoForward();
@@ -1005,8 +995,7 @@ void WebView::_goForward_NW()
 void WebView::_reload_NW()
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
-		_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.ptr);
+	if (_Win32_WebViewInstance* instance = CastInstance<_Win32_WebViewInstance>(_instance.get())) {
 		IWebBrowser2* browser = instance->m_browser;
 		if (browser) {
 			browser->Refresh();
@@ -1060,8 +1049,7 @@ void WebView::_runJavaScript_NW(const String& _script)
 	String16 script = _script;
 	if (script.isNotEmpty()) {
 		Ref<ViewInstance> _instance = getViewInstance();
-		if (_Win32_WebViewInstance::checkInstance(_instance.ptr)) {
-			_Win32_WebViewInstance* instance = (_Win32_WebViewInstance*)(_instance.ptr);
+		if (_Win32_WebViewInstance* instance = CastInstance<_Win32_WebViewInstance>(_instance.get())) {
 			IHTMLDocument2* doc2 = instance->getDoc();
 			if (doc2) {
 				HRESULT hr;

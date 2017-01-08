@@ -16,7 +16,7 @@ Image::Image()
 
 Ref<Image> Image::createStatic(const ImageDesc& desc)
 {
-	return createStatic(desc.width, desc.height, desc.colors, desc.stride, desc.ref.ptr);
+	return createStatic(desc.width, desc.height, desc.colors, desc.stride, desc.ref.get());
 }
 
 Ref<Image> Image::createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride)
@@ -24,7 +24,7 @@ Ref<Image> Image::createStatic(sl_uint32 width, sl_uint32 height, const Color* p
 	return createStatic(width, height, pixels, stride, sl_null);
 }
 
-Ref<Image> Image::createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride, const Referable* ref)
+Ref<Image> Image::createStatic(sl_uint32 width, sl_uint32 height, const Color* pixels, sl_int32 stride, Referable* ref)
 {
 	Ref<Image> ret;
 	if (width == 0 || height == 0 || pixels == sl_null) {
@@ -290,7 +290,7 @@ sl_bool Image::resetPixels(const Color& color)
 
 Ref<Canvas> Image::getCanvas()
 {
-	return Ref<Canvas>::null();
+	return sl_null;
 }
 
 void Image::fillColor(const Color& color)
@@ -1212,7 +1212,7 @@ Ref<Image> Image::sub(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 heigh
 			}
 		}
 	}
-	return Ref<Image>::null();
+	return sl_null;
 }
 
 Ref<Image> Image::scale(sl_uint32 width, sl_uint32 height, StretchMode stretch) const
@@ -1281,7 +1281,7 @@ Ref<Image> Image::loadFromMemory(const void* _mem, sl_size size, sl_uint32 width
 		}
 		return ret;
 	}
-	return Ref<Image>::null();
+	return sl_null;
 }
 
 Ref<Image> Image::loadFromMemory(Memory mem, sl_uint32 width, sl_uint32 height)

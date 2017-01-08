@@ -319,7 +319,7 @@ Ref<UrlRequest> UrlRequest::_send(const UrlRequestParam& param, const String& _u
 		}
 	}
 	_onCreateError(param, url, String::null());
-	return Ref<UrlRequest>::null();
+	return sl_null;
 }
 
 void UrlRequest::_init(const UrlRequestParam& param, const String& url, const String& downloadFilePath)
@@ -376,7 +376,7 @@ void UrlRequest::onComplete()
 	}
 	if (m_onComplete.isNotNull()) {
 		if (m_dispatcher.isNotNull()) {
-			m_dispatcher->dispatch(SLIB_CALLBACK_REF(UrlRequest, _runCallback, this, m_onComplete));
+			m_dispatcher->dispatch(SLIB_BIND_REF(void(), UrlRequest, _runCallback, this, m_onComplete));
 		} else {
 			m_onComplete(this);
 		}
@@ -457,12 +457,11 @@ void UrlRequest::_onCreateError(const UrlRequestParam& param, const String& url,
 {
 	Ref<UrlRequest> req = new UrlRequest;
 	if (req.isNotNull()) {
-		SLIB_LOG_ERROR("UrlRequest", String::format("Failed to create request on %s", url));
+		LogError("UrlRequest", "Failed to create request on %s", url);
 		req->_init(param, url, downloadFilePath);
 		req->onError();
 	}
 }
-
 
 String UrlRequest::_buildParameters(const Map<String, Variant>& params)
 {
@@ -487,12 +486,12 @@ Memory UrlRequest::_buildRequestBody(const Variant& varBody)
 		if (varBody.isObject()) {
 			Ref<Referable> obj = varBody.getObject();
 			if (obj.isNotNull()) {
-				if (IMap<String, Variant>::checkInstance(obj.ptr)) {
-					body = _buildParameters((IMap<String, Variant>*)(obj.ptr)).toMemory();
-				} else if (XmlDocument::checkInstance(obj.ptr)) {
-					body = ((XmlDocument*)(obj.ptr))->toString().toMemory();
-				} else if (CMemory::checkInstance(obj.ptr)) {
-					body = (CMemory*)(obj.ptr);
+				if (IMap<String, Variant>* map = CastInstance< IMap<String, Variant> >(obj.get())) {
+					body = _buildParameters(map).toMemory();
+				} else if (XmlDocument* xml = CastInstance<XmlDocument>(obj.get())) {
+					body = xml->toString().toMemory();
+				} else if (CMemory* mem = CastInstance<CMemory>(obj.get())) {
+					body = mem;
 				}
 			}
 		} else {
@@ -501,6 +500,5 @@ Memory UrlRequest::_buildRequestBody(const Variant& varBody)
 	}
 	return body;
 }
-
 
 SLIB_NETWORK_NAMESPACE_END

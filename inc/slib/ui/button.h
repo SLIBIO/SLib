@@ -11,9 +11,9 @@ class SLIB_EXPORT ButtonCategoryProperties
 {
 public:
 	Color textColor;
-	SafeRef<Drawable> background;
-	SafeRef<Pen> border;
-	SafeRef<Drawable> icon;
+	AtomicRef<Drawable> background;
+	AtomicRef<Pen> border;
+	AtomicRef<Drawable> icon;
 	
 public:
 	ButtonCategoryProperties();
@@ -228,7 +228,7 @@ public:
 	void _setFont_NW(const Ref<Font>& font);
 
 private:
-	SafeString m_text;
+	AtomicString m_text;
 	sl_bool m_flagDefaultButton;
 
 	ButtonState m_state;
@@ -250,7 +250,7 @@ private:
 	sl_ui_pos m_textMarginBottom;
 	
 	Color m_textColorDefault;
-	SafeRef<Drawable> m_iconDefault;
+	AtomicRef<Drawable> m_iconDefault;
 	sl_bool m_flagUseDefaultColorFilter;
 
 	ButtonCategory* m_categories;

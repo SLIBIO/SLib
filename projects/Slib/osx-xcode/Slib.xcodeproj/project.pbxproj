@@ -14,6 +14,8 @@
 		2620412B1C88A95E00AF48F2 /* object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2620412A1C88A95E00AF48F2 /* object.cpp */; };
 		2620412D1C88AE3B00AF48F2 /* list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2620412C1C88AE3B00AF48F2 /* list.cpp */; };
 		2620412F1C88AF9300AF48F2 /* map.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2620412E1C88AF9300AF48F2 /* map.cpp */; };
+		2626C12F1E15AA55004E150C /* collection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2626C12E1E15AA55004E150C /* collection.cpp */; };
+		2626C1311E15AA73004E150C /* preference.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2626C1301E15AA73004E150C /* preference.cpp */; };
 		2640BC391CAA65EF004AA780 /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2640BC381CAA65EF004AA780 /* xml.cpp */; };
 		26483B2C1C99D8F3009075BF /* yuv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26483B2B1C99D8F3009075BF /* yuv.cpp */; };
 		2648D5421D0965C400819E09 /* mobile_game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2648D5411D0965C400819E09 /* mobile_game.cpp */; };
@@ -65,12 +67,8 @@
 		266DD54A1C11940A00D47AB0 /* audio_codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4A51C11940A00D47AB0 /* audio_codec.cpp */; };
 		266DD54B1C11940A00D47AB0 /* audio_format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4A61C11940A00D47AB0 /* audio_format.cpp */; };
 		266DD54C1C11940A00D47AB0 /* audio_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4A71C11940A00D47AB0 /* audio_player.cpp */; };
-		266DD54E1C11940A00D47AB0 /* audio_player_dsound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4A91C11940A00D47AB0 /* audio_player_dsound.cpp */; };
-		266DD5501C11940A00D47AB0 /* audio_player_opensl_es.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4AB1C11940A00D47AB0 /* audio_player_opensl_es.cpp */; };
 		266DD5511C11940A00D47AB0 /* audio_player_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4AC1C11940A00D47AB0 /* audio_player_osx.mm */; };
 		266DD5531C11940A00D47AB0 /* audio_recorder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4AE1C11940A00D47AB0 /* audio_recorder.cpp */; };
-		266DD5551C11940A00D47AB0 /* audio_recorder_dsound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4B01C11940A00D47AB0 /* audio_recorder_dsound.cpp */; };
-		266DD5571C11940A00D47AB0 /* audio_recorder_opensl_es.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4B21C11940A00D47AB0 /* audio_recorder_opensl_es.cpp */; };
 		266DD5581C11940A00D47AB0 /* audio_recorder_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4B31C11940A00D47AB0 /* audio_recorder_osx.mm */; };
 		266DD55A1C11940A00D47AB0 /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4B51C11940A00D47AB0 /* camera.cpp */; };
 		266DD55C1C11940A00D47AB0 /* codec_opus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4B71C11940A00D47AB0 /* codec_opus.cpp */; };
@@ -154,8 +152,6 @@
 		267C16B91CE779D8000318C2 /* scroll_bar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 267C16B81CE779D8000318C2 /* scroll_bar.cpp */; };
 		2688DD851C16F6E200973672 /* video_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2688DD841C16F6E200973672 /* video_view.cpp */; };
 		2688DD871C16FBDF00973672 /* camera_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2688DD861C16FBDF00973672 /* camera_view.cpp */; };
-		268916361C182ADA009FD75E /* camera_dshow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268916351C182ADA009FD75E /* camera_dshow.cpp */; };
-		268D4F2E1C89FBF4000D9691 /* queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268D4F2D1C89FBF4000D9691 /* queue.cpp */; };
 		26912BC31DEA81D5008C5FFD /* web_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26912BC21DEA81D5008C5FFD /* web_service.cpp */; };
 		2699DC901D43682D0085EE67 /* list_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2699DC8F1D43682D0085EE67 /* list_view.cpp */; };
 		26A4ECCF1CFE7FB700288A0B /* tree_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26A4ECCE1CFE7FB700288A0B /* tree_view.cpp */; };
@@ -186,6 +182,11 @@
 		26C13E471DDA516D00612945 /* url_request_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26C13E461DDA516D00612945 /* url_request_apple.mm */; };
 		26C4E26B1DB47A7200A9211F /* transition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C4E26A1DB47A7200A9211F /* transition.cpp */; };
 		26C70E9C1CA168EB005B1768 /* datagram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C70E9B1CA168EB005B1768 /* datagram.cpp */; };
+		26C72AC71E2150E200F7D6D0 /* audio_player_dsound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C72AC51E2150E200F7D6D0 /* audio_player_dsound.cpp */; };
+		26C72AC81E2150E200F7D6D0 /* audio_player_opensl_es.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C72AC61E2150E200F7D6D0 /* audio_player_opensl_es.cpp */; };
+		26C72ACB1E2150EE00F7D6D0 /* audio_recorder_dsound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C72AC91E2150EE00F7D6D0 /* audio_recorder_dsound.cpp */; };
+		26C72ACC1E2150EE00F7D6D0 /* audio_recorder_opensl_es.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C72ACA1E2150EE00F7D6D0 /* audio_recorder_opensl_es.cpp */; };
+		26C72ACE1E2150F900F7D6D0 /* camera_dshow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C72ACD1E2150F900F7D6D0 /* camera_dshow.cpp */; };
 		26C7E37E1D00097000C0A769 /* linear_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C7E37D1D00097000C0A769 /* linear_view.cpp */; };
 		26CA8D791C23B4C90049A658 /* system_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26CA8D781C23B4C90049A658 /* system_apple.mm */; };
 		26CBB0291DE5EC4F00F5A6F9 /* earth.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CBB0241DE5EC4F00F5A6F9 /* earth.cpp */; };
@@ -273,6 +274,8 @@
 		2620412A1C88A95E00AF48F2 /* object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = object.cpp; sourceTree = "<group>"; };
 		2620412C1C88AE3B00AF48F2 /* list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list.cpp; sourceTree = "<group>"; };
 		2620412E1C88AF9300AF48F2 /* map.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = map.cpp; sourceTree = "<group>"; };
+		2626C12E1E15AA55004E150C /* collection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = collection.cpp; sourceTree = "<group>"; };
+		2626C1301E15AA73004E150C /* preference.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = preference.cpp; sourceTree = "<group>"; };
 		2640BC381CAA65EF004AA780 /* xml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = xml.cpp; sourceTree = "<group>"; };
 		26483B2B1C99D8F3009075BF /* yuv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yuv.cpp; sourceTree = "<group>"; };
 		2648D5411D0965C400819E09 /* mobile_game.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mobile_game.cpp; sourceTree = "<group>"; };
@@ -324,12 +327,8 @@
 		266DD4A51C11940A00D47AB0 /* audio_codec.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_codec.cpp; sourceTree = "<group>"; };
 		266DD4A61C11940A00D47AB0 /* audio_format.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_format.cpp; sourceTree = "<group>"; };
 		266DD4A71C11940A00D47AB0 /* audio_player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_player.cpp; sourceTree = "<group>"; };
-		266DD4A91C11940A00D47AB0 /* audio_player_dsound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_player_dsound.cpp; sourceTree = "<group>"; };
-		266DD4AB1C11940A00D47AB0 /* audio_player_opensl_es.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_player_opensl_es.cpp; sourceTree = "<group>"; };
 		266DD4AC1C11940A00D47AB0 /* audio_player_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = audio_player_osx.mm; sourceTree = "<group>"; };
 		266DD4AE1C11940A00D47AB0 /* audio_recorder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_recorder.cpp; sourceTree = "<group>"; };
-		266DD4B01C11940A00D47AB0 /* audio_recorder_dsound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_recorder_dsound.cpp; sourceTree = "<group>"; };
-		266DD4B21C11940A00D47AB0 /* audio_recorder_opensl_es.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_recorder_opensl_es.cpp; sourceTree = "<group>"; };
 		266DD4B31C11940A00D47AB0 /* audio_recorder_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = audio_recorder_osx.mm; sourceTree = "<group>"; };
 		266DD4B51C11940A00D47AB0 /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cpp; sourceTree = "<group>"; };
 		266DD4B71C11940A00D47AB0 /* codec_opus.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = codec_opus.cpp; sourceTree = "<group>"; };
@@ -413,8 +412,6 @@
 		267C16B81CE779D8000318C2 /* scroll_bar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scroll_bar.cpp; sourceTree = "<group>"; };
 		2688DD841C16F6E200973672 /* video_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_view.cpp; sourceTree = "<group>"; };
 		2688DD861C16FBDF00973672 /* camera_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera_view.cpp; sourceTree = "<group>"; };
-		268916351C182ADA009FD75E /* camera_dshow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera_dshow.cpp; sourceTree = "<group>"; };
-		268D4F2D1C89FBF4000D9691 /* queue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = queue.cpp; sourceTree = "<group>"; };
 		26912BC21DEA81D5008C5FFD /* web_service.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = web_service.cpp; sourceTree = "<group>"; };
 		2699DC8F1D43682D0085EE67 /* list_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list_view.cpp; sourceTree = "<group>"; };
 		26A4ECCE1CFE7FB700288A0B /* tree_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tree_view.cpp; sourceTree = "<group>"; };
@@ -445,6 +442,11 @@
 		26C13E461DDA516D00612945 /* url_request_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = url_request_apple.mm; sourceTree = "<group>"; };
 		26C4E26A1DB47A7200A9211F /* transition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = transition.cpp; sourceTree = "<group>"; };
 		26C70E9B1CA168EB005B1768 /* datagram.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = datagram.cpp; sourceTree = "<group>"; };
+		26C72AC51E2150E200F7D6D0 /* audio_player_dsound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_player_dsound.cpp; sourceTree = "<group>"; };
+		26C72AC61E2150E200F7D6D0 /* audio_player_opensl_es.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_player_opensl_es.cpp; sourceTree = "<group>"; };
+		26C72AC91E2150EE00F7D6D0 /* audio_recorder_dsound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_recorder_dsound.cpp; sourceTree = "<group>"; };
+		26C72ACA1E2150EE00F7D6D0 /* audio_recorder_opensl_es.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_recorder_opensl_es.cpp; sourceTree = "<group>"; };
+		26C72ACD1E2150F900F7D6D0 /* camera_dshow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera_dshow.cpp; sourceTree = "<group>"; };
 		26C7E37D1D00097000C0A769 /* linear_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = linear_view.cpp; sourceTree = "<group>"; };
 		26CA8D781C23B4C90049A658 /* system_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = system_apple.mm; sourceTree = "<group>"; };
 		26CBB0241DE5EC4F00F5A6F9 /* earth.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = earth.cpp; path = map/earth.cpp; sourceTree = "<group>"; };
@@ -553,17 +555,17 @@
 				26D028641C48847E0083F1F3 /* audio_data.cpp */,
 				266DD4A61C11940A00D47AB0 /* audio_format.cpp */,
 				266DD4A71C11940A00D47AB0 /* audio_player.cpp */,
-				266DD4A91C11940A00D47AB0 /* audio_player_dsound.cpp */,
-				266DD4AB1C11940A00D47AB0 /* audio_player_opensl_es.cpp */,
+				26C72AC51E2150E200F7D6D0 /* audio_player_dsound.cpp */,
+				26C72AC61E2150E200F7D6D0 /* audio_player_opensl_es.cpp */,
 				266DD4AC1C11940A00D47AB0 /* audio_player_osx.mm */,
 				266DD4AE1C11940A00D47AB0 /* audio_recorder.cpp */,
-				266DD4B01C11940A00D47AB0 /* audio_recorder_dsound.cpp */,
-				266DD4B21C11940A00D47AB0 /* audio_recorder_opensl_es.cpp */,
+				26C72AC91E2150EE00F7D6D0 /* audio_recorder_dsound.cpp */,
+				26C72ACA1E2150EE00F7D6D0 /* audio_recorder_opensl_es.cpp */,
 				266DD4B31C11940A00D47AB0 /* audio_recorder_osx.mm */,
 				26694BF61C9AB4330047E67C /* audio_util.cpp */,
 				266DD4B51C11940A00D47AB0 /* camera.cpp */,
 				266DD5F31C11DF1500D47AB0 /* camera_avfoundation.mm */,
-				268916351C182ADA009FD75E /* camera_dshow.cpp */,
+				26C72ACD1E2150F900F7D6D0 /* camera_dshow.cpp */,
 				266DD5EF1C11D25900D47AB0 /* camera_osx.mm */,
 				266DD4B71C11940A00D47AB0 /* codec_opus.cpp */,
 				266DD4B81C11940A00D47AB0 /* codec_vp8.cpp */,
@@ -839,6 +841,7 @@
 				A25F2FA41B03A33700854DAF /* base.cpp */,
 				A25F2FA51B03A33700854DAF /* base64.cpp */,
 				26B5737E1D1051DF00304424 /* charset.cpp */,
+				2626C12E1E15AA55004E150C /* collection.cpp */,
 				A234D6EA1B3F12A600ADDF4E /* content_type.cpp */,
 				A25F2FA61B03A33700854DAF /* event.cpp */,
 				A2DE1D8E1B383BC100A74698 /* event_unix.cpp */,
@@ -860,8 +863,8 @@
 				A2DE1D861B383BA600A74698 /* pipe.cpp */,
 				A2DE1D841B383BA600A74698 /* pipe_unix.cpp */,
 				A25F2FB01B03A33700854DAF /* platform_apple.mm */,
+				2626C1301E15AA73004E150C /* preference.cpp */,
 				A2774E0B1B1A005B00538A7B /* ptr.cpp */,
-				268D4F2D1C89FBF4000D9691 /* queue.cpp */,
 				A25F2FB31B03A33700854DAF /* ref.cpp */,
 				26D3A1A31C85894A00FB8DBD /* resource.cpp */,
 				A25F2FB51B03A33700854DAF /* service.cpp */,
@@ -1045,6 +1048,7 @@
 				26E376D91C9858A000B178E6 /* vector3.cpp in Sources */,
 				A2DE1D8C1B383BB000A74698 /* system_unix.cpp in Sources */,
 				266DD5A51C11940A00D47AB0 /* edit_view_osx.mm in Sources */,
+				2626C1311E15AA73004E150C /* preference.cpp in Sources */,
 				2620412B1C88A95E00AF48F2 /* object.cpp in Sources */,
 				266DD5A21C11940A00D47AB0 /* edit_view.cpp in Sources */,
 				26AE7BFE1C9934740026C2D9 /* triangle3.cpp in Sources */,
@@ -1055,6 +1059,7 @@
 				266DD56E1C11940A00D47AB0 /* netfilter.cpp in Sources */,
 				A25F30181B03A33700854DAF /* file_unix.cpp in Sources */,
 				266DD5771C11940A00D47AB0 /* socket_address.cpp in Sources */,
+				26C72ACB1E2150EE00F7D6D0 /* audio_recorder_dsound.cpp in Sources */,
 				266DD59D1C11940A00D47AB0 /* select_view.cpp in Sources */,
 				A25F30261B03A33700854DAF /* setting.cpp in Sources */,
 				266DD5C01C11940A00D47AB0 /* image_view.cpp in Sources */,
@@ -1102,8 +1107,10 @@
 				266DD58F1C11940A00D47AB0 /* button_osx.mm in Sources */,
 				26CA8D791C23B4C90049A658 /* system_apple.mm in Sources */,
 				2688DD851C16F6E200973672 /* video_view.cpp in Sources */,
+				26C72ACC1E2150EE00F7D6D0 /* audio_recorder_opensl_es.cpp in Sources */,
 				266DD56F1C11940A00D47AB0 /* network_async.cpp in Sources */,
 				266DD5F41C11DF1500D47AB0 /* camera_avfoundation.mm in Sources */,
+				26C72ACE1E2150F900F7D6D0 /* camera_dshow.cpp in Sources */,
 				A2C8BE351AFA832800D584D1 /* thirdparty_libjpeg.c in Sources */,
 				264A5D7C1CB6C9BF00FB0B08 /* ui_menu.cpp in Sources */,
 				A2C8BE391AFA832800D584D1 /* thirdparty_zlib.c in Sources */,
@@ -1112,10 +1119,8 @@
 				266DD57F1C11940A00D47AB0 /* opengl_gl.cpp in Sources */,
 				266DD54A1C11940A00D47AB0 /* audio_codec.cpp in Sources */,
 				260A402E1D2AAAD8009CFCE8 /* render_resource.cpp in Sources */,
-				266DD5501C11940A00D47AB0 /* audio_player_opensl_es.cpp in Sources */,
 				266DD5CA1C11940A00D47AB0 /* tab_view.cpp in Sources */,
 				266DD47C1C1193AB00D47AB0 /* vibrator.cpp in Sources */,
-				268916361C182ADA009FD75E /* camera_dshow.cpp in Sources */,
 				A25F30251B03A33700854DAF /* service.cpp in Sources */,
 				26C13E471DDA516D00612945 /* url_request_apple.mm in Sources */,
 				266DD5F01C11D25900D47AB0 /* camera_osx.mm in Sources */,
@@ -1128,7 +1133,6 @@
 				266DD5E21C11940A00D47AB0 /* web_view.cpp in Sources */,
 				A25F300C1B03A33700854DAF /* app.cpp in Sources */,
 				26FA807C1C98891B0074F76B /* quaternion.cpp in Sources */,
-				268D4F2E1C89FBF4000D9691 /* queue.cpp in Sources */,
 				26FBDE5D1DA2B40700FF1B55 /* font_apple.mm in Sources */,
 				2666122B1D2A44280081F26E /* graphics_resource.cpp in Sources */,
 				266DD48E1C1193C400D47AB0 /* bitmap.cpp in Sources */,
@@ -1138,7 +1142,6 @@
 				266DD5DF1C11940A00D47AB0 /* view_osx.mm in Sources */,
 				E17DADF11E0C9A1E006161F6 /* gesture.cpp in Sources */,
 				A25F301E1B03A33700854DAF /* mutex.cpp in Sources */,
-				266DD5571C11940A00D47AB0 /* audio_recorder_opensl_es.cpp in Sources */,
 				266DD5D81C11940A00D47AB0 /* view.cpp in Sources */,
 				26A4ECCF1CFE7FB700288A0B /* tree_view.cpp in Sources */,
 				A25F302B1B03A33700854DAF /* thread.cpp in Sources */,
@@ -1177,7 +1180,6 @@
 				266DD5B31C11940A00D47AB0 /* list_report_view.cpp in Sources */,
 				266F12B31C97A13F00DE26FF /* block_cipher.cpp in Sources */,
 				A2C8BE371AFA832800D584D1 /* thirdparty_libpng.c in Sources */,
-				266DD54E1C11940A00D47AB0 /* audio_player_dsound.cpp in Sources */,
 				266DD57B1C11940A00D47AB0 /* tcpip.cpp in Sources */,
 				2688DD871C16FBDF00973672 /* camera_view.cpp in Sources */,
 				26AFF77B1C34CE2B00AF9470 /* atomic.cpp in Sources */,
@@ -1210,11 +1212,14 @@
 				26C13E431DDA30FD00612945 /* url.cpp in Sources */,
 				26FBC26D1DF9E83F00D76774 /* function.cpp in Sources */,
 				266DD5661C11940A00D47AB0 /* http_proxy.cpp in Sources */,
+				26C72AC71E2150E200F7D6D0 /* audio_player_dsound.cpp in Sources */,
 				266DD5CD1C11940A00D47AB0 /* ui_core.cpp in Sources */,
 				266DD4931C1193C400D47AB0 /* font_freetype.cpp in Sources */,
 				266DD5CB1C11940A00D47AB0 /* tab_view_osx.mm in Sources */,
 				266DD4661C11930800D47AB0 /* md5.cpp in Sources */,
 				26B1C9A11DC7ABB60092C84F /* text_view.cpp in Sources */,
+				2626C12F1E15AA55004E150C /* collection.cpp in Sources */,
+				26C72AC81E2150E200F7D6D0 /* audio_player_opensl_es.cpp in Sources */,
 				266DD5D01C11940A00D47AB0 /* ui_core_osx.mm in Sources */,
 				26D3A1A61C85940700FB8DBD /* locale.cpp in Sources */,
 				260272E61C81877F0079E2F2 /* asset.cpp in Sources */,
@@ -1230,7 +1235,6 @@
 				266DD56A1C11940A00D47AB0 /* mac_address.cpp in Sources */,
 				A25F30111B03A33700854DAF /* async_kqueue.cpp in Sources */,
 				A25F301D1B03A33700854DAF /* memory.cpp in Sources */,
-				266DD5551C11940A00D47AB0 /* audio_recorder_dsound.cpp in Sources */,
 				26B89A6C1DC3467B00ABE895 /* font_atlas.cpp in Sources */,
 				266DD4981C1193C400D47AB0 /* image_jpeg.cpp in Sources */,
 				266DD4651C11930800D47AB0 /* gcm.cpp in Sources */,

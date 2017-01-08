@@ -83,8 +83,8 @@ public:
 	SLIB_BOOLEAN_PROPERTY(FreeSourceOnUpdate)
 
 protected:
-	SafeRef<Bitmap> m_source;
-	SafeWeakRef<Bitmap> m_sourceWeak;
+	AtomicRef<Bitmap> m_source;
+	AtomicWeakRef<Bitmap> m_sourceWeak;
 	sl_uint32 m_width;
 	sl_uint32 m_height;
 	

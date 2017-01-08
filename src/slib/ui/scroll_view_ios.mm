@@ -61,7 +61,7 @@ public:
 		if (viewContent.isNotNull()) {
 			Ref<ViewInstance> instance = viewContent->attachToNewInstance(Ref<ViewInstance>::null());
 			if (instance.isNotNull()) {
-				handle = UIPlatform::getViewHandle(instance.ptr);
+				handle = UIPlatform::getViewHandle(instance.get());
 			}
 			sv->m_contentView = handle;
 			if (handle != nil) {
@@ -88,8 +88,7 @@ public:
 	{
 		CGPoint pt= sv.contentOffset;
 		Ref<View> _view = instance->getView();
-		if (ScrollView::checkInstance(_view.ptr)) {
-			_ScrollView* view = (_ScrollView*)(_view.ptr);
+		if (_ScrollView* view = CastInstance<_ScrollView>(_view.get())) {
 			CGFloat f = UIPlatform::getGlobalScaleFactor();
 			view->_onScroll_NW((sl_scroll_pos)(pt.x * f), (sl_scroll_pos)(pt.y * f));
 		}
@@ -236,7 +235,7 @@ SLIB_UI_NAMESPACE_END
 	[super setContentOffset:contentOffset];
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_ScrollView::__onScroll(instance.ptr, self);
+		slib::_ScrollView::__onScroll(instance.get(), self);
 	}
 }
 

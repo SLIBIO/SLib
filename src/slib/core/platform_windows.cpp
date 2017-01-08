@@ -91,7 +91,7 @@ String Windows::getWindowText(HWND hWnd)
 			return String::fromUtf16(buf, len);
 		}
 	}
-	return String::null();
+	return sl_null;
 }
 
 void Windows::setWindowText(HWND hWnd, const String& _str)

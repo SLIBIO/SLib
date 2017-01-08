@@ -69,7 +69,7 @@ DialogResult AlertDialog::_run()
 		[alert addButtonWithTitle:titleOk];
 	}
 	
-	NSWindow* hParent = UIPlatform::getWindowHandle(parent.ptr);
+	NSWindow* hParent = UIPlatform::getWindowHandle(parent.get());
 	__block NSInteger result;
 	if (hParent != nil) {
 		[alert beginSheetModalForWindow:hParent completionHandler:^(NSInteger n){
@@ -170,7 +170,7 @@ sl_bool FileDialog::_run()
 			[panel setNameFieldStringValue:(Apple::getNSStringFromString(fileName))];
 		}
 		
-		NSWindow* hParent = UIPlatform::getWindowHandle(parent.ptr);
+		NSWindow* hParent = UIPlatform::getWindowHandle(parent.get());
 		__block NSInteger result;
 		if (hParent != nil) {
 			[panel beginSheetModalForWindow:hParent completionHandler:^(NSInteger n){
@@ -194,7 +194,7 @@ sl_bool FileDialog::_run()
 					}
 				}
 				if (paths.getCount() > 0) {
-					selectedPath = paths.getItemValue(0, String::null());
+					selectedPath = paths.getValueAt(0);
 					selectedPaths = paths;
 					return sl_true;
 				}

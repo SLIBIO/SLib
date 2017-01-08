@@ -22,13 +22,13 @@ public:
 	virtual void stop();
 	
 public:
-	SLIB_PTR_PROPERTY(IVideoCaptureListener, FrameListener)
+	SLIB_PROPERTY(AtomicPtr<IVideoCaptureListener>, FrameListener)
 	
 protected:
 	virtual void onCaptureVideoFrame(VideoCapture* capture, VideoCaptureFrame* frame);
 	
 protected:
-	SafeRef<Camera> m_camera;
+	AtomicRef<Camera> m_camera;
 	
 };
 

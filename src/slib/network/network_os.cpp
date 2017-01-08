@@ -9,9 +9,9 @@ SLIB_NETWORK_NAMESPACE_BEGIN
 List<IPv4Address> Network::findAllIPv4Addresses()
 {
 	List<IPv4Address> list;
-	ListItems<NetworkInterfaceInfo> devices(Network::findAllInterfaces());
+	ListElements<NetworkInterfaceInfo> devices(Network::findAllInterfaces());
 	for (sl_size i = 0; i < devices.count; i++) {
-		ListItems<IPv4AddressInfo> addrs(devices[i].addresses_IPv4);
+		ListElements<IPv4AddressInfo> addrs(devices[i].addresses_IPv4);
 		for (sl_size k = 0; k < addrs.count; k++) {
 			if (addrs[k].address.isHost()) {
 				list.add_NoLock(addrs[k].address);
@@ -24,9 +24,9 @@ List<IPv4Address> Network::findAllIPv4Addresses()
 List<IPv4AddressInfo> Network::findAllIPv4AddressInfos()
 {
 	List<IPv4AddressInfo> list;
-	ListItems<NetworkInterfaceInfo> devices(Network::findAllInterfaces());
+	ListElements<NetworkInterfaceInfo> devices(Network::findAllInterfaces());
 	for (sl_size i = 0; i < devices.count; i++) {
-		ListItems<IPv4AddressInfo> addrs(devices[i].addresses_IPv4);
+		ListElements<IPv4AddressInfo> addrs(devices[i].addresses_IPv4);
 		for (sl_size k = 0; k < addrs.count; k++) {
 			if (addrs[k].address.isHost()) {
 				list.add_NoLock(addrs[k]);
@@ -39,7 +39,7 @@ List<IPv4AddressInfo> Network::findAllIPv4AddressInfos()
 List<MacAddress> Network::findAllMacAddresses()
 {
 	List<MacAddress> list;
-	ListItems<NetworkInterfaceInfo> devices(Network::findAllInterfaces());
+	ListElements<NetworkInterfaceInfo> devices(Network::findAllInterfaces());
 	for (sl_size i = 0; i < devices.count; i++) {
 		if (devices[i].macAddress.isNotZero()) {
 			list.add_NoLock(devices[i].macAddress);
@@ -51,7 +51,7 @@ List<MacAddress> Network::findAllMacAddresses()
 
 sl_bool Network::findInterface(const String& name, NetworkInterfaceInfo* pInfo)
 {
-	ListItems<NetworkInterfaceInfo> devices(Network::findAllInterfaces());
+	ListElements<NetworkInterfaceInfo> devices(Network::findAllInterfaces());
 	for (sl_size i = 0; i < devices.count; i++) {
 		if (devices[i].displayName == name) {
 			if(pInfo) {
@@ -79,16 +79,24 @@ SLIB_NETWORK_NAMESPACE_END
 SLIB_NETWORK_NAMESPACE_BEGIN
 
 template <>
-int Compare<MIB_IPADDRROW, IPv4Address>::compare(const MIB_IPADDRROW& a, const IPv4Address& b)
+class Compare<MIB_IPADDRROW, IPv4Address>
 {
-	return Compare<sl_uint32>::compare(a.dwAddr, Endian::swap32LE(b.getInt()));
-}
+public:
+	SLIB_INLINE int operator()(const MIB_IPADDRROW& a, const IPv4Address& b) const
+	{
+		return Compare<sl_uint32>()(a.dwAddr, Endian::swap32LE(b.getInt()));
+	}
+};
 
 template <>
-sl_bool Compare<MIB_IPADDRROW, IPv4Address>::equals(const MIB_IPADDRROW& a, const IPv4Address& b)
+class Equals<MIB_IPADDRROW, IPv4Address>
 {
-	return Compare<sl_uint32>::equals(a.dwAddr, Endian::swap32LE(b.getInt()));
-}
+public:
+	sl_bool operator()(const MIB_IPADDRROW& a, const IPv4Address& b) const
+	{
+		return Equals<sl_uint32>()(a.dwAddr, Endian::swap32LE(b.getInt()));
+	}
+};
 
 List<NetworkInterfaceInfo> Network::findAllInterfaces()
 {
@@ -132,7 +140,7 @@ List<NetworkInterfaceInfo> Network::findAllInterfaces()
 									networkPrefixLength = ((IP_ADAPTER_UNICAST_ADDRESS_LH*)pip)->OnLinkPrefixLength;
 								} else {
 									sl_size indexTable = 0;
-									if (BinarySearch<MIB_IPADDRROW, IPv4Address>::search(iptable->table, iptable->dwNumEntries, a4.address, &indexTable)) {
+									if (BinarySearch::search(iptable->table, iptable->dwNumEntries, a4.address, &indexTable)) {
 										networkPrefixLength = IPv4Address(Endian::swap32LE(iptable->table[indexTable].dwMask)).getNetworkPrefixLengthFromMask();
 									}
 								}
@@ -270,14 +278,14 @@ List<NetworkInterfaceInfo> Network::findAllInterfaces()
 			
 			String name = adapter->ifa_name;
 			
-			NetworkInterfaceInfo* pdev = ret.getItemPtr(name);
+			NetworkInterfaceInfo* pdev = ret.getItemPointer(name);
 			if (!pdev) {
 				NetworkInterfaceInfo dev;
 				dev.name = name;
 				dev.displayName = name;
 				dev.macAddress.setZero();
 				ret.put_NoLock(name, dev);
-				pdev = ret.getItemPtr(name);
+				pdev = ret.getItemPointer(name);
 			}
 			if (pdev && adapter->ifa_addr) {
 				if (adapter->ifa_addr->sa_family == AF_INET) {
@@ -319,7 +327,7 @@ List<NetworkInterfaceInfo> Network::findAllInterfaces()
 		freeifaddrs(adapters);
 	}
 
-    return ret.values();
+    return ret.getAllValues();
 }
 SLIB_NETWORK_NAMESPACE_END
 
@@ -350,7 +358,7 @@ String Network::getInterfaceNameFromIndex(sl_uint32 index)
 	if (s) {
 		return String(s);
 	} else {
-		return String::null();
+		return sl_null;
 	}
 }
 
@@ -386,7 +394,7 @@ List<IPAddress> Network::getIPAddressesFromHostName(const String& hostName)
 
 IPAddress Network::getIPAddressFromHostName(const String& hostName)
 {
-	ListItems<IPAddress> list(getIPAddressesFromHostName(hostName));
+	ListElements<IPAddress> list(getIPAddressesFromHostName(hostName));
 	sl_size i;
 	for (i = 0; i < list.count; i++) {
 		if (list[i].isIPv4()) {
@@ -403,7 +411,7 @@ IPAddress Network::getIPAddressFromHostName(const String& hostName)
 
 IPv4Address Network::getIPv4AddressFromHostName(const String& hostName)
 {
-	ListItems<IPAddress> list(getIPAddressesFromHostName(hostName));
+	ListElements<IPAddress> list(getIPAddressesFromHostName(hostName));
 	for (sl_size i = 0; i < list.count; i++) {
 		if (list[i].isIPv4()) {
 			return list[i].getIPv4();
@@ -414,7 +422,7 @@ IPv4Address Network::getIPv4AddressFromHostName(const String& hostName)
 
 IPv6Address Network::getIPv6AddressFromHostName(const String& hostName)
 {
-	ListItems<IPAddress> list(getIPAddressesFromHostName(hostName));
+	ListElements<IPAddress> list(getIPAddressesFromHostName(hostName));
 	for (sl_size i = 0; i < list.count; i++) {
 		if (list[i].isIPv6()) {
 			return list[i].getIPv6();

@@ -64,13 +64,13 @@ public:
 					m_overlappedRead.Offset = (DWORD)m_offset;
 					m_overlappedRead.OffsetHigh = (DWORD)(m_offset >> 32);
 					if (::ReadFile((HANDLE)handle, req->data, req->size, NULL, &m_overlappedRead)) {
-						doInput(req.ptr, 0, sl_true);
+						doInput(req.get(), 0, sl_true);
 					} else {
 						DWORD dwErr = ::GetLastError();
 						if (dwErr == ERROR_IO_PENDING) {
 							m_requestOperating = req;
 						} else {
-							doInput(req.ptr, 0, sl_true);
+							doInput(req.get(), 0, sl_true);
 						}
 					}
 				}
@@ -84,13 +84,13 @@ public:
 					m_overlappedWrite.Offset = (DWORD)m_offset;
 					m_overlappedWrite.OffsetHigh = (DWORD)(m_offset >> 32);
 					if (::WriteFile((HANDLE)handle, req->data, req->size, NULL, &m_overlappedWrite)) {
-						doOutput(req.ptr, 0, sl_true);
+						doOutput(req.get(), 0, sl_true);
 					} else {
 						DWORD dwErr = ::GetLastError();
 						if (dwErr == ERROR_IO_PENDING) {
 							m_requestOperating = req;
 						} else {
-							doOutput(req.ptr, 0, sl_true);
+							doOutput(req.get(), 0, sl_true);
 						}
 					}
 				}
@@ -118,9 +118,9 @@ public:
 
 		if (req.isNotNull()) {
 			if (pOverlapped == &m_overlappedRead) {
-				doInput(req.ptr, dwSize, flagError);
+				doInput(req.get(), dwSize, flagError);
 			} else if (pOverlapped == &m_overlappedWrite) {
-				doOutput(req.ptr, dwSize, flagError);
+				doOutput(req.get(), dwSize, flagError);
 			}
 		}
 	}
@@ -133,7 +133,7 @@ public:
 		}
 		PtrLocker<IAsyncStreamListener> listener(req->listener);
 		if (listener.isNotNull()) {
-			listener->onRead((AsyncStream*)(object.ptr), req->data, size, req->refData.ptr, flagError);
+			listener->onRead((AsyncStream*)(object.get()), req->data, size, req->refData.get(), flagError);
 		}
 	}
 
@@ -145,7 +145,7 @@ public:
 		}
 		PtrLocker<IAsyncStreamListener> listener(req->listener);
 		if (listener.isNotNull()) {
-			listener->onWrite((AsyncStream*)(object.ptr), req->data, size, req->refData.ptr, flagError);
+			listener->onWrite((AsyncStream*)(object.get()), req->data, size, req->refData.get(), flagError);
 		}
 	}
 
@@ -226,7 +226,7 @@ public:
 Ref<AsyncStream> AsyncFile::openIOCP(const String& path, FileMode mode, const Ref<AsyncIoLoop>& loop)
 {
 	Ref<_Win32AsyncFileStreamInstance> ret = _Win32AsyncFileStreamInstance::open(path, mode);
-	return AsyncStream::create(ret.ptr, AsyncIoMode::InOut, loop);
+	return AsyncStream::create(ret.get(), AsyncIoMode::InOut, loop);
 }
 
 Ref<AsyncStream> AsyncFile::openIOCP(const String& path, FileMode mode)

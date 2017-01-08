@@ -367,14 +367,14 @@ protected:
 	Ref<Texture> m_textureDebug;
 	Ref<Font> m_fontDebug;
 
-	SafeRef<VertexBuffer> m_defaultVertexBufferForDrawRectangle2D;
-	SafeRef<RenderProgram2D_Position> m_defaultRenderProgramForDrawRectangle2D;
+	AtomicRef<VertexBuffer> m_defaultVertexBufferForDrawRectangle2D;
+	AtomicRef<RenderProgram2D_Position> m_defaultRenderProgramForDrawRectangle2D;
 	
-	SafeRef<VertexBuffer> m_defaultVertexBufferForDrawTexture2D;
-	SafeRef<RenderProgram2D_PositionTexture> m_defaultRenderProgramForDrawTexture2D;
+	AtomicRef<VertexBuffer> m_defaultVertexBufferForDrawTexture2D;
+	AtomicRef<RenderProgram2D_PositionTexture> m_defaultRenderProgramForDrawTexture2D;
 	
-	SafeRef<RenderProgram2D_Position> m_defaultRenderProgramForDrawLine2D;
-	SafeRef<RenderProgram3D_Position> m_defaultRenderProgramForDrawLine3D;
+	AtomicRef<RenderProgram2D_Position> m_defaultRenderProgramForDrawLine2D;
+	AtomicRef<RenderProgram3D_Position> m_defaultRenderProgramForDrawLine3D;
 
 };
 

@@ -7,8 +7,8 @@
 #pragma comment(lib, "mswsock.lib")
 
 #include "../../../inc/slib/network/async.h"
-#include "../../../inc/slib/core/log.h"
 #include "../../../inc/slib/core/platform_windows.h"
+#include "../../../inc/slib/core/log.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
@@ -18,11 +18,11 @@ public:
 	WSAOVERLAPPED m_overlappedRead;
 	WSABUF m_bufRead;
 	DWORD m_flagsRead;
-	SafeRef<AsyncStreamRequest> m_requestReading;
+	AtomicRef<AsyncStreamRequest> m_requestReading;
 
 	WSAOVERLAPPED m_overlappedWrite;
 	WSABUF m_bufWrite;
-	SafeRef<AsyncStreamRequest> m_requestWriting;
+	AtomicRef<AsyncStreamRequest> m_requestWriting;
 
 	WSAOVERLAPPED m_overlappedConnect;
 	LPFN_CONNECTEX m_funcConnectEx;
@@ -112,7 +112,7 @@ public:
 						if (dwErr == WSA_IO_PENDING) {
 							m_requestReading = req;
 						} else {
-							_onReceive(req.ptr, 0, sl_true);
+							_onReceive(req.get(), 0, sl_true);
 						}
 					}
 				}
@@ -137,7 +137,7 @@ public:
 						if (dwErr == WSA_IO_PENDING) {
 							m_requestWriting = req;
 						} else {
-							_onSend(req.ptr, 0, sl_true);
+							_onSend(req.get(), 0, sl_true);
 						}
 					}
 				}
@@ -209,7 +209,7 @@ public:
 			Ref<AsyncStreamRequest> req = m_requestReading;
 			m_requestReading.setNull();
 			if (req.isNotNull()) {
-				_onReceive(req.ptr, dwSize, flagError);
+				_onReceive(req.get(), dwSize, flagError);
 			}
 		} else if (pOverlapped == &m_overlappedWrite) {
 			if (dwSize == 0) {
@@ -218,7 +218,7 @@ public:
 			Ref<AsyncStreamRequest> req = m_requestWriting;
 			m_requestWriting.setNull();
 			if (req.isNotNull()) {
-				_onSend(req.ptr, dwSize, flagError);
+				_onSend(req.get(), dwSize, flagError);
 			}
 		} else if (pOverlapped == &m_overlappedConnect) {
 			if (flagError) {
@@ -234,7 +234,7 @@ public:
 Ref<AsyncTcpSocket> AsyncTcpSocket::create(const Ref<Socket>& socket, const Ref<AsyncIoLoop>& loop)
 {
 	Ref<_Win32AsyncTcpSocketInstance> ret = _Win32AsyncTcpSocketInstance::create(socket);
-	return AsyncTcpSocket::create(ret.ptr, loop);
+	return AsyncTcpSocket::create(ret.get(), loop);
 }
 
 
@@ -245,7 +245,7 @@ public:
 
 	WSAOVERLAPPED m_overlapped;
 	char m_bufferAccept[2 * (sizeof(SOCKADDR_IN)+16)];
-	SafeRef<Socket> m_socketAccept;
+	AtomicRef<Socket> m_socketAccept;
 
 	LPFN_ACCEPTEX m_funcAcceptEx;
 	LPFN_GETACCEPTEXSOCKADDRS m_funcGetAcceptExSockaddrs;
@@ -278,7 +278,7 @@ public:
 				}
 			}
 		}
-		return Ref<_Win32AsyncTcpServerInstance>::null();
+		return sl_null;
 	}
 
 	sl_bool initialize()
@@ -428,7 +428,7 @@ public:
 Ref<AsyncTcpServer> AsyncTcpServer::create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
 {
 	Ref<_Win32AsyncTcpServerInstance> ret = _Win32AsyncTcpServerInstance::create(socket, listener);
-	return AsyncTcpServer::create(ret.ptr, loop, flagAutoStart);
+	return AsyncTcpServer::create(ret.get(), loop, flagAutoStart);
 }
 
 
@@ -590,9 +590,9 @@ Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ref<Socket>& socket, const Ptr<
 	Memory buffer = Memory::create(packetSize);
 	if (buffer.isNotEmpty()) {
 		Ref<_Win32AsyncUdpSocketInstance> ret = _Win32AsyncUdpSocketInstance::create(socket, listener, buffer);
-		return AsyncUdpSocket::create(ret.ptr, loop, flagAutoStart);
+		return AsyncUdpSocket::create(ret.get(), loop, flagAutoStart);
 	}
-	return Ref<AsyncUdpSocket>::null();
+	return sl_null;
 }
 
 SLIB_NETWORK_NAMESPACE_END

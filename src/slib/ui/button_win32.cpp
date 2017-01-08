@@ -31,7 +31,7 @@ Ref<ViewInstance> Button::createNativeWidget(ViewInstance* parent)
 {
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
 	if (!shared) {
-		return Ref<ViewInstance>::null();
+		return sl_null;
 	}
 	String16 text = m_text;
 	DWORD style = WS_TABSTOP;
@@ -41,7 +41,7 @@ Ref<ViewInstance> Button::createNativeWidget(ViewInstance* parent)
 	Ref<_Win32_ButtonViewInstance> ret = Win32_ViewInstance::create<_Win32_ButtonViewInstance>(this, parent, L"BUTTON", (LPCWSTR)(text.getData()), style, 0);
 	if (ret.isNotNull()) {
 		Ref<Font> font = getFont();
-		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
 		if (hFont) {
 			::SendMessageW(ret->getHandle(), WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
@@ -76,7 +76,7 @@ void Button::_setFont_NW(const Ref<Font>& font)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}

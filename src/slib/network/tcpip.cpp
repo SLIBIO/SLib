@@ -475,11 +475,10 @@ sl_uint32 IPv4PacketIdentifier::hashCode() const
 	t += destination.hashCode();
 	t *= 31;
 	t += SLIB_MAKE_DWORD2(identification, protocol);
-	return sl_hash(t);
+	return Hash64(t);
 }
 
-template <>
-sl_uint32 Hash<IPv4PacketIdentifier>::hash(const IPv4PacketIdentifier& v)
+sl_uint32 Hash<IPv4PacketIdentifier>::operator()(const IPv4PacketIdentifier& v) const
 {
 	return v.hashCode();
 }
@@ -523,7 +522,7 @@ Memory IPv4Fragmentation::combineFragment(const void* _ip, sl_uint32 size, sl_bo
 	IPv4Packet* ip = (IPv4Packet*)(_ip);
 	if (!flagCheckedHeader) {
 		if (!(IPv4Packet::check(ip, size))) {
-			return Memory::null();
+			return sl_null;
 		}
 	}
 
@@ -545,11 +544,11 @@ Memory IPv4Fragmentation::combineFragment(const void* _ip, sl_uint32 size, sl_bo
 	if (offset == 0) {
 		packet = new IPv4FragmentedPacket;
 		if (packet.isNull()) {
-			return Memory::null();
+			return sl_null;
 		}
 		packet->header = Memory::create(ip, ip->getHeaderSize());
 		if (packet->header.isEmpty()) {
-			return Memory::null();
+			return sl_null;
 		}
 		IPv4Packet* headerNew = (IPv4Packet*)(packet->header.getData());
 		headerNew->setMF(sl_false);
@@ -558,12 +557,12 @@ Memory IPv4Fragmentation::combineFragment(const void* _ip, sl_uint32 size, sl_bo
 		packet->sizeContent = 0;
 		packet->fragments.removeAll();
 		if (!(m_packets.put(id, packet))) {
-			return Memory::null();
+			return sl_null;
 		}
 	} else {
 		m_packets.get(id, &packet);
 		if (packet.isNull()) {
-			return Memory::null();
+			return sl_null;
 		}
 	}
 
@@ -577,7 +576,7 @@ Memory IPv4Fragmentation::combineFragment(const void* _ip, sl_uint32 size, sl_bo
 		packet->sizeContent = end;
 		if (end == 0) {
 			m_packets.remove(id);
-			return Memory::null();
+			return sl_null;
 		}
 	}
 
@@ -592,11 +591,11 @@ Memory IPv4Fragmentation::combineFragment(const void* _ip, sl_uint32 size, sl_bo
 				end = fragments[i].start;
 			}
 			if (start >= end) {
-				return Memory::null();
+				return sl_null;
 			}
 		}
 	} else {
-		return Memory::null();
+		return sl_null;
 	}
 	IPv4Fragment fragment;
 	fragment.start = start;
@@ -618,7 +617,7 @@ Memory IPv4Fragmentation::combineFragment(const void* _ip, sl_uint32 size, sl_bo
 			return mem;
 		}
 	}
-	return Memory::null();
+	return sl_null;
 }
 
 List<Memory> IPv4Fragmentation::makeFragments(const IPv4Packet* header, const void* ipContent, sl_uint32 sizeContent, sl_uint32 mtu)
@@ -651,7 +650,7 @@ List<Memory> IPv4Fragmentation::makeFragments(const IPv4Packet* header, sl_uint1
 		}
 		Memory mem = Memory::create(sizeHeader + n);
 		if (mem.isEmpty()) {
-			return List<Memory>::null();
+			return sl_null;
 		}
 		sl_uint8* buf = (sl_uint8*)(mem.getData());
 		Base::copyMemory(buf, header, sizeHeader);

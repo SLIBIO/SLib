@@ -180,7 +180,7 @@ public:
 	void update(float fraction, const MapCameraPosition& value)
 	{
 		Ref<MapCamera> _camera(m_camera);
-		_MapCamera* camera = (_MapCamera*)(_camera.ptr);
+		_MapCamera* camera = (_MapCamera*)(_camera.get());
 		if (camera) {
 			double minAlt = camera->m_minimumAltitudeForAnimation;
 			camera->m_position = value;
@@ -206,7 +206,7 @@ public:
 	void update(float fraction, const float& value)
 	{
 		Ref<MapCamera> _camera(m_camera);
-		_MapCamera* camera = (_MapCamera*)(_camera.ptr);
+		_MapCamera* camera = (_MapCamera*)(_camera.get());
 		if (camera) {
 			camera->m_position.bearing = value;
 			camera->_invalidateViewMatrix();
@@ -228,7 +228,7 @@ public:
 	void update(float fraction, const float& value)
 	{
 		Ref<MapCamera> _camera(m_camera);
-		_MapCamera* camera = (_MapCamera*)(_camera.ptr);
+		_MapCamera* camera = (_MapCamera*)(_camera.get());
 		if (camera) {
 			camera->m_position.tilt = value;
 			camera->_invalidateViewMatrix();
@@ -264,7 +264,7 @@ Ref<Animation> MapCamera::startNavigation(const AnimationFrames<MapCameraPositio
 			return animation;
 		}
 	}
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
 Ref<Animation> MapCamera::startNavigation(const MapCameraPosition& newPosition, float duration, AnimationCurve curve)
@@ -315,7 +315,7 @@ Ref<Animation> MapCamera::startBearingAnimation(float targetValue, float duratio
 			}
 		}
 	}
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
 void MapCamera::stopBearingAnimation()
@@ -348,7 +348,7 @@ Ref<Animation> MapCamera::startTiltAnimation(float targetValue, float duration)
 			}
 		}
 	}
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
 void MapCamera::stopTiltAnimation()

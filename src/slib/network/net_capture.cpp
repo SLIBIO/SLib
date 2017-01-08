@@ -44,13 +44,13 @@ sl_bool NetCapture::setLinkType(sl_uint32 type)
 
 String NetCapture::getLastErrorMessage()
 {
-	return String::null();
+	return sl_null;
 }
 
 class _NetRawPacketCapture : public NetCapture
 {
 public:
-	SafeRef<Socket> m_socket;
+	AtomicRef<Socket> m_socket;
 	
 	NetworkLinkDeviceType m_deviceType;
 	sl_uint32 m_ifaceIndex;
@@ -81,8 +81,8 @@ public:
 		if (deviceName.isNotEmpty()) {
 			iface = Network::getInterfaceIndexFromName(deviceName);
 			if (iface == 0) {
-				SLIB_LOG_ERROR(TAG, "Failed to find the interface index of device: " + deviceName);
-				return Ref<_NetRawPacketCapture>::null();
+				LogError(TAG, "Failed to find the interface index of device: %s", deviceName);
+				return sl_null;
 			}
 		}
 		Ref<Socket> socket;
@@ -97,11 +97,11 @@ public:
 			if (iface > 0) {
 				if (param.flagPromiscuous) {
 					if (!(socket->setPromiscuousMode(deviceName, sl_true))) {
-						SLIB_LOG(TAG, "Failed to set promiscuous mode to the network device: " + deviceName);
+						Log(TAG, "Failed to set promiscuous mode to the network device: %s", deviceName);
 					}
 				}
 				if (!(socket->setOption_bindToDevice(deviceName))) {
-					SLIB_LOG(TAG, "Failed to bind the network device: " + deviceName);
+					Log(TAG, "Failed to bind the network device: %s", deviceName);
 				}
 			}
 			Memory mem = Memory::create(MAX_PACKET_SIZE);
@@ -113,7 +113,7 @@ public:
 					ret->m_deviceType = deviceType;
 					ret->m_ifaceIndex = iface;
 					ret->m_listener = param.listener;
-					ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_NetRawPacketCapture, _run, ret.ptr));
+					ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_NetRawPacketCapture, _run, ret.get()));
 					if (ret->m_thread.isNotNull()) {
 						ret->m_flagInit = sl_true;
 						if (param.flagAutoStart) {
@@ -121,14 +121,14 @@ public:
 						}
 						return ret;
 					} else {
-						SLIB_LOG_ERROR(TAG, "Failed to create thread");
+						LogError(TAG, "Failed to create thread");
 					}
 				}
 			}
 		} else {
-			SLIB_LOG_ERROR(TAG, "Failed to create Packet socket");
+			LogError(TAG, "Failed to create Packet socket");
 		}
-		return Ref<_NetRawPacketCapture>::null();
+		return sl_null;
 	}
 	
 	void release()
@@ -249,9 +249,9 @@ Ref<NetCapture> NetCapture::createRawPacket(const NetCaptureParam& param)
 class _NetRawIPv4Capture : public NetCapture
 {
 public:
-	SafeRef<Socket> m_socketTCP;
-	SafeRef<Socket> m_socketUDP;
-	SafeRef<Socket> m_socketICMP;
+	AtomicRef<Socket> m_socketTCP;
+	AtomicRef<Socket> m_socketUDP;
+	AtomicRef<Socket> m_socketICMP;
 	
 	Memory m_bufPacket;	
 	Ref<Thread> m_thread;
@@ -290,7 +290,7 @@ public:
 					ret->m_socketUDP = socketUDP;
 					ret->m_socketICMP = socketICMP;
 					ret->m_listener = param.listener;
-					ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_NetRawIPv4Capture, _run, ret.ptr));
+					ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_NetRawIPv4Capture, _run, ret.get()));
 					if (ret->m_thread.isNotNull()) {
 						ret->m_flagInit = sl_true;
 						if (param.flagAutoStart) {
@@ -298,12 +298,12 @@ public:
 						}
 						return ret;
 					} else {
-						SLIB_LOG_ERROR(TAG, "Failed to create thread");
+						LogError(TAG, "Failed to create thread");
 					}
 				}
 			}
 		}
-		return Ref<_NetRawIPv4Capture>::null();
+		return sl_null;
 	}
 	
 	void release()

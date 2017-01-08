@@ -86,8 +86,8 @@ public:
 	sl_bool resetPixels(const Color& color);
 	
 protected:
-	SafeRef<Drawable> m_drawableCached;
-	SafeRef<BitmapCache> m_renderingTextureCached;
+	AtomicRef<Drawable> m_drawableCached;
+	AtomicRef<BitmapCache> m_renderingTextureCached;
 	
 };
 

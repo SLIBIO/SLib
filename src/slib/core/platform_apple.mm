@@ -30,7 +30,7 @@ NSString* Apple::getNSStringFromString16(const String16& str, NSString* def)
 String Apple::getStringFromNSString(NSString* str)
 {
 	if (str == nil) {
-		return String8::null();
+		return sl_null;
 	}
 	const char* buf = [str UTF8String];
 	return String::fromUtf8(buf);
@@ -39,7 +39,7 @@ String Apple::getStringFromNSString(NSString* str)
 String16 Apple::getString16FromNSString(NSString* str)
 {
 	if (str == nil) {
-		return String16::null();
+		return sl_null;
 	}
 	sl_size len = (sl_size)([str length]);
 	String16 ret = String16::allocate(len);
@@ -63,7 +63,7 @@ String Apple::getFilePathFromNSURL(NSURL* url)
 		}
 		return path;
 	}
-	return String::null();
+	return sl_null;
 }
 
 Memory Apple::getMemoryFromNSData(NSData* data)
@@ -81,7 +81,7 @@ Memory Apple::getMemoryFromNSData(NSData* data)
 			}
 		}
 	}
-	return Memory::null();
+	return sl_null;
 }
 
 NSData* Apple::getNSDataFromMemory(const Memory& memory)

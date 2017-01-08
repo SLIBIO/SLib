@@ -26,20 +26,12 @@ MobileApp::MobileApp()
 
 Ref<MobileApp> MobileApp::getApp()
 {
-	Ref<Application> app(Application::getApp());
-	if (MobileApp::checkInstance(app.ptr)) {
-		return Ref<MobileApp>::from(app);
-	}
-	return Ref<MobileApp>::null();
+	return CastRef<MobileApp>(Application::getApp());
 }
 
 Ref<MobileMainWindow> MobileApp::getMainWindow()
 {
-	Ref<Window> window = UIApp::getMainWindow();
-	if (MobileMainWindow::checkInstance(window.ptr)) {
-		return Ref<MobileMainWindow>::from(window);
-	}
-	return Ref<MobileMainWindow>::null();
+	return CastRef<MobileMainWindow>(UIApp::getMainWindow());
 }
 
 sl_bool MobileApp::m_flagPaused = sl_false;
@@ -55,7 +47,7 @@ Ref<View> MobileApp::getRootView()
 	if (window.isNotNull()) {
 		return window->getContentView();
 	}
-	return Ref<View>::null();
+	return sl_null;
 }
 
 Ref<View> MobileApp::getContentView()
@@ -231,8 +223,8 @@ void MobileApp::dispatchPause()
 	Ref<ViewPager> pager = m_pager;
 	if (pager.isNotNull()) {
 		Ref<View> page = pager->getCurrentPage();
-		if (ViewPage::checkInstance(page.ptr)) {
-			((ViewPage*)(page.ptr))->dispatchPause();
+		if (ViewPage* _page = CastInstance<ViewPage>(page.get())) {
+			_page->dispatchPause();
 		}
 	}
 	ListLocker< Ref<ViewPage> > popups(m_popupPages);
@@ -260,8 +252,8 @@ void MobileApp::dispatchResume()
 	Ref<ViewPager> pager = m_pager;
 	if (pager.isNotNull()) {
 		Ref<View> page = pager->getCurrentPage();
-		if (ViewPage::checkInstance(page.ptr)) {
-			((ViewPage*)(page.ptr))->dispatchPause();
+		if (ViewPage* _page = CastInstance<ViewPage>(page.get())) {
+			_page->dispatchPause();
 		}
 	}
 	ListLocker< Ref<ViewPage> > popups(m_popupPages);
@@ -305,8 +297,8 @@ void MobileApp::dispatchBack(UIEvent* ev)
 	}
 	if (m_pager->getPagesCount() > 1) {
 		Ref<View> page = m_pager->getCurrentPage();
-		if (ViewPage::checkInstance(page.ptr)) {
-			((ViewPage*)(page.ptr))->dispatchBackPressed(ev);
+		if (ViewPage* _page = CastInstance<ViewPage>(page.get())) {
+			_page->dispatchBackPressed(ev);
 			if (ev->isPreventedDefault()) {
 				return;
 			}
@@ -323,7 +315,7 @@ sl_bool MobileApp::dispatchBackToApp()
 	if (app.isNotNull()) {
 		Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
 		if (ev.isNotNull()) {
-			app->dispatchBack(ev.ptr);
+			app->dispatchBack(ev.get());
 			if (ev->isPreventedDefault()) {
 				return sl_false;
 			}

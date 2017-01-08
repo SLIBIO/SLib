@@ -173,7 +173,7 @@ sl_bool RenderEngine::beginProgram(const Ref<RenderProgram>& program, RenderProg
 	if (program.isNotNull()) {
 		Ref<RenderProgramInstance> instance = linkProgram(program);
 		if (instance.isNotNull()) {
-			return _beginProgram(program.ptr, instance.ptr, ppState);
+			return _beginProgram(program.get(), instance.get(), ppState);
 		}
 	}
 	return sl_false;
@@ -235,7 +235,7 @@ void RenderEngine::applyTexture(sl_reg sampler, const Ref<Texture>& texture)
 	if (texture.isNotNull()) {
 		Ref<TextureInstance> instance = linkTexture(texture);
 		if (instance.isNotNull()) {
-			_applyTexture(sampler, texture.ptr, instance.ptr);
+			_applyTexture(sampler, texture.get(), instance.get());
 		}
 	}
 }
@@ -247,12 +247,12 @@ Ref<TextureInstance> RenderEngine::linkTexture(const Ref<Texture>& texture)
 		if (instance.isNotNull()) {
 			return instance;
 		}
-		instance = _createTextureInstance(texture.ptr);
+		instance = _createTextureInstance(texture.get());
 		if (instance.isNotNull()) {
 			return instance;
 		}
 	}
-	return Ref<TextureInstance>::null();
+	return sl_null;
 }
 
 Ref<VertexBufferInstance> RenderEngine::linkVertexBuffer(const Ref<VertexBuffer>& vb)
@@ -262,12 +262,12 @@ Ref<VertexBufferInstance> RenderEngine::linkVertexBuffer(const Ref<VertexBuffer>
 		if (instance.isNotNull()) {
 			return instance;
 		}
-		instance = _createVertexBufferInstance(vb.ptr);
+		instance = _createVertexBufferInstance(vb.get());
 		if (instance.isNotNull()) {
 			return instance;
 		}
 	}
-	return Ref<VertexBufferInstance>::null();
+	return sl_null;
 }
 
 Ref<IndexBufferInstance> RenderEngine::linkIndexBuffer(const Ref<IndexBuffer>& ib)
@@ -277,12 +277,12 @@ Ref<IndexBufferInstance> RenderEngine::linkIndexBuffer(const Ref<IndexBuffer>& i
 		if (instance.isNotNull()) {
 			return instance;
 		}
-		instance = _createIndexBufferInstance(ib.ptr);
+		instance = _createIndexBufferInstance(ib.get());
 		if (instance.isNotNull()) {
 			return instance;
 		}
 	}
-	return Ref<IndexBufferInstance>::null();
+	return sl_null;
 }
 
 Ref<RenderProgramInstance> RenderEngine::linkProgram(const Ref<RenderProgram>& program)
@@ -292,12 +292,12 @@ Ref<RenderProgramInstance> RenderEngine::linkProgram(const Ref<RenderProgram>& p
 		if (instance.isNotNull()) {
 			return instance;
 		}
-		instance = _createProgramInstance(program.ptr);
+		instance = _createProgramInstance(program.get());
 		if (instance.isNotNull()) {
 			return instance;
 		}
 	}
-	return Ref<RenderProgramInstance>::null();
+	return sl_null;
 }
 
 void RenderEngine::setLineWidth(sl_real width)

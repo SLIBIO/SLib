@@ -21,26 +21,6 @@ SLIB_ALIGN(8) T Matrix3T<T>::_identity[9] = {
 	, 0, 0, 1 };
 
 
-
-template <class T>
-Matrix3T<T>::Matrix3T(T _m00, T _m01, T _m02,
-					  T _m10, T _m11, T _m12,
-					  T _m20, T _m21, T _m22)
-: m00(_m00), m01(_m01), m02(_m02),
-m10(_m10), m11(_m11), m12(_m12),
-m20(_m20), m21(_m21), m22(_m22)
-{
-}
-
-template <class T>
-Matrix3T<T>::Matrix3T(const Vector3T<T>& row0, const Vector3T<T>& row1, const Vector3T<T>& row2)
-: m00(row0.x), m01(row0.y), m02(row0.z),
-m10(row1.x), m11(row1.y), m12(row1.z),
-m20(row2.x), m21(row2.y), m22(row2.z)
-{
-	
-}
-
 template <class T>
 Vector3T<T> Matrix3T<T>::getRow0() const
 {

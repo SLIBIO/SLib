@@ -3,6 +3,7 @@
 #if defined(SLIB_PLATFORM_IS_OSX)
 
 #include "../../../inc/slib/media/audio_player.h"
+#include "../../../inc/slib/core/log.h"
 
 #include "media_platform_osx.h"
 
@@ -36,7 +37,7 @@ public:
 public:
     static void logError(String text)
     {
-        SLIB_LOG_ERROR("AudioPlayer", text);
+        LogError("AudioPlayer", text);
     }
     
     static Ref<_OSX_AudioPlayerBuffer> create(const AudioPlayerBufferParam& param, const AudioDeviceID deviceID)
@@ -113,7 +114,7 @@ public:
 					ret->m_event = param.event;
 					
 					AudioDeviceIOProcID callback;
-					if (AudioDeviceCreateIOProcID(deviceID, DeviceIOProc, ret.ptr, &callback) == kAudioHardwareNoError) {
+					if (AudioDeviceCreateIOProcID(deviceID, DeviceIOProc, ret.get(), &callback) == kAudioHardwareNoError) {
 						ret->m_callback = callback;
 						if (param.flagAutoStart) {
 							ret->start();
@@ -123,7 +124,7 @@ public:
 						logError("Failed to create io proc");
 					}
 					
-					return Ref<_OSX_AudioPlayerBuffer>::null();
+					return sl_null;
 				}
 			} else {
 				logError("Failed to get set buffer size");
@@ -135,6 +136,7 @@ public:
         return ret;
     }
 	
+	// override
 	void release()
 	{
 		ObjectLocker lock(this);
@@ -149,11 +151,13 @@ public:
 		AudioConverterDispose(m_converter);
 	}
 	
+	// override
 	sl_bool isOpened()
 	{
 		return m_flagOpened;
 	}
 	
+	// override
 	void start()
 	{
 		ObjectLocker lock(this);
@@ -169,7 +173,8 @@ public:
 		}
 	}
 	
-    void pause()
+	// override
+    void stop()
     {
 		ObjectLocker lock(this);
 		if (!m_flagOpened) {
@@ -184,17 +189,13 @@ public:
 		}
     }
 	
-	void stop()
-	{
-		pause();
-	}
-    
+	// override
     sl_bool isRunning()
     {
         return m_flagRunning;
     }
     
-    SafeArray<sl_int16> m_dataConvert;
+    AtomicArray<sl_int16> m_dataConvert;
     void onConvert(sl_uint32 nFrames, AudioBufferList* data)
     {
         sl_uint32 nChannels = m_nChannels;
@@ -261,7 +262,7 @@ public:
 public:
     static void logError(String text)
     {
-        SLIB_LOG_ERROR("AudioPlayer", text);
+        LogError("AudioPlayer", text);
     }
     
     static Ref<_OSX_AudioPlayer> create(const AudioPlayerParam& param)
@@ -269,7 +270,7 @@ public:
 		OSX_AudioDeviceInfo deviceInfo;
 		if (!(deviceInfo.selectDevice(sl_false, param.deviceId))) {
 			logError("Failed to find audio ouptut device - " + param.deviceId);
-			return Ref<_OSX_AudioPlayer>::null();
+			return sl_null;
 		}
 
 		Ref<_OSX_AudioPlayer> ret = new _OSX_AudioPlayer();
@@ -278,19 +279,22 @@ public:
 		}		
         return ret;
     }
-    
+	
+	// override
     Ref<AudioPlayerBuffer> createBuffer(const AudioPlayerBufferParam& param)
     {
         if (m_deviceID != 0) {
             return _OSX_AudioPlayerBuffer::create(param, m_deviceID);
         }
-        return Ref<AudioPlayerBuffer>::null();
+        return sl_null;
     }
 	
+	// override
 	Ref<AudioPlayerControl> _openNative(const AudioPlayerOpenParam& param)
 	{
 		return sl_null;
 	}
+	
 };
 
 Ref<AudioPlayer> AudioPlayer::create(const AudioPlayerParam& param)
@@ -300,7 +304,7 @@ Ref<AudioPlayer> AudioPlayer::create(const AudioPlayerParam& param)
 
 List<AudioPlayerInfo> AudioPlayer::getPlayersList()
 {
-	ListItems<OSX_AudioDeviceInfo> list(OSX_AudioDeviceInfo::getAllDevices(sl_false));
+	ListElements<OSX_AudioDeviceInfo> list(OSX_AudioDeviceInfo::getAllDevices(sl_false));
 	List<AudioPlayerInfo> ret;
 	for (sl_size i = 0; i < list.count; i++) {
 		AudioPlayerInfo info;

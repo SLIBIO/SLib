@@ -27,7 +27,7 @@ String DeviceInformation::getDeviceId()
 	if (jactivity) {
 		return _JAndroidDeviceInformation::getDeviceId.callString(sl_null, jactivity);
 	}
-	return String::null();
+	return sl_null;
 }
 
 String DeviceInformation::getDeviceName()
@@ -36,7 +36,7 @@ String DeviceInformation::getDeviceName()
 	if (jactivity) {
 		return _JAndroidDeviceInformation::getDeviceName.callString(sl_null);
 	}
-	return String::null();
+	return sl_null;
 }
 
 String DeviceInformation::getSystemVersion()
@@ -45,7 +45,7 @@ String DeviceInformation::getSystemVersion()
 	if (jactivity) {
 		return _JAndroidDeviceInformation::getDeviceOSVersion.callString(sl_null);
 	}
-	return String::null();
+	return sl_null;
 }
 
 String DeviceInformation::getSystemName()

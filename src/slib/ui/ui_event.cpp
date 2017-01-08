@@ -67,18 +67,6 @@ DEFINE_MODIFIER_FUNCS(Control)
 DEFINE_MODIFIER_FUNCS(Windows)
 DEFINE_MODIFIER_FUNCS(Command)
 
-KeycodeAndModifiers::KeycodeAndModifiers() : value(0)
-{
-}
-
-KeycodeAndModifiers::KeycodeAndModifiers(Keycode keycode) : value((int)keycode)
-{
-}
-
-KeycodeAndModifiers::KeycodeAndModifiers(Keycode keycode, const Modifiers& modifiers) : value((int)keycode | modifiers)
-{
-}
-
 KeycodeAndModifiers KeycodeAndModifiers::none()
 {
 	return 0;
@@ -134,7 +122,7 @@ String KeycodeAndModifiers::toString() const
 sl_bool KeycodeAndModifiers::parse(const String& str)
 {
 	KeycodeAndModifiers km;
-	ListItems<String> list(str.split("+"));
+	ListElements<String> list(str.split("+"));
 	for (sl_size i = 0; i < list.count; i++) {
 		if (km.getKeycode() != Keycode::Unknown) {
 			return sl_false;
@@ -473,7 +461,7 @@ sl_uint32 UIEvent::getTouchPointsCount() const
 TouchPoint UIEvent::getTouchPoint(sl_uint32 index) const
 {
 	TouchPoint pt;
-	m_points.getItem(index, &pt);
+	m_points.getAt(index, &pt);
 	return pt;
 }
 
@@ -802,7 +790,7 @@ String UI::getKeyName(Keycode code, sl_bool flagShort)
 	if (mapper) {
 		return mapper->get(code, flagShort);
 	}
-	return String::null();
+	return sl_null;
 }
 
 Keycode UI::getKeycodeFromName(const String& keyName)
@@ -887,7 +875,6 @@ void IWindowListener::onDemaximize(Window* window)
 }
 
 
-
 // UIEventLogListener implementation
 void UIEventLogListener::onMouseEvent(View* view, UIEvent* event)
 {
@@ -911,57 +898,57 @@ void UIEventLogListener::onKeyEvent(View* view, UIEvent* event)
 
 void UIEventLogListener::onClick(View* view, UIEvent* event)
 {
-	SLIB_LOG("View", "onClick");
+	Log("View", "onClick");
 }
 
 void UIEventLogListener::onSetCursor(View* view, UIEvent* event)
 {
-	SLIB_LOG("View", "OnSetCursor");
+	Log("View", "OnSetCursor");
 }
 
 void UIEventLogListener::onClose(Window* window, UIEvent* ev)
 {
-	SLIB_LOG("Window", "OnClose");
+	Log("Window", "OnClose");
 }
 
 void UIEventLogListener::onActivate(Window* window)
 {
-	SLIB_LOG("Window", "onActivate");
+	Log("Window", "onActivate");
 }
 
 void UIEventLogListener::onDeactivate(Window* window)
 {
-	SLIB_LOG("Window", "onDeactivate");
+	Log("Window", "onDeactivate");
 }
 
 void UIEventLogListener::onMove(Window* window)
 {
-	SLIB_LOG("Window", "onMove");
+	Log("Window", "onMove");
 }
 
 void UIEventLogListener::onResize(Window* window, sl_ui_len width, sl_ui_len height)
 {
-	SLIB_LOG("Window", String::format("onResize (%d, %d)", width, height));
+	Log("Window", String::format("onResize (%d, %d)", width, height));
 }
 
 void UIEventLogListener::onMinimize(Window* window)
 {
-	SLIB_LOG("Window", "onMinimize");
+	Log("Window", "onMinimize");
 }
 
 void UIEventLogListener::onDeminimize(Window* window)
 {
-	SLIB_LOG("Window", "onDeminimize");
+	Log("Window", "onDeminimize");
 }
 
 void UIEventLogListener::onMaximize(Window* window)
 {
-	SLIB_LOG("Window", "onMaximize");
+	Log("Window", "onMaximize");
 }
 
 void UIEventLogListener::onDemaximize(Window* window)
 {
-	SLIB_LOG("Window", "onDemaximize");
+	Log("Window", "onDemaximize");
 }
 
 String UIEventLogListener::getModifierText(UIEvent* event)
@@ -993,11 +980,11 @@ void UIEventLogListener::processKey(String name, UIEvent* event)
 	} else {
 		str = "KeyUp ";
 	}
-	str += UI::getKeyName(event->getKeycode());
-	
-	str += " VK-" + String::fromInt32(event->getSystemKeycode());
-	str += " " + getModifierText(event);
-	SLIB_LOG(name, str);
+	Log(name, "%s %s VK-%d %s",
+		str,
+		UI::getKeyName(event->getKeycode()),
+		event->getSystemKeycode(),
+		getModifierText(event));
 }
 
 void UIEventLogListener::processMouse(String name, UIEvent* event)
@@ -1052,9 +1039,10 @@ void UIEventLogListener::processMouse(String name, UIEvent* event)
 		default:
 			return;
 	}
-	str += " (" + String::fromInt32((sl_int32)(event->getX())) + "," + String::fromInt32((sl_int32)(event->getY())) + ")";
-	str += " " + getModifierText(event);
-	SLIB_LOG(name, str);
+	Log(name, "%s (%d, %d) %s",
+		str,
+		(sl_int32)(event->getX()), (sl_int32)(event->getY()),
+		getModifierText(event));
 }
 
 void UIEventLogListener::processTouch(String name, UIEvent* event)
@@ -1076,15 +1064,15 @@ void UIEventLogListener::processTouch(String name, UIEvent* event)
 		default:
 			return;
 	}
-	str += " (" + String::fromInt32((sl_int32)(event->getX())) + "," + String::fromInt32((sl_int32)(event->getY())) + ", Pressure-" + String::fromFloat(event->getPressure()) + ")";
-	SLIB_LOG(name, str);
+	Log(name, "%s (%d, %d), Pressure-%f",
+		str,
+		(sl_int32)(event->getX()), (sl_int32)(event->getY()),
+		event->getPressure());
 }
 
 void UIEventLogListener::processMouseWheel(String name, UIEvent* event)
 {
-	String str = "MouseWheel (" + String::fromFloat(event->getDeltaX()) + "," + String::fromFloat(event->getDeltaY());
-	str += ") " + getModifierText(event);
-	SLIB_LOG(name, str);
+	Log(name, "MouseWheel (%f, %f) %s", event->getDeltaX(), event->getDeltaY(), getModifierText(event));
 }
 
 String UI::getStatesDescription()
@@ -1133,8 +1121,7 @@ String UI::getStatesDescription()
 		str += "MBUTTON ";
 	}
 	Point pt = getCursorPos();
-	str += " MOUSE(" + String::fromInt32((sl_int32)(pt.x)) + "," + String::fromInt32((sl_int32)(pt.y)) + ")";
-	return str;
+	return String::format("%s MOUSE(%d, %d)", str, (sl_int32)(pt.x), (sl_int32)(pt.y));
 }
 
 SLIB_UI_NAMESPACE_END

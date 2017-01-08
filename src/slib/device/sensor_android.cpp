@@ -75,7 +75,7 @@ public:
 	{
 		_AndroidSensorMap* sensorMap = _AndroidSensors_get();
 		if (!sensorMap) {
-			return Ref<_Android_Sensor>::null();
+			return sl_null;
 		}
 
 		jobject jactivity = Android::getCurrentActivity();
@@ -91,7 +91,7 @@ public:
 					if (ret.isNotNull()) {
 						ret->_init(param);
 						ret->m_sensor = sensor;
-						jlong instance = (jlong)(ret.ptr);
+						jlong instance = (jlong)(ret.get());
 						_JAndroidSensor::setInstance.call(obj, instance);
 						sensorMap->put(instance, ret);
                         if (param.flagAutoStart) {
@@ -102,14 +102,14 @@ public:
 				}
 			}
 		}
-		return Ref<_Android_Sensor>::null();
+		return sl_null;
 	}
 
 	static Ref<_Android_Sensor> get(jlong instance)
 	{
 		_AndroidSensorMap* sensorMap = _AndroidSensors_get();
 		if (!sensorMap) {
-			return Ref<_Android_Sensor>::null();
+			return sl_null;
 		}
 
 		WeakRef<_Android_Sensor> sensor;

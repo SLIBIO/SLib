@@ -172,7 +172,7 @@ void Url::parse(const String& url)
 	if (indexHost >= 3) {
 		scheme = String(str, indexHost - 3);
 	} else {
-		scheme = String::null();
+		scheme.setNull();
 	}
 	if (indexPath >= 0) {
 		host = String(str + indexHost, indexPath - indexHost);
@@ -181,12 +181,12 @@ void Url::parse(const String& url)
 			query = String(str + indexQuery, n - indexQuery);
 		} else {
 			path = String(str + indexPath, n - indexPath);
-			query = String::null();
+			query.setNull();
 		}
 	} else {
 		host = String(str + indexHost, n - indexHost);
-		path = String::null();
-		query = String::null();
+		path.setNull();
+		query.setNull();
 	}
 }
 
@@ -197,7 +197,7 @@ String _URL_encodePercentByUTF8(const String& value, const sl_bool patternUnrese
 		const sl_char8* src = value.getData();
 		SLIB_SCOPED_BUFFER(sl_char8, 1024, dst, n * 3);
 		if (dst == sl_null) {
-			return String::null();
+			return sl_null;
 		}
 		sl_size k = 0;
 		for (sl_size i = 0; i < n; i++) {
@@ -212,7 +212,7 @@ String _URL_encodePercentByUTF8(const String& value, const sl_bool patternUnrese
 		}
 		return String8(dst, k);
 	} else {
-		return String::null();
+		return sl_null;
 	}
 }
 
@@ -253,7 +253,7 @@ String Url::decodePercentByUTF8(const String& value)
 		Base::freeMemory(dst);
 		return ret;
 	} else {
-		return String::null();
+		return sl_null;
 	}
 }
 

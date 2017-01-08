@@ -32,7 +32,7 @@ Ref<ViewInstance> CheckBox::createNativeWidget(ViewInstance* parent)
 {
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
 	if (!shared) {
-		return Ref<ViewInstance>::null();
+		return sl_null;
 	}
 	String16 text = getText();
 	UINT style = BS_AUTOCHECKBOX | WS_TABSTOP;
@@ -45,7 +45,7 @@ Ref<ViewInstance> CheckBox::createNativeWidget(ViewInstance* parent)
 			::SendMessageW(handle, BM_SETCHECK, BST_UNCHECKED, 0);
 		}
 		Ref<Font> font = getFont();
-		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}

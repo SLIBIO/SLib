@@ -25,7 +25,7 @@ public:
 		if (viewContent.isNotNull()) {
 			Ref<ViewInstance> instance = viewContent->attachToNewInstance(Ref<ViewInstance>::null());
 			if (instance.isNotNull()) {
-				handle = UIPlatform::getViewHandle(instance.ptr);
+				handle = UIPlatform::getViewHandle(instance.get());
 			}
 		}
 		[sv setDocumentView:handle];
@@ -50,8 +50,7 @@ public:
 		if (clip != nil) {
 			NSPoint pt=[clip bounds].origin;
 			Ref<View> _view = instance->getView();
-			if (ScrollView::checkInstance(_view.ptr)) {
-				_ScrollView* view = (_ScrollView*)(_view.ptr);
+			if (_ScrollView* view = CastInstance<_ScrollView>(_view.get())) {
 				view->_onScroll_NW((sl_ui_pos)(pt.x), (sl_ui_pos)(pt.y));
 			}
 		}
@@ -187,7 +186,7 @@ SLIB_UI_NAMESPACE_END
 - (void)boundDidChange:(NSNotification *)notification {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_ScrollView::__onScroll(instance.ptr, self);
+		slib::_ScrollView::__onScroll(instance.get(), self);
 	}
 }
 @end

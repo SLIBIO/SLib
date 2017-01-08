@@ -12,9 +12,9 @@
 
 #if defined(SLIB_COMPILER_IS_VC)
 
-#if defined (_DEBUG)
-#define SLIB_DEBUG
-#endif
+#	if defined (_DEBUG)
+#		define SLIB_DEBUG
+#	endif
 
 #	define SLIB_STDCALL		__stdcall
 #	define SLIB_INLINE		__forceinline
@@ -26,16 +26,16 @@ typedef __int64				sl_int64;
 typedef unsigned __int64	sl_uint64;
 typedef size_t				sl_size_t;
 
-#define SLIB_ALIGN(n)		__declspec(align(n))
+#	define SLIB_ALIGN(n)	__declspec(align(n))
 
-#define SLIB_EXPORT
-#define SLIB_VISIBLE_LOCAL
+#	define SLIB_EXPORT
+#	define SLIB_VISIBLE_LOCAL
 
 #elif defined(SLIB_COMPILER_IS_GCC)
 
-#if ! defined (__OPTIMIZE__)
-#define SLIB_DEBUG
-#endif
+#	if ! defined (__OPTIMIZE__)
+#		define SLIB_DEBUG
+#	endif
 
 #	define SLIB_STDCALL		__attribute__((stdcall))
 #	define SLIB_INLINE		inline __attribute__((always_inline))
@@ -47,15 +47,15 @@ typedef long long			sl_int64;
 typedef unsigned long long	sl_uint64;
 typedef __SIZE_TYPE__		sl_size_t;
 
-#define SLIB_ALIGN(n)		__attribute__((aligned(n)))
+#	define SLIB_ALIGN(n)		__attribute__((aligned(n)))
 
-#if __GNUC__ >= 4
-#define SLIB_EXPORT			__attribute__((visibility("default")))
-#define SLIB_VISIBLE_LOCAL	__attribute__((visibility("hidden")))
-#else
-#define SLIB_EXPORT
-#define SLIB_VISIBLE_LOCAL
-#endif
+#	if __GNUC__ >= 4
+#		define SLIB_EXPORT			__attribute__((visibility("default")))
+#		define SLIB_VISIBLE_LOCAL	__attribute__((visibility("hidden")))
+#	else
+#		define SLIB_EXPORT
+#		define SLIB_VISIBLE_LOCAL
+#	endif
 
 #endif
 
@@ -90,31 +90,12 @@ typedef bool				sl_bool;
 #define sl_true				true
 #define sl_false			false
 
-#define SLIB_UINT8_MAX		(sl_uint8)(0xFF)
-#define SLIB_INT8_MAX		(sl_int8)(0x7F)
-#define SLIB_INT8_MIN		(sl_int8)(-0x80)
-#define SLIB_UINT16_MAX		(sl_uint16)(0xFFFF)
-#define SLIB_INT16_MAX		(sl_int16)(0x7FFF)
-#define SLIB_INT16_MIN		(sl_int16)(-0x8000)
-#define SLIB_UINT32_MAX		0xFFFFFFFF
-#define SLIB_INT32_MAX		0x7FFFFFFF
-#define SLIB_INT32_MIN		-0x80000000
-#define SLIB_UINT64_MAX		SLIB_UINT64(0xFFFFFFFFFFFFFFFF)
-#define SLIB_INT64_MAX		SLIB_INT64(0x7FFFFFFFFFFFFFFF)
-#define SLIB_INT64_MIN		SLIB_INT64(-0x8000000000000000)
-
 #ifdef SLIB_ARCH_IS_64BIT
 typedef sl_uint64			sl_size;
 typedef sl_int64			sl_reg;
-#define SLIB_SIZE_MAX		SLIB_UINT64_MAX
-#define SLIB_REG_MAX		SLIB_INT64_MAX
-#define SLIB_REG_MIN		SLIB_INT64_MIN
 #else
 typedef sl_uint32			sl_size;
 typedef sl_int32			sl_reg;
-#define SLIB_SIZE_MAX		SLIB_UINT32_MAX
-#define SLIB_REG_MAX		SLIB_INT32_MAX
-#define SLIB_REG_MIN		SLIB_INT32_MIN
 #endif
 
 typedef char				sl_char8;
@@ -127,15 +108,9 @@ typedef sl_uint32			sl_char32;
 
 // Unicode String Constant Definition
 #if defined(SLIB_COMPILER_IS_VC)
-
 #	define SLIB_UNICODE(quote)			(const sl_char16*)(L##quote)
 #	define SLIB_USE_UNICODE16
-
-#define SLIB_STRINGIFY(...)				(#__VA_ARGS__)
-#define SLIB_STRINGIFY_UNICODE(...)		SLIB_UNICODE(#__VA_ARGS__)
-
 #elif defined(SLIB_COMPILER_IS_GCC)
-
 #	if defined(__SIZEOF_WCHAR_T__) && (__SIZEOF_WCHAR_T__ == 2)
 #		define SLIB_UNICODE(quote)		(const sl_char16*)(L##quote)
 #		define SLIB_USE_UNICODE16
@@ -143,50 +118,9 @@ typedef sl_uint32			sl_char32;
 #		define SLIB_UNICODE(quote)		(const sl_char32*)(L##quote)
 #		define SLIB_USE_UNICODE32
 #	endif
-
-#define SLIB_STRINGIFY(x...)			(#x)
-#define SLIB_STRINGIFY_UNICODE(x...)	SLIB_UNICODE(#x)
-
 #endif
 
 #define SLIB_CONSTEXPR				constexpr
-
-
-#define SLIB_IS_ALIGNED(p, a)		(!((unsigned long)(p) & ((a) - 1)))
-#define SLIB_IS_ALIGNED_4(x)		(!(((sl_reg)((void*)(x))) & 3))
-#define SLIB_IS_ALIGNED_8(x)		(!(((sl_reg)((void*)(x))) & 7))
-
-#define SLIB_MAX(a, b)				((a)>(b)?(a):(b))
-#define SLIB_MIN(a, b)				((a)<(b)?(a):(b))
-
-#define SLIB_CHECK_FLAG(v, flag)	(((v) & (flag)) != 0)
-#define SLIB_SET_FLAG(v, flag)		v |= (flag);
-#define SLIB_RESET_FLAG(v, flag)	v &= (~(flag));
-
-#define SLIB_GET_BYTE(A,n)			((sl_uint8)((A) >> (n << 3)))
-#define SLIB_GET_BYTE0(A)			((sl_uint8)(A))
-#define SLIB_GET_BYTE1(A)			((sl_uint8)((A) >> 8))
-#define SLIB_GET_BYTE2(A)			((sl_uint8)((A) >> 16))
-#define SLIB_GET_BYTE3(A)			((sl_uint8)((A) >> 24))
-#define SLIB_GET_BYTE4(A)			((sl_uint8)((A) >> 32))
-#define SLIB_GET_BYTE5(A)			((sl_uint8)((A) >> 40))
-#define SLIB_GET_BYTE6(A)			((sl_uint8)((A) >> 48))
-#define SLIB_GET_BYTE7(A)			((sl_uint8)((A) >> 56))
-#define SLIB_GET_WORD(A,n)			((sl_uint16)((A) >> (n << 4)))
-#define SLIB_GET_WORD0(A)			((sl_uint16)(A))
-#define SLIB_GET_WORD1(A)			((sl_uint16)((A) >> 16))
-#define SLIB_GET_WORD2(A)			((sl_uint16)((A) >> 32))
-#define SLIB_GET_WORD3(A)			((sl_uint16)((A) >> 48))
-#define SLIB_GET_DWORD(A,n)			((sl_uint32)((A) >> (n << 5)))
-#define SLIB_GET_DWORD0(A)			((sl_uint32)(A))
-#define SLIB_GET_DWORD1(A)			((sl_uint32)((A) >> 32))
-
-#define SLIB_MAKE_WORD(A,B)					((((sl_uint32)(A))<<8) | ((sl_uint32)(B)))
-#define SLIB_MAKE_DWORD(A,B,C,D)			((((sl_uint32)(A))<<24) | (((sl_uint32)(B))<<16) | (((sl_uint32)(C))<<8) | ((sl_uint32)(D)))
-#define SLIB_MAKE_DWORD2(A,B)				((((sl_uint32)(A))<<16) | ((sl_uint32)(B)))
-#define SLIB_MAKE_QWORD(A,B,C,D,E,F,G,H)	(((sl_uint64)(SLIB_MAKE_DWORD(A,B,C,D)) << 32) | SLIB_MAKE_DWORD(E,F,G,H))
-#define SLIB_MAKE_QWORD2(A,B,C,D)			(((sl_uint64)(SLIB_MAKE_DWORD2(A,B)) << 32) | SLIB_MAKE_DWORD2(C,D))
-#define SLIB_MAKE_QWORD4(A,B)				((((sl_uint64)(A)) << 32) | (B))
 
 
 SLIB_NAMESPACE_BEGIN

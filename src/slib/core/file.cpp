@@ -30,7 +30,7 @@ Ref<File> File::open(const String& filePath, FileMode mode)
 		}
 		_close(file);
 	}
-	return Ref<File>::null();
+	return sl_null;
 }
 
 
@@ -112,7 +112,7 @@ sl_bool File::isHidden(const String& filePath)
 String File::getParentDirectoryPath(const String& pathName)
 {
 	if (pathName.isEmpty()) {
-		return String::null();
+		return sl_null;
 	}
 	sl_reg indexSlash = pathName.lastIndexOf('/');
 	sl_reg indexBackSlash = pathName.lastIndexOf('\\');
@@ -133,7 +133,7 @@ String File::getParentDirectoryPath(const String& pathName)
 		}
 	}
 	if (index == -1) {
-		return String::null();
+		return sl_null;
 	} else {
 		if (index == 0 && indexSlash == 0 && pathName.getLength() != 1) {
 			return "/";
@@ -146,7 +146,7 @@ String File::getParentDirectoryPath(const String& pathName)
 String File::getFileName(const String& pathName)
 {
 	if (pathName.isEmpty()) {
-		return String::null();
+		return sl_null;
 	}
 	sl_reg indexSlash = pathName.lastIndexOf('/');
 	sl_reg indexBackSlash = pathName.lastIndexOf('\\');
@@ -174,13 +174,13 @@ String File::getFileExtension(const String& pathName)
 {
 	String fileName = getFileName(pathName);
 	if (fileName.isEmpty()) {
-		return String::null();
+		return sl_null;
 	}
 	sl_reg index = fileName.lastIndexOf('.');
 	if (index > 0) {
 		return fileName.substring(index + 1);
 	} else {
-		return String::null();
+		return sl_null;
 	}
 }
 
@@ -188,7 +188,7 @@ String File::getFileNameOnly(const String& pathName)
 {
 	String fileName = getFileName(pathName);
 	if (fileName.isEmpty()) {
-		return String::null();
+		return sl_null;
 	}
 	sl_reg index = fileName.lastIndexOf('.');
 	if (index > 0) {
@@ -224,7 +224,7 @@ Memory File::readAllBytes(const String& path, sl_size maxSize)
 			size = maxSize;
 		}
 		if (size == 0) {
-			return Memory::null();
+			return sl_null;
 		}
 		Memory ret = Memory::create(size);
 		if (ret.isNotNull()) {
@@ -234,7 +234,7 @@ Memory File::readAllBytes(const String& path, sl_size maxSize)
 			}
 		}
 	}
-	return Memory::null();
+	return sl_null;
 }
 
 String File::readAllTextUTF8(const String& path, sl_size maxSize)
@@ -246,7 +246,7 @@ String File::readAllTextUTF8(const String& path, sl_size maxSize)
 #else
 		sl_uint64 _size = file->getSize();
 		if (_size > 0x7fffffff) {
-			return String::null();
+			return sl_null;
 		}
 		sl_size size = (sl_size)_size;
 #endif
@@ -255,7 +255,7 @@ String File::readAllTextUTF8(const String& path, sl_size maxSize)
 		}
 		return file->readTextUTF8(size);
 	}
-	return String::null();
+	return sl_null;
 }
 
 String16 File::readAllTextUTF16(const String& path, sl_bool flagBigEndian, sl_size maxSize)
@@ -267,7 +267,7 @@ String16 File::readAllTextUTF16(const String& path, sl_bool flagBigEndian, sl_si
 #else
 		sl_uint64 _size = file->getSize();
 		if (_size > 0x7fffffff) {
-			return String16::null();
+			return sl_null;
 		}
 		sl_size size = (sl_size)_size;
 #endif
@@ -276,7 +276,7 @@ String16 File::readAllTextUTF16(const String& path, sl_bool flagBigEndian, sl_si
 		}
 		return file->readTextUTF16(size, flagBigEndian);
 	}
-	return String16::null();
+	return sl_null;
 }
 
 String File::readAllText(const String& path, Charset* outCharset, sl_size maxSize)
@@ -288,7 +288,7 @@ String File::readAllText(const String& path, Charset* outCharset, sl_size maxSiz
 #else
 		sl_uint64 _size = file->getSize();
 		if (_size > 0x7fffffff) {
-			return String::null();
+			return sl_null;
 		}
 		sl_size size = (sl_size)_size;
 #endif
@@ -297,7 +297,7 @@ String File::readAllText(const String& path, Charset* outCharset, sl_size maxSiz
 		}
 		return file->readText(size, outCharset);
 	}
-	return String::null();
+	return sl_null;
 }
 
 String16 File::readAllText16(const String& path, Charset* outCharset, sl_size maxSize)
@@ -309,7 +309,7 @@ String16 File::readAllText16(const String& path, Charset* outCharset, sl_size ma
 #else
 		sl_uint64 _size = file->getSize();
 		if (_size > 0x7fffffff) {
-			return String::null();
+			return sl_null;
 		}
 		sl_size size = (sl_size)_size;
 #endif
@@ -318,7 +318,7 @@ String16 File::readAllText16(const String& path, Charset* outCharset, sl_size ma
 		}
 		return file->readText16(size, outCharset);
 	}
-	return String16::null();
+	return sl_null;
 }
 
 sl_size File::writeAllBytes(const String& path, const void* buf, sl_size size)
@@ -412,7 +412,7 @@ sl_bool File::appendAllTextUTF16BE(const String& path, const String16& text)
 List<String> File::getAllDescendantFiles(const String& dirPath)
 {
 	if (!isDirectory(dirPath)) {
-		return List<String>::null();
+		return sl_null;
 	}
 	List<String> ret;
 	List<String> listCurrent = getFiles(dirPath);
@@ -425,7 +425,7 @@ List<String> File::getAllDescendantFiles(const String& dirPath)
 			ret.add_NoLock(item);
 			String dir = dirPath + "/" + item;
 			if (File::isDirectory(dir)) {
-				ListItems<String> sub(File::getAllDescendantFiles(dir));
+				ListElements<String> sub(File::getAllDescendantFiles(dir));
 				for (sl_size j = 0; j < sub.count; j++) {
 					ret.add(item + "/" + sub[j]);
 				}
@@ -491,7 +491,7 @@ sl_bool File::deleteDirectoryRecursively(const String& dirPath)
 {
 	if (File::isDirectory(dirPath)) {
 		String path = dirPath + "/";
-		ListItems<String> list(File::getFiles(dirPath));
+		ListElements<String> list(File::getFiles(dirPath));
 		sl_bool ret = sl_true;
 		for (sl_size i = 0; i < list.count; i++) {
 			String sub = path + list[i];
@@ -588,7 +588,7 @@ String File::findParentPathContainingFile(const String& basePath, const String& 
 		}
 		segments.segments.popBack();
 	}
-	return String::null();
+	return sl_null;
 }
 
 

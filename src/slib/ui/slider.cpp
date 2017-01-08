@@ -326,7 +326,7 @@ void Slider::_drawTrack(Canvas* canvas, const Ref<Drawable>& track, const Rectan
 		return;
 	}
 	Color color;
-	if (ColorDrawable::check(track.ptr, &color)) {
+	if (ColorDrawable::check(track.get(), &color)) {
 		Ref<Pen> pen = Pen::createSolidPen(1, color);
 		if (isVertical()) {
 			sl_real x = (rectDst.left + rectDst.right) / 2;
@@ -346,7 +346,7 @@ void Slider::_drawThumb(Canvas* canvas, const Ref<Drawable>& thumb, const Rectan
 		return;
 	}
 	Color color;
-	if (ColorDrawable::check(thumb.ptr, &color)) {
+	if (ColorDrawable::check(thumb.get(), &color)) {
 		sl_bool flagAntiAlias = canvas->isAntiAlias();
 		canvas->setAntiAlias(sl_true);
 		if (Math::isAlmostZero(rectDst.getWidth() - rectDst.getHeight())) {

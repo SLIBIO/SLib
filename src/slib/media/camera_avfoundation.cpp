@@ -9,12 +9,12 @@ SLIB_MEDIA_NAMESPACE_BEGIN
 
 Ref<Camera> AVFoundation::createCamera(const CameraParam& param)
 {
-	return Ref<Camera>::null();
+	return sl_null;
 }
 
 List<CameraInfo> AVFoundation::getCamerasList()
 {
-	return List<CameraInfo>::null();
+	return sl_null;
 }
 
 SLIB_MEDIA_NAMESPACE_END

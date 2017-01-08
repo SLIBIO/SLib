@@ -57,7 +57,7 @@ public:
 		[handle setSelectable:TRUE];
 		
 		Ref<Font> font = getFont();
-		NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
+		NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
@@ -75,7 +75,7 @@ public:
 		[tv setSelectable:TRUE];
 		
 		Ref<Font> font = getFont();
-		NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
+		NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
 		if (hFont != nil) {
 			[tv setFont:hFont];
 		}
@@ -105,8 +105,7 @@ public:
 	static void onChangeTextField(OSX_ViewInstance* instance, NSTextField* control)
 	{
 		Ref<View> _view = instance->getView();
-		if (EditView::checkInstance(_view.ptr)) {
-			_EditView* view = (_EditView*)(_view.ptr);
+		if (_EditView* view = CastInstance<_EditView>(_view.get())) {
 			String text = Apple::getStringFromNSString([control stringValue]);
 			String textNew = view->dispatchChange(text);
 			if (text != textNew) {
@@ -119,8 +118,7 @@ public:
 	static void onChangeTextArea(OSX_ViewInstance* instance, _Slib_OSX_TextArea* control)
 	{
 		Ref<View> _view = instance->getView();
-		if (EditView::checkInstance(_view.ptr)) {
-			_EditView* view = (_EditView*)(_view.ptr);
+		if (_EditView* view = CastInstance<_EditView>(_view.get())) {
 			String text = Apple::getStringFromNSString([control->textView string]);
 			String textNew = view->dispatchChange(text);
 			if (text != textNew) {
@@ -376,7 +374,7 @@ void EditView::_setFont_NW(const Ref<Font>& font)
 	if (handle != nil) {
 		if ([handle isKindOfClass:[NSTextField class]]) {
 			NSTextField* tv = (NSTextField*)handle;
-			NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
+			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
 			if (hFont != nil) {
 				if (UI::isUiThread()) {
 					[tv setFont:hFont];
@@ -388,7 +386,7 @@ void EditView::_setFont_NW(const Ref<Font>& font)
 			}
 		} else if ([handle isKindOfClass:[_Slib_OSX_TextArea class]]) {
 			_Slib_OSX_TextArea* tv = (_Slib_OSX_TextArea*)handle;
-			NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
+			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
 			if (hFont != nil) {
 				if (UI::isUiThread()) {
 					[tv->textView setFont:hFont];
@@ -409,7 +407,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_EditView::onChangeTextField(instance.ptr, self);
+		slib::_EditView::onChangeTextField(instance.get(), self);
 	}
 }
 
@@ -447,7 +445,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_EditView::onChangeTextField(instance.ptr, self);
+		slib::_EditView::onChangeTextField(instance.get(), self);
 	}
 }
 
@@ -493,7 +491,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_EditView::onChangeTextArea(instance.ptr, self);
+		slib::_EditView::onChangeTextArea(instance.get(), self);
 	}
 }
 @end

@@ -33,7 +33,7 @@ void ThreadPool::release()
 	}
 	m_flagRunning = sl_false;
 	
-	ListItems< Ref<Thread> > threads(m_threadWorkers);
+	ListElements< Ref<Thread> > threads(m_threadWorkers);
 	sl_size i;
 	for (i = 0; i < threads.count; i++) {
 		threads[i]->finish();
@@ -53,7 +53,7 @@ sl_uint32 ThreadPool::getThreadsCount()
 	return (sl_uint32)(m_threadWorkers.getCount());
 }
 
-sl_bool ThreadPool::addTask(const Callback& task)
+sl_bool ThreadPool::addTask(const Function<void()>& task)
 {
 	if (task.isNull()) {
 		return sl_false;
@@ -69,7 +69,7 @@ sl_bool ThreadPool::addTask(const Callback& task)
 
 	// wake a sleeping worker
 	{
-		ListItems< Ref<Thread> > threads(m_threadWorkers);
+		ListElements< Ref<Thread> > threads(m_threadWorkers);
 		for (sl_size i = 0; i < threads.count; i++) {
 			if (threads[i]->isWaiting()) {
 				threads[i]->wake();
@@ -82,7 +82,7 @@ sl_bool ThreadPool::addTask(const Callback& task)
 	{
 		sl_size nThreads = m_threadWorkers.getCount();
 		if (nThreads == 0 || (nThreads < getMaximumThreadsCount())) {
-			Ref<Thread> worker = Thread::start(SLIB_CALLBACK_CLASS(ThreadPool, onRunWorker, this), getThreadStackSize());
+			Ref<Thread> worker = Thread::start(SLIB_FUNCTION_CLASS(ThreadPool, onRunWorker, this), getThreadStackSize());
 			if (worker.isNotNull()) {
 				m_threadWorkers.add_NoLock(worker);
 			}
@@ -91,7 +91,7 @@ sl_bool ThreadPool::addTask(const Callback& task)
 	return sl_true;
 }
 
-sl_bool ThreadPool::dispatch(const Callback& callback)
+sl_bool ThreadPool::dispatch(const Function<void()>& callback)
 {
 	return addTask(callback);
 }
@@ -99,7 +99,7 @@ sl_bool ThreadPool::dispatch(const Callback& callback)
 void ThreadPool::onRunWorker()
 {
 	while (m_flagRunning && Thread::isNotStoppingCurrent()) {
-		Callback task;
+		Function<void()> task;
 		if (m_tasks.pop(&task)) {
 			task();
 		} else {

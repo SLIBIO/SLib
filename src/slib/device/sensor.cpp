@@ -185,19 +185,19 @@ void Sensor::_onAccelerometerChanged(float xAccel, float yAccel, float zAccel)
 void SensorLogListener::onLocationChanged(Sensor* sensor, const GeoLocation& location)
 {
 	String str = "Location(" + String::fromDouble(location.latitude) + "," + location.longitude + "," + location.altitude + ")";
-	SLIB_LOG("Sensor", str);
+	Log("Sensor", str);
 }
 
 void SensorLogListener::onCompassChanged(Sensor* sensor, float declination)
 {
 	String str = String("Compass(") + declination + ")";
-	SLIB_LOG("Sensor", str);
+	Log("Sensor", str);
 }
 
 void SensorLogListener::onAccelerometerChanged(Sensor* sensor, float xAccel, float yAccel, float zAccel)
 {
 	String str = String("Accelerometer(") + xAccel + "," + yAccel + "," + zAccel + ")";
-	SLIB_LOG("Sensor", str);
+	Log("Sensor", str);
 }
 
 SLIB_DEVICE_NAMESPACE_END
@@ -208,7 +208,7 @@ SLIB_DEVICE_NAMESPACE_BEGIN
 
 Ref<Sensor> Sensor::create(const SensorParam& param)
 {
-	return Ref<Sensor>::null();
+	return sl_null;
 }
 
 sl_bool Sensor::isAvailableLocation()

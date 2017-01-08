@@ -32,9 +32,9 @@ protected:
 	~Thread();
 
 public:
-	static Ref<Thread> create(const Callback& callback);
+	static Ref<Thread> create(const Function<void()>& callback);
 	
-	static Ref<Thread> start(const Callback& callback, sl_uint32 stackSize = SLIB_THREAD_DEFAULT_STACK_SIZE);
+	static Ref<Thread> start(const Function<void()>& callback, sl_uint32 stackSize = SLIB_THREAD_DEFAULT_STACK_SIZE);
 	
 public:
 	sl_bool start(sl_uint32 stackSize = SLIB_THREAD_DEFAULT_STACK_SIZE);
@@ -69,7 +69,7 @@ public:
 	
 	sl_bool isNotWaiting();
 	
-	const Callback& getCallback();
+	const Function<void()>& getCallback();
 	
 	static sl_bool sleep(sl_uint32 ms);
 	
@@ -93,7 +93,7 @@ public:
 	// attached objects are removed when the thread is exited
 	Ref<Referable> getAttachedObject(const String& name);
 	
-	void attachObject(const String& name, const Referable* object);
+	void attachObject(const String& name, Referable* object);
 	
 	void removeAttachedObject(const String& name);
 	
@@ -103,11 +103,11 @@ private:
 
 	sl_bool m_flagRequestStop;
 	sl_bool m_flagRunning;
-	Callback m_callback;
+	Function<void()> m_callback;
 
 	Ref<Event> m_eventWake;
 	Ref<Event> m_eventExit;
-	SafeRef<Event> m_eventWaiting;
+	AtomicRef<Event> m_eventWaiting;
 
 	HashMap<String, Variant> m_properties;
 	HashMap< String, Ref<Referable> > m_attachedObjects;

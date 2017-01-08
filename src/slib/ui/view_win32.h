@@ -26,7 +26,7 @@ public:
 			if (ret.isNotNull()) {
 				ret->m_handle = hWnd;
 				ret->m_flagDestroyOnRelease = flagDestroyOnRelease;
-				UIPlatform::registerViewInstance(hWnd, ret.ptr);
+				UIPlatform::registerViewInstance(hWnd, ret.get());
 			} else {
 				if (flagDestroyOnRelease) {
 					::PostMessageW(hWnd, SLIB_UI_MESSAGE_CLOSE, 0, 0);
@@ -46,7 +46,7 @@ public:
 		if (handle) {
 			return create<T>(handle, sl_true);
 		}
-		return Ref<T>::null();
+		return sl_null;
 	}
 
 	static HWND createHandle(View* view, ViewInstance* parent

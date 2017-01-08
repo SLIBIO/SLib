@@ -16,10 +16,10 @@ Transition::Transition(const Transition& other) = default;
 
 Transition& Transition::operator=(const Transition& other) = default;
 
-Ref<Animation> Transition::start(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Callback& onStop)
+Ref<Animation> Transition::start(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Function<void()>& onStop)
 {
 	if (view.isNull()) {
-		return Ref<Animation>::null();
+		return sl_null;
 	}
 	Ref<Animation> animation = createAnimation(view, transition, pageAction, onStop);
 	if (animation.isNotNull()) {
@@ -27,24 +27,24 @@ Ref<Animation> Transition::start(const Ref<View>& view, const Transition& transi
 		return animation;
 	} else {
 		onStop();
-		return Ref<Animation>::null();
+		return sl_null;
 	}
 }
 
-Ref<Animation> Transition::createAnimation(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Callback& onStop)
+Ref<Animation> Transition::createAnimation(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Function<void()>& onStop)
 {
 	if (view.isNull()) {
-		return Ref<Animation>::null();
+		return sl_null;
 	}
 	
 	TransitionType type = transition.type;
 	if (type == TransitionType::Default || type == TransitionType::None) {
-		return Ref<Animation>::null();
+		return sl_null;
 	}
 	
 	float duration = transition.duration;
 	if (duration < SLIB_EPSILON) {
-		return Ref<Animation>::null();
+		return sl_null;
 	}
 	
 	TransitionDirection direction = transition.direction;
@@ -125,13 +125,13 @@ Ref<Animation> Transition::createAnimation(const Ref<View>& view, const Transiti
 		return animation;
 	}
 	
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
-Ref<Animation> Transition::startPopup(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Callback& onStop)
+Ref<Animation> Transition::startPopup(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Function<void()>& onStop)
 {
 	if (view.isNull()) {
-		return Ref<Animation>::null();
+		return sl_null;
 	}
 	Ref<Animation> animation = createPopupAnimation(view, transition, pageAction, onStop);
 	if (animation.isNotNull()) {
@@ -139,28 +139,28 @@ Ref<Animation> Transition::startPopup(const Ref<View>& view, const Transition& t
 		return animation;
 	} else {
 		onStop();
-		return Ref<Animation>::null();
+		return sl_null;
 	}
 }
 
-Ref<Animation> Transition::createPopupAnimation(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Callback& onStop)
+Ref<Animation> Transition::createPopupAnimation(const Ref<View>& view, const Transition& transition, UIPageAction pageAction, const Function<void()>& onStop)
 {
 	if (view.isNull()) {
-		return Ref<Animation>::null();
+		return sl_null;
 	}
 	
 	TransitionType type = transition.type;
 	if (type == TransitionType::Default || type == TransitionType::None) {
-		return Ref<Animation>::null();
+		return sl_null;
 	}
 	
 	float duration = transition.duration;
 	if (duration < SLIB_EPSILON) {
-		return Ref<Animation>::null();
+		return sl_null;
 	}
 	
 	if (pageAction != UIPageAction::Push && pageAction != UIPageAction::Pop) {
-		return Ref<Animation>::null();
+		return sl_null;
 	}
 
 	TransitionDirection direction = transition.direction;
@@ -223,7 +223,7 @@ Ref<Animation> Transition::createPopupAnimation(const Ref<View>& view, const Tra
 		return animation;
 	}
 	
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
 SLIB_UI_NAMESPACE_END

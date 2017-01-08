@@ -33,7 +33,7 @@ public:
 	
 	sl_ui_len m_heightScreen;
 	
-	SafeRef<ViewInstance> m_viewContent;
+	AtomicRef<ViewInstance> m_viewContent;
 	
 public:
 	_OSX_Window()
@@ -78,7 +78,7 @@ public:
 				return ret;
 			}
 		}
-		return Ref<_OSX_Window>::null();
+		return sl_null;
 	}
 	
 	static Ref<WindowInstance> create(const WindowInstanceParam& param)
@@ -93,7 +93,7 @@ public:
 				styleMask = NSClosableWindowMask;
 			}
 		}
-		NSScreen* screen = UIPlatform::getScreenHandle(param.screen.ptr);
+		NSScreen* screen = UIPlatform::getScreenHandle(param.screen.get());
 		UIRect screenFrame;
 		Ref<Screen> _screen = param.screen;
 		if (_screen.isNotNull()) {
@@ -131,7 +131,7 @@ public:
 				return ret;
 			}
 		}
-		return Ref<_OSX_Window>::null();
+		return sl_null;
 	}
 	
 	void release()
@@ -180,7 +180,7 @@ public:
 				return UIPlatform::createWindowInstance(parent);
 			}
 		}
-		return Ref<WindowInstance>::null();
+		return sl_null;
 	}
 	
 	sl_bool setParent(const Ref<WindowInstance>& windowInst)
@@ -188,7 +188,7 @@ public:
 		NSWindow* window = m_window;
 		if (window != nil) {
 			if (windowInst.isNotNull()) {
-				_OSX_Window* w = (_OSX_Window*)(windowInst.ptr);
+				_OSX_Window* w = (_OSX_Window*)(windowInst.get());
 				NSWindow* p = w->m_window;
 				m_parent = p;
 				if (p != nil) {
@@ -310,7 +310,7 @@ public:
 			NSString* title = [window title];
 			return Apple::getStringFromNSString(title);
 		}
-		return String::null();
+		return sl_null;
 	}
 	
 	sl_bool setTitle(const String& title)
@@ -928,7 +928,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::_OSX_Window> window = m_window;
 	if (window.isNotNull()) {
-		slib::UI::dispatchToUiThread(SLIB_CALLBACK_REF(slib::_OSX_Window, release, window));
+		slib::UI::dispatchToUiThread(SLIB_FUNCTION_REF(slib::_OSX_Window, release, window));
 	}
 }
 
@@ -1016,7 +1016,7 @@ Ref<WindowInstance> UIPlatform::createWindowInstance(NSWindow* window)
 	}
 	ret = _OSX_Window::create(window);
 	if (ret.isNotNull()) {
-		UIPlatform::_registerWindowInstance((__bridge void*)window, ret.ptr);
+		UIPlatform::_registerWindowInstance((__bridge void*)window, ret.get());
 	}
 	return ret;
 }
@@ -1046,7 +1046,7 @@ NSWindow* UIPlatform::getWindowHandle(Window* window)
 	if (window) {
 		Ref<WindowInstance> instance = window->getWindowInstance();
 		if (instance.isNotNull()) {
-			_OSX_Window* _instance = (_OSX_Window*)(instance.ptr);
+			_OSX_Window* _instance = (_OSX_Window*)(instance.get());
 			if (_instance) {
 				return _instance->m_window;
 			}

@@ -57,13 +57,13 @@ private:
 	void _setBackgroundColor_NW(const Color& color);
 	
 protected:
-	SafeString m_text;
+	AtomicString m_text;
 	Color m_textColor;
 	Alignment m_textAlignment;
 	
-	SafeList<String16> m_textLines;
+	AtomicList<String16> m_textLines;
 	sl_ui_len m_currentTextBoundWidth;
-	SafeRef<Font> m_currentTextFont;
+	AtomicRef<Font> m_currentTextFont;
 	
 };
 

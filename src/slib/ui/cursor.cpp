@@ -8,32 +8,32 @@ SLIB_DEFINE_OBJECT(Cursor, Object)
 
 Ref<Cursor> Cursor::getArrow()
 {
-	return Ref<Cursor>::null();
+	return sl_null;
 }
 
 Ref<Cursor> Cursor::getIBeam()
 {
-	return Ref<Cursor>::null();
+	return sl_null;
 }
 
 Ref<Cursor> Cursor::getCross()
 {
-	return Ref<Cursor>::null();
+	return sl_null;
 }
 
 Ref<Cursor> Cursor::getHand()
 {
-	return Ref<Cursor>::null();
+	return sl_null;
 }
 
 Ref<Cursor> Cursor::getResizeLeftRight()
 {
-	return Ref<Cursor>::null();
+	return sl_null;
 }
 
 Ref<Cursor> Cursor::getResizeUpDown()
 {
-	return Ref<Cursor>::null();
+	return sl_null;
 }
 
 void Cursor::setCurrent(const Ref<Cursor>& cursor)
@@ -42,7 +42,7 @@ void Cursor::setCurrent(const Ref<Cursor>& cursor)
 
 Ref<Cursor> Cursor::getCurrent()
 {
-	return Ref<Cursor>::null();
+	return sl_null;
 }
 
 void Cursor::show()

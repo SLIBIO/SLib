@@ -409,8 +409,12 @@ public:
 };
 
 template <>
-sl_uint32 Hash<IPv4PacketIdentifier>::hash(const IPv4PacketIdentifier& v);
-
+class Hash<IPv4PacketIdentifier>
+{
+public:
+	sl_uint32 operator()(const IPv4PacketIdentifier& v) const;
+	
+};
 
 struct SLIB_EXPORT IPv4Fragment
 {

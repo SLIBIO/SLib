@@ -26,7 +26,7 @@ String Assets::getFilePath(const String& path)
 	if (s.isNotEmpty()) {
 		return Application::getApplicationDirectory() + "/" + s;
 	}
-	return String::null();
+	return sl_null;
 }
 #endif
 
@@ -51,7 +51,7 @@ sl_bool Assets::isBasedOnFileSystem()
 
 String Assets::getFilePath(const String& path)
 {
-	return String::null();
+	return sl_null;
 }
 
 Memory Assets::readAllBytes(const String& path)

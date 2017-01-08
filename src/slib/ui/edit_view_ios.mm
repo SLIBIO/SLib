@@ -23,7 +23,6 @@
 @property (nonatomic, retain) UILabel *placeHolderLabel;
 
 -(void) setHintText:(NSString*) hintText;
--(NSString*) getHintText;
 
 @end
 
@@ -138,7 +137,7 @@ public:
 		[handle setBackgroundColor:(GraphicsPlatform::getUIColorFromColor(getBackgroundColor()))];
 		[handle setEnabled:(m_flagReadOnly ? NO : YES)];
 		Ref<Font> font = getFont();
-		UIFont* hFont = GraphicsPlatform::getUIFont(font.ptr, UIPlatform::getGlobalScaleFactor());
+		UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
@@ -171,7 +170,7 @@ public:
 		[handle setPlaceholder:(Apple::getNSStringFromString(m_hintText))];
 		[handle setSelectable:TRUE];
 		Ref<Font> font = getFont();
-		UIFont* hFont = GraphicsPlatform::getUIFont(font.ptr, UIPlatform::getGlobalScaleFactor());
+		UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
@@ -203,8 +202,7 @@ public:
 	static void onChangeText(iOS_ViewInstance* instance, UITextField* field, UITextView* area)
 	{
 		Ref<View> _view = instance->getView();
-		if (EditView::checkInstance(_view.ptr)) {
-			_EditView* view = (_EditView*)(_view.ptr);
+		if (_EditView* view = CastInstance<_EditView>(_view.get())) {
 			String text;
 			if (field != nil) {
 				text = Apple::getStringFromNSString([field text]);
@@ -227,8 +225,7 @@ public:
 	static void onEnterAction(iOS_ViewInstance* instance, UITextField* field, UITextView* area)
 	{
 		Ref<View> _view = instance->getView();
-		if (EditView::checkInstance(_view.ptr)) {
-			_EditView* view = (_EditView*)(_view.ptr);
+		if (_EditView* view = CastInstance<_EditView>(_view.get())) {
 			view->dispatchEnterAction();
 			if (view->isAutoDismissKeyboard()) {
 				if (field != nil) {
@@ -471,13 +468,13 @@ void EditView::_setFont_NW(const Ref<Font>& font)
 	if (handle != nil) {
 		if ([handle isKindOfClass:[UITextField class]]) {
 			UITextField* tv = (UITextField*)handle;
-			UIFont* hFont = GraphicsPlatform::getUIFont(font.ptr, UIPlatform::getGlobalScaleFactor());
+			UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
 			if (hFont != nil) {
 				[tv setFont:hFont];
 			}
 		} else if ([handle isKindOfClass:[UITextView class]]) {
 			UITextView* tv = (UITextView*)handle;
-			UIFont* hFont = GraphicsPlatform::getUIFont(font.ptr, UIPlatform::getGlobalScaleFactor());
+			UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
 			if (hFont != nil) {
 				[tv setFont:hFont];
 			}
@@ -565,7 +562,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_EditView::onChangeText(instance.ptr, self, nil);
+		slib::_EditView::onChangeText(instance.get(), self, nil);
 	}
 }
 
@@ -576,7 +573,7 @@ SLIB_UI_NAMESPACE_END
 -(BOOL) textFieldShouldReturn:(UITextField *)textField{
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_EditView::onEnterAction(instance.ptr, self, nil);
+		slib::_EditView::onEnterAction(instance.get(), self, nil);
 	}
 	return NO;
 }
@@ -641,7 +638,7 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::_EditView::onChangeText(instance.ptr, nil, self);
+		slib::_EditView::onChangeText(instance.get(), nil, self);
 		
 		if([[self placeholder] length] > 0) {
 			[UIView animateWithDuration:0.25f animations:^{

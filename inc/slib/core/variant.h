@@ -3,7 +3,6 @@
 
 #include "definition.h"
 #include "ref.h"
-#include "ptr.h"
 #include "time.h"
 #include "string.h"
 #include "list.h"
@@ -40,7 +39,8 @@ struct _Variant_Const
 
 extern const _Variant_Const _Variant_Null;
 
-class SafeVariant;
+class Variant;
+typedef Atomic<Variant> AtomicVariant;
 
 class SLIB_EXPORT Variant
 {
@@ -49,15 +49,15 @@ public:
 	VariantType _type;
 
 public:
-	Variant();
+	SLIB_CONSTEXPR Variant() : _value(0), _type(VariantType::Null) {}
 	
 	Variant(Variant&& other);
 	
 	Variant(const Variant& other);
 	
-	Variant(SafeVariant&& _other);
+	Variant(AtomicVariant&& _other);
 	
-	Variant(const SafeVariant& other);
+	Variant(const AtomicVariant& other);
 
 	~Variant();
 	
@@ -82,9 +82,9 @@ public:
 	
 	Variant(const String16& value);
 	
-	Variant(const SafeString8& value);
+	Variant(const AtomicString8& value);
 	
-	Variant(const SafeString16& value);
+	Variant(const AtomicString16& value);
 	
 	Variant(const sl_char8* sz8);
 	
@@ -98,35 +98,35 @@ public:
 	Variant(const Ref<T>& ref);
 	
 	template <class T>
-	Variant(const SafeRef<T>& ref);
+	Variant(const AtomicRef<T>& ref);
 	
 	template <class T>
 	Variant(const WeakRef<T>& weak);
 	
 	template <class T>
-	Variant(const SafeWeakRef<T>& weak);
+	Variant(const AtomicWeakRef<T>& weak);
 
 	Variant(const Memory& mem);
 	
-	Variant(const SafeMemory& mem);
+	Variant(const AtomicMemory& mem);
 	
-	template <class T, class COMPARE>
-	Variant(const Array<T, COMPARE>& object);
+	template <class T>
+	Variant(const Array<T>& object);
 	
-	template <class T, class COMPARE>
-	Variant(const SafeArray<T, COMPARE>& object);
+	template <class T>
+	Variant(const AtomicArray<T>& object);
 
-	template <class T, class COMPARE>
-	Variant(const List<T, COMPARE>& object);
+	template <class T>
+	Variant(const List<T>& object);
 	
-	template <class T, class COMPARE>
-	Variant(const SafeList<T, COMPARE>& object);
+	template <class T>
+	Variant(const AtomicList<T>& object);
 	
 	template <class KT, class VT>
 	Variant(const Map<KT, VT>& object);
 	
 	template <class KT, class VT>
-	Variant(const SafeMap<KT, VT>& object);
+	Variant(const AtomicMap<KT, VT>& object);
 
 public:
 	static const Variant& null();
@@ -164,11 +164,11 @@ public:
 	
 	static Variant fromMemory(const Memory& mem);
 	
-	template <class T, class COMPARE>
-	static Variant fromArray(const Array<T, COMPARE>& value);
+	template <class T>
+	static Variant fromArray(const Array<T>& value);
 	
-	template <class T, class COMPARE>
-	static Variant fromList(const List<T, COMPARE>& value);
+	template <class T>
+	static Variant fromList(const List<T>& value);
 	
 	static Variant fromVariantList(const List<Variant>& value);
 	
@@ -193,9 +193,9 @@ public:
 	
 	Variant& operator=(const Variant& other);
 	
-	Variant& operator=(SafeVariant&& other);
+	Variant& operator=(AtomicVariant&& other);
 	
-	Variant& operator=(const SafeVariant& other);
+	Variant& operator=(const AtomicVariant& other);
 	
 	Variant& operator=(sl_null_t);
 	
@@ -215,11 +215,11 @@ public:
 	
 	Variant& operator=(const String8& value);
 	
-	Variant& operator=(const SafeString8& value);
+	Variant& operator=(const AtomicString8& value);
 	
 	Variant& operator=(const String16& value);
 	
-	Variant& operator=(const SafeString16& value);
+	Variant& operator=(const AtomicString16& value);
 	
 	Variant& operator=(const sl_char8* sz8);
 	
@@ -233,35 +233,35 @@ public:
 	Variant& operator=(const Ref<T>& ref);
 	
 	template <class T>
-	Variant& operator=(const SafeRef<T>& ref);
+	Variant& operator=(const AtomicRef<T>& ref);
 	
 	template <class T>
 	Variant& operator=(const WeakRef<T>& weak);
 	
 	template <class T>
-	Variant& operator=(const SafeWeakRef<T>& weak);
+	Variant& operator=(const AtomicWeakRef<T>& weak);
 
 	Variant& operator=(const Memory& mem);
 	
-	Variant& operator=(const SafeMemory& mem);
+	Variant& operator=(const AtomicMemory& mem);
 	
-	template <class T, class COMPARE>
-	Variant& operator=(const Array<T, COMPARE>& object);
+	template <class T>
+	Variant& operator=(const Array<T>& object);
 	
-	template <class T, class COMPARE>
-	Variant& operator=(const SafeArray<T, COMPARE>& object);
+	template <class T>
+	Variant& operator=(const AtomicArray<T>& object);
 
-	template <class T, class COMPARE>
-	Variant& operator=(const List<T, COMPARE>& object);
+	template <class T>
+	Variant& operator=(const List<T>& object);
 	
-	template <class T, class COMPARE>
-	Variant& operator=(const SafeList<T, COMPARE>& object);
+	template <class T>
+	Variant& operator=(const AtomicList<T>& object);
 	
 	template <class KT, class VT>
 	Variant& operator=(const Map<KT, VT>& object);
 	
 	template <class KT, class VT>
-	Variant& operator=(const SafeMap<KT, VT>& object);
+	Variant& operator=(const AtomicMap<KT, VT>& object);
 	
 	Variant operator[](sl_size indexForVariantList) const;
 	
@@ -359,9 +359,9 @@ public:
 	
 	void setString(const String16& value);
 	
-	void setString(const SafeString8& value);
+	void setString(const AtomicString8& value);
 	
-	void setString(const SafeString16& value);
+	void setString(const AtomicString16& value);
 	
 	void setString(const sl_char8* sz8);
 	
@@ -403,7 +403,7 @@ public:
 	
 	sl_bool isObjectNull() const;
 	
-	sl_class_type getObjectClassType() const;
+	sl_object_type getObjectType() const;
 	
 	sl_bool isMemory() const;
 	
@@ -411,17 +411,17 @@ public:
 	
 	void setMemory(const Memory& mem);
 	
-	template <class TYPE, class COMPARE>
-	Array<TYPE, COMPARE> getArray(const Array<TYPE, COMPARE>& def) const;
+	template <class T>
+	Array<T> getArray(const Array<T>& def) const;
 	
-	template <class TYPE, class COMPARE>
-	void setArray(const Array<TYPE, COMPARE>& array);
+	template <class T>
+	void setArray(const Array<T>& array);
 
-	template <class TYPE, class COMPARE>
-	List<TYPE, COMPARE> getList(const List<TYPE, COMPARE>& def) const;
+	template <class T>
+	List<T> getList(const List<T>& def) const;
 	
-	template <class TYPE, class COMPARE>
-	void setList(const List<TYPE, COMPARE>& list);
+	template <class T>
+	void setList(const List<T>& list);
 	
 	template <class KT, class VT>
 	Map<KT, VT> getMap(const Map<KT, VT>& def) const;
@@ -441,13 +441,13 @@ public:
 	
 	List< Map<String, Variant> > getVariantMapList() const;
 
-	sl_size getListItemsCount() const;
+	sl_size getListElementsCount() const;
 	
-	Variant getListItem(sl_size index) const;
+	Variant getListElement(sl_size index) const;
 
-	sl_bool setListItem(sl_size index, const Variant& value);
+	sl_bool setListElement(sl_size index, const Variant& value);
 
-	sl_bool addListItem(const Variant& value);
+	sl_bool addListElement(const Variant& value);
 
 	Variant getField(const String& key) const;
 
@@ -461,12 +461,12 @@ public:
 private:
 	static void _free(VariantType type, sl_uint64 value);
 	
-	friend class SafeVariant;
+	friend class Atomic<Variant>;
 	
 };
 
-
-class SLIB_EXPORT SafeVariant
+template <>
+class SLIB_EXPORT Atomic<Variant>
 {
 public:
 	sl_uint64 _value;
@@ -475,162 +475,162 @@ private:
 	SpinLock m_lock;
 	
 public:
-	SafeVariant();
+	SLIB_CONSTEXPR Atomic() : _value(0), _type(VariantType::Null) {}
 	
-	SafeVariant(SafeVariant&& other);
+	Atomic(AtomicVariant&& other);
 	
-	SafeVariant(const SafeVariant& other);
+	Atomic(const AtomicVariant& other);
 	
-	SafeVariant(Variant&& other);
+	Atomic(Variant&& other);
 	
-	SafeVariant(const Variant& other);
+	Atomic(const Variant& other);
 	
-	~SafeVariant();
-	
-public:
-	SafeVariant(sl_null_t);
-	
-	SafeVariant(sl_int32 value);
-	
-	SafeVariant(sl_uint32 value);
-	
-	SafeVariant(sl_int64 value);
-	
-	SafeVariant(sl_uint64 value);
-	
-	SafeVariant(float value);
-	
-	SafeVariant(double value);
-	
-	SafeVariant(const sl_bool value);
-	
-	SafeVariant(const String8& value);
-
-	SafeVariant(const String16& value);
-	
-	SafeVariant(const SafeString8& value);
-	
-	SafeVariant(const SafeString16& value);
-	
-	SafeVariant(const sl_char8* sz8);
-	
-	SafeVariant(const sl_char16* sz16);
-	
-	SafeVariant(const Time& value);
-	
-	SafeVariant(const void* ptr);
-
-	template <class T>
-	SafeVariant(const Ref<T>& ref);
-	
-	template <class T>
-	SafeVariant(const SafeRef<T>& ref);
-	
-	template <class T>
-	SafeVariant(const WeakRef<T>& weak);
-	
-	template <class T>
-	SafeVariant(const SafeWeakRef<T>& weak);
-
-	SafeVariant(const Memory& mem);
-	
-	SafeVariant(const SafeMemory& mem);
-	
-	template <class T, class COMPARE>
-	SafeVariant(const Array<T, COMPARE>& object);
-	
-	template <class T, class COMPARE>
-	SafeVariant(const SafeArray<T, COMPARE>& object);
-	
-	template <class T, class COMPARE>
-	SafeVariant(const List<T, COMPARE>& object);
-	
-	template <class T, class COMPARE>
-	SafeVariant(const SafeList<T, COMPARE>& object);
-
-	template <class KT, class VT>
-	SafeVariant(const Map<KT, VT>& object);
-	
-	template <class KT, class VT>
-	SafeVariant(const SafeMap<KT, VT>& object);
+	~Atomic();
 	
 public:
-	static const SafeVariant& null();
+	Atomic(sl_null_t);
+	
+	Atomic(sl_int32 value);
+	
+	Atomic(sl_uint32 value);
+	
+	Atomic(sl_int64 value);
+	
+	Atomic(sl_uint64 value);
+	
+	Atomic(float value);
+	
+	Atomic(double value);
+	
+	Atomic(const sl_bool value);
+	
+	Atomic(const String8& value);
+
+	Atomic(const String16& value);
+	
+	Atomic(const AtomicString8& value);
+	
+	Atomic(const AtomicString16& value);
+	
+	Atomic(const sl_char8* sz8);
+	
+	Atomic(const sl_char16* sz16);
+	
+	Atomic(const Time& value);
+	
+	Atomic(const void* ptr);
+
+	template <class T>
+	Atomic(const Ref<T>& ref);
+	
+	template <class T>
+	Atomic(const AtomicRef<T>& ref);
+	
+	template <class T>
+	Atomic(const WeakRef<T>& weak);
+	
+	template <class T>
+	Atomic(const AtomicWeakRef<T>& weak);
+
+	Atomic(const Memory& mem);
+	
+	Atomic(const AtomicMemory& mem);
+	
+	template <class T>
+	Atomic(const Array<T>& object);
+	
+	template <class T>
+	Atomic(const AtomicArray<T>& object);
+	
+	template <class T>
+	Atomic(const List<T>& object);
+	
+	template <class T>
+	Atomic(const AtomicList<T>& object);
+
+	template <class KT, class VT>
+	Atomic(const Map<KT, VT>& object);
+	
+	template <class KT, class VT>
+	Atomic(const AtomicMap<KT, VT>& object);
 	
 public:
-	SafeVariant& operator=(SafeVariant&& other);
+	static const AtomicVariant& null();
 	
-	SafeVariant& operator=(const SafeVariant& other);
+public:
+	AtomicVariant& operator=(AtomicVariant&& other);
 	
-	SafeVariant& operator=(Variant&& other);
+	AtomicVariant& operator=(const AtomicVariant& other);
 	
-	SafeVariant& operator=(const Variant& other);
+	AtomicVariant& operator=(Variant&& other);
 	
-	SafeVariant& operator=(sl_null_t);
+	AtomicVariant& operator=(const Variant& other);
 	
-	SafeVariant& operator=(sl_int32 value);
+	AtomicVariant& operator=(sl_null_t);
 	
-	SafeVariant& operator=(sl_uint32 value);
+	AtomicVariant& operator=(sl_int32 value);
 	
-	SafeVariant& operator=(sl_int64 value);
+	AtomicVariant& operator=(sl_uint32 value);
 	
-	SafeVariant& operator=(sl_uint64 value);
+	AtomicVariant& operator=(sl_int64 value);
 	
-	SafeVariant& operator=(float value);
+	AtomicVariant& operator=(sl_uint64 value);
 	
-	SafeVariant& operator=(double value);
+	AtomicVariant& operator=(float value);
 	
-	SafeVariant& operator=(const sl_bool value);
+	AtomicVariant& operator=(double value);
 	
-	SafeVariant& operator=(const String8& value);
+	AtomicVariant& operator=(const sl_bool value);
 	
-	SafeVariant& operator=(const SafeString8& value);
+	AtomicVariant& operator=(const String8& value);
 	
-	SafeVariant& operator=(const String16& value);
+	AtomicVariant& operator=(const AtomicString8& value);
 	
-	SafeVariant& operator=(const SafeString16& value);
+	AtomicVariant& operator=(const String16& value);
+	
+	AtomicVariant& operator=(const AtomicString16& value);
 
-	SafeVariant& operator=(const sl_char8* sz8);
+	AtomicVariant& operator=(const sl_char8* sz8);
 	
-	SafeVariant& operator=(const sl_char16* sz16);
+	AtomicVariant& operator=(const sl_char16* sz16);
 	
-	SafeVariant& operator=(const Time& value);
+	AtomicVariant& operator=(const Time& value);
 	
-	SafeVariant& operator=(const void* ptr);
-	
-	template <class T>
-	SafeVariant& operator=(const Ref<T>& ref);
+	AtomicVariant& operator=(const void* ptr);
 	
 	template <class T>
-	SafeVariant& operator=(const SafeRef<T>& ref);
+	AtomicVariant& operator=(const Ref<T>& ref);
 	
 	template <class T>
-	SafeVariant& operator=(const WeakRef<T>& weak);
+	AtomicVariant& operator=(const AtomicRef<T>& ref);
 	
 	template <class T>
-	SafeVariant& operator=(const SafeWeakRef<T>& weak);
+	AtomicVariant& operator=(const WeakRef<T>& weak);
+	
+	template <class T>
+	AtomicVariant& operator=(const AtomicWeakRef<T>& weak);
 
-	SafeVariant& operator=(const Memory& mem);
+	AtomicVariant& operator=(const Memory& mem);
 	
-	SafeVariant& operator=(const SafeMemory& mem);
+	AtomicVariant& operator=(const AtomicMemory& mem);
 	
-	template <class T, class COMPARE>
-	SafeVariant& operator=(const Array<T, COMPARE>& object);
+	template <class T>
+	AtomicVariant& operator=(const Array<T>& object);
 	
-	template <class T, class COMPARE>
-	SafeVariant& operator=(const SafeArray<T, COMPARE>& object);
+	template <class T>
+	AtomicVariant& operator=(const AtomicArray<T>& object);
 	
-	template <class T, class COMPARE>
-	SafeVariant& operator=(const List<T, COMPARE>& object);
+	template <class T>
+	AtomicVariant& operator=(const List<T>& object);
 	
-	template <class T, class COMPARE>
-	SafeVariant& operator=(const SafeList<T, COMPARE>& object);
+	template <class T>
+	AtomicVariant& operator=(const AtomicList<T>& object);
 
 	template <class KT, class VT>
-	SafeVariant& operator=(const Map<KT, VT>& object);
+	AtomicVariant& operator=(const Map<KT, VT>& object);
 	
 	template <class KT, class VT>
-	SafeVariant& operator=(const SafeMap<KT, VT>& object);
+	AtomicVariant& operator=(const AtomicMap<KT, VT>& object);
 	
 	Variant operator[](sl_size indexForVariantList) const;
 	
@@ -742,11 +742,11 @@ public:
 	
 	void setString(const String8& value);
 	
-	void setString(const SafeString8& value);
+	void setString(const AtomicString8& value);
 	
 	void setString(const String16& value);
 	
-	void setString(const SafeString16& value);
+	void setString(const AtomicString16& value);
 	
 	void setString(const sl_char8* sz8);
 	
@@ -772,7 +772,7 @@ public:
 	
 	sl_bool isObjectNull() const;
 	
-	sl_class_type getObjectClassType() const;
+	sl_object_type getObjectType() const;
 	
 	sl_bool isMemory() const;
 	
@@ -780,17 +780,17 @@ public:
 	
 	void setMemory(const Memory& mem);
 	
-	template <class TYPE, class COMPARE>
-	Array<TYPE, COMPARE> getArray(const Array<TYPE, COMPARE>& def) const;
+	template <class T>
+	Array<T> getArray(const Array<T>& def) const;
 	
-	template <class TYPE, class COMPARE>
-	void setArray(const Array<TYPE, COMPARE>& array);
+	template <class T>
+	void setArray(const Array<T>& array);
 	
-	template <class TYPE, class COMPARE>
-	List<TYPE, COMPARE> getList(const List<TYPE, COMPARE>& def) const;
+	template <class T>
+	List<T> getList(const List<T>& def) const;
 	
-	template <class TYPE, class COMPARE>
-	void setList(const List<TYPE, COMPARE>& list);
+	template <class T>
+	void setList(const List<T>& list);
 	
 	template <class KT, class VT>
 	Map<KT, VT> getMap(const Map<KT, VT>& def) const;
@@ -811,13 +811,13 @@ public:
 	
 	List< Map<String, Variant> > getVariantMapList() const;
 	
-	sl_size getListItemsCount() const;
+	sl_size getListElementsCount() const;
 	
-	Variant getListItem(sl_size index) const;
+	Variant getListElement(sl_size index) const;
 	
-	sl_bool setListItem(sl_size index, const Variant& value);
+	sl_bool setListElement(sl_size index, const Variant& value);
 	
-	sl_bool addListItem(const Variant& value);
+	sl_bool addListElement(const Variant& value);
 	
 	Variant getField(const String& key) const;
 	
@@ -843,42 +843,68 @@ sl_bool operator!=(const Variant& v1, const Variant& v2);
 
 
 template <>
-sl_int32 Compare<Variant>::compare(const Variant &a, const Variant &b);
-
-template <>
-sl_class_type IMap<String, Variant>::ClassType();
-
-template <>
-sl_class_type IMap<String, Variant>::getClassType() const;
-
-template <>
-sl_bool IMap<String, Variant>::checkClassType(sl_class_type type) const;
+class Compare<Variant>
+{
+public:
+	int operator()(const Variant &a, const Variant &b) const;
+};
 
 
-template <>
-sl_class_type CList<Variant>::ClassType();
+template <class... ARGS>
+String8 String8::format(const sl_char8* szFormat, ARGS&&... args)
+{
+	Variant params[] = {Forward<ARGS>(args)...};
+	return formatv(szFormat, params, sizeof...(args));
+}
 
-template <>
-sl_class_type CList<Variant>::getClassType() const;
+template <class... ARGS>
+String8 String8::format(const String8& strFormat, ARGS&&... args)
+{
+	Variant params[] = {Forward<ARGS>(args)...};
+	return formatv(strFormat, params, sizeof...(args));
+}
 
-template <>
-sl_bool CList<Variant>::checkClassType(sl_class_type type) const;
+template <class... ARGS>
+String16 String16::format(const sl_char16* szFormat, ARGS&&... args)
+{
+	Variant params[] = {Forward<ARGS>(args)...};
+	return formatv(szFormat, params, sizeof...(args));
+}
 
+template <class... ARGS>
+String16 String16::format(const String16& strFormat, ARGS&&... args)
+{
+	Variant params[] = {Forward<ARGS>(args)...};
+	return formatv(strFormat, params, sizeof...(args));
+}
 
-template <>
-sl_class_type CList< Map<String, Variant> >::ClassType();
+template <class... ARGS>
+String8 String8::arg(ARGS&&... args) const
+{
+	Variant params[] = {Forward<ARGS>(args)...};
+	return argv(params, sizeof...(args));
+}
 
-template <>
-sl_class_type CList< Map<String, Variant> >::getClassType() const;
+template <class... ARGS>
+String16 String16::arg(ARGS&&... args) const
+{
+	Variant params[] = {Forward<ARGS>(args)...};
+	return argv(params, sizeof...(args));
+}
 
-template <>
-sl_bool CList< Map<String, Variant> >::checkClassType(sl_class_type type) const;
+template <class... ARGS>
+String8 Atomic<String8>::arg(ARGS&&... args) const
+{
+	Variant params[] = {Forward<ARGS>(args)...};
+	return argv(params, sizeof...(args));
+}
 
-
-SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_LIST(Variant)
-SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_MAP(String, Variant)
-SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_MAP(sl_uint64, Variant)
-
+template <class... ARGS>
+String16 Atomic<String16>::arg(ARGS&&... args) const
+{
+	Variant params[] = {Forward<ARGS>(args)...};
+	return argv(params, sizeof...(args));
+}
 
 typedef List<Variant> VariantList;
 typedef Map<String, Variant> VariantMap;
@@ -890,28 +916,24 @@ SLIB_NAMESPACE_END
 
 SLIB_NAMESPACE_BEGIN
 
-SLIB_INLINE Variant::Variant() : _type(VariantType::Null)
-{
-}
-
 template <class T>
 Variant::Variant(const Ref<T>& ref)
 {
 	if (ref.isNotNull()) {
 		_type = VariantType::Object;
-		new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+		new (reinterpret_cast<Ref<T>*>(&_value)) Ref<T>(ref);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
 template <class T>
-Variant::Variant(const SafeRef<T>& _ref)
+Variant::Variant(const AtomicRef<T>& _ref)
 {
 	Ref<T> ref(_ref);
 	if (ref.isNotNull()) {
 		_type = VariantType::Object;
-		new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+		new (reinterpret_cast<Ref<T>*>(&_value)) Ref<T>(ref);
 	} else {
 		_type = VariantType::Null;
 	}
@@ -922,65 +944,65 @@ Variant::Variant(const WeakRef<T>& weak)
 {
 	if (weak.isNotNull()) {
 		_type = VariantType::Weak;
-		new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+		new (reinterpret_cast<WeakRef<T>*>(&_value)) WeakRef<T>(weak);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
 template <class T>
-Variant::Variant(const SafeWeakRef<T>& _weak)
+Variant::Variant(const AtomicWeakRef<T>& _weak)
 {
 	Ref<T> weak(_weak);
 	if (weak.isNotNull()) {
 		_type = VariantType::Weak;
-		new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+		new (reinterpret_cast<WeakRef<T>*>(&_value)) WeakRef<T>(weak);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
-template <class T, class COMPARE>
-Variant::Variant(const Array<T, COMPARE>& object)
+template <class T>
+Variant::Variant(const Array<T>& object)
 {
 	if (object.isNotNull()) {
 		_type = VariantType::Object;
-		new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+		new (reinterpret_cast<Array<T>*>(&_value)) Array<T>(object);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
-template <class T, class COMPARE>
-Variant::Variant(const SafeArray<T, COMPARE>& _object)
+template <class T>
+Variant::Variant(const AtomicArray<T>& _object)
 {
-	Array<T, COMPARE> object(_object);
+	Array<T> object(_object);
 	if (object.isNotNull()) {
 		_type = VariantType::Object;
-		new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+		new (reinterpret_cast<Array<T>*>(&_value)) Array<T>(object);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
-template <class T, class COMPARE>
-Variant::Variant(const List<T, COMPARE>& object)
+template <class T>
+Variant::Variant(const List<T>& object)
 {
 	if (object.isNotNull()) {
 		_type = VariantType::Object;
-		new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+		new (reinterpret_cast<List<T>*>(&_value)) List<T>(object);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
-template <class T, class COMPARE>
-Variant::Variant(const SafeList<T, COMPARE>& _object)
+template <class T>
+Variant::Variant(const AtomicList<T>& _object)
 {
-	List<T, COMPARE> object(_object);
+	List<T> object(_object);
 	if (object.isNotNull()) {
 		_type = VariantType::Object;
-		new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+		new (reinterpret_cast<List<T>*>(&_value)) List<T>(object);
 	} else {
 		_type = VariantType::Null;
 	}
@@ -991,19 +1013,19 @@ Variant::Variant(const Map<KT, VT>& object)
 {
 	if (object.isNotNull()) {
 		_type = VariantType::Object;
-		new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+		new (reinterpret_cast<Map<KT, VT>*>(&_value)) Map<KT, VT>(object);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
 template <class KT, class VT>
-Variant::Variant(const SafeMap<KT, VT>& _object)
+Variant::Variant(const AtomicMap<KT, VT>& _object)
 {
 	Map<KT, VT> object(_object);
 	if (object.isNotNull()) {
 		_type = VariantType::Object;
-		new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+		new (reinterpret_cast<Map<KT, VT>*>(&_value)) Map<KT, VT>(object);
 	} else {
 		_type = VariantType::Null;
 	}
@@ -1011,7 +1033,7 @@ Variant::Variant(const SafeMap<KT, VT>& _object)
 
 SLIB_INLINE const Variant& Variant::null()
 {
-	return *((Variant*)((void*)(&_Variant_Null)));
+	return *(reinterpret_cast<Variant const*>(&_Variant_Null));
 }
 
 template <class T>
@@ -1020,14 +1042,14 @@ Variant Variant::fromRef(const Ref<T>& ref)
 	return ref;
 }
 
-template <class T, class COMPARE>
-static Variant fromArray(const Array<T, COMPARE>& value)
+template <class T>
+static Variant fromArray(const Array<T>& value)
 {
 	return value;
 }
 
-template <class T, class COMPARE>
-static Variant fromList(const List<T, COMPARE>& value)
+template <class T>
+static Variant fromList(const List<T>& value)
 {
 	return value;
 }
@@ -1052,7 +1074,7 @@ Variant& Variant::operator=(const Ref<T>& ref)
 }
 
 template <class T>
-Variant& Variant::operator=(const SafeRef<T>& ref)
+Variant& Variant::operator=(const AtomicRef<T>& ref)
 {
 	setObject(ref);
 	return *this;
@@ -1066,35 +1088,35 @@ Variant& Variant::operator=(const WeakRef<T>& weak)
 }
 
 template <class T>
-Variant& Variant::operator=(const SafeWeakRef<T>& weak)
+Variant& Variant::operator=(const AtomicWeakRef<T>& weak)
 {
 	setWeak(weak);
 	return *this;
 }
 
-template <class T, class COMPARE>
-Variant& Variant::operator=(const Array<T, COMPARE>& object)
+template <class T>
+Variant& Variant::operator=(const Array<T>& object)
 {
 	setArray(object);
 	return *this;
 }
 
-template <class T, class COMPARE>
-Variant& Variant::operator=(const SafeArray<T, COMPARE>& object)
+template <class T>
+Variant& Variant::operator=(const AtomicArray<T>& object)
 {
 	setArray(object);
 	return *this;
 }
 
-template <class T, class COMPARE>
-Variant& Variant::operator=(const List<T, COMPARE>& object)
+template <class T>
+Variant& Variant::operator=(const List<T>& object)
 {
 	setList(object);
 	return *this;
 }
 
-template <class T, class COMPARE>
-Variant& Variant::operator=(const SafeList<T, COMPARE>& object)
+template <class T>
+Variant& Variant::operator=(const AtomicList<T>& object)
 {
 	setList(object);
 	return *this;
@@ -1108,7 +1130,7 @@ Variant& Variant::operator=(const Map<KT, VT>& object)
 }
 
 template <class KT, class VT>
-Variant& Variant::operator=(const SafeMap<KT, VT>& object)
+Variant& Variant::operator=(const AtomicMap<KT, VT>& object)
 {
 	setMap(object);
 	return *this;
@@ -1132,12 +1154,7 @@ SLIB_INLINE sl_bool Variant::isNotNull() const
 template <class T>
 Ref<T> Variant::getObject(const Ref<T>& def) const
 {
-	Ref<Referable> obj(getObject());
-	if (T::checkInstance(obj.ptr)) {
-		return Ref<T>::from(obj);
-	} else {
-		return def;
-	}
+	return CastRef<T>(getObject(), def);
 }
 
 template <class T>
@@ -1146,7 +1163,7 @@ void Variant::setObject(const Ref<T>& ref)
 	_free(_type, _value);
 	if (ref.isNotNull()) {
 		_type = VariantType::Object;
-		new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+		new (reinterpret_cast<Ref<T>*>(&_value)) Ref<T>(ref);
 	} else {
 		_type = VariantType::Null;
 	}
@@ -1158,51 +1175,51 @@ void Variant::setWeak(const WeakRef<T>& weak)
 	_free(_type, _value);
 	if (weak.isNotNull()) {
 		_type = VariantType::Weak;
-		new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+		new (reinterpret_cast<WeakRef<T>*>(&_value)) WeakRef<T>(weak);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
-template <class TYPE, class COMPARE>
-Array<TYPE, COMPARE> Variant::getArray(const Array<TYPE, COMPARE>& def) const
+template <class T>
+Array<T> Variant::getArray(const Array<T>& def) const
 {
 	Ref<Referable> obj(getObject());
-	if (CArray<TYPE, COMPARE>::checkInstance(obj.ptr)) {
-		return (CArray<TYPE, COMPARE>*)(obj.ptr);
+	if (CArray<T>* p = CastInstance< CArray<T> >(obj._ptr)) {
+		return p;
 	}
 	return def;
 }
 
-template <class T, class COMPARE>
-void Variant::setArray(const Array<T, COMPARE>& object)
+template <class T>
+void Variant::setArray(const Array<T>& object)
 {
 	_free(_type, _value);
 	if (object.isNotNull()) {
 		_type = VariantType::Object;
-		new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+		new (reinterpret_cast<Array<T>*>(&_value)) Array<T>(object);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
-template <class TYPE, class COMPARE>
-List<TYPE, COMPARE> Variant::getList(const List<TYPE, COMPARE>& def) const
+template <class T>
+List<T> Variant::getList(const List<T>& def) const
 {
 	Ref<Referable> obj(getObject());
-	if (CList<TYPE, COMPARE>::checkInstance(obj.ptr)) {
-		return (CList<TYPE, COMPARE>*)(obj.ptr);
+	if (CList<T>* p = CastInstance< CList<T> >(obj._ptr)) {
+		return p;
 	}
 	return def;
 }
 
-template <class T, class COMPARE>
-void Variant::setList(const List<T, COMPARE>& object)
+template <class T>
+void Variant::setList(const List<T>& object)
 {
 	_free(_type, _value);
 	if (object.isNotNull()) {
 		_type = VariantType::Object;
-		new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+		new (reinterpret_cast<List<T>*>(&_value)) List<T>(object);
 	} else {
 		_type = VariantType::Null;
 	}
@@ -1212,8 +1229,8 @@ template <class KT, class VT>
 Map<KT, VT> Variant::getMap(const Map<KT, VT>& def) const
 {
 	Ref<Referable> obj(getObject());
-	if (IMap<KT, VT>::checkInstance(obj.ptr)) {
-		return (IMap<KT, VT>*)(obj.ptr);
+	if (IMap<KT, VT>* p = CastInstance< IMap<KT, VT> >(obj._ptr)) {
+		return p;
 	}
 	return def;
 }
@@ -1224,235 +1241,231 @@ void Variant::setMap(const Map<KT, VT>& object)
 	_free(_type, _value);
 	if (object.isNotNull()) {
 		_type = VariantType::Object;
-		new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+		new (reinterpret_cast<Map<KT, VT>*>(&_value)) Map<KT, VT>(object);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
 
-SLIB_INLINE SafeVariant::SafeVariant() : _type(VariantType::Null)
-{
-}
-
 template <class T>
-SafeVariant::SafeVariant(const Ref<T>& ref)
+Atomic<Variant>::Atomic(const Ref<T>& ref)
 {
 	if (ref.isNotNull()) {
 		_type = VariantType::Object;
-		new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+		new (reinterpret_cast<Ref<T>*>(&_value)) Ref<T>(ref);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
 template <class T>
-SafeVariant::SafeVariant(const SafeRef<T>& _ref)
+Atomic<Variant>::Atomic(const AtomicRef<T>& _ref)
 {
 	Ref<T> ref(_ref);
 	if (ref.isNotNull()) {
 		_type = VariantType::Object;
-		new ((Ref<T>*)(void*)(&_value)) Ref<T>(ref);
+		new (reinterpret_cast<Ref<T>*>(&_value)) Ref<T>(ref);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
 template <class T>
-SafeVariant::SafeVariant(const WeakRef<T>& weak)
+Atomic<Variant>::Atomic(const WeakRef<T>& weak)
 {
 	if (weak.isNotNull()) {
 		_type = VariantType::Weak;
-		new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+		new (reinterpret_cast<WeakRef<T>*>(&_value)) WeakRef<T>(weak);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
 template <class T>
-SafeVariant::SafeVariant(const SafeWeakRef<T>& _weak)
+Atomic<Variant>::Atomic(const AtomicWeakRef<T>& _weak)
 {
 	WeakRef<T> weak(_weak);
 	if (weak.isNotNull()) {
 		_type = VariantType::Weak;
-		new ((WeakRef<T>*)(void*)(&_value)) WeakRef<T>(weak);
+		new (reinterpret_cast<WeakRef<T>*>(&_value)) WeakRef<T>(weak);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
-template <class T, class COMPARE>
-SafeVariant::SafeVariant(const Array<T, COMPARE>& object)
+template <class T>
+Atomic<Variant>::Atomic(const Array<T>& object)
 {
 	if (object.isNotNull()) {
 		_type = VariantType::Object;
-		new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+		new (reinterpret_cast<Array<T>*>(&_value)) Array<T>(object);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
-template <class T, class COMPARE>
-SafeVariant::SafeVariant(const SafeArray<T, COMPARE>& _object)
+template <class T>
+Atomic<Variant>::Atomic(const AtomicArray<T>& _object)
 {
-	Array<T, COMPARE> object(_object);
+	Array<T> object(_object);
 	if (object.isNotNull()) {
 		_type = VariantType::Object;
-		new ((Array<T, COMPARE>*)(void*)(&_value)) Array<T, COMPARE>(object);
+		new (reinterpret_cast<Array<T>*>(&_value)) Array<T>(object);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
-template <class T, class COMPARE>
-SafeVariant::SafeVariant(const List<T, COMPARE>& object)
+template <class T>
+Atomic<Variant>::Atomic(const List<T>& object)
 {
 	if (object.isNotNull()) {
 		_type = VariantType::Object;
-		new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+		new (reinterpret_cast<List<T>*>(&_value)) List<T>(object);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
-template <class T, class COMPARE>
-SafeVariant::SafeVariant(const SafeList<T, COMPARE>& _object)
+template <class T>
+Atomic<Variant>::Atomic(const AtomicList<T>& _object)
 {
-	List<T, COMPARE> object(_object);
+	List<T> object(_object);
 	if (object.isNotNull()) {
 		_type = VariantType::Object;
-		new ((List<T, COMPARE>*)(void*)(&_value)) List<T, COMPARE>(object);
+		new (reinterpret_cast<List<T>*>(&_value)) List<T>(object);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
 template <class KT, class VT>
-SafeVariant::SafeVariant(const Map<KT, VT>& object)
+Atomic<Variant>::Atomic(const Map<KT, VT>& object)
 {
 	if (object.isNotNull()) {
 		_type = VariantType::Object;
-		new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+		new (reinterpret_cast<Map<KT, VT>*>(&_value)) Map<KT, VT>(object);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
 template <class KT, class VT>
-SafeVariant::SafeVariant(const SafeMap<KT, VT>& _object)
+Atomic<Variant>::Atomic(const AtomicMap<KT, VT>& _object)
 {
 	Map<KT, VT> object(_object);
 	if (object.isNotNull()) {
 		_type = VariantType::Object;
-		new ((Map<KT, VT>*)(void*)(&_value)) Map<KT, VT>(object);
+		new (reinterpret_cast<Map<KT, VT>*>(&_value)) Map<KT, VT>(object);
 	} else {
 		_type = VariantType::Null;
 	}
 }
 
-SLIB_INLINE const SafeVariant& SafeVariant::null()
+SLIB_INLINE const AtomicVariant& Atomic<Variant>::null()
 {
-	return *((SafeVariant*)((void*)(&_Variant_Null)));
+	return *(reinterpret_cast<AtomicVariant const*>(&_Variant_Null));
 }
 
 template <class T>
-SLIB_INLINE SafeVariant& SafeVariant::operator=(const Ref<T>& ref)
+AtomicVariant& Atomic<Variant>::operator=(const Ref<T>& ref)
 {
 	setObject(ref);
 	return *this;
 }
 
 template <class T>
-SafeVariant& SafeVariant::operator=(const SafeRef<T>& ref)
+AtomicVariant& Atomic<Variant>::operator=(const AtomicRef<T>& ref)
 {
 	setObject(ref);
 	return *this;
 }
 
 template <class T>
-SafeVariant& SafeVariant::operator=(const WeakRef<T>& weak)
+AtomicVariant& Atomic<Variant>::operator=(const WeakRef<T>& weak)
 {
 	setWeak(weak);
 	return *this;
 }
 
 template <class T>
-SafeVariant& SafeVariant::operator=(const SafeWeakRef<T>& weak)
+AtomicVariant& Atomic<Variant>::operator=(const AtomicWeakRef<T>& weak)
 {
 	setWeak(weak);
 	return *this;
 }
 
-template <class T, class COMPARE>
-SafeVariant& SafeVariant::operator=(const Array<T, COMPARE>& object)
+template <class T>
+AtomicVariant& Atomic<Variant>::operator=(const Array<T>& object)
 {
 	setArray(object);
 	return *this;
 }
 
-template <class T, class COMPARE>
-SafeVariant& SafeVariant::operator=(const SafeArray<T, COMPARE>& object)
+template <class T>
+AtomicVariant& Atomic<Variant>::operator=(const AtomicArray<T>& object)
 {
 	setArray(object);
 	return *this;
 }
 
-template <class T, class COMPARE>
-SafeVariant& SafeVariant::operator=(const List<T, COMPARE>& object)
+template <class T>
+AtomicVariant& Atomic<Variant>::operator=(const List<T>& object)
 {
 	setList(object);
 	return *this;
 }
 
-template <class T, class COMPARE>
-SafeVariant& SafeVariant::operator=(const SafeList<T, COMPARE>& object)
+template <class T>
+AtomicVariant& Atomic<Variant>::operator=(const AtomicList<T>& object)
 {
 	setList(object);
 	return *this;
 }
 
 template <class KT, class VT>
-SafeVariant& SafeVariant::operator=(const Map<KT, VT>& object)
+AtomicVariant& Atomic<Variant>::operator=(const Map<KT, VT>& object)
 {
 	setMap(object);
 	return *this;
 }
 
 template <class KT, class VT>
-SafeVariant& SafeVariant::operator=(const SafeMap<KT, VT>& object)
+AtomicVariant& Atomic<Variant>::operator=(const AtomicMap<KT, VT>& object)
 {
 	setMap(object);
 	return *this;
 }
 
-SLIB_INLINE VariantType SafeVariant::getType() const
+SLIB_INLINE VariantType Atomic<Variant>::getType() const
 {
 	return _type;
 }
 
-SLIB_INLINE sl_bool SafeVariant::isNull() const
+SLIB_INLINE sl_bool Atomic<Variant>::isNull() const
 {
 	return _type == VariantType::Null;
 }
 
-SLIB_INLINE sl_bool SafeVariant::isNotNull() const
+SLIB_INLINE sl_bool Atomic<Variant>::isNotNull() const
 {
 	return _type != VariantType::Null;
 }
 
 template <class T>
-Ref<T> SafeVariant::getObject(const Ref<T>& def) const
+Ref<T> Atomic<Variant>::getObject(const Ref<T>& def) const
 {
 	Variant var(*this);
 	return var.getObject(def);
 }
 
 template <class T>
-void SafeVariant::setObject(const Ref<T>& object)
+void Atomic<Variant>::setObject(const Ref<T>& object)
 {
 	if (object.isNotNull()) {
 		sl_int64 v;
-		new ((Ref<T>*)(void*)(&v)) Ref<T>(object);
+		new (reinterpret_cast<Ref<T>*>(&v)) Ref<T>(object);
 		_replace(VariantType::Object, v);
 	} else {
 		_replace(VariantType::Null, 0);
@@ -1460,49 +1473,49 @@ void SafeVariant::setObject(const Ref<T>& object)
 }
 
 template <class T>
-void SafeVariant::setWeak(const WeakRef<T>& weak)
+void Atomic<Variant>::setWeak(const WeakRef<T>& weak)
 {
 	if (weak.isNotNull()) {
 		sl_int64 v;
-		new ((WeakRef<T>*)(void*)(&v)) WeakRef<T>(weak);
+		new (reinterpret_cast<WeakRef<T>*>(&v)) WeakRef<T>(weak);
 		_replace(VariantType::Weak, v);
 	} else {
 		_replace(VariantType::Null, 0);
 	}
 }
 
-template <class TYPE, class COMPARE>
-Array<TYPE, COMPARE> SafeVariant::getArray(const Array<TYPE, COMPARE>& def) const
+template <class T>
+Array<T> Atomic<Variant>::getArray(const Array<T>& def) const
 {
 	Variant var(*this);
 	return var.getArray(def);
 }
 
-template <class TYPE, class COMPARE>
-void SafeVariant::setArray(const Array<TYPE, COMPARE>& object)
+template <class T>
+void Atomic<Variant>::setArray(const Array<T>& object)
 {
 	if (object.isNotNull()) {
 		sl_int64 v;
-		new ((Array<TYPE, COMPARE>*)(void*)(&v)) Array<TYPE, COMPARE>(object);
+		new (reinterpret_cast<Array<T>*>(&v)) Array<T>(object);
 		_replace(VariantType::Object, v);
 	} else {
 		_replace(VariantType::Null, 0);
 	}
 }
 
-template <class TYPE, class COMPARE>
-List<TYPE, COMPARE> SafeVariant::getList(const List<TYPE, COMPARE>& def) const
+template <class T>
+List<T> Atomic<Variant>::getList(const List<T>& def) const
 {
 	Variant var(*this);
 	return var.getList(def);
 }
 
-template <class TYPE, class COMPARE>
-void SafeVariant::setList(const List<TYPE, COMPARE>& object)
+template <class T>
+void Atomic<Variant>::setList(const List<T>& object)
 {
 	if (object.isNotNull()) {
 		sl_int64 v;
-		new ((List<TYPE, COMPARE>*)(void*)(&v)) List<TYPE, COMPARE>(object);
+		new (reinterpret_cast<List<T>*>(&v)) List<T>(object);
 		_replace(VariantType::Object, v);
 	} else {
 		_replace(VariantType::Null, 0);
@@ -1510,22 +1523,120 @@ void SafeVariant::setList(const List<TYPE, COMPARE>& object)
 }
 
 template <class KT, class VT>
-Map<KT, VT> SafeVariant::getMap(const Map<KT, VT>& def) const
+Map<KT, VT> Atomic<Variant>::getMap(const Map<KT, VT>& def) const
 {
 	Variant var(*this);
 	return var.getMap(def);
 }
 
 template <class KT, class VT>
-void SafeVariant::setMap(const Map<KT, VT>& object)
+void Atomic<Variant>::setMap(const Map<KT, VT>& object)
 {
 	if (object.isNotNull()) {
 		sl_int64 v;
-		new ((Map<KT, VT>*)(void*)(&v)) Map<KT, VT>(object);
+		new (reinterpret_cast<Map<KT, VT>*>(&v)) Map<KT, VT>(object);
 		_replace(VariantType::Object, v);
 	} else {
 		_replace(VariantType::Null, 0);
 	}
+}
+
+extern const char _VariantMap_ClassID[];
+
+template <>
+SLIB_INLINE sl_object_type IMap<String, Variant>::ObjectType()
+{
+	return _VariantMap_ClassID;
+}
+
+template <>
+SLIB_INLINE sl_bool IMap<String, Variant>::checkObjectType(sl_object_type type)
+{
+	if (type == _VariantMap_ClassID || type == _Map_ClassID) {
+		return sl_true;
+	}
+	return Object::checkObjectType(type);
+}
+
+template <>
+SLIB_INLINE sl_object_type IMap<String, Variant>::getObjectType() const
+{
+	return _VariantMap_ClassID;
+}
+
+template <>
+SLIB_INLINE sl_bool IMap<String, Variant>::isInstanceOf(sl_object_type type) const
+{
+	if (type == _VariantMap_ClassID || type == _Map_ClassID) {
+		return sl_true;
+	}
+	return Object::checkObjectType(type);
+}
+
+
+extern const char _VariantList_ClassID[];
+
+template <>
+SLIB_INLINE sl_object_type CList<Variant>::ObjectType()
+{
+	return _VariantList_ClassID;
+}
+
+template <>
+SLIB_INLINE sl_bool CList<Variant>::checkObjectType(sl_object_type type)
+{
+	if (type == _VariantList_ClassID || type == _List_ClassID) {
+		return sl_true;
+	}
+	return Object::checkObjectType(type);
+}
+
+template <>
+SLIB_INLINE sl_object_type CList<Variant>::getObjectType() const
+{
+	return _VariantList_ClassID;
+}
+
+template <>
+SLIB_INLINE sl_bool CList<Variant>::isInstanceOf(sl_object_type type) const
+{
+	if (type == _VariantList_ClassID || type == _List_ClassID) {
+		return sl_true;
+	}
+	return Object::checkObjectType(type);
+}
+
+
+extern const char _VariantMapList_ClassID[];
+
+template <>
+SLIB_INLINE sl_object_type CList< Map<String, Variant> >::ObjectType()
+{
+	return _VariantMapList_ClassID;
+}
+
+template <>
+SLIB_INLINE sl_bool CList< Map<String, Variant> >::checkObjectType(sl_object_type type)
+{
+	if (type == _VariantMapList_ClassID || type == _Map_ClassID) {
+		return sl_true;
+	}
+	return Object::checkObjectType(type);
+}
+
+template <>
+SLIB_INLINE sl_object_type CList< Map<String, Variant> >::getObjectType() const
+{
+	return _VariantMapList_ClassID;
+}
+
+template <>
+SLIB_INLINE sl_bool CList< Map<String, Variant> >::isInstanceOf(sl_object_type type) const
+{
+	if (type == _VariantMapList_ClassID || type == _Map_ClassID) {
+		return sl_true;
+	}
+	return Object::checkObjectType(type);
 }
 
 SLIB_NAMESPACE_END

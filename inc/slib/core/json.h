@@ -73,23 +73,23 @@ public:
 	static Variant createMap();
 	
 	
-	template <class T, class COMPARE>
-	static void fromJson(const Variant& v, List<T, COMPARE>& _out);
+	template <class T>
+	static void fromJson(const Variant& v, List<T>& _out);
 	
-	template <class T, class COMPARE>
-	static void fromJson(const Variant& v, List<T, COMPARE>& _out, const List<T, COMPARE>& def);
+	template <class T>
+	static void fromJson(const Variant& v, List<T>& _out, const List<T>& def);
 	
-	template <class T, class COMPARE>
-	static Variant toJson(const List<T, COMPARE>& _in);
+	template <class T>
+	static Variant toJson(const List<T>& _in);
 
-	template <class T, class COMPARE>
-	static void fromJson(const Variant& v, SafeList<T, COMPARE>& _out);
+	template <class T>
+	static void fromJson(const Variant& v, AtomicList<T>& _out);
 	
-	template <class T, class COMPARE>
-	static void fromJson(const Variant& v, SafeList<T, COMPARE>& _out, const SafeList<T, COMPARE>& def);
+	template <class T>
+	static void fromJson(const Variant& v, AtomicList<T>& _out, const AtomicList<T>& def);
 	
-	template <class T, class COMPARE>
-	static Variant toJson(const SafeList<T, COMPARE>& _in);
+	template <class T>
+	static Variant toJson(const AtomicList<T>& _in);
 	
 	template <class T>
 	static void fromJson(const Variant& v, Map<String, T>& _out);
@@ -101,13 +101,13 @@ public:
 	static Variant toJson(const Map<String, T>& _in);
 	
 	template <class T>
-	static void fromJson(const Variant& v, SafeMap<String, T>& _out);
+	static void fromJson(const Variant& v, AtomicMap<String, T>& _out);
 	
 	template <class T>
-	static void fromJson(const Variant& v, SafeMap<String, T>& _out, const SafeMap<String, T>& def);
+	static void fromJson(const Variant& v, AtomicMap<String, T>& _out, const AtomicMap<String, T>& def);
 	
 	template <class T>
-	static Variant toJson(const SafeMap<String, T>& _in);
+	static Variant toJson(const AtomicMap<String, T>& _in);
 	
 	template <class T>
 	static void fromJson(const Variant& v, Ref<T>& _out);
@@ -119,13 +119,13 @@ public:
 	static Variant toJson(const Ref<T>& _in);
 	
 	template <class T>
-	static void fromJson(const Variant& v, SafeRef<T>& _out);
+	static void fromJson(const Variant& v, AtomicRef<T>& _out);
 	
 	template <class T>
-	static void fromJson(const Variant& v, SafeRef<T>& _out, const SafeRef<T>& def);
+	static void fromJson(const Variant& v, AtomicRef<T>& _out, const AtomicRef<T>& def);
 	
 	template <class T>
-	static Variant toJson(const SafeRef<T>& _in);
+	static Variant toJson(const AtomicRef<T>& _in);
 
 	template <class T>
 	static void fromJson(const Variant& v, WeakRef<T>& _out);
@@ -137,13 +137,13 @@ public:
 	static Variant toJson(const WeakRef<T>& _in);
 	
 	template <class T>
-	static void fromJson(const Variant& v, SafeWeakRef<T>& _out);
+	static void fromJson(const Variant& v, AtomicWeakRef<T>& _out);
 	
 	template <class T>
-	static void fromJson(const Variant& v, SafeWeakRef<T>& _out, const SafeWeakRef<T>& def);
+	static void fromJson(const Variant& v, AtomicWeakRef<T>& _out, const AtomicWeakRef<T>& def);
 	
 	template <class T>
-	static Variant toJson(const SafeWeakRef<T>& _in);
+	static Variant toJson(const AtomicWeakRef<T>& _in);
 
 	static Variant toJson(const sl_char8* _in);
 	
@@ -220,7 +220,7 @@ SLIB_INLINE void Json::get(const Variant& v, sl_size index, T& _out)
 {
 	List<Variant> list = v.getVariantList();
 	Variant item;
-	if (list.getItem(index, &item)) {
+	if (list.getAt(index, &item)) {
 		Json::fromJson(item, _out);
 	}
 }
@@ -238,9 +238,9 @@ template <> void Json::fromJson(const Variant& v, Variant& _out);
 template <> void Json::fromJson(const Variant& v, Variant& _out, const Variant& def);
 template <> Variant Json::toJson(const Variant& _in);
 
-template <> void Json::fromJson(const Variant& v, SafeVariant& _out);
-template <> void Json::fromJson(const Variant& v, SafeVariant& _out, const SafeVariant& def);
-template <> Variant Json::toJson(const SafeVariant& _in);
+template <> void Json::fromJson(const Variant& v, AtomicVariant& _out);
+template <> void Json::fromJson(const Variant& v, AtomicVariant& _out, const AtomicVariant& def);
+template <> Variant Json::toJson(const AtomicVariant& _in);
 
 template <> void Json::fromJson(const Variant& v, sl_int32& _out);
 template <> void Json::fromJson(const Variant& v, sl_int32& _out, const sl_int32& def);
@@ -290,17 +290,17 @@ template <> void Json::fromJson(const Variant& v, String8& _out);
 template <> void Json::fromJson(const Variant& v, String8& _out, const String8& def);
 template <> Variant Json::toJson(const String8& _in);
 
-template <> void Json::fromJson(const Variant& v, SafeString8& _out);
-template <> void Json::fromJson(const Variant& v, SafeString8& _out, const SafeString8& def);
-template <> Variant Json::toJson(const SafeString8& _in);
+template <> void Json::fromJson(const Variant& v, AtomicString8& _out);
+template <> void Json::fromJson(const Variant& v, AtomicString8& _out, const AtomicString8& def);
+template <> Variant Json::toJson(const AtomicString8& _in);
 
 template <> void Json::fromJson(const Variant& v, String16& _out);
 template <> void Json::fromJson(const Variant& v, String16& _out, const String16& def);
 template <> Variant Json::toJson(const String16& _in);
 
-template <> void Json::fromJson(const Variant& v, SafeString16& _out);
-template <> void Json::fromJson(const Variant& v, SafeString16& _out, const SafeString16& def);
-template <> Variant Json::toJson(const SafeString16& _in);
+template <> void Json::fromJson(const Variant& v, AtomicString16& _out);
+template <> void Json::fromJson(const Variant& v, AtomicString16& _out, const AtomicString16& def);
+template <> Variant Json::toJson(const AtomicString16& _in);
 
 template <> void Json::fromJson(const Variant& v, Time& _out);
 template <> void Json::fromJson(const Variant& v, Time& _out, const Time& def);
@@ -310,42 +310,42 @@ template <> void Json::fromJson(const Variant& v, List<Variant>& _out);
 template <> void Json::fromJson(const Variant& v, List<Variant>& _out, const List<Variant>& def);
 template <> Variant Json::toJson(const List<Variant>& _in);
 
-template <> void Json::fromJson(const Variant& v, SafeList<Variant>& _out);
-template <> void Json::fromJson(const Variant& v, SafeList<Variant>& _out, const SafeList<Variant>& def);
-template <> Variant Json::toJson(const SafeList<Variant>& _in);
+template <> void Json::fromJson(const Variant& v, AtomicList<Variant>& _out);
+template <> void Json::fromJson(const Variant& v, AtomicList<Variant>& _out, const AtomicList<Variant>& def);
+template <> Variant Json::toJson(const AtomicList<Variant>& _in);
 
 template <> void Json::fromJson(const Variant& v, Map<String, Variant>& _out);
 template <> void Json::fromJson(const Variant& v, Map<String, Variant>& _out, const Map<String, Variant>& def);
 template <> Variant Json::toJson(const Map<String, Variant>& _in);
 
-template <> void Json::fromJson(const Variant& v, SafeMap<String, Variant>& _out);
-template <> void Json::fromJson(const Variant& v, SafeMap<String, Variant>& _out, const SafeMap<String, Variant>& def);
-template <> Variant Json::toJson(const SafeMap<String, Variant>& _in);
+template <> void Json::fromJson(const Variant& v, AtomicMap<String, Variant>& _out);
+template <> void Json::fromJson(const Variant& v, AtomicMap<String, Variant>& _out, const AtomicMap<String, Variant>& def);
+template <> Variant Json::toJson(const AtomicMap<String, Variant>& _in);
 
 template <> void Json::fromJson(const Variant& v, List< Map<String, Variant> >& _out);
 template <> void Json::fromJson(const Variant& v, List< Map<String, Variant> >& _out, const List< Map<String, Variant> >& def);
 template <> Variant Json::toJson(const List< Map<String, Variant> >& _in);
 
-template <> void Json::fromJson(const Variant& v, SafeList< Map<String, Variant> >& _out);
-template <> void Json::fromJson(const Variant& v, SafeList< Map<String, Variant> >& _out, const SafeList< Map<String, Variant> >& def);
-template <> Variant Json::toJson(const SafeList< Map<String, Variant> >& _in);
+template <> void Json::fromJson(const Variant& v, AtomicList< Map<String, Variant> >& _out);
+template <> void Json::fromJson(const Variant& v, AtomicList< Map<String, Variant> >& _out, const AtomicList< Map<String, Variant> >& def);
+template <> Variant Json::toJson(const AtomicList< Map<String, Variant> >& _in);
 
-template <class T, class COMPARE>
-void Json::fromJson(const Variant& v, List<T, COMPARE>& _out)
+template <class T>
+void Json::fromJson(const Variant& v, List<T>& _out)
 {
-	List<T, COMPARE> dst;
+	List<T> dst;
 	Ref<Referable> obj(v.getObject());
 	if (obj.isNotNull()) {
-		if (CList<Variant>::checkInstance(obj.ptr)) {
-			ListLocker<Variant> src(*((CList<Variant>*)(obj.ptr)));
+		if (CList<Variant>* _src = CastInstance< CList<Variant> >(obj.get())) {
+			ListLocker<Variant> src(*_src);
 			for (sl_size i = 0; i < src.count; i++) {
 				Variant& v = src[i];
 				T o;
 				Json::fromJson(v, o);
 				dst.add_NoLock(o);
 			}
-		} else if (CList< Map<String, Variant> >::checkInstance(obj.ptr)) {
-			ListLocker< Map<String, Variant> > src(*((CList< Map<String, Variant> >*)(obj.ptr)));
+		} else if (CList< Map<String, Variant> >* _src = CastInstance< CList< Map<String, Variant> > >(obj.get())) {
+			ListLocker< Map<String, Variant> > src(*_src);
 			for (sl_size i = 0; i < src.count; i++) {
 				Variant v(src[i]);
 				T o;
@@ -357,8 +357,8 @@ void Json::fromJson(const Variant& v, List<T, COMPARE>& _out)
 	_out = dst;
 }
 
-template <class T, class COMPARE>
-void Json::fromJson(const Variant& v, List<T, COMPARE>& _out, const List<T, COMPARE>& def)
+template <class T>
+void Json::fromJson(const Variant& v, List<T>& _out, const List<T>& def)
 {
 	if (v.isNotNull()) {
 		Json::fromJson(v, _out);
@@ -367,8 +367,8 @@ void Json::fromJson(const Variant& v, List<T, COMPARE>& _out, const List<T, COMP
 	}
 }
 
-template <class T, class COMPARE>
-Variant Json::toJson(const List<T, COMPARE>& _in)
+template <class T>
+Variant Json::toJson(const List<T>& _in)
 {
 	List<Variant> list;
 	if (_in.isNotNull()) {
@@ -379,19 +379,19 @@ Variant Json::toJson(const List<T, COMPARE>& _in)
 		}
 		return list;
 	}
-	return Variant::null();
+	return sl_null;
 }
 
-template <class T, class COMPARE>
-void Json::fromJson(const Variant& v, SafeList<T, COMPARE>& _out)
+template <class T>
+void Json::fromJson(const Variant& v, AtomicList<T>& _out)
 {
-	List<T, COMPARE> __out;
+	List<T> __out;
 	Json::fromJson(v, __out);
 	_out = __out;
 }
 
-template <class T, class COMPARE>
-void Json::fromJson(const Variant& v, SafeList<T, COMPARE>& _out, const SafeList<T, COMPARE>& def)
+template <class T>
+void Json::fromJson(const Variant& v, AtomicList<T>& _out, const AtomicList<T>& def)
 {
 	if (v.isNotNull()) {
 		Json::fromJson(v, _out);
@@ -400,16 +400,16 @@ void Json::fromJson(const Variant& v, SafeList<T, COMPARE>& _out, const SafeList
 	}
 }
 
-template <class T, class COMPARE>
-Variant Json::toJson(const SafeList<T, COMPARE>& _in)
+template <class T>
+Variant Json::toJson(const AtomicList<T>& _in)
 {
-	return Json::toJson(List<T, COMPARE>(_in));
+	return Json::toJson(List<T>(_in));
 }
 
 template <class T>
 void Json::fromJson(const Variant& v, Map<String, T>& _out)
 {
-	Iterator< Pair<String, Variant> > iterator = v.getVariantMap().iterator();
+	Iterator< Pair<String, Variant> > iterator = v.getVariantMap().toIterator();
 	if (iterator.isNotNull()) {
 		Map<String, T> map;
 		map.initHash();
@@ -421,7 +421,7 @@ void Json::fromJson(const Variant& v, Map<String, T>& _out)
 		}
 		_out = map;
 	} else {
-		_out = Map<String, T>::null();
+		_out.setNull();
 	}
 }
 
@@ -439,7 +439,7 @@ template <class T>
 Variant Json::toJson(const Map<String, T>& _in)
 {
 	Map<String, Variant> map;
-	Iterator< Pair<String, T> > iterator = _in.iterator();
+	Iterator< Pair<String, T> > iterator = _in.toIterator();
 	if (iterator.isNotNull()) {
 		map.initList();
 		Pair<String, T> pair;
@@ -451,7 +451,7 @@ Variant Json::toJson(const Map<String, T>& _in)
 }
 
 template <class T>
-void Json::fromJson(const Variant& v, SafeMap<String, T>& _out)
+void Json::fromJson(const Variant& v, AtomicMap<String, T>& _out)
 {
 	Map<String, T> __out;
 	Json::fromJson(v, __out);
@@ -459,7 +459,7 @@ void Json::fromJson(const Variant& v, SafeMap<String, T>& _out)
 }
 
 template <class T>
-void Json::fromJson(const Variant& v, SafeMap<String, T>& _out, const SafeMap<String, T>& def)
+void Json::fromJson(const Variant& v, AtomicMap<String, T>& _out, const AtomicMap<String, T>& def)
 {
 	if (v.isNotNull()) {
 		Json::fromJson(v, _out);
@@ -469,7 +469,7 @@ void Json::fromJson(const Variant& v, SafeMap<String, T>& _out, const SafeMap<St
 }
 
 template <class T>
-Variant Json::toJson(const SafeMap<String, T>& _in)
+Variant Json::toJson(const AtomicMap<String, T>& _in)
 {
 	return Json::toJson(Map<String, T>(_in));
 }
@@ -485,7 +485,7 @@ void Json::fromJson(const Variant& v, Ref<T>& _out)
 			return;
 		}
 	}
-	_out = Ref<T>::null();
+	_out.setNull();
 }
 
 template <class T>
@@ -504,11 +504,11 @@ Variant Json::toJson(const Ref<T>& _in)
 	if (_in.isNotNull()) {
 		return toJson(*_in);
 	}
-	return Variant::null();
+	return sl_null;
 }
 
 template <class T>
-void Json::fromJson(const Variant& v, SafeRef<T>& _out)
+void Json::fromJson(const Variant& v, AtomicRef<T>& _out)
 {
 	Ref<T> __out;
 	fromJson(v, __out);
@@ -516,7 +516,7 @@ void Json::fromJson(const Variant& v, SafeRef<T>& _out)
 }
 
 template <class T>
-void Json::fromJson(const Variant& v, SafeRef<T>& _out, const SafeRef<T>& def)
+void Json::fromJson(const Variant& v, AtomicRef<T>& _out, const AtomicRef<T>& def)
 {
 	if (v.isNotNull()) {
 		fromJson(v, _out);
@@ -526,7 +526,7 @@ void Json::fromJson(const Variant& v, SafeRef<T>& _out, const SafeRef<T>& def)
 }
 
 template <class T>
-Variant Json::toJson(const SafeRef<T>& _in)
+Variant Json::toJson(const AtomicRef<T>& _in)
 {
 	return toJson(Ref<T>(_in));
 }
@@ -550,19 +550,19 @@ Variant Json::toJson(const WeakRef<T>& _in)
 }
 
 template <class T>
-void Json::fromJson(const Variant& v, SafeWeakRef<T>& _out)
+void Json::fromJson(const Variant& v, AtomicWeakRef<T>& _out)
 {
 	_out.setNull();
 }
 
 template <class T>
-void Json::fromJson(const Variant& v, SafeWeakRef<T>& _out, const SafeWeakRef<T>& def)
+void Json::fromJson(const Variant& v, AtomicWeakRef<T>& _out, const AtomicWeakRef<T>& def)
 {
 	_out = def;
 }
 
 template <class T>
-Variant Json::toJson(const SafeWeakRef<T>& _in)
+Variant Json::toJson(const AtomicWeakRef<T>& _in)
 {
 	return toJson(Ref<T>(_in));
 }

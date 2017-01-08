@@ -51,24 +51,17 @@ private:
 };
 
 template <class T>
-class SafeIterator;
-
-#define SLIB_TEMPLATE_PARAMS_IIterator T
-#define SLIB_TEMPLATE_DEF_PARAMS_IIterator class T
-
-/** auto-referencing object **/
-template <class T>
 class SLIB_EXPORT Iterator
 {
 public:
 	Ref< IIterator<T> > ref;
-	SLIB_DECLARE_TEMPLATE_REF_WRAPPER(Iterator, SafeIterator, IIterator)
-
+	SLIB_REF_WRAPPER(Iterator, IIterator<T>)
+	
 public:
 	sl_bool hasNext() const;
-
+	
 	sl_reg getIndex() const;
-
+	
 	sl_bool next(T* _out) const;
 	
 	// range-based for loop
@@ -78,13 +71,13 @@ public:
 	
 };
 
-/** auto-referencing object **/
 template <class T>
-class SLIB_EXPORT SafeIterator
+class SLIB_EXPORT Atomic< Iterator<T> >
 {
-	SafeRef< IIterator<T> > ref;
-	SLIB_DECLARE_TEMPLATE_REF_WRAPPER(SafeIterator, Iterator, IIterator)
-	
+public:
+	AtomicRef< IIterator<T> > ref;
+	SLIB_ATOMIC_REF_WRAPPER(IIterator<T>)
+
 public:
 	sl_bool hasNext() const;
 	
@@ -98,6 +91,9 @@ public:
 	IteratorPosition<T> end() const;
 	
 };
+
+template <class T>
+using AtomicIterator = Atomic< Iterator<T> >;
 
 SLIB_NAMESPACE_END
 
@@ -145,12 +141,10 @@ SLIB_INLINE IteratorPosition<T>& IteratorPosition<T>::operator++()
 }
 
 
-SLIB_DEFINE_TEMPLATE_REF_WRAPPER(Iterator, SafeIterator, IIterator, ref)
-
 template <class T>
 SLIB_INLINE sl_bool Iterator<T>::hasNext() const
 {
-	IIterator<T>* obj = ref.ptr;
+	IIterator<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->hasNext();
 	}
@@ -160,7 +154,7 @@ SLIB_INLINE sl_bool Iterator<T>::hasNext() const
 template <class T>
 SLIB_INLINE sl_reg Iterator<T>::getIndex() const
 {
-	IIterator<T>* obj = ref.ptr;
+	IIterator<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->getIndex();
 	}
@@ -170,7 +164,7 @@ SLIB_INLINE sl_reg Iterator<T>::getIndex() const
 template <class T>
 SLIB_INLINE sl_bool Iterator<T>::next(T* _out) const
 {
-	IIterator<T>* obj = ref.ptr;
+	IIterator<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->next(_out);
 	}
@@ -189,10 +183,9 @@ SLIB_INLINE IteratorPosition<T> Iterator<T>::end() const
 	return IteratorPosition<T>();
 }
 
-SLIB_DEFINE_TEMPLATE_REF_WRAPPER(SafeIterator, Iterator, IIterator, ref)
 
 template <class T>
-SLIB_INLINE sl_bool SafeIterator<T>::hasNext() const
+sl_bool Atomic< Iterator<T> >::hasNext() const
 {
 	Ref< IIterator<T> > obj(ref);
 	if (obj.isNotNull()) {
@@ -202,7 +195,7 @@ SLIB_INLINE sl_bool SafeIterator<T>::hasNext() const
 }
 
 template <class T>
-SLIB_INLINE sl_reg SafeIterator<T>::getIndex() const
+sl_reg Atomic< Iterator<T> >::getIndex() const
 {
 	Ref< IIterator<T> > obj(ref);
 	if (obj.isNotNull()) {
@@ -212,7 +205,7 @@ SLIB_INLINE sl_reg SafeIterator<T>::getIndex() const
 }
 
 template <class T>
-SLIB_INLINE sl_bool SafeIterator<T>::next(T* _out) const
+sl_bool Atomic< Iterator<T> >::next(T* _out) const
 {
 	Ref< IIterator<T> > obj(ref);
 	if (obj.isNotNull()) {
@@ -222,13 +215,13 @@ SLIB_INLINE sl_bool SafeIterator<T>::next(T* _out) const
 };
 
 template <class T>
-SLIB_INLINE IteratorPosition<T> SafeIterator<T>::begin() const
+IteratorPosition<T> Atomic< Iterator<T> >::begin() const
 {
 	return IteratorPosition<T>(ref);
 }
 
 template <class T>
-SLIB_INLINE IteratorPosition<T> SafeIterator<T>::end() const
+IteratorPosition<T> Atomic< Iterator<T> >::end() const
 {
 	return IteratorPosition<T>();
 }

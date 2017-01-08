@@ -187,8 +187,8 @@ protected:
 
 	MemoryBuffer m_bufResponseContent;
 	HttpStatus m_responseStatus;
-	SafeString m_responseMessage;
-	SafeMap<String, String> m_responseHeaders;
+	AtomicString m_responseMessage;
+	AtomicMap<String, String> m_responseHeaders;
 	
 	Ptr<IUrlRequestListener> m_listener;
 	Function<void(UrlRequest*)> m_onComplete;

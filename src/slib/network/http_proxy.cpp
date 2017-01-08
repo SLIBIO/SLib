@@ -35,7 +35,7 @@ Ref<HttpProxy> HttpProxy::create(const HttpProxyParam& param)
 			return ret;
 		}
 	}
-	return Ref<HttpProxy>::null();
+	return sl_null;
 }
 
 void HttpProxy::release()
@@ -52,11 +52,13 @@ sl_bool HttpProxy::preprocessRequest(const Ref<HttpServiceContext>& context)
 		HttpMethod method = context->getMethod();
 		if (method == HttpMethod::CONNECT) {
 			if (m_param.flagLogDebug) {
-				SLIB_LOG(SERVICE_TAG, "[" + String::fromPointerValue(connection.ptr) + "] PROXY CONNECT - Host: " + context->getPath());
+				Log(SERVICE_TAG, "[%s] PROXY CONNECT - Host: %s",
+					String::fromPointerValue(connection.get()),
+					context->getPath());
 			}
 			Ref<ThreadPool> pool = getThreadPool();
 			if (pool.isNotNull()) {
-				pool->addTask(SLIB_CALLBACK_WEAKREF(HttpProxy, _processConnect, this, Ref<HttpServiceContext>(context)));
+				pool->addTask(SLIB_BIND_WEAKREF(void(), HttpProxy, _processConnect, this, Ref<HttpServiceContext>(context)));
 			}
 			return sl_true;
 		}
@@ -73,11 +75,14 @@ sl_bool HttpProxy::preprocessRequest(const Ref<HttpServiceContext>& context)
 		if (flagProxy) {
 			String host = context->getHost();
 			if (m_param.flagLogDebug) {
-				SLIB_LOG(SERVICE_TAG, "[" + String::fromPointerValue(connection.ptr) + "] PROXY " + context->getMethodText() + " - Host: " + host);
+				Log(SERVICE_TAG, "[%s] PROXY %s - Host: %s",
+					String::fromPointerValue(connection.get()),
+					context->getMethodText(),
+					host);
 			}
 			Ref<ThreadPool> pool = getThreadPool();
 			if (pool.isNotNull()) {
-				pool->addTask(SLIB_CALLBACK_WEAKREF(HttpProxy, _processProxy, this, Ref<HttpServiceContext>(context), host, portProxy));
+				pool->addTask(SLIB_BIND_WEAKREF(void(), HttpProxy, _processProxy, this, Ref<HttpServiceContext>(context), host, portProxy));
 			}
 			return sl_true;
 		}
@@ -156,10 +161,10 @@ void HttpProxy::_processConnect(const Ref<HttpServiceContext>& context)
 		return;
 	}
 	String host = context->getPath();
-	Ref<_HttpProxy_ConnectContext> connectContext = new _HttpProxy_ConnectContext(connection.ptr, context->getRequestBody());
+	Ref<_HttpProxy_ConnectContext> connectContext = new _HttpProxy_ConnectContext(connection.get(), context->getRequestBody());
 	if (connectContext.isNotNull()) {
-		if (connectTo(connection.ptr, host, WeakRef<_HttpProxy_ConnectContext>(connectContext))) {
-			connection->setProxyObject(connectContext.ptr);
+		if (connectTo(connection.get(), host, WeakRef<_HttpProxy_ConnectContext>(connectContext))) {
+			connection->setProxyObject(connectContext.get());
 			return;
 		}
 	}
@@ -230,7 +235,7 @@ public:
 	// override
 	Memory onAsyncCopyRead(AsyncCopy* task, const Memory& input)
 	{
-		if (task == m_copyRemoteToLocal.ptr) {
+		if (task == m_copyRemoteToLocal.get()) {
 			if (m_sizeResponse == 0) {
 
 			} else if (task->getWrittenSize() >= m_sizeResponse) {
@@ -264,10 +269,10 @@ void HttpProxy::_processProxy(const Ref<HttpServiceContext>& context, String hos
 		host += ":";
 		host += port;
 	}
-	Ref<_HttpProxy_ProxyContext> proxyContext = new _HttpProxy_ProxyContext(connection.ptr, context);
+	Ref<_HttpProxy_ProxyContext> proxyContext = new _HttpProxy_ProxyContext(connection.get(), context);
 	if (proxyContext.isNotNull()) {
-		if (connectTo(connection.ptr, host, WeakRef<_HttpProxy_ProxyContext>(proxyContext))) {
-			connection->setProxyObject(proxyContext.ptr);
+		if (connectTo(connection.get(), host, WeakRef<_HttpProxy_ProxyContext>(proxyContext))) {
+			connection->setProxyObject(proxyContext.get());
 			return;
 		}
 	}
@@ -298,7 +303,7 @@ public:
 		connection->setUserObject(Ref<Referable>::null());
 		PtrLocker<IHttpProxyConnectListener> listener(m_listener);
 		if (listener.isNotNull()) {
-			listener->onConnect(connection.ptr, socket, flagError);
+			listener->onConnect(connection.get(), socket, flagError);
 		}
 	}
 };
@@ -312,7 +317,7 @@ sl_bool HttpProxy::connectTo(HttpServiceConnection* connection, const String& ho
 		if (socket.isNotNull()) {
 			Ref<_HttpProxy_ConnectListener> listenerConnect = new _HttpProxy_ConnectListener(connection, listener);
 			if (socket->connect(address, listenerConnect)) {
-				connection->setUserObject(socket.ptr);
+				connection->setUserObject(socket.get());
 				return sl_true;
 			}
 		}

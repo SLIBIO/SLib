@@ -173,59 +173,108 @@ public:
 public:
 	SLIB_INLINE Color() = default;
 	
-	SLIB_INLINE Color(const Color& other) = default;
+	SLIB_CONSTEXPR Color(const Color& other):
+	 r(other.r), g(other.g), b(other.b), a(other.a)
+	{}
 	
-	Color(sl_uint32 r, sl_uint32 g, sl_uint32 b, sl_uint32 a = 255);
+	SLIB_CONSTEXPR Color(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a = 255):
+	 r(_r), g(_g), b(_b), a(_a)
+	{}
 	
-	Color(sl_uint32 argb);
+	SLIB_CONSTEXPR Color(sl_uint32 argb):
+	 b((sl_uint8)(argb & 0xFF)),
+	 g((sl_uint8)((argb >> 8) & 0xFF)),
+	 r((sl_uint8)((argb >> 16) & 0xFF)),
+	 a((sl_uint8)((argb >> 24) & 0xFF))
+	{}
+	
+	SLIB_CONSTEXPR Color(const Color3f& v):
+	 r((sl_uint8)(Math::clamp0_255((sl_int32)(v.x * 255)))),
+	 g((sl_uint8)(Math::clamp0_255((sl_int32)(v.y * 255)))),
+	 b((sl_uint8)(Math::clamp0_255((sl_int32)(v.z * 255)))),
+	 a(255)
+	{}
+	
+	SLIB_CONSTEXPR Color(const Color4f& v):
+	 r((sl_uint8)(Math::clamp0_255((sl_int32)(v.x * 255)))),
+	 g((sl_uint8)(Math::clamp0_255((sl_int32)(v.y * 255)))),
+	 b((sl_uint8)(Math::clamp0_255((sl_int32)(v.z * 255)))),
+	 a((sl_uint8)(Math::clamp0_255((sl_int32)(v.w * 255))))
+	{}
 
-	Color(const Color3f& v);
-	
-	Color(const Color4f& v);
-	
 public:
 	static const Color& zero();
 	
-	sl_bool isZero() const;
+	SLIB_CONSTEXPR sl_bool isZero() const
+	{
+		return r == 0 && g == 0 && b == 0 && a == 0;
+	}
 	
-	sl_bool isNotZero() const;
+	SLIB_CONSTEXPR sl_bool isNotZero() const
+	{
+		return r != 0 || g != 0 || b != 0 || a != 0;
+	}
 	
 	void setZero();
 
-	float getBlueF() const;
+	SLIB_CONSTEXPR float getBlueF() const
+	{
+		return (float)(b) / 255.0f;
+	}
 	
 	void setBlueF(float v);
 	
-	float getGreenF() const;
+	SLIB_CONSTEXPR float getGreenF() const
+	{
+		return (float)(g) / 255.0f;
+	}
 	
 	void setGreenF(float v);
 	
-	float getRedF() const;
+	SLIB_CONSTEXPR float getRedF() const
+	{
+		return (float)(r) / 255.0f;
+	}
 	
 	void setRedF(float v);
 	
-	float getAlphaF() const;
+	SLIB_CONSTEXPR float getAlphaF() const
+	{
+		return (float)(a) / 255.0f;
+	}
 	
 	void setAlphaF(float v);
 	
 	void setRGBA(sl_uint8 r, sl_uint8 g, sl_uint8 b, sl_uint8 a);
 
-	sl_uint32 getARGB() const;
-	
-	void setARGB(sl_uint32 v);
+	SLIB_CONSTEXPR sl_uint32 getARGB() const
+	{
+		return ((sl_uint32)(a) << 24) | ((sl_uint32)(r) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(b));
+	}
 
-	sl_uint32 getABGR() const;
+	void setARGB(sl_uint32 v);
+	
+	SLIB_CONSTEXPR sl_uint32 getABGR() const
+	{
+		return ((sl_uint32)(a) << 24) | ((sl_uint32)(b) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(r));
+	}
 	
 	void setABGR(sl_uint32 v);
+	
+	SLIB_CONSTEXPR sl_uint32 getRGB() const
+	{
+		return ((sl_uint32)(r) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(b));
+	}
 
 	void setRGB(sl_uint8 r, sl_uint8 g, sl_uint8 b);
 	
-	sl_uint32 getRGB() const;
-	
 	void setRGB(sl_uint32 v);
 
-	sl_uint32 getBGR() const;
-	
+	SLIB_CONSTEXPR sl_uint32 getBGR() const
+	{
+		return ((sl_uint32)(b) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(r));
+	}
+
 	void setBGR(sl_uint32 v);
 	
 	
@@ -261,27 +310,56 @@ public:
 	
 	String toString() const;
 	
-	SLIB_DECLARE_PARSE_FUNCTIONS(Color)
+	
+	template <class ST>
+	static sl_bool parse(const ST& str, Color* _out)
+	{
+		return Parse(str, _out);
+	}
+	
+	template <class ST>
+	sl_bool parse(const ST& str)
+	{
+		return Parse(str, this);
+	}
 	
 public:
 	SLIB_INLINE Color& operator=(const Color& other) = default;
 	
-	sl_bool operator==(const Color& other) const;
+	SLIB_CONSTEXPR sl_bool operator==(const Color& other) const
+	{
+		return r == other.r && g == other.g && b == other.b && a == other.a;
+	}
 	
-	sl_bool operator!=(const Color& other) const;
-
-	operator Color3f() const;
+	SLIB_CONSTEXPR sl_bool operator!=(const Color& other) const
+	{
+		return r != other.r || g != other.g || b != other.b || a != other.a;
+	}
 	
-	operator Color4f() const;
+	SLIB_CONSTEXPR operator Color3f() const
+	{
+		return Color3f((sl_real)(r) / 255, (sl_real)(g) / 255, (sl_real)(b) / 255);
+	}
+	
+	SLIB_CONSTEXPR operator Color4f() const
+	{
+		return Color4f((sl_real)(r) / 255, (sl_real)(g) / 255, (sl_real)(b) / 255, (sl_real)(a) / 255);
+	}
 	
 private:
 	static sl_uint8 _zero[4];
 	
 };
 
+template <>
+sl_reg Parser<Color, sl_char8>::parse(Color* _out, const sl_char8 *sz, sl_size posBegin, sl_size len);
+
+template <>
+sl_reg Parser<Color, sl_char16>::parse(Color* _out, const sl_char16 *sz, sl_size posBegin, sl_size len);
+
 #define SLIB_STATIC_COLOR(name, R, G, B, A) \
 	SLIB_ALIGN(8) static sl_uint8 _static_color_buf_##name[] = {R, G, B, A}; \
-	Color& name = *((Color*)((void*)_static_color_buf_##name));
+	Color& name = *(reinterpret_cast<Color*>(_static_color_buf_##name));
 
 class SLIB_EXPORT ColorMatrix
 {
@@ -311,31 +389,9 @@ SLIB_GRAPHICS_NAMESPACE_END
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
-SLIB_INLINE Color::Color(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a) : r(_r), g(_g), b(_b), a(_a)
-{
-}
-
-SLIB_INLINE Color::Color(sl_uint32 argb)
-{
-	b = (sl_uint8)(argb & 0xFF);
-	g = (sl_uint8)((argb >> 8) & 0xFF);
-	r = (sl_uint8)((argb >> 16) & 0xFF);
-	a = (sl_uint8)((argb >> 24) & 0xFF);
-}
-
 SLIB_INLINE const Color& Color::zero()
 {
-	return *((Color*)((void*)(&_zero)));
-}
-
-SLIB_INLINE sl_bool Color::isZero() const
-{
-	return r == 0 && g == 0 && b == 0 && a == 0;
-}
-
-SLIB_INLINE sl_bool Color::isNotZero() const
-{
-	return r != 0 || g != 0 || b != 0 || a != 0;
+	return *(reinterpret_cast<Color const*>(&_zero));
 }
 
 SLIB_INLINE void Color::setZero()
@@ -354,22 +410,12 @@ SLIB_INLINE void Color::setRGBA(sl_uint8 _r, sl_uint8 _g, sl_uint8 _b, sl_uint8 
 	a = _a;
 }
 
-SLIB_INLINE sl_uint32 Color::getARGB() const
-{
-	return ((sl_uint32)(a) << 24) | ((sl_uint32)(r) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(b));
-}
-
 SLIB_INLINE void Color::setARGB(sl_uint32 v)
 {
 	b = (sl_uint8)(v & 0xFF);
 	g = (sl_uint8)((v >> 8) & 0xFF);
 	r = (sl_uint8)((v >> 16) & 0xFF);
 	a = (sl_uint8)((v >> 24) & 0xFF);
-}
-
-SLIB_INLINE sl_uint32 Color::getABGR() const
-{
-	return ((sl_uint32)(a) << 24) | ((sl_uint32)(b) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(r));
 }
 
 SLIB_INLINE void Color::setABGR(sl_uint32 v)
@@ -387,11 +433,6 @@ SLIB_INLINE void Color::setRGB(sl_uint8 _r, sl_uint8 _g, sl_uint8 _b)
 	b = _b;
 }
 
-SLIB_INLINE sl_uint32 Color::getRGB() const
-{
-	return ((sl_uint32)(r) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(b));
-}
-
 SLIB_INLINE void Color::setRGB(sl_uint32 v)
 {
 	b = (sl_uint8)(v & 0xFF);
@@ -399,26 +440,11 @@ SLIB_INLINE void Color::setRGB(sl_uint32 v)
 	r = (sl_uint8)((v >> 16) & 0xFF);
 }
 
-SLIB_INLINE sl_uint32 Color::getBGR() const
-{
-	return ((sl_uint32)(b) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(r));
-}
-
 SLIB_INLINE void Color::setBGR(sl_uint32 v)
 {
 	r = (sl_uint8)(v & 0xFF);
 	g = (sl_uint8)((v >> 8) & 0xFF);
 	b = (sl_uint8)((v >> 16) & 0xFF);
-}
-
-SLIB_INLINE sl_bool Color::operator==(const Color& other) const
-{
-	return r == other.r && g == other.g && b == other.b && a == other.a;
-}
-
-SLIB_INLINE sl_bool Color::operator!=(const Color& other) const
-{
-	return r != other.r || g != other.g || b != other.b || a != other.a;
 }
 
 SLIB_GRAPHICS_NAMESPACE_END

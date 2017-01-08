@@ -79,17 +79,17 @@ String TabView::getTabLabel(sl_uint32 index)
 {
 	MutexLocker lock(m_items.getLocker());
 	if (index < m_items.getCount()) {
-		TabViewItem* item = m_items.getItemPtr(index);
+		TabViewItem* item = m_items.getPointerAt(index);
 		return item->label;
 	}
-	return String::null();
+	return sl_null;
 }
 
 void TabView::setTabLabel(sl_uint32 index, const String& text, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	if (index < m_items.getCount()) {
-		TabViewItem* item = m_items.getItemPtr(index);
+		TabViewItem* item = m_items.getPointerAt(index);
 		item->label = text;
 		if (isNativeWidget()) {
 			_setTabLabel_NW(index, text);
@@ -105,17 +105,17 @@ Ref<View> TabView::getTabContentView(sl_uint32 index)
 {
 	MutexLocker lock(m_items.getLocker());
 	if (index < m_items.getCount()) {
-		TabViewItem* item = m_items.getItemPtr(index);
+		TabViewItem* item = m_items.getPointerAt(index);
 		return item->contentView;
 	}
-	return Ref<View>::null();
+	return sl_null;
 }
 
 void TabView::setTabContentView(sl_uint32 index, const Ref<View>& view, UIUpdateMode mode)
 {
 	MutexLocker lock(m_items.getLocker());
 	if (index < m_items.getCount()) {
-		TabViewItem* item = m_items.getItemPtr(index);
+		TabViewItem* item = m_items.getPointerAt(index);
 		if (item->contentView != view) {
 			removeChild(item->contentView, UIUpdateMode::NoRedraw);
 			if (view.isNotNull()) {
@@ -134,7 +134,7 @@ void TabView::setTabContentView(sl_uint32 index, const Ref<View>& view, UIUpdate
 				if (UI::isUiThread()) {
 					_setTabContentView_NW(index, view);
 				} else {
-					UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(TabView, _setTabContentView_NW, this, index, view));
+					UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), TabView, _setTabContentView_NW, this, index, view));
 				}
 			} else {
 				selectTab(m_indexSelected, UIUpdateMode::NoRedraw);
@@ -646,7 +646,7 @@ void TabView::onResize(sl_ui_len width, sl_ui_len height)
 
 Ref<ViewInstance> TabView::createNativeWidget(ViewInstance* parent)
 {
-	return Ref<ViewInstance>::null();
+	return sl_null;
 }
 
 void TabView::_refreshTabsCount_NW()

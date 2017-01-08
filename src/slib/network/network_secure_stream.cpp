@@ -67,7 +67,7 @@ void AsyncTcpSecureStreamServer::onAccept(AsyncTcpServer* socketListen, const Re
 		param.listener = (WeakRef<AsyncTcpSecureStreamServer>)(this);
 		Ref<AsyncSecureStream> stream = SecureStreamServer::createAsyncStream(socket, param);
 		if (stream.isNotNull()) {
-			m_streams.put(stream.ptr, stream);
+			m_streams.put(stream.get(), stream);
 		}
 	}
 }
@@ -107,13 +107,13 @@ public:
 		if (flagError) {
 			PtrLocker<IAsyncSecureStreamListener> listener(stream->getListener());
 			if (listener.isNotNull()) {
-				listener->onConnectedSecureStream(stream.ptr, sl_true);
+				listener->onConnectedSecureStream(stream.get(), sl_true);
 			}
 		} else {
 			if (!(stream->connect())) {
 				PtrLocker<IAsyncSecureStreamListener> listener(stream->getListener());
 				if (listener.isNotNull()) {
-					listener->onConnectedSecureStream(stream.ptr, sl_true);
+					listener->onConnectedSecureStream(stream.get(), sl_true);
 				}
 			}
 		}
@@ -134,7 +134,7 @@ Ref<AsyncSecureStream> AsyncTcpSecureStreamClient::create(
 			return stream;
 		}
 	}
-	return Ref<AsyncSecureStream>::null();
+	return sl_null;
 }
 
 Ref<AsyncSecureStream> AsyncTcpSecureStreamClient::create(

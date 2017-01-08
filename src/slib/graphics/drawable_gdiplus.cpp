@@ -34,7 +34,7 @@ public:
 	}
 	
 public:
-	static Ref<_Gdiplus_ImageDrawable> create(Gdiplus::Image* image, sl_bool flagFreeOnRelease, const Referable* ref)
+	static Ref<_Gdiplus_ImageDrawable> create(Gdiplus::Image* image, sl_bool flagFreeOnRelease, Referable* ref)
 	{
 		if (image) {
 			Ref<_Gdiplus_ImageDrawable> ret = new _Gdiplus_ImageDrawable();
@@ -48,7 +48,7 @@ public:
 				delete image;
 			}
 		}
-		return Ref<_Gdiplus_ImageDrawable>::null();
+		return sl_null;
 	}
 	
     // override
@@ -88,22 +88,21 @@ Ref<Drawable> PlatformDrawable::loadFromMemory(const void* buf, sl_size size)
 			return GraphicsPlatform::createImageDrawable(image, sl_true);
 		}
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
-Ref<Drawable> GraphicsPlatform::createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease, const Referable* ref)
+Ref<Drawable> GraphicsPlatform::createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease, Referable* ref)
 {
 	return _Gdiplus_ImageDrawable::create(image, flagFreeOnRelease, ref);
 }
 
 Gdiplus::Image* GraphicsPlatform::getImageHandle(Drawable* _drawable)
 {
-	if (_Gdiplus_ImageDrawable::checkInstance(_drawable)) {
-		_Gdiplus_ImageDrawable* drawable = (_Gdiplus_ImageDrawable*)_drawable;
+	if (_Gdiplus_ImageDrawable* drawable = CastInstance<_Gdiplus_ImageDrawable>(_drawable)) {
 		return drawable->m_image;
 	}
-	if (Bitmap::checkInstance(_drawable)) {
-		return GraphicsPlatform::getBitmapHandle((Bitmap*)_drawable);
+	if (Bitmap* bitmap = CastInstance<Bitmap>(_drawable)) {
+		return GraphicsPlatform::getBitmapHandle(bitmap);
 	}
 	return NULL;
 }

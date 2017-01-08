@@ -5,16 +5,16 @@
 
 SLIB_NAMESPACE_BEGIN
 
-template < class TYPE1, class TYPE2=TYPE1, class COMPARE=Compare<TYPE1, TYPE2> >
 class SLIB_EXPORT BinarySearch
 {
 public:
-	static sl_bool search(const TYPE1* list, sl_size size, const TYPE2& what, sl_size* pIndexPrev = sl_null);
+	template < class T1, class T2, class COMPARE=Compare<T1, T2> >
+	static sl_bool search(const T1* list, sl_size size, const T2& what, sl_size* pIndexPrev = sl_null, const COMPARE& compare = COMPARE());
+
 };
 
-
-template <class TYPE1, class TYPE2, class COMPARE>
-sl_bool BinarySearch<TYPE1, TYPE2, COMPARE>::search(const TYPE1* list, sl_size size, const TYPE2& what, sl_size* pIndexPrev)
+template <class T1, class T2, class COMPARE>
+sl_bool BinarySearch::search(const T1* list, sl_size size, const T2& what, sl_size* pIndexPrev, const COMPARE& compare)
 {
 	if (size == 0) {
 		if (pIndexPrev) {
@@ -27,7 +27,7 @@ sl_bool BinarySearch<TYPE1, TYPE2, COMPARE>::search(const TYPE1* list, sl_size s
 	sl_size end = size - 1;
 	while (1) {
 		if (start == end) {
-			int c = COMPARE::compare(list[start], what);
+			int c = compare(list[start], what);
 			if (c == 0) {
 				if (pIndexPrev) {
 					*pIndexPrev = start;
@@ -41,7 +41,7 @@ sl_bool BinarySearch<TYPE1, TYPE2, COMPARE>::search(const TYPE1* list, sl_size s
 			break;
 		} else {
 			sl_size mid = (start + end) / 2;
-			int c = COMPARE::compare(list[mid], what);
+			int c = compare(list[mid], what);
 			if (c == 0) {
 				if (pIndexPrev) {
 					*pIndexPrev = mid;

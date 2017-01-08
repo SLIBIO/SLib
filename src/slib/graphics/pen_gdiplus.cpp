@@ -101,7 +101,7 @@ public:
 				m_platformObject = new _Gdiplus_PenObject(m_desc);
 			}
 		}
-		return (_Gdiplus_PenObject*)(m_platformObject.ptr);;
+		return (_Gdiplus_PenObject*)(m_platformObject.get());;
 	}
 
 	Gdiplus::Pen* getPlatformHandle()

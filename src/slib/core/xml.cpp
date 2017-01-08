@@ -67,7 +67,7 @@ String XmlNode::getText() const
 	if (buildText(buf)) {
 		return buf.merge();
 	}
-	return String::null();
+	return sl_null;
 }
 
 String XmlNode::toString() const
@@ -76,7 +76,7 @@ String XmlNode::toString() const
 	if (buildXml(buf)) {
 		return buf.merge();
 	}
-	return String::null();
+	return sl_null;
 }
 
 sl_bool XmlNode::isDocumentNode() const
@@ -89,7 +89,7 @@ Ref<XmlDocument> XmlNode::toDocumentNode() const
 	if (m_type == XmlNodeType::Document) {
 		return (XmlDocument*)this;
 	}
-	return Ref<XmlDocument>::null();
+	return sl_null;
 }
 
 sl_bool XmlNode::isElementNode() const
@@ -102,7 +102,7 @@ Ref<XmlElement> XmlNode::toElementNode() const
 	if (m_type == XmlNodeType::Element) {
 		return (XmlElement*)this;
 	}
-	return Ref<XmlElement>::null();
+	return sl_null;
 }
 
 sl_bool XmlNode::isTextNode() const
@@ -115,7 +115,7 @@ Ref<XmlText> XmlNode::toTextNode() const
 	if (m_type == XmlNodeType::Text) {
 		return (XmlText*)this;
 	}
-	return Ref<XmlText>::null();
+	return sl_null;
 }
 
 sl_bool XmlNode::isProcessingInstructionNode() const
@@ -128,7 +128,7 @@ Ref<XmlProcessingInstruction> XmlNode::toProcessingInstructionNode() const
 	if (m_type == XmlNodeType::ProcessingInstruction) {
 		return (XmlProcessingInstruction*)this;
 	}
-	return Ref<XmlProcessingInstruction>::null();
+	return sl_null;
 }
 
 sl_bool XmlNode::isCommentNode() const
@@ -141,7 +141,7 @@ Ref<XmlComment> XmlNode::toCommentNode() const
 	if (m_type == XmlNodeType::ProcessingInstruction) {
 		return (XmlComment*)this;
 	}
-	return Ref<XmlComment>::null();
+	return sl_null;
 }
 
 Ref<XmlDocument> XmlNode::getDocument() const
@@ -151,7 +151,7 @@ Ref<XmlDocument> XmlNode::getDocument() const
 	} else {
 		return m_document;
 	}
-	return Ref<XmlDocument>::null();
+	return sl_null;
 }
 
 Ref<XmlElement> XmlNode::getRoot() const
@@ -165,7 +165,7 @@ Ref<XmlElement> XmlNode::getRoot() const
 			return doc->getFirstChildElement();
 		}
 	}
-	return Ref<XmlElement>::null();
+	return sl_null;
 }
 
 Ref<XmlNodeGroup> XmlNode::getParent() const
@@ -288,7 +288,7 @@ String XmlNodeGroup::getInnerXml() const
 	if (buildInnerXml(buf)) {
 		return buf.merge();
 	}
-	return String::null();
+	return sl_null;
 }
 
 sl_size XmlNodeGroup::getChildrenCount() const
@@ -298,7 +298,7 @@ sl_size XmlNodeGroup::getChildrenCount() const
 
 Ref<XmlNode> XmlNodeGroup::getChild(sl_size index) const
 {
-	return m_children.getItemValue(index, Ref<XmlNode>::null());
+	return m_children.getValueAt(index);
 }
 
 sl_bool XmlNodeGroup::addChild(const Ref<XmlNode>& node)
@@ -321,7 +321,7 @@ sl_bool XmlNodeGroup::removeChild(const Ref<XmlNode>& node, sl_bool flagUnregist
 				node->_setDocument(Ref<XmlDocument>::null());
 			}
 			node->m_parent.setNull();
-			return m_children.remove_NoLock(index) > 0;
+			return m_children.removeAt_NoLock(index);
 		}
 	}
 	return sl_false;
@@ -341,20 +341,20 @@ void XmlNodeGroup::removeAllChildren(sl_bool flagUnregisterDocument)
 
 String XmlNodeGroup::getChildText(sl_size index) const
 {
-	Ref<XmlNode> node = m_children.getItemValue(index, Ref<XmlNode>::null());
+	Ref<XmlNode> node = m_children.getValueAt(index);
 	if (node.isNotNull()) {
 		return node->getText();
 	}
-	return String::null();
+	return sl_null;
 }
 
 Ref<XmlElement> XmlNodeGroup::getChildElement(sl_size index) const
 {
-	Ref<XmlNode> node = m_children.getItemValue(index, Ref<XmlNode>::null());
+	Ref<XmlNode> node = m_children.getValueAt(index);
 	if (node.isNotNull()) {
 		return node->toElementNode();
 	}
-	return Ref<XmlElement>::null();
+	return sl_null;
 }
 
 List< Ref<XmlElement> > XmlNodeGroup::getChildElements() const
@@ -425,7 +425,7 @@ Ref<XmlElement> XmlNodeGroup::getFirstChildElement() const
 			return e;
 		}
 	}
-	return Ref<XmlElement>::null();
+	return sl_null;
 }
 
 Ref<XmlElement> XmlNodeGroup::getFirstChildElement(const String& tagName) const
@@ -442,7 +442,7 @@ Ref<XmlElement> XmlNodeGroup::getFirstChildElement(const String& tagName) const
 			}
 		}
 	}
-	return Ref<XmlElement>::null();
+	return sl_null;
 }
 
 Ref<XmlElement> XmlNodeGroup::getFirstChildElement(const String& uri, const String& localName) const
@@ -456,7 +456,7 @@ Ref<XmlElement> XmlNodeGroup::getFirstChildElement(const String& uri, const Stri
 			}
 		}
 	}
-	return Ref<XmlElement>::null();
+	return sl_null;
 }
 
 String XmlNodeGroup::getFirstChildElementText() const
@@ -465,7 +465,7 @@ String XmlNodeGroup::getFirstChildElementText() const
 	if (e.isNotNull()) {
 		return e->getText();
 	}
-	return String::null();
+	return sl_null;
 }
 
 String XmlNodeGroup::getFirstChildElementText(const String& tagName) const
@@ -477,7 +477,7 @@ String XmlNodeGroup::getFirstChildElementText(const String& tagName) const
 	if (e.isNotNull()) {
 		return e->getText();
 	}
-	return String::null();
+	return sl_null;
 }
 
 String XmlNodeGroup::getFirstChildElementText(const String& uri, const String& localName) const
@@ -486,7 +486,7 @@ String XmlNodeGroup::getFirstChildElementText(const String& uri, const String& l
 	if (e.isNotNull()) {
 		return e->getText();
 	}
-	return String::null();
+	return sl_null;
 }
 
 List< Ref<XmlElement> > XmlNodeGroup::getDescendantElements(const String& tagName) const
@@ -547,7 +547,7 @@ Ref<XmlElement> XmlNodeGroup::getFirstDescendantElement(const String& tagName) c
 			}
 		}
 	}
-	return Ref<XmlElement>::null();
+	return sl_null;
 }
 
 Ref<XmlElement> XmlNodeGroup::getFirstDescendantElement(const String& uri, const String& localName) const
@@ -566,7 +566,7 @@ Ref<XmlElement> XmlNodeGroup::getFirstDescendantElement(const String& uri, const
 			}
 		}
 	}
-	return Ref<XmlElement>::null();
+	return sl_null;
 }
 
 String XmlNodeGroup::getFirstDescendantElementText(const String& tagName) const
@@ -575,7 +575,7 @@ String XmlNodeGroup::getFirstDescendantElementText(const String& tagName) const
 	if (e.isNotNull()) {
 		return e->getText();
 	}
-	return String::null();
+	return sl_null;
 }
 
 String XmlNodeGroup::getFirstDescendantElementText(const String& uri, const String& localName) const
@@ -584,7 +584,7 @@ String XmlNodeGroup::getFirstDescendantElementText(const String& uri, const Stri
 	if (e.isNotNull()) {
 		return e->getText();
 	}
-	return String::null();
+	return sl_null;
 }
 
 Ref<XmlElement> XmlNodeGroup::findChildElementByAttribute(const String& attrName, const String& attrValue) const
@@ -603,7 +603,7 @@ Ref<XmlElement> XmlNodeGroup::findChildElementByAttribute(const String& attrName
 			}
 		}
 	}
-	return Ref<XmlElement>::null();
+	return sl_null;
 }
 
 Ref<XmlElement> XmlNodeGroup::findChildElementById(const String& _id) const
@@ -631,7 +631,7 @@ Ref<XmlElement> XmlElement::create(const String& name)
 			return ret;
 		}
 	}
-	return Ref<XmlElement>::null();
+	return sl_null;
 }
 
 Ref<XmlElement> XmlElement::create(const String& name, const String& uri, const String& localName)
@@ -645,7 +645,7 @@ Ref<XmlElement> XmlElement::create(const String& name, const String& uri, const 
 			return ret;
 		}
 	}
-	return Ref<XmlElement>::null();
+	return sl_null;
 }
 
 sl_bool XmlElement::buildXml(StringBuffer& output) const
@@ -663,7 +663,7 @@ sl_bool XmlElement::buildXml(StringBuffer& output) const
 	// attributes
 	{
 		MutexLocker lock(&m_lockAttributes);
-		ListItems<XmlAttribute> attrs(m_attributes);
+		ListElements<XmlAttribute> attrs(m_attributes);
 		for (sl_size i = 0; i < attrs.count; i++) {
 			if (attrs[i].whiteSpacesBeforeName.isEmpty()) {
 				if (!(output.addStatic(" ", 1))) {
@@ -759,7 +759,7 @@ sl_size XmlElement::getAttributesCount() const
 sl_bool XmlElement::getAttribute(sl_size index, XmlAttribute* _out) const
 {
 	MutexLocker lock(&m_lockAttributes);
-	return m_attributes.getItem_NoLock(index, _out);
+	return m_attributes.getAt_NoLock(index, _out);
 }
 
 String XmlElement::getAttribute(const String& name) const
@@ -771,29 +771,29 @@ String XmlElement::getAttribute(const String& name) const
 String XmlElement::getAttribute(const String& uri, const String& localName) const
 {
 	MutexLocker lock(&m_lockAttributes);
-	ListItems<XmlAttribute> attrs(m_attributes);
+	ListElements<XmlAttribute> attrs(m_attributes);
 	for (sl_size i = 0; i < attrs.count; i++) {
 		if (attrs[i].uri == uri && attrs[i].localName == localName) {
 			return attrs[i].value;
 		}
 	}
-	return String::null();
+	return sl_null;
 }
 
 sl_bool XmlElement::containsAttribute(const String& name) const
 {
 	MutexLocker lock(&m_lockAttributes);
-	return m_mapAttributes.contains_NoLock(name, String::null());
+	return m_mapAttributes.contains_NoLock(name);
 }
 
 sl_bool XmlElement::setAttribute(sl_size index, const String& value)
 {
 	MutexLocker lock(&m_lockAttributes);
 	XmlAttribute attr;
-	if (m_attributes.getItem_NoLock(index, &attr)) {
+	if (m_attributes.getAt_NoLock(index, &attr)) {
 		m_mapAttributes.put(attr.name, value);
 		attr.value = value;
-		return m_attributes.setItem_NoLock(index, attr);
+		return m_attributes.setAt_NoLock(index, attr);
 	}
 	return sl_false;
 }
@@ -802,12 +802,12 @@ sl_bool XmlElement::setAttribute(sl_size index, const String& uri, const String&
 {
 	MutexLocker lock(&m_lockAttributes);
 	XmlAttribute attr;
-	if (m_attributes.getItem_NoLock(index, &attr)) {
+	if (m_attributes.getAt_NoLock(index, &attr)) {
 		m_mapAttributes.put(attr.name, value);
 		attr.uri = uri;
 		attr.localName = localName;
 		attr.value = value;
-		return m_attributes.setItem_NoLock(index, attr);
+		return m_attributes.setAt_NoLock(index, attr);
 	}
 	return sl_false;
 }
@@ -820,7 +820,7 @@ sl_bool XmlElement::setAttribute(const String& name, const String& value)
 	MutexLocker lock(&m_lockAttributes);
 	if (m_mapAttributes.contains_NoLock(name)) {
 		m_mapAttributes.put_NoLock(name, value);
-		ListItems<XmlAttribute> attrs(m_attributes);
+		ListElements<XmlAttribute> attrs(m_attributes);
 		for (sl_size i = 0; i < attrs.count; i++) {
 			if (attrs[i].name == name) {
 				attrs[i].value = value;
@@ -845,7 +845,7 @@ sl_bool XmlElement::setAttribute(const XmlAttribute& attr)
 	MutexLocker lock(&m_lockAttributes);
 	if (m_mapAttributes.contains_NoLock(attr.name)) {
 		m_mapAttributes.put_NoLock(attr.name, attr.value);
-		ListItems<XmlAttribute> attrs(m_attributes);
+		ListElements<XmlAttribute> attrs(m_attributes);
 		for (sl_size i = 0; i < attrs.count; i++) {
 			if (attrs[i].name == attr.name) {
 				attrs[i] = attr;
@@ -862,7 +862,7 @@ sl_bool XmlElement::setAttribute(const XmlAttribute& attr)
 sl_bool XmlElement::setAttribute(const String& uri, const String& localName, const String& value)
 {
 	MutexLocker lock(&m_lockAttributes);
-	ListItems<XmlAttribute> attrs(m_attributes);
+	ListElements<XmlAttribute> attrs(m_attributes);
 	for (sl_size i = 0; i < attrs.count; i++) {
 		if (attrs[i].uri == uri && attrs[i].localName == localName) {
 			attrs[i].value = value;
@@ -876,9 +876,9 @@ sl_bool XmlElement::removeAttribute(sl_size index)
 {
 	MutexLocker lock(&m_lockAttributes);
 	XmlAttribute attr;
-	if (m_attributes.getItem_NoLock(index, &attr)) {
+	if (m_attributes.getAt_NoLock(index, &attr)) {
 		m_mapAttributes.remove_NoLock(attr.name);
-		return m_attributes.remove_NoLock(index) > 0;
+		return m_attributes.removeAt_NoLock(index);
 	}
 	return sl_false;
 }
@@ -888,10 +888,10 @@ sl_bool XmlElement::removeAttribute(const String& name)
 	MutexLocker lock(&m_lockAttributes);
 	if (m_mapAttributes.contains_NoLock(name)) {
 		m_mapAttributes.remove_NoLock(name);
-		ListItems<XmlAttribute> attrs(m_attributes);
+		ListElements<XmlAttribute> attrs(m_attributes);
 		for (sl_size i = 0; i < attrs.count; i++) {
 			if (attrs[i].name == name) {
-				return m_attributes.remove_NoLock(i) > 0;
+				return m_attributes.removeAt_NoLock(i);
 			}
 		}
 	}
@@ -1094,7 +1094,7 @@ Ref<XmlProcessingInstruction> XmlProcessingInstruction::create(const String& tar
 			return ret;
 		}
 	}
-	return Ref<XmlProcessingInstruction>::null();
+	return sl_null;
 }
 
 sl_bool XmlProcessingInstruction::buildText(StringBuffer& output) const
@@ -1324,7 +1324,7 @@ String XmlParseParam::getErrorText()
 	if (flagError) {
 		return "(" + String::fromSize(errorLine) + ":" + String::fromSize(errorColumn) + ") " + errorMessage;
 	}
-	return String::null();
+	return sl_null;
 }
 
 void XmlParseParam::setCreatingAll()
@@ -1714,7 +1714,7 @@ void _Xml_Parser<ST, CT, BT>::parseComment(XmlNodeGroup* parent)
 						if (!(parent->addChild(comment))) {
 							REPORT_ERROR(_g_xml_error_msg_memory_lack)
 						}
-						CALL_LISTENER(onComment, comment.ptr, str)
+						CALL_LISTENER(onComment, comment.get(), str)
 					} else {
 						CALL_LISTENER(onComment, sl_null, str)
 					}
@@ -1762,7 +1762,7 @@ void _Xml_Parser<ST, CT, BT>::parseCDATA(XmlNodeGroup* parent)
 					if (!(parent->addChild(text))) {
 						REPORT_ERROR(_g_xml_error_msg_memory_lack)
 					}
-					CALL_LISTENER(onCDATA, text.ptr, str)
+					CALL_LISTENER(onCDATA, text.get(), str)
 				} else {
 					CALL_LISTENER(onCDATA, sl_null, str)
 				}
@@ -1824,7 +1824,7 @@ void _Xml_Parser<ST, CT, BT>::parsePI(XmlNodeGroup* parent)
 					if (!(parent->addChild(PI))) {
 						REPORT_ERROR(_g_xml_error_msg_memory_lack)
 					}
-					CALL_LISTENER(onProcessingInstruction, PI.ptr, target, str)
+					CALL_LISTENER(onProcessingInstruction, PI.get(), target, str)
 				} else {
 					CALL_LISTENER(onProcessingInstruction, sl_null, target, str)
 				}
@@ -2014,7 +2014,7 @@ void _Xml_Parser<ST, CT, BT>::parseElement(XmlNodeGroup* parent, const String& _
 					if (!(listPrefixMappings.add(String::null()))) {
 						REPORT_ERROR(_g_xml_error_msg_memory_lack)
 					}
-					CALL_LISTENER(onStartPrefixMapping, element.ptr, String::null(), defNamespace);
+					CALL_LISTENER(onStartPrefixMapping, element.get(), String::null(), defNamespace);
 				} else if (prefix == "xmlns" && attr.localName.isNotEmpty() && attr.value.isNotEmpty()) {
 					if (namespaces == _namespaces) {
 						namespaces = _namespaces.duplicate();
@@ -2025,7 +2025,7 @@ void _Xml_Parser<ST, CT, BT>::parseElement(XmlNodeGroup* parent, const String& _
 					if (!(listPrefixMappings.add(attr.localName))) {
 						REPORT_ERROR(_g_xml_error_msg_memory_lack)
 					}
-					CALL_LISTENER(onStartPrefixMapping, element.ptr, attr.localName, attr.value)
+					CALL_LISTENER(onStartPrefixMapping, element.get(), attr.localName, attr.value)
 				}
 			}
 		}
@@ -2066,9 +2066,9 @@ void _Xml_Parser<ST, CT, BT>::parseElement(XmlNodeGroup* parent, const String& _
 			REPORT_ERROR(_g_xml_error_msg_memory_lack)
 		}
 	}
-	CALL_LISTENER(onStartElement, element.ptr, element.ptr)
+	CALL_LISTENER(onStartElement, element.get(), element.get())
 	if (!flagEmptyTag) {
-		parseNodes(parent ? element.ptr : sl_null, defNamespace, namespaces);
+		parseNodes(parent ? element.get() : sl_null, defNamespace, namespaces);
 		if (flagError) {
 			return;
 		}
@@ -2101,11 +2101,11 @@ void _Xml_Parser<ST, CT, BT>::parseElement(XmlNodeGroup* parent, const String& _
 		pos++;
 	}
 	element->setEndPositionInSource(pos);
-	CALL_LISTENER(onEndElement, element.ptr, element.ptr);
+	CALL_LISTENER(onEndElement, element.get(), element.get());
 	if (param.flagProcessNamespaces) {
 		ListLocker<String> prefixes(listPrefixMappings);
 		for (sl_size i = 0; i < prefixes.count; i++) {
-			CALL_LISTENER(onEndPrefixMapping, element.ptr, prefixes[i]);
+			CALL_LISTENER(onEndPrefixMapping, element.get(), prefixes[i]);
 		}
 	}
 }
@@ -2187,7 +2187,7 @@ void _Xml_Parser<ST, CT, BT>::parseText(XmlNodeGroup* parent)
 				if (!(parent->addChild(node))) {
 					REPORT_ERROR(_g_xml_error_msg_memory_lack)
 				}
-				CALL_LISTENER(onText, node.ptr, text)
+				CALL_LISTENER(onText, node.get(), text)
 			} else {
 				CALL_LISTENER(onText, sl_null, text)
 			}
@@ -2250,8 +2250,8 @@ void _Xml_Parser<ST, CT, BT>::parseNodes(XmlNodeGroup* parent, const String& def
 template <class ST, class CT, class BT>
 void _Xml_Parser<ST, CT, BT>::parseXml()
 {
-	CALL_LISTENER(onStartDocument, document.ptr, document.ptr)
-	parseNodes(document.ptr, String::null(), Map<String, String>::null());
+	CALL_LISTENER(onStartDocument, document.get(), document.get())
+	parseNodes(document.get(), String::null(), Map<String, String>::null());
 	if (flagError) {
 		return;
 	}
@@ -2263,7 +2263,7 @@ void _Xml_Parser<ST, CT, BT>::parseXml()
 			REPORT_ERROR(_g_xml_error_msg_document_not_wellformed);
 		}
 	}
-	CALL_LISTENER(onEndDocument, document.ptr, document.ptr)
+	CALL_LISTENER(onEndDocument, document.get(), document.get())
 }
 
 template <class ST, class CT, class BT>
@@ -2283,7 +2283,7 @@ Ref<XmlDocument> _Xml_Parser<ST, CT, BT>::parseXml(const String& sourceFilePath,
 			parser.document->setEndPositionInSource(len);
 			param.flagError = sl_true;
 			param.errorMessage = _g_xml_error_msg_memory_lack;
-			return Ref<XmlDocument>::null();
+			return sl_null;
 		}
 	}
 	parser.param = param;
@@ -2304,10 +2304,10 @@ Ref<XmlDocument> _Xml_Parser<ST, CT, BT>::parseXml(const String& sourceFilePath,
 	param.errorLine = ST::countLineNumber(buf, parser.pos, &(param.errorColumn));
 	
 	if (param.flagLogError) {
-		SLIB_LOG_ERROR("Xml", param.getErrorText());
+		LogError("Xml", param.getErrorText());
 	}
 	
-	return Ref<XmlDocument>::null();
+	return sl_null;
 	
 }
 
@@ -2377,7 +2377,7 @@ String Xml::makeEscapedText(const String& text)
 	if (buildEscapedText(text, buf)) {
 		return buf.merge();
 	}
-	return String::null();
+	return sl_null;
 }
 
 sl_bool Xml::buildEscapedText(const String& text, StringBuffer& output)

@@ -28,8 +28,7 @@ void JNICALL _AndroidGLView_nativeOnFrame(JNIEnv* env, jobject _this, jlong jins
 	Ref<_RenderViewInstance> instance = Ref<_RenderViewInstance>::from(Android_ViewInstance::getAndroidInstance(jinstance));
 	if (instance.isNotNull()) {
 		Ref<View> _view = instance->getView();
-		if (RenderView::checkInstance(_view.ptr)) {
-			RenderView* view = (RenderView*)(_view.ptr);
+		if (RenderView* view = CastInstance<RenderView>(_view.get())) {
 			Ref<RenderEngine> engine = instance->m_renderEngine;
 			if (engine.isNull()) {
 				engine = GLES::createEngine();
@@ -38,7 +37,7 @@ void JNICALL _AndroidGLView_nativeOnFrame(JNIEnv* env, jobject _this, jlong jins
 			if (engine.isNotNull()) {
 				if (width > 0 && height > 0) {
 					engine->setViewport(0, 0, width, height);
-					view->dispatchFrame(engine.ptr);
+					view->dispatchFrame(engine.get());
 				}
 			}
 		}

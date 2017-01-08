@@ -45,9 +45,9 @@ void AlertDialog::_show()
 	if ([titleNo length] == 0) {
 		titleNo = @"No";
 	}
-	Callback onOk = this->onOk;
-	Callback onCancel = this->onCancel;
-	Callback onNo = this->onNo;
+	Function<void()> onOk = this->onOk;
+	Function<void()> onCancel = this->onCancel;
+	Function<void()> onNo = this->onNo;
 	
 	UIAlertController* alert = [UIAlertController alertControllerWithTitle:caption message:text preferredStyle:UIAlertControllerStyleAlert];
 	if (type == AlertDialogType::OkCancel) {

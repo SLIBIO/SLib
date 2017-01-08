@@ -31,6 +31,7 @@ protected:
 	
 public:
 	static Ref<VertexBuffer> create(const Memory& mem);
+	
 	static Ref<VertexBuffer> create(const void* buf, sl_size size);
 	
 public:

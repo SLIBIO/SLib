@@ -19,7 +19,7 @@ Ref<Bitmap> Bitmap::create(const ImageDesc& desc)
 		ret->writePixels(0, 0, desc.width, desc.height, desc.colors, desc.stride);
 		return ret;
 	}
-	return Ref<Bitmap>::null();
+	return sl_null;
 }
 
 Ref<Bitmap> Bitmap::create(const Ref<Image>& image)
@@ -29,7 +29,7 @@ Ref<Bitmap> Bitmap::create(const Ref<Image>& image)
 		image->getDesc(desc);
 		return Bitmap::create(desc);
 	}
-	return Ref<Bitmap>::null();
+	return sl_null;
 }
 
 Ref<Bitmap> Bitmap::loadFromMemory(const Memory& mem)
@@ -37,7 +37,7 @@ Ref<Bitmap> Bitmap::loadFromMemory(const Memory& mem)
 	if (mem.isNotEmpty()) {
 		return Bitmap::loadFromMemory(mem.getData(), mem.getSize());
 	}
-	return Ref<Bitmap>::null();
+	return sl_null;
 }
 
 Ref<Bitmap> Bitmap::loadFromFile(const String& filePath)
@@ -46,7 +46,7 @@ Ref<Bitmap> Bitmap::loadFromFile(const String& filePath)
 	if (mem.isNotEmpty()) {
 		return Bitmap::loadFromMemory(mem);
 	}
-	return Ref<Bitmap>::null();
+	return sl_null;
 }
 
 Ref<Bitmap> Bitmap::loadFromAsset(const String& path)
@@ -55,7 +55,7 @@ Ref<Bitmap> Bitmap::loadFromAsset(const String& path)
 	if (mem.isNotEmpty()) {
 		return Bitmap::loadFromMemory(mem);
 	}
-	return Ref<Bitmap>::null();
+	return sl_null;
 }
 
 sl_real Bitmap::getDrawableWidth()

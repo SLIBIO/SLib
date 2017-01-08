@@ -57,10 +57,10 @@ public:
 
 protected:
 	HttpHeaderReader m_requestHeaderReader;
-	SafeMemory m_requestHeader;
+	AtomicMemory m_requestHeader;
 	sl_uint64 m_requestContentLength;
 	MemoryBuffer m_requestBodyBuffer;
-	SafeMemory m_requestBody;
+	AtomicMemory m_requestBody;
 	sl_bool m_flagAsynchronousResponse;
 
 private:
@@ -111,15 +111,15 @@ public:
 public:
 	SLIB_PROPERTY(SocketAddress, LocalAddress)
 	SLIB_PROPERTY(SocketAddress, RemoteAddress)
-	SLIB_REF_PROPERTY(Referable, ProxyObject)
-	SLIB_REF_PROPERTY(Referable, UserObject)
+	SLIB_PROPERTY(AtomicRef<Referable>, ProxyObject)
+	SLIB_PROPERTY(AtomicRef<Referable>, UserObject)
 
 protected:
 	WeakRef<HttpService> m_service;
 	Ref<AsyncStream> m_io;
 	Ref<AsyncOutput> m_output;
 
-	SafeRef<HttpServiceContext> m_contextCurrent;
+	AtomicRef<HttpServiceContext> m_contextCurrent;
 
 	sl_bool m_flagClosed;
 	Memory m_bufRead;
@@ -136,7 +136,7 @@ protected:
 
 protected:
 	// override
-	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError);
+	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError);
 	
 	// override
 	void onAsyncOutputComplete(AsyncOutput* output);
@@ -263,8 +263,8 @@ protected:
 	sl_bool _init(const HttpServiceParam& param);
 	
 protected:
-	SafeRef<AsyncIoLoop> m_ioLoop;
-	SafeRef<ThreadPool> m_threadPool;
+	AtomicRef<AsyncIoLoop> m_ioLoop;
+	AtomicRef<ThreadPool> m_threadPool;
 	sl_bool m_flagRunning;
 	
 	HashMap< HttpServiceConnection*, Ref<HttpServiceConnection> > m_connections;

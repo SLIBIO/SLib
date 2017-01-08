@@ -5,12 +5,6 @@
 SLIB_MATH_NAMESPACE_BEGIN
 
 template <class T>
-PlaneT<T>::PlaneT(T _a, T _b, T _c, T _d)
-: a(_a), b(_b), c(_c), d(_d)
-{
-}
-
-template <class T>
 PlaneT<T>::PlaneT(const Vector3T<T>& point, const Vector3T<T>& normal)
 {
 	setFromPointAndNormal(point, normal);

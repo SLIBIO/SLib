@@ -46,7 +46,7 @@ static void _Gdiplus_applyAlphaToColor(Gdiplus::Color& color, sl_real alpha)
 	if (pen.isNull()) { \
 		pen = Pen::getDefault(); \
 	} \
-	Gdiplus::Pen* hPen = GraphicsPlatform::getPenHandle(pen.ptr); \
+	Gdiplus::Pen* hPen = GraphicsPlatform::getPenHandle(pen.get()); \
 	Gdiplus::Pen* hPenClone = NULL; \
 	if (alpha < 0.995f) { \
 		if (hPen) { \
@@ -67,12 +67,12 @@ static void _Gdiplus_applyAlphaToColor(Gdiplus::Color& color, sl_real alpha)
 #define DRAW_PEN_BRUSH_BEGIN \
 	Gdiplus::Graphics* graphics = m_graphics; \
 	sl_real alpha = getAlpha(); \
-	Gdiplus::Brush* hBrush = GraphicsPlatform::getBrushHandle(brush.ptr); \
+	Gdiplus::Brush* hBrush = GraphicsPlatform::getBrushHandle(brush.get()); \
 	Ref<Pen> pen = _pen; \
 	if (brush.isNull() && pen.isNull()) { \
 		pen = Pen::getDefault(); \
 	} \
-	Gdiplus::Pen* hPen = GraphicsPlatform::getPenHandle(pen.ptr); \
+	Gdiplus::Pen* hPen = GraphicsPlatform::getPenHandle(pen.get()); \
 	Gdiplus::Brush* hBrushClone = NULL; \
 	Gdiplus::Pen* hPenClone = NULL; \
 	if (alpha < 0.995f) { \
@@ -107,7 +107,7 @@ class _Gdiplus_Canvas : public Canvas
 	SLIB_DECLARE_OBJECT
 public:
 	Gdiplus::Graphics* m_graphics;
-	Stack<Gdiplus::GraphicsState> m_stackState;
+	LinkedStack<Gdiplus::GraphicsState> m_stackState;
 	sl_bool m_flagFreeOnRelease;
 	Ref<Referable> m_ref;
 
@@ -124,7 +124,7 @@ public:
 	}
 
 public:
-	static Ref<_Gdiplus_Canvas> create(CanvasType type, Gdiplus::Graphics* graphics, sl_real width, sl_real height, sl_bool flagFreeOnRelease, const Referable* ref)
+	static Ref<_Gdiplus_Canvas> create(CanvasType type, Gdiplus::Graphics* graphics, sl_real width, sl_real height, sl_bool flagFreeOnRelease, Referable* ref)
 	{		
 		if (graphics) {
 			Ref<_Gdiplus_Canvas> ret = new _Gdiplus_Canvas();
@@ -143,7 +143,7 @@ public:
 				delete graphics;
 			}
 		}
-		return Ref<_Gdiplus_Canvas>::null();
+		return sl_null;
 	}
 
     // override
@@ -184,7 +184,7 @@ public:
 	void clipToPath(const Ref<GraphicsPath>& path)
 	{
 		if (path.isNotNull()) {
-			Gdiplus::GraphicsPath* handle = GraphicsPlatform::getGraphicsPath(path.ptr);
+			Gdiplus::GraphicsPath* handle = GraphicsPlatform::getGraphicsPath(path.get());
 			if (handle) {
 				m_graphics->SetClip(handle, Gdiplus::CombineModeIntersect);
 			}
@@ -234,7 +234,7 @@ public:
 				font = Font::getDefault();
 			}
 			if (font.isNotNull()) {
-				Gdiplus::Font* pf = GraphicsPlatform::getGdiplusFont(font.ptr);
+				Gdiplus::Font* pf = GraphicsPlatform::getGdiplusFont(font.get());
 				if (pf) {
 					Gdiplus::StringFormat format(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsNoClip);
 					int a = color.a;
@@ -388,7 +388,7 @@ public:
 	{
 		Ref<GraphicsPath> path = _path;
 		if (path.isNotNull()) {
-			Gdiplus::GraphicsPath* pPath = GraphicsPlatform::getGraphicsPath(path.ptr);
+			Gdiplus::GraphicsPath* pPath = GraphicsPlatform::getGraphicsPath(path.get());
 			if (pPath) {
 				DRAW_PEN_BRUSH_BEGIN
 				if (hBrush) {
@@ -418,18 +418,17 @@ public:
 
 SLIB_DEFINE_OBJECT(_Gdiplus_Canvas, Canvas)
 
-Ref<Canvas> GraphicsPlatform::createCanvas(CanvasType type, Gdiplus::Graphics* graphics, sl_uint32 width, sl_uint32 height, sl_bool flagFreeOnRelease, const Referable* ref)
+Ref<Canvas> GraphicsPlatform::createCanvas(CanvasType type, Gdiplus::Graphics* graphics, sl_uint32 width, sl_uint32 height, sl_bool flagFreeOnRelease, Referable* ref)
 {
 	if (!graphics) {
-		return Ref<Canvas>::null();
+		return sl_null;
 	}
 	return _Gdiplus_Canvas::create(type, graphics, (sl_real)width, (sl_real)height, flagFreeOnRelease, ref);
 }
 
 Gdiplus::Graphics* GraphicsPlatform::getCanvasHandle(Canvas* _canvas)
 {
-	if (_Gdiplus_Canvas::checkInstance(_canvas)) {
-		_Gdiplus_Canvas* canvas = (_Gdiplus_Canvas*)_canvas;
+	if (_Gdiplus_Canvas* canvas = CastInstance<_Gdiplus_Canvas>(_canvas)) {
 		return canvas->m_graphics;
 	}
 	return NULL;

@@ -22,7 +22,7 @@ void Android::initialize(JavaVM* jvm)
 	Jni::initialize(jvm);
 }
 
-SLIB_STATIC_ZERO_INITIALIZED(JniSafeGlobal<jobject>, _g_android_current_activity);
+SLIB_STATIC_ZERO_INITIALIZED(AtomicJniGlobal<jobject>, _g_android_current_activity);
 
 jobject Android::getCurrentActivity()
 {
@@ -84,7 +84,7 @@ Memory Android::readAllBytesFromAsset(const String& path)
 			return writer.getData();
 		}
 	}
-	return Memory::null();
+	return sl_null;
 }
 
 void Android::dismissKeyboard()

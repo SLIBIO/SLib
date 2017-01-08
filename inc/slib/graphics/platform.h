@@ -36,11 +36,11 @@ public:
 	static Gdiplus::Font* getGdiplusFont(Font* font);
 	static HFONT getGdiFont(Font* font);
 	
-	static Ref<Canvas> createCanvas(CanvasType type, Gdiplus::Graphics* graphics, sl_uint32 width, sl_uint32 height, sl_bool flagFreeOnRelease = sl_true, const Referable* ref = sl_null);
+	static Ref<Canvas> createCanvas(CanvasType type, Gdiplus::Graphics* graphics, sl_uint32 width, sl_uint32 height, sl_bool flagFreeOnRelease = sl_true, Referable* ref = sl_null);
 	static Gdiplus::Graphics* getCanvasHandle(Canvas* canvas);
 	static void drawImage(Canvas* canvas, const Rectangle& rectDst, Gdiplus::Image* image, const Rectangle& rectSrc, const DrawParam& param);
 	
-	static Ref<Drawable> createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease = sl_true, const Referable* ref = sl_null);
+	static Ref<Drawable> createImageDrawable(Gdiplus::Image* image, sl_bool flagFreeOnRelease = sl_true, Referable* ref = sl_null);
 	static Gdiplus::Image* getImageHandle(Drawable* drawable);
 	
 	static Gdiplus::Bitmap* getBitmapHandle(Bitmap* bitmap);
@@ -59,7 +59,7 @@ public:
 	static Ref<Canvas> createCanvas(CanvasType type, jobject canvas);
 	static jobject getCanvasHandle(Canvas* canvas);
 	
-	static Ref<Drawable> createImageDrawable(jobject bitmap, sl_bool flagRecycleOnRelease = sl_true, const Referable* ref = sl_null);
+	static Ref<Drawable> createImageDrawable(jobject bitmap, sl_bool flagRecycleOnRelease = sl_true, Referable* ref = sl_null);
 	static jobject getImageDrawableHandle(Drawable* drawable);
 	
 #elif defined(SLIB_PLATFORM_IS_APPLE)

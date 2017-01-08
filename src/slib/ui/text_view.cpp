@@ -62,7 +62,7 @@ Ref<SDM_Text> SDM_Text::create(const Ref<Font>& font)
 			return ret;
 		}
 	}
-	return Ref<SDM_Text>::null();
+	return sl_null;
 }
 
 String SDM_Text::getText()

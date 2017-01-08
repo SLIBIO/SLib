@@ -21,31 +21,49 @@ public:
 	T m20; T m21; T m22;
 
 public:
-	Matrix3T() = default;
+	SLIB_INLINE Matrix3T() = default;
 
-	Matrix3T(const Matrix3T<T>& other) = default;
+	SLIB_CONSTEXPR Matrix3T(const Matrix3T<T>& other):
+	 m00(other.m00), m01(other.m01), m02(other.m02),
+	 m10(other.m10), m11(other.m11), m12(other.m12),
+	 m20(other.m20), m21(other.m21), m22(other.m22)
+	{}
 	
 	template <class O>
-	Matrix3T(const Matrix3T<O>& other);
+	SLIB_CONSTEXPR Matrix3T(const Matrix3T<O>& other):
+	 m00((T)(other.m00)), m01((T)(other.m01)), m02((T)(other.m02)),
+	 m10((T)(other.m10)), m11((T)(other.m11)), m12((T)(other.m12)),
+	 m20((T)(other.m20)), m21((T)(other.m21)), m22((T)(other.m22))
+	{}
 
-	Matrix3T(T m00, T m01, T m02,
-			 T m10, T m11, T m12,
-			 T m20, T m21, T m22);
+	SLIB_CONSTEXPR Matrix3T(
+		T _m00, T _m01, T _m02,
+		T _m10, T _m11, T _m12,
+		T _m20, T _m21, T _m22
+	):
+	 m00(_m00), m01(_m01), m02(_m02),
+	 m10(_m10), m11(_m11), m12(_m12),
+	 m20(_m20), m21(_m21), m22(_m22)
+	{}
 
-	Matrix3T(const Vector3T<T>& row0, const Vector3T<T>& row1, const Vector3T<T>& row2);
+	SLIB_CONSTEXPR Matrix3T(const Vector3T<T>& row0, const Vector3T<T>& row1, const Vector3T<T>& row2):
+	 m00(row0.x), m01(row0.y), m02(row0.z),
+	 m10(row1.x), m11(row1.y), m12(row1.z),
+	 m20(row2.x), m21(row2.y), m22(row2.z)
+	{}
 	
 public:
 	static const Matrix3T<T>& zero();
-
+	
 	static const Matrix3T<T>& one();
-
+	
 	static const Matrix3T<T>& identity();
 	
 	static const Matrix3T<T>& fromArray(const T arr[9]);
 	
 	static Matrix3T<T>& fromArray(T arr[9]);
-
 	
+public:
 	Vector3T<T> getRow0() const;
 	
 	void setRow0(const Vector3T<T>& v);
@@ -154,7 +172,7 @@ public:
 	sl_bool operator==(const Matrix3T<T>& other) const;
 	
 	sl_bool operator!=(const Matrix3T<T>& other) const;
-
+	
 private:
 	static T _zero[9];
 	static T _one[9];
@@ -183,42 +201,33 @@ SLIB_MATH_NAMESPACE_END
 SLIB_MATH_NAMESPACE_BEGIN
 
 template <class T>
-template <class O>
-Matrix3T<T>::Matrix3T(const Matrix3T<O>& other)
-: m00((T)(other.m00)), m01((T)(other.m01)), m02((T)(other.m02)),
-m10((T)(other.m10)), m11((T)(other.m11)), m12((T)(other.m12)),
-m20((T)(other.m20)), m21((T)(other.m21)), m22((T)(other.m22))
-{
-}
-
-template <class T>
 SLIB_INLINE const Matrix3T<T>& Matrix3T<T>::zero()
 {
-	return *((Matrix3T<T>*)((void*)(_zero)));
+	return *(reinterpret_cast<Matrix3T<T> const*>(&_zero));
 }
 
 template <class T>
 SLIB_INLINE const Matrix3T<T>& Matrix3T<T>::one()
 {
-	return *((Matrix3T<T>*)((void*)(_one)));
+	return *(reinterpret_cast<Matrix3T<T> const*>(&_one));
 }
 
 template <class T>
 SLIB_INLINE const Matrix3T<T>& Matrix3T<T>::identity()
 {
-	return *((Matrix3T<T>*)((void*)(_identity)));
+	return *(reinterpret_cast<Matrix3T<T> const*>(&_identity));
 }
 
 template <class T>
-SLIB_INLINE const Matrix3T<T>& Matrix3T<T>::fromArray(const T* arr)
+SLIB_INLINE const Matrix3T<T>& Matrix3T<T>::fromArray(const T arr[9])
 {
-	return *((Matrix3T<T>*)((void*)(arr)));
+	return *(reinterpret_cast<Matrix3T<T> const*>(arr));
 }
 
 template <class T>
-SLIB_INLINE Matrix3T<T>& Matrix3T<T>::fromArray(T* arr)
+SLIB_INLINE Matrix3T<T>& Matrix3T<T>::fromArray(T arr[9])
 {
-	return *((Matrix3T<T>*)((void*)(arr)));
+	return *(reinterpret_cast<Matrix3T<T>*>(arr));
 }
 
 template <class T>

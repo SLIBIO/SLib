@@ -22,10 +22,10 @@ Thread::~Thread()
 {
 }
 
-Ref<Thread> Thread::create(const Callback& callback)
+Ref<Thread> Thread::create(const Function<void()>& callback)
 {
 	if (callback.isNull()) {
-		return Ref<Thread>::null();
+		return sl_null;
 	}
 	Ref<Thread> ret = new Thread();
 	if (ret.isNotNull()) {
@@ -34,7 +34,7 @@ Ref<Thread> Thread::create(const Callback& callback)
 	return ret;
 }
 
-Ref<Thread> Thread::start(const Callback& callback, sl_uint32 stackSize)
+Ref<Thread> Thread::start(const Function<void()>& callback, sl_uint32 stackSize)
 {
 	Ref<Thread> ret = create(callback);
 	if (ret.isNotNull()) {
@@ -42,7 +42,7 @@ Ref<Thread> Thread::start(const Callback& callback, sl_uint32 stackSize)
 			return ret;
 		}
 	}
-	return Ref<Thread>::null();
+	return sl_null;
 }
 
 sl_bool Thread::start(sl_uint32 stackSize)
@@ -189,7 +189,7 @@ sl_bool Thread::isNotWaiting()
 	return m_eventWaiting.isNull();
 }
 
-const Callback& Thread::getCallback()
+const Function<void()>& Thread::getCallback()
 {
 	return m_callback;
 }
@@ -247,7 +247,7 @@ sl_uint64 Thread::getCurrentThreadUniqueId()
 
 Variant Thread::getProperty(const String& name)
 {
-	return m_properties.getValue(name, Variant::null());
+	return m_properties.getValue(name);
 }
 
 void Thread::setProperty(const String& name, const Variant& value)
@@ -265,7 +265,7 @@ Ref<Referable> Thread::getAttachedObject(const String& name)
 	return m_attachedObjects.getValue(name, Ref<Referable>::null());
 }
 
-void Thread::attachObject(const String& name, const Referable* object)
+void Thread::attachObject(const String& name, Referable* object)
 {
 	m_attachedObjects.put(name, object);
 }

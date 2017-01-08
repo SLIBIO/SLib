@@ -9,7 +9,7 @@ Ref<Database> DatabaseStatement::getDatabase()
 	return m_db;
 }
 
-List< Map<String, Variant> > DatabaseStatement::getListForQueryResult(const Variant* params, sl_uint32 nParams)
+List< Map<String, Variant> > DatabaseStatement::getListForQueryResultBy(const Variant* params, sl_uint32 nParams)
 {
 	List< Map<String, Variant> > ret;
 	Ref<DatabaseCursor> cursor = query(params, nParams);
@@ -21,7 +21,7 @@ List< Map<String, Variant> > DatabaseStatement::getListForQueryResult(const Vari
 	return ret;
 }
 
-Map<String, Variant> DatabaseStatement::getRecordForQueryResult(const Variant* params, sl_uint32 nParams)
+Map<String, Variant> DatabaseStatement::getRecordForQueryResultBy(const Variant* params, sl_uint32 nParams)
 {
 	Map<String, Variant> ret;
 	Ref<DatabaseCursor> cursor = query(params, nParams);
@@ -30,10 +30,10 @@ Map<String, Variant> DatabaseStatement::getRecordForQueryResult(const Variant* p
 			return cursor->getRow();
 		}
 	}
-	return Map<String, Variant>::null();
+	return sl_null;
 }
 
-Variant DatabaseStatement::getValueForQueryResult(const Variant* params, sl_uint32 nParams)
+Variant DatabaseStatement::getValueForQueryResultBy(const Variant* params, sl_uint32 nParams)
 {
 	Ref<DatabaseCursor> cursor = query(params, nParams);
 	if (cursor.isNotNull()) {
@@ -41,7 +41,7 @@ Variant DatabaseStatement::getValueForQueryResult(const Variant* params, sl_uint
 			return cursor->getValue(0);
 		}
 	}
-	return Variant::null();
+	return sl_null;
 }
 
 SLIB_DB_NAMESPACE_END

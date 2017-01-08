@@ -16,8 +16,7 @@ public:
 	static void JNICALL nativeOnStartLoad(JNIEnv* env, jobject _this, jlong instance, jstring jurl)
 	{
 		Ref<View> _view = Android_ViewInstance::getAndroidView(instance);
-		if (WebView::checkInstance(_view.ptr)) {
-			_WebView* view = (_WebView*)(_view.ptr);
+		if (_WebView* view = CastInstance<_WebView>(_view.get())) {
 			String url = Jni::getString(jurl);
 			view->dispatchStartLoad(url);
 		}
@@ -26,8 +25,7 @@ public:
 	static void JNICALL nativeOnFinishLoad(JNIEnv* env, jobject _this, jlong instance, jstring jurl)
 	{
 		Ref<View> _view = Android_ViewInstance::getAndroidView(instance);
-		if (WebView::checkInstance(_view.ptr)) {
-			_WebView* view = (_WebView*)(_view.ptr);
+		if (_WebView* view = CastInstance<_WebView>(_view.get())) {
 			String url = Jni::getString(jurl);
 			view->dispatchFinishLoad(url, sl_false);
 		}
@@ -36,8 +34,7 @@ public:
 	static void JNICALL nativeOnErrorLoad(JNIEnv* env, jobject _this, jlong instance, jstring jurl, jstring jerror)
 	{
 		Ref<View> _view = Android_ViewInstance::getAndroidView(instance);
-		if (WebView::checkInstance(_view.ptr)) {
-			_WebView* view = (_WebView*)(_view.ptr);
+		if (_WebView* view = CastInstance<_WebView>(_view.get())) {
 			view->m_lastErrorMessage = Jni::getString(jerror);
 			String url = Jni::getString(jurl);
 			view->dispatchFinishLoad(url, sl_true);
@@ -47,8 +44,7 @@ public:
 	static void JNICALL nativeOnMessage(JNIEnv* env, jobject _this, jlong instance, jstring jmsg, jstring jparam)
 	{
 		Ref<View> _view = Android_ViewInstance::getAndroidView(instance);
-		if (WebView::checkInstance(_view.ptr)) {
-			_WebView* view = (_WebView*)(_view.ptr);
+		if (_WebView* view = CastInstance<_WebView>(_view.get())) {
 			String msg = Jni::getString(jmsg);
 			if (msg.isNotEmpty()) {
 				String param = Jni::getString(jparam);
@@ -122,7 +118,7 @@ String WebView::_getURL_NW()
 	if (handle) {
 		return _JAndroidWebView::getURL.callString(sl_null, handle);
 	}
-	return String::null();
+	return sl_null;
 }
 
 String WebView::_getPageTitle_NW()
@@ -131,7 +127,7 @@ String WebView::_getPageTitle_NW()
 	if (handle) {
 		return _JAndroidWebView::getTitle.callString(sl_null, handle);
 	}
-	return String::null();
+	return sl_null;
 }
 
 void WebView::_goBack_NW()

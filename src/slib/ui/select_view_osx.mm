@@ -40,7 +40,7 @@ public:
 				[v addItemWithTitle:[NSString stringWithFormat:@"%d",i]];
 				NSMenuItem* item = [v lastItem];
 				if (item != nil) {
-					NSString* s = Apple::getNSStringFromString(m_titles.getItemValue(i, String::null()));
+					NSString* s = Apple::getNSStringFromString(m_titles.getValueAt(i));
 					if (s == nil) {
 						s = @"";
 					}
@@ -94,7 +94,7 @@ Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* _parent)
 		((_SelectView*)this)->__copyItems(handle);
 		
 		Ref<Font> font = getFont();
-		NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
+		NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
@@ -153,7 +153,7 @@ void SelectView::_setFont_NW(const Ref<Font>& font)
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
 		NSPopUpButton* v = (NSPopUpButton*)handle;
-		NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
+		NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
 		if (hFont != nil) {
 			[v setFont:hFont];
 		}
@@ -178,8 +178,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::SelectView::checkInstance(view.ptr)) {
-			((slib::_SelectView*)(view.ptr))->__onSelectItem(self);
+		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
+			_view->__onSelectItem(self);
 		}
 	}
 }

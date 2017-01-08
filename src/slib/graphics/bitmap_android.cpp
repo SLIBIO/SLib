@@ -51,7 +51,7 @@ public:
 	}
 
 public:
-	static Ref<_Android_Bitmap> create(jobject jbitmap, sl_bool flagFreeOnRelease, const Referable* ref)
+	static Ref<_Android_Bitmap> create(jobject jbitmap, sl_bool flagFreeOnRelease, Referable* ref)
 	{
 		Ref<_Android_Bitmap> ret;
 		if (jbitmap) {
@@ -305,7 +305,7 @@ public:
 		if (jcanvas.isNotNull()) {
 			return GraphicsPlatform::createCanvas(CanvasType::Bitmap, jcanvas);
 		}
-		return Ref<Canvas>::null();
+		return sl_null;
 	}
 
     // override
@@ -364,18 +364,17 @@ Ref<Bitmap> Bitmap::loadFromMemory(const void* mem, sl_size size)
 	return _Android_Bitmap::load(mem, size);
 }
 
-Ref<Drawable> GraphicsPlatform::createImageDrawable(jobject bitmap, sl_bool flagFreeOnRelease, const Referable* ref)
+Ref<Drawable> GraphicsPlatform::createImageDrawable(jobject bitmap, sl_bool flagFreeOnRelease, Referable* ref)
 {
 	return _Android_Bitmap::create(bitmap, flagFreeOnRelease, ref);
 }
 
 jobject GraphicsPlatform::getImageDrawableHandle(Drawable* _drawable)
 {
-	if (!(_Android_Bitmap::checkInstance(_drawable))) {
-		return 0;
+	if (_Android_Bitmap* drawable = CastInstance<_Android_Bitmap>(_drawable)) {
+		return drawable->m_bitmap;
 	}
-	_Android_Bitmap* drawable = (_Android_Bitmap*)_drawable;
-	return drawable->m_bitmap;
+	return 0;
 }
 
 SLIB_GRAPHICS_NAMESPACE_END

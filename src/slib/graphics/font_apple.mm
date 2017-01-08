@@ -201,7 +201,7 @@ public:
 				m_platformObject = new _Apple_FontObject;
 			}
 		}
-		return (_Apple_FontObject*)(m_platformObject.ptr);;
+		return (_Apple_FontObject*)(m_platformObject.get());;
 	}
 	
 	CTFontRef getCoreText()

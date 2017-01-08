@@ -14,13 +14,19 @@
 
 SLIB_NAMESPACE_BEGIN
 
-template < class T, class COMPARE >
+template <class T>
 class List;
 
-template < class T, class COMPARE=Compare<T> >
+template <class T>
+using AtomicList = Atomic< List<T> >;
+
+extern const char _List_ClassID[];
+
+template <class T>
 class SLIB_EXPORT CList : public Object
 {
-	SLIB_DECLARE_OBJECT
+	SLIB_TEMPLATE_OBJECT(Object, _List_ClassID)
+	
 protected:
 	T* m_data;
 	sl_size m_count;
@@ -33,36 +39,28 @@ public:
 	
 	CList(sl_size count, sl_size capacity);
 	
-	CList(const T* values, sl_size count);
-	
 	template <class _T>
 	CList(const _T* values, sl_size count);
 	
 	~CList();
 	
 public:
-	static CList<T, COMPARE>* create();
+	static CList<T>* create();
 	
-	static CList<T, COMPARE>* create(sl_size count);
+	static CList<T>* create(sl_size count);
 	
-	static CList<T, COMPARE>* create(sl_size count, sl_size capacity);
-	
-	static CList<T, COMPARE>* createFromElements(const T* values, sl_size count);
+	static CList<T>* create(sl_size count, sl_size capacity);
 	
 	template <class _T>
-	static CList<T, COMPARE>* createFromElements(const _T* values, sl_size count);
+	static CList<T>* createFromElements(const _T* values, sl_size count);
 	
-	static CList<T, COMPARE>* createFromArray(const Array<T, COMPARE>& array);
+	template <class _T>
+	static CList<T>* createFromArray(const Array<_T>& array);
 	
-	template <class _T,  class _COMPARE>
-	static CList<T, COMPARE>* createFromArray(const Array<_T, _COMPARE>& array);
+	static CList<T>* createFromElement(const T& value);
 	
-	static CList<T, COMPARE>* createFromElement(const T& value);
-	
-	static CList<T, COMPARE>* createCopy(CList<T, COMPARE>* other);
-	
-	template <class _T, class _COMPARE>
-	static CList<T, COMPARE>* createCopy(CList<_T, _COMPARE>* other);
+	template <class _T>
+	static CList<T>* createCopy(CList<_T>* other);
 	
 public:
 	sl_size getCount() const;
@@ -72,110 +70,93 @@ public:
 	T* getData() const;
 	
 public:
-	T* getItemPtr(sl_size index) const;
+	T* getPointerAt(sl_size index) const;
 	
-	sl_bool getItem_NoLock(sl_size index, T* _out = sl_null) const;
+	sl_bool getAt_NoLock(sl_size index, T* _out = sl_null) const;
 	
-	sl_bool getItem(sl_size index, T* _out = sl_null) const;
+	sl_bool getAt(sl_size index, T* _out = sl_null) const;
 	
-	T getItemValue_NoLock(sl_size index, const T& def) const;
+	T getValueAt_NoLock(sl_size index) const;
 	
-	T getItemValue(sl_size index, const T& def) const;
+	T getValueAt(sl_size index) const;
 	
-	sl_bool setItem_NoLock(sl_size index, const T& value) const;
+	T getValueAt_NoLock(sl_size index, const T& def) const;
 	
-	sl_bool setItem(sl_size index, const T& value) const;
+	T getValueAt(sl_size index, const T& def) const;
+	
+	sl_bool setAt_NoLock(sl_size index, const T& value) const;
+	
+	sl_bool setAt(sl_size index, const T& value) const;
+	
+	T const& operator[](sl_size_t index) const;
+	
+	T& operator[](sl_size_t index);
 	
 public:
 	sl_bool setCount_NoLock(sl_size count);
 	
 	sl_bool setCount(sl_size count);
 	
-	sl_bool insert_NoLock(sl_size index, const T* values, sl_size count);
-	
-	template <class _T>
-	sl_bool insert_NoLock(sl_size index, const _T* values, sl_size count);
-	
-	sl_bool insert(sl_size index, const T* values, sl_size count);
-	
-	template <class _T>
-	sl_bool insert(sl_size index, const _T* values, sl_size count);
-	
-	sl_bool insertAll(sl_size index, const CList<T, COMPARE>* other);
-	
-	template <class _T, class _COMPARE>
-	sl_bool insertAll(sl_size index, const CList<_T, _COMPARE>* other);
-	
 	sl_bool insert_NoLock(sl_size index, const T& value);
 	
 	sl_bool insert(sl_size index, const T& value);
 	
-	sl_bool add_NoLock(const T* values, sl_size count);
+	template <class _T>
+	sl_bool insertElements_NoLock(sl_size index, const _T* values, sl_size count);
 	
 	template <class _T>
-	sl_bool add_NoLock(const _T* values, sl_size count);
-	
-	sl_bool add(const T* values, sl_size count);
+	sl_bool insertElements(sl_size index, const _T* values, sl_size count);
 	
 	template <class _T>
-	sl_bool add(const _T* values, sl_size count);
-	
-	sl_bool addAll(const CList<T, COMPARE>* other);
-	
-	template <class _T, class _COMPARE>
-	sl_bool addAll(const CList<_T, _COMPARE>* other);
+	sl_bool insertAll(sl_size index, const CList<_T>* other);
 	
 	sl_bool add_NoLock(const T& value);
 	
 	sl_bool add(const T& value);
-	
-	template <class _T, class _COMPARE>
-	sl_bool addIfNotExistT_NoLock(const _T& value);
-	
-	template <class _T, class _COMPARE>
-	sl_bool addIfNotExistT(const _T& value);
-	
-	sl_bool addIfNotExist_NoLock(const T& value);
-	
-	sl_bool addIfNotExist(const T& value);
-	
-	sl_bool add_NoLock(const Iterator<T>& iterator);
+
+	template <class _T>
+	sl_bool addElements_NoLock(const _T* values, sl_size count);
 	
 	template <class _T>
-	sl_bool add_NoLock(const Iterator<_T>& iterator);
-	
-	sl_bool add(const Iterator<T>& iterator);
+	sl_bool addElements(const _T* values, sl_size count);
 	
 	template <class _T>
-	sl_bool add(const Iterator<_T>& iterator);
+	sl_bool addAll_NoLock(const CList<_T>* other);
+
+	template <class _T>
+	sl_bool addAll(const CList<_T>* other);
+	
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_bool addIfNotExist_NoLock(const _T& value, const EQUALS& equals = EQUALS());
+	
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_bool addIfNotExist(const _T& value, const EQUALS& equals = EQUALS());
+	
+	template <class _T>
+	sl_bool addAll_NoLock(const Iterator<_T>& iterator);
+	
+	template <class _T>
+	sl_bool addAll(const Iterator<_T>& iterator);
 	
 	sl_bool removeAt_NoLock(sl_size index, T* outValue = sl_null);
 	
 	sl_bool removeAt(sl_size index, T* outValue = sl_null);
 
-	sl_size remove_NoLock(sl_size index, sl_size count = 1);
+	sl_size removeRange_NoLock(sl_size index, sl_size count);
 	
-	sl_size remove(sl_size index, sl_size count = 1);
+	sl_size removeRange(sl_size index, sl_size count);
 	
-	template <class _T, class _COMPARE>
-	sl_bool removeValueT_NoLock(const _T& value, T* outValue = sl_null);
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_bool removeValue_NoLock(const _T& value, T* outValue = sl_null, const EQUALS& equals = EQUALS());
 	
-	template <class _T, class _COMPARE>
-	sl_bool removeValueT(const _T& value, T* outValue = sl_null);
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_bool removeValue(const _T& value, T* outValue = sl_null, const EQUALS& equals = EQUALS());
 	
-	template <class _T, class _COMPARE>
-	sl_size removeValuesT_NoLock(const _T& value, List<T,COMPARE>* outValues = sl_null);
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_size removeElementsByValue_NoLock(const _T& value, List<T>* outValues = sl_null, const EQUALS& equals = EQUALS());
 	
-	template <class _T, class _COMPARE>
-	sl_size removeValuesT(const _T& value, List<T,COMPARE>* outValues = sl_null);
-
-	sl_bool removeValue_NoLock(const T& value);
-	
-	sl_bool removeValue(const T& value);
-	
-	sl_size removeValues_NoLock(const T& value);
-	
-	sl_size removeValues(const T& value);
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_size removeElementsByValue(const _T& value, List<T>* outValues = sl_null, const EQUALS& equals = EQUALS());
 	
 	sl_size removeAll_NoLock();
 	
@@ -185,67 +166,51 @@ public:
 	
 	sl_bool popFront(T* _out = sl_null);
 	
-	sl_size popFront_NoLock(sl_size count);
+	sl_size popFrontElements_NoLock(sl_size count);
 	
-	sl_size popFront(sl_size count);
+	sl_size popFrontElements(sl_size count);
 	
 	sl_bool popBack_NoLock(T* _out = sl_null);
 	
 	sl_bool popBack(T* _out = sl_null);
 	
-	sl_size popBack_NoLock(sl_size count);
+	sl_size popBackElements_NoLock(sl_size count);
 	
-	sl_size popBack(sl_size count);
+	sl_size popBackElements(sl_size count);
 	
-	template <class _T, class _COMPARE>
-	sl_reg indexOfT_NoLock(const _T& value, sl_reg start = 0) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_reg indexOf_NoLock(const _T& value, sl_reg start = 0, const EQUALS& equals = EQUALS()) const;
 	
-	template <class _T, class _COMPARE>
-	sl_reg indexOfT(const _T& value, sl_reg start = 0) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_reg indexOf(const _T& value, sl_reg start = 0, const EQUALS& equals = EQUALS()) const;
 	
-	sl_reg indexOf_NoLock(const T& value, sl_reg start = 0) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_reg lastIndexOf_NoLock(const _T& value, sl_reg start = -1, const EQUALS& equals = EQUALS()) const;
 	
-	sl_reg indexOf(const T& value, sl_reg start = 0) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_reg lastIndexOf(const _T& value, sl_reg start = -1, const EQUALS& equals = EQUALS()) const;
 	
-	template <class _T, class _COMPARE>
-	sl_reg lastIndexOfT_NoLock(const _T& value, sl_reg start = -1) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_bool contains_NoLock(const _T& value, const EQUALS& equals = EQUALS()) const;
 	
-	template <class _T, class _COMPARE>
-	sl_reg lastIndexOfT(const _T& value, sl_reg start = -1) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_bool contains(const _T& value, const EQUALS& equals = EQUALS()) const;
 	
-	sl_reg lastIndexOf_NoLock(const T& value, sl_reg start = -1) const;
+	CList<T>* duplicate_NoLock() const;
 	
-	sl_reg lastIndexOf(const T& value, sl_reg start = -1) const;
+	CList<T>* duplicate() const;
 	
-	template <class _T, class _COMPARE>
-	sl_bool containsT_NoLock(const _T& value) const;
+	Array<T> toArray_NoLock() const;
 	
-	template <class _T, class _COMPARE>
-	sl_bool containsT(const _T& value) const;
+	Array<T> toArray() const;
 	
-	sl_bool contains_NoLock(const T& value) const;
+	template < class COMPARE = Compare<T> >
+	void sort_NoLock(sl_bool flagAscending = sl_true, const COMPARE& compare = COMPARE()) const;
 	
-	sl_bool contains(const T& value) const;
+	template < class COMPARE = Compare<T> >
+	void sort(sl_bool flagAscending = sl_true, const COMPARE& compare = COMPARE()) const;
 	
-	CList<T, COMPARE>* duplicate_NoLock() const;
-	
-	CList<T, COMPARE>* duplicate() const;
-	
-	Array<T, COMPARE> toArray_NoLock() const;
-	
-	Array<T, COMPARE> toArray() const;
-	
-	template <class _COMPARE>
-	void sortBy_NoLock(sl_bool flagAscending = sl_true) const;
-	
-	template <class _COMPARE>
-	void sortBy(sl_bool flagAscending = sl_true) const;
-	
-	void sort_NoLock(sl_bool flagAscending = sl_true) const;
-	
-	void sort(sl_bool flagAscending = sl_true) const;
-	
-	Iterator<T> iterator() const;
+	Iterator<T> toIterator() const;
 	
 	// range-based for loop
 	T* begin();
@@ -261,81 +226,56 @@ protected:
 	
 };
 
-template <class T, class COMPARE>
+template <class T>
 class SLIB_EXPORT ListPosition
 {
 public:
 	ListPosition();
 	
-	ListPosition(const Ref< CList<T, COMPARE> >& list);
+	ListPosition(const Ref< CList<T> >& list);
 	
-	ListPosition(const ListPosition<T, COMPARE>& other);
+	ListPosition(const ListPosition<T>& other);
 	
-	ListPosition(ListPosition<T, COMPARE>&& other);
+	ListPosition(ListPosition<T>&& other);
 	
 public:
 	T& operator*();
 	
-	sl_bool operator!=(const ListPosition<T, COMPARE>& other);
+	sl_bool operator!=(const ListPosition<T>& other);
 	
-	ListPosition<T, COMPARE>& operator++();
+	ListPosition<T>& operator++();
 	
 private:
-	Ref< CList<T, COMPARE> > ref;
+	Ref< CList<T> > ref;
 	T* data;
 	sl_size count;
 	
 };
 
-template <class T, class COMPARE>
-class SafeList;
-
-#define SLIB_TEMPLATE_PARAMS_CList T, COMPARE
-#define SLIB_TEMPLATE_DEF_PARAMS_CList class T, class COMPARE
-
-/** auto-referencing object **/
-template < class T, class COMPARE=Compare<T> >
+template <class T>
 class SLIB_EXPORT List
 {
 public:
-	Ref< CList<T, COMPARE> > ref;
-	SLIB_DECLARE_TEMPLATE_REF_WRAPPER(List, SafeList, CList)
+	Ref< CList<T> > ref;
+	SLIB_REF_WRAPPER(List, CList<T>)
 	
 public:
-	List(sl_size count);
+	static List<T> create();
 	
-	List(const T* data, sl_size count);
+	static List<T> create(sl_size count);
+	
+	static List<T> create(sl_size count, sl_size capacity);
 	
 	template <class _T>
-	List(const _T* data, sl_size count);
-	
-public:
-	template <class _COMPARE>
-	const List<T, COMPARE>& from(const List<T, _COMPARE>& other);
-	
-public:
-	static List<T, COMPARE> create();
-	
-	static List<T, COMPARE> create(sl_size count);
-	
-	static List<T, COMPARE> create(sl_size count, sl_size capacity);
-	
-	static List<T, COMPARE> createFromElements(const T* values, sl_size count);
+	static List<T> createFromElements(const _T* values, sl_size count);
 	
 	template <class _T>
-	static List<T, COMPARE> createFromElements(const _T* values, sl_size count);
+	static List<T> createFromArray(const Array<_T>& array);
 	
-	static List<T, COMPARE> createFromArray(const Array<T, COMPARE>& array);
+	static List<T> createFromElement(const T& e);
 	
-	template <class _T,  class _COMPARE>
-	static List<T, COMPARE> createFromArray(const Array<_T, _COMPARE>& array);
-	
-	static List<T, COMPARE> createFromElement(const T& e);
-	
-	static List<T, COMPARE> createCopy(const List<T, COMPARE>& other);
-	
-	template <class _T, class _COMPARE>
-	static List<T, COMPARE> createCopy(const List<_T, _COMPARE>& other);
+	template <class _T>
+	static List<T> createCopy(const List<_T>& other);
 	
 public:
 	sl_size getCount() const;
@@ -349,114 +289,100 @@ public:
 	sl_bool isNotEmpty() const;
 	
 public:
-	T* getItemPtr(sl_size index) const;
+	T* getPointerAt(sl_size index) const;
 	
-	sl_bool getItem(sl_size index, T* _out = sl_null) const;
+	sl_bool getAt_NoLock(sl_size index, T* _out = sl_null) const;
 	
-	T getItemValue(sl_size index, const T& def) const;
+	sl_bool getAt(sl_size index, T* _out = sl_null) const;
 	
-	sl_bool setItem(sl_size index, const T& value) const;
+	T getValueAt_NoLock(sl_size index) const;
+	
+	T getValueAt(sl_size index) const;
+
+	T getValueAt_NoLock(sl_size index, const T& def) const;
+	
+	T getValueAt(sl_size index, const T& def) const;
+	
+	sl_bool setAt_NoLock(sl_size index, const T& value) const;
+	
+	sl_bool setAt(sl_size index, const T& value) const;
+	
+	T& operator[](sl_size_t index) const;
 	
 public:
 	sl_bool setCount_NoLock(sl_size count);
 	
 	sl_bool setCount(sl_size count);
 	
-	sl_bool insert_NoLock(sl_size index, const T* values, sl_size count) const;
-	
-	template <class _T>
-	sl_bool insert_NoLock(sl_size index, const _T* values, sl_size count) const;
-	
-	sl_bool insert(sl_size index, const T* values, sl_size count) const;
-	
-	template <class _T>
-	sl_bool insert(sl_size index, const _T* values, sl_size count) const;
-	
-	sl_bool insertAll(sl_size index, const List<T, COMPARE>& other) const;
-	
-	template <class _T, class _COMPARE>
-	sl_bool insertAll(sl_size index, const List<_T, _COMPARE>& other) const;
-	
-	sl_bool insertAll(sl_size index, const SafeList<T, COMPARE>& other) const;
-	
-	template <class _T, class _COMPARE>
-	sl_bool insertAll(sl_size index, const SafeList<_T, _COMPARE>& other) const;
-	
 	sl_bool insert_NoLock(sl_size index, const T& value) const;
 	
 	sl_bool insert(sl_size index, const T& value) const;
-	
-	sl_bool add_NoLock(const T* values, sl_size count);
+
+	template <class _T>
+	sl_bool insertElements_NoLock(sl_size index, const _T* values, sl_size count) const;
 	
 	template <class _T>
-	sl_bool add_NoLock(const _T* values, sl_size count);
-	
-	sl_bool add(const T* values, sl_size count);
+	sl_bool insertElements(sl_size index, const _T* values, sl_size count) const;
 	
 	template <class _T>
-	sl_bool add(const _T* values, sl_size count);
+	sl_bool insertAll(sl_size index, const List<_T>& other) const;
 	
-	sl_bool addAll(const List<T, COMPARE>& _other);
-	
-	template <class _T, class _COMPARE>
-	sl_bool addAll(const List<_T, _COMPARE>& _other);
-	
-	sl_bool addAll(const SafeList<T, COMPARE>& _other);
-	
-	template <class _T, class _COMPARE>
-	sl_bool addAll(const SafeList<_T, _COMPARE>& _other);
+	template <class _T>
+	sl_bool insertAll(sl_size index, const AtomicList<_T>& other) const;
 	
 	sl_bool add_NoLock(const T& value);
 	
 	sl_bool add(const T& value);
-	
-	template <class _T, class _COMPARE>
-	sl_bool addIfNotExistT_NoLock(const _T& value);
-	
-	template <class _T, class _COMPARE>
-	sl_bool addIfNotExistT(const _T& value);
-	
-	sl_bool addIfNotExist_NoLock(const T& value);
-	
-	sl_bool addIfNotExist(const T& value);
-	
-	sl_bool add_NoLock(const Iterator<T>& iterator);
+
+	template <class _T>
+	sl_bool addElements_NoLock(const _T* values, sl_size count);
 	
 	template <class _T>
-	sl_bool add_NoLock(const Iterator<_T>& iterator);
-	
-	sl_bool add(const Iterator<T>& iterator);
+	sl_bool addElements(const _T* values, sl_size count);
 	
 	template <class _T>
-	sl_bool add(const Iterator<_T>& iterator);
+	sl_bool addAll_NoLock(const List<_T>& _other);
+	
+	template <class _T>
+	sl_bool addAll_NoLock(const AtomicList<_T>& _other);
+	
+	template <class _T>
+	sl_bool addAll(const List<_T>& _other);
+	
+	template <class _T>
+	sl_bool addAll(const AtomicList<_T>& _other);
+	
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_bool addIfNotExist_NoLock(const _T& value, const EQUALS& equals = EQUALS());
+	
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_bool addIfNotExist(const _T& value, const EQUALS& equals = EQUALS());
+	
+	template <class _T>
+	sl_bool addAll_NoLock(const Iterator<_T>& iterator);
+	
+	template <class _T>
+	sl_bool addAll(const Iterator<_T>& iterator);
 	
 	sl_bool removeAt_NoLock(sl_size index, T* outValue = sl_null) const;
 	
 	sl_bool removeAt(sl_size index, T* outValue = sl_null) const;
 	
-	sl_size remove_NoLock(sl_size index, sl_size count = 1) const;
+	sl_size removeRange_NoLock(sl_size index, sl_size count) const;
 	
-	sl_size remove(sl_size index, sl_size count = 1) const;
+	sl_size removeRange(sl_size index, sl_size count) const;
 	
-	template <class _T, class _COMPARE>
-	sl_bool removeValueT_NoLock(const _T& value, T* outValue = sl_null) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_bool removeValue_NoLock(const _T& value, T* outValue = sl_null, const EQUALS& equals = EQUALS()) const;
 	
-	template <class _T, class _COMPARE>
-	sl_bool removeValueT(const _T& value, T* outValue = sl_null) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_bool removeValue(const _T& value, T* outValue = sl_null, const EQUALS& equals = EQUALS()) const;
 	
-	template <class _T, class _COMPARE>
-	sl_size removeValuesT_NoLock(const _T& value, List<T,COMPARE>* outValues = sl_null) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_size removeElementsByValue_NoLock(const _T& value, List<T>* outValues = sl_null, const EQUALS& equals = EQUALS()) const;
 	
-	template <class _T, class _COMPARE>
-	sl_size removeValuesT(const _T& value, List<T,COMPARE>* outValues = sl_null) const;
-	
-	sl_bool removeValue_NoLock(const T& value) const;
-	
-	sl_bool removeValue(const T& value) const;
-	
-	sl_size removeValues_NoLock(const T& value) const;
-	
-	sl_size removeValues(const T& value) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_size removeElementsByValue(const _T& value, List<T>* outValues = sl_null, const EQUALS& equals = EQUALS()) const;
 	
 	sl_size removeAll_NoLock() const;
 	
@@ -466,67 +392,51 @@ public:
 	
 	sl_bool popFront(T* _out = sl_null) const;
 	
-	sl_size popFront_NoLock(sl_size count) const;
+	sl_size popFrontElements_NoLock(sl_size count) const;
 	
-	sl_size popFront(sl_size count) const;
+	sl_size popFrontElements(sl_size count) const;
 	
 	sl_bool popBack_NoLock(T* _out = sl_null) const;
 	
 	sl_bool popBack(T* _out = sl_null) const;
 	
-	sl_size popBack_NoLock(sl_size count) const;
+	sl_size popBackElements_NoLock(sl_size count) const;
 	
-	sl_size popBack(sl_size count) const;
+	sl_size popBackElements(sl_size count) const;
 	
-	template <class _T, class _COMPARE>
-	sl_reg indexOfT_NoLock(const _T& value, sl_reg start = 0) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_reg indexOf_NoLock(const _T& value, sl_reg start = 0, const EQUALS& equals = EQUALS()) const;
 	
-	template <class _T, class _COMPARE>
-	sl_reg indexOfT(const _T& value, sl_reg start = 0) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_reg indexOf(const _T& value, sl_reg start = 0, const EQUALS& equals = EQUALS()) const;
 	
-	sl_reg indexOf_NoLock(const T& value, sl_reg start = 0) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_reg lastIndexOf_NoLock(const _T& value, sl_reg start = -1, const EQUALS& equals = EQUALS()) const;
 	
-	sl_reg indexOf(const T& value, sl_reg start = 0) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_reg lastIndexOf(const _T& value, sl_reg start = -1, const EQUALS& equals = EQUALS()) const;
 	
-	template <class _T, class _COMPARE>
-	sl_reg lastIndexOfT_NoLock(const _T& value, sl_reg start = -1) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_bool contains_NoLock(const _T& value, const EQUALS& equals = EQUALS()) const;
 	
-	template <class _T, class _COMPARE>
-	sl_reg lastIndexOfT(const _T& value, sl_reg start = -1) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_bool contains(const _T& value, const EQUALS& equals = EQUALS()) const;
 	
-	sl_reg lastIndexOf_NoLock(const T& value, sl_reg start = -1) const;
+	List<T> duplicate_NoLock() const;
 	
-	sl_reg lastIndexOf(const T& value, sl_reg start = -1) const;
+	List<T> duplicate() const;
 	
-	template <class _T, class _COMPARE>
-	sl_bool containsT_NoLock(const _T& value) const;
+	Array<T> toArray_NoLock() const;
 	
-	template <class _T, class _COMPARE>
-	sl_bool containsT(const _T& value) const;
+	Array<T> toArray() const;
 	
-	sl_bool contains_NoLock(const T& value) const;
+	template < class COMPARE = Compare<T> >
+	void sort(sl_bool flagAscending = sl_true, const COMPARE& compare = COMPARE()) const;
 	
-	sl_bool contains(const T& value) const;
+	template < class COMPARE = Compare<T> >
+	void sort_NoLock(sl_bool flagAscending = sl_true, const COMPARE& compare = COMPARE()) const;
 	
-	List<T, COMPARE> duplicate_NoLock() const;
-	
-	List<T, COMPARE> duplicate() const;
-	
-	Array<T, COMPARE> toArray_NoLock() const;
-	
-	Array<T, COMPARE> toArray() const;
-	
-	template <class _COMPARE>
-	void sortBy(sl_bool flagAscending = sl_true) const;
-	
-	template <class _COMPARE>
-	void sortBy_NoLock(sl_bool flagAscending = sl_true) const;
-	
-	void sort_NoLock(sl_bool flagAscending = sl_true) const;
-	
-	void sort(sl_bool flagAscending = sl_true) const;
-	
-	Iterator<T> iterator() const;
+	Iterator<T> toIterator() const;
 	
 	const Mutex* getLocker() const;
 	
@@ -537,27 +447,13 @@ public:
 	
 };
 
-
-/** auto-referencing object **/
-template < class T, class COMPARE = Compare<T> >
-class SLIB_EXPORT SafeList
+template <class T>
+class SLIB_EXPORT Atomic< List<T> >
 {
 public:
-	SafeRef< CList<T, COMPARE> > ref;
-	SLIB_DECLARE_TEMPLATE_REF_WRAPPER(SafeList, List, CList)
-	
-public:
-	SafeList(sl_size count);
-	
-	SafeList(const T* data, sl_size count);
-	
-	template <class _T>
-	SafeList(const _T* data, sl_size count);
-	
-public:
-	template <class _COMPARE>
-	const SafeList<T, COMPARE>& from(const SafeList<T, _COMPARE>& other);
-	
+	AtomicRef< CList<T> > ref;
+	SLIB_ATOMIC_REF_WRAPPER(CList<T>)
+
 public:
 	sl_size getCount() const;
 	
@@ -566,111 +462,87 @@ public:
 	sl_bool isNotEmpty() const;
 	
 public:
-	sl_bool getItem(sl_size index, T* _out = sl_null) const;
+	sl_bool getAt(sl_size index, T* _out = sl_null) const;
 	
-	T getItemValue(sl_size index, const T& def) const;
+	T getValueAt(sl_size index) const;
 	
-	sl_bool setItem(sl_size index, const T& value) const;
+	T getValueAt(sl_size index, const T& def) const;
+	
+	sl_bool setAt(sl_size index, const T& value) const;
+	
+	T operator[](sl_size_t index) const;
 	
 public:
 	sl_bool setCount(sl_size count);
 	
-	sl_bool insert(sl_size index, const T* values, sl_size count) const;
-	
-	template <class _T>
-	sl_bool insert(sl_size index, const _T* values, sl_size count) const;
-	
-	sl_bool insertAll(sl_size index, const List<T, COMPARE>& other) const;
-	
-	template <class _T, class _COMPARE>
-	sl_bool insertAll(sl_size index, const List<_T, _COMPARE>& other) const;
-	
-	sl_bool insertAll(sl_size index, const SafeList<T, COMPARE>& other) const;
-	
-	template <class _T, class _COMPARE>
-	sl_bool insertAll(sl_size index, const SafeList<_T, _COMPARE>& other) const;
-	
 	sl_bool insert(sl_size index, const T& value) const;
 	
-	sl_bool add(const T* values, sl_size count);
+	template <class _T>
+	sl_bool insertElements(sl_size index, const _T* values, sl_size count) const;
 	
 	template <class _T>
-	sl_bool add(const _T* values, sl_size count);
+	sl_bool insertAll(sl_size index, const List<_T>& other) const;
 	
-	sl_bool addAll(const List<T, COMPARE>& _other);
-	
-	template <class _T, class _COMPARE>
-	sl_bool addAll(const List<_T, _COMPARE>& _other);
-	
-	sl_bool addAll(const SafeList<T, COMPARE>& _other);
-	
-	template <class _T, class _COMPARE>
-	sl_bool addAll(const SafeList<_T, _COMPARE>& _other);
+	template <class _T>
+	sl_bool insertAll(sl_size index, const AtomicList<_T>& other) const;
 	
 	sl_bool add(const T& value);
 	
-	template <class _T, class _COMPARE>
-	sl_bool addIfNotExistT(const _T& value);
-	
-	sl_bool addIfNotExist(const T& value);
-	
-	sl_bool add(const Iterator<T>& iterator);
+	template <class _T>
+	sl_bool addElements(const _T* values, sl_size count);
 	
 	template <class _T>
-	sl_bool add(const Iterator<_T>& iterator);
+	sl_bool addAll(const List<_T>& _other);
+	
+	template <class _T>
+	sl_bool addAll(const AtomicList<_T>& _other);
+	
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_bool addIfNotExist(const _T& value, const EQUALS& equals = EQUALS());
+	
+	template <class _T>
+	sl_bool addAll(const Iterator<_T>& iterator);
 	
 	sl_bool removeAt(sl_size index, T* outValue = sl_null) const;
 	
-	sl_size remove(sl_size index, sl_size count = 1) const;
+	sl_size removeRange(sl_size index, sl_size count) const;
 	
-	template <class _T, class _COMPARE>
-	sl_bool removeValueT(const _T& value, T* outValue = sl_null) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_bool removeValue(const _T& value, T* outValue = sl_null, const EQUALS& equals = EQUALS()) const;
 	
-	template <class _T, class _COMPARE>
-	sl_size removeValuesT(const _T& value, List<T,COMPARE>* outValues = sl_null) const;
-	
-	sl_bool removeValue(const T& value) const;
-	
-	sl_size removeValues(const T& value) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_size removeElementsByValue(const _T& value, List<T>* outValues = sl_null, const EQUALS& equals = EQUALS()) const;
 	
 	sl_size removeAll() const;
 	
 	sl_bool popFront(T* _out = sl_null) const;
 	
-	sl_size popFront(sl_size count) const;
+	sl_size popFrontElements(sl_size count) const;
 	
 	sl_bool popBack(T* _out = sl_null) const;
 	
-	sl_size popBack(sl_size count) const;
+	sl_size popBackElements(sl_size count) const;
 
-	template <class _T, class _COMPARE>
-	sl_reg indexOfT(const _T& value, sl_reg start = 0) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_reg indexOf(const _T& value, sl_reg start = 0, const EQUALS& equals = EQUALS()) const;
 	
-	sl_reg indexOf(const T& value, sl_reg start = 0) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_reg lastIndexOf(const _T& value, sl_reg start = -1, const EQUALS& equals = EQUALS()) const;
 	
-	template <class _T, class _COMPARE>
-	sl_reg lastIndexOfT(const _T& value, sl_reg start = -1) const;
+	template < class _T, class EQUALS = Equals<T, _T> >
+	sl_bool contains(const _T& value, const EQUALS& equals = EQUALS()) const;
 	
-	sl_reg lastIndexOf(const T& value, sl_reg start = -1) const;
+	List<T> duplicate() const;
 	
-	template <class _T, class _COMPARE>
-	sl_bool containsT(const _T& value) const;
+	Array<T> toArray() const;
 	
-	sl_bool contains(const T& value) const;
-	
-	List<T, COMPARE> duplicate() const;
-	
-	Array<T, COMPARE> toArray() const;
-	
-	template <class _COMPARE>
-	void sortBy(sl_bool flagAscending = sl_true) const;
-	
-	void sort(sl_bool flagAscending = sl_true) const;
+	template < class COMPARE = Compare<T> >
+	void sort(sl_bool flagAscending = sl_true, const COMPARE& compare = COMPARE()) const;
 
 	// range-based for loop
-	ListPosition<T, COMPARE> begin() const;
+	ListPosition<T> begin() const;
 	
-	ListPosition<T, COMPARE> end() const;
+	ListPosition<T> end() const;
 	
 };
 
@@ -688,18 +560,7 @@ private:
 public:
 	ListLocker(const List<T>& list);
 	
-	template <class _COMPARE>
-	ListLocker(const List<T, _COMPARE>& list);
-	
-	ListLocker(const SafeList<T>& list);
-	
-	template <class _COMPARE>
-	ListLocker(const SafeList<T, _COMPARE>& list);
-	
 	ListLocker(const CList<T>& list);
-	
-	template <class _COMPARE>
-	ListLocker(const CList<T, _COMPARE>& list);
 	
 	~ListLocker();
 	
@@ -715,7 +576,7 @@ public:
 
 
 template <class T>
-class SLIB_EXPORT ListItems
+class SLIB_EXPORT ListElements
 {
 public:
 	T* data;
@@ -725,20 +586,9 @@ private:
 	List<T> m_list;
 	
 public:
-	ListItems(const List<T>& list);
+	ListElements(const List<T>& list);
 	
-	template <class _COMPARE>
-	ListItems(const List<T, _COMPARE>& list);
-	
-	ListItems(const SafeList<T>& list);
-	
-	template <class _COMPARE>
-	ListItems(const SafeList<T, _COMPARE>& list);
-	
-	ListItems(const CList<T>& list);
-	
-	template <class _COMPARE>
-	ListItems(const CList<T, _COMPARE>& list);
+	ListElements(const CList<T>& list);
 	
 public:
 	T& operator[](sl_reg index);
@@ -751,16 +601,16 @@ public:
 };
 
 
-template <class T, class COMPARE = Compare<T> >
+template <class T>
 class SLIB_EXPORT ListIterator : public IIterator<T>
 {
 protected:
-	const CList<T, COMPARE>* m_list;
+	const CList<T>* m_list;
 	Ref<Referable> m_refer;
 	sl_size m_index;
 	
 public:
-	ListIterator(const CList<T, COMPARE>* list, const Referable* refer);
+	ListIterator(const CList<T>* list, Referable* refer);
 	
 public:
 	// override
@@ -778,16 +628,12 @@ public:
 #define SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_LIST(...) \
 	extern template class CList<__VA_ARGS__>; \
 	extern template class List<__VA_ARGS__>; \
-	extern template class SafeList<__VA_ARGS__>; \
-	extern template class ListLocker<__VA_ARGS__>; \
-	extern template class ListItems<__VA_ARGS__>;
+	extern template class Atomic< List<__VA_ARGS__> >; \
 
 #define SLIB_DEFINE_EXPLICIT_INSTANTIATIONS_FOR_LIST(...) \
 	template class CList<__VA_ARGS__>; \
 	template class List<__VA_ARGS__>; \
-	template class SafeList<__VA_ARGS__>; \
-	template class ListLocker<__VA_ARGS__>; \
-	template class ListItems<__VA_ARGS__>;
+	template class Atomic< List<__VA_ARGS__> >; \
 
 SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_LIST(Ref<Referable>)
 
@@ -797,20 +643,16 @@ SLIB_NAMESPACE_END
 
 SLIB_NAMESPACE_BEGIN
 
-extern const char _List_ClassID[];
-
-SLIB_DEFINE_TEMPLATE_OBJECT(CList, Object, _List_ClassID)
-
-template <class T, class COMPARE>
-CList<T, COMPARE>::CList()
+template <class T>
+CList<T>::CList()
 {
 	m_data = 0;
 	m_count = 0;
 	m_capacity = 0;
 }
 
-template <class T, class COMPARE>
-CList<T, COMPARE>::CList(sl_size count)
+template <class T>
+CList<T>::CList(sl_size count)
 {
 	if (count > 0) {
 		T* data = New<T>::create(count);
@@ -826,8 +668,8 @@ CList<T, COMPARE>::CList(sl_size count)
 	m_capacity = 0;
 }
 
-template <class T, class COMPARE>
-CList<T, COMPARE>::CList(sl_size count, sl_size capacity)
+template <class T>
+CList<T>::CList(sl_size count, sl_size capacity)
 {
 	if (capacity < count) {
 		capacity = count;
@@ -846,26 +688,9 @@ CList<T, COMPARE>::CList(sl_size count, sl_size capacity)
 	m_capacity = 0;
 }
 
-template <class T, class COMPARE>
-CList<T, COMPARE>::CList(const T* values, sl_size count)
-{
-	if (count > 0) {
-		T* data = New<T>::create(values, count);
-		if (data) {
-			m_data = data;
-			m_count = count;
-			m_capacity = count;
-			return;
-		}
-	}
-	m_data = 0;
-	m_count = 0;
-	m_capacity = 0;
-}
-
-template <class T, class COMPARE>
+template <class T>
 template <class _T>
-CList<T, COMPARE>::CList(const _T* values, sl_size count)
+CList<T>::CList(const _T* values, sl_size count)
 {
 	if (count > 0) {
 		T* data = New<T>::create(values, count);
@@ -881,23 +706,23 @@ CList<T, COMPARE>::CList(const _T* values, sl_size count)
 	m_capacity = 0;
 }
 
-template <class T, class COMPARE>
-CList<T, COMPARE>::~CList()
+template <class T>
+CList<T>::~CList()
 {
 	New<T>::free(m_data, m_count);
 }
 
-template <class T, class COMPARE>
-CList<T, COMPARE>* CList<T, COMPARE>::create()
+template <class T>
+CList<T>* CList<T>::create()
 {
-	return new CList<T, COMPARE>;
+	return new CList<T>;
 }
 
-template <class T, class COMPARE>
-CList<T, COMPARE>* CList<T, COMPARE>::create(sl_size count)
+template <class T>
+CList<T>* CList<T>::create(sl_size count)
 {
 	if (count > 0) {
-		CList<T, COMPARE>* ret = new CList<T, COMPARE>(count);
+		CList<T>* ret = new CList<T>(count);
 		if (ret) {
 			if (ret->m_count > 0) {
 				return ret;
@@ -905,16 +730,16 @@ CList<T, COMPARE>* CList<T, COMPARE>::create(sl_size count)
 			delete ret;
 		}
 	} else {
-		return new CList<T, COMPARE>;
+		return new CList<T>;
 	}
 	return sl_null;
 }
 
-template <class T, class COMPARE>
-CList<T, COMPARE>* CList<T, COMPARE>::create(sl_size count, sl_size capacity)
+template <class T>
+CList<T>* CList<T>::create(sl_size count, sl_size capacity)
 {
 	if (count > 0 || capacity > 0) {
-		CList<T, COMPARE>* ret = new CList<T, COMPARE>(count, capacity);
+		CList<T>* ret = new CList<T>(count, capacity);
 		if (ret) {
 			if (ret->m_capacity > 0) {
 				return ret;
@@ -922,34 +747,17 @@ CList<T, COMPARE>* CList<T, COMPARE>::create(sl_size count, sl_size capacity)
 			delete ret;
 		}
 	} else {
-		return new CList<T, COMPARE>;
+		return new CList<T>;
 	}
 	return sl_null;
 }
 
-template <class T, class COMPARE>
-CList<T, COMPARE>* CList<T, COMPARE>::createFromElements(const T* values, sl_size count)
-{
-	if (count > 0) {
-		CList<T, COMPARE>* ret = new CList<T, COMPARE>(values, count);
-		if (ret) {
-			if (ret->m_count > 0) {
-				return ret;
-			}
-			delete ret;
-		}
-	} else {
-		return new CList<T, COMPARE>;
-	}
-	return sl_null;
-}
-
-template <class T, class COMPARE>
+template <class T>
 template <class _T>
-CList<T, COMPARE>* CList<T, COMPARE>::createFromElements(const _T* values, sl_size count)
+CList<T>* CList<T>::createFromElements(const _T* values, sl_size count)
 {
 	if (count > 0) {
-		CList<T, COMPARE>* ret = new CList<T, COMPARE>(values, count);
+		CList<T>* ret = new CList<T>(values, count);
 		if (ret) {
 			if (ret->m_count > 0) {
 				return ret;
@@ -957,30 +765,24 @@ CList<T, COMPARE>* CList<T, COMPARE>::createFromElements(const _T* values, sl_si
 			delete ret;
 		}
 	} else {
-		return new CList<T, COMPARE>;
+		return new CList<T>;
 	}
 	return sl_null;
 }
 
-template <class T, class COMPARE>
-CList<T, COMPARE>* CList<T, COMPARE>::createFromArray(const Array<T, COMPARE>& array)
+template <class T>
+template <class _T>
+CList<T>* CList<T>::createFromArray(const Array<_T>& array)
 {
 	return createFromElements(array.getData(), array.getCount());
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-CList<T, COMPARE>* CList<T, COMPARE>::createFromArray(const Array<_T, _COMPARE>& array)
+template <class T>
+CList<T>* CList<T>::createFromElement(const T& value)
 {
-	return createFromElements(array.getData(), array.getCount());
-}
-
-template <class T, class COMPARE>
-CList<T, COMPARE>* CList<T, COMPARE>::createFromElement(const T& value)
-{
-	CList<T, COMPARE>* ret = create(0, 1);
+	CList<T>* ret = new CList<T>(&value, 1);
 	if (ret) {
-		if (ret->add_NoLock(value)) {
+		if (ret->m_count > 0) {
 			return ret;
 		}
 		delete ret;
@@ -988,8 +790,9 @@ CList<T, COMPARE>* CList<T, COMPARE>::createFromElement(const T& value)
 	return sl_null;
 }
 
-template <class T, class COMPARE>
-CList<T, COMPARE>* CList<T, COMPARE>::createCopy(CList<T, COMPARE>* other)
+template <class T>
+template <class _T>
+CList<T>* CList<T>::createCopy(CList<_T>* other)
 {
 	if (other) {
 		return createFromElements(other->getData(), other->getCount());
@@ -997,36 +800,26 @@ CList<T, COMPARE>* CList<T, COMPARE>::createCopy(CList<T, COMPARE>* other)
 	return sl_null;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-CList<T, COMPARE>* CList<T, COMPARE>::createCopy(CList<_T, _COMPARE>* other)
-{
-	if (other) {
-		return createFromElements(other->getData(), other->getCount());
-	}
-	return sl_null;
-}
-
-template <class T, class COMPARE>
-SLIB_INLINE sl_size CList<T, COMPARE>::getCount() const
+template <class T>
+SLIB_INLINE sl_size CList<T>::getCount() const
 {
 	return m_count;
 }
 
-template <class T, class COMPARE>
-SLIB_INLINE sl_size CList<T, COMPARE>::getCapacity() const
+template <class T>
+SLIB_INLINE sl_size CList<T>::getCapacity() const
 {
 	return m_capacity;
 }
 
-template <class T, class COMPARE>
-SLIB_INLINE T* CList<T, COMPARE>::getData() const
+template <class T>
+SLIB_INLINE T* CList<T>::getData() const
 {
 	return m_data;
 }
 
-template <class T, class COMPARE>
-T* CList<T, COMPARE>::getItemPtr(sl_size index) const
+template <class T>
+T* CList<T>::getPointerAt(sl_size index) const
 {
 	if (index < m_count) {
 		return m_data + index;
@@ -1034,8 +827,8 @@ T* CList<T, COMPARE>::getItemPtr(sl_size index) const
 	return sl_null;
 }
 
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::getItem_NoLock(sl_size index, T* _out) const
+template <class T>
+sl_bool CList<T>::getAt_NoLock(sl_size index, T* _out) const
 {
 	if (index < m_count) {
 		if (_out) {
@@ -1046,15 +839,42 @@ sl_bool CList<T, COMPARE>::getItem_NoLock(sl_size index, T* _out) const
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::getItem(sl_size index, T* _out) const
+template <class T>
+sl_bool CList<T>::getAt(sl_size index, T* _out) const
 {
 	ObjectLocker lock(this);
-	return getItem_NoLock(index, _out);
+	if (index < m_count) {
+		if (_out) {
+			*_out = m_data[index];
+		}
+		return sl_true;
+	}
+	return sl_false;
 }
 
-template <class T, class COMPARE>
-T CList<T, COMPARE>::getItemValue_NoLock(sl_size index, const T& def) const
+template <class T>
+T CList<T>::getValueAt_NoLock(sl_size index) const
+{
+	if (index < m_count) {
+		return m_data[index];
+	} else {
+		return T();
+	}
+}
+
+template <class T>
+T CList<T>::getValueAt(sl_size index) const
+{
+	ObjectLocker lock(this);
+	if (index < m_count) {
+		return m_data[index];
+	} else {
+		return T();
+	}
+}
+
+template <class T>
+T CList<T>::getValueAt_NoLock(sl_size index, const T& def) const
 {
 	if (index < m_count) {
 		return m_data[index];
@@ -1062,15 +882,18 @@ T CList<T, COMPARE>::getItemValue_NoLock(sl_size index, const T& def) const
 	return def;
 }
 
-template <class T, class COMPARE>
-T CList<T, COMPARE>::getItemValue(sl_size index, const T& def) const
+template <class T>
+T CList<T>::getValueAt(sl_size index, const T& def) const
 {
 	ObjectLocker lock(this);
-	return getItemValue_NoLock(index, def);
+	if (index < m_count) {
+		return m_data[index];
+	}
+	return def;
 }
 
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::setItem_NoLock(sl_size index, const T& value) const
+template <class T>
+sl_bool CList<T>::setAt_NoLock(sl_size index, const T& value) const
 {
 	if (index < m_count) {
 		m_data[index] = value;
@@ -1079,70 +902,57 @@ sl_bool CList<T, COMPARE>::setItem_NoLock(sl_size index, const T& value) const
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::setItem(sl_size index, const T& value) const
+template <class T>
+sl_bool CList<T>::setAt(sl_size index, const T& value) const
 {
 	ObjectLocker lock(this);
-	return setItem_NoLock(index, value);
-}
-
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::setCount_NoLock(sl_size count)
-{
-	return _setCountInner(count);
-}
-
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::setCount(sl_size count)
-{
-	ObjectLocker lock(this);
-	return setCount_NoLock(count);
-}
-
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::insert_NoLock(sl_size index, const T* values, sl_size count)
-{
-	if (count == 0) {
-		return sl_true;
-	}
-	sl_size oldCount = m_count;
-	if (_setCountInner(oldCount + count)) {
-		if (index < oldCount) {
-			{
-				T* dst = m_data + m_count - 1;
-				const T* src = m_data + oldCount - 1;
-				sl_size n = oldCount - index;
-				while (n) {
-					*(dst--) = *(src--);
-					n--;
-				}
-			}
-			{
-				T* dst = m_data + index;
-				const T* src = values;
-				sl_size n = count;
-				while (n) {
-					*(dst++) = *(src++);
-					n--;
-				}
-			}
-		} else {
-			T* dst = m_data + oldCount;
-			const T* src = values;
-			sl_size n = count;
-			while (n) {
-				*(dst++) = *(src++);
-				n--;
-			}
-		}
+	if (index < m_count) {
+		m_data[index] = value;
 		return sl_true;
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
+template <class T>
+SLIB_INLINE T const& CList<T>::operator[](sl_size_t index) const
+{
+	return m_data[index];
+}
+
+template <class T>
+SLIB_INLINE T& CList<T>::operator[](sl_size_t index)
+{
+	return m_data[index];
+}
+
+template <class T>
+sl_bool CList<T>::setCount_NoLock(sl_size count)
+{
+	return _setCountInner(count);
+}
+
+template <class T>
+sl_bool CList<T>::setCount(sl_size count)
+{
+	ObjectLocker lock(this);
+	return setCount_NoLock(count);
+}
+
+template <class T>
+sl_bool CList<T>::insert_NoLock(sl_size index, const T& value)
+{
+	return insertElements_NoLock(index, &value, 1);
+}
+
+template <class T>
+sl_bool CList<T>::insert(sl_size index, const T& value)
+{
+	return insertElements(index, &value, 1);
+}
+
+template <class T>
 template <class _T>
-sl_bool CList<T, COMPARE>::insert_NoLock(sl_size index, const _T* values, sl_size count)
+sl_bool CList<T>::insertElements_NoLock(sl_size index, const _T* values, sl_size count)
 {
 	if (count == 0) {
 		return sl_true;
@@ -1182,73 +992,20 @@ sl_bool CList<T, COMPARE>::insert_NoLock(sl_size index, const _T* values, sl_siz
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::insert(sl_size index, const T* values, sl_size count)
-{
-	if (count == 0) {
-		return sl_true;
-	}
-	ObjectLocker lock(this);
-	return insert_NoLock(index, values, count);
-}
-
-template <class T, class COMPARE>
+template <class T>
 template <class _T>
-sl_bool CList<T, COMPARE>::insert(sl_size index, const _T* values, sl_size count)
+sl_bool CList<T>::insertElements(sl_size index, const _T* values, sl_size count)
 {
 	if (count == 0) {
 		return sl_true;
 	}
 	ObjectLocker lock(this);
-	return insert_NoLock(index, values, count);
+	return insertElements_NoLock(index, values, count);
 }
 
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::insertAll(sl_size index, const CList<T, COMPARE>* other)
-{
-	if (!other) {
-		return sl_true;
-	}
-	if (this == other) {
-		return sl_false;
-	}
-	ObjectLocker lock(this, other);
-	sl_size count = other->getCount();
-	if (count == 0) {
-		return sl_true;
-	}
-	T* otherData = other->getData();
-	sl_size oldCount = m_count;
-	if (_setCountInner(oldCount + count)) {
-		if (index < oldCount) {
-			T* dst = m_data + m_count - 1;
-			T* src = m_data + oldCount - 1;
-			sl_size n = oldCount - index;
-			while (n) {
-				*(dst--) = *(src--);
-				n--;
-			}
-			dst = m_data + index;
-			for (sl_size i = 0; i < count; i++) {
-				*(dst++) = otherData[i];
-			}
-		} else {
-			T* dst = m_data + oldCount;
-			const T* src = otherData;
-			sl_size n = count;
-			while (n) {
-				*(dst++) = *(src++);
-				n--;
-			}
-		}
-		return sl_true;
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool CList<T, COMPARE>::insertAll(sl_size index, const CList<_T, _COMPARE>* other)
+template <class T>
+template <class _T>
+sl_bool CList<T>::insertAll(sl_size index, const CList<_T>* other)
 {
 	if (!other) {
 		return sl_true;
@@ -1290,41 +1047,32 @@ sl_bool CList<T, COMPARE>::insertAll(sl_size index, const CList<_T, _COMPARE>* o
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::insert_NoLock(sl_size index, const T& value)
+template <class T>
+sl_bool CList<T>::add_NoLock(const T& value)
 {
-	return insert_NoLock(index, &value, 1);
-}
-
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::insert(sl_size index, const T& value)
-{
-	return insert(index, &value, 1);
-}
-
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::add_NoLock(const T* values, sl_size count)
-{
-	if (count == 0) {
-		return sl_true;
-	}
 	sl_size oldCount = m_count;
-	if (_setCountInner(oldCount + count)) {
-		T* dst = m_data + oldCount;
-		const T* src = values;
-		sl_size n = count;
-		while (n) {
-			*(dst++) = *(src++);
-			n--;
+	if (oldCount < m_capacity) {
+		m_count++;
+		new (m_data + oldCount) T(value);
+	} else {
+		if (!(_setCountInner(oldCount + 1))) {
+			return sl_false;
 		}
-		return sl_true;
+		m_data[oldCount] = value;
 	}
-	return sl_false;
+	return sl_true;
 }
 
-template <class T, class COMPARE>
+template <class T>
+sl_bool CList<T>::add(const T& value)
+{
+	ObjectLocker lock(this);
+	return add_NoLock(value);
+}
+
+template <class T>
 template <class _T>
-sl_bool CList<T, COMPARE>::add_NoLock(const _T* values, sl_size count)
+sl_bool CList<T>::addElements_NoLock(const _T* values, sl_size count)
 {
 	if (count == 0) {
 		return sl_true;
@@ -1343,29 +1091,20 @@ sl_bool CList<T, COMPARE>::add_NoLock(const _T* values, sl_size count)
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::add(const T* values, sl_size count)
-{
-	if (count == 0) {
-		return sl_true;
-	}
-	ObjectLocker lock(this);
-	return add_NoLock(values, count);
-}
-
-template <class T, class COMPARE>
+template <class T>
 template <class _T>
-sl_bool CList<T, COMPARE>::add(const _T* values, sl_size count)
+sl_bool CList<T>::addElements(const _T* values, sl_size count)
 {
 	if (count == 0) {
 		return sl_true;
 	}
 	ObjectLocker lock(this);
-	return add_NoLock(values, count);
+	return addElements_NoLock(values, count);
 }
 
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::addAll(const CList<T, COMPARE>* other)
+template <class T>
+template <class _T>
+sl_bool CList<T>::addAll_NoLock(const CList<_T>* other)
 {
 	if (!other) {
 		return sl_true;
@@ -1373,34 +1112,6 @@ sl_bool CList<T, COMPARE>::addAll(const CList<T, COMPARE>* other)
 	if (this == other) {
 		return sl_false;
 	}
-	ObjectLocker lock(this, other);
-	sl_size count = other->getCount();
-	if (count == 0) {
-		return sl_true;
-	}
-	T* otherData = other->getData();
-	sl_size oldCount = m_count;
-	if (_setCountInner(oldCount + count)) {
-		T* dst = m_data + oldCount;
-		for (sl_size i = 0; i < count; i++) {
-			*(dst++) = otherData[i];
-		}
-		return sl_true;
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool CList<T, COMPARE>::addAll(const CList<_T, _COMPARE>* other)
-{
-	if (!other) {
-		return sl_true;
-	}
-	if (this == other) {
-		return sl_false;
-	}
-	ObjectLocker lock(this, other);
 	sl_size count = other->getCount();
 	if (count == 0) {
 		return sl_true;
@@ -1417,78 +1128,44 @@ sl_bool CList<T, COMPARE>::addAll(const CList<_T, _COMPARE>* other)
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::add_NoLock(const T& value)
-{
-	sl_size oldCount = m_count;
-	if (oldCount < m_capacity) {
-		m_count++;
-		new (m_data + oldCount) T(value);
-	} else {
-		if (!(_setCountInner(oldCount + 1))) {
-			return sl_false;
-		}
-		m_data[oldCount] = value;
-	}
-	return sl_true;
-}
-
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::add(const T& value)
-{
-	ObjectLocker lock(this);
-	return add_NoLock(value);
-}
-
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool CList<T, COMPARE>::addIfNotExistT_NoLock(const _T& value)
-{
-	if (indexOfT_NoLock<_T, _COMPARE>(value) < 0) {
-		return add_NoLock(value);
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool CList<T, COMPARE>::addIfNotExistT(const _T& value)
-{
-	ObjectLocker lock(this);
-	return addIfNotExistT_NoLock<_T, _COMPARE>(value);
-}
-
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::addIfNotExist_NoLock(const T& value)
-{
-	if (indexOf_NoLock(value) < 0) {
-		return add_NoLock(value);
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::addIfNotExist(const T& value)
-{
-	ObjectLocker lock(this);
-	return addIfNotExist_NoLock(value);
-}
-
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::add_NoLock(const Iterator<T>& iterator)
-{
-	T value;
-	while (iterator.next(&value)) {
-		if (!(add_NoLock(value))) {
-			return sl_false;
-		}
-	}
-	return sl_true;
-}
-
-template <class T, class COMPARE>
+template <class T>
 template <class _T>
-sl_bool CList<T, COMPARE>::add_NoLock(const Iterator<_T>& iterator)
+sl_bool CList<T>::addAll(const CList<_T>* other)
+{
+	if (!other) {
+		return sl_true;
+	}
+	if (this == other) {
+		return sl_false;
+	}
+	ObjectLocker lock(this, other);
+	return addAll_NoLock(other);
+}
+
+template <class T>
+template <class _T, class EQUALS>
+sl_bool CList<T>::addIfNotExist_NoLock(const _T& value, const EQUALS& equals)
+{
+	if (indexOf_NoLock(value, 0, equals) < 0) {
+		return add_NoLock(value);
+	}
+	return sl_false;
+}
+
+template <class T>
+template <class _T, class EQUALS>
+sl_bool CList<T>::addIfNotExist(const _T& value, const EQUALS& equals)
+{
+	ObjectLocker lock(this);
+	if (indexOf_NoLock(value, 0, equals) < 0) {
+		return add_NoLock(value);
+	}
+	return sl_false;
+}
+
+template <class T>
+template <class _T>
+sl_bool CList<T>::addAll_NoLock(const Iterator<_T>& iterator)
 {
 	_T value;
 	while (iterator.next(&value)) {
@@ -1499,83 +1176,78 @@ sl_bool CList<T, COMPARE>::add_NoLock(const Iterator<_T>& iterator)
 	return sl_true;
 }
 
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::add(const Iterator<T>& iterator)
-{
-	ObjectLocker lock(this);
-	return add_NoLock(iterator);
-}
-
-template <class T, class COMPARE>
+template <class T>
 template <class _T>
-sl_bool CList<T, COMPARE>::add(const Iterator<_T>& iterator)
+sl_bool CList<T>::addAll(const Iterator<_T>& iterator)
 {
 	ObjectLocker lock(this);
-	return add_NoLock(iterator);
+	return addAll_NoLock(iterator);
 }
 
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::removeAt_NoLock(sl_size index, T* outValue)
+template <class T>
+sl_bool CList<T>::removeAt_NoLock(sl_size index, T* outValue)
 {
-	if (index < m_count) {
+	sl_size total = m_count;
+	if (index < total) {
 		T* m = m_data + index;
 		if (outValue) {
 			*outValue = *m;
 		}
-		sl_size n = m_count - index - 1;
+		sl_size n = total - index - 1;
 		while (n) {
 			*(m) = *(m+1);
 			n--;
 			m++;
 		}
-		_setCountInner(m_count - 1);
+		_setCountInner(total - 1);
 		return sl_true;
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::removeAt(sl_size index, T* outValue)
+template <class T>
+sl_bool CList<T>::removeAt(sl_size index, T* outValue)
 {
 	ObjectLocker lock(this);
 	return removeAt_NoLock(index, outValue);
 }
 
-template <class T, class COMPARE>
-sl_size CList<T, COMPARE>::remove_NoLock(sl_size index, sl_size count)
+template <class T>
+sl_size CList<T>::removeRange_NoLock(sl_size index, sl_size count)
 {
-	if (index < m_count && count > 0) {
-		if (count > m_count - index) {
-			count = m_count - index;
+	sl_size total = m_count;
+	if (index < total && count > 0) {
+		if (count > total - index) {
+			count = total - index;
 		}
 		T* dst = m_data + index;
 		T* src = dst + count;
-		sl_size n = m_count - index - count;
+		sl_size n = total - index - count;
 		while (n) {
 			*(dst++) = *(src++);
 			n--;
 		}
-		_setCountInner(m_count - count);
+		_setCountInner(total - count);
 		return count;
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-sl_size CList<T, COMPARE>::remove(sl_size index, sl_size count)
+template <class T>
+sl_size CList<T>::removeRange(sl_size index, sl_size count)
 {
 	ObjectLocker lock(this);
-	return remove_NoLock(index, count);
+	return removeRange_NoLock(index, count);
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool CList<T, COMPARE>::removeValueT_NoLock(const _T& value, T* outValue)
+template <class T>
+template <class _T, class EQUALS>
+sl_bool CList<T>::removeValue_NoLock(const _T& value, T* outValue, const EQUALS& equals)
 {
 	if (m_data) {
 		sl_size n = m_count;
-		for (sl_size i = 0; i < n;) {
-			if (_COMPARE::equals(m_data[i], value)) {
+		for (sl_size i = 0; i < n; i++) {
+			if (equals(m_data[i], value)) {
 				if (outValue) {
 					*outValue = m_data[i];
 				}
@@ -1584,30 +1256,28 @@ sl_bool CList<T, COMPARE>::removeValueT_NoLock(const _T& value, T* outValue)
 				}
 				_setCountInner(n - 1);
 				return sl_true;
-			} else {
-				i++;
 			}
 		}
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool CList<T, COMPARE>::removeValueT(const _T& value, T* outValue)
+template <class T>
+template <class _T, class EQUALS>
+sl_bool CList<T>::removeValue(const _T& value, T* outValue, const EQUALS& equals)
 {
 	ObjectLocker lock(this);
-	return removeValueT_NoLock<_T, _COMPARE>(value, outValue);
+	return removeValue_NoLock(value, outValue, equals);
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_size CList<T, COMPARE>::removeValuesT_NoLock(const _T& value, List<T, COMPARE>* outValues)
+template <class T>
+template <class _T, class EQUALS>
+sl_size CList<T>::removeElementsByValue_NoLock(const _T& value, List<T>* outValues, const EQUALS& equals)
 {
 	if (m_data) {
 		sl_size n = m_count;
 		for (sl_size i = 0; i < n;) {
-			if (_COMPARE::equals(m_data[i], value)) {
+			if (equals(m_data[i], value)) {
 				if (outValues) {
 					outValues->add_NoLock(m_data[i]);
 				}
@@ -1627,57 +1297,31 @@ sl_size CList<T, COMPARE>::removeValuesT_NoLock(const _T& value, List<T, COMPARE
 	return 0;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_size CList<T, COMPARE>::removeValuesT(const _T& value, List<T, COMPARE>* outValues)
+template <class T>
+template <class _T, class EQUALS>
+sl_size CList<T>::removeElementsByValue(const _T& value, List<T>* outValues, const EQUALS& equals)
 {
 	ObjectLocker lock(this);
-	return removeValuesT_NoLock<_T, _COMPARE>(value, outValues);
+	return removeElementsByValue_NoLock(value, outValues, equals);
 }
 
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::removeValue_NoLock(const T& value)
-{
-	return removeValueT_NoLock<T, COMPARE>(value);
-}
-
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::removeValue(const T& value)
-{
-	ObjectLocker lock(this);
-	return removeValueT_NoLock<T, COMPARE>(value);
-}
-
-template <class T, class COMPARE>
-sl_size CList<T, COMPARE>::removeValues_NoLock(const T& value)
-{
-	return removeValuesT_NoLock<T, COMPARE>(value);
-}
-
-template <class T, class COMPARE>
-sl_size CList<T, COMPARE>::removeValues(const T& value)
-{
-	ObjectLocker lock(this);
-	return removeValuesT_NoLock<T, COMPARE>(value);
-}
-
-template <class T, class COMPARE>
-sl_size CList<T, COMPARE>::removeAll_NoLock()
+template <class T>
+sl_size CList<T>::removeAll_NoLock()
 {
 	sl_size count = m_count;
 	_setCountInner(0);
 	return count;
 }
 
-template <class T, class COMPARE>
-sl_size CList<T, COMPARE>::removeAll()
+template <class T>
+sl_size CList<T>::removeAll()
 {
 	ObjectLocker lock(this);
 	return removeAll_NoLock();
 }
 
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::popFront_NoLock(T* _out)
+template <class T>
+sl_bool CList<T>::popFront_NoLock(T* _out)
 {
 	sl_size n = m_count;
 	if (n > 0) {
@@ -1696,15 +1340,15 @@ sl_bool CList<T, COMPARE>::popFront_NoLock(T* _out)
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::popFront(T* _out)
+template <class T>
+sl_bool CList<T>::popFront(T* _out)
 {
 	ObjectLocker lock(this);
 	return popFront_NoLock(_out);
 }
 
-template <class T, class COMPARE>
-sl_size CList<T, COMPARE>::popFront_NoLock(sl_size count)
+template <class T>
+sl_size CList<T>::popFrontElements_NoLock(sl_size count)
 {
 	sl_size n = m_count;
 	if (n > 0 && count > 0) {
@@ -1725,15 +1369,15 @@ sl_size CList<T, COMPARE>::popFront_NoLock(sl_size count)
 	return 0;
 }
 
-template <class T, class COMPARE>
-sl_size CList<T, COMPARE>::popFront(sl_size count)
+template <class T>
+sl_size CList<T>::popFrontElements(sl_size count)
 {
 	ObjectLocker lock(this);
-	return popFront_NoLock(count);
+	return popFrontElements_NoLock(count);
 }
 
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::popBack_NoLock(T* _out)
+template <class T>
+sl_bool CList<T>::popBack_NoLock(T* _out)
 {
 	sl_size n = m_count;
 	if (n > 0) {
@@ -1745,15 +1389,15 @@ sl_bool CList<T, COMPARE>::popBack_NoLock(T* _out)
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::popBack(T* _out)
+template <class T>
+sl_bool CList<T>::popBack(T* _out)
 {
 	ObjectLocker lock(this);
 	return popBack_NoLock(_out);
 }
 
-template <class T, class COMPARE>
-sl_size CList<T, COMPARE>::popBack_NoLock(sl_size count)
+template <class T>
+sl_size CList<T>::popBackElements_NoLock(sl_size count)
 {
 	sl_size n = m_count;
 	if (n > 0 && count > 0) {
@@ -1767,23 +1411,23 @@ sl_size CList<T, COMPARE>::popBack_NoLock(sl_size count)
 	return 0;
 }
 
-template <class T, class COMPARE>
-sl_size CList<T, COMPARE>::popBack(sl_size count)
+template <class T>
+sl_size CList<T>::popBackElements(sl_size count)
 {
 	ObjectLocker lock(this);
-	return popBack_NoLock(count);
+	return popBackElements_NoLock(count);
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_reg CList<T, COMPARE>::indexOfT_NoLock(const _T& value, sl_reg start) const
+template <class T>
+template <class _T, class EQUALS>
+sl_reg CList<T>::indexOf_NoLock(const _T& value, sl_reg start, const EQUALS& equals) const
 {
 	sl_reg ret = -1;
 	if (start < 0) {
 		start = 0;
 	}
 	for (sl_size i = start; i < m_count; i++) {
-		if (_COMPARE::equals(m_data[i], value)) {
+		if (equals(m_data[i], value)) {
 			ret = i;
 			break;
 		}
@@ -1791,37 +1435,24 @@ sl_reg CList<T, COMPARE>::indexOfT_NoLock(const _T& value, sl_reg start) const
 	return ret;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_reg CList<T, COMPARE>::indexOfT(const _T& value, sl_reg start) const
+template <class T>
+template <class _T, class EQUALS>
+sl_reg CList<T>::indexOf(const _T& value, sl_reg start, const EQUALS& equals) const
 {
 	ObjectLocker lock(this);
-	return indexOfT_NoLock<_T, _COMPARE>(value, start);
+	return indexOf_NoLock(value, start, equals);
 }
 
-template <class T, class COMPARE>
-sl_reg CList<T, COMPARE>::indexOf_NoLock(const T& value, sl_reg start) const
-{
-	return indexOfT_NoLock<T, COMPARE>(value, start);
-}
-
-template <class T, class COMPARE>
-sl_reg CList<T, COMPARE>::indexOf(const T& value, sl_reg start) const
-{
-	ObjectLocker lock(this);
-	return indexOfT_NoLock<T, COMPARE>(value, start);
-}
-
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_reg CList<T, COMPARE>::lastIndexOfT_NoLock(const _T& value, sl_reg start) const
+template <class T>
+template <class _T, class EQUALS>
+sl_reg CList<T>::lastIndexOf_NoLock(const _T& value, sl_reg start, const EQUALS& equals) const
 {
 	sl_reg ret = -1;
 	if (start < 0 || start >= (sl_reg)m_count) {
 		start = m_count - 1;
 	}
 	for (sl_reg i = start; i >= 0; i--) {
-		if (_COMPARE::equals(m_data[i], value)) {
+		if (equals(m_data[i], value)) {
 			ret = i;
 			break;
 		}
@@ -1829,55 +1460,30 @@ sl_reg CList<T, COMPARE>::lastIndexOfT_NoLock(const _T& value, sl_reg start) con
 	return ret;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_reg CList<T, COMPARE>::lastIndexOfT(const _T& value, sl_reg start) const
+template <class T>
+template <class _T, class EQUALS>
+sl_reg CList<T>::lastIndexOf(const _T& value, sl_reg start, const EQUALS& equals) const
 {
 	ObjectLocker lock(this);
-	return lastIndexOfT_NoLock<_T, _COMPARE>(value, start);
+	return lastIndexOf_NoLock(value, start, equals);
 }
 
-template <class T, class COMPARE>
-sl_reg CList<T, COMPARE>::lastIndexOf_NoLock(const T& value, sl_reg start) const
+template <class T>
+template <class _T, class EQUALS>
+sl_bool CList<T>::contains_NoLock(const _T& value, const EQUALS& equals) const
 {
-	return lastIndexOfT_NoLock<T, COMPARE>(value, start);
+	return indexOf_NoLock(value, equals) >= 0;
 }
 
-template <class T, class COMPARE>
-sl_reg CList<T, COMPARE>::lastIndexOf(const T& value, sl_reg start) const
+template <class T>
+template <class _T, class EQUALS>
+sl_bool CList<T>::contains(const _T& value, const EQUALS& equals) const
 {
-	ObjectLocker lock(this);
-	return lastIndexOfT_NoLock<T, COMPARE>(value, start);
+	return indexOf(value, equals) >= 0;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool CList<T, COMPARE>::containsT_NoLock(const _T& value) const
-{
-	return indexOfT_NoLock<_T, _COMPARE>(value) >= 0;
-}
-
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool CList<T, COMPARE>::containsT(const _T& value) const
-{
-	return indexOfT<_T, _COMPARE>(value) >= 0;
-}
-
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::contains_NoLock(const T& value) const
-{
-	return indexOfT_NoLock<T, COMPARE>(value) >= 0;
-}
-
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::contains(const T& value) const
-{
-	return indexOfT<T, COMPARE>(value) >= 0;
-}
-
-template <class T, class COMPARE>
-CList<T, COMPARE>* CList<T, COMPARE>::duplicate_NoLock() const
+template <class T>
+CList<T>* CList<T>::duplicate_NoLock() const
 {
 	if (m_count > 0) {
 		return createFromElements(m_data, m_count);
@@ -1885,93 +1491,83 @@ CList<T, COMPARE>* CList<T, COMPARE>::duplicate_NoLock() const
 	return sl_null;
 }
 
-template <class T, class COMPARE>
-CList<T, COMPARE>* CList<T, COMPARE>::duplicate() const
+template <class T>
+CList<T>* CList<T>::duplicate() const
 {
 	ObjectLocker lock(this);
 	return duplicate_NoLock();
 }
 
-template <class T, class COMPARE>
-Array<T, COMPARE> CList<T, COMPARE>::toArray_NoLock() const
+template <class T>
+Array<T> CList<T>::toArray_NoLock() const
 {
-	return Array<T, COMPARE>::create(m_data, m_count);
+	return Array<T>::create(m_data, m_count);
 }
 
-template <class T, class COMPARE>
-Array<T, COMPARE> CList<T, COMPARE>::toArray() const
+template <class T>
+Array<T> CList<T>::toArray() const
 {
 	ObjectLocker lock(this);
 	return toArray_NoLock();
 }
 
-template <class T, class COMPARE>
-template <class _COMPARE>
-void CList<T, COMPARE>::sortBy_NoLock(sl_bool flagAscending) const
+template <class T>
+template <class COMPARE>
+void CList<T>::sort_NoLock(sl_bool flagAscending, const COMPARE& compare) const
 {
-	QuickSort<T, _COMPARE>::sort(m_data, m_count, flagAscending);
+	QuickSort::sort(m_data, m_count, flagAscending, compare);
 }
 
-template <class T, class COMPARE>
-template <class _COMPARE>
-void CList<T, COMPARE>::sortBy(sl_bool flagAscending) const
-{
-	ObjectLocker lock(this);
-	QuickSort<T, _COMPARE>::sort(m_data, m_count, flagAscending);
-}
-
-template <class T, class COMPARE>
-void CList<T, COMPARE>::sort_NoLock(sl_bool flagAscending) const
-{
-	QuickSort<T, COMPARE>::sort(m_data, m_count, flagAscending);
-}
-
-template <class T, class COMPARE>
-void CList<T, COMPARE>::sort(sl_bool flagAscending) const
+template <class T>
+template <class COMPARE>
+void CList<T>::sort(sl_bool flagAscending, const COMPARE& compare) const
 {
 	ObjectLocker lock(this);
-	QuickSort<T, COMPARE>::sort(m_data, m_count, flagAscending);
+	QuickSort::sort(m_data, m_count, flagAscending, compare);
 }
 
-template <class T, class COMPARE>
-SLIB_INLINE Iterator<T> CList<T, COMPARE>::iterator() const
+template <class T>
+Iterator<T> CList<T>::toIterator() const
 {
-	return new ListIterator<T, COMPARE>(this, sl_null);
+	return new ListIterator<T>(this, sl_null);
 }
 
-template <class T, class COMPARE>
-SLIB_INLINE T* CList<T, COMPARE>::begin()
+template <class T>
+SLIB_INLINE T* CList<T>::begin()
 {
 	return m_data;
 }
 
-template <class T, class COMPARE>
-SLIB_INLINE T const* CList<T, COMPARE>::begin() const
+template <class T>
+SLIB_INLINE T const* CList<T>::begin() const
 {
 	return m_data;
 }
 
-template <class T, class COMPARE>
-SLIB_INLINE T* CList<T, COMPARE>::end()
+template <class T>
+SLIB_INLINE T* CList<T>::end()
 {
 	return m_data + m_count;
 }
 
-template <class T, class COMPARE>
-SLIB_INLINE T const* CList<T, COMPARE>::end() const
+template <class T>
+SLIB_INLINE T const* CList<T>::end() const
 {
 	return m_data + m_count;
 }
 
-template <class T, class COMPARE>
-sl_bool CList<T, COMPARE>::_setCountInner(sl_size count)
+template <class T>
+sl_bool CList<T>::_setCountInner(sl_size count)
 {
 	sl_size oldCount = m_count;
 	if (oldCount == count) {
 		return sl_true;
 	}
 	if (count < oldCount) {
-		New<T>::destructor(m_data + count, oldCount - count);
+		T* data = m_data;
+		for (sl_size i = count; i < oldCount; i++) {
+			(data+i)->~T();
+		}
 		m_count = count;
 	}
 	if (m_capacity < count) {
@@ -2021,11 +1617,11 @@ sl_bool CList<T, COMPARE>::_setCountInner(sl_size count)
 }
 
 
-template <class T, class COMPARE>
-SLIB_INLINE ListPosition<T, COMPARE>::ListPosition() {};
+template <class T>
+SLIB_INLINE ListPosition<T>::ListPosition() {};
 
-template <class T, class COMPARE>
-SLIB_INLINE ListPosition<T, COMPARE>::ListPosition(const Ref< CList<T, COMPARE> >& list) : ref(list)
+template <class T>
+SLIB_INLINE ListPosition<T>::ListPosition(const Ref< CList<T> >& list) : ref(list)
 {
 	if (list.isNotNull()) {
 		data = list->getData();
@@ -2036,26 +1632,26 @@ SLIB_INLINE ListPosition<T, COMPARE>::ListPosition(const Ref< CList<T, COMPARE> 
 	}
 }
 
-template <class T, class COMPARE>
-ListPosition<T, COMPARE>::ListPosition(const ListPosition<T, COMPARE>& other) = default;
+template <class T>
+ListPosition<T>::ListPosition(const ListPosition<T>& other) = default;
 
-template <class T, class COMPARE>
-ListPosition<T, COMPARE>::ListPosition(ListPosition<T, COMPARE>&& other) = default;
+template <class T>
+ListPosition<T>::ListPosition(ListPosition<T>&& other) = default;
 
-template <class T, class COMPARE>
-SLIB_INLINE T& ListPosition<T, COMPARE>::operator*()
+template <class T>
+SLIB_INLINE T& ListPosition<T>::operator*()
 {
 	return *data;
 }
 
-template <class T, class COMPARE>
-SLIB_INLINE sl_bool ListPosition<T, COMPARE>::operator!=(const ListPosition<T, COMPARE>& other)
+template <class T>
+SLIB_INLINE sl_bool ListPosition<T>::operator!=(const ListPosition<T>& other)
 {
 	return count > 0;
 }
 
-template <class T, class COMPARE>
-SLIB_INLINE ListPosition<T, COMPARE>& ListPosition<T, COMPARE>::operator++()
+template <class T>
+SLIB_INLINE ListPosition<T>& ListPosition<T>::operator++()
 {
 	data++;
 	count--;
@@ -2063,195 +1659,210 @@ SLIB_INLINE ListPosition<T, COMPARE>& ListPosition<T, COMPARE>::operator++()
 }
 
 
-SLIB_DEFINE_TEMPLATE_REF_WRAPPER(List, SafeList, CList, ref)
-
-template <class T, class COMPARE>
-List<T, COMPARE>::List(sl_size count) : ref(CList<T, COMPARE>::create(count))
+template <class T>
+List<T> List<T>::create()
 {
+	return CList<T>::create();
 }
 
-template <class T, class COMPARE>
-List<T, COMPARE>::List(const T* data, sl_size count) : ref(CList<T, COMPARE>::createFromElements(data, count))
+template <class T>
+List<T> List<T>::create(sl_size count)
 {
+	return CList<T>::create(count);
 }
 
-template <class T, class COMPARE>
+template <class T>
+List<T> List<T>::create(sl_size count, sl_size capacity)
+{
+	return CList<T>::create(count, capacity);
+}
+
+template <class T>
 template <class _T>
-List<T, COMPARE>::List(const _T* data, sl_size count) : ref(CList<T, COMPARE>::createFromElements(data, count))
+List<T> List<T>::createFromElements(const _T* values, sl_size count)
 {
+	return CList<T>::createFromElements(values, count);
 }
 
-template <class T, class COMPARE>
-template <class _COMPARE>
-SLIB_INLINE const List<T, COMPARE>& List<T, COMPARE>::from(const List<T, _COMPARE>& other)
-{
-	return *((List<T, COMPARE>*)((void*)&other));
-}
-
-template <class T, class COMPARE>
-List<T, COMPARE> List<T, COMPARE>::create()
-{
-	return CList<T, COMPARE>::create();
-}
-
-template <class T, class COMPARE>
-List<T, COMPARE> List<T, COMPARE>::create(sl_size count)
-{
-	return CList<T, COMPARE>::create(count);
-}
-
-template <class T, class COMPARE>
-List<T, COMPARE> List<T, COMPARE>::create(sl_size count, sl_size capacity)
-{
-	return CList<T, COMPARE>::create(count, capacity);
-}
-
-template <class T, class COMPARE>
-List<T, COMPARE> List<T, COMPARE>::createFromElements(const T* values, sl_size count)
-{
-	return CList<T, COMPARE>::createFromElements(values, count);
-}
-
-template <class T, class COMPARE>
+template <class T>
 template <class _T>
-List<T, COMPARE> List<T, COMPARE>::createFromElements(const _T* values, sl_size count)
-{
-	return CList<T, COMPARE>::createFromElements(values, count);
-}
-
-template <class T, class COMPARE>
-List<T, COMPARE> List<T, COMPARE>::createFromArray(const Array<T, COMPARE>& array)
+List<T> List<T>::createFromArray(const Array<_T>& array)
 {
 	return createFromElements(array.getData(), array.getCount());
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-List<T, COMPARE> List<T, COMPARE>::createFromArray(const Array<_T, _COMPARE>& array)
+template <class T>
+List<T> List<T>::createFromElement(const T& e)
 {
-	return createFromElements(array.getData(), array.getCount());
+	return CList<T>::createFromElement(e);
 }
 
-template <class T, class COMPARE>
-List<T, COMPARE> List<T, COMPARE>::createFromElement(const T& e)
+template <class T>
+template <class _T>
+List<T> List<T>::createCopy(const List<_T>& other)
 {
-	return CList<T, COMPARE>::createFromElement(e);
+	return CList<T>::createCopy(other.ref._ptr);
 }
 
-template <class T, class COMPARE>
-List<T, COMPARE> List<T, COMPARE>::createCopy(const List<T, COMPARE>& other)
+template <class T>
+SLIB_INLINE sl_size List<T>::getCount() const
 {
-	return CList<T, COMPARE>::createCopy(other.ref.ptr);
-}
-
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-List<T, COMPARE> List<T, COMPARE>::createCopy(const List<_T, _COMPARE>& other)
-{
-	return CList<T, COMPARE>::createCopy(other.ref.ptr);
-}
-
-template <class T, class COMPARE>
-SLIB_INLINE sl_size List<T, COMPARE>::getCount() const
-{
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->getCount();
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-SLIB_INLINE sl_size List<T, COMPARE>::getCapacity() const
+template <class T>
+SLIB_INLINE sl_size List<T>::getCapacity() const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->getCapacity();
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-SLIB_INLINE T* List<T, COMPARE>::getData() const
+template <class T>
+SLIB_INLINE T* List<T>::getData() const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->getData();
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-SLIB_INLINE sl_bool List<T, COMPARE>::isEmpty() const
+template <class T>
+SLIB_INLINE sl_bool List<T>::isEmpty() const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->getCount() == 0;
 	}
 	return sl_true;
 }
 
-template <class T, class COMPARE>
-SLIB_INLINE sl_bool List<T, COMPARE>::isNotEmpty() const
+template <class T>
+SLIB_INLINE sl_bool List<T>::isNotEmpty() const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->getCount() != 0;
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-T* List<T, COMPARE>::getItemPtr(sl_size index) const
+template <class T>
+T* List<T>::getPointerAt(sl_size index) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->getItemPtr(index);
+		return obj->getPointerAt(index);
 	}
 	return sl_null;
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::getItem(sl_size index, T* _out) const
+template <class T>
+sl_bool List<T>::getAt_NoLock(sl_size index, T* _out) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->getItem(index, _out);
+		return obj->getAt_NoLock(index, _out);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-T List<T, COMPARE>::getItemValue(sl_size index, const T& def) const
+template <class T>
+sl_bool List<T>::getAt(sl_size index, T* _out) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->getItemValue(index, def);
+		return obj->getAt(index, _out);
+	}
+	return sl_false;
+}
+
+template <class T>
+T List<T>::getValueAt_NoLock(sl_size index) const
+{
+	CList<T>* obj = ref._ptr;
+	if (obj) {
+		return obj->getValueAt_NoLock(index);
+	} else {
+		return T();
+	}
+}
+
+template <class T>
+T List<T>::getValueAt(sl_size index) const
+{
+	CList<T>* obj = ref._ptr;
+	if (obj) {
+		return obj->getValueAt(index);
+	} else {
+		return T();
+	}
+}
+
+template <class T>
+T List<T>::getValueAt_NoLock(sl_size index, const T& def) const
+{
+	CList<T>* obj = ref._ptr;
+	if (obj) {
+		return obj->getValueAt_NoLock(index, def);
 	}
 	return def;
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::setItem(sl_size index, const T& value) const
+template <class T>
+T List<T>::getValueAt(sl_size index, const T& def) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->setItem(index, value);
+		return obj->getValueAt(index, def);
+	}
+	return def;
+}
+
+template <class T>
+sl_bool List<T>::setAt_NoLock(sl_size index, const T& value) const
+{
+	CList<T>* obj = ref._ptr;
+	if (obj) {
+		return obj->setAt_NoLock(index, value);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::setCount_NoLock(sl_size count)
+template <class T>
+sl_bool List<T>::setAt(sl_size index, const T& value) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
+	if (obj) {
+		return obj->setAt(index, value);
+	}
+	return sl_false;
+}
+
+template <class T>
+SLIB_INLINE T& List<T>::operator[](sl_size_t index) const
+{
+	return (ref->getData())[index];
+}
+
+template <class T>
+sl_bool List<T>::setCount_NoLock(sl_size count)
+{
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->setCount_NoLock(count);
 	} else {
 		if (count == 0) {
 			return sl_true;
 		}
-		obj = CList<T, COMPARE>::create();
+		obj = CList<T>::create();
 		if (obj) {
 			ref = obj;
 			return obj->setCount_NoLock(count);
@@ -2260,17 +1871,17 @@ sl_bool List<T, COMPARE>::setCount_NoLock(sl_size count)
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::setCount(sl_size count)
+template <class T>
+sl_bool List<T>::setCount(sl_size count)
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->setCount(count);
 	} else {
 		if (count == 0) {
 			return sl_true;
 		}
-		obj = CList<T, COMPARE>::create();
+		obj = CList<T>::create();
 		if (obj) {
 			ref = obj;
 			return obj->setCount_NoLock(count);
@@ -2279,872 +1890,612 @@ sl_bool List<T, COMPARE>::setCount(sl_size count)
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::insert_NoLock(sl_size index, const T* values, sl_size count) const
+template <class T>
+sl_bool List<T>::insert_NoLock(sl_size index, const T& value) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->insert_NoLock(index, values, count);
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-template <class _T>
-sl_bool List<T, COMPARE>::insert_NoLock(sl_size index, const _T* values, sl_size count) const
-{
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->insert_NoLock(index, values, count);
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::insert(sl_size index, const T* values, sl_size count) const
-{
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->insert(index, values, count);
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-template <class _T>
-sl_bool List<T, COMPARE>::insert(sl_size index, const _T* values, sl_size count) const
-{
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->insert(index, values, count);
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::insertAll(sl_size index, const List<T, COMPARE>& other) const
-{
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->insertAll(index, other.ref.ptr);
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool List<T, COMPARE>::insertAll(sl_size index, const List<_T, _COMPARE>& other) const
-{
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->insertAll(index, other.ref.ptr);
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::insertAll(sl_size index, const SafeList<T, COMPARE>& other) const
-{
-	return insertAll(index, List<T, COMPARE>(other));
-}
-
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool List<T, COMPARE>::insertAll(sl_size index, const SafeList<_T, _COMPARE>& other) const
-{
-	return insertAll(index, List<_T, _COMPARE>(other));
-}
-
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::insert_NoLock(sl_size index, const T& value) const
-{
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->insert_NoLock(index, value);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::insert(sl_size index, const T& value) const
+template <class T>
+sl_bool List<T>::insert(sl_size index, const T& value) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->insert(index, value);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::add_NoLock(const T* values, sl_size count)
-{
-	if (count == 0) {
-		return sl_true;
-	}
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->add_NoLock(values, count);
-	} else {
-		obj = CList<T, COMPARE>::create();
-		if (obj) {
-			ref = obj;
-			return obj->add_NoLock(values, count);
-		}
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
+template <class T>
 template <class _T>
-sl_bool List<T, COMPARE>::add_NoLock(const _T* values, sl_size count)
+sl_bool List<T>::insertElements_NoLock(sl_size index, const _T* values, sl_size count) const
 {
-	if (count == 0) {
-		return sl_true;
-	}
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->add_NoLock(values, count);
-	} else {
-		obj = CList<T, COMPARE>::create();
-		if (obj) {
-			ref = obj;
-			return obj->add_NoLock(values, count);
-		}
+		return obj->insertElements_NoLock(index, values, count);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::add(const T* values, sl_size count)
-{
-	if (count == 0) {
-		return sl_true;
-	}
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->add(values, count);
-	} else {
-		obj = CList<T, COMPARE>::create();
-		if (obj) {
-			ref = obj;
-			return obj->add_NoLock(values, count);
-		}
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
+template <class T>
 template <class _T>
-sl_bool List<T, COMPARE>::add(const _T* values, sl_size count)
+sl_bool List<T>::insertElements(sl_size index, const _T* values, sl_size count) const
 {
-	if (count == 0) {
-		return sl_true;
-	}
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->add(values, count);
-	} else {
-		obj = CList<T, COMPARE>::create();
-		if (obj) {
-			ref = obj;
-			return obj->add_NoLock(values, count);
-		}
+		return obj->insertElements(index, values, count);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::addAll(const List<T, COMPARE>& _other)
+template <class T>
+template <class _T>
+sl_bool List<T>::insertAll(sl_size index, const List<_T>& other) const
 {
-	CList<T, COMPARE>* other = _other.ref.ptr;
-	if (!other) {
-		return sl_true;
-	}
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->addAll(other);
-	} else {
-		obj = CList<T, COMPARE>::create();
-		if (obj) {
-			ref = obj;
-			return obj->addAll(other);
-		}
+		return obj->insertAll(index, other.ref._ptr);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool List<T, COMPARE>::addAll(const List<_T, _COMPARE>& _other)
+template <class T>
+template <class _T>
+sl_bool List<T>::insertAll(sl_size index, const AtomicList<_T>& other) const
 {
-	CList<_T, _COMPARE>* other = _other.ref.ptr;
-	if (!other) {
-		return sl_true;
-	}
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->add(other);
-	} else {
-		obj = CList<T, COMPARE>::create();
-		if (obj) {
-			ref = obj;
-			return obj->addAll(other);
-		}
-	}
-	return sl_false;
+	return insertAll(index, List<_T>(other));
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::addAll(const SafeList<T, COMPARE>& other)
+template <class T>
+sl_bool List<T>::add_NoLock(const T& value)
 {
-	return addAll(List<T, COMPARE>(other));
-}
-
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool List<T, COMPARE>::addAll(const SafeList<_T, _COMPARE>& other)
-{
-	return addAll(List<_T, _COMPARE>(other));
-}
-
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::add_NoLock(const T& value)
-{
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->add_NoLock(value);
 	} else {
-		obj = CList<T, COMPARE>::create();
+		obj = CList<T>::createFromElement(value);
 		if (obj) {
 			ref = obj;
-			return obj->add_NoLock(value);
+			return sl_true;
 		}
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::add(const T& value)
+template <class T>
+sl_bool List<T>::add(const T& value)
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->add(value);
 	} else {
-		obj = CList<T, COMPARE>::create();
+		obj = CList<T>::createFromElement(value);
 		if (obj) {
 			ref = obj;
-			return obj->add_NoLock(value);
+			return sl_true;
 		}
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool List<T, COMPARE>::addIfNotExistT_NoLock(const _T& value)
-{
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->template addIfNotExistT_NoLock<_T, _COMPARE>(value);
-	} else {
-		obj = CList<T, COMPARE>::create();
-		if (obj) {
-			ref = obj;
-			return obj->template addIfNotExistT_NoLock<_T, _COMPARE>(value);
-		}
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool List<T, COMPARE>::addIfNotExistT(const _T& value)
-{
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->template addIfNotExistT<_T, _COMPARE>(value);
-	} else {
-		obj = CList<T, COMPARE>::create();
-		if (obj) {
-			ref = obj;
-			return obj->template addIfNotExistT_NoLock<_T, _COMPARE>(value);
-		}
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::addIfNotExist_NoLock(const T& value)
-{
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->addIfNotExist_NoLock(value);
-	} else {
-		obj = CList<T, COMPARE>::create();
-		if (obj) {
-			ref = obj;
-			return obj->addIfNotExist_NoLock(value);
-		}
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::addIfNotExist(const T& value)
-{
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->addIfNotExist(value);
-	} else {
-		obj = CList<T, COMPARE>::create();
-		if (obj) {
-			ref = obj;
-			return obj->addIfNotExist_NoLock(value);
-		}
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::add_NoLock(const Iterator<T>& iterator)
-{
-	if (iterator.isNull()) {
-		return sl_true;
-	}
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->add_NoLock(iterator);
-	} else {
-		obj = CList<T, COMPARE>::create();
-		if (obj) {
-			ref = obj;
-			return obj->add_NoLock(iterator);
-		}
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
+template <class T>
 template <class _T>
-sl_bool List<T, COMPARE>::add_NoLock(const Iterator<_T>& iterator)
+sl_bool List<T>::addElements_NoLock(const _T* values, sl_size count)
 {
-	if (iterator.isNull()) {
+	if (count == 0) {
 		return sl_true;
 	}
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->add_NoLock(iterator);
+		return obj->addElements_NoLock(values, count);
 	} else {
-		obj = CList<T, COMPARE>::create();
+		obj = CList<T>::createFromElements(values, count);
 		if (obj) {
 			ref = obj;
-			return obj->add_NoLock(iterator);
+			return sl_true;
 		}
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::add(const Iterator<T>& iterator)
-{
-	if (iterator.isNull()) {
-		return sl_true;
-	}
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->add(iterator);
-	} else {
-		obj = CList<T, COMPARE>::create();
-		if (obj) {
-			ref = obj;
-			return obj->add_NoLock(iterator);
-		}
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
+template <class T>
 template <class _T>
-sl_bool List<T, COMPARE>::add(const Iterator<_T>& iterator)
+sl_bool List<T>::addElements(const _T* values, sl_size count)
 {
-	if (iterator.isNull()) {
+	if (count == 0) {
 		return sl_true;
 	}
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->add(iterator);
+		return obj->addElements(values, count);
 	} else {
-		obj = CList<T, COMPARE>::create();
+		obj = CList<T>::createFromElements(values, count);
 		if (obj) {
 			ref = obj;
-			return obj->add_NoLock(iterator);
+			return sl_true;
 		}
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::removeAt_NoLock(sl_size index, T* outValue) const
+template <class T>
+template <class _T>
+sl_bool List<T>::addAll_NoLock(const List<_T>& _other)
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<_T>* other = _other.ref._ptr;
+	if (!other) {
+		return sl_true;
+	}
+	CList<T>* obj = ref._ptr;
+	if (obj) {
+		return obj->addAll_NoLock(other);
+	} else {
+		obj = CList<T>::createCopy(other);
+		if (obj) {
+			ref = obj;
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
+template <class T>
+template <class _T>
+sl_bool List<T>::addAll_NoLock(const AtomicList<_T>& other)
+{
+	return addAll_NoLock(List<_T>(other));
+}
+
+template <class T>
+template <class _T>
+sl_bool List<T>::addAll(const List<_T>& _other)
+{
+	CList<_T>* other = _other.ref._ptr;
+	if (!other) {
+		return sl_true;
+	}
+	CList<T>* obj = ref._ptr;
+	if (obj) {
+		return obj->addAll(other);
+	} else {
+		obj = CList<T>::createCopy(other);
+		if (obj) {
+			ref = obj;
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
+template <class T>
+template <class _T>
+sl_bool List<T>::addAll(const AtomicList<_T>& other)
+{
+	return addAll(List<_T>(other));
+}
+
+template <class T>
+template <class _T, class EQUALS>
+sl_bool List<T>::addIfNotExist_NoLock(const _T& value, const EQUALS& equals)
+{
+	CList<T>* obj = ref._ptr;
+	if (obj) {
+		return obj->addIfNotExist_NoLock(value, equals);
+	} else {
+		obj = CList<T>::createFromElement(value);
+		if (obj) {
+			ref = obj;
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
+template <class T>
+template <class _T, class EQUALS>
+sl_bool List<T>::addIfNotExist(const _T& value, const EQUALS& equals)
+{
+	CList<T>* obj = ref._ptr;
+	if (obj) {
+		return obj->addIfNotExist(value, equals);
+	} else {
+		obj = CList<T>::createFromElement(value);
+		if (obj) {
+			ref = obj;
+			return sl_true;
+		}
+	}
+	return sl_false;
+}
+
+template <class T>
+template <class _T>
+sl_bool List<T>::addAll_NoLock(const Iterator<_T>& iterator)
+{
+	if (iterator.isNull()) {
+		return sl_true;
+	}
+	CList<T>* obj = ref._ptr;
+	if (obj) {
+		return obj->addAll_NoLock(iterator);
+	} else {
+		obj = CList<T>::create();
+		if (obj) {
+			ref = obj;
+			return obj->addAll_NoLock(iterator);
+		}
+	}
+	return sl_false;
+}
+
+template <class T>
+template <class _T>
+sl_bool List<T>::addAll(const Iterator<_T>& iterator)
+{
+	if (iterator.isNull()) {
+		return sl_true;
+	}
+	CList<T>* obj = ref._ptr;
+	if (obj) {
+		return obj->addAll(iterator);
+	} else {
+		obj = CList<T>::create();
+		if (obj) {
+			ref = obj;
+			return obj->addAll_NoLock(iterator);
+		}
+	}
+	return sl_false;
+}
+
+template <class T>
+sl_bool List<T>::removeAt_NoLock(sl_size index, T* outValue) const
+{
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->removeAt_NoLock(index, outValue);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::removeAt(sl_size index, T* outValue) const
+template <class T>
+sl_bool List<T>::removeAt(sl_size index, T* outValue) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->removeAt(index, outValue);
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-sl_size List<T, COMPARE>::remove_NoLock(sl_size index, sl_size count) const
+template <class T>
+sl_size List<T>::removeRange_NoLock(sl_size index, sl_size count) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->remove_NoLock(index, count);
+		return obj->removeRange_NoLock(index, count);
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-sl_size List<T, COMPARE>::remove(sl_size index, sl_size count) const
+template <class T>
+sl_size List<T>::removeRange(sl_size index, sl_size count) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->remove(index, count);
+		return obj->removeRange(index, count);
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool List<T, COMPARE>::removeValueT_NoLock(const _T& value, T* outValue) const
+template <class T>
+template <class _T, class EQUALS>
+sl_bool List<T>::removeValue_NoLock(const _T& value, T* outValue, const EQUALS& equals) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->template removeValueT_NoLock<_T, _COMPARE>(value, outValue);
+		return obj->removeValue_NoLock(value, outValue, equals);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool List<T, COMPARE>::removeValueT(const _T& value, T* outValue) const
+template <class T>
+template <class _T, class EQUALS>
+sl_bool List<T>::removeValue(const _T& value, T* outValue, const EQUALS& equals) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->template removeValueT<_T, _COMPARE>(value, outValue);
+		return obj->removeValue(value, outValue, equals);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_size List<T, COMPARE>::removeValuesT_NoLock(const _T& value, List<T, COMPARE>* outValues) const
+template <class T>
+template <class _T, class EQUALS>
+sl_size List<T>::removeElementsByValue_NoLock(const _T& value, List<T>* outValues, const EQUALS& equals) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->template removeValuesT_NoLock<_T, _COMPARE>(value, outValues);
+		return obj->removeElementsByValue_NoLock(value, outValues, equals);
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_size List<T, COMPARE>::removeValuesT(const _T& value, List<T, COMPARE>* outValues) const
+template <class T>
+template <class _T, class EQUALS>
+sl_size List<T>::removeElementsByValue(const _T& value, List<T>* outValues, const EQUALS& equals) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->template removeValuesT<_T, _COMPARE>(value, outValues);
+		return obj->removeElementsByValue(value, outValues, equals);
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::removeValue_NoLock(const T& value) const
+template <class T>
+sl_size List<T>::removeAll_NoLock() const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->removeValue_NoLock(value);
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::removeValue(const T& value) const
-{
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->removeValue(value);
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-sl_size List<T, COMPARE>::removeValues_NoLock(const T& value) const
-{
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->removeValues_NoLock(value);
-	}
-	return 0;
-}
-
-template <class T, class COMPARE>
-sl_size List<T, COMPARE>::removeValues(const T& value) const
-{
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->removeValues(value);
-	}
-	return 0;
-}
-
-template <class T, class COMPARE>
-sl_size List<T, COMPARE>::removeAll_NoLock() const
-{
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->removeAll_NoLock();
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-sl_size List<T, COMPARE>::removeAll() const
+template <class T>
+sl_size List<T>::removeAll() const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->removeAll();
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::popFront_NoLock(T* _out) const
+template <class T>
+sl_bool List<T>::popFront_NoLock(T* _out) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->popFront_NoLock(_out);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::popFront(T* _out) const
+template <class T>
+sl_bool List<T>::popFront(T* _out) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->popFront(_out);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_size List<T, COMPARE>::popFront_NoLock(sl_size count) const
+template <class T>
+sl_size List<T>::popFrontElements_NoLock(sl_size count) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->popFront_NoLock(count);
+		return obj->popFrontElements_NoLock(count);
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-sl_size List<T, COMPARE>::popFront(sl_size count) const
+template <class T>
+sl_size List<T>::popFrontElements(sl_size count) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->popFront(count);
+		return obj->popFrontElements(count);
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::popBack_NoLock(T* _out) const
+template <class T>
+sl_bool List<T>::popBack_NoLock(T* _out) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->popBack_NoLock(_out);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::popBack(T* _out) const
+template <class T>
+sl_bool List<T>::popBack(T* _out) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->popBack(_out);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_size List<T, COMPARE>::popBack_NoLock(sl_size count) const
+template <class T>
+sl_size List<T>::popBackElements_NoLock(sl_size count) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->popBack_NoLock(count);
+		return obj->popBackElements_NoLock(count);
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-sl_size List<T, COMPARE>::popBack(sl_size count) const
+template <class T>
+sl_size List<T>::popBackElements(sl_size count) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->popBack(count);
+		return obj->popBackElements(count);
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_reg List<T, COMPARE>::indexOfT_NoLock(const _T& value, sl_reg start) const
+template <class T>
+template <class _T, class EQUALS>
+sl_reg List<T>::indexOf_NoLock(const _T& value, sl_reg start, const EQUALS& equals) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->template indexOfT_NoLock<_T, _COMPARE>(value, start);
+		return obj->indexOf_NoLock(value, start, equals);
 	}
 	return -1;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_reg List<T, COMPARE>::indexOfT(const _T& value, sl_reg start) const
+template <class T>
+template <class _T, class EQUALS>
+sl_reg List<T>::indexOf(const _T& value, sl_reg start, const EQUALS& equals) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->template indexOfT<_T, _COMPARE>(value, start);
+		return obj->indexOf(value, start, equals);
 	}
 	return -1;
 }
 
-template <class T, class COMPARE>
-sl_reg List<T, COMPARE>::indexOf_NoLock(const T& value, sl_reg start) const
+template <class T>
+template <class _T, class EQUALS>
+sl_reg List<T>::lastIndexOf_NoLock(const _T& value, sl_reg start, const EQUALS& equals) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->indexOf_NoLock(value, start);
+		return obj->lastIndexOf_NoLock(value, start, equals);
 	}
 	return -1;
 }
 
-template <class T, class COMPARE>
-sl_reg List<T, COMPARE>::indexOf(const T& value, sl_reg start) const
+template <class T>
+template <class _T, class EQUALS>
+sl_reg List<T>::lastIndexOf(const _T& value, sl_reg start, const EQUALS& equals) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->indexOf(value, start);
+		return obj->lastIndexOf(value, start, equals);
 	}
 	return -1;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_reg List<T, COMPARE>::lastIndexOfT_NoLock(const _T& value, sl_reg start) const
+template <class T>
+template <class _T, class EQUALS>
+sl_bool List<T>::contains_NoLock(const _T& value, const EQUALS& equals) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->template lastIndexOfT_NoLock<_T, _COMPARE>(value, start);
-	}
-	return -1;
-}
-
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_reg List<T, COMPARE>::lastIndexOfT(const _T& value, sl_reg start) const
-{
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->template lastIndexOfT<_T, _COMPARE>(value, start);
-	}
-	return -1;
-}
-
-template <class T, class COMPARE>
-sl_reg List<T, COMPARE>::lastIndexOf_NoLock(const T& value, sl_reg start) const
-{
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->lastIndexOf_NoLock(value, start);
-	}
-	return -1;
-}
-
-template <class T, class COMPARE>
-sl_reg List<T, COMPARE>::lastIndexOf(const T& value, sl_reg start) const
-{
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->lastIndexOf(value, start);
-	}
-	return -1;
-}
-
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool List<T, COMPARE>::containsT_NoLock(const _T& value) const
-{
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->template containsT_NoLock<_T, _COMPARE>(value);
+		return obj->contains_NoLock(value, equals);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool List<T, COMPARE>::containsT(const _T& value) const
+template <class T>
+template <class _T, class EQUALS>
+sl_bool List<T>::contains(const _T& value, const EQUALS& equals) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		return obj->template contains<_T, _COMPARE>(value);
+		return obj->contains(value, equals);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::contains_NoLock(const T& value) const
+template <class T>
+List<T> List<T>::duplicate_NoLock() const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->contains_NoLock(value);
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-sl_bool List<T, COMPARE>::contains(const T& value) const
-{
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return obj->contains(value);
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-List<T, COMPARE> List<T, COMPARE>::duplicate_NoLock() const
-{
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->duplicate_NoLock();
 	}
-	return List<T, COMPARE>::null();
+	return sl_null;
 }
 
-template <class T, class COMPARE>
-List<T, COMPARE> List<T, COMPARE>::duplicate() const
+template <class T>
+List<T> List<T>::duplicate() const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->duplicate();
 	}
-	return List<T, COMPARE>::null();
+	return sl_null;
 }
 
-template <class T, class COMPARE>
-Array<T, COMPARE> List<T, COMPARE>::toArray_NoLock() const
+template <class T>
+Array<T> List<T>::toArray_NoLock() const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->toArray_NoLock();
 	}
-	return Array<T, COMPARE>::null();
+	return sl_null;
 }
 
-template <class T, class COMPARE>
-Array<T, COMPARE> List<T, COMPARE>::toArray() const
+template <class T>
+Array<T> List<T>::toArray() const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->toArray();
 	}
-	return Array<T, COMPARE>::null();
+	return sl_null;
 }
 
-template <class T, class COMPARE>
-template <class _COMPARE>
-void List<T, COMPARE>::sortBy(sl_bool flagAscending) const
+template <class T>
+template <class COMPARE>
+void List<T>::sort_NoLock(sl_bool flagAscending, const COMPARE& compare) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		obj->template sortBy<_COMPARE>(flagAscending);
+		obj->sort_NoLock(flagAscending, compare);
 	}
 }
 
-template <class T, class COMPARE>
-template <class _COMPARE>
-void List<T, COMPARE>::sortBy_NoLock(sl_bool flagAscending) const
+template <class T>
+template <class COMPARE>
+void List<T>::sort(sl_bool flagAscending, const COMPARE& compare) const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		obj->template sortBy_NoLock<_COMPARE>(flagAscending);
+		obj->sort(flagAscending, compare);
 	}
 }
 
-template <class T, class COMPARE>
-void List<T, COMPARE>::sort_NoLock(sl_bool flagAscending) const
+template <class T>
+Iterator<T> List<T>::toIterator() const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
-		obj->sort_NoLock(flagAscending);
+		return new ListIterator<T>(obj, obj);
 	}
+	return sl_null;
 }
 
-template <class T, class COMPARE>
-void List<T, COMPARE>::sort(sl_bool flagAscending) const
+template <class T>
+T* List<T>::begin() const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		obj->sort(flagAscending);
-	}
-}
-
-template <class T, class COMPARE>
-Iterator<T> List<T, COMPARE>::iterator() const
-{
-	CList<T, COMPARE>* obj = ref.ptr;
-	if (obj) {
-		return new ListIterator<T, COMPARE>(obj, obj);
-	}
-	return Iterator<T>::null();
-}
-
-template <class T, class COMPARE>
-T* List<T, COMPARE>::begin() const
-{
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->begin();
 	}
 	return sl_null;
 }
 
-template <class T, class COMPARE>
-T* List<T, COMPARE>::end() const
+template <class T>
+T* List<T>::end() const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->end();
 	}
 	return sl_null;
 }
 
-template <class T, class COMPARE>
-const Mutex* List<T, COMPARE>::getLocker() const
+template <class T>
+const Mutex* List<T>::getLocker() const
 {
-	CList<T, COMPARE>* obj = ref.ptr;
+	CList<T>* obj = ref._ptr;
 	if (obj) {
 		return obj->getLocker();
 	} else {
@@ -3153,95 +2504,92 @@ const Mutex* List<T, COMPARE>::getLocker() const
 }
 
 
-SLIB_DEFINE_TEMPLATE_REF_WRAPPER(SafeList, List, CList, ref)
-
-template <class T, class COMPARE>
-SafeList<T, COMPARE>::SafeList(sl_size count) : ref(CList<T, COMPARE>::create(count))
+template <class T>
+sl_size Atomic< List<T> >::getCount() const
 {
-}
-
-template <class T, class COMPARE>
-SafeList<T, COMPARE>::SafeList(const T* data, sl_size count) : ref(CList<T, COMPARE>::createFromElements(data, count))
-{
-}
-
-template <class T, class COMPARE>
-template <class _T>
-SafeList<T, COMPARE>::SafeList(const _T* data, sl_size count) : ref(CList<T, COMPARE>::createFromElements(data, count))
-{
-}
-
-template <class T, class COMPARE>
-template <class _COMPARE>
-SLIB_INLINE const SafeList<T, COMPARE>& SafeList<T, COMPARE>::from(const SafeList<T, _COMPARE>& other)
-{
-	return *((SafeList<T, COMPARE>*)((void*)&other));
-}
-
-template <class T, class COMPARE>
-sl_size SafeList<T, COMPARE>::getCount() const
-{
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
 		return obj->getCount();
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::isEmpty() const
+template <class T>
+sl_bool Atomic< List<T> >::isEmpty() const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
 		return obj->getCount() == 0;
 	}
 	return sl_true;
 }
 
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::isNotEmpty() const
+template <class T>
+sl_bool Atomic< List<T> >::isNotEmpty() const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
 		return obj->getCount() != 0;
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::getItem(sl_size index, T* _out) const
+template <class T>
+sl_bool Atomic< List<T> >::getAt(sl_size index, T* _out) const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->getItem(index, _out);
+		return obj->getAt(index, _out);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-T SafeList<T, COMPARE>::getItemValue(sl_size index, const T& def) const
+template <class T>
+T Atomic< List<T> >::getValueAt(sl_size index) const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->getItemValue(index, def);
+		return obj->getValueAt(index);
+	} else {
+		return T();
+	}
+}
+
+template <class T>
+T Atomic< List<T> >::getValueAt(sl_size index, const T& def) const
+{
+	Ref< CList<T> > obj(ref);
+	if (obj.isNotNull()) {
+		return obj->getValueAt(index, def);
 	}
 	return def;
 }
 
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::setItem(sl_size index, const T& value) const
+template <class T>
+sl_bool Atomic< List<T> >::setAt(sl_size index, const T& value) const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->setItem(index, value);
+		return obj->setAt(index, value);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::setCount(sl_size count)
+template <class T>
+T Atomic< List<T> >::operator[](sl_size_t index) const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
+	if (obj.isNotNull()) {
+		return obj->getValueAt(index);
+	} else {
+		return T();
+	}
+}
+
+template <class T>
+sl_bool Atomic< List<T> >::setCount(sl_size count)
+{
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
 		return obj->setCount(count);
 	} else {
@@ -3251,7 +2599,7 @@ sl_bool SafeList<T, COMPARE>::setCount(sl_size count)
 			lock.unlock();
 			return obj->setCount(count);
 		}
-		obj = CList<T, COMPARE>::create();
+		obj = CList<T>::create();
 		if (obj.isNotNull()) {
 			ref = obj;
 			lock.unlock();
@@ -3261,196 +2609,49 @@ sl_bool SafeList<T, COMPARE>::setCount(sl_size count)
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::insert(sl_size index, const T* values, sl_size count) const
+template <class T>
+sl_bool Atomic< List<T> >::insert(sl_size index, const T& value) const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
-	if (obj.isNotNull()) {
-		return obj->insert(index, values, count);
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-template <class _T>
-sl_bool SafeList<T, COMPARE>::insert(sl_size index, const _T* values, sl_size count) const
-{
-	Ref< CList<T, COMPARE> > obj(ref);
-	if (obj.isNotNull()) {
-		return obj->insert(index, values, count);
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::insertAll(sl_size index, const List<T, COMPARE>& other) const
-{
-	Ref< CList<T, COMPARE> > obj(ref);
-	if (obj.isNotNull()) {
-		return obj->insertAll(index, other.ref.ptr);
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool SafeList<T, COMPARE>::insertAll(sl_size index, const List<_T, _COMPARE>& other) const
-{
-	Ref< CList<T, COMPARE> > obj(ref);
-	if (obj.isNotNull()) {
-		return obj->insertAll(index, other.ref.ptr);
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::insertAll(sl_size index, const SafeList<T, COMPARE>& other) const
-{
-	return insertAll(index, List<T, COMPARE>(other));
-}
-
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool SafeList<T, COMPARE>::insertAll(sl_size index, const SafeList<_T, _COMPARE>& other) const
-{
-	return insertAll(index, List<_T, _COMPARE>(other));
-}
-
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::insert(sl_size index, const T& value) const
-{
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
 		return obj->insert(index, value);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::add(const T* values, sl_size count)
-{
-	if (count == 0) {
-		return sl_true;
-	}
-	Ref< CList<T, COMPARE> > obj(ref);
-	if (obj.isNotNull()) {
-		return obj->add(values, count);
-	} else {
-		SpinLocker lock(SpinLockPoolForList::get(this));
-		obj = ref;
-		if (obj.isNotNull()) {
-			lock.unlock();
-			return obj->add(values, count);
-		}
-		obj = CList<T, COMPARE>::create();
-		if (obj.isNotNull()) {
-			ref = obj;
-			lock.unlock();
-			return obj->add(values, count);
-		}
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
+template <class T>
 template <class _T>
-sl_bool SafeList<T, COMPARE>::add(const _T* values, sl_size count)
+sl_bool Atomic< List<T> >::insertElements(sl_size index, const _T* values, sl_size count) const
 {
-	if (count == 0) {
-		return sl_true;
-	}
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->add(values, count);
-	} else {
-		SpinLocker lock(SpinLockPoolForList::get(this));
-		obj = ref;
-		if (obj.isNotNull()) {
-			lock.unlock();
-			return obj->add(values, count);
-		}
-		obj = CList<T, COMPARE>::create();
-		if (obj.isNotNull()) {
-			ref = obj;
-			lock.unlock();
-			return obj->add(values, count);
-		}
+		return obj->insertElements(index, values, count);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::addAll(const List<T, COMPARE>& _other)
+template <class T>
+template <class _T>
+sl_bool Atomic< List<T> >::insertAll(sl_size index, const List<_T>& other) const
 {
-	CList<T, COMPARE>* other = _other.ref.ptr;
-	if (!other) {
-		return sl_true;
-	}
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->addAll(other);
-	} else {
-		SpinLocker lock(SpinLockPoolForList::get(this));
-		obj = ref;
-		if (obj.isNotNull()) {
-			lock.unlock();
-			return obj->addAll(other);
-		}
-		obj = CList<T, COMPARE>::create();
-		if (obj.isNotNull()) {
-			ref = obj;
-			lock.unlock();
-			return obj->addAll(other);
-		}
+		return obj->insertAll(index, other.ref._ptr);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool SafeList<T, COMPARE>::addAll(const List<_T, _COMPARE>& _other)
+template <class T>
+template <class _T>
+sl_bool Atomic< List<T> >::insertAll(sl_size index, const AtomicList<_T>& other) const
 {
-	CList<_T, _COMPARE>* other = _other.object;
-	if (!other) {
-		return sl_true;
-	}
-	Ref< CList<T, COMPARE> > obj(ref);
-	if (obj.isNotNull()) {
-		return obj->addAll(other);
-	} else {
-		SpinLocker lock(SpinLockPoolForList::get(this));
-		obj = ref;
-		if (obj.isNotNull()) {
-			lock.unlock();
-			return obj->addAll(other);
-		}
-		obj = CList<T, COMPARE>::create();
-		if (obj.isNotNull()) {
-			ref = obj;
-			lock.unlock();
-			return obj->addAll(other);
-		}
-	}
-	return sl_false;
+	return insertAll(index, List<_T>(other));
 }
 
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::addAll(const SafeList<T, COMPARE>& other)
+template <class T>
+sl_bool Atomic< List<T> >::add(const T& value)
 {
-	return addAll(List<T, COMPARE>(other));
-}
-
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool SafeList<T, COMPARE>::addAll(const SafeList<_T, _COMPARE>& other)
-{
-	return addAll(List<_T, _COMPARE>(other));
-}
-
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::add(const T& value)
-{
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
 		return obj->add(value);
 	} else {
@@ -3460,7 +2661,7 @@ sl_bool SafeList<T, COMPARE>::add(const T& value)
 			lock.unlock();
 			return obj->add(value);
 		}
-		obj = CList<T, COMPARE>::create();
+		obj = CList<T>::create();
 		if (obj.isNotNull()) {
 			ref = obj;
 			lock.unlock();
@@ -3470,371 +2671,297 @@ sl_bool SafeList<T, COMPARE>::add(const T& value)
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool SafeList<T, COMPARE>::addIfNotExistT(const _T& value)
-{
-	Ref< CList<T, COMPARE> > obj(ref);
-	if (obj.isNotNull()) {
-		return obj->template addIfNotExistT<_T, _COMPARE>(value);
-	} else {
-		SpinLocker lock(SpinLockPoolForList::get(this));
-		obj = ref;
-		if (obj.isNotNull()) {
-			lock.unlock();
-			return obj->template addIfNotExistT<_T, _COMPARE>(value);
-		}
-		obj = CList<T, COMPARE>::create();
-		if (obj.isNotNull()) {
-			ref = obj;
-			lock.unlock();
-			return obj->template addIfNotExistT<_T, _COMPARE>(value);
-		}
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::addIfNotExist(const T& value)
-{
-	Ref< CList<T, COMPARE> > obj(ref);
-	if (obj.isNotNull()) {
-		return obj->addIfNotExist(value);
-	} else {
-		SpinLocker lock(SpinLockPoolForList::get(this));
-		obj = ref;
-		if (obj.isNotNull()) {
-			lock.unlock();
-			return obj->addIfNotExist(value);
-		}
-		obj = CList<T, COMPARE>::create();
-		if (obj.isNotNull()) {
-			ref = obj;
-			lock.unlock();
-			return obj->addIfNotExist(value);
-		}
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::add(const Iterator<T>& iterator)
-{
-	if (iterator.isNull()) {
-		return sl_true;
-	}
-	Ref< CList<T, COMPARE> > obj(ref);
-	if (obj.isNotNull()) {
-		return obj->add(iterator);
-	} else {
-		SpinLocker lock(SpinLockPoolForList::get(this));
-		obj = ref;
-		if (obj.isNotNull()) {
-			lock.unlock();
-			return obj->add(iterator);
-		}
-		obj = CList<T, COMPARE>::create();
-		if (obj.isNotNull()) {
-			ref = obj;
-			lock.unlock();
-			return obj->add(iterator);
-		}
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
+template <class T>
 template <class _T>
-sl_bool SafeList<T, COMPARE>::add(const Iterator<_T>& iterator)
+sl_bool Atomic< List<T> >::addElements(const _T* values, sl_size count)
 {
-	if (iterator.isNull()) {
+	if (count == 0) {
 		return sl_true;
 	}
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->add(iterator);
+		return obj->addElements(values, count);
 	} else {
 		SpinLocker lock(SpinLockPoolForList::get(this));
 		obj = ref;
 		if (obj.isNotNull()) {
 			lock.unlock();
-			return obj->add(iterator);
+			return obj->addElements(values, count);
 		}
-		obj = CList<T, COMPARE>::create();
+		obj = CList<T>::create();
 		if (obj.isNotNull()) {
 			ref = obj;
 			lock.unlock();
-			return obj->add(iterator);
+			return obj->addElements(values, count);
 		}
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::removeAt(sl_size index, T* outValue) const
+template <class T>
+template <class _T>
+sl_bool Atomic< List<T> >::addAll(const List<_T>& _other)
 {
-	Ref< CList<T, COMPARE> > obj(ref);
+	CList<_T>* other = _other.object;
+	if (!other) {
+		return sl_true;
+	}
+	Ref< CList<T> > obj(ref);
+	if (obj.isNotNull()) {
+		return obj->addAll(other);
+	} else {
+		SpinLocker lock(SpinLockPoolForList::get(this));
+		obj = ref;
+		if (obj.isNotNull()) {
+			lock.unlock();
+			return obj->addAll(other);
+		}
+		obj = CList<T>::create();
+		if (obj.isNotNull()) {
+			ref = obj;
+			lock.unlock();
+			return obj->addAll(other);
+		}
+	}
+	return sl_false;
+}
+
+template <class T>
+template <class _T>
+sl_bool Atomic< List<T> >::addAll(const AtomicList<_T>& other)
+{
+	return addAll(List<_T>(other));
+}
+
+template <class T>
+template <class _T, class EQUALS>
+sl_bool Atomic< List<T> >::addIfNotExist(const _T& value, const EQUALS& equals)
+{
+	Ref< CList<T> > obj(ref);
+	if (obj.isNotNull()) {
+		return obj->addIfNotExist(value, equals);
+	} else {
+		SpinLocker lock(SpinLockPoolForList::get(this));
+		obj = ref;
+		if (obj.isNotNull()) {
+			lock.unlock();
+			return obj->addIfNotExist(value, equals);
+		}
+		obj = CList<T>::create();
+		if (obj.isNotNull()) {
+			ref = obj;
+			lock.unlock();
+			return obj->addIfNotExist(value, equals);
+		}
+	}
+	return sl_false;
+}
+
+template <class T>
+template <class _T>
+sl_bool Atomic< List<T> >::addAll(const Iterator<_T>& iterator)
+{
+	if (iterator.isNull()) {
+		return sl_true;
+	}
+	Ref< CList<T> > obj(ref);
+	if (obj.isNotNull()) {
+		return obj->addAll(iterator);
+	} else {
+		SpinLocker lock(SpinLockPoolForList::get(this));
+		obj = ref;
+		if (obj.isNotNull()) {
+			lock.unlock();
+			return obj->addAll(iterator);
+		}
+		obj = CList<T>::create();
+		if (obj.isNotNull()) {
+			ref = obj;
+			lock.unlock();
+			return obj->addAll(iterator);
+		}
+	}
+	return sl_false;
+}
+
+template <class T>
+sl_bool Atomic< List<T> >::removeAt(sl_size index, T* outValue) const
+{
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
 		return obj->removeAt(index, outValue);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_size SafeList<T, COMPARE>::remove(sl_size index, sl_size count) const
+template <class T>
+sl_size Atomic< List<T> >::removeRange(sl_size index, sl_size count) const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->remove(index, count);
+		return obj->removeRange(index, count);
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool SafeList<T, COMPARE>::removeValueT(const _T& value, T* outValue) const
+template <class T>
+template <class _T, class EQUALS>
+sl_bool Atomic< List<T> >::removeValue(const _T& value, T* outValue, const EQUALS& equals) const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->template removeValueT<_T, _COMPARE>(value, outValue);
+		return obj->removeValue(value, outValue, equals);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_size SafeList<T, COMPARE>::removeValuesT(const _T& value, List<T, COMPARE>* outValues) const
+template <class T>
+template <class _T, class EQUALS>
+sl_size Atomic< List<T> >::removeElementsByValue(const _T& value, List<T>* outValues, const EQUALS& equals) const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->template removeValuesT<_T, _COMPARE>(value, outValues);
+		return obj->removeElementsByValue(value, outValues, equals);
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::removeValue(const T& value) const
+template <class T>
+sl_size Atomic< List<T> >::removeAll() const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
-	if (obj.isNotNull()) {
-		return obj->removeValue(value);
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-sl_size SafeList<T, COMPARE>::removeValues(const T& value) const
-{
-	Ref< CList<T, COMPARE> > obj(ref);
-	if (obj.isNotNull()) {
-		return obj->removeValues(value);
-	}
-	return 0;
-}
-
-template <class T, class COMPARE>
-sl_size SafeList<T, COMPARE>::removeAll() const
-{
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
 		return obj->removeAll();
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::popFront(T* _out) const
+template <class T>
+sl_bool Atomic< List<T> >::popFront(T* _out) const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
 		return obj->popFront(_out);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_size SafeList<T, COMPARE>::popFront(sl_size count) const
+template <class T>
+sl_size Atomic< List<T> >::popFrontElements(sl_size count) const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->popFront(count);
+		return obj->popFrontElements(count);
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::popBack(T* _out) const
+template <class T>
+sl_bool Atomic< List<T> >::popBack(T* _out) const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
 		return obj->popBack(_out);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_size SafeList<T, COMPARE>::popBack(sl_size count) const
+template <class T>
+sl_size Atomic< List<T> >::popBackElements(sl_size count) const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->popBack(count);
+		return obj->popBackElements(count);
 	}
 	return 0;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_reg SafeList<T, COMPARE>::indexOfT(const _T& value, sl_reg start) const
+template <class T>
+template <class _T, class EQUALS>
+sl_reg Atomic< List<T> >::indexOf(const _T& value, sl_reg start, const EQUALS& equals) const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
-	if (obj.isNotNull()) {
-		return obj->template indexOfT<_T, _COMPARE>(value, start);
-	}
-	return -1;
-}
-
-template <class T, class COMPARE>
-sl_reg SafeList<T, COMPARE>::indexOf(const T& value, sl_reg start) const
-{
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
 		return obj->indexOf(value, start);
 	}
 	return -1;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_reg SafeList<T, COMPARE>::lastIndexOfT(const _T& value, sl_reg start) const
+template <class T>
+template <class _T, class EQUALS>
+sl_reg Atomic< List<T> >::lastIndexOf(const _T& value, sl_reg start, const EQUALS& equals) const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
-	if (obj.isNotNull()) {
-		return obj->template lastIndexOfT<_T, _COMPARE>(value, start);
-	}
-	return -1;
-}
-
-template <class T, class COMPARE>
-sl_reg SafeList<T, COMPARE>::lastIndexOf(const T& value, sl_reg start) const
-{
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
 		return obj->lastIndexOf(value, start);
 	}
 	return -1;
 }
 
-template <class T, class COMPARE>
-template <class _T, class _COMPARE>
-sl_bool SafeList<T, COMPARE>::containsT(const _T& value) const
+template <class T>
+template <class _T, class EQUALS>
+sl_bool Atomic< List<T> >::contains(const _T& value, const EQUALS& equals) const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
-	if (obj.isNotNull()) {
-		return obj->template containsT<_T, _COMPARE>(value);
-	}
-	return sl_false;
-}
-
-template <class T, class COMPARE>
-sl_bool SafeList<T, COMPARE>::contains(const T& value) const
-{
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
 		return obj->contains(value);
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-List<T, COMPARE> SafeList<T, COMPARE>::duplicate() const
+template <class T>
+List<T> Atomic< List<T> >::duplicate() const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
 		return obj->duplicate();
 	}
-	return List<T, COMPARE>::null();
+	return sl_null;
 }
 
-template <class T, class COMPARE>
-Array<T, COMPARE> SafeList<T, COMPARE>::toArray() const
+template <class T>
+Array<T> Atomic< List<T> >::toArray() const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
 		return obj->toArray();
 	}
-	return Array<T, COMPARE>::null();
+	return sl_null;
 }
 
-template <class T, class COMPARE>
-template <class _COMPARE>
-void SafeList<T, COMPARE>::sortBy(sl_bool flagAscending) const
+template <class T>
+template <class COMPARE>
+void Atomic< List<T> >::sort(sl_bool flagAscending, const COMPARE& compare) const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
+	Ref< CList<T> > obj(ref);
 	if (obj.isNotNull()) {
-		obj->template sortBy<_COMPARE>(flagAscending);
+		obj->sortBy(flagAscending, compare);
 	}
 }
 
-template <class T, class COMPARE>
-void SafeList<T, COMPARE>::sort(sl_bool flagAscending) const
+template <class T>
+SLIB_INLINE ListPosition<T> Atomic< List<T> >::begin() const
 {
-	Ref< CList<T, COMPARE> > obj(ref);
-	if (obj.isNotNull()) {
-		obj->sort(flagAscending);
-	}
+	return ListPosition<T>(ref);
 }
 
-template <class T, class COMPARE>
-SLIB_INLINE ListPosition<T, COMPARE> SafeList<T, COMPARE>::begin() const
+template <class T>
+SLIB_INLINE ListPosition<T> Atomic< List<T> >::end() const
 {
-	return ListPosition<T, COMPARE>(ref);
-}
-
-template <class T, class COMPARE>
-SLIB_INLINE ListPosition<T, COMPARE> SafeList<T, COMPARE>::end() const
-{
-	return ListPosition<T, COMPARE>();
+	return ListPosition<T>();
 }
 
 
 template <class T>
-ListLocker<T>::ListLocker(const List<T>& list) : ObjectLocker(list.ref.ptr)
+ListLocker<T>::ListLocker(const List<T>& list) : ObjectLocker(list.ref._ptr)
 {
 	m_list = list;
 	data = list.getData();
 	count = list.getCount();
-}
-
-template <class T>
-template <class _COMPARE>
-ListLocker<T>::ListLocker(const List<T, _COMPARE>& list) : ObjectLocker(list.ref.ptr)
-{
-	m_list = list;
-	data = list.getData();
-	count = list.getCount();
-}
-
-template <class T>
-ListLocker<T>::ListLocker(const SafeList<T>& list) : ListLocker(List<T>(list))
-{
-}
-
-template <class T>
-template <class _COMPARE>
-ListLocker<T>::ListLocker(const SafeList<T, _COMPARE>& list) : ListLocker(List<T, _COMPARE>(list))
-{
 }
 
 template <class T>
 ListLocker<T>::ListLocker(const CList<T>& list) : ObjectLocker(&list)
-{
-	data = list.getData();
-	count = list.getCount();
-}
-
-template <class T>
-template <class _COMPARE>
-ListLocker<T>::ListLocker(const CList<T, _COMPARE>& list) : ObjectLocker(&list)
 {
 	data = list.getData();
 	count = list.getCount();
@@ -3865,7 +2992,7 @@ SLIB_INLINE T* ListLocker<T>::end()
 }
 
 template <class T>
-ListItems<T>::ListItems(const List<T>& list)
+ListElements<T>::ListElements(const List<T>& list)
 {
 	m_list = list;
 	data = list.getData();
@@ -3873,85 +3000,57 @@ ListItems<T>::ListItems(const List<T>& list)
 }
 
 template <class T>
-template <class _COMPARE>
-ListItems<T>::ListItems(const List<T, _COMPARE>& list)
-{
-	m_list = list;
-	data = list.getData();
-	count = list.getCount();
-}
-
-template <class T>
-ListItems<T>::ListItems(const SafeList<T>& list) : ListItems(List<T>(list))
-{
-}
-
-template <class T>
-template <class _COMPARE>
-ListItems<T>::ListItems(const SafeList<T, _COMPARE>& list) : ListItems(List<T, _COMPARE>(list))
-{
-}
-
-template <class T>
-ListItems<T>::ListItems(const CList<T>& list)
+ListElements<T>::ListElements(const CList<T>& list)
 {
 	data = list.getData();
 	count = list.getCount();
 }
 
 template <class T>
-template <class _COMPARE>
-ListItems<T>::ListItems(const CList<T, _COMPARE>& list)
-{
-	data = list.getData();
-	count = list.getCount();
-}
-
-template <class T>
-SLIB_INLINE T& ListItems<T>::operator[](sl_reg index)
+SLIB_INLINE T& ListElements<T>::operator[](sl_reg index)
 {
 	return data[index];
 }
 
 template <class T>
-SLIB_INLINE T* ListItems<T>::begin()
+SLIB_INLINE T* ListElements<T>::begin()
 {
 	return data;
 }
 
 template <class T>
-SLIB_INLINE T* ListItems<T>::end()
+SLIB_INLINE T* ListElements<T>::end()
 {
 	return data + count;
 }
 
 
-template <class T, class COMPARE>
-ListIterator<T, COMPARE>::ListIterator(const CList<T, COMPARE>* list, const Referable* refer)
+template <class T>
+ListIterator<T>::ListIterator(const CList<T>* list, Referable* refer)
 {
 	m_index = 0;
 	m_list = list;
 	m_refer = refer;
 }
 
-template <class T, class COMPARE>
-sl_bool ListIterator<T, COMPARE>::hasNext()
+template <class T>
+sl_bool ListIterator<T>::hasNext()
 {
 	return (m_index < m_list->getCount());
 }
 
-template <class T, class COMPARE>
-sl_bool ListIterator<T, COMPARE>::next(T* _out)
+template <class T>
+sl_bool ListIterator<T>::next(T* _out)
 {
-	if (m_list->getItem(m_index, _out)) {
+	if (m_list->getAt(m_index, _out)) {
 		m_index++;
 		return sl_true;
 	}
 	return sl_false;
 }
 
-template <class T, class COMPARE>
-sl_reg ListIterator<T, COMPARE>::getIndex()
+template <class T>
+sl_reg ListIterator<T>::getIndex()
 {
 	return (sl_reg)m_index - 1;
 }

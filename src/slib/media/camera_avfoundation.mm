@@ -68,11 +68,11 @@ public:
 	
 public:
 	static void logError(String error) {
-		SLIB_LOG("Camera", error);
+		Log("Camera", error);
 	}
 	
 	static void logError(String error, NSError* err) {
-		SLIB_LOG("Camera", error + ": " + [err localizedDescription]);
+		Log("Camera", "%s: [%s]", error, [err localizedDescription]);
 	}
 
 	static Ref<_AVFoundation_Camera> _create(const CameraParam& param)

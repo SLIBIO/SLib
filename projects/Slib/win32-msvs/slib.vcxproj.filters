@@ -740,9 +740,6 @@
     <ClInclude Include="..\..\..\inc\slib\core\log.h">
       <Filter>inc\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\loop_queue.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\core\macro.h">
       <Filter>inc\core</Filter>
     </ClInclude>
@@ -816,6 +813,18 @@
       <Filter>inc\core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\core\ptr.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\ref_wrapper.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\singleton.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\linked_list.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\deque.h">
       <Filter>inc\core</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1315,9 +1324,6 @@
     <ClCompile Include="..\..\..\src\slib\core\locale.cpp">
       <Filter>src\slib\core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\core\queue.cpp">
-      <Filter>src\slib\core</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\slib\crypto\block_cipher.cpp">
       <Filter>src\slib\crypto</Filter>
     </ClCompile>
@@ -1554,6 +1560,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\ptr.cpp">
       <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\collection.cpp">
+      <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\gesture.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\motion_tracker.cpp">
+      <Filter>src\slib\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\picker_view.cpp">
+      <Filter>src\slib\ui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -11,8 +11,7 @@ SLIB_UI_NAMESPACE_BEGIN
 void JNICALL _JAndroidSelectView_nativeOnSelect(JNIEnv* env, jobject _this, jlong instance, jint n)
 {
 	Ref<View> _view = Android_ViewInstance::getAndroidView(instance);
-	if (SelectView::checkInstance(_view.ptr)) {
-		SelectView* view = (SelectView*)(_view.ptr);
+	if (SelectView* view = CastInstance<SelectView>(_view.get())) {
 		view->onSelectItem(n);
 	}
 }
@@ -77,7 +76,7 @@ Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* _parent)
 			((_SelectView*)this)->__copyItems(handle);
 
 			Ref<Font> font = getFont();
-			jobject jfont = GraphicsPlatform::getNativeFont(font.ptr);
+			jobject jfont = GraphicsPlatform::getNativeFont(font.get());
 			if (jfont) {
 				_JAndroidSelectView::setFont.callBoolean(sl_null, handle, jfont);
 			}
@@ -130,7 +129,7 @@ void SelectView::_setFont_NW(const Ref<Font>& font)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		jobject jfont = GraphicsPlatform::getNativeFont(font.ptr);
+		jobject jfont = GraphicsPlatform::getNativeFont(font.get());
 		if (jfont) {
 			_JAndroidSelectView::setFont.callBoolean(sl_null, handle, jfont);
 		}

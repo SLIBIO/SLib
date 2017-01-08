@@ -13,53 +13,20 @@
 
 SLIB_RENDER_NAMESPACE_BEGIN
 
-enum class RenderCanvasClipType
+RenderCanvasClip::RenderCanvasClip(): flagTransform(sl_false)
 {
-	Rectangle,
-	Ellipse,
-	RoundRect
-};
+}
 
-class RenderCanvasClip
+RenderCanvasState::RenderCanvasState()
+: matrix(Matrix3::identity()), flagClipRect(sl_false)
 {
-public:
-	RenderCanvasClipType type;
-	Rectangle region;
-	sl_real rx;
-	sl_real ry;
-	sl_bool flagTransform;
-	Matrix3 transform;
-	
-public:
-	RenderCanvasClip()
-	: flagTransform(sl_false)
-	{
-	}
-	
-};
+}
 
-class RenderCanvasState : public Referable
+RenderCanvasState::RenderCanvasState(RenderCanvasState* other)
+: matrix(other->matrix), flagClipRect(other->flagClipRect), clipRect(other->clipRect)
 {
-public:
-	Matrix3 matrix;
-	sl_bool flagClipRect;
-	Rectangle clipRect;
-	Queue<RenderCanvasClip> clips;
-	
-public:
-	RenderCanvasState()
-	: matrix(Matrix3::identity()), flagClipRect(sl_false)
-	{
-	}
-	
-	RenderCanvasState(RenderCanvasState* other)
-	: matrix(other->matrix), flagClipRect(other->flagClipRect), clipRect(other->clipRect)
-	{
-		clips.pushAll(&(other->clips));
-	}
-	
-};
-
+	clips.pushAll(&(other->clips));
+}
 
 SLIB_RENDER_PROGRAM_STATE_BEGIN(RenderCanvasProgramState, RenderVertex2D_Position)
 	SLIB_RENDER_PROGRAM_STATE_UNIFORM_MATRIX3(Transform, u_Transform)
@@ -290,7 +257,7 @@ public:
 				return ret;
 			}
 		}
-		return Ref<RenderCanvasProgram>::null();
+		return sl_null;
 	}
 	
 };
@@ -323,7 +290,7 @@ public:
 			if (!(programs.get_NoLock(sig, &program))) {
 				program = RenderCanvasProgram::create(param);
 				if (program.isNull()) {
-					return Ref<RenderCanvasProgram>::null();
+					return sl_null;
 				}
 				if (programs.getCount() > MAX_PROGRAM_COUNT) {
 					programs.removeAll_NoLock();
@@ -332,7 +299,7 @@ public:
 			}
 			return program;
 		}
-		return Ref<RenderCanvasProgram>::null();
+		return sl_null;
 	}
 	
 };
@@ -343,6 +310,10 @@ SLIB_SAFE_STATIC_GETTER(_RenderCanvas_Shared, _RenderCanvas_getShared)
 SLIB_DEFINE_OBJECT(RenderCanvas, Canvas)
 
 RenderCanvas::RenderCanvas()
+{
+}
+
+RenderCanvas::~RenderCanvas()
 {
 }
 
@@ -372,7 +343,7 @@ Ref<RenderCanvas> RenderCanvas::create(const Ref<RenderEngine>& engine, sl_real 
 		}
 		
 	}
-	return Ref<RenderCanvas>::null();
+	return sl_null;
 }
 
 Ref<RenderEngine> RenderCanvas::getEngine()
@@ -382,7 +353,7 @@ Ref<RenderEngine> RenderCanvas::getEngine()
 
 void RenderCanvas::save()
 {
-	RenderCanvasState* stateOld = m_state.ptr;
+	RenderCanvasState* stateOld = m_state.get();
 	Ref<RenderCanvasState> stateNew = new RenderCanvasState(stateOld);
 	if (stateNew.isNotNull()) {
 		m_stackStates.push_NoLock(stateOld);
@@ -423,7 +394,7 @@ Rectangle RenderCanvas::getClipBounds()
 
 void RenderCanvas::clipToRectangle(const Rectangle& rect)
 {
-	RenderCanvasState* state = m_state.ptr;
+	RenderCanvasState* state = m_state.get();
 	if (state->flagClipRect) {
 		state->clipRect.intersectRectangle(rect, &(state->clipRect));
 	} else {
@@ -438,7 +409,7 @@ void RenderCanvas::clipToPath(const Ref<GraphicsPath>& path)
 
 void RenderCanvas::clipToRoundRect(const Rectangle& rect, const Size& radius)
 {
-	RenderCanvasState* state = m_state.ptr;
+	RenderCanvasState* state = m_state.get();
 	RenderCanvasClip clip;
 	clip.type = RenderCanvasClipType::RoundRect;
 	clip.region = rect;
@@ -449,7 +420,7 @@ void RenderCanvas::clipToRoundRect(const Rectangle& rect, const Size& radius)
 
 void RenderCanvas::clipToEllipse(const Rectangle& rect)
 {
-	RenderCanvasState* state = m_state.ptr;
+	RenderCanvasState* state = m_state.get();
 	RenderCanvasClip clip;
 	clip.type = RenderCanvasClipType::Ellipse;
 	clip.region = rect;
@@ -458,7 +429,7 @@ void RenderCanvas::clipToEllipse(const Rectangle& rect)
 
 void RenderCanvas::concatMatrix(const Matrix3& matrix)
 {
-	RenderCanvasState* state = m_state.ptr;
+	RenderCanvasState* state = m_state.get();
 	state->matrix = matrix * state->matrix;
 	if (Math::isAlmostZero(matrix.m00 - 1) && Math::isAlmostZero(matrix.m01) && Math::isAlmostZero(matrix.m10) && Math::isAlmostZero(matrix.m11 - 1)) {
 		sl_real tx = matrix.m20;
@@ -522,7 +493,7 @@ void RenderCanvas::drawText16(const String16& text, sl_real x, sl_real y, const 
 			return;
 		}
 	}
-	_RenderCanvasFont* rfont = (_RenderCanvasFont*)(font.ptr);
+	_RenderCanvasFont* rfont = (_RenderCanvasFont*)(font.get());
 	Ref<Referable> cache = rfont->m_renderingCache;
 	if (cache.isNull()) {
 		cache = FontAtlas::getShared(font);
@@ -532,7 +503,7 @@ void RenderCanvas::drawText16(const String16& text, sl_real x, sl_real y, const 
 		rfont->m_renderingCache = cache;
 	}
 	
-	FontAtlas* fa = (FontAtlas*)(cache.ptr);
+	FontAtlas* fa = (FontAtlas*)(cache.get());
 	sl_char16* arrChar = text.getData();
 	sl_size len = text.getLength();
 	FontAtlasChar fac;
@@ -586,7 +557,7 @@ void RenderCanvas::drawRectangle(const Rectangle& _rect, const Ref<Pen>& pen, co
 		return;
 	}
 	
-	RenderCanvasState* state = m_state.ptr;
+	RenderCanvasState* state = m_state.get();
 	
 	if (brush.isNotNull()) {
 		Rectangle rect = _rect;
@@ -600,7 +571,7 @@ void RenderCanvas::drawRectangle(const Rectangle& _rect, const Ref<Pen>& pen, co
 		pp.prepare(state, sl_true);
 		
 		RenderProgramScope<RenderCanvasProgramState> scope;
-		if (scope.begin(m_engine.ptr, shared->getProgram(pp))) {
+		if (scope.begin(m_engine.get(), shared->getProgram(pp))) {
 			Matrix3 mat;
 			mat.m00 = rect.getWidth(); mat.m10 = 0; mat.m20 = rect.left;
 			mat.m01 = 0; mat.m11 = rect.getHeight(); mat.m21 = rect.top;
@@ -648,7 +619,7 @@ void RenderCanvas::drawTexture(const Matrix3& transform, const Ref<Texture>& tex
 		return;
 	}
 	
-	RenderCanvasState* state = m_state.ptr;
+	RenderCanvasState* state = m_state.get();
 	
 	Rectangle rectSrc = _rectSrc;
 	sl_real sw = (sl_real)(texture->getWidth());
@@ -666,7 +637,7 @@ void RenderCanvas::drawTexture(const Matrix3& transform, const Ref<Texture>& tex
 	}
 	
 	RenderProgramScope<RenderCanvasProgramState> scope;
-	if (scope.begin(m_engine.ptr, shared->getProgram(pp))) {
+	if (scope.begin(m_engine.get(), shared->getProgram(pp))) {
 		pp.applyToProgramState(scope.getState(), transform);
 		scope->setTexture(texture);
 		scope->setTransform(transform * state->matrix * m_matViewport);
@@ -723,7 +694,7 @@ void RenderCanvas::drawTexture(const Rectangle& _rectDst, const Ref<Texture>& te
 		return;
 	}
 	
-	RenderCanvasState* state = m_state.ptr;
+	RenderCanvasState* state = m_state.get();
 	
 	Rectangle rectDst = _rectDst;
 	Rectangle rectSrc = _rectSrc;
@@ -753,7 +724,7 @@ void RenderCanvas::drawTexture(const Rectangle& _rectDst, const Ref<Texture>& te
 	}
 	
 	RenderProgramScope<RenderCanvasProgramState> scope;
-	if (scope.begin(m_engine.ptr, shared->getProgram(pp))) {
+	if (scope.begin(m_engine.get(), shared->getProgram(pp))) {
 		scope->setTexture(texture);
 		Matrix3 mat;
 		mat.m00 = rectDst.getWidth(); mat.m10 = 0; mat.m20 = rectDst.left;
@@ -820,7 +791,7 @@ void RenderCanvas::_drawBitmap(const Rectangle& rectDst, Bitmap* src, const Rect
 void RenderCanvas::onDraw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param)
 {
 	if (src->isBitmap()) {
-		_drawBitmap(rectDst, (Bitmap*)(src.ptr), rectSrc, param);
+		_drawBitmap(rectDst, (Bitmap*)(src.get()), rectSrc, param);
 	} else {
 		Canvas::onDraw(rectDst, src, rectSrc, param);
 	}
@@ -829,7 +800,7 @@ void RenderCanvas::onDraw(const Rectangle& rectDst, const Ref<Drawable>& src, co
 void RenderCanvas::onDrawAll(const Rectangle& rectDst, const Ref<Drawable>& src, const DrawParam& param)
 {
 	if (src->isBitmap()) {
-		_drawBitmap(rectDst, (Bitmap*)(src.ptr), Rectangle(0, 0, src->getDrawableWidth(), src->getDrawableHeight()), param);
+		_drawBitmap(rectDst, (Bitmap*)(src.get()), Rectangle(0, 0, src->getDrawableWidth(), src->getDrawableHeight()), param);
 	} else {
 		Canvas::onDrawAll(rectDst, src, param);
 	}

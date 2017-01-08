@@ -8,7 +8,7 @@
 
 SLIB_NAMESPACE_BEGIN
 
-SLIB_STATIC_ZERO_INITIALIZED(SafeWeakRef<Application>, _g_app)
+SLIB_STATIC_ZERO_INITIALIZED(AtomicWeakRef<Application>, _g_app)
 
 SLIB_DEFINE_OBJECT(Application, Object)
 
@@ -21,7 +21,7 @@ Application::Application()
 Ref<Application> Application::getApp()
 {
 	if (SLIB_SAFE_STATIC_CHECK_FREED(_g_app)) {
-		return Ref<Application>::null();
+		return sl_null;
 	}
 	return _g_app;
 }
@@ -48,7 +48,7 @@ List<String> Application::getArguments()
 
 String Application::getCommand(sl_uint32 index)
 {
-	return m_arguments.getItemValue(index, String::null());
+	return m_arguments.getValueAt(index);
 }
 
 void Application::run(const String& commandLine)
@@ -102,7 +102,7 @@ void Application::doRun()
 			System::sleep(100);
 		}
 		if (!m_uniqueInstanceHandle) {
-			SLIB_LOG_ERROR("APP", instanceId + " is ALREADY RUNNING");
+			LogError("APP", "%s is ALREADY RUNNING", instanceId);
 			return;
 		}
 	}
@@ -187,7 +187,7 @@ String Application::getEnvironmentPath(const String& key)
 	if (envMap) {
 		return envMap->getValue(key, String::null());
 	}
-	return String::null();
+	return sl_null;
 }
 
 String Application::parseEnvironmentPath(const String& _path)
@@ -215,7 +215,7 @@ String Application::getApplicationPath()
 {
 	String* s = _Application_getAppPath();
 	if (!s) {
-		return String::null();
+		return sl_null;
 	}
 	return *s;
 }
@@ -226,7 +226,7 @@ String Application::getApplicationDirectory()
 {
 	String* s = _Application_getAppDir();
 	if (!s) {
-		return String::null();
+		return sl_null;
 	}
 	return *s;
 }
@@ -357,7 +357,7 @@ List<String> Application::breakCommandLine(const String& commandLine)
 String Application::buildCommandLine(const String* argv, sl_size argc)
 {
 	StringBuffer commandLine;
-	for (int i = 0; i < argc; i++) {
+	for (sl_size i = 0; i < argc; i++) {
 		String s = argv[i];
 		if (i > 0) {
 			commandLine.add(" ");
@@ -365,7 +365,7 @@ String Application::buildCommandLine(const String* argv, sl_size argc)
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 		if (s.contains(" ") || s.contains("\t") || s.contains("\r") || s.contains("\n") || s.contains("\"")) {
 			commandLine.addStatic("\"", 1);
-			ListItems<String> items(s.split("\""));
+			ListElements<String> items(s.split("\""));
 			for (sl_size k = 0; k < items.count; k++) {
 				String t = items[k];
 				commandLine.add(t);

@@ -53,9 +53,8 @@ PointT<T> CubicBezierCurveT<T>::getPoint(T t)
 template <class T>
 sl_uint32 CubicBezierCurveT<T>::convertArcToBezier(PointT<T> pts[13], const RectangleT<T>& rc, T startDegrees, T sweepDegrees)
 {
-	T PI2, _2PI;
-	Math::getPI2(&PI2);
-	Math::get2PI(&_2PI);
+	T PI2 = Math::HalfPI<T>();
+	T _2PI = Math::DualPI<T>();
 	
 	T width = rc.getWidth();
 	T height = rc.getHeight();

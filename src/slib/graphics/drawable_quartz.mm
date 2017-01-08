@@ -17,17 +17,17 @@ Ref<Drawable> PlatformDrawable::create(const ImageDesc& desc)
 {
 	sl_uint32 width = desc.width;
 	if (width == 0) {
-		return Ref<Drawable>::null();
+		return sl_null;
 	}
 	sl_uint32 height = desc.height;
 	if (height == 0) {
-		return Ref<Drawable>::null();
+		return sl_null;
 	}
 	sl_uint32 stride = desc.stride;
 	Ref<Drawable> ret;
 	Ref<Referable> refData = desc.ref;
 	refData->increaseReference();
-	CGDataProviderRef provider = CGDataProviderCreateWithData(refData.ptr, desc.colors, (stride * height) << 2, _Drawable_DataProviderRelease);
+	CGDataProviderRef provider = CGDataProviderCreateWithData(refData.get(), desc.colors, (stride * height) << 2, _Drawable_DataProviderRelease);
 	if (provider) {
 		CGColorSpaceRef colorSpaceRef = CGColorSpaceCreateDeviceRGB();
 		if (colorSpaceRef) {
@@ -55,7 +55,7 @@ Ref<Drawable> PlatformDrawable::loadFromMemory(const void* mem, sl_size size)
 		CGImageRelease(image);
 		return ret;
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 
@@ -100,7 +100,7 @@ public:
 			}
 			CGImageRelease(image);
 		}
-		return Ref<_Quartz_ImageDrawable>::null();
+		return sl_null;
 	}
 	
 	// override
@@ -147,8 +147,7 @@ Ref<Drawable> GraphicsPlatform::createImageDrawable(CGImageRef image, sl_bool fl
 
 CGImageRef GraphicsPlatform::getImageDrawableHandle(Drawable* _drawable)
 {
-	if (_Quartz_ImageDrawable::checkInstance(_drawable)) {
-		_Quartz_ImageDrawable* drawable = (_Quartz_ImageDrawable*)_drawable;
+	if (_Quartz_ImageDrawable* drawable = CastInstance<_Quartz_ImageDrawable>(_drawable)) {
 		return drawable->m_image;
 	}
 	return NULL;

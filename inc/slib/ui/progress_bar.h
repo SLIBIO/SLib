@@ -106,9 +106,9 @@ protected:
 	float m_step;
 	sl_bool m_flagReversed;
 	
-	SafeRef<Drawable> m_track;
-	SafeRef<Drawable> m_progress;
-	SafeRef<Drawable> m_progress2;
+	AtomicRef<Drawable> m_track;
+	AtomicRef<Drawable> m_progress;
+	AtomicRef<Drawable> m_progress2;
 	
 };
 

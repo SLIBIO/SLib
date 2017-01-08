@@ -83,7 +83,7 @@ public:
 				return ret;
 			}
 		}
-		return Ref<_Sensor>::null();
+		return sl_null;
 	}
 
 	// override

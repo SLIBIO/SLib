@@ -141,7 +141,7 @@ public:
 	void onSwipe(GestureType type);
 	
 public:
-	SLIB_PTR_PROPERTY(IViewPagerListener, Listener)
+	SLIB_PROPERTY(AtomicPtr<IViewPagerListener>, Listener)
 	
 protected:
 	CList< Ref<View> > m_pages;
@@ -345,16 +345,16 @@ protected:
 	void _applyDefaultClosingPopupTransition(Transition& transition);
 	
 public:
-	SLIB_CALLBACK_PROPERTY(OnClose);
+	SLIB_PROPERTY(AtomicFunction<void()>, OnClose);
 	
 protected:
-	SafeWeakRef<ViewPager> m_pager;
+	AtomicWeakRef<ViewPager> m_pager;
 	
 	sl_bool m_flagDidPopup;
 	sl_bool m_flagClosingPopup;
 	Color m_popupBackgroundColor;
 	sl_bool m_flagDidModalOnUIThread;
-	SafeRef<Event> m_eventClosePopup;
+	AtomicRef<Event> m_eventClosePopup;
 	
 };
 

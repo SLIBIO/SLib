@@ -28,7 +28,7 @@ public:
 				}
 			}
 		}
-		return Ref<T>::null();
+		return sl_null;
 	}
 
 	template <class T>
@@ -40,7 +40,7 @@ public:
 				return ret;
 			}
 		}
-		return Ref<T>::null();
+		return sl_null;
 	}
 
 	sl_bool init(jobject jhandle);

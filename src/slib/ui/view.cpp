@@ -77,7 +77,7 @@ Ref<View::LayoutAttributes> View::_initializeLayoutAttibutes()
 	}
 	attrs = new LayoutAttributes;
 	if (attrs.isNull()) {
-		return Ref<LayoutAttributes>::null();
+		return sl_null;
 	}
 
 	attrs->widthMode = SizeMode::Fixed;
@@ -138,7 +138,7 @@ Ref<View::TransformAttributes> View::_initializeTransformAttributes()
 	}
 	attrs = new TransformAttributes;
 	if (attrs.isNull()) {
-		return Ref<TransformAttributes>::null();
+		return sl_null;
 	}
 
 	attrs->flagTransformFinalInvalid = sl_false;
@@ -183,7 +183,7 @@ Ref<View::DrawAttributes> View::_initializeDrawAttributes()
 	}
 	attrs = new DrawAttributes;
 	if (attrs.isNull()) {
-		return Ref<DrawAttributes>::null();
+		return sl_null;
 	}
 	
 	attrs->backgroundScaleMode = ScaleMode::Stretch;
@@ -227,7 +227,7 @@ Ref<View::AnimationAttributes> View::_initializeAnimationAttributes()
 	}
 	attrs = new AnimationAttributes;
 	if (attrs.isNull()) {
-		return Ref<AnimationAttributes>::null();
+		return sl_null;
 	}
 	
 	m_animationAttributes = attrs;
@@ -243,7 +243,7 @@ Ref<View::ScrollAttributes> View::_initializeScrollAttributes()
 	}
 	attrs = new ScrollAttributes;
 	if (attrs.isNull()) {
-		return Ref<ScrollAttributes>::null();
+		return sl_null;
 	}
 	
 	attrs->flagValidHorz = sl_false;
@@ -336,7 +336,7 @@ void View::setAttachMode(UIAttachMode mode)
 
 Ref<ViewInstance> View::createNativeWidget(ViewInstance* parent)
 {
-	return Ref<ViewInstance>::null();
+	return sl_null;
 }
 
 Ref<ViewInstance> View::createInstance(ViewInstance* parent)
@@ -351,7 +351,7 @@ Ref<ViewInstance> View::createInstance(ViewInstance* parent)
 		}
 		return createGenericInstance(parent);
 	}
-	return Ref<ViewInstance>::null();
+	return sl_null;
 }
 
 sl_bool View::isNativeWidget()
@@ -373,7 +373,7 @@ Ref<Window> View::getWindow()
 	if (parent.isNotNull()) {
 		return parent->getWindow();
 	}
-	return Ref<Window>::null();
+	return sl_null;
 }
 
 void View::setWindow(const Ref<Window>& window)
@@ -413,14 +413,14 @@ void View::attach(const Ref<ViewInstance>& instance)
 		if (UI::isUiThread()) {
 			_processAttachOnUiThread();
 		} else {
-			UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, _processAttachOnUiThread, this));
+			UI::dispatchToUiThread(SLIB_FUNCTION_WEAKREF(View, _processAttachOnUiThread, this));
 		}
 	}
 }
 
 Ref<ViewInstance> View::attachToNewInstance(const Ref<ViewInstance>& parent)
 {
-	Ref<ViewInstance> instance = createInstance(parent.ptr);
+	Ref<ViewInstance> instance = createInstance(parent.get());
 	if (instance.isNotNull()) {
 		attach(instance);
 	}
@@ -444,7 +444,7 @@ void View::_processAttachOnUiThread()
 		if (gesture.isNotNull()) {
 			gesture->enableNative();
 		}
-		if (getParent().isNull() && !(RenderView::checkInstance(this))) {
+		if (getParent().isNull() && !(IsInstanceOf<RenderView>(this))) {
 			_makeLayout(sl_false);
 		}
 		if (m_flagCreatingChildInstances) {
@@ -527,12 +527,12 @@ void View::insertChild(sl_size index, const Ref<View>& view, UIUpdateMode mode)
 
 void View::removeChild(sl_size index, UIUpdateMode mode)
 {
-	Ref<View> view = m_children.getItemValue(index, Ref<View>::null());
+	Ref<View> view = m_children.getValueAt(index);
 	if (view.isNull()) {
 		return;
 	}
 	_removeChild(view);
-	m_children.remove(index);
+	m_children.removeAt(index);
 	if (view == m_childMouseDown) {
 		m_childMouseDown.setNull();
 	}
@@ -570,14 +570,14 @@ void View::removeAllChildren(UIUpdateMode mode)
 {
 	if (isInstance()) {
 		if (!(UI::isUiThread())) {
-			UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, removeAllChildren, this, mode));
+			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), View, removeAllChildren, this, mode));
 			return;
 		}
 		ListLocker< Ref<View> > children(m_children);
 		for (sl_size i = 0; i < children.count; i++) {
 			Ref<View>& child = children[i];
 			if (child.isNotNull()) {
-				_removeChild(child.ptr);
+				_removeChild(child.get());
 			}
 		}
 	} else {
@@ -606,7 +606,7 @@ Ref<View> View::getChildAt(sl_ui_pos x, sl_ui_pos y)
 			}
 		}
 	}
-	return Ref<View>::null();
+	return sl_null;
 }
 
 Ref<View> View::getChildAt(const UIPoint& point)
@@ -629,7 +629,7 @@ Ref<View> View::getChildById(const String& _id)
 			}
 		}
 	}
-	return Ref<View>::null();
+	return sl_null;
 }
 
 Ref<View> View::getRootView()
@@ -656,7 +656,7 @@ Ref<View> View::getInstanceView()
 	if (parent.isNotNull()) {
 		return parent->getInstanceView();
 	}
-	return Ref<View>::null();
+	return sl_null;
 }
 
 Ref<ViewInstance> View::getInstanceViewInstance()
@@ -669,7 +669,7 @@ Ref<ViewInstance> View::getInstanceViewInstance()
 	if (parent.isNotNull()) {
 		return parent->getInstanceViewInstance();
 	}
-	return Ref<ViewInstance>::null();
+	return sl_null;
 }
 
 void View::removeFromParent()
@@ -685,7 +685,7 @@ void View::attachChild(const Ref<View>& child)
 	if (m_flagCreatingChildInstances) {
 		if (child.isNotNull() && child->m_flagCreatingInstance) {
 			if (!(UI::isUiThread())) {
-				UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, attachChild, this, child));
+				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), View, attachChild, this, child));
 				return;
 			}
 			Ref<ViewInstance> parentInstance = getViewInstance();
@@ -704,7 +704,7 @@ void View::addChildInstance(const Ref<ViewInstance>& child)
 			if (UI::isUiThread()) {
 				instance->addChildInstance(child);
 			} else {
-				UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, addChildInstance, this, child));
+				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), View, addChildInstance, this, child));
 			}
 		}
 	}
@@ -718,7 +718,7 @@ void View::removeChildInstance(const Ref<ViewInstance>& child)
 			if (UI::isUiThread()) {
 				instance->removeChildInstance(child);
 			} else {
-				UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, removeChildInstance, this, child));
+				UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), View, removeChildInstance, this, child));
 			}
 		}
 	}
@@ -752,7 +752,7 @@ void View::bringToFront(UIUpdateMode mode)
 		ObjectLocker lock(&(parent->m_children));
 		sl_reg index = parent->m_children.indexOf_NoLock(this);
 		if (index >= 0) {
-			parent->m_children.remove_NoLock(index);
+			parent->m_children.removeAt_NoLock(index);
 			parent->m_children.add_NoLock(this);
 			if (instance.isNull()) {
 				if (mode == UIUpdateMode::Redraw) {
@@ -774,7 +774,7 @@ void View::_addChild(const Ref<View>& child, UIUpdateMode mode)
 		}
 		child->setParent(this);
 		if (m_flagOnAddChild) {
-			onAddChild(child.ptr);
+			onAddChild(child.get());
 		}
 		if (mode != UIUpdateMode::Init) {
 			requestLayout(UIUpdateMode::NoRedraw);
@@ -809,11 +809,11 @@ void View::_removeChild(const Ref<View>& view)
 {
 	if (view.isNotNull()) {
 		if (m_flagOnRemoveChild) {
-			onRemoveChild(view.ptr);
+			onRemoveChild(view.get());
 		}
 		Ref<ViewInstance> instanceChild = view->getViewInstance();
 		if (instanceChild.isNotNull()) {
-			removeChildInstance(instanceChild.ptr);
+			removeChildInstance(instanceChild.get());
 			view->detach();
 		}
 		view->removeParent(this);
@@ -1333,7 +1333,7 @@ Ref<View> View::getFocusedDescendant()
 		}
 		return focused;
 	}
-	return Ref<View>::null();
+	return sl_null;
 }
 
 void View::_setFocusedChild(View* child, UIUpdateMode mode)
@@ -1867,7 +1867,7 @@ void View::_makeLayout(sl_bool flagApplyLayout)
 										child->onPrepareLayout(param);
 									}
 								}
-								if (child->isInstance() && RenderView::checkInstance(child.ptr)) {
+								if (child->isInstance() && IsInstanceOf<RenderView>(child)) {
 									child->_setFrame(child->getLayoutFrame(), UIUpdateMode::NoRedraw, sl_true);
 									child->_requestMakeLayout();
 								} else {
@@ -2252,7 +2252,7 @@ void View::_requestMakeLayout()
 	Ref<View> view = this;
 	while (view.isNotNull()) {
 		if (view->isInstance()) {
-			if (RenderView::checkInstance(view.ptr)) {
+			if (IsInstanceOf<RenderView>(view)) {
 				flagRenderView = sl_true;
 				break;
 			}
@@ -2260,9 +2260,9 @@ void View::_requestMakeLayout()
 		view = view->getParent();
 	}
 	if (flagRenderView) {
-		((RenderView*)(view.ptr))->requestRender();
+		((RenderView*)(view.get()))->requestRender();
 	} else {
-		UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(View, _makeLayout, this, sl_false));
+		UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), View, _makeLayout, this, sl_false));
 	}
 }
 
@@ -2746,7 +2746,7 @@ Ref<View> View::getLayoutLeftReferingView()
 	if (attrs.isNotNull()) {
 		return attrs->leftReferingView;
 	}
-	return Ref<View>::null();
+	return sl_null;
 }
 
 sl_bool View::isLayoutRightFixed()
@@ -2835,7 +2835,7 @@ Ref<View> View::getLayoutRightReferingView()
 	if (attrs.isNotNull()) {
 		return attrs->rightReferingView;
 	}
-	return Ref<View>::null();
+	return sl_null;
 }
 
 sl_bool View::isLayoutTopFixed()
@@ -2925,7 +2925,7 @@ Ref<View> View::getLayoutTopReferingView()
 	if (attrs.isNotNull()) {
 		return attrs->topReferingView;
 	}
-	return Ref<View>::null();
+	return sl_null;
 }
 
 sl_bool View::isLayoutBottomFixed()
@@ -3014,7 +3014,7 @@ Ref<View> View::getLayoutBottomReferingView()
 	if (attrs.isNotNull()) {
 		return attrs->bottomReferingView;
 	}
-	return Ref<View>::null();
+	return sl_null;
 }
 
 sl_bool View::isCenterHorizontal()
@@ -4197,7 +4197,7 @@ Ref<Drawable> View::getBackground()
 	if (attrs.isNotNull()) {
 		return attrs->background;
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 void View::setBackground(const Ref<Drawable>& drawable, UIUpdateMode mode)
@@ -4217,7 +4217,7 @@ Ref<Drawable> View::getPressedBackground()
 	if (attrs.isNotNull()) {
 		return attrs->backgroundPressed;
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 void View::setPressedBackground(const Ref<Drawable>& drawable, UIUpdateMode mode)
@@ -4237,7 +4237,7 @@ Ref<Drawable> View::getHoverBackground()
 	if (attrs.isNotNull()) {
 		return attrs->backgroundHover;
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 void View::setHoverBackground(const Ref<Drawable>& drawable, UIUpdateMode mode)
@@ -4321,7 +4321,7 @@ Ref<Pen> View::getBorder()
 	if (attrs.isNotNull()) {
 		return attrs->penBorder;
 	}
-	return Ref<Pen>::null();
+	return sl_null;
 }
 
 void View::setBorder(const Ref<Pen>& pen, UIUpdateMode mode)
@@ -4506,7 +4506,7 @@ Ref<GraphicsPath> View::getBoundShapePath()
 	if (attrs.isNotNull()) {
 		return attrs->boundShapePath;
 	}
-	return Ref<GraphicsPath>::null();
+	return sl_null;
 }
 
 void View::setBoundShapePath(const Ref<GraphicsPath>& path, UIUpdateMode mode)
@@ -4934,7 +4934,7 @@ Ref<Animation> View::getTransformAnimation()
 	if (attrs.isNotNull()) {
 		return attrs->animationTransform;
 	}
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
 void View::setTransformAnimation(const Ref<Animation>& animation, const AnimationFrames<Matrix3>& frames, UIUpdateMode mode)
@@ -4969,7 +4969,7 @@ Ref<Animation> View::startTransformAnimation(const AnimationFrames<Matrix3>& fra
 		animation->start();
 		return animation;
 	}
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
 Ref<Animation> View::startTransformAnimation(const Matrix3& startValue, const Matrix3& endValue, float duration, AnimationCurve curve)
@@ -5024,7 +5024,7 @@ Ref<Animation> View::getTranslateAnimation()
 	if (attrs.isNotNull()) {
 		return attrs->animationTranslation;
 	}
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
 void View::setTranslateAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, UIUpdateMode mode)
@@ -5059,7 +5059,7 @@ Ref<Animation> View::startTranslateAnimation(const AnimationFrames<Vector2>& fra
 		animation->start();
 		return animation;
 	}
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
 Ref<Animation> View::startTranslateAnimation(const Vector2& startValue, const Vector2& endValue, float duration, AnimationCurve curve)
@@ -5114,7 +5114,7 @@ Ref<Animation> View::getScaleAnimation()
 	if (attrs.isNotNull()) {
 		return attrs->animationScale;
 	}
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
 void View::setScaleAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, UIUpdateMode mode)
@@ -5155,7 +5155,7 @@ Ref<Animation> View::startScaleAnimation(const AnimationFrames<Vector2>& frames,
 		animation->start();
 		return animation;
 	}
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
 Ref<Animation> View::startScaleAnimation(const Vector2& startValue, const Vector2& endValue, float duration, AnimationCurve curve)
@@ -5216,7 +5216,7 @@ Ref<Animation> View::getRotateAnimation()
 	if (attrs.isNotNull()) {
 		return attrs->animationRotation;
 	}
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
 void View::setRotateAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, UIUpdateMode mode)
@@ -5251,7 +5251,7 @@ Ref<Animation> View::startRotateAnimation(const AnimationFrames<sl_real>& frames
 		animation->start();
 		return animation;
 	}
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
 Ref<Animation> View::startRotateAnimation(sl_real startValue, sl_real endValue, float duration, AnimationCurve curve)
@@ -5306,7 +5306,7 @@ Ref<Animation> View::getFrameAnimation()
 	if (attrs.isNotNull()) {
 		return attrs->animationFrame;
 	}
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
 void View::setFrameAnimation(const Ref<Animation>& animation, const AnimationFrames<Rectangle>& frames, UIUpdateMode mode)
@@ -5341,7 +5341,7 @@ Ref<Animation> View::startFrameAnimation(const AnimationFrames<Rectangle>& frame
 		animation->start();
 		return animation;
 	}
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
 Ref<Animation> View::startFrameAnimation(const Rectangle& startValue, const Rectangle& endValue, float duration, AnimationCurve curve)
@@ -5395,7 +5395,7 @@ Ref<Animation> View::getAlphaAnimation()
 	if (attrs.isNotNull()) {
 		return attrs->animationAlpha;
 	}
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
 void View::setAlphaAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, UIUpdateMode mode)
@@ -5430,7 +5430,7 @@ Ref<Animation> View::startAlphaAnimation(const AnimationFrames<sl_real>& frames,
 		animation->start();
 		return animation;
 	}
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
 Ref<Animation> View::startAlphaAnimation(sl_real startValue, sl_real endValue, float duration, AnimationCurve curve)
@@ -5485,7 +5485,7 @@ Ref<Animation> View::getBackgroundColorAnimation()
 	if (attrs.isNotNull()) {
 		return attrs->animationBackgroundColor;
 	}
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
 void View::setBackgroundColorAnimation(const Ref<Animation>& animation, const AnimationFrames<Color4f>& frames, UIUpdateMode mode)
@@ -5520,7 +5520,7 @@ Ref<Animation> View::startBackgroundColorAnimation(const AnimationFrames<Color4f
 		animation->start();
 		return animation;
 	}
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
 Ref<Animation> View::startBackgroundColorAnimation(const Color4f& startValue, const Color4f& endValue, float duration, AnimationCurve curve)
@@ -5554,7 +5554,7 @@ Ref<ScrollBar> View::getHorizontalScrollBar()
 	if (attrs.isNotNull()) {
 		return attrs->horz;
 	}
-	return Ref<ScrollBar>::null();
+	return sl_null;
 }
 
 Ref<ScrollBar> View::getVerticalScrollBar()
@@ -5563,7 +5563,7 @@ Ref<ScrollBar> View::getVerticalScrollBar()
 	if (attrs.isNotNull()) {
 		return attrs->vert;
 	}
-	return Ref<ScrollBar>::null();
+	return sl_null;
 }
 
 void View::setHorizontalScrollBar(const Ref<ScrollBar>& bar, UIUpdateMode mode)
@@ -6025,7 +6025,7 @@ Ref<ScrollBar> View::_createHorizontalScrollBar()
 	if (ret.isNotNull()) {
 		return ret;
 	}
-	return Ref<ScrollBar>::null();
+	return sl_null;
 }
 
 Ref<ScrollBar> View::_createVerticalScrollBar()
@@ -6034,7 +6034,7 @@ Ref<ScrollBar> View::_createVerticalScrollBar()
 	if (ret.isNotNull()) {
 		return ret;
 	}
-	return Ref<ScrollBar>::null();
+	return sl_null;
 }
 
 
@@ -6162,7 +6162,7 @@ Ref<View> View::getFirstFocusableDescendant()
 			}
 		}
 	}
-	return Ref<View>::null();
+	return sl_null;
 }
 
 Ref<View> View::getLastFocusableDescendant()
@@ -6180,7 +6180,7 @@ Ref<View> View::getLastFocusableDescendant()
 			}
 		}
 	}
-	return Ref<View>::null();
+	return sl_null;
 }
 
 sl_bool View::isProcessingTabStop()
@@ -6311,7 +6311,7 @@ void View::drawChildren(Canvas* canvas, const Ref<View>* children, sl_size count
 	UIRect rcInvalidatedParent = canvas->getInvalidatedRect();
 	
 	for (sl_size i = 0; i < count; i++) {
-		View* child = children[i].ptr;
+		View* child = children[i].get();
 		if (child) {
 			if (child->isVisible()) {
 				if (child->isInstance()) {
@@ -6438,14 +6438,14 @@ Ref<Bitmap> View::drawLayer()
 {
 	Ref<DrawAttributes> drawAttrs = _initializeDrawAttributes();
 	if (drawAttrs.isNull()) {
-		return Ref<Bitmap>::null();
+		return sl_null;
 	}
 	
 	sl_uint32 width = getWidth();
 	sl_uint32 height = getHeight();
 	
 	if (width == 0 || height == 0 || width > MAX_LAYER_SIZE || height > MAX_LAYER_SIZE) {
-		return Ref<Bitmap>::null();
+		return sl_null;
 	}
 
 	sl_bool flagInvalidate = drawAttrs->flagInvalidatedLayer;
@@ -6457,11 +6457,11 @@ Ref<Bitmap> View::drawLayer()
 	if (bitmap.isNull() || bitmap->getWidth() < width || bitmap->getHeight() < height) {
 		bitmap = Bitmap::create((width + 255) & 0xFFFFFF00, (height + 255) & 0xFFFFFF00);
 		if (bitmap.isNull()) {
-			return Ref<Bitmap>::null();
+			return sl_null;
 		}
 		canvas = bitmap->getCanvas();
 		if (canvas.isNull()) {
-			return Ref<Bitmap>::null();
+			return sl_null;
 		}
 		drawAttrs->bitmapLayer = bitmap;
 		drawAttrs->canvasLayer = canvas;
@@ -6499,7 +6499,7 @@ Ref<Bitmap> View::drawLayer()
 	} while (0);
 
 	CanvasStateScope scope(canvas);
-	drawContent(canvas.ptr);
+	drawContent(canvas.get());
 
 	return bitmap;
 	
@@ -6764,7 +6764,7 @@ void View::dispatchMouseEvent(UIEvent* ev)
 				sl_bool flagSP = ev->isStoppedPropagation();
 				UIAction action = ev->getAction();
 				ev->setAction(UIAction::MouseLeave);
-				dispatchMouseEventToChild(ev, oldChildMouseMove.ptr);
+				dispatchMouseEventToChild(ev, oldChildMouseMove.get());
 				ev->setAction(action);
 				ev->setStoppedPropagation(flagSP);
 				m_childMouseMove.setNull();
@@ -6816,7 +6816,7 @@ sl_bool View::dispatchMouseEventToChildren(UIEvent* ev, const Ref<View>* childre
 		case UIAction::RightButtonDown:
 		case UIAction::MiddleButtonDown:
 			for (sl_size i = 0; i < count; i++) {
-				View* child = children[count - 1 - i].ptr;
+				View* child = children[count - 1 - i].get();
 				if (POINT_EVENT_CHECK_CHILD(child)) {
 					UIPointf pt = child->convertCoordinateFromParent(ptMouse);
 					if (child->hitTest(pt)) {
@@ -6837,14 +6837,14 @@ sl_bool View::dispatchMouseEventToChildren(UIEvent* ev, const Ref<View>* childre
 		case UIAction::MiddleButtonDrag:
 			oldChild = m_childMouseDown;
 			if (oldChild.isNotNull()) {
-				dispatchMouseEventToChild(ev, oldChild.ptr);
+				dispatchMouseEventToChild(ev, oldChild.get());
 			}
 			return sl_true;
 		case UIAction::LeftButtonDoubleClick:
 		case UIAction::RightButtonDoubleClick:
 		case UIAction::MiddleButtonDoubleClick:
 			for (sl_size i = 0; i < count; i++) {
-				View* child = children[count - 1 - i].ptr;
+				View* child = children[count - 1 - i].get();
 				if (POINT_EVENT_CHECK_CHILD(child)) {
 					UIPointf pt = child->convertCoordinateFromParent(ptMouse);
 					if (child->hitTest(pt)) {
@@ -6863,7 +6863,7 @@ sl_bool View::dispatchMouseEventToChildren(UIEvent* ev, const Ref<View>* childre
 		case UIAction::MiddleButtonUp:
 			oldChild = m_childMouseDown;
 			if (oldChild.isNotNull()) {
-				dispatchMouseEventToChild(ev, oldChild.ptr);
+				dispatchMouseEventToChild(ev, oldChild.get());
 				if (action == _View_getActionUp(m_actionMouseDown)) {
 					m_childMouseDown.setNull();
 					m_actionMouseDown = UIAction::Unknown;
@@ -6874,7 +6874,7 @@ sl_bool View::dispatchMouseEventToChildren(UIEvent* ev, const Ref<View>* childre
 		case UIAction::MouseEnter:
 			oldChild = m_childMouseMove;
 			for (sl_size i = 0; i < count; i++) {
-				View* child = children[count - 1 - i].ptr;
+				View* child = children[count - 1 - i].get();
 				if (POINT_EVENT_CHECK_CHILD(child)) {
 					UIPointf pt = child->convertCoordinateFromParent(ptMouse);
 					if (child->hitTest(pt)) {
@@ -6891,7 +6891,7 @@ sl_bool View::dispatchMouseEventToChildren(UIEvent* ev, const Ref<View>* childre
 							m_childMouseMove = child;
 							if (oldChild.isNotNull() && oldChild != child) {
 								ev->setAction(UIAction::MouseLeave);
-								dispatchMouseEventToChild(ev, oldChild.ptr);
+								dispatchMouseEventToChild(ev, oldChild.get());
 								ev->setAction(action);
 							}
 							return sl_true;
@@ -6903,7 +6903,7 @@ sl_bool View::dispatchMouseEventToChildren(UIEvent* ev, const Ref<View>* childre
 		case UIAction::MouseLeave:
 			oldChild = m_childMouseMove;
 			if (oldChild.isNotNull()) {
-				dispatchMouseEventToChild(ev, oldChild.ptr);
+				dispatchMouseEventToChild(ev, oldChild.get());
 				m_childMouseMove.setNull();
 			}
 			return sl_true;
@@ -7014,7 +7014,7 @@ sl_bool View::dispatchTouchEventToChildren(UIEvent *ev, const Ref<View>* childre
 	switch (action) {
 		case UIAction::TouchBegin:
 			for (sl_size i = 0; i < count; i++) {
-				View* child = children[count - 1 - i].ptr;
+				View* child = children[count - 1 - i].get();
 				if (POINT_EVENT_CHECK_CHILD(child)) {
 					UIPointf pt = child->convertCoordinateFromParent(ptMouse);
 					if (child->hitTest(pt)) {
@@ -7031,14 +7031,14 @@ sl_bool View::dispatchTouchEventToChildren(UIEvent *ev, const Ref<View>* childre
 		case UIAction::TouchMove:
 			oldChild = m_childMouseDown;
 			if (oldChild.isNotNull()) {
-				dispatchTouchEventToChild(ev, oldChild.ptr);
+				dispatchTouchEventToChild(ev, oldChild.get());
 				return sl_true;
 			}
 		case UIAction::TouchEnd:
 		case UIAction::TouchCancel:
 			oldChild = m_childMouseDown;
 			if (oldChild.isNotNull()) {
-				dispatchTouchEventToChild(ev, oldChild.ptr);
+				dispatchTouchEventToChild(ev, oldChild.get());
 				if (m_actionMouseDown == UIAction::TouchBegin) {
 					m_childMouseDown.setNull();
 					m_actionMouseDown = UIAction::Unknown;
@@ -7081,7 +7081,7 @@ void View::dispatchMultiTouchEventToChildren(UIEvent *ev, const Ref<View>* child
 				sl_size k;
 				
 				for (sl_size i = 0; i < count && nCheck > 0; i++) {
-					View* child = children[count - 1 - i].ptr;
+					View* child = children[count - 1 - i].get();
 					if (POINT_EVENT_CHECK_CHILD(child)) {
 						sl_size nInside = 0;
 						sl_size nOutside = 0;
@@ -7142,7 +7142,7 @@ void View::dispatchMultiTouchEventToChildren(UIEvent *ev, const Ref<View>* child
 				UIAction action = ev->getAction();
 				ev->setAction(UIAction::TouchCancel);
 				ev->setTouchPoints(arr);
-				dispatchTouchEventToChild(ev, list[i].ptr);
+				dispatchTouchEventToChild(ev, list[i].get());
 				ev->setAction(action);
 				ev->setStoppedPropagation(flagSP);
 			}
@@ -7252,7 +7252,7 @@ sl_bool View::dispatchMouseWheelEventToChildren(UIEvent* ev, const Ref<View>* ch
 	}
 	UIPointf ptMouse = ev->getPoint();
 	for (sl_size i = 0; i < count; i++) {
-		View* child = children[count - 1 - i].ptr;
+		View* child = children[count - 1 - i].get();
 		if (POINT_EVENT_CHECK_CHILD(child)) {
 			UIPointf pt = child->convertCoordinateFromParent(ptMouse);
 			if (child->hitTest(pt)) {
@@ -7363,7 +7363,7 @@ void View::dispatchClickWithNoEvent()
 {
 	Ref<UIEvent> ev = UIEvent::createMouseEvent(UIAction::Unknown, 0, 0, Time::zero());
 	if (ev.isNotNull()) {
-		dispatchClick(ev.ptr);		
+		dispatchClick(ev.get());		
 	}
 }
 
@@ -7428,7 +7428,7 @@ sl_bool View::dispatchSetCursorToChildren(UIEvent* ev, const Ref<View>* children
 	}
 	UIPointf ptMouse = ev->getPoint();
 	for (sl_size i = 0; i < count; i++) {
-		View* child = children[count - 1 - i].ptr;
+		View* child = children[count - 1 - i].get();
 		if (POINT_EVENT_CHECK_CHILD(child)) {
 			UIPointf pt = child->convertCoordinateFromParent(ptMouse);
 			if (child->hitTest(pt)) {
@@ -7629,7 +7629,7 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 #if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
 Ref<ViewInstance> View::createGenericInstance(ViewInstance* parent)
 {
-	return Ref<ViewInstance>::null();
+	return sl_null;
 }
 #endif
 

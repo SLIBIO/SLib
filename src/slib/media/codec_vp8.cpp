@@ -65,7 +65,7 @@ public:
 public:
 	static void logError(String str)
 	{
-		SLIB_LOG_ERROR("VideoVpxEncoder", str);
+		LogError("VideoVpxEncoder", str);
 	}
 	
 	static vpx_rc_mode _getBitrateControlMode(VPXBitrateMode mode)
@@ -136,7 +136,7 @@ public:
 			logError("Video codec is not supported");
 		}
 		
-		return Ref<_VP8EncoderImpl>::null();
+		return sl_null;
 	}
 	
 	Memory encode(const VideoFrame& input)
@@ -183,7 +183,7 @@ public:
 		} else {
 			logError("VideoFrame size is wrong.");
 		}
-		return Memory::null();
+		return sl_null;
 	}
 
 	void setBitrate(const sl_uint32& _bitrate)
@@ -224,7 +224,7 @@ public:
 public:
 	static void logError(String str)
 	{
-		SLIB_LOG_ERROR("VideoVpxDecoder", str);
+		LogError("VideoVpxDecoder", str);
 	}
 
 	static Ref<_VP8DecoderImpl> create(const VP8DecoderParam& param)
@@ -250,7 +250,7 @@ public:
 		} else {
 			logError("Video codec is not supported");
 		}
-		return Ref<_VP8DecoderImpl>::null();
+		return sl_null;
 	}
 
 	SLIB_INLINE sl_int32 vpx_img_plane_width(const vpx_image_t *img, sl_int32 plane)

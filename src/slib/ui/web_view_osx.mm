@@ -97,9 +97,9 @@ public:
 			NSString* s = [NSString stringWithFormat:@"%@", val];
 			params.add(Apple::getStringFromNSString(s));
 		}
-		String msg = params.getItemValue(0, String::null());
+		String msg = params.getValueAt(0);
 		if (msg.isNotEmpty()) {
-			String param = params.getItemValue(0, String::null());
+			String param = params.getValueAt(0);
 			dispatchMessageFromJavaScript(msg, param);
 		}
 	}
@@ -186,7 +186,7 @@ String WebView::_getPageTitle_NW()
 		String ret = Apple::getStringFromNSString(title);
 		return ret;
 	}
-	return String::null();
+	return sl_null;
 }
 
 void WebView::_goBack_NW()
@@ -330,9 +330,9 @@ SLIB_UI_NAMESPACE_END
 #endif
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::Ref<slib::View> view = instance->getView();
-		if (slib::WebView::checkInstance(view.ptr)) {
-			((slib::_WebView*)(view.ptr))->__onStartLoad(self);
+		slib::Ref<slib::View> _view = instance->getView();
+		if (slib::_WebView* view = slib::CastInstance<slib::_WebView>(_view.get())) {
+			view->__onStartLoad(self);
 		}
 	}
 }
@@ -349,9 +349,9 @@ SLIB_UI_NAMESPACE_END
 #endif
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::Ref<slib::View> view = instance->getView();
-		if (slib::WebView::checkInstance(view.ptr)) {
-			((slib::_WebView*)(view.ptr))->__onFinishLoad(self);
+		slib::Ref<slib::View> _view = instance->getView();
+		if (slib::_WebView* view = slib::CastInstance<slib::_WebView>(_view.get())) {
+			view->__onFinishLoad(self);
 		}
 	}
 }
@@ -368,9 +368,9 @@ SLIB_UI_NAMESPACE_END
 #endif
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::Ref<slib::View> view = instance->getView();
-		if (slib::WebView::checkInstance(view.ptr)) {
-			((slib::_WebView*)(view.ptr))->__onLoadError(self, error);
+		slib::Ref<slib::View> _view = instance->getView();
+		if (slib::_WebView* view = slib::CastInstance<slib::_WebView>(_view.get())) {
+			view->__onLoadError(self, error);
 		}
 	}
 }
@@ -388,9 +388,9 @@ SLIB_UI_NAMESPACE_END
 #endif
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::Ref<slib::View> view = instance->getView();
-		if (slib::WebView::checkInstance(view.ptr)) {
-			((slib::_WebView*)(view.ptr))->__onLoadError(self, error);
+		slib::Ref<slib::View> _view = instance->getView();
+		if (slib::_WebView* view = slib::CastInstance<slib::_WebView>(_view.get())) {
+			view->__onLoadError(self, error);
 		}
 	}
 }
@@ -401,9 +401,9 @@ SLIB_UI_NAMESPACE_END
 	id body = message.body;
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
-		slib::Ref<slib::View> view = instance->getView();
-		if (slib::WebView::checkInstance(view.ptr)) {
-			((slib::_WebView*)(view.ptr))->__onInvokeMethod(self, body);
+		slib::Ref<slib::View> _view = instance->getView();
+		if (slib::_WebView* view = slib::CastInstance<slib::_WebView>(_view.get())) {
+			view->__onInvokeMethod(self, body);
 		}
 	}
 }
@@ -417,9 +417,9 @@ SLIB_UI_NAMESPACE_END
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance.lock();
 	if (instance.isNotNull()) {
-		slib::Ref<slib::View> view = instance->getView();
-		if (slib::WebView::checkInstance(view.ptr)) {
-			((slib::_WebView*)(view.ptr))->__onInvokeMethod(self, args);
+		slib::Ref<slib::View> _view = instance->getView();
+		if (slib::_WebView* view = slib::CastInstance<slib::_WebView>ckInstance(_view.get())) {
+			view->__onInvokeMethod(self, args);
 		}
 	}
 	return nil;

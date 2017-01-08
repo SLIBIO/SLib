@@ -8,9 +8,9 @@ SLIB_NAMESPACE_BEGIN
 class SLIB_EXPORT SpinLock
 {
 public:
-	SpinLock();
+	SLIB_CONSTEXPR SpinLock() : m_flagLock(0) {}
 	
-	SpinLock(const SpinLock& other);
+	SLIB_CONSTEXPR SpinLock(const SpinLock& other) : m_flagLock(0) {}
 	
 public:
 	void lock() const;
@@ -23,7 +23,7 @@ public:
 	SpinLock& operator=(const SpinLock& other);
 
 private:
-	volatile mutable sl_int32 m_flagLock;
+	sl_int32 m_flagLock;
 	
 };
 
@@ -73,14 +73,14 @@ template <int CATEGORY>
 SLIB_INLINE SpinLock* SpinLockPool<CATEGORY>::get(const void* ptr)
 {
 	sl_size index = ((sl_size)(ptr)) % SLIB_SPINLOCK_POOL_SIZE;
-	return (SpinLock*)((void*)(m_locks + index));
+	return reinterpret_cast<SpinLock*>(m_locks + index);
 }
 
 SLIB_NAMESPACE_END
 
 #define SLIB_STATIC_SPINLOCK(NAME) \
 	static sl_int32 _static_spinlock_##NAME = 0; \
-	slib::SpinLock& NAME = *((slib::SpinLock*)((void*)(&_static_spinlock_##NAME)));
+	slib::SpinLock& NAME = *(reinterpret_cast<slib::SpinLock*>(&_static_spinlock_##NAME));
 
 #define SLIB_STATIC_SPINLOCKER(NAME) \
 	SLIB_STATIC_SPINLOCK(NAME) \

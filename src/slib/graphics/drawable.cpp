@@ -131,12 +131,12 @@ void Drawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst, const DrawPar
 
 sl_bool Drawable::isBitmap()
 {
-	return Bitmap::checkInstance(this);
+	return IsInstanceOf<Bitmap>(this);
 }
 
 sl_bool Drawable::isImage()
 {
-	return Image::checkInstance(this);
+	return IsInstanceOf<Image>(this);
 }
 
 Ref<Drawable> Drawable::filter(const ColorMatrix& colorMatrix, sl_real alpha, sl_real blurRadius)
@@ -164,7 +164,7 @@ Ref<Drawable> Drawable::createSubDrawable(const Ref<Drawable>& src, sl_real x, s
 	if (src.isNotNull()) {
 		return src->subDrawable(x, y, width, height);
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 Ref<Drawable> Drawable::createSubDrawable(const Ref<Drawable>& src, const Rectangle& rectSrc)
@@ -172,7 +172,7 @@ Ref<Drawable> Drawable::createSubDrawable(const Ref<Drawable>& src, const Rectan
 	if (src.isNotNull()) {
 		return src->subDrawable(rectSrc.left, rectSrc.top, rectSrc.getWidth(), rectSrc.getHeight());
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 Ref<Drawable> Drawable::createScaledDrawable(const Ref<Drawable>& src, sl_real width, sl_real height)
@@ -180,7 +180,7 @@ Ref<Drawable> Drawable::createScaledDrawable(const Ref<Drawable>& src, sl_real w
 	if (src.isNotNull()) {
 		return src->scaleDrawable(width, height);
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 Ref<Drawable> Drawable::createScaledDrawable(const Ref<Drawable>& src, const Size& size)
@@ -188,7 +188,7 @@ Ref<Drawable> Drawable::createScaledDrawable(const Ref<Drawable>& src, const Siz
 	if (src.isNotNull()) {
 		return src->scaleDrawable(size.x, size.y);
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 Ref<Drawable> Drawable::filter(const Ref<Drawable>& src, const ColorMatrix& colorMatrix, sl_real alpha, sl_real blurRadius)
@@ -196,7 +196,7 @@ Ref<Drawable> Drawable::filter(const Ref<Drawable>& src, const ColorMatrix& colo
 	if (src.isNotNull()) {
 		return src->filter(colorMatrix, alpha, blurRadius);
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 Ref<Drawable> Drawable::filter(const Ref<Drawable>& src, sl_real alpha, sl_real blurRadius)
@@ -204,7 +204,7 @@ Ref<Drawable> Drawable::filter(const Ref<Drawable>& src, sl_real alpha, sl_real 
 	if (src.isNotNull()) {
 		return src->filter(alpha, blurRadius);
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 
@@ -215,7 +215,7 @@ Ref<Drawable> PlatformDrawable::create(const Ref<Image>& image)
 		image->getDesc(desc);
 		return PlatformDrawable::create(desc);
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 Ref<Drawable> PlatformDrawable::loadFromMemory(const Memory& mem)
@@ -223,7 +223,7 @@ Ref<Drawable> PlatformDrawable::loadFromMemory(const Memory& mem)
 	if (mem.isNotEmpty()) {
 		return PlatformDrawable::loadFromMemory(mem.getData(), mem.getSize());
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 
@@ -233,7 +233,7 @@ Ref<Drawable> PlatformDrawable::loadFromFile(const String& filePath)
 	if (mem.isNotEmpty()) {
 		return PlatformDrawable::loadFromMemory(mem);
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 Ref<Drawable> PlatformDrawable::loadFromAsset(const String& path)
@@ -242,7 +242,7 @@ Ref<Drawable> PlatformDrawable::loadFromAsset(const String& path)
 	if (mem.isNotEmpty()) {
 		return PlatformDrawable::loadFromMemory(mem);
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 SLIB_DEFINE_OBJECT(ColorDrawable, Drawable)
@@ -266,9 +266,9 @@ Ref<Drawable> ColorDrawable::create(const Color& color)
 
 sl_bool ColorDrawable::check(const Ref<Drawable>& drawable, Color* outColor)
 {
-	if (ColorDrawable::checkInstance(drawable.ptr)) {
+	if (ColorDrawable* c = CastInstance<ColorDrawable>(drawable.get())) {
 		if (outColor) {
-			*outColor = ((ColorDrawable*)(drawable.ptr))->m_color;
+			*outColor = c->m_color;
 		}
 		return sl_true;
 	} else {
@@ -327,7 +327,7 @@ Ref<Drawable> SubDrawable::create(const Ref<Drawable>& src, sl_real x, sl_real y
 			return sub;
 		}
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 sl_real SubDrawable::getDrawableWidth()
@@ -379,7 +379,7 @@ Ref<Drawable> ScaledDrawable::create(const Ref<Drawable>& src, sl_real width, sl
 			return ret;
 		}
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 sl_real ScaledDrawable::getDrawableWidth()
@@ -436,7 +436,7 @@ Ref<Drawable> ScaledSubDrawable::create(const Ref<Drawable>& src, const Rectangl
 			return ret;
 		}
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 sl_real ScaledSubDrawable::getDrawableWidth()
@@ -489,7 +489,7 @@ SLIB_DEFINE_OBJECT(FilterDrawable, Drawable)
 Ref<Drawable> FilterDrawable::create(const Ref<Drawable>& src, const ColorMatrix& colorMatrix, sl_real alpha, sl_real blurRadius)
 {
 	if (src.isNull()) {
-		return Ref<Drawable>::null();
+		return sl_null;
 	}
 	Ref<FilterDrawable> ret = new FilterDrawable;
 	if (ret.isNotNull()) {
@@ -500,13 +500,13 @@ Ref<Drawable> FilterDrawable::create(const Ref<Drawable>& src, const ColorMatrix
 		ret->m_blurRadius = blurRadius;
 		return ret;
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 Ref<Drawable> FilterDrawable::create(const Ref<Drawable>& src, sl_real alpha, sl_real blurRadius)
 {
 	if (src.isNull()) {
-		return Ref<Drawable>::null();
+		return sl_null;
 	}
 	Ref<FilterDrawable> ret = new FilterDrawable;
 	if (ret.isNotNull()) {
@@ -516,7 +516,7 @@ Ref<Drawable> FilterDrawable::create(const Ref<Drawable>& src, sl_real alpha, sl
 		ret->m_blurRadius = blurRadius;
 		return ret;
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 sl_real FilterDrawable::getDrawableWidth()
@@ -604,7 +604,7 @@ Ref<Drawable> NinePiecesDrawable::create(sl_real leftWidth, sl_real rightWidth, 
 		ret->m_partTopRight = bottomRight;
 		return ret;
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 Ref<Drawable> NinePiecesDrawable::create(sl_int32 leftWidth, sl_int32 rightWidth, sl_int32 topHeight, sl_int32 bottomHeight,
@@ -669,14 +669,14 @@ Ref<Drawable> NinePatchDrawable::create(sl_real leftWidthDst, sl_real rightWidth
 				const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc, sl_real topHeightSrc, sl_real bottomHeightSrc)
 {
 	if (src.isNull()) {
-		return Ref<Drawable>::null();
+		return sl_null;
 	}
 	
 	if (leftWidthSrc + rightWidthSrc + SLIB_EPSILON > src->getDrawableWidth()) {
-		return Ref<Drawable>::null();
+		return sl_null;
 	}
 	if (topHeightSrc + bottomHeightSrc + SLIB_EPSILON > src->getDrawableWidth()) {
-		return Ref<Drawable>::null();
+		return sl_null;
 	}
 	
 	Ref<NinePatchDrawable> ret = new NinePatchDrawable;
@@ -720,7 +720,7 @@ Ref<Drawable> NinePatchDrawable::create(sl_real leftWidthDst, sl_real rightWidth
 		return ret;
 		
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 Ref<Drawable> NinePatchDrawable::create(const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc, sl_real topHeightSrc, sl_real bottomHeightSrc)
@@ -810,11 +810,11 @@ Ref<Drawable> HorizontalThreePatchDrawable::create(sl_real leftWidthDst, sl_real
 										const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc)
 {
 	if (src.isNull()) {
-		return Ref<Drawable>::null();
+		return sl_null;
 	}
 	
 	if (leftWidthSrc + rightWidthSrc + SLIB_EPSILON > src->getDrawableWidth()) {
-		return Ref<Drawable>::null();
+		return sl_null;
 	}
 
 	Ref<HorizontalThreePatchDrawable> ret = new HorizontalThreePatchDrawable;
@@ -842,7 +842,7 @@ Ref<Drawable> HorizontalThreePatchDrawable::create(sl_real leftWidthDst, sl_real
 		return ret;
 		
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 Ref<Drawable> HorizontalThreePatchDrawable::create(const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc)
@@ -896,11 +896,11 @@ Ref<Drawable> VerticalThreePatchDrawable::create(sl_real topHeightDst, sl_real b
 										const Ref<Drawable>& src, sl_real topHeightSrc, sl_real bottomHeightSrc)
 {
 	if (src.isNull()) {
-		return Ref<Drawable>::null();
+		return sl_null;
 	}
 	
 	if (topHeightSrc + bottomHeightSrc + SLIB_EPSILON > src->getDrawableHeight()) {
-		return Ref<Drawable>::null();
+		return sl_null;
 	}
 	
 	Ref<VerticalThreePatchDrawable> ret = new VerticalThreePatchDrawable;
@@ -928,7 +928,7 @@ Ref<Drawable> VerticalThreePatchDrawable::create(sl_real topHeightDst, sl_real b
 		return ret;
 		
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 Ref<Drawable> VerticalThreePatchDrawable::create(const Ref<Drawable>& src, sl_real topHeightSrc, sl_real bottomHeightSrc)
@@ -1029,10 +1029,10 @@ void MipmapDrawable::addSource(const Ref<Drawable>& source)
 Ref<Drawable> MipmapDrawable::getSource(sl_size index)
 {
 	_Source source;
-	if (m_sources.getItem(index, &source)) {
+	if (m_sources.getAt(index, &source)) {
 		return source.drawable;
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 sl_size MipmapDrawable::getSourcesCount()
@@ -1048,7 +1048,7 @@ Ref<Drawable> MipmapDrawable::getMatchingSource(sl_real requiredWidth, sl_real r
 	
 	ListLocker<_Source> sources(m_sources);
 	if (sources.count == 0) {
-		return Ref<Drawable>::null();
+		return sl_null;
 	}
 	if (sources.count == 1) {
 		return sources[0].drawable;
@@ -1090,7 +1090,7 @@ Ref<Drawable> MipmapDrawable::getMatchingSource(sl_real requiredWidth, sl_real r
 	if (maxSrc.isNotNull()) {
 		return maxSrc;
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 void MipmapDrawable::onDraw(Canvas* canvas, const Rectangle& rectDst, const Rectangle& rectSrc, const DrawParam& param)

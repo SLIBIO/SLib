@@ -29,7 +29,7 @@ public:
 			}
 		} else {
 			for (sl_uint32 i = nOrig; i < nNew; i++) {
-				String16 s = m_titles.getItemValue(i, String::null());
+				String16 s = m_titles.getValueAt(i);
 				::SendMessageW(hWnd, CB_ADDSTRING, 0, (LPARAM)(s.getData()));
 			}
 		}
@@ -81,8 +81,8 @@ public:
 	{
 		if (code == CBN_SELCHANGE) {
 			Ref<View> view = getView();
-			if (SelectView::checkInstance(view.ptr)) {
-				((_SelectView*)(view.ptr))->__onSelectItem(m_handle);
+			if (_SelectView* _view = CastInstance<_SelectView>(view.get())) {
+				_view->__onSelectItem(m_handle);
 			}
 			return sl_true;
 		}
@@ -94,7 +94,7 @@ Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* parent)
 {
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
 	if (!shared) {
-		return Ref<ViewInstance>::null();
+		return sl_null;
 	}
 
 	UINT style = CBS_DROPDOWNLIST | WS_TABSTOP;
@@ -105,7 +105,7 @@ Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* parent)
 		HWND handle = ret->getHandle();
 
 		Ref<Font> font = getFont();
-		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
@@ -159,7 +159,7 @@ void SelectView::_setFont_NW(const Ref<Font>& font)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}

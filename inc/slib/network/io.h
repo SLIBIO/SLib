@@ -30,7 +30,7 @@ public:
 	sl_int32 write32(const void* buf, sl_uint32 size);
 
 protected:
-	SafeRef<Socket> m_socket;
+	AtomicRef<Socket> m_socket;
 
 };
 

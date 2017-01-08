@@ -61,23 +61,23 @@ public:
 public:
 	static void logError(String str)
 	{
-		SLIB_LOG_ERROR("AudioOpusEncoder", str);
+		LogError("AudioOpusEncoder", str);
 	}
 
 	static Ref<_OpusEncoderImpl> create(const OpusEncoderParam& param)
 	{
 		if (!isValidSamplingRate(param.samplesPerSecond)) {
 			logError("Encoding sampling rate must be one of 8000, 12000, 16000, 24000, 48000");
-			return Ref<_OpusEncoderImpl>::null();
+			return sl_null;
 		}
 		if (param.channelsCount != 1 && param.channelsCount != 2) {
 			logError("Encoding channel must be 1 or 2");
-			return Ref<_OpusEncoderImpl>::null();
+			return sl_null;
 		}
 		
 		int sizeEncoder = opus_encoder_get_size((opus_int32)(param.channelsCount));
 		if (sizeEncoder <= 0) {
-			return Ref<_OpusEncoderImpl>::null();
+			return sl_null;
 		}
 		
 		::OpusEncoder* encoder = (::OpusEncoder*)(Base::createMemory(sizeEncoder));
@@ -120,7 +120,7 @@ public:
 			}
 			Base::freeMemory(encoder);
 		}
-		return Ref<_OpusEncoderImpl>::null();
+		return sl_null;
 	}
 	
 	Memory encode(const AudioData& input)
@@ -198,7 +198,7 @@ public:
 				}
 			}
 		}
-		return Memory::null();
+		return sl_null;
 	}
 
 	void setBitrate(const sl_uint32& _bitrate)
@@ -251,23 +251,23 @@ public:
 public:
 	static void logError(String str)
 	{
-		SLIB_LOG_ERROR("AudioOpusDecoder", str);
+		LogError("AudioOpusDecoder", str);
 	}
 
 	static Ref<_OpusDecoderImpl> create(const OpusDecoderParam& param)
 	{
 		if (!isValidSamplingRate(param.samplesPerSecond)) {
 			logError("Decoding sampling rate must be one of 8000, 12000, 16000, 24000, 48000");
-			return Ref<_OpusDecoderImpl>::null();
+			return sl_null;
 		}
 		if (param.channelsCount != 1 && param.channelsCount != 2) {
 			logError("Decoding channel must be 1 or 2");
-			return Ref<_OpusDecoderImpl>::null();
+			return sl_null;
 		}
 		int error;
 		::OpusDecoder* decoder = ::opus_decoder_create((opus_int32)(param.samplesPerSecond), (opus_int32)(param.channelsCount), &error);
 		if (! decoder) {
-			return Ref<_OpusDecoderImpl>::null();
+			return sl_null;
 		}
 		Ref<_OpusDecoderImpl> ret = new _OpusDecoderImpl();
 		if (ret.isNotNull()) {

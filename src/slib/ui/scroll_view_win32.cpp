@@ -30,8 +30,7 @@ public:
 		HWND handle = getHandle();
 		if (msg == WM_ERASEBKGND) {
 			Ref<View> view = getView();
-			if (ScrollView::checkInstance(view.ptr)) {
-				_ScrollView* sv = (_ScrollView*)(view.ptr);
+			if (_ScrollView* sv = CastInstance<_ScrollView>(view.get())) {
 				Ref<View> cv = sv->getContentView();
 				if (cv.isNotNull()) {
 					if (cv->getWidth() >= sv->getWidth() && cv->getHeight() >= sv->getHeight()) {
@@ -58,17 +57,16 @@ public:
 			}
 		} else {
 			Ref<View> view = getView();
-			if (ScrollView::checkInstance(view.ptr)) {
-				_ScrollView* sv = (_ScrollView*)(view.ptr);
+			if (_ScrollView* sv = CastInstance<_ScrollView>(view.get())) {
 				if (sv->m_flagHorizontalScroll) {
 					if (Windows::processWindowHorizontalScrollEvents(handle, msg, wParam, lParam, _SCROLL_LINE_SIZE, _SCROLL_WHEEL_SIZE)) {
-						__refreshContentPosition((_ScrollView*)(view.ptr), sl_true);
+						__refreshContentPosition(sv, sl_true);
 						return sl_true;
 					}
 				}
 				if (sv->m_flagVerticalScroll) {
 					if (Windows::processWindowVerticalScrollEvents(handle, msg, wParam, lParam, _SCROLL_LINE_SIZE, _SCROLL_WHEEL_SIZE)) {
-						__refreshContentPosition((_ScrollView*)(view.ptr), sl_true);
+						__refreshContentPosition(sv, sl_true);
 						return sl_true;
 					}
 				}
@@ -141,7 +139,7 @@ Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* parent)
 {
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
 	if (!shared) {
-		return Ref<ViewInstance>::null();
+		return sl_null;
 	}
 
 	DWORD style = WS_CLIPCHILDREN;
@@ -168,16 +166,16 @@ Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* parent)
 void ScrollView::_refreshContentSize_NW()
 {
 	Ref<ViewInstance> instance = getViewInstance();
-	if (_Win32_ScrollViewInstance::checkInstance(instance.ptr)) {
-		((_Win32_ScrollViewInstance*)(instance.ptr))->__refreshContentSize((_ScrollView*)this);
+	if (_Win32_ScrollViewInstance* _instance = CastInstance<_Win32_ScrollViewInstance>(instance.get())) {
+		_instance->__refreshContentSize((_ScrollView*)this);
 	}
 }
 
 void ScrollView::_setContentView_NW(const Ref<View>& view)
 {
 	Ref<ViewInstance> instance = getViewInstance();
-	if (_Win32_ScrollViewInstance::checkInstance(instance.ptr)) {
-		((_Win32_ScrollViewInstance*)(instance.ptr))->__setContentView(view, (_ScrollView*)this);
+	if (_Win32_ScrollViewInstance* _instance = CastInstance<_Win32_ScrollViewInstance>(instance.get())) {
+		_instance->__setContentView(view, (_ScrollView*)this);
 	}
 }
 
@@ -198,8 +196,8 @@ void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y)
 			::SetScrollInfo(handle, SB_VERT, &si, TRUE);
 		}
 		Ref<ViewInstance> instance = getViewInstance();
-		if (_Win32_ScrollViewInstance::checkInstance(instance.ptr)) {
-			((_Win32_ScrollViewInstance*)(instance.ptr))->__refreshContentPosition((_ScrollView*)this, sl_false);
+		if (_Win32_ScrollViewInstance* _instance = CastInstance<_Win32_ScrollViewInstance>(instance.get())) {
+			_instance->__refreshContentPosition((_ScrollView*)this, sl_false);
 		}
 	}
 }
@@ -262,8 +260,8 @@ void ScrollView::_setBorder_NW(sl_bool flag)
 void ScrollView::_setBackgroundColor_NW(const Color& color)
 {
 	Ref<ViewInstance> instance = getViewInstance();
-	if (_Win32_ScrollViewInstance::checkInstance(instance.ptr)) {
-		((_Win32_ScrollViewInstance*)(instance.ptr))->m_backgroundColor = color;
+	if (_Win32_ScrollViewInstance* _instance = CastInstance<_Win32_ScrollViewInstance>(instance.get())) {
+		_instance->m_backgroundColor = color;
 	}
 }
 

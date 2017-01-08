@@ -13,7 +13,7 @@ Ref<SocketEvent> SocketEvent::create(const Ref<Socket>& socket, sl_uint32 events
 			return ev;
 		}
 	}
-	return Ref<SocketEvent>::null();
+	return sl_null;
 }
 
 Ref<SocketEvent> SocketEvent::createRead(const Ref<Socket>& socket)
@@ -86,7 +86,7 @@ sl_bool SocketEvent::waitMultipleEvents(const Ref<SocketEvent>* events, sl_uint3
 		if (thread->isStopping()) {
 			return sl_false;
 		}
-		thread->setWaitingEvent(events[0].ptr);
+		thread->setWaitingEvent(events[0].get());
 	}
 	sl_bool ret = __waitMultipleEvents(events, status, count, timeout);
 	if (thread.isNotNull()) {

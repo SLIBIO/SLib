@@ -102,10 +102,10 @@ SLIB_GRAPHICS_NAMESPACE_BEGIN
 
 #define SLIB_DEFINE_NINEPIECES_RESOURCE(NAME, LEFT_WIDTH, RIGHT_WIDTH, TOP_HEIGHT, BOTTOM_HEIGHT, TOP_LEFT, TOP, TOP_RIGHT, LEFT, CENTER, RIGHT, BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT) \
 	namespace NAME { \
-		SLIB_STATIC_ZERO_INITIALIZED(SafeRef<Drawable>, value) \
+		SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Drawable>, value) \
 		slib::Ref<slib::Drawable> get() { \
 			if (SLIB_SAFE_STATIC_CHECK_FREED(value)) { \
-				return slib::Ref<slib::Drawable>::null(); \
+				return sl_null; \
 			} \
 			if (value.isNull()) { \
 				value = NinePiecesDrawable::create(LEFT_WIDTH, RIGHT_WIDTH, TOP_HEIGHT, BOTTOM_HEIGHT, TOP_LEFT, TOP, TOP_RIGHT, LEFT, CENTER, RIGHT, BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT); \
@@ -122,10 +122,10 @@ SLIB_GRAPHICS_NAMESPACE_BEGIN
 
 #define SLIB_DEFINE_NINEPATCH_RESOURCE(NAME, DST_LEFT_WIDTH, DST_RIGHT_WIDTH, DST_TOP_HEIGHT, DST_BOTTOM_HEIGHT, SRC, SRC_LEFT_WIDTH, SRC_RIGHT_WIDTH, SRC_TOP_HEIGHT, SRC_BOTTOM_HEIGHT) \
 	namespace NAME { \
-		SLIB_STATIC_ZERO_INITIALIZED(SafeRef<Drawable>, value) \
+		SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Drawable>, value) \
 		slib::Ref<slib::Drawable> get() { \
 			if (SLIB_SAFE_STATIC_CHECK_FREED(value)) { \
-				return slib::Ref<slib::Drawable>::null(); \
+				return sl_null; \
 			} \
 			if (value.isNull()) { \
 				value = NinePatchDrawable::create(DST_LEFT_WIDTH, DST_RIGHT_WIDTH, DST_TOP_HEIGHT, DST_BOTTOM_HEIGHT, SRC, SRC_LEFT_WIDTH, SRC_RIGHT_WIDTH, SRC_TOP_HEIGHT, SRC_BOTTOM_HEIGHT); \

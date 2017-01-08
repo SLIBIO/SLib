@@ -38,7 +38,7 @@ Ref<Pipe> Pipe::create()
 		_close(hRead);
 		_close(hWrite);
 	}
-	return Ref<Pipe>::null();
+	return sl_null;
 }
 
 sl_bool Pipe::isOpened() const
@@ -90,7 +90,7 @@ Ref<PipeEvent> PipeEvent::create()
 			return ret;
 		}
 	}
-	return Ref<PipeEvent>::null();
+	return sl_null;
 }
 
 Ref<Pipe> PipeEvent::getPipe()

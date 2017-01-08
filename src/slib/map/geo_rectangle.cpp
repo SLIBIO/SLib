@@ -1,5 +1,7 @@
 #include "../../../inc/slib/map/geo_rectangle.h"
 
+#include "../../../inc/slib/core/macro.h"
+
 SLIB_MAP_NAMESPACE_BEGIN
 
 GeoRectangle::GeoRectangle() = default;

@@ -113,7 +113,7 @@ WindowLayoutResource::WindowLayoutResource(sl_real sp)
 	SLIB_REFERABLE_CONSTRUCTOR
 	Ref<View> view = Window::getContentView();
 	m_contentViewRef = view;
-	m_contentView = view.ptr;
+	m_contentView = view.get();
 }
 
 UISize WindowLayoutResource::getContentSize()

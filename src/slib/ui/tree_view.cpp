@@ -9,7 +9,7 @@ void ITreeViewListener::onSelectItem(TreeView* view, TreeViewItem* item)
 class _TreeContentView : public View
 {
 public:
-	SafeWeakRef<TreeView> m_tree;
+	AtomicWeakRef<TreeView> m_tree;
 	
 public:
 	_TreeContentView()
@@ -90,7 +90,7 @@ Ref<TreeViewItem> TreeViewItem::getItemById(const String& _id)
 			}
 		}
 	}
-	return Ref<TreeViewItem>::null();
+	return sl_null;
 }
 
 List< Ref<TreeViewItem> > TreeViewItem::getChildren()
@@ -105,7 +105,7 @@ sl_size TreeViewItem::getChildrenCount()
 
 Ref<TreeViewItem> TreeViewItem::getChild(sl_size index)
 {
-	return m_children.getItemValue(index, Ref<TreeViewItem>::null());
+	return m_children.getValueAt(index);
 }
 
 void TreeViewItem::addChild(const Ref<TreeViewItem>& item, UIUpdateMode mode)
@@ -114,7 +114,7 @@ void TreeViewItem::addChild(const Ref<TreeViewItem>& item, UIUpdateMode mode)
 		return;
 	}
 	if (m_children.add(item)) {
-		_addChild(item.ptr, mode);
+		_addChild(item.get(), mode);
 	}
 }
 
@@ -127,7 +127,7 @@ Ref<TreeViewItem> TreeViewItem::addChild(const String& text, const Ref<Drawable>
 		addChild(item, mode);
 		return item;
 	}
-	return Ref<TreeViewItem>::null();
+	return sl_null;
 }
 
 Ref<TreeViewItem> TreeViewItem::addChild(const String& text, UIUpdateMode mode)
@@ -141,7 +141,7 @@ void TreeViewItem::insertChild(sl_size index, const Ref<TreeViewItem>& item, UIU
 		return;
 	}
 	if (m_children.insert(index, item)) {
-		_addChild(item.ptr, mode);
+		_addChild(item.get(), mode);
 	}
 }
 
@@ -154,7 +154,7 @@ Ref<TreeViewItem> TreeViewItem::insertChild(sl_size index, const String& text, c
 		insertChild(index, item, mode);
 		return item;
 	}
-	return Ref<TreeViewItem>::null();
+	return sl_null;
 }
 
 Ref<TreeViewItem> TreeViewItem::insertChild(sl_size index, const String& text, UIUpdateMode mode)
@@ -164,12 +164,12 @@ Ref<TreeViewItem> TreeViewItem::insertChild(sl_size index, const String& text, U
 
 void TreeViewItem::removeChild(sl_size index, UIUpdateMode mode)
 {
-	Ref<TreeViewItem> item = m_children.getItemValue(index, Ref<TreeViewItem>::null());
+	Ref<TreeViewItem> item = m_children.getValueAt(index);
 	if (item.isNull()) {
 		return;
 	}
-	_removeChild(item.ptr);
-	m_children.remove(index);
+	_removeChild(item.get());
+	m_children.removeAt(index);
 	if (isVisible()) {
 		_relayoutTree(mode);
 	}
@@ -180,7 +180,7 @@ void TreeViewItem::removeChild(const Ref<TreeViewItem>& item, UIUpdateMode mode)
 	if (item.isNull()) {
 		return;
 	}
-	_removeChild(item.ptr);
+	_removeChild(item.get());
 	m_children.removeValue(item);
 	if (isVisible()) {
 		_relayoutTree(mode);
@@ -191,7 +191,7 @@ void TreeViewItem::removeAllChildren(UIUpdateMode mode)
 {
 	ListLocker< Ref<TreeViewItem> > children(m_children);
 	for (sl_size i = 0; i < children.count; i++) {
-		_removeChild(children[i].ptr);
+		_removeChild(children[i].get());
 	}
 	m_children.removeAll();
 	if (isVisible()) {
@@ -369,7 +369,7 @@ void TreeViewItem::_addChild(TreeViewItem* item, UIUpdateMode mode)
 	item->m_parent = this;
 	Ref<TreeView> tree = m_tree;
 	if (tree.isNotNull()) {
-		item->_setTreeViewHierarchy(tree.ptr, m_level + 1);
+		item->_setTreeViewHierarchy(tree.get(), m_level + 1);
 	}
 	if (isVisible()) {
 		_relayoutTree(mode);
@@ -417,7 +417,7 @@ Ref<_TreeContentView> TreeViewItem::_getContentView()
 	if (tree.isNotNull()) {
 		return tree->m_content;
 	}
-	return Ref<_TreeContentView>::null();
+	return sl_null;
 }
 
 class _TreeView_DefaultIdentIcon : public Drawable
@@ -511,7 +511,7 @@ Ref<TreeViewItem> TreeView::getItemById(const String& _id)
 	if (root.isNotNull()) {
 		return root->getItemById(_id);
 	}
-	return Ref<TreeViewItem>::null();
+	return sl_null;
 }
 
 List< Ref<TreeViewItem> > TreeView::getItems()
@@ -520,7 +520,7 @@ List< Ref<TreeViewItem> > TreeView::getItems()
 	if (root.isNotNull()) {
 		return root->getChildren();
 	}
-	return List< Ref<TreeViewItem> >::null();
+	return sl_null;
 }
 
 sl_size TreeView::getItemsCount()
@@ -538,7 +538,7 @@ Ref<TreeViewItem> TreeView::getItem(sl_size index)
 	if (root.isNotNull()) {
 		return root->getChild(index);
 	}
-	return Ref<TreeViewItem>::null();
+	return sl_null;
 }
 
 void TreeView::addItem(const Ref<TreeViewItem>& item, UIUpdateMode mode)
@@ -555,7 +555,7 @@ Ref<TreeViewItem> TreeView::addItem(const String& text, const Ref<Drawable>& ico
 	if (root.isNotNull()) {
 		return root->addChild(text, icon, mode);
 	}
-	return Ref<TreeViewItem>::null();
+	return sl_null;
 }
 
 Ref<TreeViewItem> TreeView::addItem(const String& text, UIUpdateMode mode)
@@ -564,7 +564,7 @@ Ref<TreeViewItem> TreeView::addItem(const String& text, UIUpdateMode mode)
 	if (root.isNotNull()) {
 		return root->addChild(text, mode);
 	}
-	return Ref<TreeViewItem>::null();
+	return sl_null;
 }
 
 void TreeView::insertItem(sl_size index, const Ref<TreeViewItem>& item, UIUpdateMode mode)
@@ -581,7 +581,7 @@ Ref<TreeViewItem> TreeView::insertItem(sl_size index, const String& text, const 
 	if (root.isNotNull()) {
 		return root->insertChild(index, text, icon, mode);
 	}
-	return Ref<TreeViewItem>::null();
+	return sl_null;
 }
 
 Ref<TreeViewItem> TreeView::insertItem(sl_size index, const String& text, UIUpdateMode mode)
@@ -590,7 +590,7 @@ Ref<TreeViewItem> TreeView::insertItem(sl_size index, const String& text, UIUpda
 	if (root.isNotNull()) {
 		return root->insertChild(index, text, mode);
 	}
-	return Ref<TreeViewItem>::null();
+	return sl_null;
 }
 
 void TreeView::removeItem(sl_size index, UIUpdateMode mode)
@@ -848,7 +848,7 @@ void TreeView::_drawContent(Canvas* canvas)
 {
 	Ref<TreeViewItem> root = m_root;
 	if (root.isNotNull()) {
-		_drawItem(canvas, root.ptr, sl_true);
+		_drawItem(canvas, root.get(), sl_true);
 	}
 }
 
@@ -867,7 +867,7 @@ void TreeView::_makeLayoutContent()
 		if (m_iconCollapsed.isNotNull() || m_iconExpanded.isNotNull()) {
 			left += m_itemIndent;
 		}
-		_makeLayoutItem(root.ptr, top, left, right, sl_true);
+		_makeLayoutItem(root.get(), top, left, right, sl_true);
 		top += getPaddingBottom();
 		if (top < 0) {
 			top = 0;
@@ -940,7 +940,7 @@ void TreeView::_makeLayoutItem(TreeViewItem* item, sl_ui_pos& top, sl_ui_pos lef
 		for (sl_size i = 0; i < children.count; i++) {
 			const Ref<TreeViewItem>& child = children[i];
 			if (child.isNotNull()) {
-				_makeLayoutItem(child.ptr, top, left, right, sl_false);
+				_makeLayoutItem(child.get(), top, left, right, sl_false);
 			}
 		}
 	}
@@ -1028,7 +1028,7 @@ void TreeView::_drawItem(Canvas* canvas, TreeViewItem* item, sl_bool flagRoot)
 		for (sl_size i = 0; i < children.count; i++) {
 			const Ref<TreeViewItem>& child = children[i];
 			if (child.isNotNull()) {
-				_drawItem(canvas, child.ptr, sl_false);
+				_drawItem(canvas, child.get(), sl_false);
 			}
 		}
 	}
@@ -1054,7 +1054,7 @@ void TreeView::_processMouseEvent(UIEvent* ev)
 				if (content->convertCoordinateToParent(ev->getPoint()).getLength2p(m_pointBeginTapping) < 25) {
 					Ref<TreeViewItem> root = m_root;
 					if (root.isNotNull()) {
-						_processMouseEventItem(ev, sl_true, root.ptr, sl_true);
+						_processMouseEventItem(ev, sl_true, root.get(), sl_true);
 					}
 				}
 			}
@@ -1070,7 +1070,7 @@ void TreeView::_processMouseEvent(UIEvent* ev)
 		}
 		Ref<TreeViewItem> root = m_root;
 		if (root.isNotNull()) {
-			_processMouseEventItem(ev, sl_false, root.ptr, sl_true);
+			_processMouseEventItem(ev, sl_false, root.get(), sl_true);
 		}
 	}
 }
@@ -1101,7 +1101,7 @@ void TreeView::_processMouseEventItem(UIEvent* ev, sl_bool flagClick, TreeViewIt
 			const Ref<TreeViewItem>& child = children[i];
 			if (child.isNotNull()) {
 				if (child->m_frame.top <= y && y < child->m_bottomChildren) {
-					_processMouseEventItem(ev, flagClick, child.ptr, sl_false);
+					_processMouseEventItem(ev, flagClick, child.get(), sl_false);
 					return;
 				}
 			}

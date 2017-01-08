@@ -154,8 +154,7 @@ public:
 		HWND handle = getHandle();
 		if (handle) {
 			Ref<View> _view = getView();
-			if (TabView::checkInstance(_view.ptr)) {
-				_TabView* view = (_TabView*)(_view.ptr);
+			if (_TabView* view = CastInstance<_TabView>(_view.get())) {
 				UINT code = nmhdr->code;
 				if (code == TCN_SELCHANGE) {
 					view->__onSelectTab(handle, this);
@@ -171,7 +170,7 @@ Ref<ViewInstance> TabView::createNativeWidget(ViewInstance* parent)
 {
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
 	if (!shared) {
-		return Ref<ViewInstance>::null();
+		return sl_null;
 	}
 
 	DWORD style = WS_CLIPCHILDREN;
@@ -184,12 +183,12 @@ Ref<ViewInstance> TabView::createNativeWidget(ViewInstance* parent)
 		HWND handle = ret->getHandle();
 
 		Ref<Font> font = getFont();
-		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
 
-		((_TabView*)this)->__copyTabs(handle, ret.ptr);
+		((_TabView*)this)->__copyTabs(handle, ret.get());
 	}
 	return ret;
 }
@@ -222,8 +221,8 @@ void TabView::_setTabContentView_NW(sl_uint32 index, const Ref<View>& view)
 {
 	Ref<ViewInstance> viewInstance = getViewInstance();
 	if (viewInstance.isNotNull()) {
-		HWND handle = UIPlatform::getViewHandle(viewInstance.ptr);
-		((_TabView*)this)->__applyTabContents(handle, viewInstance.ptr);
+		HWND handle = UIPlatform::getViewHandle(viewInstance.get());
+		((_TabView*)this)->__applyTabContents(handle, viewInstance.get());
 	}
 }
 
@@ -239,8 +238,8 @@ void TabView::_selectTab_NW(sl_uint32 index)
 {
 	Ref<ViewInstance> viewInstance = getViewInstance();
 	if (viewInstance.isNotNull()) {
-		HWND handle = UIPlatform::getViewHandle(viewInstance.ptr);
-		((_TabView*)this)->__selectTab(handle, viewInstance.ptr, index);
+		HWND handle = UIPlatform::getViewHandle(viewInstance.get());
+		((_TabView*)this)->__selectTab(handle, viewInstance.get(), index);
 	}
 }
 
@@ -257,7 +256,7 @@ void TabView::_setFont_NW(const Ref<Font>& font)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}

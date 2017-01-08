@@ -21,7 +21,7 @@ public:
 	{
 		FT_Error err = FT_Init_FreeType(&m_library);
 		if (err || !m_library) {
-			SLIB_LOG_ERROR("FreeType", "Failed to initialize FreeType");
+			LogError("FreeType", "Failed to initialize FreeType");
 		}
 	}
 
@@ -79,7 +79,7 @@ Ref<FreeType> FreeType::loadFromMemory(const Memory& mem, sl_uint32 index)
 			}
 		}
 	}
-	return Ref<FreeType>::null();
+	return sl_null;
 }
 
 Ref<FreeType> FreeType::loadFromFile(const String& fontFilePath, sl_uint32 index)

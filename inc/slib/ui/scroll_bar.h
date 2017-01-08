@@ -129,7 +129,7 @@ public:
 	void dispatchScroll(sl_scroll_pos value);
 	
 public:
-	SLIB_PTR_PROPERTY(IScrollBarListener, Listener);
+	SLIB_PROPERTY(AtomicPtr<IScrollBarListener>, Listener);
 	
 protected:
 	void _setHoverThumb(sl_bool flag);
@@ -142,13 +142,13 @@ protected:
 	sl_scroll_pos m_value_min;
 	sl_scroll_pos m_value_max;
 	
-	SafeRef<Drawable> m_thumb;
-	SafeRef<Drawable> m_pressedThumb;
-	SafeRef<Drawable> m_hoverThumb;
+	AtomicRef<Drawable> m_thumb;
+	AtomicRef<Drawable> m_pressedThumb;
+	AtomicRef<Drawable> m_hoverThumb;
 	
-	SafeRef<Drawable> m_track;
-	SafeRef<Drawable> m_pressedTrack;
-	SafeRef<Drawable> m_hoverTrack;
+	AtomicRef<Drawable> m_track;
+	AtomicRef<Drawable> m_pressedTrack;
+	AtomicRef<Drawable> m_hoverTrack;
 	
 	float m_thumb_len_ratio_min;
 	

@@ -28,11 +28,6 @@
 #include <mach/mach.h>
 #endif
 
-#if defined(SLIB_PLATFORM_IS_BLACKBERRY)
-#include <Qt/qdeclarativedebug.h>
-#include <bb/cascades/Application>
-#endif
-
 #define _PATH_MAX 1024
 
 SLIB_NAMESPACE_BEGIN
@@ -89,7 +84,7 @@ String System::getCurrentDirectory()
 	if (r) {
 		return path;
 	}
-	return String::null();
+	return sl_null;
 }
 
 sl_bool System::setCurrentDirectory(const String& dir)
@@ -135,8 +130,7 @@ void* System::createGlobalUniqueInstance(const String& uniqueName)
 		return sl_null;
 	}
 
-	SLIB_STATIC_STRING(tmp, "/tmp/");
-	String fileName = tmp + name;
+	String fileName = "/tmp/.slib_global_lock_" + name;
 	_SYS_GLOBAL_UNIQUE_INSTANCE* instance = new _SYS_GLOBAL_UNIQUE_INSTANCE();
 	instance->name = name;
 	instance->file = File::openForWrite(fileName);
@@ -196,7 +190,7 @@ sl_bool System::createProcess(const String& pathExecutable, const String* cmds, 
 {
 	pid_t pid = fork();
 	if (pid == -1) {
-		SLIB_LOG_ERROR("System::createProcess", "Cannot fork");
+		LogError("System::createProcess", "Cannot fork");
 		return sl_false;
 	} else {
 		if (pid == 0) {
@@ -308,7 +302,7 @@ void Console::print(const String& s)
 {
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 	SLIB_STATIC_STRING(c, "Console");
-	Log::getConsoleLogger()->log(c, s);
+	Logger::getConsoleLogger()->log(c, s);
 #elif defined(SLIB_PLATFORM_IS_BLACKBERRY)
 	String8 _s = s;
 	qDebug() << _s.getData() << endl;

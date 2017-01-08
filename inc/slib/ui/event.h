@@ -46,22 +46,28 @@ public:
 };
 
 template<>
-SLIB_INLINE sl_uint32 Hash<Keycode>::hash(const Keycode& code)
+class Hash<Keycode>
 {
-	return sl_hash((sl_uint32)code);
-}
+public:
+	SLIB_CONSTEXPR sl_uint32 operator()(const Keycode& code) const
+	{
+		return Rehash((sl_uint32)code);
+	}
+	
+};
 
 class SLIB_EXPORT KeycodeAndModifiers
 {
 public:
-	SLIB_DECLARE_PRIMITIVE_WRAPPER(int, KeycodeAndModifiers)
+	int value;
+	SLIB_MEMBERS_OF_PRIMITIVE_WRAPPER(KeycodeAndModifiers, int, value)
 	
 public:
-	KeycodeAndModifiers();
+	SLIB_CONSTEXPR KeycodeAndModifiers() : value(0) {}
 	
-	KeycodeAndModifiers(Keycode keycode);
+	SLIB_CONSTEXPR KeycodeAndModifiers(Keycode keycode) : value((int)keycode) {}
 	
-	KeycodeAndModifiers(Keycode keycode, const Modifiers& modifiers);
+	SLIB_CONSTEXPR KeycodeAndModifiers(Keycode keycode, const Modifiers& modifiers) : value((int)keycode | modifiers) {}
 
 public:
 	static KeycodeAndModifiers none();

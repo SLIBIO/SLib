@@ -49,7 +49,7 @@ public:
 				return ret;
 			}
 		}
-		return Ref<_Quartz_Canvas>::null();
+		return sl_null;
 	}
 	
 	// override
@@ -86,7 +86,7 @@ public:
 	void clipToPath(const Ref<GraphicsPath>& path)
 	{
 		if (path.isNotNull()) {
-			CGPathRef handle = GraphicsPlatform::getGraphicsPath(path.ptr);
+			CGPathRef handle = GraphicsPlatform::getGraphicsPath(path.get());
 			if (handle) {
 				_clipToPath(handle, path->getFillMode());				
 			}
@@ -131,7 +131,7 @@ public:
 			}
 			if (_font.isNotNull()) {
 				
-				CTFontRef font = GraphicsPlatform::getCoreTextFont(_font.ptr);
+				CTFontRef font = GraphicsPlatform::getCoreTextFont(_font.get());
 				
 				if (font) {
 					
@@ -200,7 +200,7 @@ public:
 			CGContextBeginPath(m_graphics);
 			CGContextMoveToPoint(m_graphics, pt1.x, pt1.y);
 			CGContextAddLineToPoint(m_graphics, pt2.x, pt2.y);
-			_applyPen(pen.ptr);
+			_applyPen(pen.get());
 			CGContextStrokePath(m_graphics);
 		}
 	}
@@ -221,7 +221,7 @@ public:
 			for (sl_uint32 i = 1; i < countPoints; i++) {
 				CGContextAddLineToPoint(m_graphics, points[i].x, points[i].y);
 			}
-			_applyPen(pen.ptr);
+			_applyPen(pen.get());
 			CGContextStrokePath(m_graphics);
 		}
 	}
@@ -245,7 +245,7 @@ public:
 		rect.size.width = _rect.getWidth();
 		rect.size.height = _rect.getHeight();
 		if (brush.isNotNull()) {
-			_applyBrush(brush.ptr);
+			_applyBrush(brush.get());
 			CGContextFillRect(m_graphics, rect);
 		}
 		Ref<Pen> pen = _pen;
@@ -253,7 +253,7 @@ public:
 			pen = Pen::getDefault();
 		}
 		if (pen.isNotNull()) {
-			_applyPen(pen.ptr);
+			_applyPen(pen.get());
 			rect.origin.y++;
 			CGContextStrokeRect(m_graphics, rect);
 		}
@@ -278,7 +278,7 @@ public:
 		rect.size.width = _rect.getWidth();
 		rect.size.height = _rect.getHeight();
 		if (brush.isNotNull()) {
-			_applyBrush(brush.ptr);
+			_applyBrush(brush.get());
 			CGContextFillEllipseInRect(m_graphics, rect);
 		}
 		Ref<Pen> pen = _pen;
@@ -286,7 +286,7 @@ public:
 			pen = Pen::getDefault();
 		}
 		if (pen.isNotNull()) {
-			_applyPen(pen.ptr);
+			_applyPen(pen.get());
 			CGContextStrokeEllipseInRect(m_graphics, rect);
 		}
 	}
@@ -323,7 +323,7 @@ public:
 	void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
 		if (path.isNotNull()) {
-			CGPathRef handle = GraphicsPlatform::getGraphicsPath(path.ptr);
+			CGPathRef handle = GraphicsPlatform::getGraphicsPath(path.get());
 			if (handle) {
 				_drawPath(handle, _pen, brush, path->getFillMode());
 			}
@@ -333,7 +333,7 @@ public:
 	void _drawPath(CGPathRef path, const Ref<Pen>& _pen, const Ref<Brush>& brush, FillMode fillMode)
 	{
 		if (brush.isNotNull()) {
-			_applyBrush(brush.ptr);
+			_applyBrush(brush.get());
 			CGContextBeginPath(m_graphics);
 			CGContextAddPath(m_graphics, path);
 			switch (fillMode) {
@@ -351,7 +351,7 @@ public:
 			pen = Pen::getDefault();
 		}
 		if (pen.isNotNull()) {
-			_applyPen(pen.ptr);
+			_applyPen(pen.get());
 			CGContextBeginPath(m_graphics);
 			CGContextAddPath(m_graphics, path);
 			CGContextStrokePath(m_graphics);
@@ -479,15 +479,14 @@ SLIB_DEFINE_OBJECT(_Quartz_Canvas, Canvas)
 Ref<Canvas> GraphicsPlatform::createCanvas(CanvasType type, CGContextRef graphics, sl_uint32 width, sl_uint32 height)
 {
 	if (!graphics) {
-		return Ref<Canvas>::null();
+		return sl_null;
 	}
 	return _Quartz_Canvas::_create(type, graphics, (sl_real)width, (sl_real)height);
 }
 
 CGContextRef GraphicsPlatform::getCanvasHandle(Canvas* _canvas)
 {
-	if (_Quartz_Canvas::checkInstance(_canvas)) {
-		_Quartz_Canvas* canvas = (_Quartz_Canvas*)_canvas;
+	if (_Quartz_Canvas* canvas = CastInstance<_Quartz_Canvas>(_canvas)) {
 		return canvas->m_graphics;
 	}
 	return NULL;

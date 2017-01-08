@@ -1,4 +1,5 @@
 #include "../../../inc/slib/core/time.h"
+
 #include "../../../inc/slib/core/variant.h"
 
 SLIB_NAMESPACE_BEGIN
@@ -34,12 +35,12 @@ Time::Time(const String16& str)
 	setString(str);
 }
 
-Time::Time(const SafeString8& str)
+Time::Time(const AtomicString8& str)
 {
 	setString(str);
 }
 
-Time::Time(const SafeString16& str)
+Time::Time(const AtomicString16& str)
 {
 	setString(str);
 }
@@ -52,6 +53,13 @@ Time::Time(const sl_char8* str)
 Time::Time(const sl_char16* str)
 {
 	setString(str);
+}
+
+Time Time::now()
+{
+	Time ret;
+	ret.setNow();
+	return ret;
 }
 
 void Time::setInt(sl_int64 time)
@@ -604,7 +612,7 @@ String Time::getWeekday(sl_bool flagShort) const
 			return s;
 		}
 	}
-	return String::null();
+	return sl_null;
 }
 
 Time Time::getTimeOnly() const
@@ -760,7 +768,7 @@ sl_bool Time::setString(const String16& str)
 	}
 }
 
-sl_bool Time::setString(const SafeString8& str)
+sl_bool Time::setString(const AtomicString8& str)
 {
 	if (parse(str)) {
 		return sl_true;
@@ -770,7 +778,7 @@ sl_bool Time::setString(const SafeString8& str)
 	}
 }
 
-sl_bool Time::setString(const SafeString16& str)
+sl_bool Time::setString(const AtomicString16& str)
 {
 	if (parse(str)) {
 		return sl_true;
@@ -805,7 +813,7 @@ String Time::format(const String8& fmt) const
 	return String8::format(fmt, *this);
 }
 
-String Time::format(const SafeString8& fmt) const
+String Time::format(const AtomicString8& fmt) const
 {
 	return String8::format(fmt, *this);
 }
@@ -815,7 +823,7 @@ String Time::format(const String16& fmt) const
 	return String16::format(fmt, *this);
 }
 
-String Time::format(const SafeString16& fmt) const
+String Time::format(const AtomicString16& fmt) const
 {
 	return String16::format(fmt, *this);
 }
@@ -941,7 +949,7 @@ sl_bool Time::parseElements(const String16& time, sl_int32* outArrayYMDHMS)
 	return _Time_parseElements(outArrayYMDHMS, time.getData(), 0, time.getLength()) == n;
 }
 
-sl_bool Time::parseElements(const SafeString8& _time, sl_int32* outArrayYMDHMS)
+sl_bool Time::parseElements(const AtomicString8& _time, sl_int32* outArrayYMDHMS)
 {
 	String8 time = _time;
 	sl_size n = time.getLength();
@@ -951,7 +959,7 @@ sl_bool Time::parseElements(const SafeString8& _time, sl_int32* outArrayYMDHMS)
 	return _Time_parseElements(outArrayYMDHMS, time.getData(), 0, time.getLength()) == n;
 }
 
-sl_bool Time::parseElements(const SafeString16& _time, sl_int32* outArrayYMDHMS)
+sl_bool Time::parseElements(const AtomicString16& _time, sl_int32* outArrayYMDHMS)
 {
 	String time = _time;
 	sl_size n = time.getLength();
@@ -979,7 +987,7 @@ sl_bool Time::parseElements(const sl_char16* time, sl_int32* outArrayYMDHMS)
 	return sl_false;
 }
 
-template <class CT, class ST>
+template <class CT>
 SLIB_INLINE sl_reg _Time_parse(Time* _out, const CT* sz, sl_size i, sl_size n)
 {
 	sl_int32 t[6];
@@ -992,8 +1000,17 @@ SLIB_INLINE sl_reg _Time_parse(Time* _out, const CT* sz, sl_size i, sl_size n)
 	return ret;
 }
 
-SLIB_DEFINE_PARSE_FUNCTIONS(Time, _Time_parse)
+template <>
+sl_reg Parser<Time, sl_char8>::parse(Time* _out, const sl_char8 *sz, sl_size posBegin, sl_size len)
+{
+	return _Time_parse(_out, sz, posBegin, len);
+}
 
+template <>
+sl_reg Parser<Time, sl_char16>::parse(Time* _out, const sl_char16 *sz, sl_size posBegin, sl_size len)
+{
+	return _Time_parse(_out, sz, posBegin, len);
+}
 
 Time& Time::operator=(const String8& time)
 {
@@ -1007,13 +1024,13 @@ Time& Time::operator=(const String16& time)
 	return *this;
 }
 
-Time& Time::operator=(const SafeString8& time)
+Time& Time::operator=(const AtomicString8& time)
 {
 	setString(time);
 	return *this;
 }
 
-Time& Time::operator=(const SafeString16& time)
+Time& Time::operator=(const AtomicString16& time)
 {
 	setString(time);
 	return *this;

@@ -79,15 +79,15 @@ void ListReportView::setRowsCount(sl_uint32 nCount, UIUpdateMode mode)
 
 String ListReportView::getItemText(sl_uint32 iRow, sl_uint32 iCol)
 {
-	List<ListReportViewCell> row = m_cells.getItemValue(iRow, List<ListReportViewCell>::null());
+	List<ListReportViewCell> row = m_cells.getValueAt(iRow);
 	if (row.isNotNull()) {
 		MutexLocker lock(row.getLocker());
 		if (iCol < row.getCount()) {
-			ListReportViewCell* cell = row.getItemPtr(iCol);
+			ListReportViewCell* cell = row.getPointerAt(iCol);
 			return cell->text;
 		}
 	}
-	return String::null();
+	return sl_null;
 }
 
 void ListReportView::setItemText(sl_uint32 iRow, sl_uint32 iCol, const String& text, UIUpdateMode mode)
@@ -99,10 +99,10 @@ void ListReportView::setItemText(sl_uint32 iRow, sl_uint32 iCol, const String& t
 				return;
 			}
 		}
-		List<ListReportViewCell> row = m_cells.getItemValue(iRow, List<ListReportViewCell>::null());
+		List<ListReportViewCell> row = m_cells.getValueAt(iRow);
 		if (row.isNull()) {
 			row.setCount(iCol + 1);
-			m_cells.setItem(iRow, row);
+			m_cells.setAt(iRow, row);
 		}
 		if (row.isNotNull()) {
 			MutexLocker lock(row.getLocker());
@@ -111,7 +111,7 @@ void ListReportView::setItemText(sl_uint32 iRow, sl_uint32 iCol, const String& t
 					return;
 				}
 			}
-			ListReportViewCell* cell = row.getItemPtr(iCol);
+			ListReportViewCell* cell = row.getPointerAt(iCol);
 			cell->text = text;
 		}
 		if (mode == UIUpdateMode::Redraw) {
@@ -128,17 +128,17 @@ String ListReportView::getHeaderText(sl_uint32 iCol)
 {
 	MutexLocker lock(m_columns.getLocker());
 	if (iCol < m_columns.getCount()) {
-		ListReportViewColumn* col = m_columns.getItemPtr(iCol);
+		ListReportViewColumn* col = m_columns.getPointerAt(iCol);
 		return col->title;
 	}
-	return String::null();
+	return sl_null;
 }
 
 void ListReportView::setHeaderText(sl_uint32 iCol, const String& text, UIUpdateMode mode)
 {
 	MutexLocker lock(m_columns.getLocker());
 	if (iCol < m_columns.getCount()) {
-		ListReportViewColumn* col = m_columns.getItemPtr(iCol);
+		ListReportViewColumn* col = m_columns.getPointerAt(iCol);
 		col->title = text;
 		if (isNativeWidget()) {
 			_setHeaderText_NW(iCol, text);
@@ -154,7 +154,7 @@ sl_ui_len ListReportView::getColumnWidth(sl_uint32 iCol)
 {
 	MutexLocker lock(m_columns.getLocker());
 	if (iCol < m_columns.getCount()) {
-		ListReportViewColumn* col = m_columns.getItemPtr(iCol);
+		ListReportViewColumn* col = m_columns.getPointerAt(iCol);
 		return col->width;
 	}
 	return 0;
@@ -164,7 +164,7 @@ void ListReportView::setColumnWidth(sl_uint32 iCol, sl_ui_len width, UIUpdateMod
 {
 	MutexLocker lock(m_columns.getLocker());
 	if (iCol < m_columns.getCount()) {
-		ListReportViewColumn* col = m_columns.getItemPtr(iCol);
+		ListReportViewColumn* col = m_columns.getPointerAt(iCol);
 		col->width = width;
 		if (isNativeWidget()) {
 			_setColumnWidth_NW(iCol, width);
@@ -180,7 +180,7 @@ Alignment ListReportView::getHeaderAlignment(sl_uint32 iCol)
 {
 	MutexLocker lock(m_columns.getLocker());
 	if (iCol < m_columns.getCount()) {
-		ListReportViewColumn* col = m_columns.getItemPtr(iCol);
+		ListReportViewColumn* col = m_columns.getPointerAt(iCol);
 		return col->headerAlign;
 	}
 	return Alignment::Center;
@@ -190,7 +190,7 @@ void ListReportView::setHeaderAlignment(sl_uint32 iCol, Alignment align, UIUpdat
 {
 	MutexLocker lock(m_columns.getLocker());
 	if (iCol < m_columns.getCount()) {
-		ListReportViewColumn* col = m_columns.getItemPtr(iCol);
+		ListReportViewColumn* col = m_columns.getPointerAt(iCol);
 		col->headerAlign = align;
 		if (isNativeWidget()) {
 			_setHeaderAlignment_NW(iCol, align);
@@ -206,7 +206,7 @@ Alignment ListReportView::getColumnAlignment(sl_uint32 iCol)
 {
 	MutexLocker lock(m_columns.getLocker());
 	if (iCol < m_columns.getCount()) {
-		ListReportViewColumn* col = m_columns.getItemPtr(iCol);
+		ListReportViewColumn* col = m_columns.getPointerAt(iCol);
 		return col->align;
 	}
 	return Alignment::Center;
@@ -216,7 +216,7 @@ void ListReportView::setColumnAlignment(sl_uint32 iCol, Alignment align, UIUpdat
 {
 	MutexLocker lock(m_columns.getLocker());
 	if (iCol < m_columns.getCount()) {
-		ListReportViewColumn* col = m_columns.getItemPtr(iCol);
+		ListReportViewColumn* col = m_columns.getPointerAt(iCol);
 		col->align = align;
 		if (isNativeWidget()) {
 			_setColumnAlignment_NW(iCol, align);
@@ -256,7 +256,7 @@ void ListReportView::removeRow(sl_uint32 iRow, UIUpdateMode mode)
 	ObjectLocker lock(this);
 	if (iRow < m_nRows) {
 		if (iRow < m_cells.getCount()) {
-			m_cells.remove(iRow);
+			m_cells.removeAt(iRow);
 		}
 		setRowsCount(m_nRows - 1, mode);
 	}
@@ -296,7 +296,7 @@ void ListReportView::dispatchClickRow(sl_uint32 row, const UIPoint& pt)
 {
 	Ref<UIEvent> ev = UIEvent::createMouseEvent(UIAction::Unknown, (sl_ui_posf)(pt.x), (sl_ui_posf)(pt.y), Time::zero());
 	if (ev.isNotNull()) {
-		dispatchClick(ev.ptr);
+		dispatchClick(ev.get());
 	}
 	onClickRow(row, pt);
 	PtrLocker<IListReportViewListener> listener(getListener());
@@ -317,7 +317,7 @@ void ListReportView::dispatchDoubleClickRow(sl_uint32 row, const UIPoint& pt)
 {
 	Ref<UIEvent> ev = UIEvent::createMouseEvent(UIAction::LeftButtonDoubleClick, (sl_real)(pt.x), (sl_real)(pt.y), Time::zero());
 	if (ev.isNotNull()) {
-		dispatchMouseEvent(ev.ptr);
+		dispatchMouseEvent(ev.get());
 	}
 	onDoubleClickRow(row, pt);
 	PtrLocker<IListReportViewListener> listener(getListener());
@@ -331,7 +331,7 @@ void ListReportView::dispatchDoubleClickRow(sl_uint32 row, const UIPoint& pt)
 
 Ref<ViewInstance> ListReportView::createNativeWidget(ViewInstance* parent)
 {
-	return Ref<ViewInstance>::null();
+	return sl_null;
 }
 
 void ListReportView::_refreshColumnsCount_NW()

@@ -31,7 +31,7 @@ Ref<Service> Service::getApp()
 	if (app.isNotNull() && app->getAppType() == AppType::Service) {
 		return Ref<Service>::from(app);
 	}
-	return Ref<Service>::null();
+	return sl_null;
 }
 
 sl_bool Service::dispatchStartService()
@@ -44,44 +44,47 @@ void Service::dispatchStopService()
 	onStopService();
 }
 
-#define PID_FILE (System::getTempDirectory() + "/" + appName + ".pid")
+#define START_ID "_STARTED"
+#define STOP_ID "_STOPPING"
 
 void Service::startService()
 {
 	String appName = getServiceName();
+	if (appName.isEmpty()) {
+		LogError(TAG, "SERVICE NAME IS EMPTY");
+		return;
+	}
+	
+	String stopId = appName + STOP_ID;
+	void* stopInstance = System::createGlobalUniqueInstance(stopId);
+	if (stopInstance) {
+		System::freeGlobalUniqueInstance(stopInstance);
+	} else {
+		LogError(TAG, "OTHER PROCESS IS STOPPING %s", appName);
+		return;
+	}
 
 	if (!(isUniqueInstanceRunning())) {
 
-		String pathPID = PID_FILE;
-		if (File::exists(pathPID)) {
-			File::deleteFile(pathPID);
-			if (File::exists(pathPID)) {
-				SLIB_LOG(TAG, "Cannot remove temporary PID file of " + appName);
-				return;
-			}
-		}
-
-		SLIB_LOG(TAG, "Starting " + appName);
+		Log(TAG, "STARING %s", appName);
 		
 		String appPath = System::getApplicationPath();
 		System::createProcess(appPath, sl_null, 0);
 
 		for (int i = 0; i < WAIT_SECONDS*10; i++) {
-			if (isUniqueInstanceRunning()) {
-				if (File::exists(pathPID)) {
-					if (isUniqueInstanceRunning()) {
-						SLIB_LOG(TAG, appName + " is STARTED");
-						return;
-					} else {
-						break;
-					}
-				}
+			String startId = appName + START_ID;
+			void* startInstance = System::createGlobalUniqueInstance(startId);
+			if (startInstance) {
+				System::freeGlobalUniqueInstance(startInstance);
+			} else {
+				Log(TAG, "%s IS STARTED", appName);
+				return;
 			}
 			System::sleep(100);
 		}
-		SLIB_LOG_ERROR(TAG, appName + " is NOT STARTED");
+		LogError(TAG, "%s IS NOT STARTED", appName);
 	} else {
-		SLIB_LOG_ERROR(TAG, appName + " is ALREADY RUNNING");
+		LogError(TAG, "%s IS ALREADY RUNNING", appName);
 	}
 }
 
@@ -90,28 +93,24 @@ void Service::stopService()
 	String appName = getServiceName();
 	
 	if (!(isUniqueInstanceRunning())) {
-		
-		SLIB_LOG_ERROR(TAG, appName + " is NOT RUNNING");
-		
+		LogError(TAG, "%s IS NOT RUNNING", appName);
 	} else {
-		
-		String pathPID = PID_FILE;
-		if (File::exists(pathPID)) {
-			SLIB_LOG(TAG, "Stopping " + appName);
-			if (File::deleteFile(pathPID)) {
-				for (int i = 0; i < WAIT_SECONDS * 10; i++) {
-					if (!(isUniqueInstanceRunning())) {
-						SLIB_LOG(TAG, appName + " is STOPPED");
-						return;
-					}
-					System::sleep(100);
+		String stopId = appName + STOP_ID;
+		void* stopInstance = System::createGlobalUniqueInstance(stopId);
+		if (stopInstance) {
+			Log(TAG, "STOPPING %s", appName);
+			for (int i = 0; i < WAIT_SECONDS * 10; i++) {
+				if (!(isUniqueInstanceRunning())) {
+					System::freeGlobalUniqueInstance(stopInstance);
+					Log(TAG, "%s IS STOPPED", appName);
+					return;
 				}
-				SLIB_LOG_ERROR(TAG, appName + " is NOT STOPPED");
-			} else {
-				SLIB_LOG_ERROR(TAG, "FAILED to delete PID file");
+				System::sleep(100);
 			}
+			System::freeGlobalUniqueInstance(stopInstance);
+			LogError(TAG, "%s IS NOT STOPPED", appName);
 		} else {
-			SLIB_LOG_ERROR(TAG, "PID file is not exist");
+			LogError(TAG, "OTHER PROCESS IS STOPPING %s", appName);
 		}
 	}
 }
@@ -120,9 +119,9 @@ void Service::statusService()
 {
 	String appName = getServiceName();
 	if (isUniqueInstanceRunning()) {
-		SLIB_LOG(TAG, appName + " is RUNNING");
+		Log(TAG, "%s IS RUNNING", appName);
 	} else {
-		SLIB_LOG(TAG, appName + " is NOT RUNNING");
+		Log(TAG, "%s IS NOT RUNNING", appName);
 	}
 }
 
@@ -143,7 +142,7 @@ void Service::onStopService()
 void Service::doRun()
 {
 #if defined(SLIB_PLATFORM_IS_MOBILE)
-	SLIB_LOG(TAG, "Can not run on mobile platforms");
+	Log(TAG, "Can not run on mobile platforms");
 #else
 	String command = getCommand();
 	if (command == "start") {
@@ -158,7 +157,7 @@ void Service::doRun()
 	} else if (command.isEmpty()) {
 		runService();
 	} else {
-		SLIB_LOG_ERROR(TAG, "INVALID COMMAND - " + command);
+		LogError(TAG, "INVALID COMMAND - %s", command);
 	}
 #endif
 }
@@ -172,24 +171,36 @@ void Service::onRunApp()
 		return;
 	}
 	
-	String pidFileName = PID_FILE;
-	if (!File::writeAllTextUTF8(pidFileName, String::fromUint64(System::getProcessId()))) {
-		SLIB_LOG_ERROR(TAG, "FAILED to create PID file");
+	String startId = appName + START_ID;
+	void* startInstance = sl_null;
+	for (int i = 0; i < WAIT_SECONDS * 10; i++) {
+		startInstance = System::createGlobalUniqueInstance(startId);
+		if (startInstance) {
+			break;
+		}
+		System::sleep(100);
+	}
+	if (!startInstance) {
+		LogError(TAG, "FAILED TO CREATE STARTED SIGNAL");
 		dispatchStopService();
 		return;
 	}
 
+	String stopId = appName + STOP_ID;
+	
 	while (1) {
-		if (File::exists(pidFileName)) {
-			System::sleep(500);
+		void* stopInstance = System::createGlobalUniqueInstance(stopId);
+		if (stopInstance) {
+			System::freeGlobalUniqueInstance(stopInstance);
 		} else {
 			break;
 		}
+		System::sleep(500);
 	}
 	
 	dispatchStopService();
 	
-	File::deleteFile(pidFileName);
+	System::freeGlobalUniqueInstance(startInstance);
 	
 }
 

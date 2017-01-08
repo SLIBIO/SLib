@@ -90,9 +90,9 @@ public:
 
 Ref<Screen> UI::getPrimaryScreen()
 {
-	SLIB_STATIC_ZERO_INITIALIZED(SafeRef<Screen>, ret)
+	SLIB_STATIC_ZERO_INITIALIZED(AtomicRef<Screen>, ret)
 	if (SLIB_SAFE_STATIC_CHECK_FREED(ret)) {
-		return Ref<Screen>::null();
+		return sl_null;
 	}
 	if (ret.isNull()) {
 		jobject jactivity = Android::getCurrentActivity();
@@ -133,12 +133,12 @@ void UI::openUrl(const String& _url) {
 	}
 }
 
-SLIB_SAFE_STATIC_GETTER(Queue<Callback>, _AndroidUi_getDispatchQueue);
+SLIB_SAFE_STATIC_GETTER(LinkedQueue< Function<void()> >, _AndroidUi_getDispatchQueue);
 
-void UI::dispatchToUiThread(const Callback& callback)
+void UI::dispatchToUiThread(const Function<void()>& callback)
 {
 	if (callback.isNotNull()) {
-		Queue<Callback>* queue = _AndroidUi_getDispatchQueue();
+		LinkedQueue< Function<void()> >* queue = _AndroidUi_getDispatchQueue();
 		if (queue) {
 			queue->push(callback);
 			_AndroidUiThread::dispatch.call(sl_null);
@@ -148,9 +148,9 @@ void UI::dispatchToUiThread(const Callback& callback)
 
 void _AndroidUiThread_runDispatchCallback(JNIEnv* env, jobject _this)
 {
-	Queue<Callback>* queue = _AndroidUi_getDispatchQueue();
+	LinkedQueue< Function<void()> >* queue = _AndroidUi_getDispatchQueue();
 	if (queue) {
-		Callback callback;
+		Function<void()> callback;
 		while (queue->pop(&callback)) {
 			callback();
 		}
@@ -179,7 +179,7 @@ void UIPlatform::quitApp()
 
 void _Android_onCreateActivity(JNIEnv* env, jobject _this, jobject activity)
 {
-	SLIB_LOG("Activity", "Created");
+	Log("Activity", "Created");
 	Android::setCurrentActivity(activity);
 	Ref<UIApp> app = UIApp::getApp();
 	if (app.isNotNull()) {
@@ -194,26 +194,26 @@ void _Android_onCreateActivity(JNIEnv* env, jobject _this, jobject activity)
 
 void _Android_onDestroyActivity(JNIEnv* env, jobject _this, jobject activity)
 {
-	SLIB_LOG("Activity", "Destroyed");
+	Log("Activity", "Destroyed");
 	MobileApp::dispatchDestroyActivityToApp();
 }
 
 void _Android_onResumeActivity(JNIEnv* env, jobject _this, jobject activity)
 {
-	SLIB_LOG("Activity", "Resumed");
+	Log("Activity", "Resumed");
 	Android::setCurrentActivity(activity);
 	MobileApp::dispatchResumeToApp();
 }
 
 void _Android_onPauseActivity(JNIEnv* env, jobject _this, jobject activity)
 {
-	SLIB_LOG("Activity", "Paused");
+	Log("Activity", "Paused");
 	MobileApp::dispatchPauseToApp();
 }
 
 jboolean _Android_onBack(JNIEnv* env, jobject _this, jobject activity)
 {
-	SLIB_LOG("Activity", "BackPressed");
+	Log("Activity", "BackPressed");
 	return (jboolean)(MobileApp::dispatchBackToApp());
 }
 

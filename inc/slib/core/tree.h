@@ -50,11 +50,13 @@ public:
 	
 };
 
-template <class KT, class VT, class COMPARE=Compare<KT> >
+template < class KT, class VT, class KEY_COMPARE = Compare<KT> >
 class SLIB_EXPORT BTree
 {
 public:
 	BTree(sl_uint32 order = SLIB_BTREE_DEFAULT_ORDER);
+	
+	BTree(const KEY_COMPARE& compare, sl_uint32 order = SLIB_BTREE_DEFAULT_ORDER);
 	
 	~BTree();
 
@@ -64,26 +66,21 @@ public:
 	sl_uint32 getOrder() const;
 
 	sl_uint32 getMaxLength() const;
-
-	sl_bool get(const KT& key, VT* value = sl_null) const;
-
-	VT* getItemPtr(const KT& key) const;
-
-	List<VT> getValues(const KT& key) const;
 	
 	sl_bool search(const KT& key, TreePosition* pos = sl_null, VT* outValue = sl_null) const;
-	
-	sl_bool search(const KT& key, const VT& value, TreePosition* pos = sl_null) const;
-
-	sl_bool search(const KT& key, TreePosition* pPosBegin, TreePosition* pPosEnd) const;
 	
 	sl_bool searchInNode(const KT& key, const TreeNode& node, TreePosition* pos = sl_null, VT* outValue = sl_null) const;
 	
 	sl_bool searchItemInNode(const KT& key, const TreeNode& node, sl_uint32& pos, TreeNode& link, VT* outValue = sl_null) const;
 	
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool searchKeyAndValue(const KT& key, const _VT& value, TreePosition* pos = sl_null, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+	
+	sl_bool getRange(const KT& key, TreePosition* pPosBegin, TreePosition* pPosEnd) const;
+
 	sl_bool getAt(const TreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
 	
-	VT* getValuePtrAt(const TreePosition& pos) const;
+	VT* getValuePointerAt(const TreePosition& pos) const;
 	
 	sl_uint64 getCount() const;
 	
@@ -97,17 +94,32 @@ public:
 	
 	sl_bool getPrevPosition(TreePosition& pos, KT* key = sl_null, VT* value = sl_null) const;
 	
+	sl_bool get(const KT& key, VT* value = sl_null) const;
+	
+	VT* getItemPointer(const KT& key) const;
+	
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	VT* getItemPointerByKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+	
+	List<VT> getValues(const KT& key) const;
+	
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	List<VT> getValuesByKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
+	
 	sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 	
-	sl_bool addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist = sl_null);
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool addIfNewKeyAndValue(const KT& key, const _VT& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 	
 	sl_bool remove(const KT& key, VT* outValue = sl_null);
 	
 	sl_size removeItems(const KT& key, List<VT>* outValues = sl_null);
 	
-	sl_bool removeValue(const KT& key, const VT& value);
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool removeKeyAndValue(const KT& key, const _VT& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 	
-	sl_size removeValues(const KT& key, const VT& value);
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_size removeItemsByKeyAndValue(const KT& key, const _VT& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 	
 	sl_bool removeAt(const TreePosition& pos);
 	
@@ -154,6 +166,7 @@ private:
 	sl_uint32 m_order;
 	sl_uint32 m_maxLength;
 	sl_uint64 m_totalCount;
+	KEY_COMPARE m_compare;
 
 private:
 	NodeData* _createNodeData();
@@ -252,8 +265,8 @@ SLIB_INLINE void TreePosition::setNull()
 	node.setNull();
 }
 
-template <class KT, class VT, class COMPARE>
-BTree<KT, VT, COMPARE>::BTree(sl_uint32 order)
+template <class KT, class VT, class KEY_COMPARE>
+BTree<KT, VT, KEY_COMPARE>::BTree(sl_uint32 order)
 {
 	if (order < 1) {
 		order = 1;
@@ -264,183 +277,50 @@ BTree<KT, VT, COMPARE>::BTree(sl_uint32 order)
 	init();
 }
 
-template <class KT, class VT, class COMPARE>
-BTree<KT, VT, COMPARE>::~BTree()
+template <class KT, class VT, class KEY_COMPARE>
+BTree<KT, VT, KEY_COMPARE>::BTree(const KEY_COMPARE& compare, sl_uint32 order) : m_compare(compare)
+{
+	if (order < 1) {
+		order = 1;
+	}
+	m_order = order;
+	m_maxLength = 0;
+	m_totalCount = 0;
+	init();
+}
+
+template <class KT, class VT, class KEY_COMPARE>
+BTree<KT, VT, KEY_COMPARE>::~BTree()
 {
 	free();
 }
 
-template <class KT, class VT, class COMPARE>
-SLIB_INLINE sl_bool BTree<KT, VT, COMPARE>::isValid() const
+template <class KT, class VT, class KEY_COMPARE>
+SLIB_INLINE sl_bool BTree<KT, VT, KEY_COMPARE>::isValid() const
 {
 	return m_rootNode != sl_null;
 }
 
-template <class KT, class VT, class COMPARE>
-SLIB_INLINE sl_uint32 BTree<KT, VT, COMPARE>::getOrder() const
+template <class KT, class VT, class KEY_COMPARE>
+SLIB_INLINE sl_uint32 BTree<KT, VT, KEY_COMPARE>::getOrder() const
 {
 	return m_order;
 }
 
-template <class KT, class VT, class COMPARE>
-SLIB_INLINE sl_uint32 BTree<KT, VT, COMPARE>::getMaxLength() const
+template <class KT, class VT, class KEY_COMPARE>
+SLIB_INLINE sl_uint32 BTree<KT, VT, KEY_COMPARE>::getMaxLength() const
 {
 	return m_maxLength;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::get(const KT& key, VT* value) const
-{
-	TreePosition pos;
-	if (search(key, &pos)) {
-		if (getAt(pos, sl_null, value)) {
-			return sl_true;
-		}
-	}
-	return sl_false;
-}
-
-template <class KT, class VT, class COMPARE>
-VT* BTree<KT, VT, COMPARE>::getItemPtr(const KT& key) const
-{
-	TreePosition pos;
-	if (search(key, &pos)) {
-		return getValuePtrAt(pos);
-	}
-	return sl_null;
-}
-
-template <class KT, class VT, class COMPARE>
-List<VT> BTree<KT, VT, COMPARE>::getValues(const KT& key) const
-{
-	List<VT> ret;
-	TreePosition pos;
-	if (search(key, &pos)) {
-		VT value;
-		if (!(getAt(pos, sl_null, &value))) {
-			return ret;
-		}
-		ret.add_NoLock(value);
-		TreePosition posMid = pos;
-		KT keyItem;
-		while (getPrevPosition(pos, &keyItem, &value)) {
-			if (COMPARE::compare(keyItem, key) == 0) {
-				ret.add_NoLock(value);
-			} else {
-				break;
-			}
-		}
-		pos = posMid;
-		while (getNextPosition(pos, &keyItem, &value)) {
-			if (COMPARE::compare(keyItem, key) == 0) {
-				ret.add_NoLock(value);
-			} else {
-				break;
-			}
-		}
-	}
-	return ret;
-}
-
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::search(const KT& key, TreePosition* pos, VT* outValue) const
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool BTree<KT, VT, KEY_COMPARE>::search(const KT& key, TreePosition* pos, VT* outValue) const
 {
 	return searchInNode(key, getRootNode(), pos, outValue);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::search(const KT& key, const VT& value, TreePosition* pPos) const
-{
-	List<VT> ret;
-	TreePosition pos;
-	if (search(key, &pos)) {
-		VT v;
-		if (!(getAt(pos, sl_null, &v))) {
-			if (pPos) {
-				*pPos = pos;
-			}
-			return sl_false;
-		}
-		if (value == v) {
-			if (pPos) {
-				*pPos = pos;
-			}
-			return sl_true;
-		}
-		TreePosition posMid = pos;
-		KT keyItem;
-		while (getPrevPosition(pos, &keyItem, &v)) {
-			if (COMPARE::compare(keyItem, key) == 0) {
-				if (value == v) {
-					if (pPos) {
-						*pPos = pos;
-					}
-					return sl_true;
-				}
-			} else {
-				break;
-			}
-		}
-		pos = posMid;
-		while (getNextPosition(pos, &keyItem, &v)) {
-			if (COMPARE::compare(keyItem, key) == 0) {
-				if (value == v) {
-					if (pPos) {
-						*pPos = pos;
-					}
-					return sl_true;
-				}
-			} else {
-				break;
-			}
-		}
-		if (pPos) {
-			*pPos = posMid;
-		}
-	} else {
-		if (pPos) {
-			*pPos = pos;
-		}
-	}
-	return sl_false;
-}
-
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::search(const KT& key, TreePosition* pPosBegin, TreePosition* pPosEnd) const
-{
-	TreePosition pos;
-	if (search(key, &pos)) {
-		TreePosition posBegin = pos;
-		TreePosition posEnd = pos;
-		KT keyItem;
-		while (getPrevPosition(pos, &keyItem)) {
-			if (COMPARE::compare(keyItem, key) == 0) {
-				posBegin = pos;
-			} else {
-				break;
-			}
-		}
-		pos = posEnd;
-		while (getNextPosition(pos, &keyItem)) {
-			if (COMPARE::compare(keyItem, key) == 0) {
-				posEnd = pos;
-			} else {
-				break;
-			}
-		}
-		return sl_true;
-	}
-	if (pPosBegin) {
-		*pPosBegin = pos;
-	}
-	if (pPosEnd) {
-		pPosEnd->setNull();
-	}
-	return sl_false;
-}
-
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::searchInNode(const KT& key, const TreeNode& node, TreePosition* pos, VT* outValue) const
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool BTree<KT, VT, KEY_COMPARE>::searchInNode(const KT& key, const TreeNode& node, TreePosition* pos, VT* outValue) const
 {
 	TreeNode link;
 	sl_uint32 item;
@@ -463,8 +343,8 @@ sl_bool BTree<KT, VT, COMPARE>::searchInNode(const KT& key, const TreeNode& node
 	}
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::searchItemInNode(const KT& key, const TreeNode& node, sl_uint32& pos, TreeNode& link, VT* outValue) const
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool BTree<KT, VT, KEY_COMPARE>::searchItemInNode(const KT& key, const TreeNode& node, sl_uint32& pos, TreeNode& link, VT* outValue) const
 {
 	NodeDataScope data(this, node);
 	if (data.isNull()) {
@@ -478,7 +358,7 @@ sl_bool BTree<KT, VT, COMPARE>::searchItemInNode(const KT& key, const TreeNode& 
 		return sl_false;
 	}
 	sl_size _pos = 0;
-	if (BinarySearch<KT, KT, COMPARE>::search(data->keys, n, key, &_pos)) {
+	if (BinarySearch::search(data->keys, n, key, &_pos, m_compare)) {
 		pos = (sl_uint32)_pos;
 		if (outValue) {
 			*outValue = data->values[pos];
@@ -496,8 +376,109 @@ sl_bool BTree<KT, VT, COMPARE>::searchItemInNode(const KT& key, const TreeNode& 
 	}
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::getAt(const TreePosition& pos, KT* key, VT* value) const
+template <class KT, class VT, class KEY_COMPARE>
+template <class _VT, class VALUE_EQUALS>
+sl_bool BTree<KT, VT, KEY_COMPARE>::searchKeyAndValue(const KT& key, const _VT& value, TreePosition* pPos, VT* outValue, const VALUE_EQUALS& value_equals) const
+{
+	List<VT> ret;
+	TreePosition pos;
+	if (search(key, &pos)) {
+		VT v;
+		if (!(getAt(pos, sl_null, &v))) {
+			if (pPos) {
+				*pPos = pos;
+			}
+			return sl_false;
+		}
+		if (value_equals(value, v)) {
+			if (pPos) {
+				*pPos = pos;
+			}
+			if (outValue) {
+				*outValue = v;
+			}
+			return sl_true;
+		}
+		TreePosition posMid = pos;
+		KT keyItem;
+		while (getPrevPosition(pos, &keyItem, &v)) {
+			if (m_compare(keyItem, key) == 0) {
+				if (value_equals(value, v)) {
+					if (pPos) {
+						*pPos = pos;
+					}
+					if (outValue) {
+						*outValue = v;
+					}
+					return sl_true;
+				}
+			} else {
+				break;
+			}
+		}
+		pos = posMid;
+		while (getNextPosition(pos, &keyItem, &v)) {
+			if (m_compare(keyItem, key) == 0) {
+				if (value_equals(value, v)) {
+					if (pPos) {
+						*pPos = pos;
+					}
+					if (outValue) {
+						*outValue = v;
+					}
+					return sl_true;
+				}
+			} else {
+				break;
+			}
+		}
+		if (pPos) {
+			*pPos = posMid;
+		}
+	} else {
+		if (pPos) {
+			*pPos = pos;
+		}
+	}
+	return sl_false;
+}
+
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool BTree<KT, VT, KEY_COMPARE>::getRange(const KT& key, TreePosition* pPosBegin, TreePosition* pPosEnd) const
+{
+	TreePosition pos;
+	if (search(key, &pos)) {
+		TreePosition posBegin = pos;
+		TreePosition posEnd = pos;
+		KT keyItem;
+		while (getPrevPosition(pos, &keyItem)) {
+			if (m_compare(keyItem, key) == 0) {
+				posBegin = pos;
+			} else {
+				break;
+			}
+		}
+		pos = posEnd;
+		while (getNextPosition(pos, &keyItem)) {
+			if (m_compare(keyItem, key) == 0) {
+				posEnd = pos;
+			} else {
+				break;
+			}
+		}
+		return sl_true;
+	}
+	if (pPosBegin) {
+		*pPosBegin = pos;
+	}
+	if (pPosEnd) {
+		pPosEnd->setNull();
+	}
+	return sl_false;
+}
+
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool BTree<KT, VT, KEY_COMPARE>::getAt(const TreePosition& pos, KT* key, VT* value) const
 {
 	NodeDataScope data(this, pos.node);
 	if (data.isNotNull()) {
@@ -514,8 +495,8 @@ sl_bool BTree<KT, VT, COMPARE>::getAt(const TreePosition& pos, KT* key, VT* valu
 	return sl_false;
 }
 
-template <class KT, class VT, class COMPARE>
-VT* BTree<KT, VT, COMPARE>::getValuePtrAt(const TreePosition& pos) const
+template <class KT, class VT, class KEY_COMPARE>
+VT* BTree<KT, VT, KEY_COMPARE>::getValuePointerAt(const TreePosition& pos) const
 {
 	NodeDataScope data(this, pos.node);
 	if (data.isNotNull()) {
@@ -526,14 +507,14 @@ VT* BTree<KT, VT, COMPARE>::getValuePtrAt(const TreePosition& pos) const
 	return sl_null;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_uint64 BTree<KT, VT, COMPARE>::getCount() const
+template <class KT, class VT, class KEY_COMPARE>
+sl_uint64 BTree<KT, VT, KEY_COMPARE>::getCount() const
 {
 	return getCountInNode(getRootNode());
 }
 
-template <class KT, class VT, class COMPARE>
-sl_uint64 BTree<KT, VT, COMPARE>::getCountInNode(const TreeNode& node) const
+template <class KT, class VT, class KEY_COMPARE>
+sl_uint64 BTree<KT, VT, KEY_COMPARE>::getCountInNode(const TreeNode& node) const
 {
 	if (node.isNull()) {
 		return 0;
@@ -547,8 +528,8 @@ sl_uint64 BTree<KT, VT, COMPARE>::getCountInNode(const TreeNode& node) const
 	}
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::getFirstPosition(TreePosition& pos, KT* key, VT* value ) const
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool BTree<KT, VT, KEY_COMPARE>::getFirstPosition(TreePosition& pos, KT* key, VT* value ) const
 {
 	TreeNode node = getRootNode();
 	if (node.isNull()) {
@@ -581,8 +562,8 @@ sl_bool BTree<KT, VT, COMPARE>::getFirstPosition(TreePosition& pos, KT* key, VT*
 	return sl_false;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::getNextPosition(TreePosition& pos, KT* key, VT* value) const
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool BTree<KT, VT, KEY_COMPARE>::getNextPosition(TreePosition& pos, KT* key, VT* value) const
 {
 	if (pos.isNull()) {
 		return getFirstPosition(pos, key, value);
@@ -681,8 +662,8 @@ sl_bool BTree<KT, VT, COMPARE>::getNextPosition(TreePosition& pos, KT* key, VT* 
 	return sl_false;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::getLastPosition(TreePosition& pos, KT* key, VT* value) const
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool BTree<KT, VT, KEY_COMPARE>::getLastPosition(TreePosition& pos, KT* key, VT* value) const
 {
 	TreeNode node = getRootNode();
 	if (node.isNull()) {
@@ -721,8 +702,8 @@ sl_bool BTree<KT, VT, COMPARE>::getLastPosition(TreePosition& pos, KT* key, VT* 
 	return sl_false;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::getPrevPosition(TreePosition& pos, KT* key, VT* value) const
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool BTree<KT, VT, KEY_COMPARE>::getPrevPosition(TreePosition& pos, KT* key, VT* value) const
 {
 	if (pos.isNull()) {
 		return getLastPosition(pos, key, value);
@@ -820,8 +801,103 @@ sl_bool BTree<KT, VT, COMPARE>::getPrevPosition(TreePosition& pos, KT* key, VT* 
 	return sl_false;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::put(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool BTree<KT, VT, KEY_COMPARE>::get(const KT& key, VT* value) const
+{
+	return search(key, sl_null, value);
+}
+
+template <class KT, class VT, class KEY_COMPARE>
+VT* BTree<KT, VT, KEY_COMPARE>::getItemPointer(const KT& key) const
+{
+	TreePosition pos;
+	if (search(key, &pos)) {
+		return getValuePointerAt(pos);
+	}
+	return sl_null;
+}
+
+template <class KT, class VT, class KEY_COMPARE>
+template <class _VT, class VALUE_EQUALS>
+VT* BTree<KT, VT, KEY_COMPARE>::getItemPointerByKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals) const
+{
+	TreePosition pos;
+	if (searchKeyAndValue(key, value, &pos, sl_null, value_equals)) {
+		return getValuePointerAt(pos);
+	}
+	return sl_null;
+}
+
+template <class KT, class VT, class KEY_COMPARE>
+List<VT> BTree<KT, VT, KEY_COMPARE>::getValues(const KT& key) const
+{
+	List<VT> ret;
+	TreePosition pos;
+	if (search(key, &pos)) {
+		VT value;
+		if (!(getAt(pos, sl_null, &value))) {
+			return ret;
+		}
+		ret.add_NoLock(value);
+		TreePosition posMid = pos;
+		KT keyItem;
+		while (getPrevPosition(pos, &keyItem, &value)) {
+			if (m_compare(keyItem, key) == 0) {
+				ret.add_NoLock(value);
+			} else {
+				break;
+			}
+		}
+		pos = posMid;
+		while (getNextPosition(pos, &keyItem, &value)) {
+			if (m_compare(keyItem, key) == 0) {
+				ret.add_NoLock(value);
+			} else {
+				break;
+			}
+		}
+	}
+	return ret;
+}
+
+template <class KT, class VT, class KEY_COMPARE>
+template <class _VT, class VALUE_EQUALS>
+List<VT> BTree<KT, VT, KEY_COMPARE>::getValuesByKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals) const
+{
+	List<VT> ret;
+	TreePosition pos;
+	VT v;
+	if (searchKeyAndValue(key, value, &pos, &v, value_equals)) {
+		if (value_equals(v, value)) {
+			ret.add_NoLock(v);
+		}
+		TreePosition posMid = pos;
+		KT keyItem;
+		while (getPrevPosition(pos, &keyItem, &v)) {
+			if (m_compare(keyItem, key) == 0) {
+				if (value_equals(v, value)) {
+					ret.add_NoLock(v);
+				}
+			} else {
+				break;
+			}
+		}
+		pos = posMid;
+		while (getNextPosition(pos, &keyItem, &v)) {
+			if (m_compare(keyItem, key) == 0) {
+				if (value_equals(v, value)) {
+					ret.add_NoLock(v);
+				}
+			} else {
+				break;
+			}
+		}
+	}
+	return ret;
+}
+
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool BTree<KT, VT, KEY_COMPARE>::put(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
 {
 	if (pFlagExist) {
 		*pFlagExist = sl_false;
@@ -852,14 +928,15 @@ sl_bool BTree<KT, VT, COMPARE>::put(const KT& key, const VT& value, MapPutMode m
 	return _insertItemInNode(pos.node, pos.item, link, key, value, link);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist)
+template <class KT, class VT, class KEY_COMPARE>
+template <class _VT, class VALUE_EQUALS>
+sl_bool BTree<KT, VT, KEY_COMPARE>::addIfNewKeyAndValue(const KT& key, const _VT& value, sl_bool* pFlagExist, const VALUE_EQUALS& value_equals)
 {
 	if (pFlagExist) {
 		*pFlagExist = sl_false;
 	}
 	TreePosition pos;
-	if (search(key, value, &pos)) {
+	if (searchKeyAndValue(key, value, &pos, sl_null, value_equals)) {
 		if (pFlagExist) {
 			*pFlagExist = sl_true;
 		}
@@ -869,8 +946,8 @@ sl_bool BTree<KT, VT, COMPARE>::addIfNewKeyAndValue(const KT& key, const VT& val
 	return _insertItemInNode(pos.node, pos.item, link, key, value, link);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::remove(const KT& key, VT* outValue)
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool BTree<KT, VT, KEY_COMPARE>::remove(const KT& key, VT* outValue)
 {
 	TreePosition pos;
 	if (search(key, &pos, outValue)) {
@@ -881,19 +958,19 @@ sl_bool BTree<KT, VT, COMPARE>::remove(const KT& key, VT* outValue)
 	return sl_false;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_size BTree<KT, VT, COMPARE>::removeItems(const KT& key, List<VT>* outValues)
+template <class KT, class VT, class KEY_COMPARE>
+sl_size BTree<KT, VT, KEY_COMPARE>::removeItems(const KT& key, List<VT>* outValues)
 {
 	TreePosition pos;
 	if (outValues) {
 		VT v;
 		if (search(key, &pos, &v)) {
-			outValues->add_NoLock(v);
 			if (removeAt(pos)) {
+				outValues->add_NoLock(v);
 				sl_size n = 1;
 				while (search(key, &pos, &v)) {
-					outValues->add_NoLock(v);
 					if (removeAt(pos)) {
+						outValues->add_NoLock(v);
 						n++;
 					} else {
 						break;
@@ -920,11 +997,12 @@ sl_size BTree<KT, VT, COMPARE>::removeItems(const KT& key, List<VT>* outValues)
 	return 0;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::removeValue(const KT& key, const VT& value)
+template <class KT, class VT, class KEY_COMPARE>
+template <class _VT, class VALUE_EQUALS>
+sl_bool BTree<KT, VT, KEY_COMPARE>::removeKeyAndValue(const KT& key, const _VT& value, VT* outValue, const VALUE_EQUALS& value_equals)
 {
 	TreePosition pos;
-	if (search(key, value, &pos)) {
+	if (searchKeyAndValue(key, value, &pos, outValue, value_equals)) {
 		if (removeAt(pos)) {
 			return sl_true;
 		}
@@ -932,28 +1010,48 @@ sl_bool BTree<KT, VT, COMPARE>::removeValue(const KT& key, const VT& value)
 	return sl_false;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_size BTree<KT, VT, COMPARE>::removeValues(const KT& key, const VT& value)
+template <class KT, class VT, class KEY_COMPARE>
+template <class _VT, class VALUE_EQUALS>
+sl_size BTree<KT, VT, KEY_COMPARE>::removeItemsByKeyAndValue(const KT& key, const _VT& value, List<VT>* outValues, const VALUE_EQUALS& value_equals)
 {
 	TreePosition pos;
-	if (search(key, value, &pos)) {
-		if (removeAt(pos)) {
-			sl_size n = 1;
-			while (search(key, value, &pos)) {
-				if (removeAt(pos)) {
-					n++;
-				} else {
-					break;
+	if (outValues) {
+		VT v;
+		if (searchKeyAndValue(key, value, &pos, &v, value_equals)) {
+			if (removeAt(pos)) {
+				outValues->add_NoLock(v);
+				sl_size n = 1;
+				while (searchKeyAndValue(key, value, &pos, &v, value_equals)) {
+					if (removeAt(pos)) {
+						outValues->add_NoLock(v);
+						n++;
+					} else {
+						break;
+					}
 				}
+				return n;
 			}
-			return n;
+		}
+	} else {
+		if (searchKeyAndValue(key, value, &pos, sl_null, value_equals)) {
+			if (removeAt(pos)) {
+				sl_size n = 1;
+				while (searchKeyAndValue(key, value, &pos, sl_null, value_equals)) {
+					if (removeAt(pos)) {
+						n++;
+					} else {
+						break;
+					}
+				}
+				return n;
+			}
 		}
 	}
 	return 0;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::removeAt(const TreePosition& pos)
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool BTree<KT, VT, KEY_COMPARE>::removeAt(const TreePosition& pos)
 {
 	if (pos.node.isNull()) {
 		return sl_false;
@@ -1021,8 +1119,8 @@ sl_bool BTree<KT, VT, COMPARE>::removeAt(const TreePosition& pos)
 	return sl_true;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::removeNode(const TreeNode& node)
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool BTree<KT, VT, KEY_COMPARE>::removeNode(const TreeNode& node)
 {
 	if (node.isNull()) {
 		return sl_false;
@@ -1033,8 +1131,8 @@ sl_bool BTree<KT, VT, COMPARE>::removeNode(const TreeNode& node)
 	return _removeNode(node, sl_true);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_size BTree<KT, VT, COMPARE>::removeAll()
+template <class KT, class VT, class KEY_COMPARE>
+sl_size BTree<KT, VT, KEY_COMPARE>::removeAll()
 {
 	TreeNode node = getRootNode();
 	NodeDataScope data(this, node);
@@ -1059,37 +1157,37 @@ sl_size BTree<KT, VT, COMPARE>::removeAll()
 }
 
 
-template <class KT, class VT, class COMPARE>
-SLIB_INLINE BTree<KT, VT, COMPARE>::NodeDataScope::NodeDataScope(const BTree* tree, const TreeNode& node)
+template <class KT, class VT, class KEY_COMPARE>
+SLIB_INLINE BTree<KT, VT, KEY_COMPARE>::NodeDataScope::NodeDataScope(const BTree* tree, const TreeNode& node)
 {
 	this->tree = (BTree*)tree;
 	this->data = tree->readNodeData(node);
 }
 
-template <class KT, class VT, class COMPARE>
-SLIB_INLINE BTree<KT, VT, COMPARE>::NodeDataScope::~NodeDataScope()
+template <class KT, class VT, class KEY_COMPARE>
+SLIB_INLINE BTree<KT, VT, KEY_COMPARE>::NodeDataScope::~NodeDataScope()
 {
 	tree->releaseNodeData(data);
 }
 
-template <class KT, class VT, class COMPARE>
-typename BTree<KT, VT, COMPARE>::NodeData* BTree<KT, VT, COMPARE>::NodeDataScope::operator->()
+template <class KT, class VT, class KEY_COMPARE>
+typename BTree<KT, VT, KEY_COMPARE>::NodeData* BTree<KT, VT, KEY_COMPARE>::NodeDataScope::operator->()
 {
 	return data;
 }
 
-template <class KT, class VT, class COMPARE>
-SLIB_INLINE sl_bool BTree<KT, VT, COMPARE>::NodeDataScope::isNull() {
+template <class KT, class VT, class KEY_COMPARE>
+SLIB_INLINE sl_bool BTree<KT, VT, KEY_COMPARE>::NodeDataScope::isNull() {
 	return data == sl_null;
 }
 
-template <class KT, class VT, class COMPARE>
-SLIB_INLINE sl_bool BTree<KT, VT, COMPARE>::NodeDataScope::isNotNull() {
+template <class KT, class VT, class KEY_COMPARE>
+SLIB_INLINE sl_bool BTree<KT, VT, KEY_COMPARE>::NodeDataScope::isNotNull() {
 	return data != sl_null;
 }
 
-template <class KT, class VT, class COMPARE>
-typename BTree<KT, VT, COMPARE>::NodeData* BTree<KT, VT, COMPARE>::_createNodeData()
+template <class KT, class VT, class KEY_COMPARE>
+typename BTree<KT, VT, KEY_COMPARE>::NodeData* BTree<KT, VT, KEY_COMPARE>::_createNodeData()
 {
 	NodeData* data = new NodeData;
 	if (data) {
@@ -1114,8 +1212,8 @@ typename BTree<KT, VT, COMPARE>::NodeData* BTree<KT, VT, COMPARE>::_createNodeDa
 	return sl_null;
 }
 
-template <class KT, class VT, class COMPARE>
-void BTree<KT, VT, COMPARE>::_freeNodeData(NodeData* data)
+template <class KT, class VT, class KEY_COMPARE>
+void BTree<KT, VT, KEY_COMPARE>::_freeNodeData(NodeData* data)
 {
 	if (data) {
 		New<KT>::free(data->keys, m_order);
@@ -1125,8 +1223,8 @@ void BTree<KT, VT, COMPARE>::_freeNodeData(NodeData* data)
 	}
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::_insertItemInNode(const TreeNode& node, sl_uint32 at, const TreeNode& after, const KT& key, const VT& value, const TreeNode& link)
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool BTree<KT, VT, KEY_COMPARE>::_insertItemInNode(const TreeNode& node, sl_uint32 at, const TreeNode& after, const KT& key, const VT& value, const TreeNode& link)
 {
 	NodeDataScope data(this, node);
 	if (data.isNull()) {
@@ -1285,8 +1383,8 @@ sl_bool BTree<KT, VT, COMPARE>::_insertItemInNode(const TreeNode& node, sl_uint3
 	return sl_false;
 }
 
-template <class KT, class VT, class COMPARE>
-void BTree<KT, VT, COMPARE>::_changeTotalCount(const TreeNode& node, sl_int64 n)
+template <class KT, class VT, class KEY_COMPARE>
+void BTree<KT, VT, KEY_COMPARE>::_changeTotalCount(const TreeNode& node, sl_int64 n)
 {
 	NodeDataScope data(this, node);
 	if (data.isNotNull()) {
@@ -1299,8 +1397,8 @@ void BTree<KT, VT, COMPARE>::_changeTotalCount(const TreeNode& node, sl_int64 n)
 	}
 }
 
-template <class KT, class VT, class COMPARE>
-void BTree<KT, VT, COMPARE>::_changeParentTotalCount(NodeData* data, sl_int64 n)
+template <class KT, class VT, class KEY_COMPARE>
+void BTree<KT, VT, KEY_COMPARE>::_changeParentTotalCount(NodeData* data, sl_int64 n)
 {
 	TreeNode parent = data->linkParent;
 	if (parent.isNotNull()) {
@@ -1310,8 +1408,8 @@ void BTree<KT, VT, COMPARE>::_changeParentTotalCount(NodeData* data, sl_int64 n)
 	}
 }
 
-template <class KT, class VT, class COMPARE>
-sl_uint64 BTree<KT, VT, COMPARE>::_getTotalCountInData(NodeData* data) const
+template <class KT, class VT, class KEY_COMPARE>
+sl_uint64 BTree<KT, VT, KEY_COMPARE>::_getTotalCountInData(NodeData* data) const
 {
 	sl_uint32 n = data->countItems;
 	sl_uint64 m = n + getCountInNode(data->linkFirst);
@@ -1321,8 +1419,8 @@ sl_uint64 BTree<KT, VT, COMPARE>::_getTotalCountInData(NodeData* data) const
 	return m;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::_removeNode(const TreeNode& node, sl_bool flagUpdateParent)
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool BTree<KT, VT, KEY_COMPARE>::_removeNode(const TreeNode& node, sl_bool flagUpdateParent)
 {
 	if (node.isNull()) {
 		return sl_false;
@@ -1372,28 +1470,28 @@ sl_bool BTree<KT, VT, COMPARE>::_removeNode(const TreeNode& node, sl_bool flagUp
 	return deleteNode(node);
 }
 
-template <class KT, class VT, class COMPARE>
-void BTree<KT, VT, COMPARE>::init()
+template <class KT, class VT, class KEY_COMPARE>
+void BTree<KT, VT, KEY_COMPARE>::init()
 {
 	m_rootNode = _createNodeData();
 }
 
-template <class KT, class VT, class COMPARE>
-void BTree<KT, VT, COMPARE>::free()
+template <class KT, class VT, class KEY_COMPARE>
+void BTree<KT, VT, KEY_COMPARE>::free()
 {
 	_removeNode(getRootNode(), sl_false);
 }
 
-template <class KT, class VT, class COMPARE>
-TreeNode BTree<KT, VT, COMPARE>::getRootNode() const
+template <class KT, class VT, class KEY_COMPARE>
+TreeNode BTree<KT, VT, KEY_COMPARE>::getRootNode() const
 {
 	TreeNode node;
 	node.position = (sl_size)m_rootNode;
 	return node;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::setRootNode(TreeNode node)
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool BTree<KT, VT, KEY_COMPARE>::setRootNode(TreeNode node)
 {
 	if (node.isNull()) {
 		return sl_false;
@@ -1402,8 +1500,8 @@ sl_bool BTree<KT, VT, COMPARE>::setRootNode(TreeNode node)
 	return sl_true;
 }
 
-template <class KT, class VT, class COMPARE>
-TreeNode BTree<KT, VT, COMPARE>::createNode(NodeData* data)
+template <class KT, class VT, class KEY_COMPARE>
+TreeNode BTree<KT, VT, KEY_COMPARE>::createNode(NodeData* data)
 {
 	TreeNode node;
 	if (data) {
@@ -1418,8 +1516,8 @@ TreeNode BTree<KT, VT, COMPARE>::createNode(NodeData* data)
 	return node;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::deleteNode(TreeNode node)
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool BTree<KT, VT, KEY_COMPARE>::deleteNode(TreeNode node)
 {
 	if (node.isNull()) {
 		return sl_false;
@@ -1429,15 +1527,15 @@ sl_bool BTree<KT, VT, COMPARE>::deleteNode(TreeNode node)
 	return sl_true;
 }
 
-template <class KT, class VT, class COMPARE>
-typename BTree<KT, VT, COMPARE>::NodeData* BTree<KT, VT, COMPARE>::readNodeData(const TreeNode& node) const
+template <class KT, class VT, class KEY_COMPARE>
+typename BTree<KT, VT, KEY_COMPARE>::NodeData* BTree<KT, VT, KEY_COMPARE>::readNodeData(const TreeNode& node) const
 {
 	NodeData* data = (NodeData*)(void*)(sl_size)(node.position);
 	return data;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool BTree<KT, VT, COMPARE>::writeNodeData(const TreeNode& node, NodeData* data)
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool BTree<KT, VT, KEY_COMPARE>::writeNodeData(const TreeNode& node, NodeData* data)
 {
 	if (node.isNull()) {
 		return sl_false;
@@ -1460,8 +1558,8 @@ sl_bool BTree<KT, VT, COMPARE>::writeNodeData(const TreeNode& node, NodeData* da
 	return sl_true;
 }
 
-template <class KT, class VT, class COMPARE>
-void BTree<KT, VT, COMPARE>::releaseNodeData(NodeData* data)
+template <class KT, class VT, class KEY_COMPARE>
+void BTree<KT, VT, KEY_COMPARE>::releaseNodeData(NodeData* data)
 {
 }
 
