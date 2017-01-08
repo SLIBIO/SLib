@@ -23,7 +23,7 @@ Ref<Image> _ImageResourceEntry::getImage()
 Ref<Image> _ImageResourceEntry::getMatchingImage(sl_uint32 reqWidth, sl_uint32 reqHeight)
 {
 	if (reqWidth == 0 || reqHeight == 0) {
-		return Ref<Image>::null();
+		return sl_null;
 	}
 	Ref<Image>& s = *((Ref<Image>*)((void*)&image));
 	if (flag_load) {
@@ -83,7 +83,7 @@ Ref<Image> _ImageResource_getImage(_ImageResourceEntry* entries, sl_uint32 requi
 		while (entry->flagValid) {
 			return entry->getImage();
 		}
-		return Ref<Image>::null();
+		return sl_null;
 	}
 	
 	sl_uint32 minSize = 0;
@@ -122,7 +122,7 @@ Ref<Image> _ImageResource_getImage(_ImageResourceEntry* entries, sl_uint32 requi
 	if (maxEntry) {
 		return maxEntry->getMatchingImage(requiredWidth, requiredHeight);
 	}
-	return Ref<Image>::null();
+	return sl_null;
 }
 
 List< Ref<Image> > _ImageResource_getImages(_ImageResourceEntry* entries)
@@ -288,7 +288,7 @@ Ref<Drawable> _ImageResource_get(_ImageResourceEntry* entries, sl_uint32 width, 
 			return new _ImageResource_Drawable(entries, width, height);
 		}
 	}
-	return Ref<Drawable>::null();
+	return sl_null;
 }
 
 SLIB_GRAPHICS_NAMESPACE_END

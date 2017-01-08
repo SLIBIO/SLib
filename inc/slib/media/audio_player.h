@@ -85,19 +85,19 @@ protected:
 	AudioPlayerControl(){};
 	
 public:
-	virtual void start() = 0;
+	virtual void stop() = 0;
+	
+	virtual void resume() = 0;
 	
 	virtual void pause() = 0;
 	
-	virtual void stop() = 0;
-	
 	virtual sl_bool isRunning() = 0;
-
+	
 public:
 	void _removeFromMap();
 };
 
-class SLIB_EXPORT AudioPlayerBuffer : public AudioPlayerControl
+class SLIB_EXPORT AudioPlayerBuffer : public Object
 {
 	SLIB_DECLARE_OBJECT
 
@@ -109,6 +109,12 @@ public:
 	
 	virtual sl_bool isOpened() = 0;
 	
+	virtual void start() = 0;
+	
+	virtual void stop() = 0;
+	
+	virtual sl_bool isRunning() = 0;
+
 public:
 	void write(const AudioData& audioPlay);
 
@@ -121,7 +127,7 @@ protected:
 	LoopQueue<sl_int16> m_queue;
 	sl_int16 m_lastSample;
 	sl_uint32 m_nChannels;
-	SafeArray<sl_int16> m_processData;
+	AtomicArray<sl_int16> m_processData;
 	
 	Ptr<IAudioPlayerBufferListener> m_listener;
 	Ref<Event> m_event;
@@ -150,6 +156,7 @@ public:
 	
 protected:
 	virtual Ref<AudioPlayerControl> _openNative(const AudioPlayerOpenParam& param) = 0;
+	
 };
 
 SLIB_MEDIA_NAMESPACE_END

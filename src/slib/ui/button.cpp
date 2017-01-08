@@ -453,7 +453,7 @@ Ref<Drawable> Button::getIcon(ButtonState state, sl_uint32 category)
 	if (category < m_nCategories) {
 		return m_categories[category].properties[(int)state].icon;
 	} else {
-		return Ref<Drawable>::null();
+		return sl_null;
 	}
 }
 
@@ -485,7 +485,7 @@ Ref<Drawable> Button::getBackground(ButtonState state, sl_uint32 category)
 	if (category < m_nCategories) {
 		return m_categories[category].properties[(int)state].background;
 	} else {
-		return Ref<Drawable>::null();
+		return sl_null;
 	}
 }
 
@@ -519,7 +519,7 @@ Ref<Pen> Button::getBorder(ButtonState state, sl_uint32 category)
 	if (category < m_nCategories) {
 		return m_categories[category].properties[(int)state].border;
 	} else {
-		return Ref<Pen>::null();
+		return sl_null;
 	}
 }
 
@@ -937,7 +937,7 @@ void Button::_invalidateButtonState()
 
 Ref<ViewInstance> Button::createNativeWidget(ViewInstance* parent)
 {
-	return Ref<ViewInstance>::null();
+	return sl_null;
 }
 
 void Button::_setText_NW(const String& text)

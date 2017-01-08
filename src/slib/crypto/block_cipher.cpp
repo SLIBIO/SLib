@@ -213,7 +213,7 @@ Memory BlockCipher_CBC<BlockCipher, Padding>::encrypt(const BlockCipher* crypto,
 			return mem.sub(0, n);
 		}
 	}
-	return Memory::null();
+	return sl_null;
 }
 
 // destination buffer size must equals to or greater than size
@@ -269,7 +269,7 @@ Memory BlockCipher_CBC<BlockCipher, Padding>::decrypt(const BlockCipher* crypto,
 			return mem.sub(0, n);
 		}
 	}
-	return Memory::null();
+	return sl_null;
 }
 
 

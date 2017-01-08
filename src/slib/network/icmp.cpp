@@ -134,7 +134,7 @@ int IcmpEchoAddress::compare(const IcmpEchoAddress& other) const
 {
 	int c = ip.compare(other.ip);
 	if (c == 0) {
-		return Compare<sl_uint32>::compare(SLIB_MAKE_DWORD2(identifier, sequenceNumber), SLIB_MAKE_DWORD2(other.identifier, other.sequenceNumber));
+		return Compare<sl_uint32>()(SLIB_MAKE_DWORD2(identifier, sequenceNumber), SLIB_MAKE_DWORD2(other.identifier, other.sequenceNumber));
 	}
 	return c;
 }
@@ -143,7 +143,7 @@ sl_uint32 IcmpEchoAddress::hashCode() const
 {
 	sl_uint64 t = ip.hashCode();
 	t = t * 31 + SLIB_MAKE_DWORD2(identifier, sequenceNumber);
-	return sl_hash(t);
+	return Hash64(t);
 }
 
 sl_bool IcmpEchoAddress::operator == (const IcmpEchoAddress& other) const
@@ -156,20 +156,17 @@ sl_bool IcmpEchoAddress::operator!=(const IcmpEchoAddress& other) const
 	return !(*this == other);
 }
 
-template <>
-int Compare<IcmpEchoAddress>::compare(const IcmpEchoAddress& a, const IcmpEchoAddress& b)
+int Compare<IcmpEchoAddress>::operator()(const IcmpEchoAddress& a, const IcmpEchoAddress& b) const
 {
 	return a.compare(b);
 }
 
-template <>
-sl_bool Compare<IcmpEchoAddress>::equals(const IcmpEchoAddress& a, const IcmpEchoAddress& b)
+sl_bool Equals<IcmpEchoAddress>::operator()(const IcmpEchoAddress& a, const IcmpEchoAddress& b) const
 {
 	return a == b;
 }
 
-template <>
-sl_uint32 Hash<IcmpEchoAddress>::hash(const IcmpEchoAddress& a)
+sl_uint32 Hash<IcmpEchoAddress>::operator()(const IcmpEchoAddress& a) const
 {
 	return a.hashCode();
 }

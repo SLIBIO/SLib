@@ -46,7 +46,7 @@ public:
 public:
 	static void logError(String text)
 	{
-		SLIB_LOG_ERROR("OpenSL_ES", text);
+		LogError("OpenSL_ES", text);
 	}
 
 	static Ref<_OpenSLES_AudioRecorderImpl> create(const AudioRecorderParam& param)
@@ -129,7 +129,7 @@ public:
 								
 								if (ret->m_bufFrame) {
 									Base::zeroMemory(ret->m_bufFrame, sizeof(sl_int16) * ret->m_nSamplesFrame * 2);
-									if ((*bufferQueue)->RegisterCallback(bufferQueue, _OpenSLES_AudioRecorderImpl::callback, ret.ptr) == SL_RESULT_SUCCESS) {
+									if ((*bufferQueue)->RegisterCallback(bufferQueue, _OpenSLES_AudioRecorderImpl::callback, ret.get()) == SL_RESULT_SUCCESS) {
 										if (param.flagAutoStart) {
 											ret->start();
 										}
@@ -138,7 +138,7 @@ public:
 										logError("Failed to register callback");
 									}
 								}
-								return Ref<_OpenSLES_AudioRecorderImpl>::null();
+								return sl_null;
 							}
 						} else {
 							logError("Failed to get buffer queue");
@@ -254,7 +254,7 @@ SLIB_MEDIA_NAMESPACE_BEGIN
 
 Ref<AudioRecorder> OpenSL_ES::createRecorder(const AudioRecorderParam& param)
 {
-	return Ref<AudioRecorder>::null();
+	return sl_null;
 }
 
 SLIB_MEDIA_NAMESPACE_END

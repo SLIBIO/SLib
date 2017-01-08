@@ -7,6 +7,7 @@
 #include "thread.h"
 #include "file.h"
 #include "variant.h"
+#include "ptr.h"
 
 SLIB_NAMESPACE_BEGIN
 
@@ -31,19 +32,19 @@ class AsyncStreamRequest;
 class SLIB_EXPORT Async
 {
 public:
-	static sl_bool runTask(const Callback& task, const Ref<AsyncLoop>& loop);
+	static sl_bool runTask(const Function<void()>& task, const Ref<AsyncLoop>& loop);
 	
-	static sl_bool runTask(const Callback& task);
-	
-	
-	static sl_bool setTimeout(const Callback& task, sl_uint64 delay_ms, const Ref<AsyncLoop>& loop);
-	
-	static sl_bool setTimeout(const Callback& task, sl_uint64 delay_ms);
+	static sl_bool runTask(const Function<void()>& task);
 	
 	
-	static Ref<AsyncTimer> addTimer(const Callback& task, sl_uint64 interval_ms, const Ref<AsyncLoop>& loop);
+	static sl_bool setTimeout(const Function<void()>& task, sl_uint64 delay_ms, const Ref<AsyncLoop>& loop);
 	
-	static Ref<AsyncTimer> addTimer(const Callback& task, sl_uint64 interval_ms);
+	static sl_bool setTimeout(const Function<void()>& task, sl_uint64 delay_ms);
+	
+	
+	static Ref<AsyncTimer> addTimer(const Function<void()>& task, sl_uint64 interval_ms, const Ref<AsyncLoop>& loop);
+	
+	static Ref<AsyncTimer> addTimer(const Function<void()>& task, sl_uint64 interval_ms);
 	
 	static void removeTimer(const Ref<AsyncTimer>& timer, const Ref<AsyncLoop>& loop);
 	
@@ -74,11 +75,11 @@ public:
 	
 	sl_bool isRunning();
 	
-	sl_bool addTask(const Callback& task);
+	sl_bool addTask(const Function<void()>& task);
 
-	sl_bool setTimeout(const Callback& task, sl_uint64 delay_ms);
+	sl_bool setTimeout(const Function<void()>& task, sl_uint64 delay_ms);
 
-	Ref<AsyncTimer> addTimer(const Callback& task, sl_uint64 interval_ms);
+	Ref<AsyncTimer> addTimer(const Function<void()>& task, sl_uint64 interval_ms);
 	
 	sl_bool addTimer(const Ref<AsyncTimer>& timer);
 	
@@ -87,7 +88,7 @@ public:
 	sl_uint64 getEllapsedMilliseconds();
 	
 	// override
-	sl_bool dispatch(const Callback& callback);
+	sl_bool dispatch(const Function<void()>& callback);
 
 protected:
 	sl_bool m_flagInit;
@@ -96,12 +97,12 @@ protected:
 
 	TimeCounter m_timeCounter;
 
-	Queue<Callback> m_queueTasks;
+	LinkedQueue<Function<void()>> m_queueTasks;
 
 	struct TimeTask
 	{
 		sl_uint64 time;
-		Callback task;
+		Function<void()> task;
 	};
 	BTree<sl_uint64, TimeTask> m_timeTasks;
 	Mutex m_lockTimeTasks;
@@ -114,7 +115,7 @@ protected:
 	public:
 		sl_bool operator==(const Timer& other) const;
 	};
-	Queue<Timer> m_queueTimers;
+	LinkedQueue<Timer> m_queueTimers;
 	Mutex m_lockTimer;
 
 protected:
@@ -135,7 +136,7 @@ protected:
 	AsyncTimer();
 	
 public:
-	static Ref<AsyncTimer> create(const Callback& task, sl_uint64 interval_ms, sl_bool flagStart = sl_true);
+	static Ref<AsyncTimer> create(const Function<void()>& task, sl_uint64 interval_ms, sl_bool flagStart = sl_true);
 	
 public:
 	void start();
@@ -144,7 +145,7 @@ public:
 	
 	sl_bool isStarted();
 	
-	Callback getTask();
+	Function<void()> getTask();
 	
 	sl_uint64 getInterval();
 	
@@ -159,7 +160,7 @@ public:
 	
 protected:
 	sl_bool m_flagStarted;
-	Callback m_task;
+	Function<void()> m_task;
 	sl_uint64 m_interval;
 	sl_int32 m_nCountRun;
 	
@@ -190,7 +191,7 @@ public:
 	sl_bool isRunning();
 	
 	
-	sl_bool addTask(const Callback& task);
+	sl_bool addTask(const Function<void()>& task);
 
 	void wake();
 	
@@ -202,7 +203,7 @@ public:
 	void requestOrder(AsyncIoInstance* instance);
 	
 	// override
-	sl_bool dispatch(const Callback& callback);
+	sl_bool dispatch(const Function<void()>& callback);
 	
 protected:
 	sl_bool m_flagInit;
@@ -211,11 +212,11 @@ protected:
 	
 	Ref<Thread> m_thread;
 	
-	Queue<Callback> m_queueTasks;
+	LinkedQueue< Function<void()> > m_queueTasks;
 
-	Queue< Ref<AsyncIoInstance> > m_queueInstancesOrder;
-	Queue< Ref<AsyncIoInstance> > m_queueInstancesClosing;
-	Queue< Ref<AsyncIoInstance> > m_queueInstancesClosed;
+	LinkedQueue< Ref<AsyncIoInstance> > m_queueInstancesOrder;
+	LinkedQueue< Ref<AsyncIoInstance> > m_queueInstancesClosing;
+	LinkedQueue< Ref<AsyncIoInstance> > m_queueInstancesClosed;
 	
 protected:
 	static void* __createHandle();
@@ -258,7 +259,7 @@ public:
 	
 	void setClosing();
 	
-	void addToQueue(Queue< Ref<AsyncIoInstance> >& queue);
+	void addToQueue(LinkedQueue< Ref<AsyncIoInstance> >& queue);
 	
 	void requestOrder();
 
@@ -289,7 +290,7 @@ protected:
 	virtual void onEvent(EventDesc* pev) = 0;
 
 private:
-	SafeWeakRef<AsyncIoObject> m_object;
+	AtomicWeakRef<AsyncIoObject> m_object;
 	sl_file m_handle;
 	AsyncIoMode m_mode;
 
@@ -344,8 +345,8 @@ protected:
 	void setIoInstance(AsyncIoInstance* instance);
 
 private:
-	SafeWeakRef<AsyncIoLoop> m_ioLoop;
-	SafeRef<AsyncIoInstance> m_ioInstance;
+	AtomicWeakRef<AsyncIoLoop> m_ioLoop;
+	AtomicRef<AsyncIoInstance> m_ioInstance;
 
 	HashMap< String, Ref<Referable> > m_mapUserObjects_s;
 	HashMap< sl_uint64, Ref<Referable> > m_mapUserObjects_i;
@@ -359,10 +360,10 @@ class SLIB_EXPORT IAsyncStreamListener
 {
 public:
 	// data may be changed during the I/O operations
-	virtual void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError);
+	virtual void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError);
 	
 	// data may be changed during the I/O operations
-	virtual void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, const Referable* ref, sl_bool flagError);
+	virtual void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError);
 	
 };
 
@@ -378,12 +379,12 @@ public:
 	sl_bool flagRead;
 	
 protected:
-	AsyncStreamRequest(void* data, sl_uint32 size, const Referable* refData, const Ptr<IAsyncStreamListener>& listener, sl_bool flagRead);
+	AsyncStreamRequest(void* data, sl_uint32 size, Referable* refData, const Ptr<IAsyncStreamListener>& listener, sl_bool flagRead);
 
 public:
-	static Ref<AsyncStreamRequest> createRead(void* data, sl_uint32 size, const Referable* refData, const Ptr<IAsyncStreamListener>& listener);
+	static Ref<AsyncStreamRequest> createRead(void* data, sl_uint32 size, Referable* refData, const Ptr<IAsyncStreamListener>& listener);
 	
-	static Ref<AsyncStreamRequest> createWrite(void* data, sl_uint32 size, const Referable* refData, const Ptr<IAsyncStreamListener>& listener);
+	static Ref<AsyncStreamRequest> createWrite(void* data, sl_uint32 size, Referable* refData, const Ptr<IAsyncStreamListener>& listener);
 
 };
 
@@ -396,9 +397,9 @@ public:
 	AsyncStreamInstance();
 	
 public:
-	virtual sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref);
+	virtual sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref);
 	
-	virtual sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref);
+	virtual sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref);
 
 	virtual sl_bool isSeekable();
 	
@@ -422,8 +423,8 @@ protected:
 	sl_size getWriteRequestsCount();
 
 private:
-	Queue< Ref<AsyncStreamRequest> > m_requestsRead;
-	Queue< Ref<AsyncStreamRequest> > m_requestsWrite;
+	LinkedQueue< Ref<AsyncStreamRequest> > m_requestsRead;
+	LinkedQueue< Ref<AsyncStreamRequest> > m_requestsWrite;
 	sl_reg m_sizeWriteWaiting;
 	
 };
@@ -442,9 +443,9 @@ public:
 	
 	virtual sl_bool isOpened() = 0;
 	
-	virtual sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref = sl_null) = 0;
+	virtual sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null) = 0;
 	
-	virtual sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref = sl_null) = 0;
+	virtual sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null) = 0;
 	
 	virtual sl_bool isSeekable();
 	
@@ -456,7 +457,7 @@ public:
 
 	sl_bool writeFromMemory(const Memory& mem, const Ptr<IAsyncStreamListener>& listener);
 	
-	virtual sl_bool addTask(const Callback& callback) = 0;
+	virtual sl_bool addTask(const Function<void()>& callback) = 0;
 	
 };
 
@@ -470,10 +471,10 @@ public:
 	sl_bool isOpened();
 
 	// override
-	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref = sl_null);
+	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
 	
 	// override
-	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref = sl_null);
+	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
 	
 	// override
 	sl_bool isSeekable();
@@ -485,7 +486,7 @@ public:
 	sl_uint64 getSize();
 	
 	// override
-	sl_bool addTask(const Callback& callback);
+	sl_bool addTask(const Function<void()>& callback);
 	
 	sl_size getWaitingSizeForWrite();
 
@@ -507,13 +508,13 @@ protected:
 
 public:
 	// override
-	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref = sl_null);
+	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
 	
 	// override
-	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref = sl_null);
+	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
 	
 	// override
-	sl_bool addTask(const Callback& callback);
+	sl_bool addTask(const Function<void()>& callback);
 	
 protected:
 	virtual void processRequest(AsyncStreamRequest* request) = 0;
@@ -529,7 +530,7 @@ protected:
 	void _runProcessor();
 	
 private:
-	Queue< Ref<AsyncStreamRequest> > m_requests;
+	LinkedQueue< Ref<AsyncStreamRequest> > m_requests;
 	sl_bool m_flagProcessRequest;
 	
 	Ref<AsyncLoop> m_loop;
@@ -555,7 +556,7 @@ public:
 	sl_bool isOpened();
 	
 	// override
-	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref = sl_null);
+	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
 
 public:
 	Ptr<IReader> getReader();
@@ -565,7 +566,7 @@ protected:
 	void processRequest(AsyncStreamRequest* request);
 
 private:
-	SafePtr<IReader> m_reader;
+	AtomicPtr<IReader> m_reader;
 	
 };
 
@@ -588,7 +589,7 @@ public:
 	sl_bool isOpened();
 	
 	// override
-	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref = sl_null);
+	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
 
 public:
 	Ptr<IWriter> getWriter();
@@ -598,7 +599,7 @@ protected:
 	void processRequest(AsyncStreamRequest* request);
 
 protected:
-	SafePtr<IWriter> m_writer;
+	AtomicPtr<IWriter> m_writer;
 };
 
 class SLIB_EXPORT AsyncFile : public AsyncStreamSimulator
@@ -666,7 +667,7 @@ protected:
 	void processRequest(AsyncStreamRequest* request);
 
 private:
-	SafeRef<File> m_file;
+	AtomicRef<File> m_file;
 	
 };
 
@@ -730,17 +731,17 @@ public:
 
 protected:
 	// override
-	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError);
+	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError);
 	
 	// override
-	void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, const Referable* ref, sl_bool flagError);
+	void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError);
 
 protected:
 	void enqueue();
 
 protected:
-	SafeRef<AsyncStream> m_source;
-	SafeRef<AsyncStream> m_target;
+	AtomicRef<AsyncStream> m_source;
+	AtomicRef<AsyncStream> m_target;
 	Ptr<IAsyncCopyListener> m_listener;
 	sl_uint64 m_sizeRead;
 	sl_uint64 m_sizeWritten;
@@ -758,10 +759,10 @@ protected:
 		Memory memRead;
 		Memory memWrite;
 	};
-	Queue< Ref<Buffer> > m_buffersRead;
-	SafeRef<Buffer> m_bufferReading;
-	Queue< Ref<Buffer> > m_buffersWrite;
-	SafeRef<Buffer> m_bufferWriting;
+	LinkedQueue< Ref<Buffer> > m_buffersRead;
+	AtomicRef<Buffer> m_bufferReading;
+	LinkedQueue< Ref<Buffer> > m_buffersWrite;
+	AtomicRef<Buffer> m_bufferWriting;
 
 };
 
@@ -793,7 +794,7 @@ public:
 protected:
 	MemoryQueue m_header;
 	sl_uint64 m_sizeBody;
-	SafeRef<AsyncStream> m_body;
+	AtomicRef<AsyncStream> m_body;
 };
 
 class SLIB_EXPORT AsyncOutputBuffer: public Object
@@ -818,7 +819,7 @@ public:
 
 protected:
 	sl_uint64 m_lengthOutput;
-	Queue< Ref<AsyncOutputBufferElement> > m_queueOutput;
+	LinkedQueue< Ref<AsyncOutputBufferElement> > m_queueOutput;
 	
 	friend class AsyncOutput;
 };
@@ -856,7 +857,7 @@ public:
 	
 protected:
 	// override
-	void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, const Referable* ref, sl_bool flagError);
+	void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError);
 
 	// override
 	void onAsyncCopyExit(AsyncCopy* task);
@@ -900,16 +901,16 @@ public:
 	sl_bool isOpened();
 	
 	// override
-	virtual sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref = sl_null);
+	virtual sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
 
 	// override
-	virtual sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref = sl_null);
+	virtual sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
 
 	// override
-	sl_bool addTask(const Callback& callback);
+	sl_bool addTask(const Function<void()>& callback);
 	
 	
-	void addReadData(void* data, sl_uint32 size, const Referable* refData);
+	void addReadData(void* data, sl_uint32 size, Referable* refData);
 	
 	void addReadData(const Memory& data);
 	
@@ -928,9 +929,9 @@ public:
 	sl_bool isWritingEnded();
 
 protected:
-	virtual Memory filterRead(void* data, sl_uint32 size, const Referable* refData);
+	virtual Memory filterRead(void* data, sl_uint32 size, Referable* refData);
 	
-	virtual Memory filterWrite(void* data, sl_uint32 size, const Referable* refData);
+	virtual Memory filterWrite(void* data, sl_uint32 size, Referable* refData);
 
 protected:
 	void setReadingError();
@@ -944,15 +945,15 @@ protected:
 protected:
 	sl_bool m_flagOpened;
 
-	SafeRef<AsyncStream> m_stream;
+	AtomicRef<AsyncStream> m_stream;
 	
 	MemoryQueue m_bufReadConverted;
-	Queue< Ref<AsyncStreamRequest> > m_requestsRead;
+	LinkedQueue< Ref<AsyncStreamRequest> > m_requestsRead;
 	Mutex m_lockReading;
 	sl_bool m_flagReading;
 	sl_bool m_flagReadingError;
 	sl_bool m_flagReadingEnded;
-	SafeMemory m_memReading;
+	AtomicMemory m_memReading;
 
 	Mutex m_lockWriting;
 	sl_bool m_flagWritingError;
@@ -961,7 +962,7 @@ protected:
 protected:
 	void _read();
 	
-	void _processRead(void* data, sl_uint32 size, const Referable* refData, sl_bool flagError);
+	void _processRead(void* data, sl_uint32 size, Referable* refData, sl_bool flagError);
 	
 	void _processReadEmpty();
 
@@ -971,10 +972,10 @@ protected:
 
 protected:
 	// override
-	virtual void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError);
+	virtual void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError);
 
 	// override
-	virtual void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, const Referable* ref, sl_bool flagError);
+	virtual void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError);
 };
 
 SLIB_NAMESPACE_END

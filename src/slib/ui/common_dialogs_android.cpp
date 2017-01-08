@@ -48,9 +48,9 @@ SLIB_JNI_END_CLASS
 class _UiAlertResult : public Referable
 {
 public:
-	Callback onOk;
-	Callback onCancel;
-	Callback onNo;
+	Function<void()> onOk;
+	Function<void()> onCancel;
+	Function<void()> onNo;
 };
 
 typedef HashMap<jlong, Ref<_UiAlertResult> > _UiAlertMap;
@@ -75,7 +75,7 @@ void AlertDialog::_show()
 				_JAndroidAlert::type.set(jalert, (int)(type));
 				_JAndroidAlert::caption.set(jalert, caption);
 				_JAndroidAlert::text.set(jalert, text);
-				jlong lresult = (jlong)(result.ptr);
+				jlong lresult = (jlong)(result.get());
 				_JAndroidAlert::nativeObject.set(jalert, lresult);
 				_JAndroidAlert::titleOk.set(jalert, titleOk);
 				_JAndroidAlert::titleCancel.set(jalert, titleCancel);

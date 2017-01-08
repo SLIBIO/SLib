@@ -511,8 +511,10 @@ enum class Country
 
 class Locale
 {
-	SLIB_DECLARE_PRIMITIVE_WRAPPER(int, Locale)
 public:
+	int value;
+	SLIB_MEMBERS_OF_PRIMITIVE_WRAPPER(Locale, int, value)
+
 	enum {
 		Unknown = 0,
 		ar = SLIB_DEFINE_LOCALE_CODE(Language::Arabic, Country::Unknown),
@@ -565,7 +567,7 @@ public:
 	};
 	
 public:
-	Locale();
+	SLIB_CONSTEXPR Locale() : value(Locale::Unknown) {}
 	
 	Locale(Language language, Country country);
 	
@@ -645,6 +647,16 @@ public:
 	
 };
 
+template <>
+class Hash<Locale>
+{
+public:
+	SLIB_CONSTEXPR sl_uint32 operator()(const Locale& locale) const
+	{
+		return Rehash(locale.value);
+	}
+	
+};
 
 SLIB_NAMESPACE_END
 

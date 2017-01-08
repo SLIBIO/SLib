@@ -3,6 +3,7 @@
 #if defined(SLIB_PLATFORM_IS_OSX)
 
 #include "../../../inc/slib/media/audio_recorder.h"
+#include "../../../inc/slib/core/log.h"
 
 #include "media_platform_osx.h"
 
@@ -38,7 +39,7 @@ public:
 public:
 	static void logError(String text)
 	{
-		SLIB_LOG_ERROR("AudioRecorder", text);
+		LogError("AudioRecorder", text);
 	}
 	
 	static Ref<_OSX_AudioRecorder> create(const AudioRecorderParam& param)
@@ -124,7 +125,7 @@ public:
 					ret->m_event = param.event;
 
 					AudioDeviceIOProcID callback;
-					if (AudioDeviceCreateIOProcID(deviceID, DeviceIOProc, ret.ptr, &callback) == kAudioHardwareNoError) {
+					if (AudioDeviceCreateIOProcID(deviceID, DeviceIOProc, ret.get(), &callback) == kAudioHardwareNoError) {
 						ret->m_callback = callback;
 						if (param.flagAutoStart) {
 							ret->start();
@@ -134,7 +135,7 @@ public:
 						logError("Failed to create io proc");
 					}
 					
-					return Ref<_OSX_AudioRecorder>::null();
+					return sl_null;
 				}
 			} else {
 				logError("Failed to get set buffer size");
@@ -299,7 +300,7 @@ Ref<AudioRecorder> AudioRecorder::create(const AudioRecorderParam& param)
 
 List<AudioRecorderInfo> AudioRecorder::getRecordersList()
 {
-	ListItems<OSX_AudioDeviceInfo> list(OSX_AudioDeviceInfo::getAllDevices(sl_true));
+	ListElements<OSX_AudioDeviceInfo> list(OSX_AudioDeviceInfo::getAllDevices(sl_true));
 	List<AudioRecorderInfo> ret;
 	for (sl_size i = 0; i < list.count; i++) {
 		AudioRecorderInfo info;

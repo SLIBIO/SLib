@@ -4,7 +4,6 @@
 
 #include "../../../inc/slib/core/list.h"
 #include "../../../inc/slib/core/string.h"
-#include "../../../inc/slib/core/log.h"
 
 #import <Foundation/Foundation.h>
 #import <CoreAudio/CoreAudio.h>

@@ -20,40 +20,61 @@ protected:
 public:
 	CMemory(sl_size count);
 	
-	CMemory(const sl_uint8* data, sl_size size);
+	CMemory(const void* data, sl_size size);
 	
-	CMemory(const sl_uint8* data, sl_size size, const Referable* refer);
+	CMemory(const void* data, sl_size size, Referable* refer);
 	
 public:
 	static CMemory* create(sl_size size);
 	
-	static CMemory* create(const sl_uint8* data, sl_size size);
+	static CMemory* create(const void* data, sl_size size);
 	
-	static CMemory* createStatic(const sl_uint8* data, sl_size size, const Referable* refer);
+	static CMemory* createStatic(const void* data, sl_size size, Referable* refer);
 
 public:
-	CMemory* sub(sl_size start, sl_size size = SLIB_SIZE_MAX) const;
+	CMemory* sub(sl_size start, sl_size size = SLIB_SIZE_MAX);
 	
 	CMemory* duplicate() const;
 	
 };
 
+class Memory;
 
-class SafeMemory;
+template <>
+class SLIB_EXPORT Atomic<Memory>
+{
+public:
+	AtomicRef<CMemory> ref;
+	SLIB_ATOMIC_REF_WRAPPER(CMemory)
+	
+public:
+	sl_size getSize() const;
+	
+	sl_bool isEmpty() const;
+	
+	sl_bool isNotEmpty() const;
+	
+	Memory sub(sl_size start, sl_size count = SLIB_SIZE_MAX) const;
+	
+	sl_size read(sl_size startSource, sl_size len, void* bufDst) const;
+	
+	sl_size write(sl_size startTarget, sl_size len, const void* bufSrc) const;
+	
+	sl_size copy(sl_size startTarget, const Memory& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const;
+	
+	sl_size copy(const Memory& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const;
+	
+	Memory duplicate() const;
+	
+	sl_bool getData(MemoryData& data) const;
+	
+};
 
-/** auto-referencing object **/
 class SLIB_EXPORT Memory
 {
 public:
 	Ref<CMemory> ref;
-	SLIB_DECLARE_REF_WRAPPER(Memory, SafeMemory, CMemory)
-	
-public:
-	Memory(sl_size size);
-	
-	Memory(const void* buf, sl_size size);
-	
-	Memory(const void* buf, sl_size size, const Referable* refer);
+	SLIB_REF_WRAPPER(Memory, CMemory)
 	
 public:
 	static Memory create(sl_size count);
@@ -62,7 +83,7 @@ public:
 	
 	static Memory createStatic(const void* buf, sl_size size);
 	
-	static Memory createStatic(const void* buf, sl_size size, const Referable* refer);
+	static Memory createStatic(const void* buf, sl_size size, Referable* refer);
 	
 public:
 	void* getData() const;
@@ -89,53 +110,7 @@ public:
 	
 };
 
-template <>
-int Compare<Memory>::compare(const Memory& a, const Memory& b);
-
-template <>
-sl_bool Compare<Memory>::equals(const Memory& a, const Memory& b);
-
-
-SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_LIST(Memory)
-SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_QUEUE(Memory)
-
-
-/** auto-referencing object **/
-class SLIB_EXPORT SafeMemory
-{
-public:
-	SafeRef<CMemory> ref;
-	SLIB_DECLARE_REF_WRAPPER(SafeMemory, Memory, CMemory)
-	
-public:
-	SafeMemory(sl_size size);
-	
-	SafeMemory(const void* buf, sl_size size);
-	
-	SafeMemory(const void* buf, sl_size size, const Referable* refer);
-	
-public:
-	sl_size getSize() const;
-	
-	sl_bool isEmpty() const;
-	
-	sl_bool isNotEmpty() const;
-	
-	Memory sub(sl_size start, sl_size count = SLIB_SIZE_MAX) const;
-	
-	sl_size read(sl_size startSource, sl_size len, void* bufDst) const;
-	
-	sl_size write(sl_size startTarget, sl_size len, const void* bufSrc) const;
-	
-	sl_size copy(sl_size startTarget, const Memory& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const;
-	
-	sl_size copy(const Memory& source, sl_size startSource = 0, sl_size len = SLIB_SIZE_MAX) const;
-	
-	Memory duplicate() const;
-	
-	sl_bool getData(MemoryData& data) const;
-
-};
+typedef Atomic<Memory> AtomicMemory;
 
 class SLIB_EXPORT MemoryData
 {
@@ -172,7 +147,7 @@ public:
 	Memory merge() const;
 
 protected:
-	Queue<MemoryData> m_queue;
+	LinkedQueue<MemoryData> m_queue;
 	sl_size m_size;
 	
 };
@@ -194,6 +169,8 @@ private:
 	sl_size m_posCurrent;
 	
 };
+
+SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_LIST(Memory)
 
 SLIB_NAMESPACE_END
 

@@ -196,7 +196,7 @@ String Locale::getLanguageName(Language lang)
 		case Language::Unknown:
 			break;
 	}
-	return String::null();
+	return sl_null;
 }
 
 Language Locale::getLanguageFromCode(const sl_char8* code)
@@ -491,7 +491,7 @@ String Locale::getCountryName(Country country)
 		case Country::Unknown:
 			break;
 	}
-	return String::null();
+	return sl_null;
 }
 
 String Locale::getCountryLongName(Country country)
@@ -555,10 +555,6 @@ String Locale::getCountryCode(Country country)
 sl_bool Locale::isValidCountryCode(Country country)
 {
 	return getCountryName(country).isNotNull();
-}
-
-Locale::Locale() : value(Locale::Unknown)
-{
 }
 
 Locale::Locale(Language language, Country country)

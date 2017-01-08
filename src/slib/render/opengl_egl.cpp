@@ -7,8 +7,8 @@
 #include "../../../inc/slib/render/engine.h"
 #include "../../../inc/slib/render/opengl.h"
 #include "../../../inc/slib/core/thread.h"
-#include "../../../inc/slib/core/platform_windows.h"
 #include "../../../inc/slib/core/log.h"
+#include "../../../inc/slib/core/platform_windows.h"
 
 SLIB_RENDER_NAMESPACE_BEGIN
 
@@ -24,7 +24,7 @@ public:
 
 	RendererParam m_param;
 
-	SafeRef<Thread> m_threadRender;
+	AtomicRef<Thread> m_threadRender;
 
 	EGLNativeWindowType m_hWindow;
 	EGLNativeDisplayType m_hDisplay;
@@ -75,14 +75,14 @@ public:
 	{
 		EGLNativeWindowType windowHandle = (EGLNativeWindowType)_windowHandle;
 		if (windowHandle == 0) {
-			return Ref<_EGLRendererImpl>::null();
+			return sl_null;
 		}
 
 		RendererParam param = _param;
 
 		PFNEGLGETPLATFORMDISPLAYEXTPROC eglGetPlatformDisplayEXT = (PFNEGLGETPLATFORMDISPLAYEXTPROC)(_EGL_ENTRY(eglGetProcAddress)("eglGetPlatformDisplayEXT"));
 		if (!eglGetPlatformDisplayEXT) {
-			return Ref<_EGLRendererImpl>::null();
+			return sl_null;
 		}
 
 		EGLint _majorVersion = EGL_DONT_CARE;
@@ -98,7 +98,7 @@ public:
 		_clientVersion = 2;
 #endif
 		if (_platform == 0) {
-			return Ref<_EGLRendererImpl>::null();
+			return sl_null;
 		}
 
 		const EGLint displayAttributes[] =
@@ -186,7 +186,7 @@ public:
 												ret->m_config = config;
 												ret->m_callback = param.callback;
 
-												ret->m_threadRender = Thread::start(SLIB_CALLBACK_CLASS(_EGLRendererImpl, run, ret.ptr));
+												ret->m_threadRender = Thread::start(SLIB_FUNCTION_CLASS(_EGLRendererImpl, run, ret.get()));
 
 												return ret;
 											}
@@ -205,7 +205,7 @@ public:
 			}
 			releaseDisplay(windowHandle, displayHandle);
 		}
-		return Ref<_EGLRendererImpl>::null();
+		return sl_null;
 	}
 
 	void release()
@@ -240,7 +240,7 @@ public:
 
 		TimeCounter timer;
 		while (Thread::isNotStoppingCurrent()) {
-			runStep(engine.ptr);
+			runStep(engine.get());
 			if (Thread::isNotStoppingCurrent()) {
 				sl_uint64 t = timer.getEllapsedMilliseconds();
 				if (t < 20) {
@@ -304,7 +304,7 @@ _EGL_EntryPoints _EGL_ENTRIES;
 #define _SLIB_RENDER_EGL_ENTRY(TYPE, name, ...) \
 	proc = ::GetProcAddress(hDll, #name); \
 if (proc == 0) { \
-	SLIB_LOG_ERROR("EGL", "Failed to get function entry point - " #name); \
+	LogError("EGL", "Failed to get function entry point - " #name); \
 	return; \
 } \
 	*((FARPROC*)(&(_EGL_ENTRIES.name))) = proc;
@@ -325,7 +325,7 @@ void EGL::loadEntries(const String& _pathDll, sl_bool flagReload)
 	HMODULE hDll;
 	hDll = ::LoadLibraryW((LPCWSTR)(pathDll.getData()));
 	if (!hDll) {
-		//SLIB_LOG_ERROR("GLES", "Failed to load EGL dll - " + pathEGL);
+		//LogError("GLES", "Failed to load EGL dll - %s", pathEGL);
 		return;
 	}
 	FARPROC proc;
@@ -370,7 +370,7 @@ SLIB_RENDER_NAMESPACE_END
 SLIB_RENDER_NAMESPACE_BEGIN
 Ref<Renderer> EGL::createRenderer(void* windowHandle, const RendererParam& param)
 {
-	return Ref<Renderer>::null();
+	return sl_null;
 }
 
 void EGL::loadEntries(const String& pathDll, sl_bool flagReload)

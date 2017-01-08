@@ -20,7 +20,7 @@ Variant DatabaseCursor::getValue(const String& name)
 	if (index >= 0) {
 		return getValue(index);
 	}
-	return Variant::null();
+	return sl_null;
 }
 
 String DatabaseCursor::getString(const String& name)
@@ -29,7 +29,7 @@ String DatabaseCursor::getString(const String& name)
 	if (index >= 0) {
 		return getString(index);
 	}
-	return String::null();
+	return sl_null;
 }
 
 sl_int64 DatabaseCursor::getInt64(sl_uint32 index, sl_int64 defaultValue)
@@ -150,7 +150,7 @@ Memory DatabaseCursor::getBlob(const String& name)
 	if (index >= 0) {
 		return getBlob(index);
 	}
-	return Memory::null();
+	return sl_null;
 }
 
 SLIB_DB_NAMESPACE_END

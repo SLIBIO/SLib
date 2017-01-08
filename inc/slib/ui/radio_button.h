@@ -26,7 +26,7 @@ public:
 	void dispatchClick(UIEvent* ev);
 	
 public:
-	SLIB_WEAK_PROPERTY(RadioGroup, RadioGroup)
+	SLIB_PROPERTY(AtomicWeakRef<RadioGroup>, RadioGroup)
 	
 };
 
@@ -48,7 +48,7 @@ public:
 	
 protected:
 	CList< Ref<RadioButton> > m_views;
-	SafeRef<RadioButton> m_viewSelected;
+	AtomicRef<RadioButton> m_viewSelected;
 	
 };
 

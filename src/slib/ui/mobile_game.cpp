@@ -19,11 +19,7 @@ MobileGame::MobileGame()
 
 Ref<MobileGame> MobileGame::getApp()
 {
-	Ref<Application> app(Application::getApp());
-	if (MobileGame::checkInstance(app.ptr)) {
-		return Ref<MobileGame>::from(app);
-	}
-	return Ref<MobileGame>::null();
+	return CastRef<MobileGame>(Application::getApp());
 }
 
 Ref<MobileGameView> MobileGame::getGameView()

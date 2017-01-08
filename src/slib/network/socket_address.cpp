@@ -65,7 +65,7 @@ int SocketAddress::compare(const SocketAddress& other) const
 {
 	int c = ip.compare(other.ip);
 	if (c == 0) {
-		return Compare<sl_int32>::compare(port, other.port);
+		return Compare<sl_int32>()(port, other.port);
 	}
 	return c;
 }
@@ -74,7 +74,7 @@ sl_uint32 SocketAddress::hashCode() const
 {
 	sl_uint64 t = ip.hashCode();
 	t = t * 31 + port;
-	return sl_hash(t);
+	return Hash64(t);
 }
 
 String SocketAddress::toString() const
@@ -161,7 +161,7 @@ sl_bool SocketAddress::setHostAddress(const String& address)
 }
 
 
-template <class CT, class ST>
+template <class CT>
 static sl_reg _SocketAddress_parse(SocketAddress* obj, const CT* sz, sl_size pos, sl_size len)
 {
 	if (pos >= len) {
@@ -171,7 +171,7 @@ static sl_reg _SocketAddress_parse(SocketAddress* obj, const CT* sz, sl_size pos
 	if (sz[0] == '[') {
 		IPv6Address addr;
 		pos++;
-		pos = IPv6Address::parse(&addr, sz, pos, len);
+		pos = Parser<IPv6Address, CT>::parse(&addr, sz, pos, len);
 		if (pos == SLIB_PARSE_ERROR || pos >= len) {
 			return SLIB_PARSE_ERROR;
 		}
@@ -182,7 +182,7 @@ static sl_reg _SocketAddress_parse(SocketAddress* obj, const CT* sz, sl_size pos
 		ip = addr;
 	} else {
 		IPv4Address addr;
-		pos = IPv4Address::parse(&addr, sz, pos, len);
+		pos = Parser<IPv4Address, CT>::parse(&addr, sz, pos, len);
 		if (pos == SLIB_PARSE_ERROR) {
 			return SLIB_PARSE_ERROR;
 		}
@@ -196,7 +196,7 @@ static sl_reg _SocketAddress_parse(SocketAddress* obj, const CT* sz, sl_size pos
 	}
 	pos++;
 	sl_uint32 port;
-	pos = ST::parseUint32(10, &port, sz, pos, len);
+	pos = StringTypeFromCharType<CT>::Type::parseUint32(10, &port, sz, pos, len);
 	if (pos == SLIB_PARSE_ERROR) {
 		return SLIB_PARSE_ERROR;
 	}
@@ -207,7 +207,17 @@ static sl_reg _SocketAddress_parse(SocketAddress* obj, const CT* sz, sl_size pos
 	return pos;
 }
 
-SLIB_DEFINE_PARSE_FUNCTIONS(SocketAddress, _SocketAddress_parse)
+template <>
+sl_reg Parser<SocketAddress, sl_char8>::parse(SocketAddress* _out, const sl_char8 *sz, sl_size posBegin, sl_size len)
+{
+	return _SocketAddress_parse(_out, sz, posBegin, len);
+}
+
+template <>
+sl_reg Parser<SocketAddress, sl_char16>::parse(SocketAddress* _out, const sl_char16 *sz, sl_size posBegin, sl_size len)
+{
+	return _SocketAddress_parse(_out, sz, posBegin, len);
+}
 
 sl_bool SocketAddress::parseIPv4Range(const String& str, IPv4Address* _from, IPv4Address* _to)
 {
@@ -264,20 +274,17 @@ sl_bool SocketAddress::operator!=(const SocketAddress& other) const
 	return ! (*this == other);
 }
 
-template <>
-int Compare<SocketAddress>::compare(const SocketAddress& a, const SocketAddress& b)
+int Compare<SocketAddress>::operator()(const SocketAddress& a, const SocketAddress& b) const
 {
 	return a.compare(b);
 }
 
-template <>
-sl_bool Compare<SocketAddress>::equals(const SocketAddress& a, const SocketAddress& b)
+sl_bool Equals<SocketAddress>::operator()(const SocketAddress& a, const SocketAddress& b) const
 {
 	return a == b;
 }
 
-template <>
-sl_uint32 Hash<SocketAddress>::hash(const SocketAddress& a)
+sl_uint32 Hash<SocketAddress>::operator()(const SocketAddress& a) const
 {
 	return a.hashCode();
 }

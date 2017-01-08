@@ -39,7 +39,7 @@ public:
 			m_flagUpdateList = sl_true;
 			SpinLocker lock(&m_lock);
 			if (m_thread.isNull()) {
-				m_thread = Thread::start(SLIB_CALLBACK_CLASS(_AnimationCenter, run, this));
+				m_thread = Thread::start(SLIB_FUNCTION_CLASS(_AnimationCenter, run, this));
 			} else {
 				m_thread->wake();
 			}
@@ -54,7 +54,7 @@ public:
 		ListLocker< Ref<Animation> > list(m_animations);
 		sl_size n = list.count;
 		for (sl_size i = 0; i < n;) {
-			if (list[i].ptr == animation) {
+			if (list[i].get() == animation) {
 				for (sl_size j = i + 1; j < n; j++) {
 					list[j - 1] = list[j];
 				}
@@ -87,14 +87,14 @@ public:
 					animations = m_animations.duplicate();
 				}
 				
-				ListItems< Ref<Animation> > list(animations);
+				ListElements< Ref<Animation> > list(animations);
 				if (list.count > 0) {
 					Time now = Time::now();
 					for (sl_size i = 0; i < list.count; i++) {
 						Ref<Animation> animation = list[i];
 						if (animation.isNotNull()) {
 							if (animation->isStopped()) {
-								removeAnimation(animation.ptr);
+								removeAnimation(animation.get());
 							} else {
 								animation->update(now);
 							}
@@ -163,7 +163,7 @@ Animation::Animation()
 	m_curveEaseFactor = 1.0f;
 	m_curveEaseDoubleFactor = 2.0f;
 	m_curveCycles = 1.0f;
-	m_curveCycles2PI = SLIB_2_PI;
+	m_curveCycles2PI = SLIB_PI_DUAL;
 	m_curveTension = 2.0f;
 	m_customCurve = sl_null;
 	
@@ -184,7 +184,7 @@ Ref<Animation> Animation::create(float duration)
 		ret->setDuration(duration);
 		return ret;
 	}
-	return Ref<Animation>::null();
+	return sl_null;
 }
 
 void Animation::pauseAnimationCenter()
@@ -293,7 +293,7 @@ float Animation::getAnimationCurveCycles()
 void Animation::setAnimationCurveCycles(float cycles)
 {
 	m_curveCycles = cycles;
-	m_curveCycles2PI = cycles * SLIB_2_PI;
+	m_curveCycles2PI = cycles * SLIB_PI_DUAL;
 }
 
 float Animation::getAnimationCurveTension()
@@ -652,7 +652,7 @@ void Animation::dispatchRepeatAnimation(sl_int32 nRemainingRepeatCount)
 void Animation::dispatchStopAnimation()
 {
 	onStopAnimation();
-	Callback onStop(getOnStop());
+	Function<void()> onStop(getOnStop());
 	if (onStop.isNotNull()) {
 		onStop();
 	}
@@ -801,7 +801,7 @@ float Animation::_applyCurve(float f)
 				CustomAnimationCurve func = m_customCurve;
 				Ref<Referable> param = m_customCurveParam;
 				if (func) {
-					return func(f, param.ptr);
+					return func(f, param.get());
 				}
 				return f;
 			}

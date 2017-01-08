@@ -57,9 +57,9 @@ public:
 	sl_uint64 getRequestContentLength() const;
 	
 public:
-	SLIB_STRING_PROPERTY(Protocol)
-	SLIB_PROPERTY(Ptr<IHttpClientListener>, Listener);
-	SLIB_PROPERTY(Ref<Event>, CompletionEvent);
+	SLIB_PROPERTY(AtomicString, Protocol)
+	SLIB_PROPERTY(AtomicPtr<IHttpClientListener>, Listener);
+	SLIB_PROPERTY(AtomicRef<Event>, CompletionEvent);
 	
 protected:
 	HttpHeaderReader m_responseHeaderReader;
@@ -101,7 +101,7 @@ protected:
 	Ref<AsyncStream> m_io;
 	Ref<AsyncOutput> m_output;
 
-	Queue< Ref<HttpClientContext> > m_queueContexts;
+	LinkedQueue< Ref<HttpClientContext> > m_queueContexts;
 	Ref<HttpClientContext> m_currentContext;
 
 	sl_bool m_flagClosed;
@@ -116,7 +116,7 @@ protected:
 	void _onError(HttpClientContext* context);
 
 protected:
-	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError);
+	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError);
 	void onAsyncOutputComplete(AsyncOutput* output);
 	void onAsyncOutputError(AsyncOutput* output);
 
@@ -146,8 +146,8 @@ public:
 protected:
 	String m_protocol;
 	String m_host;
-	Queue< Ref<HttpClientConnection> > m_connectionsWorking;
-	Queue< Ref<HttpClientConnection> > m_connectionsFree;
+	LinkedQueue< Ref<HttpClientConnection> > m_connectionsWorking;
+	LinkedQueue< Ref<HttpClientConnection> > m_connectionsFree;
 
 	friend class HttpClient;
 };

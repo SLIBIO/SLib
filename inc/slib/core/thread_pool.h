@@ -27,10 +27,10 @@ public:
 	
 	sl_uint32 getThreadsCount();
 
-	sl_bool addTask(const Callback& task);
+	sl_bool addTask(const Function<void()>& task);
 	
 	// override
-	sl_bool dispatch(const Callback& callback);
+	sl_bool dispatch(const Function<void()>& callback);
 
 public:
 	SLIB_PROPERTY(sl_uint32, MinimumThreadsCount)
@@ -42,7 +42,7 @@ protected:
 
 protected:
 	CList< Ref<Thread> > m_threadWorkers;
-	Queue<Callback> m_tasks;
+	LinkedQueue< Function<void()> > m_tasks;
 
 	sl_bool m_flagRunning;
 	

@@ -21,7 +21,7 @@ String JsonParseParam::getErrorText()
 	if (flagError) {
 		return "(" + String::fromSize(errorLine) + ":" + String::fromSize(errorColumn) + ") " + errorMessage;
 	}
-	return String::null();
+	return sl_null;
 }
 
 template <class ST, class CT>
@@ -122,7 +122,7 @@ Variant _Json_Parser<ST, CT>::parseJson()
 {
 	escapeSpaceAndComments();
 	if (pos == len) {
-		return Variant::null();
+		return sl_null;
 	}
 	
 	CT first = buf[pos];
@@ -136,7 +136,7 @@ Variant _Json_Parser<ST, CT>::parseJson()
 		if (f) {
 			flagError = sl_true;
 			errorMessage = "String: Missing character  \" or ' ";
-			return Variant::null();
+			return sl_null;
 		}
 		return str;
 	}
@@ -148,7 +148,7 @@ Variant _Json_Parser<ST, CT>::parseJson()
 		if (pos == len) {
 			flagError = sl_true;
 			errorMessage = "Array: Missing character ] ";
-			return Variant::null();
+			return sl_null;
 		}
 		if (buf[pos] == ']') {
 			pos++;
@@ -158,18 +158,18 @@ Variant _Json_Parser<ST, CT>::parseJson()
 		while (pos < len) {
 			CT ch = buf[pos];
 			if (ch == ']' || ch == ',') {
-				list.addListItem(Variant::null());
+				list.addListElement(Variant::null());
 			} else {
 				Variant item = parseJson();
 				if (flagError) {
-					return Variant::null();
+					return sl_null;
 				}
-				list.addListItem(item);
+				list.addListElement(item);
 			}
 			if (pos == len) {
 				flagError = sl_true;
 				errorMessage = "Array: Missing character ] ";
-				return Variant::null();
+				return sl_null;
 			}
 			ch = buf[pos];
 			if (ch == ']') {
@@ -183,12 +183,12 @@ Variant _Json_Parser<ST, CT>::parseJson()
 			if (pos == len) {
 				flagError = sl_true;
 				errorMessage = "Array: Missing character ] ";
-				return Variant::null();
+				return sl_null;
 			}
 		}
 		flagError = sl_true;
 		errorMessage = "Array: Missing character ] ";
-		return Variant::null();
+		return sl_null;
 	}
 	
 	// object
@@ -197,7 +197,7 @@ Variant _Json_Parser<ST, CT>::parseJson()
 		if (pos == len) {
 			flagError = sl_true;
 			errorMessage = "Object: Missing character } ";
-			return Variant::null();
+			return sl_null;
 		}
 		Variant map = Variant::createVariantHashMap();
 		sl_bool flagFirst = sl_true;
@@ -206,7 +206,7 @@ Variant _Json_Parser<ST, CT>::parseJson()
 			if (pos == len) {
 				flagError = sl_true;
 				errorMessage = "Object: Missing character } ";
-				return Variant::null();
+				return sl_null;
 			}
 			CT ch = buf[pos];
 			if (ch == '}') {
@@ -219,14 +219,14 @@ Variant _Json_Parser<ST, CT>::parseJson()
 				} else {
 					flagError = sl_true;
 					errorMessage = "Object: Missing character , ";
-					return Variant::null();
+					return sl_null;
 				}
 			}
 			escapeSpaceAndComments();
 			if (pos == len) {
 				flagError = sl_true;
 				errorMessage = "Object: Missing character } ";
-				return Variant::null();
+				return sl_null;
 			}
 			ST key;
 			ch = buf[pos];
@@ -241,7 +241,7 @@ Variant _Json_Parser<ST, CT>::parseJson()
 				if (f) {
 					flagError = sl_true;
 					errorMessage = "Object Item Name: Missing terminating character \" or ' ";
-					return Variant::null();
+					return sl_null;
 				}
 			} else {
 				sl_size s = pos;
@@ -256,7 +256,7 @@ Variant _Json_Parser<ST, CT>::parseJson()
 				if (pos == len) {
 					flagError = sl_true;
 					errorMessage = "Object: Missing character : ";
-					return Variant::null();
+					return sl_null;
 				}
 				key = ST(buf + s, pos - s);
 			}
@@ -264,27 +264,27 @@ Variant _Json_Parser<ST, CT>::parseJson()
 			if (pos == len) {
 				flagError = sl_true;
 				errorMessage = "Object: Missing character : ";
-				return Variant::null();
+				return sl_null;
 			}
 			if (buf[pos] == ':') {
 				pos++;
 			} else {
 				flagError = sl_true;
 				errorMessage = "Object: Missing character : ";
-				return Variant::null();
+				return sl_null;
 			}
 			escapeSpaceAndComments();
 			if (pos == len) {
 				flagError = sl_true;
 				errorMessage = "Object: Missing Item value";
-				return Variant::null();
+				return sl_null;
 			}
 			if (buf[pos] == '}' || buf[pos] == ',') {
 				map.putField(key, Variant::null());
 			} else {
 				Variant item = parseJson();
 				if (flagError) {
-					return Variant::null();
+					return sl_null;
 				}
 				map.putField(key, item);
 			}
@@ -292,7 +292,7 @@ Variant _Json_Parser<ST, CT>::parseJson()
 		}
 		flagError = sl_true;
 		errorMessage = "Object: Missing character } ";
-		return Variant::null();
+		return sl_null;
 	}
 	{
 		sl_size s = pos;
@@ -307,11 +307,11 @@ Variant _Json_Parser<ST, CT>::parseJson()
 		if (pos == s) {
 			flagError = sl_true;
 			errorMessage = "Invalid token";
-			return Variant::null();
+			return sl_null;
 		}
 		ST str(buf + s, pos - s);
 		if (str == strNull) {
-			return Variant::null();
+			return sl_null;
 		}
 		if (str == strTrue) {
 			return Variant::fromBoolean(sl_true);
@@ -334,7 +334,7 @@ Variant _Json_Parser<ST, CT>::parseJson()
 	}
 	flagError = sl_true;
 	errorMessage = "Invalid token";
-	return Variant::null();
+	return sl_null;
 }
 
 template <class ST, class CT>
@@ -368,10 +368,10 @@ Variant _Json_Parser<ST, CT>::parseJson(const CT* buf, sl_size len, JsonParsePar
 	param.errorLine = ST::countLineNumber(buf, parser.pos, &(param.errorColumn));
 	
 	if (param.flagLogError) {
-		SLIB_LOG_ERROR("Json", param.getErrorText());
+		LogError("Json", param.getErrorText());
 	}
 	
-	return Variant::null();
+	return sl_null;
 	
 }
 
@@ -504,12 +504,12 @@ template <> Variant Json::toJson(const Variant& _in)
 	return _in;
 }
 
-template <> void Json::fromJson(const Variant& v, SafeVariant& _out)
+template <> void Json::fromJson(const Variant& v, AtomicVariant& _out)
 {
 	_out = v;
 }
 
-template <> void Json::fromJson(const Variant& v, SafeVariant& _out, const SafeVariant& def)
+template <> void Json::fromJson(const Variant& v, AtomicVariant& _out, const AtomicVariant& def)
 {
 	if (v.isNotNull()) {
 		_out = v;
@@ -518,7 +518,7 @@ template <> void Json::fromJson(const Variant& v, SafeVariant& _out, const SafeV
 	}
 }
 
-template <> Variant Json::toJson(const SafeVariant& _in)
+template <> Variant Json::toJson(const AtomicVariant& _in)
 {
 	return _in;
 }
@@ -703,17 +703,17 @@ template <> Variant Json::toJson(const String8& _in)
 	return Variant(_in);
 }
 
-template <> void Json::fromJson(const Variant& v, SafeString8& _out)
+template <> void Json::fromJson(const Variant& v, AtomicString8& _out)
 {
 	_out = v.getString8();
 }
 
-template <> void Json::fromJson(const Variant& v, SafeString8& _out, const SafeString8& def)
+template <> void Json::fromJson(const Variant& v, AtomicString8& _out, const AtomicString8& def)
 {
 	_out = v.getString8(def);
 }
 
-template <> Variant Json::toJson(const SafeString8& _in)
+template <> Variant Json::toJson(const AtomicString8& _in)
 {
 	return Variant(_in);
 }
@@ -733,17 +733,17 @@ template <> Variant Json::toJson(const String16& _in)
 	return Variant(_in);
 }
 
-template <> void Json::fromJson(const Variant& v, SafeString16& _out)
+template <> void Json::fromJson(const Variant& v, AtomicString16& _out)
 {
 	_out = v.getString16();
 }
 
-template <> void Json::fromJson(const Variant& v, SafeString16& _out, const SafeString16& def)
+template <> void Json::fromJson(const Variant& v, AtomicString16& _out, const AtomicString16& def)
 {
 	_out = v.getString16(def);
 }
 
-template <> Variant Json::toJson(const SafeString16& _in)
+template <> Variant Json::toJson(const AtomicString16& _in)
 {
 	return Variant(_in);
 }
@@ -782,12 +782,12 @@ template <> Variant Json::toJson(const List<Variant>& _in)
 	return _in;
 }
 
-template <> void Json::fromJson(const Variant& v, SafeList<Variant>& _out)
+template <> void Json::fromJson(const Variant& v, AtomicList<Variant>& _out)
 {
 	_out = v.getVariantList();
 }
 
-template <> void Json::fromJson(const Variant& v, SafeList<Variant>& _out, const SafeList<Variant>& def)
+template <> void Json::fromJson(const Variant& v, AtomicList<Variant>& _out, const AtomicList<Variant>& def)
 {
 	if (v.isNotNull()) {
 		_out = v.getVariantList();
@@ -796,7 +796,7 @@ template <> void Json::fromJson(const Variant& v, SafeList<Variant>& _out, const
 	}
 }
 
-template <> Variant Json::toJson(const SafeList<Variant>& _in)
+template <> Variant Json::toJson(const AtomicList<Variant>& _in)
 {
 	return _in;
 }
@@ -820,12 +820,12 @@ template <> Variant Json::toJson(const Map<String, Variant>& _in)
 	return _in;
 }
 
-template <> void Json::fromJson(const Variant& v, SafeMap<String, Variant>& _out)
+template <> void Json::fromJson(const Variant& v, AtomicMap<String, Variant>& _out)
 {
 	_out = v.getVariantMap();
 }
 
-template <> void Json::fromJson(const Variant& v, SafeMap<String, Variant>& _out, const SafeMap<String, Variant>& def)
+template <> void Json::fromJson(const Variant& v, AtomicMap<String, Variant>& _out, const AtomicMap<String, Variant>& def)
 {
 	if (v.isNotNull()) {
 		_out = v.getVariantMap();
@@ -834,7 +834,7 @@ template <> void Json::fromJson(const Variant& v, SafeMap<String, Variant>& _out
 	}
 }
 
-template <> Variant Json::toJson(const SafeMap<String, Variant>& _in)
+template <> Variant Json::toJson(const AtomicMap<String, Variant>& _in)
 {
 	return _in;
 }
@@ -858,12 +858,12 @@ template <> Variant Json::toJson(const List< Map<String, Variant> >& _in)
 	return _in;
 }
 
-template <> void Json::fromJson(const Variant& v, SafeList< Map<String, Variant> >& _out)
+template <> void Json::fromJson(const Variant& v, AtomicList< Map<String, Variant> >& _out)
 {
 	_out = v.getVariantMapList();
 }
 
-template <> void Json::fromJson(const Variant& v, SafeList< Map<String, Variant> >& _out, const SafeList< Map<String, Variant> >& def)
+template <> void Json::fromJson(const Variant& v, AtomicList< Map<String, Variant> >& _out, const AtomicList< Map<String, Variant> >& def)
 {
 	if (v.isNotNull()) {
 		_out = v.getVariantMapList();
@@ -872,7 +872,7 @@ template <> void Json::fromJson(const Variant& v, SafeList< Map<String, Variant>
 	}
 }
 
-template <> Variant Json::toJson(const SafeList< Map<String, Variant> >& _in)
+template <> Variant Json::toJson(const AtomicList< Map<String, Variant> >& _in)
 {
 	return _in;
 }

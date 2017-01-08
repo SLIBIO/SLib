@@ -206,7 +206,7 @@ public:
 				m_platformObject = new _Win32_FontObject;
 			}
 		}
-		return (_Win32_FontObject*)(m_platformObject.ptr);;
+		return (_Win32_FontObject*)(m_platformObject.get());;
 	}
 
 	Gdiplus::Font* getGdiplus()

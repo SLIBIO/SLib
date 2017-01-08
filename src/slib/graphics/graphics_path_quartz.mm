@@ -37,7 +37,7 @@ void GraphicsPath::_initialize_PO()
 
 void GraphicsPath::_moveTo_PO(sl_real x, sl_real y)
 {
-	_Quartz_GraphicsPathObject* po = (_Quartz_GraphicsPathObject*)(m_platformObject.ptr);
+	_Quartz_GraphicsPathObject* po = (_Quartz_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		CGPathMoveToPoint(po->path, NULL, x, y);
 	}
@@ -45,7 +45,7 @@ void GraphicsPath::_moveTo_PO(sl_real x, sl_real y)
 
 void GraphicsPath::_lineTo_PO(sl_real x, sl_real y)
 {
-	_Quartz_GraphicsPathObject* po = (_Quartz_GraphicsPathObject*)(m_platformObject.ptr);
+	_Quartz_GraphicsPathObject* po = (_Quartz_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		CGPathAddLineToPoint(po->path, NULL, x, y);
 	}
@@ -53,7 +53,7 @@ void GraphicsPath::_lineTo_PO(sl_real x, sl_real y)
 
 void GraphicsPath::_cubicTo_PO(sl_real xc1, sl_real yc1, sl_real xc2, sl_real yc2, sl_real xe, sl_real ye)
 {
-	_Quartz_GraphicsPathObject* po = (_Quartz_GraphicsPathObject*)(m_platformObject.ptr);
+	_Quartz_GraphicsPathObject* po = (_Quartz_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		CGPathAddCurveToPoint(po->path, NULL, xc1, yc1, xc2, yc2, xe, ye);
 	}
@@ -61,7 +61,7 @@ void GraphicsPath::_cubicTo_PO(sl_real xc1, sl_real yc1, sl_real xc2, sl_real yc
 
 void GraphicsPath::_closeSubpath_PO()
 {
-	_Quartz_GraphicsPathObject* po = (_Quartz_GraphicsPathObject*)(m_platformObject.ptr);
+	_Quartz_GraphicsPathObject* po = (_Quartz_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		CGPathCloseSubpath(po->path);
 	}
@@ -73,7 +73,7 @@ void GraphicsPath::_setFillMode_PO(FillMode mode)
 
 Rectangle GraphicsPath::_getBounds_PO()
 {
-	_Quartz_GraphicsPathObject* po = (_Quartz_GraphicsPathObject*)(m_platformObject.ptr);
+	_Quartz_GraphicsPathObject* po = (_Quartz_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		Rectangle ret;
 		CGRect rc = CGPathGetPathBoundingBox(po->path);
@@ -88,7 +88,7 @@ Rectangle GraphicsPath::_getBounds_PO()
 
 sl_bool GraphicsPath::_containsPoint_PO(sl_real x, sl_real y)
 {
-	_Quartz_GraphicsPathObject* po = (_Quartz_GraphicsPathObject*)(m_platformObject.ptr);
+	_Quartz_GraphicsPathObject* po = (_Quartz_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		CGPoint pt;
 		pt.x = x;
@@ -103,7 +103,7 @@ class _GraphicsPath : public GraphicsPath
 public:
 	CGPathRef getPlatformPath()
 	{
-		_Quartz_GraphicsPathObject* po = (_Quartz_GraphicsPathObject*)(m_platformObject.ptr);
+		_Quartz_GraphicsPathObject* po = (_Quartz_GraphicsPathObject*)(m_platformObject.get());
 		if (po) {
 			return po->path;
 		}

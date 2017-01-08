@@ -47,7 +47,7 @@ Ref<OSX_ViewInstance> OSX_ViewInstance::create(NSView* handle, sl_bool flagFreeO
 		if (ret.isNotNull()) {
 			ret->m_handle = handle;
 			ret->m_flagFreeOnRelease = flagFreeOnRelease;
-			UIPlatform::registerViewInstance(handle, ret.ptr);
+			UIPlatform::registerViewInstance(handle, ret.get());
 		} else {
 			if (flagFreeOnRelease) {
 				freeHandle(handle);
@@ -318,7 +318,7 @@ void OSX_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
 {
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil) {
-		OSX_ViewInstance* child = (OSX_ViewInstance*)(_child.ptr);
+		OSX_ViewInstance* child = (OSX_ViewInstance*)(_child.get());
 		if (child) {
 			NSView* child_handle = child->m_handle;
 			if (child_handle != nil) {
@@ -330,7 +330,7 @@ void OSX_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
 
 void OSX_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
 {
-	OSX_ViewInstance* child = (OSX_ViewInstance*)(_child.ptr);
+	OSX_ViewInstance* child = (OSX_ViewInstance*)(_child.get());
 	if (child) {
 		NSView* child_handle = child->m_handle;
 		if (child_handle != nil) {
@@ -405,7 +405,7 @@ void OSX_ViewInstance::onDraw(NSRect rcDirty)
 			Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, context, (sl_uint32)(rectBound.size.width), (sl_uint32)(rectBound.size.height));
 			if (canvas.isNotNull()) {
 				canvas->setInvalidatedRect(Rectangle((sl_real)(rcDirty.origin.x), (sl_real)(rcDirty.origin.y), (sl_real)(rcDirty.origin.x + rcDirty.size.width), (sl_real)(rcDirty.origin.y + rcDirty.size.height)));
-				ViewInstance::onDraw(canvas.ptr);
+				ViewInstance::onDraw(canvas.get());
 			}
 			
 			/*
@@ -428,8 +428,8 @@ sl_bool OSX_ViewInstance::onEventKey(sl_bool flagDown, NSEvent* event)
 		t.setSecondsCountf([event timestamp]);
 		Ref<UIEvent> ev = UIEvent::createKeyEvent(action, key, vkey, t);
 		if (ev.isNotNull()) {
-			applyModifiers(ev.ptr, event);
-			onKeyEvent(ev.ptr);
+			applyModifiers(ev.get(), event);
+			onKeyEvent(ev.get());
 			return ev->isStoppedPropagation();
 		}
 	}
@@ -450,8 +450,8 @@ sl_bool OSX_ViewInstance::onEventMouse(UIAction action, NSEvent* event)
 			t.setSecondsCountf([event timestamp]);
 			Ref<UIEvent> ev = UIEvent::createMouseEvent(action, x, y, t);
 			if (ev.isNotNull()) {
-				applyModifiers(ev.ptr, event);
-				onMouseEvent(ev.ptr);
+				applyModifiers(ev.get(), event);
+				onMouseEvent(ev.get());
 				return ev->isStoppedPropagation();
 			}
 		}
@@ -476,8 +476,8 @@ sl_bool OSX_ViewInstance::onEventMouseWheel(NSEvent* event)
 		t.setSecondsCountf([event timestamp]);
 		Ref<UIEvent> ev = UIEvent::createMouseWheelEvent(x, y, deltaX, deltaY, t);
 		if (ev.isNotNull()) {
-			applyModifiers(ev.ptr, event);
-			onMouseWheelEvent(ev.ptr);
+			applyModifiers(ev.get(), event);
+			onMouseWheelEvent(ev.get());
 			return ev->isStoppedPropagation();
 		}
 	}
@@ -496,7 +496,7 @@ sl_bool OSX_ViewInstance::onEventUpdateCursor(NSEvent* event)
 		t.setSecondsCountf([event timestamp]);
 		Ref<UIEvent> ev = UIEvent::createSetCursorEvent(x, y, t);
 		if (ev.isNotNull()) {
-			onSetCursor(ev.ptr);
+			onSetCursor(ev.get());
 			return ev->isPreventedDefault();
 		}
 	}
@@ -1000,7 +1000,7 @@ NSView* UIPlatform::getViewHandle(View* view)
 	if (view) {
 		Ref<ViewInstance> instance = view->getViewInstance();
 		if (instance.isNotNull()) {
-			OSX_ViewInstance* osx_instance = (OSX_ViewInstance*)(instance.ptr);
+			OSX_ViewInstance* osx_instance = (OSX_ViewInstance*)(instance.get());
 			return osx_instance->getHandle();
 		}
 	}

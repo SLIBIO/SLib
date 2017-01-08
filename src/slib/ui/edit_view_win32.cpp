@@ -79,8 +79,7 @@ public:
 		case EN_CHANGE:
 			{
 				Ref<View> _view = getView();
-				if (EditView::checkInstance(_view.ptr)) {
-					EditView* view = (EditView*)(_view.ptr);
+				if (EditView* view = CastInstance<EditView>(_view.get())) {
 					String text = Windows::getWindowText(m_handle);
 					String textNew = view->dispatchChange(text);
 					if (text != textNew) {
@@ -128,7 +127,7 @@ public:
 	{
 		Win32_UI_Shared* shared = Win32_UI_Shared::get();
 		if (!shared) {
-			return Ref<ViewInstance>::null();
+			return sl_null;
 		}
 
 		int style = WS_TABSTOP;
@@ -161,7 +160,7 @@ public:
 			HWND handle = ret->getHandle();
 			
 			Ref<Font> font = getFont();
-			HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
+			HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
 			if (hFont) {
 				::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 			}
@@ -209,21 +208,6 @@ void EditView::_setText_NW(const String& text)
 	}
 }
 
-void EditView::_getTextAlignment_NW()
-{
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		LONG style = ::GetWindowLongW(handle, GWL_STYLE);
-		if (style & ES_CENTER) {
-			m_textAlignment = Alignment::Center;
-		} else if (style & ES_RIGHT) {
-			m_textAlignment = Alignment::Right;
-		} else {
-			m_textAlignment = Alignment::Left;
-		}
-	}
-}
-
 void EditView::_setTextAlignment_NW(Alignment _align)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
@@ -241,16 +225,6 @@ void EditView::_setTextAlignment_NW(Alignment _align)
 	}
 }
 
-void EditView::_getHintText_NW()
-{
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		WCHAR buf[1024] = { 0 };
-		::SendMessageW(handle, 0x1502 /*EM_GETCUEBANNER*/, (WPARAM)buf, 1024);
-		m_hintText = String16(buf, 1024);
-	}
-}
-
 void EditView::_setHintText_NW(const String& _value)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
@@ -260,29 +234,11 @@ void EditView::_setHintText_NW(const String& _value)
 	}
 }
 
-void EditView::_isReadOnly_NW()
-{
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		LONG style = ::GetWindowLongW(handle, GWL_STYLE);
-		m_flagReadOnly = (style & ES_READONLY) ? sl_true : sl_false;
-	}
-}
-
 void EditView::_setReadOnly_NW(sl_bool flag)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
 		::SendMessageW(handle, EM_SETREADONLY, (WPARAM)(flag ? TRUE : FALSE), 0);
-	}
-}
-
-void EditView::_isMultiLine_NW()
-{
-	HWND handle = UIPlatform::getViewHandle(this);
-	if (handle) {
-		LONG style = ::GetWindowLongW(handle, GWL_STYLE);
-		m_flagMultiLine = (style & ES_MULTILINE) ? sl_true : sl_false;
 	}
 }
 
@@ -304,8 +260,7 @@ void EditView::_setMultiLine_NW(sl_bool flag)
 void EditView::_setTextColor_NW(const Color& color)
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_EditViewInstance::checkInstance(_instance.ptr)) {
-		_Win32_EditViewInstance* instance = ((_Win32_EditViewInstance*)(_instance.ptr));
+	if (_Win32_EditViewInstance* instance = CastInstance<_Win32_EditViewInstance>(_instance.get())) {
 		instance->setTextColor(color); 
 	}
 }
@@ -314,7 +269,7 @@ void EditView::_setFont_NW(const Ref<Font>& font)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
@@ -339,8 +294,7 @@ void EditView::_setBorder_NW(sl_bool flag)
 void EditView::_setBackgroundColor_NW(const Color& color)
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_EditViewInstance::checkInstance(_instance.ptr)) {
-		_Win32_EditViewInstance* instance = ((_Win32_EditViewInstance*)(_instance.ptr));
+	if (_Win32_EditViewInstance* instance = CastInstance<_Win32_EditViewInstance>(_instance.get())) {
 		instance->setBackgroundColor(color);
 	}
 }

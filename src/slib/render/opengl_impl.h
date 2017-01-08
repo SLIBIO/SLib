@@ -202,9 +202,9 @@ static sl_uint32 _GL_createShader(GLenum type, const String& source)
 				GL_ENTRY(glGetShaderInfoLog)(shader, 1024, &lenLog, log);
 				log[lenLog] = 0;
 				if (type == GL_VERTEX_SHADER) {
-					SLIB_LOG("OpenGL Compile Vertex Shader", String(log));
+					Log("OpenGL Compile Vertex Shader", String(log));
 				} else if (type == GL_FRAGMENT_SHADER) {
-					SLIB_LOG("OpenGL Compile Fragment Shader", String(log));
+					Log("OpenGL Compile Fragment Shader", String(log));
 				}
 			}
 		}
@@ -1069,7 +1069,7 @@ public:
 				handle.program = program;
 				handle.vertexShader = vertexShader;
 				handle.fragmentShader = fragmentShader;
-				((GL_ENGINE*)(engine.ptr))->m_listDirtyProgramHandles.add(handle);
+				((GL_ENGINE*)(engine.get()))->m_listDirtyProgramHandles.add(handle);
 			}
 		}
 		
@@ -1089,7 +1089,7 @@ public:
 							if (state.isNotNull()) {
 								state->gl_program = ph;
 								state->gl_engine = engine;
-								if (program->onInit(engine, state.ptr)) {
+								if (program->onInit(engine, state.get())) {
 									Ref<_RenderProgramInstance> ret = new _RenderProgramInstance();
 									if (ret.isNotNull()) {
 										ret->program = ph;
@@ -1108,7 +1108,7 @@ public:
 					GL_BASE::deleteShader(vs);
 				}
 			}
-			return Ref<_RenderProgramInstance>::null();
+			return sl_null;
 		}
 		
 		static String convertShader(String glsl)
@@ -1133,7 +1133,7 @@ public:
 	Ref<RenderProgramInstance> _createProgramInstance(RenderProgram* program)
 	{
 		if (!isCurrentEngine()) {
-			return Ref<RenderProgramInstance>::null();
+			return sl_null;
 		}
 		return _RenderProgramInstance::create(this, program);
 	}
@@ -1152,7 +1152,7 @@ public:
 		{
 			Ref<RenderEngine> engine = getEngine();
 			if (engine.isNotNull()) {
-				((GL_ENGINE*)(engine.ptr))->m_listDirtyBufferHandles.add(handle);
+				((GL_ENGINE*)(engine.get()))->m_listDirtyBufferHandles.add(handle);
 			}
 		}
 		
@@ -1169,7 +1169,7 @@ public:
 				}
 				GL_BASE::deleteBuffer(handle);
 			}
-			return Ref<_VertexBufferInstance>::null();
+			return sl_null;
 		}
 		
 		// override
@@ -1185,7 +1185,7 @@ public:
 	Ref<VertexBufferInstance> _createVertexBufferInstance(VertexBuffer* buffer)
 	{
 		if (!isCurrentEngine()) {
-			return Ref<VertexBufferInstance>::null();
+			return sl_null;
 		}
 		return _VertexBufferInstance::create(this, buffer);
 	}
@@ -1204,7 +1204,7 @@ public:
 		{
 			Ref<RenderEngine> engine = getEngine();
 			if (engine.isNotNull()) {
-				((GL_ENGINE*)(engine.ptr))->m_listDirtyBufferHandles.add(handle);
+				((GL_ENGINE*)(engine.get()))->m_listDirtyBufferHandles.add(handle);
 			}
 		}
 		
@@ -1221,7 +1221,7 @@ public:
 				}
 				GL_BASE::deleteBuffer(handle);
 			}
-			return Ref<_IndexBufferInstance>::null();
+			return sl_null;
 		}
 		
 		// override
@@ -1237,7 +1237,7 @@ public:
 	Ref<IndexBufferInstance> _createIndexBufferInstance(IndexBuffer* buffer)
 	{
 		if (!isCurrentEngine()) {
-			return Ref<IndexBufferInstance>::null();
+			return sl_null;
 		}
 		return _IndexBufferInstance::create(this, buffer);
 	}
@@ -1256,7 +1256,7 @@ public:
 		{
 			Ref<RenderEngine> engine = getEngine();
 			if (engine.isNotNull()) {
-				((GL_ENGINE*)(engine.ptr))->m_listDirtyTextureHandles.add(handle);
+				((GL_ENGINE*)(engine.get()))->m_listDirtyTextureHandles.add(handle);
 			}
 		}
 		
@@ -1276,7 +1276,7 @@ public:
 				}
 				GL_BASE::deleteTexture(handle);
 			}
-			return Ref<_TextureInstance>::null();
+			return sl_null;
 		}
 		
 		// override
@@ -1296,7 +1296,7 @@ public:
 	Ref<TextureInstance> _createTextureInstance(Texture* texture)
 	{
 		if (!isCurrentEngine()) {
-			return Ref<TextureInstance>::null();
+			return sl_null;
 		}
 		return _TextureInstance::create(this, texture);
 	}
@@ -1381,7 +1381,7 @@ public:
 		m_currentProgram = program;
 		m_currentProgramInstance = instance;
 		if (ppState) {
-			*ppState = instance->state.ptr;
+			*ppState = instance->state.get();
 		}
 		return sl_true;
 	}
@@ -1409,13 +1409,13 @@ public:
 		if (m_currentProgramInstance.isNull()) {
 			return;
 		}
-		_VertexBufferInstance* vb = (_VertexBufferInstance*)(primitive->vertexBufferInstance.ptr);
-		vb->_update(primitive->vertexBuffer.ptr);
+		_VertexBufferInstance* vb = (_VertexBufferInstance*)(primitive->vertexBufferInstance.get());
+		vb->_update(primitive->vertexBuffer.get());
 		if (primitive->indexBuffer.isNotNull()) {
-			_IndexBufferInstance* ib = (_IndexBufferInstance*)(primitive->indexBufferInstance.ptr);
-			ib->_update(primitive->indexBuffer.ptr);
+			_IndexBufferInstance* ib = (_IndexBufferInstance*)(primitive->indexBufferInstance.get());
+			ib->_update(primitive->indexBuffer.get());
 			GL_BASE::bindVertexBuffer(vb->handle);
-			if (m_currentProgram->onPreRender(this, m_currentProgramInstance->state.ptr, primitive)) {
+			if (m_currentProgram->onPreRender(this, m_currentProgramInstance->state.get(), primitive)) {
 				switch (primitive->type) {
 				case PrimitiveType::Triangles:
 					GL_BASE::drawTriangles(primitive->countElements, ib->handle, 0);
@@ -1436,12 +1436,12 @@ public:
 					GL_BASE::drawPoints(primitive->countElements, ib->handle, 0);
 					break;
 				}
-				m_currentProgram->onPostRender(this, m_currentProgramInstance->state.ptr, primitive);
+				m_currentProgram->onPostRender(this, m_currentProgramInstance->state.get(), primitive);
 			}
 			//GL_BASE::unbindVertexBuffer();
 		} else {
 			GL_BASE::bindVertexBuffer(vb->handle);
-			if (m_currentProgram->onPreRender(this, m_currentProgramInstance->state.ptr, primitive)) {
+			if (m_currentProgram->onPreRender(this, m_currentProgramInstance->state.get(), primitive)) {
 				switch (primitive->type) {
 				case PrimitiveType::Triangles:
 					GL_BASE::drawTriangles(primitive->countElements);
@@ -1462,7 +1462,7 @@ public:
 					GL_BASE::drawPoints(primitive->countElements);
 					break;
 				}
-				m_currentProgram->onPostRender(this, m_currentProgramInstance->state.ptr, primitive);
+				m_currentProgram->onPostRender(this, m_currentProgramInstance->state.get(), primitive);
 			}
 			//GL_BASE::unbindVertexBuffer();
 		}

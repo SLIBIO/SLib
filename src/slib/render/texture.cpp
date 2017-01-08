@@ -49,7 +49,7 @@ Ref<Texture> Texture::create(const Ref<Bitmap>& source)
 			}
 		}
 	}
-	return Ref<Texture>::null();
+	return sl_null;
 }
 
 Ref<Texture> Texture::create(const BitmapData& bitmapData)
@@ -65,7 +65,7 @@ Ref<Texture> Texture::create(sl_uint32 width, sl_uint32 height, const Color* pix
 Ref<Texture> Texture::loadFromMemory(const void* mem, sl_size size)
 {
 	if (size == 0) {
-		return Ref<Texture>::null();
+		return sl_null;
 	}
 	return create(Image::loadFromMemory(mem, size));
 }
@@ -73,7 +73,7 @@ Ref<Texture> Texture::loadFromMemory(const void* mem, sl_size size)
 Ref<Texture> Texture::loadFromMemory(const Memory& mem)
 {
 	if (mem.isEmpty()) {
-		return Ref<Texture>::null();
+		return sl_null;
 	}
 	return loadFromMemory(mem.getData(), mem.getSize());
 }
@@ -113,10 +113,10 @@ Ref<Texture> Texture::getBitmapRenderingCache(const Ref<Bitmap>& source)
 		if (width > 0) {
 			sl_uint32 height = source->getHeight();
 			if (height > 0) {
-				_TextureBitmap* tb = (_TextureBitmap*)(source.ptr);
+				_TextureBitmap* tb = (_TextureBitmap*)(source.get());
 				Ref<BitmapCache> cache = tb->m_renderingTextureCached;
 				if (cache.isNotNull()) {
-					return ((_TextureBitmapCache*)(cache.ptr))->texture;
+					return ((_TextureBitmapCache*)(cache.get()))->texture;
 				}
 				Ref<Texture> ret = new Texture;
 				if (ret.isNotNull()) {
@@ -133,7 +133,7 @@ Ref<Texture> Texture::getBitmapRenderingCache(const Ref<Bitmap>& source)
 			}
 		}
 	}
-	return Ref<Texture>::null();
+	return sl_null;
 }
 
 Ref<Bitmap> Texture::getSource()
@@ -190,7 +190,7 @@ void Texture::update(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height
 	for (int i = 0; i < SLIB_MAX_RENDER_ENGINE_COUNT_PER_OBJECT; i++) {
 		Ref<RenderBaseObjectInstance> instance = m_instances[i];
 		if (instance.isNotNull()) {
-			((TextureInstance*)(instance.ptr))->notifyUpdated(x, y, width, height);
+			((TextureInstance*)(instance.get()))->notifyUpdated(x, y, width, height);
 		}
 	}
 }

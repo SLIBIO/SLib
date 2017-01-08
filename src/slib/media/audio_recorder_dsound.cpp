@@ -41,13 +41,13 @@ public:
 public:
 	static void logError(String text)
 	{
-		SLIB_LOG_ERROR("AudioRecorder", text);
+		LogError("AudioRecorder", text);
 	}
 	
 	static Ref<_DirectSound_AudioRecorder> create(const AudioRecorderParam& param)
 	{
 		if (param.channelsCount != 1 && param.channelsCount != 2) {
-			return Ref<_DirectSound_AudioRecorder>::null();
+			return sl_null;
 		}
 		
 		::CoInitializeEx(NULL, COINIT_MULTITHREADED);
@@ -67,7 +67,7 @@ public:
 			}
 			if (i == props.count) {
 				logError("Failed to find capture device");
-				return Ref<_DirectSound_AudioRecorder>::null();
+				return sl_null;
 			}
 		}
 		
@@ -79,7 +79,7 @@ public:
 			} else {
 				logError("Can not create dsound capture device");
 			}
-			return Ref<_DirectSound_AudioRecorder>::null();
+			return sl_null;
 		}
 		
 		WAVEFORMATEX wf;
@@ -183,7 +183,7 @@ public:
 		CloseHandle(hEvent0);
 		CloseHandle(hEvent1);
 		
-		return Ref<_DirectSound_AudioRecorder>::null();
+		return sl_null;
 	}
 	
 	void release()
@@ -217,7 +217,7 @@ public:
 		if (m_flagRunning) {
 			return;
 		}
-		m_thread = Thread::start(SLIB_CALLBACK_CLASS(_DirectSound_AudioRecorder, run, this));
+		m_thread = Thread::start(SLIB_FUNCTION_CLASS(_DirectSound_AudioRecorder, run, this));
 		if (m_thread.isNotNull()) {
 			m_flagRunning = sl_true;
 		}
@@ -316,7 +316,7 @@ Ref<AudioRecorder> DirectSound::createRecorder(const AudioRecorderParam& param)
 List<AudioRecorderInfo> DirectSound::getRecordersList()
 {
 	List<AudioRecorderInfo> ret;
-	ListItems<_DirectSound_AudioRecorder::DeviceProperty> props(_DirectSound_AudioRecorder::queryDeviceInfos());
+	ListElements<_DirectSound_AudioRecorder::DeviceProperty> props(_DirectSound_AudioRecorder::queryDeviceInfos());
 	for (sl_size i = 0; i < props.count; i++) {
 		_DirectSound_AudioRecorder::DeviceProperty& prop = props[i];
 		AudioRecorderInfo info;
@@ -335,12 +335,12 @@ SLIB_MEDIA_NAMESPACE_BEGIN
 
 Ref<AudioRecorder> DirectSound::createRecorder(const AudioRecorderParam& param)
 {
-	return Ref<AudioRecorder>::null();
+	return sl_null;
 }
 
 List<AudioRecorderInfo> DirectSound::getRecordersList()
 {
-	return List<AudioRecorderInfo>::null();
+	return sl_null;
 }
 
 SLIB_MEDIA_NAMESPACE_END

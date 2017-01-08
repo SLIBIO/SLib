@@ -5,112 +5,139 @@
 
 SLIB_NAMESPACE_BEGIN
 
-sl_uint32 sl_rehash(sl_uint32 code);
-sl_uint32 sl_hash(char n);
-sl_uint32 sl_hash(unsigned char n);
-sl_uint32 sl_hash(short n);
-sl_uint32 sl_hash(unsigned short n);
-sl_uint32 sl_hash(int n);
-sl_uint32 sl_hash(unsigned int n);
-sl_uint32 sl_hash(long n);
-sl_uint32 sl_hash(unsigned long n);
-sl_uint32 sl_hash(long long n);
-sl_uint32 sl_hash(unsigned long long n);
-sl_uint32 sl_hash(const void* ptr);
-sl_uint32 sl_hash(float f);
-sl_uint32 sl_hash(double f);
-sl_uint32 sl_hash(const void* data, sl_size size);
+template <class T>
+class Hash;
 
-template <class TYPE>
-class SLIB_EXPORT Hash
+SLIB_CONSTEXPR sl_uint32 Rehash(sl_uint32 x)
+{
+	return x ^ (x >> 4) ^ (x >> 7) ^ (x >> 12) ^ (x >> 16) ^ (x >> 19) ^ (x >> 20) ^ (x >> 24) ^ (x >> 27);
+}
+
+SLIB_CONSTEXPR sl_uint32 Hash64(sl_uint64 x)
+{
+	return Rehash((sl_uint32)(x ^ (x >> 32)));
+}
+
+sl_uint32 HashBytes(const void* buf, sl_size n);
+
+template <>
+class Hash<char>
 {
 public:
-	static sl_uint32 hash(const TYPE& v);
-	
+	SLIB_CONSTEXPR sl_uint32 operator()(char v) const { return Rehash(v);}
 };
 
-
-SLIB_INLINE sl_uint32 sl_rehash(sl_uint32 code)
+template <>
+class Hash<unsigned char>
 {
-	code ^= (code >> 20) ^ (code >> 12);
-	code ^= (code >> 7) ^ (code >> 4);
-	return code;
-}
+public:
+	SLIB_CONSTEXPR sl_uint32 operator()(unsigned char v) const { return Rehash(v);}
+};
 
-SLIB_INLINE sl_uint32 sl_hash(char n)
+template <>
+class Hash<wchar_t>
 {
-	return sl_rehash((sl_uint32)n);
-}
+public:
+	SLIB_CONSTEXPR sl_uint32 operator()(wchar_t v) const { return Rehash(v);}
+};
 
-SLIB_INLINE sl_uint32 sl_hash(unsigned char n)
+template <>
+class Hash<short>
 {
-	return sl_rehash((sl_uint32)n);
-}
+public:
+	SLIB_CONSTEXPR sl_uint32 operator()(short v) const { return Rehash(v);}
+};
 
-SLIB_INLINE sl_uint32 sl_hash(short n)
+template <>
+class Hash<unsigned short>
 {
-	return sl_rehash((sl_uint32)n);
-}
+public:
+	SLIB_CONSTEXPR sl_uint32 operator()(unsigned short v) const { return Rehash(v);}
+};
 
-SLIB_INLINE sl_uint32 sl_hash(unsigned short n)
+template <>
+class Hash<int>
 {
-	return sl_rehash((sl_uint32)n);
-}
+public:
+	SLIB_CONSTEXPR sl_uint32 operator()(int v) const { return Rehash(v);}
+};
 
-SLIB_INLINE sl_uint32 sl_hash(int n)
+template <>
+class Hash<unsigned int>
 {
-	return sl_rehash((sl_uint32)n);
-}
+public:
+	SLIB_CONSTEXPR sl_uint32 operator()(unsigned int v) const { return Rehash(v);}
+};
 
-SLIB_INLINE sl_uint32 sl_hash(unsigned int n)
+template <>
+class Hash<long>
 {
-	return sl_rehash((sl_uint32)n);
-}
+public:
+	SLIB_CONSTEXPR sl_uint32 operator()(long v) const { return Rehash((sl_uint32)v);}
+};
 
-SLIB_INLINE sl_uint32 sl_hash(long n)
+template <>
+class Hash<unsigned long>
 {
-	return sl_rehash((sl_uint32)n);
-}
+public:
+	SLIB_CONSTEXPR sl_uint32 operator()(unsigned long v) const { return Rehash((sl_uint32)v);}
+};
 
-SLIB_INLINE sl_uint32 sl_hash(unsigned long n)
+template <>
+class Hash<sl_int64>
 {
-	return sl_rehash((sl_uint32)n);
-}
+public:
+	SLIB_CONSTEXPR sl_uint32 operator()(sl_int64 v) const { return Hash64(v); }
+};
 
-SLIB_INLINE sl_uint32 sl_hash(long long n)
+template <>
+class Hash<sl_uint64>
 {
-	return sl_rehash((sl_uint32)(n ^ (n >> 32)));
-}
+public:
+	SLIB_CONSTEXPR sl_uint32 operator()(sl_uint64 v) const { return Hash64(v); }
+};
 
-SLIB_INLINE sl_uint32 sl_hash(unsigned long long n)
+template <>
+class Hash<float>
 {
-	return sl_rehash((sl_uint32)(n ^ (n >> 32)));
-}
+public:
+	SLIB_INLINE sl_uint32 operator()(float v) const { return Rehash(*(reinterpret_cast<sl_uint32*>(&v))); }
+};
 
-SLIB_INLINE sl_uint32 sl_hash(const void* ptr)
+template <>
+class Hash<double>
 {
+public:
+	SLIB_INLINE sl_uint32 operator()(double v) const { return Hash64(*(reinterpret_cast<sl_uint64*>(&v))); }
+};
+
+template <class T>
+class Hash<T const*>
+{
+public:
+	SLIB_INLINE sl_uint32 operator()(T const* v) const
+	{
 #ifdef SLIB_ARCH_IS_64BIT
-	return sl_hash((sl_uint64)ptr);
+		return Hash64((sl_uint64)((const void*)v));
 #else
-	return sl_hash((sl_uint32)ptr);
+		return Rehash((sl_uint32)((const void*)v));
 #endif
-}
+	}
+};
 
-SLIB_INLINE sl_uint32 sl_hash(float f)
+template <class T>
+class Hash<T*>
 {
-	return sl_rehash(*(sl_uint32*)(void*)(&f));
-}
-
-SLIB_INLINE sl_uint32 sl_hash(double f)
-{
-	return sl_hash(*(sl_uint64*)(void*)(&f));
-}
-
-template <class TYPE>
-SLIB_INLINE sl_uint32 Hash<TYPE>::hash(const TYPE& v)
-{
-	return sl_hash(v);
-}
+public:
+	SLIB_INLINE sl_uint32 operator()(T* v) const
+	{
+#ifdef SLIB_ARCH_IS_64BIT
+		return Hash64((sl_uint64)((const void*)v));
+#else
+		return Rehash((sl_uint32)((const void*)v));
+#endif
+	}
+};
 
 SLIB_NAMESPACE_END
 

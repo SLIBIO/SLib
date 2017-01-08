@@ -2,6 +2,7 @@
 
 #include "../../../inc/slib/ui/view.h"
 #include "../../../inc/slib/ui/core.h"
+#include "../../../inc/slib/ui/screen.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -16,6 +17,10 @@ WindowInstanceParam::WindowInstanceParam()
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 	activity = sl_null;
 #endif
+}
+
+WindowInstanceParam::~WindowInstanceParam()
+{
 }
 
 UIRect WindowInstanceParam::calculateRegion(const UIRect& screenFrame) const
@@ -79,6 +84,10 @@ Window::Window()
 	
 	m_activity = sl_null;
 	
+}
+
+Window::~Window()
+{
 }
 
 void Window::close()
@@ -187,7 +196,7 @@ void Window::runModal()
 {
 	Ref<WindowInstance> instance = m_instance;
 	if (instance.isNotNull()) {
-		UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(Window, _runModal, this));
+		UI::dispatchToUiThread(SLIB_FUNCTION_WEAKREF(Window, _runModal, this));
 	}
 }
 
@@ -775,7 +784,7 @@ void Window::create()
 	if (UI::isUiThread()) {
 		_create();
 	} else {
-		UI::dispatchToUiThread(SLIB_CALLBACK_REF(Window, _create, this));
+		UI::dispatchToUiThread(SLIB_FUNCTION_REF(Window, _create, this));
 	}
 }
 
@@ -876,7 +885,7 @@ List< Ref<View> > Window::getViews()
 	if (view.isNotNull()) {
 		return view->getChildren();
 	}
-	return List< Ref<View> >::null();
+	return sl_null;
 }
 
 void Window::removeAllViews()
@@ -1076,7 +1085,7 @@ sl_bool WindowInstance::onClose()
 	if (window.isNotNull()) {
 		Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
 		if (ev.isNotNull()) {
-			window->dispatchClose(ev.ptr);
+			window->dispatchClose(ev.get());
 			if (ev->isPreventedDefault()) {
 				return sl_false;
 			}

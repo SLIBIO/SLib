@@ -104,8 +104,7 @@ public:
 	sl_bool processNotify(NMHDR* nmhdr, LRESULT& result)
 	{
 		Ref<View> _view = getView();
-		if (ListReportView::checkInstance(_view.ptr)) {
-			ListReportView* view = (ListReportView*)(_view.ptr);
+		if (ListReportView* view = CastInstance<ListReportView>(_view.get())) {
 			NMITEMACTIVATE* nm = (NMITEMACTIVATE*)nmhdr;
 			UINT code = nmhdr->code;
 			if (code == LVN_GETDISPINFOW) {
@@ -158,7 +157,7 @@ Ref<ViewInstance> ListReportView::createNativeWidget(ViewInstance* parent)
 {
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
 	if (!shared) {
-		return Ref<ViewInstance>::null();
+		return sl_null;
 	}
 
 	DWORD style = LVS_REPORT | LVS_SINGLESEL | LVS_OWNERDATA | WS_TABSTOP | WS_BORDER;
@@ -170,7 +169,7 @@ Ref<ViewInstance> ListReportView::createNativeWidget(ViewInstance* parent)
 		HWND handle = ret->getHandle();
 
 		Ref<Font> font = getFont();
-		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
 		if (hFont) {
 			// You should send this message before inserting any items
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
@@ -254,7 +253,7 @@ void ListReportView::_setFont_NW(const Ref<Font>& font)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}

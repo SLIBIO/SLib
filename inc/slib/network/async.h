@@ -15,16 +15,16 @@ class SLIB_EXPORT IAsyncTcpSocketListener : public IAsyncStreamListener
 public:
 	virtual void onConnect(AsyncTcpSocket* socket, const SocketAddress& address, sl_bool flagError);
 	
-	virtual void onReceive(AsyncTcpSocket* socket, void* data, sl_uint32 sizeReceive, const Referable* refData, sl_bool flagError);
+	virtual void onReceive(AsyncTcpSocket* socket, void* data, sl_uint32 sizeReceive, Referable* refData, sl_bool flagError);
 	
-	virtual void onSend(AsyncTcpSocket* socket, void* data, sl_uint32 sizeSent, const Referable* refData, sl_bool flagError);
+	virtual void onSend(AsyncTcpSocket* socket, void* data, sl_uint32 sizeSent, Referable* refData, sl_bool flagError);
 
 public:
 	// override
-	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError);
+	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError);
 	
 	// override
-	void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, const Referable* ref, sl_bool flagError);
+	void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError);
 	
 };
 
@@ -41,9 +41,9 @@ public:
 public:
 	sl_bool connect(const SocketAddress& address, const Ptr<IAsyncTcpSocketListener>& listener);
 
-	sl_bool receive(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, const Referable* refData);
+	sl_bool receive(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, Referable* refData);
 	
-	sl_bool send(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, const Referable* refData);
+	sl_bool send(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, Referable* refData);
 
 protected:
 	void _onReceive(AsyncStreamRequest* req, sl_uint32 size, sl_bool flagError);
@@ -53,12 +53,12 @@ protected:
 	void _onConnect(sl_bool flagError);
 
 protected:
-	SafeRef<Socket> m_socket;
+	AtomicRef<Socket> m_socket;
 
 	sl_bool m_flagSupportingConnect;
 	sl_bool m_flagRequestConnect;
 	SocketAddress m_addressRequestConnect;
-	SafePtr<IAsyncTcpSocketListener> m_listenerConnect;
+	AtomicPtr<IAsyncTcpSocketListener> m_listenerConnect;
 	
 };
 
@@ -103,11 +103,11 @@ public:
 public:
 	sl_bool connect(const SocketAddress& address, const Ptr<IAsyncTcpSocketListener>& listener);
 
-	sl_bool receive(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, const Referable* refData = sl_null);
+	sl_bool receive(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, Referable* refData = sl_null);
 	
 	sl_bool receive(const Memory& mem, const Ptr<IAsyncTcpSocketListener>& listener);
 
-	sl_bool send(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, const Referable* refData = sl_null);
+	sl_bool send(void* data, sl_uint32 size, const Ptr<IAsyncTcpSocketListener>& listener, Referable* refData = sl_null);
 	
 	sl_bool send(const Memory& mem, const Ptr<IAsyncTcpSocketListener>& listener);
 
@@ -157,7 +157,7 @@ protected:
 protected:
 	sl_bool m_flagRunning;
 
-	SafeRef<Socket> m_socket;
+	AtomicRef<Socket> m_socket;
 	Ptr<IAsyncTcpServerListener> m_listener;
 	
 };
@@ -249,7 +249,7 @@ protected:
 protected:
 	sl_bool m_flagRunning;
 
-	SafeRef<Socket> m_socket;
+	AtomicRef<Socket> m_socket;
 	Memory m_buffer;
 	
 	struct SendRequest
@@ -257,7 +257,7 @@ protected:
 		SocketAddress addressTo;
 		Memory data;
 	};
-	Queue<SendRequest> m_queueSendRequests;
+	LinkedQueue<SendRequest> m_queueSendRequests;
 	
 	Ptr<IAsyncUdpSocketListener> m_listener;
 

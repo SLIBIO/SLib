@@ -12,7 +12,7 @@ SLIB_NAMESPACE_BEGIN
 
 static void _logJniError(const String& text)
 {
-	SLIB_LOG_ERROR("SLIB_JNI", text);
+	LogError("SLIB_JNI", text);
 }
 
 JavaVM* _g_jvm_shared = sl_null;
@@ -56,11 +56,11 @@ void Jni::initialize(JavaVM* jvm)
 			for (sl_size i = 0; i < list.count; i++) {
 				_JniSingletonClass* obj = list[i];
 #if defined(JNI_LOG_INIT_LOAD)
-				SLIB_LOG("LOADING JAVA CLASS", obj->name);
+				Log("LOADING JAVA CLASS", obj->name);
 #endif
 				obj->cls = Jni::getClass(obj->name);
 				if (obj->cls.isNull()) {
-					SLIB_LOG("LOADING JAVA CLASS FAILED", obj->name);
+					Log("LOADING JAVA CLASS FAILED", obj->name);
 				}
 			}
 		}
@@ -74,12 +74,12 @@ void Jni::initialize(JavaVM* jvm)
 				JniClass cls = obj->gcls->cls;
 				if (cls.isNotNull()) {
 #if defined(JNI_LOG_INIT_LOAD)
-					SLIB_LOG("LOADING JAVA FIELD", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
+					Log("LOADING JAVA FIELD", "%s::%s %s", String(obj->gcls->name), obj->name, obj->sig);
 #endif
 					obj->cls = cls;
 					obj->id = cls.getFieldID(obj->name, obj->sig);
 					if (obj->id == sl_null) {
-						SLIB_LOG("LOADING JAVA FIELD FAILED", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
+						Log("LOADING JAVA FIELD FAILED", "%s::%s %s", String(obj->gcls->name), obj->name, obj->sig);
 					}
 				}
 			}
@@ -92,12 +92,12 @@ void Jni::initialize(JavaVM* jvm)
 				JniClass cls = obj->gcls->cls;
 				if (cls.isNotNull()) {
 #if defined(JNI_LOG_INIT_LOAD)
-					SLIB_LOG("LOADING JAVA STATIC FIELD", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
+					Log("LOADING JAVA STATIC FIELD", "%s::%s %s", String(obj->gcls->name), obj->name, obj->sig);
 #endif
 					obj->cls = cls;
 					obj->id = cls.getStaticFieldID(obj->name, obj->sig);
 					if (obj->id == sl_null) {
-						SLIB_LOG("LOADING JAVA STATIC FIELD FAILED", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
+						Log("LOADING JAVA STATIC FIELD FAILED", "%s::%s %s", String(obj->gcls->name), obj->name, obj->sig);
 					}
 				}
 			}
@@ -110,12 +110,12 @@ void Jni::initialize(JavaVM* jvm)
 				JniClass cls = obj->gcls->cls;
 				if (cls.isNotNull()) {
 #if defined(JNI_LOG_INIT_LOAD)
-					SLIB_LOG("LOADING JAVA METHOD", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
+					Log("LOADING JAVA METHOD", "%s::%s %s", String(obj->gcls->name), obj->name, obj->sig);
 #endif
 					obj->cls = cls;
 					obj->id = cls.getMethodID(obj->name, obj->sig);
 					if (obj->id == sl_null) {
-						SLIB_LOG("LOADING JAVA METHOD FAILED", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
+						Log("LOADING JAVA METHOD FAILED", "%s::%s %s", String(obj->gcls->name), obj->name, obj->sig);
 					}
 				}
 			}
@@ -128,12 +128,12 @@ void Jni::initialize(JavaVM* jvm)
 				JniClass cls = obj->gcls->cls;
 				if (cls.isNotNull()) {
 #if defined(JNI_LOG_INIT_LOAD)
-					SLIB_LOG("LOADING JAVA STATIC METHOD", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
+					Log("LOADING JAVA STATIC METHOD", "%s::%s %s", String(obj->gcls->name), obj->name, obj->sig);
 #endif
 					obj->cls = cls;
 					obj->id = cls.getStaticMethodID(obj->name, obj->sig);
 					if (obj->id == sl_null) {
-						SLIB_LOG("LOADING JAVA STATIC METHOD FAILED", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
+						Log("LOADING JAVA STATIC METHOD FAILED", "%s::%s %s", String(obj->gcls->name), obj->name, obj->sig);
 					}
 				}
 			}
@@ -146,10 +146,10 @@ void Jni::initialize(JavaVM* jvm)
 				JniClass cls = obj->gcls->cls;
 				if (cls.isNotNull()) {
 #if defined(JNI_LOG_INIT_LOAD)
-					SLIB_LOG("REGISTERING JAVA NATIVE", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
+					Log("REGISTERING JAVA NATIVE", "%s::%s %s", String(obj->gcls->name), obj->name, obj->sig);
 #endif
 					if (!cls.registerNative(obj->name, obj->sig, obj->fn)) {
-						SLIB_LOG("REGISTERING JAVA NATIVE FAILED", String(obj->gcls->name) + "::" + obj->name + " " + obj->sig);
+						Log("REGISTERING JAVA NATIVE FAILED", "%s::%s %s", String(obj->gcls->name), obj->name, obj->sig);
 					}
 				}
 			}
@@ -233,14 +233,14 @@ JniClass Jni::findClass(const char* className)
 			}
 		}
 	}
-	return JniClass::null();
+	return sl_null;
 }
 
 JniClass Jni::getClass(const String& className)
 {
 	_Jni_Shared* shared = _Jni_getShared();
 	if (!shared) {
-		return JniClass::null();
+		return sl_null;
 	}
 	JniClass ret;
 	if (shared->classes.get(className, &ret)) {
@@ -659,14 +659,6 @@ void Jni::closeInputStream(jobject stream)
 
 SLIB_DEFINE_ROOT_OBJECT(_JniGlobalBase)
 
-template class _JniGlobal<jobject>;
-template class _JniGlobal<jclass>;
-template class _JniGlobal<jstring>;
-
-SLIB_DEFINE_REF_WRAPPER(JniClass, JniSafeClass, _JniGlobal<jclass>, ref)
-
-SLIB_DEFINE_REF_WRAPPER(JniSafeClass, JniClass, _JniGlobal<jclass>, ref)
-
 JniClass::JniClass(jclass cls) : ref(_JniGlobal<jclass>::from(cls))
 {
 }
@@ -697,7 +689,7 @@ JniClass JniClass::getClassOfObject(jobject obj)
 
 jclass JniClass::get() const
 {
-	_JniGlobal<jclass>* o = ref.ptr;
+	_JniGlobal<jclass>* o = ref.get();
 	if (ref.isNotNull()) {
 		return o->object;
 	} else {
@@ -1757,11 +1749,11 @@ sl_bool JniClass::registerNative(const char* name, const char* sig, const void* 
 	return sl_false;
 }
 
-JniSafeClass::JniSafeClass(jclass cls) : ref(_JniGlobal<jclass>::from(cls))
+Atomic<JniClass>::Atomic(jclass cls) : ref(_JniGlobal<jclass>::from(cls))
 {
 }
 
-JniSafeClass& JniSafeClass::operator=(jclass cls)
+AtomicJniClass& Atomic<JniClass>::operator=(jclass cls)
 {
 	ref = _JniGlobal<jclass>::from(cls);
 	return *this;

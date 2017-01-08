@@ -1,17 +1,19 @@
 #include "../../../inc/slib/ui/app.h"
 #include "../../../inc/slib/ui/core.h"
+#include "../../../inc/slib/ui/window.h"
+#include "../../../inc/slib/ui/menu.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(UIApp, Application)
 
+UIApp::UIApp()
+{
+}
+
 Ref<UIApp> UIApp::getApp()
 {
-	Ref<Application> app(Application::getApp());
-	if (UIApp::checkInstance(app.ptr)) {
-		return Ref<UIApp>::from(app);
-	}
-	return Ref<UIApp>::null();
+	return CastRef<UIApp>(Application::getApp());
 }
 
 AppType UIApp::getAppType()

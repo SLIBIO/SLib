@@ -232,20 +232,50 @@ public:
 	static Uint128 fromHexString(const String& str);
 	
 	String toHexString() const;
-
 	
-	SLIB_DECLARE_PARSE_FUNCTIONS_ARG(Uint128, sl_uint32, radix, 10)
+	
+	template <class ST>
+	static sl_bool parse(const ST& str, Uint128* _out, sl_uint32 radix = 10)
+	{
+		return ParseInt(str, _out, radix);
+	}
+	
+	template <class ST>
+	sl_bool parse(const ST& str, sl_uint32 radix = 10)
+	{
+		return ParseInt(str, this, radix);
+	}
 
 };
 
-template<>
-int Compare<Uint128>::compare(const Uint128& a, const Uint128& b);
+template <>
+sl_reg IntParser<Uint128, sl_char8>::parse(Uint128* _out, sl_uint32 radix, const sl_char8 *sz, sl_size posBegin, sl_size len);
 
-template<>
-sl_bool Compare<Uint128>::equals(const Uint128& a, const Uint128& b);
+template <>
+sl_reg IntParser<Uint128, sl_char16>::parse(Uint128* _out, sl_uint32 radix, const sl_char16 *sz, sl_size posBegin, sl_size len);
 
-template<>
-sl_uint32 Hash<Uint128>::hash(const Uint128& v);
+
+template <>
+class Compare<Uint128>
+{
+public:
+	int operator()(const Uint128& a, const Uint128& b) const;
+};
+
+template <>
+class Equals<Uint128>
+{
+public:
+	sl_bool operator()(const Uint128& a, const Uint128& b) const;
+};
+
+template <>
+class Hash<Uint128>
+{
+public:
+	sl_uint32 operator()(const Uint128& a) const;
+};
+
 
 SLIB_MATH_NAMESPACE_END
 

@@ -45,7 +45,7 @@ public:
 				delete bitmap;
 			}
 		}
-		return Ref<_Gdiplus_Bitmap>::null();
+		return sl_null;
 	}
 	
 	static Ref<_Gdiplus_Bitmap> loadFromMemory(const void* mem, sl_size size)
@@ -63,7 +63,7 @@ public:
 				delete bitmap;
 			}
 		}
-		return Ref<_Gdiplus_Bitmap>::null();
+		return sl_null;
 	}
 	
     // override
@@ -281,7 +281,7 @@ public:
 			sl_uint32 h = getBitmapHeight();
 			return GraphicsPlatform::createCanvas(CanvasType::Bitmap, g, w, h, sl_true, this);
 		}
-		return Ref<Canvas>::null();
+		return sl_null;
 	}
 	
     // override
@@ -305,8 +305,7 @@ Ref<Bitmap> Bitmap::loadFromMemory(const void* mem, sl_size size)
 
 Gdiplus::Bitmap* GraphicsPlatform::getBitmapHandle(Bitmap* _bitmap)
 {
-	if (_Gdiplus_Bitmap::checkInstance(_bitmap)) {
-		_Gdiplus_Bitmap* bitmap = (_Gdiplus_Bitmap*)_bitmap;
+	if (_Gdiplus_Bitmap* bitmap = CastInstance<_Gdiplus_Bitmap>(_bitmap)) {
 		return bitmap->m_bitmap;
 	}
 	return NULL;

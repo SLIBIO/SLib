@@ -4,54 +4,64 @@
 #include "definition.h"
 
 #include "cpp.h"
+#include "compare.h"
 
 SLIB_NAMESPACE_BEGIN
 
-template < class TYPE, class COMPARE = Compare<TYPE> >
 class SLIB_EXPORT SelectionSort
 {
 public:
-	static void sortAsc(TYPE* list, sl_size size);
+	template < class TYPE, class COMPARE = Compare<TYPE> >
+	static void sortAsc(TYPE* list, sl_size size, const COMPARE& compare = COMPARE());
 	
-	static void sortDesc(TYPE* list, sl_size size);
+	template < class TYPE, class COMPARE = Compare<TYPE> >
+	static void sortDesc(TYPE* list, sl_size size, const COMPARE& compare = COMPARE());
 	
-	static void sort(TYPE* list, sl_size size, sl_bool flagAscending = sl_true);
+	template < class TYPE, class COMPARE = Compare<TYPE> >
+	static void sort(TYPE* list, sl_size size, sl_bool flagAscending, const COMPARE& compare = COMPARE());
 	
 };
 
-template < class TYPE, class COMPARE = Compare<TYPE> >
 class SLIB_EXPORT InsertionSort
 {
 public:
-	static void sortAsc(TYPE* list, sl_size size);
+	template < class TYPE, class COMPARE = Compare<TYPE> >
+	static void sortAsc(TYPE* list, sl_size size, const COMPARE& compare = COMPARE());
 	
-	static void sortDesc(TYPE* list, sl_size size);
+	template < class TYPE, class COMPARE = Compare<TYPE> >
+	static void sortDesc(TYPE* list, sl_size size, const COMPARE& compare = COMPARE());
 	
-	static void sort(TYPE* list, sl_size size, sl_bool flagAsc = sl_true);
+	template < class TYPE, class COMPARE = Compare<TYPE> >
+	static void sort(TYPE* list, sl_size size, sl_bool flagAsc, const COMPARE& compare = COMPARE());
 	
-	static void sortAsc(const TYPE* src, TYPE* dst, sl_size size);
+	template < class TYPE, class COMPARE = Compare<TYPE> >
+	static void sortAsc(const TYPE* src, TYPE* dst, sl_size size, const COMPARE& compare = COMPARE());
 	
-	static void sortDesc(const TYPE* src, TYPE* dst, sl_size size);
+	template < class TYPE, class COMPARE = Compare<TYPE> >
+	static void sortDesc(const TYPE* src, TYPE* dst, sl_size size, const COMPARE& compare = COMPARE());
 	
-	static void sort(const TYPE* src, TYPE* dst, sl_size size, sl_bool flagAscending = sl_true);
+	template < class TYPE, class COMPARE = Compare<TYPE> >
+	static void sort(const TYPE* src, TYPE* dst, sl_size size, sl_bool flagAscending, const COMPARE& compare = COMPARE());
 	
 };
 
-template < class TYPE, class COMPARE = Compare<TYPE> >
 class SLIB_EXPORT QuickSort
 {
 public:
-	static void sortAsc(TYPE* list, sl_size size);
+	template < class TYPE, class COMPARE = Compare<TYPE> >
+	static void sortAsc(TYPE* list, sl_size size, const COMPARE& compare = COMPARE());
 	
-	static void sortDesc(TYPE* list, sl_size size);
+	template < class TYPE, class COMPARE = Compare<TYPE> >
+	static void sortDesc(TYPE* list, sl_size size, const COMPARE& compare = COMPARE());
 	
-	static void sort(TYPE* list, sl_size size, sl_bool flagAscending = sl_true);
+	template < class TYPE, class COMPARE = Compare<TYPE> >
+	static void sort(TYPE* list, sl_size size, sl_bool flagAscending, const COMPARE& compare = COMPARE());
 	
 };
 
 
 template <class TYPE, class COMPARE>
-void SelectionSort<TYPE, COMPARE>::sortAsc(TYPE* list, sl_size size)
+void SelectionSort::sortAsc(TYPE* list, sl_size size, const COMPARE& compare)
 {
 	if (size < 2) {
 		return;
@@ -60,8 +70,7 @@ void SelectionSort<TYPE, COMPARE>::sortAsc(TYPE* list, sl_size size)
 	for (sl_size i = 0; i < size_1; i++) {
 		sl_size sel = i;
 		for (sl_size j = i + 1; j < size; j++) {
-			int c = COMPARE::compare(list[sel], list[j]);
-			if (c > 0) {
+			if (compare(list[sel], list[j]) > 0) {
 				sel = j;
 			}
 		}
@@ -72,7 +81,7 @@ void SelectionSort<TYPE, COMPARE>::sortAsc(TYPE* list, sl_size size)
 }
 
 template <class TYPE, class COMPARE>
-void SelectionSort<TYPE, COMPARE>::sortDesc(TYPE* list, sl_size size)
+void SelectionSort::sortDesc(TYPE* list, sl_size size, const COMPARE& compare)
 {
 	if (size < 2) {
 		return;
@@ -81,8 +90,7 @@ void SelectionSort<TYPE, COMPARE>::sortDesc(TYPE* list, sl_size size)
 	for (sl_size i = 0; i < size_1; i++) {
 		sl_size sel = i;
 		for (sl_size j = i + 1; j < size; j++) {
-			int c = COMPARE::compare(list[sel], list[j]);
-			if (c < 0) {
+			if (compare(list[sel], list[j]) < 0) {
 				sel = j;
 			}
 		}
@@ -93,18 +101,18 @@ void SelectionSort<TYPE, COMPARE>::sortDesc(TYPE* list, sl_size size)
 }
 
 template <class TYPE, class COMPARE>
-void SelectionSort<TYPE, COMPARE>::sort(TYPE* list, sl_size size, sl_bool flagAsc)
+void SelectionSort::sort(TYPE* list, sl_size size, sl_bool flagAsc, const COMPARE& compare)
 {
 	if (flagAsc) {
-		sortAsc(list, size);
+		sortAsc(list, size, compare);
 	} else {
-		sortDesc(list, size);
+		sortDesc(list, size, compare);
 	}
 }
 
 
 template <class TYPE, class COMPARE>
-void InsertionSort<TYPE, COMPARE>::sortAsc(TYPE* list, sl_size size)
+void InsertionSort::sortAsc(TYPE* list, sl_size size, const COMPARE& compare)
 {
 	if (size < 2) {
 		return;
@@ -113,8 +121,7 @@ void InsertionSort<TYPE, COMPARE>::sortAsc(TYPE* list, sl_size size)
 		TYPE x = list[i];
 		sl_size j = i;
 		while (j > 0) {
-			int c = COMPARE::compare(list[j - 1], x);
-			if (c <= 0) {
+			if (compare(list[j - 1], x) <= 0) {
 				break;
 			}
 			list[j] = list[j - 1];
@@ -127,7 +134,7 @@ void InsertionSort<TYPE, COMPARE>::sortAsc(TYPE* list, sl_size size)
 }
 
 template <class TYPE, class COMPARE>
-void InsertionSort<TYPE, COMPARE>::sortDesc(TYPE* list, sl_size size)
+void InsertionSort::sortDesc(TYPE* list, sl_size size, const COMPARE& compare)
 {
 	if (size < 2) {
 		return;
@@ -136,8 +143,7 @@ void InsertionSort<TYPE, COMPARE>::sortDesc(TYPE* list, sl_size size)
 		TYPE x = list[i];
 		sl_size j = i;
 		while (j > 0) {
-			int c = COMPARE::compare(list[j - 1], x);
-			if (c >= 0) {
+			if (compare(list[j - 1], x) >= 0) {
 				break;
 			}
 			list[j] = list[j - 1];
@@ -150,17 +156,17 @@ void InsertionSort<TYPE, COMPARE>::sortDesc(TYPE* list, sl_size size)
 }
 
 template <class TYPE, class COMPARE>
-void InsertionSort<TYPE, COMPARE>::sort(TYPE* list, sl_size size, sl_bool flagAsc)
+void InsertionSort::sort(TYPE* list, sl_size size, sl_bool flagAsc, const COMPARE& compare)
 {
 	if (flagAsc) {
-		sortAsc(list, size);
+		sortAsc(list, size, compare);
 	} else {
-		sortDesc(list, size);
+		sortDesc(list, size, compare);
 	}
 }
 
 template <class TYPE, class COMPARE>
-void InsertionSort<TYPE, COMPARE>::sortAsc(const TYPE* src, TYPE* dst, sl_size size)
+void InsertionSort::sortAsc(const TYPE* src, TYPE* dst, sl_size size, const COMPARE& compare)
 {
 	if (src == dst) {
 		sort(dst, size);
@@ -173,8 +179,7 @@ void InsertionSort<TYPE, COMPARE>::sortAsc(const TYPE* src, TYPE* dst, sl_size s
 	for (sl_size i = 1; i < size_1; i++) {
 		sl_size j = i;
 		while (j > 0) {
-			int c = COMPARE::compare(dst[j - 1], src[i]);
-			if (c <= 0) {
+			if (compare(dst[j - 1], src[i]) <= 0) {
 				break;
 			}
 			dst[j] = dst[j - 1];
@@ -185,7 +190,7 @@ void InsertionSort<TYPE, COMPARE>::sortAsc(const TYPE* src, TYPE* dst, sl_size s
 }
 
 template <class TYPE, class COMPARE>
-void InsertionSort<TYPE, COMPARE>::sortDesc(const TYPE* src, TYPE* dst, sl_size size)
+void InsertionSort::sortDesc(const TYPE* src, TYPE* dst, sl_size size, const COMPARE& compare)
 {
 	if (src == dst) {
 		sort(dst, size);
@@ -198,8 +203,7 @@ void InsertionSort<TYPE, COMPARE>::sortDesc(const TYPE* src, TYPE* dst, sl_size 
 	for (sl_size i = 1; i < size_1; i++) {
 		sl_size j = i;
 		while (j > 0) {
-			int c = COMPARE::compare(dst[j - 1], src[i]);
-			if (c >= 0) {
+			if (compare(dst[j - 1], src[i]) >= 0) {
 				break;
 			}
 			dst[j] = dst[j - 1];
@@ -210,18 +214,18 @@ void InsertionSort<TYPE, COMPARE>::sortDesc(const TYPE* src, TYPE* dst, sl_size 
 }
 
 template <class TYPE, class COMPARE>
-void InsertionSort<TYPE, COMPARE>::sort(const TYPE* src, TYPE* dst, sl_size size, sl_bool flagAsc)
+void InsertionSort::sort(const TYPE* src, TYPE* dst, sl_size size, sl_bool flagAsc, const COMPARE& compare)
 {
 	if (flagAsc) {
-		sortAsc(src, dst, size);
+		sortAsc(src, dst, size, compare);
 	} else {
-		sortDesc(src, dst, size);
+		sortDesc(src, dst, size, compare);
 	}
 }
 
 
 template <class TYPE, class COMPARE>
-void QuickSort<TYPE, COMPARE>::sortAsc(TYPE* list, sl_size size)
+void QuickSort::sortAsc(TYPE* list, sl_size size, const COMPARE& compare)
 {
 	if (size < 2) {
 		return;
@@ -233,7 +237,7 @@ void QuickSort<TYPE, COMPARE>::sortAsc(TYPE* list, sl_size size)
 	for(;;) {
 		sl_size n = end - start + 1;
 		if (n < 8) {
-			InsertionSort<TYPE, COMPARE>::sortAsc(list + start, n);
+			InsertionSort::sortAsc(list + start, n);
 		} else {
 			sl_size mid = start + (n / 2);
 			Swap(list[mid], list[start]);
@@ -245,8 +249,7 @@ void QuickSort<TYPE, COMPARE>::sortAsc(TYPE* list, sl_size size)
 					if (border2 > end) {
 						break;
 					}
-					int c = COMPARE::compare(list[border2], list[start]);
-					if (c > 0) {
+					if (compare(list[border2], list[start]) > 0) {
 						break;
 					}
 				};
@@ -255,8 +258,7 @@ void QuickSort<TYPE, COMPARE>::sortAsc(TYPE* list, sl_size size)
 					if (border1 <= start) {
 						break;
 					}
-					int c = COMPARE::compare(list[border1], list[start]);
-					if (c < 0) {
+					if (compare(list[border1], list[start]) < 0) {
 						break;
 					}
 				}
@@ -302,7 +304,7 @@ void QuickSort<TYPE, COMPARE>::sortAsc(TYPE* list, sl_size size)
 }
 
 template <class TYPE, class COMPARE>
-void QuickSort<TYPE, COMPARE>::sortDesc(TYPE* list, sl_size size)
+void QuickSort::sortDesc(TYPE* list, sl_size size, const COMPARE& compare)
 {
 	if (size < 2) {
 		return;
@@ -314,7 +316,7 @@ void QuickSort<TYPE, COMPARE>::sortDesc(TYPE* list, sl_size size)
 	for(;;) {
 		sl_size n = end - start + 1;
 		if (n < 8) {
-			InsertionSort<TYPE, COMPARE>::sortDesc(list + start, n);
+			InsertionSort::sortDesc(list + start, n);
 		} else {
 			sl_size mid = start + (n / 2);
 			Swap(list[mid], list[start]);
@@ -326,8 +328,7 @@ void QuickSort<TYPE, COMPARE>::sortDesc(TYPE* list, sl_size size)
 					if (border2 > end) {
 						break;
 					}
-					int c = COMPARE::compare(list[border2], list[start]);
-					if (c < 0) {
+					if (compare(list[border2], list[start]) < 0) {
 						break;
 					}
 				};
@@ -336,8 +337,7 @@ void QuickSort<TYPE, COMPARE>::sortDesc(TYPE* list, sl_size size)
 					if (border1 <= start) {
 						break;
 					}
-					int c = COMPARE::compare(list[border1], list[start]);
-					if (c > 0) {
+					if (compare(list[border1], list[start]) > 0) {
 						break;
 					}
 				}
@@ -383,12 +383,12 @@ void QuickSort<TYPE, COMPARE>::sortDesc(TYPE* list, sl_size size)
 }
 
 template <class TYPE, class COMPARE>
-void QuickSort<TYPE, COMPARE>::sort(TYPE* list, sl_size size, sl_bool flagAsc)
+void QuickSort::sort(TYPE* list, sl_size size, sl_bool flagAsc, const COMPARE& compare)
 {
 	if (flagAsc) {
-		sortAsc(list, size);
+		sortAsc(list, size, compare);
 	} else {
-		sortDesc(list, size);
+		sortDesc(list, size, compare);
 	}
 }
 

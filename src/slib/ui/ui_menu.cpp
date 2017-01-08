@@ -95,12 +95,12 @@ void MenuItem::setSubmenu(const Ref<Menu>& menu)
 	m_submenu = menu;
 }
 
-Callback MenuItem::getAction() const
+Function<void()> MenuItem::getAction() const
 {
 	return m_action;
 }
 
-void MenuItem::setAction(const Callback& action)
+void MenuItem::setAction(const Function<void()>& action)
 {
 	m_action = action;
 }
@@ -161,7 +161,7 @@ sl_uint32 Menu::getMenuItemsCount() const
 
 Ref<MenuItem> Menu::getMenuItem(sl_uint32 index) const
 {
-	return m_items.getItemValue(index, Ref<MenuItem>::null());
+	return m_items.getValueAt(index);
 }
 
 void Menu::show(const UIPoint& pt)
@@ -268,7 +268,7 @@ sl_bool Menu::processShortcutKey(const KeycodeAndModifiers& km)
 
 Ref<Menu> Menu::create()
 {
-	return Ref<Menu>::null();
+	return sl_null;
 }
 
 #endif

@@ -24,7 +24,7 @@ protected:
 	void onFrame(RenderEngine* engine);
 	
 protected:
-	SafeRef<Texture> m_textureFrame;
+	AtomicRef<Texture> m_textureFrame;
 	sl_bool m_flagYUV;
 	
 	Ref<RenderProgram2D_PositionTexture> m_programRGB;

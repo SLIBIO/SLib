@@ -56,9 +56,9 @@ public:
 
 	virtual void setSubmenu(const Ref<Menu>& menu);
 
-	Callback getAction() const;
+	Function<void()> getAction() const;
 
-	virtual void setAction(const Callback& action);
+	virtual void setAction(const Function<void()>& action);
 
 	virtual sl_bool isSeparator() const;
 
@@ -69,15 +69,15 @@ public:
 protected:
 	WeakRef<Menu> m_parent;
 
-	SafeString m_text;
+	AtomicString m_text;
 	KeycodeAndModifiers m_shortcutKey;
 	KeycodeAndModifiers m_secondShortcutKey;
 	sl_bool m_flagEnabled;
 	sl_bool m_flagChecked;
-	SafeRef<Bitmap> m_icon;
-	SafeRef<Bitmap> m_checkedIcon;
-	SafeRef<Menu> m_submenu;
-	SafeCallback m_action;
+	AtomicRef<Bitmap> m_icon;
+	AtomicRef<Bitmap> m_checkedIcon;
+	AtomicRef<Menu> m_submenu;
+	AtomicFunction<void()> m_action;
 
 };
 
@@ -92,7 +92,7 @@ public:
 	Ref<Bitmap> icon;
 	Ref<Bitmap> checkedIcon;
 	Ref<Menu> submenu;
-	Callback action;
+	Function<void()> action;
 
 public:
 	MenuItemParam();

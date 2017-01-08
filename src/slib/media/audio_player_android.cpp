@@ -3,6 +3,8 @@
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 
 #include "../../../inc/slib/media/audio_player.h"
+
+#include "../../../inc/slib/media/opensl_es.h"
 #include "../../../inc/slib/ui/platform.h"
 #include "../../../inc/slib/core/safe_static.h"
 
@@ -35,6 +37,15 @@ public:
 		isStartedBeforePrepared = sl_false;
 	}
 
+	~_Android_AudioPlayerControl()
+	{
+		_AndroidAudioPlayerControlMap* map = _AndroidAudioPlayerControls_get();
+		if (map) {
+			map->remove((jlong) this);
+		}
+	}
+
+public:
 	void init(const String& url)
 	{
 		JniLocal<jstring> _url = Jni::getJniString(url);
@@ -53,16 +64,9 @@ public:
 	{
 	}
 
-	~_Android_AudioPlayerControl()
-	{
-		_AndroidAudioPlayerControlMap* map = _AndroidAudioPlayerControls_get();
-		if (map) {
-			map->remove((jlong) this);
-		}
-	}
 
-public:
-	void start()
+	// override
+	void resume()
 	{
 		if (!isPrepared) {
 			isStartedBeforePrepared = sl_true;
@@ -78,6 +82,7 @@ public:
 		}
 	}
 
+	// override
 	void pause()
 	{
 		ObjectLocker lock(this);
@@ -91,6 +96,7 @@ public:
 		}
 	}
 
+	// override
 	void stop()
 	{
 		ObjectLocker lock(this);
@@ -105,6 +111,7 @@ public:
 		}
 	}
 
+	// override
 	sl_bool isRunning()
 	{
 		ObjectLocker lock(this);
@@ -120,7 +127,7 @@ public:
 	{
 		isPrepared = sl_true;
 		if (isStartedBeforePrepared) {
-			start();
+			resume();
 		}
 	}
 
@@ -130,38 +137,61 @@ public:
 	}
 
 private:
-	JniSafeGlobal<jobject> m_player;
-	sl_bool isPrepared, isStartedBeforePrepared;
+	AtomicJniGlobal<jobject> m_player;
+	sl_bool isPrepared;
+	sl_bool isStartedBeforePrepared;
 };
 
-class _Android_AudioPlayer : public AudioPlayer {
+class _Android_AudioPlayer : public AudioPlayer
+{
 public:
-	_Android_AudioPlayer()
-	{
-	}
-
-	~_Android_AudioPlayer()
-	{
-	}
+	AudioPlayerParam m_param;
+	Ref<AudioPlayer> m_playerOpenSLES;
 
 public:
-	static void logError(String text)
-	{
-
-	}
-
 	static Ref<_Android_AudioPlayer> create(const AudioPlayerParam& param)
 	{
 		Ref<_Android_AudioPlayer> ret = new _Android_AudioPlayer();
-		return ret;
+		if (ret.isNotNull()) {
+			ret->m_param = param;
+			return ret;
+		}
+		return sl_null;
 	}
 
 	Ref<AudioPlayerBuffer> createBuffer(const AudioPlayerBufferParam& param)
 	{
+		Ref<AudioPlayer> playerOpenSLES;
+		{
+			ObjectLocker lock(this);
+			if (m_playerOpenSLES.isNull()) {
+				m_playerOpenSLES = OpenSL_ES::createPlayer(m_param);
+			}
+			playerOpenSLES = m_playerOpenSLES;
+		}
+		if (playerOpenSLES.isNotNull()) {
+			return playerOpenSLES->createBuffer(param);
+		}
 		return sl_null;
 	}
 
-	Ref<AudioPlayerControl> _openNative(const AudioPlayerOpenParam& param);
+	Ref<AudioPlayerControl> _openNative(const AudioPlayerOpenParam& param)
+	{
+		Ref<_Android_AudioPlayerControl> ret = new _Android_AudioPlayerControl;
+		if (ret.isNotNull()) {
+			if (param.data.isNotNull() && param.data.getSize() > 0) {
+				ret->init(param.data);
+			} else if (param.url.isNotNull() && param.url.getLength() > 0) {
+				ret->init(param.url);
+			}
+			if (param.flagAutoStart) {
+				ret->resume();
+			}
+			return ret;
+		}
+		return sl_null;
+	}
+
 };
 
 Ref<AudioPlayer> AudioPlayer::create(const AudioPlayerParam& param)
@@ -177,23 +207,6 @@ List<AudioPlayerInfo> AudioPlayer::getPlayersList()
 	return List<AudioPlayerInfo>::createFromElement(ret);
 }
 
-Ref<AudioPlayerControl> _Android_AudioPlayer::_openNative(const AudioPlayerOpenParam &param)
-{
-	Ref<_Android_AudioPlayerControl> ret = new _Android_AudioPlayerControl;
-	if (ret.isNotNull()) {
-		if (param.data.isNotNull() && param.data.getSize() > 0) {
-			ret->init(param.data);
-		} else if (param.url.isNotNull() && param.url.getLength() > 0) {
-			ret->init(param.url);
-		}
-		if (param.flagAutoStart) {
-			ret->start();
-		}
-		return ret;
-	}
-	return sl_null;
-}
-
 void _AudioPlayer_onCompleted(JNIEnv* env, jobject _this, jlong instance)
 {
 	_AndroidAudioPlayerControlMap* map = _AndroidAudioPlayerControls_get();
@@ -206,7 +219,6 @@ void _AudioPlayer_onCompleted(JNIEnv* env, jobject _this, jlong instance)
 		}
 	}
 }
-
 
 void _AudioPlayer_onPrepared(JNIEnv* env, jobject _this, jlong instance)
 {

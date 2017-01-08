@@ -16,10 +16,10 @@ SLIB_NAMESPACE_BEGIN
 class SLIB_EXPORT Url
 {
 public:
-	SafeString scheme;
-	SafeString host;
-	SafeString path;
-	SafeString query;
+	AtomicString scheme;
+	AtomicString host;
+	AtomicString path;
+	AtomicString query;
 
 public:
 	void parse(const String& url);

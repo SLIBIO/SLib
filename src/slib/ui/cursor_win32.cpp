@@ -54,7 +54,7 @@ HCURSOR UIPlatform::getCursorHandle(const Ref<Cursor>& cursor)
 	if (cursor.isNull()) {
 		return NULL;
 	}
-	_Win32_Cursor* c = (_Win32_Cursor*)(cursor.ptr);
+	_Win32_Cursor* c = (_Win32_Cursor*)(cursor.get());
 	return c->m_hCursor;
 }
 
@@ -99,7 +99,7 @@ void Cursor::setCurrent(const Ref<Cursor>& cursor)
 	if (cursor.isNull()) {
 		return;
 	}
-	_Win32_Cursor* c = (_Win32_Cursor*)(cursor.ptr);
+	_Win32_Cursor* c = (_Win32_Cursor*)(cursor.get());
 	::SetCursor(c->m_hCursor);
 }
 

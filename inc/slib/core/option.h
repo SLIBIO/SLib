@@ -1,6 +1,10 @@
 #ifndef CHECKHEADER_SLIB_CORE_OPTION
 #define CHECKHEADER_SLIB_CORE_OPTION
 
+#if !defined(_MSC_VER) && __cplusplus < 201103
+#	error "Slib needs at least a C++11 compliant compiler. Please enable C++11 in Project Settings"
+#endif
+
 /* Platforms */
 // Windows Platforms
 #define SLIB_PLATFORM_WIN32			0x01010000

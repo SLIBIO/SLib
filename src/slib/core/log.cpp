@@ -80,73 +80,49 @@ public:
 };
 
 
-Log::Log()
+LoggerSet::LoggerSet()
 {
 }
 
-Log::Log(const Ref<Logger>& logger, const Ref<Logger>& errorLogger)
+LoggerSet::LoggerSet(const Ref<Logger>& logger, const Ref<Logger>& errorLogger)
 {
 	addDefaultLogger(logger);
 	addErrorLogger(errorLogger);
 }
 
-Ref<Log> Log::global()
-{
-	Ref<Logger> console(getConsoleLogger());
-	SLIB_SAFE_STATIC(Ref<Log>, log, new Log(console, console))
-	if (SLIB_SAFE_STATIC_CHECK_FREED(log)) {
-		return Ref<Log>::null();
-	}
-	return log;
-}
-
-Ref<Logger> Log::getConsoleLogger()
-{
-	SLIB_SAFE_STATIC(Ref<Logger>, logger, new ConsoleLogger)
-	if (SLIB_SAFE_STATIC_CHECK_FREED(logger)) {
-		return Ref<Logger>::null();
-	}
-	return logger;
-}
-
-Ref<Logger> Log::createFileLogger(const String& fileName)
-{
-	return new FileLogger(fileName);
-}
-
-void Log::clearDefaultLogger()
+void LoggerSet::clearDefaultLogger()
 {
 	m_listLoggers.removeAll();
 }
 
-void Log::addDefaultLogger(const Ref<Logger>& logger)
+void LoggerSet::addDefaultLogger(const Ref<Logger>& logger)
 {
 	m_listLoggers.add(logger);
 }
 
-void Log::removeDefaultLogger(const Ref<Logger>& logger)
+void LoggerSet::removeDefaultLogger(const Ref<Logger>& logger)
 {
 	m_listLoggers.removeValue(logger);
 }
 
 
-void Log::clearErrorLogger()
+void LoggerSet::clearErrorLogger()
 {
 	m_listErrorLoggers.removeAll();
 }
 
-void Log::addErrorLogger(const Ref<Logger>& logger)
+void LoggerSet::addErrorLogger(const Ref<Logger>& logger)
 {
 	m_listErrorLoggers.add(logger);
 }
 
-void Log::removeErrorLogger(const Ref<Logger>& logger)
+void LoggerSet::removeErrorLogger(const Ref<Logger>& logger)
 {
 	m_listErrorLoggers.removeValue(logger);
 }
 
 
-void Log::log(const String& tag, const String& content)
+void LoggerSet::log(const String& tag, const String& content)
 {
 	ListLocker< Ref<Logger> > list(m_listLoggers);
 	for (sl_size i = 0; i < list.count; i++) {
@@ -154,7 +130,7 @@ void Log::log(const String& tag, const String& content)
 	}
 }
 
-void Log::logError(const String& tag, const String& content)
+void LoggerSet::logError(const String& tag, const String& content)
 {
 	ListLocker< Ref<Logger> > list(m_listLoggers);
 	for (sl_size i = 0; i < list.count; i++) {
@@ -162,30 +138,44 @@ void Log::logError(const String& tag, const String& content)
 	}
 }
 
-void Log::logGlobal(const String& tag, const String& content)
+Ref<LoggerSet> Logger::global()
 {
-	Ref<Log> log = global();
+	Ref<Logger> console(getConsoleLogger());
+	SLIB_SAFE_STATIC(Ref<LoggerSet>, log, new LoggerSet(console, console))
+	if (SLIB_SAFE_STATIC_CHECK_FREED(log)) {
+		return sl_null;
+	}
+	return log;
+}
+
+Ref<Logger> Logger::getConsoleLogger()
+{
+	SLIB_SAFE_STATIC(Ref<Logger>, logger, new ConsoleLogger)
+	if (SLIB_SAFE_STATIC_CHECK_FREED(logger)) {
+		return sl_null;
+	}
+	return logger;
+}
+
+Ref<Logger> Logger::createFileLogger(const String& fileName)
+{
+	return new FileLogger(fileName);
+}
+
+void Logger::logGlobal(const String& tag, const String& content)
+{
+	Ref<LoggerSet> log = global();
 	if (log.isNotNull()) {
 		log->log(tag, content);
 	}
 }
 
-void Log::logGlobalError(const String& tag, const String& content)
+void Logger::logGlobalError(const String& tag, const String& content)
 {
-	Ref<Log> log = global();
+	Ref<LoggerSet> log = global();
 	if (log.isNotNull()) {
 		log->logError(tag, content);
 	}
-}
-
-void _log(const char* tag, const char* msg)
-{
-	SLIB_LOG(tag, msg);
-}
-
-void _log_error(const char* tag, const char* msg)
-{
-	SLIB_LOG_ERROR(tag, msg);
 }
 
 SLIB_NAMESPACE_END

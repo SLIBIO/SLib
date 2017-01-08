@@ -49,7 +49,7 @@ SLIB_SAFE_STATIC_GETTER(_UrlRequestShared, _getUrlRequestShared)
 
 class _UrlRequest : public UrlRequest {
 public:
-	JniSafeGlobal<jobject> m_jrequest;
+	AtomicJniGlobal<jobject> m_jrequest;
 
 public:
 	_UrlRequest() {
@@ -65,11 +65,11 @@ public:
 			Ref<_UrlRequest> ret = new _UrlRequest;
 			if (ret.isNotNull()) {
 				ret->_init(param, url, downloadFilePath);
-				shared->threadPool->addTask(SLIB_CALLBACK(&(_UrlRequest::execute), WeakRef<_UrlRequest>(ret)));
+				shared->threadPool->addTask(Function<void()>::bind(&(_UrlRequest::execute), WeakRef<_UrlRequest>(ret)));
 				return ret;
 			}
 		}
-		return Ref<_UrlRequest>::null();
+		return sl_null;
 	}
 
 	// override
@@ -87,13 +87,13 @@ public:
 		JniLocal<jobjectArray> jheaders;
 		{
 			CList<String> list;
-			Iterator< Pair<String, String> > iterator = request->m_requestHeaders.iterator();
+			Iterator< Pair<String, String> > iterator = request->m_requestHeaders.toIterator();
 			Pair<String, String> pair;
 			while (iterator.next(&pair)) {
 				list.add_NoLock(pair.key);
 				list.add_NoLock(pair.value);
 			}
-			ListItems<String> m(list);
+			ListElements<String> m(list);
 			if (m.count > 0) {
 				jheaders = Jni::newStringArray(m.count);
 				if (jheaders.isNotNull()) {
@@ -109,13 +109,13 @@ public:
 		JniLocal<jobjectArray> jadditionalHeaders;
 		{
 			CList<String> list;
-			Iterator< Pair<String, String> > iterator = request->m_additionalRequestHeaders.iterator();
+			Iterator< Pair<String, String> > iterator = request->m_additionalRequestHeaders.toIterator();
 			Pair<String, String> pair;
 			while (iterator.next(&pair)) {
 				list.add_NoLock(pair.key);
 				list.add_NoLock(pair.value);
 			}
-			ListItems<String> m(list);
+			ListElements<String> m(list);
 			if (m.count > 0) {
 				jadditionalHeaders = Jni::newStringArray(m.count);
 				if (jadditionalHeaders.isNotNull()) {
@@ -166,7 +166,7 @@ public:
 			sl_uint32 n = Jni::getArrayLength(headers);
 			if (n > 0) {
 				Map<String, String> map;
-				map.initHashBy<HashIgnoreCaseString, CompareIgnoreCaseString>();
+				map.initHash(0, HashIgnoreCaseString(), CompareIgnoreCaseString());
 				if (map.isNotNull()) {
 					for (sl_uint32 i = 0; i < n - 1; i += 2) {
 						String key = Jni::getStringArrayElement(headers, i);

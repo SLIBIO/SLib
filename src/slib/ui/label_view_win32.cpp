@@ -100,7 +100,7 @@ Ref<ViewInstance> LabelView::createNativeWidget(ViewInstance* parent)
 {
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
 	if (!shared) {
-		return Ref<ViewInstance>::null();
+		return sl_null;
 	}
 
 	int style = SS_NOTIFY;
@@ -120,7 +120,7 @@ Ref<ViewInstance> LabelView::createNativeWidget(ViewInstance* parent)
 		HWND handle = ret->getHandle();
 
 		Ref<Font> font = getFont();
-		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
@@ -159,8 +159,7 @@ void LabelView::_setTextAlignment_NW(Alignment _align)
 void LabelView::_setTextColor_NW(const Color& color)
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_LabelViewInstance::checkInstance(_instance.ptr)) {
-		_Win32_LabelViewInstance* instance = ((_Win32_LabelViewInstance*)(_instance.ptr));
+	if (_Win32_LabelViewInstance* instance = CastInstance<_Win32_LabelViewInstance>(_instance.get())) {
 		instance->setTextColor(color); 
 	}
 }
@@ -169,7 +168,7 @@ void LabelView::_setFont_NW(const Ref<Font>& font)
 {
 	HWND handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		HFONT hFont = GraphicsPlatform::getGdiFont(font.ptr);
+		HFONT hFont = GraphicsPlatform::getGdiFont(font.get());
 		if (hFont) {
 			::SendMessageW(handle, WM_SETFONT, (WPARAM)hFont, TRUE);
 		}
@@ -194,8 +193,7 @@ void LabelView::_setBorder_NW(sl_bool flag)
 void LabelView::_setBackgroundColor_NW(const Color& color)
 {
 	Ref<ViewInstance> _instance = getViewInstance();
-	if (_Win32_LabelViewInstance::checkInstance(_instance.ptr)) {
-		_Win32_LabelViewInstance* instance = ((_Win32_LabelViewInstance*)(_instance.ptr));
+	if (_Win32_LabelViewInstance* instance = CastInstance<_Win32_LabelViewInstance>(_instance.get())) {
 		instance->setBackgroundColor(color);
 	}
 }

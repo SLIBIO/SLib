@@ -131,10 +131,10 @@ void LabelView::onDraw(Canvas* canvas)
 static List<String16> _Label_getLines(const String16& text)
 {
 	const sl_char16* buf = text.getData();
-	sl_uint32 len = text.getLength();
+	sl_uint32 len = (sl_uint32)(text.getLength());
 	sl_uint32 indexStart = 0;
 	List<String16> lines;
-	for (sl_size i = 0; i <= len; i++) {
+	for (sl_uint32 i = 0; i <= len; i++) {
 		sl_char16 ch = buf[i];
 		if (ch == '\r' || ch == '\n' || ch == 0) {
 			String16 line = String16(buf + indexStart, i - indexStart);
@@ -287,7 +287,7 @@ void LabelView::_makeMultilineList()
 
 Ref<ViewInstance> LabelView::createNativeWidget(ViewInstance* parent)
 {
-	return Ref<ViewInstance>::null();
+	return sl_null;
 }
 
 void LabelView::_setText_NW(const String& text)

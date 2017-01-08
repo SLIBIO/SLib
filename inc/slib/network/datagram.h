@@ -73,10 +73,10 @@ protected:
 	void onConnect(AsyncTcpSocket* socket, const SocketAddress& address, sl_bool flagError);
 	
 	// override
-	void onReceive(AsyncTcpSocket* socket, void* data, sl_uint32 sizeReceive, const Referable* refData, sl_bool flagError);
+	void onReceive(AsyncTcpSocket* socket, void* data, sl_uint32 sizeReceive, Referable* refData, sl_bool flagError);
 	
 	// override
-	void onSend(AsyncTcpSocket* socket, void* data, sl_uint32 sizeSent, const Referable* refData, sl_bool flagError);
+	void onSend(AsyncTcpSocket* socket, void* data, sl_uint32 sizeSent, Referable* refData, sl_bool flagError);
 	
 	void onMessageError(AsyncTcpSocket* socket);
 	

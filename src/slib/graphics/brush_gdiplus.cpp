@@ -48,7 +48,7 @@ public:
 				m_platformObject = new _Gdiplus_BrushObject(m_desc);
 			}
 		}
-		return (_Gdiplus_BrushObject*)(m_platformObject.ptr);;
+		return (_Gdiplus_BrushObject*)(m_platformObject.get());;
 	}
 
 	Gdiplus::Brush* getPlatformHandle()

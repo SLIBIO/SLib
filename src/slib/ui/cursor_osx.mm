@@ -36,7 +36,7 @@ NSCursor* UIPlatform::getCursorHandle(const Ref<Cursor>& cursor)
 	if (cursor.isNull()) {
 		return nil;
 	}
-	_OSX_Cursor* c = (_OSX_Cursor*)(cursor.ptr);
+	_OSX_Cursor* c = (_OSX_Cursor*)(cursor.get());
 	return c->m_cursor;
 }
 
@@ -75,7 +75,7 @@ void Cursor::setCurrent(const Ref<Cursor>& cursor)
 	if (cursor.isNull()) {
 		return;
 	}
-	_OSX_Cursor* c = (_OSX_Cursor*)(cursor.ptr);
+	_OSX_Cursor* c = (_OSX_Cursor*)(cursor.get());
 	[c->m_cursor set];
 }
 

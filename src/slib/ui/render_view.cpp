@@ -54,7 +54,7 @@ void RenderView::renderViewContent(RenderEngine* engine)
 	engine->setBlending(sl_true);
 	Ref<RenderCanvas> canvas = RenderCanvas::create(engine, (sl_real)(getWidth()), (sl_real)(getHeight()));
 	if (canvas.isNotNull()) {
-		dispatchDraw(canvas.ptr);
+		dispatchDraw(canvas.get());
 	}
 }
 
@@ -84,7 +84,7 @@ void RenderView::dispatchFrame(RenderEngine* engine)
 
 Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* parent)
 {
-	return Ref<ViewInstance>::null();
+	return sl_null;
 }
 
 void RenderView::_setRedrawMode_NW(RedrawMode mode)

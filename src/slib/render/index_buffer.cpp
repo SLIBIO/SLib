@@ -42,7 +42,7 @@ Ref<IndexBuffer> IndexBuffer::create(const Memory& mem)
 			return ret;
 		}
 	}
-	return Ref<IndexBuffer>::null();
+	return sl_null;
 }
 
 Ref<IndexBuffer> IndexBuffer::create(const void* buf, sl_size size)
@@ -82,7 +82,7 @@ void IndexBuffer::update(sl_size offset, sl_size size)
 	for (int i = 0; i < SLIB_MAX_RENDER_ENGINE_COUNT_PER_OBJECT; i++) {
 		Ref<RenderBaseObjectInstance> instance = m_instances[i];
 		if (instance.isNotNull()) {
-			((IndexBufferInstance*)(instance.ptr))->notifyUpdated(offset, size);
+			((IndexBufferInstance*)(instance.get()))->notifyUpdated(offset, size);
 		}
 	}
 }

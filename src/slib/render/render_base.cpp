@@ -11,6 +11,10 @@ RenderBaseObjectInstance::RenderBaseObjectInstance()
 	m_flagUpdated = sl_false;
 }
 
+RenderBaseObjectInstance::~RenderBaseObjectInstance()
+{
+}
+
 void RenderBaseObjectInstance::link(const Ref<RenderEngine>& engine, const Ref<RenderBaseObject>& object)
 {
 	m_object = object;
@@ -61,7 +65,7 @@ void RenderBaseObject::addInstance(const Ref<RenderBaseObjectInstance>& instance
 			}
 			Ref<RenderEngine> engine(instance->m_engine);
 			if (engine.isNotNull()) {
-				if (engine.ptr == engineNew.ptr) {
+				if (engine.get() == engineNew.get()) {
 					return;
 				}
 			} else {
@@ -110,7 +114,7 @@ Ref<RenderBaseObjectInstance> RenderBaseObject::getInstance(RenderEngine* engine
 			if (instance.isNotNull()) {
 				Ref<RenderEngine> instanceEngine(instance->m_engine);
 				if (instanceEngine.isNotNull()) {
-					if (instanceEngine.ptr == engine) {
+					if (instanceEngine.get() == engine) {
 						return instance;
 					}
 				} else {
@@ -119,7 +123,7 @@ Ref<RenderBaseObjectInstance> RenderBaseObject::getInstance(RenderEngine* engine
 			}
 		}
 	}
-	return Ref<RenderBaseObjectInstance>::null();
+	return sl_null;
 }
 
 SLIB_RENDER_NAMESPACE_END

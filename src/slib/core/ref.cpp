@@ -1,9 +1,16 @@
 #include "../../../inc/slib/core/ref.h"
-#include "../../../inc/slib/core/object.h"
 
 SLIB_NAMESPACE_BEGIN
 
 #define _SIGNATURE 0x15181289
+
+struct _Ref_Const
+{
+	void* ptr;
+	sl_int32 lock;
+};
+
+const _Ref_Const _Ref_Null = {0, 0};
 
 Referable::Referable()
 {
@@ -79,12 +86,12 @@ void Referable::makeNeverFree()
 	m_nRefCount = -1;
 }
 
-sl_class_type Referable::getClassType() const
+sl_object_type Referable::getObjectType() const
 {
 	return 0;
 }
 
-sl_bool Referable::checkClassType(sl_class_type type) const
+sl_bool Referable::isInstanceOf(sl_object_type type) const
 {
 	return sl_false;
 }
@@ -112,8 +119,6 @@ void Referable::_checkValid()
 }
 #endif
 
-const _Ref_Const _Ref_Null = {0, 0};
-
 
 SLIB_DEFINE_ROOT_OBJECT(CWeakRef)
 
@@ -121,7 +126,7 @@ CWeakRef::CWeakRef()
 {
 }
 
-CWeakRef* CWeakRef::create(const Referable* object)
+CWeakRef* CWeakRef::create(Referable* object)
 {
 	CWeakRef* ret = new CWeakRef;
 	if (ret) {
@@ -153,6 +158,18 @@ void CWeakRef::release()
 		m_object = sl_null;
 	}
 	decreaseReference();
+}
+
+
+ReferableKeeper::ReferableKeeper(Referable* object)
+{
+	m_object = object;
+	object->increaseReference();
+}
+
+ReferableKeeper::~ReferableKeeper()
+{
+	m_object->decreaseReferenceNoFree();
 }
 
 SLIB_NAMESPACE_END

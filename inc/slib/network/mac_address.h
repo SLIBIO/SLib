@@ -25,7 +25,7 @@ public:
 	MacAddress(sl_uint8 m0, sl_uint8 m1, sl_uint8 m2, sl_uint8 m3, sl_uint8 m4, sl_uint8 m5);
 	
 	MacAddress(const String& address);
-
+	
 public:
 	static const MacAddress& zero();
 	
@@ -34,7 +34,7 @@ public:
 	sl_bool isNotZero() const;
 
 	void setZero();
-
+	
 	static const MacAddress& getBroadcast();
 	
 	sl_bool isBroadcast() const;
@@ -65,8 +65,17 @@ public:
 	sl_bool setString(const String& address);
 
 	
-	SLIB_DECLARE_PARSE_FUNCTIONS(MacAddress)
+	template <class ST>
+	static sl_bool parse(const ST& str, MacAddress* _out)
+	{
+		return Parse(str, _out);
+	}
 	
+	template <class ST>
+	sl_bool parse(const ST& str)
+	{
+		return Parse(str, this);
+	}
 	
 public:
 	MacAddress& operator=(const MacAddress& other);
@@ -76,21 +85,40 @@ public:
 	sl_bool operator==(const MacAddress& other) const;
 	
 	sl_bool operator!=(const MacAddress& other) const;
-
+	
 private:
 	static const sl_uint8 _zero[6];
 	static const sl_uint8 _broadcast[6];
-
+	
 };
 
 template <>
-int Compare<MacAddress>::compare(const MacAddress& a, const MacAddress& b);
+sl_reg Parser<MacAddress, sl_char8>::parse(MacAddress* _out, const sl_char8 *sz, sl_size posBegin, sl_size len);
 
 template <>
-sl_bool Compare<MacAddress>::equals(const MacAddress& a, const MacAddress& b);
+sl_reg Parser<MacAddress, sl_char16>::parse(MacAddress* _out, const sl_char16 *sz, sl_size posBegin, sl_size len);
+
 
 template <>
-sl_uint32 Hash<MacAddress>::hash(const MacAddress& a);
+class Compare<MacAddress>
+{
+public:
+	int operator()(const MacAddress& a, const MacAddress& b) const;
+};
+
+template <>
+class Equals<MacAddress>
+{
+public:
+	sl_bool operator()(const MacAddress& a, const MacAddress& b) const;
+};
+
+template <>
+class Hash<MacAddress>
+{
+public:
+	sl_uint32 operator()(const MacAddress& a) const;
+};
 
 SLIB_NETWORK_NAMESPACE_END
 
@@ -99,7 +127,7 @@ SLIB_NETWORK_NAMESPACE_BEGIN
 
 SLIB_INLINE const MacAddress& MacAddress::zero()
 {
-	return *((MacAddress*)((void*)(&_zero)));
+	return *(reinterpret_cast<MacAddress const*>(&_zero));
 }
 
 SLIB_INLINE sl_bool MacAddress::isZero() const
@@ -114,7 +142,7 @@ SLIB_INLINE sl_bool MacAddress::isNotZero() const
 
 SLIB_INLINE const MacAddress& MacAddress::getBroadcast()
 {
-	return *((MacAddress*)((void*)(&_broadcast)));
+	return *(reinterpret_cast<MacAddress const*>(&_broadcast));
 }
 
 SLIB_INLINE sl_bool MacAddress::isBroadcast() const

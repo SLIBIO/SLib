@@ -25,7 +25,7 @@ public:
 class ListReportViewColumn
 {
 public:
-	SafeString title;
+	AtomicString title;
 	sl_ui_len width;
 	Alignment align;
 	Alignment headerAlign;
@@ -37,7 +37,7 @@ public:
 class ListReportViewCell
 {
 public:
-	SafeString text;
+	AtomicString text;
 };
 
 class SLIB_EXPORT ListReportView : public View
@@ -87,7 +87,7 @@ public:
 	virtual void removeAllRows(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 public:
-	SLIB_PTR_PROPERTY(IListReportViewListener, Listener)
+	SLIB_PROPERTY(AtomicPtr<IListReportViewListener>, Listener)
 	
 protected:
 	virtual void onSelectRow(sl_uint32 row);

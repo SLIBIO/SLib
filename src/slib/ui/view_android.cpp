@@ -31,7 +31,7 @@ void JNICALL _AndroidView_nativeOnDraw(JNIEnv* env, jobject _this, jlong jinstan
 	if (instance.isNotNull()) {
 		Ref<Canvas> canvas = GraphicsPlatform::createCanvas(CanvasType::View, jcanvas);
 		if (canvas.isNotNull()) {
-			instance->onDraw(canvas.ptr);
+			instance->onDraw(canvas.get());
 		}
 	}
 }
@@ -60,7 +60,7 @@ jboolean JNICALL _AndroidView_nativeOnKeyEvent(JNIEnv* env, jobject _this, jlong
 			if (flagWin) {
 				ev->setWindowsKey();
 			}
-			instance->onKeyEvent(ev.ptr);
+			instance->onKeyEvent(ev.get());
 			if (ev->isStoppedPropagation()) {
 				return 1;
 			}
@@ -92,7 +92,7 @@ jboolean JNICALL _AndroidView_nativeOnTouchEvent(JNIEnv* env, jobject _this, jlo
 				t.setMillisecondsCount(time);
 				Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, t);
 				if (ev.isNotNull()) {
-					instance->onTouchEvent(ev.ptr);
+					instance->onTouchEvent(ev.get());
 					if (ev->isStoppedPropagation()) {
 						return 1;
 					}
@@ -258,7 +258,7 @@ Ref<View> Android_ViewInstance::getAndroidView(jlong jinstance)
 	if (instance.isNotNull()) {
 		return instance->getView();
 	}
-	return Ref<View>::null();
+	return sl_null;
 }
 
 jobject Android_ViewInstance::getHandle()
@@ -391,7 +391,7 @@ UIPointf Android_ViewInstance::convertCoordinateFromViewToScreen(const UIPointf&
 void Android_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
 {
 	jobject handle = m_handle.get();
-	jobject child = UIPlatform::getViewHandle(_child.ptr);
+	jobject child = UIPlatform::getViewHandle(_child.get());
 	if (handle && child) {
 		_JAndroidView::addChild.call(sl_null, handle, child);
 	}
@@ -400,7 +400,7 @@ void Android_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
 void Android_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
 {
 	jobject handle = m_handle.get();
-	jobject child = UIPlatform::getViewHandle(_child.ptr);
+	jobject child = UIPlatform::getViewHandle(_child.get());
 	if (handle && child) {
 		_JAndroidView::removeChild.call(sl_null, handle, child);
 	}
@@ -497,7 +497,7 @@ jobject UIPlatform::getViewHandle(View* view)
 sl_bool GestureDetector::_enableNative(const Ref<View>& view, GestureType type)
 {
 	Ref<ViewInstance> _instance = view->getViewInstance();
-	Android_ViewInstance* instance = static_cast<Android_ViewInstance*>(_instance.ptr);
+	Android_ViewInstance* instance = static_cast<Android_ViewInstance*>(_instance.get());
 	if (instance) {
 		jobject handle = instance->getHandle();
 		if (handle) {
@@ -508,6 +508,8 @@ sl_bool GestureDetector::_enableNative(const Ref<View>& view, GestureType type)
 				case GestureType::SwipeDown:
 					_JAndroidView::enableGesture.call(sl_null, handle);
 					return sl_true;
+				default:
+					break;
 			}
 		}
 	}

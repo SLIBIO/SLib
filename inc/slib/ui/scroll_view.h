@@ -87,7 +87,7 @@ protected:
 	void _onScroll_NW(sl_scroll_pos x, sl_scroll_pos y);
 	
 protected:
-	SafeRef<View> m_viewContent;
+	AtomicRef<View> m_viewContent;
 	sl_bool m_flagHorizontalScroll;
 	sl_bool m_flagVerticalScroll;
 	sl_bool m_flagInitedScrollbars;

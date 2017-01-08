@@ -36,7 +36,7 @@ public:
 		} else {
 			view = new T;
 		}
-		onBindView(lv, index, view.ptr);
+		onBindView(lv, index, view.get());
 		return view;
 	}
 	
@@ -81,7 +81,7 @@ protected:
 	sl_ui_len _measureItemHeight(const Ref<View>& itemView, sl_ui_len heightList);
 
 protected:
-	SafePtr<IListViewAdapter> m_adapter;
+	AtomicPtr<IListViewAdapter> m_adapter;
 	
 	Ref<_ListContentView> m_contentView;
 	sl_bool m_flagResetAdapter;

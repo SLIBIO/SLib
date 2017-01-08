@@ -1,7 +1,6 @@
 #include "../../../inc/slib/ui/list_view.h"
 
 #include "../../../inc/slib/ui/core.h"
-#include "../../../inc/slib/core/log.h"
 
 #define MAX_ITEMS_VISIBLE 500
 #define MAX_MID_HEIGHT 1000000
@@ -85,13 +84,13 @@ void ListView::setAdapter(const Ptr<IListViewAdapter>& adapter)
 {
 	m_adapter = adapter;
 	m_flagResetAdapter = sl_true;
-	UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(ListView, _checkUpdateContent, this, sl_false));
+	UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ListView, _checkUpdateContent, this, sl_false));
 }
 
 void ListView::refreshItems()
 {
 	m_flagRefreshItems = sl_true;
-	UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(ListView, _checkUpdateContent, this, sl_false));
+	UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ListView, _checkUpdateContent, this, sl_false));
 }
 
 void ListView::onScroll(sl_scroll_pos _x, sl_scroll_pos _y)
@@ -100,12 +99,12 @@ void ListView::onScroll(sl_scroll_pos _x, sl_scroll_pos _y)
 	if (Math::isAlmostZero(y - m_lastScrollY)) {
 		return;
 	}
-	UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(ListView, _layoutItemViews, this, sl_false, sl_true, sl_false));
+	UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ListView, _layoutItemViews, this, sl_false, sl_true, sl_false));
 }
 
 void ListView::onResize(sl_ui_len x, sl_ui_len y)
 {
-	UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(ListView, _layoutItemViews, this, sl_false, sl_false, sl_true));
+	UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ListView, _layoutItemViews, this, sl_false, sl_false, sl_true));
 }
 
 void ListView::_checkUpdateContent(sl_bool fromDraw)
@@ -366,7 +365,7 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 		
 		do {
 
-			View* contentView = m_contentView.ptr;
+			View* contentView = m_contentView.get();
 
 			Ref<View>* viewsVisibleItems = m_viewsVisibleItems;
 			sl_ui_len* heightsVisibleItems = m_heightsVisibleItems;
@@ -567,7 +566,7 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 							countFreeViews--;
 						}
 					}
-					Ref<View> view = adapter->getView(this, indexGoUp - 1, viewFree.ptr);
+					Ref<View> view = adapter->getView(this, indexGoUp - 1, viewFree.get());
 					sl_ui_len h = _measureItemHeight(view, heightListView);
 					viewsGoUpItems[countGoUpViews] = view;
 					heightsGoUpItems[countGoUpViews] = h;
@@ -594,7 +593,7 @@ void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool fl
 							countFreeViews--;
 						}
 					}
-					Ref<View> view = adapter->getView(this, indexGoDown, viewFree.ptr);
+					Ref<View> view = adapter->getView(this, indexGoDown, viewFree.get());
 					sl_ui_len h = _measureItemHeight(view, heightListView);
 					viewsGoDownItems[countGoDownViews] = view;
 					heightsGoDownItems[countGoDownViews] = h;
@@ -802,7 +801,7 @@ void _ListContentView::onResizeChild(View* child, sl_ui_len width, sl_ui_len hei
 	Ref<ListView> lv = m_lv;
 	if (lv.isNotNull()) {
 		if (lv->m_lockCountLayouting == 0) {
-			UI::dispatchToUiThread(SLIB_CALLBACK_WEAKREF(ListView, _layoutItemViews, lv.ptr, sl_false, sl_false, sl_false));
+			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ListView, _layoutItemViews, lv.get(), sl_false, sl_false, sl_false));
 		}
 	}
 }

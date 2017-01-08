@@ -434,12 +434,12 @@ List<String> File::getFiles(const String& _filePath)
 {
 	String filePath = _filePath;
 	if (filePath.isEmpty()) {
-		return List<String>::null();
+		return sl_null;
 	}
 	if (File::isDirectory(filePath)) {
 		filePath = normalizeDirectoryPath(filePath);
 	} else {
-		return List<String>::null();
+		return sl_null;
 	}
 
 	SLIB_STATIC_STRING(t, "/*");
@@ -461,7 +461,7 @@ List<String> File::getFiles(const String& _filePath)
 		::FindClose(handle);
 		return ret;
 	} else {
-		return List<String>::null();
+		return sl_null;
 	}
 }
 

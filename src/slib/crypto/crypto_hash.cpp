@@ -25,7 +25,7 @@ Ref<CryptoHash> CryptoHash::create(CryptoHashType type)
 	case CryptoHashType::SHA512:
 		return new SHA512();
 	}
-	return Ref<CryptoHash>::null();
+	return sl_null;
 }
 
 Ref<CryptoHash> CryptoHash::md5()

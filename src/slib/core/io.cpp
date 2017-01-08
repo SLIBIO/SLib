@@ -481,7 +481,7 @@ sl_bool IReader::readSection(Memory* mem, sl_size maxSize)
 			return sl_false;
 		}
 		if (size == 0) {
-			*mem = Memory::null();
+			mem->setNull();
 			return sl_true;
 		}
 		Memory ret = Memory::create(size);
@@ -510,7 +510,7 @@ Memory IReader::readSection(sl_size maxSize)
 	if (readSection(&ret, maxSize)) {
 		return ret;
 	}
-	return Memory::null();
+	return sl_null;
 }
 
 sl_bool IReader::readStringSection(String* str, sl_size maxLen)
@@ -518,7 +518,7 @@ sl_bool IReader::readStringSection(String* str, sl_size maxLen)
 	Memory mem;
 	if (readSection(&mem, maxLen)) {
 		if (mem.isEmpty()) {
-			*str = String::null();
+			str->setNull();
 			return sl_true;
 		}
 		sl_size len = mem.getSize();
@@ -547,7 +547,7 @@ String IReader::readStringSection(sl_size maxLen)
 	if (readStringSection(&ret, maxLen)) {
 		return ret;
 	} else {
-		return String::null();
+		return sl_null;
 	}
 }
 
@@ -556,7 +556,7 @@ sl_bool IReader::readBigInt(BigInt* v, sl_size maxLen)
 	Memory mem;
 	if (readSection(&mem, maxLen)) {
 		if (mem.isEmpty()) {
-			*v = BigInt::null();
+			v->setNull();
 			return sl_true;
 		}
 		sl_size len = mem.getSize();
@@ -585,7 +585,7 @@ BigInt IReader::readBigInt(sl_size maxLen)
 	if (readBigInt(&ret, maxLen)) {
 		return ret;
 	} else {
-		return BigInt::null();
+		return sl_null;
 	}
 }
 
@@ -661,7 +661,7 @@ String IReader::readTextUTF8(sl_size size)
 			}
 		}
 	}
-	return String::null();
+	return sl_null;
 }
 
 String16 IReader::readTextUTF16(sl_size size, sl_bool flagBigEndian)
@@ -708,7 +708,7 @@ String16 IReader::readTextUTF16(sl_size size, sl_bool flagBigEndian)
 			return str;
 		}
 	}
-	return String16::null();
+	return sl_null;
 }
 
 String IReader::readText(sl_size size, Charset* outCharset)
@@ -745,7 +745,7 @@ String IReader::readText(sl_size size, Charset* outCharset)
 							}
 						}
 					}
-					return String::null();
+					return sl_null;
 				}
 			}
 			if (outCharset) {
@@ -782,7 +782,7 @@ String IReader::readText(sl_size size, Charset* outCharset)
 			} else {
 				return String::fromUtf8(sbuf, 2);
 			}
-			return String8::null();
+			return sl_null;
 		}
 	} else {
 		String ret = String8::allocate(size);
@@ -798,7 +798,7 @@ String IReader::readText(sl_size size, Charset* outCharset)
 	if (outCharset) {
 		*outCharset = Charset::UTF8;
 	}
-	return String8::null();
+	return sl_null;
 }
 
 String16 IReader::readText16(sl_size size, Charset* outCharset)
@@ -842,7 +842,7 @@ String16 IReader::readText16(sl_size size, Charset* outCharset)
 							return str;
 						}
 					}
-					return String16::null();
+					return sl_null;
 				}
 			}
 			SLIB_SCOPED_BUFFER(sl_char8, 4096, tbuf, size);
@@ -863,7 +863,7 @@ String16 IReader::readText16(sl_size size, Charset* outCharset)
 							buf = tbuf + 3;
 						}
 					} else {
-						return String16::null();
+						return sl_null;
 					}
 				}
 				return String16::fromUtf8(buf, size);
@@ -880,7 +880,7 @@ String16 IReader::readText16(sl_size size, Charset* outCharset)
 	if (outCharset) {
 		*outCharset = Charset::UTF8;
 	}
-	return String16::null();
+	return sl_null;
 }
 
 /***************
@@ -1700,7 +1700,7 @@ void DatagramStream::clear()
 	m_buf.clear();
 }
 
-sl_bool DatagramStream::parse(const void* _data, sl_size size, Queue<Memory>& datagrams)
+sl_bool DatagramStream::parse(const void* _data, sl_size size, LinkedQueue<Memory>& datagrams)
 {
 	sl_uint32 maxDatagram = getMaxDatagramSize();
 	ObjectLocker lock(this);
@@ -1765,11 +1765,11 @@ sl_bool DatagramStream::parse(const void* _data, sl_size size, Queue<Memory>& da
 Memory DatagramStream::build(const void* datagram, sl_uint32 size)
 {
 	if (size == 0) {
-		return Memory::null();
+		return sl_null;
 	}
 	sl_uint32 sizeMax = getMaxDatagramSize();
 	if (sizeMax > 0 && size > sizeMax) {
-		return Memory::null();
+		return sl_null;
 	}
 	Memory mem = Memory::create(size + 4);
 	if (mem.isNotEmpty()) {
@@ -1784,11 +1784,11 @@ Memory DatagramStream::build(MemoryBuffer& input)
 {
 	sl_size size = input.getSize();
 	if (size == 0 || size >= 0x80000000) {
-		return Memory::null();
+		return sl_null;
 	}
 	sl_uint32 sizeMax = getMaxDatagramSize();
 	if (sizeMax > 0 && size > sizeMax) {
-		return Memory::null();
+		return sl_null;
 	}
 	MemoryWriter writer;
 	writer.writeUint32((sl_uint32)size);

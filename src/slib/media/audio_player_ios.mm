@@ -24,7 +24,6 @@
 	slib::WeakRef<slib::AudioPlayerControl> mControl;
 }
 
--(id) initWithURL:(NSString* ) url;
 -(void) setStatus:(AVPlayerStatus) status;
 -(AVPlayerStatus) getStatus;
 -(sl_bool) isPlaying;
@@ -174,22 +173,7 @@ public:
 	}
 	
 public:
-	void start()
-	{
-		ObjectLocker lock(this);
-		if (mAVObserver != nil) {
-			[mAVObserver play];
-		}
-	}
-	
-	void pause()
-	{
-		ObjectLocker lock(this);
-		if (mAVObserver != nil) {
-			[mAVObserver pause];
-		}
-	}
-	
+	// override
 	void stop()
 	{
 		ObjectLocker lock(this);
@@ -198,6 +182,25 @@ public:
 		}
 	}
 	
+	// override
+	void resume()
+	{
+		ObjectLocker lock(this);
+		if (mAVObserver != nil) {
+			[mAVObserver play];
+		}
+	}
+	
+	// override
+	void pause()
+	{
+		ObjectLocker lock(this);
+		if (mAVObserver != nil) {
+			[mAVObserver pause];
+		}
+	}
+	
+	// override
 	sl_bool isRunning()
 	{
 		ObjectLocker lock(this);
@@ -241,7 +244,7 @@ public:
 public:
 	static void logError(String text)
 	{
-		SLIB_LOG_ERROR("AudioPlayer", text);
+		LogError("AudioPlayer", text);
 	}
 	
 	static Ref<_iOS_AudioPlayerBuffer> create(const AudioPlayerBufferParam& param)
@@ -320,7 +323,7 @@ public:
 							
 							AURenderCallbackStruct cs;
 							cs.inputProc = CallbackOutput;
-							cs.inputProcRefCon = ret.ptr;
+							cs.inputProcRefCon = ret.get();
 							
 							result = AudioUnitSetProperty(audioUnitOutput,
 														  kAudioUnitProperty_SetRenderCallback,
@@ -345,7 +348,7 @@ public:
 								logError("Failed to set callback");
 							}
 							
-							return Ref<_iOS_AudioPlayerBuffer>::null();
+							return sl_null;
 
 						}
 						
@@ -371,6 +374,7 @@ public:
 		return ret;
 	}
 	
+	// override
 	void release()
 	{
 		ObjectLocker lock(this);
@@ -386,11 +390,13 @@ public:
 		AudioConverterDispose(m_converter);
 	}
 	
+	// override
 	sl_bool isOpened()
 	{
 		return m_flagOpened;
 	}
 	
+	// override
 	void start()
 	{
 		ObjectLocker lock(this);
@@ -406,7 +412,8 @@ public:
 		m_flagRunning = sl_true;
 	}
 	
-	void pause()
+	// override
+	void stop()
 	{
 		ObjectLocker lock(this);
 		if (!m_flagOpened) {
@@ -421,17 +428,13 @@ public:
 		}
 	}
 	
-	void stop()
-	{
-		pause();
-	}
-	
+	// override
 	sl_bool isRunning()
 	{
 		return m_flagRunning;
 	}
 	
-	SafeArray<sl_int16> m_dataConvert;
+	AtomicArray<sl_int16> m_dataConvert;
 	void onConvert(sl_uint32 nFrames, AudioBufferList* data)
 	{
 		sl_uint32 nChannels = m_nChannels;
@@ -500,7 +503,7 @@ public:
 public:
 	static void logError(String text)
 	{
-		SLIB_LOG_ERROR("AudioPlayer", text);
+		LogError("AudioPlayer", text);
 	}
 	
 	static Ref<_iOS_AudioPlayer> create(const AudioPlayerParam& param)
@@ -535,13 +538,13 @@ Ref<AudioPlayerControl> _iOS_AudioPlayer::_openNative(const AudioPlayerOpenParam
 	if (param.data.isNotNull() && param.data.getSize() > 0) {
 		Ref<AudioPlayerControl> ret = new _iOS_AudioPlayerControl(param.data);
 		if (param.flagAutoStart) {
-			ret->start();
+			ret->resume();
 		}
 		return ret;
 	} else if (param.url.isNotNull() && param.url.getLength() > 0) {
 		Ref<AudioPlayerControl> ret = new _iOS_AudioPlayerControl(param.url);
 		if (param.flagAutoStart) {
-			ret->start();
+			ret->resume();
 		}
 		return ret;
 	} else {

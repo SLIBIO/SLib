@@ -112,7 +112,7 @@ public:
 			if (index < m_nColumnNames) {
 				return m_columnNames[index];
 			}
-			return String::null();
+			return sl_null;
 		}
 
 		// override
@@ -151,7 +151,7 @@ public:
 			if (buf && n > 0) {
 				return Memory::create(buf, n);
 			}
-			return Memory::null();
+			return sl_null;
 		}
 
 		Variant _getValue(sl_uint32 index)
@@ -176,7 +176,7 @@ public:
 			case SQLITE_BLOB:
 				return _getBlob(index);
 			}
-			return Variant::null();
+			return sl_null;
 		}
 
 		// override
@@ -185,7 +185,7 @@ public:
 			if (index < m_nColumnNames) {
 				return _getValue(index);
 			}
-			return Variant::null();
+			return sl_null;
 		}
 
 		// override
@@ -202,7 +202,7 @@ public:
 					return _getString(index);
 				}
 			}
-			return String::null();
+			return sl_null;
 		}
 
 		// override
@@ -318,7 +318,7 @@ public:
 					return _getBlob(index);
 				}
 			}
-			return Memory::null();
+			return sl_null;
 		}
 
 		// override
@@ -416,9 +416,9 @@ public:
 		}
 
 		// override
-		sl_int64 execute(const Variant* params, sl_uint32 nParams)
+		sl_int64 executeBy(const Variant* params, sl_uint32 nParams)
 		{
-			ObjectLocker lock(m_db.ptr);
+			ObjectLocker lock(m_db.get());
 			if (_execute(params, nParams)) {
 				if (::sqlite3_step(m_statement) == SQLITE_DONE) {
 					::sqlite3_reset(m_statement);
@@ -430,12 +430,12 @@ public:
 		}
 
 		// override
-		Ref<DatabaseCursor> query(const Variant* params, sl_uint32 nParams)
+		Ref<DatabaseCursor> queryBy(const Variant* params, sl_uint32 nParams)
 		{
-			ObjectLocker lock(m_db.ptr);
+			ObjectLocker lock(m_db.get());
 			Ref<DatabaseCursor> ret;
 			if (_execute(params, nParams)) {
-				ret = new _DatabaseCursor(m_db.ptr, this, m_statement);
+				ret = new _DatabaseCursor(m_db.get(), this, m_statement);
 				if (ret.isNotNull()) {
 					return ret;
 				}

@@ -12,17 +12,42 @@
 SLIB_NAMESPACE_BEGIN
 
 template <class KT, class VT>
+class Map;
+
+template <class KT, class VT>
+using AtomicMap = Atomic< Map<KT, VT> >;
+
+
+template <class KT, class VT>
 class SLIB_EXPORT Pair
 {
 public:
 	KT key;
 	VT value;
+	
+public:
+	SLIB_INLINE Pair() {}
+	
+	SLIB_INLINE Pair(const Pair<KT, VT>& other) = default;
+	
+	SLIB_INLINE Pair(Pair<KT, VT>&& other) = default;
+	
+	template <class T1, class T2>
+	SLIB_INLINE Pair(T1&& _key, T2&& _value) : key(Forward<T1>(_key)), value(Forward<T2>(_value)) {}
+	
+	SLIB_INLINE Pair<KT, VT>& operator=(const Pair<KT, VT>& other) = default;
+	
+	SLIB_INLINE Pair<KT, VT>& operator=(Pair<KT, VT>&& other) = default;
+	
 };
+
+extern const char _Map_ClassID[];
 
 template <class KT, class VT>
 class SLIB_EXPORT IMap : public Object
 {
-	SLIB_DECLARE_OBJECT
+	SLIB_TEMPLATE_OBJECT(Object, _Map_ClassID)
+
 public:
 	static IMap<KT, VT>* createDefault();
 	
@@ -32,11 +57,15 @@ public:
 
 	sl_bool isNotEmpty() const;
 
-	virtual VT* getItemPtr(const KT& key) const = 0;
+	virtual VT* getItemPointer(const KT& key) const = 0;
 	
 	sl_bool get_NoLock(const KT& key, VT* _out = sl_null) const;
 	
 	sl_bool get(const KT& key, VT* _out = sl_null) const;
+	
+	VT getValue_NoLock(const KT& key) const;
+	
+	VT getValue(const KT& key) const;
 	
 	VT getValue_NoLock(const KT& key, const VT& def) const;
 	
@@ -49,8 +78,6 @@ public:
 	virtual sl_bool put_NoLock(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null) = 0;
 	
 	sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
-	
-	void putAll(IMap<KT, VT>* other, MapPutMode mode = MapPutMode::Default);
 	
 	template <class _KT, class _VT>
 	void putAll(IMap<_KT, _VT>* other, MapPutMode mode = MapPutMode::Default);
@@ -75,29 +102,29 @@ public:
 	
 	IMap<KT, VT>* duplicate() const;
 	
-	virtual Iterator<KT> keyIteratorWithRefer(const Referable* refer) const = 0;
+	virtual Iterator<KT> getKeyIteratorWithRefer(Referable* refer) const = 0;
 	
-	Iterator<KT> keyIterator() const;
+	Iterator<KT> getKeyIterator() const;
 	
-	virtual List<KT> keys_NoLock() const = 0;
+	virtual List<KT> getAllKeys_NoLock() const = 0;
 	
-	List<KT> keys() const;
+	List<KT> getAllKeys() const;
 	
-	virtual Iterator<VT> valueIteratorWithRefer(const Referable* refer) const = 0;
+	virtual Iterator<VT> getValueIteratorWithRefer(Referable* refer) const = 0;
 	
-	Iterator<VT> valueIterator() const;
+	Iterator<VT> getValueIterator() const;
 	
-	virtual List<VT> values_NoLock() const = 0;
+	virtual List<VT> getAllValues_NoLock() const = 0;
 	
-	List<VT> values() const;
+	List<VT> getAllValues() const;
 	
-	virtual Iterator< Pair<KT, VT> > iteratorWithRefer(const Referable* refer) const = 0;
+	virtual Iterator< Pair<KT, VT> > toIteratorWithRefer(Referable* refer) const = 0;
 	
-	Iterator< Pair<KT, VT> > iterator() const;
+	Iterator< Pair<KT, VT> > toIterator() const;
 	
-	virtual List< Pair<KT, VT> > pairs_NoLock() const = 0;
+	virtual List< Pair<KT, VT> > toList_NoLock() const = 0;
 	
-	List< Pair<KT, VT> > pairs() const;
+	List< Pair<KT, VT> > toList() const;
 	
 	// range-based for loop
 	IteratorPosition< Pair<KT, VT> > begin() const;
@@ -107,32 +134,49 @@ public:
 };
 
 
-template < class KT, class VT, class COMPARE = Compare<KT> >
+template < class KT, class VT, class KEY_EQUALS = Equals<KT> >
 class SLIB_EXPORT ListMap : public IMap<KT, VT>
 {
 public:
 	class PairKeyCompare
 	{
 	public:
-		static sl_bool equals(const Pair<KT, VT>& a, const KT& b);
+		KEY_EQUALS key_equals;
+		
+	public:
+		PairKeyCompare(const KEY_EQUALS& key_equals);
+		
+		sl_bool operator()(const Pair<KT, VT>& a, const KT& b) const;
 	};
 	
+	template <class _VT, class VALUE_EQUALS>
 	class PairCompare
 	{
 	public:
-		static sl_bool equals(const Pair<KT, VT>& a, const Pair<KT, VT>& b);
+		KEY_EQUALS key_equals;
+		VALUE_EQUALS value_equals;
+		
+	public:
+		PairCompare(const KEY_EQUALS& key_equals, const VALUE_EQUALS& value_equals);
+		
+		sl_bool operator()(const Pair<KT, VT>& a, const Pair<KT, _VT>& b) const;
 	};
 
 	CList< Pair<KT, VT> > list;
 	
 public:
-	static ListMap<KT, VT, COMPARE>* create();
+	ListMap(const KEY_EQUALS& equals);
+	
+public:
+	static ListMap<KT, VT, KEY_EQUALS>* create(const KEY_EQUALS& key_equals = KEY_EQUALS());
+	
+	VT operator[](const KT& key) const;
 	
 	// override
 	sl_size getCount() const;
 	
 	// override
-	VT* getItemPtr(const KT& key) const;
+	VT* getItemPointer(const KT& key) const;
 	
 	// override
 	List<VT> getValues_NoLock(const KT& key) const;
@@ -140,27 +184,29 @@ public:
 	// override
 	sl_bool put_NoLock(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 	
-	sl_bool addIfNewKeyAndValue_NoLock(const KT& key, const VT& value, sl_bool* pFlagExist = sl_null);
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool addIfNewKeyAndValue_NoLock(const KT& key, const _VT& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 	
-	sl_bool addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist = sl_null);
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool addIfNewKeyAndValue(const KT& key, const _VT& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 	
 	// override
 	sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null);
 	
-	sl_bool remove(const KT& key, VT* outValue = sl_null);
-	
 	// override
 	sl_size removeItems_NoLock(const KT& key, List<VT>* outValues = sl_null);
 	
-	sl_size removeItems(const KT& key, List<VT>* outValues = sl_null);
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool removeKeyAndValue_NoLock(const KT& key, const _VT& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 	
-	sl_bool removeValue_NoLock(const KT& key, const VT& value);
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool removeKeyAndValue(const KT& key, const _VT& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 	
-	sl_bool removeValue(const KT& key, const VT& value);
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_size removeItemsByKeyAndValue_NoLock(const KT& key, const _VT& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 	
-	sl_size removeValues_NoLock(const KT& key, const VT& value);
-	
-	sl_size removeValues(const KT& key, const VT& value);
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_size removeItemsByKeyAndValue(const KT& key, const _VT& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 	
 	// override
 	sl_size removeAll_NoLock();
@@ -168,114 +214,121 @@ public:
 	// override
 	sl_bool contains_NoLock(const KT& key) const;
 	
-	sl_bool contains(const KT& key) const;
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool containsKeyAndValue_NoLock(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
 	
-	sl_bool contains_NoLock(const KT& key, const VT& value) const;
-	
-	sl_bool contains(const KT& key, const VT& value) const;
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool containsKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
 	
 	// override
 	IMap<KT, VT>* duplicate_NoLock() const;
 	
 	// override
-	Iterator<KT> keyIteratorWithRefer(const Referable* refer) const;
+	Iterator<KT> getKeyIteratorWithRefer(Referable* refer) const;
 	
 	// override
-	List<KT> keys_NoLock() const;
+	List<KT> getAllKeys_NoLock() const;
 	
 	// override
-	Iterator<VT> valueIteratorWithRefer(const Referable* refer) const;
+	Iterator<VT> getValueIteratorWithRefer(Referable* refer) const;
 	
 	// override
-	List<VT> values_NoLock() const;
+	List<VT> getAllValues_NoLock() const;
 	
 	// override
-	Iterator< Pair<KT, VT> > iteratorWithRefer(const Referable* refer) const;
+	Iterator< Pair<KT, VT> > toIteratorWithRefer(Referable* refer) const;
 	
 	// override
-	List< Pair<KT, VT> > pairs_NoLock() const;
+	List< Pair<KT, VT> > toList_NoLock() const;
+	
+protected:
+	KEY_EQUALS m_equals;
 	
 };
 
 
-template < class KT, class VT, class HASH = Hash<KT>, class COMPARE = Compare<KT> >
+template < class KT, class VT, class HASH = Hash<KT>, class KEY_EQUALS = Equals<KT> >
 class SLIB_EXPORT HashMap : public IMap<KT, VT>
 {
 public:
-	HashTable<KT, VT, HASH, COMPARE> table;
+	HashTable<KT, VT, HASH, KEY_EQUALS> table;
 
 public:
-	HashMap(sl_uint32 capacity = SLIB_HASHTABLE_DEFAULT_CAPACITY);
-
+	HashMap(sl_uint32 capacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
+	
 public:
-	static HashMap<KT, VT, HASH, COMPARE>* create(sl_uint32 capacity = SLIB_HASHTABLE_DEFAULT_CAPACITY);
+	static HashMap<KT, VT, HASH, KEY_EQUALS>* create(sl_uint32 capacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
+	
+	VT operator[](const KT& key) const;
 
 	// override
 	sl_size getCount() const;
 	
 	// override
-	VT* getItemPtr(const KT& key) const;
+	VT* getItemPointer(const KT& key) const;
 	
 	// override
 	List<VT> getValues_NoLock(const KT& key) const;
-
+	
 	// override
 	sl_bool put_NoLock(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
-
-	sl_bool addIfNewKeyAndValue_NoLock(const KT& key, const VT& value, sl_bool* pFlagExist = sl_null);
 	
-	sl_bool addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist = sl_null);
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool addIfNewKeyAndValue_NoLock(const KT& key, const _VT& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+	
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool addIfNewKeyAndValue(const KT& key, const _VT& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 	
 	// override
 	sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null);
 	
-	sl_bool remove(const KT& key, VT* outValue = sl_null);
-	
 	// override
 	sl_size removeItems_NoLock(const KT& key, List<VT>* outValues = sl_null);
 	
-	sl_size removeItems(const KT& key, List<VT>* outValues = sl_null);
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool removeKeyAndValue_NoLock(const KT& key, const _VT& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 	
-	sl_bool removeValue_NoLock(const KT& key, const VT& value);
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool removeKeyAndValue(const KT& key, const _VT& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 	
-	sl_bool removeValue(const KT& key, const VT& value);
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_size removeItemsByKeyAndValue_NoLock(const KT& key, const _VT& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 	
-	sl_size removeValues_NoLock(const KT& key, const VT& value);
-	
-	sl_size removeValues(const KT& key, const VT& value);
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_size removeItemsByKeyAndValue(const KT& key, const _VT& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 	
 	// override
 	sl_size removeAll_NoLock();
-
+	
 	// override
 	sl_bool contains_NoLock(const KT& key) const;
 	
-	sl_bool contains(const KT& key) const;
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool containsKeyAndValue_NoLock(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
 	
-	sl_bool contains_NoLock(const KT& key, const VT& value) const;
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool containsKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
 	
-	sl_bool contains(const KT& key, const VT& value) const;
-
 	// override
 	IMap<KT, VT>* duplicate_NoLock() const;
-
-	// override
-	Iterator<KT> keyIteratorWithRefer(const Referable* refer) const;
-
-	// override
-	List<KT> keys_NoLock() const;
 	
 	// override
-	Iterator<VT> valueIteratorWithRefer(const Referable* refer) const;
-
-	// override
-	List<VT> values_NoLock() const;
+	Iterator<KT> getKeyIteratorWithRefer(Referable* refer) const;
 	
 	// override
-	Iterator< Pair<KT, VT> > iteratorWithRefer(const Referable* refer) const;
+	List<KT> getAllKeys_NoLock() const;
 	
 	// override
-	List< Pair<KT, VT> > pairs_NoLock() const;
+	Iterator<VT> getValueIteratorWithRefer(Referable* refer) const;
+	
+	// override
+	List<VT> getAllValues_NoLock() const;
+	
+	// override
+	Iterator< Pair<KT, VT> > toIteratorWithRefer(Referable* refer) const;
+	
+	// override
+	List< Pair<KT, VT> > toList_NoLock() const;
 
 };
 
@@ -285,145 +338,139 @@ public:
 	Now TreeMap is based on BTree, but should be changed to Red-Black
 	Tree implementation which is a little better for in-memory structure.
 */
-template < class KT, class VT, class COMPARE=Compare<KT> >
+template < class KT, class VT, class KEY_COMPARE = Compare<KT> >
 class SLIB_EXPORT TreeMap : public IMap<KT, VT>
 {
 public:
-	BTree<KT, VT, COMPARE> tree;
+	BTree<KT, VT, KEY_COMPARE> tree;
+	
+public:
+	TreeMap(const KEY_COMPARE& key_compare = KEY_COMPARE());
 
 public:
-	static TreeMap<KT, VT, COMPARE>* create();
+	static TreeMap<KT, VT, KEY_COMPARE>* create(const KEY_COMPARE& key_compare = KEY_COMPARE());
 	
+	VT operator[](const KT& key) const;
+
 	// override
 	sl_size getCount() const;
 	
 	// override
-	VT* getItemPtr(const KT& key) const;
+	VT* getItemPointer(const KT& key) const;
 	
 	// override
 	List<VT> getValues_NoLock(const KT& key) const;
 	
 	// override
 	sl_bool put_NoLock(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
-
-	sl_bool addIfNewKeyAndValue_NoLock(const KT& key, const VT& value, sl_bool* pFlagExist = sl_null);
 	
-	sl_bool addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist = sl_null);
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool addIfNewKeyAndValue_NoLock(const KT& key, const _VT& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
+	
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool addIfNewKeyAndValue(const KT& key, const _VT& value, sl_bool* pFlagExist = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 	
 	// override
 	sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null);
 	
-	sl_bool remove(const KT& key, VT* outValue = sl_null);
-	
 	// override
 	sl_size removeItems_NoLock(const KT& key, List<VT>* outValues = sl_null);
 	
-	sl_size removeItems(const KT& key, List<VT>* outValues = sl_null);
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool removeKeyAndValue_NoLock(const KT& key, const _VT& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 	
-	sl_bool removeValue_NoLock(const KT& key, const VT& value);
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool removeKeyAndValue(const KT& key, const _VT& value, VT* outValue = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 	
-	sl_bool removeValue(const KT& key, const VT& value);
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_size removeItemsByKeyAndValue_NoLock(const KT& key, const _VT& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 	
-	sl_size removeValues_NoLock(const KT& key, const VT& value);
-	
-	sl_size removeValues(const KT& key, const VT& value);
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_size removeItemsByKeyAndValue(const KT& key, const _VT& value, List<VT>* outValues = sl_null, const VALUE_EQUALS& value_equals = VALUE_EQUALS());
 	
 	// override
 	sl_size removeAll_NoLock();
 	
 	// override
 	sl_bool contains_NoLock(const KT& key) const;
-
-	sl_bool contains(const KT& key) const;
 	
-	sl_bool contains_NoLock(const KT& key, const VT& value) const;
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool containsKeyAndValue_NoLock(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
 	
-	sl_bool contains(const KT& key, const VT& value) const;
+	template < class _VT, class VALUE_EQUALS = Equals<VT, _VT> >
+	sl_bool containsKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals = VALUE_EQUALS()) const;
 	
 	// override
 	IMap<KT, VT>* duplicate_NoLock() const;
 	
 	// override
-	Iterator<KT> keyIteratorWithRefer(const Referable* refer) const;
+	Iterator<KT> getKeyIteratorWithRefer(Referable* refer) const;
 	
 	// override
-	List<KT> keys_NoLock() const;
+	List<KT> getAllKeys_NoLock() const;
 	
 	// override
-	Iterator<VT> valueIteratorWithRefer(const Referable* refer) const;
+	Iterator<VT> getValueIteratorWithRefer(Referable* refer) const;
 	
 	// override
-	List<VT> values_NoLock() const;
+	List<VT> getAllValues_NoLock() const;
 	
 	// override
-	Iterator< Pair<KT, VT> > iteratorWithRefer(const Referable* refer) const;
+	Iterator< Pair<KT, VT> > toIteratorWithRefer(Referable* refer) const;
 	
 	// override
-	List< Pair<KT, VT> > pairs_NoLock() const;
-
+	List< Pair<KT, VT> > toList_NoLock() const;
+	
 };
 
 
-template <class KT, class VT>
-class SafeMap;
-
-#define SLIB_TEMPLATE_PARAMS_IMap KT, VT
-#define SLIB_TEMPLATE_DEF_PARAMS_IMap class KT, class VT
-
-/** auto-referencing object **/
 template <class KT, class VT>
 class SLIB_EXPORT Map
 {
 public:
 	Ref< IMap<KT, VT> > ref;
-	SLIB_DECLARE_TEMPLATE_REF_WRAPPER(Map, SafeMap, IMap)
+	SLIB_REF_WRAPPER(Map, IMap<KT, VT>)
 
 public:
-	static Map<KT, VT> createList();
-	
-	template <class COMPARE>
-	static Map<KT, VT> createListBy();
-	
-	static Map<KT, VT> createHash(sl_uint32 initialCapacity = SLIB_HASHTABLE_DEFAULT_CAPACITY);
-	
-	template < class HASH, class COMPARE = Compare<KT> >
-	static Map<KT, VT> createHashBy(sl_uint32 initialCapacity = SLIB_HASHTABLE_DEFAULT_CAPACITY);
-	
-	static Map<KT, VT> createTree();
-	
-	template <class COMPARE>
-	static Map<KT, VT> createTreeBy();
+	template < class KEY_EQUALS = Equals<KT> >
+	static Map<KT, VT> createList(const KEY_EQUALS& key_equals = KEY_EQUALS());
+
+	template < class HASH = Hash<KT>, class KEY_EQUALS = Equals<KT> >
+	static Map<KT, VT> createHash(sl_uint32 initialCapacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
+
+	template < class KEY_COMPARE = Compare<KT> >
+	static Map<KT, VT> createTree(const KEY_COMPARE& key_compare = KEY_COMPARE());
 	
 public:
-	void initList();
+	template < class KEY_EQUALS = Equals<KT> >
+	void initList(const KEY_EQUALS& key_equals = KEY_EQUALS());
 	
-	template <class COMPARE>
-	void initListBy();
+	template < class HASH = Hash<KT>, class KEY_EQUALS = Equals<KT> >
+	void initHash(sl_uint32 initialCapacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
 	
-	void initHash(sl_uint32 initialCapacity = SLIB_HASHTABLE_DEFAULT_CAPACITY);
-	
-	template < class HASH, class COMPARE = Compare<KT> >
-	void initHashBy(sl_uint32 initialCapacity = SLIB_HASHTABLE_DEFAULT_CAPACITY);
-	
-	void initTree();
-	
-	template <class COMPARE>
-	void initTreeBy();
+	template < class KEY_COMPARE = Compare<KT> >
+	void initTree(const KEY_COMPARE& key_compare = KEY_COMPARE());
 	
 public:
+	VT operator[](const KT& key) const;
+	
 	sl_size getCount() const;
 	
 	sl_bool isEmpty() const;
 	
 	sl_bool isNotEmpty() const;
 	
-	VT* getItemPtr(const KT& key) const;
+	VT* getItemPointer(const KT& key) const;
 	
-	VT* getNewItemPtr(const KT& key);
+	VT* getNewItemPointer(const KT& key);
 	
 	sl_bool get_NoLock(const KT& key, VT* _out = sl_null) const;
 	
 	sl_bool get(const KT& key, VT* _out = sl_null) const;
+	
+	VT getValue_NoLock(const KT& key) const;
+	
+	VT getValue(const KT& key) const;
 	
 	VT getValue_NoLock(const KT& key, const VT& def) const;
 	
@@ -437,15 +484,11 @@ public:
 	
 	sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 	
-	void putAll(const Map<KT, VT>& other, MapPutMode mode = MapPutMode::Default);
-	
 	template <class _KT, class _VT>
 	void putAll(const Map<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
 	
-	void putAll(const SafeMap<KT, VT>& other, MapPutMode mode = MapPutMode::Default);
-	
 	template <class _KT, class _VT>
-	void putAll(const SafeMap<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
+	void putAll(const AtomicMap<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
 	
 	sl_bool remove_NoLock(const KT& key, VT* outValue = sl_null) const;
 	
@@ -467,23 +510,23 @@ public:
 	
 	Map<KT, VT> duplicate() const;
 	
-	Iterator<KT> keyIterator() const;
+	Iterator<KT> getKeyIterator() const;
 	
-	List<KT> keys_NoLock() const;
+	List<KT> getAllKeys_NoLock() const;
 	
-	List<KT> keys() const;
+	List<KT> getAllKeys() const;
 	
-	Iterator<VT> valueIterator() const;
+	Iterator<VT> getValueIterator() const;
 	
-	List<VT> values_NoLock() const;
+	List<VT> getAllValues_NoLock() const;
 	
-	List<VT> values() const;
+	List<VT> getAllValues() const;
 	
-	Iterator< Pair<KT, VT> > iterator() const;
+	Iterator< Pair<KT, VT> > toIterator() const;
 	
-	List< Pair<KT, VT> > pairs_NoLock() const;
+	List< Pair<KT, VT> > toList_NoLock() const;
 	
-	List< Pair<KT, VT> > pairs() const;
+	List< Pair<KT, VT> > toList() const;
 	
 	// range-based for loop
 	IteratorPosition< Pair<KT, VT> > begin() const;
@@ -494,32 +537,26 @@ public:
 	
 };
 
-
-/** auto-referencing object **/
 template <class KT, class VT>
-class SLIB_EXPORT SafeMap
+class SLIB_EXPORT Atomic< Map<KT, VT> >
 {
 public:
-	SafeRef< IMap<KT, VT> > ref;
-	SLIB_DECLARE_TEMPLATE_REF_WRAPPER(SafeMap, Map, IMap)
+	AtomicRef< IMap<KT, VT> > ref;
+	SLIB_ATOMIC_REF_WRAPPER(IMap<KT, VT>)
 	
 public:
-	void initList();
+	template < class KEY_EQUALS = Equals<KT> >
+	void initList(const KEY_EQUALS& key_equals = KEY_EQUALS());
 	
-	template <class COMPARE>
-	void initListBy();
+	template < class HASH = Hash<KT>, class KEY_EQUALS = Equals<KT> >
+	void initHash(sl_uint32 initialCapacity = 0, const HASH& hash = HASH(), const KEY_EQUALS& key_equals = KEY_EQUALS());
 	
-	void initHash(sl_uint32 initialCapacity = SLIB_HASHTABLE_DEFAULT_CAPACITY);
-	
-	template < class HASH, class COMPARE = Compare<KT> >
-	void initHashBy(sl_uint32 initialCapacity = SLIB_HASHTABLE_DEFAULT_CAPACITY);
-	
-	void initTree();
-	
-	template <class COMPARE>
-	void initTreeBy();
+	template < class KEY_COMPARE = Compare<KT> >
+	void initTree(const KEY_COMPARE& key_compare = KEY_COMPARE());
 	
 public:
+	VT operator[](const KT& key) const;
+	
 	sl_size getCount() const;
 	
 	sl_bool isEmpty() const;
@@ -528,21 +565,19 @@ public:
 	
 	sl_bool get(const KT& key, VT* _out = sl_null) const;
 	
+	VT getValue(const KT& key) const;
+	
 	VT getValue(const KT& key, const VT& def) const;
 	
 	List<VT> getValues(const KT& key) const;
 	
 	sl_bool put(const KT& key, const VT& value, MapPutMode mode = MapPutMode::Default, sl_bool* pFlagExist = sl_null);
 	
-	void putAll(const Map<KT, VT>& other, MapPutMode mode = MapPutMode::Default);
-	
 	template <class _KT, class _VT>
 	void putAll(const Map<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
 	
-	void putAll(const SafeMap<KT, VT>& other, MapPutMode mode = MapPutMode::Default);
-	
 	template <class _KT, class _VT>
-	void putAll(const SafeMap<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
+	void putAll(const AtomicMap<_KT, _VT>& other, MapPutMode mode = MapPutMode::Default);
 	
 	sl_bool remove(const KT& key, VT* outValue = sl_null) const;
 	
@@ -554,17 +589,17 @@ public:
 
 	Map<KT, VT> duplicate() const;
 	
-	Iterator<KT> keyIterator() const;
+	Iterator<KT> getKeyIterator() const;
 	
-	List<KT> keys() const;
+	List<KT> getAllKeys() const;
 	
-	Iterator<VT> valueIterator() const;
+	Iterator<VT> getValueIterator() const;
 	
-	List<VT> values() const;
+	List<VT> getAllValues() const;
 	
-	Iterator< Pair<KT, VT> > iterator() const;
+	Iterator< Pair<KT, VT> > toIterator() const;
 	
-	List< Pair<KT, VT> > pairs() const;
+	List< Pair<KT, VT> > toList() const;
 	
 	// range-based for loop
 	IteratorPosition< Pair<KT, VT> > begin() const;
@@ -574,16 +609,16 @@ public:
 };
 
 
-template < class KT, class VT, class COMPARE = Compare<KT> >
+template < class KT, class VT, class KEY_EQUALS >
 class ListMapKeyIterator : public IIterator<KT>
 {
 protected:
-	const ListMap<KT, VT, COMPARE>* m_map;
+	const ListMap<KT, VT, KEY_EQUALS>* m_map;
 	sl_size m_index;
 	Ref<Referable> m_refer;
 	
 public:
-	ListMapKeyIterator(const ListMap<KT, VT, COMPARE>* map, const Referable* refer);
+	ListMapKeyIterator(const ListMap<KT, VT, KEY_EQUALS>* map, Referable* refer);
 	
 public:
 	// override
@@ -598,16 +633,16 @@ public:
 };
 
 
-template < class KT, class VT, class COMPARE = Compare<KT> >
+template <class KT, class VT, class KEY_EQUALS>
 class ListMapValueIterator : public IIterator<VT>
 {
 protected:
-	const ListMap<KT, VT, COMPARE>* m_map;
+	const ListMap<KT, VT, KEY_EQUALS>* m_map;
 	sl_size m_index;
 	Ref<Referable> m_refer;
 	
 public:
-	ListMapValueIterator(const ListMap<KT, VT, COMPARE>* map, const Referable* refer);
+	ListMapValueIterator(const ListMap<KT, VT, KEY_EQUALS>* map, Referable* refer);
 	
 public:
 	// override
@@ -622,16 +657,16 @@ public:
 };
 
 
-template < class KT, class VT, class COMPARE = Compare<KT> >
+template <class KT, class VT, class KEY_EQUALS>
 class ListMapIterator : public IIterator< Pair<KT, VT> >
 {
 protected:
-	const ListMap<KT, VT, COMPARE>* m_map;
+	const ListMap<KT, VT, KEY_EQUALS>* m_map;
 	sl_size m_index;
 	Ref<Referable> m_refer;
 	
 public:
-	ListMapIterator(const ListMap<KT, VT, COMPARE>* map, const Referable* refer);
+	ListMapIterator(const ListMap<KT, VT, KEY_EQUALS>* map, Referable* refer);
 	
 public:
 	// override
@@ -646,17 +681,17 @@ public:
 };
 
 
-template < class KT, class VT, class HASH = Hash<KT>, class COMPARE = Compare<KT> >
+template <class KT, class VT, class HASH, class KEY_EQUALS>
 class HashMapKeyIterator : public IIterator<KT>
 {
 protected:
-	const HashMap<KT, VT, HASH, COMPARE>* m_map;
+	const HashMap<KT, VT, HASH, KEY_EQUALS>* m_map;
 	HashPosition m_pos;
 	sl_size m_index;
 	Ref<Referable> m_refer;
 	
 public:
-	HashMapKeyIterator(const HashMap<KT, VT, HASH, COMPARE>* map, const Referable* refer);
+	HashMapKeyIterator(const HashMap<KT, VT, HASH, KEY_EQUALS>* map, Referable* refer);
 	
 public:
 	// override
@@ -671,17 +706,17 @@ public:
 };
 
 
-template < class KT, class VT, class HASH = Hash<KT>, class COMPARE = Compare<KT> >
+template <class KT, class VT, class HASH, class KEY_EQUALS>
 class HashMapValueIterator : public IIterator<VT>
 {
 protected:
-	const HashMap<KT, VT, HASH, COMPARE>* m_map;
+	const HashMap<KT, VT, HASH, KEY_EQUALS>* m_map;
 	HashPosition m_pos;
 	sl_size m_index;
 	Ref<Referable> m_refer;
 	
 public:
-	HashMapValueIterator(const HashMap<KT, VT, HASH, COMPARE>* map, const Referable* refer);
+	HashMapValueIterator(const HashMap<KT, VT, HASH, KEY_EQUALS>* map, Referable* refer);
 	
 public:
 	// override
@@ -696,17 +731,17 @@ public:
 };
 
 
-template < class KT, class VT, class HASH = Hash<KT>, class COMPARE = Compare<KT> >
+template <class KT, class VT, class HASH, class KEY_EQUALS>
 class HashMapIterator : public IIterator< Pair<KT, VT> >
 {
 protected:
-	const HashMap<KT, VT, HASH, COMPARE>* m_map;
+	const HashMap<KT, VT, HASH, KEY_EQUALS>* m_map;
 	HashPosition m_pos;
 	sl_size m_index;
 	Ref<Referable> m_refer;
 	
 public:
-	HashMapIterator(const HashMap<KT, VT, HASH, COMPARE>* map, const Referable* refer);
+	HashMapIterator(const HashMap<KT, VT, HASH, KEY_EQUALS>* map, Referable* refer);
 	
 public:
 	// override
@@ -721,17 +756,17 @@ public:
 };
 
 
-template < class KT, class VT, class COMPARE=Compare<KT> >
+template <class KT, class VT, class KEY_COMPARE>
 class TreeMapKeyIterator : public IIterator<KT>
 {
 protected:
-	const TreeMap<KT, VT, COMPARE>* m_map;
+	const TreeMap<KT, VT, KEY_COMPARE>* m_map;
 	TreePosition m_pos;
 	sl_size m_index;
 	Ref<Referable> m_refer;
 	
 public:
-	TreeMapKeyIterator(const TreeMap<KT, VT, COMPARE>* map, const Referable* refer);
+	TreeMapKeyIterator(const TreeMap<KT, VT, KEY_COMPARE>* map, Referable* refer);
 	
 public:
 	// override
@@ -745,18 +780,17 @@ public:
 	
 };
 
-
-template < class KT, class VT, class COMPARE=Compare<KT> >
+template <class KT, class VT, class KEY_COMPARE>
 class TreeMapValueIterator: public IIterator<VT>
 {
 protected:
-	const TreeMap<KT, VT, COMPARE>* m_map;
+	const TreeMap<KT, VT, KEY_COMPARE>* m_map;
 	TreePosition m_pos;
 	sl_size m_index;
 	Ref<Referable> m_refer;
 	
 public:
-	TreeMapValueIterator(const TreeMap<KT, VT, COMPARE>* map, const Referable* refer);
+	TreeMapValueIterator(const TreeMap<KT, VT, KEY_COMPARE>* map, Referable* refer);
 	
 public:
 	// override
@@ -770,18 +804,17 @@ public:
 	
 };
 
-
-template < class KT, class VT, class COMPARE=Compare<KT> >
+template <class KT, class VT, class KEY_COMPARE>
 class TreeMapIterator : public IIterator< Pair<KT, VT> >
 {
 protected:
-	const TreeMap<KT, VT, COMPARE>* m_map;
+	const TreeMap<KT, VT, KEY_COMPARE>* m_map;
 	TreePosition m_pos;
 	sl_size m_index;
 	Ref<Referable> m_refer;
 	
 public:
-	TreeMapIterator(const TreeMap<KT, VT, COMPARE>* map, const Referable* refer);
+	TreeMapIterator(const TreeMap<KT, VT, KEY_COMPARE>* map, Referable* refer);
 	
 public:
 	// override
@@ -797,36 +830,25 @@ public:
 
 
 #define SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_MAP(...) \
-	extern template class HashTable<__VA_ARGS__>; \
-	extern template class BTree<__VA_ARGS__>; \
 	extern template class IMap<__VA_ARGS__>; \
-	extern template class ListMap<__VA_ARGS__>; \
 	extern template class HashMap<__VA_ARGS__>; \
-	extern template class TreeMap<__VA_ARGS__>; \
 	extern template class Map<__VA_ARGS__>; \
-	extern template class SafeMap<__VA_ARGS__>; \
+	extern template class Atomic< Map<__VA_ARGS__> >;
 
 #define SLIB_DEFINE_EXPLICIT_INSTANTIATIONS_FOR_MAP(...) \
-	template class HashTable<__VA_ARGS__>; \
-	template class BTree<__VA_ARGS__>; \
 	template class IMap<__VA_ARGS__>; \
-	template class ListMap<__VA_ARGS__>; \
 	template class HashMap<__VA_ARGS__>; \
-	template class TreeMap<__VA_ARGS__>; \
 	template class Map<__VA_ARGS__>; \
-	template class SafeMap<__VA_ARGS__>; \
+	template class Atomic< Map<__VA_ARGS__> >;
 
 
 SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_MAP(sl_uint64, Ref<Referable>)
+
 
 SLIB_NAMESPACE_END
 
 
 SLIB_NAMESPACE_BEGIN
-
-extern const char _Map_ClassID[];
-
-SLIB_DEFINE_TEMPLATE_OBJECT(IMap, Object, _Map_ClassID)
 
 template <class KT, class VT>
 IMap<KT, VT>* IMap<KT, VT>::createDefault()
@@ -849,7 +871,7 @@ sl_bool IMap<KT, VT>::isNotEmpty() const
 template <class KT, class VT>
 sl_bool IMap<KT, VT>::get_NoLock(const KT& key, VT* _out) const
 {
-	VT* p = getItemPtr(key);
+	VT* p = getItemPointer(key);
 	if (p) {
 		if (_out) {
 			*_out = *p;
@@ -863,7 +885,7 @@ template <class KT, class VT>
 sl_bool IMap<KT, VT>::get(const KT& key, VT* _out) const
 {
 	ObjectLocker lock(this);
-	VT* p = getItemPtr(key);
+	VT* p = getItemPointer(key);
 	if (p) {
 		if (_out) {
 			*_out = *p;
@@ -874,9 +896,32 @@ sl_bool IMap<KT, VT>::get(const KT& key, VT* _out) const
 }
 
 template <class KT, class VT>
+VT IMap<KT, VT>::getValue_NoLock(const KT& key) const
+{
+	VT* p = getItemPointer(key);
+	if (p) {
+		return *p;
+	} else {
+		return VT();
+	}
+}
+
+template <class KT, class VT>
+VT IMap<KT, VT>::getValue(const KT& key) const
+{
+	ObjectLocker lock(this);
+	VT* p = getItemPointer(key);
+	if (p) {
+		return *p;
+	} else {
+		return VT();
+	}
+}
+
+template <class KT, class VT>
 VT IMap<KT, VT>::getValue_NoLock(const KT& key, const VT& def) const
 {
-	VT* p = getItemPtr(key);
+	VT* p = getItemPointer(key);
 	if (p) {
 		return *p;
 	}
@@ -887,7 +932,7 @@ template <class KT, class VT>
 VT IMap<KT, VT>::getValue(const KT& key, const VT& def) const
 {
 	ObjectLocker lock(this);
-	VT* p = getItemPtr(key);
+	VT* p = getItemPointer(key);
 	if (p) {
 		return *p;
 	}
@@ -909,23 +954,6 @@ sl_bool IMap<KT, VT>::put(const KT& key, const VT& value, MapPutMode mode, sl_bo
 }
 
 template <class KT, class VT>
-void IMap<KT, VT>::putAll(IMap<KT, VT>* other, MapPutMode mode)
-{
-	if (!other) {
-		return;
-	}
-	if (this == other) {
-		return;
-	}
-	ObjectLocker lock(this, other);
-	Iterator< Pair<KT, VT> > iterator(other->iterator());
-	Pair<KT, VT> v;
-	while (iterator.next(&v)) {
-		put_NoLock(v.key, v.value, mode);
-	}
-}
-
-template <class KT, class VT>
 template <class _KT, class _VT>
 void IMap<KT, VT>::putAll(IMap<_KT, _VT>* other, MapPutMode mode)
 {
@@ -936,7 +964,7 @@ void IMap<KT, VT>::putAll(IMap<_KT, _VT>* other, MapPutMode mode)
 		return;
 	}
 	ObjectLocker lock(this, other);
-	Iterator< Pair<_KT,_VT> > iterator(other->iterator());
+	Iterator< Pair<_KT,_VT> > iterator(other->toIterator());
 	Pair<_KT, _VT> v;
 	while (iterator.next(&v)) {
 		put_NoLock(v.key, v.value, mode);
@@ -979,48 +1007,48 @@ IMap<KT, VT>* IMap<KT, VT>::duplicate() const
 }
 
 template <class KT, class VT>
-Iterator<KT> IMap<KT, VT>::keyIterator() const
+Iterator<KT> IMap<KT, VT>::getKeyIterator() const
 {
-	return keyIteratorWithRefer(sl_null);
+	return getKeyIteratorWithRefer(sl_null);
 }
 
 template <class KT, class VT>
-List<KT> IMap<KT, VT>::keys() const
+List<KT> IMap<KT, VT>::getAllKeys() const
 {
 	ObjectLocker lock(this);
-	return keys_NoLock();
+	return getAllKeys_NoLock();
 }
 
 template <class KT, class VT>
-Iterator<VT> IMap<KT, VT>::valueIterator() const
+Iterator<VT> IMap<KT, VT>::getValueIterator() const
 {
-	return valueIteratorWithRefer(sl_null);
+	return getValueIteratorWithRefer(sl_null);
 }
 
 template <class KT, class VT>
-List<VT> IMap<KT, VT>::values() const
-{
-	ObjectLocker lock(this);
-	return values_NoLock();
-}
-
-template <class KT, class VT>
-Iterator< Pair<KT, VT> > IMap<KT, VT>::iterator() const
-{
-	return iteratorWithRefer(sl_null);
-}
-
-template <class KT, class VT>
-List< Pair<KT, VT> > IMap<KT, VT>::pairs() const
+List<VT> IMap<KT, VT>::getAllValues() const
 {
 	ObjectLocker lock(this);
-	return pairs_NoLock();
+	return getAllValues_NoLock();
+}
+
+template <class KT, class VT>
+Iterator< Pair<KT, VT> > IMap<KT, VT>::toIterator() const
+{
+	return toIteratorWithRefer(sl_null);
+}
+
+template <class KT, class VT>
+List< Pair<KT, VT> > IMap<KT, VT>::toList() const
+{
+	ObjectLocker lock(this);
+	return toList_NoLock();
 }
 
 template <class KT, class VT>
 SLIB_INLINE IteratorPosition< Pair<KT, VT> > IMap<KT, VT>::begin() const
 {
-	return iterator().begin();
+	return toIterator().begin();
 }
 
 template <class KT, class VT>
@@ -1030,35 +1058,65 @@ SLIB_INLINE IteratorPosition< Pair<KT, VT> > IMap<KT, VT>::end() const
 }
 
 
-template <class KT, class VT, class COMPARE>
-SLIB_INLINE sl_bool ListMap<KT, VT, COMPARE>::PairKeyCompare::equals(const Pair<KT, VT>& a, const KT& b)
+template <class KT, class VT, class KEY_EQUALS>
+ListMap<KT, VT, KEY_EQUALS>::PairKeyCompare::PairKeyCompare(const KEY_EQUALS& _key_equals) : key_equals(_key_equals)
 {
-	return COMPARE::equals(a.key, b);
 }
 
-template <class KT, class VT, class COMPARE>
-SLIB_INLINE sl_bool ListMap<KT, VT, COMPARE>::PairCompare::equals(const Pair<KT, VT>& a, const Pair<KT, VT>& b)
+template <class KT, class VT, class KEY_EQUALS>
+SLIB_INLINE sl_bool ListMap<KT, VT, KEY_EQUALS>::PairKeyCompare::operator()(const Pair<KT, VT>& a, const KT& b) const
 {
-	return COMPARE::equals(a.key, b.key) && a.value == b.value;
+	return key_equals(a.key, b);
+}
+
+template <class KT, class VT, class KEY_EQUALS>
+template <class _VT, class VALUE_EQUALS>
+ListMap<KT, VT, KEY_EQUALS>::PairCompare<_VT, VALUE_EQUALS>::PairCompare(const KEY_EQUALS& _key_equals, const VALUE_EQUALS& _value_equals) : key_equals(_key_equals), value_equals(_value_equals)
+{
+}
+
+template <class KT, class VT, class KEY_EQUALS>
+template <class _VT, class VALUE_EQUALS>
+SLIB_INLINE sl_bool ListMap<KT, VT, KEY_EQUALS>::PairCompare<_VT, VALUE_EQUALS>::operator()(const Pair<KT, VT>& a, const Pair<KT, _VT>& b) const
+{
+	return key_equals(a.key, b.key) && value_equals(a.value, b.value);
 }
 
 
-template <class KT, class VT, class COMPARE>
-ListMap<KT, VT, COMPARE>* ListMap<KT, VT, COMPARE>::create()
+template <class KT, class VT, class KEY_EQUALS>
+ListMap<KT, VT, KEY_EQUALS>::ListMap(const KEY_EQUALS& key_equals) : m_equals(key_equals)
 {
-	return new ListMap<KT, VT, COMPARE>;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_size ListMap<KT, VT, COMPARE>::getCount() const
+template <class KT, class VT, class KEY_EQUALS>
+ListMap<KT, VT, KEY_EQUALS>* ListMap<KT, VT, KEY_EQUALS>::create(const KEY_EQUALS& key_equals)
+{
+	return new ListMap<KT, VT, KEY_EQUALS>(key_equals);
+}
+
+template <class KT, class VT, class KEY_EQUALS>
+VT ListMap<KT, VT, KEY_EQUALS>::operator[](const KT& key) const
+{
+	ObjectLocker lock(this);
+	sl_reg index = list.indexOf_NoLock(key, 0, PairKeyCompare(m_equals));
+	if (index >= 0) {
+		Pair<KT, VT>* p = list.getData() + index;
+		return p->value;
+	} else {
+		return VT();
+	}
+}
+
+template <class KT, class VT, class KEY_EQUALS>
+sl_size ListMap<KT, VT, KEY_EQUALS>::getCount() const
 {
 	return list.getCount();
 }
 
-template <class KT, class VT, class COMPARE>
-VT* ListMap<KT, VT, COMPARE>::getItemPtr(const KT& key) const
+template <class KT, class VT, class KEY_EQUALS>
+VT* ListMap<KT, VT, KEY_EQUALS>::getItemPointer(const KT& key) const
 {
-	sl_reg index = list.template indexOfT_NoLock<KT, PairKeyCompare>(key);
+	sl_reg index = list.indexOf_NoLock(key, 0, PairKeyCompare(m_equals));
 	if (index >= 0) {
 		Pair<KT, VT>* p = list.getData() + index;
 		return &(p->value);
@@ -1066,15 +1124,15 @@ VT* ListMap<KT, VT, COMPARE>::getItemPtr(const KT& key) const
 	return sl_null;
 }
 
-template <class KT, class VT, class COMPARE>
-List<VT> ListMap<KT, VT, COMPARE>::getValues_NoLock(const KT& key) const
+template <class KT, class VT, class KEY_EQUALS>
+List<VT> ListMap<KT, VT, KEY_EQUALS>::getValues_NoLock(const KT& key) const
 {
 	CList<VT>* ret = new CList<VT>;
 	if (ret) {
 		Pair<KT, VT>* data = list.getData();
 		sl_size count = list.getCount();
 		for (sl_size i = 0; i < count; i++) {
-			if (COMPARE::equals(data[i].key, key)) {
+			if (m_equals(data[i].key, key)) {
 				ret->add_NoLock(data[i].value);
 			}
 		}
@@ -1083,18 +1141,18 @@ List<VT> ListMap<KT, VT, COMPARE>::getValues_NoLock(const KT& key) const
 		}
 		delete ret;
 	}
-	return List<VT>::null();
+	return sl_null;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool ListMap<KT, VT, COMPARE>::put_NoLock(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
+template <class KT, class VT, class KEY_EQUALS>
+sl_bool ListMap<KT, VT, KEY_EQUALS>::put_NoLock(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
 {
 	if (pFlagExist) {
 		*pFlagExist = sl_false;
 	}
 	Pair<KT, VT>* items = list.getData();
 	if (mode != MapPutMode::AddAlways) {
-		sl_reg index = list.template indexOfT_NoLock<KT, PairKeyCompare>(key);
+		sl_reg index = list.indexOf_NoLock(key, 0, PairKeyCompare(m_equals));
 		if (index >= 0) {
 			if (pFlagExist) {
 				*pFlagExist = sl_true;
@@ -1109,164 +1167,157 @@ sl_bool ListMap<KT, VT, COMPARE>::put_NoLock(const KT& key, const VT& value, Map
 			return sl_false;
 		}
 	}
-	Pair<KT, VT> pair;
-	pair.key = key;
-	pair.value = value;
-	if (list.add_NoLock(pair)) {
+	if (list.add_NoLock(Pair<KT, VT>(key, value))) {
 		return sl_true;
 	}
 	return sl_false;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool ListMap<KT, VT, COMPARE>::addIfNewKeyAndValue_NoLock(const KT& key, const VT& value, sl_bool* pFlagExist)
+template <class KT, class VT, class KEY_EQUALS>
+template <class _VT, class VALUE_EQUALS>
+sl_bool ListMap<KT, VT, KEY_EQUALS>::addIfNewKeyAndValue_NoLock(const KT& key, const _VT& value, sl_bool* pFlagExist, const VALUE_EQUALS& value_equals)
 {
 	if (pFlagExist) {
 		*pFlagExist = sl_false;
 	}
-	Pair<KT, VT> pair;
-	pair.key = key;
-	pair.value = value;
-	sl_reg index = list.template indexOfT_NoLock<Pair<KT, VT>, PairCompare>(pair);
+	sl_reg index = list.indexOf_NoLock(Pair<KT, _VT>(key, value), 0, PairCompare<_VT, VALUE_EQUALS>(m_equals, value_equals));
 	if (index >= 0) {
 		if (pFlagExist) {
 			*pFlagExist = sl_true;
 		}
 		return sl_false;
 	}
-	if (list.add_NoLock(pair)) {
+	if (list.add_NoLock(Pair<KT, VT>(key, value))) {
 		return sl_true;
 	}
 	return sl_false;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool ListMap<KT, VT, COMPARE>::addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist)
+template <class KT, class VT, class KEY_EQUALS>
+template <class _VT, class VALUE_EQUALS>
+sl_bool ListMap<KT, VT, KEY_EQUALS>::addIfNewKeyAndValue(const KT& key, const _VT& value, sl_bool* pFlagExist, const VALUE_EQUALS& value_equals)
 {
 	ObjectLocker lock(this);
-	return addIfNewKeyAndValue_NoLock(key, value, pFlagExist);
+	return addIfNewKeyAndValue_NoLock(key, value, pFlagExist, value_equals);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool ListMap<KT, VT, COMPARE>::remove_NoLock(const KT& key, VT* outValue)
+template <class KT, class VT, class KEY_EQUALS>
+sl_bool ListMap<KT, VT, KEY_EQUALS>::remove_NoLock(const KT& key, VT* outValue)
 {
 	if (outValue) {
 		Pair<KT, VT> pair;
-		if (list.template removeValueT_NoLock<KT, PairKeyCompare>(key, &pair)) {
+		if (list.removeValue_NoLock(key, &pair, PairKeyCompare(m_equals))) {
 			*outValue = pair.value;
 			return sl_true;
 		}
 		return sl_false;
 	} else {
-		return list.template removeValueT_NoLock<KT, PairKeyCompare>(key);
+		return list.removeValue_NoLock(key, sl_null, PairKeyCompare(m_equals));
 	}
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool ListMap<KT, VT, COMPARE>::remove(const KT& key, VT* outValue)
-{
-	ObjectLocker lock(this);
-	return remove_NoLock(key, outValue);
-}
-
-template <class KT, class VT, class COMPARE>
-sl_size ListMap<KT, VT, COMPARE>::removeItems_NoLock(const KT& key, List<VT>* outValues)
+template <class KT, class VT, class KEY_EQUALS>
+sl_size ListMap<KT, VT, KEY_EQUALS>::removeItems_NoLock(const KT& key, List<VT>* outValues)
 {
 	if (outValues) {
 		List< Pair<KT, VT> > pairs;
-		sl_size n = list.template removeValuesT_NoLock<KT, PairKeyCompare>(key, &pairs);
+		sl_size n = list.removeElementsByValue_NoLock(key, &pairs, PairKeyCompare(m_equals));
 		if (n) {
-			ListItems< Pair<KT, VT> > p(pairs);
+			ListElements< Pair<KT, VT> > p(pairs);
 			for (sl_size i = 0; i < p.count; i++) {
 				outValues->add_NoLock(p[i].value);
 			}
 		}
 		return n;
 	} else {
-		return list.template removeValuesT_NoLock<KT, PairKeyCompare>(key);
+		return list.removeElementsByValue_NoLock(key, sl_null, PairKeyCompare(m_equals));
 	}
 }
 
-template <class KT, class VT, class COMPARE>
-sl_size ListMap<KT, VT, COMPARE>::removeItems(const KT& key, List<VT>* outValues)
+template <class KT, class VT, class KEY_EQUALS>
+template <class _VT, class VALUE_EQUALS>
+sl_bool ListMap<KT, VT, KEY_EQUALS>::removeKeyAndValue_NoLock(const KT& key, const _VT& value, VT* outValue, const VALUE_EQUALS& value_equals)
+{
+	if (outValue) {
+		Pair<KT, VT> pair;
+		if (list.removeValue_NoLock(Pair<KT, _VT>(key, value), &pair, PairCompare<_VT, VALUE_EQUALS>(m_equals, value_equals))) {
+			*outValue = pair.value;
+			return sl_true;
+		}
+		return sl_false;
+	} else {
+		return list.removeValue_NoLock(Pair<KT, _VT>(key, value), sl_null, PairCompare<_VT, VALUE_EQUALS>(m_equals, value_equals));
+	}
+}
+
+template <class KT, class VT, class KEY_EQUALS>
+template <class _VT, class VALUE_EQUALS>
+sl_bool ListMap<KT, VT, KEY_EQUALS>::removeKeyAndValue(const KT& key, const _VT& value, VT* outValue, const VALUE_EQUALS& value_equals)
 {
 	ObjectLocker lock(this);
-	return removeItems_NoLock(key, outValues);
+	return removeKeyAndValue_NoLock(key, value, value_equals);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool ListMap<KT, VT, COMPARE>::removeValue_NoLock(const KT& key, const VT& value)
+template <class KT, class VT, class KEY_EQUALS>
+template <class _VT, class VALUE_EQUALS>
+sl_size ListMap<KT, VT, KEY_EQUALS>::removeItemsByKeyAndValue_NoLock(const KT& key, const _VT& value, List<VT>* outValues, const VALUE_EQUALS& value_equals)
 {
-	Pair<KT, VT> pair;
-	pair.key = key;
-	pair.value = value;
-	return list.template removeValueT_NoLock<Pair<KT, VT>, PairCompare>(pair);
+	if (outValues) {
+		List< Pair<KT, VT> > pairs;
+		sl_size n = list.removeElementsByValue_NoLock(Pair<KT, _VT>(key, value), &pairs, PairCompare<_VT, VALUE_EQUALS>(m_equals, value_equals));
+		if (n) {
+			ListElements< Pair<KT, VT> > p(pairs);
+			for (sl_size i = 0; i < p.count; i++) {
+				outValues->add_NoLock(p[i].value);
+			}
+		}
+		return n;
+	} else {
+		return list.removeElementsByValue_NoLock(Pair<KT, _VT>(key, value), sl_null, PairCompare<_VT, VALUE_EQUALS>(m_equals, value_equals));
+	}
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool ListMap<KT, VT, COMPARE>::removeValue(const KT& key, const VT& value)
-{
-	ObjectLocker lock(this);
-	return removeValue_NoLock(key, value);
-}
-
-template <class KT, class VT, class COMPARE>
-sl_size ListMap<KT, VT, COMPARE>::removeValues_NoLock(const KT& key, const VT& value)
-{
-	Pair<KT, VT> pair;
-	pair.key = key;
-	pair.value = value;
-	return list.template removeValuesT_NoLock<Pair<KT, VT>, PairCompare>(pair);
-}
-
-template <class KT, class VT, class COMPARE>
-sl_size ListMap<KT, VT, COMPARE>::removeValues(const KT& key, const VT& value)
+template <class KT, class VT, class KEY_EQUALS>
+template <class _VT, class VALUE_EQUALS>
+sl_size ListMap<KT, VT, KEY_EQUALS>::removeItemsByKeyAndValue(const KT& key, const _VT& value, List<VT>* outValues, const VALUE_EQUALS& value_equals)
 {
 	ObjectLocker lock(this);
-	return removeValues_NoLock(key, value);
+	return removeItemsByKeyAndValue_NoLock(key, value, outValues, value_equals);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_size ListMap<KT, VT, COMPARE>::removeAll_NoLock()
+template <class KT, class VT, class KEY_EQUALS>
+sl_size ListMap<KT, VT, KEY_EQUALS>::removeAll_NoLock()
 {
 	return list.removeAll_NoLock();
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool ListMap<KT, VT, COMPARE>::contains_NoLock(const KT& key) const
+template <class KT, class VT, class KEY_EQUALS>
+sl_bool ListMap<KT, VT, KEY_EQUALS>::contains_NoLock(const KT& key) const
 {
-	return list.template indexOfT_NoLock<KT, PairKeyCompare>(key) >= 0;
+	return list.indexOf_NoLock(key, 0, PairKeyCompare(m_equals)) >= 0;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool ListMap<KT, VT, COMPARE>::contains(const KT& key) const
+template <class KT, class VT, class KEY_EQUALS>
+template <class _VT, class VALUE_EQUALS>
+sl_bool ListMap<KT, VT, KEY_EQUALS>::containsKeyAndValue_NoLock(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals) const
+{
+	return list.indexOf_NoLock(Pair<KT, _VT>(key, value), 0, PairCompare<_VT, VALUE_EQUALS>(m_equals, value_equals)) >= 0;
+}
+
+template <class KT, class VT, class KEY_EQUALS>
+template <class _VT, class VALUE_EQUALS>
+sl_bool ListMap<KT, VT, KEY_EQUALS>::containsKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals) const
 {
 	ObjectLocker lock(this);
-	return list.template indexOfT_NoLock<KT, PairKeyCompare>(key) >= 0;
+	return contains_NoLock(key, value, value_equals);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool ListMap<KT, VT, COMPARE>::contains_NoLock(const KT& key, const VT& value) const
+template <class KT, class VT, class KEY_EQUALS>
+IMap<KT, VT>* ListMap<KT, VT, KEY_EQUALS>::duplicate_NoLock() const
 {
-	Pair<KT, VT> pair;
-	pair.key = key;
-	pair.value = value;
-	return list.template indexOfT_NoLock<Pair<KT, VT>, PairCompare>(pair) >= 0;
-}
-
-template <class KT, class VT, class COMPARE>
-sl_bool ListMap<KT, VT, COMPARE>::contains(const KT& key, const VT& value) const
-{
-	ObjectLocker lock(this);
-	return contains_NoLock(key, value);
-}
-
-template <class KT, class VT, class COMPARE>
-IMap<KT, VT>* ListMap<KT, VT, COMPARE>::duplicate_NoLock() const
-{
-	ListMap<KT, VT, COMPARE>* ret = new ListMap<KT, VT, COMPARE>;
+	ListMap<KT, VT, KEY_EQUALS>* ret = new ListMap<KT, VT, KEY_EQUALS>(m_equals);
 	if (ret) {
-		if (ret->list.add_NoLock(list.getData(), list.getCount())) {
+		if (ret->list.addElements_NoLock(list.getData(), list.getCount())) {
 			return ret;
 		}
 		delete ret;
@@ -1274,14 +1325,14 @@ IMap<KT, VT>* ListMap<KT, VT, COMPARE>::duplicate_NoLock() const
 	return sl_null;
 }
 
-template <class KT, class VT, class COMPARE>
-Iterator<KT> ListMap<KT, VT, COMPARE>::keyIteratorWithRefer(const Referable* refer) const
+template <class KT, class VT, class KEY_EQUALS>
+Iterator<KT> ListMap<KT, VT, KEY_EQUALS>::getKeyIteratorWithRefer(Referable* refer) const
 {
-	return new ListMapKeyIterator<KT, VT, COMPARE>(this, refer);
+	return new ListMapKeyIterator<KT, VT, KEY_EQUALS>(this, refer);
 }
 
-template <class KT, class VT, class COMPARE>
-List<KT> ListMap<KT, VT, COMPARE>::keys_NoLock() const
+template <class KT, class VT, class KEY_EQUALS>
+List<KT> ListMap<KT, VT, KEY_EQUALS>::getAllKeys_NoLock() const
 {
 	CList<KT>* ret = new CList<KT>;
 	if (ret) {
@@ -1296,17 +1347,17 @@ List<KT> ListMap<KT, VT, COMPARE>::keys_NoLock() const
 		}
 		delete ret;
 	}
-	return List<KT>::null();
+	return sl_null;
 }
 
-template <class KT, class VT, class COMPARE>
-Iterator<VT> ListMap<KT, VT, COMPARE>::valueIteratorWithRefer(const Referable* refer) const
+template <class KT, class VT, class KEY_EQUALS>
+Iterator<VT> ListMap<KT, VT, KEY_EQUALS>::getValueIteratorWithRefer(Referable* refer) const
 {
-	return new ListMapValueIterator<KT, VT, COMPARE>(this, refer);
+	return new ListMapValueIterator<KT, VT, KEY_EQUALS>(this, refer);
 }
 
-template <class KT, class VT, class COMPARE>
-List<VT> ListMap<KT, VT, COMPARE>::values_NoLock() const
+template <class KT, class VT, class KEY_EQUALS>
+List<VT> ListMap<KT, VT, KEY_EQUALS>::getAllValues_NoLock() const
 {
 	CList<VT>* ret = new CList<VT>;
 	if (ret) {
@@ -1321,31 +1372,31 @@ List<VT> ListMap<KT, VT, COMPARE>::values_NoLock() const
 		}
 		delete ret;
 	}
-	return List<VT>::null();
+	return sl_null;
 }
 
-template <class KT, class VT, class COMPARE>
-Iterator< Pair<KT, VT> > ListMap<KT, VT, COMPARE>::iteratorWithRefer(const Referable* refer) const
+template <class KT, class VT, class KEY_EQUALS>
+Iterator< Pair<KT, VT> > ListMap<KT, VT, KEY_EQUALS>::toIteratorWithRefer(Referable* refer) const
 {
-	return new ListMapIterator<KT, VT, COMPARE>(this, refer);
+	return new ListMapIterator<KT, VT, KEY_EQUALS>(this, refer);
 }
 
-template <class KT, class VT, class COMPARE>
-List< Pair<KT, VT> > ListMap<KT, VT, COMPARE>::pairs_NoLock() const
+template <class KT, class VT, class KEY_EQUALS>
+List< Pair<KT, VT> > ListMap<KT, VT, KEY_EQUALS>::toList_NoLock() const
 {
-	return (CList< Pair<KT, VT> >*)((void*)(list.duplicate()));
+	return list.duplicate();
 }
 
 
-template <class KT, class VT, class HASH, class COMPARE>
-HashMap<KT, VT, HASH, COMPARE>::HashMap(sl_uint32 capacity) : table(capacity)
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+HashMap<KT, VT, HASH, KEY_EQUALS>::HashMap(sl_uint32 capacity, const HASH& hash, const KEY_EQUALS& key_equals) : table(capacity)
 {
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-HashMap<KT, VT, HASH, COMPARE>* HashMap<KT, VT, HASH, COMPARE>::create(sl_uint32 capacity)
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+HashMap<KT, VT, HASH, KEY_EQUALS>* HashMap<KT, VT, HASH, KEY_EQUALS>::create(sl_uint32 capacity, const HASH& hash, const KEY_EQUALS& key_equals)
 {
-	HashMap<KT, VT, HASH, COMPARE>* ret = new HashMap<KT, VT, HASH, COMPARE>(capacity);
+	HashMap<KT, VT, HASH, KEY_EQUALS>* ret = new HashMap<KT, VT, HASH, KEY_EQUALS>(capacity, hash, key_equals);
 	if (ret) {
 		if (ret->table.getCapacity() > 0) {
 			return ret;
@@ -1355,131 +1406,130 @@ HashMap<KT, VT, HASH, COMPARE>* HashMap<KT, VT, HASH, COMPARE>::create(sl_uint32
 	return sl_null;
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_size HashMap<KT, VT, HASH, COMPARE>::getCount() const
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+VT HashMap<KT, VT, HASH, KEY_EQUALS>::operator[](const KT& key) const
+{
+	ObjectLocker lock(this);
+	VT* p = table.getItemPointer(key);
+	if (p) {
+		return *p;
+	} else {
+		return VT();
+	}
+}
+
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+sl_size HashMap<KT, VT, HASH, KEY_EQUALS>::getCount() const
 {
 	return (sl_size)(table.getCount());
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-VT* HashMap<KT, VT, HASH, COMPARE>::getItemPtr(const KT& key) const
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+VT* HashMap<KT, VT, HASH, KEY_EQUALS>::getItemPointer(const KT& key) const
 {
-	return table.getItemPtr(key);
+	return table.getItemPointer(key);
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-List<VT> HashMap<KT, VT, HASH, COMPARE>::getValues_NoLock(const KT& key) const
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+List<VT> HashMap<KT, VT, HASH, KEY_EQUALS>::getValues_NoLock(const KT& key) const
 {
 	return table.getValues(key);
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_bool HashMap<KT, VT, HASH, COMPARE>::put_NoLock(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::put_NoLock(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
 {
 	return table.put(key, value, mode, pFlagExist);
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_bool HashMap<KT, VT, HASH, COMPARE>::addIfNewKeyAndValue_NoLock(const KT& key, const VT& value, sl_bool* pFlagExist)
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+template <class _VT, class VALUE_EQUALS>
+sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::addIfNewKeyAndValue_NoLock(const KT& key, const _VT& value, sl_bool* pFlagExist, const VALUE_EQUALS& value_equals)
 {
-	return table.addIfNewKeyAndValue(key, value, pFlagExist);
+	return table.addIfNewKeyAndValue(key, value, pFlagExist, value_equals);
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_bool HashMap<KT, VT, HASH, COMPARE>::addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist)
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+template <class _VT, class VALUE_EQUALS>
+sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::addIfNewKeyAndValue(const KT& key, const _VT& value, sl_bool* pFlagExist, const VALUE_EQUALS& value_equals)
 {
 	ObjectLocker lock(this);
-	return table.addIfNewKeyAndValue(key, value, pFlagExist);
+	return table.addIfNewKeyAndValue(key, value, pFlagExist, value_equals);
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_bool HashMap<KT, VT, HASH, COMPARE>::remove_NoLock(const KT& key, VT* outValue)
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::remove_NoLock(const KT& key, VT* outValue)
 {
 	return table.remove(key, outValue);
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_bool HashMap<KT, VT, HASH, COMPARE>::remove(const KT& key, VT* outValue)
-{
-	ObjectLocker lock(this);
-	return table.remove(key, outValue);
-}
-
-template <class KT, class VT, class HASH, class COMPARE>
-sl_size HashMap<KT, VT, HASH, COMPARE>::removeItems_NoLock(const KT& key, List<VT>* outValues)
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+sl_size HashMap<KT, VT, HASH, KEY_EQUALS>::removeItems_NoLock(const KT& key, List<VT>* outValues)
 {
 	return table.removeItems(key, outValues);
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_size HashMap<KT, VT, HASH, COMPARE>::removeItems(const KT& key, List<VT>* outValues)
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+template <class _VT, class VALUE_EQUALS>
+sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::removeKeyAndValue_NoLock(const KT& key, const _VT& value, VT* outValue, const VALUE_EQUALS& value_equals)
+{
+	return table.removeKeyAndValue(key, value, outValue, value_equals);
+}
+
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+template <class _VT, class VALUE_EQUALS>
+sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::removeKeyAndValue(const KT& key, const _VT& value, VT* outValue, const VALUE_EQUALS& value_equals)
 {
 	ObjectLocker lock(this);
-	return table.removeItems(key, outValues);
+	return table.removeKeyAndValue(key, value, outValue, value_equals);
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_bool HashMap<KT, VT, HASH, COMPARE>::removeValue_NoLock(const KT& key, const VT& value)
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+template <class _VT, class VALUE_EQUALS>
+sl_size HashMap<KT, VT, HASH, KEY_EQUALS>::removeItemsByKeyAndValue_NoLock(const KT& key, const _VT& value, List<VT>* outValues, const VALUE_EQUALS& value_equals)
 {
-	return table.removeValue(key, value);
+	return table.removeItemsByKeyAndValue(key, value, outValues, value_equals);
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_bool HashMap<KT, VT, HASH, COMPARE>::removeValue(const KT& key, const VT& value)
-{
-	ObjectLocker lock(this);
-	return table.removeValue(key, value);
-}
-
-template <class KT, class VT, class HASH, class COMPARE>
-sl_size HashMap<KT, VT, HASH, COMPARE>::removeValues_NoLock(const KT& key, const VT& value)
-{
-	return table.removeValues(key, value);
-}
-
-template <class KT, class VT, class HASH, class COMPARE>
-sl_size HashMap<KT, VT, HASH, COMPARE>::removeValues(const KT& key, const VT& value)
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+template <class _VT, class VALUE_EQUALS>
+sl_size HashMap<KT, VT, HASH, KEY_EQUALS>::removeItemsByKeyAndValue(const KT& key, const _VT& value, List<VT>* outValues, const VALUE_EQUALS& value_equals)
 {
 	ObjectLocker lock(this);
-	return table.removeValues(key, value);
+	return table.removeItemsByKeyAndValue(key, value, outValues, value_equals);
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_size HashMap<KT, VT, HASH, COMPARE>::removeAll_NoLock()
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+sl_size HashMap<KT, VT, HASH, KEY_EQUALS>::removeAll_NoLock()
 {
 	return table.removeAll();
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_bool HashMap<KT, VT, HASH, COMPARE>::contains_NoLock(const KT& key) const
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::contains_NoLock(const KT& key) const
 {
 	return table.search(key);
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_bool HashMap<KT, VT, HASH, COMPARE>::contains(const KT& key) const
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+template <class _VT, class VALUE_EQUALS>
+sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::containsKeyAndValue_NoLock(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals) const
+{
+	return table.searchKeyAndValue(key, value, sl_null, sl_null, value_equals);
+}
+
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+template <class _VT, class VALUE_EQUALS>
+sl_bool HashMap<KT, VT, HASH, KEY_EQUALS>::containsKeyAndValue(const KT& key, const _VT& value, const VALUE_EQUALS& value_equals) const
 {
 	ObjectLocker lock(this);
-	return table.search(key);
+	return table.searchKeyAndValue(key, value, sl_null, sl_null, value_equals);
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_bool HashMap<KT, VT, HASH, COMPARE>::contains_NoLock(const KT& key, const VT& value) const
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+IMap<KT, VT>* HashMap<KT, VT, HASH, KEY_EQUALS>::duplicate_NoLock() const
 {
-	return table.search(key, value);
-}
-
-template <class KT, class VT, class HASH, class COMPARE>
-sl_bool HashMap<KT, VT, HASH, COMPARE>::contains(const KT& key, const VT& value) const
-{
-	ObjectLocker lock(this);
-	return table.search(key, value);
-}
-
-template <class KT, class VT, class HASH, class COMPARE>
-IMap<KT, VT>* HashMap<KT, VT, HASH, COMPARE>::duplicate_NoLock() const
-{
-	HashMap<KT, VT, HASH, COMPARE>* ret = new HashMap<KT, VT, HASH, COMPARE>;
+	HashMap<KT, VT, HASH, KEY_EQUALS>* ret = new HashMap<KT, VT, HASH, KEY_EQUALS>;
 	if (ret) {
 		if (ret->table.copyFrom(&table)) {
 			return ret;
@@ -1489,14 +1539,14 @@ IMap<KT, VT>* HashMap<KT, VT, HASH, COMPARE>::duplicate_NoLock() const
 	return sl_null;
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-Iterator<KT> HashMap<KT, VT, HASH, COMPARE>::keyIteratorWithRefer(const Referable* refer) const
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+Iterator<KT> HashMap<KT, VT, HASH, KEY_EQUALS>::getKeyIteratorWithRefer(Referable* refer) const
 {
-	return new HashMapKeyIterator<KT, VT, HASH, COMPARE>(this, refer);
+	return new HashMapKeyIterator<KT, VT, HASH, KEY_EQUALS>(this, refer);
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-List<KT> HashMap<KT, VT, HASH, COMPARE>::keys_NoLock() const
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+List<KT> HashMap<KT, VT, HASH, KEY_EQUALS>::getAllKeys_NoLock() const
 {
 	CList<KT>* ret = new CList<KT>;
 	if (ret) {
@@ -1505,22 +1555,22 @@ List<KT> HashMap<KT, VT, HASH, COMPARE>::keys_NoLock() const
 		while (table.getNextPosition(pos, &key, sl_null)) {
 			if (!(ret->add_NoLock(key))) {
 				delete ret;
-				return List<KT>::null();
+				return sl_null;
 			}
 		}
 		return ret;
 	}
-	return List<KT>::null();
+	return sl_null;
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-Iterator<VT> HashMap<KT, VT, HASH, COMPARE>::valueIteratorWithRefer(const Referable* refer) const
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+Iterator<VT> HashMap<KT, VT, HASH, KEY_EQUALS>::getValueIteratorWithRefer(Referable* refer) const
 {
-	return new HashMapValueIterator<KT, VT, HASH, COMPARE>(this, refer);
+	return new HashMapValueIterator<KT, VT, HASH, KEY_EQUALS>(this, refer);
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-List<VT> HashMap<KT, VT, HASH, COMPARE>::values_NoLock() const
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+List<VT> HashMap<KT, VT, HASH, KEY_EQUALS>::getAllValues_NoLock() const
 {
 	CList<VT>* ret = new CList<VT>;
 	if (ret) {
@@ -1529,22 +1579,22 @@ List<VT> HashMap<KT, VT, HASH, COMPARE>::values_NoLock() const
 		while (table.getNextPosition(pos, sl_null, &value)) {
 			if (!(ret->add_NoLock(value))) {
 				delete ret;
-				return List<VT>::null();
+				return sl_null;
 			}
 		}
 		return ret;
 	}
-	return List<VT>::null();
+	return sl_null;
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-Iterator< Pair<KT, VT> > HashMap<KT, VT, HASH, COMPARE>::iteratorWithRefer(const Referable* refer) const
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+Iterator< Pair<KT, VT> > HashMap<KT, VT, HASH, KEY_EQUALS>::toIteratorWithRefer(Referable* refer) const
 {
-	return new HashMapIterator<KT, VT, HASH, COMPARE>(this, refer);
+	return new HashMapIterator<KT, VT, HASH, KEY_EQUALS>(this, refer);
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-List< Pair<KT, VT> > HashMap<KT, VT, HASH, COMPARE>::pairs_NoLock() const
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+List< Pair<KT, VT> > HashMap<KT, VT, HASH, KEY_EQUALS>::toList_NoLock() const
 {
 	CList< Pair<KT, VT> >* ret = new CList< Pair<KT, VT> >;
 	if (ret) {
@@ -1553,19 +1603,24 @@ List< Pair<KT, VT> > HashMap<KT, VT, HASH, COMPARE>::pairs_NoLock() const
 		while (table.getNextPosition(pos, &(pair.key), &(pair.value))) {
 			if (!(ret->add_NoLock(pair))) {
 				delete ret;
-				return List< Pair<KT, VT> >::null();
+				return sl_null;
 			}
 		}
 		return ret;
 	}
-	return List< Pair<KT, VT> >::null();
+	return sl_null;
 }
 
 
-template <class KT, class VT, class COMPARE>
-TreeMap<KT, VT, COMPARE>* TreeMap<KT, VT, COMPARE>::create()
+template <class KT, class VT, class KEY_COMPARE>
+TreeMap<KT, VT, KEY_COMPARE>::TreeMap(const KEY_COMPARE& key_compare) : tree(key_compare)
 {
-	TreeMap<KT, VT, COMPARE>* ret = new TreeMap<KT, VT, COMPARE>;
+}
+
+template <class KT, class VT, class KEY_COMPARE>
+TreeMap<KT, VT, KEY_COMPARE>* TreeMap<KT, VT, KEY_COMPARE>::create(const KEY_COMPARE& key_compare)
+{
+	TreeMap<KT, VT, KEY_COMPARE>* ret = new TreeMap<KT, VT, KEY_COMPARE>(key_compare);
 	if (ret) {
 		if (ret->tree.isValid()) {
 			return ret;
@@ -1575,131 +1630,130 @@ TreeMap<KT, VT, COMPARE>* TreeMap<KT, VT, COMPARE>::create()
 	return sl_null;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_size TreeMap<KT, VT, COMPARE>::getCount() const
+template <class KT, class VT, class KEY_COMPARE>
+VT TreeMap<KT, VT, KEY_COMPARE>::operator[](const KT& key) const
+{
+	ObjectLocker lock(this);
+	VT* p = tree.getItemPointer(key);
+	if (p) {
+		return *p;
+	} else {
+		return VT();
+	}
+}
+
+template <class KT, class VT, class KEY_COMPARE>
+sl_size TreeMap<KT, VT, KEY_COMPARE>::getCount() const
 {
 	return (sl_size)(tree.getCount());
 }
 
-template <class KT, class VT, class COMPARE>
-VT* TreeMap<KT, VT, COMPARE>::getItemPtr(const KT& key) const
+template <class KT, class VT, class KEY_COMPARE>
+VT* TreeMap<KT, VT, KEY_COMPARE>::getItemPointer(const KT& key) const
 {
-	return tree.getItemPtr(key);
+	return tree.getItemPointer(key);
 }
 
-template <class KT, class VT, class COMPARE>
-List<VT> TreeMap<KT, VT, COMPARE>::getValues_NoLock(const KT& key) const
+template <class KT, class VT, class KEY_COMPARE>
+List<VT> TreeMap<KT, VT, KEY_COMPARE>::getValues_NoLock(const KT& key) const
 {
 	return tree.getValues(key);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool TreeMap<KT, VT, COMPARE>::put_NoLock(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool TreeMap<KT, VT, KEY_COMPARE>::put_NoLock(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
 {
 	return tree.put(key, value, mode, pFlagExist);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool TreeMap<KT, VT, COMPARE>::addIfNewKeyAndValue_NoLock(const KT& key, const VT& value, sl_bool* pFlagExist)
+template <class KT, class VT, class KEY_COMPARE>
+template <class _VT, class VALUE_COMPARE>
+sl_bool TreeMap<KT, VT, KEY_COMPARE>::addIfNewKeyAndValue_NoLock(const KT& key, const _VT& value, sl_bool* pFlagExist, const VALUE_COMPARE& value_compare)
 {
-	return tree.addIfNewKeyAndValue(key, value, pFlagExist);
+	return tree.addIfNewKeyAndValue(key, value, pFlagExist, value_compare);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool TreeMap<KT, VT, COMPARE>::addIfNewKeyAndValue(const KT& key, const VT& value, sl_bool* pFlagExist)
+template <class KT, class VT, class KEY_COMPARE>
+template <class _VT, class VALUE_COMPARE>
+sl_bool TreeMap<KT, VT, KEY_COMPARE>::addIfNewKeyAndValue(const KT& key, const _VT& value, sl_bool* pFlagExist, const VALUE_COMPARE& value_compare)
 {
 	ObjectLocker lock(this);
-	return tree.addIfNewKeyAndValue(key, value, pFlagExist);
+	return tree.addIfNewKeyAndValue(key, value, pFlagExist, value_compare);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool TreeMap<KT, VT, COMPARE>::remove_NoLock(const KT& key, VT* outValue)
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool TreeMap<KT, VT, KEY_COMPARE>::remove_NoLock(const KT& key, VT* outValue)
 {
 	return tree.remove(key, outValue);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool TreeMap<KT, VT, COMPARE>::remove(const KT& key, VT* outValue)
-{
-	ObjectLocker lock(this);
-	return tree.remove(key, outValue);
-}
-
-template <class KT, class VT, class COMPARE>
-sl_size TreeMap<KT, VT, COMPARE>::removeItems_NoLock(const KT& key, List<VT>* outValues)
+template <class KT, class VT, class KEY_COMPARE>
+sl_size TreeMap<KT, VT, KEY_COMPARE>::removeItems_NoLock(const KT& key, List<VT>* outValues)
 {
 	return tree.removeItems(key, outValues);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_size TreeMap<KT, VT, COMPARE>::removeItems(const KT& key, List<VT>* outValues)
+template <class KT, class VT, class KEY_COMPARE>
+template <class _VT, class VALUE_COMPARE>
+sl_bool TreeMap<KT, VT, KEY_COMPARE>::removeKeyAndValue_NoLock(const KT& key, const _VT& value, VT* outValue, const VALUE_COMPARE& value_compare)
+{
+	return tree.removeKeyAndValue(key, value, outValue, value_compare);
+}
+
+template <class KT, class VT, class KEY_COMPARE>
+template <class _VT, class VALUE_COMPARE>
+sl_bool TreeMap<KT, VT, KEY_COMPARE>::removeKeyAndValue(const KT& key, const _VT& value, VT* outValue, const VALUE_COMPARE& value_compare)
 {
 	ObjectLocker lock(this);
-	return tree.removeItems(key, outValues);
+	return tree.removeKeyAndValue(key, value, outValue, value_compare);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool TreeMap<KT, VT, COMPARE>::removeValue_NoLock(const KT& key, const VT& value)
+template <class KT, class VT, class KEY_COMPARE>
+template <class _VT, class VALUE_COMPARE>
+sl_size TreeMap<KT, VT, KEY_COMPARE>::removeItemsByKeyAndValue_NoLock(const KT& key, const _VT& value, List<VT>* outValues, const VALUE_COMPARE& value_compare)
 {
-	return tree.removeValue(key, value);
+	return tree.removeItemsByKeyAndValue(key, value, outValues, value_compare);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool TreeMap<KT, VT, COMPARE>::removeValue(const KT& key, const VT& value)
-{
-	ObjectLocker lock(this);
-	return tree.removeValue(key, value);
-}
-
-template <class KT, class VT, class COMPARE>
-sl_size TreeMap<KT, VT, COMPARE>::removeValues_NoLock(const KT& key, const VT& value)
-{
-	return tree.removeValues(key, value);
-}
-
-template <class KT, class VT, class COMPARE>
-sl_size TreeMap<KT, VT, COMPARE>::removeValues(const KT& key, const VT& value)
+template <class KT, class VT, class KEY_COMPARE>
+template <class _VT, class VALUE_COMPARE>
+sl_size TreeMap<KT, VT, KEY_COMPARE>::removeItemsByKeyAndValue(const KT& key, const _VT& value, List<VT>* outValues, const VALUE_COMPARE& value_compare)
 {
 	ObjectLocker lock(this);
-	return tree.removeValues(key, value);
+	return tree.removeItemsByKeyAndValue(key, value, outValues, value_compare);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_size TreeMap<KT, VT, COMPARE>::removeAll_NoLock()
+template <class KT, class VT, class KEY_COMPARE>
+sl_size TreeMap<KT, VT, KEY_COMPARE>::removeAll_NoLock()
 {
 	return tree.removeAll();
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool TreeMap<KT, VT, COMPARE>::contains_NoLock(const KT& key) const
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool TreeMap<KT, VT, KEY_COMPARE>::contains_NoLock(const KT& key) const
 {
-	return tree.search(key, sl_null);
+	return tree.search(key);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool TreeMap<KT, VT, COMPARE>::contains(const KT& key) const
+template <class KT, class VT, class KEY_COMPARE>
+template <class _VT, class VALUE_COMPARE>
+sl_bool TreeMap<KT, VT, KEY_COMPARE>::containsKeyAndValue_NoLock(const KT& key, const _VT& value, const VALUE_COMPARE& value_compare) const
+{
+	return tree.searchKeyAndValue(key, value, sl_null, sl_null, value_compare);
+}
+
+template <class KT, class VT, class KEY_COMPARE>
+template <class _VT, class VALUE_COMPARE>
+sl_bool TreeMap<KT, VT, KEY_COMPARE>::containsKeyAndValue(const KT& key, const _VT& value, const VALUE_COMPARE& value_compare) const
 {
 	ObjectLocker lock(this);
-	return tree.search(key, sl_null);
+	return tree.searchKeyAndValue(key, value, sl_null, sl_null, value_compare);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool TreeMap<KT, VT, COMPARE>::contains_NoLock(const KT& key, const VT& value) const
+template <class KT, class VT, class KEY_COMPARE>
+IMap<KT, VT>* TreeMap<KT, VT, KEY_COMPARE>::duplicate_NoLock() const
 {
-	return tree.search(key, value, sl_null);
-}
-
-template <class KT, class VT, class COMPARE>
-sl_bool TreeMap<KT, VT, COMPARE>::contains(const KT& key, const VT& value) const
-{
-	ObjectLocker lock(this);
-	return tree.search(key, value, sl_null);
-}
-
-template <class KT, class VT, class COMPARE>
-IMap<KT, VT>* TreeMap<KT, VT, COMPARE>::duplicate_NoLock() const
-{
-	TreeMap<KT, VT, COMPARE>* ret = new TreeMap<KT, VT, COMPARE>;
+	TreeMap<KT, VT, KEY_COMPARE>* ret = new TreeMap<KT, VT, KEY_COMPARE>;
 	if (ret) {
 		TreePosition pos;
 		KT key;
@@ -1715,14 +1769,14 @@ IMap<KT, VT>* TreeMap<KT, VT, COMPARE>::duplicate_NoLock() const
 	return sl_null;
 }
 
-template <class KT, class VT, class COMPARE>
-Iterator<KT> TreeMap<KT, VT, COMPARE>::keyIteratorWithRefer(const Referable* refer) const
+template <class KT, class VT, class KEY_COMPARE>
+Iterator<KT> TreeMap<KT, VT, KEY_COMPARE>::getKeyIteratorWithRefer(Referable* refer) const
 {
-	return new TreeMapKeyIterator<KT, VT, COMPARE>(this, refer);
+	return new TreeMapKeyIterator<KT, VT, KEY_COMPARE>(this, refer);
 }
 
-template <class KT, class VT, class COMPARE>
-List<KT> TreeMap<KT, VT, COMPARE>::keys_NoLock() const
+template <class KT, class VT, class KEY_COMPARE>
+List<KT> TreeMap<KT, VT, KEY_COMPARE>::getAllKeys_NoLock() const
 {
 	CList<KT>* ret = new CList<KT>;
 	if (ret) {
@@ -1731,22 +1785,22 @@ List<KT> TreeMap<KT, VT, COMPARE>::keys_NoLock() const
 		while (tree.getNextPosition(pos, &key, sl_null)) {
 			if (!(ret->add_NoLock(key))) {
 				delete ret;
-				return List<KT>::null();
+				return sl_null;
 			}
 		}
 		return ret;
 	}
-	return List<KT>::null();
+	return sl_null;
 }
 
-template <class KT, class VT, class COMPARE>
-Iterator<VT> TreeMap<KT, VT, COMPARE>::valueIteratorWithRefer(const Referable* refer) const
+template <class KT, class VT, class KEY_COMPARE>
+Iterator<VT> TreeMap<KT, VT, KEY_COMPARE>::getValueIteratorWithRefer(Referable* refer) const
 {
-	return new TreeMapValueIterator<KT, VT, COMPARE>(this, refer);
+	return new TreeMapValueIterator<KT, VT, KEY_COMPARE>(this, refer);
 }
 
-template <class KT, class VT, class COMPARE>
-List<VT> TreeMap<KT, VT, COMPARE>::values_NoLock() const
+template <class KT, class VT, class KEY_COMPARE>
+List<VT> TreeMap<KT, VT, KEY_COMPARE>::getAllValues_NoLock() const
 {
 	CList<VT>* ret = new CList<VT>;
 	if (ret) {
@@ -1755,22 +1809,22 @@ List<VT> TreeMap<KT, VT, COMPARE>::values_NoLock() const
 		while (tree.getNextPosition(pos, sl_null, &value)) {
 			if (!(ret->add_NoLock(value))) {
 				delete ret;
-				return List<VT>::null();
+				return sl_null;
 			}
 		}
 		return ret;
 	}
-	return List<VT>::null();
+	return sl_null;
 }
 
-template <class KT, class VT, class COMPARE>
-Iterator< Pair<KT, VT> > TreeMap<KT, VT, COMPARE>::iteratorWithRefer(const Referable* refer) const
+template <class KT, class VT, class KEY_COMPARE>
+Iterator< Pair<KT, VT> > TreeMap<KT, VT, KEY_COMPARE>::toIteratorWithRefer(Referable* refer) const
 {
-	return new TreeMapIterator<KT, VT, COMPARE>(this, refer);
+	return new TreeMapIterator<KT, VT, KEY_COMPARE>(this, refer);
 }
 
-template <class KT, class VT, class COMPARE>
-List< Pair<KT, VT> > TreeMap<KT, VT, COMPARE>::pairs_NoLock() const
+template <class KT, class VT, class KEY_COMPARE>
+List< Pair<KT, VT> > TreeMap<KT, VT, KEY_COMPARE>::toList_NoLock() const
 {
 	CList< Pair<KT, VT> >* ret = new CList< Pair<KT, VT> >;
 	if (ret) {
@@ -1779,99 +1833,72 @@ List< Pair<KT, VT> > TreeMap<KT, VT, COMPARE>::pairs_NoLock() const
 		while (tree.getNextPosition(pos, &(pair.key), &(pair.value))) {
 			if (!(ret->add_NoLock(pair))) {
 				delete ret;
-				return List< Pair<KT, VT> >::null();
+				return sl_null;
 			}
 		}
 		return ret;
 	}
-	return List< Pair<KT, VT> >::null();
+	return sl_null;
 }
 
 
-SLIB_DEFINE_TEMPLATE_REF_WRAPPER(Map, SafeMap, IMap, ref)
-
 template <class KT, class VT>
-Map<KT, VT> Map<KT, VT>::createList()
+template <class KEY_EQUALS>
+Map<KT, VT> Map<KT, VT>::createList(const KEY_EQUALS& key_equals)
 {
-	return ListMap<KT, VT>::create();
+	return ListMap<KT, VT, KEY_EQUALS>::create(key_equals);
 }
 
 template <class KT, class VT>
-template <class COMPARE>
-Map<KT, VT> Map<KT, VT>::createListBy()
+template <class HASH, class KEY_EQUALS>
+Map<KT, VT> Map<KT, VT>::createHash(sl_uint32 initialCapacity, const HASH& hash, const KEY_EQUALS& key_equals)
 {
-	return ListMap<KT, VT, COMPARE>::create();
+	return HashMap<KT, VT, HASH, KEY_EQUALS>::create(initialCapacity, hash, key_equals);
 }
 
 template <class KT, class VT>
-Map<KT, VT> Map<KT, VT>::createHash(sl_uint32 initialCapacity)
+template <class KEY_COMPARE>
+Map<KT, VT> Map<KT, VT>::createTree(const KEY_COMPARE& key_compare)
 {
-	return HashMap<KT, VT>::create(initialCapacity);
+	return TreeMap<KT, VT, KEY_COMPARE>::create(key_compare);
 }
 
 template <class KT, class VT>
-template <class HASH, class COMPARE>
-Map<KT, VT> Map<KT, VT>::createHashBy(sl_uint32 initialCapacity)
+template <class KEY_EQUALS>
+void Map<KT, VT>::initList(const KEY_EQUALS& key_equals)
 {
-	return HashMap<KT, VT, HASH, COMPARE>::create(initialCapacity);
+	ref = ListMap<KT, VT, KEY_EQUALS>::create(key_equals);
 }
 
 template <class KT, class VT>
-Map<KT, VT> Map<KT, VT>::createTree()
+template <class HASH, class KEY_EQUALS>
+void Map<KT, VT>::initHash(sl_uint32 initialCapacity, const HASH& hash, const KEY_EQUALS& key_equals)
 {
-	return TreeMap<KT, VT>::create();
+	ref = HashMap<KT, VT, HASH, KEY_EQUALS>::create(initialCapacity, hash, key_equals);
 }
 
 template <class KT, class VT>
-template <class COMPARE>
-Map<KT, VT> Map<KT, VT>::createTreeBy()
+template <class KEY_COMPARE>
+void Map<KT, VT>::initTree(const KEY_COMPARE& key_compare)
 {
-	return TreeMap<KT, VT, COMPARE>::create();
+	ref = TreeMap<KT, VT, KEY_COMPARE>::create(key_compare);
 }
 
 template <class KT, class VT>
-void Map<KT, VT>::initList()
+VT Map<KT, VT>::operator[](const KT& key) const
 {
-	ref = ListMap<KT, VT>::create();
-}
-
-template <class KT, class VT>
-template <class COMPARE>
-void Map<KT, VT>::initListBy()
-{
-	ref = ListMap<KT, VT, COMPARE>::create();
-}
-
-template <class KT, class VT>
-void Map<KT, VT>::initHash(sl_uint32 initialCapacity)
-{
-	ref = HashMap<KT, VT>::create(initialCapacity);
-}
-
-template <class KT, class VT>
-template <class HASH, class COMPARE>
-void Map<KT, VT>::initHashBy(sl_uint32 initialCapacity)
-{
-	ref = HashMap<KT, VT, HASH, COMPARE>::create(initialCapacity);
-}
-
-template <class KT, class VT>
-void Map<KT, VT>::initTree()
-{
-	ref = TreeMap<KT, VT>::create();
-}
-
-template <class KT, class VT>
-template <class COMPARE>
-void Map<KT, VT>::initTreeBy()
-{
-	ref = TreeMap<KT, VT, COMPARE>::create();
+	IMap<KT, VT>* obj = ref._ptr;
+	if (obj) {
+		return obj->getValue(key);
+	} else {
+		return VT();
+	}
 }
 
 template <class KT, class VT>
 sl_size Map<KT, VT>::getCount() const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->getCount();
 	}
@@ -1881,7 +1908,7 @@ sl_size Map<KT, VT>::getCount() const
 template <class KT, class VT>
 sl_bool Map<KT, VT>::isEmpty() const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return (obj->getCount()) == 0;
 	}
@@ -1891,7 +1918,7 @@ sl_bool Map<KT, VT>::isEmpty() const
 template <class KT, class VT>
 sl_bool Map<KT, VT>::isNotEmpty() const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return (obj->getCount()) > 0;
 	}
@@ -1899,19 +1926,19 @@ sl_bool Map<KT, VT>::isNotEmpty() const
 }
 
 template <class KT, class VT>
-VT* Map<KT, VT>::getItemPtr(const KT& key) const
+VT* Map<KT, VT>::getItemPointer(const KT& key) const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
-		return obj->getItemPtr(key);
+		return obj->getItemPointer(key);
 	}
 	return sl_null;
 }
 
 template <class KT, class VT>
-VT* Map<KT, VT>::getNewItemPtr(const KT& key)
+VT* Map<KT, VT>::getNewItemPointer(const KT& key)
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (!obj) {
 		obj = IMap<KT, VT>::createDefault();
 		if (obj) {
@@ -1920,11 +1947,11 @@ VT* Map<KT, VT>::getNewItemPtr(const KT& key)
 			return sl_null;
 		}
 	}
-	VT* ret = obj->getItemPtr(key);
+	VT* ret = obj->getItemPointer(key);
 	if (!ret) {
 		VT t;
 		obj->put(key, t);
-		ret = obj->getItemPtr(key);
+		ret = obj->getItemPointer(key);
 	}
 	return ret;
 }
@@ -1932,7 +1959,7 @@ VT* Map<KT, VT>::getNewItemPtr(const KT& key)
 template <class KT, class VT>
 sl_bool Map<KT, VT>::get_NoLock(const KT& key, VT* _out) const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->get_NoLock(key, _out);
 	}
@@ -1942,7 +1969,7 @@ sl_bool Map<KT, VT>::get_NoLock(const KT& key, VT* _out) const
 template <class KT, class VT>
 sl_bool Map<KT, VT>::get(const KT& key, VT* _out) const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->get(key, _out);
 	}
@@ -1950,9 +1977,31 @@ sl_bool Map<KT, VT>::get(const KT& key, VT* _out) const
 }
 
 template <class KT, class VT>
+VT Map<KT, VT>::getValue_NoLock(const KT& key) const
+{
+	IMap<KT, VT>* obj = ref._ptr;
+	if (obj) {
+		return obj->getValue_NoLock(key);
+	} else {
+		return VT();
+	}
+}
+
+template <class KT, class VT>
+VT Map<KT, VT>::getValue(const KT& key) const
+{
+	IMap<KT, VT>* obj = ref._ptr;
+	if (obj) {
+		return obj->getValue(key);
+	} else {
+		return VT();
+	}
+}
+
+template <class KT, class VT>
 VT Map<KT, VT>::getValue_NoLock(const KT& key, const VT& def) const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->getValue_NoLock(key, def);
 	}
@@ -1962,7 +2011,7 @@ VT Map<KT, VT>::getValue_NoLock(const KT& key, const VT& def) const
 template <class KT, class VT>
 VT Map<KT, VT>::getValue(const KT& key, const VT& def) const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->getValue(key, def);
 	}
@@ -1972,27 +2021,27 @@ VT Map<KT, VT>::getValue(const KT& key, const VT& def) const
 template <class KT, class VT>
 List<VT> Map<KT, VT>::getValues_NoLock(const KT& key) const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->getValues_NoLock(key);
 	}
-	return List<VT>::null();
+	return sl_null;
 }
 
 template <class KT, class VT>
 List<VT> Map<KT, VT>::getValues(const KT& key) const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->getValues(key);
 	}
-	return List<VT>::null();
+	return sl_null;
 }
 
 template <class KT, class VT>
 sl_bool Map<KT, VT>::put_NoLock(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->put_NoLock(key, value, mode, pFlagExist);
 	} else {
@@ -2010,7 +2059,7 @@ sl_bool Map<KT, VT>::put_NoLock(const KT& key, const VT& value, MapPutMode mode,
 template <class KT, class VT>
 sl_bool Map<KT, VT>::put(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->put(key, value, mode, pFlagExist);
 	} else {
@@ -2026,49 +2075,26 @@ sl_bool Map<KT, VT>::put(const KT& key, const VT& value, MapPutMode mode, sl_boo
 }
 
 template <class KT, class VT>
-void Map<KT, VT>::putAll(const Map<KT, VT>& other, MapPutMode mode)
-{
-	IMap<KT, VT>* obj = ref.ptr;
-	if (obj) {
-		obj->putAll(other.ref.ptr, mode);
-	} else {
-		if (mode != MapPutMode::ReplaceExisting) {
-			obj = IMap<KT, VT>::createDefault();
-			if (obj) {
-				ref = obj;
-				obj->putAll(other.ref.ptr, mode);
-			}
-		}
-	}
-}
-
-template <class KT, class VT>
 template <class _KT, class _VT>
 void Map<KT, VT>::putAll(const Map<_KT, _VT>& other, MapPutMode mode)
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
-		obj->putAll(other.ref.ptr, mode);
+		obj->putAll(other.ref._ptr, mode);
 	} else {
 		if (mode != MapPutMode::ReplaceExisting) {
 			obj = IMap<KT, VT>::createDefault();
 			if (obj) {
 				ref = obj;
-				obj->putAll(other.ref.ptr, mode);
+				obj->putAll(other.ref._ptr, mode);
 			}
 		}
 	}
 }
 
 template <class KT, class VT>
-void Map<KT, VT>::putAll(const SafeMap<KT, VT>& other, MapPutMode mode)
-{
-	putAll(Map<KT, VT>(other), mode);
-}
-
-template <class KT, class VT>
 template <class _KT, class _VT>
-void Map<KT, VT>::putAll(const SafeMap<_KT, _VT>& other, MapPutMode mode)
+void Map<KT, VT>::putAll(const AtomicMap<_KT, _VT>& other, MapPutMode mode)
 {
 	putAll(Map<_KT, _VT>(other), mode);
 }
@@ -2076,7 +2102,7 @@ void Map<KT, VT>::putAll(const SafeMap<_KT, _VT>& other, MapPutMode mode)
 template <class KT, class VT>
 sl_bool Map<KT, VT>::remove_NoLock(const KT& key, VT* outValue) const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->remove_NoLock(key, outValue);
 	}
@@ -2086,7 +2112,7 @@ sl_bool Map<KT, VT>::remove_NoLock(const KT& key, VT* outValue) const
 template <class KT, class VT>
 sl_bool Map<KT, VT>::remove(const KT& key, VT* outValue) const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->remove(key, outValue);
 	}
@@ -2096,7 +2122,7 @@ sl_bool Map<KT, VT>::remove(const KT& key, VT* outValue) const
 template <class KT, class VT>
 sl_size Map<KT, VT>::removeItems_NoLock(const KT& key, List<VT>* outValues) const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->removeItems_NoLock(key, outValues);
 	}
@@ -2106,7 +2132,7 @@ sl_size Map<KT, VT>::removeItems_NoLock(const KT& key, List<VT>* outValues) cons
 template <class KT, class VT>
 sl_size Map<KT, VT>::removeItems(const KT& key, List<VT>* outValues) const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->removeItems(key, outValues);
 	}
@@ -2116,7 +2142,7 @@ sl_size Map<KT, VT>::removeItems(const KT& key, List<VT>* outValues) const
 template <class KT, class VT>
 sl_size Map<KT, VT>::removeAll_NoLock() const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->removeAll_NoLock();
 	}
@@ -2126,7 +2152,7 @@ sl_size Map<KT, VT>::removeAll_NoLock() const
 template <class KT, class VT>
 sl_size Map<KT, VT>::removeAll() const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->removeAll();
 	}
@@ -2136,7 +2162,7 @@ sl_size Map<KT, VT>::removeAll() const
 template <class KT, class VT>
 sl_bool Map<KT, VT>::contains_NoLock(const KT& key) const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->contains_NoLock(key);
 	}
@@ -2146,7 +2172,7 @@ sl_bool Map<KT, VT>::contains_NoLock(const KT& key) const
 template <class KT, class VT>
 sl_bool Map<KT, VT>::contains(const KT& key) const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->contains(key);
 	}
@@ -2156,117 +2182,117 @@ sl_bool Map<KT, VT>::contains(const KT& key) const
 template <class KT, class VT>
 Map<KT, VT> Map<KT, VT>::duplicate_NoLock() const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->duplicate_NoLock();
 	}
-	return Map<KT, VT>::null();
+	return sl_null;
 }
 
 template <class KT, class VT>
 Map<KT, VT> Map<KT, VT>::duplicate() const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->duplicate();
 	}
-	return Map<KT, VT>::null();
+	return sl_null;
 }
 
 template <class KT, class VT>
-Iterator<KT> Map<KT, VT>::keyIterator() const
+Iterator<KT> Map<KT, VT>::getKeyIterator() const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
-		return obj->keyIteratorWithRefer(obj);
+		return obj->getKeyIteratorWithRefer(obj);
 	}
-	return Iterator<KT>::null();
+	return sl_null;
 }
 
 template <class KT, class VT>
-List<KT> Map<KT, VT>::keys_NoLock() const
+List<KT> Map<KT, VT>::getAllKeys_NoLock() const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
-		return obj->keys_NoLock();
+		return obj->getAllKeys_NoLock();
 	}
-	return List<KT>::null();
+	return sl_null;
 }
 
 template <class KT, class VT>
-List<KT> Map<KT, VT>::keys() const
+List<KT> Map<KT, VT>::getAllKeys() const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
-		return obj->keys();
+		return obj->getAllKeys();
 	}
-	return List<KT>::null();
+	return sl_null;
 }
 
 template <class KT, class VT>
-Iterator<VT> Map<KT, VT>::valueIterator() const
+Iterator<VT> Map<KT, VT>::getValueIterator() const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
-		return obj->valueIteratorWithRefer(obj);
+		return obj->getValueIteratorWithRefer(obj);
 	}
-	return Iterator<VT>::null();
+	return sl_null;
 }
 
 template <class KT, class VT>
-List<VT> Map<KT, VT>::values_NoLock() const
+List<VT> Map<KT, VT>::getAllValues_NoLock() const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
-		return obj->values_NoLock();
+		return obj->getAllValues_NoLock();
 	}
-	return List<VT>::null();
+	return sl_null;
 }
 
 template <class KT, class VT>
-List<VT> Map<KT, VT>::values() const
+List<VT> Map<KT, VT>::getAllValues() const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
-		return obj->values();
+		return obj->getAllValues();
 	}
-	return List<VT>::null();
+	return sl_null;
 }
 
 template <class KT, class VT>
-Iterator< Pair<KT, VT> > Map<KT, VT>::iterator() const
+Iterator< Pair<KT, VT> > Map<KT, VT>::toIterator() const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
-		return obj->iteratorWithRefer(obj);
+		return obj->toIteratorWithRefer(obj);
 	}
-	return Iterator< Pair<KT, VT> >::null();
+	return sl_null;
 }
 
 template <class KT, class VT>
-List< Pair<KT, VT> > Map<KT, VT>::pairs_NoLock() const
+List< Pair<KT, VT> > Map<KT, VT>::toList_NoLock() const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
-		return obj->pairs_NoLock();
+		return obj->toList_NoLock();
 	}
-	return List< Pair<KT, VT> >::null();
+	return sl_null;
 }
 
 template <class KT, class VT>
-List< Pair<KT, VT> > Map<KT, VT>::pairs() const
+List< Pair<KT, VT> > Map<KT, VT>::toList() const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
-		return obj->pairs();
+		return obj->toList();
 	}
-	return List< Pair<KT, VT> >::null();
+	return sl_null;
 }
 
 template <class KT, class VT>
 SLIB_INLINE IteratorPosition< Pair<KT, VT> > Map<KT, VT>::begin() const
 {
-	return iterator().begin();
+	return toIterator().begin();
 }
 
 template <class KT, class VT>
@@ -2278,7 +2304,7 @@ SLIB_INLINE IteratorPosition< Pair<KT, VT> > Map<KT, VT>::end() const
 template <class KT, class VT>
 const Mutex* Map<KT, VT>::getLocker() const
 {
-	IMap<KT, VT>* obj = ref.ptr;
+	IMap<KT, VT>* obj = ref._ptr;
 	if (obj) {
 		return obj->getLocker();
 	}
@@ -2286,49 +2312,40 @@ const Mutex* Map<KT, VT>::getLocker() const
 }
 
 
-SLIB_DEFINE_TEMPLATE_REF_WRAPPER(SafeMap, Map, IMap, ref)
-
 template <class KT, class VT>
-void SafeMap<KT, VT>::initList()
+template <class KEY_EQUALS>
+void Atomic< Map<KT, VT> >::initList(const KEY_EQUALS& key_equals)
 {
-	ref = ListMap<KT, VT>::create();
+	ref = ListMap<KT, VT, KEY_EQUALS>::create(key_equals);
 }
 
 template <class KT, class VT>
-template <class COMPARE>
-void SafeMap<KT, VT>::initListBy()
+template <class HASH, class KEY_EQUALS>
+void Atomic< Map<KT, VT> >::initHash(sl_uint32 initialCapacity, const HASH& hash, const KEY_EQUALS& key_equals)
 {
-	ref = ListMap<KT, VT, COMPARE>::create();
+	ref = HashMap<KT, VT, HASH, KEY_EQUALS>::create(initialCapacity, hash, key_equals);
 }
 
 template <class KT, class VT>
-void SafeMap<KT, VT>::initHash(sl_uint32 initialCapacity)
+template <class KEY_COMPARE>
+void Atomic< Map<KT, VT> >::initTree(const KEY_COMPARE& key_compare)
 {
-	ref = HashMap<KT, VT>::create(initialCapacity);
+	ref = TreeMap<KT, VT, KEY_COMPARE>::create(key_compare);
 }
 
 template <class KT, class VT>
-template <class HASH, class COMPARE>
-void SafeMap<KT, VT>::initHashBy(sl_uint32 initialCapacity)
+VT Atomic< Map<KT, VT> >::operator[](const KT& key) const
 {
-	ref = HashMap<KT, VT, HASH, COMPARE>::create(initialCapacity);
+	Ref< IMap<KT, VT> > obj(ref);
+	if (obj.isNotNull()) {
+		return obj->getValue(key);
+	} else {
+		return VT();
+	}
 }
 
 template <class KT, class VT>
-void SafeMap<KT, VT>::initTree()
-{
-	ref = TreeMap<KT, VT>::create();
-}
-
-template <class KT, class VT>
-template <class COMPARE>
-void SafeMap<KT, VT>::initTreeBy()
-{
-	ref = TreeMap<KT, VT, COMPARE>::create();
-}
-
-template <class KT, class VT>
-sl_size SafeMap<KT, VT>::getCount() const
+sl_size Atomic< Map<KT, VT> >::getCount() const
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
@@ -2338,7 +2355,7 @@ sl_size SafeMap<KT, VT>::getCount() const
 }
 
 template <class KT, class VT>
-sl_bool SafeMap<KT, VT>::isEmpty() const
+sl_bool Atomic< Map<KT, VT> >::isEmpty() const
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
@@ -2348,7 +2365,7 @@ sl_bool SafeMap<KT, VT>::isEmpty() const
 }
 
 template <class KT, class VT>
-sl_bool SafeMap<KT, VT>::isNotEmpty() const
+sl_bool Atomic< Map<KT, VT> >::isNotEmpty() const
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
@@ -2358,7 +2375,7 @@ sl_bool SafeMap<KT, VT>::isNotEmpty() const
 }
 
 template <class KT, class VT>
-sl_bool SafeMap<KT, VT>::get(const KT& key, VT* _out) const
+sl_bool Atomic< Map<KT, VT> >::get(const KT& key, VT* _out) const
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
@@ -2368,7 +2385,18 @@ sl_bool SafeMap<KT, VT>::get(const KT& key, VT* _out) const
 }
 
 template <class KT, class VT>
-VT SafeMap<KT, VT>::getValue(const KT& key, const VT& def) const
+VT Atomic< Map<KT, VT> >::getValue(const KT& key) const
+{
+	Ref< IMap<KT, VT> > obj(ref);
+	if (obj.isNotNull()) {
+		return obj->getValue(key);
+	} else {
+		return VT();
+	}
+}
+
+template <class KT, class VT>
+VT Atomic< Map<KT, VT> >::getValue(const KT& key, const VT& def) const
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
@@ -2378,17 +2406,17 @@ VT SafeMap<KT, VT>::getValue(const KT& key, const VT& def) const
 }
 
 template <class KT, class VT>
-List<VT> SafeMap<KT, VT>::getValues(const KT& key) const
+List<VT> Atomic< Map<KT, VT> >::getValues(const KT& key) const
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
 		return obj->getValues(key);
 	}
-	return List<VT>::null();
+	return sl_null;
 }
 
 template <class KT, class VT>
-sl_bool SafeMap<KT, VT>::put(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
+sl_bool Atomic< Map<KT, VT> >::put(const KT& key, const VT& value, MapPutMode mode, sl_bool* pFlagExist)
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
@@ -2413,24 +2441,25 @@ sl_bool SafeMap<KT, VT>::put(const KT& key, const VT& value, MapPutMode mode, sl
 }
 
 template <class KT, class VT>
-void SafeMap<KT, VT>::putAll(const Map<KT, VT>& other, MapPutMode mode)
+template <class _KT, class _VT>
+void Atomic< Map<KT, VT> >::putAll(const Map<_KT, _VT>& other, MapPutMode mode)
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
-		obj->putAll(other.ref.ptr, mode);
+		obj->putAll(other.ref._ptr, mode);
 	} else {
 		if (mode != MapPutMode::ReplaceExisting) {
 			SpinLocker lock(SpinLockPoolForMap::get(this));
 			obj = ref;
 			if (obj.isNotNull()) {
 				lock.unlock();
-				obj->putAll(other.ref.ptr, mode);
+				obj->putAll(other.ref._ptr, mode);
 			}
 			obj = IMap<KT, VT>::createDefault();
 			if (obj.isNotNull()) {
 				ref = obj;
 				lock.unlock();
-				obj->putAll(other.ref.ptr, mode);
+				obj->putAll(other.ref._ptr, mode);
 			}
 		}
 	}
@@ -2438,44 +2467,13 @@ void SafeMap<KT, VT>::putAll(const Map<KT, VT>& other, MapPutMode mode)
 
 template <class KT, class VT>
 template <class _KT, class _VT>
-void SafeMap<KT, VT>::putAll(const Map<_KT, _VT>& other, MapPutMode mode)
-{
-	Ref< IMap<KT, VT> > obj(ref);
-	if (obj.isNotNull()) {
-		obj->putAll(other.ref.ptr, mode);
-	} else {
-		if (mode != MapPutMode::ReplaceExisting) {
-			SpinLocker lock(SpinLockPoolForMap::get(this));
-			obj = ref;
-			if (obj.isNotNull()) {
-				lock.unlock();
-				obj->putAll(other.ref.ptr, mode);
-			}
-			obj = IMap<KT, VT>::createDefault();
-			if (obj.isNotNull()) {
-				ref = obj;
-				lock.unlock();
-				obj->putAll(other.ref.ptr, mode);
-			}
-		}
-	}
-}
-
-template <class KT, class VT>
-void SafeMap<KT, VT>::putAll(const SafeMap<KT, VT>& other, MapPutMode mode)
-{
-	putAll(Map<KT, VT>(other), mode);
-}
-
-template <class KT, class VT>
-template <class _KT, class _VT>
-void SafeMap<KT, VT>::putAll(const SafeMap<_KT, _VT>& other, MapPutMode mode)
+void Atomic< Map<KT, VT> >::putAll(const AtomicMap<_KT, _VT>& other, MapPutMode mode)
 {
 	putAll(Map<_KT, _VT>(other), mode);
 }
 
 template <class KT, class VT>
-sl_bool SafeMap<KT, VT>::remove(const KT& key, VT* outValue) const
+sl_bool Atomic< Map<KT, VT> >::remove(const KT& key, VT* outValue) const
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
@@ -2485,7 +2483,7 @@ sl_bool SafeMap<KT, VT>::remove(const KT& key, VT* outValue) const
 }
 
 template <class KT, class VT>
-sl_size SafeMap<KT, VT>::removeItems(const KT& key, List<VT>* outValues) const
+sl_size Atomic< Map<KT, VT> >::removeItems(const KT& key, List<VT>* outValues) const
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
@@ -2495,7 +2493,7 @@ sl_size SafeMap<KT, VT>::removeItems(const KT& key, List<VT>* outValues) const
 }
 
 template <class KT, class VT>
-sl_size SafeMap<KT, VT>::removeAll() const
+sl_size Atomic< Map<KT, VT> >::removeAll() const
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
@@ -2505,7 +2503,7 @@ sl_size SafeMap<KT, VT>::removeAll() const
 }
 
 template <class KT, class VT>
-sl_bool SafeMap<KT, VT>::contains(const KT& key) const
+sl_bool Atomic< Map<KT, VT> >::contains(const KT& key) const
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
@@ -2515,198 +2513,200 @@ sl_bool SafeMap<KT, VT>::contains(const KT& key) const
 }
 
 template <class KT, class VT>
-Map<KT, VT> SafeMap<KT, VT>::duplicate() const
+Map<KT, VT> Atomic< Map<KT, VT> >::duplicate() const
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
 		return obj->duplicate();
 	}
-	return Map<KT, VT>::null();
+	return sl_null;
 }
 
 template <class KT, class VT>
-Iterator<KT> SafeMap<KT, VT>::keyIterator() const
+Iterator<KT> Atomic< Map<KT, VT> >::getKeyIterator() const
 {
 	Map<KT, VT> map(*this);
-	return map.keyIterator();
+	return map.getKeyIterator();
 }
 
 template <class KT, class VT>
-List<KT> SafeMap<KT, VT>::keys() const
+List<KT> Atomic< Map<KT, VT> >::getAllKeys() const
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->keys();
+		return obj->getAllKeys();
 	}
-	return List<KT>::null();
+	return sl_null;
 }
 
 template <class KT, class VT>
-Iterator<VT> SafeMap<KT, VT>::valueIterator() const
+Iterator<VT> Atomic< Map<KT, VT> >::getValueIterator() const
 {
 	Map<KT, VT> map(*this);
-	return map.valueIterator();
+	return map.getValueIterator();
 }
 
 template <class KT, class VT>
-List<VT> SafeMap<KT, VT>::values() const
+List<VT> Atomic< Map<KT, VT> >::getAllValues() const
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->values();
+		return obj->getAllValues();
 	}
-	return List<VT>::null();
+	return sl_null;
 }
 
 template <class KT, class VT>
-Iterator< Pair<KT, VT> > SafeMap<KT, VT>::iterator() const
+Iterator< Pair<KT, VT> > Atomic< Map<KT, VT> >::toIterator() const
 {
 	Map<KT, VT> map(*this);
-	return map.iterator();
+	return map.toIterator();
 }
 
 template <class KT, class VT>
-List< Pair<KT, VT> > SafeMap<KT, VT>::pairs() const
+List< Pair<KT, VT> > Atomic< Map<KT, VT> >::toList() const
 {
 	Ref< IMap<KT, VT> > obj(ref);
 	if (obj.isNotNull()) {
-		return obj->pairs();
+		return obj->toList();
 	}
-	return List< Pair<KT, VT> >::null();
+	return sl_null;
 }
 
 template <class KT, class VT>
-SLIB_INLINE IteratorPosition< Pair<KT, VT> > SafeMap<KT, VT>::begin() const
+SLIB_INLINE IteratorPosition< Pair<KT, VT> > Atomic< Map<KT, VT> >::begin() const
 {
-	return iterator().begin();
+	return toIterator().begin();
 }
 
 template <class KT, class VT>
-SLIB_INLINE IteratorPosition< Pair<KT, VT> > SafeMap<KT, VT>::end() const
+SLIB_INLINE IteratorPosition< Pair<KT, VT> > Atomic< Map<KT, VT> >::end() const
 {
 	return IteratorPosition< Pair<KT, VT> >();
 }
 
 
-template <class KT, class VT, class COMPARE>
-ListMapKeyIterator<KT, VT, COMPARE>::ListMapKeyIterator(const ListMap<KT, VT, COMPARE>* map, const Referable* refer)
+template <class KT, class VT, class KEY_EQUALS>
+ListMapKeyIterator<KT, VT, KEY_EQUALS>::ListMapKeyIterator(const ListMap<KT, VT, KEY_EQUALS>* map, Referable* refer)
+: m_map(map), m_index(0), m_refer(refer)
 {
-	m_map = map;
-	m_index = 0;
-	m_refer = refer;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool ListMapKeyIterator<KT, VT, COMPARE>::hasNext()
+template <class KT, class VT, class KEY_EQUALS>
+sl_bool ListMapKeyIterator<KT, VT, KEY_EQUALS>::hasNext()
 {
 	return (m_index < m_map->getCount());
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool ListMapKeyIterator<KT, VT, COMPARE>::next(KT* _out)
+template <class KT, class VT, class KEY_EQUALS>
+sl_bool ListMapKeyIterator<KT, VT, KEY_EQUALS>::next(KT* _out)
 {
-	Pair<KT, VT> pair;
-	if (m_map->list.getItem(m_index, &pair)) {
-		if (_out) {
+	if (_out) {
+		Pair<KT, VT> pair;
+		if (m_map->list.getAt(m_index, &pair)) {
 			*_out = pair.key;
+			m_index++;
+			return sl_true;
 		}
-		m_index++;
-		return sl_true;
+	} else {
+		if (m_map->list.getAt(m_index, sl_null)) {
+			m_index++;
+			return sl_true;
+		}
 	}
 	return sl_false;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_reg ListMapKeyIterator<KT, VT, COMPARE>::getIndex()
+template <class KT, class VT, class KEY_EQUALS>
+sl_reg ListMapKeyIterator<KT, VT, KEY_EQUALS>::getIndex()
 {
 	return (sl_reg)m_index - 1;
 }
 
 
-template <class KT, class VT, class COMPARE>
-ListMapValueIterator<KT, VT, COMPARE>::ListMapValueIterator(const ListMap<KT, VT, COMPARE>* map, const Referable* refer)
+template <class KT, class VT, class KEY_EQUALS>
+ListMapValueIterator<KT, VT, KEY_EQUALS>::ListMapValueIterator(const ListMap<KT, VT, KEY_EQUALS>* map, Referable* refer)
+: m_map(map), m_index(0), m_refer(refer)
 {
-	m_map = map;
-	m_index = 0;
-	m_refer = refer;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool ListMapValueIterator<KT, VT, COMPARE>::hasNext()
+template <class KT, class VT, class KEY_EQUALS>
+sl_bool ListMapValueIterator<KT, VT, KEY_EQUALS>::hasNext()
 {
 	return (m_index < m_map->getCount());
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool ListMapValueIterator<KT, VT, COMPARE>::next(VT* _out)
+template <class KT, class VT, class KEY_EQUALS>
+sl_bool ListMapValueIterator<KT, VT, KEY_EQUALS>::next(VT* _out)
 {
-	Pair<KT, VT> pair;
-	if (m_map->list.getItem(m_index, &pair)) {
-		if (_out) {
+	if (_out) {
+		Pair<KT, VT> pair;
+		if (m_map->list.getAt(m_index, &pair)) {
 			*_out = pair.value;
+			m_index++;
+			return sl_true;
 		}
-		m_index++;
-		return sl_true;
+	} else {
+		if (m_map->list.getAt(m_index, sl_null)) {
+			m_index++;
+			return sl_true;
+		}
 	}
 	return sl_false;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_reg ListMapValueIterator<KT, VT, COMPARE>::getIndex()
+template <class KT, class VT, class KEY_EQUALS>
+sl_reg ListMapValueIterator<KT, VT, KEY_EQUALS>::getIndex()
 {
 	return (sl_reg)m_index - 1;
 }
 
 
-template <class KT, class VT, class COMPARE>
-ListMapIterator<KT, VT, COMPARE>::ListMapIterator(const ListMap<KT, VT, COMPARE>* map, const Referable* refer)
+template <class KT, class VT, class KEY_EQUALS>
+ListMapIterator<KT, VT, KEY_EQUALS>::ListMapIterator(const ListMap<KT, VT, KEY_EQUALS>* map, Referable* refer)
+: m_map(map), m_index(0), m_refer(refer)
 {
-	m_map = map;
-	m_index = 0;
-	m_refer = refer;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool ListMapIterator<KT, VT, COMPARE>::hasNext()
+template <class KT, class VT, class KEY_EQUALS>
+sl_bool ListMapIterator<KT, VT, KEY_EQUALS>::hasNext()
 {
 	return (m_index < m_map->getCount());
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool ListMapIterator<KT, VT, COMPARE>::next(Pair<KT, VT>* _out)
+template <class KT, class VT, class KEY_EQUALS>
+sl_bool ListMapIterator<KT, VT, KEY_EQUALS>::next(Pair<KT, VT>* _out)
 {
-	if (m_map->list.getItem(m_index, _out)) {
+	if (m_map->list.getAt(m_index, _out)) {
 		m_index++;
 		return sl_true;
 	}
 	return sl_false;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_reg ListMapIterator<KT, VT, COMPARE>::getIndex()
+template <class KT, class VT, class KEY_EQUALS>
+sl_reg ListMapIterator<KT, VT, KEY_EQUALS>::getIndex()
 {
 	return (sl_reg)m_index - 1;
 }
 
 
-template <class KT, class VT, class HASH, class COMPARE>
-HashMapKeyIterator<KT, VT, HASH, COMPARE>::HashMapKeyIterator(const HashMap<KT, VT, HASH, COMPARE>* map, const Referable* refer)
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+HashMapKeyIterator<KT, VT, HASH, KEY_EQUALS>::HashMapKeyIterator(const HashMap<KT, VT, HASH, KEY_EQUALS>* map, Referable* refer)
+: m_map(map), m_index(0), m_refer(refer)
 {
-	m_map = map;
-	m_index = 0;
-	m_refer = refer;
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_bool HashMapKeyIterator<KT, VT, HASH, COMPARE>::hasNext()
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+sl_bool HashMapKeyIterator<KT, VT, HASH, KEY_EQUALS>::hasNext()
 {
 	ObjectLocker lock(m_map);
 	HashPosition pos = m_pos;
 	return m_map->table.getNextPosition(pos);
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_bool HashMapKeyIterator<KT, VT, HASH, COMPARE>::next(KT* _out)
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+sl_bool HashMapKeyIterator<KT, VT, HASH, KEY_EQUALS>::next(KT* _out)
 {
 	ObjectLocker lock(m_map);
 	if (m_map->table.getNextPosition(m_pos, _out, sl_null)) {
@@ -2716,31 +2716,29 @@ sl_bool HashMapKeyIterator<KT, VT, HASH, COMPARE>::next(KT* _out)
 	return sl_false;
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_reg HashMapKeyIterator<KT, VT, HASH, COMPARE>::getIndex()
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+sl_reg HashMapKeyIterator<KT, VT, HASH, KEY_EQUALS>::getIndex()
 {
 	return (sl_reg)m_index - 1;
 }
 
 
-template <class KT, class VT, class HASH, class COMPARE>
-HashMapValueIterator<KT, VT, HASH, COMPARE>::HashMapValueIterator(const HashMap<KT, VT, HASH, COMPARE>* map, const Referable* refer)
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+HashMapValueIterator<KT, VT, HASH, KEY_EQUALS>::HashMapValueIterator(const HashMap<KT, VT, HASH, KEY_EQUALS>* map, Referable* refer)
+: m_map(map), m_index(0), m_refer(refer)
 {
-	m_map = map;
-	m_index = 0;
-	m_refer = refer;
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_bool HashMapValueIterator<KT, VT, HASH, COMPARE>::hasNext()
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+sl_bool HashMapValueIterator<KT, VT, HASH, KEY_EQUALS>::hasNext()
 {
 	ObjectLocker lock(m_map);
 	HashPosition pos = m_pos;
 	return m_map->table.getNextPosition(pos);
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_bool HashMapValueIterator<KT, VT, HASH, COMPARE>::next(VT* _out)
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+sl_bool HashMapValueIterator<KT, VT, HASH, KEY_EQUALS>::next(VT* _out)
 {
 	ObjectLocker lock(m_map);
 	if (m_map->table.getNextPosition(m_pos, sl_null, _out)) {
@@ -2750,31 +2748,29 @@ sl_bool HashMapValueIterator<KT, VT, HASH, COMPARE>::next(VT* _out)
 	return sl_false;
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_reg HashMapValueIterator<KT, VT, HASH, COMPARE>::getIndex()
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+sl_reg HashMapValueIterator<KT, VT, HASH, KEY_EQUALS>::getIndex()
 {
 	return (sl_reg)m_index - 1;
 }
 
 
-template <class KT, class VT, class HASH, class COMPARE>
-HashMapIterator<KT, VT, HASH, COMPARE>::HashMapIterator(const HashMap<KT, VT, HASH, COMPARE>* map, const Referable* refer)
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+HashMapIterator<KT, VT, HASH, KEY_EQUALS>::HashMapIterator(const HashMap<KT, VT, HASH, KEY_EQUALS>* map, Referable* refer)
+: m_map(map), m_index(0), m_refer(refer)
 {
-	m_map = map;
-	m_index = 0;
-	m_refer = refer;
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_bool HashMapIterator<KT, VT, HASH, COMPARE>::hasNext()
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+sl_bool HashMapIterator<KT, VT, HASH, KEY_EQUALS>::hasNext()
 {
 	ObjectLocker lock(m_map);
 	HashPosition pos = m_pos;
 	return m_map->table.getNextPosition(pos, sl_null, sl_null);
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_bool HashMapIterator<KT, VT, HASH, COMPARE>::next(Pair<KT, VT>* _out)
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+sl_bool HashMapIterator<KT, VT, HASH, KEY_EQUALS>::next(Pair<KT, VT>* _out)
 {
 	ObjectLocker lock(m_map);
 	if (m_map->table.getNextPosition(m_pos, &(_out->key), &(_out->value))) {
@@ -2784,31 +2780,29 @@ sl_bool HashMapIterator<KT, VT, HASH, COMPARE>::next(Pair<KT, VT>* _out)
 	return sl_false;
 }
 
-template <class KT, class VT, class HASH, class COMPARE>
-sl_reg HashMapIterator<KT, VT, HASH, COMPARE>::getIndex()
+template <class KT, class VT, class HASH, class KEY_EQUALS>
+sl_reg HashMapIterator<KT, VT, HASH, KEY_EQUALS>::getIndex()
 {
 	return (sl_reg)m_index - 1;
 }
 
 
-template <class KT, class VT, class COMPARE>
-TreeMapKeyIterator<KT, VT, COMPARE>::TreeMapKeyIterator(const TreeMap<KT, VT, COMPARE>* map, const Referable* refer)
+template <class KT, class VT, class KEY_COMPARE>
+TreeMapKeyIterator<KT, VT, KEY_COMPARE>::TreeMapKeyIterator(const TreeMap<KT, VT, KEY_COMPARE>* map, Referable* refer)
+: m_map(map), m_index(0), m_refer(refer)
 {
-	m_map = map;
-	m_index = 0;
-	m_refer = refer;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool TreeMapKeyIterator<KT, VT, COMPARE>::hasNext()
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool TreeMapKeyIterator<KT, VT, KEY_COMPARE>::hasNext()
 {
 	ObjectLocker lock(m_map);
 	TreePosition pos = m_pos;
 	return m_map->tree.getNextPosition(pos);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool TreeMapKeyIterator<KT, VT, COMPARE>::next(KT* _out)
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool TreeMapKeyIterator<KT, VT, KEY_COMPARE>::next(KT* _out)
 {
 	ObjectLocker lock(m_map);
 	if (m_map->tree.getNextPosition(m_pos, _out, sl_null)) {
@@ -2818,31 +2812,29 @@ sl_bool TreeMapKeyIterator<KT, VT, COMPARE>::next(KT* _out)
 	return sl_false;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_reg TreeMapKeyIterator<KT, VT, COMPARE>::getIndex()
+template <class KT, class VT, class KEY_COMPARE>
+sl_reg TreeMapKeyIterator<KT, VT, KEY_COMPARE>::getIndex()
 {
 	return (sl_reg)m_index - 1;
 }
 
 
-template <class KT, class VT, class COMPARE>
-TreeMapValueIterator<KT, VT, COMPARE>::TreeMapValueIterator(const TreeMap<KT, VT, COMPARE>* map, const Referable* refer)
+template <class KT, class VT, class KEY_COMPARE>
+TreeMapValueIterator<KT, VT, KEY_COMPARE>::TreeMapValueIterator(const TreeMap<KT, VT, KEY_COMPARE>* map, Referable* refer)
+: m_map(map), m_index(0), m_refer(refer)
 {
-	m_map = map;
-	m_index = 0;
-	m_refer = refer;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool TreeMapValueIterator<KT, VT, COMPARE>::hasNext()
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool TreeMapValueIterator<KT, VT, KEY_COMPARE>::hasNext()
 {
 	ObjectLocker lock(m_map);
 	TreePosition pos = m_pos;
 	return m_map->tree.getNextPosition(pos);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool TreeMapValueIterator<KT, VT, COMPARE>::next(VT* _out)
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool TreeMapValueIterator<KT, VT, KEY_COMPARE>::next(VT* _out)
 {
 	ObjectLocker lock(m_map);
 	if (m_map->tree.getNextPosition(m_pos, sl_null, _out)) {
@@ -2852,31 +2844,29 @@ sl_bool TreeMapValueIterator<KT, VT, COMPARE>::next(VT* _out)
 	return sl_false;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_reg TreeMapValueIterator<KT, VT, COMPARE>::getIndex()
+template <class KT, class VT, class KEY_COMPARE>
+sl_reg TreeMapValueIterator<KT, VT, KEY_COMPARE>::getIndex()
 {
 	return (sl_reg)m_index - 1;
 }
 
 
-template <class KT, class VT, class COMPARE>
-TreeMapIterator<KT, VT, COMPARE>::TreeMapIterator(const TreeMap<KT, VT, COMPARE>* map, const Referable* refer)
+template <class KT, class VT, class KEY_COMPARE>
+TreeMapIterator<KT, VT, KEY_COMPARE>::TreeMapIterator(const TreeMap<KT, VT, KEY_COMPARE>* map, Referable* refer)
+: m_map(map), m_index(0), m_refer(refer)
 {
-	m_map = map;
-	m_index = 0;
-	m_refer = refer;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool TreeMapIterator<KT, VT, COMPARE>::hasNext()
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool TreeMapIterator<KT, VT, KEY_COMPARE>::hasNext()
 {
 	ObjectLocker lock(m_map);
 	TreePosition pos = m_pos;
 	return m_map->tree.getNextPosition(pos);
 }
 
-template <class KT, class VT, class COMPARE>
-sl_bool TreeMapIterator<KT, VT, COMPARE>::next(Pair<KT, VT>* _out)
+template <class KT, class VT, class KEY_COMPARE>
+sl_bool TreeMapIterator<KT, VT, KEY_COMPARE>::next(Pair<KT, VT>* _out)
 {
 	ObjectLocker lock(m_map);
 	if (_out) {
@@ -2893,8 +2883,8 @@ sl_bool TreeMapIterator<KT, VT, COMPARE>::next(Pair<KT, VT>* _out)
 	return sl_false;
 }
 
-template <class KT, class VT, class COMPARE>
-sl_reg TreeMapIterator<KT, VT, COMPARE>::getIndex()
+template <class KT, class VT, class KEY_COMPARE>
+sl_reg TreeMapIterator<KT, VT, KEY_COMPARE>::getIndex()
 {
 	return (sl_reg)m_index - 1;
 }

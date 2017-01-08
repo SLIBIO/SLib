@@ -412,12 +412,12 @@ List<String> File::getFiles(const String& _filePath)
 {
 	String filePath = _filePath;
 	if (filePath.isEmpty()) {
-		return List<String>::null();
+		return sl_null;
 	}
 	if (File::isDirectory(filePath)) {
 		filePath = normalizeDirectoryPath(filePath);
 	} else {
-		return List<String>::null();
+		return sl_null;
 	}
 	List<String> ret;
 	String8 dirPath = filePath;

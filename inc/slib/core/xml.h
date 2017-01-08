@@ -17,6 +17,7 @@
 #include "definition.h"
 
 #include "variant.h"
+#include "ptr.h"
 
 SLIB_NAMESPACE_BEGIN
 
@@ -133,7 +134,7 @@ protected:
 	XmlNodeType m_type;
 	WeakRef<XmlNodeGroup> m_parent;
 	WeakRef<XmlDocument> m_document;
-	SafeString m_sourceFilePath;
+	AtomicString m_sourceFilePath;
 	sl_size m_positionStartInSource;
 	sl_size m_positionEndInSource;
 	sl_size m_lineInSource;
@@ -283,9 +284,9 @@ public:
 	void removeAllAttributes();
 	
 protected:
-	SafeString m_name;
-	SafeString m_uri;
-	SafeString m_localName;
+	AtomicString m_name;
+	AtomicString m_uri;
+	AtomicString m_localName;
 	CList<XmlAttribute> m_attributes;
 	HashMap<String, String> m_mapAttributes;
 	Mutex m_lockAttributes;
@@ -350,7 +351,7 @@ public:
 	void setCDATA(sl_bool flag);
 	
 protected:
-	SafeString m_text;
+	AtomicString m_text;
 	sl_bool m_flagCDATA;
 
 };
@@ -380,8 +381,8 @@ public:
 	void setContent(const String& content);
 
 protected:
-	SafeString m_target;
-	SafeString m_content;
+	AtomicString m_target;
+	AtomicString m_content;
 
 };
 
@@ -406,7 +407,7 @@ public:
 	void setComment(const String& comment);
 	
 protected:
-	SafeString m_comment;
+	AtomicString m_comment;
 	
 };
 
@@ -431,7 +432,7 @@ public:
 	void setContent(const String& comment);
 	
 protected:
-	SafeString m_content;
+	AtomicString m_content;
 	
 };
 

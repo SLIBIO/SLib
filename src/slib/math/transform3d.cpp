@@ -523,11 +523,10 @@ Vector3T<T> Transform3T<T>::projectToViewport(const Matrix4T<T>& matViewProjecti
 {
 	Vector4T<T> v = Vector4T<T>(point, 1) * matViewProjection;
 	if (v.w >= 0 && Math::isLessThanEpsilon(v.w)) {
-		Math::getEpsilon(&(v.w));
+		v.w = Math::Epsilon<T>();
 	}
 	if (v.w <= 0 && Math::isLessThanEpsilon(-v.w)) {
-		Math::getEpsilon(&(v.w));
-		v.w = -v.w;
+		v.w = - Math::Epsilon<T>();
 	}
 	return {v.x / v.w, v.y / v.w, v.z / v.w};
 }

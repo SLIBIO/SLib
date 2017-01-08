@@ -41,7 +41,7 @@ Ref<Image> Image::loadFromJPEG(const void* content, sl_size size)
 
 	if (setjmp(jerr.setjmp_buffer)) {
 		jpeg_destroy_decompress(&cinfo);
-		return Ref<Image>::null();
+		return sl_null;
 	}
 
 	jpeg_create_decompress(&cinfo);
@@ -87,7 +87,7 @@ Ref<Image> Image::loadFromJPEG(const void* content, sl_size size)
 Memory Image::saveToJPEG(const Ref<Image>& image, float quality)
 {
 	if (image.isNull()) {
-		return Memory::null();
+		return sl_null;
 	}
 
 	Memory ret;
@@ -108,7 +108,7 @@ Memory Image::saveToJPEG(const Ref<Image>& image, float quality)
 		if (buf) {
 			free(buf);
 		}
-		return Memory::null();
+		return sl_null;
 	}
 
 	jpeg_mem_dest(&cinfo, &buf, &size);

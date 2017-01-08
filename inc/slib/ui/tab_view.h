@@ -18,9 +18,9 @@ public:
 class TabViewItem
 {
 public:
-	SafeString label;
+	AtomicString label;
 	
-	SafeRef<View> contentView;
+	AtomicRef<View> contentView;
 	
 };
 
@@ -137,7 +137,7 @@ public:
 	virtual UIRect getTabContentRegion();
 	
 public:
-	SLIB_PTR_PROPERTY(ITabViewListener, Listener)
+	SLIB_PROPERTY(AtomicPtr<ITabViewListener>, Listener)
 	
 public:
 	// override
@@ -194,11 +194,11 @@ protected:
 	sl_ui_len m_tabWidth;
 	sl_ui_len m_tabHeight;
 	
-	SafeRef<Drawable> m_barBackground;
-	SafeRef<Drawable> m_contentBackground;
-	SafeRef<Drawable> m_tabBackground;
-	SafeRef<Drawable> m_selectedTabBackground;
-	SafeRef<Drawable> m_hoverTabBackground;
+	AtomicRef<Drawable> m_barBackground;
+	AtomicRef<Drawable> m_contentBackground;
+	AtomicRef<Drawable> m_tabBackground;
+	AtomicRef<Drawable> m_selectedTabBackground;
+	AtomicRef<Drawable> m_hoverTabBackground;
 	Color m_labelColor;
 	Color m_selectedLabelColor;
 	Color m_hoverLabelColor;

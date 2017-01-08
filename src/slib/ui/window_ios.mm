@@ -30,7 +30,7 @@ class _iOS_Window : public WindowInstance
 {
 public:
 	UIView* m_window;
-	SafeRef<ViewInstance> m_viewContent;
+	AtomicRef<ViewInstance> m_viewContent;
 	
 public:
 	_iOS_Window()
@@ -68,7 +68,7 @@ public:
 				return ret;
 			}
 		}
-		return Ref<_iOS_Window>::null();
+		return sl_null;
 	}
 	
 	static Ref<WindowInstance> create(const WindowInstanceParam& param)
@@ -94,7 +94,7 @@ public:
 		rect.size.height = (CGFloat)(_rect.getHeight()) / f;
 		_slib_iOS_Window* window = [[_slib_iOS_Window alloc] initWithFrame:rect];
 		if (window != nil) {
-			UIScreen* screen = UIPlatform::getScreenHandle(_screen.ptr);
+			UIScreen* screen = UIPlatform::getScreenHandle(_screen.get());
 			if (screen != nil) {
 				window.screen = screen;
 			}
@@ -115,7 +115,7 @@ public:
 				}
 			}
 		}
-		return Ref<_iOS_Window>::null();
+		return sl_null;
 	}
 	
 	void release()
@@ -158,7 +158,7 @@ public:
 	
 	Ref<WindowInstance> getParent()
 	{
-		return Ref<WindowInstance>::null();
+		return sl_null;
 	}
 	
 	sl_bool setParent(const Ref<WindowInstance>& window)
@@ -263,7 +263,7 @@ public:
 	
 	String getTitle()
 	{
-		return String::null();
+		return sl_null;
 	}
 	
 	sl_bool setTitle(const String& title)
@@ -698,7 +698,7 @@ Ref<WindowInstance> UIPlatform::createWindowInstance(UIView* window)
 	}
 	ret = _iOS_Window::create(window);
 	if (ret.isNotNull()) {
-		UIPlatform::_registerWindowInstance((__bridge void*)window, ret.ptr);
+		UIPlatform::_registerWindowInstance((__bridge void*)window, ret.get());
 	}
 	return ret;
 }

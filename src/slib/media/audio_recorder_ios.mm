@@ -42,7 +42,7 @@ public:
 	
 	static void logError(String text)
 	{
-		SLIB_LOG_ERROR("AudioRecorder", text);
+		LogError("AudioRecorder", text);
 	}
 	
 	static Ref<_iOS_AudioRecorder> create(const AudioRecorderParam& param)
@@ -121,7 +121,7 @@ public:
 							
 							AURenderCallbackStruct cs;
 							cs.inputProc = CallbackInput;
-							cs.inputProcRefCon = ret.ptr;
+							cs.inputProcRefCon = ret.get();
 							
 							result = AudioUnitSetProperty(audioUnitInput,
 														  kAudioOutputUnitProperty_SetInputCallback,
@@ -144,7 +144,7 @@ public:
 								logError("Failed to set callback");
 							}
 							
-							return Ref<_iOS_AudioRecorder>::null();
+							return sl_null;
 						}
 						
 						AudioConverterDispose(converter);

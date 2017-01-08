@@ -69,7 +69,7 @@ Ref<HttpService> HttpServiceContext::getService()
 	if (connection.isNotNull()) {
 		return connection->getService();
 	}
-	return Ref<HttpService>::null();
+	return sl_null;
 }
 
 Ref<HttpServiceConnection> HttpServiceContext::getConnection()
@@ -83,7 +83,7 @@ Ref<AsyncStream> HttpServiceContext::getIO()
 	if (connection.isNotNull()) {
 		return connection->getIO();
 	}
-	return Ref<AsyncStream>::null();
+	return sl_null;
 }
 
 Ref<AsyncIoLoop> HttpServiceContext::getAsyncIoLoop()
@@ -92,7 +92,7 @@ Ref<AsyncIoLoop> HttpServiceContext::getAsyncIoLoop()
 	if (service.isNotNull()) {
 		return service->getAsyncIoLoop();
 	}
-	return Ref<AsyncIoLoop>::null();
+	return sl_null;
 }
 
 const SocketAddress& HttpServiceContext::getLocalAddress()
@@ -170,7 +170,7 @@ Ref<HttpServiceConnection> HttpServiceConnection::create(HttpService* service, A
 			}
 		}
 	}
-	return Ref<HttpServiceConnection>::null();
+	return sl_null;
 }
 
 void HttpServiceConnection::close()
@@ -255,7 +255,7 @@ void HttpServiceConnection::_processInput(const void* _data, sl_uint32 size)
 		m_contextCurrent = _context;
 		_context->setProcessingByThread(param.flagProcessByThreads);
 	}
-	HttpServiceContext* context = _context.ptr;
+	HttpServiceContext* context = _context.get();
 	if (context->m_requestHeader.isEmpty()) {
 		sl_size posBody;
 		if (context->m_requestHeaderReader.add(data, size, posBody)) {
@@ -324,7 +324,7 @@ void HttpServiceConnection::_processInput(const void* _data, sl_uint32 size)
 			if (context->isProcessingByThread()) {
 				Ref<ThreadPool> threadPool = service->getThreadPool();
 				if (threadPool.isNotNull()) {
-					threadPool->addTask(SLIB_CALLBACK_WEAKREF(HttpServiceConnection, _processContext, this, _context));
+					threadPool->addTask(SLIB_BIND_WEAKREF(void(), HttpServiceConnection, _processContext, this, _context));
 				} else {
 					sendResponse_ServerError();
 					return;
@@ -347,7 +347,7 @@ void HttpServiceConnection::_processContext(const Ref<HttpServiceContext>& conte
 		sendConnectResponse_Failed();
 		return;
 	}
-	service->processRequest(context.ptr);
+	service->processRequest(context.get());
 	if (!(context->isAsynchronousResponse())) {
 		context->completeResponse();
 	}
@@ -374,7 +374,7 @@ void HttpServiceConnection::_completeResponse(HttpServiceContext* context)
 	start();
 }
 
-void HttpServiceConnection::onRead(AsyncStream* stream, void* data, sl_uint32 size, const Referable* ref, sl_bool flagError)
+void HttpServiceConnection::onRead(AsyncStream* stream, void* data, sl_uint32 size, Referable* ref, sl_bool flagError)
 {
 	m_flagReading = sl_false;
 	if (flagError) {
@@ -424,7 +424,7 @@ public:
 		m_connection = connection;
 	}
 
-	void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, const Referable* ref, sl_bool flagError)
+	void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError)
 	{
 		Ref<HttpServiceConnection> connection = m_connection;
 		if (connection.isNotNull()) {
@@ -519,7 +519,7 @@ public:
 				}
 			}
 		}
-		return Ref<_DefaultHttpServiceConnectionProvider>::null();
+		return sl_null;
 	}
 	
 	void release()
@@ -542,14 +542,14 @@ public:
 			if (stream.isNotNull()) {
 				SocketAddress addrLocal;
 				socketAccept->getLocalAddress(addrLocal);
-				service->addConnection(stream.ptr, address, addrLocal);
+				service->addConnection(stream.get(), address, addrLocal);
 			}
 		}
 	}
 
 	void onError(AsyncTcpServer* socketListen)
 	{
-		SLIB_LOG_ERROR(SERVICE_TAG, "Accept Error");
+		LogError(SERVICE_TAG, "Accept Error");
 	}
 };
 
@@ -620,7 +620,7 @@ Ref<HttpService> HttpService::create(const HttpServiceParam& param)
 			return ret;
 		}
 	}
-	return Ref<HttpService>::null();
+	return sl_null;
 }
 
 void HttpService::release()
@@ -687,11 +687,12 @@ void HttpService::processRequest(const Ref<HttpServiceContext>& context)
 		return;
 	}
 	if (m_param.flagLogDebug) {
-		SLIB_LOG(SERVICE_TAG, "[" + String::fromPointerValue(connection.ptr) + "] Method="
-			+ context->getMethodText()
-			+ " Path=" + context->getPath()
-			+ " Query=" + context->getQuery()
-			+ " Host=" + context->getHost());
+		Log(SERVICE_TAG, "[%s] Method=%s Path=%s Query=%s Host=%s",
+			String::fromPointerValue(connection.get()),
+			context->getMethodText(),
+			context->getPath(),
+			context->getQuery(),
+			context->getHost());
 	}
 	
 	do {
@@ -804,7 +805,7 @@ sl_bool HttpService::processFile(const Ref<HttpServiceContext>& context, const S
 				Ref<AsyncFile> file = AsyncFile::openForRead(path, m_threadPool);
 				if (file.isNotNull()) {
 					file->seek(start);
-					context->copyFrom(file.ptr, len);
+					context->copyFrom(file.get(), len);
 					return sl_true;
 				}
 				
@@ -910,14 +911,16 @@ void HttpService::onPostProcessRequest(const Ref<HttpServiceContext>& context, s
 
 Ref<HttpServiceConnection> HttpService::addConnection(const Ref<AsyncStream>& stream, const SocketAddress& remoteAddress, const SocketAddress& localAddress)
 {
-	Ref<HttpServiceConnection> connection = HttpServiceConnection::create(this, stream.ptr);
+	Ref<HttpServiceConnection> connection = HttpServiceConnection::create(this, stream.get());
 	if (connection.isNotNull()) {
 		if (m_param.flagLogDebug) {
-			SLIB_LOG(SERVICE_TAG, "[" + String::fromPointerValue(connection.ptr) + "] Connection Created - Address: " + remoteAddress.toString());
+			Log(SERVICE_TAG, "[%s] Connection Created - Address: %s",
+				String::fromPointerValue(connection.get()),
+				remoteAddress.toString());
 		}
 		connection->setRemoteAddress(remoteAddress);
 		connection->setLocalAddress(localAddress);
-		m_connections.put(connection.ptr, connection);
+		m_connections.put(connection.get(), connection);
 		connection->start();
 	}
 	return connection;
@@ -926,7 +929,7 @@ Ref<HttpServiceConnection> HttpService::addConnection(const Ref<AsyncStream>& st
 void HttpService::closeConnection(HttpServiceConnection* connection)
 {
 	if (m_param.flagLogDebug) {
-		SLIB_LOG(SERVICE_TAG, "[" + String::fromPointerValue(connection) + "] Connection Closed");
+		Log(SERVICE_TAG, "[%s] Connection Closed", String::fromPointerValue(connection));
 	}
 	m_connections.remove(connection);
 }

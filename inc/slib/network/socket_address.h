@@ -57,7 +57,17 @@ public:
 	sl_bool setHostAddress(const String& address);
 	
 	
-	SLIB_DECLARE_PARSE_FUNCTIONS(SocketAddress)
+	template <class ST>
+	static sl_bool parse(const ST& str, SocketAddress* _out)
+	{
+		return Parse(str, _out);
+	}
+	
+	template <class ST>
+	sl_bool parse(const ST& str)
+	{
+		return Parse(str, this);
+	}
 
 	static sl_bool parseIPv4Range(const String& str, IPv4Address* from = sl_null, IPv4Address* to = sl_null);
 
@@ -87,13 +97,31 @@ private:
 };
 
 template <>
-int Compare<SocketAddress>::compare(const SocketAddress& a, const SocketAddress& b);
+sl_reg Parser<SocketAddress, sl_char8>::parse(SocketAddress* _out, const sl_char8 *sz, sl_size posBegin, sl_size len);
 
 template <>
-sl_bool Compare<SocketAddress>::equals(const SocketAddress& a, const SocketAddress& b);
+sl_reg Parser<SocketAddress, sl_char16>::parse(SocketAddress* _out, const sl_char16 *sz, sl_size posBegin, sl_size len);
 
 template <>
-sl_uint32 Hash<SocketAddress>::hash(const SocketAddress& a);
+class Compare<SocketAddress>
+{
+public:
+	int operator()(const SocketAddress& a, const SocketAddress& b) const;
+};
+
+template <>
+class Equals<SocketAddress>
+{
+public:
+	sl_bool operator()(const SocketAddress& a, const SocketAddress& b) const;
+};
+
+template <>
+class Hash<SocketAddress>
+{
+public:
+	sl_uint32 operator()(const SocketAddress& a) const;
+};
 
 SLIB_NETWORK_NAMESPACE_END
 

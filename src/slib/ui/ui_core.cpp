@@ -14,8 +14,8 @@ class _UI_Core_Default
 {
 public:
 	sl_real fontSize;
-	SafeString fontFamily;
-	SafeRef<Font> font;
+	AtomicString fontFamily;
+	AtomicRef<Font> font;
 	sl_ui_len scrollBarWidth;
 
 public:
@@ -65,7 +65,7 @@ String UI::getDefaultFontFamily()
 {
 	_UI_Core_Default* def = _UI_Core_getDefault();
 	if (!def) {
-		return String::null();
+		return sl_null;
 	}
 	return def->fontFamily;
 }
@@ -91,7 +91,7 @@ Ref<Font> UI::getDefaultFont()
 {
 	_UI_Core_Default* def = _UI_Core_getDefault();
 	if (!def) {
-		return Ref<Font>::null();
+		return sl_null;
 	}
 	return def->font;
 }
@@ -205,17 +205,17 @@ void UI::showAlert(const String& text)
 	AlertDialog::show(text);
 }
 
-void UI::showAlert(const String& text, const Callback& onOk)
+void UI::showAlert(const String& text, const Function<void()>& onOk)
 {
 	AlertDialog::show(text, onOk);
 }
 
-void UI::showAlert(const String& caption, const String& text, const Callback& onOk)
+void UI::showAlert(const String& caption, const String& text, const Function<void()>& onOk)
 {
 	AlertDialog::show(caption, text, onOk);
 }
 
-void UI::runOnUiThread(const Callback& callback)
+void UI::runOnUiThread(const Function<void()>& callback)
 {
 	if (callback.isNotNull()) {
 		if (isUiThread()) {
@@ -226,19 +226,19 @@ void UI::runOnUiThread(const Callback& callback)
 	}
 }
 
-class _UiCallback : public Runnable
+class _UiCallback : public Callable<void()>
 {
 public:
-	Callback m_callback;
+	Function<void()> m_callback;
 
 public:
-	SLIB_INLINE _UiCallback(const Callback& callback) : m_callback(callback)
+	SLIB_INLINE _UiCallback(const Function<void()>& callback) : m_callback(callback)
 	{
 	}
 
 public:
 	// override
-	void run()
+	void invoke()
 	{
 		if (UI::isUiThread()) {
 			m_callback();
@@ -249,19 +249,19 @@ public:
 
 };
 
-Callback UI::getCallbackOnUiThread(const Callback& callback)
+Function<void()> UI::getCallbackOnUiThread(const Function<void()>& callback)
 {
 	if (callback.isNotNull()) {
-		return (Runnable*)(new _UiCallback(callback));
+		return (Callable<void()>*)(new _UiCallback(callback));
 	}
-	return Callback::null();
+	return sl_null;
 }
 
 class _UiDispatcher : public Dispatcher
 {
 public:
 	// override
-	sl_bool dispatch(const Callback& callback)
+	sl_bool dispatch(const Function<void()>& callback)
 	{
 		UI::dispatchToUiThread(callback);
 		return sl_true;

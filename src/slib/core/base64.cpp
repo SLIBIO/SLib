@@ -1,5 +1,4 @@
 #include "../../../inc/slib/core/base64.h"
-#include "../../../inc/slib/core/log.h"
 
 SLIB_NAMESPACE_BEGIN
 
@@ -8,7 +7,7 @@ SLIB_NAMESPACE_BEGIN
 String Base64::encode(const void* buf, sl_size size)
 {
 	if (size == 0) {
-		return String::null();
+		return sl_null;
 	}
 	const sl_uint8* input = (const sl_uint8*)buf;
 	sl_uint32 last = (sl_uint32)(size % 3);
@@ -127,18 +126,18 @@ Memory Base64::decode(const String& base64)
 {
 	sl_size len = base64.getLength();
 	if (len < 4) {
-		return Memory::null();
+		return sl_null;
 	}
 	sl_size size = len / 4 * 3;
 	Memory mem = Memory::create(size);
 	if (mem.isEmpty()) {
-		return Memory::null();
+		return sl_null;
 	}
 	sl_size sizeOutput = decode(base64, mem.getData(), size);
 	if (sizeOutput > 0) {
 		return mem.sub(0, sizeOutput);
 	}
-	return Memory::null();
+	return sl_null;
 }
 
 SLIB_NAMESPACE_END

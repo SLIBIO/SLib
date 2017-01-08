@@ -19,6 +19,8 @@ class SLIB_EXPORT RenderBaseObjectInstance : public Object
 	
 protected:
 	RenderBaseObjectInstance();
+	
+	~RenderBaseObjectInstance();
 
 public:
 	void link(const Ref<RenderEngine>& engine, const Ref<RenderBaseObject>& object);
@@ -35,8 +37,8 @@ public:
 	void _update(RenderBaseObject* object);
 	
 protected:
-	SafeWeakRef<RenderBaseObject> m_object;
-	SafeWeakRef<RenderEngine> m_engine;
+	AtomicWeakRef<RenderBaseObject> m_object;
+	AtomicWeakRef<RenderEngine> m_engine;
 	
 	sl_bool m_flagUpdated;
 	
@@ -58,7 +60,7 @@ public:
 	Ref<RenderBaseObjectInstance> getInstance(RenderEngine* engine);
 	
 protected:
-	SafeRef<RenderBaseObjectInstance> m_instances[SLIB_MAX_RENDER_ENGINE_COUNT_PER_OBJECT];
+	AtomicRef<RenderBaseObjectInstance> m_instances[SLIB_MAX_RENDER_ENGINE_COUNT_PER_OBJECT];
 	
 };
 

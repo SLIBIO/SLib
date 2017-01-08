@@ -35,6 +35,7 @@
     <ClInclude Include="..\..\..\inc\slib\core\content_type.h" />
     <ClInclude Include="..\..\..\inc\slib\core\cpp.h" />
     <ClInclude Include="..\..\..\inc\slib\core\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\deque.h" />
     <ClInclude Include="..\..\..\inc\slib\core\endian.h" />
     <ClInclude Include="..\..\..\inc\slib\core\event.h" />
     <ClInclude Include="..\..\..\inc\slib\core\expire.h" />
@@ -47,11 +48,11 @@
     <ClInclude Include="..\..\..\inc\slib\core\iterator.h" />
     <ClInclude Include="..\..\..\inc\slib\core\java.h" />
     <ClInclude Include="..\..\..\inc\slib\core\json.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\linked_list.h" />
     <ClInclude Include="..\..\..\inc\slib\core\linked_object.h" />
     <ClInclude Include="..\..\..\inc\slib\core\list.h" />
     <ClInclude Include="..\..\..\inc\slib\core\locale.h" />
     <ClInclude Include="..\..\..\inc\slib\core\log.h" />
-    <ClInclude Include="..\..\..\inc\slib\core\loop_queue.h" />
     <ClInclude Include="..\..\..\inc\slib\core\macro.h" />
     <ClInclude Include="..\..\..\inc\slib\core\map.h" />
     <ClInclude Include="..\..\..\inc\slib\core\math.h" />
@@ -70,12 +71,14 @@
     <ClInclude Include="..\..\..\inc\slib\core\queue.h" />
     <ClInclude Include="..\..\..\inc\slib\core\queue_channel.h" />
     <ClInclude Include="..\..\..\inc\slib\core\ref.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\ref_wrapper.h" />
     <ClInclude Include="..\..\..\inc\slib\core\resource.h" />
     <ClInclude Include="..\..\..\inc\slib\core\safe_static.h" />
     <ClInclude Include="..\..\..\inc\slib\core\scoped.h" />
     <ClInclude Include="..\..\..\inc\slib\core\search.h" />
     <ClInclude Include="..\..\..\inc\slib\core\service.h" />
     <ClInclude Include="..\..\..\inc\slib\core\setting.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\singleton.h" />
     <ClInclude Include="..\..\..\inc\slib\core\sort.h" />
     <ClInclude Include="..\..\..\inc\slib\core\spin_lock.h" />
     <ClInclude Include="..\..\..\inc\slib\core\string.h" />
@@ -277,6 +280,7 @@
     <ClCompile Include="..\..\..\src\slib\core\base.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\base64.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\charset.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\collection.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\content_type.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\event.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\event_win32.cpp" />
@@ -299,7 +303,6 @@
     <ClCompile Include="..\..\..\src\slib\core\java.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\platform_windows.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\ptr.cpp" />
-    <ClCompile Include="..\..\..\src\slib\core\queue.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\asset.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\ref.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\resource.cpp" />
@@ -460,6 +463,7 @@
     <ClCompile Include="..\..\..\src\slib\ui\cursor_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\edit_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\edit_view_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\gesture.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\image_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\label_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\label_view_win32.cpp" />
@@ -469,6 +473,8 @@
     <ClCompile Include="..\..\..\src\slib\ui\list_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\mobile_app.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\mobile_game.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\motion_tracker.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\picker_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\progress_bar.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\radio_button.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\radio_button_win32.cpp" />

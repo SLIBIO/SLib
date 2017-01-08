@@ -31,16 +31,24 @@ public:
 public:
 	SLIB_INLINE IPv4Address() = default;
 	
-	SLIB_INLINE IPv4Address(const IPv4Address& other) = default;
+	SLIB_CONSTEXPR IPv4Address(const IPv4Address& other):
+	 a(other.a), b(other.b), c(other.c), d(other.d)
+	{}
 
-	IPv4Address(const sl_uint8* addr);
+	SLIB_CONSTEXPR IPv4Address(sl_uint8 const addr[4]):
+	 a(addr[0]), b(addr[1]), c(addr[2]), d(addr[3])
+	{}
 	
-	IPv4Address(sl_uint8 a, sl_uint8 b, sl_uint8 c, sl_uint8 d);
+	SLIB_CONSTEXPR IPv4Address(sl_uint8 _a, sl_uint8 _b, sl_uint8 _c, sl_uint8 _d):
+	 a(_a), b(_b), c(_c), d(_d)
+	{}
 	
-	IPv4Address(sl_uint32 addr);
+	SLIB_CONSTEXPR IPv4Address(sl_uint32 addr):
+	 a((sl_uint8)(addr >> 24)), b((sl_uint8)(addr >> 16)), c((sl_uint8)(addr >> 8)), d((sl_uint8)(addr))
+	{}
 	
 	IPv4Address(const String& address);
-
+	
 public:
 	void setElements(sl_uint8 a, sl_uint8 b, sl_uint8 c, sl_uint8 d);
 	
@@ -86,8 +94,17 @@ public:
 	sl_bool setHostName(const String& hostName);
 	
 	
-	SLIB_DECLARE_PARSE_FUNCTIONS(IPv4Address)
+	template <class ST>
+	static sl_bool parse(const ST& str, IPv4Address* _out)
+	{
+		return Parse(str, _out);
+	}
 	
+	template <class ST>
+	sl_bool parse(const ST& str)
+	{
+		return Parse(str, this);
+	}
 
 public:
 	SLIB_INLINE IPv4Address& operator=(const IPv4Address& other) = default;
@@ -111,22 +128,38 @@ public:
 	sl_bool operator<=(const IPv4Address& other) const;
 	
 	sl_bool operator<(const IPv4Address& other) const;
-
+	
 private:
 	static const sl_uint8 _zero[4];
-	
+
 };
 
 template <>
-int Compare<IPv4Address>::compare(const IPv4Address& a, const IPv4Address& b);
+sl_reg Parser<IPv4Address, sl_char8>::parse(IPv4Address* _out, const sl_char8 *sz, sl_size posBegin, sl_size len);
 
 template <>
-sl_bool Compare<IPv4Address>::equals(const IPv4Address& a, const IPv4Address& b);
+sl_reg Parser<IPv4Address, sl_char16>::parse(IPv4Address* _out, const sl_char16 *sz, sl_size posBegin, sl_size len);
 
 template <>
-sl_uint32 Hash<IPv4Address>::hash(const IPv4Address& a);
+class Compare<IPv4Address>
+{
+public:
+	int operator()(const IPv4Address& a, const IPv4Address& b) const;
+};
 
-SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_LIST(IPv4Address)
+template <>
+class Equals<IPv4Address>
+{
+public:
+	sl_bool operator()(const IPv4Address& a, const IPv4Address& b) const;
+};
+
+template <>
+class Hash<IPv4Address>
+{
+public:
+	sl_uint32 operator()(const IPv4Address& a) const;
+};
 
 
 class SLIB_EXPORT IPv4AddressInfo
@@ -143,12 +176,18 @@ public:
 };
 
 template <>
-int Compare<IPv4AddressInfo>::compare(const IPv4AddressInfo& a, const IPv4AddressInfo& b);
+class Compare<IPv4AddressInfo>
+{
+public:
+	int operator()(const IPv4AddressInfo& a, const IPv4AddressInfo& b) const;
+};
 
 template <>
-sl_bool Compare<IPv4AddressInfo>::equals(const IPv4AddressInfo& a, const IPv4AddressInfo& b);
-
-SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_LIST(IPv4AddressInfo)
+class Equals<IPv4AddressInfo>
+{
+public:
+	sl_bool operator()(const IPv4AddressInfo& a, const IPv4AddressInfo& b) const;
+};
 
 
 class SLIB_EXPORT IPv6Address
@@ -157,7 +196,7 @@ public:
 	sl_uint8 m[16];
 
 public:
-	IPv6Address();
+	SLIB_INLINE IPv6Address() = default;
 	
 	IPv6Address(const IPv6Address& other);
 
@@ -224,8 +263,17 @@ public:
 	sl_bool setHostName(const String& hostName);
 	
 	
-	SLIB_DECLARE_PARSE_FUNCTIONS(IPv6Address)
+	template <class ST>
+	static sl_bool parse(const ST& str, IPv6Address* _out)
+	{
+		return Parse(str, _out);
+	}
 	
+	template <class ST>
+	sl_bool parse(const ST& str)
+	{
+		return Parse(str, this);
+	}
 
 public:
 	IPv6Address& operator=(const IPv6Address& other);
@@ -247,20 +295,35 @@ public:
 private:
 	static const sl_uint8 _zero[16];
 	static const sl_uint8 _loopback[16];
-
+	
 };
 
 template <>
-int Compare<IPv6Address>::compare(const IPv6Address& a, const IPv6Address& b);
+sl_reg Parser<IPv6Address, sl_char8>::parse(IPv6Address* _out, const sl_char8 *sz, sl_size posBegin, sl_size len);
 
 template <>
-sl_bool Compare<IPv6Address>::equals(const IPv6Address& a, const IPv6Address& b);
+sl_reg Parser<IPv6Address, sl_char16>::parse(IPv6Address* _out, const sl_char16 *sz, sl_size posBegin, sl_size len);
 
 template <>
-sl_uint32 Hash<IPv6Address>::hash(const IPv6Address& a);
+class Compare<IPv6Address>
+{
+public:
+	int operator()(const IPv6Address& a, const IPv6Address& b) const;
+};
 
-SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_LIST(IPv6Address)
+template <>
+class Equals<IPv6Address>
+{
+public:
+	sl_bool operator()(const IPv6Address& a, const IPv6Address& b) const;
+};
 
+template <>
+class Hash<IPv6Address>
+{
+public:
+	sl_uint32 operator()(const IPv6Address& a) const;
+};
 
 
 #define _SLIB_NET_IPADDRESS_SIZE 16
@@ -279,7 +342,9 @@ public:
 	sl_uint8 m[_SLIB_NET_IPADDRESS_SIZE];
 	
 public:
-	IPAddress();
+	SLIB_INLINE IPAddress():
+	 type(IPAddressType::None)
+	{}
 	
 	IPAddress(const IPAddress& other);
 	
@@ -321,8 +386,17 @@ public:
 	sl_bool setHostName(const String& hostName);
 	
 	
-	SLIB_DECLARE_PARSE_FUNCTIONS(IPAddress)
+	template <class ST>
+	static sl_bool parse(const ST& str, IPAddress* _out)
+	{
+		return Parse(str, _out);
+	}
 	
+	template <class ST>
+	sl_bool parse(const ST& str)
+	{
+		return Parse(str, this);
+	}
 	
 public:
 	IPAddress& operator=(const IPAddress& other);
@@ -336,7 +410,7 @@ public:
 	sl_bool operator==(const IPAddress& other) const;
 	
 	sl_bool operator!=(const IPAddress& other) const;
-
+	
 private:
 	struct _IPAddress
 	{
@@ -348,35 +422,36 @@ private:
 };
 
 template <>
-int Compare<IPAddress>::compare(const IPAddress& a, const IPAddress& b);
+sl_reg Parser<IPAddress, sl_char8>::parse(IPAddress* _out, const sl_char8 *sz, sl_size posBegin, sl_size len);
 
 template <>
-sl_bool Compare<IPAddress>::equals(const IPAddress& a, const IPAddress& b);
+sl_reg Parser<IPAddress, sl_char16>::parse(IPAddress* _out, const sl_char16 *sz, sl_size posBegin, sl_size len);
 
 template <>
-sl_uint32 Hash<IPAddress>::hash(const IPAddress& a);
+class Compare<IPAddress>
+{
+public:
+	int operator()(const IPAddress& a, const IPAddress& b) const;
+};
 
-SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_LIST(IPAddress)
+template <>
+class Equals<IPAddress>
+{
+public:
+	sl_bool operator()(const IPAddress& a, const IPAddress& b) const;
+};
+
+template <>
+class Hash<IPAddress>
+{
+public:
+	sl_uint32 operator()(const IPAddress& a) const;
+};
 
 SLIB_NETWORK_NAMESPACE_END
 
 
 SLIB_NETWORK_NAMESPACE_BEGIN
-
-SLIB_INLINE IPv4Address::IPv4Address(const sl_uint8* addr)
-: a(addr[0]), b(addr[1]), c(addr[2]), d(addr[3])
-{
-}
-
-SLIB_INLINE IPv4Address::IPv4Address(sl_uint8 _a, sl_uint8 _b, sl_uint8 _c, sl_uint8 _d)
-: a(_a), b(_b), c(_c), d(_d)
-{
-}
-
-SLIB_INLINE IPv4Address::IPv4Address(sl_uint32 addr)
-: a((sl_uint8)(addr >> 24)), b((sl_uint8)(addr >> 16)), c((sl_uint8)(addr >> 8)), d((sl_uint8)(addr))
-{
-}
 
 SLIB_INLINE sl_uint32 IPv4Address::getInt() const
 {
@@ -393,7 +468,7 @@ SLIB_INLINE void IPv4Address::setInt(sl_uint32 addr)
 
 SLIB_INLINE const IPv4Address& IPv4Address::zero()
 {
-	return *((IPv4Address*)((void*)(&_zero)));
+	return *(reinterpret_cast<IPv4Address const*>(&_zero));
 }
 
 SLIB_INLINE sl_bool IPv4Address::isZero() const
@@ -438,22 +513,18 @@ SLIB_INLINE sl_bool IPv4Address::operator!=(sl_uint32 addr) const
 
 SLIB_INLINE const IPv6Address& IPv6Address::zero()
 {
-	return *((IPv6Address*)((void*)(&_zero)));
+	return *(reinterpret_cast<IPv6Address const*>(&_zero));
 }
 
 SLIB_INLINE const IPv6Address& IPv6Address::getLoopback()
 {
-	return *((IPv6Address*)((void*)(&_loopback)));
+	return *(reinterpret_cast<IPv6Address const*>(&_loopback));
 }
 
-
-SLIB_INLINE IPAddress::IPAddress() : type(IPAddressType::None)
-{
-}
 
 SLIB_INLINE const IPAddress& IPAddress::none()
 {
-	return *((IPAddress*)((void*)(&_none)));
+	return *(reinterpret_cast<IPAddress const*>(&_none));
 }
 
 SLIB_INLINE void IPAddress::setNone()

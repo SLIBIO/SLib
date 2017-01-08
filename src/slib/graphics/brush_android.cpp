@@ -44,7 +44,7 @@ public:
 				m_platformObject = new _Android_BrushObject(m_desc);
 			}
 		}
-		return (_Android_BrushObject*)(m_platformObject.ptr);;
+		return (_Android_BrushObject*)(m_platformObject.get());;
 	}
 
 	jobject getPlatformHandle()

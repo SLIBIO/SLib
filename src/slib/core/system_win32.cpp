@@ -18,7 +18,6 @@ using namespace Platform;
 #include "../../../inc/slib/core/app.h"
 #include "../../../inc/slib/core/file.h"
 #include "../../../inc/slib/core/list.h"
-#include "../../../inc/slib/core/log.h"
 
 SLIB_NAMESPACE_BEGIN
 
@@ -78,13 +77,10 @@ sl_uint32 System::getTickCount()
 #if defined(SLIB_PLATFORM_IS_WIN32)
 void* System::createGlobalUniqueInstance(const String& _name)
 {
-	String16 name = _name;
-	if (name.isEmpty()) {
+	if (_name.isEmpty()) {
 		return sl_null;
 	}
-	SLIB_STATIC_STRING16(g, "Global\\");
-	name = g + File::makeSafeFileName(name);
-
+	String16 name = "Global\\" + File::makeSafeFileName(_name);
 	HANDLE hMutex = ::OpenMutexW(MUTEX_ALL_ACCESS, FALSE, (LPCWSTR)(name.getData()));
 	if (hMutex != NULL) {
 		::CloseHandle(hMutex);

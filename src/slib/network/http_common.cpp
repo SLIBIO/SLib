@@ -61,7 +61,7 @@ String HttpStatuses::toString(HttpStatus status)
 		HTTP_STATUS_CASE(HttpVersionNotSupported, "HTTP Version not supported");
 		
 	}
-	return String::null();
+	return sl_null;
 }
 
 
@@ -96,7 +96,7 @@ String HttpMethods::toString(HttpMethod method)
 		default:
 			break;
 	}
-	return String::null();
+	return sl_null;
 }
 
 class _HttpMethod_Mapping
@@ -495,8 +495,8 @@ sl_bool HttpRequest::containsPostParameter(String name) const
 void HttpRequest::applyPostParameters(const void* data, sl_size size)
 {
 	Map<String, String> params = parseParameters(data, size);
-	m_postParameters.putAll(params.ref.ptr);
-	m_parameters.putAll(params.ref.ptr);
+	m_postParameters.putAll(params.ref.get());
+	m_parameters.putAll(params.ref.get());
 }
 
 void HttpRequest::applyPostParameters(const String& str)
@@ -507,8 +507,8 @@ void HttpRequest::applyPostParameters(const String& str)
 void HttpRequest::applyQueryToParameters()
 {
 	Map<String, String> params = parseParameters(m_query);
-	m_queryParameters.putAll(params.ref.ptr);
-	m_parameters.putAll(params.ref.ptr);
+	m_queryParameters.putAll(params.ref.get());
+	m_parameters.putAll(params.ref.get());
 }
 
 Map<String, String> HttpRequest::parseParameters(const String& str)
@@ -573,7 +573,7 @@ Memory HttpRequest::makeRequestPacket() const
 	msg.addStatic(strVersion.getData(), strVersion.getLength());
 	msg.addStatic("\r\n", 2);
 
-	Iterator< Pair<String, String> > iterator = m_requestHeaders.iterator();
+	Iterator< Pair<String, String> > iterator = m_requestHeaders.toIterator();
 	Pair<String, String> pair;
 	while (iterator.next(&pair)) {
 		String str = pair.key;
@@ -677,7 +677,7 @@ HttpResponse::HttpResponse()
 	SLIB_STATIC_STRING(s2, "OK");
 	m_responseMessage = s2;
 
-	m_responseHeaders.initHashBy<HashIgnoreCaseString, CompareIgnoreCaseString>();
+	m_responseHeaders.initHash(0, HashIgnoreCaseString(), CompareIgnoreCaseString());
 }
 
 HttpStatus HttpResponse::getResponseCode() const
@@ -880,7 +880,7 @@ Memory HttpResponse::makeResponsePacket() const
 	msg.addStatic(strMessage.getData(), strMessage.getLength());
 	msg.addStatic("\r\n", 2);
 
-	Iterator< Pair<String, String> > iterator = m_responseHeaders.iterator();
+	Iterator< Pair<String, String> > iterator = m_responseHeaders.toIterator();
 	Pair<String, String> pair;
 	while (iterator.next(&pair)) {
 		String str = pair.key;
@@ -957,8 +957,8 @@ sl_reg HttpResponse::parseResponsePacket(const void* packet, sl_size size)
 	setResponseMessage(String::fromUtf8(data + posStart, posCurrent - posStart));
 	posCurrent += 2;
 
-	ObjectLocker lock(m_responseHeaders.ref.ptr);
-	sl_reg iRet = HttpHeaders::parseHeaders(m_responseHeaders.ref.ptr, data + posCurrent, size - posCurrent);
+	ObjectLocker lock(m_responseHeaders.ref.get());
+	sl_reg iRet = HttpHeaders::parseHeaders(m_responseHeaders.ref.get(), data + posCurrent, size - posCurrent);
 	if (iRet > 0) {
 		return posCurrent + iRet;
 	} else {
@@ -1115,7 +1115,7 @@ public:
 		m_sizeRead = 0;
 	}
 
-	Memory filterRead(void* data, sl_uint32 size, const Referable* refData)
+	Memory filterRead(void* data, sl_uint32 size, Referable* refData)
 	{
 		sl_uint64 sizeRemain = m_sizeTotal - m_sizeRead;
 		if (size < sizeRemain) {
@@ -1193,7 +1193,7 @@ public:
 		m_sizeTrailerField = 0;
 	}
 
-	Memory filterRead(void* _data, sl_uint32 size, const Referable* refData)
+	Memory filterRead(void* _data, sl_uint32 size, Referable* refData)
 	{
 		sl_uint8* data = (sl_uint8*)_data;
 		sl_uint32 pos = 0;
@@ -1233,7 +1233,7 @@ public:
 				} else {
 					m_state = -1;
 					setError();
-					return Memory::null();
+					return sl_null;
 				}
 				pos++;
 				break;
@@ -1248,7 +1248,7 @@ public:
 					} else {
 						m_state = -1;
 						setError();
-						return Memory::null();
+						return sl_null;
 					}
 				}
 				pos++;
@@ -1261,7 +1261,7 @@ public:
 				} else {
 					m_state = -1;
 					setError();
-					return Memory::null();
+					return sl_null;
 				}
 				pos++;
 				break;
@@ -1288,12 +1288,12 @@ public:
 				} else {
 					m_state = -1;
 					setError();
-					return Memory::null();
+					return sl_null;
 				}
 				pos++;
 				break;
 			default:
-				return Memory::null();
+				return sl_null;
 			}
 		}
 		return decompressData(output, sizeOutput, refData);
@@ -1328,7 +1328,7 @@ Ref<HttpContentReader> HttpContentReader::createChunked(const Ref<AsyncStream>& 
 class _HttpContentReader_TearDown : public HttpContentReader
 {
 public:
-	Memory filterRead(void* data, sl_uint32 size, const Referable* refData)
+	Memory filterRead(void* data, sl_uint32 size, Referable* refData)
 	{
 		return decompressData(data, size, refData);
 	}
@@ -1364,7 +1364,7 @@ sl_bool HttpContentReader::isDecompressing()
 	return m_flagDecompressing;
 }
 
-void HttpContentReader::onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, const Referable* ref, sl_bool flagError)
+void HttpContentReader::onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError)
 {
 	if (flagError) {
 		setReadingEnded();
@@ -1395,7 +1395,7 @@ void HttpContentReader::setError()
 	setReadingError();
 }
 
-sl_bool HttpContentReader::write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, const Referable* ref)
+sl_bool HttpContentReader::write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref)
 {
 	return sl_false;
 }
@@ -1411,7 +1411,7 @@ sl_bool HttpContentReader::setDecompressing()
 	}
 }
 
-Memory HttpContentReader::decompressData(void* data, sl_uint32 size, const Referable* refData)
+Memory HttpContentReader::decompressData(void* data, sl_uint32 size, Referable* refData)
 {
 	if (m_flagDecompressing) {
 		return m_zlib.decompress(data, size);

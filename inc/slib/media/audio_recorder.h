@@ -83,7 +83,7 @@ protected:
 protected:
 	LoopQueue<sl_int16> m_queue;
 	sl_uint32 m_nChannels;
-	SafeArray<sl_int16> m_processData;
+	AtomicArray<sl_int16> m_processData;
 	
 	Ptr<IAudioRecorderListener> m_listener;
 	Ref<Event> m_event;

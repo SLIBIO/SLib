@@ -98,12 +98,12 @@ protected:
 	void _setHoverThumb(int index);
 		
 public:
-	SLIB_PTR_PROPERTY(ISliderListener, Listener);
+	SLIB_PROPERTY(AtomicPtr<ISliderListener>, Listener);
 	
 protected:
-	SafeRef<Drawable> m_thumb;
-	SafeRef<Drawable> m_pressedThumb;
-	SafeRef<Drawable> m_hoverThumb;
+	AtomicRef<Drawable> m_thumb;
+	AtomicRef<Drawable> m_pressedThumb;
+	AtomicRef<Drawable> m_hoverThumb;
 
 	UISize m_thumbSize;
 

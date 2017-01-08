@@ -54,12 +54,12 @@ void PickerView::removeAllItems(UIUpdateMode mode)
 
 String PickerView::getItemValue(sl_uint32 index)
 {
-	return m_values.getItemValue(index, String::null());
+	return m_values.getValueAt(index);
 }
 
 void PickerView::setItemValue(sl_uint32 index, const String& value)
 {
-	m_values.setItem(index, value);
+	m_values.setAt(index, value);
 }
 
 List<String> PickerView::getValues()
@@ -74,13 +74,13 @@ void PickerView::setValues(const List<String>& list)
 
 String PickerView::getItemTitle(sl_uint32 index)
 {
-	return m_titles.getItemValue(index, String::null());
+	return m_titles.getValueAt(index);
 }
 
 void PickerView::setItemTitle(sl_uint32 index, const String& title, UIUpdateMode mode)
 {
 	if (index < m_titles.getCount()) {
-		m_titles.setItem(index, title);
+		m_titles.setAt(index, title);
 		if (isNativeWidget()) {
 			_setItemTitle_NW(index, title);
 		} else {
@@ -152,12 +152,12 @@ sl_uint32 PickerView::getSelectedIndex()
 
 String PickerView::getSelectedValue()
 {
-	return m_values.getItemValue(m_indexSelected, String::null());
+	return m_values.getValueAt(m_indexSelected);
 }
 
 String PickerView::getSelectedTitle()
 {
-	return m_titles.getItemValue(m_indexSelected, String::null());
+	return m_titles.getValueAt(m_indexSelected);
 }
 
 Color PickerView::getTextColor()
@@ -188,11 +188,11 @@ void PickerView::onDraw(Canvas* canvas)
 		return;
 	}
 	sl_int32 nLinesHalf = m_linesHalfCount;
-	sl_int32 lineHeight = (sl_int32)(_getLineHeight());
-	sl_int32 height = (nLinesHalf * 2 + 1) * lineHeight;
+	sl_real lineHeight = (sl_real)(_getLineHeight());
+	sl_real height = (nLinesHalf * 2 + 1) * lineHeight;
 	
-	UIRect rect = getBoundsInnerPadding();
-	sl_ui_pos yStart = rect.top + (rect.getHeight() - height) / 2;
+	Rectangle rect = getBoundsInnerPadding();
+	sl_real yStart = rect.top + (rect.getHeight() - height) / 2;
 	
 	ListLocker<String> titles(m_titles);
 	sl_int32 i;
@@ -263,10 +263,11 @@ void PickerView::onDraw(Canvas* canvas)
 	
 	Color c = m_textColor;
 	c.a /= 2;
+	/*
 	Ref<Pen> pen = Pen::createSolidPen(1, c);
 	canvas->drawLine(rect.left, yStart + lineHeight * nLinesHalf, rect.right, yStart + lineHeight * nLinesHalf, pen);
 	canvas->drawLine(rect.left, yStart + lineHeight * nLinesHalf + lineHeight, rect.right, yStart + lineHeight * nLinesHalf + lineHeight, pen);
-	
+	*/
 }
 
 void PickerView::onMouseEvent(UIEvent* ev)
@@ -385,7 +386,7 @@ void PickerView::_startFlow(sl_real speed)
 	ObjectLocker lock(this);
 	if (m_timer.isNull()) {
 		m_timeCallbackBefore.setZero();
-		m_timer = Async::addTimer(SLIB_CALLBACK_WEAKREF(PickerView, _timerCallback, this), 10);
+		m_timer = Async::addTimer(SLIB_FUNCTION_WEAKREF(PickerView, _timerCallback, this), 10);
 	}
 }
 
@@ -423,7 +424,7 @@ void PickerView::_timerCallback()
 			m_yOffset = 0;
 		}
 	}
-	_flow((sl_real)(m_speedFlow * (time - m_timeCallbackBefore).getMillisecondsCountf()));
+	_flow((sl_ui_pos)(m_speedFlow * (time - m_timeCallbackBefore).getMillisecondsCountf()));
 	invalidate();
 	m_speedFlow *= 0.97f;
 	m_timeCallbackBefore = time;
@@ -433,7 +434,7 @@ void PickerView::_timerCallback()
 
 Ref<ViewInstance> PickerView::createNativeWidget(ViewInstance* parent)
 {
-	return Ref<ViewInstance>::null();
+	return sl_null;
 }
 
 void PickerView::_getSelectedIndex_NW()

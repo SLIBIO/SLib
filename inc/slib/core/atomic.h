@@ -23,13 +23,14 @@ public:
 	
 	Atomic<T>& operator=(T&& other);
 	
-	operator T () const;
+	operator T() const;
 	
 protected:
 	T m_value;
 	SpinLock m_lock;
 	
 };
+
 
 template <>
 class SLIB_EXPORT Atomic<sl_int32>
@@ -59,6 +60,20 @@ private:
 };
 
 typedef Atomic<sl_int32> AtomicInt32;
+
+
+template <class T>
+class RemoveAtomic;
+
+template <class T>
+struct RemoveAtomic< Atomic<T> > { typedef T Type; };
+
+template <class T>
+struct PropertyTypeHelper< Atomic<T> >
+{
+	typedef typename PropertyTypeHelper<T>::ArgType ArgType;
+	typedef typename RemoveConstReference< typename PropertyTypeHelper<T>::RetType >::Type RetType;
+};
 
 
 template <class T>
@@ -105,7 +120,7 @@ Atomic<T>& Atomic<T>::operator=(T&& other)
 }
 
 template <class T>
-Atomic<T>::operator T () const
+Atomic<T>::operator T() const
 {
 	SLIB_ALIGN(8) char t[sizeof(T)];
 	{

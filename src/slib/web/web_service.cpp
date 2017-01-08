@@ -16,10 +16,7 @@ WebService::~WebService()
 Ref<WebService> WebService::getApp()
 {
 	Ref<Application> app(Application::getApp());
-	if (WebService::checkInstance(app.ptr)) {
-		return Ref<WebService>::from(app);
-	}
-	return Ref<WebService>::null();
+	return CastRef<WebService>(app);
 }
 
 HttpServiceParam& WebService::getHttpParam()

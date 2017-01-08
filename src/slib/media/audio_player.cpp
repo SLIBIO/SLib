@@ -42,7 +42,7 @@ void AudioPlayerControl::_removeFromMap()
 	}
 }
 
-SLIB_DEFINE_OBJECT(AudioPlayerBuffer, AudioPlayerControl)
+SLIB_DEFINE_OBJECT(AudioPlayerBuffer, Object)
 
 AudioPlayerBuffer::AudioPlayerBuffer()
 {
@@ -123,7 +123,7 @@ Ref<AudioPlayerControl> AudioPlayer::open(const slib::AudioPlayerOpenParam &para
 	if (param.flagKeepReference) {
 		_AudioPlayerControlsMap* map = _getAudioPlayerControlsMap();
 		if (map) {
-			map->put(control.ptr, control);
+			map->put(control.get(), control);
 		}
 	}
 	

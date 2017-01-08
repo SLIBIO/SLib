@@ -6,8 +6,11 @@
 #include "string.h"
 #include "object.h"
 #include "list.h"
+#include "variant.h"
 
 SLIB_NAMESPACE_BEGIN
+
+class LoggerSet;
 
 class SLIB_EXPORT Logger : public Object
 {
@@ -15,7 +18,18 @@ public:
 	virtual void log(const String& tag, const String& content) = 0;
 	
 	virtual void logError(const String& tag, const String& content);
+
+public:
+	static Ref<LoggerSet> global();
 	
+	static Ref<Logger> getConsoleLogger();
+	
+	static Ref<Logger> createFileLogger(const String& fileName);
+	
+	static void logGlobal(const String& tag, const String& content);
+	
+	static void logGlobalError(const String& tag, const String& content);
+
 };
 
 class SLIB_EXPORT FileLogger : public Logger
@@ -30,23 +44,16 @@ public:
 	void log(const String& tag, const String& content);
 
 public:
-	SLIB_STRING_PROPERTY(FileName)
+	SLIB_PROPERTY(AtomicString, FileName)
 
 };
 
-class SLIB_EXPORT Log : public Object
+class SLIB_EXPORT LoggerSet : public Logger
 {
 public:
-	Log();
+	LoggerSet();
 	
-	Log(const Ref<Logger>& logger, const Ref<Logger>& errorLogger);
-	
-public:
-	static Ref<Log> global();
-	
-	static Ref<Logger> getConsoleLogger();
-	
-	static Ref<Logger> createFileLogger(const String& fileName);
+	LoggerSet(const Ref<Logger>& logger, const Ref<Logger>& errorLogger);
 	
 public:
 	void clearDefaultLogger();
@@ -54,33 +61,41 @@ public:
 	void addDefaultLogger(const Ref<Logger>& logger);
 	
 	void removeDefaultLogger(const Ref<Logger>& logger);
-
+	
 	
 	void clearErrorLogger();
 	
 	void addErrorLogger(const Ref<Logger>& logger);
 	
 	void removeErrorLogger(const Ref<Logger>& logger);
-
 	
+public:
+	// override
 	void log(const String& tag, const String& content);
 	
+	// override
 	void logError(const String& tag, const String& content);
-
 	
-	static void logGlobal(const String& tag, const String& content);
-	
-	static void logGlobalError(const String& tag, const String& content);
-
-private:
+protected:
 	CList< Ref<Logger> > m_listLoggers;
 	CList< Ref<Logger> > m_listErrorLoggers;
-	
+
 };
 
-SLIB_NAMESPACE_END
+template <class... ARGS>
+void Log(const String& tag, const String& format, ARGS&&... args)
+{
+	String content = String::format(format, args...);
+	Logger::logGlobal(tag, content);
+}
 
-#define SLIB_LOG(tag, content, ...) slib::Log::logGlobal((tag), slib::String::format(content, ##__VA_ARGS__));
-#define SLIB_LOG_ERROR(tag, content, ...) slib::Log::logGlobalError((tag), slib::String::format(content, ##__VA_ARGS__));
+template <class... ARGS>
+void LogError(const String& tag, const String& format, ARGS&&... args)
+{
+	String content = String::format(format, args...);
+	Logger::logGlobalError(tag, content);
+}
+
+SLIB_NAMESPACE_END
 
 #endif

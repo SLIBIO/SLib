@@ -2,8 +2,8 @@
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
-const sl_uint8 MacAddress::_zero[6] = { 0 };
-const sl_uint8 MacAddress::_broadcast[6] = { 255, 255, 255, 255, 255, 255 };
+SLIB_ALIGN(8) const sl_uint8 MacAddress::_zero[6] = { 0 };
+SLIB_ALIGN(8) const sl_uint8 MacAddress::_broadcast[6] = { 255, 255, 255, 255, 255, 255 };
 
 MacAddress::MacAddress(const MacAddress& other) = default;
 
@@ -99,7 +99,7 @@ int MacAddress::compare(const MacAddress& other) const
 
 sl_uint32 MacAddress::hashCode() const
 {
-	return sl_hash(m, 6);
+	return HashBytes(m, 6);
 }
 
 String MacAddress::toString(sl_char8 sep) const
@@ -124,7 +124,7 @@ sl_bool MacAddress::setString(const String& str)
 	}
 }
 
-template <class CT, class ST>
+template <class CT>
 static sl_reg _MacAddress_parse(MacAddress* obj, const CT* sz, sl_size i, sl_size n)
 {
 	int v[6];
@@ -177,7 +177,17 @@ static sl_reg _MacAddress_parse(MacAddress* obj, const CT* sz, sl_size i, sl_siz
 	return i;
 }
 
-SLIB_DEFINE_PARSE_FUNCTIONS(MacAddress, _MacAddress_parse)
+template <>
+sl_reg Parser<MacAddress, sl_char8>::parse(MacAddress* _out, const sl_char8 *sz, sl_size posBegin, sl_size len)
+{
+	return _MacAddress_parse(_out, sz, posBegin, len);
+}
+
+template <>
+sl_reg Parser<MacAddress, sl_char16>::parse(MacAddress* _out, const sl_char16 *sz, sl_size posBegin, sl_size len)
+{
+	return _MacAddress_parse(_out, sz, posBegin, len);
+}
 
 
 MacAddress& MacAddress::operator=(const MacAddress& other) = default;
@@ -188,20 +198,18 @@ MacAddress& MacAddress::operator=(const String& address)
 	return *this;
 }
 
-template <>
-int Compare<MacAddress>::compare(const MacAddress& a, const MacAddress& b)
+
+int Compare<MacAddress>::operator()(const MacAddress& a, const MacAddress& b) const
 {
 	return a.compare(b);
 }
 
-template <>
-sl_bool Compare<MacAddress>::equals(const MacAddress& a, const MacAddress& b)
+sl_bool Equals<MacAddress>::operator()(const MacAddress& a, const MacAddress& b) const
 {
 	return a == b;
 }
 
-template <>
-sl_uint32 Hash<MacAddress>::hash(const MacAddress& a)
+sl_uint32 Hash<MacAddress>::operator()(const MacAddress& a) const
 {
 	return a.hashCode();
 }

@@ -11,13 +11,14 @@
 #include "core/atomic.h"
 #include "core/tuple.h"
 #include "core/ref.h"
-#include "core/function.h"
 #include "core/object.h"
 #include "core/ptr.h"
+#include "core/function.h"
 
 #include "core/macro.h"
 #include "core/scoped.h"
 #include "core/safe_static.h"
+#include "core/singleton.h"
 
 #include "core/spin_lock.h"
 #include "core/mutex.h"
@@ -38,10 +39,11 @@
 #include "core/iterator.h"
 #include "core/list.h"
 #include "core/map.h"
+#include "core/linked_list.h"
 #include "core/queue.h"
-#include "core/loop_queue.h"
 #include "core/queue_channel.h"
 #include "core/linked_object.h"
+#include "core/loop_queue.h"
 #include "core/expire.h"
 
 #include "core/math.h"
@@ -67,13 +69,12 @@
 #include "core/charset.h"
 #include "core/parse.h"
 #include "core/resource.h"
+#include "core/preference.h"
 #include "core/setting.h"
 
 #include "core/json.h"
 #include "core/xml.h"
 #include "core/base64.h"
-
-#include "core/preference.h"
 
 #endif
 

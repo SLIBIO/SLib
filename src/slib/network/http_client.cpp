@@ -188,7 +188,7 @@ void HttpClientConnection::addContext(const Ref<HttpClientContext>& context)
 		return;
 	}
 	if (!(m_queueContexts.push(context))) {
-		_onError(context.ptr);
+		_onError(context.get());
 		return;
 	}	
 	if (context->getMethod() == HttpMethod::POST && context->getRequestContentType().isEmpty()) {
@@ -323,7 +323,7 @@ void HttpClientConnection::_processInput(const void* _data, sl_uint32 size)
 			if (context->isProcessingByThread()) {
 				Ref<AsyncLoop> loop = service->getAsyncLoop();
 				if (loop.isNotNull()) {
-					loop->addTask(SLIB_CALLBACK_WEAKREF(HttpServiceConnection, _processContext, this, _context));
+					loop->addTask(SLIB_BIND_WEAKREF(void(), HttpServiceConnection, _processContext, this, _context));
 					return;
 				} else {
 					sendResponse_ServerError();
@@ -354,7 +354,7 @@ void HttpServiceConnection::_read()
 	}
 }
 
-void HttpServiceConnection::onRead(AsyncStream* stream, void* data, sl_uint32 size, const Referable* ref, sl_bool flagError)
+void HttpServiceConnection::onRead(AsyncStream* stream, void* data, sl_uint32 size, Referable* ref, sl_bool flagError)
 {
 	m_flagReading = sl_false;
 	if (flagError) {

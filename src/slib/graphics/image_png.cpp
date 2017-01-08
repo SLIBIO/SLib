@@ -27,7 +27,7 @@ Ref<Image> Image::loadFromPNG(const void* content, sl_size size)
 			if (mem.isNotEmpty()) {
 				png_bytep buffer = (png_bytep)(mem.getData());
 				if (png_image_finish_read(&image, NULL, buffer, (png_int_32)pitch, NULL)) {
-					ret = Image::createStatic(image.width, image.height, (Color*)buffer, image.width, mem.ref.ptr);
+					ret = Image::createStatic(image.width, image.height, (Color*)buffer, image.width, mem.ref.get());
 				}
 			}
 		}
@@ -53,7 +53,7 @@ static void _slib_image_png_encode_warning(png_structrp png_ptr, png_const_charp
 Memory Image::saveToPNG(const Ref<Image>& image)
 {
 	if (image.isNull()) {
-		return Memory::null();
+		return sl_null;
 	}
 
 	/* initialize stuff */

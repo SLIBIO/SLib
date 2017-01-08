@@ -69,9 +69,9 @@ protected:
 	void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 	
 public:
-	SLIB_PTR_PROPERTY(IEditViewListener, Listener)
+	SLIB_PROPERTY(AtomicPtr<IEditViewListener>, Listener)
 	
-	SLIB_CALLBACK_PROPERTY(EnterAction)
+	SLIB_PROPERTY(AtomicFunction<void()>, EnterAction)
 	
 protected:
 	virtual String onChange(const String& newValue);
@@ -120,9 +120,9 @@ private:
 	void _setBackgroundColor_NW(const Color& color);
 	
 protected:
-	SafeString m_text;
+	AtomicString m_text;
 	Alignment m_textAlignment;
-	SafeString m_hintText;
+	AtomicString m_hintText;
 	sl_bool m_flagReadOnly;
 	sl_bool m_flagMultiLine;
 	Color m_textColor;

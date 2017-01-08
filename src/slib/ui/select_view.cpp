@@ -140,12 +140,12 @@ void SelectView::removeAllItems(UIUpdateMode mode)
 
 String SelectView::getItemValue(sl_uint32 index)
 {
-	return m_values.getItemValue(index, String::null());
+	return m_values.getValueAt(index);
 }
 
 void SelectView::setItemValue(sl_uint32 index, const String& value)
 {
-	m_values.setItem(index, value);
+	m_values.setAt(index, value);
 }
 
 List<String> SelectView::getValues()
@@ -160,13 +160,13 @@ void SelectView::setValues(const List<String>& list)
 
 String SelectView::getItemTitle(sl_uint32 index)
 {
-	return m_titles.getItemValue(index, String::null());
+	return m_titles.getValueAt(index);
 }
 
 void SelectView::setItemTitle(sl_uint32 index, const String& title, UIUpdateMode mode)
 {
 	if (index < m_titles.getCount()) {
-		m_titles.setItem(index, title);
+		m_titles.setAt(index, title);
 		if (isNativeWidget()) {
 			_setItemTitle_NW(index, title);
 		} else {
@@ -238,12 +238,12 @@ sl_uint32 SelectView::getSelectedIndex()
 
 String SelectView::getSelectedValue()
 {
-	return m_values.getItemValue(m_indexSelected, String::null());
+	return m_values.getValueAt(m_indexSelected);
 }
 
 String SelectView::getSelectedTitle()
 {
-	return m_titles.getItemValue(m_indexSelected, String::null());
+	return m_titles.getValueAt(m_indexSelected);
 }
 
 const UISize& SelectView::getIconSize()
@@ -466,7 +466,7 @@ UIRect SelectView::getRightIconRegion()
 
 Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* parent)
 {
-	return Ref<ViewInstance>::null();
+	return sl_null;
 }
 
 void SelectView::_getSelectedIndex_NW()

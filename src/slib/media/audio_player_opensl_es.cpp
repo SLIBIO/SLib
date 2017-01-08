@@ -34,7 +34,7 @@ public:
 public:
 	static void logError(String text)
 	{
-		SLIB_LOG_ERROR("OpenSL_ES", text);
+		LogError("OpenSL_ES", text);
 	}
 
 	static Ref<_OpenSLES_AudioPlayerImpl> create(const AudioPlayerParam& param)
@@ -119,7 +119,7 @@ public:
 public:
 	static void logError(String text)
 	{
-		SLIB_LOG_ERROR("OpenSL_ES_Buffer", text);
+		LogError("OpenSL_ES_Buffer", text);
 	}
 
 	static Ref<_OpenSLES_AudioPlayerBufferImpl> create(Ref<_OpenSLES_AudioPlayerImpl> engine, const AudioPlayerBufferParam& param)
@@ -181,7 +181,7 @@ public:
 							ret->m_event = param.event;
 							
 							if (ret->m_bufFrame) {
-								if ((*bufferQueue)->RegisterCallback(bufferQueue, _OpenSLES_AudioPlayerBufferImpl::callback, ret.ptr) == SL_RESULT_SUCCESS) {
+								if ((*bufferQueue)->RegisterCallback(bufferQueue, _OpenSLES_AudioPlayerBufferImpl::callback, ret.get()) == SL_RESULT_SUCCESS) {
 									if (param.flagAutoStart) {
 										ret->start();
 									}
@@ -190,7 +190,7 @@ public:
 									logError("Failed to register callback");
 								}
 							}
-							return Ref<_OpenSLES_AudioPlayerBufferImpl>::null();
+							return sl_null;
 						}
 					} else {
 						logError("Failed to get buffer queue");
@@ -315,7 +315,7 @@ SLIB_MEDIA_NAMESPACE_BEGIN
 
 Ref<AudioPlayer> OpenSL_ES::createPlayer(const AudioPlayerParam& param)
 {
-	return Ref<AudioPlayer>::null();
+	return sl_null;
 }
 
 SLIB_MEDIA_NAMESPACE_END

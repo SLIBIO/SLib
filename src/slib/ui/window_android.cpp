@@ -55,8 +55,8 @@ SLIB_JNI_END_CLASS
 class _Android_Window : public WindowInstance
 {
 public:
-	JniSafeGlobal<jobject> m_window;
-	SafeRef<ViewInstance> m_viewContent;
+	AtomicJniGlobal<jobject> m_window;
+	AtomicRef<ViewInstance> m_viewContent;
 
 public:
 	_Android_Window()
@@ -72,7 +72,7 @@ public:
 	static Ref<_Android_Window> create(jobject jwindow)
 	{
 		if (!jwindow) {
-			return Ref<_Android_Window>::null();
+			return sl_null;
 		}
 		JniLocal<jobject> jcontent = _JAndroidWindow::getContentView.callObject(jwindow);
 		Ref<_Android_Window> ret = new _Android_Window();
@@ -88,7 +88,7 @@ public:
 				return ret;
 			}
 		}
-		return Ref<_Android_Window>::null();
+		return sl_null;
 	}
 
 	static jobject createHandle(const WindowInstanceParam& param)
@@ -131,7 +131,7 @@ public:
 
 	Ref<WindowInstance> getParent()
 	{
-		return Ref<WindowInstance>::null();
+		return sl_null;
 	}
 
 	sl_bool setParent(const Ref<WindowInstance>& window)
@@ -218,7 +218,7 @@ public:
 
 	String getTitle()
 	{
-		return String::null();
+		return sl_null;
 	}
 
 	sl_bool setTitle(const String& title)
@@ -478,7 +478,7 @@ Ref<WindowInstance> Window::createWindowInstance(const WindowInstanceParam& para
 	if (jwindow.isNotNull()) {
 		return UIPlatform::createWindowInstance(jwindow);
 	}
-	return Ref<WindowInstance>::null();
+	return sl_null;
 }
 
 
@@ -490,7 +490,7 @@ Ref<WindowInstance> UIPlatform::createWindowInstance(jobject jwindow)
 	}
 	Ref<_Android_Window> ret = _Android_Window::create(jwindow);
 	if (ret.isNotNull()) {
-		UIPlatform::_registerWindowInstance((void*)(ret->m_window.get()), ret.ptr);
+		UIPlatform::_registerWindowInstance((void*)(ret->m_window.get()), ret.get());
 	}
 	return ret;
 }

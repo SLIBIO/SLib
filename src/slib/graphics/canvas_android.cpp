@@ -57,7 +57,7 @@ public:
 				return ret;
 			}
 		}
-		return Ref<_Android_Canvas>::null();
+		return sl_null;
 	}
 
     // override
@@ -96,7 +96,7 @@ public:
     // override
 	void clipToPath(const Ref<GraphicsPath>& path)
 	{
-		jobject handle = GraphicsPlatform::getGraphicsPath(path.ptr);
+		jobject handle = GraphicsPlatform::getGraphicsPath(path.get());
 		if (handle) {
 			_JAndroidGraphics::clipToPath.call(m_canvas, handle);
 		}
@@ -119,7 +119,7 @@ public:
 			if (font.isNull()) {
 				font = Font::getDefault();
 			}
-			jobject hFont = GraphicsPlatform::getNativeFont(font.ptr);
+			jobject hFont = GraphicsPlatform::getNativeFont(font.get());
 			if (hFont) {
 				JniLocal<jstring> jtext = Jni::getJniString(text);
 				_JAndroidGraphics::drawText.call(m_canvas, jtext.value, (float)x, (float)y, hFont, color.getARGB());
@@ -134,7 +134,7 @@ public:
 		if (pen.isNull()) {
 			pen = Pen::getDefault();
 		}
-		jobject hPen = GraphicsPlatform::getPenHandle(pen.ptr);
+		jobject hPen = GraphicsPlatform::getPenHandle(pen.get());
 		if (hPen) {
 			_JAndroidGraphics::drawLine.call(m_canvas
 					, (float)(pt1.x), (float)(pt1.y), (float)(pt2.x), (float)(pt2.y)
@@ -152,7 +152,7 @@ public:
 		if (pen.isNull()) {
 			pen = Pen::getDefault();
 		}
-		jobject hPen = GraphicsPlatform::getPenHandle(pen.ptr);
+		jobject hPen = GraphicsPlatform::getPenHandle(pen.get());
 		if (hPen) {
 			JniLocal<jfloatArray> jarr = Jni::newFloatArray(countPoints*2);
 			if (jarr.isNotNull()) {
@@ -169,7 +169,7 @@ public:
 		if (pen.isNull()) {
 			pen = Pen::getDefault();
 		}
-		jobject hPen = GraphicsPlatform::getPenHandle(pen.ptr);
+		jobject hPen = GraphicsPlatform::getPenHandle(pen.get());
 		if (hPen) {
 			_JAndroidGraphics::drawArc.call(m_canvas
 					, (float)(rect.left), (float)(rect.top), (float)(rect.right), (float)(rect.bottom)
@@ -185,8 +185,8 @@ public:
 		if (brush.isNull() && pen.isNull()) {
 			pen = Pen::getDefault();
 		}
-		jobject hPen = GraphicsPlatform::getPenHandle(pen.ptr);
-		jobject hBrush = GraphicsPlatform::getBrushHandle(brush.ptr);
+		jobject hPen = GraphicsPlatform::getPenHandle(pen.get());
+		jobject hBrush = GraphicsPlatform::getBrushHandle(brush.get());
 		if (hPen || hBrush) {
 			_JAndroidGraphics::drawRectangle.call(m_canvas
 					, (float)(rect.left), (float)(rect.top), (float)(rect.right), (float)(rect.bottom)
@@ -201,8 +201,8 @@ public:
 		if (brush.isNull() && pen.isNull()) {
 			pen = Pen::getDefault();
 		}
-		jobject hPen = GraphicsPlatform::getPenHandle(pen.ptr);
-		jobject hBrush = GraphicsPlatform::getBrushHandle(brush.ptr);
+		jobject hPen = GraphicsPlatform::getPenHandle(pen.get());
+		jobject hBrush = GraphicsPlatform::getBrushHandle(brush.get());
 		if (hPen || hBrush) {
 			_JAndroidGraphics::drawRoundRectangle.call(m_canvas
 					, (float)(rect.left), (float)(rect.top), (float)(rect.right), (float)(rect.bottom)
@@ -217,8 +217,8 @@ public:
 		if (brush.isNull() && pen.isNull()) {
 			pen = Pen::getDefault();
 		}
-		jobject hPen = GraphicsPlatform::getPenHandle(pen.ptr);
-		jobject hBrush = GraphicsPlatform::getBrushHandle(brush.ptr);
+		jobject hPen = GraphicsPlatform::getPenHandle(pen.get());
+		jobject hBrush = GraphicsPlatform::getBrushHandle(brush.get());
 		if (hPen || hBrush) {
 			_JAndroidGraphics::drawEllipse.call(m_canvas
 					, (float)(rect.left), (float)(rect.top), (float)(rect.right), (float)(rect.bottom)
@@ -236,8 +236,8 @@ public:
 		if (brush.isNull() && pen.isNull()) {
 			pen = Pen::getDefault();
 		}
-		jobject hPen = GraphicsPlatform::getPenHandle(pen.ptr);
-		jobject hBrush = GraphicsPlatform::getBrushHandle(brush.ptr);
+		jobject hPen = GraphicsPlatform::getPenHandle(pen.get());
+		jobject hBrush = GraphicsPlatform::getBrushHandle(brush.get());
 		if (hPen || hBrush) {
 			JniLocal<jfloatArray> jarr = Jni::newFloatArray(countPoints*2);
 			if (jarr.isNotNull()) {
@@ -254,8 +254,8 @@ public:
 		if (brush.isNull() && pen.isNull()) {
 			pen = Pen::getDefault();
 		}
-		jobject hPen = GraphicsPlatform::getPenHandle(pen.ptr);
-		jobject hBrush = GraphicsPlatform::getBrushHandle(brush.ptr);
+		jobject hPen = GraphicsPlatform::getPenHandle(pen.get());
+		jobject hBrush = GraphicsPlatform::getBrushHandle(brush.get());
 		if (hPen || hBrush) {
 			_JAndroidGraphics::drawPie.call(m_canvas
 					, (float)(rect.left), (float)(rect.top), (float)(rect.right), (float)(rect.bottom)
@@ -267,14 +267,14 @@ public:
     // override
 	void drawPath(const Ref<GraphicsPath>& path, const Ref<Pen>& _pen, const Ref<Brush>& brush)
 	{
-		jobject hPath = GraphicsPlatform::getGraphicsPath(path.ptr);
+		jobject hPath = GraphicsPlatform::getGraphicsPath(path.get());
 		if (hPath) {
 			Ref<Pen> pen = _pen;
 			if (brush.isNull() && pen.isNull()) {
 				pen = Pen::getDefault();
 			}
-			jobject hPen = GraphicsPlatform::getPenHandle(pen.ptr);
-			jobject hBrush = GraphicsPlatform::getBrushHandle(brush.ptr);
+			jobject hPen = GraphicsPlatform::getPenHandle(pen.get());
+			jobject hBrush = GraphicsPlatform::getBrushHandle(brush.get());
 			if (hPen || hBrush) {
 				_JAndroidGraphics::drawPath.call(m_canvas
 						, hPath
@@ -302,15 +302,14 @@ SLIB_DEFINE_OBJECT(_Android_Canvas, Canvas)
 Ref<Canvas> GraphicsPlatform::createCanvas(CanvasType type, jobject jcanvas)
 {
 	if (!jcanvas) {
-		return Ref<Canvas>::null();
+		return sl_null;
 	}
 	return _Android_Canvas::create(type, jcanvas);
 }
 
 jobject GraphicsPlatform::getCanvasHandle(Canvas* _canvas)
 {
-	if (_Android_Canvas::checkInstance(_canvas)) {
-		_Android_Canvas* canvas = (_Android_Canvas*)_canvas;
+	if (_Android_Canvas* canvas = CastInstance<_Android_Canvas>(_canvas)) {
 		return canvas->m_canvas;
 	} else {
 		return 0;

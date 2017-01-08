@@ -20,7 +20,7 @@ Ref<GraphicsPath> GraphicsPath::create()
 	if (path->m_platformObject.isNotNull()) {
 		return path;
 	}
-	return Ref<GraphicsPath>::null();
+	return sl_null;
 }
 
 void GraphicsPath::moveTo(sl_real x, sl_real y)

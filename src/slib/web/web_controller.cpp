@@ -36,12 +36,12 @@ sl_bool WebController::onHttpRequest(const Ref<HttpServiceContext>& context)
 			if (ret.isObject()) {
 				Ref<Referable> obj = ret.getObject();
 				if (obj.isNotNull()) {
-					if (IMap<String, Variant>::checkInstance(obj.ptr)) {
+					if (IsInstanceOf< Map<String, Variant> >(obj)) {
 						context->write(ret.toJsonString());
-					} else if (XmlDocument::checkInstance(obj.ptr)) {
-						context->write(((XmlDocument*)(obj.ptr))->toString());
-					} else if (CMemory::checkInstance(obj.ptr)) {
-						context->write((CMemory*)(obj.ptr));
+					} else if (XmlDocument* xml = CastInstance<XmlDocument>(obj.get())) {
+						context->write(xml->toString());
+					} else if (CMemory* mem = CastInstance<CMemory>(obj.get())) {
+						context->write(mem);
 					}
 				}
 			} else {

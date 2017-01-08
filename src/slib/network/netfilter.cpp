@@ -135,7 +135,7 @@ public:
 	Ref<PipeEvent> m_wake;
 
 	HashMap< sl_uint16, Ref<_Linux_NetFilterQueue> > m_queues;
-	Queue< Ref<_Linux_NetFilterQueue> > m_listRemovingQueues;
+	LinkedQueue< Ref<_Linux_NetFilterQueue> > m_listRemovingQueues;
 	
 public:
 	_Linux_NetFilter()
@@ -160,11 +160,11 @@ public:
 	{
 		Memory bufPacket = Memory::create(SIZE_PACKET);
 		if (bufPacket.isEmpty()) {
-			return Ref<_Linux_NetFilter>::null();
+			return sl_null;
 		}
 		Ref<PipeEvent> wake = PipeEvent::create();
 		if (wake.isNull()) {
-			return Ref<_Linux_NetFilter>::null();
+			return sl_null;
 		}
 		
 		nfq_handle* handle = nfq_open();
@@ -178,7 +178,7 @@ public:
 					ret->m_bufPacket = bufPacket;
 					ret->m_wake = wake;
 					ret->m_listener = param.listener;
-					ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_Linux_NetFilter, _run, ret.ptr));
+					ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_Linux_NetFilter, _run, ret.get()));
 					if (ret->m_thread.isNotNull()) {
 						ret->m_flagInit = sl_true;
 						if (param.flagAutoStart) {
@@ -186,15 +186,15 @@ public:
 						}
 						return ret;
 					} else {
-						SLIB_LOG_ERROR(TAG, "Failed to create thread");
+						LogError(TAG, "Failed to create thread");
 					}
 				}
 			} else {
-				SLIB_LOG_ERROR(TAG, "Failed to bind netfilter handle");
+				LogError(TAG, "Failed to bind netfilter handle");
 			}
 			nfq_close(handle);
 		}
-		return Ref<_Linux_NetFilter>::null();
+		return sl_null;
 	}
 	
 	void release()
@@ -252,7 +252,7 @@ public:
 		}
 		Ref<_Linux_NetFilterQueue> queueObj = new _Linux_NetFilterQueue;
 		if (queueObj.isNotNull()) {
-			nfq_q_handle* queue = nfq_create_queue(m_handle, queueNumber, &_Linux_NetFilter::_callbackFilter, queueObj.ptr);
+			nfq_q_handle* queue = nfq_create_queue(m_handle, queueNumber, &_Linux_NetFilter::_callbackFilter, queueObj.get());
 			if (queue) {
 				nfq_set_queue_maxlen(queue, 1024*10);
 				queueObj->m_filter = this;
@@ -263,11 +263,11 @@ public:
 					m_queues.put(queueNumber, queueObj);
 					return sl_true;
 				} else {
-					SLIB_LOG_ERROR(TAG, "Failed to set queue mode");
+					LogError(TAG, "Failed to set queue mode");
 				}
 				nfq_destroy_queue(queue);
 			} else {
-				SLIB_LOG_ERROR(TAG, "Failed to create queue - number=" + String::fromUint32(queueNumber));
+				LogError(TAG, "Failed to create queue - number=%d", queueNumber);
 			}
 		}
 		return sl_false;
@@ -348,7 +348,7 @@ public:
 				if (err == EAGAIN || err == EWOULDBLOCK) {
 					poll(fds, 2, -1);
 				} else if (err == ENOBUFS) {
-					SLIB_LOG_ERROR(TAG, "Not enough receive buffer");
+					LogError(TAG, "Not enough receive buffer");
 				} else {
 					break;
 				}
@@ -371,7 +371,7 @@ SLIB_NETWORK_NAMESPACE_BEGIN
 
 Ref<NetFilter> NetFilter::create(const NetFilterParam& param)
 {
-	return Ref<NetFilter>::null();
+	return sl_null;
 }
 
 SLIB_NETWORK_NAMESPACE_END

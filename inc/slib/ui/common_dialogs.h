@@ -30,45 +30,45 @@ public:
 	
 	static void show(const String& text);
 
-	static void show(const String& text, const Callback& onOk);
+	static void show(const String& text, const Function<void()>& onOk);
 	
-	static void show(const String& caption, const String& text, const Callback& onOk);
+	static void show(const String& caption, const String& text, const Function<void()>& onOk);
 
 	static DialogResult runOkCancel(const String& text);
 	
 	static DialogResult runOkCancel(const String& caption, const String& text);
 	
-	static void showOkCancel(const String& text, const Callback& onOk, const Callback& onCancel);
+	static void showOkCancel(const String& text, const Function<void()>& onOk, const Function<void()>& onCancel);
 	
-	static void showOkCancel(const String& caption, const String& text, const Callback& onOk, const Callback& onCancel);
+	static void showOkCancel(const String& caption, const String& text, const Function<void()>& onOk, const Function<void()>& onCancel);
 	
-	static void showOkCancel(const String& text, const Callback& onOk);
+	static void showOkCancel(const String& text, const Function<void()>& onOk);
 	
-	static void showOkCancel(const String& caption, const String& text, const Callback& onOk);
+	static void showOkCancel(const String& caption, const String& text, const Function<void()>& onOk);
 	
 	static DialogResult runYesNo(const String& text);
 	
 	static DialogResult runYesNo(const String& caption, const String& text);
 	
-	static void showYesNo(const String& text, const Callback& onYes, const Callback& onNo);
+	static void showYesNo(const String& text, const Function<void()>& onYes, const Function<void()>& onNo);
 	
-	static void showYesNo(const String& caption, const String& text, const Callback& onYes, const Callback& onNo);
+	static void showYesNo(const String& caption, const String& text, const Function<void()>& onYes, const Function<void()>& onNo);
 	
-	static void showYesNo(const String& text, const Callback& onYes);
+	static void showYesNo(const String& text, const Function<void()>& onYes);
 	
-	static void showYesNo(const String& caption, const String& text, const Callback& onYes);
+	static void showYesNo(const String& caption, const String& text, const Function<void()>& onYes);
 	
 	static DialogResult runYesNoCancel(const String& text);
 	
 	static DialogResult runYesNoCancel(const String& caption, const String& text);
 	
-	static void showYesNoCancel(const String& text, const Callback& onYes, const Callback& onNo, const Callback& onCancel);
+	static void showYesNoCancel(const String& text, const Function<void()>& onYes, const Function<void()>& onNo, const Function<void()>& onCancel);
 	
-	static void showYesNoCancel(const String& caption, const String& text, const Callback& onYes, const Callback& onNo, const Callback& onCancel);
+	static void showYesNoCancel(const String& caption, const String& text, const Function<void()>& onYes, const Function<void()>& onNo, const Function<void()>& onCancel);
 	
-	static void showYesNoCancel(const String& text, const Callback& onYes, const Callback& onNo);
+	static void showYesNoCancel(const String& text, const Function<void()>& onYes, const Function<void()>& onNo);
 	
-	static void showYesNoCancel(const String& caption, const String& text, const Callback& onYes, const Callback& onNo);
+	static void showYesNoCancel(const String& caption, const String& text, const Function<void()>& onYes, const Function<void()>& onNo);
 	
 public:
 	AlertDialog();
@@ -91,9 +91,9 @@ public:
 	String titleYes;
 	String titleNo;
 	
-	Callback onOk;
-	Callback onCancel;
-	Callback onNo;
+	Function<void()> onOk;
+	Function<void()> onCancel;
+	Function<void()> onNo;
 	
 public:
 	DialogResult _run();

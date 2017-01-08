@@ -78,7 +78,7 @@ protected:
 	Ref<Referable> m_platformObject;
 	SpinLock m_lock;
 	
-	SafeRef<Referable> m_renderingCache;
+	AtomicRef<Referable> m_renderingCache;
 	
 };
 

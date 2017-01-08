@@ -96,7 +96,7 @@ void ExpiringMap<KT, VT>::setupTimer(sl_uint32 expiring_duration_ms, const Ref<A
 		m_duration = expiring_duration_ms;
 		m_loop = loop;
 		typedef ExpiringMap<KT, VT> _ExpiringMap;
-		m_timer = loop->addTimer(SLIB_CALLBACK_CLASS(_ExpiringMap, _update, this), expiring_duration_ms);
+		m_timer = loop->addTimer(SLIB_FUNCTION_CLASS(_ExpiringMap, _update, this), expiring_duration_ms);
 	}
 }
 
@@ -125,14 +125,14 @@ template <class KT, class VT>
 sl_bool ExpiringMap<KT, VT>::get(const KT& key, VT* _out, sl_bool flagUpdateLifetime)
 {
 	ObjectLocker lock(this);
-	VT* p = m_mapCurrent.getItemPtr(key);
+	VT* p = m_mapCurrent.getItemPointer(key);
 	if (p) {
 		if (_out) {
 			*_out = *p;
 		}
 		return sl_true;
 	}
-	p = m_mapBackup.getItemPtr(key);
+	p = m_mapBackup.getItemPointer(key);
 	if (p) {
 		if (_out) {
 			*_out = *p;
@@ -150,11 +150,11 @@ template <class KT, class VT>
 VT ExpiringMap<KT, VT>::getValue(const KT& key, const VT& def, sl_bool flagUpdateLifetime)
 {
 	ObjectLocker lock(this);
-	VT* p = m_mapCurrent.getItemPtr(key);
+	VT* p = m_mapCurrent.getItemPointer(key);
 	if (p) {
 		return *p;
 	}
-	p = m_mapBackup.getItemPtr(key);
+	p = m_mapBackup.getItemPointer(key);
 	if (p) {
 		if (flagUpdateLifetime) {
 			m_mapCurrent.put_NoLock(key, *p);

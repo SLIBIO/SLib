@@ -11,7 +11,7 @@ SLIB_UI_NAMESPACE_BEGIN
 class _Win32_RenderViewInstance : public Win32_ViewInstance, public IRenderCallback
 {
 public:
-	SafeRef<Renderer> m_renderer;
+	AtomicRef<Renderer> m_renderer;
 
 public:
 	_Win32_RenderViewInstance()
@@ -58,11 +58,8 @@ public:
 	void onFrame(RenderEngine* engine)
 	{
 		Ref<View> _view = getView();
-		if (RenderView::checkInstance(_view.ptr)) {
-			Ref<RenderView> view = Ref<RenderView>::from(_view);
-			if (view.isNotNull()) {
-				view->dispatchFrame(engine);
-			}
+		if (RenderView* view = CastInstance<RenderView>(_view.get())) {
+			view->dispatchFrame(engine);
 		}
 	}
 };
@@ -71,7 +68,7 @@ Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* parent)
 {
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
 	if (!shared) {
-		return Ref<ViewInstance>::null();
+		return sl_null;
 	}
 
 	DWORD styleEx = 0;

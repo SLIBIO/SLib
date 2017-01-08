@@ -43,8 +43,10 @@ enum class FillMode
 
 class Alignment
 {
-	SLIB_DECLARE_FLAGS(Alignment)
 public:
+	int value;
+	SLIB_MEMBERS_OF_FLAGS(Alignment, value)
+	
 	enum
 	{
 		HorizontalMask = 3,

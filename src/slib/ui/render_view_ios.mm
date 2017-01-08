@@ -18,7 +18,7 @@
 	@public sl_bool m_flagRenderingContinuously;
 	@public sl_bool m_flagRequestRender;
 	
-	slib::SafeRef<slib::Thread> m_thread;
+	slib::AtomicRef<slib::Thread> m_thread;
 }
 
 -(void)_init;
@@ -153,9 +153,8 @@ void _iOS_GLCallback(__weak _Slib_iOS_GLView* _handle)
 						desc.m_engine->setViewport(0, 0, width, height);
 						
 						Ref<View> _view = instance->getView();
-						if (RenderView::checkInstance(_view.ptr)) {
-							RenderView* view = (RenderView*)(_view.ptr);
-							view->dispatchFrame(desc.m_engine.ptr);
+						if (RenderView* view = CastInstance<RenderView>(_view.get())) {
+							view->dispatchFrame(desc.m_engine.get());
 						}
 						
 						[handle display];
@@ -192,7 +191,7 @@ SLIB_UI_NAMESPACE_END
 {
 	m_flagRenderingContinuously = sl_false;
 	m_flagRequestRender = sl_true;
-	m_thread = slib::Thread::start(SLIB_CALLBACK(&(slib::_iOS_GLCallback), self));
+	m_thread = slib::Thread::start(slib::Function<void()>::bind(&(slib::_iOS_GLCallback), self));
 }
 
 -(void)dealloc

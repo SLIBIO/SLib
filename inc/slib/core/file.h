@@ -22,8 +22,10 @@ enum class FileMode
 
 class FileAttributes
 {
-	SLIB_DECLARE_FLAGS(FileAttributes)
 public:
+	int value;
+	SLIB_MEMBERS_OF_FLAGS(FileAttributes, value)
+
 	enum {
 		Directory = 1,
 		Hidden = 2,

@@ -8,26 +8,7 @@
 **************************************/
 SLIB_MATH_NAMESPACE_BEGIN
 
-template<>
-int Compare<Uint128>::compare(const Uint128& a, const Uint128& b)
-{
-	return a.compare(b);
-}
-
-template<>
-sl_bool Compare<Uint128>::equals(const Uint128& a, const Uint128& b)
-{
-	return a == b;
-}
-
-template<>
-sl_uint32 Hash<Uint128>::hash(const Uint128& v)
-{
-	return sl_rehash((sl_uint32)(v.high ^ (v.high >> 32) ^ v.low ^ (v.low >> 32)));
-}
-
-
-const sl_uint64 Uint128::_zero[2] = { 0, 0 };
+SLIB_ALIGN(8) const sl_uint64 Uint128::_zero[2] = { 0, 0 };
 
 int Uint128::compare(const Uint128& other) const
 {
@@ -775,7 +756,7 @@ Uint128 Uint128::fromString(const String& str, sl_uint32 radix)
 String Uint128::toString(sl_uint32 radix) const
 {
 	if (radix < 2 || radix > 64) {
-		return String::null();
+		return sl_null;
 	}
 	Uint128 m = *this;
 	if (m.isZero()) {
@@ -831,7 +812,7 @@ String Uint128::toHexString() const
 }
 
 
-template <class CT, class ST>
+template <class CT>
 static sl_reg _Uint128_parseString(Uint128* out, const CT* sz, sl_size posBegin, sl_size len, sl_uint32 radix)
 {
 	if (radix < 2 || radix > 64) {
@@ -871,7 +852,33 @@ static sl_reg _Uint128_parseString(Uint128* out, const CT* sz, sl_size posBegin,
 	return pos;
 }
 
-SLIB_DEFINE_PARSE_FUNCTIONS_ARG(Uint128, _Uint128_parseString, sl_uint32, radix, 10)
 
+template <>
+sl_reg IntParser<Uint128, sl_char8>::parse(Uint128* _out, sl_uint32 radix, const sl_char8 *sz, sl_size posBegin, sl_size len)
+{
+	return _Uint128_parseString(_out, sz, posBegin, len, radix);
+}
+
+template <>
+sl_reg IntParser<Uint128, sl_char16>::parse(Uint128* _out, sl_uint32 radix, const sl_char16 *sz, sl_size posBegin, sl_size len)
+{
+	return _Uint128_parseString(_out, sz, posBegin, len, radix);
+}
+
+
+int Compare<Uint128>::operator()(const Uint128& a, const Uint128& b) const
+{
+	return a.compare(b);
+}
+
+sl_bool Equals<Uint128>::operator()(const Uint128& a, const Uint128& b) const
+{
+	return a == b;
+}
+
+sl_uint32 Hash<Uint128>::operator()(const Uint128& v) const
+{
+	return Rehash((sl_uint32)(v.high ^ (v.high >> 32) ^ v.low ^ (v.low >> 32)));
+}
 
 SLIB_MATH_NAMESPACE_END

@@ -4,7 +4,7 @@
 #include "../../../inc/slib/core/definition.h"
 
 #define TAG "AsyncSocket"
-#define LOG_ERROR(msg) SLIB_LOG_ERROR(TAG, msg)
+#define LOG_ERROR(msg) LogError(TAG, msg)
 
 #define ASYNC_UDP_PACKET_SIZE 65535
 

@@ -4,12 +4,13 @@
 
 #include "../../../inc/slib/core/scoped.h"
 #include "../../../inc/slib/core/platform_apple.h"
+#include "../../../inc/slib/core/log.h"
 
 SLIB_MEDIA_NAMESPACE_BEGIN
 
 void OSX_AudioDeviceInfo::logError(String text)
 {
-	SLIB_LOG_ERROR("AudioDevice", text);
+	LogError("AudioDevice", text);
 }
 	
 List<OSX_AudioDeviceInfo> OSX_AudioDeviceInfo::getAllDevices(sl_bool flagInput)
@@ -144,7 +145,7 @@ sl_bool OSX_AudioDeviceInfo::selectDevice(sl_bool flagInput, String uid)
 	if (uid.isEmpty()) {
 		return getDefaultDevice(flagInput);
 	} else {
-		ListItems<OSX_AudioDeviceInfo> list(getAllDevices(flagInput));
+		ListElements<OSX_AudioDeviceInfo> list(getAllDevices(flagInput));
 		for (sl_size i = 0; i < list.count; i++) {
 			OSX_AudioDeviceInfo& element = list[i];
 			if (element.uid == uid) {

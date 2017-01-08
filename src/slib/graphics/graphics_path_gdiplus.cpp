@@ -61,7 +61,7 @@ void GraphicsPath::_initialize_PO()
 
 void GraphicsPath::_moveTo_PO(sl_real x, sl_real y)
 {
-	_Gdiplus_GraphicsPathObject* po = (_Gdiplus_GraphicsPathObject*)(m_platformObject.ptr);
+	_Gdiplus_GraphicsPathObject* po = (_Gdiplus_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		po->lastX = x;
 		po->lastY = y;
@@ -70,7 +70,7 @@ void GraphicsPath::_moveTo_PO(sl_real x, sl_real y)
 
 void GraphicsPath::_lineTo_PO(sl_real x, sl_real y)
 {
-	_Gdiplus_GraphicsPathObject* po = (_Gdiplus_GraphicsPathObject*)(m_platformObject.ptr);
+	_Gdiplus_GraphicsPathObject* po = (_Gdiplus_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		po->path->AddLine((Gdiplus::REAL)(po->lastX), (Gdiplus::REAL)(po->lastY), (Gdiplus::REAL)(x), (Gdiplus::REAL)(y));
 		po->lastX = x;
@@ -80,7 +80,7 @@ void GraphicsPath::_lineTo_PO(sl_real x, sl_real y)
 
 void GraphicsPath::_cubicTo_PO(sl_real xc1, sl_real yc1, sl_real xc2, sl_real yc2, sl_real xe, sl_real ye)
 {
-	_Gdiplus_GraphicsPathObject* po = (_Gdiplus_GraphicsPathObject*)(m_platformObject.ptr);
+	_Gdiplus_GraphicsPathObject* po = (_Gdiplus_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		po->path->AddBezier(
 			(Gdiplus::REAL)(po->lastX), (Gdiplus::REAL)(po->lastY), 
@@ -95,7 +95,7 @@ void GraphicsPath::_cubicTo_PO(sl_real xc1, sl_real yc1, sl_real xc2, sl_real yc
 
 void GraphicsPath::_closeSubpath_PO()
 {
-	_Gdiplus_GraphicsPathObject* po = (_Gdiplus_GraphicsPathObject*)(m_platformObject.ptr);
+	_Gdiplus_GraphicsPathObject* po = (_Gdiplus_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		po->path->CloseFigure();
 	}
@@ -103,7 +103,7 @@ void GraphicsPath::_closeSubpath_PO()
 
 void GraphicsPath::_setFillMode_PO(FillMode mode)
 {
-	_Gdiplus_GraphicsPathObject* po = (_Gdiplus_GraphicsPathObject*)(m_platformObject.ptr);
+	_Gdiplus_GraphicsPathObject* po = (_Gdiplus_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		po->path->SetFillMode(_Gdiplus_convertFillMode(mode));
 	}
@@ -111,7 +111,7 @@ void GraphicsPath::_setFillMode_PO(FillMode mode)
 
 Rectangle GraphicsPath::_getBounds_PO()
 {
-	_Gdiplus_GraphicsPathObject* po = (_Gdiplus_GraphicsPathObject*)(m_platformObject.ptr);
+	_Gdiplus_GraphicsPathObject* po = (_Gdiplus_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		Rectangle ret;
 		Gdiplus::RectF rc;
@@ -127,7 +127,7 @@ Rectangle GraphicsPath::_getBounds_PO()
 
 sl_bool GraphicsPath::_containsPoint_PO(sl_real x, sl_real y)
 {
-	_Gdiplus_GraphicsPathObject* po = (_Gdiplus_GraphicsPathObject*)(m_platformObject.ptr);
+	_Gdiplus_GraphicsPathObject* po = (_Gdiplus_GraphicsPathObject*)(m_platformObject.get());
 	if (po) {
 		return (po->path->IsVisible((Gdiplus::REAL)x, (Gdiplus::REAL)y)) != FALSE;
 	}
@@ -139,7 +139,7 @@ class _GraphicsPath : public GraphicsPath
 public:
 	Gdiplus::GraphicsPath* createHandle()
 	{
-		ListItems<GraphicsPathPoint> points(this->points);
+		ListElements<GraphicsPathPoint> points(this->points);
 		sl_size n = points.count;
 		if (n > 0) {
 			SLIB_SCOPED_BUFFER(Gdiplus::PointF, 1024, pts, n);
@@ -157,7 +157,7 @@ public:
 
 	Gdiplus::GraphicsPath* getPlatformPath()
 	{
-		_Gdiplus_GraphicsPathObject* po = (_Gdiplus_GraphicsPathObject*)(m_platformObject.ptr);
+		_Gdiplus_GraphicsPathObject* po = (_Gdiplus_GraphicsPathObject*)(m_platformObject.get());
 		if (po) {
 			return po->path;
 		}

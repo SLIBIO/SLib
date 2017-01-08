@@ -190,8 +190,8 @@ public:
 	void update(const Time& current);
 	
 public:
-	SLIB_PTR_PROPERTY(IAnimationListener, Listener)
-	SLIB_CALLBACK_PROPERTY(OnStop)
+	SLIB_PROPERTY(AtomicPtr<IAnimationListener>, Listener)
+	SLIB_PROPERTY(AtomicFunction<void()>, OnStop)
 	
 protected:
 	virtual void onAnimationFrame(float seconds);
@@ -232,7 +232,7 @@ protected:
 	float m_curveCycles2PI;
 	float m_curveTension;
 	CustomAnimationCurve m_customCurve;
-	SafeRef<Referable> m_customCurveParam;
+	AtomicRef<Referable> m_customCurveParam;
 	
 	CList< Ref<AnimationTarget> > m_targets;
 	CList< Ref<Animation> > m_linkedAnimations;
@@ -328,7 +328,7 @@ public:
 	virtual void update(float fraction) = 0;
 	
 protected:
-	SafeWeakRef<Animation> m_animation;
+	AtomicWeakRef<Animation> m_animation;
 	
 };
 

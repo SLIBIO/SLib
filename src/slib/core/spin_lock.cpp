@@ -5,14 +5,6 @@
 
 SLIB_NAMESPACE_BEGIN
 
-SpinLock::SpinLock() : m_flagLock(0)
-{
-}
-
-SpinLock::SpinLock(const SpinLock& other) : m_flagLock(0)
-{
-}
-
 void SpinLock::lock() const
 {
 	sl_uint32 count = 0;
@@ -24,12 +16,14 @@ void SpinLock::lock() const
 
 sl_bool SpinLock::tryLock() const
 {
-	return Base::interlockedCompareExchange32((sl_int32*)(&m_flagLock), 1, 0);
+	sl_int32* p = (sl_int32*)(&m_flagLock);
+	return Base::interlockedCompareExchange32(p, 1, 0);
 }
 
 void SpinLock::unlock() const
 {
-	Base::interlockedCompareExchange32((sl_int32*)(&m_flagLock), 0, 1);
+	sl_int32* p = (sl_int32*)(&m_flagLock);
+	Base::interlockedCompareExchange32(p, 0, 1);
 }
 
 SpinLock& SpinLock::operator=(const SpinLock& other)

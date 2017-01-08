@@ -77,31 +77,23 @@ void System::freeGlobalUniqueInstance(void* instance)
 #if defined(SLIB_PLATFORM_IS_MOBILE)
 sl_bool System::createProcess(const String& pathExecutable, const String* cmds, sl_uint32 nCmds)
 {
-	SLIB_STATIC_STRING(n, "System::createProcess");
-	SLIB_STATIC_STRING(v, "Not supported");
-	SLIB_LOG_ERROR(n, v);
+	LogError("System::createProcess", "Not supported");
 	return sl_false;
 }
 
 void System::exec(const String& pathExecutable, const String* cmds, sl_uint32 nCmds)
 {
-	SLIB_STATIC_STRING(n, "System::exec");
-	SLIB_STATIC_STRING(v, "Not supported");
-	SLIB_LOG_ERROR(n, v);
+	LogError("System::exec", "Not supported");
 }
 
 void System::exit(int code)
 {
-	SLIB_STATIC_STRING(n, "System::exit");
-	SLIB_STATIC_STRING(v, "Not supported");
-	SLIB_LOG_ERROR(n, v);
+	LogError("System::exit", "Not supported");
 }
 
 void System::setCrashHandler(SIGNAL_HANDLER handler)
 {
-	SLIB_STATIC_STRING(n, "System::setCrashHandler");
-	SLIB_STATIC_STRING(v, "Not supported");
-	SLIB_LOG_ERROR(n, v);
+	LogError("System::setCrashHandler", "Not supported");
 }
 #endif
 
@@ -126,7 +118,7 @@ void Console::println(const String& s)
 #if defined(SLIB_PLATFORM_IS_MOBILE)
 String Console::readLine()
 {
-	return String::null();
+	return sl_null;
 }
 #endif
 

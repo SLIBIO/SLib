@@ -51,7 +51,7 @@ Ref<TcpDatagramClient> TcpDatagramClient::create(const TcpDatagramClientParam& p
 			}
 		}
 	}
-	return Ref<TcpDatagramClient>::null();
+	return sl_null;
 }
 
 void TcpDatagramClient::close()
@@ -149,12 +149,12 @@ void TcpDatagramClient::onConnect(AsyncTcpSocket* socket, const SocketAddress& a
 	}
 }
 
-void TcpDatagramClient::onReceive(AsyncTcpSocket* socket, void* data, sl_uint32 sizeReceive, const Referable* refData, sl_bool flagError)
+void TcpDatagramClient::onReceive(AsyncTcpSocket* socket, void* data, sl_uint32 sizeReceive, Referable* refData, sl_bool flagError)
 {
 	if (flagError) {
 		onMessageError(socket);
 	} else {
-		Queue<Memory> queue;
+		LinkedQueue<Memory> queue;
 		if (m_datagram.parse(data, sizeReceive, queue)) {
 			PtrLocker<ITcpDatagramListener> listener(m_listener);
 			if (listener.isNotNull()) {
@@ -173,7 +173,7 @@ void TcpDatagramClient::onReceive(AsyncTcpSocket* socket, void* data, sl_uint32 
 	}
 }
 
-void TcpDatagramClient::onSend(AsyncTcpSocket* socket, void* data, sl_uint32 sizeSent, const Referable* refData, sl_bool flagError)
+void TcpDatagramClient::onSend(AsyncTcpSocket* socket, void* data, sl_uint32 sizeSent, Referable* refData, sl_bool flagError)
 {
 	if (flagError) {
 		onMessageError(socket);
@@ -183,7 +183,7 @@ void TcpDatagramClient::onSend(AsyncTcpSocket* socket, void* data, sl_uint32 siz
 void TcpDatagramClient::onMessageError(AsyncTcpSocket* socket)
 {
 	ObjectLocker lock(this);
-	if (m_socketMessage.ptr == socket) {
+	if (m_socketMessage.get() == socket) {
 		PtrLocker<ITcpDatagramListener> listener(m_listener);
 		if (listener.isNotNull()) {
 			listener->onError(this);
@@ -218,7 +218,7 @@ Ref<TcpDatagramClient> TcpDatagramClient::_createForServer(TcpDatagramServer* se
 			}
 		}
 	}
-	return Ref<TcpDatagramClient>::null();
+	return sl_null;
 }
 
 void TcpDatagramClient::_reconnect()
@@ -226,7 +226,7 @@ void TcpDatagramClient::_reconnect()
 	ObjectLocker lock(this);
 	if (m_flagOpened) {
 		_close();
-		Async::setTimeout(SLIB_CALLBACK_WEAKREF(TcpDatagramClient, connect, this), m_autoReconnectIntervalSeconds*1000);
+		Async::setTimeout(SLIB_FUNCTION_WEAKREF(TcpDatagramClient, connect, this), m_autoReconnectIntervalSeconds*1000);
 	}
 }
 
@@ -263,7 +263,7 @@ Ref<TcpDatagramServer> TcpDatagramServer::create(const TcpDatagramServerParam& p
 			return server;
 		}
 	}
-	return Ref<TcpDatagramServer>::null();
+	return sl_null;
 }
 
 void TcpDatagramServer::close()
@@ -307,8 +307,8 @@ void TcpDatagramServer::onAccept(AsyncTcpServer* socketListen, const Ref<Socket>
 {
 	Ref<TcpDatagramClient> client = TcpDatagramClient::_createForServer(this, socketAccept);
 	if (client.isNotNull()) {
-		m_clients.put(client.ptr, client);
-		client->onConnect(client->m_socketMessage.ptr, address, sl_false);
+		m_clients.put(client.get(), client);
+		client->onConnect(client->m_socketMessage.get(), address, sl_false);
 	}
 }
 

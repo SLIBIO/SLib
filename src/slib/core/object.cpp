@@ -60,7 +60,4 @@ void ObjectLocker::lock(const Object* object1, const Object* object2)
 	}
 }
 
-
-SLIB_DEFINE_OBJECT(LinkedObjectListBase, Object)
-
 SLIB_NAMESPACE_END

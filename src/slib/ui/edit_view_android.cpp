@@ -11,8 +11,7 @@ SLIB_UI_NAMESPACE_BEGIN
 void JNICALL _AndroidEditView_nativeOnChange(JNIEnv* env, jobject _this, jlong instance)
 {
 	Ref<View> _view = Android_ViewInstance::getAndroidView(instance);
-	if (EditView::checkInstance(_view.ptr)) {
-		EditView* view = (EditView*)(_view.ptr);
+	if (EditView* view = CastInstance<EditView>(_view.get())) {
 		String text = view->getText();
 		String textNew = view->dispatchChange(text);
 		if (text != textNew) {
@@ -63,7 +62,7 @@ public:
 		_JAndroidEditView::setTextColor.callBoolean(sl_null, handle, m_textColor.getARGB());
 		_JAndroidEditView::setBackgroundColor.callBoolean(sl_null, handle, getBackgroundColor().getARGB());
 		Ref<Font> font = getFont();
-		jobject jfont = GraphicsPlatform::getNativeFont(font.ptr);
+		jobject jfont = GraphicsPlatform::getNativeFont(font.get());
 		if (jfont) {
 			_JAndroidEditView::setFont.callBoolean(sl_null, handle, jfont);
 		}
@@ -195,7 +194,7 @@ void EditView::_setFont_NW(const Ref<Font>& font)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		jobject jfont = GraphicsPlatform::getNativeFont(font.ptr);
+		jobject jfont = GraphicsPlatform::getNativeFont(font.get());
 		if (jfont) {
 			_JAndroidEditView::setFont.callBoolean(sl_null, handle, jfont);
 		}

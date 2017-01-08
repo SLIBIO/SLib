@@ -88,7 +88,7 @@ protected:
 	String m_commandLine;
 	List<String> m_arguments;
 	
-	SafeString m_uniqueInstanceId;
+	AtomicString m_uniqueInstanceId;
 	void* m_uniqueInstanceHandle;
 	
 	sl_bool m_flagCrashRecoverySupport;
@@ -134,11 +134,7 @@ public: \
 		} \
 	} \
 	slib::Ref<CLASS> CLASS::getApp() { \
-		slib::Ref<slib::Application> app(slib::Application::getApp()); \
-		if (CLASS::checkInstance(app.ptr)) { \
-			return slib::Ref<CLASS>::from(app); \
-		} \
-		return slib::Ref<CLASS>::null(); \
+		return slib::CastRef<CLASS>(slib::Application::getApp()); \
 	}
 
 

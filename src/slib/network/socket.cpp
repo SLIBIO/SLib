@@ -77,7 +77,7 @@ void Socket::initializeSocket()
 		WSADATA wsaData;
 		int err = WSAStartup(MAKEWORD(2, 2), &wsaData);
 		if (err != 0) {
-			SLIB_LOG_ERROR("SOCKET", "WSA Startup failed");
+			LogError("SOCKET", "WSA Startup failed");
 		}
 		flagInit = sl_true;
 	}
@@ -149,7 +149,7 @@ Ref<Socket> Socket::open(SocketType type, sl_uint32 _protocol)
 	}
 #endif
 	else {
-		return Ref<Socket>::null();
+		return sl_null;
 	}
 	
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
@@ -172,7 +172,7 @@ Ref<Socket> Socket::open(SocketType type, sl_uint32 _protocol)
 		}
 		_Socket_close(handle);
 	}
-	return Ref<Socket>::null();
+	return sl_null;
 }
 
 Ref<Socket> Socket::openTcp()
@@ -1225,7 +1225,7 @@ String Socket::getErrorMessage(SocketError error)
 {
 	switch (error) {
 		case SocketError::None:
-			return String::null();
+			return sl_null;
 		case SocketError::NetworkDown:
 			return "NETDOWN - Network is down";
 		case SocketError::NetworkReset:

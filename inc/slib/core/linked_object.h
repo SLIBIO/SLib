@@ -16,8 +16,8 @@ template <class T>
 class SLIB_EXPORT LinkedObject : public Object
 {
 public:
-	SafeRef<T> next;
-	SafeWeakRef<T> before;
+	AtomicRef<T> next;
+	AtomicWeakRef<T> before;
 	
 };
 
@@ -412,7 +412,7 @@ List< Ref<T> > LinkedObjectList<T>::toList_NoLock() const
 	if (m_count) {
 		ret = List< Ref<T> >::create(m_count);
 		if (ret.isNotNull()) {
-			ListItems< Ref<T> > list(ret);
+			ListElements< Ref<T> > list(ret);
 			sl_size index = 0;
 			Ref<T> now = m_front;
 			while (now) {

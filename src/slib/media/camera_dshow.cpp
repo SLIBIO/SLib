@@ -88,11 +88,11 @@ public:
 
 public:
 	static void logError(String error) {
-		SLIB_LOG("Camera", error);
+		Log("Camera", error);
 	}
 
 	static void logError(String error, HRESULT hr) {
-		SLIB_LOG("Camera", error + " (Result=" + String::fromInt32((sl_int32)hr) + ")");
+		Log("Camera", "%s (Result=%d)", error, (sl_int32)hr);
 	}
 
 	static Ref<_DShow_Camera> _create(const CameraParam& param)
@@ -142,7 +142,7 @@ public:
 														if (SUCCEEDED(hr)) {
 															ret = new _DShow_Camera();
 															if (ret.isNotNull()) {
-																hr = grabber->SetCallback(ret.ptr, 0);
+																hr = grabber->SetCallback(ret.get(), 0);
 																if (SUCCEEDED(hr)) {
 																	ret->m_capture = capture;
 																	ret->m_graph = graph;
@@ -428,12 +428,12 @@ SLIB_MEDIA_NAMESPACE_BEGIN
 
 Ref<Camera> DirectShow::createCamera(const CameraParam& param)
 {
-	return Ref<Camera>::null();
+	return sl_null;
 }
 
 List<CameraInfo> DirectShow::getCamerasList()
 {
-	return List<CameraInfo>::null();
+	return sl_null;
 }
 
 SLIB_MEDIA_NAMESPACE_END

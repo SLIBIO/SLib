@@ -66,7 +66,7 @@ void MySQL_Database::initThread()
 			::mysql_thread_init();
 			ref = new _MySQL_Database_ThreadHandler;
 			if (ref.isNotNull()) {
-				thread->attachObject("MYSQL", ref.ptr);
+				thread->attachObject("MYSQL", ref.get());
 			}
 		}
 	} else {
@@ -129,7 +129,7 @@ public:
 
 			} else {
 				outErrorMessage = ::mysql_error(mysql);
-				SLIB_LOG_ERROR(TAG, outErrorMessage);
+				LogError(TAG, outErrorMessage);
 			}
 			::mysql_close(mysql);
 		}
@@ -155,7 +155,7 @@ public:
 		if (0 == ::mysql_real_query(m_mysql, sql.getData(), (sl_uint32)(sql.getLength()))) {
 			return ::mysql_affected_rows(m_mysql);
 		}
-		SLIB_LOG_ERROR(TAG, ::mysql_error(m_mysql));
+		LogError(TAG, ::mysql_error(m_mysql));
 		return -1;
 	}
 
@@ -211,7 +211,7 @@ public:
 			if (index < m_nColumnNames) {
 				return m_columnNames[index];
 			}
-			return String::null();
+			return sl_null;
 		}
 
 		// override
@@ -250,7 +250,7 @@ public:
 					return _getValue(index);
 				}
 			}
-			return Variant::null();
+			return sl_null;
 		}
 
 		// override
@@ -261,7 +261,7 @@ public:
 					return String::fromUtf8(m_row[index], (sl_uint32)(m_lengths[index]));
 				}
 			}
-			return String::null();
+			return sl_null;
 		}
 
 		// override
@@ -274,7 +274,7 @@ public:
 					}
 				}
 			}
-			return Memory::null();
+			return sl_null;
 		}
 
 		// override
@@ -305,7 +305,7 @@ public:
 				::mysql_free_result(res);
 			}
 		} else {
-			SLIB_LOG_ERROR(TAG, ::mysql_error(m_mysql));
+			LogError(TAG, ::mysql_error(m_mysql));
 		}
 		return ret;
 	}
@@ -415,7 +415,7 @@ public:
 			if (index < m_nColumnNames) {
 				return m_columnNames[index];
 			}
-			return String::null();
+			return sl_null;
 		}
 
 		// override
@@ -448,7 +448,7 @@ public:
 					return s;
 				}
 			}
-			return String::null();
+			return sl_null;
 		}
 
 		Memory _getBlobEx(sl_uint32 index)
@@ -462,7 +462,7 @@ public:
 					return mem;
 				}
 			}
-			return Memory::null();
+			return sl_null;
 		}
 
 		Variant _getValue(sl_uint32 index)
@@ -506,7 +506,7 @@ public:
 					}
 				}
 			}
-			return Variant::null();
+			return sl_null;
 		}
 
 		// override
@@ -515,7 +515,7 @@ public:
 			if (index < m_nColumnNames) {
 				return _getValue(index);
 			}
-			return Variant::null();
+			return sl_null;
 		}
 
 		// override
@@ -558,7 +558,7 @@ public:
 					}
 				}
 			}
-			return String::null();
+			return sl_null;
 		}
 
 		// override
@@ -855,7 +855,7 @@ public:
 					}
 				}
 			}
-			return Memory::null();
+			return sl_null;
 		}
 
 		// override
@@ -893,7 +893,7 @@ public:
 
 		sl_bool prepare()
 		{
-			ObjectLocker lock(m_db.ptr);
+			ObjectLocker lock(m_db.get());
 			close();
 			MYSQL_STMT* statement = ::mysql_stmt_init(m_mysql);
 			if (statement) {
@@ -901,7 +901,7 @@ public:
 					m_statement = statement;
 					return sl_true;
 				}
-				SLIB_LOG_ERROR(TAG, ::mysql_stmt_error(statement));
+				LogError(TAG, ::mysql_stmt_error(statement));
 				::mysql_stmt_close(statement);
 			}
 			return sl_false;
@@ -909,7 +909,7 @@ public:
 
 		void close()
 		{
-			ObjectLocker lock(m_db.ptr);
+			ObjectLocker lock(m_db.get());
 			if (m_statement) {
 				::mysql_stmt_close(m_statement);
 				m_statement = NULL;
@@ -999,16 +999,16 @@ public:
 						if (0 == ::mysql_stmt_bind_param(m_statement, bind)) {
 							return sl_true;
 						} else {
-							SLIB_LOG_ERROR(TAG, ::mysql_stmt_error(m_statement));
+							LogError(TAG, ::mysql_stmt_error(m_statement));
 						}
 					} else {
-						SLIB_LOG_ERROR(TAG, "Can't create memory for parameter binding");
+						LogError(TAG, "Can't create memory for parameter binding");
 					}
 				} else {
 					return sl_true;
 				}
 			} else {
-				SLIB_LOG_ERROR(TAG, "Bind error: requires %d params but only %d params provided", n, nParams);
+				LogError(TAG, "Bind error: requires %d params but only %d params provided", n, nParams);
 			}
 			return sl_false;
 		}
@@ -1031,12 +1031,12 @@ public:
 								if (0 == ::mysql_stmt_execute(m_statement)) {
 									return sl_true;
 								} else {
-									SLIB_LOG_ERROR(TAG, ::mysql_stmt_error(m_statement));
+									LogError(TAG, ::mysql_stmt_error(m_statement));
 								}
 							}
 						}
 					} else {
-						SLIB_LOG_ERROR(TAG, ::mysql_stmt_error(m_statement));
+						LogError(TAG, ::mysql_stmt_error(m_statement));
 					}
 				}
 			}
@@ -1044,10 +1044,10 @@ public:
 		}
 
 		// override
-		sl_int64 execute(const Variant* params, sl_uint32 nParams)
+		sl_int64 executeBy(const Variant* params, sl_uint32 nParams)
 		{
 			initThread();
-			ObjectLocker lock(m_db.ptr);
+			ObjectLocker lock(m_db.get());
 			if (_execute(params, nParams)) {
 				return ::mysql_stmt_affected_rows(m_statement);
 			}
@@ -1055,10 +1055,10 @@ public:
 		}
 
 		// override
-		Ref<DatabaseCursor> query(const Variant* params, sl_uint32 nParams)
+		Ref<DatabaseCursor> queryBy(const Variant* params, sl_uint32 nParams)
 		{
 			initThread();
-			ObjectLocker lock(m_db.ptr);
+			ObjectLocker lock(m_db.get());
 			Ref<DatabaseCursor> ret;
 			if (_execute(params, nParams)) {
 				MYSQL_RES* resultMetadata = ::mysql_stmt_result_metadata(m_statement);
@@ -1141,7 +1141,7 @@ public:
 								}
 							}
 							if (0 == ::mysql_stmt_bind_result(m_statement, bind)) {
-								ret = new _DatabaseStatementCursor(m_db.ptr, this, m_statement, resultMetadata, bind, fds);
+								ret = new _DatabaseStatementCursor(m_db.get(), this, m_statement, resultMetadata, bind, fds);
 								if (ret.isNotNull()) {
 									return ret;
 								}
@@ -1169,7 +1169,7 @@ public:
 				return ret;
 			}
 		}
-		return Ref<DatabaseStatement>::null();
+		return sl_null;
 	}
 
 	// override

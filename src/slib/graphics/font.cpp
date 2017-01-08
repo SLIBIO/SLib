@@ -32,9 +32,9 @@ void Font::setDefaultFontSize(sl_real size)
 
 Ref<Font> Font::getDefault()
 {
-	SLIB_SAFE_STATIC(SafeRef<Font>, defaultFont, create(FontDesc()))
+	SLIB_SAFE_STATIC(AtomicRef<Font>, defaultFont, create(FontDesc()))
 	if (SLIB_SAFE_STATIC_CHECK_FREED(defaultFont)) {
-		return Ref<Font>::null();
+		return sl_null;
 	}
 	return defaultFont;
 }

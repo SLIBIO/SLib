@@ -70,7 +70,7 @@ public:
 				if (ret.isNotNull()) {
 					ret->m_handle = handle;
 					ret->m_listener = param.listener;
-					ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_NetPcapCapture, _run, ret.ptr));
+					ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_NetPcapCapture, _run, ret.get()));
 					if (ret->m_thread.isNotNull()) {
 						ret->m_flagInit = sl_true;
 						if (param.flagAutoStart) {
@@ -78,15 +78,15 @@ public:
 						}
 						return ret;
 					} else {
-						SLIB_LOG_ERROR(TAG, "Failed to create thread");
+						LogError(TAG, "Failed to create thread");
 					}
 				} 
 			} else {
-				SLIB_LOG_ERROR(TAG, "Set Buffer Size Failed");
+				LogError(TAG, "Set Buffer Size Failed");
 			}
 			pcap_close(handle);
 		} else {
-			SLIB_LOG_ERROR(TAG, errBuf);
+			LogError(TAG, errBuf);
 		}
 #else
 		pcap_t* handle = pcap_create(szName, errBuf);
@@ -101,7 +101,7 @@ public:
 								if (ret.isNotNull()) {
 									ret->m_handle = handle;
 									ret->m_listener = param.listener;
-									ret->m_thread = Thread::create(SLIB_CALLBACK_CLASS(_NetPcapCapture, _run, ret.ptr));
+									ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_NetPcapCapture, _run, ret.get()));
 									if (ret->m_thread.isNotNull()) {
 										ret->m_flagInit = sl_true;
 										if (param.flagAutoStart) {
@@ -109,30 +109,30 @@ public:
 										}
 										return ret;
 									} else {
-										SLIB_LOG_ERROR(TAG, "Failed to create thread");
+										LogError(TAG, "Failed to create thread");
 									}
 								}
 							} else {
-								SLIB_LOG_ERROR(TAG, "Activate Failed");
+								LogError(TAG, "Activate Failed");
 							}
 						} else {
-							SLIB_LOG_ERROR(TAG, "Set Timeout Failed");
+							LogError(TAG, "Set Timeout Failed");
 						}
 					} else {
-						SLIB_LOG_ERROR(TAG, "Set Promiscuous Mode Failed");
+						LogError(TAG, "Set Promiscuous Mode Failed");
 					}
 				} else {
-					SLIB_LOG_ERROR(TAG, "Set Buffer Size Failed");
+					LogError(TAG, "Set Buffer Size Failed");
 				}
 			} else {
-				SLIB_LOG_ERROR(TAG, "Set Snaplen Failed");
+				LogError(TAG, "Set Snaplen Failed");
 			}
 			pcap_close(handle);
 		} else {
-			SLIB_LOG_ERROR(TAG, errBuf);
+			LogError(TAG, errBuf);
 		}
 #endif
-		return Ref<_NetPcapCapture>::null();
+		return sl_null;
 	}
 	
 	void release()
@@ -232,7 +232,7 @@ public:
 				return err;
 			}
 		}
-		return String::null();
+		return sl_null;
 	}
 };
 
@@ -288,7 +288,7 @@ List<NetCaptureDeviceInfo> NetCapture::getAllPcapDevices()
 		}
 		pcap_freealldevs(devs);
 	} else {
-		SLIB_LOG_ERROR(TAG, errBuf);
+		LogError(TAG, errBuf);
 	}
 	return list;
 }
@@ -310,7 +310,7 @@ sl_bool NetCapture::findPcapDevice(const String& name, NetCaptureDeviceInfo& _ou
 		}
 		pcap_freealldevs(devs);
 	} else {
-		SLIB_LOG_ERROR(TAG, errBuf);
+		LogError(TAG, errBuf);
 	}
 	return sl_false;
 }
@@ -319,7 +319,7 @@ sl_bool NetCapture::findPcapDevice(const String& name, NetCaptureDeviceInfo& _ou
 
 Ref<NetCapture> NetCapture::createPcap(const NetCaptureParam& param)
 {
-	return Ref<NetCapture>::null();
+	return sl_null;
 }
 
 List<NetCaptureDevice> NetCapture::getAllDevices()

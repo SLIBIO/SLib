@@ -19,24 +19,25 @@ public:
 	T w;
 	
 public:
-	Vector4T() = default;
+	SLIB_INLINE Vector4T() = default;
 	
-	Vector4T(const Vector4T<T, FT>& other) = default;
+	SLIB_CONSTEXPR Vector4T(const Vector4T<T, FT>& other) : x(other.x), y(other.y), z(other.z), w(other.w) {}
 
 	template <class O, class FO>
-	Vector4T(const Vector4T<O, FO>& other);
+	SLIB_CONSTEXPR Vector4T(const Vector4T<O, FO>& other) : x((T)(other.x)), y((T)(other.y)), z((T)(other.z)), w((T)(other.w)) {}
 
-	Vector4T(T x, T y, T z, T w);
+	SLIB_CONSTEXPR Vector4T(T _x, T _y, T _z, T _w) : x(_x), y(_y), z(_z), w(_w) {}
 
-	Vector4T(const Vector3T<T, FT>& xyz, T w);
-	
+	SLIB_CONSTEXPR Vector4T(const Vector3T<T, FT>& xyz, T _w) : x(xyz.x), y(xyz.y), z(xyz.z), w(_w) {}
+
 public:
 	static const Vector4T<T, FT>& zero();
 	
 	static const Vector4T<T, FT>& fromArray(const T arr[4]);
 
 	static Vector4T<T, FT>& fromArray(T arr[4]);
-	
+
+public:
 	const Vector3T<T, FT>& xyz() const;
 	
 	Vector3T<T, FT>& xyz();
@@ -107,7 +108,7 @@ public:
 	
 private:
 	static T _zero[4];
-	
+
 };
 
 SLIB_DECLARE_GEOMETRY_TYPE_EX(Vector4)
@@ -131,19 +132,21 @@ SLIB_MATH_NAMESPACE_END
 SLIB_MATH_NAMESPACE_BEGIN
 
 template <class T, class FT>
-template <class O, class FO>
-SLIB_INLINE Vector4T<T, FT>::Vector4T(const Vector4T<O, FO>& other) : x((T)(other.x)), y(other.y), z(other.z), w(other.w)
+SLIB_INLINE const Vector4T<T, FT>& Vector4T<T, FT>::zero()
 {
+	return *(reinterpret_cast<Vector4T<T, FT> const*>(&_zero));
 }
 
 template <class T, class FT>
-SLIB_INLINE Vector4T<T, FT>::Vector4T(T _x, T _y, T _z, T _w) : x(_x), y(_y), z(_z), w(_w)
+SLIB_INLINE const Vector4T<T, FT>& Vector4T<T, FT>::fromArray(const T arr[4])
 {
+	return *(reinterpret_cast<Vector4T<T, FT> const*>(arr));
 }
 
 template <class T, class FT>
-SLIB_INLINE Vector4T<T, FT>::Vector4T(const Vector3T<T, FT>& xyz, T _w) : x(xyz.x), y(xyz.y), z(xyz.z), w(_w)
+SLIB_INLINE Vector4T<T, FT>& Vector4T<T, FT>::fromArray(T arr[4])
 {
+	return *(reinterpret_cast<Vector4T<T, FT>*>(arr));
 }
 
 template <class T, class FT>
@@ -158,33 +161,15 @@ SLIB_INLINE Vector4T<T, FT>& Vector4T<T, FT>::operator=(const Vector4T<O, FO>& o
 }
 
 template <class T, class FT>
-SLIB_INLINE const Vector4T<T, FT>& Vector4T<T, FT>::zero()
-{
-	return *((Vector4T<T, FT>*)((void*)(_zero)));
-}
-
-template <class T, class FT>
-SLIB_INLINE const Vector4T<T, FT>& Vector4T<T, FT>::fromArray(const T* arr)
-{
-	return *((Vector4T<T, FT>*)((void*)(arr)));
-}
-
-template <class T, class FT>
-SLIB_INLINE Vector4T<T, FT>& Vector4T<T, FT>::fromArray(T* arr)
-{
-	return *((Vector4T<T, FT>*)((void*)(arr)));
-}
-
-template <class T, class FT>
 SLIB_INLINE const Vector3T<T, FT>& Vector4T<T, FT>::xyz() const
 {
-	return *((const Vector3T<T, FT>*)((const void*)(this)));
+	return *(reinterpret_cast<Vector3T<T, FT> const*>(this));
 }
 
 template <class T, class FT>
 SLIB_INLINE Vector3T<T, FT>& Vector4T<T, FT>::xyz()
 {
-	return *((Vector3T<T, FT>*)((void*)(this)));
+	return *(reinterpret_cast<Vector3T<T, FT>*>(this));
 }
 
 template <class T, class FT>

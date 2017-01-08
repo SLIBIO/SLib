@@ -93,7 +93,7 @@ DialogResult AlertDialog::_run()
 		style = MB_YESNOCANCEL;
 		break;
 	}
-	HWND hWndParent = UIPlatform::getWindowHandle(parent.ptr);
+	HWND hWndParent = UIPlatform::getWindowHandle(parent.get());
 	if (!hWndParent) {
 		style |= MB_TASKMODAL;
 	}
@@ -168,7 +168,7 @@ sl_bool FileDialog::_run()
 		if (SUCCEEDED(SHGetMalloc(&pMalloc))) {
 			BROWSEINFOW bi;
 			Base::zeroMemory(&bi, sizeof(bi));
-			bi.hwndOwner = UIPlatform::getWindowHandle(parent.ptr);
+			bi.hwndOwner = UIPlatform::getWindowHandle(parent.get());
 			String16 _title = title;
 			if (_title.isEmpty()) {
 				bi.lpszTitle = L"Browse for folder...";
@@ -201,7 +201,7 @@ sl_bool FileDialog::_run()
 		OPENFILENAMEW ofn;
 		Base::zeroMemory(&ofn, sizeof(ofn));
 		ofn.lStructSize = sizeof(ofn);
-		ofn.hwndOwner = UIPlatform::getWindowHandle(parent.ptr);
+		ofn.hwndOwner = UIPlatform::getWindowHandle(parent.get());
 
 		sl_size lenSzFilters = 0;
 		CList<_FileDialog_FilterW> wfilters;
@@ -223,7 +223,7 @@ sl_bool FileDialog::_run()
 		{
 			sl_size pos = 0;
 			sl_size len;
-			ListItems<_FileDialog_FilterW> list(wfilters);
+			ListElements<_FileDialog_FilterW> list(wfilters);
 			for (sl_size i = 0; i < list.count; i++) {
 				len = list[i].title.getLength();
 				Base::copyMemory(szFilters + pos, list[i].title.getData(), len * 2);
@@ -307,7 +307,7 @@ sl_bool FileDialog::_run()
 							}
 							if (files.isNotEmpty()) {
 								selectedPaths = files;
-								selectedPath = files.getItemValue(0, String::null());
+								selectedPath = files.getValueAt(0);
 								return sl_true;
 							}
 						}

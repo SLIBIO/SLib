@@ -51,11 +51,11 @@ public:
 	{
 		_AndroidCameraMap* cameraMap = _AndroidCameras_get();
 		if (!cameraMap) {
-			return Ref<_Android_Camera>::null();
+			return sl_null;
 		}
 		Ref<_Android_Camera> ret = new _Android_Camera();
 		if (ret.isNotNull()) {
-			jlong instance = (jlong)(ret.ptr);
+			jlong instance = (jlong)(ret.get());
 			cameraMap->put(instance, ret);
 			JniLocal<jstring> jid = Jni::getJniString(param.deviceId);
 			JniLocal<jobject> jcamera = _JAndroidCamera::create.callObject(sl_null, jid.get(), instance);
@@ -71,14 +71,14 @@ public:
 				return ret;
 			}
 		}
-		return Ref<_Android_Camera>::null();
+		return sl_null;
 	}
 
 	static Ref<_Android_Camera> get(jlong instance)
 	{
 		_AndroidCameraMap* cameraMap = _AndroidCameras_get();
 		if (!cameraMap) {
-			return Ref<_Android_Camera>::null();
+			return sl_null;
 		}
 		WeakRef<_Android_Camera> camera;
 		cameraMap->get(instance, &camera);

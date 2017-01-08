@@ -37,7 +37,7 @@ public:
 	void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 	
 protected:
-	SafeRef<Drawable> m_source;
+	AtomicRef<Drawable> m_source;
 	ScaleMode m_scaleMode;
 	Alignment m_gravity;
 	

@@ -41,7 +41,7 @@ void GLES::loadEntries(const String& _pathDll, sl_bool flagReload)
 	}
 	HMODULE hDll = ::LoadLibraryW((LPCWSTR)(pathDll.getData()));
 	if (!hDll) {
-		//SLIB_LOG_ERROR("GLES", "Failed to load GLES dll - " + pathDll);
+		//LogError("GLES", "Failed to load GLES dll - %s", pathDll);
 		return;
 	}
 	FARPROC proc;
@@ -89,7 +89,7 @@ SLIB_RENDER_NAMESPACE_BEGIN
 
 Ref<GLRenderEngine> GLES::createEngine()
 {
-	return Ref<GLRenderEngine>::null();
+	return sl_null;
 }
 
 void GLES::loadEntries(const String& pathDll, sl_bool flagReload)

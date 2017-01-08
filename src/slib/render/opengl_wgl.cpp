@@ -4,7 +4,6 @@
 
 #include "../../../inc/slib/render/engine.h"
 #include "../../../inc/slib/render/opengl.h"
-#include "../../../inc/slib/core/log.h"
 #include "../../../inc/slib/core/thread.h"
 #include "../../../inc/slib/core/platform_windows.h"
 
@@ -22,7 +21,7 @@ public:
 	HWND m_hWindow;
 	HDC m_hDC;
 
-	SafeRef<Thread> m_threadRender;
+	AtomicRef<Thread> m_threadRender;
 
 public:
 	_WGLRendererImpl()
@@ -41,7 +40,7 @@ public:
 	{
 		HWND hWnd = (HWND)_windowHandle;
 		if (hWnd == 0) {
-			return Ref<_WGLRendererImpl>::null();
+			return sl_null;
 		}
 
 		HDC hDC = ::GetDC(hWnd);
@@ -77,7 +76,7 @@ public:
 							ret->m_hDC = hDC;
 							ret->m_context = context;
 
-							ret->m_threadRender = Thread::start(SLIB_CALLBACK_CLASS(_WGLRendererImpl, run, ret.ptr));
+							ret->m_threadRender = Thread::start(SLIB_FUNCTION_CLASS(_WGLRendererImpl, run, ret.get()));
 
 							ret->m_callback = param.callback;
 
@@ -90,7 +89,7 @@ public:
 			}
 			::ReleaseDC(hWnd, hDC);
 		}
-		return Ref<_WGLRendererImpl>::null();
+		return sl_null;
 	}
 
 	void release()
@@ -123,7 +122,7 @@ public:
 
 		TimeCounter timer;
 		while (Thread::isNotStoppingCurrent()) {
-			runStep(engine.ptr);
+			runStep(engine.get());
 			if (Thread::isNotStoppingCurrent()) {
 				sl_uint64 t = timer.getEllapsedMilliseconds();
 				if (t < 20) {
@@ -185,7 +184,7 @@ SLIB_RENDER_NAMESPACE_BEGIN
 
 Ref<Renderer> WGL::createRenderer(void* windowHandle, const RendererParam& param)
 {
-	return Ref<Renderer>::null();
+	return sl_null;
 }
 
 SLIB_RENDER_NAMESPACE_END

@@ -96,7 +96,7 @@ public:
 		if (map) { \
 			return map->map.getValue_NoLock(name, TYPE::null()); \
 		} \
-		return TYPE::null(); \
+		return sl_null; \
 	}
 
 

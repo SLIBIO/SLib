@@ -156,7 +156,7 @@ Ref<RadioButton> RadioGroup::getSelected()
 #if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_WIN32))
 Ref<ViewInstance> RadioButton::createNativeWidget(ViewInstance* parent)
 {
-	return Ref<ViewInstance>::null();
+	return sl_null;
 }
 #endif
 

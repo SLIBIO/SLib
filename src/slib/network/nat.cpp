@@ -1,6 +1,5 @@
 #include "../../../inc/slib/network/nat.h"
 
-#include "../../../inc/slib/core/log.h"
 #include "../../../inc/slib/core/new.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN

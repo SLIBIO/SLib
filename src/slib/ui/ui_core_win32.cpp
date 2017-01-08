@@ -31,7 +31,7 @@ class _Win32_UI
 {
 public:
 	Ref<Screen> m_screenPrimary;
-	Queue<Callback> m_queueDispatch;
+	LinkedQueue< Function<void()> > m_queueDispatch;
 
 	_Win32_UI();
 
@@ -61,7 +61,7 @@ List< Ref<Screen> > UI::getScreens()
 {
 	_Win32_UI* ui = _Win32_getUI();
 	if (!ui) {
-		return List< Ref<Screen> >::null();
+		return sl_null;
 	}
 	List< Ref<Screen> > ret;
 	ret.add(ui->m_screenPrimary);
@@ -72,7 +72,7 @@ Ref<Screen> UI::getPrimaryScreen()
 {
 	_Win32_UI* ui = _Win32_getUI();
 	if (!ui) {
-		return Ref<Screen>::null();
+		return sl_null;
 	}
 	return ui->m_screenPrimary;
 }
@@ -81,7 +81,7 @@ Ref<Screen> UI::getFocusedScreen()
 {
 	_Win32_UI* ui = _Win32_getUI();
 	if (!ui) {
-		return Ref<Screen>::null();
+		return sl_null;
 	}
 	return ui->m_screenPrimary;
 }
@@ -91,7 +91,7 @@ sl_bool UI::isUiThread()
 	return (_g_thread_ui == ::GetCurrentThreadId());
 }
 
-void UI::dispatchToUiThread(const Callback& callback)
+void UI::dispatchToUiThread(const Function<void()>& callback)
 {
 	if (callback.isNull()) {
 		return;
@@ -114,7 +114,7 @@ void _Win32_processUiDispatchQueue()
 	if (!ui) {
 		return;
 	}
-	Callback callback;
+	Function<void()> callback;
 	while (ui->m_queueDispatch.pop(&callback)) {
 		callback();
 	}
@@ -175,7 +175,7 @@ void UIPlatform::runLoop(sl_uint32 level)
 				if (instance.isNotNull()) {
 					Ref<View> view = instance->getView();
 					if (view.isNotNull()) {
-						if (_Win32_captureChildInstanceEvents(view.ptr, msg)) {
+						if (_Win32_captureChildInstanceEvents(view.get(), msg)) {
 							break;
 						}
 						if (instance->preprocessWindowMessage(msg)) {

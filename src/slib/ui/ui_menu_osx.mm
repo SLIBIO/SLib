@@ -77,7 +77,7 @@ public:
 				return ret;
 			}
 		}
-		return Ref<_OSX_Menu>::null();
+		return sl_null;
 	}
 
 	// override
@@ -100,7 +100,7 @@ public:
 			m_items.insert(index, item);
 			return item;
 		}
-		return Ref<MenuItem>::null();
+		return sl_null;
 	}
 
 	Ref<MenuItem> addSeparator()
@@ -121,7 +121,7 @@ public:
 			m_items.insert(index, item);
 			return item;
 		}
-		return Ref<MenuItem>::null();
+		return sl_null;
 	}
 
 	// override
@@ -130,7 +130,7 @@ public:
 		ObjectLocker lock(this);
 		if (index < m_items.getCount()) {
 			[m_handle removeItemAtIndex:index];
-			m_items.remove(index);
+			m_items.removeAt(index);
 		}
 	}
 
@@ -141,7 +141,7 @@ public:
 		sl_reg index = m_items.indexOf(item);
 		if (index >= 0) {
 			[m_handle removeItemAtIndex:index];
-			m_items.remove(index);
+			m_items.removeAt(index);
 		}
 	}
 
@@ -191,7 +191,7 @@ Ref<_OSX_MenuItem> _OSX_MenuItem::create(_OSX_Menu* parent, const MenuItemParam&
 		Ref<_OSX_MenuItem> ret = new _OSX_MenuItem;
 		if (ret.isNotNull()) {
 			ret->m_handle = handle;
-			handle->m_item = ret.ptr;
+			handle->m_item = ret.get();
 			ret->m_parent = parent;
 			ret->m_text = param.text;
 			ret->m_shortcutKey = param.shortcutKey;
@@ -206,7 +206,7 @@ Ref<_OSX_MenuItem> _OSX_MenuItem::create(_OSX_Menu* parent, const MenuItemParam&
 		}
 
 	}
-	return Ref<_OSX_MenuItem>::null();
+	return sl_null;
 }
 
 void _OSX_MenuItem::setText(const String& text)
@@ -298,16 +298,16 @@ NSImage* _OSX_MenuItem::_createIcon(const Ref<Bitmap>& iconSrc)
 
 NSMenu* UIPlatform::getMenuHandle(const Ref<Menu>& menu)
 {
-	if (_OSX_Menu::checkInstance(menu.ptr)) {
-		return ((_OSX_Menu*)(menu.ptr))->m_handle;
+	if (_OSX_Menu* _menu = CastInstance<_OSX_Menu>(menu.get())) {
+		return _menu->m_handle;
 	}
 	return nil;
 }
 
-NSMenuItem* UIPlatform::getMenuItemHandle(const Ref<MenuItem>& menu)
+NSMenuItem* UIPlatform::getMenuItemHandle(const Ref<MenuItem>& item)
 {
-	if (_OSX_MenuItem::checkInstance(menu.ptr)) {
-		return ((_OSX_MenuItem*)(menu.ptr))->m_handle;
+	if (_OSX_MenuItem* _item = CastInstance<_OSX_MenuItem>(item.get())) {
+		return _item->m_handle;
 	}
 	return nil;
 }

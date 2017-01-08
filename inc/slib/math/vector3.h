@@ -18,15 +18,15 @@ public:
 	T z;
 
 public:
-	Vector3T() = default;
+	SLIB_INLINE Vector3T() = default;
 	
-	Vector3T(const Vector3T<T, FT>& other) = default;
+	SLIB_CONSTEXPR Vector3T(const Vector3T<T, FT>& other) : x(other.x), y(other.y), z(other.z) {}
 
 	template <class O, class FO>
-	Vector3T(const Vector3T<O, FO>& other);
+	SLIB_CONSTEXPR Vector3T(const Vector3T<O, FO>& other) : x((T)(other.x)), y((T)(other.y)), z((T)(other.z)) {}
 
-	Vector3T(T x, T y, T z);
-	
+	SLIB_CONSTEXPR Vector3T(T _x, T _y, T _z) : x(_x), y(_y), z(_z) {}
+
 public:
 	static const Vector3T<T, FT>& zero();
 	
@@ -102,7 +102,7 @@ public:
 	
 private:
 	static T _zero[3];
-	
+
 };
 
 SLIB_DECLARE_GEOMETRY_TYPE_EX(Vector3)
@@ -120,21 +120,27 @@ public:
 	static Vector3T<T, FT> interpolate(const Vector3T<T, FT>& a, const Vector3T<T, FT>& b, float factor);
 };
 
-
 SLIB_MATH_NAMESPACE_END
 
 
 SLIB_MATH_NAMESPACE_BEGIN
 
 template <class T, class FT>
-template <class O, class FO>
-SLIB_INLINE Vector3T<T, FT>::Vector3T(const Vector3T<O, FO>& other) : x((T)(other.x)), y((T)(other.y)), z((T)(other.z))
+SLIB_INLINE const Vector3T<T, FT>& Vector3T<T, FT>::zero()
 {
+	return *(reinterpret_cast<Vector3T<T, FT> const*>(&_zero));
 }
 
 template <class T, class FT>
-SLIB_INLINE Vector3T<T, FT>::Vector3T(T _x, T _y, T _z) : x(_x), y(_y), z(_z)
+SLIB_INLINE const Vector3T<T, FT>& Vector3T<T, FT>::fromArray(const T arr[3])
 {
+	return *(reinterpret_cast<Vector3T<T, FT> const*>(arr));
+}
+
+template <class T, class FT>
+SLIB_INLINE Vector3T<T, FT>& Vector3T<T, FT>::fromArray(T arr[3])
+{
+	return *(reinterpret_cast<Vector3T<T, FT>*>(arr));
 }
 
 template <class T, class FT>
@@ -145,24 +151,6 @@ SLIB_INLINE Vector3T<T, FT>& Vector3T<T, FT>::operator=(const Vector3T<O, FO>& o
 	y = (T)(other.y);
 	z = (T)(other.z);
 	return *this;
-}
-
-template <class T, class FT>
-SLIB_INLINE const Vector3T<T, FT>& Vector3T<T, FT>::zero()
-{
-	return *((Vector3T<T, FT>*)((void*)(_zero)));
-}
-
-template <class T, class FT>
-SLIB_INLINE const Vector3T<T, FT>& Vector3T<T, FT>::fromArray(const T* arr)
-{
-	return *((Vector3T<T, FT>*)((void*)(arr)));
-}
-
-template <class T, class FT>
-SLIB_INLINE Vector3T<T, FT>& Vector3T<T, FT>::fromArray(T* arr)
-{
-	return *((Vector3T<T, FT>*)((void*)(arr)));
 }
 
 template <class T, class FT>

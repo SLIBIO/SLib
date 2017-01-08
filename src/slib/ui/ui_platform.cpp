@@ -1,6 +1,9 @@
 #include "../../../inc/slib/ui/core.h"
 
 #include "../../../inc/slib/ui/platform.h"
+#include "../../../inc/slib/ui/view.h"
+#include "../../../inc/slib/ui/window.h"
+
 #include "../../../inc/slib/core/safe_static.h"
 
 SLIB_UI_NAMESPACE_BEGIN
@@ -22,7 +25,7 @@ Ref<ViewInstance> UIPlatform::_getViewInstance(const void* handle)
 	if (map) {
 		return map->getValue(handle, WeakRef<ViewInstance>::null());
 	}
-	return Ref<ViewInstance>::null();
+	return sl_null;
 }
 
 void UIPlatform::_removeViewInstance(const void* handle)
@@ -50,7 +53,7 @@ Ref<WindowInstance> UIPlatform::_getWindowInstance(const void* handle)
 	if (map) {
 		return map->getValue(handle, WeakRef<WindowInstance>::null());
 	}
-	return Ref<WindowInstance>::null();
+	return sl_null;
 }
 
 void UIPlatform::_removeWindowInstance(const void* handle)

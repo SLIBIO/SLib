@@ -20,7 +20,7 @@ public:
 	sl_bool m_flagMaximized;
 	sl_bool m_flagModal;
 
-	SafeRef<ViewInstance> m_viewContent;
+	AtomicRef<ViewInstance> m_viewContent;
 	sl_bool m_flagDestroyOnRelease;
 
 	Color m_backgroundColor;
@@ -152,7 +152,7 @@ public:
 			HWND hParent = Windows::getOwnerWindow(hWnd);
 			return UIPlatform::createWindowInstance(hParent, sl_false);
 		}
-		return Ref<WindowInstance>::null();
+		return sl_null;
 	}
 
 	sl_bool setParent(const Ref<WindowInstance>& window)
@@ -160,7 +160,7 @@ public:
 		HWND hWnd = m_handle;
 		if (hWnd) {
 			if (window.isNotNull()) {
-				_Win32_Window* w = (_Win32_Window*)(window.ptr);
+				_Win32_Window* w = (_Win32_Window*)(window.get());
 				HWND hWndParent = w->m_handle;
 				if (hWndParent) {
 					::SetWindowLongPtr(hWnd, GWLP_HWNDPARENT, (LONG_PTR)hWndParent);
@@ -794,7 +794,7 @@ LRESULT CALLBACK _Win32_ViewProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 LRESULT CALLBACK _Win32_WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	Ref<WindowInstance> _window = UIPlatform::getWindowInstance(hWnd);
-	_Win32_Window* window = (_Win32_Window*)(_window.ptr);
+	_Win32_Window* window = (_Win32_Window*)(_window.get());
 	if (window && window->m_handle) {
 		switch (uMsg) {
 		case WM_CLOSE:
@@ -936,7 +936,7 @@ Ref<WindowInstance> Window::createWindowInstance(const WindowInstanceParam& para
 	if (hWnd) {
 		return UIPlatform::createWindowInstance(hWnd);
 	}
-	return Ref<WindowInstance>::null();
+	return sl_null;
 }
 
 Ref<WindowInstance> UIPlatform::createWindowInstance(HWND hWnd, sl_bool flagDestroyOnRelease)
@@ -947,7 +947,7 @@ Ref<WindowInstance> UIPlatform::createWindowInstance(HWND hWnd, sl_bool flagDest
 	}
 	ret = _Win32_Window::create(hWnd, flagDestroyOnRelease);
 	if (ret.isNotNull()) {
-		UIPlatform::_registerWindowInstance((void*)hWnd, ret.ptr);
+		UIPlatform::_registerWindowInstance((void*)hWnd, ret.get());
 	}
 	return ret;
 }
@@ -976,7 +976,7 @@ HWND UIPlatform::getWindowHandle(Window* window)
 {
 	if (window) {
 		Ref<WindowInstance> _instance = window->getWindowInstance();
-		_Win32_Window* instance = (_Win32_Window*)(_instance.ptr);
+		_Win32_Window* instance = (_Win32_Window*)(_instance.get());
 		if (instance) {
 			return instance->m_handle;
 		}

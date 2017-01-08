@@ -5,54 +5,42 @@
 
 SLIB_NAMESPACE_BEGIN
 
-/*************************************************************************
-	Compare<TYPE>::compare(v1, v2) returns
-		negative: v1 < v2
-		0		: v1 = v2
-		positive: v1 > v2
-*************************************************************************/
-
-template <class TYPE1, class TYPE2=TYPE1>
+template <class T1, class T2 = T1>
 class SLIB_EXPORT Compare
 {
 public:
-	static int compare(const TYPE1& a, const TYPE2& b);
-
-	static sl_bool equals(const TYPE1& a, const TYPE2& b);
-	
+	int operator()(const T1& a, const T2& b) const;
 };
 
-template <class TYPE1, class TYPE2=TYPE1>
+template <class T1, class T2 = T1>
 class SLIB_EXPORT CompareDescending
 {
 public:
-	static int compare(const TYPE1& a, const TYPE2& b);
-	
-	static sl_bool eqauls(const TYPE1& a, const TYPE2& b);
-	
+	int operator()(const T1& a, const T2& b) const;
+};
+
+template <class T1, class T2 = T1>
+class SLIB_EXPORT Equals
+{
+public:
+	sl_bool operator()(const T1& a, const T2& b) const;
 };
 
 
-template <class TYPE1, class TYPE2>
-SLIB_INLINE int Compare<TYPE1, TYPE2>::compare(const TYPE1& a, const TYPE2& b)
+template <class T1, class T2>
+SLIB_INLINE int Compare<T1, T2>::operator()(const T1& a, const T2& b) const
 {
 	return (a < b) ? -1 : (a > b);
 }
 
-template <class TYPE1, class TYPE2>
-SLIB_INLINE sl_bool Compare<TYPE1, TYPE2>::equals(const TYPE1& a, const TYPE2& b)
+template <class T1, class T2>
+SLIB_INLINE int CompareDescending<T1, T2>::operator()(const T1& a, const T2& b) const
 {
-	return a == b;
+	return -(Compare<T1, T2>::compare(a, b));
 }
 
-template <class TYPE1, class TYPE2>
-SLIB_INLINE int CompareDescending<TYPE1, TYPE2>::compare(const TYPE1& a, const TYPE2& b)
-{
-	return - (Compare<TYPE1, TYPE2>::compare(a, b));
-}
-
-template <class TYPE1, class TYPE2>
-SLIB_INLINE sl_bool CompareDescending<TYPE1, TYPE2>::eqauls(const TYPE1& a, const TYPE2& b)
+template <class T1, class T2>
+SLIB_INLINE sl_bool Equals<T1, T2>::operator()(const T1& a, const T2& b) const
 {
 	return a == b;
 }

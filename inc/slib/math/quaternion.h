@@ -19,18 +19,30 @@ public:
 public:
 	QuaternionT() = default;
 	
-	QuaternionT(const QuaternionT<T>& other) = default;
+	SLIB_CONSTEXPR QuaternionT(const QuaternionT<T>& other):
+	 x(other.x), y(other.y), z(other.z), w(other.w)
+	{}
 	
 	template <class O>
-	QuaternionT(const QuaternionT<O>& other);
+	SLIB_CONSTEXPR QuaternionT(const QuaternionT<O>& other):
+	 x((T)(other.x)), y((T)(other.y)), z((T)(other.z)), w((T)(other.w))
+	{}
 
-	QuaternionT(T x, T y, T z, T w);
+	QuaternionT(T _x, T _y, T _z, T _w):
+	 x(_x), y(_y), z(_z), w(_w)
+	{}
 	
-	QuaternionT(const Vector4T<T>& other);
-	
+	QuaternionT(const Vector4T<T>& other):
+	 x(other.x), y(other.y), z(other.z), w(other.w)
+	{}
+
 public:
 	static const QuaternionT<T>& identity();
 	
+	static const QuaternionT<T>& fromArray(const T arr[2]);
+	
+	static QuaternionT<T>& fromArray(T arr[2]);
+
 	const Vector4T<T>& toVector4() const;
 	
 	Vector4T<T>& toVector4();
@@ -88,28 +100,21 @@ SLIB_MATH_NAMESPACE_END
 SLIB_MATH_NAMESPACE_BEGIN
 
 template <class T>
-template <class O>
-SLIB_INLINE QuaternionT<T>::QuaternionT(const QuaternionT<O>& other)
-: x((T)(other.x)), y((T)(other.y)), z((T)(other.z)), w((T)(other.w))
-{
-}
-
-template <class T>
-SLIB_INLINE QuaternionT<T>::QuaternionT(T _x, T _y, T _z, T _w)
-: x(_x), y(_y), z(_z), w(_w)
-{
-}
-
-template <class T>
-SLIB_INLINE QuaternionT<T>::QuaternionT(const Vector4T<T>& other)
-: x(other.x), y(other.y), z(other.z), w(other.w)
-{
-}
-
-template <class T>
 SLIB_INLINE const QuaternionT<T>& QuaternionT<T>::identity()
 {
-	return *((QuaternionT<T>*)((void*)_identity));
+	return *(reinterpret_cast<QuaternionT<T> const*>(&_identity));
+}
+
+template <class T>
+SLIB_INLINE const QuaternionT<T>& QuaternionT<T>::fromArray(const T arr[2])
+{
+	return *(reinterpret_cast<QuaternionT<T> const*>(arr));
+}
+
+template <class T>
+SLIB_INLINE QuaternionT<T>& QuaternionT<T>::fromArray(T arr[2])
+{
+	return *(reinterpret_cast<QuaternionT<T>*>(arr));
 }
 
 template <class T>

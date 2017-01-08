@@ -139,7 +139,18 @@ public:
 	
 	String toHexString() const;
 	
-	SLIB_DECLARE_PARSE_FUNCTIONS_ARG(CBigInt, sl_uint32, radix, 10)
+	
+	template <class ST>
+	static sl_bool parse(const ST& str, CBigInt* _out, sl_uint32 radix = 10)
+	{
+		return ParseInt(str, _out, radix);
+	}
+	
+	template <class ST>
+	sl_bool parse(const ST& str, sl_uint32 radix = 10)
+	{
+		return ParseInt(str, this, radix);
+	}
 	
 	
 	// compare returns
@@ -315,13 +326,85 @@ private:
 	void _free();
 };
 
-class SafeBigInt;
+template <>
+sl_reg IntParser<CBigInt, sl_char8>::parse(CBigInt* _out, sl_uint32 radix, const sl_char8 *sz, sl_size posBegin, sl_size len);
+
+template <>
+sl_reg IntParser<CBigInt, sl_char16>::parse(CBigInt* _out, sl_uint32 radix, const sl_char16 *sz, sl_size posBegin, sl_size len);
+
+
+class BigInt;
+
+template <>
+class SLIB_EXPORT Atomic<BigInt>
+{
+public:
+	AtomicRef<CBigInt> ref;
+	SLIB_ATOMIC_REF_WRAPPER_NO_OP(CBigInt)
+	
+public:
+	Atomic(sl_int32 n);
+	
+	Atomic(sl_uint32 n);
+	
+	Atomic(sl_int64 n);
+	
+	Atomic(sl_uint64 n);
+	
+public:
+	BigInt duplicate() const;
+	
+	BigInt compact() const;
+	
+	sl_bool isZero() const;
+	
+	sl_bool isNotZero() const;
+	
+	sl_bool getBytesLE(void* buf, sl_size n) const;
+	
+	Memory getBytesLE() const;
+	
+	sl_bool getBytesBE(void* buf, sl_size n) const;
+	
+	Memory getBytesBE() const;
+	
+	String toString(sl_uint32 radix = 10) const;
+	
+	String toHexString() const;
+	
+	// compare returns
+	//  0: equal,  negative: less than, positive: greater than
+	sl_int32 compare(const BigInt& other) const;
+	
+	sl_int32 compare(sl_int32 v) const;
+	
+	sl_int32 compare(sl_uint32 v) const;
+	
+	sl_int32 compare(sl_int64 v) const;
+	
+	sl_int32 compare(sl_uint64 v) const;
+	
+	BigInt negative() const;
+	
+public:
+	Atomic& operator=(sl_int32 n);
+	
+	Atomic& operator=(sl_uint32 n);
+	
+	Atomic& operator=(sl_int64 n);
+	
+	Atomic& operator=(sl_uint64 n);
+	
+};
+
+typedef Atomic<BigInt> AtomicBigInt;
+
 
 class SLIB_EXPORT BigInt
 {
 public:
 	Ref<CBigInt> ref;
-	SLIB_DECLARE_REF_WRAPPER_NO_OP(BigInt, SafeBigInt, CBigInt)
+	SLIB_REF_WRAPPER_NO_OP(BigInt, CBigInt)
 
 public:
 	BigInt(sl_int32 n);
@@ -643,67 +726,6 @@ public:
 	
 	BigInt& operator>>=(sl_uint32 n);
 
-};
-
-class SLIB_EXPORT SafeBigInt
-{
-public:
-	SafeRef<CBigInt> ref;
-	SLIB_DECLARE_REF_WRAPPER_NO_OP(SafeBigInt, BigInt, CBigInt)
-	
-public:
-	SafeBigInt(sl_int32 n);
-	
-	SafeBigInt(sl_uint32 n);
-	
-	SafeBigInt(sl_int64 n);
-	
-	SafeBigInt(sl_uint64 n);
-	
-public:
-	BigInt duplicate() const;
-	
-	BigInt compact() const;
-	
-	sl_bool isZero() const;
-	
-	sl_bool isNotZero() const;
-	
-	sl_bool getBytesLE(void* buf, sl_size n) const;
-	
-	Memory getBytesLE() const;
-	
-	sl_bool getBytesBE(void* buf, sl_size n) const;
-	
-	Memory getBytesBE() const;
-	
-	String toString(sl_uint32 radix = 10) const;
-	
-	String toHexString() const;
-	
-	// compare returns
-	//  0: equal,  negative: less than, positive: greater than
-	sl_int32 compare(const BigInt& other) const;
-	
-	sl_int32 compare(sl_int32 v) const;
-	
-	sl_int32 compare(sl_uint32 v) const;
-	
-	sl_int32 compare(sl_int64 v) const;
-	
-	sl_int32 compare(sl_uint64 v) const;
-	
-	BigInt negative() const;
-	
-public:
-	SafeBigInt& operator=(sl_int32 n);
-	
-	SafeBigInt& operator=(sl_uint32 n);
-	
-	SafeBigInt& operator=(sl_int64 n);
-	
-	SafeBigInt& operator=(sl_uint64 n);
-	
 };
 
 

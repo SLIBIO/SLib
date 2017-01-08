@@ -397,7 +397,7 @@ public:
 public:
 	void clear();
 	
-	sl_bool parse(const void* data, sl_size size, Queue<Memory>& datagrams);
+	sl_bool parse(const void* data, sl_size size, LinkedQueue<Memory>& datagrams);
 	
 	Memory build(const void* datagram, sl_uint32 size);
 	

@@ -23,28 +23,6 @@ SLIB_ALIGN(8) T Matrix4T<T>::_identity[16] = {
 	, 0, 0, 1, 0
 	, 0, 0, 0, 1 };
 
-
-template <class T>
-Matrix4T<T>::Matrix4T(T _m00, T _m01, T _m02, T _m03,
-					  T _m10, T _m11, T _m12, T _m13,
-					  T _m20, T _m21, T _m22, T _m23,
-					  T _m30, T _m31, T _m32, T _m33)
-: m00(_m00), m01(_m01), m02(_m02), m03(_m03),
-m10(_m10), m11(_m11), m12(_m12), m13(_m13),
-m20(_m20), m21(_m21), m22(_m22), m23(_m23),
-m30(_m30), m31(_m31), m32(_m32), m33(_m33)
-{
-}
-
-template <class T>
-Matrix4T<T>::Matrix4T(const Vector4T<T>& row0, const Vector4T<T>& row1, const Vector4T<T>& row2, const Vector4T<T>& row3)
-: m00(row0.x), m01(row0.y), m02(row0.z), m03(row0.w),
-m10(row1.x), m11(row1.y), m12(row1.z), m13(row1.w),
-m20(row2.x), m21(row2.y), m22(row2.z), m23(row2.w),
-m30(row3.x), m31(row3.y), m32(row3.z), m33(row3.w)
-{
-}
-
 template <class T>
 Vector4T<T> Matrix4T<T>::getRow0() const
 {

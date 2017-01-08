@@ -1,11 +1,11 @@
 #include "../../../inc/slib/core/string.h"
+
 #include "../../../inc/slib/core/base.h"
 #include "../../../inc/slib/core/mio.h"
 #include "../../../inc/slib/core/endian.h"
 #include "../../../inc/slib/core/scoped.h"
 #include "../../../inc/slib/core/math.h"
 #include "../../../inc/slib/core/variant.h"
-#include "../../../inc/slib/core/parse.h"
 
 SLIB_NAMESPACE_BEGIN
 
@@ -62,21 +62,17 @@ public:
 };
 
 
-const sl_char8 _g_string8_null_buf[] = {0, 0};
+const _String8_Const _String8_Null = {sl_null, 0};
 
-const StringContainer8 _g_string8_null_container = {(sl_char8*)(_g_string8_null_buf), 0, 0, -1};
-const _String8_Const _String8_Null = {(StringContainer8*)(&_g_string8_null_container), 0};
+const sl_char8 _g_string8_empty_buf[] = {0, 0};
+const StringContainer8 _g_string8_empty_container = {const_cast<sl_char8*>(_g_string8_empty_buf), 0, 0, -1};
+const _String8_Const _String8_Empty = {const_cast<StringContainer8*>(&_g_string8_empty_container), 0};
 
-const StringContainer8 _g_string8_empty_container = {(sl_char8*)(_g_string8_null_buf), 0, 0, -1};
-const _String8_Const _String8_Empty = {(StringContainer8*)(&_g_string8_empty_container), 0};
+const _String16_Const _String16_Null = {sl_null, 0};
 
-const sl_char16 _g_string16_null_buf[] = {0, 0};
-
-const StringContainer16 _g_string16_null_container = {(sl_char16*)(_g_string16_null_buf), 0, 0, -1};
-const _String16_Const _String16_Null = {(StringContainer16*)(&_g_string16_null_container), 0};
-
-const StringContainer16 _g_string16_empty_container = {(sl_char16*)(_g_string16_null_buf), 0, 0, -1};
-const _String16_Const _String16_Empty = {(StringContainer16*)(&_g_string16_empty_container), 0};
+const sl_char16 _g_string16_empty_buf[] = {0, 0};
+const StringContainer16 _g_string16_empty_container = {const_cast<sl_char16*>(_g_string16_empty_buf), 0, 0, -1};
+const _String16_Const _String16_Empty = {const_cast<StringContainer16*>(&_g_string16_empty_container), 0};
 
 
 SLIB_INLINE sl_reg StringContainer8::increaseReference()
@@ -128,7 +124,7 @@ SLIB_INLINE StringContainer8* String8::_alloc(sl_size len)
 	}
 	sl_char8* buf = (sl_char8*)(Base::createMemory(sizeof(StringContainer8) + len + 1));
 	if (buf) {
-		StringContainer8* container = (StringContainer8*)((void*)buf);
+		StringContainer8* container = reinterpret_cast<StringContainer8*>(buf);
 		container->sz = buf + sizeof(StringContainer8);
 		container->len = len;
 		container->hash = 0;
@@ -136,7 +132,7 @@ SLIB_INLINE StringContainer8* String8::_alloc(sl_size len)
 		container->sz[len] = 0;
 		return container;
 	}
-	return _String8_Null.container;
+	return sl_null;
 }
 
 SLIB_INLINE StringContainer16* String16::_alloc(sl_size len)
@@ -146,7 +142,7 @@ SLIB_INLINE StringContainer16* String16::_alloc(sl_size len)
 	}
 	sl_char8* buf = (sl_char8*)(Base::createMemory(sizeof(StringContainer8) + ((len + 1) << 1)));
 	if (buf) {
-		StringContainer16* container = (StringContainer16*)((void*)buf);
+		StringContainer16* container = reinterpret_cast<StringContainer16*>(buf);
 		container->sz = (sl_char16*)((void*)(buf + sizeof(StringContainer16)));
 		container->len = len;
 		container->hash = 0;
@@ -154,52 +150,54 @@ SLIB_INLINE StringContainer16* String16::_alloc(sl_size len)
 		container->sz[len] = 0;
 		return container;
 	}
-	return _String16_Null.container;
+	return sl_null;
 }
 
 
-SLIB_INLINE StringContainer8* SafeString8::_retainContainer() const
+SLIB_INLINE StringContainer8* Atomic<String8>::_retainContainer() const
 {
-	if ((void*)(this) == (void*)(&_String8_Null)) {
-		return _String8_Null.container;
-	} else if ((void*)(this) == (void*)(&_String8_Empty)) {
-		return _String8_Empty.container;
-	} else {
+	if (m_container) {
 		SpinLocker lock(&m_lock);
 		StringContainer8* container = m_container;
-		container->increaseReference();
+		if (container) {
+			container->increaseReference();
+		}
 		return container;
 	}
+	return sl_null;
 }
 
-SLIB_INLINE StringContainer16* SafeString16::_retainContainer() const
+SLIB_INLINE StringContainer16* Atomic<String16>::_retainContainer() const
 {
-	if ((void*)(this) == (void*)(&_String16_Null)) {
-		return _String16_Null.container;
-	} else if ((void*)(this) == (void*)(&_String16_Empty)) {
-		return _String16_Empty.container;
-	} else {
+	if (m_container) {
 		SpinLocker lock(&m_lock);
 		StringContainer16* container = m_container;
-		container->increaseReference();
+		if (container) {
+			container->increaseReference();
+		}
 		return container;
 	}
+	return sl_null;
 }
 
 
 SLIB_INLINE void String8::_replaceContainer(StringContainer8* container)
 {
-	m_container->decreaseReference();
+	if (m_container) {
+		m_container->decreaseReference();
+	}
 	m_container = container;
 }
 
 SLIB_INLINE void String16::_replaceContainer(StringContainer16* container)
 {
-	m_container->decreaseReference();
+	if (m_container) {
+		m_container->decreaseReference();
+	}
 	m_container = container;
 }
 
-SLIB_INLINE void SafeString8::_replaceContainer(StringContainer8* container)
+SLIB_INLINE void Atomic<String8>::_replaceContainer(StringContainer8* container)
 {
 	StringContainer8* before;
 	{
@@ -207,10 +205,12 @@ SLIB_INLINE void SafeString8::_replaceContainer(StringContainer8* container)
 		before = m_container;
 		m_container = container;
 	}
-	before->decreaseReference();
+	if (before) {
+		before->decreaseReference();
+	}
 }
 
-SLIB_INLINE void SafeString16::_replaceContainer(StringContainer16* container)
+SLIB_INLINE void Atomic<String16>::_replaceContainer(StringContainer16* container)
 {
 	StringContainer16* before;
 	{
@@ -218,14 +218,16 @@ SLIB_INLINE void SafeString16::_replaceContainer(StringContainer16* container)
 		before = m_container;
 		m_container = container;
 	}
-	before->decreaseReference();
+	if (before) {
+		before->decreaseReference();
+	}
 }
 
 
 SLIB_INLINE StringContainer8* String8::_create(sl_char8 ch, sl_size nRepeatCount)
 {
 	StringContainer8* container = _alloc(nRepeatCount);
-	if (container != _String8_Null.container) {
+	if (container) {
 		Base::resetMemory(container->sz, ch, nRepeatCount);
 	}
 	return container;
@@ -234,7 +236,7 @@ SLIB_INLINE StringContainer8* String8::_create(sl_char8 ch, sl_size nRepeatCount
 SLIB_INLINE StringContainer16* String16::_create(sl_char16 ch, sl_size nRepeatCount)
 {
 	StringContainer16* container = _alloc(nRepeatCount);
-	if (container != _String16_Null.container) {
+	if (container) {
 		Base::resetMemory2((sl_uint16*)(container->sz), ch, nRepeatCount);
 	}
 	return container;
@@ -248,12 +250,12 @@ SLIB_INLINE StringContainer8* String8::_create(const sl_char8* utf8, sl_reg lenU
 		}
 		sl_size len = lenUtf8;
 		StringContainer8* container = _alloc(len);
-		if (container != _String8_Null.container) {
+		if (container) {
 			Base::copyMemory(container->sz, utf8, len);
 		}
 		return container;
 	}
-	return _String8_Null.container;
+	return sl_null;
 }
 
 SLIB_INLINE StringContainer16* String16::_create(const sl_char8* utf8, sl_reg lenUtf8)
@@ -264,13 +266,13 @@ SLIB_INLINE StringContainer16* String16::_create(const sl_char8* utf8, sl_reg le
 		}
 		sl_size len = Charsets::utf8ToUtf16(utf8, lenUtf8, sl_null, -1);
 		StringContainer16* container = _alloc(len);
-		if (container != _String16_Null.container && container != _String16_Empty.container) {
+		if (container && len > 0) {
 			Charsets::utf8ToUtf16(utf8, lenUtf8, container->sz, len);
 			container->sz[len] = 0;
 		}
 		return container;
 	}
-	return _String16_Null.container;
+	return sl_null;
 }
 
 SLIB_INLINE StringContainer8* String8::_create(const sl_char16* utf16, sl_reg lenUtf16)
@@ -281,13 +283,13 @@ SLIB_INLINE StringContainer8* String8::_create(const sl_char16* utf16, sl_reg le
 		}
 		sl_size len = Charsets::utf16ToUtf8(utf16, lenUtf16, sl_null, -1);
 		StringContainer8* container = _alloc(len);
-		if (container != _String8_Null.container && container != _String8_Empty.container) {
+		if (container && len > 0) {
 			Charsets::utf16ToUtf8(utf16, lenUtf16, container->sz, len);
 			container->sz[len] = 0;
 		}
 		return container;
 	}
-	return _String8_Null.container;
+	return sl_null;
 }
 
 SLIB_INLINE StringContainer16* String16::_create(const sl_char16* utf16, sl_reg lenUtf16)
@@ -298,12 +300,12 @@ SLIB_INLINE StringContainer16* String16::_create(const sl_char16* utf16, sl_reg 
 		}
 		sl_size len = lenUtf16;
 		StringContainer16* container = _alloc(len);
-		if (container != _String16_Null.container) {
+		if (container) {
 			Base::copyMemory(container->sz, utf16, len*sizeof(sl_char16));
 		}
 		return container;
 	}
-	return _String16_Null.container;
+	return sl_null;
 }
 
 SLIB_INLINE StringContainer8* String8::_create(const sl_char32* utf32, sl_reg lenUtf32)
@@ -314,13 +316,13 @@ SLIB_INLINE StringContainer8* String8::_create(const sl_char32* utf32, sl_reg le
 		}
 		sl_size len = Charsets::utf32ToUtf8(utf32, lenUtf32, sl_null, -1);
 		StringContainer8* container = _alloc(len);
-		if (container != _String8_Null.container) {
+		if (container && len > 0) {
 			Charsets::utf32ToUtf8(utf32, lenUtf32, container->sz, len);
 			container->sz[len] = 0;
 		}
 		return container;
 	}
-	return _String8_Null.container;
+	return sl_null;
 }
 
 SLIB_INLINE StringContainer16* String16::_create(const sl_char32* utf32, sl_reg lenUtf32)
@@ -331,13 +333,13 @@ SLIB_INLINE StringContainer16* String16::_create(const sl_char32* utf32, sl_reg 
 		}
 		sl_size len = Charsets::utf32ToUtf16(utf32, lenUtf32, sl_null, -1);
 		StringContainer16* container = _alloc(len);
-		if (container != _String16_Null.container) {
+		if (container && len > 0) {
 			Charsets::utf32ToUtf16(utf32, lenUtf32, container->sz, len);
 			container->sz[len] = 0;
 		}
 		return container;
 	}
-	return _String16_Null.container;
+	return sl_null;
 }
 
 
@@ -351,7 +353,7 @@ SLIB_INLINE StringContainer8* String8::_merge8(const sl_char8* s1, sl_reg len1, 
 	}
 	sl_size len = len1 + len2;
 	StringContainer8* s = _alloc(len);
-	if (s != _String8_Null.container) {
+	if (s && len > 0) {
 		Base::copyMemory(s->sz, s1, len1);
 		Base::copyMemory(s->sz + len1, s2, len2);
 		s->sz[len] = 0;
@@ -369,7 +371,7 @@ SLIB_INLINE StringContainer16* String16::_merge16(const sl_char16* s1, sl_reg le
 	}
 	sl_size len = len1 + len2;
 	StringContainer16* s = _alloc(len);
-	if (s != _String16_Null.container) {
+	if (s && len > 0) {
 		Base::copyMemory(s->sz, s1, len1*sizeof(sl_char16));
 		Base::copyMemory(s->sz + len1, s2, len2*sizeof(sl_char16));
 		s->sz[len] = 0;
@@ -388,7 +390,7 @@ SLIB_INLINE StringContainer8* String8::_merge16(const sl_char8* s1, sl_reg len1,
 	sl_size len2 = Charsets::utf16ToUtf8(s2_u16, len2_u16, sl_null, -1);
 	sl_size len = len1 + len2;
 	StringContainer8* s = _alloc(len);
-	if (s != _String8_Null.container) {
+	if (s && len > 0) {
 		Base::copyMemory(s->sz, s1, len1);
 		Charsets::utf16ToUtf8(s2_u16, len2_u16, s->sz + len1, len2);
 		s->sz[len] = 0;
@@ -407,7 +409,7 @@ SLIB_INLINE StringContainer8* String8::_merge16(const sl_char16* s1_u16, sl_reg 
 	sl_size len1 = Charsets::utf16ToUtf8(s1_u16, len1_u16, sl_null, -1);
 	sl_size len = len1 + len2;
 	StringContainer8* s = _alloc(len);
-	if (s != _String8_Null.container) {
+	if (s && len > 0) {
 		Charsets::utf16ToUtf8(s1_u16, len1_u16, s->sz, len1);
 		Base::copyMemory(s->sz + len1, s2, len2);
 		s->sz[len] = 0;
@@ -426,7 +428,7 @@ SLIB_INLINE StringContainer8* String8::_merge32(const sl_char8* s1, sl_reg len1,
 	sl_size len2 = Charsets::utf32ToUtf8(s2_u32, len2_u32, sl_null, -1);
 	sl_size len = len1 + len2;
 	StringContainer8* s = _alloc(len);
-	if (s != _String8_Null.container) {
+	if (s && len > 0) {
 		Base::copyMemory(s->sz, s1, len1*sizeof(sl_char8));
 		Charsets::utf32ToUtf8(s2_u32, len2_u32, s->sz + len1, len2);
 		s->sz[len] = 0;
@@ -445,7 +447,7 @@ SLIB_INLINE StringContainer8* String8::_merge32(const sl_char32* s1_u32, sl_reg 
 	sl_size len1 = Charsets::utf32ToUtf8(s1_u32, len1_u32, sl_null, -1);
 	sl_size len = len1 + len2;
 	StringContainer8* s = _alloc(len);
-	if (s != _String8_Null.container) {
+	if (s && len > 0) {
 		Charsets::utf32ToUtf8(s1_u32, len1_u32, s->sz, len1);
 		Base::copyMemory(s->sz + len1, s2, len2);
 		s->sz[len] = 0;
@@ -464,7 +466,7 @@ SLIB_INLINE StringContainer16* String16::_merge8(const sl_char16* s1, sl_reg len
 	sl_size len2 = Charsets::utf8ToUtf16(s2_u8, len2_u8, sl_null, -1);
 	sl_size len = len1 + len2;
 	StringContainer16* s = _alloc(len);
-	if (s != _String16_Null.container) {
+	if (s && len > 0) {
 		Base::copyMemory(s->sz, s1, len1*sizeof(sl_char16));
 		Charsets::utf8ToUtf16(s2_u8, len2_u8, s->sz + len1, len2);
 		s->sz[len] = 0;
@@ -483,7 +485,7 @@ SLIB_INLINE StringContainer16* String16::_merge8(const sl_char8* s1_u8, sl_reg l
 	sl_size len1 = Charsets::utf8ToUtf16(s1_u8, len1_u8, sl_null, -1);
 	sl_size len = len1 + len2;
 	StringContainer16* s = _alloc(len);
-	if (s != _String16_Null.container) {
+	if (s && len > 0) {
 		Charsets::utf8ToUtf16(s1_u8, len1_u8, s->sz, len1);
 		Base::copyMemory(s->sz + len1, s2, len2*sizeof(sl_char16));
 		s->sz[len] = 0;
@@ -502,7 +504,7 @@ SLIB_INLINE StringContainer16* String16::_merge32(const sl_char16* s1, sl_reg le
 	sl_size len2 = Charsets::utf32ToUtf16(s2_u32, len2_u32, sl_null, -1);
 	sl_size len = len1 + len2;
 	StringContainer16* s = _alloc(len);
-	if (s != _String16_Null.container) {
+	if (s && len > 0) {
 		Base::copyMemory(s->sz, s1, len1*sizeof(sl_char16));
 		Charsets::utf32ToUtf16(s2_u32, len2_u32, s->sz + len1, len2);
 		s->sz[len] = 0;
@@ -521,7 +523,7 @@ SLIB_INLINE StringContainer16* String16::_merge32(const sl_char32* s1_u32, sl_re
 	sl_size len1 = Charsets::utf32ToUtf16(s1_u32, len1_u32, sl_null, -1);
 	sl_size len = len1 + len2;
 	StringContainer16* s = _alloc(len);
-	if (s != _String16_Null.container) {
+	if (s && len > 0) {
 		Charsets::utf32ToUtf16(s1_u32, len1_u32, s->sz, len1);
 		Base::copyMemory(s->sz + len1, s2, len2*sizeof(sl_char16));
 		s->sz[len] = 0;
@@ -774,48 +776,56 @@ SLIB_INLINE sl_int32 String16::_compare32(const sl_char16* m1, sl_reg len1, cons
 String8::String8(const String8& src)
 {
 	StringContainer8* container = src.m_container;
-	container->increaseReference();
+	if (container) {
+		container->increaseReference();
+	}
 	m_container= container;
 }
 
 String16::String16(const String16& src)
 {
 	StringContainer16* container = src.m_container;
-	container->increaseReference();
+	if (container) {
+		container->increaseReference();
+	}
 	m_container = container;
 }
 
-SafeString8::SafeString8(const String8& src)
+Atomic<String8>::Atomic(const String8& src)
 {
 	StringContainer8* container = src.m_container;
-	container->increaseReference();
+	if (container) {
+		container->increaseReference();
+	}
 	m_container = container;
 }
 
-SafeString16::SafeString16(const String16& src)
+Atomic<String16>::Atomic(const String16& src)
 {
 	StringContainer16* container = src.m_container;
-	container->increaseReference();
+	if (container) {
+		container->increaseReference();
+	}
 	m_container = container;
 }
 
 
-String8::String8(const SafeString8& src)
+String8::String8(const AtomicString8& src)
 {
 	m_container = src._retainContainer();
 }
 
-String16::String16(const SafeString16& src)
+String16::String16(const AtomicString16& src)
 {
 	m_container = src._retainContainer();
 }
 
-SafeString8::SafeString8(const SafeString8& src)
+Atomic<String8>::Atomic(const AtomicString8& src)
 {
 	m_container = src._retainContainer();
 }
 
-SafeString16::SafeString16(const SafeString16& src)
+Atomic<String16>::Atomic(const AtomicString16& src)
 {
 	m_container = src._retainContainer();
 }
@@ -824,7 +834,7 @@ SafeString16::SafeString16(const SafeString16& src)
 String8::String8(const String16& src)
 {
 	if (src.isNull()) {
-		m_container = _String8_Null.container;
+		m_container = sl_null;
 	} else {
 		sl_size len = src.getLength();
 		if (len == 0) {
@@ -838,7 +848,7 @@ String8::String8(const String16& src)
 String16::String16(const String8& src)
 {
 	if (src.isNull()) {
-		m_container = _String16_Null.container;
+		m_container = sl_null;
 	} else {
 		sl_size len = src.getLength();
 		if (len == 0) {
@@ -849,10 +859,10 @@ String16::String16(const String8& src)
 	}
 }
 
-SafeString8::SafeString8(const String16& src)
+Atomic<String8>::Atomic(const String16& src)
 {
 	if (src.isNull()) {
-		m_container = _String8_Null.container;
+		m_container = sl_null;
 	} else {
 		sl_size len = src.getLength();
 		if (len == 0) {
@@ -863,10 +873,10 @@ SafeString8::SafeString8(const String16& src)
 	}
 }
 
-SafeString16::SafeString16(const String8& src)
+Atomic<String16>::Atomic(const String8& src)
 {
 	if (src.isNull()) {
-		m_container = _String16_Null.container;
+		m_container = sl_null;
 	} else {
 		sl_size len = src.getLength();
 		if (len == 0) {
@@ -878,11 +888,11 @@ SafeString16::SafeString16(const String8& src)
 }
 
 
-String8::String8(const SafeString16& _src)
+String8::String8(const AtomicString16& _src)
 {
 	String16 src(_src);
 	if (src.isNull()) {
-		m_container = _String8_Null.container;
+		m_container = sl_null;
 	} else {
 		sl_size len = src.getLength();
 		if (len == 0) {
@@ -893,11 +903,11 @@ String8::String8(const SafeString16& _src)
 	}
 }
 
-String16::String16(const SafeString8& _src)
+String16::String16(const AtomicString8& _src)
 {
 	String8 src(_src);
 	if (src.isNull()) {
-		m_container = _String16_Null.container;
+		m_container = sl_null;
 	} else {
 		sl_size len = src.getLength();
 		if (len == 0) {
@@ -908,11 +918,11 @@ String16::String16(const SafeString8& _src)
 	}
 }
 
-SafeString8::SafeString8(const SafeString16& _src)
+Atomic<String8>::Atomic(const AtomicString16& _src)
 {
 	String16 src(_src);
 	if (src.isNull()) {
-		m_container = _String8_Null.container;
+		m_container = sl_null;
 	} else {
 		sl_size len = src.getLength();
 		if (len == 0) {
@@ -923,11 +933,11 @@ SafeString8::SafeString8(const SafeString16& _src)
 	}
 }
 
-SafeString16::SafeString16(const SafeString8& _src)
+Atomic<String16>::Atomic(const AtomicString8& _src)
 {
 	String8 src(_src);
 	if (src.isNull()) {
-		m_container = _String16_Null.container;
+		m_container = sl_null;
 	} else {
 		sl_size len = src.getLength();
 		if (len == 0) {
@@ -941,22 +951,34 @@ SafeString16::SafeString16(const SafeString8& _src)
 
 String8::~String8()
 {
-	m_container->decreaseReference();
+	StringContainer8* container = m_container;
+	if (container) {
+		container->decreaseReference();
+	}
 }
 
 String16::~String16()
 {
-	m_container->decreaseReference();
+	StringContainer16* container = m_container;
+	if (container) {
+		container->decreaseReference();
+	}
 }
 
-SafeString8::~SafeString8()
+Atomic<String8>::~Atomic()
 {
-	m_container->decreaseReference();
+	StringContainer8* container = m_container;
+	if (container) {
+		container->decreaseReference();
+	}
 }
 
-SafeString16::~SafeString16()
+Atomic<String16>::~Atomic()
 {
-	m_container->decreaseReference();
+	StringContainer16* container = m_container;
+	if (container) {
+		container->decreaseReference();
+	}
 }
 
 
@@ -965,7 +987,7 @@ String8::String8(sl_char8 ch, sl_size nRepeatCount)
 	m_container = _create(ch, nRepeatCount);
 }
 
-SafeString8::SafeString8(sl_char8 ch, sl_size nRepeatCount)
+Atomic<String8>::Atomic(sl_char8 ch, sl_size nRepeatCount)
 {
 	m_container = String8::_create(ch, nRepeatCount);
 }
@@ -975,7 +997,7 @@ String16::String16(sl_char16 ch, sl_size nRepeatCount)
 	m_container = _create(ch, nRepeatCount);
 }
 
-SafeString16::SafeString16(sl_char16 ch, sl_size nRepeatCount)
+Atomic<String16>::Atomic(sl_char16 ch, sl_size nRepeatCount)
 {
 	m_container = String16::_create(ch, nRepeatCount);
 }
@@ -991,12 +1013,12 @@ String8::String8(const sl_char8* strUtf8, sl_reg length)
 	m_container = _create(strUtf8, length);
 }
 
-SafeString8::SafeString8(const sl_char8* strUtf8)
+Atomic<String8>::Atomic(const sl_char8* strUtf8)
 {
 	m_container = String8::_create(strUtf8, -1);
 }
 
-SafeString8::SafeString8(const sl_char8* strUtf8, sl_reg length)
+Atomic<String8>::Atomic(const sl_char8* strUtf8, sl_reg length)
 {
 	m_container = String8::_create(strUtf8, length);
 }
@@ -1011,12 +1033,12 @@ String16::String16(const sl_char8* strUtf8, sl_reg length)
 	m_container = _create(strUtf8, length);
 }
 
-SafeString16::SafeString16(const sl_char8* strUtf8)
+Atomic<String16>::Atomic(const sl_char8* strUtf8)
 {
 	m_container = String16::_create(strUtf8, -1);
 }
 
-SafeString16::SafeString16(const sl_char8* strUtf8, sl_reg length)
+Atomic<String16>::Atomic(const sl_char8* strUtf8, sl_reg length)
 {
 	m_container = String16::_create(strUtf8, length);
 }
@@ -1032,12 +1054,12 @@ String8::String8(const sl_char16* strUtf16, sl_reg length)
 	m_container = _create(strUtf16, length);
 }
 
-SafeString8::SafeString8(const sl_char16* strUtf16)
+Atomic<String8>::Atomic(const sl_char16* strUtf16)
 {
 	m_container = String8::_create(strUtf16, -1);
 }
 
-SafeString8::SafeString8(const sl_char16* strUtf16, sl_reg length)
+Atomic<String8>::Atomic(const sl_char16* strUtf16, sl_reg length)
 {
 	m_container = String8::_create(strUtf16, length);
 }
@@ -1052,12 +1074,12 @@ String16::String16(const sl_char16* strUtf16, sl_reg length)
 	m_container = _create(strUtf16, length);
 }
 
-SafeString16::SafeString16(const sl_char16* strUtf16)
+Atomic<String16>::Atomic(const sl_char16* strUtf16)
 {
 	m_container = String16::_create(strUtf16, -1);
 }
 
-SafeString16::SafeString16(const sl_char16* strUtf16, sl_reg length)
+Atomic<String16>::Atomic(const sl_char16* strUtf16, sl_reg length)
 {
 	m_container = String16::_create(strUtf16, length);
 }
@@ -1073,12 +1095,12 @@ String8::String8(const sl_char32* strUtf32, sl_reg length)
 	m_container = _create(strUtf32, length);
 }
 
-SafeString8::SafeString8(const sl_char32* strUtf32)
+Atomic<String8>::Atomic(const sl_char32* strUtf32)
 {
 	m_container = String8::_create(strUtf32, -1);
 }
 
-SafeString8::SafeString8(const sl_char32* strUtf32, sl_reg length)
+Atomic<String8>::Atomic(const sl_char32* strUtf32, sl_reg length)
 {
 	m_container = String8::_create(strUtf32, length);
 }
@@ -1093,12 +1115,12 @@ String16::String16(const sl_char32* strUtf32, sl_reg length)
 	m_container = _create(strUtf32, length);
 }
 
-SafeString16::SafeString16(const sl_char32* strUtf32)
+Atomic<String16>::Atomic(const sl_char32* strUtf32)
 {
 	m_container = String16::_create(strUtf32, -1);
 }
 
-SafeString16::SafeString16(const sl_char32* strUtf32, sl_reg length)
+Atomic<String16>::Atomic(const sl_char32* strUtf32, sl_reg length)
 {
 	m_container = String16::_create(strUtf32, length);
 }
@@ -1121,16 +1143,19 @@ String8 String8::fromStatic(const sl_char8 *sz, sl_reg len)
 		if (len == 0) {
 			return _String8_Empty.container;
 		}
+		if (len < 0) {
+			len = Base::getStringLength(sz);
+		}
 		StringContainer8* container = (StringContainer8*)(Base::createMemory(sizeof(StringContainer8)));
 		if (container) {
 			container->sz = (sl_char8*)sz;
 			container->len = len;
 			container->hash = 0;
-			container->ref = 0;
+			container->ref = 1;
 			return container;
 		}
 	}
-	return _String8_Null.container;
+	return sl_null;
 }
 
 String16 String16::fromStatic(const sl_char16 *sz, sl_reg len)
@@ -1139,16 +1164,19 @@ String16 String16::fromStatic(const sl_char16 *sz, sl_reg len)
 		if (len == 0) {
 			return _String16_Empty.container;
 		}
+		if (len < 0) {
+			len = Base::getStringLength2(sz);
+		}
 		StringContainer16* container = (StringContainer16*)(Base::createMemory(sizeof(StringContainer16)));
 		if (container) {
 			container->sz = (sl_char16*)sz;
 			container->len = len;
 			container->hash = 0;
-			container->ref = 0;
+			container->ref = 1;
 			return container;
 		}
 	}
-	return _String16_Null.container;
+	return sl_null;
 }
 
 
@@ -1200,10 +1228,10 @@ String16 String16::fromUtf32(const sl_char32* utf32, sl_reg len)
 String8 String8::fromUtf16BE(const void* _utf16, sl_reg len)
 {
 	if (!_utf16) {
-		return String::null();
+		return sl_null;
 	}
 	if (len == 0) {
-		return String::getEmpty();
+		return String8::getEmpty();
 	}
 	if (((((sl_reg)(_utf16)) & 1) == 0) && Endian::isBE()) {
 		return String8((sl_char16*)_utf16, len);
@@ -1218,7 +1246,7 @@ String8 String8::fromUtf16BE(const void* _utf16, sl_reg len)
 		}
 		return String8(utf16, len);
 	}
-	return String8::null();
+	return sl_null;
 }
 
 String8 String8::fromUtf16BE(const Memory& mem)
@@ -1229,10 +1257,10 @@ String8 String8::fromUtf16BE(const Memory& mem)
 String16 String16::fromUtf16BE(const void* _utf16, sl_reg len)
 {
 	if (!_utf16) {
-		return String::null();
+		return sl_null;
 	}
 	if (len == 0) {
-		return String::getEmpty();
+		return String16::getEmpty();
 	}
 	if (((((sl_reg)(_utf16)) & 1) == 0) && Endian::isBE()) {
 		return String16((sl_char16*)_utf16, len);
@@ -1247,7 +1275,7 @@ String16 String16::fromUtf16BE(const void* _utf16, sl_reg len)
 		}
 		return str;
 	}
-	return String16::null();
+	return sl_null;
 }
 
 String16 String16::fromUtf16BE(const Memory& mem)
@@ -1259,10 +1287,10 @@ String16 String16::fromUtf16BE(const Memory& mem)
 String8 String8::fromUtf16LE(const void* _utf16, sl_reg len)
 {
 	if (!_utf16) {
-		return String::null();
+		return sl_null;
 	}
 	if (len == 0) {
-		return String::getEmpty();
+		return String8::getEmpty();
 	}
 	if ((((sl_reg)(_utf16)) & 1) == 0 && Endian::isLE()) {
 		return String8((sl_char16*)_utf16, len);
@@ -1277,7 +1305,7 @@ String8 String8::fromUtf16LE(const void* _utf16, sl_reg len)
 		}
 		return String8(utf16, len);
 	}
-	return String8::null();
+	return sl_null;
 }
 
 String8 String8::fromUtf16LE(const Memory& mem)
@@ -1288,10 +1316,10 @@ String8 String8::fromUtf16LE(const Memory& mem)
 String16 String16::fromUtf16LE(const void* _utf16, sl_reg len)
 {
 	if (!_utf16) {
-		return String::null();
+		return sl_null;
 	}
 	if (len == 0) {
-		return String::getEmpty();
+		return String16::getEmpty();
 	}
 	if ((((sl_reg)(_utf16)) & 1) == 0 && Endian::isLE()) {
 		return String16((sl_char16*)_utf16, len);
@@ -1307,7 +1335,7 @@ String16 String16::fromUtf16LE(const void* _utf16, sl_reg len)
 		}
 		return str;
 	}
-	return String16::null();
+	return sl_null;
 }
 
 String16 String16::fromUtf16LE(const Memory& mem)
@@ -1320,7 +1348,7 @@ String8 String8::fromUtf(const void* _buf, sl_size len)
 {
 	sl_char8* buf = (sl_char8*)_buf;
 	if (!buf) {
-		return String8::null();
+		return sl_null;
 	}
 	if (len == 0) {
 		return String8::getEmpty();
@@ -1350,7 +1378,7 @@ String16 String16::fromUtf(const void* _buf, sl_size len)
 {
 	sl_char8* buf = (sl_char8*)_buf;
 	if (!buf) {
-		return String16::null();
+		return sl_null;
 	}
 	if (len == 0) {
 		return String16::getEmpty();
@@ -1377,26 +1405,26 @@ String16 String16::fromUtf(const Memory& mem)
 }
 
 
-sl_bool SafeString8::isEmpty() const
+sl_bool Atomic<String8>::isEmpty() const
 {
 	String8 s(*this);
 	return s.getLength() == 0;
 }
 
-sl_bool SafeString16::isEmpty() const
+sl_bool Atomic<String16>::isEmpty() const
 {
 	String16 s(*this);
 	return s.getLength() == 0;
 }
 
 
-sl_bool SafeString8::isNotEmpty() const
+sl_bool Atomic<String8>::isNotEmpty() const
 {
 	String8 s(*this);
 	return s.getLength() != 0;
 }
 
-sl_bool SafeString16::isNotEmpty() const
+sl_bool Atomic<String16>::isNotEmpty() const
 {
 	String16 s(*this);
 	return s.getLength() != 0;
@@ -1405,29 +1433,25 @@ sl_bool SafeString16::isNotEmpty() const
 
 void String8::setNull()
 {
-	if (m_container != _String8_Null.container) {
-		_replaceContainer(_String8_Null.container);
-	}
+	_replaceContainer(sl_null);
 }
 
 void String16::setNull()
 {
-	if (m_container != _String16_Null.container) {
-		_replaceContainer(_String16_Null.container);
+	_replaceContainer(sl_null);
+}
+
+void Atomic<String8>::setNull()
+{
+	if (m_container) {
+		_replaceContainer(sl_null);
 	}
 }
 
-void SafeString8::setNull()
+void Atomic<String16>::setNull()
 {
-	if (m_container != _String8_Null.container) {
-		_replaceContainer(_String8_Null.container);
-	}
-}
-
-void SafeString16::setNull()
-{
-	if (m_container != _String16_Null.container) {
-		_replaceContainer(_String16_Null.container);
+	if (m_container) {
+		_replaceContainer(sl_null);
 	}
 }
 
@@ -1446,14 +1470,14 @@ void String16::setEmpty()
 	}
 }
 
-void SafeString8::setEmpty()
+void Atomic<String8>::setEmpty()
 {
 	if (m_container != _String8_Empty.container) {
 		_replaceContainer(_String8_Empty.container);
 	}
 }
 
-void SafeString16::setEmpty()
+void Atomic<String16>::setEmpty()
 {
 	if (m_container != _String16_Empty.container) {
 		_replaceContainer(_String16_Empty.container);
@@ -1461,13 +1485,13 @@ void SafeString16::setEmpty()
 }
 
 
-sl_size SafeString8::getLength() const
+sl_size Atomic<String8>::getLength() const
 {
 	String8 s(*this);
 	return s.getLength();
 }
 
-sl_size SafeString16::getLength() const
+sl_size Atomic<String16>::getLength() const
 {
 	String16 s(*this);
 	return s.getLength();
@@ -1476,12 +1500,16 @@ sl_size SafeString16::getLength() const
 
 void String8::setLength(sl_size len)
 {
-	m_container->len = len;
+	if (m_container && m_container != &_g_string8_empty_container) {
+		m_container->len = len;
+	}
 }
 
 void String16::setLength(sl_size len)
 {
-	m_container->len = len;
+	if (m_container && m_container != &_g_string16_empty_container) {
+		m_container->len = len;
+	}
 }
 
 
@@ -1493,45 +1521,49 @@ SLIB_INLINE sl_uint32 _String_calcHash(const CT* buf, sl_size len)
 		sl_uint32 ch = buf[i];
 		hash = hash * 31 + ch;
 	}
-	hash = sl_rehash(hash);
+	hash = Rehash(hash);
 	return hash;
 }
 
 sl_uint32 String8::getHashCode() const
 {
-	sl_size n = m_container->len;
-	if (n == 0) {
-		return 0;
+	if (m_container) {
+		sl_size n = m_container->len;
+		if (n > 0) {
+			sl_uint32 hash = m_container->hash;
+			if (hash == 0) {
+				hash = _String_calcHash(m_container->sz, n);
+				m_container->hash = hash;
+			}
+			return hash;
+		}
 	}
-	sl_uint32 hash = m_container->hash;
-	if (hash == 0) {
-		hash = _String_calcHash(m_container->sz, n);
-		m_container->hash = hash;
-	}
-	return hash;
+	return 0;
 }
 
 sl_uint32 String16::getHashCode() const
 {
-	sl_size n = m_container->len;
-	if (n == 0) {
-		return 0;
+	if (m_container) {
+		sl_size n = m_container->len;
+		if (n > 0) {
+			sl_uint32 hash = m_container->hash;
+			if (hash == 0) {
+				hash = _String_calcHash(m_container->sz, n);
+				m_container->hash = hash;
+			}
+			return hash;
+		}
 	}
-	sl_uint32 hash = m_container->hash;
-	if (hash == 0) {
-		hash = _String_calcHash(m_container->sz, n);
-		m_container->hash = hash;
-	}
-	return hash;
+	return 0;
 }
 
-sl_uint32 SafeString8::getHashCode() const
+sl_uint32 Atomic<String8>::getHashCode() const
 {
 	String8 s(*this);
 	return s.getHashCode();
 }
 
-sl_uint32 SafeString16::getHashCode() const
+sl_uint32 Atomic<String16>::getHashCode() const
 {
 	String16 s(*this);
 	return s.getHashCode();
@@ -1540,12 +1572,16 @@ sl_uint32 SafeString16::getHashCode() const
 
 void String8::setHashCode(sl_uint32 hash)
 {
-	m_container->hash = hash;
+	if (m_container && m_container != &_g_string8_empty_container) {
+		m_container->hash = hash;
+	}
 }
 
 void String16::setHashCode(sl_uint32 hash)
 {
-	m_container->hash = hash;
+	if (m_container && m_container != &_g_string16_empty_container) {
+		m_container->hash = hash;
+	}
 }
 
 
@@ -1558,37 +1594,41 @@ SLIB_INLINE sl_uint32 _String_calcHashIgnoreCase(const CT* buf, sl_size len)
 		ch = SLIB_CHAR_LOWER_TO_UPPER(ch);
 		hash = hash * 31 + ch;
 	}
-	hash = sl_rehash(hash);
+	hash = Rehash(hash);
 	return hash;
 }
 
 sl_uint32 String8::getHashCodeIgnoreCase() const
 {
-	sl_size n = m_container->len;
-	if (n == 0) {
-		return 0;
+	if (m_container) {
+		sl_size n = m_container->len;
+		if (n > 0) {
+			sl_uint32 hash = _String_calcHashIgnoreCase(m_container->sz, n);
+			return hash;
+		}
 	}
-	sl_uint32 hash = _String_calcHashIgnoreCase(m_container->sz, n);
-	return hash;
+	return 0;
 }
 
 sl_uint32 String16::getHashCodeIgnoreCase() const
 {
-	sl_size n = m_container->len;
-	if (n == 0) {
-		return 0;
+	if (m_container) {
+		sl_size n = m_container->len;
+		if (n > 0) {
+			sl_uint32 hash = _String_calcHashIgnoreCase(m_container->sz, n);
+			return hash;
+		}
 	}
-	sl_uint32 hash = _String_calcHashIgnoreCase(m_container->sz, n);
-	return hash;
+	return 0;
 }
 
-sl_uint32 SafeString8::getHashCodeIgnoreCase() const
+sl_uint32 Atomic<String8>::getHashCodeIgnoreCase() const
 {
 	String8 s(*this);
 	return s.getHashCodeIgnoreCase();
 }
 
-sl_uint32 SafeString16::getHashCodeIgnoreCase() const
+sl_uint32 Atomic<String16>::getHashCodeIgnoreCase() const
 {
 	String16 s(*this);
 	return s.getHashCodeIgnoreCase();
@@ -1597,16 +1637,20 @@ sl_uint32 SafeString16::getHashCodeIgnoreCase() const
 
 sl_char8 String8::getAt(sl_reg index) const
 {
-	if (index >= 0 && index < (sl_reg)(m_container->len)) {
-		return m_container->sz[index];
+	if (m_container) {
+		if (index >= 0 && index < (sl_reg)(m_container->len)) {
+			return m_container->sz[index];
+		}
 	}
 	return 0;
 }
 
 sl_char16 String16::getAt(sl_reg index) const
 {
-	if (index >= 0 && index < (sl_reg)(m_container->len)) {
-		return m_container->sz[index];
+	if (m_container) {
+		if (index >= 0 && index < (sl_reg)(m_container->len)) {
+			return m_container->sz[index];
+		}
 	}
 	return 0;
 }
@@ -1614,20 +1658,53 @@ sl_char16 String16::getAt(sl_reg index) const
 
 sl_bool String8::setAt(sl_reg index, sl_char8 ch)
 {
-	if (index >= 0 && index < (sl_reg)(m_container->len)) {
-		m_container->sz[index] = ch;
-		return sl_true;
+	if (m_container) {
+		if (index >= 0 && index < (sl_reg)(m_container->len)) {
+			m_container->sz[index] = ch;
+			return sl_true;
+		}
 	}
 	return sl_false;
 }
 
 sl_bool String16::setAt(sl_reg index, sl_char16 ch)
 {
-	if (index >= 0 && index < (sl_reg)(m_container->len)) {
-		m_container->sz[index] = ch;
-		return sl_true;
+	if (m_container) {
+		if (index >= 0 && index < (sl_reg)(m_container->len)) {
+			m_container->sz[index] = ch;
+			return sl_true;
+		}
 	}
 	return sl_false;
+}
+
+
+String8& String8::operator=(sl_null_t)
+{
+	_replaceContainer(sl_null);
+	return *this;
+}
+
+String16& String16::operator=(sl_null_t)
+{
+	_replaceContainer(sl_null);
+	return *this;
+}
+
+AtomicString8& Atomic<String8>::operator=(sl_null_t)
+{
+	if (m_container) {
+		_replaceContainer(sl_null);
+	}
+	return *this;
+}
+
+AtomicString16& Atomic<String16>::operator=(sl_null_t)
+{
+	if (m_container) {
+		_replaceContainer(sl_null);
+	}
+	return *this;
 }
 
 
@@ -1635,7 +1712,7 @@ String8& String8::operator=(String8&& other)
 {
 	if (this != &other) {
 		_replaceContainer(other.m_container);
-		other.m_container = _String8_Null.container;
+		other.m_container = sl_null;
 	}
 	return *this;
 }
@@ -1644,62 +1721,62 @@ String16& String16::operator=(String16&& other)
 {
 	if (this != &other) {
 		_replaceContainer(other.m_container);
-		other.m_container = _String16_Null.container;
+		other.m_container = sl_null;
 	}
 	return *this;
 }
 
-SafeString8& SafeString8::operator=(SafeString8&& other)
+AtomicString8& Atomic<String8>::operator=(AtomicString8&& other)
 {
 	if (this != &other) {
 		_replaceContainer(other.m_container);
-		other.m_container = _String8_Null.container;
+		other.m_container = sl_null;
 	}
 	return *this;
 }
 
-SafeString16& SafeString16::operator=(SafeString16&& other)
+AtomicString16& Atomic<String16>::operator=(AtomicString16&& other)
 {
 	if (this != &other) {
 		_replaceContainer(other.m_container);
-		other.m_container = _String16_Null.container;
+		other.m_container = sl_null;
 	}
 	return *this;
 }
 
 
-String8& String8::operator=(SafeString8&& other)
+String8& String8::operator=(AtomicString8&& other)
 {
 	if ((void*)this != (void*)(&other)) {
 		_replaceContainer(other.m_container);
-		other.m_container = _String8_Null.container;
+		other.m_container = sl_null;
 	}
 	return *this;
 }
 
-String16& String16::operator=(SafeString16&& other)
+String16& String16::operator=(AtomicString16&& other)
 {
 	if ((void*)this != (void*)(&other)) {
 		_replaceContainer(other.m_container);
-		other.m_container = _String16_Null.container;
+		other.m_container = sl_null;
 	}
 	return *this;
 }
 
-SafeString8& SafeString8::operator=(String8&& other)
+AtomicString8& Atomic<String8>::operator=(String8&& other)
 {
 	if ((void*)this != (void*)(&other)) {
 		_replaceContainer(other.m_container);
-		other.m_container = _String8_Null.container;
+		other.m_container = sl_null;
 	}
 	return *this;
 }
 
-SafeString16& SafeString16::operator=(String16&& other)
+AtomicString16& Atomic<String16>::operator=(String16&& other)
 {
 	if ((void*)this != (void*)(&other)) {
 		_replaceContainer(other.m_container);
-		other.m_container = _String16_Null.container;
+		other.m_container = sl_null;
 	}
 	return *this;
 }
@@ -1709,7 +1786,9 @@ String8& String8::operator=(const String8& other)
 {
 	StringContainer8* container = other.m_container;
 	if (m_container != container) {
-		container->increaseReference();
+		if (container) {
+			container->increaseReference();
+		}
 		_replaceContainer(container);
 	}
 	return *this;
@@ -1719,34 +1798,40 @@ String16& String16::operator=(const String16& other)
 {
 	StringContainer16* container = other.m_container;
 	if (m_container != container) {
-		container->increaseReference();
+		if (container) {
+			container->increaseReference();
+		}
 		_replaceContainer(container);
 	}
 	return *this;
 }
 
-SafeString8& SafeString8::operator=(const String8& other)
+AtomicString8& Atomic<String8>::operator=(const String8& other)
 {
 	StringContainer8* container = other.m_container;
 	if (m_container != container) {
-		container->increaseReference();
+		if (container) {
+			container->increaseReference();
+		}
 		_replaceContainer(container);
 	}
 	return *this;
 }
 
-SafeString16& SafeString16::operator=(const String16& other)
+AtomicString16& Atomic<String16>::operator=(const String16& other)
 {
 	StringContainer16* container = other.m_container;
 	if (m_container != container) {
-		container->increaseReference();
+		if (container) {
+			container->increaseReference();
+		}
 		_replaceContainer(container);
 	}
 	return *this;
 }
 
 
-String8& String8::operator=(const SafeString8& other)
+String8& String8::operator=(const AtomicString8& other)
 {
 	if (m_container != other.m_container) {
 		_replaceContainer(other._retainContainer());
@@ -1754,7 +1839,7 @@ String8& String8::operator=(const SafeString8& other)
 	return *this;
 }
 
-String16& String16::operator=(const SafeString16& other)
+String16& String16::operator=(const AtomicString16& other)
 {
 	if (m_container != other.m_container) {
 		_replaceContainer(other._retainContainer());
@@ -1762,7 +1847,7 @@ String16& String16::operator=(const SafeString16& other)
 	return *this;
 }
 
-SafeString8& SafeString8::operator=(const SafeString8& other)
+AtomicString8& Atomic<String8>::operator=(const AtomicString8& other)
 {
 	if (m_container != other.m_container) {
 		_replaceContainer(other._retainContainer());
@@ -1770,7 +1855,7 @@ SafeString8& SafeString8::operator=(const SafeString8& other)
 	return *this;
 }
 
-SafeString16& SafeString16::operator=(const SafeString16& other)
+AtomicString16& Atomic<String16>::operator=(const AtomicString16& other)
 {
 	if (m_container != other.m_container) {
 		_replaceContainer(other._retainContainer());
@@ -1809,7 +1894,7 @@ String16& String16::operator=(const String8& other)
 	return *this;
 }
 
-SafeString8& SafeString8::operator=(const String16& other)
+AtomicString8& Atomic<String8>::operator=(const String16& other)
 {
 	if (other.isNull()) {
 		setNull();
@@ -1824,7 +1909,7 @@ SafeString8& SafeString8::operator=(const String16& other)
 	return *this;
 }
 
-SafeString16& SafeString16::operator=(const String8& other)
+AtomicString16& Atomic<String16>::operator=(const String8& other)
 {
 	if (other.isNull()) {
 		setNull();
@@ -1840,7 +1925,7 @@ SafeString16& SafeString16::operator=(const String8& other)
 }
 
 
-String8& String8::operator=(const SafeString16& _other)
+String8& String8::operator=(const AtomicString16& _other)
 {
 	String16 other(_other);
 	if (other.isNull()) {
@@ -1856,7 +1941,7 @@ String8& String8::operator=(const SafeString16& _other)
 	return *this;
 }
 
-String16& String16::operator=(const SafeString8& _other)
+String16& String16::operator=(const AtomicString8& _other)
 {
 	String8 other(_other);
 	if (other.isNull()) {
@@ -1872,7 +1957,7 @@ String16& String16::operator=(const SafeString8& _other)
 	return *this;
 }
 
-SafeString8& SafeString8::operator=(const SafeString16& _other)
+AtomicString8& Atomic<String8>::operator=(const AtomicString16& _other)
 {
 	String16 other(_other);
 	if (other.isNull()) {
@@ -1888,7 +1973,7 @@ SafeString8& SafeString8::operator=(const SafeString16& _other)
 	return *this;
 }
 
-SafeString16& SafeString16::operator=(const SafeString8& _other)
+AtomicString16& Atomic<String16>::operator=(const AtomicString8& _other)
 {
 	String8 other(_other);
 	if (other.isNull()) {
@@ -1925,7 +2010,7 @@ String16& String16::operator=(const sl_char8* utf8)
 	return *this;
 }
 
-SafeString8& SafeString8::operator=(const sl_char8* utf8)
+AtomicString8& Atomic<String8>::operator=(const sl_char8* utf8)
 {
 	if (utf8) {
 		_replaceContainer(String8::_create(utf8, -1));
@@ -1935,7 +2020,7 @@ SafeString8& SafeString8::operator=(const sl_char8* utf8)
 	return *this;
 }
 
-SafeString16& SafeString16::operator=(const sl_char8* utf8)
+AtomicString16& Atomic<String16>::operator=(const sl_char8* utf8)
 {
 	if (utf8) {
 		_replaceContainer(String16::_create(utf8, -1));
@@ -1966,7 +2051,7 @@ String16& String16::operator=(const sl_char16* utf16)
 	return *this;
 }
 
-SafeString8& SafeString8::operator=(const sl_char16* utf16)
+AtomicString8& Atomic<String8>::operator=(const sl_char16* utf16)
 {
 	if (utf16) {
 		_replaceContainer(String8::_create(utf16, -1));
@@ -1976,7 +2061,7 @@ SafeString8& SafeString8::operator=(const sl_char16* utf16)
 	return *this;
 }
 
-SafeString16& SafeString16::operator=(const sl_char16* utf16)
+AtomicString16& Atomic<String16>::operator=(const sl_char16* utf16)
 {
 	if (utf16) {
 		_replaceContainer(String16::_create(utf16, -1));
@@ -2007,7 +2092,7 @@ String16& String16::operator=(const sl_char32* utf32)
 	return *this;
 }
 
-SafeString8& SafeString8::operator=(const sl_char32* utf32)
+AtomicString8& Atomic<String8>::operator=(const sl_char32* utf32)
 {
 	if (utf32) {
 		_replaceContainer(String8::_create(utf32, -1));
@@ -2017,7 +2102,7 @@ SafeString8& SafeString8::operator=(const sl_char32* utf32)
 	return *this;
 }
 
-SafeString16& SafeString16::operator=(const sl_char32* utf32)
+AtomicString16& Atomic<String16>::operator=(const sl_char32* utf32)
 {
 	if (utf32) {
 		_replaceContainer(String16::_create(utf32, -1));
@@ -2076,7 +2161,7 @@ String16& String16::operator+=(const String16& other)
 	return *this;
 }
 
-String8 SafeString8::operator+(const String8& other) const
+String8 Atomic<String8>::operator+(const String8& other) const
 {
 	String8 s(*this);
 	sl_size n = s.getLength();
@@ -2089,7 +2174,7 @@ String8 SafeString8::operator+(const String8& other) const
 	return s.getNotNull();
 }
 
-SafeString8& SafeString8::operator+=(const String8& other)
+AtomicString8& Atomic<String8>::operator+=(const String8& other)
 {
 	String8 s(*this);
 	sl_size n = s.getLength();
@@ -2102,7 +2187,7 @@ SafeString8& SafeString8::operator+=(const String8& other)
 	return *this;
 }
 
-String16 SafeString16::operator+(const String16& other) const
+String16 Atomic<String16>::operator+(const String16& other) const
 {
 	String16 s(*this);
 	sl_size n = s.getLength();
@@ -2115,7 +2200,7 @@ String16 SafeString16::operator+(const String16& other) const
 	return s.getNotNull();
 }
 
-SafeString16& SafeString16::operator+=(const String16& other)
+AtomicString16& Atomic<String16>::operator+=(const String16& other)
 {
 	String16 s(*this);
 	sl_size n = s.getLength();
@@ -2161,7 +2246,7 @@ String16& String16::operator+=(const String8& other)
 	return *this;
 }
 
-String8 SafeString8::operator+(const String16& other) const
+String8 Atomic<String8>::operator+(const String16& other) const
 {
 	String8 s(*this);
 	if (other.isNotEmpty()) {
@@ -2170,7 +2255,7 @@ String8 SafeString8::operator+(const String16& other) const
 	return s.getNotNull();
 }
 
-SafeString8& SafeString8::operator+=(const String16& other)
+AtomicString8& Atomic<String8>::operator+=(const String16& other)
 {
 	if (other.isNotEmpty()) {
 		String8 s(*this);
@@ -2179,7 +2264,7 @@ SafeString8& SafeString8::operator+=(const String16& other)
 	return *this;
 }
 
-String16 SafeString16::operator+(const String8& other) const
+String16 Atomic<String16>::operator+(const String8& other) const
 {
 	String16 s(*this);
 	if (other.isNotEmpty()) {
@@ -2188,7 +2273,7 @@ String16 SafeString16::operator+(const String8& other) const
 	return s.getNotNull();
 }
 
-SafeString16& SafeString16::operator+=(const String8& other)
+AtomicString16& Atomic<String16>::operator+=(const String8& other)
 {
 	if (other.isNotEmpty()) {
 		String16 s(*this);
@@ -2198,7 +2283,7 @@ SafeString16& SafeString16::operator+=(const String8& other)
 }
 
 
-String8 String8::operator+(const SafeString8& _other) const
+String8 String8::operator+(const AtomicString8& _other) const
 {
 	sl_size n = getLength();
 	String8 other(_other);
@@ -2211,7 +2296,7 @@ String8 String8::operator+(const SafeString8& _other) const
 	return getNotNull();
 }
 
-String8& String8::operator+=(const SafeString8& _other)
+String8& String8::operator+=(const AtomicString8& _other)
 {
 	sl_size n = getLength();
 	String8 other(_other);
@@ -2224,7 +2309,7 @@ String8& String8::operator+=(const SafeString8& _other)
 	return *this;
 }
 
-String16 String16::operator+(const SafeString16& _other) const
+String16 String16::operator+(const AtomicString16& _other) const
 {
 	sl_size n = getLength();
 	String16 other(_other);
@@ -2237,7 +2322,7 @@ String16 String16::operator+(const SafeString16& _other) const
 	return getNotNull();
 }
 
-String16& String16::operator+=(const SafeString16& _other)
+String16& String16::operator+=(const AtomicString16& _other)
 {
 	sl_size n = getLength();
 	String16 other(_other);
@@ -2250,7 +2335,7 @@ String16& String16::operator+=(const SafeString16& _other)
 	return *this;
 }
 
-String8 SafeString8::operator+(const SafeString8& _other) const
+String8 Atomic<String8>::operator+(const AtomicString8& _other) const
 {
 	String8 s(*this);
 	sl_size n = s.getLength();
@@ -2264,7 +2349,7 @@ String8 SafeString8::operator+(const SafeString8& _other) const
 	return s.getNotNull();
 }
 
-SafeString8& SafeString8::operator+=(const SafeString8& _other)
+AtomicString8& Atomic<String8>::operator+=(const AtomicString8& _other)
 {
 	String8 s(*this);
 	sl_size n = s.getLength();
@@ -2278,7 +2363,7 @@ SafeString8& SafeString8::operator+=(const SafeString8& _other)
 	return *this;
 }
 
-String16 SafeString16::operator+(const SafeString16& _other) const
+String16 Atomic<String16>::operator+(const AtomicString16& _other) const
 {
 	String16 s(*this);
 	sl_size n = s.getLength();
@@ -2292,7 +2377,7 @@ String16 SafeString16::operator+(const SafeString16& _other) const
 	return s.getNotNull();
 }
 
-SafeString16& SafeString16::operator+=(const SafeString16& _other)
+AtomicString16& Atomic<String16>::operator+=(const AtomicString16& _other)
 {
 	String16 s(*this);
 	sl_size n = s.getLength();
@@ -2307,7 +2392,7 @@ SafeString16& SafeString16::operator+=(const SafeString16& _other)
 }
 
 
-String8 String8::operator+(const SafeString16& _other) const
+String8 String8::operator+(const AtomicString16& _other) const
 {
 	String16 other(_other);
 	if (other.isNotEmpty()) {
@@ -2316,7 +2401,7 @@ String8 String8::operator+(const SafeString16& _other) const
 	return getNotNull();
 }
 
-String8& String8::operator+=(const SafeString16& _other)
+String8& String8::operator+=(const AtomicString16& _other)
 {
 	String16 other(_other);
 	if (other.isNotEmpty()) {
@@ -2325,7 +2410,7 @@ String8& String8::operator+=(const SafeString16& _other)
 	return *this;
 }
 
-String16 String16::operator+(const SafeString8& _other) const
+String16 String16::operator+(const AtomicString8& _other) const
 {
 	String8 other(_other);
 	if (other.isNotEmpty()) {
@@ -2334,7 +2419,7 @@ String16 String16::operator+(const SafeString8& _other) const
 	return getNotNull();
 }
 
-String16& String16::operator+=(const SafeString8& _other)
+String16& String16::operator+=(const AtomicString8& _other)
 {
 	String8 other(_other);
 	if (other.isNotEmpty()) {
@@ -2343,7 +2428,7 @@ String16& String16::operator+=(const SafeString8& _other)
 	return *this;
 }
 
-String8 SafeString8::operator+(const SafeString16& _other) const
+String8 Atomic<String8>::operator+(const AtomicString16& _other) const
 {
 	String8 s(*this);
 	String16 other(_other);
@@ -2353,7 +2438,7 @@ String8 SafeString8::operator+(const SafeString16& _other) const
 	return s.getNotNull();
 }
 
-SafeString8& SafeString8::operator+=(const SafeString16& _other)
+AtomicString8& Atomic<String8>::operator+=(const AtomicString16& _other)
 {
 	String16 other(_other);
 	if (other.isNotEmpty()) {
@@ -2363,7 +2448,7 @@ SafeString8& SafeString8::operator+=(const SafeString16& _other)
 	return *this;
 }
 
-String16 SafeString16::operator+(const SafeString8& _other) const
+String16 Atomic<String16>::operator+(const AtomicString8& _other) const
 {
 	String16 s(*this);
 	String8 other(_other);
@@ -2373,7 +2458,7 @@ String16 SafeString16::operator+(const SafeString8& _other) const
 	return s.getNotNull();
 }
 
-SafeString16& SafeString16::operator+=(const SafeString8& _other)
+AtomicString16& Atomic<String16>::operator+=(const AtomicString8& _other)
 {
 	String16 s(*this);
 	String8 other(_other);
@@ -2416,7 +2501,7 @@ String16& String16::operator+=(const sl_char8* utf8)
 	return *this;
 }
 
-String8 SafeString8::operator+(const sl_char8* utf8) const
+String8 Atomic<String8>::operator+(const sl_char8* utf8) const
 {
 	String8 s(*this);
 	if (utf8) {
@@ -2425,7 +2510,7 @@ String8 SafeString8::operator+(const sl_char8* utf8) const
 	return s.getNotNull();
 }
 
-SafeString8& SafeString8::operator+=(const sl_char8* utf8)
+AtomicString8& Atomic<String8>::operator+=(const sl_char8* utf8)
 {
 	String8 s(*this);
 	if (utf8) {
@@ -2434,7 +2519,7 @@ SafeString8& SafeString8::operator+=(const sl_char8* utf8)
 	return *this;
 }
 
-String16 SafeString16::operator+(const sl_char8* utf8) const
+String16 Atomic<String16>::operator+(const sl_char8* utf8) const
 {
 	String16 s(*this);
 	if (utf8) {
@@ -2443,7 +2528,7 @@ String16 SafeString16::operator+(const sl_char8* utf8) const
 	return s.getNotNull();
 }
 
-SafeString16& SafeString16::operator+=(const sl_char8* utf8)
+AtomicString16& Atomic<String16>::operator+=(const sl_char8* utf8)
 {
 	String16 s(*this);
 	if (utf8) {
@@ -2485,7 +2570,7 @@ String16& String16::operator+=(const sl_char16* utf16)
 	return *this;
 }
 
-String8 SafeString8::operator+(const sl_char16* utf16) const
+String8 Atomic<String8>::operator+(const sl_char16* utf16) const
 {
 	String8 s(*this);
 	if (utf16) {
@@ -2494,7 +2579,7 @@ String8 SafeString8::operator+(const sl_char16* utf16) const
 	return s.getNotNull();
 }
 
-SafeString8& SafeString8::operator+=(const sl_char16* utf16)
+AtomicString8& Atomic<String8>::operator+=(const sl_char16* utf16)
 {
 	String8 s(*this);
 	if (utf16) {
@@ -2503,7 +2588,7 @@ SafeString8& SafeString8::operator+=(const sl_char16* utf16)
 	return *this;
 }
 
-String16 SafeString16::operator+(const sl_char16* utf16) const
+String16 Atomic<String16>::operator+(const sl_char16* utf16) const
 {
 	String16 s(*this);
 	if (utf16) {
@@ -2512,7 +2597,7 @@ String16 SafeString16::operator+(const sl_char16* utf16) const
 	return s.getNotNull();
 }
 
-SafeString16& SafeString16::operator+=(const sl_char16* utf16)
+AtomicString16& Atomic<String16>::operator+=(const sl_char16* utf16)
 {
 	String16 s(*this);
 	if (utf16) {
@@ -2554,7 +2639,7 @@ String16& String16::operator+=(const sl_char32* utf32)
 	return *this;
 }
 
-String8 SafeString8::operator+(const sl_char32* utf32) const
+String8 Atomic<String8>::operator+(const sl_char32* utf32) const
 {
 	String8 s(*this);
 	if (utf32) {
@@ -2563,7 +2648,7 @@ String8 SafeString8::operator+(const sl_char32* utf32) const
 	return s.getNotNull();
 }
 
-SafeString8& SafeString8::operator+=(const sl_char32* utf32)
+AtomicString8& Atomic<String8>::operator+=(const sl_char32* utf32)
 {
 	String8 s(*this);
 	if (utf32) {
@@ -2572,7 +2657,7 @@ SafeString8& SafeString8::operator+=(const sl_char32* utf32)
 	return *this;
 }
 
-String16 SafeString16::operator+(const sl_char32* utf32) const
+String16 Atomic<String16>::operator+(const sl_char32* utf32) const
 {
 	String16 s(*this);
 	if (utf32) {
@@ -2581,7 +2666,7 @@ String16 SafeString16::operator+(const sl_char32* utf32) const
 	return s.getNotNull();
 }
 
-SafeString16& SafeString16::operator+=(const sl_char32* utf32)
+AtomicString16& Atomic<String16>::operator+=(const sl_char32* utf32)
 {
 	String16 s(*this);
 	if (utf32) {
@@ -2607,12 +2692,12 @@ String16 operator+(const sl_char8* utf8, const String16& s)
 	return s.getNotNull();
 }
 
-String8 operator+(const sl_char8* utf8, const SafeString8& s)
+String8 operator+(const sl_char8* utf8, const AtomicString8& s)
 {
 	return utf8 + String8(s);
 }
 
-String16 operator+(const sl_char8* utf8, const SafeString16& s)
+String16 operator+(const sl_char8* utf8, const AtomicString16& s)
 {
 	return utf8 + String16(s);
 }
@@ -2634,12 +2719,12 @@ String16 operator+(const sl_char16* utf16, const String16& s)
 	return s.getNotNull();
 }
 
-String8 operator+(const sl_char16* utf16, const SafeString8& s)
+String8 operator+(const sl_char16* utf16, const AtomicString8& s)
 {
 	return utf16 + String8(s);
 }
 
-String16 operator+(const sl_char16* utf16, const SafeString16& s)
+String16 operator+(const sl_char16* utf16, const AtomicString16& s)
 {
 	return utf16 + String16(s);
 }
@@ -2661,12 +2746,12 @@ String16 operator+(const sl_char32* utf32, const String16& s)
 	return s.getNotNull();
 }
 
-String8 operator+(const sl_char32* utf32, const SafeString8& s)
+String8 operator+(const sl_char32* utf32, const AtomicString8& s)
 {
 	return utf32 + String8(s);
 }
 
-String16 operator+(const sl_char32* utf32, const SafeString16& s)
+String16 operator+(const sl_char32* utf32, const AtomicString16& s)
 {
 	return utf32 + String16(s);
 }
@@ -2702,32 +2787,32 @@ String16 operator+(sl_int32 number, const String16& other)
 	return String16::fromInt32(number) + other;
 }
 
-String8 SafeString8::operator+(sl_int32 number) const
+String8 Atomic<String8>::operator+(sl_int32 number) const
 {
 	return *this + String8::fromInt32(number);
 }
 
-SafeString8& SafeString8::operator+=(sl_int32 number)
+AtomicString8& Atomic<String8>::operator+=(sl_int32 number)
 {
 	return (*this += String8::fromInt32(number));
 }
 
-String8 operator+(sl_int32 number, const SafeString8& other)
+String8 operator+(sl_int32 number, const AtomicString8& other)
 {
 	return String8::fromInt32(number) + other;
 }
 
-String16 SafeString16::operator+(sl_int32 number) const
+String16 Atomic<String16>::operator+(sl_int32 number) const
 {
 	return *this + String16::fromInt32(number);
 }
 
-SafeString16& SafeString16::operator+=(sl_int32 number)
+AtomicString16& Atomic<String16>::operator+=(sl_int32 number)
 {
 	return (*this += String16::fromInt32(number));
 }
 
-String16 operator+(sl_int32 number, const SafeString16& other)
+String16 operator+(sl_int32 number, const AtomicString16& other)
 {
 	return String16::fromInt32(number) + other;
 }
@@ -2763,32 +2848,32 @@ String16 operator+(sl_uint32 number, const String16& other)
 	return String16::fromUint32(number) + other;
 }
 
-String8 SafeString8::operator+(sl_uint32 number) const
+String8 Atomic<String8>::operator+(sl_uint32 number) const
 {
 	return *this + String8::fromUint32(number);
 }
 
-SafeString8& SafeString8::operator+=(sl_uint32 number)
+AtomicString8& Atomic<String8>::operator+=(sl_uint32 number)
 {
 	return (*this += String8::fromUint32(number));
 }
 
-String8 operator+(sl_uint32 number, const SafeString8& other)
+String8 operator+(sl_uint32 number, const AtomicString8& other)
 {
 	return String8::fromUint32(number) + other;
 }
 
-String16 SafeString16::operator+(sl_uint32 number) const
+String16 Atomic<String16>::operator+(sl_uint32 number) const
 {
 	return *this + String16::fromUint32(number);
 }
 
-SafeString16& SafeString16::operator+=(sl_uint32 number)
+AtomicString16& Atomic<String16>::operator+=(sl_uint32 number)
 {
 	return (*this += String16::fromUint32(number));
 }
 
-String16 operator+(sl_uint32 number, const SafeString16& other)
+String16 operator+(sl_uint32 number, const AtomicString16& other)
 {
 	return String16::fromUint32(number) + other;
 }
@@ -2824,32 +2909,32 @@ String16 operator+(sl_int64 number, const String16& other)
 	return String16::fromInt64(number) + other;
 }
 
-String8 SafeString8::operator+(sl_int64 number) const
+String8 Atomic<String8>::operator+(sl_int64 number) const
 {
 	return *this + String8::fromInt64(number);
 }
 
-SafeString8& SafeString8::operator+=(sl_int64 number)
+AtomicString8& Atomic<String8>::operator+=(sl_int64 number)
 {
 	return (*this += String8::fromInt64(number));
 }
 
-String8 operator+(sl_int64 number, const SafeString8& other)
+String8 operator+(sl_int64 number, const AtomicString8& other)
 {
 	return String8::fromInt64(number) + other;
 }
 
-String16 SafeString16::operator+(sl_int64 number) const
+String16 Atomic<String16>::operator+(sl_int64 number) const
 {
 	return *this + String16::fromInt64(number);
 }
 
-SafeString16& SafeString16::operator+=(sl_int64 number)
+AtomicString16& Atomic<String16>::operator+=(sl_int64 number)
 {
 	return (*this += String16::fromInt64(number));
 }
 
-String16 operator+(sl_int64 number, const SafeString16& other)
+String16 operator+(sl_int64 number, const AtomicString16& other)
 {
 	return String16::fromInt64(number) + other;
 }
@@ -2885,32 +2970,32 @@ String16 operator+(sl_uint64 number, const String16& other)
 	return String16::fromUint64(number) + other;
 }
 
-String8 SafeString8::operator+(sl_uint64 number) const
+String8 Atomic<String8>::operator+(sl_uint64 number) const
 {
 	return *this + String8::fromUint64(number);
 }
 
-SafeString8& SafeString8::operator+=(sl_uint64 number)
+AtomicString8& Atomic<String8>::operator+=(sl_uint64 number)
 {
 	return (*this += String8::fromUint64(number));
 }
 
-String8 operator+(sl_uint64 number, const SafeString8& other)
+String8 operator+(sl_uint64 number, const AtomicString8& other)
 {
 	return String8::fromUint64(number) + other;
 }
 
-String16 SafeString16::operator+(sl_uint64 number) const
+String16 Atomic<String16>::operator+(sl_uint64 number) const
 {
 	return *this + String16::fromUint64(number);
 }
 
-SafeString16& SafeString16::operator+=(sl_uint64 number)
+AtomicString16& Atomic<String16>::operator+=(sl_uint64 number)
 {
 	return (*this += String16::fromUint64(number));
 }
 
-String16 operator+(sl_uint64 number, const SafeString16& other)
+String16 operator+(sl_uint64 number, const AtomicString16& other)
 {
 	return String16::fromUint64(number) + other;
 }
@@ -2946,32 +3031,32 @@ String16 operator+(float number, const String16& other)
 	return String16::fromFloat(number) + other;
 }
 
-String8 SafeString8::operator+(float number) const
+String8 Atomic<String8>::operator+(float number) const
 {
 	return *this + String8::fromFloat(number);
 }
 
-SafeString8& SafeString8::operator+=(float number)
+AtomicString8& Atomic<String8>::operator+=(float number)
 {
 	return (*this += String8::fromFloat(number));
 }
 
-String8 operator+(float number, const SafeString8& other)
+String8 operator+(float number, const AtomicString8& other)
 {
 	return String8::fromFloat(number) + other;
 }
 
-String16 SafeString16::operator+(float number) const
+String16 Atomic<String16>::operator+(float number) const
 {
 	return *this + String16::fromFloat(number);
 }
 
-SafeString16& SafeString16::operator+=(float number)
+AtomicString16& Atomic<String16>::operator+=(float number)
 {
 	return (*this += String16::fromFloat(number));
 }
 
-String16 operator+(float number, const SafeString16& other)
+String16 operator+(float number, const AtomicString16& other)
 {
 	return String16::fromFloat(number) + other;
 }
@@ -3007,32 +3092,32 @@ String16 operator+(double number, const String16& other)
 	return String16::fromDouble(number) + other;
 }
 
-String8 SafeString8::operator+(double number) const
+String8 Atomic<String8>::operator+(double number) const
 {
 	return *this + String8::fromDouble(number);
 }
 
-SafeString8& SafeString8::operator+=(double number)
+AtomicString8& Atomic<String8>::operator+=(double number)
 {
 	return (*this += String8::fromDouble(number));
 }
 
-String8 operator+(double number, const SafeString8& other)
+String8 operator+(double number, const AtomicString8& other)
 {
 	return String8::fromDouble(number) + other;
 }
 
-String16 SafeString16::operator+(double number) const
+String16 Atomic<String16>::operator+(double number) const
 {
 	return *this + String16::fromDouble(number);
 }
 
-SafeString16& SafeString16::operator+=(double number)
+AtomicString16& Atomic<String16>::operator+=(double number)
 {
 	return (*this += String16::fromDouble(number));
 }
 
-String16 operator+(double number, const SafeString16& other)
+String16 operator+(double number, const AtomicString16& other)
 {
 	return String16::fromDouble(number) + other;
 }
@@ -3068,32 +3153,32 @@ String16 operator+(sl_bool value, const String16& other)
 	return String8::fromBoolean(value) + other;
 }
 
-String8 SafeString8::operator+(sl_bool value) const
+String8 Atomic<String8>::operator+(sl_bool value) const
 {
 	return *this + String8::fromBoolean(value);
 }
 
-SafeString8& SafeString8::operator+=(sl_bool value)
+AtomicString8& Atomic<String8>::operator+=(sl_bool value)
 {
 	return (*this += String8::fromBoolean(value));
 }
 
-String8 operator+(sl_bool value, const SafeString8& other)
+String8 operator+(sl_bool value, const AtomicString8& other)
 {
 	return String8::fromBoolean(value) + other;
 }
 
-String16 SafeString16::operator+(sl_bool value) const
+String16 Atomic<String16>::operator+(sl_bool value) const
 {
 	return *this + String16::fromBoolean(value);
 }
 
-SafeString16& SafeString16::operator+=(sl_bool value)
+AtomicString16& Atomic<String16>::operator+=(sl_bool value)
 {
 	return (*this += String16::fromBoolean(value));
 }
 
-String16 operator+(sl_bool value, const SafeString16& other)
+String16 operator+(sl_bool value, const AtomicString16& other)
 {
 	return String8::fromBoolean(value) + other;
 }
@@ -3147,13 +3232,13 @@ sl_bool String16::equals(const String16& other) const
 	return sl_true;
 }
 
-sl_bool SafeString8::equals(const String8& other) const
+sl_bool Atomic<String8>::equals(const String8& other) const
 {
 	String8 s(*this);
 	return s.equals(other);
 }
 
-sl_bool SafeString16::equals(const String16& other) const
+sl_bool Atomic<String16>::equals(const String16& other) const
 {
 	String16 s(*this);
 	return s.equals(other);
@@ -3186,39 +3271,39 @@ sl_bool String16::equals(const String8& _other) const
 	return _equals16(s1, l1, s2, l2);
 }
 
-sl_bool SafeString8::equals(const String16& other) const
+sl_bool Atomic<String8>::equals(const String16& other) const
 {
 	String8 s(*this);
 	return s.equals(other);
 }
 
-sl_bool SafeString16::equals(const String8& other) const
+sl_bool Atomic<String16>::equals(const String8& other) const
 {
 	String16 s(*this);
 	return s.equals(other);
 }
 
 
-sl_bool String8::equals(const SafeString8& _other) const
+sl_bool String8::equals(const AtomicString8& _other) const
 {
 	String8 other(_other);
 	return equals(other);
 }
 
-sl_bool String16::equals(const SafeString16& _other) const
+sl_bool String16::equals(const AtomicString16& _other) const
 {
 	String16 other(_other);
 	return equals(other);
 }
 
-sl_bool SafeString8::equals(const SafeString8& _other) const
+sl_bool Atomic<String8>::equals(const AtomicString8& _other) const
 {
 	String8 s(*this);
 	String8 other(_other);
 	return s.equals(other);
 }
 
-sl_bool SafeString16::equals(const SafeString16& _other) const
+sl_bool Atomic<String16>::equals(const AtomicString16& _other) const
 {
 	String16 s(*this);
 	String16 other(_other);
@@ -3226,26 +3311,26 @@ sl_bool SafeString16::equals(const SafeString16& _other) const
 }
 
 
-sl_bool String8::equals(const SafeString16& _other) const
+sl_bool String8::equals(const AtomicString16& _other) const
 {
 	String16 other(_other);
 	return equals(other);
 }
 
-sl_bool String16::equals(const SafeString8& _other) const
+sl_bool String16::equals(const AtomicString8& _other) const
 {
 	String8 other(_other);
 	return equals(other);
 }
 
-sl_bool SafeString8::equals(const SafeString16& _other) const
+sl_bool Atomic<String8>::equals(const AtomicString16& _other) const
 {
 	String8 s(*this);
 	String16 other(_other);
 	return s.equals(other);
 }
 
-sl_bool SafeString16::equals(const SafeString8& _other) const
+sl_bool Atomic<String16>::equals(const AtomicString8& _other) const
 {
 	String16 s(*this);
 	String8 other(_other);
@@ -3267,7 +3352,7 @@ sl_bool String16::equals(const sl_char8* utf8) const
 	return _equals8(getData(), getLength(), utf8, -1);
 }
 
-sl_bool SafeString8::equals(const sl_char8* utf8) const
+sl_bool Atomic<String8>::equals(const sl_char8* utf8) const
 {
 	String8 s(*this);
 	sl_char8* sz = s.getData();
@@ -3277,7 +3362,7 @@ sl_bool SafeString8::equals(const sl_char8* utf8) const
 	return String8::_equals8(sz, s.getLength(), utf8, -1);
 }
 
-sl_bool SafeString16::equals(const sl_char8* utf8) const
+sl_bool Atomic<String16>::equals(const sl_char8* utf8) const
 {
 	String16 s(*this);
 	return String16::_equals8(s.getData(), s.getLength(), utf8, -1);
@@ -3298,13 +3383,13 @@ sl_bool String16::equals(const sl_char16* utf16) const
 	return _equals16(sz, getLength(), utf16, -1);
 }
 
-sl_bool SafeString8::equals(const sl_char16* utf16) const
+sl_bool Atomic<String8>::equals(const sl_char16* utf16) const
 {
 	String8 s(*this);
 	return String8::_equals16(s.getData(), s.getLength(), utf16, -1);
 }
 
-sl_bool SafeString16::equals(const sl_char16* utf16) const
+sl_bool Atomic<String16>::equals(const sl_char16* utf16) const
 {
 	String16 s(*this);
 	sl_char16* sz = s.getData();
@@ -3325,13 +3410,13 @@ sl_bool String16::equals(const sl_char32* utf32) const
 	return _equals32(getData(), getLength(), utf32, -1);
 }
 
-sl_bool SafeString8::equals(const sl_char32* utf32) const
+sl_bool Atomic<String8>::equals(const sl_char32* utf32) const
 {
 	String8 s(*this);
 	return String8::_equals32(s.getData(), s.getLength(), utf32, -1);
 }
 
-sl_bool SafeString16::equals(const sl_char32* utf32) const
+sl_bool Atomic<String16>::equals(const sl_char32* utf32) const
 {
 	String16 s(*this);
 	return String16::_equals32(s.getData(), s.getLength(), utf32, -1);
@@ -3418,13 +3503,13 @@ sl_int32 String16::compare(const String16& other) const
 	return 0;
 }
 
-sl_int32 SafeString8::compare(const String8& other) const
+sl_int32 Atomic<String8>::compare(const String8& other) const
 {
 	String s(*this);
 	return s.compare(other);
 }
 
-sl_int32 SafeString16::compare(const String16& other) const
+sl_int32 Atomic<String16>::compare(const String16& other) const
 {
 	String16 s(*this);
 	return s.compare(other);
@@ -3443,39 +3528,39 @@ sl_int32 String16::compare(const String8& _other) const
 	return _compare16(getData(), getLength(), other.getData(), other.getLength());
 }
 
-sl_int32 SafeString8::compare(const String16& other) const
+sl_int32 Atomic<String8>::compare(const String16& other) const
 {
 	String8 s(*this);
 	return s.compare(other);
 }
 
-sl_int32 SafeString16::compare(const String8& other) const
+sl_int32 Atomic<String16>::compare(const String8& other) const
 {
 	String16 s(*this);
 	return s.compare(other);
 }
 
 
-sl_int32 String8::compare(const SafeString8& _other) const
+sl_int32 String8::compare(const AtomicString8& _other) const
 {
 	String8 other(_other);
 	return compare(other);
 }
 
-sl_int32 String16::compare(const SafeString16& _other) const
+sl_int32 String16::compare(const AtomicString16& _other) const
 {
 	String16 other(_other);
 	return compare(other);
 }
 
-sl_int32 SafeString8::compare(const SafeString8& _other) const
+sl_int32 Atomic<String8>::compare(const AtomicString8& _other) const
 {
 	String8 s(*this);
 	String8 other(_other);
 	return s.compare(other);
 }
 
-sl_int32 SafeString16::compare(const SafeString16& _other) const
+sl_int32 Atomic<String16>::compare(const AtomicString16& _other) const
 {
 	String16 s(*this);
 	String16 other(_other);
@@ -3483,26 +3568,26 @@ sl_int32 SafeString16::compare(const SafeString16& _other) const
 }
 
 
-sl_int32 String8::compare(const SafeString16& _other) const
+sl_int32 String8::compare(const AtomicString16& _other) const
 {
 	String16 other(_other);
 	return compare(other);
 }
 
-sl_int32 String16::compare(const SafeString8& _other) const
+sl_int32 String16::compare(const AtomicString8& _other) const
 {
 	String8 other(_other);
 	return compare(other);
 }
 
-sl_int32 SafeString8::compare(const SafeString16& _other) const
+sl_int32 Atomic<String8>::compare(const AtomicString16& _other) const
 {
 	String8 s(*this);
 	String16 other(_other);
 	return s.compare(other);
 }
 
-sl_int32 SafeString16::compare(const SafeString8& _other) const
+sl_int32 Atomic<String16>::compare(const AtomicString8& _other) const
 {
 	String16 s(*this);
 	String8 other(_other);
@@ -3524,13 +3609,13 @@ sl_int32 String16::compare(const sl_char8* utf8) const
 	return _compare8(getData(), getLength(), utf8, -1);
 }
 
-sl_int32 SafeString8::compare(const sl_char8* utf8) const
+sl_int32 Atomic<String8>::compare(const sl_char8* utf8) const
 {
 	String8 s(*this);
 	return s.compare(utf8);
 }
 
-sl_int32 SafeString16::compare(const sl_char8* utf8) const
+sl_int32 Atomic<String16>::compare(const sl_char8* utf8) const
 {
 	String16 s(*this);
 	return s.compare(utf8);
@@ -3551,13 +3636,13 @@ sl_int32 String16::compare(const sl_char16* utf16) const
 	return _compare16(sz, getLength(), utf16, -1);
 }
 
-sl_int32 SafeString8::compare(const sl_char16* utf16) const
+sl_int32 Atomic<String8>::compare(const sl_char16* utf16) const
 {
 	String8 s(*this);
 	return s.compare(utf16);
 }
 
-sl_int32 SafeString16::compare(const sl_char16* utf16) const
+sl_int32 Atomic<String16>::compare(const sl_char16* utf16) const
 {
 	String16 s(*this);
 	return s.compare(utf16);
@@ -3574,13 +3659,13 @@ sl_int32 String16::compare(const sl_char32* utf32) const
 	return _compare32(getData(), getLength(), utf32, -1);
 }
 
-sl_int32 SafeString8::compare(const sl_char32* utf32) const
+sl_int32 Atomic<String8>::compare(const sl_char32* utf32) const
 {
 	String8 s(*this);
 	return s.compare(utf32);
 }
 
-sl_int32 SafeString16::compare(const sl_char32* utf32) const
+sl_int32 Atomic<String16>::compare(const sl_char32* utf32) const
 {
 	String16 s(*this);
 	return s.compare(utf32);
@@ -3623,13 +3708,13 @@ sl_int32 String16::compare(const String16& other, sl_size len) const
 	return _compare16(s1, l1, s2, l2);
 }
 
-sl_int32 SafeString8::compare(const String8& other, sl_size len) const
+sl_int32 Atomic<String8>::compare(const String8& other, sl_size len) const
 {
 	String8 s(*this);
 	return s.compare(other, len);
 }
 
-sl_int32 SafeString16::compare(const String16& other, sl_size len) const
+sl_int32 Atomic<String16>::compare(const String16& other, sl_size len) const
 {
 	String16 s(*this);
 	return s.compare(other, len);
@@ -3682,13 +3767,13 @@ sl_bool String16::equalsIgnoreCase(const String16& other) const
 	return sl_true;
 }
 
-sl_bool SafeString8::equalsIgnoreCase(const String8& other) const
+sl_bool Atomic<String8>::equalsIgnoreCase(const String8& other) const
 {
 	String8 s(*this);
 	return s.equalsIgnoreCase(other);
 }
 
-sl_bool SafeString16::equalsIgnoreCase(const String16& other) const
+sl_bool Atomic<String16>::equalsIgnoreCase(const String16& other) const
 {
 	String16 s(*this);
 	return s.equalsIgnoreCase(other);
@@ -3779,13 +3864,13 @@ sl_int32 String16::compareIgnoreCase(const String16& other) const
 	return 0;
 }
 
-sl_int32 SafeString8::compareIgnoreCase(const String8& other) const
+sl_int32 Atomic<String8>::compareIgnoreCase(const String8& other) const
 {
 	String8 s(*this);
 	return s.compareIgnoreCase(other);
 }
 
-sl_int32 SafeString16::compareIgnoreCase(const String16& other) const
+sl_int32 Atomic<String16>::compareIgnoreCase(const String16& other) const
 {
 	String16 s(*this);
 	return s.compareIgnoreCase(other);
@@ -3801,11 +3886,11 @@ sl_bool CLASS::OP(const String16& other) const \
 { \
 	return BODY; \
 } \
-sl_bool CLASS::OP(const SafeString8& other) const \
+sl_bool CLASS::OP(const AtomicString8& other) const \
 { \
 	return BODY; \
 } \
-sl_bool CLASS::OP(const SafeString16& other) const \
+sl_bool CLASS::OP(const AtomicString16& other) const \
 { \
 	return BODY; \
 } \
@@ -3849,19 +3934,19 @@ _DEFINE_STRING_COMPARE_FUNCS(String16, operator<=, compare(other)<=0, s.compare(
 _DEFINE_STRING_COMPARE_FUNCS(String16, operator>, compare(other)>0, s.compare(other)<0)
 _DEFINE_STRING_COMPARE_FUNCS(String16, operator<, compare(other)<0, s.compare(other)>0)
 
-_DEFINE_STRING_COMPARE_FUNCS(SafeString8, operator==, equals(other), s.equals(other))
-_DEFINE_STRING_COMPARE_FUNCS(SafeString8, operator!=, !(equals(other)), !(s.equals(other)))
-_DEFINE_STRING_COMPARE_FUNCS(SafeString8, operator>=, compare(other)>=0, s.compare(other)<=0)
-_DEFINE_STRING_COMPARE_FUNCS(SafeString8, operator<=, compare(other)<=0, s.compare(other)>=0)
-_DEFINE_STRING_COMPARE_FUNCS(SafeString8, operator>, compare(other)>0, s.compare(other)<0)
-_DEFINE_STRING_COMPARE_FUNCS(SafeString8, operator<, compare(other)<0, s.compare(other)>0)
+_DEFINE_STRING_COMPARE_FUNCS(AtomicString8, operator==, equals(other), s.equals(other))
+_DEFINE_STRING_COMPARE_FUNCS(AtomicString8, operator!=, !(equals(other)), !(s.equals(other)))
+_DEFINE_STRING_COMPARE_FUNCS(AtomicString8, operator>=, compare(other)>=0, s.compare(other)<=0)
+_DEFINE_STRING_COMPARE_FUNCS(AtomicString8, operator<=, compare(other)<=0, s.compare(other)>=0)
+_DEFINE_STRING_COMPARE_FUNCS(AtomicString8, operator>, compare(other)>0, s.compare(other)<0)
+_DEFINE_STRING_COMPARE_FUNCS(AtomicString8, operator<, compare(other)<0, s.compare(other)>0)
 
-_DEFINE_STRING_COMPARE_FUNCS(SafeString16, operator==, equals(other), s.equals(other))
-_DEFINE_STRING_COMPARE_FUNCS(SafeString16, operator!=, !(equals(other)), !(s.equals(other)))
-_DEFINE_STRING_COMPARE_FUNCS(SafeString16, operator>=, compare(other)>=0, s.compare(other)<=0)
-_DEFINE_STRING_COMPARE_FUNCS(SafeString16, operator<=, compare(other)<=0, s.compare(other)>=0)
-_DEFINE_STRING_COMPARE_FUNCS(SafeString16, operator>, compare(other)>0, s.compare(other)<0)
-_DEFINE_STRING_COMPARE_FUNCS(SafeString16, operator<, compare(other)<0, s.compare(other)>0)
+_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator==, equals(other), s.equals(other))
+_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator!=, !(equals(other)), !(s.equals(other)))
+_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator>=, compare(other)>=0, s.compare(other)<=0)
+_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator<=, compare(other)<=0, s.compare(other)>=0)
+_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator>, compare(other)>0, s.compare(other)<0)
+_DEFINE_STRING_COMPARE_FUNCS(AtomicString16, operator<, compare(other)<0, s.compare(other)>0)
 
 String8 String8::duplicate() const
 {
@@ -3873,13 +3958,13 @@ String16 String16::duplicate() const
     return String16(getData(), getLength());
 }
 
-String8 SafeString8::duplicate() const
+String8 Atomic<String8>::duplicate() const
 {
     String8 s(*this);
     return s.duplicate();
 }
 
-String16 SafeString16::duplicate() const
+String16 Atomic<String16>::duplicate() const
 {
     String16 s(*this);
     return s.duplicate();
@@ -3905,13 +3990,13 @@ Memory String16::toStaticMemory() const
 	return Memory::createStatic(getData(), getLength()*sizeof(sl_char16));
 }
 
-Memory SafeString8::toMemory() const
+Memory Atomic<String8>::toMemory() const
 {
     String8 s(*this);
     return s.toMemory();
 }
 
-Memory SafeString16::toMemory() const
+Memory Atomic<String16>::toMemory() const
 {
 	String16 s(*this);
 	return s.toMemory();
@@ -3968,25 +4053,25 @@ sl_bool String16::getUtf8(StringData& output) const
 	return sl_false;
 }
 
-sl_size SafeString8::getUtf16(sl_char16* utf16, sl_size len) const
+sl_size Atomic<String8>::getUtf16(sl_char16* utf16, sl_size len) const
 {
     String8 s(*this);
     return s.getUtf16(utf16, len);
 }
 
-sl_bool SafeString8::getUtf16(StringData& output) const
+sl_bool Atomic<String8>::getUtf16(StringData& output) const
 {
     String8 s(*this);
     return s.getUtf16(output);
 }
 
-sl_size SafeString16::getUtf8(sl_char8* utf8, sl_size len) const
+sl_size Atomic<String16>::getUtf8(sl_char8* utf8, sl_size len) const
 {
 	String16 s(*this);
 	return s.getUtf8(utf8, len);
 }
 
-sl_bool SafeString16::getUtf8(StringData& output) const
+sl_bool Atomic<String16>::getUtf8(StringData& output) const
 {
 	String16 s(*this);
 	return s.getUtf8(output);
@@ -4020,13 +4105,13 @@ Memory String16::toUtf8() const
 	return memory;
 }
 
-Memory SafeString8::toUtf16() const
+Memory Atomic<String8>::toUtf16() const
 {
     String8 s(*this);
     return s.toUtf16();
 }
 
-Memory SafeString16::toUtf8() const
+Memory Atomic<String16>::toUtf8() const
 {
 	String16 s(*this);
 	return s.toUtf8();
@@ -4057,13 +4142,13 @@ sl_bool String8::getUtf32(StringData& output) const
 	return sl_false;
 }
 
-sl_size SafeString8::getUtf32(sl_char32* utf32, sl_size len) const
+sl_size Atomic<String8>::getUtf32(sl_char32* utf32, sl_size len) const
 {
     String8 s(*this);
     return s.getUtf32(utf32, len);
 }
 
-sl_bool SafeString8::getUtf32(StringData& output) const
+sl_bool Atomic<String8>::getUtf32(StringData& output) const
 {
     String8 s(*this);
     return s.getUtf32(output);
@@ -4083,7 +4168,7 @@ Memory String8::toUtf32() const
 	return memory;
 }
 
-Memory SafeString8::toUtf32() const
+Memory Atomic<String8>::toUtf32() const
 {
     String8 s(*this);
     return s.toUtf32();
@@ -4099,7 +4184,7 @@ String8 String8::substring(sl_reg start, sl_reg end) const
 		end = count;
 	}
 	if (start >= end) {
-		return String8::null();
+		return sl_null;
 	}
 	if (start == 0 && end == count) {
 		return *this;
@@ -4117,7 +4202,7 @@ String16 String16::substring(sl_reg start, sl_reg end) const
 		end = count;
 	}
 	if (start >= end) {
-		return String16::null();
+		return sl_null;
 	}
 	if (start == 0 && end == count) {
 		return *this;
@@ -4125,13 +4210,13 @@ String16 String16::substring(sl_reg start, sl_reg end) const
 	return String16(getData() + start, end - start);
 }
 
-String8 SafeString8::substring(sl_reg start, sl_reg end) const
+String8 Atomic<String8>::substring(sl_reg start, sl_reg end) const
 {
     String8 s(*this);
     return s.substring(start, end);
 }
 
-String16 SafeString16::substring(sl_reg start, sl_reg end) const
+String16 Atomic<String16>::substring(sl_reg start, sl_reg end) const
 {
 	String16 s(*this);
 	return s.substring(start, end);
@@ -4147,13 +4232,13 @@ String16 String16::left(sl_reg len) const
     return substring( 0, len );
 }
 
-String8 SafeString8::left(sl_reg len) const
+String8 Atomic<String8>::left(sl_reg len) const
 {
     String8 s(*this);
     return s.left(len);
 }
 
-String16 SafeString16::left(sl_reg len) const
+String16 Atomic<String16>::left(sl_reg len) const
 {
 	String16 s(*this);
 	return s.left(len);
@@ -4169,13 +4254,13 @@ String16 String16::right(sl_reg len) const
     return substring(getLength() - len);
 }
 
-String8 SafeString8::right(sl_reg len) const
+String8 Atomic<String8>::right(sl_reg len) const
 {
 	String8 s(*this);
 	return s.right(len);
 }
 
-String16 SafeString16::right(sl_reg len) const
+String16 Atomic<String16>::right(sl_reg len) const
 {
 	String16 s(*this);
 	return s.right(len);
@@ -4191,13 +4276,13 @@ String16 String16::mid(sl_reg start, sl_reg len) const
     return substring(start, start+len);
 }
 
-String8 SafeString8::mid(sl_reg start, sl_reg len) const
+String8 Atomic<String8>::mid(sl_reg start, sl_reg len) const
 {
 	String8 s(*this);
 	return s.mid(start, len);
 }
 
-String16 SafeString16::mid(sl_reg start, sl_reg len) const
+String16 Atomic<String16>::mid(sl_reg start, sl_reg len) const
 {
 	String16 s(*this);
 	return s.mid(start, len);
@@ -4251,13 +4336,13 @@ sl_reg String16::indexOf(sl_char16 ch, sl_reg _start) const
 	}
 }
 
-sl_reg SafeString8::indexOf(sl_char8 ch, sl_reg start) const
+sl_reg Atomic<String8>::indexOf(sl_char8 ch, sl_reg start) const
 {
 	String8 s(*this);
 	return s.indexOf(ch, start);
 }
 
-sl_reg SafeString16::indexOf(sl_char16 ch, sl_reg start) const
+sl_reg Atomic<String16>::indexOf(sl_char16 ch, sl_reg start) const
 {
 	String16 s(*this);
 	return s.indexOf(ch, start);
@@ -4310,13 +4395,13 @@ sl_reg String16::indexOf(const String16& pattern, sl_reg start) const
 	return _String_indexOf<String16, sl_char16, _TemplateFunc16>(*this, pattern.getData(), pattern.getLength(), start);
 }
 
-sl_reg SafeString8::indexOf(const String8& str, sl_reg start) const
+sl_reg Atomic<String8>::indexOf(const String8& str, sl_reg start) const
 {
 	String8 s(*this);
 	return s.indexOf(str, start);
 }
 
-sl_reg SafeString16::indexOf(const String16& str, sl_reg start) const
+sl_reg Atomic<String16>::indexOf(const String16& str, sl_reg start) const
 {
 	String16 s(*this);
 	return s.indexOf(str, start);
@@ -4332,13 +4417,13 @@ sl_reg String16::indexOf(const sl_char16* pattern, sl_reg start) const
 	return _String_indexOf<String16, sl_char16, _TemplateFunc16>(*this, pattern, Base::getStringLength2(pattern), start);
 }
 
-sl_reg SafeString8::indexOf(const sl_char8* pattern, sl_reg start) const
+sl_reg Atomic<String8>::indexOf(const sl_char8* pattern, sl_reg start) const
 {
 	String8 s(*this);
 	return s.indexOf(pattern, start);
 }
 
-sl_reg SafeString16::indexOf(const sl_char16* pattern, sl_reg start) const
+sl_reg Atomic<String16>::indexOf(const sl_char16* pattern, sl_reg start) const
 {
 	String16 s(*this);
 	return s.indexOf(pattern, start);
@@ -4392,13 +4477,13 @@ sl_reg String16::lastIndexOf(sl_char16 ch, sl_reg _start) const
 	}
 }
 
-sl_reg SafeString8::lastIndexOf(sl_char8 ch, sl_reg start) const
+sl_reg Atomic<String8>::lastIndexOf(sl_char8 ch, sl_reg start) const
 {
 	String8 s(*this);
 	return s.lastIndexOf(ch, start);
 }
 
-sl_reg SafeString16::lastIndexOf(sl_char16 ch, sl_reg start) const
+sl_reg Atomic<String16>::lastIndexOf(sl_char16 ch, sl_reg start) const
 {
 	String16 s(*this);
 	return s.lastIndexOf(ch, start);
@@ -4452,13 +4537,13 @@ sl_reg String16::lastIndexOf(const String16& pattern, sl_reg start) const
 	return _String_lastIndexOf<String16, sl_char16, _TemplateFunc16>(*this, pattern.getData(), pattern.getLength(), start);
 }
 
-sl_reg SafeString8::lastIndexOf(const String8& str, sl_reg start) const
+sl_reg Atomic<String8>::lastIndexOf(const String8& str, sl_reg start) const
 {
 	String8 s(*this);
 	return s.indexOf(str, start);
 }
 
-sl_reg SafeString16::lastIndexOf(const String16& str, sl_reg start) const
+sl_reg Atomic<String16>::lastIndexOf(const String16& str, sl_reg start) const
 {
 	String16 s(*this);
 	return s.indexOf(str, start);
@@ -4474,13 +4559,13 @@ sl_reg String16::lastIndexOf(const sl_char16* pattern, sl_reg start) const
 	return _String_lastIndexOf<String16, sl_char16, _TemplateFunc16>(*this, pattern, Base::getStringLength2(pattern), start);
 }
 
-sl_reg SafeString8::lastIndexOf(const sl_char8* pattern, sl_reg start) const
+sl_reg Atomic<String8>::lastIndexOf(const sl_char8* pattern, sl_reg start) const
 {
 	String8 s(*this);
 	return s.indexOf(pattern, start);
 }
 
-sl_reg SafeString16::lastIndexOf(const sl_char16* pattern, sl_reg start) const
+sl_reg Atomic<String16>::lastIndexOf(const sl_char16* pattern, sl_reg start) const
 {
 	String16 s(*this);
 	return s.indexOf(pattern, start);
@@ -4491,7 +4576,7 @@ sl_bool String8::startsWith(sl_char8 ch) const
 	if (isEmpty()) {
 		return sl_false;
 	} else {
-		return m_container->sz[0] == ch;
+		return getData()[0] == ch;
 	}
 }
 
@@ -4500,17 +4585,17 @@ sl_bool String16::startsWith(sl_char16 ch) const
 	if (isEmpty()) {
 		return sl_false;
 	} else {
-		return m_container->sz[0] == ch;
+		return getData()[0] == ch;
 	}
 }
 
-sl_bool SafeString8::startsWith(sl_char8 ch) const
+sl_bool Atomic<String8>::startsWith(sl_char8 ch) const
 {
 	String8 s(*this);
 	return s.startsWith(ch);
 }
 
-sl_bool SafeString16::startsWith(sl_char16 ch) const
+sl_bool Atomic<String16>::startsWith(sl_char16 ch) const
 {
 	String16 s(*this);
 	return s.startsWith(ch);
@@ -4545,13 +4630,13 @@ sl_bool String16::startsWith(const String16& str) const
 	}
 }
 
-sl_bool SafeString8::startsWith(const String8& str) const
+sl_bool Atomic<String8>::startsWith(const String8& str) const
 {
 	String8 s(*this);
 	return s.startsWith(str);
 }
 
-sl_bool SafeString16::startsWith(const String16& str) const
+sl_bool Atomic<String16>::startsWith(const String16& str) const
 {
 	String16 s(*this);
 	return s.startsWith(str);
@@ -4594,13 +4679,13 @@ sl_bool String16::startsWith(const sl_char16* str) const
 	return sl_false;
 }
 
-sl_bool SafeString8::startsWith(const sl_char8* str) const
+sl_bool Atomic<String8>::startsWith(const sl_char8* str) const
 {
 	String8 s(*this);
 	return s.startsWith(str);
 }
 
-sl_bool SafeString16::startsWith(const sl_char16* str) const
+sl_bool Atomic<String16>::startsWith(const sl_char16* str) const
 {
 	String16 s(*this);
 	return s.startsWith(str);
@@ -4612,7 +4697,7 @@ sl_bool String8::endsWith(sl_char8 ch) const
 	if (count < 1) {
 		return sl_false;
 	} else {
-		return m_container->sz[count - 1] == ch;
+		return getData()[count - 1] == ch;
 	}
 }
 
@@ -4622,17 +4707,17 @@ sl_bool String16::endsWith(sl_char16 ch) const
 	if (count < 1) {
 		return sl_false;
 	} else {
-		return m_container->sz[count - 1] == ch;
+		return getData()[count - 1] == ch;
 	}
 }
 
-sl_bool SafeString8::endsWith(sl_char8 ch) const
+sl_bool Atomic<String8>::endsWith(sl_char8 ch) const
 {
 	String8 s(*this);
 	return s.endsWith(ch);
 }
 
-sl_bool SafeString16::endsWith(sl_char16 ch) const
+sl_bool Atomic<String16>::endsWith(sl_char16 ch) const
 {
 	String16 s(*this);
 	return s.endsWith(ch);
@@ -4667,13 +4752,13 @@ sl_bool String16::endsWith(const String16& str) const
 	}
 }
 
-sl_bool SafeString8::endsWith(const String8& str) const
+sl_bool Atomic<String8>::endsWith(const String8& str) const
 {
 	String8 s(*this);
 	return s.endsWith(str);
 }
 
-sl_bool SafeString16::endsWith(const String16& str) const
+sl_bool Atomic<String16>::endsWith(const String16& str) const
 {
 	String16 s(*this);
 	return s.endsWith(str);
@@ -4707,13 +4792,13 @@ sl_bool String16::endsWith(const sl_char16* str) const
 	}
 }
 
-sl_bool SafeString8::endsWith(const sl_char8* str) const
+sl_bool Atomic<String8>::endsWith(const sl_char8* str) const
 {
 	String8 s(*this);
 	return s.endsWith(str);
 }
 
-sl_bool SafeString16::endsWith(const sl_char16* str) const
+sl_bool Atomic<String16>::endsWith(const sl_char16* str) const
 {
 	String16 s(*this);
 	return s.endsWith(str);
@@ -4729,13 +4814,13 @@ sl_bool String16::contains(sl_char16 ch) const
     return indexOf(ch) >= 0;
 }
 
-sl_bool SafeString8::constains(sl_char8 ch) const
+sl_bool Atomic<String8>::constains(sl_char8 ch) const
 {
 	String8 s(*this);
 	return s.contains(ch);
 }
 
-sl_bool SafeString16::contains(sl_char16 ch) const
+sl_bool Atomic<String16>::contains(sl_char16 ch) const
 {
 	String16 s(*this);
 	return s.contains(ch);
@@ -4751,13 +4836,13 @@ sl_bool String16::contains(const String16& str) const
     return indexOf(str) >= 0;
 }
 
-sl_bool SafeString8::contains(const String8& str) const
+sl_bool Atomic<String8>::contains(const String8& str) const
 {
 	String8 s(*this);
 	return s.contains(str);
 }
 
-sl_bool SafeString16::contains(const String16& str) const
+sl_bool Atomic<String16>::contains(const String16& str) const
 {
 	String16 s(*this);
 	return s.contains(str);
@@ -4773,13 +4858,13 @@ sl_bool String16::contains(const sl_char16* str) const
 	return indexOf(str) >= 0;
 }
 
-sl_bool SafeString8::contains(const sl_char8* str) const
+sl_bool Atomic<String8>::contains(const sl_char8* str) const
 {
 	String8 s(*this);
 	return s.contains(str);
 }
 
-sl_bool SafeString16::contains(const sl_char16* str) const
+sl_bool Atomic<String16>::contains(const sl_char16* str) const
 {
 	String16 s(*this);
 	return s.contains(str);
@@ -4811,13 +4896,13 @@ void String16::makeUpper()
 	_String_copyMakingUpper(getData(), getData(), getLength());
 }
 
-void SafeString8::makeUpper()
+void Atomic<String8>::makeUpper()
 {
 	String8 s(*this);
 	_String_copyMakingUpper(s.getData(), s.getData(), s.getLength());
 }
 
-void SafeString16::makeUpper()
+void Atomic<String16>::makeUpper()
 {
 	String16 s(*this);
 	_String_copyMakingUpper(s.getData(), s.getData(), s.getLength());
@@ -4833,13 +4918,13 @@ void String16::makeLower()
 	_String_copyMakingLower(getData(), getData(), getLength());
 }
 
-void SafeString8::makeLower()
+void Atomic<String8>::makeLower()
 {
 	String8 s(*this);
 	_String_copyMakingLower(s.getData(), s.getData(), s.getLength());
 }
 
-void SafeString16::makeLower()
+void Atomic<String16>::makeLower()
 {
 	String16 s(*this);
 	_String_copyMakingLower(s.getData(), s.getData(), s.getLength());
@@ -4924,7 +5009,7 @@ String16 String16::toLower(const sl_char16* sz, sl_reg _len)
 String8 String8::toUpper() const
 {
 	if (isNull()) {
-		return String8::null();
+		return sl_null;
 	}
 	return toUpper(getData(), getLength());
 }
@@ -4932,24 +5017,24 @@ String8 String8::toUpper() const
 String16 String16::toUpper() const
 {
 	if (isNull()) {
-		return String16::null();
+		return sl_null;
 	}
 	return toUpper(getData(), getLength());
 }
 
-String8 SafeString8::toUpper() const
+String8 Atomic<String8>::toUpper() const
 {
 	if (isNull()) {
-		return String8::null();
+		return sl_null;
 	}
 	String8 s(*this);
 	return String8::toUpper(s.getData(), s.getLength());
 }
 
-String16 SafeString16::toUpper() const
+String16 Atomic<String16>::toUpper() const
 {
 	if (isNull()) {
-		return String16::null();
+		return sl_null;
 	}
 	String16 s(*this);
 	return String16::toUpper(s.getData(), s.getLength());
@@ -4958,7 +5043,7 @@ String16 SafeString16::toUpper() const
 String8 String8::toLower() const
 {
 	if (isNull()) {
-		return String8::null();
+		return sl_null;
 	}
 	return toLower(getData(), getLength());
 }
@@ -4966,24 +5051,24 @@ String8 String8::toLower() const
 String16 String16::toLower() const
 {
 	if (isNull()) {
-		return String16::null();
+		return sl_null;
 	}
 	return toLower(getData(), getLength());
 }
 
-String8 SafeString8::toLower() const
+String8 Atomic<String8>::toLower() const
 {
 	if (isNull()) {
-		return String8::null();
+		return sl_null;
 	}
 	String8 s(*this);
 	return String8::toLower(s.getData(), s.getLength());
 }
 
-String16 SafeString16::toLower() const
+String16 Atomic<String16>::toLower() const
 {
 	if (isNull()) {
-		return String16::null();
+		return sl_null;
 	}
 	String16 s(*this);
 	return String16::toLower(s.getData(), s.getLength());
@@ -5000,13 +5085,13 @@ template <class ST, class CT>
 SLIB_INLINE ST _String_replaceAll(const ST& str, const CT* pattern, sl_reg countPat, const CT* bufReplace, sl_reg countReplace)
 {
 	if (countPat == 0) {
-		return ST::null();
+		return sl_null;
 	}
 	sl_reg count = str.getLength();
 	if (count == 0) {
-		return ST::null();
+		return sl_null;
 	}
-	Queue<STRING_REPLACE_SUBSET> queue;
+	LinkedQueue<STRING_REPLACE_SUBSET> queue;
 	STRING_REPLACE_SUBSET subset;
 	const CT* buf = str.getData();
 	sl_reg size = 0;
@@ -5050,13 +5135,13 @@ String16 String16::replaceAll(const String16& pattern, const String16& replaceme
 	return _String_replaceAll<String16, sl_char16>(*this, pattern.getData(), pattern.getLength(), replacement.getData(), replacement.getLength());
 }
 
-String8 SafeString8::replaceAll(const String8& pattern, const String8& replacement) const
+String8 Atomic<String8>::replaceAll(const String8& pattern, const String8& replacement) const
 {
 	String8 s(*this);
 	return s.replaceAll(pattern, replacement);
 }
 
-String16 SafeString16::replaceAll(const String16& pattern, const String16& replacement) const
+String16 Atomic<String16>::replaceAll(const String16& pattern, const String16& replacement) const
 {
 	String16 s(*this);
 	return s.replaceAll(pattern, replacement);
@@ -5072,13 +5157,13 @@ String16 String16::replaceAll(const String16& pattern, const sl_char16* replacem
 	return _String_replaceAll<String16, sl_char16>(*this, pattern.getData(), pattern.getLength(), replacement, Base::getStringLength2(replacement));
 }
 
-String8 SafeString8::replaceAll(const String8& pattern, const sl_char8* replacement) const
+String8 Atomic<String8>::replaceAll(const String8& pattern, const sl_char8* replacement) const
 {
 	String8 s(*this);
 	return s.replaceAll(pattern, replacement);
 }
 
-String16 SafeString16::replaceAll(const String16& pattern, const sl_char16* replacement) const
+String16 Atomic<String16>::replaceAll(const String16& pattern, const sl_char16* replacement) const
 {
 	String16 s(*this);
 	return s.replaceAll(pattern, replacement);
@@ -5094,13 +5179,13 @@ String16 String16::replaceAll(const sl_char16* pattern, const String16& replacem
 	return _String_replaceAll<String16, sl_char16>(*this, pattern, Base::getStringLength2(pattern), replacement.getData(), replacement.getLength());
 }
 
-String8 SafeString8::replaceAll(const sl_char8* pattern, const String8& replacement) const
+String8 Atomic<String8>::replaceAll(const sl_char8* pattern, const String8& replacement) const
 {
 	String8 s(*this);
 	return s.replaceAll(pattern, replacement);
 }
 
-String16 SafeString16::replaceAll(const sl_char16* pattern, const String16& replacement) const
+String16 Atomic<String16>::replaceAll(const sl_char16* pattern, const String16& replacement) const
 {
 	String16 s(*this);
 	return s.replaceAll(pattern, replacement);
@@ -5116,13 +5201,13 @@ String16 String16::replaceAll(const sl_char16* pattern, const sl_char16* replace
 	return _String_replaceAll<String16, sl_char16>(*this, pattern, Base::getStringLength2(pattern), replacement, Base::getStringLength2(replacement));
 }
 
-String8 SafeString8::replaceAll(const sl_char8* pattern, const sl_char8* replacement) const
+String8 Atomic<String8>::replaceAll(const sl_char8* pattern, const sl_char8* replacement) const
 {
 	String8 s(*this);
 	return s.replaceAll(pattern, replacement);
 }
 
-String16 SafeString16::replaceAll(const sl_char16* pattern, const sl_char16* replacement) const
+String16 Atomic<String16>::replaceAll(const sl_char16* pattern, const sl_char16* replacement) const
 {
 	String16 s(*this);
 	return s.replaceAll(pattern, replacement);
@@ -5141,7 +5226,7 @@ SLIB_INLINE ST _String_trim(const ST& str)
 		}
 	}
 	if (i >= n) {
-		return ST::null();
+		return sl_null;
 	}
 	sl_size j = n - 1;
 	for (; j >= i; j--) {
@@ -5163,13 +5248,13 @@ String16 String16::trim() const
 	return _String_trim<String16, sl_char16>(*this);
 }
 
-String8 SafeString8::trim() const
+String8 Atomic<String8>::trim() const
 {
 	String8 s(*this);
 	return s.trim();
 }
 
-String16 SafeString16::trim() const
+String16 Atomic<String16>::trim() const
 {
 	String16 s(*this);
 	return s.trim();
@@ -5189,7 +5274,7 @@ SLIB_INLINE ST _String_trimLeft(const ST& str)
 		}
 	}
 	if (i >= n) {
-		return ST::null();
+		return sl_null;
 	}
 	return str.substring(i);
 }
@@ -5204,13 +5289,13 @@ String16 String16::trimLeft() const
 	return _String_trimLeft<String16, sl_char16>(*this);
 }
 
-String8 SafeString8::trimLeft() const
+String8 Atomic<String8>::trimLeft() const
 {
 	String8 s(*this);
 	return s.trimLeft();
 }
 
-String16 SafeString16::trimLeft() const
+String16 Atomic<String16>::trimLeft() const
 {
 	String16 s(*this);
 	return s.trimLeft();
@@ -5230,7 +5315,7 @@ SLIB_INLINE ST _String_trimRight(const ST& str)
 		}
 	}
 	if (j == 0) {
-		return ST::null();
+		return sl_null;
 	}
 	return str.substring(0, j);
 }
@@ -5245,13 +5330,13 @@ String16 String16::trimRight() const
 	return _String_trimRight<String16, sl_char16>(*this);
 }
 
-String8 SafeString8::trimRight() const
+String8 Atomic<String8>::trimRight() const
 {
 	String8 s(*this);
 	return s.trimRight();
 }
 
-String16 SafeString16::trimRight() const
+String16 Atomic<String16>::trimRight() const
 {
 	String16 s(*this);
 	return s.trimRight();
@@ -5262,7 +5347,7 @@ template <class ST, class CT, class TT>
 List<ST> _String_split(const ST& str, const CT* pattern, sl_size countPattern)
 {
 	if (countPattern == 0) {
-		return List<ST>::null();
+		return sl_null;
 	}
 	CList<ST>* ret = CList<ST>::create();
 	if (ret) {
@@ -5290,13 +5375,13 @@ List<String16> String16::split(const String16& pattern) const
 	return _String_split<String16, sl_char16, _TemplateFunc16>(*this, pattern.getData(), pattern.getLength());
 }
 
-List<String8> SafeString8::split(const String8& pattern) const
+List<String8> Atomic<String8>::split(const String8& pattern) const
 {
 	String8 s(*this);
 	return s.split(pattern);
 }
 
-List<String16> SafeString16::split(const String16& pattern) const
+List<String16> Atomic<String16>::split(const String16& pattern) const
 {
 	String16 s(*this);
 	return s.split(pattern);
@@ -5312,13 +5397,13 @@ List<String16> String16::split(const sl_char16* pattern) const
 	return _String_split<String16, sl_char16, _TemplateFunc16>(*this, pattern, Base::getStringLength2(pattern));
 }
 
-List<String8> SafeString8::split(const sl_char8* pattern) const
+List<String8> Atomic<String8>::split(const sl_char8* pattern) const
 {
 	String8 s(*this);
 	return s.split(pattern);
 }
 
-List<String16> SafeString16::split(const sl_char16* pattern) const
+List<String16> Atomic<String16>::split(const sl_char16* pattern) const
 {
 	String16 s(*this);
 	return s.split(pattern);
@@ -5451,7 +5536,7 @@ String8 String8::applyBackslashEscapes(sl_bool flagDoubleQuote, sl_bool flagAddQ
 	}
 	String8 ret = allocate(n);
 	if (ret.isEmpty()) {
-		return String8::null();
+		return sl_null;
 	}
 	_String_applyBackslashEscapes<String8, sl_char8>(*this, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, ret.getData());
 	return ret;
@@ -5462,19 +5547,19 @@ String16 String16::applyBackslashEscapes(sl_bool flagDoubleQuote, sl_bool flagAd
 	sl_size n = _String_applyBackslashEscapes<String16, sl_char16>(*this, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, sl_null);
 	String16 ret = allocate(n);
 	if (ret.isEmpty()) {
-		return String16::null();
+		return sl_null;
 	}
 	_String_applyBackslashEscapes<String16, sl_char16>(*this, flagDoubleQuote, flagAddQuote, flagEscapeNonAscii, ret.getData());
 	return ret;
 }
 
-String8 SafeString8::applyBackslashEscapes(sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii)
+String8 Atomic<String8>::applyBackslashEscapes(sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii)
 {
 	String8 s(*this);
 	return s.applyBackslashEscapes(flagDoubleQuote, flagAddQuote, flagEscapeNonAscii);
 }
 
-String16 SafeString16::applyBackslashEscapes(sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii)
+String16 Atomic<String16>::applyBackslashEscapes(sl_bool flagDoubleQuote, sl_bool flagAddQuote, sl_bool flagEscapeNonAscii)
 {
 	String16 s(*this);
 	return s.applyBackslashEscapes(flagDoubleQuote, flagAddQuote, flagEscapeNonAscii);
@@ -5490,7 +5575,7 @@ SLIB_INLINE ST _String_parseBackslashEscapes(const CT* sz, sl_size n, sl_size* l
 		*outFlagError = sl_true;
 	}
 	if (n <= 0) {
-		return ST::null();
+		return sl_null;
 	}
 	sl_bool flagDoubleQuote = sl_false;
 	CT chEnd = 0;
@@ -5501,11 +5586,11 @@ SLIB_INLINE ST _String_parseBackslashEscapes(const CT* sz, sl_size n, sl_size* l
 		flagDoubleQuote = sl_false;
 		chEnd = '\'';
 	} else {
-		return ST::null();
+		return sl_null;
 	}
 	SLIB_SCOPED_BUFFER(CT, 2048, buf, n);
 	if (buf == sl_null) {
-		return ST::null();
+		return sl_null;
 	}
 	sl_size len = 0;
 	sl_bool flagSuccess = sl_false;
@@ -5734,13 +5819,13 @@ String16 String16::parseBackslashEscapes(sl_size* lengthParsed, sl_bool* flagErr
 	return parseBackslashEscapes(getData(), getLength(), lengthParsed, flagError);
 }
 
-String8 SafeString8::parseBackslashEscapes(sl_size* lengthParsed, sl_bool* flagError) const
+String8 Atomic<String8>::parseBackslashEscapes(sl_size* lengthParsed, sl_bool* flagError) const
 {
 	String8 s(*this);
 	return s.parseBackslashEscapes(lengthParsed, flagError);
 }
 
-String16 SafeString16::parseBackslashEscapes(sl_size* lengthParsed, sl_bool* flagError) const
+String16 Atomic<String16>::parseBackslashEscapes(sl_size* lengthParsed, sl_bool* flagError) const
 {
 	String16 s(*this);
 	return s.parseBackslashEscapes(lengthParsed, flagError);
@@ -5791,13 +5876,13 @@ sl_size String16::countLineNumber(sl_size pos, sl_size* column) const
 	return countLineNumber(getData(), Math::min(getLength(), pos), column);
 }
 
-sl_size SafeString8::countLineNumber(sl_size pos, sl_size* column) const
+sl_size Atomic<String8>::countLineNumber(sl_size pos, sl_size* column) const
 {
 	String8 s(*this);
 	return s.countLineNumber(pos, column);
 }
 
-sl_size SafeString16::countLineNumber(sl_size pos, sl_size* column) const
+sl_size Atomic<String16>::countLineNumber(sl_size pos, sl_size* column) const
 {
 	String16 s(*this);
 	return s.countLineNumber(pos, column);
@@ -5956,13 +6041,13 @@ sl_bool String16::parseInt32(sl_int32 radix, sl_int32* _out) const
 	return _String_parseInt(radix, getData(), 0, n, _out) == n;
 }
 
-sl_bool SafeString8::parseInt32(sl_int32 radix, sl_int32* _out) const
+sl_bool Atomic<String8>::parseInt32(sl_int32 radix, sl_int32* _out) const
 {
 	String8 s(*this);
 	return s.parseInt32(radix, _out);
 }
 
-sl_bool SafeString16::parseInt32(sl_int32 radix, sl_int32* _out) const
+sl_bool Atomic<String16>::parseInt32(sl_int32 radix, sl_int32* _out) const
 {
 	String16 s(*this);
 	return s.parseInt32(radix, _out);
@@ -5982,13 +6067,13 @@ sl_int32 String16::parseInt32(sl_int32 radix, sl_int32 def) const
 	return _out;
 }
 
-sl_int32 SafeString8::parseInt32(sl_int32 radix, sl_int32 def) const
+sl_int32 Atomic<String8>::parseInt32(sl_int32 radix, sl_int32 def) const
 {
 	String8 s(*this);
 	return s.parseInt32(radix, def);
 }
 
-sl_int32 SafeString16::parseInt32(sl_int32 radix, sl_int32 def) const
+sl_int32 Atomic<String16>::parseInt32(sl_int32 radix, sl_int32 def) const
 {
 	String16 s(*this);
 	return s.parseInt32(radix, def);
@@ -6023,13 +6108,13 @@ sl_bool String16::parseUint32(sl_int32 radix, sl_uint32* _out) const
 	return _String_parseUint(radix, getData(), 0, n, _out) == n;
 }
 
-sl_bool SafeString8::parseUint32(sl_int32 radix, sl_uint32* _out) const
+sl_bool Atomic<String8>::parseUint32(sl_int32 radix, sl_uint32* _out) const
 {
 	String8 s(*this);
 	return s.parseUint32(radix, _out);
 }
 
-sl_bool SafeString16::parseUint32(sl_int32 radix, sl_uint32* _out) const
+sl_bool Atomic<String16>::parseUint32(sl_int32 radix, sl_uint32* _out) const
 {
 	String16 s(*this);
 	return s.parseUint32(radix, _out);
@@ -6049,13 +6134,13 @@ sl_uint32 String16::parseUint32(sl_int32 radix, sl_uint32 def) const
 	return _out;
 }
 
-sl_uint32 SafeString8::parseUint32(sl_int32 radix, sl_uint32 def) const
+sl_uint32 Atomic<String8>::parseUint32(sl_int32 radix, sl_uint32 def) const
 {
 	String8 s(*this);
 	return s.parseUint32(radix, def);
 }
 
-sl_uint32 SafeString16::parseUint32(sl_int32 radix, sl_uint32 def) const
+sl_uint32 Atomic<String16>::parseUint32(sl_int32 radix, sl_uint32 def) const
 {
 	String16 s(*this);
 	return s.parseUint32(radix, def);
@@ -6090,13 +6175,13 @@ sl_bool String16::parseInt64(sl_int32 radix, sl_int64* _out) const
 	return _String_parseInt(radix, getData(), 0, n, _out) == n;
 }
 
-sl_bool SafeString8::parseInt64(sl_int32 radix, sl_int64* _out) const
+sl_bool Atomic<String8>::parseInt64(sl_int32 radix, sl_int64* _out) const
 {
 	String8 s(*this);
 	return s.parseInt64(radix, _out);
 }
 
-sl_bool SafeString16::parseInt64(sl_int32 radix, sl_int64* _out) const
+sl_bool Atomic<String16>::parseInt64(sl_int32 radix, sl_int64* _out) const
 {
 	String16 s(*this);
 	return s.parseInt64(radix, _out);
@@ -6116,13 +6201,13 @@ sl_int64 String16::parseInt64(sl_int32 radix, sl_int64 def) const
 	return _out;
 }
 
-sl_int64 SafeString8::parseInt64(sl_int32 radix, sl_int64 def) const
+sl_int64 Atomic<String8>::parseInt64(sl_int32 radix, sl_int64 def) const
 {
 	String8 s(*this);
 	return s.parseInt64(radix, def);
 }
 
-sl_int64 SafeString16::parseInt64(sl_int32 radix, sl_int64 def) const
+sl_int64 Atomic<String16>::parseInt64(sl_int32 radix, sl_int64 def) const
 {
 	String16 s(*this);
 	return s.parseInt64(radix, def);
@@ -6157,13 +6242,13 @@ sl_bool String16::parseUint64(sl_int32 radix, sl_uint64* _out) const
 	return _String_parseUint(radix, getData(), 0, n, _out) == n;
 }
 
-sl_bool SafeString8::parseUint64(sl_int32 radix, sl_uint64* _out) const
+sl_bool Atomic<String8>::parseUint64(sl_int32 radix, sl_uint64* _out) const
 {
 	String8 s(*this);
 	return s.parseUint64(radix, _out);
 }
 
-sl_bool SafeString16::parseUint64(sl_int32 radix, sl_uint64* _out) const
+sl_bool Atomic<String16>::parseUint64(sl_int32 radix, sl_uint64* _out) const
 {
 	String16 s(*this);
 	return s.parseUint64(radix, _out);
@@ -6183,13 +6268,13 @@ sl_uint64 String16::parseUint64(sl_int32 radix, sl_uint64 def) const
 	return _out;
 }
 
-sl_uint64 SafeString8::parseUint64(sl_int32 radix, sl_uint64 def) const
+sl_uint64 Atomic<String8>::parseUint64(sl_int32 radix, sl_uint64 def) const
 {
 	String8 s(*this);
 	return s.parseUint64(radix, def);
 }
 
-sl_uint64 SafeString16::parseUint64(sl_int32 radix, sl_uint64 def) const
+sl_uint64 Atomic<String16>::parseUint64(sl_int32 radix, sl_uint64 def) const
 {
 	String16 s(*this);
 	return s.parseUint64(radix, def);
@@ -6214,13 +6299,13 @@ sl_bool String16::parseInt(sl_int32 radix, sl_reg* _out) const
 #endif
 }
 
-sl_bool SafeString8::parseInt(sl_int32 radix, sl_reg* _out) const
+sl_bool Atomic<String8>::parseInt(sl_int32 radix, sl_reg* _out) const
 {
 	String8 s(*this);
 	return s.parseInt(radix, _out);
 }
 
-sl_bool SafeString16::parseInt(sl_int32 radix, sl_reg* _out) const
+sl_bool Atomic<String16>::parseInt(sl_int32 radix, sl_reg* _out) const
 {
 	String16 s(*this);
 	return s.parseInt(radix, _out);
@@ -6240,13 +6325,13 @@ sl_reg String16::parseInt(sl_int32 radix, sl_reg def) const
 	return _out;
 }
 
-sl_reg SafeString8::parseInt(sl_int32 radix, sl_reg def) const
+sl_reg Atomic<String8>::parseInt(sl_int32 radix, sl_reg def) const
 {
 	String8 s(*this);
 	return s.parseInt(radix, def);
 }
 
-sl_reg SafeString16::parseInt(sl_int32 radix, sl_reg def) const
+sl_reg Atomic<String16>::parseInt(sl_int32 radix, sl_reg def) const
 {
 	String16 s(*this);
 	return s.parseInt(radix, def);
@@ -6271,13 +6356,13 @@ sl_bool String16::parseSize(sl_int32 radix, sl_size* _out) const
 #endif
 }
 
-sl_bool SafeString8::parseSize(sl_int32 radix, sl_size* _out) const
+sl_bool Atomic<String8>::parseSize(sl_int32 radix, sl_size* _out) const
 {
 	String8 s(*this);
 	return s.parseSize(radix, _out);
 }
 
-sl_bool SafeString16::parseSize(sl_int32 radix, sl_size* _out) const
+sl_bool Atomic<String16>::parseSize(sl_int32 radix, sl_size* _out) const
 {
 	String16 s(*this);
 	return s.parseSize(radix, _out);
@@ -6297,13 +6382,13 @@ sl_size String16::parseSize(sl_int32 radix, sl_size def) const
 	return _out;
 }
 
-sl_size SafeString8::parseSize(sl_int32 radix, sl_size def) const
+sl_size Atomic<String8>::parseSize(sl_int32 radix, sl_size def) const
 {
 	String8 s(*this);
 	return s.parseSize(radix, def);
 }
 
-sl_size SafeString16::parseSize(sl_int32 radix, sl_size def) const
+sl_size Atomic<String16>::parseSize(sl_int32 radix, sl_size def) const
 {
 	String16 s(*this);
 	return s.parseSize(radix, def);
@@ -6446,13 +6531,13 @@ sl_bool String16::parseFloat(float* _out) const
 	return _String_parseFloat(getData(), 0, n, _out) == n;
 }
 
-sl_bool SafeString8::parseFloat(float* _out) const
+sl_bool Atomic<String8>::parseFloat(float* _out) const
 {
 	String8 s(*this);
 	return s.parseFloat(_out);
 }
 
-sl_bool SafeString16::parseFloat(float* _out) const
+sl_bool Atomic<String16>::parseFloat(float* _out) const
 {
 	String16 s(*this);
 	return s.parseFloat(_out);
@@ -6472,13 +6557,13 @@ float String16::parseFloat(float def) const
 	return _out;
 }
 
-float SafeString8::parseFloat(float def) const
+float Atomic<String8>::parseFloat(float def) const
 {
 	String8 s(*this);
 	return s.parseFloat(def);
 }
 
-float SafeString16::parseFloat(float def) const
+float Atomic<String16>::parseFloat(float def) const
 {
 	String16 s(*this);
 	return s.parseFloat(def);
@@ -6513,13 +6598,13 @@ sl_bool String16::parseDouble(double* _out) const
 	return _String_parseFloat(getData(), 0, n, _out) == n;
 }
 
-sl_bool SafeString8::parseDouble(double* _out) const
+sl_bool Atomic<String8>::parseDouble(double* _out) const
 {
 	String8 s(*this);
 	return s.parseDouble(_out);
 }
 
-sl_bool SafeString16::parseDouble(double* _out) const
+sl_bool Atomic<String16>::parseDouble(double* _out) const
 {
 	String16 s(*this);
 	return s.parseDouble(_out);
@@ -6539,13 +6624,13 @@ double String16::parseDouble(double def) const
 	return _out;
 }
 
-double SafeString8::parseDouble(double def) const
+double Atomic<String8>::parseDouble(double def) const
 {
 	String8 s(*this);
 	return s.parseDouble(def);
 }
 
-double SafeString16::parseDouble(double def) const
+double Atomic<String16>::parseDouble(double def) const
 {
 	String16 s(*this);
 	return s.parseDouble(def);
@@ -6665,13 +6750,13 @@ sl_bool String16::parseBoolean(sl_bool* _out) const
 	return _String_parseBoolean(getData(), 0, n, _out) == n;
 }
 
-sl_bool SafeString8::parseBoolean(sl_bool* _out) const
+sl_bool Atomic<String8>::parseBoolean(sl_bool* _out) const
 {
 	String8 s(*this);
 	return s.parseBoolean(_out);
 }
 
-sl_bool SafeString16::parseBoolean(sl_bool* _out) const
+sl_bool Atomic<String16>::parseBoolean(sl_bool* _out) const
 {
 	String16 s(*this);
 	return s.parseBoolean(_out);
@@ -6691,13 +6776,13 @@ sl_bool String16::parseBoolean(sl_bool def) const
 	return _out;
 }
 
-sl_bool SafeString8::parseBoolean(sl_bool def) const
+sl_bool Atomic<String8>::parseBoolean(sl_bool def) const
 {
 	String8 s(*this);
 	return s.parseBoolean(def);
 }
 
-sl_bool SafeString16::parseBoolean(sl_bool def) const
+sl_bool Atomic<String16>::parseBoolean(sl_bool def) const
 {
 	String16 s(*this);
 	return s.parseBoolean(def);
@@ -6771,13 +6856,13 @@ sl_bool String16::parseHexString(void* _out) const
 	return _String_parseHexString(getData(), 0, n, _out) == n;
 }
 
-sl_bool SafeString8::parseHexString(void* _out) const
+sl_bool Atomic<String8>::parseHexString(void* _out) const
 {
 	String8 s(*this);
 	return s.parseHexString(_out);
 }
 
-sl_bool SafeString16::parseHexString(void* _out) const
+sl_bool Atomic<String16>::parseHexString(void* _out) const
 {
 	String16 s(*this);
 	return s.parseHexString(_out);
@@ -6789,7 +6874,7 @@ template <class IT, class UT, class ST, class CT>
 SLIB_INLINE ST _String_fromInt(IT _value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase, CT chGroup = sl_false, sl_bool flagSignPositive = sl_false, sl_bool flagLeadingSpacePositive = sl_false, sl_bool flagEncloseNagtive = sl_false)
 {
 	if (radix < 2 || radix > 64) {
-		return ST::null();
+		return sl_null;
 	}
 	
 	const char* pattern = flagUpperCase && radix <= 36 ? _string_conv_radix_pattern_upper : _string_conv_radix_pattern_lower;
@@ -6874,7 +6959,7 @@ template <class IT, class ST, class CT>
 SLIB_INLINE ST _String_fromUint(IT value, sl_uint32 radix, sl_uint32 minWidth, sl_bool flagUpperCase, CT chGroup = 0, sl_bool flagSignPositive = sl_false, sl_bool flagLeadingSpacePositive = sl_false)
 {
 	if (radix < 2 || radix > 64) {
-		return ST::null();
+		return sl_null;
 	}
 	
 	const char* pattern = flagUpperCase && radix <= 36 ? _string_conv_radix_pattern_upper : _string_conv_radix_pattern_lower;
@@ -7263,7 +7348,7 @@ template <class ST, class CT>
 SLIB_INLINE ST _String_makeHexString(const void* buf, sl_size size)
 {
 	if (!buf || size <= 0) {
-		return ST::null();
+		return sl_null;
 	}
 	ST str = ST::allocate(size * 2);
 	if (str.isEmpty()) {
@@ -7790,300 +7875,146 @@ String16 String16::formatv(const sl_char16* format, const Variant *params, sl_si
 	return _String_format<String16, sl_char16, StringBuffer16>(format, Base::getStringLength2(format), params, nParams);
 }
 
-String8 String8::argv(const Variant* params, sl_size nParams)
+String8 String8::format(const String8& strFormat)
+{
+	return strFormat;
+}
+
+String16 String16::format(const String16& strFormat)
+{
+	return strFormat;
+}
+
+String8 String8::format(const sl_char8* szFormat)
+{
+	return szFormat;
+}
+
+String16 String16::format(const sl_char16* szFormat)
+{
+	return szFormat;
+}
+
+String8 String8::argv(const Variant* params, sl_size nParams) const
 {
 	return formatv(*this, params, nParams);
 }
 
-String16 String16::argv(const Variant* params, sl_size nParams)
+String16 String16::argv(const Variant* params, sl_size nParams) const
 {
 	return formatv(*this, params, nParams);
 }
 
-String8 SafeString8::argv(const Variant* params, sl_size nParams)
+String8 Atomic<String8>::argv(const Variant* params, sl_size nParams) const
 {
 	return String8::formatv(*this, params, nParams);
 }
 
-String16 SafeString16::argv(const Variant* params, sl_size nParams)
+String16 Atomic<String16>::argv(const Variant* params, sl_size nParams) const
 {
 	return String16::formatv(*this, params, nParams);
 }
 
-String8 String8::format(const String8& str)
-{
-	return str;
-}
 
-String16 String16::format(const String16& str)
-{
-	return str;
-}
-
-String8 String8::format(const String8& szFormat, const Variant& param)
-{
-	return formatv(szFormat, &param, 1);
-}
-
-String16 String16::format(const String16& szFormat, const Variant& param)
-{
-	return formatv(szFormat, &param, 1);
-}
-
-String8 String8::format(const sl_char8* szFormat, const Variant& param)
-{
-	return formatv(szFormat, &param, 1);
-}
-
-String16 String16::format(const sl_char16* szFormat, const Variant& param)
-{
-	return formatv(szFormat, &param, 1);
-}
-
-String8 String8::arg(const Variant& param)
-{
-	return formatv(*this, &param, 1);
-}
-
-String16 String16::arg(const Variant& param)
-{
-	return formatv(*this, &param, 1);
-}
-
-String8 SafeString8::arg(const Variant& param)
-{
-	return String8::formatv(*this, &param, 1);
-}
-
-String16 SafeString16::arg(const Variant& param)
-{
-	return String16::formatv(*this, &param, 1);
-}
-
-#define FORMAT_BEGIN_VARS_LIST(n) SLIB_ALIGN(16) char _vars[sizeof(Variant)*n]; Variant* vars=(Variant*)((void*)_vars); char* pvar = _vars;
-#define FORMAT_ADD_VAR_TO_LIST(s) { char* sv = (char*)((void*)&s); for (int iv = 0; iv < sizeof(Variant); iv++) { *(pvar++) = *(sv++); } }
-
-#define FORMAT_DEFINE_FUNCTIONS(nParams) \
-String8 String8::format(const String8& szFormat, _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS##nParams) \
-{ \
-	FORMAT_BEGIN_VARS_LIST(nParams) \
-	FORMAT_PARAMS_LIST_##nParams \
-	return formatv(szFormat, vars, nParams); \
-} \
-String16 String16::format(const String16& szFormat, _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS##nParams) \
-{ \
-	FORMAT_BEGIN_VARS_LIST(nParams) \
-	FORMAT_PARAMS_LIST_##nParams \
-	return formatv(szFormat, vars, nParams); \
-} \
-String8 String8::format(const sl_char8* szFormat, _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS##nParams) \
-{ \
-	FORMAT_BEGIN_VARS_LIST(nParams) \
-	FORMAT_PARAMS_LIST_##nParams \
-	return formatv(szFormat, vars, nParams); \
-} \
-String16 String16::format(const sl_char16* szFormat, _SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS##nParams) \
-{ \
-	FORMAT_BEGIN_VARS_LIST(nParams) \
-	FORMAT_PARAMS_LIST_##nParams \
-	return formatv(szFormat, vars, nParams); \
-} \
-String8 String8::arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS##nParams) \
-{ \
-	FORMAT_BEGIN_VARS_LIST(nParams) \
-	FORMAT_PARAMS_LIST_##nParams \
-	return formatv(*this, vars, nParams); \
-} \
-String16 String16::arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS##nParams) \
-{ \
-	FORMAT_BEGIN_VARS_LIST(nParams) \
-	FORMAT_PARAMS_LIST_##nParams \
-	return formatv(*this, vars, nParams); \
-} \
-String8 SafeString8::arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS##nParams) \
-{ \
-	FORMAT_BEGIN_VARS_LIST(nParams) \
-	FORMAT_PARAMS_LIST_##nParams \
-	return String8::formatv(*this, vars, nParams); \
-} \
-String16 SafeString16::arg(_SLIB_STRING_DECLARE_FORMAT_FUNCTIONS_PARAMS##nParams) \
-{ \
-	FORMAT_BEGIN_VARS_LIST(nParams) \
-	FORMAT_PARAMS_LIST_##nParams \
-	return String16::formatv(*this, vars, nParams); \
-}
-
-
-#define FORMAT_PARAMS_LIST_2 FORMAT_ADD_VAR_TO_LIST(param1) FORMAT_ADD_VAR_TO_LIST(param2)
-#define FORMAT_PARAMS_LIST_3 FORMAT_PARAMS_LIST_2 FORMAT_ADD_VAR_TO_LIST(param3)
-#define FORMAT_PARAMS_LIST_4 FORMAT_PARAMS_LIST_3 FORMAT_ADD_VAR_TO_LIST(param4)
-#define FORMAT_PARAMS_LIST_5 FORMAT_PARAMS_LIST_4 FORMAT_ADD_VAR_TO_LIST(param5)
-#define FORMAT_PARAMS_LIST_6 FORMAT_PARAMS_LIST_5 FORMAT_ADD_VAR_TO_LIST(param6)
-#define FORMAT_PARAMS_LIST_7 FORMAT_PARAMS_LIST_6 FORMAT_ADD_VAR_TO_LIST(param7)
-#define FORMAT_PARAMS_LIST_8 FORMAT_PARAMS_LIST_7 FORMAT_ADD_VAR_TO_LIST(param8)
-#define FORMAT_PARAMS_LIST_9 FORMAT_PARAMS_LIST_8 FORMAT_ADD_VAR_TO_LIST(param9)
-#define FORMAT_PARAMS_LIST_10 FORMAT_PARAMS_LIST_9 FORMAT_ADD_VAR_TO_LIST(param10)
-#define FORMAT_PARAMS_LIST_11 FORMAT_PARAMS_LIST_10 FORMAT_ADD_VAR_TO_LIST(param11)
-#define FORMAT_PARAMS_LIST_12 FORMAT_PARAMS_LIST_11 FORMAT_ADD_VAR_TO_LIST(param12)
-#define FORMAT_PARAMS_LIST_13 FORMAT_PARAMS_LIST_12 FORMAT_ADD_VAR_TO_LIST(param13)
-#define FORMAT_PARAMS_LIST_14 FORMAT_PARAMS_LIST_13 FORMAT_ADD_VAR_TO_LIST(param14)
-#define FORMAT_PARAMS_LIST_15 FORMAT_PARAMS_LIST_14 FORMAT_ADD_VAR_TO_LIST(param15)
-#define FORMAT_PARAMS_LIST_16 FORMAT_PARAMS_LIST_15 FORMAT_ADD_VAR_TO_LIST(param16)
-#define FORMAT_PARAMS_LIST_17 FORMAT_PARAMS_LIST_16 FORMAT_ADD_VAR_TO_LIST(param17)
-#define FORMAT_PARAMS_LIST_18 FORMAT_PARAMS_LIST_17 FORMAT_ADD_VAR_TO_LIST(param18)
-#define FORMAT_PARAMS_LIST_19 FORMAT_PARAMS_LIST_18 FORMAT_ADD_VAR_TO_LIST(param19)
-#define FORMAT_PARAMS_LIST_20 FORMAT_PARAMS_LIST_19 FORMAT_ADD_VAR_TO_LIST(param20)
-#define FORMAT_PARAMS_LIST_21 FORMAT_PARAMS_LIST_20 FORMAT_ADD_VAR_TO_LIST(param21)
-#define FORMAT_PARAMS_LIST_22 FORMAT_PARAMS_LIST_21 FORMAT_ADD_VAR_TO_LIST(param22)
-#define FORMAT_PARAMS_LIST_23 FORMAT_PARAMS_LIST_22 FORMAT_ADD_VAR_TO_LIST(param23)
-#define FORMAT_PARAMS_LIST_24 FORMAT_PARAMS_LIST_23 FORMAT_ADD_VAR_TO_LIST(param24)
-#define FORMAT_PARAMS_LIST_25 FORMAT_PARAMS_LIST_24 FORMAT_ADD_VAR_TO_LIST(param25)
-#define FORMAT_PARAMS_LIST_26 FORMAT_PARAMS_LIST_25 FORMAT_ADD_VAR_TO_LIST(param26)
-#define FORMAT_PARAMS_LIST_27 FORMAT_PARAMS_LIST_26 FORMAT_ADD_VAR_TO_LIST(param27)
-#define FORMAT_PARAMS_LIST_28 FORMAT_PARAMS_LIST_27 FORMAT_ADD_VAR_TO_LIST(param28)
-#define FORMAT_PARAMS_LIST_29 FORMAT_PARAMS_LIST_28 FORMAT_ADD_VAR_TO_LIST(param29)
-#define FORMAT_PARAMS_LIST_30 FORMAT_PARAMS_LIST_29 FORMAT_ADD_VAR_TO_LIST(param30)
-
-FORMAT_DEFINE_FUNCTIONS(2)
-FORMAT_DEFINE_FUNCTIONS(3)
-FORMAT_DEFINE_FUNCTIONS(4)
-FORMAT_DEFINE_FUNCTIONS(5)
-FORMAT_DEFINE_FUNCTIONS(6)
-FORMAT_DEFINE_FUNCTIONS(7)
-FORMAT_DEFINE_FUNCTIONS(8)
-FORMAT_DEFINE_FUNCTIONS(9)
-FORMAT_DEFINE_FUNCTIONS(10)
-FORMAT_DEFINE_FUNCTIONS(11)
-FORMAT_DEFINE_FUNCTIONS(12)
-FORMAT_DEFINE_FUNCTIONS(13)
-FORMAT_DEFINE_FUNCTIONS(14)
-FORMAT_DEFINE_FUNCTIONS(15)
-FORMAT_DEFINE_FUNCTIONS(16)
-FORMAT_DEFINE_FUNCTIONS(17)
-FORMAT_DEFINE_FUNCTIONS(18)
-FORMAT_DEFINE_FUNCTIONS(19)
-FORMAT_DEFINE_FUNCTIONS(20)
-FORMAT_DEFINE_FUNCTIONS(21)
-FORMAT_DEFINE_FUNCTIONS(22)
-FORMAT_DEFINE_FUNCTIONS(23)
-FORMAT_DEFINE_FUNCTIONS(24)
-FORMAT_DEFINE_FUNCTIONS(25)
-FORMAT_DEFINE_FUNCTIONS(26)
-FORMAT_DEFINE_FUNCTIONS(27)
-FORMAT_DEFINE_FUNCTIONS(28)
-FORMAT_DEFINE_FUNCTIONS(29)
-FORMAT_DEFINE_FUNCTIONS(30)
-
-template <>
-int Compare<String8>::compare(const String8& a, const String8& b)
+int Compare<String8>::operator()(const String8& a, const String8& b) const
 {
 	return a.compare(b);
 }
 
-template <>
-int Compare<String16>::compare(const String16& a, const String16& b)
+int Compare<String16>::operator()(const String16& a, const String16& b) const
 {
 	return a.compare(b);
 }
 
-template <>
-int Compare<SafeString8>::compare(const SafeString8& a, const SafeString8& b)
+int Compare<AtomicString8>::operator()(const AtomicString8& a, const AtomicString8& b) const
 {
 	return a.compare(b);
 }
 
-template <>
-int Compare<SafeString16>::compare(const SafeString16& a, const SafeString16& b)
+int Compare<AtomicString16>::operator()(const AtomicString16& a, const AtomicString16& b) const
 {
 	return a.compare(b);
 }
 
 
-template <>
-sl_bool Compare<String8>::equals(const String8& a, const String8& b)
+sl_bool Equals<String8>::operator()(const String8& a, const String8& b) const
 {
 	return a.equals(b);
 }
 
-template <>
-sl_bool Compare<String16>::equals(const String16& a, const String16& b)
+sl_bool Equals<String16>::operator()(const String16& a, const String16& b) const
 {
 	return a.equals(b);
 }
 
-template <>
-sl_bool Compare<SafeString8>::equals(const SafeString8& a, const SafeString8& b)
+sl_bool Equals<AtomicString8>::operator()(const AtomicString8& a, const AtomicString8& b) const
 {
 	return a.equals(b);
 }
 
-template <>
-sl_bool Compare<SafeString16>::equals(const SafeString16& a, const SafeString16& b)
+sl_bool Equals<AtomicString16>::operator()(const AtomicString16& a, const AtomicString16& b) const
 {
 	return a.equals(b);
 }
 
 
-template <>
-sl_uint32 Hash<String8>::hash(const String8& v)
-{
-	return v.getHashCode();
-}
-template <>
-sl_uint32 Hash<String16>::hash(const String16& v)
+sl_uint32 Hash<String8>::operator()(const String8& v) const
 {
 	return v.getHashCode();
 }
 
-template <>
-sl_uint32 Hash<SafeString8>::hash(const SafeString8& v)
+sl_uint32 Hash<String16>::operator()(const String16& v) const
 {
 	return v.getHashCode();
 }
 
-template <>
-sl_uint32 Hash<SafeString16>::hash(const SafeString16& v)
+sl_uint32 Hash<AtomicString8>::operator()(const AtomicString8& v) const
+{
+	return v.getHashCode();
+}
+
+sl_uint32 Hash<AtomicString16>::operator()(const AtomicString16& v) const
 {
 	return v.getHashCode();
 }
 
 
-int CompareIgnoreCaseString8::compare(const String8& a, const String8& b)
+int CompareIgnoreCaseString8::operator()(const String8& a, const String8& b) const
 {
 	return a.compareIgnoreCase(b);
 }
 
-sl_bool CompareIgnoreCaseString8::equals(const String8& a, const String8& b)
+int CompareIgnoreCaseString16::operator()(const String16& a, const String16& b) const
+{
+	return a.compareIgnoreCase(b);
+}
+
+
+sl_bool EqualsIgnoreCaseString8::operator()(const String8& a, const String8& b) const
+{
+	return a.equalsIgnoreCase(b);
+}
+
+sl_bool EqualsIgnoreCaseString16::operator()(const String16& a, const String16& b) const
 {
 	return a.equalsIgnoreCase(b);
 }
 
 
-int CompareIgnoreCaseString16::compare(const String16& a, const String16& b)
-{
-	return a.compareIgnoreCase(b);
-}
-
-sl_bool CompareIgnoreCaseString16::equals(const String16& a, const String16& b)
-{
-	return a.equalsIgnoreCase(b);
-}
-
-
-sl_uint32 HashIgnoreCaseString8::hash(const String8& v)
+sl_uint32 HashIgnoreCaseString8::operator()(const String8& v) const
 {
 	return v.getHashCodeIgnoreCase();
 }
 
-sl_uint32 HashIgnoreCaseString16::hash(const String16& v)
+sl_uint32 HashIgnoreCaseString16::operator()(const String16& v) const
 {
 	return v.getHashCodeIgnoreCase();
 }
 
 
 /**********************************************************
- String Buffer
- **********************************************************/
+				String Buffer
+**********************************************************/
 
 StringBuffer8::StringBuffer8()
 {
@@ -8279,7 +8210,7 @@ Memory StringBuffer8::mergeToMemory() const
 {
 	ObjectLocker lock(this);
 	if (m_queue.getCount() == 0) {
-		return Memory::null();
+		return sl_null;
 	}
 	Link<StringData>* front = m_queue.getFront();
 	sl_size total = m_len;
@@ -8303,7 +8234,7 @@ Memory StringBuffer16::mergeToMemory() const
 {
 	ObjectLocker lock(this);
 	if (m_queue.getCount() == 0) {
-		return Memory::null();
+		return sl_null;
 	}
 	Link<StringData>* front = m_queue.getFront();
 	sl_size total = m_len;

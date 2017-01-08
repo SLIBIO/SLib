@@ -30,12 +30,12 @@ void RenderProgram::onPostRender(RenderEngine* engine, RenderProgramState* state
 
 String RenderProgram::getGLSLVertexShader(RenderEngine* engine)
 {
-	return String::null();
+	return sl_null;
 }
 
 String RenderProgram::getGLSLFragmentShader(RenderEngine* engine)
 {
-	return String::null();
+	return sl_null;
 }
 
 Ref<RenderProgramInstance> RenderProgram::getInstance(RenderEngine* engine)

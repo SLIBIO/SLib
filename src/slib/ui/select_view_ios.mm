@@ -28,7 +28,7 @@ public:
 	
 	NSString* __getItemTitle(sl_uint32 row)
 	{
-		String s = m_titles.getItemValue(row, String::null());
+		String s = m_titles.getValueAt(row);
 		return Apple::getNSStringFromString(s);
 	}
 	
@@ -68,7 +68,7 @@ Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* _parent)
 		((_SelectView*)this)->__selectItem(handle, m_indexSelected);
 		
 		Ref<Font> font = getFont();
-		UIFont* hFont = GraphicsPlatform::getUIFont(font.ptr, UIPlatform::getGlobalScaleFactor());
+		UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
@@ -159,7 +159,7 @@ void SelectView::_setFont_NW(const Ref<Font>& font)
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
 		_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
-		UIFont* hFont = GraphicsPlatform::getUIFont(font.ptr, UIPlatform::getGlobalScaleFactor());
+		UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
 		if (hFont != nil) {
 			[v setFont:hFont];
 		}
@@ -268,8 +268,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::SelectView::checkInstance(view.ptr)) {
-			((slib::_SelectView*)(view.ptr))->__onSelectItem(self, (sl_uint32)row);
+		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
+			_view->__onSelectItem(self, (sl_uint32)row);
 		}
 	}
 }
@@ -279,8 +279,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::SelectView::checkInstance(view.ptr)) {
-			return (NSInteger)(((slib::_SelectView*)(view.ptr))->__getItemsCount());
+		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
+			return (NSInteger)(_view->__getItemsCount());
 		}
 	}
 	return 0;
@@ -291,8 +291,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::SelectView::checkInstance(view.ptr)) {
-			return ((slib::_SelectView*)(view.ptr))->__getItemTitle((sl_uint32)row);
+		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
+			return _view->__getItemTitle((sl_uint32)row);
 		}
 	}
 	return @"";
@@ -303,8 +303,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::SelectView::checkInstance(view.ptr)) {
-			if ((NSInteger)(((slib::_SelectView*)(view.ptr))->__getItemsCount()) > 0) {
+		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
+			if ((NSInteger)(_view->__getItemsCount()) > 0) {
 				return YES;
 			}
 		}
@@ -318,8 +318,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::SelectView::checkInstance(view.ptr)) {
-			((slib::_SelectView*)(view.ptr))->__onStartSelection(self);
+		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
+			_view->__onStartSelection(self);
 		}
 	}
 }
@@ -346,8 +346,8 @@ SLIB_UI_NAMESPACE_END
 	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
 	if (instance.isNotNull()) {
 		slib::Ref<slib::View> view = instance->getView();
-		if (slib::SelectView::checkInstance(view.ptr)) {
-			((slib::_SelectView*)(view.ptr))->__onCancelSelection(self);
+		if (slib::_SelectView* _view = slib::CastInstance<slib::_SelectView>(view.get())) {
+			_view->__onCancelSelection(self);
 		}
 	}
 }

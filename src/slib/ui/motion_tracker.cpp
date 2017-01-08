@@ -149,7 +149,7 @@ static sl_bool _MotionTracker_solveLeastSquares(const sl_real* x, const sl_real*
 				q[j][h] -= dot * q[i][h];
 			}
 		}
-		sl_real f = q[j][0];
+		//sl_real f = q[j][0];
 		sl_real norm = _MotionTracker_getVectorLength(&q[j][0], m);
 		if (norm < 0.000001f) {
 			// vectors are linearly dependent or zero so no solution

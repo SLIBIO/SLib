@@ -15,21 +15,21 @@ public:
 	T y;
 
 public:
-	Vector2T() = default;
+	SLIB_INLINE Vector2T() = default;
 	
-	Vector2T(const Vector2T<T, FT>& other) = default;
+	SLIB_CONSTEXPR Vector2T(const Vector2T<T, FT>& other) : x(other.x), y(other.y) {}
 
 	template <class O, class FO>
-	Vector2T(const Vector2T<O, FO>& other);
+	SLIB_CONSTEXPR Vector2T(const Vector2T<O, FO>& other) : x((T)(other.x)), y((T)(other.y)) {}
 
-	Vector2T(T x, T y);
-	
+	SLIB_CONSTEXPR Vector2T(T _x, T _y) : x(_x), y(_y) {}
+
 public:
 	static const Vector2T<T, FT>& zero();
 	
-	static const Vector2T& fromArray(const T arr[2]);
+	static const Vector2T<T, FT>& fromArray(const T arr[2]);
 	
-	static Vector2T& fromArray(T arr[2]);
+	static Vector2T<T, FT>& fromArray(T arr[2]);
 	
 	T dot(const Vector2T<T, FT>& other) const;
 	
@@ -97,7 +97,7 @@ public:
 	
 private:
 	static T _zero[2];
-	
+
 };
 
 
@@ -122,32 +122,21 @@ SLIB_MATH_NAMESPACE_END
 SLIB_MATH_NAMESPACE_BEGIN
 
 template <class T, class FT>
-template <class O, class FO>
-SLIB_INLINE Vector2T<T, FT>::Vector2T(const Vector2T<O, FO>& other) : x((T)(other.x)), y((T)(other.y))
-{
-}
-
-template <class T, class FT>
-SLIB_INLINE Vector2T<T, FT>::Vector2T(T _x, T _y) : x(_x), y(_y)
-{
-}
-
-template <class T, class FT>
 SLIB_INLINE const Vector2T<T, FT>& Vector2T<T, FT>::zero()
 {
-	return *((Vector2T<T, FT>*)((void*)(_zero)));
+	return *(reinterpret_cast<Vector2T<T, FT> const*>(&_zero));
 }
 
 template <class T, class FT>
-SLIB_INLINE const Vector2T<T, FT>& Vector2T<T, FT>::fromArray(const T* arr)
+SLIB_INLINE const Vector2T<T, FT>& Vector2T<T, FT>::fromArray(const T arr[2])
 {
-	return *((Vector2T<T, FT>*)((void*)(arr)));
+	return *(reinterpret_cast<Vector2T<T, FT> const*>(arr));
 }
 
 template <class T, class FT>
-SLIB_INLINE Vector2T<T, FT>& Vector2T<T, FT>::fromArray(T* arr)
+SLIB_INLINE Vector2T<T, FT>& Vector2T<T, FT>::fromArray(T arr[2])
 {
-	return *((Vector2T<T, FT>*)((void*)(arr)));
+	return *(reinterpret_cast<Vector2T<T, FT>*>(arr));
 }
 
 template <class T, class FT>
@@ -170,7 +159,6 @@ Vector2T<T, FT> operator/(T f, const Vector2T<T, FT>& v)
 {
 	return {f / v.x, f / v.y};
 }
-
 
 template <class T, class FT>
 SLIB_INLINE Vector2T<T, FT> Interpolation< Vector2T<T, FT> >::interpolate(const Vector2T<T, FT>& a, const Vector2T<T, FT>& b, float factor)

@@ -46,7 +46,7 @@ Ref<iOS_ViewInstance> iOS_ViewInstance::create(UIView* handle, sl_bool flagFreeO
 		if (ret.isNotNull()) {
 			ret->m_handle = handle;
 			ret->m_flagFreeOnRelease = flagFreeOnRelease;
-			UIPlatform::registerViewInstance(handle, ret.ptr);
+			UIPlatform::registerViewInstance(handle, ret.get());
 		} else {
 			if (flagFreeOnRelease) {
 				freeHandle(handle);
@@ -312,7 +312,7 @@ UIPointf iOS_ViewInstance::convertCoordinateFromViewToScreen(const UIPointf& ptV
 
 void iOS_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
 {
-	iOS_ViewInstance* child = (iOS_ViewInstance*)(_child.ptr);
+	iOS_ViewInstance* child = (iOS_ViewInstance*)(_child.get());
 	if (child) {
 		UIView* handle = m_handle;
 		if (handle != nil) {
@@ -326,7 +326,7 @@ void iOS_ViewInstance::addChildInstance(const Ref<ViewInstance>& _child)
 
 void iOS_ViewInstance::removeChildInstance(const Ref<ViewInstance>& _child)
 {
-	iOS_ViewInstance* child = (iOS_ViewInstance*)(_child.ptr);
+	iOS_ViewInstance* child = (iOS_ViewInstance*)(_child.get());
 	if (child) {
 		UIView* child_handle = child->m_handle;
 		if (child_handle != nil) {
@@ -374,7 +374,7 @@ void iOS_ViewInstance::onDraw(CGRect rectDirty)
 			
 			if (canvas.isNotNull()) {
 				canvas->setInvalidatedRect(Rectangle((sl_real)(rectDirty.origin.x * f), (sl_real)(rectDirty.origin.y * f), (sl_real)((rectDirty.origin.x + rectDirty.size.width) * f), (sl_real)((rectDirty.origin.y + rectDirty.size.height) * f)));
-				ViewInstance::onDraw(canvas.ptr);
+				ViewInstance::onDraw(canvas.get());
 			}
 		}
 	}
@@ -389,7 +389,7 @@ sl_bool iOS_ViewInstance::onEventTouch(UIAction action, NSSet* touches, ::UIEven
 		CGFloat f = UIPlatform::getGlobalScaleFactor();
 		
 		sl_uint32 n = (sl_uint32)([touches count]);
-		Array<TouchPoint> points(n);
+		Array<TouchPoint> points = Array<TouchPoint>::create(n);
 		if (points.isNotNull()) {
 			TouchPoint* pts = points.getData();
 			sl_uint32 i = 0;
@@ -420,7 +420,7 @@ sl_bool iOS_ViewInstance::onEventTouch(UIAction action, NSSet* touches, ::UIEven
 		t.setSecondsCountf(event.timestamp);
 		Ref<UIEvent> ev = UIEvent::createTouchEvent(action, points, t);
 		if (ev.isNotNull()) {
-			onTouchEvent(ev.ptr);
+			onTouchEvent(ev.get());
 			if (ev->isStoppedPropagation()) {
 				return sl_true;
 			}
@@ -523,7 +523,7 @@ UIView* UIPlatform::getViewHandle(View* view)
 	if (view) {
 		Ref<ViewInstance> _instance = view->getViewInstance();
 		if (_instance.isNotNull()) {
-			iOS_ViewInstance* instance = static_cast<iOS_ViewInstance*>(_instance.ptr);
+			iOS_ViewInstance* instance = static_cast<iOS_ViewInstance*>(_instance.get());
 			return instance->getHandle();
 		}
 	}
@@ -533,7 +533,7 @@ UIView* UIPlatform::getViewHandle(View* view)
 sl_bool GestureDetector::_enableNative(const Ref<View>& view, GestureType type)
 {
 	Ref<ViewInstance> _instance = view->getViewInstance();
-	iOS_ViewInstance* instance = static_cast<iOS_ViewInstance*>(_instance.ptr);
+	iOS_ViewInstance* instance = static_cast<iOS_ViewInstance*>(_instance.get());
 	if (instance) {
 		switch (type) {
 			case GestureType::SwipeLeft:
@@ -568,6 +568,8 @@ sl_bool GestureDetector::_enableNative(const Ref<View>& view, GestureType type)
 					instance->m_gestureSwipeDown = gesture;
 				}
 				return sl_true;
+			default:
+				break;
 		}
 	}
 	return sl_false;

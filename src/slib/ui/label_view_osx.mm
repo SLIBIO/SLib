@@ -28,7 +28,7 @@ public:
 		[handle setBackgroundColor:(GraphicsPlatform::getNSColorFromColor(getBackgroundColor()))];
 		
 		Ref<Font> font = getFont();
-		NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
+		NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
@@ -101,7 +101,7 @@ void LabelView::_setFont_NW(const Ref<Font>& font)
 	NSView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[NSTextField class]]) {
 		NSTextField* tv = (NSTextField*)handle;
-		NSFont* hFont = GraphicsPlatform::getNSFont(font.ptr);
+		NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
 		if (hFont != nil) {
 			[tv setFont:hFont];
 		}
