@@ -6,10 +6,11 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
-void Notification::registerForNotification()
+void PushNotification::registerForNotification()
 {
 	UIApplication* application = [UIApplication sharedApplication];
-	[application registerForRemoteNotifications];
+	UIUserNotificationSettings* notificationSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert categories:nil];
+	[application registerUserNotificationSettings:notificationSettings];
 }
 
 SLIB_UI_NAMESPACE_END

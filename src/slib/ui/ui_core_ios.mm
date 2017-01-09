@@ -278,7 +278,7 @@ SLIB_UI_NAMESPACE_END
 		tokenString += slib::String::format("%02x", bytes[i]);
 	}
 	
-	slib::Function<void (const slib::String&)> callback = slib::Notification::getTokenRefreshCallback();
+	slib::Function<void (const slib::String&)> callback = slib::PushNotification::getTokenRefreshCallback();
 	if (callback.isNotNull()) {
 		callback(tokenString);
 	}
@@ -286,7 +286,7 @@ SLIB_UI_NAMESPACE_END
 
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
 {
-	slib::Function<void (const slib::String&)> callback = slib::Notification::getTokenRefreshCallback();
+	slib::Function<void (const slib::String&)> callback = slib::PushNotification::getTokenRefreshCallback();
 	if (callback.isNotNull()) {
 		callback(slib::String::null());
 	}
@@ -296,11 +296,12 @@ SLIB_UI_NAMESPACE_END
 	NSError *err;
 	NSData* jsonData = [NSJSONSerialization dataWithJSONObject:userInfo options:0 error:&err];
 	NSString* jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+//	slib::PushNotificationMessage message;
 	if (jsonString) {
 		slib::Variant _userInfo = slib::Json::parseJson(slib::Apple::getStringFromNSString(jsonString));
-		slib::Function<void (const slib::Map<slib::String, slib::Variant>&)> callback = slib::Notification::getNotificationReceivedCallback();
+		slib::Function<void(slib::PushNotificationMessage&)> callback = slib::PushNotification::getNotificationReceivedCallback();
 		if (callback.isNotNull()) {
-			callback(_userInfo.getVariantMap());
+//			callback(_userInfo.getVariantMap());
 		}
 	}
 }

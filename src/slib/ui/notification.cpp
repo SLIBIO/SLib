@@ -5,9 +5,9 @@ SLIB_UI_NAMESPACE_BEGIN
 
 SLIB_SAFE_STATIC_GETTER(String, _getDeviceToken)
 SLIB_SAFE_STATIC_GETTER(Function<void (const String &)>, _getTokenRefreshCallback)
-SLIB_SAFE_STATIC_GETTER(Function<void (const Map<String, Variant>&)>, _getNotificationReceivedCallback)
+SLIB_SAFE_STATIC_GETTER(Function<void(PushNotificationMessage&)>, _getNotificationReceivedCallback)
 
-String Notification::getDeviceToken()
+String PushNotification::getDeviceToken()
 {
 	String* token = _getDeviceToken();
 	if (token) {
@@ -16,7 +16,7 @@ String Notification::getDeviceToken()
 	return String::null();
 }
 
-void Notification::setTokenRefreshCallback(const Function<void(String const&)>& callback)
+void PushNotification::setTokenRefreshCallback(const Function<void(String)>& callback)
 {
 	Function<void (const String&)>* _refreshCallback = _getTokenRefreshCallback();
 	if (_refreshCallback) {
@@ -24,15 +24,15 @@ void Notification::setTokenRefreshCallback(const Function<void(String const&)>& 
 	}
 }
 
-void Notification::setNotificationReceivedCallback(const Function<void (const Map<String, Variant>&)>& callback)
+void PushNotification::setNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback)
 {
-	Function<void (const Map<String, Variant>&)>* _receivedCallback = _getNotificationReceivedCallback();
+	Function<void(PushNotificationMessage&)>* _receivedCallback = _getNotificationReceivedCallback();
 	if (_receivedCallback) {
 		*_receivedCallback = callback;
 	}
 }
 
-Function<void (const String &)> Notification::getTokenRefreshCallback()
+Function<void(String)> PushNotification::getTokenRefreshCallback()
 {
 	Function<void (const String &)>* callback = _getTokenRefreshCallback();
 	if (callback) {
@@ -41,9 +41,9 @@ Function<void (const String &)> Notification::getTokenRefreshCallback()
 	return sl_null;
 }
 
-Function<void (const Map<String, Variant>&)> Notification::getNotificationReceivedCallback()
+Function<void(PushNotificationMessage&)> PushNotification::getNotificationReceivedCallback()
 {
-	Function<void (const Map<String, Variant>&)>* callback = _getNotificationReceivedCallback();
+	Function<void(PushNotificationMessage&)>* callback = _getNotificationReceivedCallback();
 	if (callback) {
 		return *callback;
 	}

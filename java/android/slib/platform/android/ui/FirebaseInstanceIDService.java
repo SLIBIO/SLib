@@ -11,5 +11,12 @@ public class FirebaseInstanceIDService extends FirebaseInstanceIdService{
         nativeOnTokenRefresh(refreshedToken);
     }
 
+    static public void getToken() {
+        String token = FirebaseInstanceId.getInstance().getToken();
+        if (token != null && token.length() > 0) {
+            nativeOnTokenRefresh(token);
+        }
+    }
+
     private static native void nativeOnTokenRefresh(String token);
 }

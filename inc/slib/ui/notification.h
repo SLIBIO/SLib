@@ -9,15 +9,23 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
-class SLIB_EXPORT Notification
+class SLIB_EXPORT PushNotificationMessage
+{
+public:
+	String title;
+	String body;
+	Map<String, String> data;
+};
+
+class SLIB_EXPORT PushNotification
 {
 public:
 	static void registerForNotification();
 	static String getDeviceToken();
-	static void setTokenRefreshCallback(const Function<void(String const&)>& callback);
-	static void setNotificationReceivedCallback(const Function<void (const Map<String, Variant>&)>& callback);
-	static Function<void(String const&)> getTokenRefreshCallback();
-	static Function<void (const Map<String, Variant>&)> getNotificationReceivedCallback();
+	static void setTokenRefreshCallback(const Function<void(String)>& callback);
+	static void setNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback);
+	static Function<void(String)> getTokenRefreshCallback();
+	static Function<void(PushNotificationMessage&)> getNotificationReceivedCallback();
 };
 
 SLIB_UI_NAMESPACE_END

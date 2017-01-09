@@ -4,36 +4,48 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.RemoteMessage;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
 public class FirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-//        if (remoteMessage.getData().size() > 0) {
-//
-//        }
-//        if (remoteMessage.getNotification() != null) {
-//
-//        }
         String messageBody = remoteMessage.getNotification().getBody();
-        nativeOnMessageReceived(messageBody);
-        sendNotification(messageBody);
+        Map<String, String> map = remoteMessage.getData();
+        Vector<String> data = new Vector<String>();
+
+        if (data == null) {
+            int size = data.size();
+            String[] values = map.values().toArray(new String[] {});
+            String[] keys = map.keySet().toArray(new String[] {});
+
+            for (int i = 0; i < map.size(); i++) {
+                String key = keys[i];
+                String value = values[i];
+
+                if (key == null && value == null) {
+                    break;
+                }
+
+                data.add(key);
+                data.add(value);
+            }
+        }
+
+        String title = remoteMessage.getNotification().getTitle();
+        String body = remoteMessage.getNotification().getBody();
+
+        nativeOnMessageReceived(title, body, data.toArray(new String[] {}));
     }
 
-    private void sendNotification(String messageBody) {
-        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setContentTitle("FCM Message")
-                .setContentText(messageBody)
-                .setAutoCancel(true)
-                .setSound(defaultSoundUri);
-
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
-    }
-
-    private static native void nativeOnMessageReceived(String message);
+    private static native void nativeOnMessageReceived(String title, String body, String[] data);
 }
