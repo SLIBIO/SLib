@@ -74,34 +74,6 @@ sl_uint32 System::getTickCount()
 #endif
 }
 
-#if defined(SLIB_PLATFORM_IS_WIN32)
-void* System::createGlobalUniqueInstance(const String& _name)
-{
-	if (_name.isEmpty()) {
-		return sl_null;
-	}
-	String16 name = "Global\\" + File::makeSafeFileName(_name);
-	HANDLE hMutex = ::OpenMutexW(MUTEX_ALL_ACCESS, FALSE, (LPCWSTR)(name.getData()));
-	if (hMutex != NULL) {
-		::CloseHandle(hMutex);
-		return sl_null;
-	}
-	hMutex = ::CreateMutexW(NULL, FALSE, (LPCWSTR)(name.getData()));
-	if (hMutex) {
-		return (void*)(hMutex);
-	} else {
-		return sl_null;
-	}
-}
-
-void System::freeGlobalUniqueInstance(void* instance)
-{
-	if (instance) {
-		::CloseHandle((HANDLE)instance);
-	}
-}
-#endif
-
 sl_uint32 System::getProcessId()
 {
 	return ::GetCurrentProcessId();
@@ -263,6 +235,63 @@ String Console::readLine()
 	line[511] = 0;
 	return l;
 }
+#endif
+
+#if defined(SLIB_PLATFORM_IS_WIN32)
+
+class _GlobalUniqueInstance : public GlobalUniqueInstance
+{
+public:
+	HANDLE m_hMutex;
+
+public:
+	_GlobalUniqueInstance()
+	{
+	}
+
+	~_GlobalUniqueInstance()
+	{
+		::CloseHandle(m_hMutex);
+	}
+};
+
+
+Ref<GlobalUniqueInstance> GlobalUniqueInstance::create(const String& _name)
+{
+	if (_name.isEmpty()) {
+		return sl_null;
+	}
+	String16 name = "Global\\" + File::makeSafeFileName(_name);
+	HANDLE hMutex = ::OpenMutexW(MUTEX_ALL_ACCESS, FALSE, (LPCWSTR)(name.getData()));
+	if (hMutex != NULL) {
+		::CloseHandle(hMutex);
+		return sl_null;
+	}
+	Ref<_GlobalUniqueInstance> instance = new _GlobalUniqueInstance;
+	if (instance.isNotNull()) {
+		hMutex = ::CreateMutexW(NULL, FALSE, (LPCWSTR)(name.getData()));
+		if (hMutex) {
+			instance->m_hMutex = hMutex;
+			return instance;
+		}
+	}
+	return sl_null;
+}
+
+sl_bool GlobalUniqueInstance::exists(const String& _name)
+{
+	if (_name.isEmpty()) {
+		return sl_false;
+	}
+	String16 name = "Global\\" + File::makeSafeFileName(_name);
+	HANDLE hMutex = ::OpenMutexW(MUTEX_ALL_ACCESS, FALSE, (LPCWSTR)(name.getData()));
+	if (hMutex != NULL) {
+		::CloseHandle(hMutex);
+		return sl_true;
+	}
+	return sl_false;
+}
+
 #endif
 
 void _abort(const char* msg, const char* file, sl_uint32 line)

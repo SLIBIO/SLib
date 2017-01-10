@@ -85,7 +85,7 @@
 		{ static_assert(__is_convertible_to(FROM, TO), "Cannot convert from '" #FROM "' to '" #TO "'"); }
 #else
 #	define SLIB_TRY_CONVERT_TYPE(FROM, TO) \
-		{ (void)static_cast<TO>((FROM)0); }
+		{ static_assert(slib::IsConvertible<FROM, TO>::value, "Cannot convert from '" #FROM "' to '" #TO "'"); }
 #endif
 
 

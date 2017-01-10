@@ -31,50 +31,6 @@ String System::getCachesDirectory()
 #endif
 
 #if defined(SLIB_PLATFORM_IS_MOBILE)
-
-SLIB_SAFE_STATIC_GETTER(CList<String>, _System_getGlobalUniqueInstances)
-
-struct _SYS_GLOBAL_UNIQUE_INSTANCE
-{
-	String name;
-};
-
-void* System::createGlobalUniqueInstance(const String& _name)
-{
-	String name = _name;
-	if (name.isEmpty()) {
-		return sl_null;
-	}
-	name = File::makeSafeFileName(name);
-	CList<String>* lst = _System_getGlobalUniqueInstances();
-	if (!lst) {
-		return sl_null;
-	}
-	if (lst->indexOf(name) >= 0) {
-		return sl_null;
-	}
-	_SYS_GLOBAL_UNIQUE_INSTANCE* instance = new _SYS_GLOBAL_UNIQUE_INSTANCE();
-	instance->name = name;
-	lst->add(name);
-	return instance;
-}
-
-void System::freeGlobalUniqueInstance(void* instance)
-{
-	if (instance) {
-		_SYS_GLOBAL_UNIQUE_INSTANCE* l = (_SYS_GLOBAL_UNIQUE_INSTANCE*)(instance);
-		if (l) {
-			CList<String>* lst = _System_getGlobalUniqueInstances();
-			if (lst) {
-				lst->removeValue(l->name);
-			}
-			delete l;
-		}
-	}
-}
-#endif
-
-#if defined(SLIB_PLATFORM_IS_MOBILE)
 sl_bool System::createProcess(const String& pathExecutable, const String* cmds, sl_uint32 nCmds)
 {
 	LogError("System::createProcess", "Not supported");
@@ -120,6 +76,75 @@ String Console::readLine()
 {
 	return sl_null;
 }
+#endif
+
+
+#if defined(SLIB_PLATFORM_IS_MOBILE)
+
+typedef CList<String> _GlobalUniqueInstanceList;
+
+SLIB_SAFE_STATIC_GETTER(_GlobalUniqueInstanceList, _getGlobalUniqueInstanceList)
+
+class _GlobalUniqueInstance : public GlobalUniqueInstance
+{
+public:
+	String m_name;
+	
+public:
+	_GlobalUniqueInstance()
+	{
+	}
+	
+	~_GlobalUniqueInstance()
+	{
+		_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
+		if (list) {
+			list->removeValue(m_name);
+		}
+	}
+	
+};
+
+Ref<GlobalUniqueInstance> GlobalUniqueInstance::create(const String& _name)
+{
+	String name = _name;
+	if (name.isEmpty()) {
+		return sl_null;
+	}
+	name = File::makeSafeFileName(name);
+	_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
+	if (!list) {
+		return sl_null;
+	}
+	if (list->indexOf(name) >= 0) {
+		return sl_null;
+	}
+	Ref<_GlobalUniqueInstance> instance = new _GlobalUniqueInstance();
+	if (instance.isNotNull()) {
+		instance->m_name = name;
+		list->add(name);
+		return instance;
+	}
+	return sl_null;
+}
+
+sl_bool GlobalUniqueInstance::exists(const String& _name)
+{
+	String name = _name;
+	if (name.isEmpty()) {
+		return sl_false;
+	}
+	name = File::makeSafeFileName(name);
+	_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
+	if (!list) {
+		return sl_false;
+	}
+	if (list->indexOf(name) >= 0) {
+		return sl_true;
+	}
+	return sl_true;
+}
+
 #endif
 
 SLIB_NAMESPACE_END

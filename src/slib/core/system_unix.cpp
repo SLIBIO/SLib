@@ -106,65 +106,6 @@ sl_uint32 System::getTickCount()
 	}
 }
 
-#if !defined(SLIB_PLATFORM_IS_MOBILE)
-
-SLIB_SAFE_STATIC_GETTER(CList<String>, _System_getGlobalUniqueInstances)
-
-struct _SYS_GLOBAL_UNIQUE_INSTANCE
-{
-	String name;
-	Ref<File> file;
-};
-
-void* System::createGlobalUniqueInstance(const String& uniqueName)
-{
-	if (uniqueName.isEmpty()) {
-		return sl_null;
-	}
-	String name = File::makeSafeFileName(uniqueName);
-	CList<String>* lst = _System_getGlobalUniqueInstances();
-	if (!lst) {
-		return sl_null;
-	}
-	if (lst->indexOf(name) >= 0) {
-		return sl_null;
-	}
-
-	String fileName = "/tmp/.slib_global_lock_" + name;
-	_SYS_GLOBAL_UNIQUE_INSTANCE* instance = new _SYS_GLOBAL_UNIQUE_INSTANCE();
-	instance->name = name;
-	instance->file = File::openForWrite(fileName);
-	if (instance->file.isNull()) {
-		delete instance;
-		return sl_null;
-	}
-	if (! (instance->file->lock())) {
-		instance->file->close();
-		delete instance;
-		return sl_null;
-	}
-	lst->add(name);
-	return instance;
-}
-
-void System::freeGlobalUniqueInstance(void* instance)
-{
-	if (instance) {
-		_SYS_GLOBAL_UNIQUE_INSTANCE* l = (_SYS_GLOBAL_UNIQUE_INSTANCE*)(instance);
-		if (l) {
-			l->file->unlock();
-			l->file->close();
-			File::deleteFile(l->file->getPath());
-			CList<String>* lst = _System_getGlobalUniqueInstances();
-			if (lst) {
-				lst->removeValue(l->name);
-			}
-			delete l;
-		}
-	}
-}
-#endif
-
 sl_uint32 System::getProcessId()
 {
 	return getpid();
@@ -325,6 +266,101 @@ String Console::readLine()
 	}
 	return ret;
 }
+#endif
+
+#if !defined(SLIB_PLATFORM_IS_MOBILE)
+
+typedef CList<String> _GlobalUniqueInstanceList;
+
+SLIB_SAFE_STATIC_GETTER(_GlobalUniqueInstanceList, _getGlobalUniqueInstanceList)
+
+class _GlobalUniqueInstance : public GlobalUniqueInstance
+{
+public:
+	String m_name;
+	Ref<File> m_file;
+	
+public:
+	_GlobalUniqueInstance()
+	{
+	}
+	
+	~_GlobalUniqueInstance()
+	{
+		m_file->unlock();
+		m_file->close();
+		File::deleteFile(m_file->getPath());
+		_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
+		if (list) {
+			list->removeValue(m_name);
+		}
+	}
+	
+};
+
+Ref<GlobalUniqueInstance> GlobalUniqueInstance::create(const String& _name)
+{
+	if (_name.isEmpty()) {
+		return sl_null;
+	}
+	String name = File::makeSafeFileName(_name);
+	_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
+	if (!list) {
+		return sl_null;
+	}
+	if (list->indexOf(name) >= 0) {
+		return sl_null;
+	}
+	
+	Ref<_GlobalUniqueInstance> instance = new _GlobalUniqueInstance;
+	if (instance.isNotNull()) {
+		String fileName = "/tmp/.slib_global_lock_" + name;
+		Ref<File> file = File::openForWrite(fileName);
+		if (file.isNotNull()) {
+			if (file->lock()) {
+				instance->m_name = name;
+				instance->m_file = file;
+				list->add(name);
+				return instance;
+			}
+			file->close();
+			File::deleteFile(fileName);
+		}
+	}
+	return sl_null;
+}
+
+sl_bool GlobalUniqueInstance::exists(const String& _name)
+{
+	if (_name.isEmpty()) {
+		return sl_false;
+	}
+	String name = File::makeSafeFileName(_name);
+	_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
+	if (!list) {
+		return sl_false;
+	}
+	if (list->indexOf(name) >= 0) {
+		return sl_true;
+	}
+	String fileName = "/tmp/.slib_global_lock_" + name;
+	if (File::exists(fileName)) {
+		Ref<File> file = File::openForWrite(fileName);
+		if (file.isNull()) {
+			return sl_true;
+		} else {
+			if (file->lock()) {
+				file->unlock();
+			} else {
+				return sl_true;
+			}
+			file->close();
+			File::deleteFile(fileName);
+		}
+	}
+	return sl_false;
+}
+
 #endif
 
 void _abort(const char* msg, const char* file, sl_uint32 line)

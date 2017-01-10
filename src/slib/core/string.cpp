@@ -7855,22 +7855,22 @@ SLIB_INLINE ST _String_format(const CT* format, sl_size len, const Variant* para
 	return sb.merge();
 }
 
-String8 String8::formatv(const String8& format, const Variant *params, sl_size nParams)
+String8 String8::formatBy(const String8& format, const Variant *params, sl_size nParams)
 {
 	return _String_format<String8, sl_char8, StringBuffer8>(format.getData(), format.getLength(), params, nParams);
 }
 
-String16 String16::formatv(const String16& format, const Variant *params, sl_size nParams)
+String16 String16::formatBy(const String16& format, const Variant *params, sl_size nParams)
 {
 	return _String_format<String16, sl_char16, StringBuffer16>(format.getData(), format.getLength(), params, nParams);
 }
 
-String8 String8::formatv(const sl_char8* format, const Variant *params, sl_size nParams)
+String8 String8::formatBy(const sl_char8* format, const Variant *params, sl_size nParams)
 {
 	return _String_format<String8, sl_char8, StringBuffer8>(format, Base::getStringLength(format), params, nParams);
 }
 
-String16 String16::formatv(const sl_char16* format, const Variant *params, sl_size nParams)
+String16 String16::formatBy(const sl_char16* format, const Variant *params, sl_size nParams)
 {
 	return _String_format<String16, sl_char16, StringBuffer16>(format, Base::getStringLength2(format), params, nParams);
 }
@@ -7895,24 +7895,24 @@ String16 String16::format(const sl_char16* szFormat)
 	return szFormat;
 }
 
-String8 String8::argv(const Variant* params, sl_size nParams) const
+String8 String8::argBy(const Variant* params, sl_size nParams) const
 {
-	return formatv(*this, params, nParams);
+	return formatBy(*this, params, nParams);
 }
 
-String16 String16::argv(const Variant* params, sl_size nParams) const
+String16 String16::argBy(const Variant* params, sl_size nParams) const
 {
-	return formatv(*this, params, nParams);
+	return formatBy(*this, params, nParams);
 }
 
-String8 Atomic<String8>::argv(const Variant* params, sl_size nParams) const
+String8 Atomic<String8>::argBy(const Variant* params, sl_size nParams) const
 {
-	return String8::formatv(*this, params, nParams);
+	return String8::formatBy(*this, params, nParams);
 }
 
-String16 Atomic<String16>::argv(const Variant* params, sl_size nParams) const
+String16 Atomic<String16>::argBy(const Variant* params, sl_size nParams) const
 {
-	return String16::formatv(*this, params, nParams);
+	return String16::formatBy(*this, params, nParams);
 }
 
 

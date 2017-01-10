@@ -170,7 +170,7 @@ public:
 			NSDictionary* dict = http.allHeaderFields;
 			if (dict != nil && [dict count] > 0) {
 				Map<String, String> map;
-				map.initHash(0, HashIgnoreCaseString(), CompareIgnoreCaseString());
+				map.initHash(0, HashIgnoreCaseString(), EqualsIgnoreCaseString());
 				if (map.isNotNull()) {
 					IMap<String, String>* pmap = map.ref.get();
 					[dict enumerateKeysAndObjectsUsingBlock:^(id key, id value, BOOL *stop) {

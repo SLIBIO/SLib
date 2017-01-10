@@ -634,9 +634,9 @@ public:
 	static String8 makeHexString(const Memory& mem);
 	
 	
-	static String8 formatv(const sl_char8* szFormat, const Variant* params, sl_size nParams);
+	static String8 formatBy(const sl_char8* szFormat, const Variant* params, sl_size nParams);
 	
-	static String8 formatv(const String8& strFormat, const Variant* params, sl_size nParams);
+	static String8 formatBy(const String8& strFormat, const Variant* params, sl_size nParams);
 	
 	static String8 format(const sl_char8* szFormat);
 	
@@ -648,7 +648,7 @@ public:
 	template <class... ARGS>
 	static String8 format(const String8& strFormat, ARGS&&... args);
 	
-	String8 argv(const Variant* params, sl_size nParams) const;
+	String8 argBy(const Variant* params, sl_size nParams) const;
 	
 	template <class... ARGS>
 	String8 arg(ARGS&&... args) const;
@@ -1249,9 +1249,9 @@ public:
 	static String16 makeHexString(const Memory& mem);
 	
 	
-	static String16 formatv(const sl_char16* szFormat, const Variant* params, sl_size nParams);
+	static String16 formatBy(const sl_char16* szFormat, const Variant* params, sl_size nParams);
 	
-	static String16 formatv(const String16& strFormat, const Variant* params, sl_size nParams);
+	static String16 formatBy(const String16& strFormat, const Variant* params, sl_size nParams);
 	
 	static String16 format(const sl_char16* szFormat);
 	
@@ -1263,7 +1263,7 @@ public:
 	template <class... ARGS>
 	static String16 format(const String16& strFormat, ARGS&&... args);
 	
-	String16 argv(const Variant* params, sl_size nParams) const;
+	String16 argBy(const Variant* params, sl_size nParams) const;
 	
 	template <class... ARGS>
 	String16 arg(ARGS&&... args) const;
@@ -1779,7 +1779,7 @@ public:
 	sl_bool parseHexString(void* _out) const;
 	
 	
-	String8 argv(const Variant* params, sl_size nParams) const;
+	String8 argBy(const Variant* params, sl_size nParams) const;
 	
 	template <class... ARGS>
 	String8 arg(ARGS&&... args) const;
@@ -2246,7 +2246,7 @@ public:
 	sl_bool parseHexString(void* _out) const;
 	
 	
-	String16 argv(const Variant* params, sl_size nParams) const;
+	String16 argBy(const Variant* params, sl_size nParams) const;
 	
 	template <class... ARGS>
 	String16 arg(ARGS&&... args) const;

@@ -52,13 +52,36 @@ SLIB_INLINE void Swap(T& a, T& b)
 	b = Move(t);
 }
 
-template<typename T, sl_size_t N>
+template<class T, sl_size_t N>
 SLIB_CONSTEXPR sl_size_t CountOfArray(const T (&)[N])
 {
 	return N;
 }
 
 template <class T> struct PropertyTypeHelper { typedef T const& ArgType; typedef T const& RetType; };
+
+template <class T> T&& DeclaredValue() noexcept;
+
+template <class FROM, class TO>
+class IsConvertibleHelper
+{
+private:
+	template<class T> static void _test_implicit(T);
+	
+	template<class _FROM, class _TO, class _T = decltype(_test_implicit<_TO>(DeclaredValue<_FROM>()))>
+	static ConstValue<bool, true> _test(int);
+	
+	template <class _FROM, class _TO>
+	static ConstValue<bool, false> _test(...);
+	
+public:
+	typedef decltype(_test<FROM, TO>(0)) type;
+	
+};
+
+template <typename FROM, typename TO>
+struct IsConvertible : public IsConvertibleHelper<FROM, TO>::type {};
+
 
 SLIB_NAMESPACE_END
 

@@ -677,7 +677,7 @@ HttpResponse::HttpResponse()
 	SLIB_STATIC_STRING(s2, "OK");
 	m_responseMessage = s2;
 
-	m_responseHeaders.initHash(0, HashIgnoreCaseString(), CompareIgnoreCaseString());
+	m_responseHeaders.initHash(0, HashIgnoreCaseString(), EqualsIgnoreCaseString());
 }
 
 HttpStatus HttpResponse::getResponseCode() const

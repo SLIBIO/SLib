@@ -32,12 +32,6 @@ public:
 	static sl_uint32 getTickCount();
 
 	
-	// Inter-process Synchronization
-	static void* createGlobalUniqueInstance(const String& name);
-	
-	static void freeGlobalUniqueInstance(void* instance);
-
-	
 	// Process & Thread
 	static sl_uint32 getProcessId();
 	
@@ -70,6 +64,15 @@ public:
 	static void println(const String& s);
 
 	static String readLine();
+};
+
+class SLIB_EXPORT GlobalUniqueInstance : public Referable
+{
+public:
+	static Ref<GlobalUniqueInstance> create(const String& name);
+	
+	static sl_bool exists(const String& name);
+	
 };
 
 SLIB_NAMESPACE_END

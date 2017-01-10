@@ -55,11 +55,7 @@ void Service::startService()
 		return;
 	}
 	
-	String stopId = appName + STOP_ID;
-	void* stopInstance = System::createGlobalUniqueInstance(stopId);
-	if (stopInstance) {
-		System::freeGlobalUniqueInstance(stopInstance);
-	} else {
+	if (GlobalUniqueInstance::exists(appName + STOP_ID)) {
 		LogError(TAG, "OTHER PROCESS IS STOPPING %s", appName);
 		return;
 	}
@@ -72,11 +68,7 @@ void Service::startService()
 		System::createProcess(appPath, sl_null, 0);
 
 		for (int i = 0; i < WAIT_SECONDS*10; i++) {
-			String startId = appName + START_ID;
-			void* startInstance = System::createGlobalUniqueInstance(startId);
-			if (startInstance) {
-				System::freeGlobalUniqueInstance(startInstance);
-			} else {
+			if (GlobalUniqueInstance::exists(appName + START_ID)) {
 				Log(TAG, "%s IS STARTED", appName);
 				return;
 			}
@@ -95,19 +87,16 @@ void Service::stopService()
 	if (!(isUniqueInstanceRunning())) {
 		LogError(TAG, "%s IS NOT RUNNING", appName);
 	} else {
-		String stopId = appName + STOP_ID;
-		void* stopInstance = System::createGlobalUniqueInstance(stopId);
-		if (stopInstance) {
+		Ref<GlobalUniqueInstance> stopInstance = GlobalUniqueInstance::create(appName + STOP_ID);
+		if (stopInstance.isNotNull()) {
 			Log(TAG, "STOPPING %s", appName);
 			for (int i = 0; i < WAIT_SECONDS * 10; i++) {
 				if (!(isUniqueInstanceRunning())) {
-					System::freeGlobalUniqueInstance(stopInstance);
 					Log(TAG, "%s IS STOPPED", appName);
 					return;
 				}
 				System::sleep(100);
 			}
-			System::freeGlobalUniqueInstance(stopInstance);
 			LogError(TAG, "%s IS NOT STOPPED", appName);
 		} else {
 			LogError(TAG, "OTHER PROCESS IS STOPPING %s", appName);
@@ -171,36 +160,18 @@ void Service::onRunApp()
 		return;
 	}
 	
-	String startId = appName + START_ID;
-	void* startInstance = sl_null;
-	for (int i = 0; i < WAIT_SECONDS * 10; i++) {
-		startInstance = System::createGlobalUniqueInstance(startId);
-		if (startInstance) {
-			break;
-		}
-		System::sleep(100);
-	}
-	if (!startInstance) {
-		LogError(TAG, "FAILED TO CREATE STARTED SIGNAL");
-		dispatchStopService();
-		return;
-	}
+	Ref<GlobalUniqueInstance> startInstance = GlobalUniqueInstance::create(appName + START_ID);
 
 	String stopId = appName + STOP_ID;
 	
 	while (1) {
-		void* stopInstance = System::createGlobalUniqueInstance(stopId);
-		if (stopInstance) {
-			System::freeGlobalUniqueInstance(stopInstance);
-		} else {
+		if (GlobalUniqueInstance::exists(stopId)) {
 			break;
 		}
 		System::sleep(500);
 	}
 	
 	dispatchStopService();
-	
-	System::freeGlobalUniqueInstance(startInstance);
 	
 }
 

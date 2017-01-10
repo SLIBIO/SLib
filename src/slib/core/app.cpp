@@ -14,8 +14,11 @@ SLIB_DEFINE_OBJECT(Application, Object)
 
 Application::Application()
 {
-	m_uniqueInstanceHandle = sl_null;
 	m_flagCrashRecoverySupport = sl_false;
+}
+
+Application::~Application()
+{
 }
 
 Ref<Application> Application::getApp()
@@ -94,14 +97,8 @@ void Application::doRun()
 #if !defined(SLIB_PLATFORM_IS_MOBILE)
 	String instanceId = getUniqueInstanceId();
 	if (instanceId.isNotEmpty()) {
-		for (int i = 0; i < 30; i++) {
-			m_uniqueInstanceHandle = System::createGlobalUniqueInstance(instanceId);
-			if (m_uniqueInstanceHandle) {
-				break;
-			}
-			System::sleep(100);
-		}
-		if (!m_uniqueInstanceHandle) {
+		m_uniqueInstance = GlobalUniqueInstance::create(instanceId);
+		if (m_uniqueInstance.isNull()) {
 			LogError("APP", "%s is ALREADY RUNNING", instanceId);
 			return;
 		}
@@ -123,9 +120,7 @@ void Application::dispatchQuitApp()
 {
 	onQuitApp();
 #if !defined(SLIB_PLATFORM_IS_MOBILE)
-	if (m_uniqueInstanceHandle) {
-		System::freeGlobalUniqueInstance(m_uniqueInstanceHandle);
-	}
+	m_uniqueInstance.setNull();
 #endif
 }
 
@@ -138,13 +133,7 @@ sl_bool Application::isUniqueInstanceRunning()
 #if !defined(SLIB_PLATFORM_IS_MOBILE)
 	String instanceId = getUniqueInstanceId();
 	if (instanceId.isNotEmpty()) {
-		void* instance = System::createGlobalUniqueInstance(instanceId);
-		if (instance) {
-			System::freeGlobalUniqueInstance(instance);
-			return sl_false;
-		} else {
-			return sl_true;
-		}
+		return GlobalUniqueInstance::exists(instanceId);
 	}
 #endif
 	return sl_false;

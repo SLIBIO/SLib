@@ -854,56 +854,56 @@ template <class... ARGS>
 String8 String8::format(const sl_char8* szFormat, ARGS&&... args)
 {
 	Variant params[] = {Forward<ARGS>(args)...};
-	return formatv(szFormat, params, sizeof...(args));
+	return formatBy(szFormat, params, sizeof...(args));
 }
 
 template <class... ARGS>
 String8 String8::format(const String8& strFormat, ARGS&&... args)
 {
 	Variant params[] = {Forward<ARGS>(args)...};
-	return formatv(strFormat, params, sizeof...(args));
+	return formatBy(strFormat, params, sizeof...(args));
 }
 
 template <class... ARGS>
 String16 String16::format(const sl_char16* szFormat, ARGS&&... args)
 {
 	Variant params[] = {Forward<ARGS>(args)...};
-	return formatv(szFormat, params, sizeof...(args));
+	return formatBy(szFormat, params, sizeof...(args));
 }
 
 template <class... ARGS>
 String16 String16::format(const String16& strFormat, ARGS&&... args)
 {
 	Variant params[] = {Forward<ARGS>(args)...};
-	return formatv(strFormat, params, sizeof...(args));
+	return formatBy(strFormat, params, sizeof...(args));
 }
 
 template <class... ARGS>
 String8 String8::arg(ARGS&&... args) const
 {
 	Variant params[] = {Forward<ARGS>(args)...};
-	return argv(params, sizeof...(args));
+	return argBy(params, sizeof...(args));
 }
 
 template <class... ARGS>
 String16 String16::arg(ARGS&&... args) const
 {
 	Variant params[] = {Forward<ARGS>(args)...};
-	return argv(params, sizeof...(args));
+	return argBy(params, sizeof...(args));
 }
 
 template <class... ARGS>
 String8 Atomic<String8>::arg(ARGS&&... args) const
 {
 	Variant params[] = {Forward<ARGS>(args)...};
-	return argv(params, sizeof...(args));
+	return argBy(params, sizeof...(args));
 }
 
 template <class... ARGS>
 String16 Atomic<String16>::arg(ARGS&&... args) const
 {
 	Variant params[] = {Forward<ARGS>(args)...};
-	return argv(params, sizeof...(args));
+	return argBy(params, sizeof...(args));
 }
 
 typedef List<Variant> VariantList;

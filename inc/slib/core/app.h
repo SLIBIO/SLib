@@ -14,12 +14,16 @@ enum class AppType
 	Service = 1
 };
 
+class GlobalUniqueInstance;
+
 class SLIB_EXPORT Application : public Object
 {
 	SLIB_DECLARE_OBJECT
 	
 public:
 	Application();
+	
+	~Application();
 	
 public:
 	virtual AppType getAppType() = 0;
@@ -89,7 +93,7 @@ protected:
 	List<String> m_arguments;
 	
 	AtomicString m_uniqueInstanceId;
-	void* m_uniqueInstanceHandle;
+	Ref<GlobalUniqueInstance> m_uniqueInstance;
 	
 	sl_bool m_flagCrashRecoverySupport;
 	
