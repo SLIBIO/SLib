@@ -15,34 +15,61 @@
 
 SLIB_NAMESPACE_BEGIN
 
-sl_file File::_open(const String& filePath, FileMode mode)
+sl_file File::_open(const String& filePath, const FileMode& mode, const FilePermissions& permissions)
 {
 	if (filePath.isEmpty()) {
 		return (sl_file)-1;
 	}
+	
 	int flags = 0;
-	int permissions = S_IRWXU | S_IRWXG | S_IRWXO;
-	switch (mode) {
-		case FileMode::Read:
-			flags = O_RDONLY;
-			permissions = 0;
-			break;
-		case FileMode::Write:
-			flags = O_WRONLY | O_CREAT | O_TRUNC;
-			break;
-		case FileMode::ReadWrite:
-			flags = O_RDWR | O_CREAT | O_TRUNC;
-			break;
-		case FileMode::Append:
-			flags = O_WRONLY | O_CREAT;
-			break;
-		case FileMode::RandomAccess:
-			flags = O_RDWR | O_CREAT;
-			break;
-		default:
-			return SLIB_FILE_INVALID_HANDLE;
+	if (mode & FileMode::Write) {
+		if (mode & FileMode::Read) {
+			flags = O_RDWR;
+		} else {
+			flags = O_WRONLY;
+		}
+		if (!(mode & FileMode::NotTruncate)) {
+			flags |= O_TRUNC;
+		}
+		if (!(mode & FileMode::NotCreate)) {
+			flags |= O_CREAT;
+		}
+	} else {
+		flags = O_RDONLY;
 	}
-	int fd = ::open(filePath.getData(), flags, permissions);
+	
+	int perm = 0;
+	if (flags & O_CREAT) {
+		if (permissions & FilePermissions::ReadByOthers) {
+			perm |= S_IROTH;
+		}
+		if (permissions & FilePermissions::WriteByOthers) {
+			perm |= S_IWOTH;
+		}
+		if (permissions & FilePermissions::ExecuteByOthers) {
+			perm |= S_IXOTH;
+		}
+		if (permissions & FilePermissions::ReadByGroup) {
+			perm |= S_IRGRP;
+		}
+		if (permissions & FilePermissions::WriteByGroup) {
+			perm |= S_IWGRP;
+		}
+		if (permissions & FilePermissions::ExecuteByGroup) {
+			perm |= S_IXGRP;
+		}
+		if (permissions & FilePermissions::ReadByUser) {
+			perm |= S_IRUSR;
+		}
+		if (permissions & FilePermissions::WriteByUser) {
+			perm |= S_IWUSR;
+		}
+		if (permissions & FilePermissions::ExecuteByUser) {
+			perm |= S_IXUSR;
+		}
+	}
+	
+	int fd = ::open(filePath.getData(), flags, perm);
 	return (sl_file)fd;
 }
 

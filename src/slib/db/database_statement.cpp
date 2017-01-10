@@ -12,7 +12,7 @@ Ref<Database> DatabaseStatement::getDatabase()
 List< Map<String, Variant> > DatabaseStatement::getListForQueryResultBy(const Variant* params, sl_uint32 nParams)
 {
 	List< Map<String, Variant> > ret;
-	Ref<DatabaseCursor> cursor = query(params, nParams);
+	Ref<DatabaseCursor> cursor = queryBy(params, nParams);
 	if (cursor.isNotNull()) {
 		while (cursor->moveNext()) {
 			ret.add_NoLock(cursor->getRow());
@@ -24,7 +24,7 @@ List< Map<String, Variant> > DatabaseStatement::getListForQueryResultBy(const Va
 Map<String, Variant> DatabaseStatement::getRecordForQueryResultBy(const Variant* params, sl_uint32 nParams)
 {
 	Map<String, Variant> ret;
-	Ref<DatabaseCursor> cursor = query(params, nParams);
+	Ref<DatabaseCursor> cursor = queryBy(params, nParams);
 	if (cursor.isNotNull()) {
 		if (cursor->moveNext()) {
 			return cursor->getRow();
@@ -35,7 +35,7 @@ Map<String, Variant> DatabaseStatement::getRecordForQueryResultBy(const Variant*
 
 Variant DatabaseStatement::getValueForQueryResultBy(const Variant* params, sl_uint32 nParams)
 {
-	Ref<DatabaseCursor> cursor = query(params, nParams);
+	Ref<DatabaseCursor> cursor = queryBy(params, nParams);
 	if (cursor.isNotNull()) {
 		if (cursor->moveNext()) {
 			return cursor->getValue(0);

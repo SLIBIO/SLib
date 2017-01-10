@@ -15,15 +15,15 @@ File::~File()
 	close();
 }
 
-Ref<File> File::open(const String& filePath, FileMode mode)
+Ref<File> File::open(const String& filePath, const FileMode& mode, const FilePermissions& permissions)
 {
-	sl_file file = _open(filePath, mode);
+	sl_file file = _open(filePath, mode, permissions);
 	if (file != SLIB_FILE_INVALID_HANDLE) {
 		Ref<File> ret = new File();
 		if (ret.isNotNull()) {
 			ret->m_file = file;
 			ret->m_path = filePath;
-			if (mode == FileMode::Append) {
+			if (mode & FileMode::SeekToEnd) {
 				ret->seekToEnd();
 			}
 			return ret;
@@ -33,6 +33,10 @@ Ref<File> File::open(const String& filePath, FileMode mode)
 	return sl_null;
 }
 
+Ref<File> File::open(const String& filePath, const FileMode& mode)
+{
+	return open(filePath, mode, FilePermissions::All);
+}
 
 Ref<File> File::openForRead(const String& filePath)
 {
@@ -57,6 +61,11 @@ Ref<File> File::openForAppend(const String& filePath)
 Ref<File> File::openForRandomAccess(const String& filePath)
 {
 	return open(filePath, FileMode::RandomAccess);
+}
+
+Ref<File> File::openForRandomRead(const String& filePath)
+{
+	return open(filePath, FileMode::RandomRead);
 }
 
 void File::close()

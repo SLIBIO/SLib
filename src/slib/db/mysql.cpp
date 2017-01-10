@@ -155,7 +155,7 @@ public:
 		if (0 == ::mysql_real_query(m_mysql, sql.getData(), (sl_uint32)(sql.getLength()))) {
 			return ::mysql_affected_rows(m_mysql);
 		}
-		LogError(TAG, ::mysql_error(m_mysql));
+		LogError(TAG, "Execute Error: %s, SQL:%s", ::mysql_error(m_mysql), sql);
 		return -1;
 	}
 
@@ -305,7 +305,7 @@ public:
 				::mysql_free_result(res);
 			}
 		} else {
-			LogError(TAG, ::mysql_error(m_mysql));
+			LogError(TAG, "Query Error: %s, SQL:", ::mysql_error(m_mysql), sql);
 		}
 		return ret;
 	}
@@ -901,7 +901,7 @@ public:
 					m_statement = statement;
 					return sl_true;
 				}
-				LogError(TAG, ::mysql_stmt_error(statement));
+				LogError(TAG, "Prepare Error: %s, SQL:%s", ::mysql_stmt_error(statement), m_sql);
 				::mysql_stmt_close(statement);
 			}
 			return sl_false;
@@ -999,16 +999,16 @@ public:
 						if (0 == ::mysql_stmt_bind_param(m_statement, bind)) {
 							return sl_true;
 						} else {
-							LogError(TAG, ::mysql_stmt_error(m_statement));
+							LogError(TAG, "Bind Error: %s, SQL:%s", ::mysql_stmt_error(m_statement), m_sql);
 						}
 					} else {
-						LogError(TAG, "Can't create memory for parameter binding");
+						LogError(TAG, "Bind error: Can't create memory for parameter binding, SQL:%s", m_sql);
 					}
 				} else {
 					return sl_true;
 				}
 			} else {
-				LogError(TAG, "Bind error: requires %d params but only %d params provided", n, nParams);
+				LogError(TAG, "Bind error: requires %d params but %d params provided, SQL:%s", n, nParams, m_sql);
 			}
 			return sl_false;
 		}
@@ -1031,12 +1031,12 @@ public:
 								if (0 == ::mysql_stmt_execute(m_statement)) {
 									return sl_true;
 								} else {
-									LogError(TAG, ::mysql_stmt_error(m_statement));
+									LogError(TAG, "Execute Statement Error: %s, SQL:%s", ::mysql_stmt_error(m_statement), m_sql);
 								}
 							}
 						}
 					} else {
-						LogError(TAG, ::mysql_stmt_error(m_statement));
+						LogError(TAG, "Execute Statement Error: %s, SQL:%s", ::mysql_stmt_error(m_statement), m_sql);
 					}
 				}
 			}

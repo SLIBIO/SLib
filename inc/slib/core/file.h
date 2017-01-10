@@ -11,13 +11,26 @@ typedef sl_reg sl_file;
 
 SLIB_NAMESPACE_BEGIN
 
-enum class FileMode
+class FileMode
 {
-	Read = 1,
-	Write = 2,
-	ReadWrite = 3,
-	Append = 4,
-	RandomAccess = 5
+public:
+	int value;
+	SLIB_MEMBERS_OF_FLAGS(FileMode, value)
+	
+	enum {
+		Read = 1,
+		Write = 2,
+		
+		NotCreate = 0x00001000,
+		NotTruncate = 0x00002000,
+		SeekToEnd = 0x10000000,
+		HintRandomAccess = 0x20000000,
+		
+		ReadWrite = Read | Write,
+		Append = Write | NotTruncate | SeekToEnd,
+		RandomAccess = Read | Write | NotTruncate | HintRandomAccess,
+		RandomRead = Read | HintRandomAccess
+	};
 };
 
 class FileAttributes
@@ -27,10 +40,47 @@ public:
 	SLIB_MEMBERS_OF_FLAGS(FileAttributes, value)
 
 	enum {
+		Default = 0,
 		Directory = 1,
 		Hidden = 2,
 		NotExist = 0x8000
 	};
+};
+
+class FilePermissions
+{
+	int value;
+	SLIB_MEMBERS_OF_FLAGS(FilePermissions, value)
+	
+	enum {
+		ReadByOthers = 0x0001,
+		WriteByOthers = 0x0002,
+		ExecuteByOthers = 0x0004,
+		Others = ReadByOthers | WriteByOthers | ExecuteByOthers,
+		
+		ReadByGroup = 0x0008,
+		WriteByGroup = 0x0010,
+		ExecuteByGroup = 0x0020,
+		Group = ReadByGroup | WriteByGroup | ExecuteByGroup,
+		
+		ReadByUser = 0x0040,
+		WriteByUser = 0x0080,
+		ExecuteByUser = 0x0100,
+		User = ReadByUser | WriteByUser | ExecuteByUser,
+		
+		Read = ReadByUser | ReadByGroup | ReadByOthers,
+		Write = WriteByUser | WriteByGroup | WriteByOthers,
+		Execute = ExecuteByUser | ExecuteByGroup | ExecuteByOthers,
+		
+		None = 0,
+		All = Read | Write | Execute,
+
+		ShareRead = 0x1000,
+		ShareWrite = 0x2000,
+		ShareDelete = 0x4000
+
+	};
+
 };
 
 class SLIB_EXPORT File : public IO
@@ -47,8 +97,10 @@ private:
 	~File();
 
 public:
-	static Ref<File> open(const String& filePath, FileMode mode);
+	static Ref<File> open(const String& filePath, const FileMode& mode, const FilePermissions& permissions);
 	
+	static Ref<File> open(const String& filePath, const FileMode& mode);
+
 	static Ref<File> openForRead(const String& filePath);
 	
 	static Ref<File> openForWrite(const String& filePath);
@@ -58,6 +110,8 @@ public:
 	static Ref<File> openForAppend(const String& filePath);
 	
 	static Ref<File> openForRandomAccess(const String& filePath);
+
+	static Ref<File> openForRandomRead(const String& filePath);
 
 public:
 	// override
@@ -205,7 +259,7 @@ public:
 #endif
 
 private:
-	static sl_file _open(const String& filePath, FileMode mode);
+	static sl_file _open(const String& filePath, const FileMode& mode, const FilePermissions& permissions);
 	
 	static sl_bool _close(sl_file file);
 	

@@ -303,6 +303,7 @@ Ref<GlobalUniqueInstance> GlobalUniqueInstance::create(const String& _name)
 	if (_name.isEmpty()) {
 		return sl_null;
 	}
+	
 	String name = File::makeSafeFileName(_name);
 	_GlobalUniqueInstanceList* list = _getGlobalUniqueInstanceList();
 	if (!list) {

@@ -635,6 +635,17 @@ UIView* _iOS_Window_findFirstResponder(UIView* root)
 	if (view == nil) {
 		return;
 	}
+	
+	UIScrollView* scroll = nil;
+	UIView* parent = view.superview;
+	while (parent != nil) {
+		if ([parent isKindOfClass:[UIScrollView class]]) {
+			scroll = (UIScrollView*)parent;
+			break;
+		}
+		parent = parent.superview;
+	}
+	
 	NSDictionary* info = [aNotification userInfo];
 	CGSize kbSize = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
 	CGRect rcTextLocal = view.bounds;
@@ -643,10 +654,16 @@ UIView* _iOS_Window_findFirstResponder(UIView* root)
 	CGFloat yText = rcTextScreen.origin.y + rcTextScreen.size.height + rcScreen.size.height / 100;
 	if (yText > rcScreen.size.height - kbSize.height) {
 		CGFloat offset = rcScreen.size.height - kbSize.height - yText;
-		CGAffineTransform transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, offset);
-		[UIView animateWithDuration:0.3 animations:^(void) {
-			self.view.transform = transform;
-		}];
+		if (scroll != nil) {
+			CGPoint pos = scroll.contentOffset;
+			pos.y -= offset;
+			scroll.contentOffset = pos;
+		} else {
+			CGAffineTransform transform = CGAffineTransformTranslate(CGAffineTransformIdentity, 0, offset);
+			[UIView animateWithDuration:0.3 animations:^(void) {
+				self.view.transform = transform;
+			}];
+		}
 	}
 }
 

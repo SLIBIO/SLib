@@ -8,7 +8,7 @@ sl_int64 Database::executeBy(const String& sql, const Variant* params, sl_uint32
 {
 	Ref<DatabaseStatement> statement = prepareStatement(sql);
 	if (statement.isNotNull()) {
-		return statement->execute(params, nParams);
+		return statement->executeBy(params, nParams);
 	}
 	return -1;
 }
@@ -17,7 +17,7 @@ Ref<DatabaseCursor> Database::queryBy(const String& sql, const Variant* params, 
 {
 	Ref<DatabaseStatement> statement = prepareStatement(sql);
 	if (statement.isNotNull()) {
-		return statement->query(params, nParams);
+		return statement->queryBy(params, nParams);
 	}
 	return sl_null;
 }
@@ -26,7 +26,7 @@ List< Map<String, Variant> > Database::getListForQueryResultBy(const String& sql
 {
 	Ref<DatabaseStatement> statement = prepareStatement(sql);
 	if (statement.isNotNull()) {
-		return statement->getListForQueryResult(params, nParams);
+		return statement->getListForQueryResultBy(params, nParams);
 	}
 	return sl_null;
 }
@@ -35,7 +35,7 @@ Map<String, Variant> Database::getRecordForQueryResultBy(const String& sql, cons
 {
 	Ref<DatabaseStatement> statement = prepareStatement(sql);
 	if (statement.isNotNull()) {
-		return statement->getRecordForQueryResult(params, nParams);
+		return statement->getRecordForQueryResultBy(params, nParams);
 	}
 	return sl_null;
 }
@@ -44,19 +44,19 @@ Variant Database::getValueForQueryResultBy(const String& sql, const Variant* par
 {
 	Ref<DatabaseStatement> statement = prepareStatement(sql);
 	if (statement.isNotNull()) {
-		return statement->getValueForQueryResult(params, nParams);
+		return statement->getValueForQueryResultBy(params, nParams);
 	}
 	return sl_null;
 }
 
 sl_int64 Database::execute(const String& sql)
 {
-	return execute(sql, sl_null, 0);
+	return executeBy(sql, sl_null, 0);
 }
 
 Ref<DatabaseCursor> Database::query(const String& sql)
 {
-	return query(sql, sl_null, 0);
+	return queryBy(sql, sl_null, 0);
 }
 
 List< Map<String, Variant> > Database::getListForQueryResult(const String& sql)

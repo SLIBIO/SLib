@@ -8,42 +8,54 @@
 
 SLIB_NAMESPACE_BEGIN
 
-sl_file File::_open(const String& _filePath, FileMode mode)
+sl_file File::_open(const String& _filePath, const FileMode& mode, const FilePermissions& permisions)
 {
 	String16 filePath = _filePath;
 	if (filePath.isEmpty()) {
 		return SLIB_FILE_INVALID_HANDLE;
 	}
 
+	DWORD dwShareMode = 0;
 	DWORD dwDesiredAccess = 0;
-	DWORD dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 	DWORD dwCreateDisposition = 0;
 	DWORD dwFlags = FILE_ATTRIBUTE_NORMAL;
 
-	switch (mode) {
-	case FileMode::Read:
-		dwDesiredAccess = GENERIC_READ;
-		dwCreateDisposition = OPEN_EXISTING;
-		break;
-	case FileMode::Write:
-		dwDesiredAccess = GENERIC_WRITE;
-		dwCreateDisposition = CREATE_ALWAYS;
-		break;
-	case FileMode::ReadWrite:
-		dwDesiredAccess = GENERIC_READ | GENERIC_WRITE;
-		dwCreateDisposition = CREATE_ALWAYS;
-		break;
-	case FileMode::Append:
-		dwDesiredAccess = GENERIC_WRITE;
-		dwCreateDisposition = OPEN_ALWAYS;
-		break;
-	case FileMode::RandomAccess:
-		dwDesiredAccess = GENERIC_READ | GENERIC_WRITE;
-		dwCreateDisposition = OPEN_ALWAYS;
-		dwFlags |= FILE_FLAG_RANDOM_ACCESS;
-		break;
+	if (permisions & FilePermissions::ShareRead) {
+		dwShareMode |= FILE_SHARE_READ;
+	}
+	if (permisions & FilePermissions::ShareWrite) {
+		dwShareMode |= FILE_SHARE_WRITE;
+	}
+	if (permisions & FilePermissions::ShareDelete) {
+		dwShareMode |= FILE_SHARE_DELETE;
 	}
 
+	if (mode & FileMode::Write) {
+		dwDesiredAccess = GENERIC_WRITE;
+		if (mode & FileMode::Read) {
+			dwDesiredAccess |= GENERIC_READ;
+		}
+		if (mode & FileMode::NotCreate) {
+			if (mode & FileMode::NotTruncate) {
+				dwCreateDisposition = OPEN_EXISTING;
+			} else {
+				dwCreateDisposition = TRUNCATE_EXISTING;
+			}
+		} else {
+			if (mode & FileMode::NotTruncate) {
+				dwCreateDisposition = CREATE_ALWAYS;
+			} else {
+				dwCreateDisposition = OPEN_ALWAYS;
+			}
+		}
+	} else {
+		dwDesiredAccess = GENERIC_READ;
+		dwCreateDisposition = OPEN_EXISTING;
+	}
+	if (mode & FileMode::HintRandomAccess) {
+		dwFlags |= FILE_FLAG_RANDOM_ACCESS;
+	}
+	
 	HANDLE handle = ::CreateFileW(
 		(LPCWSTR)(filePath.getData())
 		, dwDesiredAccess

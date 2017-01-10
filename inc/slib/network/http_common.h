@@ -296,7 +296,7 @@ protected:
 	AtomicString m_query;
 	AtomicString m_requestVersion;
 	
-	HashMap<String, String, HashIgnoreCaseString, CompareIgnoreCaseString> m_requestHeaders;
+	HashMap<String, String, HashIgnoreCaseString, EqualsIgnoreCaseString> m_requestHeaders;
 	HashMap<String, String> m_parameters;
 	HashMap<String, String> m_queryParameters;
 	HashMap<String, String> m_postParameters;
