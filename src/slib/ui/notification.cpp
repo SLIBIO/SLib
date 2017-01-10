@@ -4,7 +4,7 @@
 SLIB_UI_NAMESPACE_BEGIN
 
 SLIB_SAFE_STATIC_GETTER(String, _getDeviceToken)
-SLIB_SAFE_STATIC_GETTER(Function<void (const String &)>, _getTokenRefreshCallback)
+SLIB_SAFE_STATIC_GETTER(Function<void (String)>, _getTokenRefreshCallback)
 SLIB_SAFE_STATIC_GETTER(Function<void(PushNotificationMessage&)>, _getNotificationReceivedCallback)
 
 String PushNotification::getDeviceToken()
@@ -18,10 +18,12 @@ String PushNotification::getDeviceToken()
 
 void PushNotification::setTokenRefreshCallback(const Function<void(String)>& callback)
 {
-	Function<void (const String&)>* _refreshCallback = _getTokenRefreshCallback();
+	Function<void (String)>* _refreshCallback = _getTokenRefreshCallback();
 	if (_refreshCallback) {
 		*_refreshCallback = callback;
 	}
+	
+	_initToken();
 }
 
 void PushNotification::setNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback)
@@ -34,7 +36,7 @@ void PushNotification::setNotificationReceivedCallback(const Function<void(PushN
 
 Function<void(String)> PushNotification::getTokenRefreshCallback()
 {
-	Function<void (const String &)>* callback = _getTokenRefreshCallback();
+	Function<void (String)>* callback = _getTokenRefreshCallback();
 	if (callback) {
 		return *callback;
 	}

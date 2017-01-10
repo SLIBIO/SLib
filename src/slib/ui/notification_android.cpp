@@ -4,6 +4,7 @@
 
 #include "../../../inc/slib/ui/notification.h"
 #include "../../../inc/slib/ui/platform.h"
+#include "../../../inc/slib/core/json.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -20,7 +21,7 @@ SLIB_JNI_NATIVE(onPrepared, "nativeOnMessageReceived", "(Ljava/lang/String;Ljava
 SLIB_JNI_END_CLASS
 
 
-void PushNotification::registerForNotification()
+void PushNotification::_initToken()
 {
 	_JAndroidFirebaseInstanceIDService::getToken.call(sl_null);
 }
@@ -28,7 +29,7 @@ void PushNotification::registerForNotification()
 void _Notification_onTokenRefresh(JNIEnv* env, jobject _this, jstring token)
 {
 	String tokenString = Jni::getString(token);
-	Function<void (const String&)> callback = PushNotification::getTokenRefreshCallback();
+	Function<void (String)> callback = PushNotification::getTokenRefreshCallback();
 	if (callback.isNotNull()) {
 		callback(tokenString);
 	}
@@ -37,17 +38,25 @@ void _Notification_onTokenRefresh(JNIEnv* env, jobject _this, jstring token)
 
 void _Notification_onMessageReceived(JNIEnv* env, jobject _this, jstring title, jstring body, jobjectArray data)
 {
-	Map<String, String> _data;
+	Map<String, Variant> _data;
 	if (data) {
 		sl_uint32 n = Jni::getArrayLength(data);
 		if (n > 0) {
-			_data.initHash(0, HashIgnoreCaseString(), CompareIgnoreCaseString());
-			if (_data.isNotNull()) {
-				for (sl_uint32 i = 0; i < n - 1; i += 2) {
-					String key = Jni::getStringArrayElement(data, i);
-					String value = Jni::getStringArrayElement(data, i + 1);
-					_data.ref->put_NoLock(key, value, MapPutMode::AddAlways);
+			for (sl_uint32 i = 0; i < n - 1; i += 2) {
+				String key = Jni::getStringArrayElement(data, i);
+				String strValue = Jni::getStringArrayElement(data, i + 1);
+				Variant value;
+				if (strValue.isNotEmpty()) {
+					JsonParseParam p;
+					p.flagLogError = sl_false;
+					value = Json::parseJson(strValue, p);
+					if (value.isNull()) {
+						value = strValue;
+					}
+				} else {
+					value = strValue;
 				}
+				_data.put_NoLock(key, value, MapPutMode::AddAlways);
 			}
 		}
 	}

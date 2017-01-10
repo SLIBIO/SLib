@@ -23,8 +23,8 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         Map<String, String> map = remoteMessage.getData();
         Vector<String> data = new Vector<String>();
 
-        if (data == null) {
-            int size = data.size();
+        if (map != null) {
+            int size = map.size();
             String[] values = map.values().toArray(new String[] {});
             String[] keys = map.keySet().toArray(new String[] {});
 

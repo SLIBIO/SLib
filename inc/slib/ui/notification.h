@@ -14,18 +14,20 @@ class SLIB_EXPORT PushNotificationMessage
 public:
 	String title;
 	String body;
-	Map<String, String> data;
+	Map<String, Variant> data;
 };
 
 class SLIB_EXPORT PushNotification
 {
 public:
-	static void registerForNotification();
-	static String getDeviceToken();
+    static String getDeviceToken();
 	static void setTokenRefreshCallback(const Function<void(String)>& callback);
 	static void setNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback);
 	static Function<void(String)> getTokenRefreshCallback();
 	static Function<void(PushNotificationMessage&)> getNotificationReceivedCallback();
+    
+private:
+    static void _initToken();
 };
 
 SLIB_UI_NAMESPACE_END

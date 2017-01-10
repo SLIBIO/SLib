@@ -278,7 +278,7 @@ SLIB_UI_NAMESPACE_END
 		tokenString += slib::String::format("%02x", bytes[i]);
 	}
 	
-	slib::Function<void (const slib::String&)> callback = slib::PushNotification::getTokenRefreshCallback();
+	slib::Function<void (slib::String)> callback = slib::PushNotification::getTokenRefreshCallback();
 	if (callback.isNotNull()) {
 		callback(tokenString);
 	}
@@ -286,22 +286,41 @@ SLIB_UI_NAMESPACE_END
 
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
 {
-	slib::Function<void (const slib::String&)> callback = slib::PushNotification::getTokenRefreshCallback();
+	slib::Function<void (slib::String)> callback = slib::PushNotification::getTokenRefreshCallback();
 	if (callback.isNotNull()) {
 		callback(slib::String::null());
 	}
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler {
-	NSError *err;
+    NSError *err;
 	NSData* jsonData = [NSJSONSerialization dataWithJSONObject:userInfo options:0 error:&err];
 	NSString* jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-//	slib::PushNotificationMessage message;
 	if (jsonString) {
+        NSDictionary* aps = userInfo[@"aps"];
+        id alert;
+        if (aps != nil) {
+            alert = aps[@"alert"];
+        }
+        
 		slib::Variant _userInfo = slib::Json::parseJson(slib::Apple::getStringFromNSString(jsonString));
+        slib::PushNotificationMessage message;
+        message.data = _userInfo.getVariantMap();
+        
+        if (alert) {
+            if ([alert isKindOfClass:[NSString class]]) {
+                message.title = slib::Apple::getStringFromNSString(alert);
+            } else {
+                NSString* title = alert[@"title"];
+                NSString* body = alert[@"body"];
+                message.title = slib::Apple::getStringFromNSString(title);
+                message.body = slib::Apple::getStringFromNSString(body);
+            }
+        }
+        
 		slib::Function<void(slib::PushNotificationMessage&)> callback = slib::PushNotification::getNotificationReceivedCallback();
 		if (callback.isNotNull()) {
-//			callback(_userInfo.getVariantMap());
+			callback(message);
 		}
 	}
 }
