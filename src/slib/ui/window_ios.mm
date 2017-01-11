@@ -629,6 +629,9 @@ UIView* _iOS_Window_findFirstResponder(UIView* root)
 	return nil;
 }
 
+UIScrollView* _g_ui_keyboard_scrollview = nil;
+CGSize _g_ui_keyboard_scrollview_original_contentsize;
+
 -(void)keyboardWillShow : (NSNotification*)aNotification
 {
 	UIView* view = [self findFirstResponderText];
@@ -654,7 +657,21 @@ UIView* _iOS_Window_findFirstResponder(UIView* root)
 	CGFloat yText = rcTextScreen.origin.y + rcTextScreen.size.height + rcScreen.size.height / 100;
 	if (yText > rcScreen.size.height - kbSize.height) {
 		CGFloat offset = rcScreen.size.height - kbSize.height - yText;
+		if (_g_ui_keyboard_scrollview != nil) {
+			_g_ui_keyboard_scrollview.contentSize = _g_ui_keyboard_scrollview_original_contentsize;
+			_g_ui_keyboard_scrollview = nil;
+		}
 		if (scroll != nil) {
+			CGRect rcScrollLocal = scroll.bounds;
+			CGRect rcScrollScreen = [scroll convertRect:rcScrollLocal toView:nil];
+			CGFloat yScroll = rcScrollScreen.origin.y + rcScrollScreen.size.height + rcScreen.size.height / 100;
+			if (yScroll > rcScreen.size.height - kbSize.height) {
+				CGSize cs = scroll.contentSize;
+				_g_ui_keyboard_scrollview_original_contentsize = cs;
+				cs.height += yScroll - (rcScreen.size.height - kbSize.height);
+				scroll.contentSize = cs;
+				_g_ui_keyboard_scrollview = scroll;
+			}
 			CGPoint pos = scroll.contentOffset;
 			pos.y -= offset;
 			scroll.contentOffset = pos;
@@ -671,6 +688,10 @@ UIView* _iOS_Window_findFirstResponder(UIView* root)
 	[UIView animateWithDuration:0.3 animations:^(void) {
 		self.view.transform = CGAffineTransformIdentity;
 	}];
+	if (_g_ui_keyboard_scrollview != nil) {
+		_g_ui_keyboard_scrollview.contentSize = _g_ui_keyboard_scrollview_original_contentsize;
+		_g_ui_keyboard_scrollview = nil;
+	}
 }
 
 
