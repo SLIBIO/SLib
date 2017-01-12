@@ -25,7 +25,7 @@ Time::Time(int year, int month, int date, int hour, int minute, int second)
 	setElements(year, month, date, hour, minute, second);
 }
 
-Time::Time(const String8& str)
+Time::Time(const String& str)
 {
 	setString(str);
 }
@@ -35,7 +35,7 @@ Time::Time(const String16& str)
 	setString(str);
 }
 
-Time::Time(const AtomicString8& str)
+Time::Time(const AtomicString& str)
 {
 	setString(str);
 }
@@ -622,25 +622,20 @@ Time Time::getTimeOnly() const
 
 String Time::toString() const
 {
-	return toString8();
-}
-
-String8 Time::toString8() const
-{
 	DATE d;
 	getDate(&d);
-	StringBuffer8 sb;
-	sb.add(String8::fromInt32(d.year, 10, 4));
+	StringBuffer sb;
+	sb.add(String::fromInt32(d.year, 10, 4));
 	sb.addStatic("-", 1);
-	sb.add(String8::fromInt32(d.month, 10, 2));
+	sb.add(String::fromInt32(d.month, 10, 2));
 	sb.addStatic("-", 1);
-	sb.add(String8::fromInt32(d.day, 10, 2));
+	sb.add(String::fromInt32(d.day, 10, 2));
 	sb.addStatic(" ", 1);
-	sb.add(String8::fromInt32(getHour(), 10, 2));
+	sb.add(String::fromInt32(getHour(), 10, 2));
 	sb.addStatic(":", 1);
-	sb.add(String8::fromInt32(getMinute(), 10, 2));
+	sb.add(String::fromInt32(getMinute(), 10, 2));
 	sb.addStatic(":", 1);
-	sb.add(String8::fromInt32(getSecond(), 10, 2));
+	sb.add(String::fromInt32(getSecond(), 10, 2));
 	return sb.merge();
 }
 
@@ -680,19 +675,14 @@ String16 Time::toString16() const
 
 String Time::getDateString() const
 {
-	return getDateString8();
-}
-
-String8 Time::getDateString8() const
-{
 	DATE d;
 	getDate(&d);
-	StringBuffer8 sb;
-	sb.add(String8::fromInt32(d.year, 10, 4));
+	StringBuffer sb;
+	sb.add(String::fromInt32(d.year, 10, 4));
 	sb.addStatic("-", 1);
-	sb.add(String8::fromInt32(d.month, 10, 2));
+	sb.add(String::fromInt32(d.month, 10, 2));
 	sb.addStatic("-", 1);
-	sb.add(String8::fromInt32(d.day, 10, 2));
+	sb.add(String::fromInt32(d.day, 10, 2));
 	return sb.merge();
 }
 
@@ -717,17 +707,12 @@ String16 Time::getDateString16() const
 
 String Time::getTimeString() const
 {
-	return getTimeString8();
-}
-
-String8 Time::getTimeString8() const
-{
-	StringBuffer8 sb;
-	sb.add(String8::fromInt32(getHour(), 10, 2));
+	StringBuffer sb;
+	sb.add(String::fromInt32(getHour(), 10, 2));
 	sb.addStatic(":", 1);
-	sb.add(String8::fromInt32(getMinute(), 10, 2));
+	sb.add(String::fromInt32(getMinute(), 10, 2));
 	sb.addStatic(":", 1);
-	sb.add(String8::fromInt32(getSecond(), 10, 2));
+	sb.add(String::fromInt32(getSecond(), 10, 2));
 	return sb.merge();
 }
 
@@ -748,7 +733,7 @@ String16 Time::getTimeString16() const
 	return sb.merge();
 }
 
-sl_bool Time::setString(const String8& str)
+sl_bool Time::setString(const String& str)
 {
 	if (parse(str)) {
 		return sl_true;
@@ -768,7 +753,7 @@ sl_bool Time::setString(const String16& str)
 	}
 }
 
-sl_bool Time::setString(const AtomicString8& str)
+sl_bool Time::setString(const AtomicString& str)
 {
 	if (parse(str)) {
 		return sl_true;
@@ -808,14 +793,14 @@ sl_bool Time::setString(const sl_char16* str)
 	}
 }
 
-String Time::format(const String8& fmt) const
+String Time::format(const String& fmt) const
 {
-	return String8::format(fmt, *this);
+	return String::format(fmt, *this);
 }
 
-String Time::format(const AtomicString8& fmt) const
+String Time::format(const AtomicString& fmt) const
 {
-	return String8::format(fmt, *this);
+	return String::format(fmt, *this);
 }
 
 String Time::format(const String16& fmt) const
@@ -830,7 +815,7 @@ String Time::format(const AtomicString16& fmt) const
 
 String Time::format(const sl_char8* fmt) const
 {
-	return String8::format(fmt, *this);
+	return String::format(fmt, *this);
 }
 
 String Time::format(const sl_char16* fmt) const
@@ -931,7 +916,7 @@ sl_reg Time::parseElements(sl_int32* outArrayYMDHMS, const sl_char16* sz, sl_siz
 	return _Time_parseElements(outArrayYMDHMS, sz, 0, len);
 }
 
-sl_bool Time::parseElements(const String8& time, sl_int32* outArrayYMDHMS)
+sl_bool Time::parseElements(const String& time, sl_int32* outArrayYMDHMS)
 {
 	sl_size n = time.getLength();
 	if (n == 0) {
@@ -949,9 +934,9 @@ sl_bool Time::parseElements(const String16& time, sl_int32* outArrayYMDHMS)
 	return _Time_parseElements(outArrayYMDHMS, time.getData(), 0, time.getLength()) == n;
 }
 
-sl_bool Time::parseElements(const AtomicString8& _time, sl_int32* outArrayYMDHMS)
+sl_bool Time::parseElements(const AtomicString& _time, sl_int32* outArrayYMDHMS)
 {
-	String8 time = _time;
+	String time = _time;
 	sl_size n = time.getLength();
 	if (n == 0) {
 		return sl_false;
@@ -1012,7 +997,7 @@ sl_reg Parser<Time, sl_char16>::parse(Time* _out, const sl_char16 *sz, sl_size p
 	return _Time_parse(_out, sz, posBegin, len);
 }
 
-Time& Time::operator=(const String8& time)
+Time& Time::operator=(const String& time)
 {
 	setString(time);
 	return *this;
@@ -1024,7 +1009,7 @@ Time& Time::operator=(const String16& time)
 	return *this;
 }
 
-Time& Time::operator=(const AtomicString8& time)
+Time& Time::operator=(const AtomicString& time)
 {
 	setString(time);
 	return *this;

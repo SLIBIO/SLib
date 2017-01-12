@@ -632,14 +632,14 @@ String IReader::readTextUTF8(sl_size size)
 				if (size == 0) {
 					return String::getEmpty();
 				}
-				String ret = String8::allocate(size);
+				String ret = String::allocate(size);
 				if (ret.isNotNull()) {
 					if (read(ret.getData(), size) == size) {
 						return ret;
 					}
 				}
 			} else {
-				String ret = String8::allocate(size);
+				String ret = String::allocate(size);
 				if (ret.isNotNull()) {
 					sl_char8* buf = ret.getData();
 					Base::copyMemory(buf, sbuf, 3);
@@ -654,7 +654,7 @@ String IReader::readTextUTF8(sl_size size)
 			}
 		}
 	} else {
-		String ret = String8::allocate(size);
+		String ret = String::allocate(size);
 		if (ret.isNotNull()) {
 			if (read(ret.getData(), size) == size) {
 				return ret;
@@ -739,9 +739,9 @@ String IReader::readText(sl_size size, Charset* outCharset)
 					if (buf) {
 						if (read(buf, size) == size) {
 							if (flagUTF16LE) {
-								return String8::fromUtf16LE(buf, len);
+								return String::fromUtf16LE(buf, len);
 							} else {
-								return String8::fromUtf16BE(buf, len);
+								return String::fromUtf16BE(buf, len);
 							}
 						}
 					}
@@ -758,14 +758,14 @@ String IReader::readText(sl_size size, Charset* outCharset)
 						if (size == 0) {
 							return String::getEmpty();
 						}
-						String ret = String8::allocate(size);
+						String ret = String::allocate(size);
 						if (ret.isNotNull()) {
 							if (read(ret.getData(), size) == size) {
 								return ret;
 							}
 						}
 					} else {
-						String ret = String8::allocate(size);
+						String ret = String::allocate(size);
 						if (ret.isNotNull()) {
 							sl_char8* buf = ret.getData();
 							Base::copyMemory(buf, sbuf, 3);
@@ -785,7 +785,7 @@ String IReader::readText(sl_size size, Charset* outCharset)
 			return sl_null;
 		}
 	} else {
-		String ret = String8::allocate(size);
+		String ret = String::allocate(size);
 		if (ret.isNotNull()) {
 			if (read(ret.getData(), size) == size) {
 				if (outCharset) {

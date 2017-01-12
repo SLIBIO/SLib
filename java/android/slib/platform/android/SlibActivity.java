@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.WindowManager;
 
 public class SlibActivity extends Activity {
 
@@ -19,6 +20,7 @@ public class SlibActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Android.onCreateActivity(this);
+		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING);
 	}
 	
 	@Override
@@ -43,6 +45,7 @@ public class SlibActivity extends Activity {
 	protected void onDestroy() {
 		super.onDestroy();
 		Android.onDestroyActivity(this);
+		windows.removeAllElements();
 	}
 	
 	@Override
@@ -78,9 +81,11 @@ public class SlibActivity extends Activity {
 	}
 	
 	public void onCloseWindow(UiWindow window) {
-		windows.remove(window);
-		if (windows.isEmpty()) {
-			finish();
+		if (windows.contains(window)) {
+			windows.remove(window);
+			if (windows.isEmpty()) {
+				finish();
+			}
 		}
 	}
 	

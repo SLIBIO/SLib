@@ -446,31 +446,31 @@ void HttpServiceConnection::sendResponseAndClose(const Memory& mem)
 
 void HttpServiceConnection::sendResponse_BadRequest()
 {
-	SLIB_STATIC_STRING8(s, "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n\r\n");
+	SLIB_STATIC_STRING(s, "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n\r\n");
 	sendResponseAndRestart(Memory::create(s.getData(), s.getLength()));
 }
 
 void HttpServiceConnection::sendResponse_ServerError()
 {
-	SLIB_STATIC_STRING8(s, "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\n\r\n");
+	SLIB_STATIC_STRING(s, "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\n\r\n");
 	sendResponseAndRestart(Memory::create(s.getData(), s.getLength()));
 }
 
 void HttpServiceConnection::sendConnectResponse_Successed()
 {
-	SLIB_STATIC_STRING8(s, "HTTP/1.1 200 Connection established\r\n\r\n");
+	SLIB_STATIC_STRING(s, "HTTP/1.1 200 Connection established\r\n\r\n");
 	sendResponse(Memory::create(s.getData(), s.getLength()));
 }
 
 void HttpServiceConnection::sendConnectResponse_Failed()
 {
-	SLIB_STATIC_STRING8(s, "HTTP/1.1 500 Tunneling is not supported\r\n\r\n");
+	SLIB_STATIC_STRING(s, "HTTP/1.1 500 Tunneling is not supported\r\n\r\n");
 	sendResponseAndClose(Memory::create(s.getData(), s.getLength()));
 }
 
 void HttpServiceConnection::sendProxyResponse_Failed()
 {
-	SLIB_STATIC_STRING8(s, "HTTP/1.1 500 Internal Error\r\nContent-Length: 0\r\n\r\n");
+	SLIB_STATIC_STRING(s, "HTTP/1.1 500 Internal Error\r\nContent-Length: 0\r\n\r\n");
 	sendResponseAndRestart(Memory::create(s.getData(), s.getLength()));
 }
 

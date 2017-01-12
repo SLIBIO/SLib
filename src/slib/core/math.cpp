@@ -300,7 +300,7 @@ double Math::normalizeDegreeDistance(double v)
 template <class T>
 SLIB_INLINE static T _Math_convertAngleFromEllipseToCircle(T angle, T radiusX, T radiusY)
 {
-	T _cos = cos(angle);
+	T _cos = Math::cos(angle);
 	if (Math::isAlmostZero(_cos) || Math::isAlmostZero(sin(angle))) {
 		return angle;
 	}

@@ -9,7 +9,7 @@ SLIB_NAMESPACE_BEGIN
 
 NSString* Apple::getNSStringFromString(const String& str, NSString* def)
 {
-	String8 s = str;
+	String s = str;
 	if (s.isNull()) {
 		return def;
 	}

@@ -553,23 +553,23 @@ Map<String, String> HttpRequest::parseParameters(const void* data, sl_size len)
 Memory HttpRequest::makeRequestPacket() const
 {
 	MemoryBuffer msg;
-	String8 strMethod = m_methodText;
+	String strMethod = m_methodText;
 	msg.addStatic(strMethod.getData(), strMethod.getLength());
 	msg.addStatic(" ", 1);
-	String8 strPath = m_path;
+	String strPath = m_path;
 	if (strPath.isEmpty()) {
 		msg.addStatic("/", 1);
 	} else {
 		msg.addStatic(strPath.getData(), strPath.getLength());
 	}
-	String8 strQuery;
+	String strQuery;
 	if (m_query.isNotEmpty()) {
 		msg.addStatic("?", 1);
 		strQuery = m_query;
 		msg.addStatic(strQuery.getData(), strQuery.getLength());
 	}
 	msg.addStatic(" ", 1);
-	String8 strVersion = m_requestVersion;
+	String strVersion = m_requestVersion;
 	msg.addStatic(strVersion.getData(), strVersion.getLength());
 	msg.addStatic("\r\n", 2);
 
@@ -870,13 +870,13 @@ sl_bool HttpResponse::isChunkedResponse() const
 Memory HttpResponse::makeResponsePacket() const
 {
 	MemoryBuffer msg;
-	String8 strVersion = m_responseVersion;
+	String strVersion = m_responseVersion;
 	msg.addStatic(strVersion.getData(), strVersion.getLength());
 	msg.addStatic(" ", 1);
-	String8 strCode = String8::fromUint32((sl_uint32)m_responseCode);
+	String strCode = String::fromUint32((sl_uint32)m_responseCode);
 	msg.addStatic(strCode.getData(), strCode.getLength());
 	msg.addStatic(" ", 1);
-	String8 strMessage = m_responseMessage;
+	String strMessage = m_responseMessage;
 	msg.addStatic(strMessage.getData(), strMessage.getLength());
 	msg.addStatic("\r\n", 2);
 

@@ -3,6 +3,7 @@ package slib.platform.android.ui.view;
 import slib.platform.android.Logger;
 import slib.platform.android.ui.Graphics;
 import slib.platform.android.ui.UiThread;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;

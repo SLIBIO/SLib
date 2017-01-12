@@ -11,7 +11,7 @@
 
 SLIB_NAMESPACE_BEGIN
 
-class SLIB_EXPORT StringContainer8
+class SLIB_EXPORT StringContainer
 {
 public:
 	sl_char8* sz;
@@ -44,14 +44,14 @@ public:
 	
 };
 
-struct _String8_Const
+struct _String_Const
 {
-	StringContainer8* container;
+	StringContainer* container;
 	sl_int32 lock;
 };
 
-extern const _String8_Const _String8_Null;
-extern const _String8_Const _String8_Empty;
+extern const _String_Const _String_Null;
+extern const _String_Const _String_Empty;
 
 struct _String16_Const
 {
@@ -67,98 +67,98 @@ extern const char* _StringConv_radixPatternLower;
 extern const sl_uint8* _StringConv_radixInversePatternBig;
 extern const sl_uint8* _StringConv_radixInversePatternSmall;
 
-class String8;
-typedef Atomic<String8> AtomicString8;
+class String;
+typedef Atomic<String> AtomicString;
 class String16;
 typedef Atomic<String16> AtomicString16;
 class StringData;
 class Variant;
 
 /** auto-referencing object **/
-class SLIB_EXPORT String8
+class SLIB_EXPORT String
 {
 private:
-	StringContainer8* m_container;
+	StringContainer* m_container;
 	
 private:
-	SLIB_CONSTEXPR String8(StringContainer8* container) : m_container(container) {}
+	SLIB_CONSTEXPR String(StringContainer* container) : m_container(container) {}
 	
 public:
-	SLIB_CONSTEXPR String8() : m_container(sl_null) {}
+	SLIB_CONSTEXPR String() : m_container(sl_null) {}
 	
-	SLIB_CONSTEXPR String8(sl_null_t) : m_container(sl_null) {}
+	SLIB_CONSTEXPR String(sl_null_t) : m_container(sl_null) {}
 	
-	String8(String8&& src);
+	String(String&& src);
 	
-	String8(AtomicString8&& _src);
+	String(AtomicString&& _src);
 	
-	String8(const String8& src);
+	String(const String& src);
 	
-	String8(const AtomicString8& src);
+	String(const AtomicString& src);
 	
-	String8(const String16& src);
+	String(const String16& src);
 	
-	String8(const AtomicString16& src);
+	String(const AtomicString16& src);
 
-	~String8();
+	~String();
 	
 public:
 	// From a single charactor
-	String8(sl_char8 ch, sl_size nRepeatCount);
+	String(sl_char8 ch, sl_size nRepeatCount);
 	
 	// From an utf-8 string
-	String8(const sl_char8* strUtf8);
+	String(const sl_char8* strUtf8);
 	
 	// From an utf-8 string
-	String8(const sl_char8* strUtf8, sl_reg length);
+	String(const sl_char8* strUtf8, sl_reg length);
 	
 	// From an utf-16 string
-	String8(const sl_char16* strUtf16);
+	String(const sl_char16* strUtf16);
 	
 	// From an utf-16 string
-	String8(const sl_char16* strUtf16, sl_reg length);
+	String(const sl_char16* strUtf16, sl_reg length);
 	
 	// From an utf-32 string
-	String8(const sl_char32* strUtf32);
+	String(const sl_char32* strUtf32);
 	
 	// From an utf-32 string
-	String8(const sl_char32* strUtf32, sl_reg length);
+	String(const sl_char32* strUtf32, sl_reg length);
 
 public:
 	// create a string of 'len' charactors
-	static String8 allocate(sl_size len);
+	static String allocate(sl_size len);
 	
-	static String8 fromStatic(const sl_char8* sz8, sl_reg len = -1);
+	static String fromStatic(const sl_char8* sz8, sl_reg len = -1);
 
-	static String8 fromUtf8(const void* utf8, sl_reg len = -1);
+	static String fromUtf8(const void* utf8, sl_reg len = -1);
 	
-	static String8 fromUtf8(const Memory& mem);
+	static String fromUtf8(const Memory& mem);
 	
-	static String8 fromUtf16(const sl_char16* utf16, sl_reg len = -1);
+	static String fromUtf16(const sl_char16* utf16, sl_reg len = -1);
 	
-	static String8 fromUtf32(const sl_char32* utf32, sl_reg len = -1);
+	static String fromUtf32(const sl_char32* utf32, sl_reg len = -1);
 
-	static String8 fromUtf16BE(const void* utf16, sl_reg len = -1);
+	static String fromUtf16BE(const void* utf16, sl_reg len = -1);
 
-	static String8 fromUtf16BE(const Memory& mem);
+	static String fromUtf16BE(const Memory& mem);
 	
-	static String8 fromUtf16LE(const void* utf16, sl_reg len = -1);
+	static String fromUtf16LE(const void* utf16, sl_reg len = -1);
 
-	static String8 fromUtf16LE(const Memory& mem);
+	static String fromUtf16LE(const Memory& mem);
 
 	// process UTF16BE, UTF16LE, UTF8 strings automatically
-	static String8 fromUtf(const void* buf, sl_size len);
+	static String fromUtf(const void* buf, sl_size len);
 
-	static String8 fromUtf(const Memory& mem);
+	static String fromUtf(const Memory& mem);
 
 public:
 	// Returns a null string
-	static const String8& null();
+	static const String& null();
 	
 	// Returns an empty string
-	static const String8& getEmpty();
+	static const String& getEmpty();
 	
-	const String8& getNotNull() const;
+	const String& getNotNull() const;
 	
 	sl_bool isNull() const;
 	
@@ -192,110 +192,110 @@ public:
 	sl_bool setAt(sl_reg index, sl_char8 ch);
 	
 public:
-	String8& operator=(sl_null_t);
+	String& operator=(sl_null_t);
 	
-	String8& operator=(String8&& other);
+	String& operator=(String&& other);
 	
-	String8& operator=(AtomicString8&& _other);
+	String& operator=(AtomicString&& _other);
 
-	String8& operator=(const String8& other);
+	String& operator=(const String& other);
 	
-	String8& operator=(const AtomicString8& other);
+	String& operator=(const AtomicString& other);
 	
-	String8& operator=(const String16& other);
+	String& operator=(const String16& other);
 	
-	String8& operator=(const AtomicString16& other);
+	String& operator=(const AtomicString16& other);
 	
-	String8& operator=(const sl_char8* utf8);
+	String& operator=(const sl_char8* utf8);
 	
-	String8& operator=(const sl_char16* utf16);
+	String& operator=(const sl_char16* utf16);
 	
-	String8& operator=(const sl_char32* utf32);
-
-public:
-	String8 operator+(const String8& other) const;
-	
-	String8& operator+=(const String8& other);
-	
-	String8 operator+(const String16& other) const;
-	
-	String8& operator+=(const String16& other);
-	
-	String8 operator+(const AtomicString8& _other) const;
-	
-	String8& operator+=(const AtomicString8& other);
-	
-	String8 operator+(const AtomicString16& other) const;
-	
-	String8& operator+=(const AtomicString16& other);
-	
-	String8 operator+(const sl_char8* utf8) const;
-	
-	String8& operator+=(const sl_char8* utf8);
-	
-	String8 operator+(const sl_char16* utf16) const;
-	
-	String8& operator+=(const sl_char16* utf16);
-
-	String8 operator+(const sl_char32* utf32) const;
-	
-	String8& operator+=(const sl_char32* utf32);
-
-	friend String8 operator+(const sl_char8* utf8, const String8& second);
-	
-	friend String8 operator+(const sl_char16* utf16, const String8& second);
-	
-	friend String8 operator+(const sl_char32* utf32, const String8& second);
+	String& operator=(const sl_char32* utf32);
 
 public:
-	String8 operator+(sl_int32 number) const;
+	String operator+(const String& other) const;
 	
-	String8& operator+=(sl_int32 number);
+	String& operator+=(const String& other);
 	
-	friend String8 operator+(sl_int32 number, const String8& other);
+	String operator+(const String16& other) const;
 	
-	String8 operator+(sl_uint32 number) const;
+	String& operator+=(const String16& other);
 	
-	String8& operator+=(sl_uint32 number);
+	String operator+(const AtomicString& _other) const;
+	
+	String& operator+=(const AtomicString& other);
+	
+	String operator+(const AtomicString16& other) const;
+	
+	String& operator+=(const AtomicString16& other);
+	
+	String operator+(const sl_char8* utf8) const;
+	
+	String& operator+=(const sl_char8* utf8);
+	
+	String operator+(const sl_char16* utf16) const;
+	
+	String& operator+=(const sl_char16* utf16);
 
-	friend String8 operator+(sl_uint32 number, const String8& other);
+	String operator+(const sl_char32* utf32) const;
 	
-	String8 operator+(sl_int64 number) const;
-	
-	String8& operator+=(sl_int64 number);
+	String& operator+=(const sl_char32* utf32);
 
-	friend String8 operator+(sl_int64 number, const String8& other);
+	friend String operator+(const sl_char8* utf8, const String& second);
 	
-	String8 operator+(sl_uint64 number) const;
+	friend String operator+(const sl_char16* utf16, const String& second);
 	
-	String8& operator+=(sl_uint64 number);
-	
-	friend String8 operator+(sl_uint64 number, const String8& other);
-	
-	String8 operator+(float number) const;
-	
-	String8& operator+=(float number);
-
-	friend String8 operator+(float number, const String8& other);
-	
-	String8 operator+(double number) const;
-	
-	String8& operator+=(double number);
-
-	friend String8 operator+(double number, const String8& other);
-	
-	String8 operator+(sl_bool value) const;
-	
-	String8& operator+=(sl_bool value);
-	
-	friend String8 operator+(sl_bool value, const String8& other);
+	friend String operator+(const sl_char32* utf32, const String& second);
 
 public:
-	sl_bool equals(const String8& other) const;
+	String operator+(sl_int32 number) const;
+	
+	String& operator+=(sl_int32 number);
+	
+	friend String operator+(sl_int32 number, const String& other);
+	
+	String operator+(sl_uint32 number) const;
+	
+	String& operator+=(sl_uint32 number);
+
+	friend String operator+(sl_uint32 number, const String& other);
+	
+	String operator+(sl_int64 number) const;
+	
+	String& operator+=(sl_int64 number);
+
+	friend String operator+(sl_int64 number, const String& other);
+	
+	String operator+(sl_uint64 number) const;
+	
+	String& operator+=(sl_uint64 number);
+	
+	friend String operator+(sl_uint64 number, const String& other);
+	
+	String operator+(float number) const;
+	
+	String& operator+=(float number);
+
+	friend String operator+(float number, const String& other);
+	
+	String operator+(double number) const;
+	
+	String& operator+=(double number);
+
+	friend String operator+(double number, const String& other);
+	
+	String operator+(sl_bool value) const;
+	
+	String& operator+=(sl_bool value);
+	
+	friend String operator+(sl_bool value, const String& other);
+
+public:
+	sl_bool equals(const String& other) const;
 	
 	sl_bool equals(const String16& other) const;
 	
-	sl_bool equals(const AtomicString8& other) const;
+	sl_bool equals(const AtomicString& other) const;
 	
 	sl_bool equals(const AtomicString16& other) const;
 	
@@ -306,11 +306,11 @@ public:
 	sl_bool equals(const sl_char32* utf32) const;
 	
 	
-	sl_int32 compare(const String8& other) const;
+	sl_int32 compare(const String& other) const;
 	
 	sl_int32 compare(const String16& other) const;
 	
-	sl_int32 compare(const AtomicString8& other) const;
+	sl_int32 compare(const AtomicString& other) const;
 	
 	sl_int32 compare(const AtomicString16& other) const;
 	
@@ -320,19 +320,19 @@ public:
 	
 	sl_int32 compare(const sl_char32* utf32) const;
 	
-	sl_int32 compare(const String8& other, sl_size len) const;
+	sl_int32 compare(const String& other, sl_size len) const;
 	
 	
-	sl_bool equalsIgnoreCase(const String8& other) const;
+	sl_bool equalsIgnoreCase(const String& other) const;
 	
-	sl_int32 compareIgnoreCase(const String8& other) const;
+	sl_int32 compareIgnoreCase(const String& other) const;
 
 public:
-	sl_bool operator==(const String8& other) const;
+	sl_bool operator==(const String& other) const;
 	
 	sl_bool operator==(const String16& other) const;
 	
-	sl_bool operator==(const AtomicString8& other) const;
+	sl_bool operator==(const AtomicString& other) const;
 	
 	sl_bool operator==(const AtomicString16& other) const;
 
@@ -342,18 +342,18 @@ public:
 	
 	sl_bool operator==(const sl_char32* utf32) const;
 	
-	friend sl_bool operator==(const sl_char8* utf8, const String8& second);
+	friend sl_bool operator==(const sl_char8* utf8, const String& second);
 	
-	friend sl_bool operator==(const sl_char16* utf16, const String8& second);
+	friend sl_bool operator==(const sl_char16* utf16, const String& second);
 	
-	friend sl_bool operator==(const sl_char32* utf32, const String8& second);
+	friend sl_bool operator==(const sl_char32* utf32, const String& second);
 	
 	
-	sl_bool operator!=(const String8& other) const;
+	sl_bool operator!=(const String& other) const;
 	
 	sl_bool operator!=(const String16& other) const;
 	
-	sl_bool operator!=(const AtomicString8& other) const;
+	sl_bool operator!=(const AtomicString& other) const;
 	
 	sl_bool operator!=(const AtomicString16& other) const;
 
@@ -363,18 +363,18 @@ public:
 	
 	sl_bool operator!=(const sl_char32* utf32) const;
 	
-	friend sl_bool operator!=(const sl_char8* utf8, const String8& second);
+	friend sl_bool operator!=(const sl_char8* utf8, const String& second);
 	
-	friend sl_bool operator!=(const sl_char16* utf16, const String8& second);
+	friend sl_bool operator!=(const sl_char16* utf16, const String& second);
 	
-	friend sl_bool operator!=(const sl_char32* utf32, const String8& second);
+	friend sl_bool operator!=(const sl_char32* utf32, const String& second);
 	
 	
-	sl_bool operator>=(const String8& other) const;
+	sl_bool operator>=(const String& other) const;
 	
 	sl_bool operator>=(const String16& other) const;
 	
-	sl_bool operator>=(const AtomicString8& other) const;
+	sl_bool operator>=(const AtomicString& other) const;
 	
 	sl_bool operator>=(const AtomicString16& other) const;
 	
@@ -384,18 +384,18 @@ public:
 	
 	sl_bool operator>=(const sl_char32* utf32) const;
 	
-	friend sl_bool operator>=(const sl_char8* utf8, const String8& second);
+	friend sl_bool operator>=(const sl_char8* utf8, const String& second);
 	
-	friend sl_bool operator>=(const sl_char16* utf16, const String8& second);
+	friend sl_bool operator>=(const sl_char16* utf16, const String& second);
 	
-	friend sl_bool operator>=(const sl_char32* utf32, const String8& second);
+	friend sl_bool operator>=(const sl_char32* utf32, const String& second);
 	
 	
-	sl_bool operator<=(const String8& other) const;
+	sl_bool operator<=(const String& other) const;
 	
 	sl_bool operator<=(const String16& other) const;
 	
-	sl_bool operator<=(const AtomicString8& other) const;
+	sl_bool operator<=(const AtomicString& other) const;
 	
 	sl_bool operator<=(const AtomicString16& other) const;
 	
@@ -405,18 +405,18 @@ public:
 	
 	sl_bool operator<=(const sl_char32* utf32) const;
 	
-	friend sl_bool operator<=(const sl_char8* utf8, const String8& second);
+	friend sl_bool operator<=(const sl_char8* utf8, const String& second);
 	
-	friend sl_bool operator<=(const sl_char16* utf16, const String8& second);
+	friend sl_bool operator<=(const sl_char16* utf16, const String& second);
 	
-	friend sl_bool operator<=(const sl_char32* utf32, const String8& second);
+	friend sl_bool operator<=(const sl_char32* utf32, const String& second);
 
 	
-	sl_bool operator>(const String8& other) const;
+	sl_bool operator>(const String& other) const;
 	
 	sl_bool operator>(const String16& other) const;
 	
-	sl_bool operator>(const AtomicString8& other) const;
+	sl_bool operator>(const AtomicString& other) const;
 	
 	sl_bool operator>(const AtomicString16& other) const;
 	
@@ -426,18 +426,18 @@ public:
 	
 	sl_bool operator>(const sl_char32* utf32) const;
 	
-	friend sl_bool operator>(const sl_char8* utf8, const String8& second);
+	friend sl_bool operator>(const sl_char8* utf8, const String& second);
 	
-	friend sl_bool operator>(const sl_char16* utf16, const String8& second);
+	friend sl_bool operator>(const sl_char16* utf16, const String& second);
 	
-	friend sl_bool operator>(const sl_char32* utf32, const String8& second);
+	friend sl_bool operator>(const sl_char32* utf32, const String& second);
 	
 	
-	sl_bool operator<(const String8& other) const;
+	sl_bool operator<(const String& other) const;
 	
 	sl_bool operator<(const String16& other) const;
 	
-	sl_bool operator<(const AtomicString8& other) const;
+	sl_bool operator<(const AtomicString& other) const;
 	
 	sl_bool operator<(const AtomicString16& other) const;
 	
@@ -447,14 +447,14 @@ public:
 	
 	sl_bool operator<(const sl_char32* utf32) const;
 	
-	friend sl_bool operator<(const sl_char8* utf8, const String8& second);
+	friend sl_bool operator<(const sl_char8* utf8, const String& second);
 	
-	friend sl_bool operator<(const sl_char16* utf16, const String8& second);
+	friend sl_bool operator<(const sl_char16* utf16, const String& second);
 	
-	friend sl_bool operator<(const sl_char32* utf32, const String8& second);
+	friend sl_bool operator<(const sl_char32* utf32, const String& second);
 	
 public:
-	String8 duplicate() const;
+	String duplicate() const;
 
 	Memory toMemory() const;
 	
@@ -474,41 +474,41 @@ public:
 	// contains null character at last
 	Memory toUtf32() const;
 
-	String8 substring(sl_reg start, sl_reg end = -1) const;
+	String substring(sl_reg start, sl_reg end = -1) const;
 	
-	String8 left(sl_reg len) const;
+	String left(sl_reg len) const;
 	
-	String8 right(sl_reg len) const;
+	String right(sl_reg len) const;
 	
-	String8 mid(sl_reg start, sl_reg len) const;
+	String mid(sl_reg start, sl_reg len) const;
 
 	sl_reg indexOf(sl_char8 ch, sl_reg start = 0) const;
 	
-	sl_reg indexOf(const String8& str, sl_reg start = 0) const;
+	sl_reg indexOf(const String& str, sl_reg start = 0) const;
 	
 	sl_reg indexOf(const sl_char8* str, sl_reg start = 0) const;
 	
 	sl_reg lastIndexOf(sl_char8 ch, sl_reg start = -1) const;
 	
-	sl_reg lastIndexOf(const String8& str, sl_reg start = -1) const;
+	sl_reg lastIndexOf(const String& str, sl_reg start = -1) const;
 	
 	sl_reg lastIndexOf(const sl_char8* str, sl_reg start = -1) const;
 	
 	sl_bool startsWith(sl_char8 ch) const;
 	
-	sl_bool startsWith(const String8& str) const;
+	sl_bool startsWith(const String& str) const;
 	
 	sl_bool startsWith(const sl_char8* str) const;
 	
 	sl_bool endsWith(sl_char8 ch) const;
 	
-	sl_bool endsWith(const String8& str) const;
+	sl_bool endsWith(const String& str) const;
 
 	sl_bool endsWith(const sl_char8* str) const;
 	
 	sl_bool contains(sl_char8 ch) const;
 	
-	sl_bool contains(const String8& str) const;
+	sl_bool contains(const String& str) const;
 	
 	sl_bool contains(const sl_char8* str) const;
 
@@ -516,37 +516,37 @@ public:
 	
 	void makeLower();
 	
-	static String8 toUpper(const sl_char8* sz, sl_reg len = -1);
+	static String toUpper(const sl_char8* sz, sl_reg len = -1);
 	
-	static String8 toLower(const sl_char8* sz, sl_reg len = -1);
+	static String toLower(const sl_char8* sz, sl_reg len = -1);
 	
-	String8 toUpper() const;
+	String toUpper() const;
 	
-	String8 toLower() const;
+	String toLower() const;
 	
-	String8 replaceAll(const String8& pattern, const String8& replacement) const;
+	String replaceAll(const String& pattern, const String& replacement) const;
 	
-	String8 replaceAll(const String8& pattern, const sl_char8* replacement) const;
+	String replaceAll(const String& pattern, const sl_char8* replacement) const;
 	
-	String8 replaceAll(const sl_char8* pattern, const String8& replacement) const;
+	String replaceAll(const sl_char8* pattern, const String& replacement) const;
 	
-	String8 replaceAll(const sl_char8* pattern, const sl_char8* replacement) const;
+	String replaceAll(const sl_char8* pattern, const sl_char8* replacement) const;
 	
-	String8 trim() const;
+	String trim() const;
 	
-	String8 trimLeft() const;
+	String trimLeft() const;
 	
-	String8 trimRight() const;
+	String trimRight() const;
 	
-	List<String8> split(const String8& pattern) const;
+	List<String> split(const String& pattern) const;
 	
-	List<String8> split(const sl_char8* pattern) const;
+	List<String> split(const sl_char8* pattern) const;
 	
-	String8 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false);
+	String applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false);
 	
-	static String8 parseBackslashEscapes(const sl_char8* input, sl_size len, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null);
+	static String parseBackslashEscapes(const sl_char8* input, sl_size len, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null);
 	
-	String8 parseBackslashEscapes(sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
+	String parseBackslashEscapes(sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
 	
 	static sl_size countLineNumber(const sl_char8* input, sl_size len, sl_size* columnLast = sl_null);
 	
@@ -609,75 +609,75 @@ public:
 
 	
 	// radix: 2 ~ 64,   flagUpperCase only works if radix <= 36 (0~9a~z)
-	static String8 fromInt32(sl_int32 value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
+	static String fromInt32(sl_int32 value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
 	
-	static String8 fromUint32(sl_uint32 value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
+	static String fromUint32(sl_uint32 value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
 	
-	static String8 fromInt64(sl_int64 value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
+	static String fromInt64(sl_int64 value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
 	
-	static String8 fromUint64(sl_uint64 value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
+	static String fromUint64(sl_uint64 value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
 	
-	static String8 fromInt(sl_reg value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
+	static String fromInt(sl_reg value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
 	
-	static String8 fromSize(sl_size value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
+	static String fromSize(sl_size value, sl_uint32 radix = 10, sl_uint32 minWidth = 0, sl_bool flagUpperCase = sl_false);
 	
-	static String8 fromFloat(float value, sl_int32 precision = -1, sl_bool flagZeroPadding = sl_false, sl_uint32 minWidthIntegral = 1);
+	static String fromFloat(float value, sl_int32 precision = -1, sl_bool flagZeroPadding = sl_false, sl_uint32 minWidthIntegral = 1);
 	
-	static String8 fromDouble(double value, sl_int32 precision = -1, sl_bool flagZeroPadding = sl_false, sl_uint32 minWidthIntegral = 1);
+	static String fromDouble(double value, sl_int32 precision = -1, sl_bool flagZeroPadding = sl_false, sl_uint32 minWidthIntegral = 1);
 	
-	static String8 fromPointerValue(const void* pointer);
+	static String fromPointerValue(const void* pointer);
 	
-	static String8 fromBoolean(sl_bool value);
+	static String fromBoolean(sl_bool value);
 	
-	static String8 makeHexString(const void* data, sl_size size);
+	static String makeHexString(const void* data, sl_size size);
 	
-	static String8 makeHexString(const Memory& mem);
+	static String makeHexString(const Memory& mem);
 	
 	
-	static String8 formatBy(const sl_char8* szFormat, const Variant* params, sl_size nParams);
+	static String formatBy(const sl_char8* szFormat, const Variant* params, sl_size nParams);
 	
-	static String8 formatBy(const String8& strFormat, const Variant* params, sl_size nParams);
+	static String formatBy(const String& strFormat, const Variant* params, sl_size nParams);
 	
-	static String8 format(const sl_char8* szFormat);
+	static String format(const sl_char8* szFormat);
 	
-	static String8 format(const String8& strFormat);
-	
-	template <class... ARGS>
-	static String8 format(const sl_char8* szFormat, ARGS&&... args);
+	static String format(const String& strFormat);
 	
 	template <class... ARGS>
-	static String8 format(const String8& strFormat, ARGS&&... args);
-	
-	String8 argBy(const Variant* params, sl_size nParams) const;
+	static String format(const sl_char8* szFormat, ARGS&&... args);
 	
 	template <class... ARGS>
-	String8 arg(ARGS&&... args) const;
+	static String format(const String& strFormat, ARGS&&... args);
+	
+	String argBy(const Variant* params, sl_size nParams) const;
+	
+	template <class... ARGS>
+	String arg(ARGS&&... args) const;
 	
 private:
 	// Allocates memory required for a string for the specified length
-	static StringContainer8* _alloc(sl_size length);
+	static StringContainer* _alloc(sl_size length);
 	
-	void _replaceContainer(StringContainer8* container);
-	
-	
-	static StringContainer8* _create(sl_char8 ch, sl_size nRepeatCount);
-	
-	static StringContainer8* _create(const sl_char8* strUtf8, sl_reg length);
-	
-	static StringContainer8* _create(const sl_char16* strUtf16, sl_reg length);
-	
-	static StringContainer8* _create(const sl_char32* strUtf32, sl_reg length);
+	void _replaceContainer(StringContainer* container);
 	
 	
-	static StringContainer8* _merge8(const sl_char8* s1, sl_reg len1, const sl_char8* s2, sl_reg len2);
+	static StringContainer* _create(sl_char8 ch, sl_size nRepeatCount);
 	
-	static StringContainer8* _merge16(const sl_char8* s1, sl_reg len1, const sl_char16* s2, sl_reg len2);
+	static StringContainer* _create(const sl_char8* strUtf8, sl_reg length);
 	
-	static StringContainer8* _merge16(const sl_char16* s1, sl_reg len1, const sl_char8* s2, sl_reg len2);
+	static StringContainer* _create(const sl_char16* strUtf16, sl_reg length);
 	
-	static StringContainer8* _merge32(const sl_char8* s1, sl_reg len1, const sl_char32* s2, sl_reg len2);
+	static StringContainer* _create(const sl_char32* strUtf32, sl_reg length);
 	
-	static StringContainer8* _merge32(const sl_char32* s1, sl_reg len1, const sl_char8* s2, sl_reg len2);
+	
+	static StringContainer* _merge8(const sl_char8* s1, sl_reg len1, const sl_char8* s2, sl_reg len2);
+	
+	static StringContainer* _merge16(const sl_char8* s1, sl_reg len1, const sl_char16* s2, sl_reg len2);
+	
+	static StringContainer* _merge16(const sl_char16* s1, sl_reg len1, const sl_char8* s2, sl_reg len2);
+	
+	static StringContainer* _merge32(const sl_char8* s1, sl_reg len1, const sl_char32* s2, sl_reg len2);
+	
+	static StringContainer* _merge32(const sl_char32* s1, sl_reg len1, const sl_char8* s2, sl_reg len2);
 	
 	
 	// Check two unicode string is Equal
@@ -696,7 +696,7 @@ private:
 	static sl_int32 _compare32(const sl_char8* str1, sl_reg len1, const sl_char32* str2, sl_reg len2);
 	
 public:
-	friend class Atomic<String8>;
+	friend class Atomic<String>;
 	
 };
 
@@ -722,9 +722,9 @@ public:
 	
 	String16(const AtomicString16& src);
 
-	String16(const String8& src);
+	String16(const String& src);
 	
-	String16(const AtomicString8& src);
+	String16(const AtomicString& src);
 
 	~String16();
 	
@@ -824,9 +824,9 @@ public:
 	
 	String16& operator=(const AtomicString16& other);
 	
-	String16& operator=(const String8& other);
+	String16& operator=(const String& other);
 	
-	String16& operator=(const AtomicString8& other);
+	String16& operator=(const AtomicString& other);
 	
 	String16& operator=(const sl_char8* utf8);
 	
@@ -839,17 +839,17 @@ public:
 	
 	String16& operator+=(const String16& other);
 
-	String16 operator+(const String8& other) const;
+	String16 operator+(const String& other) const;
 	
-	String16& operator+=(const String8& other);
+	String16& operator+=(const String& other);
 
 	String16 operator+(const AtomicString16& _other) const;
 	
 	String16& operator+=(const AtomicString16& other);
 
-	String16 operator+(const AtomicString8& other) const;
+	String16 operator+(const AtomicString& other) const;
 	
-	String16& operator+=(const AtomicString8& other);
+	String16& operator+=(const AtomicString& other);
 
 	String16 operator+(const sl_char8* utf8) const;
 	
@@ -915,11 +915,11 @@ public:
 public:
 	sl_bool equals(const String16& other) const;
 	
-	sl_bool equals(const String8& other) const;
+	sl_bool equals(const String& other) const;
 	
 	sl_bool equals(const AtomicString16& other) const;
 	
-	sl_bool equals(const AtomicString8& other) const;
+	sl_bool equals(const AtomicString& other) const;
 	
 	sl_bool equals(const sl_char8* utf8) const;
 	
@@ -930,11 +930,11 @@ public:
 	
 	sl_int32 compare(const String16& other) const;
 	
-	sl_int32 compare(const String8& other) const;
+	sl_int32 compare(const String& other) const;
 	
 	sl_int32 compare(const AtomicString16& other) const;
 	
-	sl_int32 compare(const AtomicString8& other) const;
+	sl_int32 compare(const AtomicString& other) const;
 	
 	sl_int32 compare(const sl_char8* utf8) const;
 	
@@ -950,11 +950,11 @@ public:
 	sl_int32 compareIgnoreCase(const String16& other) const;
 
 public:
-	sl_bool operator==(const String8& other) const;
+	sl_bool operator==(const String& other) const;
 	
 	sl_bool operator==(const String16& other) const;
 	
-	sl_bool operator==(const AtomicString8& other) const;
+	sl_bool operator==(const AtomicString& other) const;
 	
 	sl_bool operator==(const AtomicString16& other) const;
 	
@@ -971,11 +971,11 @@ public:
 	friend sl_bool operator==(const sl_char32* utf32, const String16& second);
 	
 	
-	sl_bool operator!=(const String8& other) const;
+	sl_bool operator!=(const String& other) const;
 	
 	sl_bool operator!=(const String16& other) const;
 	
-	sl_bool operator!=(const AtomicString8& other) const;
+	sl_bool operator!=(const AtomicString& other) const;
 	
 	sl_bool operator!=(const AtomicString16& other) const;
 	
@@ -992,11 +992,11 @@ public:
 	friend sl_bool operator!=(const sl_char32* utf32, const String16& second);
 	
 	
-	sl_bool operator>=(const String8& other) const;
+	sl_bool operator>=(const String& other) const;
 	
 	sl_bool operator>=(const String16& other) const;
 	
-	sl_bool operator>=(const AtomicString8& other) const;
+	sl_bool operator>=(const AtomicString& other) const;
 	
 	sl_bool operator>=(const AtomicString16& other) const;
 	
@@ -1013,11 +1013,11 @@ public:
 	friend sl_bool operator>=(const sl_char32* utf32, const String16& second);
 	
 	
-	sl_bool operator<=(const String8& other) const;
+	sl_bool operator<=(const String& other) const;
 	
 	sl_bool operator<=(const String16& other) const;
 	
-	sl_bool operator<=(const AtomicString8& other) const;
+	sl_bool operator<=(const AtomicString& other) const;
 	
 	sl_bool operator<=(const AtomicString16& other) const;
 	
@@ -1034,11 +1034,11 @@ public:
 	friend sl_bool operator<=(const sl_char32* utf32, const String16& second);
 	
 	
-	sl_bool operator>(const String8& other) const;
+	sl_bool operator>(const String& other) const;
 	
 	sl_bool operator>(const String16& other) const;
 	
-	sl_bool operator>(const AtomicString8& other) const;
+	sl_bool operator>(const AtomicString& other) const;
 	
 	sl_bool operator>(const AtomicString16& other) const;
 	
@@ -1055,11 +1055,11 @@ public:
 	friend sl_bool operator>(const sl_char32* utf32, const String16& second);
 	
 	
-	sl_bool operator<(const String8& other) const;
+	sl_bool operator<(const String& other) const;
 	
 	sl_bool operator<(const String16& other) const;
 	
-	sl_bool operator<(const AtomicString8& other) const;
+	sl_bool operator<(const AtomicString& other) const;
 	
 	sl_bool operator<(const AtomicString16& other) const;
 	
@@ -1317,10 +1317,10 @@ public:
 
 /** auto-referencing object **/
 template <>
-class SLIB_EXPORT Atomic<String8>
+class SLIB_EXPORT Atomic<String>
 {
 private:
-	StringContainer8* volatile m_container;
+	StringContainer* volatile m_container;
 	SpinLock m_lock;
 	
 public:
@@ -1328,13 +1328,13 @@ public:
 	
 	SLIB_CONSTEXPR Atomic(sl_null_t) : m_container(sl_null) {}
 	
-	Atomic(AtomicString8&& src);
+	Atomic(AtomicString&& src);
 	
-	Atomic(String8&& src);
+	Atomic(String&& src);
 	
-	Atomic(const String8& src);
+	Atomic(const String& src);
 	
-	Atomic(const AtomicString8& src);
+	Atomic(const AtomicString& src);
 	
 	Atomic(const String16& src);
 	
@@ -1365,9 +1365,9 @@ public:
 	Atomic(const sl_char32* strUtf32, sl_reg length);
 	
 public:
-	static const AtomicString8& null();
+	static const AtomicString& null();
 	
-	static const AtomicString8& getEmpty();
+	static const AtomicString& getEmpty();
 	
 	sl_bool isNull() const;
 	
@@ -1389,110 +1389,110 @@ public:
 	sl_uint32 getHashCodeIgnoreCase() const;
 	
 public:
-	AtomicString8& operator=(sl_null_t);
+	AtomicString& operator=(sl_null_t);
 	
-	AtomicString8& operator=(AtomicString8&& other);
+	AtomicString& operator=(AtomicString&& other);
 	
-	AtomicString8& operator=(String8&& other);
+	AtomicString& operator=(String&& other);
 	
-	AtomicString8& operator=(const String8& other);
+	AtomicString& operator=(const String& other);
 	
-	AtomicString8& operator=(const AtomicString8& other);
+	AtomicString& operator=(const AtomicString& other);
 	
-	AtomicString8& operator=(const String16& other);
+	AtomicString& operator=(const String16& other);
 	
-	AtomicString8& operator=(const AtomicString16& _other);
+	AtomicString& operator=(const AtomicString16& _other);
 	
-	AtomicString8& operator=(const sl_char8* utf8);
+	AtomicString& operator=(const sl_char8* utf8);
 	
-	AtomicString8& operator=(const sl_char16* utf16);
+	AtomicString& operator=(const sl_char16* utf16);
 	
-	AtomicString8& operator=(const sl_char32* utf32);
-	
-public:
-	String8 operator+(const String8& other) const;
-	
-	AtomicString8& operator+=(const String8& other);
-	
-	String8 operator+(const String16& other) const;
-	
-	AtomicString8& operator+=(const String16& other);
-	
-	String8 operator+(const AtomicString8& other) const;
-	
-	AtomicString8& operator+=(const AtomicString8& other);
-	
-	String8 operator+(const AtomicString16& other) const;
-	
-	AtomicString8& operator+=(const AtomicString16& other);
-	
-	String8 operator+(const sl_char8* utf8) const;
-	
-	AtomicString8& operator+=(const sl_char8* utf8);
-
-	String8 operator+(const sl_char16* utf16) const;
-	
-	AtomicString8& operator+=(const sl_char16* utf16);
-
-	String8 operator+(const sl_char32* utf32) const;
-	
-	AtomicString8& operator+=(const sl_char32* utf32);
-
-	friend String8 operator+(const sl_char8* utf8, const AtomicString8& second);
-	
-	friend String8 operator+(const sl_char16* utf16, const AtomicString8& second);
-	
-	friend String8 operator+(const sl_char32* utf32, const AtomicString8& second);
+	AtomicString& operator=(const sl_char32* utf32);
 	
 public:
-	String8 operator+(sl_int32 number) const;
+	String operator+(const String& other) const;
 	
-	AtomicString8& operator+=(sl_int32 number);
+	AtomicString& operator+=(const String& other);
 	
-	friend String8 operator+(sl_int32 number, const AtomicString8& other);
+	String operator+(const String16& other) const;
 	
-	String8 operator+(sl_uint32 number) const;
+	AtomicString& operator+=(const String16& other);
 	
-	AtomicString8& operator+=(sl_uint32 number);
+	String operator+(const AtomicString& other) const;
 	
-	friend String8 operator+(sl_uint32 number, const AtomicString8& other);
+	AtomicString& operator+=(const AtomicString& other);
 	
-	String8 operator+(sl_int64 number) const;
+	String operator+(const AtomicString16& other) const;
 	
-	AtomicString8& operator+=(sl_int64 number);
+	AtomicString& operator+=(const AtomicString16& other);
 	
-	friend String8 operator+(sl_int64 number, const AtomicString8& other);
+	String operator+(const sl_char8* utf8) const;
 	
-	String8 operator+(sl_uint64 number) const;
+	AtomicString& operator+=(const sl_char8* utf8);
+
+	String operator+(const sl_char16* utf16) const;
 	
-	AtomicString8& operator+=(sl_uint64 number);
+	AtomicString& operator+=(const sl_char16* utf16);
+
+	String operator+(const sl_char32* utf32) const;
 	
-	friend String8 operator+(sl_uint64 number, const AtomicString8& other);
+	AtomicString& operator+=(const sl_char32* utf32);
+
+	friend String operator+(const sl_char8* utf8, const AtomicString& second);
 	
-	String8 operator+(float number) const;
+	friend String operator+(const sl_char16* utf16, const AtomicString& second);
 	
-	AtomicString8& operator+=(float number);
-	
-	friend String8 operator+(float number, const AtomicString8& other);
-	
-	String8 operator+(double number) const;
-	
-	AtomicString8& operator+=(double number);
-	
-	friend String8 operator+(double number, const AtomicString8& other);
-	
-	String8 operator+(sl_bool value) const;
-	
-	AtomicString8& operator+=(sl_bool value);
-	
-	friend String8 operator+(sl_bool value, const AtomicString8& other);
+	friend String operator+(const sl_char32* utf32, const AtomicString& second);
 	
 public:
-	sl_bool equals(const String8& other) const;
+	String operator+(sl_int32 number) const;
+	
+	AtomicString& operator+=(sl_int32 number);
+	
+	friend String operator+(sl_int32 number, const AtomicString& other);
+	
+	String operator+(sl_uint32 number) const;
+	
+	AtomicString& operator+=(sl_uint32 number);
+	
+	friend String operator+(sl_uint32 number, const AtomicString& other);
+	
+	String operator+(sl_int64 number) const;
+	
+	AtomicString& operator+=(sl_int64 number);
+	
+	friend String operator+(sl_int64 number, const AtomicString& other);
+	
+	String operator+(sl_uint64 number) const;
+	
+	AtomicString& operator+=(sl_uint64 number);
+	
+	friend String operator+(sl_uint64 number, const AtomicString& other);
+	
+	String operator+(float number) const;
+	
+	AtomicString& operator+=(float number);
+	
+	friend String operator+(float number, const AtomicString& other);
+	
+	String operator+(double number) const;
+	
+	AtomicString& operator+=(double number);
+	
+	friend String operator+(double number, const AtomicString& other);
+	
+	String operator+(sl_bool value) const;
+	
+	AtomicString& operator+=(sl_bool value);
+	
+	friend String operator+(sl_bool value, const AtomicString& other);
+	
+public:
+	sl_bool equals(const String& other) const;
 	
 	sl_bool equals(const String16& other) const;
 	
-	sl_bool equals(const AtomicString8& other) const;
+	sl_bool equals(const AtomicString& other) const;
 	
 	sl_bool equals(const AtomicString16& other) const;
 
@@ -1503,11 +1503,11 @@ public:
 	sl_bool equals(const sl_char32* utf32) const;
 	
 	
-	sl_int32 compare(const String8& other) const;
+	sl_int32 compare(const String& other) const;
 	
 	sl_int32 compare(const String16& other) const;
 	
-	sl_int32 compare(const AtomicString8& other) const;
+	sl_int32 compare(const AtomicString& other) const;
 	
 	sl_int32 compare(const AtomicString16& other) const;
 	
@@ -1517,19 +1517,19 @@ public:
 	
 	sl_int32 compare(const sl_char32* utf32) const;
 	
-	sl_int32 compare(const String8& other, sl_size len) const;
+	sl_int32 compare(const String& other, sl_size len) const;
 	
 	
-	sl_bool equalsIgnoreCase(const String8& other) const;
+	sl_bool equalsIgnoreCase(const String& other) const;
 	
-	sl_int32 compareIgnoreCase(const String8& other) const;
+	sl_int32 compareIgnoreCase(const String& other) const;
 	
 public:
-	sl_bool operator==(const String8& other) const;
+	sl_bool operator==(const String& other) const;
 	
 	sl_bool operator==(const String16& other) const;
 	
-	sl_bool operator==(const AtomicString8& other) const;
+	sl_bool operator==(const AtomicString& other) const;
 	
 	sl_bool operator==(const AtomicString16& other) const;
 	
@@ -1539,18 +1539,18 @@ public:
 	
 	sl_bool operator==(const sl_char32* utf32) const;
 	
-	friend sl_bool operator==(const sl_char8* utf8, const AtomicString8& second);
+	friend sl_bool operator==(const sl_char8* utf8, const AtomicString& second);
 	
-	friend sl_bool operator==(const sl_char16* utf16, const AtomicString8& second);
+	friend sl_bool operator==(const sl_char16* utf16, const AtomicString& second);
 	
-	friend sl_bool operator==(const sl_char32* utf32, const AtomicString8& second);
+	friend sl_bool operator==(const sl_char32* utf32, const AtomicString& second);
 	
 	
-	sl_bool operator!=(const String8& other) const;
+	sl_bool operator!=(const String& other) const;
 	
 	sl_bool operator!=(const String16& other) const;
 	
-	sl_bool operator!=(const AtomicString8& other) const;
+	sl_bool operator!=(const AtomicString& other) const;
 	
 	sl_bool operator!=(const AtomicString16& other) const;
 	
@@ -1560,18 +1560,18 @@ public:
 	
 	sl_bool operator!=(const sl_char32* utf32) const;
 	
-	friend sl_bool operator!=(const sl_char8* utf8, const AtomicString8& second);
+	friend sl_bool operator!=(const sl_char8* utf8, const AtomicString& second);
 	
-	friend sl_bool operator!=(const sl_char16* utf16, const AtomicString8& second);
+	friend sl_bool operator!=(const sl_char16* utf16, const AtomicString& second);
 	
-	friend sl_bool operator!=(const sl_char32* utf32, const AtomicString8& second);
+	friend sl_bool operator!=(const sl_char32* utf32, const AtomicString& second);
 	
 	
-	sl_bool operator>=(const String8& other) const;
+	sl_bool operator>=(const String& other) const;
 	
 	sl_bool operator>=(const String16& other) const;
 	
-	sl_bool operator>=(const AtomicString8& other) const;
+	sl_bool operator>=(const AtomicString& other) const;
 	
 	sl_bool operator>=(const AtomicString16& other) const;
 	
@@ -1581,18 +1581,18 @@ public:
 	
 	sl_bool operator>=(const sl_char32* utf32) const;
 	
-	friend sl_bool operator>=(const sl_char8* utf8, const AtomicString8& second);
+	friend sl_bool operator>=(const sl_char8* utf8, const AtomicString& second);
 	
-	friend sl_bool operator>=(const sl_char16* utf16, const AtomicString8& second);
+	friend sl_bool operator>=(const sl_char16* utf16, const AtomicString& second);
 	
-	friend sl_bool operator>=(const sl_char32* utf32, const AtomicString8& second);
+	friend sl_bool operator>=(const sl_char32* utf32, const AtomicString& second);
 	
 	
-	sl_bool operator<=(const String8& other) const;
+	sl_bool operator<=(const String& other) const;
 	
 	sl_bool operator<=(const String16& other) const;
 	
-	sl_bool operator<=(const AtomicString8& other) const;
+	sl_bool operator<=(const AtomicString& other) const;
 	
 	sl_bool operator<=(const AtomicString16& other) const;
 	
@@ -1602,18 +1602,18 @@ public:
 	
 	sl_bool operator<=(const sl_char32* utf32) const;
 	
-	friend sl_bool operator<=(const sl_char8* utf8, const AtomicString8& second);
+	friend sl_bool operator<=(const sl_char8* utf8, const AtomicString& second);
 	
-	friend sl_bool operator<=(const sl_char16* utf16, const AtomicString8& second);
+	friend sl_bool operator<=(const sl_char16* utf16, const AtomicString& second);
 	
-	friend sl_bool operator<=(const sl_char32* utf32, const AtomicString8& second);
+	friend sl_bool operator<=(const sl_char32* utf32, const AtomicString& second);
 	
 	
-	sl_bool operator>(const String8& other) const;
+	sl_bool operator>(const String& other) const;
 	
 	sl_bool operator>(const String16& other) const;
 	
-	sl_bool operator>(const AtomicString8& other) const;
+	sl_bool operator>(const AtomicString& other) const;
 	
 	sl_bool operator>(const AtomicString16& other) const;
 	
@@ -1623,18 +1623,18 @@ public:
 	
 	sl_bool operator>(const sl_char32* utf32) const;
 	
-	friend sl_bool operator>(const sl_char8* utf8, const AtomicString8& second);
+	friend sl_bool operator>(const sl_char8* utf8, const AtomicString& second);
 	
-	friend sl_bool operator>(const sl_char16* utf16, const AtomicString8& second);
+	friend sl_bool operator>(const sl_char16* utf16, const AtomicString& second);
 	
-	friend sl_bool operator>(const sl_char32* utf32, const AtomicString8& second);
+	friend sl_bool operator>(const sl_char32* utf32, const AtomicString& second);
 	
 	
-	sl_bool operator<(const String8& other) const;
+	sl_bool operator<(const String& other) const;
 	
 	sl_bool operator<(const String16& other) const;
 	
-	sl_bool operator<(const AtomicString8& other) const;
+	sl_bool operator<(const AtomicString& other) const;
 	
 	sl_bool operator<(const AtomicString16& other) const;
 	
@@ -1644,14 +1644,14 @@ public:
 	
 	sl_bool operator<(const sl_char32* utf32) const;
 	
-	friend sl_bool operator<(const sl_char8* utf8, const AtomicString8& second);
+	friend sl_bool operator<(const sl_char8* utf8, const AtomicString& second);
 	
-	friend sl_bool operator<(const sl_char16* utf16, const AtomicString8& second);
+	friend sl_bool operator<(const sl_char16* utf16, const AtomicString& second);
 	
-	friend sl_bool operator<(const sl_char32* utf32, const AtomicString8& second);
+	friend sl_bool operator<(const sl_char32* utf32, const AtomicString& second);
 	
 public:
-	String8 duplicate() const;
+	String duplicate() const;
 	
 	Memory toMemory() const;
 	
@@ -1669,41 +1669,41 @@ public:
 	// contains null character at last
 	Memory toUtf32() const;
 	
-	String8 substring(sl_reg start, sl_reg end = -1) const;
+	String substring(sl_reg start, sl_reg end = -1) const;
 	
-	String8 left(sl_reg len) const;
+	String left(sl_reg len) const;
 	
-	String8 right(sl_reg len) const;
+	String right(sl_reg len) const;
 	
-	String8 mid(sl_reg start, sl_reg len) const;
+	String mid(sl_reg start, sl_reg len) const;
 	
 	sl_reg indexOf(sl_char8 ch, sl_reg start = 0) const;
 	
-	sl_reg indexOf(const String8& str, sl_reg start = 0) const;
+	sl_reg indexOf(const String& str, sl_reg start = 0) const;
 	
 	sl_reg indexOf(const sl_char8* str, sl_reg start = 0) const;
 	
 	sl_reg lastIndexOf(sl_char8 ch, sl_reg start = -1) const;
 	
-	sl_reg lastIndexOf(const String8& str, sl_reg start = -1) const;
+	sl_reg lastIndexOf(const String& str, sl_reg start = -1) const;
 	
 	sl_reg lastIndexOf(const sl_char8* str, sl_reg start = -1) const;
 	
 	sl_bool startsWith(sl_char8 ch) const;
 	
-	sl_bool startsWith(const String8& str) const;
+	sl_bool startsWith(const String& str) const;
 	
 	sl_bool startsWith(const sl_char8* str) const;
 	
 	sl_bool endsWith(sl_char8 ch) const;
 	
-	sl_bool endsWith(const String8& str) const;
+	sl_bool endsWith(const String& str) const;
 	
 	sl_bool endsWith(const sl_char8* str) const;
 
 	sl_bool constains(sl_char8 ch) const;
 
-	sl_bool contains(const String8& str) const;
+	sl_bool contains(const String& str) const;
 	
 	sl_bool contains(const sl_char8* str) const;
 
@@ -1711,31 +1711,31 @@ public:
 	
 	void makeLower();
 	
-	String8 toUpper() const;
+	String toUpper() const;
 	
-	String8 toLower() const;
+	String toLower() const;
 	
-	String8 replaceAll(const String8& pattern, const String8& replacement) const;
+	String replaceAll(const String& pattern, const String& replacement) const;
 
-	String8 replaceAll(const String8& pattern, const sl_char8* replacement) const;
+	String replaceAll(const String& pattern, const sl_char8* replacement) const;
 	
-	String8 replaceAll(const sl_char8* pattern, const String8& replacement) const;
+	String replaceAll(const sl_char8* pattern, const String& replacement) const;
 	
-	String8 replaceAll(const sl_char8* pattern, const sl_char8* replacement) const;
+	String replaceAll(const sl_char8* pattern, const sl_char8* replacement) const;
 	
-	String8 trim() const;
+	String trim() const;
 	
-	String8 trimLeft() const;
+	String trimLeft() const;
 	
-	String8 trimRight() const;
+	String trimRight() const;
 	
-	List<String8> split(const String8& pattern) const;
+	List<String> split(const String& pattern) const;
 	
-	List<String8> split(const sl_char8* pattern) const;
+	List<String> split(const sl_char8* pattern) const;
 	
-	String8 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false);
+	String applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false);
 	
-	String8 parseBackslashEscapes(sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
+	String parseBackslashEscapes(sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
 	
 	sl_size countLineNumber(sl_size pos, sl_size* column = sl_null) const;
 
@@ -1779,17 +1779,17 @@ public:
 	sl_bool parseHexString(void* _out) const;
 	
 	
-	String8 argBy(const Variant* params, sl_size nParams) const;
+	String argBy(const Variant* params, sl_size nParams) const;
 	
 	template <class... ARGS>
-	String8 arg(ARGS&&... args) const;
+	String arg(ARGS&&... args) const;
 	
 private:
-	StringContainer8* _retainContainer() const;
+	StringContainer* _retainContainer() const;
 	
-	void _replaceContainer(StringContainer8* other);
+	void _replaceContainer(StringContainer* other);
 
-	friend class String8;
+	friend class String;
 };
 
 /** auto-referencing object **/
@@ -1813,9 +1813,9 @@ public:
 	
 	Atomic(const AtomicString16& src);
 	
-	Atomic(const String8& src);
+	Atomic(const String& src);
 	
-	Atomic(const AtomicString8& src);
+	Atomic(const AtomicString& src);
 	
 	~Atomic();
 	
@@ -1873,9 +1873,9 @@ public:
 	
 	AtomicString16& operator=(const AtomicString16& other);
 	
-	AtomicString16& operator=(const String8& other);
+	AtomicString16& operator=(const String& other);
 	
-	AtomicString16& operator=(const AtomicString8& _other);
+	AtomicString16& operator=(const AtomicString& _other);
 	
 	AtomicString16& operator=(const sl_char8* utf8);
 	
@@ -1888,17 +1888,17 @@ public:
 	
 	AtomicString16& operator+=(const AtomicString16& other);
 
-	String16 operator+(const String8& other) const;
+	String16 operator+(const String& other) const;
 	
-	AtomicString16& operator+=(const AtomicString8& other);
+	AtomicString16& operator+=(const AtomicString& other);
 
 	String16 operator+(const AtomicString16& other) const;
 	
 	AtomicString16& operator+=(const String16& other);
 
-	String16 operator+(const AtomicString8& other) const;
+	String16 operator+(const AtomicString& other) const;
 	
-	AtomicString16& operator+=(const String8& other);
+	AtomicString16& operator+=(const String& other);
 
 	String16 operator+(const sl_char8* utf8) const;
 	
@@ -1964,11 +1964,11 @@ public:
 public:
 	sl_bool equals(const String16& other) const;
 	
-	sl_bool equals(const String8& other) const;
+	sl_bool equals(const String& other) const;
 	
 	sl_bool equals(const AtomicString16& other) const;
 	
-	sl_bool equals(const AtomicString8& other) const;
+	sl_bool equals(const AtomicString& other) const;
 	
 	sl_bool equals(const sl_char8* utf8) const;
 	
@@ -1979,11 +1979,11 @@ public:
 	
 	sl_int32 compare(const String16& other) const;
 	
-	sl_int32 compare(const String8& other) const;
+	sl_int32 compare(const String& other) const;
 	
 	sl_int32 compare(const AtomicString16& other) const;
 	
-	sl_int32 compare(const AtomicString8& other) const;
+	sl_int32 compare(const AtomicString& other) const;
 	
 	sl_int32 compare(const sl_char8* utf8) const;
 	
@@ -1999,11 +1999,11 @@ public:
 	sl_int32 compareIgnoreCase(const String16& other) const;
 	
 public:
-	sl_bool operator==(const String8& other) const;
+	sl_bool operator==(const String& other) const;
 	
 	sl_bool operator==(const String16& other) const;
 	
-	sl_bool operator==(const AtomicString8& other) const;
+	sl_bool operator==(const AtomicString& other) const;
 	
 	sl_bool operator==(const AtomicString16& other) const;
 	
@@ -2020,11 +2020,11 @@ public:
 	friend sl_bool operator==(const sl_char32* utf32, const AtomicString16& second);
 	
 	
-	sl_bool operator!=(const String8& other) const;
+	sl_bool operator!=(const String& other) const;
 	
 	sl_bool operator!=(const String16& other) const;
 	
-	sl_bool operator!=(const AtomicString8& other) const;
+	sl_bool operator!=(const AtomicString& other) const;
 	
 	sl_bool operator!=(const AtomicString16& other) const;
 	
@@ -2041,11 +2041,11 @@ public:
 	friend sl_bool operator!=(const sl_char32* utf32, const AtomicString16& second);
 	
 	
-	sl_bool operator>=(const String8& other) const;
+	sl_bool operator>=(const String& other) const;
 	
 	sl_bool operator>=(const String16& other) const;
 	
-	sl_bool operator>=(const AtomicString8& other) const;
+	sl_bool operator>=(const AtomicString& other) const;
 	
 	sl_bool operator>=(const AtomicString16& other) const;
 	
@@ -2062,11 +2062,11 @@ public:
 	friend sl_bool operator>=(const sl_char32* utf32, const AtomicString16& second);
 	
 	
-	sl_bool operator<=(const String8& other) const;
+	sl_bool operator<=(const String& other) const;
 	
 	sl_bool operator<=(const String16& other) const;
 	
-	sl_bool operator<=(const AtomicString8& other) const;
+	sl_bool operator<=(const AtomicString& other) const;
 	
 	sl_bool operator<=(const AtomicString16& other) const;
 	
@@ -2083,11 +2083,11 @@ public:
 	friend sl_bool operator<=(const sl_char32* utf32, const AtomicString16& second);
 	
 	
-	sl_bool operator>(const String8& other) const;
+	sl_bool operator>(const String& other) const;
 	
 	sl_bool operator>(const String16& other) const;
 	
-	sl_bool operator>(const AtomicString8& other) const;
+	sl_bool operator>(const AtomicString& other) const;
 	
 	sl_bool operator>(const AtomicString16& other) const;
 	
@@ -2104,11 +2104,11 @@ public:
 	friend sl_bool operator>(const sl_char32* utf32, const AtomicString16& second);
 	
 	
-	sl_bool operator<(const String8& other) const;
+	sl_bool operator<(const String& other) const;
 	
 	sl_bool operator<(const String16& other) const;
 	
-	sl_bool operator<(const AtomicString8& other) const;
+	sl_bool operator<(const AtomicString& other) const;
 	
 	sl_bool operator<(const AtomicString16& other) const;
 	
@@ -2264,17 +2264,17 @@ template <class CharType>
 struct StringTypeFromCharType;
 
 template <>
-struct StringTypeFromCharType<sl_char8> { typedef String8 Type; };
+struct StringTypeFromCharType<sl_char8> { typedef String Type; };
 
 template <>
 struct StringTypeFromCharType<sl_char16> { typedef String16 Type; };
 
 
 template <>
-class Compare<String8>
+class Compare<String>
 {
 public:
-	int operator()(const String8& a, const String8& b) const;
+	int operator()(const String& a, const String& b) const;
 };
 
 template <>
@@ -2285,10 +2285,10 @@ public:
 };
 
 template <>
-class Compare<AtomicString8>
+class Compare<AtomicString>
 {
 public:
-	int operator()(const AtomicString8& a, const AtomicString8& b) const;
+	int operator()(const AtomicString& a, const AtomicString& b) const;
 };
 
 template <>
@@ -2300,10 +2300,10 @@ public:
 
 
 template <>
-class Equals<String8>
+class Equals<String>
 {
 public:
-	sl_bool operator()(const String8& a, const String8& b) const;
+	sl_bool operator()(const String& a, const String& b) const;
 };
 
 template <>
@@ -2314,10 +2314,10 @@ public:
 };
 
 template <>
-class Equals<AtomicString8>
+class Equals<AtomicString>
 {
 public:
-	sl_bool operator()(const AtomicString8& a, const AtomicString8& b) const;
+	sl_bool operator()(const AtomicString& a, const AtomicString& b) const;
 };
 
 template <>
@@ -2329,10 +2329,10 @@ public:
 
 
 template <>
-class Hash<String8>
+class Hash<String>
 {
 public:
-	sl_uint32 operator()(const String8& a) const;
+	sl_uint32 operator()(const String& a) const;
 };
 
 template <>
@@ -2343,10 +2343,10 @@ public:
 };
 
 template <>
-class Hash<AtomicString8>
+class Hash<AtomicString>
 {
 public:
-	sl_uint32 operator()(const AtomicString8& a) const;
+	sl_uint32 operator()(const AtomicString& a) const;
 };
 
 template <>
@@ -2357,10 +2357,10 @@ public:
 };
 
 
-class CompareIgnoreCaseString8
+class CompareIgnoreCaseString
 {
 public:
-	int operator()(const String8& a, const String8& b) const;
+	int operator()(const String& a, const String& b) const;
 };
 
 class CompareIgnoreCaseString16
@@ -2369,13 +2369,13 @@ public:
 	int operator()(const String16& a, const String16& b) const;
 };
 
-typedef CompareIgnoreCaseString8 CompareIgnoreCaseString;
+typedef CompareIgnoreCaseString CompareIgnoreCaseString;
 
 
-class EqualsIgnoreCaseString8
+class EqualsIgnoreCaseString
 {
 public:
-	sl_bool operator()(const String8& a, const String8& b) const;
+	sl_bool operator()(const String& a, const String& b) const;
 };
 
 class EqualsIgnoreCaseString16
@@ -2384,13 +2384,13 @@ public:
 	sl_bool operator()(const String16& a, const String16& b) const;
 };
 
-typedef EqualsIgnoreCaseString8 EqualsIgnoreCaseString;
+typedef EqualsIgnoreCaseString EqualsIgnoreCaseString;
 
 
-class HashIgnoreCaseString8
+class HashIgnoreCaseString
 {
 public:
-	sl_uint32 operator()(const String8& v) const;
+	sl_uint32 operator()(const String& v) const;
 	
 };
 
@@ -2401,11 +2401,7 @@ public:
 	
 };
 
-typedef HashIgnoreCaseString8 HashIgnoreCaseString;
-
-
-typedef String8 String;
-typedef AtomicString8 AtomicString;
+typedef HashIgnoreCaseString HashIgnoreCaseString;
 
 SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_LIST(String)
 SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_MAP(String, Ref<Referable>)
@@ -2422,29 +2418,29 @@ public:
 	};
 	sl_size len;
 	Ref<Referable> refer;
-	String8 str8;
+	String str8;
 	String16 str16;
 };
 
-class SLIB_EXPORT StringBuffer8 : public Object
+class SLIB_EXPORT StringBuffer : public Object
 {
 public:
-	StringBuffer8();
+	StringBuffer();
 
 public:
 	sl_size getLength() const;
 	
-	sl_bool add(const String8& str);
+	sl_bool add(const String& str);
 	
 	sl_bool add(const StringData& str);
 	
 	sl_bool addStatic(const sl_char8* buf, sl_size length);
 	
-	void link(StringBuffer8& buf);
+	void link(StringBuffer& buf);
 	
 	void clear();
 	
-	String8 merge() const;
+	String merge() const;
 	
 	Memory mergeToMemory() const;
 	
@@ -2482,7 +2478,7 @@ private:
 	
 };
 
-typedef StringBuffer8 StringBuffer;
+typedef StringBuffer StringBuffer;
 
 
 
@@ -2502,17 +2498,17 @@ typedef StringBuffer8 StringBuffer;
 #define SLIB_CHAR_LOWER_TO_UPPER(c) (((c) >= 'a' && (c) <= 'z')?((c) - ('a' - 'A')):(c))
 
 
-#define SLIB_STATIC_STRING8(name, str) \
+#define SLIB_STATIC_STRING(name, str) \
 	static sl_char8 _static_string_buf_##name[] = str; \
-	static slib::StringContainer8 _static_string_container_##name = {_static_string_buf_##name, sizeof(_static_string_buf_##name)-1, 0, -1}; \
-	static slib::StringContainer8* _static_string_##name = &_static_string_container_##name; \
-	static slib::String8& name = *(reinterpret_cast<slib::String8*>(&_static_string_##name));
+	static slib::StringContainer _static_string_container_##name = {_static_string_buf_##name, sizeof(_static_string_buf_##name)-1, 0, -1}; \
+	static slib::StringContainer* _static_string_##name = &_static_string_container_##name; \
+	static slib::String& name = *(reinterpret_cast<slib::String*>(&_static_string_##name));
 
-#define SLIB_STATIC_ATOMIC_STRING8(name, str) \
+#define SLIB_STATIC_ATOMIC_STRING(name, str) \
 	static sl_char8 _static_string_buf_##name[] = str; \
-	static slib::StringContainer8 _static_string_container_##name = {_static_string_buf_##name, sizeof(_static_string_buf_##name)-1, 0, -1}; \
-	static slib::_String8_Const _static_string_##name = {&_static_string_container_##name, 0}; \
-	static slib::AtomicString8& name = *(reinterpret_cast<slib::AtomicString8*>(&_static_string_##name));
+	static slib::StringContainer _static_string_container_##name = {_static_string_buf_##name, sizeof(_static_string_buf_##name)-1, 0, -1}; \
+	static slib::_String_Const _static_string_##name = {&_static_string_container_##name, 0}; \
+	static slib::AtomicString& name = *(reinterpret_cast<slib::AtomicString*>(&_static_string_##name));
 
 #if !defined(SLIB_USE_UNICODE32)
 #define SLIB_STATIC_STRING16(name, str) \
@@ -2527,17 +2523,17 @@ typedef StringBuffer8 StringBuffer;
 	static slib::AtomicString16& name = *(reinterpret_cast<slib::AtomicString16*>(&_static_string_##name));
 #endif
 
-#define SLIB_STATIC_STRING8_BY_ARRAY(name, ...) \
+#define SLIB_STATIC_STRING_BY_ARRAY(name, ...) \
 	static sl_char8 _static_string_buf_##name[] = {__VA_ARGS__, 0}; \
-	static slib::StringContainer8 _static_string_container_##name = {_static_string_buf_##name, sizeof(_static_string_buf_##name)-1, 0, -1}; \
-	static slib::StringContainer8* _static_string_##name = &_static_string_container_##name; \
-	static slib::String8& name = *(reinterpret_cast<slib::String8*>(&_static_string_##name));
+	static slib::StringContainer _static_string_container_##name = {_static_string_buf_##name, sizeof(_static_string_buf_##name)-1, 0, -1}; \
+	static slib::StringContainer* _static_string_##name = &_static_string_container_##name; \
+	static slib::String& name = *(reinterpret_cast<slib::String*>(&_static_string_##name));
 
-#define SLIB_STATIC_ATOMIC_STRING8_BY_ARRAY(name, ...) \
+#define SLIB_STATIC_ATOMIC_STRING_BY_ARRAY(name, ...) \
 	static sl_char8 _static_string_buf_##name[] = {__VA_ARGS__, 0}; \
-	static slib::StringContainer8 _static_string_container_##name = {_static_string_buf_##name, sizeof(_static_string_buf_##name)-1, 0, -1}; \
-	static slib::_String8_Const _static_string_##name = {&_static_string_container_##name, 0}; \
-	static slib::AtomicString8& name = *(reinterpret_cast<slib::AtomicString8*>(&_static_string_##name));
+	static slib::StringContainer _static_string_container_##name = {_static_string_buf_##name, sizeof(_static_string_buf_##name)-1, 0, -1}; \
+	static slib::_String_Const _static_string_##name = {&_static_string_container_##name, 0}; \
+	static slib::AtomicString& name = *(reinterpret_cast<slib::AtomicString*>(&_static_string_##name));
 
 #define SLIB_STATIC_STRING16_BY_ARRAY(name, ...) \
 	static sl_char16 _static_string_buf_##name[] = {__VA_ARGS__, 0}; \
@@ -2551,13 +2547,13 @@ typedef StringBuffer8 StringBuffer;
 	static slib::_String16_Const _static_string_##name = {&_static_string_container_##name, 0}; \
 	static slib::AtomicString16& name = *(reinterpret_cast<slib::AtomicString16*>(&_static_string_##name));
 
-#define SLIB_STATIC_STRING8_NULL(name) \
-	static slib::_String8_Const _static_string_null_##name = {sl_null, 0}; \
-	static slib::String8& name = *(reinterpret_cast<slib::String8*>(&_static_string_null_##name));
+#define SLIB_STATIC_STRING_NULL(name) \
+	static slib::_String_Const _static_string_null_##name = {sl_null, 0}; \
+	static slib::String& name = *(reinterpret_cast<slib::String*>(&_static_string_null_##name));
 
-#define SLIB_STATIC_ATOMIC_STRING8_NULL(name) \
-	static slib::_String8_Const _static_string_null_##name = {sl_null, 0}; \
-	static slib::AtomicString8& name = *(reinterpret_cast<slib::AtomicString8*>(&_static_string_null_##name));
+#define SLIB_STATIC_ATOMIC_STRING_NULL(name) \
+	static slib::_String_Const _static_string_null_##name = {sl_null, 0}; \
+	static slib::AtomicString& name = *(reinterpret_cast<slib::AtomicString*>(&_static_string_null_##name));
 
 #define SLIB_STATIC_STRING16_NULL(name) \
 	static slib::_String16_Const _static_string_null_##name = {sl_null, 0}; \
@@ -2567,20 +2563,13 @@ typedef StringBuffer8 StringBuffer;
 	static slib::_String16_Const _static_string_null_##name = {sl_null, 0}; \
 	static slib::AtomicString16& name = *(reinterpret_cast<slib::AtomicString16*>(&_static_string_null_##name));
 
-#define SLIB_STATIC_STRING SLIB_STATIC_STRING8
-#define SLIB_STATIC_STRING_BY_ARRAY SLIB_STATIC_STRING8_BY_ARRAY
-#define SLIB_STATIC_STRING_NULL SLIB_STATIC_STRING8_NULL
-#define SLIB_STATIC_ATOMIC_STRING SLIB_STATIC_ATOMIC_STRING8
-#define SLIB_STATIC_ATOMIC_STRING_BY_ARRAY SLIB_STATIC_ATOMIC_STRING8_BY_ARRAY
-#define SLIB_STATIC_ATOMIC_STRING_NULL SLIB_STATIC_ATOMIC_STRING8_NULL
-
 
 SLIB_NAMESPACE_END
 
 
 SLIB_NAMESPACE_BEGIN
 
-SLIB_INLINE String8::String8(String8&& src)
+SLIB_INLINE String::String(String&& src)
 {
 	m_container = src.m_container;
 	src.m_container = sl_null;
@@ -2592,7 +2581,7 @@ SLIB_INLINE String16::String16(String16&& src)
 	src.m_container = sl_null;
 }
 
-SLIB_INLINE AtomicString8::Atomic(AtomicString8&& src)
+SLIB_INLINE AtomicString::Atomic(AtomicString&& src)
 {
 	m_container = src.m_container;
 	src.m_container = sl_null;
@@ -2605,7 +2594,7 @@ SLIB_INLINE AtomicString16::Atomic(AtomicString16&& src)
 }
 
 
-SLIB_INLINE String8::String8(AtomicString8&& src)
+SLIB_INLINE String::String(AtomicString&& src)
 {
 	m_container = src.m_container;
 	src.m_container = sl_null;
@@ -2617,7 +2606,7 @@ SLIB_INLINE String16::String16(AtomicString16&& src)
 	src.m_container = sl_null;
 }
 
-SLIB_INLINE AtomicString8::Atomic(String8&& src)
+SLIB_INLINE AtomicString::Atomic(String&& src)
 {
 	m_container = src.m_container;
 	src.m_container = sl_null;
@@ -2630,9 +2619,9 @@ SLIB_INLINE AtomicString16::Atomic(String16&& src)
 }
 
 
-SLIB_INLINE const String8& String8::null()
+SLIB_INLINE const String& String::null()
 {
-	return *(reinterpret_cast<String8 const*>(&_String8_Null));
+	return *(reinterpret_cast<String const*>(&_String_Null));
 }
 
 SLIB_INLINE const String16& String16::null()
@@ -2640,9 +2629,9 @@ SLIB_INLINE const String16& String16::null()
 	return *(reinterpret_cast<String16 const*>(&_String16_Null));
 }
 
-SLIB_INLINE const AtomicString8& AtomicString8::null()
+SLIB_INLINE const AtomicString& AtomicString::null()
 {
-	return *(reinterpret_cast<AtomicString8 const*>(&_String8_Null));
+	return *(reinterpret_cast<AtomicString const*>(&_String_Null));
 }
 
 SLIB_INLINE const AtomicString16& AtomicString16::null()
@@ -2651,9 +2640,9 @@ SLIB_INLINE const AtomicString16& AtomicString16::null()
 }
 
 
-SLIB_INLINE const String8& String8::getEmpty()
+SLIB_INLINE const String& String::getEmpty()
 {
-	return *(reinterpret_cast<String8 const*>(&_String8_Empty));
+	return *(reinterpret_cast<String const*>(&_String_Empty));
 }
 
 SLIB_INLINE const String16& String16::getEmpty()
@@ -2661,9 +2650,9 @@ SLIB_INLINE const String16& String16::getEmpty()
 	return *(reinterpret_cast<String16 const*>(&_String16_Empty));
 }
 
-SLIB_INLINE const AtomicString8& AtomicString8::getEmpty()
+SLIB_INLINE const AtomicString& AtomicString::getEmpty()
 {
-	return *(reinterpret_cast<AtomicString8 const*>(&_String8_Empty));
+	return *(reinterpret_cast<AtomicString const*>(&_String_Empty));
 }
 
 SLIB_INLINE const AtomicString16& AtomicString16::getEmpty()
@@ -2672,10 +2661,10 @@ SLIB_INLINE const AtomicString16& AtomicString16::getEmpty()
 }
 
 
-SLIB_INLINE const String8& String8::getNotNull() const
+SLIB_INLINE const String& String::getNotNull() const
 {
 	if (!m_container) {
-		return *(reinterpret_cast<String8 const*>(&_String8_Empty));
+		return *(reinterpret_cast<String const*>(&_String_Empty));
 	}
 	return *this;
 }
@@ -2689,7 +2678,7 @@ SLIB_INLINE const String16& String16::getNotNull() const
 }
 
 
-SLIB_INLINE sl_bool String8::isNull() const
+SLIB_INLINE sl_bool String::isNull() const
 {
 	return m_container == sl_null;
 }
@@ -2699,7 +2688,7 @@ SLIB_INLINE sl_bool String16::isNull() const
 	return m_container == sl_null;
 }
 
-SLIB_INLINE sl_bool AtomicString8::isNull() const
+SLIB_INLINE sl_bool AtomicString::isNull() const
 {
 	return m_container == sl_null;
 }
@@ -2710,7 +2699,7 @@ SLIB_INLINE sl_bool AtomicString16::isNull() const
 }
 
 
-SLIB_INLINE sl_bool String8::isNotNull() const
+SLIB_INLINE sl_bool String::isNotNull() const
 {
 	return m_container != sl_null;
 }
@@ -2720,7 +2709,7 @@ SLIB_INLINE sl_bool String16::isNotNull() const
 	return m_container != sl_null;
 }
 
-SLIB_INLINE sl_bool AtomicString8::isNotNull() const
+SLIB_INLINE sl_bool AtomicString::isNotNull() const
 {
 	return m_container != sl_null;
 }
@@ -2731,7 +2720,7 @@ SLIB_INLINE sl_bool AtomicString16::isNotNull() const
 }
 
 
-SLIB_INLINE sl_bool String8::isEmpty() const
+SLIB_INLINE sl_bool String::isEmpty() const
 {
 	if (m_container) {
 		return (m_container->len == 0);
@@ -2750,7 +2739,7 @@ SLIB_INLINE sl_bool String16::isEmpty() const
 }
 
 
-SLIB_INLINE sl_bool String8::isNotEmpty() const
+SLIB_INLINE sl_bool String::isNotEmpty() const
 {
 	if (m_container) {
 		return (m_container->len != 0);
@@ -2769,7 +2758,7 @@ SLIB_INLINE sl_bool String16::isNotEmpty() const
 }
 
 
-SLIB_INLINE sl_char8* String8::getData() const
+SLIB_INLINE sl_char8* String::getData() const
 {
 	if (m_container) {
 		return m_container->sz;
@@ -2788,7 +2777,7 @@ SLIB_INLINE sl_char16* String16::getData() const
 }
 
 
-SLIB_INLINE sl_size String8::getLength() const
+SLIB_INLINE sl_size String::getLength() const
 {
 	if (m_container) {
 		return m_container->len;

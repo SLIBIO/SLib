@@ -2313,7 +2313,7 @@ Ref<XmlDocument> _Xml_Parser<ST, CT, BT>::parseXml(const String& sourceFilePath,
 
 Ref<XmlDocument> Xml::parseXml(const sl_char8* sz, sl_size len, XmlParseParam& param)
 {
-	return _Xml_Parser<String8, sl_char8, StringBuffer8>::parseXml(String::null(), sz, len, param);
+	return _Xml_Parser<String, sl_char8, StringBuffer>::parseXml(String::null(), sz, len, param);
 }
 
 Ref<XmlDocument> Xml::parseXml(const sl_char8* sz, sl_size len)
@@ -2324,7 +2324,7 @@ Ref<XmlDocument> Xml::parseXml(const sl_char8* sz, sl_size len)
 
 Ref<XmlDocument> Xml::parseXml(const String& xml, XmlParseParam& param)
 {
-	return _Xml_Parser<String8, sl_char8, StringBuffer8>::parseXml(String::null(), xml.getData(), xml.getLength(), param);
+	return _Xml_Parser<String, sl_char8, StringBuffer>::parseXml(String::null(), xml.getData(), xml.getLength(), param);
 }
 
 Ref<XmlDocument> Xml::parseXml(const String& xml)

@@ -139,9 +139,9 @@ public:
 			int n = sqlite3_column_bytes(m_statement, index);
 			const void* buf = sqlite3_column_text(m_statement, index);
 			if (buf && n > 0) {
-				return String8::fromUtf8(buf, n);
+				return String::fromUtf8(buf, n);
 			}
-			return String8::getEmpty();
+			return String::getEmpty();
 		}
 
 		Memory _getBlob(sl_uint32 index)
@@ -399,7 +399,7 @@ public:
 									iRet = ::sqlite3_bind_blob(m_statement, i, mem.getData(), (sl_uint32)size, SQLITE_STATIC);
 								}
 							} else {
-								String8 str = var.getString();
+								String str = var.getString();
 								var = str;
 								iRet = ::sqlite3_bind_text(m_statement, i, str.getData(), (sl_uint32)(str.getLength()), SQLITE_STATIC);
 							}

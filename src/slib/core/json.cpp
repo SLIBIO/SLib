@@ -54,13 +54,13 @@ public:
 };
 
 template <>
-_Json_Parser<String8, sl_char8>::_Json_Parser()
+_Json_Parser<String, sl_char8>::_Json_Parser()
 {
-	SLIB_STATIC_STRING8(_null, "null");
+	SLIB_STATIC_STRING(_null, "null");
 	strNull = _null;
-	SLIB_STATIC_STRING8(_true, "true");
+	SLIB_STATIC_STRING(_true, "true");
 	strTrue = _true;
-	SLIB_STATIC_STRING8(_false, "false");
+	SLIB_STATIC_STRING(_false, "false");
 	strFalse = _false;
 }
 
@@ -378,7 +378,7 @@ Variant _Json_Parser<ST, CT>::parseJson(const CT* buf, sl_size len, JsonParsePar
 
 Variant Json::parseJson(const sl_char8* sz, sl_size len, JsonParseParam& param)
 {
-	return _Json_Parser<String8, sl_char8>::parseJson(sz, len, param);
+	return _Json_Parser<String, sl_char8>::parseJson(sz, len, param);
 }
 
 Variant Json::parseJson(const sl_char8* sz, sl_size len)
@@ -389,7 +389,7 @@ Variant Json::parseJson(const sl_char8* sz, sl_size len)
 
 Variant Json::parseJson(const String& json, JsonParseParam& param)
 {
-	return _Json_Parser<String8, sl_char8>::parseJson(json.getData(), json.getLength(), param);
+	return _Json_Parser<String, sl_char8>::parseJson(json.getData(), json.getLength(), param);
 }
 
 Variant Json::parseJson(const String& json)
@@ -688,32 +688,32 @@ template <> Variant Json::toJson(const bool& _in)
 	return Variant((sl_bool)_in);
 }
 
-template <> void Json::fromJson(const Variant& v, String8& _out)
+template <> void Json::fromJson(const Variant& v, String& _out)
 {
-	_out = v.getString8();
+	_out = v.getString();
 }
 
-template <> void Json::fromJson(const Variant& v, String8& _out, const String8& def)
+template <> void Json::fromJson(const Variant& v, String& _out, const String& def)
 {
-	_out = v.getString8(def);
+	_out = v.getString(def);
 }
 
-template <> Variant Json::toJson(const String8& _in)
+template <> Variant Json::toJson(const String& _in)
 {
 	return Variant(_in);
 }
 
-template <> void Json::fromJson(const Variant& v, AtomicString8& _out)
+template <> void Json::fromJson(const Variant& v, AtomicString& _out)
 {
-	_out = v.getString8();
+	_out = v.getString();
 }
 
-template <> void Json::fromJson(const Variant& v, AtomicString8& _out, const AtomicString8& def)
+template <> void Json::fromJson(const Variant& v, AtomicString& _out, const AtomicString& def)
 {
-	_out = v.getString8(def);
+	_out = v.getString(def);
 }
 
-template <> Variant Json::toJson(const AtomicString8& _in)
+template <> Variant Json::toJson(const AtomicString& _in)
 {
 	return Variant(_in);
 }

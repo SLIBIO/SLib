@@ -210,7 +210,7 @@ String _URL_encodePercentByUTF8(const String& value, const sl_bool patternUnrese
 				dst[k++] = _StringConv_radixPatternUpper[v & 15];
 			}
 		}
-		return String8(dst, k);
+		return String(dst, k);
 	} else {
 		return sl_null;
 	}

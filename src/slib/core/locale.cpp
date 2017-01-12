@@ -647,11 +647,6 @@ String Locale::getCountryLongName() const
 
 String Locale::toString(sl_char8 delimiter) const
 {
-	return toString8(delimiter);
-}
-
-String8 Locale::toString8(sl_char8 delimiter) const
-{
 	sl_char8 sz[5];
 	Language lang = getLanguage();
 	sz[0] = (char)(((sl_uint32)(lang)));

@@ -28,7 +28,7 @@ public:
 	
 	static NSString* getNSStringFromString16(const String16& str, NSString* def = @"");
 
-	static String8 getStringFromNSString(NSString* str);
+	static String getStringFromNSString(NSString* str);
 	
 	static String16 getString16FromNSString(NSString* str);
 	

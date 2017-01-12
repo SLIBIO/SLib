@@ -78,11 +78,11 @@ public:
 	
 	Variant(const sl_bool value);
 	
-	Variant(const String8& value);
+	Variant(const String& value);
 	
 	Variant(const String16& value);
 	
-	Variant(const AtomicString8& value);
+	Variant(const AtomicString& value);
 	
 	Variant(const AtomicString16& value);
 	
@@ -146,8 +146,6 @@ public:
 	static Variant fromBoolean(sl_bool value);
 	
 	static Variant fromString(const String& value);
-	
-	static Variant fromString8(const String8& value);
 	
 	static Variant fromString16(const String16& value);
 	
@@ -213,9 +211,9 @@ public:
 	
 	Variant& operator=(const sl_bool value);
 	
-	Variant& operator=(const String8& value);
+	Variant& operator=(const String& value);
 	
-	Variant& operator=(const AtomicString8& value);
+	Variant& operator=(const AtomicString& value);
 	
 	Variant& operator=(const String16& value);
 	
@@ -343,10 +341,6 @@ public:
 	
 	String getString() const;
 	
-	String8 getString8(const String8& def) const;
-	
-	String8 getString8() const;
-
 	String16 getString16(const String16& def) const;
 
 	String16 getString16() const;
@@ -355,11 +349,11 @@ public:
 	
 	const sl_char16* getSz16(const sl_char16* def = sl_null) const;
 	
-	void setString(const String8& value);
+	void setString(const String& value);
 	
 	void setString(const String16& value);
 	
-	void setString(const AtomicString8& value);
+	void setString(const AtomicString& value);
 	
 	void setString(const AtomicString16& value);
 	
@@ -504,11 +498,11 @@ public:
 	
 	Atomic(const sl_bool value);
 	
-	Atomic(const String8& value);
+	Atomic(const String& value);
 
 	Atomic(const String16& value);
 	
-	Atomic(const AtomicString8& value);
+	Atomic(const AtomicString& value);
 	
 	Atomic(const AtomicString16& value);
 	
@@ -582,9 +576,9 @@ public:
 	
 	AtomicVariant& operator=(const sl_bool value);
 	
-	AtomicVariant& operator=(const String8& value);
+	AtomicVariant& operator=(const String& value);
 	
-	AtomicVariant& operator=(const AtomicString8& value);
+	AtomicVariant& operator=(const AtomicString& value);
 	
 	AtomicVariant& operator=(const String16& value);
 	
@@ -727,11 +721,7 @@ public:
 	String getString(const String& def) const;
 	
 	String getString() const;
-	
-	String8 getString8(const String8& def) const;
-	
-	String8 getString8() const;
-	
+		
 	String16 getString16(const String16& def) const;
 	
 	String16 getString16() const;
@@ -740,9 +730,9 @@ public:
 	
 	const sl_char16* getSz16(const sl_char16* def = sl_null) const;
 	
-	void setString(const String8& value);
+	void setString(const String& value);
 	
-	void setString(const AtomicString8& value);
+	void setString(const AtomicString& value);
 	
 	void setString(const String16& value);
 	
@@ -851,14 +841,14 @@ public:
 
 
 template <class... ARGS>
-String8 String8::format(const sl_char8* szFormat, ARGS&&... args)
+String String::format(const sl_char8* szFormat, ARGS&&... args)
 {
 	Variant params[] = {Forward<ARGS>(args)...};
 	return formatBy(szFormat, params, sizeof...(args));
 }
 
 template <class... ARGS>
-String8 String8::format(const String8& strFormat, ARGS&&... args)
+String String::format(const String& strFormat, ARGS&&... args)
 {
 	Variant params[] = {Forward<ARGS>(args)...};
 	return formatBy(strFormat, params, sizeof...(args));
@@ -879,7 +869,7 @@ String16 String16::format(const String16& strFormat, ARGS&&... args)
 }
 
 template <class... ARGS>
-String8 String8::arg(ARGS&&... args) const
+String String::arg(ARGS&&... args) const
 {
 	Variant params[] = {Forward<ARGS>(args)...};
 	return argBy(params, sizeof...(args));
@@ -893,7 +883,7 @@ String16 String16::arg(ARGS&&... args) const
 }
 
 template <class... ARGS>
-String8 Atomic<String8>::arg(ARGS&&... args) const
+String Atomic<String>::arg(ARGS&&... args) const
 {
 	Variant params[] = {Forward<ARGS>(args)...};
 	return argBy(params, sizeof...(args));

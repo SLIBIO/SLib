@@ -169,7 +169,7 @@ String Color::toString() const
 class _Color_Name_Map
 {
 public:
-	HashTable<String8, Color> mapName;
+	HashTable<String, Color> mapName;
 	
 #define _MAP_COLOR(NAME) \
 	{ \

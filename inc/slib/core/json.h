@@ -286,13 +286,13 @@ template <> void Json::fromJson(const Variant& v, bool& _out);
 template <> void Json::fromJson(const Variant& v, bool& _out, const bool& def);
 template <> Variant Json::toJson(const bool& _in);
 
-template <> void Json::fromJson(const Variant& v, String8& _out);
-template <> void Json::fromJson(const Variant& v, String8& _out, const String8& def);
-template <> Variant Json::toJson(const String8& _in);
+template <> void Json::fromJson(const Variant& v, String& _out);
+template <> void Json::fromJson(const Variant& v, String& _out, const String& def);
+template <> Variant Json::toJson(const String& _in);
 
-template <> void Json::fromJson(const Variant& v, AtomicString8& _out);
-template <> void Json::fromJson(const Variant& v, AtomicString8& _out, const AtomicString8& def);
-template <> Variant Json::toJson(const AtomicString8& _in);
+template <> void Json::fromJson(const Variant& v, AtomicString& _out);
+template <> void Json::fromJson(const Variant& v, AtomicString& _out, const AtomicString& def);
+template <> Variant Json::toJson(const AtomicString& _in);
 
 template <> void Json::fromJson(const Variant& v, String16& _out);
 template <> void Json::fromJson(const Variant& v, String16& _out, const String16& def);

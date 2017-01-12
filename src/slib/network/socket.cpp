@@ -775,7 +775,7 @@ sl_bool _Socket_setPromiscuousMode(SOCKET fd, const char* deviceName, sl_bool fl
 sl_bool Socket::setPromiscuousMode(const String& _deviceName, sl_bool flagEnable)
 {
 	if (isOpened()) {
-		String8 deviceName = _deviceName;
+		String deviceName = _deviceName;
 		if (deviceName.isNotEmpty()) {
 			if (_Socket_setPromiscuousMode((SOCKET)(m_socket), deviceName.getData(), flagEnable)) {
 				return sl_true;

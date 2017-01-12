@@ -66,8 +66,8 @@ private:
 	sl_uint8 m_stream[128]; // bigger than sizeof(z_stream)
 	
 	sl_uint8 m_gzipHeader[128];
-	String8 m_gzipFileName;
-	String8 m_gzipComment;
+	String m_gzipFileName;
+	String m_gzipComment;
 
 	sl_bool m_flagStarted;
 	

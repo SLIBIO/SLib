@@ -24,7 +24,7 @@ SLIB_INLINE void _Variant_copy(VariantType src_type, sl_uint64 src_value, sl_uin
 {
 	switch (src_type) {
 		case VariantType::String8:
-			new PTR_VAR(String8, dst_value) String8(REF_VAR(String8, src_value));
+			new PTR_VAR(String, dst_value) String(REF_VAR(String, src_value));
 			break;
 		case VariantType::String16:
 			new PTR_VAR(String16, dst_value) String16(REF_VAR(String16, src_value));
@@ -44,7 +44,7 @@ SLIB_INLINE void _Variant_free(VariantType type, sl_uint64 value)
 	switch (type)
 	{
 		case VariantType::String8:
-			REF_VAR(String8, value).String8::~String8();
+			REF_VAR(String, value).String::~String();
 			break;
 		case VariantType::String16:
 			REF_VAR(String16, value).String16::~String16();
@@ -167,11 +167,11 @@ Variant::Variant(const sl_bool value)
 	REF_VAR(sl_bool, _value) = value;
 }
 
-Variant::Variant(const String8& value)
+Variant::Variant(const String& value)
 {
 	if (value.isNotNull()) {
 		_type = VariantType::String8;
-		new PTR_VAR(String8, _value) String8(value);
+		new PTR_VAR(String, _value) String(value);
 	} else {
 		_type = VariantType::Null;
 	}
@@ -187,12 +187,12 @@ Variant::Variant(const String16& value)
 	}
 }
 
-Variant::Variant(const AtomicString8& s)
+Variant::Variant(const AtomicString& s)
 {
-	String8 value(s);
+	String value(s);
 	if (value.isNotNull()) {
 		_type = VariantType::String8;
-		new PTR_VAR(String8, _value) String8(value);
+		new PTR_VAR(String, _value) String(value);
 	} else {
 		_type = VariantType::Null;
 	}
@@ -301,12 +301,7 @@ Variant Variant::fromBoolean(sl_bool value)
 	return value;
 }
 
-Variant Variant::fromString(const String8& value)
-{
-	return value;
-}
-
-Variant Variant::fromString8(const String8& value)
+Variant Variant::fromString(const String& value)
 {
 	return value;
 }
@@ -459,13 +454,13 @@ Variant& Variant::operator=(const sl_bool value)
 	return *this;
 }
 
-Variant& Variant::operator=(const String8& value)
+Variant& Variant::operator=(const String& value)
 {
 	setString(value);
 	return *this;
 }
 
-Variant& Variant::operator=(const AtomicString8& value)
+Variant& Variant::operator=(const AtomicString& value)
 {
 	setString(value);
 	return *this;
@@ -560,7 +555,7 @@ sl_int32 Variant::getInt32(sl_int32 def) const
 		case VariantType::Boolean:
 			return (REF_VAR(sl_bool const, _value)) ? 1 : 0;
 		case VariantType::String8:
-			return REF_VAR(String8 const, _value).parseInt32(10, def);
+			return REF_VAR(String const, _value).parseInt32(10, def);
 		case VariantType::String16:
 			return REF_VAR(String16 const, _value).parseInt32(10, def);
 		case VariantType::Pointer:
@@ -569,7 +564,7 @@ sl_int32 Variant::getInt32(sl_int32 def) const
 		{
 			sl_int32 ret;
 			const sl_char8* str = REF_VAR(sl_char8 const* const , _value);
-			sl_reg pos = String8::parseInt32(10, &ret, str);
+			sl_reg pos = String::parseInt32(10, &ret, str);
 			if (pos != SLIB_PARSE_ERROR && str[pos] == 0) {
 				return ret;
 			}
@@ -621,7 +616,7 @@ sl_uint32 Variant::getUint32(sl_uint32 def) const
 		case VariantType::Boolean:
 			return (REF_VAR(sl_bool const, _value)) ? 1 : 0;
 		case VariantType::String8:
-			return REF_VAR(String8 const, _value).parseUint32(10, def);
+			return REF_VAR(String const, _value).parseUint32(10, def);
 		case VariantType::String16:
 			return REF_VAR(String16 const, _value).parseUint32(10, def);
 		case VariantType::Pointer:
@@ -630,7 +625,7 @@ sl_uint32 Variant::getUint32(sl_uint32 def) const
 		{
 			sl_uint32 ret;
 			const sl_char8* str = REF_VAR(sl_char8 const* const, _value);
-			sl_reg pos = String8::parseUint32(10, &ret, str);
+			sl_reg pos = String::parseUint32(10, &ret, str);
 			if (pos != SLIB_PARSE_ERROR && str[pos] == 0) {
 				return ret;
 			}
@@ -682,7 +677,7 @@ sl_int64 Variant::getInt64(sl_int64 def) const
 		case VariantType::Boolean:
 			return (REF_VAR(sl_bool const, _value)) ? 1 : 0;
 		case VariantType::String8:
-			return (REF_VAR(String8 const, _value)).parseInt64(10, def);
+			return (REF_VAR(String const, _value)).parseInt64(10, def);
 		case VariantType::String16:
 			return (REF_VAR(String16 const, _value)).parseInt64(10, def);
 		case VariantType::Pointer:
@@ -691,7 +686,7 @@ sl_int64 Variant::getInt64(sl_int64 def) const
 		{
 			sl_int64 ret;
 			const sl_char8* str = REF_VAR(sl_char8 const* const, _value);
-			sl_reg pos = String8::parseInt64(10, &ret, str);
+			sl_reg pos = String::parseInt64(10, &ret, str);
 			if (pos != SLIB_PARSE_ERROR && str[pos] == 0) {
 				return ret;
 			}
@@ -743,7 +738,7 @@ sl_uint64 Variant::getUint64(sl_uint64 def) const
 		case VariantType::Boolean:
 			return (REF_VAR(sl_bool const, _value)) ? 1 : 0;
 		case VariantType::String8:
-			return (REF_VAR(String8 const, _value)).parseUint64(10, def);
+			return (REF_VAR(String const, _value)).parseUint64(10, def);
 		case VariantType::String16:
 			return (REF_VAR(String16 const, _value)).parseUint64(10, def);
 		case VariantType::Pointer:
@@ -752,7 +747,7 @@ sl_uint64 Variant::getUint64(sl_uint64 def) const
 		{
 			sl_uint64 ret;
 			const sl_char8* str = REF_VAR(sl_char8 const* const, _value);
-			sl_reg pos = String8::parseUint64(10, &ret, str);
+			sl_reg pos = String::parseUint64(10, &ret, str);
 			if (pos != SLIB_PARSE_ERROR && str[pos] == 0) {
 				return ret;
 			}
@@ -817,14 +812,14 @@ float Variant::getFloat(float def) const
 		case VariantType::Double:
 			return (float)(REF_VAR(double const, _value));
 		case VariantType::String8:
-			return (REF_VAR(String8 const, _value)).parseFloat(def);
+			return (REF_VAR(String const, _value)).parseFloat(def);
 		case VariantType::String16:
 			return (REF_VAR(String16 const, _value)).parseFloat(def);
 		case VariantType::Sz8:
 		{
 			float ret;
 			const sl_char8* str = REF_VAR(sl_char8 const* const, _value);
-			sl_reg pos = String8::parseFloat(&ret, str);
+			sl_reg pos = String::parseFloat(&ret, str);
 			if (pos != SLIB_PARSE_ERROR && str[pos] == 0) {
 				return ret;
 			}
@@ -874,14 +869,14 @@ double Variant::getDouble(double def) const
 		case VariantType::Double:
 			return (double)(REF_VAR(double const, _value));
 		case VariantType::String8:
-			return (REF_VAR(String8 const, _value)).parseDouble(def);
+			return (REF_VAR(String const, _value)).parseDouble(def);
 		case VariantType::String16:
 			return (REF_VAR(String16 const, _value)).parseDouble(def);
 		case VariantType::Sz8:
 		{
 			double ret;
 			const sl_char8* str = REF_VAR(sl_char8 const* const, _value);
-			sl_reg pos = String8::parseDouble(&ret, str);
+			sl_reg pos = String::parseDouble(&ret, str);
 			if (pos != SLIB_PARSE_ERROR && str[pos] == 0) {
 				return ret;
 			}
@@ -962,14 +957,14 @@ sl_bool Variant::getBoolean(sl_bool def) const
 		case VariantType::Boolean:
 			return REF_VAR(sl_bool const, _value);
 		case VariantType::String8:
-			return (REF_VAR(String8 const, _value)).parseBoolean(def);
+			return (REF_VAR(String const, _value)).parseBoolean(def);
 		case VariantType::String16:
 			return (REF_VAR(String16 const, _value)).parseBoolean(def);
 		case VariantType::Sz8:
 		{
 			sl_bool ret;
 			const sl_char8* str = REF_VAR(sl_char8 const* const, _value);
-			sl_reg pos = String8::parseBoolean(&ret, str);
+			sl_reg pos = String::parseBoolean(&ret, str);
 			if (pos != SLIB_PARSE_ERROR && str[pos] == 0) {
 				return ret;
 			}
@@ -1025,41 +1020,31 @@ sl_bool Variant::isSz16() const
 
 String Variant::getString(const String& def) const
 {
-	return getString8(def);
-}
-
-String Variant::getString() const
-{
-	return getString8(String8::null());
-}
-
-String8 Variant::getString8(const String8& def) const
-{
 	switch (_type) {
 		case VariantType::Int32:
-			return String8::fromInt32(REF_VAR(sl_int32 const, _value));
+			return String::fromInt32(REF_VAR(sl_int32 const, _value));
 		case VariantType::Uint32:
-			return String8::fromUint32(REF_VAR(sl_uint32 const, _value));
+			return String::fromUint32(REF_VAR(sl_uint32 const, _value));
 		case VariantType::Int64:
-			return String8::fromInt64(REF_VAR(sl_int64 const, _value));
+			return String::fromInt64(REF_VAR(sl_int64 const, _value));
 		case VariantType::Uint64:
-			return String8::fromUint64(REF_VAR(sl_uint64 const, _value));
+			return String::fromUint64(REF_VAR(sl_uint64 const, _value));
 		case VariantType::Float:
-			return String8::fromFloat(REF_VAR(float const, _value));
+			return String::fromFloat(REF_VAR(float const, _value));
 		case VariantType::Double:
-			return String8::fromDouble(REF_VAR(double const, _value));
+			return String::fromDouble(REF_VAR(double const, _value));
 		case VariantType::Boolean:
 			if (REF_VAR(sl_bool const, _value)) {
-				SLIB_STATIC_STRING8_BY_ARRAY(ret, 't', 'r', 'u', 'e');
+				SLIB_STATIC_STRING_BY_ARRAY(ret, 't', 'r', 'u', 'e');
 				return ret;
 			} else {
-				SLIB_STATIC_STRING8_BY_ARRAY(ret, 'f', 'a', 'l', 's', 'e');
+				SLIB_STATIC_STRING_BY_ARRAY(ret, 'f', 'a', 'l', 's', 'e');
 				return ret;
 			}
 		case VariantType::Time:
 			return REF_VAR(Time const, _value).toString();
 		case VariantType::String8:
-			return REF_VAR(String8 const, _value);
+			return REF_VAR(String const, _value);
 		case VariantType::String16:
 			return REF_VAR(String16 const, _value);
 		case VariantType::Sz8:
@@ -1067,16 +1052,16 @@ String8 Variant::getString8(const String8& def) const
 		case VariantType::Sz16:
 			return REF_VAR(sl_char16 const* const, _value);
 		case VariantType::Pointer:
-			return "#" + String8::fromPointerValue(REF_VAR(void const* const, _value));
+			return "#" + String::fromPointerValue(REF_VAR(void const* const, _value));
 		default:
 			break;
 	}
 	return def;
 }
 
-String8 Variant::getString8() const
+String Variant::getString() const
 {
-	return getString8(String8::null());
+	return getString(String::null());
 }
 
 String16 Variant::getString16(const String16& def) const
@@ -1105,7 +1090,7 @@ String16 Variant::getString16(const String16& def) const
 		case VariantType::Time:
 			return REF_VAR(Time const, _value).toString();
 		case VariantType::String8:
-			return REF_VAR(String8 const, _value);
+			return REF_VAR(String const, _value);
 		case VariantType::String16:
 			return REF_VAR(String16 const, _value);
 		case VariantType::Sz8:
@@ -1135,7 +1120,7 @@ const sl_char8* Variant::getSz8(const sl_char8* def) const
 				return "false";
 			}
 		case VariantType::String8:
-			return REF_VAR(String8 const, _value).getData();
+			return REF_VAR(String const, _value).getData();
 		case VariantType::Sz8:
 			return REF_VAR(sl_char8 const* const, _value);
 		default:
@@ -1165,12 +1150,12 @@ const sl_char16* Variant::getSz16(const sl_char16* def) const
 	return def;
 }
 
-void Variant::setString(const String8& value)
+void Variant::setString(const String& value)
 {
 	_Variant_free(_type, _value);
 	if (value.isNotNull()) {
 		_type = VariantType::String8;
-		new PTR_VAR(String8, _value) String8(value);
+		new PTR_VAR(String, _value) String(value);
 	} else {
 		_type = VariantType::Null;
 	}
@@ -1187,13 +1172,13 @@ void Variant::setString(const String16& value)
 	}
 }
 
-void Variant::setString(const AtomicString8& s)
+void Variant::setString(const AtomicString& s)
 {
 	_Variant_free(_type, _value);
-	String8 value(s);
+	String value(s);
 	if (value.isNotNull()) {
 		_type = VariantType::String8;
-		new PTR_VAR(String8, _value) String8(value);
+		new PTR_VAR(String, _value) String(value);
 	} else {
 		_type = VariantType::Null;
 	}
@@ -1202,7 +1187,7 @@ void Variant::setString(const AtomicString8& s)
 void Variant::setString(const AtomicString16& s)
 {
 	_Variant_free(_type, _value);
-	String8 value(s);
+	String value(s);
 	if (value.isNotNull()) {
 		_type = VariantType::String16;
 		new PTR_VAR(String16, _value) String16(value);
@@ -1244,7 +1229,7 @@ Time Variant::getTime(const Time& def) const
 		case VariantType::Time:
 			return REF_VAR(Time const, _value);
 		case VariantType::String8:
-			return Time(REF_VAR(String8 const, _value));
+			return Time(REF_VAR(String const, _value));
 		case VariantType::String16:
 			return Time(REF_VAR(String16 const, _value));
 		case VariantType::Sz8:
@@ -1649,7 +1634,7 @@ String Variant::toString() const
 		case VariantType::Boolean:
 			return getString();
 		case VariantType::String8:
-			return "\"" + REF_VAR(String8 const, _value) + "\"";
+			return "\"" + REF_VAR(String const, _value) + "\"";
 		case VariantType::String16:
 			return "\"" + REF_VAR(String16 const, _value) + "\"";
 		case VariantType::Sz8:
@@ -1711,7 +1696,7 @@ String Variant::toJsonString() const
 		case VariantType::Time:
 		case VariantType::String8:
 		case VariantType::Sz8:
-			return getString8().applyBackslashEscapes();
+			return getString().applyBackslashEscapes();
 		case VariantType::String16:
 		case VariantType::Sz16:
 			return getString16().applyBackslashEscapes();
@@ -1829,11 +1814,11 @@ Atomic<Variant>::Atomic(const sl_bool value)
 	REF_VAR(sl_bool, _value) = value;
 }
 
-Atomic<Variant>::Atomic(const String8& value)
+Atomic<Variant>::Atomic(const String& value)
 {
 	if (value.isNotNull()) {
 		_type = VariantType::String8;
-		new PTR_VAR(String8, _value) String8(value);
+		new PTR_VAR(String, _value) String(value);
 	} else {
 		_type = VariantType::Null;
 	}
@@ -1849,12 +1834,12 @@ Atomic<Variant>::Atomic(const String16& value)
 	}
 }
 
-Atomic<Variant>::Atomic(const AtomicString8& s)
+Atomic<Variant>::Atomic(const AtomicString& s)
 {
-	String8 value(s);
+	String value(s);
 	if (value.isNotNull()) {
 		_type = VariantType::String8;
-		new PTR_VAR(String8, _value) String8(value);
+		new PTR_VAR(String, _value) String(value);
 	} else {
 		_type = VariantType::Null;
 	}
@@ -2014,7 +1999,7 @@ AtomicVariant& Atomic<Variant>::operator=(const sl_bool value)
 	return *this;
 }
 
-AtomicVariant& Atomic<Variant>::operator=(const String8& value)
+AtomicVariant& Atomic<Variant>::operator=(const String& value)
 {
 	setString(value);
 	return *this;
@@ -2026,7 +2011,7 @@ AtomicVariant& Atomic<Variant>::operator=(const String16& value)
 	return *this;
 }
 
-AtomicVariant& Atomic<Variant>::operator=(const AtomicString8& value)
+AtomicVariant& Atomic<Variant>::operator=(const AtomicString& value)
 {
 	setString(value);
 	return *this;
@@ -2270,18 +2255,6 @@ String Atomic<Variant>::getString() const
 	return var.getString();
 }
 
-String8 Atomic<Variant>::getString8(const String8& def) const
-{
-	Variant var(*this);
-	return var.getString8(def);
-}
-
-String8 Atomic<Variant>::getString8() const
-{
-	Variant var(*this);
-	return var.getString8();
-}
-
 String16 Atomic<Variant>::getString16(const String16& def) const
 {
 	Variant var(*this);
@@ -2306,11 +2279,11 @@ const sl_char16* Atomic<Variant>::getSz16(const sl_char16* def) const
 	return var.getSz16(def);
 }
 
-void Atomic<Variant>::setString(const String8& value)
+void Atomic<Variant>::setString(const String& value)
 {
 	if (value.isNotNull()) {
 		sl_int64 v;
-		new PTR_VAR(String8, v) String8(value);
+		new PTR_VAR(String, v) String(value);
 		_replace(VariantType::String8, v);
 	} else {
 		_replace(VariantType::Null, 0);
@@ -2328,12 +2301,12 @@ void Atomic<Variant>::setString(const String16& value)
 	}
 }
 
-void Atomic<Variant>::setString(const AtomicString8& s)
+void Atomic<Variant>::setString(const AtomicString& s)
 {
-	String8 value(s);
+	String value(s);
 	if (value.isNotNull()) {
 		sl_int64 v;
-		new PTR_VAR(String8, v) String8(value);
+		new PTR_VAR(String, v) String(value);
 		_replace(VariantType::String8, v);
 	} else {
 		_replace(VariantType::Null, 0);
@@ -2586,7 +2559,7 @@ sl_bool operator==(const Variant& v1, const Variant& v2)
 			case VariantType::Object:
 				return REF_VAR(void const* const, v1._value) == REF_VAR(void const* const, v2._value);
 			case VariantType::String8:
-				return REF_VAR(String8 const, v1._value) == REF_VAR(String8 const, v2._value);
+				return REF_VAR(String const, v1._value) == REF_VAR(String const, v2._value);
 			case VariantType::String16:
 				return REF_VAR(String16 const, v1._value) == REF_VAR(String16 const, v2._value);
 			default:

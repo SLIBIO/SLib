@@ -101,10 +101,10 @@ public:
 
 		if (mysql) {
 
-			String8 host = param.host;
-			String8 user = param.user;
-			String8 password = param.password;
-			String8 db = param.db;
+			String host = param.host;
+			String user = param.user;
+			String password = param.password;
+			String db = param.db;
 
 			unsigned long flags = 0;
 			if (param.flagMultipleStatements) {
@@ -439,7 +439,7 @@ public:
 
 		String _getStringEx(sl_uint32 index)
 		{
-			String8 s = String8::allocate((sl_uint32)(m_fds[index].length));
+			String s = String::allocate((sl_uint32)(m_fds[index].length));
 			if (s.isNotEmpty()) {
 				MYSQL_BIND bind = m_bind[index];
 				bind.buffer = s.getData();
@@ -923,7 +923,7 @@ public:
 				if (n > 0) {
 					SLIB_SCOPED_BUFFER(MYSQL_BIND, 32, bind, n);
 					SLIB_SCOPED_BUFFER(_FieldDesc, 32, fds, n);
-					SLIB_SCOPED_BUFFER(String8, 32, strings, n);
+					SLIB_SCOPED_BUFFER(String, 32, strings, n);
 					SLIB_SCOPED_BUFFER(Memory, 32, blobs, n);
 					if (bind && fds && strings && blobs) {
 						for (sl_uint32 i = 0; i < n; i++) {

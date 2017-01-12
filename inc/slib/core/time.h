@@ -44,11 +44,11 @@ public:
 	
 	Time(int year, int month, int date, int hour, int minute, int second);
 	
-	Time(const String8& str);
+	Time(const String& str);
 	
 	Time(const String16& str);
 	
-	Time(const AtomicString8& str);
+	Time(const AtomicString& str);
 	
 	Time(const AtomicString16& str);
 	
@@ -95,11 +95,11 @@ public:
 	
 	Time& operator=(sl_uint64 time);
 	
-	Time& operator=(const String8& str);
+	Time& operator=(const String& str);
 	
 	Time& operator=(const String16& str);
 	
-	Time& operator=(const AtomicString8& str);
+	Time& operator=(const AtomicString& str);
 	
 	Time& operator=(const AtomicString16& str);
 	
@@ -302,28 +302,22 @@ public:
 	
 	
 	String toString() const;
-
-	String8 toString8() const;
 	
 	String16 toString16() const;
 	
 	String getDateString() const;
 	
-	String8 getDateString8() const;
-	
 	String16 getDateString16() const;
 	
 	String getTimeString() const;
 	
-	String8 getTimeString8() const;
-	
 	String16 getTimeString16() const;
 	
-	sl_bool setString(const String8& str);
+	sl_bool setString(const String& str);
 	
 	sl_bool setString(const String16& str);
 	
-	sl_bool setString(const AtomicString8& str);
+	sl_bool setString(const AtomicString& str);
 	
 	sl_bool setString(const AtomicString16& str);
 	
@@ -331,9 +325,9 @@ public:
 	
 	sl_bool setString(const sl_char16* str);
 	
-	String format(const String8& fmt) const;
+	String format(const String& fmt) const;
 	
-	String format(const AtomicString8& fmt) const;
+	String format(const AtomicString& fmt) const;
 	
 	String format(const String16& fmt) const;
 	
@@ -348,11 +342,11 @@ public:
 	
 	static sl_reg parseElements(sl_int32* outArrayYMDHMS, const sl_char16* sz, sl_size posStart = 0, sl_size len = SLIB_SIZE_MAX);
 	
-	static sl_bool parseElements(const String8& time, sl_int32* outArrayYMDHMS);
+	static sl_bool parseElements(const String& time, sl_int32* outArrayYMDHMS);
 	
 	static sl_bool parseElements(const String16& time, sl_int32* outArrayYMDHMS);
 	
-	static sl_bool parseElements(const AtomicString8& time, sl_int32* outArrayYMDHMS);
+	static sl_bool parseElements(const AtomicString& time, sl_int32* outArrayYMDHMS);
 	
 	static sl_bool parseElements(const AtomicString16& time, sl_int32* outArrayYMDHMS);
 	

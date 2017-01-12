@@ -521,7 +521,7 @@ sl_bool File::deleteDirectoryRecursively(const String& dirPath)
 
 String File::makeSafeFileName(const String& fileName)
 {
-	String8 ret = fileName.duplicate();
+	String ret = fileName.duplicate();
 	if (ret.isEmpty()) {
 		return ret;
 	}
@@ -554,7 +554,7 @@ String File::makeSafeFileName(const String& fileName)
 
 String File::makeSafeFilePath(const String& filePath)
 {
-	String8 ret = filePath.duplicate();
+	String ret = filePath.duplicate();
 	if (ret.isEmpty()) {
 		return ret;
 	}

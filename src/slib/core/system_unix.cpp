@@ -245,10 +245,10 @@ void Console::print(const String& s)
 	SLIB_STATIC_STRING(c, "Console");
 	Logger::getConsoleLogger()->log(c, s);
 #elif defined(SLIB_PLATFORM_IS_BLACKBERRY)
-	String8 _s = s;
+	String _s = s;
 	qDebug() << _s.getData() << endl;
 #else
-	String8 _s = s;
+	String _s = s;
 	printf("%s", _s.getData());
 #endif
 }

@@ -12,7 +12,7 @@ String Base64::encode(const void* buf, sl_size size)
 	const sl_uint8* input = (const sl_uint8*)buf;
 	sl_uint32 last = (sl_uint32)(size % 3);
 	sl_size countBlock = (size / 3) + (last ? 1 : 0);
-	String8 ret = String8::allocate(countBlock * 4);
+	String ret = String::allocate(countBlock * 4);
 	if (ret.isEmpty()) {
 		return ret;
 	}

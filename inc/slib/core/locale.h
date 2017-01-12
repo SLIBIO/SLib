@@ -603,8 +603,6 @@ public:
 	
 	String toString(sl_char8 delimiter='_') const;
 	
-	String8 toString8(sl_char8 delimiter='_') const;
-	
 	String16 toString16(sl_char16 delimiter='_') const;
 		
 	// Languages

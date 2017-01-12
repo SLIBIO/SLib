@@ -26,7 +26,7 @@ public:
 };
 
 template <class T>
-sl_bool Parse(const String8& str, T* _out)
+sl_bool Parse(const String& str, T* _out)
 {
 	sl_size n = str.getLength();
 	if (n == 0) {
@@ -46,9 +46,9 @@ sl_bool Parse(const String16& str, T* _out)
 }
 
 template <class T>
-sl_bool Parse(const AtomicString8& _str, T* _out)
+sl_bool Parse(const AtomicString& _str, T* _out)
 {
-	String8 str(_str);
+	String str(_str);
 	sl_size n = str.getLength();
 	if (n == 0) {
 		return sl_false;
@@ -89,7 +89,7 @@ sl_bool Parse(const sl_char16* sz, T* _out)
 
 
 template <class T>
-sl_bool ParseInt(const String8& str, T* _out, sl_uint32 radix = 10)
+sl_bool ParseInt(const String& str, T* _out, sl_uint32 radix = 10)
 {
 	sl_size n = str.getLength();
 	if (n == 0) {
@@ -109,9 +109,9 @@ sl_bool ParseInt(const String16& str, T* _out, sl_uint32 radix = 10)
 }
 
 template <class T>
-sl_bool ParseInt(const AtomicString8& _str, T* _out, sl_uint32 radix = 10)
+sl_bool ParseInt(const AtomicString& _str, T* _out, sl_uint32 radix = 10)
 {
-	String8 str(_str);
+	String str(_str);
 	sl_size n = str.getLength();
 	if (n == 0) {
 		return sl_false;

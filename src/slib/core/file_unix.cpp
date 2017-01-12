@@ -447,7 +447,7 @@ List<String> File::getFiles(const String& _filePath)
 		return sl_null;
 	}
 	List<String> ret;
-	String8 dirPath = filePath;
+	String dirPath = filePath;
 	DIR* dir = ::opendir(dirPath.getData());
 	if (dir) {
 		dirent* ent;
@@ -481,7 +481,7 @@ sl_bool File::_deleteDirectory(const String& filePath)
 	if (filePath.isEmpty()) {
 		return sl_false;
 	}
-	String8 dirPath = normalizeDirectoryPath(filePath);
+	String dirPath = normalizeDirectoryPath(filePath);
 	return 0 == ::rmdir(dirPath.getData());
 }
 

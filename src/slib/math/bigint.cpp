@@ -902,7 +902,7 @@ String CBigInt::toString(sl_uint32 radix) const
 		} else {
 			ns = nh;
 		}
-		String ret = String8::allocate(ns);
+		String ret = String::allocate(ns);
 		if (ret.isNotNull()) {
 			sl_char8* buf = ret.getData();
 			if (sign < 0) {

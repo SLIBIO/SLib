@@ -3,7 +3,6 @@ package slib.platform.android.ui.window;
 import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
 import slib.platform.android.ui.UiThread;
-import slib.platform.android.ui.view.UiGroupView;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -17,11 +16,12 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
 
-public class UiWindow extends UiGroupView {
+public class UiWindow extends FrameLayout {
 
 	Activity activity;
 	public long instance;
 	int backgroundColor;
+	boolean flagFullScreen;
 	
 	private UiWindow(Context context) {
 		super(context);
@@ -37,10 +37,11 @@ public class UiWindow extends UiGroupView {
 			, int x, int y, int width, int height) {
 		try {
 			final UiWindow ret = new UiWindow(activity);
+			ret.flagFullScreen = flagFullScreen;
 			FrameLayout.LayoutParams params;
 			if (flagFullScreen) {
 				Logger.info("FullScreen Window Created");
-				params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);			
+				params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
 			} else {
 				Logger.info("Window Created (" + x + ", " + y + ") - Size(" + width + "," + height + ")");
 				params = new FrameLayout.LayoutParams(width, height);
@@ -101,6 +102,9 @@ public class UiWindow extends UiGroupView {
 	}
 	
 	public void setFrame(int left, int top, int right, int bottom) {
+		if (flagFullScreen) {
+			return;
+		}
 		try {
 			final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(right - left, bottom - top);
 			params.leftMargin = left;
@@ -127,6 +131,9 @@ public class UiWindow extends UiGroupView {
 	}
 	
 	public void setSize(int width, int height) {
+		if (flagFullScreen) {
+			return;
+		}
 		try {
 			final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)(getLayoutParams());
 			if (params != null) {

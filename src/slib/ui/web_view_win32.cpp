@@ -841,7 +841,7 @@ String _WebView_getSource(IHTMLDocument2* doc)
 			hr = streamInit->Save(stream, FALSE);
 			if (hr == S_OK) {
 				Memory mem = Win32_COM::readAllBytesFromStream(stream);
-				String8 ret = String8::fromUtf(mem);
+				String ret = String::fromUtf(mem);
 				return ret;
 			}
 			stream->Release();
