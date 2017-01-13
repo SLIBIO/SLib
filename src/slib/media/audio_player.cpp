@@ -141,12 +141,13 @@ Ref<AudioPlayerControl> AudioPlayer::playSound(const Memory& data)
 	return sl_null;
 }
 
-Ref<AudioPlayerControl> AudioPlayer::playUrl(const String &url)
+Ref<AudioPlayerControl> AudioPlayer::playUrl(const String &url, const sl_bool& autoPlay)
 {
 	Ref<AudioPlayer> player = create();
 	if (player.isNotNull()) {
 		AudioPlayerOpenParam param;
 		param.url = url;
+        param.flagAutoStart = autoPlay;
 		return player->open(param);
 	}
 	return sl_null;

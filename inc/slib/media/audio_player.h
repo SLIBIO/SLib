@@ -152,7 +152,7 @@ public:
 	
 	static Ref<AudioPlayerControl> playSound(const Memory& data);
 	
-	static Ref<AudioPlayerControl> playUrl(const String &url);
+	static Ref<AudioPlayerControl> playUrl(const String &url, const sl_bool& autoPlay = sl_true);
 	
 protected:
 	virtual Ref<AudioPlayerControl> _openNative(const AudioPlayerOpenParam& param) = 0;
