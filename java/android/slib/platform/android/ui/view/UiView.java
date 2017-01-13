@@ -20,6 +20,7 @@ import android.widget.AbsoluteLayout;
 import android.widget.Button;
 import android.widget.FrameLayout;
 
+@SuppressWarnings("deprecation")
 public class UiView {
 	
 	private UiView() {
@@ -85,12 +86,16 @@ public class UiView {
 	
 	public static Rect getFrame(View view)
 	{
-		Rect ret = new Rect();
-		ret.left = view.getLeft();
-		ret.top = view.getTop();
-		ret.right = view.getRight();
-		ret.bottom = view.getBottom();
-		return ret;
+		if (view instanceof IView) {
+			return ((IView)view).getUIFrame();
+		} else {
+			Rect ret = new Rect();
+			ret.left = view.getLeft();
+			ret.top = view.getTop();
+			ret.right = view.getRight();
+			ret.bottom = view.getBottom();
+			return ret;
+		}
 	}
 
 	public static boolean setFrame(final View view, int left, int top, int right, int bottom) {
@@ -316,6 +321,24 @@ public class UiView {
 		} catch (Throwable e) {
 			Logger.exception(e);
 		}
+	}
+
+	public static int resolveMeasure(int size, int measureSpec) {
+		final int specMode = View.MeasureSpec.getMode(measureSpec);
+		final int specSize = View.MeasureSpec.getSize(measureSpec);
+		final int result;
+		switch (specMode) {
+			case View.MeasureSpec.AT_MOST:
+				result = size;
+				break;
+			case View.MeasureSpec.EXACTLY:
+				result = specSize;
+				break;
+			case View.MeasureSpec.UNSPECIFIED:
+			default:
+				result = size;
+		}
+		return result;
 	}
 
 	static class ViewGestureListener implements UiGestureDetector.GestureListener {

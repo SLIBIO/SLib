@@ -251,6 +251,12 @@ public class UiWebView extends WebView implements IView {
 		addJavascriptInterface(new MyJavaScriptObject(), "SlibNative");
 	}
 
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		setMeasuredDimension(UiView.resolveMeasure(mRight-mLeft, widthMeasureSpec), UiView.resolveMeasure(mBottom-mTop, heightMeasureSpec));
+	}
+
 	class MyWebViewClient extends WebViewClient {
 		
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -298,4 +304,5 @@ public class UiWebView extends WebView implements IView {
 			onMessage(UiWebView.this, msg, param);
 		}
 	}
+
 }

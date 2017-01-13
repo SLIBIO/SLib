@@ -47,7 +47,7 @@ public class Sensor {
 
 	public static boolean isAvailableLocation(Activity context) {
 		LocationManager locationManager = (LocationManager) context.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-		if (locationManager != null || locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+		if (locationManager != null && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 			return true;
 		}
 		return false;

@@ -8,4 +8,5 @@ public class UiTextArea extends UiEditView {
 		super(context);
 		_setMultiLine(this, true);
 	}
+
 }

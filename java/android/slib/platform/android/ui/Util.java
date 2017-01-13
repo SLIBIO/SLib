@@ -12,14 +12,9 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import slib.platform.android.Logger;
-import slib.platform.android.SlibActivity;
 
 public class Util {
 
-	public static Display getDefaultDisplay(SlibActivity activity) {
-		return activity.getWindowManager().getDefaultDisplay();
-	}
-	
 	public static Display getDefaultDisplay(Activity activity) {
 		return activity.getWindowManager().getDefaultDisplay();
 	}
@@ -30,23 +25,11 @@ public class Util {
 		display.getMetrics(metrics);
 		pt.x = metrics.widthPixels;
 		pt.y = metrics.heightPixels;
-		/*
-		try {
-		    // used when 17 > SDK_INT >= 14; includes window decorations (statusbar bar/menu bar)
-		    pt.x = (Integer) Display.class.getMethod("getRawWidth").invoke(display);
-		    pt.y = (Integer) Display.class.getMethod("getRawHeight").invoke(display);
-		} catch (Exception ignored) {
-		}
-		
-		try {
-		    // used when SDK_INT >= 17; includes window decorations (statusbar bar/menu bar)
-		    Point realSize = new Point();
-		    Display.class.getMethod("getRealSize", Point.class).invoke(display, realSize);
-		    pt.x = realSize.x;
-		    pt.y = realSize.y;
-		} catch (Exception ignored) {
-		}*/
 		return pt;
+	}
+
+	public static Point getDisplaySize(Activity activity) {
+		return getDisplaySize(getDefaultDisplay(activity));
 	}
 	
 	public static float getDisplayDensity(Activity activity) {
@@ -99,7 +82,7 @@ public class Util {
 		}
 	}
 
-	public static void openURL(final SlibActivity activity, final String url) {
+	public static void openURL(final Activity activity, final String url) {
 		activity.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {

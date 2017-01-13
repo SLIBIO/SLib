@@ -97,5 +97,11 @@ public class UiButton extends Button implements IView, Button.OnClickListener {
 	public void onClick(View v) {
 		UiView.onEventClick(this);
 	}
-	
+
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		setMeasuredDimension(UiView.resolveMeasure(mRight-mLeft, widthMeasureSpec), UiView.resolveMeasure(mBottom-mTop, heightMeasureSpec));
+	}
+
 }

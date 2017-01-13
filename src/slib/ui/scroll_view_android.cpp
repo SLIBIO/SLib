@@ -12,7 +12,7 @@ void JNICALL _AndroidScrollView_nativeOnScroll(JNIEnv* env, jobject _this, jlong
 
 SLIB_JNI_BEGIN_CLASS(_JAndroidScrollView, "slib/platform/android/ui/view/UiScrollView")
 
-	SLIB_JNI_STATIC_METHOD(create, "_create", "(Landroid/content/Context;ZZ)Landroid/view/View;");
+	SLIB_JNI_STATIC_METHOD(create, "_create", "(Landroid/content/Context;Z)Landroid/view/View;");
 
 	SLIB_JNI_STATIC_METHOD(setBackgroundColor, "_setBackgroundColor", "(Landroid/view/View;I)V");
 	SLIB_JNI_STATIC_METHOD(scrollTo, "_scrollTo", "(Landroid/view/View;II)V");
@@ -60,7 +60,7 @@ Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* _parent)
 	Ref<Android_ViewInstance> ret;
 	Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 	if (parent) {
-		JniLocal<jobject> handle = _JAndroidScrollView::create.callObject(sl_null, parent->getContext(), m_flagVerticalScroll && m_flagHorizontalScroll, m_flagVerticalScroll);
+		JniLocal<jobject> handle = _JAndroidScrollView::create.callObject(sl_null, parent->getContext(), m_flagVerticalScroll);
 		ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 		if (ret.isNotNull()) {
 			jobject handle = ret->getHandle();

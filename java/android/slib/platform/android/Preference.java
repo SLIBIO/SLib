@@ -1,6 +1,5 @@
 package slib.platform.android;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 

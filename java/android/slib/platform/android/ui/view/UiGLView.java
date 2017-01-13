@@ -186,5 +186,10 @@ public class UiGLView extends GLSurfaceView implements IView, GLSurfaceView.Rend
 			}
 		}
 	}
-	
+
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		setMeasuredDimension(UiView.resolveMeasure(mRight-mLeft, widthMeasureSpec), UiView.resolveMeasure(mBottom-mTop, heightMeasureSpec));
+	}
+
 }

@@ -658,16 +658,17 @@ CGRect _g_ui_keyboard_scrollview_original_frame;
 		parent = parent.superview;
 	}
 
-	NSDictionary* info = [aNotification userInfo];
-	CGSize kbSize = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
-	CGRect rcTextLocal = view.bounds;
-	CGRect rcTextScreen = [view convertRect:rcTextLocal toView:nil];
-	CGRect rcScreen = [[UIScreen mainScreen] bounds];
-	CGFloat yText = rcTextScreen.origin.y + rcTextScreen.size.height + rcScreen.size.height / 100;
-	
 	if (scroll != _g_ui_keyboard_scrollview) {
 		[self restoreKeyboardScrollView];
 	}
+	
+	NSDictionary* info = [aNotification userInfo];
+	CGSize kbSize = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+	CGRect rcScreen = [[UIScreen mainScreen] bounds];
+	CGRect rcTextLocal = view.bounds;
+	CGRect rcTextScreen = [view convertRect:rcTextLocal toView:nil];
+	CGFloat yText = rcTextScreen.origin.y + rcTextScreen.size.height + rcScreen.size.height / 100;
+	
 	if (scroll != nil) {
 		CGRect rcScrollLocal = scroll.bounds;
 		if (_g_ui_keyboard_scrollview == scroll) {

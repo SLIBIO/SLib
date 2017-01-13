@@ -20,9 +20,9 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidPoint, "android/graphics/Point")
 SLIB_JNI_END_CLASS
 
 SLIB_JNI_BEGIN_CLASS(_AndroidUtil, "slib/platform/android/ui/Util")
-	SLIB_JNI_STATIC_METHOD(getDefaultDisplay, "getDefaultDisplay", "(Lslib/platform/android/SlibActivity;)Landroid/view/Display;");
+	SLIB_JNI_STATIC_METHOD(getDefaultDisplay, "getDefaultDisplay", "(Landroid/app/Activity;)Landroid/view/Display;");
 	SLIB_JNI_STATIC_METHOD(getDisplaySize, "getDisplaySize", "(Landroid/view/Display;)Landroid/graphics/Point;");
-	SLIB_JNI_STATIC_METHOD(openURL, "openURL", "(Lslib/platform/android/SlibActivity;Ljava/lang/String;)V");
+	SLIB_JNI_STATIC_METHOD(openURL, "openURL", "(Landroid/app/Activity;Ljava/lang/String;)V");
 SLIB_JNI_END_CLASS
 
 void _AndroidUiThread_runDispatchCallback(JNIEnv* env, jobject _this);

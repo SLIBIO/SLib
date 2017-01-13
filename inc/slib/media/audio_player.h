@@ -82,7 +82,7 @@ class SLIB_EXPORT AudioPlayerControl : public Object
 	SLIB_DECLARE_OBJECT
 	
 protected:
-	AudioPlayerControl(){};
+	AudioPlayerControl();
 	
 public:
 	virtual void stop() = 0;
@@ -150,9 +150,9 @@ public:
 	
 	Ref<AudioPlayerControl> open(const AudioPlayerOpenParam& param);
 	
-	static Ref<AudioPlayerControl> playSound(const Memory& data);
+	static Ref<AudioPlayerControl> playSound(const Memory& data, sl_bool flagAutoPlay = sl_true);
 	
-	static Ref<AudioPlayerControl> playUrl(const String &url, const sl_bool& autoPlay = sl_true);
+	static Ref<AudioPlayerControl> playUrl(const String& url, sl_bool flagAutoPlay = sl_true);
 	
 protected:
 	virtual Ref<AudioPlayerControl> _openNative(const AudioPlayerOpenParam& param) = 0;

@@ -1,12 +1,9 @@
 package slib.platform.android.media;
 
-import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.util.Log;
 
 import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
-import slib.platform.android.ui.UiThread;
 
 public class AudioPlayer {
 

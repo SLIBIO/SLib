@@ -34,6 +34,10 @@ AudioPlayerParam::AudioPlayerParam()
 
 SLIB_DEFINE_OBJECT(AudioPlayerControl, Object)
 
+AudioPlayerControl::AudioPlayerControl()
+{
+}
+
 void AudioPlayerControl::_removeFromMap()
 {
 	_AudioPlayerControlsMap* map = _getAudioPlayerControlsMap();
@@ -116,38 +120,37 @@ Ref<AudioPlayer> AudioPlayer::create()
 	return create(param);
 }
 
-Ref<AudioPlayerControl> AudioPlayer::open(const slib::AudioPlayerOpenParam &param)
+Ref<AudioPlayerControl> AudioPlayer::open(const slib::AudioPlayerOpenParam& param)
 {
 	Ref<AudioPlayerControl> control = _openNative(param);
-	
 	if (param.flagKeepReference) {
 		_AudioPlayerControlsMap* map = _getAudioPlayerControlsMap();
 		if (map) {
 			map->put(control.get(), control);
 		}
 	}
-	
 	return control;
 }
 
-Ref<AudioPlayerControl> AudioPlayer::playSound(const Memory& data)
+Ref<AudioPlayerControl> AudioPlayer::playSound(const Memory& data, sl_bool flagAutoPlay)
 {
 	Ref<AudioPlayer> player = create();
 	if (player.isNotNull()) {
 		AudioPlayerOpenParam param;
 		param.data = data;
+		param.flagAutoStart = flagAutoPlay;
 		return player->open(param);
 	}
 	return sl_null;
 }
 
-Ref<AudioPlayerControl> AudioPlayer::playUrl(const String &url, const sl_bool& autoPlay)
+Ref<AudioPlayerControl> AudioPlayer::playUrl(const String& url, sl_bool flagAutoPlay)
 {
 	Ref<AudioPlayer> player = create();
 	if (player.isNotNull()) {
 		AudioPlayerOpenParam param;
 		param.url = url;
-        param.flagAutoStart = autoPlay;
+        param.flagAutoStart = flagAutoPlay;
 		return player->open(param);
 	}
 	return sl_null;

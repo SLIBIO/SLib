@@ -9,6 +9,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AbsoluteLayout;
 
+@SuppressWarnings("deprecation")
 public class UiGroupView extends AbsoluteLayout implements IView {
 
 	private long mInstance = 0;
@@ -62,13 +63,9 @@ public class UiGroupView extends AbsoluteLayout implements IView {
 		}
 	}
 
-
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-
 		measureChildren(widthMeasureSpec, heightMeasureSpec);
-
-		setMeasuredDimension(resolveSizeAndState(mRight-mLeft, widthMeasureSpec, 0), resolveSizeAndState(mBottom-mTop, heightMeasureSpec, 0));
-
+		setMeasuredDimension(UiView.resolveMeasure(mRight-mLeft, widthMeasureSpec), UiView.resolveMeasure(mBottom-mTop, heightMeasureSpec));
 	}
 
 	@Override

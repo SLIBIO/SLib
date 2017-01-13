@@ -3,7 +3,10 @@ package slib.platform.android.ui.window;
 import slib.platform.android.Logger;
 import slib.platform.android.SlibActivity;
 import slib.platform.android.ui.UiThread;
+import slib.platform.android.ui.Util;
 import slib.platform.android.ui.view.IView;
+import slib.platform.android.ui.view.UiScrollView;
+import slib.platform.android.ui.view.UiView;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -16,9 +19,11 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.view.ViewTreeObserver;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 
-public class UiWindow extends FrameLayout {
+public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLayoutListener {
 
 	private Activity activity;
 	public long instance;
@@ -280,15 +285,12 @@ public class UiWindow extends FrameLayout {
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-
 		measureChildren(widthMeasureSpec, heightMeasureSpec);
-
 		if (flagFullScreen) {
 			setMeasuredDimension(resolveFullSize(widthMeasureSpec), resolveFullSize(heightMeasureSpec));
 		} else {
-			setMeasuredDimension(resolveSizeAndState(mRight - mLeft, widthMeasureSpec, 0), resolveSizeAndState(mBottom - mTop, heightMeasureSpec, 0));
+			setMeasuredDimension(UiView.resolveMeasure(mRight - mLeft, widthMeasureSpec), UiView.resolveMeasure(mBottom - mTop, heightMeasureSpec));
 		}
-
 	}
 
 	@Override
@@ -305,4 +307,126 @@ public class UiWindow extends FrameLayout {
 			}
 		}
 	}
+
+	boolean flagAttachedGlobalLayoutListener = false;
+	boolean flagAttachedNativeWindow = false;
+
+	@Override
+	protected void onAttachedToWindow() {
+		super.onAttachedToWindow();
+		Logger.info("UiWindow is attached to native window");
+		flagAttachedNativeWindow = true;
+		if (!flagAttachedGlobalLayoutListener) {
+			getViewTreeObserver().addOnGlobalLayoutListener(this);
+			flagAttachedGlobalLayoutListener = true;
+		}
+	}
+
+	@Override
+	protected void onDetachedFromWindow() {
+		super.onDetachedFromWindow();
+		Logger.info("UiWindow is detached from native window");
+		flagAttachedNativeWindow = false;
+	}
+
+	@Override
+	public void onGlobalLayout() {
+		try {
+			checkLayoutChanges();
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
+	}
+
+	static int savedRootViewBottom = 0;
+
+	public void checkLayoutChanges() {
+		if (!flagAttachedNativeWindow) {
+			return;
+		}
+		Rect rc = new Rect();
+		View rootView = getRootView();
+		rootView.getWindowVisibleDisplayFrame(rc);
+		if (savedRootViewBottom == 0) {
+			savedRootViewBottom = rc.bottom;
+			return;
+		}
+		if (savedRootViewBottom == rc.bottom) {
+			return;
+		}
+		savedRootViewBottom = rc.bottom;
+		int heightKeyboard = Util.getDisplaySize(activity).y - rc.bottom;
+		int heightKeyboardMin = (int)(60 * Util.getDisplayDensity(activity));
+		if (heightKeyboard > heightKeyboardMin) {
+			processKeyboardAppeared(activity, heightKeyboard);
+		} else {
+			processKeyboardDisappeared();
+		}
+	}
+
+	static UiScrollView keyboardScrollView = null;
+	static Rect originalFrame_keyboardScrollView = null;
+
+	static void processKeyboardAppeared(Activity activity, int keyboardHeight) {
+		Logger.info("Keyboard is appeared, height=" + keyboardHeight);
+		View focusedView = activity.getCurrentFocus();
+		if (focusedView instanceof EditText) {
+			UiScrollView scroll = null;
+			ViewParent _parent = focusedView.getParent();
+			View parent = null;
+			if (_parent instanceof View) {
+				parent = (View)_parent;
+			}
+			while (parent != null) {
+				if (parent instanceof UiScrollView) {
+					scroll = (UiScrollView)parent;
+					break;
+				}
+				_parent = parent.getParent();
+				if (_parent instanceof View) {
+					parent = (View)_parent;
+				} else {
+					parent = null;
+				}
+			}
+			if (keyboardScrollView != scroll) {
+				restoreKeyboardScrollView();
+			}
+
+			int heightScreen = Util.getDisplaySize(activity).y;
+			int heightView = focusedView.getHeight();
+			int yViewScreen = UiView.convertCoordinateFromViewToScreen(focusedView, 0, heightView).y;
+
+			if (scroll != null) {
+				Rect scrollFrame = scroll.getUIFrame();
+				if (keyboardScrollView == scroll) {
+					scrollFrame = originalFrame_keyboardScrollView;
+				}
+				int yScroll = UiView.convertCoordinateFromViewToScreen(scroll, 0, scrollFrame.height()).y;
+				if (yScroll > heightScreen - keyboardHeight) {
+					originalFrame_keyboardScrollView = new Rect(scrollFrame);
+					scrollFrame.bottom -= yScroll - (heightScreen - keyboardHeight);
+					UiView.setFrame(scroll, scrollFrame.left, scrollFrame.top, scrollFrame.right, scrollFrame.bottom);
+					keyboardScrollView = scroll;
+				}
+			}
+
+		} else {
+			restoreKeyboardScrollView();
+		}
+	}
+
+	static void processKeyboardDisappeared() {
+		Logger.info("Keyboard is disappeared");
+		restoreKeyboardScrollView();
+	}
+
+	static void restoreKeyboardScrollView() {
+		if (keyboardScrollView != null) {
+			Rect frame = originalFrame_keyboardScrollView;
+			UiView.setFrame(keyboardScrollView, frame.left, frame.top, frame.right, frame.bottom);
+			keyboardScrollView = null;
+		}
+	}
+
 }
