@@ -3,6 +3,7 @@ package slib.platform.android.ui.view;
 import slib.platform.android.Logger;
 import slib.platform.android.ui.Graphics;
 import slib.platform.android.ui.UiThread;
+import slib.platform.android.ui.window.UiWindow;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -94,6 +95,10 @@ public class UiView {
 
 	public static boolean setFrame(final View view, int left, int top, int right, int bottom) {
 
+		if (view instanceof UiWindow) {
+			return true;
+		}
+
 		if (!(UiThread.isUiThread())) {
 			final int l = left;
 			final int r = right;
@@ -133,8 +138,6 @@ public class UiView {
 					params.width = width;
 					params.height = height;
 					view.setLayoutParams(params);
-					view.setMinimumWidth(width);
-					view.setMinimumHeight(height);
 				} else if (_params instanceof AbsoluteLayout.LayoutParams) {
 					AbsoluteLayout.LayoutParams params = (AbsoluteLayout.LayoutParams)_params;
 					params.x = left;
@@ -143,12 +146,9 @@ public class UiView {
 					params.height = height;
 					view.setLayoutParams(params);
 				}
-			} else {
-				AbsoluteLayout.LayoutParams params = new AbsoluteLayout.LayoutParams(width, height, left, top);
-				view.setLayoutParams(params);
-			}
-			if (UiThread.isUiThread()) {
-				view.layout(left, top, right, bottom);
+				if (UiThread.isUiThread()) {
+					view.layout(left, top, right, bottom);
+				}
 			}
 			return true;
 		} catch (Exception e) {
@@ -260,6 +260,23 @@ public class UiView {
 						((ViewGroup)parent).removeView(view);
 					} else {
 						return;
+					}
+				}
+				if (view instanceof IView) {
+					ViewGroup.LayoutParams params = view.getLayoutParams();
+					if (params == null) {
+						Rect rc = ((IView)view).getUIFrame();
+						if (_group instanceof AbsoluteLayout) {
+							params = new AbsoluteLayout.LayoutParams(rc.width(), rc.height(), rc.left, rc.top);
+						} else if (_group instanceof FrameLayout) {
+							FrameLayout.LayoutParams fl = new FrameLayout.LayoutParams(rc.width(), rc.height());
+							fl.leftMargin = rc.left;
+							fl.topMargin = rc.top;
+							params = fl;
+						}
+						if (params != null) {
+							view.setLayoutParams(params);
+						}
 					}
 				}
 				group.addView(view);

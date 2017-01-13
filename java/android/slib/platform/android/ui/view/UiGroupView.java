@@ -72,8 +72,7 @@ public class UiGroupView extends AbsoluteLayout implements IView {
 	}
 
 	@Override
-	protected void onLayout(boolean changed, int l, int t,
-							int r, int b) {
+	protected void onLayout(boolean changed, int l, int t, int r, int b) {
 		int count = getChildCount();
 		for (int i = 0; i < count; i++) {
 			View child = getChildAt(i);
