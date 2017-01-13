@@ -23,26 +23,31 @@ public class UiGenericView extends View implements IView {
 		super(context);
 	}
 
+	@Override
 	public void onDraw(Canvas canvas) {
 		UiView.onEventDraw(this, canvas);
 	}
-	
+
+	@Override
 	public boolean onKeyDown(int keycode, KeyEvent event) {
 		UiView.onEventKey(this, true, keycode, event);
 		return true;
 	}
-	
+
+	@Override
 	public boolean onKeyUp(int keycode, KeyEvent event) {
 		UiView.onEventKey(this, false, keycode, event);
 		return true;
 	}
-	
+
+	@Override
 	@SuppressLint("ClickableViewAccessibility")
 	public boolean onTouchEvent(MotionEvent event) {
 		UiView.onEventTouch(this, event);
 		return true;
 	}
 
+	@Override
 	public boolean dispatchTouchEvent(MotionEvent event) {
 		if (gestureDetector != null) {
 			gestureDetector.onTouchEvent(event);
@@ -51,6 +56,11 @@ public class UiGenericView extends View implements IView {
 		} else {
 			return super.dispatchTouchEvent(event);
 		}
+	}
+
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		setMeasuredDimension(resolveSizeAndState(mRight-mLeft, widthMeasureSpec, 0), resolveSizeAndState(mBottom-mTop, heightMeasureSpec, 0));
 	}
 
 }

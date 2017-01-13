@@ -90,7 +90,7 @@ public class UiScrollView extends ScrollView implements IView {
 			nativeOnScroll(instance, x, y);
 		}
 	}
-		
+
 	public UiScrollView(Context context) {
 		super(context);
 		horz = new InnerHorizontalView(context);
