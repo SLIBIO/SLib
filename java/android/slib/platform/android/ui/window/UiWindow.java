@@ -38,6 +38,7 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 		if (context instanceof SlibActivity) {
 			((SlibActivity) context).onCreateWindow(this);
 		}
+		setFocusableInTouchMode(true);
 	}
 
 	static UiWindow create(Activity activity
