@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		006089E81E2A386400D3CD78 /* audio_player_dsound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 006089E71E2A386400D3CD78 /* audio_player_dsound.cpp */; };
+		006089EA1E2A386E00D3CD78 /* audio_player_opensl_es.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 006089E91E2A386E00D3CD78 /* audio_player_opensl_es.cpp */; };
+		006089ED1E2A388600D3CD78 /* audio_recorder_dsound.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 006089EB1E2A388600D3CD78 /* audio_recorder_dsound.cpp */; };
+		006089EE1E2A388600D3CD78 /* audio_recorder_opensl_es.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 006089EC1E2A388600D3CD78 /* audio_recorder_opensl_es.cpp */; };
 		260107861DACE89F00C40723 /* animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260107851DACE89F00C40723 /* animation.cpp */; };
 		260107881DACE8BB00C40723 /* bitmap_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 260107871DACE8BB00C40723 /* bitmap_quartz.mm */; };
 		2601078A1DACE8C400C40723 /* canvas_quartz.mm in Sources */ = {isa = PBXBuildFile; fileRef = 260107891DACE8C400C40723 /* canvas_quartz.mm */; };
@@ -261,6 +265,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		006089E71E2A386400D3CD78 /* audio_player_dsound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = audio_player_dsound.cpp; path = media/audio_player_dsound.cpp; sourceTree = "<group>"; };
+		006089E91E2A386E00D3CD78 /* audio_player_opensl_es.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = audio_player_opensl_es.cpp; path = media/audio_player_opensl_es.cpp; sourceTree = "<group>"; };
+		006089EB1E2A388600D3CD78 /* audio_recorder_dsound.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = audio_recorder_dsound.cpp; path = media/audio_recorder_dsound.cpp; sourceTree = "<group>"; };
+		006089EC1E2A388600D3CD78 /* audio_recorder_opensl_es.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = audio_recorder_opensl_es.cpp; path = media/audio_recorder_opensl_es.cpp; sourceTree = "<group>"; };
 		260107851DACE89F00C40723 /* animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = animation.cpp; sourceTree = "<group>"; };
 		260107871DACE8BB00C40723 /* bitmap_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = bitmap_quartz.mm; sourceTree = "<group>"; };
 		260107891DACE8C400C40723 /* canvas_quartz.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = canvas_quartz.mm; sourceTree = "<group>"; };
@@ -597,9 +605,13 @@
 				26DA34FC1C4B8B1D004DC204 /* audio_data.cpp */,
 				266DD35A1C1170BD00D47AB0 /* audio_format.cpp */,
 				266DD35B1C1170BD00D47AB0 /* audio_player.cpp */,
+				006089E71E2A386400D3CD78 /* audio_player_dsound.cpp */,
 				266DD36C1C1171B800D47AB0 /* audio_player_ios.mm */,
+				006089E91E2A386E00D3CD78 /* audio_player_opensl_es.cpp */,
 				266DD35C1C1170BD00D47AB0 /* audio_recorder.cpp */,
+				006089EB1E2A388600D3CD78 /* audio_recorder_dsound.cpp */,
 				266DD3721C1171E400D47AB0 /* audio_recorder_ios.mm */,
+				006089EC1E2A388600D3CD78 /* audio_recorder_opensl_es.cpp */,
 				26B5717E1C9D449E0099E69B /* audio_util.cpp */,
 				266DD35D1C1170BD00D47AB0 /* camera.cpp */,
 				266DD5F51C11E09B00D47AB0 /* camera_avfoundation.mm */,
@@ -1052,6 +1064,7 @@
 				26A9B7621C172BCC004C9B0E /* camera_view.cpp in Sources */,
 				266DD3831C117A3100D47AB0 /* gcm.cpp in Sources */,
 				2631B77E1DDB14E600729A87 /* url.cpp in Sources */,
+				006089E81E2A386400D3CD78 /* audio_player_dsound.cpp in Sources */,
 				266DD3DB1C1181B500D47AB0 /* icmp.cpp in Sources */,
 				266DD5F61C11E09B00D47AB0 /* camera_avfoundation.mm in Sources */,
 				2629F8741DFAF4AE005CF43D /* ref.cpp in Sources */,
@@ -1134,6 +1147,7 @@
 				A2498C791AFA9C3200C76201 /* thirdparty_libpng.c in Sources */,
 				266DD3A61C117AE300D47AB0 /* image_jpeg.cpp in Sources */,
 				A25F2F451B039EF600854DAF /* json.cpp in Sources */,
+				006089ED1E2A388600D3CD78 /* audio_recorder_dsound.cpp in Sources */,
 				265EBF2F1C23051F00AD81D9 /* database_statement.cpp in Sources */,
 				266DD3DF1C1181B500D47AB0 /* net_capture_pcap.cpp in Sources */,
 				26C0A3561C131F8E005690FE /* bitmap_data.cpp in Sources */,
@@ -1155,6 +1169,7 @@
 				26C0A3511C128D80005690FE /* sensor.cpp in Sources */,
 				266DD4521C1191F300D47AB0 /* web_view.cpp in Sources */,
 				26D6C37D1D1E87E2008720E4 /* charset.cpp in Sources */,
+				006089EA1E2A386E00D3CD78 /* audio_player_opensl_es.cpp in Sources */,
 				266DD3AA1C117AE300D47AB0 /* pen.cpp in Sources */,
 				26CB94CB1D0126F900D8A472 /* tree_view.cpp in Sources */,
 				2648D5481D096AB000819E09 /* ui_app.cpp in Sources */,
@@ -1190,6 +1205,7 @@
 				A2DE1DBA1B3888DA00A74698 /* java.cpp in Sources */,
 				A25F2F411B039EF600854DAF /* file.cpp in Sources */,
 				266DD3631C1170BD00D47AB0 /* audio_format.cpp in Sources */,
+				006089EE1E2A388600D3CD78 /* audio_recorder_opensl_es.cpp in Sources */,
 				2601078A1DACE8C400C40723 /* canvas_quartz.mm in Sources */,
 				266DD44A1C11918300D47AB0 /* render_view_ios.mm in Sources */,
 				26B571741C9D44720099E69B /* transform2d.cpp in Sources */,

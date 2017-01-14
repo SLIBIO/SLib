@@ -91,7 +91,7 @@ public:
 	
 	virtual void pause() = 0;
 	
-	virtual sl_bool isRunning() = 0;
+	virtual sl_bool isPlaying() = 0;
 	
 public:
 	void _removeFromMap();

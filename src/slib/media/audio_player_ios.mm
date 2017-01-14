@@ -202,7 +202,7 @@ public:
 	}
 	
 	// override
-	sl_bool isRunning()
+	sl_bool isPlaying()
 	{
 		ObjectLocker lock(this);
 		if (mAVObserver != nil) {

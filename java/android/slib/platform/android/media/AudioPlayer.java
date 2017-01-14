@@ -32,27 +32,43 @@ public class AudioPlayer {
     }
 
     public static void start(final SlibActivity context, MediaPlayer mp) {
-        if (mp != null) {
-            mp.start();
+        try {
+            if (mp != null) {
+                mp.start();
+            }
+        } catch (Exception e) {
+            Logger.exception(e);
         }
     }
 
     public static void pause(final SlibActivity context, MediaPlayer mp) {
-        if (mp != null) {
-            mp.pause();
+        try {
+            if (mp != null) {
+                mp.pause();
+            }
+        } catch (Exception e) {
+            Logger.exception(e);
         }
     }
 
     public static void stop(final SlibActivity context, MediaPlayer mp) {
-        if (mp != null) {
-            mp.stop();
-            mp.release();
+        try {
+            if (mp != null) {
+                mp.stop();
+                mp.release();
+            }
+        } catch (Exception e) {
+            Logger.exception(e);
         }
     }
 
     public static boolean isPlaying(final SlibActivity context, MediaPlayer mp) {
-        if (mp != null) {
-            return mp.isPlaying();
+        try {
+            if (mp != null) {
+                return mp.isPlaying();
+            }
+        } catch (Exception e) {
+            Logger.exception(e);
         }
         return false;
     }

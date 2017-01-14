@@ -75,7 +75,6 @@ public:
 			jobject jactivity = Android::getCurrentActivity();
 			if (jactivity) {
 				if (player.isNotNull()) {
-					ObjectLocker lock(this);
 					_JAndroidMedia::start.call(sl_null, jactivity, player.get());
 				}
 			}
@@ -91,7 +90,6 @@ public:
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			if (player.isNotNull()) {
-				ObjectLocker lock(this);
 				_JAndroidMedia::pause.call(sl_null, jactivity, player.get());
 			}
 		}
@@ -105,7 +103,6 @@ public:
 		jobject jactivity = Android::getCurrentActivity();
 		if (jactivity) {
 			if (player.isNotNull()) {
-				ObjectLocker lock(this);
 				_JAndroidMedia::stop.call(sl_null, jactivity, player.get());
 				_removeFromMap();
 			}
@@ -113,13 +110,15 @@ public:
 	}
 
 	// override
-	sl_bool isRunning()
+	sl_bool isPlaying()
 	{
 		ObjectLocker lock(this);
 		JniGlobal<jobject> player = m_player;
-		if (player.isNotNull()) {
-			ObjectLocker lock(this);
-			return _JAndroidMedia::isPlaying.callBoolean(sl_null, player.get());
+		jobject jactivity = Android::getCurrentActivity();
+		if (jactivity) {
+			if (player.isNotNull()) {
+				return _JAndroidMedia::isPlaying.callBoolean(sl_null, jactivity, player.get());
+			}
 		}
 		return sl_false;
 	}
