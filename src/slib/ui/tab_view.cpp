@@ -534,6 +534,7 @@ void TabView::dispatchSelectTab(sl_uint32 index)
 	if (listener.isNotNull()) {
 		listener->onSelectTab(this, index);
 	}
+	getOnSelectTab()(index);
 }
 
 void TabView::onSelectTab(sl_uint32 index)

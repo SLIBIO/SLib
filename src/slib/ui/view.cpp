@@ -265,6 +265,20 @@ Ref<View::ScrollAttributes> View::_initializeScrollAttributes()
 	return attrs;
 }
 
+Ref<View::EventAttributes> View::_initializeEventAttributes()
+{
+	Ref<EventAttributes> attrs = m_eventAttributes;
+	if (attrs.isNotNull()) {
+		return attrs;
+	}
+	attrs = new EventAttributes;
+	if (attrs.isNull()) {
+		return sl_null;
+	}
+	m_eventAttributes = attrs;
+	return attrs;
+}
+
 Ref<ViewInstance> View::getViewInstance()
 {
 	return m_instance;
@@ -5943,7 +5957,7 @@ public:
 	}
 	
 	// override
-	void onScroll(ScrollBar* scrollBar, sl_scroll_pos value)
+	void onChange(ScrollBar* scrollBar, sl_scroll_pos value)
 	{
 		Ref<View> view = m_view;
 		if (view.isNull()) {
@@ -6422,6 +6436,10 @@ void View::drawContent(Canvas *canvas)
 				}
 			}
 			onDraw(canvas);
+			Ref<EventAttributes> eventAttrs = m_eventAttributes;
+			if (eventAttrs.isNotNull()) {
+				(eventAttrs->draw)(canvas);
+			}
 		}
 		
 		if (m_children.getCount() > 0) {
@@ -6522,13 +6540,200 @@ void View::draw(Canvas* canvas)
 	
 }
 
-void View::post(const Function<void()>& callback, sl_bool flagInvalidate)
+void View::runAfterDraw(const Function<void()>& callback, sl_bool flagInvalidate)
 {
 	if (callback.isNotNull()) {
-		m_postCallbacks.push(callback);
+		m_runAfterDrawCallbacks.push(callback);
 		if (flagInvalidate) {
 			invalidate();
 		}
+	}
+}
+
+Ptr<IViewListener> View::getEventListener()
+{
+	Ref<EventAttributes> attrs = m_eventAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->listener;
+	}
+	return sl_null;
+}
+
+void View::setEventListener(const Ptr<IViewListener>& listener)
+{
+	Ref<EventAttributes> attrs = _initializeEventAttributes();
+	if (attrs.isNotNull()) {
+		attrs->listener = listener;
+	}
+}
+
+Function<void(Canvas*)> View::getOnDraw()
+{
+	Ref<EventAttributes> attrs = m_eventAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->draw;
+	}
+	return sl_null;
+}
+
+void View::setOnDraw(const Function<void(Canvas*)>& callback)
+{
+	Ref<EventAttributes> attrs = _initializeEventAttributes();
+	if (attrs.isNotNull()) {
+		attrs->draw = callback;
+	}
+}
+
+Function<void(UIEvent*)> View::getOnMouseEvent()
+{
+	Ref<EventAttributes> attrs = m_eventAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->mouse;
+	}
+	return sl_null;
+}
+
+void View::setOnMouseEvent(const Function<void(UIEvent*)>& callback)
+{
+	Ref<EventAttributes> attrs = _initializeEventAttributes();
+	if (attrs.isNotNull()) {
+		attrs->mouse = callback;
+	}
+}
+
+Function<void(UIEvent*)> View::getOnTouchEvent()
+{
+	Ref<EventAttributes> attrs = m_eventAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->touch;
+	}
+	return sl_null;
+}
+
+void View::setOnTouchEvent(const Function<void(UIEvent*)>& callback)
+{
+	Ref<EventAttributes> attrs = _initializeEventAttributes();
+	if (attrs.isNotNull()) {
+		attrs->touch = callback;
+	}
+}
+
+Function<void(UIEvent*)> View::getOnKeyEvent()
+{
+	Ref<EventAttributes> attrs = m_eventAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->key;
+	}
+	return sl_null;
+}
+
+void View::setOnKeyEvent(const Function<void(UIEvent*)>& callback)
+{
+	Ref<EventAttributes> attrs = _initializeEventAttributes();
+	if (attrs.isNotNull()) {
+		attrs->key = callback;
+	}
+}
+
+Function<void(UIEvent*)> View::getOnMouseWheelEvent()
+{
+	Ref<EventAttributes> attrs = m_eventAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->mouseWheel;
+	}
+	return sl_null;
+}
+
+void View::setOnMouseWheelEvent(const Function<void(UIEvent*)>& callback)
+{
+	Ref<EventAttributes> attrs = _initializeEventAttributes();
+	if (attrs.isNotNull()) {
+		attrs->mouseWheel = callback;
+	}
+}
+
+Function<void()> View::getOnClick()
+{
+	Ref<EventAttributes> attrs = m_eventAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->click;
+	}
+	return sl_null;
+}
+
+void View::setOnClick(const Function<void()>& callback)
+{
+	Ref<EventAttributes> attrs = _initializeEventAttributes();
+	if (attrs.isNotNull()) {
+		attrs->click = callback;
+	}
+}
+
+Function<void(UIEvent*)> View::getOnSetCursor()
+{
+	Ref<EventAttributes> attrs = m_eventAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->setCursor;
+	}
+	return sl_null;
+}
+
+void View::setOnSetCursor(const Function<void(UIEvent*)>& callback)
+{
+	Ref<EventAttributes> attrs = _initializeEventAttributes();
+	if (attrs.isNotNull()) {
+		attrs->setCursor = callback;
+	}
+}
+
+Function<void(sl_ui_len, sl_ui_len)> View::getOnResize()
+{
+	Ref<EventAttributes> attrs = m_eventAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->resize;
+	}
+	return sl_null;
+}
+
+void View::setOnResize(const Function<void(sl_ui_len, sl_ui_len)>& callback)
+{
+	Ref<EventAttributes> attrs = _initializeEventAttributes();
+	if (attrs.isNotNull()) {
+		attrs->resize = callback;
+	}
+}
+
+Function<void(sl_scroll_pos, sl_scroll_pos)> View::getOnScroll()
+{
+	Ref<EventAttributes> attrs = m_eventAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->scroll;
+	}
+	return sl_null;
+}
+
+void View::setOnScroll(const Function<void(sl_scroll_pos, sl_scroll_pos)>& callback)
+{
+	Ref<EventAttributes> attrs = _initializeEventAttributes();
+	if (attrs.isNotNull()) {
+		attrs->scroll = callback;
+	}
+}
+
+Function<void(GestureType)> View::getOnSwipe()
+{
+	Ref<EventAttributes> attrs = m_eventAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->swipe;
+	}
+	return sl_null;
+}
+
+void View::setOnSwipe(const Function<void(GestureType)>& callback)
+{
+	Ref<EventAttributes> attrs = _initializeEventAttributes();
+	if (attrs.isNotNull()) {
+		attrs->swipe = callback;
 	}
 }
 
@@ -6579,7 +6784,7 @@ void View::dispatchDraw(Canvas* canvas)
 	m_flagCurrentDrawing = sl_false;
 	
 	Function<void()> callback;
-	while (m_postCallbacks.pop(&callback)) {
+	while (m_runAfterDrawCallbacks.pop(&callback)) {
 		callback();
 	}
 	
@@ -6676,6 +6881,10 @@ void View::onResizeContent(sl_scroll_pos width, sl_scroll_pos height)
 {
 }
 
+void View::onSwipe(GestureType type)
+{
+}
+
 void View::onAddChild(View* child)
 {
 }
@@ -6702,10 +6911,6 @@ void View::onMakeLayout()
 }
 
 void View::onChangePadding()
-{
-}
-
-void View::onSwipe(GestureType type)
 {
 }
 
@@ -6789,9 +6994,16 @@ void View::dispatchMouseEvent(UIEvent* ev)
 		return;
 	}
 	
-	PtrLocker<IViewListener> listener(getEventListener());
-	if (listener.isNotNull()) {
-		listener->onMouseEvent(this, ev);
+	Ref<EventAttributes> eventAttrs = m_eventAttributes;
+	if (eventAttrs.isNotNull()) {
+		PtrLocker<IViewListener> listener(eventAttrs->listener);
+		if (listener.isNotNull()) {
+			listener->onMouseEvent(this, ev);
+			if (ev->isPreventedDefault()) {
+				return;
+			}
+		}
+		(eventAttrs->mouse)(ev);
 		if (ev->isPreventedDefault()) {
 			return;
 		}
@@ -6984,14 +7196,24 @@ void View::dispatchTouchEvent(UIEvent* ev)
 		return;
 	}
 	
-	PtrLocker<IViewListener> listener(getEventListener());
-	if (listener.isNotNull()) {
-		listener->onTouchEvent(this, ev);
+	Ref<EventAttributes> eventAttrs = m_eventAttributes;
+	if (eventAttrs.isNotNull()) {
+		PtrLocker<IViewListener> listener(eventAttrs->listener);
+		if (listener.isNotNull()) {
+			listener->onTouchEvent(this, ev);
+			if (ev->isPreventedDefault()) {
+				return;
+			}
+			listener->onMouseEvent(this, ev);
+			if (ev->isPreventedDefault()) {
+				return;
+			}
+		}
+		(eventAttrs->touch)(ev);
 		if (ev->isPreventedDefault()) {
 			return;
 		}
-		
-		listener->onMouseEvent(this, ev);
+		(eventAttrs->mouse)(ev);
 		if (ev->isPreventedDefault()) {
 			return;
 		}
@@ -7230,9 +7452,16 @@ void View::dispatchMouseWheelEvent(UIEvent* ev)
 		return;
 	}
 	
-	PtrLocker<IViewListener> listener(getEventListener());
-	if (listener.isNotNull()) {
-		listener->onMouseWheelEvent(this, ev);
+	Ref<EventAttributes> eventAttrs = m_eventAttributes;
+	if (eventAttrs.isNotNull()) {
+		PtrLocker<IViewListener> listener(eventAttrs->listener);
+		if (listener.isNotNull()) {
+			listener->onMouseWheelEvent(this, ev);
+			if (ev->isPreventedDefault()) {
+				return;
+			}
+		}
+		(eventAttrs->mouseWheel)(ev);
 		if (ev->isPreventedDefault()) {
 			return;
 		}
@@ -7308,9 +7537,16 @@ void View::dispatchKeyEvent(UIEvent* ev)
 		return;
 	}
 	
-	PtrLocker<IViewListener> listener(getEventListener());
-	if (listener.isNotNull()) {
-		listener->onKeyEvent(this, ev);
+	Ref<EventAttributes> eventAttrs = m_eventAttributes;
+	if (eventAttrs.isNotNull()) {
+		PtrLocker<IViewListener> listener(eventAttrs->listener);
+		if (listener.isNotNull()) {
+			listener->onKeyEvent(this, ev);
+			if (ev->isPreventedDefault()) {
+				return;
+			}
+		}
+		(eventAttrs->key)(ev);
 		if (ev->isPreventedDefault()) {
 			return;
 		}
@@ -7352,11 +7588,14 @@ void View::dispatchClick(UIEvent* ev)
 	if (ev->isPreventedDefault()) {
 		return;
 	}
-	PtrLocker<IViewListener> listener(getEventListener());
-	if (listener.isNotNull()) {
-		listener->onClick(this, ev);
+	Ref<EventAttributes> eventAttrs = m_eventAttributes;
+	if (eventAttrs.isNotNull()) {
+		PtrLocker<IViewListener> listener(eventAttrs->listener);
+		if (listener.isNotNull()) {
+			listener->onClick(this, ev);
+		}
+		(eventAttrs->click)();
 	}
-	(getOnClick())();
 }
 
 void View::dispatchClickWithNoEvent()
@@ -7404,9 +7643,16 @@ void View::dispatchSetCursor(UIEvent* ev)
 		return;
 	}
 	
-	PtrLocker<IViewListener> listener(getEventListener());
-	if (listener.isNotNull()) {
-		listener->onSetCursor(this, ev);
+	Ref<EventAttributes> eventAttrs = m_eventAttributes;
+	if (eventAttrs.isNotNull()) {
+		PtrLocker<IViewListener> listener(eventAttrs->listener);
+		if (listener.isNotNull()) {
+			listener->onSetCursor(this, ev);
+			if (ev->isPreventedDefault()) {
+				return;
+			}
+		}
+		(eventAttrs->setCursor)(ev);
 		if (ev->isPreventedDefault()) {
 			return;
 		}
@@ -7463,9 +7709,13 @@ void View::dispatchResize(sl_ui_len width, sl_ui_len height)
 {
 	refreshScroll(UIUpdateMode::NoRedraw);
 	onResize(width, height);
-	PtrLocker<IViewListener> listener(getEventListener());
-	if (listener.isNotNull()) {
-		listener->onResize(this, width, height);
+	Ref<EventAttributes> eventAttrs = m_eventAttributes;
+	if (eventAttrs.isNotNull()) {
+		PtrLocker<IViewListener> listener(eventAttrs->listener);
+		if (listener.isNotNull()) {
+			listener->onResize(this, width, height);
+		}
+		(eventAttrs->resize)(width, height);
 	}
 	Ref<View> parent = getParent();
 	if (parent.isNotNull()) {
@@ -7476,9 +7726,12 @@ void View::dispatchResize(sl_ui_len width, sl_ui_len height)
 void View::dispatchChangeVisibility(Visibility oldVisibility, Visibility newVisibility)
 {
 	onChangeVisibility(oldVisibility, newVisibility);
-	PtrLocker<IViewListener> listener(getEventListener());
-	if (listener.isNotNull()) {
-		listener->onChangeVisibility(this, oldVisibility, newVisibility);
+	Ref<EventAttributes> eventAttrs = m_eventAttributes;
+	if (eventAttrs.isNotNull()) {
+		PtrLocker<IViewListener> listener(eventAttrs->listener);
+		if (listener.isNotNull()) {
+			listener->onChangeVisibility(this, oldVisibility, newVisibility);
+		}
 	}
 	Ref<View> parent = getParent();
 	if (parent.isNotNull()) {
@@ -7489,6 +7742,27 @@ void View::dispatchChangeVisibility(Visibility oldVisibility, Visibility newVisi
 void View::dispatchScroll(sl_scroll_pos x, sl_scroll_pos y)
 {
 	onScroll(x, y);
+	Ref<EventAttributes> eventAttrs = m_eventAttributes;
+	if (eventAttrs.isNotNull()) {
+		PtrLocker<IViewListener> listener(eventAttrs->listener);
+		if (listener.isNotNull()) {
+			listener->onScroll(this, x, y);
+		}
+		(eventAttrs->scroll)(x, y);
+	}
+}
+
+void View::dispatchSwipe(GestureType type)
+{
+	onSwipe(type);
+	Ref<EventAttributes> eventAttrs = m_eventAttributes;
+	if (eventAttrs.isNotNull()) {
+		PtrLocker<IViewListener> listener(eventAttrs->listener);
+		if (listener.isNotNull()) {
+			listener->onSwipe(this, type);
+		}
+		(eventAttrs->swipe)(type);
+	}
 }
 
 void View::_processEventForStateAndClick(UIEvent* ev)
@@ -7782,7 +8056,7 @@ void ViewInstance::onSwipe(GestureType type)
 	Ref<View> view = getView();
 	if (view.isNotNull()) {
 		if (view->isEnabled()) {
-			view->onSwipe(type);
+			view->dispatchSwipe(type);
 		}
 	}
 }

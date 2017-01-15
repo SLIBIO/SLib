@@ -6,7 +6,6 @@
 #include "constants.h"
 #include "event.h"
 #include "cursor.h"
-#include "gesture.h"
 
 #include "../core/object.h"
 #include "../core/ptr.h"
@@ -967,11 +966,52 @@ public:
 	
 	void draw(Canvas* canvas);
 	
-	void post(const Function<void()>& callback, sl_bool flagInvalidate = sl_true);
+	void runAfterDraw(const Function<void()>& callback, sl_bool flagInvalidate = sl_true);
 
 public:
-	SLIB_PROPERTY(AtomicPtr<IViewListener>, EventListener)
-	SLIB_PROPERTY(AtomicFunction<void()>, OnClick)
+	Ptr<IViewListener> getEventListener();
+	
+	void setEventListener(const Ptr<IViewListener>& listener);
+	
+	Function<void(Canvas*)> getOnDraw();
+	
+	void setOnDraw(const Function<void(Canvas*)>& callback);
+	
+	Function<void(UIEvent*)> getOnMouseEvent();
+	
+	void setOnMouseEvent(const Function<void(UIEvent*)>& callback);
+	
+	Function<void(UIEvent*)> getOnTouchEvent();
+	
+	void setOnTouchEvent(const Function<void(UIEvent*)>& callback);
+	
+	Function<void(UIEvent*)> getOnKeyEvent();
+	
+	void setOnKeyEvent(const Function<void(UIEvent*)>& callback);
+	
+	Function<void(UIEvent*)> getOnMouseWheelEvent();
+	
+	void setOnMouseWheelEvent(const Function<void(UIEvent*)>& callback);
+	
+	Function<void()> getOnClick();
+	
+	void setOnClick(const Function<void()>& callback);
+	
+	Function<void(UIEvent*)> getOnSetCursor();
+	
+	void setOnSetCursor(const Function<void(UIEvent*)>& callback);
+	
+	Function<void(sl_ui_len, sl_ui_len)> getOnResize();
+	
+	void setOnResize(const Function<void(sl_ui_len, sl_ui_len)>& callback);
+	
+	Function<void(sl_scroll_pos, sl_scroll_pos)> getOnScroll();
+	
+	void setOnScroll(const Function<void(sl_scroll_pos, sl_scroll_pos)>& callback);
+	
+	Function<void(GestureType)> getOnSwipe();
+	
+	void setOnSwipe(const Function<void(GestureType)>& callback);
 	
 protected:
 	virtual void onDraw(Canvas* canvas);
@@ -1009,7 +1049,9 @@ protected:
 	virtual void onScroll(sl_scroll_pos x, sl_scroll_pos y);
 	
 	virtual void onResizeContent(sl_scroll_pos width, sl_scroll_pos height);
-	
+							
+	virtual void onSwipe(GestureType type);
+
 	virtual void onAttach();
 	
 	virtual void onAddChild(View* child);
@@ -1023,9 +1065,6 @@ protected:
 	virtual void onMakeLayout();
 	
 	virtual void onChangePadding();
-	
-public:
-	virtual void onSwipe(GestureType type);
 	
 public:
 	virtual void dispatchDraw(Canvas* canvas);
@@ -1067,6 +1106,8 @@ public:
 	virtual void dispatchChangeVisibility(Visibility oldVisibility, Visibility newVisibility);
 	
 	virtual void dispatchScroll(sl_scroll_pos x, sl_scroll_pos y);
+
+	virtual void dispatchSwipe(GestureType type);
 	
 private:
 	void _processAttachOnUiThread();
@@ -1394,7 +1435,28 @@ protected:
 	
 	Ref<ScrollAttributes> _initializeScrollAttributes();
 	
-	LinkedQueue< Function<void()> > m_postCallbacks;
+	class EventAttributes : public Referable
+	{
+	public:
+		AtomicPtr<IViewListener> listener;
+		AtomicFunction<void(Canvas*)> draw;
+		AtomicFunction<void(UIEvent*)> mouse;
+		AtomicFunction<void(UIEvent*)> touch;
+		AtomicFunction<void(UIEvent*)> key;
+		AtomicFunction<void(UIEvent*)> mouseWheel;
+		AtomicFunction<void()> click;
+		AtomicFunction<void(UIEvent*)> setCursor;
+		AtomicFunction<void(sl_ui_len, sl_ui_len)> resize;
+		AtomicFunction<void(sl_scroll_pos, sl_scroll_pos)> scroll;
+		AtomicFunction<void(GestureType)> swipe;
+	};
+	
+	AtomicRef<EventAttributes> m_eventAttributes;
+	
+	Ref<EventAttributes> _initializeEventAttributes();
+
+	
+	LinkedQueue< Function<void()> > m_runAfterDrawCallbacks;
 
 	friend class ListView;
 

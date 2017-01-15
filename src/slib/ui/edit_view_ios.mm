@@ -226,7 +226,7 @@ public:
 	{
 		Ref<View> _view = instance->getView();
 		if (_EditView* view = CastInstance<_EditView>(_view.get())) {
-			view->dispatchEnterAction();
+			view->dispatchReturnKey();
 			if (view->isAutoDismissKeyboard()) {
 				if (field != nil) {
 					[field resignFirstResponder];

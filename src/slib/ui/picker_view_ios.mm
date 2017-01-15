@@ -37,7 +37,7 @@ public:
 	void __onSelectItem(_Slib_iOS_PickerView* v, sl_uint32 row)
 	{
 		m_indexSelected = row;
-		onSelectItem(row);
+		dispatchSelectItem(row);
 	}
 	
 	void __selectItem(_Slib_iOS_PickerView* v, sl_uint32 row)

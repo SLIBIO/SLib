@@ -6,6 +6,15 @@ SLIB_UI_NAMESPACE_BEGIN
 	EditView
  ***********************/
 
+String IEditViewListener::onChange(EditView* edit, const String& newValue)
+{
+	return String::null();
+}
+
+void IEditViewListener::onReturnKey(EditView* edit)
+{
+}
+
 SLIB_DEFINE_OBJECT(EditView, View)
 
 EditView::EditView()
@@ -207,7 +216,7 @@ String EditView::onChange(const String& newValue)
 	return newValue;
 }
 
-void EditView::onEnterAction()
+void EditView::onReturnKey()
 {
 }
 
@@ -217,7 +226,7 @@ void EditView::dispatchKeyEvent(UIEvent* ev)
 	if (!(isMultiLine())) {
 		if (ev->getAction() == UIAction::KeyUp) {
 			if (ev->getKeycode() == Keycode::Enter) {
-				dispatchEnterAction();
+				dispatchReturnKey();
 			}
 		}
 	}
@@ -228,15 +237,23 @@ String EditView::dispatchChange(const String& newValue)
 	String value = onChange(newValue);
 	PtrLocker<IEditViewListener> listener(getListener());
 	if (listener.isNotNull()) {
-		return listener->onChange(this, value);
+		value = listener->onChange(this, value);
+	}
+	Function<String(String)> callback = getOnChange();
+	if (callback.isNotNull()) {
+		value = callback(value);
 	}
 	return value;
 }
 
-void EditView::dispatchEnterAction()
+void EditView::dispatchReturnKey()
 {
-	(getEnterAction())();
-	onEnterAction();
+	onReturnKey();
+	PtrLocker<IEditViewListener> listener(getListener());
+	if (listener.isNotNull()) {
+		listener->onReturnKey(this);
+	}
+	getOnReturnKey()();
 }
 
 /**********************

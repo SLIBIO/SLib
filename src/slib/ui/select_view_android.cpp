@@ -12,7 +12,7 @@ void JNICALL _JAndroidSelectView_nativeOnSelect(JNIEnv* env, jobject _this, jlon
 {
 	Ref<View> _view = Android_ViewInstance::getAndroidView(instance);
 	if (SelectView* view = CastInstance<SelectView>(_view.get())) {
-		view->onSelectItem(n);
+		view->dispatchSelectItem(n);
 	}
 }
 

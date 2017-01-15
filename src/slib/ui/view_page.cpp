@@ -238,7 +238,7 @@ void ViewPager::_goTo(sl_size index, const Transition& _transition)
 		_ViewPager_FinishAnimation(this, viewIn, UIPageAction::Resume);
 	}
 	
-	post([animationPause, animationResume] () {
+	runAfterDraw([animationPause, animationResume] () {
 		Time now = Time::now();
 		if (animationPause.isNotNull()) {
 			animationPause->start(now);
@@ -375,7 +375,7 @@ void ViewPager::_push(const Ref<View>& viewIn, const Transition& _transition, sl
 		_ViewPager_FinishAnimation(this, viewIn, UIPageAction::Push);
 	}
 	
-	post([animationPause, animationPush] () {
+	runAfterDraw([animationPause, animationPush] () {
 		Time now = Time::now();
 		if (animationPause.isNotNull()) {
 			animationPause->start(now);
@@ -1062,7 +1062,7 @@ void ViewPage::_openPopup(const Ref<View>& parent, Transition transition, sl_boo
 	if (animation.isNull()) {
 		_finishPopupAnimation(UIPageAction::Push);
 	} else {
-		post([animation] () {
+		runAfterDraw([animation] () {
 			animation->start();
 		});
 	}

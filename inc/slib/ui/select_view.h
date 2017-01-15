@@ -94,8 +94,7 @@ public:
 public:
 	SLIB_PROPERTY(AtomicPtr<ISelectViewListener>, Listener)
 	
-public:
-	virtual void onSelectItem(sl_uint32 index);
+	SLIB_PROPERTY(AtomicFunction<void(sl_uint32)>, OnSelectItem)
 	
 protected:
 	// override
@@ -107,6 +106,8 @@ protected:
 	// override
 	void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 	
+	virtual void onSelectItem(sl_uint32 index);
+
 protected:
 	UIRect getLeftIconRegion();
 	
@@ -115,6 +116,8 @@ protected:
 public:
 	// override
 	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+	
+	virtual void dispatchSelectItem(sl_uint32 index);
 	
 private:
 	void _getSelectedIndex_NW();

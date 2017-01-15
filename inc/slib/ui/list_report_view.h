@@ -89,6 +89,14 @@ public:
 public:
 	SLIB_PROPERTY(AtomicPtr<IListReportViewListener>, Listener)
 	
+	SLIB_PROPERTY(Function<void(sl_uint32)>, OnSelectRow)
+	
+	SLIB_PROPERTY(Function<void(sl_uint32, const UIPoint&)>, OnClickRow)
+	
+	SLIB_PROPERTY(Function<void(sl_uint32, const UIPoint&)>, OnRightButtonClickRow)
+	
+	SLIB_PROPERTY(Function<void(sl_uint32, const UIPoint&)>, OnDoubleClickRow)
+	
 protected:
 	virtual void onSelectRow(sl_uint32 row);
 	
@@ -102,13 +110,13 @@ public:
 	// override
 	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
 	
-	void dispatchSelectRow(sl_uint32 row);
+	virtual void dispatchSelectRow(sl_uint32 row);
 	
-	void dispatchClickRow(sl_uint32 row, const UIPoint& pt);
+	virtual void dispatchClickRow(sl_uint32 row, const UIPoint& pt);
 	
-	void dispatchRightButtonClickRow(sl_uint32 row, const UIPoint& pt);
+	virtual void dispatchRightButtonClickRow(sl_uint32 row, const UIPoint& pt);
 	
-	void dispatchDoubleClickRow(sl_uint32 row, const UIPoint& pt);
+	virtual void dispatchDoubleClickRow(sl_uint32 row, const UIPoint& pt);
 
 protected:
 	void _refreshColumnsCount_NW();

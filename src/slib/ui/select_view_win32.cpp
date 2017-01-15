@@ -62,7 +62,7 @@ public:
 
 	void __onSelectItem(HWND hWnd)
 	{
-		onSelectItem(__getSelectedIndex(hWnd));
+		dispatchSelectItem(__getSelectedIndex(hWnd));
 	}
 
 };

@@ -33,6 +33,8 @@ public:
 	
 public:
 	SLIB_PROPERTY(RenderEngineType, PreferredEngineType)
+	
+	SLIB_PROPERTY(AtomicFunction<void(RenderEngine*)>, OnFrame)
 
 protected:
 	virtual void onFrame(RenderEngine* engine);

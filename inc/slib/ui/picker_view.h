@@ -71,8 +71,7 @@ public:
 public:
 	SLIB_PROPERTY(AtomicPtr<IPickerViewListener>, Listener)
 	
-public:
-	virtual void onSelectItem(sl_uint32 index);
+	SLIB_PROPERTY(AtomicFunction<void(sl_uint32)>, OnSelectItem)
 	
 protected:
 	// override
@@ -81,9 +80,13 @@ protected:
 	// override
 	void onMouseEvent(UIEvent* ev);
 	
+	virtual void onSelectItem(sl_uint32 index);
+
 public:
 	// override
 	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+	
+	virtual void dispatchSelectItem(sl_uint32 index);
 	
 private:
 	void _selectIndexInner(sl_int32 index);

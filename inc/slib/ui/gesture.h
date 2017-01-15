@@ -3,7 +3,6 @@
 
 #include "definition.h"
 
-#include "event.h"
 #include "motion_tracker.h"
 
 SLIB_UI_NAMESPACE_BEGIN
@@ -19,6 +18,7 @@ enum class GestureType
 };
 
 class View;
+class UIEvent;
 
 class GestureRecognizer;
 

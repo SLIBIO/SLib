@@ -12,7 +12,7 @@ class ScrollBar;
 class SLIB_EXPORT IScrollBarListener
 {
 public:
-	virtual void onScroll(ScrollBar* scrollBar, sl_scroll_pos value) = 0;
+	virtual void onChange(ScrollBar* scrollBar, sl_scroll_pos value) = 0;
 };
 
 class SLIB_EXPORT ScrollBar : public View
@@ -123,13 +123,15 @@ protected:
 	// override
 	void onMouseWheelEvent(UIEvent* ev);
 	
-	virtual void onScroll(sl_scroll_pos value);
+	virtual void onChange(sl_scroll_pos value);
 	
 public:
-	void dispatchScroll(sl_scroll_pos value);
+	virtual void dispatchChange(sl_scroll_pos value);
 	
 public:
 	SLIB_PROPERTY(AtomicPtr<IScrollBarListener>, Listener);
+	
+	SLIB_PROPERTY(AtomicFunction<void(sl_scroll_pos)>, OnChange)
 	
 protected:
 	void _setHoverThumb(sl_bool flag);

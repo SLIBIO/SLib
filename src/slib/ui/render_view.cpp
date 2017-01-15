@@ -74,6 +74,7 @@ void RenderView::dispatchFrame(RenderEngine* engine)
 		engine->beginScene();
 	}
 	onFrame(engine);
+	getOnFrame()(engine);
 	if (engine) {
 		engine->endScene();
 	}

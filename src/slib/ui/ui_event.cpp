@@ -834,6 +834,14 @@ void IViewListener::onChangeVisibility(View* view, Visibility oldVisibility, Vis
 {
 }
 
+void IViewListener::onScroll(View* view, sl_scroll_pos x, sl_scroll_pos y)
+{
+}
+
+void IViewListener::onSwipe(View* view, GestureType type)
+{
+}
+
 void IWindowListener::onClose(Window* window, UIEvent* ev)
 {
 }
@@ -898,12 +906,17 @@ void UIEventLogListener::onKeyEvent(View* view, UIEvent* event)
 
 void UIEventLogListener::onClick(View* view, UIEvent* event)
 {
-	Log("View", "onClick");
+	Log("View", "OnClick");
 }
 
 void UIEventLogListener::onSetCursor(View* view, UIEvent* event)
 {
 	Log("View", "OnSetCursor");
+}
+
+void UIEventLogListener::onSwipe(View* view, GestureType type)
+{
+	Log("View", "OnSwipe");
 }
 
 void UIEventLogListener::onClose(Window* window, UIEvent* ev)

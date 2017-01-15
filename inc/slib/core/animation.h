@@ -46,8 +46,6 @@ enum class AnimationCurve
 	Default = 100
 };
 
-typedef float (*CustomAnimationCurve)(float fraction, Referable* param);
-
 class AnimationTarget;
 
 class Animation : public Object
@@ -57,7 +55,6 @@ class Animation : public Object
 protected:
 	Animation();
 	
-public:
 	~Animation();
 	
 public:
@@ -106,14 +103,6 @@ public:
 	float getAnimationCurveTension();
 	
 	void setAnimationCurveTension(float tension);
-	
-	CustomAnimationCurve getCustomAnimationCurve();
-	
-	Ref<Referable> getCustomAnimationCurveParam();
-	
-	void setCustomAnimationCurve(CustomAnimationCurve curve);
-	
-	void setCustomAnimationCurve(CustomAnimationCurve curve, const Ref<Referable>& param);
 	
 	void addTarget(const Ref<AnimationTarget>& target);
 	
@@ -191,7 +180,10 @@ public:
 	
 public:
 	SLIB_PROPERTY(AtomicPtr<IAnimationListener>, Listener)
+	
 	SLIB_PROPERTY(AtomicFunction<void()>, OnStop)
+	
+	SLIB_PROPERTY(AtomicFunction<float(float)>, CustomAnimationCurve)
 	
 protected:
 	virtual void onAnimationFrame(float seconds);
@@ -231,8 +223,6 @@ protected:
 	float m_curveCycles;
 	float m_curveCycles2PI;
 	float m_curveTension;
-	CustomAnimationCurve m_customCurve;
-	AtomicRef<Referable> m_customCurveParam;
 	
 	CList< Ref<AnimationTarget> > m_targets;
 	CList< Ref<Animation> > m_linkedAnimations;

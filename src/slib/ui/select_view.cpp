@@ -328,14 +328,6 @@ void SelectView::setTextColor(const Color& color, UIUpdateMode mode)
 	}
 }
 
-void SelectView::onSelectItem(sl_uint32 index)
-{
-	PtrLocker<ISelectViewListener> listener(getListener());
-	if (listener.isNotNull()) {
-		listener->onSelectItem(this, index);
-	}
-}
-
 void SelectView::onDraw(Canvas* canvas)
 {
 	canvas->drawText(getSelectedTitle(), getBounds(), getFont(), m_textColor, Alignment::MiddleCenter);
@@ -414,6 +406,20 @@ void SelectView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 		}
 		setMeasuredHeight(height);
 	}
+}
+
+void SelectView::onSelectItem(sl_uint32 index)
+{
+}
+
+void SelectView::dispatchSelectItem(sl_uint32 index)
+{
+	onSelectItem(index);
+	PtrLocker<ISelectViewListener> listener(getListener());
+	if (listener.isNotNull()) {
+		listener->onSelectItem(this, index);
+	}
+	getOnSelectItem()(index);
 }
 
 UIRect SelectView::getLeftIconRegion()

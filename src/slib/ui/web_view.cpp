@@ -128,6 +128,7 @@ void WebView::dispatchStartLoad(const String& url)
 	if (listener.isNotNull()) {
 		listener->onStartLoad(this, url);
 	}
+	getOnStartLoad()(url);
 }
 
 void WebView::dispatchFinishLoad(const String& url, sl_bool flagFailed)
@@ -137,6 +138,7 @@ void WebView::dispatchFinishLoad(const String& url, sl_bool flagFailed)
 	if (listener.isNotNull()) {
 		listener->onFinishLoad(this, url, flagFailed);
 	}
+	getOnFinishLoad()(url, flagFailed);
 }
 
 void WebView::dispatchMessageFromJavaScript(const String& msg, const String& param)
@@ -146,6 +148,7 @@ void WebView::dispatchMessageFromJavaScript(const String& msg, const String& par
 	if (listener.isNotNull()) {
 		listener->onMessageFromJavaScript(this, msg, param);
 	}
+	getOnMessageFromJavaScript()(msg, param);
 }
 
 

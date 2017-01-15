@@ -81,7 +81,7 @@ public:
 	
 	void __onSelectItem(NSPopUpButton* v)
 	{
-		onSelectItem(__getSelectedIndex(v));
+		dispatchSelectItem(__getSelectedIndex(v));
 	}
 };
 

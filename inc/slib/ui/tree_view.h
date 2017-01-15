@@ -247,6 +247,8 @@ public:
 public:
 	SLIB_PROPERTY(AtomicPtr<ITreeViewListener>, Listener);
 	
+	SLIB_PROPERTY(AtomicFunction<void(TreeViewItem*)>, OnSelectItem)
+	
 public:
 	virtual void onSelectItem(TreeViewItem* item);
 	
@@ -260,7 +262,7 @@ public:
 	virtual void onChangePadding();
 	
 protected:
-	void dispatchSelectItem(TreeViewItem* item);
+	virtual void dispatchSelectItem(TreeViewItem* item);
 	
 private:
 	void _createRootItem();

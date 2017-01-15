@@ -4,6 +4,7 @@
 #include "definition.h"
 
 #include "constants.h"
+#include "gesture.h"
 
 #include "../core/string.h"
 #include "../core/time.h"
@@ -346,7 +347,11 @@ public:
 	virtual void onResize(View* view, sl_ui_len width, sl_ui_len height);
 	
 	virtual void onChangeVisibility(View* view, Visibility oldVisibility, Visibility newVisibility);
+	
+	virtual void onScroll(View* view, sl_scroll_pos x, sl_scroll_pos y);
 
+	virtual void onSwipe(View* view, GestureType type);
+	
 };
 
 class SLIB_EXPORT IWindowListener
@@ -388,6 +393,8 @@ public:
 	void onClick(View* view, UIEvent* ev);
 	
 	void onSetCursor(View* view, UIEvent* ev);
+	
+	void onSwipe(View* view, GestureType type);
 	
 	
 	// window related events

@@ -173,14 +173,6 @@ void PickerView::setTextColor(const Color& color, UIUpdateMode mode)
 	}
 }
 
-void PickerView::onSelectItem(sl_uint32 index)
-{
-	PtrLocker<IPickerViewListener> listener(getListener());
-	if (listener.isNotNull()) {
-		listener->onSelectItem(this, index);
-	}
-}
-
 void PickerView::onDraw(Canvas* canvas)
 {
 	Ref<Font> font = getFont();
@@ -300,6 +292,20 @@ void PickerView::onMouseEvent(UIEvent* ev)
 		_startFlow(m_speedBefore);
 		invalidate();
 	}
+}
+
+void PickerView::onSelectItem(sl_uint32 index)
+{
+}
+
+void PickerView::dispatchSelectItem(sl_uint32 index)
+{
+	onSelectItem(index);
+	PtrLocker<IPickerViewListener> listener(getListener());
+	if (listener.isNotNull()) {
+		listener->onSelectItem(this, index);
+	}
+	getOnSelectItem()(index);
 }
 
 void PickerView::_selectIndexInner(sl_int32 index)

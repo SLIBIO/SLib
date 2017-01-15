@@ -36,7 +36,7 @@ public:
 	{
 		m_indexSelected = row;
 		v.text = __getItemTitle(row);
-		onSelectItem(row);
+		dispatchSelectItem(row);
 	}
 	
 	void __onStartSelection(_Slib_iOS_SelectView* v)

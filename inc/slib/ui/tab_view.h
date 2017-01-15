@@ -139,11 +139,13 @@ public:
 public:
 	SLIB_PROPERTY(AtomicPtr<ITabViewListener>, Listener)
 	
+	SLIB_PROPERTY(AtomicFunction<void(sl_uint32)>, OnSelectTab)
+	
 public:
 	// override
 	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
 	
-	void dispatchSelectTab(sl_uint32 index);
+	virtual void dispatchSelectTab(sl_uint32 index);
 	
 protected:
 	virtual void onSelectTab(sl_uint32 index);

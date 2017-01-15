@@ -307,17 +307,18 @@ void Slider::onKeyEvent(UIEvent* ev)
 	}
 }
 
-void Slider::onValueChanged(float value)
+void Slider::onChange(float value)
 {
 }
 
-void Slider::dispatchValueChanged(float value)
+void Slider::dispatchChange(float value)
 {
-	onValueChanged(value);
+	onChange(value);
 	PtrLocker<ISliderListener> listener(getListener());
 	if (listener.isNotNull()) {
-		listener->onValueChanged(this, value);
+		listener->onChange(this, value);
 	}
+	getOnChange()(value);
 }
 
 void Slider::_drawTrack(Canvas* canvas, const Ref<Drawable>& track, const Rectangle& rectDst)

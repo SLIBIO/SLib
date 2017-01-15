@@ -110,7 +110,7 @@ void ScrollBar::setValue(sl_scroll_pos value, UIUpdateMode mode)
 		return;
 	}
 	m_value = value;
-	dispatchScroll(value);
+	dispatchChange(value);
 	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
@@ -598,17 +598,18 @@ void ScrollBar::onMouseWheelEvent(UIEvent* ev)
 	ev->stopPropagation();
 }
 
-void ScrollBar::onScroll(sl_scroll_pos value)
+void ScrollBar::onChange(sl_scroll_pos value)
 {
 }
 
-void ScrollBar::dispatchScroll(sl_scroll_pos value)
+void ScrollBar::dispatchChange(sl_scroll_pos value)
 {
-	onScroll(value);
+	onChange(value);
 	PtrLocker<IScrollBarListener> listener(getListener());
 	if (listener.isNotNull()) {
-		listener->onScroll(this, value);
+		listener->onChange(this, value);
 	}
+	getOnChange()(value);
 }
 
 void ScrollBar::_setHoverThumb(sl_bool flag)

@@ -290,6 +290,7 @@ void ListReportView::dispatchSelectRow(sl_uint32 row)
 	if (listener.isNotNull()) {
 		listener->onSelectRow(this, row);
 	}
+	getOnSelectRow()(row);
 }
 
 void ListReportView::dispatchClickRow(sl_uint32 row, const UIPoint& pt)
@@ -303,14 +304,17 @@ void ListReportView::dispatchClickRow(sl_uint32 row, const UIPoint& pt)
 	if (listener.isNotNull()) {
 		listener->onClickRow(this, row, pt);
 	}
+	getOnClickRow()(row, pt);
 }
 
 void ListReportView::dispatchRightButtonClickRow(sl_uint32 row, const UIPoint& pt)
 {
+	onRightButtonClickRow(row, pt);
 	PtrLocker<IListReportViewListener> listener(getListener());
 	if (listener.isNotNull()) {
 		listener->onRightButtonClickRow(this, row, pt);
 	}
+	getOnRightButtonClickRow()(row, pt);
 }
 
 void ListReportView::dispatchDoubleClickRow(sl_uint32 row, const UIPoint& pt)
@@ -324,6 +328,7 @@ void ListReportView::dispatchDoubleClickRow(sl_uint32 row, const UIPoint& pt)
 	if (listener.isNotNull()) {
 		listener->onDoubleClickRow(this, row, pt);
 	}
+	getOnDoubleClickRow()(row, pt);
 }
 
 

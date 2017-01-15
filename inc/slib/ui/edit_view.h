@@ -12,7 +12,9 @@ class EditView;
 class SLIB_EXPORT IEditViewListener
 {
 public:
-	virtual String onChange(EditView* edit, const String& newValue) = 0;
+	virtual String onChange(EditView* edit, const String& newValue);
+	
+	virtual void onReturnKey(EditView* edit);
 	
 };
 
@@ -71,12 +73,14 @@ protected:
 public:
 	SLIB_PROPERTY(AtomicPtr<IEditViewListener>, Listener)
 	
-	SLIB_PROPERTY(AtomicFunction<void()>, EnterAction)
+	SLIB_PROPERTY(AtomicFunction<String(String)>, OnChange)
+	
+	SLIB_PROPERTY(AtomicFunction<void()>, OnReturnKey)
 	
 protected:
 	virtual String onChange(const String& newValue);
 
-	virtual void onEnterAction();
+	virtual void onReturnKey();
 	
 public:
 	// override
@@ -87,7 +91,7 @@ public:
 	
 	virtual String dispatchChange(const String& newValue);
 	
-	virtual void dispatchEnterAction();
+	virtual void dispatchReturnKey();
 	
 private:
 	void _getText_NW();

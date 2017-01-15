@@ -165,7 +165,6 @@ Animation::Animation()
 	m_curveCycles = 1.0f;
 	m_curveCycles2PI = SLIB_PI_DUAL;
 	m_curveTension = 2.0f;
-	m_customCurve = sl_null;
 	
 	m_flagStarted = sl_false;
 	m_lastRepeatedCount = 0;
@@ -304,27 +303,6 @@ float Animation::getAnimationCurveTension()
 void Animation::setAnimationCurveTension(float tension)
 {
 	m_curveTension = tension;
-}
-
-CustomAnimationCurve Animation::getCustomAnimationCurve()
-{
-	return m_customCurve;
-}
-
-Ref<Referable> Animation::getCustomAnimationCurveParam()
-{
-	return m_customCurveParam;
-}
-
-void Animation::setCustomAnimationCurve(CustomAnimationCurve curve)
-{
-	setCustomAnimationCurve(curve, Ref<Referable>::null());
-}
-
-void Animation::setCustomAnimationCurve(CustomAnimationCurve curve, const Ref<Referable>& param)
-{
-	m_customCurve = curve;
-	m_customCurveParam = param;
 }
 
 void Animation::addTarget(const Ref<AnimationTarget>& target)
@@ -798,10 +776,9 @@ float Animation::_applyCurve(float f)
 			}
 		case AnimationCurve::Custom:
 			{
-				CustomAnimationCurve func = m_customCurve;
-				Ref<Referable> param = m_customCurveParam;
-				if (func) {
-					return func(f, param.get());
+				Function<float(float)> func = getCustomAnimationCurve();
+				if (func.isNotNull()) {
+					return func(f);
 				}
 				return f;
 			}

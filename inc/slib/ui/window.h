@@ -284,6 +284,30 @@ public:
 public:
 	SLIB_PROPERTY(AtomicPtr<IWindowListener>, EventListener)
 	
+	SLIB_PROPERTY(AtomicFunction<void()>, OnCreate)
+	
+	SLIB_PROPERTY(AtomicFunction<void()>, OnCreateFailed)
+	
+	SLIB_PROPERTY(AtomicFunction<void(UIEvent*)>, OnClose)
+	
+	SLIB_PROPERTY(AtomicFunction<void()>, OnActivate)
+	
+	SLIB_PROPERTY(AtomicFunction<void()>, OnDeactivate)
+	
+	SLIB_PROPERTY(AtomicFunction<void()>, OnMove)
+	
+	SLIB_PROPERTY(AtomicFunction<void(UISize&)>, OnResizing)
+	
+	SLIB_PROPERTY(AtomicFunction<void(sl_ui_len, sl_ui_len)>, OnResize)
+	
+	SLIB_PROPERTY(AtomicFunction<void()>, OnMinimize)
+	
+	SLIB_PROPERTY(AtomicFunction<void()>, OnDeminimize)
+	
+	SLIB_PROPERTY(AtomicFunction<void()>, OnMaximize)
+	
+	SLIB_PROPERTY(AtomicFunction<void()>, OnDemaximize)
+
 protected:
 	virtual void onCreate();
 	

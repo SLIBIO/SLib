@@ -802,6 +802,7 @@ void TreeView::dispatchSelectItem(TreeViewItem* item)
 	if (listener.isNotNull()) {
 		listener->onSelectItem(this, item);
 	}
+	getOnSelectItem()(item);
 	(item->getOnSelect())();
 }
 

@@ -54,6 +54,12 @@ public:
 public:
 	SLIB_PROPERTY(AtomicPtr<IWebViewListener>, Listener)
 	
+	SLIB_PROPERTY(AtomicFunction<void(String)>, OnStartLoad)
+	
+	SLIB_PROPERTY(AtomicFunction<void(String, sl_bool)>, OnFinishLoad)
+	
+	SLIB_PROPERTY(AtomicFunction<void(String, String)>, OnMessageFromJavaScript)
+	
 protected:
 	virtual void onStartLoad(const String& url);
 	
@@ -68,11 +74,11 @@ public:
 	// override
 	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
 
-	void dispatchStartLoad(const String& url);
+	virtual void dispatchStartLoad(const String& url);
 	
-	void dispatchFinishLoad(const String& url, sl_bool flagFailed);
+	virtual void dispatchFinishLoad(const String& url, sl_bool flagFailed);
 	
-	void dispatchMessageFromJavaScript(const String& msg, const String& param);
+	virtual void dispatchMessageFromJavaScript(const String& msg, const String& param);
 
 private:
 	void _refreshSize_NW();

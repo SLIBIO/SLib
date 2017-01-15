@@ -74,7 +74,7 @@ public:
 							vx = -vx;
 						}
 						if (vx > 1) {
-							view->onSwipe(type);
+							view->dispatchSwipe(type);
 						}
 					}
 				} else {
@@ -84,7 +84,7 @@ public:
 							vy = -vy;
 						}
 						if (vy > 1) {
-							view->onSwipe(type);
+							view->dispatchSwipe(type);
 						}
 					}
 				}
