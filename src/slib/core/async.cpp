@@ -197,7 +197,7 @@ sl_bool AsyncLoop::dispatch(const Function<void()>& callback)
 sl_int32 AsyncLoop::_getTimeout_TimeTasks()
 {
 	MutexLocker lock(&m_lockTimeTasks);
-	sl_uint64 rel = getEllapsedMilliseconds();
+	sl_uint64 rel = getElapsedMilliseconds();
 	if (m_timeTasks.getCount() == 0) {
 		return -1;
 	}
@@ -232,7 +232,7 @@ sl_bool AsyncLoop::setTimeout(const Function<void()>& task, sl_uint64 ms)
 	}
 	MutexLocker lock(&m_lockTimeTasks);
 	TimeTask tt;
-	tt.time = getEllapsedMilliseconds() + ms;
+	tt.time = getElapsedMilliseconds() + ms;
 	tt.task = task;
 	if (m_timeTasks.put(tt.time, tt, MapPutMode::AddAlways)) {
 		_wake();
@@ -248,7 +248,7 @@ sl_int32 AsyncLoop::_getTimeout_Timer()
 	sl_int32 timeout = -1;
 	LinkedQueue< Ref<AsyncTimer> > tasks;
 
-	sl_uint64 rel = getEllapsedMilliseconds();
+	sl_uint64 rel = getElapsedMilliseconds();
 	Link<Timer>* link = m_queueTimers.getFront();
 	while (link) {
 		Ref<AsyncTimer> timer(link->value.timer);
@@ -325,9 +325,9 @@ Ref<AsyncTimer> AsyncLoop::addTimer(const Function<void()>& task, sl_uint64 inte
 	return sl_null;
 }
 
-sl_uint64 AsyncLoop::getEllapsedMilliseconds()
+sl_uint64 AsyncLoop::getElapsedMilliseconds()
 {
-	return m_timeCounter.getEllapsedMilliseconds();
+	return m_timeCounter.getElapsedMilliseconds();
 }
 
 void AsyncLoop::_runLoop()

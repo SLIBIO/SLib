@@ -7,7 +7,6 @@
 #include "function.h"
 #include "ptr.h"
 #include "list.h"
-#include "time.h"
 #include "math.h"
 #include "interpolation.h"
 
@@ -48,6 +47,8 @@ enum class AnimationCurve
 
 class AnimationTarget;
 
+class AnimationLoop;
+
 class Animation : public Object
 {
 	SLIB_DECLARE_OBJECT
@@ -60,11 +61,30 @@ protected:
 public:
 	static Ref<Animation> create(float duration);
 	
-	static void pauseAnimationCenter();
-	
-	static void resumeAnimationCenter();
+	static Ref<Animation> create(float duration, const Ref<AnimationLoop>& loop);
 	
 public:
+	Ref<AnimationLoop> getLoop();
+	
+	void addTarget(const Ref<AnimationTarget>& target);
+	
+	void removeTarget(const Ref<AnimationTarget>& target);
+	
+	void removeAllTargets();
+	
+	// linked animations are automatically started on the stop event
+	void linkAnimation(const Ref<Animation>& animation);
+	
+	void unlinkAnimation(const Ref<Animation>& animation);
+	
+	void unlinkAllAnimations();
+
+	
+	// seconds
+	float getTime();
+	
+	void setTime(float seconds, sl_bool flagUpdateFrame = sl_false);
+
 	// seconds
 	float getDuration();
 	
@@ -88,6 +108,10 @@ public:
 	
 	void setAutoReverse(sl_bool flagReverse);
 	
+	sl_bool isAbsoluteTime();
+	
+	void setAbsoluteTime(sl_bool flagAbsolute);
+	
 	AnimationCurve getAnimationCurve();
 	
 	void setAnimationCurve(AnimationCurve curve);
@@ -104,65 +128,32 @@ public:
 	
 	void setAnimationCurveTension(float tension);
 	
-	void addTarget(const Ref<AnimationTarget>& target);
+	Function<float(float)> getCustomAnimationCurve();
 	
-	void removeTarget(const Ref<AnimationTarget>& target);
-	
-	void removeAllTargets();
-	
-	// linked animations are automatically started on the stop event
-	void linkAnimation(const Ref<Animation>& animation);
-	
-	void unlinkAnimation(const Ref<Animation>& animation);
-	
-	void unlinkAllAnimations();
+	void setCustomAnimationCurve(const Function<float(float)>& curve);
 	
 	
-	void start();
+	// seconds
+	float getCurrentTime(sl_uint32* outRepeatedCount = sl_null);
 	
-	void start(const Time& current);
+	float getTimeFraction();
 	
-	void startAndSetTime(float initialSeconds);
+	sl_uint32 getRepeatedCount();
 	
-	void startAndSetTime(float initialSeconds, const Time& current);
+	
+	void start(sl_bool flagUpdateFrame = sl_false);
+	
+	void startAt(float seconds, sl_bool flagUpdateFrame = sl_false);
 
-	void restart();
+	void restart(sl_bool flagUpdateFrame = sl_false);
 	
-	void restart(const Time& current);
-	
-	void restartAndSetTime(float initialSeconds);
-	
-	void restartAndSetTime(float initialSeconds, const Time& current);
+	void restartAt(float seconds, sl_bool flagUpdateFrame = sl_false);
 	
 	void stop();
 	
 	void resume();
 	
-	void resume(const Time& current);
-	
 	void pause();
-	
-	void pause(const Time& current);
-	
-	// seconds
-	float getCurrentTime(sl_uint32* outRepeatedCount = sl_null);
-	
-	// seconds
-	float getCurrentTime(const Time& current, sl_uint32* outRepeatedCount = sl_null);
-	
-	float getEllapsedSeconds();
-	
-	float getEllapsedSeconds(const Time& current);
-	
-	void setEllapsedSeconds(float seconds);
-	
-	void setEllapsedSeconds(float seconds, const Time& current);
-	
-	float getTimeFraction();
-	
-	float getTimeFraction(const Time& current);
-	
-	sl_uint32 getTotalRepeatedCount();
 	
 	sl_bool isStarted();
 	
@@ -174,16 +165,12 @@ public:
 	
 	sl_bool isPaused();
 
-	void update();
-	
-	void update(const Time& current);
+	void update(float elapsedSeconds);
 	
 public:
 	SLIB_PROPERTY(AtomicPtr<IAnimationListener>, Listener)
 	
 	SLIB_PROPERTY(AtomicFunction<void()>, OnStop)
-	
-	SLIB_PROPERTY(AtomicFunction<float(float)>, CustomAnimationCurve)
 	
 protected:
 	virtual void onAnimationFrame(float seconds);
@@ -200,22 +187,29 @@ public:
 	void dispatchStopAnimation();
 	
 protected:
-	float _getTime(const Time& current, sl_uint32& iRepeat, sl_bool& flagStop);
+	float _getTime(sl_uint32& iRepeat, sl_bool& flagStop);
 	
 	float _getFraction(float time);
 	
 	float _applyCurve(float fraction);
-	
+		
 	sl_bool _stop();
 	
+	void _resume();
+	
+	void _pause();
+	
 protected:
-	TimeKeeper m_timer;
+	WeakRef<AnimationLoop> m_loop;
+	CList< Ref<AnimationTarget> > m_targets;
+	CList< Ref<Animation> > m_linkedAnimations;
+	
+	float m_time; // seconds
 	float m_duration; // seconds
-	Time m_timeDuration;
 	float m_delay; // seconds
-	Time m_timeDelay;
 	sl_int32 m_repeatCount;
 	sl_bool m_flagAutoReverse;
+	sl_bool m_flagAbsoluteTime;
 	
 	AnimationCurve m_curve;
 	float m_curveEaseFactor;
@@ -223,13 +217,56 @@ protected:
 	float m_curveCycles;
 	float m_curveCycles2PI;
 	float m_curveTension;
-	
-	CList< Ref<AnimationTarget> > m_targets;
-	CList< Ref<Animation> > m_linkedAnimations;
+	AtomicFunction<float(float)> m_customAnimationCurve;
 	
 	sl_bool m_flagStarted;
+	sl_bool m_flagRunning;
 	sl_uint32 m_lastRepeatedCount;
 
+};
+
+class AnimationLoop : public Object
+{
+public:
+	AnimationLoop();
+	
+	~AnimationLoop();
+	
+public:
+	static Ref<AnimationLoop> getDefault();
+
+public:
+	void addAnimation(Animation* animation);
+	
+	void removeAnimation(Animation* animation);
+	
+	void pause();
+	
+	void resume();
+	
+	sl_bool isPaused();
+
+	void wake();
+	
+protected:
+	virtual void _pause() = 0;
+	
+	virtual void _resume() = 0;
+	
+	virtual void _wake() = 0;
+	
+protected:
+	// returns millseconds to wait, negative when no animation is running
+	sl_int32 _runStep();
+	
+protected:
+	CList< Ref<Animation> > m_animations;
+	List< Ref<Animation> > m_animationsRunning;
+	sl_bool m_flagPaused;
+	
+	sl_bool m_flagUpdateList;
+	sl_int64 m_lastTime; // milliseconds
+	
 };
 
 template < class T, class INTERPOLATION = Interpolation<T> >
@@ -311,9 +348,7 @@ public:
 	void setAnimation(const Ref<Animation>& animation);
 	
 	void forceUpdate();
-	
-	void forceUpdate(const Time& current);
-	
+		
 public:
 	virtual void update(float fraction) = 0;
 	

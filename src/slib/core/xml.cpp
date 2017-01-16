@@ -2301,7 +2301,7 @@ Ref<XmlDocument> _Xml_Parser<ST, CT, BT>::parseXml(const String& sourceFilePath,
 	param.flagError = sl_true;
 	param.errorPosition = parser.pos;
 	param.errorMessage = parser.errorMessage;
-	param.errorLine = ST::countLineNumber(buf, parser.pos, &(param.errorColumn));
+	param.errorLine = ParseUtil::countLineNumber(buf, parser.pos, &(param.errorColumn));
 	
 	if (param.flagLogError) {
 		LogError("Xml", param.getErrorText());

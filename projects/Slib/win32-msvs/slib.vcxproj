@@ -298,6 +298,7 @@
     <ClCompile Include="..\..\..\src\slib\core\memory.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\mutex.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\object.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\parse.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\pipe.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\pipe_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\java.cpp" />

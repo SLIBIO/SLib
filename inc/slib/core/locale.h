@@ -567,7 +567,7 @@ public:
 	};
 	
 public:
-	SLIB_CONSTEXPR Locale() : value(Locale::Unknown) {}
+	constexpr Locale() : value(Locale::Unknown) {}
 	
 	Locale(Language language, Country country);
 	
@@ -649,7 +649,7 @@ template <>
 class Hash<Locale>
 {
 public:
-	SLIB_CONSTEXPR sl_uint32 operator()(const Locale& locale) const
+	constexpr sl_uint32 operator()(const Locale& locale) const
 	{
 		return Rehash(locale.value);
 	}

@@ -218,7 +218,6 @@ void MobileApp::onResize(sl_ui_len width, sl_ui_len height)
 
 void MobileApp::dispatchPause()
 {
-	Animation::pauseAnimationCenter();
 	onPause();
 	Ref<ViewPager> pager = m_pager;
 	if (pager.isNotNull()) {
@@ -247,7 +246,6 @@ void MobileApp::dispatchPauseToApp()
 
 void MobileApp::dispatchResume()
 {
-	Animation::resumeAnimationCenter();
 	onResume();
 	Ref<ViewPager> pager = m_pager;
 	if (pager.isNotNull()) {

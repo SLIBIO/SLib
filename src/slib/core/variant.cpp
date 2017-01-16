@@ -1559,7 +1559,7 @@ static sl_bool _Variant_getVariantMapJsonString(StringBuffer& ret, const Map<Str
 			}
 		}
 		if (flagJSON) {
-			if (!(ret.add(pair.key.applyBackslashEscapes()))) {
+			if (!(ret.add(ParseUtil::applyBackslashEscapes(pair.key)))) {
 				return sl_false;
 			}
 		} else {
@@ -1696,10 +1696,10 @@ String Variant::toJsonString() const
 		case VariantType::Time:
 		case VariantType::String8:
 		case VariantType::Sz8:
-			return getString().applyBackslashEscapes();
+			return ParseUtil::applyBackslashEscapes(getString());
 		case VariantType::String16:
 		case VariantType::Sz16:
-			return getString16().applyBackslashEscapes();
+			return ParseUtil::applyBackslashEscapes(getString16());
 		case VariantType::Object:
 		case VariantType::Weak:
 			{

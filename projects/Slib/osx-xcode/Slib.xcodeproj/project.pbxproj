@@ -150,6 +150,7 @@
 		266DD5F41C11DF1500D47AB0 /* camera_avfoundation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5F31C11DF1500D47AB0 /* camera_avfoundation.mm */; };
 		266F12B31C97A13F00DE26FF /* block_cipher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266F12B21C97A13F00DE26FF /* block_cipher.cpp */; };
 		267C16B91CE779D8000318C2 /* scroll_bar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 267C16B81CE779D8000318C2 /* scroll_bar.cpp */; };
+		2682C3EB1E2D211600E9CB98 /* parse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2682C3EA1E2D211600E9CB98 /* parse.cpp */; };
 		2688DD851C16F6E200973672 /* video_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2688DD841C16F6E200973672 /* video_view.cpp */; };
 		2688DD871C16FBDF00973672 /* camera_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2688DD861C16FBDF00973672 /* camera_view.cpp */; };
 		26912BC31DEA81D5008C5FFD /* web_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26912BC21DEA81D5008C5FFD /* web_service.cpp */; };
@@ -410,6 +411,7 @@
 		266DD5F31C11DF1500D47AB0 /* camera_avfoundation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = camera_avfoundation.mm; sourceTree = "<group>"; };
 		266F12B21C97A13F00DE26FF /* block_cipher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = block_cipher.cpp; sourceTree = "<group>"; };
 		267C16B81CE779D8000318C2 /* scroll_bar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scroll_bar.cpp; sourceTree = "<group>"; };
+		2682C3EA1E2D211600E9CB98 /* parse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = parse.cpp; sourceTree = "<group>"; };
 		2688DD841C16F6E200973672 /* video_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_view.cpp; sourceTree = "<group>"; };
 		2688DD861C16FBDF00973672 /* camera_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera_view.cpp; sourceTree = "<group>"; };
 		26912BC21DEA81D5008C5FFD /* web_service.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = web_service.cpp; sourceTree = "<group>"; };
@@ -860,6 +862,7 @@
 				A25F2FAD1B03A33700854DAF /* memory.cpp */,
 				A25F2FAE1B03A33700854DAF /* mutex.cpp */,
 				2620412A1C88A95E00AF48F2 /* object.cpp */,
+				2682C3EA1E2D211600E9CB98 /* parse.cpp */,
 				A2DE1D861B383BA600A74698 /* pipe.cpp */,
 				A2DE1D841B383BA600A74698 /* pipe_unix.cpp */,
 				A25F2FB01B03A33700854DAF /* platform_apple.mm */,
@@ -1131,6 +1134,7 @@
 				26C7E37E1D00097000C0A769 /* linear_view.cpp in Sources */,
 				266DD5951C11940A00D47AB0 /* check_box_osx.mm in Sources */,
 				266DD5E21C11940A00D47AB0 /* web_view.cpp in Sources */,
+				2682C3EB1E2D211600E9CB98 /* parse.cpp in Sources */,
 				A25F300C1B03A33700854DAF /* app.cpp in Sources */,
 				26FA807C1C98891B0074F76B /* quaternion.cpp in Sources */,
 				26FBDE5D1DA2B40700FF1B55 /* font_apple.mm in Sources */,

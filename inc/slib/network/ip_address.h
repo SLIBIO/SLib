@@ -31,19 +31,19 @@ public:
 public:
 	SLIB_INLINE IPv4Address() = default;
 	
-	SLIB_CONSTEXPR IPv4Address(const IPv4Address& other):
+	constexpr IPv4Address(const IPv4Address& other):
 	 a(other.a), b(other.b), c(other.c), d(other.d)
 	{}
 
-	SLIB_CONSTEXPR IPv4Address(sl_uint8 const addr[4]):
+	constexpr IPv4Address(sl_uint8 const addr[4]):
 	 a(addr[0]), b(addr[1]), c(addr[2]), d(addr[3])
 	{}
 	
-	SLIB_CONSTEXPR IPv4Address(sl_uint8 _a, sl_uint8 _b, sl_uint8 _c, sl_uint8 _d):
+	constexpr IPv4Address(sl_uint8 _a, sl_uint8 _b, sl_uint8 _c, sl_uint8 _d):
 	 a(_a), b(_b), c(_c), d(_d)
 	{}
 	
-	SLIB_CONSTEXPR IPv4Address(sl_uint32 addr):
+	constexpr IPv4Address(sl_uint32 addr):
 	 a((sl_uint8)(addr >> 24)), b((sl_uint8)(addr >> 16)), c((sl_uint8)(addr >> 8)), d((sl_uint8)(addr))
 	{}
 	

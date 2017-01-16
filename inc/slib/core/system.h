@@ -47,7 +47,7 @@ public:
 	
 	static void yield();
 	
-	static void yield(sl_uint32 ellapsed);
+	static void yield(sl_uint32 elapsed);
 
 	
 	static void abort(const String& msg, const String& file, sl_uint32 line);

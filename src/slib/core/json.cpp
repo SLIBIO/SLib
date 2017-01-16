@@ -131,7 +131,7 @@ Variant _Json_Parser<ST, CT>::parseJson()
 	if (first == '"' || first == '\'') {
 		sl_size m = 0;
 		sl_bool f = sl_false;
-		ST str = ST::parseBackslashEscapes(buf + pos, len - pos, &m, &f);
+		ST str = ParseUtil::parseBackslashEscapes(buf + pos, len - pos, &m, &f);
 		pos += m;
 		if (f) {
 			flagError = sl_true;
@@ -236,7 +236,7 @@ Variant _Json_Parser<ST, CT>::parseJson()
 			} else if (ch == '"' || ch == '\'') {
 				sl_size m = 0;
 				sl_bool f = sl_false;
-				key = ST::parseBackslashEscapes(buf + pos, len - pos, &m, &f);
+				key = ParseUtil::parseBackslashEscapes(buf + pos, len - pos, &m, &f);
 				pos += m;
 				if (f) {
 					flagError = sl_true;
@@ -365,7 +365,7 @@ Variant _Json_Parser<ST, CT>::parseJson(const CT* buf, sl_size len, JsonParsePar
 	param.flagError = sl_true;
 	param.errorPosition = parser.pos;
 	param.errorMessage = parser.errorMessage;
-	param.errorLine = ST::countLineNumber(buf, parser.pos, &(param.errorColumn));
+	param.errorLine = ParseUtil::countLineNumber(buf, parser.pos, &(param.errorColumn));
 	
 	if (param.flagLogError) {
 		LogError("Json", param.getErrorText());

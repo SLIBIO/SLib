@@ -19,12 +19,12 @@ public:
 public:
 	QuaternionT() = default;
 	
-	SLIB_CONSTEXPR QuaternionT(const QuaternionT<T>& other):
+	constexpr QuaternionT(const QuaternionT<T>& other):
 	 x(other.x), y(other.y), z(other.z), w(other.w)
 	{}
 	
 	template <class O>
-	SLIB_CONSTEXPR QuaternionT(const QuaternionT<O>& other):
+	constexpr QuaternionT(const QuaternionT<O>& other):
 	 x((T)(other.x)), y((T)(other.y)), z((T)(other.z)), w((T)(other.w))
 	{}
 

@@ -34,51 +34,51 @@ template <>
 class MathContants<float>
 {
 public:
-	SLIB_CONSTEXPR static float PI = SLIB_PI;
-	SLIB_CONSTEXPR static float PI_DUAL = SLIB_PI_DUAL;
-	SLIB_CONSTEXPR static float PI_HALF = SLIB_PI_HALF;
-	SLIB_CONSTEXPR static float PI_QUARTER = SLIB_PI_QUARTER;
-	SLIB_CONSTEXPR static float EPSILON = SLIB_EPSILON;
+	constexpr static float PI = SLIB_PI;
+	constexpr static float PI_DUAL = SLIB_PI_DUAL;
+	constexpr static float PI_HALF = SLIB_PI_HALF;
+	constexpr static float PI_QUARTER = SLIB_PI_QUARTER;
+	constexpr static float EPSILON = SLIB_EPSILON;
 };
 
 template <>
 class MathContants<double>
 {
 public:
-	SLIB_CONSTEXPR static double PI = SLIB_PI_LONG;
-	SLIB_CONSTEXPR static double PI_DUAL = SLIB_PI_DUAL_LONG;
-	SLIB_CONSTEXPR static double PI_HALF = SLIB_PI_HALF_LONG;
-	SLIB_CONSTEXPR static double PI_QUARTER = SLIB_PI_QUARTER_LONG;
-	SLIB_CONSTEXPR static double EPSILON = SLIB_EPSILON_LONG;
+	constexpr static double PI = SLIB_PI_LONG;
+	constexpr static double PI_DUAL = SLIB_PI_DUAL_LONG;
+	constexpr static double PI_HALF = SLIB_PI_HALF_LONG;
+	constexpr static double PI_QUARTER = SLIB_PI_QUARTER_LONG;
+	constexpr static double EPSILON = SLIB_EPSILON_LONG;
 };
 
 class Math
 {
 public:
 	template <typename T>
-	SLIB_CONSTEXPR static T max(T a, T b)
+	constexpr static T max(T a, T b)
 	{
 		return (a > b) ? a : b;
 	}
 	
 	template <typename T>
-	SLIB_CONSTEXPR static T min(T a, T b)
+	constexpr static T min(T a, T b)
 	{
 		return (a < b) ? a : b;
 	}
 	
 	template <typename T>
-	SLIB_CONSTEXPR static T abs(T v)
+	constexpr static T abs(T v)
 	{
 		return (v > 0) ? (v) : (-v);
 	}
 	
-	SLIB_CONSTEXPR static sl_int32 sign(float v)
+	constexpr static sl_int32 sign(float v)
 	{
 		return (v >= 0) ? 1 : -1;
 	}
 	
-	SLIB_CONSTEXPR static sl_int32 sign(double v)
+	constexpr static sl_int32 sign(double v)
 	{
 		return (v >= 0) ? 1 : -1;
 	}
@@ -87,12 +87,12 @@ public:
 	
 	static double pow(double x, double y);
 	
-	SLIB_CONSTEXPR static float square(float x)
+	constexpr static float square(float x)
 	{
 		return x * x;
 	}
 	
-	SLIB_CONSTEXPR static double square(double x)
+	constexpr static double square(double x)
 	{
 		return x * x;
 	}
@@ -182,143 +182,143 @@ public:
 	static sl_bool isInfinite(double f);
 
 	
-	SLIB_CONSTEXPR static float saturate(float f)
+	constexpr static float saturate(float f)
 	{
 		return (f<0.0f) ? 0.0f : ((f>1.0f) ? 1.0f : f);
 	}
 	
-	SLIB_CONSTEXPR static double saturate(double f)
+	constexpr static double saturate(double f)
 	{
 		return (f<0.0) ? 0.0 : ((f>1.0) ? 1.0 : f);
 	}
 	
 	template <typename T>
-	SLIB_CONSTEXPR static T clamp(T v, T vMin, T vMax)
+	constexpr static T clamp(T v, T vMin, T vMax)
 	{
 		return (v<vMin) ? vMin : ((v>vMax) ? vMax : v);
 	}
 	
-	SLIB_CONSTEXPR static sl_int32 clamp0_255(sl_int32 v)
+	constexpr static sl_int32 clamp0_255(sl_int32 v)
 	{
 		// ((-v) >> 31) & v <=> arithmetic sign shift, clamp to >=0
 		return (((0xFF - (((-v) >> 31) & v)) >> 31) | (((-v) >> 31) & v)) & 0xFF; // clamp to < 256
 	}
 	
-	SLIB_CONSTEXPR static sl_int32 clamp0_65535(sl_int32 v)
+	constexpr static sl_int32 clamp0_65535(sl_int32 v)
 	{
 		// ((-v) >> 31) & v <=> arithmetic sign shift, clamp to >=0
 		return (((0xFFFF - (((-v) >> 31) & v)) >> 31) | (((-v) >> 31) & v)) & 0xFFFF; // clamp to < 65536
 	}
 
 	
-	SLIB_CONSTEXPR static sl_bool isAlmostZero(float f)
+	constexpr static sl_bool isAlmostZero(float f)
 	{
 		return f > -SLIB_EPSILON && f < SLIB_EPSILON;
 	}
 	
-	SLIB_CONSTEXPR static sl_bool isAlmostZero(double f)
+	constexpr static sl_bool isAlmostZero(double f)
 	{
 		return f > -SLIB_EPSILON_LONG && f < SLIB_EPSILON_LONG;
 	}
 	
-	SLIB_CONSTEXPR static sl_bool isAlmostZero(sl_int32 v)
+	constexpr static sl_bool isAlmostZero(sl_int32 v)
 	{
 		return v == 0;
 	}
 	
-	SLIB_CONSTEXPR static sl_bool isAlmostZero(sl_uint32 v)
+	constexpr static sl_bool isAlmostZero(sl_uint32 v)
 	{
 		return v == 0;
 	}
 	
-	SLIB_CONSTEXPR static sl_bool isAlmostZero(sl_int64 v)
+	constexpr static sl_bool isAlmostZero(sl_int64 v)
 	{
 		return v == 0;
 	}
 	
-	SLIB_CONSTEXPR static sl_bool isAlmostZero(sl_uint64 v)
+	constexpr static sl_bool isAlmostZero(sl_uint64 v)
 	{
 		return v == 0;
 	}
 
-	SLIB_CONSTEXPR static sl_bool isLessThanEpsilon(float f)
+	constexpr static sl_bool isLessThanEpsilon(float f)
 	{
 		return f < SLIB_EPSILON;
 	}
 	
-	SLIB_CONSTEXPR static sl_bool isLessThanEpsilon(double f)
+	constexpr static sl_bool isLessThanEpsilon(double f)
 	{
 		return f < SLIB_EPSILON_LONG;
 	}
 	
-	SLIB_CONSTEXPR static sl_bool isLessThanEpsilon(sl_int32 v)
+	constexpr static sl_bool isLessThanEpsilon(sl_int32 v)
 	{
 		return v <= 0;
 	}
 	
-	SLIB_CONSTEXPR static sl_bool isLessThanEpsilon(sl_uint32 v)
+	constexpr static sl_bool isLessThanEpsilon(sl_uint32 v)
 	{
 		return v <= 0;
 	}
 	
-	SLIB_CONSTEXPR static sl_bool isLessThanEpsilon(sl_int64 v)
+	constexpr static sl_bool isLessThanEpsilon(sl_int64 v)
 	{
 		return v <= 0;
 	}
 	
-	SLIB_CONSTEXPR static sl_bool isLessThanEpsilon(sl_uint64 v)
+	constexpr static sl_bool isLessThanEpsilon(sl_uint64 v)
 	{
 		return v <= 0;
 	}
 
 	
-	SLIB_CONSTEXPR static float getRadianFromDegrees(float f)
+	constexpr static float getRadianFromDegrees(float f)
 	{
 		return f * SLIB_PI / 180.0f;
 	}
 	
-	SLIB_CONSTEXPR static double getRadianFromDegrees(double f)
+	constexpr static double getRadianFromDegrees(double f)
 	{
 		return f * SLIB_PI_LONG / 180.0;
 	}
 	
-	SLIB_CONSTEXPR static float getDegreesFromRadian(float f)
+	constexpr static float getDegreesFromRadian(float f)
 	{
 		return f * 180.0f / SLIB_PI;
 	}
 	
-	SLIB_CONSTEXPR static double getDegreesFromRadian(double f)
+	constexpr static double getDegreesFromRadian(double f)
 	{
 		return f * 180.0 / SLIB_PI_LONG;
 	}
 	
 	
 	template <class T>
-	SLIB_CONSTEXPR static T PI()
+	constexpr static T PI()
 	{
 		return MathContants<T>::PI;
 	}
 	
 	template <class T>
-	SLIB_CONSTEXPR static T DualPI()
+	constexpr static T DualPI()
 	{
 		return MathContants<T>::PI_DUAL;
 	}
 	
 	template <class T>
-	SLIB_CONSTEXPR static T HalfPI()
+	constexpr static T HalfPI()
 	{
 		return MathContants<T>::PI_HALF;
 	}
 	
 	template <class T>
-	SLIB_CONSTEXPR static T QuarterPI()
+	constexpr static T QuarterPI()
 	{
 		return MathContants<T>::PI_QUARTER;
 	}
 	
 	template <class T>
-	SLIB_CONSTEXPR static T Epsilon()
+	constexpr static T Epsilon()
 	{
 		return MathContants<T>::EPSILON;
 	}
@@ -356,22 +356,22 @@ public:
 	static sl_uint64 roundUpToPowerOfTwo64(sl_uint64 num);
 
 	
-	SLIB_CONSTEXPR static sl_uint32 rotateLeft32(sl_uint32 x, sl_uint32 n)
+	constexpr static sl_uint32 rotateLeft32(sl_uint32 x, sl_uint32 n)
 	{
 		return (x << n) | (x >> (32 - n));
 	}
 	
-	SLIB_CONSTEXPR static sl_uint64 rotateLeft64(sl_uint64 x, sl_uint32 n)
+	constexpr static sl_uint64 rotateLeft64(sl_uint64 x, sl_uint32 n)
 	{
 		return (x << n) | (x >> (64 - n));
 	}
 	
-	SLIB_CONSTEXPR static sl_uint32 rotateRight32(sl_uint32 x, sl_uint32 n)
+	constexpr static sl_uint32 rotateRight32(sl_uint32 x, sl_uint32 n)
 	{
 		return (x >> n) | (x << (32 - n));
 	}
 	
-	SLIB_CONSTEXPR static sl_uint64 rotateRight64(sl_uint64 x, sl_uint32 n)
+	constexpr static sl_uint64 rotateRight64(sl_uint64 x, sl_uint32 n)
 	{
 		return (x >> n) | (x << (64 - n));
 	}

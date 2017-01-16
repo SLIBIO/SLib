@@ -239,12 +239,11 @@ void ViewPager::_goTo(sl_size index, const Transition& _transition)
 	}
 	
 	runAfterDraw([animationPause, animationResume] () {
-		Time now = Time::now();
 		if (animationPause.isNotNull()) {
-			animationPause->start(now);
+			animationPause->start();
 		}
 		if (animationResume.isNotNull()) {
-			animationResume->start(now);
+			animationResume->start();
 		}
 	});
 	
@@ -376,12 +375,11 @@ void ViewPager::_push(const Ref<View>& viewIn, const Transition& _transition, sl
 	}
 	
 	runAfterDraw([animationPause, animationPush] () {
-		Time now = Time::now();
 		if (animationPause.isNotNull()) {
-			animationPause->start(now);
+			animationPause->start();
 		}
 		if (animationPush.isNotNull()) {
-			animationPush->start(now);
+			animationPush->start();
 		}
 	});
 
@@ -460,12 +458,11 @@ void ViewPager::_pop(const Ref<View>& _viewOut, const Transition& _transition)
 	dispatchPageAction(viewOut.get(), UIPageAction::Pop);
 	dispatchPageAction(viewBack.get(), UIPageAction::Resume);
 	
-	Time now = Time::now();
 	if (animationPop.isNotNull()) {
-		animationPop->start(now);
+		animationPop->start();
 	}
 	if (animationResume.isNotNull()) {
-		animationResume->start(now);
+		animationResume->start();
 	}
 	
 	viewBack->bringToFront(UIUpdateMode::NoRedraw);

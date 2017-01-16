@@ -1020,9 +1020,9 @@ void Base::yield()
 	System::yield();
 }
 
-void Base::yield(sl_uint32 ellapsed)
+void Base::yield(sl_uint32 elapsed)
 {
-	System::yield(ellapsed);
+	System::yield(elapsed);
 }
 
 SLIB_NAMESPACE_END

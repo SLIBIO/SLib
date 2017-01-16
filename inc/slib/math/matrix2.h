@@ -21,18 +21,18 @@ public:
 public:
 	SLIB_INLINE Matrix2T() = default;
 	
-	SLIB_CONSTEXPR Matrix2T(const Matrix2T<T>& other):
+	constexpr Matrix2T(const Matrix2T<T>& other):
 	 m00(other.m00), m01(other.m01),
 	 m10(other.m10), m11(other.m11)
 	{}
 
 	template <class O>
-	SLIB_CONSTEXPR Matrix2T(const Matrix2T<O>& other):
+	constexpr Matrix2T(const Matrix2T<O>& other):
 	 m00((T)(other.m00)), m01((T)(other.m01)),
 	 m10((T)(other.m10)), m11((T)(other.m11))
 	{}
 
-	SLIB_CONSTEXPR Matrix2T(
+	constexpr Matrix2T(
 		T _m00, T _m01,
 		T _m10, T _m11
 	):

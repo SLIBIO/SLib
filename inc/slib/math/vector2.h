@@ -17,12 +17,12 @@ public:
 public:
 	SLIB_INLINE Vector2T() = default;
 	
-	SLIB_CONSTEXPR Vector2T(const Vector2T<T, FT>& other) : x(other.x), y(other.y) {}
+	constexpr Vector2T(const Vector2T<T, FT>& other) : x(other.x), y(other.y) {}
 
 	template <class O, class FO>
-	SLIB_CONSTEXPR Vector2T(const Vector2T<O, FO>& other) : x((T)(other.x)), y((T)(other.y)) {}
+	constexpr Vector2T(const Vector2T<O, FO>& other) : x((T)(other.x)), y((T)(other.y)) {}
 
-	SLIB_CONSTEXPR Vector2T(T _x, T _y) : x(_x), y(_y) {}
+	constexpr Vector2T(T _x, T _y) : x(_x), y(_y) {}
 
 public:
 	static const Vector2T<T, FT>& zero();

@@ -120,8 +120,6 @@ typedef sl_uint32			sl_char32;
 #	endif
 #endif
 
-#define SLIB_CONSTEXPR				constexpr
-
 
 SLIB_NAMESPACE_BEGIN
 	SLIB_INLINE void _blank_proc(const void*) {}

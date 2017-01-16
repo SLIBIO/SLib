@@ -124,9 +124,9 @@ public:
 		while (Thread::isNotStoppingCurrent()) {
 			runStep(engine.get());
 			if (Thread::isNotStoppingCurrent()) {
-				sl_uint64 t = timer.getEllapsedMilliseconds();
-				if (t < 20) {
-					Thread::sleep(20 - (sl_uint32)(t));
+				sl_uint64 t = timer.getElapsedMilliseconds();
+				if (t < 10) {
+					Thread::sleep(10 - (sl_uint32)(t));
 				}
 				timer.reset();
 			} else {

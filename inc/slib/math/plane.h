@@ -24,16 +24,16 @@ public:
 public:
 	SLIB_INLINE PlaneT() = default;
 	
-	SLIB_CONSTEXPR PlaneT(const PlaneT<T>& other):
+	constexpr PlaneT(const PlaneT<T>& other):
 	 a(other.a), b(other.b), c(other.c), d(other.d)
 	{}
 	
 	template <class O>
-	SLIB_CONSTEXPR PlaneT(const PlaneT<O>& other):
+	constexpr PlaneT(const PlaneT<O>& other):
 	 a((T)(other.a)), b((T)(other.b)), c((T)(other.c)), d((T)(other.d))
 	{}
 	
-	SLIB_CONSTEXPR PlaneT(T _a, T _b, T _c, T _d):
+	constexpr PlaneT(T _a, T _b, T _c, T _d):
 	 a(_a), b(_b), c(_c), d(_d)
 	{}
 	

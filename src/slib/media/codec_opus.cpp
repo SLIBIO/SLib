@@ -180,7 +180,7 @@ public:
 					m_flagResetBitrate = sl_false;
 				}
 #ifdef OPUS_RESET_INTERVAL
-				if (m_timeStartReset.getEllapsedMilliseconds() > OPUS_RESET_INTERVAL || ret <= 0) {
+				if (m_timeStartReset.getElapsedMilliseconds() > OPUS_RESET_INTERVAL || ret <= 0) {
 					Base::copyMemory(m_encoder, m_encoderBackup, m_sizeEncoder);
 					m_timeStartReset.reset();
 				}

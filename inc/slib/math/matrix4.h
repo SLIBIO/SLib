@@ -24,7 +24,7 @@ public:
 public:
 	SLIB_INLINE Matrix4T() = default;
 	
-	SLIB_CONSTEXPR Matrix4T(const Matrix4T<T>& other):
+	constexpr Matrix4T(const Matrix4T<T>& other):
 	 m00(other.m00), m01(other.m01), m02(other.m02), m03(other.m03),
 	 m10(other.m10), m11(other.m11), m12(other.m12), m13(other.m13),
 	 m20(other.m20), m21(other.m21), m22(other.m22), m23(other.m23),
@@ -32,7 +32,7 @@ public:
 	{}
 
 	template <class O>
-	SLIB_CONSTEXPR Matrix4T(const Matrix4T<O>& other):
+	constexpr Matrix4T(const Matrix4T<O>& other):
 	 m00((T)(other.m00)), m01((T)(other.m01)), m02((T)(other.m02)), m03((T)(other.m03)),
 	 m10((T)(other.m10)), m11((T)(other.m11)), m12((T)(other.m12)), m13((T)(other.m13)),
 	 m20((T)(other.m20)), m21((T)(other.m21)), m22((T)(other.m22)), m23((T)(other.m23)),

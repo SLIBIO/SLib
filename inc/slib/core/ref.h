@@ -81,9 +81,9 @@ template <class T>
 class SLIB_EXPORT Ref
 {
 public:
-	SLIB_CONSTEXPR Ref() : _ptr(sl_null) {}
+	constexpr Ref() : _ptr(sl_null) {}
 	
-	SLIB_CONSTEXPR Ref(sl_null_t) : _ptr(sl_null) {}
+	constexpr Ref(sl_null_t) : _ptr(sl_null) {}
 	
 	Ref(T* _other);
 	
@@ -226,9 +226,9 @@ template <class T>
 class Atomic< Ref<T> >
 {
 public:
-	SLIB_CONSTEXPR Atomic() : _ptr(sl_null) {}
+	constexpr Atomic() : _ptr(sl_null) {}
 	
-	SLIB_CONSTEXPR Atomic(sl_null_t) : _ptr(sl_null) {}
+	constexpr Atomic(sl_null_t) : _ptr(sl_null) {}
 	
 	Atomic(T* other);
 	

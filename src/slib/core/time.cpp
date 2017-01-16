@@ -1196,18 +1196,18 @@ Time TimeCounter::getTime(const Time& current) const
 {
 	Time last = m_timeLast;
 	if (current > last) {
-		return current - last + m_timeEllapsed;
+		return current - last + m_timeElapsed;
 	} else {
-		return m_timeEllapsed;
+		return m_timeElapsed;
 	}
 }
 
-sl_uint64 TimeCounter::getEllapsedMilliseconds() const
+sl_uint64 TimeCounter::getElapsedMilliseconds() const
 {
 	return getTime().getMillisecondsCount();
 }
 
-sl_uint64 TimeCounter::getEllapsedMilliseconds(const Time& current) const
+sl_uint64 TimeCounter::getElapsedMilliseconds(const Time& current) const
 {
 	return getTime(current).getMillisecondsCount();
 }
@@ -1220,7 +1220,7 @@ void TimeCounter::reset()
 void TimeCounter::reset(const Time& current)
 {
 	m_timeLast = current;
-	m_timeEllapsed.setZero();
+	m_timeElapsed.setZero();
 }
 
 void TimeCounter::update()
@@ -1232,14 +1232,14 @@ void TimeCounter::update(const Time& current)
 {
 	Time last = m_timeLast;
 	if (current > last) {
-		m_timeEllapsed += (current - last);
+		m_timeElapsed += (current - last);
 	}
 	m_timeLast = current;
 }
 
 
 TimeKeeper::TimeKeeper()
-: m_flagStarted(sl_false), m_flagRunning(sl_false), m_timeLast(0), m_timeEllapsed(0)
+: m_flagStarted(sl_false), m_flagRunning(sl_false), m_timeLast(0), m_timeElapsed(0)
 {
 }
 
@@ -1265,7 +1265,7 @@ void TimeKeeper::startAndSetTime(const Time& init, const Time& current)
 		return;
 	}
 	m_timeLast = current;
-	m_timeEllapsed = init;
+	m_timeElapsed = init;
 	m_flagStarted = sl_true;
 	m_flagRunning = sl_true;
 }
@@ -1289,7 +1289,7 @@ void TimeKeeper::restartAndSetTime(const Time& init, const Time& current)
 {
 	SpinLocker lock(&m_lock);
 	m_timeLast = current;
-	m_timeEllapsed = init;
+	m_timeElapsed = init;
 	m_flagStarted = sl_true;
 	m_flagRunning = sl_true;
 }
@@ -1326,7 +1326,7 @@ void TimeKeeper::pause(const Time& current)
 	if (m_flagStarted) {
 		if (m_flagRunning) {
 			if (current > m_timeLast) {
-				m_timeEllapsed += (current - m_timeLast);
+				m_timeElapsed += (current - m_timeLast);
 			}
 			m_flagRunning = sl_false;
 		}
@@ -1345,9 +1345,9 @@ Time TimeKeeper::getTime(const Time& current) const
 		return Time::zero();
 	}
 	if (!m_flagRunning) {
-		return m_timeEllapsed;
+		return m_timeElapsed;
 	}
-	return m_timeEllapsed + (current - m_timeLast);
+	return m_timeElapsed + (current - m_timeLast);
 }
 
 void TimeKeeper::setTime(const Time& time)
@@ -1359,7 +1359,7 @@ void TimeKeeper::setTime(const Time& time, const Time& current)
 {
 	SpinLocker lock(&m_lock);
 	if (m_flagStarted) {
-		m_timeEllapsed = time;
+		m_timeElapsed = time;
 		m_timeLast = current;
 	}
 }
@@ -1376,7 +1376,7 @@ void TimeKeeper::update(const Time& current)
 		if (m_flagRunning) {
 			sl_int64 add = (current - m_timeLast).toInt();
 			if (add > 0) {
-				m_timeEllapsed += add;
+				m_timeElapsed += add;
 			}
 			m_timeLast = current;
 		}
@@ -1400,7 +1400,7 @@ sl_bool TimeKeeper::isRunning() const
 
 sl_bool TimeKeeper::isNotRunning() const
 {
-	return m_flagStarted && m_flagRunning;
+	return !(m_flagStarted && m_flagRunning);
 }
 
 sl_bool TimeKeeper::isPaused() const

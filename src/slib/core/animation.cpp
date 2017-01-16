@@ -6,135 +6,6 @@
 
 SLIB_NAMESPACE_BEGIN
 
-class _AnimationCenter
-{
-public:
-	CList< Ref<Animation> > m_animations;
-	Ref<Thread> m_thread;
-	SpinLock m_lock;
-	
-	sl_bool m_flagUpdateList;
-	sl_bool m_flagPaused;
-
-public:
-	_AnimationCenter()
-	{
-		m_flagUpdateList = sl_false;
-		m_flagPaused = sl_false;
-	}
-	
-	~_AnimationCenter()
-	{
-		if (m_thread.isNotNull()) {
-			m_thread->finishAndWait();
-		}
-	}
-	
-	void addAnimation(Animation* animation)
-	{
-		if (!animation) {
-			return;
-		}
-		if (m_animations.addIfNotExist(animation)) {
-			m_flagUpdateList = sl_true;
-			SpinLocker lock(&m_lock);
-			if (m_thread.isNull()) {
-				m_thread = Thread::start(SLIB_FUNCTION_CLASS(_AnimationCenter, run, this));
-			} else {
-				m_thread->wake();
-			}
-		}
-	}
-	
-	void removeAnimation(Animation* animation)
-	{
-		if (!animation) {
-			return;
-		}
-		ListLocker< Ref<Animation> > list(m_animations);
-		sl_size n = list.count;
-		for (sl_size i = 0; i < n;) {
-			if (list[i].get() == animation) {
-				for (sl_size j = i + 1; j < n; j++) {
-					list[j - 1] = list[j];
-				}
-				n--;
-			} else {
-				i++;
-			}
-		}
-		if (n < list.count) {
-			m_animations.setCount(n);
-		}
-		m_flagUpdateList = sl_true;
-		if (m_thread.isNotNull()) {
-			m_thread->wake();
-		}
-	}
-	
-	void run()
-	{
-		TimeCounter timer;
-		
-		List< Ref<Animation> > animations;
-		
-		while (Thread::isNotStoppingCurrent()) {
-			if (m_flagPaused) {
-				Thread::sleep(100000);
-			} else {
-				if (m_flagUpdateList) {
-					m_flagUpdateList = sl_false;
-					animations = m_animations.duplicate();
-				}
-				
-				ListElements< Ref<Animation> > list(animations);
-				if (list.count > 0) {
-					Time now = Time::now();
-					for (sl_size i = 0; i < list.count; i++) {
-						Ref<Animation> animation = list[i];
-						if (animation.isNotNull()) {
-							if (animation->isStopped()) {
-								removeAnimation(animation.get());
-							} else {
-								animation->update(now);
-							}
-						}
-					}
-				}
-				if (Thread::isNotStoppingCurrent()) {
-					if (list.count > 0) {
-						sl_uint64 t = timer.getEllapsedMilliseconds();
-						if (t < 10) {
-							Thread::sleep(10 - (sl_uint32)(t));
-						}
-					} else {
-						Thread::sleep(100000);
-					}
-					timer.reset();
-				} else {
-					break;
-				}
-			}
-		}
-	}
-	
-	void pause()
-	{
-		m_flagPaused = sl_true;
-	}
-	
-	void resume()
-	{
-		m_flagPaused = sl_false;
-		if (m_thread.isNotNull()) {
-			m_thread->wake();
-		}
-	}
-	
-};
-
-SLIB_SAFE_STATIC_GETTER(_AnimationCenter, _AnimationCenter_get)
-
 void IAnimationListener::onAnimationFrame(Animation* animation, float time)
 {
 }
@@ -152,12 +23,12 @@ SLIB_DEFINE_OBJECT(Animation, Object)
 
 Animation::Animation()
 {
+	m_time = 0;
 	m_duration = 1;
-	m_timeDuration.setSecondsCount(1);
 	m_delay = 0;
-	m_timeDelay.setZero();
 	m_repeatCount = 0;
 	m_flagAutoReverse = sl_false;
+	m_flagAbsoluteTime = sl_false;
 	
 	m_curve = AnimationCurve::Linear;
 	m_curveEaseFactor = 1.0f;
@@ -167,6 +38,7 @@ Animation::Animation()
 	m_curveTension = 2.0f;
 	
 	m_flagStarted = sl_false;
+	m_flagRunning = sl_false;
 	m_lastRepeatedCount = 0;
 
 }
@@ -178,131 +50,23 @@ Animation::~Animation()
 
 Ref<Animation> Animation::create(float duration)
 {
+	return create(duration, AnimationLoop::getDefault());
+}
+
+Ref<Animation> Animation::create(float duration, const Ref<AnimationLoop>& loop)
+{
 	Ref<Animation> ret = new Animation;
 	if (ret.isNotNull()) {
 		ret->setDuration(duration);
+		ret->m_loop = loop;
 		return ret;
 	}
 	return sl_null;
 }
 
-void Animation::pauseAnimationCenter()
+Ref<AnimationLoop> Animation::getLoop()
 {
-	_AnimationCenter* center = _AnimationCenter_get();
-	if (center) {
-		center->pause();
-	}
-}
-
-void Animation::resumeAnimationCenter()
-{
-	_AnimationCenter* center = _AnimationCenter_get();
-	if (center) {
-		center->resume();
-	}
-}
-
-float Animation::getDuration()
-{
-	return m_duration;
-}
-
-void Animation::setDuration(float seconds)
-{
-	if (seconds < SLIB_ANIMATION_DURATION_MINIMUM_SECONDS) {
-		seconds = SLIB_ANIMATION_DURATION_MINIMUM_SECONDS;
-	}
-	m_duration = seconds;
-	m_timeDuration.setSecondsCountf(seconds);
-}
-
-float Animation::getStartDelay()
-{
-	return m_delay;
-}
-
-void Animation::setStartDelay(float seconds)
-{
-	m_delay = seconds;
-	m_timeDelay.setSecondsCountf(seconds);
-}
-
-sl_int32 Animation::getRepeatCount()
-{
-	return m_repeatCount;
-}
-
-void Animation::setRepeatCount(sl_int32 count)
-{
-	m_repeatCount = count;
-}
-
-sl_bool Animation::isRepeatForever()
-{
-	return m_repeatCount < 0;
-}
-
-void Animation::setRepeatForever(sl_bool flagRepeatForever)
-{
-	if (flagRepeatForever) {
-		m_repeatCount = -1;
-	} else {
-		if (m_repeatCount < 0) {
-			m_repeatCount = 0;
-		}
-	}
-}
-
-sl_bool Animation::isAutoReverse()
-{
-	return m_flagAutoReverse;
-}
-
-void Animation::setAutoReverse(sl_bool flagReverse)
-{
-	m_flagAutoReverse = flagReverse;
-}
-
-AnimationCurve Animation::getAnimationCurve()
-{
-	return m_curve;
-}
-
-void Animation::setAnimationCurve(AnimationCurve curve)
-{
-	m_curve = curve;
-}
-
-float Animation::getAnimationCurveEaseFactor()
-{
-	return m_curveEaseFactor;
-}
-
-void Animation::setAnimationCurveEaseFactor(float factor)
-{
-	m_curveEaseFactor = factor;
-	m_curveEaseDoubleFactor = factor * 2;
-}
-
-float Animation::getAnimationCurveCycles()
-{
-	return m_curveCycles;
-}
-
-void Animation::setAnimationCurveCycles(float cycles)
-{
-	m_curveCycles = cycles;
-	m_curveCycles2PI = cycles * SLIB_PI_DUAL;
-}
-
-float Animation::getAnimationCurveTension()
-{
-	return m_curveTension;
-}
-
-void Animation::setAnimationCurveTension(float tension)
-{
-	m_curveTension = tension;
+	return m_loop;
 }
 
 void Animation::addTarget(const Ref<AnimationTarget>& target)
@@ -347,69 +111,215 @@ void Animation::unlinkAllAnimations()
 	m_linkedAnimations.removeAll();
 }
 
-void Animation::start()
+float Animation::getTime()
 {
-	startAndSetTime(0, Time::now());
+	return m_time;
 }
 
-void Animation::start(const Time& current)
+void Animation::setTime(float seconds, sl_bool flagUpdateFrame)
 {
-	startAndSetTime(0, current);
+	m_time = seconds;
+	if (flagUpdateFrame) {
+		update(0);
+	}
 }
 
-void Animation::startAndSetTime(float initialTime)
+float Animation::getDuration()
 {
-	startAndSetTime(initialTime, Time::now());
+	return m_duration;
 }
 
-void Animation::startAndSetTime(float initialTime, const Time& current)
+void Animation::setDuration(float seconds)
+{
+	if (seconds < SLIB_ANIMATION_DURATION_MINIMUM_SECONDS) {
+		seconds = SLIB_ANIMATION_DURATION_MINIMUM_SECONDS;
+	}
+	m_duration = seconds;
+}
+
+float Animation::getStartDelay()
+{
+	return m_delay;
+}
+
+void Animation::setStartDelay(float seconds)
+{
+	m_delay = seconds;
+}
+
+sl_int32 Animation::getRepeatCount()
+{
+	return m_repeatCount;
+}
+
+void Animation::setRepeatCount(sl_int32 count)
+{
+	m_repeatCount = count;
+}
+
+sl_bool Animation::isRepeatForever()
+{
+	return m_repeatCount < 0;
+}
+
+void Animation::setRepeatForever(sl_bool flagRepeatForever)
+{
+	if (flagRepeatForever) {
+		m_repeatCount = -1;
+	} else {
+		if (m_repeatCount < 0) {
+			m_repeatCount = 0;
+		}
+	}
+}
+
+sl_bool Animation::isAutoReverse()
+{
+	return m_flagAutoReverse;
+}
+
+void Animation::setAutoReverse(sl_bool flagReverse)
+{
+	m_flagAutoReverse = flagReverse;
+}
+
+sl_bool Animation::isAbsoluteTime()
+{
+	return m_flagAbsoluteTime;
+}
+
+void Animation::setAbsoluteTime(sl_bool flagAbsolute)
+{
+	m_flagAbsoluteTime = flagAbsolute;
+}
+
+AnimationCurve Animation::getAnimationCurve()
+{
+	return m_curve;
+}
+
+void Animation::setAnimationCurve(AnimationCurve curve)
+{
+	m_curve = curve;
+}
+
+float Animation::getAnimationCurveEaseFactor()
+{
+	return m_curveEaseFactor;
+}
+
+void Animation::setAnimationCurveEaseFactor(float factor)
+{
+	m_curveEaseFactor = factor;
+	m_curveEaseDoubleFactor = factor * 2;
+}
+
+float Animation::getAnimationCurveCycles()
+{
+	return m_curveCycles;
+}
+
+void Animation::setAnimationCurveCycles(float cycles)
+{
+	m_curveCycles = cycles;
+	m_curveCycles2PI = cycles * SLIB_PI_DUAL;
+}
+
+float Animation::getAnimationCurveTension()
+{
+	return m_curveTension;
+}
+
+void Animation::setAnimationCurveTension(float tension)
+{
+	m_curveTension = tension;
+}
+
+Function<float(float)> Animation::getCustomAnimationCurve()
+{
+	return m_customAnimationCurve;
+}
+
+void Animation::setCustomAnimationCurve(const Function<float(float)>& curve)
+{
+	m_customAnimationCurve = curve;
+}
+
+float Animation::getCurrentTime(sl_uint32* outRepeatedCount)
 {
 	ObjectLocker lock(this);
-	if (m_timer.isStarted()) {
+	sl_uint32 iRepeat;
+	sl_bool flagStop;
+	float time = _getTime(iRepeat, flagStop);
+	if (outRepeatedCount) {
+		*outRepeatedCount = iRepeat;
+	}
+	return time;
+}
+
+float Animation::getTimeFraction()
+{
+	float time = getCurrentTime();
+	return _getFraction(time);
+}
+
+sl_uint32 Animation::getRepeatedCount()
+{
+	return m_lastRepeatedCount;
+}
+
+
+void Animation::start(sl_bool flagUpdateFrame)
+{
+	startAt(0, flagUpdateFrame);
+}
+
+void Animation::startAt(float seconds, sl_bool flagUpdateFrame)
+{
+	ObjectLocker lock(this);
+	
+	if (m_flagStarted) {
 		return;
 	}
+	
 	m_flagStarted = sl_true;
+	m_flagRunning = sl_false;
+	m_time = seconds;
 	
-	Time t;
-	t.setSecondsCountf(initialTime);
-	m_timer.startAndSetTime(t, current);
-	_AnimationCenter* center = _AnimationCenter_get();
-	if (center) {
-		center->addAnimation(this);
+	_resume();
+	
+	lock.unlock();
+	
+	if (flagUpdateFrame) {
+		update(0);
 	}
-	
-	if (initialTime < SLIB_EPSILON) {
-		lock.unlock();
-		dispatchAnimationFrame(0);
-	}
-	
+
 }
 
-void Animation::restart()
+void Animation::restart(sl_bool flagUpdateFrame)
 {
-	restartAndSetTime(0, Time::now());
+	restartAt(0, flagUpdateFrame);
 }
 
-void Animation::restart(const Time& current)
-{
-	restartAndSetTime(0, current);
-}
-
-void Animation::restartAndSetTime(float initialTime)
-{
-	restartAndSetTime(initialTime, Time::now());
-}
-
-void Animation::restartAndSetTime(float initialTime, const Time& current)
+void Animation::restartAt(float seconds, sl_bool flagUpdateFrame)
 {
 	ObjectLocker lock(this);
-	if (m_timer.isStarted()) {
-		Time t;
-		t.setSecondsCountf(initialTime);
-		m_timer.restartAndSetTime(t, current);
-	} else {
-		startAndSetTime(initialTime, current);
+
+	if (!m_flagStarted) {
+		m_flagStarted = sl_true;
+		m_flagRunning = sl_false;
 	}
+	
+	m_time = seconds;
+	
+	_resume();
+	
+	lock.unlock();
+
+	if (flagUpdateFrame) {
+		update(0);
+	}
+
 }
 
 void Animation::stop()
@@ -424,129 +334,88 @@ void Animation::stop()
 
 sl_bool Animation::_stop()
 {
-	sl_bool flagStarted = m_timer.isStarted();
-	m_timer.stop();
-	if (flagStarted) {
-		_AnimationCenter* center = _AnimationCenter_get();
-		if (center) {
-			center->removeAnimation(this);
-		}
-		return sl_true;
-	}
-	return sl_false;
+	_pause();
+	sl_bool flagStarted = m_flagStarted;
+	m_flagStarted = sl_false;
+	return flagStarted;
 }
 
 void Animation::resume()
 {
-	resume(Time::now());
+	ObjectLocker lock(this);
+	_resume();
 }
 
-void Animation::resume(const Time& current)
+void Animation::_resume()
 {
-	m_timer.resume(current);
+	if (!m_flagStarted) {
+		return;
+	}
+	if (m_flagRunning) {
+		return;
+	}
+	Ref<AnimationLoop> loop(m_loop);
+	if (loop.isNotNull()) {
+		loop->addAnimation(this);
+	}
+	m_flagRunning = sl_true;
 }
 
 void Animation::pause()
 {
-	pause(Time::now());
-}
-
-void Animation::pause(const Time& current)
-{
-	m_timer.pause(current);
-}
-
-float Animation::getCurrentTime(sl_uint32* outRepeatedCount)
-{
-	return getCurrentTime(Time::now(), outRepeatedCount);
-}
-
-float Animation::getCurrentTime(const Time& current, sl_uint32* outRepeatedCount)
-{
 	ObjectLocker lock(this);
-	sl_uint32 iRepeat;
-	sl_bool flagStop;
-	float time = _getTime(current, iRepeat, flagStop);
-	if (outRepeatedCount) {
-		*outRepeatedCount = iRepeat;
+	_pause();
+}
+
+void Animation::_pause()
+{
+	if (!m_flagStarted) {
+		return;
 	}
-	return time;
-}
-
-float Animation::getEllapsedSeconds()
-{
-	return getEllapsedSeconds(Time::now());
-}
-
-float Animation::getEllapsedSeconds(const Time& current)
-{
-	return (float)(m_timer.getTime(current).getSecondsCountf());
-}
-
-void Animation::setEllapsedSeconds(float time)
-{
-	setEllapsedSeconds(time, Time::now());
-}
-
-void Animation::setEllapsedSeconds(float time, const Time& current)
-{
-	Time t;
-	t.setSecondsCountf(time);
-	m_timer.setTime(t, current);
-}
-
-float Animation::getTimeFraction()
-{
-	return getTimeFraction(Time::now());
-}
-
-float Animation::getTimeFraction(const Time& current)
-{
-	float time = getCurrentTime(current);
-	return _getFraction(time);
-}
-
-sl_uint32 Animation::getTotalRepeatedCount()
-{
-	return m_lastRepeatedCount;
+	if (!m_flagRunning) {
+		return;
+	}
+	Ref<AnimationLoop> loop(m_loop);
+	if (loop.isNotNull()) {
+		loop->removeAnimation(this);
+	}
+	m_flagRunning = sl_false;
 }
 
 sl_bool Animation::isStarted()
 {
-	return m_timer.isStarted();
+	return m_flagStarted;
 }
 
 sl_bool Animation::isStopped()
 {
-	return m_timer.isStopped();
+	return !m_flagStarted;
 }
 
 sl_bool Animation::isRunning()
 {
-	return m_timer.isRunning();
+	return m_flagStarted && m_flagRunning;
 }
 
 sl_bool Animation::isNotRunning()
 {
-	return m_timer.isNotRunning();
+	return !(m_flagStarted && m_flagRunning);
 }
 
 sl_bool Animation::isPaused()
 {
-	return m_timer.isPaused();
+	return m_flagStarted && !m_flagRunning;
 }
 
-void Animation::update()
-{
-	update(Time::now());
-}
-
-void Animation::update(const Time& current)
+void Animation::update(float elapsedSeconds)
 {
 	ObjectLocker lock(this);
-	if (!(m_timer.isStarted())) {
+	
+	if (!m_flagStarted) {
 		return;
 	}
+	
+	m_time += elapsedSeconds;
 	
 	sl_int32 repeat = m_repeatCount;
 	sl_uint32 lastRepeat = m_lastRepeatedCount;
@@ -554,7 +423,7 @@ void Animation::update(const Time& current)
 
 	sl_uint32 iRepeat;
 	sl_bool flagStop;
-	float time = _getTime(current, iRepeat, flagStop);
+	float time = _getTime(iRepeat, flagStop);
 	m_lastRepeatedCount = iRepeat;
 	
 	sl_bool flagStopped = sl_false;
@@ -580,6 +449,7 @@ void Animation::update(const Time& current)
 	if (flagStopped) {
 		dispatchStopAnimation();
 	}
+	
 }
 
 void Animation::onAnimationFrame(float time)
@@ -638,28 +508,28 @@ void Animation::dispatchStopAnimation()
 	if (listener.isNotNull()) {
 		listener->onStopAnimation(this);
 	}
-	Time now = Time::now();
+	
 	ListLocker< Ref<Animation> > linkedAnimations(m_linkedAnimations);
 	for (sl_size i = 0; i < linkedAnimations.count; i++) {
 		Ref<Animation>& animation = linkedAnimations[i];
 		if (animation.isNotNull()) {
-			animation->start(now);
+			animation->start();
 		}
 	}
 }
 
-float Animation::_getTime(const Time& current, sl_uint32& iRepeat, sl_bool& flagStop)
+float Animation::_getTime(sl_uint32& iRepeat, sl_bool& flagStop)
 {
 	iRepeat = 0;
 	flagStop = sl_false;
 	
 	if (m_flagStarted) {
-		sl_int64 duration = m_timeDuration.toInt();
+		sl_int64 duration = (sl_int64)(m_duration * 1000);
 		if (duration < 1) {
 			return 0;
 		}
 		sl_int32 repeat = m_repeatCount;
-		if (m_timer.isStopped()) {
+		if (!m_flagStarted) {
 			iRepeat = m_lastRepeatedCount;
 			if (repeat > 0 && m_flagAutoReverse && (repeat & 1)) {
 				return 0;
@@ -668,8 +538,8 @@ float Animation::_getTime(const Time& current, sl_uint32& iRepeat, sl_bool& flag
 			}
 		}
 		
-		sl_int64 delay = m_timeDelay.toInt();
-		sl_int64 t = m_timer.getTime(current).toInt() - delay;
+		sl_int64 delay = (sl_int64)(m_delay * 1000);
+		sl_int64 t = (sl_int64)(m_time * 1000) - delay;
 		if (t <= 0) {
 			return 0;
 		}
@@ -697,7 +567,7 @@ float Animation::_getTime(const Time& current, sl_uint32& iRepeat, sl_bool& flag
 				}
 			}
 		}
-		return (float)(Time(t).getSecondsCountf());
+		return (float)t / 1000.0f;
 	}
 	return 0;
 }
@@ -713,7 +583,7 @@ float Animation::_getFraction(float time)
 	return time;
 }
 
-SLIB_INLINE static float _Animation_bounce(float f)
+constexpr static float _Animation_bounce(float f)
 {
 	return f * f * 8.0f;
 }
@@ -776,7 +646,7 @@ float Animation::_applyCurve(float f)
 			}
 		case AnimationCurve::Custom:
 			{
-				Function<float(float)> func = getCustomAnimationCurve();
+				Function<float(float)> func = m_customAnimationCurve;
 				if (func.isNotNull()) {
 					return func(f);
 				}
@@ -784,6 +654,214 @@ float Animation::_applyCurve(float f)
 			}
 	}
 	return f;
+}
+
+
+AnimationLoop::AnimationLoop()
+{
+	m_flagPaused = sl_false;
+	m_flagUpdateList = sl_false;
+	m_lastTime = 0;
+}
+
+AnimationLoop::~AnimationLoop()
+{
+}
+
+void AnimationLoop::addAnimation(Animation* animation)
+{
+	if (!animation) {
+		return;
+	}
+	ObjectLocker lock(this);
+	if (m_animations.addIfNotExist_NoLock(animation)) {
+		m_flagUpdateList = sl_true;
+	}
+	if (!m_flagPaused) {
+		_wake();
+	}
+}
+
+void AnimationLoop::removeAnimation(Animation* animation)
+{
+	if (!animation) {
+		return;
+	}
+	ObjectLocker lock(this);
+	if (m_animations.removeValue_NoLock(animation)) {
+		m_flagUpdateList = sl_true;
+	}
+	if (!m_flagPaused) {
+		_wake();
+	}
+}
+
+void AnimationLoop::pause()
+{
+	ObjectLocker lock(this);
+	if (m_flagPaused) {
+		return;
+	}
+	m_flagPaused = sl_true;
+	_pause();
+}
+
+void AnimationLoop::resume()
+{
+	ObjectLocker lock(this);
+	if (!m_flagPaused) {
+		return;
+	}
+	m_flagPaused = sl_false;
+	_resume();
+}
+
+sl_bool AnimationLoop::isPaused()
+{
+	return m_flagPaused;
+}
+
+void AnimationLoop::wake()
+{
+	ObjectLocker lock(this);
+	if (!m_flagPaused) {
+		_wake();
+	}
+}
+
+sl_int32 AnimationLoop::_runStep()
+{
+	if (m_flagUpdateList) {
+		m_flagUpdateList = sl_false;
+		ObjectLocker lock(this);
+		m_animationsRunning = m_animations.duplicate_NoLock();
+	}
+	
+	if (m_flagPaused || m_animationsRunning.isEmpty()) {
+		m_lastTime = 0;
+		return -1;
+	}
+	
+	Time tCurrent = Time::now();
+	sl_int64 timeCurrent = tCurrent.getMillisecondsCount();
+	if (m_lastTime == 0) {
+		m_lastTime = timeCurrent;
+	}
+	float elapsedAbsolute = (float)(timeCurrent - m_lastTime) / 1000.0f;
+	if (elapsedAbsolute < 0) {
+		elapsedAbsolute = 0;
+	}
+	float elapsed = elapsedAbsolute;
+	if (elapsed > 0.1f) {
+		elapsed = 0.1f;
+	}
+	
+	ListElements< Ref<Animation> > list(m_animations);
+	if (list.count > 0) {
+		for (sl_size i = 0; i < list.count; i++) {
+			Ref<Animation> animation = list[i];
+			if (animation.isNotNull()) {
+				if (animation->isStopped()) {
+					removeAnimation(animation.get());
+				} else {
+					if (animation->isAbsoluteTime()) {
+						animation->update(elapsedAbsolute);
+					} else {
+						animation->update(elapsed);
+					}
+				}
+			}
+		}
+	}
+	
+	m_lastTime = timeCurrent;
+	Time tEnd = Time::now();
+	
+	sl_int64 n = (tEnd - tCurrent).getMillisecondsCount();
+	if (n < 10) {
+		if (n < 0) {
+			n = 0;
+		}
+		return (sl_int32)(10 - n);
+	} else {
+		return 0;
+	}
+	
+}
+
+
+class _DefaultAnimationLoop : public AnimationLoop
+{
+public:
+	Ref<Thread> m_thread;
+	
+public:
+	_DefaultAnimationLoop()
+	{
+		SLIB_REFERABLE_CONSTRUCTOR
+		
+		if (m_thread.isNull()) {
+			m_thread = Thread::start(SLIB_FUNCTION_CLASS(_DefaultAnimationLoop, run, this));
+		} else {
+			m_thread->wake();
+		}
+
+	}
+	
+	~_DefaultAnimationLoop()
+	{
+		if (m_thread.isNotNull()) {
+			m_thread->finishAndWait();
+		}
+	}
+	
+public:
+	// override
+	void _pause()
+	{
+	}
+	
+	// override
+	void _resume()
+	{
+		if (m_thread.isNotNull()) {
+			m_thread->wake();
+		}
+	}
+	
+	// override
+	void _wake()
+	{
+		if (m_thread.isNotNull()) {
+			m_thread->wake();
+		}
+	}
+	
+	void run()
+	{
+		while (Thread::isNotStoppingCurrent()) {
+			sl_int32 n = _runStep();
+			if (n < 0) {
+				Thread::sleep(100000);
+			} else {
+				if (n > 0) {
+					Thread::sleep(n);
+				}
+			}
+		}
+	}
+	
+};
+
+SLIB_SAFE_STATIC_GETTER(Ref<AnimationLoop>, _AnimationLoop_getDefault, new _DefaultAnimationLoop)
+
+Ref<AnimationLoop> AnimationLoop::getDefault()
+{
+	Ref<AnimationLoop>* pLoop = _AnimationLoop_getDefault();
+	if (pLoop) {
+		return *pLoop;
+	}
+	return sl_null;
 }
 
 
@@ -805,14 +883,9 @@ void AnimationTarget::setAnimation(const Ref<Animation>& animation)
 
 void AnimationTarget::forceUpdate()
 {
-	forceUpdate(Time::now());
-}
-
-void AnimationTarget::forceUpdate(const Time& current)
-{
 	Ref<Animation> animation(m_animation);
 	if (animation.isNotNull()) {
-		float fraction = animation->getTimeFraction(current);
+		float fraction = animation->getTimeFraction();
 		update(fraction);
 	}
 }

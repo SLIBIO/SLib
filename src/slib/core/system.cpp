@@ -53,12 +53,12 @@ void System::setCrashHandler(SIGNAL_HANDLER handler)
 }
 #endif
 
-void System::yield(sl_uint32 ellapsed)
+void System::yield(sl_uint32 elapsed)
 {
-	if (ellapsed < 16) {
+	if (elapsed < 16) {
 		return;
 	}
-	if (ellapsed < 32) {
+	if (elapsed < 32) {
 		System::yield();
 	} else {
 		System::sleep(1);

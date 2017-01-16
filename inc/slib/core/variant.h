@@ -49,7 +49,7 @@ public:
 	VariantType _type;
 
 public:
-	SLIB_CONSTEXPR Variant() : _value(0), _type(VariantType::Null) {}
+	constexpr Variant() : _value(0), _type(VariantType::Null) {}
 	
 	Variant(Variant&& other);
 	
@@ -469,7 +469,7 @@ private:
 	SpinLock m_lock;
 	
 public:
-	SLIB_CONSTEXPR Atomic() : _value(0), _type(VariantType::Null) {}
+	constexpr Atomic() : _value(0), _type(VariantType::Null) {}
 	
 	Atomic(AtomicVariant&& other);
 	

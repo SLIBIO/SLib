@@ -50,7 +50,7 @@ template<>
 class Hash<Keycode>
 {
 public:
-	SLIB_CONSTEXPR sl_uint32 operator()(const Keycode& code) const
+	constexpr sl_uint32 operator()(const Keycode& code) const
 	{
 		return Rehash((sl_uint32)code);
 	}
@@ -64,11 +64,11 @@ public:
 	SLIB_MEMBERS_OF_PRIMITIVE_WRAPPER(KeycodeAndModifiers, int, value)
 	
 public:
-	SLIB_CONSTEXPR KeycodeAndModifiers() : value(0) {}
+	constexpr KeycodeAndModifiers() : value(0) {}
 	
-	SLIB_CONSTEXPR KeycodeAndModifiers(Keycode keycode) : value((int)keycode) {}
+	constexpr KeycodeAndModifiers(Keycode keycode) : value((int)keycode) {}
 	
-	SLIB_CONSTEXPR KeycodeAndModifiers(Keycode keycode, const Modifiers& modifiers) : value((int)keycode | modifiers) {}
+	constexpr KeycodeAndModifiers(Keycode keycode, const Modifiers& modifiers) : value((int)keycode | modifiers) {}
 
 public:
 	static KeycodeAndModifiers none();

@@ -8,9 +8,9 @@ SLIB_NAMESPACE_BEGIN
 class SLIB_EXPORT SpinLock
 {
 public:
-	SLIB_CONSTEXPR SpinLock() : m_flagLock(0) {}
+	constexpr SpinLock() : m_flagLock(0) {}
 	
-	SLIB_CONSTEXPR SpinLock(const SpinLock& other) : m_flagLock(0) {}
+	constexpr SpinLock(const SpinLock& other) : m_flagLock(0) {}
 	
 public:
 	void lock() const;

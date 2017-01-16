@@ -204,7 +204,7 @@ public:
 	
 	static void yield();
 	
-	static void yield(sl_uint32 ellapsed);
+	static void yield(sl_uint32 elapsed);
 	
 };
 

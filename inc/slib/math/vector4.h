@@ -21,14 +21,14 @@ public:
 public:
 	SLIB_INLINE Vector4T() = default;
 	
-	SLIB_CONSTEXPR Vector4T(const Vector4T<T, FT>& other) : x(other.x), y(other.y), z(other.z), w(other.w) {}
+	constexpr Vector4T(const Vector4T<T, FT>& other) : x(other.x), y(other.y), z(other.z), w(other.w) {}
 
 	template <class O, class FO>
-	SLIB_CONSTEXPR Vector4T(const Vector4T<O, FO>& other) : x((T)(other.x)), y((T)(other.y)), z((T)(other.z)), w((T)(other.w)) {}
+	constexpr Vector4T(const Vector4T<O, FO>& other) : x((T)(other.x)), y((T)(other.y)), z((T)(other.z)), w((T)(other.w)) {}
 
-	SLIB_CONSTEXPR Vector4T(T _x, T _y, T _z, T _w) : x(_x), y(_y), z(_z), w(_w) {}
+	constexpr Vector4T(T _x, T _y, T _z, T _w) : x(_x), y(_y), z(_z), w(_w) {}
 
-	SLIB_CONSTEXPR Vector4T(const Vector3T<T, FT>& xyz, T _w) : x(xyz.x), y(xyz.y), z(xyz.z), w(_w) {}
+	constexpr Vector4T(const Vector3T<T, FT>& xyz, T _w) : x(xyz.x), y(xyz.y), z(xyz.z), w(_w) {}
 
 public:
 	static const Vector4T<T, FT>& zero();

@@ -23,20 +23,20 @@ public:
 public:
 	SLIB_INLINE Matrix3T() = default;
 
-	SLIB_CONSTEXPR Matrix3T(const Matrix3T<T>& other):
+	constexpr Matrix3T(const Matrix3T<T>& other):
 	 m00(other.m00), m01(other.m01), m02(other.m02),
 	 m10(other.m10), m11(other.m11), m12(other.m12),
 	 m20(other.m20), m21(other.m21), m22(other.m22)
 	{}
 	
 	template <class O>
-	SLIB_CONSTEXPR Matrix3T(const Matrix3T<O>& other):
+	constexpr Matrix3T(const Matrix3T<O>& other):
 	 m00((T)(other.m00)), m01((T)(other.m01)), m02((T)(other.m02)),
 	 m10((T)(other.m10)), m11((T)(other.m11)), m12((T)(other.m12)),
 	 m20((T)(other.m20)), m21((T)(other.m21)), m22((T)(other.m22))
 	{}
 
-	SLIB_CONSTEXPR Matrix3T(
+	constexpr Matrix3T(
 		T _m00, T _m01, T _m02,
 		T _m10, T _m11, T _m12,
 		T _m20, T _m21, T _m22
@@ -46,7 +46,7 @@ public:
 	 m20(_m20), m21(_m21), m22(_m22)
 	{}
 
-	SLIB_CONSTEXPR Matrix3T(const Vector3T<T>& row0, const Vector3T<T>& row1, const Vector3T<T>& row2):
+	constexpr Matrix3T(const Vector3T<T>& row0, const Vector3T<T>& row1, const Vector3T<T>& row2):
 	 m00(row0.x), m01(row0.y), m02(row0.z),
 	 m10(row1.x), m11(row1.y), m12(row1.z),
 	 m20(row2.x), m21(row2.y), m22(row2.z)

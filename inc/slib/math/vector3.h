@@ -20,12 +20,12 @@ public:
 public:
 	SLIB_INLINE Vector3T() = default;
 	
-	SLIB_CONSTEXPR Vector3T(const Vector3T<T, FT>& other) : x(other.x), y(other.y), z(other.z) {}
+	constexpr Vector3T(const Vector3T<T, FT>& other) : x(other.x), y(other.y), z(other.z) {}
 
 	template <class O, class FO>
-	SLIB_CONSTEXPR Vector3T(const Vector3T<O, FO>& other) : x((T)(other.x)), y((T)(other.y)), z((T)(other.z)) {}
+	constexpr Vector3T(const Vector3T<O, FO>& other) : x((T)(other.x)), y((T)(other.y)), z((T)(other.z)) {}
 
-	SLIB_CONSTEXPR Vector3T(T _x, T _y, T _z) : x(_x), y(_y), z(_z) {}
+	constexpr Vector3T(T _x, T _y, T _z) : x(_x), y(_y), z(_z) {}
 
 public:
 	static const Vector3T<T, FT>& zero();

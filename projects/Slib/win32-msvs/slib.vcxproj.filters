@@ -1573,6 +1573,9 @@
     <ClCompile Include="..\..\..\src\slib\ui\picker_view.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\parse.cpp">
+      <Filter>src\slib\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="slib.rc">

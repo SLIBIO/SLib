@@ -157,9 +157,9 @@ void _Ui_OSX_GLView_thread(__weak _Slib_OSX_GLView* _handle)
 		
 		if (Thread::isNotStoppingCurrent()) {
 			if (flagWorking) {
-				sl_uint64 t = timer.getEllapsedMilliseconds();
-				if (t < 20) {
-					Thread::sleep(20 - (sl_uint32)(t));
+				sl_uint64 t = timer.getElapsedMilliseconds();
+				if (t < 10) {
+					Thread::sleep(10 - (sl_uint32)(t));
 				}
 			} else {
 				Thread::sleep(1000);

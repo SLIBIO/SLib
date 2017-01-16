@@ -81,12 +81,12 @@ private:
 	StringContainer* m_container;
 	
 private:
-	SLIB_CONSTEXPR String(StringContainer* container) : m_container(container) {}
+	constexpr String(StringContainer* container) : m_container(container) {}
 	
 public:
-	SLIB_CONSTEXPR String() : m_container(sl_null) {}
+	constexpr String() : m_container(sl_null) {}
 	
-	SLIB_CONSTEXPR String(sl_null_t) : m_container(sl_null) {}
+	constexpr String(sl_null_t) : m_container(sl_null) {}
 	
 	String(String&& src);
 	
@@ -542,16 +542,6 @@ public:
 	
 	List<String> split(const sl_char8* pattern) const;
 	
-	String applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false);
-	
-	static String parseBackslashEscapes(const sl_char8* input, sl_size len, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null);
-	
-	String parseBackslashEscapes(sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
-	
-	static sl_size countLineNumber(const sl_char8* input, sl_size len, sl_size* columnLast = sl_null);
-	
-	sl_size countLineNumber(sl_size pos, sl_size* column = sl_null) const;
-	
 public:
 	static sl_reg parseInt32(sl_int32 radix, sl_int32* _out, const sl_char8*sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
@@ -707,12 +697,12 @@ private:
 	StringContainer16* m_container;
 	
 private:
-	SLIB_CONSTEXPR String16(StringContainer16* container) : m_container(container) {}
+	constexpr String16(StringContainer16* container) : m_container(container) {}
 
 public:
-	SLIB_CONSTEXPR String16() : m_container(sl_null) {}
+	constexpr String16() : m_container(sl_null) {}
 	
-	SLIB_CONSTEXPR String16(sl_null_t) : m_container(sl_null) {}
+	constexpr String16(sl_null_t) : m_container(sl_null) {}
 	
 	String16(String16&& src);
 	
@@ -1157,16 +1147,6 @@ public:
 	
 	List<String16> split(const sl_char16* pattern) const;
 	
-	String16 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false);
-	
-	static String16 parseBackslashEscapes(const sl_char16* input, sl_size len, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null);
-	
-	String16 parseBackslashEscapes(sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
-	
-	static sl_size countLineNumber(const sl_char16* input, sl_size len, sl_size* columnLast = sl_null);
-	
-	sl_size countLineNumber(sl_size pos, sl_size* column = sl_null) const;
-	
 public:
 	static sl_reg parseInt32(sl_int32 radix, sl_int32* _out, const sl_char16*sz, sl_size posBegin = 0, sl_size len = SLIB_SIZE_MAX);
 	
@@ -1324,9 +1304,9 @@ private:
 	SpinLock m_lock;
 	
 public:
-	SLIB_CONSTEXPR Atomic() : m_container(sl_null) {}
+	constexpr Atomic() : m_container(sl_null) {}
 	
-	SLIB_CONSTEXPR Atomic(sl_null_t) : m_container(sl_null) {}
+	constexpr Atomic(sl_null_t) : m_container(sl_null) {}
 	
 	Atomic(AtomicString&& src);
 	
@@ -1733,12 +1713,6 @@ public:
 	
 	List<String> split(const sl_char8* pattern) const;
 	
-	String applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false);
-	
-	String parseBackslashEscapes(sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
-	
-	sl_size countLineNumber(sl_size pos, sl_size* column = sl_null) const;
-
 public:
 	sl_bool parseInt32(sl_int32 radix, sl_int32* _out) const;
 
@@ -1801,9 +1775,9 @@ private:
 	SpinLock m_lock;
 	
 public:
-	SLIB_CONSTEXPR Atomic() : m_container(sl_null) {}
+	constexpr Atomic() : m_container(sl_null) {}
 	
-	SLIB_CONSTEXPR Atomic(sl_null_t) : m_container(sl_null) {}
+	constexpr Atomic(sl_null_t) : m_container(sl_null) {}
 	
 	Atomic(AtomicString16&& src);
 	
@@ -2199,12 +2173,6 @@ public:
 	List<String16> split(const String16& pattern) const;
 	
 	List<String16> split(const sl_char16* pattern) const;
-	
-	String16 applyBackslashEscapes(sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false);
-	
-	String16 parseBackslashEscapes(sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null) const;
-	
-	sl_size countLineNumber(sl_size pos, sl_size* column = sl_null) const;
 	
 public:
 	sl_bool parseInt32(sl_int32 radix, sl_int32* _out) const;

@@ -28,17 +28,17 @@ protected:
 	sl_int64 m_time; // microseconds
 	
 public:
-	SLIB_CONSTEXPR Time() : m_time(0) {}
+	constexpr Time() : m_time(0) {}
 	
-	SLIB_CONSTEXPR Time(const Time& other) : m_time(other.m_time) {}
+	constexpr Time(const Time& other) : m_time(other.m_time) {}
 	
-	SLIB_CONSTEXPR Time(sl_int32 time) : m_time(time) {}
+	constexpr Time(sl_int32 time) : m_time(time) {}
 	
-	SLIB_CONSTEXPR Time(sl_uint32 time) : m_time(time) {}
+	constexpr Time(sl_uint32 time) : m_time(time) {}
 	
-	SLIB_CONSTEXPR Time(sl_int64 time) : m_time(time) {}
+	constexpr Time(sl_int64 time) : m_time(time) {}
 	
-	SLIB_CONSTEXPR Time(sl_uint64 time) : m_time(time) {}
+	constexpr Time(sl_uint64 time) : m_time(time) {}
 	
 	Time(int year, int month, int date);
 	
@@ -59,19 +59,19 @@ public:
 public:
 	static Time now();
 	
-	SLIB_CONSTEXPR static Time zero()
+	constexpr static Time zero()
 	{
 		return 0;
 	}
 	
 	void setZero();
 	
-	SLIB_CONSTEXPR sl_bool isZero() const
+	constexpr sl_bool isZero() const
 	{
 		return m_time == 0;
 	}
 	
-	SLIB_CONSTEXPR sl_bool isNotZero() const
+	constexpr sl_bool isNotZero() const
 	{
 		return m_time != 0;
 	}
@@ -394,9 +394,9 @@ public:
 	
 	Time getTime(const Time& current) const;
 
-	sl_uint64 getEllapsedMilliseconds() const;
+	sl_uint64 getElapsedMilliseconds() const;
 	
-	sl_uint64 getEllapsedMilliseconds(const Time& current) const;
+	sl_uint64 getElapsedMilliseconds(const Time& current) const;
 
 	void reset();
 	
@@ -408,7 +408,7 @@ public:
 	
 protected:
 	Time m_timeLast;
-	Time m_timeEllapsed;
+	Time m_timeElapsed;
 	
 };
 
@@ -471,7 +471,7 @@ protected:
 	sl_bool m_flagStarted;
 	sl_bool m_flagRunning;
 	Time m_timeLast;
-	Time m_timeEllapsed;
+	Time m_timeElapsed;
 	SpinLock m_lock;
 	
 };

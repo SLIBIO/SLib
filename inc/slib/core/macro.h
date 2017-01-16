@@ -91,19 +91,19 @@
 
 #define SLIB_MEMBERS_OF_PRIMITIVE_WRAPPER(CLASS, TYPE, VALUE) \
 public: \
-	SLIB_CONSTEXPR CLASS(TYPE _value) : VALUE(_value) {} \
-	SLIB_CONSTEXPR CLASS(const CLASS& other) : VALUE(other.VALUE) {} \
-	SLIB_CONSTEXPR operator TYPE() const { return VALUE; } \
+	constexpr CLASS(TYPE _value) : VALUE(_value) {} \
+	constexpr CLASS(const CLASS& other) : VALUE(other.VALUE) {} \
+	constexpr operator TYPE() const { return VALUE; } \
 	SLIB_INLINE CLASS& operator=(const CLASS& other) { VALUE = other.VALUE; return *this; } \
 	SLIB_INLINE CLASS& operator=(TYPE _value) { VALUE = _value; return *this; } \
-	SLIB_CONSTEXPR sl_bool operator==(const CLASS& other) const { return VALUE == other.VALUE; } \
-	SLIB_CONSTEXPR sl_bool operator==(TYPE _value) const { return VALUE == _value; } \
-	SLIB_CONSTEXPR sl_bool operator!=(const CLASS& other) const { return VALUE != other.VALUE; } \
-	SLIB_CONSTEXPR sl_bool operator!=(TYPE _value) const { return VALUE != _value; }
+	constexpr sl_bool operator==(const CLASS& other) const { return VALUE == other.VALUE; } \
+	constexpr sl_bool operator==(TYPE _value) const { return VALUE == _value; } \
+	constexpr sl_bool operator!=(const CLASS& other) const { return VALUE != other.VALUE; } \
+	constexpr sl_bool operator!=(TYPE _value) const { return VALUE != _value; }
 
 #define SLIB_MEMBERS_OF_FLAGS(CLASS, VALUE) \
 	SLIB_MEMBERS_OF_PRIMITIVE_WRAPPER(CLASS, int, VALUE) \
-	SLIB_CONSTEXPR CLASS() : VALUE(0) {} \
+	constexpr CLASS() : VALUE(0) {} \
 	SLIB_INLINE CLASS& operator|=(int _value) { VALUE |= _value; return *this; } \
 	SLIB_INLINE CLASS& operator&=(int _value) { VALUE &= _value; return *this; }
 

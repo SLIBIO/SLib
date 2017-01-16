@@ -45,7 +45,7 @@ sl_bool Atomic<sl_int32>::waitZero(sl_int32 timeout)
 {
 	TimeCounter t;
 	sl_uint32 count = 0;
-	while (timeout < 0 || t.getEllapsedMilliseconds() < timeout) {
+	while (timeout < 0 || t.getElapsedMilliseconds() < timeout) {
 		if (Base::interlockedCompareExchange32((sl_int32*)&m_value, 0, 0)) {
 			return sl_true;
 		}

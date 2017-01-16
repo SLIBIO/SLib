@@ -85,7 +85,7 @@ public:
 	
 	void removeTimer(const Ref<AsyncTimer>& timer);
 
-	sl_uint64 getEllapsedMilliseconds();
+	sl_uint64 getElapsedMilliseconds();
 	
 	// override
 	sl_bool dispatch(const Function<void()>& callback);

@@ -23,20 +23,20 @@ public:
 public:
 	SLIB_INLINE RectangleT() = default;
 	
-	SLIB_CONSTEXPR RectangleT(const RectangleT<T, FT>& other):
+	constexpr RectangleT(const RectangleT<T, FT>& other):
 	 left(other.left), top(other.top), right(other.right), bottom(other.bottom)
 	{}
 	
 	template <class O, class FO>
-	SLIB_CONSTEXPR RectangleT(const RectangleT<O, FO>& other):
+	constexpr RectangleT(const RectangleT<O, FO>& other):
 	 left((T)(other.left)), top((T)(other.top)), right((T)(other.right)), bottom((T)(other.bottom))
 	{}
 	
-	SLIB_CONSTEXPR RectangleT(T _left, T _top, T _right, T _bottom):
+	constexpr RectangleT(T _left, T _top, T _right, T _bottom):
 	 left(_left), top(_top), right(_right), bottom(_bottom)
 	{}
 	
-	SLIB_CONSTEXPR RectangleT(const PointT<T, FT>& pt, const SizeT<T, FT>& size):
+	constexpr RectangleT(const PointT<T, FT>& pt, const SizeT<T, FT>& size):
 	 left(pt.x), top(pt.y), right(pt.x + size.x), bottom(pt.y + size.y)
 	{}
 	

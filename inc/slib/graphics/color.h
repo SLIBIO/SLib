@@ -173,29 +173,29 @@ public:
 public:
 	SLIB_INLINE Color() = default;
 	
-	SLIB_CONSTEXPR Color(const Color& other):
+	constexpr Color(const Color& other):
 	 r(other.r), g(other.g), b(other.b), a(other.a)
 	{}
 	
-	SLIB_CONSTEXPR Color(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a = 255):
+	constexpr Color(sl_uint32 _r, sl_uint32 _g, sl_uint32 _b, sl_uint32 _a = 255):
 	 r(_r), g(_g), b(_b), a(_a)
 	{}
 	
-	SLIB_CONSTEXPR Color(sl_uint32 argb):
+	constexpr Color(sl_uint32 argb):
 	 b((sl_uint8)(argb & 0xFF)),
 	 g((sl_uint8)((argb >> 8) & 0xFF)),
 	 r((sl_uint8)((argb >> 16) & 0xFF)),
 	 a((sl_uint8)((argb >> 24) & 0xFF))
 	{}
 	
-	SLIB_CONSTEXPR Color(const Color3f& v):
+	constexpr Color(const Color3f& v):
 	 r((sl_uint8)(Math::clamp0_255((sl_int32)(v.x * 255)))),
 	 g((sl_uint8)(Math::clamp0_255((sl_int32)(v.y * 255)))),
 	 b((sl_uint8)(Math::clamp0_255((sl_int32)(v.z * 255)))),
 	 a(255)
 	{}
 	
-	SLIB_CONSTEXPR Color(const Color4f& v):
+	constexpr Color(const Color4f& v):
 	 r((sl_uint8)(Math::clamp0_255((sl_int32)(v.x * 255)))),
 	 g((sl_uint8)(Math::clamp0_255((sl_int32)(v.y * 255)))),
 	 b((sl_uint8)(Math::clamp0_255((sl_int32)(v.z * 255)))),
@@ -205,40 +205,40 @@ public:
 public:
 	static const Color& zero();
 	
-	SLIB_CONSTEXPR sl_bool isZero() const
+	constexpr sl_bool isZero() const
 	{
 		return r == 0 && g == 0 && b == 0 && a == 0;
 	}
 	
-	SLIB_CONSTEXPR sl_bool isNotZero() const
+	constexpr sl_bool isNotZero() const
 	{
 		return r != 0 || g != 0 || b != 0 || a != 0;
 	}
 	
 	void setZero();
 
-	SLIB_CONSTEXPR float getBlueF() const
+	constexpr float getBlueF() const
 	{
 		return (float)(b) / 255.0f;
 	}
 	
 	void setBlueF(float v);
 	
-	SLIB_CONSTEXPR float getGreenF() const
+	constexpr float getGreenF() const
 	{
 		return (float)(g) / 255.0f;
 	}
 	
 	void setGreenF(float v);
 	
-	SLIB_CONSTEXPR float getRedF() const
+	constexpr float getRedF() const
 	{
 		return (float)(r) / 255.0f;
 	}
 	
 	void setRedF(float v);
 	
-	SLIB_CONSTEXPR float getAlphaF() const
+	constexpr float getAlphaF() const
 	{
 		return (float)(a) / 255.0f;
 	}
@@ -247,21 +247,21 @@ public:
 	
 	void setRGBA(sl_uint8 r, sl_uint8 g, sl_uint8 b, sl_uint8 a);
 
-	SLIB_CONSTEXPR sl_uint32 getARGB() const
+	constexpr sl_uint32 getARGB() const
 	{
 		return ((sl_uint32)(a) << 24) | ((sl_uint32)(r) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(b));
 	}
 
 	void setARGB(sl_uint32 v);
 	
-	SLIB_CONSTEXPR sl_uint32 getABGR() const
+	constexpr sl_uint32 getABGR() const
 	{
 		return ((sl_uint32)(a) << 24) | ((sl_uint32)(b) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(r));
 	}
 	
 	void setABGR(sl_uint32 v);
 	
-	SLIB_CONSTEXPR sl_uint32 getRGB() const
+	constexpr sl_uint32 getRGB() const
 	{
 		return ((sl_uint32)(r) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(b));
 	}
@@ -270,7 +270,7 @@ public:
 	
 	void setRGB(sl_uint32 v);
 
-	SLIB_CONSTEXPR sl_uint32 getBGR() const
+	constexpr sl_uint32 getBGR() const
 	{
 		return ((sl_uint32)(b) << 16) | ((sl_uint32)(g) << 8) | ((sl_uint32)(r));
 	}
@@ -326,22 +326,22 @@ public:
 public:
 	SLIB_INLINE Color& operator=(const Color& other) = default;
 	
-	SLIB_CONSTEXPR sl_bool operator==(const Color& other) const
+	constexpr sl_bool operator==(const Color& other) const
 	{
 		return r == other.r && g == other.g && b == other.b && a == other.a;
 	}
 	
-	SLIB_CONSTEXPR sl_bool operator!=(const Color& other) const
+	constexpr sl_bool operator!=(const Color& other) const
 	{
 		return r != other.r || g != other.g || b != other.b || a != other.a;
 	}
 	
-	SLIB_CONSTEXPR operator Color3f() const
+	constexpr operator Color3f() const
 	{
 		return Color3f((sl_real)(r) / 255, (sl_real)(g) / 255, (sl_real)(b) / 255);
 	}
 	
-	SLIB_CONSTEXPR operator Color4f() const
+	constexpr operator Color4f() const
 	{
 		return Color4f((sl_real)(r) / 255, (sl_real)(g) / 255, (sl_real)(b) / 255, (sl_real)(a) / 255);
 	}

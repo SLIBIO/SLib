@@ -150,6 +150,44 @@ sl_bool ParseInt(const sl_char16* sz, T* _out, sl_uint32 radix = 10)
 	return sl_false;
 }
 
+
+class ParseUtil
+{
+public:
+	static String applyBackslashEscapes(const String& str, sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false);
+	
+	static String16 applyBackslashEscapes(const String16& str, sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false);
+	
+	static String applyBackslashEscapes(const AtomicString& str, sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false);
+	
+	static String16 applyBackslashEscapes(const AtomicString16& str, sl_bool flagDoubleQuote = sl_true, sl_bool flagAddQuote = sl_true, sl_bool flagEscapeNonAscii = sl_false);
+	
+	static String parseBackslashEscapes(const sl_char8* input, sl_size len, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null);
+	
+	static String16 parseBackslashEscapes(const sl_char16* input, sl_size len, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null);
+	
+	static String parseBackslashEscapes(const String& str, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null);
+	
+	static String16 parseBackslashEscapes(const String16& str, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null);
+	
+	static String parseBackslashEscapes(const AtomicString& str, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null);
+	
+	static String16 parseBackslashEscapes(const AtomicString16& str, sl_size* lengthParsed = sl_null, sl_bool* flagError = sl_null);
+	
+	static sl_size countLineNumber(const sl_char8* input, sl_size len, sl_size* columnLast = sl_null);
+	
+	static sl_size countLineNumber(const sl_char16* input, sl_size len, sl_size* columnLast = sl_null);
+	
+	static sl_size countLineNumber(const String& str, sl_size pos, sl_size* column = sl_null);
+	
+	static sl_size countLineNumber(const String16& str, sl_size pos, sl_size* column = sl_null);
+	
+	static sl_size countLineNumber(const AtomicString& str, sl_size pos, sl_size* column = sl_null);
+	
+	static sl_size countLineNumber(const AtomicString16& str, sl_size pos, sl_size* column = sl_null);
+
+};
+
 SLIB_NAMESPACE_END
 
 #endif
