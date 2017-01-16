@@ -25,6 +25,10 @@ public:
 	// must be called before creating instruction or seting content view/size
 	void setVerticalScrolling(sl_bool flagVertical);
 	
+	sl_bool isPaging();
+	
+	void setPaging(sl_bool flagPaging);
+	
 	Ref<View> getContentView();
 	
 	virtual void setContentView(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
@@ -83,6 +87,8 @@ private:
 	// override
 	void _setBackgroundColor_NW(const Color& color);
 	
+	void _setPaging_NW(sl_bool flagPaging);
+	
 protected:
 	void _onScroll_NW(sl_scroll_pos x, sl_scroll_pos y);
 	
@@ -91,6 +97,7 @@ protected:
 	sl_bool m_flagHorizontalScroll;
 	sl_bool m_flagVerticalScroll;
 	sl_bool m_flagInitedScrollbars;
+	sl_bool m_flagPaging;
 	
 };
 

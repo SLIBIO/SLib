@@ -16,6 +16,8 @@ ScrollView::ScrollView()
 	m_flagInitedScrollbars = sl_false;
 	m_flagHorizontalScroll = sl_true;
 	m_flagVerticalScroll = sl_true;
+
+	m_flagPaging = sl_false;
 }
 
 sl_bool ScrollView::isHorizontalScrolling()
@@ -38,6 +40,16 @@ void ScrollView::setVerticalScrolling(sl_bool flagVertical)
 	m_flagVerticalScroll = flagVertical;
 }
 
+sl_bool ScrollView::isPaging()
+{
+	return m_flagPaging;
+}
+
+void ScrollView::setPaging(sl_bool flagPaging)
+{
+	m_flagPaging = flagPaging;
+	_setPaging_NW(flagPaging);
+}
 
 Ref<View> ScrollView::getContentView()
 {
@@ -263,6 +275,15 @@ void ScrollView::_setBorder_NW(sl_bool flag)
 }
 
 void ScrollView::_setBackgroundColor_NW(const Color& color)
+{
+}
+
+#endif
+
+
+#if !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
+
+void ScrollView::_setPaging_NW(sl_bool flagPaging)
 {
 }
 

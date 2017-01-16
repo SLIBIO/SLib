@@ -81,6 +81,8 @@ public:
 		}
 		
 		handle.backgroundColor = GraphicsPlatform::getUIColorFromColor(getBackgroundColor());
+		handle.pagingEnabled = m_flagPaging ? YES : NO;
+		
 		__applyContent(handle);
 	}
 	
@@ -217,6 +219,15 @@ void ScrollView::_setBackgroundColor_NW(const Color& color)
 	if (handle != nil && [handle isKindOfClass:[UIScrollView class]]) {
 		UIScrollView* sv = (UIScrollView*)handle;
 		sv.backgroundColor = GraphicsPlatform::getUIColorFromColor(color);
+	}
+}
+
+void ScrollView::_setPaging_NW(sl_bool flagPaging)
+{
+	UIView* handle = UIPlatform::getViewHandle(this);
+	if (handle != nil && [handle isKindOfClass:[UIScrollView class]]) {
+		UIScrollView* sv = (UIScrollView*)handle;
+		sv.pagingEnabled = flagPaging ? YES : NO;
 	}
 }
 

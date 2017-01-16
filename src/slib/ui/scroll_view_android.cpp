@@ -135,6 +135,10 @@ void ScrollView::_setBackgroundColor_NW(const Color& color)
 	}
 }
 
+void ScrollView::_setPaging_NW(sl_bool flagPaging)
+{
+}
+
 SLIB_UI_NAMESPACE_END
 
 #endif
