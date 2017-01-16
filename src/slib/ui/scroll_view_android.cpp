@@ -18,6 +18,7 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidScrollView, "slib/platform/android/ui/view/UiScrol
 	SLIB_JNI_STATIC_METHOD(scrollTo, "_scrollTo", "(Landroid/view/View;II)V");
 	SLIB_JNI_STATIC_METHOD(getScrollX, "_getScrollX", "(Landroid/view/View;)I");
 	SLIB_JNI_STATIC_METHOD(getScrollY, "_getScrollY", "(Landroid/view/View;)I");
+	SLIB_JNI_STATIC_METHOD(setPaging, "_setPaging", "(Landroid/view/View;Z)V");
 
 	SLIB_JNI_NATIVE(nativeOnScroll, "nativeOnScroll", "(JII)V", _AndroidScrollView_nativeOnScroll);
 
@@ -38,6 +39,7 @@ public:
 	void __applyProperties(jobject handle, ViewInstance* scrollViewInstance)
 	{
 		_JAndroidScrollView::setBackgroundColor.call(sl_null, handle, getBackgroundColor().getARGB());
+		_JAndroidScrollView::setPaging.call(sl_null, handle, m_flagPaging);
 		__applyContent(handle, scrollViewInstance);
 	}
 
@@ -137,6 +139,10 @@ void ScrollView::_setBackgroundColor_NW(const Color& color)
 
 void ScrollView::_setPaging_NW(sl_bool flagPaging)
 {
+	jobject handle = UIPlatform::getViewHandle(this);
+	if (handle) {
+		_JAndroidScrollView::setPaging.call(sl_null, handle, flagPaging);
+	}
 }
 
 SLIB_UI_NAMESPACE_END

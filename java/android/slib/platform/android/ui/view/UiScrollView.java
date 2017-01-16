@@ -2,8 +2,8 @@ package slib.platform.android.ui.view;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.HorizontalScrollView;
 import android.widget.ScrollView;
 import slib.platform.android.Logger;
 import slib.platform.android.ui.UiThread;
@@ -22,7 +22,7 @@ public class UiScrollView extends ScrollView implements IView {
 			if (flagVertical) {
 				return new UiScrollView(context);
 			} else {
-				return new HorizontalView(context);
+				return new UiHorizontalScrollView(context);
 			}
 		} catch (Exception e) {
 			Logger.exception(e);
@@ -60,6 +60,14 @@ public class UiScrollView extends ScrollView implements IView {
 		return view.getScrollY();
 	}
 
+	public static void _setPaging(View view, boolean flagPaging) {
+		if (view instanceof UiScrollView) {
+			((UiScrollView)view).setPaging(flagPaging);
+		} else if (view instanceof UiHorizontalScrollView) {
+			((UiHorizontalScrollView)view).setPaging(flagPaging);
+		}
+	}
+
 	private static native void nativeOnScroll(long instance, int x, int y);
 	public static void onEventScroll(IView view, int x, int y) {
 		long instance = view.getInstance();
@@ -68,8 +76,15 @@ public class UiScrollView extends ScrollView implements IView {
 		}
 	}
 
+
+	boolean mPaging = false;
+
 	public UiScrollView(Context context) {
 		super(context);
+	}
+
+	public void setPaging(boolean flagPaging) {
+		mPaging = flagPaging;
 	}
 
 	@Override
@@ -89,35 +104,40 @@ public class UiScrollView extends ScrollView implements IView {
 		setMeasuredDimension(resolveSizeAndState(mRight-mLeft, widthMeasureSpec, 0), resolveSizeAndState(mBottom-mTop, heightMeasureSpec, 0));
 	}
 
-	static class HorizontalView extends HorizontalScrollView implements IView {
+	boolean flagFling = false;
 
-		private long mInstance = 0;
-		public long getInstance() { return mInstance; }
-		public void setInstance(long instance) { this.mInstance = instance; }
-		private int mLeft, mTop, mRight, mBottom;
-		public Rect getUIFrame() { return new Rect(mLeft, mTop, mRight, mBottom); }
-		public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
-
-		public HorizontalView(Context context) {
-			super(context);
+	public void fling(int velocity) {
+		if (mPaging) {
+			scrollToPage(velocity);
+			flagFling = true;
+		} else {
+			super.fling(velocity);
 		}
+	}
 
-		@Override
-		public void addView(View view) {
-			removeAllViews();
-			super.addView(view);
+	public boolean onTouchEvent(MotionEvent ev) {
+		flagFling = false;
+		boolean flag = super.onTouchEvent(ev);
+		if (mPaging) {
+			int action = ev.getAction();
+			if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+				if (!flagFling) {
+					scrollToPage(0);
+				}
+			}
 		}
+		return flag;
+	}
 
-		@Override
-		protected void onScrollChanged(int l, int t, int oldl, int oldt) {
-		    super.onScrollChanged( l, t, oldl, oldt );
-		    onEventScroll(this, l, t);
+	void scrollToPage(int velocity) {
+		int height = getHeight();
+		int sy = getScrollY();
+		int page = sy / height;
+		int align = page * height;
+		if (sy + velocity > align + height / 2) {
+			align += height;
 		}
-
-		protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-			super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-			setMeasuredDimension(UiView.resolveMeasure(mRight-mLeft, widthMeasureSpec), UiView.resolveMeasure(mBottom-mTop, heightMeasureSpec));
-		}
+		smoothScrollTo(getScrollX(), align);
 	}
 
 }
