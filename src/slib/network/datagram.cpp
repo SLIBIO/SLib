@@ -226,7 +226,7 @@ void TcpDatagramClient::_reconnect()
 	ObjectLocker lock(this);
 	if (m_flagOpened) {
 		_close();
-		Async::setTimeout(SLIB_FUNCTION_WEAKREF(TcpDatagramClient, connect, this), m_autoReconnectIntervalSeconds*1000);
+		Dispatch::dispatch(SLIB_FUNCTION_WEAKREF(TcpDatagramClient, connect, this), m_autoReconnectIntervalSeconds*1000);
 	}
 }
 

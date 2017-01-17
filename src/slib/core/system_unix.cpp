@@ -239,35 +239,6 @@ void System::setCrashHandler(SIGNAL_HANDLER handler)
 }
 #endif
 
-void Console::print(const String& s)
-{
-#if defined(SLIB_PLATFORM_IS_ANDROID)
-	SLIB_STATIC_STRING(c, "Console");
-	Logger::getConsoleLogger()->log(c, s);
-#elif defined(SLIB_PLATFORM_IS_BLACKBERRY)
-	String _s = s;
-	qDebug() << _s.getData() << endl;
-#else
-	String _s = s;
-	printf("%s", _s.getData());
-#endif
-}
-
-#if !defined(SLIB_PLATFORM_IS_MOBILE)
-String Console::readLine()
-{
-	String ret;
-	char* line = NULL;
-	size_t len = 0;
-	::getline(&line, &len, stdin);
-	if (line) {
-		ret = String::fromUtf8(line, (sl_int32)len);
-		::free(line);
-	}
-	return ret;
-}
-#endif
-
 #if !defined(SLIB_PLATFORM_IS_MOBILE)
 
 typedef CList<String> _GlobalUniqueInstanceList;
@@ -376,6 +347,35 @@ void _abort(const char* msg, const char* file, sl_uint32 line)
 #endif
 #endif
 }
+
+void Console::print(const String& s)
+{
+#if defined(SLIB_PLATFORM_IS_ANDROID)
+	SLIB_STATIC_STRING(c, "Console");
+	Logger::getConsoleLogger()->log(c, s);
+#elif defined(SLIB_PLATFORM_IS_BLACKBERRY)
+	String _s = s;
+	qDebug() << _s.getData() << endl;
+#else
+	String _s = s;
+	printf("%s", _s.getData());
+#endif
+}
+
+#if !defined(SLIB_PLATFORM_IS_MOBILE)
+String Console::readLine()
+{
+	String ret;
+	char* line = NULL;
+	size_t len = 0;
+	::getline(&line, &len, stdin);
+	if (line) {
+		ret = String::fromUtf8(line, (sl_int32)len);
+		::free(line);
+	}
+	return ret;
+}
+#endif
 
 SLIB_NAMESPACE_END
 

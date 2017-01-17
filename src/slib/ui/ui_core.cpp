@@ -257,20 +257,20 @@ Function<void()> UI::getCallbackOnUiThread(const Function<void()>& callback)
 	return sl_null;
 }
 
-class _UiDispatcher : public Dispatcher
+class _UiExecutor : public Executor
 {
 public:
 	// override
-	sl_bool dispatch(const Function<void()>& callback)
+	sl_bool execute(const Function<void()>& callback)
 	{
 		UI::dispatchToUiThread(callback);
 		return sl_true;
 	}
 };
 
-Ref<Dispatcher> getDispatcher()
+Ref<Executor> UI::getExecutor()
 {
-	return new _UiDispatcher();
+	return new _UiExecutor();
 }
 
 static sl_int32 _g_ui_run_loop_level = 0;

@@ -3,8 +3,8 @@
 
 #include "definition.h"
 
-#include "object.h"
-#include "thread.h"
+#include "dispatch.h"
+
 #include "file.h"
 #include "variant.h"
 #include "ptr.h"
@@ -19,8 +19,6 @@ enum class AsyncIoMode
 	InOut = 3
 };
 
-class AsyncLoop;
-class AsyncTimer;
 class AsyncIoLoop;
 class AsyncIoInstance;
 class AsyncIoObject;
@@ -28,146 +26,7 @@ class AsyncStreamInstance;
 class AsyncStream;
 class AsyncStreamRequest;
 
-
-class SLIB_EXPORT Async
-{
-public:
-	static sl_bool runTask(const Function<void()>& task, const Ref<AsyncLoop>& loop);
-	
-	static sl_bool runTask(const Function<void()>& task);
-	
-	
-	static sl_bool setTimeout(const Function<void()>& task, sl_uint64 delay_ms, const Ref<AsyncLoop>& loop);
-	
-	static sl_bool setTimeout(const Function<void()>& task, sl_uint64 delay_ms);
-	
-	
-	static Ref<AsyncTimer> addTimer(const Function<void()>& task, sl_uint64 interval_ms, const Ref<AsyncLoop>& loop);
-	
-	static Ref<AsyncTimer> addTimer(const Function<void()>& task, sl_uint64 interval_ms);
-	
-	static void removeTimer(const Ref<AsyncTimer>& timer, const Ref<AsyncLoop>& loop);
-	
-	static void removeTimer(const Ref<AsyncTimer>& timer);
-	
-};
-
-class SLIB_EXPORT AsyncLoop : public Dispatcher
-{
-	SLIB_DECLARE_OBJECT
-	
-private:
-	AsyncLoop();
-	
-	~AsyncLoop();
-
-public:
-	static Ref<AsyncLoop> getDefault();
-
-	static void releaseDefault();
-
-	static Ref<AsyncLoop> create(sl_bool flagAutoStart = sl_true);	
-
-public:
-	void release();
-
-	void start();
-	
-	sl_bool isRunning();
-	
-	sl_bool addTask(const Function<void()>& task);
-
-	sl_bool setTimeout(const Function<void()>& task, sl_uint64 delay_ms);
-
-	Ref<AsyncTimer> addTimer(const Function<void()>& task, sl_uint64 interval_ms);
-	
-	sl_bool addTimer(const Ref<AsyncTimer>& timer);
-	
-	void removeTimer(const Ref<AsyncTimer>& timer);
-
-	sl_uint64 getElapsedMilliseconds();
-	
-	// override
-	sl_bool dispatch(const Function<void()>& callback);
-
-protected:
-	sl_bool m_flagInit;
-	sl_bool m_flagRunning;
-	Ref<Thread> m_thread;
-
-	TimeCounter m_timeCounter;
-
-	LinkedQueue<Function<void()>> m_queueTasks;
-
-	struct TimeTask
-	{
-		sl_uint64 time;
-		Function<void()> task;
-	};
-	BTree<sl_uint64, TimeTask> m_timeTasks;
-	Mutex m_lockTimeTasks;
-
-	class Timer
-	{
-	public:
-		WeakRef<AsyncTimer> timer;
-		
-	public:
-		sl_bool operator==(const Timer& other) const;
-	};
-	LinkedQueue<Timer> m_queueTimers;
-	Mutex m_lockTimer;
-
-protected:
-	void _wake();
-	sl_int32 _getTimeout();
-	sl_int32 _getTimeout_TimeTasks();
-	sl_int32 _getTimeout_Timer();
-	void _runLoop();
-
-};
-
-
-class SLIB_EXPORT AsyncTimer : public Object
-{
-	SLIB_DECLARE_OBJECT
-	
-protected:
-	AsyncTimer();
-	
-public:
-	static Ref<AsyncTimer> create(const Function<void()>& task, sl_uint64 interval_ms, sl_bool flagStart = sl_true);
-	
-public:
-	void start();
-	
-	void stop();
-	
-	sl_bool isStarted();
-	
-	Function<void()> getTask();
-	
-	sl_uint64 getInterval();
-	
-	void run();
-	
-	void stopAndWait();
-	
-public:
-	SLIB_PROPERTY(sl_uint64, LastRunTime)
-	
-	SLIB_PROPERTY(sl_uint32, MaxConcurrentThread)
-	
-protected:
-	sl_bool m_flagStarted;
-	Function<void()> m_task;
-	sl_uint64 m_interval;
-	sl_int32 m_nCountRun;
-	
-};
-
-
-class SLIB_EXPORT AsyncIoLoop : public Dispatcher
+class SLIB_EXPORT AsyncIoLoop : public Executor
 {
 	SLIB_DECLARE_OBJECT
 	
@@ -203,7 +62,7 @@ public:
 	void requestOrder(AsyncIoInstance* instance);
 	
 	// override
-	sl_bool dispatch(const Function<void()>& callback);
+	sl_bool execute(const Function<void()>& callback);
 	
 protected:
 	sl_bool m_flagInit;
@@ -522,7 +381,7 @@ protected:
 protected:
 	void init();
 	
-	void initWithDispatcher(const Ref<Dispatcher>& dispatcher);
+	void init(const Ref<Executor>& executor);
 	
 protected:
 	sl_bool _addRequest(AsyncStreamRequest* request);
@@ -533,8 +392,8 @@ private:
 	LinkedQueue< Ref<AsyncStreamRequest> > m_requests;
 	sl_bool m_flagProcessRequest;
 	
-	Ref<AsyncLoop> m_loop;
-	WeakRef<Dispatcher> m_dispatcher;
+	Ref<Dispatcher> m_dispatcher;
+	WeakRef<Executor> m_executor;
 
 };
 
@@ -546,7 +405,7 @@ protected:
 public:
 	static Ref<AsyncReader> create(const Ptr<IReader>& reader);
 	
-	static Ref<AsyncReader> create(const Ptr<IReader>& reader, const Ref<Dispatcher>& dispatcher);
+	static Ref<AsyncReader> create(const Ptr<IReader>& reader, const Ref<Executor>& executor);
 	
 public:
 	// override
@@ -578,7 +437,7 @@ protected:
 public:
 	static Ref<AsyncWriter> create(const Ptr<IWriter>& writer);
 	
-	static Ref<AsyncWriter> create(const Ptr<IWriter>& writer, const Ref<Dispatcher>& dispatcher);
+	static Ref<AsyncWriter> create(const Ptr<IWriter>& writer, const Ref<Executor>& executor);
 	
 
 public:
@@ -614,27 +473,27 @@ protected:
 public:
 	static Ref<AsyncFile> create(const Ref<File>& file);
 	
-	static Ref<AsyncFile> create(const Ref<File>& file, const Ref<Dispatcher>& dispatcher);
+	static Ref<AsyncFile> create(const Ref<File>& file, const Ref<Executor>& executor);
 	
 	
 	static Ref<AsyncFile> open(const String& path, FileMode mode);
 
-	static Ref<AsyncFile> open(const String& path, FileMode mode, const Ref<Dispatcher>& dispatcher);
+	static Ref<AsyncFile> open(const String& path, FileMode mode, const Ref<Executor>& executor);
 	
 	
 	static Ref<AsyncFile> openForRead(const String& path);
 	
-	static Ref<AsyncFile> openForRead(const String& path, const Ref<Dispatcher>& dispatcher);
+	static Ref<AsyncFile> openForRead(const String& path, const Ref<Executor>& executor);
 	
 	
 	static Ref<AsyncFile> openForWrite(const String& path);
 	
-	static Ref<AsyncFile> openForWrite(const String& path, const Ref<Dispatcher>& dispatcher);
+	static Ref<AsyncFile> openForWrite(const String& path, const Ref<Executor>& executor);
 	
 	
 	static Ref<AsyncFile> openForAppend(const String& path);
 	
-	static Ref<AsyncFile> openForAppend(const String& path, const Ref<Dispatcher>& dispatcher);
+	static Ref<AsyncFile> openForAppend(const String& path, const Ref<Executor>& executor);
 	
 	
 #if defined(SLIB_PLATFORM_IS_WIN32)
@@ -813,7 +672,7 @@ public:
 
 	sl_bool copyFromFile(const String& path);
 	
-	sl_bool copyFromFile(const String& path, const Ref<Dispatcher>& dispatcher);
+	sl_bool copyFromFile(const String& path, const Ref<Executor>& executor);
 	
 	sl_uint64 getOutputLength() const;
 

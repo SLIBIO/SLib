@@ -117,21 +117,6 @@ Ref<Screen> UI::getFocusedScreen()
 	return UIPlatform::createScreen(screen);
 }
 
-sl_bool UI::isUiThread()
-{
-	return [NSThread isMainThread];
-}
-
-void UI::dispatchToUiThread(const Function<void()>& _callback)
-{
-	Function<void()> callback = _callback;
-	if (callback.isNotNull()) {
-		dispatch_async(dispatch_get_main_queue(), ^{
-			callback();
-		});
-	}
-}
-
 void UIPlatform::runLoop(sl_uint32 level)
 {
 	while (1) {

@@ -56,14 +56,27 @@ public class UiThread {
 			nativeDispatchCallback();
 		}
 	};
-	public static void dispatch() {
 
+	public static void dispatch() {
 		if (!(initStatics())) {
 			return;
 		}
 		handlerUi.post(callbackDispatch);
 	}
-	
+
+	private static native void nativeDispatchDelayedCallback(long ptr);
+
+	public static void dispatchDelayed(final long ptr, int delayMillis) {
+		if (!(initStatics())) {
+			return;
+		}
+		handlerUi.postDelayed(new Runnable() {
+			public void run() {
+				nativeDispatchDelayedCallback(ptr);
+			}
+		}, delayMillis);
+	}
+
 	public static void runLoop() {
 
 		if (!(initStatics())) {

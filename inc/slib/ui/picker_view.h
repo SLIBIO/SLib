@@ -6,7 +6,7 @@
 #include "view.h"
 
 #include "../core/time.h"
-#include "../core/async.h"
+#include "../core/dispatch.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -131,7 +131,7 @@ protected:
 	sl_real m_speedFlow;
 	sl_real m_speedBefore;
 	Time m_timeCallbackBefore;
-	Ref<AsyncTimer> m_timer;
+	Ref<Timer> m_timer;
 	
 };
 

@@ -8,7 +8,7 @@
 
 SLIB_NAMESPACE_BEGIN
 
-class SLIB_EXPORT ThreadPool : public Dispatcher
+class SLIB_EXPORT ThreadPool : public Executor
 {
 	SLIB_DECLARE_OBJECT
 	
@@ -30,7 +30,7 @@ public:
 	sl_bool addTask(const Function<void()>& task);
 	
 	// override
-	sl_bool dispatch(const Function<void()>& callback);
+	sl_bool execute(const Function<void()>& callback);
 
 public:
 	SLIB_PROPERTY(sl_uint32, MinimumThreadsCount)

@@ -3,11 +3,13 @@
 #if defined(SLIB_PLATFORM_IS_WIN32)
 
 #include "ui_core_win32.h"
+#include "ui_core_common.h"
 #include "view_win32.h"
 
 #include "../../../inc/slib/ui/screen.h"
 #include "../../../inc/slib/ui/app.h"
 #include "../../../inc/slib/core/queue.h"
+#include "../../../inc/slib/core/dispatch.h"
 #include "../../../inc/slib/core/safe_static.h"
 
 #include <commctrl.h>
@@ -31,7 +33,6 @@ class _Win32_UI
 {
 public:
 	Ref<Screen> m_screenPrimary;
-	LinkedQueue< Function<void()> > m_queueDispatch;
 
 	_Win32_UI();
 
@@ -91,32 +92,33 @@ sl_bool UI::isUiThread()
 	return (_g_thread_ui == ::GetCurrentThreadId());
 }
 
-void UI::dispatchToUiThread(const Function<void()>& callback)
+void _Win32_PostMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	if (callback.isNull()) {
-		return;
-	}
-	_Win32_UI* ui = _Win32_getUI();
-	if (!ui) {
-		return;
-	}
 	Win32_UI_Shared* shared = Win32_UI_Shared::get();
 	if (!shared) {
 		return;
 	}
-	ui->m_queueDispatch.push(callback);
-	::PostMessageW(shared->hWndMessage, SLIB_UI_MESSAGE_DISPATCH, 0, 0);
+	::PostMessageW(shared->hWndMessage, uMsg, wParam, lParam);
 }
 
-void _Win32_processUiDispatchQueue()
+void UI::dispatchToUiThread(const Function<void()>& callback, sl_uint32 delayMillis)
 {
-	_Win32_UI* ui = _Win32_getUI();
-	if (!ui) {
+	if (callback.isNull()) {
 		return;
 	}
-	Function<void()> callback;
-	while (ui->m_queueDispatch.pop(&callback)) {
-		callback();
+	if (delayMillis == 0) {
+		Win32_UI_Shared* shared = Win32_UI_Shared::get();
+		if (!shared) {
+			return;
+		}
+		if (_UIDispatcher::addCallback(callback)) {
+			::PostMessageW(shared->hWndMessage, SLIB_UI_MESSAGE_DISPATCH, 0, 0);
+		}
+	} else {
+		sl_reg ptr;
+		if (_UIDispatcher::addDelayedCallback(callback, ptr)) {
+			Dispatch::dispatch(Function<void()>::bind(&_Win32_PostMessage, SLIB_UI_MESSAGE_DISPATCH_DELAYED, 0, (LPARAM)ptr), delayMillis);
+		}
 	}
 }
 
@@ -128,7 +130,9 @@ sl_bool _Win32_captureChildInstanceEvents(View* view, MSG& msg);
 LRESULT CALLBACK _Win32_MessageProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (uMsg == SLIB_UI_MESSAGE_DISPATCH) {
-		_Win32_processUiDispatchQueue();
+		_UIDispatcher::processCallbacks();
+	} else if (uMsg == SLIB_UI_MESSAGE_DISPATCH_DELAYED) {
+		_UIDispatcher::processDelayedCallback((sl_reg)lParam);
 	} else if (uMsg == SLIB_UI_MESSAGE_CUSTOM_MSGBOX) {
 		_Win32_processCustomMsgBox(wParam, lParam);
 		return 0;
@@ -142,18 +146,15 @@ LRESULT CALLBACK _Win32_MessageProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 void UIPlatform::runLoop(sl_uint32 level)
 {
-	_Win32_UI* ui = _Win32_getUI();
-	if (!ui) {
-		return;
-	}
-
 	MSG msg;
 	while (::GetMessageW(&msg, NULL, 0, 0)) {
 		if (msg.message == WM_QUIT) {
 			break;
 		}
 		if (msg.message == SLIB_UI_MESSAGE_DISPATCH) {
-			_Win32_processUiDispatchQueue();
+			_UIDispatcher::processCallbacks();
+		} else if (msg.message == SLIB_UI_MESSAGE_DISPATCH_DELAYED) {
+			_UIDispatcher::processDelayedCallback((sl_reg)(msg.lParam));
 		} else if (msg.message == SLIB_UI_MESSAGE_CLOSE) {
 			::DestroyWindow(msg.hwnd);
 		} else if (msg.message == WM_MENUCOMMAND) {
@@ -189,7 +190,7 @@ void UIPlatform::runLoop(sl_uint32 level)
 		}
 	}
 
-	ui->m_queueDispatch.removeAll();
+	_UIDispatcher::removeAllCallbacks();
 
 }
 

@@ -392,7 +392,7 @@ void PickerView::_startFlow(sl_real speed)
 	ObjectLocker lock(this);
 	if (m_timer.isNull()) {
 		m_timeCallbackBefore.setZero();
-		m_timer = Async::addTimer(SLIB_FUNCTION_WEAKREF(PickerView, _timerCallback, this), 10);
+		m_timer = Dispatch::addTimer(SLIB_FUNCTION_WEAKREF(PickerView, _timerCallback, this), 10);
 	}
 }
 
@@ -401,7 +401,7 @@ void PickerView::_stopFlow()
 	ObjectLocker lock(this);
 	if (m_timer.isNotNull()) {
 		m_timer->stop();
-		Async::removeTimer(m_timer);
+		Dispatch::removeTimer(m_timer);
 		m_timer.setNull();
 	}
 }

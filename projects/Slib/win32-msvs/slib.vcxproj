@@ -36,6 +36,7 @@
     <ClInclude Include="..\..\..\inc\slib\core\cpp.h" />
     <ClInclude Include="..\..\..\inc\slib\core\definition.h" />
     <ClInclude Include="..\..\..\inc\slib\core\deque.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\dispatch.h" />
     <ClInclude Include="..\..\..\inc\slib\core\endian.h" />
     <ClInclude Include="..\..\..\inc\slib\core\event.h" />
     <ClInclude Include="..\..\..\inc\slib\core\expire.h" />
@@ -265,6 +266,7 @@
     <ClInclude Include="..\..\..\src\slib\render\opengl_gl.h" />
     <ClInclude Include="..\..\..\src\slib\render\opengl_gles.h" />
     <ClInclude Include="..\..\..\src\slib\render\opengl_impl.h" />
+    <ClInclude Include="..\..\..\src\slib\ui\ui_core_common.h" />
     <ClInclude Include="..\..\..\src\slib\ui\ui_core_win32.h" />
     <ClInclude Include="..\..\..\src\slib\ui\view_win32.h" />
     <ClInclude Include="resource.h" />
@@ -282,6 +284,7 @@
     <ClCompile Include="..\..\..\src\slib\core\charset.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\collection.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\content_type.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\dispatch.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\event.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\event_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\file.cpp" />
@@ -495,6 +498,7 @@
     <ClCompile Include="..\..\..\src\slib\ui\tree_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\ui_app.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\ui_core.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_core_common.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\ui_core_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\ui_event.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\ui_event_win32.cpp" />

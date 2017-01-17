@@ -5,7 +5,7 @@
 
 #include "object.h"
 #include "map.h"
-#include "async.h"
+#include "dispatch.h"
 
 SLIB_NAMESPACE_BEGIN
 
@@ -18,8 +18,8 @@ protected:
 	
 	sl_uint32 m_duration;
 	
-	Ref<AsyncTimer> m_timer;
-	WeakRef<AsyncLoop> m_loop;
+	Ref<Timer> m_timer;
+	WeakRef<Dispatcher> m_dispatcher;
 
 public:
 	ExpiringMap();
@@ -29,7 +29,7 @@ public:
 public:
 	sl_uint32 getExpiringMilliseconds() const;
 
-	void setupTimer(sl_uint32 expiring_duration_ms, const Ref<AsyncLoop>& _loop);
+	void setupTimer(sl_uint32 expiring_duration_ms, const Ref<Dispatcher>& _dispatcher);
 
 	void clearTimer();
 	
@@ -81,22 +81,22 @@ sl_uint32 ExpiringMap<KT, VT>::getExpiringMilliseconds() const
 }
 
 template <class KT, class VT>
-void ExpiringMap<KT, VT>::setupTimer(sl_uint32 expiring_duration_ms, const Ref<AsyncLoop>& _loop)
+void ExpiringMap<KT, VT>::setupTimer(sl_uint32 expiring_duration_ms, const Ref<Dispatcher>& _dispatcher)
 {
 	ObjectLocker lock(this);
 	clearTimer();
-	Ref<AsyncLoop> loop = _loop;
-	if (loop.isNull()) {
-		loop = AsyncLoop::getDefault();
-		if (loop.isNull()) {
+	Ref<Dispatcher> dispatcher = _dispatcher;
+	if (dispatcher.isNull()) {
+		dispatcher = Dispatcher::getDefault();
+		if (dispatcher.isNull()) {
 			return;
 		}
 	}
 	if (expiring_duration_ms > 0) {
 		m_duration = expiring_duration_ms;
-		m_loop = loop;
+		m_dispatcher = dispatcher;
 		typedef ExpiringMap<KT, VT> _ExpiringMap;
-		m_timer = loop->addTimer(SLIB_FUNCTION_CLASS(_ExpiringMap, _update, this), expiring_duration_ms);
+		m_timer = dispatcher->addTimer(SLIB_FUNCTION_CLASS(_ExpiringMap, _update, this), expiring_duration_ms);
 	}
 }
 
@@ -104,21 +104,21 @@ template <class KT, class VT>
 void ExpiringMap<KT, VT>::clearTimer()
 {
 	ObjectLocker lock(this);
-	Ref<AsyncTimer> timer = m_timer;
+	Ref<Timer> timer = m_timer;
 	if (timer.isNotNull()) {
-		Ref<AsyncLoop> loop = m_loop;
-		if (loop.isNotNull()) {
-			loop->removeTimer(timer);
+		Ref<Dispatcher> dispatcher = m_dispatcher;
+		if (dispatcher.isNotNull()) {
+			dispatcher->removeTimer(timer);
 		}
 	}
 	m_timer.setNull();
-	m_loop.setNull();
+	m_dispatcher.setNull();
 }
 
 template <class KT, class VT>
 void ExpiringMap<KT, VT>::setupTimer(sl_uint32 period_ms)
 {
-	setupTimer(period_ms, Ref<AsyncLoop>::null());
+	setupTimer(period_ms, Ref<Dispatcher>::null());
 }
 
 template <class KT, class VT>

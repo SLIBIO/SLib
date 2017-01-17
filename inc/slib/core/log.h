@@ -12,6 +12,31 @@ SLIB_NAMESPACE_BEGIN
 
 class LoggerSet;
 
+class SLIB_EXPORT Console
+{
+public:
+	static void print(const String& s);
+	
+	template <class... ARGS>
+	void print(const String& format, ARGS&&... args)
+	{
+		String content = String::format(format, args...);
+		print(content);
+	}
+
+	static void println(const String& s);
+	
+	template <class... ARGS>
+	void println(const String& format, ARGS&&... args)
+	{
+		String content = String::format(format, args...);
+		println(content);
+	}
+
+	static String readLine();
+	
+};
+
 class SLIB_EXPORT Logger : public Object
 {
 public:

@@ -103,13 +103,13 @@ public:
 	// UI Thread
 	static sl_bool isUiThread();
 	
-	static void dispatchToUiThread(const Function<void()>& callback);
+	static void dispatchToUiThread(const Function<void()>& callback, sl_uint32 delayMillis = 0);
 	
 	static void runOnUiThread(const Function<void()>& callback);
 	
 	static Function<void()> getCallbackOnUiThread(const Function<void()>& callback);
 
-	static Ref<Dispatcher> getDispatcher();
+	static Ref<Executor> getExecutor();
 	
 	// Run Loop
 	static void runLoop();

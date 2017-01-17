@@ -17,17 +17,14 @@ class Function;
 template <class T>
 using AtomicFunction = Atomic< Function<T> >;
 
-class SLIB_EXPORT Dispatcher : public Object
+class CallableBase : public Referable
 {
-	SLIB_DECLARE_OBJECT
-
 public:
-	virtual sl_bool dispatch(const Function<void()>& callback) = 0;
-
+	SLIB_DECLARE_OBJECT
 };
 
 template <class RET_TYPE, class... ARGS>
-class SLIB_EXPORT Callable<RET_TYPE(ARGS...)> : public Referable
+class SLIB_EXPORT Callable<RET_TYPE(ARGS...)> : public CallableBase
 {
 public:
 	virtual RET_TYPE invoke(ARGS... params) = 0;
@@ -94,6 +91,22 @@ public:
 	Atomic& operator=(const FUNC& func);
 	
 	RET_TYPE operator()(ARGS... args) const;
+	
+};
+
+extern template class Function<void()>;
+
+class SLIB_EXPORT Executor : public Object
+{
+	SLIB_DECLARE_OBJECT
+	
+public:
+	Executor();
+	
+	~Executor();
+	
+public:
+	virtual sl_bool execute(const Function<void()>& callback) = 0;
 	
 };
 

@@ -65,20 +65,6 @@ void System::yield(sl_uint32 elapsed)
 	}
 }
 
-void Console::println(const String& s)
-{
-	SLIB_STATIC_STRING(l, "\n");
-	print(s + l);
-}
-
-#if defined(SLIB_PLATFORM_IS_MOBILE)
-String Console::readLine()
-{
-	return sl_null;
-}
-#endif
-
-
 #if defined(SLIB_PLATFORM_IS_MOBILE)
 
 typedef CList<String> _GlobalUniqueInstanceList;

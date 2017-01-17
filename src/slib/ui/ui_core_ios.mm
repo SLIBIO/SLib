@@ -1,5 +1,4 @@
 #include "../../../inc/slib/core/definition.h"
-#include "../../../inc/slib/core/platform_apple.h"
 
 #if defined(SLIB_PLATFORM_IS_IOS)
 
@@ -12,6 +11,7 @@
 #include "../../../inc/slib/core/log.h"
 #include "../../../inc/slib/core/json.h"
 #include "../../../inc/slib/core/variant.h"
+#include "../../../inc/slib/core/platform_apple.h"
 
 @interface _slib_iOS_AppDelegate : UIResponder <UIApplicationDelegate>
 @property (strong, nonatomic) UIWindow *window;
@@ -101,21 +101,6 @@ Ref<Screen> UI::getPrimaryScreen()
 Ref<Screen> UI::getFocusedScreen()
 {
 	return getPrimaryScreen();
-}
-
-sl_bool UI::isUiThread()
-{
-	return [NSThread isMainThread];
-}
-
-void UI::dispatchToUiThread(const Function<void()>& _callback)
-{
-    const Function<void()> callback = _callback;
-	if (callback.isNotNull()) {
-		dispatch_async(dispatch_get_main_queue(), ^{
-			callback();
-		});
-	}
 }
 
 void UI::openUrl(const String& _url)

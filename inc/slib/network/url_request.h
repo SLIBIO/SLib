@@ -40,7 +40,7 @@ public:
 	Ptr<IUrlRequestListener> listener;
 	Function<void(UrlRequest*)> onComplete;
 	Function<void(UrlRequest*, const void*, sl_size)> onReceiveContent;
-	Ref<Dispatcher> dispatcher;
+	Ref<Executor> executor;
 	
 	sl_bool flagUseBackgroundSession;
 	sl_bool flagKeepReference;
@@ -124,7 +124,7 @@ public:
 	
 	const Function<void(UrlRequest*, const void*, sl_size)>& getOnReceiveContent();
 	
-	const Ref<Dispatcher>& getDispatcher();
+	const Ref<Executor>& getExecutor();
 	
 	sl_bool isUsingBackgroundSession();
 	
@@ -193,7 +193,7 @@ protected:
 	Ptr<IUrlRequestListener> m_listener;
 	Function<void(UrlRequest*)> m_onComplete;
 	Function<void(UrlRequest*, const void*, sl_size)> m_onReceiveContent;
-	Ref<Dispatcher> m_dispatcher;
+	Ref<Executor> m_executor;
 	sl_bool m_flagUseBackgroundSession;
 	sl_bool m_flagKeepReference;
 	sl_bool m_flagStoreResponseContent;

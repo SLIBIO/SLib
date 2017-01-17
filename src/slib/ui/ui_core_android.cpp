@@ -7,10 +7,11 @@
 #include "../../../inc/slib/ui/screen.h"
 #include "../../../inc/slib/ui/platform.h"
 #include "../../../inc/slib/ui/mobile_app.h"
-#include "../../../inc/slib/core/map.h"
 #include "../../../inc/slib/core/io.h"
 #include "../../../inc/slib/core/log.h"
 #include "../../../inc/slib/core/safe_static.h"
+
+#include "ui_core_common.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -26,14 +27,17 @@ SLIB_JNI_BEGIN_CLASS(_AndroidUtil, "slib/platform/android/ui/Util")
 SLIB_JNI_END_CLASS
 
 void _AndroidUiThread_runDispatchCallback(JNIEnv* env, jobject _this);
+void _AndroidUiThread_runDispatchDelayedCallback(JNIEnv* env, jobject _this, jlong ptr);
 
 SLIB_JNI_BEGIN_CLASS(_AndroidUiThread, "slib/platform/android/ui/UiThread")
 	SLIB_JNI_STATIC_METHOD(isUiThread, "isUiThread", "()Z");
 	SLIB_JNI_STATIC_METHOD(dispatch, "dispatch", "()V");
+	SLIB_JNI_STATIC_METHOD(dispatchDelayed, "dispatchDelayed", "(JI)V");
 	SLIB_JNI_STATIC_METHOD(runLoop, "runLoop", "()V");
 	SLIB_JNI_STATIC_METHOD(quitLoop, "quitLoop", "()V");
 
 	SLIB_JNI_NATIVE(nativeDispatchCallback, "nativeDispatchCallback", "()V", _AndroidUiThread_runDispatchCallback);
+	SLIB_JNI_NATIVE(nativeDispatchDelayedCallback, "nativeDispatchDelayedCallback", "(J)V", _AndroidUiThread_runDispatchDelayedCallback);
 SLIB_JNI_END_CLASS
 
 void _Android_onCreateActivity(JNIEnv* env, jobject _this, jobject activity);
@@ -133,28 +137,28 @@ void UI::openUrl(const String& _url) {
 	}
 }
 
-SLIB_SAFE_STATIC_GETTER(LinkedQueue< Function<void()> >, _AndroidUi_getDispatchQueue);
-
-void UI::dispatchToUiThread(const Function<void()>& callback)
+void UI::dispatchToUiThread(const Function<void()>& callback, sl_uint32 delayMillis)
 {
-	if (callback.isNotNull()) {
-		LinkedQueue< Function<void()> >* queue = _AndroidUi_getDispatchQueue();
-		if (queue) {
-			queue->push(callback);
+	if (delayMillis == 0) {
+		if (_UIDispatcher::addCallback(callback)) {
 			_AndroidUiThread::dispatch.call(sl_null);
+		}
+	} else {
+		sl_reg ptr;
+		if (_UIDispatcher::addDelayedCallback(callback, ptr)) {
+			_AndroidUiThread::dispatchDelayed.call(sl_null, (jlong)ptr, delayMillis);
 		}
 	}
 }
 
 void _AndroidUiThread_runDispatchCallback(JNIEnv* env, jobject _this)
 {
-	LinkedQueue< Function<void()> >* queue = _AndroidUi_getDispatchQueue();
-	if (queue) {
-		Function<void()> callback;
-		while (queue->pop(&callback)) {
-			callback();
-		}
-	}
+	_UIDispatcher::processCallbacks();
+}
+
+void _AndroidUiThread_runDispatchDelayedCallback(JNIEnv* env, jobject _this, jlong ptr)
+{
+	_UIDispatcher::processDelayedCallback((sl_reg)ptr);
 }
 
 void UIPlatform::runLoop(sl_uint32 level)

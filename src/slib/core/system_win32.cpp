@@ -18,6 +18,7 @@ using namespace Platform;
 #include "../../../inc/slib/core/app.h"
 #include "../../../inc/slib/core/file.h"
 #include "../../../inc/slib/core/list.h"
+#include "../../../inc/slib/core/log.h"
 
 SLIB_NAMESPACE_BEGIN
 
@@ -220,23 +221,6 @@ void System::setCrashHandler(SIGNAL_HANDLER handler)
 }
 #endif
 
-void Console::print(const String& _s)
-{
-	String16 s = _s;
-	wprintf(L"%s", s.getData());
-	OutputDebugStringW((LPCWSTR)s.getData());
-}
-
-#if defined(SLIB_PLATFORM_IS_WIN32)
-String Console::readLine()
-{
-	char line[512];
-	char* l = gets_s(line);
-	line[511] = 0;
-	return l;
-}
-#endif
-
 #if defined(SLIB_PLATFORM_IS_WIN32)
 
 class _GlobalUniqueInstance : public GlobalUniqueInstance
@@ -300,6 +284,23 @@ void _abort(const char* msg, const char* file, sl_uint32 line)
 	slib::System::abort(msg, file, line);
 #endif
 }
+
+void Console::print(const String& _s)
+{
+	String16 s = _s;
+	wprintf(L"%s", s.getData());
+	OutputDebugStringW((LPCWSTR)s.getData());
+}
+
+#if defined(SLIB_PLATFORM_IS_WIN32)
+String Console::readLine()
+{
+	char line[512];
+	char* l = gets_s(line);
+	line[511] = 0;
+	return l;
+}
+#endif
 
 SLIB_NAMESPACE_END
 

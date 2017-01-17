@@ -1,6 +1,5 @@
 #include "../../../inc/slib/core/log.h"
 
-#include "../../../inc/slib/core/system.h"
 #include "../../../inc/slib/core/file.h"
 #include "../../../inc/slib/core/variant.h"
 #include "../../../inc/slib/core/safe_static.h"
@@ -10,6 +9,20 @@
 #endif
 
 SLIB_NAMESPACE_BEGIN
+
+void Console::println(const String& s)
+{
+	SLIB_STATIC_STRING(l, "\n");
+	print(s + l);
+}
+
+#if defined(SLIB_PLATFORM_IS_MOBILE)
+String Console::readLine()
+{
+	return sl_null;
+}
+#endif
+
 
 void Logger::logError(const String& tag, const String& content)
 {

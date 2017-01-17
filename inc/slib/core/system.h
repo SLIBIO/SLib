@@ -56,16 +56,6 @@ public:
 	
 };
 
-class SLIB_EXPORT Console
-{
-public:
-	static void print(const String& s);
-	
-	static void println(const String& s);
-
-	static String readLine();
-};
-
 class SLIB_EXPORT GlobalUniqueInstance : public Referable
 {
 public:

@@ -135,6 +135,8 @@
 		266F926E1D51CD5D0040166C /* render_resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266F926D1D51CD5D0040166C /* render_resource.cpp */; };
 		266F92701D51CD7A0040166C /* graphics_resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266F926F1D51CD7A0040166C /* graphics_resource.cpp */; };
 		2682C3EE1E2D35A200E9CB98 /* parse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2682C3ED1E2D35A200E9CB98 /* parse.cpp */; };
+		2682C3F11E2D5C6C00E9CB98 /* ui_core_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2682C3F01E2D5C6C00E9CB98 /* ui_core_apple.mm */; };
+		2682C3F61E2D639000E9CB98 /* ui_core_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2682C3F41E2D639000E9CB98 /* ui_core_common.cpp */; };
 		2683BFAE1C39710C0068AC42 /* atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2683BFAD1C39710C0068AC42 /* atomic.cpp */; };
 		268916341C182AC8009FD75E /* camera_dshow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268916331C182AC8009FD75E /* camera_dshow.cpp */; };
 		269222311DC12F600055095F /* image_stb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2692222F1DC12F600055095F /* image_stb.cpp */; };
@@ -176,6 +178,7 @@
 		26B5717F1C9D449E0099E69B /* audio_util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B5717E1C9D449E0099E69B /* audio_util.cpp */; };
 		26B571821C9D45A80099E69B /* yuv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26B571811C9D45A80099E69B /* yuv.cpp */; };
 		26BBBECD1D906D4A00735947 /* view_page.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BBBECB1D906D4A00735947 /* view_page.cpp */; };
+		26BC2EC61E2DFF4900D0801E /* dispatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BC2EC51E2DFF4900D0801E /* dispatch.cpp */; };
 		26C0A3511C128D80005690FE /* sensor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A34D1C128D80005690FE /* sensor.cpp */; };
 		26C0A3531C128D80005690FE /* vibrator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A34F1C128D80005690FE /* vibrator.cpp */; };
 		26C0A3561C131F8E005690FE /* bitmap_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C0A3551C131F8E005690FE /* bitmap_data.cpp */; };
@@ -399,6 +402,9 @@
 		266F926D1D51CD5D0040166C /* render_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_resource.cpp; sourceTree = "<group>"; };
 		266F926F1D51CD7A0040166C /* graphics_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graphics_resource.cpp; sourceTree = "<group>"; };
 		2682C3ED1E2D35A200E9CB98 /* parse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = parse.cpp; sourceTree = "<group>"; };
+		2682C3F01E2D5C6C00E9CB98 /* ui_core_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_core_apple.mm; sourceTree = "<group>"; };
+		2682C3F41E2D639000E9CB98 /* ui_core_common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_core_common.cpp; sourceTree = "<group>"; };
+		2682C3F51E2D639000E9CB98 /* ui_core_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ui_core_common.h; sourceTree = "<group>"; };
 		2683BFAD1C39710C0068AC42 /* atomic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = atomic.cpp; sourceTree = "<group>"; };
 		268916331C182AC8009FD75E /* camera_dshow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = camera_dshow.cpp; path = media/camera_dshow.cpp; sourceTree = "<group>"; };
 		2692222F1DC12F600055095F /* image_stb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = image_stb.cpp; sourceTree = "<group>"; };
@@ -441,6 +447,7 @@
 		26B5717E1C9D449E0099E69B /* audio_util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = audio_util.cpp; path = media/audio_util.cpp; sourceTree = "<group>"; };
 		26B571811C9D45A80099E69B /* yuv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = yuv.cpp; sourceTree = "<group>"; };
 		26BBBECB1D906D4A00735947 /* view_page.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view_page.cpp; sourceTree = "<group>"; };
+		26BC2EC51E2DFF4900D0801E /* dispatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dispatch.cpp; sourceTree = "<group>"; };
 		26C0A34D1C128D80005690FE /* sensor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sensor.cpp; sourceTree = "<group>"; };
 		26C0A34F1C128D80005690FE /* vibrator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vibrator.cpp; sourceTree = "<group>"; };
 		26C0A3551C131F8E005690FE /* bitmap_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap_data.cpp; sourceTree = "<group>"; };
@@ -675,6 +682,7 @@
 				26D6C37C1D1E87E2008720E4 /* charset.cpp */,
 				26C72AD01E22484F00F7D6D0 /* collection.cpp */,
 				A234D6ED1B3F12F600ADDF4E /* content_type.cpp */,
+				26BC2EC51E2DFF4900D0801E /* dispatch.cpp */,
 				A25F2ED11B039EF600854DAF /* event.cpp */,
 				A2DE1D9B1B383E7800A74698 /* event_unix.cpp */,
 				A25F2ED21B039EF600854DAF /* file.cpp */,
@@ -877,6 +885,9 @@
 				26CB94CA1D0126F900D8A472 /* tree_view.cpp */,
 				2648D5471D096AB000819E09 /* ui_app.cpp */,
 				A2774E291B1CBBFD00538A7B /* ui_core.cpp */,
+				2682C3F01E2D5C6C00E9CB98 /* ui_core_apple.mm */,
+				2682C3F41E2D639000E9CB98 /* ui_core_common.cpp */,
+				2682C3F51E2D639000E9CB98 /* ui_core_common.h */,
 				A25F2F261B039EF600854DAF /* ui_core_ios.mm */,
 				A25F2F291B039EF600854DAF /* ui_event.cpp */,
 				A2774E271B1CBBF600538A7B /* ui_event_ios.mm */,
@@ -993,6 +1004,7 @@
 				266DD39F1C117AE300D47AB0 /* color.cpp in Sources */,
 				26C267741DB9048200FA8FFD /* render_canvas.cpp in Sources */,
 				266DD3DD1C1181B500D47AB0 /* mac_address.cpp in Sources */,
+				26BC2EC61E2DFF4900D0801E /* dispatch.cpp in Sources */,
 				266DD3661C1170BD00D47AB0 /* camera.cpp in Sources */,
 				26B5717F1C9D449E0099E69B /* audio_util.cpp in Sources */,
 				26B5714B1C9D43E30099E69B /* map.cpp in Sources */,
@@ -1082,6 +1094,7 @@
 				E1D3A4291E14A2FC00007A98 /* preference.cpp in Sources */,
 				266DD3A51C117AE300D47AB0 /* graphics_util.cpp in Sources */,
 				266DD3E71C1181B500D47AB0 /* network_secure_stream.cpp in Sources */,
+				2682C3F11E2D5C6C00E9CB98 /* ui_core_apple.mm in Sources */,
 				A25F2F551B039EF600854DAF /* thread.cpp in Sources */,
 				A25F2F381B039EF600854DAF /* async.cpp in Sources */,
 				266DD42C1C118F7800D47AB0 /* view_ios.mm in Sources */,
@@ -1201,6 +1214,7 @@
 				266DD39D1C117AE300D47AB0 /* brush.cpp in Sources */,
 				26B5716D1C9D44720099E69B /* matrix2.cpp in Sources */,
 				AE75B9B41B0F2600004A70EE /* thirdparty_libvpx.c in Sources */,
+				2682C3F61E2D639000E9CB98 /* ui_core_common.cpp in Sources */,
 				266DD3871C117A3100D47AB0 /* sha1.cpp in Sources */,
 				266DD3DC1C1181B500D47AB0 /* ip_address.cpp in Sources */,
 				2629F8761DFAF4B8005CF43D /* ptr.cpp in Sources */,

@@ -493,9 +493,9 @@ IPv4Fragmentation::~IPv4Fragmentation()
 {
 }
 
-void IPv4Fragmentation::setupExpiringDuration(sl_uint32 ms, const Ref<AsyncLoop>& loop)
+void IPv4Fragmentation::setupExpiringDuration(sl_uint32 ms, const Ref<Dispatcher>& dispatcher)
 {
-	m_packets.setupTimer(ms, loop);
+	m_packets.setupTimer(ms, dispatcher);
 }
 
 void IPv4Fragmentation::setupExpiringDuration(sl_uint32 ms)
