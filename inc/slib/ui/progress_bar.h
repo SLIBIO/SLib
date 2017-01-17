@@ -94,7 +94,11 @@ protected:
 	sl_ui_pos _getPositionFromValue(float value);
 	
 	void _getProgressRegions(UIRect& outProgress, UIRect& outSecondaryProgress);
-
+	
+	virtual void dispatchChange(float value);
+	
+	virtual void dispatchChangeSecondary(float value);
+	
 protected:
 	LayoutOrientation m_orientation;
 	float m_value_min;

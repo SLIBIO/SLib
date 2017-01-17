@@ -12,7 +12,10 @@ class Slider;
 class SLIB_EXPORT ISliderListener
 {
 public:
-	virtual void onChange(Slider* slider, float value) = 0;
+	virtual void onChange(Slider* slider, float value);
+	
+	virtual void onChangeSecondary(Slider* slider, float value);
+	
 };
 
 class SLIB_EXPORT Slider : public ProgressBar
@@ -73,8 +76,14 @@ protected:
 	
 	virtual void onChange(float value);
 	
+	virtual void onChangeSecondary(float value);
+
 public:
-	virtual void dispatchChange(float value);
+	// override
+	void dispatchChange(float value);
+
+	// override
+	void dispatchChangeSecondary(float value);
 	
 protected:
 	void _drawTrack(Canvas* canvas, const Ref<Drawable>& track, const Rectangle& rectDst);
@@ -102,6 +111,8 @@ public:
 	
 	SLIB_PROPERTY(AtomicFunction<void(float)>, OnChange)
 	
+	SLIB_PROPERTY(AtomicFunction<void(float)>, OnChangeSecondary)
+
 protected:
 	AtomicRef<Drawable> m_thumb;
 	AtomicRef<Drawable> m_pressedThumb;

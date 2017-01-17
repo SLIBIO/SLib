@@ -116,6 +116,11 @@ Ref<Animation> Transition::createAnimation(const Ref<View>& view, const Transiti
 				animation = view->createAlphaAnimation(0.01f, 1.0f, duration, onStop, curve, sl_false);
 			} else if (pageAction == UIPageAction::Pop) {
 				animation = view->createAlphaAnimation(1.0f, 0.01f, duration, onStop, curve, sl_false);
+			} else {
+				animation = view->createAnimation(duration);
+				if (animation.isNotNull()) {
+					animation->setOnStop(onStop);
+				}
 			}
 			break;
 	}

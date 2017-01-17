@@ -550,7 +550,7 @@ void TabView::onClick(UIEvent* ev)
 	for (sl_uint32 i = 0; i < n; i++) {
 		if (getTabRegion(i).containsPoint(pt)) {
 			selectTab(i);
-			onSelectTab(i);
+			dispatchSelectTab(i);
 			return;
 		}
 	}

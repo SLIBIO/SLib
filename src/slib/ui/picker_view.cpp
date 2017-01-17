@@ -325,7 +325,7 @@ void PickerView::_selectIndexInner(sl_int32 index)
 	}
 	if (m_indexSelected != index) {
 		m_indexSelected = index;
-		onSelectItem(index);
+		dispatchSelectItem(index);
 	}
 }
 
@@ -346,7 +346,7 @@ sl_ui_len PickerView::_getLineHeight()
 {
 	Ref<Font> font = getFont();
 	if (font.isNotNull()) {
-		return (sl_ui_len)(font->getFontHeight());
+		return (sl_ui_len)(font->getFontHeight() * 1.2f);
 	}
 	return 10;
 }
@@ -419,18 +419,28 @@ void PickerView::_timerCallback()
 	}
 	float T = UIResource::getScreenMinimum() / 2000.0f;
 	if (Math::abs(m_speedFlow) <= T) {
-		if (Math::abs(m_yOffset) >= 4 * T) {
+		if (Math::abs(m_yOffset) >= T) {
 			if (m_yOffset > 0) {
 				m_speedFlow = -T;
 			} else {
 				m_speedFlow = T;
 			}
+			sl_ui_pos f = (sl_ui_pos)(m_speedFlow * (time - m_timeCallbackBefore).getMillisecondsCountf());
+			if (Math::abs(f) > Math::abs(m_yOffset)) {
+				_stopFlow();
+				m_yOffset = 0;
+				m_speedFlow = 0;
+			} else {
+				_flow(f);
+			}
 		} else {
 			_stopFlow();
 			m_yOffset = 0;
+			m_speedFlow = 0;
 		}
+	} else {
+		_flow((sl_ui_pos)(m_speedFlow * (time - m_timeCallbackBefore).getMillisecondsCountf()));
 	}
-	_flow((sl_ui_pos)(m_speedFlow * (time - m_timeCallbackBefore).getMillisecondsCountf()));
 	invalidate();
 	m_speedFlow *= 0.97f;
 	m_timeCallbackBefore = time;

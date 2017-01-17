@@ -132,8 +132,10 @@ void ProgressBar::setValue(float value, UIUpdateMode mode)
 		return;
 	}
 	m_value = value;
+	dispatchChange(value);
 	if (m_flagDualValues && value > m_value2) {
 		m_value2 = value;
+		dispatchChangeSecondary(value);
 	}
 	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
@@ -153,8 +155,10 @@ void ProgressBar::setSecondaryValue(float value, UIUpdateMode mode)
 		return;
 	}
 	m_value2 = value;
+	dispatchChangeSecondary(value);
 	if (m_flagDualValues && value < m_value) {
 		m_value = value;
+		dispatchChange(value);
 	}
 	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
@@ -172,6 +176,7 @@ void ProgressBar::setDualValues(sl_bool flagDualValues, UIUpdateMode mode)
 	if (flagDualValues) {
 		if (m_value2 < m_value) {
 			m_value2 = m_value;
+			dispatchChangeSecondary(m_value2);
 		}
 	}
 	if (mode == UIUpdateMode::Redraw) {
@@ -373,6 +378,14 @@ void ProgressBar::_getProgressRegions(UIRect& outProgress, UIRect& outSecondaryP
 		outSecondaryProgress.left = outProgress.left;
 		outSecondaryProgress.right = outProgress.right;
 	}
+}
+
+void ProgressBar::dispatchChange(float value)
+{
+}
+
+void ProgressBar::dispatchChangeSecondary(float value)
+{
 }
 
 SLIB_UI_NAMESPACE_END

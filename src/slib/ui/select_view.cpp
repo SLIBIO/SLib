@@ -356,7 +356,7 @@ void SelectView::onMouseEvent(UIEvent* ev)
 				if (index > 0) {
 					index --;
 					selectIndex(index);
-					onSelectItem(index);
+					dispatchSelectItem(index);
 					invalidate();
 				}
 			}
@@ -366,7 +366,7 @@ void SelectView::onMouseEvent(UIEvent* ev)
 				if (index + 1 < getItemsCount()) {
 					index ++;
 					selectIndex(index);
-					onSelectItem(index);
+					dispatchSelectItem(index);
 					invalidate();
 				}
 			}

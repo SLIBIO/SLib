@@ -5,6 +5,14 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+void ISliderListener::onChange(Slider *slider, float value)
+{
+}
+
+void ISliderListener::onChangeSecondary(Slider *slider, float value)
+{
+}
+
 SLIB_DEFINE_OBJECT(Slider, ProgressBar)
 
 class _Slider_Static
@@ -311,6 +319,10 @@ void Slider::onChange(float value)
 {
 }
 
+void Slider::onChangeSecondary(float value)
+{
+}
+
 void Slider::dispatchChange(float value)
 {
 	onChange(value);
@@ -319,6 +331,16 @@ void Slider::dispatchChange(float value)
 		listener->onChange(this, value);
 	}
 	getOnChange()(value);
+}
+
+void Slider::dispatchChangeSecondary(float value)
+{
+	onChangeSecondary(value);
+	PtrLocker<ISliderListener> listener(getListener());
+	if (listener.isNotNull()) {
+		listener->onChangeSecondary(this, value);
+	}
+	getOnChangeSecondary()(value);
 }
 
 void Slider::_drawTrack(Canvas* canvas, const Ref<Drawable>& track, const Rectangle& rectDst)
