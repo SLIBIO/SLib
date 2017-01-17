@@ -221,6 +221,7 @@
     <ClInclude Include="..\..\..\inc\slib\resource.h" />
     <ClInclude Include="..\..\..\inc\slib\slib.h" />
     <ClInclude Include="..\..\..\inc\slib\ui.h" />
+    <ClInclude Include="..\..\..\inc\slib\ui\animation.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\app.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\button.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\camera_view.h" />
@@ -496,6 +497,7 @@
     <ClCompile Include="..\..\..\src\slib\ui\text_view.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\transition.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\tree_view.cpp" />
+    <ClCompile Include="..\..\..\src\slib\ui\ui_animation.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\ui_app.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\ui_core.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\ui_core_common.cpp" />

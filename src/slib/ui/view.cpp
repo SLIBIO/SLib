@@ -4,6 +4,7 @@
 #include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/scroll_bar.h"
 #include "../../../inc/slib/ui/render_view.h"
+#include "../../../inc/slib/ui/animation.h"
 
 #include "../../../inc/slib/core/scoped.h"
 #include "../../../inc/slib/math/transform2d.h"
@@ -525,6 +526,11 @@ CList< Ref<View> >& View::_getChildren()
 sl_size View::getChildrenCount()
 {
 	return m_children.getCount();
+}
+
+Ref<View> View::getChild(sl_size index)
+{
+	return m_children.getValueAt(index);
 }
 
 void View::addChild(const Ref<View>& view, UIUpdateMode mode)
@@ -4860,6 +4866,20 @@ void View::invalidateLayer(const UIRect& rect)
 	}
 }
 
+Ref<Animation> View::createAnimation(float duration)
+{
+	Ref<View> parent = getParent();
+	if (parent.isNotNull()) {
+		return parent->createAnimation(duration);
+	} else {
+		Ref<UIAnimationLoop> loop = UIAnimationLoop::getInstance();
+		if (loop.isNotNull()) {
+			return Animation::create(duration, loop);
+		}
+		return sl_null;
+	}
+}
+
 void View::detachAnimations()
 {
 	Ref<AnimationAttributes> attrs = m_animationAttributes;
@@ -4959,10 +4979,9 @@ Ref<Animation> View::getTransformAnimation()
 	return sl_null;
 }
 
-void View::setTransformAnimation(const Ref<Animation>& animation, const AnimationFrames<Matrix3>& frames, UIUpdateMode mode)
+void View::setTransformAnimation(const Ref<Animation>& animation, const AnimationFrames<Matrix3>& frames)
 {
 	_resetTransformAnimation();
-	setTransformFromAnimation(frames.startValue, mode);
 	if (animation.isNotNull()) {
 		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
 		if (attrs.isNotNull()) {
@@ -4976,28 +4995,31 @@ void View::setTransformAnimation(const Ref<Animation>& animation, const Animatio
 	}
 }
 
-void View::setTransformAnimation(const Ref<Animation>& animation, const Matrix3& startValue, const Matrix3& endValue, UIUpdateMode mode)
+void View::setTransformAnimation(const Ref<Animation>& animation, const Matrix3& startValue, const Matrix3& endValue)
 {
 	AnimationFrames<Matrix3> frames(startValue, endValue);
-	setTransformAnimation(animation, frames, mode);
+	setTransformAnimation(animation, frames);
 }
 
-Ref<Animation> View::startTransformAnimation(const AnimationFrames<Matrix3>& frames, float duration, AnimationCurve curve)
+Ref<Animation> View::createTransformAnimation(const AnimationFrames<Matrix3>& frames, float duration, const Function<void()>& onStop, AnimationCurve curve, sl_bool flagStart)
 {
-	Ref<Animation> animation = Animation::create(duration);
+	Ref<Animation> animation = createAnimation(duration);
 	if (animation.isNotNull()) {
 		setTransformAnimation(animation, frames);
 		animation->setAnimationCurve(curve);
-		animation->start();
+		animation->setOnStop(onStop);
+		if (flagStart) {
+			animation->start();
+		}
 		return animation;
 	}
 	return sl_null;
 }
 
-Ref<Animation> View::startTransformAnimation(const Matrix3& startValue, const Matrix3& endValue, float duration, AnimationCurve curve)
+Ref<Animation> View::createTransformAnimation(const Matrix3& startValue, const Matrix3& endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, sl_bool flagStart)
 {
 	AnimationFrames<Matrix3> frames(startValue, endValue);
-	return startTransformAnimation(frames, duration, curve);
+	return createTransformAnimation(frames, duration, onStop, curve, flagStart);
 }
 
 void View::resetTransformAnimation(UIUpdateMode mode)
@@ -5049,10 +5071,9 @@ Ref<Animation> View::getTranslateAnimation()
 	return sl_null;
 }
 
-void View::setTranslateAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, UIUpdateMode mode)
+void View::setTranslateAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames)
 {
 	_resetTranslateAnimation();
-	setTranslationFromAnimation(frames.startValue, mode);
 	if (animation.isNotNull()) {
 		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
 		if (attrs.isNotNull()) {
@@ -5066,28 +5087,31 @@ void View::setTranslateAnimation(const Ref<Animation>& animation, const Animatio
 	}
 }
 
-void View::setTranslateAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue, UIUpdateMode mode)
+void View::setTranslateAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue)
 {
 	AnimationFrames<Vector2> frames(startValue, endValue);
-	setTranslateAnimation(animation, frames, mode);
+	setTranslateAnimation(animation, frames);
 }
 
-Ref<Animation> View::startTranslateAnimation(const AnimationFrames<Vector2>& frames, float duration, AnimationCurve curve)
+Ref<Animation> View::createTranslateAnimation(const AnimationFrames<Vector2>& frames, float duration, const Function<void()>& onStop, AnimationCurve curve, sl_bool flagStart)
 {
-	Ref<Animation> animation = Animation::create(duration);
+	Ref<Animation> animation = createAnimation(duration);
 	if (animation.isNotNull()) {
 		setTranslateAnimation(animation, frames);
 		animation->setAnimationCurve(curve);
-		animation->start();
+		animation->setOnStop(onStop);
+		if (flagStart) {
+			animation->start();
+		}
 		return animation;
 	}
 	return sl_null;
 }
 
-Ref<Animation> View::startTranslateAnimation(const Vector2& startValue, const Vector2& endValue, float duration, AnimationCurve curve)
+Ref<Animation> View::createTranslateAnimation(const Vector2& startValue, const Vector2& endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, sl_bool flagStart)
 {
 	AnimationFrames<Vector2> frames(startValue, endValue);
-	return startTranslateAnimation(frames, duration, curve);
+	return createTranslateAnimation(frames, duration, onStop, curve, flagStart);
 }
 
 void View::resetTranslateAnimation(UIUpdateMode mode)
@@ -5139,10 +5163,9 @@ Ref<Animation> View::getScaleAnimation()
 	return sl_null;
 }
 
-void View::setScaleAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, UIUpdateMode mode)
+void View::setScaleAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames)
 {
 	_resetScaleAnimation();
-	setScaleFromAnimation(frames.startValue, mode);
 	if (animation.isNotNull()) {
 		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
 		if (attrs.isNotNull()) {
@@ -5156,40 +5179,43 @@ void View::setScaleAnimation(const Ref<Animation>& animation, const AnimationFra
 	}
 }
 
-void View::setScaleAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue, UIUpdateMode mode)
+void View::setScaleAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue)
 {
 	AnimationFrames<Vector2> frames(startValue, endValue);
-	setScaleAnimation(animation, frames, mode);
+	setScaleAnimation(animation, frames);
 }
 
-void View::setScaleAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, UIUpdateMode mode)
+void View::setScaleAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue)
 {
 	AnimationFrames<Vector2> frames(Vector2(startValue, startValue), Vector2(endValue, endValue));
-	setScaleAnimation(animation, frames, mode);
+	setScaleAnimation(animation, frames);
 }
 
-Ref<Animation> View::startScaleAnimation(const AnimationFrames<Vector2>& frames, float duration, AnimationCurve curve)
+Ref<Animation> View::createScaleAnimation(const AnimationFrames<Vector2>& frames, float duration, const Function<void()>& onStop, AnimationCurve curve, sl_bool flagStart)
 {
-	Ref<Animation> animation = Animation::create(duration);
+	Ref<Animation> animation = createAnimation(duration);
 	if (animation.isNotNull()) {
 		setScaleAnimation(animation, frames);
 		animation->setAnimationCurve(curve);
-		animation->start();
+		animation->setOnStop(onStop);
+		if (flagStart) {
+			animation->start();
+		}
 		return animation;
 	}
 	return sl_null;
 }
 
-Ref<Animation> View::startScaleAnimation(const Vector2& startValue, const Vector2& endValue, float duration, AnimationCurve curve)
+Ref<Animation> View::createScaleAnimation(const Vector2& startValue, const Vector2& endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, sl_bool flagStart)
 {
 	AnimationFrames<Vector2> frames(startValue, endValue);
-	return startScaleAnimation(frames, duration, curve);
+	return createScaleAnimation(frames, duration, onStop, curve, flagStart);
 }
 
-Ref<Animation> View::startScaleAnimation(sl_real startValue, sl_real endValue, float duration, AnimationCurve curve)
+Ref<Animation> View::createScaleAnimation(sl_real startValue, sl_real endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, sl_bool flagStart)
 {
 	AnimationFrames<Vector2> frames(Vector2(startValue, startValue), Vector2(endValue, endValue));
-	return startScaleAnimation(frames, duration, curve);
+	return createScaleAnimation(frames, duration, onStop, curve, flagStart);
 }
 
 void View::resetScaleAnimation(UIUpdateMode mode)
@@ -5241,10 +5267,10 @@ Ref<Animation> View::getRotateAnimation()
 	return sl_null;
 }
 
-void View::setRotateAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, UIUpdateMode mode)
+void View::setRotateAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames)
 {
 	_resetRotateAnimation();
-	setRotationFromAnimation(frames.startValue, mode);
+	setRotationFromAnimation(frames.startValue);
 	if (animation.isNotNull()) {
 		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
 		if (attrs.isNotNull()) {
@@ -5258,28 +5284,31 @@ void View::setRotateAnimation(const Ref<Animation>& animation, const AnimationFr
 	}
 }
 
-void View::setRotateAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, UIUpdateMode mode)
+void View::setRotateAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue)
 {
 	AnimationFrames<sl_real> frames(startValue, endValue);
-	setRotateAnimation(animation, frames, mode);
+	setRotateAnimation(animation, frames);
 }
 
-Ref<Animation> View::startRotateAnimation(const AnimationFrames<sl_real>& frames, float duration, AnimationCurve curve)
+Ref<Animation> View::createRotateAnimation(const AnimationFrames<sl_real>& frames, float duration, const Function<void()>& onStop, AnimationCurve curve, sl_bool flagStart)
 {
-	Ref<Animation> animation = Animation::create(duration);
+	Ref<Animation> animation = createAnimation(duration);
 	if (animation.isNotNull()) {
 		setRotateAnimation(animation, frames);
 		animation->setAnimationCurve(curve);
-		animation->start();
+		animation->setOnStop(onStop);
+		if (flagStart) {
+			animation->start();
+		}
 		return animation;
 	}
 	return sl_null;
 }
 
-Ref<Animation> View::startRotateAnimation(sl_real startValue, sl_real endValue, float duration, AnimationCurve curve)
+Ref<Animation> View::createRotateAnimation(sl_real startValue, sl_real endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, sl_bool flagStart)
 {
 	AnimationFrames<sl_real> frames(startValue, endValue);
-	return startRotateAnimation(frames, duration, curve);
+	return createRotateAnimation(frames, duration, onStop, curve, flagStart);
 }
 
 void View::resetRotateAnimation(UIUpdateMode mode)
@@ -5331,10 +5360,9 @@ Ref<Animation> View::getFrameAnimation()
 	return sl_null;
 }
 
-void View::setFrameAnimation(const Ref<Animation>& animation, const AnimationFrames<Rectangle>& frames, UIUpdateMode mode)
+void View::setFrameAnimation(const Ref<Animation>& animation, const AnimationFrames<Rectangle>& frames)
 {
 	_resetFrameAnimation();
-	setFrame(frames.startValue, mode);
 	if (animation.isNotNull()) {
 		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
 		if (attrs.isNotNull()) {
@@ -5348,28 +5376,31 @@ void View::setFrameAnimation(const Ref<Animation>& animation, const AnimationFra
 	}
 }
 
-void View::setFrameAnimation(const Ref<Animation>& animation, const Rectangle& startValue, const Rectangle& endValue, UIUpdateMode mode)
+void View::setFrameAnimation(const Ref<Animation>& animation, const Rectangle& startValue, const Rectangle& endValue)
 {
 	AnimationFrames<Rectangle> frames(startValue, endValue);
-	setFrameAnimation(animation, frames, mode);
+	setFrameAnimation(animation, frames);
 }
 
-Ref<Animation> View::startFrameAnimation(const AnimationFrames<Rectangle>& frames, float duration, AnimationCurve curve)
+Ref<Animation> View::createFrameAnimation(const AnimationFrames<Rectangle>& frames, float duration, const Function<void()>& onStop, AnimationCurve curve, sl_bool flagStart)
 {
-	Ref<Animation> animation = Animation::create(duration);
+	Ref<Animation> animation = createAnimation(duration);
 	if (animation.isNotNull()) {
 		setFrameAnimation(animation, frames);
 		animation->setAnimationCurve(curve);
-		animation->start();
+		animation->setOnStop(onStop);
+		if (flagStart) {
+			animation->start();
+		}
 		return animation;
 	}
 	return sl_null;
 }
 
-Ref<Animation> View::startFrameAnimation(const Rectangle& startValue, const Rectangle& endValue, float duration, AnimationCurve curve)
+Ref<Animation> View::createFrameAnimation(const Rectangle& startValue, const Rectangle& endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, sl_bool flagStart)
 {
 	AnimationFrames<Rectangle> frames(startValue, endValue);
-	return startFrameAnimation(frames, duration, curve);
+	return createFrameAnimation(frames, duration, onStop, curve, flagStart);
 }
 
 void View::resetFrameAnimation(UIUpdateMode mode)
@@ -5420,10 +5451,9 @@ Ref<Animation> View::getAlphaAnimation()
 	return sl_null;
 }
 
-void View::setAlphaAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, UIUpdateMode mode)
+void View::setAlphaAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames)
 {
 	_resetAlphaAnimation();
-	setAlphaFromAnimation(frames.startValue, mode);
 	if (animation.isNotNull()) {
 		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
 		if (attrs.isNotNull()) {
@@ -5437,28 +5467,31 @@ void View::setAlphaAnimation(const Ref<Animation>& animation, const AnimationFra
 	}
 }
 
-void View::setAlphaAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, UIUpdateMode mode)
+void View::setAlphaAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue)
 {
 	AnimationFrames<sl_real> frames(startValue, endValue);
-	setAlphaAnimation(animation, frames, mode);
+	setAlphaAnimation(animation, frames);
 }
 
-Ref<Animation> View::startAlphaAnimation(const AnimationFrames<sl_real>& frames, float duration, AnimationCurve curve)
+Ref<Animation> View::createAlphaAnimation(const AnimationFrames<sl_real>& frames, float duration, const Function<void()>& onStop, AnimationCurve curve, sl_bool flagStart)
 {
-	Ref<Animation> animation = Animation::create(duration);
+	Ref<Animation> animation = createAnimation(duration);
 	if (animation.isNotNull()) {
 		setAlphaAnimation(animation, frames);
 		animation->setAnimationCurve(curve);
-		animation->start();
+		animation->setOnStop(onStop);
+		if (flagStart) {
+			animation->start();
+		}
 		return animation;
 	}
 	return sl_null;
 }
 
-Ref<Animation> View::startAlphaAnimation(sl_real startValue, sl_real endValue, float duration, AnimationCurve curve)
+Ref<Animation> View::createAlphaAnimation(sl_real startValue, sl_real endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, sl_bool flagStart)
 {
 	AnimationFrames<sl_real> frames(startValue, endValue);
-	return startAlphaAnimation(frames, duration, curve);
+	return createAlphaAnimation(frames, duration, onStop, curve, flagStart);
 }
 
 void View::resetAlphaAnimation(UIUpdateMode mode)
@@ -5510,10 +5543,9 @@ Ref<Animation> View::getBackgroundColorAnimation()
 	return sl_null;
 }
 
-void View::setBackgroundColorAnimation(const Ref<Animation>& animation, const AnimationFrames<Color4f>& frames, UIUpdateMode mode)
+void View::setBackgroundColorAnimation(const Ref<Animation>& animation, const AnimationFrames<Color4f>& frames)
 {
 	_resetBackgroundColorAnimation();
-	setBackgroundColor(frames.startValue, mode);
 	if (animation.isNotNull()) {
 		Ref<AnimationAttributes> attrs = _initializeAnimationAttributes();
 		if (attrs.isNotNull()) {
@@ -5527,28 +5559,31 @@ void View::setBackgroundColorAnimation(const Ref<Animation>& animation, const An
 	}
 }
 
-void View::setBackgroundColorAnimation(const Ref<Animation>& animation, const Color4f& startValue, const Color4f& endValue, UIUpdateMode mode)
+void View::setBackgroundColorAnimation(const Ref<Animation>& animation, const Color4f& startValue, const Color4f& endValue)
 {
 	AnimationFrames<Color4f> frames(startValue, endValue);
-	setBackgroundColorAnimation(animation, frames, mode);
+	setBackgroundColorAnimation(animation, frames);
 }
 
-Ref<Animation> View::startBackgroundColorAnimation(const AnimationFrames<Color4f>& frames, float duration, AnimationCurve curve)
+Ref<Animation> View::createBackgroundColorAnimation(const AnimationFrames<Color4f>& frames, float duration, const Function<void()>& onStop, AnimationCurve curve, sl_bool flagStart)
 {
-	Ref<Animation> animation = Animation::create(duration);
+	Ref<Animation> animation = createAnimation(duration);
 	if (animation.isNotNull()) {
 		setBackgroundColorAnimation(animation, frames);
 		animation->setAnimationCurve(curve);
-		animation->start();
+		animation->setOnStop(onStop);
+		if (flagStart) {
+			animation->start();
+		}
 		return animation;
 	}
 	return sl_null;
 }
 
-Ref<Animation> View::startBackgroundColorAnimation(const Color4f& startValue, const Color4f& endValue, float duration, AnimationCurve curve)
+Ref<Animation> View::createBackgroundColorAnimation(const Color4f& startValue, const Color4f& endValue, float duration, const Function<void()>& onStop, AnimationCurve curve, sl_bool flagStart)
 {
 	AnimationFrames<Color4f> frames(startValue, endValue);
-	return startBackgroundColorAnimation(frames, duration, curve);
+	return createBackgroundColorAnimation(frames, duration, onStop, curve, flagStart);
 }
 
 void View::resetBackgroundColorAnimation(UIUpdateMode mode)

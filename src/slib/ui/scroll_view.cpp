@@ -16,6 +16,9 @@ ScrollView::ScrollView()
 	m_flagPaging = sl_false;
 	m_pageWidth = 0;
 	m_pageHeight = 0;
+	
+	setHorizontalScrolling(sl_true);
+	setVerticalScrolling(sl_true);
 }
 
 Ref<View> ScrollView::getContentView()

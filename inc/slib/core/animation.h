@@ -141,13 +141,13 @@ public:
 	sl_uint32 getRepeatedCount();
 	
 	
-	void start(sl_bool flagUpdateFrame = sl_false);
+	void start(sl_bool flagUpdateFrame = sl_true);
 	
-	void startAt(float seconds, sl_bool flagUpdateFrame = sl_false);
+	void startAt(float seconds, sl_bool flagUpdateFrame = sl_true);
 
-	void restart(sl_bool flagUpdateFrame = sl_false);
+	void restart(sl_bool flagUpdateFrame = sl_true);
 	
-	void restartAt(float seconds, sl_bool flagUpdateFrame = sl_false);
+	void restartAt(float seconds, sl_bool flagUpdateFrame = sl_true);
 	
 	void stop();
 	
@@ -248,11 +248,7 @@ public:
 
 	void wake();
 	
-protected:
-	virtual void _pause() = 0;
-	
-	virtual void _resume() = 0;
-	
+protected:	
 	virtual void _wake() = 0;
 	
 protected:

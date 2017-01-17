@@ -2,8 +2,6 @@
 
 SLIB_NAMESPACE_BEGIN
 
-template class Function<void()>;
-
 SLIB_DEFINE_ROOT_OBJECT(CallableBase)
 
 SLIB_DEFINE_OBJECT(Executor, Object)

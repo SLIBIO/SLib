@@ -220,8 +220,12 @@ void ViewPager::_goTo(sl_size index, const Transition& _transition)
 	
 	dispatchPageAction(viewIn.get(), UIPageAction::Resume);
 	
-	animationPause->dispatchAnimationFrame(0);
-	animationResume->dispatchAnimationFrame(0);
+	if (animationPause.isNotNull()) {
+		animationPause->dispatchAnimationFrame(0);
+	}
+	if (animationResume.isNotNull()) {
+		animationResume->dispatchAnimationFrame(0);
+	}
 	
 	if (flagNext) {
 		viewIn->bringToFront(UIUpdateMode::NoRedraw);
@@ -361,8 +365,12 @@ void ViewPager::_push(const Ref<View>& viewIn, const Transition& _transition, sl
 	m_pages.add_NoLock(viewIn);
 	dispatchPageAction(viewIn.get(), UIPageAction::Push);
 	
-	animationPause->dispatchAnimationFrame(0);
-	animationPush->dispatchAnimationFrame(0);
+	if (animationPause.isNotNull()) {
+		animationPause->dispatchAnimationFrame(0);
+	}
+	if (animationPush.isNotNull()) {
+		animationPush->dispatchAnimationFrame(0);
+	}
 
 	viewIn->bringToFront(UIUpdateMode::NoRedraw);
 	viewIn->setVisibility(Visibility::Visible);
@@ -1052,7 +1060,9 @@ void ViewPage::_openPopup(const Ref<View>& parent, Transition transition, sl_boo
 	
 	dispatchOpen();
 	
-	animation->dispatchAnimationFrame(0);
+	if (animation.isNotNull()) {
+		animation->dispatchAnimationFrame(0);
+	}
 	
 	setVisibility(Visibility::Visible);
 	

@@ -94,8 +94,6 @@ public:
 	
 };
 
-extern template class Function<void()>;
-
 class SLIB_EXPORT Executor : public Object
 {
 	SLIB_DECLARE_OBJECT

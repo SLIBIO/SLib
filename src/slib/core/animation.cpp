@@ -703,7 +703,6 @@ void AnimationLoop::pause()
 		return;
 	}
 	m_flagPaused = sl_true;
-	_pause();
 }
 
 void AnimationLoop::resume()
@@ -713,7 +712,7 @@ void AnimationLoop::resume()
 		return;
 	}
 	m_flagPaused = sl_false;
-	_resume();
+	_wake();
 }
 
 sl_bool AnimationLoop::isPaused()
@@ -756,7 +755,7 @@ sl_int32 AnimationLoop::_runStep()
 		elapsed = 0.1f;
 	}
 	
-	ListElements< Ref<Animation> > list(m_animations);
+	ListElements< Ref<Animation> > list(m_animationsRunning);
 	if (list.count > 0) {
 		for (sl_size i = 0; i < list.count; i++) {
 			Ref<Animation> animation = list[i];
@@ -816,19 +815,6 @@ public:
 	}
 	
 public:
-	// override
-	void _pause()
-	{
-	}
-	
-	// override
-	void _resume()
-	{
-		if (m_thread.isNotNull()) {
-			m_thread->wake();
-		}
-	}
-	
 	// override
 	void _wake()
 	{

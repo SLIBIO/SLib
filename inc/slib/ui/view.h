@@ -94,6 +94,8 @@ public:
 	
 	sl_size getChildrenCount();
 	
+	Ref<View> getChild(sl_size index);
+	
 	void addChild(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	void insertChild(sl_size index, const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
@@ -735,95 +737,97 @@ public:
 	void invalidateLayer(const UIRect& rect);
 	
 	
+	virtual Ref<Animation> createAnimation(float duration);
+	
 	void detachAnimations();
 
 	void resetAnimations(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Animation> getTransformAnimation();
 	
-	void setTransformAnimation(const Ref<Animation>& animation, const AnimationFrames<Matrix3>& frames, UIUpdateMode mode = UIUpdateMode::Redraw);
+	void setTransformAnimation(const Ref<Animation>& animation, const AnimationFrames<Matrix3>& frames);
 	
-	void setTransformAnimation(const Ref<Animation>& animation, const Matrix3& startValue, const Matrix3& endValue, UIUpdateMode mode = UIUpdateMode::Redraw);
+	void setTransformAnimation(const Ref<Animation>& animation, const Matrix3& startValue, const Matrix3& endValue);
 	
-	Ref<Animation> startTransformAnimation(const AnimationFrames<Matrix3>& frames, float duration, AnimationCurve curve = AnimationCurve::Default);
+	Ref<Animation> createTransformAnimation(const AnimationFrames<Matrix3>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
 	
-	Ref<Animation> startTransformAnimation(const Matrix3& startValue, const Matrix3& endValue, float duration, AnimationCurve curve = AnimationCurve::Default);
+	Ref<Animation> createTransformAnimation(const Matrix3& startValue, const Matrix3& endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
 	
 	void resetTransformAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Animation> getTranslateAnimation();
 	
-	void setTranslateAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, UIUpdateMode mode = UIUpdateMode::Redraw);
+	void setTranslateAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames);
 	
-	void setTranslateAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue, UIUpdateMode mode = UIUpdateMode::Redraw);
+	void setTranslateAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue);
 	
-	Ref<Animation> startTranslateAnimation(const AnimationFrames<Vector2>& frames, float duration, AnimationCurve curve = AnimationCurve::Default);
+	Ref<Animation> createTranslateAnimation(const AnimationFrames<Vector2>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
 	
-	Ref<Animation> startTranslateAnimation(const Vector2& startValue, const Vector2& endValue, float duration, AnimationCurve curve = AnimationCurve::Default);
+	Ref<Animation> createTranslateAnimation(const Vector2& startValue, const Vector2& endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
 	
 	void resetTranslateAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Animation> getScaleAnimation();
 	
-	void setScaleAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames, UIUpdateMode mode = UIUpdateMode::Redraw);
+	void setScaleAnimation(const Ref<Animation>& animation, const AnimationFrames<Vector2>& frames);
 	
-	void setScaleAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue, UIUpdateMode mode = UIUpdateMode::Redraw);
+	void setScaleAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue);
 	
-	void setScaleAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, UIUpdateMode mode = UIUpdateMode::Redraw);
+	void setScaleAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue);
 	
-	Ref<Animation> startScaleAnimation(const AnimationFrames<Vector2>& frames, float duration, AnimationCurve curve = AnimationCurve::Default);
+	Ref<Animation> createScaleAnimation(const AnimationFrames<Vector2>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
 	
-	Ref<Animation> startScaleAnimation(const Vector2& startValue, const Vector2& endValue, float duration, AnimationCurve curve = AnimationCurve::Default);
+	Ref<Animation> createScaleAnimation(const Vector2& startValue, const Vector2& endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
 	
-	Ref<Animation> startScaleAnimation(sl_real startValue, sl_real endValue, float duration, AnimationCurve curve = AnimationCurve::Default);
+	Ref<Animation> createScaleAnimation(sl_real startValue, sl_real endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
 
 	void resetScaleAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Animation> getRotateAnimation();
 	
-	void setRotateAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, UIUpdateMode mode = UIUpdateMode::Redraw);
+	void setRotateAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames);
 	
-	void setRotateAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, UIUpdateMode mode = UIUpdateMode::Redraw);
+	void setRotateAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue);
 	
-	Ref<Animation> startRotateAnimation(const AnimationFrames<sl_real>& frames, float duration, AnimationCurve curve = AnimationCurve::Default);
+	Ref<Animation> createRotateAnimation(const AnimationFrames<sl_real>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
 	
-	Ref<Animation> startRotateAnimation(sl_real startValue, sl_real endValue, float duration, AnimationCurve curve = AnimationCurve::Default);
+	Ref<Animation> createRotateAnimation(sl_real startValue, sl_real endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
 
 	void resetRotateAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Animation> getFrameAnimation();
 	
-	void setFrameAnimation(const Ref<Animation>& animation, const AnimationFrames<Rectangle>& frames, UIUpdateMode mode = UIUpdateMode::Redraw);
+	void setFrameAnimation(const Ref<Animation>& animation, const AnimationFrames<Rectangle>& frames);
 	
-	void setFrameAnimation(const Ref<Animation>& animation, const Rectangle& startValue, const Rectangle& endValue, UIUpdateMode mode = UIUpdateMode::Redraw);
+	void setFrameAnimation(const Ref<Animation>& animation, const Rectangle& startValue, const Rectangle& endValue);
 	
-	Ref<Animation> startFrameAnimation(const AnimationFrames<Rectangle>& frames, float duration, AnimationCurve curve = AnimationCurve::Default);
+	Ref<Animation> createFrameAnimation(const AnimationFrames<Rectangle>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
 	
-	Ref<Animation> startFrameAnimation(const Rectangle& startValue, const Rectangle& endValue, float duration, AnimationCurve curve = AnimationCurve::Default);
+	Ref<Animation> createFrameAnimation(const Rectangle& startValue, const Rectangle& endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
 	
 	void resetFrameAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	Ref<Animation> getAlphaAnimation();
 	
-	void setAlphaAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames, UIUpdateMode mode = UIUpdateMode::Redraw);
+	void setAlphaAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames);
 	
-	void setAlphaAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue, UIUpdateMode mode = UIUpdateMode::Redraw);
+	void setAlphaAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue);
 	
-	Ref<Animation> startAlphaAnimation(const AnimationFrames<sl_real>& frames, float duration, AnimationCurve curve = AnimationCurve::Default);
+	Ref<Animation> createAlphaAnimation(const AnimationFrames<sl_real>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
 	
-	Ref<Animation> startAlphaAnimation(sl_real startValue, sl_real endValue, float duration, AnimationCurve curve = AnimationCurve::Default);
+	Ref<Animation> createAlphaAnimation(sl_real startValue, sl_real endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
 
 	void resetAlphaAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Animation> getBackgroundColorAnimation();
 	
-	void setBackgroundColorAnimation(const Ref<Animation>& animation, const AnimationFrames<Color4f>& frames, UIUpdateMode mode = UIUpdateMode::Redraw);
+	void setBackgroundColorAnimation(const Ref<Animation>& animation, const AnimationFrames<Color4f>& frames);
 	
-	void setBackgroundColorAnimation(const Ref<Animation>& animation, const Color4f& startValue, const Color4f& endValue, UIUpdateMode mode = UIUpdateMode::Redraw);
+	void setBackgroundColorAnimation(const Ref<Animation>& animation, const Color4f& startValue, const Color4f& endValue);
 	
-	Ref<Animation> startBackgroundColorAnimation(const AnimationFrames<Color4f>& frames, float duration, AnimationCurve curve = AnimationCurve::Default);
+	Ref<Animation> createBackgroundColorAnimation(const AnimationFrames<Color4f>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
 	
-	Ref<Animation> startBackgroundColorAnimation(const Color4f& startValue, const Color4f& endValue, float duration, AnimationCurve curve = AnimationCurve::Default);
+	Ref<Animation> createBackgroundColorAnimation(const Color4f& startValue, const Color4f& endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
 
 	void resetBackgroundColorAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	

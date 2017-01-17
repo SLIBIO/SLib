@@ -833,6 +833,9 @@
     <ClInclude Include="..\..\..\inc\slib\core\dispatch.h">
       <Filter>inc\core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\ui\animation.h">
+      <Filter>inc\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">
@@ -1587,6 +1590,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\dispatch.cpp">
       <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\ui\ui_animation.cpp">
+      <Filter>src\slib\ui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

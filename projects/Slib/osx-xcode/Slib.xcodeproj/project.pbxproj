@@ -26,6 +26,7 @@
 		2649C2371CBBCB7E003E7561 /* common_dialogs_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2649C2361CBBCB7E003E7561 /* common_dialogs_osx.mm */; };
 		264A5D7C1CB6C9BF00FB0B08 /* ui_menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 264A5D7B1CB6C9BF00FB0B08 /* ui_menu.cpp */; };
 		264A5D7E1CB6C9C800FB0B08 /* ui_menu_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 264A5D7D1CB6C9C800FB0B08 /* ui_menu_osx.mm */; };
+		2653358F1E2E8A5A00199C76 /* ui_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2653358E1E2E8A5A00199C76 /* ui_animation.cpp */; };
 		26599DBA1BEA5DD2008659BB /* thread_pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26599DB91BEA5DD2008659BB /* thread_pool.cpp */; };
 		265EBF241C23041600AD81D9 /* database_cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF1F1C23041600AD81D9 /* database_cursor.cpp */; };
 		265EBF251C23041600AD81D9 /* database_statement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 265EBF201C23041600AD81D9 /* database_statement.cpp */; };
@@ -291,6 +292,7 @@
 		2649C2361CBBCB7E003E7561 /* common_dialogs_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = common_dialogs_osx.mm; sourceTree = "<group>"; };
 		264A5D7B1CB6C9BF00FB0B08 /* ui_menu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_menu.cpp; sourceTree = "<group>"; };
 		264A5D7D1CB6C9C800FB0B08 /* ui_menu_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_menu_osx.mm; sourceTree = "<group>"; };
+		2653358E1E2E8A5A00199C76 /* ui_animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_animation.cpp; sourceTree = "<group>"; };
 		26599DB91BEA5DD2008659BB /* thread_pool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_pool.cpp; sourceTree = "<group>"; };
 		265EBF1F1C23041600AD81D9 /* database_cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database_cursor.cpp; sourceTree = "<group>"; };
 		265EBF201C23041600AD81D9 /* database_statement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = database_statement.cpp; sourceTree = "<group>"; };
@@ -687,6 +689,7 @@
 				26B1C9A01DC7ABB60092C84F /* text_view.cpp */,
 				26C4E26A1DB47A7200A9211F /* transition.cpp */,
 				26A4ECCE1CFE7FB700288A0B /* tree_view.cpp */,
+				2653358E1E2E8A5A00199C76 /* ui_animation.cpp */,
 				2648D5451D096A8B00819E09 /* ui_app.cpp */,
 				266DD52B1C11940A00D47AB0 /* ui_core.cpp */,
 				2682C3F21E2D5D0800E9CB98 /* ui_core_apple.mm */,
@@ -1098,6 +1101,7 @@
 				266DD55D1C11940A00D47AB0 /* codec_vp8.cpp in Sources */,
 				26BBBEC81D8FDF1F00735947 /* view_page.cpp in Sources */,
 				2648D5441D096A7000819E09 /* mobile_app.cpp in Sources */,
+				2653358F1E2E8A5A00199C76 /* ui_animation.cpp in Sources */,
 				266DD5B61C11940A00D47AB0 /* radio_button.cpp in Sources */,
 				266DD5891C11940A00D47AB0 /* render_program.cpp in Sources */,
 				26E376DB1C985EA100B178E6 /* vector4.cpp in Sources */,
