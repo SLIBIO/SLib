@@ -18,7 +18,7 @@ public:
 	static void print(const String& s);
 	
 	template <class... ARGS>
-	void print(const String& format, ARGS&&... args)
+	static void print(const String& format, ARGS&&... args)
 	{
 		String content = String::format(format, args...);
 		print(content);
@@ -27,7 +27,7 @@ public:
 	static void println(const String& s);
 	
 	template <class... ARGS>
-	void println(const String& format, ARGS&&... args)
+	static void println(const String& format, ARGS&&... args)
 	{
 		String content = String::format(format, args...);
 		println(content);

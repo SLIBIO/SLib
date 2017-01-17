@@ -10,6 +10,18 @@ ImageView::ImageView()
 	m_gravity = Alignment::MiddleCenter;
 }
 
+Ref<ImageView> ImageView::create(sl_ui_len width, sl_ui_len height, const Ref<slib::Drawable> &drawable)
+{
+	Ref<ImageView> ret = new ImageView;
+	if (ret.isNotNull()) {
+		ret->setSource(drawable, UIUpdateMode::Init);
+		ret->setWidth(width, UIUpdateMode::Init);
+		ret->setHeight(height, UIUpdateMode::Init);
+		return ret;
+	}
+	return sl_null;
+}
+
 Ref<Drawable> ImageView::getSource()
 {
 	return m_source;

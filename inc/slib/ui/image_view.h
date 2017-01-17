@@ -15,6 +15,9 @@ public:
 	ImageView();
 	
 public:
+	static Ref<ImageView> create(sl_ui_len width, sl_ui_len height, const Ref<Drawable>& drawable);
+	
+public:
 	Ref<Drawable> getSource();
 	
 	virtual void setSource(const Ref<Drawable>& drawable, UIUpdateMode mode = UIUpdateMode::Redraw);

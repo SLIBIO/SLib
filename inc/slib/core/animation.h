@@ -503,7 +503,7 @@ T AnimationFramesSeeker<T, INTERPOLATION>::seek(float fraction)
 		return *m_currentEndValue;
 	}
 	w /= t;
-	return INTERPOLATION::interpolate(*m_currentStartValue, *m_currentEndValue, fraction);
+	return INTERPOLATION::interpolate(*m_currentStartValue, *m_currentEndValue, w);
 }
 
 SLIB_NAMESPACE_END
