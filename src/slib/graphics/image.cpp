@@ -490,7 +490,7 @@ public:
 		if (p.flagBox) {
 			s = 1 - f;
 			e = f + p.filterSize; // p.filterSize > 1
-			n = (int)(e - SLIB_EPSILON);
+			n = (int)(e - 0.001f);
 			e -= (float)n;
 			n -= 1;
 			area = p.filterSize;
