@@ -6,15 +6,21 @@
 
 #include "view_ios.h"
 
-@interface _Slib_iOS_ScrollView : UIScrollView {
+@interface _Slib_iOS_ScrollView : UIScrollView<UIScrollViewDelegate> {
 	
 	@public slib::WeakRef<slib::iOS_ViewInstance> m_viewInstance;
 	
 	@public UIView* m_contentView;
 	
+	sl_bool m_flagPaging;
+	sl_ui_len m_pageWidth;
+	sl_ui_len m_pageHeight;
+	
 }
 
 - (void)setContentOffsetFromAPI:(CGPoint)contentOffset;
+
+- (void)setPaging:(sl_bool)flagPaging :(sl_ui_len)pageWidth :(sl_ui_len)pageHeight;
 
 @end
 
@@ -33,10 +39,10 @@ public:
 		}
 		
 		ScrollPoint size = getContentSize();
-		if (!m_flagHorizontalScroll) {
+		if (!(isHorizontalScrolling())) {
 			size.x = 0;
 		}
-		if (!m_flagVerticalScroll) {
+		if (!(isVerticalScrolling())) {
 			size.y = 0;
 		}
 		CGFloat f = UIPlatform::getGlobalScaleFactor();
@@ -81,7 +87,11 @@ public:
 		}
 		
 		handle.backgroundColor = GraphicsPlatform::getUIColorFromColor(getBackgroundColor());
-		handle.pagingEnabled = m_flagPaging ? YES : NO;
+		
+		[handle setPaging:m_flagPaging :m_pageWidth :m_pageHeight];
+		
+		handle.showsHorizontalScrollIndicator = isHorizontalScrollBarVisible() ? YES : NO;
+		handle.showsVerticalScrollIndicator = isVerticalScrollBarVisible() ? YES : NO;
 		
 		__applyContent(handle);
 	}
@@ -222,12 +232,22 @@ void ScrollView::_setBackgroundColor_NW(const Color& color)
 	}
 }
 
-void ScrollView::_setPaging_NW(sl_bool flagPaging)
+void ScrollView::_setPaging_NW(sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight)
+{
+	UIView* handle = UIPlatform::getViewHandle(this);
+	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_ScrollView class]]) {
+		_Slib_iOS_ScrollView* sv = (_Slib_iOS_ScrollView*)handle;
+		[sv setPaging:flagPaging :pageWidth :pageHeight];
+	}
+}
+
+void ScrollView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
 {
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[UIScrollView class]]) {
 		UIScrollView* sv = (UIScrollView*)handle;
-		sv.pagingEnabled = flagPaging ? YES : NO;
+		sv.showsHorizontalScrollIndicator = flagHorizontal ? YES : NO;
+		sv.showsVerticalScrollIndicator = flagVertical ? YES : NO;
 	}
 }
 
@@ -238,6 +258,9 @@ SLIB_UI_NAMESPACE_END
 -(id)initWithFrame:(CGRect)frame
 {
 	self = [super initWithFrame:frame];
+	if (self != nil) {
+		[self setDelegate:self];
+	}
 	return self;
 }
 
@@ -253,6 +276,29 @@ SLIB_UI_NAMESPACE_END
 - (void)setContentOffsetFromAPI:(CGPoint)contentOffset
 {
 	[super setContentOffset:contentOffset];
+}
+
+- (void)setPaging: (sl_bool)flagPaging :(sl_ui_len)pageWidth :(sl_ui_len)pageHeight
+{
+	m_flagPaging = flagPaging;
+	CGFloat f = slib::UIPlatform::getGlobalScaleFactor();
+	m_pageWidth = (sl_ui_len)(pageWidth / f);
+	m_pageHeight = (sl_ui_len)(pageHeight / f);
+	self.pagingEnabled = flagPaging && pageWidth <= 0 && pageHeight <= 0 ? YES : NO;
+}
+
+- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset
+{
+	if (!m_flagPaging) {
+		return;
+	}
+	if (m_pageWidth <= 0 && m_pageHeight <= 0) {
+		return;
+	}
+	CGFloat tx = scrollView.contentOffset.x + velocity.x * 60.0;
+	targetContentOffset->x = round(tx / m_pageWidth) * m_pageWidth;
+	CGFloat ty = scrollView.contentOffset.y + velocity.y * 60.0;
+	targetContentOffset->y = round(ty / m_pageHeight) * 100;
 }
 
 @end

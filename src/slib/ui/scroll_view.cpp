@@ -12,43 +12,10 @@ ScrollView::ScrollView()
 	setCreatingNativeWidget(sl_true);
 	setCreatingChildInstances(sl_false);
 	setBorder(sl_true, UIUpdateMode::Init);
-	
-	m_flagInitedScrollbars = sl_false;
-	m_flagHorizontalScroll = sl_true;
-	m_flagVerticalScroll = sl_true;
 
 	m_flagPaging = sl_false;
-}
-
-sl_bool ScrollView::isHorizontalScrolling()
-{
-	return m_flagHorizontalScroll;
-}
-
-void ScrollView::setHorizontalScrolling(sl_bool flagHorizontal)
-{
-	m_flagHorizontalScroll = flagHorizontal;
-}
-
-sl_bool ScrollView::isVerticalScrolling()
-{
-	return m_flagVerticalScroll;
-}
-
-void ScrollView::setVerticalScrolling(sl_bool flagVertical)
-{
-	m_flagVerticalScroll = flagVertical;
-}
-
-sl_bool ScrollView::isPaging()
-{
-	return m_flagPaging;
-}
-
-void ScrollView::setPaging(sl_bool flagPaging)
-{
-	m_flagPaging = flagPaging;
-	_setPaging_NW(flagPaging);
+	m_pageWidth = 0;
+	m_pageHeight = 0;
 }
 
 Ref<View> ScrollView::getContentView()
@@ -59,7 +26,6 @@ Ref<View> ScrollView::getContentView()
 void ScrollView::setContentView(const Ref<slib::View>& view, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
-	_initScrollbars();
 	if (m_viewContent != view) {
 		Ref<View> viewOld = m_viewContent;
 		removeChild(viewOld, UIUpdateMode::NoRedraw);
@@ -106,7 +72,6 @@ void ScrollView::setContentSize(sl_scroll_pos _width, sl_scroll_pos _height, UIU
 		height = 0;
 	}
 	ObjectLocker lock(this);
-	_initScrollbars();
 	Ref<View> viewContent = m_viewContent;
 	if (viewContent.isNotNull()) {
 		if (mode == UIUpdateMode::Init) {
@@ -153,6 +118,50 @@ void ScrollView::scrollTo(const ScrollPoint& position, UIUpdateMode mode)
 	scrollTo(position.x, position.y, mode);
 }
 
+sl_bool ScrollView::isPaging()
+{
+	return m_flagPaging;
+}
+
+void ScrollView::setPaging(sl_bool flagPaging)
+{
+	m_flagPaging = flagPaging;
+	_updatePaging();
+}
+
+sl_ui_len ScrollView::getPageWidth()
+{
+	return m_pageWidth;
+}
+
+void ScrollView::setPageWidth(sl_ui_len width)
+{
+	m_pageWidth = width;
+	_updatePaging();
+}
+
+sl_ui_len ScrollView::getPageHeight()
+{
+	return m_pageHeight;
+}
+
+void ScrollView::setPageHeight(sl_ui_len height)
+{
+	m_pageHeight = height;
+	_updatePaging();
+}
+
+void ScrollView::setScrollBarsVisible(sl_bool flagHorizontal, sl_bool flagVertical, UIUpdateMode mode)
+{
+	View::setScrollBarsVisible(flagHorizontal, flagVertical, mode);
+	_setScrollBarsVisible_NW(flagHorizontal, flagVertical);
+}
+
+void ScrollView::_updatePaging()
+{
+	_setPaging_NW(m_flagPaging, m_pageWidth, m_pageHeight);
+}
+
 void ScrollView::onResize(sl_ui_len width, sl_ui_len height)
 {
 	if (isNativeWidget()) {
@@ -176,25 +185,6 @@ void ScrollView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 
 void ScrollView::onMakeLayout()
 {	
-}
-
-void ScrollView::_initScrollbars()
-{
-	if (m_flagInitedScrollbars) {
-		return;
-	}
-	m_flagInitedScrollbars = sl_true;
-	if (m_flagVerticalScroll) {
-		if (m_flagHorizontalScroll) {
-			createScrollBars(UIUpdateMode::NoRedraw);
-		} else {
-			createVerticalScrollBar(UIUpdateMode::NoRedraw);
-		}
-	} else {
-		if (m_flagHorizontalScroll) {
-			createHorizontalScrollBar(UIUpdateMode::NoRedraw);
-		}
-	}
 }
 
 void ScrollView::_scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode)
@@ -283,7 +273,11 @@ void ScrollView::_setBackgroundColor_NW(const Color& color)
 
 #if !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
 
-void ScrollView::_setPaging_NW(sl_bool flagPaging)
+void ScrollView::_setPaging_NW(sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight)
+{
+}
+
+void ScrollView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
 {
 }
 

@@ -62,8 +62,8 @@ Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* _parent)
 	OSX_VIEW_CREATE_INSTANCE_BEGIN
 	_Slib_OSX_ScrollView* handle = [[_Slib_OSX_ScrollView alloc] initWithFrame:frame];
 	if (handle != nil) {
-		[handle setHasVerticalScroller:(m_flagVerticalScroll?YES:NO)];
-		[handle setHasHorizontalScroller:(m_flagHorizontalScroll?YES:NO)];
+		[handle setHasVerticalScroller:(isVerticalScrolling()?YES:NO)];
+		[handle setHasHorizontalScroller:(isHorizontalScrolling()?YES:NO)];
 		((_ScrollView*)this)->__applyProperties(handle);
 	}
 	OSX_VIEW_CREATE_INSTANCE_END

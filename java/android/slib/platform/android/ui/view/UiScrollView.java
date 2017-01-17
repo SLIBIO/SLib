@@ -60,12 +60,17 @@ public class UiScrollView extends ScrollView implements IView {
 		return view.getScrollY();
 	}
 
-	public static void _setPaging(View view, boolean flagPaging) {
+	public static void _setPaging(View view, boolean flagPaging, int pageWidth, int pageHeight) {
 		if (view instanceof UiScrollView) {
-			((UiScrollView)view).setPaging(flagPaging);
+			((UiScrollView)view).setPaging(flagPaging, pageWidth, pageHeight);
 		} else if (view instanceof UiHorizontalScrollView) {
-			((UiHorizontalScrollView)view).setPaging(flagPaging);
+			((UiHorizontalScrollView)view).setPaging(flagPaging, pageWidth, pageHeight);
 		}
+	}
+
+	public static void _setScrollBarsVisible(View view, boolean flagHorz, boolean flagVert) {
+		view.setHorizontalScrollBarEnabled(flagHorz);
+		view.setVerticalScrollBarEnabled(flagVert);
 	}
 
 	private static native void nativeOnScroll(long instance, int x, int y);
@@ -78,13 +83,15 @@ public class UiScrollView extends ScrollView implements IView {
 
 
 	boolean mPaging = false;
+	int mPageHeight = 0;
 
 	public UiScrollView(Context context) {
 		super(context);
 	}
 
-	public void setPaging(boolean flagPaging) {
+	public void setPaging(boolean flagPaging, int pageWidth, int pageHeight) {
 		mPaging = flagPaging;
+		mPageHeight = pageHeight;
 	}
 
 	@Override
@@ -130,7 +137,10 @@ public class UiScrollView extends ScrollView implements IView {
 	}
 
 	void scrollToPage(int velocity) {
-		int height = getHeight();
+		int height = mPageHeight;
+		if (height <= 0) {
+			height = getHeight();
+		}
 		int sy = getScrollY();
 		int page = sy / height;
 		int align = page * height;

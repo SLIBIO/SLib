@@ -246,6 +246,9 @@ Ref<View::ScrollAttributes> View::_initializeScrollAttributes()
 		return sl_null;
 	}
 	
+	attrs->flagHorz = sl_false;
+	attrs->flagVert = sl_false;
+	
 	attrs->flagValidHorz = sl_false;
 	attrs->flagValidVert = sl_false;
 	attrs->x = 0;
@@ -259,6 +262,11 @@ Ref<View::ScrollAttributes> View::_initializeScrollAttributes()
 	attrs->flagContentScrollingByMouseWheel = sl_true;
 	attrs->flagContentScrollingByKeyboard = sl_true;
 	attrs->flagDownContent = sl_false;
+	
+	attrs->flagHorzScrollBarVisible = sl_true;
+	attrs->flagVertScrollBarVisible = sl_true;
+	attrs->flagInitHorzScrollBar = sl_false;
+	attrs->flagInitVertScrollBar = sl_false;
 	
 	m_scrollAttributes = attrs;
 	
@@ -5562,6 +5570,40 @@ void View::_resetBackgroundColorAnimation()
 	}
 }
 
+sl_bool View::isHorizontalScrolling()
+{
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagHorz;
+	}
+	return sl_false;
+}
+
+void View::setHorizontalScrolling(sl_bool flagHorizontal)
+{
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	if (attrs.isNotNull()) {
+		attrs->flagHorz = flagHorizontal;
+	}
+}
+
+sl_bool View::isVerticalScrolling()
+{
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagVert;
+	}
+	return sl_false;
+}
+
+void View::setVerticalScrolling(sl_bool flagVertical)
+{
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	if (attrs.isNotNull()) {
+		attrs->flagVert = flagVertical;
+	}
+}
+
 Ref<ScrollBar> View::getHorizontalScrollBar()
 {
 	Ref<ScrollAttributes> attrs = m_scrollAttributes;
@@ -5636,6 +5678,54 @@ void View::removeScrollBars(UIUpdateMode mode)
 
 sl_bool View::isHorizontalScrollBarVisible()
 {
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagHorzScrollBarVisible;
+	}
+	return sl_true;
+}
+
+sl_bool View::isVerticalScrollBarVisible()
+{
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagVertScrollBarVisible;
+	}
+	return sl_true;
+}
+
+void View::setHorizontalScrollBarVisible(sl_bool flagVisible, UIUpdateMode mode)
+{
+	setScrollBarsVisible(flagVisible, isVerticalScrollBarVisible(), mode);
+}
+
+void View::setVerticalScrollBarVisible(sl_bool flagVisible, UIUpdateMode mode)
+{
+	setScrollBarsVisible(isHorizontalScrollBarVisible(), flagVisible, mode);
+}
+
+void View::setScrollBarsVisible(sl_bool flagHorizontal, sl_bool flagVertical, UIUpdateMode mode)
+{
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	if (attrs.isNotNull()) {
+		attrs->flagHorzScrollBarVisible = flagHorizontal;
+		attrs->flagVertScrollBarVisible = flagVertical;
+	}
+	_initScrollBars(UIUpdateMode::NoRedraw);
+	Ref<ScrollBar> bar;
+	bar = getHorizontalScrollBar();
+	if (bar.isNotNull()) {
+		bar->setVisible(flagHorizontal, UIUpdateMode::NoRedraw);
+	}
+	bar = getVerticalScrollBar();
+	if (bar.isNotNull()) {
+		bar->setVisible(flagVertical, UIUpdateMode::NoRedraw);
+	}
+	refreshScroll(mode);
+}
+
+sl_bool View::isHorizontalScrollBarValid()
+{
 	Ref<ScrollBar> bar = getHorizontalScrollBar();
 	if (bar.isNotNull()) {
 		return bar->isVisible() && bar->isValid();
@@ -5643,45 +5733,13 @@ sl_bool View::isHorizontalScrollBarVisible()
 	return sl_false;
 }
 
-sl_bool View::isVerticalScrollBarVisible()
+sl_bool View::isVerticalScrollBarValid()
 {
 	Ref<ScrollBar> bar = getVerticalScrollBar();
 	if (bar.isNotNull()) {
 		return bar->isVisible() && bar->isValid();
 	}
 	return sl_false;
-}
-
-void View::setHorizontalScrollBarVisible(sl_bool flagVisible, UIUpdateMode mode)
-{
-	Ref<ScrollBar> bar = getVerticalScrollBar();
-	if (bar.isNotNull()) {
-		bar->setVisible(flagVisible, UIUpdateMode::NoRedraw);
-	}
-	refreshScroll(mode);
-}
-
-void View::setVerticalScrollBarVisible(sl_bool flagVisible, UIUpdateMode mode)
-{
-	Ref<ScrollBar> bar = getVerticalScrollBar();
-	if (bar.isNotNull()) {
-		bar->setVisible(flagVisible, UIUpdateMode::NoRedraw);
-	}
-	refreshScroll(mode);
-}
-
-void View::setScrollBarsVisible(sl_bool flagVisible, UIUpdateMode mode)
-{
-	Ref<ScrollBar> bar;
-	bar = getHorizontalScrollBar();
-	if (bar.isNotNull()) {
-		bar->setVisible(flagVisible, UIUpdateMode::NoRedraw);
-	}
-	bar = getVerticalScrollBar();
-	if (bar.isNotNull()) {
-		bar->setVisible(flagVisible, UIUpdateMode::NoRedraw);
-	}
-	refreshScroll(mode);
 }
 
 sl_scroll_pos View::getScrollX()
@@ -5817,6 +5875,7 @@ void View::setContentSize(sl_scroll_pos width, sl_scroll_pos height, UIUpdateMod
 		}
 		attrs->contentWidth = width;
 		attrs->contentHeight = height;
+		_initScrollBars(UIUpdateMode::NoRedraw);
 		onResizeContent(width, height);
 		refreshScroll(mode);
 	}
@@ -6021,11 +6080,7 @@ void View::refreshScroll(UIUpdateMode mode)
 				flagVisibleVert = sl_true;
 			}
 		}
-		if (flagVisibleHorz && flagVisibleVert) {
-			//// avoid overlapping two scrollbars.
-			////		2016/6/8 temporally cancel this function
-			//barHorz->setFrame(UIRect(0, height - scroll->barWidth, width - scroll->barWidth, height), sl_false);
-		}
+
 		scrollTo(attrs->x, attrs->y, UIUpdateMode::NoRedraw);
 		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
@@ -6069,6 +6124,29 @@ void View::_getScrollBars(Ref<View> views[2])
 			if (bar.isNotNull()) {
 				if (bar->isVisible()) {
 					views[1] = bar;
+				}
+			}
+		}
+	}
+}
+
+void View::_initScrollBars(UIUpdateMode mode)
+{
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		if (attrs->flagHorz && attrs->flagHorzScrollBarVisible) {
+			if (!(attrs->flagInitHorzScrollBar)) {
+				attrs->flagInitHorzScrollBar = sl_true;
+				if (attrs->horz.isNull()) {
+					createHorizontalScrollBar(mode);
+				}
+			}
+		}
+		if (attrs->flagVert && attrs->flagVertScrollBarVisible) {
+			if (!(attrs->flagInitVertScrollBar)) {
+				attrs->flagInitVertScrollBar = sl_true;
+				if (attrs->vert.isNull()) {
+					createVerticalScrollBar(mode);
 				}
 			}
 		}
@@ -7807,6 +7885,9 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 	if (scrollAttrs.isNull()) {
 		return;
 	}
+	if (!(scrollAttrs->flagHorz) && !(scrollAttrs->flagVert)) {
+		return;
+	}
 	if (scrollAttrs->contentWidth < (sl_scroll_pos)(getWidth()) && scrollAttrs->contentHeight < (sl_scroll_pos)(getHeight())) {
 		return;
 	}
@@ -7828,6 +7909,12 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 			if (scrollAttrs->flagDownContent) {
 				sl_scroll_pos sx = scrollAttrs->scrollX_DownContent - (sl_scroll_pos)(ev->getX() - scrollAttrs->mouseX_DownContent);
 				sl_scroll_pos sy = scrollAttrs->scrollY_DownContent - (sl_scroll_pos)(ev->getY() - scrollAttrs->mouseY_DownContent);
+				if (!(scrollAttrs->flagHorz)) {
+					sx = scrollAttrs->x;
+				}
+				if (!(scrollAttrs->flagVert)) {
+					sy = scrollAttrs->y;
+				}
 				scrollTo(sx, sy);
 				ev->stopPropagation();
 			}
@@ -7845,21 +7932,25 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 				sl_scroll_pos sx = scrollAttrs->x;
 				sl_scroll_pos sy = scrollAttrs->y;
 				
-				sl_real deltaX = ev->getDeltaX();
-				if (deltaX > SLIB_EPSILON) {
-					sx -= lineX;
-					flagChange = sl_true;
-				} else if (deltaX < -SLIB_EPSILON) {
-					sx += lineX;
-					flagChange = sl_true;
+				if (scrollAttrs->flagHorz) {
+					sl_real deltaX = ev->getDeltaX();
+					if (deltaX > SLIB_EPSILON) {
+						sx -= lineX;
+						flagChange = sl_true;
+					} else if (deltaX < -SLIB_EPSILON) {
+						sx += lineX;
+						flagChange = sl_true;
+					}
 				}
-				sl_real deltaY = ev->getDeltaY();
-				if (deltaY > SLIB_EPSILON) {
-					sy -= lineY;
-					flagChange = sl_true;
-				} else if (deltaY < -SLIB_EPSILON) {
-					sy += lineY;
-					flagChange = sl_true;
+				if (scrollAttrs->flagVert) {
+					sl_real deltaY = ev->getDeltaY();
+					if (deltaY > SLIB_EPSILON) {
+						sy -= lineY;
+						flagChange = sl_true;
+					} else if (deltaY < -SLIB_EPSILON) {
+						sy += lineY;
+						flagChange = sl_true;
+					}
 				}
 				
 				if (flagChange) {
@@ -7873,24 +7964,29 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 				sl_scroll_pos sx = scrollAttrs->x;
 				sl_scroll_pos sy = scrollAttrs->y;
 				Keycode key = ev->getKeycode();
-				if (key == Keycode::Left) {
-					scrollTo(sx - lineX, sy);
-					ev->stopPropagation();
-				} else if (key == Keycode::Right) {
-					scrollTo(sx + lineX, sy);
-					ev->stopPropagation();
-				} else if (key == Keycode::Up) {
-					scrollTo(sx, sy - lineY);
-					ev->stopPropagation();
-				} else if (key == Keycode::Down) {
-					scrollTo(sx, sy + lineY);
-					ev->stopPropagation();
-				} else if (key == Keycode::PageUp) {
-					scrollTo(sx, sy - (sl_scroll_pos)(getHeight()));
-					ev->stopPropagation();
-				} else if (key == Keycode::PageDown) {
-					scrollTo(sx, sy + (sl_scroll_pos)(getHeight()));
-					ev->stopPropagation();
+				if (scrollAttrs->flagHorz) {
+					if (key == Keycode::Left) {
+						scrollTo(sx - lineX, sy);
+						ev->stopPropagation();
+					} else if (key == Keycode::Right) {
+						scrollTo(sx + lineX, sy);
+						ev->stopPropagation();
+					}
+				}
+				if (scrollAttrs->flagVert) {
+					if (key == Keycode::Up) {
+						scrollTo(sx, sy - lineY);
+						ev->stopPropagation();
+					} else if (key == Keycode::Down) {
+						scrollTo(sx, sy + lineY);
+						ev->stopPropagation();
+					} else if (key == Keycode::PageUp) {
+						scrollTo(sx, sy - (sl_scroll_pos)(getHeight()));
+						ev->stopPropagation();
+					} else if (key == Keycode::PageDown) {
+						scrollTo(sx, sy + (sl_scroll_pos)(getHeight()));
+						ev->stopPropagation();
+					}
 				}
 			}
 			break;

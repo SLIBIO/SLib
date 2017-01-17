@@ -16,13 +16,15 @@ public class UiHorizontalScrollView extends HorizontalScrollView implements IVie
 	public void setUIFrame(int left, int top, int right, int bottom) { mLeft = left; mTop = top; mRight = right; mBottom = bottom; }
 
 	boolean mPaging = false;
+	int mPageWidth = 0;
 
 	public UiHorizontalScrollView(Context context) {
 		super(context);
 	}
 
-	public void setPaging(boolean flagPaging) {
+	public void setPaging(boolean flagPaging, int pageWidth, int pageHeight) {
 		mPaging = flagPaging;
+		mPageWidth = pageWidth;
 	}
 
 	@Override
@@ -68,7 +70,10 @@ public class UiHorizontalScrollView extends HorizontalScrollView implements IVie
 	}
 
 	void scrollToPage(int velocity) {
-		int width = getWidth();
+		int width = mPageWidth;
+		if (width <= 0) {
+			width = getWidth();
+		}
 		int sx = getScrollX();
 		int page = sx / width;
 		int align = page * width;

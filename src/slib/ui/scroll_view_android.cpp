@@ -18,7 +18,8 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidScrollView, "slib/platform/android/ui/view/UiScrol
 	SLIB_JNI_STATIC_METHOD(scrollTo, "_scrollTo", "(Landroid/view/View;II)V");
 	SLIB_JNI_STATIC_METHOD(getScrollX, "_getScrollX", "(Landroid/view/View;)I");
 	SLIB_JNI_STATIC_METHOD(getScrollY, "_getScrollY", "(Landroid/view/View;)I");
-	SLIB_JNI_STATIC_METHOD(setPaging, "_setPaging", "(Landroid/view/View;Z)V");
+	SLIB_JNI_STATIC_METHOD(setPaging, "_setPaging", "(Landroid/view/View;ZII)V");
+	SLIB_JNI_STATIC_METHOD(setScrollBarsVisible, "_setScrollBarsVisible", "(Landroid/view/View;ZZ)V");
 
 	SLIB_JNI_NATIVE(nativeOnScroll, "nativeOnScroll", "(JII)V", _AndroidScrollView_nativeOnScroll);
 
@@ -39,7 +40,8 @@ public:
 	void __applyProperties(jobject handle, ViewInstance* scrollViewInstance)
 	{
 		_JAndroidScrollView::setBackgroundColor.call(sl_null, handle, getBackgroundColor().getARGB());
-		_JAndroidScrollView::setPaging.call(sl_null, handle, m_flagPaging);
+		_JAndroidScrollView::setPaging.call(sl_null, handle, m_flagPaging, m_pageWidth, m_pageHeight);
+		_JAndroidScrollView::setScrollBarsVisible.call(sl_null, handle, isHorizontalScrollBarVisible(), isVerticalScrollBarVisible());
 		__applyContent(handle, scrollViewInstance);
 	}
 
@@ -62,7 +64,7 @@ Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* _parent)
 	Ref<Android_ViewInstance> ret;
 	Android_ViewInstance* parent = (Android_ViewInstance*)_parent;
 	if (parent) {
-		JniLocal<jobject> handle = _JAndroidScrollView::create.callObject(sl_null, parent->getContext(), m_flagVerticalScroll);
+		JniLocal<jobject> handle = _JAndroidScrollView::create.callObject(sl_null, parent->getContext(), isVerticalScrolling());
 		ret = Android_ViewInstance::create<Android_ViewInstance>(this, parent, handle.get());
 		if (ret.isNotNull()) {
 			jobject handle = ret->getHandle();
@@ -137,11 +139,19 @@ void ScrollView::_setBackgroundColor_NW(const Color& color)
 	}
 }
 
-void ScrollView::_setPaging_NW(sl_bool flagPaging)
+void ScrollView::_setPaging_NW(sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {
-		_JAndroidScrollView::setPaging.call(sl_null, handle, flagPaging);
+		_JAndroidScrollView::setPaging.call(sl_null, handle, flagPaging, pageWidth, pageHeight);
+	}
+}
+
+void ScrollView::_setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical)
+{
+	jobject handle = UIPlatform::getViewHandle(this);
+	if (handle) {
+		_JAndroidScrollView::setScrollBarsVisible.call(sl_null, handle, flagHorizontal, flagVertical);
 	}
 }
 

@@ -15,20 +15,6 @@ public:
 	ScrollView();
 	
 public:
-	sl_bool isHorizontalScrolling();
-	
-	// must be called before creating instruction or seting content view/size
-	void setHorizontalScrolling(sl_bool flagHorizontal);
-	
-	sl_bool isVerticalScrolling();
-	
-	// must be called before creating instruction or seting content view/size
-	void setVerticalScrolling(sl_bool flagVertical);
-	
-	sl_bool isPaging();
-	
-	void setPaging(sl_bool flagPaging);
-	
 	Ref<View> getContentView();
 	
 	virtual void setContentView(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
@@ -48,6 +34,21 @@ public:
 	void scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	void scrollTo(const ScrollPoint& position, UIUpdateMode mode = UIUpdateMode::Redraw);
+	
+	sl_bool isPaging();
+	
+	void setPaging(sl_bool flagPaging);
+	
+	sl_ui_len getPageWidth();
+	
+	void setPageWidth(sl_ui_len width);
+	
+	sl_ui_len getPageHeight();
+	
+	void setPageHeight(sl_ui_len height);
+	
+	// override
+	void setScrollBarsVisible(sl_bool flagHorizontal, sl_bool flagVertical, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 public:
 	// override
@@ -67,9 +68,9 @@ protected:
 	void onMakeLayout();
 	
 private:
-	void _initScrollbars();
-	
 	void _scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode);
+	
+	void _updatePaging();
 	
 	void _refreshContentSize_NW();
 	
@@ -87,17 +88,18 @@ private:
 	// override
 	void _setBackgroundColor_NW(const Color& color);
 	
-	void _setPaging_NW(sl_bool flagPaging);
+	void _setPaging_NW(sl_bool flagPaging, sl_ui_len pageWidth, sl_ui_len pageHeight);
+	
+	void _setScrollBarsVisible_NW(sl_bool flagHorizontal, sl_bool flagVertical);
 	
 protected:
 	void _onScroll_NW(sl_scroll_pos x, sl_scroll_pos y);
 	
 protected:
 	AtomicRef<View> m_viewContent;
-	sl_bool m_flagHorizontalScroll;
-	sl_bool m_flagVerticalScroll;
-	sl_bool m_flagInitedScrollbars;
 	sl_bool m_flagPaging;
+	sl_ui_pos m_pageWidth;
+	sl_ui_pos m_pageHeight;
 	
 };
 

@@ -58,13 +58,13 @@ public:
 		} else {
 			Ref<View> view = getView();
 			if (_ScrollView* sv = CastInstance<_ScrollView>(view.get())) {
-				if (sv->m_flagHorizontalScroll) {
+				if (sv->isHorizontalScrolling()) {
 					if (Windows::processWindowHorizontalScrollEvents(handle, msg, wParam, lParam, _SCROLL_LINE_SIZE, _SCROLL_WHEEL_SIZE)) {
 						__refreshContentPosition(sv, sl_true);
 						return sl_true;
 					}
 				}
-				if (sv->m_flagVerticalScroll) {
+				if (sv->isVerticalScrolling()) {
 					if (Windows::processWindowVerticalScrollEvents(handle, msg, wParam, lParam, _SCROLL_LINE_SIZE, _SCROLL_WHEEL_SIZE)) {
 						__refreshContentPosition(sv, sl_true);
 						return sl_true;
@@ -103,10 +103,10 @@ public:
 			Ref<View> viewContent = view->getContentView();
 			Sizei sizeContent = view->getContentSize();
 			Sizei sizeParent = view->getSize();
-			if (view->m_flagHorizontalScroll) {
+			if (view->isHorizontalScrolling()) {
 				Windows::setWindowHorizontalScrollParam(handle, 0, sizeContent.x, sizeParent.x);
 			}
-			if (view->m_flagVerticalScroll) {
+			if (view->isVerticalScrolling()) {
 				Windows::setWindowVerticalScrollParam(handle, 0, sizeContent.y, sizeParent.y);
 			}
 			__refreshContentPosition(view, sl_false);
@@ -143,10 +143,10 @@ Ref<ViewInstance> ScrollView::createNativeWidget(ViewInstance* parent)
 	}
 
 	DWORD style = WS_CLIPCHILDREN;
-	if (m_flagHorizontalScroll) {
+	if (isHorizontalScrolling()) {
 		style = WS_HSCROLL;
 	}
-	if (m_flagVerticalScroll) {
+	if (isVerticalScrolling()) {
 		style |= WS_VSCROLL;
 	}
 
@@ -187,11 +187,11 @@ void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y)
 		Base::zeroMemory(&si, sizeof(si));
 		si.cbSize = sizeof(si);
 		si.fMask = SIF_POS;
-		if (m_flagHorizontalScroll) {
+		if (isHorizontalScrolling()) {
 			si.nPos = (int)x;
 			::SetScrollInfo(handle, SB_HORZ, &si, TRUE);
 		}
-		if (m_flagVerticalScroll) {
+		if (isVerticalScrolling()) {
 			si.nPos = (int)y;
 			::SetScrollInfo(handle, SB_VERT, &si, TRUE);
 		}

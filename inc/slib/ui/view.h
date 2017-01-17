@@ -828,6 +828,14 @@ public:
 	void resetBackgroundColorAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	
+	sl_bool isHorizontalScrolling();
+	
+	void setHorizontalScrolling(sl_bool flagHorizontal);
+	
+	sl_bool isVerticalScrolling();
+	
+	void setVerticalScrolling(sl_bool flagVertical);
+	
 	Ref<ScrollBar> getHorizontalScrollBar();
 	
 	Ref<ScrollBar> getVerticalScrollBar();
@@ -856,8 +864,12 @@ public:
 	
 	void setVerticalScrollBarVisible(sl_bool flagVisible, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setScrollBarsVisible(sl_bool flagVisible, UIUpdateMode mode = UIUpdateMode::Redraw);
+	virtual void setScrollBarsVisible(sl_bool flagHorizontal, sl_bool flagVertical, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
+	sl_bool isHorizontalScrollBarValid();
+	
+	sl_bool isVerticalScrollBarValid();
+
 	sl_scroll_pos getScrollX();
 	
 	sl_scroll_pos getScrollY();
@@ -1170,6 +1182,8 @@ private:
 	
 	void _getScrollBars(Ref<View> views[2]);
 	
+	void _initScrollBars(UIUpdateMode mode);
+	
 	void _processEventForStateAndClick(UIEvent* ev);
 	
 	void _processContentScrollingEvents(UIEvent* ev);
@@ -1411,6 +1425,9 @@ protected:
 	class ScrollAttributes : public Referable
 	{
 	public:
+		sl_bool flagHorz;
+		sl_bool flagVert;
+		
 		AtomicRef<ScrollBar> horz;
 		AtomicRef<ScrollBar> vert;
 		sl_bool flagValidHorz;
@@ -1430,6 +1447,12 @@ protected:
 		sl_scroll_pos scrollY_DownContent;
 		sl_ui_posf mouseX_DownContent;
 		sl_ui_posf mouseY_DownContent;
+		
+		sl_bool flagHorzScrollBarVisible;
+		sl_bool flagVertScrollBarVisible;
+		sl_bool flagInitHorzScrollBar;
+		sl_bool flagInitVertScrollBar;
+		
 	};
 	AtomicRef<ScrollAttributes> m_scrollAttributes;
 	
