@@ -45,7 +45,7 @@ public class UiAnimation {
 
 	static final float EPSILON = 0.000001f;
 
-	public static boolean start(final View view, final long id, float duration, float delay,
+	public static Animator start(final View view, final long id, float duration, float delay,
 	                            int curve, boolean flagRepeat, boolean flagReverse,
 	                            final float ax, final float ay,
 	                            final boolean flagTranslate, final float txStart, final float tyStart, final float txEnd, final float tyEnd,
@@ -162,14 +162,30 @@ public class UiAnimation {
 				});
 			}
 
-			return true;
+			return animator;
 
 		} catch (Exception e) {
 			Logger.exception(e);
 		}
 
-		return false;
+		return null;
 
+	}
+
+	static void stop(final Animator animator) {
+		if (UiThread.isUiThread()) {
+			animator.cancel();
+		} else {
+			UiThread.post(new Runnable() {
+				public void run() {
+					try {
+						animator.cancel();
+					} catch (Exception e) {
+						Logger.exception(e);
+					}
+				}
+			});
+		}
 	}
 
 }

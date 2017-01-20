@@ -82,12 +82,14 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 	public void close() {
 		try {
 			instance = 0;
+			if (activity instanceof SlibActivity) {
+				if (((SlibActivity) activity).onCloseWindow(this)) {
+					return;
+				}
+			}
 			ViewParent parent = getParent();
 			if (parent != null && parent instanceof ViewGroup) {
 				((ViewGroup) parent).removeView(this);
-			}
-			if (activity instanceof SlibActivity) {
-				((SlibActivity) activity).onCloseWindow(this);
 			}
 		} catch (Exception e) {
 			Logger.exception(e);

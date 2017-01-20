@@ -49,7 +49,7 @@ class RenderCanvasProgramParam
 public:
 	sl_bool flagUseTexture;
 	sl_bool flagUseColorFilter;
-	RenderCanvasClip* clips[MAX_SHADER_CLIP];
+	RenderCanvasClip* clips[MAX_SHADER_CLIP + 1];
 	sl_uint32 countClips;
 	
 public:
@@ -80,17 +80,31 @@ public:
 		}
 	}
 	
+	void addFinalClip(RenderCanvasClip* clip)
+	{
+		clips[countClips] = clip;
+		countClips++;
+	}
+	
 	void applyToProgramState(RenderCanvasProgramState* state, const Matrix3& transform)
 	{
+		Matrix3 clipTransforms[MAX_SHADER_CLIP + 1];
+		Vector4 clipRects[MAX_SHADER_CLIP + 1];
 		for (sl_uint32 i = 0; i < countClips; i++) {
-			Rectangle& r = clips[i]->region;
-			state->setClipRect(i, Vector4(r.left, r.top, r.right, r.bottom));
-			if (clips[i]->flagTransform) {
-				state->setClipTransform(i, transform * clips[i]->transform);
+			RenderCanvasClip* clip = clips[i];
+			Rectangle& r = clip->region;
+			clipRects[i] = Vector4(r.left, r.top, r.right, r.bottom);
+			if (clip->type == RenderCanvasClipType::Ellipse) {
+				clip = clip;
+			}
+			if (clip->flagTransform) {
+				clipTransforms[i] = transform * clip->transform;
 			} else {
-				state->setClipTransform(i, transform);
+				clipTransforms[i] = transform;
 			}
 		}
+		state->setClipRect(clipRects, countClips);
+		state->setClipTransform(clipTransforms, countClips);
 	}
 	
 private:
@@ -141,35 +155,61 @@ public:
 			bufFBHeader.add(SLIB_STRINGIFY(
 				uniform vec4 u_Color;
 			));
-			bufFBContent.add("void main() {");
+			bufFBContent.add("void main() { vec4 l_Color = u_Color; ");
 		}
 		
 		if (param.countClips > 0) {
-			if (bufVertexShader) {
-				bufVBHeader.add(String::format(SLIB_STRINGIFY(
-					varying vec2 v_ClipPos[%d];
-					uniform mat3 u_ClipTransform[%d];
-				), param.countClips));
-				bufFBHeader.add(String::format(SLIB_STRINGIFY(
-					varying vec2 v_ClipPos[%d];
-					uniform vec4 u_ClipRect[%d];
-				), param.countClips));
-			}
+			bufVBHeader.add(String::format(SLIB_STRINGIFY(
+				  varying vec2 v_ClipPos[%d];
+				  uniform vec4 u_ClipRect[%d];
+				  uniform mat3 u_ClipTransform[%d];
+			), param.countClips));
+			bufFBHeader.add(String::format(SLIB_STRINGIFY(
+				  varying vec2 v_ClipPos[%d];
+				  uniform vec4 u_ClipRect[%d];
+			), param.countClips));
 			for (sl_uint32 i = 0; i < param.countClips; i++) {
-				if (signatures) {
-					SLIB_STATIC_STRING(s, "C");
-					signatures->add(s);
-				}
-				if (bufVertexShader) {
-					bufVBContent.add(String::format(SLIB_STRINGIFY(
-						v_ClipPos[%d] = (vec3(a_Position, 1.0) * u_ClipTransform[%d]).xy;
-					), i));
-					bufFBContent.add(String::format(SLIB_STRINGIFY(
-						float fClip%d = step(u_ClipRect[%d].x, v_ClipPos[%d].x) * step(u_ClipRect[%d].y, v_ClipPos[%d].y) * step(v_ClipPos[%d].x, u_ClipRect[%d].z) * step(v_ClipPos[%d].y, u_ClipRect[%d].w);
-						if (fClip%d < 0.5) {
-							discard;
-						}
-					), i));
+				RenderCanvasClipType type = param.clips[i]->type;
+				if (type == RenderCanvasClipType::Ellipse) {
+					if (signatures) {
+						SLIB_STATIC_STRING(s, "E");
+						signatures->add(s);
+					}
+					if (bufVertexShader) {
+						bufVBContent.add(String::format(SLIB_STRINGIFY(
+						   v_ClipPos[%d] = (vec3(a_Position, 1.0) * u_ClipTransform[%d]).xy - (u_ClipRect[%d].xy + u_ClipRect[%d].zw) / 2.0;
+						), i));
+						bufFBContent.add(String::format(SLIB_STRINGIFY(
+						   float wClip%d = (u_ClipRect[%d].z - u_ClipRect[%d].x) / 2.0;
+						   float hClip%d = (u_ClipRect[%d].w - u_ClipRect[%d].y) / 2.0;
+						   float xClip%d = v_ClipPos[%d].x / wClip%d;
+						   float yClip%d = v_ClipPos[%d].y / hClip%d;
+						   float lenClip%d = xClip%d * xClip%d + yClip%d * yClip%d;
+						   if (lenClip%d > 1.0) {
+							   discard;
+						   } else {
+							   lenClip%d = sqrt(lenClip%d);
+							   l_Color.w *= smoothstep(0.0, 2.0/sqrt(wClip%d * hClip%d), 1.0-lenClip%d);
+						   }
+						), i));
+					}
+
+				} else {
+					if (signatures) {
+						SLIB_STATIC_STRING(s, "C");
+						signatures->add(s);
+					}
+					if (bufVertexShader) {
+						bufVBContent.add(String::format(SLIB_STRINGIFY(
+							v_ClipPos[%d] = (vec3(a_Position, 1.0) * u_ClipTransform[%d]).xy;
+						), i));
+						bufFBContent.add(String::format(SLIB_STRINGIFY(
+							float fClip%d = step(u_ClipRect[%d].x, v_ClipPos[%d].x) * step(u_ClipRect[%d].y, v_ClipPos[%d].y) * step(v_ClipPos[%d].x, u_ClipRect[%d].z) * step(v_ClipPos[%d].y, u_ClipRect[%d].w);
+							if (fClip%d < 0.5) {
+								discard;
+							}
+						), i));
+					}
 				}
 			}
 		}
@@ -209,20 +249,20 @@ public:
 					bufFBContent.add(SLIB_STRINGIFY(
 						vec4 color = texture2D(u_Texture, v_TexCoord);
 						color = vec4(dot(color, u_ColorFilterR), dot(color, u_ColorFilterG), dot(color, u_ColorFilterB), dot(color, u_ColorFilterA)) + u_ColorFilterC;
-						color = color * u_Color;
+						color = color * l_Color;
 					));
 				}
 			} else {
 				if (bufVertexShader) {
 					bufFBContent.add(SLIB_STRINGIFY(
-						vec4 color = texture2D(u_Texture, v_TexCoord) * u_Color;
+						vec4 color = texture2D(u_Texture, v_TexCoord) * l_Color;
 					));
 				}
 			}
 		} else {
 			if (bufVertexShader) {
 				bufFBContent.add(SLIB_STRINGIFY(
-					vec4 color = u_Color;
+					vec4 color = l_Color;
 				));
 			}
 		}
@@ -596,7 +636,43 @@ void RenderCanvas::drawRoundRect(const Rectangle& rect, const Size& radius, cons
 
 void RenderCanvas::drawEllipse(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush)
 {
+	_RenderCanvas_Shared* shared = _RenderCanvas_getShared();
+	if (!shared) {
+		return;
+	}
 	
+	RenderCanvasState* state = m_state.get();
+	
+	if (brush.isNotNull()) {
+		if (state->flagClipRect) {
+			if (!(state->clipRect.intersectRectangle(rect, sl_null))) {
+				return;
+			}
+		}
+		
+		RenderCanvasProgramParam pp;
+		pp.prepare(state, sl_false);
+		RenderCanvasClip clip;
+		clip.type = RenderCanvasClipType::Ellipse;
+		clip.region = rect;
+		pp.addFinalClip(&clip);
+		
+		RenderProgramScope<RenderCanvasProgramState> scope;
+		if (scope.begin(m_engine.get(), shared->getProgram(pp))) {
+			Matrix3 mat;
+			mat.m00 = rect.getWidth(); mat.m10 = 0; mat.m20 = rect.left;
+			mat.m01 = 0; mat.m11 = rect.getHeight(); mat.m21 = rect.top;
+			mat.m02 = 0; mat.m12 = 0; mat.m22 = 1;
+			pp.applyToProgramState(scope.getState(), mat);
+			mat *= state->matrix;
+			mat *= m_matViewport;
+			scope->setTransform(mat);
+			Color4f color = brush->getColor();
+			color.w *= getAlpha();
+			scope->setColor(color);
+			m_engine->drawPrimitive(4, shared->vbRectangle, PrimitiveType::TriangleStrip);
+		}
+	}
 }
 
 void RenderCanvas::drawPolygon(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen, const Ref<Brush>& brush, FillMode fillMode)

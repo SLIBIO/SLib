@@ -27,6 +27,14 @@ sl_bool UIAnimationLoop::startNativeAnimation(Animation* animation)
 	return sl_false;
 }
 
+void UIAnimationLoop::stopNativeAnimation(Animation* animation)
+{
+	if (!animation) {
+		return;
+	}
+	_stopNativeAnimation(animation);
+}
+
 void UIAnimationLoop::_wake()
 {
 	if (!m_flagRunning) {
@@ -56,9 +64,13 @@ Ref<UIAnimationLoop> UIAnimationLoop::getInstance()
 
 #if !defined(SLIB_PLATFORM_IS_ANDROID) && !defined(SLIB_PLATFORM_IS_IOS)
 
-sl_bool UIAnimationLoop::_applyNativeAnimation(const Ref<Animation>& animation)
+sl_bool UIAnimationLoop::_applyNativeAnimation(Animation* animation)
 {
 	return sl_false;
+}
+
+void UIAnimationLoop::_stopNativeAnimation(Animation* animation)
+{
 }
 
 #endif

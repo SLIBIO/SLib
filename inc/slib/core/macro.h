@@ -125,6 +125,7 @@ public: \
 
 #define SLIB_REFERABLE_MEMBER slib::ReferableKeeper _slib_referable_keeper(this);
 #define SLIB_REFERABLE_CONSTRUCTOR SLIB_REFERABLE_MEMBER
+#define SLIB_REFERABLE_DESTRUCTOR SLIB_REFERABLE_MEMBER
 
 #define SLIB_DECLARE_OBJECT \
 public: \

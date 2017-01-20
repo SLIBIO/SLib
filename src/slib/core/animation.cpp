@@ -52,6 +52,7 @@ Animation::Animation()
 
 Animation::~Animation()
 {
+	SLIB_REFERABLE_DESTRUCTOR
 	stop();
 }
 
@@ -437,17 +438,38 @@ void Animation::restartAt(float seconds)
 void Animation::stop()
 {
 	ObjectLocker lock(this);
-	sl_bool flagStarted = _stop();
+	sl_bool flagStarted = _stop(sl_false);
 	if (flagStarted) {
 		lock.unlock();
 		dispatchStopAnimation();
 	}
 }
 
-sl_bool Animation::_stop()
+void Animation::_stopFromNative()
+{
+	ObjectLocker lock(this);
+	sl_bool flagStarted = _stop(sl_true);
+	if (flagStarted) {
+		lock.unlock();
+		dispatchStopAnimation();
+	}
+}
+
+sl_bool Animation::_stop(sl_bool flagStopFromNative)
 {
 	_pause();
 	sl_bool flagStarted = m_flagStarted;
+	if (flagStarted) {
+		if (m_flagStartedNative) {
+			if (!flagStopFromNative) {
+				Ref<AnimationLoop> loop(m_loop);
+				if (loop.isNotNull()) {
+					loop->stopNativeAnimation(this);
+				}
+			}
+		}
+	}
+	m_flagStartedNative = sl_false;
 	m_flagStarted = sl_false;
 	return flagStarted;
 }
@@ -546,7 +568,7 @@ void Animation::update(float elapsedSeconds)
 	
 	sl_bool flagStopped = sl_false;
 	if (flagStop) {
-		flagStopped = _stop();
+		flagStopped = _stop(sl_false);
 		lock.unlock();
 	} else {
 		lock.unlock();
@@ -604,6 +626,16 @@ void Animation::dispatchAnimationFrame(float time)
 			target->update(fraction);
 		}
 	}
+}
+
+void Animation::dispatchStartFrame()
+{
+	dispatchAnimationFrame(0);
+}
+
+void Animation::dispatchEndFrame()
+{
+	dispatchAnimationFrame(m_duration);
 }
 
 void Animation::dispatchRepeatAnimation(sl_int32 nRemainingRepeatCount)
@@ -853,6 +885,25 @@ void AnimationLoop::wake()
 sl_bool AnimationLoop::startNativeAnimation(Animation* animation)
 {
 	return sl_false;
+}
+
+void AnimationLoop::stopNativeAnimation(Animation* animation)
+{
+}
+
+void AnimationLoop::_stopAnimationFromNative(Animation* animation)
+{
+	animation->_stopFromNative();
+}
+
+Ref<Referable> AnimationLoop::_getNativeInstance(Animation* animation)
+{
+	return animation->m_nativeInstance;
+}
+
+void AnimationLoop::_setNativeInstance(Animation* animation, Referable* instance)
+{
+	animation->m_nativeInstance = instance;
 }
 
 sl_int32 AnimationLoop::_runStep()

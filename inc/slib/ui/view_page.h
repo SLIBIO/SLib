@@ -36,6 +36,10 @@ public:
 	
 	Ref<View> getCurrentPage();
 	
+	sl_size getMinimumPagesCount();
+	
+	void setMinimumPagesCount(sl_size count);
+	
 	void addPage(const Ref<View>& page, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	void removePageAt(sl_size index, UIUpdateMode mode = UIUpdateMode::Redraw);
@@ -109,6 +113,10 @@ public:
 	void setTransitionCurve(AnimationCurve curve);
 	
 protected:
+	void _stopCurrentAnimations();
+	
+	void _resetAnimationStatus(const Ref<View>& view);
+		
 	void _goTo(sl_size index, const Transition& transition);
 	
 	void _push(const Ref<View>& page, const Transition& transition, sl_bool flagRemoveAllBackPages);
@@ -146,6 +154,7 @@ public:
 protected:
 	CList< Ref<View> > m_pages;
 	sl_size m_indexCurrent;
+	sl_size m_minimumPagesCount;
 
 	sl_bool m_flagSwipeNavigation;
 
@@ -159,6 +168,8 @@ protected:
 	AnimationCurve m_popTransitionCurve;
 	
 	sl_reg m_countActiveTransitions;
+	Ref<Animation> m_currentPushAnimation;
+	Ref<Animation> m_currentPopAnimation;
 	
 };
 

@@ -80,13 +80,15 @@ public class SlibActivity extends Activity {
 		windows.add(window);
 	}
 	
-	public void onCloseWindow(UiWindow window) {
+	public boolean onCloseWindow(UiWindow window) {
 		if (windows.contains(window)) {
 			windows.remove(window);
 			if (windows.isEmpty()) {
 				finish();
+				return true;
 			}
 		}
+		return false;
 	}
 	
 	@Override

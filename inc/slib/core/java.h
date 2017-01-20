@@ -55,21 +55,21 @@ public:
 
 };
 
-class SLIB_EXPORT _JniGlobalBase : public Referable
+class SLIB_EXPORT CJniGlobalBase : public Referable
 {
 	SLIB_DECLARE_OBJECT
 };
 
 template <class T>
-class SLIB_EXPORT _JniGlobal : public _JniGlobalBase
+class SLIB_EXPORT CJniGlobal : public CJniGlobalBase
 {
 protected:
-	_JniGlobal() = default;
+	CJniGlobal() = default;
 
-	~_JniGlobal();
+	~CJniGlobal();
 	
 public:
-	static Ref< _JniGlobal<T> > from(T obj);
+	static Ref< CJniGlobal<T> > from(T obj);
 
 public:
 	T object;
@@ -80,8 +80,8 @@ template <class T>
 class SLIB_EXPORT JniGlobal
 {
 public:
-	Ref< _JniGlobal<T> > ref;
-	SLIB_REF_WRAPPER(JniGlobal, _JniGlobal<T>)
+	Ref< CJniGlobal<T> > ref;
+	SLIB_REF_WRAPPER(JniGlobal, CJniGlobal<T>)
 
 public:
 	JniGlobal(T obj);
@@ -108,8 +108,8 @@ template <class T>
 class SLIB_EXPORT Atomic< JniGlobal<T> >
 {
 public:
-	AtomicRef< _JniGlobal<T> > ref;
-	SLIB_ATOMIC_REF_WRAPPER(_JniGlobal<T>)
+	AtomicRef< CJniGlobal<T> > ref;
+	SLIB_ATOMIC_REF_WRAPPER(CJniGlobal<T>)
 
 public:
 	Atomic(T obj);
@@ -136,8 +136,8 @@ template <>
 class SLIB_EXPORT Atomic<JniClass>
 {
 public:
-	AtomicRef< _JniGlobal<jclass> > ref;
-	SLIB_ATOMIC_REF_WRAPPER(_JniGlobal<jclass>)
+	AtomicRef< CJniGlobal<jclass> > ref;
+	SLIB_ATOMIC_REF_WRAPPER(CJniGlobal<jclass>)
     
 public:
 	Atomic(jclass cls);
@@ -152,8 +152,8 @@ typedef Atomic<JniClass> AtomicJniClass;
 class SLIB_EXPORT JniClass
 {
 public:
-	Ref< _JniGlobal<jclass> > ref;
-	SLIB_REF_WRAPPER(JniClass, _JniGlobal<jclass>)
+	Ref< CJniGlobal<jclass> > ref;
+	SLIB_REF_WRAPPER(JniClass, CJniGlobal<jclass>)
     
 public:
 	JniClass(jclass cls);
@@ -803,19 +803,19 @@ SLIB_INLINE void JniLocal<T>::free()
 
 
 template <class T>
-_JniGlobal<T>::~_JniGlobal()
+CJniGlobal<T>::~CJniGlobal()
 {
 	Jni::deleteGlobalRef(object);
 }
 
 template <class T>
-Ref< _JniGlobal<T> > _JniGlobal<T>::from(T obj)
+Ref< CJniGlobal<T> > CJniGlobal<T>::from(T obj)
 {
-	Ref< _JniGlobal<T> > ret;
+	Ref< CJniGlobal<T> > ret;
 	if (obj) {
 		jobject jglobal = Jni::newGlobalRef(obj);
 		if (jglobal) {
-			ret = new _JniGlobal<T>();
+			ret = new CJniGlobal<T>();
 			if (ret.isNotNull()) {
 				ret->object = (T)jglobal;
 				return ret;
@@ -828,12 +828,12 @@ Ref< _JniGlobal<T> > _JniGlobal<T>::from(T obj)
 
 
 template <class T>
-SLIB_INLINE JniGlobal<T>::JniGlobal(T obj) : ref(_JniGlobal<T>::from(obj))
+SLIB_INLINE JniGlobal<T>::JniGlobal(T obj) : ref(CJniGlobal<T>::from(obj))
 {
 }
 
 template <class T>
-SLIB_INLINE JniGlobal<T>::JniGlobal(const JniLocal<T>& obj) : ref(_JniGlobal<T>::from(obj.value))
+SLIB_INLINE JniGlobal<T>::JniGlobal(const JniLocal<T>& obj) : ref(CJniGlobal<T>::from(obj.value))
 {
 }
 
@@ -846,21 +846,21 @@ SLIB_INLINE JniGlobal<T> JniGlobal<T>::from(T obj)
 template <class T>
 SLIB_INLINE JniGlobal<T>& JniGlobal<T>::operator=(T obj)
 {
-	ref = _JniGlobal<T>::from(obj);
+	ref = CJniGlobal<T>::from(obj);
 	return *this;
 }
 
 template <class T>
 SLIB_INLINE JniGlobal<T>& JniGlobal<T>::operator=(const JniLocal<T>& obj)
 {
-	ref = _JniGlobal<T>::from(obj.value);
+	ref = CJniGlobal<T>::from(obj.value);
 	return *this;
 }
 
 template <class T>
 SLIB_INLINE T JniGlobal<T>::get() const
 {
-	_JniGlobal<T>* o = ref.get();
+	CJniGlobal<T>* o = ref.get();
 	if (o) {
 		return o->object;
 	} else {
@@ -871,7 +871,7 @@ SLIB_INLINE T JniGlobal<T>::get() const
 template <class T>
 SLIB_INLINE JniGlobal<T>::operator T() const
 {
-	_JniGlobal<T>* o = ref.get();
+	CJniGlobal<T>* o = ref.get();
 	if (o) {
 		return o->object;
 	} else {
@@ -881,33 +881,33 @@ SLIB_INLINE JniGlobal<T>::operator T() const
 
 
 template <class T>
-SLIB_INLINE Atomic< JniGlobal<T> >::Atomic(T obj) : ref(_JniGlobal<T>::from(obj))
+SLIB_INLINE Atomic< JniGlobal<T> >::Atomic(T obj) : ref(CJniGlobal<T>::from(obj))
 {
 }
 
 template <class T>
-SLIB_INLINE Atomic< JniGlobal<T> >::Atomic(JniLocal<T>& obj) : ref(_JniGlobal<T>::from(obj.value))
+SLIB_INLINE Atomic< JniGlobal<T> >::Atomic(JniLocal<T>& obj) : ref(CJniGlobal<T>::from(obj.value))
 {
 }
 
 template <class T>
 AtomicJniGlobal<T>& Atomic< JniGlobal<T> >::operator=(T obj)
 {
-	ref = _JniGlobal<T>::from(obj);
+	ref = CJniGlobal<T>::from(obj);
 	return *this;
 }
 
 template <class T>
 AtomicJniGlobal<T>& Atomic< JniGlobal<T> >::operator=(JniLocal<T>& obj)
 {
-	ref = _JniGlobal<T>::from(obj.value);
+	ref = CJniGlobal<T>::from(obj.value);
 	return *this;
 }
 
 template <class T>
 T Atomic< JniGlobal<T> >::get() const
 {
-	Ref< _JniGlobal<T> > o(ref);
+	Ref< CJniGlobal<T> > o(ref);
 	if (o.isNotNull()) {
 		return o->object;
 	} else {

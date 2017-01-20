@@ -19,6 +19,7 @@ MobileApp::MobileApp()
 	
 	m_pager = new ViewPager;
 	m_pager->setOpaque(sl_true);
+	m_pager->setMinimumPagesCount(1);
 	m_contentView->addChild(m_pager, UIUpdateMode::Init);
 	
 }

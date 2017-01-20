@@ -28,6 +28,7 @@ ViewPager::ViewPager()
 	setCreatingChildInstances(sl_true);
 	
 	m_indexCurrent = 0;
+	m_minimumPagesCount = 0;
 	m_flagSwipeNavigation = sl_false;
 	
 	m_pushTransitionType = TransitionType::Push;
@@ -61,6 +62,16 @@ Ref<View> ViewPager::getCurrentPage()
 	} else {
 		return sl_null;
 	}
+}
+
+sl_size ViewPager::getMinimumPagesCount()
+{
+	return m_minimumPagesCount;
+}
+
+void ViewPager::setMinimumPagesCount(sl_size count)
+{
+	m_minimumPagesCount = count;
 }
 
 void ViewPager::addPage(const Ref<View>& page, UIUpdateMode mode)
@@ -171,6 +182,28 @@ void _ViewPager_FinishAnimation(const Ref<ViewPager>& pager, const Ref<View>& vi
 	}
 }
 
+void ViewPager::_stopCurrentAnimations()
+{
+	if (m_currentPushAnimation.isNotNull()) {
+		m_currentPushAnimation->dispatchEndFrame();
+		m_currentPushAnimation->stop();
+		m_currentPushAnimation.setNull();
+	}
+	if (m_currentPopAnimation.isNotNull()) {
+		m_currentPopAnimation->dispatchEndFrame();
+		m_currentPopAnimation->stop();
+		m_currentPopAnimation.setNull();
+	}
+}
+
+void ViewPager::_resetAnimationStatus(const Ref<View>& view)
+{
+	view->setTranslation(0, 0, UIUpdateMode::Init);
+	view->setScale(1, 1, UIUpdateMode::Init);
+	view->setRotation(0, UIUpdateMode::Init);
+	view->setAlpha(1, UIUpdateMode::Init);
+}
+
 void ViewPager::_goTo(sl_size index, const Transition& _transition)
 {
 #if defined(SLIB_PLATFORM_IS_ANDROID)
@@ -204,6 +237,8 @@ void ViewPager::_goTo(sl_size index, const Transition& _transition)
 		return;
 	}
 	
+	_stopCurrentAnimations();
+	
 	setEnabled(sl_false);
 	viewOut->setEnabled(sl_false, UIUpdateMode::NoRedraw);
 	viewIn->setEnabled(sl_false, UIUpdateMode::NoRedraw);
@@ -219,6 +254,14 @@ void ViewPager::_goTo(sl_size index, const Transition& _transition)
 		animationResume = Transition::createAnimation(viewIn, transition, UIPageAction::Resume, Function<void()>::bind(&_ViewPager_FinishAnimation, Ref<ViewPager>(this), viewIn, UIPageAction::Resume));
 	}
 	
+	m_currentPushAnimation = animationResume;
+	m_currentPopAnimation = animationPause;
+	
+	_resetAnimationStatus(viewIn);
+	if (animationResume.isNotNull()) {
+		animationResume->dispatchStartFrame();
+	}
+	
 	addChild(viewIn, UIUpdateMode::NoRedraw);
 	
 	dispatchPageAction(viewOut.get(), UIPageAction::Pause);
@@ -226,10 +269,7 @@ void ViewPager::_goTo(sl_size index, const Transition& _transition)
 	dispatchPageAction(viewIn.get(), UIPageAction::Resume);
 	
 	if (animationPause.isNotNull()) {
-		animationPause->dispatchAnimationFrame(0);
-	}
-	if (animationResume.isNotNull()) {
-		animationResume->dispatchAnimationFrame(0);
+		animationPause->dispatchStartFrame();
 	}
 	
 	if (flagNext) {
@@ -320,12 +360,15 @@ void ViewPager::_push(const Ref<View>& viewIn, const Transition& _transition, sl
 	
 	ScopedCounter counter(&m_countActiveTransitions);
 	
+	_stopCurrentAnimations();
+	
 	sl_size n = m_pages.getCount();
 	
 	if (n == 0) {
 		m_indexCurrent = 0;
 		m_pages.add_NoLock(viewIn);
 		viewIn->setFrame(getBoundsInnerPadding(), UIUpdateMode::NoRedraw);
+		_resetAnimationStatus(viewIn);
 		addChild(viewIn, UIUpdateMode::NoRedraw);
 		dispatchPageAction(viewIn.get(), UIPageAction::Push);
 		dispatchFinishPageAnimation(viewIn.get(), UIPageAction::Push);
@@ -353,6 +396,14 @@ void ViewPager::_push(const Ref<View>& viewIn, const Transition& _transition, sl
 	
 	Ref<Animation> animationPush = Transition::createAnimation(viewIn, transition, UIPageAction::Push, Function<void()>::bind(&_ViewPager_FinishAnimation, Ref<ViewPager>(this), viewIn, UIPageAction::Push));
 	
+	m_currentPushAnimation = animationPush;
+	m_currentPopAnimation = animationPause;
+	
+	_resetAnimationStatus(viewIn);
+	if (animationPush.isNotNull()) {
+		animationPush->dispatchStartFrame();
+	}
+
 	addChild(viewIn, UIUpdateMode::NoRedraw);
 	
 	dispatchPageAction(viewBack.get(), UIPageAction::Pause);
@@ -369,10 +420,7 @@ void ViewPager::_push(const Ref<View>& viewIn, const Transition& _transition, sl
 	dispatchPageAction(viewIn.get(), UIPageAction::Push);
 	
 	if (animationPause.isNotNull()) {
-		animationPause->dispatchAnimationFrame(0);
-	}
-	if (animationPush.isNotNull()) {
-		animationPush->dispatchAnimationFrame(0);
+		animationPause->dispatchStartFrame();
 	}
 
 	viewIn->bringToFront(UIUpdateMode::NoRedraw);
@@ -398,7 +446,7 @@ void ViewPager::_push(const Ref<View>& viewIn, const Transition& _transition, sl
 
 void ViewPager::push(const Ref<View>& viewIn, const Transition& transition, sl_bool flagRemoveAllBackPages)
 {
-	if (UI::isUiThread() && (m_pages.getCount() == 0 || m_countActiveTransitions == 0)) {
+	if (UI::isUiThread() && m_countActiveTransitions == 0) {
 		_push(viewIn, transition, flagRemoveAllBackPages);
 	} else {
 		UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ViewPager, _push, this, viewIn, transition, flagRemoveAllBackPages));
@@ -424,7 +472,7 @@ void ViewPager::_pop(const Ref<View>& _viewOut, const Transition& _transition)
 
 	sl_size n = m_pages.getCount();
 	
-	if (n == 0) {
+	if (n <= m_minimumPagesCount) {
 		return;
 	}
 	
@@ -433,6 +481,8 @@ void ViewPager::_pop(const Ref<View>& _viewOut, const Transition& _transition)
 	if (_viewOut.isNotNull() && _viewOut != viewOut) {
 		return;
 	}
+	
+	_stopCurrentAnimations();
 	
 	if (n == 1) {
 		dispatchPageAction(viewOut.get(), UIPageAction::Pop);
@@ -462,6 +512,14 @@ void ViewPager::_pop(const Ref<View>& _viewOut, const Transition& _transition)
 	
 	Ref<Animation> animationResume = Transition::createAnimation(viewBack, transition, UIPageAction::Resume, Function<void()>::bind(&_ViewPager_FinishAnimation, Ref<ViewPager>(this), viewBack, UIPageAction::Resume));
 	
+	m_currentPopAnimation = animationPop;
+	m_currentPushAnimation = animationResume;
+	
+	_resetAnimationStatus(viewBack);
+	if (animationResume.isNotNull()) {
+		animationResume->dispatchStartFrame();
+	}
+
 	addChild(viewBack, UIUpdateMode::NoRedraw);
 
 	dispatchPageAction(viewOut.get(), UIPageAction::Pop);
@@ -1060,7 +1118,7 @@ void ViewPage::_openPopup(const Ref<View>& parent, Transition transition, sl_boo
 	dispatchOpen();
 	
 	if (animation.isNotNull()) {
-		animation->dispatchAnimationFrame(0);
+		animation->dispatchStartFrame();
 	}
 	
 	setVisibility(Visibility::Visible);

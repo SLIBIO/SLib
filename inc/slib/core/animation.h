@@ -223,24 +223,30 @@ protected:
 public:
 	void dispatchAnimationFrame(float seconds);
 	
+	void dispatchStartFrame();
+	
+	void dispatchEndFrame();
+
 	void dispatchRepeatAnimation(sl_int32 nRemainingRepeatCount);
 	
 	void dispatchStopAnimation();
 	
-protected:
+private:
 	float _getTime(sl_uint32& iRepeat, sl_bool& flagStop);
 	
 	float _getFraction(float time);
 	
 	float _applyCurve(float fraction);
 		
-	sl_bool _stop();
+	sl_bool _stop(sl_bool flagFromNative);
+	
+	void _stopFromNative();
 	
 	void _resume();
 	
 	void _pause();
 	
-protected:
+private:
 	WeakRef<AnimationLoop> m_loop;
 	CList< Ref<AnimationTarget> > m_targets;
 	CList< Ref<Animation> > m_linkedAnimations;
@@ -269,7 +275,10 @@ protected:
 	sl_bool m_flagRunning;
 	sl_uint32 m_lastRepeatedCount;
 	sl_bool m_flagStartedNative;
+	
+	AtomicRef<Referable> m_nativeInstance;
 
+	friend class AnimationLoop;
 };
 
 class AnimationLoop : public Object
@@ -297,7 +306,16 @@ public:
 	
 	virtual sl_bool startNativeAnimation(Animation* animation);
 	
-protected:	
+	virtual void stopNativeAnimation(Animation* animation);
+
+protected:
+	void _stopAnimationFromNative(Animation* animation);
+	
+	Ref<Referable> _getNativeInstance(Animation* animation);
+	
+	void _setNativeInstance(Animation* animation, Referable* instance);
+	
+protected:
 	virtual void _wake() = 0;
 	
 protected:

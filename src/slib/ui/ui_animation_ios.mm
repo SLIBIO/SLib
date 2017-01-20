@@ -33,21 +33,21 @@ static Matrix3 _UIAnimation_calcTransform(const Vector2& anchor, sl_bool flagTra
 	return mat;
 }
 
-static void _UIAnimation_applyAnimation(UIView* handle, Ref<Animation> animation, sl_bool flagTransform, CGAffineTransform ts, CGAffineTransform te, sl_bool flagAlpha, sl_real alphaStart, sl_real alphaEnd, Function<void()> onStop)
+static void _UIAnimation_applyAnimation(UIView* handle, const Ref<Animation>& animation, sl_bool flagTransform, const CGAffineTransform& ts, const CGAffineTransform& te, sl_bool flagAlpha, sl_real alphaStart, sl_real alphaEnd, Function<void()> onStop)
 {
 	UIViewAnimationOptions options = 0;
 	switch (animation->getAnimationCurve()) {
 		case AnimationCurve::EaseIn:
-			options = UIViewAnimationOptionCurveEaseIn;
+			options |= UIViewAnimationOptionCurveEaseIn;
 			break;
 		case AnimationCurve::EaseOut:
-			options = UIViewAnimationOptionCurveEaseOut;
+			options |= UIViewAnimationOptionCurveEaseOut;
 			break;
 		case AnimationCurve::EaseInOut:
-			options = UIViewAnimationOptionCurveEaseInOut;
+			options |= UIViewAnimationOptionCurveEaseInOut;
 			break;
 		default:
-			options = UIViewAnimationOptionCurveLinear;
+			options |= UIViewAnimationOptionCurveLinear;
 			break;
 	}
 	
@@ -83,7 +83,7 @@ static void _UIAnimation_applyAnimation(UIView* handle, Ref<Animation> animation
 	
 }
 
-sl_bool UIAnimationLoop::_applyNativeAnimation(const Ref<Animation>& animation)
+sl_bool UIAnimationLoop::_applyNativeAnimation(Animation* animation)
 {
 	Ref<View> viewAnimate;
 	sl_bool flagTranslate = sl_false;
@@ -178,17 +178,36 @@ sl_bool UIAnimationLoop::_applyNativeAnimation(const Ref<Animation>& animation)
 			if (flagAlpha) {
 				viewAnimate->setAlpha(alphaEnd);
 			}
-			_animation->stop();
+			_stopAnimationFromNative(_animation.get());
 		};
 		if (UI::isUiThread()) {
-			_UIAnimation_applyAnimation(handle, animation, flagTransform, ts, te, flagAlpha, alphaStart, alphaEnd, onStop);
+			_UIAnimation_applyAnimation(handle, _animation, flagTransform, ts, te, flagAlpha, alphaStart, alphaEnd, onStop);
 		} else {
-			UI::dispatchToUiThread(Function<void()>::bind(&_UIAnimation_applyAnimation, handle, animation, flagTransform, ts, te, flagAlpha, alphaStart, alphaEnd, onStop));
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_UIAnimation_applyAnimation(handle, _animation, flagTransform, ts, te, flagAlpha, alphaStart, alphaEnd, onStop);
+			});
 		}
+		
+		_setNativeInstance(animation, viewAnimate.get());
 		
 		return sl_true;
 	}
 	return sl_false;
+}
+
+void UIAnimationLoop::_stopNativeAnimation(Animation* animation)
+{
+	Ref<View> view = CastRef<View>(_getNativeInstance(animation));
+	UIView* handle = UIPlatform::getViewHandle(view.get());
+	if (handle != nil) {
+		if (UI::isUiThread()) {
+			[handle.layer removeAllAnimations];
+		} else {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[handle.layer removeAllAnimations];
+			});
+		}
+	}
 }
 
 SLIB_UI_NAMESPACE_END

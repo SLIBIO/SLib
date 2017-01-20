@@ -9,14 +9,15 @@ SLIB_UI_NAMESPACE_BEGIN
 void _AndroidAnimation_onStop(JNIEnv* env, jobject _this, jlong ptr);
 
 SLIB_JNI_BEGIN_CLASS(_JAndroidAnimation, "slib/platform/android/ui/UiAnimation")
-	SLIB_JNI_STATIC_METHOD(start, "start", "(Landroid/view/View;JFFIZZFFZFFFFZFFFFZFFZFF)Z");
+	SLIB_JNI_STATIC_METHOD(start, "start", "(Landroid/view/View;JFFIZZFFZFFFFZFFFFZFFZFF)Landroid/animation/Animator;");
+	SLIB_JNI_STATIC_METHOD(stop, "stop", "(Landroid/animation/Animator;)V");
 	SLIB_JNI_NATIVE(nativeOnStop, "nativeOnStop", "(J)V", _AndroidAnimation_onStop);
 SLIB_JNI_END_CLASS
 
 typedef HashMap< sl_reg, Function<void()> > _AndroidAnimationStopMap;
 SLIB_SAFE_STATIC_GETTER(_AndroidAnimationStopMap, _AndroidAnimationStopMap_get);
 
-sl_bool UIAnimationLoop::_applyNativeAnimation(const Ref<Animation>& animation)
+sl_bool UIAnimationLoop::_applyNativeAnimation(Animation* animation)
 {
 	Ref<View> viewAnimate;
 	sl_bool flagTranslate = sl_false;
@@ -124,16 +125,30 @@ sl_bool UIAnimationLoop::_applyNativeAnimation(const Ref<Animation>& animation)
 					anchor = viewAnimate->getAnchorOffset();
 				}
 			}
-			return _JAndroidAnimation::start.callBoolean(sl_null, handle, (jlong)id, animation->getDuration(), animation->getStartDelay(),
+			JniLocal<jobject> ret = _JAndroidAnimation::start.callObject(sl_null, handle, (jlong)id, animation->getDuration(), animation->getStartDelay(),
 			                               (int)(animation->getAnimationCurve()), animation->isRepeatForever(), animation->isAutoReverse(),
 			                               anchor.x, anchor.y,
 			                               flagTranslate, translateStart.x, translateStart.y, translateEnd.x, translateEnd.y,
 			                               flagScale, scaleStart.x, scaleStart.y, scaleEnd.x, scaleEnd.y,
 			                               flagRotate, rotateStart, rotateEnd,
 			                               flagAlpha, alphaStart, alphaEnd);
+			if (ret.isNotNull()) {
+				JniGlobal<jobject> animator = ret.get();
+				_setNativeInstance(animation, animator.ref.get());
+				return sl_true;
+			}
 		}
 	}
 	return sl_false;
+}
+
+void UIAnimationLoop::_stopNativeAnimation(Animation* animation)
+{
+	Ref<Referable> _animator = _getNativeInstance(animation);
+	JniGlobal<jobject> animator = CastInstance< CJniGlobal<jobject> >(_animator.get());
+	if (animator.isNotNull()) {
+		_JAndroidAnimation::stop.call(sl_null, animator.get());
+	}
 }
 
 void _AndroidAnimation_onStop(JNIEnv* env, jobject _this, jlong id)

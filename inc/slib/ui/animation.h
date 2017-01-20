@@ -22,6 +22,9 @@ public:
 public:
 	// override
 	sl_bool startNativeAnimation(Animation* animation);
+	
+	// override
+	void stopNativeAnimation(Animation* animation);
 
 protected:
 	// override
@@ -29,7 +32,9 @@ protected:
 	
 	void _run();
 	
-	sl_bool _applyNativeAnimation(const Ref<Animation>& animation);
+	sl_bool _applyNativeAnimation(Animation* animation);
+	
+	void _stopNativeAnimation(Animation* animation);
 	
 private:
 	sl_bool m_flagRunning;

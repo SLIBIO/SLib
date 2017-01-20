@@ -131,7 +131,6 @@ public: \
 
 #define SLIB_RENDER_PROGRAM_STATE_UNIFORM_INT_ARRAY(NAME, GL_NAME) \
 	_SLIB_DEFINE_RENDER_PROGRAM_STATE_ITEM(NAME, #GL_NAME, 1, 0, 0, 0) \
-	SLIB_INLINE void set##NAME(sl_uint32 index, sl_int32 value) { if (NAME.gl_location >= 0) setUniformIntValue(NAME.gl_location + index, value); } \
 	SLIB_INLINE void set##NAME(const sl_int32* values, sl_uint32 count) { if (NAME.gl_location >= 0) setUniformIntArray(NAME.gl_location, values, count); }
 
 #define SLIB_RENDER_PROGRAM_STATE_UNIFORM_FLOAT(NAME, GL_NAME) \
@@ -140,7 +139,6 @@ public: \
 
 #define SLIB_RENDER_PROGRAM_STATE_UNIFORM_FLOAT_ARRAY(NAME, GL_NAME) \
 	_SLIB_DEFINE_RENDER_PROGRAM_STATE_ITEM(NAME, #GL_NAME, 1, 0, 0, 0) \
-	SLIB_INLINE void set##NAME(sl_uint32 index, float value) { if (NAME.gl_location >= 0) setUniformFloatValue(NAME.gl_location + index, value); } \
 	SLIB_INLINE void set##NAME(const float* values, sl_uint32 count) { if (NAME.gl_location >= 0) setUniformFloatArray(NAME.gl_location, values, count); }
 
 #define SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR2(NAME, GL_NAME) \
@@ -149,7 +147,6 @@ public: \
 
 #define SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR2_ARRAY(NAME, GL_NAME) \
 	_SLIB_DEFINE_RENDER_PROGRAM_STATE_ITEM(NAME, #GL_NAME, 1, 0, 0, 0) \
-	SLIB_INLINE void set##NAME(sl_uint32 index, const slib::Vector2& value) { if (NAME.gl_location >= 0) setUniformFloat2Value(NAME.gl_location + index, value); } \
 	SLIB_INLINE void set##NAME(const slib::Vector2* values, sl_uint32 count) { if (NAME.gl_location >= 0) setUniformFloat2Array(NAME.gl_location, values, count); }
 
 #define SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR3(NAME, GL_NAME) \
@@ -158,7 +155,6 @@ public: \
 
 #define SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR3_ARRAY(NAME, GL_NAME) \
 	_SLIB_DEFINE_RENDER_PROGRAM_STATE_ITEM(NAME, #GL_NAME, 1, 0, 0, 0) \
-	SLIB_INLINE void set##NAME(sl_uint32 index, const slib::Vector3& value) { if (NAME.gl_location >= 0) setUniformFloat3Value(NAME.gl_location + index, value); } \
 	SLIB_INLINE void set##NAME(const slib::Vector3* values, sl_uint32 count) { if (NAME.gl_location >= 0) setUniformFloat3Array(NAME.gl_location, values, count); }
 
 #define SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4(NAME, GL_NAME) \
@@ -167,7 +163,6 @@ public: \
 
 #define SLIB_RENDER_PROGRAM_STATE_UNIFORM_VECTOR4_ARRAY(NAME, GL_NAME) \
 	_SLIB_DEFINE_RENDER_PROGRAM_STATE_ITEM(NAME, #GL_NAME, 1, 0, 0, 0) \
-	SLIB_INLINE void set##NAME(sl_uint32 index, const slib::Vector4& value) { if (NAME.gl_location >= 0) setUniformFloat4Value(NAME.gl_location + index, value); } \
 	SLIB_INLINE void set##NAME(const slib::Vector4* values, sl_uint32 count) { if (NAME.gl_location >= 0) setUniformFloat4Array(NAME.gl_location, values, count); }
 
 #define SLIB_RENDER_PROGRAM_STATE_UNIFORM_MATRIX3(NAME, GL_NAME) \
@@ -176,7 +171,6 @@ public: \
 
 #define SLIB_RENDER_PROGRAM_STATE_UNIFORM_MATRIX3_ARRAY(NAME, GL_NAME) \
 	_SLIB_DEFINE_RENDER_PROGRAM_STATE_ITEM(NAME, #GL_NAME, 1, 0, 0, 0) \
-	SLIB_INLINE void set##NAME(sl_uint32 index, const slib::Matrix3& value) { if (NAME.gl_location >= 0) setUniformMatrix3Value(NAME.gl_location + index, value); } \
 	SLIB_INLINE void set##NAME(const slib::Matrix3* values, sl_uint32 count) { if (NAME.gl_location >= 0) setUniformMatrix3Array(NAME.gl_location, values, count); }
 
 #define SLIB_RENDER_PROGRAM_STATE_UNIFORM_MATRIX4(NAME, GL_NAME) \
@@ -185,7 +179,6 @@ public: \
 
 #define SLIB_RENDER_PROGRAM_STATE_UNIFORM_MATRIX4_ARRAY(NAME, GL_NAME) \
 	_SLIB_DEFINE_RENDER_PROGRAM_STATE_ITEM(NAME, #GL_NAME, 1, 0, 0, 0) \
-	SLIB_INLINE void set##NAME(sl_uint32 index, const slib::Matrix4& value) { if (NAME.gl_location >= 0) setUniformMatrix4Value(NAME.gl_location + index, value); } \
 	SLIB_INLINE void set##NAME(const slib::Matrix4* values, sl_uint32 count) { if (NAME.gl_location >= 0) setUniformMatrix4Array(NAME.gl_location, values, count); }
 
 #define SLIB_RENDER_PROGRAM_STATE_UNIFORM_TEXTURE(NAME, GL_NAME) \

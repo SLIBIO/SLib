@@ -657,15 +657,15 @@ void Jni::closeInputStream(jobject stream)
 	JniClass
 **************************************************/
 
-SLIB_DEFINE_ROOT_OBJECT(_JniGlobalBase)
+SLIB_DEFINE_ROOT_OBJECT(CJniGlobalBase)
 
-JniClass::JniClass(jclass cls) : ref(_JniGlobal<jclass>::from(cls))
+JniClass::JniClass(jclass cls) : ref(CJniGlobal<jclass>::from(cls))
 {
 }
 
 JniClass& JniClass::operator=(jclass cls)
 {
-	ref = _JniGlobal<jclass>::from(cls);
+	ref = CJniGlobal<jclass>::from(cls);
 	return *this;
 }
 
@@ -689,7 +689,7 @@ JniClass JniClass::getClassOfObject(jobject obj)
 
 jclass JniClass::get() const
 {
-	_JniGlobal<jclass>* o = ref.get();
+	CJniGlobal<jclass>* o = ref.get();
 	if (ref.isNotNull()) {
 		return o->object;
 	} else {
@@ -1749,13 +1749,13 @@ sl_bool JniClass::registerNative(const char* name, const char* sig, const void* 
 	return sl_false;
 }
 
-Atomic<JniClass>::Atomic(jclass cls) : ref(_JniGlobal<jclass>::from(cls))
+Atomic<JniClass>::Atomic(jclass cls) : ref(CJniGlobal<jclass>::from(cls))
 {
 }
 
 AtomicJniClass& Atomic<JniClass>::operator=(jclass cls)
 {
-	ref = _JniGlobal<jclass>::from(cls);
+	ref = CJniGlobal<jclass>::from(cls);
 	return *this;
 }
 
