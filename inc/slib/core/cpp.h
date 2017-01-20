@@ -17,13 +17,13 @@ template <class T> struct RemoveConstReference<T const&> { typedef T Type; };
 
 template <class T, T v> struct ConstValue { constexpr static T value = v; };
 
-template <class T> struct IsLValueT : ConstValue<bool, false> {};
-template <class T> struct IsLValueT<T&> : ConstValue<bool, true> {};
-template <class T> constexpr bool IsLValue() { return IsLValueT<T>::value; }
+template <class T> struct IsLValueHelper : ConstValue<bool, false> {};
+template <class T> struct IsLValueHelper<T&> : ConstValue<bool, true> {};
+template <class T> constexpr bool IsLValue() { return IsLValueHelper<T>::value; }
 
-template <class T1, class T2> struct IsSameTypeT : ConstValue<bool, false> {};
-template <class T> struct IsSameTypeT<T, T> : ConstValue<bool, true> {};
-template <class T1, class T2> constexpr bool IsSameType() { return IsSameTypeT<T1, T2>::value; }
+template <class T1, class T2> struct IsSameTypeHelper : ConstValue<bool, false> {};
+template <class T> struct IsSameTypeHelper<T, T> : ConstValue<bool, true> {};
+template <class T1, class T2> constexpr bool IsSameType() { return IsSameTypeHelper<T1, T2>::value; }
 
 template <class T>
 constexpr typename RemoveReference<T>::Type&& Move(T&& v)

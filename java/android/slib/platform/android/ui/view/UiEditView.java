@@ -433,6 +433,7 @@ public class UiEditView extends EditText implements IView {
 	
 	public UiEditView(Context context) {
 		super(context);
+		setLayerType(View.LAYER_TYPE_HARDWARE, null);
 		this.addTextChangedListener(new TextWatcher() {
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 			}

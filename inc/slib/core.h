@@ -14,6 +14,7 @@
 #include "core/object.h"
 #include "core/ptr.h"
 #include "core/function.h"
+#include "core/new_helper.h"
 
 #include "core/macro.h"
 #include "core/scoped.h"

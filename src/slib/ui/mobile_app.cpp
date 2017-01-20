@@ -2,7 +2,7 @@
 
 #include "../../../inc/slib/ui/view.h"
 #include "../../../inc/slib/ui/resource.h"
-#include "../../../inc/slib/core/animation.h"
+#include "../../../inc/slib/ui/animation.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -18,9 +18,8 @@ MobileApp::MobileApp()
 	m_contentView = window->getContentView();
 	
 	m_pager = new ViewPager;
+	m_pager->setOpaque(sl_true);
 	m_contentView->addChild(m_pager, UIUpdateMode::Init);
-	
-	m_flagStartedPage = sl_false;
 	
 }
 
@@ -242,6 +241,18 @@ void MobileApp::dispatchPauseToApp()
 	if (app.isNotNull()) {
 		app->dispatchPause();
 	}
+	{
+		Ref<UIAnimationLoop> al = UIAnimationLoop::getInstance();
+		if (al.isNotNull()) {
+			al->pause();
+		}
+	}
+	{
+		Ref<AnimationLoop> al = AnimationLoop::getDefault();
+		if (al.isNotNull()) {
+			al->pause();
+		}
+	}
 }
 
 void MobileApp::dispatchResume()
@@ -259,6 +270,18 @@ void MobileApp::dispatchResume()
 		Ref<ViewPage> page = popups[i];
 		if (page.isNotNull()) {
 			page->dispatchPause();
+		}
+	}
+	{
+		Ref<UIAnimationLoop> al = UIAnimationLoop::getInstance();
+		if (al.isNotNull()) {
+			al->resume();
+		}
+	}
+	{
+		Ref<AnimationLoop> al = AnimationLoop::getDefault();
+		if (al.isNotNull()) {
+			al->resume();
 		}
 	}
 }
@@ -328,6 +351,7 @@ void MobileApp::dispatchCreateActivity()
 	if (window.isNotNull()) {
 		window->forceCreate();
 	}
+	
 	onCreateActivity();
 }
 
@@ -356,11 +380,10 @@ void MobileApp::dispatchResize(sl_ui_len width, sl_ui_len height)
 {
 	UIResource::updateDefaultScreenSize();
 	m_pager->setFrame(0, 0, width, height);
-	if (!m_flagStartedPage) {
+	if (m_pager->getPagesCount() == 0) {
 		Ref<View> page = m_startupPage;
 		if (page.isNotNull()) {
 			openHomePage(page);
-			m_flagStartedPage = sl_true;
 		}
 	}
 	onResize(width, height);

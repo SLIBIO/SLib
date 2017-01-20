@@ -161,22 +161,34 @@ public class UiView {
 		}
 		return false;
 	}
-	
+
+	static final float EPSILON = 0.000001f;
 	public static void setTransform(final View view, final float _tx, final float _ty, final float rotate, final float sx, final float sy, final float ax, final float ay) {
 		if (UiThread.isUiThread()) {
-			view.setRotation((float)(rotate * 180 / Math.PI));
-			view.setScaleX(sx);
-			view.setScaleY(sy);
+			float r = (float)(rotate * 180 / Math.PI);
+			if (Math.abs(r - view.getRotation()) > EPSILON) {
+				view.setRotation(r);
+			}
+			if (Math.abs(sx - view.getScaleX()) > EPSILON) {
+				view.setScaleX(sx);
+			}
+			if (Math.abs(sy - view.getScaleY()) > EPSILON) {
+				view.setScaleY(sy);
+			}
 			float tx = _tx;
 			float ty = _ty;
-			if (Math.abs(ax) > 0.000001f || Math.abs(ay) > 0.000001f) {
+			if (Math.abs(ax) > EPSILON || Math.abs(ay) > EPSILON) {
 				double cr = Math.cos(rotate);
 				double sr = Math.sin(rotate);
 				tx = (float)((- ax * cr + ay * sr) * sx + tx + ax);
 				ty = (float)((- ax * sr - ay * cr) * sy + ty + ay);
 			}
-			view.setTranslationX(tx);
-			view.setTranslationY(ty);			
+			if (Math.abs(tx - view.getTranslationX()) > EPSILON) {
+				view.setTranslationX(tx);
+			}
+			if (Math.abs(ty - view.getTranslationY()) > EPSILON) {
+				view.setTranslationY(ty);
+			}
 		} else {
 			view.post(new Runnable() {
 				public void run() {

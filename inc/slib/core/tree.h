@@ -7,7 +7,7 @@
 #include "compare.h"
 #include "search.h"
 #include "list.h"
-#include "new.h"
+#include "new_helper.h"
 
 #define SLIB_BTREE_DEFAULT_ORDER 16
 
@@ -1195,17 +1195,17 @@ typename BTree<KT, VT, KEY_COMPARE>::NodeData* BTree<KT, VT, KEY_COMPARE>::_crea
 		data->countItems = 0;
 		data->linkParent.setNull();
 		data->linkFirst.setNull();
-		data->keys = New<KT>::create(m_order);
+		data->keys = NewHelper<KT>::create(m_order);
 		if (data->keys) {
-			data->values = New<VT>::create(m_order);
+			data->values = NewHelper<VT>::create(m_order);
 			if (data->values) {
-				data->links = New<TreeNode>::create(m_order);
+				data->links = NewHelper<TreeNode>::create(m_order);
 				if (data->links) {
 					return data;
 				}
-				New<VT>::free(data->values, m_order);
+				NewHelper<VT>::free(data->values, m_order);
 			}
-			New<KT>::free(data->keys, m_order);
+			NewHelper<KT>::free(data->keys, m_order);
 		}
 		delete data;
 	}
@@ -1216,9 +1216,9 @@ template <class KT, class VT, class KEY_COMPARE>
 void BTree<KT, VT, KEY_COMPARE>::_freeNodeData(NodeData* data)
 {
 	if (data) {
-		New<KT>::free(data->keys, m_order);
-		New<VT>::free(data->values, m_order);
-		New<TreeNode>::free(data->links, m_order);
+		NewHelper<KT>::free(data->keys, m_order);
+		NewHelper<VT>::free(data->values, m_order);
+		NewHelper<TreeNode>::free(data->links, m_order);
 		delete data;
 	}
 }

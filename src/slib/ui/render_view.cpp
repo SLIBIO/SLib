@@ -6,6 +6,36 @@ SLIB_UI_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(RenderView, View)
 
+class _RenderAnimationLoop : public AnimationLoop
+{
+public:
+	WeakRef<RenderView> m_view;
+	
+public:
+	_RenderAnimationLoop(RenderView* view) : m_view(view)
+	{
+	}
+	
+public:
+	// override
+	void _wake()
+	{
+		Ref<RenderView> view(m_view);
+		if (view.isNotNull()) {
+			view->requestRender();
+		}
+	}
+	
+	void runStep()
+	{
+		sl_int32 n = _runStep();
+		if (n >= 0) {
+			_wake();
+		}
+	}
+	
+};
+
 RenderView::RenderView()
 {
 	SLIB_REFERABLE_CONSTRUCTOR
@@ -16,6 +46,8 @@ RenderView::RenderView()
 	
 	setPreferredEngineType(RenderEngineType::OpenGL_ES);
 	m_redrawMode = RedrawMode::Continuously;
+	
+	m_animationLoop = new _RenderAnimationLoop(this);
 }
 
 RedrawMode RenderView::getRedrawMode()
@@ -58,6 +90,11 @@ void RenderView::renderViewContent(RenderEngine* engine)
 	}
 }
 
+Ref<AnimationLoop> RenderView::getAnimationLoop()
+{
+	return m_animationLoop;
+}
+
 void RenderView::onFrame(RenderEngine* engine)
 {
 	renderViewContent(engine);
@@ -70,6 +107,10 @@ void RenderView::onAttach()
 
 void RenderView::dispatchFrame(RenderEngine* engine)
 {
+	if (m_animationLoop.isNotNull()) {
+		_RenderAnimationLoop* l = static_cast<_RenderAnimationLoop*>(m_animationLoop.get());
+		l->runStep();
+	}
 	if (engine) {
 		engine->beginScene();
 	}

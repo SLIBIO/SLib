@@ -95,27 +95,34 @@ Ref<Animation> Transition::createAnimation(const Ref<View>& view, const Transiti
 					startFactor = -startFactor;
 					endFactor = -endFactor;
 				}
-				if (direction == TransitionDirection::FromRightToLeft) {
-					sl_real width = (sl_real)(view->getWidth());
-					animation = view->createTranslateAnimation(Vector2(width * startFactor, 0), Vector2(width * endFactor, 0), duration, onStop, curve, sl_false);
+				if (Math::isAlmostZero(factor)) {
+					animation = view->createAnimation(duration);
+					if (animation.isNotNull()) {
+						animation->setOnStop(onStop);
+					}
 				} else {
-					sl_real height = (sl_real)(view->getHeight());
-					animation = view->createTranslateAnimation(Vector2(0, height * startFactor), Vector2(0, height * endFactor), duration, onStop, curve, sl_false);
+					if (direction == TransitionDirection::FromRightToLeft) {
+						sl_real width = (sl_real)(view->getWidth());
+						animation = view->createTranslateAnimation(Vector2(width * startFactor, 0), Vector2(width * endFactor, 0), duration, onStop, curve, AnimationFlags::NotStart);
+					} else {
+						sl_real height = (sl_real)(view->getHeight());
+						animation = view->createTranslateAnimation(Vector2(0, height * startFactor), Vector2(0, height * endFactor), duration, onStop, curve, AnimationFlags::NotStart);
+					}
 				}
 			}
 			break;
 		case TransitionType::Zoom:
 			if (pageAction == UIPageAction::Push || pageAction == UIPageAction::Resume) {
-				animation = view->createScaleAnimation(0.5f, 1.0f, duration, onStop, curve, sl_false);
+				animation = view->createScaleAnimation(0.5f, 1.0f, duration, onStop, curve, AnimationFlags::NotStart);
 			} else {
-				animation = view->createScaleAnimation(1.0f, 0.5f, duration, onStop, curve, sl_false);
+				animation = view->createScaleAnimation(1.0f, 0.5f, duration, onStop, curve, AnimationFlags::NotStart);
 			}
 			break;
 		case TransitionType::Fade:
 			if (pageAction == UIPageAction::Push) {
-				animation = view->createAlphaAnimation(0.01f, 1.0f, duration, onStop, curve, sl_false);
+				animation = view->createAlphaAnimation(0.01f, 1.0f, duration, onStop, curve, AnimationFlags::NotStart);
 			} else if (pageAction == UIPageAction::Pop) {
-				animation = view->createAlphaAnimation(1.0f, 0.01f, duration, onStop, curve, sl_false);
+				animation = view->createAlphaAnimation(1.0f, 0.01f, duration, onStop, curve, AnimationFlags::NotStart);
 			} else {
 				animation = view->createAnimation(duration);
 				if (animation.isNotNull()) {
@@ -194,25 +201,25 @@ Ref<Animation> Transition::createPopupAnimation(const Ref<View>& view, const Tra
 				}
 				if (direction == TransitionDirection::FromRightToLeft) {
 					sl_real width = (sl_real)(UI::getScreenWidth());
-					animation = view->createTranslateAnimation(Vector2(width * startFactor, 0), Vector2(width * endFactor, 0), duration, onStop, curve, sl_false);
+					animation = view->createTranslateAnimation(Vector2(width * startFactor, 0), Vector2(width * endFactor, 0), duration, onStop, curve, AnimationFlags::NotStart);
 				} else {
 					sl_real height = (sl_real)(UI::getScreenHeight());
-					animation = view->createTranslateAnimation(Vector2(0, height * startFactor), Vector2(0, height * endFactor), duration, onStop, curve, sl_false);
+					animation = view->createTranslateAnimation(Vector2(0, height * startFactor), Vector2(0, height * endFactor), duration, onStop, curve, AnimationFlags::NotStart);
 				}
 			}
 			break;
 		case TransitionType::Zoom:
 			if (pageAction == UIPageAction::Push) {
-				animation = view->createScaleAnimation(0.5f, 1.0f, duration, onStop, curve, sl_false);
+				animation = view->createScaleAnimation(0.5f, 1.0f, duration, onStop, curve, AnimationFlags::NotStart);
 			} else {
-				animation = view->createScaleAnimation(1.0f, 0.5f, duration, onStop, curve, sl_false);
+				animation = view->createScaleAnimation(1.0f, 0.5f, duration, onStop, curve, AnimationFlags::NotStart);
 			}
 			break;
 		case TransitionType::Fade:
 			if (pageAction == UIPageAction::Push) {
-				animation = view->createAlphaAnimation(0.01f, 1.0f, duration, onStop, curve, sl_false);
+				animation = view->createAlphaAnimation(0.01f, 1.0f, duration, onStop, curve, AnimationFlags::NotStart);
 			} else {
-				animation = view->createAlphaAnimation(1.0f, 0.01f, duration, onStop, curve, sl_false);
+				animation = view->createAlphaAnimation(1.0f, 0.01f, duration, onStop, curve, AnimationFlags::NotStart);
 			}
 			break;
 	}

@@ -116,7 +116,6 @@ protected:
 	Ref<View> m_contentView;
 	Ref<ViewPager> m_pager;
 	Ref<View> m_startupPage;
-	sl_bool m_flagStartedPage;
 	CList< Ref<ViewPage> > m_popupPages;
 	
 	friend class ViewPage;

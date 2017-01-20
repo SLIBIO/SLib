@@ -5,7 +5,7 @@
 
 #include "ref.h"
 #include "iterator.h"
-#include "new.h"
+#include "new_helper.h"
 #include "compare.h"
 
 SLIB_NAMESPACE_BEGIN
@@ -348,7 +348,7 @@ template <class T>
 CArray<T>::CArray(sl_size count)
 {
 	if (count > 0) {
-		T* dataNew = New<T>::create(count);
+		T* dataNew = NewHelper<T>::create(count);
 		if (dataNew) {
 			m_flagStatic = sl_false;
 			m_data = dataNew;
@@ -366,7 +366,7 @@ template <class _T>
 CArray<T>::CArray(const _T* data, sl_size count)
 {
 	if (count > 0) {
-		T* dataNew = New<T>::create(data, count);
+		T* dataNew = NewHelper<T>::create(data, count);
 		if (dataNew) {
 			m_flagStatic = sl_false;
 			m_data = dataNew;
@@ -398,7 +398,7 @@ template <class T>
 CArray<T>::~CArray()
 {
 	if (! m_flagStatic) {
-		New<T>::free(m_data, m_count);
+		NewHelper<T>::free(m_data, m_count);
 	}
 }
 

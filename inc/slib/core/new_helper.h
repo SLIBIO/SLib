@@ -1,5 +1,5 @@
-#ifndef CHECKHEADER_SLIB_CORE_NEW
-#define CHECKHEADER_SLIB_CORE_NEW
+#ifndef CHECKHEADER_SLIB_CORE_NEW_HELPER
+#define CHECKHEADER_SLIB_CORE_NEW_HELPER
 
 #include "definition.h"
 
@@ -8,7 +8,7 @@
 SLIB_NAMESPACE_BEGIN
 
 template <class T>
-class New
+class NewHelper
 {
 public:
 	static T* create();
@@ -46,7 +46,7 @@ SLIB_NAMESPACE_END
 SLIB_NAMESPACE_BEGIN
 
 template <class T>
-SLIB_INLINE T* New<T>::create()
+SLIB_INLINE T* NewHelper<T>::create()
 {
 	T* data = (T*)(Base::createMemory(sizeof(T)));
 	if (data) {
@@ -56,7 +56,7 @@ SLIB_INLINE T* New<T>::create()
 }
 
 template <class T>
-SLIB_INLINE T* New<T>::create(sl_size count)
+SLIB_INLINE T* NewHelper<T>::create(sl_size count)
 {
 	T* data = (T*)(Base::createMemory(sizeof(T)*count));
 	if (data) {
@@ -69,7 +69,7 @@ SLIB_INLINE T* New<T>::create(sl_size count)
 
 template <class T>
 template <class _T>
-SLIB_INLINE T* New<T>::create(const _T* other)
+SLIB_INLINE T* NewHelper<T>::create(const _T* other)
 {
 	T* data = (T*)(Base::createMemory(sizeof(T)));
 	if (data) {
@@ -80,7 +80,7 @@ SLIB_INLINE T* New<T>::create(const _T* other)
 
 template <class T>
 template <class _T>
-SLIB_INLINE T* New<T>::create(const _T* other, sl_size count)
+SLIB_INLINE T* NewHelper<T>::create(const _T* other, sl_size count)
 {
 	T* data = (T*)(Base::createMemory(sizeof(T)*count));
 	if (data) {
@@ -92,7 +92,7 @@ SLIB_INLINE T* New<T>::create(const _T* other, sl_size count)
 }
 
 template <class T>
-SLIB_INLINE void New<T>::free(T* data)
+SLIB_INLINE void NewHelper<T>::free(T* data)
 {
 	if (data) {
 		data->~T();
@@ -101,7 +101,7 @@ SLIB_INLINE void New<T>::free(T* data)
 }
 
 template <class T>
-SLIB_INLINE void New<T>::free(T* data, sl_size count)
+SLIB_INLINE void NewHelper<T>::free(T* data, sl_size count)
 {
 	if (data) {
 		for (sl_size i = 0; i < count; i++) {
@@ -112,13 +112,13 @@ SLIB_INLINE void New<T>::free(T* data, sl_size count)
 }
 
 template <class T>
-SLIB_INLINE void New<T>::constructor(T* data)
+SLIB_INLINE void NewHelper<T>::constructor(T* data)
 {
 	new (data) T();
 }
 
 template <class T>
-SLIB_INLINE void New<T>::constructor(T* data, sl_size count)
+SLIB_INLINE void NewHelper<T>::constructor(T* data, sl_size count)
 {
 	for (sl_size i = 0; i < count; i++) {
 		new (data + i) T();
@@ -127,14 +127,14 @@ SLIB_INLINE void New<T>::constructor(T* data, sl_size count)
 
 template <class T>
 template <class _T>
-SLIB_INLINE void New<T>::constructor(T* data, const _T* other)
+SLIB_INLINE void NewHelper<T>::constructor(T* data, const _T* other)
 {
 	new (data) T(*other);
 }
 
 template <class T>
 template <class _T>
-SLIB_INLINE void New<T>::constructor(T* data, const _T* other, sl_size count)
+SLIB_INLINE void NewHelper<T>::constructor(T* data, const _T* other, sl_size count)
 {
 	for (sl_size i = 0; i < count; i++) {
 		new (data + i) T(other[i]);
@@ -142,7 +142,7 @@ SLIB_INLINE void New<T>::constructor(T* data, const _T* other, sl_size count)
 }
 
 template <class T>
-SLIB_INLINE void New<T>::destructor(T* data)
+SLIB_INLINE void NewHelper<T>::destructor(T* data)
 {
 	if (data) {
 		data->~T();
@@ -150,13 +150,12 @@ SLIB_INLINE void New<T>::destructor(T* data)
 }
 
 template <class T>
-SLIB_INLINE void New<T>::destructor(T* data, sl_size count)
+SLIB_INLINE void NewHelper<T>::destructor(T* data, sl_size count)
 {
 	for (sl_size i = 0; i < count; i++) {
 		(data+i)->~T();
 	}
 }
-
 
 SLIB_NAMESPACE_END
 

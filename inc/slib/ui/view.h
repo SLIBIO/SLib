@@ -538,10 +538,6 @@ public:
 	void setTransform(const Matrix3& matrix, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	void resetTransform(UIUpdateMode mode = UIUpdateMode::Redraw);
-
-	void setTransformFromAnimation(const Matrix3& matrix, UIUpdateMode mode = UIUpdateMode::Redraw);
-	
-	void resetTransformFromAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool getFinalTranslationRotationScale(Vector2* translation = sl_null, sl_real* rotation = sl_null, Vector2* scale = sl_null, Vector2* anchor = sl_null);
 	
@@ -559,10 +555,6 @@ public:
 	
 	void setTranslation(const Vector2& t, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setTranslationFromAnimation(const Vector2& t, UIUpdateMode mode = UIUpdateMode::Redraw);
-	
-	void resetTranslationFromAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
-	
 	sl_real getScaleX();
 	
 	sl_real getScaleY();
@@ -579,17 +571,9 @@ public:
 	
 	void setScale(const Vector2& factor, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void setScaleFromAnimation(const Vector2& factor, UIUpdateMode mode = UIUpdateMode::Redraw);
-	
-	void resetScaleFromAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
-	
 	sl_real getRotation();
 	
 	void setRotation(sl_real radian, UIUpdateMode mode = UIUpdateMode::Redraw);
-	
-	void setRotationFromAnimation(sl_real radian, UIUpdateMode mode = UIUpdateMode::Redraw);
-	
-	void resetRotationFromAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_real getAnchorOffsetX();
 	
@@ -718,15 +702,9 @@ public:
 	
 	void setOpaque(sl_bool flagOpaque, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	sl_real getFinalAlpha();
-	
 	sl_real getAlpha();
 	
 	void setAlpha(sl_real alpha, UIUpdateMode mode = UIUpdateMode::Redraw);
-	
-	void setAlphaFromAnimation(sl_real alpha, UIUpdateMode mode = UIUpdateMode::Redraw);
-	
-	void resetAlphaFromAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 
 	sl_bool isLayer();
 	
@@ -737,11 +715,12 @@ public:
 	void invalidateLayer(const UIRect& rect);
 	
 	
-	virtual Ref<Animation> createAnimation(float duration);
+	virtual Ref<AnimationLoop> getAnimationLoop();
 	
-	void detachAnimations();
+	Ref<Animation> createAnimation(float duration);
 
-	void resetAnimations(UIUpdateMode mode = UIUpdateMode::Redraw);
+	Ref<Animation> createAnimation(const Ref<AnimationTarget>& target, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
+
 	
 	Ref<Animation> getTransformAnimation();
 	
@@ -749,11 +728,14 @@ public:
 	
 	void setTransformAnimation(const Ref<Animation>& animation, const Matrix3& startValue, const Matrix3& endValue);
 	
-	Ref<Animation> createTransformAnimation(const AnimationFrames<Matrix3>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
+	void setTransformAnimation(const Ref<Animation>& animation, const Matrix3& toValue);
 	
-	Ref<Animation> createTransformAnimation(const Matrix3& startValue, const Matrix3& endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
+	Ref<Animation> createTransformAnimation(const AnimationFrames<Matrix3>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
 	
-	void resetTransformAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
+	Ref<Animation> createTransformAnimation(const Matrix3& startValue, const Matrix3& endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
+	
+	Ref<Animation> createTransformAnimationTo(const Matrix3& toValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::NotUpdateWhenStart);
+
 	
 	Ref<Animation> getTranslateAnimation();
 	
@@ -761,11 +743,14 @@ public:
 	
 	void setTranslateAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue);
 	
-	Ref<Animation> createTranslateAnimation(const AnimationFrames<Vector2>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
+	void setTranslateAnimation(const Ref<Animation>& animation, const Vector2& toValue);
 	
-	Ref<Animation> createTranslateAnimation(const Vector2& startValue, const Vector2& endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
+	Ref<Animation> createTranslateAnimation(const AnimationFrames<Vector2>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
 	
-	void resetTranslateAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
+	Ref<Animation> createTranslateAnimation(const Vector2& startValue, const Vector2& endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
+	
+	Ref<Animation> createTranslateAnimationTo(const Vector2& toValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::NotUpdateWhenStart);
+	
 	
 	Ref<Animation> getScaleAnimation();
 	
@@ -773,15 +758,22 @@ public:
 	
 	void setScaleAnimation(const Ref<Animation>& animation, const Vector2& startValue, const Vector2& endValue);
 	
+	void setScaleAnimation(const Ref<Animation>& animation, const Vector2& toValue);
+	
 	void setScaleAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue);
 	
-	Ref<Animation> createScaleAnimation(const AnimationFrames<Vector2>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
+	void setScaleAnimation(const Ref<Animation>& animation, sl_real toValue);
 	
-	Ref<Animation> createScaleAnimation(const Vector2& startValue, const Vector2& endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
+	Ref<Animation> createScaleAnimation(const AnimationFrames<Vector2>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
 	
-	Ref<Animation> createScaleAnimation(sl_real startValue, sl_real endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
-
-	void resetScaleAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
+	Ref<Animation> createScaleAnimation(const Vector2& startValue, const Vector2& endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
+	
+	Ref<Animation> createScaleAnimationTo(const Vector2& toValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::NotUpdateWhenStart);
+	
+	Ref<Animation> createScaleAnimation(sl_real startValue, sl_real endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
+	
+	Ref<Animation> createScaleAnimationTo(sl_real toValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::NotUpdateWhenStart);
+	
 	
 	Ref<Animation> getRotateAnimation();
 	
@@ -789,11 +781,14 @@ public:
 	
 	void setRotateAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue);
 	
-	Ref<Animation> createRotateAnimation(const AnimationFrames<sl_real>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
+	void setRotateAnimation(const Ref<Animation>& animation, sl_real toValue);
 	
-	Ref<Animation> createRotateAnimation(sl_real startValue, sl_real endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
+	Ref<Animation> createRotateAnimation(const AnimationFrames<sl_real>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
+	
+	Ref<Animation> createRotateAnimation(sl_real startValue, sl_real endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
+	
+	Ref<Animation> createRotateAnimationTo(sl_real toValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::NotUpdateWhenStart);
 
-	void resetRotateAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	Ref<Animation> getFrameAnimation();
 	
@@ -801,23 +796,29 @@ public:
 	
 	void setFrameAnimation(const Ref<Animation>& animation, const Rectangle& startValue, const Rectangle& endValue);
 	
-	Ref<Animation> createFrameAnimation(const AnimationFrames<Rectangle>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
+	void setFrameAnimation(const Ref<Animation>& animation, const Rectangle& toValue);
 	
-	Ref<Animation> createFrameAnimation(const Rectangle& startValue, const Rectangle& endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
+	Ref<Animation> createFrameAnimation(const AnimationFrames<Rectangle>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
 	
-	void resetFrameAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
-
+	Ref<Animation> createFrameAnimation(const Rectangle& startValue, const Rectangle& endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
+	
+	Ref<Animation> createFrameAnimationTo(const Rectangle& toValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::NotUpdateWhenStart);
+	
+	
 	Ref<Animation> getAlphaAnimation();
 	
 	void setAlphaAnimation(const Ref<Animation>& animation, const AnimationFrames<sl_real>& frames);
 	
 	void setAlphaAnimation(const Ref<Animation>& animation, sl_real startValue, sl_real endValue);
 	
-	Ref<Animation> createAlphaAnimation(const AnimationFrames<sl_real>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
+	void setAlphaAnimation(const Ref<Animation>& animation, sl_real toValue);
 	
-	Ref<Animation> createAlphaAnimation(sl_real startValue, sl_real endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
-
-	void resetAlphaAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
+	Ref<Animation> createAlphaAnimation(const AnimationFrames<sl_real>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
+	
+	Ref<Animation> createAlphaAnimation(sl_real startValue, sl_real endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
+	
+	Ref<Animation> createAlphaAnimationTo(sl_real toValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::NotUpdateWhenStart);
+	
 	
 	Ref<Animation> getBackgroundColorAnimation();
 	
@@ -825,11 +826,13 @@ public:
 	
 	void setBackgroundColorAnimation(const Ref<Animation>& animation, const Color4f& startValue, const Color4f& endValue);
 	
-	Ref<Animation> createBackgroundColorAnimation(const AnimationFrames<Color4f>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
+	void setBackgroundColorAnimation(const Ref<Animation>& animation, const Color4f& toValue);
 	
-	Ref<Animation> createBackgroundColorAnimation(const Color4f& startValue, const Color4f& endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, sl_bool flagStart = sl_true);
-
-	void resetBackgroundColorAnimation(UIUpdateMode mode = UIUpdateMode::Redraw);
+	Ref<Animation> createBackgroundColorAnimation(const AnimationFrames<Color4f>& frames, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
+	
+	Ref<Animation> createBackgroundColorAnimation(const Color4f& startValue, const Color4f& endValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
+	
+	Ref<Animation> createBackgroundColorAnimationTo(const Color4f& toValue, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::NotUpdateWhenStart);
 	
 	
 	sl_bool isHorizontalScrolling();
@@ -1162,8 +1165,6 @@ private:
 	
 	void _setFontInvalidateChildInstances();
 
-	void _applyFinalAlpha(UIUpdateMode mode);
-	
 
 	void _resetTransformAnimation();
 	
@@ -1329,25 +1330,26 @@ protected:
 		sl_bool flagInverseTransformFinal;
 		Matrix3 inverseTransformFinal;
 		
-		sl_bool flagTransformStatic;
-		Matrix3 transformStatic;
-		sl_bool flagTransformAnimation;
-		Matrix3 transformAnimation;
+		sl_bool flagTransform;
+		Matrix3 transform;
 		
 		sl_bool flagTransformCalcInvalid;
 		sl_bool flagTransformCalc;
 		Matrix3 transformCalc;
 		
-		Vector2 translationStatic;
-		Vector2 translationAnimation;
-		
-		Vector2 scaleStatic;
-		Vector2 scaleAnimation;
-		
-		sl_real rotationAngleStatic;
-		sl_real rotationAngleAnimation;
+		Vector2 translation;
+		Vector2 scale;
+		sl_real rotationAngle;
 		
 		Vector2 anchorOffset;
+		
+		AtomicWeakRef<Animation> m_animationTransform;
+		AtomicWeakRef<Animation> m_animationTranslate;
+		AtomicWeakRef<Animation> m_animationScale;
+		AtomicWeakRef<Animation> m_animationRotate;
+		AtomicWeakRef<Animation> m_animationFrame;
+		AtomicWeakRef<Animation> m_animationAlpha;
+		AtomicWeakRef<Animation> m_animationBackgroundColor;
 		
 	};
 	AtomicRef<TransformAttributes> m_transformAttributes;
@@ -1382,8 +1384,7 @@ protected:
 		sl_bool flagUsingFont;
 		
 		sl_bool flagOpaque;
-		sl_real alphaStatic;
-		sl_real alphaAnimation;
+		sl_real alpha;
 		
 		sl_bool flagLayer;
 		AtomicRef<Bitmap> bitmapLayer;
@@ -1397,35 +1398,6 @@ protected:
 	
 	Ref<DrawAttributes> _initializeDrawAttributes();
 
-	class AnimationAttributes : public Referable
-	{
-	public:
-		AtomicRef<Animation> animationTransform;
-		AtomicRef< AnimationTargetT<Matrix3> > targetTransform;
-		
-		AtomicRef<Animation> animationTranslation;
-		AtomicRef< AnimationTargetT<Vector2> > targetTranslation;
-		
-		AtomicRef<Animation> animationScale;
-		AtomicRef< AnimationTargetT<Vector2> > targetScale;
-		
-		AtomicRef<Animation> animationRotation;
-		AtomicRef< AnimationTargetT<sl_real> > targetRotation;
-		
-		AtomicRef<Animation> animationFrame;
-		AtomicRef< AnimationTargetT<Rectangle> > targetFrame;
-		
-		AtomicRef<Animation> animationAlpha;
-		AtomicRef< AnimationTargetT<sl_real> > targetAlpha;
-		
-		AtomicRef<Animation> animationBackgroundColor;
-		AtomicRef< AnimationTargetT<Color4f> > targetBackgroundColor;
-		
-	};
-	AtomicRef<AnimationAttributes> m_animationAttributes;
-	
-	Ref<AnimationAttributes> _initializeAnimationAttributes();
-	
 	class ScrollAttributes : public Referable
 	{
 	public:

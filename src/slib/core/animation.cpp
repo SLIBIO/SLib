@@ -23,6 +23,12 @@ SLIB_DEFINE_OBJECT(Animation, Object)
 
 Animation::Animation()
 {
+	static sl_reg _uniqueId = 0;
+	m_id = Base::interlockedIncrement(&_uniqueId);
+	m_flagSelfAlive = sl_true;
+	m_flagNativeEnabled = sl_true;
+	m_flagUpdateWhenStart = sl_true;
+	
 	m_time = 0;
 	m_duration = 1;
 	m_delay = 0;
@@ -41,6 +47,7 @@ Animation::Animation()
 	m_flagRunning = sl_false;
 	m_lastRepeatedCount = 0;
 
+	m_flagStartedNative = sl_false;
 }
 
 Animation::~Animation()
@@ -50,10 +57,15 @@ Animation::~Animation()
 
 Ref<Animation> Animation::create(float duration)
 {
-	return create(duration, AnimationLoop::getDefault());
+	return createWithLoop(AnimationLoop::getDefault(), duration);
 }
 
-Ref<Animation> Animation::create(float duration, const Ref<AnimationLoop>& loop)
+Ref<Animation> Animation::create(const Ref<AnimationTarget>& target, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+{
+	return createWithLoop(AnimationLoop::getDefault(), target, duration, onStop, curve, flags);
+}
+
+Ref<Animation> Animation::createWithLoop(const Ref<AnimationLoop>& loop, float duration)
 {
 	Ref<Animation> ret = new Animation;
 	if (ret.isNotNull()) {
@@ -64,9 +76,46 @@ Ref<Animation> Animation::create(float duration, const Ref<AnimationLoop>& loop)
 	return sl_null;
 }
 
+Ref<Animation> Animation::createWithLoop(const Ref<AnimationLoop>& loop, const Ref<AnimationTarget>& target, float duration, const Function<void()>& onStop, AnimationCurve curve, const AnimationFlags& flags)
+{
+	Ref<Animation> ret = new Animation;
+	if (ret.isNotNull()) {
+		ret->addTarget(target);
+		ret->setDuration(duration);
+		ret->setAnimationCurve(curve);
+		ret->m_loop = loop;
+		ret->setOnStop(onStop);
+		if (flags & AnimationFlags::Repeat) {
+			ret->setRepeatForever(sl_true);
+		}
+		if (flags & AnimationFlags::AutoReverse) {
+			ret->setAutoReverse(sl_true);
+		}
+		if (flags & AnimationFlags::NotNative) {
+			ret->setNativeEnabled(sl_false);
+		}
+		if (flags & AnimationFlags::NotUpdateWhenStart) {
+			ret->setUpdateWhenStart(sl_false);
+		}
+		if (flags & AnimationFlags::NotSelfAlive) {
+			ret->setSelfAlive(sl_false);
+		}
+		if (!(flags & AnimationFlags::NotStart)) {
+			ret->start();
+		}
+		return ret;
+	}
+	return sl_null;
+}
+
 Ref<AnimationLoop> Animation::getLoop()
 {
 	return m_loop;
+}
+
+CList< Ref<AnimationTarget> >& Animation::getTargets()
+{
+	return m_targets;
 }
 
 void Animation::addTarget(const Ref<AnimationTarget>& target)
@@ -109,6 +158,41 @@ void Animation::unlinkAnimation(const Ref<Animation>& animation)
 void Animation::unlinkAllAnimations()
 {
 	m_linkedAnimations.removeAll();
+}
+
+sl_reg Animation::getId()
+{
+	return m_id;
+}
+
+sl_bool Animation::isSelfAlive()
+{
+	return m_flagSelfAlive;
+}
+
+void Animation::setSelfAlive(sl_bool flagAlive)
+{
+	m_flagSelfAlive = flagAlive;
+}
+
+sl_bool Animation::isNativeEnabled()
+{
+	return m_flagNativeEnabled;
+}
+
+void Animation::setNativeEnabled(sl_bool flagNative)
+{
+	m_flagNativeEnabled = flagNative;
+}
+
+sl_bool Animation::isUpdateWhenStart()
+{
+	return m_flagUpdateWhenStart;
+}
+
+void Animation::setUpdateWhenStart(sl_bool flagUpdate)
+{
+	m_flagUpdateWhenStart = flagUpdate;
 }
 
 float Animation::getTime()
@@ -269,54 +353,82 @@ sl_uint32 Animation::getRepeatedCount()
 }
 
 
-void Animation::start(sl_bool flagUpdateFrame)
+void Animation::start()
 {
-	startAt(0, flagUpdateFrame);
+	startAt(0);
 }
 
-void Animation::startAt(float seconds, sl_bool flagUpdateFrame)
+void Animation::startAt(float seconds)
 {
 	ObjectLocker lock(this);
 	
 	if (m_flagStarted) {
 		return;
 	}
+	if (m_flagStartedNative) {
+		return;
+	}
 	
 	m_flagStarted = sl_true;
 	m_flagRunning = sl_false;
+
+	if (m_flagNativeEnabled) {
+		Ref<AnimationLoop> loop(m_loop);
+		if (loop.isNotNull()) {
+			if (loop->startNativeAnimation(this)) {
+				m_flagStartedNative = sl_true;
+				return;
+			}
+		}
+	}
+	
 	m_time = seconds;
 	
 	_resume();
 	
 	lock.unlock();
 	
-	if (flagUpdateFrame) {
+	if (m_flagUpdateWhenStart) {
 		update(0);
 	}
 
 }
 
-void Animation::restart(sl_bool flagUpdateFrame)
+void Animation::restart()
 {
-	restartAt(0, flagUpdateFrame);
+	restartAt(0);
 }
 
-void Animation::restartAt(float seconds, sl_bool flagUpdateFrame)
+void Animation::restartAt(float seconds)
 {
 	ObjectLocker lock(this);
+
+	if (m_flagStartedNative) {
+		return;
+	}
 
 	if (!m_flagStarted) {
 		m_flagStarted = sl_true;
 		m_flagRunning = sl_false;
 	}
 	
+	if (m_flagNativeEnabled) {
+		Ref<AnimationLoop> loop(m_loop);
+		if (loop.isNotNull()) {
+			if (loop->startNativeAnimation(this)) {
+				m_flagStartedNative = sl_true;
+				return;
+			}
+		}
+	}
+	
 	m_time = seconds;
 	
 	_resume();
 	
 	lock.unlock();
 
-	if (flagUpdateFrame) {
+	if (m_flagUpdateWhenStart) {
 		update(0);
 	}
 
@@ -351,6 +463,9 @@ void Animation::_resume()
 	if (!m_flagStarted) {
 		return;
 	}
+	if (m_flagStartedNative) {
+		return;
+	}
 	if (m_flagRunning) {
 		return;
 	}
@@ -370,6 +485,9 @@ void Animation::pause()
 void Animation::_pause()
 {
 	if (!m_flagStarted) {
+		return;
+	}
+	if (m_flagStartedNative) {
 		return;
 	}
 	if (!m_flagRunning) {
@@ -674,9 +792,12 @@ void AnimationLoop::addAnimation(Animation* animation)
 		return;
 	}
 	ObjectLocker lock(this);
-	if (m_animations.addIfNotExist_NoLock(animation)) {
-		m_flagUpdateList = sl_true;
+	if (animation->isSelfAlive()) {
+		m_mapAnimations.put_NoLock(animation->getId(), animation);
+	} else {
+		m_mapWeakAnimations.put_NoLock(animation->getId(), animation);
 	}
+	m_flagUpdateList = sl_true;
 	if (!m_flagPaused) {
 		_wake();
 	}
@@ -688,9 +809,10 @@ void AnimationLoop::removeAnimation(Animation* animation)
 		return;
 	}
 	ObjectLocker lock(this);
-	if (m_animations.removeValue_NoLock(animation)) {
-		m_flagUpdateList = sl_true;
-	}
+	sl_reg _id = animation->getId();
+	m_mapAnimations.remove_NoLock(_id);
+	m_mapWeakAnimations.remove_NoLock(_id);
+	m_flagUpdateList = sl_true;
 	if (!m_flagPaused) {
 		_wake();
 	}
@@ -728,12 +850,37 @@ void AnimationLoop::wake()
 	}
 }
 
+sl_bool AnimationLoop::startNativeAnimation(Animation* animation)
+{
+	return sl_false;
+}
+
 sl_int32 AnimationLoop::_runStep()
 {
 	if (m_flagUpdateList) {
 		m_flagUpdateList = sl_false;
 		ObjectLocker lock(this);
-		m_animationsRunning = m_animations.duplicate_NoLock();
+		List< Ref<Animation> > animations;
+		{
+			Iterator< Ref<Animation> > iterator = m_mapAnimations.getValueIterator();
+			Ref<Animation> animation;
+			while (iterator.next(&animation)) {
+				if (animation.isNotNull()) {
+					animations.add_NoLock(animation);
+				}
+			}
+		}
+		{
+			Iterator< WeakRef<Animation> > iterator = m_mapWeakAnimations.getValueIterator();
+			WeakRef<Animation> _animation;
+			while (iterator.next(&_animation)) {
+				Ref<Animation> animation(_animation);
+				if (animation.isNotNull()) {
+					animations.add_NoLock(animation);
+				}
+			}
+		}
+		m_animationsRunning = animations;
 	}
 	
 	if (m_flagPaused || m_animationsRunning.isEmpty()) {

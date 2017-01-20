@@ -6,7 +6,7 @@
 #include "object.h"
 #include "function.h"
 #include "ptr.h"
-#include "list.h"
+#include "map.h"
 #include "math.h"
 #include "interpolation.h"
 
@@ -49,6 +49,26 @@ class AnimationTarget;
 
 class AnimationLoop;
 
+class AnimationFlags
+{
+public:
+	int value;
+	SLIB_MEMBERS_OF_PRIMITIVE_WRAPPER(AnimationFlags, int, value)
+	
+public:
+	SLIB_INLINE AnimationFlags() = default;
+	
+	enum {
+		Default = 0,
+		NotStart = 1,
+		Repeat = 2,
+		AutoReverse = 4,
+		NotNative = 8,
+		NotUpdateWhenStart = 16,
+		NotSelfAlive = 32
+	};
+};
+
 class Animation : public Object
 {
 	SLIB_DECLARE_OBJECT
@@ -61,10 +81,16 @@ protected:
 public:
 	static Ref<Animation> create(float duration);
 	
-	static Ref<Animation> create(float duration, const Ref<AnimationLoop>& loop);
+	static Ref<Animation> create(const Ref<AnimationTarget>& target, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
+	
+	static Ref<Animation> createWithLoop(const Ref<AnimationLoop>& loop, float duration);
+	
+	static Ref<Animation> createWithLoop(const Ref<AnimationLoop>& loop, const Ref<AnimationTarget>& target, float duration, const Function<void()>& onStop = sl_null, AnimationCurve curve = AnimationCurve::Default, const AnimationFlags& flags = AnimationFlags::Default);
 	
 public:
 	Ref<AnimationLoop> getLoop();
+	
+	CList< Ref<AnimationTarget> >& getTargets();
 	
 	void addTarget(const Ref<AnimationTarget>& target);
 	
@@ -78,6 +104,21 @@ public:
 	void unlinkAnimation(const Ref<Animation>& animation);
 	
 	void unlinkAllAnimations();
+	
+	
+	sl_reg getId();
+	
+	sl_bool isSelfAlive();
+	
+	void setSelfAlive(sl_bool flagAlive);
+	
+	sl_bool isNativeEnabled();
+	
+	void setNativeEnabled(sl_bool flagNative);
+	
+	sl_bool isUpdateWhenStart();
+	
+	void setUpdateWhenStart(sl_bool flagUpdate);
 
 	
 	// seconds
@@ -141,13 +182,13 @@ public:
 	sl_uint32 getRepeatedCount();
 	
 	
-	void start(sl_bool flagUpdateFrame = sl_true);
+	void start();
 	
-	void startAt(float seconds, sl_bool flagUpdateFrame = sl_true);
+	void startAt(float seconds);
 
-	void restart(sl_bool flagUpdateFrame = sl_true);
+	void restart();
 	
-	void restartAt(float seconds, sl_bool flagUpdateFrame = sl_true);
+	void restartAt(float seconds);
 	
 	void stop();
 	
@@ -204,6 +245,11 @@ protected:
 	CList< Ref<AnimationTarget> > m_targets;
 	CList< Ref<Animation> > m_linkedAnimations;
 	
+	sl_reg m_id;
+	sl_bool m_flagSelfAlive;
+	sl_bool m_flagNativeEnabled;
+	sl_bool m_flagUpdateWhenStart;
+	
 	float m_time; // seconds
 	float m_duration; // seconds
 	float m_delay; // seconds
@@ -222,6 +268,7 @@ protected:
 	sl_bool m_flagStarted;
 	sl_bool m_flagRunning;
 	sl_uint32 m_lastRepeatedCount;
+	sl_bool m_flagStartedNative;
 
 };
 
@@ -248,6 +295,8 @@ public:
 
 	void wake();
 	
+	virtual sl_bool startNativeAnimation(Animation* animation);
+	
 protected:	
 	virtual void _wake() = 0;
 	
@@ -256,7 +305,8 @@ protected:
 	sl_int32 _runStep();
 	
 protected:
-	CList< Ref<Animation> > m_animations;
+	HashMap< sl_reg, Ref<Animation> > m_mapAnimations;
+	HashMap< sl_reg, WeakRef<Animation> > m_mapWeakAnimations;
 	List< Ref<Animation> > m_animationsRunning;
 	sl_bool m_flagPaused;
 	
@@ -265,7 +315,7 @@ protected:
 	
 };
 
-template < class T, class INTERPOLATION = Interpolation<T> >
+template <class T>
 class AnimationFrame
 {
 public:
@@ -313,13 +363,17 @@ public:
 public:
 	T seek(float fraction);
 	
+	sl_size getFramesCount();
+	
+	AnimationFrame<T>& getFrame(sl_size index);
+
 public:
 	T startValue;
 	T endValue;
 
 protected:
-	Array< AnimationFrame<T, INTERPOLATION> > m_arrFrames;
-	AnimationFrame<T, INTERPOLATION>* m_frames;
+	Array< AnimationFrame<T> > m_arrFrames;
+	AnimationFrame<T>* m_frames;
 	sl_size m_countFrames;
 	
 	sl_size m_currentIndex;
@@ -360,6 +414,26 @@ public:
 	SLIB_INLINE AnimationTargetT(const AnimationFrames<T>& frames) : m_seeker(frames) {}
 	
 public:
+	T& getStartValue()
+	{
+		return m_seeker.startValue;
+	}
+	
+	T& getEndValue()
+	{
+		return m_seeker.endValue;
+	}
+
+	sl_size getFramesCount()
+	{
+		return m_seeker.getFramesCount();
+	}
+	
+	T& getFrame(sl_size index)
+	{
+		return m_seeker.getFrame(index);
+	}
+	
 	// override
 	void update(float fraction)
 	{
@@ -444,6 +518,18 @@ AnimationFramesSeeker<T, INTERPOLATION>::AnimationFramesSeeker(const AnimationFr
 	} else {
 		m_currentEndValue = &endValue;
 	}
+}
+
+template <class T, class INTERPOLATION>
+sl_size AnimationFramesSeeker<T, INTERPOLATION>::getFramesCount()
+{
+	return m_countFrames;
+}
+
+template <class T, class INTERPOLATION>
+AnimationFrame<T>& AnimationFramesSeeker<T, INTERPOLATION>::getFrame(sl_size index)
+{
+	return m_frames[index];
 }
 
 template <class T, class INTERPOLATION>

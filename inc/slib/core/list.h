@@ -3,7 +3,7 @@
 
 #include "definition.h"
 
-#include "new.h"
+#include "new_helper.h"
 #include "object.h"
 #include "iterator.h"
 #include "array.h"
@@ -655,7 +655,7 @@ template <class T>
 CList<T>::CList(sl_size count)
 {
 	if (count > 0) {
-		T* data = New<T>::create(count);
+		T* data = NewHelper<T>::create(count);
 		if (data) {
 			m_data = data;
 			m_count = count;
@@ -675,7 +675,7 @@ CList<T>::CList(sl_size count, sl_size capacity)
 		capacity = count;
 	}
 	if (capacity > 0) {
-		T* data = New<T>::create(capacity);
+		T* data = NewHelper<T>::create(capacity);
 		if (data) {
 			m_data = data;
 			m_count = count;
@@ -693,7 +693,7 @@ template <class _T>
 CList<T>::CList(const _T* values, sl_size count)
 {
 	if (count > 0) {
-		T* data = New<T>::create(values, count);
+		T* data = NewHelper<T>::create(values, count);
 		if (data) {
 			m_data = data;
 			m_count = count;
@@ -709,7 +709,7 @@ CList<T>::CList(const _T* values, sl_size count)
 template <class T>
 CList<T>::~CList()
 {
-	New<T>::free(m_data, m_count);
+	NewHelper<T>::free(m_data, m_count);
 }
 
 template <class T>
@@ -1610,7 +1610,7 @@ sl_bool CList<T>::_setCountInner(sl_size count)
 		}
 	}
 	if (count > oldCount) {
-		New<T>::constructor(m_data + oldCount, count - oldCount);
+		NewHelper<T>::constructor(m_data + oldCount, count - oldCount);
 		m_count = count;
 	}
 	return sl_true;

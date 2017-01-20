@@ -1,6 +1,6 @@
 #include "../../../inc/slib/network/nat.h"
 
-#include "../../../inc/slib/core/new.h"
+#include "../../../inc/slib/core/new_helper.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
@@ -207,7 +207,7 @@ _NatTableMapping::_NatTableMapping()
 
 _NatTableMapping::~_NatTableMapping()
 {
-	New<_NatTablePort>::free(m_ports, m_nPorts);
+	NewHelper<_NatTablePort>::free(m_ports, m_nPorts);
 }
 
 void _NatTableMapping::setup(sl_uint16 portBegin, sl_uint16 portEnd)
@@ -217,7 +217,7 @@ void _NatTableMapping::setup(sl_uint16 portBegin, sl_uint16 portEnd)
 	m_mapPorts.removeAll_NoLock();
 
 	if (m_ports) {
-		New<_NatTablePort>::free(m_ports, m_nPorts);
+		NewHelper<_NatTablePort>::free(m_ports, m_nPorts);
 		m_ports = sl_null;
 	}
 	m_pos = 0;
@@ -227,7 +227,7 @@ void _NatTableMapping::setup(sl_uint16 portBegin, sl_uint16 portEnd)
 	m_portEnd = portEnd;
 	if (portEnd >= portBegin) {
 		m_nPorts = portEnd - portBegin + 1;
-		m_ports = New<_NatTablePort>::create(m_nPorts);
+		m_ports = NewHelper<_NatTablePort>::create(m_nPorts);
 	}
 }
 

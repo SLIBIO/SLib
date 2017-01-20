@@ -758,9 +758,6 @@
     <ClInclude Include="..\..\..\inc\slib\core\mutex.h">
       <Filter>inc\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\core\new.h">
-      <Filter>inc\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\core\object.h">
       <Filter>inc\core</Filter>
     </ClInclude>
@@ -835,6 +832,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\ui\animation.h">
       <Filter>inc\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\slib\ui\ui_animation.h">
+      <Filter>src\slib\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\new_helper.h">
+      <Filter>inc\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

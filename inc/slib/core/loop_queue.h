@@ -4,7 +4,7 @@
 #include "definition.h"
 
 #include "object.h"
-#include "new.h"
+#include "new_helper.h"
 
 SLIB_NAMESPACE_BEGIN
 
@@ -66,7 +66,7 @@ LoopQueue<T>::LoopQueue(sl_size size, sl_size latency)
 	m_first = 0;
 	m_count = 0;
 	m_latency = latency;
-	m_data = New<T>::create(size);
+	m_data = NewHelper<T>::create(size);
 	if (m_data) {
 		m_size = size;
 	} else {
@@ -78,7 +78,7 @@ template <class T>
 LoopQueue<T>::~LoopQueue()
 {
 	if (m_data) {
-		New<T>::free(m_data, m_size);
+		NewHelper<T>::free(m_data, m_size);
 	}
 }
 
@@ -93,10 +93,10 @@ sl_bool LoopQueue<T>::setQueueSize(sl_size size)
 {
 	ObjectLocker lock(this);
 	if (m_data) {
-		New<T>::free(m_data, m_size);
+		NewHelper<T>::free(m_data, m_size);
 		m_data = sl_null;
 	}
-	m_data = New<T>::create(size);
+	m_data = NewHelper<T>::create(size);
 	if (m_data) {
 		m_first = 0;
 		m_count = 0;

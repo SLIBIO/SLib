@@ -21,6 +21,7 @@ public class UiGenericView extends View implements IView {
 	
 	public UiGenericView(Context context) {
 		super(context);
+		setLayerType(View.LAYER_TYPE_HARDWARE, null);
 	}
 
 	@Override

@@ -224,7 +224,7 @@ sl_bool Android_ViewInstance::applyProperties(View* _view, ViewInstance* parent)
 		_JAndroidView::setFrame.callBoolean(sl_null, jhandle, (int)(frame.left), (int)(frame.top), (int)(frame.right), (int)(frame.bottom));
 		_JAndroidView::setVisible.call(sl_null, jhandle, view->isVisible());
 		_JAndroidView::setEnabled.call(sl_null, jhandle, view->isEnabled());
-		sl_real alpha = view->getFinalAlpha();
+		sl_real alpha = view->getAlpha();
 		if (alpha < 0.995f) {
 			_JAndroidView::setAlpha.call(sl_null, jhandle, alpha);
 		}

@@ -663,9 +663,34 @@ private:
 };
 
 template <class T, class... ARGS>
-SLIB_INLINE Ref<T> NewRef(ARGS&&... args)
+SLIB_INLINE Ref<T> New(ARGS&&... args)
 {
 	return new T(Forward<ARGS>(args)...);
+}
+
+template <class REF, class T>
+struct _InitHelper
+{
+	template <class... ARGS>
+	SLIB_INLINE static void init(REF* o, ARGS&&... args) { (*o) = (*o)->init(Forward<ARGS>(args)...); }
+};
+
+template <class REF>
+struct _InitHelper<REF, void>
+{
+	template <class... ARGS>
+	SLIB_INLINE static void init(REF* o, ARGS&&... args) { (*o)->init(Forward<ARGS>(args)...); }
+};
+
+template <class T, class... ARGS>
+SLIB_INLINE Ref<T> Init(ARGS&&... args)
+{
+	Ref<T> o = new T;
+	if (o.isNotNull()) {
+		_InitHelper<Ref<T>, decltype(o->init(args...))>::init(&o, Forward<ARGS>(args)...);
+		return o;
+	}
+	return sl_null;
 }
 
 template <class T, class _T>
@@ -724,6 +749,10 @@ SLIB_INLINE const Ref<T>& CastRef(const Ref<_T>& object, const Ref<T>& def)
 	return def;
 }
 
+SLIB_NAMESPACE_END
+
+
+SLIB_NAMESPACE_BEGIN
 
 template <class T>
 SLIB_INLINE Ref<T>::Ref(T* other)
@@ -1691,8 +1720,7 @@ SLIB_INLINE void Atomic< Ref<T> >::_move_assign(void* _other)
 template <class T>
 WeakRef<T>::WeakRef(T* _other)
 {
-	Ref<T> other(_other);
-	_set(other._ptr);
+	_set(_other);
 }
 
 template <class T>
@@ -1864,8 +1892,7 @@ WeakRef<T>& WeakRef<T>::operator=(sl_null_t)
 template <class T>
 WeakRef<T>& WeakRef<T>::operator=(T* _other)
 {
-	Ref<T> other(_other);
-	_set(other._ptr);
+	_set(_other);
 	return *this;
 }
 
@@ -2039,8 +2066,7 @@ SLIB_INLINE void WeakRef<T>::_set(T* object)
 template <class T>
 Atomic< WeakRef<T> >::Atomic(T* _other)
 {
-	Ref<T> other(_other);
-	_set(other._ptr);
+	_set(_other);
 }
 
 template <class T>
@@ -2202,8 +2228,7 @@ AtomicWeakRef<T>& Atomic< WeakRef<T> >::operator=(sl_null_t)
 template <class T>
 AtomicWeakRef<T>& Atomic< WeakRef<T> >::operator=(T* _other)
 {
-	Ref<T> other(_other);
-	_set(other._ptr);
+	_set(_other);
 	return *this;
 }
 

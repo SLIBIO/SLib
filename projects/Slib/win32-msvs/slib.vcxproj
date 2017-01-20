@@ -60,7 +60,7 @@
     <ClInclude Include="..\..\..\inc\slib\core\memory.h" />
     <ClInclude Include="..\..\..\inc\slib\core\mio.h" />
     <ClInclude Include="..\..\..\inc\slib\core\mutex.h" />
-    <ClInclude Include="..\..\..\inc\slib\core\new.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\new_helper.h" />
     <ClInclude Include="..\..\..\inc\slib\core\object.h" />
     <ClInclude Include="..\..\..\inc\slib\core\option.h" />
     <ClInclude Include="..\..\..\inc\slib\core\parse.h" />
@@ -267,6 +267,7 @@
     <ClInclude Include="..\..\..\src\slib\render\opengl_gl.h" />
     <ClInclude Include="..\..\..\src\slib\render\opengl_gles.h" />
     <ClInclude Include="..\..\..\src\slib\render\opengl_impl.h" />
+    <ClInclude Include="..\..\..\src\slib\ui\ui_animation.h" />
     <ClInclude Include="..\..\..\src\slib\ui\ui_core_common.h" />
     <ClInclude Include="..\..\..\src\slib\ui\ui_core_win32.h" />
     <ClInclude Include="..\..\..\src\slib\ui\view_win32.h" />

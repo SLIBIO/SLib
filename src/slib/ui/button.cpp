@@ -102,7 +102,7 @@ Button::Button(sl_uint32 nCategories, ButtonCategory* categories)
 		nCategories = 1;
 	}
 	m_nCategories = nCategories;
-	m_categories = New<ButtonCategory>::create(nCategories);
+	m_categories = NewHelper<ButtonCategory>::create(nCategories);
 	if (!categories) {
 		categories = _Button_Categories::getCategories();
 		if (nCategories > 2) {
@@ -129,7 +129,7 @@ Button::Button(sl_uint32 nCategories, ButtonCategory* categories)
 
 Button::~Button()
 {
-	New<ButtonCategory>::free(m_categories, m_nCategories);
+	NewHelper<ButtonCategory>::free(m_categories, m_nCategories);
 }
 
 String Button::getText()

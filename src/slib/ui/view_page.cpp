@@ -3,6 +3,8 @@
 #include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/mobile_app.h"
 
+#include "../../../inc/slib/core/scoped.h"
+
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 #	include "../../../inc/slib/core/platform_android.h"
 #endif
@@ -37,6 +39,7 @@ ViewPager::ViewPager()
 	m_popTransitionCurve = AnimationCurve::EaseInOut;
 	m_popTransitionDuration = 0.5f;
 	
+	m_countActiveTransitions = 0;
 }
 
 sl_size ViewPager::getPagesCount()
@@ -164,7 +167,6 @@ void _ViewPager_FinishAnimation(const Ref<ViewPager>& pager, const Ref<View>& vi
 				view->setEnabled(sl_true);
 				break;
 		}
-		view->resetAnimations();
 		pager->setEnabled(sl_true);
 	}
 }
@@ -178,6 +180,9 @@ void ViewPager::_goTo(sl_size index, const Transition& _transition)
 	Transition transition = _transition;
 
 	ObjectLocker lock(this);
+	
+	ScopedCounter counter(&m_countActiveTransitions);
+	
 	if (m_indexCurrent == index) {
 		return;
 	}
@@ -242,7 +247,7 @@ void ViewPager::_goTo(sl_size index, const Transition& _transition)
 		_ViewPager_FinishAnimation(this, viewIn, UIPageAction::Resume);
 	}
 	
-	runAfterDraw([animationPause, animationResume] () {
+	viewIn->runAfterDraw([animationPause, animationResume]() {
 		if (animationPause.isNotNull()) {
 			animationPause->start();
 		}
@@ -255,7 +260,7 @@ void ViewPager::_goTo(sl_size index, const Transition& _transition)
 
 void ViewPager::goToPageAt(sl_size index, const Transition& transition)
 {
-	if (UI::isUiThread()) {
+	if (UI::isUiThread() && m_countActiveTransitions == 0) {
 		_goTo(index, transition);
 	} else {
 		UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ViewPager, _goTo, this, index, transition));
@@ -264,11 +269,7 @@ void ViewPager::goToPageAt(sl_size index, const Transition& transition)
 
 void ViewPager::goToPageAt(sl_size index)
 {
-	if (UI::isUiThread()) {
-		_goTo(index, Transition());
-	} else {
-		UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ViewPager, _goTo, this, index, Transition()));
-	}
+	goToPageAt(index, Transition());
 }
 
 void ViewPager::goPrev(const Transition& transition)
@@ -316,6 +317,8 @@ void ViewPager::_push(const Ref<View>& viewIn, const Transition& _transition, sl
 	Transition transition(_transition);
 	
 	ObjectLocker lock(this);
+	
+	ScopedCounter counter(&m_countActiveTransitions);
 	
 	sl_size n = m_pages.getCount();
 	
@@ -382,7 +385,7 @@ void ViewPager::_push(const Ref<View>& viewIn, const Transition& _transition, sl
 		_ViewPager_FinishAnimation(this, viewIn, UIPageAction::Push);
 	}
 	
-	runAfterDraw([animationPause, animationPush] () {
+	viewIn->runAfterDraw([animationPause, animationPush]() {
 		if (animationPause.isNotNull()) {
 			animationPause->start();
 		}
@@ -390,12 +393,12 @@ void ViewPager::_push(const Ref<View>& viewIn, const Transition& _transition, sl
 			animationPush->start();
 		}
 	});
-
+	
 }
 
 void ViewPager::push(const Ref<View>& viewIn, const Transition& transition, sl_bool flagRemoveAllBackPages)
 {
-	if (UI::isUiThread()) {
+	if (UI::isUiThread() && (m_pages.getCount() == 0 || m_countActiveTransitions == 0)) {
 		_push(viewIn, transition, flagRemoveAllBackPages);
 	} else {
 		UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ViewPager, _push, this, viewIn, transition, flagRemoveAllBackPages));
@@ -404,11 +407,7 @@ void ViewPager::push(const Ref<View>& viewIn, const Transition& transition, sl_b
 
 void ViewPager::push(const Ref<View>& viewIn, sl_bool flagRemoveAllBackPages)
 {
-	if (UI::isUiThread()) {
-		_push(viewIn, Transition(), flagRemoveAllBackPages);
-	} else {
-		UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ViewPager, _push, this, viewIn, Transition(), flagRemoveAllBackPages));
-	}
+	push(viewIn, Transition(), flagRemoveAllBackPages);
 }
 
 void ViewPager::_pop(const Ref<View>& _viewOut, const Transition& _transition)
@@ -420,6 +419,8 @@ void ViewPager::_pop(const Ref<View>& _viewOut, const Transition& _transition)
 	Transition transition = _transition;
 	
 	ObjectLocker lock(this);
+	
+	ScopedCounter counter(&m_countActiveTransitions);
 
 	sl_size n = m_pages.getCount();
 	
@@ -491,7 +492,7 @@ void ViewPager::_pop(const Ref<View>& _viewOut, const Transition& _transition)
 
 void ViewPager::pop(const Ref<View>& viewOut, const Transition& transition)
 {
-	if (UI::isUiThread()) {
+	if (UI::isUiThread() && m_countActiveTransitions == 0) {
 		_pop(viewOut, transition);
 	} else {
 		UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ViewPager, _pop, this, viewOut, transition));
@@ -500,29 +501,17 @@ void ViewPager::pop(const Ref<View>& viewOut, const Transition& transition)
 
 void ViewPager::pop(const Ref<View>& viewOut)
 {
-	if (UI::isUiThread()) {
-		_pop(viewOut, Transition());
-	} else {
-		UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ViewPager, _pop, this, viewOut, Transition()));
-	}
+	pop(viewOut, Transition());
 }
 
 void ViewPager::pop(const Transition& transition)
 {
-	if (UI::isUiThread()) {
-		_pop(Ref<View>::null(), transition);
-	} else {
-		UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ViewPager, _pop, this, Ref<View>::null(), transition));
-	}
+	pop(Ref<View>::null(), transition);
 }
 
 void ViewPager::pop()
 {
-	if (UI::isUiThread()) {
-		_pop(Ref<View>::null(), Transition());
-	} else {
-		UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ViewPager, _pop, this, Ref<View>::null(), Transition()));
-	}
+	pop(Ref<View>::null(), Transition());
 }
 
 void ViewPager::setSwipeNavigation(sl_bool flag)
@@ -751,6 +740,8 @@ ViewPage::ViewPage()
 	m_flagClosingPopup = sl_false;
 	m_popupBackgroundColor = Color::zero();
 	m_flagDidModalOnUIThread = sl_false;
+	
+	m_countActiveTransitions = 0;
 }
 
 Ref<ViewPager> ViewPage::getPager()
@@ -803,7 +794,13 @@ void ViewPage::close(const Transition& transition)
 			return;
 		}
 		m_flagClosingPopup = sl_true;
-		if (UI::isUiThread()) {
+		
+		Ref<MobileApp> mobile = MobileApp::getApp();
+		if (mobile.isNotNull()) {
+			mobile->m_popupPages.removeValue(this);
+		}
+		
+		if (UI::isUiThread() && m_countActiveTransitions == 0) {
 			_closePopup(transition);
 		} else {
 			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ViewPage, _closePopup, this, transition));
@@ -1034,6 +1031,8 @@ void ViewPage::_openPopup(const Ref<View>& parent, Transition transition, sl_boo
 {
 	ObjectLocker lock(this);
 	
+	ScopedCounter counter(&m_countActiveTransitions);
+	
 	Ref<View> viewAdd;
 	if (flagFillParentBackground) {
 		Ref<_ViewPagePopupBackground> back = new _ViewPagePopupBackground;
@@ -1069,16 +1068,17 @@ void ViewPage::_openPopup(const Ref<View>& parent, Transition transition, sl_boo
 	if (animation.isNull()) {
 		_finishPopupAnimation(UIPageAction::Push);
 	} else {
-		runAfterDraw([animation] () {
+		runAfterDraw([animation]() {
 			animation->start();
 		});
 	}
-	
 }
 
 void ViewPage::_closePopup(Transition transition)
 {
 	ObjectLocker lock(this);
+	
+	ScopedCounter counter(&m_countActiveTransitions);
 	
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 	Android::dismissKeyboard();
@@ -1129,16 +1129,6 @@ void ViewPage::_finishPopupAnimation(UIPageAction action)
 			}
 		}
 		
-		Ref<MobileApp> mobile = MobileApp::getApp();
-		if (mobile.isNotNull()) {
-			ListLocker< Ref<ViewPage> > popups(mobile->m_popupPages);
-			if (popups.count > 0) {
-				if (popups[popups.count-1] == this) {
-					mobile->m_popupPages.popBack_NoLock();
-				}
-			}
-		}
-		
 		Ref<Event> event = m_eventClosePopup;
 		if (event.isNotNull()) {
 			event->set();
@@ -1155,7 +1145,6 @@ void ViewPage::_finishPopupAnimation(UIPageAction action)
 	} else {
 		setEnabled(sl_true, UIUpdateMode::NoRedraw);
 	}
-	resetAnimations();
 }
 
 void ViewPage::popup(const Ref<View>& parent, const Transition& transition, sl_bool flagFillParentBackground)
@@ -1173,7 +1162,7 @@ void ViewPage::popup(const Ref<View>& parent, const Transition& transition, sl_b
 		mobile->m_popupPages.add(this);
 	}
 
-	if (UI::isUiThread()) {
+	if (UI::isUiThread() && m_countActiveTransitions == 0) {
 		_openPopup(parent, transition, flagFillParentBackground);
 	} else {
 		UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ViewPage, _openPopup, this, parent, transition, flagFillParentBackground));

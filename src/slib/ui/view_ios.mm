@@ -78,7 +78,7 @@ Ref<iOS_ViewInstance> iOS_ViewInstance::create(UIView* handle, UIView* parent, V
 			}
 			[handle setOpaque:(view->isOpaque() ? YES : NO)];
 			if (!([handle isKindOfClass:[Slib_iOS_ViewHandle class]])) {
-				sl_real alpha = view->getFinalAlpha();
+				sl_real alpha = view->getAlpha();
 				if (alpha < 0.995f) {
 					[handle setAlpha: alpha];
 				}

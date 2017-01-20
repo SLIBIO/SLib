@@ -4,7 +4,7 @@
 #include "definition.h"
 
 #include "base.h"
-#include "new.h"
+#include "new_helper.h"
 
 SLIB_NAMESPACE_BEGIN
 
@@ -117,6 +117,25 @@ public:
 	TYPE* NAME = _scoped_buf__##NAME.data;
 
 
+class ScopedCounter
+{
+public:
+	sl_reg* count;
+	
+public:
+	ScopedCounter(sl_reg* p)
+	{
+		count = p;
+		Base::interlockedIncrement(p);
+	}
+	
+	~ScopedCounter()
+	{
+		Base::interlockedDecrement(count);
+	}
+	
+};
+
 SLIB_NAMESPACE_END
 
 
@@ -203,7 +222,7 @@ SLIB_INLINE ScopedArray<T>::ScopedArray(T* _data, sl_size _count) : data(_data),
 template <class T>
 SLIB_INLINE ScopedArray<T>::ScopedArray(sl_size _count)
 {
-	data = New<T>::create(_count);
+	data = NewHelper<T>::create(_count);
 	if (data) {
 		count = _count;
 	} else {
@@ -221,7 +240,7 @@ template <class T>
 SLIB_INLINE void ScopedArray<T>::release()
 {
 	if (data) {
-		New<T>::free(data, count);
+		NewHelper<T>::free(data, count);
 		data = sl_null;
 	}
 	count = 0;
@@ -258,7 +277,7 @@ SLIB_INLINE ScopedBuffer<T, countStack>::ScopedBuffer(sl_size _count)
 	if (_count < countStack) {
 		data = stack;
 	} else {
-		data = New<T>::create(_count);
+		data = NewHelper<T>::create(_count);
 	}
 	count = _count;
 }
@@ -274,7 +293,7 @@ SLIB_INLINE void ScopedBuffer<T, countStack>::release()
 {
 	if (data) {
 		if (data != stack) {
-			New<T>::free(data, count);
+			NewHelper<T>::free(data, count);
 		}
 		data = sl_null;
 	}

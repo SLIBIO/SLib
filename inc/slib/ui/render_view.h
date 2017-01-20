@@ -31,6 +31,9 @@ public:
 	
 	void renderViewContent(RenderEngine* engine);
 	
+	// override
+	Ref<AnimationLoop> getAnimationLoop();
+	
 public:
 	SLIB_PROPERTY(RenderEngineType, PreferredEngineType)
 	
@@ -55,6 +58,7 @@ private:
 	
 protected:
 	RedrawMode m_redrawMode;
+	Ref<AnimationLoop> m_animationLoop;
 	
 };
 

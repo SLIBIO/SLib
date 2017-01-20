@@ -87,6 +87,7 @@ public class UiScrollView extends ScrollView implements IView {
 
 	public UiScrollView(Context context) {
 		super(context);
+		setLayerType(View.LAYER_TYPE_HARDWARE, null);
 	}
 
 	public void setPaging(boolean flagPaging, int pageWidth, int pageHeight) {

@@ -158,6 +158,8 @@ protected:
 	AnimationCurve m_pushTransitionCurve;
 	AnimationCurve m_popTransitionCurve;
 	
+	sl_reg m_countActiveTransitions;
+	
 };
 
 class SLIB_EXPORT ViewPage : public ViewGroup
@@ -355,6 +357,8 @@ protected:
 	Color m_popupBackgroundColor;
 	sl_bool m_flagDidModalOnUIThread;
 	AtomicRef<Event> m_eventClosePopup;
+	
+	sl_reg m_countActiveTransitions;
 	
 };
 

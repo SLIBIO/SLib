@@ -18,12 +18,18 @@ private:
 	
 public:
 	static Ref<UIAnimationLoop> getInstance();
-	
+
+public:
+	// override
+	sl_bool startNativeAnimation(Animation* animation);
+
 protected:
 	// override
 	void _wake();
 	
 	void _run();
+	
+	sl_bool _applyNativeAnimation(const Ref<Animation>& animation);
 	
 private:
 	sl_bool m_flagRunning;
