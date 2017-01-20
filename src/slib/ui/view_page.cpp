@@ -101,6 +101,9 @@ void ViewPager::removePageAt(sl_size index, UIUpdateMode mode)
 {
 	ObjectLocker lock(this);
 	sl_size n = m_pages.getCount();
+	if (n <= m_minimumPagesCount) {
+		return;
+	}
 	if (index < n) {
 		if (index == m_indexCurrent) {
 			Ref<View> oldPage = m_pages.getData()[index];
@@ -171,8 +174,10 @@ void _ViewPager_FinishAnimation(const Ref<ViewPager>& pager, const Ref<View>& vi
 		switch (action) {
 			case UIPageAction::Pause:
 			case UIPageAction::Pop:
-				view->setVisibility(Visibility::Hidden);
-				pager->removeChild(view);
+				if (pager->getCurrentPage() != view) {
+					view->setVisibility(Visibility::Hidden);
+					pager->removeChild(view);
+				}
 				break;
 			default:
 				view->setEnabled(sl_true);
@@ -187,11 +192,13 @@ void ViewPager::_stopCurrentAnimations()
 	if (m_currentPushAnimation.isNotNull()) {
 		m_currentPushAnimation->dispatchEndFrame();
 		m_currentPushAnimation->stop();
+		m_currentPushAnimation->removeAllTargets();
 		m_currentPushAnimation.setNull();
 	}
 	if (m_currentPopAnimation.isNotNull()) {
 		m_currentPopAnimation->dispatchEndFrame();
 		m_currentPopAnimation->stop();
+		m_currentPopAnimation->removeAllTargets();
 		m_currentPopAnimation.setNull();
 	}
 }

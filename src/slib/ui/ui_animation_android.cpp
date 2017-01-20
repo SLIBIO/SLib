@@ -106,7 +106,7 @@ sl_bool UIAnimationLoop::_applyNativeAnimation(Animation* animation)
 				if (flagAlpha) {
 					viewAnimate->setAlpha(alphaEnd);
 				}
-				_animation->stop();
+				_stopAnimationFromNative(_animation.get());
 			};
 			map->put(id, onStop);
 
