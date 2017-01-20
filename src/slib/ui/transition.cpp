@@ -130,6 +130,13 @@ Ref<Animation> Transition::createAnimation(const Ref<View>& view, const Transiti
 				}
 			}
 			break;
+		case TransitionType::FadeFrontAndBack:
+			if (pageAction == UIPageAction::Push || pageAction == UIPageAction::Resume) {
+				animation = view->createAlphaAnimation(0.01f, 1.0f, duration, onStop, curve, AnimationFlags::NotStart);
+			} else {
+				animation = view->createAlphaAnimation(1.0f, 0.01f, duration, onStop, curve, AnimationFlags::NotStart);
+			}
+			break;
 	}
 	return animation;
 }
@@ -216,6 +223,7 @@ Ref<Animation> Transition::createPopupAnimation(const Ref<View>& view, const Tra
 			}
 			break;
 		case TransitionType::Fade:
+		case TransitionType::FadeFrontAndBack:
 			if (pageAction == UIPageAction::Push) {
 				animation = view->createAlphaAnimation(0.01f, 1.0f, duration, onStop, curve, AnimationFlags::NotStart);
 			} else {

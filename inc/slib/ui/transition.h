@@ -15,6 +15,7 @@ enum class TransitionType
 	Cover = 3,
 	Zoom = 4,
 	Fade = 5,
+	FadeFrontAndBack = 6,
 	Default = 100
 };
 
