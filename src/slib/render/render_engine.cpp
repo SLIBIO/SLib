@@ -580,7 +580,7 @@ Ref<RenderProgram3D_Position> RenderEngine::getDefaultRenderProgramForDrawLine3D
 }
 
 #define DEBUG_WIDTH 512
-#define DEBUG_HEIGHT 20
+#define DEBUG_HEIGHT 30
 void RenderEngine::drawDebugText()
 {
 	Ref<Texture> texture = m_textureDebug;
@@ -598,7 +598,7 @@ void RenderEngine::drawDebugText()
 	
 	Ref<Font> font = m_fontDebug;
 	if (font.isNull()) {
-		font = Font::create("Arial", 12);
+		font = Font::create("Arial", 20);
 		if (font.isNull()) {
 			return;
 		}

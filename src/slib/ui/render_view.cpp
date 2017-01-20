@@ -48,6 +48,9 @@ RenderView::RenderView()
 	m_redrawMode = RedrawMode::Continuously;
 	
 	m_animationLoop = new _RenderAnimationLoop(this);
+	
+	m_flagDebugTextVisible = sl_true;
+	m_flagDebugTextVisibleOnRelease = sl_false;
 }
 
 RedrawMode RenderView::getRedrawMode()
@@ -95,6 +98,29 @@ Ref<AnimationLoop> RenderView::getAnimationLoop()
 	return m_animationLoop;
 }
 
+sl_bool RenderView::isDebugTextVisible()
+{
+	return m_flagDebugTextVisible;
+}
+
+void RenderView::setDebugTextVisible(sl_bool flagVisible)
+{
+	m_flagDebugTextVisible = sl_true;
+}
+
+sl_bool RenderView::isDebugTextVisibleOnRelease()
+{
+	return m_flagDebugTextVisible && m_flagDebugTextVisibleOnRelease;
+}
+
+void RenderView::setDebugTextVisibleOnRelease(sl_bool flagVisible)
+{
+	m_flagDebugTextVisibleOnRelease = flagVisible;
+	if (flagVisible) {
+		m_flagDebugTextVisible = sl_true;
+	}
+}
+
 void RenderView::onFrame(RenderEngine* engine)
 {
 	renderViewContent(engine);
@@ -116,6 +142,17 @@ void RenderView::dispatchFrame(RenderEngine* engine)
 	}
 	onFrame(engine);
 	getOnFrame()(engine);
+	if (m_flagDebugTextVisible) {
+		if (engine) {
+#if defined(SLIB_DEBUG)
+			engine->drawDebugText();
+#else
+			if (m_flagDebugTextVisibleOnRelease) {
+				engine->drawDebugText();
+			}
+#endif
+		}
+	}
 	if (engine) {
 		engine->endScene();
 	}

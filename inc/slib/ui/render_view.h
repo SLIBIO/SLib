@@ -34,6 +34,14 @@ public:
 	// override
 	Ref<AnimationLoop> getAnimationLoop();
 	
+	sl_bool isDebugTextVisible();
+	
+	void setDebugTextVisible(sl_bool flagVisible);
+	
+	sl_bool isDebugTextVisibleOnRelease();
+	
+	void setDebugTextVisibleOnRelease(sl_bool flagVisible);
+	
 public:
 	SLIB_PROPERTY(RenderEngineType, PreferredEngineType)
 	
@@ -59,6 +67,8 @@ private:
 protected:
 	RedrawMode m_redrawMode;
 	Ref<AnimationLoop> m_animationLoop;
+	sl_bool m_flagDebugTextVisible;
+	sl_bool m_flagDebugTextVisibleOnRelease;
 	
 };
 

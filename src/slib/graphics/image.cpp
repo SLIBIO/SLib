@@ -1217,11 +1217,28 @@ Ref<Image> Image::sub(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 heigh
 
 Ref<Image> Image::scale(sl_uint32 width, sl_uint32 height, StretchMode stretch) const
 {
-	Ref<Image> ret = Image::create(width, height);
-	if (ret.isNotNull()) {
-		draw(ret->m_desc, m_desc, BlendMode::Copy, stretch);
+	if (width > 0 && height > 0) {
+		Ref<Image> ret = Image::create(width, height);
+		if (ret.isNotNull()) {
+			draw(ret->m_desc, m_desc, BlendMode::Copy, stretch);
+		}
+		return ret;
 	}
-	return ret;
+	return sl_null;
+}
+
+Ref<Image> Image::scaleToSmall(sl_uint32 requiredWidth, sl_uint32 requiredHeight, StretchMode stretch) const
+{
+	sl_uint32 width = SLIB_MIN(requiredWidth, m_desc.width);
+	sl_uint32 height = SLIB_MIN(requiredHeight, m_desc.height);
+	if (width > 0 && height > 0) {
+		Ref<Image> ret = Image::create(width, height);
+		if (ret.isNotNull()) {
+			draw(ret->m_desc, m_desc, BlendMode::Copy, stretch);
+		}
+		return ret;
+	}
+	return sl_null;
 }
 
 ImageFileType Image::getFileType(const void* _mem, sl_size size)

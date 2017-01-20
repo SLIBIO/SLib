@@ -115,6 +115,8 @@ public:
 	
 	Ref<Image> scale(sl_uint32 width, sl_uint32 height, StretchMode stretch = StretchMode::Default) const;
 	
+	Ref<Image> scaleToSmall(sl_uint32 requiredWidth, sl_uint32 requiredHeight, StretchMode stretch = StretchMode::Default) const;
+	
 	
 	static ImageFileType getFileType(const void* mem, sl_size size);
 	
