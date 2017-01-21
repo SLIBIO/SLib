@@ -34,6 +34,13 @@ public:
 	// override
 	Ref<AnimationLoop> getAnimationLoop();
 	
+	// override
+	sl_bool isDrawingThread();
+	
+	// override
+	void post(const Function<void()>& callback);
+	
+	
 	sl_bool isDebugTextVisible();
 	
 	void setDebugTextVisible(sl_bool flagVisible);
@@ -67,6 +74,9 @@ private:
 protected:
 	RedrawMode m_redrawMode;
 	Ref<AnimationLoop> m_animationLoop;
+	sl_uint64 m_lastRenderingThreadId;
+	Queue< Function<void()> > m_queuePostedCallbacks;
+	
 	sl_bool m_flagDebugTextVisible;
 	sl_bool m_flagDebugTextVisibleOnRelease;
 	

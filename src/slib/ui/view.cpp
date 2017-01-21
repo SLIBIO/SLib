@@ -835,7 +835,7 @@ void View::invalidate()
 		return;
 	}
 	if (m_frame.getWidth() > 0 && m_frame.getHeight() > 0) {
-		if (UI::isUiThread()) {
+		if (isDrawingThread()) {
 			if (m_flagCurrentDrawing) {
 				if (m_rectCurrentDrawing.containsRectangle(getBounds())) {
 					return;
@@ -877,7 +877,7 @@ void View::invalidate(const UIRect &rect)
 	}
 	UIRect rectIntersect;
 	if (getBounds().intersectRectangle(rect, &rectIntersect)) {
-		if (UI::isUiThread()) {
+		if (isDrawingThread()) {
 			if (m_flagCurrentDrawing) {
 				if (m_rectCurrentDrawing.containsRectangle(rectIntersect)) {
 					return;
@@ -2256,22 +2256,7 @@ void View::measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 
 void View::_requestMakeLayout()
 {
-	sl_bool flagRenderView = sl_false;
-	Ref<View> view = this;
-	while (view.isNotNull()) {
-		if (view->isInstance()) {
-			if (IsInstanceOf<RenderView>(view)) {
-				flagRenderView = sl_true;
-				break;
-			}
-		}
-		view = view->getParent();
-	}
-	if (flagRenderView) {
-		((RenderView*)(view.get()))->requestRender();
-	} else {
-		UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), View, _makeLayout, this, sl_false));
-	}
+	post(SLIB_BIND_WEAKREF(void(), View, _makeLayout, this, sl_false));
 }
 
 void View::_requestInvalidateLayout(UIUpdateMode mode)
@@ -6200,6 +6185,34 @@ void View::runAfterDraw(const Function<void()>& callback, sl_bool flagInvalidate
 	}
 }
 
+sl_bool View::isDrawingThread()
+{
+	Ref<View> parent = m_parent;
+	if (parent.isNotNull()) {
+		return parent->isDrawingThread();
+	}
+	return UI::isUiThread();
+}
+
+void View::post(const Function<void()>& callback)
+{
+	Ref<View> parent = m_parent;
+	if (parent.isNotNull()) {
+		parent->post(callback);
+	} else {
+		UI::dispatchToUiThread(callback);
+	}
+}
+
+void View::runOnDrawingThread(const Function<void()>& callback)
+{
+	if (isDrawingThread()) {
+		callback();
+	} else {
+		post(callback);
+	}
+}
+
 Ptr<IViewListener> View::getEventListener()
 {
 	Ref<EventAttributes> attrs = m_eventAttributes;
@@ -6433,9 +6446,11 @@ void View::dispatchDraw(Canvas* canvas)
 	
 	m_flagCurrentDrawing = sl_false;
 	
+	sl_size n = m_runAfterDrawCallbacks.getCount();
 	Function<void()> callback;
-	while (m_runAfterDrawCallbacks.pop(&callback)) {
+	while (n > 0 && m_runAfterDrawCallbacks.pop(&callback)) {
 		callback();
+		n--;
 	}
 	
 }

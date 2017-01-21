@@ -175,17 +175,15 @@ public:
 	
 	static sl_int32 interlockedAdd32(sl_int32* pDst, sl_int32 value);
 	
-	static sl_bool interlockedCompareExchange32(sl_int32* pDst, sl_int32 value, sl_int32 comperand);
+	static sl_bool interlockedCompareExchange32(sl_int32* pDst, sl_int32 value, sl_int32 comparand);
 	
-#ifdef SLIB_ARCH_IS_64BIT
 	static sl_int64 interlockedIncrement64(sl_int64* pValue);
 	
 	static sl_int64 interlockedDecrement64(sl_int64* pValue);
 	
 	static sl_int64 interlockedAdd64(sl_int64* pDst, sl_int64 value);
 	
-	static sl_bool interlockedCompareExchange64(sl_int64* pDst, sl_int64 value, sl_int64 comperand);
-#endif
+	static sl_bool interlockedCompareExchange64(sl_int64* pDst, sl_int64 value, sl_int64 comparand);
 
 	static sl_reg interlockedIncrement(sl_reg* pValue);
 	
@@ -193,11 +191,11 @@ public:
 	
 	static sl_reg interlockedAdd(sl_reg* pDst, sl_reg value);
 	
-	static sl_bool interlockedCompareExchange(sl_reg* pDst, sl_reg value, sl_reg comperand);
+	static sl_bool interlockedCompareExchange(sl_reg* pDst, sl_reg value, sl_reg comparand);
 	
 	static void* interlockedAddPtr(void** pDst, sl_reg value);
 	
-	static sl_bool interlockedCompareExchangePtr(void** pDst, const void* value, const void* comperand);
+	static sl_bool interlockedCompareExchangePtr(void** pDst, const void* value, const void* comparand);
 	
 	
 	static void sleep(sl_uint32 millis);

@@ -84,13 +84,13 @@ void ListView::setAdapter(const Ptr<IListViewAdapter>& adapter)
 {
 	m_adapter = adapter;
 	m_flagResetAdapter = sl_true;
-	UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ListView, _checkUpdateContent, this, sl_false));
+	runOnDrawingThread(SLIB_BIND_WEAKREF(void(), ListView, _checkUpdateContent, this, sl_false));
 }
 
 void ListView::refreshItems()
 {
 	m_flagRefreshItems = sl_true;
-	UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ListView, _checkUpdateContent, this, sl_false));
+	runOnDrawingThread(SLIB_BIND_WEAKREF(void(), ListView, _checkUpdateContent, this, sl_false));
 }
 
 void ListView::onScroll(sl_scroll_pos _x, sl_scroll_pos _y)
@@ -99,17 +99,17 @@ void ListView::onScroll(sl_scroll_pos _x, sl_scroll_pos _y)
 	if (Math::isAlmostZero(y - m_lastScrollY)) {
 		return;
 	}
-	UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ListView, _layoutItemViews, this, sl_false, sl_true, sl_false));
+	post(SLIB_BIND_WEAKREF(void(), ListView, _layoutItemViews, this, sl_false, sl_true, sl_false));
 }
 
 void ListView::onResize(sl_ui_len x, sl_ui_len y)
 {
-	UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ListView, _layoutItemViews, this, sl_false, sl_false, sl_true));
+	post(SLIB_BIND_WEAKREF(void(), ListView, _layoutItemViews, this, sl_false, sl_false, sl_true));
 }
 
 void ListView::_checkUpdateContent(sl_bool fromDraw)
 {
-	if (!(UI::isUiThread())) {
+	if (!(isDrawingThread())) {
 		return;
 	}
 	if (m_flagResetAdapter) {
@@ -342,7 +342,7 @@ static void _ListView_pushArrayRight(T* arr, sl_uint64 sizeArr, sl_uint32 capaci
 
 void ListView::_layoutItemViews(sl_bool fromDraw, sl_bool fromScroll, sl_bool flagRefresh)
 {
-	if (!(UI::isUiThread())) {
+	if (!(isDrawingThread())) {
 		return;
 	}
 
@@ -801,7 +801,7 @@ void _ListContentView::onResizeChild(View* child, sl_ui_len width, sl_ui_len hei
 	Ref<ListView> lv = m_lv;
 	if (lv.isNotNull()) {
 		if (lv->m_lockCountLayouting == 0) {
-			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ListView, _layoutItemViews, lv.get(), sl_false, sl_false, sl_false));
+			post(SLIB_BIND_WEAKREF(void(), ListView, _layoutItemViews, lv.get(), sl_false, sl_false, sl_false));
 		}
 	}
 }

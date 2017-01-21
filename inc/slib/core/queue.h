@@ -7,7 +7,7 @@
 
 SLIB_NAMESPACE_BEGIN
 
-template <class T, class CONTAINER>
+template < class T, class CONTAINER = CLinkedList<T> >
 class SLIB_EXPORT Queue : public CONTAINER
 {
 public:
@@ -27,7 +27,7 @@ public:
 	
 };
 
-template <class T, class CONTAINER>
+template < class T, class CONTAINER = CLinkedList<T> >
 class SLIB_EXPORT Stack : public CONTAINER
 {
 public:

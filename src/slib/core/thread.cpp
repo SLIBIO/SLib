@@ -235,12 +235,12 @@ sl_bool Thread::isNotStoppingCurrent()
 
 sl_uint64 Thread::getCurrentThreadUniqueId()
 {
-	static sl_int32 uid = 10000;
+	static sl_int64 uid = 10000;
 	sl_uint64 n = _nativeGetCurrentThreadUniqueId();
 	if (n > 0) {
 		return n;
 	}
-	n = Base::interlockedIncrement32(&uid);
+	n = Base::interlockedIncrement64(&uid);
 	_nativeSetCurrentThreadUniqueId(n);
 	return n;
 }

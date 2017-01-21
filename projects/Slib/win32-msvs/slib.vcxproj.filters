@@ -839,6 +839,9 @@
     <ClInclude Include="..\..\..\inc\slib\core\new_helper.h">
       <Filter>inc\core</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\render\drawable.h">
+      <Filter>inc\render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">

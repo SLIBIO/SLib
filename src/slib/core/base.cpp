@@ -14,7 +14,7 @@
 #include <stdio.h>
 
 #ifdef SLIB_PLATFORM_IS_WINDOWS
-#include <windows.h>
+#include "../../../inc/slib/core/platform_windows.h"
 #endif
 
 #if defined(SLIB_PLATFORM_IS_APPLE)
@@ -886,30 +886,35 @@ sl_int32 Base::interlockedAdd32(sl_int32* pDst, sl_int32 value)
 #endif
 }
 
-sl_bool Base::interlockedCompareExchange32(sl_int32* pDst, sl_int32 value, sl_int32 comperand)
+sl_bool Base::interlockedCompareExchange32(sl_int32* pDst, sl_int32 value, sl_int32 comparand)
 {
 	SLIB_ASSERT(SLIB_IS_ALIGNED_4(pDst));
 #ifdef SLIB_PLATFORM_IS_WINDOWS
 	sl_int32 old;
 #	if (SLIB_COMPILER >= SLIB_COMPILER_VC7)
-	old = ((sl_int32)InterlockedCompareExchange((LONG*)pDst, (LONG)value, (LONG)comperand));
+	old = ((sl_int32)InterlockedCompareExchange((LONG*)pDst, (LONG)value, (LONG)comparand));
 #	else
-	old = ((sl_int32)InterlockedCompareExchange((void**)pDst, (void*)value, (void*)comperand));
+	old = ((sl_int32)InterlockedCompareExchange((void**)pDst, (void*)value, (void*)comparand));
 #	endif
-	return old == comperand;
+	return old == comparand;
 #elif defined(SLIB_PLATFORM_IS_APPLE)
-	return OSAtomicCompareAndSwap32Barrier((int32_t)comperand, (int32_t)value, (int32_t*)pDst) != false;
+	return OSAtomicCompareAndSwap32Barrier((int32_t)comparand, (int32_t)value, (int32_t*)pDst) != false;
 #elif defined(SLIB_PLATFORM_IS_UNIX)
-	return __sync_bool_compare_and_swap(pDst, comperand, value) != 0;
+	return __sync_bool_compare_and_swap(pDst, comparand, value) != 0;
 #endif
 }
 
-#ifdef SLIB_ARCH_IS_64BIT
 sl_int64 Base::interlockedIncrement64(sl_int64* pValue)
 {
 	SLIB_ASSERT(SLIB_IS_ALIGNED_8(pValue));
 #ifdef SLIB_PLATFORM_IS_WINDOWS
+#	if defined(_WIN64) || _WIN32_WINNT >= 0x0502
 	return (sl_int64)InterlockedIncrement64((LONGLONG*)pValue);
+#	else
+	SpinLocker lock(SpinLockPoolForBase::get(pValue));
+	sl_int64 r = *pValue = *pValue + 1;
+	return r;
+#	endif
 #elif defined(SLIB_PLATFORM_IS_APPLE)
 	return OSAtomicIncrement64Barrier(pValue);
 #elif defined(SLIB_PLATFORM_IS_UNIX)
@@ -921,7 +926,13 @@ sl_int64 Base::interlockedDecrement64(sl_int64* pValue)
 {
 	SLIB_ASSERT(SLIB_IS_ALIGNED_8(pValue));
 #ifdef SLIB_PLATFORM_IS_WINDOWS
+#	if defined(_WIN64) || _WIN32_WINNT >= 0x0502
 	return (sl_int64)InterlockedDecrement64((LONGLONG*)pValue);
+#	else
+	SpinLocker lock(SpinLockPoolForBase::get(pValue));
+	sl_int64 r = *pValue = *pValue - 1;
+	return r;
+#	endif
 #elif defined(SLIB_PLATFORM_IS_APPLE)
 	return OSAtomicDecrement64Barrier(pValue);
 #elif defined(SLIB_PLATFORM_IS_UNIX)
@@ -933,7 +944,13 @@ sl_int64 Base::interlockedAdd64(sl_int64* pDst, sl_int64 value)
 {
 	SLIB_ASSERT(SLIB_IS_ALIGNED_8(pDst));
 #ifdef SLIB_PLATFORM_IS_WINDOWS
+#	if defined(_WIN64) || _WIN32_WINNT >= 0x0502
 	return ((sl_int64)InterlockedExchangeAdd64((LONGLONG*)pDst, (LONGLONG)value)) + value;
+#	else
+	SpinLocker lock(SpinLockPoolForBase::get(pDst));
+	sl_int64 r = *pDst = *pDst + value;
+	return r;
+#	endif
 #elif defined(SLIB_PLATFORM_IS_APPLE)
 	return OSAtomicAdd64Barrier(value, pDst);
 #elif defined(SLIB_PLATFORM_IS_UNIX)
@@ -941,20 +958,28 @@ sl_int64 Base::interlockedAdd64(sl_int64* pDst, sl_int64 value)
 #endif
 }
 
-sl_bool Base::interlockedCompareExchange64(sl_int64* pDst, sl_int64 value, sl_int64 comperand)
+sl_bool Base::interlockedCompareExchange64(sl_int64* pDst, sl_int64 value, sl_int64 comparand)
 {
 	SLIB_ASSERT(SLIB_IS_ALIGNED_8(pDst));
 #ifdef SLIB_PLATFORM_IS_WINDOWS
-	sl_int64 old = ((sl_int64)InterlockedCompareExchange64((LONGLONG*)pDst, (LONGLONG)value, (LONGLONG)comperand));
-	return old == comperand;
+#	if defined(_WIN64) || _WIN32_WINNT >= 0x0502
+	sl_int64 old = ((sl_int64)InterlockedCompareExchange64((LONGLONG*)pDst, (LONGLONG)value, (LONGLONG)comparand));
+	return old == comparand;
+#	else
+	SpinLocker lock(SpinLockPoolForBase::get(pDst));
+	sl_int64 o = *pDst;
+	if (o == comparand) {
+		o = value;
+		return sl_true;
+	}
+	return sl_false;
+#	endif
 #elif defined(SLIB_PLATFORM_IS_APPLE)
-	return OSAtomicCompareAndSwap64Barrier(comperand, value, pDst) != false;
+	return OSAtomicCompareAndSwap64Barrier(comparand, value, pDst) != false;
 #elif defined(SLIB_PLATFORM_IS_UNIX)
-	return __sync_bool_compare_and_swap(pDst, comperand, value) != 0;
+	return __sync_bool_compare_and_swap(pDst, comparand, value) != 0;
 #endif
 }
-
-#endif
 
 sl_reg Base::interlockedIncrement(sl_reg* pValue)
 {
@@ -983,12 +1008,12 @@ sl_reg Base::interlockedAdd(sl_reg* pDst, sl_reg value)
 #endif
 }
 
-sl_bool Base::interlockedCompareExchange(sl_reg* pDst, sl_reg value, sl_reg comperand)
+sl_bool Base::interlockedCompareExchange(sl_reg* pDst, sl_reg value, sl_reg comparand)
 {
 #ifdef SLIB_ARCH_IS_64BIT
-	return interlockedCompareExchange64(pDst, value, comperand);
+	return interlockedCompareExchange64(pDst, value, comparand);
 #else
-	return interlockedCompareExchange32(pDst, value, comperand);
+	return interlockedCompareExchange32(pDst, value, comparand);
 #endif
 }
 
@@ -1001,12 +1026,12 @@ void* Base::interlockedAddPtr(void** pDst, sl_reg value)
 #endif
 }
 
-sl_bool Base::interlockedCompareExchangePtr(void** pDst, const void* value, const void* comperand)
+sl_bool Base::interlockedCompareExchangePtr(void** pDst, const void* value, const void* comparand)
 {
 #ifdef SLIB_ARCH_IS_64BIT
-	return interlockedCompareExchange64((sl_int64*)(pDst), (sl_int64)value, (sl_int64)comperand);
+	return interlockedCompareExchange64((sl_int64*)(pDst), (sl_int64)value, (sl_int64)comparand);
 #else
-	return interlockedCompareExchange32((sl_int32*)pDst, (sl_int32)value, (sl_int32)comperand);
+	return interlockedCompareExchange32((sl_int32*)pDst, (sl_int32)value, (sl_int32)comparand);
 #endif
 }
 

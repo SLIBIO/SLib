@@ -207,6 +207,7 @@
     <ClInclude Include="..\..\..\inc\slib\render\base.h" />
     <ClInclude Include="..\..\..\inc\slib\render\canvas.h" />
     <ClInclude Include="..\..\..\inc\slib\render\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\render\drawable.h" />
     <ClInclude Include="..\..\..\inc\slib\render\engine.h" />
     <ClInclude Include="..\..\..\inc\slib\render\index_buffer.h" />
     <ClInclude Include="..\..\..\inc\slib\render\opengl.h" />

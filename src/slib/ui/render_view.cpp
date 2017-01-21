@@ -1,6 +1,7 @@
 #include "../../../inc/slib/ui/render_view.h"
 
 #include "../../../inc/slib/render/canvas.h"
+#include "../../../inc/slib/core/thread.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -48,6 +49,7 @@ RenderView::RenderView()
 	m_redrawMode = RedrawMode::Continuously;
 	
 	m_animationLoop = new _RenderAnimationLoop(this);
+	m_lastRenderingThreadId = 0;
 	
 	m_flagDebugTextVisible = sl_true;
 	m_flagDebugTextVisibleOnRelease = sl_false;
@@ -98,6 +100,16 @@ Ref<AnimationLoop> RenderView::getAnimationLoop()
 	return m_animationLoop;
 }
 
+sl_bool RenderView::isDrawingThread()
+{
+	return Thread::getCurrentThreadUniqueId() == m_lastRenderingThreadId;
+}
+
+void RenderView::post(const Function<void()>& callback)
+{
+	m_queuePostedCallbacks.push(callback);
+}
+
 sl_bool RenderView::isDebugTextVisible()
 {
 	return m_flagDebugTextVisible;
@@ -133,15 +145,28 @@ void RenderView::onAttach()
 
 void RenderView::dispatchFrame(RenderEngine* engine)
 {
+	m_lastRenderingThreadId = Thread::getCurrentThreadUniqueId();
+	
 	if (m_animationLoop.isNotNull()) {
 		_RenderAnimationLoop* l = static_cast<_RenderAnimationLoop*>(m_animationLoop.get());
 		l->runStep();
 	}
+	
+	sl_size n = m_queuePostedCallbacks.getCount();
+	Function<void()> callback;
+	while (n > 0 && m_queuePostedCallbacks.pop(&callback)) {
+		callback();
+		n--;
+	}
+
 	if (engine) {
 		engine->beginScene();
 	}
+	
 	onFrame(engine);
+	
 	getOnFrame()(engine);
+	
 	if (m_flagDebugTextVisible) {
 		if (engine) {
 #if defined(SLIB_DEBUG)
@@ -153,6 +178,7 @@ void RenderView::dispatchFrame(RenderEngine* engine)
 #endif
 		}
 	}
+	
 	if (engine) {
 		engine->endScene();
 	}

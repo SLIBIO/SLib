@@ -137,9 +137,9 @@ sl_bool UIAnimationLoop::_applyNativeAnimation(Animation* animation)
 	sl_bool flagScale = sl_false;
 	Vector2 scaleStart, scaleEnd;
 	sl_bool flagRotate = sl_false;
-	sl_real rotateStart, rotateEnd;
+	sl_real rotateStart = 0, rotateEnd = 0;
 	sl_bool flagAlpha = sl_false;
-	sl_real alphaStart, alphaEnd;
+	sl_real alphaStart = 0, alphaEnd = 0;
 	{
 		ListLocker< Ref<AnimationTarget> > targets(animation->getTargets());
 		for (sl_size i = 0; i < targets.count; i++) {

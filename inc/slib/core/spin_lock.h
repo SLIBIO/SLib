@@ -59,12 +59,14 @@ public:
 	
 };
 
+extern template class SpinLockPool<-10>;
+typedef SpinLockPool<-21> SpinLockPoolForBase;
+
 extern template class SpinLockPool<-20>;
 typedef SpinLockPool<-20> SpinLockPoolForList;
 
 extern template class SpinLockPool<-21>;
 typedef SpinLockPool<-21> SpinLockPoolForMap;
-
 
 template <int CATEGORY>
 sl_int32 SpinLockPool<CATEGORY>::m_locks[SLIB_SPINLOCK_POOL_SIZE] = { 0 };

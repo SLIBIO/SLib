@@ -985,7 +985,14 @@ public:
 	
 	void draw(Canvas* canvas);
 	
+	
 	void runAfterDraw(const Function<void()>& callback, sl_bool flagInvalidate = sl_true);
+	
+	virtual sl_bool isDrawingThread();
+	
+	virtual void post(const Function<void()>& callback);
+	
+	void runOnDrawingThread(const Function<void()>& callback);
 
 public:
 	Ptr<IViewListener> getEventListener();
@@ -1455,7 +1462,7 @@ protected:
 	Ref<EventAttributes> _initializeEventAttributes();
 
 	
-	LinkedQueue< Function<void()> > m_runAfterDrawCallbacks;
+	Queue< Function<void()> > m_runAfterDrawCallbacks;
 
 	friend class ListView;
 

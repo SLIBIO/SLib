@@ -307,10 +307,10 @@ void ViewPager::_goTo(sl_size index, const Transition& _transition)
 
 void ViewPager::goToPageAt(sl_size index, const Transition& transition)
 {
-	if (UI::isUiThread() && m_countActiveTransitions == 0) {
+	if (isDrawingThread() && m_countActiveTransitions == 0) {
 		_goTo(index, transition);
 	} else {
-		UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ViewPager, _goTo, this, index, transition));
+		post(SLIB_BIND_WEAKREF(void(), ViewPager, _goTo, this, index, transition));
 	}
 }
 
@@ -453,10 +453,10 @@ void ViewPager::_push(const Ref<View>& viewIn, const Transition& _transition, sl
 
 void ViewPager::push(const Ref<View>& viewIn, const Transition& transition, sl_bool flagRemoveAllBackPages)
 {
-	if (UI::isUiThread() && m_countActiveTransitions == 0) {
+	if (isDrawingThread() && m_countActiveTransitions == 0) {
 		_push(viewIn, transition, flagRemoveAllBackPages);
 	} else {
-		UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ViewPager, _push, this, viewIn, transition, flagRemoveAllBackPages));
+		post(SLIB_BIND_WEAKREF(void(), ViewPager, _push, this, viewIn, transition, flagRemoveAllBackPages));
 	}
 }
 
@@ -557,10 +557,10 @@ void ViewPager::_pop(const Ref<View>& _viewOut, const Transition& _transition)
 
 void ViewPager::pop(const Ref<View>& viewOut, const Transition& transition)
 {
-	if (UI::isUiThread() && m_countActiveTransitions == 0) {
+	if (isDrawingThread() && m_countActiveTransitions == 0) {
 		_pop(viewOut, transition);
 	} else {
-		UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ViewPager, _pop, this, viewOut, transition));
+		post(SLIB_BIND_WEAKREF(void(), ViewPager, _pop, this, viewOut, transition));
 	}
 }
 
@@ -865,10 +865,10 @@ void ViewPage::close(const Transition& transition)
 			mobile->m_popupPages.removeValue(this);
 		}
 		
-		if (UI::isUiThread() && m_countActiveTransitions == 0) {
+		if (isDrawingThread() && m_countActiveTransitions == 0) {
 			_closePopup(transition);
 		} else {
-			UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ViewPage, _closePopup, this, transition));
+			post(SLIB_BIND_WEAKREF(void(), ViewPage, _closePopup, this, transition));
 		}
 	} else {
 		Ref<ViewPager> pager = getPager();
@@ -1227,10 +1227,10 @@ void ViewPage::popup(const Ref<View>& parent, const Transition& transition, sl_b
 		mobile->m_popupPages.add(this);
 	}
 
-	if (UI::isUiThread() && m_countActiveTransitions == 0) {
+	if (isDrawingThread() && m_countActiveTransitions == 0) {
 		_openPopup(parent, transition, flagFillParentBackground);
 	} else {
-		UI::dispatchToUiThread(SLIB_BIND_WEAKREF(void(), ViewPage, _openPopup, this, parent, transition, flagFillParentBackground));
+		post(SLIB_BIND_WEAKREF(void(), ViewPage, _openPopup, this, parent, transition, flagFillParentBackground));
 	}
 	m_flagDidPopup = sl_true;
 	m_flagClosingPopup = sl_false;

@@ -76,7 +76,7 @@ public class UiAnimation {
 							flagShown = true;
 						}
 					}
-					final float f = (float)(animation.getAnimatedValue());
+					final float f = (Float)(animation.getAnimatedValue());
 					if (flagTranslate || flagRotate || flagScale) {
 						float r = 0;
 						if (flagRotate) {
