@@ -617,7 +617,7 @@ void RenderEngine::drawDebugText()
 	text += " Primitives: ";
 	text += m_nCountDrawnPrimitivesOnLastScene;
 	Size size = Size::zero();
-	bitmap->resetPixels(Color::Black);
+	bitmap->resetPixels(Color(0, 0, 0, 150));
 	{
 		Ref<Canvas> canvas = bitmap->getCanvas();
 		if (canvas.isNotNull()) {

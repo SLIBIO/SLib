@@ -10,5 +10,6 @@
 #include "render/program.h"
 
 #include "render/canvas.h"
+#include "render/drawable.h"
 
 #endif

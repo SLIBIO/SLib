@@ -453,6 +453,7 @@
     <ClCompile Include="..\..\..\src\slib\render\opengl_wgl.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\render_base.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\render_canvas.cpp" />
+    <ClCompile Include="..\..\..\src\slib\render\render_drawable.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\render_engine.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\render_program.cpp" />
     <ClCompile Include="..\..\..\src\slib\render\render_resource.cpp" />

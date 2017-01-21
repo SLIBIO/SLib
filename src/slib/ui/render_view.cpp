@@ -105,7 +105,7 @@ sl_bool RenderView::isDebugTextVisible()
 
 void RenderView::setDebugTextVisible(sl_bool flagVisible)
 {
-	m_flagDebugTextVisible = sl_true;
+	m_flagDebugTextVisible = flagVisible;
 }
 
 sl_bool RenderView::isDebugTextVisibleOnRelease()

@@ -382,7 +382,9 @@ template <class StateType>
 class SLIB_EXPORT RenderProgramScope
 {
 public:
-	SLIB_INLINE RenderProgramScope() : m_engine(sl_null), m_program(sl_null), m_state(sl_null) {};
+	SLIB_INLINE RenderProgramScope():
+	 m_engine(sl_null), m_program(sl_null), m_state(sl_null)
+	{};
 	
 	SLIB_INLINE ~RenderProgramScope()
 	{
@@ -393,13 +395,18 @@ public:
 	SLIB_INLINE sl_bool begin(RenderEngine* engine, const Ref<RenderProgram>& program)
 	{
 		if (program.isNotNull()) {
-			if (engine->beginProgram(program, (RenderProgramState**)(&m_state))) {
+			if (engine->beginProgram(program, reinterpret_cast<RenderProgramState**>(&m_state))) {
 				m_engine = engine;
 				m_program = program;
 				return sl_true;
 			}
 		}
 		return sl_false;
+	}
+	
+	SLIB_INLINE sl_bool begin(const Ref<RenderEngine>& engine, const Ref<RenderProgram>& program)
+	{
+		return begin(engine.get(), program);
 	}
 	
 	SLIB_INLINE void end()

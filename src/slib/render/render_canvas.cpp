@@ -171,9 +171,15 @@ public:
 			for (sl_uint32 i = 0; i < param.countClips; i++) {
 				RenderCanvasClipType type = param.clips[i]->type;
 				if (type == RenderCanvasClipType::Ellipse) {
+					sl_bool flagOval = Math::isAlmostZero(param.clips[i]->region.getWidth() - param.clips[i]->region.getHeight());
 					if (signatures) {
-						SLIB_STATIC_STRING(s, "E");
-						signatures->add(s);
+						if (flagOval) {
+							SLIB_STATIC_STRING(s, "O");
+							signatures->add(s);
+						} else {
+							SLIB_STATIC_STRING(s, "E");
+							signatures->add(s);
+						}
 					}
 					if (bufVertexShader) {
 						bufVBContent.add(String::format(SLIB_STRINGIFY(
@@ -187,13 +193,16 @@ public:
 						   float lenClip%d = xClip%d * xClip%d + yClip%d * yClip%d;
 						   if (lenClip%d > 1.0) {
 							   discard;
-						   } else {
-							   lenClip%d = sqrt(lenClip%d);
-							   l_Color.w *= smoothstep(0.0, 2.0/sqrt(wClip%d * hClip%d), 1.0-lenClip%d);
 						   }
 						), i));
+						if (flagOval) {
+							bufFBContent.add(String::format(SLIB_STRINGIFY(
+							else {
+								lenClip%d = sqrt(lenClip%d);
+								l_Color.w *= smoothstep(0.0, 2.0/sqrt(wClip%d * hClip%d), 1.0-lenClip%d);
+							}), i));
+						}
 					}
-
 				} else {
 					if (signatures) {
 						SLIB_STATIC_STRING(s, "C");
@@ -651,7 +660,7 @@ void RenderCanvas::drawEllipse(const Rectangle& rect, const Ref<Pen>& pen, const
 		}
 		
 		RenderCanvasProgramParam pp;
-		pp.prepare(state, sl_false);
+		pp.prepare(state, state->flagClipRect && state->clipRect.containsRectangle(rect));
 		RenderCanvasClip clip;
 		clip.type = RenderCanvasClipType::Ellipse;
 		clip.region = rect;
@@ -853,6 +862,30 @@ void RenderCanvas::drawTexture(const Rectangle& rectDst, const Ref<Texture>& tex
 void RenderCanvas::drawTexture(const Rectangle& rectDst, const Ref<Texture>& texture, sl_real alpha)
 {
 	drawTexture(rectDst, texture, DrawParam(), Color4f(1, 1, 1, alpha));
+}
+
+void RenderCanvas::drawRectangle(const Rectangle& rect, RenderProgramState2D_Position* programState, const DrawParam& param)
+{
+	_RenderCanvas_Shared* shared = _RenderCanvas_getShared();
+	if (!shared) {
+		return;
+	}
+	
+	RenderCanvasState* canvasState = m_state.get();
+	
+	Matrix3 mat;
+	mat.m00 = rect.getWidth(); mat.m10 = 0; mat.m20 = rect.left;
+	mat.m01 = 0; mat.m11 = rect.getHeight(); mat.m21 = rect.top;
+	mat.m02 = 0; mat.m12 = 0; mat.m22 = 1;
+	mat *= canvasState->matrix;
+	mat *= m_matViewport;
+	programState->setTransform(mat);
+	
+	Color4f color(0, 0, 0, param.alpha * getAlpha());
+	programState->setColor(color);
+	
+	m_engine->drawPrimitive(4, shared->vbRectangle, PrimitiveType::TriangleStrip);
+
 }
 
 void RenderCanvas::_drawBitmap(const Rectangle& rectDst, Bitmap* src, const Rectangle& rectSrc, const DrawParam& param)

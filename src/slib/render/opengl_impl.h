@@ -252,6 +252,11 @@ sl_bool GL_BASE::linkProgram(sl_uint32 program)
 		if (status != GL_FALSE) {
 			return sl_true;
 		}
+		GLchar log[1025];
+		GLsizei lenLog = 0;
+		GL_ENTRY(glGetProgramInfoLog)(program, 1024, &lenLog, log);
+		log[lenLog] = 0;
+		Log("OpenGL Program", String(log));
 	}
 	return sl_false;
 }
