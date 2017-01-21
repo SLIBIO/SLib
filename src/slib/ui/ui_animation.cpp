@@ -62,7 +62,7 @@ Ref<UIAnimationLoop> UIAnimationLoop::getInstance()
 	return ret;
 }
 
-#if !defined(SLIB_PLATFORM_IS_ANDROID) && !defined(SLIB_PLATFORM_IS_IOS)
+#if !defined(SLIB_PLATFORM_IS_ANDROID) && !defined(SLIB_PLATFORM_IS_APPLE)
 
 sl_bool UIAnimationLoop::_applyNativeAnimation(Animation* animation)
 {

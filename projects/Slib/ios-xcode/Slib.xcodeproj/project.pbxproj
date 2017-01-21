@@ -140,7 +140,7 @@
 		2682C3F11E2D5C6C00E9CB98 /* ui_core_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2682C3F01E2D5C6C00E9CB98 /* ui_core_apple.mm */; };
 		2682C3F61E2D639000E9CB98 /* ui_core_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2682C3F41E2D639000E9CB98 /* ui_core_common.cpp */; };
 		2683BFAE1C39710C0068AC42 /* atomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2683BFAD1C39710C0068AC42 /* atomic.cpp */; };
-		268847821E2FEE2700AFA023 /* ui_animation_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 268847811E2FEE2700AFA023 /* ui_animation_ios.mm */; };
+		268847821E2FEE2700AFA023 /* ui_animation_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 268847811E2FEE2700AFA023 /* ui_animation_apple.mm */; };
 		268916341C182AC8009FD75E /* camera_dshow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 268916331C182AC8009FD75E /* camera_dshow.cpp */; };
 		269222311DC12F600055095F /* image_stb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2692222F1DC12F600055095F /* image_stb.cpp */; };
 		269394CC1D7609EB002B9B03 /* list_report_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 269394CB1D7609EB002B9B03 /* list_report_view.cpp */; };
@@ -411,7 +411,7 @@
 		2682C3F41E2D639000E9CB98 /* ui_core_common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_core_common.cpp; sourceTree = "<group>"; };
 		2682C3F51E2D639000E9CB98 /* ui_core_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ui_core_common.h; sourceTree = "<group>"; };
 		2683BFAD1C39710C0068AC42 /* atomic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = atomic.cpp; sourceTree = "<group>"; };
-		268847811E2FEE2700AFA023 /* ui_animation_ios.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_animation_ios.mm; sourceTree = "<group>"; };
+		268847811E2FEE2700AFA023 /* ui_animation_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_animation_apple.mm; sourceTree = "<group>"; };
 		268847831E2FFB1900AFA023 /* ui_animation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ui_animation.h; sourceTree = "<group>"; };
 		268916331C182AC8009FD75E /* camera_dshow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = camera_dshow.cpp; path = media/camera_dshow.cpp; sourceTree = "<group>"; };
 		2692222F1DC12F600055095F /* image_stb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = image_stb.cpp; sourceTree = "<group>"; };
@@ -893,7 +893,7 @@
 				26CB94CA1D0126F900D8A472 /* tree_view.cpp */,
 				268847831E2FFB1900AFA023 /* ui_animation.h */,
 				265335901E2E96A900199C76 /* ui_animation.cpp */,
-				268847811E2FEE2700AFA023 /* ui_animation_ios.mm */,
+				268847811E2FEE2700AFA023 /* ui_animation_apple.mm */,
 				2648D5471D096AB000819E09 /* ui_app.cpp */,
 				A2774E291B1CBBFD00538A7B /* ui_core.cpp */,
 				2682C3F01E2D5C6C00E9CB98 /* ui_core_apple.mm */,
@@ -1180,7 +1180,7 @@
 				265EBF2F1C23051F00AD81D9 /* database_statement.cpp in Sources */,
 				266DD3DF1C1181B500D47AB0 /* net_capture_pcap.cpp in Sources */,
 				26C0A3561C131F8E005690FE /* bitmap_data.cpp in Sources */,
-				268847821E2FEE2700AFA023 /* ui_animation_ios.mm in Sources */,
+				268847821E2FEE2700AFA023 /* ui_animation_apple.mm in Sources */,
 				26CA8D711C23A61D0049A658 /* system_apple.mm in Sources */,
 				26DA34FD1C4B8B1D004DC204 /* audio_data.cpp in Sources */,
 				266DD3E51C1181B500D47AB0 /* network_os.cpp in Sources */,

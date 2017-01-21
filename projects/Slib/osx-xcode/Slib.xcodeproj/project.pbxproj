@@ -217,6 +217,7 @@
 		26E376DD1C9865EF00B178E6 /* matrix2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E376DC1C9865EF00B178E6 /* matrix2.cpp */; };
 		26E376DF1C98739200B178E6 /* matrix3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E376DE1C98739200B178E6 /* matrix3.cpp */; };
 		26E376E11C987F6200B178E6 /* matrix4.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E376E01C987F6200B178E6 /* matrix4.cpp */; };
+		26E63F451E337B2300F50E8A /* ui_animation_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26E63F441E337B2300F50E8A /* ui_animation_apple.mm */; };
 		26F900651D994ED0001A6EE9 /* animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26F900641D994ED0001A6EE9 /* animation.cpp */; };
 		26FA807C1C98891B0074F76B /* quaternion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FA807B1C98891B0074F76B /* quaternion.cpp */; };
 		26FBC26D1DF9E83F00D76774 /* function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26FBC26C1DF9E83F00D76774 /* function.cpp */; };
@@ -485,6 +486,7 @@
 		26E376DC1C9865EF00B178E6 /* matrix2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix2.cpp; sourceTree = "<group>"; };
 		26E376DE1C98739200B178E6 /* matrix3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix3.cpp; sourceTree = "<group>"; };
 		26E376E01C987F6200B178E6 /* matrix4.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix4.cpp; sourceTree = "<group>"; };
+		26E63F441E337B2300F50E8A /* ui_animation_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ui_animation_apple.mm; sourceTree = "<group>"; };
 		26F900641D994ED0001A6EE9 /* animation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = animation.cpp; sourceTree = "<group>"; };
 		26FA807B1C98891B0074F76B /* quaternion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = quaternion.cpp; sourceTree = "<group>"; };
 		26FBC26C1DF9E83F00D76774 /* function.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = function.cpp; sourceTree = "<group>"; };
@@ -696,6 +698,7 @@
 				26A4ECCE1CFE7FB700288A0B /* tree_view.cpp */,
 				26BF169B1E307DC000C9878C /* ui_animation.h */,
 				2653358E1E2E8A5A00199C76 /* ui_animation.cpp */,
+				26E63F441E337B2300F50E8A /* ui_animation_apple.mm */,
 				2648D5451D096A8B00819E09 /* ui_app.cpp */,
 				266DD52B1C11940A00D47AB0 /* ui_core.cpp */,
 				2682C3F21E2D5D0800E9CB98 /* ui_core_apple.mm */,
@@ -1181,6 +1184,7 @@
 				264A5D7E1CB6C9C800FB0B08 /* ui_menu_osx.mm in Sources */,
 				26AE7BF81C99083D0026C2D9 /* rectangle.cpp in Sources */,
 				2682C3F31E2D5D0800E9CB98 /* ui_core_apple.mm in Sources */,
+				26E63F451E337B2300F50E8A /* ui_animation_apple.mm in Sources */,
 				26694BF91C9B2CBC0047E67C /* arp.cpp in Sources */,
 				26AE7C001C9939210026C2D9 /* view_frustum.cpp in Sources */,
 				26AE7C061C99AF9D0026C2D9 /* transform2d.cpp in Sources */,

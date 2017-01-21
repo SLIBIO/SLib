@@ -4669,12 +4669,14 @@ void View::setAlpha(sl_real alpha, UIUpdateMode mode)
 			invalidateBoundsInParent();
 		}
 #else
-		Ref<ViewInstance> instance = m_instance;
-		if (instance.isNotNull()) {
-			instance->setAlpha(alpha);
-		} else {
-			if (mode == UIUpdateMode::Redraw) {
-				invalidateBoundsInParent();
+		if (mode != UIUpdateMode::Init) {
+			Ref<ViewInstance> instance = m_instance;
+			if (instance.isNotNull()) {
+				instance->setAlpha(alpha);
+			} else {
+				if (mode == UIUpdateMode::Redraw) {
+					invalidateBoundsInParent();
+				}
 			}
 		}
 #endif

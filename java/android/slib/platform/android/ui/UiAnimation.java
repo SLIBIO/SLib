@@ -46,7 +46,7 @@ public class UiAnimation {
 	static final float EPSILON = 0.000001f;
 
 	public static Animator start(final View view, final long id, float duration, float delay,
-	                            int curve, boolean flagRepeat, boolean flagReverse,
+	                            int curve, int repeatCount, boolean flagReverse,
 	                            final float ax, final float ay,
 	                            final boolean flagTranslate, final float txStart, final float tyStart, final float txEnd, final float tyEnd,
 	                            final boolean flagScale, final float sxStart, final float syStart, final float sxEnd, final float syEnd,
@@ -61,7 +61,21 @@ public class UiAnimation {
 			final ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
 
 			animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+				boolean flagShown = false;
+
 				public void onAnimationUpdate(ValueAnimator animation) {
+					if (flagShown) {
+						if (!(view.isShown())) {
+							flagShown = false;
+							animator.cancel();
+							return;
+						}
+					} else {
+						if (view.isShown()) {
+							flagShown = true;
+						}
+					}
 					final float f = (float)(animation.getAnimatedValue());
 					if (flagTranslate || flagRotate || flagScale) {
 						float r = 0;
@@ -130,6 +144,7 @@ public class UiAnimation {
 
 				@Override
 				public void onAnimationCancel(Animator animation) {
+					nativeOnStop(id);
 				}
 
 				@Override
@@ -144,8 +159,12 @@ public class UiAnimation {
 				animator.setRepeatMode(ValueAnimator.REVERSE);
 				animator.setRepeatCount(1);
 			}
-			if (flagRepeat) {
+			if (repeatCount < 0) {
 				animator.setRepeatCount(ValueAnimator.INFINITE);
+			} else {
+				if (repeatCount > 0) {
+					animator.setRepeatCount(repeatCount);
+				}
 			}
 
 			if (UiThread.isUiThread()) {

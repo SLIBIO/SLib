@@ -9,7 +9,7 @@ SLIB_UI_NAMESPACE_BEGIN
 void _AndroidAnimation_onStop(JNIEnv* env, jobject _this, jlong ptr);
 
 SLIB_JNI_BEGIN_CLASS(_JAndroidAnimation, "slib/platform/android/ui/UiAnimation")
-	SLIB_JNI_STATIC_METHOD(start, "start", "(Landroid/view/View;JFFIZZFFZFFFFZFFFFZFFZFF)Landroid/animation/Animator;");
+	SLIB_JNI_STATIC_METHOD(start, "start", "(Landroid/view/View;JFFIIZFFZFFFFZFFFFZFFZFF)Landroid/animation/Animator;");
 	SLIB_JNI_STATIC_METHOD(stop, "stop", "(Landroid/animation/Animator;)V");
 	SLIB_JNI_NATIVE(nativeOnStop, "nativeOnStop", "(J)V", _AndroidAnimation_onStop);
 SLIB_JNI_END_CLASS
@@ -126,7 +126,7 @@ sl_bool UIAnimationLoop::_applyNativeAnimation(Animation* animation)
 				}
 			}
 			JniLocal<jobject> ret = _JAndroidAnimation::start.callObject(sl_null, handle, (jlong)id, animation->getDuration(), animation->getStartDelay(),
-			                               (int)(animation->getAnimationCurve()), animation->isRepeatForever(), animation->isAutoReverse(),
+			                               (int)(animation->getAnimationCurve()), animation->getRepeatCount(), animation->isAutoReverse(),
 			                               anchor.x, anchor.y,
 			                               flagTranslate, translateStart.x, translateStart.y, translateEnd.x, translateEnd.y,
 			                               flagScale, scaleStart.x, scaleStart.y, scaleEnd.x, scaleEnd.y,
