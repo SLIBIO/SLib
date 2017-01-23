@@ -74,10 +74,18 @@ void ImageView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 	Ref<Drawable> source = m_source;
 	if (source.isNotNull()) {
 		if (flagHorizontal) {
-			setMeasuredWidth((sl_ui_len)(source->getDrawableWidth()));
+			if (isHeightWrapping()) {
+				setMeasuredWidth((sl_ui_len)(source->getDrawableWidth()));
+			} else {
+				setMeasuredHeight((sl_ui_len)(getLayoutFrame().getHeight() * source->getDrawableWidth() / source->getDrawableHeight()));
+			}
 		}
 		if (flagVertical) {
-			setMeasuredHeight((sl_ui_len)(source->getDrawableHeight()));
+			if (isWidthWrapping()) {
+				setMeasuredHeight((sl_ui_len)(source->getDrawableHeight()));
+			} else {
+				setMeasuredHeight((sl_ui_len)(getLayoutFrame().getWidth() * source->getDrawableHeight() / source->getDrawableWidth()));
+			}
 		}
 	}
 }
