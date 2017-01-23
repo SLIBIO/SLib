@@ -609,7 +609,7 @@ void ScrollBar::dispatchChange(sl_scroll_pos value)
 	if (listener.isNotNull()) {
 		listener->onChange(this, value);
 	}
-	getOnChange()(value);
+	getOnChange()(this, value);
 }
 
 void ScrollBar::_setHoverThumb(sl_bool flag)

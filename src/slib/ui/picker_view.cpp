@@ -301,7 +301,7 @@ void PickerView::dispatchSelectItem(sl_uint32 index)
 	if (listener.isNotNull()) {
 		listener->onSelectItem(this, index);
 	}
-	getOnSelectItem()(index);
+	getOnSelectItem()(this, index);
 }
 
 void PickerView::_selectIndexInner(sl_int32 index)

@@ -114,7 +114,7 @@ public:
 	void setHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
 
 public:
-	SLIB_PROPERTY(AtomicFunction<void()>, OnSelect)
+	SLIB_PROPERTY(AtomicFunction<void(TreeViewItem*)>, OnSelect)
 	SLIB_PROPERTY(AtomicRef<Referable>, UserObject)
 	SLIB_PROPERTY(AtomicVariant, UserData)
 	
@@ -247,7 +247,7 @@ public:
 public:
 	SLIB_PROPERTY(AtomicPtr<ITreeViewListener>, Listener);
 	
-	SLIB_PROPERTY(AtomicFunction<void(TreeViewItem*)>, OnSelectItem)
+	SLIB_PROPERTY(AtomicFunction<void(TreeView*, TreeViewItem*)>, OnSelectItem)
 	
 public:
 	virtual void onSelectItem(TreeViewItem* item);

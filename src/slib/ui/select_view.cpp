@@ -419,7 +419,7 @@ void SelectView::dispatchSelectItem(sl_uint32 index)
 	if (listener.isNotNull()) {
 		listener->onSelectItem(this, index);
 	}
-	getOnSelectItem()(index);
+	getOnSelectItem()(this, index);
 }
 
 UIRect SelectView::getLeftIconRegion()

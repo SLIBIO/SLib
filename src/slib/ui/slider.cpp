@@ -330,7 +330,7 @@ void Slider::dispatchChange(float value)
 	if (listener.isNotNull()) {
 		listener->onChange(this, value);
 	}
-	getOnChange()(value);
+	getOnChange()(this, value);
 }
 
 void Slider::dispatchChangeSecondary(float value)
@@ -340,7 +340,7 @@ void Slider::dispatchChangeSecondary(float value)
 	if (listener.isNotNull()) {
 		listener->onChangeSecondary(this, value);
 	}
-	getOnChangeSecondary()(value);
+	getOnChangeSecondary()(this, value);
 }
 
 void Slider::_drawTrack(Canvas* canvas, const Ref<Drawable>& track, const Rectangle& rectDst)

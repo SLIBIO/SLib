@@ -6062,7 +6062,7 @@ void View::drawContent(Canvas *canvas)
 			onDraw(canvas);
 			Ref<EventAttributes> eventAttrs = m_eventAttributes;
 			if (eventAttrs.isNotNull()) {
-				(eventAttrs->draw)(canvas);
+				(eventAttrs->draw)(this, canvas);
 			}
 		}
 		
@@ -6233,7 +6233,7 @@ void View::setEventListener(const Ptr<IViewListener>& listener)
 	}
 }
 
-Function<void(Canvas*)> View::getOnDraw()
+Function<void(View*, Canvas*)> View::getOnDraw()
 {
 	Ref<EventAttributes> attrs = m_eventAttributes;
 	if (attrs.isNotNull()) {
@@ -6242,7 +6242,7 @@ Function<void(Canvas*)> View::getOnDraw()
 	return sl_null;
 }
 
-void View::setOnDraw(const Function<void(Canvas*)>& callback)
+void View::setOnDraw(const Function<void(View*, Canvas*)>& callback)
 {
 	Ref<EventAttributes> attrs = _initializeEventAttributes();
 	if (attrs.isNotNull()) {
@@ -6250,7 +6250,7 @@ void View::setOnDraw(const Function<void(Canvas*)>& callback)
 	}
 }
 
-Function<void(UIEvent*)> View::getOnMouseEvent()
+Function<void(View*, UIEvent*)> View::getOnMouseEvent()
 {
 	Ref<EventAttributes> attrs = m_eventAttributes;
 	if (attrs.isNotNull()) {
@@ -6259,7 +6259,7 @@ Function<void(UIEvent*)> View::getOnMouseEvent()
 	return sl_null;
 }
 
-void View::setOnMouseEvent(const Function<void(UIEvent*)>& callback)
+void View::setOnMouseEvent(const Function<void(View*, UIEvent*)>& callback)
 {
 	Ref<EventAttributes> attrs = _initializeEventAttributes();
 	if (attrs.isNotNull()) {
@@ -6267,7 +6267,7 @@ void View::setOnMouseEvent(const Function<void(UIEvent*)>& callback)
 	}
 }
 
-Function<void(UIEvent*)> View::getOnTouchEvent()
+Function<void(View*, UIEvent*)> View::getOnTouchEvent()
 {
 	Ref<EventAttributes> attrs = m_eventAttributes;
 	if (attrs.isNotNull()) {
@@ -6276,7 +6276,7 @@ Function<void(UIEvent*)> View::getOnTouchEvent()
 	return sl_null;
 }
 
-void View::setOnTouchEvent(const Function<void(UIEvent*)>& callback)
+void View::setOnTouchEvent(const Function<void(View*, UIEvent*)>& callback)
 {
 	Ref<EventAttributes> attrs = _initializeEventAttributes();
 	if (attrs.isNotNull()) {
@@ -6284,7 +6284,7 @@ void View::setOnTouchEvent(const Function<void(UIEvent*)>& callback)
 	}
 }
 
-Function<void(UIEvent*)> View::getOnKeyEvent()
+Function<void(View*, UIEvent*)> View::getOnKeyEvent()
 {
 	Ref<EventAttributes> attrs = m_eventAttributes;
 	if (attrs.isNotNull()) {
@@ -6293,7 +6293,7 @@ Function<void(UIEvent*)> View::getOnKeyEvent()
 	return sl_null;
 }
 
-void View::setOnKeyEvent(const Function<void(UIEvent*)>& callback)
+void View::setOnKeyEvent(const Function<void(View*, UIEvent*)>& callback)
 {
 	Ref<EventAttributes> attrs = _initializeEventAttributes();
 	if (attrs.isNotNull()) {
@@ -6301,7 +6301,7 @@ void View::setOnKeyEvent(const Function<void(UIEvent*)>& callback)
 	}
 }
 
-Function<void(UIEvent*)> View::getOnMouseWheelEvent()
+Function<void(View*, UIEvent*)> View::getOnMouseWheelEvent()
 {
 	Ref<EventAttributes> attrs = m_eventAttributes;
 	if (attrs.isNotNull()) {
@@ -6310,7 +6310,7 @@ Function<void(UIEvent*)> View::getOnMouseWheelEvent()
 	return sl_null;
 }
 
-void View::setOnMouseWheelEvent(const Function<void(UIEvent*)>& callback)
+void View::setOnMouseWheelEvent(const Function<void(View*, UIEvent*)>& callback)
 {
 	Ref<EventAttributes> attrs = _initializeEventAttributes();
 	if (attrs.isNotNull()) {
@@ -6318,7 +6318,7 @@ void View::setOnMouseWheelEvent(const Function<void(UIEvent*)>& callback)
 	}
 }
 
-Function<void()> View::getOnClick()
+Function<void(View*)> View::getOnClick()
 {
 	Ref<EventAttributes> attrs = m_eventAttributes;
 	if (attrs.isNotNull()) {
@@ -6327,7 +6327,7 @@ Function<void()> View::getOnClick()
 	return sl_null;
 }
 
-void View::setOnClick(const Function<void()>& callback)
+void View::setOnClick(const Function<void(View*)>& callback)
 {
 	Ref<EventAttributes> attrs = _initializeEventAttributes();
 	if (attrs.isNotNull()) {
@@ -6335,7 +6335,7 @@ void View::setOnClick(const Function<void()>& callback)
 	}
 }
 
-Function<void(UIEvent*)> View::getOnSetCursor()
+Function<void(View*, UIEvent*)> View::getOnSetCursor()
 {
 	Ref<EventAttributes> attrs = m_eventAttributes;
 	if (attrs.isNotNull()) {
@@ -6344,7 +6344,7 @@ Function<void(UIEvent*)> View::getOnSetCursor()
 	return sl_null;
 }
 
-void View::setOnSetCursor(const Function<void(UIEvent*)>& callback)
+void View::setOnSetCursor(const Function<void(View*, UIEvent*)>& callback)
 {
 	Ref<EventAttributes> attrs = _initializeEventAttributes();
 	if (attrs.isNotNull()) {
@@ -6352,7 +6352,7 @@ void View::setOnSetCursor(const Function<void(UIEvent*)>& callback)
 	}
 }
 
-Function<void(sl_ui_len, sl_ui_len)> View::getOnResize()
+Function<void(View*, sl_ui_len, sl_ui_len)> View::getOnResize()
 {
 	Ref<EventAttributes> attrs = m_eventAttributes;
 	if (attrs.isNotNull()) {
@@ -6361,7 +6361,7 @@ Function<void(sl_ui_len, sl_ui_len)> View::getOnResize()
 	return sl_null;
 }
 
-void View::setOnResize(const Function<void(sl_ui_len, sl_ui_len)>& callback)
+void View::setOnResize(const Function<void(View*, sl_ui_len, sl_ui_len)>& callback)
 {
 	Ref<EventAttributes> attrs = _initializeEventAttributes();
 	if (attrs.isNotNull()) {
@@ -6369,7 +6369,7 @@ void View::setOnResize(const Function<void(sl_ui_len, sl_ui_len)>& callback)
 	}
 }
 
-Function<void(sl_scroll_pos, sl_scroll_pos)> View::getOnScroll()
+Function<void(View*, sl_scroll_pos, sl_scroll_pos)> View::getOnScroll()
 {
 	Ref<EventAttributes> attrs = m_eventAttributes;
 	if (attrs.isNotNull()) {
@@ -6378,7 +6378,7 @@ Function<void(sl_scroll_pos, sl_scroll_pos)> View::getOnScroll()
 	return sl_null;
 }
 
-void View::setOnScroll(const Function<void(sl_scroll_pos, sl_scroll_pos)>& callback)
+void View::setOnScroll(const Function<void(View*, sl_scroll_pos, sl_scroll_pos)>& callback)
 {
 	Ref<EventAttributes> attrs = _initializeEventAttributes();
 	if (attrs.isNotNull()) {
@@ -6386,7 +6386,7 @@ void View::setOnScroll(const Function<void(sl_scroll_pos, sl_scroll_pos)>& callb
 	}
 }
 
-Function<void(GestureType)> View::getOnSwipe()
+Function<void(View*, GestureType)> View::getOnSwipe()
 {
 	Ref<EventAttributes> attrs = m_eventAttributes;
 	if (attrs.isNotNull()) {
@@ -6395,7 +6395,7 @@ Function<void(GestureType)> View::getOnSwipe()
 	return sl_null;
 }
 
-void View::setOnSwipe(const Function<void(GestureType)>& callback)
+void View::setOnSwipe(const Function<void(View*, GestureType)>& callback)
 {
 	Ref<EventAttributes> attrs = _initializeEventAttributes();
 	if (attrs.isNotNull()) {
@@ -6671,7 +6671,7 @@ void View::dispatchMouseEvent(UIEvent* ev)
 				return;
 			}
 		}
-		(eventAttrs->mouse)(ev);
+		(eventAttrs->mouse)(this, ev);
 		if (ev->isPreventedDefault()) {
 			return;
 		}
@@ -6877,11 +6877,11 @@ void View::dispatchTouchEvent(UIEvent* ev)
 				return;
 			}
 		}
-		(eventAttrs->touch)(ev);
+		(eventAttrs->touch)(this, ev);
 		if (ev->isPreventedDefault()) {
 			return;
 		}
-		(eventAttrs->mouse)(ev);
+		(eventAttrs->mouse)(this, ev);
 		if (ev->isPreventedDefault()) {
 			return;
 		}
@@ -7129,7 +7129,7 @@ void View::dispatchMouseWheelEvent(UIEvent* ev)
 				return;
 			}
 		}
-		(eventAttrs->mouseWheel)(ev);
+		(eventAttrs->mouseWheel)(this, ev);
 		if (ev->isPreventedDefault()) {
 			return;
 		}
@@ -7214,7 +7214,7 @@ void View::dispatchKeyEvent(UIEvent* ev)
 				return;
 			}
 		}
-		(eventAttrs->key)(ev);
+		(eventAttrs->key)(this, ev);
 		if (ev->isPreventedDefault()) {
 			return;
 		}
@@ -7262,7 +7262,7 @@ void View::dispatchClick(UIEvent* ev)
 		if (listener.isNotNull()) {
 			listener->onClick(this, ev);
 		}
-		(eventAttrs->click)();
+		(eventAttrs->click)(this);
 	}
 }
 
@@ -7320,7 +7320,7 @@ void View::dispatchSetCursor(UIEvent* ev)
 				return;
 			}
 		}
-		(eventAttrs->setCursor)(ev);
+		(eventAttrs->setCursor)(this, ev);
 		if (ev->isPreventedDefault()) {
 			return;
 		}
@@ -7383,7 +7383,7 @@ void View::dispatchResize(sl_ui_len width, sl_ui_len height)
 		if (listener.isNotNull()) {
 			listener->onResize(this, width, height);
 		}
-		(eventAttrs->resize)(width, height);
+		(eventAttrs->resize)(this, width, height);
 	}
 	Ref<View> parent = getParent();
 	if (parent.isNotNull()) {
@@ -7416,7 +7416,7 @@ void View::dispatchScroll(sl_scroll_pos x, sl_scroll_pos y)
 		if (listener.isNotNull()) {
 			listener->onScroll(this, x, y);
 		}
-		(eventAttrs->scroll)(x, y);
+		(eventAttrs->scroll)(this, x, y);
 	}
 }
 
@@ -7429,7 +7429,7 @@ void View::dispatchSwipe(GestureType type)
 		if (listener.isNotNull()) {
 			listener->onSwipe(this, type);
 		}
-		(eventAttrs->swipe)(type);
+		(eventAttrs->swipe)(this, type);
 	}
 }
 

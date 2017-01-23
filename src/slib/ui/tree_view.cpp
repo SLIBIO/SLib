@@ -801,8 +801,8 @@ void TreeView::dispatchSelectItem(TreeViewItem* item)
 	if (listener.isNotNull()) {
 		listener->onSelectItem(this, item);
 	}
-	getOnSelectItem()(item);
-	(item->getOnSelect())();
+	getOnSelectItem()(this, item);
+	(item->getOnSelect())(item);
 }
 
 void TreeView::_createRootItem()

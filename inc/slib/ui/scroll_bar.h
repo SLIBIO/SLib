@@ -131,7 +131,7 @@ public:
 public:
 	SLIB_PROPERTY(AtomicPtr<IScrollBarListener>, Listener);
 	
-	SLIB_PROPERTY(AtomicFunction<void(sl_scroll_pos)>, OnChange)
+	SLIB_PROPERTY(AtomicFunction<void(ScrollBar*, sl_scroll_pos)>, OnChange)
 	
 protected:
 	void _setHoverThumb(sl_bool flag);

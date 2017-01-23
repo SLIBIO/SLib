@@ -73,9 +73,9 @@ protected:
 public:
 	SLIB_PROPERTY(AtomicPtr<IEditViewListener>, Listener)
 	
-	SLIB_PROPERTY(AtomicFunction<String(String)>, OnChange)
+	SLIB_PROPERTY(AtomicFunction<String(EditView*, String)>, OnChange)
 	
-	SLIB_PROPERTY(AtomicFunction<void()>, OnReturnKey)
+	SLIB_PROPERTY(AtomicFunction<void(EditView*)>, OnReturnKey)
 	
 protected:
 	virtual String onChange(const String& newValue);

@@ -358,7 +358,7 @@ protected:
 	void _applyDefaultClosingPopupTransition(Transition& transition);
 	
 public:
-	SLIB_PROPERTY(AtomicFunction<void()>, OnClose);
+	SLIB_PROPERTY(AtomicFunction<void(ViewPage*)>, OnClose);
 	
 protected:
 	AtomicWeakRef<ViewPager> m_pager;

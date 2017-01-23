@@ -54,11 +54,11 @@ public:
 public:
 	SLIB_PROPERTY(AtomicPtr<IWebViewListener>, Listener)
 	
-	SLIB_PROPERTY(AtomicFunction<void(String)>, OnStartLoad)
+	SLIB_PROPERTY(AtomicFunction<void(WebView*, String)>, OnStartLoad)
 	
-	SLIB_PROPERTY(AtomicFunction<void(String, sl_bool)>, OnFinishLoad)
+	SLIB_PROPERTY(AtomicFunction<void(WebView*, String, sl_bool)>, OnFinishLoad)
 	
-	SLIB_PROPERTY(AtomicFunction<void(String, String)>, OnMessageFromJavaScript)
+	SLIB_PROPERTY(AtomicFunction<void(WebView*, String, String)>, OnMessageFromJavaScript)
 	
 protected:
 	virtual void onStartLoad(const String& url);

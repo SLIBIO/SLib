@@ -995,45 +995,45 @@ public:
 	
 	void setEventListener(const Ptr<IViewListener>& listener);
 	
-	Function<void(Canvas*)> getOnDraw();
+	Function<void(View*, Canvas*)> getOnDraw();
 	
-	void setOnDraw(const Function<void(Canvas*)>& callback);
+	void setOnDraw(const Function<void(View*, Canvas*)>& callback);
 	
-	Function<void(UIEvent*)> getOnMouseEvent();
+	Function<void(View*, UIEvent*)> getOnMouseEvent();
 	
-	void setOnMouseEvent(const Function<void(UIEvent*)>& callback);
+	void setOnMouseEvent(const Function<void(View*, UIEvent*)>& callback);
 	
-	Function<void(UIEvent*)> getOnTouchEvent();
+	Function<void(View*, UIEvent*)> getOnTouchEvent();
 	
-	void setOnTouchEvent(const Function<void(UIEvent*)>& callback);
+	void setOnTouchEvent(const Function<void(View*, UIEvent*)>& callback);
 	
-	Function<void(UIEvent*)> getOnKeyEvent();
+	Function<void(View*, UIEvent*)> getOnKeyEvent();
 	
-	void setOnKeyEvent(const Function<void(UIEvent*)>& callback);
+	void setOnKeyEvent(const Function<void(View*, UIEvent*)>& callback);
 	
-	Function<void(UIEvent*)> getOnMouseWheelEvent();
+	Function<void(View*, UIEvent*)> getOnMouseWheelEvent();
 	
-	void setOnMouseWheelEvent(const Function<void(UIEvent*)>& callback);
+	void setOnMouseWheelEvent(const Function<void(View*, UIEvent*)>& callback);
 	
-	Function<void()> getOnClick();
+	Function<void(View*)> getOnClick();
 	
-	void setOnClick(const Function<void()>& callback);
+	void setOnClick(const Function<void(View*)>& callback);
 	
-	Function<void(UIEvent*)> getOnSetCursor();
+	Function<void(View*, UIEvent*)> getOnSetCursor();
 	
-	void setOnSetCursor(const Function<void(UIEvent*)>& callback);
+	void setOnSetCursor(const Function<void(View*, UIEvent*)>& callback);
 	
-	Function<void(sl_ui_len, sl_ui_len)> getOnResize();
+	Function<void(View*, sl_ui_len, sl_ui_len)> getOnResize();
 	
-	void setOnResize(const Function<void(sl_ui_len, sl_ui_len)>& callback);
+	void setOnResize(const Function<void(View*, sl_ui_len, sl_ui_len)>& callback);
 	
-	Function<void(sl_scroll_pos, sl_scroll_pos)> getOnScroll();
+	Function<void(View*, sl_scroll_pos, sl_scroll_pos)> getOnScroll();
 	
-	void setOnScroll(const Function<void(sl_scroll_pos, sl_scroll_pos)>& callback);
+	void setOnScroll(const Function<void(View*, sl_scroll_pos, sl_scroll_pos)>& callback);
 	
-	Function<void(GestureType)> getOnSwipe();
+	Function<void(View*, GestureType)> getOnSwipe();
 	
-	void setOnSwipe(const Function<void(GestureType)>& callback);
+	void setOnSwipe(const Function<void(View*, GestureType)>& callback);
 	
 protected:
 	virtual void onDraw(Canvas* canvas);
@@ -1440,16 +1440,16 @@ protected:
 	{
 	public:
 		AtomicPtr<IViewListener> listener;
-		AtomicFunction<void(Canvas*)> draw;
-		AtomicFunction<void(UIEvent*)> mouse;
-		AtomicFunction<void(UIEvent*)> touch;
-		AtomicFunction<void(UIEvent*)> key;
-		AtomicFunction<void(UIEvent*)> mouseWheel;
-		AtomicFunction<void()> click;
-		AtomicFunction<void(UIEvent*)> setCursor;
-		AtomicFunction<void(sl_ui_len, sl_ui_len)> resize;
-		AtomicFunction<void(sl_scroll_pos, sl_scroll_pos)> scroll;
-		AtomicFunction<void(GestureType)> swipe;
+		AtomicFunction<void(View*, Canvas*)> draw;
+		AtomicFunction<void(View*, UIEvent*)> mouse;
+		AtomicFunction<void(View*, UIEvent*)> touch;
+		AtomicFunction<void(View*, UIEvent*)> key;
+		AtomicFunction<void(View*, UIEvent*)> mouseWheel;
+		AtomicFunction<void(View*)> click;
+		AtomicFunction<void(View*, UIEvent*)> setCursor;
+		AtomicFunction<void(View*, sl_ui_len, sl_ui_len)> resize;
+		AtomicFunction<void(View*, sl_scroll_pos, sl_scroll_pos)> scroll;
+		AtomicFunction<void(View*, GestureType)> swipe;
 	};
 	
 	AtomicRef<EventAttributes> m_eventAttributes;

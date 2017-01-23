@@ -139,7 +139,7 @@ public:
 public:
 	SLIB_PROPERTY(AtomicPtr<ITabViewListener>, Listener)
 	
-	SLIB_PROPERTY(AtomicFunction<void(sl_uint32)>, OnSelectTab)
+	SLIB_PROPERTY(AtomicFunction<void(TabView*, sl_uint32)>, OnSelectTab)
 	
 public:
 	// override

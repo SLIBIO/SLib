@@ -94,7 +94,7 @@ public:
 public:
 	SLIB_PROPERTY(AtomicPtr<ISelectViewListener>, Listener)
 	
-	SLIB_PROPERTY(AtomicFunction<void(sl_uint32)>, OnSelectItem)
+	SLIB_PROPERTY(AtomicFunction<void(SelectView*, sl_uint32)>, OnSelectItem)
 	
 protected:
 	// override

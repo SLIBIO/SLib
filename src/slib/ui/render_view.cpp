@@ -174,7 +174,7 @@ void RenderView::dispatchFrame(RenderEngine* engine)
 	
 	onFrame(engine);
 	
-	getOnFrame()(engine);
+	getOnFrame()(this, engine);
 	
 	if (m_flagDebugTextVisible) {
 		if (engine) {

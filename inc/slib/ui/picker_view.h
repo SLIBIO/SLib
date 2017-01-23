@@ -70,7 +70,7 @@ public:
 public:
 	SLIB_PROPERTY(AtomicPtr<IPickerViewListener>, Listener)
 	
-	SLIB_PROPERTY(AtomicFunction<void(sl_uint32)>, OnSelectItem)
+	SLIB_PROPERTY(AtomicFunction<void(PickerView*, sl_uint32)>, OnSelectItem)
 	
 protected:
 	// override

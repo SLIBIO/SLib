@@ -1548,7 +1548,7 @@ void ViewPage::dispatchClose()
 {
 	dispatchPause();
 	onClose();
-	(getOnClose())();
+	getOnClose()(this);
 }
 
 void ViewPage::dispatchResume()

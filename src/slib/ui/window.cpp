@@ -947,13 +947,13 @@ void Window::onDemaximize()
 void Window::dispatchCreate()
 {
 	onCreate();
-	getOnCreate()();
+	getOnCreate()(this);
 }
 
 void Window::dispatchCreateFailed()
 {
 	onCreateFailed();
-	getOnCreateFailed()();
+	getOnCreateFailed()(this);
 }
 
 void Window::dispatchClose(UIEvent* ev)
@@ -963,7 +963,7 @@ void Window::dispatchClose(UIEvent* ev)
 	if (listener.isNotNull()) {
 		listener->onClose(this, ev);
 	}
-	getOnClose()(ev);
+	getOnClose()(this,ev);
 	if (ev->isPreventedDefault()) {
 		return;
 	}
@@ -977,7 +977,7 @@ void Window::dispatchActivate()
 	if (listener.isNotNull()) {
 		listener->onActivate(this);
 	}
-	getOnActivate()();
+	getOnActivate()(this);
 }
 
 void Window::dispatchDeactivate()
@@ -987,7 +987,7 @@ void Window::dispatchDeactivate()
 	if (listener.isNotNull()) {
 		listener->onDeactivate(this);
 	}
-	getOnDeactivate()();
+	getOnDeactivate()(this);
 }
 
 void Window::dispatchMove()
@@ -997,7 +997,7 @@ void Window::dispatchMove()
 	if (listener.isNotNull()) {
 		listener->onMove(this);
 	}
-	getOnMove()();
+	getOnMove()(this);
 }
 
 void Window::dispatchResizing(UISize& size)
@@ -1007,7 +1007,7 @@ void Window::dispatchResizing(UISize& size)
 	if (listener.isNotNull()) {
 		listener->onResizing(this, size);
 	}
-	getOnResizing()(size);
+	getOnResizing()(this, size);
 }
 
 void Window::dispatchResize(sl_ui_len width, sl_ui_len height)
@@ -1018,7 +1018,7 @@ void Window::dispatchResize(sl_ui_len width, sl_ui_len height)
 	if (listener.isNotNull()) {
 		listener->onResize(this, width, height);
 	}
-	getOnResize()(width, height);
+	getOnResize()(this, width, height);
 }
 
 void Window::dispatchMinimize()
@@ -1028,7 +1028,7 @@ void Window::dispatchMinimize()
 	if (listener.isNotNull()) {
 		listener->onMinimize(this);
 	}
-	getOnMinimize()();
+	getOnMinimize()(this);
 }
 
 void Window::dispatchDeminimize()
@@ -1038,7 +1038,7 @@ void Window::dispatchDeminimize()
 	if (listener.isNotNull()) {
 		listener->onDeminimize(this);
 	}
-	getOnDeminimize()();
+	getOnDeminimize()(this);
 }
 
 void Window::dispatchMaximize()
@@ -1049,7 +1049,7 @@ void Window::dispatchMaximize()
 	if (listener.isNotNull()) {
 		listener->onMaximize(this);
 	}
-	getOnMaximize()();
+	getOnMaximize()(this);
 }
 
 void Window::dispatchDemaximize()
@@ -1060,7 +1060,7 @@ void Window::dispatchDemaximize()
 	if (listener.isNotNull()) {
 		listener->onDemaximize(this);
 	}
-	getOnDemaximize()();
+	getOnDemaximize()(this);
 }
 
 void Window::_refreshSize()

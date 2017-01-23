@@ -239,9 +239,9 @@ String EditView::dispatchChange(const String& newValue)
 	if (listener.isNotNull()) {
 		value = listener->onChange(this, value);
 	}
-	Function<String(String)> callback = getOnChange();
+	Function<String(EditView*, String)> callback = getOnChange();
 	if (callback.isNotNull()) {
-		value = callback(value);
+		value = callback(this, value);
 	}
 	return value;
 }
@@ -253,7 +253,7 @@ void EditView::dispatchReturnKey()
 	if (listener.isNotNull()) {
 		listener->onReturnKey(this);
 	}
-	getOnReturnKey()();
+	getOnReturnKey()(this);
 }
 
 /**********************

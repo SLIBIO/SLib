@@ -109,9 +109,9 @@ protected:
 public:
 	SLIB_PROPERTY(AtomicPtr<ISliderListener>, Listener);
 	
-	SLIB_PROPERTY(AtomicFunction<void(float)>, OnChange)
+	SLIB_PROPERTY(AtomicFunction<void(Slider*, float)>, OnChange)
 	
-	SLIB_PROPERTY(AtomicFunction<void(float)>, OnChangeSecondary)
+	SLIB_PROPERTY(AtomicFunction<void(Slider*, float)>, OnChangeSecondary)
 
 protected:
 	AtomicRef<Drawable> m_thumb;

@@ -284,29 +284,29 @@ public:
 public:
 	SLIB_PROPERTY(AtomicPtr<IWindowListener>, EventListener)
 	
-	SLIB_PROPERTY(AtomicFunction<void()>, OnCreate)
+	SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnCreate)
 	
-	SLIB_PROPERTY(AtomicFunction<void()>, OnCreateFailed)
+	SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnCreateFailed)
 	
-	SLIB_PROPERTY(AtomicFunction<void(UIEvent*)>, OnClose)
+	SLIB_PROPERTY(AtomicFunction<void(Window*, UIEvent*)>, OnClose)
 	
-	SLIB_PROPERTY(AtomicFunction<void()>, OnActivate)
+	SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnActivate)
 	
-	SLIB_PROPERTY(AtomicFunction<void()>, OnDeactivate)
+	SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnDeactivate)
 	
-	SLIB_PROPERTY(AtomicFunction<void()>, OnMove)
+	SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnMove)
 	
-	SLIB_PROPERTY(AtomicFunction<void(UISize&)>, OnResizing)
+	SLIB_PROPERTY(AtomicFunction<void(Window*, UISize&)>, OnResizing)
 	
-	SLIB_PROPERTY(AtomicFunction<void(sl_ui_len, sl_ui_len)>, OnResize)
+	SLIB_PROPERTY(AtomicFunction<void(Window*, sl_ui_len, sl_ui_len)>, OnResize)
 	
-	SLIB_PROPERTY(AtomicFunction<void()>, OnMinimize)
+	SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnMinimize)
 	
-	SLIB_PROPERTY(AtomicFunction<void()>, OnDeminimize)
+	SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnDeminimize)
 	
-	SLIB_PROPERTY(AtomicFunction<void()>, OnMaximize)
+	SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnMaximize)
 	
-	SLIB_PROPERTY(AtomicFunction<void()>, OnDemaximize)
+	SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnDemaximize)
 
 protected:
 	virtual void onCreate();

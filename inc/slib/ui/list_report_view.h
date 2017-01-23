@@ -89,13 +89,13 @@ public:
 public:
 	SLIB_PROPERTY(AtomicPtr<IListReportViewListener>, Listener)
 	
-	SLIB_PROPERTY(Function<void(sl_uint32)>, OnSelectRow)
+	SLIB_PROPERTY(Function<void(ListReportView*, sl_uint32)>, OnSelectRow)
 	
-	SLIB_PROPERTY(Function<void(sl_uint32, const UIPoint&)>, OnClickRow)
+	SLIB_PROPERTY(Function<void(ListReportView*, sl_uint32, const UIPoint&)>, OnClickRow)
 	
-	SLIB_PROPERTY(Function<void(sl_uint32, const UIPoint&)>, OnRightButtonClickRow)
+	SLIB_PROPERTY(Function<void(ListReportView*, sl_uint32, const UIPoint&)>, OnRightButtonClickRow)
 	
-	SLIB_PROPERTY(Function<void(sl_uint32, const UIPoint&)>, OnDoubleClickRow)
+	SLIB_PROPERTY(Function<void(ListReportView*, sl_uint32, const UIPoint&)>, OnDoubleClickRow)
 	
 protected:
 	virtual void onSelectRow(sl_uint32 row);
