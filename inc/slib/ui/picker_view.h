@@ -6,7 +6,6 @@
 #include "view.h"
 
 #include "../core/time.h"
-#include "../core/dispatch.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -101,7 +100,7 @@ private:
 	
 	void _stopFlow();
 	
-	void _timerCallback();
+	void _animationCallback();
 	
 	
 	void _getSelectedIndex_NW();
@@ -131,7 +130,6 @@ protected:
 	sl_real m_speedFlow;
 	sl_real m_speedBefore;
 	Time m_timeCallbackBefore;
-	Ref<Timer> m_timer;
 	
 };
 

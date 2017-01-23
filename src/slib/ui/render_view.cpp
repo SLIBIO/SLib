@@ -105,9 +105,18 @@ sl_bool RenderView::isDrawingThread()
 	return Thread::getCurrentThreadUniqueId() == m_lastRenderingThreadId;
 }
 
-void RenderView::post(const Function<void()>& callback)
+void RenderView::dispatchToDrawingThread(const Function<void()>& callback, sl_uint32 delayMillis)
 {
 	m_queuePostedCallbacks.push(callback);
+}
+
+void RenderView::runOnDrawingThread(const Function<void()>& callback)
+{
+	if (Thread::getCurrentThreadUniqueId() == m_lastRenderingThreadId) {
+		callback();
+	} else {
+		m_queuePostedCallbacks.push(callback);
+	}
 }
 
 sl_bool RenderView::isDebugTextVisible()

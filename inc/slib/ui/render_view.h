@@ -38,8 +38,10 @@ public:
 	sl_bool isDrawingThread();
 	
 	// override
-	void post(const Function<void()>& callback);
+	void dispatchToDrawingThread(const Function<void()>& callback, sl_uint32 delayMillis = 0);
 	
+	// override
+	void runOnDrawingThread(const Function<void()>& callback);
 	
 	sl_bool isDebugTextVisible();
 	

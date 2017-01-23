@@ -35,9 +35,7 @@ TabView::TabView()
 	m_labelMarginTop = 0;
 	m_labelMarginRight = 0;
 	m_labelMarginBottom = 0;
-	
-	setOccurringClick(sl_true);
-	
+		
 }
 
 sl_uint32 TabView::getTabsCount()

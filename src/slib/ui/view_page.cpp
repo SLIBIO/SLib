@@ -310,7 +310,7 @@ void ViewPager::goToPageAt(sl_size index, const Transition& transition)
 	if (isDrawingThread() && m_countActiveTransitions == 0) {
 		_goTo(index, transition);
 	} else {
-		post(SLIB_BIND_WEAKREF(void(), ViewPager, _goTo, this, index, transition));
+		dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPager, _goTo, this, index, transition));
 	}
 }
 
@@ -456,7 +456,7 @@ void ViewPager::push(const Ref<View>& viewIn, const Transition& transition, sl_b
 	if (isDrawingThread() && m_countActiveTransitions == 0) {
 		_push(viewIn, transition, flagRemoveAllBackPages);
 	} else {
-		post(SLIB_BIND_WEAKREF(void(), ViewPager, _push, this, viewIn, transition, flagRemoveAllBackPages));
+		dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPager, _push, this, viewIn, transition, flagRemoveAllBackPages));
 	}
 }
 
@@ -560,7 +560,7 @@ void ViewPager::pop(const Ref<View>& viewOut, const Transition& transition)
 	if (isDrawingThread() && m_countActiveTransitions == 0) {
 		_pop(viewOut, transition);
 	} else {
-		post(SLIB_BIND_WEAKREF(void(), ViewPager, _pop, this, viewOut, transition));
+		dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPager, _pop, this, viewOut, transition));
 	}
 }
 
@@ -868,7 +868,7 @@ void ViewPage::close(const Transition& transition)
 		if (isDrawingThread() && m_countActiveTransitions == 0) {
 			_closePopup(transition);
 		} else {
-			post(SLIB_BIND_WEAKREF(void(), ViewPage, _closePopup, this, transition));
+			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPage, _closePopup, this, transition));
 		}
 	} else {
 		Ref<ViewPager> pager = getPager();
@@ -1230,7 +1230,7 @@ void ViewPage::popup(const Ref<View>& parent, const Transition& transition, sl_b
 	if (isDrawingThread() && m_countActiveTransitions == 0) {
 		_openPopup(parent, transition, flagFillParentBackground);
 	} else {
-		post(SLIB_BIND_WEAKREF(void(), ViewPage, _openPopup, this, parent, transition, flagFillParentBackground));
+		dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPage, _openPopup, this, parent, transition, flagFillParentBackground));
 	}
 	m_flagDidPopup = sl_true;
 	m_flagClosingPopup = sl_false;

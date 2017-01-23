@@ -256,10 +256,6 @@ public:
 	
 	virtual void setHoverState(sl_bool flagState, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	sl_bool isOccurringClick();
-	
-	void setOccurringClick(sl_bool flag);
-	
 	
 	Ref<Cursor> getCursor();
 	
@@ -990,9 +986,9 @@ public:
 	
 	virtual sl_bool isDrawingThread();
 	
-	virtual void post(const Function<void()>& callback);
+	virtual void dispatchToDrawingThread(const Function<void()>& callback, sl_uint32 delayMillis = 0);
 	
-	void runOnDrawingThread(const Function<void()>& callback);
+	virtual void runOnDrawingThread(const Function<void()>& callback);
 
 public:
 	Ptr<IViewListener> getEventListener();
@@ -1237,7 +1233,6 @@ private:
 	sl_bool m_flagFocused;
 	sl_bool m_flagPressed;
 	sl_bool m_flagHover;
-	sl_bool m_flagOccurringClick;
 	
 	sl_bool m_flagCurrentDrawing;
 	UIRect m_rectCurrentDrawing;

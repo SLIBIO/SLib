@@ -14,7 +14,6 @@ LabelView::LabelView()
 	
 	m_textAlignment = Alignment::Left;
 	m_textColor = Color::Black;
-	setOccurringClick(sl_true);
 	
 }
 

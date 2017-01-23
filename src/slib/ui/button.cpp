@@ -118,7 +118,6 @@ Button::Button(sl_uint32 nCategories, ButtonCategory* categories)
 		}
 	}
 	
-	setOccurringClick(sl_true);
 	setUsingFont(sl_true);
 	
 	setBorder(Pen::create(PenStyle::Solid, 1, Color(100, 100, 100)), UIUpdateMode::Init);

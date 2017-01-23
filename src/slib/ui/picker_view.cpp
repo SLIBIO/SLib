@@ -255,11 +255,7 @@ void PickerView::onDraw(Canvas* canvas)
 	
 	Color c = m_textColor;
 	c.a /= 2;
-	/*
-	Ref<Pen> pen = Pen::createSolidPen(1, c);
-	canvas->drawLine(rect.left, yStart + lineHeight * nLinesHalf, rect.right, yStart + lineHeight * nLinesHalf, pen);
-	canvas->drawLine(rect.left, yStart + lineHeight * nLinesHalf + lineHeight, rect.right, yStart + lineHeight * nLinesHalf + lineHeight, pen);
-	*/
+
 }
 
 void PickerView::onMouseEvent(UIEvent* ev)
@@ -267,7 +263,7 @@ void PickerView::onMouseEvent(UIEvent* ev)
 	UIAction action = ev->getAction();
 	Point pt = ev->getPoint();
 
-	Time time = Time::now();
+	Time time = ev->getTime();
 	sl_real y = pt.y;
 
 	if (action == UIAction::LeftButtonDown || action == UIAction::TouchBegin) {
@@ -386,38 +382,30 @@ void PickerView::_flow(sl_ui_pos offset)
 	}
 }
 
+#define ANIMATE_FRAME_MS 10
+
 void PickerView::_startFlow(sl_real speed)
 {
 	m_speedFlow = speed;
-	ObjectLocker lock(this);
-	if (m_timer.isNull()) {
-		m_timeCallbackBefore.setZero();
-		m_timer = Dispatch::addTimer(SLIB_FUNCTION_WEAKREF(PickerView, _timerCallback, this), 10);
-	}
+	
+	m_timeCallbackBefore = Time::now();
+	dispatchToDrawingThread(SLIB_FUNCTION_WEAKREF(PickerView, _animationCallback, this), ANIMATE_FRAME_MS);
+	
 }
 
 void PickerView::_stopFlow()
 {
-	ObjectLocker lock(this);
-	if (m_timer.isNotNull()) {
-		m_timer->stop();
-		Dispatch::removeTimer(m_timer);
-		m_timer.setNull();
-	}
+	m_speedFlow = 0;
 }
 
-void PickerView::_timerCallback()
+void PickerView::_animationCallback()
 {
-	ObjectLocker lock(this);
-	if (m_timer.isNull()) {
-		return;
-	}
 	Time time = Time::now();
 	if (m_timeCallbackBefore.isZero()) {
 		m_timeCallbackBefore = time;
-		return;
 	}
-	float T = UIResource::getScreenMinimum() / 2000.0f;
+	
+	float T = UIResource::getScreenMinimum() / SLIB_IF_PLATFORM_IS_MOBILE(2000.0f, 4000.0f);
 	if (Math::abs(m_speedFlow) <= T) {
 		if (Math::abs(m_yOffset) >= T) {
 			if (m_yOffset > 0) {
@@ -429,21 +417,28 @@ void PickerView::_timerCallback()
 			if (Math::abs(f) > Math::abs(m_yOffset)) {
 				_stopFlow();
 				m_yOffset = 0;
-				m_speedFlow = 0;
+				invalidate();
+				return;
 			} else {
 				_flow(f);
 			}
 		} else {
 			_stopFlow();
 			m_yOffset = 0;
-			m_speedFlow = 0;
+			invalidate();
+			return;
 		}
 	} else {
 		_flow((sl_ui_pos)(m_speedFlow * (time - m_timeCallbackBefore).getMillisecondsCountf()));
 	}
+	
 	invalidate();
+	
 	m_speedFlow *= 0.97f;
 	m_timeCallbackBefore = time;
+	
+	dispatchToDrawingThread(SLIB_FUNCTION_WEAKREF(PickerView, _animationCallback, this), ANIMATE_FRAME_MS);
+	
 }
 
 #if !(defined(SLIB_PLATFORM_IS_IOS))

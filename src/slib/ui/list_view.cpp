@@ -37,8 +37,6 @@ ListView::ListView()
 {
 	SLIB_REFERABLE_CONSTRUCTOR
 	
-	ScrollView::setOccurringClick(sl_false);
-
 	m_lockCountLayouting = 0;
 	
 	m_flagResetAdapter = sl_true;
@@ -99,12 +97,12 @@ void ListView::onScroll(sl_scroll_pos _x, sl_scroll_pos _y)
 	if (Math::isAlmostZero(y - m_lastScrollY)) {
 		return;
 	}
-	post(SLIB_BIND_WEAKREF(void(), ListView, _layoutItemViews, this, sl_false, sl_true, sl_false));
+	dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ListView, _layoutItemViews, this, sl_false, sl_true, sl_false));
 }
 
 void ListView::onResize(sl_ui_len x, sl_ui_len y)
 {
-	post(SLIB_BIND_WEAKREF(void(), ListView, _layoutItemViews, this, sl_false, sl_false, sl_true));
+	dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ListView, _layoutItemViews, this, sl_false, sl_false, sl_true));
 }
 
 void ListView::_checkUpdateContent(sl_bool fromDraw)
@@ -801,7 +799,7 @@ void _ListContentView::onResizeChild(View* child, sl_ui_len width, sl_ui_len hei
 	Ref<ListView> lv = m_lv;
 	if (lv.isNotNull()) {
 		if (lv->m_lockCountLayouting == 0) {
-			post(SLIB_BIND_WEAKREF(void(), ListView, _layoutItemViews, lv.get(), sl_false, sl_false, sl_false));
+			dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ListView, _layoutItemViews, lv.get(), sl_false, sl_false, sl_false));
 		}
 	}
 }

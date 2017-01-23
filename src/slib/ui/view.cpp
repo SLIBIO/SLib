@@ -45,7 +45,6 @@ View::View()
 	m_flagFocused = sl_false;
 	m_flagPressed = sl_false;
 	m_flagHover = sl_false;
-	m_flagOccurringClick = sl_false;
 	
 	m_flagCurrentDrawing = sl_false;
 
@@ -1401,16 +1400,6 @@ void View::setHoverState(sl_bool flagState, UIUpdateMode mode)
 	}
 }
 
-sl_bool View::isOccurringClick()
-{
-	return m_flagOccurringClick;
-}
-
-void View::setOccurringClick(sl_bool flag)
-{
-	m_flagOccurringClick = flag;
-}
-
 Ref<Cursor> View::getCursor()
 {
 	return m_cursor;
@@ -2256,7 +2245,7 @@ void View::measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 
 void View::_requestMakeLayout()
 {
-	post(SLIB_BIND_WEAKREF(void(), View, _makeLayout, this, sl_false));
+	dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, _makeLayout, this, sl_false));
 }
 
 void View::_requestInvalidateLayout(UIUpdateMode mode)
@@ -6187,29 +6176,43 @@ void View::runAfterDraw(const Function<void()>& callback, sl_bool flagInvalidate
 
 sl_bool View::isDrawingThread()
 {
-	Ref<View> parent = m_parent;
-	if (parent.isNotNull()) {
-		return parent->isDrawingThread();
+	if (isInstance()) {
+		return UI::isUiThread();
+	} else {
+		Ref<View> parent = m_parent;
+		if (parent.isNotNull()) {
+			return parent->isDrawingThread();
+		} else {
+			return UI::isUiThread();
+		}
 	}
-	return UI::isUiThread();
 }
 
-void View::post(const Function<void()>& callback)
+void View::dispatchToDrawingThread(const Function<void()>& callback, sl_uint32 delayMillis)
 {
-	Ref<View> parent = m_parent;
-	if (parent.isNotNull()) {
-		parent->post(callback);
+	if (isInstance()) {
+		UI::dispatchToUiThread(callback, delayMillis);
 	} else {
-		UI::dispatchToUiThread(callback);
+		Ref<View> parent = m_parent;
+		if (parent.isNotNull()) {
+			parent->dispatchToDrawingThread(callback, delayMillis);
+		} else {
+			UI::dispatchToUiThread(callback, delayMillis);
+		}
 	}
 }
 
 void View::runOnDrawingThread(const Function<void()>& callback)
 {
-	if (isDrawingThread()) {
-		callback();
+	if (isInstance()) {
+		UI::runOnUiThread(callback);
 	} else {
-		post(callback);
+		Ref<View> parent = m_parent;
+		if (parent.isNotNull()) {
+			parent->runOnDrawingThread(callback);
+		} else {
+			UI::runOnUiThread(callback);
+		}
 	}
 }
 
@@ -7437,18 +7440,13 @@ void View::_processEventForStateAndClick(UIEvent* ev)
 		case UIAction::LeftButtonDown:
 		case UIAction::TouchBegin:
 			setPressedState(sl_true);
-			if (m_flagOccurringClick) {
-				ev->stopPropagation();
-			}
 			break;
 		case UIAction::LeftButtonUp:
 		case UIAction::TouchEnd:
 			if (isPressedState()) {
 				setPressedState(sl_false);
-				if (m_flagOccurringClick) {
-					if (getBounds().containsPoint(ev->getPoint())) {
-						dispatchClick(ev);
-					}
+				if (getBounds().containsPoint(ev->getPoint())) {
+					dispatchClick(ev);
 				}
 			}
 			break;
