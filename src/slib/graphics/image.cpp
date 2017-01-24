@@ -490,7 +490,7 @@ public:
 		if (p.flagBox) {
 			s = 1 - f;
 			e = f + p.filterSize; // p.filterSize > 1
-			n = (int)(e - 0.001f);
+			n = (int)(e - 0.0001);
 			e -= (float)n;
 			n -= 1;
 			area = p.filterSize;
@@ -667,12 +667,11 @@ public:
 		colorsDst = dst.colors;
 		colorsSrc = src.colors;
 		for (dy = 0; dy < dh; dy++) {
-			sx = sx_start;
 			for (dx = dx_start; dx < dx_end; dx++) {
+				sx = sx_start + (float)(dx) * sx_step;
 				isx = (sl_int32)sx;
 				FILTER::getColorAtX(color, colorsSrc + isx, sx - (float)isx, px);
 				BLEND_OP::blend(colorsDst[dx], color);
-				sx += sx_step;
 			}
 			colorsDst += dst.stride;
 			colorsSrc += src.stride;
@@ -714,8 +713,8 @@ public:
 		
 		colorsDst = dst.colors + dy_start * dst.stride;
 		colorsSrc = src.colors;
-		sy = sy_start;
 		for (dy = dy_start; dy < dy_end; dy++) {
+			sy = sy_start + (float)(dy) * sy_step;
 			isy = (sl_int32)sy;
 			float fsy = sy - (float)isy;
 			const Color* lineSrc = colorsSrc + (sl_uint32)isy * src.stride;
@@ -724,7 +723,6 @@ public:
 				BLEND_OP::blend(colorsDst[dx], color);
 			}
 			colorsDst += dst.stride;
-			sy += sy_step;
 		}
 	}
 	
@@ -762,8 +760,8 @@ public:
 			}
 		}
 		
-		sx = sx_start;
 		for (dx = dx_start; dx < dx_end; dx++) {
+			sx = sx_start + (float)(dx) * sx_step;
 			isx = (sl_int32)sx;
 			FILTER::getColorAtX(color, src.colors + isx, sx - (float)isx, px);
 			colorsDst = dst.colors + dx;
@@ -771,7 +769,6 @@ public:
 				BLEND_OP::blend(*(colorsDst), color);
 				colorsDst += dst.stride;
 			}
-			sx += sx_step;
 		}
 	}
 	
@@ -808,8 +805,8 @@ public:
 		}
 		
 		colorsDst = dst.colors + dy_start * dst.stride;
-		sy = sy_start;
 		for (dy = dy_start; dy < dy_end; dy++) {
+			sy = sy_start + (float)(dy) * sy_step;
 			isy = (sl_int32)sy;
 			float fsy = sy - (float)isy;
 			FILTER::getColorAtY(color, src.colors + isy * src.stride, fsy, src.stride, py);
@@ -817,7 +814,6 @@ public:
 				BLEND_OP::blend(colorsDst[dx], color);
 			}
 			colorsDst += dst.stride;
-			sy += sy_step;
 		}
 	}
 	
@@ -876,65 +872,59 @@ public:
 			// top
 			colorsDst = dst.colors;
 			colorsSrc = src.colors;
-			sx = sx_start;
 			for (dx = dx_start; dx < dx_end; dx++) {
+				sx = sx_start + (float)(dx) * sx_step;
 				isx = (sl_int32)sx;
 				FILTER::getColorAtX(color, colorsSrc + isx, sx - (float)isx, px);
 				BLEND_OP::blend(colorsDst[dx], color);
-				sx += sx_step;
 			}
 			// bottom
 			colorsDst = dst.colors + (dh - 1) * dst.stride;
 			colorsSrc = src.colors + (sh - 1) * src.stride;
-			sx = sx_start;
 			for (dx = dx_start; dx < dx_end; dx++) {
+				sx = sx_start + (float)(dx) * sx_step;
 				isx = (sl_int32)sx;
 				FILTER::getColorAtX(color, colorsSrc + isx, sx - (float)isx, px);
 				BLEND_OP::blend(colorsDst[dx], color);
-				sx += sx_step;
 			}
 		}
 		if (dx_start) {
 			// left
 			colorsDst = dst.colors + dy_start * dst.stride;
 			colorsSrc = src.colors;
-			sy = sy_start;
 			for (dy = dy_start; dy < dy_end; dy++) {
+				sy = sy_start + (float)(dy) * sy_step;
 				isy = (sl_int32)sy;
 				FILTER::getColorAtY(color, colorsSrc + isy * src.stride, sy - (float)isy, src.stride, py);
 				BLEND_OP::blend(*colorsDst, color);
 				colorsDst += dst.stride;
-				sy += sy_step;
 			}
 			// right
 			colorsDst = dst.colors + (dy_start * dst.stride + dw - 1);
 			colorsSrc = src.colors + (sw - 1);
-			sy = sy_start;
 			for (dy = dy_start; dy < dy_end; dy++) {
+				sy = sy_start + (float)(dy) * sy_step;
 				isy = (sl_int32)sy;
 				FILTER::getColorAtY(color, colorsSrc + isy * src.stride, sy - (float)isy, src.stride, py);
 				BLEND_OP::blend(*colorsDst, color);
 				colorsDst += dst.stride;
-				sy += sy_step;
 			}
 		}
 		
 		colorsDst = dst.colors + dy_start * dst.stride;
 		colorsSrc = src.colors;
-		sy = sy_start;
 		for (dy = dy_start; dy < dy_end; dy++) {
+			sy = sy_start + (float)(dy) * sy_step;
 			isy = (sl_int32)sy;
 			float fsy = sy - (float)isy;
 			const Color* lineSrc = colorsSrc + isy * src.stride;
-			sx = sx_start;
 			for (dx = dx_start; dx < dx_end; dx++) {
+				sx = sx_start + (float)(dx) * sx_step;
 				isx = (sl_int32)sx;
 				FILTER::getColorAt(color, lineSrc + isx, sx - (float)isx, fsy, src.stride, px, py);
 				BLEND_OP::blend(colorsDst[dx], color);
-				sx += sx_step;
 			}
 			colorsDst += dst.stride;
-			sy += sy_step;
 		}
 	}
 };
