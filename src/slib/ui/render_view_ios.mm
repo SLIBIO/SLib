@@ -189,6 +189,9 @@ SLIB_UI_NAMESPACE_END
 @implementation _Slib_iOS_GLView
 -(void)_init
 {
+	self.drawableColorFormat = GLKViewDrawableColorFormatRGBA8888;
+	self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
+	
 	m_flagRenderingContinuously = sl_false;
 	m_flagRequestRender = sl_true;
 	m_thread = slib::Thread::start(slib::Function<void()>::bind(&(slib::_iOS_GLCallback), self));

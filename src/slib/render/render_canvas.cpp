@@ -199,7 +199,7 @@ public:
 							bufFBContent.add(String::format(SLIB_STRINGIFY(
 							else {
 								lenClip%d = sqrt(lenClip%d);
-								l_Color.w *= smoothstep(0.0, 2.0/sqrt(wClip%d * hClip%d), 1.0-lenClip%d);
+								l_Color.w *= smoothstep(0.0, 1.5/sqrt(wClip%d * hClip%d), 1.0-lenClip%d);
 							}), i));
 						}
 					}
