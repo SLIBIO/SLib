@@ -165,20 +165,24 @@ Variant _Json_Parser<ST, CT>::parseJson()
 					return sl_null;
 				}
 				list.addListElement(item);
+                escapeSpaceAndComments();
+                if (pos == len) {
+                    flagError = sl_true;
+                    errorMessage = "Array: Missing character ] ";
+                    return sl_null;
+                }
+                ch = buf[pos];
 			}
-			if (pos == len) {
-				flagError = sl_true;
-				errorMessage = "Array: Missing character ] ";
-				return sl_null;
-			}
-			ch = buf[pos];
 			if (ch == ']') {
 				pos++;
 				return list;
-			}
-			if (ch == ',') {
+			} else if (ch == ',') {
 				pos++;
-			}
+            } else {
+                flagError = sl_true;
+                errorMessage = "Array: Missing character ] ";
+                return sl_null;
+            }
 			escapeSpaceAndComments();
 			if (pos == len) {
 				flagError = sl_true;
