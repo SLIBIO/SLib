@@ -22,6 +22,7 @@
 	AVPlayerItem* mAudioItem;
 	slib::Mutex mLock;
 	slib::WeakRef<slib::AudioPlayerControl> mControl;
+	slib::AudioPlayerOpenParam mParam;
 }
 
 -(void) setStatus:(AVPlayerStatus) status;
@@ -35,15 +36,16 @@
 @end
 
 @implementation _iOS_AVPlayer_Observer
--(id) initWithURL:(NSString *)url control:(slib::AudioPlayerControl*) control
+-(id) initWithParam:(slib::AudioPlayerOpenParam)param control:(slib::AudioPlayerControl*) control
 {
 	self = [super init];
 	mStatus = AVPlayerStatusUnknown;
 	mIsPlaying = sl_false;
 	
-	NSURL* _url = [NSURL URLWithString:url];
+	NSURL* _url = [NSURL URLWithString: slib::Apple::getNSStringFromString(param.url)];
 	mAudioItem = [AVPlayerItem playerItemWithURL:_url];
 	mAudioPlayer = [AVPlayer playerWithPlayerItem:mAudioItem];
+	[mAudioPlayer setAutomaticallyWaitsToMinimizeStalling:false];
 	
 	if (mAudioPlayer != nil) {
 		[mAudioPlayer addObserver:self forKeyPath:@"status" options:0 context:nil];
@@ -54,6 +56,7 @@
 	}
 	
 	mControl = control;
+	mParam = param;
 	
 	return self;
 }
@@ -131,6 +134,11 @@
 			if (mIsPlaying) {
 				[mAudioPlayer play];
 			}
+			
+			if (mParam.onReadyToPlay.isNotNull()) {
+				slib::Ref<slib::AudioPlayerControl> control = mControl;
+				mParam.onReadyToPlay(control.get());
+			}
 		} else if (mStatus == AVPlayerStatusUnknown) {
 			mIsPlaying = false;
 		}
@@ -157,14 +165,16 @@ public:
 	{
 	}
 	
-	_iOS_AudioPlayerControl(const String& url)
+	_iOS_AudioPlayerControl(const AudioPlayerOpenParam& param)
 	{
 		SLIB_REFERABLE_CONSTRUCTOR
-		mAVObserver = [[_iOS_AVPlayer_Observer alloc] initWithURL:Apple::getNSStringFromString(url) control:this];
-	}
-	
-	_iOS_AudioPlayerControl(const Memory& data)
-	{
+		mOpenParam = param;
+		
+		if (param.data.isNotNull() && param.data.getSize() > 0) {
+			
+		} else if (param.url.isNotNull() && param.url.getLength() > 0) {
+			mAVObserver = [[_iOS_AVPlayer_Observer alloc] initWithParam:mOpenParam control:this];
+		}
 	}
 	
 	~_iOS_AudioPlayerControl()
@@ -213,6 +223,7 @@ public:
 	
 private:
 	_iOS_AVPlayer_Observer* mAVObserver;
+	AudioPlayerOpenParam mOpenParam;
 };
 
 
@@ -536,21 +547,15 @@ List<AudioPlayerInfo> AudioPlayer::getPlayersList()
 
 Ref<AudioPlayerControl> _iOS_AudioPlayer::_openNative(const AudioPlayerOpenParam& param)
 {
-	if (param.data.isNotNull() && param.data.getSize() > 0) {
-		Ref<AudioPlayerControl> ret = new _iOS_AudioPlayerControl(param.data);
-		if (param.flagAutoStart) {
-			ret->resume();
-		}
-		return ret;
-	} else if (param.url.isNotNull() && param.url.getLength() > 0) {
-		Ref<AudioPlayerControl> ret = new _iOS_AudioPlayerControl(param.url);
-		if (param.flagAutoStart) {
-			ret->resume();
-		}
-		return ret;
-	} else {
+	if (param.data.getSize() < 1 && param.url.getLength() < 1) {
 		return sl_null;
 	}
+	
+	Ref<AudioPlayerControl> ret = new _iOS_AudioPlayerControl(param);
+	if (param.flagAutoStart) {
+		ret->resume();
+	}
+	return ret;
 }
 
 SLIB_MEDIA_NAMESPACE_END

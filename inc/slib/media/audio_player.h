@@ -12,6 +12,7 @@
 #include "../core/string.h"
 #include "../core/memory.h"
 #include "../core/ptr.h"
+#include "../core/function.h"
 
 SLIB_MEDIA_NAMESPACE_BEGIN
 
@@ -53,6 +54,8 @@ public:
 	
 };
 
+class AudioPlayerControl;
+
 class SLIB_EXPORT AudioPlayerOpenParam
 {
 public:
@@ -61,6 +64,8 @@ public:
 	
 	sl_bool flagAutoStart;
 	sl_bool flagKeepReference;
+	
+	AtomicFunction<void(AudioPlayerControl*)> onReadyToPlay;
 	
 public:
 	AudioPlayerOpenParam();

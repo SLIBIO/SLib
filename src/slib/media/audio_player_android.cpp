@@ -46,16 +46,21 @@ public:
 	}
 
 public:
-	void init(const String& url)
+	void init(const AudioPlayerOpenParam& param)
 	{
-		JniLocal<jstring> _url = Jni::getJniString(url);
-		jobject jactivity = Android::getCurrentActivity();
-		if (jactivity) {
-			m_player = _JAndroidMedia::createMedia.callObject(sl_null, jactivity, _url.get(), (jlong)this);
-			_AndroidAudioPlayerControlMap* map = _AndroidAudioPlayerControls_get();
-			if (map) {
-				jlong instance = (jlong) this;
-				map->put(instance, this);
+		mOpenParam = param;
+		if (mOpenParam.data.isNotNull() && mOpenParam.data.getSize() > 0) {
+			
+		} else if (mOpenParam.url.isNotNull() && mOpenParam.url.getLength() > 0) {
+			JniLocal<jstring> _url = Jni::getJniString(mOpenParam.url);
+			jobject jactivity = Android::getCurrentActivity();
+			if (jactivity) {
+				m_player = _JAndroidMedia::createMedia.callObject(sl_null, jactivity, _url.get(), (jlong)this);
+				_AndroidAudioPlayerControlMap* map = _AndroidAudioPlayerControls_get();
+				if (map) {
+					jlong instance = (jlong) this;
+					map->put(instance, this);
+				}
 			}
 		}
 	}
@@ -129,6 +134,10 @@ public:
 		if (isStartedBeforePrepared) {
 			resume();
 		}
+
+		if (mOpenParam.onReadyToPlay.isNotNull()) {
+			mOpenParam.onReadyToPlay(this);
+		}
 	}
 
 	void onCompleted()
@@ -140,6 +149,7 @@ private:
 	AtomicJniGlobal<jobject> m_player;
 	sl_bool isPrepared;
 	sl_bool isStartedBeforePrepared;
+	AudioPlayerOpenParam mOpenParam;
 };
 
 class _Android_AudioPlayer : public AudioPlayer
@@ -177,19 +187,18 @@ public:
 
 	Ref<AudioPlayerControl> _openNative(const AudioPlayerOpenParam& param)
 	{
+		if (param.data.getSize() < 1 && param.url.getLength() < 1) {
+			return sl_null;
+		}
+		
 		Ref<_Android_AudioPlayerControl> ret = new _Android_AudioPlayerControl;
 		if (ret.isNotNull()) {
-			if (param.data.isNotNull() && param.data.getSize() > 0) {
-				ret->init(param.data);
-			} else if (param.url.isNotNull() && param.url.getLength() > 0) {
-				ret->init(param.url);
-			}
+			ret->init(param);
 			if (param.flagAutoStart) {
 				ret->resume();
 			}
-			return ret;
 		}
-		return sl_null;
+		return ret;
 	}
 
 };
