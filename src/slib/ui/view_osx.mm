@@ -713,8 +713,15 @@ SLIB_UI_NAMESPACE_END
 	m_trackingArea = [[NSTrackingArea alloc] initWithRect:rc options: (NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved | NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect) owner:self userInfo:nil];
 	if (m_trackingArea != nil) {
 		[self addTrackingArea:m_trackingArea];
+		NSPoint mouseLocation = [[self window] mouseLocationOutsideOfEventStream];
+		mouseLocation = [self convertPoint: mouseLocation fromView: nil];
+		if (NSPointInRect(mouseLocation, [self bounds])) {
+			[self mouseEntered: nil];
+		} else {
+			[self mouseExited: nil];
+		}
 	}
-	//[super updateTrackingAreas];
+	[super updateTrackingAreas];
 }
 
 - (BOOL)acceptsFirstResponder

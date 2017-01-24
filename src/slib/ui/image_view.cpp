@@ -30,6 +30,12 @@ Ref<Drawable> ImageView::getSource()
 void ImageView::setSource(const Ref<Drawable>& source, UIUpdateMode mode)
 {
 	m_source = source;
+	if (source.isNotNull()) {
+		sl_real h = source->getDrawableHeight();
+		if (h > 0.0000001) {
+			setAspectRatio(source->getDrawableWidth() / h, mode);
+		}
+	}
 	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
@@ -74,18 +80,10 @@ void ImageView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 	Ref<Drawable> source = m_source;
 	if (source.isNotNull()) {
 		if (flagHorizontal) {
-			if (isHeightWrapping()) {
-				setMeasuredWidth((sl_ui_len)(source->getDrawableWidth()));
-			} else {
-				setMeasuredHeight((sl_ui_len)(getLayoutFrame().getHeight() * source->getDrawableWidth() / source->getDrawableHeight()));
-			}
+			setMeasuredWidth((sl_ui_len)(source->getDrawableWidth()));
 		}
 		if (flagVertical) {
-			if (isWidthWrapping()) {
-				setMeasuredHeight((sl_ui_len)(source->getDrawableHeight()));
-			} else {
-				setMeasuredHeight((sl_ui_len)(getLayoutFrame().getWidth() * source->getDrawableHeight() / source->getDrawableWidth()));
-			}
+			setMeasuredHeight((sl_ui_len)(source->getDrawableHeight()));
 		}
 	}
 }

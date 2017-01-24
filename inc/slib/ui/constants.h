@@ -264,6 +264,13 @@ enum class PositionMode
 	CenterInOther = 5
 };
 
+enum class AspectRatioMode
+{
+	None = 0,
+	AdjustWidth = 1,
+	AdjustHeight = 2
+};
+
 class DialogResult
 {
 public:

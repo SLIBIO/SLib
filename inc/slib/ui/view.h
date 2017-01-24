@@ -441,6 +441,32 @@ public:
 	
 	void setAlignCenterVertical(const Ref<View>& view, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
+	
+	sl_ui_len getMinimumWidth();
+	
+	void setMinimumWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::Redraw);
+	
+	sl_ui_len getMaximumWidth();
+	
+	void setMaximumWidth(sl_ui_len width, UIUpdateMode mode = UIUpdateMode::Redraw);
+	
+	sl_ui_len getMinimumHeight();
+	
+	void setMinimumHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
+	
+	sl_ui_len getMaximumHeight();
+	
+	void setMaximumHeight(sl_ui_len height, UIUpdateMode mode = UIUpdateMode::Redraw);
+	
+	AspectRatioMode getAspectRatioMode();
+	
+	void setAspectRatioMode(AspectRatioMode aspectRatioMode, UIUpdateMode updateMode = UIUpdateMode::Redraw);
+	
+	sl_real getAspectRatio();
+	
+	void setAspectRatio(sl_real ratio, UIUpdateMode mode = UIUpdateMode::Redraw);
+	
+	
 	sl_ui_pos getMarginLeft();
 	
 	void setMarginLeft(sl_ui_pos margin, UIUpdateMode mode = UIUpdateMode::Redraw);
@@ -1281,6 +1307,14 @@ protected:
 		AtomicWeakRef<View> topReferingView;
 		AtomicWeakRef<View> rightReferingView;
 		AtomicWeakRef<View> bottomReferingView;
+		
+		sl_ui_len minWidth;
+		sl_ui_len maxWidth;
+		sl_ui_len minHeight;
+		sl_ui_len maxHeight;
+		
+		AspectRatioMode aspectRatioMode;
+		sl_real aspectRatio;
 		
 		sl_ui_len measuredWidth;
 		sl_ui_len measuredHeight;

@@ -70,6 +70,8 @@ View::~View()
 	detach();
 }
 
+#define DEFAULT_MAX_SIZE 0x3fffffff
+
 Ref<View::LayoutAttributes> View::_initializeLayoutAttibutes()
 {
 	Ref<LayoutAttributes> attrs = m_layoutAttributes;
@@ -90,6 +92,14 @@ Ref<View::LayoutAttributes> View::_initializeLayoutAttibutes()
 	attrs->topMode = PositionMode::Fixed;
 	attrs->rightMode = PositionMode::Fixed;
 	attrs->bottomMode = PositionMode::Fixed;
+	
+	attrs->minWidth = 0;
+	attrs->maxWidth = DEFAULT_MAX_SIZE;
+	attrs->minHeight = 0;
+	attrs->maxHeight = DEFAULT_MAX_SIZE;
+	
+	attrs->aspectRatioMode = AspectRatioMode::None;
+	attrs->aspectRatio = 1;
 	
 	attrs->measuredWidth = 0;
 	attrs->measuredHeight = 0;
@@ -1439,20 +1449,16 @@ void View::measureLayout()
 	} else if (heightMode == SizeMode::Fixed) {
 		measuredHeight = getHeight();
 	}
-	layoutAttrs->measuredWidth = measuredWidth;
-	layoutAttrs->measuredHeight = measuredHeight;
+	layoutAttrs->measuredWidth = Math::clamp(measuredWidth, layoutAttrs->minWidth, layoutAttrs->maxWidth);
+	layoutAttrs->measuredHeight = Math::clamp(measuredHeight, layoutAttrs->minHeight, layoutAttrs->maxHeight);
 	
 	if (flagHorizontal || flagVertical) {
 		onMeasureLayout(flagHorizontal, flagVertical);
 	}
 	
-	if (widthMode == SizeMode::Wrapping) {
-		measuredWidth = layoutAttrs->measuredWidth;
-	}
-	if (heightMode == SizeMode::Wrapping) {
-		measuredHeight = layoutAttrs->measuredHeight;
-	}
-	
+	layoutAttrs->measuredWidth = Math::clamp(layoutAttrs->measuredWidth, layoutAttrs->minWidth, layoutAttrs->maxWidth);
+	layoutAttrs->measuredHeight = Math::clamp(layoutAttrs->measuredHeight, layoutAttrs->minHeight, layoutAttrs->maxHeight);
+
 	layoutAttrs->flagInvalidMeasure = sl_false;
 
 }
@@ -1463,13 +1469,14 @@ sl_ui_len View::getMeasuredWidth()
 	if (layoutAttrs.isNotNull()) {
 		if (layoutAttrs->widthMode == SizeMode::Wrapping) {
 			return layoutAttrs->measuredWidth;
-		} else if (layoutAttrs->widthMode == SizeMode::Filling) {
-			return 0;
-		} else if (layoutAttrs->widthMode == SizeMode::Weight) {
-			return 0;
+		} else if (layoutAttrs->widthMode == SizeMode::Filling || layoutAttrs->widthMode == SizeMode::Weight) {
+			return layoutAttrs->minWidth;
+		} else {
+			return Math::max(getWidth(), layoutAttrs->minWidth);
 		}
+	} else {
+		return getWidth();
 	}
-	return getWidth();
 }
 
 void View::setMeasuredWidth(sl_ui_len width)
@@ -1486,13 +1493,14 @@ sl_ui_len View::getMeasuredHeight()
 	if (layoutAttrs.isNotNull()) {
 		if (layoutAttrs->heightMode == SizeMode::Wrapping) {
 			return layoutAttrs->measuredHeight;
-		} else if (layoutAttrs->heightMode == SizeMode::Filling) {
-			return 0;
-		} else if (layoutAttrs->heightMode == SizeMode::Weight) {
-			return 0;
+		} else if (layoutAttrs->heightMode == SizeMode::Filling || layoutAttrs->heightMode == SizeMode::Weight) {
+			return layoutAttrs->minHeight;
+		} else {
+			return Math::max(getHeight(), layoutAttrs->minHeight);
 		}
+	} else {
+		return getHeight();
 	}
-	return getHeight();
 }
 
 void View::setMeasuredHeight(sl_ui_len height)
@@ -1583,6 +1591,7 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 			width = frame.getWidth();
 			break;
 	}
+	
 	switch (heightMode) {
 		case SizeMode::Wrapping:
 			height = layoutAttrs->measuredHeight;
@@ -1595,12 +1604,17 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 			height = frame.getHeight();
 			break;
 	}
-	if (width < 0) {
-		width = 0;
+	
+	if (layoutAttrs->aspectRatioMode == AspectRatioMode::AdjustWidth) {
+		width = height * layoutAttrs->aspectRatio;
+	} else if (layoutAttrs->aspectRatioMode == AspectRatioMode::AdjustHeight) {
+		if (layoutAttrs->aspectRatio > 0.0000001f) {
+			height = width / layoutAttrs->aspectRatio;
+		}
 	}
-	if (height < 0) {
-		height = 0;
-	}
+	
+	width = Math::clamp(width, layoutAttrs->minWidth, layoutAttrs->maxWidth);
+	height = Math::clamp(height, layoutAttrs->minHeight, layoutAttrs->maxHeight);
 	
 	if (layoutAttrs->flagRelativeMarginLeft) {
 		layoutAttrs->marginLeft = (sl_ui_pos)((sl_real)parentWidth * layoutAttrs->relativeMarginLeftWeight);
@@ -2350,14 +2364,17 @@ UIRect View::getLayoutFrame()
 	return getFrame();
 }
 
-void View::setLayoutFrame(const UIRect& rect)
+void View::setLayoutFrame(const UIRect& _rect)
 {
 	Ref<LayoutAttributes> attrs = m_layoutAttributes;
 	if (attrs.isNotNull()) {
+		UIRect rect = _rect;
+		rect.right = rect.left + Math::clamp(rect.right - rect.left, attrs->minWidth, attrs->maxWidth);
+		rect.bottom = rect.top + Math::clamp(rect.bottom - rect.top, attrs->minHeight, attrs->maxHeight);
 		attrs->frame = rect;
 		attrs->flagUpdatedLayoutFrame = sl_true;
 	} else {
-		_setFrame(rect, UIUpdateMode::NoRedraw, sl_true);
+		_setFrame(_rect, UIUpdateMode::NoRedraw, sl_true);
 	}
 }
 
@@ -3086,6 +3103,129 @@ void View::setAlignCenterVertical(const Ref<View>& view, UIUpdateMode mode)
 		attrs->topMode = PositionMode::CenterInOther;
 		attrs->topReferingView = view;
 		requestParentLayout(mode);
+	}
+}
+
+sl_ui_len View::getMinimumWidth()
+{
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		return attrs->minWidth;
+	}
+	return 0;
+}
+
+void View::setMinimumWidth(sl_ui_len width, UIUpdateMode mode)
+{
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		if (width < 0) {
+			width = 0;
+		}
+		attrs->minWidth = width;
+		requestParentAndSelfLayout(mode);
+	}
+}
+
+sl_ui_len View::getMaximumWidth()
+{
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		return attrs->maxWidth;
+	}
+	return DEFAULT_MAX_SIZE;
+}
+
+void View::setMaximumWidth(sl_ui_len width, UIUpdateMode mode)
+{
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		if (width < 0) {
+			width = DEFAULT_MAX_SIZE;
+		}
+		attrs->maxWidth = width;
+		requestParentAndSelfLayout(mode);
+	}
+}
+
+sl_ui_len View::getMinimumHeight()
+{
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		return attrs->minHeight;
+	}
+	return 0;
+}
+
+void View::setMinimumHeight(sl_ui_len height, UIUpdateMode mode)
+{
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		if (height < 0) {
+			height = 0;
+		}
+		attrs->minHeight = height;
+		requestParentAndSelfLayout(mode);
+	}
+}
+
+sl_ui_len View::getMaximumHeight()
+{
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		return attrs->maxHeight;
+	}
+	return 0;
+}
+
+void View::setMaximumHeight(sl_ui_len height, UIUpdateMode mode)
+{
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		if (height < 0) {
+			height = DEFAULT_MAX_SIZE;
+		}
+		attrs->maxHeight = height;
+		requestParentAndSelfLayout(mode);
+	}
+}
+
+AspectRatioMode View::getAspectRatioMode()
+{
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		return attrs->aspectRatioMode;
+	}
+	return AspectRatioMode::None;
+}
+
+void View::setAspectRatioMode(AspectRatioMode aspectRatioMode, UIUpdateMode updateMode)
+{
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		attrs->aspectRatioMode = aspectRatioMode;
+		requestParentAndSelfLayout(updateMode);
+	}
+}
+
+sl_real View::getAspectRatio()
+{
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		return attrs->aspectRatio;
+	}
+	return 0;
+}
+
+void View::setAspectRatio(sl_real ratio, UIUpdateMode mode)
+{
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	if (attrs.isNotNull()) {
+		if (ratio < 0) {
+			ratio = 1;
+		}
+		attrs->aspectRatio = ratio;
+		requestParentAndSelfLayout(mode);
 	}
 }
 
