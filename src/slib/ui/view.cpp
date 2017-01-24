@@ -6390,6 +6390,40 @@ void View::setOnDraw(const Function<void(View*, Canvas*)>& callback)
 	}
 }
 
+Function<void(View*, Canvas*)> View::getOnPreDraw()
+{
+	Ref<EventAttributes> attrs = m_eventAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->preDraw;
+	}
+	return sl_null;
+}
+
+void View::setOnPreDraw(const Function<void(View*, Canvas*)>& callback)
+{
+	Ref<EventAttributes> attrs = _initializeEventAttributes();
+	if (attrs.isNotNull()) {
+		attrs->preDraw = callback;
+	}
+}
+
+Function<void(View*, Canvas*)> View::getOnPostDraw()
+{
+	Ref<EventAttributes> attrs = m_eventAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->postDraw;
+	}
+	return sl_null;
+}
+
+void View::setOnPostDraw(const Function<void(View*, Canvas*)>& callback)
+{
+	Ref<EventAttributes> attrs = _initializeEventAttributes();
+	if (attrs.isNotNull()) {
+		attrs->postDraw = callback;
+	}
+}
+
 Function<void(View*, UIEvent*)> View::getOnMouseEvent()
 {
 	Ref<EventAttributes> attrs = m_eventAttributes;
@@ -6566,6 +6600,7 @@ void View::dispatchDraw(Canvas* canvas)
 		Ref<DrawAttributes> drawAttrs = m_drawAttributes;
 		if (drawAttrs.isNotNull() && drawAttrs->flagPreDrawEnabled) {
 			onPreDraw(canvas);
+			getOnPreDraw()(this, canvas);
 		}
 		
 		draw(canvas);
@@ -6582,6 +6617,7 @@ void View::dispatchDraw(Canvas* canvas)
 			}
 			if (drawAttrs->flagPostDrawEnabled) {
 				onPostDraw(canvas);
+				getOnPostDraw()(this, canvas);
 			}
 		}
 		

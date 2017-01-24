@@ -1025,6 +1025,14 @@ public:
 	
 	void setOnDraw(const Function<void(View*, Canvas*)>& callback);
 	
+	Function<void(View*, Canvas*)> getOnPreDraw();
+	
+	void setOnPreDraw(const Function<void(View*, Canvas*)>& callback);
+	
+	Function<void(View*, Canvas*)> getOnPostDraw();
+	
+	void setOnPostDraw(const Function<void(View*, Canvas*)>& callback);
+
 	Function<void(View*, UIEvent*)> getOnMouseEvent();
 	
 	void setOnMouseEvent(const Function<void(View*, UIEvent*)>& callback);
@@ -1475,6 +1483,8 @@ protected:
 	public:
 		AtomicPtr<IViewListener> listener;
 		AtomicFunction<void(View*, Canvas*)> draw;
+		AtomicFunction<void(View*, Canvas*)> preDraw;
+		AtomicFunction<void(View*, Canvas*)> postDraw;
 		AtomicFunction<void(View*, UIEvent*)> mouse;
 		AtomicFunction<void(View*, UIEvent*)> touch;
 		AtomicFunction<void(View*, UIEvent*)> key;
