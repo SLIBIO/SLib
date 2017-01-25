@@ -117,7 +117,7 @@ void UI::dispatchToUiThread(const Function<void()>& callback, sl_uint32 delayMil
 	} else {
 		sl_reg ptr;
 		if (_UIDispatcher::addDelayedCallback(callback, ptr)) {
-			Dispatch::dispatch(Function<void()>::bind(&_Win32_PostMessage, SLIB_UI_MESSAGE_DISPATCH_DELAYED, 0, (LPARAM)ptr), delayMillis);
+			Dispatch::setTimeout(Function<void()>::bind(&_Win32_PostMessage, SLIB_UI_MESSAGE_DISPATCH_DELAYED, 0, (LPARAM)ptr), delayMillis);
 		}
 	}
 }

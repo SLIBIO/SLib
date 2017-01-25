@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		260272E61C81877F0079E2F2 /* asset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260272E51C81877F0079E2F2 /* asset.cpp */; };
+		2609E55A1E37E03A00CFBDBB /* timer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2609E5591E37E03A00CFBDBB /* timer.cpp */; };
 		260A402E1D2AAAD8009CFCE8 /* render_resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260A402D1D2AAAD8009CFCE8 /* render_resource.cpp */; };
 		260A40301D2AAAE3009CFCE8 /* ui_resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 260A402F1D2AAAE3009CFCE8 /* ui_resource.cpp */; };
 		262041271C8895C900AF48F2 /* array.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 262041261C8895C900AF48F2 /* array.cpp */; };
@@ -277,6 +278,7 @@
 
 /* Begin PBXFileReference section */
 		260272E51C81877F0079E2F2 /* asset.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = asset.cpp; sourceTree = "<group>"; };
+		2609E5591E37E03A00CFBDBB /* timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = timer.cpp; sourceTree = "<group>"; };
 		260A402D1D2AAAD8009CFCE8 /* render_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_resource.cpp; sourceTree = "<group>"; };
 		260A402F1D2AAAE3009CFCE8 /* ui_resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ui_resource.cpp; sourceTree = "<group>"; };
 		262041261C8895C900AF48F2 /* array.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = array.cpp; sourceTree = "<group>"; };
@@ -905,6 +907,7 @@
 				A25F2FBD1B03A33700854DAF /* thread_apple.mm */,
 				26599DB91BEA5DD2008659BB /* thread_pool.cpp */,
 				A25F2FC01B03A33700854DAF /* time.cpp */,
+				2609E5591E37E03A00CFBDBB /* timer.cpp */,
 				A25F2FC11B03A33700854DAF /* variant.cpp */,
 				2640BC381CAA65EF004AA780 /* xml.cpp */,
 			);
@@ -1087,6 +1090,7 @@
 				266DD56D1C11940A00D47AB0 /* net_capture_pcap.cpp in Sources */,
 				266DD56E1C11940A00D47AB0 /* netfilter.cpp in Sources */,
 				A25F30181B03A33700854DAF /* file_unix.cpp in Sources */,
+				2609E55A1E37E03A00CFBDBB /* timer.cpp in Sources */,
 				266DD5771C11940A00D47AB0 /* socket_address.cpp in Sources */,
 				26C72ACB1E2150EE00F7D6D0 /* audio_recorder_dsound.cpp in Sources */,
 				266DD59D1C11940A00D47AB0 /* select_view.cpp in Sources */,

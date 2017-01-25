@@ -417,7 +417,7 @@ public:
 	
 	void copyFromFile(const String& path);
 	
-	void copyFromFile(const String& path, const Ref<Executor>& executor);
+	void copyFromFile(const String& path, const Ref<Dispatcher>& dispatcher);
 
 	sl_uint64 getOutputLength() const;
 

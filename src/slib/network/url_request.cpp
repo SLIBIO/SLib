@@ -244,9 +244,9 @@ const Function<void(UrlRequest*, const void*, sl_size)>& UrlRequest::getOnReceiv
 	return m_onReceiveContent;
 }
 
-const Ref<Executor>& UrlRequest::getExecutor()
+const Ref<Dispatcher>& UrlRequest::getDispatcher()
 {
-	return m_executor;
+	return m_dispatcher;
 }
 
 sl_bool UrlRequest::isUsingBackgroundSession()
@@ -336,7 +336,7 @@ void UrlRequest::_init(const UrlRequestParam& param, const String& url, const St
 	m_listener = param.listener;
 	m_onComplete = param.onComplete;
 	m_onReceiveContent = param.onReceiveContent;
-	m_executor = param.executor;
+	m_dispatcher = param.dispatcher;
 	m_flagUseBackgroundSession = param.flagUseBackgroundSession;
 	m_flagKeepReference = param.flagKeepReference;
 	m_flagStoreResponseContent = param.flagStoreResponseContent;
@@ -375,8 +375,8 @@ void UrlRequest::onComplete()
 		listener->onComplete(this);
 	}
 	if (m_onComplete.isNotNull()) {
-		if (m_executor.isNotNull()) {
-			m_executor->execute(SLIB_BIND_REF(void(), UrlRequest, _runCallback, this, m_onComplete));
+		if (m_dispatcher.isNotNull()) {
+			m_dispatcher->dispatch(SLIB_BIND_REF(void(), UrlRequest, _runCallback, this, m_onComplete));
 		} else {
 			m_onComplete(this);
 		}

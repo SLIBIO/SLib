@@ -194,6 +194,7 @@
 		26CB94CB1D0126F900D8A472 /* tree_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CB94CA1D0126F900D8A472 /* tree_view.cpp */; };
 		26CE672B1DE8271500C1371F /* hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26CE672A1DE8271500C1371F /* hash.cpp */; };
 		26D6C37D1D1E87E2008720E4 /* charset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D6C37C1D1E87E2008720E4 /* charset.cpp */; };
+		26D8AC851E3871EA0092EB81 /* timer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D8AC841E3871EA0092EB81 /* timer.cpp */; };
 		26DA34FD1C4B8B1D004DC204 /* audio_data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26DA34FC1C4B8B1D004DC204 /* audio_data.cpp */; };
 		26DA34FF1C4B8B2D004DC204 /* video_frame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26DA34FE1C4B8B2D004DC204 /* video_frame.cpp */; };
 		26E49B1F1D79AD0A0052D89F /* select_view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E49B1E1D79AD0A0052D89F /* select_view.cpp */; };
@@ -467,6 +468,7 @@
 		26CB94CA1D0126F900D8A472 /* tree_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tree_view.cpp; sourceTree = "<group>"; };
 		26CE672A1DE8271500C1371F /* hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = hash.cpp; sourceTree = "<group>"; };
 		26D6C37C1D1E87E2008720E4 /* charset.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = charset.cpp; sourceTree = "<group>"; };
+		26D8AC841E3871EA0092EB81 /* timer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = timer.cpp; sourceTree = "<group>"; };
 		26DA34FC1C4B8B1D004DC204 /* audio_data.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = audio_data.cpp; path = media/audio_data.cpp; sourceTree = "<group>"; };
 		26DA34FE1C4B8B2D004DC204 /* video_frame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = video_frame.cpp; path = media/video_frame.cpp; sourceTree = "<group>"; };
 		26E49B1E1D79AD0A0052D89F /* select_view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = select_view.cpp; sourceTree = "<group>"; };
@@ -729,6 +731,7 @@
 				A25F2EE81B039EF600854DAF /* thread_apple.mm */,
 				260251FF1BF18BCF00DEFAB1 /* thread_pool.cpp */,
 				A25F2EEB1B039EF600854DAF /* time.cpp */,
+				26D8AC841E3871EA0092EB81 /* timer.cpp */,
 				A25F2EEC1B039EF600854DAF /* variant.cpp */,
 				269462091CAD1C47001B2130 /* xml.cpp */,
 			);
@@ -1002,6 +1005,7 @@
 				266DD3D71C1181B500D47AB0 /* http_client.cpp in Sources */,
 				A25F2F3C1B039EF600854DAF /* async_unix.cpp in Sources */,
 				266DD3EC1C1181B500D47AB0 /* socket.cpp in Sources */,
+				26D8AC851E3871EA0092EB81 /* timer.cpp in Sources */,
 				A234D6EE1B3F12F600ADDF4E /* content_type.cpp in Sources */,
 				260107881DACE8BB00C40723 /* bitmap_quartz.mm in Sources */,
 				A2DE1DA71B383EA000A74698 /* system_unix.cpp in Sources */,

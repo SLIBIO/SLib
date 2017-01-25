@@ -94,20 +94,6 @@ public:
 	
 };
 
-class SLIB_EXPORT Executor : public Object
-{
-	SLIB_DECLARE_OBJECT
-	
-public:
-	Executor();
-	
-	~Executor();
-	
-public:
-	virtual sl_bool execute(const Function<void()>& callback) = 0;
-	
-};
-
 #define SLIB_BIND_CLASS(TYPE, CLASS, CALLBACK, OBJECT, ...) slib::Function<TYPE>::bindClass(OBJECT, &CLASS::CALLBACK, ##__VA_ARGS__)
 #define SLIB_BIND_REF(TYPE, CLASS, CALLBACK, OBJECT, ...) slib::Function<TYPE>::bindRef(slib::Ref<CLASS>(OBJECT), &CLASS::CALLBACK, ##__VA_ARGS__)
 #define SLIB_BIND_WEAKREF(TYPE, CLASS, CALLBACK, OBJECT, ...) slib::Function<TYPE>::bindWeakRef(slib::WeakRef<CLASS>(OBJECT), &CLASS::CALLBACK, ##__VA_ARGS__)

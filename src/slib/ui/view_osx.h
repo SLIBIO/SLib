@@ -84,6 +84,8 @@ public:
 	
 	sl_bool onEventMouse(UIAction action, NSEvent* event);
 	
+	sl_bool onEventMouse(UIAction action, const NSPoint& point);
+
 	sl_bool onEventMouseWheel(NSEvent* event);
 	
 	sl_bool onEventUpdateCursor(NSEvent* event);

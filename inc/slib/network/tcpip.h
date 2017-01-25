@@ -440,7 +440,7 @@ public:
 	~IPv4Fragmentation();
 
 public:
-	void setupExpiringDuration(sl_uint32 ms, const Ref<Dispatcher>& dispatcher);
+	void setupExpiringDuration(sl_uint32 ms, const Ref<DispatchLoop>& loop);
 	
 	void setupExpiringDuration(sl_uint32 ms);
 

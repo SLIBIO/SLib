@@ -62,6 +62,9 @@
 #include "core/file.h"
 #include "core/pipe.h"
 #include "core/async.h"
+#include "core/dispatch.h"
+#include "core/dispatch_loop.h"
+#include "core/timer.h"
 
 #include "core/app.h"
 #include "core/service.h"

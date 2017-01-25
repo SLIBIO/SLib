@@ -8,6 +8,7 @@
 #include "../core/string.h"
 #include "../core/thread.h"
 #include "../core/function.h"
+#include "../core/dispatch.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -109,7 +110,7 @@ public:
 	
 	static Function<void()> getCallbackOnUiThread(const Function<void()>& callback);
 
-	static Ref<Executor> getExecutor();
+	static Ref<Dispatcher> getDispatcher();
 	
 	// Run Loop
 	static void runLoop();

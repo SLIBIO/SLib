@@ -5,10 +5,11 @@
 
 #include "queue.h"
 #include "thread.h"
+#include "dispatch.h"
 
 SLIB_NAMESPACE_BEGIN
 
-class SLIB_EXPORT ThreadPool : public Executor
+class SLIB_EXPORT ThreadPool : public Dispatcher
 {
 	SLIB_DECLARE_OBJECT
 	
@@ -30,7 +31,7 @@ public:
 	sl_bool addTask(const Function<void()>& task);
 	
 	// override
-	sl_bool execute(const Function<void()>& callback);
+	sl_bool dispatch(const Function<void()>& callback, sl_uint64 delay_ms = 0);
 
 public:
 	SLIB_PROPERTY(sl_uint32, MinimumThreadsCount)

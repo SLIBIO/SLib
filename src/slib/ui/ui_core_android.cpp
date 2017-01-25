@@ -144,6 +144,9 @@ void UI::dispatchToUiThread(const Function<void()>& callback, sl_uint32 delayMil
 			_AndroidUiThread::dispatch.call(sl_null);
 		}
 	} else {
+		if (delayMillis > 0x7fffffff) {
+			delayMillis = 0x7fffffff;
+		}
 		sl_reg ptr;
 		if (_UIDispatcher::addDelayedCallback(callback, ptr)) {
 			_AndroidUiThread::dispatchDelayed.call(sl_null, (jlong)ptr, delayMillis);

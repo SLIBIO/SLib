@@ -2,7 +2,7 @@
 
 SLIB_NAMESPACE_BEGIN
 
-SLIB_DEFINE_OBJECT(ThreadPool, Executor)
+SLIB_DEFINE_OBJECT(ThreadPool, Dispatcher)
 
 ThreadPool::ThreadPool()
 {
@@ -91,7 +91,7 @@ sl_bool ThreadPool::addTask(const Function<void()>& task)
 	return sl_true;
 }
 
-sl_bool ThreadPool::execute(const Function<void()>& callback)
+sl_bool ThreadPool::dispatch(const Function<void()>& callback, sl_uint64 delay_ms)
 {
 	return addTask(callback);
 }

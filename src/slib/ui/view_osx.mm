@@ -459,6 +459,26 @@ sl_bool OSX_ViewInstance::onEventMouse(UIAction action, NSEvent* event)
 	return sl_false;
 }
 
+sl_bool OSX_ViewInstance::onEventMouse(UIAction action, const NSPoint& pt)
+{
+	NSView* handle = m_handle;
+	if (handle != nil) {
+		NSWindow* window = [handle window];
+		if (window != nil) {
+			sl_ui_posf x = (sl_ui_posf)(pt.x);
+			sl_ui_posf y = (sl_ui_posf)(pt.y);
+			Time t;
+			t.setSecondsCountf([[NSProcessInfo processInfo] systemUptime]);
+			Ref<UIEvent> ev = UIEvent::createMouseEvent(action, x, y, t);
+			if (ev.isNotNull()) {
+				onMouseEvent(ev.get());
+				return ev->isStoppedPropagation();
+			}
+		}
+	}
+	return sl_false;
+}
+
 sl_bool OSX_ViewInstance::onEventMouseWheel(NSEvent* event)
 {
 	NSView* handle = m_handle;
@@ -713,12 +733,15 @@ SLIB_UI_NAMESPACE_END
 	m_trackingArea = [[NSTrackingArea alloc] initWithRect:rc options: (NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved | NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect) owner:self userInfo:nil];
 	if (m_trackingArea != nil) {
 		[self addTrackingArea:m_trackingArea];
-		NSPoint mouseLocation = [[self window] mouseLocationOutsideOfEventStream];
-		mouseLocation = [self convertPoint: mouseLocation fromView: nil];
-		if (NSPointInRect(mouseLocation, [self bounds])) {
-			[self mouseEntered: nil];
-		} else {
-			[self mouseExited: nil];
+		slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+		if (instance.isNotNull()) {
+			NSPoint mouseLocation = [[self window] mouseLocationOutsideOfEventStream];
+			mouseLocation = [self convertPoint: mouseLocation fromView: nil];
+			if (NSPointInRect(mouseLocation, [self bounds])) {
+				instance->onEventMouse(slib::UIAction::MouseEnter, mouseLocation);
+			} else {
+				instance->onEventMouse(slib::UIAction::MouseLeave, mouseLocation);
+			}
 		}
 	}
 	[super updateTrackingAreas];

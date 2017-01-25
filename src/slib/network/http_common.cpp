@@ -1003,9 +1003,9 @@ void HttpOutputBuffer::copyFromFile(const String& path)
 	m_bufferOutput.copyFromFile(path);
 }
 
-void HttpOutputBuffer::copyFromFile(const String& path, const Ref<Executor>& executor)
+void HttpOutputBuffer::copyFromFile(const String& path, const Ref<Dispatcher>& dispatcher)
 {
-	m_bufferOutput.copyFromFile(path, executor);
+	m_bufferOutput.copyFromFile(path, dispatcher);
 }
 
 sl_uint64 HttpOutputBuffer::getOutputLength() const

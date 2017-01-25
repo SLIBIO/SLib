@@ -1606,10 +1606,10 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 	}
 	
 	if (layoutAttrs->aspectRatioMode == AspectRatioMode::AdjustWidth) {
-		width = height * layoutAttrs->aspectRatio;
+		width = (sl_ui_pos)(height * layoutAttrs->aspectRatio);
 	} else if (layoutAttrs->aspectRatioMode == AspectRatioMode::AdjustHeight) {
 		if (layoutAttrs->aspectRatio > 0.0000001f) {
-			height = width / layoutAttrs->aspectRatio;
+			height = (sl_ui_pos)(width / layoutAttrs->aspectRatio);
 		}
 	}
 	

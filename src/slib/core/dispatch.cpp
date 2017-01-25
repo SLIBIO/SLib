@@ -1,4 +1,5 @@
 #include "../../../inc/slib/core/dispatch.h"
+#include "../../../inc/slib/core/dispatch_loop.h"
 
 #include "../../../inc/slib/core/safe_static.h"
 #include "../../../inc/slib/core/system.h"
@@ -8,83 +9,99 @@ SLIB_NAMESPACE_BEGIN
 /*************************************
 			Dispatch
 *************************************/
-sl_bool Dispatch::dispatch(const Ref<Dispatcher>& dispatcher, const Function<void()>& task, sl_uint64 delay_ms)
+sl_bool Dispatch::dispatch(const Ref<DispatchLoop>& loop, const Function<void()>& task)
 {
-	if (dispatcher.isNotNull()) {
-		return dispatcher->dispatch(task, delay_ms);
+	if (loop.isNotNull()) {
+		return loop->dispatch(task);
 	}
 	return sl_false;
 }
 
-sl_bool Dispatch::dispatch(const Function<void()>& task, sl_uint64 delay_ms)
+sl_bool Dispatch::dispatch(const Function<void()>& task)
 {
-	return Dispatch::dispatch(Dispatcher::getDefault(), task, delay_ms);
+	return Dispatch::dispatch(DispatchLoop::getDefault(), task);
 }
 
-Ref<Timer> Dispatch::addTimer(const Ref<Dispatcher>& dispatcher, const Function<void()>& task, sl_uint64 interval_ms)
+sl_bool Dispatch::setTimeout(const Ref<DispatchLoop>& loop, const Function<void()>& task, sl_uint64 delay_ms)
 {
-	if (dispatcher.isNotNull()) {
-		return dispatcher->addTimer(task, interval_ms);
+	if (loop.isNotNull()) {
+		return loop->dispatch(task, delay_ms);
+	}
+	return sl_false;
+}
+
+sl_bool Dispatch::setTimeout(const Function<void()>& task, sl_uint64 delay_ms)
+{
+	return Dispatch::setTimeout(DispatchLoop::getDefault(), task, delay_ms);
+}
+
+Ref<Timer> Dispatch::setInterval(const Ref<DispatchLoop>& loop, const Function<void()>& task, sl_uint64 interval_ms)
+{
+	if (loop.isNotNull()) {
+		return Timer::createWithLoop(loop, task, interval_ms);
 	}
 	return sl_null;
 }
 
-Ref<Timer> Dispatch::addTimer(const Function<void()>& task, sl_uint64 interval_ms)
+Ref<Timer> Dispatch::setInterval(const Function<void()>& task, sl_uint64 interval_ms)
 {
-	return Dispatch::addTimer(Dispatcher::getDefault(), task, interval_ms);
-}
-
-void Dispatch::removeTimer(const Ref<Dispatcher>& dispatcher, const Ref<Timer>& timer)
-{
-	if (dispatcher.isNotNull()) {
-		return dispatcher->removeTimer(timer);
-	}
-}
-
-void Dispatch::removeTimer(const Ref<Timer>& timer)
-{
-	Dispatch::removeTimer(Dispatcher::getDefault(), timer);
+	return Dispatch::setInterval(DispatchLoop::getDefault(), task, interval_ms);
 }
 
 /*************************************
 			Dispatcher
 *************************************/
 
-SLIB_DEFINE_OBJECT(Dispatcher, Executor)
+SLIB_DEFINE_OBJECT(Dispatcher, Object)
 
 Dispatcher::Dispatcher()
+{
+}
+
+Dispatcher::~Dispatcher()
+{
+}
+
+
+/*************************************
+			DispatchLoop
+*************************************/
+
+SLIB_DEFINE_OBJECT(DispatchLoop, Dispatcher)
+
+DispatchLoop::DispatchLoop()
 {
 	m_flagInit = sl_false;
 	m_flagRunning = sl_false;
 }
 
-Dispatcher::~Dispatcher()
+DispatchLoop::~DispatchLoop()
 {
 	release();
 }
 
-Ref<Dispatcher> Dispatcher::getDefault()
+Ref<DispatchLoop> DispatchLoop::getDefault()
 {
-	SLIB_SAFE_STATIC(Ref<Dispatcher>, ret, create())
+	SLIB_SAFE_STATIC(Ref<DispatchLoop>, ret, create())
 	if (SLIB_SAFE_STATIC_CHECK_FREED(ret)) {
 		return sl_null;
 	}
 	return ret;
 }
 
-void Dispatcher::releaseDefault()
+void DispatchLoop::releaseDefault()
 {
-	Ref<Dispatcher> loop = getDefault();
+	Ref<DispatchLoop> loop = getDefault();
 	if (loop.isNotNull()) {
 		loop->release();
 	}
 }
 
-Ref<Dispatcher> Dispatcher::create(sl_bool flagAutoStart)
+Ref<DispatchLoop> DispatchLoop::create(sl_bool flagAutoStart)
 {
-	Ref<Dispatcher> ret = new Dispatcher;
+	Ref<DispatchLoop> ret = new DispatchLoop;
 	if (ret.isNotNull()) {
-		ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(Dispatcher, _runLoop, ret.get()));
+		ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(DispatchLoop, _runLoop, ret.get()));
 		if (ret->m_thread.isNotNull()) {
 			ret->m_flagInit = sl_true;
 			if (flagAutoStart) {
@@ -96,7 +113,7 @@ Ref<Dispatcher> Dispatcher::create(sl_bool flagAutoStart)
 	return sl_null;
 }
 
-void Dispatcher::release()
+void DispatchLoop::release()
 {
 	ObjectLocker lock(this);
 	if (!m_flagInit) {
@@ -116,7 +133,7 @@ void Dispatcher::release()
 	m_timeTasks.removeAll();
 }
 
-void Dispatcher::start()
+void DispatchLoop::start()
 {
 	ObjectLocker lock(this);
 	if (!m_flagInit) {
@@ -131,12 +148,12 @@ void Dispatcher::start()
 	}
 }
 
-sl_bool Dispatcher::isRunning()
+sl_bool DispatchLoop::isRunning()
 {
 	return m_flagRunning;
 }
 
-void Dispatcher::_wake()
+void DispatchLoop::_wake()
 {
 	ObjectLocker lock(this);
 	if (!m_flagRunning) {
@@ -145,7 +162,7 @@ void Dispatcher::_wake()
 	m_thread->wake();
 }
 
-sl_int32 Dispatcher::_getTimeout()
+sl_int32 DispatchLoop::_getTimeout()
 {
 	m_timeCounter.update();
 	if (m_queueTasks.isNotEmpty()) {
@@ -164,7 +181,7 @@ sl_int32 Dispatcher::_getTimeout()
 	}
 }
 
-sl_bool Dispatcher::dispatch(const Function<void()>& task, sl_uint64 delay_ms)
+sl_bool DispatchLoop::dispatch(const Function<void()>& task, sl_uint64 delay_ms)
 {
 	if (task.isNull()) {
 		return sl_false;
@@ -187,12 +204,7 @@ sl_bool Dispatcher::dispatch(const Function<void()>& task, sl_uint64 delay_ms)
 	return sl_false;
 }
 
-sl_bool Dispatcher::execute(const Function<void()>& callback)
-{
-	return dispatch(callback);
-}
-
-sl_int32 Dispatcher::_getTimeout_TimeTasks()
+sl_int32 DispatchLoop::_getTimeout_TimeTasks()
 {
 	MutexLocker lock(&m_lockTimeTasks);
 	sl_uint64 rel = getElapsedMilliseconds();
@@ -223,7 +235,7 @@ sl_int32 Dispatcher::_getTimeout_TimeTasks()
 	return timeout;
 }
 
-sl_int32 Dispatcher::_getTimeout_Timer()
+sl_int32 DispatchLoop::_getTimeout_Timer()
 {
 	MutexLocker lock(&m_lockTimer);
 
@@ -267,12 +279,12 @@ sl_int32 Dispatcher::_getTimeout_Timer()
 	return timeout;
 }
 
-sl_bool Dispatcher::TimerTask::operator==(const Dispatcher::TimerTask& other) const
+sl_bool DispatchLoop::TimerTask::operator==(const DispatchLoop::TimerTask& other) const
 {
 	return timer == other.timer;
 }
 
-sl_bool Dispatcher::addTimer(const Ref<Timer>& timer)
+sl_bool DispatchLoop::addTimer(const Ref<Timer>& timer)
 {
 	if (timer.isNull()) {
 		return sl_false;
@@ -288,7 +300,7 @@ sl_bool Dispatcher::addTimer(const Ref<Timer>& timer)
 	}
 }
 
-void Dispatcher::removeTimer(const Ref<Timer>& timer)
+void DispatchLoop::removeTimer(const Ref<Timer>& timer)
 {
 	MutexLocker lock(&m_lockTimer);
 	TimerTask t;
@@ -296,23 +308,12 @@ void Dispatcher::removeTimer(const Ref<Timer>& timer)
 	m_queueTimers.removeValue(t);
 }
 
-Ref<Timer> Dispatcher::addTimer(const Function<void()>& task, sl_uint64 interval_ms)
-{
-	Ref<Timer> timer = Timer::create(task, interval_ms);
-	if (timer.isNotNull()) {
-		if (addTimer(timer)) {
-			return timer;
-		}
-	}
-	return sl_null;
-}
-
-sl_uint64 Dispatcher::getElapsedMilliseconds()
+sl_uint64 DispatchLoop::getElapsedMilliseconds()
 {
 	return m_timeCounter.getElapsedMilliseconds();
 }
 
-void Dispatcher::_runLoop()
+void DispatchLoop::_runLoop()
 {
 	while (Thread::isNotStoppingCurrent()) {
 
@@ -335,83 +336,6 @@ void Dispatcher::_runLoop()
 		}
 		Thread::sleep(_t);
 
-	}
-}
-
-/*************************************
-	Timer
-**************************************/
-
-SLIB_DEFINE_OBJECT(Timer, Object)
-
-Timer::Timer()
-{
-	m_flagStarted = sl_false;
-	m_nCountRun = 0;
-	setLastRunTime(0);
-	setMaxConcurrentThread(1);
-}
-
-Ref<Timer> Timer::create(const Function<void()>& task, sl_uint64 interval_ms, sl_bool flagStart)
-{
-	Ref<Timer> ret;
-	if (task.isNull()) {
-		return ret;
-	}
-	ret = new Timer();
-	if (ret.isNotNull()) {
-		ret->m_flagStarted = flagStart;
-		ret->m_task = task;
-		ret->m_interval = interval_ms;
-	}
-	return ret;
-}
-
-void Timer::start()
-{
-	m_flagStarted = sl_true;
-}
-
-void Timer::stop()
-{
-	m_flagStarted = sl_false;
-}
-
-sl_bool Timer::isStarted()
-{
-	return m_flagStarted;
-}
-
-Function<void()> Timer::getTask()
-{
-	return m_task;
-}
-
-sl_uint64 Timer::getInterval()
-{
-	return m_interval;
-}
-
-void Timer::run()
-{
-	ObjectLocker lock(this);
-	if (m_flagStarted) {
-		sl_int32 n = Base::interlockedIncrement32(&m_nCountRun);
-		if (n <= (sl_int32)(getMaxConcurrentThread())) {
-			lock.unlock();
-			m_task();
-		}
-		Base::interlockedDecrement32(&m_nCountRun);
-	}
-}
-
-void Timer::stopAndWait()
-{
-	ObjectLocker lock(this);
-	stop();
-	sl_uint32 n = 0;
-	while (m_nCountRun > 0) {
-		System::yield(++n);
 	}
 }
 

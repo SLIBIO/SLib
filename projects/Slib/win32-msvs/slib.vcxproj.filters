@@ -842,6 +842,12 @@
     <ClInclude Include="..\..\..\inc\slib\render\drawable.h">
       <Filter>inc\render</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\dispatch_loop.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\core\timer.h">
+      <Filter>inc\core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">
@@ -1602,6 +1608,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\render\render_drawable.cpp">
       <Filter>src\slib\render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\core\timer.cpp">
+      <Filter>src\slib\core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -257,20 +257,23 @@ Function<void()> UI::getCallbackOnUiThread(const Function<void()>& callback)
 	return sl_null;
 }
 
-class _UiExecutor : public Executor
+class _UiDispatcher : public Dispatcher
 {
 public:
 	// override
-	sl_bool execute(const Function<void()>& callback)
+	sl_bool dispatch(const Function<void()>& callback, sl_uint64 delay_ms)
 	{
-		UI::dispatchToUiThread(callback);
+		if (delay_ms > 0x7fffffff) {
+			delay_ms = 0x7fffffff;
+		}
+		UI::dispatchToUiThread(callback, (sl_uint32)delay_ms);
 		return sl_true;
 	}
 };
 
-Ref<Executor> UI::getExecutor()
+Ref<Dispatcher> UI::getDispatcher()
 {
-	return new _UiExecutor();
+	return new _UiDispatcher();
 }
 
 static sl_int32 _g_ui_run_loop_level = 0;

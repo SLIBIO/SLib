@@ -3,8 +3,7 @@
 
 #include "definition.h"
 
-#include "dispatch.h"
-
+#include "dispatch_loop.h"
 #include "file.h"
 #include "variant.h"
 #include "ptr.h"
@@ -26,7 +25,7 @@ class AsyncStreamInstance;
 class AsyncStream;
 class AsyncStreamRequest;
 
-class SLIB_EXPORT AsyncIoLoop : public Executor
+class SLIB_EXPORT AsyncIoLoop : public Dispatcher
 {
 	SLIB_DECLARE_OBJECT
 	
@@ -62,7 +61,7 @@ public:
 	void requestOrder(AsyncIoInstance* instance);
 	
 	// override
-	sl_bool execute(const Function<void()>& callback);
+	sl_bool dispatch(const Function<void()>& callback, sl_uint64 delay_ms);
 	
 protected:
 	sl_bool m_flagInit;
@@ -381,7 +380,7 @@ protected:
 protected:
 	void init();
 	
-	void init(const Ref<Executor>& executor);
+	void init(const Ref<Dispatcher>& dispatcher);
 	
 protected:
 	sl_bool _addRequest(AsyncStreamRequest* request);
@@ -392,8 +391,8 @@ private:
 	LinkedQueue< Ref<AsyncStreamRequest> > m_requests;
 	sl_bool m_flagProcessRequest;
 	
-	Ref<Dispatcher> m_dispatcher;
-	WeakRef<Executor> m_executor;
+	Ref<DispatchLoop> m_dispatchLoop;
+	WeakRef<Dispatcher> m_dispatcher;
 
 };
 
@@ -405,7 +404,7 @@ protected:
 public:
 	static Ref<AsyncReader> create(const Ptr<IReader>& reader);
 	
-	static Ref<AsyncReader> create(const Ptr<IReader>& reader, const Ref<Executor>& executor);
+	static Ref<AsyncReader> create(const Ptr<IReader>& reader, const Ref<Dispatcher>& dispatcher);
 	
 public:
 	// override
@@ -437,7 +436,7 @@ protected:
 public:
 	static Ref<AsyncWriter> create(const Ptr<IWriter>& writer);
 	
-	static Ref<AsyncWriter> create(const Ptr<IWriter>& writer, const Ref<Executor>& executor);
+	static Ref<AsyncWriter> create(const Ptr<IWriter>& writer, const Ref<Dispatcher>& dispatcher);
 	
 
 public:
@@ -473,27 +472,27 @@ protected:
 public:
 	static Ref<AsyncFile> create(const Ref<File>& file);
 	
-	static Ref<AsyncFile> create(const Ref<File>& file, const Ref<Executor>& executor);
+	static Ref<AsyncFile> create(const Ref<File>& file, const Ref<Dispatcher>& dispatcher);
 	
 	
 	static Ref<AsyncFile> open(const String& path, FileMode mode);
 
-	static Ref<AsyncFile> open(const String& path, FileMode mode, const Ref<Executor>& executor);
+	static Ref<AsyncFile> open(const String& path, FileMode mode, const Ref<Dispatcher>& dispatcher);
 	
 	
 	static Ref<AsyncFile> openForRead(const String& path);
 	
-	static Ref<AsyncFile> openForRead(const String& path, const Ref<Executor>& executor);
+	static Ref<AsyncFile> openForRead(const String& path, const Ref<Dispatcher>& dispatcher);
 	
 	
 	static Ref<AsyncFile> openForWrite(const String& path);
 	
-	static Ref<AsyncFile> openForWrite(const String& path, const Ref<Executor>& executor);
+	static Ref<AsyncFile> openForWrite(const String& path, const Ref<Dispatcher>& dispatcher);
 	
 	
 	static Ref<AsyncFile> openForAppend(const String& path);
 	
-	static Ref<AsyncFile> openForAppend(const String& path, const Ref<Executor>& executor);
+	static Ref<AsyncFile> openForAppend(const String& path, const Ref<Dispatcher>& dispatcher);
 	
 	
 #if defined(SLIB_PLATFORM_IS_WIN32)
@@ -672,7 +671,7 @@ public:
 
 	sl_bool copyFromFile(const String& path);
 	
-	sl_bool copyFromFile(const String& path, const Ref<Executor>& executor);
+	sl_bool copyFromFile(const String& path, const Ref<Dispatcher>& dispatcher);
 	
 	sl_uint64 getOutputLength() const;
 

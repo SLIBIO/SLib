@@ -8,7 +8,7 @@ SLIB_NAMESPACE_BEGIN
 			AsyncIoLoop
  *************************************/
 
-SLIB_DEFINE_OBJECT(AsyncIoLoop, Executor)
+SLIB_DEFINE_OBJECT(AsyncIoLoop, Dispatcher)
 
 AsyncIoLoop::AsyncIoLoop()
 {
@@ -116,7 +116,7 @@ sl_bool AsyncIoLoop::addTask(const Function<void()>& task)
 	return sl_false;
 }
 
-sl_bool AsyncIoLoop::execute(const Function<void()>& callback)
+sl_bool AsyncIoLoop::dispatch(const Function<void()>& callback, sl_uint64 delay_ms)
 {
 	return addTask(callback);
 }
@@ -737,23 +737,23 @@ sl_bool AsyncStreamSimulator::write(void* data, sl_uint32 size, const Ptr<IAsync
 
 sl_bool AsyncStreamSimulator::addTask(const Function<void()>& callback)
 {
-	Ref<Executor> executor(m_executor);
-	if (executor.isNotNull()) {
-		return executor->execute(callback);
+	Ref<Dispatcher> dispatcher(m_dispatcher);
+	if (dispatcher.isNotNull()) {
+		return dispatcher->dispatch(callback);
 	}
 	return sl_false;
 }
 
 void AsyncStreamSimulator::init()
 {
-	m_dispatcher = Dispatcher::create();
-	m_executor = m_dispatcher;
+	m_dispatchLoop = DispatchLoop::create();
+	m_dispatcher = m_dispatchLoop;
 }
 
-void AsyncStreamSimulator::init(const Ref<Executor>& executor)
+void AsyncStreamSimulator::init(const Ref<Dispatcher>& dispatcher)
 {
-	if (executor.isNotNull()) {
-		m_executor = executor;
+	if (dispatcher.isNotNull()) {
+		m_dispatcher = dispatcher;
 	} else {
 		init();
 	}
@@ -761,14 +761,14 @@ void AsyncStreamSimulator::init(const Ref<Executor>& executor)
 
 sl_bool AsyncStreamSimulator::_addRequest(AsyncStreamRequest* req)
 {
-	Ref<Executor> executor(m_executor);
-	if (executor.isNotNull()) {
+	Ref<Dispatcher> dispatcher(m_dispatcher);
+	if (dispatcher.isNotNull()) {
 		ObjectLocker lock(this);
 		m_requests.push_NoLock(req);
 		if (!m_flagProcessRequest) {
 			m_flagProcessRequest = sl_true;
 			lock.unlock();
-			executor->execute(SLIB_FUNCTION_WEAKREF(AsyncStreamSimulator, _runProcessor, this));
+			dispatcher->dispatch(SLIB_FUNCTION_WEAKREF(AsyncStreamSimulator, _runProcessor, this));
 		}
 		return sl_true;
 	}
@@ -816,13 +816,13 @@ Ref<AsyncReader> AsyncReader::create(const Ptr<IReader>& reader)
 	return sl_null;
 }
 
-Ref<AsyncReader> AsyncReader::create(const Ptr<IReader>& reader, const Ref<Executor>& executor)
+Ref<AsyncReader> AsyncReader::create(const Ptr<IReader>& reader, const Ref<Dispatcher>& dispatcher)
 {
 	if (reader.isNotNull()) {
 		Ref<AsyncReader> ret = new AsyncReader;
 		if (ret.isNotNull()) {
 			ret->m_reader = reader;
-			ret->init(executor);
+			ret->init(dispatcher);
 			return ret;
 		}
 	}
@@ -888,13 +888,13 @@ Ref<AsyncWriter> AsyncWriter::create(const Ptr<IWriter>& writer)
 	return sl_null;
 }
 
-Ref<AsyncWriter> AsyncWriter::create(const Ptr<IWriter>& writer, const Ref<Executor>& executor)
+Ref<AsyncWriter> AsyncWriter::create(const Ptr<IWriter>& writer, const Ref<Dispatcher>& dispatcher)
 {
 	if (writer.isNotNull()) {
 		Ref<AsyncWriter> ret = new AsyncWriter;
 		if (ret.isNotNull()) {
 			ret->m_writer = writer;
-			ret->init(executor);
+			ret->init(dispatcher);
 			return ret;
 		}
 	}
@@ -967,13 +967,13 @@ Ref<AsyncFile> AsyncFile::create(const Ref<File>& file)
 	return sl_null;
 }
 
-Ref<AsyncFile> AsyncFile::create(const Ref<File>& file, const Ref<Executor>& executor)
+Ref<AsyncFile> AsyncFile::create(const Ref<File>& file, const Ref<Dispatcher>& dispatcher)
 {
 	if (file.isNotNull()) {
 		Ref<AsyncFile> ret = new AsyncFile;
 		if (ret.isNotNull()) {
 			ret->m_file = file;
-			ret->init(executor);
+			ret->init(dispatcher);
 			return ret;
 		}
 	}
@@ -989,11 +989,11 @@ Ref<AsyncFile> AsyncFile::open(const String& path, FileMode mode)
 	return sl_null;
 }
 
-Ref<AsyncFile> AsyncFile::open(const String& path, FileMode mode, const Ref<Executor>& executor)
+Ref<AsyncFile> AsyncFile::open(const String& path, FileMode mode, const Ref<Dispatcher>& dispatcher)
 {
 	Ref<File> file = File::open(path, mode);
 	if (file.isNotNull()) {
-		return AsyncFile::create(file, executor);
+		return AsyncFile::create(file, dispatcher);
 	}
 	return sl_null;
 }
@@ -1003,9 +1003,9 @@ Ref<AsyncFile> AsyncFile::openForRead(const String& path)
 	return AsyncFile::open(path, FileMode::Read);
 }
 
-Ref<AsyncFile> AsyncFile::openForRead(const String& path, const Ref<Executor>& executor)
+Ref<AsyncFile> AsyncFile::openForRead(const String& path, const Ref<Dispatcher>& dispatcher)
 {
-	return AsyncFile::open(path, FileMode::Read, executor);
+	return AsyncFile::open(path, FileMode::Read, dispatcher);
 }
 
 Ref<AsyncFile> AsyncFile::openForWrite(const String& path)
@@ -1013,9 +1013,9 @@ Ref<AsyncFile> AsyncFile::openForWrite(const String& path)
 	return AsyncFile::open(path, FileMode::Write);
 }
 
-Ref<AsyncFile> AsyncFile::openForWrite(const String& path, const Ref<Executor>& executor)
+Ref<AsyncFile> AsyncFile::openForWrite(const String& path, const Ref<Dispatcher>& dispatcher)
 {
-	return AsyncFile::open(path, FileMode::Write, executor);
+	return AsyncFile::open(path, FileMode::Write, dispatcher);
 }
 
 Ref<AsyncFile> AsyncFile::openForAppend(const String& path)
@@ -1023,9 +1023,9 @@ Ref<AsyncFile> AsyncFile::openForAppend(const String& path)
 	return AsyncFile::open(path, FileMode::Append);
 }
 
-Ref<AsyncFile> AsyncFile::openForAppend(const String& path, const Ref<Executor>& executor)
+Ref<AsyncFile> AsyncFile::openForAppend(const String& path, const Ref<Dispatcher>& dispatcher)
 {
-	return AsyncFile::open(path, FileMode::Append, executor);
+	return AsyncFile::open(path, FileMode::Append, dispatcher);
 }
 
 Ref<File> AsyncFile::getFile()
@@ -1542,17 +1542,17 @@ sl_bool AsyncOutputBuffer::copyFrom(AsyncStream* stream, sl_uint64 size)
 
 sl_bool AsyncOutputBuffer::copyFromFile(const String& path)
 {
-	return copyFromFile(path, Ref<Executor>::null());
+	return copyFromFile(path, Ref<Dispatcher>::null());
 }
 
-sl_bool AsyncOutputBuffer::copyFromFile(const String& path, const Ref<Executor>& executor)
+sl_bool AsyncOutputBuffer::copyFromFile(const String& path, const Ref<Dispatcher>& dispatcher)
 {
 	if (!(File::exists(path))) {
 		return sl_false;
 	}
 	sl_uint64 size = File::getSize(path);
 	if (size > 0) {
-		Ref<AsyncFile> file = AsyncFile::openForRead(path, executor);
+		Ref<AsyncFile> file = AsyncFile::openForRead(path, dispatcher);
 		if (file.isNotNull()) {
 			return copyFrom(file.get(), size);
 		} else {

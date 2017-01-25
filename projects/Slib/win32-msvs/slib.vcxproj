@@ -37,6 +37,7 @@
     <ClInclude Include="..\..\..\inc\slib\core\definition.h" />
     <ClInclude Include="..\..\..\inc\slib\core\deque.h" />
     <ClInclude Include="..\..\..\inc\slib\core\dispatch.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\dispatch_loop.h" />
     <ClInclude Include="..\..\..\inc\slib\core\endian.h" />
     <ClInclude Include="..\..\..\inc\slib\core\event.h" />
     <ClInclude Include="..\..\..\inc\slib\core\expire.h" />
@@ -87,6 +88,7 @@
     <ClInclude Include="..\..\..\inc\slib\core\thread.h" />
     <ClInclude Include="..\..\..\inc\slib\core\thread_pool.h" />
     <ClInclude Include="..\..\..\inc\slib\core\time.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\timer.h" />
     <ClInclude Include="..\..\..\inc\slib\core\tree.h" />
     <ClInclude Include="..\..\..\inc\slib\core\tuple.h" />
     <ClInclude Include="..\..\..\inc\slib\core\variant.h" />
@@ -323,6 +325,7 @@
     <ClCompile Include="..\..\..\src\slib\core\thread_pool.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\thread_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\time.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\timer.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\variant.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\win32_com.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\xml.cpp" />
