@@ -17,6 +17,21 @@ enum class GestureType
 	Count = 4
 };
 
+class GestureEvent : public Referable
+{
+public:
+	GestureType type;
+	
+public:
+	GestureEvent();
+	
+	~GestureEvent();
+	
+public:
+	Ref<GestureEvent> duplicate();
+	
+};
+
 class View;
 class UIEvent;
 

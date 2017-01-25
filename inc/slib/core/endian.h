@@ -28,7 +28,6 @@ public:
 		return v;
 	}
 	
-	
 	static SLIB_INLINE sl_uint32 swap32(sl_uint32 v)
 	{
 		sl_uint8* b = (sl_uint8*)(&v);

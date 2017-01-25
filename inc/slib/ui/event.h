@@ -140,6 +140,8 @@ class SLIB_EXPORT UIEvent : public Referable
 protected:
 	UIEvent();
 	
+	~UIEvent();
+	
 public:
 	static Ref<UIEvent> create(UIAction action);
 	
@@ -350,7 +352,7 @@ public:
 	
 	virtual void onScroll(View* view, sl_scroll_pos x, sl_scroll_pos y);
 
-	virtual void onSwipe(View* view, GestureType type);
+	virtual void onSwipe(View* view, GestureEvent* ev);
 	
 };
 
@@ -394,7 +396,7 @@ public:
 	
 	void onSetCursor(View* view, UIEvent* ev);
 	
-	void onSwipe(View* view, GestureType type);
+	void onSwipe(View* view, GestureEvent* ev);
 	
 	
 	// window related events

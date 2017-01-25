@@ -6560,7 +6560,7 @@ void View::setOnScroll(const Function<void(View*, sl_scroll_pos, sl_scroll_pos)>
 	}
 }
 
-Function<void(View*, GestureType)> View::getOnSwipe()
+Function<void(View*, GestureEvent*)> View::getOnSwipe()
 {
 	Ref<EventAttributes> attrs = m_eventAttributes;
 	if (attrs.isNotNull()) {
@@ -6569,7 +6569,7 @@ Function<void(View*, GestureType)> View::getOnSwipe()
 	return sl_null;
 }
 
-void View::setOnSwipe(const Function<void(View*, GestureType)>& callback)
+void View::setOnSwipe(const Function<void(View*, GestureEvent*)>& callback)
 {
 	Ref<EventAttributes> attrs = _initializeEventAttributes();
 	if (attrs.isNotNull()) {
@@ -6725,7 +6725,7 @@ void View::onResizeContent(sl_scroll_pos width, sl_scroll_pos height)
 {
 }
 
-void View::onSwipe(GestureType type)
+void View::onSwipe(GestureEvent* ev)
 {
 }
 
@@ -6833,13 +6833,12 @@ void View::dispatchMouseEvent(UIEvent* ev)
 	
 	ev->resetStates();
 	
-	onMouseEvent(ev);
-	if (ev->isPreventedDefault()) {
-		return;
-	}
-	
 	Ref<EventAttributes> eventAttrs = m_eventAttributes;
 	if (eventAttrs.isNotNull()) {
+		(eventAttrs->mouse)(this, ev);
+		if (ev->isPreventedDefault()) {
+			return;
+		}
 		PtrLocker<IViewListener> listener(eventAttrs->listener);
 		if (listener.isNotNull()) {
 			listener->onMouseEvent(this, ev);
@@ -6847,10 +6846,11 @@ void View::dispatchMouseEvent(UIEvent* ev)
 				return;
 			}
 		}
-		(eventAttrs->mouse)(this, ev);
-		if (ev->isPreventedDefault()) {
-			return;
-		}
+	}
+
+	onMouseEvent(ev);
+	if (ev->isPreventedDefault()) {
+		return;
 	}
 	
 	if (isContentScrollingByMouse()) {
@@ -7030,18 +7030,16 @@ void View::dispatchTouchEvent(UIEvent* ev)
 	
 	ev->resetStates();
 	
-	onTouchEvent(ev);
-	if (ev->isPreventedDefault()) {
-		return;
-	}
-	
-	onMouseEvent(ev);
-	if (ev->isPreventedDefault()) {
-		return;
-	}
-	
 	Ref<EventAttributes> eventAttrs = m_eventAttributes;
 	if (eventAttrs.isNotNull()) {
+		(eventAttrs->touch)(this, ev);
+		if (ev->isPreventedDefault()) {
+			return;
+		}
+		(eventAttrs->mouse)(this, ev);
+		if (ev->isPreventedDefault()) {
+			return;
+		}
 		PtrLocker<IViewListener> listener(eventAttrs->listener);
 		if (listener.isNotNull()) {
 			listener->onTouchEvent(this, ev);
@@ -7053,14 +7051,15 @@ void View::dispatchTouchEvent(UIEvent* ev)
 				return;
 			}
 		}
-		(eventAttrs->touch)(this, ev);
-		if (ev->isPreventedDefault()) {
-			return;
-		}
-		(eventAttrs->mouse)(this, ev);
-		if (ev->isPreventedDefault()) {
-			return;
-		}
+	}
+
+	onTouchEvent(ev);
+	if (ev->isPreventedDefault()) {
+		return;
+	}
+	onMouseEvent(ev);
+	if (ev->isPreventedDefault()) {
+		return;
 	}
 	
 	_processEventForStateAndClick(ev);
@@ -7291,13 +7290,12 @@ void View::dispatchMouseWheelEvent(UIEvent* ev)
 	
 	ev->resetStates();
 	
-	onMouseWheelEvent(ev);
-	if (ev->isPreventedDefault()) {
-		return;
-	}
-	
 	Ref<EventAttributes> eventAttrs = m_eventAttributes;
 	if (eventAttrs.isNotNull()) {
+		(eventAttrs->mouseWheel)(this, ev);
+		if (ev->isPreventedDefault()) {
+			return;
+		}
 		PtrLocker<IViewListener> listener(eventAttrs->listener);
 		if (listener.isNotNull()) {
 			listener->onMouseWheelEvent(this, ev);
@@ -7305,10 +7303,11 @@ void View::dispatchMouseWheelEvent(UIEvent* ev)
 				return;
 			}
 		}
-		(eventAttrs->mouseWheel)(this, ev);
-		if (ev->isPreventedDefault()) {
-			return;
-		}
+	}
+	
+	onMouseWheelEvent(ev);
+	if (ev->isPreventedDefault()) {
+		return;
 	}
 	
 	if (isContentScrollingByMouseWheel()) {
@@ -7376,13 +7375,12 @@ void View::dispatchKeyEvent(UIEvent* ev)
 	
 	ev->resetStates();
 	
-	onKeyEvent(ev);
-	if (ev->isPreventedDefault()) {
-		return;
-	}
-	
 	Ref<EventAttributes> eventAttrs = m_eventAttributes;
 	if (eventAttrs.isNotNull()) {
+		(eventAttrs->key)(this, ev);
+		if (ev->isPreventedDefault()) {
+			return;
+		}
 		PtrLocker<IViewListener> listener(eventAttrs->listener);
 		if (listener.isNotNull()) {
 			listener->onKeyEvent(this, ev);
@@ -7390,10 +7388,11 @@ void View::dispatchKeyEvent(UIEvent* ev)
 				return;
 			}
 		}
-		(eventAttrs->key)(this, ev);
-		if (ev->isPreventedDefault()) {
-			return;
-		}
+	}
+	
+	onKeyEvent(ev);
+	if (ev->isPreventedDefault()) {
+		return;
 	}
 	
 	if (isContentScrollingByKeyboard()) {
@@ -7428,18 +7427,24 @@ void View::dispatchClick(UIEvent* ev)
 	if (! m_flagEnabled) {
 		return;
 	}
-	onClick(ev);
-	if (ev->isPreventedDefault()) {
-		return;
-	}
+
 	Ref<EventAttributes> eventAttrs = m_eventAttributes;
 	if (eventAttrs.isNotNull()) {
+		(eventAttrs->click)(this);
+		if (ev->isPreventedDefault()) {
+			return;
+		}
 		PtrLocker<IViewListener> listener(eventAttrs->listener);
 		if (listener.isNotNull()) {
 			listener->onClick(this, ev);
+			if (ev->isPreventedDefault()) {
+				return;
+			}
 		}
-		(eventAttrs->click)(this);
 	}
+	
+	onClick(ev);
+
 }
 
 void View::dispatchClickWithNoEvent()
@@ -7482,13 +7487,12 @@ void View::dispatchSetCursor(UIEvent* ev)
 	
 	ev->resetStates();
 	
-	onSetCursor(ev);
-	if (ev->isPreventedDefault()) {
-		return;
-	}
-	
 	Ref<EventAttributes> eventAttrs = m_eventAttributes;
 	if (eventAttrs.isNotNull()) {
+		(eventAttrs->setCursor)(this, ev);
+		if (ev->isPreventedDefault()) {
+			return;
+		}
 		PtrLocker<IViewListener> listener(eventAttrs->listener);
 		if (listener.isNotNull()) {
 			listener->onSetCursor(this, ev);
@@ -7496,12 +7500,13 @@ void View::dispatchSetCursor(UIEvent* ev)
 				return;
 			}
 		}
-		(eventAttrs->setCursor)(this, ev);
-		if (ev->isPreventedDefault()) {
-			return;
-		}
 	}
 	
+	onSetCursor(ev);
+	if (ev->isPreventedDefault()) {
+		return;
+	}
+
 	Ref<Cursor> cursor = getCursor();
 	if (cursor.isNotNull()) {
 		Cursor::setCurrent(cursor);
@@ -7596,16 +7601,16 @@ void View::dispatchScroll(sl_scroll_pos x, sl_scroll_pos y)
 	}
 }
 
-void View::dispatchSwipe(GestureType type)
+void View::dispatchSwipe(GestureEvent* ev)
 {
-	onSwipe(type);
+	onSwipe(ev);
 	Ref<EventAttributes> eventAttrs = m_eventAttributes;
 	if (eventAttrs.isNotNull()) {
 		PtrLocker<IViewListener> listener(eventAttrs->listener);
 		if (listener.isNotNull()) {
-			listener->onSwipe(this, type);
+			listener->onSwipe(this, ev);
 		}
-		(eventAttrs->swipe)(this, type);
+		(eventAttrs->swipe)(this, ev);
 	}
 }
 
@@ -7913,7 +7918,11 @@ void ViewInstance::onSwipe(GestureType type)
 	Ref<View> view = getView();
 	if (view.isNotNull()) {
 		if (view->isEnabled()) {
-			view->dispatchSwipe(type);
+			Ref<GestureEvent> ev = new GestureEvent;
+			if (ev.isNotNull()) {
+				ev->type = type;
+				view->dispatchSwipe(ev.get());
+			}
 		}
 	}
 }

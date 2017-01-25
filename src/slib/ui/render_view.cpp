@@ -46,13 +46,19 @@ RenderView::RenderView()
 	setMakingLayout(sl_true, UIUpdateMode::Init);
 	
 	setPreferredEngineType(RenderEngineType::OpenGL_ES);
+	
 	m_redrawMode = RedrawMode::Continuously;
+	m_flagDispatchEventsToRenderingThread = sl_true;
 	
 	m_animationLoop = new _RenderAnimationLoop(this);
 	m_lastRenderingThreadId = 0;
 	
 	m_flagDebugTextVisible = sl_true;
 	m_flagDebugTextVisibleOnRelease = sl_false;
+}
+
+RenderView::~RenderView()
+{
 }
 
 RedrawMode RenderView::getRedrawMode()
@@ -66,6 +72,16 @@ void RenderView::setRedrawMode(RedrawMode mode)
 	if (isNativeWidget()) {
 		_setRedrawMode_NW(mode);
 	}
+}
+
+sl_bool RenderView::isDispatchingEventsToRenderingThread()
+{
+	return m_flagDispatchEventsToRenderingThread;
+}
+
+void RenderView::setDispatchingEventsToRenderingThread(sl_bool flag)
+{
+	m_flagDispatchEventsToRenderingThread = flag;
 }
 
 void RenderView::requestRender()
@@ -193,6 +209,117 @@ void RenderView::dispatchFrame(RenderEngine* engine)
 	}
 }
 
+void RenderView::dispatchMouseEvent(UIEvent* ev)
+{
+	if (m_flagDispatchEventsToRenderingThread) {
+		if (!(isDrawingThread())) {
+			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchMouseEvent, this, ev->duplicate()));
+			return;
+		}
+	}
+	View::dispatchMouseEvent(ev);
+}
+
+void RenderView::dispatchTouchEvent(UIEvent* ev)
+{
+	if (m_flagDispatchEventsToRenderingThread) {
+		if (Thread::getCurrentThreadUniqueId() != m_lastRenderingThreadId) {
+			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchTouchEvent, this, ev->duplicate()));
+			return;
+		}
+	}
+	View::dispatchTouchEvent(ev);
+}
+
+void RenderView::dispatchMouseWheelEvent(UIEvent* ev)
+{
+	if (m_flagDispatchEventsToRenderingThread) {
+		if (Thread::getCurrentThreadUniqueId() != m_lastRenderingThreadId) {
+			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchMouseWheelEvent, this, ev->duplicate()));
+			return;
+		}
+	}
+	View::dispatchMouseWheelEvent(ev);
+}
+
+void RenderView::dispatchKeyEvent(UIEvent* ev)
+{
+	if (m_flagDispatchEventsToRenderingThread) {
+		if (Thread::getCurrentThreadUniqueId() != m_lastRenderingThreadId) {
+			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchKeyEvent, this, ev->duplicate()));
+			return;
+		}
+	}
+	View::dispatchKeyEvent(ev);
+}
+
+void RenderView::dispatchClick(UIEvent* ev)
+{
+	if (m_flagDispatchEventsToRenderingThread) {
+		if (Thread::getCurrentThreadUniqueId() != m_lastRenderingThreadId) {
+			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchClick, this, ev->duplicate()));
+			return;
+		}
+	}
+	View::dispatchClick(ev);
+}
+
+void RenderView::dispatchSetCursor(UIEvent* ev)
+{
+	if (m_flagDispatchEventsToRenderingThread) {
+		if (Thread::getCurrentThreadUniqueId() != m_lastRenderingThreadId) {
+			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchSetCursor, this, ev->duplicate()));
+			return;
+		}
+	}
+	View::dispatchSetCursor(ev);
+}
+
+void RenderView::dispatchSwipe(GestureEvent* ev)
+{
+	if (m_flagDispatchEventsToRenderingThread) {
+		if (Thread::getCurrentThreadUniqueId() != m_lastRenderingThreadId) {
+			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchSwipe, this, ev->duplicate()));
+			return;
+		}
+	}
+	View::dispatchSwipe(ev);
+}
+
+void RenderView::_dispatchMouseEvent(const Ref<UIEvent>& ev)
+{
+	View::dispatchMouseEvent(ev.get());
+}
+
+void RenderView::_dispatchTouchEvent(const Ref<UIEvent>& ev)
+{
+	View::dispatchTouchEvent(ev.get());
+}
+
+void RenderView::_dispatchMouseWheelEvent(const Ref<UIEvent>& ev)
+{
+	View::dispatchMouseWheelEvent(ev.get());
+}
+
+void RenderView::_dispatchKeyEvent(const Ref<UIEvent>& ev)
+{
+	View::dispatchKeyEvent(ev.get());
+}
+
+void RenderView::_dispatchClick(const Ref<UIEvent>& ev)
+{
+	View::dispatchClick(ev.get());
+}
+
+void RenderView::_dispatchSetCursor(const Ref<UIEvent>& ev)
+{
+	View::dispatchSetCursor(ev.get());
+}
+
+void RenderView::_dispatchSwipe(const Ref<GestureEvent>& ev)
+{
+	View::dispatchSwipe(ev.get());
+}
 
 #if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
 

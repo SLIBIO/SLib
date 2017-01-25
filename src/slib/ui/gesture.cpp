@@ -6,6 +6,24 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+GestureEvent::GestureEvent()
+{
+}
+
+GestureEvent::~GestureEvent()
+{
+}
+
+Ref<GestureEvent> GestureEvent::duplicate()
+{
+	Ref<GestureEvent> ev = new GestureEvent;
+	if (ev.isNotNull()) {
+		ev->type = type;
+		return ev;
+	}
+	return sl_null;
+}
+
 SLIB_DEFINE_OBJECT(GestureDetector, Object)
 
 class GestureRecognizer : public Referable
@@ -74,7 +92,11 @@ public:
 							vx = -vx;
 						}
 						if (vx > 1) {
-							view->dispatchSwipe(type);
+							Ref<GestureEvent> ev = new GestureEvent;
+							if (ev.isNotNull()) {
+								ev->type = type;
+								view->dispatchSwipe(ev.get());
+							}
 						}
 					}
 				} else {
@@ -84,7 +106,11 @@ public:
 							vy = -vy;
 						}
 						if (vy > 1) {
-							view->dispatchSwipe(type);
+							Ref<GestureEvent> ev = new GestureEvent;
+							if (ev.isNotNull()) {
+								ev->type = type;
+								view->dispatchSwipe(ev.get());
+							}
 						}
 					}
 				}

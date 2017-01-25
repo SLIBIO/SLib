@@ -783,9 +783,10 @@ void ViewPager::onChangePadding()
 	}
 }
 
-void ViewPager::onSwipe(GestureType type)
+void ViewPager::onSwipe(GestureEvent* ev)
 {
 	if (m_flagSwipeNavigation) {
+		GestureType type = ev->type;
 		if (type == GestureType::SwipeLeft) {
 			goNext();
 		} else if (type == GestureType::SwipeRight) {

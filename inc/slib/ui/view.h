@@ -1065,9 +1065,9 @@ public:
 	
 	void setOnScroll(const Function<void(View*, sl_scroll_pos, sl_scroll_pos)>& callback);
 	
-	Function<void(View*, GestureType)> getOnSwipe();
+	Function<void(View*, GestureEvent*)> getOnSwipe();
 	
-	void setOnSwipe(const Function<void(View*, GestureType)>& callback);
+	void setOnSwipe(const Function<void(View*, GestureEvent*)>& callback);
 	
 protected:
 	virtual void onDraw(Canvas* canvas);
@@ -1106,7 +1106,7 @@ protected:
 	
 	virtual void onResizeContent(sl_scroll_pos width, sl_scroll_pos height);
 							
-	virtual void onSwipe(GestureType type);
+	virtual void onSwipe(GestureEvent* ev);
 
 	virtual void onAttach();
 	
@@ -1163,7 +1163,7 @@ public:
 	
 	virtual void dispatchScroll(sl_scroll_pos x, sl_scroll_pos y);
 
-	virtual void dispatchSwipe(GestureType type);
+	virtual void dispatchSwipe(GestureEvent* ev);
 	
 private:
 	void _processAttachOnUiThread();
@@ -1493,7 +1493,7 @@ protected:
 		AtomicFunction<void(View*, UIEvent*)> setCursor;
 		AtomicFunction<void(View*, sl_ui_len, sl_ui_len)> resize;
 		AtomicFunction<void(View*, sl_scroll_pos, sl_scroll_pos)> scroll;
-		AtomicFunction<void(View*, GestureType)> swipe;
+		AtomicFunction<void(View*, GestureEvent*)> swipe;
 	};
 	
 	AtomicRef<EventAttributes> m_eventAttributes;
@@ -1581,7 +1581,7 @@ public:
 	
 	void onSetCursor(UIEvent* event);
 	
-	void onSwipe(GestureType type);
+	void onSwipe(GestureType ev);
 	
 protected:
 	AtomicWeakRef<View> m_view;

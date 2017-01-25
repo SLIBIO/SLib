@@ -146,7 +146,7 @@ public:
 	void onChangePadding();
 	
 	// override
-	void onSwipe(GestureType type);
+	void onSwipe(GestureEvent* ev);
 	
 public:
 	SLIB_PROPERTY(AtomicPtr<IViewPagerListener>, Listener)

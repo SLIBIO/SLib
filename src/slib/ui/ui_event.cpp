@@ -189,6 +189,10 @@ UIEvent::UIEvent() : m_flags(0), m_action(UIAction::Unknown), m_time(0)
 {
 }
 
+UIEvent::~UIEvent()
+{
+}
+
 Ref<UIEvent> UIEvent::create(UIAction action)
 {
 	Ref<UIEvent> ret = new UIEvent;
@@ -838,7 +842,7 @@ void IViewListener::onScroll(View* view, sl_scroll_pos x, sl_scroll_pos y)
 {
 }
 
-void IViewListener::onSwipe(View* view, GestureType type)
+void IViewListener::onSwipe(View* view, GestureEvent* ev)
 {
 }
 
@@ -914,7 +918,7 @@ void UIEventLogListener::onSetCursor(View* view, UIEvent* event)
 	Log("View", "OnSetCursor");
 }
 
-void UIEventLogListener::onSwipe(View* view, GestureType type)
+void UIEventLogListener::onSwipe(View* view, GestureEvent* ev)
 {
 	Log("View", "OnSwipe");
 }
