@@ -1,6 +1,7 @@
 #include "../../../inc/slib/ui/label_view.h"
 
 #include "../../../inc/slib/core/scoped.h"
+#include "../../../inc/slib/graphics/util.h"
 
 SLIB_UI_NAMESPACE_BEGIN
 
@@ -25,7 +26,6 @@ String LabelView::getText()
 void LabelView::setText(const String& text, UIUpdateMode mode)
 {
 	m_text = text;
-	m_currentTextBoundWidth = 0;
 	
 	if (isNativeWidget()) {
 		_setText_NW(text);
@@ -74,7 +74,7 @@ void LabelView::onDraw(Canvas* canvas)
 {
 	_makeMultilineList();
 	
-	ListLocker<String16> lines(m_textLines);
+	ListLocker<TextLine> lines(m_textLines);
 	
 	if (lines.count == 0) {
 		return;
@@ -86,43 +86,27 @@ void LabelView::onDraw(Canvas* canvas)
 	}
 	
 	if (lines.count == 1) {
-		canvas->drawText(lines[0], getBoundsInnerPadding(), font, m_textColor, m_textAlignment);
+		Point pt = GraphicsUtil::calculateAlignPosition(getBoundsInnerPadding(), lines[0].width, lines[0].height, m_textAlignment);
+		canvas->drawText(lines[0].text, pt.x, pt.y, font, m_textColor);
 		return;
 	}
 	
 	UIRect rect(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(), 0);
 	
-	SLIB_SCOPED_BUFFER(sl_ui_len, 64, widthLines, lines.count)
-	SLIB_SCOPED_BUFFER(sl_ui_len, 64, heightLines, lines.count)
-	
-	sl_size i;
-	sl_ui_len totalHeight = 0;
-	
-	for (i = 0; i < lines.count; i++) {
-		String16& line = lines[i];
-		UISize size = font->getTextSize(line);
-		widthLines[i] = size.x;
-		heightLines[i] = size.y;
-		totalHeight += size.y;
-	}
-	
-	if (totalHeight <= 0) {
-		return;
-	}
-	
 	Alignment alignHorz = m_textAlignment & Alignment::HorizontalMask;
 	Alignment alignVert = m_textAlignment & Alignment::VerticalMask;
 	
 	if (alignVert == Alignment::Middle) {
-		rect.top += (getHeight() - totalHeight) / 2;
+		rect.top += (getHeight() - m_totalHeight) / 2;
 	} else if (alignVert == Alignment::Bottom) {
-		rect.top += (getHeight() - totalHeight);
+		rect.top += (getHeight() - m_totalHeight);
 	}
 	
-	for (i = 0; i < lines.count; i++) {
-		String16& line = lines[i];
-		rect.bottom = rect.top + heightLines[i];
-		canvas->drawText(line, rect, font, m_textColor, alignHorz);
+	for (sl_size i = 0; i < lines.count; i++) {
+		String16& line = lines[i].text;
+		rect.bottom = rect.top + lines[i].height;
+		Point pt = GraphicsUtil::calculateAlignPosition(rect, lines[i].width, lines[i].height, alignHorz);
+		canvas->drawText(lines[i].text, pt.x, pt.y, font, m_textColor);
 		rect.top = rect.bottom;
 	}
 
@@ -178,14 +162,7 @@ void LabelView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 	} else {
 		if (flagVertical) {
 			_makeMultilineList();
-			sl_ui_pos height = 0;
-			ListLocker<String16> lines(m_textLines);
-			for (sl_size i = 0; i < lines.count; i++) {
-				String16& line = lines[i];
-				UISize size = font->getTextSize(line);
-				height += size.y;
-			}
-			setMeasuredHeight(height);
+			setMeasuredHeight(m_totalHeight);
 		}
 	}
 }
@@ -205,7 +182,7 @@ void LabelView::_makeMultilineList()
 		return;
 	}
 	
-	if (m_currentTextBoundWidth > 0 && m_currentTextBoundWidth == maxWidth && font == m_currentTextFont) {
+	if (m_currentText == m_text && font == m_currentTextFont) {
 		return;
 	}
 	
@@ -213,8 +190,8 @@ void LabelView::_makeMultilineList()
 	const sl_char16* buf = text.getData();
 	sl_size lenText = text.getLength();
 	
-	List<String16> lines;
-	String16 line;
+	List<TextLine> lines;
+	TextLine line;
 	sl_size posLine = 0;
 	sl_size posWordStart = 0;
 	sl_bool flagNewLine = sl_false;
@@ -223,6 +200,9 @@ void LabelView::_makeMultilineList()
 	sl_size pos = 0;
 	for (; pos < lenText; pos++) {
 		if (flagNewLine) {
+			Size size = font->getTextSize(line.text);
+			line.width = size.x;
+			line.height = size.y;
 			lines.add_NoLock(line);
 			lineMeasure = String16::fromStatic(buf + pos, 1);
 			posLine = pos;
@@ -231,7 +211,7 @@ void LabelView::_makeMultilineList()
 		}
 		sl_char16 ch = buf[pos];
 		if (ch == '\r' || ch == '\n') {
-			line = String16(buf + posLine, pos - posLine);
+			line.text = String16(buf + posLine, pos - posLine);
 			if (ch == '\r' && pos + 1 < lenText && buf[pos + 1] == '\n') {
 				pos++;
 			}
@@ -253,7 +233,7 @@ void LabelView::_makeMultilineList()
 					if (pos >= posLine + 2) {
 						pos--;
 					}
-					line = String16(buf + posLine, pos - posLine);
+					line.text = String16(buf + posLine, pos - posLine);
 				} else {
 					posWordStart--;
 					pos = posWordStart;
@@ -263,22 +243,37 @@ void LabelView::_makeMultilineList()
 						}
 						posWordStart--;
 					}
-					line = String16(buf + posLine, posWordStart - posLine);
+					line.text = String16(buf + posLine, posWordStart - posLine);
 				}
 				flagNewLine = sl_true;
 			}
 		}
 	}
 	if (flagNewLine) {
+		Size size = font->getTextSize(line.text);
+		line.width = size.x;
+		line.height = size.y;
 		lines.add_NoLock(line);
 	}
 	if (pos > posLine) {
-		lines.add_NoLock(String16(buf + posLine, pos - posLine));
+		line.text = String16(buf + posLine, pos - posLine);
+		Size size = font->getTextSize(line.text);
+		line.width = size.x;
+		line.height = size.y;
+		lines.add_NoLock(line);
 	}
 	
 	m_textLines = lines;
 	
-	m_currentTextBoundWidth = maxWidth;
+	sl_uint32 totalHeight = 0;
+	
+	for (sl_size i = 0; i < m_textLines.getCount(); i++) {
+		totalHeight += m_textLines[i].height;
+	}
+	
+	m_totalHeight = totalHeight;
+	
+	m_currentText = m_text;
 	m_currentTextFont = font;
 	
 }

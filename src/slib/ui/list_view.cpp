@@ -745,7 +745,7 @@ sl_ui_len ListView::_measureItemWidth(const Ref<View>& itemView, sl_ui_len width
 		switch (mode) {
 		case SizeMode::Filling:
 		case SizeMode::Weight:
-			ret = (sl_ui_len)((sl_real)widthList * itemView->getHeightWeight());
+			ret = (sl_ui_len)((sl_real)widthList * itemView->getWidthWeight());
 			break;
 		case SizeMode::Wrapping:
 			itemView->measureLayout();

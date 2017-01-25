@@ -454,8 +454,12 @@ void View::_processAttachOnUiThread()
 		if (gesture.isNotNull()) {
 			gesture->enableNative();
 		}
-		if (getParent().isNull() && !(IsInstanceOf<RenderView>(this))) {
-			_makeLayout(sl_false);
+		if (getParent().isNull()) {
+			if (IsInstanceOf<RenderView>(this)) {
+				dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, _makeLayout, this, sl_false));
+			} else {
+				_makeLayout(sl_false);
+			}
 		}
 		if (m_flagCreatingChildInstances) {
 			ListLocker< Ref<View> > children(m_children);
@@ -1878,8 +1882,8 @@ void View::_makeLayout(sl_bool flagApplyLayout)
 										child->onPrepareLayout(param);
 									}
 								}
+								child->_setFrame(child->getLayoutFrame(), UIUpdateMode::NoRedraw, sl_true);
 								if (child->isInstance() && IsInstanceOf<RenderView>(child)) {
-									child->_setFrame(child->getLayoutFrame(), UIUpdateMode::NoRedraw, sl_true);
 									child->_requestMakeLayout();
 								} else {
 									child->_makeLayout(sl_true);

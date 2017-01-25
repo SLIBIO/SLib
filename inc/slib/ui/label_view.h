@@ -7,6 +7,12 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+struct TextLine {
+	String16 text;
+	sl_uint32 width;
+	sl_uint32 height;
+};
+
 class SLIB_EXPORT LabelView : public View
 {
 	SLIB_DECLARE_OBJECT
@@ -61,8 +67,9 @@ protected:
 	Color m_textColor;
 	Alignment m_textAlignment;
 	
-	AtomicList<String16> m_textLines;
-	sl_ui_len m_currentTextBoundWidth;
+	AtomicList<TextLine> m_textLines;
+	sl_uint32 m_totalHeight;
+	AtomicString m_currentText;
 	AtomicRef<Font> m_currentTextFont;
 	
 };
