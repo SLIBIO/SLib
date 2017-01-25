@@ -1,1 +1,1 @@
-libjpeg 9a
+libjpeg 9b

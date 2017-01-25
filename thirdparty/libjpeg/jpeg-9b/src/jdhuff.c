@@ -1196,7 +1196,7 @@ decode_mcu_sub (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
  */
 
 METHODDEF(boolean)
-jdhuff_c__decode_mcu (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
+jdhuff_decode_mcu (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 {
   huff_entropy_ptr entropy = (huff_entropy_ptr) cinfo->entropy;
   int blkn;
@@ -1428,7 +1428,7 @@ start_pass_huff_decoder (j_decompress_ptr cinfo)
     if (cinfo->lim_Se != DCTSIZE2-1)
       entropy->pub.decode_mcu = decode_mcu_sub;
     else
-		entropy->pub.decode_mcu = jdhuff_c__decode_mcu;
+      entropy->pub.decode_mcu = jdhuff_decode_mcu;
 
     for (ci = 0; ci < cinfo->comps_in_scan; ci++) {
       compptr = cinfo->cur_comp_info[ci];

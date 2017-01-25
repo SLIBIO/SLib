@@ -61,10 +61,10 @@
 #define huff_entropy_ptr jdhuff_c__huff_entropy_ptr
 #define finish_pass_huff jdhuff_c__finish_pass_huff
 #define process_restart jdhuff_c__process_restart
-#define decode_mcu_DC_first jchuff_c__decode_mcu_DC_first
-#define decode_mcu_AC_first jchuff_c__decode_mcu_AC_first
-#define decode_mcu_DC_refine jchuff_c__decode_mcu_DC_refine
-#define decode_mcu_AC_refine jchuff_c__decode_mcu_AC_refine
+#define decode_mcu_DC_first jdhuff_c__decode_mcu_DC_first
+#define decode_mcu_AC_first jdhuff_c__decode_mcu_AC_first
+#define decode_mcu_DC_refine jdhuff_c__decode_mcu_DC_refine
+#define decode_mcu_AC_refine jdhuff_c__decode_mcu_AC_refine
 #include "src/jdhuff.c"
 #define initial_setup jdinput_c__initial_setup
 #define per_scan_setup jdinput_c__per_scan_setup
@@ -135,6 +135,7 @@
 #include "src/jdmaster.c"
 #undef FIX
 #define build_ycc_rgb_table jdmergy_c__build_ycc_rgb_table
+#define build_bg_ycc_rgb_table jdmergy_c__build_bg_ycc_rgb_table
 #include "src/jdmerge.c"
 #include "src/jdpostct.c"
 #define my_upsampler jdsample_c__my_upsampler

@@ -9,9 +9,6 @@
  * cjpeg and djpeg.  It is NOT used by the core JPEG library.
  */
 
-#ifndef CDJPEG_H
-#define CDJPEG_H
-
 #define JPEG_CJPEG_DJPEG	/* define proper options in jconfig.h */
 #define JPEG_INTERNAL_OPTIONS	/* cjpeg.c,djpeg.c need to see xxx_SUPPORTED */
 #include "jinclude.h"
@@ -187,6 +184,4 @@ EXTERN(FILE *) write_stdout JPP((void));
 #else
 #define EXIT_WARNING  2
 #endif
-#endif
-
 #endif

@@ -1,7 +1,7 @@
 /*
  * jdarith.c
  *
- * Developed 1997-2013 by Guido Vollbeding.
+ * Developed 1997-2015 by Guido Vollbeding.
  * This file is part of the Independent JPEG Group's software.
  * For conditions of distribution and use, see the accompanying README file.
  *
@@ -94,7 +94,7 @@ get_byte (j_decompress_ptr cinfo)
  * (instead of fixed) with the bit shift counter CT.
  * Thus, we also need only one (variable instead of
  * fixed size) shift for the LPS/MPS decision, and
- * we can get away with any renormalization update
+ * we can do away with any renormalization update
  * of C (except for new data insertion, of course).
  *
  * I've also introduced a new scheme for accessing
@@ -640,7 +640,7 @@ decode_mcu (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
  */
 
 METHODDEF(void)
-jdarth_c__start_pass (j_decompress_ptr cinfo)
+jdarith_start_pass (j_decompress_ptr cinfo)
 {
   arith_entropy_ptr entropy = (arith_entropy_ptr) cinfo->entropy;
   int ci, tbl;
@@ -750,7 +750,7 @@ jdarth_c__start_pass (j_decompress_ptr cinfo)
  */
 
 METHODDEF(void)
-jdarth_c__finish_pass(j_decompress_ptr cinfo)
+jdarith_finish_pass (j_decompress_ptr cinfo)
 {
   /* no work necessary here */
 }
@@ -770,8 +770,8 @@ jinit_arith_decoder (j_decompress_ptr cinfo)
     (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
 				SIZEOF(arith_entropy_decoder));
   cinfo->entropy = &entropy->pub;
-  entropy->pub.start_pass = jdarth_c__start_pass;
-  entropy->pub.finish_pass = jdarth_c__finish_pass;
+  entropy->pub.start_pass = jdarith_start_pass;
+  entropy->pub.finish_pass = jdarith_finish_pass;
 
   /* Mark tables unallocated */
   for (i = 0; i < NUM_ARITH_TBLS; i++) {
