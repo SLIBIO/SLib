@@ -572,6 +572,7 @@ Ref<UIEvent> UIEvent::duplicate()
 	if (ret.isNotNull()) {
 		ret->m_flags = m_flags;
 		ret->m_action = m_action;
+		ret->m_time = m_time;
 		ret->m_keycodeAndModifiers = m_keycodeAndModifiers;
 		ret->m_systemKeycode = m_systemKeycode;
 		ret->m_point = m_point;
