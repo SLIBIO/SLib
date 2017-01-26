@@ -89,7 +89,7 @@ void ScrollView::_setContentView_NW(const Ref<View>& view)
 	}
 }
 
-void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y)
+void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate)
 {
 	jobject handle = UIPlatform::getViewHandle(this);
 	if (handle) {

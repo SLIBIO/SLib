@@ -152,11 +152,11 @@ void ScrollView::_setContentView_NW(const Ref<View>& view)
 	}
 }
 
-void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y, sl_bool animated)
+void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate)
 {
 	if (![NSThread isMainThread]) {
 		dispatch_async(dispatch_get_main_queue(), ^{
-			_scrollTo_NW(x, y, animated);
+			_scrollTo_NW(x, y, flagAnimate);
 		});
 		return;
 	}
@@ -166,10 +166,10 @@ void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y, sl_bool animated
 		CGFloat f = UIPlatform::getGlobalScaleFactor();
 		if ([handle isKindOfClass:[_Slib_iOS_ScrollView class]]) {
 			_Slib_iOS_ScrollView* sv = (_Slib_iOS_ScrollView*)handle;
-			[sv setContentOffsetFromAPI:CGPointMake((CGFloat)(x) / f, (CGFloat)(y) / f) animated:animated];
+			[sv setContentOffsetFromAPI:CGPointMake((CGFloat)(x) / f, (CGFloat)(y) / f) animated:flagAnimate];
 		} else if ([handle isKindOfClass:[UIScrollView class]]) {
 			UIScrollView* sv = (UIScrollView*)handle;
-			[sv setContentOffset:CGPointMake((CGFloat)(x) / f, (CGFloat)(y) / f) animated:animated];
+			[sv setContentOffset:CGPointMake((CGFloat)(x) / f, (CGFloat)(y) / f) animated:flagAnimate];
 		}
 	}
 }

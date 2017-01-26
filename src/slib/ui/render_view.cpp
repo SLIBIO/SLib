@@ -48,7 +48,7 @@ RenderView::RenderView()
 	setPreferredEngineType(RenderEngineType::OpenGL_ES);
 	
 	m_redrawMode = RedrawMode::Continuously;
-	m_flagDispatchEventsToRenderingThread = sl_true;
+	m_flagDispatchEventsToRenderingThread = sl_false;
 	
 	m_animationLoop = new _RenderAnimationLoop(this);
 	m_lastRenderingThreadId = 0;

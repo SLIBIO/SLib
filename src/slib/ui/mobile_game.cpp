@@ -40,6 +40,8 @@ MobileGameView::MobileGameView()
 	SLIB_REFERABLE_CONSTRUCTOR
 	
 	setRedrawMode(RedrawMode::WhenDirty);
+	setDispatchingEventsToRenderingThread(sl_true);
+	
 }
 
 SLIB_UI_NAMESPACE_END

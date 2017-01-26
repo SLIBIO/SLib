@@ -70,7 +70,7 @@ protected:
 	void onMakeLayout();
 	
 private:
-	void _scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool animated, UIUpdateMode mode);
+	void _scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate, UIUpdateMode mode);
 	
 	void _updatePaging();
 	
@@ -78,7 +78,7 @@ private:
 	
 	void _setContentView_NW(const Ref<View>& view);
 	
-	void _scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y, sl_bool animated = sl_false);
+	void _scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate);
 	
 	ScrollPoint _getScrollPosition_NW();
 	

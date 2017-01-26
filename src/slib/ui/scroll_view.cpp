@@ -198,12 +198,12 @@ void ScrollView::onMakeLayout()
 {	
 }
 
-void ScrollView::_scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool animated, UIUpdateMode mode)
+void ScrollView::_scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate, UIUpdateMode mode)
 {
 	Ref<View> view = m_viewContent;
 	if (view.isNotNull()) {
 		if (isNativeWidget()) {
-			_scrollTo_NW(x, y, animated);
+			_scrollTo_NW(x, y, flagAnimate);
 		} else {
 			sl_ui_len w = getWidth();
 			sl_ui_len cw = view->getWidth();
@@ -257,7 +257,7 @@ void ScrollView::_setContentView_NW(const Ref<View>& view)
 {
 }
 
-void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y)
+void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate)
 {
 }
 

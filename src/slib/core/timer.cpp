@@ -10,15 +10,17 @@ SLIB_DEFINE_OBJECT(Timer, Object)
 Timer::Timer()
 {
 	m_flagUseLoop = sl_false;
-	
 	m_flagStarted = sl_false;
 	m_nCountRun = 0;
+	
 	setLastRunTime(0);
 	setMaxConcurrentThread(1);
 }
 
 Timer::~Timer()
 {
+	SLIB_REFERABLE_DESTRUCTOR
+	stop();
 }
 
 Ref<Timer> Timer::createWithLoop(const Ref<DispatchLoop>& loop, const Function<void()>& task, sl_uint64 interval_ms, sl_bool flagStart)
