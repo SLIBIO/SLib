@@ -34,6 +34,8 @@ public:
 	void scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	void scrollTo(const ScrollPoint& position, UIUpdateMode mode = UIUpdateMode::Redraw);
+    
+    void smoothScrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isPaging();
 	
@@ -68,7 +70,7 @@ protected:
 	void onMakeLayout();
 	
 private:
-	void _scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode);
+	void _scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool animated, UIUpdateMode mode);
 	
 	void _updatePaging();
 	
@@ -76,7 +78,7 @@ private:
 	
 	void _setContentView_NW(const Ref<View>& view);
 	
-	void _scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y);
+	void _scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y, sl_bool animated = sl_false);
 	
 	ScrollPoint _getScrollPosition_NW();
 	

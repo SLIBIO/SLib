@@ -18,7 +18,7 @@
 	
 }
 
-- (void)setContentOffsetFromAPI:(CGPoint)contentOffset;
+- (void)setContentOffsetFromAPI:(CGPoint)contentOffset animated:(BOOL) animated;
 
 - (void)setPaging:(sl_bool)flagPaging :(sl_ui_len)pageWidth :(sl_ui_len)pageHeight;
 
@@ -152,11 +152,11 @@ void ScrollView::_setContentView_NW(const Ref<View>& view)
 	}
 }
 
-void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y)
+void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y, sl_bool animated)
 {
 	if (![NSThread isMainThread]) {
 		dispatch_async(dispatch_get_main_queue(), ^{
-			_scrollTo_NW(x, y);
+			_scrollTo_NW(x, y, animated);
 		});
 		return;
 	}
@@ -166,10 +166,10 @@ void ScrollView::_scrollTo_NW(sl_scroll_pos x, sl_scroll_pos y)
 		CGFloat f = UIPlatform::getGlobalScaleFactor();
 		if ([handle isKindOfClass:[_Slib_iOS_ScrollView class]]) {
 			_Slib_iOS_ScrollView* sv = (_Slib_iOS_ScrollView*)handle;
-			[sv setContentOffsetFromAPI:CGPointMake((CGFloat)(x) / f, (CGFloat)(y) / f)];
+			[sv setContentOffsetFromAPI:CGPointMake((CGFloat)(x) / f, (CGFloat)(y) / f) animated:animated];
 		} else if ([handle isKindOfClass:[UIScrollView class]]) {
 			UIScrollView* sv = (UIScrollView*)handle;
-			[sv setContentOffset:CGPointMake((CGFloat)(x) / f, (CGFloat)(y) / f)];
+			[sv setContentOffset:CGPointMake((CGFloat)(x) / f, (CGFloat)(y) / f) animated:animated];
 		}
 	}
 }
@@ -273,9 +273,9 @@ SLIB_UI_NAMESPACE_END
 	}
 }
 
-- (void)setContentOffsetFromAPI:(CGPoint)contentOffset
+- (void)setContentOffsetFromAPI:(CGPoint)contentOffset animated:(BOOL)animated
 {
-	[super setContentOffset:contentOffset];
+	[super setContentOffset:contentOffset animated:animated];
 }
 
 - (void)setPaging: (sl_bool)flagPaging :(sl_ui_len)pageWidth :(sl_ui_len)pageHeight

@@ -57,7 +57,7 @@ void ScrollView::setContentView(const Ref<slib::View>& view, UIUpdateMode mode)
 				}
 			} else {
 				UIPoint pt = View::getScrollPosition();
-				_scrollTo(pt.x, pt.y, UIUpdateMode::NoRedraw);
+				_scrollTo(pt.x, pt.y, sl_false, UIUpdateMode::NoRedraw);
 				if (mode == UIUpdateMode::Redraw) {
 					invalidate();
 				}
@@ -114,13 +114,19 @@ ScrollPoint ScrollView::getScrollRange()
 
 void ScrollView::scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode)
 {
-	_scrollTo(x, y, UIUpdateMode::NoRedraw);
+	_scrollTo(x, y, sl_false, UIUpdateMode::NoRedraw);
 	View::scrollTo(x, y, mode);
 }
 
 void ScrollView::scrollTo(const ScrollPoint& position, UIUpdateMode mode)
 {
 	scrollTo(position.x, position.y, mode);
+}
+
+void ScrollView::smoothScrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode)
+{
+    _scrollTo(x, y, sl_true, UIUpdateMode::NoRedraw);
+    View::scrollTo(x, y, mode);
 }
 
 sl_bool ScrollView::isPaging()
@@ -192,12 +198,12 @@ void ScrollView::onMakeLayout()
 {	
 }
 
-void ScrollView::_scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode)
+void ScrollView::_scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool animated, UIUpdateMode mode)
 {
 	Ref<View> view = m_viewContent;
 	if (view.isNotNull()) {
 		if (isNativeWidget()) {
-			_scrollTo_NW(x, y);
+			_scrollTo_NW(x, y, animated);
 		} else {
 			sl_ui_len w = getWidth();
 			sl_ui_len cw = view->getWidth();
