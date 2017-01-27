@@ -146,8 +146,11 @@ public:
 	
 	void drawTexture(const Rectangle& rectDst, const Ref<Texture>& texture, sl_real alpha = 1);
 	
+	
+	Matrix3 getTransformMatrixForRectangle(const Rectangle& rect);
+	
 	void drawRectangle(const Rectangle& rect, RenderProgramState2D_Position* programState, const DrawParam& param);
-
+	
 protected:
 	// override
 	void onDraw(const Rectangle& rectDst, const Ref<Drawable>& src, const Rectangle& rectSrc, const DrawParam& param);

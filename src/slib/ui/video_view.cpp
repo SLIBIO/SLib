@@ -159,7 +159,8 @@ void VideoView::onDraw(Canvas* _canvas)
 					program = m_programRGB;
 				}
 				if (program.isNotNull()) {
-					engine->drawTexture2D(program, Rectangle(-1, -1, 1, 1), m_textureFrame);
+					Matrix3 mat = canvas->getTransformMatrixForRectangle(getBounds());
+					engine->drawTexture2D(program, mat, m_textureFrame);
 				}
 			}
 		}

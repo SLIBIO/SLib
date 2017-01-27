@@ -873,6 +873,18 @@ void RenderCanvas::drawTexture(const Rectangle& rectDst, const Ref<Texture>& tex
 	drawTexture(rectDst, texture, DrawParam(), Color4f(1, 1, 1, alpha));
 }
 
+Matrix3 RenderCanvas::getTransformMatrixForRectangle(const Rectangle& rect)
+{
+	RenderCanvasState* canvasState = m_state.get();
+	Matrix3 mat;
+	mat.m00 = rect.getWidth(); mat.m10 = 0; mat.m20 = rect.left;
+	mat.m01 = 0; mat.m11 = rect.getHeight(); mat.m21 = rect.top;
+	mat.m02 = 0; mat.m12 = 0; mat.m22 = 1;
+	mat *= canvasState->matrix;
+	mat *= m_matViewport;
+	return mat;
+}
+
 void RenderCanvas::drawRectangle(const Rectangle& rect, RenderProgramState2D_Position* programState, const DrawParam& param)
 {
 	_RenderCanvas_Shared* shared = _RenderCanvas_getShared();
@@ -890,7 +902,7 @@ void RenderCanvas::drawRectangle(const Rectangle& rect, RenderProgramState2D_Pos
 	mat *= m_matViewport;
 	programState->setTransform(mat);
 	
-	Color4f color(0, 0, 0, param.alpha * getAlpha());
+	Color4f color(1, 1, 1, param.alpha * getAlpha());
 	programState->setColor(color);
 	
 	m_engine->drawPrimitive(4, shared->vbRectangle, PrimitiveType::TriangleStrip);
