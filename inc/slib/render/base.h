@@ -50,6 +50,11 @@ class SLIB_EXPORT RenderBaseObject : public Object
 {
 	SLIB_DECLARE_OBJECT
 	
+protected:
+	RenderBaseObject();
+	
+	~RenderBaseObject();
+	
 public:
 	void addInstance(const Ref<RenderBaseObjectInstance>& instance);
 	

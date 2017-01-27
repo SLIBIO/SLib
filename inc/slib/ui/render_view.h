@@ -49,6 +49,9 @@ public:
 	// override
 	void runOnDrawingThread(const Function<void()>& callback);
 	
+	// override
+	Ref<Dispatcher> getDispatcher();
+
 	sl_bool isDebugTextVisible();
 	
 	void setDebugTextVisible(sl_bool flagVisible);

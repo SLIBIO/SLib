@@ -26,6 +26,8 @@ public:
 public:
 	AudioPlayerInfo();
 	
+	~AudioPlayerInfo();
+	
 };
 
 class AudioPlayerBuffer;
@@ -33,7 +35,7 @@ class AudioPlayerBuffer;
 class SLIB_EXPORT IAudioPlayerBufferListener
 {
 public:
-	virtual void onPlayAudio(AudioPlayerBuffer* player, sl_size requestedSamplesCount) = 0;
+	virtual void onRequireAudioData(AudioPlayerBuffer* player, sl_size requestedSamplesCount) = 0;
 };
 
 class SLIB_EXPORT AudioPlayerBufferParam
@@ -45,61 +47,16 @@ public:
 	sl_uint32 frameLengthInMilliseconds;
 	
 	sl_bool flagAutoStart;
-
+	
 	Ptr<IAudioPlayerBufferListener> listener;
+	Function<void(AudioPlayerBuffer*, sl_size)> onRequireAudioData;
 	Ref<Event> event;
 	
 public:
 	AudioPlayerBufferParam();
 	
-};
-
-class AudioPlayerControl;
-
-class SLIB_EXPORT AudioPlayerOpenParam
-{
-public:
-	Memory data;
-	String url;
+	~AudioPlayerBufferParam();
 	
-	sl_bool flagAutoStart;
-	sl_bool flagKeepReference;
-	
-	AtomicFunction<void(AudioPlayerControl*)> onReadyToPlay;
-	
-public:
-	AudioPlayerOpenParam();
-	
-};
-
-class SLIB_EXPORT AudioPlayerParam
-{
-public:
-	String deviceId;
-	
-public:
-	AudioPlayerParam();
-	
-};
-
-class SLIB_EXPORT AudioPlayerControl : public Object
-{
-	SLIB_DECLARE_OBJECT
-	
-protected:
-	AudioPlayerControl();
-	
-public:
-	virtual void stop() = 0;
-	
-	virtual void resume() = 0;
-	
-	virtual void pause() = 0;
-	
-	virtual sl_bool isPlaying() = 0;
-	
-public:
-	void _removeFromMap();
 };
 
 class SLIB_EXPORT AudioPlayerBuffer : public Object
@@ -108,6 +65,8 @@ class SLIB_EXPORT AudioPlayerBuffer : public Object
 
 protected:
 	AudioPlayerBuffer();
+	
+	~AudioPlayerBuffer();
 	
 public:
 	virtual void release() = 0;
@@ -124,6 +83,8 @@ public:
 	void write(const AudioData& audioPlay);
 
 protected:
+	void _init(const AudioPlayerBufferParam& param);
+	
 	Array<sl_int16> _getProcessData(sl_size count);
 	
 	void _processFrame(sl_int16* s, sl_size count);
@@ -135,13 +96,31 @@ protected:
 	AtomicArray<sl_int16> m_processData;
 	
 	Ptr<IAudioPlayerBufferListener> m_listener;
+	Function<void(AudioPlayerBuffer*, sl_size)> m_onRequireAudioData;
 	Ref<Event> m_event;
+	
+};
+
+class SLIB_EXPORT AudioPlayerParam
+{
+public:
+	String deviceId;
+	
+public:
+	AudioPlayerParam();
+	
+	~AudioPlayerParam();
 	
 };
 
 class SLIB_EXPORT AudioPlayer : public Object
 {
 	SLIB_DECLARE_OBJECT
+	
+public:
+	AudioPlayer();
+	
+	~AudioPlayer();
 	
 public:
 	static Ref<AudioPlayer> create(const AudioPlayerParam& param);
@@ -152,15 +131,6 @@ public:
 	
 public:
 	virtual Ref<AudioPlayerBuffer> createBuffer(const AudioPlayerBufferParam& param) = 0;
-	
-	Ref<AudioPlayerControl> open(const AudioPlayerOpenParam& param);
-	
-	static Ref<AudioPlayerControl> playSound(const Memory& data, sl_bool flagAutoPlay = sl_true);
-	
-	static Ref<AudioPlayerControl> playUrl(const String& url, sl_bool flagAutoPlay = sl_true);
-	
-protected:
-	virtual Ref<AudioPlayerControl> _openNative(const AudioPlayerOpenParam& param) = 0;
 	
 };
 

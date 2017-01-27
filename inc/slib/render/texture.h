@@ -27,6 +27,11 @@ class SLIB_EXPORT TextureInstance : public RenderBaseObjectInstance
 	SLIB_DECLARE_OBJECT
 	
 public:
+	TextureInstance();
+	
+	~TextureInstance();
+	
+public:
 	virtual void notifyUpdated(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height);
 	
 protected:
@@ -40,6 +45,8 @@ class SLIB_EXPORT Texture : public RenderBaseObject
 	
 protected:
 	Texture();
+	
+	~Texture();
 
 public:
 	static Ref<Texture> create(const Ref<Bitmap>& source);
@@ -87,6 +94,25 @@ protected:
 	AtomicWeakRef<Bitmap> m_sourceWeak;
 	sl_uint32 m_width;
 	sl_uint32 m_height;
+	
+};
+
+class EngineTexture : public Texture
+{
+	SLIB_DECLARE_OBJECT
+	
+protected:
+	EngineTexture();
+	
+	~EngineTexture();
+	
+public:
+	Ref<Referable> getLinkedObject();
+	
+	void setLinkedObject(const Ref<Referable>& object);
+	
+protected:
+	AtomicRef<Referable> m_linkedObject;
 	
 };
 

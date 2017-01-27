@@ -18,6 +18,8 @@ public:
 public:
 	VideoFrame();
 	
+	~VideoFrame();
+	
 };
 
 SLIB_MEDIA_NAMESPACE_END

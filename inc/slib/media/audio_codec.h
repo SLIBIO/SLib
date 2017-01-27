@@ -16,6 +16,8 @@ class SLIB_EXPORT AudioEncoder : public Object
 	
 public:
 	AudioEncoder();
+	
+	~AudioEncoder();
 
 public:
 	virtual Memory encode(const AudioData& input) = 0;
@@ -42,6 +44,8 @@ class SLIB_EXPORT AudioDecoder : public Object
 	
 public:
 	AudioDecoder();
+	
+	~AudioDecoder();
 
 public:
 	// returns the count of samples (per channel) actually decoded

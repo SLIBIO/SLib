@@ -175,10 +175,7 @@ public:
 							ret->m_nSamplesFrame = param.samplesPerSecond * param.frameLengthInMilliseconds / 1000 * param.channelsCount;
 							ret->m_bufFrame = new sl_int16[ret->m_nSamplesFrame * 2];
 							
-							ret->m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000 * param.channelsCount);
-							ret->m_nChannels = param.channelsCount;
-							ret->m_listener = param.listener;
-							ret->m_event = param.event;
+							ret->_init(param);
 							
 							if (ret->m_bufFrame) {
 								if ((*bufferQueue)->RegisterCallback(bufferQueue, _OpenSLES_AudioPlayerBufferImpl::callback, ret.get()) == SL_RESULT_SUCCESS) {

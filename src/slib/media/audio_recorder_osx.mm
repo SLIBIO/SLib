@@ -119,10 +119,7 @@ public:
 					ret->m_formatSrc = formatSrc;
 					ret->m_formatDst = formatDst;
 					
-					ret->m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000 * param.channelsCount);
-					ret->m_nChannels = param.channelsCount;
-					ret->m_listener = param.listener;
-					ret->m_event = param.event;
+					ret->_init(param);
 
 					AudioDeviceIOProcID callback;
 					if (AudioDeviceCreateIOProcID(deviceID, DeviceIOProc, ret.get(), &callback) == kAudioHardwareNoError) {

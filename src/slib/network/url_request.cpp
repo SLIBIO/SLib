@@ -31,7 +31,7 @@ UrlRequestParam::UrlRequestParam()
 {
 	method = HttpMethod::GET;
 	flagUseBackgroundSession = sl_false;
-	flagKeepReference = sl_true;
+	flagSelfAlive = sl_true;
 	flagStoreResponseContent = sl_true;
 }
 
@@ -254,9 +254,9 @@ sl_bool UrlRequest::isUsingBackgroundSession()
 	return m_flagUseBackgroundSession;
 }
 
-sl_bool UrlRequest::isKeepingReference()
+sl_bool UrlRequest::isSelfAlive()
 {
-	return m_flagKeepReference;
+	return m_flagSelfAlive;
 }
 
 sl_bool UrlRequest::isStoringResponseContent()
@@ -338,10 +338,10 @@ void UrlRequest::_init(const UrlRequestParam& param, const String& url, const St
 	m_onReceiveContent = param.onReceiveContent;
 	m_dispatcher = param.dispatcher;
 	m_flagUseBackgroundSession = param.flagUseBackgroundSession;
-	m_flagKeepReference = param.flagKeepReference;
+	m_flagSelfAlive = param.flagSelfAlive;
 	m_flagStoreResponseContent = param.flagStoreResponseContent;
 	
-	if (param.flagKeepReference) {
+	if (param.flagSelfAlive) {
 		_UrlRequestMap* map = _getUrlRequestMap();
 		if (map) {
 			map->put(this, this);
@@ -352,7 +352,7 @@ void UrlRequest::_init(const UrlRequestParam& param, const String& url, const St
 
 void UrlRequest::_removeFromMap()
 {
-	if (m_flagKeepReference) {
+	if (m_flagSelfAlive) {
 		_UrlRequestMap* map = _getUrlRequestMap();
 		if (map) {
 			map->remove(this);

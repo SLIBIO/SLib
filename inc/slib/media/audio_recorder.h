@@ -10,6 +10,7 @@
 #include "../core/loop_queue.h"
 #include "../core/string.h"
 #include "../core/ptr.h"
+#include "../core/function.h"
 
 SLIB_MEDIA_NAMESPACE_BEGIN
 
@@ -22,6 +23,8 @@ public:
 
 public:
 	AudioRecorderInfo();
+	
+	~AudioRecorderInfo();
 	
 };
 
@@ -45,16 +48,24 @@ public:
 	sl_bool flagAutoStart;
 	
 	Ptr<IAudioRecorderListener> listener;
+	Function<void(AudioRecorder*, AudioData const&)> onRecordAudio;
 	Ref<Event> event;
 	
 public:
 	AudioRecorderParam();
+	
+	~AudioRecorderParam();
 	
 };
 
 class SLIB_EXPORT AudioRecorder : public Object
 {
 	SLIB_DECLARE_OBJECT
+	
+protected:
+	AudioRecorder();
+	
+	~AudioRecorder();
 	
 public:
 	static Ref<AudioRecorder> create(const AudioRecorderParam& param);
@@ -76,6 +87,8 @@ public:
 	sl_bool read(const AudioData& audio);
 	
 protected:
+	void _init(const AudioRecorderParam& param);
+	
 	Array<sl_int16> _getProcessData(sl_size count);
 	
 	void _processFrame(sl_int16* s, sl_size count);
@@ -86,6 +99,7 @@ protected:
 	AtomicArray<sl_int16> m_processData;
 	
 	Ptr<IAudioRecorderListener> m_listener;
+	Function<void(AudioRecorder*, AudioData const&)> m_onRecordAudio;
 	Ref<Event> m_event;
 	
 };

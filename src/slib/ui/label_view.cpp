@@ -103,7 +103,6 @@ void LabelView::onDraw(Canvas* canvas)
 	}
 	
 	for (sl_size i = 0; i < lines.count; i++) {
-		String16& line = lines[i].text;
 		rect.bottom = rect.top + lines[i].height;
 		Point pt = GraphicsUtil::calculateAlignPosition(rect, lines[i].width, lines[i].height, alignHorz);
 		canvas->drawText(lines[i].text, pt.x, pt.y, font, m_textColor);

@@ -6360,6 +6360,20 @@ void View::runOnDrawingThread(const Function<void()>& callback)
 	}
 }
 
+Ref<Dispatcher> View::getDispatcher()
+{
+	if (isInstance()) {
+		return UI::getDispatcher();
+	} else {
+		Ref<View> parent = m_parent;
+		if (parent.isNotNull()) {
+			return parent->getDispatcher();
+		} else {
+			return UI::getDispatcher();
+		}
+	}
+}
+
 Ptr<IViewListener> View::getEventListener()
 {
 	Ref<EventAttributes> attrs = m_eventAttributes;

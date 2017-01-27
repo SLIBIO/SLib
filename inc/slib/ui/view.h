@@ -12,6 +12,7 @@
 #include "../core/function.h"
 #include "../core/queue.h"
 #include "../core/animation.h"
+#include "../core/dispatch.h"
 #include "../graphics/canvas.h"
 #include "../graphics/bitmap.h"
 
@@ -1015,6 +1016,8 @@ public:
 	virtual void dispatchToDrawingThread(const Function<void()>& callback, sl_uint32 delayMillis = 0);
 	
 	virtual void runOnDrawingThread(const Function<void()>& callback);
+	
+	virtual Ref<Dispatcher> getDispatcher();
 
 public:
 	Ptr<IViewListener> getEventListener();

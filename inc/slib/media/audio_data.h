@@ -35,7 +35,9 @@ public:
 public:
 	AudioData();
 	
-	AudioData(const AudioData& other) = default;
+	AudioData(const AudioData& other);
+	
+	~AudioData();
 	
 public:
 	sl_size getSizeForChannel() const;
@@ -50,7 +52,7 @@ public:
 	void copySamplesFrom(const AudioData& other) const;
 	
 public:
-	AudioData& operator=(const AudioData& other) = default;
+	AudioData& operator=(const AudioData& other);
 
 };
 

@@ -9,7 +9,15 @@ SLIB_RENDER_NAMESPACE_BEGIN
 
 class SLIB_EXPORT GLRenderEngine : public RenderEngine
 {
+protected:
+	GLRenderEngine();
+	
+	~GLRenderEngine();
+	
 public:
+	virtual Ref<Texture> createTextureFromName(sl_uint32 target, sl_uint32 name, sl_bool flagDeleteOnRelease = sl_true) = 0;
+	
+
 	virtual sl_int32 getAttributeLocation(sl_uint32 program, const char* name) = 0;
 	
 	sl_int32 getAttributeLocation(sl_uint32 program, const String& name);

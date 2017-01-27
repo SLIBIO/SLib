@@ -12,10 +12,20 @@ Primitive::Primitive()
 {
 }
 
+Primitive::~Primitive()
+{
+}
+
+
 EnginePrimitive::EnginePrimitive(const Primitive& primitive)
 : Primitive(primitive)
 {
 }
+
+EnginePrimitive::~EnginePrimitive()
+{
+}
+
 
 RenderClearParam::RenderClearParam()
 {
@@ -27,6 +37,11 @@ RenderClearParam::RenderClearParam()
 	stencil = 0;
 }
 
+RenderClearParam::~RenderClearParam()
+{
+}
+
+
 RenderBlendingParam::RenderBlendingParam()
 {
 	operation = RenderBlendingOperation::Add;
@@ -36,6 +51,11 @@ RenderBlendingParam::RenderBlendingParam()
 	blendSrc = RenderBlendingFactor::SrcAlpha;
 	blendSrcAlpha = RenderBlendingFactor::SrcAlpha;
 }
+
+RenderBlendingParam::~RenderBlendingParam()
+{
+}
+
 
 RendererParam::RendererParam()
 {
@@ -49,12 +69,20 @@ RendererParam::RendererParam()
 	flagMultisample = sl_false;
 }
 
+RendererParam::~RendererParam()
+{
+}
+
 
 SLIB_DEFINE_OBJECT(Renderer, Object)
 
 Renderer::Renderer()
 {
 	setRenderingContinuously(sl_false);
+}
+
+Renderer::~Renderer()
+{
 }
 
 
@@ -68,6 +96,10 @@ RenderEngine::RenderEngine()
 	m_nCountDrawnElementsOnLastScene = 0;
 	m_nCountDrawnPrimitivesOnLastScene = 0;
 	m_nRenderMillisecondsOnLastScene = 0;
+}
+
+RenderEngine::~RenderEngine()
+{
 }
 
 sl_bool RenderEngine::isOpenGL()
@@ -230,12 +262,17 @@ void RenderEngine::drawPrimitive(sl_uint32 countElements, const Ref<VertexBuffer
 	drawPrimitive(&p);
 }
 
-void RenderEngine::applyTexture(sl_reg sampler, const Ref<Texture>& texture)
+void RenderEngine::applyTexture(sl_reg sampler, const Ref<Texture>& _texture)
 {
-	if (texture.isNotNull()) {
-		Ref<TextureInstance> instance = linkTexture(texture);
-		if (instance.isNotNull()) {
-			_applyTexture(sampler, texture.get(), instance.get());
+	Texture* texture = _texture.get();
+	if (texture) {
+		if (IsInstanceOf<EngineTexture>(texture)) {
+			_applyTexture(sampler, texture, sl_null);
+		} else {
+			Ref<TextureInstance> instance = linkTexture(_texture);
+			if (instance.isNotNull()) {
+				_applyTexture(sampler, texture, instance.get());
+			}
 		}
 	}
 }

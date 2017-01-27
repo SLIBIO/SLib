@@ -148,7 +148,7 @@ public:
 																	ret->m_graph = graph;
 																	ret->m_control = control;
 																	ret->m_grabber = grabber;
-																	ret->m_listener = param.listener;
+																	ret->_init(param);
 																	if (param.flagAutoStart) {
 																		ret->start();
 																	}

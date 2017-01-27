@@ -397,9 +397,6 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 			}
 
 			int heightScreen = Util.getDisplaySize(activity).y;
-			int heightView = focusedView.getHeight();
-			int yViewScreen = UiView.convertCoordinateFromViewToScreen(focusedView, 0, heightView).y;
-
 			if (scroll != null) {
 				Rect scrollFrame = scroll.getUIFrame();
 				if (keyboardScrollView == scroll) {

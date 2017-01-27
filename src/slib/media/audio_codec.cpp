@@ -11,6 +11,10 @@ AudioEncoder::AudioEncoder()
 	m_bitrate = 0;
 }
 
+AudioEncoder::~AudioEncoder()
+{
+}
+
 sl_uint32 AudioEncoder::getSamplesCountPerSecond() const
 {
 	return m_nSamplesPerSecond;
@@ -38,6 +42,10 @@ AudioDecoder::AudioDecoder()
 {
 	m_nSamplesPerSecond = 0;
 	m_nChannels = 0;
+}
+
+AudioDecoder::~AudioDecoder()
+{
 }
 
 sl_uint32 AudioDecoder::getSamplesCountPerSecond() const

@@ -2,6 +2,14 @@
 
 SLIB_RENDER_NAMESPACE_BEGIN
 
+GLRenderEngine::GLRenderEngine()
+{
+}
+
+GLRenderEngine::~GLRenderEngine()
+{
+}
+
 sl_int32 GLRenderEngine::getAttributeLocation(sl_uint32 program, const String& _name)
 {
 	String name(_name);

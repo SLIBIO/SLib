@@ -17,6 +17,11 @@ RenderCanvasClip::RenderCanvasClip(): flagTransform(sl_false)
 {
 }
 
+RenderCanvasClip::~RenderCanvasClip()
+{
+}
+
+
 RenderCanvasState::RenderCanvasState()
 : matrix(Matrix3::identity()), flagClipRect(sl_false)
 {
@@ -26,6 +31,10 @@ RenderCanvasState::RenderCanvasState(RenderCanvasState* other)
 : matrix(other->matrix), flagClipRect(other->flagClipRect), clipRect(other->clipRect)
 {
 	clips.pushAll(&(other->clips));
+}
+
+RenderCanvasState::~RenderCanvasState()
+{
 }
 
 SLIB_RENDER_PROGRAM_STATE_BEGIN(RenderCanvasProgramState, RenderVertex2D_Position)

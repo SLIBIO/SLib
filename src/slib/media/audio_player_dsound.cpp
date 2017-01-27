@@ -124,10 +124,7 @@ public:
 									ret->m_nSamplesFrame = samplesPerFrame;
 									ret->m_nBufferSize = sizeBuffer;
                                     
-									ret->m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000 * param.channelsCount);
-                                    ret->m_nChannels = param.channelsCount;
-									ret->m_listener = param.listener;
-                                    ret->m_event = param.event;
+									ret->_init(param);
                                     
 									if (param.flagAutoStart) {
 										ret->start();

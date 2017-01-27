@@ -25,9 +25,27 @@ VP8EncoderParam::VP8EncoderParam()
 	threadsCount = 1;
 }
 
+VP8EncoderParam::~VP8EncoderParam()
+{
+}
+
+
 VP8DecoderParam::VP8DecoderParam()
 {
 	width = height = 192;
+}
+
+VP8DecoderParam::~VP8DecoderParam()
+{
+}
+
+
+VP8Encoder::VP8Encoder()
+{
+}
+
+VP8Encoder::~VP8Encoder()
+{
 }
 
 class _VP8EncoderImpl : public VP8Encoder
@@ -200,6 +218,14 @@ public:
 	}
 };
 
+
+VP8Decoder::VP8Decoder()
+{
+}
+
+VP8Decoder::~VP8Decoder()
+{
+}
 
 class _VP8DecoderImpl : public VP8Decoder
 {

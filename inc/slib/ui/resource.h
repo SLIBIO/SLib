@@ -242,6 +242,8 @@ class SplitView;
 class ProgressBar;
 class Slider;
 class PickerView;
+class ViewPager;
+class VideoView;
 
 SLIB_UI_NAMESPACE_END
 

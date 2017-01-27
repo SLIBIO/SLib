@@ -43,7 +43,7 @@ public:
 	Ref<Dispatcher> dispatcher;
 	
 	sl_bool flagUseBackgroundSession;
-	sl_bool flagKeepReference;
+	sl_bool flagSelfAlive;
 	sl_bool flagStoreResponseContent;
 
 public:
@@ -128,7 +128,7 @@ public:
 	
 	sl_bool isUsingBackgroundSession();
 	
-	sl_bool isKeepingReference();
+	sl_bool isSelfAlive();
 
 	sl_bool isStoringResponseContent();
 	
@@ -195,7 +195,7 @@ protected:
 	Function<void(UrlRequest*, const void*, sl_size)> m_onReceiveContent;
 	Ref<Dispatcher> m_dispatcher;
 	sl_bool m_flagUseBackgroundSession;
-	sl_bool m_flagKeepReference;
+	sl_bool m_flagSelfAlive;
 	sl_bool m_flagStoreResponseContent;
 	
 	sl_uint64 m_sizeBodySent;

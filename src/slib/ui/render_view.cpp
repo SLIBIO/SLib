@@ -135,6 +135,37 @@ void RenderView::runOnDrawingThread(const Function<void()>& callback)
 	}
 }
 
+class _RenderViewDispatcher : public Dispatcher
+{
+public:
+	WeakRef<RenderView> m_view;
+	
+public:
+	// override
+	sl_bool dispatch(const Function<void()>& callback, sl_uint64 delay_ms)
+	{
+		Ref<RenderView> view(m_view);
+		if (view.isNotNull()) {
+			if (delay_ms > 0x7fffffff) {
+				delay_ms = 0x7fffffff;
+			}
+			view->dispatchToDrawingThread(callback, (sl_uint32)delay_ms);
+			return sl_true;
+		}
+		return sl_false;
+	}
+};
+
+Ref<Dispatcher> RenderView::getDispatcher()
+{
+	Ref<_RenderViewDispatcher> ret = new _RenderViewDispatcher;
+	if (ret.isNotNull()) {
+		ret->m_view = this;
+		return ret;
+	}
+	return sl_null;
+}
+
 sl_bool RenderView::isDebugTextVisible()
 {
 	return m_flagDebugTextVisible;

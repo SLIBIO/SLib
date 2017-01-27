@@ -12,7 +12,24 @@ SLIB_RENDER_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(RenderProgramInstance, RenderBaseObjectInstance)
 
+RenderProgramInstance::RenderProgramInstance()
+{
+}
+
+RenderProgramInstance::~RenderProgramInstance()
+{
+}
+
+
 SLIB_DEFINE_OBJECT(RenderProgram, RenderBaseObject)
+
+RenderProgram::RenderProgram()
+{
+}
+
+RenderProgram::~RenderProgram()
+{
+}
 
 sl_bool RenderProgram::onInit(RenderEngine* engine, RenderProgramState* state)
 {
@@ -47,6 +64,14 @@ Ref<RenderProgramInstance> RenderProgram::getInstance(RenderEngine* engine)
 /*******************************
 	RenderProgramState
  *******************************/
+
+RenderProgramState::RenderProgramState()
+{
+}
+
+RenderProgramState::~RenderProgramState()
+{
+}
 
 void RenderProgramState::setUniformFloatValue(sl_int32 uniformLocation, float value)
 {

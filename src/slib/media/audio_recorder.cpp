@@ -7,6 +7,11 @@ AudioRecorderInfo::AudioRecorderInfo()
 {
 }
 
+AudioRecorderInfo::~AudioRecorderInfo()
+{
+}
+
+
 AudioRecorderParam::AudioRecorderParam()
 {
 	samplesPerSecond = 16000;
@@ -16,8 +21,20 @@ AudioRecorderParam::AudioRecorderParam()
 	flagAutoStart = sl_true;
 }
 
+AudioRecorderParam::~AudioRecorderParam()
+{
+}
+
 
 SLIB_DEFINE_OBJECT(AudioRecorder, Object)
+
+AudioRecorder::AudioRecorder()
+{
+}
+
+AudioRecorder::~AudioRecorder()
+{
+}
 
 sl_bool AudioRecorder::read(const AudioData& audioOut)
 {
@@ -54,6 +71,15 @@ sl_bool AudioRecorder::read(const AudioData& audioOut)
 	}
 }
 
+void AudioRecorder::_init(const AudioRecorderParam& param)
+{
+	m_queue.setQueueSize(param.samplesPerSecond * param.bufferLengthInMilliseconds / 1000 * param.channelsCount);
+	m_nChannels = param.channelsCount;
+	m_listener = param.listener;
+	m_onRecordAudio = param.onRecordAudio;
+	m_event = param.event;
+}
+
 Array<sl_int16> AudioRecorder::_getProcessData(sl_size count)
 {
 	Array<sl_int16> data = m_processData;
@@ -69,7 +95,7 @@ Array<sl_int16> AudioRecorder::_getProcessData(sl_size count)
 void AudioRecorder::_processFrame(sl_int16* s, sl_size count)
 {
 	PtrLocker<IAudioRecorderListener> listener(m_listener);
-	if (listener.isNotNull()) {
+	if (listener.isNotNull() || m_onRecordAudio.isNotNull()) {
 		AudioData audio;
 		AudioFormat format;
 		sl_uint32 nChannels = m_nChannels;
@@ -82,6 +108,7 @@ void AudioRecorder::_processFrame(sl_int16* s, sl_size count)
 		audio.count = count / nChannels;
 		audio.data = s;
 		listener->onRecordAudio(this, audio);
+		m_onRecordAudio(this, audio);
 	}
 	m_queue.add(s, count);
 	if (m_event.isNotNull()) {

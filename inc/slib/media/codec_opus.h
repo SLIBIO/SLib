@@ -33,10 +33,17 @@ public:
 public:
 	OpusEncoderParam();
 	
+	~OpusEncoderParam();
+	
 };
 
 class SLIB_EXPORT OpusEncoder : public AudioEncoder
 {
+public:
+	OpusEncoder();
+	
+	~OpusEncoder();
+	
 public:
 	static Ref<OpusEncoder> create(const OpusEncoderParam& param);
 	
@@ -54,10 +61,17 @@ public:
 public:
 	OpusDecoderParam();
 	
+	~OpusDecoderParam();
+	
 };
 
 class SLIB_EXPORT OpusDecoder : public AudioDecoder
 {
+public:
+	OpusDecoder();
+	
+	~OpusDecoder();
+	
 public:
 	static Ref<OpusDecoder> create(const OpusDecoderParam& param);
 	

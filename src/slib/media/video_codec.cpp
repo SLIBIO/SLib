@@ -12,6 +12,10 @@ VideoEncoder::VideoEncoder()
 	m_bitrate = 0;
 }
 
+VideoEncoder::~VideoEncoder()
+{
+}
+
 sl_uint32 VideoEncoder::getBitrate()
 {
 	return m_bitrate;
@@ -29,6 +33,10 @@ VideoDecoder::VideoDecoder()
 {
 	m_nWidth = 0;
 	m_nHeight = 0;
+}
+
+VideoDecoder::~VideoDecoder()
+{
 }
 
 SLIB_MEDIA_NAMESPACE_END

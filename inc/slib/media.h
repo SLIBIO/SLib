@@ -10,6 +10,7 @@
 #include "media/video_frame.h"
 #include "media/video_capture.h"
 #include "media/camera.h"
+#include "media/media_player.h"
 
 #include "media/audio_codec.h"
 #include "media/video_codec.h"
@@ -17,7 +18,6 @@
 #include "media/opensl_es.h"
 #include "media/dsound.h"
 #include "media/dshow.h"
-#include "media/avfoundation.h"
 
 #include "media/codec_opus.h"
 #include "media/codec_vpx.h"

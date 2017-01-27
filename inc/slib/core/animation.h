@@ -53,11 +53,9 @@ class AnimationFlags
 {
 public:
 	int value;
-	SLIB_MEMBERS_OF_PRIMITIVE_WRAPPER(AnimationFlags, int, value)
+	SLIB_MEMBERS_OF_FLAGS(AnimationFlags, value)
 	
 public:
-	SLIB_INLINE AnimationFlags() = default;
-	
 	enum {
 		Default = 0,
 		NotStart = 1,
@@ -67,6 +65,7 @@ public:
 		NotUpdateWhenStart = 16,
 		NotSelfAlive = 32
 	};
+	
 };
 
 class Animation : public Object

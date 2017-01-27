@@ -13,6 +13,11 @@ class SLIB_EXPORT IndexBufferInstance : public RenderBaseObjectInstance
 {
 	SLIB_DECLARE_OBJECT
 	
+protected:
+	IndexBufferInstance();
+	
+	~IndexBufferInstance();
+	
 public:
 	virtual void notifyUpdated(sl_size offset, sl_size size);
 	
@@ -28,6 +33,8 @@ class SLIB_EXPORT IndexBuffer : public RenderBaseObject
 	
 protected:
 	IndexBuffer();
+	
+	~IndexBuffer();
 
 public:
 	static Ref<IndexBuffer> create(const Memory& mem);

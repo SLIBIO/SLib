@@ -7,6 +7,14 @@ SLIB_RENDER_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(TextureInstance, RenderBaseObjectInstance)
 
+TextureInstance::TextureInstance()
+{
+}
+
+TextureInstance::~TextureInstance()
+{
+}
+
 void TextureInstance::notifyUpdated(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
 {
 	ObjectLocker lock(this);
@@ -30,6 +38,10 @@ Texture::Texture()
 	setWrapX(TextureWrapMode::Clamp);
 	setWrapY(TextureWrapMode::Clamp);
 	setFreeSourceOnUpdate(sl_false);
+}
+
+Texture::~Texture()
+{
 }
 
 Ref<Texture> Texture::create(const Ref<Bitmap>& source)
@@ -203,6 +215,27 @@ void Texture::update()
 Ref<TextureInstance> Texture::getInstance(RenderEngine* engine)
 {
 	return Ref<TextureInstance>::from(RenderBaseObject::getInstance(engine));
+}
+
+
+SLIB_DEFINE_OBJECT(EngineTexture, Texture)
+
+EngineTexture::EngineTexture()
+{
+}
+
+EngineTexture::~EngineTexture()
+{
+}
+
+Ref<Referable> EngineTexture::getLinkedObject()
+{
+	return m_linkedObject;
+}
+
+void EngineTexture::setLinkedObject(const Ref<Referable>& object)
+{
+	m_linkedObject = object;
 }
 
 SLIB_RENDER_NAMESPACE_END

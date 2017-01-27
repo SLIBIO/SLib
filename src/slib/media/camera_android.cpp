@@ -61,7 +61,7 @@ public:
 			JniLocal<jobject> jcamera = _JAndroidCamera::create.callObject(sl_null, jid.get(), instance);
 			if (jcamera.isNotNull()) {
 				ret->m_camera = jcamera;
-				ret->m_listener = param.listener;
+				ret->_init(param);
 				_JAndroidCamera::setPreferedFrameSettings.call(jcamera,
 						param.preferedFrameWidth,
 						param.preferedFrameHeight);
@@ -159,7 +159,7 @@ public:
 		frame.image.pitch = 0;
 		frame.image.ref = mem.ref;
 		frame.rotation = RotationMode::Rotate90;
-		onCaptureVideoFrame(&frame);
+		_onCaptureVideoFrame(&frame);
 	}
 
 };

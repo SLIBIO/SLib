@@ -44,7 +44,16 @@ void RenderBaseObjectInstance::_update(RenderBaseObject* object)
 	}
 }
 
+
 SLIB_DEFINE_OBJECT(RenderBaseObject, Object)
+
+RenderBaseObject::RenderBaseObject()
+{
+}
+
+RenderBaseObject::~RenderBaseObject()
+{
+}
 
 void RenderBaseObject::addInstance(const Ref<RenderBaseObjectInstance>& instanceNew)
 {

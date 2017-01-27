@@ -475,9 +475,6 @@
     <ClInclude Include="..\..\..\inc\slib\math\view_frustum.h">
       <Filter>inc\math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\media\avfoundation.h">
-      <Filter>inc\media</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\media\dshow.h">
       <Filter>inc\media</Filter>
     </ClInclude>
@@ -847,6 +844,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\core\timer.h">
       <Filter>inc\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\media\media_player.h">
+      <Filter>inc\media</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1282,9 +1282,6 @@
     <ClCompile Include="..\..\..\src\slib\ui\video_view.cpp">
       <Filter>src\slib\ui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\media\camera_avfoundation.cpp">
-      <Filter>src\slib\media</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\slib\media\camera_win32.cpp">
       <Filter>src\slib\media</Filter>
     </ClCompile>
@@ -1611,6 +1608,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\core\timer.cpp">
       <Filter>src\slib\core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\media_player.cpp">
+      <Filter>src\slib\media</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

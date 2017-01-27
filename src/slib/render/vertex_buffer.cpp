@@ -4,6 +4,14 @@ SLIB_RENDER_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(VertexBufferInstance, RenderBaseObjectInstance)
 
+VertexBufferInstance::VertexBufferInstance()
+{
+}
+
+VertexBufferInstance::~VertexBufferInstance()
+{
+}
+
 void VertexBufferInstance::notifyUpdated(sl_size offset, sl_size size)
 {
 	ObjectLocker lock(this);
@@ -26,11 +34,16 @@ void VertexBufferInstance::notifyUpdated(sl_size offset, sl_size size)
 	}
 }
 
+
 SLIB_DEFINE_OBJECT(VertexBuffer, RenderBaseObject)
 
 VertexBuffer::VertexBuffer()
 {
 	m_flagStatic = sl_true;
+}
+
+VertexBuffer::~VertexBuffer()
+{
 }
 
 Ref<VertexBuffer> VertexBuffer::create(const Memory& mem)

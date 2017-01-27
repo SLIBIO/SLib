@@ -8,5 +8,9 @@ VideoFrame::VideoFrame()
 	flip = FlipMode::None;
 }
 
+VideoFrame::~VideoFrame()
+{
+}
+
 SLIB_MEDIA_NAMESPACE_END
 

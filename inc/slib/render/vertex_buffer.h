@@ -13,6 +13,11 @@ class SLIB_EXPORT VertexBufferInstance : public RenderBaseObjectInstance
 {
 	SLIB_DECLARE_OBJECT
 	
+protected:
+	VertexBufferInstance();
+	
+	~VertexBufferInstance();
+	
 public:
 	virtual void notifyUpdated(sl_size offset, sl_size size);
 	
@@ -28,6 +33,8 @@ class SLIB_EXPORT VertexBuffer : public RenderBaseObject
 	
 protected:
 	VertexBuffer();
+	
+	~VertexBuffer();
 	
 public:
 	static Ref<VertexBuffer> create(const Memory& mem);

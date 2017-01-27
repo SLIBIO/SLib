@@ -16,6 +16,8 @@ class SLIB_EXPORT VideoEncoder : public Object
 protected:
 	VideoEncoder();
 	
+	~VideoEncoder();
+	
 public:
 	virtual Memory encode(const VideoFrame& input) = 0;
 	
@@ -38,6 +40,8 @@ class SLIB_EXPORT VideoDecoder : public Object
 	
 protected:
 	VideoDecoder();
+	
+	~VideoDecoder();
 	
 public:
 	virtual sl_bool decode(const void* input, const sl_uint32& inputSize, VideoFrame& output) = 0;

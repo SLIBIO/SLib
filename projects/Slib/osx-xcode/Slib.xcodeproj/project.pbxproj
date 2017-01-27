@@ -148,8 +148,6 @@
 		266DD5E51C11940A00D47AB0 /* web_view_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5431C11940A00D47AB0 /* web_view_osx.mm */; };
 		266DD5E71C11940A00D47AB0 /* window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5451C11940A00D47AB0 /* window.cpp */; };
 		266DD5EA1C11940A00D47AB0 /* window_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5481C11940A00D47AB0 /* window_osx.mm */; };
-		266DD5F01C11D25900D47AB0 /* camera_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5EF1C11D25900D47AB0 /* camera_osx.mm */; };
-		266DD5F41C11DF1500D47AB0 /* camera_avfoundation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD5F31C11DF1500D47AB0 /* camera_avfoundation.mm */; };
 		266F12B31C97A13F00DE26FF /* block_cipher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266F12B21C97A13F00DE26FF /* block_cipher.cpp */; };
 		267C16B91CE779D8000318C2 /* scroll_bar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 267C16B81CE779D8000318C2 /* scroll_bar.cpp */; };
 		267D008C1E32AA5A002CC949 /* render_drawable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 267D008B1E32AA5A002CC949 /* render_drawable.cpp */; };
@@ -211,6 +209,9 @@
 		26D3A1A41C85894A00FB8DBD /* resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D3A1A31C85894A00FB8DBD /* resource.cpp */; };
 		26D3A1A61C85940700FB8DBD /* locale.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D3A1A51C85940700FB8DBD /* locale.cpp */; };
 		26D53C451BDF25090010BDA4 /* math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D53C441BDF25090010BDA4 /* math.cpp */; };
+		26D8AC8A1E393CE50092EB81 /* camera_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26D8AC891E393CE50092EB81 /* camera_apple.mm */; };
+		26D8AC8F1E393F010092EB81 /* media_player_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26D8AC8C1E393F010092EB81 /* media_player_apple.mm */; };
+		26D8AC901E393F010092EB81 /* media_player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26D8AC8D1E393F010092EB81 /* media_player.cpp */; };
 		26DA34FA1C4B47CF004DC204 /* video_frame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26DA34F91C4B47CF004DC204 /* video_frame.cpp */; };
 		26E376D71C984CC400B178E6 /* vector2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E376D61C984CC400B178E6 /* vector2.cpp */; };
 		26E376D91C9858A000B178E6 /* vector3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26E376D81C9858A000B178E6 /* vector3.cpp */; };
@@ -418,8 +419,6 @@
 		266DD5431C11940A00D47AB0 /* web_view_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = web_view_osx.mm; sourceTree = "<group>"; };
 		266DD5451C11940A00D47AB0 /* window.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = window.cpp; sourceTree = "<group>"; };
 		266DD5481C11940A00D47AB0 /* window_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = window_osx.mm; sourceTree = "<group>"; };
-		266DD5EF1C11D25900D47AB0 /* camera_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = camera_osx.mm; sourceTree = "<group>"; };
-		266DD5F31C11DF1500D47AB0 /* camera_avfoundation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = camera_avfoundation.mm; sourceTree = "<group>"; };
 		266F12B21C97A13F00DE26FF /* block_cipher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = block_cipher.cpp; sourceTree = "<group>"; };
 		267C16B81CE779D8000318C2 /* scroll_bar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scroll_bar.cpp; sourceTree = "<group>"; };
 		267D008B1E32AA5A002CC949 /* render_drawable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_drawable.cpp; sourceTree = "<group>"; };
@@ -481,6 +480,9 @@
 		26D3A1A31C85894A00FB8DBD /* resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = resource.cpp; sourceTree = "<group>"; };
 		26D3A1A51C85940700FB8DBD /* locale.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = locale.cpp; sourceTree = "<group>"; };
 		26D53C441BDF25090010BDA4 /* math.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = math.cpp; sourceTree = "<group>"; };
+		26D8AC891E393CE50092EB81 /* camera_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = camera_apple.mm; sourceTree = "<group>"; };
+		26D8AC8C1E393F010092EB81 /* media_player_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = media_player_apple.mm; sourceTree = "<group>"; };
+		26D8AC8D1E393F010092EB81 /* media_player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = media_player.cpp; sourceTree = "<group>"; };
 		26DA34F91C4B47CF004DC204 /* video_frame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_frame.cpp; sourceTree = "<group>"; };
 		26E376D61C984CC400B178E6 /* vector2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vector2.cpp; sourceTree = "<group>"; };
 		26E376D81C9858A000B178E6 /* vector3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vector3.cpp; sourceTree = "<group>"; };
@@ -584,13 +586,14 @@
 				266DD4B31C11940A00D47AB0 /* audio_recorder_osx.mm */,
 				26694BF61C9AB4330047E67C /* audio_util.cpp */,
 				266DD4B51C11940A00D47AB0 /* camera.cpp */,
-				266DD5F31C11DF1500D47AB0 /* camera_avfoundation.mm */,
+				26D8AC891E393CE50092EB81 /* camera_apple.mm */,
 				26C72ACD1E2150F900F7D6D0 /* camera_dshow.cpp */,
-				266DD5EF1C11D25900D47AB0 /* camera_osx.mm */,
 				266DD4B71C11940A00D47AB0 /* codec_opus.cpp */,
 				266DD4B81C11940A00D47AB0 /* codec_vp8.cpp */,
 				266DD4B91C11940A00D47AB0 /* media_platform_osx.h */,
 				266DD4BA1C11940A00D47AB0 /* media_platform_osx.mm */,
+				26D8AC8D1E393F010092EB81 /* media_player.cpp */,
+				26D8AC8C1E393F010092EB81 /* media_player_apple.mm */,
 				266DD4BB1C11940A00D47AB0 /* video_capture.cpp */,
 				266DD4BC1C11940A00D47AB0 /* video_codec.cpp */,
 				26DA34F91C4B47CF004DC204 /* video_frame.cpp */,
@@ -1080,6 +1083,7 @@
 				26E376D91C9858A000B178E6 /* vector3.cpp in Sources */,
 				A2DE1D8C1B383BB000A74698 /* system_unix.cpp in Sources */,
 				266DD5A51C11940A00D47AB0 /* edit_view_osx.mm in Sources */,
+				26D8AC8F1E393F010092EB81 /* media_player_apple.mm in Sources */,
 				2626C1311E15AA73004E150C /* preference.cpp in Sources */,
 				2620412B1C88A95E00AF48F2 /* object.cpp in Sources */,
 				266DD5A21C11940A00D47AB0 /* edit_view.cpp in Sources */,
@@ -1144,7 +1148,6 @@
 				2688DD851C16F6E200973672 /* video_view.cpp in Sources */,
 				26C72ACC1E2150EE00F7D6D0 /* audio_recorder_opensl_es.cpp in Sources */,
 				266DD56F1C11940A00D47AB0 /* network_async.cpp in Sources */,
-				266DD5F41C11DF1500D47AB0 /* camera_avfoundation.mm in Sources */,
 				26C72ACE1E2150F900F7D6D0 /* camera_dshow.cpp in Sources */,
 				A2C8BE351AFA832800D584D1 /* thirdparty_libjpeg.c in Sources */,
 				264A5D7C1CB6C9BF00FB0B08 /* ui_menu.cpp in Sources */,
@@ -1158,7 +1161,6 @@
 				266DD47C1C1193AB00D47AB0 /* vibrator.cpp in Sources */,
 				A25F30251B03A33700854DAF /* service.cpp in Sources */,
 				26C13E471DDA516D00612945 /* url_request_apple.mm in Sources */,
-				266DD5F01C11D25900D47AB0 /* camera_osx.mm in Sources */,
 				26CBB0291DE5EC4F00F5A6F9 /* earth.cpp in Sources */,
 				A25F30281B03A33700854DAF /* string.cpp in Sources */,
 				A25F30151B03A33700854DAF /* base64.cpp in Sources */,
@@ -1227,6 +1229,7 @@
 				26B0AF861C13E08600CD8673 /* bitmap_format.cpp in Sources */,
 				266DD5751C11940A00D47AB0 /* network_secure_stream.cpp in Sources */,
 				266DD46A1C11930800D47AB0 /* compress_zlib.cpp in Sources */,
+				26D8AC901E393F010092EB81 /* media_player.cpp in Sources */,
 				266DD5711C11940A00D47AB0 /* network_async_unix.cpp in Sources */,
 				266DD56C1C11940A00D47AB0 /* net_capture.cpp in Sources */,
 				26C70E9C1CA168EB005B1768 /* datagram.cpp in Sources */,
@@ -1291,6 +1294,7 @@
 				266DD5941C11940A00D47AB0 /* check_box.cpp in Sources */,
 				266DD5761C11940A00D47AB0 /* socket.cpp in Sources */,
 				266DD4631C11930800D47AB0 /* crypto_hash.cpp in Sources */,
+				26D8AC8A1E393CE50092EB81 /* camera_apple.mm in Sources */,
 				266DD54B1C11940A00D47AB0 /* audio_format.cpp in Sources */,
 				266DD55C1C11940A00D47AB0 /* codec_opus.cpp in Sources */,
 				266DD4671C11930800D47AB0 /* rsa.cpp in Sources */,

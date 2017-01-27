@@ -911,6 +911,16 @@ void GL_BASE::setActiveSampler(sl_uint32 textureNo)
 	GL_ENTRY(glActiveTexture)(GL_TEXTURE0 + textureNo);
 }
 
+void GL_BASE::bindTexture(sl_uint32 target, sl_uint32 texture)
+{
+	GL_ENTRY(glBindTexture)(target, texture);
+}
+
+void GL_BASE::unbindTexture(sl_uint32 target)
+{
+	GL_ENTRY(glBindTexture)(target, 0);
+}
+
 void GL_BASE::bindTexture2D(sl_uint32 texture)
 {
 	GL_ENTRY(glBindTexture)(GL_TEXTURE_2D, texture);
@@ -995,6 +1005,7 @@ public:
 		sl_uint32 fragmentShader;
 	};
 	CList<_ProgramHandle> m_listDirtyProgramHandles;
+	CList< Ref<Referable> > m_listDirtyObjects;
 	
 	class _RenderProgramInstance;
 	Ref<RenderProgram> m_currentProgram;
@@ -1040,6 +1051,9 @@ public:
 				GL_BASE::deleteShader(list[i].fragmentShader);
 			}
 			m_listDirtyProgramHandles.removeAll_NoLock();
+		}
+		{
+			m_listDirtyObjects.removeAll();
 		}
 	}
 	
@@ -1297,6 +1311,36 @@ public:
 		
 	};
 	
+	class _NamedTexture : public EngineTexture
+	{
+	public:
+		WeakRef<GL_ENGINE> m_engine;
+		sl_uint32 m_target;
+		sl_uint32 m_name;
+		sl_bool m_flagDeleteOnRelease;
+		
+	public:
+		_NamedTexture(GL_ENGINE* engine, sl_uint32 target, sl_uint32 name, sl_bool flagDeleteOnRelease):
+		 m_engine(engine), m_target(target), m_name(name), m_flagDeleteOnRelease(flagDeleteOnRelease)
+		{
+		}
+		
+		~_NamedTexture()
+		{
+			Ref<GL_ENGINE> engine = m_engine;
+			if (engine.isNotNull()) {
+				if (m_flagDeleteOnRelease) {
+					engine->m_listDirtyTextureHandles.add(m_name);
+				}
+				Ref<Referable> object = m_linkedObject;
+				if (object.isNotNull()) {
+					engine->m_listDirtyObjects.add(object);
+				}
+			}
+		}
+		
+	};
+	
 	// override
 	Ref<TextureInstance> _createTextureInstance(Texture* texture)
 	{
@@ -1480,10 +1524,16 @@ public:
 			return;
 		}
 		sl_uint32 samplerNo = (sl_uint32)(_samplerNo);
-		GL_BASE::setActiveSampler(samplerNo);
-		_TextureInstance* instance = (_TextureInstance*)_instance;
-		instance->_update(texture);
-		GL_BASE::bindTexture2D(instance->handle);
+		if (_instance) {
+			GL_BASE::setActiveSampler(samplerNo);
+			_TextureInstance* instance = (_TextureInstance*)_instance;
+			instance->_update(texture);
+			GL_BASE::bindTexture2D(instance->handle);
+		} else {
+			_NamedTexture* named = static_cast<_NamedTexture*>(texture);
+			GL_BASE::setActiveSampler(samplerNo);
+			GL_BASE::bindTexture(named->m_target, named->m_name);
+		}
 		GL_BASE::setTexture2DFilterMode(texture->getMinFilter(), texture->getMagFilter());
 		GL_BASE::setTexture2DWrapMode(texture->getWrapX(), texture->getWrapY());
 	}
@@ -1496,201 +1546,247 @@ public:
 		}
 		GL_BASE::setLineWidth(width);
 	}
-		
+	
 	/*************************************************
 		OpenGL entry points
 	**************************************************/
+	
+	// override
+	Ref<Texture> createTextureFromName(sl_uint32 target, sl_uint32 name, sl_bool flagDeleteOnRelease)
+	{
+		return new _NamedTexture(this, target, name, flagDeleteOnRelease);
+	}
+	
+	// override
 	sl_int32 getAttributeLocation(sl_uint32 program, const char* name)
 	{
 		return GL_BASE::getAttributeLocation(program, name);
 	}
 	
+	// override
 	void setVertexFloatArrayAttributePtr(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
 	{
 		GL_BASE::setVertexFloatArrayAttributePtr(attributeLocation, data, countComponents, strideBytes, flagDoNormalize);
 	}
 	
+	// override
 	void setVertexFloatArrayAttribute(sl_int32 attributeLocation, sl_size offsetValuesOnBuffer, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
 	{
 		GL_BASE::setVertexFloatArrayAttribute(attributeLocation, offsetValuesOnBuffer, countComponents, strideBytes, flagDoNormalize);
 	}
 	
+	// override
 	void setVertexInt8ArrayAttributePtr(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
 	{
 		GL_BASE::setVertexInt8ArrayAttributePtr(attributeLocation, data, countComponents, strideBytes, flagDoNormalize);
 	}
 	
+	// override
 	void setVertexInt8ArrayAttribute(sl_int32 attributeLocation, sl_size offsetValuesOnBuffer, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
 	{
 		GL_BASE::setVertexInt8ArrayAttribute(attributeLocation, offsetValuesOnBuffer, countComponents, strideBytes, flagDoNormalize);
 	}
 	
+	// override
 	void setVertexUint8ArrayAttributePtr(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
 	{
 		GL_BASE::setVertexUint8ArrayAttributePtr(attributeLocation, data, countComponents, strideBytes, flagDoNormalize);
 	}
 	
+	// override
 	void setVertexUint8ArrayAttribute(sl_int32 attributeLocation, sl_size offsetValuesOnBuffer, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
 	{
 		GL_BASE::setVertexUint8ArrayAttribute(attributeLocation, offsetValuesOnBuffer, countComponents, strideBytes, flagDoNormalize);
 	}
 	
+	// override
 	void setVertexInt16ArrayAttributePtr(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
 	{
 		GL_BASE::setVertexInt16ArrayAttributePtr(attributeLocation, data, countComponents, strideBytes, flagDoNormalize);
 	}
 	
+	// override
 	void setVertexInt16ArrayAttribute(sl_int32 attributeLocation, sl_size offsetValuesOnBuffer, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
 	{
 		GL_BASE::setVertexInt16ArrayAttribute(attributeLocation, offsetValuesOnBuffer, countComponents, strideBytes, flagDoNormalize);
 	}
 	
+	// override
 	void setVertexUint16ArrayAttributePtr(sl_int32 attributeLocation, const void* data, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
 	{
 		GL_BASE::setVertexUint16ArrayAttributePtr(attributeLocation, data, countComponents, strideBytes, flagDoNormalize);
 	}
 	
+	// override
 	void setVertexUint16ArrayAttribute(sl_int32 attributeLocation, sl_size offsetValuesOnBuffer, sl_uint32 countComponents, sl_uint32 strideBytes, sl_bool flagDoNormalize)
 	{
 		GL_BASE::setVertexUint16ArrayAttribute(attributeLocation, offsetValuesOnBuffer, countComponents, strideBytes, flagDoNormalize);
 	}
 	
+	// override
 	void disableVertexArrayAttribute(sl_int32 attributeLocation)
 	{
 		GL_BASE::disableVertexArrayAttribute(attributeLocation);
 	}
 
 	
+	// override
 	sl_int32 getUniformLocation(sl_uint32 program, const char* name)
 	{
 		return GL_BASE::getUniformLocation(program, name);
 	}
 	
+	// override
 	void setUniformFloatValue(sl_int32 uniformLocation, float value)
 	{
 		GL_BASE::setUniformFloatValue(uniformLocation, value);
 	}
 	
+	// override
 	void setUniformFloatArray(sl_int32 uniformLocation, const void* values, sl_uint32 count)
 	{
 		GL_BASE::setUniformFloatArray(uniformLocation, values, count);
 	}
 	
+	// override
 	void setUniformIntValue(sl_int32 uniformLocation, sl_int32 value)
 	{
 		GL_BASE::setUniformIntValue(uniformLocation, value);
 	}
 	
+	// override
 	void setUniformIntArray(sl_int32 uniformLocation, const void* values, sl_uint32 count)
 	{
 		GL_BASE::setUniformIntArray(uniformLocation, values, count);
 	}
 	
+	// override
 	void setUniformFloat2Value(sl_int32 uniformLocation, float v1, float v2)
 	{
 		GL_BASE::setUniformFloat2Value(uniformLocation, v1, v2);
 	}
 	
+	// override
 	void setUniformFloat2Value(sl_int32 uniformLocation, const Vector2& v)
 	{
 		GL_BASE::setUniformFloat2Value(uniformLocation, v);
 	}
 	
+	// override
 	void setUniformFloat2Array(sl_int32 uniformLocation, const void* values, sl_uint32 count)
 	{
 		GL_BASE::setUniformFloat2Array(uniformLocation, values, count);
 	}
 	
+	// override
 	void setUniformInt2Value(sl_int32 uniformLocation, sl_int32 v1, sl_int32 v2)
 	{
 		GL_BASE::setUniformInt2Value(uniformLocation, v1, v2);
 	}
 	
+	// override
 	void setUniformInt2Array(sl_int32 uniformLocation, const void* values, sl_uint32 count)
 	{
 		GL_BASE::setUniformInt2Array(uniformLocation, values, count);
 	}
 	
+	// override
 	void setUniformFloat3Value(sl_int32 uniformLocation, float v1, float v2, float v3)
 	{
 		GL_BASE::setUniformFloat3Value(uniformLocation, v1, v2, v3);
 	}
 	
+	// override
 	void setUniformFloat3Value(sl_int32 uniformLocation, const Vector3& v)
 	{
 		GL_BASE::setUniformFloat3Value(uniformLocation, v);
 	}
 	
+	// override
 	void setUniformFloat3Array(sl_int32 uniformLocation, const void* values, sl_uint32 count)
 	{
 		GL_BASE::setUniformFloat3Array(uniformLocation, values, count);
 	}
 	
+	// override
 	void setUniformInt3Value(sl_int32 uniformLocation, sl_int32 v1, sl_int32 v2, sl_int32 v3)
 	{
 		GL_BASE::setUniformInt3Value(uniformLocation, v1, v2, v3);
 	}
 	
+	// override
 	void setUniformInt3Array(sl_int32 uniformLocation, const void* values, sl_uint32 count)
 	{
 		GL_BASE::setUniformInt3Array(uniformLocation, values, count);
 	}
 	
+	// override
 	void setUniformFloat4Value(sl_int32 uniformLocation, float v1, float v2, float v3, float v4)
 	{
 		GL_BASE::setUniformFloat4Value(uniformLocation, v1, v2, v3, v4);
 	}
 	
+	// override
 	void setUniformFloat4Value(sl_int32 uniformLocation, const Vector4& v)
 	{
 		GL_BASE::setUniformFloat4Value(uniformLocation, v);
 	}
 	
+	// override
 	void setUniformFloat4Array(sl_int32 uniformLocation, const void* values, sl_uint32 count)
 	{
 		GL_BASE::setUniformFloat4Array(uniformLocation, values, count);
 	}
 	
+	// override
 	void setUniformInt4Value(sl_int32 uniformLocation, sl_int32 v1, sl_int32 v2, sl_int32 v3, sl_int32 v4)
 	{
 		GL_BASE::setUniformInt4Value(uniformLocation, v1, v2, v3, v4);
 	}
 	
+	// override
 	void setUniformInt4Array(sl_int32 uniformLocation, const void* values, sl_uint32 count)
 	{
 		GL_BASE::setUniformInt4Array(uniformLocation, values, count);
 	}
 	
+	// override
 	void setUniformMatrix2Value(sl_int32 uniformLocation, const Matrix2& value)
 	{
 		GL_BASE::setUniformMatrix2Value(uniformLocation, value);
 	}
 	
+	// override
 	void setUniformMatrix2Array(sl_int32 uniformLocation, const void* values, sl_uint32 count)
 	{
 		GL_BASE::setUniformMatrix2Array(uniformLocation, values, count);
 	}
 	
+	// override
 	void setUniformMatrix3Value(sl_int32 uniformLocation, const Matrix3& value)
 	{
 		GL_BASE::setUniformMatrix3Value(uniformLocation, value);
 	}
 	
+	// override
 	void setUniformMatrix3Array(sl_int32 uniformLocation, const void* values, sl_uint32 count)
 	{
 		GL_BASE::setUniformMatrix3Array(uniformLocation, values, count);
 	}
 	
+	// override
 	void setUniformMatrix4Value(sl_int32 uniformLocation, const Matrix4& value)
 	{
 		GL_BASE::setUniformMatrix4Value(uniformLocation, value);
 	}
 	
+	// override
 	void setUniformMatrix4Array(sl_int32 uniformLocation, const void* values, sl_uint32 count)
 	{
 		GL_BASE::setUniformMatrix4Array(uniformLocation, values, count);
 	}
 	
+	// override
 	void setUniformTextureSampler(sl_int32 uniformLocation, sl_uint32 samplerNo)
 	{
 		GL_BASE::setUniformTextureSampler(uniformLocation, samplerNo);

@@ -39,12 +39,16 @@ public:
 public:
 	Primitive();
 	
+	~Primitive();
+	
 };
 
 class SLIB_EXPORT EnginePrimitive : public Primitive
 {
 public:
 	EnginePrimitive(const Primitive& primitive);
+	
+	~EnginePrimitive();
 	
 public:
 	Ref<VertexBufferInstance> vertexBufferInstance;
@@ -64,6 +68,8 @@ public:
 
 public:
 	RenderClearParam();
+	
+	~RenderClearParam();
 	
 };
 
@@ -107,6 +113,8 @@ public:
 public:
 	RenderBlendingParam();
 	
+	~RenderBlendingParam();
+	
 };
 
 
@@ -133,6 +141,8 @@ public:
 public:
 	RendererParam();
 	
+	~RendererParam();
+	
 };
 
 class SLIB_EXPORT Renderer : public Object
@@ -141,6 +151,8 @@ class SLIB_EXPORT Renderer : public Object
 	
 protected:
 	Renderer();
+	
+	~Renderer();
 	
 public:
 	virtual void release() = 0;
@@ -170,7 +182,9 @@ class SLIB_EXPORT RenderEngine : public Object
 	
 protected:
 	RenderEngine();
-
+	
+	~RenderEngine();
+	
 public:
 	virtual RenderEngineType getEngineType() = 0;
 	

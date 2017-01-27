@@ -31,6 +31,8 @@ public:
 public:
 	RenderCanvasClip();
 	
+	~RenderCanvasClip();
+	
 };
 
 class RenderCanvasState : public Referable
@@ -45,6 +47,8 @@ public:
 	RenderCanvasState();
 	
 	RenderCanvasState(RenderCanvasState* other);
+	
+	~RenderCanvasState();
 	
 };
 

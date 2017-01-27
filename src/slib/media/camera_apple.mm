@@ -2,7 +2,6 @@
 
 #if defined(SLIB_PLATFORM_IS_APPLE)
 
-#include "../../../inc/slib/media/avfoundation.h"
 #include "../../../inc/slib/media/camera.h"
 
 #include "../../../inc/slib/core/platform_apple.h"
@@ -137,7 +136,7 @@ public:
 			ret->m_device = device;
 			ret->m_input = input;
 			ret->m_output = output;
-			ret->m_listener = param.listener;
+			ret->_init(param);
 			if (param.flagAutoStart) {
 				ret->start();
 			}
@@ -267,59 +266,64 @@ public:
 		
 		CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
 		
-		CVPixelBufferLockBaseAddress(imageBuffer, 0);
-		
-		void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
-		
-		sl_uint32 width = (sl_uint32)(CVPixelBufferGetWidth(imageBuffer));
-		sl_uint32 height = (sl_uint32)(CVPixelBufferGetHeight(imageBuffer));
-		
-		VideoCaptureFrame frame;
-		frame.image.width = width;
-		frame.image.height = height;
-		do {
-			OSType type = CVPixelBufferGetPixelFormatType(imageBuffer);
-			if (type == kCVPixelFormatType_420YpCbCr8BiPlanarFullRange) {
-				if (width & 1) {
-					break;
+		if (CVPixelBufferLockBaseAddress(imageBuffer, kCVPixelBufferLock_ReadOnly) == kCVReturnSuccess) {
+			
+			sl_uint8* baseAddress = (sl_uint8*)(CVPixelBufferGetBaseAddress(imageBuffer));
+			sl_uint32 width = (sl_uint32)(CVPixelBufferGetWidth(imageBuffer));
+			sl_uint32 height = (sl_uint32)(CVPixelBufferGetHeight(imageBuffer));
+			
+			if (baseAddress) {
+				
+				VideoCaptureFrame frame;
+				frame.image.width = width;
+				frame.image.height = height;
+				
+				do {
+					OSType type = CVPixelBufferGetPixelFormatType(imageBuffer);
+					if (type == kCVPixelFormatType_420YpCbCr8BiPlanarFullRange) {
+						if (width & 1) {
+							break;
+						}
+						if (height & 1) {
+							break;
+						}
+						CVPlanarPixelBufferInfo_YCbCrBiPlanar* p = reinterpret_cast<CVPlanarPixelBufferInfo_YCbCrBiPlanar*>(baseAddress);
+						if (p->componentInfoY.offset == 0) {
+							frame.image.format = BitmapFormat::YUV_NV12;
+							frame.image.data = baseAddress + sizeof(CVPlanarPixelBufferInfo_YCbCrBiPlanar);
+						} else {
+							frame.image.format = BitmapFormat::YUV_NV12;
+							frame.image.data = baseAddress + (sl_int32)(Endian::swap32LE(p->componentInfoY.offset));
+							frame.image.pitch = Endian::swap32LE(p->componentInfoY.rowBytes);
+							frame.image.data1 = baseAddress + (sl_int32)(Endian::swap32LE(p->componentInfoCbCr.offset));
+							frame.image.pitch1 = Endian::swap32LE(p->componentInfoCbCr.rowBytes);
+						}
+					} else if (type == kCVPixelFormatType_32BGRA) {
+						frame.image.format = BitmapFormat::BGRA;
+						frame.image.data = baseAddress;
+						frame.image.pitch = (sl_uint32)(CVPixelBufferGetBytesPerRow(imageBuffer));
+					}
+				} while (0);
+				
+				if (frame.image.format != BitmapFormat::None) {
+					_onCaptureVideoFrame(&frame);
 				}
-				if (height & 1) {
-					break;
-				}
-				sl_uint8* base = (sl_uint8*)(baseAddress);
-				CVPlanarPixelBufferInfo_YCbCrBiPlanar* p = (CVPlanarPixelBufferInfo_YCbCrBiPlanar*)baseAddress;
-				if (p->componentInfoY.offset == 0) {
-					frame.image.format = BitmapFormat::YUV_NV12;
-					frame.image.data = base + sizeof(CVPlanarPixelBufferInfo_YCbCrBiPlanar);
-				} else {
-					frame.image.format = BitmapFormat::YUV_NV12;
-					frame.image.data = base + (sl_int32)(Endian::swap32LE(p->componentInfoY.offset));
-					frame.image.pitch = Endian::swap32LE(p->componentInfoY.rowBytes);
-					frame.image.data1 = base + (sl_int32)(Endian::swap32LE(p->componentInfoCbCr.offset));
-					frame.image.pitch1 = Endian::swap32LE(p->componentInfoCbCr.rowBytes);
-				}
-			} else if (type == kCVPixelFormatType_32BGRA) {
-				frame.image.format = BitmapFormat::BGRA;
-				frame.image.data = baseAddress;
-				frame.image.pitch = (sl_uint32)(CVPixelBufferGetBytesPerRow(imageBuffer));
 			}
-		} while (0);
-		
-		if (frame.image.format != BitmapFormat::None) {
-			onCaptureVideoFrame(&frame);
+			
+			CVPixelBufferUnlockBaseAddress(imageBuffer, kCVPixelBufferLock_ReadOnly);
+			
 		}
-		
-		CVPixelBufferUnlockBaseAddress(imageBuffer,0);
 		
 	}
 };
 
-Ref<Camera> AVFoundation::createCamera(const CameraParam& param)
+
+Ref<Camera> Camera::create(const CameraParam& param)
 {
 	return _AVFoundation_Camera::_create(param);
 }
 
-List<CameraInfo> AVFoundation::getCamerasList()
+List<CameraInfo> Camera::getCamerasList()
 {
 	List<CameraInfo> ret;
 	NSArray *devices = [AVCaptureDevice devices];

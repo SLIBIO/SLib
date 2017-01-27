@@ -22,6 +22,11 @@ public:
 	sl_uint32 gl_program;
 
 public:
+	RenderProgramState();
+	
+	~RenderProgramState();
+	
+public:
 	void setUniformFloatValue(sl_int32 uniformLocation, float value);
 	
 	void setUniformFloatArray(sl_int32 uniformLocation, const float* arr, sl_uint32 n);
@@ -57,11 +62,22 @@ public:
 class SLIB_EXPORT RenderProgramInstance : public RenderBaseObjectInstance
 {
 	SLIB_DECLARE_OBJECT
+	
+protected:
+	RenderProgramInstance();
+	
+	~RenderProgramInstance();
+	
 };
 
 class SLIB_EXPORT RenderProgram : public RenderBaseObject
 {
 	SLIB_DECLARE_OBJECT
+	
+protected:
+	RenderProgram();
+	
+	~RenderProgram();
 
 public:
 	virtual Ref<RenderProgramState> onCreate(RenderEngine* engine) = 0;

@@ -8,28 +8,20 @@
 #include "../core/object.h"
 #include "../core/string.h"
 #include "../core/ptr.h"
+#include "../core/function.h"
 
 SLIB_MEDIA_NAMESPACE_BEGIN
 
-class IVideoCaptureListener;
-
-class SLIB_EXPORT VideoCaptureParam
-{
-public:
-	sl_bool flagAutoStart;
-
-	Ptr<IVideoCaptureListener> listener;
-	
-public:
-	VideoCaptureParam();
-	
-};
+class VideoCapture;
 
 class VideoCaptureFrame : public VideoFrame
 {
+public:
+	VideoCaptureFrame();
+	
+	~VideoCaptureFrame();
+	
 };
-
-class VideoCapture;
 
 class SLIB_EXPORT IVideoCaptureListener
 {
@@ -38,10 +30,30 @@ public:
 	
 };
 
+class SLIB_EXPORT VideoCaptureParam
+{
+public:
+	sl_bool flagAutoStart;
+
+	Ptr<IVideoCaptureListener> listener;
+	Function<void(VideoCapture*, VideoCaptureFrame*)> onCaptureVideoFrame;
+	
+public:
+	VideoCaptureParam();
+	
+	~VideoCaptureParam();
+	
+};
+
 class SLIB_EXPORT VideoCapture : public Object
 {
 	SLIB_DECLARE_OBJECT
 
+protected:
+	VideoCapture();
+	
+	~VideoCapture();
+	
 public:
 	virtual void release() = 0;
 	
@@ -52,13 +64,17 @@ public:
 	virtual void stop() = 0;
 	
 	virtual sl_bool isRunning() = 0;
-	
-protected:
-	void onCaptureVideoFrame(VideoCaptureFrame* frame);
+
+public:
+	SLIB_PROPERTY(AtomicFunction<void(VideoCapture*, VideoCaptureFrame*)>, OnCaptureVideoFrame)
+
+	SLIB_PROPERTY(AtomicPtr<IVideoCaptureListener>, Listener)
 
 protected:
-	Ptr<IVideoCaptureListener> m_listener;
+	void _init(const VideoCaptureParam& param);
 	
+	void _onCaptureVideoFrame(VideoCaptureFrame* frame);
+
 };
 
 SLIB_MEDIA_NAMESPACE_END

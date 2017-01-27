@@ -30,6 +30,8 @@ public:
 public:
 	VP8EncoderParam();
 	
+	~VP8EncoderParam();
+	
 };
 
 class SLIB_EXPORT VP8DecoderParam
@@ -41,10 +43,17 @@ public:
 public:
 	VP8DecoderParam();
 	
+	~VP8DecoderParam();
+	
 };
 
 class SLIB_EXPORT VP8Encoder : public VideoEncoder
 {
+public:
+	VP8Encoder();
+	
+	~VP8Encoder();
+	
 public:
 	static Ref<VP8Encoder> create(const VP8EncoderParam& param);
 	
@@ -52,6 +61,11 @@ public:
 
 class SLIB_EXPORT VP8Decoder : public VideoDecoder
 {
+public:
+	VP8Decoder();
+	
+	~VP8Decoder();
+	
 public:
 	static Ref<VP8Decoder> create(const VP8DecoderParam& param);
 	

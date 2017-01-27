@@ -20,11 +20,11 @@ public:
 	
 	static void clear(const RenderClearParam& param);
 	
-	void clearColor(const Color& color);
+	static void clearColor(const Color& color);
 	
-	void clearColorDepth(const Color& color, float depth = 1.0f);
+	static void clearColorDepth(const Color& color, float depth = 1.0f);
 	
-	void clearDepth(float depth = 1.0f);
+	static void clearDepth(float depth = 1.0f);
 	
 	
 	static void setDepthTest(sl_bool flagEnableDepthTest);
@@ -97,6 +97,10 @@ public:
 
 	// textures
 	static void setActiveSampler(sl_uint32 samplerNo);
+	
+	static void bindTexture(sl_uint32 target, sl_uint32 texture);
+	
+	static void unbindTexture(sl_uint32 target);
 	
 	static void bindTexture2D(sl_uint32 texture);
 	

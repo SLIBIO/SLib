@@ -4,6 +4,14 @@ SLIB_RENDER_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(IndexBufferInstance, RenderBaseObjectInstance)
 
+IndexBufferInstance::IndexBufferInstance()
+{
+}
+
+IndexBufferInstance::~IndexBufferInstance()
+{
+}
+
 void IndexBufferInstance::notifyUpdated(sl_size offset, sl_size size)
 {
 	ObjectLocker lock(this);
@@ -26,11 +34,16 @@ void IndexBufferInstance::notifyUpdated(sl_size offset, sl_size size)
 	}
 }
 
+
 SLIB_DEFINE_OBJECT(IndexBuffer, RenderBaseObject)
 
 IndexBuffer::IndexBuffer()
 {
 	m_flagStatic = sl_true;
+}
+
+IndexBuffer::~IndexBuffer()
+{
 }
 
 Ref<IndexBuffer> IndexBuffer::create(const Memory& mem)

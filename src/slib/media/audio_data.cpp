@@ -14,6 +14,14 @@ AudioData::AudioData()
 	data1 = sl_null;
 }
 
+AudioData::AudioData(const AudioData& other) = default;
+
+AudioData::~AudioData()
+{
+}
+
+AudioData& AudioData::operator=(const AudioData& other) = default;
+
 sl_size AudioData::getSizeForChannel() const
 {
 	if (format == AudioFormat::None) {

@@ -18,6 +18,19 @@ OpusEncoderParam::OpusEncoderParam()
 	type = OpusEncoderType::Voice;
 }
 
+OpusEncoderParam::~OpusEncoderParam()
+{
+}
+
+
+OpusEncoder::OpusEncoder()
+{
+}
+
+OpusEncoder::~OpusEncoder()
+{
+}
+
 sl_bool OpusEncoder::isValidSamplingRate(sl_uint32 nSamplesPerSecond)
 {
 	if (nSamplesPerSecond == 8000
@@ -226,6 +239,19 @@ OpusDecoderParam::OpusDecoderParam()
 {
 	samplesPerSecond = 16000;
 	channelsCount = 1;
+}
+
+OpusDecoderParam::~OpusDecoderParam()
+{
+}
+
+
+OpusDecoder::OpusDecoder()
+{
+}
+
+OpusDecoder::~OpusDecoder()
+{
 }
 
 sl_bool OpusDecoder::isValidSamplingRate(sl_uint32 nSamplesPerSecond)
