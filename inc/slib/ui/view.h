@@ -68,6 +68,11 @@ public:
 	
 	sl_bool isNativeWidget();
 	
+	sl_bool isInstanceLayer();
+	
+	// set before attaching
+	void setInstanceLayer(sl_bool flagLayered);
+	
 	
 	Ref<Window> getWindow();
 	
@@ -1113,6 +1118,8 @@ protected:
 
 	virtual void onAttach();
 	
+	virtual void onDetach();
+	
 	virtual void onAddChild(View* child);
 	
 	virtual void onRemoveChild(View* child);
@@ -1266,6 +1273,7 @@ private:
 	sl_bool m_flagEnabled;
 	sl_bool m_flagHitTestable;
 	sl_bool m_flagFocusable;
+	sl_bool m_flagInstanceLayer;
 
 	sl_bool m_flagFocused;
 	sl_bool m_flagPressed;

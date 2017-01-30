@@ -285,6 +285,14 @@ public:
 	
 };
 
+class SLIB_EXPORT RenderProgram2D_PositionTextureOES : public RenderProgram2D_PositionTexture
+{
+public:
+	// override
+	String getGLSLFragmentShader(RenderEngine* engine);
+	
+};
+
 
 struct RenderVertex2D_PositionColor
 {

@@ -26,6 +26,7 @@ ViewPager::ViewPager()
 	SLIB_REFERABLE_CONSTRUCTOR
 	
 	setCreatingChildInstances(sl_true);
+	setInstanceLayer(sl_true);
 	
 	m_indexCurrent = 0;
 	m_minimumPagesCount = 0;

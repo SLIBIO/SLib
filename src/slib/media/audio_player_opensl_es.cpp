@@ -82,10 +82,6 @@ public:
 
 	Ref<AudioPlayerBuffer> createBuffer(const AudioPlayerBufferParam& param);
 
-	Ref<AudioPlayerControl> _openNative(const AudioPlayerOpenParam& param)
-	{
-		return sl_null;
-	}
 };
 
 class _OpenSLES_AudioPlayerBufferImpl : public AudioPlayerBuffer

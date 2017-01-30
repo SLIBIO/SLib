@@ -24,7 +24,6 @@ public class UiGroupView extends AbsoluteLayout implements IView {
 	public UiGroupView(Context context) {
 		super(context);
 		setWillNotDraw(false);
-		setLayerType(View.LAYER_TYPE_HARDWARE, null);
 	}
 	
 	public void onDraw(Canvas canvas) {

@@ -41,6 +41,7 @@ View::View()
 	m_flagEnabled = sl_true;	
 	m_flagHitTestable = sl_true;
 	m_flagFocusable = sl_false;
+	m_flagInstanceLayer = sl_false;
 	
 	m_flagFocused = sl_false;
 	m_flagPressed = sl_false;
@@ -67,6 +68,7 @@ View::View()
 
 View::~View()
 {
+	SLIB_REFERABLE_DESTRUCTOR
 	detach();
 }
 
@@ -373,15 +375,25 @@ sl_bool View::isNativeWidget()
 	return sl_false;
 }
 
+sl_bool View::isInstanceLayer()
+{
+	return m_flagInstanceLayer;
+}
+
+void View::setInstanceLayer(sl_bool flagLayered)
+{
+	m_flagInstanceLayer = flagLayered;
+}
+
 Ref<Window> View::getWindow()
 {
 	Ref<Window> window = m_window;
 	if (window.isNotNull()) {
 		return window;
 	}
-	Ref<View> parent = getParent();
+	Ref<View> parent = m_parent;
 	if (parent.isNotNull()) {
-		return parent->getWindow();
+		return parent->m_window;
 	}
 	return sl_null;
 }
@@ -404,7 +416,7 @@ void View::setParent(const Ref<View>& parent)
 void View::removeParent(View* _parent)
 {
 	if (_parent) {
-		Ref<View> parent = getParent();
+		Ref<View> parent = m_parent;
 		if (parent == _parent) {
 			m_parent.setNull();
 		}
@@ -440,10 +452,11 @@ Ref<ViewInstance> View::attachToNewInstance(const Ref<ViewInstance>& parent)
 void View::detach()
 {
 	ObjectLocker lock(this);
-	Ref<ViewInstance> instance = getViewInstance();
+	Ref<ViewInstance> instance = m_instance;
 	if (instance.isNotNull()) {
 		instance->setView(sl_null);
 		m_instance.setNull();
+		onDetach();
 	}
 }
 
@@ -6756,6 +6769,10 @@ void View::onRemoveChild(View* child)
 }
 
 void View::onAttach()
+{
+}
+
+void View::onDetach()
 {
 }
 

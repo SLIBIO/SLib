@@ -2,6 +2,8 @@
 
 SLIB_RENDER_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(GLRenderEngine, RenderEngine)
+
 GLRenderEngine::GLRenderEngine()
 {
 }

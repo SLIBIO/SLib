@@ -941,17 +941,23 @@ static GLenum _GL_getFilter(TextureFilterMode filter)
 	}
 	return GL_NONE;
 }
-void GL_BASE::setTexture2DFilterMode(TextureFilterMode minFilter, TextureFilterMode magFilter)
+
+void GL_BASE::setTextureFilterMode(sl_uint32 target, TextureFilterMode minFilter, TextureFilterMode magFilter)
 {
 	GLenum f;
 	f = _GL_getFilter(minFilter);
 	if (f != GL_NONE) {
-		GL_ENTRY(glTexParameteri)(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, f);
+		GL_ENTRY(glTexParameteri)(target, GL_TEXTURE_MIN_FILTER, f);
 	}
 	f = _GL_getFilter(magFilter);
 	if (f != GL_NONE) {
-		GL_ENTRY(glTexParameteri)(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, f);
+		GL_ENTRY(glTexParameteri)(target, GL_TEXTURE_MAG_FILTER, f);
 	}
+}
+
+void GL_BASE::setTexture2DFilterMode(TextureFilterMode minFilter, TextureFilterMode magFilter)
+{
+	setTextureFilterMode(GL_TEXTURE_2D, minFilter, magFilter);
 }
 
 static GLenum _GL_getWrap(TextureWrapMode wrap)
@@ -966,17 +972,23 @@ static GLenum _GL_getWrap(TextureWrapMode wrap)
 	}
 	return GL_NONE;
 }
-void GL_BASE::setTexture2DWrapMode(TextureWrapMode wrapX, TextureWrapMode wrapY)
+
+void GL_BASE::setTextureWrapMode(sl_uint32 target, TextureWrapMode wrapX, TextureWrapMode wrapY)
 {
 	GLenum f;
 	f = _GL_getWrap(wrapX);
 	if (f != GL_NONE) {
-		GL_ENTRY(glTexParameteri)(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, f);
+		GL_ENTRY(glTexParameteri)(target, GL_TEXTURE_WRAP_S, f);
 	}
 	f = _GL_getWrap(wrapY);
 	if (f != GL_NONE) {
-		GL_ENTRY(glTexParameteri)(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, f);
+		GL_ENTRY(glTexParameteri)(target, GL_TEXTURE_WRAP_T, f);
 	}
+}
+
+void GL_BASE::setTexture2DWrapMode(TextureWrapMode wrapX, TextureWrapMode wrapY)
+{
+	setTextureWrapMode(GL_TEXTURE_2D, wrapX, wrapY);
 }
 
 void GL_BASE::deleteTexture(sl_uint32 texture)
@@ -1529,13 +1541,15 @@ public:
 			_TextureInstance* instance = (_TextureInstance*)_instance;
 			instance->_update(texture);
 			GL_BASE::bindTexture2D(instance->handle);
+			GL_BASE::setTexture2DFilterMode(texture->getMinFilter(), texture->getMagFilter());
+			GL_BASE::setTexture2DWrapMode(texture->getWrapX(), texture->getWrapY());
 		} else {
 			_NamedTexture* named = static_cast<_NamedTexture*>(texture);
 			GL_BASE::setActiveSampler(samplerNo);
 			GL_BASE::bindTexture(named->m_target, named->m_name);
+			GL_BASE::setTextureFilterMode(named->m_target, texture->getMinFilter(), texture->getMagFilter());
+			GL_BASE::setTextureWrapMode(named->m_target, texture->getWrapX(), texture->getWrapY());
 		}
-		GL_BASE::setTexture2DFilterMode(texture->getMinFilter(), texture->getMagFilter());
-		GL_BASE::setTexture2DWrapMode(texture->getWrapX(), texture->getWrapY());
 	}
 
 	// override

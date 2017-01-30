@@ -186,6 +186,8 @@ protected:
 	~RenderEngine();
 	
 public:
+	sl_uint64 getUniqueId();
+	
 	virtual RenderEngineType getEngineType() = 0;
 	
 	sl_bool isOpenGL();
@@ -370,6 +372,8 @@ protected:
 	virtual void _setLineWidth(sl_real width) = 0;
 	
 protected:
+	sl_uint64 m_uniqueId;
+	
 	sl_uint32 m_viewportWidth;
 	sl_uint32 m_viewportHeight;
 

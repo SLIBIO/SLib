@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.Window;
 import android.view.WindowManager;
 
 public class SlibActivity extends Activity {
@@ -18,9 +19,14 @@ public class SlibActivity extends Activity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		
 		super.onCreate(savedInstanceState);
+		
 		Android.onCreateActivity(this);
-		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+		
+		Window window = getWindow();
+		window.setFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED, WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
+		window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 	}
 	
 	@Override
@@ -98,6 +104,7 @@ public class SlibActivity extends Activity {
 		UiThread.post(new Runnable() {
 			public void run() {
 				dispatchTouchEventToSuper(evNew);
+				evNew.recycle();
 			}
 		});
 		return true;

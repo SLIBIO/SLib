@@ -10,7 +10,7 @@ SLIB_MEDIA_NAMESPACE_BEGIN
 
 Ref<AudioPlayer> AudioPlayer::create(const AudioPlayerParam& param)
 {
-	return OpenSL_ES::createPlayer(m_param);
+	return OpenSL_ES::createPlayer(param);
 }
 
 List<AudioPlayerInfo> AudioPlayer::getPlayersList()

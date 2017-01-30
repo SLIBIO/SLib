@@ -51,6 +51,9 @@ protected:
 	
 	Ref<RenderProgram2D_PositionTexture> m_programRGB;
 	Ref<RenderProgram2D_PositionTextureYUV> m_programYUV;
+	Ref<RenderProgram2D_PositionTextureOES> m_programOES;
+	
+	MediaPlayerRenderVideoParam m_renderVideoParam;
 	
 };
 

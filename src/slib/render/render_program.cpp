@@ -307,6 +307,23 @@ String RenderProgram2D_PositionTextureYUV::getGLSLFragmentShader(RenderEngine* e
 }
 
 /*******************************
+	RenderProgram2D_PositionTextureOES
+*******************************/
+String RenderProgram2D_PositionTextureOES::getGLSLFragmentShader(RenderEngine* engine)
+{
+	String source = SLIB_STRINGIFY(
+	   uniform vec4 u_Color;
+	   uniform samplerExternalOES u_Texture;
+	   varying vec2 v_TexCoord;
+	   void main() {
+		   vec4 colorTexture = texture2D(u_Texture, v_TexCoord);
+		   gl_FragColor = colorTexture * u_Color;
+	   }
+	);
+	return source;
+}
+
+/*******************************
 	RenderProgram2D_PositionColor
 *******************************/
 String RenderProgram2D_PositionColor::getGLSLVertexShader(RenderEngine* engine)

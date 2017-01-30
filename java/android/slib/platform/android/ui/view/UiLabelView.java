@@ -20,7 +20,6 @@ public class UiLabelView extends TextView implements IView {
 			@Override
 			public void onClick(View v) {
 				UiView.onEventClick(UiLabelView.this);
-				setLayerType(View.LAYER_TYPE_HARDWARE, null);
 			}
 		});
 	}

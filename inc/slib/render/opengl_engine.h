@@ -9,6 +9,8 @@ SLIB_RENDER_NAMESPACE_BEGIN
 
 class SLIB_EXPORT GLRenderEngine : public RenderEngine
 {
+	SLIB_DECLARE_OBJECT
+	
 protected:
 	GLRenderEngine();
 	
