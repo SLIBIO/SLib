@@ -11,6 +11,7 @@
 
 #include "../media/video_frame.h"
 #include "../render/texture.h"
+#include "../render/opengl_engine.h"
 
 SLIB_MEDIA_NAMESPACE_BEGIN
 
@@ -63,14 +64,26 @@ public:
 	};
 };
 
-
+// save this structure after rendering and reuse for next frame
 class MediaPlayerRenderVideoParam
 {
 public:
+	// in
 	Function<void(VideoFrame*)> onUpdateFrame;
+	
+	// in
+	Ref<GLRenderEngine> glEngine;
+	
+	// out
+	Ref<Texture> glTextureOES;
 	
 	// out
 	sl_bool flagUpdated;
+
+public:
+	// used interally by MediaPlayer
+	sl_uint64 _glEngineIdLast;
+	sl_uint32 _glTextureNameOES;
 	
 public:
 	MediaPlayerRenderVideoParam();
@@ -98,20 +111,19 @@ public:
 	static Ref<MediaPlayer> openAsset(const String& fileName, const MediaPlayerFlags& flags = MediaPlayerFlags::Default);
 	
 public:
-	virtual void stop() = 0;
+	virtual void release() = 0;
 	
 	virtual void resume() = 0;
 	
 	virtual void pause() = 0;
-	
+
 	virtual sl_bool isPlaying() = 0;
 	
 	virtual void renderVideo(MediaPlayerRenderVideoParam& param) = 0;
 	
-public:
 	sl_bool isAutoRepeat();
 	
-	void setAutoRepeat(sl_bool flagRepeat);
+	virtual void setAutoRepeat(sl_bool flagRepeat);
 	
 public:
 	SLIB_PROPERTY(AtomicPtr<IMediaPlayerListener>, Listener)

@@ -1,5 +1,6 @@
 package slib.platform.android.ui.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Rect;
 import android.view.MotionEvent;
@@ -87,7 +88,6 @@ public class UiScrollView extends ScrollView implements IView {
 
 	public UiScrollView(Context context) {
 		super(context);
-		setLayerType(View.LAYER_TYPE_HARDWARE, null);
 	}
 
 	public void setPaging(boolean flagPaging, int pageWidth, int pageHeight) {
@@ -123,6 +123,7 @@ public class UiScrollView extends ScrollView implements IView {
 		}
 	}
 
+	@SuppressLint("ClickableViewAccessibility")
 	public boolean onTouchEvent(MotionEvent ev) {
 		flagFling = false;
 		boolean flag = super.onTouchEvent(ev);

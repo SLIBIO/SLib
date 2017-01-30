@@ -2,244 +2,267 @@
 
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 
-#include "../../../inc/slib/media/audio_player.h"
+#include "../../../inc/slib/media/media_player.h"
 
-#include "../../../inc/slib/media/opensl_es.h"
-#include "../../../inc/slib/ui/platform.h"
+#include "../../../inc/slib/render/opengl.h"
 #include "../../../inc/slib/core/safe_static.h"
+
+#include "../../../inc/slib/core/platform_android.h"
+
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
 
 SLIB_MEDIA_NAMESPACE_BEGIN
 
-class _Android_AudioPlayerControl;
+class _Android_MediaPlayer;
 
-typedef HashMap<jlong, WeakRef<_Android_AudioPlayerControl> > _AndroidAudioPlayerControlMap;
-SLIB_SAFE_STATIC_GETTER(_AndroidAudioPlayerControlMap, _AndroidAudioPlayerControls_get)
+typedef HashMap<jlong, WeakRef<_Android_MediaPlayer> > _AndroidMediaPlayerMap;
+SLIB_SAFE_STATIC_GETTER(_AndroidMediaPlayerMap, _AndroidMediaPlayerMap_get)
 
-void _AudioPlayer_onCompleted(JNIEnv* env, jobject _this, jlong instance);
-void _AudioPlayer_onPrepared(JNIEnv* env, jobject _this, jlong instance);
+void _MediaPlayer_onCompleted(JNIEnv* env, jobject _this, jlong instance);
+void _MediaPlayer_onPrepared(JNIEnv* env, jobject _this, jlong instance);
 
-SLIB_JNI_BEGIN_CLASS(_JAndroidMedia, "slib/platform/android/media/AudioPlayer")
-	SLIB_JNI_STATIC_METHOD(createMedia, "createMedia", "(Lslib/platform/android/SlibActivity;Ljava/lang/String;J)Landroid/media/MediaPlayer;");
-	SLIB_JNI_STATIC_METHOD(start, "start", "(Lslib/platform/android/SlibActivity;Landroid/media/MediaPlayer;)V");
-	SLIB_JNI_STATIC_METHOD(pause, "pause", "(Lslib/platform/android/SlibActivity;Landroid/media/MediaPlayer;)V");
-	SLIB_JNI_STATIC_METHOD(stop, "stop", "(Lslib/platform/android/SlibActivity;Landroid/media/MediaPlayer;)V");
-	SLIB_JNI_STATIC_METHOD(isPlaying, "isPlaying", "(Lslib/platform/android/SlibActivity;Landroid/media/MediaPlayer;)Z");
-	SLIB_JNI_NATIVE(onCompleted, "nativeOnCompleted", "(J)V", _AudioPlayer_onCompleted);
-	SLIB_JNI_NATIVE(onPrepared, "nativeOnPrepared", "(J)V", _AudioPlayer_onPrepared);
+SLIB_JNI_BEGIN_CLASS(_JMediaPlayer, "slib/platform/android/media/SMediaPlayer")
+	SLIB_JNI_STATIC_METHOD(openUrl, "openUrl", "(Ljava/lang/String;Z)Lslib/platform/android/media/SMediaPlayer;");
+	SLIB_JNI_STATIC_METHOD(openAsset, "openAsset", "(Landroid/content/Context;Ljava/lang/String;Z)Lslib/platform/android/media/SMediaPlayer;");
+	SLIB_JNI_METHOD(setInstance, "setInstance", "(J)V");
+	SLIB_JNI_METHOD(start, "start", "()V");
+	SLIB_JNI_METHOD(pause, "pause", "()V");
+	SLIB_JNI_METHOD(stop, "stop", "()V");
+	SLIB_JNI_METHOD(isPlaying, "isPlaying", "()Z");
+	SLIB_JNI_METHOD(setLooping, "setLooping", "(Z)V");
+	SLIB_JNI_METHOD(renderVideo, "renderVideo", "(IZ)Z");
+	SLIB_JNI_NATIVE(onCompleted, "nativeOnCompleted", "(J)V", _MediaPlayer_onCompleted);
+	SLIB_JNI_NATIVE(onPrepared, "nativeOnPrepared", "(J)V", _MediaPlayer_onPrepared);
 SLIB_JNI_END_CLASS
 
-class _Android_AudioPlayerControl : public AudioPlayerControl
+class _Android_MediaPlayer : public MediaPlayer
 {
 public:
-	_Android_AudioPlayerControl()
+	JniGlobal<jobject> m_player;
+	sl_bool m_flagInited;
+	sl_bool m_flagPlaying;
+	sl_bool m_flagPrepared;
+	sl_bool m_flagVideo;
+
+public:
+	_Android_MediaPlayer()
 	{
-		isPrepared = sl_false;
-		isStartedBeforePrepared = sl_false;
+		m_flagInited = sl_false;
+		m_flagPlaying = sl_false;
+		m_flagPrepared = sl_false;
+		m_flagVideo = sl_false;
 	}
 
-	~_Android_AudioPlayerControl()
+	~_Android_MediaPlayer()
 	{
-		_AndroidAudioPlayerControlMap* map = _AndroidAudioPlayerControls_get();
+		SLIB_REFERABLE_DESTRUCTOR
+		release();
+		_AndroidMediaPlayerMap* map = _AndroidMediaPlayerMap_get();
 		if (map) {
 			map->remove((jlong) this);
 		}
 	}
 
 public:
-	void init(const AudioPlayerOpenParam& param)
-	{
-		mOpenParam = param;
-		if (mOpenParam.data.isNotNull() && mOpenParam.data.getSize() > 0) {
-			
-		} else if (mOpenParam.url.isNotNull() && mOpenParam.url.getLength() > 0) {
-			JniLocal<jstring> _url = Jni::getJniString(mOpenParam.url);
+	static Ref<_Android_MediaPlayer> create(const MediaPlayerParam& param)
+	{		
+		JniLocal<jobject> player;
+		if (param.url.isNotEmpty()) {
+			JniLocal<jstring> url = Jni::getJniString(param.url);
+			player = _JMediaPlayer::openUrl.callObject(sl_null, url.get(), param.flagVideo);
+		} else if (param.filePath.isNotEmpty()) {
+			JniLocal<jstring> filePath = Jni::getJniString(param.filePath);
+			player = _JMediaPlayer::openUrl.callObject(sl_null, filePath.get(), param.flagVideo);
+		} else if (param.assetFileName.isNotEmpty()) {
+			JniLocal<jstring> assetFileName = Jni::getJniString(param.assetFileName);
 			jobject jactivity = Android::getCurrentActivity();
 			if (jactivity) {
-				m_player = _JAndroidMedia::createMedia.callObject(sl_null, jactivity, _url.get(), (jlong)this);
-				_AndroidAudioPlayerControlMap* map = _AndroidAudioPlayerControls_get();
-				if (map) {
-					jlong instance = (jlong) this;
-					map->put(instance, this);
-				}
+				player = _JMediaPlayer::openAsset.callObject(sl_null, jactivity, assetFileName.get(), param.flagVideo);
 			}
 		}
+		if (player.isNull()) {
+			return sl_null;
+		}
+
+		Ref<_Android_MediaPlayer> ret = new _Android_MediaPlayer;
+		if (ret.isNotNull()) {
+			ret->m_player = player;
+			ret->_init(param);
+			_AndroidMediaPlayerMap* map = _AndroidMediaPlayerMap_get();
+			if (map) {
+				jlong instance = (jlong)(ret.get());
+				map->put(instance, ret);
+				_JMediaPlayer::setInstance.call(player.get(), instance);
+				_JMediaPlayer::setLooping.call(player.get(), param.flagAutoRepeat);
+				ret->m_flagVideo = param.flagVideo;
+				ret->m_flagInited = sl_true;
+				return ret;
+			}
+		}
+		return sl_null;
 	}
 
-	void init(const Memory& data)
+	// override
+	void release()
 	{
+		ObjectLocker lock(this);
+		if (!m_flagInited) {
+			return;
+		}
+		m_flagInited = sl_false;
+		if (m_flagPrepared) {
+			JniGlobal<jobject> player = m_player;
+			if (player.isNotNull()) {
+				_JMediaPlayer::stop.call(player.get());
+			}
+		}
+		_removeFromMap();
 	}
-
 
 	// override
 	void resume()
 	{
-		if (!isPrepared) {
-			isStartedBeforePrepared = sl_true;
-		} else {
-			JniGlobal<jobject> player = m_player;
-			jobject jactivity = Android::getCurrentActivity();
-			if (jactivity) {
-				if (player.isNotNull()) {
-					_JAndroidMedia::start.call(sl_null, jactivity, player.get());
-				}
-			}
+		ObjectLocker lock(this);
+		if (!m_flagInited) {
+			return;
 		}
+		if (m_flagPlaying) {
+			return;
+		}
+		if (m_flagPrepared) {
+			_JMediaPlayer::start.call(m_player.get());
+		}
+		m_flagPlaying = sl_true;
+		_addToMap();
 	}
 
 	// override
 	void pause()
 	{
+		ObjectLocker lock(this);
+		if (!m_flagInited) {
+			return;
+		}
+		if (!m_flagPlaying) {
+			return;
+		}
+		if (m_flagPrepared) {
+			_JMediaPlayer::pause.call(m_player.get());
+		}
+		m_flagPlaying = sl_false;
 		_removeFromMap();
-		ObjectLocker lock(this);
-		JniGlobal<jobject> player = m_player;
-		jobject jactivity = Android::getCurrentActivity();
-		if (jactivity) {
-			if (player.isNotNull()) {
-				_JAndroidMedia::pause.call(sl_null, jactivity, player.get());
-			}
-		}
-	}
-
-	// override
-	void stop()
-	{
-		ObjectLocker lock(this);
-		JniGlobal<jobject> player = m_player;
-		jobject jactivity = Android::getCurrentActivity();
-		if (jactivity) {
-			if (player.isNotNull()) {
-				_JAndroidMedia::stop.call(sl_null, jactivity, player.get());
-				_removeFromMap();
-			}
-		}
 	}
 
 	// override
 	sl_bool isPlaying()
 	{
 		ObjectLocker lock(this);
-		JniGlobal<jobject> player = m_player;
-		jobject jactivity = Android::getCurrentActivity();
-		if (jactivity) {
-			if (player.isNotNull()) {
-				return _JAndroidMedia::isPlaying.callBoolean(sl_null, jactivity, player.get());
+		if (!m_flagInited) {
+			return sl_false;
+		}
+		return m_flagPlaying;
+	}
+
+	// override
+	void setAutoRepeat(sl_bool flagRepeat)
+	{
+		ObjectLocker lock(this);
+		if (!m_flagInited) {
+			return;
+		}
+		_JMediaPlayer::setLooping.call(m_player.get(), flagRepeat);
+	}
+
+	// override
+	void renderVideo(MediaPlayerRenderVideoParam& param)
+	{
+		ObjectLocker lock(this);
+		if (!m_flagInited) {
+			return;
+		}
+		if (!m_flagVideo) {
+			return;
+		}
+		if (param.glEngine.isNull()) {
+			return;
+		}
+		sl_uint64 engineId = param.glEngine->getUniqueId();
+		if (param._glEngineIdLast != engineId) {
+			param.glTextureOES.setNull();
+		}
+		param._glEngineIdLast = engineId;
+		GLuint textureName = 0;
+		sl_bool flagResetTexture = sl_false;
+		if (param.glTextureOES.isNull()) {
+			glGenTextures(1, &textureName);
+			if (textureName == 0) {
+				return;
+			}
+			param.glTextureOES = param.glEngine->createTextureFromName(GL_TEXTURE_EXTERNAL_OES, textureName);
+			if (param.glTextureOES.isNull()) {
+				return;
+			}
+			param._glTextureNameOES = textureName;
+			flagResetTexture = sl_true;
+		} else {
+			textureName = param._glTextureNameOES;
+			if (textureName == 0) {
+				return;
 			}
 		}
-		return sl_false;
+		param.flagUpdated = _JMediaPlayer::renderVideo.callBoolean(m_player.get(), textureName, flagResetTexture) != 0;
 	}
 
-	void onPrepared()
+	void __onPrepared()
 	{
-		isPrepared = sl_true;
-		if (isStartedBeforePrepared) {
-			resume();
+		ObjectLocker lock(this);
+		if (!m_flagInited) {
+			return;
 		}
-
-		if (mOpenParam.onReadyToPlay.isNotNull()) {
-			mOpenParam.onReadyToPlay(this);
+		m_flagPrepared = sl_true;
+		if (m_flagPlaying) {
+			_JMediaPlayer::start.call(m_player.get());
 		}
+		lock.unlock();
+		_onReadyToPlay();
 	}
 
-	void onCompleted()
+	void __onCompleted()
 	{
-		stop();
-	}
-
-private:
-	AtomicJniGlobal<jobject> m_player;
-	sl_bool isPrepared;
-	sl_bool isStartedBeforePrepared;
-	AudioPlayerOpenParam mOpenParam;
-};
-
-class _Android_AudioPlayer : public AudioPlayer
-{
-public:
-	AudioPlayerParam m_param;
-	Ref<AudioPlayer> m_playerOpenSLES;
-
-public:
-	static Ref<_Android_AudioPlayer> create(const AudioPlayerParam& param)
-	{
-		Ref<_Android_AudioPlayer> ret = new _Android_AudioPlayer();
-		if (ret.isNotNull()) {
-			ret->m_param = param;
-			return ret;
-		}
-		return sl_null;
-	}
-
-	Ref<AudioPlayerBuffer> createBuffer(const AudioPlayerBufferParam& param)
-	{
-		Ref<AudioPlayer> playerOpenSLES;
-		{
-			ObjectLocker lock(this);
-			if (m_playerOpenSLES.isNull()) {
-				m_playerOpenSLES = OpenSL_ES::createPlayer(m_param);
-			}
-			playerOpenSLES = m_playerOpenSLES;
-		}
-		if (playerOpenSLES.isNotNull()) {
-			return playerOpenSLES->createBuffer(param);
-		}
-		return sl_null;
-	}
-
-	Ref<AudioPlayerControl> _openNative(const AudioPlayerOpenParam& param)
-	{
-		if (param.data.getSize() < 1 && param.url.getLength() < 1) {
-			return sl_null;
-		}
-		
-		Ref<_Android_AudioPlayerControl> ret = new _Android_AudioPlayerControl;
-		if (ret.isNotNull()) {
-			ret->init(param);
-			if (param.flagAutoStart) {
-				ret->resume();
-			}
-		}
-		return ret;
 	}
 
 };
 
-Ref<AudioPlayer> AudioPlayer::create(const AudioPlayerParam& param)
+void _MediaPlayer_onCompleted(JNIEnv* env, jobject _this, jlong instance)
 {
-	return _Android_AudioPlayer::create(param);
-}
-
-List<AudioPlayerInfo> AudioPlayer::getPlayersList()
-{
-	AudioPlayerInfo ret;
-	SLIB_STATIC_STRING(s, "Internal Speaker");
-	ret.name = s;
-	return List<AudioPlayerInfo>::createFromElement(ret);
-}
-
-void _AudioPlayer_onCompleted(JNIEnv* env, jobject _this, jlong instance)
-{
-	_AndroidAudioPlayerControlMap* map = _AndroidAudioPlayerControls_get();
+	_AndroidMediaPlayerMap* map = _AndroidMediaPlayerMap_get();
 	if (map) {
-		WeakRef<_Android_AudioPlayerControl> control;
-		map->get(instance, &control);
-		Ref<_Android_AudioPlayerControl> _control = control;
-		if (_control.isNotNull()) {
-			_control->onCompleted();
+		WeakRef<_Android_MediaPlayer> _player;
+		map->get(instance, &_player);
+		Ref<_Android_MediaPlayer> player = _player;
+		if (player.isNotNull()) {
+			player->__onCompleted();
 		}
 	}
 }
 
-void _AudioPlayer_onPrepared(JNIEnv* env, jobject _this, jlong instance)
+void _MediaPlayer_onPrepared(JNIEnv* env, jobject _this, jlong instance)
 {
-	_AndroidAudioPlayerControlMap* map = _AndroidAudioPlayerControls_get();
+	_AndroidMediaPlayerMap* map = _AndroidMediaPlayerMap_get();
 	if (map) {
-		WeakRef<_Android_AudioPlayerControl> control;
-		map->get(instance, &control);
-		Ref<_Android_AudioPlayerControl> _control = control;
-		if (_control.isNotNull()) {
-			_control->onPrepared();
+		WeakRef<_Android_MediaPlayer> _player;
+		map->get(instance, &_player);
+		Ref<_Android_MediaPlayer> player = _player;
+		if (player.isNotNull()) {
+			player->__onPrepared();
 		}
 	}
+}
+
+Ref<MediaPlayer> MediaPlayer::_createNative(const MediaPlayerParam& param)
+{
+	return _Android_MediaPlayer::create(param);
 }
 
 SLIB_MEDIA_NAMESPACE_END

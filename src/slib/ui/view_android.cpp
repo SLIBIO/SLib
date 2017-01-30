@@ -158,6 +158,7 @@ SLIB_JNI_BEGIN_CLASS(_JAndroidView, "slib/platform/android/ui/view/UiView")
 	SLIB_JNI_STATIC_METHOD(isEnabled, "isEnabled", "(Landroid/view/View;)Z");
 	SLIB_JNI_STATIC_METHOD(setEnabled, "setEnabled", "(Landroid/view/View;Z)V");
 	SLIB_JNI_STATIC_METHOD(setAlpha, "setAlpha", "(Landroid/view/View;F)V");
+	SLIB_JNI_STATIC_METHOD(setLayered, "setLayered", "(Landroid/view/View;)V");
 	SLIB_JNI_STATIC_METHOD(convertCoordinateFromScreenToView, "convertCoordinateFromScreenToView", "(Landroid/view/View;II)Landroid/graphics/Point;");
 	SLIB_JNI_STATIC_METHOD(convertCoordinateFromViewToScreen, "convertCoordinateFromViewToScreen", "(Landroid/view/View;II)Landroid/graphics/Point;");
 
@@ -227,6 +228,9 @@ sl_bool Android_ViewInstance::applyProperties(View* _view, ViewInstance* parent)
 		sl_real alpha = view->getAlpha();
 		if (alpha < 0.995f) {
 			_JAndroidView::setAlpha.call(sl_null, jhandle, alpha);
+		}
+		if (view->isInstanceLayer()) {
+			_JAndroidView::setLayered.call(sl_null, jhandle);
 		}
 		Vector2 t;
 		sl_real r;

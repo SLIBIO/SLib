@@ -38,9 +38,13 @@ public class UiView {
 	}
 	
 	public static void freeView(View view) {
-		setInstance(view, 0);
-		if (view instanceof UiGLView) {
-			UiGLView.removeView(view);
+		try {
+			setInstance(view, 0);
+			if (view instanceof UiGLView) {
+				UiGLView.removeView(view);
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 	}
 
@@ -64,8 +68,20 @@ public class UiView {
 		return null;
 	}
 	
-	public static void setFocus(View view) {
-		view.requestFocus();
+	public static void setFocus(final View view) {
+		try {
+			if (!(UiThread.isUiThread())) {
+				view.post(new Runnable() {
+					public void run() {
+						setFocus(view);
+					}
+				});
+			} else {
+				view.requestFocus();				
+			}
+		} catch (Exception e) {
+			Logger.exception(e);
+		}
 	}
 
 	public static void invalidate(View view) {
@@ -243,6 +259,14 @@ public class UiView {
 					view.setAlpha(alpha);
 				}
 			});
+		}
+	}
+	
+	public static void setLayered(final View view) {
+		try {
+			view.setLayerType(View.LAYER_TYPE_HARDWARE, null);			
+		} catch (Exception e) {
+			Logger.exception(e);
 		}
 	}
 	

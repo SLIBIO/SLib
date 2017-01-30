@@ -90,6 +90,9 @@ SLIB_DEFINE_OBJECT(RenderEngine, Object)
 
 RenderEngine::RenderEngine()
 {
+	static sl_int64 _id = 0;
+	m_uniqueId = Base::interlockedIncrement64(&_id);
+	
 	m_viewportWidth = 0;
 	m_viewportHeight = 0;
 
@@ -100,6 +103,11 @@ RenderEngine::RenderEngine()
 
 RenderEngine::~RenderEngine()
 {
+}
+
+sl_uint64 RenderEngine::getUniqueId()
+{
+	return m_uniqueId;
 }
 
 sl_bool RenderEngine::isOpenGL()

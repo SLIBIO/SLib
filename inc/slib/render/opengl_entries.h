@@ -122,7 +122,11 @@ public:
 	
 	static void updateTexture2D(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height, const Ref<Bitmap>& bitmap, sl_uint32 bitmapX = 0, sl_uint32 bitmapY = 0);
 	
+	static void setTextureFilterMode(sl_uint32 target, TextureFilterMode minFilter, TextureFilterMode magFilter);
+	
 	static void setTexture2DFilterMode(TextureFilterMode minFilter, TextureFilterMode magFilter);
+	
+	static void setTextureWrapMode(sl_uint32 target, TextureWrapMode wrapX, TextureWrapMode wrapY);
 	
 	static void setTexture2DWrapMode(TextureWrapMode wrapX, TextureWrapMode wrapY);
 	

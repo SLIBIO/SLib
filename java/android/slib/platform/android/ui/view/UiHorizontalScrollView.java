@@ -1,5 +1,6 @@
 package slib.platform.android.ui.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Rect;
 import android.view.MotionEvent;
@@ -20,7 +21,6 @@ public class UiHorizontalScrollView extends HorizontalScrollView implements IVie
 
 	public UiHorizontalScrollView(Context context) {
 		super(context);
-		setLayerType(View.LAYER_TYPE_HARDWARE, null);
 	}
 
 	public void setPaging(boolean flagPaging, int pageWidth, int pageHeight) {
@@ -56,6 +56,7 @@ public class UiHorizontalScrollView extends HorizontalScrollView implements IVie
 		}
 	}
 
+	@SuppressLint("ClickableViewAccessibility")
 	public boolean onTouchEvent(MotionEvent ev) {
 		flagFling = false;
 		boolean flag = super.onTouchEvent(ev);

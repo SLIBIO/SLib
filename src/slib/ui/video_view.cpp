@@ -9,6 +9,8 @@ SLIB_DEFINE_OBJECT(VideoView, RenderView)
 
 VideoView::VideoView()
 {
+	SLIB_REFERABLE_CONSTRUCTOR
+	
 	setBackgroundColor(Color::Black, UIUpdateMode::Init);
 	
 	setRedrawMode(RedrawMode::WhenDirty);
@@ -20,6 +22,9 @@ VideoView::VideoView()
 	
 	m_programRGB = new RenderProgram2D_PositionTexture;
 	m_programYUV = new RenderProgram2D_PositionTextureYUV;
+	m_programOES = new RenderProgram2D_PositionTextureOES;
+
+	m_renderVideoParam.onUpdateFrame = SLIB_FUNCTION_WEAKREF(VideoView, updateCurrentFrame, this);
 
 }
 
@@ -146,22 +151,25 @@ void VideoView::onDraw(Canvas* _canvas)
 			sl_bool flagRenderTexture = sl_false;
 			Ref<MediaPlayer> mediaPlayer = m_mediaPlayer;
 			if (mediaPlayer.isNotNull()) {
-				MediaPlayerRenderVideoParam param;
-				param.onUpdateFrame = SLIB_FUNCTION_WEAKREF(VideoView, updateCurrentFrame, this);
-				mediaPlayer->renderVideo(param);
+				m_renderVideoParam.glEngine = CastRef<GLRenderEngine>(engine);
+				mediaPlayer->renderVideo(m_renderVideoParam);
 			}
-			Ref<Texture> texture = m_textureFrame;
-			if (texture.isNotNull()) {
-				Ref<RenderProgram2D_PositionTexture> program;
+			Ref<Texture> texture;
+			Ref<RenderProgram2D_PositionTexture> program;
+			if (m_renderVideoParam.glTextureOES.isNotNull()) {
+				texture = m_renderVideoParam.glTextureOES;
+				program = m_programOES;
+			} else {
+				texture = m_textureFrame;
 				if (m_flagYUV) {
 					program = m_programYUV;
 				} else {
 					program = m_programRGB;
 				}
-				if (program.isNotNull()) {
-					Matrix3 mat = canvas->getTransformMatrixForRectangle(getBounds());
-					engine->drawTexture2D(program, mat, m_textureFrame);
-				}
+			}
+			if (texture.isNotNull() && program.isNotNull()) {
+				Matrix3 mat = canvas->getTransformMatrixForRectangle(getBounds());
+				engine->drawTexture2D(program, mat, m_textureFrame);
 			}
 		}
 	}

@@ -130,11 +130,6 @@ public class UiGLView extends GLSurfaceView implements IView, GLSurfaceView.Rend
 	int heightViewport = 0;
 	@Override
 	public void onDrawFrame(GL10 gl) {
-		if (UiThread.isUiThread()) {
-			Logger.info("GL UI");			
-		} else {
-			Logger.info("GL Render");
-		}
 		onEventFrame(this, widthViewport, heightViewport);
 	}
 	

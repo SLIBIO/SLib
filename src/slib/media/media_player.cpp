@@ -27,6 +27,9 @@ MediaPlayerParam::~MediaPlayerParam()
 MediaPlayerRenderVideoParam::MediaPlayerRenderVideoParam()
 {
 	flagUpdated = sl_false;
+	
+	_glEngineIdLast = 0;
+	_glTextureNameOES = 0;
 }
 
 MediaPlayerRenderVideoParam::~MediaPlayerRenderVideoParam()
@@ -42,6 +45,7 @@ SLIB_DEFINE_OBJECT(MediaPlayer, Object)
 MediaPlayer::MediaPlayer()
 {
 	m_flagSelfAlive = sl_false;
+	m_flagAutoRepeat = sl_false;
 }
 
 MediaPlayer::~MediaPlayer()

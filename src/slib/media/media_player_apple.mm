@@ -47,7 +47,7 @@ public:
 	~_AVPlayer()
 	{
 		SLIB_REFERABLE_DESTRUCTOR
-		_stop(sl_true, sl_false);
+		_release(sl_true, sl_false);
 	}
 	
 public:
@@ -110,9 +110,9 @@ public:
 	
 public:
 	// override
-	void stop()
+	void release()
 	{
-		_stop(sl_false, sl_false);
+		_release(sl_false, sl_false);
 	}
 	
 	// override
@@ -168,13 +168,19 @@ public:
 		if (param.onUpdateFrame.isNull()) {
 			return;
 		}
+		
 		ObjectLocker lock(this);
+		
 		if (m_flagInited) {
+			
 			if (m_status == AVPlayerStatusReadyToPlay) {
-				//CFTimeInterval nextVSync = ([sender timestamp] + [sender duration]);
+				
 				CMTime time = [m_playerItem currentTime];
+				
 				if ([m_videoOutput hasNewPixelBufferForItemTime:time]) {
+					
 					CVPixelBufferRef pixelBuffer = [m_videoOutput copyPixelBufferForItemTime:time itemTimeForDisplay:nil];
+					
 					if (pixelBuffer != NULL) {
 						
 						if (CVPixelBufferLockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly) == kCVReturnSuccess) {
@@ -216,7 +222,7 @@ public:
 		}
 	}
 	
-	void _stop(sl_bool flagFromDestructor, sl_bool flagFromObserver)
+	void _release(sl_bool flagFromDestructor, sl_bool flagFromObserver)
 	{
 		ObjectLocker lock(this);
 		if (!m_flagInited) {
@@ -250,7 +256,7 @@ public:
 			t.epoch = 0;
 			[m_playerItem seekToTime:t];
 		} else {
-			_stop(sl_false, sl_true);
+			_release(sl_false, sl_true);
 		}
 	}
 
@@ -258,7 +264,7 @@ public:
 	{
 		m_status = m_player.status;
 		if (m_status == AVPlayerStatusFailed) {
-			_stop(sl_false, sl_true);
+			_release(sl_false, sl_true);
 		} else if (m_status == AVPlayerStatusReadyToPlay) {
 			ObjectLocker lock(this);
 			if (m_flagPlaying) {
