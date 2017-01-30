@@ -746,6 +746,7 @@ void ViewPager::dispatchPageAction(View* page, UIPageAction action)
 		if (ViewPage* _page = CastInstance<ViewPage>(page)) {
 			_page->dispatchPageAction(this, action);
 		}
+		getOnPageAction()(this, page, action);
 	}
 }
 
