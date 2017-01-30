@@ -150,6 +150,7 @@ public:
 	
 public:
 	SLIB_PROPERTY(AtomicPtr<IViewPagerListener>, Listener)
+	SLIB_PROPERTY(AtomicFunction<void(ViewPager*, View*, UIPageAction)>, OnPageAction)
 	
 protected:
 	CList< Ref<View> > m_pages;
