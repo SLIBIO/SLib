@@ -200,18 +200,18 @@ sl_bool UIAnimationLoop::_applyNativeAnimation(Animation* animation)
 	if (handle != nil) {
 		
 		Ref<Animation> _animation = animation;
-		Function<void()> onStop = [=](){
+		Function<void()> onStop = [=]() {
 			if (flagTranslate) {
-				viewAnimate->setTranslation(translateEnd, UIUpdateMode::NoRedraw);
+				viewAnimate->setTranslation(translateEnd);
 			}
 			if (flagScale) {
-				viewAnimate->setScale(scaleEnd, UIUpdateMode::NoRedraw);
+				viewAnimate->setScale(scaleEnd);
 			}
 			if (flagRotate) {
-				viewAnimate->setRotation(rotateEnd, UIUpdateMode::NoRedraw);
+				viewAnimate->setRotation(rotateEnd);
 			}
 			if (flagAlpha) {
-				viewAnimate->setAlpha(alphaEnd, UIUpdateMode::NoRedraw);
+				viewAnimate->setAlpha(alphaEnd);
 			}
 			_stopAnimationFromNative(_animation.get());
 		};

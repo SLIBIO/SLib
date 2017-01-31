@@ -45,43 +45,85 @@ public class UiAnimation {
 
 	static final float EPSILON = 0.000001f;
 
-	public static Animator start(final View view, final long id, float duration, float delay,
-	                            int curve, int repeatCount, boolean flagReverse,
-	                            final float ax, final float ay,
-	                            final boolean flagTranslate, final float txStart, final float tyStart, final float txEnd, final float tyEnd,
-	                            final boolean flagScale, final float sxStart, final float syStart, final float sxEnd, final float syEnd,
-	                            final boolean flagRotate, final float rotateStart, final float rotateEnd,
-	                            final boolean flagAlpha, final float alphaStart, final float alphaEnd) {
+	long mId;
+	ValueAnimator mAnimator;
+	View mView;
+	boolean mIsViewShown = false;
+	boolean mIsStopped = false;
+
+	Animator.AnimatorListener mListener = new Animator.AnimatorListener() {
+		@Override
+		public void onAnimationStart(Animator animation) {
+		}
+
+		@Override
+		public void onAnimationEnd(Animator animation) {
+			if (mIsStopped) {
+				return;
+			}
+			_stop();
+		}
+
+		@Override
+		public void onAnimationCancel(Animator animation) {
+			if (mIsStopped) {
+				return;
+			}
+			_stop();
+		}
+
+		@Override
+		public void onAnimationRepeat(Animator animation) {
+		}
+	};
+
+	public static UiAnimation start(View view, long id, float duration, float delay,
+	                                int curve, int repeatCount, boolean flagReverse,
+	                                final float ax, final float ay,
+	                                final boolean flagTranslate, final float txStart, final float tyStart, final float txEnd, final float tyEnd,
+	                                final boolean flagScale, final float sxStart, final float syStart, final float sxEnd, final float syEnd,
+	                                final boolean flagRotate, final float rotateStart, final float rotateEnd,
+	                                final boolean flagAlpha, final float alphaStart, final float alphaEnd) {
 
 
 		try {
 
+			final UiAnimation animation = new UiAnimation();
+
+			animation.mId = id;
+			animation.mView = view;
+
 			final boolean flagAnchor = (flagRotate || flagScale) && (Math.abs(ax) > EPSILON || Math.abs(ay) > EPSILON);
 
 			final ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
-
 			animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 
-				boolean flagShown = false;
-
-				public void onAnimationUpdate(ValueAnimator animation) {
-					if (flagShown) {
+				public void onAnimationUpdate(ValueAnimator va) {
+					if (animation.mIsStopped) {
+						return;
+					}
+					View view = animation.mView;
+					if (view == null) {
+						return;
+					}
+					if (animation.mIsViewShown) {
 						if (!(view.isShown())) {
-							flagShown = false;
+							animation.mIsViewShown = false;
+							animation._stop();
 							animator.cancel();
 							return;
 						}
 					} else {
 						if (view.isShown()) {
-							flagShown = true;
+							animation.mIsViewShown = true;
 						}
 					}
-					final float f = (Float)(animation.getAnimatedValue());
+					final float f = (Float) (va.getAnimatedValue());
 					if (flagTranslate || flagRotate || flagScale) {
 						float r = 0;
 						if (flagRotate) {
 							r = interpolateValue(f, rotateStart, rotateEnd);
-							float rd = (float)(r * 180 / Math.PI);
+							float rd = (float) (r * 180 / Math.PI);
 							if (Math.abs(view.getRotation() - rd) > EPSILON) {
 								view.setRotation(rd);
 							}
@@ -114,8 +156,8 @@ public class UiAnimation {
 							if (flagAnchor) {
 								double cr = Math.cos(r);
 								double sr = Math.sin(r);
-								tx = (float)((- ax * cr + ay * sr) * sx + tx + ax);
-								ty = (float)((- ax * sr - ay * cr) * sy + ty + ay);
+								tx = (float) ((-ax * cr + ay * sr) * sx + tx + ax);
+								ty = (float) ((-ax * sr - ay * cr) * sy + ty + ay);
 							}
 							if (Math.abs(tx - view.getTranslationX()) > EPSILON) {
 								view.setTranslationX(tx);
@@ -131,30 +173,11 @@ public class UiAnimation {
 					}
 				}
 			});
-
-			animator.addListener(new Animator.AnimatorListener() {
-				@Override
-				public void onAnimationStart(Animator animation) {
-				}
-
-				@Override
-				public void onAnimationEnd(Animator animation) {
-					nativeOnStop(id);
-				}
-
-				@Override
-				public void onAnimationCancel(Animator animation) {
-					nativeOnStop(id);
-				}
-
-				@Override
-				public void onAnimationRepeat(Animator animation) {
-				}
-			});
+			animator.addListener(animation.mListener);
 
 			animator.setInterpolator(getInterpolator(curve));
-			animator.setDuration((int)(duration * 1000));
-			animator.setStartDelay((int)(delay * 1000));
+			animator.setDuration((int) (duration * 1000));
+			animator.setStartDelay((int) (delay * 1000));
 			if (flagReverse) {
 				animator.setRepeatMode(ValueAnimator.REVERSE);
 				animator.setRepeatCount(1);
@@ -181,7 +204,9 @@ public class UiAnimation {
 				});
 			}
 
-			return animator;
+			animation.mAnimator = animator;
+
+			return animation;
 
 		} catch (Exception e) {
 			Logger.exception(e);
@@ -191,14 +216,18 @@ public class UiAnimation {
 
 	}
 
-	static void stop(final Animator animator) {
+	void stop() {
+		if (mIsStopped) {
+			return;
+		}
+		_stop();
 		if (UiThread.isUiThread()) {
-			animator.cancel();
+			mAnimator.cancel();
 		} else {
 			UiThread.post(new Runnable() {
 				public void run() {
 					try {
-						animator.cancel();
+						mAnimator.cancel();
 					} catch (Exception e) {
 						Logger.exception(e);
 					}
@@ -207,4 +236,10 @@ public class UiAnimation {
 		}
 	}
 
+	private void _stop()
+	{
+		mIsStopped = true;
+		mView = null;
+		nativeOnStop(mId);
+	}
 }

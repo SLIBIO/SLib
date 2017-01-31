@@ -113,7 +113,7 @@ public:
 	void setTransitionCurve(AnimationCurve curve);
 	
 protected:
-	void _stopCurrentAnimations();
+	void _onFinishAnimation(const Ref<View>& view, UIPageAction action);
 	
 	void _resetAnimationStatus(const Ref<View>& view);
 		
@@ -168,9 +168,7 @@ protected:
 	AnimationCurve m_pushTransitionCurve;
 	AnimationCurve m_popTransitionCurve;
 	
-	sl_reg m_countActiveTransitions;
-	Ref<Animation> m_currentPushAnimation;
-	Ref<Animation> m_currentPopAnimation;
+	sl_reg m_countActiveTransitionAnimations;
 	
 };
 
@@ -370,7 +368,7 @@ protected:
 	sl_bool m_flagDidModalOnUIThread;
 	AtomicRef<Event> m_eventClosePopup;
 	
-	sl_reg m_countActiveTransitions;
+	sl_reg m_countActiveTransitionAnimations;
 	
 };
 

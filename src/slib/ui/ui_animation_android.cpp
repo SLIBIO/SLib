@@ -9,8 +9,8 @@ SLIB_UI_NAMESPACE_BEGIN
 void _AndroidAnimation_onStop(JNIEnv* env, jobject _this, jlong ptr);
 
 SLIB_JNI_BEGIN_CLASS(_JAndroidAnimation, "slib/platform/android/ui/UiAnimation")
-	SLIB_JNI_STATIC_METHOD(start, "start", "(Landroid/view/View;JFFIIZFFZFFFFZFFFFZFFZFF)Landroid/animation/Animator;");
-	SLIB_JNI_STATIC_METHOD(stop, "stop", "(Landroid/animation/Animator;)V");
+	SLIB_JNI_STATIC_METHOD(start, "start", "(Landroid/view/View;JFFIIZFFZFFFFZFFFFZFFZFF)Lslib/platform/android/ui/UiAnimation;");
+	SLIB_JNI_METHOD(stop, "stop", "()V");
 	SLIB_JNI_NATIVE(nativeOnStop, "nativeOnStop", "(J)V", _AndroidAnimation_onStop);
 SLIB_JNI_END_CLASS
 
@@ -147,7 +147,7 @@ void UIAnimationLoop::_stopNativeAnimation(Animation* animation)
 	Ref<Referable> _animator = _getNativeInstance(animation);
 	JniGlobal<jobject> animator = CastInstance< CJniGlobal<jobject> >(_animator.get());
 	if (animator.isNotNull()) {
-		_JAndroidAnimation::stop.call(sl_null, animator.get());
+		_JAndroidAnimation::stop.call(animator.get());
 	}
 }
 
