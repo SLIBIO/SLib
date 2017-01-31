@@ -98,7 +98,7 @@ RenderEngine::RenderEngine()
 
 	m_nCountDrawnElementsOnLastScene = 0;
 	m_nCountDrawnPrimitivesOnLastScene = 0;
-	m_nRenderMillisecondsOnLastScene = 0;
+	m_timeLastDebugText.setZero();
 }
 
 RenderEngine::~RenderEngine()
@@ -132,14 +132,12 @@ sl_bool RenderEngine::beginScene()
 {
 	m_nCountDrawnElementsOnLastScene = 0;
 	m_nCountDrawnPrimitivesOnLastScene = 0;
-	m_timeBeginLastScene = Time::now();
 	return _beginScene();
 }
 
 void RenderEngine::endScene()
 {
 	_endScene();
-	m_nRenderMillisecondsOnLastScene = (sl_uint32)((Time::now() - m_timeBeginLastScene).getMillisecondsCount());
 }
 
 void RenderEngine::setViewport(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
@@ -626,6 +624,12 @@ Ref<RenderProgram3D_Position> RenderEngine::getDefaultRenderProgramForDrawLine3D
 #define DEBUG_HEIGHT 30
 void RenderEngine::drawDebugText()
 {
+	Time now = Time::now();
+	if (m_timeLastDebugText.isZero()) {
+		m_timeLastDebugText = now;
+		return;
+	}
+	
 	Ref<Texture> texture = m_textureDebug;
 	if (texture.isNull()) {
 		texture = Texture::create(Bitmap::create(DEBUG_WIDTH, DEBUG_HEIGHT));
@@ -649,12 +653,14 @@ void RenderEngine::drawDebugText()
 	setDepthTest(sl_false);
 	String text;
 	text = "FPS:";
-	sl_uint32 n = m_nRenderMillisecondsOnLastScene;
-	if (n > 0) {
-		text += String::fromDouble(1000.0 / n, 2);
+	double duration = (now - m_timeLastDebugText).getMillisecondsCountf();
+	if (duration > 1) {
+		text += String::fromDouble(1000.0 / duration, 1, sl_true);
 	} else {
-		text += "inf";
+		text += "Inf";
 	}
+	m_timeLastDebugText = now;
+
 	text += " Vertices: ";
 	text += m_nCountDrawnElementsOnLastScene;
 	text += " Primitives: ";

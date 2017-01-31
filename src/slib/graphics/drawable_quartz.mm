@@ -51,6 +51,7 @@ Ref<Drawable> PlatformDrawable::loadFromMemory(const void* mem, sl_size size)
 {
 	CGImageRef image = GraphicsPlatform::loadCGImageFromMemory(mem, size);
 	if (image) {
+		CGImageRetain(image);
 		Ref<Drawable> ret = GraphicsPlatform::createImageDrawable(image);
 		CGImageRelease(image);
 		return ret;

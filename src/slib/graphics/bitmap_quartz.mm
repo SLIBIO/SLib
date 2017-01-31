@@ -46,8 +46,11 @@ public:
 				CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 				
 				if (colorSpace) {
+					
 					CGContextRef bitmap = CGBitmapContextCreate(mem.getData(), width, height, 8, width << 2, colorSpace, kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast);
 					
+					CGColorSpaceRelease(colorSpace);
+
 					if (bitmap) {
 						
 						ret = new _Quartz_Bitmap();
@@ -66,8 +69,6 @@ public:
 						CGContextRelease(bitmap);
 					}
 					
-					CGColorSpaceRelease(colorSpace);
-					
 				}
 				
 			}
@@ -80,6 +81,7 @@ public:
 		Ref<_Quartz_Bitmap> ret;
 		CGImageRef image = GraphicsPlatform::loadCGImageFromMemory(mem, size);
 		if (image) {
+			CGImageRetain(image);
 			sl_uint32 width = (sl_uint32)(CGImageGetWidth(image));
 			sl_uint32 height = (sl_uint32)(CGImageGetHeight(image));
 			ret = create(width, height);

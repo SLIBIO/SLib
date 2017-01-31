@@ -53,7 +53,7 @@ void* Base::reallocMemory(void* ptr, sl_size sizeNew)
 {
 	if (sizeNew == 0) {
 		freeMemory(ptr);
-		return createMemory(0);
+		return createMemory(1);
 	}
 #ifndef FORCE_MEM_ALIGNED
 	return realloc(ptr, sizeNew);

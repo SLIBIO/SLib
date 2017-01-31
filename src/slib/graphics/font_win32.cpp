@@ -65,7 +65,7 @@ Size Font::getTextSize(const String& _text)
 
 }
 
-sl_bool Font::getFontMetrics(FontMetrics& _out)
+sl_bool Font::_getFontMetrics_PO(FontMetrics& _out)
 {
 	Gdiplus::Font* handle = GraphicsPlatform::getGdiplusFont(this);
 	if (handle) {

@@ -12,7 +12,6 @@ ScrollView::ScrollView()
 	setCreatingNativeWidget(sl_true);
 	setCreatingChildInstances(sl_false);
     setMakingLayout(sl_true, UIUpdateMode::Init);
-    setBorder(sl_true, UIUpdateMode::Init);
 
 	m_flagPaging = sl_false;
 	m_pageWidth = 0;

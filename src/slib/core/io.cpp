@@ -832,7 +832,7 @@ String16 IReader::readText16(sl_size size, Charset* outCharset)
 					if (str.isNotNull()) {
 						sl_char16* buf = str.getData();
 						size = len << 1;
-						if (read(buf, len) == len) {
+						if (read(buf, size) == size) {
 							if ((flagUTF16BE && Endian::isLE()) || (flagUTF16LE && Endian::isBE())) {
 								for (sl_size i = 0; i < len; i++) {
 									sl_uint16 c = (sl_uint16)(buf[i]);
@@ -1563,13 +1563,13 @@ void MemoryWriter::init(const Memory& mem)
 
 void MemoryWriter::init(void* buf, sl_size size)
 {
+	if (!buf) {
+		size = 0;
+	}
 	ObjectLocker lock(this);
 	m_buf = buf;
 	m_size = size;
 	m_offset = 0;
-	if (!buf) {
-		size = 0;
-	}
 }
 
 sl_reg MemoryWriter::write(const void* buf, sl_size size)

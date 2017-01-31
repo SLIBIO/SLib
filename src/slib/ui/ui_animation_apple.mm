@@ -133,9 +133,9 @@ sl_bool UIAnimationLoop::_applyNativeAnimation(Animation* animation)
 {
 	Ref<View> viewAnimate;
 	sl_bool flagTranslate = sl_false;
-	Vector2 translateStart, translateEnd;
+	Vector2 translateStart(0, 0), translateEnd(0, 0);
 	sl_bool flagScale = sl_false;
-	Vector2 scaleStart, scaleEnd;
+	Vector2 scaleStart(1, 1), scaleEnd(1, 1);
 	sl_bool flagRotate = sl_false;
 	sl_real rotateStart = 0, rotateEnd = 0;
 	sl_bool flagAlpha = sl_false;

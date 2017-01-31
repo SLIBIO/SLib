@@ -745,7 +745,7 @@ void Uint128::setBytesLE(const void* _buf)
 
 Uint128 Uint128::fromString(const String& str, sl_uint32 radix)
 {
-	Uint128 ret;
+	Uint128 ret(0);
 	if (ret.parse(str, radix)) {
 		return ret;
 	}

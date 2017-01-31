@@ -156,18 +156,17 @@ UIWindow* UIPlatform::getMainWindow()
 UIWindow* UIPlatform::getKeyWindow()
 {
 	UIWindow* window = _g_slib_ios_keyWindow;
-	if (window == nil) {
-		UIApplication* app = [UIApplication sharedApplication];
-		for (UIWindow* win in app.windows) {
-			if (win.windowLevel > UIWindowLevelNormal) {
-				window = win;
-				[win makeKeyAndVisible];
-				break;
-			}
-		}
-		return UIPlatform::getMainWindow();
+	if (window != nil) {
+		return window;
 	}
-	return window;
+	UIApplication* app = [UIApplication sharedApplication];
+	for (UIWindow* win in app.windows) {
+		if (win.windowLevel > UIWindowLevelNormal) {
+			[win makeKeyAndVisible];
+			return win;
+		}
+	}
+	return UIPlatform::getMainWindow();
 }
 
 void UIPlatform::setKeyWindow(UIWindow *window)

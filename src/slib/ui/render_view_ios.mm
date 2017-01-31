@@ -170,8 +170,8 @@ void _iOS_GLCallback(__weak _Slib_iOS_GLView* _handle)
 		if (Thread::isNotStoppingCurrent()) {
 			if (flagWorking) {
 				sl_uint64 t = timer.getElapsedMilliseconds();
-				if (t < 10) {
-					Thread::sleep(10 - (sl_uint32)(t));
+				if (t < 15) {
+					Thread::sleep(15 - (sl_uint32)(t));
 				}
 			} else {
 				Thread::sleep(1000);

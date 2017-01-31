@@ -530,9 +530,9 @@ String File::makeSafeFileName(const String& fileName)
 	for (sl_size i = 0; i < len; i++) {
 		sl_uint32 ch = (sl_uint8)(buf[i]);
 		if (ch < 0x20) {
-			ch = '_';
+			buf[i] = '_';
 		} else if (ch >= 0x7f && ch < 0xA0) {
-			ch = '_';
+			buf[i] = '_';
 		} else {
 			switch (ch) {
 			case '\\':
@@ -544,7 +544,7 @@ String File::makeSafeFileName(const String& fileName)
 			case '<':
 			case '>':
 			case '|':
-				ch = '_';
+				buf[i] = '_';
 				break;
 			}
 		}
@@ -563,9 +563,9 @@ String File::makeSafeFilePath(const String& filePath)
 	for (sl_size i = 0; i < len; i++) {
 		sl_uint32 ch = (sl_uint8)(buf[i]);
 		if (ch < 0x20) {
-			ch = '_';
+			buf[i] = '_';
 		} else if (ch >= 0x7f && ch < 0xA0) {
-			ch = '_';
+			buf[i] = '_';
 		} else {
 			switch (ch) {
 			case ':':
@@ -575,7 +575,7 @@ String File::makeSafeFilePath(const String& filePath)
 			case '<':
 			case '>':
 			case '|':
-				ch = '_';
+				buf[i] = '_';
 				break;
 			}
 		}

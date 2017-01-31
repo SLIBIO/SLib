@@ -650,7 +650,7 @@ CBigInt* CBigInt::fromBytesLE(const void* bytes, sl_size nBytes)
 		}
 		delete ret;
 	}
-	return ret;
+	return sl_null;
 }
 
 CBigInt* CBigInt::fromBytesLE(const Memory& mem)
@@ -730,7 +730,7 @@ CBigInt* CBigInt::fromBytesBE(const void* bytes, sl_size nBytes)
 		}
 		delete ret;
 	}
-	return ret;
+	return sl_null;
 }
 
 CBigInt* CBigInt::fromBytesBE(const Memory& mem)
@@ -1466,12 +1466,6 @@ sl_bool CBigInt::mulAbs(const CBigInt& a, sl_uint32 b)
 		setZero();
 		return sl_true;
 	}
-	sl_size nd;
-	if (&a == this) {
-		nd = na;
-	} else {
-		nd = getMostSignificantElements();
-	}
 	sl_size n = na + 1;
 	SLIB_SCOPED_BUFFER(sl_uint32, STACK_BUFFER_SIZE, out, n);
 	if (!out) {
@@ -1789,7 +1783,7 @@ sl_bool CBigInt::div(const CBigInt& a, sl_uint64 b, CBigInt* quotient, sl_uint64
 	}
 	if (div(a, o, quotient, r)) {
 		if (remainder) {
-			sl_uint8 bytes[8];
+			sl_uint8 bytes[8] = {0};
 			r->getBytesLE(bytes, 8);
 			*remainder = MIO::readUint64(bytes);
 		}
@@ -2194,10 +2188,16 @@ sl_bool CBigInt::inverseMod(const CBigInt& A, const CBigInt& M)
 	if (!T1.copyFrom(Xa)) {
 		return sl_false;
 	}
+	if (!(T1.elements)) {
+		return sl_false;
+	}
 	CBIGINT_INT32(T1a, 1);
 	CBIGINT_INT32(T1b, 0);
 	CBigInt T2;
 	if (!T2.copyFrom(M)) {
+		return sl_false;
+	}
+	if (!(T2.elements)) {
 		return sl_false;
 	}
 	CBIGINT_INT32(T2a, 0);
@@ -3533,7 +3533,7 @@ sl_uint32 BigInt::mod(const BigInt& A, sl_int32 v)
 {
 	CBigInt* a = A.ref._ptr;
 	if (a) {
-		sl_uint32 r;
+		sl_uint32 r = 0;
 		if (CBigInt::div(*a, v, sl_null, &r)) {
 			return r;
 		}
@@ -3545,7 +3545,7 @@ sl_uint32 BigInt::mod(const BigInt& A, sl_uint32 v)
 {
 	CBigInt* a = A.ref._ptr;
 	if (a) {
-		sl_uint32 r;
+		sl_uint32 r = 0;
 		if (CBigInt::div(*a, v, sl_null, &r)) {
 			return r;
 		}

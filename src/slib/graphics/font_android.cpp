@@ -39,7 +39,7 @@ Size Font::getTextSize(const String& text)
 	return Size::zero();
 }
 
-sl_bool Font::getFontMetrics(FontMetrics& _out)
+sl_bool Font::_getFontMetrics_PO(FontMetrics& _out)
 {
 	jobject font = GraphicsPlatform::getNativeFont(this);
 	if (font) {

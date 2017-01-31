@@ -346,12 +346,12 @@ sl_bool BTree<KT, VT, KEY_COMPARE>::searchInNode(const KT& key, const TreeNode& 
 template <class KT, class VT, class KEY_COMPARE>
 sl_bool BTree<KT, VT, KEY_COMPARE>::searchItemInNode(const KT& key, const TreeNode& node, sl_uint32& pos, TreeNode& link, VT* outValue) const
 {
+	pos = 0;
 	NodeDataScope data(this, node);
 	if (data.isNull()) {
 		link.setNull();
 		return sl_false;
 	}
-	pos = 0;
 	sl_uint32 n = data->countItems;
 	if (n == 0) {
 		link.setNull();

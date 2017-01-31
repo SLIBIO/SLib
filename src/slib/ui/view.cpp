@@ -5748,7 +5748,6 @@ void View::refreshScroll(UIUpdateMode mode)
 	if (attrs.isNotNull()) {
 		sl_ui_pos width = getWidth();
 		sl_ui_pos height = getHeight();
-		sl_bool flagVisibleHorz = sl_false;
 		Ref<ScrollBar> barHorz = attrs->horz;
 		if (barHorz.isNotNull()) {
 			barHorz->setParent(this);
@@ -5761,11 +5760,7 @@ void View::refreshScroll(UIUpdateMode mode)
 				barHorz->setListener(Ref<_View_ScrollBarListener>(new _View_ScrollBarListener(this)));
 			}
 			attrs->flagValidHorz = barHorz->isValid();
-			if (barHorz->isVisible() && attrs->flagValidHorz) {
-				flagVisibleHorz = sl_true;
-			}
 		}
-		sl_bool flagVisibleVert = sl_false;
 		Ref<ScrollBar> barVert = attrs->vert;
 		if (barVert.isNotNull()) {
 			barVert->setParent(this);
@@ -5779,9 +5774,6 @@ void View::refreshScroll(UIUpdateMode mode)
 				barVert->setListener(Ref<_View_ScrollBarListener>(new _View_ScrollBarListener(this)));
 			}
 			attrs->flagValidVert = barVert->isValid();
-			if (barVert->isVisible() && attrs->flagValidVert) {
-				flagVisibleVert = sl_true;
-			}
 		}
 
 		scrollTo(attrs->x, attrs->y, UIUpdateMode::NoRedraw);
@@ -6276,7 +6268,6 @@ Ref<Bitmap> View::drawLayer()
 	
 	UIRect rc;
 	if (flagInvalidateWhole) {
-		flagInvalidateWhole = sl_false;
 		rc.left = 0;
 		rc.top = 0;
 		rc.right = width;

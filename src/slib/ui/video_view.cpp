@@ -148,7 +148,6 @@ void VideoView::onDraw(Canvas* _canvas)
 	if (canvas) {
 		Ref<RenderEngine> engine = canvas->getEngine();
 		if (engine.isNotNull()) {
-			sl_bool flagRenderTexture = sl_false;
 			Ref<MediaPlayer> mediaPlayer = m_mediaPlayer;
 			if (mediaPlayer.isNotNull()) {
 				m_renderVideoParam.glEngine = CastRef<GLRenderEngine>(engine);

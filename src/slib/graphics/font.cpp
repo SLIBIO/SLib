@@ -12,11 +12,20 @@ FontDesc::FontDesc()
 	flagUnderline = sl_false;
 }
 
+FontDesc::~FontDesc()
+{
+}
+
 sl_real _g_graphics_font_default_size = 12;
 
 SLIB_DEFINE_ROOT_OBJECT(Font)
 
 Font::Font()
+{
+	m_flagMetricsCache = sl_false;
+}
+
+Font::~Font()
 {
 }
 
@@ -87,6 +96,20 @@ sl_bool Font::isItalic()
 sl_bool Font::isUnderline()
 {
 	return m_desc.flagUnderline;
+}
+
+sl_bool Font::getFontMetrics(FontMetrics& _out)
+{
+	if (m_flagMetricsCache) {
+		_out = m_metricsCache;
+		return sl_true;
+	}
+	if (_getFontMetrics_PO(m_metricsCache)) {
+		m_flagMetricsCache = sl_true;
+		_out = m_metricsCache;
+		return sl_true;
+	}
+	return 0;
 }
 
 sl_real Font::getFontHeight()

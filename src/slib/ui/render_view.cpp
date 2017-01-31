@@ -201,6 +201,10 @@ void RenderView::onAttach()
 
 void RenderView::dispatchFrame(RenderEngine* engine)
 {
+	if (!engine) {
+		return;
+	}
+	
 	m_lastRenderingThreadId = Thread::getCurrentThreadUniqueId();
 	
 	if (m_animationLoop.isNotNull()) {
@@ -215,29 +219,24 @@ void RenderView::dispatchFrame(RenderEngine* engine)
 		n--;
 	}
 
-	if (engine) {
-		engine->beginScene();
-	}
+	engine->beginScene();
 	
 	onFrame(engine);
 	
 	getOnFrame()(this, engine);
 	
 	if (m_flagDebugTextVisible) {
-		if (engine) {
 #if defined(SLIB_DEBUG)
-			engine->drawDebugText();
+		engine->drawDebugText();
 #else
-			if (m_flagDebugTextVisibleOnRelease) {
-				engine->drawDebugText();
-			}
-#endif
+		if (m_flagDebugTextVisibleOnRelease) {
+			engine->drawDebugText();
 		}
+#endif
 	}
 	
-	if (engine) {
-		engine->endScene();
-	}
+	engine->endScene();
+	
 }
 
 void RenderView::dispatchMouseEvent(UIEvent* ev)

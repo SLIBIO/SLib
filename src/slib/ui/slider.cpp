@@ -510,9 +510,6 @@ void Slider::_getRegions(UIRect& outTrack, UIRect& outProgress, UIRect& outSecon
 			thumbHeight = minThumbSize;
 		}
 	}
-	if (!(isDualValues())) {
-		outSecondaryThumb.setZero();
-	}
 	if (isVertical()) {
 		outTrack.top = _getStartPadding();
 		outTrack.bottom = getHeight() - _getEndPadding();
@@ -535,6 +532,8 @@ void Slider::_getRegions(UIRect& outTrack, UIRect& outProgress, UIRect& outSecon
 			outSecondaryThumb.left = outThumb.left;
 			outSecondaryThumb.bottom = outSecondaryThumb.top + thumbHeight;
 			outSecondaryThumb.right = outThumb.right;
+		} else {
+			outSecondaryThumb.setZero();
 		}
 	} else {
 		outTrack.left = _getStartPadding();
@@ -558,6 +557,8 @@ void Slider::_getRegions(UIRect& outTrack, UIRect& outProgress, UIRect& outSecon
 			outSecondaryThumb.top = outThumb.top;
 			outSecondaryThumb.right = outSecondaryThumb.left + thumbWidth;
 			outSecondaryThumb.bottom = outThumb.bottom;
+		} else {
+			outSecondaryThumb.setZero();
 		}
 	}
 }

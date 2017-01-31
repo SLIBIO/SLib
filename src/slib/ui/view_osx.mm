@@ -729,7 +729,7 @@ SLIB_UI_NAMESPACE_END
 	if (m_trackingArea != nil) {
 		[self removeTrackingArea:m_trackingArea];
 	}
-	NSRect rc;
+	NSRect rc = [self bounds];
 	m_trackingArea = [[NSTrackingArea alloc] initWithRect:rc options: (NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved | NSTrackingActiveInKeyWindow | NSTrackingInVisibleRect) owner:self userInfo:nil];
 	if (m_trackingArea != nil) {
 		[self addTrackingArea:m_trackingArea];

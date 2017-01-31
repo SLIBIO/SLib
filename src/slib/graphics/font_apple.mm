@@ -49,7 +49,7 @@ Size Font::getTextSize(const String& text)
 	return ret;
 }
 
-sl_bool Font::getFontMetrics(FontMetrics& _out)
+sl_bool Font::_getFontMetrics_PO(FontMetrics& _out)
 {
 	CTFontRef handle = GraphicsPlatform::getCoreTextFont(this);
 	if (!handle) {

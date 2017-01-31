@@ -17,7 +17,6 @@ CGImageRef GraphicsPlatform::loadCGImageFromMemory(const void* buf, sl_size size
 		return NULL;
 	}
 	ret = [image CGImageForProposedRect:NULL context:NULL hints:NULL];
-	CGImageRetain(ret);
 	return ret;
 }
 
@@ -55,7 +54,6 @@ CGImageRef GraphicsPlatform::loadCGImageFromMemory(const void* buf, sl_size size
 		return NULL;
 	}
 	ret = image.CGImage;
-	CGImageRetain(ret);
 	return ret;
 }
 

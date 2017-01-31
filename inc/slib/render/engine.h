@@ -380,8 +380,7 @@ protected:
 	// debug 
 	sl_uint32 m_nCountDrawnElementsOnLastScene;
 	sl_uint32 m_nCountDrawnPrimitivesOnLastScene;
-	Time m_timeBeginLastScene;
-	sl_uint32 m_nRenderMillisecondsOnLastScene;
+	Time m_timeLastDebugText;
 	Ref<Texture> m_textureDebug;
 	Ref<Font> m_fontDebug;
 

@@ -134,9 +134,11 @@ Ref<ViewInstance> ListReportView::createNativeWidget(ViewInstance* _parent)
 	OSX_VIEW_CREATE_INSTANCE_END
 	if (ret.isNotNull()) {
 		ret->setView(this);
-		[table reloadData];
+		if (table != nil) {
+			[table reloadData];
+			table->m_viewInstance = ret;
+		}
 	}
-	table->m_viewInstance = ret;
 	return ret;
 }
 

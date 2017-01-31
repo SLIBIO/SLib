@@ -284,7 +284,7 @@ SLIB_MATH_NAMESPACE_BEGIN
 
 SLIB_INLINE Uint128::Uint128() = default;
 
-SLIB_INLINE Uint128::Uint128(const Uint128& num) = default;;
+SLIB_INLINE Uint128::Uint128(const Uint128& num) = default;
 
 SLIB_INLINE Uint128::Uint128(sl_uint64 num) : high(0), low(num)
 {

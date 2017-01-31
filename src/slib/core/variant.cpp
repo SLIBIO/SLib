@@ -67,6 +67,7 @@ SLIB_INLINE void Atomic<Variant>::_retain(VariantType& type, sl_uint64& value) c
 {
 	if ((void*)(this) == (void*)(&_Variant_Null)) {
 		type = VariantType::Null;
+		value = 0;
 	} else {
 		SpinLocker lock(&m_lock);
 		type = _type;

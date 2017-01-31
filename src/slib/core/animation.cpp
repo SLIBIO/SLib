@@ -975,11 +975,11 @@ sl_int32 AnimationLoop::_runStep()
 	Time tEnd = Time::now();
 	
 	sl_int64 n = (tEnd - tCurrent).getMillisecondsCount();
-	if (n < 10) {
+	if (n < 15) {
 		if (n < 0) {
 			n = 0;
 		}
-		return (sl_int32)(10 - n);
+		return (sl_int32)(15 - n);
 	} else {
 		return 0;
 	}

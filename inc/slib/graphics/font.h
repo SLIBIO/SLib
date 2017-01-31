@@ -20,6 +20,9 @@ public:
 
 public:
 	FontDesc();
+	
+	~FontDesc();
+	
 };
 
 struct SLIB_EXPORT FontMetrics
@@ -35,6 +38,8 @@ class SLIB_EXPORT Font : public Referable
 	
 protected:
 	Font();
+	
+	~Font();
 	
 public:
 	static Ref<Font> getDefault();
@@ -60,6 +65,8 @@ public:
 	
 	sl_bool isUnderline();
 	
+	sl_bool getFontMetrics(FontMetrics& _out);
+	
 	sl_real getFontHeight();
 	
 	sl_real getFontAscent();
@@ -70,10 +77,13 @@ public:
 	
 	Size getTextSize(const String& text);
 	
-	sl_bool getFontMetrics(FontMetrics& _out);
+private:
+	sl_bool _getFontMetrics_PO(FontMetrics& _out);
 	
 protected:
 	FontDesc m_desc;
+	FontMetrics m_metricsCache;
+	sl_bool m_flagMetricsCache;
 	
 	Ref<Referable> m_platformObject;
 	SpinLock m_lock;
