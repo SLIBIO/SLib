@@ -167,6 +167,8 @@ protected:
 	
 	void _drawBitmap(const Rectangle& rectDst, Bitmap* src, const Rectangle& rectSrc, const DrawParam& param);
 	
+	void _fillRectangle(const Rectangle& rect, const Color& color);
+	
 protected:
 	Ref<RenderEngine> m_engine;
 	sl_real m_width;

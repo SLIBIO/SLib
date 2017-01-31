@@ -598,17 +598,61 @@ void RenderCanvas::drawText16(const String16& text, sl_real x, sl_real y, const 
 
 void RenderCanvas::drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& pen)
 {
+	sl_real m = (pt1.y - pt2.y) / (pt1.x - pt2.x);
+	
+	sl_real angle = Math::arctan(m);
+	
+	sl_real centerX = (pt1.x + pt2.x) / 2;
+	sl_real centerY = (pt1.y + pt2.y) / 2;
+	
+	sl_real newX1 = centerX + (pt1.x - centerX) * Math::cos(-angle) - (pt1.y - centerY) * Math::sin(-angle);
+	sl_real newY1 = centerY + (pt1.x - centerX) * Math::sin(-angle) + (pt1.y - centerY) * Math::cos(-angle);
+	
+	sl_real newX2 = centerX + (pt2.x - centerX) * Math::cos(-angle) - (pt2.y - centerY) * Math::sin(-angle);
+	sl_real newY2 = centerY + (pt2.x - centerX) * Math::sin(-angle) + (pt2.y - centerY) * Math::cos(-angle);
+	
+	
+	CanvasStateScope scope(this);
+	rotate(centerX, centerY, angle);
+	_fillRectangle(Rectangle(newX1, newY1 - pen->getWidth() / 2, newX2, newY2 + pen->getWidth() / 2), pen->getColor());
+	
 }
 
 void RenderCanvas::drawLines(const Point* points, sl_uint32 countPoints, const Ref<Pen>& pen)
 {
+	for (sl_uint32 i = 1; i < countPoints; i++) {
+		drawLine(points[i - 1], points[i], pen);
+	}
 }
 
 void RenderCanvas::drawArc(const Rectangle& rect, sl_real startDegrees, sl_real sweepDegrees, const Ref<Pen>& pen)
 {
 }
 
-void RenderCanvas::drawRectangle(const Rectangle& _rect, const Ref<Pen>& pen, const Ref<Brush>& brush)
+void RenderCanvas::drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush)
+{
+	if (brush.isNotNull()) {
+		Rectangle _rect = rect;
+		if (pen.isNotNull()) {
+			_rect = Rectangle(rect.getLeftTop().x + pen->getWidth(), rect.getLeftTop().y + pen->getWidth(), rect.getRightBottom().x - pen->getWidth(), rect.getRightBottom().y - pen->getWidth());
+		}
+		
+		_fillRectangle(_rect, brush->getColor());
+	}
+	if (pen.isNotNull()) {
+		Rectangle _rect_top = Rectangle(rect.getLeftTop().x, rect.getLeftTop().y, rect.getRightTop().x, rect.getRightTop().y + pen->getWidth());
+		Rectangle _rect_bottom = Rectangle(rect.getLeftBottom().x, rect.getLeftBottom().y - pen->getWidth(), rect.getRightBottom().x, rect.getRightBottom().y);
+		Rectangle _rect_left = Rectangle(rect.getLeftTop().x, rect.getLeftTop().y + pen->getWidth(), rect.getLeftBottom().x + pen->getWidth(), rect.getLeftBottom().y - pen->getWidth());
+		Rectangle _rect_right = Rectangle(rect.getRightTop().x - pen->getWidth(), rect.getRightTop().y + pen->getWidth(), rect.getRightBottom().x, rect.getRightBottom().y - pen->getWidth());
+		
+		_fillRectangle(_rect_top, pen->getColor());
+		_fillRectangle(_rect_bottom, pen->getColor());
+		_fillRectangle(_rect_left, pen->getColor());
+		_fillRectangle(_rect_right, pen->getColor());
+	}
+}
+
+void RenderCanvas::_fillRectangle(const Rectangle& _rect, const Color& _color)
 {
 	_RenderCanvas_Shared* shared = _RenderCanvas_getShared();
 	if (!shared) {
@@ -616,33 +660,31 @@ void RenderCanvas::drawRectangle(const Rectangle& _rect, const Ref<Pen>& pen, co
 	}
 	
 	RenderCanvasState* state = m_state.get();
+
+	Rectangle rect = _rect;
+	if (state->flagClipRect) {
+		if (!(state->clipRect.intersectRectangle(rect, &rect))) {
+			return;
+		}
+	}
 	
-	if (brush.isNotNull()) {
-		Rectangle rect = _rect;
-		if (state->flagClipRect) {
-			if (!(state->clipRect.intersectRectangle(rect, &rect))) {
-				return;
-			}
-		}
-		
-		RenderCanvasProgramParam pp;
-		pp.prepare(state, sl_true);
-		
-		RenderProgramScope<RenderCanvasProgramState> scope;
-		if (scope.begin(m_engine.get(), shared->getProgram(pp))) {
-			Matrix3 mat;
-			mat.m00 = rect.getWidth(); mat.m10 = 0; mat.m20 = rect.left;
-			mat.m01 = 0; mat.m11 = rect.getHeight(); mat.m21 = rect.top;
-			mat.m02 = 0; mat.m12 = 0; mat.m22 = 1;
-			pp.applyToProgramState(scope.getState(), mat);
-			mat *= state->matrix;
-			mat *= m_matViewport;
-			scope->setTransform(mat);
-			Color4f color = brush->getColor();
-			color.w *= getAlpha();
-			scope->setColor(color);
-			m_engine->drawPrimitive(4, shared->vbRectangle, PrimitiveType::TriangleStrip);
-		}
+	RenderCanvasProgramParam pp;
+	pp.prepare(state, sl_true);
+	
+	RenderProgramScope<RenderCanvasProgramState> scope;
+	if (scope.begin(m_engine.get(), shared->getProgram(pp))) {
+		Matrix3 mat;
+		mat.m00 = rect.getWidth(); mat.m10 = 0; mat.m20 = rect.left;
+		mat.m01 = 0; mat.m11 = rect.getHeight(); mat.m21 = rect.top;
+		mat.m02 = 0; mat.m12 = 0; mat.m22 = 1;
+		pp.applyToProgramState(scope.getState(), mat);
+		mat *= state->matrix;
+		mat *= m_matViewport;
+		scope->setTransform(mat);
+		Color4f color = _color;
+		color.w *= getAlpha();
+		scope->setColor(color);
+		m_engine->drawPrimitive(4, shared->vbRectangle, PrimitiveType::TriangleStrip);
 	}
 	
 }
