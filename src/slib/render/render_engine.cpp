@@ -415,18 +415,16 @@ void RenderEngine::drawTexture2D()
 
 void RenderEngine::drawTexture2D(const Ref<RenderProgram2D_PositionTexture>& program, const Matrix3& transform, const Ref<Texture>& texture, const Rectangle& rectSrc, const Color4f& color)
 {
-	if (texture.isNotNull()) {
+	if (texture.isNotNull() && program.isNotNull()) {
 		RenderProgramScope<RenderProgramState2D_PositionTexture> scope;
 		if (scope.begin(this, program)) {
-			if (texture.isNotNull()) {
-				scope->setTransform(transform);
-				scope->setTexture(texture);
-				Matrix3 textureTransform;
-				_RenderEngine_makeTextureTransform2D(textureTransform, rectSrc);
-				scope->setTextureTransform(textureTransform);
-				scope->setColor(color);
-				drawTexture2D();
-			}
+			scope->setTransform(transform);
+			scope->setTexture(texture);
+			Matrix3 textureTransform;
+			_RenderEngine_makeTextureTransform2D(textureTransform, rectSrc);
+			scope->setTextureTransform(textureTransform);
+			scope->setColor(color);
+			drawTexture2D();
 		}
 	}
 }

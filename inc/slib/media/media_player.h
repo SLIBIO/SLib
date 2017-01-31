@@ -76,6 +76,8 @@ public:
 	
 	// out
 	Ref<Texture> glTextureOES;
+	// out
+	Matrix3 glTextureTransformOES;
 	
 	// out
 	sl_bool flagUpdated;

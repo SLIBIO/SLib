@@ -229,7 +229,7 @@ sl_bool Android_ViewInstance::applyProperties(View* _view, ViewInstance* parent)
 		if (alpha < 0.995f) {
 			_JAndroidView::setAlpha.call(sl_null, jhandle, alpha);
 		}
-		if (view->isInstanceLayer()) {
+		if (view->isHardwareLayer()) {
 			_JAndroidView::setLayered.call(sl_null, jhandle);
 		}
 		Vector2 t;

@@ -311,7 +311,9 @@ String RenderProgram2D_PositionTextureYUV::getGLSLFragmentShader(RenderEngine* e
 *******************************/
 String RenderProgram2D_PositionTextureOES::getGLSLFragmentShader(RenderEngine* engine)
 {
-	String source = SLIB_STRINGIFY(
+	String source = "#extension GL_OES_EGL_image_external : require\n";
+	source += SLIB_STRINGIFY(
+	   precision mediump float;
 	   uniform vec4 u_Color;
 	   uniform samplerExternalOES u_Texture;
 	   varying vec2 v_TexCoord;

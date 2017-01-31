@@ -8,7 +8,6 @@ import slib.platform.android.ui.view.UiGLView;
 import slib.platform.android.ui.window.UiWindow;
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
@@ -113,25 +112,6 @@ public class SlibActivity extends Activity {
 	void dispatchTouchEventToSuper(final MotionEvent ev) {
 		try {
 			super.dispatchTouchEvent(ev);
-		} catch (Exception e) {
-			Logger.exception(e);
-		}
-	}
-	
-	@Override
-	public boolean dispatchKeyEvent(final KeyEvent ev) {
-		// avoid crash on using UI::runLoop
-		UiThread.post(new Runnable() {
-			public void run() {
-				dispatchKeyEventToSuper(ev);
-			}
-		});
-		return true;
-	}
-	
-	public void dispatchKeyEventToSuper(final KeyEvent ev) {
-		try {
-			super.dispatchKeyEvent(ev);
 		} catch (Exception e) {
 			Logger.exception(e);
 		}

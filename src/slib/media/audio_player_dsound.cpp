@@ -311,12 +311,6 @@ public:
 		return _DirectSound_AudioPlayerBuffer::create(param, m_deviceID);
 	}
 
-	// override
-	Ref<AudioPlayerControl> _openNative(const AudioPlayerOpenParam& param)
-	{
-		return sl_null;
-	}
-
 	struct DeviceProperty {
 		GUID guid;
 		String szGuid;

@@ -949,8 +949,8 @@ sl_int32 AnimationLoop::_runStep()
 		elapsedAbsolute = 0;
 	}
 	float elapsed = elapsedAbsolute;
-	if (elapsed > 0.1f) {
-		elapsed = 0.1f;
+	if (elapsed > 0.05f) {
+		elapsed = 0.05f;
 	}
 	
 	ListElements< Ref<Animation> > list(m_animationsRunning);

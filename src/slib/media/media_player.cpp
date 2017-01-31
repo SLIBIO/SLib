@@ -28,6 +28,8 @@ MediaPlayerRenderVideoParam::MediaPlayerRenderVideoParam()
 {
 	flagUpdated = sl_false;
 	
+	glTextureTransformOES = Matrix3::identity();
+	
 	_glEngineIdLast = 0;
 	_glTextureNameOES = 0;
 }

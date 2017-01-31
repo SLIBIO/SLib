@@ -375,12 +375,12 @@ sl_bool View::isNativeWidget()
 	return sl_false;
 }
 
-sl_bool View::isInstanceLayer()
+sl_bool View::isHardwareLayer()
 {
 	return m_flagInstanceLayer;
 }
 
-void View::setInstanceLayer(sl_bool flagLayered)
+void View::setHardwareLayer(sl_bool flagLayered)
 {
 	m_flagInstanceLayer = flagLayered;
 }

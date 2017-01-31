@@ -155,12 +155,15 @@ void VideoView::onDraw(Canvas* _canvas)
 				mediaPlayer->renderVideo(m_renderVideoParam);
 			}
 			Ref<Texture> texture;
+			Matrix3 textureMatrix;
 			Ref<RenderProgram2D_PositionTexture> program;
 			if (m_renderVideoParam.glTextureOES.isNotNull()) {
 				texture = m_renderVideoParam.glTextureOES;
+				textureMatrix = m_renderVideoParam.glTextureTransformOES;
 				program = m_programOES;
 			} else {
 				texture = m_textureFrame;
+				textureMatrix = Matrix3::identity();
 				if (m_flagYUV) {
 					program = m_programYUV;
 				} else {
@@ -169,7 +172,15 @@ void VideoView::onDraw(Canvas* _canvas)
 			}
 			if (texture.isNotNull() && program.isNotNull()) {
 				Matrix3 mat = canvas->getTransformMatrixForRectangle(getBounds());
-				engine->drawTexture2D(program, mat, m_textureFrame);
+				RenderProgramScope<RenderProgramState2D_PositionTexture> scope;
+				if (scope.begin(engine.get(), program)) {
+					scope->setTransform(mat);
+					scope->setTexture(texture);
+					scope->setTextureTransform(textureMatrix);
+					scope->setColor(Color4f(1, 1, 1, canvas->getAlpha()));
+					Ref<VertexBuffer> vb = engine->getDefaultVertexBufferForDrawTexture2D();
+					engine->drawPrimitive(4, vb, PrimitiveType::TriangleStrip);
+				}
 			}
 		}
 	}

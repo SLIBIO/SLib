@@ -86,7 +86,7 @@ void LabelView::onDraw(Canvas* canvas)
 	}
 	
 	if (lines.count == 1) {
-		Point pt = GraphicsUtil::calculateAlignPosition(getBoundsInnerPadding(), lines[0].width, lines[0].height, m_textAlignment);
+		Point pt = GraphicsUtil::calculateAlignPosition(getBoundsInnerPadding(), (sl_real)(lines[0].width), (sl_real)(lines[0].height), m_textAlignment);
 		canvas->drawText(lines[0].text, pt.x, pt.y, font, m_textColor);
 		return;
 	}
@@ -104,7 +104,7 @@ void LabelView::onDraw(Canvas* canvas)
 	
 	for (sl_size i = 0; i < lines.count; i++) {
 		rect.bottom = rect.top + lines[i].height;
-		Point pt = GraphicsUtil::calculateAlignPosition(rect, lines[i].width, lines[i].height, alignHorz);
+		Point pt = GraphicsUtil::calculateAlignPosition(rect, (sl_real)(lines[i].width), (sl_real)(lines[i].height), alignHorz);
 		canvas->drawText(lines[i].text, pt.x, pt.y, font, m_textColor);
 		rect.top = rect.bottom;
 	}
@@ -199,7 +199,7 @@ void LabelView::_makeMultilineList()
 	sl_size pos = 0;
 	for (; pos < lenText; pos++) {
 		if (flagNewLine) {
-			Size size = font->getTextSize(line.text);
+			Sizei size = font->getTextSize(line.text);
 			line.width = size.x;
 			line.height = size.y;
 			lines.add_NoLock(line);
@@ -249,14 +249,14 @@ void LabelView::_makeMultilineList()
 		}
 	}
 	if (flagNewLine) {
-		Size size = font->getTextSize(line.text);
+		Sizei size = font->getTextSize(line.text);
 		line.width = size.x;
 		line.height = size.y;
 		lines.add_NoLock(line);
 	}
 	if (pos > posLine) {
 		line.text = String16(buf + posLine, pos - posLine);
-		Size size = font->getTextSize(line.text);
+		Sizei size = font->getTextSize(line.text);
 		line.width = size.x;
 		line.height = size.y;
 		lines.add_NoLock(line);

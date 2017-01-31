@@ -419,6 +419,7 @@
     <ClCompile Include="..\..\..\src\slib\media\codec_opus.cpp" />
     <ClCompile Include="..\..\..\src\slib\media\codec_vp8.cpp" />
     <ClCompile Include="..\..\..\src\slib\media\media_player.cpp" />
+    <ClCompile Include="..\..\..\src\slib\media\media_player_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\media\video_capture.cpp" />
     <ClCompile Include="..\..\..\src\slib\media\video_codec.cpp" />
     <ClCompile Include="..\..\..\src\slib\media\video_frame.cpp" />

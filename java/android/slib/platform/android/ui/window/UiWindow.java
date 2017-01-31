@@ -33,7 +33,6 @@ public class UiWindow extends FrameLayout implements ViewTreeObserver.OnGlobalLa
 
 	private UiWindow(Context context) {
 		super(context);
-		setLayerType(View.LAYER_TYPE_HARDWARE, null);
 		instance = 0;
 		backgroundColor = 0;
 		if (context instanceof SlibActivity) {

@@ -1612,6 +1612,9 @@
     <ClCompile Include="..\..\..\src\slib\media\media_player.cpp">
       <Filter>src\slib\media</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\media\media_player_win32.cpp">
+      <Filter>src\slib\media</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="slib.rc">

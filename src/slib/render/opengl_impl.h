@@ -1146,8 +1146,8 @@ public:
 		{
 #if defined(_OPENGL_IMPL)
 #else
-			if (! (glsl.startsWith("precision"))) {
-				glsl = "precision highp float;" + glsl;
+			if (! (glsl.contains("precision highp float;") || glsl.contains("precision mediump float;") || glsl.contains("precision lowp float;"))) {
+				glsl = "precision mediump float;" + glsl;
 			}
 #endif
 			return glsl;

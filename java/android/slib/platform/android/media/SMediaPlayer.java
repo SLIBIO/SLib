@@ -12,50 +12,42 @@ public class SMediaPlayer implements MediaPlayer.OnCompletionListener, MediaPlay
 
 	private MediaPlayer mPlayer;
 	private long mInstance = 0;
-	private boolean mFlagVideo = false;
 
-	public static SMediaPlayer openUrl(String url, boolean flagVideo) {
+	public static SMediaPlayer openUrl(String url) {
 		try {
 			MediaPlayer player = new MediaPlayer();
 			player.setDataSource(url);
-			return new SMediaPlayer(player, flagVideo);
+			return new SMediaPlayer(player);
 		} catch (Exception e) {
 			Logger.exception(e);
 			return null;
 		}
 	}
 
-	public static SMediaPlayer openAsset(Context context, String fileName, boolean flagVideo) {
+	public static SMediaPlayer openAsset(Context context, String fileName) {
 		try {
-			MediaPlayer player = new MediaPlayer();
 			AssetManager assets = context.getAssets();
 			AssetFileDescriptor fd = assets.openFd(fileName);
+			MediaPlayer player = new MediaPlayer();
 			player.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
-			return new SMediaPlayer(player, flagVideo);
+			return new SMediaPlayer(player);
 		} catch (Exception e) {
 			Logger.exception(e);
 			return null;
 		}
 	}
 	
-	private SMediaPlayer(MediaPlayer player, boolean flagVideo) {
+	private SMediaPlayer(MediaPlayer player) {
 		mPlayer = player;
-		mFlagVideo = flagVideo;
 		player.setOnCompletionListener(this);
 		player.setOnPreparedListener(this);
-		if (!flagVideo) {
-			prepare();
-		}
+		mPlayer.prepareAsync();
 	}
 	
 	public void setInstance(long instance) {
 		mInstance = instance;
 	}
 	
-	public void prepare() {
-		mPlayer.prepareAsync();
-	}
-
 	public void start() {
 		try {
 			mPlayer.start();
@@ -97,7 +89,6 @@ public class SMediaPlayer implements MediaPlayer.OnCompletionListener, MediaPlay
 		}
 	}
 	
-	
 	private SurfaceTexture mTexture;
 	private Surface mSurface;
 	private boolean mFlagUpdatedVideo = false;
@@ -117,9 +108,8 @@ public class SMediaPlayer implements MediaPlayer.OnCompletionListener, MediaPlay
 				});
 				mSurface = new Surface(mTexture);
 				mPlayer.setSurface(mSurface);
-				mSurface.release();
+				mSurface.release();			
 				mFlagUpdatedVideo = false;
-				prepare();
 				return false;
 			}
 			if (mFlagUpdatedVideo) {

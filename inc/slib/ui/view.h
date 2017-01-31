@@ -68,10 +68,10 @@ public:
 	
 	sl_bool isNativeWidget();
 	
-	sl_bool isInstanceLayer();
+	sl_bool isHardwareLayer();
 	
 	// set before attaching
-	void setInstanceLayer(sl_bool flagLayered);
+	void setHardwareLayer(sl_bool flagLayered);
 	
 	
 	Ref<Window> getWindow();

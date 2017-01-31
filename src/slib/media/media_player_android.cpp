@@ -23,8 +23,8 @@ void _MediaPlayer_onCompleted(JNIEnv* env, jobject _this, jlong instance);
 void _MediaPlayer_onPrepared(JNIEnv* env, jobject _this, jlong instance);
 
 SLIB_JNI_BEGIN_CLASS(_JMediaPlayer, "slib/platform/android/media/SMediaPlayer")
-	SLIB_JNI_STATIC_METHOD(openUrl, "openUrl", "(Ljava/lang/String;Z)Lslib/platform/android/media/SMediaPlayer;");
-	SLIB_JNI_STATIC_METHOD(openAsset, "openAsset", "(Landroid/content/Context;Ljava/lang/String;Z)Lslib/platform/android/media/SMediaPlayer;");
+	SLIB_JNI_STATIC_METHOD(openUrl, "openUrl", "(Ljava/lang/String;)Lslib/platform/android/media/SMediaPlayer;");
+	SLIB_JNI_STATIC_METHOD(openAsset, "openAsset", "(Landroid/content/Context;Ljava/lang/String;)Lslib/platform/android/media/SMediaPlayer;");
 	SLIB_JNI_METHOD(setInstance, "setInstance", "(J)V");
 	SLIB_JNI_METHOD(start, "start", "()V");
 	SLIB_JNI_METHOD(pause, "pause", "()V");
@@ -34,6 +34,7 @@ SLIB_JNI_BEGIN_CLASS(_JMediaPlayer, "slib/platform/android/media/SMediaPlayer")
 	SLIB_JNI_METHOD(renderVideo, "renderVideo", "(IZ)Z");
 	SLIB_JNI_NATIVE(onCompleted, "nativeOnCompleted", "(J)V", _MediaPlayer_onCompleted);
 	SLIB_JNI_NATIVE(onPrepared, "nativeOnPrepared", "(J)V", _MediaPlayer_onPrepared);
+	SLIB_JNI_OBJECT_FIELD(mTextureMatrix, "[F");
 SLIB_JNI_END_CLASS
 
 class _Android_MediaPlayer : public MediaPlayer
@@ -70,15 +71,15 @@ public:
 		JniLocal<jobject> player;
 		if (param.url.isNotEmpty()) {
 			JniLocal<jstring> url = Jni::getJniString(param.url);
-			player = _JMediaPlayer::openUrl.callObject(sl_null, url.get(), param.flagVideo);
+			player = _JMediaPlayer::openUrl.callObject(sl_null, url.get());
 		} else if (param.filePath.isNotEmpty()) {
 			JniLocal<jstring> filePath = Jni::getJniString(param.filePath);
-			player = _JMediaPlayer::openUrl.callObject(sl_null, filePath.get(), param.flagVideo);
+			player = _JMediaPlayer::openUrl.callObject(sl_null, filePath.get());
 		} else if (param.assetFileName.isNotEmpty()) {
 			JniLocal<jstring> assetFileName = Jni::getJniString(param.assetFileName);
 			jobject jactivity = Android::getCurrentActivity();
 			if (jactivity) {
-				player = _JMediaPlayer::openAsset.callObject(sl_null, jactivity, assetFileName.get(), param.flagVideo);
+				player = _JMediaPlayer::openAsset.callObject(sl_null, jactivity, assetFileName.get());
 			}
 		}
 		if (player.isNull()) {
@@ -212,6 +213,24 @@ public:
 			}
 		}
 		param.flagUpdated = _JMediaPlayer::renderVideo.callBoolean(m_player.get(), textureName, flagResetTexture) != 0;
+		if (param.flagUpdated) {
+			JniLocal<jfloatArray> arr = (jfloatArray)(_JMediaPlayer::mTextureMatrix.get(m_player.get()));
+			if (arr.isNotNull()) {
+				float t[16];
+				Jni::getFloatArrayRegion(arr.get(), 0, 16, t);
+				Matrix3 mat;
+				mat.m00 = t[0];
+				mat.m01 = t[1];
+				mat.m02 = 0;
+				mat.m10 = -t[4];
+				mat.m11 = -t[5];
+				mat.m12 = 0;
+				mat.m20 = t[12];
+				mat.m21 = 1-t[13];
+				mat.m22 = 1;
+				param.glTextureTransformOES = mat;
+			}
+		}
 	}
 
 	void __onPrepared()
