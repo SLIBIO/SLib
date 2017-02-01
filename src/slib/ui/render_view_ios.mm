@@ -189,7 +189,7 @@ SLIB_UI_NAMESPACE_END
 @implementation _Slib_iOS_GLView
 -(void)_init
 {
-	self.drawableColorFormat = GLKViewDrawableColorFormatRGBA8888;
+	self.drawableColorFormat = GLKViewDrawableColorFormatRGB565;
 	self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
 	
 	m_flagRenderingContinuously = sl_false;

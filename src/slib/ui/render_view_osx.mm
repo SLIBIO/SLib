@@ -69,7 +69,7 @@ void _Ui_OSX_GLView_thread(__weak _Slib_OSX_GLView* _handle)
 	NSOpenGLPixelFormatAttribute attrs[] = {
 		NSOpenGLPFADoubleBuffer
 		, NSOpenGLPFAColorSize, 24
-		, NSOpenGLPFAAlphaSize, 8
+		, NSOpenGLPFAAlphaSize, 0
 		, NSOpenGLPFADepthSize, 24
 		, NSOpenGLPFAStencilSize, 8
 		, 0

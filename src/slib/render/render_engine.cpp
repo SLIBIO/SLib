@@ -62,7 +62,7 @@ RendererParam::RendererParam()
 	nRedBits = 8;
 	nGreenBits = 8;
 	nBlueBits = 8;
-	nAlphaBits = 8;
+	nAlphaBits = 0;
 	nAccumBits = 0;
 	nDepthBits = 24;
 	nStencilBits = 8;
