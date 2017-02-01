@@ -1542,8 +1542,8 @@ void ViewPage::dispatchFinishPageAnimation(ViewPager* pager, UIPageAction action
 
 void ViewPage::dispatchOpen()
 {
-	dispatchResume();
 	onOpen();
+	dispatchResume();
 }
 
 void ViewPage::dispatchClose()
