@@ -848,6 +848,9 @@
     <ClInclude Include="..\..\..\inc\slib\media\media_player.h">
       <Filter>inc\media</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\graphics\text.h">
+      <Filter>inc\graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">
@@ -1614,6 +1617,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\media\media_player_win32.cpp">
       <Filter>src\slib\media</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_text.cpp">
+      <Filter>src\slib\graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -31,6 +31,8 @@ class SLIB_EXPORT Canvas : public Object
 public:
 	Canvas();
 	
+	~Canvas();
+	
 public:
 	CanvasType getType();
 	
@@ -92,15 +94,17 @@ public:
 	virtual void scale(sl_real sx, sl_real sy);
 	
 
-	virtual Size getTextSize(const Ref<Font>& font, const String& text);
-
-	virtual void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color);
+	virtual Size measureText(const Ref<Font>& font, const String& text, sl_bool flagMultiLine = sl_false);
+	
+	virtual Size measureText16(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine = sl_false);
+	
+	virtual void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color) = 0;
 	
 	virtual void drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color);
 	
-	void drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment);
+	void drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment, sl_bool flagMultiLine = sl_false);
 	
-	void drawText16(const String16& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment);
+	void drawText16(const String16& text, const Rectangle& rcDst, const Ref<Font>& font, const Color& color, Alignment alignment, sl_bool flagMultiLine = sl_false);
 	
 	
 	virtual void drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& pen) = 0;
@@ -120,7 +124,11 @@ public:
 	
 	virtual void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush) = 0;
 	
+	virtual void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Color& fillColor);
+	
 	void drawRectangle(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Pen>& pen, const Ref<Brush>& brush);
+	
+	void drawRectangle(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Pen>& pen, const Color& fillColor);
 	
 	void drawRectangle(const Rectangle& rc, const Ref<Pen>& pen);
 	

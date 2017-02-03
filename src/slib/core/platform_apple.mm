@@ -14,7 +14,10 @@ NSString* Apple::getNSStringFromString(const String& str, NSString* def)
 		return def;
 	}
 	NSString* ret = [[NSString alloc] initWithUTF8String:s.getData()];
-	return ret;
+	if (ret != nil) {
+		return ret;
+	}
+	return def;
 }
 
 NSString* Apple::getNSStringFromString16(const String16& str, NSString* def)
@@ -24,7 +27,10 @@ NSString* Apple::getNSStringFromString16(const String16& str, NSString* def)
 		return def;
 	}
 	NSString* ret = [[NSString alloc] initWithCharacters:(unichar*)s.getData() length:s.getLength()];
-	return ret;
+	if (ret != nil) {
+		return ret;
+	}
+	return def;
 }
 
 String Apple::getStringFromNSString(NSString* str)

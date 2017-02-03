@@ -284,6 +284,8 @@ public:
 	
 	void requestParentAndSelfLayout(UIUpdateMode mode = UIUpdateMode::Redraw);
 
+	void invalidateContentLayout(UIUpdateMode mode = UIUpdateMode::Redraw);
+
 	
 	sl_bool isLayouting();
 	
@@ -1012,6 +1014,8 @@ public:
 	Ref<Bitmap> drawLayer();
 	
 	void draw(Canvas* canvas);
+	
+	virtual Size measureText(const String& size, const Ref<Font>& font, sl_bool flagMultiLine = sl_false);
 	
 	
 	void runAfterDraw(const Function<void()>& callback, sl_bool flagInvalidate = sl_true);

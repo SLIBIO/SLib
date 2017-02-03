@@ -11,7 +11,7 @@
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
-struct ImageDesc;
+class ImageDesc;
 class Image;
 
 class BitmapCache : public Object
@@ -27,6 +27,8 @@ class SLIB_EXPORT Bitmap : public Drawable
 
 protected:
 	Bitmap();
+	
+	~Bitmap();
 	
 public:
 	static Ref<Bitmap> create(sl_uint32 width, sl_uint32 height);

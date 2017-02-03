@@ -35,6 +35,8 @@ class SLIB_EXPORT GraphicsPath : public Object
 protected:
 	GraphicsPath();
 	
+	~GraphicsPath();
+	
 public:
 	static Ref<GraphicsPath> create();
 

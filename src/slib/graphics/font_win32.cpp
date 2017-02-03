@@ -37,34 +37,6 @@ public:
 	}
 };
 
-Size Font::getTextSize(const String& _text)
-{
-	Gdiplus::Font* handle = GraphicsPlatform::getGdiplusFont(this);
-	if (!handle) {
-		return Size::zero();
-	}
-
-	SLIB_SAFE_STATIC(_Win32_FontStatic, fs)
-	if (SLIB_SAFE_STATIC_CHECK_FREED(fs)) {
-		return Size::zero();
-	}
-
-	Size ret(0, 0);
-	if (fs.graphics) {
-		String16 text = _text;
-		Gdiplus::StringFormat format(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsNoClip);
-		Gdiplus::RectF bound;
-		Gdiplus::PointF origin(0, 0);
-		Gdiplus::Status result = fs.graphics->MeasureString((WCHAR*)(text.getData()), (INT)(text.getLength()), handle, origin, &format, &bound);
-		if (result == Gdiplus::Ok) {
-			ret.x = bound.Width;
-			ret.y = bound.Height;
-		}
-	}
-	return ret;
-
-}
-
 sl_bool Font::_getFontMetrics_PO(FontMetrics& _out)
 {
 	Gdiplus::Font* handle = GraphicsPlatform::getGdiplusFont(this);
@@ -80,6 +52,34 @@ sl_bool Font::_getFontMetrics_PO(FontMetrics& _out)
 		}
 	}
 	return sl_false;
+}
+
+Size Font::_measureText_PO(const String& _text)
+{
+	Gdiplus::Font* handle = GraphicsPlatform::getGdiplusFont(this);
+	if (!handle) {
+		return Size::zero();
+	}
+
+	SLIB_SAFE_STATIC(_Win32_FontStatic, fs)
+	if (SLIB_SAFE_STATIC_CHECK_FREED(fs)) {
+		return Size::zero();
+	}
+
+	Size ret(0, 0);
+	if (fs.graphics) {
+		String16 text = _text;
+		Gdiplus::StringFormat format(Gdiplus::StringFormatFlagsNoWrap | Gdiplus::StringFormatFlagsNoClip | Gdiplus::StringFormatFlagsNoFitBlackBox);
+		Gdiplus::RectF bound;
+		Gdiplus::PointF origin(0, 0);
+		Gdiplus::Status result = fs.graphics->MeasureString((WCHAR*)(text.getData()), (INT)(text.getLength()), handle, origin, Gdiplus::StringFormat::GenericTypographic(), &bound);
+		if (result == Gdiplus::Ok) {
+			ret.x = bound.Width;
+			ret.y = bound.Height;
+		}
+	}
+	return ret;
+
 }
 
 class _Win32_FontObject : public Referable

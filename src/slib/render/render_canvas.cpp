@@ -533,11 +533,38 @@ void RenderCanvas::concatMatrix(const Matrix3& matrix)
 	}
 }
 
-class _RenderCanvasFont : public Font
+Size RenderCanvas::measureText(const Ref<Font>& font, const String& text, sl_bool flagMultiLine)
 {
-public:
-	friend class RenderCanvas;
-};
+	return measureRenderingText(font, text, flagMultiLine);
+}
+
+Size RenderCanvas::measureText16(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine)
+{
+	return measureRenderingText(font, text, flagMultiLine);
+}
+
+Size RenderCanvas::measureRenderingText(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine)
+{
+	if (text.isEmpty()) {
+		return Size::zero();
+	}
+	if (font.isNull()) {
+		return Size::zero();
+	}
+	
+	Ref<FontAtlas> fa = font->getSharedAtlas();
+	if (fa.isNull()) {
+		return Size::zero();
+	}
+	
+	return fa->measureText(text, flagMultiLine);
+
+}
+
+void RenderCanvas::drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color)
+{
+	RenderCanvas::drawText16(text, x, y, font, color);
+}
 
 void RenderCanvas::drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& _font, const Color& _color)
 {
@@ -551,17 +578,12 @@ void RenderCanvas::drawText16(const String16& text, sl_real x, sl_real y, const 
 			return;
 		}
 	}
-	_RenderCanvasFont* rfont = (_RenderCanvasFont*)(font.get());
-	Ref<Referable> cache = rfont->m_renderingCache;
-	if (cache.isNull()) {
-		cache = FontAtlas::getShared(font);
-		if (cache.isNull()) {
-			return;
-		}
-		rfont->m_renderingCache = cache;
+	
+	Ref<FontAtlas> fa = font->getSharedAtlas();
+	if (fa.isNull()) {
+		return;
 	}
 	
-	FontAtlas* fa = (FontAtlas*)(cache.get());
 	sl_char16* arrChar = text.getData();
 	sl_size len = text.getLength();
 	FontAtlasChar fac;
@@ -574,47 +596,59 @@ void RenderCanvas::drawText16(const String16& text, sl_real x, sl_real y, const 
 	for (sl_size i = 0; i < len; i++) {
 		sl_char16 ch = arrChar[i];
 		if (fa->getChar(ch, fac)) {
-			Ref<Texture> texture = Texture::getBitmapRenderingCache(fac.bitmap);
-			if (texture.isNotNull()) {
-				sl_real fw = fac.fontWidth;
-				sl_real fh = fac.fontHeight;
-				sl_real fxn = fx + fw;
-				sl_real fy = y + (fontHeight - fh) / 2;
-				if (fontItalic) {
-					Matrix3 transform;
-					sl_real ratio = 0.2f;
-					transform.m00 = fw; transform.m10 = -ratio * fh; transform.m20 = ratio * fh + fx;
-					transform.m01 = 0; transform.m11 = fh; transform.m21 = fy;
-					transform.m02 = 0; transform.m12 = 0; transform.m22 = 1;
-					drawTexture(transform, texture, fac.region, dp, color);
-				} else {
-					drawTexture(Rectangle(fx, fy, fxn, fy + fh), texture, fac.region, dp, color);
-				}
-				fx = fxn;
+			sl_real fw = fac.fontWidth;
+			sl_real fxn = fx + fw;
+			if (fac.bitmap.isNotNull()) {
+				Ref<Texture> texture = Texture::getBitmapRenderingCache(fac.bitmap);
+				if (texture.isNotNull()) {
+					sl_real fh = fac.fontHeight;
+					sl_real fy = y + (fontHeight - fh) / 2;
+					if (fontItalic) {
+						Matrix3 transform;
+						sl_real ratio = 0.2f;
+						transform.m00 = fw; transform.m10 = -ratio * fh; transform.m20 = ratio * fh + fx;
+						transform.m01 = 0; transform.m11 = fh; transform.m21 = fy;
+						transform.m02 = 0; transform.m12 = 0; transform.m22 = 1;
+						drawTexture(transform, texture, fac.region, dp, color);
+					} else {
+						drawTexture(Rectangle(fx, fy, fxn, fy + fh), texture, fac.region, dp, color);
+					}
+				}				
 			}
+			fx = fxn;
 		}
 	}
 }
 
 void RenderCanvas::drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& pen)
 {
-	sl_real m = (pt1.y - pt2.y) / (pt1.x - pt2.x);
+	if (pen.isNull()) {
+		return;
+	}
 	
-	sl_real angle = Math::arctan(m);
+	sl_real penWidthHalf = pen->getWidth() / 2;
+	
+	if (Math::abs(pt1.x - pt2.x) < 0.0000001f || Math::abs(pt1.y - pt2.y) < 0.0000001f) {
+		_fillRectangle(Rectangle(pt1.x - penWidthHalf, pt1.y - penWidthHalf, pt2.x + penWidthHalf, pt2.y + penWidthHalf), pen->getColor());
+		return;
+	}
+	
+	sl_real angle = Math::arctan((pt1.y - pt2.y) / (pt1.x - pt2.x));
+	sl_real c = Math::cos(-angle);
+	sl_real s = Math::sin(-angle);
 	
 	sl_real centerX = (pt1.x + pt2.x) / 2;
 	sl_real centerY = (pt1.y + pt2.y) / 2;
 	
-	sl_real newX1 = centerX + (pt1.x - centerX) * Math::cos(-angle) - (pt1.y - centerY) * Math::sin(-angle);
-	sl_real newY1 = centerY + (pt1.x - centerX) * Math::sin(-angle) + (pt1.y - centerY) * Math::cos(-angle);
+	sl_real newX1 = centerX + (pt1.x - centerX) * c - (pt1.y - centerY) * s;
+	sl_real newY1 = centerY + (pt1.x - centerX) * s + (pt1.y - centerY) * c;
 	
-	sl_real newX2 = centerX + (pt2.x - centerX) * Math::cos(-angle) - (pt2.y - centerY) * Math::sin(-angle);
-	sl_real newY2 = centerY + (pt2.x - centerX) * Math::sin(-angle) + (pt2.y - centerY) * Math::cos(-angle);
-	
+	sl_real newX2 = centerX + (pt2.x - centerX) * c - (pt2.y - centerY) * s;
+	sl_real newY2 = centerY + (pt2.x - centerX) * s + (pt2.y - centerY) * c;
 	
 	CanvasStateScope scope(this);
 	rotate(centerX, centerY, angle);
-	_fillRectangle(Rectangle(newX1, newY1 - pen->getWidth() / 2, newX2, newY2 + pen->getWidth() / 2), pen->getColor());
+	_fillRectangle(Rectangle(newX1 - penWidthHalf, newY1 - penWidthHalf, newX2 + penWidthHalf, newY2 + penWidthHalf), pen->getColor());
 	
 }
 
@@ -629,26 +663,38 @@ void RenderCanvas::drawArc(const Rectangle& rect, sl_real startDegrees, sl_real 
 {
 }
 
+
 void RenderCanvas::drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush)
 {
 	if (brush.isNotNull()) {
+		RenderCanvas::drawRectangle(rect, pen, brush->getColor());
+	} else {
+		RenderCanvas::drawRectangle(rect, pen, Color::zero());
+	}
+}
+
+void RenderCanvas::drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Color& fillColor)
+{
+	if (fillColor.a > 0) {
 		Rectangle _rect = rect;
 		if (pen.isNotNull()) {
-			_rect = Rectangle(rect.getLeftTop().x + pen->getWidth(), rect.getLeftTop().y + pen->getWidth(), rect.getRightBottom().x - pen->getWidth(), rect.getRightBottom().y - pen->getWidth());
+			sl_real penWidth = pen->getWidth();
+			_fillRectangle(Rectangle(rect.left + penWidth, rect.top + penWidth, rect.right - penWidth, rect.bottom - penWidth), fillColor);
+		} else {
+			_fillRectangle(rect, fillColor);
 		}
-		
-		_fillRectangle(_rect, brush->getColor());
 	}
 	if (pen.isNotNull()) {
-		Rectangle _rect_top = Rectangle(rect.getLeftTop().x, rect.getLeftTop().y, rect.getRightTop().x, rect.getRightTop().y + pen->getWidth());
-		Rectangle _rect_bottom = Rectangle(rect.getLeftBottom().x, rect.getLeftBottom().y - pen->getWidth(), rect.getRightBottom().x, rect.getRightBottom().y);
-		Rectangle _rect_left = Rectangle(rect.getLeftTop().x, rect.getLeftTop().y + pen->getWidth(), rect.getLeftBottom().x + pen->getWidth(), rect.getLeftBottom().y - pen->getWidth());
-		Rectangle _rect_right = Rectangle(rect.getRightTop().x - pen->getWidth(), rect.getRightTop().y + pen->getWidth(), rect.getRightBottom().x, rect.getRightBottom().y - pen->getWidth());
-		
-		_fillRectangle(_rect_top, pen->getColor());
-		_fillRectangle(_rect_bottom, pen->getColor());
-		_fillRectangle(_rect_left, pen->getColor());
-		_fillRectangle(_rect_right, pen->getColor());
+		Color color = pen->getColor();
+		sl_real penWidth = pen->getWidth();
+		// top
+		_fillRectangle(Rectangle(rect.left, rect.top, rect.right, rect.top + penWidth), color);
+		// bottom
+		_fillRectangle(Rectangle(rect.left, rect.bottom - penWidth, rect.right, rect.bottom), color);
+		// left
+		_fillRectangle(Rectangle(rect.left, rect.top + penWidth, rect.left + penWidth, rect.bottom - penWidth), color);
+		// right
+		_fillRectangle(Rectangle(rect.right - penWidth, rect.top + penWidth, rect.right, rect.bottom - penWidth), color);
 	}
 }
 
@@ -691,7 +737,7 @@ void RenderCanvas::_fillRectangle(const Rectangle& _rect, const Color& _color)
 
 void RenderCanvas::drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& pen, const Ref<Brush>& brush)
 {
-	
+	drawRectangle(rect, pen, brush);
 }
 
 void RenderCanvas::drawEllipse(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush)

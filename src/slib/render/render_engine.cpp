@@ -670,7 +670,7 @@ void RenderEngine::drawDebugText()
 	{
 		Ref<Canvas> canvas = bitmap->getCanvas();
 		if (canvas.isNotNull()) {
-			size = canvas->getTextSize(font, text);
+			size = canvas->measureText(font, text);
 			size.x += 5;
 			canvas->drawText(text, 0, 3, font, Color::Red);
 		}

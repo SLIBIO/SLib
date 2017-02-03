@@ -14,6 +14,10 @@ GraphicsPath::GraphicsPath()
 	_initialize_PO();
 }
 
+GraphicsPath::~GraphicsPath()
+{
+}
+
 Ref<GraphicsPath> GraphicsPath::create()
 {
 	Ref<GraphicsPath> path = new GraphicsPath;

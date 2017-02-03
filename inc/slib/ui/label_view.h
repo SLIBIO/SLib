@@ -5,12 +5,14 @@
 
 #include "view.h"
 
+#include "../graphics/text.h"
+
 SLIB_UI_NAMESPACE_BEGIN
 
 struct TextLine {
 	String16 text;
-	sl_uint32 width;
-	sl_uint32 height;
+	sl_ui_len width;
+	sl_ui_len height;
 };
 
 class SLIB_EXPORT LabelView : public View
@@ -19,6 +21,8 @@ class SLIB_EXPORT LabelView : public View
 	
 public:
 	LabelView();
+	
+	~LabelView();
 	
 public:
 	String getText();
@@ -33,6 +37,10 @@ public:
 	
 	virtual void setGravity(Alignment align, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
+	MultiLineMode getMultiLineMode();
+	
+	virtual void setMultiLineMode(MultiLineMode multiLineMode, UIUpdateMode updateMode = UIUpdateMode::Redraw);
+	
 public:
 	// override
 	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
@@ -45,8 +53,6 @@ protected:
 	void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 	
 private:
-	void _makeMultilineList();
-	
 	void _setText_NW(const String& text);
 	
 	void _setTextColor_NW(const Color& color);
@@ -66,11 +72,9 @@ protected:
 	AtomicString m_text;
 	Color m_textColor;
 	Alignment m_textAlignment;
+	MultiLineMode m_multiLineMode;
 	
-	AtomicList<TextLine> m_textLines;
-	sl_uint32 m_totalHeight;
-	AtomicString m_currentText;
-	AtomicRef<Font> m_currentTextFont;
+	SimpleTextBox m_textBox;
 	
 };
 

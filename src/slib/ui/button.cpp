@@ -73,6 +73,7 @@ Button::Button(sl_uint32 nCategories, ButtonCategory* categories)
 	setAlwaysOnDrawBackground(sl_true, UIUpdateMode::Init);
 	setAlwaysOnDrawBorder(sl_true, UIUpdateMode::Init);
 	
+	m_flagMultiLine = sl_false;
 	m_flagDefaultButton = sl_false;
 	
 	m_state = ButtonState::Normal;
@@ -123,7 +124,7 @@ Button::Button(sl_uint32 nCategories, ButtonCategory* categories)
 	setBorder(Pen::create(PenStyle::Solid, 1, Color(100, 100, 100)), UIUpdateMode::Init);
 	setBackground(ColorDrawable::create(Color(240, 240, 240)), UIUpdateMode::Init);
 	m_textColorDefault = Color::Black;
-
+	
 }
 
 Button::~Button()
@@ -141,11 +142,8 @@ void Button::setText(const String& text, UIUpdateMode mode)
 	m_text = text;
 	if (isNativeWidget()) {
 		_setText_NW(text);
-	} else {
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
 	}
+	invalidateContentLayout(mode);
 }
 
 sl_bool Button::isDefaultButton()
@@ -195,6 +193,17 @@ void Button::setCurrentCategory(sl_uint32 n, UIUpdateMode mode)
 	}
 }
 
+sl_bool Button::isMultiLine()
+{
+	return m_flagMultiLine;
+}
+
+void Button::setMultiLine(sl_bool flag, UIUpdateMode mode)
+{
+	m_flagMultiLine = flag;
+	invalidateContentLayout(mode);
+}
+
 const UISize& Button::getIconSize()
 {
 	return m_iconSize;
@@ -203,9 +212,7 @@ const UISize& Button::getIconSize()
 void Button::setIconSize(const UISize& size, UIUpdateMode mode)
 {
 	m_iconSize = size;
-	if (mode == UIUpdateMode::Redraw) {
-		invalidate();
-	}
+	invalidateContentLayout(mode);
 }
 
 void Button::setIconSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode)
@@ -259,9 +266,7 @@ Alignment Button::getIconAlignment()
 void Button::setIconAlignment(Alignment align, UIUpdateMode mode)
 {
 	m_iconAlignment = align;
-	if (mode == UIUpdateMode::Redraw) {
-		invalidate();
-	}
+	invalidateContentLayout(mode);
 }
 
 Alignment Button::getTextAlignment()
@@ -272,9 +277,7 @@ Alignment Button::getTextAlignment()
 void Button::setTextAlignment(Alignment align, UIUpdateMode mode)
 {
 	m_textAlignment = align;
-	if (mode == UIUpdateMode::Redraw) {
-		invalidate();
-	}
+	invalidateContentLayout(mode);
 }
 
 sl_bool Button::isTextBeforeIcon()
@@ -285,9 +288,7 @@ sl_bool Button::isTextBeforeIcon()
 void Button::setTextBeforeIcon(sl_bool flag, UIUpdateMode mode)
 {
 	m_flagTextBeforeIcon = flag;
-	if (mode == UIUpdateMode::Redraw) {
-		invalidate();
-	}
+	invalidateContentLayout(mode);
 }
 
 LayoutOrientation Button::getLayoutOrientation()
@@ -298,9 +299,7 @@ LayoutOrientation Button::getLayoutOrientation()
 void Button::setLayoutOrientation(LayoutOrientation orientation, UIUpdateMode mode)
 {
 	m_layoutOrientation = orientation;
-	if (mode == UIUpdateMode::Redraw) {
-		invalidate();
-	}
+	invalidateContentLayout(mode);
 }
 
 void Button::setIconMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode)
@@ -309,9 +308,7 @@ void Button::setIconMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui
 	m_iconMarginTop = top;
 	m_iconMarginRight = right;
 	m_iconMarginBottom = bottom;
-	if (mode == UIUpdateMode::Redraw) {
-		invalidate();
-	}
+	invalidateContentLayout(mode);
 }
 
 void Button::setIconMargin(sl_ui_pos margin, UIUpdateMode mode)
@@ -365,9 +362,7 @@ void Button::setTextMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui
 	m_textMarginTop = top;
 	m_textMarginRight = right;
 	m_textMarginBottom = bottom;
-	if (mode == UIUpdateMode::Redraw) {
-		invalidate();
-	}
+	invalidateContentLayout(mode);
 }
 
 void Button::setTextMargin(sl_ui_pos margin, UIUpdateMode mode)
@@ -743,13 +738,8 @@ void Button::layoutIconAndText(sl_ui_len widthFrame, sl_ui_len heightFrame, UISi
 		heightIcon = 0;
 	}
 	
-	Ref<Font> font = getFont();
-	UISize sizeText;
-	if (font.isNotNull()) {
-		sizeText = font->getTextSize(m_text);
-	} else {
-		sizeText = UISize::zero();
-	}
+	UISize sizeText = measureText(m_text, getFont(), m_flagMultiLine);
+
 	sl_ui_pos widthText = sizeText.x + m_textMarginLeft + m_textMarginRight;
 	if (widthText < 0) {
 		widthText = 0;
@@ -913,7 +903,11 @@ void Button::drawButtonContent(Canvas* canvas, const Ref<Drawable>& icon, const 
 		rcText.top += pt.y;
 		rcText.right += pt.x;
 		rcText.bottom += pt.y;
-		canvas->drawText(text, (sl_real)(rcText.left), (sl_real)(rcText.top), getFont(), textColor);
+		if (m_flagMultiLine) {
+			canvas->drawText(text, rcText, getFont(), textColor, m_textAlignment, sl_true);
+		} else {
+			canvas->drawText(text, (sl_real)(rcText.left), (sl_real)(rcText.top), getFont(), textColor);
+		}
 	}
 }
 

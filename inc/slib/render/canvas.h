@@ -92,6 +92,17 @@ public:
 	void concatMatrix(const Matrix3& matrix);
 	
 	// override
+	Size measureText(const Ref<Font>& font, const String& text, sl_bool flagMultiLine = sl_false);
+	
+	// override
+	Size measureText16(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine = sl_false);
+	
+	static Size measureRenderingText(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine = sl_false);
+	
+	// override
+	void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color);
+
+	// override
 	void drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color);
 	
 	// override
@@ -105,6 +116,9 @@ public:
 	
 	// override
 	void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Ref<Brush>& brush);
+	
+	// override
+	void drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Color& fillColor);
 	
 	// override
 	void drawRoundRect(const Rectangle& rect, const Size& radius, const Ref<Pen>& pen, const Ref<Brush>& brush);

@@ -2310,6 +2310,9 @@ void View::_requestInvalidateMeasure(sl_bool flagWidth, sl_bool flagHeight, UIUp
 
 void View::requestLayout(UIUpdateMode mode)
 {
+	if (mode == UIUpdateMode::Init) {
+		return;
+	}
 	_requestInvalidateMeasure(sl_true, sl_true, mode);
 	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
@@ -2318,6 +2321,9 @@ void View::requestLayout(UIUpdateMode mode)
 
 void View::requestParentLayout(UIUpdateMode mode)
 {
+	if (mode == UIUpdateMode::Init) {
+		return;
+	}
 	Ref<View> parent = m_parent;
 	if (parent.isNotNull()) {
 		parent->requestLayout(mode);
@@ -2326,6 +2332,9 @@ void View::requestParentLayout(UIUpdateMode mode)
 
 void View::requestParentAndSelfLayout(UIUpdateMode mode)
 {
+	if (mode == UIUpdateMode::Init) {
+		return;
+	}
 	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
 	if (layoutAttrs.isNotNull()) {
 		layoutAttrs->flagInvalidLayout = sl_true;
@@ -2339,6 +2348,24 @@ void View::requestParentAndSelfLayout(UIUpdateMode mode)
 			if (mode == UIUpdateMode::Redraw) {
 				invalidate();
 			}
+		}
+	}
+}
+
+void View::invalidateContentLayout(UIUpdateMode mode)
+{
+	if (mode == UIUpdateMode::Init) {
+		return;
+	}
+	if (isWidthWrapping() || isHeightWrapping()) {
+		Ref<View> parent = m_parent;
+		if (parent.isNotNull()) {
+			parent->requestLayout(UIUpdateMode::NoRedraw);
+		}
+	}
+	if (!(isNativeWidget())) {
+		if (mode == UIUpdateMode::Redraw) {
+			invalidate();
 		}
 	}
 }
@@ -6076,8 +6103,10 @@ void View::drawBorder(Canvas* canvas, const Ref<Pen>& pen)
 				break;
 			case BoundShape::Rectangle:
 			default:
-				rc.right -= 1;
-				rc.bottom -= 1;
+				if (isInstance()) {
+					rc.right -= 1;
+					rc.bottom -= 1;
+				}
 				rc.fixSizeError();
 				sl_bool flagAntiAlias = canvas->isAntiAlias();
 				canvas->setAntiAlias(sl_false);
@@ -6310,6 +6339,24 @@ void View::draw(Canvas* canvas)
 	CanvasStateScope scope(canvas);
 	drawContent(canvas);
 	
+}
+
+Size View::measureText(const String& text, const Ref<Font>& _font, sl_bool flagMultiLine)
+{
+	if (!(isInstance())) {
+		Ref<View> parent = m_parent;
+		if (parent.isNotNull()) {
+			return parent->measureText(text, _font, flagMultiLine);
+		}
+	}
+	Ref<Font> font = _font;
+	if (font.isNull()) {
+		font = getFont();
+		if (font.isNull()) {
+			return Size::zero();
+		}
+	}
+	return font->measureText(text, flagMultiLine);
 }
 
 void View::runAfterDraw(const Function<void()>& callback, sl_bool flagInvalidate)

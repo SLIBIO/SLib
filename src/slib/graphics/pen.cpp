@@ -15,10 +15,18 @@ PenDesc::PenDesc()
     miterLimit = 10;
 }
 
+PenDesc::~PenDesc()
+{
+}
+
 
 SLIB_DEFINE_OBJECT(Pen, Object)
 
 Pen::Pen()
+{
+}
+
+Pen::~Pen()
 {
 }
 

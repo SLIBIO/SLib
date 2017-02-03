@@ -111,6 +111,18 @@ void RenderView::renderViewContent(RenderEngine* engine)
 	}
 }
 
+Size RenderView::measureText(const String& text, const Ref<Font>& _font, sl_bool flagMultiLine)
+{
+	Ref<Font> font = _font;
+	if (font.isNull()) {
+		font = getFont();
+		if (font.isNull()) {
+			return Size::zero();
+		}
+	}
+	return RenderCanvas::measureRenderingText(font, text, flagMultiLine);
+}
+
 Ref<AnimationLoop> RenderView::getAnimationLoop()
 {
 	return m_animationLoop;

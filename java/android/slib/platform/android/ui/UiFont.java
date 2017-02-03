@@ -83,7 +83,16 @@ public class UiFont {
 		paint.setTextSize(size);
 	}
 	
-	public PointF getTextSize(String text) {
+	public FontMetrics getFontMetrics() {
+		try {
+			return paint.getFontMetrics();
+		} catch (Exception e) {
+			Logger.exception(e);
+			return null;
+		}
+	}
+
+	public PointF measureText(String text) {
 		float width = 0;
 		float height = this.height;
 		try {
@@ -96,15 +105,6 @@ public class UiFont {
 			Logger.exception(e);
 		}
 		return new PointF(width, height);
-	}
-
-	public FontMetrics getFontMetrics() {
-		try {
-			return paint.getFontMetrics();
-		} catch (Exception e) {
-			Logger.exception(e);
-			return null;
-		}
 	}
 
 }

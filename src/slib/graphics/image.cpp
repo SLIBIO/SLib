@@ -8,9 +8,23 @@
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
+ImageDesc::ImageDesc()
+ : width(0), height(0), stride(0), colors(sl_null)
+{
+}
+
+ImageDesc::~ImageDesc()
+{
+}
+
+
 SLIB_DEFINE_OBJECT(Image, Bitmap)
 
 Image::Image()
+{
+}
+
+Image::~Image()
 {
 }
 

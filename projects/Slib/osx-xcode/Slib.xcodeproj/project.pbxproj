@@ -184,6 +184,7 @@
 		26BBBEC81D8FDF1F00735947 /* view_page.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BBBEC71D8FDF1F00735947 /* view_page.cpp */; };
 		26BC2EC81E2E09B500D0801E /* dispatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BC2EC71E2E09B500D0801E /* dispatch.cpp */; };
 		26BF169C1E307DC000C9878C /* ui_animation.h in Headers */ = {isa = PBXBuildFile; fileRef = 26BF169B1E307DC000C9878C /* ui_animation.h */; };
+		26BFCFC51E41CFC700F4493D /* graphics_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BFCFC41E41CFC700F4493D /* graphics_text.cpp */; };
 		26C13E431DDA30FD00612945 /* url.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C13E421DDA30FD00612945 /* url.cpp */; };
 		26C13E451DDA32F000612945 /* url_request.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C13E441DDA32F000612945 /* url_request.cpp */; };
 		26C13E471DDA516D00612945 /* url_request_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26C13E461DDA516D00612945 /* url_request_apple.mm */; };
@@ -455,6 +456,7 @@
 		26BBBEC71D8FDF1F00735947 /* view_page.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view_page.cpp; sourceTree = "<group>"; };
 		26BC2EC71E2E09B500D0801E /* dispatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dispatch.cpp; sourceTree = "<group>"; };
 		26BF169B1E307DC000C9878C /* ui_animation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ui_animation.h; sourceTree = "<group>"; };
+		26BFCFC41E41CFC700F4493D /* graphics_text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graphics_text.cpp; sourceTree = "<group>"; };
 		26C13E421DDA30FD00612945 /* url.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = url.cpp; sourceTree = "<group>"; };
 		26C13E441DDA32F000612945 /* url_request.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = url_request.cpp; sourceTree = "<group>"; };
 		26C13E461DDA516D00612945 /* url_request_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = url_request_apple.mm; sourceTree = "<group>"; };
@@ -773,6 +775,7 @@
 				26FBDE621DA2B41700FF1B55 /* graphics_path_quartz.mm */,
 				26FBDE681DA2BDE900FF1B55 /* graphics_platform_apple.mm */,
 				2666122A1D2A44280081F26E /* graphics_resource.cpp */,
+				26BFCFC41E41CFC700F4493D /* graphics_text.cpp */,
 				266DD4871C1193C400D47AB0 /* graphics_util.cpp */,
 				266DD4881C1193C400D47AB0 /* image_jpeg.cpp */,
 				266DD4891C1193C400D47AB0 /* image_png.cpp */,
@@ -1237,6 +1240,7 @@
 				266DD55F1C11940A00D47AB0 /* media_platform_osx.mm in Sources */,
 				26E376DF1C98739200B178E6 /* matrix3.cpp in Sources */,
 				266DD4681C11930800D47AB0 /* sha1.cpp in Sources */,
+				26BFCFC51E41CFC700F4493D /* graphics_text.cpp in Sources */,
 				266DD49D1C1193C400D47AB0 /* pen.cpp in Sources */,
 				A2DE1D7F1B383B7900A74698 /* java.cpp in Sources */,
 				A2C8BE381AFA832800D584D1 /* thirdparty_sqlite3.c in Sources */,

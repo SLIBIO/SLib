@@ -12,6 +12,10 @@ Bitmap::Bitmap()
 {
 }
 
+Bitmap::~Bitmap()
+{
+}
+
 Ref<Bitmap> Bitmap::create(const ImageDesc& desc)
 {
 	Ref<Bitmap> ret = Bitmap::create(desc.width, desc.height);

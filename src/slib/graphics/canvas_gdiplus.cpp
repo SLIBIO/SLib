@@ -170,7 +170,9 @@ public:
 		if (status == Gdiplus::Ok) {
 			return Rectangle(rc.X, rc.Y, rc.X + rc.Width, rc.Y + rc.Height);
 		}
-		return Rectangle(Point::zero(), getSize());
+
+		Size size = getSize();
+		return Rectangle(0, 0, size.x, size.y);
 	}
 
     // override
@@ -224,7 +226,13 @@ public:
 		setMatrix(mat);
 	}
 
-    // override
+	// override
+	void drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color)
+	{
+		_Gdiplus_Canvas::drawText16(text, x, y, font, color);
+	}
+	
+	// override
 	void drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& _font, const Color& color)
 	{
 		if (text.isNotEmpty()) {
@@ -252,7 +260,7 @@ public:
 					graphics->DrawString((const WCHAR*)(text.getData()), (INT)(text.getLength())
 						, pf
 						, Gdiplus::PointF(x, y + 1)
-						, &format
+						, Gdiplus::StringFormat::GenericTypographic()
 						, &brush);
 				}
 			}

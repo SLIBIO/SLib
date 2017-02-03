@@ -25,6 +25,7 @@ class SLIB_EXPORT FreeType : public Object
 	
 public:
 	FreeType();
+	
 	~FreeType();
 	
 public:

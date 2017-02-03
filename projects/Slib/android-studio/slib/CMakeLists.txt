@@ -15,7 +15,7 @@ file (GLOB SLIB_FILES
     ${CMAKE_CURRENT_LIST_DIR}/../../../../src/slib/web/*.cpp
 )
 
-set(THIRDPARTY_FILES
+set (THIRDPARTY_FILES
  ${CMAKE_CURRENT_LIST_DIR}/../../../../src/thirdparty/thirdparty_libjpeg.c
  ${CMAKE_CURRENT_LIST_DIR}/../../../../src/thirdparty/thirdparty_libpng.c
  ${CMAKE_CURRENT_LIST_DIR}/../../../../src/thirdparty/thirdparty_zlib.c
@@ -23,28 +23,34 @@ set(THIRDPARTY_FILES
  ${CMAKE_CURRENT_LIST_DIR}/../../../../src/thirdparty/thirdparty_sqlite3.c
 )
 
-if (${ANDROID_ABI} STREQUAL "armeabi-v7a")
- set(THRIDPARTY_NEON_FILES
+if (ANDROID_ABI STREQUAL "armeabi-v7a")
+ set (THIRDPARTY_NEON_FILES
   ${CMAKE_CURRENT_LIST_DIR}/../../../../src/thirdparty/thirdparty_libopus.c
   ${CMAKE_CURRENT_LIST_DIR}/../../../../src/thirdparty/thirdparty_libvpx.c
   ${CMAKE_CURRENT_LIST_DIR}/../../../../src/thirdparty/thirdparty_libvpx_enc.c
   ${CMAKE_CURRENT_LIST_DIR}/../../../../src/thirdparty/thirdparty_libvpx_dec.c
  )
- set_property(SOURCE ${THRIDPARTY_NEON_FILES} APPEND_STRING PROPERTY COMPILE_FLAGS " -mfpu=neon")
+ if (CMAKE_BUILD_TYPE MATCHES Debug)
+  set_source_files_properties(${THIRDPARTY_NEON_FILES} PROPERTIES COMPILE_FLAGS -O3)
+ endif ()
+ set_property(SOURCE ${THIRDPARTY_NEON_FILES} APPEND_STRING PROPERTY COMPILE_FLAGS " -mfpu=neon")
  add_definitions("-DHAVE_NEON=1")
 else ()
- set(THRIDPARTY_NEON_FILES)
- set(THIRDPARTY_FILES ${THIRDPARTY_FILES}
+ set (THIRDPARTY_NEON_FILES)
+ set (THIRDPARTY_FILES ${THIRDPARTY_FILES}
   ${CMAKE_CURRENT_LIST_DIR}/../../../../src/thirdparty/thirdparty_libopus.c
   ${CMAKE_CURRENT_LIST_DIR}/../../../../src/thirdparty/thirdparty_libvpx.c
   ${CMAKE_CURRENT_LIST_DIR}/../../../../src/thirdparty/thirdparty_libvpx_enc.c
   ${CMAKE_CURRENT_LIST_DIR}/../../../../src/thirdparty/thirdparty_libvpx_dec.c
  )
 endif ()
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+ set_source_files_properties(${THIRDPARTY_FILES} PROPERTIES COMPILE_FLAGS -O3)
+endif ()
 
 add_library(
  slib STATIC
  ${SLIB_FILES}
  ${THIRDPARTY_FILES}
- ${THRIDPARTY_NEON_FILES}
+ ${THIRDPARTY_NEON_FILES}
 )

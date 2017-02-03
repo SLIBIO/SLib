@@ -4,6 +4,14 @@
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
+ColorComponentBuffer::ColorComponentBuffer()
+{
+}
+
+ColorComponentBuffer::~ColorComponentBuffer()
+{
+}
+
 BitmapData::BitmapData()
 {
 	width = 0;
@@ -28,6 +36,10 @@ BitmapData::BitmapData(const BitmapData& other) = default;
 BitmapData::BitmapData(sl_uint32 width, sl_uint32 height, const Color* colors, sl_int32 stride)
 {
 	setFromColors(width, height, colors, stride);
+}
+
+BitmapData::~BitmapData()
+{
 }
 
 void*& BitmapData::planeData(sl_uint32 plane)

@@ -64,19 +64,17 @@ public:
 public:
 	static Ref<_Android_Screen> create(jobject display)
 	{
-		Ref<_Android_Screen> ret;
-		if (display) {
-			JniLocal<jobject> size = _AndroidUtil::getDisplaySize.callObject(sl_null, display);
-			if (size.isNotNull()) {
-				ret = new _Android_Screen();
-				if (ret.isNotNull()) {
-					ret->m_display = display;
-					ret->m_width = _JAndroidPoint::x.get(size);
-					ret->m_height = _JAndroidPoint::y.get(size);
-				}
+		JniLocal<jobject> size = _AndroidUtil::getDisplaySize.callObject(sl_null, display);
+		if (size.isNotNull()) {
+			Ref<_Android_Screen> ret = new _Android_Screen();
+			if (ret.isNotNull()) {
+				ret->m_display = display;
+				ret->m_width = _JAndroidPoint::x.get(size);
+				ret->m_height = _JAndroidPoint::y.get(size);
+				return ret;
 			}
 		}
-		return ret;
+		return sl_null;
 	}
 
 public:
@@ -99,11 +97,7 @@ Ref<Screen> UI::getPrimaryScreen()
 		return sl_null;
 	}
 	if (ret.isNull()) {
-		jobject jactivity = Android::getCurrentActivity();
-		if (jactivity) {
-			JniLocal<jobject> display = _AndroidUtil::getDefaultDisplay.callObject(sl_null, jactivity);
-			ret = _Android_Screen::create(display);
-		}
+		ret = _Android_Screen::create(sl_null);
 	}
 	return ret;
 }

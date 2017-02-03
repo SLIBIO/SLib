@@ -12,7 +12,19 @@ typedef NSFont UIFont;
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
-Size Font::getTextSize(const String& text)
+sl_bool Font::_getFontMetrics_PO(FontMetrics& _out)
+{
+	CTFontRef handle = GraphicsPlatform::getCoreTextFont(this);
+	if (!handle) {
+		return sl_false;
+	}
+	_out.ascent = CTFontGetAscent(handle);
+	_out.descent = CTFontGetDescent(handle);
+	_out.leading = CTFontGetLeading(handle);
+	return sl_true;
+}
+
+Size Font::_measureText_PO(const String& text)
 {
 	CTFontRef handle = GraphicsPlatform::getCoreTextFont(this);
 	if (!handle) {
@@ -22,6 +34,7 @@ Size Font::getTextSize(const String& text)
 	Size ret(0, 0);
 	
 	NSString* ns_text = Apple::getNSStringFromString(text);
+	
 	CFStringRef string = (__bridge CFStringRef)ns_text;
 	
 	CFStringRef keys[] = { kCTFontAttributeName };
@@ -47,18 +60,6 @@ Size Font::getTextSize(const String& text)
 		CFRelease(attributes);
 	}
 	return ret;
-}
-
-sl_bool Font::_getFontMetrics_PO(FontMetrics& _out)
-{
-	CTFontRef handle = GraphicsPlatform::getCoreTextFont(this);
-	if (!handle) {
-		return sl_false;
-	}
-	_out.ascent = CTFontGetAscent(handle);
-	_out.descent = CTFontGetDescent(handle);
-	_out.leading = CTFontGetLeading(handle);
-	return sl_true;
 }
 
 class _Apple_FontObject : public Referable

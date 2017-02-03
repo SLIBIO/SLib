@@ -38,6 +38,9 @@ public:
 	void renderViewContent(RenderEngine* engine);
 	
 	// override
+	Size measureText(const String& text, const Ref<Font>& font, sl_bool flagMultiLine = sl_false);
+	
+	// override
 	Ref<AnimationLoop> getAnimationLoop();
 	
 	// override

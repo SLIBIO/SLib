@@ -24,6 +24,10 @@ DrawParam::DrawParam(const DrawParam& other)
 	}
 }
 
+DrawParam::~DrawParam()
+{
+}
+
 DrawParam& DrawParam::operator=(const DrawParam& other)
 {
 	useAlpha = other.useAlpha;
@@ -97,6 +101,14 @@ Color DrawParam::transformColor(const Color& src) const
 }
 
 SLIB_DEFINE_OBJECT(Drawable, Object)
+
+Drawable::Drawable()
+{
+}
+
+Drawable::~Drawable()
+{
+}
 
 sl_real Drawable::getDrawableWidth()
 {
@@ -245,7 +257,16 @@ Ref<Drawable> PlatformDrawable::loadFromAsset(const String& path)
 	return sl_null;
 }
 
+
 SLIB_DEFINE_OBJECT(ColorDrawable, Drawable)
+
+ColorDrawable::ColorDrawable()
+{
+}
+
+ColorDrawable::~ColorDrawable()
+{
+}
 
 Ref<Drawable> ColorDrawable::create(const Color& color)
 {
@@ -294,6 +315,14 @@ void ColorDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst, const Dr
 
 SLIB_DEFINE_OBJECT(EmptyDrawable, Drawable)
 
+EmptyDrawable::EmptyDrawable()
+{
+}
+
+EmptyDrawable::~EmptyDrawable()
+{
+}
+
 Ref<Drawable> EmptyDrawable::get()
 {
 	SLIB_SAFE_STATIC(Ref<Drawable>, ret, new EmptyDrawable)
@@ -313,6 +342,14 @@ void EmptyDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst, const Dr
 
 
 SLIB_DEFINE_OBJECT(SubDrawable, Drawable)
+
+SubDrawable::SubDrawable()
+{
+}
+
+SubDrawable::~SubDrawable()
+{
+}
 
 Ref<Drawable> SubDrawable::create(const Ref<Drawable>& src, sl_real x, sl_real y, sl_real width, sl_real height)
 {
@@ -367,6 +404,14 @@ void SubDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst, const Draw
 
 
 SLIB_DEFINE_OBJECT(ScaledDrawable, Drawable)
+
+ScaledDrawable::ScaledDrawable()
+{
+}
+
+ScaledDrawable::~ScaledDrawable()
+{
+}
 
 Ref<Drawable> ScaledDrawable::create(const Ref<Drawable>& src, sl_real width, sl_real height)
 {
@@ -423,6 +468,14 @@ void ScaledDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst, const D
 
 
 SLIB_DEFINE_OBJECT(ScaledSubDrawable, Drawable)
+
+ScaledSubDrawable::ScaledSubDrawable()
+{
+}
+
+ScaledSubDrawable::~ScaledSubDrawable()
+{
+}
 
 Ref<Drawable> ScaledSubDrawable::create(const Ref<Drawable>& src, const Rectangle& rectSrc, sl_real width, sl_real height)
 {
@@ -485,6 +538,14 @@ void ScaledSubDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst, cons
 
 
 SLIB_DEFINE_OBJECT(FilterDrawable, Drawable)
+
+FilterDrawable::FilterDrawable()
+{
+}
+
+FilterDrawable::~FilterDrawable()
+{
+}
 
 Ref<Drawable> FilterDrawable::create(const Ref<Drawable>& src, const ColorMatrix& colorMatrix, sl_real alpha, sl_real blurRadius)
 {
@@ -569,6 +630,14 @@ void FilterDrawable::_prepareParam(DrawParam& dst, const DrawParam& src)
 
 
 SLIB_DEFINE_OBJECT(NinePiecesDrawable, Drawable)
+
+NinePiecesDrawable::NinePiecesDrawable()
+{
+}
+
+NinePiecesDrawable::~NinePiecesDrawable()
+{
+}
 
 Ref<Drawable> NinePiecesDrawable::create(sl_real leftWidth, sl_real rightWidth, sl_real topHeight, sl_real bottomHeight,
 									 const Ref<Drawable>& topLeft, const Ref<Drawable>& top, const Ref<Drawable>& topRight,
@@ -664,6 +733,14 @@ void NinePiecesDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst, con
 
 
 SLIB_DEFINE_OBJECT(NinePatchDrawable, Drawable)
+
+NinePatchDrawable::NinePatchDrawable()
+{
+}
+
+NinePatchDrawable::~NinePatchDrawable()
+{
+}
 
 Ref<Drawable> NinePatchDrawable::create(sl_real leftWidthDst, sl_real rightWidthDst, sl_real topHeightDst, sl_real bottomHeightDst,
 				const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc, sl_real topHeightSrc, sl_real bottomHeightSrc)
@@ -806,6 +883,14 @@ void NinePatchDrawable::onDrawAll(Canvas* canvas, const Rectangle& rectDst, cons
 
 SLIB_DEFINE_OBJECT(HorizontalThreePatchDrawable, Drawable)
 
+HorizontalThreePatchDrawable::HorizontalThreePatchDrawable()
+{
+}
+
+HorizontalThreePatchDrawable::~HorizontalThreePatchDrawable()
+{
+}
+
 Ref<Drawable> HorizontalThreePatchDrawable::create(sl_real leftWidthDst, sl_real rightWidthDst,
 										const Ref<Drawable>& src, sl_real leftWidthSrc, sl_real rightWidthSrc)
 {
@@ -891,6 +976,14 @@ void HorizontalThreePatchDrawable::onDrawAll(Canvas* canvas, const Rectangle& re
 
 
 SLIB_DEFINE_OBJECT(VerticalThreePatchDrawable, Drawable)
+
+VerticalThreePatchDrawable::VerticalThreePatchDrawable()
+{
+}
+
+VerticalThreePatchDrawable::~VerticalThreePatchDrawable()
+{
+}
 
 Ref<Drawable> VerticalThreePatchDrawable::create(sl_real topHeightDst, sl_real bottomHeightDst,
 										const Ref<Drawable>& src, sl_real topHeightSrc, sl_real bottomHeightSrc)
@@ -982,6 +1075,10 @@ MipmapDrawable::MipmapDrawable()
 {
 	m_width = 1;
 	m_height = 1;
+}
+
+MipmapDrawable::~MipmapDrawable()
+{
 }
 
 sl_real MipmapDrawable::getDrawableWidth()

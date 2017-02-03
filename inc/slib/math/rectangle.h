@@ -36,8 +36,8 @@ public:
 	 left(_left), top(_top), right(_right), bottom(_bottom)
 	{}
 	
-	constexpr RectangleT(const PointT<T, FT>& pt, const SizeT<T, FT>& size):
-	 left(pt.x), top(pt.y), right(pt.x + size.x), bottom(pt.y + size.y)
+	constexpr RectangleT(const PointT<T, FT>& leftTop, const SizeT<T, FT>& rightBottom):
+	 left(leftTop.x), top(leftTop.y), right(rightBottom.x), bottom(rightBottom.y)
 	{}
 	
 public:
