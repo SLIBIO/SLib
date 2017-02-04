@@ -312,10 +312,27 @@ NSMenuItem* UIPlatform::getMenuItemHandle(const Ref<MenuItem>& item)
 	return nil;
 }
 
-void UIApp::setMenu(const Ref<Menu>& menu)
+void UIApp::setMenu(const Ref<Menu>& _menu)
 {
-	m_mainMenu = menu;
-	[[NSApplication sharedApplication] setMainMenu: UIPlatform::getMenuHandle(menu)];
+	m_mainMenu = _menu;
+	NSMenu* menu = UIPlatform::getMenuHandle(_menu);
+	if (menu != nil) {
+		NSApplication* app = [NSApplication sharedApplication];
+		[app setMainMenu: menu];
+		Ref<MenuItem> item = _menu->getMenuItem(0);
+		if (item.isNotNull()) {
+			String text = item->getText();
+			if (text.isNotEmpty()) {
+				NSMenuItem* nsItem = [menu itemAtIndex:0];
+				if (nsItem != nil) {
+					NSMenu* nsSubMenu = [nsItem submenu];
+					if (nsSubMenu != nil) {
+						[nsSubMenu setTitle:(Apple::getNSStringFromString(text.replaceAll("&", String::null()) + " "))];
+					}
+				}
+			}
+		}
+	}
 }
 
 SLIB_UI_NAMESPACE_END
