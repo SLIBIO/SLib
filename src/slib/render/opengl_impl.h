@@ -13,6 +13,8 @@
 #define STACK_BUFFER_COUNT 128
 #define STACK_IMAGE_SIZE 16384
 
+#define MAX_SAMPLER_COUNT 16
+
 SLIB_RENDER_NAMESPACE_BEGIN
 
 void GL_BASE::setViewport(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
@@ -349,6 +351,16 @@ void GL_BASE::updateIndexBuffer(sl_uint32 buffer, sl_size offset, const void* da
 	_GL_updateBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer, offset, data, size);
 }
 
+void GL_BASE::bindIndexBuffer(sl_uint32 buffer)
+{
+	GL_ENTRY(glBindBuffer)(GL_ELEMENT_ARRAY_BUFFER, buffer);
+}
+
+void GL_BASE::unbindIndexBuffer()
+{
+	GL_ENTRY(glBindBuffer)(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
 void GL_BASE::deleteBuffer(sl_uint32 buffer)
 {
 	if (buffer) {
@@ -664,43 +676,35 @@ void GL_BASE::setUniformTextureSampler(sl_int32 uniformLocation, sl_uint32 textu
 	}
 }
 
-SLIB_INLINE static void _GL_drawVertices(GLenum mode, sl_uint32 countVertices, sl_uint32 startIndex)
+SLIB_INLINE static GLenum _GL_getPrimitiveType(PrimitiveType type)
 {
-	GL_ENTRY(glDrawArrays)(mode, startIndex, countVertices);
-}
-SLIB_INLINE static void _GL_drawIndices(GLenum mode, sl_uint32 countIndices, const sl_uint16* indices)
-{
-	GL_ENTRY(glBindBuffer)(GL_ELEMENT_ARRAY_BUFFER, 0);
-	GL_ENTRY(glDrawElements)(mode, countIndices, GL_UNSIGNED_SHORT, indices);
-}
-SLIB_INLINE static void _GL_drawIndices(GLenum mode, sl_uint32 countIndices, sl_uint32 indexBuffer, sl_size offsetBytes)
-{
-	GL_ENTRY(glBindBuffer)(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-	GL_ENTRY(glDrawElements)(mode, countIndices, GL_UNSIGNED_SHORT, (void*)offsetBytes);
-	GL_ENTRY(glBindBuffer)(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
-
-#define _SL_DRAW(t1, t2) \
-	void GL_BASE::draw##t1(sl_uint32 countVertices, sl_uint32 startIndex) \
-	{ \
-		_GL_drawVertices(t2, countVertices, startIndex); \
-	} \
-	void GL_BASE::draw##t1(sl_uint32 countIndices, const sl_uint16* indices)  \
-	{ \
-		_GL_drawIndices(t2, countIndices, indices); \
-	} \
-	void GL_BASE::draw##t1(sl_uint32 countIndices, sl_uint32 indexBuffer, sl_size offsetBytes) \
-	{ \
-		_GL_drawIndices(t2, countIndices, indexBuffer, offsetBytes); \
+	switch (type) {
+		case PrimitiveType::Triangle:
+			return GL_TRIANGLES;
+		case PrimitiveType::TriangleStrip:
+			return GL_TRIANGLE_STRIP;
+		case PrimitiveType::TriangleFan:
+			return GL_TRIANGLE_FAN;
+		case PrimitiveType::Line:
+			return GL_LINES;
+		case PrimitiveType::LineLoop:
+			return GL_LINE_LOOP;
+		case PrimitiveType::LineStrip:
+			return GL_LINE_STRIP;
+		case PrimitiveType::Point:
+			return GL_POINTS;
 	}
+}
 
-_SL_DRAW(Triangles, GL_TRIANGLES)
-_SL_DRAW(TriangleStrip, GL_TRIANGLE_STRIP)
-_SL_DRAW(TriangleFan, GL_TRIANGLE_FAN)
-_SL_DRAW(Lines, GL_LINES)
-_SL_DRAW(LineLoop, GL_LINE_LOOP)
-_SL_DRAW(LineStrip, GL_LINE_STRIP)
-_SL_DRAW(Points, GL_POINTS)
+void GL_BASE::drawPrimitives(PrimitiveType type, sl_uint32 countVertices, sl_uint32 startIndex)
+{
+	GL_ENTRY(glDrawArrays)(_GL_getPrimitiveType(type), startIndex, countVertices);
+}
+
+void GL_BASE::drawElements(PrimitiveType type, sl_uint32 countIndices, sl_size offsetBytes)
+{
+	GL_ENTRY(glDrawElements)(_GL_getPrimitiveType(type), countIndices, GL_UNSIGNED_SHORT, (void*)offsetBytes);
+}
 
 void GL_BASE::setLineWidth(float width)
 {
@@ -1022,6 +1026,34 @@ public:
 	class _RenderProgramInstance;
 	Ref<RenderProgram> m_currentProgram;
 	Ref<_RenderProgramInstance> m_currentProgramInstance;
+	
+	class _VertexBufferInstance;
+	Ref<_VertexBufferInstance> m_currentVertexBufferInstance;
+	
+	class _IndexBufferInstance;
+	Ref<_IndexBufferInstance> m_currentIndexBufferInstance;
+	
+	Ref<RenderProgram> m_currentProgramRendering;
+	Ref<_RenderProgramInstance> m_currentProgramInstanceRendering;
+	
+	class _TextureInstance;
+	
+	class _SamplerState {
+	public:
+		Ref<Texture> texture;
+		Ref<_TextureInstance> instance;
+		TextureFilterMode minFilter;
+		TextureFilterMode magFilter;
+		TextureWrapMode wrapX;
+		TextureWrapMode wrapY;
+	public:
+		void reset()
+		{
+			texture.setNull();
+			instance.setNull();
+		}
+	};
+	_SamplerState m_currentSamplers[MAX_SAMPLER_COUNT];
 
 public:
 	GL_ENGINE()
@@ -1438,24 +1470,33 @@ public:
 			return sl_false;
 		}
 		_RenderProgramInstance* instance = (_RenderProgramInstance*)_instance;
-		GL_BASE::useProgram(instance->program);
-		m_currentProgram = program;
-		m_currentProgramInstance = instance;
+		if (m_currentProgramInstance != instance) {
+			GL_BASE::useProgram(instance->program);
+			m_currentProgramInstance = instance;
+		}
 		if (ppState) {
 			*ppState = instance->state.get();
 		}
+		m_currentProgram = program;
 		return sl_true;
 	}
 
 	// override
 	void _endProgram()
 	{
-		if (!isCurrentEngine()) {
-			return;
-		}
-		GL_BASE::useProgram(0);
+	}
+	
+	void _resetCurrentBuffers()
+	{
 		m_currentProgram.setNull();
 		m_currentProgramInstance.setNull();
+		m_currentProgramRendering.setNull();
+		m_currentProgramInstanceRendering.setNull();
+		m_currentVertexBufferInstance.setNull();
+		m_currentIndexBufferInstance.setNull();
+		for (sl_uint32 i = 0; i < MAX_SAMPLER_COUNT; i++) {
+			m_currentSamplers[i].reset();
+		}
 	}
 
 	// override
@@ -1470,85 +1511,106 @@ public:
 		if (m_currentProgramInstance.isNull()) {
 			return;
 		}
-		_VertexBufferInstance* vb = (_VertexBufferInstance*)(primitive->vertexBufferInstance.get());
+		
+		_VertexBufferInstance* vb = static_cast<_VertexBufferInstance*>(primitive->vertexBufferInstance.get());
 		vb->_update(primitive->vertexBuffer.get());
-		if (primitive->indexBuffer.isNotNull()) {
-			_IndexBufferInstance* ib = (_IndexBufferInstance*)(primitive->indexBufferInstance.get());
+		_IndexBufferInstance* ib = sl_null;
+		if (primitive->indexBufferInstance.isNotNull()) {
+			ib = (_IndexBufferInstance*)(primitive->indexBufferInstance.get());
 			ib->_update(primitive->indexBuffer.get());
+		}
+		
+		sl_bool flagResetProgramState = sl_false;
+		if (m_currentProgramInstanceRendering != m_currentProgramInstance) {
+			flagResetProgramState = sl_true;
+		}
+		if (vb != m_currentVertexBufferInstance || ib != m_currentIndexBufferInstance) {
+			flagResetProgramState = sl_true;
+			m_currentVertexBufferInstance = vb;
+			m_currentIndexBufferInstance = ib;
 			GL_BASE::bindVertexBuffer(vb->handle);
-			if (m_currentProgram->onPreRender(this, m_currentProgramInstance->state.get(), primitive)) {
-				switch (primitive->type) {
-				case PrimitiveType::Triangles:
-					GL_BASE::drawTriangles(primitive->countElements, ib->handle, 0);
-					break;
-				case PrimitiveType::TriangleStrip:
-					GL_BASE::drawTriangleStrip(primitive->countElements, ib->handle, 0);
-					break;
-				case PrimitiveType::TriangleFan:
-					GL_BASE::drawTriangleFan(primitive->countElements, ib->handle, 0);
-					break;
-				case PrimitiveType::Lines:
-					GL_BASE::drawLines(primitive->countElements, ib->handle, 0);
-					break;
-				case PrimitiveType::LineStrip:
-					GL_BASE::drawLineStrip(primitive->countElements, ib->handle, 0);
-					break;
-				case PrimitiveType::Points:
-					GL_BASE::drawPoints(primitive->countElements, ib->handle, 0);
-					break;
-				}
-				m_currentProgram->onPostRender(this, m_currentProgramInstance->state.get(), primitive);
+			if (ib) {
+				GL_BASE::bindIndexBuffer(ib->handle);
 			}
-			//GL_BASE::unbindVertexBuffer();
+		}
+		
+		if (flagResetProgramState) {
+			if (m_currentProgramInstanceRendering.isNotNull()) {
+				m_currentProgramRendering->onPostRender(this, m_currentProgramInstance->state.get());
+			}
+			m_currentProgramInstanceRendering = m_currentProgramInstance;
+			m_currentProgramRendering = m_currentProgram;
+			m_currentProgram->onPreRender(this, m_currentProgramInstance->state.get());
+		}
+		
+		if (ib) {
+			GL_BASE::drawElements(primitive->type, primitive->countElements);
 		} else {
-			GL_BASE::bindVertexBuffer(vb->handle);
-			if (m_currentProgram->onPreRender(this, m_currentProgramInstance->state.get(), primitive)) {
-				switch (primitive->type) {
-				case PrimitiveType::Triangles:
-					GL_BASE::drawTriangles(primitive->countElements);
-					break;
-				case PrimitiveType::TriangleStrip:
-					GL_BASE::drawTriangleStrip(primitive->countElements);
-					break;
-				case PrimitiveType::TriangleFan:
-					GL_BASE::drawTriangleFan(primitive->countElements);
-					break;
-				case PrimitiveType::Lines:
-					GL_BASE::drawLines(primitive->countElements);
-					break;
-				case PrimitiveType::LineStrip:
-					GL_BASE::drawLineStrip(primitive->countElements);
-					break;
-				case PrimitiveType::Points:
-					GL_BASE::drawPoints(primitive->countElements);
-					break;
-				}
-				m_currentProgram->onPostRender(this, m_currentProgramInstance->state.get(), primitive);
-			}
-			//GL_BASE::unbindVertexBuffer();
+			GL_BASE::drawPrimitives(primitive->type, primitive->countElements);
 		}
 	}
 	
 	// override
 	void _applyTexture(sl_reg _samplerNo, Texture* texture, TextureInstance* _instance)
 	{
+		sl_uint32 samplerNo = (sl_uint32)(_samplerNo);
+		if (samplerNo > MAX_SAMPLER_COUNT) {
+			return;
+		}
 		if (!isCurrentEngine()) {
 			return;
 		}
-		sl_uint32 samplerNo = (sl_uint32)(_samplerNo);
 		if (_instance) {
-			GL_BASE::setActiveSampler(samplerNo);
 			_TextureInstance* instance = (_TextureInstance*)_instance;
 			instance->_update(texture);
-			GL_BASE::bindTexture2D(instance->handle);
-			GL_BASE::setTexture2DFilterMode(texture->getMinFilter(), texture->getMagFilter());
-			GL_BASE::setTexture2DWrapMode(texture->getWrapX(), texture->getWrapY());
+			if (m_currentSamplers[samplerNo].instance != instance) {
+				GL_BASE::setActiveSampler(samplerNo);
+				GL_BASE::bindTexture2D(instance->handle);
+				GL_BASE::setTexture2DFilterMode(texture->getMinFilter(), texture->getMagFilter());
+				GL_BASE::setTexture2DWrapMode(texture->getWrapX(), texture->getWrapY());
+				m_currentSamplers[samplerNo].texture = texture;
+				m_currentSamplers[samplerNo].instance = instance;
+				m_currentSamplers[samplerNo].minFilter = texture->getMinFilter();
+				m_currentSamplers[samplerNo].magFilter = texture->getMagFilter();
+				m_currentSamplers[samplerNo].wrapX = texture->getWrapX();
+				m_currentSamplers[samplerNo].wrapY = texture->getWrapY();
+			} else {
+				if (m_currentSamplers[samplerNo].minFilter != texture->getMinFilter() || m_currentSamplers[samplerNo].magFilter != texture->getMagFilter()) {
+					GL_BASE::setTexture2DFilterMode(texture->getMinFilter(), texture->getMagFilter());
+					m_currentSamplers[samplerNo].minFilter = texture->getMinFilter();
+					m_currentSamplers[samplerNo].magFilter = texture->getMagFilter();
+				}
+				if (m_currentSamplers[samplerNo].wrapX != texture->getWrapX() || m_currentSamplers[samplerNo].wrapY != texture->getWrapY()) {
+					GL_BASE::setTexture2DWrapMode(texture->getWrapX(), texture->getWrapY());
+					m_currentSamplers[samplerNo].wrapX = texture->getWrapX();
+					m_currentSamplers[samplerNo].wrapY = texture->getWrapY();
+				}
+			}
 		} else {
-			_NamedTexture* named = static_cast<_NamedTexture*>(texture);
-			GL_BASE::setActiveSampler(samplerNo);
-			GL_BASE::bindTexture(named->m_target, named->m_name);
-			GL_BASE::setTextureFilterMode(named->m_target, texture->getMinFilter(), texture->getMagFilter());
-			GL_BASE::setTextureWrapMode(named->m_target, texture->getWrapX(), texture->getWrapY());
+			if (m_currentSamplers[samplerNo].texture != texture) {
+				_NamedTexture* named = static_cast<_NamedTexture*>(texture);
+				GL_BASE::setActiveSampler(samplerNo);
+				GL_BASE::bindTexture(named->m_target, named->m_name);
+				GL_BASE::setTextureFilterMode(named->m_target, texture->getMinFilter(), texture->getMagFilter());
+				GL_BASE::setTextureWrapMode(named->m_target, texture->getWrapX(), texture->getWrapY());
+				m_currentSamplers[samplerNo].texture = texture;
+				m_currentSamplers[samplerNo].instance.setNull();
+				m_currentSamplers[samplerNo].minFilter = texture->getMinFilter();
+				m_currentSamplers[samplerNo].magFilter = texture->getMagFilter();
+				m_currentSamplers[samplerNo].wrapX = texture->getWrapX();
+				m_currentSamplers[samplerNo].wrapY = texture->getWrapY();
+			} else {
+				if (m_currentSamplers[samplerNo].minFilter != texture->getMinFilter() || m_currentSamplers[samplerNo].magFilter != texture->getMagFilter()) {
+					GL_BASE::setTexture2DFilterMode(texture->getMinFilter(), texture->getMagFilter());
+					m_currentSamplers[samplerNo].minFilter = texture->getMinFilter();
+					m_currentSamplers[samplerNo].magFilter = texture->getMagFilter();
+				}
+				if (m_currentSamplers[samplerNo].wrapX != texture->getWrapX() || m_currentSamplers[samplerNo].wrapY != texture->getWrapY()) {
+					GL_BASE::setTexture2DWrapMode(texture->getWrapX(), texture->getWrapY());
+					m_currentSamplers[samplerNo].wrapX = texture->getWrapX();
+					m_currentSamplers[samplerNo].wrapY = texture->getWrapY();
+				}
+			}
 		}
 	}
 

@@ -41,55 +41,11 @@ public:
 
 	/* objects are represented as unsigned integers (zero means null object) */
 
-	// draw
-	static void drawTriangles(sl_uint32 countVertices, sl_uint32 startIndex = 0);
+	// draw	
+	static void drawPrimitives(PrimitiveType type, sl_uint32 countVertices, sl_uint32 startIndex = 0);
 	
-	static void drawTriangles(sl_uint32 countIndices, const sl_uint16* indices);
+	static void drawElements(PrimitiveType type, sl_uint32 countIndices, sl_size offsetBytes = 0);
 	
-	static void drawTriangles(sl_uint32 countIndices, sl_uint32 indexBuffer, sl_size offsetBytes);
-	
-	
-	static void drawTriangleStrip(sl_uint32 countVertices, sl_uint32 startIndex = 0);
-	
-	static void drawTriangleStrip(sl_uint32 countIndices, const sl_uint16* indices);
-	
-	static void drawTriangleStrip(sl_uint32 countIndices, sl_uint32 indexBuffer, sl_size offsetBytes);
-	
-	
-	static void drawTriangleFan(sl_uint32 countVertices, sl_uint32 startIndex = 0);
-	
-	static void drawTriangleFan(sl_uint32 countIndices, const sl_uint16* indices);
-	
-	static void drawTriangleFan(sl_uint32 countIndices, sl_uint32 indexBuffer, sl_size offsetBytes);
-	
-	
-	static void drawLines(sl_uint32 countVertices, sl_uint32 startIndex = 0);
-	
-	static void drawLines(sl_uint32 countIndices, const sl_uint16* indices);
-	
-	static void drawLines(sl_uint32 countIndices, sl_uint32 indexBuffer, sl_size offsetBytes);
-	
-	
-	static void drawLineStrip(sl_uint32 countVertices, sl_uint32 startIndex = 0);
-	
-	static void drawLineStrip(sl_uint32 countIndices, const sl_uint16* indices);
-	
-	static void drawLineStrip(sl_uint32 countIndices, sl_uint32 indexBuffer, sl_size offsetBytes);
-	
-	
-	static void drawLineLoop(sl_uint32 countVertices, sl_uint32 startIndex = 0);
-	
-	static void drawLineLoop(sl_uint32 countIndices, const sl_uint16* indices);
-	
-	static void drawLineLoop(sl_uint32 countIndices, sl_uint32 indexBuffer, sl_size offsetBytes);
-	
-	
-	static void drawPoints(sl_uint32 countVertices, sl_uint32 startIndex = 0);
-	
-	static void drawPoints(sl_uint32 countIndices, const sl_uint16* indices);
-	
-	static void drawPoints(sl_uint32 countIndices, sl_uint32 indexBuffer, sl_size offsetBytes);
-
 	
 	static void setLineWidth(float width);
 	
@@ -168,6 +124,10 @@ public:
 	static sl_uint32 createIndexBuffer(sl_size size, sl_bool flagStatic = sl_true);
 	
 	static void updateIndexBuffer(sl_uint32 buffer, sl_size offset, const void* data, sl_size size);
+	
+	static void bindIndexBuffer(sl_uint32 buffer);
+	
+	static void unbindIndexBuffer();
 	
 	static void deleteBuffer(sl_uint32 buffer);
 

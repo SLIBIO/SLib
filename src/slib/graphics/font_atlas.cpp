@@ -5,9 +5,9 @@
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
-#define PLANE_SIZE_MIN 64
-#define PLANE_WIDTH_DEFAULT 1024
-#define PLANE_HEIGHT_DEFAULT 64
+#define PLANE_SIZE_MIN 32
+#define PLANE_WIDTH_DEFAULT 0
+#define PLANE_HEIGHT_DEFAULT 0
 #define MAX_PLANES_DEFAULT 16
 #define FONT_SIZE_MIN 4
 #define FONT_SIZE_MAX 48
@@ -50,7 +50,7 @@ Ref<FontAtlas> FontAtlas::create(const FontAtlasParam& param)
 {
 	if (param.font.isNotNull()) {
 		String fontFamily = param.font->getFamilyName();
-		sl_real fontSize = param.font->getSize();
+		sl_real fontSize = param.font->getFontHeight();
 		sl_bool fontBold = param.font->isBold();
 		Ref<Font> fontSource = Font::create(fontFamily, fontSize, fontBold);
 		if (fontSource.isNotNull()) {
@@ -63,10 +63,19 @@ Ref<FontAtlas> FontAtlas::create(const FontAtlasParam& param)
 			Ref<Font> fontDraw = Font::create(fontFamily, fontSize, fontBold);
 			if (fontDraw.isNotNull()) {
 				sl_uint32 planeWidth = param.planeWidth;
+				if (planeWidth == 0) {
+					planeWidth = (sl_uint32)(fontDraw->getFontHeight() * 16);
+					if (planeWidth > 1024) {
+						planeWidth = 1024;
+					}
+				}
 				if (planeWidth < PLANE_SIZE_MIN) {
 					planeWidth = PLANE_SIZE_MIN;
 				}
 				sl_uint32 planeHeight = param.planeHeight;
+				if (planeHeight == 0) {
+					planeHeight = (sl_uint32)(fontDraw->getFontHeight());
+				}
 				if (planeHeight < PLANE_SIZE_MIN) {
 					planeHeight = PLANE_SIZE_MIN;
 				}
@@ -108,16 +117,16 @@ Ref<FontAtlas> FontAtlas::getShared(const Ref<Font>& font)
 		_FontAtlasMap* map = _FontAtlas_getShared();
 		if (map) {
 			String fontFamily = font->getFamilyName();
-			int fontSize10 = (int)(font->getSize() * 10);
+			int fontSize = (int)(font->getSize());
 			sl_bool fontBold = font->isBold();
-			String sig = String::format("%s_%d_%s", fontFamily, fontSize10, fontBold?"B":"");
+			String sig = String::format("%s_%d_%s", fontFamily, fontSize, fontBold?"B":"");
 			WeakRef<FontAtlas> weakFA;
 			map->get(sig, &weakFA);
 			Ref<FontAtlas> ret = weakFA;
 			if (ret.isNotNull()) {
 				return ret;
 			}
-			Ref<Font> fontSource = Font::create(fontFamily, ((sl_real)fontSize10) / 10, fontBold);
+			Ref<Font> fontSource = Font::create(fontFamily, (sl_real)fontSize, fontBold);
 			if (fontSource.isNotNull()) {
 				FontAtlasParam fap;
 				fap.font = fontSource;
@@ -276,22 +285,19 @@ sl_bool FontAtlas::_getChar(sl_char16 ch, sl_bool flagSizeOnly, FontAtlasChar& _
 
 	sl_uint32 widthChar = sizeDraw.x;
 	sl_uint32 heightChar = sizeDraw.y;
-	if (sizeDraw.x <= 0 || sizeDraw.y <= 0 || widthChar > m_planeWidth || heightChar > m_planeHeight) {
+	if (sizeDraw.x <= 0 || sizeDraw.y <= 0) {
 		_out.fontWidth = 0;
 		_out.fontHeight = 0;
 		m_map.put_NoLock(ch, _out);
 		return sl_false;
 	}
 	
-	widthChar++;
-	heightChar++;
-	
-	if (m_currentPlaneX + widthChar > m_planeWidth) {
+	if (m_currentPlaneX > 0 && m_currentPlaneX + widthChar > m_planeWidth) {
 		m_currentPlaneX = 0;
 		m_currentPlaneY += m_currentPlaneRowHeight;
 		m_currentPlaneRowHeight = 0;
 	}
-	if (m_currentPlaneY + heightChar > m_planeHeight) {
+	if (m_currentPlaneY > 0 && m_currentPlaneY + heightChar > m_planeHeight) {
 		if (m_countPlanes >= m_maxPlanes) {
 			m_map.removeAll_NoLock();
 			m_countPlanes = 1;

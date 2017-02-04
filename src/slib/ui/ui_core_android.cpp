@@ -122,7 +122,6 @@ sl_bool UI::isUiThread()
 	return _AndroidUiThread::isUiThread.callBoolean(sl_null) != 0;
 }
 
-
 void UI::openUrl(const String& _url) {
 	jobject jactivity = Android::getCurrentActivity();
 	if (jactivity) {

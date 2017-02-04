@@ -36,12 +36,12 @@ sl_bool RenderProgram::onInit(RenderEngine* engine, RenderProgramState* state)
 	return sl_true;
 }
 
-sl_bool RenderProgram::onPreRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive)
+sl_bool RenderProgram::onPreRender(RenderEngine* engine, RenderProgramState* state)
 {
 	return sl_true;
 }
 
-void RenderProgram::onPostRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive)
+void RenderProgram::onPostRender(RenderEngine* engine, RenderProgramState* state)
 {
 }
 
@@ -185,7 +185,7 @@ sl_bool _RenderProgramTemplate::onInit(RenderEngine* _engine, RenderProgramState
 	return sl_false;
 }
 
-sl_bool _RenderProgramTemplate::onPreRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
+sl_bool _RenderProgramTemplate::onPreRender(RenderEngine* _engine, RenderProgramState* _state)
 {
 	RenderEngineType type = _engine->getEngineType();
 	
@@ -227,7 +227,7 @@ sl_bool _RenderProgramTemplate::onPreRender(RenderEngine* _engine, RenderProgram
 	return sl_false;
 }
 
-void _RenderProgramTemplate::onPostRender(RenderEngine* _engine, RenderProgramState* _state, Primitive* primitive)
+void _RenderProgramTemplate::onPostRender(RenderEngine* _engine, RenderProgramState* _state)
 {
 	RenderEngineType type = _engine->getEngineType();
 	
