@@ -23,6 +23,8 @@ public:
 public:
 	PenDesc();
 	
+	~PenDesc();
+	
 };
 
 class SLIB_EXPORT Pen : public Object
@@ -31,6 +33,8 @@ class SLIB_EXPORT Pen : public Object
 	
 protected:
 	Pen();
+	
+	~Pen();
 	
 public:
 	static Ref<Pen> getDefault();

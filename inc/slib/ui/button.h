@@ -57,6 +57,10 @@ public:
 	ButtonState getButtonState();
 	
 	
+	sl_bool isMultiLine();
+	
+	void setMultiLine(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
+
 	const UISize& getIconSize();
 	
 	virtual void setIconSize(const UISize& size, UIUpdateMode mode = UIUpdateMode::Redraw);
@@ -229,6 +233,7 @@ public:
 
 private:
 	AtomicString m_text;
+	sl_bool m_flagMultiLine;
 	sl_bool m_flagDefaultButton;
 
 	ButtonState m_state;

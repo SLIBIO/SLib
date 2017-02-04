@@ -20,24 +20,10 @@ SLIB_JNI_END_CLASS
 
 SLIB_JNI_BEGIN_CLASS(_JAndroidFont, "slib/platform/android/ui/UiFont")
 	SLIB_JNI_STATIC_METHOD(create, "create", "(Ljava/lang/String;FI)Lslib/platform/android/ui/UiFont;");
-	SLIB_JNI_METHOD(getTextSize, "getTextSize", "(Ljava/lang/String;)Landroid/graphics/PointF;");
 	SLIB_JNI_METHOD(getFontMetrics, "getFontMetrics", "()Landroid/graphics/Paint$FontMetrics;");
+	SLIB_JNI_METHOD(measureText, "measureText", "(Ljava/lang/String;)Landroid/graphics/PointF;");
 SLIB_JNI_END_CLASS
 
-
-Size Font::getTextSize(const String& text)
-{
-	jobject font = GraphicsPlatform::getNativeFont(this);
-	if (font) {	
-		JniLocal<jstring> jtext = Jni::getJniString(text);
-		JniLocal<jobject> size = _JAndroidFont::getTextSize.callObject(font, jtext.get());
-		Size ret;
-		ret.x = _JAndroidPointF::x.get(size.get());
-		ret.y = _JAndroidPointF::y.get(size.get());
-		return ret;
-	}
-	return Size::zero();
-}
 
 sl_bool Font::_getFontMetrics_PO(FontMetrics& _out)
 {
@@ -52,6 +38,20 @@ sl_bool Font::_getFontMetrics_PO(FontMetrics& _out)
 		}
 	}
 	return sl_false;
+}
+
+Size Font::_measureText_PO(const String& text)
+{
+	jobject font = GraphicsPlatform::getNativeFont(this);
+	if (font) {	
+		JniLocal<jstring> jtext = Jni::getJniString(text);
+		JniLocal<jobject> size = _JAndroidFont::measureText.callObject(font, jtext.get());
+		Size ret;
+		ret.x = _JAndroidPointF::x.get(size.get());
+		ret.y = _JAndroidPointF::y.get(size.get());
+		return ret;
+	}
+	return Size::zero();
 }
 
 class _Android_FontObject : public Referable

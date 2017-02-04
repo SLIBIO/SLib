@@ -14,6 +14,10 @@ Canvas::Canvas()
 	m_flagAntiAlias = sl_true;
 }
 
+Canvas::~Canvas()
+{
+}
+
 CanvasType Canvas::getType()
 {
 	return m_type;
@@ -147,17 +151,20 @@ void Canvas::scale(sl_real sx, sl_real sy)
 	concatMatrix(mat);
 }
 
-Size Canvas::getTextSize(const Ref<Font>& font, const String &text)
+Size Canvas::measureText(const Ref<Font>& font, const String& text, sl_bool flagMultiLine)
 {
 	if (font.isNotNull()) {
-		return font->getTextSize(text);
+		return font->measureText(text, flagMultiLine);
 	}
 	return Size::zero();
 }
 
-void Canvas::drawText(const String& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color)
+Size Canvas::measureText16(const Ref<Font>& font, const String16& text, sl_bool flagMultiLine)
 {
-	drawText16(text, x, y, font, color);
+	if (font.isNotNull()) {
+		return font->measureText16(text, flagMultiLine);
+	}
+	return Size::zero();
 }
 
 void Canvas::drawText16(const String16& text, sl_real x, sl_real y, const Ref<Font>& font, const Color& color)
@@ -165,8 +172,12 @@ void Canvas::drawText16(const String16& text, sl_real x, sl_real y, const Ref<Fo
 	drawText(text, x, y, font, color);
 }
 
-void Canvas::drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& _font, const Color& color, Alignment align)
+void Canvas::drawText(const String& text, const Rectangle& rcDst, const Ref<Font>& _font, const Color& color, Alignment align, sl_bool flagMultiLine)
 {
+	if (flagMultiLine) {
+		drawText16(text, rcDst, _font, color, align, sl_true);
+		return;
+	}
 	Ref<Font> font = _font;
 	if (font.isNull()) {
 		font = Font::getDefault();
@@ -174,12 +185,12 @@ void Canvas::drawText(const String& text, const Rectangle& rcDst, const Ref<Font
 			return;
 		}
 	}
-	Size size = getTextSize(font, text);
+	Size size = measureText(font, text, sl_false);
 	Point pt = GraphicsUtil::calculateAlignPosition(rcDst, size.x, size.y, align);
 	drawText(text, pt.x, pt.y, font, color);
 }
 
-void Canvas::drawText16(const String16& text, const Rectangle& rcDst, const Ref<Font>& _font, const Color& color, Alignment align)
+void Canvas::drawText16(const String16& text, const Rectangle& rcDst, const Ref<Font>& _font, const Color& color, Alignment align, sl_bool flagMultiLine)
 {
 	Ref<Font> font = _font;
 	if (font.isNull()) {
@@ -188,9 +199,49 @@ void Canvas::drawText16(const String16& text, const Rectangle& rcDst, const Ref<
 			return;
 		}
 	}
-	Size size = getTextSize(font, text);
+	Size size = measureText16(font, text, flagMultiLine);
 	Point pt = GraphicsUtil::calculateAlignPosition(rcDst, size.x, size.y, align);
-	drawText16(text, pt.x, pt.y, font, color);
+	if (flagMultiLine) {
+		Alignment hAlign = align & Alignment::HorizontalMask;
+		sl_char16* sz = text.getData();
+		sl_size len = text.getLength();
+		sl_size startLine = 0;
+		sl_size pos = 0;
+		sl_real y = pt.y;
+		while (pos <= len) {
+			sl_char16 ch;
+			if (pos < len) {
+				ch = sz[pos];
+			} else {
+				ch = '\n';
+			}
+			if (ch == '\r' || ch == '\n') {
+				if (pos > startLine) {
+					String16 line(sz + startLine, pos - startLine);
+					Size s = measureText16(font, line);
+					sl_real x;
+					if (hAlign == Alignment::Center) {
+						x = pt.x + (size.x - s.x) / 2;
+					} else if (hAlign == Alignment::Right) {
+						x = pt.x + size.x - s.x;
+					} else {
+						x = pt.x;
+					}
+					drawText16(line, x, y, font, color);
+					y += s.y;
+				}
+				if (ch == '\r' && pos + 1 < len) {
+					if (sz[pos + 1] == '\n') {
+						pos++;
+					}
+				}
+				startLine = pos + 1;
+			}
+			pos++;
+		}
+	} else {
+		drawText16(text, pt.x, pt.y, font, color);
+	}
 }
 
 void Canvas::drawLine(sl_real x1, sl_real y1, sl_real x2, sl_real y2, const Ref<Pen>& pen)
@@ -209,9 +260,19 @@ void Canvas::drawArc(sl_real x, sl_real y, sl_real width, sl_real height, sl_rea
 	drawArc(Rectangle(x, y, x + width, y + height), startDegrees, sweepDegrees, pen);
 }
 
+void Canvas::drawRectangle(const Rectangle& rect, const Ref<Pen>& pen, const Color& fillColor)
+{
+	drawRectangle(rect, pen, Brush::createSolidBrush(fillColor));
+}
+
 void Canvas::drawRectangle(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Pen>& pen, const Ref<Brush>& brush)
 {
 	drawRectangle(Rectangle(x, y, x+width, y+height), pen, brush);
+}
+
+void Canvas::drawRectangle(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Pen>& pen, const Color& fillColor)
+{
+	drawRectangle(Rectangle(x, y, x+width, y+height), pen, fillColor);
 }
 
 void Canvas::drawRectangle(const Rectangle& rc, const Ref<Pen>& pen)
@@ -231,7 +292,7 @@ void Canvas::fillRectangle(const Rectangle& rc, const Ref<Brush>& brush)
 
 void Canvas::fillRectangle(const Rectangle& rc, const Color& color)
 {
-	drawRectangle(rc, Ref<Pen>::null(), Brush::createSolidBrush(color));
+	drawRectangle(rc, Ref<Pen>::null(), color);
 }
 
 void Canvas::fillRectangle(sl_real x, sl_real y, sl_real width, sl_real height, const Ref<Brush>& brush)
@@ -241,7 +302,7 @@ void Canvas::fillRectangle(sl_real x, sl_real y, sl_real width, sl_real height, 
 
 void Canvas::fillRectangle(sl_real x, sl_real y, sl_real width, sl_real height, const Color& color)
 {
-	drawRectangle(Rectangle(x, y, x+width, y+height), Ref<Pen>::null(), Brush::createSolidBrush(color));
+	drawRectangle(Rectangle(x, y, x+width, y+height), Ref<Pen>::null(), color);
 }
 
 void Canvas::drawRoundRect(sl_real x, sl_real y, sl_real width, sl_real height, sl_real rx, sl_real ry, const Ref<Pen>& pen, const Ref<Brush>& brush)

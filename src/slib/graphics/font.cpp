@@ -1,5 +1,6 @@
 #include "../../../inc/slib/graphics/font.h"
 
+#include "../../../inc/slib/graphics/font_atlas.h"
 #include "../../../inc/slib/core/safe_static.h"
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
@@ -139,6 +140,90 @@ sl_real Font::getFontDescent()
 	return 0;
 }
 
+Size Font::measureSingleLineText(const String& text)
+{
+	return _measureText_PO(text);
+}
+
+Size Font::measureMultiLineText(const String16& text)
+{
+	sl_char16* sz = text.getData();
+	sl_size len = text.getLength();
+	sl_size startLine = 0;
+	sl_size pos = 0;
+	sl_real width = 0;
+	sl_real height = 0;
+	while (pos <= len) {
+		sl_char16 ch;
+		if (pos < len) {
+			ch = sz[pos];
+		} else {
+			ch = '\n';
+		}
+		if (ch == '\r' || ch == '\n') {
+			if (pos > startLine) {
+				Size size = _measureText_PO(String(sz + startLine, pos - startLine));
+				if (size.x > width) {
+					width = size.x;
+				}
+				height += size.y;
+			}
+			if (ch == '\r' && pos + 1 < len) {
+				if (sz[pos + 1] == '\n') {
+					pos++;
+				}
+			}
+			startLine = pos + 1;
+		}
+		pos++;
+	}
+	return Size(width, height);
+}
+
+Size Font::measureText(const String& text, sl_bool flagMultiLine)
+{
+	if (flagMultiLine) {
+		return measureMultiLineText(text);
+	} else {
+		return measureSingleLineText(text);
+	}
+}
+
+Size Font::measureText16(const String16& text, sl_bool flagMultiLine)
+{
+	if (flagMultiLine) {
+		return measureMultiLineText(text);
+	} else {
+		return measureSingleLineText(text);
+	}
+}
+
+Ref<FontAtlas> Font::getAtlas()
+{
+	Ref<FontAtlas> fa = m_fontAtlas;
+	if (fa.isNull()) {
+		FontAtlasParam param;
+		param.font = this;
+		fa = FontAtlas::create(param);
+		if (fa.isNotNull()) {
+			m_fontAtlas = fa;
+		}
+	}
+	return fa;
+}
+
+Ref<FontAtlas> Font::getSharedAtlas()
+{
+	Ref<FontAtlas> fa = m_fontAtlas;
+	if (fa.isNull()) {
+		fa = FontAtlas::getShared(this);
+		if (fa.isNotNull()) {
+			m_fontAtlas = fa;
+		}
+	}
+	return fa;
+}
+
 Ref<Referable> Font::getPlatformObject()
 {
 	return m_platformObject;
@@ -146,7 +231,7 @@ Ref<Referable> Font::getPlatformObject()
 
 #if !(defined(SLIB_PLATFORM_IS_APPLE)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
 
-Size Font::getTextSize(const String& text)
+Size Font::_measureText_PO(const String& text)
 {
 	return Size::zero();
 }

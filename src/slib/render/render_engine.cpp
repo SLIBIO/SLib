@@ -8,7 +8,7 @@
 SLIB_RENDER_NAMESPACE_BEGIN
 
 Primitive::Primitive()
-: type(PrimitiveType::Triangles), countElements(0)
+: type(PrimitiveType::Triangle), countElements(0)
 {
 }
 
@@ -220,6 +220,11 @@ sl_bool RenderEngine::beginProgram(const Ref<RenderProgram>& program, RenderProg
 void RenderEngine::endProgram()
 {
 	_endProgram();
+}
+
+void RenderEngine::resetCurrentBuffers()
+{
+	_resetCurrentBuffers();
 }
 
 void RenderEngine::drawPrimitive(Primitive* primitive)
@@ -579,7 +584,7 @@ void RenderEngine::drawLines(LineSegment* lines, sl_uint32 n, const Color4f& col
 			if (scope.begin(this, getDefaultRenderProgramForDrawLine2D())) {
 				scope->setTransform(Matrix3::identity());
 				scope->setColor(color);
-				drawPrimitive(n * 2, vb, PrimitiveType::Lines);
+				drawPrimitive(n * 2, vb, PrimitiveType::Line);
 			}
 		}
 	}
@@ -604,7 +609,7 @@ void RenderEngine::drawLines(Line3* lines, sl_uint32 n, const Color4f& color)
 			if (scope.begin(this, getDefaultRenderProgramForDrawLine3D())) {
 				scope->setTransform(Matrix4::identity());
 				scope->setColor(color);
-				drawPrimitive(n * 2, vb, PrimitiveType::Lines);
+				drawPrimitive(n * 2, vb, PrimitiveType::Line);
 			}
 		}
 	}
@@ -670,7 +675,7 @@ void RenderEngine::drawDebugText()
 	{
 		Ref<Canvas> canvas = bitmap->getCanvas();
 		if (canvas.isNotNull()) {
-			size = canvas->getTextSize(font, text);
+			size = canvas->measureText(font, text);
 			size.x += 5;
 			canvas->drawText(text, 0, 3, font, Color::Red);
 		}

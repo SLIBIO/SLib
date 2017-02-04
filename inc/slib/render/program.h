@@ -84,9 +84,9 @@ public:
 	
 	virtual sl_bool onInit(RenderEngine* engine, RenderProgramState* state);
 	
-	virtual sl_bool onPreRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
+	virtual sl_bool onPreRender(RenderEngine* engine, RenderProgramState* state);
 	
-	virtual void onPostRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
+	virtual void onPostRender(RenderEngine* engine, RenderProgramState* state);
 
 	virtual String getGLSLVertexShader(RenderEngine* engine);
 	
@@ -227,10 +227,10 @@ public:
 	sl_bool onInit(RenderEngine* engine, RenderProgramState* state);
 	
 	// override
-	sl_bool onPreRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
+	sl_bool onPreRender(RenderEngine* engine, RenderProgramState* state);
 	
 	// override
-	void onPostRender(RenderEngine* engine, RenderProgramState* state, Primitive* primitive);
+	void onPostRender(RenderEngine* engine, RenderProgramState* state);
 
 };
 

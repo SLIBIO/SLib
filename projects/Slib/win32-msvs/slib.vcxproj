@@ -124,6 +124,7 @@
     <ClInclude Include="..\..\..\inc\slib\graphics\pen.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\platform.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\resource.h" />
+    <ClInclude Include="..\..\..\inc\slib\graphics\text.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\util.h" />
     <ClInclude Include="..\..\..\inc\slib\graphics\yuv.h" />
     <ClInclude Include="..\..\..\inc\slib\map.h" />
@@ -365,6 +366,7 @@
     <ClCompile Include="..\..\..\src\slib\graphics\graphics_path_gdiplus.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\graphics_platform_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\graphics_resource.cpp" />
+    <ClCompile Include="..\..\..\src\slib\graphics\graphics_text.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\graphics_util.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\image.cpp" />
     <ClCompile Include="..\..\..\src\slib\graphics\image_jpeg.cpp" />

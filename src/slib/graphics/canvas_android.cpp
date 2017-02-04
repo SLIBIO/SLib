@@ -84,7 +84,8 @@ public:
 			ret.bottom = _JAndroidRect::bottom.get(rect);
 			return ret;
 		}
-		return Rectangle(Point::zero(), getSize());
+		Size size = getSize();
+		return Rectangle(0, 0, size.x, size.y);
 	}
 
     // override

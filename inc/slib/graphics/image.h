@@ -13,14 +13,21 @@
 
 SLIB_GRAPHICS_NAMESPACE_BEGIN
 
-struct SLIB_EXPORT ImageDesc
+class SLIB_EXPORT ImageDesc
 {
+public:
 	sl_uint32 width;
 	sl_uint32 height;
 	sl_int32 stride;
 	Color* colors;
 	
 	Ref<Referable> ref;
+	
+public:
+	ImageDesc();
+	
+	~ImageDesc();
+	
 };
 
 class SLIB_EXPORT Image : public Bitmap
@@ -29,6 +36,8 @@ class SLIB_EXPORT Image : public Bitmap
 	
 protected:
 	Image();
+	
+	~Image();
 	
 public:
 	static Ref<Image> createStatic(const ImageDesc& desc);

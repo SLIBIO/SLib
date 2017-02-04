@@ -18,6 +18,9 @@ public:
 	
 public:
 	BrushDesc();
+	
+	~BrushDesc();
+	
 };
 
 class SLIB_EXPORT Brush : public Referable
@@ -26,6 +29,8 @@ class SLIB_EXPORT Brush : public Referable
 	
 protected:
 	Brush();
+	
+	~Brush();
 	
 public:
 	static Ref<Brush> getDefault();

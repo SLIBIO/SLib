@@ -350,7 +350,8 @@ void Window::setClientSize(sl_ui_len width, sl_ui_len height)
 
 UIRect Window::getClientBounds()
 {
-	return UIRect(UIPoint::zero(), getClientSize());
+	UISize size = getClientSize();
+	return UIRect(0, 0, size.x, size.y);
 }
 
 String Window::getTitle()

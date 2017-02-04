@@ -15,7 +15,12 @@ LabelView::LabelView()
 	
 	m_textAlignment = Alignment::Left;
 	m_textColor = Color::Black;
+	m_multiLineMode = MultiLineMode::Single;
 	
+}
+
+LabelView::~LabelView()
+{
 }
 
 String LabelView::getText()
@@ -29,11 +34,8 @@ void LabelView::setText(const String& text, UIUpdateMode mode)
 	
 	if (isNativeWidget()) {
 		_setText_NW(text);
-	} else {
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
 	}
+	invalidateContentLayout(mode);
 }
 
 Color LabelView::getTextColor()
@@ -70,66 +72,20 @@ void LabelView::setGravity(Alignment align, UIUpdateMode mode)
 	}
 }
 
-void LabelView::onDraw(Canvas* canvas)
+MultiLineMode LabelView::getMultiLineMode()
 {
-	_makeMultilineList();
-	
-	ListLocker<TextLine> lines(m_textLines);
-	
-	if (lines.count == 0) {
-		return;
-	}
-	
-	Ref<Font> font = getFont();
-	if (font.isNull()) {
-		return;
-	}
-	
-	if (lines.count == 1) {
-		Point pt = GraphicsUtil::calculateAlignPosition(getBoundsInnerPadding(), (sl_real)(lines[0].width), (sl_real)(lines[0].height), m_textAlignment);
-		canvas->drawText(lines[0].text, pt.x, pt.y, font, m_textColor);
-		return;
-	}
-	
-	UIRect rect(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(), 0);
-	
-	Alignment alignHorz = m_textAlignment & Alignment::HorizontalMask;
-	Alignment alignVert = m_textAlignment & Alignment::VerticalMask;
-	
-	if (alignVert == Alignment::Middle) {
-		rect.top += (getHeight() - m_totalHeight) / 2;
-	} else if (alignVert == Alignment::Bottom) {
-		rect.top += (getHeight() - m_totalHeight);
-	}
-	
-	for (sl_size i = 0; i < lines.count; i++) {
-		rect.bottom = rect.top + lines[i].height;
-		Point pt = GraphicsUtil::calculateAlignPosition(rect, (sl_real)(lines[i].width), (sl_real)(lines[i].height), alignHorz);
-		canvas->drawText(lines[i].text, pt.x, pt.y, font, m_textColor);
-		rect.top = rect.bottom;
-	}
-
+	return m_multiLineMode;
 }
 
-static List<String16> _Label_getLines(const String16& text)
+void LabelView::setMultiLineMode(MultiLineMode multiLineMode, UIUpdateMode updateMode)
 {
-	const sl_char16* buf = text.getData();
-	sl_uint32 len = (sl_uint32)(text.getLength());
-	sl_uint32 indexStart = 0;
-	List<String16> lines;
-	for (sl_uint32 i = 0; i <= len; i++) {
-		sl_char16 ch = buf[i];
-		if (ch == '\r' || ch == '\n' || ch == 0) {
-			String16 line = String16(buf + indexStart, i - indexStart);
-			i++;
-			if (ch == '\r' && i < len && buf[i] == '\n') {
-				i++;
-			}
-			indexStart = i;
-			lines.add(line);
-		}
-	}
-	return lines;
+	m_multiLineMode = multiLineMode;
+	invalidateContentLayout(updateMode);
+}
+
+void LabelView::onDraw(Canvas* canvas)
+{
+	m_textBox.draw(canvas, m_text, getFont(), getBoundsInnerPadding(), isWidthWrapping(), m_multiLineMode, m_textAlignment, m_textColor);
 }
 
 void LabelView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
@@ -137,143 +93,15 @@ void LabelView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 	if (!flagVertical && !flagHorizontal) {
 		return;
 	}
-	
-	Ref<Font> font = getFont();
-	if (font.isNull()) {
-		return;
-	}
 
+	sl_ui_pos paddingWidth = getPaddingLeft() + getPaddingRight();
+	m_textBox.update(m_text, getFont(), (sl_real)(getWidth() - paddingWidth), isWidthWrapping(), m_multiLineMode, m_textAlignment);
 	if (flagHorizontal) {
-		sl_ui_pos maxWidth = 0, height = 0;
-		ListLocker<String16> lines(_Label_getLines(m_text));
-		for (sl_size i = 0; i < lines.count; i++) {
-			String16& line = lines[i];
-			UISize size = font->getTextSize(line);
-			if (size.x > maxWidth) {
-				maxWidth = size.x;
-			}
-			height += size.y;
-		}
-		setMeasuredWidth(maxWidth);
-		if (flagVertical) {
-			setMeasuredHeight(height);
-		}
-	} else {
-		if (flagVertical) {
-			_makeMultilineList();
-			setMeasuredHeight(m_totalHeight);
-		}
+		setMeasuredWidth((sl_ui_pos)(m_textBox.getContentWidth()) + paddingWidth);
 	}
-}
-
-void LabelView::_makeMultilineList()
-{
-	
-	Ref<Font> font = getFont();
-	if (font.isNull()) {
-		return;
+	if (flagVertical) {
+		setMeasuredHeight((sl_ui_pos)(m_textBox.getContentHeight()) + getPaddingTop() + getPaddingBottom());
 	}
-	
-	UIRect rect = getBoundsInnerPadding();
-	sl_ui_len maxWidth = rect.getWidth();
-	
-	if (Math::isAlmostZero(maxWidth)) {
-		return;
-	}
-	
-	if (m_currentText == m_text && font == m_currentTextFont) {
-		return;
-	}
-	
-	String16 text = m_text;
-	const sl_char16* buf = text.getData();
-	sl_size lenText = text.getLength();
-	
-	List<TextLine> lines;
-	TextLine line;
-	sl_size posLine = 0;
-	sl_size posWordStart = 0;
-	sl_bool flagNewLine = sl_false;
-	String16 lineMeasure = String16::fromStatic(buf, 1);
-
-	sl_size pos = 0;
-	for (; pos < lenText; pos++) {
-		if (flagNewLine) {
-			Sizei size = font->getTextSize(line.text);
-			line.width = size.x;
-			line.height = size.y;
-			lines.add_NoLock(line);
-			lineMeasure = String16::fromStatic(buf + pos, 1);
-			posLine = pos;
-			posWordStart = pos;
-			flagNewLine = sl_false;
-		}
-		sl_char16 ch = buf[pos];
-		if (ch == '\r' || ch == '\n') {
-			line.text = String16(buf + posLine, pos - posLine);
-			if (ch == '\r' && pos + 1 < lenText && buf[pos + 1] == '\n') {
-				pos++;
-			}
-			flagNewLine = sl_true;
-		} else if (SLIB_CHAR_IS_SPACE_TAB(ch)) {
-			posWordStart = pos + 1;
-		} else {
-			lineMeasure.setLength(pos + 1 - posLine);
-			UISize size = font->getTextSize(lineMeasure);
-			if (size.x > maxWidth) {
-				sl_bool flagOneWord = sl_true;
-				for (sl_size k = posLine; k < posWordStart; k++) {
-					if (!(SLIB_CHAR_IS_SPACE_TAB(buf[k]))) {
-						flagOneWord = sl_false;
-						break;
-					}
-				}
-				if (flagOneWord) {
-					if (pos >= posLine + 2) {
-						pos--;
-					}
-					line.text = String16(buf + posLine, pos - posLine);
-				} else {
-					posWordStart--;
-					pos = posWordStart;
-					while (posWordStart > posLine) {
-						if (!(SLIB_CHAR_IS_SPACE_TAB(buf[posWordStart-1]))) {
-							break;
-						}
-						posWordStart--;
-					}
-					line.text = String16(buf + posLine, posWordStart - posLine);
-				}
-				flagNewLine = sl_true;
-			}
-		}
-	}
-	if (flagNewLine) {
-		Sizei size = font->getTextSize(line.text);
-		line.width = size.x;
-		line.height = size.y;
-		lines.add_NoLock(line);
-	}
-	if (pos > posLine) {
-		line.text = String16(buf + posLine, pos - posLine);
-		Sizei size = font->getTextSize(line.text);
-		line.width = size.x;
-		line.height = size.y;
-		lines.add_NoLock(line);
-	}
-	
-	m_textLines = lines;
-	
-	sl_uint32 totalHeight = 0;
-	
-	for (sl_size i = 0; i < m_textLines.getCount(); i++) {
-		totalHeight += m_textLines[i].height;
-	}
-	
-	m_totalHeight = totalHeight;
-	
-	m_currentText = m_text;
-	m_currentTextFont = font;
 	
 }
 

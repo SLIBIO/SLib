@@ -19,6 +19,12 @@ public:
 	sl_int32 sample_stride; // bytes offset between samples on a row
 	sl_int32 pitch; // bytes of a physical row
 	Ref<Referable> ref;
+	
+public:
+	ColorComponentBuffer();
+	
+	~ColorComponentBuffer();
+	
 };
 
 class SLIB_EXPORT BitmapData
@@ -54,6 +60,8 @@ public:
 	BitmapData(const BitmapData& other);
 	
 	BitmapData(sl_uint32 width, sl_uint32 height, const Color* colors, sl_int32 stride = 0);
+	
+	~BitmapData();
 	
 public:
 	void*& planeData(sl_uint32 plane);

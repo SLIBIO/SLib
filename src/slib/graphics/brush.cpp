@@ -10,9 +10,17 @@ BrushDesc::BrushDesc()
     color = Color::White;
 }
 
+BrushDesc::~BrushDesc()
+{
+}
+
 SLIB_DEFINE_ROOT_OBJECT(Brush)
 
 Brush::Brush()
+{
+}
+
+Brush::~Brush()
 {
 }
 

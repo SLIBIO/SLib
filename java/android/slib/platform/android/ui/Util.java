@@ -3,6 +3,7 @@ package slib.platform.android.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Point;
 import android.net.Uri;
 import android.util.DisplayMetrics;
@@ -21,8 +22,13 @@ public class Util {
 	
 	public static Point getDisplaySize(Display display) {
 		Point pt = new Point();
-		DisplayMetrics metrics = new DisplayMetrics();
-		display.getMetrics(metrics);
+		DisplayMetrics metrics;
+		if (display != null) {
+			metrics = new DisplayMetrics();
+			display.getMetrics(metrics);
+		} else {
+			metrics = Resources.getSystem().getDisplayMetrics();
+		}
 		pt.x = metrics.widthPixels;
 		pt.y = metrics.heightPixels;
 		return pt;

@@ -20,12 +20,13 @@ SLIB_RENDER_NAMESPACE_BEGIN
 
 enum class PrimitiveType
 {
-	Lines = 0,
-	LineStrip = 1,
-	Triangles = 2,
-	TriangleStrip = 3,
-	TriangleFan = 4,
-	Points = 5
+	Triangle = 0,
+	TriangleStrip = 1,
+	TriangleFan = 2,
+	Line = 3,
+	LineLoop = 4,
+	LineStrip = 5,
+	Point = 6
 };
 
 class SLIB_EXPORT Primitive
@@ -224,13 +225,15 @@ public:
 	
 	void endProgram();
 	
+	void resetCurrentBuffers();
+	
 	void drawPrimitive(Primitive* primitive);
 	
 	void drawPrimitives(Primitive* primitives, sl_uint32 count);
 	
-	void drawPrimitive(sl_uint32 countElements, const Ref<VertexBuffer>& vb, const Ref<IndexBuffer>& ib, PrimitiveType type = PrimitiveType::Triangles);
+	void drawPrimitive(sl_uint32 countElements, const Ref<VertexBuffer>& vb, const Ref<IndexBuffer>& ib, PrimitiveType type = PrimitiveType::Triangle);
 	
-	void drawPrimitive(sl_uint32 countElements, const Ref<VertexBuffer>& vb, PrimitiveType type = PrimitiveType::Triangles);
+	void drawPrimitive(sl_uint32 countElements, const Ref<VertexBuffer>& vb, PrimitiveType type = PrimitiveType::Triangle);
 
 	void applyTexture(sl_reg sampler, const Ref<Texture>& texture);
 
@@ -364,6 +367,8 @@ protected:
 	virtual sl_bool _beginProgram(RenderProgram* program, RenderProgramInstance* instance, RenderProgramState** ppState) = 0;
 	
 	virtual void _endProgram() = 0;
+	
+	virtual void _resetCurrentBuffers() = 0;
 	
 	virtual void _drawPrimitive(EnginePrimitive* primitive) = 0;
 	

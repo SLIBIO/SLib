@@ -120,7 +120,6 @@ enum class ScaleMode
 	Cover = 3
 };
 
-
 enum class ColorSpace
 {
 	None = 0,
@@ -129,6 +128,14 @@ enum class ColorSpace
 	CMYK = 3,
 	HLS = 4,
 	HSV = 5
+};
+
+enum class MultiLineMode
+{
+	Single, // Single line
+	Multiple, // Break only at CR/LF
+	WordWrap, // Break at TAB, Spaces, CR/LF
+	BreakWord // Break at any position
 };
 
 SLIB_GRAPHICS_NAMESPACE_END

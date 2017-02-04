@@ -32,6 +32,8 @@ struct SLIB_EXPORT FontMetrics
 	sl_real leading;
 };
 
+class FontAtlas;
+
 class SLIB_EXPORT Font : public Referable
 {
 	SLIB_DECLARE_OBJECT
@@ -73,22 +75,34 @@ public:
 	
 	sl_real getFontDescent();
 	
-	Ref<Referable> getPlatformObject();
+	Size measureSingleLineText(const String& text);
 	
-	Size getTextSize(const String& text);
+	Size measureMultiLineText(const String16& text);
+	
+	Size measureText(const String& text, sl_bool flagMultiLine = sl_false);
+	
+	Size measureText16(const String16& text, sl_bool flagMultiLine = sl_false);
+	
+	Ref<FontAtlas> getAtlas();
+	
+	Ref<FontAtlas> getSharedAtlas();
+	
+	Ref<Referable> getPlatformObject();
 	
 private:
 	sl_bool _getFontMetrics_PO(FontMetrics& _out);
+	
+	Size _measureText_PO(const String& text);
 	
 protected:
 	FontDesc m_desc;
 	FontMetrics m_metricsCache;
 	sl_bool m_flagMetricsCache;
 	
+	AtomicRef<FontAtlas> m_fontAtlas;
+	
 	Ref<Referable> m_platformObject;
 	SpinLock m_lock;
-	
-	AtomicRef<Referable> m_renderingCache;
 	
 };
 
