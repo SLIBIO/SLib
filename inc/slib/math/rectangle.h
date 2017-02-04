@@ -155,7 +155,15 @@ private:
 
 };
 
-SLIB_DECLARE_GEOMETRY_TYPE_EX(Rectangle)
+extern template class RectangleT<float>;
+extern template class RectangleT<double>;
+extern template class RectangleT<sl_int32, float>;
+extern template class RectangleT<sl_int64, double>;
+typedef RectangleT<sl_real> Rectangle;
+typedef RectangleT<float> Rectanglef;
+typedef RectangleT<double> Rectanglelf;
+typedef RectangleT<sl_int32, float> Rectanglei;
+typedef RectangleT<sl_int64, double> Rectangleli;
 
 template <class T, class FT>
 class Interpolation< RectangleT<T, FT> >
