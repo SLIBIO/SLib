@@ -59,6 +59,7 @@ View::View()
 	m_flagOnAddChild = sl_false;
 	m_flagOnRemoveChild = sl_false;
 	
+	m_flagInvalidLayout = sl_true;
 	m_paddingLeft = 0;
 	m_paddingTop = 0;
 	m_paddingRight = 0;
@@ -74,9 +75,16 @@ View::~View()
 
 #define DEFAULT_MAX_SIZE 0x3fffffff
 
-Ref<View::LayoutAttributes> View::_initializeLayoutAttibutes()
+Ref<View::LayoutAttributes> View::_initializeLayoutAttributes()
 {
 	Ref<LayoutAttributes> attrs = m_layoutAttributes;
+	if (attrs.isNotNull()) {
+		return attrs;
+	}
+	
+	ObjectLocker lock(this);
+	
+	attrs = m_layoutAttributes;
 	if (attrs.isNotNull()) {
 		return attrs;
 	}
@@ -108,8 +116,6 @@ Ref<View::LayoutAttributes> View::_initializeLayoutAttibutes()
 	attrs->frame = m_frame;
 	attrs->requestedFrame = m_frame;
 	attrs->flagInvalidMeasure = sl_true;
-	attrs->flagInvalidLayout = sl_true;
-	attrs->flagMakeLayout = sl_false;
 	
 	attrs->flagInvalidRelativeBoundWidth = sl_true;
 	attrs->measuredRelativeBoundWidth = 0;
@@ -134,9 +140,8 @@ Ref<View::LayoutAttributes> View::_initializeLayoutAttibutes()
 	attrs->flagRelativeMarginBottom = sl_false;
 	attrs->relativeMarginBottomWeight = 0;
 	
-	attrs->flagRecursiveMakeLayout = sl_false;
 	attrs->flagUpdatedLayoutFrame = sl_false;
-		
+	
 	m_layoutAttributes = attrs;
 	
 	return attrs;
@@ -146,6 +151,13 @@ Ref<View::LayoutAttributes> View::_initializeLayoutAttibutes()
 Ref<View::TransformAttributes> View::_initializeTransformAttributes()
 {
 	Ref<TransformAttributes> attrs = m_transformAttributes;
+	if (attrs.isNotNull()) {
+		return attrs;
+	}
+
+	ObjectLocker lock(this);
+	
+	attrs = m_transformAttributes;
 	if (attrs.isNotNull()) {
 		return attrs;
 	}
@@ -185,6 +197,13 @@ Ref<View::TransformAttributes> View::_initializeTransformAttributes()
 Ref<View::DrawAttributes> View::_initializeDrawAttributes()
 {
 	Ref<DrawAttributes> attrs = m_drawAttributes;
+	if (attrs.isNotNull()) {
+		return attrs;
+	}
+
+	ObjectLocker lock(this);
+	
+	attrs = m_drawAttributes;
 	if (attrs.isNotNull()) {
 		return attrs;
 	}
@@ -231,6 +250,13 @@ Ref<View::ScrollAttributes> View::_initializeScrollAttributes()
 	if (attrs.isNotNull()) {
 		return attrs;
 	}
+
+	ObjectLocker lock(this);
+	
+	attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs;
+	}
 	attrs = new ScrollAttributes;
 	if (attrs.isNull()) {
 		return sl_null;
@@ -266,6 +292,13 @@ Ref<View::ScrollAttributes> View::_initializeScrollAttributes()
 Ref<View::EventAttributes> View::_initializeEventAttributes()
 {
 	Ref<EventAttributes> attrs = m_eventAttributes;
+	if (attrs.isNotNull()) {
+		return attrs;
+	}
+
+	ObjectLocker lock(this);
+	
+	attrs = m_eventAttributes;
 	if (attrs.isNotNull()) {
 		return attrs;
 	}
@@ -575,7 +608,7 @@ void View::removeChild(sl_size index, UIUpdateMode mode)
 		_setFocusedChild(sl_null, UIUpdateMode::NoRedraw);
 	}
 	m_childrenMultiTouch.removeValue(view);
-	requestLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 }
 
 void View::removeChild(const Ref<View>& view, UIUpdateMode mode)
@@ -595,7 +628,7 @@ void View::removeChild(const Ref<View>& view, UIUpdateMode mode)
 		_setFocusedChild(sl_null, UIUpdateMode::NoRedraw);
 	}
 	m_childrenMultiTouch.removeValue(view);
-	requestLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 }
 
 void View::removeAllChildren(UIUpdateMode mode)
@@ -623,7 +656,7 @@ void View::removeAllChildren(UIUpdateMode mode)
 	_setFocusedChild(sl_null, UIUpdateMode::NoRedraw);
 	m_childrenMultiTouch.setNull();
 	m_children.removeAll();
-	requestLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 }
 
 Ref<View> View::getChildAt(sl_ui_pos x, sl_ui_pos y)
@@ -811,7 +844,7 @@ void View::_addChild(const Ref<View>& child, UIUpdateMode mode)
 		}
 		
 		if (mode != UIUpdateMode::Init) {
-			requestLayout(UIUpdateMode::NoRedraw);
+			invalidateLayoutFromResizeContent(UIUpdateMode::NoRedraw);
 			if (isInstance() && m_flagCreatingChildInstances && child->m_flagCreatingInstance) {
 				switch(child->getAttachMode()) {
 					case UIAttachMode::NotAttach:
@@ -1054,29 +1087,20 @@ void View::_setFrame(const UIRect& _frame, UIUpdateMode mode, sl_bool flagLayout
 		layoutAttrs->frame = frame;
 		layoutAttrs->requestedFrame = frame;
 		layoutAttrs->flagInvalidMeasure = sl_true;
-		if (!(flagNotResizeWidth && flagNotResizeHeight)) {
-			layoutAttrs->flagInvalidLayout = sl_true;
-		}
-		if (mode != UIUpdateMode::Init) {
-			if (!flagLayouting) {
-				Ref<View> parent = getParent();
-				if (parent.isNotNull() && parent->isLayouting()) {
-					parent->requestLayout(UIUpdateMode::NoRedraw);
-				} else {
-					_requestMakeLayout();
-				}
-			}
-		}
-	} else {
-		if (mode != UIUpdateMode::Init) {
-			requestParentLayout(UIUpdateMode::NoRedraw);
-		}
 	}
 	
 	if (!(flagNotResizeWidth && flagNotResizeHeight)) {
+		m_flagInvalidLayout = sl_true;
 		dispatchResize(frame.getWidth(), frame.getHeight());
 		if (mode == UIUpdateMode::Redraw) {
 			invalidateLayer();
+		}
+		if (!flagLayouting) {
+			invalidateLayoutFromResize(UIUpdateMode::NoRedraw);
+		}
+	} else {
+		if (!flagLayouting) {
+			invalidateParentLayout(UIUpdateMode::NoRedraw);
 		}
 	}
 	
@@ -1187,19 +1211,16 @@ void View::requestFrame(const UIRect& _frame, UIUpdateMode mode)
 	frame.fixSizeError();
 
 	if (mode != UIUpdateMode::Init) {
-	
 		Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
 		if (layoutAttrs.isNotNull()) {
-			Ref<View> parent = getParent();
-			if (parent.isNotNull() && parent->isLayouting()) {
-				layoutAttrs->flagInvalidMeasure = sl_true;
+			Ref<View> parent = m_parent;
+			if (parent.isNotNull()) {
 				layoutAttrs->requestedFrame = frame;
-				parent->requestLayout(UIUpdateMode::NoRedraw);
+				invalidateLayoutFromResize(UIUpdateMode::NoRedraw);
 				return;
 			}
 		}
 	}
-	
 	_setFrame(frame, mode, sl_false);
 }
 
@@ -1222,11 +1243,11 @@ void View::setVisibility(Visibility visibility, UIUpdateMode mode)
 				case Visibility::Visible:
 				case Visibility::Hidden:
 					if (oldVisibility == Visibility::Gone) {
-						requestParentAndSelfLayout(UIUpdateMode::NoRedraw);
+						invalidateParentLayout(UIUpdateMode::NoRedraw);
 					}
 					break;
 				case Visibility::Gone:
-					requestParentLayout(UIUpdateMode::NoRedraw);
+					invalidateParentLayout(UIUpdateMode::NoRedraw);
 					break;
 			}
 		}
@@ -1530,9 +1551,6 @@ void View::setMeasuredHeight(sl_ui_len height)
 
 void View::_prepareLayout(ViewPrepareLayoutParam& param)
 {
-	if (!(isVisible())) {
-		return;
-	}
 	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
 	if (layoutAttrs.isNull()) {
 		return;
@@ -1823,98 +1841,91 @@ void View::_prepareLayout(ViewPrepareLayoutParam& param)
 
 void View::_makeLayout(sl_bool flagApplyLayout)
 {
-	if (isVisible()) {
-		
-		Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
-		
-		if (layoutAttrs.isNotNull() && !(layoutAttrs->flagRecursiveMakeLayout)) {
-			
-			layoutAttrs->flagRecursiveMakeLayout = sl_true;
-			
-			do {
-				if (flagApplyLayout) {
-					if (layoutAttrs->frame.isAlmostEqual(m_frame)) {
-						if (!(layoutAttrs->flagInvalidLayout)) {
-							break;
-						}
-					} else {
-						_setFrame(layoutAttrs->frame, UIUpdateMode::NoRedraw, sl_true);
-					}
-				} else {
-					if (!(layoutAttrs->flagInvalidLayout)) {
-						break;
-					}
-					if (layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping) {
-						measureLayout();
-						UIRect frame = layoutAttrs->frame;
-						if (layoutAttrs->widthMode == SizeMode::Wrapping) {
-							frame.setWidth(layoutAttrs->measuredWidth);
-						}
-						if (layoutAttrs->heightMode == SizeMode::Wrapping) {
-							frame.setHeight(layoutAttrs->measuredHeight);
-						}
-						_setFrame(frame, UIUpdateMode::NoRedraw, sl_true);
-					}
+	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+	if (layoutAttrs.isNotNull()) {
+		if (flagApplyLayout) {
+			if (!(layoutAttrs->frame.isAlmostEqual(m_frame))) {
+				_setFrame(layoutAttrs->frame, UIUpdateMode::NoRedraw, sl_true);
+				m_flagInvalidLayout = sl_true;
+			}
+		} else {
+			if (layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping) {
+				measureLayout();
+				UIRect frame = layoutAttrs->frame;
+				sl_bool flagUpdate = sl_false;
+				if (layoutAttrs->widthMode == SizeMode::Wrapping && !(Math::isAlmostZero(layoutAttrs->measuredWidth - m_frame.getWidth()))) {
+					frame.setWidth(layoutAttrs->measuredWidth);
+					flagUpdate = sl_true;
 				}
-				
-				if (layoutAttrs->flagMakeLayout) {
-					
-					ViewPrepareLayoutParam param;
-					param.parentContentFrame.left = m_paddingLeft;
-					param.parentContentFrame.top = m_paddingTop;
-					param.parentContentFrame.right = getWidth() - m_paddingRight;
-					param.parentContentFrame.bottom = getHeight() - m_paddingBottom;
-					param.parentContentFrame.fixSizeError();
-					param.flagUseLayoutFrame = sl_false;
-					
-					{
-						ListLocker< Ref<View> > children(m_children);
-						for (sl_size i = 0; i < children.count; i++) {
-							Ref<View>& child = children[i];
-							if (child.isNotNull() && child->isLayouting()) {
-								child->_prepareLayout(param);
-								child->setLayoutFrameUpdated(sl_false);
-							}
-						}
-					}
-					
-					if (layoutAttrs->flagOnMakeLayout) {
-						onMakeLayout();
-					}
-					
-					param.flagUseLayoutFrame = sl_true;
-
-					{
-						ListLocker< Ref<View> > children(m_children);
-						for (sl_size i = 0; i < children.count; i++) {
-							Ref<View>& child = children[i];
-							if (child.isNotNull() && child->isLayouting()) {
-								if (!(child->isLayoutFrameUpdated())) {
-									child->_prepareLayout(param);
-									if (child->isOnPrepareLayoutEnabled()) {
-										child->onPrepareLayout(param);
-									}
-								}
-								child->_setFrame(child->getLayoutFrame(), UIUpdateMode::NoRedraw, sl_true);
-								if (child->isInstance() && IsInstanceOf<RenderView>(child)) {
-									child->_requestMakeLayout();
-								} else {
-									child->_makeLayout(sl_true);
-								}
-							}
-						}
-					}
+				if (layoutAttrs->heightMode == SizeMode::Wrapping && !(Math::isAlmostZero(layoutAttrs->measuredHeight - m_frame.getHeight()))) {
+					frame.setHeight(layoutAttrs->measuredHeight);
+					flagUpdate = sl_true;
 				}
-				
-				layoutAttrs->flagInvalidLayout = sl_false;
-				
-			} while (0);
-
-			layoutAttrs->flagRecursiveMakeLayout = sl_false;
-			
+				if (flagUpdate) {
+					_setFrame(frame, UIUpdateMode::NoRedraw, sl_true);
+					m_flagInvalidLayout = sl_true;
+				}
+			}
 		}
 	}
+	
+	if (m_flagInvalidLayout) {
+		
+		if (m_children.getCount() > 0) {
+			
+			ViewPrepareLayoutParam param;
+			param.parentContentFrame.left = m_paddingLeft;
+			param.parentContentFrame.top = m_paddingTop;
+			param.parentContentFrame.right = getWidth() - m_paddingRight;
+			param.parentContentFrame.bottom = getHeight() - m_paddingBottom;
+			param.parentContentFrame.fixSizeError();
+			param.flagUseLayoutFrame = sl_false;
+			
+			{
+				ListLocker< Ref<View> > children(m_children);
+				for (sl_size i = 0; i < children.count; i++) {
+					Ref<View>& child = children[i];
+					if (child.isNotNull() && child->m_layoutAttributes.isNotNull()) {
+						child->_prepareLayout(param);
+						child->setLayoutFrameUpdated(sl_false);
+					}
+				}
+			}
+			
+			if (layoutAttrs.isNotNull() && layoutAttrs->flagOnMakeLayout) {
+				onMakeLayout();
+			}
+			
+			param.flagUseLayoutFrame = sl_true;
 
+			{
+				ListLocker< Ref<View> > children(m_children);
+				for (sl_size i = 0; i < children.count; i++) {
+					Ref<View>& child = children[i];
+					if (child.isNotNull()) {
+						if (child->m_layoutAttributes.isNotNull() && !(child->isLayoutFrameUpdated())) {
+							child->_prepareLayout(param);
+							if (child->isOnPrepareLayoutEnabled()) {
+								child->onPrepareLayout(param);
+							}
+						}
+						if (child->isNativeWidget() && IsInstanceOf<RenderView>(child)) {
+							child->_setFrame(child->getLayoutFrame(), UIUpdateMode::NoRedraw, sl_true);
+							if (child->m_flagInvalidLayout) {
+								child->_requestMakeLayout();
+							}
+						} else {
+							child->_makeLayout(sl_true);
+						}
+					}
+				}
+			}
+		}
+		
+		m_flagInvalidLayout = sl_false;
+		
+	};
+	
 }
 
 void View::_measureRelativeBoundWidth()
@@ -2276,127 +2287,84 @@ void View::measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 
 void View::_requestMakeLayout()
 {
-	dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, _makeLayout, this, sl_false));
-}
-
-void View::_requestInvalidateLayout(UIUpdateMode mode)
-{
-	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
-	if (layoutAttrs.isNotNull()) {
-		layoutAttrs->flagInvalidLayout = sl_true;
-		layoutAttrs->flagInvalidMeasure = sl_true;
-		if (mode != UIUpdateMode::Init) {
-			_requestMakeLayout();
+	if (isInstance()) {
+		dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, _makeLayout, this, sl_false));
+		return;
+	}
+	Ref<View> view = m_parent;
+	while (view.isNotNull()) {
+		if (view->isInstance()) {
+			view->dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, _makeLayout, this, sl_false));
+			return;
 		}
+		view = view->m_parent;
 	}
 }
 
-void View::_requestInvalidateMeasure(sl_bool flagWidth, sl_bool flagHeight, UIUpdateMode mode)
-{
-	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
-	if (layoutAttrs.isNotNull()) {
-		layoutAttrs->flagInvalidLayout = sl_true;
-		flagWidth = flagWidth && layoutAttrs->widthMode == SizeMode::Wrapping;
-		flagHeight = flagHeight && layoutAttrs->heightMode == SizeMode::Wrapping;
-		if (flagWidth || flagHeight) {
-			Ref<View> parent = m_parent;
-			if (parent.isNotNull()) {
-				parent->_requestInvalidateMeasure(flagWidth, flagHeight, mode);
-			}
-		}
-		_requestInvalidateLayout(mode);
-	}
-}
-
-void View::requestLayout(UIUpdateMode mode)
+void View::invalidateLayoutFromResize(UIUpdateMode mode)
 {
 	if (mode == UIUpdateMode::Init) {
 		return;
 	}
-	_requestInvalidateMeasure(sl_true, sl_true, mode);
+	m_flagInvalidLayout = sl_true;
+	Ref<View> parent = m_parent;
+	if (parent.isNotNull()) {
+		parent->invalidateLayoutFromResizeContent(UIUpdateMode::NoRedraw);
+	} else {
+		if (m_children.getCount() > 0) {
+			_requestMakeLayout();
+		}
+	}
 	if (mode == UIUpdateMode::Redraw) {
 		invalidate();
 	}
 }
 
-void View::requestParentLayout(UIUpdateMode mode)
+void View::invalidateLayoutFromResizeContent(UIUpdateMode mode)
+{
+	if (mode == UIUpdateMode::Init) {
+		return;
+	}
+	m_flagInvalidLayout = sl_true;
+	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
+	if (layoutAttrs.isNotNull()) {
+		if (layoutAttrs->widthMode == SizeMode::Wrapping || layoutAttrs->heightMode == SizeMode::Wrapping) {
+			layoutAttrs->flagInvalidMeasure = sl_true;
+			Ref<View> parent = m_parent;
+			if (parent.isNotNull()) {
+				parent->invalidateLayoutFromResizeContent(UIUpdateMode::NoRedraw);
+			} else {
+				_requestMakeLayout();
+			}
+		} else {
+			if (m_children.getCount() > 0) {
+				_requestMakeLayout();
+			}
+		}
+	} else {
+		if (m_children.getCount() > 0) {
+			_requestMakeLayout();
+		}
+	}
+	if (mode == UIUpdateMode::Redraw) {
+		invalidate();
+	}
+}
+
+void View::invalidateParentLayout(UIUpdateMode mode)
 {
 	if (mode == UIUpdateMode::Init) {
 		return;
 	}
 	Ref<View> parent = m_parent;
 	if (parent.isNotNull()) {
-		parent->requestLayout(mode);
+		parent->invalidateLayoutFromResizeContent(mode);
 	}
-}
-
-void View::requestParentAndSelfLayout(UIUpdateMode mode)
-{
-	if (mode == UIUpdateMode::Init) {
-		return;
-	}
-	Ref<LayoutAttributes> layoutAttrs = m_layoutAttributes;
-	if (layoutAttrs.isNotNull()) {
-		layoutAttrs->flagInvalidLayout = sl_true;
-		layoutAttrs->flagInvalidMeasure = sl_true;
-		Ref<View> parent = m_parent;
-		if (parent.isNotNull() && parent->isLayouting()) {
-			parent->requestLayout(mode);
-			_requestInvalidateLayout(mode);
-		} else {
-			_requestInvalidateLayout(mode);
-			if (mode == UIUpdateMode::Redraw) {
-				invalidate();
-			}
-		}
-	}
-}
-
-void View::invalidateContentLayout(UIUpdateMode mode)
-{
-	if (mode == UIUpdateMode::Init) {
-		return;
-	}
-	if (isWidthWrapping() || isHeightWrapping()) {
-		Ref<View> parent = m_parent;
-		if (parent.isNotNull()) {
-			parent->requestLayout(UIUpdateMode::NoRedraw);
-		}
-	}
-	if (!(isNativeWidget())) {
-		if (mode == UIUpdateMode::Redraw) {
-			invalidate();
-		}
-	}
-}
-
-sl_bool View::isLayouting()
-{
-	return m_layoutAttributes.isNotNull();
 }
 
 void View::resetLayout(UIUpdateMode mode)
 {
 	m_layoutAttributes.setNull();
-	requestParentLayout(mode);
-}
-
-sl_bool View::isMakingLayout()
-{
-	Ref<LayoutAttributes> attrs = m_layoutAttributes;
-	if (attrs.isNotNull()) {
-		return attrs->flagMakeLayout;
-	}
-	return sl_false;
-}
-
-void View::setMakingLayout(sl_bool flagMakeLayout, UIUpdateMode mode)
-{
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
-	if (attrs.isNotNull()) {
-		attrs->flagMakeLayout = flagMakeLayout;
-		requestLayout(mode);
-	}
 }
 
 UIRect View::getLayoutFrame()
@@ -2450,10 +2418,9 @@ sl_bool View::isOnPrepareLayoutEnabled()
 
 void View::setOnPrepareLayoutEnabled(sl_bool flagEnabled, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->flagOnPrepareLayout = flagEnabled;
-		requestParentLayout(mode);
 	}
 }
 
@@ -2468,10 +2435,9 @@ sl_bool View::isOnMakeLayoutEnabled()
 
 void View::setOnMakeLayoutEnabled(sl_bool flagEnabled, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->flagOnMakeLayout = flagEnabled;
-		requestLayout(mode);
 	}
 }
 
@@ -2504,10 +2470,10 @@ sl_bool View::isWidthFixed()
 
 void View::setWidthFixed(UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
 	if (attrs.isNotNull()) {
 		attrs->widthMode = SizeMode::Fixed;
-		requestParentAndSelfLayout(mode);
+		invalidateLayoutFromResize(mode);
 	}
 }
 
@@ -2522,20 +2488,20 @@ sl_bool View::isHeightFixed()
 
 void View::setHeightFixed(UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
 	if (attrs.isNotNull()) {
 		attrs->heightMode = SizeMode::Fixed;
-		requestParentAndSelfLayout(mode);
+		invalidateLayoutFromResize(mode);
 	}
 }
 
 void View::setSizeFixed(UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
 	if (attrs.isNotNull()) {
 		attrs->widthMode = SizeMode::Fixed;
 		attrs->heightMode = SizeMode::Fixed;
-		requestParentAndSelfLayout(mode);
+		invalidateLayoutFromResize(mode);
 	}
 }
 
@@ -2568,11 +2534,11 @@ sl_bool View::isWidthFilling()
 
 void View::setWidthFilling(sl_real weight, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->widthMode = SizeMode::Filling;
 		attrs->widthWeight = weight;
-		requestParentAndSelfLayout(mode);
+		invalidateLayoutFromResize(mode);
 	}
 }
 
@@ -2587,23 +2553,23 @@ sl_bool View::isHeightFilling()
 
 void View::setHeightFilling(sl_real weight, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->heightMode = SizeMode::Filling;
 		attrs->heightWeight = weight;
-		requestParentAndSelfLayout(mode);
+		invalidateLayoutFromResize(mode);
 	}
 }
 
 void View::setSizeFilling(sl_real widthWeight, sl_real heightWeight, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->widthMode = SizeMode::Filling;
 		attrs->widthWeight = widthWeight;
 		attrs->heightMode = SizeMode::Filling;
 		attrs->heightWeight = heightWeight;
-		requestParentAndSelfLayout(mode);
+		invalidateLayoutFromResize(mode);
 	}
 }
 
@@ -2618,10 +2584,10 @@ sl_bool View::isWidthWrapping()
 
 void View::setWidthWrapping(UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->widthMode = SizeMode::Wrapping;
-		requestParentAndSelfLayout(mode);
+		invalidateLayoutFromResizeContent(mode);
 	}
 }
 
@@ -2636,20 +2602,20 @@ sl_bool View::isHeightWrapping()
 
 void View::setHeightWrapping(UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->heightMode = SizeMode::Wrapping;
-		requestParentAndSelfLayout(mode);
+		invalidateLayoutFromResizeContent(mode);
 	}
 }
 
 void View::setSizeWrapping(UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->widthMode = SizeMode::Wrapping;
 		attrs->heightMode = SizeMode::Wrapping;
-		requestParentAndSelfLayout(mode);
+		invalidateLayoutFromResizeContent(mode);
 	}
 }
 
@@ -2664,11 +2630,11 @@ sl_bool View::isWidthWeight()
 
 void View::setWidthWeight(sl_real weight, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->widthMode = SizeMode::Weight;
 		attrs->widthWeight = weight;
-		requestParentAndSelfLayout(mode);
+		invalidateLayoutFromResize(mode);
 	}
 }
 
@@ -2683,23 +2649,23 @@ sl_real View::getHeightWeight()
 
 void View::setHeightWeight(sl_real weight, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->heightMode = SizeMode::Weight;
 		attrs->heightWeight = weight;
-		requestParentAndSelfLayout(mode);
+		invalidateLayoutFromResize(mode);
 	}
 }
 
 void View::setSizeWeight(sl_real widthWeight, sl_real heightWeight, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->widthMode = SizeMode::Weight;
 		attrs->widthWeight = widthWeight;
 		attrs->heightMode = SizeMode::Weight;
 		attrs->heightWeight = heightWeight;
-		requestParentAndSelfLayout(mode);
+		invalidateLayoutFromResize(mode);
 	}
 }
 
@@ -2714,10 +2680,10 @@ sl_bool View::isLayoutLeftFixed()
 
 void View::setLayoutLeftFixed(UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
 	if (attrs.isNotNull()) {
 		attrs->leftMode = PositionMode::Fixed;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -2732,10 +2698,10 @@ sl_bool View::isAlignParentLeft()
 
 void View::setAlignParentLeft(UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->leftMode = PositionMode::ParentEdge;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -2753,11 +2719,11 @@ void View::setAlignLeft(const Ref<View>& view, UIUpdateMode mode)
 	if (view.isNull()) {
 		return;
 	}
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->leftMode = PositionMode::OtherStart;
 		attrs->leftReferingView = view;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -2775,11 +2741,11 @@ void View::setRightOf(const Ref<View>& view, UIUpdateMode mode)
 	if (view.isNull()) {
 		return;
 	}
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->leftMode = PositionMode::OtherEnd;
 		attrs->leftReferingView = view;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -2803,10 +2769,10 @@ sl_bool View::isLayoutRightFixed()
 
 void View::setLayoutRightFixed(UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
 	if (attrs.isNotNull()) {
 		attrs->rightMode = PositionMode::Fixed;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -2821,10 +2787,10 @@ sl_bool View::isAlignParentRight()
 
 void View::setAlignParentRight(UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->rightMode = PositionMode::ParentEdge;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -2842,11 +2808,11 @@ void View::setAlignRight(const Ref<View>& view, UIUpdateMode mode)
 	if (view.isNull()) {
 		return;
 	}
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->rightMode = PositionMode::OtherEnd;
 		attrs->rightReferingView = view;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -2864,11 +2830,11 @@ void View::setLeftOf(const Ref<View>& view, UIUpdateMode mode)
 	if (view.isNull()) {
 		return;
 	}
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->rightMode = PositionMode::OtherStart;
 		attrs->rightReferingView = view;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -2892,10 +2858,10 @@ sl_bool View::isLayoutTopFixed()
 
 void View::setLayoutTopFixed(UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
 	if (attrs.isNotNull()) {
 		attrs->topMode = PositionMode::Fixed;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 
 }
@@ -2911,10 +2877,10 @@ sl_bool View::isAlignParentTop()
 
 void View::setAlignParentTop(UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->topMode = PositionMode::ParentEdge;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -2932,11 +2898,11 @@ void View::setAlignTop(const Ref<View>& view, UIUpdateMode mode)
 	if (view.isNull()) {
 		return;
 	}
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->topMode = PositionMode::OtherStart;
 		attrs->topReferingView = view;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -2954,11 +2920,11 @@ void View::setBelow(const Ref<View>& view, UIUpdateMode mode)
 	if (view.isNull()) {
 		return;
 	}
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->topMode = PositionMode::OtherEnd;
 		attrs->topReferingView = view;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -2982,10 +2948,10 @@ sl_bool View::isLayoutBottomFixed()
 
 void View::setLayoutBottomFixed(UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
 	if (attrs.isNotNull()) {
 		attrs->bottomMode = PositionMode::Fixed;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -3000,10 +2966,10 @@ sl_bool View::isAlignParentBottom()
 
 void View::setAlignParentBottom(UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->bottomMode = PositionMode::ParentEdge;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -3021,11 +2987,11 @@ void View::setAlignBottom(const Ref<View>& view, UIUpdateMode mode)
 	if (view.isNotNull()) {
 		return;
 	}
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->bottomMode = PositionMode::OtherEnd;
 		attrs->bottomReferingView = view;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -3043,11 +3009,11 @@ void View::setAbove(const Ref<View>& view, UIUpdateMode mode)
 	if (view.isNotNull()) {
 		return;
 	}
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->bottomMode = PositionMode::OtherStart;
 		attrs->bottomReferingView = view;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -3071,10 +3037,10 @@ sl_bool View::isCenterHorizontal()
 
 void View::setCenterHorizontal(UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->leftMode = PositionMode::CenterInParent;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -3089,20 +3055,20 @@ sl_bool View::isCenterVertical()
 
 void View::setCenterVertical(UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->topMode = PositionMode::CenterInParent;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
 void View::setCenterInParent(UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->leftMode = PositionMode::CenterInParent;
 		attrs->topMode = PositionMode::CenterInParent;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -3120,11 +3086,11 @@ void View::setAlignCenterHorizontal(const Ref<View>& view, UIUpdateMode mode)
 	if (view.isNotNull()) {
 		return;
 	}
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->leftMode = PositionMode::CenterInOther;
 		attrs->leftReferingView = view;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -3142,17 +3108,17 @@ void View::setAlignCenterVertical(const Ref<View>& view, UIUpdateMode mode)
 	if (view.isNotNull()) {
 		return;
 	}
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->topMode = PositionMode::CenterInOther;
 		attrs->topReferingView = view;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
 sl_ui_len View::getMinimumWidth()
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
 	if (attrs.isNotNull()) {
 		return attrs->minWidth;
 	}
@@ -3161,19 +3127,19 @@ sl_ui_len View::getMinimumWidth()
 
 void View::setMinimumWidth(sl_ui_len width, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		if (width < 0) {
 			width = 0;
 		}
 		attrs->minWidth = width;
-		requestParentAndSelfLayout(mode);
+		invalidateLayoutFromResize(mode);
 	}
 }
 
 sl_ui_len View::getMaximumWidth()
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
 	if (attrs.isNotNull()) {
 		return attrs->maxWidth;
 	}
@@ -3182,19 +3148,19 @@ sl_ui_len View::getMaximumWidth()
 
 void View::setMaximumWidth(sl_ui_len width, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		if (width < 0) {
 			width = DEFAULT_MAX_SIZE;
 		}
 		attrs->maxWidth = width;
-		requestParentAndSelfLayout(mode);
+		invalidateLayoutFromResize(mode);
 	}
 }
 
 sl_ui_len View::getMinimumHeight()
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
 	if (attrs.isNotNull()) {
 		return attrs->minHeight;
 	}
@@ -3203,19 +3169,19 @@ sl_ui_len View::getMinimumHeight()
 
 void View::setMinimumHeight(sl_ui_len height, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		if (height < 0) {
 			height = 0;
 		}
 		attrs->minHeight = height;
-		requestParentAndSelfLayout(mode);
+		invalidateLayoutFromResize(mode);
 	}
 }
 
 sl_ui_len View::getMaximumHeight()
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
 	if (attrs.isNotNull()) {
 		return attrs->maxHeight;
 	}
@@ -3224,19 +3190,19 @@ sl_ui_len View::getMaximumHeight()
 
 void View::setMaximumHeight(sl_ui_len height, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		if (height < 0) {
 			height = DEFAULT_MAX_SIZE;
 		}
 		attrs->maxHeight = height;
-		requestParentAndSelfLayout(mode);
+		invalidateLayoutFromResize(mode);
 	}
 }
 
 AspectRatioMode View::getAspectRatioMode()
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
 	if (attrs.isNotNull()) {
 		return attrs->aspectRatioMode;
 	}
@@ -3245,16 +3211,16 @@ AspectRatioMode View::getAspectRatioMode()
 
 void View::setAspectRatioMode(AspectRatioMode aspectRatioMode, UIUpdateMode updateMode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->aspectRatioMode = aspectRatioMode;
-		requestParentAndSelfLayout(updateMode);
+		invalidateLayoutFromResize(updateMode);
 	}
 }
 
 sl_real View::getAspectRatio()
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = m_layoutAttributes;
 	if (attrs.isNotNull()) {
 		return attrs->aspectRatio;
 	}
@@ -3263,13 +3229,13 @@ sl_real View::getAspectRatio()
 
 void View::setAspectRatio(sl_real ratio, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		if (ratio < 0) {
 			ratio = 1;
 		}
 		attrs->aspectRatio = ratio;
-		requestParentAndSelfLayout(mode);
+		invalidateLayoutFromResize(mode);
 	}
 }
 
@@ -3284,13 +3250,13 @@ sl_ui_pos View::getMarginLeft()
 
 void View::setMarginLeft(sl_ui_pos marginLeft, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->marginLeft = marginLeft;
 		if (attrs->leftMode == PositionMode::Fixed && attrs->rightMode == PositionMode::Fixed) {
 			attrs->leftMode = PositionMode::ParentEdge;
 		}
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -3305,13 +3271,13 @@ sl_ui_pos View::getMarginTop()
 
 void View::setMarginTop(sl_ui_pos marginTop, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->marginTop = marginTop;
 		if (attrs->topMode == PositionMode::Fixed && attrs->bottomMode == PositionMode::Fixed) {
 			attrs->topMode = PositionMode::ParentEdge;
 		}
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -3326,10 +3292,10 @@ sl_ui_pos View::getMarginRight()
 
 void View::setMarginRight(sl_ui_pos marginRight, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->marginRight = marginRight;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -3344,34 +3310,34 @@ sl_ui_pos View::getMarginBottom()
 
 void View::setMarginBottom(sl_ui_pos marginBottom, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->marginBottom = marginBottom;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
 void View::setMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->marginLeft = left;
 		attrs->marginTop = top;
 		attrs->marginRight = right;
 		attrs->marginBottom = bottom;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
 void View::setMargin(sl_ui_pos margin, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->marginLeft = margin;
 		attrs->marginTop = margin;
 		attrs->marginRight = margin;
 		attrs->marginBottom = margin;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -3395,14 +3361,14 @@ sl_real View::getRelativeMarginLeftWeight()
 
 void View::setRelativeMarginLeft(sl_real weight, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->flagRelativeMarginLeft = sl_true;
 		attrs->relativeMarginLeftWeight = weight;
 		if (attrs->leftMode == PositionMode::Fixed && attrs->rightMode == PositionMode::Fixed) {
 			attrs->leftMode = PositionMode::ParentEdge;
 		}
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -3420,14 +3386,14 @@ sl_ui_pos View::getAbsoluteMarginLeft()
 
 void View::setAbsoluteMarginLeft(sl_ui_pos margin, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->flagRelativeMarginLeft = sl_false;
 		attrs->marginLeft = margin;
 		if (attrs->leftMode == PositionMode::Fixed && attrs->rightMode == PositionMode::Fixed) {
 			attrs->leftMode = PositionMode::ParentEdge;
 		}
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -3451,14 +3417,14 @@ sl_real View::getRelativeMarginTopWeight()
 
 void View::setRelativeMarginTop(sl_real weight, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->flagRelativeMarginTop = sl_true;
 		attrs->relativeMarginTopWeight = weight;
 		if (attrs->topMode == PositionMode::Fixed && attrs->bottomMode == PositionMode::Fixed) {
 			attrs->topMode = PositionMode::ParentEdge;
 		}
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -3476,14 +3442,14 @@ sl_ui_pos View::getAbsoluteMarginTop()
 
 void View::setAbsoluteMarginTop(sl_ui_pos margin, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->flagRelativeMarginTop = sl_false;
 		attrs->marginTop = margin;
 		if (attrs->topMode == PositionMode::Fixed && attrs->bottomMode == PositionMode::Fixed) {
 			attrs->topMode = PositionMode::ParentEdge;
 		}
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -3507,11 +3473,11 @@ sl_real View::getRelativeMarginRightWeight()
 
 void View::setRelativeMarginRight(sl_real weight, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->flagRelativeMarginRight = sl_true;
 		attrs->relativeMarginRightWeight = weight;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -3529,11 +3495,11 @@ sl_ui_pos View::getAbsoluteMarginRight()
 
 void View::setAbsoluteMarginRight(sl_ui_pos margin, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->flagRelativeMarginRight = sl_false;
 		attrs->marginRight = margin;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -3557,11 +3523,11 @@ sl_real View::getRelativeMarginBottomWeight()
 
 void View::setRelativeMarginBottom(sl_real weight, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->flagRelativeMarginBottom = sl_true;
 		attrs->relativeMarginBottomWeight = weight;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -3579,11 +3545,11 @@ sl_ui_pos View::getAbsoluteMarginBottom()
 
 void View::setAbsoluteMarginBottom(sl_ui_pos margin, UIUpdateMode mode)
 {
-	Ref<LayoutAttributes> attrs = _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> attrs = _initializeLayoutAttributes();
 	if (attrs.isNotNull()) {
 		attrs->flagRelativeMarginBottom = sl_false;
 		attrs->marginBottom = margin;
-		requestParentLayout(mode);
+		invalidateParentLayout(mode);
 	}
 }
 
@@ -3614,7 +3580,7 @@ sl_ui_pos View::getPaddingLeft()
 void View::setPaddingLeft(sl_ui_pos paddingLeft, UIUpdateMode mode)
 {
 	m_paddingLeft = paddingLeft;
-	requestLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 	onChangePadding();
 }
 
@@ -3626,7 +3592,7 @@ sl_ui_pos View::getPaddingTop()
 void View::setPaddingTop(sl_ui_pos paddingTop, UIUpdateMode mode)
 {
 	m_paddingTop = paddingTop;
-	requestLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 	onChangePadding();
 }
 
@@ -3638,7 +3604,7 @@ sl_ui_pos View::getPaddingRight()
 void View::setPaddingRight(sl_ui_pos paddingRight, UIUpdateMode mode)
 {
 	m_paddingRight = paddingRight;
-	requestLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 	onChangePadding();
 }
 
@@ -3650,7 +3616,7 @@ sl_ui_pos View::getPaddingBottom()
 void View::setPaddingBottom(sl_ui_pos paddingBottom, UIUpdateMode mode)
 {
 	m_paddingBottom = paddingBottom;
-	requestLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 	onChangePadding();
 }
 
@@ -3660,7 +3626,7 @@ void View::setPadding(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos 
 	m_paddingTop = top;
 	m_paddingRight = right;
 	m_paddingBottom = bottom;
-	requestLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 	onChangePadding();
 }
 
@@ -3670,7 +3636,7 @@ void View::setPadding(sl_ui_pos padding, UIUpdateMode mode)
 	m_paddingTop = padding;
 	m_paddingRight = padding;
 	m_paddingBottom = padding;
-	requestLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 	onChangePadding();
 }
 
@@ -4702,7 +4668,7 @@ void View::_setFontInvalidateChildInstances()
 		if (child.isNotNull()) {
 			child->_setFontInvalidateChildInstances();
 			if (child->isUsingFont()) {
-				child->requestLayout(UIUpdateMode::NoRedraw);
+				child->invalidateLayoutFromResizeContent(UIUpdateMode::NoRedraw);
 				if (child->isInstance()) {
 					if (child->isNativeWidget()) {
 						Ref<Font> font = child->getFont();
@@ -4741,7 +4707,7 @@ void View::setFont(const Ref<Font>& font, UIUpdateMode mode)
 		} else {
 			attrs->font = font;
 			if (isUsingFont()) {
-				requestLayout(mode);
+				invalidateLayoutFromResizeContent(mode);
 				if (mode == UIUpdateMode::Redraw) {
 					invalidate();
 				}
@@ -4751,18 +4717,20 @@ void View::setFont(const Ref<Font>& font, UIUpdateMode mode)
 	}
 }
 
+#define _APPLY_FONT_PRECISION(f) (sl_real)((sl_int32)((f) + 0.5f))
+
 void View::setFont(const String& fontFamily, sl_real size, sl_bool flagBold, sl_bool flagItalic, sl_bool flagUnderline, UIUpdateMode mode)
 {
-	setFont(Font::create(fontFamily, size, flagBold, flagItalic, flagUnderline), mode);
+	setFont(Font::create(fontFamily, _APPLY_FONT_PRECISION(size), flagBold, flagItalic, flagUnderline), mode);
 }
 
 void View::setFontAttributes(sl_real size, sl_bool flagBold, sl_bool flagItalic, sl_bool flagUnderline, UIUpdateMode mode)
 {
 	Ref<Font> font = getFont();
 	if (font.isNull()) {
-		setFont(Font::create(UI::getDefaultFontFamily(), size, flagBold, flagItalic, flagUnderline), mode);
+		setFont(Font::create(UI::getDefaultFontFamily(), _APPLY_FONT_PRECISION(size), flagBold, flagItalic, flagUnderline), mode);
 	} else {
-		setFont(Font::create(font->getFamilyName(), size, flagBold, flagItalic, flagUnderline), mode);
+		setFont(Font::create(font->getFamilyName(), _APPLY_FONT_PRECISION(size), flagBold, flagItalic, flagUnderline), mode);
 	}
 }
 
@@ -6219,36 +6187,31 @@ void View::drawContent(Canvas *canvas)
 		}
 	}
 	
-	do {
-		
-		{
-			CanvasStateScope scope(canvas);
-			canvas->clipToRectangle(canvas->getInvalidatedRect());
-			if (drawAttrs.isNotNull()) {
-				if (drawAttrs->flagOnDrawBackgroundAlways || drawAttrs->backgroundColor.isNotZero() || drawAttrs->background.isNotNull()) {
-					onDrawBackground(canvas);
-				}
-			}
-			Ref<ScrollAttributes> scrollAttrs = m_scrollAttributes;
-			if (scrollAttrs.isNotNull()) {
-				sl_real scrollX = (sl_real)(scrollAttrs->x);
-				sl_real scrollY = (sl_real)(scrollAttrs->y);
-				if(!(Math::isAlmostZero(scrollX)) || !(Math::isAlmostZero(scrollY))) {
-					canvas->translate(-scrollX, -scrollY);
-				}
-			}
-			onDraw(canvas);
-			Ref<EventAttributes> eventAttrs = m_eventAttributes;
-			if (eventAttrs.isNotNull()) {
-				(eventAttrs->draw)(this, canvas);
+	{
+		CanvasStateScope scope(canvas);
+		if (drawAttrs.isNotNull()) {
+			if (drawAttrs->flagOnDrawBackgroundAlways || drawAttrs->backgroundColor.isNotZero() || drawAttrs->background.isNotNull()) {
+				onDrawBackground(canvas);
 			}
 		}
-		
-		if (m_children.getCount() > 0) {
-			onDrawChildren(canvas);
+		Ref<ScrollAttributes> scrollAttrs = m_scrollAttributes;
+		if (scrollAttrs.isNotNull()) {
+			sl_real scrollX = (sl_real)(scrollAttrs->x);
+			sl_real scrollY = (sl_real)(scrollAttrs->y);
+			if(!(Math::isAlmostZero(scrollX)) || !(Math::isAlmostZero(scrollY))) {
+				canvas->translate(-scrollX, -scrollY);
+			}
 		}
-
-	} while (0);
+		onDraw(canvas);
+		Ref<EventAttributes> eventAttrs = m_eventAttributes;
+		if (eventAttrs.isNotNull()) {
+			(eventAttrs->draw)(this, canvas);
+		}
+	}
+	
+	if (m_children.getCount() > 0) {
+		onDrawChildren(canvas);
+	}
 	
 }
 
@@ -6337,6 +6300,7 @@ void View::draw(Canvas* canvas)
 	}
 	
 	CanvasStateScope scope(canvas);
+	canvas->clipToRectangle(canvas->getInvalidatedRect());
 	drawContent(canvas);
 	
 }
@@ -8007,7 +7971,6 @@ ViewGroup::ViewGroup()
 	SLIB_REFERABLE_CONSTRUCTOR
 	
 	setCreatingChildInstances(sl_true);
-	setMakingLayout(sl_true, UIUpdateMode::Init);
 	
 }
 

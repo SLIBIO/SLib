@@ -117,16 +117,16 @@ Ref<FontAtlas> FontAtlas::getShared(const Ref<Font>& font)
 		_FontAtlasMap* map = _FontAtlas_getShared();
 		if (map) {
 			String fontFamily = font->getFamilyName();
-			int fontSize = (int)(font->getSize());
+			sl_real fontSize = SLIB_FONT_SIZE_PRECISION_APPLY(font->getSize());
 			sl_bool fontBold = font->isBold();
-			String sig = String::format("%s_%d_%s", fontFamily, fontSize, fontBold?"B":"");
+			String sig = String::format("%s_%d_%s", fontFamily, fontSize * SLIB_FONT_SIZE_PRECISION_MULTIPLIER, fontBold?"B":"");
 			WeakRef<FontAtlas> weakFA;
 			map->get(sig, &weakFA);
 			Ref<FontAtlas> ret = weakFA;
 			if (ret.isNotNull()) {
 				return ret;
 			}
-			Ref<Font> fontSource = Font::create(fontFamily, (sl_real)fontSize, fontBold);
+			Ref<Font> fontSource = Font::create(fontFamily, fontSize, fontBold);
 			if (fontSource.isNotNull()) {
 				FontAtlasParam fap;
 				fap.font = fontSource;

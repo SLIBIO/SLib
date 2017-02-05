@@ -27,13 +27,7 @@ public:
 	
 	void setVertical(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-protected:
-	// override
-	void onResizeChild(View* child, sl_ui_len width, sl_ui_len height);
-	
-	// override
-	void onChangeVisibilityOfChild(View* child, Visibility oldVisibility, Visibility newVisibility);
-	
+protected:	
 	// override
 	void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 	

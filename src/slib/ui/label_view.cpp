@@ -35,7 +35,7 @@ void LabelView::setText(const String& text, UIUpdateMode mode)
 	if (isNativeWidget()) {
 		_setText_NW(text);
 	}
-	invalidateContentLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 }
 
 Color LabelView::getTextColor()
@@ -80,7 +80,7 @@ MultiLineMode LabelView::getMultiLineMode()
 void LabelView::setMultiLineMode(MultiLineMode multiLineMode, UIUpdateMode updateMode)
 {
 	m_multiLineMode = multiLineMode;
-	invalidateContentLayout(updateMode);
+	invalidateLayoutFromResizeContent(updateMode);
 }
 
 void LabelView::onDraw(Canvas* canvas)

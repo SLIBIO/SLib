@@ -122,7 +122,7 @@ Button::Button(sl_uint32 nCategories, ButtonCategory* categories)
 	setUsingFont(sl_true);
 	
 	setBorder(Pen::create(PenStyle::Solid, 1, Color(100, 100, 100)), UIUpdateMode::Init);
-	setBackground(ColorDrawable::create(Color(240, 240, 240)), UIUpdateMode::Init);
+
 	m_textColorDefault = Color::Black;
 	
 }
@@ -143,7 +143,7 @@ void Button::setText(const String& text, UIUpdateMode mode)
 	if (isNativeWidget()) {
 		_setText_NW(text);
 	}
-	invalidateContentLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 }
 
 sl_bool Button::isDefaultButton()
@@ -201,7 +201,7 @@ sl_bool Button::isMultiLine()
 void Button::setMultiLine(sl_bool flag, UIUpdateMode mode)
 {
 	m_flagMultiLine = flag;
-	invalidateContentLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 }
 
 const UISize& Button::getIconSize()
@@ -212,7 +212,7 @@ const UISize& Button::getIconSize()
 void Button::setIconSize(const UISize& size, UIUpdateMode mode)
 {
 	m_iconSize = size;
-	invalidateContentLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 }
 
 void Button::setIconSize(sl_ui_len width, sl_ui_len height, UIUpdateMode mode)
@@ -266,7 +266,7 @@ Alignment Button::getIconAlignment()
 void Button::setIconAlignment(Alignment align, UIUpdateMode mode)
 {
 	m_iconAlignment = align;
-	invalidateContentLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 }
 
 Alignment Button::getTextAlignment()
@@ -277,7 +277,7 @@ Alignment Button::getTextAlignment()
 void Button::setTextAlignment(Alignment align, UIUpdateMode mode)
 {
 	m_textAlignment = align;
-	invalidateContentLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 }
 
 sl_bool Button::isTextBeforeIcon()
@@ -288,7 +288,7 @@ sl_bool Button::isTextBeforeIcon()
 void Button::setTextBeforeIcon(sl_bool flag, UIUpdateMode mode)
 {
 	m_flagTextBeforeIcon = flag;
-	invalidateContentLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 }
 
 LayoutOrientation Button::getLayoutOrientation()
@@ -299,7 +299,7 @@ LayoutOrientation Button::getLayoutOrientation()
 void Button::setLayoutOrientation(LayoutOrientation orientation, UIUpdateMode mode)
 {
 	m_layoutOrientation = orientation;
-	invalidateContentLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 }
 
 void Button::setIconMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui_pos bottom, UIUpdateMode mode)
@@ -308,7 +308,7 @@ void Button::setIconMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui
 	m_iconMarginTop = top;
 	m_iconMarginRight = right;
 	m_iconMarginBottom = bottom;
-	invalidateContentLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 }
 
 void Button::setIconMargin(sl_ui_pos margin, UIUpdateMode mode)
@@ -362,7 +362,7 @@ void Button::setTextMargin(sl_ui_pos left, sl_ui_pos top, sl_ui_pos right, sl_ui
 	m_textMarginTop = top;
 	m_textMarginRight = right;
 	m_textMarginBottom = bottom;
-	invalidateContentLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 }
 
 void Button::setTextMargin(sl_ui_pos margin, UIUpdateMode mode)
@@ -630,14 +630,13 @@ void Button::onDraw(Canvas* canvas)
 
 void Button::onDrawBackground(Canvas* canvas)
 {
+	Color color = getBackgroundColor();
+	
 	ButtonCategoryProperties& params = m_categories[m_category].properties[(int)m_state];
 	Ref<Drawable> background = params.background;
-	if (background.isNotNull()) {
-		drawBackground(canvas, getBackgroundColor(), background);
-	} else {
+	if (background.isNull()) {
 		Ref<DrawAttributes> attrs = m_drawAttributes;
 		if (attrs.isNotNull()) {
-			Ref<Drawable> background;
 			switch (m_state) {
 				case ButtonState::Hover:
 					background = attrs->backgroundHover;
@@ -650,31 +649,34 @@ void Button::onDrawBackground(Canvas* canvas)
 			}
 			if (background.isNull()) {
 				background = attrs->background;
-				if (background.isNotNull()) {
-					if (m_flagUseDefaultColorFilter) {
-						const ColorMatrix* cm = sl_null;
-						switch (m_state) {
-							case ButtonState::Hover:
-								cm = &_g_button_colorMatrix_hover;
-								break;
-							case ButtonState::Pressed:
-								cm = &_g_button_colorMatrix_pressed;
-								break;
-							case ButtonState::Disabled:
-								cm = &_g_button_colorMatrix_disabled;
-								break;
-							default:
-								break;
-						}
-						if (cm) {
-							background = background->filter(*cm);
-						}
-					}
-				}
 			}
-			drawBackground(canvas, attrs->backgroundColor, background);
 		}
 	}
+	
+	if (m_flagUseDefaultColorFilter) {
+		const ColorMatrix* cm = sl_null;
+		switch (m_state) {
+			case ButtonState::Hover:
+				cm = &_g_button_colorMatrix_hover;
+				break;
+			case ButtonState::Pressed:
+				cm = &_g_button_colorMatrix_pressed;
+				break;
+			case ButtonState::Disabled:
+				cm = &_g_button_colorMatrix_disabled;
+				break;
+			default:
+				break;
+		}
+		if (cm) {
+			if (background.isNotNull()) {
+				background = background->filter(*cm);
+			}
+			color = cm->transformColor(color);
+		}
+	}
+	drawBackground(canvas, color, background);
+
 }
 
 void Button::onDrawBorder(Canvas* canvas)

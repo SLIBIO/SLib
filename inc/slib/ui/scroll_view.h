@@ -65,9 +65,6 @@ protected:
 	
 	// override
 	void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
-
-	// override
-	void onMakeLayout();
 	
 private:
 	void _scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate, UIUpdateMode mode);

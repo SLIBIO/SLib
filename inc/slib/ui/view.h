@@ -278,22 +278,13 @@ public:
 	
 	void setMeasuredHeight(sl_ui_len height);
 
-	void requestLayout(UIUpdateMode mode = UIUpdateMode::Redraw);
+	void invalidateLayoutFromResize(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void requestParentLayout(UIUpdateMode mode = UIUpdateMode::Redraw);
+	void invalidateLayoutFromResizeContent(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	void requestParentAndSelfLayout(UIUpdateMode mode = UIUpdateMode::Redraw);
-
-	void invalidateContentLayout(UIUpdateMode mode = UIUpdateMode::Redraw);
-
-	
-	sl_bool isLayouting();
+	void invalidateParentLayout(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	void resetLayout(UIUpdateMode mode = UIUpdateMode::Redraw);
-	
-	sl_bool isMakingLayout();
-	
-	void setMakingLayout(sl_bool flag, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	UIRect getLayoutFrame();
 	
@@ -1202,10 +1193,6 @@ private:
 	
 	void _requestMakeLayout();
 	
-	void _requestInvalidateLayout(UIUpdateMode mode);
-	
-	void _requestInvalidateMeasure(sl_bool flagWidth, sl_bool flagHeight, UIUpdateMode mode);
-	
 	void _applyCalcTransform(UIUpdateMode mode);
 	
 	void _applyFinalTransform(UIUpdateMode mode);
@@ -1308,6 +1295,7 @@ private:
 	
 	AtomicRef<GestureDetector> m_gestureDetector;
 	
+	sl_bool m_flagInvalidLayout;
 	sl_ui_pos m_paddingLeft;
 	sl_ui_pos m_paddingTop;
 	sl_ui_pos m_paddingRight;
@@ -1344,8 +1332,6 @@ protected:
 		UIRect frame;
 		UIRect requestedFrame;
 		sl_bool flagInvalidMeasure;
-		sl_bool flagInvalidLayout;
-		sl_bool flagMakeLayout;
 
 		sl_ui_len measuredRelativeBoundWidth;
 		sl_bool flagInvalidRelativeBoundWidth;
@@ -1370,13 +1356,12 @@ protected:
 		sl_bool flagRelativeMarginBottom;
 		sl_real relativeMarginBottomWeight;
 		
-		sl_bool flagRecursiveMakeLayout;
 		sl_bool flagUpdatedLayoutFrame;
 		
 	};
 	AtomicRef<LayoutAttributes> m_layoutAttributes;
 	
-	Ref<LayoutAttributes> _initializeLayoutAttibutes();
+	Ref<LayoutAttributes> _initializeLayoutAttributes();
 
 	class TransformAttributes : public Referable
 	{

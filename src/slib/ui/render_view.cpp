@@ -43,7 +43,6 @@ RenderView::RenderView()
 	
 	setCreatingNativeWidget(sl_true);
 	setCreatingChildInstances(sl_false);
-	setMakingLayout(sl_true, UIUpdateMode::Init);
 	
 	setPreferredEngineType(RenderEngineType::OpenGL_ES);
 	
@@ -130,20 +129,32 @@ Ref<AnimationLoop> RenderView::getAnimationLoop()
 
 sl_bool RenderView::isDrawingThread()
 {
-	return Thread::getCurrentThreadUniqueId() == m_lastRenderingThreadId;
+	if (isNativeWidget()) {
+		return Thread::getCurrentThreadUniqueId() == m_lastRenderingThreadId;
+	} else {
+		return View::isDrawingThread();
+	}
 }
 
 void RenderView::dispatchToDrawingThread(const Function<void()>& callback, sl_uint32 delayMillis)
 {
-	m_queuePostedCallbacks.push(callback);
+	if (isNativeWidget()) {
+		m_queuePostedCallbacks.push(callback);
+	} else {
+		View::dispatchToDrawingThread(callback, delayMillis);
+	}
 }
 
 void RenderView::runOnDrawingThread(const Function<void()>& callback)
 {
-	if (Thread::getCurrentThreadUniqueId() == m_lastRenderingThreadId) {
-		callback();
+	if (isNativeWidget()) {
+		if (Thread::getCurrentThreadUniqueId() == m_lastRenderingThreadId) {
+			callback();
+		} else {
+			m_queuePostedCallbacks.push(callback);
+		}
 	} else {
-		m_queuePostedCallbacks.push(callback);
+		View::runOnDrawingThread(callback);
 	}
 }
 
@@ -265,7 +276,7 @@ void RenderView::dispatchMouseEvent(UIEvent* ev)
 void RenderView::dispatchTouchEvent(UIEvent* ev)
 {
 	if (m_flagDispatchEventsToRenderingThread) {
-		if (Thread::getCurrentThreadUniqueId() != m_lastRenderingThreadId) {
+		if (!(isDrawingThread())) {
 			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchTouchEvent, this, ev->duplicate()));
 			return;
 		}
@@ -276,7 +287,7 @@ void RenderView::dispatchTouchEvent(UIEvent* ev)
 void RenderView::dispatchMouseWheelEvent(UIEvent* ev)
 {
 	if (m_flagDispatchEventsToRenderingThread) {
-		if (Thread::getCurrentThreadUniqueId() != m_lastRenderingThreadId) {
+		if (!(isDrawingThread())) {
 			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchMouseWheelEvent, this, ev->duplicate()));
 			return;
 		}
@@ -287,7 +298,7 @@ void RenderView::dispatchMouseWheelEvent(UIEvent* ev)
 void RenderView::dispatchKeyEvent(UIEvent* ev)
 {
 	if (m_flagDispatchEventsToRenderingThread) {
-		if (Thread::getCurrentThreadUniqueId() != m_lastRenderingThreadId) {
+		if (!(isDrawingThread())) {
 			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchKeyEvent, this, ev->duplicate()));
 			return;
 		}
@@ -298,7 +309,7 @@ void RenderView::dispatchKeyEvent(UIEvent* ev)
 void RenderView::dispatchClick(UIEvent* ev)
 {
 	if (m_flagDispatchEventsToRenderingThread) {
-		if (Thread::getCurrentThreadUniqueId() != m_lastRenderingThreadId) {
+		if (!(isDrawingThread())) {
 			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchClick, this, ev->duplicate()));
 			return;
 		}
@@ -309,7 +320,7 @@ void RenderView::dispatchClick(UIEvent* ev)
 void RenderView::dispatchSetCursor(UIEvent* ev)
 {
 	if (m_flagDispatchEventsToRenderingThread) {
-		if (Thread::getCurrentThreadUniqueId() != m_lastRenderingThreadId) {
+		if (!(isDrawingThread())) {
 			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchSetCursor, this, ev->duplicate()));
 			return;
 		}
@@ -320,7 +331,7 @@ void RenderView::dispatchSetCursor(UIEvent* ev)
 void RenderView::dispatchSwipe(GestureEvent* ev)
 {
 	if (m_flagDispatchEventsToRenderingThread) {
-		if (Thread::getCurrentThreadUniqueId() != m_lastRenderingThreadId) {
+		if (!(isDrawingThread())) {
 			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchSwipe, this, ev->duplicate()));
 			return;
 		}

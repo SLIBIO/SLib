@@ -11,7 +11,6 @@ ScrollView::ScrollView()
 
 	setCreatingNativeWidget(sl_true);
 	setCreatingChildInstances(sl_false);
-    setMakingLayout(sl_true, UIUpdateMode::Init);
 
 	m_flagPaging = sl_false;
 	m_pageWidth = 0;
@@ -191,10 +190,6 @@ void ScrollView::onResizeChild(View* child, sl_ui_len width, sl_ui_len height)
 
 void ScrollView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 {
-}
-
-void ScrollView::onMakeLayout()
-{	
 }
 
 void ScrollView::_scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate, UIUpdateMode mode)

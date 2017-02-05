@@ -25,7 +25,7 @@ void LinearView::setOrientation(LayoutOrientation orientation, UIUpdateMode mode
 		return;
 	}
 	m_orientation = orientation;
-	requestLayout(mode);
+	invalidateLayoutFromResizeContent(mode);
 }
 
 sl_bool LinearView::isHorizontal()
@@ -46,20 +46,6 @@ sl_bool LinearView::isVertical()
 void LinearView::setVertical(UIUpdateMode mode)
 {
 	setOrientation(LayoutOrientation::Vertical, mode);
-}
-
-void LinearView::onResizeChild(View* child, sl_ui_len width, sl_ui_len height)
-{
-	if (!(child->isLayouting())) {
-		requestLayout();
-	}
-}
-
-void LinearView::onChangeVisibilityOfChild(View* child, Visibility oldVisibility, Visibility newVisibility)
-{
-	if (!(child->isLayouting())) {
-		requestLayout();
-	}
 }
 
 void LinearView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
@@ -165,7 +151,7 @@ void LinearView::onMakeLayout()
 						UIRect frame = child->getLayoutFrame();
 						sizeSum += frame.getHeight();
 					} else {
-						if (Math::isAlmostZero(child->getWidthWeight() - 1)) {
+						if (Math::isAlmostZero(child->getHeightWeight() - 1)) {
 							countFullFill++;
 						} else {
 							countPartFill++;
@@ -217,7 +203,7 @@ void LinearView::onMakeLayout()
 							}
 						}
 					} else {
-						if (child->getWidthMode() == SizeMode::Filling) {
+						if (child->getHeightMode() == SizeMode::Filling) {
 							sl_real weight = child->getHeightWeight();
 							if (!(Math::isAlmostZero(weight - 1))) {
 								sl_ui_pos height = (sl_ui_pos)((sl_real)(remainedSize) * weight);
@@ -273,7 +259,7 @@ void LinearView::onMakeLayout()
 							}
 						}
 					} else {
-						if (child->getWidthMode() == SizeMode::Filling) {
+						if (child->getHeightMode() == SizeMode::Filling) {
 							sl_real weight = child->getHeightWeight();
 							if (Math::isAlmostZero(weight - 1)) {
 								UIRect frame = child->getLayoutFrame();

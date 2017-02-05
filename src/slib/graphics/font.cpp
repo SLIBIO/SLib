@@ -53,20 +53,28 @@ Ref<Font> Font::create(const FontDesc &desc)
 {
 	Ref<Font> ret = new Font;
 	if (ret.isNotNull()) {
-		ret->m_desc = desc;
+		ret->m_desc.familyName = desc.familyName;
+		ret->m_desc.size = SLIB_FONT_SIZE_PRECISION_APPLY(desc.size);
+		ret->m_desc.flagBold = desc.flagBold;
+		ret->m_desc.flagItalic = desc.flagItalic;
+		ret->m_desc.flagUnderline = desc.flagUnderline;
+		return ret;
 	}
-	return ret;
+	return sl_null;
 }
 
 Ref<Font> Font::create(String familyName, sl_real size, sl_bool flagBold, sl_bool flagItalic, sl_bool flagUnderline)
 {
-	FontDesc desc;
-	desc.familyName = familyName;
-	desc.size = size;
-	desc.flagBold = flagBold;
-	desc.flagItalic = flagItalic;
-	desc.flagUnderline = flagUnderline;
-	return create(desc);
+	Ref<Font> ret = new Font;
+	if (ret.isNotNull()) {
+		ret->m_desc.familyName = familyName;
+		ret->m_desc.size = SLIB_FONT_SIZE_PRECISION_APPLY(size);
+		ret->m_desc.flagBold = flagBold;
+		ret->m_desc.flagItalic = flagItalic;
+		ret->m_desc.flagUnderline = flagUnderline;
+		return ret;
+	}
+	return sl_null;
 }
 
 void Font::getDesc(FontDesc& desc)
