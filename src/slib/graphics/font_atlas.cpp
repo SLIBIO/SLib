@@ -119,7 +119,11 @@ Ref<FontAtlas> FontAtlas::getShared(const Ref<Font>& font)
 			String fontFamily = font->getFamilyName();
 			sl_real fontSize = SLIB_FONT_SIZE_PRECISION_APPLY(font->getSize());
 			sl_bool fontBold = font->isBold();
-			String sig = String::format("%s_%d_%s", fontFamily, fontSize * SLIB_FONT_SIZE_PRECISION_MULTIPLIER, fontBold?"B":"");
+			String sig = fontFamily;
+			sig += (int)(fontSize * SLIB_FONT_SIZE_PRECISION_MULTIPLIER);
+			if (fontBold) {
+				sig += "B";
+			}
 			WeakRef<FontAtlas> weakFA;
 			map->get(sig, &weakFA);
 			Ref<FontAtlas> ret = weakFA;

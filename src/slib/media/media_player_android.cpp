@@ -167,6 +167,12 @@ public:
 		return m_flagPlaying;
 	}
 
+	//override
+	sl_real getVolume()
+	{
+		return (sl_real) _JMediaPlayer::getVolume.callFloat(m_player.get());
+	}
+
 	// override
 	void setVolume(sl_real volume)
 	{
@@ -176,12 +182,6 @@ public:
 		}
 
 		_JMediaPlayer::setVolume.call(m_player.get(), volume);
-	}
-
-	//override
-	sl_real getVolume()
-	{
-		return (sl_real) _JMediaPlayer::getVolume.callFloat(m_player.get());
 	}
 
 	// override

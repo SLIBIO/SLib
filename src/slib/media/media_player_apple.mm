@@ -161,19 +161,7 @@ public:
 		return m_flagPlaying;
 	}
 	
-	void setVolume(sl_real volume)
-	{
-		ObjectLocker lock(this);
-		if (!m_flagInited) {
-			return;
-		}
-		if (m_status == AVPlayerStatusFailed) {
-			return;
-		}
-		
-		[m_player setVolume:volume];
-	}
-	
+	// override
 	sl_real getVolume()
 	{
 		ObjectLocker lock(this);
@@ -185,6 +173,20 @@ public:
 		}
 		
 		return m_player.volume;
+	}
+	
+	// override
+	void setVolume(sl_real volume)
+	{
+		ObjectLocker lock(this);
+		if (!m_flagInited) {
+			return;
+		}
+		if (m_status == AVPlayerStatusFailed) {
+			return;
+		}
+		
+		[m_player setVolume:volume];
 	}
 	
 	// override

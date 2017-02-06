@@ -121,9 +121,9 @@ public:
 
 	virtual sl_bool isPlaying() = 0;
 	
-	virtual void setVolume(sl_real) = 0;
-	
 	virtual sl_real getVolume() = 0;
+	
+	virtual void setVolume(sl_real) = 0;
 	
 	virtual void renderVideo(MediaPlayerRenderVideoParam& param) = 0;
 	
