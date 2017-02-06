@@ -103,6 +103,8 @@ public:
 	
 	virtual void setUniformTextureSampler(sl_int32 uniformLocation, sl_uint32 samplerNo) = 0;
 	
+	virtual void setUniformTextureSamplerArray(sl_int32 uniformLocation, const sl_reg* values, sl_uint32 count) = 0;
+	
 };
 
 SLIB_RENDER_NAMESPACE_END

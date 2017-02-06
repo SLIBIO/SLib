@@ -217,6 +217,8 @@ public:
 	
 	static void setUniformTextureSampler(sl_int32 uniformLocation, sl_uint32 samplerNo);
 
+	static void setUniformTextureSamplerArray(sl_int32 uniformLocation, const sl_reg* values, sl_uint32 count);
+
 public:
 	static sl_bool isAvailable();
 	

@@ -143,12 +143,19 @@ void RenderProgramState::setUniformMatrix4Array(sl_int32 uniformLocation, const 
 	gl_engine->setUniformMatrix4Array(uniformLocation, arr, n);
 }
 
-void RenderProgramState::setUniformTexture(sl_int32 uniformLocation, sl_uint32 samplerNo, const Ref<Texture>& texture)
+void RenderProgramState::setUniformTexture(sl_int32 uniformLocation, const Ref<Texture>& texture, sl_reg sampler)
 {
-	gl_engine->setUniformTextureSampler(uniformLocation, samplerNo);
-	gl_engine->applyTexture(samplerNo, texture);
+	gl_engine->applyTexture(texture, sampler);
+	gl_engine->setUniformTextureSampler(uniformLocation, (sl_uint32)sampler);
 }
 
+void RenderProgramState::setUniformTextureArray(sl_int32 uniformLocation, const Ref<Texture>* textures, const sl_reg* samplers, sl_uint32 n)
+{
+	for (sl_uint32 i = 0; i < n; i++) {
+		gl_engine->applyTexture(textures[i], samplers[i]);
+	}
+	gl_engine->setUniformTextureSamplerArray(uniformLocation, samplers, n);
+}
 
 /*******************************
 	_RenderProgramTemplate

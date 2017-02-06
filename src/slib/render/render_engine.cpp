@@ -273,18 +273,22 @@ void RenderEngine::drawPrimitive(sl_uint32 countElements, const Ref<VertexBuffer
 	drawPrimitive(&p);
 }
 
-void RenderEngine::applyTexture(sl_reg sampler, const Ref<Texture>& _texture)
+void RenderEngine::applyTexture(const Ref<Texture>& _texture, sl_reg sampler)
 {
 	Texture* texture = _texture.get();
 	if (texture) {
 		if (IsInstanceOf<EngineTexture>(texture)) {
-			_applyTexture(sampler, texture, sl_null);
+			_applyTexture(texture, sl_null, sampler);
 		} else {
 			Ref<TextureInstance> instance = linkTexture(_texture);
 			if (instance.isNotNull()) {
-				_applyTexture(sampler, texture, instance.get());
+				_applyTexture(texture, instance.get(), sampler);
+			} else {
+				_applyTexture(sl_null, sl_null, sampler);
 			}
 		}
+	} else {
+		_applyTexture(sl_null, sl_null, sampler);
 	}
 }
 

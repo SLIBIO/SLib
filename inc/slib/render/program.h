@@ -55,7 +55,9 @@ public:
 	
 	void setUniformMatrix4Array(sl_int32 uniformLocation, const Matrix4* arr, sl_uint32 n);
 	
-	void setUniformTexture(sl_int32 uniformLocation, sl_uint32 samplerNo, const Ref<Texture>& texture);
+	void setUniformTexture(sl_int32 uniformLocation, const Ref<Texture>& texture, sl_reg sampler = 0);
+	
+	void setUniformTextureArray(sl_int32 uniformLocation, const Ref<Texture>* textures, const sl_reg* samplers, sl_uint32 n);
 	
 };
 
@@ -199,11 +201,11 @@ public: \
 
 #define SLIB_RENDER_PROGRAM_STATE_UNIFORM_TEXTURE(NAME, GL_NAME) \
 	_SLIB_DEFINE_RENDER_PROGRAM_STATE_ITEM(NAME, #GL_NAME, 1, 0, 0, 0) \
-	SLIB_INLINE void set##NAME(const Ref<slib::Texture>& texture, sl_uint32 samplerNo = 0) { if (NAME.gl_location >= 0) setUniformTexture(NAME.gl_location, samplerNo, texture); }
+	SLIB_INLINE void set##NAME(const Ref<slib::Texture>& texture) { if (NAME.gl_location >= 0) setUniformTexture(NAME.gl_location, texture); }
 
 #define SLIB_RENDER_PROGRAM_STATE_UNIFORM_TEXTURE_ARRAY(NAME, GL_NAME) \
 	_SLIB_DEFINE_RENDER_PROGRAM_STATE_ITEM(NAME, #GL_NAME, 1, 0, 0, 0) \
-	SLIB_INLINE void set##NAME(sl_uint32 index, const Ref<slib::Texture>& texture, sl_uint32 firstSamplerNo = 0) { if (NAME.gl_location >= 0) setUniformTexture(NAME.gl_location + index, firstSamplerNo + index, texture); }
+	SLIB_INLINE void set##NAME(const Ref<slib::Texture>* textures, sl_uint32 count) { if (NAME.gl_location >= 0) setUniformTextureArray(NAME.gl_location, textures, count); }
 
 #define SLIB_RENDER_PROGRAM_STATE_ATTRIBUTE_FLOAT(MEMBER, GL_NAME) \
 	_SLIB_DEFINE_RENDER_PROGRAM_STATE_ITEM(GL_NAME, #GL_NAME, 2, 0, (sl_uint32)(sl_size)(&(((VertexType*)0)->MEMBER)), sizeof(((VertexType*)0)->MEMBER) / sizeof(float))

@@ -39,12 +39,11 @@ Size Font::_measureText_PO(const String& text)
 	
 	CFStringRef keys[] = { kCTFontAttributeName };
 	CFTypeRef values[] = { handle };
-	CFDictionaryRef attributes = CFDictionaryCreate(
-													kCFAllocatorDefault
-													, (const void**)&keys, (const void**)&values
-													, sizeof(keys) / sizeof(keys[0])
-													, &kCFCopyStringDictionaryKeyCallBacks
-													, &kCFTypeDictionaryValueCallBacks);
+	CFDictionaryRef attributes = CFDictionaryCreate(kCFAllocatorDefault,
+													(const void**)&keys, (const void**)&values,
+													sizeof(keys) / sizeof(keys[0]),
+													&kCFCopyStringDictionaryKeyCallBacks,
+													&kCFTypeDictionaryValueCallBacks);
 	if (attributes) {
 		CFAttributedStringRef attrString = CFAttributedStringCreate(kCFAllocatorDefault, string, attributes);
 		if (attrString) {

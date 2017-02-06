@@ -50,7 +50,7 @@ Ref<FontAtlas> FontAtlas::create(const FontAtlasParam& param)
 {
 	if (param.font.isNotNull()) {
 		String fontFamily = param.font->getFamilyName();
-		sl_real fontSize = param.font->getFontHeight();
+		sl_real fontSize = param.font->getSize();
 		sl_bool fontBold = param.font->isBold();
 		Ref<Font> fontSource = Font::create(fontFamily, fontSize, fontBold);
 		if (fontSource.isNotNull()) {

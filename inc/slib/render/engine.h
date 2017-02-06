@@ -235,8 +235,8 @@ public:
 	
 	void drawPrimitive(sl_uint32 countElements, const Ref<VertexBuffer>& vb, PrimitiveType type = PrimitiveType::Triangle);
 
-	void applyTexture(sl_reg sampler, const Ref<Texture>& texture);
-
+	void applyTexture(const Ref<Texture>& texture, sl_reg sampler);
+	
 	Ref<TextureInstance> linkTexture(const Ref<Texture>& texture);
 
 	Ref<VertexBufferInstance> linkVertexBuffer(const Ref<VertexBuffer>& vb);
@@ -372,7 +372,7 @@ protected:
 	
 	virtual void _drawPrimitive(EnginePrimitive* primitive) = 0;
 	
-	virtual void _applyTexture(sl_reg sampler, Texture* texture, TextureInstance* instance) = 0;
+	virtual void _applyTexture(Texture* texture, TextureInstance* instance, sl_reg sampler) = 0;
 	
 	virtual void _setLineWidth(sl_real width) = 0;
 	
