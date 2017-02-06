@@ -713,8 +713,7 @@ sl_bool View::isRootView()
 
 Ref<View> View::getInstanceView()
 {
-	Ref<ViewInstance> instance = m_instance;
-	if (instance.isNotNull()) {
+	if (m_instance.isNotNull()) {
 		return this;
 	}
 	Ref<View> parent = m_parent;
@@ -1086,16 +1085,16 @@ void View::_setFrame(const UIRect& _frame, UIUpdateMode mode, sl_bool flagLayout
 	if (layoutAttrs.isNotNull()) {
 		layoutAttrs->frame = frame;
 		layoutAttrs->requestedFrame = frame;
-		layoutAttrs->flagInvalidMeasure = sl_true;
 	}
 	
 	if (!(flagNotResizeWidth && flagNotResizeHeight)) {
-		m_flagInvalidLayout = sl_true;
 		dispatchResize(frame.getWidth(), frame.getHeight());
 		if (mode == UIUpdateMode::Redraw) {
 			invalidateLayer();
 		}
-		if (!flagLayouting) {
+		if (flagLayouting) {
+			m_flagInvalidLayout = sl_true;
+		} else {
 			invalidateLayoutFromResize(UIUpdateMode::NoRedraw);
 		}
 	} else {
@@ -1903,14 +1902,17 @@ void View::_makeLayout(sl_bool flagApplyLayout)
 				for (sl_size i = 0; i < children.count; i++) {
 					Ref<View>& child = children[i];
 					if (child.isNotNull()) {
-						if (child->m_layoutAttributes.isNotNull() && !(child->isLayoutFrameUpdated())) {
+						Ref<LayoutAttributes> childLayoutAttrs = child->m_layoutAttributes;
+						if (childLayoutAttrs.isNotNull() && !(child->isLayoutFrameUpdated())) {
 							child->_prepareLayout(param);
 							if (child->isOnPrepareLayoutEnabled()) {
 								child->onPrepareLayout(param);
 							}
 						}
 						if (child->isNativeWidget() && IsInstanceOf<RenderView>(child)) {
-							child->_setFrame(child->getLayoutFrame(), UIUpdateMode::NoRedraw, sl_true);
+							if (childLayoutAttrs.isNotNull()) {
+								child->_setFrame(child->getLayoutFrame(), UIUpdateMode::NoRedraw, sl_true);
+							}
 							if (child->m_flagInvalidLayout) {
 								child->_requestMakeLayout();
 							}
@@ -2287,23 +2289,20 @@ void View::measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 
 void View::_requestMakeLayout()
 {
-	if (isInstance()) {
-		dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, _makeLayout, this, sl_false));
-		return;
-	}
-	Ref<View> view = m_parent;
-	while (view.isNotNull()) {
-		if (view->isInstance()) {
-			view->dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, _makeLayout, this, sl_false));
-			return;
-		}
-		view = view->m_parent;
-	}
+	dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, _makeLayout, this, sl_false));
 }
 
 void View::invalidateLayoutFromResize(UIUpdateMode mode)
 {
 	if (mode == UIUpdateMode::Init) {
+		return;
+	}
+	Ref<View> instanceView = getInstanceView();
+	if (instanceView.isNull()) {
+		return;
+	}
+	if (!(instanceView->isDrawingThread())) {
+		instanceView->dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, invalidateLayoutFromResize, this, mode));
 		return;
 	}
 	m_flagInvalidLayout = sl_true;
@@ -2323,6 +2322,14 @@ void View::invalidateLayoutFromResize(UIUpdateMode mode)
 void View::invalidateLayoutFromResizeContent(UIUpdateMode mode)
 {
 	if (mode == UIUpdateMode::Init) {
+		return;
+	}
+	Ref<View> instanceView = getInstanceView();
+	if (instanceView.isNull()) {
+		return;
+	}
+	if (!(instanceView->isDrawingThread())) {
+		instanceView->dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, invalidateLayoutFromResizeContent, this, mode));
 		return;
 	}
 	m_flagInvalidLayout = sl_true;

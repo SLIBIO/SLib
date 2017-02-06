@@ -26,7 +26,7 @@ public:
 		fontSize = 12;
 #else
 		scrollBarWidth = SLIB_MIN(UI::getScreenWidth(), UI::getScreenHeight()) / 60;
-		fontSize = SLIB_MIN(UI::getScreenWidth(), UI::getScreenHeight()) / 40.0f;
+		fontSize = (sl_real)(SLIB_MIN(UI::getScreenWidth(), UI::getScreenHeight()) / 40);
 #endif
 		fontFamily = "Arial";
 		font = Font::create(fontFamily, fontSize);
