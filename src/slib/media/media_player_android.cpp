@@ -30,6 +30,8 @@ SLIB_JNI_BEGIN_CLASS(_JMediaPlayer, "slib/platform/android/media/SMediaPlayer")
 	SLIB_JNI_METHOD(pause, "pause", "()V");
 	SLIB_JNI_METHOD(stop, "stop", "()V");
 	SLIB_JNI_METHOD(isPlaying, "isPlaying", "()Z");
+	SLIB_JNI_METHOD(setVolume, "setVolume", "(F)V");
+	SLIB_JNI_METHOD(getVolume, "getVolume", "()F");
 	SLIB_JNI_METHOD(setLooping, "setLooping", "(Z)V");
 	SLIB_JNI_METHOD(renderVideo, "renderVideo", "(IZ)Z");
 	SLIB_JNI_NATIVE(onCompleted, "nativeOnCompleted", "(J)V", _MediaPlayer_onCompleted);
@@ -163,6 +165,23 @@ public:
 			return sl_false;
 		}
 		return m_flagPlaying;
+	}
+
+	// override
+	void setVolume(sl_real volume)
+	{
+		ObjectLocker lock(this);
+		if (!m_flagInited) {
+			return;
+		}
+
+		_JMediaPlayer::setVolume.call(m_player.get(), volume);
+	}
+
+	//override
+	sl_real getVolume()
+	{
+		return (sl_real) _JMediaPlayer::getVolume.callFloat(m_player.get());
 	}
 
 	// override

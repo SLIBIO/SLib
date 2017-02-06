@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.graphics.SurfaceTexture;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.view.Surface;
 import slib.platform.android.Logger;
@@ -12,6 +13,7 @@ public class SMediaPlayer implements MediaPlayer.OnCompletionListener, MediaPlay
 
 	private MediaPlayer mPlayer;
 	private long mInstance = 0;
+	private float mVolume = 1;
 
 	public static SMediaPlayer openUrl(String url) {
 		try {
@@ -79,6 +81,21 @@ public class SMediaPlayer implements MediaPlayer.OnCompletionListener, MediaPlay
 			Logger.exception(e);
 		}
 		return false;
+	}
+
+	public void setVolume(float volume) {
+		float prevVolume = mVolume;
+		try {
+			mPlayer.setVolume(volume, volume);
+			mVolume = volume;
+		} catch (Exception e) {
+			Logger.exception(e);
+			mVolume = prevVolume;
+		}
+	}
+
+	public float getVolume() {
+		return mVolume;
 	}
 	
 	public void setLooping(boolean flag) {

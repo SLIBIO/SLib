@@ -161,6 +161,32 @@ public:
 		return m_flagPlaying;
 	}
 	
+	void setVolume(sl_real volume)
+	{
+		ObjectLocker lock(this);
+		if (!m_flagInited) {
+			return;
+		}
+		if (m_status == AVPlayerStatusFailed) {
+			return;
+		}
+		
+		[m_player setVolume:volume];
+	}
+	
+	sl_real getVolume()
+	{
+		ObjectLocker lock(this);
+		if (!m_flagInited) {
+			return 0.0;
+		}
+		if (m_status == AVPlayerStatusFailed) {
+			return 0.0;
+		}
+		
+		return m_player.volume;
+	}
+	
 	// override
 	void renderVideo(MediaPlayerRenderVideoParam& param)
 	{
