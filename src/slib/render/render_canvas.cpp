@@ -140,7 +140,7 @@ public:
 		return m_fragmentShader;
 	}
 	
-	static void generateShaderSources(const RenderCanvasProgramParam& param, StringBuffer* signatures, StringBuffer* bufVertexShader, StringBuffer* bufFragmentShader)
+	static void generateShaderSources(const RenderCanvasProgramParam& param, char* signatures, StringBuffer* bufVertexShader, StringBuffer* bufFragmentShader)
 	{
 		StringBuffer bufVBHeader;
 		StringBuffer bufVBContent;
@@ -148,8 +148,7 @@ public:
 		StringBuffer bufFBContent;
 		
 		if (signatures) {
-			SLIB_STATIC_STRING(s, "S");
-			signatures->add(s);
+			*(signatures++) = 'S';
 		}
 		
 		if (bufVertexShader) {
@@ -168,26 +167,26 @@ public:
 		}
 		
 		if (param.countClips > 0) {
-			bufVBHeader.add(String::format(SLIB_STRINGIFY(
-				  varying vec2 v_ClipPos[%d];
-				  uniform vec4 u_ClipRect[%d];
-				  uniform mat3 u_ClipTransform[%d];
-			), param.countClips));
-			bufFBHeader.add(String::format(SLIB_STRINGIFY(
-				  varying vec2 v_ClipPos[%d];
-				  uniform vec4 u_ClipRect[%d];
-			), param.countClips));
+			if (bufVertexShader) {
+				bufVBHeader.add(String::format(SLIB_STRINGIFY(
+					  varying vec2 v_ClipPos[%d];
+					  uniform vec4 u_ClipRect[%d];
+					  uniform mat3 u_ClipTransform[%d];
+				), param.countClips));
+				bufFBHeader.add(String::format(SLIB_STRINGIFY(
+					  varying vec2 v_ClipPos[%d];
+					  uniform vec4 u_ClipRect[%d];
+				), param.countClips));
+			}
 			for (sl_uint32 i = 0; i < param.countClips; i++) {
 				RenderCanvasClipType type = param.clips[i]->type;
 				if (type == RenderCanvasClipType::Ellipse) {
 					sl_bool flagOval = Math::isAlmostZero(param.clips[i]->region.getWidth() - param.clips[i]->region.getHeight());
 					if (signatures) {
 						if (flagOval) {
-							SLIB_STATIC_STRING(s, "O");
-							signatures->add(s);
+							*(signatures++) = 'O';
 						} else {
-							SLIB_STATIC_STRING(s, "E");
-							signatures->add(s);
+							*(signatures++) = 'E';
 						}
 					}
 					if (bufVertexShader) {
@@ -214,8 +213,7 @@ public:
 					}
 				} else {
 					if (signatures) {
-						SLIB_STATIC_STRING(s, "C");
-						signatures->add(s);
+						*(signatures++) = 'C';
 					}
 					if (bufVertexShader) {
 						bufVBContent.add(String::format(SLIB_STRINGIFY(
@@ -234,8 +232,7 @@ public:
 		
 		if (param.flagUseTexture) {
 			if (signatures) {
-				SLIB_STATIC_STRING(s, "T");
-				signatures->add(s);
+				*(signatures++) = 'T';
 			}
 			if (bufVertexShader) {
 				bufVBHeader.add(SLIB_STRINGIFY(
@@ -253,8 +250,7 @@ public:
 			
 			if (param.flagUseColorFilter) {
 				if (signatures) {
-					SLIB_STATIC_STRING(s, "F");
-					signatures->add(s);
+					*(signatures++) = 'F';
 				}
 				if (bufVertexShader) {
 					bufFBHeader.add(SLIB_STRINGIFY(
@@ -340,24 +336,20 @@ public:
 
 	Ref<RenderCanvasProgram> getProgram(const RenderCanvasProgramParam& param)
 	{
-		StringBuffer sb;
-		RenderCanvasProgram::generateShaderSources(param, &sb, sl_null, sl_null);
+		char sig[64] = {0};
+		RenderCanvasProgram::generateShaderSources(param, sig, sl_null, sl_null);
 		Ref<RenderCanvasProgram> program;
-		String sig = sb.merge();
-		if (sig.isNotEmpty()) {
-			if (!(programs.get_NoLock(sig, &program))) {
-				program = RenderCanvasProgram::create(param);
-				if (program.isNull()) {
-					return sl_null;
-				}
-				if (programs.getCount() > MAX_PROGRAM_COUNT) {
-					programs.removeAll_NoLock();
-				}
-				programs.put_NoLock(sig, program);
+		if (!(programs.get_NoLock(sig, &program))) {
+			program = RenderCanvasProgram::create(param);
+			if (program.isNull()) {
+				return sl_null;
 			}
-			return program;
+			if (programs.getCount() > MAX_PROGRAM_COUNT) {
+				programs.removeAll_NoLock();
+			}
+			programs.put_NoLock(sig, program);
 		}
-		return sl_null;
+		return program;
 	}
 	
 };
@@ -571,6 +563,7 @@ void RenderCanvas::drawText16(const String16& text, sl_real x, sl_real y, const 
 	if (text.isEmpty()) {
 		return;
 	}
+	
 	Ref<Font> font = _font;
 	if (font.isNull()) {
 		font = Font::getDefault();
@@ -578,19 +571,39 @@ void RenderCanvas::drawText16(const String16& text, sl_real x, sl_real y, const 
 			return;
 		}
 	}
-	
+
+	sl_char16* arrChar = text.getData();
+	sl_size len = text.getLength();
+	sl_real fontHeight = font->getFontHeight();
+	sl_bool fontItalic = font->isItalic();
+
 	Ref<FontAtlas> fa = font->getSharedAtlas();
 	if (fa.isNull()) {
 		return;
 	}
 	
-	sl_char16* arrChar = text.getData();
-	sl_size len = text.getLength();
+	_RenderCanvas_Shared* shared = _RenderCanvas_getShared();
+	if (!shared) {
+		return;
+	}
+	
+	RenderCanvasState* state = m_state.get();
+	if (state->flagClipRect) {
+		if (state->clipRect.top >= y + fontHeight || state->clipRect.bottom <= y || state->clipRect.right <= x) {
+			return;
+		}
+	}
+	
+	RenderCanvasProgramParam pp;
+	pp.prepare(state, sl_false);
+	pp.flagUseTexture = sl_true;
+
+	RenderProgramScope<RenderCanvasProgramState> scope;
+	sl_bool flagBeginScope = sl_false;
+	Ref<Texture> textureBefore;
+	
 	FontAtlasChar fac;
-	DrawParam dp;
 	Color4f color = _color;
-	sl_real fontHeight = font->getFontHeight();
-	sl_bool fontItalic = font->isItalic();
 	sl_real fx = x;
 	
 	for (sl_size i = 0; i < len; i++) {
@@ -599,25 +612,55 @@ void RenderCanvas::drawText16(const String16& text, sl_real x, sl_real y, const 
 			sl_real fw = fac.fontWidth;
 			sl_real fxn = fx + fw;
 			if (fac.bitmap.isNotNull()) {
-				Ref<Texture> texture = Texture::getBitmapRenderingCache(fac.bitmap);
-				if (texture.isNotNull()) {
-					sl_real fh = fac.fontHeight;
-					sl_real fy = y + (fontHeight - fh) / 2;
-					if (fontItalic) {
-						Matrix3 transform;
-						sl_real ratio = 0.2f;
-						transform.m00 = fw; transform.m10 = -ratio * fh; transform.m20 = ratio * fh + fx;
-						transform.m01 = 0; transform.m11 = fh; transform.m21 = fy;
-						transform.m02 = 0; transform.m12 = 0; transform.m22 = 1;
-						drawTexture(transform, texture, fac.region, dp, color);
-					} else {
-						drawTexture(Rectangle(fx, fy, fxn, fy + fh), texture, fac.region, dp, color);
+				sl_bool flagIgnore = sl_false;
+				if (state->flagClipRect) {
+					if (state->clipRect.left >= fxn || state->clipRect.right <= fx) {
+						flagIgnore = sl_true;
 					}
-				}				
+				}
+				if (!flagIgnore) {
+					Ref<Texture> texture = Texture::getBitmapRenderingCache(fac.bitmap);
+					if (texture.isNotNull()) {
+						sl_real fh = fac.fontHeight;
+						sl_real fy = y + (fontHeight - fh) / 2;
+						if (!flagBeginScope) {
+							Ref<RenderProgram> program = shared->getProgram(pp);
+							if (!(scope.begin(m_engine.get(), program))) {
+								return;
+							}
+							scope->setColor(Color4f(color.x, color.y, color.z, color.w * getAlpha()));
+							flagBeginScope = sl_true;
+						}
+						Matrix3 mat;
+						if (fontItalic) {
+							sl_real ratio = 0.2f;
+							mat.m00 = fw; mat.m10 = -ratio * fh; mat.m20 = ratio * fh + fx;
+							mat.m01 = 0; mat.m11 = fh; mat.m21 = fy;
+							mat.m02 = 0; mat.m12 = 0; mat.m22 = 1;
+						} else {
+							mat.m00 = fw; mat.m10 = 0; mat.m20 = fx;
+							mat.m01 = 0; mat.m11 = fh; mat.m21 = fy;
+							mat.m02 = 0; mat.m12 = 0; mat.m22 = 1;
+						}
+						pp.applyToProgramState(scope.getState(), mat);
+						mat *= state->matrix;
+						mat *= m_matViewport;
+						scope->setTransform(mat);
+						if (textureBefore != texture) {
+							scope->setTexture(texture);
+							textureBefore = texture;
+						}
+						sl_real sw = (sl_real)(texture->getWidth());
+						sl_real sh = (sl_real)(texture->getHeight());
+						scope->setRectSrc(Vector4((sl_real)(fac.region.left) / sw, (sl_real)(fac.region.top) / sh, (sl_real)(fac.region.getWidth()) / sw, (sl_real)(fac.region.getHeight()) / sh));
+						m_engine->drawPrimitive(4, shared->vbRectangle, PrimitiveType::TriangleStrip);
+					}
+				}
 			}
 			fx = fxn;
 		}
 	}
+	
 }
 
 void RenderCanvas::drawLine(const Point& pt1, const Point& pt2, const Ref<Pen>& pen)

@@ -44,6 +44,10 @@ void RenderBaseObjectInstance::_update(RenderBaseObject* object)
 	}
 }
 
+sl_bool RenderBaseObjectInstance::_isUpdated()
+{
+	return m_flagUpdated;
+}
 
 SLIB_DEFINE_OBJECT(RenderBaseObject, Object)
 

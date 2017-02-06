@@ -54,6 +54,8 @@ RenderView::RenderView()
 	
 	m_flagDebugTextVisible = sl_true;
 	m_flagDebugTextVisibleOnRelease = sl_false;
+	
+	setBackgroundColor(Color::Black, UIUpdateMode::Init);
 }
 
 RenderView::~RenderView()
@@ -222,6 +224,29 @@ void RenderView::onAttach()
 	requestRender();
 }
 
+void RenderView::onDrawBackground(Canvas* canvas)
+{
+	if (isNativeWidget()) {
+		Ref<DrawAttributes> attrs = m_drawAttributes;
+		if (attrs.isNotNull()) {
+			Ref<Drawable> background;
+			if (isPressedState()) {
+				background = attrs->backgroundPressed;
+			} else if (isHoverState()) {
+				background = attrs->backgroundHover;
+			}
+			if (background.isNull()) {
+				background = attrs->background;
+			}
+			if (background.isNotNull()) {
+				drawBackground(canvas, Color::zero(), background);
+			}
+		}
+	} else {
+		View::onDrawBackground(canvas);
+	}
+}
+
 void RenderView::dispatchFrame(RenderEngine* engine)
 {
 	if (!engine) {
@@ -243,6 +268,15 @@ void RenderView::dispatchFrame(RenderEngine* engine)
 	}
 
 	engine->beginScene();
+	
+	// clear
+	{
+		Color color = getBackgroundColor();
+		if (color.a > 0) {
+			color.a = 255;
+			engine->clearColorDepth(color);
+		}
+	}
 	
 	onFrame(engine);
 	

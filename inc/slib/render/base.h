@@ -36,6 +36,8 @@ public:
 	// should be called by only engine internally
 	void _update(RenderBaseObject* object);
 	
+	sl_bool _isUpdated();
+	
 protected:
 	AtomicWeakRef<RenderBaseObject> m_object;
 	AtomicWeakRef<RenderEngine> m_engine;

@@ -74,6 +74,9 @@ protected:
 	// override
 	void onAttach();
 	
+	// override
+	void onDrawBackground(Canvas* canvas);
+	
 public:
 	// override
 	Ref<ViewInstance> createNativeWidget(ViewInstance* _parent);

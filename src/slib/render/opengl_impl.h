@@ -1067,12 +1067,14 @@ public:
 	};
 	_SamplerState m_samplers[MAX_SAMPLER_COUNT];
 	sl_uint32 m_nSamplers;
+	sl_uint32 m_activeSampler;
 
 public:
 	GL_ENGINE()
 	{
 		m_threadUniqueId = Thread::getCurrentThreadUniqueId();
 		m_nSamplers = 0;
+		m_activeSampler = -1;
 	}
 
 	~GL_ENGINE()
@@ -1511,6 +1513,7 @@ public:
 		for (sl_uint32 i = 0; i < m_nSamplers; i++) {
 			m_samplers[i].reset();
 		}
+		m_activeSampler = -1;
 	}
 
 	// override
@@ -1550,7 +1553,7 @@ public:
 		
 		if (flagResetProgramState) {
 			if (m_currentProgramInstanceRendering.isNotNull()) {
-				m_currentProgramRendering->onPostRender(this, m_currentProgramInstance->state.get());
+				m_currentProgramRendering->onPostRender(this, m_currentProgramInstanceRendering->state.get());
 			}
 			m_currentProgramInstanceRendering = m_currentProgramInstance;
 			m_currentProgramRendering = m_currentProgram;
@@ -1579,6 +1582,14 @@ public:
 		}
 	}
 	
+	void _setActiveSampler(sl_uint32 sampler)
+	{
+		if (m_activeSampler != sampler) {
+			GL_BASE::setActiveSampler(sampler);
+			m_activeSampler = sampler;
+		}
+	}
+	
 	// override
 	void _applyTexture(Texture* texture, TextureInstance* _instance, sl_reg _samplerNo)
 	{
@@ -1592,15 +1603,18 @@ public:
 		}
 		if (!texture) {
 			m_samplers[samplerNo].reset();
-			GL_BASE::setActiveSampler(samplerNo);
+			_setActiveSampler(samplerNo);
 			GL_BASE::unbindTexture2D();
 			return;
 		}
 		if (_instance) {
 			_TextureInstance* instance = (_TextureInstance*)_instance;
-			instance->_update(texture);
+			if (instance->_isUpdated()) {
+				_setActiveSampler(samplerNo);
+				instance->_update(texture);
+			}
 			if (m_samplers[samplerNo].instance != instance) {
-				GL_BASE::setActiveSampler(samplerNo);
+				_setActiveSampler(samplerNo);
 				GL_BASE::bindTexture2D(instance->handle);
 				GL_BASE::setTexture2DFilterMode(texture->getMinFilter(), texture->getMagFilter());
 				GL_BASE::setTexture2DWrapMode(texture->getWrapX(), texture->getWrapY());
@@ -1612,11 +1626,13 @@ public:
 				m_samplers[samplerNo].wrapY = texture->getWrapY();
 			} else {
 				if (m_samplers[samplerNo].minFilter != texture->getMinFilter() || m_samplers[samplerNo].magFilter != texture->getMagFilter()) {
+					_setActiveSampler(samplerNo);
 					GL_BASE::setTexture2DFilterMode(texture->getMinFilter(), texture->getMagFilter());
 					m_samplers[samplerNo].minFilter = texture->getMinFilter();
 					m_samplers[samplerNo].magFilter = texture->getMagFilter();
 				}
 				if (m_samplers[samplerNo].wrapX != texture->getWrapX() || m_samplers[samplerNo].wrapY != texture->getWrapY()) {
+					_setActiveSampler(samplerNo);
 					GL_BASE::setTexture2DWrapMode(texture->getWrapX(), texture->getWrapY());
 					m_samplers[samplerNo].wrapX = texture->getWrapX();
 					m_samplers[samplerNo].wrapY = texture->getWrapY();
@@ -1624,8 +1640,8 @@ public:
 			}
 		} else {
 			if (m_samplers[samplerNo].texture != texture) {
+				_setActiveSampler(samplerNo);
 				_NamedTexture* named = static_cast<_NamedTexture*>(texture);
-				GL_BASE::setActiveSampler(samplerNo);
 				GL_BASE::bindTexture(named->m_target, named->m_name);
 				GL_BASE::setTextureFilterMode(named->m_target, texture->getMinFilter(), texture->getMagFilter());
 				GL_BASE::setTextureWrapMode(named->m_target, texture->getWrapX(), texture->getWrapY());
@@ -1637,11 +1653,13 @@ public:
 				m_samplers[samplerNo].wrapY = texture->getWrapY();
 			} else {
 				if (m_samplers[samplerNo].minFilter != texture->getMinFilter() || m_samplers[samplerNo].magFilter != texture->getMagFilter()) {
+					_setActiveSampler(samplerNo);
 					GL_BASE::setTexture2DFilterMode(texture->getMinFilter(), texture->getMagFilter());
 					m_samplers[samplerNo].minFilter = texture->getMinFilter();
 					m_samplers[samplerNo].magFilter = texture->getMagFilter();
 				}
 				if (m_samplers[samplerNo].wrapX != texture->getWrapX() || m_samplers[samplerNo].wrapY != texture->getWrapY()) {
+					_setActiveSampler(samplerNo);
 					GL_BASE::setTexture2DWrapMode(texture->getWrapX(), texture->getWrapY());
 					m_samplers[samplerNo].wrapX = texture->getWrapX();
 					m_samplers[samplerNo].wrapY = texture->getWrapY();
