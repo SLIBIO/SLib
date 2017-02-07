@@ -1072,7 +1072,6 @@ public:
 public:
 	GL_ENGINE()
 	{
-		m_threadUniqueId = Thread::getCurrentThreadUniqueId();
 		m_nSamplers = 0;
 		m_activeSampler = -1;
 	}
@@ -1082,7 +1081,7 @@ public:
 	}
 
 public:
-	SLIB_INLINE sl_bool isCurrentEngine()
+	SLIB_INLINE sl_bool isEngineThread()
 	{
 		return m_threadUniqueId == Thread::getCurrentThreadUniqueId();
 	}
@@ -1211,9 +1210,6 @@ public:
 	// override
 	Ref<RenderProgramInstance> _createProgramInstance(RenderProgram* program)
 	{
-		if (!isCurrentEngine()) {
-			return sl_null;
-		}
 		return _RenderProgramInstance::create(this, program);
 	}
 	
@@ -1263,9 +1259,6 @@ public:
 	// override
 	Ref<VertexBufferInstance> _createVertexBufferInstance(VertexBuffer* buffer)
 	{
-		if (!isCurrentEngine()) {
-			return sl_null;
-		}
 		return _VertexBufferInstance::create(this, buffer);
 	}
 	
@@ -1315,9 +1308,6 @@ public:
 	// override
 	Ref<IndexBufferInstance> _createIndexBufferInstance(IndexBuffer* buffer)
 	{
-		if (!isCurrentEngine()) {
-			return sl_null;
-		}
 		return _IndexBufferInstance::create(this, buffer);
 	}
 
@@ -1404,18 +1394,12 @@ public:
 	// override
 	Ref<TextureInstance> _createTextureInstance(Texture* texture)
 	{
-		if (!isCurrentEngine()) {
-			return sl_null;
-		}
 		return _TextureInstance::create(this, texture);
 	}
 
 	// override
 	sl_bool _beginScene()
 	{
-		if (!isCurrentEngine()) {
-			return sl_false;
-		}
 		freeDirtyHandles();
 		return sl_true;
 	}
@@ -1428,63 +1412,42 @@ public:
 	// override
 	void _setViewport(sl_uint32 x, sl_uint32 y, sl_uint32 width, sl_uint32 height)
 	{
-		if (!isCurrentEngine()) {
-			return;
-		}
 		GL_BASE::setViewport(x, y, width, height);
 	}
 	
 	// override
 	void _clear(const RenderClearParam& param)
 	{
-		if (!isCurrentEngine()) {
-			return;
-		}
 		GL_BASE::clear(param);
 	}
 
 	// override
 	void _setDepthTest(sl_bool flag)
 	{
-		if (!isCurrentEngine()) {
-			return;
-		}
 		GL_BASE::setDepthTest(flag);
 	}
 
 	// override
 	void _setDepthWriteEnabled(sl_bool flagEnableDepthWrite)
 	{
-		if (!isCurrentEngine()) {
-			return;
-		}
 		GL_BASE::setDepthWriteEnabled(flagEnableDepthWrite);
 	}
 
 	// override
 	void _setCullFace(sl_bool flagEnableCull, sl_bool flagCullCCW = sl_true)
 	{
-		if (!isCurrentEngine()) {
-			return;
-		}
 		GL_BASE::setCullFace(flagEnableCull, flagCullCCW);
 	}
 
 	// override
 	void _setBlending(sl_bool flagEnableBlending, const RenderBlendingParam& param)
 	{
-		if (!isCurrentEngine()) {
-			return;
-		}
 		GL_BASE::setBlending(flagEnableBlending, param);
 	}
 	
 	// override
 	sl_bool _beginProgram(RenderProgram* program, RenderProgramInstance* _instance, RenderProgramState** ppState)
 	{
-		if (!isCurrentEngine()) {
-			return sl_false;
-		}
 		_RenderProgramInstance* instance = (_RenderProgramInstance*)_instance;
 		if (m_currentProgramInstance != instance) {
 			GL_BASE::useProgram(instance->program);
@@ -1519,9 +1482,6 @@ public:
 	// override
 	void _drawPrimitive(EnginePrimitive* primitive)
 	{
-		if (!isCurrentEngine()) {
-			return;
-		}
 		if (m_currentProgram.isNull()) {
 			return;
 		}
@@ -1593,9 +1553,6 @@ public:
 	// override
 	void _applyTexture(Texture* texture, TextureInstance* _instance, sl_reg _samplerNo)
 	{
-		if (!isCurrentEngine()) {
-			return;
-		}
 		_initSamplersCount();
 		sl_uint32 samplerNo = (sl_uint32)(_samplerNo);
 		if (samplerNo >= m_nSamplers) {
@@ -1671,9 +1628,6 @@ public:
 	// override
 	void _setLineWidth(sl_real width)
 	{
-		if (!isCurrentEngine()) {
-			return;
-		}
 		GL_BASE::setLineWidth(width);
 	}
 	

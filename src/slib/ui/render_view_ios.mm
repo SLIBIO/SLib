@@ -18,7 +18,8 @@
 	@public sl_bool m_flagRenderingContinuously;
 	@public sl_bool m_flagRequestRender;
 	
-	slib::AtomicRef<slib::Thread> m_thread;
+	CADisplayLink* m_displayLink;
+	slib::Ref<slib::RenderEngine> m_engine;
 }
 
 -(void)_init;
@@ -45,13 +46,6 @@ Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* _parent)
 
 void RenderView::_setRedrawMode_NW(RedrawMode mode)
 {
-	if (![NSThread isMainThread]) {
-		dispatch_async(dispatch_get_main_queue(), ^{
-			_setRedrawMode_NW(mode);
-		});
-		return;
-	}
-	
 	UIView* handle = UIPlatform::getViewHandle(this);
 	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_GLView class]]) {
 		_Slib_iOS_GLView* v = (_Slib_iOS_GLView*)handle;
@@ -61,148 +55,65 @@ void RenderView::_setRedrawMode_NW(RedrawMode mode)
 
 void RenderView::_requestRender_NW()
 {
-	if (![NSThread isMainThread]) {
-		dispatch_async(dispatch_get_main_queue(), ^{
-			_requestRender_NW();
-		});
-		return;
-	}
-	
 	UIView* view = UIPlatform::getViewHandle(this);
 	if (view != nil && [view isKindOfClass:[_Slib_iOS_GLView class]]) {
 		_Slib_iOS_GLView* v = (_Slib_iOS_GLView*)view;
-		v->m_flagRequestRender = sl_true;
-	}
-}
-
-struct _iOS_GLDesc
-{
-	EAGLContext* m_context = nil;
-	Ref<RenderEngine> m_engine;
-	
-	sl_bool create()
-	{
-		EAGLContext* context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
-		if (context == nil) {
-			context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-		}
-		if (context != nil) {
-			Ref<RenderEngine> engine = GLES::createEngine();
-			if (engine.isNotNull()) {
-				m_context = context;
-				m_engine = engine;
-				return sl_true;
-			}
-		}
-		return sl_false;
-	}
-};
-
-void _iOS_GLCallback(__weak _Slib_iOS_GLView* _handle)
-{
-	TimeCounter timer;
-	
-	_iOS_GLDesc desc;
-	
-	while (1) {
-		
-		sl_bool flagWorking = sl_false;
-		
-		if (Thread::isNotStoppingCurrent()) {
-			
-			_Slib_iOS_GLView* handle = _handle;
-			if (handle == nil) {
-				return;
-			}
-			
-			Ref<iOS_ViewInstance> instance = handle->m_viewInstance;
-			if (instance.isNull()) {
-				return;
-			}
-			
-			if (handle.superview != nil && handle.hidden == NO && !(MobileApp::isPaused())) {
-				
-				if (desc.m_context == nil) {
-					if (!(desc.create())) {
-						return;
-					}
-					handle.context = desc.m_context;
-				}
-				
-				sl_uint32 width = (sl_uint32)(handle.frame.size.width * handle.contentScaleFactor);
-				sl_uint32 height = (sl_uint32)(handle.frame.size.height * handle.contentScaleFactor);
-				
-				if (width > 0 && height > 0) {
-					
-					flagWorking = sl_true;
-					
-					sl_bool flagUpdate = sl_false;
-					if (handle->m_flagRenderingContinuously) {
-						flagUpdate = sl_true;
-					} else {
-						if (handle->m_flagRequestRender) {
-							flagUpdate = sl_true;
-						}
-					}
-					handle->m_flagRequestRender = sl_false;
-					
-					if (flagUpdate) {
-						
-						[EAGLContext setCurrentContext:desc.m_context];
-						
-						desc.m_engine->setViewport(0, 0, width, height);
-						
-						Ref<View> _view = instance->getView();
-						if (RenderView* view = CastInstance<RenderView>(_view.get())) {
-							view->dispatchFrame(desc.m_engine.get());
-						}
-						
-						[handle display];
-
-					}
-				}
-			}
-			
-		} else {
-			break;
-		}
-		
-		if (Thread::isNotStoppingCurrent()) {
-			if (flagWorking) {
-				sl_uint64 t = timer.getElapsedMilliseconds();
-				if (t < 15) {
-					Thread::sleep(15 - (sl_uint32)(t));
-				}
-			} else {
-				Thread::sleep(1000);
-			}
-			timer.reset();
-		} else {
-			break;
-		}
-		
+		[v _requestRender];
 	}
 }
 
 SLIB_UI_NAMESPACE_END
 
+@interface _Slib_iOS_GLViewDisplayLink : NSObject
+{
+	@public __weak _Slib_iOS_GLView* m_view;
+}
+@end
+
+@implementation _Slib_iOS_GLViewDisplayLink
+
+- (void)onGLRenderFrame
+{
+	_Slib_iOS_GLView* view = m_view;
+	if (view != nil) {
+		if (view->m_flagRenderingContinuously || view->m_flagRequestRender) {
+			view->m_flagRequestRender = sl_false;
+			[view setNeedsDisplay];
+		}
+	}
+}
+
+@end
+
 @implementation _Slib_iOS_GLView
+
 -(void)_init
 {
+	m_flagRenderingContinuously = sl_false;
+	m_flagRequestRender = sl_true;
+	
+
+	EAGLContext* context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
+	if (context == nil) {
+		context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+	}
+	if (context != nil) {
+		self.context = context;
+	}
+	
 	self.drawableColorFormat = GLKViewDrawableColorFormatRGB565;
 	self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
 	
-	m_flagRenderingContinuously = sl_false;
-	m_flagRequestRender = sl_true;
-	m_thread = slib::Thread::start(slib::Function<void()>::bind(&(slib::_iOS_GLCallback), self));
+	_Slib_iOS_GLViewDisplayLink* link = [[_Slib_iOS_GLViewDisplayLink alloc] init];
+	link->m_view = self;
+	m_displayLink = [CADisplayLink displayLinkWithTarget:link selector:@selector(onGLRenderFrame)];
+	[m_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+	
 }
 
 -(void)dealloc
 {
-	slib::Ref<slib::Thread> thread = m_thread;
-	if (thread.isNotNull()) {
-		thread->finishAndWait();
-	}
+	[m_displayLink invalidate];
 }
 
 -(void)_requestRender
@@ -217,10 +128,24 @@ SLIB_UI_NAMESPACE_END
 
 - (void)drawRect:(CGRect)dirtyRect
 {
-}
+	slib::Ref<slib::iOS_ViewInstance> instance = m_viewInstance;
+	if (instance.isNull()) {
+		return;
+	}
+	
+	slib::Ref<slib::View> _view = instance->getView();
+	if (slib::RenderView* view = slib::CastInstance<slib::RenderView>(_view.get())) {
+		sl_uint32 width = (sl_uint32)(self.frame.size.width * self.contentScaleFactor);
+		sl_uint32 height = (sl_uint32)(self.frame.size.height * self.contentScaleFactor);
+		if (m_engine.isNull()) {
+			m_engine = slib::GLES::createEngine();
+		}
+		if (m_engine.isNotNull()) {
+			m_engine->setViewport(0, 0, width, height);
+			view->dispatchFrame(m_engine.get());
+		}
+	}
 
-- (void)setNeedsDisplay
-{
 }
 
 - (void)setFrame:(CGRect)frame

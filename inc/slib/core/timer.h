@@ -9,6 +9,7 @@
 SLIB_NAMESPACE_BEGIN
 
 class DispatchLoop;
+class Dispatcher;
 
 class SLIB_EXPORT Timer : public Object
 {
@@ -21,6 +22,8 @@ protected:
 	
 public:
 	static Ref<Timer> createWithLoop(const Ref<DispatchLoop>& loop, const Function<void()>& task, sl_uint64 interval_ms, sl_bool flagStart = sl_true);
+	
+	static Ref<Timer> createWithDispatcher(const Ref<Dispatcher>& dispatcher, const Function<void()>& task, sl_uint64 interval_ms, sl_bool flagStart = sl_true);
 	
 public:
 	void start();
@@ -43,13 +46,18 @@ public:
 	SLIB_PROPERTY(sl_uint32, MaxConcurrentThread)
 	
 protected:
+	void _runFromDispatcher();
+	
+protected:
 	sl_bool m_flagStarted;
 	Function<void()> m_task;
 	sl_uint64 m_interval;
 	sl_int32 m_nCountRun;
 	
-	sl_bool m_flagUseLoop;
+	Ref<Dispatcher> m_dispatcher;
 	WeakRef<DispatchLoop> m_loop;
+	
+	sl_bool m_flagDispatched;
 	
 };
 

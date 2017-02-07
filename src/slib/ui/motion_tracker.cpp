@@ -4,8 +4,11 @@
 
 SLIB_UI_NAMESPACE_BEGIN
 
+#define MOVEMENT_ZERO_MOVEMENT 5
+
 #define MAX_TRACK_HORIZON 0.2f
-#define MOVEMENT_STOP_MILLIS 100
+#define MOVEMENT_STOP_MILLIS 500
+
 
 #define MAX_DEGREE 4
 #define HISTORY_SIZE SLIB_MOTION_TRACKER_HISTORY_SIZE
@@ -28,6 +31,10 @@ MotionTracker::MotionTracker(sl_uint32 degree)
 	m_nHistory = 0;
 	m_flagRefreshTrack = sl_true;
 	m_flagValidTrack = sl_false;
+}
+
+MotionTracker::~MotionTracker()
+{
 }
 
 void MotionTracker::addMovement(sl_real x, sl_real y, const Time& time)
@@ -68,6 +75,23 @@ void MotionTracker::addMovement(const Point& pt)
 void MotionTracker::addMovement(UIEvent* ev)
 {
 	addMovement(ev->getX(), ev->getY(), ev->getTime());
+}
+
+sl_bool MotionTracker::getLastPosition(Point* _out)
+{
+	if (m_nHistory > 0) {
+		if (_out) {
+			if (m_topHistory == 0) {
+				_out->x = m_history[HISTORY_SIZE - 1].x;
+				_out->y = m_history[HISTORY_SIZE - 1].y;
+			} else {
+				_out->x = m_history[m_topHistory - 1].x;
+				_out->y = m_history[m_topHistory - 1].y;
+			}
+		}
+		return sl_true;
+	}
+	return sl_false;
 }
 
 void MotionTracker::clearMovements()

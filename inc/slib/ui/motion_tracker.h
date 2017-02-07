@@ -8,6 +8,9 @@ Motion tracking algorithm based on least-squares linear regression.
  https://en.wikipedia.org/wiki/Least_squares
  https://en.wikipedia.org/wiki/Linear_regression
  
+
+ MotionTracker is not thread-safe!
+ 
 ******************************************************************/
 
 #include "definition.h"
@@ -27,6 +30,8 @@ public:
 	
 	MotionTracker(sl_uint32 degree);
 	
+	~MotionTracker();
+	
 public:
 	void addMovement(sl_real x, sl_real y, const Time& time);
 
@@ -37,6 +42,8 @@ public:
 	void addMovement(const Point& pt);
 	
 	void addMovement(UIEvent* ev);
+	
+	sl_bool getLastPosition(Point* _out);
 	
 	void clearMovements();
 	

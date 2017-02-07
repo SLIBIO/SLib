@@ -13,6 +13,7 @@
 #include "../core/queue.h"
 #include "../core/animation.h"
 #include "../core/dispatch.h"
+#include "../core/timer.h"
 #include "../graphics/canvas.h"
 #include "../graphics/bitmap.h"
 
@@ -1018,6 +1019,8 @@ public:
 	virtual void runOnDrawingThread(const Function<void()>& callback);
 	
 	virtual Ref<Dispatcher> getDispatcher();
+	
+	Ref<Timer> createTimer(const Function<void()>& task, sl_uint32 interval_ms, sl_bool flagStart = sl_true);
 
 public:
 	Ptr<IViewListener> getEventListener();
@@ -1358,6 +1361,11 @@ protected:
 		
 		sl_bool flagUpdatedLayoutFrame;
 		
+	public:
+		LayoutAttributes();
+		
+		~LayoutAttributes();
+		
 	};
 	AtomicRef<LayoutAttributes> m_layoutAttributes;
 	
@@ -1394,6 +1402,11 @@ protected:
 		AtomicWeakRef<Animation> m_animationFrame;
 		AtomicWeakRef<Animation> m_animationAlpha;
 		AtomicWeakRef<Animation> m_animationBackgroundColor;
+
+	public:
+		TransformAttributes();
+		
+		~TransformAttributes();
 		
 	};
 	AtomicRef<TransformAttributes> m_transformAttributes;
@@ -1437,6 +1450,11 @@ protected:
 		sl_bool flagInvalidatedWholeLayer;
 		UIRect rectInvalidatedLayer;
 		
+	public:
+		DrawAttributes();
+		
+		~DrawAttributes();
+		
 	};
 	AtomicRef<DrawAttributes> m_drawAttributes;
 	
@@ -1473,6 +1491,11 @@ protected:
 		sl_bool flagInitHorzScrollBar;
 		sl_bool flagInitVertScrollBar;
 		
+	public:
+		ScrollAttributes();
+		
+		~ScrollAttributes();
+		
 	};
 	AtomicRef<ScrollAttributes> m_scrollAttributes;
 	
@@ -1494,6 +1517,12 @@ protected:
 		AtomicFunction<void(View*, sl_ui_len, sl_ui_len)> resize;
 		AtomicFunction<void(View*, sl_scroll_pos, sl_scroll_pos)> scroll;
 		AtomicFunction<void(View*, GestureEvent*)> swipe;
+		
+	public:
+		EventAttributes();
+		
+		~EventAttributes();
+		
 	};
 	
 	AtomicRef<EventAttributes> m_eventAttributes;
@@ -1519,6 +1548,8 @@ class SLIB_EXPORT ViewInstance : public Object
 
 public:
 	ViewInstance();
+	
+	~ViewInstance();
 	
 public:
 	Ref<View> getView();
@@ -1595,6 +1626,8 @@ class ViewGroup : public View
 	SLIB_DECLARE_OBJECT
 public:
 	ViewGroup();
+	
+	~ViewGroup();
 	
 };
 

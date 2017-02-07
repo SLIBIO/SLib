@@ -9,12 +9,14 @@ SLIB_DEFINE_OBJECT(Timer, Object)
 
 Timer::Timer()
 {
-	m_flagUseLoop = sl_false;
 	m_flagStarted = sl_false;
 	m_nCountRun = 0;
 	
+	m_flagDispatched = sl_false;
+	
 	setLastRunTime(0);
 	setMaxConcurrentThread(1);
+	
 }
 
 Timer::~Timer()
@@ -25,14 +27,38 @@ Timer::~Timer()
 
 Ref<Timer> Timer::createWithLoop(const Ref<DispatchLoop>& loop, const Function<void()>& task, sl_uint64 interval_ms, sl_bool flagStart)
 {
-	Ref<Timer> ret;
 	if (task.isNull()) {
+		return sl_null;
+	}
+	if (loop.isNull()) {
+		return sl_null;
+	}
+	Ref<Timer> ret = new Timer();
+	if (ret.isNotNull()) {
+		ret->m_loop = loop;
+		
+		ret->m_task = task;
+		ret->m_interval = interval_ms;
+		
+		if (flagStart) {
+			ret->start();
+		}
 		return ret;
 	}
-	ret = new Timer();
+	return sl_null;
+}
+
+Ref<Timer> Timer::createWithDispatcher(const Ref<Dispatcher>& dispatcher, const Function<void()>& task, sl_uint64 interval_ms, sl_bool flagStart)
+{
+	if (task.isNull()) {
+		return sl_null;
+	}
+	if (dispatcher.isNull()) {
+		return sl_null;
+	}
+	Ref<Timer> ret = new Timer();
 	if (ret.isNotNull()) {
-		ret->m_flagUseLoop = sl_true;
-		ret->m_loop = loop;
+		ret->m_dispatcher = dispatcher;
 		
 		ret->m_task = task;
 		ret->m_interval = interval_ms;
@@ -49,7 +75,13 @@ void Timer::start()
 {
 	ObjectLocker lock(this);
 	if (!m_flagStarted) {
-		if (m_flagUseLoop) {
+		if (m_dispatcher.isNotNull()) {
+			m_flagStarted = sl_true;
+			if (!m_flagDispatched) {
+				m_flagDispatched = sl_true;
+				m_dispatcher->dispatch(SLIB_FUNCTION_WEAKREF(Timer, _runFromDispatcher, this), m_interval);
+			}
+		} else {
 			Ref<DispatchLoop> loop = m_loop;
 			if (loop.isNotNull()) {
 				m_flagStarted = sl_true;
@@ -65,7 +97,7 @@ void Timer::stop()
 	ObjectLocker lock(this);
 	if (m_flagStarted) {
 		m_flagStarted = sl_false;
-		if (m_flagUseLoop) {
+		if (m_dispatcher.isNull()) {
 			Ref<DispatchLoop> loop = m_loop;
 			if (loop.isNotNull()) {
 				lock.unlock();
@@ -109,6 +141,19 @@ void Timer::stopAndWait()
 	sl_uint32 n = 0;
 	while (m_nCountRun > 0) {
 		System::yield(++n);
+	}
+}
+
+void Timer::_runFromDispatcher()
+{
+	if (m_flagStarted) {
+		m_task();
+	}
+	ObjectLocker lock(this);
+	if (m_flagStarted) {
+		m_dispatcher->dispatch(SLIB_FUNCTION_WEAKREF(Timer, _runFromDispatcher, this), m_interval);
+	} else {
+		m_flagDispatched = sl_false;
 	}
 }
 

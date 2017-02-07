@@ -20,7 +20,7 @@ PickerView::PickerView()
 	m_linesHalfCount = 2;
 	m_flagCircular = sl_false;
 	m_yOffset = 0;
-	m_timeCallbackBefore.setZero();
+	m_timeFlowFrameBefore.setZero();
 }
 
 sl_uint32 PickerView::getItemsCount()
@@ -261,31 +261,34 @@ void PickerView::onDraw(Canvas* canvas)
 void PickerView::onMouseEvent(UIEvent* ev)
 {
 	UIAction action = ev->getAction();
-	Point pt = ev->getPoint();
-
 	Time time = ev->getTime();
-	sl_real y = pt.y;
+	
+	if (m_motionTracker.isNull()) {
+		m_motionTracker = new MotionTracker;
+		if (m_motionTracker.isNull()) {
+			return;
+		}
+	}
 
 	if (action == UIAction::LeftButtonDown || action == UIAction::TouchBegin) {
 		_stopFlow();
-		m_timeTouchBefore = time;
-		m_speedBefore = 0;
-		m_yTouchBefore = y;
+		m_motionTracker->clearMovements();
+		m_motionTracker->addMovement(ev);
 		invalidate();
 	} else if (action == UIAction::LeftButtonDrag || action == UIAction::TouchMove) {
 		_stopFlow();
-		sl_real offset = y - m_yTouchBefore;
-		m_speedBefore = (sl_real)(offset / (time - m_timeTouchBefore).getMillisecondsCountf());
-		_flow((sl_ui_pos)offset);
-		m_timeTouchBefore = time;
-		m_yTouchBefore = y;
-		invalidate();
-	} else if (action == UIAction::LeftButtonUp || action == UIAction::TouchEnd || action == UIAction::TouchCancel) {
-		sl_real timeOffset = (sl_real)((time - m_timeTouchBefore).getMillisecondsCountf());
-		if (timeOffset > 300) {
-			m_speedBefore = 0;
+		Point ptLast;
+		if (m_motionTracker->getLastPosition(&ptLast)) {
+			sl_real offset = ev->getY() - ptLast.y;
+			_flow((sl_ui_pos)offset);
+			invalidate();
 		}
-		_startFlow(m_speedBefore);
+		m_motionTracker->addMovement(ev);
+	} else if (action == UIAction::LeftButtonUp || action == UIAction::TouchEnd || action == UIAction::TouchCancel) {
+		m_motionTracker->addMovement(ev);
+		sl_real speed = 0;
+		m_motionTracker->getVelocity(sl_null, &speed);
+		_startFlow(speed);
 		invalidate();
 	}
 }
@@ -382,38 +385,35 @@ void PickerView::_flow(sl_ui_pos offset)
 	}
 }
 
-#define ANIMATE_FRAME_MS 10
+#define ANIMATE_FRAME_MS 15
 
 void PickerView::_startFlow(sl_real speed)
 {
 	m_speedFlow = speed;
-	
-	m_timeCallbackBefore = Time::now();
-	dispatchToDrawingThread(SLIB_FUNCTION_WEAKREF(PickerView, _animationCallback, this), ANIMATE_FRAME_MS);
-	
+	m_timeFlowFrameBefore = Time::now();
+	m_timerFlow = createTimer(SLIB_FUNCTION_WEAKREF(PickerView, _animationCallback, this), ANIMATE_FRAME_MS);
 }
 
 void PickerView::_stopFlow()
 {
-	m_speedFlow = 0;
+	m_timerFlow.setNull();
 }
 
 void PickerView::_animationCallback()
 {
 	Time time = Time::now();
-	if (m_timeCallbackBefore.isZero()) {
-		m_timeCallbackBefore = time;
-	}
-	
-	float T = UIResource::getScreenMinimum() / SLIB_IF_PLATFORM_IS_MOBILE(2000.0f, 4000.0f);
+	sl_real ellapsed = (sl_real)((time - m_timeFlowFrameBefore).getSecondsCountf());
+	m_timeFlowFrameBefore = time;
+
+	float T = UIResource::getScreenMinimum() / SLIB_IF_PLATFORM_IS_MOBILE(2.0f, 4.0f);
 	if (Math::abs(m_speedFlow) <= T) {
-		if (Math::abs(m_yOffset) >= T) {
+		if (Math::abs(m_yOffset) >= 1) {
 			if (m_yOffset > 0) {
 				m_speedFlow = -T;
 			} else {
 				m_speedFlow = T;
 			}
-			sl_ui_pos f = (sl_ui_pos)(m_speedFlow * (time - m_timeCallbackBefore).getMillisecondsCountf());
+			sl_ui_pos f = (sl_ui_pos)(m_speedFlow * ellapsed);
 			if (Math::abs(f) > Math::abs(m_yOffset)) {
 				_stopFlow();
 				m_yOffset = 0;
@@ -429,15 +429,13 @@ void PickerView::_animationCallback()
 			return;
 		}
 	} else {
-		_flow((sl_ui_pos)(m_speedFlow * (time - m_timeCallbackBefore).getMillisecondsCountf()));
+		_flow((sl_ui_pos)(m_speedFlow * ellapsed));
 	}
 	
 	invalidate();
 	
 	m_speedFlow *= 0.97f;
-	m_timeCallbackBefore = time;
-	
-	dispatchToDrawingThread(SLIB_FUNCTION_WEAKREF(PickerView, _animationCallback, this), ANIMATE_FRAME_MS);
+
 	
 }
 

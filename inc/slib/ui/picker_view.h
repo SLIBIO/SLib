@@ -4,6 +4,7 @@
 #include "definition.h"
 
 #include "view.h"
+#include "motion_tracker.h"
 
 #include "../core/time.h"
 
@@ -124,12 +125,12 @@ protected:
 	
 	sl_uint32 m_linesHalfCount;
 	sl_bool m_flagCircular;
+	
+	Ref<MotionTracker> m_motionTracker;
+	Ref<Timer> m_timerFlow;
 	sl_ui_pos m_yOffset;
-	Time m_timeTouchBefore;
-	sl_real m_yTouchBefore;
 	sl_real m_speedFlow;
-	sl_real m_speedBefore;
-	Time m_timeCallbackBefore;
+	Time m_timeFlowFrameBefore;
 	
 };
 

@@ -75,6 +75,60 @@ View::~View()
 
 #define DEFAULT_MAX_SIZE 0x3fffffff
 
+View::LayoutAttributes::LayoutAttributes()
+{
+	widthMode = SizeMode::Fixed;
+	heightMode = SizeMode::Fixed;
+	widthWeight = 1;
+	heightWeight = 1;
+	
+	leftMode = PositionMode::Fixed;
+	topMode = PositionMode::Fixed;
+	rightMode = PositionMode::Fixed;
+	bottomMode = PositionMode::Fixed;
+	
+	minWidth = 0;
+	maxWidth = DEFAULT_MAX_SIZE;
+	minHeight = 0;
+	maxHeight = DEFAULT_MAX_SIZE;
+	
+	aspectRatioMode = AspectRatioMode::None;
+	aspectRatio = 1;
+	
+	measuredWidth = 0;
+	measuredHeight = 0;
+	flagInvalidMeasure = sl_true;
+	
+	flagInvalidRelativeBoundWidth = sl_true;
+	measuredRelativeBoundWidth = 0;
+	flagBadRelativeBoundWidth = sl_false;
+	flagInvalidRelativeBoundHeight = sl_true;
+	measuredRelativeBoundHeight = 0;
+	flagBadRelativeBoundHeight = sl_false;
+	
+	flagOnPrepareLayout = sl_false;
+	flagOnMakeLayout = sl_false;
+	
+	marginLeft = 0;
+	marginTop = 0;
+	marginRight = 0;
+	marginBottom = 0;
+	flagRelativeMarginLeft = sl_false;
+	relativeMarginLeftWeight = 0;
+	flagRelativeMarginTop = sl_false;
+	relativeMarginTopWeight = 0;
+	flagRelativeMarginRight = sl_false;
+	relativeMarginRightWeight = 0;
+	flagRelativeMarginBottom = sl_false;
+	relativeMarginBottomWeight = 0;
+	
+	flagUpdatedLayoutFrame = sl_false;
+}
+
+View::LayoutAttributes::~LayoutAttributes()
+{
+}
+
 Ref<View::LayoutAttributes> View::_initializeLayoutAttributes()
 {
 	Ref<LayoutAttributes> attrs = m_layoutAttributes;
@@ -92,60 +146,43 @@ Ref<View::LayoutAttributes> View::_initializeLayoutAttributes()
 	if (attrs.isNull()) {
 		return sl_null;
 	}
-
-	attrs->widthMode = SizeMode::Fixed;
-	attrs->heightMode = SizeMode::Fixed;
-	attrs->widthWeight = 1;
-	attrs->heightWeight = 1;
 	
-	attrs->leftMode = PositionMode::Fixed;
-	attrs->topMode = PositionMode::Fixed;
-	attrs->rightMode = PositionMode::Fixed;
-	attrs->bottomMode = PositionMode::Fixed;
-	
-	attrs->minWidth = 0;
-	attrs->maxWidth = DEFAULT_MAX_SIZE;
-	attrs->minHeight = 0;
-	attrs->maxHeight = DEFAULT_MAX_SIZE;
-	
-	attrs->aspectRatioMode = AspectRatioMode::None;
-	attrs->aspectRatio = 1;
-	
-	attrs->measuredWidth = 0;
-	attrs->measuredHeight = 0;
 	attrs->frame = m_frame;
 	attrs->requestedFrame = m_frame;
-	attrs->flagInvalidMeasure = sl_true;
-	
-	attrs->flagInvalidRelativeBoundWidth = sl_true;
-	attrs->measuredRelativeBoundWidth = 0;
-	attrs->flagBadRelativeBoundWidth = sl_false;
-	attrs->flagInvalidRelativeBoundHeight = sl_true;
-	attrs->measuredRelativeBoundHeight = 0;
-	attrs->flagBadRelativeBoundHeight = sl_false;
-	
-	attrs->flagOnPrepareLayout = sl_false;
-	attrs->flagOnMakeLayout = sl_false;
-	
-	attrs->marginLeft = 0;
-	attrs->marginTop = 0;
-	attrs->marginRight = 0;
-	attrs->marginBottom = 0;
-	attrs->flagRelativeMarginLeft = sl_false;
-	attrs->relativeMarginLeftWeight = 0;
-	attrs->flagRelativeMarginTop = sl_false;
-	attrs->relativeMarginTopWeight = 0;
-	attrs->flagRelativeMarginRight = sl_false;
-	attrs->relativeMarginRightWeight = 0;
-	attrs->flagRelativeMarginBottom = sl_false;
-	attrs->relativeMarginBottomWeight = 0;
-	
-	attrs->flagUpdatedLayoutFrame = sl_false;
 	
 	m_layoutAttributes = attrs;
 	
 	return attrs;
 	
+}
+
+View::TransformAttributes::TransformAttributes()
+{
+	flagTransformFinalInvalid = sl_false;
+	flagTransformFinal = sl_false;
+	
+	flagInverseTransformFinalInvalid = sl_false;
+	flagInverseTransformFinal = sl_false;
+	
+	flagTransform = sl_false;
+	
+	flagTransformCalcInvalid = sl_false;
+	flagTransformCalc = sl_false;
+	
+	translation.x = 0;
+	translation.y = 0;
+	
+	scale.x = 1;
+	scale.y = 1;
+	
+	rotationAngle = 0;
+	
+	anchorOffset.x = 0;
+	anchorOffset.y = 0;
+}
+
+View::TransformAttributes::~TransformAttributes()
+{
 }
 
 Ref<View::TransformAttributes> View::_initializeTransformAttributes()
@@ -165,33 +202,44 @@ Ref<View::TransformAttributes> View::_initializeTransformAttributes()
 	if (attrs.isNull()) {
 		return sl_null;
 	}
-
-	attrs->flagTransformFinalInvalid = sl_false;
-	attrs->flagTransformFinal = sl_false;
 	
-	attrs->flagInverseTransformFinalInvalid = sl_false;
-	attrs->flagInverseTransformFinal = sl_false;
-	
-	attrs->flagTransform = sl_false;
-	
-	attrs->flagTransformCalcInvalid = sl_false;
-	attrs->flagTransformCalc = sl_false;
-	
-	attrs->translation.x = 0;
-	attrs->translation.y = 0;
-	
-	attrs->scale.x = 1;
-	attrs->scale.y = 1;
-	
-	attrs->rotationAngle = 0;
-	
-	attrs->anchorOffset.x = 0;
-	attrs->anchorOffset.y = 0;
-
 	m_transformAttributes = attrs;
 	
 	return attrs;
 	
+}
+
+View::DrawAttributes::DrawAttributes()
+{
+	backgroundScaleMode = ScaleMode::Stretch;
+	backgroundAlignment = Alignment::MiddleCenter;
+	backgroundColor = Color::zero();
+	
+	boundShape = BoundShape::Rectangle;
+	
+	roundRectBoundShapeRadius.x = 5;
+	roundRectBoundShapeRadius.y = 5;
+	
+	borderColor = Color::Black;
+	borderStyle = PenStyle::Solid;
+	borderWidth = 0;
+	
+	flagPreDrawEnabled = sl_false;
+	flagPostDrawEnabled = sl_false;
+	flagOnDrawBackgroundAlways = sl_false;
+	flagOnDrawBorderAlways = sl_false;
+	
+	flagUsingFont = sl_false;
+	
+	flagOpaque = sl_false;
+	alpha = 1;
+	flagLayer = sl_false;
+	flagInvalidatedLayer = sl_true;
+	flagInvalidatedWholeLayer = sl_true;
+}
+
+View::DrawAttributes::~DrawAttributes()
+{
 }
 
 Ref<View::DrawAttributes> View::_initializeDrawAttributes()
@@ -207,41 +255,45 @@ Ref<View::DrawAttributes> View::_initializeDrawAttributes()
 	if (attrs.isNotNull()) {
 		return attrs;
 	}
+	
 	attrs = new DrawAttributes;
 	if (attrs.isNull()) {
 		return sl_null;
 	}
 	
-	attrs->backgroundScaleMode = ScaleMode::Stretch;
-	attrs->backgroundAlignment = Alignment::MiddleCenter;
-	attrs->backgroundColor = Color::zero();
-	
-	attrs->boundShape = BoundShape::Rectangle;
-	
-	attrs->roundRectBoundShapeRadius.x = 5;
-	attrs->roundRectBoundShapeRadius.y = 5;
-	
-	attrs->borderColor = Color::Black;
-	attrs->borderStyle = PenStyle::Solid;
-	attrs->borderWidth = 0;
-	
-	attrs->flagPreDrawEnabled = sl_false;
-	attrs->flagPostDrawEnabled = sl_false;
-	attrs->flagOnDrawBackgroundAlways = sl_false;
-	attrs->flagOnDrawBorderAlways = sl_false;
-	
-	attrs->flagUsingFont = sl_false;
-	
-	attrs->flagOpaque = sl_false;
-	attrs->alpha = 1;
-	attrs->flagLayer = sl_false;
-	attrs->flagInvalidatedLayer = sl_true;
-	attrs->flagInvalidatedWholeLayer = sl_true;
-
 	m_drawAttributes = attrs;
 	
 	return attrs;
 	
+}
+
+View::ScrollAttributes::ScrollAttributes()
+{
+	flagHorz = sl_false;
+	flagVert = sl_false;
+	
+	flagValidHorz = sl_false;
+	flagValidVert = sl_false;
+	x = 0;
+	y = 0;
+	contentWidth = 0;
+	contentHeight = 0;
+	barWidth = UI::getDefaultScrollBarWidth();
+	
+	flagContentScrollingByMouse = sl_true;
+	flagContentScrollingByTouch = sl_true;
+	flagContentScrollingByMouseWheel = sl_true;
+	flagContentScrollingByKeyboard = sl_true;
+	flagDownContent = sl_false;
+	
+	flagHorzScrollBarVisible = sl_true;
+	flagVertScrollBarVisible = sl_true;
+	flagInitHorzScrollBar = sl_false;
+	flagInitVertScrollBar = sl_false;
+}
+
+View::ScrollAttributes::~ScrollAttributes()
+{
 }
 
 Ref<View::ScrollAttributes> View::_initializeScrollAttributes()
@@ -262,31 +314,17 @@ Ref<View::ScrollAttributes> View::_initializeScrollAttributes()
 		return sl_null;
 	}
 	
-	attrs->flagHorz = sl_false;
-	attrs->flagVert = sl_false;
-	
-	attrs->flagValidHorz = sl_false;
-	attrs->flagValidVert = sl_false;
-	attrs->x = 0;
-	attrs->y = 0;
-	attrs->contentWidth = 0;
-	attrs->contentHeight = 0;
-	attrs->barWidth = UI::getDefaultScrollBarWidth();
-	
-	attrs->flagContentScrollingByMouse = sl_true;
-	attrs->flagContentScrollingByTouch = sl_true;
-	attrs->flagContentScrollingByMouseWheel = sl_true;
-	attrs->flagContentScrollingByKeyboard = sl_true;
-	attrs->flagDownContent = sl_false;
-	
-	attrs->flagHorzScrollBarVisible = sl_true;
-	attrs->flagVertScrollBarVisible = sl_true;
-	attrs->flagInitHorzScrollBar = sl_false;
-	attrs->flagInitVertScrollBar = sl_false;
-	
 	m_scrollAttributes = attrs;
 	
 	return attrs;
+}
+
+View::EventAttributes::EventAttributes()
+{
+}
+
+View::EventAttributes::~EventAttributes()
+{
 }
 
 Ref<View::EventAttributes> View::_initializeEventAttributes()
@@ -306,7 +344,9 @@ Ref<View::EventAttributes> View::_initializeEventAttributes()
 	if (attrs.isNull()) {
 		return sl_null;
 	}
+	
 	m_eventAttributes = attrs;
+	
 	return attrs;
 }
 
@@ -6396,6 +6436,11 @@ Ref<Dispatcher> View::getDispatcher()
 	}
 }
 
+Ref<Timer> View::createTimer(const Function<void()>& task, sl_uint32 interval_ms, sl_bool flagStart)
+{
+	return Timer::createWithDispatcher(getDispatcher(), task, interval_ms, flagStart);
+}
+
 Ptr<IViewListener> View::getEventListener()
 {
 	Ref<EventAttributes> attrs = m_eventAttributes;
@@ -7857,6 +7902,10 @@ ViewInstance::ViewInstance()
 	m_flagWindowContent = sl_false;
 }
 
+ViewInstance::~ViewInstance()
+{
+}
+
 Ref<View> ViewInstance::getView()
 {
 	return m_view;
@@ -7979,6 +8028,10 @@ ViewGroup::ViewGroup()
 	
 	setCreatingChildInstances(sl_true);
 	
+}
+
+ViewGroup::~ViewGroup()
+{
 }
 
 SLIB_UI_NAMESPACE_END
