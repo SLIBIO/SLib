@@ -41,7 +41,11 @@ public:
 
 };
 
-SLIB_DECLARE_GEOMETRY_TYPE(Sphere)
+extern template class SphereT<float>;
+extern template class SphereT<double>;
+typedef SphereT<sl_real> Sphere;
+typedef SphereT<float> Spheref;
+typedef SphereT<double> Spherelf;
 
 SLIB_MATH_NAMESPACE_END
 

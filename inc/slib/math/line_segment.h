@@ -50,7 +50,11 @@ public:
 	
 };
 
-SLIB_DECLARE_GEOMETRY_TYPE(LineSegment)
+extern template class LineSegmentT<float>;
+extern template class LineSegmentT<double>;
+typedef LineSegmentT<sl_real> LineSegment;
+typedef LineSegmentT<float> LineSegmentf;
+typedef LineSegmentT<double> LineSegmentlf;
 
 SLIB_MATH_NAMESPACE_END
 

@@ -68,7 +68,11 @@ public:
 
 };
 
-SLIB_DECLARE_GEOMETRY_TYPE(Triangle3)
+extern template class Triangle3T<float>;
+extern template class Triangle3T<double>;
+typedef Triangle3T<sl_real> Triangle3;
+typedef Triangle3T<float> Triangle3f;
+typedef Triangle3T<double> Triangle3lf;
 
 SLIB_MATH_NAMESPACE_END
 

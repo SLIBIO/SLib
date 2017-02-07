@@ -101,7 +101,15 @@ private:
 };
 
 
-SLIB_DECLARE_GEOMETRY_TYPE_EX(Vector2)
+extern template class Vector2T<float>;
+extern template class Vector2T<double>;
+extern template class Vector2T<sl_int32, float>;
+extern template class Vector2T<sl_int64, double>;
+typedef Vector2T<sl_real> Vector2;
+typedef Vector2T<float> Vector2f;
+typedef Vector2T<double> Vector2lf;
+typedef Vector2T<sl_int32, float> Vector2i;
+typedef Vector2T<sl_int64, double> Vector2li;
 
 template <class T, class FT>
 Vector2T<T, FT> operator*(T f, const Vector2T<T, FT>& v);

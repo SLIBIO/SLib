@@ -43,7 +43,11 @@ public:
 
 };
 
-SLIB_DECLARE_GEOMETRY_TYPE(Triangle)
+extern template class TriangleT<float>;
+extern template class TriangleT<double>;
+typedef TriangleT<sl_real> Triangle;
+typedef TriangleT<float> Trianglef;
+typedef TriangleT<double> Trianglelf;
 
 SLIB_MATH_NAMESPACE_END
 

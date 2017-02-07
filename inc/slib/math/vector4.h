@@ -111,7 +111,15 @@ private:
 
 };
 
-SLIB_DECLARE_GEOMETRY_TYPE_EX(Vector4)
+extern template class Vector4T<float>;
+extern template class Vector4T<double>;
+extern template class Vector4T<sl_int32, float>;
+extern template class Vector4T<sl_int64, double>;
+typedef Vector4T<sl_real> Vector4;
+typedef Vector4T<float> Vector4f;
+typedef Vector4T<double> Vector4lf;
+typedef Vector4T<sl_int32, float> Vector4i;
+typedef Vector4T<sl_int64, double> Vector4li;
 
 template <class T, class FT>
 Vector4T<T, FT> operator*(T f, const Vector4T<T, FT>& v);

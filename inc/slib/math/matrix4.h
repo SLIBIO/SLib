@@ -204,7 +204,11 @@ public:
 	static Matrix4T<T> interpolate(const Matrix4T<T>& a, const Matrix4T<T>& b, float factor);
 };
 
-SLIB_DECLARE_GEOMETRY_TYPE(Matrix4)
+extern template class Matrix4T<float>;
+extern template class Matrix4T<double>;
+typedef Matrix4T<sl_real> Matrix4;
+typedef Matrix4T<float> Matrix4f;
+typedef Matrix4T<double> Matrix4lf;
 
 SLIB_MATH_NAMESPACE_END
 

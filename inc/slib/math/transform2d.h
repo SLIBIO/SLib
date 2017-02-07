@@ -65,7 +65,11 @@ public:
 	
 };
 
-SLIB_DECLARE_GEOMETRY_TYPE(Transform2)
+extern template class Transform2T<float>;
+extern template class Transform2T<double>;
+typedef Transform2T<sl_real> Transform2;
+typedef Transform2T<float> Transform2f;
+typedef Transform2T<double> Transform2lf;
 
 SLIB_MATH_NAMESPACE_END
 

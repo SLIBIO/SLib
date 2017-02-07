@@ -89,7 +89,11 @@ private:
 
 };
 
-SLIB_DECLARE_GEOMETRY_TYPE(Box)
+extern template class BoxT<float>;
+extern template class BoxT<double>;
+typedef BoxT<sl_real> Box;
+typedef BoxT<float> Boxf;
+typedef BoxT<double> Boxlf;
 
 SLIB_MATH_NAMESPACE_END
 

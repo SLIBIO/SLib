@@ -78,7 +78,11 @@ public:
 
 };
 
-SLIB_DECLARE_GEOMETRY_TYPE(Plane)
+extern template class PlaneT<float>;
+extern template class PlaneT<double>;
+typedef PlaneT<sl_real> Plane;
+typedef PlaneT<float> Planef;
+typedef PlaneT<double> Planelf;
 
 SLIB_MATH_NAMESPACE_END
 

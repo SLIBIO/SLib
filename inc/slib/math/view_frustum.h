@@ -51,7 +51,11 @@ public:
 
 };
 
-SLIB_DECLARE_GEOMETRY_TYPE(ViewFrustum)
+extern template class ViewFrustumT<float>;
+extern template class ViewFrustumT<double>;
+typedef ViewFrustumT<sl_real> ViewFrustum;
+typedef ViewFrustumT<float> ViewFrustumf;
+typedef ViewFrustumT<double> ViewFrustumlf;
 
 SLIB_MATH_NAMESPACE_END
 

@@ -138,7 +138,11 @@ public:
 	
 };
 
-SLIB_DECLARE_GEOMETRY_TYPE(Transform3)
+extern template class Transform3T<float>;
+extern template class Transform3T<double>;
+typedef Transform3T<sl_real> Transform3;
+typedef Transform3T<float> Transform3f;
+typedef Transform3T<double> Transform3lf;
 
 SLIB_MATH_NAMESPACE_END
 

@@ -64,7 +64,11 @@ public:
 	
 };
 
-SLIB_DECLARE_GEOMETRY_TYPE(Line)
+extern template class LineT<float>;
+extern template class LineT<double>;
+typedef LineT<sl_real> Line;
+typedef LineT<float> Linef;
+typedef LineT<double> Linelf;
 
 SLIB_MATH_NAMESPACE_END
 

@@ -180,7 +180,11 @@ private:
 
 };
 
-SLIB_DECLARE_GEOMETRY_TYPE(Matrix3)
+extern template class Matrix3T<float>;
+extern template class Matrix3T<double>;
+typedef Matrix3T<sl_real> Matrix3;
+typedef Matrix3T<float> Matrix3f;
+typedef Matrix3T<double> Matrix3lf;
 
 template <class T>
 Matrix3T<T> operator*(T value, const Matrix3T<T>& m);

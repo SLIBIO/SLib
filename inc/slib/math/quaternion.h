@@ -92,7 +92,11 @@ private:
 	
 };
 
-SLIB_DECLARE_GEOMETRY_TYPE(Quaternion)
+extern template class QuaternionT<float>;
+extern template class QuaternionT<double>;
+typedef QuaternionT<sl_real> Quaternion;
+typedef QuaternionT<float> Quaternionf;
+typedef QuaternionT<double> Quaternionlf;
 
 SLIB_MATH_NAMESPACE_END
 

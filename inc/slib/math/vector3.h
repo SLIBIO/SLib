@@ -105,7 +105,15 @@ private:
 
 };
 
-SLIB_DECLARE_GEOMETRY_TYPE_EX(Vector3)
+extern template class Vector3T<float>;
+extern template class Vector3T<double>;
+extern template class Vector3T<sl_int32, float>;
+extern template class Vector3T<sl_int64, double>;
+typedef Vector3T<sl_real> Vector3;
+typedef Vector3T<float> Vector3f;
+typedef Vector3T<double> Vector3lf;
+typedef Vector3T<sl_int32, float> Vector3i;
+typedef Vector3T<sl_int64, double> Vector3li;
 
 template <class T, class FT>
 Vector3T<T, FT> operator*(T f, const Vector3T<T, FT>& v);

@@ -50,7 +50,11 @@ public:
 	
 };
 
-SLIB_DECLARE_GEOMETRY_TYPE(Line3)
+extern template class Line3T<float>;
+extern template class Line3T<double>;
+typedef Line3T<sl_real> Line3;
+typedef Line3T<float> Line3f;
+typedef Line3T<double> Line3lf;
 
 SLIB_MATH_NAMESPACE_END
 

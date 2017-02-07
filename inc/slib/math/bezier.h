@@ -62,7 +62,11 @@ public:
 	
 };
 
-SLIB_DECLARE_GEOMETRY_TYPE(CubicBezierCurve)
+extern template class CubicBezierCurveT<float>;
+extern template class CubicBezierCurveT<double>;
+typedef CubicBezierCurveT<sl_real> CubicBezierCurve;
+typedef CubicBezierCurveT<float> CubicBezierCurvef;
+typedef CubicBezierCurveT<double> CubicBezierCurvelf;
 
 SLIB_MATH_NAMESPACE_END
 
