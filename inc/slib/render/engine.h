@@ -118,6 +118,17 @@ public:
 	
 };
 
+enum class RenderFunctionOperation
+{
+	Never = 0,
+	Always = 1,
+	Equal = 2,
+	NotEqual = 3,
+	Less = 4,
+	LessEqual = 5,
+	Greater = 6,
+	GreaterEqual = 7,
+};
 
 class SLIB_EXPORT IRenderCallback
 {
@@ -214,6 +225,8 @@ public:
 	void setDepthTest(sl_bool flagEnableDepthTest);
 
 	void setDepthWriteEnabled(sl_bool flagEnableDepthWrite);
+	
+	void setDepthFunction(RenderFunctionOperation op);
 
 	void setCullFace(sl_bool flagEnableCull, sl_bool flagCullCCW = sl_true);
 
@@ -359,6 +372,8 @@ protected:
 	virtual void _setDepthTest(sl_bool flagEnableDepthTest) = 0;
 	
 	virtual void _setDepthWriteEnabled(sl_bool flagEnableDepthWrite) = 0;
+	
+	virtual void _setDepthFunction(RenderFunctionOperation op) = 0;
 	
 	virtual void _setCullFace(sl_bool flagEnableCull, sl_bool flagCullCCW) = 0;
 	

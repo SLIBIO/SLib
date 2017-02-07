@@ -31,6 +31,8 @@ public:
 	
 	static void setDepthWriteEnabled(sl_bool flagEnableDepthWrite);
 	
+	static void setDepthFunction(RenderFunctionOperation op);
+	
 	
 	static void setCullFace(sl_bool flagEnableCull, sl_bool flagCullCCW = sl_true);
 	

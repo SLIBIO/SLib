@@ -89,6 +89,34 @@ void GL_BASE::setDepthWriteEnabled(sl_bool flagEnableDepthWrite)
 	GL_ENTRY(glDepthMask)(flagEnableDepthWrite ? GL_TRUE : GL_FALSE);
 }
 
+static GLenum _GL_getFunctionOp(RenderFunctionOperation op)
+{
+	switch (op) {
+		case RenderFunctionOperation::Never:
+			return GL_NEVER;
+		case RenderFunctionOperation::Always:
+			return GL_ALWAYS;
+		case RenderFunctionOperation::Equal:
+			return GL_EQUAL;
+		case RenderFunctionOperation::NotEqual:
+			return GL_NOTEQUAL;
+		case RenderFunctionOperation::Less:
+			return GL_LESS;
+		case RenderFunctionOperation::LessEqual:
+			return GL_LEQUAL;
+		case RenderFunctionOperation::Greater:
+			return GL_GREATER;
+		case RenderFunctionOperation::GreaterEqual:
+			return GL_GEQUAL;
+	}
+	return GL_ALWAYS;
+}
+
+void GL_BASE::setDepthFunction(RenderFunctionOperation op)
+{
+	GL_ENTRY(glDepthFunc)(_GL_getFunctionOp(op));
+}
+
 void GL_BASE::setCullFace(sl_bool flagEnableCull, sl_bool flagCullCCW)
 {
 	if (flagEnableCull) {
@@ -1431,6 +1459,12 @@ public:
 	void _setDepthWriteEnabled(sl_bool flagEnableDepthWrite)
 	{
 		GL_BASE::setDepthWriteEnabled(flagEnableDepthWrite);
+	}
+	
+	// override
+	void _setDepthFunction(RenderFunctionOperation op)
+	{
+		GL_BASE::setDepthFunction(op);
 	}
 
 	// override

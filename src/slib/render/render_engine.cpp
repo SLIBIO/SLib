@@ -191,6 +191,11 @@ void RenderEngine::setDepthWriteEnabled(sl_bool flagEnableDepthWrite)
 	_setDepthWriteEnabled(flagEnableDepthWrite);
 }
 
+void RenderEngine::setDepthFunction(RenderFunctionOperation op)
+{
+	_setDepthFunction(op);
+}
+
 void RenderEngine::setCullFace(sl_bool flagEnableCull, sl_bool flagCullCCW)
 {
 	_setCullFace(flagEnableCull, flagCullCCW);
