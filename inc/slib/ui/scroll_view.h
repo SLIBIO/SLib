@@ -34,8 +34,11 @@ public:
 	void scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	void scrollTo(const ScrollPoint& position, UIUpdateMode mode = UIUpdateMode::Redraw);
-    
+	
+	// override
     void smoothScrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
+	
+	void smoothScrollTo(const ScrollPoint& position, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	sl_bool isPaging();
 	
@@ -55,6 +58,9 @@ public:
 public:
 	// override
 	Ref<ViewInstance> createNativeWidget(ViewInstance* parent);
+	
+	// override
+	void dispatchScroll(sl_scroll_pos x, sl_scroll_pos y);
 
 protected:
 	// override
@@ -67,8 +73,6 @@ protected:
 	void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 	
 private:
-	void _scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate, UIUpdateMode mode);
-	
 	void _updatePaging();
 	
 	void _refreshContentSize_NW();

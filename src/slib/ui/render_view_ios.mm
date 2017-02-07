@@ -101,7 +101,7 @@ SLIB_UI_NAMESPACE_END
 		self.context = context;
 	}
 	
-	self.drawableColorFormat = GLKViewDrawableColorFormatRGB565;
+	self.drawableColorFormat = GLKViewDrawableColorFormatRGBA8888;
 	self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
 	
 	_Slib_iOS_GLViewDisplayLink* link = [[_Slib_iOS_GLViewDisplayLink alloc] init];

@@ -126,9 +126,10 @@ protected:
 	sl_uint32 m_linesHalfCount;
 	sl_bool m_flagCircular;
 	
+	sl_ui_pos m_yOffset;
+	
 	Ref<MotionTracker> m_motionTracker;
 	Ref<Timer> m_timerFlow;
-	sl_ui_pos m_yOffset;
 	sl_real m_speedFlow;
 	Time m_timeFlowFrameBefore;
 	

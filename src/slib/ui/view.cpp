@@ -5,6 +5,7 @@
 #include "../../../inc/slib/ui/scroll_bar.h"
 #include "../../../inc/slib/ui/render_view.h"
 #include "../../../inc/slib/ui/animation.h"
+#include "../../../inc/slib/ui/resource.h"
 
 #include "../../../inc/slib/core/scoped.h"
 #include "../../../inc/slib/math/transform2d.h"
@@ -284,6 +285,7 @@ View::ScrollAttributes::ScrollAttributes()
 	flagContentScrollingByTouch = sl_true;
 	flagContentScrollingByMouseWheel = sl_true;
 	flagContentScrollingByKeyboard = sl_true;
+	flagSmoothContentScrolling = sl_true;
 	flagDownContent = sl_false;
 	
 	flagHorzScrollBarVisible = sl_true;
@@ -5535,25 +5537,41 @@ void View::scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode)
 			y = 0;
 		}
 		
-		if (Math::isAlmostZero(attrs->x - x) && Math::isAlmostZero(attrs->y - y)) {
-			attrs->x = x;
-			attrs->y = y;
-			return;
+		if (_scrollTo(x, y, sl_true, sl_false)) {
+			if (mode == UIUpdateMode::Redraw) {
+				invalidate();
+			}
+		}
+	}
+}
+
+void View::scrollTo(const ScrollPoint& position, UIUpdateMode mode)
+{
+	scrollTo(position.x, position.y, mode);
+}
+
+void View::smoothScrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode)
+{
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	
+	if (attrs.isNotNull()) {
+		
+		sl_scroll_pos rx = attrs->contentWidth - getWidth();
+		if (x > rx) {
+			x = rx;
+		}
+		if (x < 0) {
+			x = 0;
+		}
+		sl_scroll_pos ry = attrs->contentHeight - getHeight();
+		if (y > ry) {
+			y = ry;
+		}
+		if (y < 0) {
+			y = 0;
 		}
 		
-		attrs->x = x;
-		attrs->y = y;
-		
-		dispatchScroll(x, y);
-		
-		Ref<ScrollBar> bar = attrs->horz;
-		if (bar.isNotNull()) {
-			bar->setValueOfOutRange(x, UIUpdateMode::NoRedraw);
-		}
-		bar = attrs->vert;
-		if (bar.isNotNull()) {
-			bar->setValueOfOutRange(y, UIUpdateMode::NoRedraw);
-		}
+		_startContentScrollingFlow(sl_true, Pointlf(x, y));
 		
 		if (mode == UIUpdateMode::Redraw) {
 			invalidate();
@@ -5561,7 +5579,7 @@ void View::scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode)
 	}
 }
 
-void View::scrollTo(const ScrollPoint& position, UIUpdateMode mode)
+void View::smoothScrollTo(const ScrollPoint& position, UIUpdateMode mode)
 {
 	scrollTo(position.x, position.y, mode);
 }
@@ -5749,6 +5767,24 @@ void View::setContentScrollingByKeyboard(sl_bool flag)
 	}
 }
 
+sl_bool View::isSmoothContentScrolling()
+{
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagSmoothContentScrolling;
+	}
+	return sl_true;
+}
+
+void View::setSmoothContentScrolling(sl_bool flag)
+{
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	if (attrs.isNotNull()) {
+		attrs->flagSmoothContentScrolling = flag;
+	}
+}
+
+
 class _View_ScrollBarListener : public Referable, public IScrollBarListener
 {
 public:
@@ -5888,6 +5924,123 @@ void View::_initScrollBars(UIUpdateMode mode)
 			}
 		}
 	}
+}
+
+#define BOUNCE_WEIGHT 0.07f
+
+sl_bool View::_scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagFinish, sl_bool flagAnimate)
+{
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNull()) {
+		return sl_false;
+	}
+	
+	sl_bool flagFinishX = flagFinish;
+	sl_bool flagFinishY = flagFinish;
+	
+	sl_scroll_pos comp;
+	sl_real w = 0;
+	if (attrs->flagHorz) {
+		w = (sl_real)(getWidth());
+		if (attrs->contentWidth > w) {
+			comp = -(w * BOUNCE_WEIGHT);
+			if (x < comp) {
+				x = comp;
+				flagFinishX = sl_true;
+			}
+			comp = attrs->contentWidth - w + (w * BOUNCE_WEIGHT);
+			if (x > comp) {
+				x = comp;
+				flagFinishX = sl_true;
+			}
+		} else {
+			flagFinishX = sl_true;
+		}
+	} else {
+		flagFinishX = sl_true;
+	}
+	sl_real h = 0;
+	if (attrs->flagVert) {
+		h = (sl_real)(getHeight());
+		if (attrs->contentHeight > h) {
+			comp = -(h * BOUNCE_WEIGHT);
+			if (y < comp) {
+				y = comp;
+				flagFinishY = sl_true;
+			}
+			comp = attrs->contentHeight - h + (h * BOUNCE_WEIGHT);
+			if (y > comp) {
+				y = comp;
+				flagFinishY = sl_true;
+			}
+		} else {
+			flagFinishY = sl_true;
+		}
+	} else {
+		flagFinishY = sl_true;
+	}
+	
+	sl_bool flagUpdated = sl_false;
+	if (Math::isAlmostZero(attrs->x - x) && Math::isAlmostZero(attrs->y - y)) {
+		attrs->x = x;
+		attrs->y = y;
+	} else {
+		
+		attrs->x = x;
+		attrs->y = y;
+		
+		dispatchScroll(x, y);
+		
+		Ref<ScrollBar> bar = attrs->horz;
+		if (bar.isNotNull()) {
+			bar->setValueOfOutRange(x, UIUpdateMode::NoRedraw);
+		}
+		bar = attrs->vert;
+		if (bar.isNotNull()) {
+			bar->setValueOfOutRange(y, UIUpdateMode::NoRedraw);
+		}
+
+		flagUpdated = sl_true;
+	}
+	
+	if (flagAnimate) {
+		if (flagFinishX && flagFinishY) {
+			sl_bool flagTarget = sl_false;
+			if (attrs->flagHorz) {
+				if (x < 0) {
+					x = 0;
+					flagTarget = sl_true;
+				}
+				if (attrs->contentWidth > w) {
+					if (x > attrs->contentWidth - w) {
+						x = attrs->contentWidth - w;
+						flagTarget = sl_true;
+					}
+				}
+			}
+			if (attrs->flagVert) {
+				if (y < 0) {
+					y = 0;
+					flagTarget = sl_true;
+				}
+				if (attrs->contentHeight > h) {
+					if (y > attrs->contentHeight - h) {
+						y = attrs->contentHeight - h;
+						flagTarget = sl_true;
+					}
+				}
+			}
+			if (flagTarget) {
+				_startContentScrollingFlow(sl_true, Pointlf(x, y));
+			} else {
+				_stopContentScrollingFlow();
+			}
+		}
+	} else {
+		_stopContentScrollingFlow();
+	}
+
+	return flagUpdated;
 }
 
 sl_bool View::isMultiTouchMode()
@@ -6870,11 +7023,6 @@ void View::dispatchMouseEvent(UIEvent* ev)
 		return;
 	}
 	
-	Ref<GestureDetector> gesture = m_gestureDetector;
-	if (gesture.isNotNull()) {
-		gesture->processEvent(ev);
-	}
-	
 	UIAction action = ev->getAction();
 
 	// pass event to children
@@ -6908,6 +7056,11 @@ void View::dispatchMouseEvent(UIEvent* ev)
 				m_childMouseMove.setNull();
 			}
 		}
+	}
+	
+	Ref<GestureDetector> gesture = m_gestureDetector;
+	if (gesture.isNotNull()) {
+		gesture->processEvent(ev);
 	}
 	
 	if (ev->isStoppedPropagation()) {
@@ -6969,6 +7122,12 @@ sl_bool View::dispatchMouseEventToChildren(UIEvent* ev, const Ref<View>* childre
 						dispatchMouseEventToChild(ev, child, sl_false);
 						ev->setPoint(ptMouse);
 						if (!(ev->isPassedToNext())) {
+							oldChild = m_childMouseDown;
+							if (oldChild.isNotNull() && oldChild != child) {
+								ev->setAction(UIAction::TouchCancel);
+								dispatchTouchEventToChild(ev, oldChild.get());
+								ev->setAction(action);
+							}
 							m_childMouseDown = child;
 							m_actionMouseDown = action;
 							return sl_true;
@@ -7082,11 +7241,6 @@ void View::dispatchTouchEvent(UIEvent* ev)
 		return;
 	}
 	
-	Ref<GestureDetector> gesture = m_gestureDetector;
-	if (gesture.isNotNull()) {
-		gesture->processEvent(ev);
-	}
-	
 	UIAction action = ev->getAction();
 	
 	// pass event to children
@@ -7107,6 +7261,11 @@ void View::dispatchTouchEvent(UIEvent* ev)
 		}
 	}
 	
+	Ref<GestureDetector> gesture = m_gestureDetector;
+	if (gesture.isNotNull()) {
+		gesture->processEvent(ev);
+	}
+
 	if (ev->isStoppedPropagation()) {
 		return;
 	}
@@ -7174,6 +7333,12 @@ sl_bool View::dispatchTouchEventToChildren(UIEvent *ev, const Ref<View>* childre
 					if (child->hitTest(pt)) {
 						dispatchTouchEventToChild(ev, child);
 						if (!(ev->isPassedToNext())) {
+							oldChild = m_childMouseDown;
+							if (oldChild.isNotNull() && oldChild != child) {
+								ev->setAction(UIAction::TouchCancel);
+								dispatchTouchEventToChild(ev, oldChild.get());
+								ev->setAction(action);
+							}
 							m_childMouseDown = child;
 							m_actionMouseDown = action;
 							break;
@@ -7740,37 +7905,77 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 	if (scrollAttrs.isNull()) {
 		return;
 	}
-	if (!(scrollAttrs->flagHorz) && !(scrollAttrs->flagVert)) {
+	sl_bool flagHorz = scrollAttrs->flagHorz;
+	if (flagHorz && scrollAttrs->contentWidth <= (sl_scroll_pos)(getWidth())) {
+		flagHorz = sl_false;
+	}
+	sl_bool flagVert = scrollAttrs->flagVert;
+	if (flagVert && scrollAttrs->contentHeight <= (sl_scroll_pos)(getHeight())) {
+		flagVert = sl_false;
+	}
+	if (!flagHorz && !flagVert) {
 		return;
 	}
-	if (scrollAttrs->contentWidth < (sl_scroll_pos)(getWidth()) && scrollAttrs->contentHeight < (sl_scroll_pos)(getHeight())) {
-		return;
-	}
+	
 	sl_scroll_pos lineX = (sl_scroll_pos)(getWidth() / 20);
 	sl_scroll_pos lineY = (sl_scroll_pos)(getHeight() / 20);
+	
+	if (scrollAttrs->flagSmoothContentScrolling) {
+		if (scrollAttrs->motionTracker.isNull()) {
+			ObjectLocker lock(this);
+			if (scrollAttrs->motionTracker.isNull()) {
+				scrollAttrs->motionTracker = new MotionTracker;
+			}
+		}
+	}
+	
 	UIAction action = ev->getAction();
 	switch (action) {
 		case UIAction::LeftButtonDown:
 		case UIAction::TouchBegin:
+			_stopContentScrollingFlow();
 			scrollAttrs->flagDownContent = sl_true;
-			scrollAttrs->scrollX_DownContent = scrollAttrs->x;
-			scrollAttrs->scrollY_DownContent = scrollAttrs->y;
-			scrollAttrs->mouseX_DownContent = ev->getX();
-			scrollAttrs->mouseY_DownContent = ev->getY();
+			scrollAttrs->mousePointBefore = ev->getPoint();
+			if (scrollAttrs->flagSmoothContentScrolling) {
+				scrollAttrs->motionTracker->clearMovements();
+				scrollAttrs->motionTracker->addMovement(ev);
+			}
 			ev->stopPropagation();
 			break;
 		case UIAction::LeftButtonDrag:
 		case UIAction::TouchMove:
+			_stopContentScrollingFlow();
 			if (scrollAttrs->flagDownContent) {
-				sl_scroll_pos sx = scrollAttrs->scrollX_DownContent - (sl_scroll_pos)(ev->getX() - scrollAttrs->mouseX_DownContent);
-				sl_scroll_pos sy = scrollAttrs->scrollY_DownContent - (sl_scroll_pos)(ev->getY() - scrollAttrs->mouseY_DownContent);
-				if (!(scrollAttrs->flagHorz)) {
-					sx = scrollAttrs->x;
+				Point offset = ev->getPoint() - scrollAttrs->mousePointBefore;
+				scrollAttrs->mousePointBefore = ev->getPoint();
+				sl_scroll_pos sx = scrollAttrs->x;
+				sl_scroll_pos sy = scrollAttrs->y;
+				if (flagHorz) {
+					sx -= offset.x;
 				}
-				if (!(scrollAttrs->flagVert)) {
-					sy = scrollAttrs->y;
+				if (flagVert) {
+					sy -= offset.y;
 				}
-				scrollTo(sx, sy);
+				if (scrollAttrs->flagSmoothContentScrolling) {
+					_scrollTo(sx, sy, sl_true, sl_false);
+					scrollAttrs->motionTracker->addMovement(ev);
+					invalidate();
+				} else {
+					scrollTo(sx, sy);
+				}
+#if defined(SLIB_PLATFORM_IS_MOBILE)
+				sl_real T = (sl_real)(UIResource::getScreenMinimum() / 200);
+#else
+				sl_real T = 2;
+#endif
+				if (offset.getLength2p() > T * T) {
+					ev->setAction(UIAction::TouchCancel);
+					Ref<View> view = m_childMouseDown;
+					if (view.isNotNull()) {
+						dispatchTouchEventToChild(ev, view.get());
+					}
+					ev->setAction(action);
+				}
 				ev->stopPropagation();
 			}
 			break;
@@ -7778,6 +7983,21 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 		case UIAction::TouchEnd:
 			if (scrollAttrs->flagDownContent) {
 				scrollAttrs->flagDownContent = sl_false;
+				if (scrollAttrs->flagSmoothContentScrolling) {
+					scrollAttrs->motionTracker->addMovement(ev);
+					Point speed;
+					if (scrollAttrs->motionTracker->getVelocity(&speed)) {
+						if (!flagHorz) {
+							speed.x = 0;
+						}
+						if (!flagVert) {
+							speed.y = 0;
+						}
+						_startContentScrollingFlow(sl_false, speed);
+					} else {
+						_startContentScrollingFlow(sl_false, Point::zero());
+					}
+				}
 				ev->stopPropagation();
 			}
 			break;
@@ -7787,7 +8007,7 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 				sl_scroll_pos sx = scrollAttrs->x;
 				sl_scroll_pos sy = scrollAttrs->y;
 				
-				if (scrollAttrs->flagHorz) {
+				if (flagHorz) {
 					sl_real deltaX = ev->getDeltaX();
 					if (deltaX > SLIB_EPSILON) {
 						sx -= lineX;
@@ -7797,7 +8017,7 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 						flagChange = sl_true;
 					}
 				}
-				if (scrollAttrs->flagVert) {
+				if (flagVert) {
 					sl_real deltaY = ev->getDeltaY();
 					if (deltaY > SLIB_EPSILON) {
 						sy -= lineY;
@@ -7816,32 +8036,37 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 			break;
 		case UIAction::KeyDown:
 			{
+				sl_bool flagChange = sl_false;
 				sl_scroll_pos sx = scrollAttrs->x;
 				sl_scroll_pos sy = scrollAttrs->y;
 				Keycode key = ev->getKeycode();
-				if (scrollAttrs->flagHorz) {
+				if (flagHorz) {
 					if (key == Keycode::Left) {
-						scrollTo(sx - lineX, sy);
-						ev->stopPropagation();
+						sx -= lineX;
+						flagChange = sl_true;
 					} else if (key == Keycode::Right) {
-						scrollTo(sx + lineX, sy);
-						ev->stopPropagation();
+						sx += lineX;
+						flagChange = sl_true;
 					}
 				}
-				if (scrollAttrs->flagVert) {
+				if (flagVert) {
 					if (key == Keycode::Up) {
-						scrollTo(sx, sy - lineY);
-						ev->stopPropagation();
+						sy -= lineY;
+						flagChange = sl_true;
 					} else if (key == Keycode::Down) {
-						scrollTo(sx, sy + lineY);
-						ev->stopPropagation();
+						sy += lineY;
+						flagChange = sl_true;
 					} else if (key == Keycode::PageUp) {
-						scrollTo(sx, sy - (sl_scroll_pos)(getHeight()));
-						ev->stopPropagation();
+						sy -= (sl_scroll_pos)(getHeight());
+						flagChange = sl_true;
 					} else if (key == Keycode::PageDown) {
-						scrollTo(sx, sy + (sl_scroll_pos)(getHeight()));
-						ev->stopPropagation();
+						sy += (sl_scroll_pos)(getHeight());
+						flagChange = sl_true;
 					}
+				}
+				if (flagChange) {
+					scrollTo(sx, sy);
+					ev->stopPropagation();
 				}
 			}
 			break;
@@ -7850,6 +8075,119 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 	}
 }
 
+#define SMOOTH_SCROLL_FRAME_MS 15
+
+void View::_startContentScrollingFlow(sl_bool flagSmoothTarget, const Pointlf& speedOrTarget)
+{
+	Ref<ScrollAttributes> scrollAttrs = m_scrollAttributes;
+	if (scrollAttrs.isNull()) {
+		return;
+	}
+	if (!(isDrawingThread())) {
+		dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), View, _startContentScrollingFlow, this, flagSmoothTarget, speedOrTarget));
+		return;
+	}
+	scrollAttrs->flagSmoothTarget = flagSmoothTarget;
+	if (flagSmoothTarget) {
+		scrollAttrs->xSmoothTarget = speedOrTarget.x;
+		scrollAttrs->ySmoothTarget = speedOrTarget.y;
+	} else {
+		scrollAttrs->speedFlow = speedOrTarget;
+	}
+	scrollAttrs->timeFlowFrameBefore = Time::now();
+	scrollAttrs->timerFlow = createTimer(SLIB_FUNCTION_WEAKREF(View, _processContentScrollingFlow, this), SMOOTH_SCROLL_FRAME_MS);
+}
+
+void View::_stopContentScrollingFlow()
+{
+	if (!(isDrawingThread())) {
+		dispatchToDrawingThread(SLIB_FUNCTION_WEAKREF(View, _stopContentScrollingFlow, this));
+		return;
+	}
+	Ref<ScrollAttributes> scrollAttrs = m_scrollAttributes;
+	if (scrollAttrs.isNull()) {
+		return;
+	}
+	scrollAttrs->timerFlow.setNull();
+}
+
+static void _View_smoothScrollElement(sl_scroll_pos& value, sl_scroll_pos& target, sl_scroll_pos dt, sl_scroll_pos T, sl_bool& flagAnimating)
+{
+	flagAnimating = sl_false;
+	sl_scroll_pos offset = target - value;
+	sl_scroll_pos offsetAbs = Math::abs(offset);
+	if (offsetAbs > 1) {
+		sl_scroll_pos speed;
+		if (offsetAbs > T) {
+			speed = offset;
+		} else {
+			speed = T * Math::sign(offset);
+		}
+		sl_scroll_pos add = speed * (dt * 1.5f);
+		if (Math::abs(add) < offsetAbs) {
+			value += add;
+			flagAnimating = sl_true;
+		} else {
+			value = target;
+		}
+	} else {
+		value = target;
+	}
+}
+
+void View::_processContentScrollingFlow()
+{
+	Ref<ScrollAttributes> scrollAttrs = m_scrollAttributes;
+	if (scrollAttrs.isNull()) {
+		return;
+	}
+	
+	Time time = Time::now();
+	sl_real dt = (sl_real)((time - scrollAttrs->timeFlowFrameBefore).getSecondsCountf());
+	scrollAttrs->timeFlowFrameBefore = time;
+	
+#ifdef SLIB_PLATFORM_IS_MOBILE
+	sl_real T = (sl_real)(UIResource::getScreenMinimum() / 2);
+#else
+	sl_real T = (sl_real)(UIResource::getScreenMinimum() / 4);
+#endif
+	
+	if (scrollAttrs->flagSmoothTarget) {
+
+		sl_bool flagX = sl_false, flagY = sl_false;
+		
+		sl_scroll_pos x = scrollAttrs->x;
+		sl_scroll_pos y = scrollAttrs->y;
+		_View_smoothScrollElement(x, scrollAttrs->xSmoothTarget, dt, T, flagX);
+		_View_smoothScrollElement(y, scrollAttrs->ySmoothTarget, dt, T, flagY);
+		
+		_scrollTo(x, y, sl_true, sl_true);
+		
+		if (!flagX && !flagY) {
+			_stopContentScrollingFlow();
+		}
+		
+	} else {
+		
+		sl_scroll_pos x = scrollAttrs->x;
+		sl_scroll_pos y = scrollAttrs->y;
+		
+		sl_bool flagFinish = sl_false;
+		if (scrollAttrs->speedFlow.getLength() <= T / 5) {
+			flagFinish = sl_true;
+		} else {
+			x -= scrollAttrs->speedFlow.x * dt;
+			y -= scrollAttrs->speedFlow.y * dt;
+			scrollAttrs->speedFlow *= 0.95f;
+		}
+
+		_scrollTo(x, y, flagFinish, sl_true);
+		
+	}
+	
+	invalidate();
+	
+}
 
 #if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_IOS)) && !(defined(SLIB_PLATFORM_IS_WIN32)) && !(defined(SLIB_PLATFORM_IS_ANDROID))
 Ref<ViewInstance> View::createGenericInstance(ViewInstance* parent)

@@ -261,7 +261,6 @@ void PickerView::onDraw(Canvas* canvas)
 void PickerView::onMouseEvent(UIEvent* ev)
 {
 	UIAction action = ev->getAction();
-	Time time = ev->getTime();
 	
 	if (m_motionTracker.isNull()) {
 		m_motionTracker = new MotionTracker;

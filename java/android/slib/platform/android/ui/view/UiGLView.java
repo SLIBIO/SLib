@@ -80,7 +80,7 @@ public class UiGLView extends GLSurfaceView implements IView, GLSurfaceView.Rend
 		super(context);
 		
 		setEGLContextClientVersion(2);
-		setEGLConfigChooser(new ConfigChooser(false, false));
+		setEGLConfigChooser(new ConfigChooser(true, false));
 		
 		setRenderer(this);
 		setRenderMode(RENDERMODE_WHEN_DIRTY);

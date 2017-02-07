@@ -49,7 +49,8 @@ RenderBlendingParam::RenderBlendingParam()
 	blendDst = RenderBlendingFactor::OneMinusSrcAlpha;
 	blendDstAlpha = RenderBlendingFactor::OneMinusSrcAlpha;
 	blendSrc = RenderBlendingFactor::SrcAlpha;
-	blendSrcAlpha = RenderBlendingFactor::SrcAlpha;
+	blendSrcAlpha = RenderBlendingFactor::One;
+	blendConstant = Vector4::zero();
 }
 
 RenderBlendingParam::~RenderBlendingParam()
@@ -62,7 +63,7 @@ RendererParam::RendererParam()
 	nRedBits = 8;
 	nGreenBits = 8;
 	nBlueBits = 8;
-	nAlphaBits = 0;
+	nAlphaBits = 8;
 	nAccumBits = 0;
 	nDepthBits = 24;
 	nStencilBits = 8;

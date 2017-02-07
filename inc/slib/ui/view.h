@@ -22,6 +22,7 @@ SLIB_UI_NAMESPACE_BEGIN
 class Window;
 class ViewInstance;
 class ScrollBar;
+class MotionTracker;
 
 struct ViewPrepareLayoutParam;
 
@@ -909,6 +910,10 @@ public:
 	
 	void scrollTo(const Pointlf& position, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
+	virtual void smoothScrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
+	
+	void smoothScrollTo(const Pointlf& position, UIUpdateMode mode = UIUpdateMode::Redraw);
+	
 	void setScrollX(sl_scroll_pos x, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
 	void setScrollY(sl_scroll_pos y, UIUpdateMode mode = UIUpdateMode::Redraw);
@@ -951,6 +956,10 @@ public:
 	sl_bool isContentScrollingByKeyboard();
 	
 	void setContentScrollingByKeyboard(sl_bool flag);
+	
+	sl_bool isSmoothContentScrolling();
+	
+	void setSmoothContentScrolling(sl_bool flag);
 
 	
 	sl_bool isMultiTouchMode();
@@ -1230,9 +1239,17 @@ private:
 	
 	void _initScrollBars(UIUpdateMode mode);
 	
+	sl_bool _scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagFinish, sl_bool flagAnimate);
+	
 	void _processEventForStateAndClick(UIEvent* ev);
 	
 	void _processContentScrollingEvents(UIEvent* ev);
+	
+	void _startContentScrollingFlow(sl_bool flagSmoothTarget, const Pointlf& speedOrTarget);
+	
+	void _stopContentScrollingFlow();
+	
+	void _processContentScrollingFlow();
 	
 protected:
 	void measureRelativeLayout(sl_bool flagHorizontal, sl_bool flagVertical);
@@ -1480,11 +1497,17 @@ protected:
 		sl_bool flagContentScrollingByTouch;
 		sl_bool flagContentScrollingByMouseWheel;
 		sl_bool flagContentScrollingByKeyboard;
+		sl_bool flagSmoothContentScrolling;
+		
 		sl_bool flagDownContent;
-		sl_scroll_pos scrollX_DownContent;
-		sl_scroll_pos scrollY_DownContent;
-		sl_ui_posf mouseX_DownContent;
-		sl_ui_posf mouseY_DownContent;
+		Point mousePointBefore;
+		Ref<MotionTracker> motionTracker;
+		Ref<Timer> timerFlow;
+		Time timeFlowFrameBefore;
+		Point speedFlow;
+		sl_bool flagSmoothTarget;
+		sl_scroll_pos xSmoothTarget;
+		sl_scroll_pos ySmoothTarget;
 		
 		sl_bool flagHorzScrollBarVisible;
 		sl_bool flagVertScrollBarVisible;

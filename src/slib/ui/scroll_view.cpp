@@ -55,7 +55,7 @@ void ScrollView::setContentView(const Ref<slib::View>& view, UIUpdateMode mode)
 				}
 			} else {
 				UIPoint pt = View::getScrollPosition();
-				_scrollTo(pt.x, pt.y, sl_false, UIUpdateMode::NoRedraw);
+				scrollTo(pt.x, pt.y, UIUpdateMode::NoRedraw);
 				if (mode == UIUpdateMode::Redraw) {
 					invalidate();
 				}
@@ -112,7 +112,12 @@ ScrollPoint ScrollView::getScrollRange()
 
 void ScrollView::scrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode)
 {
-	_scrollTo(x, y, sl_false, UIUpdateMode::NoRedraw);
+	Ref<View> view = m_viewContent;
+	if (view.isNotNull()) {
+		if (isNativeWidget()) {
+			_scrollTo_NW(x, y, sl_false);
+		}
+	}
 	View::scrollTo(x, y, mode);
 }
 
@@ -123,8 +128,19 @@ void ScrollView::scrollTo(const ScrollPoint& position, UIUpdateMode mode)
 
 void ScrollView::smoothScrollTo(sl_scroll_pos x, sl_scroll_pos y, UIUpdateMode mode)
 {
-    _scrollTo(x, y, sl_true, UIUpdateMode::NoRedraw);
-    View::scrollTo(x, y, mode);
+	Ref<View> view = m_viewContent;
+	if (view.isNotNull()) {
+		if (isNativeWidget()) {
+			_scrollTo_NW(x, y, sl_true);
+			return;
+		}
+	}
+    View::smoothScrollTo(x, y, mode);
+}
+
+void ScrollView::smoothScrollTo(const ScrollPoint& position, UIUpdateMode mode)
+{
+	smoothScrollTo(position.x, position.y, mode);
 }
 
 sl_bool ScrollView::isPaging()
@@ -171,6 +187,17 @@ void ScrollView::_updatePaging()
 	_setPaging_NW(m_flagPaging, m_pageWidth, m_pageHeight);
 }
 
+void ScrollView::dispatchScroll(sl_scroll_pos x, sl_scroll_pos y)
+{
+	View::dispatchScroll(x, y);
+	Ref<View> view = m_viewContent;
+	if (view.isNotNull()) {
+		if (!(isNativeWidget())) {
+			view->setPosition((sl_ui_pos)-x, (sl_ui_pos)-y);
+		}
+	}
+}
+
 void ScrollView::onResize(sl_ui_len width, sl_ui_len height)
 {
 	if (isNativeWidget()) {
@@ -190,44 +217,6 @@ void ScrollView::onResizeChild(View* child, sl_ui_len width, sl_ui_len height)
 
 void ScrollView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 {
-}
-
-void ScrollView::_scrollTo(sl_scroll_pos x, sl_scroll_pos y, sl_bool flagAnimate, UIUpdateMode mode)
-{
-	Ref<View> view = m_viewContent;
-	if (view.isNotNull()) {
-		if (isNativeWidget()) {
-			_scrollTo_NW(x, y, flagAnimate);
-		} else {
-			sl_ui_len w = getWidth();
-			sl_ui_len cw = view->getWidth();
-			if (cw > w) {
-				sl_ui_pos rx = cw - w;
-				if (x > (sl_scroll_pos)rx) {
-					x = rx;
-				}
-				if (x < 0) {
-					x = 0;
-				}
-			} else {
-				x = 0;
-			}
-			sl_ui_len h = getHeight();
-			sl_ui_len ch = view->getHeight();
-			if (ch > h) {
-				sl_ui_pos ry = ch - h;
-				if (y > (sl_scroll_pos)ry) {
-					y = ry;
-				}
-				if (y < 0) {
-					y = 0;
-				}
-			} else {
-				y = 0;
-			}
-			view->setPosition((sl_ui_pos)-x, (sl_ui_pos)-y, mode);
-		}
-	}
 }
 
 void ScrollView::_onScroll_NW(sl_scroll_pos x, sl_scroll_pos y)
