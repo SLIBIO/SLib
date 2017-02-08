@@ -6890,7 +6890,9 @@ void View::dispatchDraw(Canvas* canvas)
 		m_rectCurrentDrawing.right = (sl_ui_pos)(rcInvalidated.right + SLIB_EPSILON);
 		m_rectCurrentDrawing.bottom = (sl_ui_pos)(rcInvalidated.bottom + SLIB_EPSILON);
 		
-		_makeLayout(sl_false);
+		if (!(isInstance())) {
+			_makeLayout(sl_false);
+		}
 		
 		Ref<DrawAttributes> drawAttrs = m_drawAttributes;
 		if (drawAttrs.isNotNull() && drawAttrs->flagPreDrawEnabled) {
