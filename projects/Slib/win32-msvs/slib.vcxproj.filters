@@ -80,6 +80,15 @@
     <Filter Include="src\slib\map">
       <UniqueIdentifier>{6ebc5a2a-3ac1-497e-88f6-b4fb4c33e97a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="inc\crypto">
+      <UniqueIdentifier>{ab9a640e-7eaf-4fc6-81ff-097a29c137d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="inc\web">
+      <UniqueIdentifier>{c400c7f5-1966-4757-9bc6-e8e6882ad1bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\slib\web">
+      <UniqueIdentifier>{07e26063-f546-433f-8c39-7d09ba394ba2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\slib\core\async_config.h">
@@ -362,9 +371,6 @@
       <Filter>inc\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\network\os.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\secure_stream.h">
       <Filter>inc\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\network\socket.h">
@@ -851,6 +857,48 @@
     <ClInclude Include="..\..\..\inc\slib\graphics\text.h">
       <Filter>inc\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\crypto\aes.h">
+      <Filter>inc\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\crypto\block_cipher.h">
+      <Filter>inc\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\crypto\definition.h">
+      <Filter>inc\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\crypto\gcm.h">
+      <Filter>inc\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\crypto\hash.h">
+      <Filter>inc\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\crypto\md5.h">
+      <Filter>inc\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\crypto\rsa.h">
+      <Filter>inc\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\crypto\sha1.h">
+      <Filter>inc\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\crypto\sha2.h">
+      <Filter>inc\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\crypto\zlib.h">
+      <Filter>inc\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\web\constants.h">
+      <Filter>inc\web</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\web\controller.h">
+      <Filter>inc\web</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\web\definition.h">
+      <Filter>inc\web</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\inc\slib\web\service.h">
+      <Filter>inc\web</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">
@@ -1027,9 +1075,6 @@
     <ClCompile Include="..\..\..\src\slib\crypto\crypto_hash.cpp">
       <Filter>src\slib\crypto</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\crypto\crypto_secure_stream.cpp">
-      <Filter>src\slib\crypto</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\slib\crypto\gcm.cpp">
       <Filter>src\slib\crypto</Filter>
     </ClCompile>
@@ -1139,9 +1184,6 @@
       <Filter>src\slib\network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\network\network_os.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\network_secure_stream.cpp">
       <Filter>src\slib\network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\network\socket.cpp">
@@ -1620,6 +1662,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\graphics\graphics_text.cpp">
       <Filter>src\slib\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\web\web_controller.cpp">
+      <Filter>src\slib\web</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\slib\web\web_service.cpp">
+      <Filter>src\slib\web</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

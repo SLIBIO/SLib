@@ -40,7 +40,6 @@
 		26694BF91C9B2CBC0047E67C /* arp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26694BF81C9B2CBC0047E67C /* arp.cpp */; };
 		266DD4621C11930800D47AB0 /* aes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4591C11930800D47AB0 /* aes.cpp */; };
 		266DD4631C11930800D47AB0 /* crypto_hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD45A1C11930800D47AB0 /* crypto_hash.cpp */; };
-		266DD4641C11930800D47AB0 /* crypto_secure_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD45B1C11930800D47AB0 /* crypto_secure_stream.cpp */; };
 		266DD4651C11930800D47AB0 /* gcm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD45C1C11930800D47AB0 /* gcm.cpp */; };
 		266DD4661C11930800D47AB0 /* md5.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD45D1C11930800D47AB0 /* md5.cpp */; };
 		266DD4671C11930800D47AB0 /* rsa.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD45E1C11930800D47AB0 /* rsa.cpp */; };
@@ -97,7 +96,6 @@
 		266DD5711C11940A00D47AB0 /* network_async_unix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4CD1C11940A00D47AB0 /* network_async_unix.cpp */; };
 		266DD5731C11940A00D47AB0 /* network_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4CF1C11940A00D47AB0 /* network_io.cpp */; };
 		266DD5741C11940A00D47AB0 /* network_os.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4D01C11940A00D47AB0 /* network_os.cpp */; };
-		266DD5751C11940A00D47AB0 /* network_secure_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4D11C11940A00D47AB0 /* network_secure_stream.cpp */; };
 		266DD5761C11940A00D47AB0 /* socket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4D21C11940A00D47AB0 /* socket.cpp */; };
 		266DD5771C11940A00D47AB0 /* socket_address.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4D31C11940A00D47AB0 /* socket_address.cpp */; };
 		266DD5781C11940A00D47AB0 /* socket_event.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4D41C11940A00D47AB0 /* socket_event.cpp */; };
@@ -312,7 +310,6 @@
 		26694BF81C9B2CBC0047E67C /* arp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = arp.cpp; sourceTree = "<group>"; };
 		266DD4591C11930800D47AB0 /* aes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = aes.cpp; sourceTree = "<group>"; };
 		266DD45A1C11930800D47AB0 /* crypto_hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crypto_hash.cpp; sourceTree = "<group>"; };
-		266DD45B1C11930800D47AB0 /* crypto_secure_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crypto_secure_stream.cpp; sourceTree = "<group>"; };
 		266DD45C1C11930800D47AB0 /* gcm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gcm.cpp; sourceTree = "<group>"; };
 		266DD45D1C11930800D47AB0 /* md5.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = md5.cpp; sourceTree = "<group>"; };
 		266DD45E1C11930800D47AB0 /* rsa.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rsa.cpp; sourceTree = "<group>"; };
@@ -369,7 +366,6 @@
 		266DD4CD1C11940A00D47AB0 /* network_async_unix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = network_async_unix.cpp; sourceTree = "<group>"; };
 		266DD4CF1C11940A00D47AB0 /* network_io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = network_io.cpp; sourceTree = "<group>"; };
 		266DD4D01C11940A00D47AB0 /* network_os.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = network_os.cpp; sourceTree = "<group>"; };
-		266DD4D11C11940A00D47AB0 /* network_secure_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = network_secure_stream.cpp; sourceTree = "<group>"; };
 		266DD4D21C11940A00D47AB0 /* socket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = socket.cpp; sourceTree = "<group>"; };
 		266DD4D31C11940A00D47AB0 /* socket_address.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = socket_address.cpp; sourceTree = "<group>"; };
 		266DD4D41C11940A00D47AB0 /* socket_event.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = socket_event.cpp; sourceTree = "<group>"; };
@@ -626,7 +622,6 @@
 				266DD4CD1C11940A00D47AB0 /* network_async_unix.cpp */,
 				266DD4CF1C11940A00D47AB0 /* network_io.cpp */,
 				266DD4D01C11940A00D47AB0 /* network_os.cpp */,
-				266DD4D11C11940A00D47AB0 /* network_secure_stream.cpp */,
 				266DD4D21C11940A00D47AB0 /* socket.cpp */,
 				266DD4D31C11940A00D47AB0 /* socket_address.cpp */,
 				266DD4D41C11940A00D47AB0 /* socket_event.cpp */,
@@ -927,7 +922,6 @@
 				266F12B21C97A13F00DE26FF /* block_cipher.cpp */,
 				266DD4611C11930800D47AB0 /* compress_zlib.cpp */,
 				266DD45A1C11930800D47AB0 /* crypto_hash.cpp */,
-				266DD45B1C11930800D47AB0 /* crypto_secure_stream.cpp */,
 				266DD45C1C11930800D47AB0 /* gcm.cpp */,
 				266DD45D1C11930800D47AB0 /* md5.cpp */,
 				266DD45E1C11930800D47AB0 /* rsa.cpp */,
@@ -1117,7 +1111,6 @@
 				266DD5741C11940A00D47AB0 /* network_os.cpp in Sources */,
 				266DD5D21C11940A00D47AB0 /* ui_event.cpp in Sources */,
 				26C13E451DDA32F000612945 /* url_request.cpp in Sources */,
-				266DD4641C11930800D47AB0 /* crypto_secure_stream.cpp in Sources */,
 				267C16B91CE779D8000318C2 /* scroll_bar.cpp in Sources */,
 				26B0AF851C13E08600CD8673 /* bitmap_data.cpp in Sources */,
 				266DD55D1C11940A00D47AB0 /* codec_vp8.cpp in Sources */,
@@ -1230,7 +1223,6 @@
 				26AFF77B1C34CE2B00AF9470 /* atomic.cpp in Sources */,
 				A25F301B1B03A33700854DAF /* json.cpp in Sources */,
 				26B0AF861C13E08600CD8673 /* bitmap_format.cpp in Sources */,
-				266DD5751C11940A00D47AB0 /* network_secure_stream.cpp in Sources */,
 				266DD46A1C11930800D47AB0 /* compress_zlib.cpp in Sources */,
 				26D8AC901E393F010092EB81 /* media_player.cpp in Sources */,
 				266DD5711C11940A00D47AB0 /* network_async_unix.cpp in Sources */,

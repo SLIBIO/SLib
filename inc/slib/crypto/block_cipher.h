@@ -100,35 +100,6 @@ public:
 
 };
 
-
-#define SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_BLOCK_CIPHER(C) \
-	extern template class BlockCipher_Blocks<C>; \
-	extern template class BlockCipher_ECB<C, BlockCipherPadding_PKCS7>; \
-	extern template class BlockCipher_CBC<C, BlockCipherPadding_PKCS7>; \
-	extern template class BlockCipher_CTR<C>;
-
-class AES;
-SLIB_DECLARE_EXPLICIT_INSTANTIATIONS_FOR_BLOCK_CIPHER(AES);
-
-#define SLIB_DECLARE_BLOCKCIPHER_BODY \
-	sl_size encryptBlocks(const void* src, void* dst, sl_size size) const; \
-	sl_size decryptBlocks(const void* src, void* dst, sl_size size) const; \
-	sl_size encrypt_ECB_PKCS7Padding(const void* src, sl_size size, void* dst) const; \
-	sl_size decrypt_ECB_PKCS7Padding(const void* src, sl_size size, void* dst) const; \
-	sl_size encrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size, void* dst) const; \
-	sl_size decrypt_CBC_PKCS7Padding(const void* iv, const void* src, sl_size size, void* dst) const; \
-	sl_size encrypt_CBC_PKCS7Padding(const void* src, sl_size size, void* dst) const; \
-	sl_size decrypt_CBC_PKCS7Padding(const void* src, sl_size size, void* dst) const; \
-	Memory encrypt_CBC_PKCS7Padding(const void* src, sl_size size) const; \
-	Memory decrypt_CBC_PKCS7Padding(const void* src, sl_size size) const; \
-	Memory encrypt_CBC_PKCS7Padding(const Memory& mem) const; \
-	Memory decrypt_CBC_PKCS7Padding(const Memory& mem) const; \
-	sl_size encrypt_CTR(const void* input, sl_size size, void* output, void* counter, sl_uint32 offset = 0) const; \
-	sl_size encrypt_CTR(const void* iv, sl_uint64 counter, sl_uint32 offset, const void* input, sl_size size, void* output) const; \
-	sl_size encrypt_CTR(const void* iv, sl_uint64 pos, const void* input, sl_size size, void* output) const;
-
-
 SLIB_CRYPTO_NAMESPACE_END
-
 
 #endif

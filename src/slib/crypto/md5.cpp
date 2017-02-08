@@ -5,11 +5,13 @@
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
 
-SLIB_DEFINE_CRYPTO_HASH(MD5, 16)
-
 MD5::MD5()
 {
 	rdata_len = 0;
+}
+
+MD5::~MD5()
+{
 }
 
 void MD5::start()

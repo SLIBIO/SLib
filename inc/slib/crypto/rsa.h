@@ -16,6 +16,11 @@ public:
 	BigInt E; // public exponent
 
 public:
+	RSAPublicKey();
+	
+	~RSAPublicKey();
+	
+public:
 	sl_uint32 getLength() const;
 	
 };
@@ -35,6 +40,11 @@ public:
 	// Use N and D only for decryption
 	sl_bool flagUseOnlyD = sl_false;
 
+public:
+	RSAPrivateKey();
+	
+	~RSAPrivateKey();
+	
 public:
 	sl_uint32 getLength() const;
 	
@@ -70,21 +80,6 @@ public:
 	static sl_uint32 decryptPrivate_oaep_v21(const RSAPrivateKey& key, const Ref<CryptoHash>& hash, const void* input, void* output, sl_uint32 sizeOutputBuffer, const void* label = 0, sl_uint32 sizeLabel = 0);
 
 };
-
-SLIB_CRYPTO_NAMESPACE_END
-
-
-SLIB_CRYPTO_NAMESPACE_BEGIN
-
-SLIB_INLINE sl_uint32 RSAPublicKey::getLength() const
-{
-	return (sl_uint32)(N.getMostSignificantBytes());
-}
-
-SLIB_INLINE sl_uint32 RSAPrivateKey::getLength() const
-{
-	return (sl_uint32)(N.getMostSignificantBytes());
-}
 
 SLIB_CRYPTO_NAMESPACE_END
 

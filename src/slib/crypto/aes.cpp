@@ -10,6 +10,14 @@
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
 
+AES::AES()
+{
+}
+
+AES::~AES()
+{
+}
+
 sl_uint32 AES::getBlockSize()
 {
 	return 16;
@@ -500,6 +508,14 @@ void AES::setKey_SHA256(const String& key)
 	setKey(sig, 32);
 }
 
+
+AES_GCM::AES_GCM()
+{
+}
+
+AES_GCM::~AES_GCM()
+{
+}
 
 void AES_GCM::setKey(const void* key, sl_uint32 lenKey)
 {

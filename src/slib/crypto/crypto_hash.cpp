@@ -9,6 +9,14 @@
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
 
+CryptoHash::CryptoHash()
+{
+}
+
+CryptoHash::~CryptoHash()
+{
+}
+
 Ref<CryptoHash> CryptoHash::create(CryptoHashType type)
 {
 	switch (type) {
@@ -104,6 +112,55 @@ void CryptoHash::applyMask_MGF1(const void* seed, sl_uint32 sizeSeed, void* _tar
 		target[k] ^= h[k];
 	}
 }
+
+
+#define DEFINE_CRYPTO_HASH(CLASS, HASH_SIZE) \
+void CLASS::hash(const void* input, sl_size n, void* output) \
+{ \
+	CLASS h; \
+	h.execute(input, n, output); \
+} \
+sl_uint32 CLASS::getHashSize() \
+{ \
+	return HASH_SIZE; \
+} \
+void CLASS::hash(const String& s, void* output) \
+{ \
+	hash(s.getData(), s.getLength(), output); \
+} \
+void CLASS::hash(const Memory& data, void* output) \
+{ \
+	hash(data.getData(), data.getSize(), output); \
+} \
+Memory CLASS::hash(const void* input, sl_size n) \
+{ \
+	char v[HASH_SIZE]; \
+	hash(input, n, v); \
+	return Memory::create(v, HASH_SIZE); \
+} \
+Memory CLASS::hash(const String& s) \
+{ \
+	char v[HASH_SIZE]; \
+	hash(s.getData(), s.getLength(), v); \
+	return Memory::create(v, HASH_SIZE); \
+} \
+Memory CLASS::hash(const Memory& data) \
+{ \
+	char v[HASH_SIZE]; \
+	hash(data.getData(), data.getSize(), v); \
+	return Memory::create(v, HASH_SIZE); \
+} \
+sl_uint32 CLASS::getSize() const \
+{ \
+	return getHashSize(); \
+}
+
+DEFINE_CRYPTO_HASH(MD5, 16)
+DEFINE_CRYPTO_HASH(SHA1, 20)
+DEFINE_CRYPTO_HASH(SHA224, 28)
+DEFINE_CRYPTO_HASH(SHA256, 32)
+DEFINE_CRYPTO_HASH(SHA384, 48)
+DEFINE_CRYPTO_HASH(SHA512, 64)
 
 SLIB_CRYPTO_NAMESPACE_END
 

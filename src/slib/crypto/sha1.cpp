@@ -4,11 +4,13 @@
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
 
-SLIB_DEFINE_CRYPTO_HASH(SHA1, 20)
-
 SHA1::SHA1()
 {
 	rdata_len = 0;
+}
+
+SHA1::~SHA1()
+{
 }
 
 void SHA1::start()

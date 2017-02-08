@@ -95,6 +95,16 @@
     <ClInclude Include="..\..\..\inc\slib\core\win32_com.h" />
     <ClInclude Include="..\..\..\inc\slib\core\xml.h" />
     <ClInclude Include="..\..\..\inc\slib\crypto.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\aes.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\block_cipher.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\gcm.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\hash.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\md5.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\rsa.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\sha1.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\sha2.h" />
+    <ClInclude Include="..\..\..\inc\slib\crypto\zlib.h" />
     <ClInclude Include="..\..\..\inc\slib\db.h" />
     <ClInclude Include="..\..\..\inc\slib\db\database.h" />
     <ClInclude Include="..\..\..\inc\slib\db\definition.h" />
@@ -200,7 +210,6 @@
     <ClInclude Include="..\..\..\inc\slib\network\nat.h" />
     <ClInclude Include="..\..\..\inc\slib\network\netfilter.h" />
     <ClInclude Include="..\..\..\inc\slib\network\os.h" />
-    <ClInclude Include="..\..\..\inc\slib\network\secure_stream.h" />
     <ClInclude Include="..\..\..\inc\slib\network\socket.h" />
     <ClInclude Include="..\..\..\inc\slib\network\socket_address.h" />
     <ClInclude Include="..\..\..\inc\slib\network\tcpip.h" />
@@ -264,6 +273,10 @@
     <ClInclude Include="..\..\..\inc\slib\ui\view_page.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\web_view.h" />
     <ClInclude Include="..\..\..\inc\slib\ui\window.h" />
+    <ClInclude Include="..\..\..\inc\slib\web\constants.h" />
+    <ClInclude Include="..\..\..\inc\slib\web\controller.h" />
+    <ClInclude Include="..\..\..\inc\slib\web\definition.h" />
+    <ClInclude Include="..\..\..\inc\slib\web\service.h" />
     <ClInclude Include="..\..\..\src\slib\core\async_config.h" />
     <ClInclude Include="..\..\..\src\slib\graphics\image_stb.h" />
     <ClInclude Include="..\..\..\src\slib\network\network_async_config.h" />
@@ -334,7 +347,6 @@
     <ClCompile Include="..\..\..\src\slib\crypto\block_cipher.cpp" />
     <ClCompile Include="..\..\..\src\slib\crypto\compress_zlib.cpp" />
     <ClCompile Include="..\..\..\src\slib\crypto\crypto_hash.cpp" />
-    <ClCompile Include="..\..\..\src\slib\crypto\crypto_secure_stream.cpp" />
     <ClCompile Include="..\..\..\src\slib\crypto\gcm.cpp" />
     <ClCompile Include="..\..\..\src\slib\crypto\md5.cpp" />
     <ClCompile Include="..\..\..\src\slib\crypto\rsa.cpp" />
@@ -442,7 +454,6 @@
     <ClCompile Include="..\..\..\src\slib\network\network_async_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\network\network_io.cpp" />
     <ClCompile Include="..\..\..\src\slib\network\network_os.cpp" />
-    <ClCompile Include="..\..\..\src\slib\network\network_secure_stream.cpp" />
     <ClCompile Include="..\..\..\src\slib\network\net_capture.cpp" />
     <ClCompile Include="..\..\..\src\slib\network\net_capture_pcap.cpp" />
     <ClCompile Include="..\..\..\src\slib\network\socket.cpp" />
@@ -525,6 +536,8 @@
     <ClCompile Include="..\..\..\src\slib\ui\web_view_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\window.cpp" />
     <ClCompile Include="..\..\..\src\slib\ui\window_win32.cpp" />
+    <ClCompile Include="..\..\..\src\slib\web\web_controller.cpp" />
+    <ClCompile Include="..\..\..\src\slib\web\web_service.cpp" />
     <ClCompile Include="..\..\..\src\thirdparty\thirdparty_freetype.c">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MaxSpeed</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>

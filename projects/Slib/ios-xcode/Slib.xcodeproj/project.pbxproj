@@ -93,7 +93,6 @@
 		266DD3E41C1181B500D47AB0 /* network_async.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3CB1C1181B500D47AB0 /* network_async.cpp */; };
 		266DD3E51C1181B500D47AB0 /* network_os.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3CC1C1181B500D47AB0 /* network_os.cpp */; };
 		266DD3E61C1181B500D47AB0 /* network_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3CD1C1181B500D47AB0 /* network_io.cpp */; };
-		266DD3E71C1181B500D47AB0 /* network_secure_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3CE1C1181B500D47AB0 /* network_secure_stream.cpp */; };
 		266DD3E81C1181B500D47AB0 /* socket_address.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3CF1C1181B500D47AB0 /* socket_address.cpp */; };
 		266DD3E91C1181B500D47AB0 /* socket_event_unix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3D01C1181B500D47AB0 /* socket_event_unix.cpp */; };
 		266DD3EB1C1181B500D47AB0 /* socket_event.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3D21C1181B500D47AB0 /* socket_event.cpp */; };
@@ -107,7 +106,6 @@
 		266DD4071C118B9900D47AB0 /* render_program.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3FB1C118B9900D47AB0 /* render_program.cpp */; };
 		266DD4081C118B9900D47AB0 /* texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3FC1C118B9900D47AB0 /* texture.cpp */; };
 		266DD4091C118B9900D47AB0 /* vertex_buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD3FD1C118B9900D47AB0 /* vertex_buffer.cpp */; };
-		266DD40B1C118CD100D47AB0 /* crypto_secure_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD40A1C118CD100D47AB0 /* crypto_secure_stream.cpp */; };
 		266DD41B1C118E4A00D47AB0 /* cursor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD41A1C118E4A00D47AB0 /* cursor.cpp */; };
 		266DD4291C118F6D00D47AB0 /* view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4281C118F6D00D47AB0 /* view.cpp */; };
 		266DD42C1C118F7800D47AB0 /* view_ios.mm in Sources */ = {isa = PBXBuildFile; fileRef = 266DD42B1C118F7800D47AB0 /* view_ios.mm */; };
@@ -362,7 +360,6 @@
 		266DD3CB1C1181B500D47AB0 /* network_async.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = network_async.cpp; sourceTree = "<group>"; };
 		266DD3CC1C1181B500D47AB0 /* network_os.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = network_os.cpp; sourceTree = "<group>"; };
 		266DD3CD1C1181B500D47AB0 /* network_io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = network_io.cpp; sourceTree = "<group>"; };
-		266DD3CE1C1181B500D47AB0 /* network_secure_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = network_secure_stream.cpp; sourceTree = "<group>"; };
 		266DD3CF1C1181B500D47AB0 /* socket_address.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = socket_address.cpp; sourceTree = "<group>"; };
 		266DD3D01C1181B500D47AB0 /* socket_event_unix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = socket_event_unix.cpp; sourceTree = "<group>"; };
 		266DD3D21C1181B500D47AB0 /* socket_event.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = socket_event.cpp; sourceTree = "<group>"; };
@@ -379,7 +376,6 @@
 		266DD3FB1C118B9900D47AB0 /* render_program.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = render_program.cpp; sourceTree = "<group>"; };
 		266DD3FC1C118B9900D47AB0 /* texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = texture.cpp; sourceTree = "<group>"; };
 		266DD3FD1C118B9900D47AB0 /* vertex_buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vertex_buffer.cpp; sourceTree = "<group>"; };
-		266DD40A1C118CD100D47AB0 /* crypto_secure_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = crypto_secure_stream.cpp; sourceTree = "<group>"; };
 		266DD41A1C118E4A00D47AB0 /* cursor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cursor.cpp; sourceTree = "<group>"; };
 		266DD4281C118F6D00D47AB0 /* view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view.cpp; sourceTree = "<group>"; };
 		266DD42A1C118F7800D47AB0 /* view_ios.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = view_ios.h; sourceTree = "<group>"; };
@@ -751,7 +747,6 @@
 				26B571501C9D442D0099E69B /* block_cipher.cpp */,
 				266DD46B1C11934A00D47AB0 /* compress_zlib.cpp */,
 				266DD3791C117A3100D47AB0 /* crypto_hash.cpp */,
-				266DD40A1C118CD100D47AB0 /* crypto_secure_stream.cpp */,
 				266DD37A1C117A3100D47AB0 /* gcm.cpp */,
 				266DD37B1C117A3100D47AB0 /* md5.cpp */,
 				266DD37C1C117A3100D47AB0 /* rsa.cpp */,
@@ -825,7 +820,6 @@
 				266DD3CB1C1181B500D47AB0 /* network_async.cpp */,
 				266DD3CD1C1181B500D47AB0 /* network_io.cpp */,
 				266DD3CC1C1181B500D47AB0 /* network_os.cpp */,
-				266DD3CE1C1181B500D47AB0 /* network_secure_stream.cpp */,
 				266DD3CF1C1181B500D47AB0 /* socket_address.cpp */,
 				266DD3D01C1181B500D47AB0 /* socket_event_unix.cpp */,
 				266DD3D21C1181B500D47AB0 /* socket_event.cpp */,
@@ -1057,7 +1051,6 @@
 				2648D54C1D096AC400819E09 /* mobile_game.cpp in Sources */,
 				26B571551C9D44620099E69B /* bezier.cpp in Sources */,
 				266DD3D61C1181B500D47AB0 /* ethernet.cpp in Sources */,
-				266DD40B1C118CD100D47AB0 /* crypto_secure_stream.cpp in Sources */,
 				266DD36A1C1170BD00D47AB0 /* video_codec.cpp in Sources */,
 				26DA34FF1C4B8B2D004DC204 /* video_frame.cpp in Sources */,
 				266F926C1D51CD450040166C /* list_view.cpp in Sources */,
@@ -1117,7 +1110,6 @@
 				266DD3881C117A3100D47AB0 /* sha2.cpp in Sources */,
 				E1D3A4291E14A2FC00007A98 /* preference.cpp in Sources */,
 				266DD3A51C117AE300D47AB0 /* graphics_util.cpp in Sources */,
-				266DD3E71C1181B500D47AB0 /* network_secure_stream.cpp in Sources */,
 				2682C3F11E2D5C6C00E9CB98 /* ui_core_apple.mm in Sources */,
 				A25F2F551B039EF600854DAF /* thread.cpp in Sources */,
 				A25F2F381B039EF600854DAF /* async.cpp in Sources */,

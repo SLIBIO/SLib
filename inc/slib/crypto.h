@@ -14,6 +14,4 @@
 
 #include "crypto/zlib.h"
 
-#include "crypto/secure_stream.h"
-
 #endif

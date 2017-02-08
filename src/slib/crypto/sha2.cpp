@@ -9,6 +9,10 @@ _SHA256Base::_SHA256Base()
 	rdata_len = 0;
 }
 
+_SHA256Base::~_SHA256Base()
+{
+}
+
 void _SHA256Base::_start()
 {
 	rdata_len = 0;
@@ -130,7 +134,13 @@ void _SHA256Base::_updateSection(const sl_uint8* input)
 }
 
 
-SLIB_DEFINE_CRYPTO_HASH(SHA224, 28)
+SHA224::SHA224()
+{
+}
+
+SHA224::~SHA224()
+{
+}
 
 void SHA224::start()
 {
@@ -156,7 +166,13 @@ void SHA224::finish(void* _output)
 }
 
 
-SLIB_DEFINE_CRYPTO_HASH(SHA256, 32)
+SHA256::SHA256()
+{
+}
+
+SHA256::~SHA256()
+{
+}
 
 void SHA256::start()
 {
@@ -185,6 +201,10 @@ void SHA256::finish(void* _output)
 _SHA512Base::_SHA512Base()
 {
 	rdata_len = 0;
+}
+
+_SHA512Base::~_SHA512Base()
+{
 }
 
 void _SHA512Base::_start()
@@ -308,7 +328,13 @@ void _SHA512Base::_updateSection(const sl_uint8* input)
 }
 
 
-SLIB_DEFINE_CRYPTO_HASH(SHA384, 48)
+SHA384::SHA384()
+{
+}
+
+SHA384::~SHA384()
+{
+}
 
 void SHA384::start()
 {
@@ -334,7 +360,13 @@ void SHA384::finish(void* _output)
 }
 
 
-SLIB_DEFINE_CRYPTO_HASH(SHA512, 64)
+SHA512::SHA512()
+{
+}
+
+SHA512::~SHA512()
+{
+}
 
 void SHA512::start()
 {

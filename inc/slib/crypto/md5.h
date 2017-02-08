@@ -17,6 +17,8 @@ class SLIB_EXPORT MD5 : public CryptoHash
 {
 public:
 	MD5();
+	
+	~MD5();
 
 public:
 	// override
@@ -28,8 +30,22 @@ public:
 	// override
 	void finish(void* output);
 	
-public:
-	SLIB_DECLARE_CRYPTO_HASH
+public: /* common functions for CryptoHash */
+	static void hash(const void* input, sl_size n, void* output);
+	
+	static sl_uint32 getHashSize();
+	
+	static void hash(const String& s, void* output);
+	
+	static void hash(const Memory& data, void* output);
+	
+	static Memory hash(const void* input, sl_size n);
+	
+	static Memory hash(const String& s);
+	
+	static Memory hash(const Memory& data);
+	
+	sl_uint32 getSize() const;
 
 private:
 	void _updateSection(const sl_uint8* input);

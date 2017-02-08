@@ -29,6 +29,11 @@ enum class CryptoHashType
 class SLIB_EXPORT CryptoHash : public Object
 {
 public:
+	CryptoHash();
+	
+	~CryptoHash();
+	
+public:
 	static Ref<CryptoHash> create(CryptoHashType type);
 	
 	static Ref<CryptoHash> md5();
@@ -60,57 +65,5 @@ public:
 };
 
 SLIB_CRYPTO_NAMESPACE_END
-
-#define SLIB_DECLARE_CRYPTO_HASH \
-public: \
-	static void hash(const void* input, sl_size n, void* output); \
-	static sl_uint32 getHashSize(); \
-	static void hash(const String& s, void* output); \
-	static void hash(const Memory& data, void* output); \
-	static Memory hash(const void* input, sl_size n); \
-	static Memory hash(const String& s); \
-	static Memory hash(const Memory& data); \
-	sl_uint32 getSize() const;
-
-#define SLIB_DEFINE_CRYPTO_HASH(CLASS, HASH_SIZE) \
-	void CLASS::hash(const void* input, sl_size n, void* output) \
-	{ \
-		CLASS h; \
-		h.execute(input, n, output); \
-	} \
-	sl_uint32 CLASS::getHashSize() \
-	{ \
-		return HASH_SIZE; \
-	} \
-	void CLASS::hash(const String& s, void* output) \
-	{ \
-		hash(s.getData(), s.getLength(), output); \
-	} \
-	void CLASS::hash(const Memory& data, void* output) \
-	{ \
-		hash(data.getData(), data.getSize(), output); \
-	} \
-	Memory CLASS::hash(const void* input, sl_size n) \
-	{ \
-		char v[HASH_SIZE]; \
-		hash(input, n, v); \
-		return Memory::create(v, HASH_SIZE); \
-	} \
-	Memory CLASS::hash(const String& s) \
-	{ \
-		char v[HASH_SIZE]; \
-		hash(s.getData(), s.getLength(), v); \
-		return Memory::create(v, HASH_SIZE); \
-	} \
-	Memory CLASS::hash(const Memory& data) \
-	{ \
-		char v[HASH_SIZE]; \
-		hash(data.getData(), data.getSize(), v); \
-		return Memory::create(v, HASH_SIZE); \
-	} \
-	sl_uint32 CLASS::getSize() const \
-	{ \
-		return getHashSize(); \
-	}
 
 #endif

@@ -7,6 +7,34 @@
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
 
+RSAPublicKey::RSAPublicKey()
+{
+}
+
+RSAPublicKey::~RSAPublicKey()
+{
+}
+
+sl_uint32 RSAPublicKey::getLength() const
+{
+	return (sl_uint32)(N.getMostSignificantBytes());
+}
+
+
+RSAPrivateKey::RSAPrivateKey()
+{
+}
+
+RSAPrivateKey::~RSAPrivateKey()
+{
+}
+
+sl_uint32 RSAPrivateKey::getLength() const
+{
+	return (sl_uint32)(N.getMostSignificantBytes());
+}
+
+
 sl_bool RSA::executePublic(const RSAPublicKey& key, const void* src, void* dst)
 {
 	sl_size n = key.N.getMostSignificantBytes();

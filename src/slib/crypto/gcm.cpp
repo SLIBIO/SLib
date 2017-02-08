@@ -248,6 +248,11 @@ GCM<BlockCipher>::GCM(const BlockCipher* cipher)
 }
 
 template <class BlockCipher>
+GCM<BlockCipher>::~GCM()
+{
+}
+
+template <class BlockCipher>
 sl_bool GCM<BlockCipher>::setCipher(const BlockCipher* cipher)
 {
 	if (cipher) {

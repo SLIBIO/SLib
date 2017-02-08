@@ -6,6 +6,15 @@
 
 SLIB_CRYPTO_NAMESPACE_BEGIN
 
+GzipParam::GzipParam()
+{
+}
+
+GzipParam::~GzipParam()
+{
+}
+
+
 ZlibCompress::ZlibCompress()
 {
 	m_flagStarted = sl_false;

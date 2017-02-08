@@ -14,6 +14,12 @@ class SLIB_EXPORT GzipParam
 public:
 	String fileName;
 	String comment;
+	
+public:
+	GzipParam();
+	
+	~GzipParam();
+	
 };
 
 class SLIB_EXPORT ZlibCompress : public Object

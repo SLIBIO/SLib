@@ -63,13 +63,12 @@ public:
 template <class BlockCipher>
 class SLIB_EXPORT GCM : public GCM_Base
 {
-protected:
-	const BlockCipher* m_cipher;
-	
 public:
 	GCM();
 	
 	GCM(const BlockCipher* cipher);
+	
+	~GCM();
 	
 public:
 	sl_bool setCipher(const BlockCipher* cipher);
@@ -108,6 +107,9 @@ public:
 		const void* C, sl_size lenC,
 		const void* tag, sl_size lenTag = 16 /* 4 <= lenTag <= 16 */
 	);
+	
+protected:
+	const BlockCipher* m_cipher;
 	
 };
 

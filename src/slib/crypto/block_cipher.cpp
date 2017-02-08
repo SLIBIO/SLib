@@ -358,10 +358,6 @@ sl_size BlockCipher_CTR<BlockCipher>::encrypt(const BlockCipher* crypto, const v
 
 
 #define DEFINE_BLOCKCIPHER(CLASS) \
-	template class BlockCipher_Blocks<CLASS>; \
-	template class BlockCipher_ECB<CLASS, BlockCipherPadding_PKCS7>; \
-	template class BlockCipher_CBC<CLASS, BlockCipherPadding_PKCS7>; \
-	template class BlockCipher_CTR<CLASS>; \
 	sl_size CLASS::encryptBlocks(const void* src, void* dst, sl_size size) const \
 	{ return BlockCipher_Blocks<CLASS>::encryptBlocks(this, src, dst, size); } \
 	sl_size CLASS::decryptBlocks(const void* src, void* dst, sl_size size) const \

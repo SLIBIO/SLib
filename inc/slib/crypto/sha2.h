@@ -22,6 +22,8 @@ class SLIB_EXPORT _SHA256Base : public CryptoHash
 public:
 	_SHA256Base();
 	
+	~_SHA256Base();
+	
 public:
 	// override
 	void update(const void* input, sl_size n);
@@ -43,19 +45,43 @@ protected:
 class SLIB_EXPORT SHA224 : public _SHA256Base
 {
 public:
+	SHA224();
+	
+	~SHA224();
+	
+public:
 	// override
 	void start();
 	
 	// override
 	void finish(void* output);
 
-public:
-	SLIB_DECLARE_CRYPTO_HASH
+public: /* common functions for CryptoHash */
+	static void hash(const void* input, sl_size n, void* output);
+	
+	static sl_uint32 getHashSize();
+	
+	static void hash(const String& s, void* output);
+	
+	static void hash(const Memory& data, void* output);
+	
+	static Memory hash(const void* input, sl_size n);
+	
+	static Memory hash(const String& s);
+	
+	static Memory hash(const Memory& data);
+	
+	sl_uint32 getSize() const;
 	
 };
 
 class SLIB_EXPORT SHA256 : public _SHA256Base
 {
+public:
+	SHA256();
+	
+	~SHA256();
+	
 public:
 	// override
 	void start();
@@ -66,8 +92,22 @@ public:
 public:
 	static sl_uint32 make32bitChecksum(const void* input, sl_size n);
 	
-public:
-	SLIB_DECLARE_CRYPTO_HASH
+public: /* common functions for CryptoHash */
+	static void hash(const void* input, sl_size n, void* output);
+	
+	static sl_uint32 getHashSize();
+	
+	static void hash(const String& s, void* output);
+	
+	static void hash(const Memory& data, void* output);
+	
+	static Memory hash(const void* input, sl_size n);
+	
+	static Memory hash(const String& s);
+	
+	static Memory hash(const Memory& data);
+	
+	sl_uint32 getSize() const;
 	
 };
 
@@ -75,6 +115,8 @@ class SLIB_EXPORT _SHA512Base : public CryptoHash
 {
 public:
 	_SHA512Base();
+	
+	~_SHA512Base();
 
 public:
 	// override
@@ -98,28 +140,66 @@ protected:
 class SLIB_EXPORT SHA384 : public _SHA512Base
 {
 public:
+	SHA384();
+	
+	~SHA384();
+	
+public:
 	// override
 	void start();
 	
 	// override
 	void finish(void* output);
 	
-public:
-	SLIB_DECLARE_CRYPTO_HASH
+public: /* common functions for CryptoHash */
+	static void hash(const void* input, sl_size n, void* output);
+	
+	static sl_uint32 getHashSize();
+	
+	static void hash(const String& s, void* output);
+	
+	static void hash(const Memory& data, void* output);
+	
+	static Memory hash(const void* input, sl_size n);
+	
+	static Memory hash(const String& s);
+	
+	static Memory hash(const Memory& data);
+	
+	sl_uint32 getSize() const;
 	
 };
 
 class SLIB_EXPORT SHA512 : public _SHA512Base
 {
 public:
+	SHA512();
+	
+	~SHA512();
+	
+public:
 	// override
 	void start();
 	
 	// override
 	void finish(void* output);
 	
-public:
-	SLIB_DECLARE_CRYPTO_HASH
+public: /* common functions for CryptoHash */
+	static void hash(const void* input, sl_size n, void* output);
+	
+	static sl_uint32 getHashSize();
+	
+	static void hash(const String& s, void* output);
+	
+	static void hash(const Memory& data, void* output);
+	
+	static Memory hash(const void* input, sl_size n);
+	
+	static Memory hash(const String& s);
+	
+	static Memory hash(const Memory& data);
+	
+	sl_uint32 getSize() const;
 	
 };
 
