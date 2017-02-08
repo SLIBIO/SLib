@@ -18,8 +18,9 @@
 	@public sl_bool m_flagRenderingContinuously;
 	@public sl_bool m_flagRequestRender;
 	
-	CADisplayLink* m_displayLink;
+	id m_renderer;
 	slib::Ref<slib::RenderEngine> m_engine;
+	CADisplayLink* m_displayLink;
 }
 
 -(void)_init;
@@ -64,23 +65,60 @@ void RenderView::_requestRender_NW()
 
 SLIB_UI_NAMESPACE_END
 
-@interface _Slib_iOS_GLViewDisplayLink : NSObject
+@interface _Slib_iOS_GLViewRenderer : NSObject
 {
 	@public __weak _Slib_iOS_GLView* m_view;
+	@public __weak CADisplayLink* m_displayLink;
+	
+	BOOL m_flagRunning;
 }
 @end
 
-@implementation _Slib_iOS_GLViewDisplayLink
+@implementation _Slib_iOS_GLViewRenderer
 
 - (void)onGLRenderFrame
 {
+	if (!m_flagRunning) {
+		return;
+	}
 	_Slib_iOS_GLView* view = m_view;
 	if (view != nil) {
-		if (view->m_flagRenderingContinuously || view->m_flagRequestRender) {
-			view->m_flagRequestRender = sl_false;
-			[view setNeedsDisplay];
+		if (view.superview != nil && view.hidden == NO && !(slib::MobileApp::isPaused())) {
+			if (view->m_flagRenderingContinuously || view->m_flagRequestRender) {
+				view->m_flagRequestRender = sl_false;
+				sl_uint32 width = (sl_uint32)(view.frame.size.width * view.contentScaleFactor);
+				sl_uint32 height = (sl_uint32)(view.frame.size.height * view.contentScaleFactor);
+				if (width > 0 && height > 0) {
+					[view display];
+				}
+			}
 		}
 	}
+}
+
+- (void)onRun
+{
+	m_flagRunning = YES;
+#if defined(SLIB_PLATFORM_IS_IOS_SIMULATOR)
+	slib::TimeCounter timer;
+	while (m_flagRunning) {
+		[self onGLRenderFrame];
+		sl_uint64 t = timer.getElapsedMilliseconds();
+		if (t < 15) {
+			[NSThread sleepForTimeInterval:(15 - (sl_uint32)(t)) / 1000.0];
+		}
+		timer.reset();
+	}
+#else
+	NSRunLoop* loop = [NSRunLoop currentRunLoop];
+	[m_displayLink addToRunLoop:loop forMode:NSDefaultRunLoopMode];
+	[loop run];
+#endif
+}
+
+- (void)stop
+{
+	m_flagRunning = NO;
 }
 
 @end
@@ -104,16 +142,19 @@ SLIB_UI_NAMESPACE_END
 	self.drawableColorFormat = GLKViewDrawableColorFormatRGBA8888;
 	self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
 	
-	_Slib_iOS_GLViewDisplayLink* link = [[_Slib_iOS_GLViewDisplayLink alloc] init];
-	link->m_view = self;
-	m_displayLink = [CADisplayLink displayLinkWithTarget:link selector:@selector(onGLRenderFrame)];
-	[m_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+	_Slib_iOS_GLViewRenderer* renderer = [[_Slib_iOS_GLViewRenderer alloc] init];
+	renderer->m_view = self;
+	m_displayLink = [CADisplayLink displayLinkWithTarget:renderer selector:@selector(onGLRenderFrame)];
+	renderer->m_displayLink = m_displayLink;
+	[NSThread detachNewThreadSelector:@selector(onRun) toTarget:renderer withObject:nil];
+	m_renderer = renderer;
 	
 }
 
 -(void)dealloc
 {
 	[m_displayLink invalidate];
+	[m_renderer stop];
 }
 
 -(void)_requestRender
@@ -146,6 +187,10 @@ SLIB_UI_NAMESPACE_END
 		}
 	}
 
+}
+
+- (void)setNeedsDisplay
+{
 }
 
 - (void)setFrame:(CGRect)frame

@@ -142,6 +142,7 @@ void RenderView::dispatchToDrawingThread(const Function<void()>& callback, sl_ui
 {
 	if (isNativeWidget()) {
 		m_queuePostedCallbacks.push(callback);
+		requestRender();
 	} else {
 		View::dispatchToDrawingThread(callback, delayMillis);
 	}
@@ -154,6 +155,7 @@ void RenderView::runOnDrawingThread(const Function<void()>& callback)
 			callback();
 		} else {
 			m_queuePostedCallbacks.push(callback);
+			requestRender();
 		}
 	} else {
 		View::runOnDrawingThread(callback);
@@ -299,8 +301,9 @@ void RenderView::dispatchFrame(RenderEngine* engine)
 void RenderView::dispatchMouseEvent(UIEvent* ev)
 {
 	if (m_flagDispatchEventsToRenderingThread) {
-		if (!(isDrawingThread())) {
+		if (isNativeWidget()) {
 			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchMouseEvent, this, ev->duplicate()));
+			requestRender();
 			return;
 		}
 	}
@@ -310,8 +313,9 @@ void RenderView::dispatchMouseEvent(UIEvent* ev)
 void RenderView::dispatchTouchEvent(UIEvent* ev)
 {
 	if (m_flagDispatchEventsToRenderingThread) {
-		if (!(isDrawingThread())) {
+		if (isNativeWidget()) {
 			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchTouchEvent, this, ev->duplicate()));
+			requestRender();
 			return;
 		}
 	}
@@ -321,8 +325,9 @@ void RenderView::dispatchTouchEvent(UIEvent* ev)
 void RenderView::dispatchMouseWheelEvent(UIEvent* ev)
 {
 	if (m_flagDispatchEventsToRenderingThread) {
-		if (!(isDrawingThread())) {
+		if (isNativeWidget()) {
 			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchMouseWheelEvent, this, ev->duplicate()));
+			requestRender();
 			return;
 		}
 	}
@@ -332,8 +337,9 @@ void RenderView::dispatchMouseWheelEvent(UIEvent* ev)
 void RenderView::dispatchKeyEvent(UIEvent* ev)
 {
 	if (m_flagDispatchEventsToRenderingThread) {
-		if (!(isDrawingThread())) {
+		if (isNativeWidget()) {
 			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchKeyEvent, this, ev->duplicate()));
+			requestRender();
 			return;
 		}
 	}
@@ -343,8 +349,9 @@ void RenderView::dispatchKeyEvent(UIEvent* ev)
 void RenderView::dispatchClick(UIEvent* ev)
 {
 	if (m_flagDispatchEventsToRenderingThread) {
-		if (!(isDrawingThread())) {
+		if (isNativeWidget()) {
 			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchClick, this, ev->duplicate()));
+			requestRender();
 			return;
 		}
 	}
@@ -354,8 +361,9 @@ void RenderView::dispatchClick(UIEvent* ev)
 void RenderView::dispatchSetCursor(UIEvent* ev)
 {
 	if (m_flagDispatchEventsToRenderingThread) {
-		if (!(isDrawingThread())) {
+		if (isNativeWidget()) {
 			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchSetCursor, this, ev->duplicate()));
+			requestRender();
 			return;
 		}
 	}
@@ -365,8 +373,9 @@ void RenderView::dispatchSetCursor(UIEvent* ev)
 void RenderView::dispatchSwipe(GestureEvent* ev)
 {
 	if (m_flagDispatchEventsToRenderingThread) {
-		if (!(isDrawingThread())) {
+		if (isNativeWidget()) {
 			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchSwipe, this, ev->duplicate()));
+			requestRender();
 			return;
 		}
 	}
