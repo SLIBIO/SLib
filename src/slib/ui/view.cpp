@@ -280,7 +280,10 @@ View::ScrollAttributes::ScrollAttributes()
 	contentWidth = 0;
 	contentHeight = 0;
 	barWidth = UI::getDefaultScrollBarWidth();
-	
+	flagPaging = sl_false;
+	pageWidth = 0;
+	pageHeight = 0;
+
 	flagContentScrollingByMouse = sl_true;
 	flagContentScrollingByTouch = sl_true;
 	flagContentScrollingByMouseWheel = sl_true;
@@ -5861,6 +5864,60 @@ void View::refreshScroll(UIUpdateMode mode)
 	}
 }
 
+sl_bool View::isPaging()
+{
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->flagPaging;
+	}
+	return sl_false;
+}
+
+void View::setPaging(sl_bool flagPaging)
+{
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	if (attrs.isNotNull()) {
+		attrs->flagPaging = flagPaging;
+		onUpdatePaging();
+	}
+}
+
+sl_ui_len View::getPageWidth()
+{
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->pageWidth;
+	}
+	return 0;
+}
+
+void View::setPageWidth(sl_ui_len width)
+{
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	if (attrs.isNotNull()) {
+		attrs->pageWidth = width;
+		onUpdatePaging();
+	}
+}
+
+sl_ui_len View::getPageHeight()
+{
+	Ref<ScrollAttributes> attrs = m_scrollAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->pageHeight;
+	}
+	return 0;
+}
+
+void View::setPageHeight(sl_ui_len height)
+{
+	Ref<ScrollAttributes> attrs = _initializeScrollAttributes();
+	if (attrs.isNotNull()) {
+		attrs->pageHeight = height;
+		onUpdatePaging();
+	}
+}
+
 Ref<ScrollBar> View::_createHorizontalScrollBar()
 {
 	Ref<ScrollBar> ret = new ScrollBar;
@@ -7000,6 +7057,10 @@ void View::onChangePadding()
 {
 }
 
+void View::onUpdatePaging()
+{	
+}
+
 static UIAction _View_getActionUp(UIAction actionDown)
 {
 	if (actionDown == UIAction::LeftButtonDown) {
@@ -7899,6 +7960,29 @@ void View::_processEventForStateAndClick(UIEvent* ev)
 	}
 }
 
+static void _View_scrollPagingElement(sl_scroll_pos& value, sl_scroll_pos speed, sl_scroll_pos pageSize)
+{
+	if (pageSize < 1) {
+		return;
+	}
+	speed = -speed;
+	if (speed > pageSize * 0.4) {
+		speed = pageSize * 0.4;
+	}
+	if (speed < -pageSize * 0.4) {
+		speed = -pageSize * 0.4;
+	}
+	sl_scroll_pos page = Math::round(value / pageSize);
+	sl_scroll_pos offset = value - page * pageSize;
+	if (offset + speed > pageSize / 2) {
+		value = (page + 1) * pageSize;
+	} else if (offset + speed < - pageSize / 2) {
+		value = (page - 1) * pageSize;
+	} else {
+		value = page * pageSize;
+	}
+}
+
 void View::_processContentScrollingEvents(UIEvent* ev)
 {
 	Ref<ScrollAttributes> scrollAttrs = m_scrollAttributes;
@@ -7983,19 +8067,38 @@ void View::_processContentScrollingEvents(UIEvent* ev)
 		case UIAction::TouchEnd:
 			if (scrollAttrs->flagDownContent) {
 				scrollAttrs->flagDownContent = sl_false;
-				if (scrollAttrs->flagSmoothContentScrolling) {
-					scrollAttrs->motionTracker->addMovement(ev);
-					Point speed;
-					if (scrollAttrs->motionTracker->getVelocity(&speed)) {
-						if (!flagHorz) {
-							speed.x = 0;
+				if (scrollAttrs->flagPaging) {
+					sl_scroll_pos x = scrollAttrs->x;
+					sl_scroll_pos y = scrollAttrs->y;
+					Point speed = Point::zero();
+					if (scrollAttrs->flagSmoothContentScrolling) {
+						scrollAttrs->motionTracker->addMovement(ev);
+						scrollAttrs->motionTracker->getVelocity(&speed);
+					}
+					if (flagHorz) {
+						sl_scroll_pos pageWidth = (sl_scroll_pos)(scrollAttrs->pageWidth == 0 ? getWidth() : scrollAttrs->pageWidth);
+						_View_scrollPagingElement(x, speed.x, pageWidth);
+					}
+					if (flagVert) {
+						sl_scroll_pos pageHeight = (sl_scroll_pos)(scrollAttrs->pageHeight == 0 ? getHeight() : scrollAttrs->pageHeight);
+						_View_scrollPagingElement(y, speed.y, pageHeight);
+					}
+					smoothScrollTo(x, y);
+				} else {
+					if (scrollAttrs->flagSmoothContentScrolling) {
+						scrollAttrs->motionTracker->addMovement(ev);
+						Point speed;
+						if (scrollAttrs->motionTracker->getVelocity(&speed)) {
+							if (!flagHorz) {
+								speed.x = 0;
+							}
+							if (!flagVert) {
+								speed.y = 0;
+							}
+							_startContentScrollingFlow(sl_false, speed);
+						} else {
+							_startContentScrollingFlow(sl_false, Point::zero());
 						}
-						if (!flagVert) {
-							speed.y = 0;
-						}
-						_startContentScrollingFlow(sl_false, speed);
-					} else {
-						_startContentScrollingFlow(sl_false, Point::zero());
 					}
 				}
 				ev->stopPropagation();
@@ -8123,7 +8226,7 @@ static void _View_smoothScrollElement(sl_scroll_pos& value, sl_scroll_pos& targe
 		} else {
 			speed = T * Math::sign(offset);
 		}
-		sl_scroll_pos add = speed * (dt * 1.5f);
+		sl_scroll_pos add = speed * (dt * 3.5f);
 		if (Math::abs(add) < offsetAbs) {
 			value += add;
 			flagAnimating = sl_true;
@@ -8161,7 +8264,7 @@ void View::_processContentScrollingFlow()
 		_View_smoothScrollElement(x, scrollAttrs->xSmoothTarget, dt, T, flagX);
 		_View_smoothScrollElement(y, scrollAttrs->ySmoothTarget, dt, T, flagY);
 		
-		_scrollTo(x, y, sl_true, sl_true);
+		_scrollTo(x, y, sl_false, sl_true);
 		
 		if (!flagX && !flagY) {
 			_stopContentScrollingFlow();

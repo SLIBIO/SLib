@@ -11,10 +11,6 @@ ScrollView::ScrollView()
 
 	setCreatingNativeWidget(sl_true);
 	setCreatingChildInstances(sl_false);
-
-	m_flagPaging = sl_false;
-	m_pageWidth = 0;
-	m_pageHeight = 0;
 	
 	setHorizontalScrolling(sl_true);
 	setVerticalScrolling(sl_true);
@@ -143,48 +139,10 @@ void ScrollView::smoothScrollTo(const ScrollPoint& position, UIUpdateMode mode)
 	smoothScrollTo(position.x, position.y, mode);
 }
 
-sl_bool ScrollView::isPaging()
-{
-	return m_flagPaging;
-}
-
-void ScrollView::setPaging(sl_bool flagPaging)
-{
-	m_flagPaging = flagPaging;
-	_updatePaging();
-}
-
-sl_ui_len ScrollView::getPageWidth()
-{
-	return m_pageWidth;
-}
-
-void ScrollView::setPageWidth(sl_ui_len width)
-{
-	m_pageWidth = width;
-	_updatePaging();
-}
-
-sl_ui_len ScrollView::getPageHeight()
-{
-	return m_pageHeight;
-}
-
-void ScrollView::setPageHeight(sl_ui_len height)
-{
-	m_pageHeight = height;
-	_updatePaging();
-}
-
 void ScrollView::setScrollBarsVisible(sl_bool flagHorizontal, sl_bool flagVertical, UIUpdateMode mode)
 {
 	View::setScrollBarsVisible(flagHorizontal, flagVertical, mode);
 	_setScrollBarsVisible_NW(flagHorizontal, flagVertical);
-}
-
-void ScrollView::_updatePaging()
-{
-	_setPaging_NW(m_flagPaging, m_pageWidth, m_pageHeight);
 }
 
 void ScrollView::dispatchScroll(sl_scroll_pos x, sl_scroll_pos y)
@@ -219,9 +177,18 @@ void ScrollView::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 {
 }
 
+void ScrollView::onUpdatePaging()
+{
+	if (isNativeWidget()) {
+		_setPaging_NW(isPaging(), getPageWidth(), getPageHeight());
+	}
+}
+
 void ScrollView::_onScroll_NW(sl_scroll_pos x, sl_scroll_pos y)
 {
-	View::scrollTo(x, y, UIUpdateMode::NoRedraw);
+	if (isNativeWidget()) {
+		View::scrollTo(x, y, UIUpdateMode::NoRedraw);
+	}
 }
 
 

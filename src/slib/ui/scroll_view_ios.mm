@@ -88,7 +88,9 @@ public:
 		
 		handle.backgroundColor = GraphicsPlatform::getUIColorFromColor(getBackgroundColor());
 		
-		[handle setPaging:m_flagPaging :m_pageWidth :m_pageHeight];
+		if (isPaging()) {
+			[handle setPaging:sl_true :getPageWidth() :getPageHeight()];
+		}
 		
 		handle.showsHorizontalScrollIndicator = isHorizontalScrollBarVisible() ? YES : NO;
 		handle.showsVerticalScrollIndicator = isVerticalScrollBarVisible() ? YES : NO;

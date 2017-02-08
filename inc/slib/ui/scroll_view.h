@@ -40,18 +40,6 @@ public:
 	
 	void smoothScrollTo(const ScrollPoint& position, UIUpdateMode mode = UIUpdateMode::Redraw);
 	
-	sl_bool isPaging();
-	
-	void setPaging(sl_bool flagPaging);
-	
-	sl_ui_len getPageWidth();
-	
-	void setPageWidth(sl_ui_len width);
-	
-	sl_ui_len getPageHeight();
-	
-	void setPageHeight(sl_ui_len height);
-	
 	// override
 	void setScrollBarsVisible(sl_bool flagHorizontal, sl_bool flagVertical, UIUpdateMode mode = UIUpdateMode::Redraw);
 
@@ -72,9 +60,10 @@ protected:
 	// override
 	void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 	
-private:
-	void _updatePaging();
+	// override
+	void onUpdatePaging();
 	
+private:
 	void _refreshContentSize_NW();
 	
 	void _setContentView_NW(const Ref<View>& view);
@@ -100,9 +89,6 @@ protected:
 	
 protected:
 	AtomicRef<View> m_viewContent;
-	sl_bool m_flagPaging;
-	sl_ui_pos m_pageWidth;
-	sl_ui_pos m_pageHeight;
 	
 };
 

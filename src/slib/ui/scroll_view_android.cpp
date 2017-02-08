@@ -40,7 +40,9 @@ public:
 	void __applyProperties(jobject handle, ViewInstance* scrollViewInstance)
 	{
 		_JAndroidScrollView::setBackgroundColor.call(sl_null, handle, getBackgroundColor().getARGB());
-		_JAndroidScrollView::setPaging.call(sl_null, handle, m_flagPaging, m_pageWidth, m_pageHeight);
+		if (isPaging()) {
+			_JAndroidScrollView::setPaging.call(sl_null, handle, 1, getPageWidth(), getPageHeight());
+		}
 		_JAndroidScrollView::setScrollBarsVisible.call(sl_null, handle, isHorizontalScrollBarVisible(), isVerticalScrollBarVisible());
 		__applyContent(handle, scrollViewInstance);
 	}

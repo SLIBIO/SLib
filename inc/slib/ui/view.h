@@ -940,6 +940,18 @@ public:
 	
 	void refreshScroll(UIUpdateMode mode = UIUpdateMode::Redraw);
 	
+	sl_bool isPaging();
+	
+	void setPaging(sl_bool flagPaging);
+	
+	sl_ui_len getPageWidth();
+	
+	void setPageWidth(sl_ui_len width);
+	
+	sl_ui_len getPageHeight();
+	
+	void setPageHeight(sl_ui_len height);
+	
 	
 	sl_bool isContentScrollingByMouse();
 	
@@ -1138,6 +1150,8 @@ protected:
 	virtual void onMakeLayout();
 	
 	virtual void onChangePadding();
+	
+	virtual void onUpdatePaging();
 	
 public:
 	virtual void dispatchDraw(Canvas* canvas);
@@ -1492,6 +1506,9 @@ protected:
 		sl_scroll_pos contentWidth;
 		sl_scroll_pos contentHeight;
 		sl_ui_len barWidth;
+		sl_bool flagPaging;
+		sl_ui_pos pageWidth;
+		sl_ui_pos pageHeight;
 		
 		sl_bool flagContentScrollingByMouse;
 		sl_bool flagContentScrollingByTouch;
