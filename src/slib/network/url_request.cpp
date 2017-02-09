@@ -35,6 +35,10 @@ UrlRequestParam::UrlRequestParam()
 	flagStoreResponseContent = sl_true;
 }
 
+UrlRequestParam::~UrlRequestParam()
+{
+}
+
 SLIB_DEFINE_OBJECT(UrlRequest, Object)
 
 typedef HashMap< UrlRequest*, Ref<UrlRequest> > _UrlRequestMap;
@@ -52,97 +56,110 @@ UrlRequest::UrlRequest()
 	
 }
 
-Ref<UrlRequest> UrlRequest::send(const String& url, const UrlRequestParam& param)
+UrlRequest::~UrlRequest()
 {
-	return _send(param, url, String::null());
 }
 
-Ref<UrlRequest> UrlRequest::downloadToFile(const String& filePath, const String& url, const UrlRequestParam& param)
+Ref<UrlRequest> UrlRequest::send(const UrlRequestParam& param)
 {
-	return _send(param, url, filePath);
+	return _send(param, String::null());
+}
+
+Ref<UrlRequest> UrlRequest::downloadToFile(const String& filePath, const UrlRequestParam& param)
+{
+	return _send(param, filePath);
 }
 
 Ref<UrlRequest> UrlRequest::send(const String& url, const Function<void(UrlRequest*)>& onComplete)
 {
 	UrlRequestParam rp;
+	rp.url = url;
 	rp.method = HttpMethod::GET;
 	rp.onComplete = onComplete;
-	return send(url, rp);
+	return send(rp);
 }
 
 Ref<UrlRequest> UrlRequest::send(const String& url, const Map<String, Variant>& params, const Function<void(UrlRequest*)>& onComplete)
 {
 	UrlRequestParam rp;
+	rp.url = url;
 	rp.method = HttpMethod::GET;
 	rp.parameters = params;
 	rp.onComplete = onComplete;
-	return send(url, rp);
+	return send(rp);
 }
 
 Ref<UrlRequest> UrlRequest::send(HttpMethod method, const String& url, const Function<void(UrlRequest*)>& onComplete)
 {
 	UrlRequestParam rp;
+	rp.url = url;
 	rp.method = method;
 	rp.onComplete = onComplete;
-	return send(url, rp);
+	return send(rp);
 }
 
 Ref<UrlRequest> UrlRequest::send(HttpMethod method, const String& url, const Map<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete)
 {
 	UrlRequestParam rp;
+	rp.url = url;
 	rp.method = method;
 	rp.parameters = params;
 	rp.requestBody = _buildRequestBody(body);
 	rp.onComplete = onComplete;
-	return send(url, rp);
+	return send(rp);
 }
 
 Ref<UrlRequest> UrlRequest::sendJson(HttpMethod method, const String& url, const Map<String, Variant>& params, const Variant& json, const Function<void(UrlRequest*)>& onComplete)
 {
 	UrlRequestParam rp;
+	rp.url = url;
 	rp.method = method;
 	rp.parameters = params;
 	rp.requestBody = json.toJsonString().toMemory();
 	rp.onComplete = onComplete;
-	return send(url, rp);
+	return send(rp);
 }
 
 Ref<UrlRequest> UrlRequest::post(const String& url, const Variant& body, const Function<void(UrlRequest*)>& onComplete)
 {
 	UrlRequestParam rp;
+	rp.url = url;
 	rp.method = HttpMethod::POST;
 	rp.requestBody = _buildRequestBody(body);
 	rp.onComplete = onComplete;
-	return send(url, rp);
+	return send(rp);
 }
 
 Ref<UrlRequest> UrlRequest::post(const String& url, const Map<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete)
 {
 	UrlRequestParam rp;
+	rp.url = url;
 	rp.method = HttpMethod::POST;
 	rp.parameters = params;
 	rp.requestBody = _buildRequestBody(body);
 	rp.onComplete = onComplete;
-	return send(url, rp);
+	return send(rp);
 }
 
 Ref<UrlRequest> UrlRequest::postJson(const String& url, const Variant& json, const Function<void(UrlRequest*)>& onComplete)
 {
 	UrlRequestParam rp;
+	rp.url = url;
 	rp.method = HttpMethod::POST;
 	rp.requestBody = json.toJsonString().toMemory();
 	rp.onComplete = onComplete;
-	return send(url, rp);
+	return send(rp);
 }
 
 Ref<UrlRequest> UrlRequest::postJson(const String& url, const Map<String, Variant>& params, const Variant& json, const Function<void(UrlRequest*)>& onComplete)
 {
 	UrlRequestParam rp;
+	rp.url = url;
 	rp.method = HttpMethod::POST;
 	rp.parameters = params;
 	rp.requestBody = json.toJsonString().toMemory();
 	rp.onComplete = onComplete;
-	return send(url, rp);
+	return send(rp);
 }
 
 const String& UrlRequest::getUrl()
@@ -301,10 +318,11 @@ sl_bool UrlRequest::isError()
 	return m_flagError;
 }
 
-Ref<UrlRequest> UrlRequest::_send(const UrlRequestParam& param, const String& _url, const String& downloadFilePath)
+Ref<UrlRequest> UrlRequest::_send(const UrlRequestParam& param, const String& downloadFilePath)
 {
-	String url = _url;
+	String url = param.url;
 	if (url.isNotEmpty()) {
+		String url = param.url;
 		if (param.parameters.isNotEmpty()) {
 			if (url.contains('?')) {
 				url += "&";
@@ -318,7 +336,7 @@ Ref<UrlRequest> UrlRequest::_send(const UrlRequestParam& param, const String& _u
 			return request;
 		}
 	}
-	_onCreateError(param, url, String::null());
+	_onCreateError(param, param.url, String::null());
 	return sl_null;
 }
 

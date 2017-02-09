@@ -20,6 +20,11 @@ public:
 	AtomicString host;
 	AtomicString path;
 	AtomicString query;
+	
+public:
+	Url();
+	
+	~Url();
 
 public:
 	void parse(const String& url);

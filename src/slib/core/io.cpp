@@ -8,6 +8,15 @@ SLIB_NAMESPACE_BEGIN
 /***************
 	IReader
  ***************/
+
+IReader::IReader()
+{
+}
+
+IReader::~IReader()
+{
+}
+
 sl_int32 IReader::read32(void* buf, sl_uint32 size)
 {
 	return (sl_int32)(read(buf, size));
@@ -883,9 +892,19 @@ String16 IReader::readText16(sl_size size, Charset* outCharset)
 	return sl_null;
 }
 
+
 /***************
 	IWriter
 ***************/
+
+IWriter::IWriter()
+{
+}
+
+IWriter::~IWriter()
+{
+}
+
 sl_int32 IWriter::write32(const void* buf, sl_uint32 size)
 {
 	return (sl_int32)(write(buf, size));
@@ -1444,6 +1463,10 @@ MemoryReader::MemoryReader(const void* buf, sl_size size)
 	init(buf, size);
 }
 
+MemoryReader::~MemoryReader()
+{
+}
+
 void MemoryReader::init(const Memory& mem)
 {
 	ObjectLocker lock(this);
@@ -1542,6 +1565,10 @@ MemoryWriter::MemoryWriter(const Memory& mem)
 MemoryWriter::MemoryWriter(void* buf, sl_size size)
 {
 	init(buf, size);
+}
+
+MemoryWriter::~MemoryWriter()
+{
 }
 
 void MemoryWriter::init()
@@ -1685,10 +1712,17 @@ sl_uint64 MemoryWriter::getPosition()
 /***********************************
 	DatagramStream
 ***********************************/
+
 DatagramStream::DatagramStream()
 {
 	setMaxDatagramSize(0);
-	clear();
+	m_lenCurrentDatagram = 0;
+	m_posCurrentDatagram = 0;
+	m_lenBufSize = 0;
+}
+
+DatagramStream::~DatagramStream()
+{
 }
 
 void DatagramStream::clear()

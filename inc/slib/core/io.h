@@ -6,6 +6,7 @@
 #include "object.h"
 #include "memory.h"
 #include "time.h"
+
 #include "../math/bigint.h"
 
 SLIB_NAMESPACE_BEGIN
@@ -19,6 +20,11 @@ enum class SeekPosition
 
 class SLIB_EXPORT IReader
 {
+public:
+	IReader();
+	
+	~IReader();
+	
 public:
 	virtual sl_reg read(void* buf, sl_size size);
 	
@@ -136,6 +142,11 @@ public:
 
 class SLIB_EXPORT IWriter
 {
+public:
+	IWriter();
+	
+	~IWriter();
+	
 public:
 	virtual sl_reg write(const void* buf, sl_size size);
 	
@@ -296,6 +307,8 @@ public:
 	MemoryReader(const Memory& mem);
 
 	MemoryReader(const void* buf, sl_size size);
+	
+	~MemoryReader();
 
 public:
 	void init(const Memory& mem);
@@ -337,6 +350,8 @@ public:
 	MemoryWriter(const Memory& mem);
 	
 	MemoryWriter(void* buf, sl_size size);
+	
+	~MemoryWriter();
 
 public:
 	void init();
@@ -393,6 +408,8 @@ class SLIB_EXPORT DatagramStream : public Object
 {
 public:
 	DatagramStream();
+	
+	~DatagramStream();
 
 public:
 	void clear();

@@ -30,6 +30,8 @@ public:
 public:
 	_NatTablePort();
 	
+	~_NatTablePort();
+	
 };
 
 class _NatTableMapping : public Object
@@ -73,12 +75,17 @@ public:
 
 public:
 	NatTableParam();
+	
+	~NatTableParam();
+	
 };
 
 class SLIB_EXPORT NatTable : public Object
 {
 public:
 	NatTable();
+	
+	~NatTable();
 
 public:
 	const NatTableParam& getParam() const;

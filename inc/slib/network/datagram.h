@@ -4,6 +4,7 @@
 #include "definition.h"
 
 #include "async.h"
+
 #include "../core/io.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
@@ -16,9 +17,9 @@ class SLIB_EXPORT ITcpDatagramListener
 public:
 	virtual void onReceiveFrom(TcpDatagramClient* client, void* data, sl_uint32 sizeReceived) = 0;
 	
-	virtual void onError(TcpDatagramClient* client);
+	virtual void onConnect(TcpDatagramClient* client);
 	
-	virtual void onConnect(TcpDatagramClient* client, sl_bool flagError);
+	virtual void onError(TcpDatagramClient* client);
 	
 };
 
@@ -26,9 +27,18 @@ class SLIB_EXPORT TcpDatagramParam
 {
 public:
 	SocketAddress bindAddress;
+	sl_uint32 maxWaitingBytesForSending; // default: 1024000
 	Ref<AsyncIoLoop> ioLoop;
+	
 	Ptr<ITcpDatagramListener> listener;
-	sl_uint32 maxWaitingBytesForSending = 1024000;
+	Function<void(TcpDatagramClient*, void*, sl_uint32)> onReceiveFrom;
+	Function<void(TcpDatagramClient*)> onConnect;
+	Function<void(TcpDatagramClient*)> onError;
+	
+public:
+	TcpDatagramParam();
+	
+	~TcpDatagramParam();
 	
 };
 
@@ -36,14 +46,22 @@ class SLIB_EXPORT TcpDatagramClientParam : public TcpDatagramParam
 {
 public:
 	SocketAddress serverAddress;
-	sl_bool flagAutoConnect = sl_true;
-	sl_bool flagAutoReconnect = sl_false;
-	sl_uint32 autoReconnectIntervalSeconds = 5;
+	
+	sl_bool flagAutoConnect; // default: true
+	sl_bool flagAutoReconnect; // default: false
+	sl_uint32 autoReconnectIntervalSeconds; // default: 5
+	
+public:
+	TcpDatagramClientParam();
+	
+	~TcpDatagramClientParam();
 	
 };
 
 class SLIB_EXPORT TcpDatagramClient : public Object, public IAsyncTcpSocketListener
 {
+	SLIB_DECLARE_OBJECT
+	
 public:
 	TcpDatagramClient();
 
@@ -71,12 +89,10 @@ public:
 protected:
 	// override
 	void onConnect(AsyncTcpSocket* socket, const SocketAddress& address, sl_bool flagError);
+
+	void onReceiveStream(AsyncStreamResult* result);
 	
-	// override
-	void onReceive(AsyncTcpSocket* socket, void* data, sl_uint32 sizeReceive, Referable* refData, sl_bool flagError);
-	
-	// override
-	void onSend(AsyncTcpSocket* socket, void* data, sl_uint32 sizeSent, Referable* refData, sl_bool flagError);
+	void onSendStream(AsyncStreamResult* result);
 	
 	void onMessageError(AsyncTcpSocket* socket);
 	
@@ -97,12 +113,16 @@ protected:
 	sl_uint32 m_maxWaitingBytesForSending;
 	
 	WeakRef<TcpDatagramServer> m_server;
-	Ptr<ITcpDatagramListener> m_listener;
 	Ref<AsyncIoLoop> m_ioLoop;
 	SocketAddress m_addressBind;
 	SocketAddress m_addressServer;
 	sl_bool m_flagAutoReconnect;
 	sl_uint32 m_autoReconnectIntervalSeconds;
+	
+	Ptr<ITcpDatagramListener> m_listener;
+	Function<void(TcpDatagramClient*, void*, sl_uint32)> m_onReceiveFrom;
+	Function<void(TcpDatagramClient*)> m_onConnect;
+	Function<void(TcpDatagramClient*)> m_onError;
 	
 	friend class TcpDatagramServer;
 	
@@ -111,12 +131,19 @@ protected:
 class SLIB_EXPORT TcpDatagramServerParam : public TcpDatagramParam
 {
 public:
-	sl_bool flagAutoStart = sl_true;
+	sl_bool flagAutoStart; // default: true
 
+public:
+	TcpDatagramServerParam();
+	
+	~TcpDatagramServerParam();
+	
 };
 
 class SLIB_EXPORT TcpDatagramServer : public Object, public IAsyncTcpServerListener
 {
+	SLIB_DECLARE_OBJECT
+	
 protected:
 	TcpDatagramServer();
 	
@@ -147,11 +174,13 @@ protected:
 protected:
 	Ref<AsyncTcpServer> m_server;
 	HashMap< TcpDatagramClient*, Ref<TcpDatagramClient> > m_clients;
-	
-	Ptr<ITcpDatagramListener> m_listener;
 	Ref<AsyncIoLoop> m_ioLoop;
-	
 	sl_uint32 m_maxWaitingBytesForSending;
+
+	Ptr<ITcpDatagramListener> m_listener;
+	Function<void(TcpDatagramClient*, void*, sl_uint32)> m_onReceiveFrom;
+	Function<void(TcpDatagramClient*)> m_onConnect;
+	Function<void(TcpDatagramClient*)> m_onError;
 
 	friend class TcpDatagramClient;
 	

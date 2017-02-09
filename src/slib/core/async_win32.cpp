@@ -128,24 +128,16 @@ public:
 	void doInput(AsyncStreamRequest* req, sl_uint32 size, sl_bool flagError)
 	{
 		Ref<AsyncIoObject> object = getObject();
-		if (object.isNull()) {
-			return;
-		}
-		PtrLocker<IAsyncStreamListener> listener(req->listener);
-		if (listener.isNotNull()) {
-			listener->onRead((AsyncStream*)(object.get()), req->data, size, req->refData.get(), flagError);
+		if (object.isNotNull()) {
+			req->runCallback(static_cast<AsyncStream*>(object.get()), size, flagError);
 		}
 	}
 
 	void doOutput(AsyncStreamRequest* req, sl_uint32 size, sl_bool flagError)
 	{
 		Ref<AsyncIoObject> object = getObject();
-		if (object.isNull()) {
-			return;
-		}
-		PtrLocker<IAsyncStreamListener> listener(req->listener);
-		if (listener.isNotNull()) {
-			listener->onWrite((AsyncStream*)(object.get()), req->data, size, req->refData.get(), flagError);
+		if (object.isNotNull()) {
+			req->runCallback(static_cast<AsyncStream*>(object.get()), size, flagError);
 		}
 	}
 

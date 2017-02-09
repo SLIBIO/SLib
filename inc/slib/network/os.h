@@ -18,6 +18,12 @@ public:
 	MacAddress macAddress;
 	List<IPv4AddressInfo> addresses_IPv4;
 	List<IPv6Address> addresses_IPv6;
+	
+public:
+	NetworkInterfaceInfo();
+	
+	~NetworkInterfaceInfo();
+	
 };
 
 class SLIB_EXPORT Network

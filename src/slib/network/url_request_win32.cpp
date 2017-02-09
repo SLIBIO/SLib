@@ -140,10 +140,10 @@ public:
 	sl_bool isOpened();
 
 	// override
-	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref);
+	sl_bool read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* ref);
 
 	// override
-	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref)
+	sl_bool write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* ref)
 	{
 		return sl_false;
 	}
@@ -381,7 +381,12 @@ public:
 							Ref<_UrlRequestDownloadStream> stream = new _UrlRequestDownloadStream(this);
 							if (stream.isNotNull()) {
 								m_downloadStream = stream;
-								m_downloadCopy = AsyncCopy::create(stream, m_downloadFile, -1, stream, READ_BUFFER_SIZE);
+								AsyncCopyParam cp;
+								cp.source = stream;
+								cp.target = m_downloadFile;
+								cp.listener.setRef(stream);
+								cp.bufferSize = READ_BUFFER_SIZE;
+								m_downloadCopy = AsyncCopy::create(cp);
 								if (m_downloadCopy.isNotNull()) {
 									return;
 								}
@@ -491,11 +496,11 @@ sl_bool _UrlRequestDownloadStream::isOpened()
 	return m_request.isNotNull();
 }
 
-sl_bool _UrlRequestDownloadStream::read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref)
+sl_bool _UrlRequestDownloadStream::read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* ref)
 {
 	Ref<_UrlRequest> request(m_request);
 	if (request.isNotNull()) {
-		Ref<AsyncStreamRequest> buf = AsyncStreamRequest::createRead(data, size, ref, listener);
+		Ref<AsyncStreamRequest> buf = AsyncStreamRequest::createRead(data, size, ref, callback);
 		if (buf.isNotNull()) {
 			ObjectLocker lock(this);
 			if (m_currentBuffer.isNotNull()) {
@@ -517,20 +522,14 @@ void _UrlRequestDownloadStream::onReadBuffer(_UrlRequest* request, HINTERNET hRe
 	}
 	ObjectLocker lock(this);
 	if (m_currentBuffer.isNotNull()) {
-		PtrLocker<IAsyncStreamListener> listener(m_currentBuffer->listener);
-		if (listener.isNotNull()) {
-			listener->onRead(this, m_currentBuffer->data, m_currentReadSize, m_currentBuffer->refData.get(), sl_false);
-		}
+		m_currentBuffer->runCallback(this, m_currentReadSize, sl_false);
 		m_currentBuffer.setNull();
 	}
 	while (m_currentBuffer.isNull()) {
 		Ref<AsyncStreamRequest> buf;
 		if (m_queueBuffers.pop(&buf)) {
 			if (!(readBuffer(request, hRequest, buf.get()))) {
-				PtrLocker<IAsyncStreamListener> listener(buf->listener);
-				if (listener.isNotNull()) {
-					listener->onRead(this, buf->data, 0, buf->refData.get(), sl_true);
-				}
+				m_currentBuffer->runCallback(this, 0, sl_true);
 				close();
 				return;
 			}
@@ -546,10 +545,7 @@ sl_bool _UrlRequestDownloadStream::readBuffer(_UrlRequest* request, HINTERNET hR
 	if (::InternetReadFile(hRequest, buffer->data, buffer->size, &m_currentReadSize)) {
 		if (m_currentReadSize) {
 			request->onDownloadContent(m_currentReadSize);
-			PtrLocker<IAsyncStreamListener> listener(buffer->listener);
-			if (listener.isNotNull()) {
-				listener->onRead(this, buffer->data, m_currentReadSize, buffer->refData.get(), sl_false);
-			}
+			buffer->runCallback(this, m_currentReadSize, sl_false);
 			return sl_true;
 		} else {
 			m_flagCompleteRead = sl_true;

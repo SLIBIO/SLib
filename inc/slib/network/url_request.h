@@ -31,6 +31,7 @@ public:
 class SLIB_EXPORT UrlRequestParam
 {
 public:
+	String url;
 	HttpMethod method;
 	Map<String, Variant> parameters;
 	Map<String, String> requestHeaders;
@@ -49,6 +50,8 @@ public:
 public:
 	UrlRequestParam();
 	
+	~UrlRequestParam();
+	
 };
 
 class SLIB_EXPORT UrlRequest : public Object
@@ -57,11 +60,13 @@ class SLIB_EXPORT UrlRequest : public Object
 	
 protected:
 	UrlRequest();
+	
+	~UrlRequest();
 		
 public:
-	static Ref<UrlRequest> send(const String& url, const UrlRequestParam& param);
+	static Ref<UrlRequest> send(const UrlRequestParam& param);
 	
-	static Ref<UrlRequest> downloadToFile(const String& filePath, const String& url, const UrlRequestParam& param);
+	static Ref<UrlRequest> downloadToFile(const String& filePath, const UrlRequestParam& param);
 	
 	static Ref<UrlRequest> send(const String& url, const Function<void(UrlRequest*)>& onComplete);
 	
@@ -145,7 +150,7 @@ public:
 	sl_bool isError();
 	
 protected:
-	static Ref<UrlRequest> _send(const UrlRequestParam& param, const String& url, const String& downloadFilePath);
+	static Ref<UrlRequest> _send(const UrlRequestParam& param, const String& downloadFilePath);
 	
 	static Ref<UrlRequest> _create(const UrlRequestParam& param, const String& url, const String& downloadFilePath);
 	

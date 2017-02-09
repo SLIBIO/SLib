@@ -21,6 +21,11 @@ public:
 	};
 	
 public:
+	SocketEvent();
+	
+	~SocketEvent();
+	
+public:
 	static Ref<SocketEvent> create(const Ref<Socket>& socket);
 	
 	static Ref<SocketEvent> create(const Ref<Socket>& socket, sl_uint32 events);

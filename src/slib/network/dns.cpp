@@ -156,6 +156,10 @@ DnsRecord::DnsRecord()
 	_class = DnsClass::IN;
 }
 
+DnsRecord::~DnsRecord()
+{
+}
+
 const String& DnsRecord::getName() const
 {
 	return _name;
@@ -316,6 +320,15 @@ sl_uint32 DnsRecord::_buildHeader(void* _buf, sl_uint32 offset, sl_uint32 size)
 	return pos + 4;
 }
 
+
+DnsQuestionRecord::DnsQuestionRecord()
+{
+}
+
+DnsQuestionRecord::~DnsQuestionRecord()
+{
+}
+
 sl_uint32 DnsQuestionRecord::parseRecord(const void* buf, sl_uint32 offset, sl_uint32 size)
 {
 	return _parseHeader(buf, offset, size);
@@ -333,6 +346,10 @@ DnsResponseRecord::DnsResponseRecord()
 	_messageLength = 0;
 	_dataOffset = 0;
 	_dataLength = 0;
+}
+
+DnsResponseRecord::~DnsResponseRecord()
+{
 }
 
 sl_uint32 DnsResponseRecord::getTTL() const
@@ -500,6 +517,15 @@ String DnsResponseRecord::toString() const
 /*************************************************************
 					DnsPacket
 *************************************************************/
+
+DnsPacket::DnsPacket()
+{
+}
+
+DnsPacket::~DnsPacket()
+{
+}
+
 sl_bool DnsPacket::parsePacket(const void* packet, sl_uint32 size)
 {
 	sl_uint8* buf = (sl_uint8*)packet;
@@ -671,27 +697,41 @@ Memory DnsPacket::buildHostAddressAnswerPacket(sl_uint16 id, const String& hostN
 /*************************************************************
 				DnsClient
 *************************************************************/
+
+DnsClientParam::DnsClientParam()
+{
+}
+
+DnsClientParam::~DnsClientParam()
+{
+}
+
+SLIB_DEFINE_OBJECT(DnsClient, Object)
+
 DnsClient::DnsClient()
 {
 	m_idLast = 0;
 }
 
-Ref<DnsClient> DnsClient::create(const DnsClientParam& param, const Ref<AsyncIoLoop>& loop)
+DnsClient::~DnsClient()
+{
+}
+
+Ref<DnsClient> DnsClient::create(const DnsClientParam& param)
 {
 	Ref<DnsClient> ret = new DnsClient;
 	if (ret.isNotNull()) {
 		ret->m_listener = param.listener;
-		Ref<AsyncUdpSocket> socket = AsyncUdpSocket::create((WeakRef<DnsClient>)(ret), 4096, loop);
+		AsyncUdpSocketParam up;
+		up.listener.setWeak(ret);
+		up.packetSize = 4096;
+		up.ioLoop = param.ioLoop;
+		Ref<AsyncUdpSocket> socket = AsyncUdpSocket::create(up);
 		if (socket.isNotNull()) {
 			ret->m_udp = socket;
 		}
 	}
 	return ret;
-}
-
-Ref<DnsClient> DnsClient::create(const DnsClientParam& param)
-{
-	return DnsClient::create(param, AsyncIoLoop::getDefault());
 }
 
 void DnsClient::sendQuestion(const SocketAddress& serverAddress, const String& hostName)
@@ -736,6 +776,10 @@ DnsResolveHostParam::DnsResolveHostParam()
 	flagEncryptForward = sl_false;
 }
 
+DnsResolveHostParam::~DnsResolveHostParam()
+{
+}
+
 DnsServerParam::DnsServerParam()
 {
 	portDns = SLIB_NETWORK_DNS_PORT;
@@ -750,6 +794,10 @@ DnsServerParam::DnsServerParam()
 	flagAutoStart = sl_true;
 }
 
+DnsServerParam::~DnsServerParam()
+{
+}
+
 void DnsServerParam::parse(const Variant& conf)
 {
 	portDns = (sl_uint16)conf.getField("dns_port").getUint32(SLIB_NETWORK_DNS_PORT);
@@ -762,6 +810,9 @@ void DnsServerParam::parse(const Variant& conf)
 	defaultForwardAddressIp.parse(conf.getField("forward_dns").getString());
 	defaultForwardAddress = SocketAddress(defaultForwardAddressIp, SLIB_NETWORK_DNS_PORT);
 }
+
+
+SLIB_DEFINE_OBJECT(DnsServer, Object)
 
 DnsServer::DnsServer()
 {
@@ -778,17 +829,27 @@ DnsServer::~DnsServer()
 
 #define TAG_SERVER "DnsServer"
 
-Ref<DnsServer> DnsServer::create(const DnsServerParam& param, const Ref<AsyncIoLoop>& loop)
+Ref<DnsServer> DnsServer::create(const DnsServerParam& param)
 {
 	Ref<DnsServer> ret = new DnsServer;
+	
 	if (ret.isNotNull()) {
 
-		Ref<AsyncUdpSocket> socketDns = AsyncUdpSocket::create(param.portDns, (WeakRef<DnsServer>)(ret), 4096, loop, sl_false);
+		AsyncUdpSocketParam up;
+		up.listener.setWeak(ret);
+		up.packetSize = 4096;
+		up.ioLoop = param.ioLoop;
+		up.flagAutoStart = sl_false;
+		
+		up.bindAddress.port = param.portDns;
+		Ref<AsyncUdpSocket> socketDns = AsyncUdpSocket::create(up);
 		if (socketDns.isNull()) {
 			LogError(TAG_SERVER, "Failed to bind to port %d", param.portDns);
 			return sl_null;
 		}
-		Ref<AsyncUdpSocket> socketEncrypt = AsyncUdpSocket::create(param.portEncryption, (WeakRef<DnsServer>)(ret), 4096, loop, sl_false);
+		
+		up.bindAddress.port = param.portEncryption;
+		Ref<AsyncUdpSocket> socketEncrypt = AsyncUdpSocket::create(up);
 		if (socketEncrypt.isNull()) {
 			LogError(TAG_SERVER, "Failed to bind to port %d", param.portEncryption);
 			return sl_null;
@@ -818,11 +879,6 @@ Ref<DnsServer> DnsServer::create(const DnsServerParam& param, const Ref<AsyncIoL
 		
 	}
 	return sl_null;
-}
-
-Ref<DnsServer> DnsServer::create(const DnsServerParam& param)
-{
-	return create(param, AsyncIoLoop::getDefault());
 }
 
 void DnsServer::release()

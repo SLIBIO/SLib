@@ -5,6 +5,14 @@ SLIB_NETWORK_NAMESPACE_BEGIN
 
 SLIB_DEFINE_OBJECT(SocketEvent, Event)
 
+SocketEvent::SocketEvent()
+{
+}
+
+SocketEvent::~SocketEvent()
+{
+}
+
 Ref<SocketEvent> SocketEvent::create(const Ref<Socket>& socket, sl_uint32 events)
 {
 	Ref<SocketEvent> ev = SocketEvent::create(socket);

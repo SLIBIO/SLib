@@ -18,6 +18,7 @@ Referable::Referable()
 	m_signature = _SIGNATURE;
 #endif
 	m_nRefCount = 0;
+	m_flagWeakRef = sl_false;
 	m_weak = sl_null;
 }
 
@@ -27,6 +28,7 @@ Referable::Referable(const Referable& other)
 	m_signature = _SIGNATURE;
 #endif
 	m_nRefCount = 0;
+	m_flagWeakRef = sl_false;
 	m_weak = sl_null;
 }
 
@@ -72,15 +74,6 @@ sl_reg Referable::decreaseReferenceNoFree()
 	return 1;
 }
 
-CWeakRef* Referable::getWeakObject()
-{
-	SpinLocker lock(&m_lockWeak);
-	if (! m_weak) {
-		m_weak = CWeakRef::create(this);
-	}
-	return m_weak;
-}
-
 void Referable::makeNeverFree()
 {
 	m_nRefCount = -1;
@@ -94,6 +87,15 @@ sl_object_type Referable::getObjectType() const
 sl_bool Referable::isInstanceOf(sl_object_type type) const
 {
 	return sl_false;
+}
+
+CWeakRef* Referable::_getWeakObject()
+{
+	SpinLocker lock(&m_lockWeak);
+	if (! m_weak) {
+		m_weak = CWeakRef::create(this);
+	}
+	return m_weak;
 }
 
 void Referable::_clearWeak()
@@ -124,6 +126,7 @@ SLIB_DEFINE_ROOT_OBJECT(CWeakRef)
 
 CWeakRef::CWeakRef()
 {
+	m_flagWeakRef = sl_true;
 }
 
 CWeakRef* CWeakRef::create(Referable* object)

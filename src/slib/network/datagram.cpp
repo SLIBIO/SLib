@@ -4,7 +4,7 @@ SLIB_NETWORK_NAMESPACE_BEGIN
 
 #define DATAGRAM_BUF_SIZE 4096
 
-void ITcpDatagramListener::onConnect(TcpDatagramClient* client, sl_bool flagError)
+void ITcpDatagramListener::onConnect(TcpDatagramClient* client)
 {
 }
 
@@ -12,9 +12,32 @@ void ITcpDatagramListener::onError(TcpDatagramClient* client)
 {
 }
 
+TcpDatagramParam::TcpDatagramParam()
+{
+	maxWaitingBytesForSending = 1024000;
+}
+
+TcpDatagramParam::~TcpDatagramParam()
+{
+}
+
 /***************************************
 		TcpDatagramClient
 ***************************************/
+
+TcpDatagramClientParam::TcpDatagramClientParam()
+{
+	flagAutoConnect = sl_true;
+	flagAutoReconnect = sl_false;
+	autoReconnectIntervalSeconds = 5;
+}
+
+TcpDatagramClientParam::~TcpDatagramClientParam()
+{
+}
+
+
+SLIB_DEFINE_OBJECT(TcpDatagramClient, Object)
 
 TcpDatagramClient::TcpDatagramClient()
 {
@@ -30,12 +53,16 @@ TcpDatagramClient::~TcpDatagramClient()
 Ref<TcpDatagramClient> TcpDatagramClient::create(const TcpDatagramClientParam& param)
 {
 	Memory memReceive = Memory::create(DATAGRAM_BUF_SIZE);
+	
 	if (memReceive.isNotEmpty()) {
+		
 		if (param.serverAddress.isValid()) {
+			
 			Ref<TcpDatagramClient> ret = new TcpDatagramClient;
+			
 			if (ret.isNotNull()) {
+				
 				ret->m_flagOpened = sl_true;
-				ret->m_listener = param.listener;
 				ret->m_ioLoop = param.ioLoop;
 				ret->m_addressBind = param.bindAddress;
 				ret->m_addressServer = param.serverAddress;
@@ -44,9 +71,16 @@ Ref<TcpDatagramClient> TcpDatagramClient::create(const TcpDatagramClientParam& p
 				ret->m_bufReceive = memReceive;
 				ret->m_maxWaitingBytesForSending = param.maxWaitingBytesForSending;
 				ret->m_datagram.setMaxDatagramSize(param.maxWaitingBytesForSending);
+				
+				ret->m_listener = param.listener;
+				ret->m_onConnect = param.onConnect;
+				ret->m_onReceiveFrom = param.onReceiveFrom;
+				ret->m_onError = param.onError;
+
 				if (param.flagAutoConnect) {
 					ret->connect();
 				}
+				
 				return ret;
 			}
 		}
@@ -75,7 +109,12 @@ void TcpDatagramClient::connect()
 			m_socketMessage->close();
 			m_socketMessage.setNull();
 		}
-		m_socketConnect = AsyncTcpSocket::createAndConnect(m_addressBind, m_addressServer, this, m_ioLoop);
+		AsyncTcpSocketParam param;
+		param.bindAddress = m_addressBind;
+		param.connectAddress = m_addressServer;
+		param.listener.setPointer(this);
+		param.ioLoop = m_ioLoop;
+		m_socketConnect = AsyncTcpSocket::create(param);
 		if (m_socketConnect.isNull()) {
 			if (m_flagAutoReconnect) {
 				_reconnect();
@@ -111,7 +150,7 @@ sl_bool TcpDatagramClient::send(const void* data, sl_uint32 size)
 		if (m_socketMessage.isNotNull()) {
 			if (m_socketMessage->getWaitingSizeForWrite() < m_maxWaitingBytesForSending) {
 				Memory packet = m_datagram.build(data, size);
-				if (m_socketMessage->send(packet, WeakRef<TcpDatagramClient>(this))) {
+				if (m_socketMessage->send(packet, SLIB_FUNCTION_WEAKREF(TcpDatagramClient, onSendStream, this))) {
 					return sl_true;
 				}
 			}
@@ -131,8 +170,9 @@ void TcpDatagramClient::onConnect(AsyncTcpSocket* socket, const SocketAddress& a
 	if (flagError) {
 		PtrLocker<ITcpDatagramListener> listener(m_listener);
 		if (listener.isNotNull()) {
-			listener->onConnect(this, flagError);
+			listener->onError(this);
 		}
+		m_onError(this);
 		if (m_flagAutoReconnect) {
 			_reconnect();
 		}
@@ -140,43 +180,45 @@ void TcpDatagramClient::onConnect(AsyncTcpSocket* socket, const SocketAddress& a
 		m_socketMessage = socket;
 		PtrLocker<ITcpDatagramListener> listener(m_listener);
 		if (listener.isNotNull()) {
-			listener->onConnect(this, flagError);
+			listener->onConnect(this);
 		}
+		m_onConnect(this);
 		ObjectLocker lock(this);
 		if (m_socketMessage.isNotNull()) {
-			m_socketMessage->receive(m_bufReceive, WeakRef<TcpDatagramClient>(this));
+			m_socketMessage->receive(m_bufReceive, SLIB_FUNCTION_WEAKREF(TcpDatagramClient, onReceiveStream, this));
 		}
 	}
 }
 
-void TcpDatagramClient::onReceive(AsyncTcpSocket* socket, void* data, sl_uint32 sizeReceive, Referable* refData, sl_bool flagError)
+void TcpDatagramClient::onReceiveStream(AsyncStreamResult* result)
 {
-	if (flagError) {
-		onMessageError(socket);
+	if (result->flagError) {
+		onMessageError(static_cast<AsyncTcpSocket*>(result->stream));
 	} else {
 		LinkedQueue<Memory> queue;
-		if (m_datagram.parse(data, sizeReceive, queue)) {
+		if (m_datagram.parse(result->data, result->size, queue)) {
 			PtrLocker<ITcpDatagramListener> listener(m_listener);
 			if (listener.isNotNull()) {
 				Memory packet;
 				while (queue.pop(&packet)) {
 					listener->onReceiveFrom(this, packet.getData(), (sl_uint32)(packet.getSize()));
+					m_onReceiveFrom(this, packet.getData(), (sl_uint32)(packet.getSize()));
 				}
 			}
 		} else {
-			onMessageError(socket);
+			onMessageError(static_cast<AsyncTcpSocket*>(result->stream));
 		}
 		ObjectLocker lock(this);
 		if (m_socketMessage.isNotNull()) {
-			m_socketMessage->receive(m_bufReceive, WeakRef<TcpDatagramClient>(this));
+			m_socketMessage->receive(m_bufReceive, SLIB_FUNCTION_WEAKREF(TcpDatagramClient, onReceiveStream, this));
 		}
 	}
 }
 
-void TcpDatagramClient::onSend(AsyncTcpSocket* socket, void* data, sl_uint32 sizeSent, Referable* refData, sl_bool flagError)
+void TcpDatagramClient::onSendStream(AsyncStreamResult* result)
 {
-	if (flagError) {
-		onMessageError(socket);
+	if (result->flagError) {
+		onMessageError(static_cast<AsyncTcpSocket*>(result->stream));
 	}
 }
 
@@ -188,6 +230,7 @@ void TcpDatagramClient::onMessageError(AsyncTcpSocket* socket)
 		if (listener.isNotNull()) {
 			listener->onError(this);
 		}
+		m_onError(this);
 		if (m_flagAutoReconnect) {
 			_reconnect();
 		} else {
@@ -199,20 +242,37 @@ void TcpDatagramClient::onMessageError(AsyncTcpSocket* socket)
 Ref<TcpDatagramClient> TcpDatagramClient::_createForServer(TcpDatagramServer* server, const Ref<Socket>& socketAccepted)
 {
 	if (server) {
+		
 		Memory memReceive = Memory::create(DATAGRAM_BUF_SIZE);
+		
 		if (memReceive.isNotEmpty()) {
+		
 			Ref<TcpDatagramClient> ret = new TcpDatagramClient;
+			
 			if (ret.isNotNull()) {
+				
 				Ref<AsyncIoLoop> loop = server->m_ioLoop;
-				Ref<AsyncTcpSocket> socket = AsyncTcpSocket::create(socketAccepted, loop);
+				
+				AsyncTcpSocketParam param;
+				param.socket = socketAccepted;
+				param.ioLoop = loop;
+				
+				Ref<AsyncTcpSocket> socket = AsyncTcpSocket::create(param);
+				
 				if (socket.isNotNull()) {
+					
 					ret->m_flagOpened = sl_true;
 					ret->m_socketMessage = socket;
 					ret->m_server = server;
-					ret->m_listener = server->m_listener;
 					ret->m_bufReceive = memReceive;
 					ret->m_maxWaitingBytesForSending = server->m_maxWaitingBytesForSending;
 					ret->m_datagram.setMaxDatagramSize(ret->m_maxWaitingBytesForSending);
+					
+					ret->m_listener = server->m_listener;
+					ret->m_onConnect = server->m_onConnect;
+					ret->m_onReceiveFrom = server->m_onReceiveFrom;
+					ret->m_onError = server->m_onError;
+					
 					return ret;
 				}
 			}
@@ -245,6 +305,17 @@ void TcpDatagramClient::_close()
 /***************************************
 		TcpDatagramServer
 ***************************************/
+
+TcpDatagramServerParam::TcpDatagramServerParam()
+{
+	flagAutoStart = sl_true;
+}
+
+TcpDatagramServerParam::~TcpDatagramServerParam()
+{
+}
+
+SLIB_DEFINE_OBJECT(TcpDatagramServer, Object)
 
 TcpDatagramServer::TcpDatagramServer()
 {
@@ -315,6 +386,10 @@ void TcpDatagramServer::onAccept(AsyncTcpServer* socketListen, const Ref<Socket>
 sl_bool TcpDatagramServer::_initialize(const TcpDatagramServerParam& param)
 {
 	m_listener = param.listener;
+	m_onConnect = param.onConnect;
+	m_onReceiveFrom = param.onReceiveFrom;
+	m_onError = param.onError;
+	
 	m_ioLoop = param.ioLoop;
 	m_maxWaitingBytesForSending = param.maxWaitingBytesForSending;
 	

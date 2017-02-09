@@ -68,8 +68,8 @@ public:
 			if (pcap_setbuff(handle, param.sizeBuffer) == 0) {
 				Ref<_NetPcapCapture> ret = new _NetPcapCapture;
 				if (ret.isNotNull()) {
+					ret->_initWithParam(param);
 					ret->m_handle = handle;
-					ret->m_listener = param.listener;
 					ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_NetPcapCapture, _run, ret.get()));
 					if (ret->m_thread.isNotNull()) {
 						ret->m_flagInit = sl_true;
@@ -99,8 +99,8 @@ public:
 							if (iRet == 0 || iRet == PCAP_WARNING || iRet == PCAP_WARNING_PROMISC_NOTSUP || iRet == PCAP_WARNING_TSTAMP_TYPE_NOTSUP) {
 								Ref<_NetPcapCapture> ret = new _NetPcapCapture;
 								if (ret.isNotNull()) {
+									ret->_initWithParam(param);
 									ret->m_handle = handle;
-									ret->m_listener = param.listener;
 									ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_NetPcapCapture, _run, ret.get()));
 									if (ret->m_thread.isNotNull()) {
 										ret->m_flagInit = sl_true;

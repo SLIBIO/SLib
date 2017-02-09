@@ -416,11 +416,18 @@ public:
 	
 };
 
-struct SLIB_EXPORT IPv4Fragment
+class SLIB_EXPORT IPv4Fragment
 {
+public:
 	sl_uint32 start;
 	sl_uint32 end;
 	Memory data;
+	
+public:
+	IPv4Fragment();
+	
+	~IPv4Fragment();
+	
 };
 
 class SLIB_EXPORT IPv4FragmentedPacket : public Referable
@@ -430,6 +437,12 @@ public:
 	List<IPv4Fragment> fragments;
 	sl_uint32 sizeAccumulated;
 	sl_uint32 sizeContent;
+	
+public:
+	IPv4FragmentedPacket();
+	
+	~IPv4FragmentedPacket();
+	
 };
 
 class SLIB_EXPORT IPv4Fragmentation : public Object

@@ -26,6 +26,10 @@ HttpServiceContext::HttpServiceContext()
 	setProcessingByThread(sl_true);
 }
 
+HttpServiceContext::~HttpServiceContext()
+{
+}
+
 Ref<HttpServiceContext> HttpServiceContext::create(const Ref<HttpServiceConnection>& connection)
 {
 	Ref<HttpServiceContext> ret;
@@ -158,7 +162,11 @@ Ref<HttpServiceConnection> HttpServiceConnection::create(HttpService* service, A
 		if (bufRead.isNotEmpty()) {
 			Ref<HttpServiceConnection> ret = new HttpServiceConnection;
 			if (ret.isNotNull()) {
-				Ref<AsyncOutput> output = AsyncOutput::create(io, WeakRef<HttpServiceConnection>(ret), SIZE_COPY_BUF);
+				AsyncOutputParam op;
+				op.stream = io;
+				op.listener.setWeak(ret);
+				op.bufferSize = SIZE_COPY_BUF;
+				Ref<AsyncOutput> output = AsyncOutput::create(op);
 				if (output.isNotNull()) {
 					ret->m_service = service;
 					ret->m_io = io;
@@ -224,7 +232,7 @@ void HttpServiceConnection::_read()
 		return;
 	}
 	m_flagReading = sl_true;
-	if (!(m_io->readToMemory(m_bufRead, (WeakRef<HttpServiceConnection>)this))) {
+	if (!(m_io->readToMemory(m_bufRead, SLIB_FUNCTION_WEAKREF(HttpServiceConnection, onReadStream, this)))) {
 		m_flagReading = sl_false;
 		close();
 	}
@@ -374,13 +382,13 @@ void HttpServiceConnection::_completeResponse(HttpServiceContext* context)
 	start();
 }
 
-void HttpServiceConnection::onRead(AsyncStream* stream, void* data, sl_uint32 size, Referable* ref, sl_bool flagError)
+void HttpServiceConnection::onReadStream(AsyncStreamResult* result)
 {
 	m_flagReading = sl_false;
-	if (flagError) {
+	if (result->flagError) {
 		close();
 	} else {
-		_processInput(data, size);
+		_processInput(result->data, result->size);
 	}
 }
 
@@ -396,7 +404,7 @@ void HttpServiceConnection::onAsyncOutputError(AsyncOutput* output)
 void HttpServiceConnection::sendResponse(const Memory& mem)
 {
 	if (mem.isNotEmpty()) {
-		if (m_io->writeFromMemory(mem, Ptr<IAsyncStreamListener>::null())) {
+		if (m_io->writeFromMemory(mem, sl_null)) {
 			return;
 		}
 	}
@@ -406,7 +414,7 @@ void HttpServiceConnection::sendResponse(const Memory& mem)
 void HttpServiceConnection::sendResponseAndRestart(const Memory& mem)
 {
 	if (mem.isNotEmpty()) {
-		if (m_io->writeFromMemory(mem, Ptr<IAsyncStreamListener>::null())) {
+		if (m_io->writeFromMemory(mem, sl_null)) {
 			start();
 			return;
 		}
@@ -414,7 +422,7 @@ void HttpServiceConnection::sendResponseAndRestart(const Memory& mem)
 	close();
 }
 
-class _HttpServiceConnection_SendResponseAndCloseListener : public Referable, public IAsyncStreamListener
+class _HttpServiceConnection_SendResponseAndCloseListener : public Referable
 {
 public:
 	WeakRef<HttpServiceConnection> m_connection;
@@ -424,7 +432,7 @@ public:
 		m_connection = connection;
 	}
 
-	void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError)
+	void onWriteStream(AsyncStreamResult* result)
 	{
 		Ref<HttpServiceConnection> connection = m_connection;
 		if (connection.isNotNull()) {
@@ -437,7 +445,7 @@ void HttpServiceConnection::sendResponseAndClose(const Memory& mem)
 {
 	if (mem.isNotEmpty()) {
 		Ref<_HttpServiceConnection_SendResponseAndCloseListener> listener(new _HttpServiceConnection_SendResponseAndCloseListener(this));
-		if (m_io->writeFromMemory(mem, listener)) {
+		if (m_io->writeFromMemory(mem, SLIB_FUNCTION_REF(_HttpServiceConnection_SendResponseAndCloseListener, onWriteStream, listener))) {
 			return;
 		}
 	}
@@ -477,6 +485,15 @@ void HttpServiceConnection::sendProxyResponse_Failed()
 /******************************************************
 	HttpServiceConnectionProvider
 ******************************************************/
+
+HttpServiceConnectionProvider::HttpServiceConnectionProvider()
+{
+}
+
+HttpServiceConnectionProvider::~HttpServiceConnectionProvider()
+{
+}
+
 Ref<HttpService> HttpServiceConnectionProvider::getService()
 {
 	return m_service;
@@ -512,7 +529,11 @@ public:
 			if (ret.isNotNull()) {
 				ret->m_loop = loop;
 				ret->setService(service);
-				Ref<AsyncTcpServer> server = AsyncTcpServer::create(addressListen, (WeakRef<_DefaultHttpServiceConnectionProvider>)(ret), loop);
+				AsyncTcpServerParam sp;
+				sp.bindAddress = addressListen;
+				sp.listener.setWeak(ret);
+				sp.ioLoop = loop;
+				Ref<AsyncTcpServer> server = AsyncTcpServer::create(sp);
 				if (server.isNotNull()) {
 					ret->m_server = server;
 					return ret;
@@ -538,7 +559,10 @@ public:
 			if (loop.isNull()) {
 				return;
 			}
-			Ref<AsyncTcpSocket> stream = AsyncTcpSocket::create(socketAccept, loop);
+			AsyncTcpSocketParam cp;
+			cp.socket = socketAccept;
+			cp.ioLoop = loop;
+			Ref<AsyncTcpSocket> stream = AsyncTcpSocket::create(cp);
 			if (stream.isNotNull()) {
 				SocketAddress addrLocal;
 				socketAccept->getLocalAddress(addrLocal);
@@ -574,6 +598,10 @@ HttpServiceParam::HttpServiceParam()
 	flagLogDebug = sl_false;
 }
 
+HttpServiceParam::~HttpServiceParam()
+{
+}
+
 
 SLIB_DEFINE_OBJECT(HttpService, Object)
 
@@ -602,6 +630,9 @@ sl_bool HttpService::_init(const HttpServiceParam& param)
 				if (! (addHttpService(param.addressBind, param.port))) {
 					return sl_false;
 				}
+			}
+			if (param.processor.isNotNull()) {
+				addProcessor(param.processor);
 			}
 			
 			ioLoop->start();
@@ -697,6 +728,12 @@ void HttpService::processRequest(const Ref<HttpServiceContext>& context)
 	
 	do {
 		
+		if (m_param.onRequest.isNotNull()) {
+			if (m_param.onRequest(this, context.get())) {
+				break;
+			}
+		}
+	
 		ListLocker< Ptr<IHttpServiceProcessor> > processors(m_processors);
 		{
 			sl_size i = 0;
@@ -954,7 +991,7 @@ void HttpService::addConnectionProvider(const Ref<HttpServiceConnectionProvider>
 	m_connectionProviders.add(provider);
 }
 
-void HttpService::removeService(const Ref<HttpServiceConnectionProvider>& provider)
+void HttpService::removeConnectionProvider(const Ref<HttpServiceConnectionProvider>& provider)
 {
 	m_connectionProviders.removeValue(provider);
 }

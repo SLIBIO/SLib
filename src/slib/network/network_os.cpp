@@ -6,6 +6,14 @@
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
+NetworkInterfaceInfo::NetworkInterfaceInfo()
+{
+}
+
+NetworkInterfaceInfo::~NetworkInterfaceInfo()
+{
+}
+
 List<IPv4Address> Network::findAllIPv4Addresses()
 {
 	List<IPv4Address> list;

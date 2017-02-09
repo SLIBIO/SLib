@@ -120,6 +120,14 @@ const sl_bool _URL_unreserved_pattern_uri[128] = {
 	/*78*/	1,		1,		1,		0,		0,		0,		1,		0
 };
 
+Url::Url()
+{
+}
+
+Url::~Url()
+{
+}
+
 void Url::parse(const String& url)
 {
 	const sl_char8* str = url.getData();

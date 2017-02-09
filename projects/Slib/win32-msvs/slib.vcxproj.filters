@@ -259,9 +259,6 @@
     <ClInclude Include="..\..\..\inc\slib\ui\camera_view.h">
       <Filter>inc\ui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\slib\network\network_async_config.h">
-      <Filter>src\slib\network</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\slib\render\opengl_gl.h">
       <Filter>src\slib\render</Filter>
     </ClInclude>
@@ -340,13 +337,7 @@
     <ClInclude Include="..\..\..\inc\slib\network\http.h">
       <Filter>inc\network</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\http_client.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\network\http_common.h">
-      <Filter>inc\network</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\inc\slib\network\http_proxy.h">
       <Filter>inc\network</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\inc\slib\network\http_service.h">
@@ -899,6 +890,9 @@
     <ClInclude Include="..\..\..\inc\slib\web\service.h">
       <Filter>inc\web</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\slib\network\network_async.h">
+      <Filter>src\slib\network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\slib\core\io.cpp">
@@ -1141,13 +1135,7 @@
     <ClCompile Include="..\..\..\src\slib\device\vibrator.cpp">
       <Filter>src\slib\device</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\http_client.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\slib\network\http_common.cpp">
-      <Filter>src\slib\network</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\slib\network\http_proxy.cpp">
       <Filter>src\slib\network</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\slib\network\http_service.cpp">
