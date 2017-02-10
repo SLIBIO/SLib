@@ -734,7 +734,7 @@ void HttpService::processRequest(const Ref<HttpServiceContext>& context)
 			}
 		}
 	
-		ListLocker< Ptr<IHttpServiceProcessor> > processors(m_processors);
+		ListElements< Ptr<IHttpServiceProcessor> > processors(m_processorsCached);
 		{
 			sl_size i = 0;
 			for (; i < processors.count; i++) {
@@ -974,16 +974,18 @@ void HttpService::closeConnection(HttpServiceConnection* connection)
 void HttpService::addProcessor(const Ptr<IHttpServiceProcessor>& processor)
 {
 	m_processors.add(processor);
+	m_processorsCached = m_processors.duplicate();
 }
 
 void HttpService::removeProcessor(const Ptr<IHttpServiceProcessor>& processor)
 {
 	m_processors.removeValue(processor);
+	m_processorsCached = m_processors.duplicate();
 }
 
 List< Ptr<IHttpServiceProcessor> > HttpService::getProcessors()
 {
-	return m_processors.duplicate();
+	return m_processorsCached;
 }
 
 void HttpService::addConnectionProvider(const Ref<HttpServiceConnectionProvider>& provider)

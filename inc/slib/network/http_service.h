@@ -281,6 +281,7 @@ protected:
 	HashMap< HttpServiceConnection*, Ref<HttpServiceConnection> > m_connections;
 
 	CList< Ptr<IHttpServiceProcessor> > m_processors;
+	AtomicList< Ptr<IHttpServiceProcessor> > m_processorsCached;
 	CList< Ref<HttpServiceConnectionProvider> > m_connectionProviders;
 
 	HttpServiceParam m_param;
