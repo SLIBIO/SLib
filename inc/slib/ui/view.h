@@ -983,6 +983,11 @@ public:
 	void setPassingEventsToChildren(sl_bool flag);
 	
 	
+	sl_bool isProcessingOkCancel();
+	
+	void setProcessingOkCancel(sl_bool flag);
+
+	
 	Ref<View> getNextFocusableView();
 	
 	Ref<View> getPreviousFocusableView();
@@ -1096,6 +1101,14 @@ public:
 	
 	void setOnSwipe(const Function<void(View*, GestureEvent*)>& callback);
 	
+	Function<void(View*, UIEvent*)> getOnOK();
+	
+	void setOnOK(const Function<void(View*, UIEvent*)>& callback);
+	
+	Function<void(View*, UIEvent*)> getOnCancel();
+	
+	void setOnCancel(const Function<void(View*, UIEvent*)>& callback);
+	
 protected:
 	virtual void onDraw(Canvas* canvas);
 	
@@ -1153,6 +1166,10 @@ protected:
 	
 	virtual void onUpdatePaging();
 	
+	virtual void onOK(UIEvent* ev);
+	
+	virtual void onCancel(UIEvent* ev);
+	
 public:
 	virtual void dispatchDraw(Canvas* canvas);
 	
@@ -1180,7 +1197,7 @@ public:
 	
 	virtual void dispatchClick(UIEvent* ev);
 	
-	void dispatchClickWithNoEvent();
+	void dispatchClick();
 	
 	virtual void dispatchSetCursor(UIEvent* ev);
 	
@@ -1195,6 +1212,14 @@ public:
 	virtual void dispatchScroll(sl_scroll_pos x, sl_scroll_pos y);
 
 	virtual void dispatchSwipe(GestureEvent* ev);
+	
+	virtual void dispatchOK(UIEvent* ev);
+	
+	void dispatchOK();
+	
+	virtual void dispatchCancel(UIEvent* ev);
+	
+	void dispatchCancel();
 	
 private:
 	void _processAttachOnUiThread();
@@ -1322,6 +1347,7 @@ private:
 	sl_bool m_flagOnAddChild;
 	sl_bool m_flagOnRemoveChild;
 	
+	sl_bool m_flagProcessingOkCancel;
 	sl_bool m_flagProcessingTabStop;
 	AtomicWeakRef<View> m_viewNextTabStop;
 	AtomicWeakRef<View> m_viewPrevTabStop;
@@ -1557,6 +1583,8 @@ protected:
 		AtomicFunction<void(View*, sl_ui_len, sl_ui_len)> resize;
 		AtomicFunction<void(View*, sl_scroll_pos, sl_scroll_pos)> scroll;
 		AtomicFunction<void(View*, GestureEvent*)> swipe;
+		AtomicFunction<void(View*, UIEvent*)> ok;
+		AtomicFunction<void(View*, UIEvent*)> cancel;
 		
 	public:
 		EventAttributes();

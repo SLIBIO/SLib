@@ -69,6 +69,7 @@ Button::Button() : Button(2)
 Button::Button(sl_uint32 nCategories, ButtonCategory* categories)
 {
 	setCreatingNativeWidget(sl_false);
+	setFocusable(sl_true);
 	
 	setAlwaysOnDrawBackground(sl_true, UIUpdateMode::Init);
 	setAlwaysOnDrawBorder(sl_true, UIUpdateMode::Init);
@@ -719,6 +720,21 @@ void Button::onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical)
 		setMeasuredHeight(height);
 	}
 	
+}
+
+void Button::onKeyEvent(UIEvent* ev)
+{
+	if (ev->getAction() == UIAction::KeyDown) {
+		if (ev->getKeycode() == Keycode::Enter) {
+			dispatchClick();
+			ev->preventDefault();
+		}
+	}
+}
+
+void Button::onClick(UIEvent* ev)
+{
+	dispatchOK(ev);
 }
 
 UISize Button::measureContentSize()

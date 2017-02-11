@@ -291,6 +291,8 @@ public:
 	
 	SLIB_PROPERTY(AtomicFunction<void(Window*, UIEvent*)>, OnClose)
 	
+	SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnDestroy)
+	
 	SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnActivate)
 	
 	SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnDeactivate)
@@ -308,6 +310,10 @@ public:
 	SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnMaximize)
 	
 	SLIB_PROPERTY(AtomicFunction<void(Window*)>, OnDemaximize)
+	
+	SLIB_PROPERTY(AtomicFunction<void(Window*, UIEvent* ev)>, OnOK)
+	
+	SLIB_PROPERTY(AtomicFunction<void(Window*, UIEvent* ev)>, OnCancel)
 
 protected:
 	virtual void onCreate();
@@ -315,6 +321,8 @@ protected:
 	virtual void onCreateFailed();
 	
 	virtual void onClose(UIEvent* ev);
+	
+	virtual void onDestroy();
 	
 	virtual void onActivate();
 	
@@ -334,12 +342,18 @@ protected:
 	
 	virtual void onDemaximize();
 	
+	virtual void onOK(UIEvent* ev);
+	
+	virtual void onCancel(UIEvent* ev);
+
 public:
 	virtual void dispatchCreate();
 	
 	virtual void dispatchCreateFailed();
 	
 	virtual void dispatchClose(UIEvent* ev);
+	
+	virtual void dispatchDestroy();
 	
 	virtual void dispatchActivate();
 	
@@ -358,7 +372,15 @@ public:
 	virtual void dispatchMaximize();
 	
 	virtual void dispatchDemaximize();
-
+	
+	virtual void dispatchOK(UIEvent* ev);
+	
+	void dispatchOK();
+	
+	virtual void dispatchCancel(UIEvent* ev);
+	
+	void dispatchCancel();
+	
 private:
 	Ref<WindowInstance> createWindowInstance(const WindowInstanceParam& param);
 

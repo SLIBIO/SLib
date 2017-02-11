@@ -165,11 +165,28 @@ void AlertDialog::run(const String& text)
 	alert.run();
 }
 
+void AlertDialog::run(const Ref<Window>& parent, const String& text)
+{
+	AlertDialog alert;
+	alert.text = text;
+	alert.parent = parent;
+	alert.run();
+}
+
 void AlertDialog::run(const String& caption, const String& text)
 {
 	AlertDialog alert;
 	alert.caption = caption;
 	alert.text = text;
+	alert.run();
+}
+
+void AlertDialog::run(const Ref<Window>& parent, const String& caption, const String& text)
+{
+	AlertDialog alert;
+	alert.caption = caption;
+	alert.text = text;
+	alert.parent = parent;
 	alert.run();
 }
 
@@ -205,12 +222,31 @@ DialogResult AlertDialog::runOkCancel(const String& text)
 	return alert.run();
 }
 
+DialogResult AlertDialog::runOkCancel(const Ref<Window>& parent, const String& text)
+{
+	AlertDialog alert;
+	alert.type = AlertDialogType::OkCancel;
+	alert.text = text;
+	alert.parent = parent;
+	return alert.run();
+}
+
 DialogResult AlertDialog::runOkCancel(const String& caption, const String& text)
 {
 	AlertDialog alert;
 	alert.type = AlertDialogType::OkCancel;
 	alert.caption = caption;
 	alert.text = text;
+	return alert.run();
+}
+
+DialogResult AlertDialog::runOkCancel(const Ref<Window>& parent, const String& caption, const String& text)
+{
+	AlertDialog alert;
+	alert.type = AlertDialogType::OkCancel;
+	alert.caption = caption;
+	alert.text = text;
+	alert.parent = parent;
 	return alert.run();
 }
 
@@ -263,12 +299,31 @@ DialogResult AlertDialog::runYesNo(const String& text)
 	return alert.run();
 }
 
+DialogResult AlertDialog::runYesNo(const Ref<Window>& parent, const String& text)
+{
+	AlertDialog alert;
+	alert.type = AlertDialogType::YesNo;
+	alert.text = text;
+	alert.parent = parent;
+	return alert.run();
+}
+
 DialogResult AlertDialog::runYesNo(const String& caption, const String& text)
 {
 	AlertDialog alert;
 	alert.type = AlertDialogType::YesNo;
 	alert.caption = caption;
 	alert.text = text;
+	return alert.run();
+}
+
+DialogResult AlertDialog::runYesNo(const Ref<Window>& parent, const String& caption, const String& text)
+{
+	AlertDialog alert;
+	alert.type = AlertDialogType::YesNo;
+	alert.caption = caption;
+	alert.text = text;
+	alert.parent = parent;
 	return alert.run();
 }
 
@@ -321,12 +376,31 @@ DialogResult AlertDialog::runYesNoCancel(const String& text)
 	return alert.run();
 }
 
+DialogResult AlertDialog::runYesNoCancel(const Ref<Window>& parent, const String& text)
+{
+	AlertDialog alert;
+	alert.type = AlertDialogType::YesNoCancel;
+	alert.text = text;
+	alert.parent = parent;
+	return alert.run();
+}
+
 DialogResult AlertDialog::runYesNoCancel(const String& caption, const String& text)
 {
 	AlertDialog alert;
 	alert.type = AlertDialogType::YesNoCancel;
 	alert.caption = caption;
 	alert.text = text;
+	return alert.run();
+}
+
+DialogResult AlertDialog::runYesNoCancel(const Ref<Window>& parent, const String& caption, const String& text)
+{
+	AlertDialog alert;
+	alert.type = AlertDialogType::YesNoCancel;
+	alert.caption = caption;
+	alert.text = text;
+	alert.parent = parent;
 	return alert.run();
 }
 

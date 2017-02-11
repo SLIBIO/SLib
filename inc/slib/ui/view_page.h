@@ -339,6 +339,12 @@ public:
 	
 	virtual void dispatchCloseWindow(UIEvent* ev);
 	
+	// override
+	virtual void dispatchOK(UIEvent* ev);
+
+	// override
+	virtual void dispatchCancel(UIEvent* ev);
+	
 protected:
 	void _openPopup(const Ref<View>& parent, Transition transition, sl_bool flagFillParentBackground);
 	
@@ -352,6 +358,8 @@ protected:
 	
 	void _applyDefaultClosingPopupTransition(Transition& transition);
 	
+	void _onClosePopupWindow(Window* window, UIEvent* ev);
+
 public:
 	SLIB_PROPERTY(AtomicFunction<void(ViewPage*, ViewPager* pager, UIPageAction action)>, OnPageAction);
 	

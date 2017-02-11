@@ -14,7 +14,6 @@ public:
 public:
 	_TreeContentView()
 	{
-		setFocusable(sl_true);
 	}
 	
 	// override

@@ -851,6 +851,10 @@ void IWindowListener::onClose(Window* window, UIEvent* ev)
 {
 }
 
+void IWindowListener::onCancel(Window* window)
+{
+}
+
 void IWindowListener::onActivate(Window* window)
 {
 }
@@ -927,6 +931,11 @@ void UIEventLogListener::onSwipe(View* view, GestureEvent* ev)
 void UIEventLogListener::onClose(Window* window, UIEvent* ev)
 {
 	Log("Window", "OnClose");
+}
+
+void UIEventLogListener::onCancel(Window* window)
+{
+	Log("Window", "onCancel");
 }
 
 void UIEventLogListener::onActivate(Window* window)

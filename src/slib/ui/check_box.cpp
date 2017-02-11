@@ -142,6 +142,10 @@ void CheckBox::dispatchClick(UIEvent* ev)
 	Button::dispatchClick(ev);
 }
 
+void CheckBox::dispatchClick()
+{
+	View::dispatchClick();
+}
 
 #if !(defined(SLIB_PLATFORM_IS_OSX)) && !(defined(SLIB_PLATFORM_IS_WIN32))
 

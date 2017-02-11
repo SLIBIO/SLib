@@ -27,6 +27,8 @@ public:
 	
 	// override
 	void dispatchClick(UIEvent* ev);
+
+	void dispatchClick();
 	
 public:
 	void _getChecked_NW();

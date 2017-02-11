@@ -195,9 +195,19 @@ void UI::alert(const String& text)
 	AlertDialog::run(text);
 }
 
+void UI::alert(const Ref<Window>& parent, const String& text)
+{
+	AlertDialog::run(parent, text);
+}
+
 void UI::alert(const String& caption, const String& text)
 {
 	AlertDialog::run(caption, text);
+}
+
+void UI::alert(const Ref<Window>& parent, const String& caption, const String& text)
+{
+	AlertDialog::run(parent, caption, text);
 }
 
 void UI::showAlert(const String& text)

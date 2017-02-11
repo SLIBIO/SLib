@@ -65,9 +65,15 @@ public:
 	// Message Box
 	// Run on UI thread
 	static void alert(const String& text);
-	
+
+	// Run on UI thread
+	static void alert(const Ref<Window>& parent, const String& text);
+
 	// Run on UI thread
 	static void alert(const String& caption, const String& text);
+	
+	// Run on UI thread
+	static void alert(const Ref<Window>& parent, const String& caption, const String& text);
 	
 	static void showAlert(const String& text);
 	

@@ -99,8 +99,10 @@ void Window::close()
 	Ref<WindowInstance> instance = m_instance;
 	if (instance.isNotNull()) {
 		instance->close();
+		detach();
+		lock.unlock();
+		dispatchDestroy();
 	}
-	detach();
 }
 
 sl_bool Window::isClosed()
@@ -768,7 +770,7 @@ void Window::detach()
 	getFrame();
 	isMaximized();
 	isMinimized();
-	
+
 	Ref<View> view = m_viewContent;
 	if (view.isNotNull()) {
 		view->detach();
@@ -912,6 +914,10 @@ void Window::onClose(UIEvent* ev)
 {
 }
 
+void Window::onDestroy()
+{
+}
+
 void Window::onActivate()
 {
 }
@@ -948,6 +954,14 @@ void Window::onDemaximize()
 {
 }
 
+void Window::onOK(UIEvent* ev)
+{
+}
+
+void Window::onCancel(UIEvent* ev)
+{
+}
+
 void Window::dispatchCreate()
 {
 	onCreate();
@@ -972,6 +986,17 @@ void Window::dispatchClose(UIEvent* ev)
 		return;
 	}
 	detach();
+	dispatchDestroy();
+}
+
+void Window::dispatchDestroy()
+{
+	onDestroy();
+	PtrLocker<IWindowListener> listener(getEventListener());
+	if (listener.isNotNull()) {
+		listener->onCancel(this);
+	}
+	getOnDestroy()(this);
 }
 
 void Window::dispatchActivate()
@@ -1065,6 +1090,38 @@ void Window::dispatchDemaximize()
 		listener->onDemaximize(this);
 	}
 	getOnDemaximize()(this);
+}
+
+void Window::dispatchOK(UIEvent* ev)
+{
+	onOK(ev);
+	getOnOK()(this, ev);
+}
+
+void Window::dispatchOK()
+{
+	Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
+	if (ev.isNotNull()) {
+		dispatchOK(ev.get());
+	}
+}
+
+void Window::dispatchCancel(UIEvent* ev)
+{
+	onCancel(ev);
+	getOnCancel()(this, ev);
+	if (ev->isPreventedDefault()) {
+		return;
+	}
+	close();
+}
+
+void Window::dispatchCancel()
+{
+	Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
+	if (ev.isNotNull()) {
+		dispatchCancel(ev.get());
+	}
 }
 
 void Window::_refreshSize()

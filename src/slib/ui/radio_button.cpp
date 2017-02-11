@@ -106,6 +106,11 @@ void RadioButton::dispatchClick(UIEvent* ev)
 	}
 }
 
+void RadioButton::dispatchClick()
+{
+	View::dispatchClick();
+}
+
 
 SLIB_DEFINE_OBJECT(RadioGroup, Object)
 

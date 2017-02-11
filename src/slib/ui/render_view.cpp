@@ -346,18 +346,6 @@ void RenderView::dispatchKeyEvent(UIEvent* ev)
 	View::dispatchKeyEvent(ev);
 }
 
-void RenderView::dispatchClick(UIEvent* ev)
-{
-	if (m_flagDispatchEventsToRenderingThread) {
-		if (isNativeWidget()) {
-			m_queuePostedCallbacks.push(SLIB_BIND_WEAKREF(void(), RenderView, _dispatchClick, this, ev->duplicate()));
-			requestRender();
-			return;
-		}
-	}
-	View::dispatchClick(ev);
-}
-
 void RenderView::dispatchSetCursor(UIEvent* ev)
 {
 	if (m_flagDispatchEventsToRenderingThread) {
@@ -400,11 +388,6 @@ void RenderView::_dispatchMouseWheelEvent(const Ref<UIEvent>& ev)
 void RenderView::_dispatchKeyEvent(const Ref<UIEvent>& ev)
 {
 	View::dispatchKeyEvent(ev.get());
-}
-
-void RenderView::_dispatchClick(const Ref<UIEvent>& ev)
-{
-	View::dispatchClick(ev.get());
 }
 
 void RenderView::_dispatchSetCursor(const Ref<UIEvent>& ev)

@@ -26,7 +26,11 @@ class SLIB_EXPORT AlertDialog : public Referable
 public:
 	static void run(const String& text);
 	
+	static void run(const Ref<Window>& parent, const String& text);
+	
 	static void run(const String& caption, const String& text);
+	
+	static void run(const Ref<Window>& parent, const String& caption, const String& text);
 	
 	static void show(const String& text);
 
@@ -36,7 +40,11 @@ public:
 
 	static DialogResult runOkCancel(const String& text);
 	
+	static DialogResult runOkCancel(const Ref<Window>& parent, const String& text);
+	
 	static DialogResult runOkCancel(const String& caption, const String& text);
+	
+	static DialogResult runOkCancel(const Ref<Window>& parent, const String& caption, const String& text);
 	
 	static void showOkCancel(const String& text, const Function<void()>& onOk, const Function<void()>& onCancel);
 	
@@ -48,7 +56,11 @@ public:
 	
 	static DialogResult runYesNo(const String& text);
 	
+	static DialogResult runYesNo(const Ref<Window>& parent, const String& text);
+	
 	static DialogResult runYesNo(const String& caption, const String& text);
+	
+	static DialogResult runYesNo(const Ref<Window>& parent, const String& caption, const String& text);
 	
 	static void showYesNo(const String& text, const Function<void()>& onYes, const Function<void()>& onNo);
 	
@@ -60,7 +72,11 @@ public:
 	
 	static DialogResult runYesNoCancel(const String& text);
 	
+	static DialogResult runYesNoCancel(const Ref<Window>& parent, const String& text);
+	
 	static DialogResult runYesNoCancel(const String& caption, const String& text);
+	
+	static DialogResult runYesNoCancel(const Ref<Window>& parent, const String& caption, const String& text);
 	
 	static void showYesNoCancel(const String& text, const Function<void()>& onYes, const Function<void()>& onNo, const Function<void()>& onCancel);
 	

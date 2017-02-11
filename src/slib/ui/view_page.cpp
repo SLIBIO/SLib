@@ -1253,6 +1253,7 @@ Ref<Window> ViewPage::popupWindow(const Ref<Window>& parent)
 	}
 	
 	Ref<Window> window = new Window;
+	
 	if (window.isNotNull()) {
 		window->setParent(parent);
 		window->setContentView(this);
@@ -1265,32 +1266,35 @@ Ref<Window> ViewPage::popupWindow(const Ref<Window>& parent)
 		}
 		window->setClientSize(getWidth(), getHeight());
 		window->setModal(sl_true);
-		WeakRef<ViewPage> _page = this;
-		window->setOnClose([_page](Window* window, UIEvent* ev) {
-			Ref<ViewPage> page(_page);
-			if (page.isNotNull()) {
-				ObjectLocker lock(page.get());
-				if (page->m_popupState == PopupState::ShowWindow) {
-					if (page->_dispatchCloseWindow()) {
-						page->m_popupState = PopupState::None;
-						lock.unlock();
-						page->dispatchClose();
-					} else {
-						ev->preventDefault();
-					}
-				}
-			}
-		});
+		window->setOnClose(SLIB_FUNCTION_WEAKREF(ViewPage, _onClosePopupWindow, this));
 		
 		window->create();
 		
 		m_popupState = PopupState::ShowWindow;
+		
+		lock.unlock();
+		
+		dispatchOpen();
 		
 		return window;
 		
 	}
 	
 	return sl_null;
+}
+
+void ViewPage::_onClosePopupWindow(Window* window, UIEvent* ev)
+{
+	ObjectLocker lock(this);
+	if (m_popupState == PopupState::ShowWindow) {
+		if (_dispatchCloseWindow()) {
+			m_popupState = PopupState::None;
+			lock.unlock();
+			dispatchClose();
+		} else {
+			ev->preventDefault();
+		}
+	}
 }
 
 sl_bool ViewPage::isPopup()
@@ -1565,6 +1569,24 @@ void ViewPage::dispatchCloseWindow(UIEvent* ev)
 {
 	onCloseWindow(ev);
 	getOnCloseWindow()(this, ev);
+}
+
+void ViewPage::dispatchOK(UIEvent* ev)
+{
+	ViewGroup::dispatchOK(ev);
+}
+
+void ViewPage::dispatchCancel(UIEvent* ev)
+{
+	onCancel(ev);
+	getOnCancel()(this, ev);
+	if (ev->isStoppedPropagation()) {
+		return;
+	}
+	if (ev->isPreventedDefault()) {
+		return;
+	}
+	close();
 }
 
 SLIB_UI_NAMESPACE_END

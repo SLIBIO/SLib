@@ -21,6 +21,7 @@ EditView::EditView()
 {
 	setCreatingNativeWidget(sl_true);
 	setUsingFont(sl_true);
+	setFocusable(sl_true);
 	m_textAlignment = Alignment::MiddleCenter;
 	m_flagReadOnly = sl_false;
 	m_flagMultiLine = sl_false;
@@ -224,7 +225,7 @@ void EditView::dispatchKeyEvent(UIEvent* ev)
 {
 	View::dispatchKeyEvent(ev);
 	if (!(isMultiLine())) {
-		if (ev->getAction() == UIAction::KeyUp) {
+		if (ev->getAction() == UIAction::KeyDown) {
 			if (ev->getKeycode() == Keycode::Enter) {
 				dispatchReturnKey();
 			}

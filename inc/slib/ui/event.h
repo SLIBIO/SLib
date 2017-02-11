@@ -361,6 +361,8 @@ class SLIB_EXPORT IWindowListener
 public:
 	virtual void onClose(Window* window, UIEvent* ev);
 	
+	virtual void onCancel(Window* window);
+	
 	virtual void onActivate(Window* window);
 	
 	virtual void onDeactivate(Window* window);
@@ -401,6 +403,8 @@ public:
 	
 	// window related events
 	void onClose(Window* window, UIEvent* ev);
+	
+	void onCancel(Window* window);
 	
 	void onActivate(Window* window);
 	

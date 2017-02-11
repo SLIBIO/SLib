@@ -103,6 +103,30 @@ SLIB_UI_NAMESPACE_END
 	[super setFrame:frame];
 }
 
+- (void)keyDown:(NSEvent*)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		sl_bool flagNoDefault = instance->onEventKey(sl_true, theEvent);
+		if (flagNoDefault) {
+			return;
+		}
+	}
+	[super keyDown:theEvent];
+}
+
+- (void)keyUp:(NSEvent*)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		sl_bool flagNoDefault = instance->onEventKey(sl_false, theEvent);
+		if (flagNoDefault) {
+			return;
+		}
+	}
+	[super keyUp:theEvent];
+}
+
 @end
 
 #endif

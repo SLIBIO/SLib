@@ -213,6 +213,12 @@ protected:
 	// override
 	void onMeasureLayout(sl_bool flagHorizontal, sl_bool flagVertical);
 	
+	// override
+	void onKeyEvent(UIEvent* ev);
+
+	// override
+	void onClick(UIEvent* ev);
+	
 protected:
 	virtual UISize measureContentSize();
 

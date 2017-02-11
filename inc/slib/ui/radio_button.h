@@ -24,6 +24,8 @@ public:
 	
 	// override
 	void dispatchClick(UIEvent* ev);
+
+	void dispatchClick();
 	
 public:
 	SLIB_PROPERTY(AtomicWeakRef<RadioGroup>, RadioGroup)

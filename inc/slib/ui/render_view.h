@@ -96,9 +96,6 @@ public:
 	void dispatchKeyEvent(UIEvent* ev);
 	
 	// override
-	void dispatchClick(UIEvent* ev);
-	
-	// override
 	void dispatchSetCursor(UIEvent* ev);
 	
 	// override
@@ -112,8 +109,6 @@ private:
 	void _dispatchMouseWheelEvent(const Ref<UIEvent>& ev);
 	
 	void _dispatchKeyEvent(const Ref<UIEvent>& ev);
-	
-	void _dispatchClick(const Ref<UIEvent>& ev);
 	
 	void _dispatchSetCursor(const Ref<UIEvent>& ev);
 	

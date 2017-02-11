@@ -53,6 +53,7 @@ View::View()
 	m_actionMouseDown = UIAction::Unknown;
 	m_flagMultiTouchMode = sl_false;
 	m_flagPassEventToChildren = sl_true;
+	m_flagProcessingOkCancel = sl_true;
 	m_flagProcessingTabStop = sl_true;
 	
 	m_flagCapturingChildInstanceEvents = sl_false;
@@ -540,7 +541,11 @@ void View::detach()
 
 void View::_processAttachOnUiThread()
 {
-	if (isInstance()) {
+	Ref<ViewInstance> instance = m_instance;
+	if (instance.isNotNull()) {
+		if (m_flagFocused) {
+			instance->setFocus();
+		}
 		Ref<GestureDetector> gesture = m_gestureDetector;
 		if (gesture.isNotNull()) {
 			gesture->enableNative();
@@ -6120,15 +6125,25 @@ void View::setPassingEventsToChildren(sl_bool flag)
 	m_flagPassEventToChildren = flag;
 }
 
+sl_bool View::isProcessingOkCancel()
+{
+	return m_flagProcessingOkCancel;
+}
+
+void View::setProcessingOkCancel(sl_bool flag)
+{
+	m_flagProcessingOkCancel = flag;
+}
+
 Ref<View> View::getNextFocusableView()
 {
 	Ref<View> parent = getParent();
 	if (parent.isNull()) {
-		return this;
+		return getFirstFocusableDescendant();
 	}
 	{
 		sl_size index = 0;
-		ListLocker< Ref<View> > children(m_children);
+		ListLocker< Ref<View> > children(parent->m_children);
 		sl_size i;
 		for (i = 0; i < children.count; i++) {
 			if (children[i] == this) {
@@ -6157,11 +6172,11 @@ Ref<View> View::getPreviousFocusableView()
 {
 	Ref<View> parent = getParent();
 	if (parent.isNull()) {
-		return this;
+		return getLastFocusableDescendant();
 	}
 	{
 		sl_size index = 0;
-		ListLocker< Ref<View> > children(m_children);
+		ListLocker< Ref<View> > children(parent->m_children);
 		sl_size i;
 		for (i = 0; i < children.count; i++) {
 			if (children[i] == this) {
@@ -6244,6 +6259,11 @@ Ref<View> View::getNextTabStop()
 void View::setNextTabStop(const Ref<View>& view)
 {
 	m_viewNextTabStop = view;
+	if (view.isNotNull()) {
+		if (view->m_viewPrevTabStop.isNull()) {
+			view->m_viewPrevTabStop = this;
+		}
+	}
 }
 
 Ref<View> View::getPreviousTabStop()
@@ -6258,6 +6278,11 @@ Ref<View> View::getPreviousTabStop()
 void View::setPreviousTabStop(const Ref<View>& view)
 {
 	m_viewPrevTabStop = view;
+	if (view.isNotNull()) {
+		if (view->m_viewNextTabStop.isNull()) {
+			view->m_viewNextTabStop = this;
+		}
+	}
 }
 
 sl_bool View::isCapturingChildInstanceEvents()
@@ -6872,6 +6897,40 @@ void View::setOnSwipe(const Function<void(View*, GestureEvent*)>& callback)
 	}
 }
 
+Function<void(View*, UIEvent*)> View::getOnOK()
+{
+	Ref<EventAttributes> attrs = m_eventAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->ok;
+	}
+	return sl_null;
+}
+
+void View::setOnOK(const Function<void(View*, UIEvent*)>& callback)
+{
+	Ref<EventAttributes> attrs = _initializeEventAttributes();
+	if (attrs.isNotNull()) {
+		attrs->ok = callback;
+	}
+}
+
+Function<void(View*, UIEvent*)> View::getOnCancel()
+{
+	Ref<EventAttributes> attrs = m_eventAttributes;
+	if (attrs.isNotNull()) {
+		return attrs->cancel;
+	}
+	return sl_null;
+}
+
+void View::setOnCancel(const Function<void(View*, UIEvent*)>& callback)
+{
+	Ref<EventAttributes> attrs = _initializeEventAttributes();
+	if (attrs.isNotNull()) {
+		attrs->cancel = callback;
+	}
+}
+
 void View::dispatchDraw(Canvas* canvas)
 {
 	m_flagCurrentDrawing = sl_true;
@@ -7061,6 +7120,14 @@ void View::onChangePadding()
 
 void View::onUpdatePaging()
 {	
+}
+
+void View::onOK(UIEvent* ev)
+{
+}
+
+void View::onCancel(UIEvent* ev)
+{
 }
 
 static UIAction _View_getActionUp(UIAction actionDown)
@@ -7681,8 +7748,8 @@ void View::dispatchKeyEvent(UIEvent* ev)
 		return;
 	}
 	
-	Ref<View> viewFocusedChild = getFocusedChild();
-	if (viewFocusedChild.isNotNull()) {
+	Ref<View> viewFocusedChild = m_childFocused;
+	if (viewFocusedChild.isNotNull() && !(viewFocusedChild->isInstance())) {
 		viewFocusedChild->dispatchKeyEvent(ev);
 	}
 	
@@ -7708,6 +7775,7 @@ void View::dispatchKeyEvent(UIEvent* ev)
 	}
 	
 	onKeyEvent(ev);
+	
 	if (ev->isPreventedDefault()) {
 		return;
 	}
@@ -7716,24 +7784,43 @@ void View::dispatchKeyEvent(UIEvent* ev)
 		_processContentScrollingEvents(ev);
 	}
 	
-	if (isProcessingTabStop()) {
-		Keycode key = ev->getKeycode();
-		if (key == Keycode::Tab) {
-			if (ev->isShiftKey()) {
-				Ref<View> v = getPreviousTabStop();
-				if (v.isNotNull() && v != this) {
-					v->setFocus();
-					ev->stopPropagation();
-				}
-			} else {
-				Ref<View> v = getNextTabStop();
-				if (v.isNotNull() && v != this) {
-					v->setFocus();
-					ev->stopPropagation();
+	if (m_flagProcessingTabStop) {
+		if (ev->getAction() == UIAction::KeyUp) {
+			if (ev->getKeycode() == Keycode::Tab) {
+				if (ev->isShiftKey()) {
+					Ref<View> v = getPreviousTabStop();
+					if (v.isNotNull() && v != this) {
+						v->setFocus();
+						ev->stopPropagation();
+						ev->preventDefault();
+					}
+				} else {
+					Ref<View> v = getNextTabStop();
+					if (v.isNotNull() && v != this) {
+						v->setFocus();
+						ev->stopPropagation();
+						ev->preventDefault();
+					}
 				}
 			}
 		}
 	}
+	
+	if (m_flagProcessingOkCancel) {
+		if (ev->getAction() == UIAction::KeyDown) {
+			Keycode keycode = ev->getKeycode();
+			if (keycode == Keycode::Enter) {
+				dispatchOK();
+				ev->stopPropagation();
+				ev->preventDefault();
+			} else if (keycode == Keycode::Escape) {
+				dispatchCancel();
+				ev->stopPropagation();
+				ev->preventDefault();
+			}
+		}
+	}
+	
 }
 
 void View::dispatchClick(UIEvent* ev)
@@ -7764,7 +7851,7 @@ void View::dispatchClick(UIEvent* ev)
 
 }
 
-void View::dispatchClickWithNoEvent()
+void View::dispatchClick()
 {
 	Ref<UIEvent> ev = UIEvent::createMouseEvent(UIAction::Unknown, 0, 0, Time::zero());
 	if (ev.isNotNull()) {
@@ -7928,6 +8015,64 @@ void View::dispatchSwipe(GestureEvent* ev)
 			listener->onSwipe(this, ev);
 		}
 		(eventAttrs->swipe)(this, ev);
+	}
+}
+
+void View::dispatchOK(UIEvent* ev)
+{
+	onOK(ev);
+	Ref<EventAttributes> eventAttrs = m_eventAttributes;
+	if (eventAttrs.isNotNull()) {
+		(eventAttrs->ok)(this, ev);
+	}
+	if (ev->isStoppedPropagation()) {
+		return;
+	}
+	Ref<View> parent = m_parent;
+	if (parent.isNotNull()) {
+		parent->dispatchOK(ev);
+	} else {
+		Ref<Window> window = m_window;
+		if (window.isNotNull()) {
+			window->dispatchOK();
+		}
+	}
+}
+
+void View::dispatchOK()
+{
+	Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
+	if (ev.isNotNull()) {
+		dispatchOK(ev.get());
+	}
+}
+
+void View::dispatchCancel(UIEvent* ev)
+{
+	onCancel(ev);
+	Ref<EventAttributes> eventAttrs = m_eventAttributes;
+	if (eventAttrs.isNotNull()) {
+		(eventAttrs->cancel)(this, ev);
+	}
+	if (ev->isStoppedPropagation()) {
+		return;
+	}
+	Ref<View> parent = m_parent;
+	if (parent.isNotNull()) {
+		parent->dispatchCancel(ev);
+	} else {
+		Ref<Window> window = m_window;
+		if (window.isNotNull()) {
+			window->dispatchCancel();
+		}
+	}
+}
+
+void View::dispatchCancel()
+{
+	Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
+	if (ev.isNotNull()) {
+		dispatchCancel(ev.get());
 	}
 }
 
@@ -8405,7 +8550,7 @@ void ViewInstance::onClick()
 {
 	Ref<View> view = getView();
 	if (view.isNotNull()) {
-		view->dispatchClickWithNoEvent();
+		view->dispatchClick();
 	}
 }
 
