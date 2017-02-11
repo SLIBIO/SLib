@@ -326,6 +326,11 @@ SocketError Socket::getLastError() const
 	return m_lastError;
 }
 
+String Socket::getLastErrorMessage() const
+{
+	return getErrorMessage(m_lastError);
+}
+
 sl_bool Socket::shutdown(SocketShutdownMode mode)
 {
 	if (isOpened()) {

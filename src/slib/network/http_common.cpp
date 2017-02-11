@@ -210,6 +210,7 @@ sl_reg HttpHeaders::parseHeaders(IMap<String, String>* map, const void* _data, s
 /***********************************************************************
 	HttpRequest
 ***********************************************************************/
+
 HttpRequest::HttpRequest()
 {
 	SLIB_STATIC_STRING(s1, "HTTP/1.1");
@@ -218,6 +219,10 @@ HttpRequest::HttpRequest()
 	SLIB_STATIC_STRING(s2, "GET");
 	m_methodText = s2;
 	m_methodTextUpper = s2;
+}
+
+HttpRequest::~HttpRequest()
+{
 }
 
 HttpMethod HttpRequest::getMethod() const
@@ -680,6 +685,10 @@ HttpResponse::HttpResponse()
 	m_responseHeaders.initHash(0, HashIgnoreCaseString(), EqualsIgnoreCaseString());
 }
 
+HttpResponse::~HttpResponse()
+{
+}
+
 HttpStatus HttpResponse::getResponseCode() const
 {
 	return m_responseCode;
@@ -973,6 +982,10 @@ HttpOutputBuffer::HttpOutputBuffer()
 {
 }
 
+HttpOutputBuffer::~HttpOutputBuffer()
+{
+}
+
 void HttpOutputBuffer::clearOutput()
 {
 	m_bufferOutput.clearOutput();
@@ -1021,6 +1034,10 @@ HttpHeaderReader::HttpHeaderReader()
 	m_last[0] = 0;
 	m_last[1] = 0;
 	m_last[2] = 0;
+}
+
+HttpHeaderReader::~HttpHeaderReader()
+{
 }
 
 sl_bool HttpHeaderReader::add(const void* _buf, sl_size size, sl_size& posBody)
@@ -1101,6 +1118,10 @@ void HttpHeaderReader::clear()
 HttpContentReader::HttpContentReader()
 {
 	m_flagDecompressing = sl_false;
+}
+
+HttpContentReader::~HttpContentReader()
+{
 }
 
 class _HttpContentReader_Persistent : public HttpContentReader
@@ -1364,13 +1385,13 @@ sl_bool HttpContentReader::isDecompressing()
 	return m_flagDecompressing;
 }
 
-void HttpContentReader::onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError)
+void HttpContentReader::onReadStream(AsyncStreamResult* result)
 {
-	if (flagError) {
+	if (result->flagError) {
 		setReadingEnded();
 	}
-	AsyncStreamFilter::onRead(stream, data, sizeRead, ref, flagError);
-	if (flagError) {
+	AsyncStreamFilter::onReadStream(result);
+	if (result->flagError) {
 		setError();
 	}
 }
@@ -1395,7 +1416,7 @@ void HttpContentReader::setError()
 	setReadingError();
 }
 
-sl_bool HttpContentReader::write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref)
+sl_bool HttpContentReader::write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* ref)
 {
 	return sl_false;
 }

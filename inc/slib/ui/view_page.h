@@ -5,6 +5,7 @@
 
 #include "view.h"
 #include "transition.h"
+#include "window.h"
 
 #include "../core/event.h"
 
@@ -197,13 +198,13 @@ public:
 	
 	void close();
 	
-	void openPage(const Ref<View>& pageOther, const Transition& transition);
+	void goToPage(const Ref<View>& pageOther, const Transition& transition);
 	
-	void openPage(const Ref<View>& pageOther);
+	void goToPage(const Ref<View>& pageOther);
 	
-	void openHomePage(const Ref<View>& pageOther, const Transition& transition);
+	void goToHomePage(const Ref<View>& pageOther, const Transition& transition);
 	
-	void openHomePage(const Ref<View>& pageOther);
+	void goToHomePage(const Ref<View>& pageOther);
 	
 	
 	TransitionType getGlobalOpeningTransitionType();
@@ -250,11 +251,9 @@ public:
 	void popup(const Ref<View>& parent, const Transition& transition, sl_bool flagFillParentBackground = sl_true);
 	
 	void popup(const Ref<View>& parent, sl_bool flagFillParentBackground = sl_true);
-	
-	void popupPage(const Ref<ViewPage>& pageOther, const Transition& transition, sl_bool flagFillParentBackground = sl_true);
-	
-	void popupPage(const Ref<ViewPage>& pageOther, sl_bool flagFillParentBackground = sl_true);
-	
+
+	Ref<Window> popupWindow(const Ref<Window>& parent);
+
 	sl_bool isPopup();
 	
 	Color getPopupBackgroundColor();
@@ -305,15 +304,6 @@ public:
 	
 	void setGlobalPopupBackgroundColor(const Color& color);
 
-	
-	void modal(const Ref<View>& parent, const Transition& transition, sl_bool flagFillParentBackground = sl_true);
-	
-	void modal(const Ref<View>& parent, sl_bool flagFillParentBackground = sl_true);
-	
-	void modalPage(const Ref<ViewPage>& pageOther, const Transition& transition, sl_bool flagFillParentBackground = sl_true);
-	
-	void modalPage(const Ref<ViewPage>& pageOther, sl_bool flagFillParentBackground = sl_true);
-	
 protected:
 	virtual void onOpen();
 	
@@ -330,6 +320,8 @@ protected:
 	// For mobile platforms
 	virtual void onBackPressed(UIEvent* ev);
 	
+	virtual void onCloseWindow(UIEvent* ev);
+	
 public:
 	virtual void dispatchPageAction(ViewPager* pager, UIPageAction action);
 	
@@ -345,6 +337,8 @@ public:
 	
 	virtual void dispatchBackPressed(UIEvent* ev);
 	
+	virtual void dispatchCloseWindow(UIEvent* ev);
+	
 protected:
 	void _openPopup(const Ref<View>& parent, Transition transition, sl_bool flagFillParentBackground);
 	
@@ -352,22 +346,40 @@ protected:
 	
 	void _finishPopupAnimation(UIPageAction action);
 	
+	sl_bool _dispatchCloseWindow();
+	
 	void _applyDefaultOpeningPopupTransition(Transition& transition);
 	
 	void _applyDefaultClosingPopupTransition(Transition& transition);
 	
 public:
+	SLIB_PROPERTY(AtomicFunction<void(ViewPage*, ViewPager* pager, UIPageAction action)>, OnPageAction);
+	
+	SLIB_PROPERTY(AtomicFunction<void(ViewPage*, ViewPager* pager, UIPageAction action)>, OnFinishPageAnimation);
+	
+	SLIB_PROPERTY(AtomicFunction<void(ViewPage*)>, OnOpen);
+	
 	SLIB_PROPERTY(AtomicFunction<void(ViewPage*)>, OnClose);
+
+	SLIB_PROPERTY(AtomicFunction<void(ViewPage*)>, OnResume);
+	
+	SLIB_PROPERTY(AtomicFunction<void(ViewPage*)>, OnPause);
+	
+	SLIB_PROPERTY(AtomicFunction<void(ViewPage*, UIEvent* ev)>, OnBackPressed);
+	
+	SLIB_PROPERTY(AtomicFunction<void(ViewPage*, UIEvent* ev)>, OnCloseWindow);
 	
 protected:
 	AtomicWeakRef<ViewPager> m_pager;
 	
-	sl_bool m_flagDidPopup;
-	sl_bool m_flagClosingPopup;
-	Color m_popupBackgroundColor;
-	sl_bool m_flagDidModalOnUIThread;
-	AtomicRef<Event> m_eventClosePopup;
+	enum class PopupState
+	{
+		None, Popup, ClosingPopup, ShowWindow
+	};
+	PopupState m_popupState;
 	
+	Color m_popupBackgroundColor;
+
 	sl_reg m_countActiveTransitionAnimations;
 	
 };

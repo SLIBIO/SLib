@@ -1,14 +1,19 @@
+#include "../../../inc/slib/core/definition.h"
+
+#if defined(SLIB_PLATFORM_IS_APPLE)
+
 #include "../../../inc/slib/core/preference.h"
-#include "../../../inc/slib/core/platform_apple.h"
 #include "../../../inc/slib/core/json.h"
+
+#include "../../../inc/slib/core/platform_apple.h"
 
 #import <Foundation/Foundation.h>
 
 SLIB_NAMESPACE_BEGIN
 
-void Preference::setValue(const String &key, const slib::Variant &value)
+void Preference::setValue(const String& key, const Variant& value)
 {
-	if (key.getLength() <= 0) {
+	if (key.isEmpty()) {
 		return;
 	}
 	NSString* _key = Apple::getNSStringFromString(key);
@@ -17,12 +22,14 @@ void Preference::setValue(const String &key, const slib::Variant &value)
 		return;
 	}
 	NSString* _value = Apple::getNSStringFromString(jsonString);
-	[[NSUserDefaults standardUserDefaults] setValue:_value forKey:_key];
+	NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+	[defaults setValue:_value forKey:_key];
+	[defaults synchronize];
 }
 
-Variant Preference::getValue(const String &key)
+Variant Preference::getValue(const String& key)
 {
-	if (key.getLength() <= 0) {
+	if (key.isEmpty()) {
 		return sl_null;
 	}
 	
@@ -38,3 +45,5 @@ Variant Preference::getValue(const String &key)
 }
 
 SLIB_NAMESPACE_END
+
+#endif

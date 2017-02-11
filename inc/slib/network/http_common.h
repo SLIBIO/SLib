@@ -161,6 +161,8 @@ class SLIB_EXPORT HttpRequest
 {
 public:
 	HttpRequest();
+	
+	~HttpRequest();
 
 public:
 	HttpMethod getMethod() const;
@@ -307,6 +309,8 @@ class SLIB_EXPORT HttpResponse
 {
 public:
 	HttpResponse();
+	
+	~HttpResponse();
 
 public:
 	HttpStatus getResponseCode() const;
@@ -403,6 +407,8 @@ class SLIB_EXPORT HttpOutputBuffer
 {
 public:
 	HttpOutputBuffer();
+	
+	~HttpOutputBuffer();
 
 public:
 	void clearOutput();
@@ -430,6 +436,8 @@ class SLIB_EXPORT HttpHeaderReader
 {
 public:
 	HttpHeaderReader();
+	
+	~HttpHeaderReader();
 
 public:
 	// return sl_true when body section (\r\n\r\n) is detected
@@ -459,6 +467,8 @@ class SLIB_EXPORT HttpContentReader : public AsyncStreamFilter
 protected:
 	HttpContentReader();
 	
+	~HttpContentReader();
+	
 public:
 	static Ref<HttpContentReader> createPersistent(const Ref<AsyncStream>& io,
 												   const Ptr<IHttpContentReaderListener>& listener,
@@ -480,10 +490,10 @@ public:
 
 protected:
 	// override
-	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref);
+	sl_bool write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* ref);
 	
 	// override
-	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError);
+	void onReadStream(AsyncStreamResult* result);
 	
 protected:
 	void setError();

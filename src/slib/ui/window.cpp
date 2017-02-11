@@ -13,6 +13,7 @@ WindowInstanceParam::WindowInstanceParam()
 	flagFullScreen = sl_true;
 	flagCenterScreen = sl_true;
 	flagDialog = sl_false;
+	flagModal = sl_false;
 	
 #if defined(SLIB_PLATFORM_IS_ANDROID)
 	activity = sl_null;
@@ -81,6 +82,8 @@ Window::Window()
 	m_flagShowTitleBar = sl_true;
 	m_flagFullScreenOnCreate = SLIB_IF_PLATFORM_IS_MOBILE(sl_true, sl_false);
 	m_flagCenterScreenOnCreate = sl_false;
+	
+	m_flagUseClientSizeRequested = sl_false;
 	
 	m_activity = sl_null;
 	
@@ -161,8 +164,10 @@ void Window::setContentView(const Ref<View>& view)
 		instance = orig->getViewInstance();
 		orig->detach();
 	}
-	if (view.isNotNull() && instance.isNotNull()) {
-		view->attach(instance);
+	if (view.isNotNull()) {
+		if (instance.isNotNull()) {
+			view->attach(instance);
+		}
 		view->setWindow(this);
 	}
 	m_viewContent = view;
@@ -192,22 +197,6 @@ void Window::setFocus()
 	}
 }
 
-void Window::runModal()
-{
-	Ref<WindowInstance> instance = m_instance;
-	if (instance.isNotNull()) {
-		UI::dispatchToUiThread(SLIB_FUNCTION_WEAKREF(Window, _runModal, this));
-	}
-}
-
-void Window::_runModal()
-{
-	Ref<WindowInstance> instance = m_instance;
-	if (instance.isNotNull()) {
-		instance->runModal();
-	}
-}
-
 UIRect Window::getFrame()
 {
 	Ref<WindowInstance> instance = m_instance;
@@ -224,6 +213,7 @@ void Window::setFrame(const UIRect& frame)
 	if (CHECK_INSTANCE(instance)) {
 		instance->setFrame(frame);
 	}
+	m_flagUseClientSizeRequested = sl_false;
 }
 
 void Window::setFrame(sl_ui_pos left, sl_ui_pos top, sl_ui_len width, sl_ui_len height)
@@ -331,15 +321,25 @@ UISize Window::getClientSize()
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
 		return instance->getClientSize();
+	} else {
+		if (m_flagUseClientSizeRequested) {
+			return m_clientSizeRequested;
+		} else {
+			return UISize::zero();
+		}
 	}
-	return UISize::zero();
 }
 
 void Window::setClientSize(const UISize& size)
 {
 	Ref<WindowInstance> instance = m_instance;
 	if (CHECK_INSTANCE(instance)) {
+		m_flagUseClientSizeRequested = sl_false;
 		instance->setClientSize(size);
+	} else {
+		m_flagUseClientSizeRequested = sl_true;
+		m_clientSizeRequested = size;
+		m_frame.setSize(size);
 	}
 }
 
@@ -802,12 +802,19 @@ void Window::_create()
 	}
 	
 	WindowInstanceParam param;
+
+	Ref<Window> parent = m_parent;
+	if (parent.isNotNull()) {
+		param.parent = parent->m_instance;
+	}
+	
 	param.screen = m_screen;
 	param.menu = m_menu;
 	param.flagBorderless = m_flagBorderless;
 	param.flagFullScreen = m_flagFullScreenOnCreate;
 	param.flagCenterScreen = m_flagCenterScreenOnCreate;
 	param.flagDialog = m_flagDialog;
+	param.flagModal = m_flagModal;
 	param.location = m_frame.getLocation();
 	param.size = m_frame.getSize();
 	param.title = m_title;
@@ -817,13 +824,6 @@ void Window::_create()
 	Ref<WindowInstance> window = createWindowInstance(param);
 	
 	if (window.isNotNull()) {
-		
-		Ref<Window> parent = m_parent;
-		if (parent.isNotNull()) {
-			window->setParent(parent->m_instance);
-		} else {
-			window->setParent(Ref<WindowInstance>::null());
-		}
 		
 		window->setBackgroundColor(m_backgroundColor);
 		
@@ -839,8 +839,15 @@ void Window::_create()
 		window->setAlpha(m_alpha);
 		window->setTransparent(m_flagTransparent);
 		
-		window->setVisible(sl_true);
+		if (m_flagUseClientSizeRequested) {
+			UISize size = window->getWindowSizeFromClientSize(m_clientSizeRequested);
+			m_frame = window->getFrame();
+			m_frame.setSize(size);
+			window->setFrame(m_frame);
+		}
 		
+		window->setVisible(sl_true);
+
 		attach(window);
 		
 		dispatchCreate();
@@ -850,10 +857,6 @@ void Window::_create()
 		dispatchResize(frame.getWidth(), frame.getHeight());
 #endif
 
-		if (m_flagModal) {
-			_runModal();
-		}
-	
 	} else {
 		dispatchCreateFailed();
 	}

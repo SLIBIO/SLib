@@ -80,9 +80,7 @@
 		266DD5611C11940A00D47AB0 /* video_codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4BC1C11940A00D47AB0 /* video_codec.cpp */; };
 		266DD5621C11940A00D47AB0 /* dns.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4BE1C11940A00D47AB0 /* dns.cpp */; };
 		266DD5631C11940A00D47AB0 /* ethernet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4BF1C11940A00D47AB0 /* ethernet.cpp */; };
-		266DD5641C11940A00D47AB0 /* http_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4C01C11940A00D47AB0 /* http_client.cpp */; };
 		266DD5651C11940A00D47AB0 /* http_common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4C11C11940A00D47AB0 /* http_common.cpp */; };
-		266DD5661C11940A00D47AB0 /* http_proxy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4C21C11940A00D47AB0 /* http_proxy.cpp */; };
 		266DD5671C11940A00D47AB0 /* http_service.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4C31C11940A00D47AB0 /* http_service.cpp */; };
 		266DD5681C11940A00D47AB0 /* icmp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4C41C11940A00D47AB0 /* icmp.cpp */; };
 		266DD5691C11940A00D47AB0 /* ip_address.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4C51C11940A00D47AB0 /* ip_address.cpp */; };
@@ -92,7 +90,7 @@
 		266DD56D1C11940A00D47AB0 /* net_capture_pcap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4C91C11940A00D47AB0 /* net_capture_pcap.cpp */; };
 		266DD56E1C11940A00D47AB0 /* netfilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4CA1C11940A00D47AB0 /* netfilter.cpp */; };
 		266DD56F1C11940A00D47AB0 /* network_async.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4CB1C11940A00D47AB0 /* network_async.cpp */; };
-		266DD5701C11940A00D47AB0 /* network_async_config.h in Headers */ = {isa = PBXBuildFile; fileRef = 266DD4CC1C11940A00D47AB0 /* network_async_config.h */; };
+		266DD5701C11940A00D47AB0 /* network_async.h in Headers */ = {isa = PBXBuildFile; fileRef = 266DD4CC1C11940A00D47AB0 /* network_async.h */; };
 		266DD5711C11940A00D47AB0 /* network_async_unix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4CD1C11940A00D47AB0 /* network_async_unix.cpp */; };
 		266DD5731C11940A00D47AB0 /* network_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4CF1C11940A00D47AB0 /* network_io.cpp */; };
 		266DD5741C11940A00D47AB0 /* network_os.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 266DD4D01C11940A00D47AB0 /* network_os.cpp */; };
@@ -182,6 +180,7 @@
 		26BBBEC81D8FDF1F00735947 /* view_page.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BBBEC71D8FDF1F00735947 /* view_page.cpp */; };
 		26BC2EC81E2E09B500D0801E /* dispatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BC2EC71E2E09B500D0801E /* dispatch.cpp */; };
 		26BF169C1E307DC000C9878C /* ui_animation.h in Headers */ = {isa = PBXBuildFile; fileRef = 26BF169B1E307DC000C9878C /* ui_animation.h */; };
+		26BF6B551E4D97F2005D4412 /* preference_apple.mm in Sources */ = {isa = PBXBuildFile; fileRef = 26BF6B541E4D97F2005D4412 /* preference_apple.mm */; };
 		26BFCFC51E41CFC700F4493D /* graphics_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26BFCFC41E41CFC700F4493D /* graphics_text.cpp */; };
 		26C13E431DDA30FD00612945 /* url.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C13E421DDA30FD00612945 /* url.cpp */; };
 		26C13E451DDA32F000612945 /* url_request.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 26C13E441DDA32F000612945 /* url_request.cpp */; };
@@ -350,9 +349,7 @@
 		266DD4BC1C11940A00D47AB0 /* video_codec.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = video_codec.cpp; sourceTree = "<group>"; };
 		266DD4BE1C11940A00D47AB0 /* dns.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dns.cpp; sourceTree = "<group>"; };
 		266DD4BF1C11940A00D47AB0 /* ethernet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ethernet.cpp; sourceTree = "<group>"; };
-		266DD4C01C11940A00D47AB0 /* http_client.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_client.cpp; sourceTree = "<group>"; };
 		266DD4C11C11940A00D47AB0 /* http_common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_common.cpp; sourceTree = "<group>"; };
-		266DD4C21C11940A00D47AB0 /* http_proxy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_proxy.cpp; sourceTree = "<group>"; };
 		266DD4C31C11940A00D47AB0 /* http_service.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_service.cpp; sourceTree = "<group>"; };
 		266DD4C41C11940A00D47AB0 /* icmp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = icmp.cpp; sourceTree = "<group>"; };
 		266DD4C51C11940A00D47AB0 /* ip_address.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ip_address.cpp; sourceTree = "<group>"; };
@@ -362,7 +359,7 @@
 		266DD4C91C11940A00D47AB0 /* net_capture_pcap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = net_capture_pcap.cpp; sourceTree = "<group>"; };
 		266DD4CA1C11940A00D47AB0 /* netfilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = netfilter.cpp; sourceTree = "<group>"; };
 		266DD4CB1C11940A00D47AB0 /* network_async.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = network_async.cpp; sourceTree = "<group>"; };
-		266DD4CC1C11940A00D47AB0 /* network_async_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = network_async_config.h; sourceTree = "<group>"; };
+		266DD4CC1C11940A00D47AB0 /* network_async.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = network_async.h; sourceTree = "<group>"; };
 		266DD4CD1C11940A00D47AB0 /* network_async_unix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = network_async_unix.cpp; sourceTree = "<group>"; };
 		266DD4CF1C11940A00D47AB0 /* network_io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = network_io.cpp; sourceTree = "<group>"; };
 		266DD4D01C11940A00D47AB0 /* network_os.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = network_os.cpp; sourceTree = "<group>"; };
@@ -452,6 +449,7 @@
 		26BBBEC71D8FDF1F00735947 /* view_page.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view_page.cpp; sourceTree = "<group>"; };
 		26BC2EC71E2E09B500D0801E /* dispatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dispatch.cpp; sourceTree = "<group>"; };
 		26BF169B1E307DC000C9878C /* ui_animation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ui_animation.h; sourceTree = "<group>"; };
+		26BF6B541E4D97F2005D4412 /* preference_apple.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = preference_apple.mm; sourceTree = "<group>"; };
 		26BFCFC41E41CFC700F4493D /* graphics_text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graphics_text.cpp; sourceTree = "<group>"; };
 		26C13E421DDA30FD00612945 /* url.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = url.cpp; sourceTree = "<group>"; };
 		26C13E441DDA32F000612945 /* url_request.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = url_request.cpp; sourceTree = "<group>"; };
@@ -606,9 +604,7 @@
 				26C70E9B1CA168EB005B1768 /* datagram.cpp */,
 				266DD4BE1C11940A00D47AB0 /* dns.cpp */,
 				266DD4BF1C11940A00D47AB0 /* ethernet.cpp */,
-				266DD4C01C11940A00D47AB0 /* http_client.cpp */,
 				266DD4C11C11940A00D47AB0 /* http_common.cpp */,
-				266DD4C21C11940A00D47AB0 /* http_proxy.cpp */,
 				266DD4C31C11940A00D47AB0 /* http_service.cpp */,
 				266DD4C41C11940A00D47AB0 /* icmp.cpp */,
 				266DD4C51C11940A00D47AB0 /* ip_address.cpp */,
@@ -618,7 +614,7 @@
 				266DD4C91C11940A00D47AB0 /* net_capture_pcap.cpp */,
 				266DD4CA1C11940A00D47AB0 /* netfilter.cpp */,
 				266DD4CB1C11940A00D47AB0 /* network_async.cpp */,
-				266DD4CC1C11940A00D47AB0 /* network_async_config.h */,
+				266DD4CC1C11940A00D47AB0 /* network_async.h */,
 				266DD4CD1C11940A00D47AB0 /* network_async_unix.cpp */,
 				266DD4CF1C11940A00D47AB0 /* network_io.cpp */,
 				266DD4D01C11940A00D47AB0 /* network_os.cpp */,
@@ -894,6 +890,7 @@
 				A2DE1D841B383BA600A74698 /* pipe_unix.cpp */,
 				A25F2FB01B03A33700854DAF /* platform_apple.mm */,
 				2626C1301E15AA73004E150C /* preference.cpp */,
+				26BF6B541E4D97F2005D4412 /* preference_apple.mm */,
 				A2774E0B1B1A005B00538A7B /* ptr.cpp */,
 				A25F2FB31B03A33700854DAF /* ref.cpp */,
 				26D3A1A31C85894A00FB8DBD /* resource.cpp */,
@@ -979,7 +976,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				266DD5701C11940A00D47AB0 /* network_async_config.h in Headers */,
+				266DD5701C11940A00D47AB0 /* network_async.h in Headers */,
 				26BF169C1E307DC000C9878C /* ui_animation.h in Headers */,
 				266DD5DE1C11940A00D47AB0 /* view_osx.h in Headers */,
 				266DD5831C11940A00D47AB0 /* opengl_impl.h in Headers */,
@@ -1069,7 +1066,6 @@
 				A2DE1D891B383BA600A74698 /* pipe.cpp in Sources */,
 				2648D5461D096A8B00819E09 /* ui_app.cpp in Sources */,
 				26F900651D994ED0001A6EE9 /* animation.cpp in Sources */,
-				266DD5641C11940A00D47AB0 /* http_client.cpp in Sources */,
 				266DD5811C11940A00D47AB0 /* opengl_gles.cpp in Sources */,
 				266DD4A11C1193DB00D47AB0 /* bigint.cpp in Sources */,
 				26AE7C081C99B3290026C2D9 /* transform3d.cpp in Sources */,
@@ -1220,6 +1216,7 @@
 				A2C8BE371AFA832800D584D1 /* thirdparty_libpng.c in Sources */,
 				266DD57B1C11940A00D47AB0 /* tcpip.cpp in Sources */,
 				2688DD871C16FBDF00973672 /* camera_view.cpp in Sources */,
+				26BF6B551E4D97F2005D4412 /* preference_apple.mm in Sources */,
 				26AFF77B1C34CE2B00AF9470 /* atomic.cpp in Sources */,
 				A25F301B1B03A33700854DAF /* json.cpp in Sources */,
 				26B0AF861C13E08600CD8673 /* bitmap_format.cpp in Sources */,
@@ -1250,7 +1247,6 @@
 				26FBDE571DA2B3F700FF1B55 /* drawable_quartz.mm in Sources */,
 				26C13E431DDA30FD00612945 /* url.cpp in Sources */,
 				26FBC26D1DF9E83F00D76774 /* function.cpp in Sources */,
-				266DD5661C11940A00D47AB0 /* http_proxy.cpp in Sources */,
 				26C72AC71E2150E200F7D6D0 /* audio_player_dsound.cpp in Sources */,
 				266DD5CD1C11940A00D47AB0 /* ui_core.cpp in Sources */,
 				266DD4931C1193C400D47AB0 /* font_freetype.cpp in Sources */,

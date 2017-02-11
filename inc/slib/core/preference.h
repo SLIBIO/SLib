@@ -14,6 +14,12 @@ public:
 	
 	static Variant getValue(const String& key);
 	
+
+	// used for Win32 applications
+	static String getApplicationKeyName();
+
+	static void setApplicationKeyName(const String& name);
+
 };
 
 SLIB_NAMESPACE_END

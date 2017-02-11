@@ -7,6 +7,7 @@
 
 #include "../core/object.h"
 #include "../core/ptr.h"
+#include "../core/function.h"
 
 /*******************************************************
 	NetFilter based on Linux netfilter_queue
@@ -36,6 +37,11 @@ public:
 	sl_uint32 physicalDeviceOut;
 
 	sl_uint16 queueNumber;
+	
+public:
+	NetFilterPacket();
+	
+	~NetFilterPacket();
 
 public:
 	virtual sl_bool getSourceMacAddress(MacAddress& address) = 0;
@@ -66,16 +72,24 @@ public:
 	sl_bool flagAutoStart;
 
 	Ptr<INetFilterListener> listener;
-
+	Function<void(NetFilter*, NetFilterPacket*)> onFilterPacket;
+	
 public:
 	NetFilterParam();
+	
+	~NetFilterParam();
 
 };
 
 class SLIB_EXPORT NetFilter : public Object
 {
 	SLIB_DECLARE_OBJECT
-    
+	
+public:
+	NetFilter();
+	
+	~NetFilter();
+	
 public:
 	static Ref<NetFilter> create(const NetFilterParam& param);
 	
@@ -96,6 +110,7 @@ protected:
 
 protected:
 	Ptr<INetFilterListener> m_listener;
+	Function<void(NetFilter*, NetFilterPacket*)> m_onFilterPacket;
 	
 };
 

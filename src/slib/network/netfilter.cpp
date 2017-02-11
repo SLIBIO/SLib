@@ -7,12 +7,32 @@
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
+NetFilterPacket::NetFilterPacket()
+{
+}
+
+NetFilterPacket::~NetFilterPacket()
+{
+}
+
 NetFilterParam::NetFilterParam()
 {
 	flagAutoStart = sl_true;
 }
 
+NetFilterParam::~NetFilterParam()
+{
+}
+
 SLIB_DEFINE_OBJECT(NetFilter, Object)
+
+NetFilter::NetFilter()
+{
+}
+
+NetFilter::~NetFilter()
+{
+}
 
 void NetFilter::_onFilterPacket(NetFilterPacket* packet)
 {
@@ -20,6 +40,7 @@ void NetFilter::_onFilterPacket(NetFilterPacket* packet)
 	if (listener.isNotNull()) {
 		listener->onFilterPacket(this, packet);
 	}
+	m_onFilterPacket(this, packet);
 }
 
 SLIB_NETWORK_NAMESPACE_END
@@ -178,6 +199,7 @@ public:
 					ret->m_bufPacket = bufPacket;
 					ret->m_wake = wake;
 					ret->m_listener = param.listener;
+					ret->m_onFilterPacket = param.onFilterPacket;
 					ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_Linux_NetFilter, _run, ret.get()));
 					if (ret->m_thread.isNotNull()) {
 						ret->m_flagInit = sl_true;

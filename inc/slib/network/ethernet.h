@@ -61,6 +61,11 @@ private:
 class SLIB_EXPORT EthernetMacTable : public Object
 {
 public:
+	EthernetMacTable();
+	
+	~EthernetMacTable();
+	
+public:
 	void add(const IPv4Address& ip, const MacAddress& mac);
 	
 	sl_bool getMacAddress(const IPv4Address& ip, MacAddress* _out = sl_null);

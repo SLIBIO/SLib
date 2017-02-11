@@ -10,10 +10,14 @@ SLIB_NETWORK_NAMESPACE_BEGIN
 
 class SLIB_EXPORT TcpStream : public Object, public IStream, public IClosable
 {
+	SLIB_DECLARE_OBJECT
+	
 public:
 	TcpStream();
 	
 	TcpStream(const Ref<Socket>& socket);
+	
+	~TcpStream();
 
 public:
 	void setSocket(const Ref<Socket>& socket);

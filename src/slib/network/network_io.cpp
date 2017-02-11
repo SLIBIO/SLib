@@ -2,11 +2,17 @@
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
+SLIB_DEFINE_OBJECT(TcpStream, Object)
+
 TcpStream::TcpStream()
 {
 }
 
 TcpStream::TcpStream(const Ref<Socket>& socket) : m_socket(socket)
+{
+}
+
+TcpStream::~TcpStream()
 {
 }
 

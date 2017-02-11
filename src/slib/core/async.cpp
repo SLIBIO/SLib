@@ -215,6 +215,10 @@ AsyncIoInstance::AsyncIoInstance()
 	m_mode = AsyncIoMode::InOut;
 }
 
+AsyncIoInstance::~AsyncIoInstance()
+{
+}
+
 Ref<AsyncIoObject> AsyncIoInstance::getObject()
 {
 	return m_object;
@@ -336,45 +340,16 @@ void AsyncIoObject::closeIoInstance()
 	}
 }
 
-Ref<Referable> AsyncIoObject::getUserObject(const String& key)
+Variant AsyncIoObject::getUserData()
 {
-	return m_mapUserObjects_s.getValue(key, Ref<Referable>::null());
+	return m_userData;
 }
 
-void AsyncIoObject::setUserObject(const String& key, const Ref<Referable>& object)
+void AsyncIoObject::setUserData(const Variant& data)
 {
-	m_mapUserObjects_s.put(key, object);
+	m_userData = data;
 }
 
-Ref<Referable> AsyncIoObject::getUserObject(sl_uint64 key)
-{
-	return m_mapUserObjects_i.getValue(key, Ref<Referable>::null());
-}
-
-void AsyncIoObject::setUserObject(sl_uint64 key, const Ref<Referable>& object)
-{
-	m_mapUserObjects_i.put(key, object);
-}
-
-Variant AsyncIoObject::getUserData(const String& key)
-{
-	return m_mapUserData_s.getValue(key, Variant::null());
-}
-
-void AsyncIoObject::setUserData(const String& key, const Variant& data)
-{
-	m_mapUserData_s.put(key, data);
-}
-
-Variant AsyncIoObject::getUserData(sl_uint64 key)
-{
-	return m_mapUserData_i.getValue(key, Variant::null());
-}
-
-void AsyncIoObject::setUserData(sl_uint64 key, const Variant& object)
-{
-	m_mapUserData_i.put(key, object);
-}
 
 void AsyncIoObject::setIoLoop(const Ref<AsyncIoLoop>& loop)
 {
@@ -395,39 +370,44 @@ SLIB_DEFINE_ROOT_OBJECT(AsyncStreamRequest)
 AsyncStreamRequest::AsyncStreamRequest(
 	void* _data,
 	sl_uint32 _size,
-	Referable* _refData,
-	const Ptr<IAsyncStreamListener>& _listener,
+	Referable* _userObject,
+	const Function<void(AsyncStreamResult*)>& _callback,
 	sl_bool _flagRead)
-: data(_data), size(_size), refData(_refData), listener(_listener), flagRead(_flagRead)
+ : data(_data), size(_size), userObject(_userObject), callback(_callback), flagRead(_flagRead)
 {
 }
 
 Ref<AsyncStreamRequest> AsyncStreamRequest::createRead(
 	void* data,
 	sl_uint32 size,
-	Referable* refData,
-	const Ptr<IAsyncStreamListener>& listener)
+	Referable* userObject,
+	const Function<void(AsyncStreamResult*)>& callback)
 {
-	return new AsyncStreamRequest(data, size, refData, listener, sl_true);
+	return new AsyncStreamRequest(data, size, userObject, callback, sl_true);
 }
 
 Ref<AsyncStreamRequest> AsyncStreamRequest::createWrite(
 	void* data,
 	sl_uint32 size,
-	Referable* refData,
-	const Ptr<IAsyncStreamListener>& listener)
+	Referable* userObject,
+	const Function<void(AsyncStreamResult*)>& callback)
 {
-	return new AsyncStreamRequest(data, size, refData, listener, sl_false);
+	return new AsyncStreamRequest(data, size, userObject, callback, sl_false);
 }
 
-void IAsyncStreamListener::onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError)
+void AsyncStreamRequest::runCallback(AsyncStream* stream, sl_uint32 resultSize, sl_bool flagError)
 {
+	if (callback.isNotNull()) {
+		AsyncStreamResult result;
+		result.stream = stream;
+		result.data = data;
+		result.size = resultSize;
+		result.requestSize = size;
+		result.userObject = userObject.get();
+		result.flagError = flagError;
+		callback(&result);
+	}
 }
-
-void IAsyncStreamListener::onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError)
-{
-}
-
 
 SLIB_DEFINE_OBJECT(AsyncStreamInstance, AsyncIoInstance)
 
@@ -436,12 +416,16 @@ AsyncStreamInstance::AsyncStreamInstance()
 	m_sizeWriteWaiting = 0;
 }
 
-sl_bool AsyncStreamInstance::read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* refData)
+AsyncStreamInstance::~AsyncStreamInstance()
+{
+}
+
+sl_bool AsyncStreamInstance::read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
 {
 	if (size == 0) {
 		return sl_false;
 	}
-	Ref<AsyncStreamRequest> req = AsyncStreamRequest::createRead(data, size, refData, listener);
+	Ref<AsyncStreamRequest> req = AsyncStreamRequest::createRead(data, size, userObject, callback);
 	if (req.isNotNull()) {
 		m_requestsRead.push(req);
 		return sl_true;
@@ -449,12 +433,12 @@ sl_bool AsyncStreamInstance::read(void* data, sl_uint32 size, const Ptr<IAsyncSt
 	return sl_false;
 }
 
-sl_bool AsyncStreamInstance::write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* refData)
+sl_bool AsyncStreamInstance::write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
 {
 	if (size == 0) {
 		return sl_false;
 	}
-	Ref<AsyncStreamRequest> req = AsyncStreamRequest::createWrite(data, size, refData, listener);
+	Ref<AsyncStreamRequest> req = AsyncStreamRequest::createWrite(data, size, userObject, callback);
 	if (req.isNotNull()) {
 		m_requestsWrite.push(req);
 		return sl_true;
@@ -526,6 +510,14 @@ sl_size AsyncStreamInstance::getWriteRequestsCount()
 
 SLIB_DEFINE_OBJECT(AsyncStream, Object)
 
+AsyncStream::AsyncStream()
+{
+}
+
+AsyncStream::~AsyncStream()
+{
+}
+
 Ref<AsyncStream> AsyncStream::create(AsyncStreamInstance* instance, AsyncIoMode mode, const Ref<AsyncIoLoop>& loop)
 {
 	Ref<AsyncStreamBase> ret;
@@ -563,27 +555,36 @@ sl_uint64 AsyncStream::getSize()
 	return 0;
 }
 
-sl_bool AsyncStream::readToMemory(const Memory& mem, const Ptr<IAsyncStreamListener>& listener)
+sl_bool AsyncStream::readToMemory(const Memory& mem, const Function<void(AsyncStreamResult*)>& callback)
 {
 	sl_size size = mem.getSize();
 	if (size > 0x40000000) {
 		size = 0x40000000;
 	}
-	return read(mem.getData(), (sl_uint32)(size), listener, mem.ref.get());
+	return read(mem.getData(), (sl_uint32)(size), callback, mem.ref.get());
 }
 
-sl_bool AsyncStream::writeFromMemory(const Memory& mem, const Ptr<IAsyncStreamListener>& listener)
+sl_bool AsyncStream::writeFromMemory(const Memory& mem, const Function<void(AsyncStreamResult*)>& callback)
 {
 	sl_size size = mem.getSize();
 	if (size > 0x40000000) {
 		size = 0x40000000;
 	}
-	return write(mem.getData(), (sl_uint32)(size), listener, mem.ref.get());
+	return write(mem.getData(), (sl_uint32)(size), callback, mem.ref.get());
 }
 
 /*************************************
 	AsyncStreamBase
 **************************************/
+
+AsyncStreamBase::AsyncStreamBase()
+{
+}
+
+AsyncStreamBase::~AsyncStreamBase()
+{
+}
+
 Ref<AsyncStreamInstance> AsyncStreamBase::getIoInstance()
 {
 	return Ref<AsyncStreamInstance>::from(AsyncIoObject::getIoInstance());
@@ -620,7 +621,7 @@ sl_bool AsyncStreamBase::isOpened()
 	return getIoInstance().isNotNull();
 }
 
-sl_bool AsyncStreamBase::read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* refData)
+sl_bool AsyncStreamBase::read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
 {
 	Ref<AsyncIoLoop> loop = getIoLoop();
 	if (loop.isNull()) {
@@ -628,7 +629,7 @@ sl_bool AsyncStreamBase::read(void* data, sl_uint32 size, const Ptr<IAsyncStream
 	}
 	Ref<AsyncStreamInstance> instance = getIoInstance();
 	if (instance.isNotNull()) {
-		if (instance->read(data, size, listener, refData)) {
+		if (instance->read(data, size, callback, userObject)) {
 			loop->requestOrder(instance.get());
 			return sl_true;
 		}
@@ -636,7 +637,7 @@ sl_bool AsyncStreamBase::read(void* data, sl_uint32 size, const Ptr<IAsyncStream
 	return sl_false;
 }
 
-sl_bool AsyncStreamBase::write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* refData)
+sl_bool AsyncStreamBase::write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
 {
 	Ref<AsyncIoLoop> loop = getIoLoop();
 	if (loop.isNull()) {
@@ -644,7 +645,7 @@ sl_bool AsyncStreamBase::write(void* data, sl_uint32 size, const Ptr<IAsyncStrea
 	}
 	Ref<AsyncStreamInstance> instance = getIoInstance();
 	if (instance.isNotNull()) {
-		if (instance->write(data, size, listener, refData)) {
+		if (instance->write(data, size, callback, userObject)) {
 			loop->requestOrder(instance.get());
 			return sl_true;
 		}
@@ -709,11 +710,15 @@ AsyncStreamSimulator::AsyncStreamSimulator()
 	m_flagProcessRequest = sl_false;
 }
 
-sl_bool AsyncStreamSimulator::read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* refData)
+AsyncStreamSimulator::~AsyncStreamSimulator()
+{
+}
+
+sl_bool AsyncStreamSimulator::read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
 {
 	if (data && size > 0) {
 		if (isOpened()) {
-			Ref<AsyncStreamRequest> req = AsyncStreamRequest::createRead(data, size, refData, listener);
+			Ref<AsyncStreamRequest> req = AsyncStreamRequest::createRead(data, size, userObject, callback);
 			if (req.isNotNull()) {
 				return _addRequest(req.get());
 			}
@@ -722,11 +727,11 @@ sl_bool AsyncStreamSimulator::read(void* data, sl_uint32 size, const Ptr<IAsyncS
 	return sl_false;
 }
 
-sl_bool AsyncStreamSimulator::write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* refData)
+sl_bool AsyncStreamSimulator::write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
 {
 	if (data && size > 0) {
 		if (isOpened()) {
-			Ref<AsyncStreamRequest> req = AsyncStreamRequest::createWrite(data, size, refData, listener);
+			Ref<AsyncStreamRequest> req = AsyncStreamRequest::createWrite(data, size, userObject, callback);
 			if (req.isNotNull()) {
 				return _addRequest(req.get());
 			}
@@ -803,6 +808,10 @@ AsyncReader::AsyncReader()
 {
 }
 
+AsyncReader::~AsyncReader()
+{
+}
+
 Ref<AsyncReader> AsyncReader::create(const Ptr<IReader>& reader)
 {
 	if (reader.isNotNull()) {
@@ -840,7 +849,7 @@ void AsyncReader::close()
 	m_reader.setNull();
 }
 
-sl_bool AsyncReader::write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* refData)
+sl_bool AsyncReader::write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
 {
 	return sl_false;
 }
@@ -859,10 +868,7 @@ void AsyncReader::processRequest(AsyncStreamRequest* request)
 		if (size <= 0) {
 			flagError = sl_true;
 		}
-		PtrLocker<IAsyncStreamListener> listener(request->listener);
-		if (listener.isNotNull()) {
-			listener->onRead(this, request->data, (sl_uint32)size, request->refData.get(), flagError);
-		}
+		request->runCallback(this, (sl_uint32)size, flagError);
 	}
 }
 
@@ -872,6 +878,10 @@ void AsyncReader::processRequest(AsyncStreamRequest* request)
 **************************************/
 
 AsyncWriter::AsyncWriter()
+{
+}
+
+AsyncWriter::~AsyncWriter()
 {
 }
 
@@ -912,7 +922,7 @@ void AsyncWriter::close()
 	m_writer.setNull();
 }
 
-sl_bool AsyncWriter::read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* refData)
+sl_bool AsyncWriter::read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& listener, Referable* userObject)
 {
 	return sl_false;
 }
@@ -931,10 +941,7 @@ void AsyncWriter::processRequest(AsyncStreamRequest* request)
 		if (size <= 0) {
 			flagError = sl_true;
 		}
-		PtrLocker<IAsyncStreamListener> listener(request->listener);
-		if (listener.isNotNull()) {
-			listener->onWrite(this, request->data, (sl_uint32)size, request->refData.get(), flagError);
-		}
+		request->runCallback(this, (sl_uint32)size, flagError);
 	}
 }
 
@@ -1058,14 +1065,7 @@ void AsyncFile::processRequest(AsyncStreamRequest* request)
 			flagError = sl_true;
 			size = 0;
 		}
-		PtrLocker<IAsyncStreamListener> listener(request->listener);
-		if (listener.isNotNull()) {
-			if (request->flagRead) {
-				listener->onRead(this, request->data, (sl_uint32)size, request->refData.get(), flagError);
-			} else {
-				listener->onWrite(this, request->data, (sl_uint32)size, request->refData.get(), flagError);
-			}
-		}
+		request->runCallback(this, (sl_uint32)size, flagError);
 	}
 }
 
@@ -1096,6 +1096,7 @@ sl_uint64 AsyncFile::getSize()
 /*************************************
 	AsyncCopy
 **************************************/
+
 Memory IAsyncCopyListener::onAsyncCopyRead(AsyncCopy* task, const Memory& input)
 {
 	return input;
@@ -1108,6 +1109,20 @@ void IAsyncCopyListener::onAsyncCopyWrite(AsyncCopy* task)
 void IAsyncCopyListener::onAsyncCopyExit(AsyncCopy* task)
 {
 }
+
+AsyncCopyParam::AsyncCopyParam()
+{
+	size = SLIB_UINT64_MAX;
+	bufferSize = 0x10000;
+	bufferCount = 8;
+	flagAutoStart = sl_true;
+}
+
+AsyncCopyParam::~AsyncCopyParam()
+{
+}
+
+SLIB_DEFINE_OBJECT(AsyncCopy, Object)
 
 AsyncCopy::AsyncCopy()
 {
@@ -1125,31 +1140,29 @@ AsyncCopy::~AsyncCopy()
 	close();
 }
 
-Ref<AsyncCopy> AsyncCopy::create(const Ref<AsyncStream>& source, const Ref<AsyncStream>& target
-	, sl_uint64 sizeTotal, const Ptr<IAsyncCopyListener>& listener
-	, sl_uint32 bufferSize, sl_uint32 bufferCount
-	, sl_bool flagStart)
+Ref<AsyncCopy> AsyncCopy::create(const AsyncCopyParam& param)
 {
-	if (target.isNull()) {
+	if (param.target.isNull()) {
 		return sl_null;
 	}
-	if (source.isNull()) {
+	if (param.source.isNull()) {
 		return sl_null;
 	}
-	if (sizeTotal == 0) {
+	if (param.size == 0) {
 		return sl_null;
 	}
-	if (bufferSize == 0 || bufferCount == 0) {
+	if (param.bufferSize == 0 || param.bufferCount == 0) {
 		return sl_null;
 	}
 	Ref<AsyncCopy> ret = new AsyncCopy();
 	if (ret.isNotNull()) {
-		ret->m_source = source;
-		ret->m_target = target;
-		ret->m_listener = listener;
-		ret->m_sizeTotal = sizeTotal;
-		for (sl_uint32 i = 0; i < bufferCount; i++) {
-			Memory mem = Memory::create(bufferSize);
+		ret->m_source = param.source;
+		ret->m_target = param.target;
+		ret->m_listener = param.listener;
+		ret->m_callback = param.callback;
+		ret->m_sizeTotal = param.size;
+		for (sl_uint32 i = 0; i < param.bufferCount; i++) {
+			Memory mem = Memory::create(param.bufferSize);
 			if (mem.isNotEmpty()) {
 				Ref<Buffer> buf = new Buffer;
 				if (buf.isNotNull()) {
@@ -1160,7 +1173,7 @@ Ref<AsyncCopy> AsyncCopy::create(const Ref<AsyncStream>& source, const Ref<Async
 				return sl_null;
 			}
 		}
-		if (flagStart) {
+		if (param.flagAutoStart) {
 			if (ret->start()) {
 				return ret;
 			}
@@ -1260,19 +1273,14 @@ sl_bool AsyncCopy::isWriting()
 	return m_bufferWriting.isNotNull();
 }
 
-const Ptr<IAsyncCopyListener>& AsyncCopy::getListener()
-{
-	return m_listener;
-}
-
-void AsyncCopy::onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError)
+void AsyncCopy::onReadStream(AsyncStreamResult* result)
 {
 	ObjectLocker lock(this);
 	if (!m_flagRunning) {
 		return;
 	}
 
-	if (flagError) {
+	if (result->flagError) {
 		m_flagReadError = sl_true;
 	}
 
@@ -1280,8 +1288,8 @@ void AsyncCopy::onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Refe
 	m_bufferReading.setNull();
 
 	if (bufferReading.isNotNull()) {
-		m_sizeRead += sizeRead;
-		Memory memWrite = bufferReading->mem.sub(0, sizeRead);
+		m_sizeRead += result->size;
+		Memory memWrite = bufferReading->mem.sub(0, result->size);
 		if (memWrite.isEmpty()) {
 			m_flagReadError = sl_true;
 		} else {
@@ -1303,13 +1311,13 @@ void AsyncCopy::onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Refe
 
 }
 
-void AsyncCopy::onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError)
+void AsyncCopy::onWriteStream(AsyncStreamResult* result)
 {
 	ObjectLocker lock(this);
 	if (!m_flagRunning) {
 		return;
 	}
-	if (flagError) {
+	if (result->flagError) {
 		m_flagWriteError = sl_true;
 	}
 
@@ -1317,13 +1325,14 @@ void AsyncCopy::onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, 
 	m_bufferWriting.setNull();
 
 	if (bufferWriting.isNotNull()) {
-		m_sizeWritten += sizeWritten;
+		m_sizeWritten += result->size;
 		bufferWriting->memWrite.setNull();
 		m_buffersRead.pushBack(bufferWriting);
 		PtrLocker<IAsyncCopyListener> listener(m_listener);
 		if (listener.isNotNull()) {
 			listener->onAsyncCopyWrite(this);
 		}
+		m_callback(this);
 	}
 
 	enqueue();
@@ -1364,7 +1373,7 @@ void AsyncCopy::enqueue()
 			if (buffer->memRead.isNotEmpty()) {
 				Ref<AsyncStream> source = m_source;
 				if (source.isNotNull()) {
-					bRet = source->readToMemory(buffer->memRead, (WeakRef<AsyncCopy>)this);
+					bRet = source->readToMemory(buffer->memRead, SLIB_FUNCTION_WEAKREF(AsyncCopy, onReadStream, this));
 				}
 			}
 			if (!bRet) {
@@ -1388,7 +1397,7 @@ void AsyncCopy::enqueue()
 			sl_bool bRet = sl_false;
 			Ref<AsyncStream> target = m_target;
 			if (target.isNotNull()) {
-				bRet = target->writeFromMemory(buffer->memWrite, (WeakRef<AsyncCopy>)this);
+				bRet = target->writeFromMemory(buffer->memWrite, SLIB_FUNCTION_WEAKREF(AsyncCopy, onWriteStream, this));
 			}
 			if (!bRet) {
 				m_bufferWriting.setNull();
@@ -1409,6 +1418,7 @@ void AsyncCopy::enqueue()
 /**********************************************
 	AsyncOutputBufferElement
 **********************************************/
+
 AsyncOutputBufferElement::AsyncOutputBufferElement()
 {
 	m_sizeBody = 0;
@@ -1424,6 +1434,10 @@ AsyncOutputBufferElement::AsyncOutputBufferElement(AsyncStream* stream, sl_uint6
 {
 	m_body = stream;
 	m_sizeBody = size;
+}
+
+AsyncOutputBufferElement::~AsyncOutputBufferElement()
+{
 }
 
 sl_bool AsyncOutputBufferElement::isEmpty() const
@@ -1468,12 +1482,18 @@ sl_uint64 AsyncOutputBufferElement::getBodySize()
 	return m_sizeBody;
 }
 
+
 /**********************************************
 	AsyncOutputBuffer
 **********************************************/
+
 AsyncOutputBuffer::AsyncOutputBuffer()
 {
 	m_lengthOutput = 0;
+}
+
+AsyncOutputBuffer::~AsyncOutputBuffer()
+{
 }
 
 void AsyncOutputBuffer::clearOutput()
@@ -1578,6 +1598,18 @@ void IAsyncOutputListener::onAsyncOutputComplete(AsyncOutput* output)
 {
 }
 
+AsyncOutputParam::AsyncOutputParam()
+{
+	bufferSize = 0x10000;
+	bufferCount = 3;
+}
+
+AsyncOutputParam::~AsyncOutputParam()
+{
+}
+
+SLIB_DEFINE_OBJECT(AsyncOutput, AsyncOutputBuffer)
+
 AsyncOutput::AsyncOutput()
 {
 	m_flagClosed = sl_false;
@@ -1604,28 +1636,26 @@ void AsyncOutput::close()
 	m_streamOutput.setNull();
 }
 
-Ref<AsyncOutput> AsyncOutput::create(const Ref<AsyncStream>& streamOutput, const Ptr<IAsyncOutputListener>& listener, sl_uint32 sizeBuffer)
+Ref<AsyncOutput> AsyncOutput::create(const AsyncOutputParam& param)
 {
-	if (streamOutput.isNull()) {
+	if (param.stream.isNull()) {
 		return sl_null;
 	}
-	Memory buffer = Memory::create(sizeBuffer);
+	Memory buffer = Memory::create(param.bufferSize);
 	if (buffer.isEmpty()) {
 		return sl_null;
 	}
 	Ref<AsyncOutput> ret = new AsyncOutput;
 	if (ret.isNotNull()) {
-		ret->m_streamOutput = streamOutput;
+		ret->m_streamOutput = param.stream;
+		ret->m_bufferSize = param.bufferSize;
+		ret->m_bufferCount = param.bufferCount;
+		ret->m_listener = param.listener;
+		ret->m_callback = param.callback;
 		ret->m_bufWrite = buffer;
-		ret->m_sizeBuffer = sizeBuffer;
-		ret->m_listener = listener;
+		return ret;
 	}
-	return ret;
-}
-
-Ref<AsyncOutput> AsyncOutput::create(const Ref<AsyncStream>& streamOutput, sl_uint32 sizeBuffer)
-{
-	return create(streamOutput, Ptr<IAsyncOutputListener>::null(), sizeBuffer);
+	return sl_null;
 }
 
 void AsyncOutput::mergeBuffer(AsyncOutputBuffer* buffer)
@@ -1669,7 +1699,7 @@ void AsyncOutput::_write(sl_bool flagCompleted)
 		sl_uint32 size = (sl_uint32)(header.pop(m_bufWrite.getData(), m_bufWrite.getSize()));
 		if (size > 0) {
 			m_flagWriting = sl_true;
-			if (!(m_streamOutput->write(m_bufWrite.getData(), size, (WeakRef<AsyncOutput>)this, m_bufWrite.ref.get()))) {
+			if (!(m_streamOutput->write(m_bufWrite.getData(), size, SLIB_FUNCTION_WEAKREF(AsyncOutput, onWriteStream, this), m_bufWrite.ref.get()))) {
 				m_flagWriting = sl_false;
 				_onError();
 			}
@@ -1680,7 +1710,14 @@ void AsyncOutput::_write(sl_bool flagCompleted)
 		if (sizeBody != 0 && body.isNotNull()) {
 			m_flagWriting = sl_true;
 			m_elementWriting.setNull();
-			Ref<AsyncCopy> copy = AsyncCopy::create(body, m_streamOutput, sizeBody, (WeakRef<AsyncOutput>)this, 0x10000, 3);
+			AsyncCopyParam param;
+			param.source = body;
+			param.target = m_streamOutput;
+			param.size = sizeBody;
+			param.bufferSize = m_bufferSize;
+			param.bufferCount = m_bufferCount;
+			param.listener.setWeak(this);
+			Ref<AsyncCopy> copy = AsyncCopy::create(param);
 			if (copy.isNotNull()) {
 				m_copy = copy;
 			} else {
@@ -1705,10 +1742,10 @@ void AsyncOutput::onAsyncCopyExit(AsyncCopy* task)
 	}
 }
 
-void AsyncOutput::onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError)
+void AsyncOutput::onWriteStream(AsyncStreamResult* result)
 {
 	m_flagWriting = sl_false;
-	if (flagError) {
+	if (result->flagError) {
 		_onError();
 		return;
 	}
@@ -1735,6 +1772,9 @@ void AsyncOutput::_onComplete()
 /**********************************************
 	AsyncStreamFilter
 **********************************************/
+
+SLIB_DEFINE_OBJECT(AsyncStreamFilter, AsyncStream)
+
 AsyncStreamFilter::AsyncStreamFilter()
 {
 	m_flagOpened = sl_true;
@@ -1778,9 +1818,9 @@ sl_bool AsyncStreamFilter::isOpened()
 	return m_flagOpened;
 }
 
-sl_bool AsyncStreamFilter::read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref)
+sl_bool AsyncStreamFilter::read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
 {
-	Ref<AsyncStreamRequest> request = AsyncStreamRequest::createRead(data, size, ref, listener);
+	Ref<AsyncStreamRequest> request = AsyncStreamRequest::createRead(data, size, userObject, callback);
 	if (request.isNotNull()) {
 		MutexLocker lock(&m_lockReading);
 		if (!m_flagOpened) {
@@ -1802,11 +1842,11 @@ sl_bool AsyncStreamFilter::read(void* data, sl_uint32 size, const Ptr<IAsyncStre
 	return sl_false;
 }
 
-void AsyncStreamFilter::addReadData(void* data, sl_uint32 size, Referable* refData)
+void AsyncStreamFilter::addReadData(void* data, sl_uint32 size, Referable* userObject)
 {
 	if (size > 0) {
 		MutexLocker lock(&m_lockReading);
-		Memory memConv = filterRead(data, size, refData);
+		Memory memConv = filterRead(data, size, userObject);
 		if (memConv.isNotEmpty()) {
 			m_bufReadConverted.add(memConv);
 		}
@@ -1859,28 +1899,28 @@ void AsyncStreamFilter::_read()
 		}
 		m_memReading = mem;
 	}
-	if (stream->readToMemory(m_memReading, WeakRef<AsyncStreamFilter>(this))) {
+	if (stream->readToMemory(m_memReading, SLIB_FUNCTION_WEAKREF(AsyncStreamFilter, onReadStream, this))) {
 		m_flagReading = sl_true;
 	}
 }
 
-void AsyncStreamFilter::onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError)
+void AsyncStreamFilter::onReadStream(AsyncStreamResult* result)
 {
 	MutexLocker lock(&m_lockReading);
 	m_flagReading = sl_false;
-	_processRead(data, sizeRead, ref, flagError);
+	_processRead(result);
 }
 
-void AsyncStreamFilter::_processRead(void* data, sl_uint32 size, Referable* refData, sl_bool flagError)
+void AsyncStreamFilter::_processRead(AsyncStreamResult* result)
 {
 	MutexLocker lock(&m_lockReading);
 	if (!m_flagOpened) {
 		return;
 	}
-	if (size > 0) {
-		addReadData(data, size, refData);
+	if (result->size > 0) {
+		addReadData(result->data, result->size, result->userObject);
 	}
-	if (flagError) {
+	if (result->flagError) {
 		m_flagReadingError = sl_true;
 	}
 	if (m_bufReadConverted.getSize() > 0) {
@@ -1893,16 +1933,10 @@ void AsyncStreamFilter::_processRead(void* data, sl_uint32 size, Referable* refD
 				sl_size _m = m_bufReadConverted.pop(req->data, req->size);
 				sl_uint32 m = (sl_uint32)(_m);
 				if (m_bufReadConverted.getSize() == 0) {
-					PtrLocker<IAsyncStreamListener> listener(req->listener);
-					if (listener.isNotNull()) {
-						listener->onRead(this, req->data, m, req->refData.get(), m_flagReadingError);
-					}
+					req->runCallback(this, m, m_flagReadingError);
 					break;
 				} else {
-					PtrLocker<IAsyncStreamListener> listener(req->listener);
-					if (listener.isNotNull()) {
-						listener->onRead(this, req->data, m, req->refData.get(), sl_false);
-					}
+					req->runCallback(this, m, sl_false);
 				}
 			}
 		}
@@ -1918,20 +1952,30 @@ void AsyncStreamFilter::_processRead(void* data, sl_uint32 size, Referable* refD
 
 void AsyncStreamFilter::_processReadEmpty()
 {
-	_processRead(sl_null, 0, sl_null, sl_false);
+	AsyncStreamResult result;
+	result.stream = this;
+	result.data = sl_null;
+	result.size = 0;
+	result.requestSize = 0;
+	result.userObject = sl_null;
+	result.flagError = sl_false;
+	_processRead(&result);
 }
 
-class _AsyncStreamFilter_WriteRequest : public Referable
+class _AsyncStreamFilter_WriteRequest : public AsyncStreamRequest
 {
 public:
 	Memory memConverted;
-	void* data;
-	sl_uint32 size;
-	Ref<Referable> refData;
-	Ptr<IAsyncStreamListener> listener;
+	
+public:
+	_AsyncStreamFilter_WriteRequest(const Memory& _memConv, void* data, sl_uint32 size, Referable* userObject, const Function<void(AsyncStreamResult*)>& callback)
+	 : AsyncStreamRequest(data, size, userObject, callback, sl_false), memConverted(_memConv)
+	{
+	}
+	
 };
 
-sl_bool AsyncStreamFilter::write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref)
+sl_bool AsyncStreamFilter::write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject)
 {
 	MutexLocker lock(&m_lockWriting);
 	Ref<AsyncStream> stream = m_stream;
@@ -1945,22 +1989,17 @@ sl_bool AsyncStreamFilter::write(void* data, sl_uint32 size, const Ptr<IAsyncStr
 		return sl_false;
 	}
 	if (size > 0) {
-		Memory memConv = filterWrite(data, size, ref);
+		Memory memConv = filterWrite(data, size, userObject);
 		if (memConv.isNotEmpty()) {
-			Ref<_AsyncStreamFilter_WriteRequest> req = new _AsyncStreamFilter_WriteRequest;
+			Ref<_AsyncStreamFilter_WriteRequest> req = new _AsyncStreamFilter_WriteRequest(memConv, data, size, userObject, callback);
 			if (req.isNotNull()) {
-				req->memConverted = memConv;
-				req->data = data;
-				req->size = size;
-				req->refData = ref;
-				req->listener = listener;
-				return stream->write(memConv.getData(), (sl_uint32)(memConv.getSize()), WeakRef<AsyncStreamFilter>(this), req.get());
+				return stream->write(memConv.getData(), (sl_uint32)(memConv.getSize()), SLIB_FUNCTION_WEAKREF(AsyncStreamFilter, onWriteStream, this), req.get());
 			}
 		} else {
-			if (listener.isNull()) {
+			if (callback.isNull()) {
 				return sl_true;
 			}
-			if (addTask(SLIB_BIND_WEAKREF(void(), AsyncStreamFilter, _processZeroWrite, this, data, size, listener, Ref<Referable>(ref)))) {
+			if (addTask(SLIB_BIND_WEAKREF(void(), AsyncStreamFilter, _processZeroWrite, this, data, size, callback, Ref<Referable>(userObject)))) {
 				return sl_true;
 			}
 		}
@@ -1968,26 +2007,27 @@ sl_bool AsyncStreamFilter::write(void* data, sl_uint32 size, const Ptr<IAsyncStr
 	return sl_false;
 }
 
-void AsyncStreamFilter::onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError)
+void AsyncStreamFilter::onWriteStream(AsyncStreamResult* result)
 {
-	if (flagError) {
+	if (result->flagError) {
 		m_flagWritingError = sl_true;
 	}
-	_AsyncStreamFilter_WriteRequest* req = (_AsyncStreamFilter_WriteRequest*)(ref);
+	_AsyncStreamFilter_WriteRequest* req = (_AsyncStreamFilter_WriteRequest*)(result->userObject);
 	if (req) {
-		PtrLocker<IAsyncStreamListener> listener(req->listener);
-		if (listener.isNotNull()) {
-			listener->onWrite(this, req->data, req->size, req->refData.get(), m_flagWritingError);
-		}
+		req->runCallback(this, req->size, m_flagWritingError);
 	}
 }
 
-void AsyncStreamFilter::_processZeroWrite(void* data, sl_uint32 size, Ptr<IAsyncStreamListener> _listener, const Ref<Referable>& ref)
+void AsyncStreamFilter::_processZeroWrite(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, const Ref<Referable>& userObject)
 {
-	PtrLocker<IAsyncStreamListener> listener(_listener);
-	if (listener.isNotNull()) {
-		listener->onWrite(this, data, size, ref.get(), m_flagWritingError);
-	}
+	AsyncStreamResult result;
+	result.stream = this;
+	result.data = data;
+	result.size = size;
+	result.requestSize = size;
+	result.userObject = userObject.get();
+	result.flagError = m_flagWritingError;
+	callback(&result);
 }
 
 sl_bool AsyncStreamFilter::addTask(const Function<void()>& callback)
@@ -1999,14 +2039,14 @@ sl_bool AsyncStreamFilter::addTask(const Function<void()>& callback)
 	return sl_false;
 }
 
-Memory AsyncStreamFilter::filterRead(void* data, sl_uint32 size, Referable* refData)
+Memory AsyncStreamFilter::filterRead(void* data, sl_uint32 size, Referable* userObject)
 {
-	return Memory::createStatic(data, size, refData);
+	return Memory::createStatic(data, size, userObject);
 }
 
-Memory AsyncStreamFilter::filterWrite(void* data, sl_uint32 size, Referable* refData)
+Memory AsyncStreamFilter::filterWrite(void* data, sl_uint32 size, Referable* userObject)
 {
-	return Memory::createStatic(data, size, refData);
+	return Memory::createStatic(data, size, userObject);
 }
 
 sl_bool AsyncStreamFilter::isReadingError()
@@ -2054,10 +2094,7 @@ void AsyncStreamFilter::_closeAllReadRequests()
 	Ref<AsyncStreamRequest> req;
 	while (m_requestsRead.pop(&req)) {
 		if (req.isNotNull()) {
-			PtrLocker<IAsyncStreamListener> listener(req->listener);
-			if (listener.isNotNull()) {
-				listener->onRead(this, req->data, 0, req->refData.get(), sl_true);
-			}
+			req->runCallback(this, 0, sl_true);
 		}
 	}
 }

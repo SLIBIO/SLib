@@ -4,6 +4,14 @@
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
+EthernetMacTable::EthernetMacTable()
+{
+}
+
+EthernetMacTable::~EthernetMacTable()
+{
+}
+
 void EthernetMacTable::add(const IPv4Address& ip, const MacAddress& mac)
 {
 	m_table.put(ip, mac);

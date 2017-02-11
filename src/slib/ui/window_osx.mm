@@ -83,50 +83,94 @@ public:
 	
 	static Ref<WindowInstance> create(const WindowInstanceParam& param)
 	{
-		int styleMask = 0;
-		if (param.flagBorderless || param.flagFullScreen) {
-			styleMask = NSBorderlessWindowMask;
-		} else {
-			if (param.flagShowTitleBar){
-				styleMask = NSTitledWindowMask | NSClosableWindowMask;
-			} else {
-				styleMask = NSClosableWindowMask;
-			}
+		
+		NSWindow* parent = nil;
+		if (param.parent.isNotNull()) {
+			_OSX_Window* w = static_cast<_OSX_Window*>(param.parent.get());
+			parent = w->m_window;
 		}
-		NSScreen* screen = UIPlatform::getScreenHandle(param.screen.get());
-		UIRect screenFrame;
-		Ref<Screen> _screen = param.screen;
-		if (_screen.isNotNull()) {
-			screenFrame = _screen->getRegion();
+		
+		sl_bool flagModal = param.flagModal && parent != nil;
+		
+		NSScreen* screen = nil;
+		int styleMask = 0;
+		NSRect rect;
+		
+		if (flagModal) {
+			
+			rect.origin.x = 0;
+			rect.origin.y = 0;
+			rect.size.width = param.size.x;
+			rect.size.height = param.size.y;
+			
+			styleMask = NSTitledWindowMask;
+			
 		} else {
-			_screen = UI::getPrimaryScreen();
+			
+			if (param.flagBorderless || param.flagFullScreen) {
+				styleMask = NSBorderlessWindowMask;
+			} else {
+				if (param.flagShowTitleBar){
+					styleMask = NSTitledWindowMask | NSClosableWindowMask;
+				} else {
+					styleMask = NSClosableWindowMask;
+				}
+			}
+			
+			screen = UIPlatform::getScreenHandle(param.screen.get());
+			
+			UIRect screenFrame;
+			Ref<Screen> _screen = param.screen;
 			if (_screen.isNotNull()) {
 				screenFrame = _screen->getRegion();
 			} else {
-				screenFrame = UIRect::zero();
+				_screen = UI::getPrimaryScreen();
+				if (_screen.isNotNull()) {
+					screenFrame = _screen->getRegion();
+				} else {
+					screenFrame = UIRect::zero();
+				}
 			}
+			
+			_getNSRect(rect, param.calculateRegion(screenFrame), screenFrame.getHeight());
+			
+			rect = [NSWindow contentRectForFrameRect:rect styleMask:styleMask];
 		}
-		NSRect rect;
-		_getNSRect(rect, param.calculateRegion(screenFrame), screenFrame.getHeight());
-		
-		rect = [NSWindow contentRectForFrameRect:rect styleMask:styleMask];
 
 		_slib_OSX_Window* window = [[_slib_OSX_Window alloc] initWithContentRect:rect styleMask:styleMask backing:NSBackingStoreBuffered defer:YES screen:screen];
+		
 		if (window != nil) {
+		
 			window->m_flagClosing = sl_false;
-			window->m_flagModal = sl_false;
+			window->m_flagModal = flagModal;
 			[window setReleasedWhenClosed:NO];
 			[window setContentView:[[Slib_OSX_ViewHandle alloc] init]];
+
 			Ref<_OSX_Window> ret = Ref<_OSX_Window>::from(UIPlatform::createWindowInstance(window));
+			
 			if (ret.isNotNull()) {
+				
+				ret->m_parent = parent;
+				
 				window->m_window = ret;
+				
 				{
 					NSString* title = Apple::getNSStringFromString(param.title);
 					[window setTitle: title];
 				}
-				[window makeKeyAndOrderFront:NSApp];
-				[window setDelegate: window];
-				//[window setAcceptsMouseMovedEvents:TRUE];
+				
+				if (flagModal) {
+					window->m_flagModal = sl_true;
+					[parent beginSheet:window completionHandler:^(NSModalResponse returnCode) {
+						window->m_flagModal = sl_false;
+					}];
+				} else {
+					if (parent != nil) {
+						[parent addChildWindow:window ordered:NSWindowAbove];
+					}
+					[window makeKeyAndOrderFront:NSApp];
+					[window setDelegate: window];
+				}
 				
 				return ret;
 			}
@@ -157,7 +201,11 @@ public:
 				_slib_OSX_Window* w = (_slib_OSX_Window*)window;
 				if (w->m_flagModal) {
 					w->m_flagModal = sl_false;
-					[NSApp stopModal];
+					NSWindow* parent = m_parent;
+					if (parent != nil) {
+						[parent endSheet: window];
+						return;
+					}
 				}
 				if (!(w->m_flagClosing)) {
 					[w close];
@@ -188,7 +236,7 @@ public:
 		NSWindow* window = m_window;
 		if (window != nil) {
 			if (windowInst.isNotNull()) {
-				_OSX_Window* w = (_OSX_Window*)(windowInst.get());
+				_OSX_Window* w = static_cast<_OSX_Window*>(windowInst.get());
 				NSWindow* p = w->m_window;
 				m_parent = p;
 				if (p != nil) {
@@ -217,19 +265,6 @@ public:
 		return sl_false;
 	}
 	
-	void runModal()
-	{
-		NSWindow* _handle = m_window;
-		if (_handle != nil && [_handle isKindOfClass:[_slib_OSX_Window class]]) {
-			_slib_OSX_Window* handle = (_slib_OSX_Window*)_handle;
-			if (handle->m_flagModal) {
-				return;
-			}
-			handle->m_flagModal = sl_true;
-			[NSApp runModalForWindow:handle];
-		}
-	}
-
 	UIRect getFrame()
 	{
 		NSWindow* window = m_window;
@@ -243,16 +278,19 @@ public:
 		}
 	}
 	
-	sl_bool setFrame(const UIRect& _frame)
+	sl_bool setFrame(const UIRect& frame)
 	{
-		UIRect frame = _frame;
 		NSWindow* window = m_window;
 		if (window != nil) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				NSRect rect;
-				_getNSRect(rect, frame, m_heightScreen);
+			NSRect rect;
+			_getNSRect(rect, frame, m_heightScreen);
+			if ([NSThread isMainThread]) {
 				[window setFrame:rect display:TRUE];
-			});
+			} else {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[window setFrame:rect display:TRUE];
+				});
+			}
 			return sl_true;
 		}
 		return sl_false;
@@ -292,12 +330,16 @@ public:
 		UISize size = _size;
 		NSWindow* window = m_window;
 		if (window != nil) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				NSSize s;
-				s.width = (CGFloat)(size.x);
-				s.height = (CGFloat)(size.y);
+			NSSize s;
+			s.width = (CGFloat)(size.x);
+			s.height = (CGFloat)(size.y);
+			if ([NSThread isMainThread]) {
 				[window setContentSize:s];
-			});
+			} else {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[window setContentSize:s];
+				});
+			}
 			return sl_true;
 		}
 		return sl_false;
@@ -347,7 +389,13 @@ public:
 			} else {
 				color = GraphicsPlatform::getNSColorFromColor(_color);
 			}
-			[window setBackgroundColor:color];
+			if ([NSThread isMainThread]) {
+				[window setBackgroundColor:color];
+			} else {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[window setBackgroundColor:color];
+				});
+			}
 			return sl_true;
 		}
 		return sl_false;
@@ -372,7 +420,7 @@ public:
 	{
 		NSWindow* window = m_window;
 		if (window != nil) {
-			dispatch_async(dispatch_get_main_queue(), ^{
+			if ([NSThread isMainThread]) {
 				sl_bool f1 = [window isMiniaturized] ? sl_true : sl_false;
 				sl_bool f2 = flag ? sl_true : sl_false;
 				if (f1 != f2) {
@@ -382,7 +430,19 @@ public:
 						[window deminiaturize:nil];
 					}
 				}
-			});
+			} else {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					sl_bool f1 = [window isMiniaturized] ? sl_true : sl_false;
+					sl_bool f2 = flag ? sl_true : sl_false;
+					if (f1 != f2) {
+						if (f2) {
+							[window miniaturize:nil];
+						} else {
+							[window deminiaturize:nil];
+						}
+					}
+				});
+			}
 			return sl_true;
 		}
 		return sl_false;
@@ -407,13 +467,21 @@ public:
 	{
 		NSWindow* window = m_window;
 		if (window != nil) {
-			dispatch_async(dispatch_get_main_queue(), ^{
+			if ([NSThread isMainThread]) {
 				sl_bool f1 = [window isZoomed] ? sl_true : sl_false;
 				sl_bool f2 = flag ? sl_true : sl_false;
 				if (f1 != f2) {
 					[window zoom:nil];
 				}
-			});
+			} else {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					sl_bool f1 = [window isZoomed] ? sl_true : sl_false;
+					sl_bool f2 = flag ? sl_true : sl_false;
+					if (f1 != f2) {
+						[window zoom:nil];
+					}
+				});
+			}
 			return sl_true;
 		}
 		return sl_false;
@@ -438,15 +506,30 @@ public:
 	{
 		NSWindow* window = m_window;
 		if (window != nil) {
-			if (flag) {
-				NSWindow* parent = m_parent;
-				if (parent != nil) {
-					[parent addChildWindow:window ordered:NSWindowAbove];
+			if ([NSThread isMainThread]) {
+				if (flag) {
+					NSWindow* parent = m_parent;
+					if (parent != nil) {
+						[parent addChildWindow:window ordered:NSWindowAbove];
+					} else {
+						[window orderFrontRegardless];
+					}
 				} else {
-					[window orderFrontRegardless];
+					[window orderOut:nil];
 				}
 			} else {
-				[window orderOut:nil];
+				dispatch_async(dispatch_get_main_queue(), ^{
+					if (flag) {
+						NSWindow* parent = m_parent;
+						if (parent != nil) {
+							[parent addChildWindow:window ordered:NSWindowAbove];
+						} else {
+							[window orderFrontRegardless];
+						}
+					} else {
+						[window orderOut:nil];
+					}
+				});
 			}
 			return sl_true;
 		}
@@ -471,10 +554,20 @@ public:
 	{
 		NSWindow* window = m_window;
 		if (window != nil) {
-			if (flag) {
-				[window setLevel:NSFloatingWindowLevel];
+			if ([NSThread isMainThread]) {
+				if (flag) {
+					[window setLevel:NSFloatingWindowLevel];
+				} else {
+					[window setLevel:NSNormalWindowLevel];
+				}
 			} else {
-				[window setLevel:NSNormalWindowLevel];
+				dispatch_async(dispatch_get_main_queue(), ^{
+					if (flag) {
+						[window setLevel:NSFloatingWindowLevel];
+					} else {
+						[window setLevel:NSNormalWindowLevel];
+					}
+				});
 			}
 		}
 		return sl_false;
@@ -516,7 +609,13 @@ public:
 				} else {
 					style = style & (~NSClosableWindowMask);
 				}
-				[window setStyleMask:style];
+				if ([NSThread isMainThread]) {
+					[window setStyleMask:style];
+				} else {
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[window setStyleMask:style];
+					});
+				}
 			}
 			return sl_true;
 		}
@@ -559,7 +658,13 @@ public:
 				} else {
 					style = style & (~NSMiniaturizableWindowMask);
 				}
-				[window setStyleMask:style];
+				if ([NSThread isMainThread]) {
+					[window setStyleMask:style];
+				} else {
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[window setStyleMask:style];
+					});
+				}
 			}
 			return sl_true;
 		}
@@ -593,10 +698,12 @@ public:
 			sl_bool f1 = [buttonZoom isEnabled] ? sl_true : sl_false;
 			sl_bool f2 = flag ? sl_true : sl_false;
 			if (f1 != f2) {
-				if (flag) {
-					[buttonZoom setEnabled:TRUE];
+				if ([NSThread isMainThread]) {
+					[buttonZoom setEnabled:flag];
 				} else {
-					[buttonZoom setEnabled:FALSE];
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[buttonZoom setEnabled:flag];
+					});
 				}
 			}
 			return sl_true;
@@ -637,7 +744,13 @@ public:
 						style = NSClosableWindowMask;
 					}
 				}
-				[window setStyleMask:style];
+				if ([NSThread isMainThread]) {
+					[window setStyleMask:style];
+				} else {
+					dispatch_async(dispatch_get_main_queue(), ^{
+						[window setStyleMask:style];
+					});
+				}
 			}
 			return sl_true;
 		}
@@ -665,7 +778,13 @@ public:
 			if (alpha > 1) {
 				alpha = 1;
 			}
-			[window setAlphaValue:alpha];
+			if ([NSThread isMainThread]) {
+				[window setAlphaValue:alpha];
+			} else {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					[window setAlphaValue:alpha];
+				});
+			}
 			return sl_true;
 		}
 		return sl_false;

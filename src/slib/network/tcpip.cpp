@@ -484,6 +484,22 @@ sl_uint32 Hash<IPv4PacketIdentifier>::operator()(const IPv4PacketIdentifier& v) 
 }
 
 
+IPv4Fragment::IPv4Fragment()
+{
+}
+
+IPv4Fragment::~IPv4Fragment()
+{
+}
+
+IPv4FragmentedPacket::IPv4FragmentedPacket()
+{
+}
+
+IPv4FragmentedPacket::~IPv4FragmentedPacket()
+{
+}
+
 IPv4Fragmentation::IPv4Fragmentation()
 {
 	m_currentIdentifier = 0;

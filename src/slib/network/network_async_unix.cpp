@@ -1,8 +1,8 @@
-#include "network_async_config.h"
+#include "../../../inc/slib/network/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_UNIX)
 
-#include "../../../inc/slib/network/async.h"
+#include "network_async.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
@@ -196,10 +196,9 @@ public:
 	}
 };
 
-Ref<AsyncTcpSocket> AsyncTcpSocket::create(const Ref<Socket>& socket, const Ref<AsyncIoLoop>& loop)
+Ref<AsyncTcpSocketInstance> AsyncTcpSocket::_createInstance(const Ref<Socket>& socket)
 {
-	Ref<_Unix_AsyncTcpSocketInstance> ret = _Unix_AsyncTcpSocketInstance::create(socket);
-	return AsyncTcpSocket::create(ret.get(), loop);
+	return _Unix_AsyncTcpSocketInstance::create(socket);
 }
 
 class _Unix_AsyncTcpServerInstance : public AsyncTcpServerInstance
@@ -219,7 +218,7 @@ public:
 	}
 	
 public:
-	static Ref<_Unix_AsyncTcpServerInstance> create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener)
+	static Ref<_Unix_AsyncTcpServerInstance> create(const Ref<Socket>& socket)
 	{
 		Ref<_Unix_AsyncTcpServerInstance> ret;
 		if (socket.isNotNull()) {
@@ -230,7 +229,6 @@ public:
 					if (ret.isNotNull()) {
 						ret->m_socket = socket;
 						ret->setHandle(handle);
-						ret->m_listener = listener;
 						return ret;
 					}
 				}				
@@ -278,10 +276,9 @@ public:
 	}
 };
 
-Ref<AsyncTcpServer> AsyncTcpServer::create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
+Ref<AsyncTcpServerInstance> AsyncTcpServer::_createInstance(const Ref<Socket>& socket)
 {
-	Ref<_Unix_AsyncTcpServerInstance> ret = _Unix_AsyncTcpServerInstance::create(socket, listener);
-	return AsyncTcpServer::create(ret.get(), loop, flagAutoStart);
+	return _Unix_AsyncTcpServerInstance::create(socket);
 }
 
 class _Unix_AsyncUdpSocketInstance : public AsyncUdpSocketInstance
@@ -297,7 +294,7 @@ public:
 	}
 	
 public:
-	static Ref<_Unix_AsyncUdpSocketInstance> create(const Ref<Socket>& socket, const Ptr<IAsyncUdpSocketListener>& listener, const Memory& buffer)
+	static Ref<_Unix_AsyncUdpSocketInstance> create(const Ref<Socket>& socket, const Memory& buffer)
 	{
 		Ref<_Unix_AsyncUdpSocketInstance> ret;
 		if (socket.isNotNull()) {
@@ -308,7 +305,6 @@ public:
 					if (ret.isNotNull()) {
 						ret->m_socket = socket;
 						ret->setHandle(handle);
-						ret->m_listener = listener;
 						ret->m_buffer = buffer;
 						return ret;
 					}
@@ -381,12 +377,11 @@ public:
 
 };
 
-Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ref<Socket>& socket, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
+Ref<AsyncUdpSocketInstance> AsyncUdpSocket::_createInstance(const Ref<Socket>& socket, sl_uint32 packetSize)
 {
 	Memory buffer = Memory::create(packetSize);
 	if (buffer.isNotEmpty()) {
-		Ref<_Unix_AsyncUdpSocketInstance> ret = _Unix_AsyncUdpSocketInstance::create(socket, listener, buffer);
-		return AsyncUdpSocket::create(ret.get(), loop, flagAutoStart);
+		return _Unix_AsyncUdpSocketInstance::create(socket, buffer);
 	}
 	return sl_null;
 }

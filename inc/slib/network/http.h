@@ -16,9 +16,8 @@
 
 *****************************************/
 
-#include "http_client.h"
+#include "http_common.h"
 #include "http_service.h"
-#include "http_proxy.h"
 
 #endif
 

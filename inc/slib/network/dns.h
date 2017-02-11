@@ -261,6 +261,8 @@ class SLIB_EXPORT DnsRecord
 {
 public:
 	DnsRecord();
+	
+	~DnsRecord();
 
 public:
 	const String& getName() const;
@@ -294,6 +296,11 @@ private:
 class SLIB_EXPORT DnsQuestionRecord : public DnsRecord
 {
 public:
+	DnsQuestionRecord();
+	
+	~DnsQuestionRecord();
+	
+public:
 	sl_uint32 parseRecord(const void* buf, sl_uint32 offset, sl_uint32 size);
 	
 	sl_uint32 buildRecord(void* buf, sl_uint32 offset, sl_uint32 size);
@@ -304,6 +311,8 @@ class SLIB_EXPORT DnsResponseRecord : public DnsRecord
 {
 public:
 	DnsResponseRecord();
+	
+	~DnsResponseRecord();
 	
 public:
 	sl_uint32 getTTL() const;
@@ -362,6 +371,11 @@ private:
 class SLIB_EXPORT DnsPacket
 {
 public:
+	DnsPacket();
+	
+	~DnsPacket();
+	
+public:
 	sl_bool flagQuestion;
 	
 	sl_uint16 id;
@@ -410,6 +424,7 @@ public:
 
 };
 
+
 class DnsClient;
 
 class SLIB_EXPORT IDnsClientListener
@@ -423,16 +438,25 @@ class SLIB_EXPORT DnsClientParam
 public:
 	Ptr<IDnsClientListener> listener;
 	
+	Ref<AsyncIoLoop> ioLoop;
+	
+public:
+	DnsClientParam();
+	
+	~DnsClientParam();
+	
 };
 
 class SLIB_EXPORT DnsClient : public Object, public IAsyncUdpSocketListener
 {
+	SLIB_DECLARE_OBJECT
+	
 protected:
 	DnsClient();
+	
+	~DnsClient();
 
 public:
-	static Ref<DnsClient> create(const DnsClientParam& param, const Ref<AsyncIoLoop>& loop);
-	
 	static Ref<DnsClient> create(const DnsClientParam& param);
 
 public:
@@ -481,6 +505,8 @@ public:
 public:
 	DnsResolveHostParam();
 	
+	~DnsResolveHostParam();
+	
 };
 
 class SLIB_EXPORT IDnsServerListener
@@ -506,11 +532,15 @@ public:
 	sl_bool flagEncryptDefaultForward;
 
 	sl_bool flagAutoStart;
+	
+	Ref<AsyncIoLoop> ioLoop;
 
 	Ptr<IDnsServerListener> listener;
 	
 public:
 	DnsServerParam();
+	
+	~DnsServerParam();
 
 public:
 	void parse(const Variant& config);
@@ -520,14 +550,14 @@ public:
 
 class SLIB_EXPORT DnsServer : public Object, public IAsyncUdpSocketListener
 {
+	SLIB_DECLARE_OBJECT
+	
 protected:
 	DnsServer();
 	
 	~DnsServer();
     
 public:
-	static Ref<DnsServer> create(const DnsServerParam& param, const Ref<AsyncIoLoop>& loop);
-
 	static Ref<DnsServer> create(const DnsServerParam& param);
 
 public:

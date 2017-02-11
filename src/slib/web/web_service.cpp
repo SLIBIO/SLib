@@ -34,6 +34,12 @@ void WebService::setHttpPort(sl_uint16 port)
 	m_httpParam.port = port;
 }
 
+void WebService::useAsset(const String& prefix)
+{
+	m_httpParam.flagUseAsset = sl_true;
+	m_httpParam.prefixAsset = prefix;
+}
+
 const Ref<WebController>& WebService::getController()
 {
 	return m_controller;

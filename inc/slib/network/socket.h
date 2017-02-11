@@ -158,6 +158,8 @@ public:
 	sl_bool isIPv6() const;
 
 	SocketError getLastError() const;
+	
+	String getLastErrorMessage() const;
 
 	sl_bool shutdown(SocketShutdownMode shutMode);
 	

@@ -19,6 +19,7 @@
 #include "../core/ptr.h"
 #include "../core/time.h"
 #include "../core/string.h"
+#include "../core/function.h"
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
@@ -28,6 +29,11 @@ public:
 	sl_uint8* data;
 	sl_uint32 length;
 	Time time;
+	
+public:
+	NetCapturePacket();
+	
+	~NetCapturePacket();
 	
 };
 
@@ -40,6 +46,11 @@ public:
 	
 	List<IPv4Address> ipv4Addresses;
 	List<IPv6Address> ipv6Addresses;
+	
+public:
+	NetCaptureDeviceInfo();
+	
+	~NetCaptureDeviceInfo();
 	
 };
 
@@ -63,18 +74,26 @@ public:
 	
 	NetworkLinkDeviceType preferedLinkDeviceType; // NetworkLinkDeviceType, used in Packet Socket mode. now supported Ethernet and Raw
 
-	sl_bool flagAutoStart;
+	sl_bool flagAutoStart; // default: true
 	
 	Ptr<INetCaptureListener> listener;
+	Function<void(NetCapture*, NetCapturePacket*)> onCapturePacket;
 	
 public:
 	NetCaptureParam();
+	
+	~NetCaptureParam();
 	
 };
 
 class SLIB_EXPORT NetCapture : public Object
 {
 	SLIB_DECLARE_OBJECT
+	
+protected:
+	NetCapture();
+	
+	~NetCapture();
 
 public:
 	// libpcap capturing engine
@@ -108,10 +127,13 @@ public:
 	static sl_bool findPcapDevice(const String& name, NetCaptureDeviceInfo& _out);
 	
 protected:
+	void _initWithParam(const NetCaptureParam& param);
+	
 	void _onCapturePacket(NetCapturePacket* packet);
 
 protected:
 	Ptr<INetCaptureListener> m_listener;
+	Function<void(NetCapture*, NetCapturePacket*)> m_onCapturePacket;
 	
 };
 

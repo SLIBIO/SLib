@@ -17,9 +17,17 @@ NatTableParam::NatTableParam()
 	icmpEchoIdentifier = 30000;
 }
 
+NatTableParam::~NatTableParam()
+{
+}
+
 NatTable::NatTable()
 {
 	m_icmpEchoSequenceCurrent = 0;
+}
+
+NatTable::~NatTable()
+{
 }
 
 const NatTableParam& NatTable::getParam() const
@@ -193,6 +201,10 @@ _NatTablePort::_NatTablePort()
 {
 	flagActive = sl_false;
 	timeLastAccess.setZero();
+}
+
+_NatTablePort::~_NatTablePort()
+{
 }
 
 _NatTableMapping::_NatTableMapping()

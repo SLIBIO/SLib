@@ -23,6 +23,8 @@ typedef BOOL(WINAPI *WINAPI_GetQueuedCompletionStatusEx)
 	BOOL fAlertable
 );
 
+class Variant;
+
 class SLIB_EXPORT Windows
 {
 public:
@@ -66,6 +68,11 @@ public:
 	
 
 	static Ref<Event> createEvent(HANDLE hEvent, sl_bool flagCloseOnRelease = sl_true);
+
+
+	static sl_bool getRegistryValue(HKEY hKey, const String16& subPath, const String16& name, Variant* out);
+
+	static sl_bool setRegistryValue(HKEY hKey, const String16& subPath, const String16& name, const Variant& value);
 
 };
 

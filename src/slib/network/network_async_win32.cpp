@@ -1,4 +1,4 @@
-#include "network_async_config.h"
+#include "../../../inc/slib/network/definition.h"
 
 #if defined(SLIB_PLATFORM_IS_WINDOWS)
 
@@ -6,7 +6,8 @@
 #include <mswsock.h>
 #pragma comment(lib, "mswsock.lib")
 
-#include "../../../inc/slib/network/async.h"
+#include "network_async.h"
+
 #include "../../../inc/slib/core/platform_windows.h"
 #include "../../../inc/slib/core/log.h"
 
@@ -231,10 +232,9 @@ public:
 	}
 };
 
-Ref<AsyncTcpSocket> AsyncTcpSocket::create(const Ref<Socket>& socket, const Ref<AsyncIoLoop>& loop)
+Ref<AsyncTcpSocketInstance> AsyncTcpSocket::_createInstance(const Ref<Socket>& socket)
 {
-	Ref<_Win32AsyncTcpSocketInstance> ret = _Win32AsyncTcpSocketInstance::create(socket);
-	return AsyncTcpSocket::create(ret.get(), loop);
+	return _Win32AsyncTcpSocketInstance::create(socket);
 }
 
 
@@ -262,7 +262,7 @@ public:
 	}
 
 public:
-	static Ref<_Win32AsyncTcpServerInstance> create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener)
+	static Ref<_Win32AsyncTcpServerInstance> create(const Ref<Socket>& socket)
 	{
 		if (socket.isNotNull()) {
 			sl_file handle = (sl_file)(socket->getHandle());
@@ -272,7 +272,6 @@ public:
 					ret->m_socket = socket;
 					ret->setHandle(handle);
 					if (ret->initialize()) {
-						ret->m_listener = listener;
 						return ret;
 					}
 				}
@@ -297,7 +296,7 @@ public:
 				, &dwBytes, NULL, NULL);
 			if (ret == SOCKET_ERROR) {
 				m_funcAcceptEx = sl_null;
-				LOG_ERROR("Get AcceptEx extension error");
+				LogError(TAG, "Get AcceptEx extension error");
 			}
 		}
 		// GetAcceptExSockaddrs
@@ -311,7 +310,7 @@ public:
 				, &dwBytes, NULL, NULL);
 			if (ret == SOCKET_ERROR) {
 				m_funcGetAcceptExSockaddrs = sl_null;
-				LOG_ERROR("Get GetAcceptExSockaddrs extension error");
+				LogError(TAG, "Get GetAcceptExSockaddrs extension error");
 			}
 		}
 		return m_funcAcceptEx != sl_null && m_funcGetAcceptExSockaddrs != sl_null;
@@ -363,7 +362,7 @@ public:
 					break;
 				}
 			} else {
-				LOG_ERROR("Failed to create accept socket");
+				LogError(TAG, "Failed to create accept socket");
 				processAccept(sl_true);
 				break;
 			}
@@ -425,10 +424,9 @@ public:
 
 };
 
-Ref<AsyncTcpServer> AsyncTcpServer::create(const Ref<Socket>& socket, const Ptr<IAsyncTcpServerListener>& listener, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
+Ref<AsyncTcpServerInstance> AsyncTcpServer::_createInstance(const Ref<Socket>& socket)
 {
-	Ref<_Win32AsyncTcpServerInstance> ret = _Win32AsyncTcpServerInstance::create(socket, listener);
-	return AsyncTcpServer::create(ret.get(), loop, flagAutoStart);
+	return _Win32AsyncTcpServerInstance::create(socket);
 }
 
 
@@ -455,7 +453,7 @@ public:
 	}
 
 public:
-	static Ref<_Win32AsyncUdpSocketInstance> create(const Ref<Socket>& socket, const Ptr<IAsyncUdpSocketListener>& listener, const Memory& buffer)
+	static Ref<_Win32AsyncUdpSocketInstance> create(const Ref<Socket>& socket, const Memory& buffer)
 	{
 		Ref<_Win32AsyncUdpSocketInstance> ret;
 		if (socket.isNotNull()) {
@@ -466,7 +464,6 @@ public:
 					if (ret.isNotNull()) {
 						ret->m_socket = socket;
 						ret->setHandle(handle);
-						ret->m_listener = listener;
 						ret->m_buffer = buffer;
 						return ret;
 					}
@@ -585,12 +582,11 @@ public:
 
 };
 
-Ref<AsyncUdpSocket> AsyncUdpSocket::create(const Ref<Socket>& socket, const Ptr<IAsyncUdpSocketListener>& listener, sl_uint32 packetSize, const Ref<AsyncIoLoop>& loop, sl_bool flagAutoStart)
+Ref<AsyncUdpSocketInstance> AsyncUdpSocket::_createInstance(const Ref<Socket>& socket, sl_uint32 packetSize)
 {
 	Memory buffer = Memory::create(packetSize);
 	if (buffer.isNotEmpty()) {
-		Ref<_Win32AsyncUdpSocketInstance> ret = _Win32AsyncUdpSocketInstance::create(socket, listener, buffer);
-		return AsyncUdpSocket::create(ret.get(), loop, flagAutoStart);
+		return _Win32AsyncUdpSocketInstance::create(socket, buffer);
 	}
 	return sl_null;
 }

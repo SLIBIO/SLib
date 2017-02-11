@@ -99,6 +99,8 @@ class SLIB_EXPORT AsyncIoInstance : public Object
 	
 public:
 	AsyncIoInstance();
+	
+	~AsyncIoInstance();
 
 public:
 	Ref<AsyncIoObject> getObject();
@@ -178,24 +180,9 @@ public:
 	void closeIoInstance();
 
 	
-	Ref<Referable> getUserObject(const String& key);
+	Variant getUserData();
 	
-	void setUserObject(const String& key, const Ref<Referable>& object);
-
-	
-	Ref<Referable> getUserObject(sl_uint64 key);
-	
-	void setUserObject(sl_uint64 key, const Ref<Referable>& object);
-
-	
-	Variant getUserData(const String& key);
-	
-	void setUserData(const String& key, const Variant& data);
-
-	
-	Variant getUserData(sl_uint64 key);
-	
-	void setUserData(sl_uint64 key, const Variant& object);
+	void setUserData(const Variant& data);
 
 protected:
 	void setIoLoop(const Ref<AsyncIoLoop>& loop);
@@ -206,22 +193,19 @@ private:
 	AtomicWeakRef<AsyncIoLoop> m_ioLoop;
 	AtomicRef<AsyncIoInstance> m_ioInstance;
 
-	HashMap< String, Ref<Referable> > m_mapUserObjects_s;
-	HashMap< sl_uint64, Ref<Referable> > m_mapUserObjects_i;
-	HashMap<String, Variant> m_mapUserData_s;
-	HashMap<sl_uint64, Variant> m_mapUserData_i;
-	
+	AtomicVariant m_userData;
+
 };
 
 
-class SLIB_EXPORT IAsyncStreamListener
+struct SLIB_EXPORT AsyncStreamResult
 {
-public:
-	// data may be changed during the I/O operations
-	virtual void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError);
-	
-	// data may be changed during the I/O operations
-	virtual void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError);
+	AsyncStream* stream;
+	void* data;
+	sl_uint32 size;
+	sl_uint32 requestSize;
+	Referable* userObject;
+	sl_bool flagError;
 	
 };
 
@@ -232,18 +216,21 @@ class SLIB_EXPORT AsyncStreamRequest : public Referable
 public:
 	void* data;
 	sl_uint32 size;
-	Ref<Referable> refData;
-	Ptr<IAsyncStreamListener> listener;
+	Ref<Referable> userObject;
+	Function<void(AsyncStreamResult*)> callback;
 	sl_bool flagRead;
 	
 protected:
-	AsyncStreamRequest(void* data, sl_uint32 size, Referable* refData, const Ptr<IAsyncStreamListener>& listener, sl_bool flagRead);
+	AsyncStreamRequest(void* data, sl_uint32 size, Referable* userObject, const Function<void(AsyncStreamResult*)>& callback, sl_bool flagRead);
 
 public:
-	static Ref<AsyncStreamRequest> createRead(void* data, sl_uint32 size, Referable* refData, const Ptr<IAsyncStreamListener>& listener);
+	static Ref<AsyncStreamRequest> createRead(void* data, sl_uint32 size, Referable* userObject, const Function<void(AsyncStreamResult*)>& callback);
 	
-	static Ref<AsyncStreamRequest> createWrite(void* data, sl_uint32 size, Referable* refData, const Ptr<IAsyncStreamListener>& listener);
-
+	static Ref<AsyncStreamRequest> createWrite(void* data, sl_uint32 size, Referable* userObject, const Function<void(AsyncStreamResult*)>& callback);
+	
+public:
+	void runCallback(AsyncStream* stream, sl_uint32 resultSize, sl_bool flagError);
+	
 };
 
 
@@ -254,11 +241,13 @@ class SLIB_EXPORT AsyncStreamInstance : public AsyncIoInstance
 public:
 	AsyncStreamInstance();
 	
-public:
-	virtual sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref);
+	~AsyncStreamInstance();
 	
-	virtual sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref);
-
+public:
+	virtual sl_bool read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject);
+	
+	virtual sl_bool write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject);
+	
 	virtual sl_bool isSeekable();
 	
 	virtual sl_bool seek(sl_uint64 pos);
@@ -292,6 +281,11 @@ class SLIB_EXPORT AsyncStream : public AsyncIoObject
 	SLIB_DECLARE_OBJECT
 	
 public:
+	AsyncStream();
+	
+	~AsyncStream();
+	
+public:
 	static Ref<AsyncStream> create(AsyncStreamInstance* instance, AsyncIoMode mode, const Ref<AsyncIoLoop>& loop);
 	
 	static Ref<AsyncStream> create(AsyncStreamInstance* instance, AsyncIoMode mode);
@@ -301,9 +295,9 @@ public:
 	
 	virtual sl_bool isOpened() = 0;
 	
-	virtual sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null) = 0;
+	virtual sl_bool read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null) = 0;
 	
-	virtual sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null) = 0;
+	virtual sl_bool write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null) = 0;
 	
 	virtual sl_bool isSeekable();
 	
@@ -311,9 +305,9 @@ public:
 	
 	virtual sl_uint64 getSize();
 	
-	sl_bool readToMemory(const Memory& mem, const Ptr<IAsyncStreamListener>& listener);
+	sl_bool readToMemory(const Memory& mem, const Function<void(AsyncStreamResult*)>& callback);
 
-	sl_bool writeFromMemory(const Memory& mem, const Ptr<IAsyncStreamListener>& listener);
+	sl_bool writeFromMemory(const Memory& mem, const Function<void(AsyncStreamResult*)>& callback);
 	
 	virtual sl_bool addTask(const Function<void()>& callback) = 0;
 	
@@ -322,6 +316,11 @@ public:
 class SLIB_EXPORT AsyncStreamBase : public AsyncStream
 {
 public:
+	AsyncStreamBase();
+	
+	~AsyncStreamBase();
+	
+public:
 	// override
 	void close();
 	
@@ -329,10 +328,10 @@ public:
 	sl_bool isOpened();
 
 	// override
-	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
+	sl_bool read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null);
 	
 	// override
-	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
+	sl_bool write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null);
 	
 	// override
 	sl_bool isSeekable();
@@ -363,13 +362,15 @@ class SLIB_EXPORT AsyncStreamSimulator : public AsyncStream
 	
 protected:
 	AsyncStreamSimulator();
+	
+	~AsyncStreamSimulator();
 
 public:
 	// override
-	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
+	sl_bool read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null);
 	
 	// override
-	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
+	sl_bool write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null);
 	
 	// override
 	sl_bool addTask(const Function<void()>& callback);
@@ -401,6 +402,8 @@ class SLIB_EXPORT AsyncReader : public AsyncStreamSimulator
 protected:
 	AsyncReader();
 	
+	~AsyncReader();
+	
 public:
 	static Ref<AsyncReader> create(const Ptr<IReader>& reader);
 	
@@ -414,7 +417,7 @@ public:
 	sl_bool isOpened();
 	
 	// override
-	sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
+	sl_bool write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null);
 
 public:
 	Ptr<IReader> getReader();
@@ -433,6 +436,8 @@ class SLIB_EXPORT AsyncWriter : public AsyncStreamSimulator
 protected:
 	AsyncWriter();
 	
+	~AsyncWriter();
+	
 public:
 	static Ref<AsyncWriter> create(const Ptr<IWriter>& writer);
 	
@@ -447,7 +452,7 @@ public:
 	sl_bool isOpened();
 	
 	// override
-	sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
+	sl_bool read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null);
 
 public:
 	Ptr<IWriter> getWriter();
@@ -458,6 +463,7 @@ protected:
 
 protected:
 	AtomicPtr<IWriter> m_writer;
+	
 };
 
 class SLIB_EXPORT AsyncFile : public AsyncStreamSimulator
@@ -543,18 +549,40 @@ public:
 	
 };
 
-class SLIB_EXPORT AsyncCopy : public Object, public IAsyncStreamListener
+class SLIB_EXPORT AsyncCopyParam
 {
+public:
+	// required
+	Ref<AsyncStream> source;
+	Ref<AsyncStream> target;
+
+	// optional
+	sl_uint64 size; // default: Maximum	
+	sl_uint32 bufferSize; // default: 0x10000
+	sl_uint32 bufferCount; // default: 8
+	sl_bool flagAutoStart; // default: true
+	
+	Ptr<IAsyncCopyListener> listener;
+	Function<void(AsyncCopy*)> callback;
+
+public:
+	AsyncCopyParam();
+	
+	~AsyncCopyParam();
+	
+};
+
+class SLIB_EXPORT AsyncCopy : public Object
+{
+	SLIB_DECLARE_OBJECT
+	
 private:
 	AsyncCopy();
 	
 	~AsyncCopy();
 	
 public:
-	static Ref<AsyncCopy> create(const Ref<AsyncStream>& source, const Ref<AsyncStream>& target
-		, sl_uint64 sizeTotal, const Ptr<IAsyncCopyListener>& listener
-		, sl_uint32 bufferSize = 0x10000, sl_uint32 bufferCount = 8
-		, sl_bool flagStart = sl_true);
+	static Ref<AsyncCopy> create(const AsyncCopyParam& param);
 
 public:
 	sl_bool start();
@@ -585,22 +613,18 @@ public:
 
 	sl_bool isWriting();
 
-	const Ptr<IAsyncCopyListener>& getListener();
-
-protected:
-	// override
-	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError);
+private:
+	void onReadStream(AsyncStreamResult* result);
 	
-	// override
-	void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError);
+	void onWriteStream(AsyncStreamResult* result);
 
-protected:
 	void enqueue();
 
-protected:
-	AtomicRef<AsyncStream> m_source;
-	AtomicRef<AsyncStream> m_target;
+private:
+	Ref<AsyncStream> m_source;
+	Ref<AsyncStream> m_target;
 	Ptr<IAsyncCopyListener> m_listener;
+	Function<void(AsyncCopy*)> m_callback;
 	sl_uint64 m_sizeRead;
 	sl_uint64 m_sizeWritten;
 	sl_uint64 m_sizeTotal;
@@ -632,6 +656,8 @@ public:
 	AsyncOutputBufferElement(const Memory& header);
 	
 	AsyncOutputBufferElement(AsyncStream* stream, sl_uint64 size);
+	
+	~AsyncOutputBufferElement();
 
 public:
 	sl_bool isEmpty() const;
@@ -653,12 +679,15 @@ protected:
 	MemoryQueue m_header;
 	sl_uint64 m_sizeBody;
 	AtomicRef<AsyncStream> m_body;
+	
 };
 
 class SLIB_EXPORT AsyncOutputBuffer: public Object
 {
 public:
 	AsyncOutputBuffer();
+	
+	~AsyncOutputBuffer();
 
 public:
 	void clearOutput();
@@ -694,17 +723,36 @@ public:
 	
 };
 
-class SLIB_EXPORT AsyncOutput : public AsyncOutputBuffer, public IAsyncCopyListener, public IAsyncStreamListener
+class AsyncOutputParam
 {
+public:
+	Ref<AsyncStream> stream;
+	
+	// optional
+	sl_uint32 bufferSize;
+	sl_uint32 bufferCount;
+	
+	Ptr<IAsyncOutputListener> listener;
+	Function<void(AsyncOutput*)> callback;
+	
+public:
+	AsyncOutputParam();
+	
+	~AsyncOutputParam();
+	
+};
+
+class SLIB_EXPORT AsyncOutput : public AsyncOutputBuffer, public IAsyncCopyListener
+{
+	SLIB_DECLARE_OBJECT
+	
 protected:
 	AsyncOutput();
 	
 	~AsyncOutput();
 	
 public:
-	static Ref<AsyncOutput> create(const Ref<AsyncStream>& streamOutput, const Ptr<IAsyncOutputListener>& listener, sl_uint32 sizeBuffer = 0x10000);
-	
-	static Ref<AsyncOutput> create(const Ref<AsyncStream>& streamOutput, sl_uint32 sizeBuffer = 0x10000);
+	static Ref<AsyncOutput> create(const AsyncOutputParam& param);
 
 public:
 	void mergeBuffer(AsyncOutputBuffer* buffer);
@@ -715,32 +763,41 @@ public:
 	
 protected:
 	// override
-	void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError);
-
-	// override
 	void onAsyncCopyExit(AsyncCopy* task);
 
+private:
+	void onWriteStream(AsyncStreamResult* result);
+	
 protected:
 	void _onError();
+	
 	void _onComplete();
+	
 	void _write(sl_bool flagCompleted);
 	
 protected:
-	Ref<AsyncOutputBufferElement> m_elementWriting;
 	Ref<AsyncStream> m_streamOutput;
+	sl_uint32 m_bufferSize;
+	sl_uint32 m_bufferCount;
+
+	Ptr<IAsyncOutputListener> m_listener;
+	Function<void(AsyncOutput*)> m_callback;
+	
+	Ref<AsyncOutputBufferElement> m_elementWriting;
 	Ref<AsyncCopy> m_copy;
 	Memory m_bufWrite;
-	sl_uint32 m_sizeBuffer;
 	sl_bool m_flagWriting;
 	sl_bool m_flagClosed;
 	
-	Ptr<IAsyncOutputListener> m_listener;
 };
+
 
 #define SLIB_ASYNC_STREAM_FILTER_DEFAULT_BUFFER_SIZE 16384
 
-class SLIB_EXPORT AsyncStreamFilter : public AsyncStream, public IAsyncStreamListener
+class SLIB_EXPORT AsyncStreamFilter : public AsyncStream
 {
+	SLIB_DECLARE_OBJECT
+	
 protected:
 	AsyncStreamFilter();
 	
@@ -759,16 +816,16 @@ public:
 	sl_bool isOpened();
 	
 	// override
-	virtual sl_bool read(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
+	virtual sl_bool read(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null);
 
 	// override
-	virtual sl_bool write(void* data, sl_uint32 size, const Ptr<IAsyncStreamListener>& listener, Referable* ref = sl_null);
+	virtual sl_bool write(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& callback, Referable* userObject = sl_null);
 
 	// override
 	sl_bool addTask(const Function<void()>& callback);
 	
 	
-	void addReadData(void* data, sl_uint32 size, Referable* refData);
+	void addReadData(void* data, sl_uint32 size, Referable* userObject);
 	
 	void addReadData(const Memory& data);
 	
@@ -787,9 +844,9 @@ public:
 	sl_bool isWritingEnded();
 
 protected:
-	virtual Memory filterRead(void* data, sl_uint32 size, Referable* refData);
+	virtual Memory filterRead(void* data, sl_uint32 size, Referable* userObject);
 	
-	virtual Memory filterWrite(void* data, sl_uint32 size, Referable* refData);
+	virtual Memory filterWrite(void* data, sl_uint32 size, Referable* userObject);
 
 protected:
 	void setReadingError();
@@ -820,20 +877,19 @@ protected:
 protected:
 	void _read();
 	
-	void _processRead(void* data, sl_uint32 size, Referable* refData, sl_bool flagError);
+	void _processRead(AsyncStreamResult* result);
 	
 	void _processReadEmpty();
 
-	void _processZeroWrite(void* data, sl_uint32 size, Ptr<IAsyncStreamListener> listener, const Ref<Referable>& ref);
+	void _processZeroWrite(void* data, sl_uint32 size, const Function<void(AsyncStreamResult*)>& listener, const Ref<Referable>& userObject);
 	
 	void _closeAllReadRequests();
 
 protected:
-	// override
-	virtual void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError);
+	virtual void onReadStream(AsyncStreamResult* result);
 
-	// override
-	virtual void onWrite(AsyncStream* stream, void* data, sl_uint32 sizeWritten, Referable* ref, sl_bool flagError);
+	virtual void onWriteStream(AsyncStreamResult* result);
+	
 };
 
 SLIB_NAMESPACE_END

@@ -15,6 +15,22 @@
 
 SLIB_NETWORK_NAMESPACE_BEGIN
 
+NetCapturePacket::NetCapturePacket()
+{
+}
+
+NetCapturePacket::~NetCapturePacket()
+{
+}
+
+NetCaptureDeviceInfo::NetCaptureDeviceInfo()
+{
+}
+
+NetCaptureDeviceInfo::~NetCaptureDeviceInfo()
+{
+}
+
 NetCaptureParam::NetCaptureParam()
 {
 	flagPromiscuous = sl_false;
@@ -26,15 +42,19 @@ NetCaptureParam::NetCaptureParam()
 	flagAutoStart = sl_true;
 }
 
+NetCaptureParam::~NetCaptureParam()
+{
+}
+
 
 SLIB_DEFINE_OBJECT(NetCapture, Object)
 
-void NetCapture::_onCapturePacket(NetCapturePacket* packet)
+NetCapture::NetCapture()
 {
-	PtrLocker<INetCaptureListener> listener(m_listener);
-	if (listener.isNotNull()) {
-		listener->onCapturePacket(this, packet);
-	}
+}
+
+NetCapture::~NetCapture()
+{
 }
 
 sl_bool NetCapture::setLinkType(sl_uint32 type)
@@ -46,6 +66,22 @@ String NetCapture::getLastErrorMessage()
 {
 	return sl_null;
 }
+
+void NetCapture::_initWithParam(const NetCaptureParam& param)
+{
+	m_listener = param.listener;
+	m_onCapturePacket = param.onCapturePacket;
+}
+
+void NetCapture::_onCapturePacket(NetCapturePacket* packet)
+{
+	PtrLocker<INetCaptureListener> listener(m_listener);
+	if (listener.isNotNull()) {
+		listener->onCapturePacket(this, packet);
+	}
+	m_onCapturePacket(this, packet);
+}
+
 
 class _NetRawPacketCapture : public NetCapture
 {
@@ -108,11 +144,11 @@ public:
 			if (mem.isNotEmpty()) {
 				Ref<_NetRawPacketCapture> ret = new _NetRawPacketCapture;
 				if (ret.isNotNull()) {
+					ret->_initWithParam(param);
 					ret->m_bufPacket = mem;
 					ret->m_socket = socket;
 					ret->m_deviceType = deviceType;
 					ret->m_ifaceIndex = iface;
-					ret->m_listener = param.listener;
 					ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_NetRawPacketCapture, _run, ret.get()));
 					if (ret->m_thread.isNotNull()) {
 						ret->m_flagInit = sl_true;
@@ -285,11 +321,11 @@ public:
 			if (mem.isNotEmpty()) {
 				Ref<_NetRawIPv4Capture> ret = new _NetRawIPv4Capture;
 				if (ret.isNotNull()) {
+					ret->_initWithParam(param);
 					ret->m_bufPacket = mem;
 					ret->m_socketTCP = socketTCP;
 					ret->m_socketUDP = socketUDP;
 					ret->m_socketICMP = socketICMP;
-					ret->m_listener = param.listener;
 					ret->m_thread = Thread::create(SLIB_FUNCTION_CLASS(_NetRawIPv4Capture, _run, ret.get()));
 					if (ret->m_thread.isNotNull()) {
 						ret->m_flagInit = sl_true;

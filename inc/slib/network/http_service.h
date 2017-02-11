@@ -19,6 +19,8 @@ class SLIB_EXPORT HttpServiceContext : public Object, public HttpRequest, public
 protected:
 	HttpServiceContext();
 	
+	~HttpServiceContext();
+	
 public:
 	static Ref<HttpServiceContext> create(const Ref<HttpServiceConnection>& connection);
 
@@ -70,7 +72,7 @@ private:
 	
 };
 
-class SLIB_EXPORT HttpServiceConnection : public Object, public IAsyncStreamListener, public IAsyncOutputListener, public IClosable
+class SLIB_EXPORT HttpServiceConnection : public Object, public IAsyncOutputListener, public IClosable
 {
 protected:
 	HttpServiceConnection();
@@ -135,8 +137,7 @@ protected:
 	void _completeResponse(HttpServiceContext* context);
 
 protected:
-	// override
-	void onRead(AsyncStream* stream, void* data, sl_uint32 sizeRead, Referable* ref, sl_bool flagError);
+	void onReadStream(AsyncStreamResult* result);
 	
 	// override
 	void onAsyncOutputComplete(AsyncOutput* output);
@@ -151,6 +152,11 @@ protected:
 
 class SLIB_EXPORT HttpServiceConnectionProvider : public Object
 {
+public:
+	HttpServiceConnectionProvider();
+	
+	~HttpServiceConnectionProvider();
+	
 public:
 	virtual void release() = 0;
 	
@@ -190,17 +196,24 @@ public:
 	sl_bool flagAlwaysRespondAcceptRangesHeader;
 	
 	sl_bool flagLogDebug;
-
+	
+	Ptr<IHttpServiceProcessor> processor;
+	Function<sl_bool(HttpService*, HttpServiceContext* context)> onRequest;
+	
 public:
 	HttpServiceParam();
+	
+	HttpServiceParam(const HttpServiceParam& other);
+	
+	~HttpServiceParam();
 	
 };
 
 class SLIB_EXPORT HttpService : public Object
 {
 	SLIB_DECLARE_OBJECT
-protected:
 	
+protected:
 	HttpService();
 	
 	~HttpService();
@@ -249,7 +262,7 @@ public:
 	
 	void addConnectionProvider(const Ref<HttpServiceConnectionProvider>& provider);
 
-	void removeService(const Ref<HttpServiceConnectionProvider>& provider);
+	void removeConnectionProvider(const Ref<HttpServiceConnectionProvider>& provider);
 
 	
 	sl_bool addHttpService(const SocketAddress& addr);
@@ -270,6 +283,7 @@ protected:
 	HashMap< HttpServiceConnection*, Ref<HttpServiceConnection> > m_connections;
 
 	CList< Ptr<IHttpServiceProcessor> > m_processors;
+	AtomicList< Ptr<IHttpServiceProcessor> > m_processorsCached;
 	CList< Ref<HttpServiceConnectionProvider> > m_connectionProviders;
 
 	HttpServiceParam m_param;

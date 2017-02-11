@@ -33,8 +33,6 @@ public:
 	
 	sl_reg decreaseReferenceNoFree();
 	
-	CWeakRef* getWeakObject();
-	
 	void makeNeverFree();
 	
 public:
@@ -46,6 +44,13 @@ private:
 	void _clearWeak();
 	
 public:
+	SLIB_INLINE sl_bool _isWeakRef() const
+	{
+		return m_flagWeakRef;
+	}
+	
+	CWeakRef* _getWeakObject();
+	
 	void _free();
 	
 private:
@@ -56,9 +61,11 @@ private:
 	
 private:
 	sl_reg m_nRefCount;
+	sl_bool m_flagWeakRef;
 	CWeakRef* m_weak;
 	SpinLock m_lockWeak;
 	
+	friend class CWeakRef;
 };
 
 
@@ -1871,10 +1878,10 @@ WeakRef<T> WeakRef<T>::fromReferable(Referable* referable)
 {
 	if (referable) {
 		WeakRef<T> ret;
-		if (IsInstanceOf<CWeakRef>(referable)) {
+		if (referable->_isWeakRef()) {
 			ret._weak = static_cast<CWeakRef*>(referable);
 		} else {
-			ret._weak = referable->getWeakObject();
+			ret._weak = referable->_getWeakObject();
 		}
 		return ret;
 	} else {
@@ -2056,7 +2063,7 @@ template <class T>
 SLIB_INLINE void WeakRef<T>::_set(T* object)
 {
 	if (object) {
-		_weak = object->getWeakObject();
+		_weak = object->_getWeakObject();
 	} else {
 		_weak.setNull();
 	}
@@ -2386,7 +2393,7 @@ template <class T>
 SLIB_INLINE void Atomic< WeakRef<T> >::_set(T* object)
 {
 	if (object) {
-		_weak = object->getWeakObject();
+		_weak = object->_getWeakObject();
 	} else {
 		_weak.setNull();
 	}
