@@ -176,22 +176,6 @@ void MobileApp::closePopup()
 	closePopup(Transition());
 }
 
-void MobileApp::modalPage(const Ref<ViewPage>& page, const Transition& transition, sl_bool flagFillParentBackground)
-{
-	if (page.isNull()) {
-		return;
-	}
-	Ref<View> content = m_contentView;
-	if (content.isNotNull()) {
-		page->modal(content, transition, flagFillParentBackground);
-	}
-}
-
-void MobileApp::modalPage(const Ref<ViewPage>& page, sl_bool flagFillParentBackground)
-{
-	modalPage(page, Transition(), flagFillParentBackground);
-}
-
 void MobileApp::onPause()
 {
 }
@@ -308,12 +292,8 @@ void MobileApp::dispatchBack(UIEvent* ev)
 			Ref<ViewPage> page = popups[popups.count-1];
 			if (page.isNotNull()) {
 				page->dispatchBackPressed(ev);
-				if (ev->isPreventedDefault()) {
-					return;
-				}
-				page->close();
+				ev->preventDefault();
 			}
-			ev->preventDefault();
 			return;
 		}
 	}
@@ -321,12 +301,8 @@ void MobileApp::dispatchBack(UIEvent* ev)
 		Ref<View> page = m_pager->getCurrentPage();
 		if (ViewPage* _page = CastInstance<ViewPage>(page.get())) {
 			_page->dispatchBackPressed(ev);
-			if (ev->isPreventedDefault()) {
-				return;
-			}
+			ev->preventDefault();
 		}
-		m_pager->pop();
-		ev->preventDefault();
 		return;
 	}
 }

@@ -69,6 +69,7 @@
     <ClInclude Include="..\..\..\inc\slib\core\platform_android.h" />
     <ClInclude Include="..\..\..\inc\slib\core\platform_apple.h" />
     <ClInclude Include="..\..\..\inc\slib\core\platform_windows.h" />
+    <ClInclude Include="..\..\..\inc\slib\core\preference.h" />
     <ClInclude Include="..\..\..\inc\slib\core\ptr.h" />
     <ClInclude Include="..\..\..\inc\slib\core\queue.h" />
     <ClInclude Include="..\..\..\inc\slib\core\queue_channel.h" />
@@ -323,6 +324,8 @@
     <ClCompile Include="..\..\..\src\slib\core\pipe_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\java.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\platform_windows.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\preference.cpp" />
+    <ClCompile Include="..\..\..\src\slib\core\preference_win32.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\ptr.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\asset.cpp" />
     <ClCompile Include="..\..\..\src\slib\core\ref.cpp" />

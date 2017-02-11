@@ -24,12 +24,15 @@ class WindowInstance;
 class SLIB_EXPORT WindowInstanceParam
 {
 public:
+	Ref<WindowInstance> parent;
+	
 	Ref<Screen> screen;
 	Ref<Menu> menu;
 	sl_bool flagBorderless;
 	sl_bool flagFullScreen;
 	sl_bool flagCenterScreen;
 	sl_bool flagDialog;
+	sl_bool flagModal;
 	UIPoint location;
 	UISize size;
 
@@ -88,9 +91,7 @@ public:
 	
 	virtual void setFocus();
 	
-	void runModal();
-	
-	
+
 	UIRect getFrame();
 	
 	virtual void setFrame(const UIRect& frame);
@@ -361,8 +362,6 @@ public:
 private:
 	Ref<WindowInstance> createWindowInstance(const WindowInstanceParam& param);
 
-	void _runModal();
-	
 	void _create();
 	
 	void _refreshSize();
@@ -396,6 +395,9 @@ private:
 	sl_bool m_flagShowTitleBar;
 	sl_bool m_flagFullScreenOnCreate;
 	sl_bool m_flagCenterScreenOnCreate;
+	
+	UISize m_clientSizeRequested;
+	sl_bool m_flagUseClientSizeRequested;
 
 	// jobject
 	void* m_activity;
@@ -426,8 +428,6 @@ public:
 	
 	
 	virtual sl_bool setFocus() = 0;
-	
-	virtual void runModal() = 0;
 
 	
 	virtual UIRect getFrame() = 0;

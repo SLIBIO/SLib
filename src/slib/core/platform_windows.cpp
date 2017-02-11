@@ -4,6 +4,8 @@
 
 #include "../../../inc/slib/core/platform_windows.h"
 #include "../../../inc/slib/core/scoped.h"
+#include "../../../inc/slib/core/variant.h"
+#include "../../../inc/slib/core/endian.h"
 
 #include <crtdbg.h>
 
@@ -320,6 +322,156 @@ WINAPI_##func Windows::getAPI_##func() { \
 
 LOAD_LIBRARY(kernel32, "kernel32.dll")
 GET_API(kernel32, GetQueuedCompletionStatusEx)
+
+sl_bool Windows::getRegistryValue(HKEY hKeyParent, const String16& path, const String16& name, Variant* out)
+{
+	if (!hKeyParent) {
+		return sl_false;
+	}
+	HKEY hKey;
+	sl_bool flagOpened = sl_false;
+	if (path.isEmpty()) {
+		hKey = hKeyParent;
+	} else {
+		if (path.isEmpty()) {
+			return sl_false;
+		}
+		hKey = NULL;
+		::RegOpenKeyExW(hKeyParent, path.getData(), 0, KEY_QUERY_VALUE, &hKey);
+		if (!hKey) {
+			return sl_false;
+		}
+		flagOpened = sl_true;
+	}
+	DWORD type = 0;
+	DWORD size = 0;
+	sl_bool flagSuccess = sl_false;
+	if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, name.getData(), NULL, &type, NULL, &size)) {
+		if (out) {
+			if (size > 0) {
+				switch (type) {
+					case REG_BINARY:
+					case REG_MULTI_SZ:
+						{
+							SLIB_SCOPED_BUFFER(BYTE, 512, buf, size);
+							if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, name.getData(), NULL, &type, buf, &size)) {
+								Memory mem = Memory::create(buf, size);
+								if (mem.isNotEmpty()) {
+									out->setMemory(mem);
+									flagSuccess = sl_true;
+								}
+							}
+						}
+						break;
+					case REG_EXPAND_SZ:
+					case REG_SZ:
+						{
+							SLIB_SCOPED_BUFFER(BYTE, 512, buf, size);
+							if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, name.getData(), NULL, &type, buf, &size)) {
+								String16 s(reinterpret_cast<sl_char16*>(buf), size / 2 - 1);
+								out->setString(s);
+								flagSuccess = sl_true;
+							}
+						}
+						break;
+					case REG_DWORD:
+					case REG_DWORD_BIG_ENDIAN:
+						if (size == 4) {
+							sl_uint32 n;
+							if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, name.getData(), NULL, &type, reinterpret_cast<BYTE*>(&n), &size)) {
+								if (size == 4) {
+									if (type == REG_DWORD) {
+										out->setUint32(n);
+									} else {
+										out->setUint32(Endian::swap32(n));
+									}
+									flagSuccess = sl_true;
+								}
+							}
+						}
+						break;
+					case REG_QWORD:
+						if (size == 8) {
+							sl_uint64 n;
+							if (ERROR_SUCCESS == ::RegQueryValueExW(hKey, name.getData(), NULL, &type, reinterpret_cast<BYTE*>(&n), &size)) {
+								if (size == 8) {
+									out->setUint64(n);
+									flagSuccess = sl_true;
+								}
+							}
+						}
+						break;
+					default: // REG_NONE
+						out->setNull();
+						flagSuccess = sl_true;
+						break;
+				}
+			} else {
+				out->setNull();
+				flagSuccess = sl_true;
+			}
+		} else {
+			flagSuccess = sl_true;
+		}
+	}
+	if (flagOpened) {
+		::RegCloseKey(hKey);
+	}
+	return flagSuccess;
+}
+
+sl_bool Windows::setRegistryValue(HKEY hKeyParent, const String16& path, const String16& name, const Variant& value)
+{
+	if (!hKeyParent) {
+		return sl_false;
+	}
+	HKEY hKey;
+	sl_bool flagOpened = sl_false;
+	if (path.isEmpty()) {
+		hKey = hKeyParent;
+	} else {
+		if (path.isEmpty()) {
+			return sl_false;
+		}
+		hKey = NULL;
+		::RegOpenKeyExW(hKeyParent, path.getData(), 0, KEY_SET_VALUE, &hKey);
+		if (!hKey) {
+			::RegCreateKeyExW(hKeyParent, path.getData(), NULL, NULL, 0, KEY_ALL_ACCESS, NULL, &hKey, NULL);
+			if (!hKey) {
+				return sl_false;
+			}
+		}
+		flagOpened = sl_true;
+	}
+	sl_bool flagSuccess = sl_false;
+	if (value.isInt64() || value.isUint64()) {
+		sl_uint64 n = value.getUint64();
+		if (ERROR_SUCCESS == ::RegSetValueExW(hKey, name.getData(), NULL, REG_QWORD, reinterpret_cast<BYTE*>(&n), 8)) {
+			flagSuccess = sl_true;
+		}
+	} else if (value.isInteger()) {
+		sl_uint32 n = value.getUint32();
+		if (ERROR_SUCCESS == ::RegSetValueExW(hKey, name.getData(), NULL, REG_DWORD, reinterpret_cast<BYTE*>(&n), 4)) {
+			flagSuccess = sl_true;
+		}
+	} else if (value.isMemory()) {
+		Memory mem = value.getMemory();
+		if (mem.isNotNull()) {
+			if (ERROR_SUCCESS == ::RegSetValueExW(hKey, name.getData(), NULL, REG_BINARY, reinterpret_cast<BYTE*>(mem.getData()), (DWORD)(mem.getSize()))) {
+				flagSuccess = sl_true;
+			}
+		}
+	} else if (value.isString()) {
+		String16 str = value.getString16();
+		if (ERROR_SUCCESS == ::RegSetValueExW(hKey, name.getData(), NULL, REG_SZ, reinterpret_cast<BYTE*>(str.getData()), (DWORD)(str.getLength() + 1) * 2)) {
+			flagSuccess = sl_true;
+		}
+	}
+	if (flagOpened) {
+		::RegCloseKey(hKey);
+	}
+	return flagSuccess;
+}
 
 SLIB_NAMESPACE_END
 

@@ -203,6 +203,8 @@ public:
 public:
 	HttpServiceParam();
 	
+	HttpServiceParam(const HttpServiceParam& other);
+	
 	~HttpServiceParam();
 	
 };

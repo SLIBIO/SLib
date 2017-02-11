@@ -68,10 +68,6 @@ public:
 	
 	void closePopup();
 	
-	void modalPage(const Ref<ViewPage>& page, const Transition& transition, sl_bool flagFillParentBackground = sl_true);
-	
-	void modalPage(const Ref<ViewPage>& page, sl_bool flagFillParentBackground = sl_true);
-	
 protected:
 	virtual void onPause();
 	

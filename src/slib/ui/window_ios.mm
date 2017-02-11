@@ -184,10 +184,6 @@ public:
 		return sl_false;
 	}
 	
-	void runModal()
-	{
-	}
-	
 	UIRect getFrame()
 	{
 		UIView* window = m_window;

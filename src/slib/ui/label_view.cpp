@@ -16,7 +16,8 @@ LabelView::LabelView()
 	m_textAlignment = Alignment::Left;
 	m_textColor = Color::Black;
 	m_multiLineMode = MultiLineMode::Single;
-	
+
+	setPadding(1, 1, 1, 1, UIUpdateMode::Init);
 }
 
 LabelView::~LabelView()

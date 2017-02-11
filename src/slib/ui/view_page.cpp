@@ -791,10 +791,8 @@ ViewPage::ViewPage()
 {
 	SLIB_REFERABLE_CONSTRUCTOR
 	
-	m_flagDidPopup = sl_false;
-	m_flagClosingPopup = sl_false;
+	m_popupState = PopupState::None;
 	m_popupBackgroundColor = Color::zero();
-	m_flagDidModalOnUIThread = sl_false;
 	
 	m_countActiveTransitionAnimations = 0;
 }
@@ -813,7 +811,7 @@ void ViewPage::open(const Ref<ViewPager>& pager, const Transition& transition)
 {
 	if (pager.isNotNull()) {
 		ObjectLocker lock(this);
-		if (m_flagDidPopup) {
+		if (m_popupState != PopupState::None) {
 			return;
 		}
 		pager->push(this, transition);
@@ -829,7 +827,7 @@ void ViewPage::openHome(const Ref<ViewPager>& pager, const Transition& transitio
 {
 	if (pager.isNotNull()) {
 		ObjectLocker lock(this);
-		if (m_flagDidPopup) {
+		if (m_popupState != PopupState::None) {
 			return;
 		}
 		pager->push(this, transition, sl_true);
@@ -844,17 +842,20 @@ void ViewPage::openHome(const Ref<ViewPager>& pager)
 void ViewPage::close(const Transition& transition)
 {
 	ObjectLocker lock(this);
-	if (m_flagDidPopup) {
-		if (m_flagClosingPopup) {
-			return;
+	if (m_popupState == PopupState::ShowWindow) {
+		m_popupState = PopupState::None;
+		Ref<Window> window = getWindow();
+		lock.unlock();
+		dispatchClose();
+		if (window.isNotNull()) {
+			window->close();
 		}
-		m_flagClosingPopup = sl_true;
-		
+	} else if (m_popupState == PopupState::Popup) {
+		m_popupState = PopupState::ClosingPopup;
 		Ref<MobileApp> mobile = MobileApp::getApp();
 		if (mobile.isNotNull()) {
 			mobile->m_popupPages.removeValue(this);
 		}
-		
 		if (isDrawingThread()) {
 			_closePopup(transition);
 		} else {
@@ -873,7 +874,7 @@ void ViewPage::close()
 	close(Transition());
 }
 
-void ViewPage::openPage(const Ref<View>& page, const Transition& transition)
+void ViewPage::goToPage(const Ref<View>& page, const Transition& transition)
 {
 	Ref<ViewPager> pager = getPager();
 	if (pager.isNotNull()) {
@@ -885,12 +886,12 @@ void ViewPage::openPage(const Ref<View>& page, const Transition& transition)
 	}
 }
 
-void ViewPage::openPage(const Ref<View>& page)
+void ViewPage::goToPage(const Ref<View>& page)
 {
-	openPage(page, Transition());
+	goToPage(page, Transition());
 }
 
-void ViewPage::openHomePage(const Ref<View>& page, const Transition& transition)
+void ViewPage::goToHomePage(const Ref<View>& page, const Transition& transition)
 {
 	Ref<ViewPager> pager = getPager();
 	if (pager.isNotNull()) {
@@ -902,9 +903,9 @@ void ViewPage::openHomePage(const Ref<View>& page, const Transition& transition)
 	}
 }
 
-void ViewPage::openHomePage(const Ref<View>& page)
+void ViewPage::goToHomePage(const Ref<View>& page)
 {
-	openHomePage(page, Transition());
+	goToHomePage(page, Transition());
 }
 
 TransitionType ViewPage::getGlobalOpeningTransitionType()
@@ -1194,18 +1195,7 @@ void ViewPage::_finishPopupAnimation(UIPageAction action)
 			}
 		}
 		
-		Ref<Event> event = m_eventClosePopup;
-		if (event.isNotNull()) {
-			event->set();
-			m_eventClosePopup.setNull();
-		}
-		
-		if (m_flagDidModalOnUIThread) {
-			m_flagDidModalOnUIThread = sl_false;
-			UI::quitLoop();
-		}
-		
-		m_flagDidPopup = sl_false;
+		m_popupState = PopupState::None;
 		
 	} else {
 		setEnabled(sl_true, UIUpdateMode::NoRedraw);
@@ -1214,13 +1204,25 @@ void ViewPage::_finishPopupAnimation(UIPageAction action)
 	Base::interlockedDecrement(&m_countActiveTransitionAnimations);
 }
 
+sl_bool ViewPage::_dispatchCloseWindow()
+{
+	Ref<UIEvent> ev = UIEvent::create(UIAction::Unknown);
+	if (ev.isNotNull()) {
+		dispatchCloseWindow(ev.get());
+		if (ev->isPreventedDefault()) {
+			return sl_false;
+		}
+	}
+	return sl_true;
+}
+
 void ViewPage::popup(const Ref<View>& parent, const Transition& transition, sl_bool flagFillParentBackground)
 {
 	if (parent.isNull()) {
 		return;
 	}
 	ObjectLocker lock(this);
-	if (m_flagDidPopup) {
+	if (m_popupState != PopupState::None) {
 		return;
 	}
 	
@@ -1234,8 +1236,7 @@ void ViewPage::popup(const Ref<View>& parent, const Transition& transition, sl_b
 	} else {
 		dispatchToDrawingThread(SLIB_BIND_WEAKREF(void(), ViewPage, _openPopup, this, parent, transition, flagFillParentBackground));
 	}
-	m_flagDidPopup = sl_true;
-	m_flagClosingPopup = sl_false;
+	m_popupState = PopupState::Popup;
 }
 
 void ViewPage::popup(const Ref<View>& parent, sl_bool flagFillParentBackground)
@@ -1243,27 +1244,58 @@ void ViewPage::popup(const Ref<View>& parent, sl_bool flagFillParentBackground)
 	popup(parent, Transition(), flagFillParentBackground);
 }
 
-void ViewPage::popupPage(const Ref<ViewPage>& pageOther, const Transition& transition, sl_bool flagFillParentBackground)
+Ref<Window> ViewPage::popupWindow(const Ref<Window>& parent)
 {
-	if (pageOther.isNotNull()) {
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			Ref<View> parent = pager->getParent();
-			if (parent.isNotNull()) {
-				pageOther->popup(parent, transition, flagFillParentBackground);
-			}
-		}
+	ObjectLocker lock(this);
+	
+	if (m_popupState != PopupState::None) {
+		return sl_null;
 	}
-}
-
-void ViewPage::popupPage(const Ref<ViewPage>& pageOther, sl_bool flagFillParentBackground)
-{
-	popupPage(pageOther, Transition(), flagFillParentBackground);
+	
+	Ref<Window> window = new Window;
+	if (window.isNotNull()) {
+		window->setParent(parent);
+		window->setContentView(this);
+		window->setDialog(sl_true);
+		if (isCenterVertical() && isCenterHorizontal()) {
+			window->setCenterScreenOnCreate(sl_true);
+		} else {
+			window->setLeft(getLeft());
+			window->setTop(getTop());
+		}
+		window->setClientSize(getWidth(), getHeight());
+		window->setModal(sl_true);
+		WeakRef<ViewPage> _page = this;
+		window->setOnClose([_page](Window* window, UIEvent* ev) {
+			Ref<ViewPage> page(_page);
+			if (page.isNotNull()) {
+				ObjectLocker lock(page.get());
+				if (page->m_popupState == PopupState::ShowWindow) {
+					if (page->_dispatchCloseWindow()) {
+						page->m_popupState = PopupState::None;
+						lock.unlock();
+						page->dispatchClose();
+					} else {
+						ev->preventDefault();
+					}
+				}
+			}
+		});
+		
+		window->create();
+		
+		m_popupState = PopupState::ShowWindow;
+		
+		return window;
+		
+	}
+	
+	return sl_null;
 }
 
 sl_bool ViewPage::isPopup()
 {
-	return m_flagDidPopup;
+	return m_popupState == PopupState::Popup;
 }
 
 Color ViewPage::getPopupBackgroundColor()
@@ -1432,60 +1464,6 @@ void ViewPage::_applyDefaultClosingPopupTransition(Transition& transition)
 	}
 }
 
-void ViewPage::modal(const Ref<View>& parent, const Transition& transition, sl_bool flagFillParentBackground)
-{
-	
-	if (parent.isNull()) {
-		return;
-	}
-	ObjectLocker lock(this);
-	if (m_flagDidPopup) {
-		return;
-	}
-	
-	popup(parent, transition, flagFillParentBackground);
-	
-	lock.unlock();
-	
-	if (UI::isUiThread()) {
-		m_flagDidModalOnUIThread = sl_true;
-		UI::runLoop();
-		m_flagDidModalOnUIThread = sl_false;
-	} else {
-		m_flagDidModalOnUIThread = sl_false;
-		Ref<Event> ev = Event::create(sl_false);
-		if (ev.isNotNull()) {
-			m_eventClosePopup = ev;
-			ev->wait();
-			m_eventClosePopup.setNull();
-		}
-	}
-	
-}
-
-void ViewPage::modal(const Ref<View>& parent, sl_bool flagFillParentBackground)
-{
-	modal(parent, Transition(), flagFillParentBackground);
-}
-
-void ViewPage::modalPage(const Ref<ViewPage>& pageOther, const Transition& transition, sl_bool flagFillParentBackground)
-{
-	if (pageOther.isNotNull()) {
-		Ref<ViewPager> pager = getPager();
-		if (pager.isNotNull()) {
-			Ref<View> parent = pager->getParent();
-			if (parent.isNotNull()) {
-				pageOther->modal(parent, transition, flagFillParentBackground);
-			}
-		}
-	}
-}
-
-void ViewPage::modalPage(const Ref<ViewPage>& pageOther, sl_bool flagFillParentBackground)
-{
-	modalPage(pageOther, Transition(), flagFillParentBackground);
-}
-
 void ViewPage::onOpen()
 {
 }
@@ -1514,10 +1492,15 @@ void ViewPage::onBackPressed(UIEvent* ev)
 {
 }
 
+void ViewPage::onCloseWindow(UIEvent* ev)
+{
+}
+
 void ViewPage::dispatchPageAction(ViewPager* pager, UIPageAction action)
 {
 	m_pager = pager;
 	onPageAction(action);
+	getOnPageAction()(this, pager, action);
 	switch (action) {
 		case UIPageAction::Push:
 			dispatchOpen();
@@ -1538,11 +1521,13 @@ void ViewPage::dispatchFinishPageAnimation(ViewPager* pager, UIPageAction action
 {
 	m_pager = pager;
 	onFinishPageAnimation(action);
+	getOnFinishPageAnimation()(this, pager, action);
 }
 
 void ViewPage::dispatchOpen()
 {
 	onOpen();
+	getOnOpen()(this);
 	dispatchResume();
 }
 
@@ -1556,16 +1541,30 @@ void ViewPage::dispatchClose()
 void ViewPage::dispatchResume()
 {
 	onResume();
+	getOnResume()(this);
 }
 
 void ViewPage::dispatchPause()
 {
 	onPause();
+	getOnPause()(this);
 }
 
 void ViewPage::dispatchBackPressed(UIEvent* ev)
 {
 	onBackPressed(ev);
+	if (ev->isPreventedDefault()) {
+		return;
+	}
+	if (_dispatchCloseWindow()) {
+		close();
+	}
+}
+
+void ViewPage::dispatchCloseWindow(UIEvent* ev)
+{
+	onCloseWindow(ev);
+	getOnCloseWindow()(this, ev);
 }
 
 SLIB_UI_NAMESPACE_END

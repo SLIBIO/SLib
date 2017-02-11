@@ -28,6 +28,8 @@ public:
 	sl_uint16 getHttpPort();
 	
 	void setHttpPort(sl_uint16 port);
+
+	void useAsset(const String& prefixForAssetPath);
 	
 	const Ref<WebController>& getController();
 	

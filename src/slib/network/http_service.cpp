@@ -598,6 +598,8 @@ HttpServiceParam::HttpServiceParam()
 	flagLogDebug = sl_false;
 }
 
+HttpServiceParam::HttpServiceParam(const HttpServiceParam& other) = default;
+
 HttpServiceParam::~HttpServiceParam()
 {
 }

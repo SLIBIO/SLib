@@ -28,14 +28,10 @@ Ref<ViewInstance> Button::createNativeWidget(ViewInstance* _parent)
 		if (hFont != nil) {
 			[handle setFont:hFont];
 		}
-		
 		if (m_flagDefaultButton) {
 			[handle setKeyEquivalent:@"\r"];
-			handle.bezelStyle = NSRoundedBezelStyle;
-		} else {
-			handle.bezelStyle = NSRoundedBezelStyle;
-			//handle.bezelStyle = NSRegularSquareBezelStyle;
 		}
+		handle.bezelStyle = NSRoundedBezelStyle;
 	}
 	OSX_VIEW_CREATE_INSTANCE_END
 	return ret;
@@ -57,11 +53,8 @@ void Button::_setDefaultButton_NW(sl_bool flag)
 		NSButton* v = (NSButton*)handle;
 		if (flag) {
 			[v setKeyEquivalent:@"\r"];
-			v.bezelStyle = NSRoundedBezelStyle;
 		} else {
 			[v setKeyEquivalent:@""];
-			v.bezelStyle = NSRoundedBezelStyle;
-			//v.bezelStyle = NSRegularSquareBezelStyle;
 		}
 	}
 }
@@ -81,6 +74,7 @@ void Button::_setFont_NW(const Ref<Font>& font)
 SLIB_UI_NAMESPACE_END
 
 @implementation _Slib_OSX_Button
+
 -(id)initWithFrame:(NSRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -103,6 +97,12 @@ SLIB_UI_NAMESPACE_END
 {
 	return NO;
 }
+
+- (void)setFrame:(NSRect)frame
+{
+	[super setFrame:frame];
+}
+
 @end
 
 #endif

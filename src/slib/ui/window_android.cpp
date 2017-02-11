@@ -150,10 +150,6 @@ public:
 		return sl_false;
 	}
 
-	void runModal()
-	{
-	}
-
 	UIRect getFrame()
 	{
 		JniGlobal<jobject> _jwindow(m_window);

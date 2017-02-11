@@ -121,13 +121,16 @@ void UIPlatform::runLoop(sl_uint32 level)
 {
 	while (1) {
 		@autoreleasepool {
-			NSEvent* ev = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:nil inMode:NSDefaultRunLoopMode dequeue:YES];
-			if ([ev type] == NSApplicationDefined) {
-				if ([ev subtype] == NSPowerOffEventType) {
-					break;
+			NSDate* date = [NSDate dateWithTimeIntervalSinceNow:1000];
+			NSEvent* ev = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:date inMode:NSDefaultRunLoopMode dequeue:YES];
+			if (ev != nil) {
+				if ([ev type] == NSApplicationDefined) {
+					if ([ev subtype] == NSPowerOffEventType) {
+						break;
+					}
 				}
+				[NSApp sendEvent:ev];
 			}
-			[NSApp sendEvent:ev];
 		}
 	}
 }

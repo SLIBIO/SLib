@@ -35,6 +35,8 @@ UrlRequestParam::UrlRequestParam()
 	flagStoreResponseContent = sl_true;
 }
 
+UrlRequestParam::UrlRequestParam(const UrlRequestParam& other) = default;
+
 UrlRequestParam::~UrlRequestParam()
 {
 }
@@ -79,6 +81,16 @@ Ref<UrlRequest> UrlRequest::send(const String& url, const Function<void(UrlReque
 	return send(rp);
 }
 
+Ref<UrlRequest> UrlRequest::send(const String& url, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
+{
+	UrlRequestParam rp;
+	rp.url = url;
+	rp.method = HttpMethod::GET;
+	rp.onComplete = onComplete;
+	rp.dispatcher = dispatcher;
+	return send(rp);
+}
+
 Ref<UrlRequest> UrlRequest::send(const String& url, const Map<String, Variant>& params, const Function<void(UrlRequest*)>& onComplete)
 {
 	UrlRequestParam rp;
@@ -89,12 +101,33 @@ Ref<UrlRequest> UrlRequest::send(const String& url, const Map<String, Variant>& 
 	return send(rp);
 }
 
+Ref<UrlRequest> UrlRequest::send(const String& url, const Map<String, Variant>& params, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
+{
+	UrlRequestParam rp;
+	rp.url = url;
+	rp.method = HttpMethod::GET;
+	rp.parameters = params;
+	rp.onComplete = onComplete;
+	rp.dispatcher = dispatcher;
+	return send(rp);
+}
+
 Ref<UrlRequest> UrlRequest::send(HttpMethod method, const String& url, const Function<void(UrlRequest*)>& onComplete)
 {
 	UrlRequestParam rp;
 	rp.url = url;
 	rp.method = method;
 	rp.onComplete = onComplete;
+	return send(rp);
+}
+
+Ref<UrlRequest> UrlRequest::send(HttpMethod method, const String& url, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
+{
+	UrlRequestParam rp;
+	rp.url = url;
+	rp.method = method;
+	rp.onComplete = onComplete;
+	rp.dispatcher = dispatcher;
 	return send(rp);
 }
 
@@ -109,6 +142,18 @@ Ref<UrlRequest> UrlRequest::send(HttpMethod method, const String& url, const Map
 	return send(rp);
 }
 
+Ref<UrlRequest> UrlRequest::send(HttpMethod method, const String& url, const Map<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
+{
+	UrlRequestParam rp;
+	rp.url = url;
+	rp.method = method;
+	rp.parameters = params;
+	rp.requestBody = _buildRequestBody(body);
+	rp.onComplete = onComplete;
+	rp.dispatcher = dispatcher;
+	return send(rp);
+}
+
 Ref<UrlRequest> UrlRequest::sendJson(HttpMethod method, const String& url, const Map<String, Variant>& params, const Variant& json, const Function<void(UrlRequest*)>& onComplete)
 {
 	UrlRequestParam rp;
@@ -120,6 +165,18 @@ Ref<UrlRequest> UrlRequest::sendJson(HttpMethod method, const String& url, const
 	return send(rp);
 }
 
+Ref<UrlRequest> UrlRequest::sendJson(HttpMethod method, const String& url, const Map<String, Variant>& params, const Variant& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
+{
+	UrlRequestParam rp;
+	rp.url = url;
+	rp.method = method;
+	rp.parameters = params;
+	rp.requestBody = json.toJsonString().toMemory();
+	rp.onComplete = onComplete;
+	rp.dispatcher = dispatcher;
+	return send(rp);
+}
+
 Ref<UrlRequest> UrlRequest::post(const String& url, const Variant& body, const Function<void(UrlRequest*)>& onComplete)
 {
 	UrlRequestParam rp;
@@ -127,6 +184,17 @@ Ref<UrlRequest> UrlRequest::post(const String& url, const Variant& body, const F
 	rp.method = HttpMethod::POST;
 	rp.requestBody = _buildRequestBody(body);
 	rp.onComplete = onComplete;
+	return send(rp);
+}
+
+Ref<UrlRequest> UrlRequest::post(const String& url, const Variant& body, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
+{
+	UrlRequestParam rp;
+	rp.url = url;
+	rp.method = HttpMethod::POST;
+	rp.requestBody = _buildRequestBody(body);
+	rp.onComplete = onComplete;
+	rp.dispatcher = dispatcher;
 	return send(rp);
 }
 
@@ -141,6 +209,18 @@ Ref<UrlRequest> UrlRequest::post(const String& url, const Map<String, Variant>& 
 	return send(rp);
 }
 
+Ref<UrlRequest> UrlRequest::post(const String& url, const Map<String, Variant>& params, const Variant& body, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
+{
+	UrlRequestParam rp;
+	rp.url = url;
+	rp.method = HttpMethod::POST;
+	rp.parameters = params;
+	rp.requestBody = _buildRequestBody(body);
+	rp.onComplete = onComplete;
+	rp.dispatcher = dispatcher;
+	return send(rp);
+}
+
 Ref<UrlRequest> UrlRequest::postJson(const String& url, const Variant& json, const Function<void(UrlRequest*)>& onComplete)
 {
 	UrlRequestParam rp;
@@ -148,6 +228,17 @@ Ref<UrlRequest> UrlRequest::postJson(const String& url, const Variant& json, con
 	rp.method = HttpMethod::POST;
 	rp.requestBody = json.toJsonString().toMemory();
 	rp.onComplete = onComplete;
+	return send(rp);
+}
+
+Ref<UrlRequest> UrlRequest::postJson(const String& url, const Variant& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
+{
+	UrlRequestParam rp;
+	rp.url = url;
+	rp.method = HttpMethod::POST;
+	rp.requestBody = json.toJsonString().toMemory();
+	rp.onComplete = onComplete;
+	rp.dispatcher = dispatcher;
 	return send(rp);
 }
 
@@ -159,6 +250,18 @@ Ref<UrlRequest> UrlRequest::postJson(const String& url, const Map<String, Varian
 	rp.parameters = params;
 	rp.requestBody = json.toJsonString().toMemory();
 	rp.onComplete = onComplete;
+	return send(rp);
+}
+
+Ref<UrlRequest> UrlRequest::postJson(const String& url, const Map<String, Variant>& params, const Variant& json, const Function<void(UrlRequest*)>& onComplete, const Ref<Dispatcher>& dispatcher)
+{
+	UrlRequestParam rp;
+	rp.url = url;
+	rp.method = HttpMethod::POST;
+	rp.parameters = params;
+	rp.requestBody = json.toJsonString().toMemory();
+	rp.onComplete = onComplete;
+	rp.dispatcher = dispatcher;
 	return send(rp);
 }
 

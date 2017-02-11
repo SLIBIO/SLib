@@ -18,7 +18,6 @@ public:
 
 	sl_bool m_flagMinimized;
 	sl_bool m_flagMaximized;
-	sl_bool m_flagModal;
 
 	AtomicRef<ViewInstance> m_viewContent;
 	sl_bool m_flagDestroyOnRelease;
@@ -30,7 +29,6 @@ public:
 	{
 		m_flagMinimized = sl_false;
 		m_flagMaximized = sl_false;
-		m_flagModal = sl_false;
 
 		m_backgroundColor = Color::zero();
 	}
@@ -72,6 +70,12 @@ public:
 
 		HINSTANCE hInst = ::GetModuleHandleW(NULL);
 
+		HWND hParent = NULL;
+		if (param.parent.isNotNull()) {
+			_Win32_Window* w = static_cast<_Win32_Window*>(param.parent.get());
+			hParent = w->m_handle;
+		}
+
 		// create handle
 		HWND hWnd;
 		{
@@ -107,10 +111,14 @@ public:
 				, style
 				, (int)(frameWindow.left), (int)(frameWindow.top)
 				, (int)(frameWindow.getWidth()), (int)(frameWindow.getHeight())
-				, NULL // parent
+				, hParent // parent
 				, UIPlatform::getMenuHandle(param.menu) // menu
 				, hInst
 				, NULL);
+
+			if (hParent && param.flagModal) {
+				::EnableWindow(hParent, FALSE);
+			}
 		}
 		return hWnd;
 	}
@@ -125,11 +133,9 @@ public:
 		ObjectLocker lock(this);
 		HWND hWnd = m_handle;
 		if (hWnd) {
-			if (m_flagModal) {
-				HWND hWndParent = Windows::getOwnerWindow(hWnd);
-				if (hWndParent) {
-					::EnableWindow(hWndParent, TRUE);
-				}
+			HWND hWndParent = Windows::getOwnerWindow(hWnd);
+			if (hWndParent) {
+				::EnableWindow(hWndParent, TRUE);
 			}
 			m_handle = NULL;
 			UIPlatform::removeWindowInstance(hWnd);
@@ -160,7 +166,7 @@ public:
 		HWND hWnd = m_handle;
 		if (hWnd) {
 			if (window.isNotNull()) {
-				_Win32_Window* w = (_Win32_Window*)(window.get());
+				_Win32_Window* w = static_cast<_Win32_Window*>(window.get());
 				HWND hWndParent = w->m_handle;
 				if (hWndParent) {
 					::SetWindowLongPtr(hWnd, GWLP_HWNDPARENT, (LONG_PTR)hWndParent);
@@ -190,18 +196,6 @@ public:
 			return sl_true;
 		}
 		return sl_false;
-	}
-
-	void runModal()
-	{
-		m_flagModal = sl_true;
-		HWND hWnd = m_handle;
-		if (hWnd) {
-			HWND hWndParent = Windows::getOwnerWindow(hWnd);
-			if (hWndParent) {
-				::EnableWindow(hWndParent, FALSE);
-			}
-		}
 	}
 
 	UIRect getFrame()
