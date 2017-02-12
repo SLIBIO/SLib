@@ -3,6 +3,7 @@
 #if defined(SLIB_PLATFORM_IS_APPLE)
 
 #include "../../../inc/slib/core/platform_apple.h"
+
 #include "../../../inc/slib/core/file.h"
 
 SLIB_NAMESPACE_BEGIN
@@ -168,16 +169,22 @@ String Apple::getSystemVersion()
 	return _g_system_version;
 }
 
-sl_uint32 getSystemMajorVersion()
+sl_uint32 Apple::getSystemMajorVersion()
 {
 	_Apple_initSystemVersion();
 	return _g_system_version_major;
 }
 
-sl_uint32 getSystemMinorVersion()
+sl_uint32 Apple::getSystemMinorVersion()
 {
 	_Apple_initSystemVersion();
 	return _g_system_version_minor;
+}
+
+String Apple::getMainBundlePath()
+{
+	NSString* path = [[NSBundle mainBundle] bundlePath];
+	return getStringFromNSString(path);
 }
 
 SLIB_NAMESPACE_END

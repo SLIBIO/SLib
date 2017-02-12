@@ -54,6 +54,15 @@ public:
 	
 	static void setCrashHandler(SIGNAL_HANDLER handler);
 	
+	
+	static void registerApplicationRunAtStartup(const String& path);
+	
+	static void registerApplicationRunAtStartup();
+	
+	static void unregisterApplicationRunAtStartup(const String& path);
+	
+	static void unregisterApplicationRunAtStartup();
+	
 };
 
 class SLIB_EXPORT GlobalUniqueInstance : public Referable
