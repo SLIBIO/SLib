@@ -47,6 +47,8 @@ public:
 	static sl_uint32 getSystemMajorVersion();
 	
 	static sl_uint32 getSystemMinorVersion();
+	
+	static String getMainBundlePath();
 
 };
 

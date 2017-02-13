@@ -1123,6 +1123,31 @@ SLIB_UI_NAMESPACE_END
 	return TRUE;
 }
 
+- (void)sendEvent:(NSEvent *)event
+{
+	if (event.type == NSEventTypeKeyDown) {
+		id view = [self firstResponder];
+		if ([view isKindOfClass:[NSTextView class]]) {
+			// Find NSTextField
+			NSView* t = view;
+			t = t.superview;
+			if (!([t isKindOfClass:[NSTextField class]])) {
+				t = t.superview;
+			}
+			if ([t isKindOfClass:[NSTextField class]]) {
+				int c = event.keyCode;
+				// Tab, Return, Escape
+				if (c == 0x30 || c == 0x24 || c == 0x35) {
+					// NSTextField can't get keyDown event, so we manually invoke this event
+					[t keyDown:event];
+					return;
+				}
+			}
+		}
+	}
+	[super sendEvent:event];
+}
+
 @end
 
 SLIB_UI_NAMESPACE_BEGIN

@@ -47,6 +47,70 @@ String System::getTempDirectory()
 	return Apple::getStringFromNSString(path);
 }
 
+void _System_setBundleLoginItemEnabled(const String& path, sl_bool flagEnabled)
+{
+#if defined(SLIB_PLATFORM_IS_MACOS)
+	if (path.isEmpty()) {
+		return;
+	}
+	
+	NSURL *itemURL = [NSURL fileURLWithPath:(Apple::getNSStringFromString(path))];
+	LSSharedFileListItemRef existingItem = NULL;
+	
+	LSSharedFileListRef loginItems = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
+	
+	if(loginItems) {
+		UInt32 seed = 0U;
+		NSArray *currentLoginItems = CFBridgingRelease(LSSharedFileListCopySnapshot(loginItems, &seed));
+		for (id itemObject in currentLoginItems) {
+			LSSharedFileListItemRef item = (__bridge LSSharedFileListItemRef)itemObject;
+			UInt32 resolutionFlags = kLSSharedFileListNoUserInteraction | kLSSharedFileListDoNotMountVolumes;
+			CFURLRef URL = NULL;
+			OSStatus err = LSSharedFileListItemResolve(item, resolutionFlags, &URL, NULL);
+			if (err == noErr) {
+				Boolean foundIt = CFEqual(URL, (__bridge CFTypeRef)(itemURL));
+				CFRelease(URL);
+				if (foundIt) {
+					existingItem = item;
+					break;
+				}
+			}
+		}
+		if (flagEnabled) {
+			if (existingItem == NULL) {
+				LSSharedFileListInsertItemURL(loginItems, kLSSharedFileListItemBeforeFirst, NULL, NULL, (__bridge CFURLRef)itemURL, NULL, NULL);
+			}
+		} else {
+			if (existingItem != NULL) {
+				LSSharedFileListItemRemove(loginItems, existingItem);
+			}
+		}
+		CFRelease(loginItems);
+	}
+	
+#endif
+}
+
+void System::registerApplicationRunAtStartup(const String& path)
+{
+	_System_setBundleLoginItemEnabled(path, sl_true);
+}
+
+void System::registerApplicationRunAtStartup()
+{
+	_System_setBundleLoginItemEnabled(Apple::getMainBundlePath(), sl_true);
+}
+
+void System::unregisterApplicationRunAtStartup(const String& path)
+{
+	_System_setBundleLoginItemEnabled(path, sl_false);
+}
+
+void System::unregisterApplicationRunAtStartup()
+{
+	_System_setBundleLoginItemEnabled(Apple::getMainBundlePath(), sl_false);
+}
+
 SLIB_NAMESPACE_END
 
 #endif

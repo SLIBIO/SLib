@@ -441,6 +441,7 @@ SLIB_UI_NAMESPACE_END
 @end
 
 @implementation _Slib_OSX_SecureTextField
+
 -(void)controlTextDidChange:(NSNotification *)obj
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
@@ -460,9 +461,11 @@ SLIB_UI_NAMESPACE_END
 	}
 	[super keyUp:theEvent];
 }
+
 @end
 
 @implementation _Slib_OSX_TextArea
+
 -(id)initWithFrame:(NSRect)frame
 {
 	self = [super initWithFrame:frame];
@@ -487,6 +490,7 @@ SLIB_UI_NAMESPACE_END
 	}
 	return self;
 }
+
 -(void)controlTextDidChange:(NSNotification *)obj
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
@@ -494,9 +498,23 @@ SLIB_UI_NAMESPACE_END
 		slib::_EditView::onChangeTextArea(instance.get(), self);
 	}
 }
+
 @end
 
 @implementation _Slib_OSX_TextArea_TextView
+
+- (void)keyDown:(NSEvent*)theEvent
+{
+	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
+	if (instance.isNotNull()) {
+		sl_bool flagNoDefault = instance->onEventKey(sl_true, theEvent);
+		if (flagNoDefault) {
+			return;
+		}
+	}
+	[super keyDown:theEvent];
+}
+
 - (void)keyUp:(NSEvent*)theEvent
 {
 	slib::Ref<slib::OSX_ViewInstance> instance = m_viewInstance;
