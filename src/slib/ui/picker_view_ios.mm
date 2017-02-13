@@ -18,146 +18,145 @@
 }
 @end
 
-SLIB_UI_NAMESPACE_BEGIN
-
-class _PickerView : public PickerView
+namespace slib
 {
-public:
-	sl_uint32 __getItemsCount()
+	class _PickerView : public PickerView
 	{
-		return (sl_uint32)(m_titles.getCount());
-	}
-	
-	NSString* __getItemTitle(sl_uint32 row)
-	{
-		String s = m_titles.getValueAt(row);
-		return Apple::getNSStringFromString(s);
-	}
-	
-	void __onSelectItem(_Slib_iOS_PickerView* v, sl_uint32 row)
-	{
-		m_indexSelected = row;
-		dispatchSelectItem(row);
-	}
-	
-	void __selectItem(_Slib_iOS_PickerView* v, sl_uint32 row)
-	{
-		[v selectRow:row inComponent:0 animated:NO];
-	}
-};
-
-Ref<ViewInstance> PickerView::createNativeWidget(ViewInstance* _parent)
-{
-	IOS_VIEW_CREATE_INSTANCE_BEGIN
-	_Slib_iOS_PickerView* handle = [[_Slib_iOS_PickerView alloc] initWithFrame:frame];
-	if (handle != nil) {
-		Ref<Font> font = getFont();
-		UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
-		if (hFont != nil) {
-			handle->m_font = hFont;
+	public:
+		sl_uint32 __getItemsCount()
+		{
+			return (sl_uint32)(m_titles.getCount());
 		}
-		handle->m_view = this;
-	}
-	IOS_VIEW_CREATE_INSTANCE_END
-	if (handle != nil) {
-		((_PickerView*)this)->__selectItem(handle, m_indexSelected);
-	}
-	return ret;
-}
-
-void PickerView::_getSelectedIndex_NW()
-{
-}
-
-void PickerView::_select_NW(sl_uint32 index)
-{
-	if (![NSThread isMainThread]) {
-		dispatch_async(dispatch_get_main_queue(), ^{
-			_select_NW(index);
-		});
-		return;
+		
+		NSString* __getItemTitle(sl_uint32 row)
+		{
+			String s = m_titles.getValueAt(row);
+			return Apple::getNSStringFromString(s);
+		}
+		
+		void __onSelectItem(_Slib_iOS_PickerView* v, sl_uint32 row)
+		{
+			m_indexSelected = row;
+			dispatchSelectItem(row);
+		}
+		
+		void __selectItem(_Slib_iOS_PickerView* v, sl_uint32 row)
+		{
+			[v selectRow:row inComponent:0 animated:NO];
+		}
+	};
+	
+	Ref<ViewInstance> PickerView::createNativeWidget(ViewInstance* _parent)
+	{
+		IOS_VIEW_CREATE_INSTANCE_BEGIN
+		_Slib_iOS_PickerView* handle = [[_Slib_iOS_PickerView alloc] initWithFrame:frame];
+		if (handle != nil) {
+			Ref<Font> font = getFont();
+			UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
+			if (hFont != nil) {
+				handle->m_font = hFont;
+			}
+			handle->m_view = this;
+		}
+		IOS_VIEW_CREATE_INSTANCE_END
+		if (handle != nil) {
+			((_PickerView*)this)->__selectItem(handle, m_indexSelected);
+		}
+		return ret;
 	}
 	
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
-		_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
-		((_PickerView*)this)->__selectItem(v, index);
-	}
-}
-
-void PickerView::_refreshItemsCount_NW()
-{
-	if (![NSThread isMainThread]) {
-		dispatch_async(dispatch_get_main_queue(), ^{
-			_refreshItemsCount_NW();
-		});
-		return;
+	void PickerView::_getSelectedIndex_NW()
+	{
 	}
 	
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
-		_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
-		[v reloadAllComponents];
-		((_PickerView*)this)->__selectItem(v, m_indexSelected);
-	}
-}
-
-void PickerView::_refreshItemsContent_NW()
-{
-	if (![NSThread isMainThread]) {
-		dispatch_async(dispatch_get_main_queue(), ^{
-			_refreshItemsContent_NW();
-		});
-		return;
-	}
-	
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
-		_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
-		[v reloadAllComponents];
-		((_PickerView*)this)->__selectItem(v, m_indexSelected);
-	}
-}
-
-void PickerView::_setItemTitle_NW(sl_uint32 index, const String& title)
-{
-	if (![NSThread isMainThread]) {
-		String _title = title;
-		dispatch_async(dispatch_get_main_queue(), ^{
-			_setItemTitle_NW(index, _title);
-		});
-		return;
+	void PickerView::_select_NW(sl_uint32 index)
+	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_select_NW(index);
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
+			_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
+			((_PickerView*)this)->__selectItem(v, index);
+		}
 	}
 	
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
-		_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
-		[v reloadAllComponents];
-	}
-}
-
-void PickerView::_setFont_NW(const Ref<Font>& font)
-{
-	if (![NSThread isMainThread]) {
-		Ref<Font> _font = font;
-		dispatch_async(dispatch_get_main_queue(), ^{
-			_setFont_NW(_font);
-		});
-		return;
+	void PickerView::_refreshItemsCount_NW()
+	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_refreshItemsCount_NW();
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
+			_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
+			[v reloadAllComponents];
+			((_PickerView*)this)->__selectItem(v, m_indexSelected);
+		}
 	}
 	
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
-		_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
-		UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
-		if (hFont != nil) {
-			v->m_font = hFont;
+	void PickerView::_refreshItemsContent_NW()
+	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_refreshItemsContent_NW();
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
+			_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
+			[v reloadAllComponents];
+			((_PickerView*)this)->__selectItem(v, m_indexSelected);
+		}
+	}
+	
+	void PickerView::_setItemTitle_NW(sl_uint32 index, const String& title)
+	{
+		if (![NSThread isMainThread]) {
+			String _title = title;
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_setItemTitle_NW(index, _title);
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
+			_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
 			[v reloadAllComponents];
 		}
 	}
+	
+	void PickerView::_setFont_NW(const Ref<Font>& font)
+	{
+		if (![NSThread isMainThread]) {
+			Ref<Font> _font = font;
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_setFont_NW(_font);
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_PickerView class]]) {
+			_Slib_iOS_PickerView* v = (_Slib_iOS_PickerView*)handle;
+			UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
+			if (hFont != nil) {
+				v->m_font = hFont;
+				[v reloadAllComponents];
+			}
+		}
+	}	
 }
-
-SLIB_UI_NAMESPACE_END
 
 @implementation _Slib_iOS_PickerView
 -(id)initWithFrame:(CGRect)frame

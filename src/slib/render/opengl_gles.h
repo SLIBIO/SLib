@@ -157,13 +157,14 @@
 	_SLIB_RENDER_GLES_ENTRY(void, glViewport, GLint x, GLint y, GLsizei width, GLsizei height) 
 
 
-SLIB_RENDER_NAMESPACE_BEGIN
-struct _GLES_ENTRY_POINTS
+namespace slib
 {
-	_SLIB_RENDER_GLES_ENTRIES
-};
-extern _GLES_ENTRY_POINTS _GLES_ENTRIES;
-SLIB_RENDER_NAMESPACE_END
+	struct _GLES_ENTRY_POINTS
+	{
+		_SLIB_RENDER_GLES_ENTRIES
+	};
+	extern _GLES_ENTRY_POINTS _GLES_ENTRIES;
+}
 
 #define _GLES_ENTRY(name) _GLES_ENTRIES.name
 

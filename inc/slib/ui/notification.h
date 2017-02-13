@@ -7,29 +7,28 @@
 #include "../core/variant.h"
 #include "../core/function.h"
 
-SLIB_UI_NAMESPACE_BEGIN
-
-class SLIB_EXPORT PushNotificationMessage
+namespace slib
 {
-public:
-	String title;
-	String body;
-	Map<String, Variant> data;
-};
-
-class SLIB_EXPORT PushNotification
-{
-public:
-    static String getDeviceToken();
-	static void setTokenRefreshCallback(const Function<void(String)>& callback);
-	static void setNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback);
-	static Function<void(String)> getTokenRefreshCallback();
-	static Function<void(PushNotificationMessage&)> getNotificationReceivedCallback();
-    
-private:
-    static void _initToken();
-};
-
-SLIB_UI_NAMESPACE_END
+	class SLIB_EXPORT PushNotificationMessage
+	{
+	public:
+		String title;
+		String body;
+		Map<String, Variant> data;
+	};
+	
+	class SLIB_EXPORT PushNotification
+	{
+	public:
+		static String getDeviceToken();
+		static void setTokenRefreshCallback(const Function<void(String)>& callback);
+		static void setNotificationReceivedCallback(const Function<void(PushNotificationMessage&)>& callback);
+		static Function<void(String)> getTokenRefreshCallback();
+		static Function<void(PushNotificationMessage&)> getNotificationReceivedCallback();
+		
+	private:
+		static void _initToken();
+	};	
+}
 
 #endif

@@ -6,59 +6,58 @@
 #include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/platform.h"
 
-SLIB_UI_NAMESPACE_BEGIN
-
-sl_uint32 UIEvent::getSystemKeycode(Keycode key)
+namespace slib
 {
-	return -1;
+	sl_uint32 UIEvent::getSystemKeycode(Keycode key)
+	{
+		return -1;
+	}
+	
+	Keycode UIEvent::getKeycodeFromSystemKeycode(sl_uint32 vkey)
+	{
+		return Keycode::Unknown;
+	}
+	
+	sl_bool UI::checkKeyPressed(Keycode key)
+	{
+		return sl_false;
+	}
+	
+	sl_bool UI::checkCapsLockOn()
+	{
+		return sl_false;
+	}
+	
+	sl_bool UI::checkNumLockOn()
+	{
+		return sl_false;
+	}
+	
+	sl_bool UI::checkScrollLockOn()
+	{
+		return sl_false;
+	}
+	
+	
+	UIPoint UI::getCursorPos()
+	{
+		return UIPoint::zero();
+	}
+	
+	sl_bool UI::checkLeftButtonPressed()
+	{
+		return sl_false;
+	}
+	
+	sl_bool UI::checkRightButtonPressed()
+	{
+		return sl_false;
+	}
+	
+	sl_bool UI::checkMiddleButtonPressed()
+	{
+		return sl_false;
+	}	
 }
-
-Keycode UIEvent::getKeycodeFromSystemKeycode(sl_uint32 vkey)
-{
-	return Keycode::Unknown;
-}
-
-sl_bool UI::checkKeyPressed(Keycode key)
-{
-	return sl_false;
-}
-
-sl_bool UI::checkCapsLockOn()
-{
-	return sl_false;
-}
-
-sl_bool UI::checkNumLockOn()
-{
-	return sl_false;
-}
-
-sl_bool UI::checkScrollLockOn()
-{
-	return sl_false;
-}
-
-
-UIPoint UI::getCursorPos()
-{
-	return UIPoint::zero();
-}
-
-sl_bool UI::checkLeftButtonPressed()
-{
-	return sl_false;
-}
-
-sl_bool UI::checkRightButtonPressed()
-{
-	return sl_false;
-}
-
-sl_bool UI::checkMiddleButtonPressed()
-{
-	return sl_false;
-}
-
-SLIB_UI_NAMESPACE_END
 
 #endif

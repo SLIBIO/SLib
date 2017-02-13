@@ -4,15 +4,14 @@
 
 #include <UIKit/UIKit.h>
 
-SLIB_UI_NAMESPACE_BEGIN
-
-void PushNotification::_initToken()
+namespace slib
 {
-    UIApplication* application = [UIApplication sharedApplication];
-    UIUserNotificationSettings* notificationSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert categories:nil];
-    [application registerUserNotificationSettings:notificationSettings];
+	void PushNotification::_initToken()
+	{
+		UIApplication* application = [UIApplication sharedApplication];
+		UIUserNotificationSettings* notificationSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert categories:nil];
+		[application registerUserNotificationSettings:notificationSettings];
+	}
 }
-
-SLIB_UI_NAMESPACE_END
 
 #endif

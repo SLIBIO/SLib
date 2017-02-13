@@ -144,120 +144,119 @@
 
 #include "tcpip.h"
 
-SLIB_NETWORK_NAMESPACE_BEGIN
-
-enum class IcmpType
+namespace slib
 {
-	EchoReply = 0,
-	DestinationUnreachable = 3,
-	Redirect = 5,
-	Echo = 8,
-	TimeExceeded = 11,
-	ParameterProblem = 12,
-	Timestamp = 13,
-	TimestampReply = 14
-};
-
-class SLIB_EXPORT IcmpHeaderFormat
-{
-public:
-	IcmpType getType() const;
-    
-	void setType(IcmpType type);
-    
-	sl_uint8 getCode() const;
-    
-	void setCode(sl_uint8 code);
-    
-	sl_uint16 getChecksum() const;
-    
-	void setChecksum(sl_uint16 checksum);
-    
-	void updateChecksum(sl_uint32 sizeContent);
-    
-	sl_bool checkChecksum(sl_uint32 sizeContent) const;
+	enum class IcmpType
+	{
+		EchoReply = 0,
+		DestinationUnreachable = 3,
+		Redirect = 5,
+		Echo = 8,
+		TimeExceeded = 11,
+		ParameterProblem = 12,
+		Timestamp = 13,
+		TimestampReply = 14
+	};
 	
-	sl_bool check(sl_uint32 sizeContent) const;
-
-	sl_uint16 getEchoIdentifier() const;
+	class SLIB_EXPORT IcmpHeaderFormat
+	{
+	public:
+		IcmpType getType() const;
+		
+		void setType(IcmpType type);
+		
+		sl_uint8 getCode() const;
+		
+		void setCode(sl_uint8 code);
+		
+		sl_uint16 getChecksum() const;
+		
+		void setChecksum(sl_uint16 checksum);
+		
+		void updateChecksum(sl_uint32 sizeContent);
+		
+		sl_bool checkChecksum(sl_uint32 sizeContent) const;
+		
+		sl_bool check(sl_uint32 sizeContent) const;
+		
+		sl_uint16 getEchoIdentifier() const;
+		
+		void setEchoIdentifier(sl_uint16 id);
+		
+		sl_uint16 getEchoSequenceNumber() const;
+		
+		void setEchoSequenceNumber(sl_uint16 sn);
+		
+		IPv4Address getRedirectGatewayAddress() const;
+		
+		void setRedirectGatewayAddress(const IPv4Address& address);
+		
+		sl_uint8 getParameterProblemPointer() const;
+		
+		void setParameterProblemPointer(sl_uint8 pointer);
+		
+		sl_uint16 getTimestampIdentifier() const;
+		
+		void setTimestampIdentifier(sl_uint16 id);
+		
+		sl_uint16 getTimestampSequenceNumber() const;
+		
+		void setTimestampSequenceNumber(sl_uint16 sn);
+		
+		const sl_uint8* getContent() const;
+		
+		sl_uint8* getContent();
+		
+	private:
+		sl_uint8 _type;
+		sl_uint8 _code;
+		sl_uint8 _checksum[2];
+		sl_uint8 _rest[4];
+		
+	};
 	
-	void setEchoIdentifier(sl_uint16 id);
+	class SLIB_EXPORT IcmpEchoAddress
+	{
+	public:
+		IPv4Address ip;
+		sl_uint16 identifier;
+		sl_uint16 sequenceNumber;
+		
+	public:
+		int compare(const IcmpEchoAddress& other) const;
+		
+		sl_uint32 hashCode() const;
+		
+	public:
+		sl_bool operator==(const IcmpEchoAddress& other) const;
+		
+		sl_bool operator!=(const IcmpEchoAddress& other) const;
+		
+	};
 	
-	sl_uint16 getEchoSequenceNumber() const;
+	template <>
+	class Compare<IcmpEchoAddress>
+	{
+	public:
+		int operator()(const IcmpEchoAddress& a, const IcmpEchoAddress& b) const;
+		
+	};
 	
-	void setEchoSequenceNumber(sl_uint16 sn);
+	template <>
+	class Equals<IcmpEchoAddress>
+	{
+	public:
+		sl_bool operator()(const IcmpEchoAddress& a, const IcmpEchoAddress& b) const;
+		
+	};
 	
-	IPv4Address getRedirectGatewayAddress() const;
-	
-	void setRedirectGatewayAddress(const IPv4Address& address);
-	
-	sl_uint8 getParameterProblemPointer() const;
-	
-	void setParameterProblemPointer(sl_uint8 pointer);
-	
-	sl_uint16 getTimestampIdentifier() const;
-	
-	void setTimestampIdentifier(sl_uint16 id);
-	
-	sl_uint16 getTimestampSequenceNumber() const;
-	
-	void setTimestampSequenceNumber(sl_uint16 sn);
-	
-	const sl_uint8* getContent() const;
-	
-	sl_uint8* getContent();
-	
-private:
-	sl_uint8 _type;
-	sl_uint8 _code;
-	sl_uint8 _checksum[2];
-	sl_uint8 _rest[4];
-	
-};
-
-class SLIB_EXPORT IcmpEchoAddress
-{
-public:
-	IPv4Address ip;
-	sl_uint16 identifier;
-	sl_uint16 sequenceNumber;
-
-public:
-	int compare(const IcmpEchoAddress& other) const;
-	
-	sl_uint32 hashCode() const;
-
-public:
-	sl_bool operator==(const IcmpEchoAddress& other) const;
-    
-	sl_bool operator!=(const IcmpEchoAddress& other) const;
-	
-};
-
-template <>
-class Compare<IcmpEchoAddress>
-{
-public:
-	int operator()(const IcmpEchoAddress& a, const IcmpEchoAddress& b) const;
-	
-};
-
-template <>
-class Equals<IcmpEchoAddress>
-{
-public:
-	sl_bool operator()(const IcmpEchoAddress& a, const IcmpEchoAddress& b) const;
-	
-};
-
-template <>
-class Hash<IcmpEchoAddress>
-{
-public:
-	sl_uint32 operator()(const IcmpEchoAddress& a) const;
-	
-};
-
-SLIB_NETWORK_NAMESPACE_END
+	template <>
+	class Hash<IcmpEchoAddress>
+	{
+	public:
+		sl_uint32 operator()(const IcmpEchoAddress& a) const;
+		
+	};	
+}
 
 #endif

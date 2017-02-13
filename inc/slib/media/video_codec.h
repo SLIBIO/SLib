@@ -7,51 +7,50 @@
 
 #include "../core/object.h"
 
-SLIB_MEDIA_NAMESPACE_BEGIN
-
-class SLIB_EXPORT VideoEncoder : public Object
+namespace slib
 {
-	SLIB_DECLARE_OBJECT
+	class SLIB_EXPORT VideoEncoder : public Object
+	{
+		SLIB_DECLARE_OBJECT
+		
+	protected:
+		VideoEncoder();
+		
+		~VideoEncoder();
+		
+	public:
+		virtual Memory encode(const VideoFrame& input) = 0;
+		
+	public:
+		sl_uint32 getBitrate();
+		
+		virtual void setBitrate(sl_uint32 bitrate);
+		
+	protected:
+		sl_uint32 m_nWidth;
+		sl_uint32 m_nHeight;
+		sl_uint32 m_nKeyFrameInterval;
+		sl_uint32 m_bitrate;
+		
+	};
 	
-protected:
-	VideoEncoder();
-	
-	~VideoEncoder();
-	
-public:
-	virtual Memory encode(const VideoFrame& input) = 0;
-	
-public:
-	sl_uint32 getBitrate();
-	
-	virtual void setBitrate(sl_uint32 bitrate);
-	
-protected:
-	sl_uint32 m_nWidth;
-	sl_uint32 m_nHeight;
-	sl_uint32 m_nKeyFrameInterval;
-	sl_uint32 m_bitrate;
-	
-};
-
-class SLIB_EXPORT VideoDecoder : public Object
-{
-	SLIB_DECLARE_OBJECT
-	
-protected:
-	VideoDecoder();
-	
-	~VideoDecoder();
-	
-public:
-	virtual sl_bool decode(const void* input, const sl_uint32& inputSize, VideoFrame& output) = 0;
-	
-protected:
-	sl_uint32 m_nWidth;
-	sl_uint32 m_nHeight;
-	
-};
-
-SLIB_MEDIA_NAMESPACE_END
+	class SLIB_EXPORT VideoDecoder : public Object
+	{
+		SLIB_DECLARE_OBJECT
+		
+	protected:
+		VideoDecoder();
+		
+		~VideoDecoder();
+		
+	public:
+		virtual sl_bool decode(const void* input, const sl_uint32& inputSize, VideoFrame& output) = 0;
+		
+	protected:
+		sl_uint32 m_nWidth;
+		sl_uint32 m_nHeight;
+		
+	};	
+}
 
 #endif

@@ -14,215 +14,215 @@ typedef WKWebView OSWebView;
 }
 @end
 
-SLIB_UI_NAMESPACE_BEGIN
-
-class _WebView : public WebView
+namespace slib
 {
-public:
-	void __load(OSWebView* handle)
+	class _WebView : public WebView
 	{
-		NSString* strURL = Apple::getNSStringFromString(m_urlOrigin);
-		OSWebView* mainFrame = handle;
-		if (m_flagOfflineContent) {
-			NSString* content = Apple::getNSStringFromString(m_offlineContentHTML);
-			if (strURL == nil || strURL.length == 0) {
-				[mainFrame loadHTMLString:content baseURL:nil];
+	public:
+		void __load(OSWebView* handle)
+		{
+			NSString* strURL = Apple::getNSStringFromString(m_urlOrigin);
+			OSWebView* mainFrame = handle;
+			if (m_flagOfflineContent) {
+				NSString* content = Apple::getNSStringFromString(m_offlineContentHTML);
+				if (strURL == nil || strURL.length == 0) {
+					[mainFrame loadHTMLString:content baseURL:nil];
+				} else {
+					NSURL* url = [NSURL URLWithString:strURL];
+					[mainFrame loadHTMLString:content baseURL:url];
+				}
 			} else {
+				if (strURL == nil || strURL.length == 0) {
+					return;
+				}
 				NSURL* url = [NSURL URLWithString:strURL];
-				[mainFrame loadHTMLString:content baseURL:url];
+				NSURLRequest* request = [NSURLRequest requestWithURL:url];
+				[mainFrame loadRequest:request];
 			}
-		} else {
-			if (strURL == nil || strURL.length == 0) {
+		}
+		
+		void __applyProperties(OSWebView* handle)
+		{
+			if (![NSThread isMainThread]) {
+				dispatch_async(dispatch_get_main_queue(), ^{
+					__applyProperties(handle);
+				});
 				return;
 			}
-			NSURL* url = [NSURL URLWithString:strURL];
-			NSURLRequest* request = [NSURLRequest requestWithURL:url];
-			[mainFrame loadRequest:request];
+			
+			__load(handle);
 		}
+		
+		void __onStartLoad(OSWebView* handle)
+		{
+			dispatchStartLoad(getURL());
+		}
+		
+		void __onFinishLoad(OSWebView* handle)
+		{
+			dispatchFinishLoad(getURL(), sl_false);
+		}
+		
+		void __onLoadError(OSWebView* handle, NSError* error)
+		{
+			m_lastErrorMessage = Apple::getStringFromNSString([error localizedDescription]);
+			dispatchFinishLoad(getURL(), sl_true);
+		}
+		
+		void __onInvokeMethod(OSWebView* handle, id body)
+		{
+			NSString* s = [NSString stringWithFormat:@"%@", body];
+			String msg = Apple::getStringFromNSString(s);
+			String param;
+			sl_reg index = msg.indexOf("::");
+			if (index >= 0) {
+				param = msg.substring(index+2);
+				msg = msg.substring(0, index);
+			}
+			if (msg.isNotEmpty()) {
+				dispatchMessageFromJavaScript(msg, param);
+			}
+		}
+		
+		void __onInvokeMethod(OSWebView* handle, NSArray* args)
+		{
+			sl_uint32 n = (sl_uint32)([args count]);
+			List<String> params;
+			for (sl_uint32 i = 0; i < n; i++) {
+				id val = [args objectAtIndex:i];
+				NSString* s = [NSString stringWithFormat:@"%@", val];
+				params.add(Apple::getStringFromNSString(s));
+			}
+			String msg = params.getValueAt(0);
+			if (msg.isNotEmpty()) {
+				String param = params.getValueAt(0);
+				dispatchMessageFromJavaScript(msg, param);
+			}
+		}
+	};
+	
+	Ref<ViewInstance> WebView::createNativeWidget(ViewInstance* _parent)
+	{
+		IOS_VIEW_CREATE_INSTANCE_BEGIN
+		_Slib_iOS_WebView* handle = [[_Slib_iOS_WebView alloc] initWithFrame:frame];
+		if (handle != nil) {
+			((_WebView*)this)->__applyProperties(handle);
+		}
+		IOS_VIEW_CREATE_INSTANCE_END
+		return ret;
 	}
 	
-	void __applyProperties(OSWebView* handle)
+	void WebView::_refreshSize_NW()
+	{
+	}
+	
+	void WebView::_load_NW()
 	{
 		if (![NSThread isMainThread]) {
 			dispatch_async(dispatch_get_main_queue(), ^{
-				__applyProperties(handle);
+				_load_NW();
 			});
 			return;
 		}
 		
-		__load(handle);
-	}
-	
-	void __onStartLoad(OSWebView* handle)
-	{
-		dispatchStartLoad(getURL());
-	}
-	
-	void __onFinishLoad(OSWebView* handle)
-	{
-		dispatchFinishLoad(getURL(), sl_false);
-	}
-	
-	void __onLoadError(OSWebView* handle, NSError* error)
-	{
-		m_lastErrorMessage = Apple::getStringFromNSString([error localizedDescription]);
-		dispatchFinishLoad(getURL(), sl_true);
-	}
-	
-	void __onInvokeMethod(OSWebView* handle, id body)
-	{
-		NSString* s = [NSString stringWithFormat:@"%@", body];
-		String msg = Apple::getStringFromNSString(s);
-		String param;
-		sl_reg index = msg.indexOf("::");
-		if (index >= 0) {
-			param = msg.substring(index+2);
-			msg = msg.substring(0, index);
-		}
-		if (msg.isNotEmpty()) {
-			dispatchMessageFromJavaScript(msg, param);
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
+			OSWebView* wv = (OSWebView*)handle;
+			((_WebView*)this)->__load(wv);
 		}
 	}
 	
-	void __onInvokeMethod(OSWebView* handle, NSArray* args)
+	String WebView::_getURL_NW()
 	{
-		sl_uint32 n = (sl_uint32)([args count]);
-		List<String> params;
-		for (sl_uint32 i = 0; i < n; i++) {
-			id val = [args objectAtIndex:i];
-			NSString* s = [NSString stringWithFormat:@"%@", val];
-			params.add(Apple::getStringFromNSString(s));
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
+			OSWebView* wv = (OSWebView*)handle;
+			NSString* s = wv.URL.absoluteString;
+			return Apple::getStringFromNSString(s);
 		}
-		String msg = params.getValueAt(0);
-		if (msg.isNotEmpty()) {
-			String param = params.getValueAt(0);
-			dispatchMessageFromJavaScript(msg, param);
+		return m_urlOrigin;
+	}
+	
+	String WebView::_getPageTitle_NW()
+	{
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
+			OSWebView* wv = (OSWebView*)handle;
+			NSString* title = wv.title;
+			String ret = Apple::getStringFromNSString(title);
+			return ret;
+		}
+		return sl_null;
+	}
+	
+	void WebView::_goBack_NW()
+	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_goBack_NW();
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
+			OSWebView* wv = (OSWebView*)handle;
+			[wv goBack];
 		}
 	}
-};
-
-Ref<ViewInstance> WebView::createNativeWidget(ViewInstance* _parent)
-{
-	IOS_VIEW_CREATE_INSTANCE_BEGIN
-	_Slib_iOS_WebView* handle = [[_Slib_iOS_WebView alloc] initWithFrame:frame];
-	if (handle != nil) {
-		((_WebView*)this)->__applyProperties(handle);
-	}
-	IOS_VIEW_CREATE_INSTANCE_END
-	return ret;
-}
-
-void WebView::_refreshSize_NW()
-{
-}
-
-void WebView::_load_NW()
-{
-	if (![NSThread isMainThread]) {
-		dispatch_async(dispatch_get_main_queue(), ^{
-			_load_NW();
-		});
-		return;
+	
+	void WebView::_goForward_NW()
+	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_goForward_NW();
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
+			OSWebView* wv = (OSWebView*)handle;
+			[wv goForward];
+		}
 	}
 	
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
-		OSWebView* wv = (OSWebView*)handle;
-		((_WebView*)this)->__load(wv);
-	}
-}
-
-String WebView::_getURL_NW()
-{
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
-		OSWebView* wv = (OSWebView*)handle;
-		NSString* s = wv.URL.absoluteString;
-		return Apple::getStringFromNSString(s);
-	}
-	return m_urlOrigin;
-}
-
-String WebView::_getPageTitle_NW()
-{
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
-		OSWebView* wv = (OSWebView*)handle;
-		NSString* title = wv.title;
-		String ret = Apple::getStringFromNSString(title);
-		return ret;
-	}
-	return sl_null;
-}
-
-void WebView::_goBack_NW()
-{
-	if (![NSThread isMainThread]) {
-		dispatch_async(dispatch_get_main_queue(), ^{
-			_goBack_NW();
-		});
-		return;
+	void WebView::_reload_NW()
+	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_reload_NW();
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
+			OSWebView* wv = (OSWebView*)handle;
+			[wv reload];
+		}
 	}
 	
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
-		OSWebView* wv = (OSWebView*)handle;
-		[wv goBack];
-	}
-}
-
-void WebView::_goForward_NW()
-{
-	if (![NSThread isMainThread]) {
-		dispatch_async(dispatch_get_main_queue(), ^{
-			_goForward_NW();
-		});
-		return;
-	}
-	
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
-		OSWebView* wv = (OSWebView*)handle;
-		[wv goForward];
-	}
-}
-
-void WebView::_reload_NW()
-{
-	if (![NSThread isMainThread]) {
-		dispatch_async(dispatch_get_main_queue(), ^{
-			_reload_NW();
-		});
-		return;
-	}
-	
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
-		OSWebView* wv = (OSWebView*)handle;
-		[wv reload];
-	}
-}
-
-void WebView::_runJavaScript_NW(const String& script)
-{
-	if (![NSThread isMainThread]) {
-		String _script = script;
-		dispatch_async(dispatch_get_main_queue(), ^{
-			_runJavaScript_NW(_script);
-		});
-		return;
-	}
-	
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
-		OSWebView* wv = (OSWebView*)handle;
-		NSString* _script = Apple::getNSStringFromString(script);
-		if (_script != nil && _script.length != 0) {
-			[wv evaluateJavaScript:_script completionHandler:nil];
+	void WebView::_runJavaScript_NW(const String& script)
+	{
+		if (![NSThread isMainThread]) {
+			String _script = script;
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_runJavaScript_NW(_script);
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[OSWebView class]]) {
+			OSWebView* wv = (OSWebView*)handle;
+			NSString* _script = Apple::getNSStringFromString(script);
+			if (_script != nil && _script.length != 0) {
+				[wv evaluateJavaScript:_script completionHandler:nil];
+			}
 		}
 	}
 }
-SLIB_UI_NAMESPACE_END
 
 @implementation _Slib_iOS_WebView
 -(id)initWithFrame:(CGRect)frame

@@ -6,40 +6,39 @@
 #include "mobile_app.h"
 #include "render_view.h"
 
-SLIB_UI_NAMESPACE_BEGIN
-
-class MobileGameView;
-
-class SLIB_EXPORT MobileGame : public MobileApp
+namespace slib
 {
-	SLIB_DECLARE_OBJECT
-
-public:
-	MobileGame();
+	class MobileGameView;
 	
-public:
-	static Ref<MobileGame> getApp();
+	class SLIB_EXPORT MobileGame : public MobileApp
+	{
+		SLIB_DECLARE_OBJECT
+		
+	public:
+		MobileGame();
+		
+	public:
+		static Ref<MobileGame> getApp();
+		
+		Ref<MobileGameView> getGameView();
+		
+	public:
+		// override
+		virtual void dispatchResize(sl_ui_len width, sl_ui_len height);
+		
+	private:
+		Ref<MobileGameView> m_gameView;
+		
+	};
 	
-	Ref<MobileGameView> getGameView();
-	
-public:
-	// override
-	virtual void dispatchResize(sl_ui_len width, sl_ui_len height);
-
-private:
-	Ref<MobileGameView> m_gameView;
-	
-};
-
-class SLIB_EXPORT MobileGameView : public RenderView
-{
-	SLIB_DECLARE_OBJECT
-	
-public:
-	MobileGameView();
-	
-};
-
-SLIB_UI_NAMESPACE_END
+	class SLIB_EXPORT MobileGameView : public RenderView
+	{
+		SLIB_DECLARE_OBJECT
+		
+	public:
+		MobileGameView();
+		
+	};	
+}
 
 #endif

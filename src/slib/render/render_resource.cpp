@@ -1,5 +1,6 @@
 #include "../../../inc/slib/render/resource.h"
 
-SLIB_RENDER_NAMESPACE_BEGIN
+namespace slib
+{
 
-SLIB_RENDER_NAMESPACE_END
+}

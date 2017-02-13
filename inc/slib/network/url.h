@@ -11,41 +11,40 @@
 
 #include "../core/string.h"
 
-SLIB_NAMESPACE_BEGIN
-
-class SLIB_EXPORT Url
+namespace slib
 {
-public:
-	AtomicString scheme;
-	AtomicString host;
-	AtomicString path;
-	AtomicString query;
-	
-public:
-	Url();
-	
-	~Url();
-
-public:
-	void parse(const String& url);
-
-public:
-	static String encodePercentByUTF8(const String& value);
-	
-	static String decodePercentByUTF8(const String& value);
-
-	
-	static String encodeUriComponentByUTF8(const String& value);
-	
-	static String decodeUriComponentByUTF8(const String& value);
-
-	
-	static String encodeUriByUTF8(const String& value);
-	
-	static String decodeUriByUTF8(const String& value);
-
-};
-
-SLIB_NAMESPACE_END
+	class SLIB_EXPORT Url
+	{
+	public:
+		AtomicString scheme;
+		AtomicString host;
+		AtomicString path;
+		AtomicString query;
+		
+	public:
+		Url();
+		
+		~Url();
+		
+	public:
+		void parse(const String& url);
+		
+	public:
+		static String encodePercentByUTF8(const String& value);
+		
+		static String decodePercentByUTF8(const String& value);
+		
+		
+		static String encodeUriComponentByUTF8(const String& value);
+		
+		static String decodeUriComponentByUTF8(const String& value);
+		
+		
+		static String encodeUriByUTF8(const String& value);
+		
+		static String decodeUriByUTF8(const String& value);
+		
+	};	
+}
 
 #endif

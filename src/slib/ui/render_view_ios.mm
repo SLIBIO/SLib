@@ -30,40 +30,39 @@
 @end
 
 
-SLIB_UI_NAMESPACE_BEGIN
-
-Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* _parent)
+namespace slib
 {
-	_Slib_iOS_GLView* handle = nil;
-	IOS_VIEW_CREATE_INSTANCE_BEGIN
-	handle = [[_Slib_iOS_GLView alloc] initWithFrame:frame];
-	IOS_VIEW_CREATE_INSTANCE_END
-	if (handle != nil && ret.isNotNull()) {
-		[handle _init];
-		[handle _setRenderContinuously:(m_redrawMode == RedrawMode::Continuously)];
+	Ref<ViewInstance> RenderView::createNativeWidget(ViewInstance* _parent)
+	{
+		_Slib_iOS_GLView* handle = nil;
+		IOS_VIEW_CREATE_INSTANCE_BEGIN
+		handle = [[_Slib_iOS_GLView alloc] initWithFrame:frame];
+		IOS_VIEW_CREATE_INSTANCE_END
+		if (handle != nil && ret.isNotNull()) {
+			[handle _init];
+			[handle _setRenderContinuously:(m_redrawMode == RedrawMode::Continuously)];
+		}
+		return ret;
 	}
-	return ret;
-}
-
-void RenderView::_setRedrawMode_NW(RedrawMode mode)
-{
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_GLView class]]) {
-		_Slib_iOS_GLView* v = (_Slib_iOS_GLView*)handle;
-		[v _setRenderContinuously:(mode == RedrawMode::Continuously)];
+	
+	void RenderView::_setRedrawMode_NW(RedrawMode mode)
+	{
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_GLView class]]) {
+			_Slib_iOS_GLView* v = (_Slib_iOS_GLView*)handle;
+			[v _setRenderContinuously:(mode == RedrawMode::Continuously)];
+		}
 	}
+	
+	void RenderView::_requestRender_NW()
+	{
+		UIView* view = UIPlatform::getViewHandle(this);
+		if (view != nil && [view isKindOfClass:[_Slib_iOS_GLView class]]) {
+			_Slib_iOS_GLView* v = (_Slib_iOS_GLView*)view;
+			[v _requestRender];
+		}
+	}	
 }
-
-void RenderView::_requestRender_NW()
-{
-	UIView* view = UIPlatform::getViewHandle(this);
-	if (view != nil && [view isKindOfClass:[_Slib_iOS_GLView class]]) {
-		_Slib_iOS_GLView* v = (_Slib_iOS_GLView*)view;
-		[v _requestRender];
-	}
-}
-
-SLIB_UI_NAMESPACE_END
 
 @interface _Slib_iOS_GLViewRenderer : NSObject
 {

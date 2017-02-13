@@ -5,8 +5,9 @@
 
 #include "../core/resource.h"
 
-SLIB_RENDER_NAMESPACE_BEGIN
-
-SLIB_RENDER_NAMESPACE_END
+namespace slib
+{
+	
+}
 
 #endif

@@ -5,15 +5,14 @@
 
 #include "engine.h"
 
-SLIB_RENDER_NAMESPACE_BEGIN
-
-class SLIB_EXPORT WGL
+namespace slib
 {
-public:
-	static Ref<Renderer> createRenderer(void* windowHandle, const RendererParam& param);
-	
-};
-
-SLIB_RENDER_NAMESPACE_END
+	class SLIB_EXPORT WGL
+	{
+	public:
+		static Ref<Renderer> createRenderer(void* windowHandle, const RendererParam& param);
+		
+	};
+}
 
 #endif

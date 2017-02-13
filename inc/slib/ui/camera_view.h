@@ -7,31 +7,30 @@
 
 #include "../media/camera.h"
 
-SLIB_UI_NAMESPACE_BEGIN
-
-class SLIB_EXPORT CameraView : public VideoView, public IVideoCaptureListener
+namespace slib
 {
-	SLIB_DECLARE_OBJECT
-	
-public:
-	CameraView();
-	
-public:
-	virtual void start(const CameraParam& param);
-	
-	virtual void stop();
-	
-public:
-	SLIB_PROPERTY(AtomicPtr<IVideoCaptureListener>, FrameListener)
-	
-protected:
-	virtual void onCaptureVideoFrame(VideoCapture* capture, VideoCaptureFrame* frame);
-	
-protected:
-	AtomicRef<Camera> m_camera;
-	
-};
-
-SLIB_UI_NAMESPACE_END
+	class SLIB_EXPORT CameraView : public VideoView, public IVideoCaptureListener
+	{
+		SLIB_DECLARE_OBJECT
+		
+	public:
+		CameraView();
+		
+	public:
+		virtual void start(const CameraParam& param);
+		
+		virtual void stop();
+		
+	public:
+		SLIB_PROPERTY(AtomicPtr<IVideoCaptureListener>, FrameListener)
+		
+	protected:
+		virtual void onCaptureVideoFrame(VideoCapture* capture, VideoCaptureFrame* frame);
+		
+	protected:
+		AtomicRef<Camera> m_camera;
+		
+	};	
+}
 
 #endif

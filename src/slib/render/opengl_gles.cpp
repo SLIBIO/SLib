@@ -17,95 +17,92 @@
 
 #include <Windows.h>
 
-SLIB_RENDER_NAMESPACE_BEGIN
-
-_GLES_ENTRY_POINTS _GLES_ENTRIES;
-
+namespace slib
+{
+	_GLES_ENTRY_POINTS _GLES_ENTRIES;
+	
 #undef _SLIB_RENDER_GLES_ENTRY
 #define _SLIB_RENDER_GLES_ENTRY(TYPE, name, ...) \
 	proc = ::GetProcAddress(hDll, #name); \
 	*((FARPROC*)(&(_GLES_ENTRIES.name))) = proc;
-
-static sl_bool _g_render_GLES_flagLoadedEntryPoints = sl_false;
-
-void GLES::loadEntries(const String& _pathDll, sl_bool flagReload)
-{
-	String16 pathDll = _pathDll;
-	if (pathDll.isEmpty()) {
-		return;
-	}
-	if (!flagReload) {
-		if (_g_render_GLES_flagLoadedEntryPoints) {
+	
+	static sl_bool _g_render_GLES_flagLoadedEntryPoints = sl_false;
+	
+	void GLES::loadEntries(const String& _pathDll, sl_bool flagReload)
+	{
+		String16 pathDll = _pathDll;
+		if (pathDll.isEmpty()) {
 			return;
 		}
+		if (!flagReload) {
+			if (_g_render_GLES_flagLoadedEntryPoints) {
+				return;
+			}
+		}
+		HMODULE hDll = ::LoadLibraryW((LPCWSTR)(pathDll.getData()));
+		if (!hDll) {
+			//LogError("GLES", "Failed to load GLES dll - %s", pathDll);
+			return;
+		}
+		FARPROC proc;
+		_SLIB_RENDER_GLES_ENTRIES
+		_g_render_GLES_flagLoadedEntryPoints = sl_true;
 	}
-	HMODULE hDll = ::LoadLibraryW((LPCWSTR)(pathDll.getData()));
-	if (!hDll) {
-		//LogError("GLES", "Failed to load GLES dll - %s", pathDll);
-		return;
+	
+	void GLES::loadEntries(sl_bool flagReload)
+	{
+		SLIB_STATIC_STRING16(s, "libGLESv2.dll");
+		loadEntries(s, flagReload);
 	}
-	FARPROC proc;
-	_SLIB_RENDER_GLES_ENTRIES
-	_g_render_GLES_flagLoadedEntryPoints = sl_true;
+	
+	sl_bool GLES::isAvailable()
+	{
+		return _g_render_GLES_flagLoadedEntryPoints;
+	}
 }
-
-void GLES::loadEntries(sl_bool flagReload)
-{
-	SLIB_STATIC_STRING16(s, "libGLESv2.dll");
-	loadEntries(s, flagReload);
-}
-
-sl_bool GLES::isAvailable()
-{
-	return _g_render_GLES_flagLoadedEntryPoints;
-}
-
-SLIB_RENDER_NAMESPACE_END
 
 #else
 
-SLIB_RENDER_NAMESPACE_BEGIN
-
-void GLES::loadEntries(const String& pathDll, sl_bool flagReload)
+namespace slib
 {
+	void GLES::loadEntries(const String& pathDll, sl_bool flagReload)
+	{
+	}
+	
+	void GLES::loadEntries(sl_bool flagReload)
+	{
+	}
+	
+	sl_bool GLES::isAvailable()
+	{
+		return sl_true;
+	}
 }
-
-void GLES::loadEntries(sl_bool flagReload)
-{
-}
-
-sl_bool GLES::isAvailable()
-{
-	return sl_true;
-}
-
-SLIB_RENDER_NAMESPACE_END
 
 #endif
 
 #else
 
-SLIB_RENDER_NAMESPACE_BEGIN
-
-Ref<GLRenderEngine> GLES::createEngine()
+namespace slib
 {
-	return sl_null;
+	Ref<GLRenderEngine> GLES::createEngine()
+	{
+		return sl_null;
+	}
+	
+	void GLES::loadEntries(const String& pathDll, sl_bool flagReload)
+	{
+	}
+	
+	void GLES::loadEntries(sl_bool flagReload)
+	{
+	}
+	
+	sl_bool GLES::isAvailable()
+	{
+		return sl_false;
+	}
 }
-
-void GLES::loadEntries(const String& pathDll, sl_bool flagReload)
-{
-}
-
-void GLES::loadEntries(sl_bool flagReload)
-{
-}
-
-sl_bool GLES::isAvailable()
-{
-	return sl_false;
-}
-
-SLIB_RENDER_NAMESPACE_END
 
 #endif
 

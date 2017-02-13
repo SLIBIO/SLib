@@ -10,17 +10,16 @@
 #define SLIB_AUDIO_SUPPORT_OPENSL_ES
 #endif
 
-SLIB_MEDIA_NAMESPACE_BEGIN
-
-class SLIB_EXPORT OpenSL_ES
+namespace slib
 {
-public:
-	static Ref<AudioPlayer> createPlayer(const AudioPlayerParam& param);
-	
-	static Ref<AudioRecorder> createRecorder(const AudioRecorderParam& param);
-	
-};
-
-SLIB_MEDIA_NAMESPACE_END
+	class SLIB_EXPORT OpenSL_ES
+	{
+	public:
+		static Ref<AudioPlayer> createPlayer(const AudioPlayerParam& param);
+		
+		static Ref<AudioRecorder> createRecorder(const AudioRecorderParam& param);
+		
+	};
+}
 
 #endif

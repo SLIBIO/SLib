@@ -17,186 +17,185 @@
 @property (strong, nonatomic) UIWindow *window;
 @end
 
-SLIB_UI_NAMESPACE_BEGIN
-
-class _iOS_Screen : public Screen
+namespace slib
 {
-public:
-	UIScreen* m_screen;
-	
-public:
-	static Ref<_iOS_Screen> create(UIScreen* screen)
+	class _iOS_Screen : public Screen
 	{
-		Ref<_iOS_Screen> ret;
-		if (screen != nil) {
-			ret = new _iOS_Screen();
-			if (ret.isNotNull()) {
-				ret->m_screen = screen;
+	public:
+		UIScreen* m_screen;
+		
+	public:
+		static Ref<_iOS_Screen> create(UIScreen* screen)
+		{
+			Ref<_iOS_Screen> ret;
+			if (screen != nil) {
+				ret = new _iOS_Screen();
+				if (ret.isNotNull()) {
+					ret->m_screen = screen;
+				}
 			}
+			return ret;
 		}
-		return ret;
+		
+		static UIScreen* getPrimaryScreen()
+		{
+			NSArray* arr = [UIScreen screens];
+			sl_size n = [arr count];
+			if (n == 0) {
+				return nil;
+			}
+			UIScreen* primary = [arr objectAtIndex:0];
+			return primary;
+		}
+		
+		// override
+		UIRect getRegion()
+		{
+			CGRect rect = [m_screen bounds];
+			CGFloat f = UIPlatform::getGlobalScaleFactor();
+			UIRect region;
+			region.left = (sl_ui_pos)(rect.origin.x * f);
+			region.top = (sl_ui_pos)(rect.origin.y * f);
+			region.setWidth((sl_ui_pos)(rect.size.width * f));
+			region.setHeight((sl_ui_pos)(rect.size.height * f));
+			return region;
+		}
+		
+	};
+	
+	Ref<Screen> UIPlatform::createScreen(UIScreen* screen)
+	{
+		return _iOS_Screen::create(screen);
 	}
 	
-	static UIScreen* getPrimaryScreen()
+	UIScreen* UIPlatform::getScreenHandle(Screen* _screen)
 	{
+		_iOS_Screen* screen = (_iOS_Screen*)_screen;
+		if (screen) {
+			return screen->m_screen;
+		}
+		return nil;
+	}
+	
+	List< Ref<Screen> > UI::getScreens()
+	{
+		List< Ref<Screen> > ret;
 		NSArray* arr = [UIScreen screens];
 		sl_size n = [arr count];
 		if (n == 0) {
-			return nil;
+			return ret;
 		}
-		UIScreen* primary = [arr objectAtIndex:0];
-		return primary;
-	}
-    
-    // override
-    UIRect getRegion()
-	{
-		CGRect rect = [m_screen bounds];
-		CGFloat f = UIPlatform::getGlobalScaleFactor();
-		UIRect region;
-		region.left = (sl_ui_pos)(rect.origin.x * f);
-		region.top = (sl_ui_pos)(rect.origin.y * f);
-		region.setWidth((sl_ui_pos)(rect.size.width * f));
-		region.setHeight((sl_ui_pos)(rect.size.height * f));
-		return region;
-	}
-
-};
-
-Ref<Screen> UIPlatform::createScreen(UIScreen* screen)
-{
-	return _iOS_Screen::create(screen);
-}
-
-UIScreen* UIPlatform::getScreenHandle(Screen* _screen)
-{
-	_iOS_Screen* screen = (_iOS_Screen*)_screen;
-	if (screen) {
-		return screen->m_screen;
-	}
-	return nil;
-}
-
-List< Ref<Screen> > UI::getScreens()
-{
-	List< Ref<Screen> > ret;
-	NSArray* arr = [UIScreen screens];
-	sl_size n = [arr count];
-	if (n == 0) {
+		for (sl_size i = 0; i < n; i++) {
+			UIScreen* _screen = [arr objectAtIndex:i];
+			ret.add_NoLock(_iOS_Screen::create(_screen));
+		}
 		return ret;
 	}
-	for (sl_size i = 0; i < n; i++) {
-		UIScreen* _screen = [arr objectAtIndex:i];
-		ret.add_NoLock(_iOS_Screen::create(_screen));
-	}
-	return ret;
-}
-
-Ref<Screen> UI::getPrimaryScreen()
-{
-	UIScreen* screen = _iOS_Screen::getPrimaryScreen();
-	return UIPlatform::createScreen(screen);
-}
-
-Ref<Screen> UI::getFocusedScreen()
-{
-	return getPrimaryScreen();
-}
-
-void UI::openUrl(const String& _url)
-{
-	if (![NSThread isMainThread]) {
-		String __url = _url;
-		dispatch_async(dispatch_get_main_queue(), ^{
-			openUrl(__url);
-		});
-		return;
+	
+	Ref<Screen> UI::getPrimaryScreen()
+	{
+		UIScreen* screen = _iOS_Screen::getPrimaryScreen();
+		return UIPlatform::createScreen(screen);
 	}
 	
-	if (_url.isNotEmpty()) {
-		NSString* s = Apple::getNSStringFromString(_url);
-		NSURL* url = [NSURL URLWithString:s];
-		[[UIApplication sharedApplication] openURL:url];
+	Ref<Screen> UI::getFocusedScreen()
+	{
+		return getPrimaryScreen();
 	}
-}
-
-void UIPlatform::runLoop(sl_uint32 level)
-{
-	@autoreleasepool {
-		CFRunLoopRun();
-	}
-}
-
-void UIPlatform::quitLoop()
-{
-	CFRunLoopStop(CFRunLoopGetCurrent());
-}
-
-void UIPlatform::runApp()
-{
-	@autoreleasepool {
-		UIApplicationMain(0, nil, nil, NSStringFromClass([_slib_iOS_AppDelegate class]));
-	}
-}
-
-void UIPlatform::quitApp()
-{
-}
-
-__weak UIWindow* _g_slib_ios_keyWindow = nil;
-UIWindow* UIPlatform::getMainWindow()
-{
-	_slib_iOS_AppDelegate* app = (_slib_iOS_AppDelegate*)([[UIApplication sharedApplication] delegate]);
-	if (app != nil) {
-		return app.window;
-	}
-	return nil;
-}
-
-UIWindow* UIPlatform::getKeyWindow()
-{
-	UIWindow* window = _g_slib_ios_keyWindow;
-	if (window != nil) {
-		return window;
-	}
-	UIApplication* app = [UIApplication sharedApplication];
-	for (UIWindow* win in app.windows) {
-		if (win.windowLevel > UIWindowLevelNormal) {
-			[win makeKeyAndVisible];
-			return win;
+	
+	void UI::openUrl(const String& _url)
+	{
+		if (![NSThread isMainThread]) {
+			String __url = _url;
+			dispatch_async(dispatch_get_main_queue(), ^{
+				openUrl(__url);
+			});
+			return;
+		}
+		
+		if (_url.isNotEmpty()) {
+			NSString* s = Apple::getNSStringFromString(_url);
+			NSURL* url = [NSURL URLWithString:s];
+			[[UIApplication sharedApplication] openURL:url];
 		}
 	}
-	return UIPlatform::getMainWindow();
-}
-
-void UIPlatform::setKeyWindow(UIWindow *window)
-{
-	_g_slib_ios_keyWindow = window;
-}
-
-CGFloat _g_slib_ios_global_scale_factor = 0;
-
-CGFloat UIPlatform::getGlobalScaleFactor()
-{
-	if (_g_slib_ios_global_scale_factor == 0) {
-		UIScreen* screen = _iOS_Screen::getPrimaryScreen();
-		if (screen != nil) {
-			CGFloat f = screen.scale;
-			_g_slib_ios_global_scale_factor = f;
-			return f;
-		} else {
-			return 1;
+	
+	void UIPlatform::runLoop(sl_uint32 level)
+	{
+		@autoreleasepool {
+			CFRunLoopRun();
 		}
 	}
-	return _g_slib_ios_global_scale_factor;
+	
+	void UIPlatform::quitLoop()
+	{
+		CFRunLoopStop(CFRunLoopGetCurrent());
+	}
+	
+	void UIPlatform::runApp()
+	{
+		@autoreleasepool {
+			UIApplicationMain(0, nil, nil, NSStringFromClass([_slib_iOS_AppDelegate class]));
+		}
+	}
+	
+	void UIPlatform::quitApp()
+	{
+	}
+	
+	__weak UIWindow* _g_slib_ios_keyWindow = nil;
+	UIWindow* UIPlatform::getMainWindow()
+	{
+		_slib_iOS_AppDelegate* app = (_slib_iOS_AppDelegate*)([[UIApplication sharedApplication] delegate]);
+		if (app != nil) {
+			return app.window;
+		}
+		return nil;
+	}
+	
+	UIWindow* UIPlatform::getKeyWindow()
+	{
+		UIWindow* window = _g_slib_ios_keyWindow;
+		if (window != nil) {
+			return window;
+		}
+		UIApplication* app = [UIApplication sharedApplication];
+		for (UIWindow* win in app.windows) {
+			if (win.windowLevel > UIWindowLevelNormal) {
+				[win makeKeyAndVisible];
+				return win;
+			}
+		}
+		return UIPlatform::getMainWindow();
+	}
+	
+	void UIPlatform::setKeyWindow(UIWindow *window)
+	{
+		_g_slib_ios_keyWindow = window;
+	}
+	
+	CGFloat _g_slib_ios_global_scale_factor = 0;
+	
+	CGFloat UIPlatform::getGlobalScaleFactor()
+	{
+		if (_g_slib_ios_global_scale_factor == 0) {
+			UIScreen* screen = _iOS_Screen::getPrimaryScreen();
+			if (screen != nil) {
+				CGFloat f = screen.scale;
+				_g_slib_ios_global_scale_factor = f;
+				return f;
+			} else {
+				return 1;
+			}
+		}
+		return _g_slib_ios_global_scale_factor;
+	}
+	
+	void UIPlatform::setGlobalScaleFactor(CGFloat factor)
+	{
+		_g_slib_ios_global_scale_factor = factor;
+	}	
 }
-
-void UIPlatform::setGlobalScaleFactor(CGFloat factor)
-{
-	_g_slib_ios_global_scale_factor = factor;
-}
-
-SLIB_UI_NAMESPACE_END
 
 @implementation _slib_iOS_AppDelegate
 

@@ -6,22 +6,21 @@
 #include "../graphics/color.h"
 #include "../graphics/bitmap.h"
 
-SLIB_MEDIA_NAMESPACE_BEGIN
-
-class SLIB_EXPORT VideoFrame
+namespace slib
 {
-public:
-	BitmapData image;
-	RotationMode rotation;
-	FlipMode flip;
-	
-public:
-	VideoFrame();
-	
-	~VideoFrame();
-	
-};
-
-SLIB_MEDIA_NAMESPACE_END
+	class SLIB_EXPORT VideoFrame
+	{
+	public:
+		BitmapData image;
+		RotationMode rotation;
+		FlipMode flip;
+		
+	public:
+		VideoFrame();
+		
+		~VideoFrame();
+		
+	};	
+}
 
 #endif

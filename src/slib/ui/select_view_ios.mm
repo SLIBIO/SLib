@@ -16,157 +16,156 @@
 }
 @end
 
-SLIB_UI_NAMESPACE_BEGIN
-
-class _SelectView : public SelectView
+namespace slib
 {
-public:
-	sl_uint32 __getItemsCount()
+	class _SelectView : public SelectView
 	{
-		return (sl_uint32)(m_titles.getCount());
-	}
-	
-	NSString* __getItemTitle(sl_uint32 row)
-	{
-		String s = m_titles.getValueAt(row);
-		return Apple::getNSStringFromString(s);
-	}
-	
-	void __onSelectItem(_Slib_iOS_SelectView* v, sl_uint32 row)
-	{
-		m_indexSelected = row;
-		v.text = __getItemTitle(row);
-		dispatchSelectItem(row);
-	}
-	
-	void __onStartSelection(_Slib_iOS_SelectView* v)
-	{
-		sl_uint32 n = m_indexSelected;
-		v->m_selectionBefore = n;
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[v->m_picker selectRow:n inComponent:0 animated:NO];
-		});
-	}
-	
-	void __onCancelSelection(_Slib_iOS_SelectView* v)
-	{
-		__onSelectItem(v, v->m_selectionBefore);
-	}
-	
-	void __selectItem(_Slib_iOS_SelectView* v, sl_uint32 row)
-	{
-		v.text = __getItemTitle(row);
-		[v->m_picker selectRow:row inComponent:0 animated:NO];
-	}
-};
-
-Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* _parent)
-{
-	IOS_VIEW_CREATE_INSTANCE_BEGIN
-	_Slib_iOS_SelectView* handle = [[_Slib_iOS_SelectView alloc] initWithFrame:frame];
-	if (handle != nil) {
-		((_SelectView*)this)->__selectItem(handle, m_indexSelected);
+	public:
+		sl_uint32 __getItemsCount()
+		{
+			return (sl_uint32)(m_titles.getCount());
+		}
 		
-		Ref<Font> font = getFont();
-		UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
-		if (hFont != nil) {
-			[handle setFont:hFont];
+		NSString* __getItemTitle(sl_uint32 row)
+		{
+			String s = m_titles.getValueAt(row);
+			return Apple::getNSStringFromString(s);
+		}
+		
+		void __onSelectItem(_Slib_iOS_SelectView* v, sl_uint32 row)
+		{
+			m_indexSelected = row;
+			v.text = __getItemTitle(row);
+			dispatchSelectItem(row);
+		}
+		
+		void __onStartSelection(_Slib_iOS_SelectView* v)
+		{
+			sl_uint32 n = m_indexSelected;
+			v->m_selectionBefore = n;
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[v->m_picker selectRow:n inComponent:0 animated:NO];
+			});
+		}
+		
+		void __onCancelSelection(_Slib_iOS_SelectView* v)
+		{
+			__onSelectItem(v, v->m_selectionBefore);
+		}
+		
+		void __selectItem(_Slib_iOS_SelectView* v, sl_uint32 row)
+		{
+			v.text = __getItemTitle(row);
+			[v->m_picker selectRow:row inComponent:0 animated:NO];
+		}
+	};
+	
+	Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* _parent)
+	{
+		IOS_VIEW_CREATE_INSTANCE_BEGIN
+		_Slib_iOS_SelectView* handle = [[_Slib_iOS_SelectView alloc] initWithFrame:frame];
+		if (handle != nil) {
+			((_SelectView*)this)->__selectItem(handle, m_indexSelected);
+			
+			Ref<Font> font = getFont();
+			UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
+			if (hFont != nil) {
+				[handle setFont:hFont];
+			}
+		}
+		IOS_VIEW_CREATE_INSTANCE_END
+		return ret;
+	}
+	
+	void SelectView::_getSelectedIndex_NW()
+	{
+	}
+	
+	void SelectView::_select_NW(sl_uint32 index)
+	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_select_NW(index);
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
+			_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
+			((_SelectView*)this)->__selectItem(v, index);
 		}
 	}
-	IOS_VIEW_CREATE_INSTANCE_END
-	return ret;
-}
-
-void SelectView::_getSelectedIndex_NW()
-{
-}
-
-void SelectView::_select_NW(sl_uint32 index)
-{
-	if (![NSThread isMainThread]) {
-		dispatch_async(dispatch_get_main_queue(), ^{
-			_select_NW(index);
-		});
-		return;
+	
+	void SelectView::_refreshItemsCount_NW()
+	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_refreshItemsCount_NW();
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
+			_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
+			[v->m_picker reloadAllComponents];
+		}
 	}
 	
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
-		_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
-		((_SelectView*)this)->__selectItem(v, index);
-	}
-}
-
-void SelectView::_refreshItemsCount_NW()
-{
-	if (![NSThread isMainThread]) {
-		dispatch_async(dispatch_get_main_queue(), ^{
-			_refreshItemsCount_NW();
-		});
-		return;
-	}
-	
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
-		_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
-		[v->m_picker reloadAllComponents];
-	}
-}
-
-void SelectView::_refreshItemsContent_NW()
-{
-	if (![NSThread isMainThread]) {
-		dispatch_async(dispatch_get_main_queue(), ^{
-			_refreshItemsContent_NW();
-		});
-		return;
+	void SelectView::_refreshItemsContent_NW()
+	{
+		if (![NSThread isMainThread]) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_refreshItemsContent_NW();
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
+			_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
+			[v->m_picker reloadAllComponents];
+		}
 	}
 	
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
-		_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
-		[v->m_picker reloadAllComponents];
-	}
-}
-
-void SelectView::_setItemTitle_NW(sl_uint32 index, const String& title)
-{
-	if (![NSThread isMainThread]) {
-		String _title = title;
-		dispatch_async(dispatch_get_main_queue(), ^{
-			_setItemTitle_NW(index, _title);
-		});
-		return;
-	}
-	
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
-		_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
-		[v->m_picker reloadAllComponents];
-	}
-}
-
-void SelectView::_setFont_NW(const Ref<Font>& font)
-{
-	if (![NSThread isMainThread]) {
-		Ref<Font> _font = font;
-		dispatch_async(dispatch_get_main_queue(), ^{
-			_setFont_NW(_font);
-		});
-		return;
+	void SelectView::_setItemTitle_NW(sl_uint32 index, const String& title)
+	{
+		if (![NSThread isMainThread]) {
+			String _title = title;
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_setItemTitle_NW(index, _title);
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
+			_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
+			[v->m_picker reloadAllComponents];
+		}
 	}
 	
-	UIView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
-		_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
-		UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
-		if (hFont != nil) {
-			[v setFont:hFont];
+	void SelectView::_setFont_NW(const Ref<Font>& font)
+	{
+		if (![NSThread isMainThread]) {
+			Ref<Font> _font = font;
+			dispatch_async(dispatch_get_main_queue(), ^{
+				_setFont_NW(_font);
+			});
+			return;
+		}
+		
+		UIView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[_Slib_iOS_SelectView class]]) {
+			_Slib_iOS_SelectView* v = (_Slib_iOS_SelectView*)handle;
+			UIFont* hFont = GraphicsPlatform::getUIFont(font.get(), UIPlatform::getGlobalScaleFactor());
+			if (hFont != nil) {
+				[v setFont:hFont];
+			}
 		}
 	}
 }
-
-SLIB_UI_NAMESPACE_END
 
 #define DROP_ICON_WIDTH 20
 #define DROP_ICON_HEIGHT 12

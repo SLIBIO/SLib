@@ -8,93 +8,92 @@
 #include "../../../inc/slib/ui/view.h"
 #include "../../../inc/slib/ui/platform.h"
 
-SLIB_UI_NAMESPACE_BEGIN
-
-class iOS_ViewInstance : public ViewInstance
+namespace slib
 {
-public:
-	iOS_ViewInstance();
-	~iOS_ViewInstance();
-	
-public:
-	static Ref<iOS_ViewInstance> create(UIView* handle, sl_bool flagFreeOnRelease);
-	
-	static Ref<iOS_ViewInstance> create(UIView* handle, UIView* parent, View* view);
-	
-public:
-	void release();
-	
-	static void freeHandle(UIView* handle);
-
-	UIView* getHandle();
-	
-public:
-	// override
-	sl_bool isValid();
-	
-	// override
-	void setFocus();
-	
-	// override
-	void invalidate();
-	
-	// override
-	void invalidate(const UIRect& rect);
-	
-	// override
-	UIRect getFrame();
-	
-	// override
-	void setFrame(const UIRect& frame);
-	
-	// override
-	void setTransform(const Matrix3& transform);
-	
-	// override
-	void setVisible(sl_bool flag);
-	
-	// override
-	void setEnabled(sl_bool flag);
-	
-	// override
-	void setOpaque(sl_bool flag);
-	
-	// override
-	void setAlpha(sl_real alpha);
-	
-	// override
-	UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen);
-	
-	// override
-	UIPointf convertCoordinateFromViewToScreen(const UIPointf& ptView);
-	
-	// override
-	void addChildInstance(const Ref<ViewInstance>& instance);
-	
-	// override
-	void removeChildInstance(const Ref<ViewInstance>& instance);
-	
-	// override
-	void bringToFront();
-	
-public:
-	void onDraw(CGRect rectDirty);
-	
-	sl_bool onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event);
-	
-protected:
-	UIView* m_handle;
-	sl_bool m_flagFreeOnRelease;
-	
-	UISwipeGestureRecognizer* m_gestureSwipeLeft;
-	UISwipeGestureRecognizer* m_gestureSwipeRight;
-	UISwipeGestureRecognizer* m_gestureSwipeUp;
-	UISwipeGestureRecognizer* m_gestureSwipeDown;
-	
-	friend GestureDetector;
-};
-
-SLIB_UI_NAMESPACE_END
+	class iOS_ViewInstance : public ViewInstance
+	{
+	public:
+		iOS_ViewInstance();
+		~iOS_ViewInstance();
+		
+	public:
+		static Ref<iOS_ViewInstance> create(UIView* handle, sl_bool flagFreeOnRelease);
+		
+		static Ref<iOS_ViewInstance> create(UIView* handle, UIView* parent, View* view);
+		
+	public:
+		void release();
+		
+		static void freeHandle(UIView* handle);
+		
+		UIView* getHandle();
+		
+	public:
+		// override
+		sl_bool isValid();
+		
+		// override
+		void setFocus();
+		
+		// override
+		void invalidate();
+		
+		// override
+		void invalidate(const UIRect& rect);
+		
+		// override
+		UIRect getFrame();
+		
+		// override
+		void setFrame(const UIRect& frame);
+		
+		// override
+		void setTransform(const Matrix3& transform);
+		
+		// override
+		void setVisible(sl_bool flag);
+		
+		// override
+		void setEnabled(sl_bool flag);
+		
+		// override
+		void setOpaque(sl_bool flag);
+		
+		// override
+		void setAlpha(sl_real alpha);
+		
+		// override
+		UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen);
+		
+		// override
+		UIPointf convertCoordinateFromViewToScreen(const UIPointf& ptView);
+		
+		// override
+		void addChildInstance(const Ref<ViewInstance>& instance);
+		
+		// override
+		void removeChildInstance(const Ref<ViewInstance>& instance);
+		
+		// override
+		void bringToFront();
+		
+	public:
+		void onDraw(CGRect rectDirty);
+		
+		sl_bool onEventTouch(UIAction action, NSSet* touches, ::UIEvent* event);
+		
+	protected:
+		UIView* m_handle;
+		sl_bool m_flagFreeOnRelease;
+		
+		UISwipeGestureRecognizer* m_gestureSwipeLeft;
+		UISwipeGestureRecognizer* m_gestureSwipeRight;
+		UISwipeGestureRecognizer* m_gestureSwipeUp;
+		UISwipeGestureRecognizer* m_gestureSwipeDown;
+		
+		friend GestureDetector;
+	};	
+}
 
 @interface Slib_iOS_ViewHandle : UIView {
 

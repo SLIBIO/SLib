@@ -6,17 +6,16 @@
 #include "../core/object.h"
 #include "../math/rectangle.h"
 
-SLIB_UI_NAMESPACE_BEGIN
-
-class SLIB_EXPORT Screen : public Object
+namespace slib
 {
-	SLIB_DECLARE_OBJECT
-    
-public:
-	virtual UIRect getRegion() = 0;
-    
-};
-
-SLIB_UI_NAMESPACE_END
+	class SLIB_EXPORT Screen : public Object
+	{
+		SLIB_DECLARE_OBJECT
+		
+	public:
+		virtual UIRect getRegion() = 0;
+		
+	};
+}
 
 #endif

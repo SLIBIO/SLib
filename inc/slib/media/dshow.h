@@ -5,17 +5,16 @@
 
 #include "camera.h"
 
-SLIB_MEDIA_NAMESPACE_BEGIN
-
-class SLIB_EXPORT DirectShow
+namespace slib
 {
-public:
-	static Ref<Camera> createCamera(const CameraParam& param);
-	
-	static List<CameraInfo> getCamerasList();
-	
-};
-
-SLIB_MEDIA_NAMESPACE_END
+	class SLIB_EXPORT DirectShow
+	{
+	public:
+		static Ref<Camera> createCamera(const CameraParam& param);
+		
+		static List<CameraInfo> getCamerasList();
+		
+	};	
+}
 
 #endif

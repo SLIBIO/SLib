@@ -3,94 +3,92 @@
 #include "../../../inc/slib/ui/window.h"
 #include "../../../inc/slib/ui/menu.h"
 
-SLIB_UI_NAMESPACE_BEGIN
-
-SLIB_DEFINE_OBJECT(UIApp, Application)
-
-UIApp::UIApp()
+namespace slib
 {
-}
-
-Ref<UIApp> UIApp::getApp()
-{
-	return CastRef<UIApp>(Application::getApp());
-}
-
-AppType UIApp::getAppType()
-{
-	return AppType::UI;
-}
-
-void UIApp::quit()
-{
-	UI::quitApp();
-}
-
-Ref<Window> UIApp::getMainWindow()
-{
-	return m_mainWindow;
-}
-
-void UIApp::setMainWindow(const Ref<Window>& window)
-{
-	void* _thiz = this;
-	if (_thiz) {
-		m_mainWindow = window;
+	SLIB_DEFINE_OBJECT(UIApp, Application)
+	
+	UIApp::UIApp()
+	{
 	}
-}
-
-Ref<Menu> UIApp::getMenu()
-{
-	return m_mainMenu;
-}
-
+	
+	Ref<UIApp> UIApp::getApp()
+	{
+		return CastRef<UIApp>(Application::getApp());
+	}
+	
+	AppType UIApp::getAppType()
+	{
+		return AppType::UI;
+	}
+	
+	void UIApp::quit()
+	{
+		UI::quitApp();
+	}
+	
+	Ref<Window> UIApp::getMainWindow()
+	{
+		return m_mainWindow;
+	}
+	
+	void UIApp::setMainWindow(const Ref<Window>& window)
+	{
+		void* _thiz = this;
+		if (_thiz) {
+			m_mainWindow = window;
+		}
+	}
+	
+	Ref<Menu> UIApp::getMenu()
+	{
+		return m_mainMenu;
+	}
+	
 #if !defined(SLIB_PLATFORM_IS_OSX)
-
-void UIApp::setMenu(const Ref<Menu>& menu)
-{
-	m_mainMenu = menu;
-}
-
+	
+	void UIApp::setMenu(const Ref<Menu>& menu)
+	{
+		m_mainMenu = menu;
+	}
+	
 #endif
-
-void UIApp::onStart()
-{
-}
-
-void UIApp::onExit()
-{
-}
-
-void UIApp::onRunApp()
-{
-	UI::runApp();
-}
-
-void UIApp::dispatchStart()
-{
-	onStart();
-}
-
-void UIApp::dispatchStartToApp()
-{
-	Ref<UIApp> app = getApp();
-	if (app.isNotNull()) {
-		app->dispatchStart();
+	
+	void UIApp::onStart()
+	{
+	}
+	
+	void UIApp::onExit()
+	{
+	}
+	
+	void UIApp::onRunApp()
+	{
+		UI::runApp();
+	}
+	
+	void UIApp::dispatchStart()
+	{
+		onStart();
+	}
+	
+	void UIApp::dispatchStartToApp()
+	{
+		Ref<UIApp> app = getApp();
+		if (app.isNotNull()) {
+			app->dispatchStart();
+		}
+	}
+	
+	void UIApp::dispatchExit()
+	{
+		onExit();
+	}
+	
+	void UIApp::dispatchExitToApp()
+	{
+		Ref<UIApp> app = getApp();
+		if (app.isNotNull()) {
+			app->dispatchExit();
+		}
 	}
 }
-
-void UIApp::dispatchExit()
-{
-	onExit();
-}
-
-void UIApp::dispatchExitToApp()
-{
-	Ref<UIApp> app = getApp();
-	if (app.isNotNull()) {
-		app->dispatchExit();
-	}
-}
-
-SLIB_UI_NAMESPACE_END
-
