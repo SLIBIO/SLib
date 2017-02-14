@@ -8,99 +8,100 @@
 #include "../../../inc/slib/ui/view.h"
 #include "../../../inc/slib/ui/platform.h"
 
-SLIB_UI_NAMESPACE_BEGIN
-
-class OSX_ViewInstance : public ViewInstance
+namespace slib
 {
-public:
-	OSX_ViewInstance();
-	~OSX_ViewInstance();
-	
-public:
-	static Ref<OSX_ViewInstance> create(NSView* handle, sl_bool flagFreeOnRelease);
-	
-	static Ref<OSX_ViewInstance> create(NSView* handle, NSView* parent, View* view);
-	
-public:
-	void release();
-	
-	static void freeHandle(NSView* handle);
-	
-	NSView* getHandle();
-	
-public:
-	// override
-	sl_bool isValid();
-	
-	// override
-	void setFocus();
-	
-	// override
-	void invalidate();
-	
-	// override
-	void invalidate(const UIRect& rect);
-	
-	// override
-	UIRect getFrame();
-	
-	// override
-	void setFrame(const UIRect& frame);
-	
-	// override
-	void setTransform(const Matrix3& transform);
 
-	// override
-	void setVisible(sl_bool flag);
-	
-	// override
-	void setEnabled(sl_bool flag);
-	
-	// override
-	void setOpaque(sl_bool flag);
-	
-	// override
-	void setAlpha(sl_real alpha);
+	class OSX_ViewInstance : public ViewInstance
+	{
+	public:
+		OSX_ViewInstance();
+		~OSX_ViewInstance();
+		
+	public:
+		static Ref<OSX_ViewInstance> create(NSView* handle, sl_bool flagFreeOnRelease);
+		
+		static Ref<OSX_ViewInstance> create(NSView* handle, NSView* parent, View* view);
+		
+	public:
+		void release();
+		
+		static void freeHandle(NSView* handle);
+		
+		NSView* getHandle();
+		
+	public:
+		// override
+		sl_bool isValid();
+		
+		// override
+		void setFocus();
+		
+		// override
+		void invalidate();
+		
+		// override
+		void invalidate(const UIRect& rect);
+		
+		// override
+		UIRect getFrame();
+		
+		// override
+		void setFrame(const UIRect& frame);
+		
+		// override
+		void setTransform(const Matrix3& transform);
 
-	// override
-	UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen);
-	
-	// override
-	UIPointf convertCoordinateFromViewToScreen(const UIPointf& ptView);
-	
-	// override
-	void addChildInstance(const Ref<ViewInstance>& instance);
-	
-	// override
-	void removeChildInstance(const Ref<ViewInstance>& instance);
-	
-	// override
-	void bringToFront();
-	
-public:
-	void onDraw(NSRect rectDirty);
-	
-	sl_bool onEventKey(sl_bool flagDown, NSEvent* event);
-	
-	sl_bool onEventMouse(UIAction action, NSEvent* event);
-	
-	sl_bool onEventMouse(UIAction action, const NSPoint& point);
+		// override
+		void setVisible(sl_bool flag);
+		
+		// override
+		void setEnabled(sl_bool flag);
+		
+		// override
+		void setOpaque(sl_bool flag);
+		
+		// override
+		void setAlpha(sl_real alpha);
 
-	sl_bool onEventMouseWheel(NSEvent* event);
-	
-	sl_bool onEventUpdateCursor(NSEvent* event);
-	
-	void applyModifiers(UIEvent* ev, NSEvent* event);
-	
-protected:
-	NSView* m_handle;
-	sl_bool m_flagFreeOnRelease;
-	
-};
+		// override
+		UIPointf convertCoordinateFromScreenToView(const UIPointf& ptScreen);
+		
+		// override
+		UIPointf convertCoordinateFromViewToScreen(const UIPointf& ptView);
+		
+		// override
+		void addChildInstance(const Ref<ViewInstance>& instance);
+		
+		// override
+		void removeChildInstance(const Ref<ViewInstance>& instance);
+		
+		// override
+		void bringToFront();
+		
+	public:
+		void onDraw(NSRect rectDirty);
+		
+		sl_bool onEventKey(sl_bool flagDown, NSEvent* event);
+		
+		sl_bool onEventMouse(UIAction action, NSEvent* event);
+		
+		sl_bool onEventMouse(UIAction action, const NSPoint& point);
 
-void OSX_transformViewFrame(NSPoint& origin, NSSize& size, const UIRect& frame, sl_real translationX, sl_real translationY, sl_real scaleX, sl_real scaleY, sl_real rotationRadian, sl_real anchorOffsetX, sl_real anchorOffsetY);
+		sl_bool onEventMouseWheel(NSEvent* event);
+		
+		sl_bool onEventUpdateCursor(NSEvent* event);
+		
+		void applyModifiers(UIEvent* ev, NSEvent* event);
+		
+	protected:
+		NSView* m_handle;
+		sl_bool m_flagFreeOnRelease;
+		
+	};
 
-SLIB_UI_NAMESPACE_END
+	void OSX_transformViewFrame(NSPoint& origin, NSSize& size, const UIRect& frame, sl_real translationX, sl_real translationY, sl_real scaleX, sl_real scaleY, sl_real rotationRadian, sl_real anchorOffsetX, sl_real anchorOffsetY);
+
+}
 
 @interface Slib_OSX_ViewBase : NSView {
 	@public sl_bool m_flagOpaque;

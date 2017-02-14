@@ -14,64 +14,65 @@
 
 @end
 
-SLIB_UI_NAMESPACE_BEGIN
-
-Ref<ViewInstance> Button::createNativeWidget(ViewInstance* _parent)
+namespace slib
 {
-	OSX_VIEW_CREATE_INSTANCE_BEGIN
-	_Slib_OSX_Button* handle = [[_Slib_OSX_Button alloc] initWithFrame:frame];
-	if (handle != nil) {
-		handle.title = Apple::getNSStringFromString(m_text);
-		
-		Ref<Font> font = getFont();
-		NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
-		if (hFont != nil) {
-			[handle setFont:hFont];
+
+	Ref<ViewInstance> Button::createNativeWidget(ViewInstance* _parent)
+	{
+		OSX_VIEW_CREATE_INSTANCE_BEGIN
+		_Slib_OSX_Button* handle = [[_Slib_OSX_Button alloc] initWithFrame:frame];
+		if (handle != nil) {
+			handle.title = Apple::getNSStringFromString(m_text);
+			
+			Ref<Font> font = getFont();
+			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
+			if (hFont != nil) {
+				[handle setFont:hFont];
+			}
+			if (m_flagDefaultButton) {
+				[handle setKeyEquivalent:@"\r"];
+			}
+			handle.bezelStyle = NSRoundedBezelStyle;
 		}
-		if (m_flagDefaultButton) {
-			[handle setKeyEquivalent:@"\r"];
-		}
-		handle.bezelStyle = NSRoundedBezelStyle;
+		OSX_VIEW_CREATE_INSTANCE_END
+		return ret;
 	}
-	OSX_VIEW_CREATE_INSTANCE_END
-	return ret;
-}
 
-void Button::_setText_NW(const String& text)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
-		NSButton* v = (NSButton*)handle;
-		v.title = Apple::getNSStringFromString(text);
-	}
-}
-
-void Button::_setDefaultButton_NW(sl_bool flag)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
-		NSButton* v = (NSButton*)handle;
-		if (flag) {
-			[v setKeyEquivalent:@"\r"];
-		} else {
-			[v setKeyEquivalent:@""];
+	void Button::_setText_NW(const String& text)
+	{
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
+			NSButton* v = (NSButton*)handle;
+			v.title = Apple::getNSStringFromString(text);
 		}
 	}
-}
 
-void Button::_setFont_NW(const Ref<Font>& font)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
-		NSButton* v = (NSButton*)handle;
-		NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
-		if (hFont != nil) {
-			[v setFont:hFont];
+	void Button::_setDefaultButton_NW(sl_bool flag)
+	{
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
+			NSButton* v = (NSButton*)handle;
+			if (flag) {
+				[v setKeyEquivalent:@"\r"];
+			} else {
+				[v setKeyEquivalent:@""];
+			}
 		}
 	}
-}
 
-SLIB_UI_NAMESPACE_END
+	void Button::_setFont_NW(const Ref<Font>& font)
+	{
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[NSButton class]]) {
+			NSButton* v = (NSButton*)handle;
+			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
+			if (hFont != nil) {
+				[v setFont:hFont];
+			}
+		}
+	}
+
+}
 
 @implementation _Slib_OSX_Button
 

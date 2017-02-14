@@ -8,29 +8,30 @@
 #include "../../../inc/slib/ui/core.h"
 #include "../../../inc/slib/ui/platform.h"
 
-SLIB_UI_NAMESPACE_BEGIN
-
-class Win32_UI_Shared
+namespace slib
 {
-public:
-	HINSTANCE hInstance;
-	ATOM wndClassForView;
-	ATOM wndClassForWindow;
-	HWND hWndMessage;
 
-private:
-	ATOM m_wndClassForMessage;
+	class Win32_UI_Shared
+	{
+	public:
+		HINSTANCE hInstance;
+		ATOM wndClassForView;
+		ATOM wndClassForWindow;
+		HWND hWndMessage;
 
-public:
-	Win32_UI_Shared();
-	~Win32_UI_Shared();
+	private:
+		ATOM m_wndClassForMessage;
 
-public:
-	static Win32_UI_Shared* get();
+	public:
+		Win32_UI_Shared();
+		~Win32_UI_Shared();
 
-};
+	public:
+		static Win32_UI_Shared* get();
 
-SLIB_UI_NAMESPACE_END
+	};
+
+}
 
 #endif
 

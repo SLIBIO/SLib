@@ -14,153 +14,154 @@
 
 @end
 
-SLIB_UI_NAMESPACE_BEGIN
-
-class _SelectView : public SelectView
+namespace slib
 {
-public:
-	void __applyItemsCount(NSPopUpButton* v)
+
+	class _SelectView : public SelectView
 	{
-		ObjectLocker lock(this);
-		sl_uint32 nOrig = (sl_uint32)([v numberOfItems]);
-		sl_uint32 nNew = (sl_uint32)(m_titles.getCount());
-		if (nOrig == nNew) {
-			return;
-		}
-		if (nOrig > nNew) {
-			if (nNew  > 0) {
-				for (sl_uint32 i = nOrig; i > nNew; i--) {
-					[v removeItemAtIndex:(i - 1)];
+	public:
+		void __applyItemsCount(NSPopUpButton* v)
+		{
+			ObjectLocker lock(this);
+			sl_uint32 nOrig = (sl_uint32)([v numberOfItems]);
+			sl_uint32 nNew = (sl_uint32)(m_titles.getCount());
+			if (nOrig == nNew) {
+				return;
+			}
+			if (nOrig > nNew) {
+				if (nNew  > 0) {
+					for (sl_uint32 i = nOrig; i > nNew; i--) {
+						[v removeItemAtIndex:(i - 1)];
+					}
+				} else {
+					[v removeAllItems];
 				}
 			} else {
-				[v removeAllItems];
-			}
-		} else {
-			for (sl_uint32 i = nOrig; i < nNew; i++) {
-				[v addItemWithTitle:[NSString stringWithFormat:@"%d",i]];
-				NSMenuItem* item = [v lastItem];
-				if (item != nil) {
-					NSString* s = Apple::getNSStringFromString(m_titles.getValueAt(i));
-					if (s == nil) {
-						s = @"";
+				for (sl_uint32 i = nOrig; i < nNew; i++) {
+					[v addItemWithTitle:[NSString stringWithFormat:@"%d",i]];
+					NSMenuItem* item = [v lastItem];
+					if (item != nil) {
+						NSString* s = Apple::getNSStringFromString(m_titles.getValueAt(i));
+						if (s == nil) {
+							s = @"";
+						}
+						[item setTitle:s];
 					}
-					[item setTitle:s];
 				}
 			}
 		}
-	}
-	
-	void __copyItems(NSPopUpButton* v)
-	{
-		[v removeAllItems];
-		__applyItemsCount(v);
-		if (m_indexSelected >= m_titles.getCount()) {
-			m_indexSelected = 0;
-		}
-		if ([v numberOfItems] > 0) {
-			[v selectItemAtIndex:m_indexSelected];
-		}
-	}
-	
-	void __setItemTitle(NSPopUpButton* v, sl_uint32 index, const String& title)
-	{
-		NSString* s = Apple::getNSStringFromString(title);
-		if (s == nil) {
-			s = @"";
-		}
-		NSMenuItem* item = [v itemAtIndex:index];
-		if (item != nil) {
-			[item setTitle:s];
-		}
-	}
-	
-	sl_uint32 __getSelectedIndex(NSPopUpButton* v)
-	{
-		return (sl_uint32)([v indexOfSelectedItem]);
-	}
-	
-	void __onSelectItem(NSPopUpButton* v)
-	{
-		dispatchSelectItem(__getSelectedIndex(v));
-	}
-};
-
-Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* _parent)
-{
-	OSX_VIEW_CREATE_INSTANCE_BEGIN
-	_Slib_OSX_SelectView* handle = [[_Slib_OSX_SelectView alloc] initWithFrame:frame];
-	if (handle != nil) {
-		[handle setPullsDown:NO];
-		((_SelectView*)this)->__copyItems(handle);
 		
-		Ref<Font> font = getFont();
-		NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
-		if (hFont != nil) {
-			[handle setFont:hFont];
+		void __copyItems(NSPopUpButton* v)
+		{
+			[v removeAllItems];
+			__applyItemsCount(v);
+			if (m_indexSelected >= m_titles.getCount()) {
+				m_indexSelected = 0;
+			}
+			if ([v numberOfItems] > 0) {
+				[v selectItemAtIndex:m_indexSelected];
+			}
+		}
+		
+		void __setItemTitle(NSPopUpButton* v, sl_uint32 index, const String& title)
+		{
+			NSString* s = Apple::getNSStringFromString(title);
+			if (s == nil) {
+				s = @"";
+			}
+			NSMenuItem* item = [v itemAtIndex:index];
+			if (item != nil) {
+				[item setTitle:s];
+			}
+		}
+		
+		sl_uint32 __getSelectedIndex(NSPopUpButton* v)
+		{
+			return (sl_uint32)([v indexOfSelectedItem]);
+		}
+		
+		void __onSelectItem(NSPopUpButton* v)
+		{
+			dispatchSelectItem(__getSelectedIndex(v));
+		}
+	};
+
+	Ref<ViewInstance> SelectView::createNativeWidget(ViewInstance* _parent)
+	{
+		OSX_VIEW_CREATE_INSTANCE_BEGIN
+		_Slib_OSX_SelectView* handle = [[_Slib_OSX_SelectView alloc] initWithFrame:frame];
+		if (handle != nil) {
+			[handle setPullsDown:NO];
+			((_SelectView*)this)->__copyItems(handle);
+			
+			Ref<Font> font = getFont();
+			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
+			if (hFont != nil) {
+				[handle setFont:hFont];
+			}
+		}
+		OSX_VIEW_CREATE_INSTANCE_END
+		return ret;
+	}
+
+	void SelectView::_getSelectedIndex_NW()
+	{
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
+			NSPopUpButton* v = (NSPopUpButton*)handle;
+			m_indexSelected = ((_SelectView*)this)->__getSelectedIndex(v);
 		}
 	}
-	OSX_VIEW_CREATE_INSTANCE_END
-	return ret;
-}
 
-void SelectView::_getSelectedIndex_NW()
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
-		NSPopUpButton* v = (NSPopUpButton*)handle;
-		m_indexSelected = ((_SelectView*)this)->__getSelectedIndex(v);
-	}
-}
-
-void SelectView::_select_NW(sl_uint32 index)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
-		NSPopUpButton* v = (NSPopUpButton*)handle;
-		[v selectItemAtIndex:index];
-	}
-}
-
-void SelectView::_refreshItemsCount_NW()
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
-		NSPopUpButton* v = (NSPopUpButton*)handle;
-		((_SelectView*)this)->__applyItemsCount(v);
-	}
-}
-
-void SelectView::_refreshItemsContent_NW()
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
-		NSPopUpButton* v = (NSPopUpButton*)handle;
-		((_SelectView*)this)->__copyItems(v);
-	}
-}
-
-void SelectView::_setItemTitle_NW(sl_uint32 index, const String& title)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
-		NSPopUpButton* v = (NSPopUpButton*)handle;
-		((_SelectView*)this)->__setItemTitle(v, index, title);
-	}
-}
-
-void SelectView::_setFont_NW(const Ref<Font>& font)
-{
-	NSView* handle = UIPlatform::getViewHandle(this);
-	if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
-		NSPopUpButton* v = (NSPopUpButton*)handle;
-		NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
-		if (hFont != nil) {
-			[v setFont:hFont];
+	void SelectView::_select_NW(sl_uint32 index)
+	{
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
+			NSPopUpButton* v = (NSPopUpButton*)handle;
+			[v selectItemAtIndex:index];
 		}
 	}
-}
 
-SLIB_UI_NAMESPACE_END
+	void SelectView::_refreshItemsCount_NW()
+	{
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
+			NSPopUpButton* v = (NSPopUpButton*)handle;
+			((_SelectView*)this)->__applyItemsCount(v);
+		}
+	}
+
+	void SelectView::_refreshItemsContent_NW()
+	{
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
+			NSPopUpButton* v = (NSPopUpButton*)handle;
+			((_SelectView*)this)->__copyItems(v);
+		}
+	}
+
+	void SelectView::_setItemTitle_NW(sl_uint32 index, const String& title)
+	{
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
+			NSPopUpButton* v = (NSPopUpButton*)handle;
+			((_SelectView*)this)->__setItemTitle(v, index, title);
+		}
+	}
+
+	void SelectView::_setFont_NW(const Ref<Font>& font)
+	{
+		NSView* handle = UIPlatform::getViewHandle(this);
+		if (handle != nil && [handle isKindOfClass:[NSPopUpButton class]]) {
+			NSPopUpButton* v = (NSPopUpButton*)handle;
+			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
+			if (hFont != nil) {
+				[v setFont:hFont];
+			}
+		}
+	}
+
+}
 
 @implementation _Slib_OSX_SelectView
 -(id)initWithFrame:(NSRect)frame

@@ -12,28 +12,29 @@
 
 @end
 
-SLIB_UI_NAMESPACE_BEGIN
-
-Ref<ViewInstance> RadioButton::createNativeWidget(ViewInstance* _parent)
+namespace slib
 {
-	OSX_VIEW_CREATE_INSTANCE_BEGIN
-	_Slib_OSX_RadioButton* handle = [[_Slib_OSX_RadioButton alloc] initWithFrame:frame];
-	if (handle != nil) {
-		handle.title = Apple::getNSStringFromString(getText());
-		[handle setButtonType:NSRadioButton];
-		[handle setState: (isChecked() ? NSOnState : NSOffState)];
-		
-		Ref<Font> font = getFont();
-		NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
-		if (hFont != nil) {
-			[handle setFont:hFont];
-		}
-	}
-	OSX_VIEW_CREATE_INSTANCE_END
-	return ret;
-}
 
-SLIB_UI_NAMESPACE_END
+	Ref<ViewInstance> RadioButton::createNativeWidget(ViewInstance* _parent)
+	{
+		OSX_VIEW_CREATE_INSTANCE_BEGIN
+		_Slib_OSX_RadioButton* handle = [[_Slib_OSX_RadioButton alloc] initWithFrame:frame];
+		if (handle != nil) {
+			handle.title = Apple::getNSStringFromString(getText());
+			[handle setButtonType:NSRadioButton];
+			[handle setState: (isChecked() ? NSOnState : NSOffState)];
+			
+			Ref<Font> font = getFont();
+			NSFont* hFont = GraphicsPlatform::getNSFont(font.get());
+			if (hFont != nil) {
+				[handle setFont:hFont];
+			}
+		}
+		OSX_VIEW_CREATE_INSTANCE_END
+		return ret;
+	}
+
+}
 
 @implementation _Slib_OSX_RadioButton
 -(id)initWithFrame:(NSRect)frame
